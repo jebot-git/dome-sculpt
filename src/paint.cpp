@@ -3,6 +3,7 @@
 #include "texture-set-resample.hpp"
 #include "source-paint-parameters.hpp"
 #include "paint-overlay-packet.hpp"
+#include "current-paint-preview.hpp"
 #include "emission-paint-access.hpp"
 #include "native-weight-paint-access.hpp"
 #include "native-weight-state.hpp"
@@ -195,6 +196,11 @@ struct PaintedMesh::CompositeCache {
   uint64_t native_emission_token=0;
   CompositeFactors native_emission_factors{};
   std::weak_ptr<const TextureMaps> native_emission_preview;
+  std::weak_ptr<const detail::CurrentGridPaintPreview> current_grid_preview;
+  using GridKey=std::tuple<uint64_t,uintptr_t,uintptr_t,std::array<uint32_t,9>>;
+  struct GridEntry {std::weak_ptr<const detail::CurrentGridPaintPreview> owner;uint64_t used=0;};
+  std::map<GridKey,GridEntry> current_grids;
+  uint64_t current_grid_access=0;
 };
 PaintCompositeCacheStats paint_composite_cache_stats(){
   auto &cache=composite_retention();std::lock_guard lock(cache.mutex);
@@ -1038,6 +1044,67 @@ std::shared_ptr<const detail::PaintOverlayPacket> detail::PaintOverlayFactory::c
     }
   }
   paint_compute::checkpoint(cancelled);return packet;
+}
+std::shared_ptr<const TextureMaps> detail::PaintOverlayFactory::capture_current_grid(
+    const PaintedMesh &paint,const Material &material,const std::function<bool()> &cancelled){
+  paint_compute::checkpoint(cancelled);material.validate();
+  if(paint.source_maps_||paint.baked_||paint.color_projection_||paint.normal_projection_||
+     paint.surface_->paint_domain||paint.sampling_attachment_||paint.source_sampling_prepared()||
+     paint.surface_->diagnostics.policy!=PaintUvPolicy::Strict)
+    throw std::invalid_argument("Current-grid GPU preview requires its actual plain writable grid");
+  auto &cache=*paint.composite_cache_;std::lock_guard lock(cache.mutex);
+  auto previous=cache.current_grid_preview.lock();
+  const auto padding=std::shared_ptr<const std::vector<int32_t>>(paint.surface_,&paint.surface_->padding);
+  const std::array<float,9> factors{material.color[0],material.color[1],material.color[2],material.color[3],
+    material.emissive[0],material.emissive[1],material.emissive[2],material.metallic,material.roughness};
+  const auto key=PaintedMesh::CompositeCache::GridKey{paint.composite_token_,uintptr_t(paint.mesh_owner().get()),uintptr_t(padding.get()),std::bit_cast<std::array<uint32_t,9>>(factors)};
+  if(cache.current_grid_access==UINT64_MAX){for(auto&[key,value]:cache.current_grids)value.used=0;cache.current_grid_access=0;}
+  const auto access=++cache.current_grid_access;
+  if(auto found=cache.current_grids.find(key);found!=cache.current_grids.end()){
+    const auto held=found->second.owner.lock();
+    if(held&&held->matches_material(material)&&held->geometry()==paint.mesh_owner()&&
+       !held->geometry().owner_before(paint.mesh_owner())&&!paint.mesh_owner().owner_before(held->geometry())&&
+       held->layers()->padding()==padding&&!held->layers()->padding().owner_before(padding)&&!padding.owner_before(held->layers()->padding())){
+      found->second.used=access;cache.current_grid_preview=held;
+      auto maps=std::make_shared<TextureMaps>();maps->transparent=held->transparent();maps->current_grid_preview=held;return maps;
+    }
+    cache.current_grids.erase(found);
+  }
+  auto packet=std::shared_ptr<CurrentGridPaintPreview>(new CurrentGridPaintPreview);
+  packet->geometry_=paint.mesh_owner();packet->layers_=capture(paint,cancelled);
+  packet->factors_=factors;
+  packet->physical_=overlay_uses_float_emission(*packet->layers_)||
+    std::any_of(material.emissive.begin(),material.emissive.end(),[](float value){return value>1;});
+  const auto r=paint.resolution(),columns=r/32;const auto layers=packet->layers_->layers();
+  packet->transparent_tiles_.resize(size_t(columns)*columns);
+  const auto old=previous;
+  bool compatible=old&&old->factors_[3]==packet->factors_[3]&&
+    old->layers_->padding()==packet->layers_->padding()&&
+    !old->layers_->padding().owner_before(packet->layers_->padding())&&!packet->layers_->padding().owner_before(old->layers_->padding())&&old->layers_->layers().size()==layers.size();
+  if(compatible)for(size_t i=0;i<layers.size();++i)
+    compatible&=old->layers_->layers()[i].opacity==layers[i].opacity;
+  packet->transparent_=material.color[3]<.999f&&
+    std::find(packet->layers_->padding()->begin(),packet->layers_->padding()->end(),-1)!=packet->layers_->padding()->end();
+  for(size_t tile=0;tile<packet->transparent_tiles_.size();++tile){
+    if((tile&63)==0)paint_compute::checkpoint(cancelled);
+    bool reuse=compatible;
+    if(reuse)for(size_t i=0;i<layers.size();++i)reuse&=old->layers_->layers()[i].tiles[tile]==layers[i].tiles[tile];
+    bool transparent=reuse?old->transparent_tiles_[tile]:false;
+    if(!reuse)for(uint32_t y=0;y<32&&!transparent;++y)for(uint32_t x=0;x<32;++x){
+      const auto px=uint32_t(tile%columns)*32+x,py=uint32_t(tile/columns)*32+y;
+      if(packet->layers_->padding()->at(size_t(py)*r+px)==int32_t(size_t(py)*r+px)&&packet->alpha_texel(px,py)<.999f){transparent=true;break;}
+    }
+    packet->transparent_tiles_[tile]=transparent;packet->transparent_|=transparent;
+  }
+  paint_compute::checkpoint(cancelled);
+  auto maps=std::make_shared<TextureMaps>();maps->transparent=packet->transparent_;
+  maps->current_grid_preview=packet;packet->self_=packet;
+  cache.current_grid_preview=packet;
+  // Weak, bounded LRU metadata: simultaneous duplicate actors/materials must
+  // keep their own unchanged data keys instead of invalidating one last entry.
+  if(cache.current_grids.size()>=1024){auto oldest=cache.current_grids.begin();for(auto it=cache.current_grids.begin();it!=cache.current_grids.end();++it){if(it->second.owner.expired()){oldest=it;break;}if(it->second.used<oldest->second.used)oldest=it;}cache.current_grids.erase(oldest);}
+  try{cache.current_grids.emplace(key,PaintedMesh::CompositeCache::GridEntry{packet,access});}catch(const std::bad_alloc&){}
+  return maps;
 }
 std::shared_ptr<const detail::PaintOverlayPacket> detail::PaintOverlayFactory::capture_native_emission(
     const PaintedMesh &paint,const std::function<bool()> &cancelled) {
@@ -2343,7 +2410,7 @@ PaintNormalUvProjectionResult SourceNormalPreparationAccess::reproject(const Pai
   auto projection=std::make_shared<PaintNormalProjection>();projection->pbr=std::move(pbr);projection->mtoon=std::move(toon);projection->validate(r);result.projection=std::move(projection);stop();return result;
 }
 void BakedTextures::validate(uint32_t resolution) const {
-  if (maps.overlay || maps.source_maps || maps.source_only || maps.baked_base || maps.color_projection || maps.pbr_transparent || !maps.emission_coverage.rgba.empty() || maps.emission_coverage.width || maps.emission_coverage.height || !maps.color_coverage.rgba.empty() || maps.color_coverage.width || maps.color_coverage.height || !maps.baked_normal.rgba.empty() || maps.baked_normal.width || maps.baked_normal.height || !maps.baked_coverage.rgba.empty() || maps.baked_coverage.width || maps.baked_coverage.height) throw std::invalid_argument("Attach original maps through from_maps, not a baked payload");
+  if (maps.current_grid_preview || maps.overlay || maps.source_maps || maps.source_only || maps.baked_base || maps.color_projection || maps.pbr_transparent || !maps.emission_coverage.rgba.empty() || maps.emission_coverage.width || maps.emission_coverage.height || !maps.color_coverage.rgba.empty() || maps.color_coverage.width || maps.color_coverage.height || !maps.baked_normal.rgba.empty() || maps.baked_normal.width || maps.baked_normal.height || !maps.baked_coverage.rgba.empty() || maps.baked_coverage.width || maps.baked_coverage.height) throw std::invalid_argument("Attach original maps through from_maps, not a baked payload");
   if(size_t(color_interpretation)>1 || (color_interpretation==BakedColorInterpretation::ResolvedPbr)!=!maps.pbr_color.rgba.empty())
     throw std::invalid_argument("Baked PBR color interpretation is incomplete");
   if(size_t(normal_interpretation)>1||maps.normal_projection||

@@ -2,8 +2,11 @@
 #pragma once
 #include "dome/render.hpp"
 #include "paint-overlay-packet.hpp"
+#include "render-paint-state.hpp"
+#include "render-store-ledger.hpp"
 #include <map>
 #include <tuple>
+#include <set>
 #include <cstring>
 #include <algorithm>
 #include <cstdint>
@@ -12,17 +15,23 @@ namespace dome::detail {
 // is flattened into them: original sampling and absolute background stay live.
 class PaintOverlayCompiler {
 public:
+ using Ledger=ContextStoreLedger;
  struct Resource {
+  std::array<Ledger::Store,5> stores;
   std::array<GLuint,5> planes{};size_t bytes=0;uint32_t resolution=0;
   std::shared_ptr<const PaintOverlayPacket> owner;bool pbr=false;
  };
 private:
+public:
  using Key=std::pair<const PaintOverlayPacket*,bool>;
+ using Selection=std::set<Key>;
+private:
  static std::shared_ptr<const PaintOverlayPacket> contribution(const std::shared_ptr<const PaintOverlayPacket> &packet){
   if(!packet)throw std::invalid_argument("Missing immutable overlay input");
   return packet->contribution_owner()?packet->contribution_owner():packet;
  }
  std::map<Key,Resource> cache_;GLuint program_=0,vao_=0;
+ std::shared_ptr<Ledger> ledger_;Ledger::Group group_=0;bool own_ledger_=false;
  static GLuint shader(GLenum type,const char *source){
   GLuint id=glCreateShader(type);if(!id)throw std::runtime_error("Cannot allocate overlay shader");glShaderSource(id,1,&source,nullptr);glCompileShader(id);GLint ok=0;glGetShaderiv(id,GL_COMPILE_STATUS,&ok);
   if(!ok){char message[4096]{};glGetShaderInfoLog(id,sizeof(message),nullptr,message);glDeleteShader(id);throw std::runtime_error(message);}return id;
@@ -57,21 +66,10 @@ void main(){
   }catch(...){if(p)glDeleteProgram(p);if(v)glDeleteShader(v);if(f)glDeleteShader(f);if(vao_)glDeleteVertexArrays(1,&vao_);vao_=0;throw;}
   glDeleteShader(v);glDeleteShader(f);
  }
- struct State {
-  GLint fbo=0,viewport[4]{},program=0,vao=0,active=0,unpack=0,buffer=0;GLint polygon[2]{};std::vector<GLboolean> clips,blending;std::vector<std::array<GLboolean,4>> colours;
-  static constexpr std::array<GLenum,10> switches{GL_DEPTH_TEST,GL_CULL_FACE,GL_SCISSOR_TEST,GL_STENCIL_TEST,GL_FRAMEBUFFER_SRGB,GL_RASTERIZER_DISCARD,GL_SAMPLE_ALPHA_TO_COVERAGE,GL_SAMPLE_COVERAGE,GL_DITHER,GL_SAMPLE_MASK};
-  std::array<GLboolean,switches.size()> enabled{};std::array<GLint,8> two_d{},tbo{},sampler{};
-  static constexpr std::array<GLenum,6> stores{GL_UNPACK_ALIGNMENT,GL_UNPACK_ROW_LENGTH,GL_UNPACK_IMAGE_HEIGHT,GL_UNPACK_SKIP_PIXELS,GL_UNPACK_SKIP_ROWS,GL_UNPACK_SKIP_IMAGES};std::array<GLint,stores.size()> values{};
-  State(){GLint draw=0,clip=0;glGetIntegerv(GL_MAX_DRAW_BUFFERS,&draw);glGetIntegerv(GL_MAX_CLIP_DISTANCES,&clip);colours.resize(size_t(std::max(0,draw)));blending.resize(colours.size());clips.resize(size_t(std::max(0,clip)));glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING,&fbo);glGetIntegerv(GL_VIEWPORT,viewport);glGetIntegerv(GL_CURRENT_PROGRAM,&program);glGetIntegerv(GL_VERTEX_ARRAY_BINDING,&vao);glGetIntegerv(GL_ACTIVE_TEXTURE,&active);glGetIntegerv(GL_PIXEL_UNPACK_BUFFER_BINDING,&unpack);glGetIntegerv(GL_TEXTURE_BUFFER_BINDING,&buffer);for(size_t i=0;i<colours.size();++i){glGetBooleani_v(GL_COLOR_WRITEMASK,GLuint(i),colours[i].data());blending[i]=glIsEnabledi(GL_BLEND,GLuint(i));}glDisable(GL_BLEND);glGetIntegerv(GL_POLYGON_MODE,polygon);glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);for(size_t i=0;i<clips.size();++i){clips[i]=glIsEnabled(GL_CLIP_DISTANCE0+i);glDisable(GL_CLIP_DISTANCE0+i);}
-   for(size_t i=0;i<switches.size();++i){enabled[i]=glIsEnabled(switches[i]);glDisable(switches[i]);}glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE);glBindBuffer(GL_PIXEL_UNPACK_BUFFER,0);
-   for(size_t i=0;i<stores.size();++i){glGetIntegerv(stores[i],&values[i]);glPixelStorei(stores[i],i==0?1:0);}
-   for(size_t i=0;i<8;++i){glActiveTexture(GL_TEXTURE0+i);glGetIntegerv(GL_TEXTURE_BINDING_2D,&two_d[i]);glGetIntegerv(GL_TEXTURE_BINDING_BUFFER,&tbo[i]);glGetIntegeri_v(GL_SAMPLER_BINDING,GLuint(i),&sampler[i]);glBindSampler(GLuint(i),0);}
-  }
-  ~State(){glPolygonMode(GL_FRONT_AND_BACK,GLenum(polygon[0]));for(size_t i=0;i<clips.size();++i)if(clips[i])glEnable(GL_CLIP_DISTANCE0+i);else glDisable(GL_CLIP_DISTANCE0+i);for(size_t i=0;i<8;++i){glActiveTexture(GL_TEXTURE0+i);glBindTexture(GL_TEXTURE_2D,GLuint(two_d[i]));glBindTexture(GL_TEXTURE_BUFFER,GLuint(tbo[i]));glBindSampler(GLuint(i),GLuint(sampler[i]));}glActiveTexture(GLenum(active));glBindBuffer(GL_TEXTURE_BUFFER,GLuint(buffer));glBindBuffer(GL_PIXEL_UNPACK_BUFFER,GLuint(unpack));for(size_t i=0;i<stores.size();++i)glPixelStorei(stores[i],values[i]);for(size_t i=0;i<switches.size();++i)if(enabled[i])glEnable(switches[i]);else glDisable(switches[i]);for(size_t i=0;i<colours.size();++i){glColorMaski(GLuint(i),colours[i][0],colours[i][1],colours[i][2],colours[i][3]);if(blending[i])glEnablei(GL_BLEND,GLuint(i));else glDisablei(GL_BLEND,GLuint(i));}glBindFramebuffer(GL_DRAW_FRAMEBUFFER,GLuint(fbo));glViewport(viewport[0],viewport[1],viewport[2],viewport[3]);glUseProgram(GLuint(program));glBindVertexArray(GLuint(vao));}
- };
+ using State=PaintCompilerState;
  struct Temporary {
-  std::array<GLuint,4> buffers{},views{},baked{};GLuint fbo=0;
-  ~Temporary(){glDeleteBuffers(4,buffers.data());glDeleteTextures(4,views.data());glDeleteTextures(4,baked.data());if(fbo)glDeleteFramebuffers(1,&fbo);}
+  std::array<GLuint,4> buffers{},views{},baked{};std::array<Ledger::Store,4> buffer_stores,view_stores,baked_stores;GLuint fbo=0;
+  ~Temporary(){if(fbo)glDeleteFramebuffers(1,&fbo);}
  };
  static void image(GLuint name,uint32_t width,uint32_t height,GLenum internal,GLenum format,const void *pixels){glBindTexture(GL_TEXTURE_2D,name);glTexImage2D(GL_TEXTURE_2D,0,GLint(internal),GLsizei(width),GLsizei(height),0,format,GL_UNSIGNED_BYTE,pixels);glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);}
  Resource build(std::shared_ptr<const PaintOverlayPacket> packet,bool pbr,size_t budget,size_t working_budget){
@@ -108,22 +106,24 @@ void main(){
   if(common.empty())common.push_back({});if(physical.empty())physical.push_back(0);
   State state;initialise();Temporary temp;
   try{
-   glGenBuffers(4,temp.buffers.data());glGenTextures(4,temp.views.data());glGenTextures(4,temp.baked.data());glGenTextures(5,result.planes.data());glGenFramebuffers(1,&temp.fbo);
-   auto buffer=[&](size_t n,GLenum format,size_t bytes,const void *data){glActiveTexture(GL_TEXTURE0+n);glBindBuffer(GL_TEXTURE_BUFFER,temp.buffers[n]);glBufferData(GL_TEXTURE_BUFFER,GLsizeiptr(bytes),data,GL_STATIC_DRAW);glBindTexture(GL_TEXTURE_BUFFER,temp.views[n]);glTexBuffer(GL_TEXTURE_BUFFER,format,temp.buffers[n]);};
+   glGenFramebuffers(1,&temp.fbo);if(!temp.fbo)throw std::runtime_error("Overlay framebuffer name allocation failed");
+   auto buffer=[&](size_t n,GLenum format,size_t bytes,const void *data){temp.buffer_stores[n]=ledger_->create(Ledger::Kind::Buffer,bytes,Ledger::Domain::Material,group_);temp.buffers[n]=temp.buffer_stores[n].name();temp.view_stores[n]=ledger_->create(Ledger::Kind::Texture,0,Ledger::Domain::Material,group_,std::span(&temp.buffer_stores[n],1));temp.views[n]=temp.view_stores[n].name();glActiveTexture(GL_TEXTURE0+n);glBindBuffer(GL_TEXTURE_BUFFER,temp.buffers[n]);glBufferData(GL_TEXTURE_BUFFER,GLsizeiptr(bytes),data,GL_STATIC_DRAW);glBindTexture(GL_TEXTURE_BUFFER,temp.views[n]);glTexBuffer(GL_TEXTURE_BUFFER,format,temp.buffers[n]);};
    buffer(0,GL_RGBA32UI,common.size()*16,common.data());buffer(1,GL_R32F,physical.size()*4,physical.data());buffer(2,GL_RG32I,offsets.size()*8,offsets.data());buffer(3,GL_R32I,pixels*4,input.padding()->data());
    std::array<uint8_t,4> zero{};for(size_t n=0;n<4;++n){glActiveTexture(GL_TEXTURE4+n);const auto baked=input.baked();const Image *im=nullptr;if(baked&&n<3)im=n==0?(pbr&&baked->color_interpretation==BakedColorInterpretation::ResolvedPbr?&baked->maps.pbr_color:&baked->maps.color):n==1?&baked->maps.metal_rough:&baked->maps.emission;
+    temp.baked_stores[n]=ledger_->create(Ledger::Kind::Texture,baked?pixels*(n==3?1:4):(n==3?1:4),Ledger::Domain::Material,group_);temp.baked[n]=temp.baked_stores[n].name();
     image(temp.baked[n],baked?input.resolution():1,baked?input.resolution():1,n==3?GL_R8:GL_RGBA8,n==3?GL_RED:GL_RGBA,baked?(n==3?static_cast<const void*>(baked->coverage.data()):static_cast<const void*>(im->rgba.data())):zero.data());}
-   glBindFramebuffer(GL_DRAW_FRAMEBUFFER,temp.fbo);std::array<GLenum,5> attachments{};for(size_t n=0;n<5;++n){glBindTexture(GL_TEXTURE_2D,result.planes[n]);glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA32F,GLsizei(input.resolution()),GLsizei(input.resolution()),0,GL_RGBA,GL_FLOAT,nullptr);glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);attachments[n]=GL_COLOR_ATTACHMENT0+n;glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER,attachments[n],GL_TEXTURE_2D,result.planes[n],0);}glDrawBuffers(5,attachments.data());
+   glBindFramebuffer(GL_DRAW_FRAMEBUFFER,temp.fbo);std::array<GLenum,5> attachments{};for(size_t n=0;n<5;++n){result.stores[n]=ledger_->create(Ledger::Kind::Texture,result.bytes/5,Ledger::Domain::Material,group_);result.planes[n]=result.stores[n].name();glBindTexture(GL_TEXTURE_2D,result.planes[n]);glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA32F,GLsizei(input.resolution()),GLsizei(input.resolution()),0,GL_RGBA,GL_FLOAT,nullptr);glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);attachments[n]=GL_COLOR_ATTACHMENT0+n;glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER,attachments[n],GL_TEXTURE_2D,result.planes[n],0);}glDrawBuffers(5,attachments.data());
    if(glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER)!=GL_FRAMEBUFFER_COMPLETE)throw std::runtime_error("GPU overlay framebuffer incomplete");
    for(size_t n=0;n<4;++n){glActiveTexture(GL_TEXTURE4+n);glBindTexture(GL_TEXTURE_2D,temp.baked[n]);}
    glViewport(0,0,GLsizei(input.resolution()),GLsizei(input.resolution()));glUseProgram(program_);glBindVertexArray(vao_);
    const char *names[]{"common_pixels","physical_pixels","tile_offsets","padding","baked_color","baked_orm","baked_emission","baked_coverage"};for(int i=0;i<8;++i)glUniform1i(glGetUniformLocation(program_,names[i]),i);glUniform1i(glGetUniformLocation(program_,"resolution"),GLint(input.resolution()));glUniform1i(glGetUniformLocation(program_,"layer_count"),GLint(input.layers().size()));glUniform1i(glGetUniformLocation(program_,"has_baked"),bool(input.baked()));std::array<float,16> opacity{};for(size_t i=0;i<input.layers().size();++i)opacity[i]=input.layers()[i].opacity;glUniform1fv(glGetUniformLocation(program_,"layer_opacity"),16,opacity.data());glDrawArrays(GL_TRIANGLES,0,3);for(auto plane:result.planes){glBindTexture(GL_TEXTURE_2D,plane);glGenerateMipmap(GL_TEXTURE_2D);}
    if(glGetError()!=GL_NO_ERROR)throw std::runtime_error("GPU sparse overlay compilation failed");
-  }catch(...){glDeleteTextures(5,result.planes.data());throw;}
+  }catch(...){throw;}
   return result;
  }
 public:
- PaintOverlayCompiler()=default;PaintOverlayCompiler(const PaintOverlayCompiler&)=delete;PaintOverlayCompiler&operator=(const PaintOverlayCompiler&)=delete;
+ explicit PaintOverlayCompiler(std::shared_ptr<Ledger> ledger={}):ledger_(ledger?ledger:std::make_shared<Ledger>(Ledger::Limits{2ull*1024*1024*1024,2048,256})),own_ledger_(!ledger){group_=ledger_->create_group();}
+ PaintOverlayCompiler(const PaintOverlayCompiler&)=delete;PaintOverlayCompiler&operator=(const PaintOverlayCompiler&)=delete;
  struct Input {std::shared_ptr<const PaintOverlayPacket> owner;bool pbr=false;};
  static size_t texture_bytes(const std::shared_ptr<const PaintOverlayPacket> &owner){
   if(!owner)throw std::invalid_argument("Missing immutable overlay input");if(owner->empty())return 0;
@@ -131,23 +131,44 @@ public:
  }
  static size_t texture_images(const std::shared_ptr<const PaintOverlayPacket> &owner){if(!owner)throw std::invalid_argument("Missing immutable overlay input");return owner->empty()?0:5;}
 
- void prepare(const std::vector<Input> &inputs,size_t budget=1024ull*1024*1024,size_t max_images=1024,size_t working_budget=256ull*1024*1024){
+ struct Demand {size_t bytes=0,images=0;};
+ static Demand demand(const std::shared_ptr<const PaintOverlayPacket>&owner,bool pbr,size_t working=256ull*1024*1024){
+  if(!owner||owner->empty())return {};size_t common_count=0,physical_count=0;
+  for(const auto&layer:owner->layers())for(size_t t=0;t<layer.tiles.size();++t)if(layer.tiles[t]){++common_count;if(!layer.emission_tiles.empty()&&layer.emission_tiles[t])++physical_count;}
+  if(common_count>working/sizeof(std::pair<const void*,const void*>)||physical_count>(working-common_count*sizeof(std::pair<const void*,const void*>))/sizeof(const void*))throw std::length_error("Overlay store planning exceeds CPU scratch budget");
+  std::vector<std::pair<const void*,const void*>>common;std::vector<const void*>physical;common.reserve(common_count);physical.reserve(physical_count);
+  for(const auto&l:owner->layers())for(size_t t=0;t<l.tiles.size();++t)if(l.tiles[t]){common.emplace_back(l.tiles[t].get(),pbr&&!l.pbr_tiles.empty()?l.pbr_tiles[t].get():nullptr);if(!l.emission_tiles.empty()&&l.emission_tiles[t])physical.push_back(l.emission_tiles[t].get());}
+  auto order=[](const auto&a,const auto&b){auto less=std::less<const void*>{};return less(a.first,b.first)||(a.first==b.first&&less(a.second,b.second));};std::sort(common.begin(),common.end(),order);common.erase(std::unique(common.begin(),common.end()),common.end());std::sort(physical.begin(),physical.end(),std::less<const void*>{});physical.erase(std::unique(physical.begin(),physical.end()),physical.end());
+  const auto r=owner->resolution();const size_t pixels=size_t(r)*r,offsets=std::max(size_t(1),owner->layers().size()*size_t(r/32)*(r/32));
+  return {texture_bytes(owner)+std::max(size_t(1),common.size()*1024)*16+std::max(size_t(1),physical.size()*1024*7)*4+offsets*8+pixels*4+(owner->baked()?pixels*13:13),13};
+ }
+ Demand additional(const std::vector<Input>&inputs,size_t working=256ull*1024*1024)const{Selection seen;Demand total;for(const auto&i:inputs){auto owner=contribution(i.owner);Key key{owner.get(),i.pbr};if(cache_.contains(key)||!seen.insert(key).second)continue;const auto d=demand(owner,i.pbr,working);if(d.bytes>SIZE_MAX-total.bytes||d.images>SIZE_MAX-total.images)throw std::length_error("Overlay store forecast overflow");total.bytes+=d.bytes;total.images+=d.images;}return total;}
+ Ledger::Group group()const noexcept{return group_;}
+ void prepare(const std::vector<Input> &inputs,size_t budget=1024ull*1024*1024,size_t max_images=1024,size_t working_budget=256ull*1024*1024,bool preserve_existing=false){
+  if(own_ledger_)ledger_->collect();
+  const auto delta=additional(inputs,working_budget);const auto used=ledger_->usage(group_);if(used.bytes>budget||delta.bytes>budget-used.bytes||used.images>max_images||delta.images>max_images-used.images)throw std::length_error("Overlay old/new/debt peak exceeds quota");ledger_->preflight(Ledger::Domain::Material,delta.bytes,delta.images);if(delta.bytes)ledger_->mark_used();
   if(inputs.size()>512)throw std::length_error("GPU overlay descriptor count exceeds two interpretations per native object");
   std::map<Key,Input> wanted;size_t bytes=0,images=0;
   for(const auto &input:inputs){auto owner=contribution(input.owner);Key key{owner.get(),input.pbr};if(wanted.contains(key))continue;
     const auto size=texture_bytes(owner);images+=texture_images(owner);if(size>budget-bytes)throw std::length_error("GPU overlay cache byte budget exceeded");
     bytes+=size;wanted.emplace(key,Input{std::move(owner),input.pbr});}
   if(images>max_images)throw std::length_error("GPU overlay image count exceeded");
-  for(auto it=cache_.begin();it!=cache_.end();)if(!wanted.contains(it->first)){glDeleteTextures(5,it->second.planes.data());it=cache_.erase(it);}else ++it;
+
   std::vector<Key> added;added.reserve(wanted.size());
-  try{for(const auto &[key,input]:wanted)if(!cache_.contains(key)){auto value=build(input.owner,input.pbr,budget-(bytes-(texture_bytes(input.owner))),working_budget);try{cache_.emplace(key,std::move(value));added.push_back(key);}catch(...){glDeleteTextures(5,value.planes.data());throw;}}}
-  catch(...){for(const auto &key:added){auto it=cache_.find(key);glDeleteTextures(5,it->second.planes.data());cache_.erase(it);}throw;}
+  try{for(const auto &[key,input]:wanted)if(!cache_.contains(key)){auto value=build(input.owner,input.pbr,budget-(bytes-(texture_bytes(input.owner))),working_budget);cache_.emplace(key,std::move(value));added.push_back(key);}}
+  catch(...){for(const auto &key:added)cache_.erase(key);if(own_ledger_)ledger_->seal_noexcept();throw;}
+  if(own_ledger_&&delta.bytes)ledger_->seal(true);if(!preserve_existing)retain(selection(inputs));
  }
- const Resource &at(const std::shared_ptr<const PaintOverlayPacket> &packet,bool pbr)const{return cache_.at({contribution(packet).get(),pbr});}
- size_t bytes()const{size_t count=0;for(const auto &[key,value]:cache_)count+=value.bytes;return count;}
+ static Selection selection(const std::vector<Input>&inputs){Selection result;for(const auto&i:inputs)result.emplace(contribution(i.owner).get(),i.pbr);return result;}
+ void retain(const Selection&wanted)noexcept {for(auto it=cache_.begin();it!=cache_.end();)if(!wanted.contains(it->first)){it=cache_.erase(it);}else ++it;}
+ // Raw references are invalidated by pruning prepare/retain/clear. Reacquire
+ // before each submission, or mark_used() before submitting retained refs.
+ void mark_used()noexcept{ledger_->mark_used();}
+ const Resource &at(const std::shared_ptr<const PaintOverlayPacket> &packet,bool pbr)const{ledger_->mark_used();return cache_.at({contribution(packet).get(),pbr});}
+ size_t bytes()const{return ledger_->usage(group_).bytes;}
  size_t size()const noexcept{return cache_.size();}
- size_t image_count()const noexcept{size_t n=0;for(const auto &[key,value]:cache_)if(value.bytes)n+=5;return n;}
- void clear(bool release){if(release)for(const auto &[key,value]:cache_)glDeleteTextures(5,value.planes.data());cache_.clear();if(release){if(program_)glDeleteProgram(program_);if(vao_)glDeleteVertexArrays(1,&vao_);}program_=vao_=0;}
+ size_t image_count()const noexcept{return ledger_->usage(group_).images;}
+ void clear(bool release){cache_.clear();if(release){if(program_)glDeleteProgram(program_);if(vao_)glDeleteVertexArrays(1,&vao_);}program_=vao_=0;if(own_ledger_)ledger_->clear(release);}
  ~PaintOverlayCompiler(){clear(true);}
 };
 }

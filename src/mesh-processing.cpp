@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/mesh-processing.hpp"
 #include "affine-query-metric.hpp"
+#include "packed-material-query.hpp"
 #include <bit>
 #include <limits>
 #include <map>
@@ -210,6 +211,15 @@ ClosestPoint closest(Vec3 p, Vec3 a, Vec3 b, Vec3 c) {
   }
   return best;
 }
+// An optional private material-policy proof over immutable BVH triangle ID
+// bounds. Standalone SurfaceQuery never supplies it and retains exact legacy
+// traversal/budget behavior. Spatial bounds and precise hit math are unchanged.
+struct TraversalEligibility {
+ std::span<const std::array<uint32_t,2>> bounds;
+ uint32_t first;
+ const detail::PackedMaterialQuery::Eligibility &eligible;
+ bool allows(size_t node)const {const auto b=bounds[node];return eligible(first+b[0],b[1]-b[0]+1);}
+};
 struct Bvh {
   const Mesh &m;
   std::vector<uint32_t> order;
@@ -287,11 +297,12 @@ struct Bvh {
   double closest_hit(Vec3 p, int n, double best, uint32_t &triangle,
                      Vec3 &position, std::array<float,3> &bary,
                      const SurfaceQueryOptions &options,
-                     size_t &visited) const {
+                     size_t &visited, bool stable_ties=false,const TraversalEligibility*eligibility=nullptr) const {
     cancel(options.cancelled);
     auto &node = nodes[n];
     if (node.box.distance2(p) > best)
       return best;
+    if(eligibility&&!eligibility->allows(size_t(n)))return best;
     if (node.left < 0) {
       for (size_t i = node.start; i < node.start + node.count; i++) {
         if (++visited > options.max_triangle_tests)
@@ -302,7 +313,7 @@ struct Bvh {
           continue;
         auto q = closest(p, point(t, 0), point(t, 1), point(t, 2));
         const double distance = q.distance2;
-        if (distance < best) {
+        if (distance < best || (stable_ties&&distance==best&&(triangle==UINT32_MAX||t<triangle))) {
           if(options.closest_filter&&!options.closest_filter(t,q.bary))continue;
           best = distance;
           triangle = t;
@@ -315,18 +326,19 @@ struct Bvh {
     int a = node.left, b = node.right;
     if (nodes[a].box.distance2(p) > nodes[b].box.distance2(p))
       std::swap(a, b);
-    best = closest_hit(p, a, best, triangle, position, bary, options, visited);
-    return closest_hit(p, b, best, triangle, position, bary, options, visited);
+    best = closest_hit(p, a, best, triangle, position, bary, options, visited, stable_ties, eligibility);
+    return closest_hit(p, b, best, triangle, position, bary, options, visited, stable_ties, eligibility);
   }
   void ray_hit(Vec3 p, Vec3 d, const SurfaceRay &ray, int n, double &best, uint32_t &triangle,
-               std::array<float, 3> &bary, const SurfaceQueryOptions &options, size_t &visited) const {
+               std::array<float, 3> &bary, const SurfaceQueryOptions &options, size_t &visited, bool stable_ties=false,const TraversalEligibility*eligibility=nullptr) const {
     cancel(options.cancelled);
     auto &node = nodes[n];
     if (!node.box.ray(p, d))
       return;
+    if(eligibility&&!eligibility->allows(size_t(n)))return;
     if (node.left >= 0) {
-      ray_hit(p, d, ray, node.left, best, triangle, bary, options, visited);
-      ray_hit(p, d, ray, node.right, best, triangle, bary, options, visited);
+      ray_hit(p, d, ray, node.left, best, triangle, bary, options, visited, stable_ties, eligibility);
+      ray_hit(p, d, ray, node.right, best, triangle, bary, options, visited, stable_ties, eligibility);
       return;
     }
     for (size_t i = node.start; i < node.start + node.count; i++) {
@@ -338,6 +350,7 @@ struct Bvh {
       if (!ray.hit(point(t,0),point(t,1),point(t,2),best,distance,coordinates))
         continue;
       if (options.ray_filter && !options.ray_filter(t, coordinates)) continue;
+      if(stable_ties&&distance==best&&triangle!=UINT32_MAX&&t>triangle)continue;
       best = distance;
       triangle = t;
       bary = coordinates;
@@ -398,25 +411,7 @@ struct Bvh {
     return votes >= 2;
   }
 };
-} // namespace
-struct SurfaceQuery::Impl {
-  // Public construction retains its old defensive Mesh copy. Only the sealed
-  // private placed-chunk factory can share an actually const geometry owner.
-  Mesh copied;
-  std::shared_ptr<const Mesh> immutable;
-  const Mesh &mesh;
-  Bvh tree;
-  Impl(const Mesh &m, const std::function<bool()> &fn)
-      : copied(m),mesh(copied),tree(mesh, fn) {}
-  Impl(std::shared_ptr<const Mesh> m,const std::function<bool()> &fn,size_t nodes)
-      : immutable(std::move(m)),mesh(*immutable),
-        tree(mesh,fn?std::function<bool()>(std::cref(fn)):std::function<bool()>{},nodes) {
-    // Build-only borrowed callback. Never retain a model/Scene callback or a
-    // reference to a completed worker operation in the immutable query owner.
-    tree.cancelled={};
-  }
-  SurfaceHit hit(uint32_t triangle, Vec3 position, std::array<float, 3> bary,
-                 float distance) const {
+SurfaceHit packed_query_hit(const Mesh&mesh,uint32_t triangle,Vec3 position,std::array<float,3>bary,float distance){
     auto a = mesh.indices[triangle * 3], b = mesh.indices[triangle * 3 + 1],
          c = mesh.indices[triangle * 3 + 2];
     auto n = mesh.normals[a] * bary[0] + mesh.normals[b] * bary[1] +
@@ -432,6 +427,31 @@ struct SurfaceQuery::Impl {
          float(geometric[2]/magnitude)};
     }
     return {triangle, position, normalized(n), bary, distance};
+}
+} // namespace
+struct SurfaceQuery::Impl {
+  // Public construction retains its old defensive Mesh copy. Only the sealed
+  // private placed-chunk factory can share an actually const geometry owner.
+  Mesh copied;
+  std::shared_ptr<const Mesh> immutable;
+  const Mesh &mesh;
+  Bvh tree;
+  Impl(const Mesh &m, const std::function<bool()> &fn)
+      : copied(m),mesh(copied),tree(mesh, fn) {
+    // Construction callbacks may own worker/model state. The completed BVH
+    // never uses this build-only callback during later queries.
+    tree.cancelled={};
+  }
+  Impl(std::shared_ptr<const Mesh> m,const std::function<bool()> &fn,size_t nodes)
+      : immutable(std::move(m)),mesh(*immutable),
+        tree(mesh,fn?std::function<bool()>(std::cref(fn)):std::function<bool()>{},nodes) {
+    // Build-only borrowed callback. Never retain a model/Scene callback or a
+    // reference to a completed worker operation in the immutable query owner.
+    tree.cancelled={};
+  }
+  SurfaceHit hit(uint32_t triangle, Vec3 position, std::array<float, 3> bary,
+                 float distance) const {
+    return packed_query_hit(mesh,triangle,position,bary,distance);
   }
 };
 SurfaceQuery::SurfaceQuery(const Mesh &m, const std::function<bool()> &fn) {
@@ -724,6 +744,89 @@ CleanupResult cleanup_mesh(const Mesh &m, const CleanupOptions &o) {
   cancel(o.cancelled);
   return out;
 }
+
+namespace detail {
+namespace {
+size_t packed_sum(size_t a,size_t n,size_t width=1){if(width&&n>(SIZE_MAX-a)/width)throw std::length_error("Packed query byte forecast overflow");return a+n*width;}
+size_t packed_mesh_bytes(const Mesh&m){size_t n=0;n=packed_sum(n,m.positions.size(),sizeof(Vec3));n=packed_sum(n,m.normals.size(),sizeof(Vec3));n=packed_sum(n,m.uv.size(),sizeof(std::array<float,2>));n=packed_sum(n,m.indices.size(),sizeof(uint32_t));n=packed_sum(n,m.uv_pins.size());return packed_sum(n,m.uv_seams.size());}
+void validate_packed_original(const Mesh&m,const std::function<bool()>&fn){
+ if(m.positions.empty()||m.indices.empty()||m.indices.size()%3||m.indices.size()/3>UINT32_MAX)throw std::invalid_argument("Invalid original packed query size");
+ if(m.normals.size()!=m.positions.size()||(!m.uv.empty()&&m.uv.size()!=m.positions.size())||(!m.uv_pins.empty()&&m.uv_pins.size()!=m.positions.size())||(!m.uv_seams.empty()&&m.uv_seams.size()!=m.indices.size()))throw std::invalid_argument("Invalid original packed query attributes");
+ for(size_t v=0;v<m.positions.size();++v){if((v&511)==0)cancel(fn);const auto p=m.positions[v];if(std::max({std::abs(p.x),std::abs(p.y),std::abs(p.z)})>100)throw std::invalid_argument("Mesh outside 100m authoring workspace");if(!finite(p)||!finite(m.normals[v])||!std::isfinite(length(m.normals[v])))throw std::invalid_argument("Nonfinite original packed query vertex");if(!m.uv.empty()&&(!std::isfinite(m.uv[v][0])||!std::isfinite(m.uv[v][1])))throw std::invalid_argument("Nonfinite original packed query UV");if(!m.uv_pins.empty()&&m.uv_pins[v]>1)throw std::invalid_argument("Invalid original packed query pin");}
+ for(size_t c=0;c<m.indices.size();c+=3){if(c%1536==0)cancel(fn);for(size_t k=0;k<3;++k){if(m.indices[c+k]>=m.positions.size())throw std::invalid_argument("Original packed query index out of range");if(!m.uv_seams.empty()&&m.uv_seams[c+k]>1)throw std::invalid_argument("Invalid original packed query seam");}const auto a=m.positions[m.indices[c]],b=m.positions[m.indices[c+1]],d=m.positions[m.indices[c+2]];const auto cross=precise_cross(difference(b,a),difference(d,a));if(cross[0]==0&&cross[1]==0&&cross[2]==0)throw std::invalid_argument("Degenerate original packed query face");}
+ cancel(fn);
+}
+std::vector<uint32_t> packed_references(const Mesh&m,size_t first,size_t triangles,const std::function<bool()>&fn){
+ std::vector<uint32_t>r;r.reserve(triangles*3);for(size_t c=0;c<triangles*3;++c){if((c&1023)==0)cancel(fn);r.push_back(m.indices[first*3+c]);}size_t comparisons=0;std::sort(r.begin(),r.end(),[&](uint32_t a,uint32_t b){if((++comparisons&2047)==0)cancel(fn);return a<b;});r.erase(std::unique(r.begin(),r.end()),r.end());cancel(fn);return r;
+}
+}
+struct PackedMaterialQuery::Impl {
+ struct Plan {size_t first,triangles,vertices,nodes;};
+ struct Part {
+  Mesh mesh;uint32_t first;Bvh tree;std::vector<std::array<uint32_t,2>>intervals;
+  Part(Mesh m,uint32_t offset,size_t nodes,const std::function<bool()>&fn):mesh(std::move(m)),first(offset),tree(mesh,fn?std::function<bool()>(std::cref(fn)):std::function<bool()>{},nodes){
+   tree.cancelled={};intervals.reserve(nodes);intervals.resize(tree.nodes.size());
+   for(size_t i=tree.nodes.size();i-->0;){if((i&511)==0)cancel(fn);const auto&n=tree.nodes[i];uint32_t lo=UINT32_MAX,hi=0;
+    if(n.left<0){for(size_t k=n.start;k<n.start+n.count;++k){lo=std::min(lo,tree.order[k]);hi=std::max(hi,tree.order[k]);}}
+    else{lo=std::min(intervals[size_t(n.left)][0],intervals[size_t(n.right)][0]);hi=std::max(intervals[size_t(n.left)][1],intervals[size_t(n.right)][1]);}
+    intervals[i]={lo,hi};
+   }cancel(fn);
+  }
+ };
+ std::unique_ptr<SurfaceQuery>small;
+ Mesh original;std::vector<std::unique_ptr<Part>>parts;Usage used;
+ Impl(const Mesh&m,const std::function<bool()>&fn,Limits limits,size_t metadata){
+  cancel(fn);if(!limits.retained_bytes||!limits.working_bytes||!limits.partitions||limits.partitions>128||!limits.part_triangles||limits.part_triangles>262144||!limits.nodes||limits.nodes>4194304)throw std::invalid_argument("Invalid packed query resource limits");
+  const auto source_bytes=packed_mesh_bytes(m);size_t retained=packed_sum(16384,source_bytes);retained=packed_sum(retained,metadata);
+  if(retained>limits.retained_bytes||retained>limits.working_bytes)throw std::length_error("Original packed query payload/metadata exceeds byte budget before copy");
+  if(m.positions.size()<=2'000'000&&m.indices.size()/3<=2'000'000){
+   const auto n=m.indices.size()/3;const auto nodes=n?chunk_bvh_nodes(n):0;
+   // The unchanged legacy vector grows geometrically; include its retained
+   // capacity and concurrent old/new node storage, not only live node count.
+   retained=packed_sum(retained,n,sizeof(uint32_t));retained=packed_sum(retained,nodes,2*sizeof(Bvh::Node));const auto working=packed_sum(retained,nodes,sizeof(Bvh::Node));
+   if(nodes>limits.nodes||retained>limits.retained_bytes||working>limits.working_bytes)throw std::length_error("Legacy material query exceeds prospective byte/node budget");
+   small=std::make_unique<SurfaceQuery>(m,fn);used={retained,working,1,nodes,m.positions.size(),false};return;
+  }
+  validate_packed_original(m,fn);const size_t triangles=m.indices.size()/3,count=(triangles+limits.part_triangles-1)/limits.part_triangles;
+  if(count>limits.partitions)throw std::length_error("Packed query partition budget exceeded before copy");
+  retained=packed_sum(retained,count,16384);if(retained>limits.retained_bytes||retained>limits.working_bytes)throw std::length_error("Packed query plan metadata exceeds prospective byte budget");std::vector<Plan>plan;plan.reserve(count);size_t all_nodes=0,vertices=0,peak_refs=0;
+  // Plan one bounded ref list at a time; no input-vertex-sized remap exists.
+  for(size_t first=0;first<triangles;){cancel(fn);const auto n=std::min(limits.part_triangles,triangles-first);if(packed_sum(retained,n*3,sizeof(uint32_t))>limits.working_bytes)throw std::length_error("Packed query planning scratch exceeds byte budget before allocation");const auto refs=packed_references(m,first,n,fn);const auto nodes=chunk_bvh_nodes(n);if(nodes>limits.nodes-all_nodes)throw std::length_error("Packed query total BVH node budget exceeded");all_nodes+=nodes;vertices=packed_sum(vertices,refs.size());retained=packed_sum(retained,refs.size(),2*sizeof(Vec3));retained=packed_sum(retained,n,3*sizeof(uint32_t)+sizeof(uint32_t));retained=packed_sum(retained,nodes,sizeof(Bvh::Node)+sizeof(std::array<uint32_t,2>));peak_refs=std::max(peak_refs,n*3*sizeof(uint32_t));if(retained>limits.retained_bytes||packed_sum(retained,peak_refs)>limits.working_bytes)throw std::length_error("Packed query retained/build byte budget exceeded before source/part copies");plan.push_back({first,n,refs.size(),nodes});first+=n;}
+  const auto working=packed_sum(retained,peak_refs);if(working>limits.working_bytes)throw std::length_error("Packed query build byte budget exceeded");
+  original=m;parts.reserve(count);
+  for(const auto&p:plan){cancel(fn);const auto refs=packed_references(m,p.first,p.triangles,fn);Mesh compact;compact.positions.reserve(p.vertices);compact.normals.reserve(p.vertices);compact.indices.reserve(p.triangles*3);for(size_t v=0;v<refs.size();++v){if((v&511)==0)cancel(fn);compact.positions.push_back(m.positions[refs[v]]);compact.normals.push_back(m.normals[refs[v]]);}for(size_t c=0;c<p.triangles*3;++c){if((c&1023)==0)cancel(fn);const auto index=m.indices[p.first*3+c];const auto found=std::lower_bound(refs.begin(),refs.end(),index);if(found==refs.end()||*found!=index)throw std::logic_error("Packed query reference plan lost a source vertex");compact.indices.push_back(uint32_t(found-refs.begin()));}structural(compact,fn);compact.validate();parts.push_back(std::make_unique<Part>(std::move(compact),uint32_t(p.first),p.nodes,fn));}
+  used={retained,working,count,all_nodes,vertices,true};cancel(fn);
+ }
+ SurfaceQueryOptions mapped(const SurfaceQueryOptions&o,uint32_t first)const{
+  SurfaceQueryOptions result;result.max_triangle_tests=o.max_triangle_tests;result.closest_maximum=o.closest_maximum;if(o.cancelled)result.cancelled=std::cref(o.cancelled);
+  if(o.triangle_filter)result.triangle_filter=[&o,first](uint32_t t){return o.triangle_filter(first+t);};
+  if(o.ray_filter)result.ray_filter=[&o,first](uint32_t t,const std::array<float,3>&b){return o.ray_filter(first+t,b);};
+  if(o.closest_filter)result.closest_filter=[&o,first](uint32_t t,const std::array<float,3>&b){return o.closest_filter(first+t,b);};
+  return result;
+ }
+};
+PackedMaterialQuery::PackedMaterialQuery(const Mesh&m,const std::function<bool()>&fn):PackedMaterialQuery(m,fn,Limits{}){}
+PackedMaterialQuery::PackedMaterialQuery(const Mesh&m,const std::function<bool()>&fn,Limits l,size_t metadata):impl_(std::make_unique<Impl>(m,fn,l,metadata)){}
+PackedMaterialQuery::~PackedMaterialQuery()=default;
+const Mesh&PackedMaterialQuery::mesh()const{return impl_->small?impl_->small->mesh():impl_->original;}
+PackedMaterialQuery::Usage PackedMaterialQuery::usage()const noexcept{return impl_->used;}
+SurfaceHit PackedMaterialQuery::closest(Vec3 p)const{return closest(p,{});}
+SurfaceHit PackedMaterialQuery::closest(Vec3 p,const SurfaceQueryOptions&o,const Eligibility&eligible)const{const auto hit=nearest(p,o,eligible);if(!hit)throw std::runtime_error("No eligible source surface triangle");return *hit;}
+std::optional<SurfaceHit>PackedMaterialQuery::nearest(Vec3 p,const SurfaceQueryOptions&o,const Eligibility&eligible)const{const auto hit=nearest_result(p,o,eligible);return hit?std::optional<SurfaceHit>(hit->surface):std::nullopt;}
+std::optional<SurfaceQueryResult>PackedMaterialQuery::nearest_result(Vec3 p,const SurfaceQueryOptions&o,const Eligibility&eligible)const{
+ if(impl_->small)return impl_->small->nearest_result(p,o);cancel(o.cancelled);
+ if(!o.max_triangle_tests||o.max_triangle_tests>2'000'000)throw std::invalid_argument("Invalid closest surface query budget");if(!finite(p)||std::max({std::abs(p.x),std::abs(p.y),std::abs(p.z)})>1000)throw std::invalid_argument("Invalid closest-surface query");if(std::isnan(o.closest_maximum)||o.closest_maximum<=0)throw std::invalid_argument("Invalid closest surface range");
+ double best=std::nextafter(double(o.closest_maximum)*o.closest_maximum,INFINITY);size_t visited=0;std::optional<SurfaceQueryResult>result;
+ for(const auto&part:impl_->parts){auto options=impl_->mapped(o,part->first);const TraversalEligibility policy{part->intervals,part->first,eligible};uint32_t triangle=UINT32_MAX;Vec3 position;std::array<float,3>bary{};const auto distance=part->tree.closest_hit(p,0,best,triangle,position,bary,options,visited,true,eligible?&policy:nullptr);if(triangle==UINT32_MAX)continue;const auto global=part->first+triangle;if(result&&(distance>best||(distance==best&&global>=result->surface.triangle)))continue;auto hit=packed_query_hit(part->mesh,triangle,position,bary,float(std::sqrt(distance)));hit.triangle=global;best=distance;result=SurfaceQueryResult{hit,distance};}cancel(o.cancelled);return result;
+}
+std::optional<SurfaceHit>PackedMaterialQuery::raycast(Vec3 p,Vec3 d,float maximum,const SurfaceQueryOptions&o,const Eligibility&eligible)const{const auto hit=raycast_result(p,d,maximum,o,eligible);return hit?std::optional<SurfaceHit>(hit->surface):std::nullopt;}
+std::optional<SurfaceQueryResult>PackedMaterialQuery::raycast_result(Vec3 p,Vec3 d,float maximum,const SurfaceQueryOptions&o,const Eligibility&eligible)const{
+ if(impl_->small)return impl_->small->raycast_result(p,d,maximum,o);cancel(o.cancelled);if(!o.max_triangle_tests)throw std::invalid_argument("Empty surface ray budget");if(!finite(p)||!finite(d)||!std::isfinite(length(d))||std::max({std::abs(p.x),std::abs(p.y),std::abs(p.z)})>1000||length(d)<1e-12f||!std::isfinite(maximum)||maximum<0||maximum>1000)throw std::invalid_argument("Invalid surface ray");
+ d=normalized(d);const SurfaceRay ray(p,d);double best=maximum;size_t visited=0;std::optional<SurfaceQueryResult>result;
+ for(const auto&part:impl_->parts){auto options=impl_->mapped(o,part->first);const TraversalEligibility policy{part->intervals,part->first,eligible};uint32_t triangle=UINT32_MAX;std::array<float,3>bary{};double distance=best;part->tree.ray_hit(p,d,ray,0,distance,triangle,bary,options,visited,true,eligible?&policy:nullptr);if(triangle==UINT32_MAX)continue;const auto global=part->first+triangle;if(result&&(distance>best||(distance==best&&global>=result->surface.triangle)))continue;auto hit=packed_query_hit(part->mesh,triangle,p+d*float(distance),bary,float(distance));hit.triangle=global;best=distance;result=SurfaceQueryResult{hit,distance*distance};}cancel(o.cancelled);return result;
+}
+} // namespace detail
+
 Volume mesh_to_volume(const Mesh &m, const VoxelizeOptions &o) {
   cancel(o.cancelled);
   if (!std::isfinite(o.voxel_size) || o.voxel_size < .00001f ||

@@ -1,0 +1,784 @@
+{
+  "scope": "Private render-only ordinary current-grid preview; not merged/installed or full painting-backend completion",
+  "base": "775f92b837da757aa5bfb8583e2f426685eade50",
+  "product_source": "1452ddec1d1b298d2c1b4f5a30200d2492c0b9fd",
+  "extended_consumer": "acff27fefa886add190f32be844fc4358a63cdbe",
+  "private_branch": "work/plain-gpu-preview-20261111",
+  "product_paths_unchanged_after_1452": [
+    "src",
+    "include",
+    "third_party",
+    "experiments"
+  ],
+  "strict_sanitizers": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+    "LSAN_OPTIONS": "unset; no suppressions"
+  },
+  "full_owning_builds": {
+    "release_848": {
+      "source": "848780e6cb64047e1c1283c2609c65aaa009b5a8",
+      "targets": [
+        "dome-sculpt",
+        "dome-sculpt-current-paint-preview-native-test",
+        "dome-sculpt-current-paint-preview-gpu-test",
+        "dome-sculpt-paint-composite-native-test",
+        "dome-sculpt-paint-composite-render-test",
+        "dome-sculpt-mtoon-render-test",
+        "dome-sculpt-texture-set-surfaces-test",
+        "dome-sculpt-texture-set-native-test",
+        "dome-sculpt-paint-overlay-gpu-test",
+        "dome-sculpt-source-paint-overlay-test",
+        "dome-sculpt-gpu-color-blur-native-test"
+      ],
+      "returncode": 0,
+      "elapsed": 19.569808959960938,
+      "drift": [],
+      "status": "",
+      "raw": {
+        "path": "artifacts/plain-gpu-preview-build-20261111/receipts/attempt1-848780e6/release-build.json",
+        "sha256": "27271eafa808e8f7c106a671887a35ca865cf2991aadac7c338cc672a72d483e"
+      }
+    },
+    "release_1452": {
+      "source": "1452ddec1d1b298d2c1b4f5a30200d2492c0b9fd",
+      "targets": [
+        "dome-sculpt",
+        "dome-sculpt-current-paint-preview-native-test",
+        "dome-sculpt-current-paint-preview-gpu-test",
+        "dome-sculpt-paint-composite-native-test",
+        "dome-sculpt-paint-composite-render-test",
+        "dome-sculpt-mtoon-render-test",
+        "dome-sculpt-texture-set-surfaces-test",
+        "dome-sculpt-texture-set-native-test",
+        "dome-sculpt-paint-overlay-gpu-test",
+        "dome-sculpt-source-paint-overlay-test",
+        "dome-sculpt-gpu-color-blur-native-test"
+      ],
+      "returncode": 0,
+      "elapsed": 12.923914432525635,
+      "drift": [],
+      "status": "",
+      "raw": {
+        "path": "artifacts/plain-gpu-preview-build-20261111/receipts/qualified-1452ddec/release-build.json",
+        "sha256": "18cdb17845ce9a00dacb80da875a3e184c86dff6ab0b5c945fea2b00409381be"
+      }
+    },
+    "sanitize_1452_fresh_277_steps": {
+      "source": "1452ddec1d1b298d2c1b4f5a30200d2492c0b9fd",
+      "targets": [
+        "dome-sculpt",
+        "dome-sculpt-current-paint-preview-native-test",
+        "dome-sculpt-current-paint-preview-gpu-test",
+        "dome-sculpt-paint-composite-native-test",
+        "dome-sculpt-paint-composite-render-test",
+        "dome-sculpt-mtoon-render-test",
+        "dome-sculpt-texture-set-surfaces-test",
+        "dome-sculpt-texture-set-native-test",
+        "dome-sculpt-paint-overlay-gpu-test",
+        "dome-sculpt-source-paint-overlay-test",
+        "dome-sculpt-gpu-color-blur-native-test"
+      ],
+      "returncode": 0,
+      "elapsed": 729.2051541805267,
+      "drift": [],
+      "status": "",
+      "raw": {
+        "path": "artifacts/plain-gpu-preview-build-20261111/receipts/qualified-1452ddec/sanitize-build.json",
+        "sha256": "ed1325f40551f3804c96080a176ab12389dc13a397703a4ec7a1eb6f53febc47"
+      }
+    }
+  },
+  "consumer_refresh": {
+    "release": {
+      "source": "acff27fefa886add190f32be844fc4358a63cdbe",
+      "targets": [
+        "dome-sculpt",
+        "dome-sculpt-current-paint-preview-native-test",
+        "dome-sculpt-current-paint-preview-gpu-test",
+        "dome-sculpt-paint-composite-native-test",
+        "dome-sculpt-paint-composite-render-test",
+        "dome-sculpt-mtoon-render-test",
+        "dome-sculpt-texture-set-surfaces-test",
+        "dome-sculpt-texture-set-native-test",
+        "dome-sculpt-paint-overlay-gpu-test",
+        "dome-sculpt-source-paint-overlay-test",
+        "dome-sculpt-gpu-color-blur-native-test"
+      ],
+      "returncode": 0,
+      "elapsed": 5.822574853897095,
+      "drift": [],
+      "status": "",
+      "raw": {
+        "path": "artifacts/plain-gpu-preview-build-20261111/receipts/release-build.json",
+        "sha256": "a7cffc2d17696cd97f87b4e0bffb4d8225372a708cdecb08f754cb0d7c1c5827"
+      }
+    },
+    "sanitize": {
+      "source": "acff27fefa886add190f32be844fc4358a63cdbe",
+      "targets": [
+        "dome-sculpt",
+        "dome-sculpt-current-paint-preview-native-test",
+        "dome-sculpt-current-paint-preview-gpu-test",
+        "dome-sculpt-paint-composite-native-test",
+        "dome-sculpt-paint-composite-render-test",
+        "dome-sculpt-mtoon-render-test",
+        "dome-sculpt-texture-set-surfaces-test",
+        "dome-sculpt-texture-set-native-test",
+        "dome-sculpt-paint-overlay-gpu-test",
+        "dome-sculpt-source-paint-overlay-test",
+        "dome-sculpt-gpu-color-blur-native-test"
+      ],
+      "returncode": 0,
+      "elapsed": 19.810539722442627,
+      "drift": [],
+      "status": "",
+      "raw": {
+        "path": "artifacts/plain-gpu-preview-build-20261111/receipts/sanitize-build.json",
+        "sha256": "7f7244bc561f07d67a10904e8aafbcd9cd188c2801f07233768cf8fa7b3f3c88"
+      }
+    }
+  },
+  "qualified_1452_ten_case_runs": {
+    "release": {
+      "source": "1452ddec1d1b298d2c1b4f5a30200d2492c0b9fd",
+      "environment": {
+        "LD_LIBRARY_PATH": "/usr/lib64",
+        "LIBGL_ALWAYS_SOFTWARE": "1",
+        "LP_NUM_THREADS": "2",
+        "OPENBLAS_NUM_THREADS": "2",
+        "OMP_NUM_THREADS": "2"
+      },
+      "results": [
+        {
+          "case": "current-native",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-build-20261111/release/dome-sculpt-current-paint-preview-native-test"
+          ],
+          "returncode": 0,
+          "timeout": false,
+          "elapsed": 0.05067110061645508,
+          "elf_sha256": "54d047c8cff166415eedfba44dd729fd46ba8593ab4b43c30726d0dc091d65d1"
+        },
+        {
+          "case": "current-gpu",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-build-20261111/release/dome-sculpt-current-paint-preview-gpu-test"
+          ],
+          "returncode": 0,
+          "timeout": false,
+          "elapsed": 1.2123112678527832,
+          "elf_sha256": "ef1a35fd84207589da7e7edbf902412888719ac437acd91781ac5069b3d40708"
+        },
+        {
+          "case": "legacy-composite-native",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-build-20261111/release/dome-sculpt-paint-composite-native-test"
+          ],
+          "returncode": 0,
+          "timeout": false,
+          "elapsed": 0.5032789707183838,
+          "elf_sha256": "7eb1aebbc216b133d9839f4b78c573d9c3265b52805840a18a3198486787236b"
+        },
+        {
+          "case": "legacy-composite-render",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-build-20261111/release/dome-sculpt-paint-composite-render-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-build-20261111/release-export"
+          ],
+          "returncode": 0,
+          "timeout": false,
+          "elapsed": 7.928324937820435,
+          "elf_sha256": "e10df19dca5bac6d8905df7724bf8f0ed9bf2eba0911a8307dbe83135222c6d4"
+        },
+        {
+          "case": "texture-set-surfaces",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-build-20261111/release/dome-sculpt-texture-set-surfaces-test"
+          ],
+          "returncode": 0,
+          "timeout": false,
+          "elapsed": 0.05052828788757324,
+          "elf_sha256": "99fb5ae34b5edd786b4e0375e8db9a529e085e8af604bd955785e1ba7d7990dc"
+        },
+        {
+          "case": "texture-set-native",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-build-20261111/release/dome-sculpt-texture-set-native-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-build-20261111/release-sets"
+          ],
+          "returncode": 0,
+          "timeout": false,
+          "elapsed": 0.050585031509399414,
+          "elf_sha256": "17ab11ed98a1ed28848c9410118f351323b7424e7f776fb2f9150cbeab65ca48"
+        },
+        {
+          "case": "legacy-overlay",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-build-20261111/release/dome-sculpt-paint-overlay-gpu-test"
+          ],
+          "returncode": 0,
+          "timeout": false,
+          "elapsed": 0.10108351707458496,
+          "elf_sha256": "c75c477db60ff69252e5edf0951be4b58faffe5a795654dfe57674d6b14d3522"
+        },
+        {
+          "case": "source-overlay",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-build-20261111/release/dome-sculpt-source-paint-overlay-test"
+          ],
+          "returncode": 0,
+          "timeout": false,
+          "elapsed": 0.3028688430786133,
+          "elf_sha256": "1577565d52cf3ed680b332e8404f213c1edaaad073680647a4b3a9c588deeb2c"
+        },
+        {
+          "case": "mtoon-render",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-build-20261111/release/dome-sculpt-mtoon-render-test"
+          ],
+          "returncode": 0,
+          "timeout": false,
+          "elapsed": 2.4743497371673584,
+          "elf_sha256": "8f219bf5c426e3b0c9c9551e71b36a8589a703820381fb0d8cbf7a682d09ca0e"
+        },
+        {
+          "case": "gpu-blur-native-software",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-build-20261111/release/dome-sculpt-gpu-color-blur-native-test",
+            "software",
+            "/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-build-20261111/release-blur"
+          ],
+          "returncode": 0,
+          "timeout": false,
+          "elapsed": 0.20171880722045898,
+          "elf_sha256": "3fd85f79d9c6d099cba1e087daf820c0bd29565cd62af9119b99417d9b19f811"
+        }
+      ],
+      "raw": {
+        "path": "artifacts/plain-gpu-preview-build-20261111/receipts/qualified-1452ddec/release-tests.json",
+        "sha256": "84cb852a8f71e615b0e6fb99ad00b013633dd6637168ff2548f1ab1d6d3a5410"
+      }
+    },
+    "sanitize": {
+      "source": "1452ddec1d1b298d2c1b4f5a30200d2492c0b9fd",
+      "environment": {
+        "LD_LIBRARY_PATH": "/usr/lib64",
+        "LIBGL_ALWAYS_SOFTWARE": "1",
+        "LP_NUM_THREADS": "2",
+        "OPENBLAS_NUM_THREADS": "2",
+        "OMP_NUM_THREADS": "2",
+        "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+        "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+      },
+      "results": [
+        {
+          "case": "current-native",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-build-20261111/sanitize/dome-sculpt-current-paint-preview-native-test"
+          ],
+          "returncode": 0,
+          "timeout": false,
+          "elapsed": 0.25209736824035645,
+          "elf_sha256": "c10bdbf4f1184623009317b22bc1e70414a2cba790a73e82d6d1cf7b8de6822b"
+        },
+        {
+          "case": "current-gpu",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-build-20261111/sanitize/dome-sculpt-current-paint-preview-gpu-test"
+          ],
+          "returncode": 0,
+          "timeout": false,
+          "elapsed": 2.1740779876708984,
+          "elf_sha256": "93d67765105614611d3cb4a00351ec56ebbe4f61462ee07731c7a03f90c206af"
+        },
+        {
+          "case": "legacy-composite-native",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-build-20261111/sanitize/dome-sculpt-paint-composite-native-test"
+          ],
+          "returncode": 0,
+          "timeout": false,
+          "elapsed": 2.266143321990967,
+          "elf_sha256": "653559b0d5942fbe0d03a41a2a5e6375c504579af898c342f7fc4f97b1c96240"
+        },
+        {
+          "case": "legacy-composite-render",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-build-20261111/sanitize/dome-sculpt-paint-composite-render-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-build-20261111/sanitize-export"
+          ],
+          "returncode": 0,
+          "timeout": false,
+          "elapsed": 44.0447096824646,
+          "elf_sha256": "2aab62aedd37e8b6e8c2eab26ebb8c710bae6978f1a2d46095c411ee1fb18460"
+        },
+        {
+          "case": "texture-set-surfaces",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-build-20261111/sanitize/dome-sculpt-texture-set-surfaces-test"
+          ],
+          "returncode": 0,
+          "timeout": false,
+          "elapsed": 0.2015547752380371,
+          "elf_sha256": "e79506c56c0e33c23e030b8352c1a0c502a7261b69d4c7fd5b2a779883d9eace"
+        },
+        {
+          "case": "texture-set-native",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-build-20261111/sanitize/dome-sculpt-texture-set-native-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-build-20261111/sanitize-sets"
+          ],
+          "returncode": 0,
+          "timeout": false,
+          "elapsed": 0.20162630081176758,
+          "elf_sha256": "837bfe3c202838ec356b02351ab9e956b1077d92deeba3f8b36dc6ab55e44098"
+        },
+        {
+          "case": "legacy-overlay",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-build-20261111/sanitize/dome-sculpt-paint-overlay-gpu-test"
+          ],
+          "returncode": 0,
+          "timeout": false,
+          "elapsed": 0.3533446788787842,
+          "elf_sha256": "96a34900c7b3762f6d344a66205afbdfc03aadd62ae6e4dedf05df27d08d5b44"
+        },
+        {
+          "case": "source-overlay",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-build-20261111/sanitize/dome-sculpt-source-paint-overlay-test"
+          ],
+          "returncode": 0,
+          "timeout": false,
+          "elapsed": 0.5558545589447021,
+          "elf_sha256": "f5d1bbcfcf26907ba9968ea589297e5b5035dd8587c8a9b98454f32bac6cb39f"
+        },
+        {
+          "case": "mtoon-render",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-build-20261111/sanitize/dome-sculpt-mtoon-render-test"
+          ],
+          "returncode": 0,
+          "timeout": false,
+          "elapsed": 3.5414316654205322,
+          "elf_sha256": "e7fa7d0142e707f4d6980a760c042a022b5349e574e3bed6544fe607c2c47064"
+        },
+        {
+          "case": "gpu-blur-native-software",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-build-20261111/sanitize/dome-sculpt-gpu-color-blur-native-test",
+            "software",
+            "/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-build-20261111/sanitize-blur"
+          ],
+          "returncode": 0,
+          "timeout": false,
+          "elapsed": 0.7068462371826172,
+          "elf_sha256": "65d52768ec985c5d2cd60e5cf7714980c74c2b4bad028688b709238f0142a6e8"
+        }
+      ],
+      "raw": {
+        "path": "artifacts/plain-gpu-preview-build-20261111/receipts/qualified-1452ddec/sanitize-tests.json",
+        "sha256": "8737979fe6900c6b6901e0586249bc9d3dd66d54f2b91428e7176a3296a7a405"
+      }
+    }
+  },
+  "extended_98815_software": {
+    "release": {
+      "source": "acff27fefa886add190f32be844fc4358a63cdbe",
+      "environment": {
+        "LD_LIBRARY_PATH": "/usr/lib64",
+        "LIBGL_ALWAYS_SOFTWARE": "1",
+        "LP_NUM_THREADS": "2",
+        "OPENBLAS_NUM_THREADS": "2",
+        "OMP_NUM_THREADS": "2"
+      },
+      "results": [
+        {
+          "case": "current-gpu",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-build-20261111/release/dome-sculpt-current-paint-preview-gpu-test"
+          ],
+          "returncode": 0,
+          "timeout": false,
+          "elapsed": 0.8074967861175537,
+          "elf_sha256": "a782a835749a808da35456c2a34177b5af931414d3c3d5bf414bdf9efb815000"
+        }
+      ],
+      "raw": {
+        "path": "artifacts/plain-gpu-preview-build-20261111/receipts/release-extended-tests.json",
+        "sha256": "ae682b44f8d33d4cb430d8a2e57e4b3a877ef14e133e9cfea9dd16c9264b92a0"
+      }
+    },
+    "sanitize": {
+      "source": "acff27fefa886add190f32be844fc4358a63cdbe",
+      "environment": {
+        "LD_LIBRARY_PATH": "/usr/lib64",
+        "LIBGL_ALWAYS_SOFTWARE": "1",
+        "LP_NUM_THREADS": "2",
+        "OPENBLAS_NUM_THREADS": "2",
+        "OMP_NUM_THREADS": "2",
+        "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+        "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+      },
+      "results": [
+        {
+          "case": "current-gpu",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-build-20261111/sanitize/dome-sculpt-current-paint-preview-gpu-test"
+          ],
+          "returncode": 0,
+          "timeout": false,
+          "elapsed": 2.0234928131103516,
+          "elf_sha256": "3969871641190b0430eae5cc3d5f2e5bea33daceb78ba9a491d67c0c277ce73f"
+        }
+      ],
+      "raw": {
+        "path": "artifacts/plain-gpu-preview-build-20261111/receipts/sanitize-extended-tests.json",
+        "sha256": "ec0b73715b7ed810c39b993a63181226c74ab5bbe62ce782a58816860182e9ed"
+      }
+    }
+  },
+  "extended_98818_strict_arc": {
+    "release": {
+      "source": "acff27fefa886add190f32be844fc4358a63cdbe",
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-build-20261111/release/dome-sculpt-current-paint-preview-gpu-test",
+        "--hardware"
+      ],
+      "returncode": 0,
+      "timeout": false,
+      "elapsed": 0.5156691074371338,
+      "elf_sha256": "a782a835749a808da35456c2a34177b5af931414d3c3d5bf414bdf9efb815000",
+      "dri_fds": [
+        "/dev/dri/renderD129"
+      ],
+      "exclusive_lock": "/tmp/dome-sculpt-arc-device.lock",
+      "environment": {
+        "LD_LIBRARY_PATH": "/usr/lib64",
+        "DRI_PRIME": "pci-0000_03_00_0",
+        "LP_NUM_THREADS": "2"
+      },
+      "raw": {
+        "path": "artifacts/plain-gpu-preview-build-20261111/receipts/current-gpu-arc-release.json",
+        "sha256": "266de1d4402cb7a1959bb31ff889853d09705eaf30a8b6c8c72260e56fb7f13c"
+      },
+      "stdout": "Native XR graphics: windowless EGL 1.5\nGL_RENDERER Mesa Intel(R) Arc(tm) A770 Graphics (DG2)\nEGL_NODE /dev/dri/renderD129 PCI 0000:03:00.0 0x8086 0x56a0\nFLOAT_MAX_RELATIVE 1.38579e-07\nEXPECTED Current-grid old/new/retirement GPU budget exceeded\nEXPECTED Current-grid GPU retirement fence creation failed; debt retained\nEXPECTED Current-grid GPU retirement fence query failed; debt retained\nEXPECTED Current-grid GPU allocation/upload failed\nFLOAT_MAX_RELATIVE 0\nPASS 98818 current-grid GPU/reference/cache/resource checks"
+    },
+    "sanitize": {
+      "source": "acff27fefa886add190f32be844fc4358a63cdbe",
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-build-20261111/sanitize/dome-sculpt-current-paint-preview-gpu-test",
+        "--hardware"
+      ],
+      "returncode": 0,
+      "timeout": false,
+      "elapsed": 1.9203822612762451,
+      "elf_sha256": "3969871641190b0430eae5cc3d5f2e5bea33daceb78ba9a491d67c0c277ce73f",
+      "dri_fds": [
+        "/dev/dri/renderD129"
+      ],
+      "exclusive_lock": "/tmp/dome-sculpt-arc-device.lock",
+      "environment": {
+        "LD_LIBRARY_PATH": "/usr/lib64",
+        "DRI_PRIME": "pci-0000_03_00_0",
+        "LP_NUM_THREADS": "2",
+        "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+        "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+      },
+      "raw": {
+        "path": "artifacts/plain-gpu-preview-build-20261111/receipts/current-gpu-arc-sanitize.json",
+        "sha256": "c097b46b7e6c67a621324b149ce4f493cfd36f8dfdefc8c0245d0ff896e3de79"
+      },
+      "stdout": "Native XR graphics: windowless EGL 1.5\nGL_RENDERER Mesa Intel(R) Arc(tm) A770 Graphics (DG2)\nEGL_NODE /dev/dri/renderD129 PCI 0000:03:00.0 0x8086 0x56a0\nFLOAT_MAX_RELATIVE 1.38579e-07\nEXPECTED Current-grid old/new/retirement GPU budget exceeded\nEXPECTED Current-grid GPU retirement fence creation failed; debt retained\nEXPECTED Current-grid GPU retirement fence query failed; debt retained\nEXPECTED Current-grid GPU allocation/upload failed\nFLOAT_MAX_RELATIVE 0\nPASS 98818 current-grid GPU/reference/cache/resource checks"
+    }
+  },
+  "asserted_actual_copy": {
+    "genuine_scene_actors": 5,
+    "common_capacity_before": 4,
+    "common_capacity_after": 8,
+    "actual_old_buffer_bytes": 68608,
+    "actual_new_buffer_bytes": 134144,
+    "actual_glCopyBufferSubData_bytes": 68608,
+    "actual_new_common_CPU_upload_bytes": 16384,
+    "old_common_CPU_reuploads": 0,
+    "old_slot_re_resolves_with_changed_materials": 4,
+    "all_old_and_new_outputs": "exact every-texel legacy CPU color/ORM/emission bytes"
+  },
+  "numerical_scope": {
+    "legacy_RGBA_ORM_emission": "exact bytes for admitted plain fields, before legacy clamp/linear sampling",
+    "physical_planes": "independent native arithmetic; tested max_relative=1.38579e-7; assertions use max(1e-12, abs(expected)*4e-6)",
+    "tiny_coverage_and_HDR": "real native FLOAT coverage below1/255 and radiance above1; bare HDR background; invisible FLOAT keeps legacy visible quantization",
+    "authority": "native8401 checks include actual worker no-eager-image wrappers, alpha, source guard, real texture-set proofs, Cancel/Undo/Redo/ordered Save/reopen",
+    "no_product_GPU_readback": "GL readback/finish and nonzero sync wait wrappers assert zero; explicit validation readback only"
+  },
+  "runtime_providers": {
+    "/usr/lib64/libEGL.so.1.1.0": "76ffc090b8990696d028e7d1bc82606c564565fb05d2fa9e5f6122b61e9f1b60",
+    "/usr/lib64/libEGL_mesa.so.0.0.0": "c786fa61da74b62ae0b8ab9fdb9bc020be92c02896d37220c58724107195002c",
+    "/usr/lib64/libGL.so.1.7.0": "cc4380adee239f7d4e0b5674ffde3d3add2e030778fb48db290bd96eafaf50e5",
+    "/usr/lib64/libGLdispatch.so.0.0.0": "3c53e14fb731128afe1fa1c88e94944fe9a60cbe170f2e08c1134b709d771ec7",
+    "/usr/lib64/libLLVM.so.22.1": "aec1ccf02e5cc4d161920d76dce31dbbb22efebf62da71ec3180b70ff15d77bb",
+    "/usr/lib64/libOpenGL.so.0.0.0": "07a014ea0624d5d9711f941fb0401a203c2025b683d34897bd1b261a32a83d69",
+    "/usr/lib64/libgallium-26.2.5.so": "033e3135e977d3e5fc6b63624573febe48b2e567c0e47da49d3125d9de8d1839"
+  },
+  "retained_failures": [
+    {
+      "path": "artifacts/plain-gpu-preview-build-20261111/receipts/attempt0-6b09ec82/release-build.log",
+      "sha256": "cb225d8d8343ee3cc7ab4fcf14b441c2072d543901be099f0a8b1709302807cd",
+      "reason": "Original full owning build stopped at modified legacy consumer missing src include; fixed only target include wiring at848780e6",
+      "tail": [
+        "\tMajor (requiring I/O) page faults: 68",
+        "\tMinor (reclaiming a frame) page faults: 3496973",
+        "\tVoluntary context switches: 3282",
+        "\tInvoluntary context switches: 17346",
+        "\tSwaps: 0",
+        "\tFile system inputs: 28824",
+        "\tFile system outputs: 514528",
+        "\tSocket messages sent: 0",
+        "\tSocket messages received: 0",
+        "\tSignals delivered: 0",
+        "\tPage size (bytes): 4096",
+        "\tExit status: 1"
+      ]
+    },
+    {
+      "path": "artifacts/plain-gpu-preview-build-20261111/receipts/attempt1-848780e6/current-gpu-release.log",
+      "sha256": "48fb97350d90e901c88fa90931ddd54dd172104e43b6334c60d99191f50b54e8",
+      "reason": "Actual GLSL rejected integer returns in float quantizers; fixed product source1452ddec",
+      "tail": [
+        "Native XR graphics: windowless EGL 1.5",
+        "GL_RENDERER llvmpipe (LLVM 22.1.8, 256 bits)",
+        "FAIL 0:11(36): error: `return' with wrong type int, in function `linear_byte' returning float",
+        "0:11(53): error: `return' with wrong type int, in function `linear_byte' returning float",
+        "0:12(34): error: `return' with wrong type int, in function `srgb_byte' returning float",
+        "0:12(51): error: `return' with wrong type int, in function `srgb_byte' returning float",
+        ""
+      ]
+    },
+    {
+      "path": "artifacts/plain-gpu-preview-build-20261111/receipts/attempt1-848780e6/legacy-composite-render-release.log",
+      "sha256": "19a2330d092222b948315c7f33d4280d0f594a23de9779a8182ca6af642c0df3",
+      "reason": "Same actual shader error independently retained in existing render/export consumer",
+      "tail": [
+        "GL_VENDOR Mesa",
+        "GL_RENDERER llvmpipe (LLVM 22.1.8, 256 bits)",
+        "COMPUTE CPU",
+        "PASS Requested independent consumer executes on actual Intel Arc A770",
+        "PASS Selected compositor produces exact legacy CPU maps for all14 channels/layer mask/opacity/padding",
+        "PASS Actual mesh worker publishes selected-backend plain writable paint",
+        "PASS Immutable actual worker frame retains current-grid COW inputs without eager derived image output",
+        "FAIL 0:11(36): error: `return' with wrong type int, in function `linear_byte' returning float",
+        "0:11(53): error: `return' with wrong type int, in function `linear_byte' returning float",
+        "0:12(34): error: `return' with wrong type int, in function `srgb_byte' returning float",
+        "0:12(51): error: `return' with wrong type int, in function `srgb_byte' returning float",
+        ""
+      ]
+    }
+  ],
+  "artifacts": {
+    "release": {
+      "dome-sculpt": {
+        "bytes": 15953880,
+        "sha256": "d1e2e287abfd674ea05773f9361a54508690ced016e9b650f1618c9b499fab6f"
+      },
+      "dome-sculpt-current-paint-preview-gpu-test": {
+        "bytes": 14676112,
+        "sha256": "a782a835749a808da35456c2a34177b5af931414d3c3d5bf414bdf9efb815000"
+      },
+      "dome-sculpt-current-paint-preview-native-test": {
+        "bytes": 14280064,
+        "sha256": "54d047c8cff166415eedfba44dd729fd46ba8593ab4b43c30726d0dc091d65d1"
+      },
+      "dome-sculpt-gpu-color-blur-native-test": {
+        "bytes": 14347720,
+        "sha256": "3fd85f79d9c6d099cba1e087daf820c0bd29565cd62af9119b99417d9b19f811"
+      },
+      "dome-sculpt-mtoon-render-test": {
+        "bytes": 3081480,
+        "sha256": "8f219bf5c426e3b0c9c9551e71b36a8589a703820381fb0d8cbf7a682d09ca0e"
+      },
+      "dome-sculpt-paint-composite-native-test": {
+        "bytes": 14253872,
+        "sha256": "7eb1aebbc216b133d9839f4b78c573d9c3265b52805840a18a3198486787236b"
+      },
+      "dome-sculpt-paint-composite-render-test": {
+        "bytes": 14708448,
+        "sha256": "e10df19dca5bac6d8905df7724bf8f0ed9bf2eba0911a8307dbe83135222c6d4"
+      },
+      "dome-sculpt-paint-overlay-gpu-test": {
+        "bytes": 3544032,
+        "sha256": "c75c477db60ff69252e5edf0951be4b58faffe5a795654dfe57674d6b14d3522"
+      },
+      "dome-sculpt-source-paint-overlay-test": {
+        "bytes": 5758400,
+        "sha256": "1577565d52cf3ed680b332e8404f213c1edaaad073680647a4b3a9c588deeb2c"
+      },
+      "dome-sculpt-texture-set-native-test": {
+        "bytes": 14280544,
+        "sha256": "17ab11ed98a1ed28848c9410118f351323b7424e7f776fb2f9150cbeab65ca48"
+      },
+      "dome-sculpt-texture-set-surfaces-test": {
+        "bytes": 14304504,
+        "sha256": "99fb5ae34b5edd786b4e0375e8db9a529e085e8af604bd955785e1ba7d7990dc"
+      },
+      "libdome-sculpt-core.a": {
+        "bytes": 46719790,
+        "sha256": "1ba65f8d14bb492482f0ecd8d45412e247465c6db8f5815ab6157c50cc846455"
+      },
+      "libdome-sculpt-native-graphics.a": {
+        "bytes": 18422,
+        "sha256": "4a506b091f94e9fc66bccc24f2357064d66606889807b89c66f47302624ebc0c"
+      },
+      "libdome-sculpt-render.a": {
+        "bytes": 1213498,
+        "sha256": "55f7b1795d2f6beaa326faaf6fd776c1219b6c5446f6fb65f3b5468a127042bb"
+      }
+    },
+    "sanitize": {
+      "dome-sculpt": {
+        "bytes": 484833696,
+        "sha256": "6c9ef062592a83213431c0b61b1b3382f0876fe82f60a03f9d8cee08797c9952"
+      },
+      "dome-sculpt-current-paint-preview-gpu-test": {
+        "bytes": 460880472,
+        "sha256": "3969871641190b0430eae5cc3d5f2e5bea33daceb78ba9a491d67c0c277ce73f"
+      },
+      "dome-sculpt-current-paint-preview-native-test": {
+        "bytes": 447502208,
+        "sha256": "c10bdbf4f1184623009317b22bc1e70414a2cba790a73e82d6d1cf7b8de6822b"
+      },
+      "dome-sculpt-gpu-color-blur-native-test": {
+        "bytes": 451196320,
+        "sha256": "65d52768ec985c5d2cd60e5cf7714980c74c2b4bad028688b709238f0142a6e8"
+      },
+      "dome-sculpt-mtoon-render-test": {
+        "bytes": 267019288,
+        "sha256": "e7fa7d0142e707f4d6980a760c042a022b5349e574e3bed6544fe607c2c47064"
+      },
+      "dome-sculpt-paint-composite-native-test": {
+        "bytes": 447917784,
+        "sha256": "653559b0d5942fbe0d03a41a2a5e6375c504579af898c342f7fc4f97b1c96240"
+      },
+      "dome-sculpt-paint-composite-render-test": {
+        "bytes": 463788752,
+        "sha256": "2aab62aedd37e8b6e8c2eab26ebb8c710bae6978f1a2d46095c411ee1fb18460"
+      },
+      "dome-sculpt-paint-overlay-gpu-test": {
+        "bytes": 253245744,
+        "sha256": "96a34900c7b3762f6d344a66205afbdfc03aadd62ae6e4dedf05df27d08d5b44"
+      },
+      "dome-sculpt-source-paint-overlay-test": {
+        "bytes": 278080240,
+        "sha256": "f5d1bbcfcf26907ba9968ea589297e5b5035dd8587c8a9b98454f32bac6cb39f"
+      },
+      "dome-sculpt-texture-set-native-test": {
+        "bytes": 447177144,
+        "sha256": "837bfe3c202838ec356b02351ab9e956b1077d92deeba3f8b36dc6ab55e44098"
+      },
+      "dome-sculpt-texture-set-surfaces-test": {
+        "bytes": 448526520,
+        "sha256": "e79506c56c0e33c23e030b8352c1a0c502a7261b69d4c7fd5b2a779883d9eace"
+      },
+      "libdome-sculpt-core.a": {
+        "bytes": 1472207034,
+        "sha256": "2e695c7d76c924981e0f85c8f00e0af2141b87e95af0243ad360016aae016f6d"
+      },
+      "libdome-sculpt-native-graphics.a": {
+        "bytes": 348822,
+        "sha256": "dd1512b484f20b35db91f761477c212a9a43689f54a59b5130362717e57843a6"
+      },
+      "libdome-sculpt-render.a": {
+        "bytes": 41636712,
+        "sha256": "0bd2844e2033acd50e4cf6ffaa25d65d6408d4553474d2097b4b9cb0e8714294"
+      }
+    }
+  },
+  "key_source_sha256": {
+    "src/current-paint-preview.cpp": "caa38727398f50d5793c9649eb363231231fadb95e0065fc77c7eb3341209938",
+    "src/current-paint-preview.hpp": "0681267c3ed24d456ea2e7cba0be4d41bdacbf0e662e7827765a2ba2bb5241fd",
+    "src/render-current-paint-preview.hpp": "11c1997d8b37284ce00ffcb759b0cb42f44450470b2e1094eacfdf4e2d3ccade",
+    "src/render-paint-state.hpp": "a879f5a803f361753588960dd78f563aa71f262a5bd1facf0127f0a4a5e665bf",
+    "tests/current-paint-preview-gpu.cpp": "a66150f67a28f165baa274474474a90ce0d0609ffb6ed7c1b11765db74f7b389",
+    "tests/current-paint-preview-native.cpp": "5389c74b2de1b42ad18e51821d0402cc7d1e5d72b3843d1b354e32126dac8966"
+  },
+  "source_manifests": [
+    {
+      "path": "artifacts/plain-gpu-preview-build-20261111/receipts/qualified-1452ddec/release-source-before.json",
+      "sha256": "8701f1d586f56bb06457c78e3592877cd7baa33997596d0d193277d7dabc0eed"
+    },
+    {
+      "path": "artifacts/plain-gpu-preview-build-20261111/receipts/qualified-1452ddec/release-source-after.json",
+      "sha256": "8701f1d586f56bb06457c78e3592877cd7baa33997596d0d193277d7dabc0eed"
+    },
+    {
+      "path": "artifacts/plain-gpu-preview-build-20261111/receipts/qualified-1452ddec/sanitize-source-before.json",
+      "sha256": "8701f1d586f56bb06457c78e3592877cd7baa33997596d0d193277d7dabc0eed"
+    },
+    {
+      "path": "artifacts/plain-gpu-preview-build-20261111/receipts/qualified-1452ddec/sanitize-source-after.json",
+      "sha256": "8701f1d586f56bb06457c78e3592877cd7baa33997596d0d193277d7dabc0eed"
+    },
+    {
+      "path": "artifacts/plain-gpu-preview-build-20261111/receipts/release-source-before.json",
+      "sha256": "f7df148063612eb1dba7589d8a33658473cdf0aec9297935dc590a75d1f1f628"
+    },
+    {
+      "path": "artifacts/plain-gpu-preview-build-20261111/receipts/release-source-after.json",
+      "sha256": "f7df148063612eb1dba7589d8a33658473cdf0aec9297935dc590a75d1f1f628"
+    },
+    {
+      "path": "artifacts/plain-gpu-preview-build-20261111/receipts/sanitize-source-before.json",
+      "sha256": "f7df148063612eb1dba7589d8a33658473cdf0aec9297935dc590a75d1f1f628"
+    },
+    {
+      "path": "artifacts/plain-gpu-preview-build-20261111/receipts/sanitize-source-after.json",
+      "sha256": "f7df148063612eb1dba7589d8a33658473cdf0aec9297935dc590a75d1f1f628"
+    }
+  ],
+  "compiler_profiles": {
+    "release": {
+      "cache_flags": [
+        "CMAKE_CXX_FLAGS_RELEASE:STRING=-O3 -DNDEBUG -ffunction-sections -fdata-sections",
+        "CMAKE_C_FLAGS_RELEASE:STRING=-O3 -DNDEBUG -ffunction-sections -fdata-sections",
+        "CMAKE_EXE_LINKER_FLAGS:STRING=-Wl,--gc-sections",
+        "CMAKE_JOB_POOL_LINK:UNINITIALIZED=dome_blur_links",
+        "DOME_BUILD_UI:BOOL=ON",
+        "DOME_BUILD_XR:BOOL=ON",
+        "DOME_COMPUTE_BACKEND:STRING=CPU",
+        "FLTK_DIR:UNINITIALIZED=/home/blux/de-xr/dome-sculpt/artifacts/sdk-20261111/toolkit-release/share/fltk"
+      ],
+      "configured_compile_database_sha256": "723e3cd9a153dd9575da2a2ab025dddd2c0c029163b4ea1015af49888b762d00",
+      "configured_compile_database_entries": 999,
+      "actually_compiled_unique_object_outputs": 250,
+      "owning_commands": {
+        "/src/paint.cpp": "/usr/bin/c++ -DDOME_SCULPT_INSTALLED_ASSETS=\\\"/usr/local/share/dome-sculpt/assets/humanoid\\\" -DDOME_SCULPT_SOURCE_ASSETS=\\\"/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/assets/humanoid\\\" -I/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/third_party -I/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/include -I/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/third_party/openbrush -I/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/third_party/cgltf -I/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/third_party/nlohmann -I/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/third_party/xatlas -I/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/third_party/mikktspace -I/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/third_party/ufbx -O3 -DNDEBUG -ffunction-sections -fdata-sections -std=gnu++20 -Wall -Wextra -Wpedantic -o CMakeFiles/dome-sculpt-core.dir/src/paint.cpp.o -c /home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/src/paint.cpp",
+        "/src/current-paint-preview.cpp": "/usr/bin/c++ -DDOME_SCULPT_INSTALLED_ASSETS=\\\"/usr/local/share/dome-sculpt/assets/humanoid\\\" -DDOME_SCULPT_SOURCE_ASSETS=\\\"/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/assets/humanoid\\\" -I/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/third_party -I/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/include -I/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/third_party/openbrush -I/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/third_party/cgltf -I/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/third_party/nlohmann -I/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/third_party/xatlas -I/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/third_party/mikktspace -I/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/third_party/ufbx -O3 -DNDEBUG -ffunction-sections -fdata-sections -std=gnu++20 -Wall -Wextra -Wpedantic -o CMakeFiles/dome-sculpt-core.dir/src/current-paint-preview.cpp.o -c /home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/src/current-paint-preview.cpp",
+        "/src/render.cpp": "/usr/bin/c++ -I/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/include -I/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/third_party/openbrush -I/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/third_party/nlohmann -isystem /usr/include/freetype2 -isystem /usr/include/libpng16 -isystem /usr/include/harfbuzz -isystem /usr/include/glib-2.0 -isystem /usr/lib64/glib-2.0/include -isystem /usr/include/sysprof-6 -isystem /usr/include/libxml2 -O3 -DNDEBUG -ffunction-sections -fdata-sections -std=gnu++20 -pthread -DWITH_GZFILEOP -o CMakeFiles/dome-sculpt-render.dir/src/render.cpp.o -c /home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/src/render.cpp",
+        "/src/app.cpp": "/usr/bin/c++ -DDOME_HAS_XR=1 -I/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/third_party/desktop -I/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-build-20261111/release -I/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/include -I/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/third_party/openbrush -I/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/third_party/nlohmann -isystem /usr/include/freetype2 -isystem /usr/include/libpng16 -isystem /usr/include/harfbuzz -isystem /usr/include/glib-2.0 -isystem /usr/lib64/glib-2.0/include -isystem /usr/include/sysprof-6 -isystem /usr/include/libxml2 -isystem /home/blux/de-xr/dome-sculpt/artifacts/sdk-20261111/toolkit-release/include -isystem /usr/include/cairo -isystem /usr/include/pixman-1 -isystem /usr/include/libmount -isystem /usr/include/blkid -O3 -DNDEBUG -ffunction-sections -fdata-sections -std=gnu++20 -pthread -DWITH_GZFILEOP -o CMakeFiles/dome-sculpt.dir/src/app.cpp.o -c /home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/src/app.cpp",
+        "/tests/current-paint-preview-gpu.cpp": "/usr/bin/c++ -I/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/src -I/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/include -I/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/third_party/openbrush -I/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/third_party/nlohmann -isystem /usr/include/freetype2 -isystem /usr/include/libpng16 -isystem /usr/include/harfbuzz -isystem /usr/include/glib-2.0 -isystem /usr/lib64/glib-2.0/include -isystem /usr/include/sysprof-6 -isystem /usr/include/libxml2 -O3 -DNDEBUG -ffunction-sections -fdata-sections -std=gnu++20 -pthread -DWITH_GZFILEOP -o CMakeFiles/dome-sculpt-current-paint-preview-gpu-test.dir/tests/current-paint-preview-gpu.cpp.o -c /home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/tests/current-paint-preview-gpu.cpp"
+      }
+    },
+    "sanitize": {
+      "cache_flags": [
+        "CMAKE_CXX_FLAGS_RELEASE:STRING=-O1 -g1 -DNDEBUG -ffunction-sections -fdata-sections -fsanitize=address,undefined -fno-omit-frame-pointer",
+        "CMAKE_C_FLAGS_RELEASE:STRING=-O1 -g1 -DNDEBUG -ffunction-sections -fdata-sections -fsanitize=address,undefined -fno-omit-frame-pointer",
+        "CMAKE_EXE_LINKER_FLAGS:STRING=-Wl,--gc-sections -fsanitize=address,undefined",
+        "CMAKE_JOB_POOL_LINK:UNINITIALIZED=dome_blur_links",
+        "DOME_BUILD_UI:BOOL=ON",
+        "DOME_BUILD_XR:BOOL=ON",
+        "DOME_COMPUTE_BACKEND:STRING=CPU",
+        "FLTK_DIR:UNINITIALIZED=/home/blux/de-xr/dome-sculpt/artifacts/sdk-20261111/toolkit-sanitize/share/fltk"
+      ],
+      "configured_compile_database_sha256": "d96ca5b8453075aea88e20e698bb671d7c53e22d820fe521195b1684341b23be",
+      "configured_compile_database_entries": 999,
+      "actually_compiled_unique_object_outputs": 250,
+      "owning_commands": {
+        "/src/paint.cpp": "/usr/bin/c++ -DDOME_SCULPT_INSTALLED_ASSETS=\\\"/usr/local/share/dome-sculpt/assets/humanoid\\\" -DDOME_SCULPT_SOURCE_ASSETS=\\\"/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/assets/humanoid\\\" -I/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/third_party -I/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/include -I/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/third_party/openbrush -I/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/third_party/cgltf -I/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/third_party/nlohmann -I/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/third_party/xatlas -I/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/third_party/mikktspace -I/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/third_party/ufbx -O1 -g1 -DNDEBUG -ffunction-sections -fdata-sections -fsanitize=address,undefined -fno-omit-frame-pointer -std=gnu++20 -Wall -Wextra -Wpedantic -o CMakeFiles/dome-sculpt-core.dir/src/paint.cpp.o -c /home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/src/paint.cpp",
+        "/src/current-paint-preview.cpp": "/usr/bin/c++ -DDOME_SCULPT_INSTALLED_ASSETS=\\\"/usr/local/share/dome-sculpt/assets/humanoid\\\" -DDOME_SCULPT_SOURCE_ASSETS=\\\"/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/assets/humanoid\\\" -I/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/third_party -I/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/include -I/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/third_party/openbrush -I/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/third_party/cgltf -I/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/third_party/nlohmann -I/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/third_party/xatlas -I/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/third_party/mikktspace -I/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/third_party/ufbx -O1 -g1 -DNDEBUG -ffunction-sections -fdata-sections -fsanitize=address,undefined -fno-omit-frame-pointer -std=gnu++20 -Wall -Wextra -Wpedantic -o CMakeFiles/dome-sculpt-core.dir/src/current-paint-preview.cpp.o -c /home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/src/current-paint-preview.cpp",
+        "/src/render.cpp": "/usr/bin/c++ -I/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/include -I/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/third_party/openbrush -I/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/third_party/nlohmann -isystem /usr/include/freetype2 -isystem /usr/include/libpng16 -isystem /usr/include/harfbuzz -isystem /usr/include/glib-2.0 -isystem /usr/lib64/glib-2.0/include -isystem /usr/include/sysprof-6 -isystem /usr/include/libxml2 -O1 -g1 -DNDEBUG -ffunction-sections -fdata-sections -fsanitize=address,undefined -fno-omit-frame-pointer -std=gnu++20 -pthread -DWITH_GZFILEOP -o CMakeFiles/dome-sculpt-render.dir/src/render.cpp.o -c /home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/src/render.cpp",
+        "/src/app.cpp": "/usr/bin/c++ -DDOME_HAS_XR=1 -I/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/third_party/desktop -I/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-build-20261111/sanitize -I/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/include -I/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/third_party/openbrush -I/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/third_party/nlohmann -isystem /usr/include/freetype2 -isystem /usr/include/libpng16 -isystem /usr/include/harfbuzz -isystem /usr/include/glib-2.0 -isystem /usr/lib64/glib-2.0/include -isystem /usr/include/sysprof-6 -isystem /usr/include/libxml2 -isystem /home/blux/de-xr/dome-sculpt/artifacts/sdk-20261111/toolkit-sanitize/include -isystem /usr/include/cairo -isystem /usr/include/pixman-1 -isystem /usr/include/libmount -isystem /usr/include/blkid -O1 -g1 -DNDEBUG -ffunction-sections -fdata-sections -fsanitize=address,undefined -fno-omit-frame-pointer -std=gnu++20 -pthread -DWITH_GZFILEOP -o CMakeFiles/dome-sculpt.dir/src/app.cpp.o -c /home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/src/app.cpp",
+        "/tests/current-paint-preview-gpu.cpp": "/usr/bin/c++ -I/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/src -I/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/include -I/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/third_party/openbrush -I/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/third_party/nlohmann -isystem /usr/include/freetype2 -isystem /usr/include/libpng16 -isystem /usr/include/harfbuzz -isystem /usr/include/glib-2.0 -isystem /usr/lib64/glib-2.0/include -isystem /usr/include/sysprof-6 -isystem /usr/include/libxml2 -O1 -g1 -DNDEBUG -ffunction-sections -fdata-sections -fsanitize=address,undefined -fno-omit-frame-pointer -std=gnu++20 -pthread -DWITH_GZFILEOP -o CMakeFiles/dome-sculpt-current-paint-preview-gpu-test.dir/tests/current-paint-preview-gpu.cpp.o -c /home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-20261111/tests/current-paint-preview-gpu.cpp"
+      }
+    }
+  }
+}

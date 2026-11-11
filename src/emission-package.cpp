@@ -9,6 +9,7 @@
 #include <bit>
 #include "emission-exr-access.hpp"
 #include "native-scene-payload.hpp"
+#include "native-read-scope.hpp"
 #include "humanoid-sha256.hpp"
 #include "dome/polygon-scene.hpp"
 #include <nlohmann/json.hpp>
@@ -206,7 +207,7 @@ detail::NativeScenePayload detail::capture_native_scene_payload(const Scene &sce
 }
 Scene detail::restore_native_scene_payload(std::span<const uint8_t> bytes,bool compressed,size_t decoded_bytes,size_t max_decoded_bytes,const std::function<bool()> &cancelled){
  if(bytes.empty()||bytes.size()>128*1024*1024||!max_decoded_bytes||max_decoded_bytes>256*1024*1024||!decoded_bytes||decoded_bytes>max_decoded_bytes||(!compressed&&bytes.size()!=decoded_bytes))throw std::length_error("Native authoring stored/expanded byte limit exceeded");
- std::vector<uint8_t> expanded;if(compressed){expanded=native_deflate(bytes,false,decoded_bytes,cancelled);bytes=expanded;}cbor_preflight(bytes,cancelled);const auto value=Json::from_cbor(bytes.begin(),bytes.end(),true,true);auto result=Scene::decode(value);stop(cancelled);return result;
+ std::vector<uint8_t> expanded;if(compressed){expanded=native_deflate(bytes,false,decoded_bytes,cancelled);bytes=expanded;}cbor_preflight(bytes,cancelled);const auto value=Json::from_cbor(bytes.begin(),bytes.end(),true,true);detail::NativeReadScope native_read(cancelled);auto result=Scene::decode(value);stop(cancelled);return result;
 }
 Scene detail::emission_export_subset(const Scene &source,std::span<const uint64_t> exported){
  std::set<uint64_t> selected;for(auto id:exported){source.object(id);if(!selected.insert(id).second)throw std::invalid_argument("Duplicate native export subset object");}if(selected.empty())throw std::invalid_argument("No native export subset objects");auto owner=source.snapshot();std::vector<uint64_t> discard;for(const auto &o:owner.objects())if(!selected.contains(o.id))discard.push_back(o.id);for(auto id:discard)owner.erase(id);std::set<uint64_t> kept;for(const auto &o:owner.objects())for(const auto &g:owner.group_path(o.group))kept.insert(g.id);std::vector<uint64_t> groups;for(const auto &g:owner.groups())if(!kept.contains(g.id)&&(!g.parent||kept.contains(g.parent)))groups.push_back(g.id);for(auto id:groups)owner.erase_group(id,false);return owner;
@@ -240,7 +241,7 @@ std::optional<Scene> extract_native_emission(std::span<const uint8_t> bytes,cons
  if(canonical_domains&&!canonical_count)throw std::invalid_argument("Native HDR package4 has no genuine canonical writable-domain witness");
  if(domains&&!domain_count)throw std::invalid_argument("Native HDR package3 has no genuine coordinate-domain witness");
  for(const auto &entry:images){auto image_limits=limits.image;image_limits.cancelled=limits.cancelled;decode_emission_exr(view(j,binary,entry),image_limits);}
- stop(limits.cancelled);std::vector<uint8_t> expanded;if(compressed){expanded=native_deflate(native,false,decoded_bytes,limits.cancelled);native=expanded;}cbor_preflight(native,limits.cancelled);const auto value=Json::from_cbor(native.begin(),native.end(),true,true);auto result=Scene::decode(value);for(auto id:owners)result.object(id);
+ stop(limits.cancelled);std::vector<uint8_t> expanded;if(compressed){expanded=native_deflate(native,false,decoded_bytes,limits.cancelled);native=expanded;}cbor_preflight(native,limits.cancelled);const auto value=Json::from_cbor(native.begin(),native.end(),true,true);detail::NativeReadScope native_read(limits.cancelled);auto result=Scene::decode(value);for(auto id:owners)result.object(id);
  for(const auto &entry:images){const auto &object=result.object(entry.at("object").get<uint64_t>());if(object.material_bindings&&object.material_bindings->canonical_paint_sampling&&(!canonical_domains||!entry.contains("domain")||entry.at("domain").at("kind")!="canonical-paint37"))throw std::invalid_argument("Canonical HDR package omitted its actual writable-domain witness");}
 
  if(domains){size_t actual=0;for(const auto &entry:images)if(entry.contains("domain")){++actual;const auto &object=result.object(entry.at("object").get<uint64_t>());native_domain(j,binary,entry,object,limits.cancelled,canonical_domains);auto expected=entry.at("domain").at("kind")=="canonical-paint37"?detail::canonical_paint_emission_field(object,limits.cancelled):detail::native_paint_emission_field(object,limits.cancelled);auto image_limits=limits.image;image_limits.cancelled=limits.cancelled;auto image=decode_emission_exr(view(j,binary,entry),image_limits);if(image.width!=expected.width||image.height!=expected.height||image.pixels.size()!=expected.pixels.size())throw std::invalid_argument("Native HDR field differs from its retained paint owner");for(size_t p=0;p<image.pixels.size();++p){if((p&1023)==0)stop(limits.cancelled);if(image.pixels[p]!=expected.pixels[p])throw std::invalid_argument("Native HDR float planes differ from their exact native paint replay");}}

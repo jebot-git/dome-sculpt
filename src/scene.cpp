@@ -10,8 +10,10 @@
 #include "polygon-surface-preview.hpp"
 #include "color-bound-memo.hpp"
 #include "emission-paint-access.hpp"
+#include "native-scene-geometry-intern.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/scene.hpp"
+#include "current-paint-preview.hpp"
 #include "dome/scene-file.hpp"
 #include "deformation-json.hpp"
 #include "polygon-paint-authority.hpp"
@@ -700,6 +702,7 @@ nlohmann::json Scene::encode() const {
   return j;
 }
 Scene Scene::decode(const nlohmann::json &j) {
+  detail::NativeReadScope::check();
   Scene result;
   if(!j.is_object() || (!j.at("format").is_string() || j.at("format").get_ref<const std::string&>()!="dome-sculpt") || !j.at("version").is_number_integer())
     throw std::runtime_error("Unsupported scene format or version type");
@@ -1195,8 +1198,10 @@ Scene Scene::decode(const nlohmann::json &j) {
     }
   }
   result.objects_.clear();
+  detail::NativeSceneGeometryIntern decoded_geometry;
   size_t samples = 0, texels = 0, deformation_entries = material_fields?SourceMaterialArchive::deformation_entries(j.at("source_materials")):0, paint_bytes = 0;
   for (auto &v : objects) {
+    detail::NativeReadScope::check();
     SculptObject o;
     o.id = id(v.at("id"));
     if (archives) o.group = nonnegative_id(v.at("group"));
@@ -1386,7 +1391,7 @@ std::vector<ObjectSurface> Scene::preview_surface_bundles(const std::function<bo
   return surfaces_impl(false,true,cancelled,mesher,true);
 }
 std::vector<ObjectSurface> Scene::surfaces_impl(bool atlas, bool preview, const std::function<bool()> &cancelled, const SculptMesher &mesher,bool texture_bundles,
-    const std::function<bool(const SculptObject &)> *capture_sculpt) const {
+    const std::function<bool(const SculptObject &)> *capture_sculpt,bool render_only) const {
   bool has_sets=false;for(const auto &o:objects_)if(o.texture_sets){has_sets=true;if(!texture_bundles)throw std::logic_error("Texture-set surfaces require their owning subset render/export adapter");}
   if(has_sets)detail::validate_texture_set_graph(*this);
   std::vector<ObjectSurface> result;
@@ -1417,10 +1422,13 @@ std::vector<ObjectSurface> Scene::surfaces_impl(bool atlas, bool preview, const 
       if (atlas && !o.mesh_active)
         unwrap(mesh, 1024, 4, cancelled);
       const bool polygon_field=o.mesh_active&&o.material_bindings&&bool(o.material_bindings->polygon_surface_transfer);
+      // Only the actual render publisher may select a GPU-only marker. Public
+      // preview/export/material-sampling callers still receive their real Images.
+      const auto current_grid=render_only?detail::CurrentGridPaintPreview::for_render(o,cancelled):nullptr;
       if(polygon_field&&!preview)throw std::invalid_argument("Polygon surface standard export requires its actual portable field compiler");
       result.push_back(
           {o.id, o.name, o.transform, o.material, std::move(mesh),
-           o.mesh_active ? (polygon_field ? detail::PolygonSurfacePaintCodec::preview(*o.painted,o.material_bindings,o.material,cancelled) : (preview||o.painted->source_sampling_prepared()) ? (detail::EmissionExportAccess::requires_preview(*o.painted,o.material,o.material_bindings.get()) ? detail::EmissionExportAccess::preview(*o.painted,o.material,cancelled) : o.painted->preview(o.material,cancelled)) : o.painted->composite(o.material,cancelled)) : nullptr,
+           current_grid?current_grid:o.mesh_active ? (polygon_field ? detail::PolygonSurfacePaintCodec::preview(*o.painted,o.material_bindings,o.material,cancelled) : (preview||o.painted->source_sampling_prepared()) ? (detail::EmissionExportAccess::requires_preview(*o.painted,o.material,o.material_bindings.get()) ? detail::EmissionExportAccess::preview(*o.painted,o.material,cancelled) : o.painted->preview(o.material,cancelled)) : o.painted->composite(o.material,cancelled)) : nullptr,
            o.mesh_active ? o.deformation : nullptr, group_path(o.group),
            o.mesh_active ? o.appearance : nullptr,
            o.mesh_active ? o.material_bindings : nullptr,

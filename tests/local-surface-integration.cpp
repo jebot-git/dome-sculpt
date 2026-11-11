@@ -3,6 +3,7 @@
 #include "dome/document.hpp"
 #include "dome/local-surface.hpp"
 #include "sculpt-placed-chunks.hpp"
+#include "current-paint-preview.hpp"
 #include <atomic>
 #include <bit>
 #include <cstdlib>
@@ -712,6 +713,8 @@ int main(int argc, char **argv) try {
     d.replace(std::move(scene));
     ready(d);
     auto before = d.frame().surface;
+    const auto native_before=d.copy_scene();
+    const auto color_before=native_before.active().painted->preview(native_before.active().material)->color.rgba;
     auto source = d.copy_scene().active().painted->mesh_owner();
     auto settings = d.frame().state->paint;
     settings.front_only = false;
@@ -720,10 +723,17 @@ int main(int argc, char **argv) try {
     doc_stroke(d, brush({0, 0, 0}, Tool::Clay, .16f));
     ready(d);
     auto after = d.frame().surface;
-    check(d.copy_scene().active().painted->has_paint_data() &&
-              after->ranges[0].textures->color.rgba !=
-                  before->ranges[0].textures->color.rgba,
+    const auto native_after=d.copy_scene();
+    const auto color_after=native_after.active().painted->preview(native_after.active().material)->color.rgba;
+    check(native_after.active().painted->has_paint_data() &&
+              native_after.encode()!=native_before.encode() &&
+              color_before.size()==64*64*4&&color_after.size()==64*64*4&&color_after!=color_before,
           "Product color painting actually changes texture data");
+    const auto old_packet=before->ranges[0].textures->current_grid_preview;
+    const auto new_packet=after->ranges[0].textures->current_grid_preview;
+    check(old_packet&&new_packet&&old_packet->contribution_owner()!=new_packet->contribution_owner()&&
+              before->ranges[0].textures->color.rgba.empty()&&after->ranges[0].textures->color.rgba.empty(),
+          "Actual color edit publishes a changed immutable GPU contribution without materializing render-only CPU images");
     check(d.copy_scene().active().painted->mesh_owner() == source &&
               after->geometry_identity == before->geometry_identity,
           "Color painting retains immutable SurfaceMap mesh owner and geometry "

@@ -1832,7 +1832,7 @@ void Document::mesh_loop() {
             reserve_layout(bytes);
             texture_layouts.emplace(o.id,layout);texture_layout_bytes+=bytes;++frame_layout_builds;
           }
-          detail::TextureSetWorkerView view;view.pbr=job->pbr_view;view.weights=job->weight_view;view.masks=job->sculpt_mask_view;
+          detail::TextureSetWorkerView view;view.render_only=true;view.pbr=job->pbr_view;view.weights=job->weight_view;view.masks=job->sculpt_mask_view;
           view.selected=std::find(weighted.begin(),weighted.end(),o.id)!=weighted.end();view.joint=job->weight_joint;
           view.weight_values=proposed?proposed->object(o.id).deformation:o.deformation;
           if(view.masks&&o.id==job->scene.active().id)view.mask=[&](uint32_t v){return job->scene.object(o.id).volume->mask_sample(layout->posed()->positions.at(v));};

@@ -2,6 +2,7 @@
 #include "dome/scene-file.hpp"
 #include "dome/emission-native.hpp"
 #include "dome/native-authoring.hpp"
+#include "native-read-scope.hpp"
 #include <array>
 #include <fstream>
 #include <nlohmann/json.hpp>
@@ -10,6 +11,7 @@
 namespace dome {
 LoadedSceneFile load_scene_file(const std::filesystem::path &path,
                                const std::function<bool()> &cancelled) {
+  detail::NativeReadScope native_read(cancelled);
   constexpr size_t limit = 256 * 1024 * 1024;
   auto check = [&] {
     if (cancelled && cancelled())

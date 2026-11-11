@@ -9,6 +9,7 @@
 namespace dome {
 namespace detail {class PaintOverlayPacket;struct PaintOverlayFactory;struct EmissionExportAccess;class BakedNormalField;struct NativeWeightPaintAccess;struct TextureSetPaintAccess;class TextureSetFieldSource;class PolygonSurfaceOwner;class PolygonSurfacePreview;struct PolygonSurfaceStage;struct PolygonSurfacePaintCodec;}
 struct Material;
+namespace detail {class CurrentGridPaintPreview;}
 class PaintProjection;
 class PaintSamplingDomain;
 class PaintSamplingAttachment;
@@ -71,6 +72,9 @@ struct TextureMaps {
   std::shared_ptr<const PaintNormalProjection> normal_projection;
   // Transient sparse GPU contribution input; never a serialized image authority.
   std::shared_ptr<const detail::PaintOverlayPacket> overlay;
+  // Explicit render-only current-grid owner. CPU materialization APIs never
+  // return this marker in place of their actual Image payloads.
+  std::shared_ptr<const detail::CurrentGridPaintPreview> current_grid_preview;
   // Scene39 current surface field. Independent from colour/F32 grid sampling;
   // a generic baked-normal/source-frame interpretation cannot replace it.
   std::shared_ptr<const detail::PolygonSurfacePreview> polygon_surface;

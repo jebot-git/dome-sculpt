@@ -6,6 +6,7 @@
 #include "polygon-surface-preview.hpp"
 #include "dome/document.hpp"
 #include "paint-overlay-packet.hpp"
+#include "current-paint-preview.hpp"
 #include <bit>
 #include <limits>
 namespace dome::detail {
@@ -20,7 +21,7 @@ bool material(const Material&a,const Material&b){
 }
 std::shared_ptr<const TextureSetRangeProof> prepare_texture_set_range(
     std::shared_ptr<const TextureSetSurfacePlan>plan,std::shared_ptr<const TextureSetPackedGeometry>layout,
-    size_t field,size_t first,size_t vertex,const std::function<bool()>&cancelled){
+    size_t field,size_t first,size_t vertex,const std::function<bool()>&cancelled,bool render_only){
  if(!plan)throw std::invalid_argument("Texture-set draw requires its actual owning plan");plan->authenticate_owner(plan);
  if(!layout)throw std::invalid_argument("Texture-set range requires its actual packed attribute layout");layout->authenticate_owner(layout);layout->authenticate_plan(*plan);
  if(field>=plan->fields().size()||field>=plan->draws().size())throw std::out_of_range("Unknown texture-set draw field");
@@ -32,7 +33,8 @@ std::shared_ptr<const TextureSetRangeProof> prepare_texture_set_range(
   const auto read=view.source->read_view(view);result->maps_=PolygonSurfacePaintCodec::preview(*read,view.material_bindings,view.material,cancelled,view.source->source_preview());
   if(!result->maps_||!result->maps_->polygon_surface||!result->maps_->polygon_surface->matches(view.material_bindings,read->paint_sampling_attachment())||result->layout_->canonical(field))throw std::invalid_argument("Retained texture-set range lost its actual source/current field packet");
  }else{
-  result->maps_=EmissionExportAccess::requires_preview(*view.painted,view.material,view.material_bindings.get())?
+  result->maps_=render_only?CurrentGridPaintPreview::for_field(result->plan_->object(),view,cancelled):nullptr;
+  if(!result->maps_)result->maps_=EmissionExportAccess::requires_preview(*view.painted,view.material,view.material_bindings.get())?
     EmissionExportAccess::preview(*view.painted,view.material,cancelled):view.painted->preview(view.material,cancelled);
   if(!result->maps_||result->maps_->source_only||result->maps_->source_maps||result->maps_->normal_projection||result->maps_->color_projection||result->maps_->polygon_surface)throw std::invalid_argument("Texture-set complex field cannot borrow the plain range proof");
   if((!result->maps_->normal.rgba.empty())!=result->layout_->canonical(field))throw std::invalid_argument("Texture-set canonical tangent layout differs from its actual field");

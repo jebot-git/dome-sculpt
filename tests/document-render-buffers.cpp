@@ -3,9 +3,21 @@
 #include "mtoon-render.cpp"
 #undef main
 #include <unistd.h>
+#include "sculpt-scene-chunks.hpp"
+#include "sculpt-chunk-masks.hpp"
+#include <bit>
+#include <map>
+#include "render-upload-target.hpp"
 namespace {
-size_t vertex_bytes=0,index_calls=0;
-bool capture=false;
+enum class Kind {Geometry,Scalar,Material};
+struct Traffic {size_t geometry_allocated=0,geometry_uploaded=0,scalar_uploaded=0,geometry_copied=0,data_calls=0,sub_calls=0,copy_calls=0,material_resolves=0;} traffic;
+std::map<GLuint,Kind> kinds;bool capture=false;
+GLenum binding(GLenum target){return target==GL_COPY_WRITE_BUFFER?GL_COPY_WRITE_BUFFER_BINDING:target==GL_COPY_READ_BUFFER?GL_COPY_READ_BUFFER_BINDING:target==GL_ELEMENT_ARRAY_BUFFER?GL_ELEMENT_ARRAY_BUFFER_BINDING:target==GL_TEXTURE_BUFFER?GL_TEXTURE_BUFFER_BINDING:target==GL_PIXEL_PACK_BUFFER?GL_PIXEL_PACK_BUFFER_BINDING:GL_ARRAY_BUFFER_BINDING;}
+Kind kind(GLenum target){GLint name=0;glGetIntegerv(binding(target),&name);auto p=kinds.find(GLuint(name));return p==kinds.end()?Kind::Material:p->second;}
+struct Geometry {size_t vertices=0,indices=0;uint64_t hash=1469598103934665603ull;};
+Geometry fingerprint(const detail::SculptSurfaceChunks::Ptr&owner){Geometry result;auto word=[&](uint32_t n){result.hash=(result.hash^n)*1099511628211ull;};owner->for_each_chunk([&](const auto&chunk){const auto&m=chunk->mesh;result.vertices+=m.positions.size();result.indices+=m.indices.size();for(auto a:{chunk->coordinate.x,chunk->coordinate.y,chunk->coordinate.z})word(uint32_t(a));for(const auto*values:{&m.positions,&m.normals})for(auto v:*values)for(auto b:std::bit_cast<std::array<uint32_t,3>>(v))word(b);for(auto i:m.indices)word(i);});return result;}
+const detail::SculptObjectChunks& field(const std::shared_ptr<const MeshSnapshot>&s,uint64_t id=1){if(!s->sculpt_chunks)throw std::runtime_error("Missing actual sculpt chunk owner");const auto*p=s->sculpt_chunks->find(id);if(!p||!p->geometry)throw std::runtime_error("Missing actual indexed sculpt field");return *p;}
+bool no_writes(){return traffic.data_calls==0&&traffic.sub_calls==0&&traffic.copy_calls==0;}
 struct Home {
   std::filesystem::path path;
   Home() {
@@ -22,100 +34,31 @@ struct Home {
 };
 }
 extern "C" void __real_glBufferData(GLenum,GLsizeiptr,const void*,GLenum);
-extern "C" void __wrap_glBufferData(GLenum target,GLsizeiptr size,const void *data,GLenum usage) {
-  if(capture&&target==GL_ARRAY_BUFFER)vertex_bytes+=size;
-  if(capture&&target==GL_ELEMENT_ARRAY_BUFFER)index_calls++;
-  __real_glBufferData(target,size,data,usage);
+extern "C" void __wrap_glBufferData(GLenum target,GLsizeiptr size,const void*data,GLenum usage){
+ if(capture){++traffic.data_calls;GLint name=0;glGetIntegerv(binding(target),&name);Kind k=Kind::Material;if(target==GL_ARRAY_BUFFER)k=usage==GL_DYNAMIC_DRAW?Kind::Scalar:Kind::Geometry;else if(render_upload_test::index(target,data,usage)||render_upload_test::vertex(target,data,usage))k=usage==GL_DYNAMIC_DRAW?Kind::Scalar:Kind::Geometry;kinds[GLuint(name)]=k;if(k==Kind::Geometry)traffic.geometry_allocated+=size_t(size);if(data){if(k==Kind::Geometry)traffic.geometry_uploaded+=size_t(size);if(k==Kind::Scalar)traffic.scalar_uploaded+=size_t(size);}}
+ __real_glBufferData(target,size,data,usage);
 }
-int main(int argc,char **argv)try {
-  Home home;NativeGraphics graphics;
-  std::string device=reinterpret_cast<const char*>(glGetString(GL_RENDERER));std::cout<<"GPU "<<device<<'\n';
-  check(argc<2||std::string(argv[1])!="--hardware"||(device.find("llvmpipe")==std::string::npos&&device.find("softpipe")==std::string::npos),"Document buffer fixture executes on requested GPU hardware");
-  Fbo fbo;fbo.bind();SurfaceRenderer renderer;Document document;
-  Volume volume(.05f);Brush seed;seed.radius=.3f;seed.blend=0;
-  volume.begin_stroke();volume.stamp(seed);volume.end_stroke();
-  Scene source;source.active().volume=std::make_shared<Volume>(volume.geometry_snapshot());source.active().material=white();document.replace(std::move(source));
-  auto ready=[&] {
-    if(!document.wait_mesh()||!document.frame().state->error.empty())throw std::runtime_error("Document did not publish a valid current mesh: "+document.frame().state->error);
-    return document.frame().surface;
-  };
-  auto render=[&](std::shared_ptr<const MeshSnapshot> scene) {
-    vertex_bytes=index_calls=0;capture=true;
-    try {renderer.draw(std::move(scene),{},identity,{0,0,2},Fbo::size,Fbo::size,true);}catch(...){capture=false;throw;}
-    capture=false;return read();
-  };
-  auto original=ready();auto original_key=original->geometry_identity;
-  check(bool(original_key),"Actual Document publishes an owned geometry identity");
-  auto baseline=render(original);auto uploads=renderer.buffer_stats().geometry_uploads;
-  auto settings=document.frame().state->sculpt_settings;settings.mask_edit=true;document.sculpt_settings(settings);
-  auto controls=ready();render(controls);
-  check(controls->geometry_identity==original_key&&controls->sculpt_meshing.cells_evaluated==0&&controls->sculpt_meshing.materialize_ms==0,
-        "Mask controls retain actual field geometry without tile extraction or full assembly");
-  check(index_calls==0&&vertex_bytes==controls->mesh.positions.size()*sizeof(float)&&renderer.buffer_stats().geometry_uploads==uploads,
-        "Document mask control publication uploads only its scalar stream");
-  document.sculpt_mask_fill(1);if(!document.wait_asset())throw std::runtime_error("Global protection worker timeout");
-  auto filled=ready();auto dark=render(filled);
-  check(filled->geometry_identity==original_key&&index_calls==0&&vertex_bytes==filled->mesh.positions.size()*sizeof(float),
-        "Real background Fill retains geometry and transfers one mask scalar per vertex");
-  check(at(dark)[0]<at(baseline)[0]-40&&at(dark)[3]==at(baseline)[3],"Actual persisted global protection darkens the rendered model");
-  check(document.undo(),"Worker Fill is undoable through the actual Document");
-  auto restored=ready();
-  check(restored->geometry_identity==original_key&&render(restored)==baseline&&index_calls==0,
-        "Document Undo restores exact pixels without reuploading geometry");
-  document.begin_cut();
-  if(!document.wait_cut())throw std::runtime_error("Cut preview worker timeout");
-  auto capped=ready();auto capped_pixels=render(capped);
-  check(capped->geometry_identity&&capped->geometry_identity!=original_key&&capped->mesh.positions.size()>original->mesh.positions.size()&&index_calls==1,
-        "Real cut caps have their own immutable geometry identity and upload appended geometry");
-  check(capped->sculpt_masks.size()==capped->mesh.positions.size()&&std::all_of(capped->sculpt_masks.begin()+original->mesh.positions.size(),capped->sculpt_masks.end(),[](float value){return value==-1;}),
-        "Ephemeral cut caps retain original protection and append unmasked scalar values");
-  render(capped);check(vertex_bytes==0&&index_calls==0,"The second cut-preview eye reuses the same packed geometry and scalar buffers");
-  auto cut_settings=document.frame().state->cut->settings;cut_settings.yaw=90;cut_settings.offset_mm=37;document.edit_cut(cut_settings);
-  if(!document.wait_cut())throw std::runtime_error("Changed cut preview worker timeout");
-  auto changed_cap=ready();auto changed_cap_pixels=render(changed_cap);
-  check(changed_cap->geometry_identity!=capped->geometry_identity&&index_calls==1&&changed_cap_pixels!=capped_pixels,
-        "Changing a capped plane refreshes actual geometry and rendered coverage even when source identity is unchanged");
-  cut_settings.cap=false;document.edit_cut(cut_settings);
-  if(!document.wait_cut())throw std::runtime_error("Uncapped cut preview worker timeout");
-  auto uncapped=ready();auto uncapped_pixels=render(uncapped);
-  check(uncapped->geometry_identity==original_key&&uncapped->mesh.positions.size()==original->mesh.positions.size(),
-        "A shader-only cut retains the authenticated original geometry identity");
-  cut_settings.offset_mm=137;document.edit_cut(cut_settings);
-  if(!document.wait_cut())throw std::runtime_error("Moved uncapped plane worker timeout");
-  auto moved_plane=ready();auto moved_plane_pixels=render(moved_plane);
-  check(moved_plane->geometry_identity==original_key&&index_calls==0&&moved_plane_pixels!=uncapped_pixels,
-        "Moving an uncapped plane changes clipping pixels without reuploading source geometry");
-  document.end_cut(false);auto after_cut_cancel=ready();auto cancelled_pixels=render(after_cut_cancel);
-  check(after_cut_cancel->geometry_identity==original_key&&index_calls==0&&cancelled_pixels==baseline&&original->mesh.positions.size()<capped->mesh.positions.size(),
-        "Cancelling a cut restores exact source pixels and geometry without mutating the retained source snapshot");
-  settings=document.frame().state->sculpt_settings;settings.mask_visible=false;settings.mask_edit=false;document.sculpt_settings(settings);render(ready());
-  auto info=document.frame().state->objects.front();auto material=info.material;material.color={1,0,0,1};
-  document.object_properties(info.id,info.name,true,false,info.transform,material);
-  auto recolored=ready();auto red=render(recolored);
-  check(recolored->geometry_identity==original_key&&vertex_bytes==0&&index_calls==0&&close(at(red),{255,0,0,255}),
-        "Actual material-only authoring changes pixels with no vertex or index transfer");
-  Brush carve;carve.from=carve.to={.25f,0,0};carve.radius=.25f;carve.blend=0;carve.tool=Tool::Carve;
-  if(!document.begin_desktop())throw std::runtime_error("Cannot start real geometry gesture");
-  document.stamp_desktop(carve);document.end_desktop();
-  auto sculpted=ready();auto sculpted_pixels=render(sculpted);
-  check(sculpted->geometry_identity!=original_key&&sculpted->sculpt_meshing.local_updates==1&&sculpted->sculpt_meshing.full_rebuilds==0,
-        "Actual sculpt gesture authenticates a local tile update and invalidates GPU geometry");
-  check(vertex_bytes>0&&index_calls==1&&sculpted_pixels!=red,"Changed field geometry actually refreshes GPU buffers and visible coverage");
-  auto sculpted_key=sculpted->geometry_identity;auto transform=info.transform;transform.position.x=.12f;
-  document.object_properties(info.id,info.name,true,false,transform,material);
-  auto moved=ready();render(moved);
-  check(moved->geometry_identity!=sculpted_key&&moved->sculpt_meshing.cells_evaluated==0&&vertex_bytes>0&&index_calls==1,
-        "Object motion reuses field extraction while refreshing packed world-space geometry");
-  Scene painted;painted.active().painted=std::make_shared<PaintedMesh>(quad(),64);painted.active().mesh_active=true;painted.active().material=white();document.replace(std::move(painted));
-  auto before_paint=ready();auto paint_key=before_paint->geometry_identity;auto white_pixels=render(before_paint);auto texture_uploads=renderer.texture_stats().uploads;
-  auto ink=document.frame().state->paint;ink.color={0,0,1,1};ink.channel=PaintChannel::Color;document.paint_settings(ink);
-  Brush paint;paint.radius=.4f;paint.normal={0,0,1};paint.blend=0;
-  if(!document.begin_desktop())throw std::runtime_error("Cannot start real texture gesture");
-  document.stamp_desktop(paint);document.end_desktop();
-  auto after_paint=ready();auto blue=render(after_paint);
-  check(after_paint->geometry_identity==paint_key&&vertex_bytes==0&&index_calls==0,"Real layered painting retains packed mesh geometry and its GPU buffers");
-  check(blue!=white_pixels&&at(blue)[2]>at(blue)[0]+40&&renderer.texture_stats().uploads>texture_uploads,
-        "Actual texture gesture uploads changed material pixels and renders the new ink");
-  check(glGetError()==GL_NO_ERROR,"Actual Document-to-GPU authoring leaves the GL error queue clean");
-  std::cout<<"Document GPU reuse complete: "<<checks<<" checks\n";return 0;
-}catch(const std::exception &e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
+extern "C" void __real_glBufferSubData(GLenum,GLintptr,GLsizeiptr,const void*);
+extern "C" void __wrap_glBufferSubData(GLenum target,GLintptr offset,GLsizeiptr size,const void*data){if(capture){++traffic.sub_calls;const auto k=kind(target);if(k==Kind::Geometry)traffic.geometry_uploaded+=size_t(size);if(k==Kind::Scalar)traffic.scalar_uploaded+=size_t(size);}__real_glBufferSubData(target,offset,size,data);}
+extern "C" void __real_glCopyBufferSubData(GLenum,GLenum,GLintptr,GLintptr,GLsizeiptr);
+extern "C" void __wrap_glCopyBufferSubData(GLenum a,GLenum b,GLintptr c,GLintptr d,GLsizeiptr e){if(capture){++traffic.copy_calls;if(kind(b)==Kind::Geometry)traffic.geometry_copied+=size_t(e);}__real_glCopyBufferSubData(a,b,c,d,e);}
+extern "C" void __real_glDrawArrays(GLenum,GLint,GLsizei);
+extern "C" void __wrap_glDrawArrays(GLenum a,GLint b,GLsizei c){if(capture){GLint program=0;glGetIntegerv(GL_CURRENT_PROGRAM,&program);if(glGetUniformLocation(GLuint(program),"common_pixels")>=0)++traffic.material_resolves;}__real_glDrawArrays(a,b,c);}
+int main(int argc,char **argv)try{
+ Home home;NativeGraphics graphics;std::string device=reinterpret_cast<const char*>(glGetString(GL_RENDERER));std::cout<<"GPU "<<device<<'\n';check(argc<2||std::string(argv[1])!="--hardware"||(device.find("llvmpipe")==std::string::npos&&device.find("softpipe")==std::string::npos),"Document buffer fixture executes on requested GPU hardware");
+ Fbo fbo;fbo.bind();SurfaceRenderer renderer;renderer.set_frame_time(0);Document document;Volume volume(.05f);Brush seed;seed.radius=.3f;seed.blend=0;volume.begin_stroke();volume.stamp(seed);volume.end_stroke();Scene source;source.active().volume=std::make_shared<Volume>(volume.geometry_snapshot());source.active().material=white();document.replace(std::move(source));
+ auto ready=[&]{if(!document.wait_mesh()||!document.frame().state->error.empty())throw std::runtime_error("Document did not publish a valid current mesh: "+document.frame().state->error);return document.frame().surface;};
+ auto render=[&](std::shared_ptr<const MeshSnapshot>scene,bool live=false){traffic={};capture=true;try{const auto state=document.frame().state;renderer.draw(std::move(scene),{},identity,{0,0,2},96,96,true,false,false,live?std::span<const ObjectInfo>(state->objects):std::span<const ObjectInfo>{});}catch(...){capture=false;throw;}capture=false;return read();};
+ auto original=ready();const auto geometry=field(original).geometry;const auto original_geometry=fingerprint(geometry);check(original->mesh.indices.empty()&&original_geometry.vertices>0&&original_geometry.indices>0,"Actual Document publishes genuine indexed chunk geometry without a fake packed SDF mesh");auto baseline=render(original);const auto initial=renderer.buffer_stats();check(traffic.geometry_uploaded>0&&at(baseline)[0]>200&&at(baseline)[3]==255,"Initial actual indexed geometry uploads real payloads and draws an independent nonblank white baseline");check(render(original)==baseline&&no_writes(),"Second unchanged sculpt eye makes zero Data/SubData/copy calls");
+ auto settings=document.frame().state->sculpt_settings;settings.mask_edit=true;document.sculpt_settings(settings);auto controls=ready();render(controls);check(field(controls).geometry==geometry&&fingerprint(geometry).hash==original_geometry.hash&&controls->sculpt_meshing.cells_evaluated==0&&controls->sculpt_meshing.materialize_ms==0,"Mask controls retain immutable indexed field geometry without extraction or full assembly");size_t required_scalars=0;geometry->for_each_chunk([&](const auto&chunk){const auto a=field(original).masks?field(original).masks->find(chunk):nullptr,b=field(controls).masks?field(controls).masks->find(chunk):nullptr;if(a!=b)required_scalars+=chunk->mesh.positions.size()*sizeof(float);});check(renderer.buffer_stats().geometry_uploads==initial.geometry_uploads&&traffic.geometry_allocated==0&&traffic.geometry_uploaded==0&&traffic.geometry_copied==0&&traffic.scalar_uploaded==required_scalars,"Mask controls write exactly any changed genuine scalar values and no geometry or indices");
+ document.sculpt_mask_fill(1);if(!document.wait_asset())throw std::runtime_error("Global protection worker timeout");auto filled=ready();const auto dark=render(filled);check(field(filled).geometry==geometry&&field(filled).masks&&traffic.scalar_uploaded==original_geometry.vertices*sizeof(float)&&traffic.geometry_allocated==0&&traffic.geometry_uploaded==0&&traffic.geometry_copied==0&&renderer.buffer_stats().geometry_uploads==initial.geometry_uploads,"Real background Fill uploads exactly one genuine scalar per native chunk vertex without geometry writes");check(at(dark)[0]<at(baseline)[0]-40&&at(dark)[3]==at(baseline)[3],"Actual persisted global protection darkens the rendered model");check(document.undo(),"Worker Fill is undoable through the actual Document");auto restored=ready();check(field(restored).geometry==geometry&&render(restored)==baseline&&traffic.geometry_uploaded==0&&renderer.buffer_stats().geometry_uploads==initial.geometry_uploads,"Document Undo restores exact pixels and original geometry without geometry reupload");
+ document.begin_cut();if(!document.wait_cut())throw std::runtime_error("Cut preview worker timeout");auto capped=ready();const auto capped_pixels=render(capped);check(!capped->mesh.indices.empty()&&capped->ranges.back().object==UINT64_MAX&&field(capped).geometry==geometry&&traffic.geometry_uploaded>0,"Real cut boundary retains the authentic indexed source and uploads its separate appended cap");const auto cap_first=capped->ranges.back().first_vertex;std::array<float,4>cap_mask{};glGetVertexAttribfv(6,GL_CURRENT_VERTEX_ATTRIB,cap_mask.data());check(cap_first<capped->mesh.positions.size()&&!capped->ranges.back().source_frame&&((capped->sculpt_masks.empty()&&cap_mask[0]==-1)||(capped->sculpt_masks.size()==capped->mesh.positions.size()&&std::all_of(capped->sculpt_masks.begin()+cap_first,capped->sculpt_masks.end(),[](float value){return value==-1;}))),"Ephemeral cap retains native field protection and uses genuine unmasked scalar values or the actual GL -1 default");check(render(capped)==capped_pixels&&no_writes(),"The second cut-preview eye makes zero Data/SubData/copy calls");
+ auto cut_settings=document.frame().state->cut->settings;cut_settings.yaw=90;cut_settings.offset_mm=37;document.edit_cut(cut_settings);if(!document.wait_cut())throw std::runtime_error("Changed cut preview worker timeout");auto changed_cap=ready();const auto changed_cap_pixels=render(changed_cap);check(changed_cap->geometry_identity!=capped->geometry_identity&&traffic.geometry_uploaded>0&&changed_cap_pixels!=capped_pixels,"Changing a capped plane refreshes actual geometry and rendered coverage");
+ cut_settings.cap=false;document.edit_cut(cut_settings);if(!document.wait_cut())throw std::runtime_error("Uncapped cut preview worker timeout");auto uncapped=ready();const auto uncapped_pixels=render(uncapped);check(field(uncapped).geometry==geometry&&uncapped->mesh.indices.empty(),"Shader-only cut restores genuine original chunk ownership without flattening");cut_settings.offset_mm=137;document.edit_cut(cut_settings);if(!document.wait_cut())throw std::runtime_error("Moved uncapped plane worker timeout");auto moved_plane=ready();const auto moved_plane_pixels=render(moved_plane);check(field(moved_plane).geometry==geometry&&traffic.geometry_uploaded==0&&traffic.geometry_allocated==0&&traffic.geometry_copied==0&&moved_plane_pixels!=uncapped_pixels,"Moving an uncapped plane changes pixels through uniforms without geometry uploads");
+ document.end_cut(false);auto after_cancel=ready();const auto cancelled=render(after_cancel);check(field(after_cancel).geometry==geometry&&fingerprint(geometry).hash==original_geometry.hash&&cancelled==baseline&&traffic.geometry_uploaded==0&&traffic.geometry_allocated==0&&traffic.geometry_copied==0,"Cancelling Cut restores exact source pixels and indexed geometry without mutating the retained original owner");
+ settings=document.frame().state->sculpt_settings;settings.mask_visible=false;settings.mask_edit=false;document.sculpt_settings(settings);render(ready());auto info=document.frame().state->objects.front();auto material=info.material;material.color={1,0,0,1};document.object_properties(info.id,info.name,true,false,info.transform,material);auto recolored=ready();const auto red=render(recolored);check(field(recolored).geometry==geometry&&no_writes()&&close(at(red),{255,0,0,255}),"Actual material-only authoring changes pixels with zero geometry/scalar transfer");
+ Brush carve;carve.from=carve.to={.25f,0,0};carve.radius=.25f;carve.blend=0;carve.tool=Tool::Carve;if(!document.begin_desktop())throw std::runtime_error("Cannot start real geometry gesture");document.stamp_desktop(carve);document.end_desktop();auto sculpted=ready();const auto sculpted_pixels=render(sculpted);const auto edited=field(sculpted).geometry;check(edited!=geometry&&fingerprint(edited).hash!=original_geometry.hash&&fingerprint(geometry).hash==original_geometry.hash&&sculpted->sculpt_meshing.local_updates==1&&sculpted->sculpt_meshing.full_rebuilds==0,"Actual sculpt gesture changes a genuine local indexed chunk owner while preserving the independent old geometry fingerprint");check(traffic.geometry_uploaded>0&&renderer.buffer_stats().geometry_uploads>initial.geometry_uploads&&sculpted_pixels!=red,"Changed field geometry reaches actual GPU buffers and visible coverage");
+ const auto edited_stats=renderer.buffer_stats();auto transform=info.transform;transform.position.x=.12f;document.object_properties(info.id,info.name,true,false,transform,material);auto moved=ready();const auto moved_pixels=render(moved);check(field(moved).geometry==edited&&moved->sculpt_meshing.cells_evaluated==0&&renderer.buffer_stats().geometry_uploads==edited_stats.geometry_uploads&&no_writes()&&moved_pixels!=sculpted_pixels,"Authored object motion reuses genuine local geometry and changes pixels through GPU placement with zero transfers");
+ document.configure_object_grab(true,false);auto held_source=ready();const auto held_baseline=render(held_source,true);const auto held_native=document.copy_scene().encode();check(document.begin_object_grab(info.id),"Actual Document begins a native object hold");CanvasTransform delta;delta.position.x=.1f;document.move_held_object_world(delta);const auto held_pixels=render(held_source,true);check(held_pixels!=held_baseline&&no_writes()&&document.copy_scene().encode()==held_native,"Live held motion changes real pixels with zero transfers and no native authoring mutation");check(render(held_source,true)==held_pixels&&no_writes(),"Second held eye retains exact pixels with zero buffer API traffic");document.end_object_grab(false);check(render(held_source,true)==held_baseline&&no_writes()&&document.copy_scene().encode()==held_native,"Cancelling a real hold restores exact pixels/native source with zero transfers");document.configure_object_grab(false,false);
+ Scene painted;painted.active().painted=std::make_shared<PaintedMesh>(quad(),64);painted.active().mesh_active=true;painted.active().material=white();document.replace(std::move(painted));auto before_paint=ready();const auto paint_key=before_paint->geometry_identity;const auto white_pixels=render(before_paint);const auto white_native=document.copy_scene().encode();auto ink=document.frame().state->paint;ink.color={0,0,1,1};ink.channel=PaintChannel::Color;document.paint_settings(ink);Brush paint;paint.radius=.4f;paint.normal={0,0,1};paint.blend=0;if(!document.begin_desktop())throw std::runtime_error("Cannot start real texture gesture");document.stamp_desktop(paint);document.end_desktop();auto after_paint=ready();const auto blue=render(after_paint);check(after_paint->ranges.front().textures&&after_paint->ranges.front().textures->current_grid_preview&&after_paint->ranges.front().textures->color.rgba.empty()&&after_paint->ranges.front().textures->metal_rough.rgba.empty()&&after_paint->ranges.front().textures->emission.rgba.empty(),"Real plain native authoring publishes an authenticated GPU current-field packet with no flattened CPU render images");check(after_paint->geometry_identity==paint_key&&traffic.geometry_allocated==0&&traffic.geometry_uploaded==0&&traffic.geometry_copied==0,"Real layered painting retains packed mesh geometry without geometry transfers");check(blue!=white_pixels&&at(blue)[2]>at(blue)[0]+40&&traffic.material_resolves>0,"Actual layered gesture performs a real GPU native-field resolve and renders changed ink");const auto blue_native=document.copy_scene().encode();check(document.undo()&&render(ready())==white_pixels&&document.copy_scene().encode()==white_native,"Real paint Undo restores exact white pixels and native layers");check(document.redo()&&render(ready())==blue&&document.copy_scene().encode()==blue_native,"Real paint Redo restores exact blue pixels and native layers");check(glGetError()==GL_NO_ERROR,"Actual Document-to-GPU authoring leaves the GL error queue clean");std::cout<<"Document GPU reuse complete: "<<checks<<" checks\n";return 0;
+}catch(const std::exception&e){capture=false;std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

@@ -8,6 +8,7 @@ struct TextureSetWorkerView {
   uint32_t joint=0;
   std::shared_ptr<const DeformationState> weight_values;
   std::function<float(uint32_t)> mask;
+  bool render_only=false;
 };
 // Appends one shared object geometry stream and every nonempty material range.
 // The caller owns the unpublished snapshot; cancellation discards it as a whole.

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/volume.hpp"
+#include "native-scene-geometry-intern.hpp"
 #include "io.hpp"
 #include "sculpt-mask.hpp"
 #include "sculpt-symmetry.hpp"
@@ -89,12 +90,17 @@ void Volume::clear_history() {
   history_bytes_ = 0;
 }
 void Volume::recompose() {
+  size_t read_steps=0;
+  auto read_checkpoint=[&]{if((read_steps++&255)==0)detail::NativeReadScope::check();};
   Voxels result;
   std::unordered_map<Int3, bool, IntHash> keys;
   for (auto &l : layers_)
-    for (auto &[p, d] : l.delta)
+    for (auto &[p, d] : l.delta) {
+      read_checkpoint();
       keys[p] = true;
+    }
   for (auto &[p, unused] : keys) {
+    read_checkpoint();
     float v = std::clamp(float(sum(p)), -band(), band());
     if (v < band())
       result.emplace(p, v);
@@ -655,6 +661,9 @@ Volume Volume::load(const std::filesystem::path &path) {
   return decode(j);
 }
 Volume Volume::decode(const nlohmann::json &j) {
+  detail::NativeReadScope::check();
+  size_t read_steps=0;
+  auto read_checkpoint=[&]{if((read_steps++&255)==0)detail::NativeReadScope::check();};
   const auto header=archive_detail::volume_header(j);
   const int version=header.version;
   Volume v(header.voxel);
@@ -663,6 +672,7 @@ Volume Volume::decode(const nlohmann::json &j) {
   if (!samples.is_array() || samples.size() > 4'000'000)
     throw std::length_error("Invalid project sample count");
   for (auto &s : samples) {
+    read_checkpoint();
     if (!s.is_array() || s.size() != 4)
       throw std::runtime_error("Invalid project sample");
     auto coordinate = [&](int axis) {
@@ -689,11 +699,15 @@ Volume Volume::decode(const nlohmann::json &j) {
     v.cells_.emplace(p, d);
   }
   std::vector<Int3> outside;
-  for (auto &[p, d] : v.cells_)
+  for (auto &[p, d] : v.cells_) {
+    read_checkpoint();
     if (d >= v.band())
       outside.push_back(p);
-  for (auto p : outside)
+  }
+  for (auto p : outside) {
+    read_checkpoint();
     v.cells_.erase(p);
+  }
   if (j.at("version") >= 2 && !j.contains("sculpt_layers"))
     throw std::runtime_error("Missing sculpt layer data");
   if (j.contains("sculpt_layers")) {
@@ -727,6 +741,7 @@ Volume Volume::decode(const nlohmann::json &j) {
           (count += ds.size()) > 4'000'000)
         throw std::length_error("Sculpt layer storage budget exceeded");
       for (auto &s : ds) {
+        read_checkpoint();
         if (!s.is_array() || s.size() != 4)
           throw std::runtime_error("Invalid sculpt displacement");
         Int3 p;
@@ -754,13 +769,17 @@ Volume Volume::decode(const nlohmann::json &j) {
     v.recompose();
     if (v.cells_.size() != stored.size())
       throw std::runtime_error("Sculpt layer cache mismatch");
-    for (auto &[p, d] : stored)
+    for (auto &[p, d] : stored) {
+      read_checkpoint();
       if (std::abs(v.at(p) - d) > v.voxel_ * 1e-5f)
         throw std::runtime_error("Sculpt layer cache mismatch");
+    }
     v.cells_ = std::move(stored);
   } else {
-    for (auto &[p, d] : v.cells_)
+    for (auto &[p, d] : v.cells_) {
+      read_checkpoint();
       v.layers_.front().delta[p] = double(d) - v.band();
+    }
   }
   if (version >= 3) {
     auto &mask = j.at("sculpt_mask");
@@ -773,6 +792,7 @@ Volume Volume::decode(const nlohmann::json &j) {
         values.size() > 4'000'000 - v.stored_samples())
       throw std::length_error("Sculpt mask/layer storage budget exceeded");
     for (auto &item : values) {
+      read_checkpoint();
       if (!item.is_array() || item.size() != 4)
         throw std::runtime_error("Invalid sculpt mask entry");
       Int3 p;
@@ -822,6 +842,7 @@ Volume Volume::decode(const nlohmann::json &j) {
     throw std::runtime_error("Sculpt mask/controls require volume version 3 or later");
   }
   v.geometry_history_.reset();
+  detail::NativeSceneGeometryIntern::intern_decoded(v.cells_,v.voxel_,v.band_);
   return v;
 }
 void Volume::swap_state(Volume &other) noexcept {
