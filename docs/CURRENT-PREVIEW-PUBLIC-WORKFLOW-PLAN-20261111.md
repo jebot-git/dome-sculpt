@@ -8,8 +8,14 @@ The previous blur fixture uses an imported source model, retained appearance and
 material bindings, and genuine paired source-color preparation. Those inputs are
 explicitly outside `CurrentGridPaintPreview::eligible` in
 `src/current-paint-preview.cpp`. Repeating that workflow alone cannot qualify the
-new plain current-grid preview. The texture-set workspace scenarios cover other
-authoring interactions but do not independently assert this render packet.
+new plain current-grid preview. The texture-set workspace producer is different:
+`tests/texture-set-resolution.cpp:47` initializes genuine plain64/128 texture-set
+fields, with mask/hidden/physical/tiny-FLOAT authoring. These meet the new
+`eligible_field` conditions and use `for_field` through the texture-set worker.
+Its existing81 scenarios are therefore useful current texture-set UI coverage
+when rerun with fresh producers/app/inspector, although they do not independently
+assert packet identity. They do not replace the ordinary single-actor
+`for_render` fixture below, and their earlier passes do not qualify this new ABI.
 
 The separate native producer option `--plain-workflow-fixtures OUTPUT` creates a
 genuine strict-UV64 `PaintedMesh` without imported/projected/baked/polygon or
