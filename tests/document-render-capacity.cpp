@@ -36,14 +36,17 @@ Scene indexed_scene(){Scene s;constexpr uint32_t side=600;
 // on the600x600 grid it is in cell(369,186), triangle1 (global local223939).
 void picking(const MeshSnapshot &snapshot,uint32_t local_triangle,bool stable_ties=false){
  check(bool(snapshot.picking)&&!snapshot.ranges.empty(),"Actual capacity publication retains its worker-built picker");
- const Vec3 point{.173f,-.283f,0},origin=point+Vec3{0,0,1};
+ const Vec3 point{.1732f,-.2833f,0},origin=point+Vec3{0,0,1};
  auto correct=[&](const MaterialSurfaceHit &hit,const SurfaceRange &range){
   const auto triangle=uint32_t(range.first/3)+local_triangle;
   const auto &s=hit.surface;
+  if(s.triangle!=triangle)return false;
+  Vec3 reconstructed{};
+  for(size_t k=0;k<3;++k)reconstructed+=snapshot.mesh.positions.at(snapshot.mesh.indices.at(size_t(triangle)*3+k))*s.barycentric[k];
   return hit.packed()&&hit.object==range.object&&s.triangle==triangle&&
    snapshot.picking->logical_triangle(s.triangle)==local_triangle&&
    snapshot.picking->material_identity(s.triangle)==SurfaceMaterialIdentity{range.object,range.texture_set}&&
-   length(s.position-point)<1e-5f&&length(s.normal-Vec3{0,0,1})<1e-5f&&
+   length(s.position-point)<1e-5f&&length(reconstructed-point)<1e-6f&&length(s.normal-Vec3{0,0,1})<1e-5f&&
    std::abs(s.barycentric[0]+s.barycentric[1]+s.barycentric[2]-1)<1e-5f&&
    std::all_of(s.barycentric.begin(),s.barycentric.end(),[](float b){return b>=0&&b<=1;});
  };
