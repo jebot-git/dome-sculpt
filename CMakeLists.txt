@@ -5043,3 +5043,11 @@ if(BUILD_TESTING AND TARGET dome-sculpt-render)
   add_test(NAME renderer-recovery COMMAND dome-sculpt-renderer-recovery-test)
   set_tests_properties(renderer-recovery PROPERTIES TIMEOUT 180 ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2")
 endif()
+
+if(BUILD_TESTING)
+  add_executable(dome-sculpt-surface-query-callback-lifetime-test tests/surface-query-callback-lifetime.cpp)
+  target_link_libraries(dome-sculpt-surface-query-callback-lifetime-test PRIVATE dome-sculpt-core)
+  add_test(NAME surface-query-callback-lifetime COMMAND dome-sculpt-surface-query-callback-lifetime-test)
+  set_tests_properties(surface-query-callback-lifetime PROPERTIES TIMEOUT 180)
+endif()
+
