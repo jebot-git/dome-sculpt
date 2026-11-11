@@ -1,0 +1,90 @@
+{
+  "source": "49465f294baa0547ec724938a0f0fa91cdb3e125",
+  "scope": "Sculpt material state hoisting only; complete changed renderer and consumer TUs, seven relinks/profile, exact remaining frozenb8 providers. Not a fresh whole-source build or hardware/GUI/headset/performance qualification.",
+  "profiles": {
+    "release": {
+      "build_exit": 0,
+      "fresh_complete_TUs": 2,
+      "relinked_consumers": 7,
+      "softwareGL_checks": 1733,
+      "softwareGL_exit": 0,
+      "material_query_samples": [
+        3,
+        3,
+        3,
+        3,
+        3,
+        3
+      ],
+      "object_range_limit": 3,
+      "sanitizer_options": null,
+      "ubsan_options": null,
+      "lsan_options": null,
+      "build_status_sha256": "c06ea2a0ec580a551df2fc190bfa4a89d972c4834bb4b4355a97f1d1242c5dd7",
+      "graphics_status_sha256": "e765236f2125539447437ef6c729b240e6e43f1e349b5c23b6a27a2cc3c92380",
+      "application_sha256": "87d665b562253e287742bdded2eeafcc8f13513d6a49ea940742d7cb265c26fc"
+    },
+    "sanitize": {
+      "build_exit": 0,
+      "fresh_complete_TUs": 2,
+      "relinked_consumers": 7,
+      "softwareGL_checks": 1733,
+      "softwareGL_exit": 0,
+      "material_query_samples": [
+        3,
+        3,
+        3,
+        3,
+        3,
+        3
+      ],
+      "object_range_limit": 3,
+      "sanitizer_options": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+      "ubsan_options": "halt_on_error=1:print_stacktrace=1",
+      "lsan_options": null,
+      "build_status_sha256": "097b40bd8fab9c8c6b3052130630e330ce81b398d5c61af6de94b123b7059c8a",
+      "graphics_status_sha256": "9652526f9ccdbaa1ab565cfdea5e69713afbf419fb2b2a488fc2990a534d8a80",
+      "application_sha256": "1ead01916708cc1f306c27cc7a27e9d601e9d569405b5d286b4226c815373695"
+    }
+  },
+  "comparisons": {
+    "release": {
+      "original_currentb8_pairs": 94,
+      "all_exact": true,
+      "receipt_sha256": "285ea6660c9ede5a439d091c84dd1d90ee9278e83646dead6aaf9237ec9cb6b6"
+    },
+    "sanitize": {
+      "original_currentb8_pairs": 94,
+      "all_exact": true,
+      "receipt_sha256": "285ea6660c9ede5a439d091c84dd1d90ee9278e83646dead6aaf9237ec9cb6b6"
+    },
+    "release_sanitize": {
+      "pairs": 94,
+      "all_exact": true
+    }
+  },
+  "counterexample": {
+    "exit": 1,
+    "expected_failure": true,
+    "seconds": 8.685527891968377,
+    "command": [
+      "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-object-state-build-20261111/release/old-renderer-counterexample",
+      "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-object-state-build-20261111/old-renderer-counterexample-output"
+    ],
+    "binary_sha256": "d5584bbbf99dba7312752376b7b8e3a8c2304767169dea0945c643a79ff59cf5",
+    "log_sha256": "e634a329374d2a7546cb5b96e36606785c75bcacc886a2f22d9cfb8102d74d32",
+    "actual_material_setup_lines": [
+      "MATERIAL_SETUP case=0 actual=581 object_range_limit=3"
+    ],
+    "original_pixel_oracle_pass_before_structural_failure": true
+  },
+  "pending": [
+    "Newrenderer actualArc/currentapp and original fullP1 workload comparison after baseline completes; no speedup claimed yet.",
+    "Other currentintegration and original fullproduction requirements remain required."
+  ],
+  "old_new_material_submission_counts": {
+    "old": 581,
+    "new": 3,
+    "case": "sameactualthree-objectoriginalimageoracle; opaque,Blend,Mask/reflection variants retain exactimages"
+  }
+}
