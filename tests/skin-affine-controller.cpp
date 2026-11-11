@@ -15,7 +15,7 @@ struct Driver {
 int main()try{
  auto scene=fixture(2,true,true);Document d;d.replace(scene);check(d.wait_mesh(),"Affine native source geometry ready");Driver hand(d);hand.open();auto before=d.copy_scene().encode();
  check(d.frame().state->menu_page==14&&d.frame().state->menu_enabled[7],"Actual joystick exposes Bind for affine target and reference");
- hand.sector(1);hand.value(1);hand.confirm();check(d.frame().state->skin_options.mode==SkinAuthoringMode::Transfer&&d.copy_scene().encode()==before,"Actual ray method selection is staged and retains complete Scene");
+ hand.sector(1);const auto control=d.frame().state->controls;check(control.parameter==VrParameter::SkinMode&&control.minimum<=1&&control.maximum>=1&&control.maximum>control.minimum,"Actual method slider contains unchanged Transfer choice index1");hand.value((1-control.minimum)/(control.maximum-control.minimum));hand.confirm();check(d.frame().state->skin_options.mode==SkinAuthoringMode::Transfer&&d.copy_scene().encode()==before,"Actual ray method selection is staged and retains complete Scene");
  hand.sector(7);check(d.wait_asset()&&d.frame().state->error.empty()&&d.copy_scene().active().deformation->skin,"Actual controller Bind executes persistent full-affine transfer");auto after=d.copy_scene().encode();compare_pose(d.copy_scene());
  check(d.undo()&&d.copy_scene().encode()==before&&d.redo()&&d.copy_scene().encode()==after,"Controller transfer shares exact one-step global history");
  std::cout<<"PASS "<<checks<<" affine controller checks\n";return 0;
