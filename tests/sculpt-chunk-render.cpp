@@ -65,8 +65,17 @@ int main(int argc,char **argv)try{
     const auto flat=reference(scene);auto chunked=mixed(scene);auto oracle=render(expected,flat);
     material_setups=0;tangent_defaults=0;batch_submissions=0;batch_runs=0;count_material_setups=true;auto image=render(actual,chunked);count_material_setups=false;
     check(image==oracle,"Actual GL chunk draw equals independent whole-mesher reference for opaque/Blend/Mask and reflected/sheared geometry");
+    size_t expected_draws=0;
+    for(const auto &object:chunked->sculpt_chunks->objects()){
+      std::optional<detail::SculptSurfaceRun> prior;
+      object.geometry->for_each_run([&](const detail::SculptSurfaceRun &run){
+        if(prior&&prior->chunk==run.chunk&&prior->first+prior->count==run.first)prior->count+=run.count;
+        else {++expected_draws;prior=run;}
+      });
+    }
+    check(batch_runs==expected_draws,"Batch keeps741's independent adjacent-only run coalescing as well as complete draw order");
     check(batch_submissions==chunked->sculpt_chunks->objects().size()&&batch_runs>batch_submissions,"Actual ordered run stream is batched once per sculpt object without chunk sorting");
-    std::cout<<"ORDERED_BATCHES case="<<cases<<" actual="<<batch_submissions<<" original_runs="<<batch_runs<<'\n';
+    std::cout<<"ORDERED_BATCHES case="<<cases<<" actual="<<batch_submissions<<" ordered_draws="<<batch_runs<<'\n';
     const auto setup_limit=chunked->ranges.size()+chunked->sculpt_chunks->objects().size();
     std::cout<<"MATERIAL_SETUP case="<<cases<<" actual="<<material_setups<<" object_range_limit="<<setup_limit<<'\n';
     check(material_setups>0&&material_setups<=setup_limit,"Material state submission is bounded by actual objects/ranges, not ordered sculpt cell runs");

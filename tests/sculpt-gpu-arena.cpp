@@ -37,7 +37,9 @@ int main()try{
   auto scene=fixture();const auto native=scene.encode();auto base=SculptSceneChunks::capture(scene,{7,1,1,true,true}).chunks;
   auto changed=scene.snapshot();changed.object(1).volume=std::make_shared<Volume>(*scene.object(1).volume);changed.object(1).volume->fill_mask(.71f);
   auto masks=SculptSceneChunks::capture(changed,{7,2,2,true,true},base).chunks;
-  render_detail::SculptGpuArena arena;auto first=arena.stage(base);const auto commands=first->commands.at(1);const auto positions=first->positions.get();arena.commit(std::move(first));
+  render_detail::SculptGpuArena arena;auto first=arena.stage(base);const auto commands=first->commands.at(1);
+  size_t raw_runs=0;base->find(1)->geometry->for_each_run([&](const auto &){++raw_runs;});
+  check(commands->source_runs==raw_runs&&commands->counts.size()<raw_runs,"Cached raw command capacity stays independent of adjacent-only coalescing");const auto positions=first->positions.get();arena.commit(std::move(first));
   const auto baseline_bytes=arena.live_bytes(),geometry_uploads=arena.uploads,base_scalars=arena.scalar_uploads;
   auto next=arena.stage(masks);check(next->commands.at(1)==commands&&next->positions.get()==positions,"Mask-only transaction preserves actual immutable geometry command owner and GPU positions");
   check(next->copy_bytes>0&&next->geometry_transfers==0&&next->scalar_transfers>0,"Mask transaction stages a new scalar buffer with GPU copy, no geometry upload");next.reset();
