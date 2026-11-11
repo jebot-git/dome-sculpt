@@ -13,6 +13,18 @@ not the full painting backend; see [ARMORPAINT-EXPERIMENT.md](ARMORPAINT-EXPERIM
 The later controller-tray and spatial node/history requirements remain required.
 Historical pause entries follow and do not revoke the user's resumption.
 
+## Goal resumed with restored sources — 2026-11-11
+
+The user reactivated the full original goal. Read
+[RESUMED-20261111.md](RESUMED-20261111.md). Candidate03f8 is restored in
+artifacts/resume-integration-20261111; old temporary builds/worktree are gone.
+Persistent historical receipts remain; fresh runtime evidence is required.
+Latest DomeD is acc2b70, compatible canonical SDKs are rebuilt and the exact
+current bitmap-cache helper is adopted. Sanitized XR saved-Redo investigation
+continues without weakened endpoints. ArmorPaint GPU-painting integration is
+being assessed from current native-C source. All original requirements remain
+incomplete; earlier pause entries below are historical.
+
 ## Requested pause after current build — 2026-11-06
 
 Current03f8edf1 is pushed on work/authoring-final-integration. Fresh Release and
@@ -26,6 +38,23 @@ User requested pause after finalising this build. Preserve all failures and the
 complete original objective; main product admission/full-goal completion remain
 pending. No further build, tests or features start without resumption.
 
+## Final integration candidate frozen for matched builds — 2026-11-06
+
+Ready product milestones and repaired test drivers are now composed with main
+a1f99757. Production files remain unchanged from qualified Release83805b87.
+The corrected whole runtime from a9457dc9 passes all eight actual-loader cases,
+99 original checks, against that frozen application; both real GUI profiles pass
+81 checks each with the canonical row28. Original failures remain preserved.
+Read TEXTURE-RESOLUTION-LOADER-WORKFLOWS-838.md and
+SCULPT-INTEGRATION-RELEASE-83805.md for exact scopes.
+
+Fresh whole32-target Release and matching ASan/UBSan on this committed union are
+next, with current native/graphics/GUI/loader/P1 and inherited-role regressions.
+Latest fetched DomeD and clean canonical toolkit source are still341152b; SDKs
+stay frozen. The complete original goal is resumed and incomplete. Main product
+admission, broader production/interoperability/accelerator and controller-drawer
+requirements remain required. No install or physical-headset acceptance.
+
 ## Combined Release, Arc and P1 milestone — 2026-11-06
 
 Private83805b87 now passes the fresh32-target build, selected native22+workspace2,
@@ -37,6 +66,19 @@ The first XR fixture has a confirmed menu-reopen timing defect and is being
 repaired without changing product code or expected native endpoints. Corrected
 XR and matching sanitizer union remain pending. Main product admission and the
 complete original goal remain unfinished; work is resumed, not paused.
+
+## Resumed combined candidate: source frozen for fresh verification — 2026-11-06
+
+The complete original goal is resumed, with current milestone integration first.
+The native paint adapter repair ccdf59e1 passes eight focused native routes and
+655 export controls; root additionally validates all five sourceful GLBs with
+the pinned Khronos validator: zero errors and warnings, two infos per file.
+Main62981755 status/remesh records are now composed with the current product
+candidate. A fresh whole32-target Release/native/graphics/GUI/loader/P1 cycle is
+next; focused component evidence does not qualify that full union. Matching SAN,
+current inherited role readers and appropriate device evidence remain required.
+Earlier paused and pending status entries below are historical. All original
+requirements remain incomplete; no installation or new headset acceptance.
 
 ## Goal resumed: current component integration — 2026-11-06
 
@@ -69,7 +111,7 @@ accepted publication; a genuine bounded construction repair is in progress.
 New sourceful texture/resolution branches, broader production, interoperability,
 backend/device and controller-drawer requirements remain required. Full goal active.
 
-## Private combined sculpt/material Release evidence — 2026-11-06
+## Historical private combined sculpt/material Release evidence — 2026-11-06
 
 Private `d1f40159` now has fresh reachable Release application/core/render/XR
 providers, 15 selected native suites, 733 software and 733 authenticated Arc GL
@@ -80,6 +122,23 @@ running. This does not admit the source into main or complete current combined
 XR/Wayland/physical, production performance, sourceful texture sets, resolution,
 broader authoring/interoperability/accelerator or controller-drawer requirements.
 The full objective remains active and incomplete.
+
+Historical private-branch notes follow. Their original scope is retained;
+the matched current qualification above supersedes their runtime status.
+
+## Private coherent polygon/texture Release candidate — 2026-11-06
+
+Current qualified sourceee557 composes the existing main44fe foundation with
+owning polygon fields39, plain native texture sets40 and shared-geometry export.
+Fresh reachable app/core/support/render/XR,8native modes577, actual FLTK70,
+software+authenticatedArc existingGL51 and independentappearance537 perdevice,
+and5Khronos outputs0errors pass. Read
+[COHERENT-POLYGON-TEXTURE-RELEASE.md](COHERENT-POLYGON-TEXTURE-RELEASE.md).
+This is a private Release checkpoint: new-layout sanitizer, broader compositor,
+XR/interoperability/accelerator/physical verification, source-backed fields,
+retained set history, all-channel resolution editing and the full remaining
+requirements are still required. Main admission and local-coordinate chunk
+composition are separate; no complete production or ALL claim.
 
 ## Current isotropic remeshing integration — 2026-11-06
 
@@ -148,6 +207,36 @@ RETOPO-CALLER-ADMISSION.md. This is private qualified integration, not main
 admission or completion of broader retopology/remeshing, authoring, interoperability,
 GPU/performance and physical-workflow requirements. Existing limits and default
 policies are unchanged.
+
+## Owning37 continuation with current main — 2026-11-05
+
+This private tree now combines owning37 candidate c6e6cd5 with admitted main
+c53e0b6 (explicit SurfaceHeat5, Automatic0 default unchanged). This merge has
+not yet been compiled or qualified. The earlier c6 cohort has a fresh optimized
+Release application and selected native/key/codec/package checks, not full-suite
+or sanitizer qualification. All 244 actual own objects, archives and executables
+are preserved in verified separate-inode copy-on-write snapshots before this
+source merge. Existing component results retain their exact original scope.
+
+A genuine manifold affine/reflected source now proves retained-domain polygon
+refusal, Save/history/cancellation/retry and before-only37 persistence/Restore.
+The required changed-polygon positive after canonical-paint Restore still fails:
+"Baked normal field lost its actual separate attribute origin". The conversion
+keeps the baked field but drops its material origin; new geometry also needs
+real current normal/paint correspondence. This is an unimplemented adapter,
+not a reason to discard fields, counterfeit owners or bypass validation.
+All production, caller-input, remesh, interoperability, accelerator, device and
+controller-drawer requirements remain active. Entries below retain checkpoint
+history; this source merge is not main admission or a completed release.
+
+## Private owning37 source continuation — 2026-11-05
+
+Current main9dd63f9 and private admission candidate93c1fad are composed by real
+merge history in this branch. This is source integration only: no new build or
+runtime/GUI/device qualification. A changed SourceMaterialBindings owner requires
+fresh owning consumers. Keep older component proofs scoped to their original
+bytes. Current polygon/weights/caller repairs and every unfinished requirement
+remain required before production admission. Read HANDOFF.md.
 
 ## Explicit surface-heat binding admission — 2026-11-05
 

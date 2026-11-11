@@ -1,0 +1,43 @@
+{
+  "scope": "Implemented shared texture history source adapter; syntax only, no runtime qualification",
+  "base": "fc43fa7d2bf157b0843181a9a91fb28cb4d56761",
+  "files": {
+    "src/texture-set-archive.hpp": "19e923d7253b84089ebab51867706e8e28f9da96e45354b12222e177246c85b9",
+    "src/texture-set-archive.cpp": "efb611b1aa9b5fb0689394d265219085e4fb7392beda4be7c544cae7ec8fa963",
+    "src/polygon-scene-archive.hpp": "7eafbe7822b61237b26c0e696d28b54ba2820e24c9184ebd748e1c0af6e21b8b",
+    "src/polygon-scene.cpp": "0186f4729317a2aed90f8621275516d63dbc58991e9f51ae169a5a3f2ac9fbb1",
+    "tests/texture-set-history.cpp": "c29328eb173d208dd0498608ef04324033ec7e1ffe79b8072d31f45add6002ea"
+  },
+  "syntax": [
+    {
+      "state": "terminal",
+      "exits": [
+        0,
+        0,
+        1
+      ],
+      "seconds": 6.793929845967796,
+      "input_count": 408,
+      "drift": [],
+      "allocated": 4390912,
+      "cap": 8388608
+    },
+    {
+      "state": "terminal",
+      "exit": 0,
+      "seconds": 1.8266787260072306,
+      "input_count": 408,
+      "drift": [],
+      "allocated": 4444160,
+      "cap": 8388608
+    }
+  ],
+  "remaining": [
+    "Root Scene wiring and sourceful material/node prefix graph adapter",
+    "Fresh coherent whole-owned providers and regression execution",
+    "Full Scene Save/fresh reopen/Undo/Redo/Restore",
+    "Genuine plain40-to-polygon membership transition",
+    "SAN and physical device gates",
+    "Per-set painted resolution editing"
+  ]
+}

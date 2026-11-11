@@ -6,6 +6,7 @@
 #include "source-uv-archive.hpp"
 #include "paint-archive-shape.hpp"
 #include <nlohmann/json.hpp>
+#include <optional>
 namespace dome::detail {
 // A Scene12 aggregate preflight runs before any Volume, SurfaceMap, mesh, skin
 // or retained source object is decoded. Every serialized payload is charged;
@@ -43,9 +44,10 @@ struct PolygonSceneBudget {
     add(samples, n, 4'000'000,
         "Scene retained polygon sculpt storage exceeds budget");
   }
-  void paint(const nlohmann::json &input, bool retained=false,unsigned version=std::numeric_limits<unsigned>::max()) {
+  void paint(const nlohmann::json &input, bool retained=false,unsigned version=std::numeric_limits<unsigned>::max(),bool shared_set_geometry=false,std::optional<bool> source_physical={}) {
     if (input.is_null())
       return;
+    if(source_physical&&(version!=40||!shared_set_geometry||input.contains("version")||input.contains("mesh")))throw std::invalid_argument("Source-grid counting requires its inspected Scene40 shared geometry context");
     const auto &p=paint_archive_payload(input,owning_paint_domain,SourcePaintDecodeContext{independent_source_paint,owning_physical_emission&&version>=27});
     if(input.contains("version")&&input.at("version")==4){
       if(version<28)throw std::invalid_argument("Independent source paint requires its actual Scene28 feature");
@@ -84,11 +86,14 @@ struct PolygonSceneBudget {
       }
       if(l.contains("physical_emission_tiles")){
         const auto &tiles=l.at("physical_emission_tiles");
-        if(!owning_physical_emission||version<27||!physical_paint_authority(input,SourcePaintDecodeContext{independent_source_paint,owning_physical_emission&&version>=27})||!tiles.is_array()||tiles.empty()||tiles.size()>4096)
+        if(!owning_physical_emission||version<27||!(source_physical.value_or(false)||physical_paint_authority(input,SourcePaintDecodeContext{independent_source_paint,owning_physical_emission&&version>=27}))||!tiles.is_array()||tiles.empty()||tiles.size()>4096)
           throw std::invalid_argument("Physical paint requires actual Scene27/Paint3 capability");
         add(paint_bytes,tiles.size()*sizeof(PaintEmissionTile),256*1024*1024,"Scene retained physical paint storage exceeded");
       }
     }
+    if(shared_set_geometry){
+      if(version!=40||p.contains("mesh"))throw std::invalid_argument("Paint7 must use its owning geometry table");
+    }else{
     const auto &mesh = p.at("mesh");
     if(retained && mesh.at("positions").is_binary())
       add(retained_vertices,mesh.at("positions").get_binary().size()/12,8'000'000,
@@ -97,6 +102,7 @@ struct PolygonSceneBudget {
       if (item.value().is_binary())
         add(paint_bytes, item.value().get_binary().size(), 256 * 1024 * 1024,
             "Scene retained mesh storage exceeded");
+    }
     if (p.contains("baked"))
       for (const auto *key :
            {"color", "orm", "emission", "normal", "coverage"}) {

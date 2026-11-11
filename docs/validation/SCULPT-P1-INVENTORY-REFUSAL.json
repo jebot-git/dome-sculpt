@@ -1,0 +1,68 @@
+{
+  "current_provider_source": "d1f4015995c48ee582b9478d99cb521a1101571b",
+  "consumer_source": "93b8493d7dbc93894b5cb338f925db4fb187e827",
+  "scope": "Exact approved P1 INVENTORY ONLY; no fallback, product change, limit relaxation, sustained loops or Arc context",
+  "argv": [
+    "/tmp/dome-sculpt-sustained-d1f4-krc4t7nt/dome-sculpt-sculpt-sustained",
+    "--output",
+    "/tmp/dome-sculpt-sustained-d1f4-krc4t7nt/P1-inventory",
+    "--inventory-only",
+    "--device",
+    "software",
+    "--tier",
+    "production",
+    "--objects",
+    "1",
+    "--voxel",
+    ".0125",
+    "--width",
+    "768",
+    "--height",
+    "768"
+  ],
+  "consumer_sha256": "29385b6b5877fe260ae057fd5857f87e48341c919673786cab4eb836bc2508e5",
+  "state": "terminal",
+  "exit": 1,
+  "child_exit": 1,
+  "admitted": false,
+  "reason": "Document error: Sculpt chunk working byte limit exceeded",
+  "error": null,
+  "actual_size": null,
+  "seconds": 3.9079355240100995,
+  "rss_tree_peak_bytes": 295702528,
+  "rss_tree_limit_bytes": 3221225472,
+  "wall_limit_seconds": 180,
+  "drift": [],
+  "owned282_drift": [],
+  "runtime_post_drift": [],
+  "space_final": {
+    "workspace_free_bytes": 21724164096,
+    "tmpfs_free_bytes": 29497643008,
+    "metadata_allocated_bytes": 2318336,
+    "tmpfs_allocated_bytes": 17764352,
+    "cap_bytes": 100663296,
+    "prospective_bytes": 67108864
+  },
+  "output_files": {
+    "/tmp/dome-sculpt-sustained-d1f4-krc4t7nt/P1-inventory/fixed-inputs.json": {
+      "sha256": "85e82de7824ea1d90ff79938d46a4e8dbfc2e3c81602b6cdc4d5dc428aa4419d",
+      "bytes": 450786
+    },
+    "/tmp/dome-sculpt-sustained-d1f4-krc4t7nt/P1-inventory/result.json": {
+      "sha256": "929315d274b5e780a66377afdacaf02cf414432f3c172a49d2dfe32793eac8a5",
+      "bytes": 2148
+    },
+    "/tmp/dome-sculpt-sustained-d1f4-krc4t7nt/P1-inventory/context-initial.maps": {
+      "sha256": "1378f1adbd440c235f7e78dfa4db531c94a0492effc77c7d86e0fb4d7a4e35e0",
+      "bytes": 31548
+    },
+    "/tmp/dome-sculpt-sustained-d1f4-krc4t7nt/P1-inventory/raw-samples.ndjson": {
+      "sha256": "d019a828c68becfb0b33c1054cd4324bdc7c26acd2e0ea2953d071d237818c76",
+      "bytes": 230
+    }
+  },
+  "status_sha256": "5783518f792b477e2bd9798f6743034f88c9554789507d1768fac385c886af32",
+  "status_path": "artifacts/current-inventory-P1-v1/status.json",
+  "actual_count_scope": "No production snapshot/count was accepted. Only the unchanged small grouped regression completed before cold P1 refusal. No warm-up/stable production oracle or sustained work ran.",
+  "no_fallback_or_guard_relaxation": true
+}

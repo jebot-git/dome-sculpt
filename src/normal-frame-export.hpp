@@ -1,8 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 #include "normal-frame-runtime.hpp"
+#include "vrm1-normal-authority.hpp"
 #include "export-corner-coordinates.hpp"
 #include "native-paint-sampling.hpp"
+#include "canonical-paint-sampling.hpp"
 #include "native-paint-frame-source.hpp"
 #include "native-paint-export-policy.hpp"
 #include "dome/color-paint-sampling.hpp"
@@ -132,8 +134,8 @@ inline PaintSourceTexture normal_frame_canonical_export(const ObjectSurface &inp
   view.wrap_s=view.wrap_t=33071;view.min_filter=view.mag_filter=9729;
   return view;
 }
-inline NormalFrameExport normal_frame_export(const ObjectSurface &input,SourceMorphSpace space,
-    const std::function<bool()> &cancelled={},bool retain_pbr_sampling=false) {
+inline NormalFrameExport normal_frame_export_impl(const ObjectSurface &input,SourceMorphSpace space,
+    const std::function<bool()> &cancelled,bool retain_pbr_sampling,const Vrm1NormalFrameExportProof *normal_proof) {
   if(!input.material_bindings || !input.material_bindings->normal_frames)throw std::invalid_argument("Missing original frame export payload");
   const auto &binding=*input.material_bindings;binding.validate();const auto &set=*binding.normal_frames;
   if(binding.native_paint_frames&&(!input.paint_sampling_attachment||input.paint_corner_coordinates.empty()))
@@ -150,7 +152,7 @@ inline NormalFrameExport normal_frame_export(const ObjectSurface &input,SourceMo
   const bool legacy=space==SourceMorphSpace::Original;const auto selected=legacy?set.mtoon:set.pbr;auto tangent_source=selected;
   if(!selected)throw std::invalid_argument("Selected export material has no retained normal frame");
   const bool pbr_normal=prepared||(input.textures && input.textures->source_maps && input.textures->source_maps->normal.image && input.textures->source_maps->normal_scale!=0);
-  if(!prepared && pbr_normal && input.textures->source_maps->normal.uv_transform!=std::array<float,6>{1,0,0,1,0,0})throw std::invalid_argument("Normal texture transform needs a proven PBR consumer frame convention before export");
+  if(!prepared && pbr_normal && input.textures->source_maps->normal.uv_transform!=std::array<float,6>{1,0,0,1,0,0} && !(normal_proof&&normal_proof->matches(input)))throw std::invalid_argument("Normal texture transform needs a proven PBR consumer frame convention before export");
   const bool mtoon_normal=binding.has_mtoon && binding.material.parameters.normal_enabled && binding.material.parameters.normal_scale!=0 && binding.material.textures[size_t(MToonSlot::Normal)].index>=0;
   if(legacy && (!binding.has_mtoon || binding.material.version()!=MToonVersion::V0))throw std::invalid_argument("Original frame VRM0 export requires an explicit legacy MToon0 material");
   if((legacy?mtoon_normal:pbr_normal) && selected->tangents.empty())throw std::invalid_argument("Normal mapped export has no retained authoritative tangents");
@@ -177,8 +179,9 @@ inline NormalFrameExport normal_frame_export(const ObjectSurface &input,SourceMo
     const auto node=binding.color_preparation?binding.color_preparation->paint_sampling:nullptr;
     const auto native=binding.native_paint_frames;
     const auto sampling=native?binding.native_paint_sampling:nullptr;
-    const auto expected=sampling?sampling->attachment():node?node->geometry_attachment():nullptr;
-    if(legacy||binding.has_mtoon||(!native&&!retained)||!expected||expected!=input.paint_sampling_attachment||
+    const auto canonical=binding.canonical_paint_sampling;
+    const auto expected=sampling?sampling->attachment():canonical?canonical->attachment():node?node->geometry_attachment():nullptr;
+    if(legacy||binding.has_mtoon||(!native&&!canonical&&!retained)||!expected||expected!=input.paint_sampling_attachment||
         expected.owner_before(input.paint_sampling_attachment)||input.paint_sampling_attachment.owner_before(expected))
       throw std::invalid_argument("Paint sampling export requires its own supported native colour/normal attachment");
     PaintSamplingLimits limits;limits.cancelled=cancelled;
@@ -186,11 +189,14 @@ inline NormalFrameExport normal_frame_export(const ObjectSurface &input,SourceMo
       // The normal source was captured from the CURRENT geometry at key
       // creation. Its older writable paint source is an independent domain;
       // never reinterpret either origin as the other one's UV coordinates.
-      if(node||retained||!retain_pbr_sampling||input.appearance||input.polygon_colors||
+      if(canonical||node||retained||!retain_pbr_sampling||input.appearance||input.polygon_colors||
           !sampling->valid_owner(sampling))
         throw std::invalid_argument("Native key export requires its exact independent frame and paint owners");
       native->validate_binding(binding,true,cancelled);
       sampling->validate(limits);sampling->validate_mesh(input.mesh,limits);
+    }else if(canonical){
+      canonical->validate_binding(binding,true);
+      canonical->normal_uv()->validate_current(input.mesh,cancelled);
     }else node->validate_current(input.mesh,cancelled);
     auto corners=expected->domain()->corner_coordinates(input.mesh,limits);
     if(corners!=input.paint_corner_coordinates)throw std::invalid_argument("Paint export corner stream differs from its own REST/domain proof");
@@ -248,5 +254,9 @@ inline NormalFrameExport normal_frame_export(const ObjectSurface &input,SourceMo
     out.surface.appearance=std::move(appearance);
   }
   return out;
+}
+inline NormalFrameExport normal_frame_export(const ObjectSurface &input,SourceMorphSpace space,
+ const std::function<bool()> &cancelled={},bool retain_pbr_sampling=false){
+ return normal_frame_export_impl(input,space,cancelled,retain_pbr_sampling,nullptr);
 }
 } // namespace dome::detail

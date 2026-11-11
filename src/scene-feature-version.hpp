@@ -13,6 +13,8 @@
 #include "emission-authority.hpp"
 #include "native-paint-sampling.hpp"
 #include "native-paint-frame-source.hpp"
+#include "canonical-paint-sampling.hpp"
+#include "polygon-surface-owner.hpp"
 #include <set>
 #include <nlohmann/json.hpp>
 namespace dome { struct PolygonAuthority; }
@@ -53,6 +55,10 @@ inline unsigned minimum_scene_version(const PaintedMesh *paint){return paint&&pa
 inline unsigned minimum_scene_version(const SourceMaterialBindings *binding) {
   if (!binding)
     return 0;
+  // This newest feature is selected only by a real owning node. Its complete
+  // before graph is validated/collected separately, including before-only roots.
+  if(binding->polygon_surface_transfer)return 39;
+  if(binding->canonical_paint_sampling)return 37;
   unsigned result=binding->uv_origin
              ? std::max({minimum_scene_version(binding->uv_origin->paint.get()),minimum_scene_version(binding->uv_origin->deformation.get()),minimum_scene_version(binding->uv_origin->appearance.get())})
              : 0u;
@@ -126,6 +132,8 @@ inline unsigned minimum_deformation_scene_version(const nlohmann::json &d) {
 // Scan actual reachable material owners, including histories. Separate objects
 // can require the two capabilities even when neither individual binding does.
 inline unsigned composed_material_scene_version(const SourceMaterialArchive &materials){
+  if(std::any_of(materials.bindings().begin(),materials.bindings().end(),[](const auto&b){return bool(b->polygon_surface_transfer);}))return 39u;
+  if(std::any_of(materials.bindings().begin(),materials.bindings().end(),[](const auto &b){return bool(b->canonical_paint_sampling);}))return 37u;
   if(std::any_of(materials.bindings().begin(),materials.bindings().end(),[](const auto &b){return bool(b->native_paint_frames);}))return 36u;
   bool native=false,canonical=false;
   for(const auto &b:materials.bindings()){

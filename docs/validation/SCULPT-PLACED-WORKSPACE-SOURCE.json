@@ -1,0 +1,140 @@
+{
+  "scope": "source-only syntax; no object, link, native, GPU or P1 runtime",
+  "base": "498fee621e6dd71491a4b3fd0b18ddd53b0902dd",
+  "source": {
+    "src/sculpt-placed-chunk.cpp": "eda2b037788adc3c156a48a2eff98fefc6549b3ba234115f501e4fd8ef242a57",
+    "src/sculpt-placed-chunk.hpp": "ff0a241ad5d5bb3af5902981512a7c1fe8d2088e6669b88b86faab1362ee4286",
+    "src/sculpt-placed-chunks.cpp": "a641bb9847ab4fb8e2ccef51aca1181f7da77c2cd6c984d42e3a196eefca557b",
+    "src/sculpt-placed-chunks.hpp": "a2d50b762034f0d8dd32d7c43759475641720e6f2a9eae3c1d43e4255f0768c3",
+    "src/sculpt-scene-chunks.cpp": "5e198fb9485e77493b4de9d4d6c3b886202c3fd9b6c3168b5a07ac10859f5d34",
+    "tests/sculpt-placed-workspace.cpp": "0b650edaf64278b20d2dd143cb4d7dc88d59f13acbcfd2239492a22d496bd3f8",
+    "tests/sculpt-placed-workspace.cmake": "bae28aa0c58586e0c72f9233028ef3170244566bc2970875e065416d8d19b615",
+    "CMakeLists.txt": "85a25a311bf6343cb38d5ab09c7acf9f78273b2cce3b452f979c1afaf223978e"
+  },
+  "results": [
+    {
+      "source": "src/sculpt-placed-chunk.cpp",
+      "command": [
+        "c++",
+        "-std=gnu++20",
+        "-O3",
+        "-DNDEBUG",
+        "-ffunction-sections",
+        "-fdata-sections",
+        "-Wall",
+        "-Wextra",
+        "-Wpedantic",
+        "-fsyntax-only",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-placed-workspace-498/src",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/src",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/include",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/third_party/openbrush",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/third_party/nlohmann",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/third_party",
+        "src/sculpt-placed-chunk.cpp"
+      ],
+      "exit": 0,
+      "seconds": 0.6417568249744363,
+      "diagnostic_bytes": 0
+    },
+    {
+      "source": "src/sculpt-placed-chunks.cpp",
+      "command": [
+        "c++",
+        "-std=gnu++20",
+        "-O3",
+        "-DNDEBUG",
+        "-ffunction-sections",
+        "-fdata-sections",
+        "-Wall",
+        "-Wextra",
+        "-Wpedantic",
+        "-fsyntax-only",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-placed-workspace-498/src",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/src",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/include",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/third_party/openbrush",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/third_party/nlohmann",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/third_party",
+        "src/sculpt-placed-chunks.cpp"
+      ],
+      "exit": 0,
+      "seconds": 0.6173003729782067,
+      "diagnostic_bytes": 0
+    },
+    {
+      "source": "src/sculpt-scene-chunks.cpp",
+      "command": [
+        "c++",
+        "-std=gnu++20",
+        "-O3",
+        "-DNDEBUG",
+        "-ffunction-sections",
+        "-fdata-sections",
+        "-Wall",
+        "-Wextra",
+        "-Wpedantic",
+        "-fsyntax-only",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-placed-workspace-498/src",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/src",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/include",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/third_party/openbrush",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/third_party/nlohmann",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/third_party",
+        "src/sculpt-scene-chunks.cpp"
+      ],
+      "exit": 0,
+      "seconds": 0.7471920190146193,
+      "diagnostic_bytes": 0
+    },
+    {
+      "source": "tests/sculpt-placed-workspace.cpp",
+      "command": [
+        "c++",
+        "-std=gnu++20",
+        "-O3",
+        "-DNDEBUG",
+        "-ffunction-sections",
+        "-fdata-sections",
+        "-Wall",
+        "-Wextra",
+        "-Wpedantic",
+        "-fsyntax-only",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-placed-workspace-498/src",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/src",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/include",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/third_party/openbrush",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/third_party/nlohmann",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/third_party",
+        "tests/sculpt-placed-workspace.cpp"
+      ],
+      "exit": 0,
+      "seconds": 1.5427008160040714,
+      "diagnostic_bytes": 0
+    }
+  ],
+  "source_drift": [],
+  "product_provider_drift": [],
+  "workspace_free": 21726052352,
+  "initial_failure_preserved": "artifacts/source-only-v1/input and logs",
+  "standalone_numerical_limits_unchanged": true,
+  "public_and_private_object_data_layouts_unchanged": true,
+  "changed_whole_providers": [
+    "src/sculpt-placed-chunk.cpp",
+    "src/sculpt-placed-chunks.cpp",
+    "src/sculpt-scene-chunks.cpp"
+  ],
+  "append_only_private_methods": [
+    "SculptPlacedChunk::placement_bytes",
+    "SculptPlacedChunk::query_bytes",
+    "SculptPlacedChunks::placement_bytes"
+  ],
+  "previous_failure": {
+    "source": "498fee621e6dd71491a4b3fd0b18ddd53b0902dd",
+    "result": "/tmp/dome-sculpt-498fee62-benchmark/p1/result.json",
+    "sha256": "b50b7e16aac3821166e8ea7fe9927eff94fb4dfaf5a336f0cb3a6f521806e3f7",
+    "visible_triangles": 258852,
+    "status": "cold publication then warm-up placed directory working-byte refusal; inventory not admitted"
+  },
+  "runtime_under_fix": false
+}

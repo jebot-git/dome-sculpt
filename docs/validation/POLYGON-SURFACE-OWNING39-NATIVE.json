@@ -1,0 +1,103 @@
+{
+  "status": "Qualified private initial owning polygon-field native workflow; not renderer/UI/SAN/main admission",
+  "source": "643dec72c537040608c62a7c4b7f9b2b472e98e3",
+  "fresh_build_base": "e75409d3bc66cd16963f1a48cd45a2ca364376f6",
+  "product_delta": [
+    "src/polygon-surface-archive.cpp"
+  ],
+  "product_repair": "0ae2726b",
+  "layout_changes_since_fresh_base": false,
+  "actual_providers": {
+    "fresh_reachable_own_inputs": 233,
+    "old_preserved_inputs": 252,
+    "unchanged_prior_inputs_in_native_run": 239,
+    "whole_archive_override": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/artifacts/polygon-transfer39-owning-release/reader-lifecycle-v3/polygon-surface-archive.cpp.o",
+      "sha256": "20232b540a85af90b2170b6a11cdb59c7b96a9d9af021c6c7160b4e230122d5a"
+    },
+    "whole_fixture_object": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/artifacts/polygon-transfer39-owning-release/fixture-carrier-v5/polygon-surface-native.cpp.o",
+      "sha256": "17596d06553897b78d7c011365d7e604326c1baacf302a941648456e794ef7eb"
+    },
+    "native_ELF": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/artifacts/polygon-transfer39-owning-release/fixture-carrier-v5/native-test",
+      "sha256": "0c69336b1bfdf5d999ed8ecda1c582ef993a1486b08aa76e93780b10186eec3f"
+    },
+    "old_archive_member_excluded": true,
+    "all_prior_hashes_rechecked": true
+  },
+  "native_controls": 292,
+  "cases": 8,
+  "matrix": [
+    "native N-only / canonical baked-normal+key+FLOAT",
+    "ordinary affine / reflected affine",
+    "Move / Flip"
+  ],
+  "actual_workflows": [
+    "genuine Bake and editable polygon conversion",
+    "native physical-emission stroke",
+    "capture actual original paint and separate normal/key owners",
+    "native polygon gesture cancel and accepted worker Apply",
+    "immediately queued Save",
+    "owning Scene39/material21/Paint6 full and before-only second-cycle decoding",
+    "global Undo/Redo",
+    "restart plus exact source Restore and Undo/Redo"
+  ],
+  "strict_negatives": [
+    "wrong old Scene capability",
+    "out-of-range actual before root",
+    "false material feature flag",
+    "cross-pool future/cyclic owning prefix",
+    "standalone Paint6 without enclosing source authority",
+    "current polygon/source mismatch"
+  ],
+  "status_receipt": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/artifacts/polygon-transfer39-owning-release/fixture-carrier-v5/status.json",
+    "sha256": "9a7512964b2463ba9a82b612c33a970af44e97df96fe86c4f3f65c3c072ce591"
+  },
+  "native_log": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/artifacts/polygon-transfer39-owning-release/fixture-carrier-v5/native.log",
+    "sha256": "99c3f9582f9c53c351ea0a63458cf5c23d2d44b9a752d222d6d3af5d938785cf"
+  },
+  "plan": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/artifacts/polygon-transfer39-owning-release/fixture-carrier-v5/plan.json",
+    "sha256": "e1846672a16c83b656e3c450bdf0ca267df3a42ffb0ada3adc38c15d8e77b7f7"
+  },
+  "failure_map_archive_control": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/artifacts/polygon-transfer39-owning-release/closed-reader-v3-map/ledger.json",
+    "sha256": "dabac159d344ef714d729783ca74ee206e748972bede7bfad17e18083369b711"
+  },
+  "remaining": [
+    "shader sampler reuse and actual GL frames/mixed materials",
+    "SAN/desktop/OpenXR/device qualification",
+    "repeated edits and broad topology/source-aware domains",
+    "portable GLB/VRM field adapters"
+  ],
+  "limits": "CPU native component/application-provider evidence only; no current renderer execution, no hardware/headset claim; earlier failed invocations remain failed and preserved",
+  "downstream_consumers": {
+    "status": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/artifacts/polygon-transfer39-owning-release/remaining-five-v6/status.json",
+      "sha256": "29bf6d977e19597af254b63331445600a9165386fcb647f8639b93f9b808bd2f"
+    },
+    "plan": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/artifacts/polygon-transfer39-owning-release/remaining-five-v6/plan.json",
+      "sha256": "578a185f83cee7d28387f6d0f1ceeb8e6cb347baed9322afa3439cb7131b0ed3"
+    },
+    "counts": {
+      "node_codec": 56,
+      "current_paint_legacy_bytes_and_FLOAT": 16408,
+      "combined_affine_polygon_retopology": 248,
+      "canonical37_key_controls": 29,
+      "canonical37_emission_contracts": 28
+    },
+    "five_complete_fixture_TUs": true,
+    "same_whole_Archive_override": true,
+    "old_archive_member_excluded_for_every_link": true,
+    "prior_inputs_unchanged": 241,
+    "source_and_actual_ELF_maps_unchanged": true,
+    "phase_bytes": 207228928,
+    "cumulative_bytes": 1275940864,
+    "phase_cap_approved": 318767104,
+    "serial_link_prospective": 67108864
+  }
+}

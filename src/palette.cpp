@@ -324,6 +324,7 @@ void SpatialPalette::raster(const EditorState &s) {
         if(row==0){const char *methods[]={"Vertex positions","Exact authored reflection","Relative artist-frame conversion"};label=methods[std::clamp(int(std::lround(value*2)),0,2)];}
         else {char shown[96];snprintf(shown,sizeof(shown),row==1?"Plane X: %.7g local m":"Match tolerance: %.5g local m",row==1?detail::mirror_plane_metres(value):double(detail::mirror_tolerance_metres(value)));label=shown;}
       }
+      else if(c.parameter==VrParameter::TextureResolution)label=std::to_string(64u<<std::clamp(int(std::lround(value)),0,5))+" x "+std::to_string(64u<<std::clamp(int(std::lround(value)),0,5))+" pixels";
       else if(c.parameter==VrParameter::ShapeRestore)label=value>=.5f?"Restore complete original state":"Cancel (default)";
       else if(c.parameter==VrParameter::PolygonConversion)label=value>=1.5f?"Restore retained original source":value>=.5f?(s.polygon_requires_conversion?"Convert visible shape / retain source":"Edit current native polygons"):"Cancel (default)";
       else if(c.parameter==VrParameter::PolygonDistance){char size[64];snprintf(size,sizeof(size),"Distance %.6g world mm",double(value));label=size;}
@@ -409,7 +410,7 @@ void SpatialPalette::raster(const EditorState &s) {
     rect(360 * unit_, 588 * unit_, 220 * unit_, 42 * unit_, accent);
     text(170 * unit_, 616 * unit_, "Cancel", fg);
     text(470 * unit_, 616 * unit_,
-         c.parameter == VrParameter::ShapeMirror ? "Mirror / Press" : (c.parameter == VrParameter::VoxelSize || c.parameter == VrParameter::TriangleEdge) ? "Remesh / Press" : "Done / Press", fg);
+         c.parameter == VrParameter::TextureResolution ? "Apply resize / Press" : c.parameter == VrParameter::ShapeMirror ? "Mirror / Press" : (c.parameter == VrParameter::VoxelSize || c.parameter == VrParameter::TriangleEdge) ? "Remesh / Press" : "Done / Press", fg);
     if (c.parameter == VrParameter::RigRotation || c.parameter == VrParameter::MorphWeight)
       text(320 * unit_, 480 * unit_, "Apply on Done / Press", fg);
     if (c.parameter == VrParameter::VoxelSize || c.parameter == VrParameter::TriangleEdge) {
@@ -459,6 +460,7 @@ void SpatialPalette::raster(const EditorState &s) {
       if (sector == 10)
         return !current->material.toon;
     }
+    if(s.menu_page==31 && sector==2)return s.texture_face_select;
     if(s.menu_page==30 && sector==4)return s.paint.emission_units==PaintEmissionUnits::MaterialRelative;
     if(s.menu_page==30 && sector==5)return s.paint.emission_units==PaintEmissionUnits::Physical;
     if(s.menu_page==30 && sector==7)return s.paint.channel==PaintChannel::Emission;
@@ -540,7 +542,7 @@ void SpatialPalette::raster(const EditorState &s) {
     text(320*unit_,295*unit_,view.settings?rig_fit_parameter_text(view):rig_fit_selection_label(view),fg);
     text(320*unit_,320*unit_,view.rest_source?std::to_string(view.bone_heads.size())+" original bones":rig_fit_selection_point(view)?std::to_string(view.landmarks.points.size())+" landmarks placed":"Not placed",fg);
   }
-  const char *page = s.menu_page==30 ? "Emission / HDR" : s.menu_page==29 ? "VRM1 expression preview" : s.menu_page==28 ? "Export / editable project" : s.menu_page==27 ? "Humanoid rig fitting" : s.menu_page==25 ? "Image projection" : s.menu_page==24 ? "Shapekey tools" : s.menu_page==22 ? "Polygon topology" : s.menu_page==19 ? "Polygon edit" : s.menu_page == 23 ? "Import options" : s.menu_page == 21 ? "Import model" : s.menu_page == 20 ? "Holding / isolation" : s.menu_page == 18 ? "Procedural sculpt" : s.menu_page == 17 ? "Plane cut" : s.menu_page == 16 ? "Retopology" : s.menu_page == 15 ? "Masks / symmetry" : s.menu_page == 14 ? "Bind / transfer skin"
+  const char *page = s.menu_page==31 ? "Material texture sets" : s.menu_page==30 ? "Emission / HDR" : s.menu_page==29 ? "VRM1 expression preview" : s.menu_page==28 ? "Export / editable project" : s.menu_page==27 ? "Humanoid rig fitting" : s.menu_page==25 ? "Image projection" : s.menu_page==24 ? "Shapekey tools" : s.menu_page==22 ? "Polygon topology" : s.menu_page==19 ? "Polygon edit" : s.menu_page == 23 ? "Import options" : s.menu_page == 21 ? "Import model" : s.menu_page == 20 ? "Holding / isolation" : s.menu_page == 18 ? "Procedural sculpt" : s.menu_page == 17 ? "Plane cut" : s.menu_page == 16 ? "Retopology" : s.menu_page == 15 ? "Masks / symmetry" : s.menu_page == 14 ? "Bind / transfer skin"
                      : s.menu_page == 13 ? "Skin weights"
                      : s.menu_page == 12 ? "Mesh baking"
                      : s.menu_page == 11 ? "Rig and shapekeys"
@@ -556,6 +558,7 @@ void SpatialPalette::raster(const EditorState &s) {
   text(320 * unit_, 345 * unit_, page, fg);
   auto active = std::find_if(s.objects.begin(), s.objects.end(),
                              [&](auto &o) { return o.id == s.active_object; });
+  if(s.menu_page==31){const auto set=std::find_if(s.texture_sets.begin(),s.texture_sets.end(),[&](const auto&v){return v.id==s.active_texture_set;});text(320*unit_,280*unit_,"Set "+std::to_string(s.active_texture_set)+": "+(set==s.texture_sets.end()?std::string{}:set->name),fg);text(320*unit_,312*unit_,std::to_string(s.texture_faces.size())+" faces / "+(set==s.texture_sets.end()?std::string{}:std::to_string(set->resolution)+" px / ")+(s.texture_face_select?"Picking faces":"Paint selected set"),fg);}
   if(s.menu_page==29&&s.expressions){
     const auto &v=*s.expressions;std::string status;
     if(!v.entries.empty()){const auto &entry=v.entries.at(v.selected);status=(entry.custom?"Custom: ":"Preset: ")+entry.name+" | "+std::to_string(int(std::lround(entry.weight*100)))+"%"+(entry.binary?" (binary)":"");}

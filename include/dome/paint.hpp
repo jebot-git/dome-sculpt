@@ -6,11 +6,12 @@
 #include <map>
 #include <memory>
 namespace dome {
-namespace detail {class PaintOverlayPacket;struct PaintOverlayFactory;struct EmissionExportAccess;class BakedNormalField;struct NativeWeightPaintAccess;}
+namespace detail {class PaintOverlayPacket;struct PaintOverlayFactory;struct EmissionExportAccess;class BakedNormalField;struct NativeWeightPaintAccess;struct TextureSetPaintAccess;class TextureSetFieldSource;class PolygonSurfaceOwner;class PolygonSurfacePreview;struct PolygonSurfaceStage;struct PolygonSurfacePaintCodec;}
 struct Material;
 class PaintProjection;
 class PaintSamplingDomain;
 class PaintSamplingAttachment;
+class TextureSetFaceDomain;
 class PaintSamplingArchive;
 struct SourcePaintDecodeContext;
 struct PaintSourceMaps;
@@ -69,6 +70,9 @@ struct TextureMaps {
   std::shared_ptr<const PaintNormalProjection> normal_projection;
   // Transient sparse GPU contribution input; never a serialized image authority.
   std::shared_ptr<const detail::PaintOverlayPacket> overlay;
+  // Scene39 current surface field. Independent from colour/F32 grid sampling;
+  // a generic baked-normal/source-frame interpretation cannot replace it.
+  std::shared_ptr<const detail::PolygonSurfacePreview> polygon_surface;
 };
 enum class BakedColorInterpretation { VertexComponent, ResolvedPbr };
 enum class BakedNormalInterpretation { CanonicalMikk, PreparedAttributes };
@@ -244,14 +248,31 @@ private:
   friend struct detail::PaintOverlayFactory;
   friend struct detail::EmissionExportAccess;
   friend struct detail::NativeWeightPaintAccess;
+  friend struct detail::TextureSetPaintAccess;
   friend struct PolygonPaintAccess;
   friend struct SourceNormalPreparationAccess;
   friend struct SourcePaintSamplingAccess;
   friend struct SourceKeyPaintAccess;
+  friend struct detail::PolygonSurfacePaintCodec;
+  nlohmann::json encode_native_payload(PaintImageArchive *,NormalSamplingArchive *,PaintSamplingArchive *,
+      const detail::PolygonSurfaceOwner *) const;
+  static std::shared_ptr<PaintedMesh> decode_native_payload(const nlohmann::json &,const PaintImageArchive *,
+      bool,const NormalSamplingArchive *,const PaintSamplingArchive *,const SourcePaintDecodeContext &,
+      const detail::PolygonSurfaceStage *);
   void seal_paint_sampling_attachment();
+  // Only the owning Scene40 membership archive may omit the current geometry.
+  // Legacy/public paint entry points never supply this sealed domain.
+  nlohmann::json encode_impl(PaintImageArchive *,NormalSamplingArchive *,PaintSamplingArchive *,
+      const std::shared_ptr<const TextureSetFaceDomain> &,const detail::PolygonSurfaceOwner * = nullptr,
+      const detail::TextureSetFieldSource*source_field=nullptr) const;
+  static std::shared_ptr<PaintedMesh> decode_impl(const nlohmann::json &,const PaintImageArchive *,
+      bool,const NormalSamplingArchive *,const PaintSamplingArchive *,const SourcePaintDecodeContext &,
+      const std::shared_ptr<const TextureSetFaceDomain> &,const detail::PolygonSurfaceStage * = nullptr,
+      const PaintedMesh*shared_raster=nullptr,const detail::TextureSetFieldSource*source_field=nullptr);
   PaintedMesh() = default;
   PaintedMesh(Mesh, uint32_t, const PaintSurfaceOptions &);
   PaintedMesh(Mesh, uint32_t, const PaintSurfaceOptions &,std::shared_ptr<const PaintSamplingDomain>);
+  PaintedMesh(std::shared_ptr<const Mesh>,uint32_t,const PaintSurfaceOptions &,std::shared_ptr<const PaintSamplingDomain>,std::shared_ptr<const TextureSetFaceDomain> = {});
   struct PaintSample { PaintSettings settings; float opacity = 1; };
   using PaintSampler = std::function<std::optional<PaintSample>(Vec3,Vec3)>;
   void stamp_sampled(const Brush &, const PaintSettings &, const PaintSampler &, const std::function<bool()> &cancelled = {}, const Evaluation * = nullptr);
@@ -264,6 +285,8 @@ private:
   std::shared_ptr<CompositeCache> composite_cache_;
   uint64_t composite_token_ = 0, before_composite_token_ = 0;
   std::shared_ptr<const SurfaceMap> surface_;
+  // Independent writable membership; geometry/raster can be shared by sets.
+  std::shared_ptr<const TextureSetFaceDomain> texture_set_domain_;
   std::shared_ptr<const PaintSamplingAttachment> sampling_attachment_;
   std::shared_ptr<const PaintSourceMaps> source_maps_;
   std::shared_ptr<const PaintColorProjection> color_projection_;

@@ -128,9 +128,8 @@ void Document::update_object_grab_locked(const SpatialFrame &frame){
       const auto &aim=hands[owner].aim;
       auto origin=world_to_model(state_.canvas,vec(aim.position));
       auto direction=vec(ob::rotate(ob::conjugate(state_.canvas.orientation),ob::rotate(aim.orientation,{0,0,-1})));
-      auto hit=snapshot->picking->raycast(origin,direction,100,frame.time);if(!hit)return;
-      const size_t corner=size_t(hit->triangle)*3;target=0;
-      for(const auto&r:snapshot->ranges)if(corner>=r.first&&corner-r.first<r.count){target=r.object;break;}
+      auto hit=snapshot->picking->raycast_target(origin,direction,100,frame.time);if(!hit)return;
+      target=hit->object;
       if(!target)return;
     }
     // Edge detection above used the previous hands. The accepted authority
@@ -193,9 +192,7 @@ std::optional<uint64_t> Document::pick_object(Vec3 origin,Vec3 direction,double 
   if(!std::isfinite(seconds))throw std::invalid_argument("Invalid material pick time");
   std::lock_guard lock(model_mutex_);auto snapshot=mesh_.load();
   if(snapshot->generation!=state_.generation || snapshot->revision!=state_.revision || !snapshot->picking)return {};
-  auto hit=snapshot->picking->raycast(origin,direction,100,seconds);if(!hit)return {};
-  const size_t corner=size_t(hit->triangle)*3;
-  for(const auto &r:snapshot->ranges)if(corner>=r.first&&corner-r.first<r.count)return r.object;
-  return {};
+  auto hit=snapshot->picking->raycast_target(origin,direction,100,seconds);if(!hit)return {};
+  return hit->object?std::optional<uint64_t>(hit->object):std::nullopt;
 }
 } // namespace dome

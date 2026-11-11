@@ -4,6 +4,7 @@
 #include "dome/source-maps.hpp"
 #include "gltf-document.hpp"
 namespace dome::detail {
+class CanonicalPaintSampling;
 Scene emission_export_subset(const Scene &,std::span<const uint64_t>);
 struct EmissionExportImage {
  uint64_t object=0;
@@ -15,6 +16,8 @@ struct EmissionExportImage {
  // Genuine native32 field; legacy images retain their implicit UV0 meaning.
  bool native_paint_domain=false;
  unsigned texcoord=0;
+ // Package4 only: actual independently authenticated canonical writable owner.
+ std::shared_ptr<const CanonicalPaintSampling> canonical_paint_domain;
 };
 void attach_native_emission(GltfDocument &,const NativeEmissionExport &,
                             std::span<const uint64_t> exported_objects,

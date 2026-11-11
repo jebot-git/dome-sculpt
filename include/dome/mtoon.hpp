@@ -3,6 +3,7 @@
 #include "math.hpp"
 #include <nlohmann/json.hpp>
 #include <string_view>
+#include <functional>
 namespace dome {
 namespace detail {struct NativeWeightMaterialAccess;}
 
@@ -85,6 +86,10 @@ public:
   static MToonMaterial from_vrm1(const nlohmann::json &,
                                  size_t texture_count = SIZE_MAX);
   void validate(size_t texture_count = SIZE_MAX) const;
+  // Conservative dynamic storage of a value copy, without making that copy.
+  // Includes retained unknown JSON even when an outer material is inactive.
+  size_t copy_working_bytes(size_t max_bytes,
+      const std::function<bool()> &cancelled = {}) const;
   nlohmann::json
   source_json() const; // Known edits merged; unknown data retained.
   nlohmann::json encode() const;

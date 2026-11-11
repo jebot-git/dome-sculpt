@@ -1,0 +1,166 @@
+{
+  "test_source": "93b8493d7dbc93894b5cb338f925db4fb187e827",
+  "current_provider_source": "d1f4015995c48ee582b9478d99cb521a1101571b",
+  "scope": "Fresh whole test consumer against exact CURRENT d1 headers/source/Release282 outputs only; corrected SMOKE logic, no production inventory/Arc/performance claim",
+  "state": "terminal",
+  "exit": 0,
+  "seconds": 30.236126760020852,
+  "steps": [
+    {
+      "name": "dependencies",
+      "exit": 0,
+      "seconds": 0.20455552998464555,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "compile",
+      "exit": 0,
+      "seconds": 15.401598151947837,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "link",
+      "exit": 0,
+      "seconds": 0.9092378600034863,
+      "log_sha256": "16edcc553219c8519b63019c61df69c1cc8118cef4874db044e823c5b45f6914"
+    },
+    {
+      "name": "smoke",
+      "exit": 0,
+      "seconds": 12.566377415030729,
+      "log_sha256": "3e6b064c74fbe50f507cd0af36949b7e32dee849fe01d6df388d726f76b6dc79"
+    }
+  ],
+  "current_protected_outputs": 282,
+  "actual_dependencies": 477,
+  "pinned_inputs": 3699,
+  "actual_trace_objects": 196,
+  "current_archives": 9,
+  "archive_members_receipt_sha256": "03a5354b3f6000a38d12559d6c02c8d62eee45bc6b6f439cdfb7136757776c2f",
+  "all_actual_project_members_current_d1": true,
+  "result": {
+    "status": "smoke-pass-not-production",
+    "initial_size": {
+      "chunks": 224,
+      "retained_chunk_bytes": 168124057,
+      "scalar_bytes": 57176,
+      "stored_samples": 114620,
+      "visible_triangles": 100704,
+      "visible_vertices": 57176
+    },
+    "device": {
+      "authenticated": true,
+      "drm_node_scope": "software GL, no hardware claim",
+      "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+      "requested": "software",
+      "vendor": "Mesa",
+      "version": "4.6 (Core Profile) Mesa 26.2.5"
+    },
+    "peak_rss_kib": 477456,
+    "history": {
+      "cancel_exact": true,
+      "ordered_save_reopen_exact": true,
+      "real_factory_return_barrier_reached": true,
+      "retired_native_generation_exact": true,
+      "undo_redo_exact": true
+    },
+    "gpu_timer_quality": {
+      "valid_samples": 8,
+      "expected_pairs": 8,
+      "valid_coverage": 1.0,
+      "distribution_qualified": true,
+      "disjoint_observed": false,
+      "reset_status": 0
+    },
+    "rows": 25
+  },
+  "independent_checkpoints": [
+    {
+      "checked_scalars": 14294,
+      "exact_frame_modes": 3,
+      "index": 0,
+      "kind": "independent_checkpoint",
+      "observer_ns_excluded": 1170872820,
+      "ordered_corners": 302112,
+      "raw_write_ns_excluded": 20370,
+      "repetition": 0,
+      "sequence": 2,
+      "typed_queries": 8,
+      "whole_extraction_and_checks_ns": 174666977
+    },
+    {
+      "checked_scalars": 14302,
+      "exact_frame_modes": 3,
+      "index": 1,
+      "kind": "independent_checkpoint",
+      "observer_ns_excluded": 1137446250,
+      "ordered_corners": 302160,
+      "raw_write_ns_excluded": 20736,
+      "repetition": 0,
+      "sequence": 14,
+      "typed_queries": 8,
+      "whole_extraction_and_checks_ns": 173790735
+    },
+    {
+      "checked_scalars": 14302,
+      "exact_frame_modes": 3,
+      "index": 2,
+      "kind": "independent_checkpoint",
+      "observer_ns_excluded": 1198280756,
+      "ordered_corners": 302160,
+      "raw_write_ns_excluded": 29257,
+      "repetition": 0,
+      "sequence": 30,
+      "typed_queries": 8,
+      "whole_extraction_and_checks_ns": 175509413
+    },
+    {
+      "checked_scalars": 14308,
+      "exact_frame_modes": 3,
+      "index": 3,
+      "kind": "independent_checkpoint",
+      "observer_ns_excluded": 1185709959,
+      "ordered_corners": 302196,
+      "raw_write_ns_excluded": 23882,
+      "repetition": 0,
+      "sequence": 32,
+      "typed_queries": 8,
+      "whole_extraction_and_checks_ns": 193881482
+    }
+  ],
+  "original_grouped_regression": {
+    "checked_scalars": 5092,
+    "exact_frame_modes": 3,
+    "kind": "original_grouped_regression",
+    "observer_ns_excluded": 1564269604,
+    "ordered_corners": 52008,
+    "raw_write_ns_excluded": 39943,
+    "repetition": 0,
+    "sequence": 0,
+    "typed_queries": 4,
+    "whole_extraction_and_checks_ns": 33433559
+  },
+  "protected_drift": [],
+  "owned282_drift": [],
+  "runtime_inputs": 69,
+  "runtime_post_drift": [],
+  "outputs": {
+    "/tmp/dome-sculpt-sustained-d1f4-krc4t7nt/dome-sculpt-sculpt-sustained": "29385b6b5877fe260ae057fd5857f87e48341c919673786cab4eb836bc2508e5",
+    "/tmp/dome-sculpt-sustained-d1f4-krc4t7nt/sustained.o": "e8d403d0305b8b3128ac08f6e97c6dd63eed99b246c8a62302654f71a628515b"
+  },
+  "space_final": {
+    "workspace_free_bytes": 21734899712,
+    "tmpfs_free_bytes": 30007721984,
+    "metadata_allocated_bytes": 1617920,
+    "tmpfs_allocated_bytes": 17268736,
+    "cap_bytes": 100663296,
+    "prospective_bytes": 67108864
+  },
+  "result_sha256": "2df5756f3f586bc271e2e633c2df3123975b768160591235cc6a9736ae909a8f",
+  "raw_samples_sha256": "aff79a667c7dbb5dea26f2c4a439222e8aa167f0fda7194e50ff8d55574c2588",
+  "fixed_inputs_sha256": "dab3cb81532095ee0b5b57310b5cd563e387bcdd59116619b01bec62b4bbc33f",
+  "status_receipt_sha256": "85b5ecb51a77d940fcfc267ec2464f5a04c0b2658fd3759d2a8d5deec5506997",
+  "artifact_status": "artifacts/current-smoke-v1/status.json",
+  "execution": "/tmp/dome-sculpt-sustained-d1f4-krc4t7nt",
+  "remaining": "Actual >=250000 production inventory, sustained production software/Arc timings and new-consumer sanitizer/physical pacing remain unexecuted. No speed claim from smoke."
+}

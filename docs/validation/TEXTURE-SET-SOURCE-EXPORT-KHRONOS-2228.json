@@ -1,0 +1,131 @@
+{
+  "state": "terminal",
+  "exit": 0,
+  "scope": "Independent Khronos source-export component GLB check; not new full combined cohort",
+  "files": [
+    {
+      "name": "native-reflected.glb",
+      "sha256": "732d3aaf84d2778124b4617c874a943bf48189b3f6aa320a996de3efb9bfdccf",
+      "errors": 0,
+      "warnings": 0,
+      "infos": 2,
+      "messages": [
+        {
+          "code": "UNUSED_OBJECT",
+          "message": "This object may be unused.",
+          "severity": 2,
+          "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+        },
+        {
+          "code": "UNUSED_OBJECT",
+          "message": "This object may be unused.",
+          "severity": 2,
+          "pointer": "/meshes/0/primitives/1/attributes/TEXCOORD_0"
+        }
+      ]
+    },
+    {
+      "name": "native-sheared.glb",
+      "sha256": "4859022987b4e98a8a23818983da74e5675beb745a51e91d25918c55706b9c46",
+      "errors": 0,
+      "warnings": 0,
+      "infos": 2,
+      "messages": [
+        {
+          "code": "UNUSED_OBJECT",
+          "message": "This object may be unused.",
+          "severity": 2,
+          "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+        },
+        {
+          "code": "UNUSED_OBJECT",
+          "message": "This object may be unused.",
+          "severity": 2,
+          "pointer": "/meshes/0/primitives/1/attributes/TEXCOORD_0"
+        }
+      ]
+    },
+    {
+      "name": "native-smooth.glb",
+      "sha256": "4062ff92ef560492cc9c36708bacbade66489158bdc7cd6feec1f7f50a6609d5",
+      "errors": 0,
+      "warnings": 0,
+      "infos": 2,
+      "messages": [
+        {
+          "code": "UNUSED_OBJECT",
+          "message": "This object may be unused.",
+          "severity": 2,
+          "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+        },
+        {
+          "code": "UNUSED_OBJECT",
+          "message": "This object may be unused.",
+          "severity": 2,
+          "pointer": "/meshes/0/primitives/1/attributes/TEXCOORD_0"
+        }
+      ]
+    },
+    {
+      "name": "prepared-reflected.glb",
+      "sha256": "77f6cb627d368e480a59456864ad6f7e7d19d4aea4823533ebbf6b11920bad27",
+      "errors": 0,
+      "warnings": 0,
+      "infos": 2,
+      "messages": [
+        {
+          "code": "UNUSED_OBJECT",
+          "message": "This object may be unused.",
+          "severity": 2,
+          "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+        },
+        {
+          "code": "UNUSED_OBJECT",
+          "message": "This object may be unused.",
+          "severity": 2,
+          "pointer": "/meshes/0/primitives/1/attributes/TEXCOORD_0"
+        }
+      ]
+    },
+    {
+      "name": "prepared-sheared.glb",
+      "sha256": "acb2207643b6ef5aaea9662b674c066e3e090ff204259a1bad0f543573b0911f",
+      "errors": 0,
+      "warnings": 0,
+      "infos": 2,
+      "messages": [
+        {
+          "code": "UNUSED_OBJECT",
+          "message": "This object may be unused.",
+          "severity": 2,
+          "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+        },
+        {
+          "code": "UNUSED_OBJECT",
+          "message": "This object may be unused.",
+          "severity": 2,
+          "pointer": "/meshes/0/primitives/1/attributes/TEXCOORD_0"
+        }
+      ]
+    }
+  ],
+  "pins": {
+    "/tmp/dome-sculpt-source-export-repair-2228/runtime/explicit-source-export/native-smooth.glb": "4062ff92ef560492cc9c36708bacbade66489158bdc7cd6feec1f7f50a6609d5",
+    "/tmp/dome-sculpt-source-export-repair-2228/runtime/explicit-source-export/prepared-reflected.glb": "77f6cb627d368e480a59456864ad6f7e7d19d4aea4823533ebbf6b11920bad27",
+    "/tmp/dome-sculpt-source-export-repair-2228/runtime/explicit-source-export/prepared-sheared.glb": "acb2207643b6ef5aaea9662b674c066e3e090ff204259a1bad0f543573b0911f",
+    "/tmp/dome-sculpt-source-export-repair-2228/runtime/explicit-source-export/native-reflected.glb": "732d3aaf84d2778124b4617c874a943bf48189b3f6aa320a996de3efb9bfdccf",
+    "/tmp/dome-sculpt-source-export-repair-2228/runtime/explicit-source-export/native-sheared.glb": "4859022987b4e98a8a23818983da74e5675beb745a51e91d25918c55706b9c46",
+    "/home/blux/de-xr/dome-sculpt/artifacts/gltf-validator/node_modules/gltf-validator/LICENSE": "3ddf9be5c28fe27dad143a5dc76eea25222ad1dd68934a047064e56ed2fa40c5",
+    "/home/blux/de-xr/dome-sculpt/artifacts/gltf-validator/node_modules/gltf-validator/NOTICES": "933f161ca1e7b3ead5a6cf93ebb3bf6cb67f0e79b38e08d2046f8cdc41cb78a3",
+    "/home/blux/de-xr/dome-sculpt/artifacts/gltf-validator/node_modules/gltf-validator/gltf_validator.dart.js": "b73a7b2d455ac217567725138b46d826a13d7d1bb0c88c15f7c571bfb349298c",
+    "/home/blux/de-xr/dome-sculpt/artifacts/gltf-validator/node_modules/gltf-validator/index.js": "78deff9ea85743e86461c2d14fae76e7fc3ca0432e652f62948066b55fa16f0d",
+    "/home/blux/de-xr/dome-sculpt/artifacts/gltf-validator/node_modules/gltf-validator/package.json": "3578d16153fa237c72784588da2e8fcccc9cd3c1c58ef34c7912f0732d2f5fa6",
+    "/home/blux/de-xr/dome-sculpt/artifacts/gltf-validator/node_modules/gltf-validator/validation.schema.json": "e33db4da1e907481a5fc056d2daab40be1a603620d8f4a1c81919120f3340365",
+    "/home/blux/de-xr/dome-sculpt/artifacts/gltf-validator/node_modules/gltf-validator/ISSUES.md": "72981a105335964111253e7e5db4e956b8ab3a17fd74c2d02180bffc7f533c20",
+    "/home/blux/de-xr/dome-sculpt/artifacts/gltf-validator/node_modules/gltf-validator/README.md": "f5f26dc624a62817b356cec631b33af7358d046a4b2c0499a5f55189d986afa5",
+    "/home/blux/de-xr/dome-sculpt/artifacts/gltf-validator/node_modules/gltf-validator/module.mjs": "d2a88775a8b22f61be8e00644760f0f04b615fad0fc5175fefd40e0da4df2c8f",
+    "/tmp/dome-sculpt-source-export-khronos-2228/validate.cjs": "78028e43df721c240723ff1e557abed8b171f3841bff2ce293893cdd21f50b48",
+    "/usr/bin/node-22": "1a1ebcd93dc90cf3e3dc37493e8efc04a1f60bddada1402453094214af03e33d"
+  },
+  "drift": []
+}

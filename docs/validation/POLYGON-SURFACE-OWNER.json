@@ -1,0 +1,63 @@
+{
+  "scope": "Private original-source/corner owner and inner replay recipe only; no material/Scene/native/export admission",
+  "source_base": "023f4c3",
+  "terminal_handle": "90327",
+  "checks": 107,
+  "profiles": [
+    "optimized Release focused whole-TU component"
+  ],
+  "binary_sha256": "ecc76c8002aff9111d07d62fea1be7bac27992feb969fdfd91e13b9ec2185654",
+  "source_drift": [],
+  "input_drift": [],
+  "closure": "Complete private source-owner inner-recipe factory/replay+whole actual native fixture consumer, immutable current query override/c6 Scene frame Paint support. No public layout/Scene39/Apply/export admission",
+  "excluded_changed_uninvoked_members": {
+    "document.cpp.o": true,
+    "document-skin.cpp.o": true,
+    "skin-authoring.cpp.o": true,
+    "surface-heat-authoring.cpp.o": true,
+    "skin-editor.cpp.o": true,
+    "palette.cpp.o": true
+  },
+  "artifacts": "artifacts/polygon-surface-owner-codec-v1/status.json",
+  "fixture_semantics": [
+    "Actual saved final pre-UV Restore endpoint, independent canonical normal field +physical sparse emission +pose/morph +shear/reflection",
+    "Actual saved before-only polygon origin restored through real product helper to current CPS37/new key state"
+  ],
+  "controls": [
+    "Independent source target-ID morph/weighted joint inverse-transpose N +linear T/current world W/four-texel texture oracle",
+    "Move carries normal detail and preserves separate paint/normal coordinates",
+    "Flip preserves original corner sides/full before root",
+    "Normal-free geometry/paint capture without invented normal coordinates",
+    "Mutable live Paint metadata isolation",
+    "Inner recipe exact before-root alias and current derivative replay",
+    "Unsupported inner version/operation, fabricated no-op, different current geometry and cyclic rig history refusal",
+    "Memory/cancel boundaries, not exhaustive factory OOM"
+  ],
+  "preserved_failures": [
+    {
+      "handle": "82104",
+      "exit": 1,
+      "reason": "Test incorrectly assumed prior.dsculpt still held CPS37. Actual guard/history cohort overwrote it with final pre-UV Restore endpoint. Product capture passed; test Restore was invalid. Exact source recovered and SHA-verified against original pre-build manifest after basename collision prevented its initial copy."
+    }
+  ],
+  "remaining": [
+    "Scene39/material21/Paint6/domain3 owning codec",
+    "Actual changed polygon Apply and ordered native Save/Undo/Restore",
+    "Paint grid attachment and native CPU query/render pipeline",
+    "General topology/common-refinement",
+    "Typed MToon/source normal adapters",
+    "Portable GLB/VRM adapter and independent graphics",
+    "Full new-owner allocation denial/cancel sweep and whole-owned SAN"
+  ],
+  "space": {
+    "cumulative": 813793280,
+    "phase": 16138240,
+    "actual_free": 23617458176,
+    "prospective": 0
+  },
+  "inputs": {
+    "src/polygon-surface-owner.hpp": "a1d152aa4e64c3b5badf7a7841bfe1848b8f8d71a7418f81849d5d6f1a515c32",
+    "src/polygon-surface-owner.cpp": "25eea05be1aca702dedf63a5fa9da6c1623ca6bcd9696d1c5230aab7f4c2e80c",
+    "tests/polygon-surface-owner.cpp": "7db9276323b170c0e22391530a53998cd0b7be10c1ea4ab86ab7e1ed28a1611f"
+  }
+}

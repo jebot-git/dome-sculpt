@@ -1,0 +1,94 @@
+{
+  "scope": "Private CPU Release resize repair on498 with whole changed TUs and exact unchanged matching providers; no ordinary FLTK/OpenXR-loader/SAN/device or full-product qualification",
+  "base": "498fee621e6dd71491a4b3fd0b18ddd53b0902dd",
+  "source_hashes": {
+    "src/paint.cpp": "55d7e3915d9fe224f29ea51c8dc7c3529fedb5d72f5168daf0508a0040737b4f",
+    "src/texture-set-resample.cpp": "ce443818d299fb0a767485586ba2472d2a298ad6276b48b565f3470ac9b34812",
+    "tests/texture-set-resolution.cpp": "3f5b4896f5d4d5668284b70097f3a86032cabe67b51b47505418ae4228d7d03d"
+  },
+  "result": {
+    "exit": 0,
+    "checks": 2319,
+    "native_seconds": 0.8052440869505517,
+    "input_count": 3803,
+    "drift": [],
+    "original_cohort_owned_outputs": 308,
+    "actual_core_members": 184,
+    "excluded_members_absent": true,
+    "actual_paint_present": true,
+    "actual_resample_present": true,
+    "filtered_archive_members_exact": true
+  },
+  "oracle": {
+    "zero_background": {
+      "radiance_peak": 687.435,
+      "relative_rgb_error": [
+        0.00765285,
+        8.42361e-08,
+        1.11465e-05
+      ],
+      "float_coverage_error": 0.0022456
+    },
+    "HDR_background_500_0.125_3": {
+      "radiance_peak": 1059.1,
+      "relative_rgb_error": [
+        0.00419004,
+        2.10563e-07,
+        2.82442e-06
+      ],
+      "float_coverage_error": 0.0022456
+    },
+    "unorm_and_pbr_area_byte_error_maximum": 1,
+    "independent_float_material_oracle_error_maximum": 2e-06,
+    "original_component_policy": 0.3,
+    "original_RMS_policy": 0.08
+  },
+  "coverage": [
+    "valid actual native authoring; independent all14 common channels, coverage, mask and hidden-layer data",
+    "actual sub-UNORM8 FLOAT coverage with high absolute radiance",
+    "independent physical+legacy+HDR background composition and bilinear reconstruction",
+    "actual native color-prepared distinct PBR RGBA and independent linear-light area oracle",
+    "same-size owner no-op, real new raster/shared geometry and membership/sibling identities",
+    "peak/work quota, in-transfer cancellation, measured reconstruction quality and prepared-owner refusal",
+    "real Document worker128-to256 Cancel/Apply, sibling64, immediately ordered Save and fresh native load",
+    "one exact global Undo/Redo and stale-source rejection",
+    "real SpatialFrame menu/ray staged resolution, Cancel, Apply256-to64, ordered Save/load, Undo/Redo and focus loss"
+  ],
+  "resources": {
+    "allocated": 134635520,
+    "full_prospective": 67108864,
+    "cap": 209715200,
+    "root_free": 21724950528
+  },
+  "execution": {
+    "status": "/tmp/dome-sculpt-resolution-stroke-498-v8/status.json",
+    "status_sha256": "c6bfa763ee3aad95b3bc1f708a1362355486d6e6accd9dae1eea1a2c1e006697",
+    "native_log_gzip_sha256": "68131a2e4d0712e3ec00cdcbc81fe494230756a88444e8b93150bf858ad0a21e",
+    "native_log": "ORACLE linear_emission peak=687.435 relative_rgb=0.00765285,8.42361e-08,1.11465e-05 float_coverage=0.0022456\nORACLE linear_emission peak=1059.1 relative_rgb=0.00419004,2.10563e-07,2.82442e-06 float_coverage=0.0022456\nEXPECTED Texture-set retained owner bytes exceed bounds\nEXPECTED Material reconstruction exceeds the resolution operation's prospective byte/work budget\nEXPECTED Texture-set resolution cancelled\nEXPECTED Texture-set resolution cannot meet authored layer/coverage/mask/FLOAT reconstruction bounds\nEXPECTED Resampling requires actual plain member geometry/grid owners\nEXPECTED The texture-set source changed; reopen its controls\nPASS 2319 measured texture resolution checks\n",
+    "before_sha256": "bca18e68fbe921c5d63d1adea5bce30f78a48649d9f6d97a1e0a7f773ca69642",
+    "after_sha256": "bca18e68fbe921c5d63d1adea5bce30f78a48649d9f6d97a1e0a7f773ca69642",
+    "new_ELF_sha256": "26783d907dcd7e8fff0e7984036027173b5730720cfe0a49eeeeb75e308de73f",
+    "whole_fixture_object_sha256": "ba7bb76ff50aec08463a99b2a3a92cea2ec8cadd89a2e6d2d5446f0cdce97458",
+    "whole_resample_object_sha256": "f8e183bfa803877d29be5826073a4b8aeaac94d5eab1c4bf66c912ce808bb431",
+    "whole_Paint_object": "/tmp/dome-sculpt-resolution-stroke-498-v6/paint.o",
+    "whole_Paint_object_sha256": "c030237fde55c659c8558b988c1cd880daf2c557c749ed7bfb68e2cd3e4f073d",
+    "filtered_archive": "/tmp/dome-sculpt-resolution-stroke-498-v6/libcore-filtered.a",
+    "filtered_archive_sha256": "9a8fad6d5bd647fc1cb0bd12cdbaf5a3fdded36f2bd16c2018b72caf81cec490",
+    "lossless_full_linker_trace_gzip_sha256": "2762c20e949b44ece2094c48dc01b5192aef3572ec9479f9297235b8af6b9c0c"
+  },
+  "failures_preserved": [
+    "frozen498 initial invalid-radius control",
+    "v1 corrected radius exposes actual FLOAT compositor refusal",
+    "v2 link phase byte guard, partial ELF/raw map/source retained",
+    "v3 genuine raster budget failure",
+    "v4 andv5 initial root-floor refusals before any child",
+    "v6 prospective worker budget refusal after2265 checks",
+    "v7 repeated material sampling budget refusal after2300 checks"
+  ],
+  "remaining": [
+    "fresh all-own combined application/native regression",
+    "actual ordinary FLTK resolution GUI and actual-loader synthetic OpenXR eight-case workflow",
+    "matching sanitizer/device/hardware/backend qualification",
+    "separately authenticated sourceful/prepared/baked unequal-grid transitions and accelerator implementation remain refused"
+  ]
+}

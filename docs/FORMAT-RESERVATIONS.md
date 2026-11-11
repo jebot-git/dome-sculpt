@@ -11,7 +11,7 @@ meanings and reject unsupported capabilities explicitly.
 | 36: independent current native paint/frame capture | Admitted main; see `src/scene.cpp` and `CURRENT-RIM-INTEGRATION.md` | Material18 |
 | 37: canonical writable-paint ownership | Private owning37 source, currently `bf9e6f3`; earlier fresh Release evidence is exact `c6e6cd5` | Material19; see `OWNING37-CURRENT-MAIN-COMPOSITION.md` in that branch |
 | 38: anchored field and derived POSITION prototype | Existing source-only `4ee2902` continuation; not admitted | Material20, FrameSet3, Paint5/domain2 and conditional color5. Its reader/writer and full owning workflow remain unfinished. |
-| 39: polygon surface transfer | Reserved for the current normal/paint polygon conversion implementation in `work/owning37-main-9dd` | Material21, Paint6/domain3 if the actual representation needs them; finalize the typed definitions before enabling a codec. |
+| 39: polygon surface transfer | Reserved for the current normal/paint polygon conversion implementation in `work/owning37-main-9dd` | Material21, Paint6/domain3; private source-connected initial Move/Flip node1, scoped reader/writer and typed preview are unexecuted. Fresh whole-owning closure and real publication/render/export gates are required. |
 | 40: same-mesh texture sets | Reserved for the texture-set implementation; not an object-picker alias | Paint7 for an actual membership envelope; Material22 if a new material envelope is needed. Existing nested records keep their own meanings. |
 
 PolygonSources8 is reserved for retaining actual texture sets in source origins;

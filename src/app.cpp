@@ -25,6 +25,7 @@
 #include "procedural-editor.hpp"
 #include "import-editor.hpp"
 #include "paint-editor.hpp"
+#include "texture-set-editor.hpp"
 #include "projection-editor.hpp"
 #include "mesh-editor.hpp"
 #include "bake-editor.hpp"
@@ -269,6 +270,12 @@ struct Canvas : Fl_Gl_Window {
         sculpting =
             Fl::event_button() == FL_LEFT_MOUSE && Fl::event_state(FL_SHIFT);
         have_stamp = false;
+        if(Fl::event_button()==FL_LEFT_MOUSE&&document.frame().state->texture_face_select){
+          sculpting=false;float aspect=float(w())/std::max(1,h()),tangent=std::tan(22.5f*3.14159265f/180);
+          Vec3 direction{(2.f*(last_x-this->x())/w()-1)*aspect*tangent,(1-2.f*(last_y-this->y())/h())*tangent,-1};
+          auto origin=rotation.inverse().rotate(Vec3{0,0,distance}-pan);direction=rotation.inverse().rotate(normalized(direction));
+          document.texture_face_pointer(origin,direction,Fl::event_state(FL_CTRL),material_time);suppress_drag=true;invalidate();return 1;
+        }
         if(sculpting&&document.frame().state->polygon){
           sculpting=false;auto state=document.frame().state;
           if(!state->polygon->surface||state->polygon->busy||state->polygon->committing){suppress_drag=true;return 1;}
@@ -711,6 +718,9 @@ struct App {
     menu.add("&Paint/Image projection/Use projection image",0,command,this,FL_MENU_TOGGLE);
     menu.add("&Paint/Image projection/Projection from view",0,command,this);
     menu.add("&Paint/Image projection/Cancel image load",0,command,this);
+    menu.add("&Paint/Texture sets...",0,command,this);
+    menu.add("&Paint/Pick material faces",0,command,this,FL_MENU_TOGGLE);
+    menu.add("&Paint/Clear material face selection",0,command,this);
     menu.add("&Paint/Brush settings...", FL_ALT | 'p', command, this);
     menu.add("&Paint/Add layer", FL_CTRL | 'l', command, this);
     menu.add("&Paint/Next layer", 0, command, this);
@@ -918,6 +928,10 @@ struct App {
     enable("&Sculpt/Smaller brush",
            !modal && !s->asset_busy && s->radius > .005f);
     enable("&Sculpt/Larger brush", !modal && !s->asset_busy && s->radius < 2);
+    enable("&Paint/Texture sets...",!modal&&s->can_edit_texture_sets);
+    enable("&Paint/Pick material faces",!modal&&s->can_edit_texture_sets);
+    enable("&Paint/Clear material face selection",!modal&&!s->asset_busy&&!s->texture_faces.empty());
+    checked("&Paint/Pick material faces",s->texture_face_select);
     checked("&Paint/Use painted mesh", s->mesh_active);
     checked("&Paint/Edit source volume", !s->mesh_active);
     checked("&Paint/Toggle eraser", s->paint.erase);
@@ -1408,6 +1422,10 @@ struct App {
       canvas.document.use_mesh();
     } else if (label == "Edit source volume") {
       canvas.document.use_source();
+    } else if (label == "Texture sets...") {
+      edit_texture_sets(canvas.document);
+    } else if (label == "Pick material faces" || label == "Clear material face selection") {
+      canvas.document.texture_set_action(label=="Pick material faces"?SpatialCommand::TexturePickFaces:SpatialCommand::TextureClearFaces);
     } else if (label == "Brush settings...") {
       edit_paint(canvas.document);
     } else if (label == "Masks and symmetry...") {

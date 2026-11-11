@@ -1,5 +1,7 @@
+#include "polygon-surface-range.hpp"
 #include "native-paint-sampling.hpp"
 #include "native-paint-metadata.hpp"
+#include "texture-set-range.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/material-visibility.hpp"
 #include "dome/document.hpp"
@@ -13,6 +15,7 @@
 #include "prepared-color-state.hpp"
 #include "paint-overlay-alpha.hpp"
 #include "source-vrm1-background.hpp"
+#include "sculpt-placed-chunks.hpp"
 namespace dome {
 std::optional<MToonMaterial> retained_mtoon(const CreatorAppearance *appearance){
   if(!appearance)return {};
@@ -54,7 +57,10 @@ struct Visibility {
   std::vector<std::array<float,4>> vertex_colors;
   std::vector<std::array<float,2>> paint_corners;
   explicit Visibility(const SurfaceRange &r, const Mesh &mesh,
-                      std::span<const std::array<float,4>> packed_colors, bool explicit_colors, std::span<const std::array<float,2>> coordinates, bool per_vertex) : range(r) {
+                      std::span<const std::array<float,4>> packed_colors, bool explicit_colors, std::span<const std::array<float,2>> coordinates, bool per_vertex,const std::function<bool()>&cancelled) : range(r) {
+    detail::validate_polygon_range(mesh,r,coordinates,per_vertex,{},{},{},false,cancelled);
+    if(r.texture_set_proof){r.texture_set_proof->authenticate_stream(mesh,r);r.texture_set_proof->authenticate_tint(mesh,r,packed_colors);}
+    else if(r.texture_set)throw std::invalid_argument("Visibility texture set lacks its actual field/range proof");
     cull = r.material.double_sided ? MToonCull::Off : MToonCull::Back;
     alpha = r.material.alpha; cutoff = r.material.alpha_cutoff; factor = r.material.color[3];
     auto maps = r.textures;
@@ -89,12 +95,11 @@ struct Visibility {
       if(!expected||expected!=r.paint_sampling_attachment||expected.owner_before(r.paint_sampling_attachment)||r.paint_sampling_attachment.owner_before(expected))
         throw std::invalid_argument("Visibility paint range differs from its own immutable material attachment");
       const auto &domain=*r.paint_sampling_attachment->domain();
-      if(domain.source_corners().size()!=r.count||coordinates.empty())
+      if((r.texture_set_proof?r.count!=r.texture_set_proof->draw().count:domain.source_corners().size()!=r.count)||coordinates.empty())
         throw std::invalid_argument("Visibility paint corner coordinates are incomplete");
       paint_corners.reserve(r.count);
       for(size_t c=0;c<r.count;++c) {
-        auto logical=c;
-        if(r.paint_winding_reversed&&c%3)logical=c/3*3+3-c%3;
+        const auto logical=detail::surface_logical_corner(r,c);
         auto source=domain.source_corners()[logical];
         auto expected=domain.basis()->uv.at(domain.basis()->indices.at(source));
         auto actual=coordinates[per_vertex?mesh.indices.at(r.first+c):r.first+c];
@@ -137,7 +142,7 @@ struct Visibility {
       color.validate(maps&&maps->source_maps?maps->source_maps->coordinate_count():owned_uv1?2:1);
       if(prepared){color=derived_view(maps,maps->pbr_color);color.wrap_s=color.wrap_t=33071;color.min_filter=color.mag_filter=9729;}
       if(explicit_colors) {
-        if(!packed_colors.empty()) {
+        if(!packed_colors.empty()&&!r.texture_set_proof) {
           size_t end=r.first_vertex;
           for(size_t c=r.first;c<r.first+r.count;++c){auto v=mesh.indices.at(c);if(v<r.first_vertex)throw std::invalid_argument("Packed visibility color offset is outside its range");end=std::max(end,size_t(v)+1);}
           if(end>packed_colors.size())throw std::invalid_argument("Packed visibility color range is incomplete");
@@ -282,11 +287,21 @@ struct Visibility {
 };
 } // namespace
 struct MaterialSurfaceQuery::Impl {
-  SurfaceQuery query;
+  std::unique_ptr<SurfaceQuery> query;
+  detail::SculptSceneChunks::Ptr chunks;
   std::vector<Visibility> surfaces;
+  uint64_t object_for(uint32_t triangle) const {
+    const size_t corner=size_t(triangle)*3;
+    auto found=std::upper_bound(surfaces.begin(),surfaces.end(),corner,
+        [](size_t value,const Visibility &surface){return value<surface.range.first;});
+    if(found==surfaces.begin())throw std::logic_error("Material hit has no actual owning range");
+    --found;
+    if(corner>=found->range.first+found->range.count)throw std::logic_error("Material hit is outside its actual owning range");
+    return found->range.object;
+  }
   Impl(const Mesh &mesh, std::span<const SurfaceRange> ranges, const std::function<bool()> &cancelled,
        std::span<const std::array<float,4>> colors,bool explicit_colors, std::span<const std::array<float,2>> paint={},bool per_vertex=false)
-      : query(mesh, cancelled) {
+      : query(mesh.indices.empty()?nullptr:std::make_unique<SurfaceQuery>(mesh,cancelled)) {
     if(!colors.empty()&&colors.size()!=mesh.positions.size())throw std::invalid_argument("Packed visibility color vertex count differs from geometry");
     for(size_t i=0;i<colors.size();++i){if((i&1023)==0&&cancelled&&cancelled())throw std::runtime_error("Visibility color validation cancelled");for(float c:colors[i])if(!std::isfinite(c)||c<0||c>1)throw std::invalid_argument("Packed visibility requires finite linear unit RGBA");}
     if(!paint.empty()&&paint.size()!=(per_vertex?mesh.positions.size():mesh.indices.size()))throw std::invalid_argument("Visibility paint coordinate alignment differs from geometry");
@@ -297,10 +312,13 @@ struct MaterialSurfaceQuery::Impl {
       if (range.first != end || range.count % 3 || range.count > mesh.indices.size() - end)
         throw std::invalid_argument("Visibility requires contiguous triangle-aligned surface ranges");
       end += range.count;
-      surfaces.emplace_back(range, mesh,colors,explicit_colors,paint,per_vertex);
+      surfaces.emplace_back(range, mesh,colors,explicit_colors,paint,per_vertex,cancelled);
     }
     if (end != mesh.indices.size()) throw std::invalid_argument("Visibility surface ranges are incomplete");
   }
+  std::optional<MaterialSurfaceHit> target(Vec3 point,Vec3 direction,float maximum,double seconds,
+      uint64_t only,std::span<const uint64_t> excluded,bool ray,bool visibility,
+      std::span<const SurfaceMaterialIdentity> excluded_materials={}) const;
 };
 MaterialSurfaceQuery::MaterialSurfaceQuery(const Mesh &mesh, std::span<const SurfaceRange> ranges,
                                            const std::function<bool()> &cancelled)
@@ -314,9 +332,144 @@ MaterialSurfaceQuery::MaterialSurfaceQuery(const Mesh &mesh,std::span<const Surf
 MaterialSurfaceQuery::MaterialSurfaceQuery(const Mesh &mesh,std::span<const SurfaceRange> ranges,
  const std::function<bool()> &cancelled,std::span<const std::array<float,4>> colors,PaintVertexCoordinates paint)
     :impl_(std::make_unique<Impl>(mesh,ranges,cancelled,colors,true,paint.values,true)){}
+MaterialSurfaceQuery::MaterialSurfaceQuery(const Mesh &mesh,std::span<const SurfaceRange> ranges,
+ const std::function<bool()> &cancelled,std::span<const std::array<float,4>> colors,PaintVertexCoordinates paint,
+ std::shared_ptr<const detail::SculptSceneChunks> chunks)
+    :impl_(std::make_unique<Impl>(mesh,ranges,cancelled,colors,true,paint.values,true)) {
+  if(!chunks)throw std::invalid_argument("Missing actual mixed sculpt scene owner");
+  for(const auto &object:chunks->objects()) {
+    if(cancelled&&cancelled())throw std::runtime_error("Mixed scene query cancelled");
+    if(!object.placed||!object.placed->has_queries())
+      throw std::invalid_argument("Mixed query requires worker-built current chunk acceleration");
+    if(std::any_of(ranges.begin(),ranges.end(),[&](const auto &range){return range.object==object.object;}))
+      throw std::invalid_argument("A mixed object cannot occupy both packed and chunk namespaces");
+  }
+  // An empty generated-geometry directory carries capture metadata only.
+  // Its packed triangles still have the single legacy namespace. Retain a
+  // mixed namespace only when it actually contains generated geometry.
+  if(!chunks->objects().empty())impl_->chunks=std::move(chunks);
+}
 MaterialSurfaceQuery::~MaterialSurfaceQuery() = default;
-SurfaceHit MaterialSurfaceQuery::closest(Vec3 point) const { return impl_->query.closest(point); }
+namespace {
+bool bounds_ray(const detail::SculptChunkBounds &box,Vec3 p,Vec3 d,float maximum) {
+  double lo=0,hi=maximum;
+  const std::array<float,3> a{box.minimum.x,box.minimum.y,box.minimum.z},b{box.maximum.x,box.maximum.y,box.maximum.z};
+  const std::array<float,3> origin{p.x,p.y,p.z},direction{d.x,d.y,d.z};
+  for(size_t k=0;k<3;++k) {
+    if(direction[k]==0){if(origin[k]<a[k]||origin[k]>b[k])return false;continue;}
+    auto x=(double(a[k])-origin[k])/direction[k],y=(double(b[k])-origin[k])/direction[k];
+    if(x>y)std::swap(x,y);lo=std::max(lo,x);hi=std::min(hi,y);if(lo>hi)return false;
+  }
+  return true;
+}
+double bounds_distance(const detail::SculptChunkBounds &box,Vec3 p) {
+  double result=0;
+  const std::array<float,3> a{box.minimum.x,box.minimum.y,box.minimum.z},b{box.maximum.x,box.maximum.y,box.maximum.z},v{p.x,p.y,p.z};
+  for(size_t k=0;k<3;++k){auto d=std::max({double(a[k])-v[k],0.,double(v[k])-b[k]});result+=d*d;}
+  return result;
+}
+}
+std::optional<MaterialSurfaceHit> MaterialSurfaceQuery::Impl::target(Vec3 point,Vec3 direction,
+    float maximum,double seconds,uint64_t only,std::span<const uint64_t> excluded,bool ray,bool visibility,
+    std::span<const SurfaceMaterialIdentity> excluded_materials) const {
+  if(!finite(point)||!std::isfinite(seconds)||std::isnan(maximum)||maximum<=0||
+     std::max({std::abs(point.x),std::abs(point.y),std::abs(point.z)})>1000||
+     (ray&&(!finite(direction)||!std::isfinite(length(direction))||length(direction)<1e-12f||!std::isfinite(maximum))))
+    throw std::invalid_argument("Invalid mixed material query");
+  if(ray)direction=normalized(direction);
+  size_t triangle_tests=0,metadata_tests=0;
+  auto allowed=[&](uint64_t object){return (!only||only==object)&&std::find(excluded.begin(),excluded.end(),object)==excluded.end();};
+  auto material_allowed=[&](SurfaceMaterialIdentity identity){return std::find(excluded_materials.begin(),excluded_materials.end(),identity)==excluded_materials.end();};
+  auto count=[&](uint32_t){if(++triangle_tests>65536)throw std::length_error("Mixed scene triangle work budget exceeded");return true;};
+  std::optional<MaterialSurfaceHit> best;double best_distance2=INFINITY;
+  auto upper_limit=[&]{return best?std::min(maximum,std::nextafter(float(std::sqrt(best_distance2)),INFINITY)):maximum;};
+  auto rank=[&](uint64_t object){
+    if(chunks){auto i=std::find(chunks->object_order().begin(),chunks->object_order().end(),object);return size_t(i-chunks->object_order().begin());}
+    auto i=std::find_if(surfaces.begin(),surfaces.end(),[&](const auto &s){return s.range.object==object;});return size_t(i-surfaces.begin());
+  };
+  auto accept=[&](MaterialSurfaceHit hit,double distance2){
+    bool earlier=false;
+    if(best&&distance2==best_distance2) {
+      if(hit.object!=best->object)earlier=rank(hit.object)<rank(best->object);
+      else if(hit.chunk&&best->chunk)
+        earlier=hit.chunk->triangles.at(hit.surface.triangle)<best->chunk->triangles.at(best->surface.triangle);
+      else if(!hit.chunk&&!best->chunk)earlier=hit.surface.triangle<best->surface.triangle;
+    }
+    if(!best||distance2<best_distance2||earlier){best=std::move(hit);best_distance2=distance2;}
+  };
+  if(query) {
+    SurfaceQueryOptions options;options.max_triangle_tests=65536;options.closest_maximum=maximum;
+    options.triangle_filter=[&](uint32_t t){
+      count(t);const auto corner=size_t(t)*3;
+      auto found=std::upper_bound(surfaces.begin(),surfaces.end(),corner,
+          [](size_t c,const Visibility &v){return c<v.range.first;});
+      if(found==surfaces.begin())return false;--found;
+      return corner<found->range.first+found->range.count&&allowed(found->range.object)&&
+          material_allowed({found->range.object,found->range.texture_set});
+    };
+    auto visible=[&](uint32_t t,const std::array<float,3> &bary){
+      if(!visibility)return true;
+      const auto c=size_t(t)*3;auto found=std::upper_bound(surfaces.begin(),surfaces.end(),c,
+        [](size_t v,const Visibility &s){return v<s.range.first;});
+      if(found==surfaces.begin())return false;--found;
+      return c<found->range.first+found->range.count&&found->visible(query->mesh(),t,bary,direction,seconds,ray);
+    };
+    options.ray_filter=visible;options.closest_filter=visible;
+    auto hit=ray?query->raycast_result(point,direction,maximum,options):query->nearest_result(point,options);
+    if(hit)accept({hit->surface,object_for(hit->surface.triangle),{}},hit->squared_distance);
+  }
+  if(chunks)for(const auto &object:chunks->objects()) {
+    if(!allowed(object.object)||!material_allowed({object.object,0}))continue;
+    const auto &material=object.material;
+    if(visibility&&material.alpha!=Material::AlphaMode::Opaque&&
+       (material.alpha==Material::AlphaMode::Mask?material.color[3]<material.alpha_cutoff:material.color[3]<=0))continue;
+    object.placed->visit_bounds([&](const auto &bounds){
+      if(++metadata_tests>262144)throw std::length_error("Mixed scene bounds work budget exceeded");
+      const auto limit=upper_limit();
+      return ray?bounds_ray(bounds,point,direction,limit):bounds_distance(bounds,point)<=std::nextafter(best?best_distance2:double(maximum)*maximum,INFINITY);
+    },[&](const detail::SculptPlacedChunk::Ptr &chunk){
+      SurfaceQueryOptions options;options.max_triangle_tests=65536;
+      options.closest_maximum=upper_limit();
+      options.triangle_filter=count;
+      const auto &frame=chunk->placement_frame();
+      const auto local_direction=frame.inverse().direction({direction.x,direction.y,direction.z});
+      if(ray&&!material.double_sided)options.ray_filter=[&](uint32_t t,const std::array<float,3>&){
+        const auto &m=*chunk->geometry_owner();const auto c=size_t(t)*3;
+        const auto a=m.positions[m.indices[c]],b=m.positions[m.indices[c+1]],v=m.positions[m.indices[c+2]];
+        const double ux=double(b.x)-a.x,uy=double(b.y)-a.y,uz=double(b.z)-a.z;
+        const double vx=double(v.x)-a.x,vy=double(v.y)-a.y,vz=double(v.z)-a.z;
+        return (uy*vz-uz*vy)*local_direction[0]+(uz*vx-ux*vz)*local_direction[1]+(ux*vy-uy*vx)*local_direction[2]<0;
+      };
+      const auto limit=upper_limit();
+      auto hit=ray?chunk->query()->raycast_result(point,direction,limit,frame.world(),options):chunk->query()->nearest_result(point,frame.world(),options);
+      if(hit)accept({hit->surface,object.object,chunk->source()},hit->squared_distance);
+    });
+  }
+  return best;
+}
+MaterialSurfaceHit MaterialSurfaceQuery::closest_target(Vec3 p,uint64_t object) const {
+  auto hit=impl_->target(p,{},INFINITY,0,object,{},false,false);
+  if(!hit)throw std::runtime_error("No eligible source surface triangle");return *hit;
+}
+std::optional<MaterialSurfaceHit> MaterialSurfaceQuery::nearby_target(Vec3 p,float maximum,double seconds) const {
+  return impl_->target(p,{},maximum,seconds,0,{},false,true);
+}
+std::optional<MaterialSurfaceHit> MaterialSurfaceQuery::raycast_target(Vec3 p,Vec3 d,float maximum,double seconds,uint64_t object) const {
+  return impl_->target(p,d,maximum,seconds,object,{},true,true);
+}
+std::optional<MaterialSurfaceHit> MaterialSurfaceQuery::raycast_excluding_target(Vec3 p,Vec3 d,float maximum,double seconds,std::span<const uint64_t> excluded) const {
+  return impl_->target(p,d,maximum,seconds,0,excluded,true,true);
+}
+std::optional<MaterialSurfaceHit> MaterialSurfaceQuery::raycast_excluding_materials_target(Vec3 p,Vec3 d,
+    float maximum,double seconds,std::span<const SurfaceMaterialIdentity> excluded) const {
+  return impl_->target(p,d,maximum,seconds,0,{},true,true,excluded);
+}
+SurfaceHit MaterialSurfaceQuery::closest(Vec3 point) const {
+  if(impl_->chunks)throw std::logic_error("A mixed scene requires a typed material hit");
+  if(!impl_->query)throw std::logic_error("No packed material geometry"); return impl_->query->closest(point); }
 std::optional<SurfaceHit> MaterialSurfaceQuery::nearby(Vec3 point,float maximum,double seconds) const {
+  if(impl_->chunks)throw std::logic_error("A mixed scene requires a typed material hit");
+  if(!impl_->query)throw std::logic_error("No packed material geometry");
   if(!std::isfinite(maximum)||maximum<=0||!std::isfinite(seconds))throw std::invalid_argument("Invalid direct selection query");
   SurfaceQueryOptions options;options.max_triangle_tests=65536;options.closest_maximum=maximum;
   options.closest_filter=[&](uint32_t triangle,const std::array<float,3> &bary){
@@ -326,22 +479,25 @@ std::optional<SurfaceHit> MaterialSurfaceQuery::nearby(Vec3 point,float maximum,
     --found;
     // A controller can touch either side or enter a surface slightly. Keep
     // alpha/UV/MToon animation, but don't impose camera backface culling.
-    return corner<found->range.first+found->range.count&&found->visible(impl_->query.mesh(),triangle,bary,{},seconds,false);
+    return corner<found->range.first+found->range.count&&found->visible(impl_->query->mesh(),triangle,bary,{},seconds,false);
   };
-  return impl_->query.nearest(point,options);
+  return impl_->query->nearest(point,options);
 
 }
 SurfaceHit MaterialSurfaceQuery::closest(Vec3 point,uint64_t only_object) const {
+  if(impl_->chunks)throw std::logic_error("A mixed scene requires a typed material hit");
+  if(!impl_->query)throw std::logic_error("No packed material geometry");
   SurfaceQueryOptions options;options.max_triangle_tests=65536;
   options.triangle_filter=[&](uint32_t triangle) {
     const size_t corner=size_t(triangle)*3;
     for(const auto &surface:impl_->surfaces)if(surface.range.object==only_object&&corner>=surface.range.first&&corner-surface.range.first<surface.range.count)return true;
     return false;
   };
-  return impl_->query.closest(point,options);
+  return impl_->query->closest(point,options);
 }
 std::optional<SurfaceHit> MaterialSurfaceQuery::raycast(Vec3 origin, Vec3 direction,
                                                        float maximum, double seconds,uint64_t only_object) const {
+  if(impl_->chunks||!impl_->query)throw std::logic_error("A mixed scene requires a typed material hit");
   if (!std::isfinite(seconds)) throw std::invalid_argument("Invalid visibility animation time");
   SurfaceQueryOptions options; options.max_triangle_tests = 65536;
   options.ray_filter = [&](uint32_t triangle, const std::array<float,3> &bary) {
@@ -351,13 +507,14 @@ std::optional<SurfaceHit> MaterialSurfaceQuery::raycast(Vec3 origin, Vec3 direct
     if (found == impl_->surfaces.begin()) return false;
     --found;
     return (!only_object || found->range.object==only_object) && index < found->range.first + found->range.count &&
-           found->visible(impl_->query.mesh(), triangle, bary, direction, seconds);
+           found->visible(impl_->query->mesh(), triangle, bary, direction, seconds);
   };
-  return impl_->query.raycast(origin, direction, maximum, options);
+  return impl_->query->raycast(origin, direction, maximum, options);
 }
 
 std::optional<SurfaceHit> MaterialSurfaceQuery::raycast_excluding(Vec3 origin, Vec3 direction,
     float maximum,double seconds,std::span<const uint64_t> excluded) const {
+  if(impl_->chunks||!impl_->query)throw std::logic_error("A mixed scene requires a typed material hit");
   if(!std::isfinite(seconds))throw std::invalid_argument("Invalid visibility animation time");
   SurfaceQueryOptions options;options.max_triangle_tests=65536;
   options.ray_filter=[&](uint32_t triangle,const std::array<float,3> &bary) {
@@ -368,8 +525,35 @@ std::optional<SurfaceHit> MaterialSurfaceQuery::raycast_excluding(Vec3 origin, V
     --found;
     return index<found->range.first+found->range.count &&
       std::find(excluded.begin(),excluded.end(),found->range.object)==excluded.end() &&
-      found->visible(impl_->query.mesh(),triangle,bary,direction,seconds);
+      found->visible(impl_->query->mesh(),triangle,bary,direction,seconds);
   };
-  return impl_->query.raycast(origin,direction,maximum,options);
+  return impl_->query->raycast(origin,direction,maximum,options);
+}
+SurfaceMaterialIdentity MaterialSurfaceQuery::material_identity(uint32_t triangle)const{
+ const auto corner=size_t(triangle)*3;
+ auto found=std::upper_bound(impl_->surfaces.begin(),impl_->surfaces.end(),corner,[](size_t at,const Visibility&v){return at<v.range.first;});
+ if(found==impl_->surfaces.begin())throw std::out_of_range("Material query triangle has no range");--found;
+ if(corner>=found->range.first+found->range.count)throw std::out_of_range("Material query triangle is outside its range");
+ return {found->range.object,found->range.texture_set};
+}
+uint32_t MaterialSurfaceQuery::logical_triangle(uint32_t triangle)const{
+ (void)material_identity(triangle);const auto corner=size_t(triangle)*3;
+ auto found=std::upper_bound(impl_->surfaces.begin(),impl_->surfaces.end(),corner,[](size_t at,const Visibility&v){return at<v.range.first;});--found;
+ const auto local=corner-found->range.first;
+ return found->range.texture_set_proof?found->range.texture_set_proof->logical_corner(local,false)/3:uint32_t(local/3);
+}
+std::optional<SurfaceHit> MaterialSurfaceQuery::raycast_excluding_materials(Vec3 origin,Vec3 direction,
+    float maximum,double seconds,std::span<const SurfaceMaterialIdentity>excluded)const{
+ if(impl_->chunks||!impl_->query)throw std::logic_error("A mixed scene requires a typed material hit");
+ if(!std::isfinite(seconds))throw std::invalid_argument("Invalid visibility animation time");
+ SurfaceQueryOptions options;options.max_triangle_tests=65536;
+ options.ray_filter=[&](uint32_t triangle,const std::array<float,3>&bary){
+  const auto corner=size_t(triangle)*3;
+  auto found=std::upper_bound(impl_->surfaces.begin(),impl_->surfaces.end(),corner,[](size_t at,const Visibility&v){return at<v.range.first;});
+  if(found==impl_->surfaces.begin())return false;--found;
+  const SurfaceMaterialIdentity identity{found->range.object,found->range.texture_set};
+  return corner<found->range.first+found->range.count&&std::find(excluded.begin(),excluded.end(),identity)==excluded.end()&&found->visible(impl_->query->mesh(),triangle,bary,direction,seconds);
+ };
+ return impl_->query->raycast(origin,direction,maximum,options);
 }
 } // namespace dome

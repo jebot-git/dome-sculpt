@@ -1,0 +1,59 @@
+{
+  "scope": "New actual FLTK51+resize and ordinary-app/actual-loader regression sources only",
+  "base": "d8bd88d4dcb530d50ed53c726fcf22153975439b",
+  "files": {
+    "CMakeLists.txt": "e3154436e6b78bd0530fdf440be7b4b103e4924ea4c595d442606c80625253d9",
+    "tests/texture-set-resolution-workflows.cmake": "6f1cd1500197373052228cfc75fcb009e6fb3d81842fd9a4ed004b2b668b4176",
+    "tests/texture-set-menu.py": "8b28e61123d522fec3c3a571615aeb1aa32547d8e5d6f4e3beb0f8c10353e8d0",
+    "tests/texture-set-resolution-fixture.cpp": "425dc2a8914fae323ab25df3c23caa68555c0f14087c12f3927a432e1f679e85",
+    "tests/texture-set-resolution-runtime.cpp": "0d3dbc72c8ef50493d98c672d064b2059f2a2eabb9d882c629c74ad28bba72b5",
+    "tests/texture-set-resolution-xr.py": "a84fc67c8ea7f7351c29ae29e09def44cbef3a87f61c4c421dc4de6d427b1c39",
+    "docs/TEXTURE-SET-SOURCEFUL-RESOLUTION-DESIGN.md": "0feb3a1d578f239b4cc0d6911f977357f6fd01f342c87e557f5035ba8e9e7df0"
+  },
+  "checks": [
+    {
+      "state": "terminal",
+      "scope": "Python AST only, no GUI/XR/runtime execution",
+      "legacy_static_check_sites": 30,
+      "legacy_check_predicates_and_labels": "exact AST match before added resize cases",
+      "legacy_source": "08b1feba",
+      "legacy_sha256": "2269b4945c5cc677600fd52cbf6b130f3c7cc80693d7a207f35a1e96f52a6d8e",
+      "syntax": [
+        {
+          "file": "tests/texture-set-menu.py",
+          "sha256": "8b28e61123d522fec3c3a571615aeb1aa32547d8e5d6f4e3beb0f8c10353e8d0",
+          "AST": "pass"
+        },
+        {
+          "file": "tests/texture-set-resolution-xr.py",
+          "sha256": "a84fc67c8ea7f7351c29ae29e09def44cbef3a87f61c4c421dc4de6d427b1c39",
+          "AST": "pass"
+        }
+      ],
+      "allocated": 4255744,
+      "cap": 8388608
+    },
+    {
+      "state": "terminal",
+      "exits": [
+        0,
+        0
+      ],
+      "seconds": 4.672205099021085,
+      "input_count": 414,
+      "drift": [],
+      "allocated": 4308992,
+      "cap": 8388608
+    }
+  ],
+  "runtime": "Not executed; no objects/archive/ELF/library/link generated",
+  "sourceful": "Coordinated dual-grid requirements only; unsupported guards unchanged",
+  "remaining": [
+    "Fresh coherent owning app/core/render/XR/runtime modules",
+    "Actual native fixture/numeric execution",
+    "FLTK normal+compact51prefix and new controls",
+    "Actual-loader eight-case workflow execution",
+    "Measured output/resource forecast and full SAN reserve",
+    "Sourceful/GPU/physical-headset transition qualification"
+  ]
+}

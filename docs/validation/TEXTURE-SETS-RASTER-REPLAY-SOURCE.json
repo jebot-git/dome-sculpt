@@ -1,0 +1,20 @@
+{
+  "status": "Source-only actual raster identity/sharing and optional node shared-geometry replay hooks",
+  "syntax": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/texture-set-fields-e412/artifacts/raster-sharing-syntax-v2/status.json",
+    "sha256": "c968be3dd9ab7f224a91f9e2777671b641853983679d95a56dc49146684e38d7",
+    "whole_TUs": 4,
+    "exit": 0
+  },
+  "actual_hooks": [
+    "raster_owner returns actual SurfaceMap/control block",
+    "Paint7 decode may reuse a proved domain/geometry/resolution/policy raster prototype without first constructing another raster",
+    "Node reader may receive actual native shared geometry before minting node Paint/attachment; complete source-root/trace replay remains mandatory",
+    "Cached nodes reject a changed shared geometry control block"
+  ],
+  "preserved_failure": "Initial syntax attempt failed namespace qualification in new raster branch; corrected whole-TU syntax4 passes. Original failure/log retained.",
+  "not_claimed": [
+    "objects/links/runtime/native or UI/GL/XR/SAN/device proof",
+    "source-backed Paint7 payload or PolygonSources8 completion"
+  ]
+}

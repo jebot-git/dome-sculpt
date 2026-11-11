@@ -1,0 +1,10 @@
+# Test-only fixture and actual-loader runtime. No product observer/wrappers.
+if(BUILD_TESTING)
+  add_executable(dome-sculpt-texture-set-resolution-fixture tests/texture-set-resolution-fixture.cpp)
+  target_include_directories(dome-sculpt-texture-set-resolution-fixture PRIVATE src)
+  target_link_libraries(dome-sculpt-texture-set-resolution-fixture PRIVATE dome-sculpt-core)
+  if(DOME_BUILD_XR)
+    add_library(dome-sculpt-texture-resolution-runtime SHARED tests/texture-set-resolution-runtime.cpp)
+    target_link_libraries(dome-sculpt-texture-resolution-runtime PRIVATE dome-sculpt-json PkgConfig::NATIVEGL)
+  endif()
+endif()

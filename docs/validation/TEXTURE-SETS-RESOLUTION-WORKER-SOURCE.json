@@ -1,0 +1,80 @@
+{
+  "scope": "Implemented CPU plain painted-field resize, worker and FLTK/XR controls; source/syntax only",
+  "history": [
+    "9de9f348",
+    "b9c65b6d",
+    "9bf0fa39",
+    "7f19ac30",
+    "5191eed0"
+  ],
+  "files": {
+    "CMakeLists.txt": "39ebb9bf0b93c31c41e6d1b747bee3d724b961113a054bd3b2a663f92519721d",
+    "include/dome/texture-sets.hpp": "c411c8d006f821d09c776247e76339066a3ea0039936690d65c04efc39df63cf",
+    "include/dome/texture-set-resolution.hpp": "5b058ca04850f425143bb68b06e4c38efba738473ff726a6b57e96eed69b565e",
+    "include/dome/vr-controls.hpp": "1bc2dbf6339f06bd2dfc62fb7480a3518cacfb6658ac67951f7fd60f2f1c38ba",
+    "src/texture-set-resample.cpp": "841c29854fcd9f32e18d06c4913a956e06376139d3ad4a18e9758867b60548c9",
+    "src/texture-set-resample.hpp": "19d87b1dd80f4b6ff8c6955ee0189240b5c82666e6bad8c58050f7aeb406e706",
+    "src/texture-set-paint-access.hpp": "dbccf40c985f3ca670d04650802760c68ac49fcd7f35d6c6e45e2544bf740518",
+    "src/paint.cpp": "2d65edc834f792cb8c39e1e8fe6dc4df5682d58d58055e72825cc4c06b777090",
+    "src/document-texture-sets.cpp": "03de9c25b35f2174cc4c47267b888c8238da0fe70788556e92478be799a59e6f",
+    "src/document.cpp": "b806436944bdc840245f286fb789ca91440974e35d3938e15f6777dc6600fc10",
+    "src/input.cpp": "775f8c0b44ef157834604dd53d94ab36f499d649c2bb925c723417e46a160da4",
+    "src/palette.cpp": "3a8ab54814972d0ff00ec38a520978a95b70a94ef725aab941f43fd346c6bb2b",
+    "src/texture-set-controls.hpp": "113144a00115bdec8ad0b05b1ecf20f57f225f847722f51c716fec0219732da1",
+    "src/texture-set-editor.cpp": "db1de563c043b9095f02279b02bb26515647abf438ae46a6f2ba14f53f5613da",
+    "tests/texture-set-resolution.cpp": "6ec77151776453123ddc3cdb402edebfb8e2b8f640f3e271f36ab02b05086be0"
+  },
+  "syntax": [
+    {
+      "state": "terminal",
+      "exits": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "seconds": 25.866172462003306,
+      "input_count": 424,
+      "drift": [],
+      "allocated": 5173248,
+      "cap": 8388608
+    },
+    {
+      "state": "terminal",
+      "exit": 0,
+      "seconds": 3.1411955090006813,
+      "input_count": 424,
+      "drift": [],
+      "allocated": 5279744,
+      "cap": 8388608
+    },
+    {
+      "state": "terminal",
+      "exit": 0,
+      "seconds": 1.0658102639717981,
+      "input_count": 424,
+      "drift": [],
+      "allocated": 5332992,
+      "cap": 8388608
+    }
+  ],
+  "runtime": "No assertions executed; no object/archive/ELF/link/build",
+  "remaining": [
+    "Fresh complete source-coherent R/S providers and regression execution",
+    "FLTK pointer/compact controls and actual XR/device runtime",
+    "Native ordered Save/reopen and exact worker history/cancel qualification",
+    "Measured sourceful/current-grid transition and prepared/baked/PBR publication",
+    "Selected accelerator implementation/quality",
+    "Allocator fault and physical headset qualification"
+  ],
+  "proposed_tmpfs_caps_bytes": {
+    "release_including_128MiB_prospective": 536870912,
+    "sanitizer_including_256MiB_prospective": 3221225472,
+    "source_results": 134217728
+  },
+  "qualified_trees": "Untouched; all preserved artifacts remain"
+}
