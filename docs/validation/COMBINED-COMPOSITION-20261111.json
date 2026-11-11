@@ -1,0 +1,41 @@
+{
+  "base": "b8c469ce875eb2542c220300c3c63edbf1526570",
+  "head": "a3552bd43c71fc0c6cb6da35ce7d7dd9c567bb77",
+  "scope": "Source composition only; all existing product/build/assets/packaging/header/provider files equal the frozen successfully testedb8 tree. New default-build changes are limited to two separately qualified test fixture files; independent experiment remains opt-in. No fresh whole-build or main product admission claim.",
+  "changed_files": [
+    "THIRD-PARTY.md",
+    "docs/ADDITIONAL-REQUIREMENTS-2026-11-11.md",
+    "docs/ARMORPAINT-EXPERIMENT.md",
+    "docs/COMBINED-BUILD-20261111.md",
+    "docs/HANDOFF.md",
+    "docs/REQUIREMENTS.md",
+    "docs/XR-SAVED-REDO-20261111.md",
+    "docs/validation/ARMORPAINT-BLUR-20261111.json",
+    "docs/validation/COMBINED-BUILD-B8C469-20261111.json",
+    "docs/validation/XR-SAVED-REDO-20261111.json",
+    "experiments/armorpaint-blur/CMakeLists.txt",
+    "experiments/armorpaint-blur/NOTICE.txt",
+    "experiments/armorpaint-blur/README.md",
+    "experiments/armorpaint-blur/blur_adapter.cpp",
+    "experiments/armorpaint-blur/blur_adapter.hpp",
+    "experiments/armorpaint-blur/generate_shader.py",
+    "experiments/armorpaint-blur/proof.cpp",
+    "experiments/armorpaint-blur/validate.py",
+    "experiments/armorpaint-blur/vendor/LICENSE.armorpaint",
+    "experiments/armorpaint-blur/vendor/make_blur.c",
+    "tests/texture-set-resolution-runtime.cpp",
+    "tests/texture-set-resolution-xr.py",
+    "third_party/sources.json"
+  ],
+  "unchanged_product_files": 726,
+  "unchanged_product_manifest_sha256": "0eca327b8ac21ce71496a54276289f953cbe99280a01df262e2f1713dd096b3d",
+  "fixture_source": "17cd3b66124d403ea6a88ce844b252d72eff6ff5",
+  "fixture_hashes": {
+    "tests/texture-set-resolution-runtime.cpp": "931454ae4c1f8d9737472d0f0f81d037fa1d4fcd29f60a9df608b9e02fd5c864",
+    "tests/texture-set-resolution-xr.py": "dcd43627e69b046d1986aa35839f3fcf74bde36fda77fd0fc150f733fcb22e0c"
+  },
+  "full_manifest": {
+    "path": "artifacts/combined-composition-20261111/proof.json",
+    "sha256": "049a55f28f5246a515739c08a3558da9b003902d6492ca4d70bd4935f6a94686"
+  }
+}
