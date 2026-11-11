@@ -79,3 +79,9 @@ checks, reentry reset or compare-before-alias behavior. Existing limits and
 validation remain unchanged. CBOR parsing still has before/after checks; this
 receipt does not claim SAX cancellation, every codec's prompt interruption,
 full worker history/Save qualification, or production-wide admission.
+
+Evidence archive v2 verifies every member's bytes, mode, UID/GID and exact
+nanosecond mtime on full decode. The first archive and all originals remain:
+its bytes were correct, but Python's default tar timestamp conversion rounded
+118 member mtimes. Explicit decimal PAX timestamps correct that metadata-only
+archive defect; native source, binaries and test outcomes are unchanged.
