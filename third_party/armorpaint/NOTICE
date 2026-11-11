@@ -1,0 +1,21 @@
+Altered ArmorPaint color-layer blur adaptation in Dome Sculpt.
+
+Source: https://github.com/armory3d/armorpaint
+Commit: 629f8e77b3f19d533c60a1baa4fe9d4db9ee1163
+Original: paint/sources/render/make_blur.c, retained unchanged at
+experiments/armorpaint-blur/vendor/make_blur.c, with the complete zlib/libpng
+license at experiments/armorpaint-blur/vendor/LICENSE.armorpaint.
+
+The build copies the exact get_blur_tool_weight function offline into the build
+directory. src/paint-blur-gpu.cpp is an ALTERED texture-space cross-filter
+adaptation. It adds typed common/PBR colors, independent authored alpha and
+coverage, sRGB conversion, per-chart normalization, independent mask gating,
+dirty tiles/halos and private EGL/PBO/fence ownership. It does not import the
+upstream frontend, engine, project/history format, packed normal/material roles
+or complete painting/material/baking workflow.
+
+Native host, transaction/history integration and independent tests are
+GPL-3.0-or-later. The native EGL helper retains its separate MIT notice in
+third_party/openbrush/LICENSE.native-graphics and its documented local changes.
+This adaptation is not the upstream ArmorPaint application. Preserve the
+upstream license and attribution when distributing the derived application.

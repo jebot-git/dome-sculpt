@@ -9,7 +9,11 @@ The original notices and licenses on reused source files remain in force.
   `third_party/sources.json`. Its GLSL extraction is explicitly marked altered;
   the independent host/validation glue is GPL-3.0-or-later. It reuses the existing
   MIT native EGL helper and introduces no stock ArmorPaint frontend or engine
-  runtime. It is excluded from normal application builds and installations.
+  runtime. The standalone experiment remains opt-in. The native active-layer
+  color filter also derives its cross-kernel weights from this pinned source;
+  its typed shader adaptation is marked altered in `src/paint-blur-gpu.cpp`.
+  The native host, COW/history integration and independent tests are GPL-3.0-or-later.
+  See `docs/GPU-COLOR-LAYER-BLUR.md` for the bounded implementation scope.
 
 - Blender 5.4 Alpha source excerpts/reference files: GPL-2.0-or-later.
   Trackball sphere/hyperbola projection is adapted from `calctrackballvec`;

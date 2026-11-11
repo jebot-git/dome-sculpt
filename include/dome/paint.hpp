@@ -2,6 +2,7 @@
 #pragma once
 #include "emission.hpp"
 #include "mesh.hpp"
+#include "paint-blur.hpp"
 #include <deque>
 #include <map>
 #include <memory>
@@ -200,6 +201,11 @@ public:
   bool has_paint_data() const noexcept { return allocated_tiles_ != 0 || bool(source_maps_) || bool(baked_) || bool(sampling_attachment_); }
   bool undo();
   bool redo();
+  // Synchronous detached authoring operation; run only on an owning background
+  // worker. Mutates genuine active-layer COW fields, never a render composite.
+  PaintBlurReport blur_color_layer_gpu(const PaintBlurOptions & = {},
+      const std::function<bool()> &cancelled = {});
+  bool gpu_color_blur_eligible()const noexcept;
   std::shared_ptr<PaintedMesh> snapshot() const;
   bool source_sampling_prepared() const noexcept;
   bool valid_source_sampling_attachment() const noexcept;

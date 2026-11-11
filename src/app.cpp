@@ -724,6 +724,7 @@ struct App {
     menu.add("&Paint/Brush settings...", FL_ALT | 'p', command, this);
     menu.add("&Paint/Add layer", FL_CTRL | 'l', command, this);
     menu.add("&Paint/Next layer", 0, command, this);
+    menu.add("&Paint/Blur active color layer on GPU",0,command,this);
     menu.add("&Paint/Layer visible", 0, command, this, FL_MENU_TOGGLE);
     menu.add("&Paint/Delete layer", 0, command, this);
     menu.add("&Paint/Cycle layer opacity", 0, command, this);
@@ -964,6 +965,7 @@ struct App {
                                       s->paint_layers.size() > 1);
     enable("&Paint/Next layer", !modal && !s->asset_busy && s->mesh_active &&
                                     s->paint_layers.size() > 1);
+    enable("&Paint/Blur active color layer on GPU",!modal&&s->can_blur_color_layer);
     enable("&Mesh/UV editor...", !modal && !s->asset_busy && s->mesh_active &&
                                      active != s->objects.end() &&
                                      active->editable);
@@ -1459,6 +1461,8 @@ struct App {
       canvas.document.paint_command(SpatialCommand::AddLayer);
     else if (label == "Next layer")
       canvas.document.paint_command(SpatialCommand::NextLayer);
+    else if(label=="Blur active color layer on GPU")
+      canvas.document.paint_command(SpatialCommand::BlurColorLayer);
     else if (label == "Layer visible")
       canvas.document.paint_command(SpatialCommand::LayerVisible);
     else if (label == "Delete layer")

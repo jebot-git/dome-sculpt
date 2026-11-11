@@ -6,6 +6,8 @@
 #include "emission-paint-access.hpp"
 #include "native-weight-paint-access.hpp"
 #include "native-weight-state.hpp"
+#include "paint-blur-gpu.hpp"
+#include <numeric>
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Ray/triangle picking adapted from Blender 5.4 Alpha isect_ray_tri_v3,
 // GPL-2.0-or-later; see third_party/blender/math_geom.cc.reference.
@@ -445,6 +447,96 @@ struct PaintedMesh::SurfaceMap {
     sampling_raster_proven=bool(paint_domain);
   }
 };
+bool PaintedMesh::gpu_color_blur_eligible()const noexcept{
+  return surface_&&!editing_&&!surface_->source_capture_only&&!surface_->paint_domain&&surface_->diagnostics.policy==PaintUvPolicy::Strict&&surface_->linked.empty();
+}
+PaintBlurReport PaintedMesh::blur_color_layer_gpu(const PaintBlurOptions&options,const std::function<bool()>&cancelled){
+  auto stop=[&]{if(cancelled&&cancelled())throw std::runtime_error("GPU layer blur cancelled");};stop();
+  if(editing_)throw std::logic_error("Finish the active paint gesture before blurring its layer");
+  if(!std::isfinite(options.strength)||options.strength<0||options.strength>1||options.maximum_working_bytes>512*1024*1024||!options.maximum_working_bytes)throw std::invalid_argument("Invalid GPU layer blur limits");
+  if(!gpu_color_blur_eligible())throw std::logic_error("GPU layer blur requires an unambiguous current strict UV field; retained/repeated/overlapping source-coordinate domains need their separate authenticated tool");
+  PaintBlurReport report;if(options.strength==0)return report;
+  const auto&original=layer(active_);const uint32_t columns=surface_->columns;
+  std::vector<uint8_t>dirty(original.tiles.size());
+  for(size_t tile=0;tile<original.tiles.size();++tile){stop();
+    if(!original.tiles[tile]||std::none_of(original.tiles[tile]->pixels.begin(),original.tiles[tile]->pixels.end(),[](const auto&p){return p.data[9]!=0;}))continue;
+    int x=int(tile%columns),y=int(tile/columns);
+    // Seven-pixel cross halos can affect adjacent32px tiles. A conservative3x3
+    // tile directory includes corners; chart/membership and kernel reject them.
+    for(int dy=-1;dy<=1;++dy)for(int dx=-1;dx<=1;++dx)if(x+dx>=0&&y+dy>=0&&x+dx<int(columns)&&y+dy<int(columns))dirty[size_t(y+dy)*columns+size_t(x+dx)]=1;
+  }
+  const size_t count=size_t(std::count(dirty.begin(),dirty.end(),uint8_t(1)));if(!count)return report;
+  struct Edge{uint32_t a,b,face;};const auto&mesh=surface_->mesh;const size_t faces=mesh.indices.size()/3;
+  if(faces>2'000'000||mesh.positions.size()>2'000'000)throw std::length_error("GPU layer blur chart geometry exceeds its exact label/planning bound");
+  // Include the retained native data, private result tiles, chart planning,
+  // layer-history pointer copies and bounded CPU/GPU tile transfer scratch.
+  const size_t copies=count*(sizeof(PaintTile)+(original.pbr_tiles.empty()?0:sizeof(PaintColorTile)));
+  const size_t fixed=sizeof(detail::ColorBlurInput)+sizeof(detail::ColorBlurOutput);
+  const size_t chart=mesh.indices.size()*sizeof(Edge)+faces*sizeof(uint32_t);
+  size_t retained=0;
+  auto charge=[&](size_t bytes){if(bytes>options.maximum_working_bytes-retained)throw std::length_error("GPU layer blur retained authority/history budget exceeded");retained+=bytes;};
+  charge(storage_bytes());charge(history_bytes_);
+  charge(detail::TextureSetPaintAccess::working_bytes(*this,resolution()));
+  charge(mesh.positions.size()*sizeof(Vec3)+mesh.normals.size()*sizeof(Vec3)+mesh.uv.size()*sizeof(std::array<float,2>)+mesh.indices.size()*sizeof(uint32_t)+mesh.uv_pins.size()+mesh.uv_seams.size());
+  if(source_maps_)charge(source_maps_->unique_pixels()*4);
+  for(const auto*history:{&undo_,&redo_})for(const auto&s:*history)charge(sizeof(Stroke)+(s.before.capacity()+s.after.capacity()+s.color_before.capacity()+s.color_after.capacity()+s.emission_before.capacity()+s.emission_after.capacity())*sizeof(std::shared_ptr<const PaintTile>));
+  if(retained>options.maximum_working_bytes||copies>options.maximum_working_bytes-retained||chart>options.maximum_working_bytes-retained-copies||fixed*3>options.maximum_working_bytes-retained-copies-chart)throw std::length_error("GPU layer blur retained/chart/dirty-tile staging budget exceeded");
+  std::vector<uint32_t>parent(faces);std::iota(parent.begin(),parent.end(),0);
+  std::vector<Edge>edges;edges.reserve(mesh.indices.size());
+  auto root=[&](uint32_t i){while(parent[i]!=i){parent[i]=parent[parent[i]];i=parent[i];}return i;};
+  for(uint32_t face=0;face<faces;++face){if((face&1023)==0)stop();for(size_t k=0;k<3;++k){if(!mesh.uv_seams.empty()&&mesh.uv_seams[size_t(face)*3+k])continue;auto a=mesh.indices[size_t(face)*3+k],b=mesh.indices[size_t(face)*3+(k+1)%3];if(a>b)std::swap(a,b);edges.push_back({a,b,face});}}
+  std::sort(edges.begin(),edges.end(),[](auto a,auto b){return std::tie(a.a,a.b,a.face)<std::tie(b.a,b.b,b.face);});stop();
+  for(size_t i=1;i<edges.size();++i){if((i&4095)==0)stop();if(edges[i-1].a==edges[i].a&&edges[i-1].b==edges[i].b){auto a=root(edges[i-1].face),b=root(edges[i].face);if(a!=b)parent[b]=a;}}
+  for(uint32_t face=0;face<faces;++face)parent[face]=root(face);
+  // These labels name actual indexed writable UV connectivity. Normal/source
+  // grids, nearest-position welding and generated texture carriers are absent.
+  auto label=[&](uint32_t x,uint32_t y){const auto&t=surface_->texels[size_t(y)*resolution()+x];return t.covered&&(!texture_set_domain_||texture_set_domain_->contains(t.face))?parent.at(t.face)+1:0;};
+  auto draft=snapshot();draft->undo_=undo_;draft->redo_=redo_;draft->history_bytes_=history_bytes_;
+  draft->begin_stroke();auto&target=draft->active();
+  detail::ColorBlurGpu gpu(options.allow_software_validation);report.device=gpu.device();
+  auto input=std::make_unique<detail::ColorBlurInput>();auto output=std::make_unique<detail::ColorBlurOutput>();
+  for(size_t tile=0;tile<dirty.size();++tile)if(dirty[tile]){
+    stop();const int x0=int(tile%columns)*32,y0=int(tile/columns)*32;
+    for(size_t y=0;y<detail::blur_input;++y)for(size_t x=0;x<detail::blur_input;++x){
+      const uint32_t px=uint32_t(std::clamp(x0+int(x)-7,0,int(resolution())-1)),py=uint32_t(std::clamp(y0+int(y)-7,0,int(resolution())-1));
+      const auto&p=pixel(active_,px,py);const auto other=pbr_pixel(active_,px,py);const size_t i=y*detail::blur_input+x;
+      for(size_t c=0;c<3;++c){input->color[0][i][c]=unit(p.data[c]);input->color[1][i][c]=unit(other[c]);}
+      input->color[0][i][3]=input->color[1][i][3]=unit(p.data[9]);
+      input->metadata[i]={unit(p.data[3]),unit(other[3]),unit(p.data[13]),float(label(px,py))};
+    }
+    gpu.run(*input,*output,options.strength,cancelled);++report.tiles;report.uploaded_bytes+=sizeof(*input);report.downloaded_bytes+=sizeof(*output);
+    auto copy=original.tiles[tile]?std::make_shared<PaintTile>(*original.tiles[tile]):std::make_shared<PaintTile>();
+    std::shared_ptr<PaintColorTile>pbr_copy;if(!original.pbr_tiles.empty()){
+      pbr_copy=original.pbr_tiles[tile]?std::make_shared<PaintColorTile>(*original.pbr_tiles[tile]):std::make_shared<PaintColorTile>();
+      if(!original.pbr_tiles[tile])for(size_t y=0;y<32;++y)for(size_t x=0;x<32;++x)pbr_copy->pixels[y*32+x]=pbr_pixel(active_,uint32_t(x0+int(x)),uint32_t(y0+int(y)));
+    }
+    bool changed=false,pbr_changed=false;
+    for(size_t y=0;y<32;++y)for(size_t x=0;x<32;++x){
+      const size_t i=y*32+x,source=(y+7)*detail::blur_input+x+7;
+      if(input->metadata[source][2]==0||input->metadata[source][3]==0)continue;
+      auto&p=copy->pixels[i];const auto before=p;
+      const float coverage=output->planes[0][i][3];
+      if(!std::isfinite(coverage)||coverage<0||coverage>1.00001f)throw std::runtime_error("GPU blur returned invalid color coverage");
+      for(const auto&plane:output->planes)for(float value:plane[i])if(!std::isfinite(value)||value<-.00001f||value>1.00001f)throw std::runtime_error("GPU blur returned invalid linear color/alpha data");
+      if(coverage>0){
+        for(size_t c=0;c<3;++c)p.data[c]=byte(output->planes[0][i][c]);
+        p.data[3]=byte(output->planes[2][i][0]);p.data[9]=byte(coverage);
+        if(pbr_copy){auto before_pbr=pbr_pixel(active_,uint32_t(x0+int(x)),uint32_t(y0+int(y)));auto&color=pbr_copy->pixels[i];for(size_t c=0;c<3;++c)color[c]=byte(output->planes[1][i][c]);color[3]=byte(output->planes[2][i][1]);pbr_changed|=color!=before_pbr;}
+      }
+      changed|=p!=before;
+    }
+    if(changed||pbr_changed){
+      if(!original.tiles[tile])++draft->allocated_tiles_;
+      target.tiles[tile]=std::move(copy);
+      if(pbr_copy&&pbr_changed){if(!original.pbr_tiles[tile])++draft->allocated_color_tiles_;target.pbr_tiles[tile]=std::move(pbr_copy);}
+      ++report.changed_tiles;
+    }
+  }
+  stop();if(!report.changed_tiles)return report;
+  if(draft->storage_bytes()>128*1024*1024)throw std::length_error("GPU layer blur native paint storage budget exceeded");
+  if(draft->revision_==UINT64_MAX)throw std::overflow_error("GPU layer blur paint revision exhausted");
+  ++draft->revision_;draft->composite_token_=next_composite_token();report.changed=draft->end_stroke();stop();swap_state(*draft);return report;
+}
 struct PaintedMesh::Evaluation {
   std::shared_ptr<const SurfaceMap> source;
   std::shared_ptr<const Mesh> geometry;

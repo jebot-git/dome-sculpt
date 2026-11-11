@@ -51,6 +51,15 @@ void adopt_texture_set_stroke(Scene&scene,const std::shared_ptr<const TextureSet
  limits.validate();stop(limits);if(!lease)throw std::invalid_argument("Texture-set stroke has no current recipient lease");lease->authenticate_owner(lease);lease->authenticate_scene(scene);
  if(!TextureSetPaintAccess::stroke_structure(*lease->paint(),draft))throw std::invalid_argument("Texture-set stroke draft changed its geometry/source/material/layer structure");
  auto sealed=draft.snapshot();
+ if(!scene.object(lease->object()).texture_sets){
+  // Plain actors have an authentic recipient lease, but no collection or
+  // material-slot membership to pass to edit_texture_set. Preserve the same
+  // structural/source guard and stage a second private COW owner before the
+  // single replacement; never mutate a published paint alias in place.
+  auto recipient=scene.object(lease->object()).painted->snapshot();
+  TextureSetPaintAccess::swap_stroke(*recipient,*sealed);stop(limits);
+  scene.object(lease->object()).painted=std::move(recipient);return;
+ }
  // edit_texture_set constructs another detached recipient and seals its field.
  // No cached Scene, borrowed mutable collection or live target is overwritten.
  edit_texture_set(scene,lease->object(),lease->set(),[&](PaintedMesh&p,Material&){TextureSetPaintAccess::swap_stroke(p,*sealed);return true;},limits);

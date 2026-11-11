@@ -684,6 +684,7 @@ void Document::publish_locked(bool force,bool checkpoint) {
     state_.bake_source=state_.bake_sources.empty()?0:state_.bake_sources.front();
   state_.can_bake=!state_.object_grabbing && bake_target_ready_locked() && !state_.bake_sources.empty();
   state_.can_clear_bake=!state_.object_grabbing && bake_target_ready_locked() && bool(active.painted->baked());
+  state_.can_blur_color_layer=command_enabled_locked(SpatialCommand::BlurColorLayer);
   state_.can_convert_bake=canonical_conversion_ready_locked();
   auto work=asset_status();state_.can_cancel_asset=state_.asset_busy && work.cancellable;
   state_.can_cancel_asset|=projection_load_&&!projection_load_->done.load()&&!projection_load_->cancelled.load();
@@ -1208,6 +1209,7 @@ void Document::weight_settings(WeightToolSettings settings, std::optional<uint32
 }
 void Document::paint_command(SpatialCommand command) {
   std::lock_guard lock(model_mutex_);
+  if(command==SpatialCommand::BlurColorLayer){PaintBlurOptions options;options.strength=state_.paint.flow;queue_blur_color_locked(options);return;}
   finish_locked();
   bool normal_paint = command == SpatialCommand::MakeMesh || command == SpatialCommand::EditSource ||
       (command >= SpatialCommand::PaintColor && command <= SpatialCommand::LayerOpacity);
@@ -3093,6 +3095,10 @@ void Document::control_event_locked(VrControlEvent event) {
 }
 
 bool Document::command_enabled_locked(SpatialCommand command) const {
+  if(command==SpatialCommand::BlurColorLayer){
+    const auto&o=scene_.active();const auto field=o.painted?active_texture_set(o):TextureSetView{};
+    return !state_.asset_busy&&!state_.recovery_busy&&!control_before_&&!action_active_locked()&&!state_.polygon&&!state_.cut&&!state_.retopology&&!state_.expressions&&!state_.object_grabbing&&!uv_&&object_editable_locked(o.id)&&o.mesh_active&&field.painted&&field.painted->gpu_color_blur_eligible();
+  }
   if(texture_set_command(command))return texture_set_command_enabled_locked(command);
   if(expression_command(command))return expression_command_enabled_locked(command);
   if(state_.expressions&&!preview_command(command)&&command!=SpatialCommand::CancelWork&&command!=SpatialCommand::Center)return false;
@@ -3308,6 +3314,7 @@ void Document::sculpt_command(SpatialCommand command) {
   if(published_.load()==publication)publish_locked();
 }
 void Document::command_locked(SpatialCommand command) {
+  if(command==SpatialCommand::BlurColorLayer){if(command_enabled_locked(command)){PaintBlurOptions options;options.strength=state_.paint.flow;queue_blur_color_locked(options);}return;}
   if(texture_set_command(command)){texture_set_command_locked(command);return;}
   if(expression_command(command)){expression_command_locked(command);return;}
   if(state_.expressions&&command==SpatialCommand::CancelWork){end_expression_preview_locked(false);return;}

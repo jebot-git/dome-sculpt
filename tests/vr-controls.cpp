@@ -189,6 +189,28 @@ int main() try {
               doc.copy_scene().active().painted->layers()[0].opacity == 1 &&
               !doc.frame().state->dirty,
           "Layer slider undo restores the saved layer and its history");
+  doc.cancel_spatial_menu();
+  hand.open();hand.sector(9);hand.sector(3);hand.sector(11);
+  require(doc.frame().state->menu_page==6,
+          "Painting retains the direct brush-controls shortcut");
+  hand.sector(10);
+  require(doc.frame().state->menu_page==32,
+          "The former duplicate Erase slot exposes native filters");
+  hand.sector(8);
+  require(doc.frame().state->menu_page==6,
+          "Filter Back returns to the original brush-controls page");
+  hand.sector(10);
+  hand.frame.focused=false;hand.send();
+  require(!doc.frame().state->menu&&!doc.frame().state->dirty,
+          "Focus loss cancels the filter menu without authoring an edit");
+  hand.frame.focused=true;hand.send();hand.open();hand.sector(9);hand.sector(3);
+  const bool erase=doc.frame().state->paint.erase;
+  hand.sector(10);
+  require(doc.frame().state->paint.erase!=erase,
+          "The original Painting Erase command still toggles the live brush");
+  hand.open();hand.sector(9);hand.sector(3);hand.sector(10);
+  require(doc.frame().state->paint.erase==erase&&!doc.frame().state->dirty,
+          "Erase can be toggled back without altering the saved layer");
   std::filesystem::remove(path);
   return 0;
 } catch (const std::exception &e) {
