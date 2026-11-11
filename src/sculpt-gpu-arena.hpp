@@ -29,6 +29,7 @@ class SculptGpuArena {
   };
   struct Commands {
     detail::SculptSurfaceChunks::Ptr geometry;
+    size_t source_runs=0; // Raw reserved capacity, distinct from coalesced draws.
     std::vector<GLsizei> counts;
     std::vector<const void*> offsets;
     std::vector<GLint> bases;
@@ -137,7 +138,7 @@ public:
         vertices=sculpt_arena_add(vertices,mesh.positions.size());indices=sculpt_arena_add(indices,mesh.indices.size());
       });
       const auto prior=accepted_?accepted_->commands.find(object.object):decltype(accepted_->commands)::const_iterator{};
-      if(accepted_&&prior!=accepted_->commands.end()&&same_owner(prior->second->geometry,object.geometry))runs=sculpt_arena_add(runs,prior->second->counts.size());
+      if(accepted_&&prior!=accepted_->commands.end()&&same_owner(prior->second->geometry,object.geometry))runs=sculpt_arena_add(runs,prior->second->source_runs);
       else object.geometry->for_each_run([&](const auto &){poll(cancel);if(++runs>size_t(std::numeric_limits<GLsizei>::max()))throw std::length_error("Sculpt arena draw count overflow");});
     }
     const auto cpu=cpu_forecast(count,objects,runs);
@@ -213,6 +214,7 @@ public:
       }
       auto commands=std::make_shared<Commands>();commands->geometry=object.geometry;
       size_t n=0;object.geometry->for_each_run([&](const auto &){poll(cancel);++n;});
+      commands->source_runs=n;
       commands->counts.reserve(n);commands->offsets.reserve(n);commands->bases.reserve(n);
       object.geometry->for_each_run([&](const detail::SculptSurfaceRun &run){poll(cancel);
         const auto placed=object.placed->find(run.chunk);if(!placed)throw std::logic_error("Sculpt arena run lost placed owner");
@@ -220,7 +222,14 @@ public:
         if(at==next->entries.end()||!same_owner(at->second.geometry,placed->geometry_owner()))throw std::logic_error("Sculpt arena run lost actual geometry owner");
         const auto &entry=at->second;
         if(run.first>entry.indices.count||run.count>entry.indices.count-run.first||run.count>size_t(std::numeric_limits<GLsizei>::max()))throw std::length_error("Sculpt arena run outside actual index owner");
-        commands->counts.push_back(GLsizei(run.count));commands->offsets.push_back(reinterpret_cast<const void*>((entry.indices.first+run.first)*sizeof(uint32_t)));commands->bases.push_back(GLint(entry.vertices.first));
+        const auto offset=(entry.indices.first+run.first)*sizeof(uint32_t);
+        // Preserve741's exact adjacent-only merge. Never reorder by chunk,
+        // opacity, buffer offset or owner; primitive order/tie results stay exact.
+        if(!commands->counts.empty()&&commands->bases.back()==GLint(entry.vertices.first)&&
+           reinterpret_cast<uintptr_t>(commands->offsets.back())+size_t(commands->counts.back())*sizeof(uint32_t)==offset&&
+           run.count<=size_t(std::numeric_limits<GLsizei>::max()-commands->counts.back()))
+          commands->counts.back()+=GLsizei(run.count);
+        else {commands->counts.push_back(GLsizei(run.count));commands->offsets.push_back(reinterpret_cast<const void*>(offset));commands->bases.push_back(GLint(entry.vertices.first));}
       });
       next->commands.emplace(object.object,std::move(commands));
     }
