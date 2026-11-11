@@ -58,10 +58,13 @@ unsigned menu_completion_event = 0;
 unsigned field_step=0;bool field_panel_ready=false;
 std::vector<uint8_t> field_root_signature;
 std::map<unsigned,std::pair<unsigned,unsigned>> field_root_visible;
+std::map<unsigned,std::pair<unsigned,unsigned>> field_menu_closed;
+bool field_root_open=false;
 
 std::string field_mode(){const auto*p=getenv("DOME_XR_TEXTURE_RESOLUTION");return p?p:"";}
 bool field_history(){return field_mode().starts_with("apply-");}
 bool field_root_gate(){return field_history()&&(field_step==39||(field_history()&&(field_step==55||field_step==69)));}
+bool field_close_gate(){return field_history()&&(field_step==43||field_step==57||field_step==71);}
 bool field_reset(){return field_mode()=="focus"||field_mode()=="reference";}
 bool field_mark(const char*name){const auto*p=getenv("DOME_XR_TEXTURE_GATES");return p&&std::filesystem::exists(std::filesystem::path(p)/name);}
 uint32_t field_target(){const auto*p=getenv("DOME_XR_TEXTURE_TARGET");const int n=p?std::atoi(p):64;if(n!=64&&n!=128&&n!=256)throw std::runtime_error("Unexpected actual field target");return uint32_t(n);}
@@ -71,6 +74,10 @@ bool field_wait(){
   const auto at=field_root_visible.find(field_step);
   return at==field_root_visible.end()||at->second.second+1!=physical_frame||physical_frame<at->second.first+3;
  }
+ if(field_close_gate()){
+  const auto at=field_menu_closed.find(field_step);
+  return at==field_menu_closed.end()||at->second.second+1!=physical_frame||physical_frame<at->second.first+3;
+ }
  if(field_step==27&&!field_panel_ready)return true;
  if(field_history())return (field_step==45&&!field_mark("accepted"))||(field_step==59&&!field_mark("undone"))||(field_step==73&&!field_mark("redone"));
  if(field_mode()=="quality")return false;
@@ -79,7 +86,9 @@ bool field_wait(){
 bool field_click(){
  if(field_step==8||field_step==14||field_step==20||field_step==26)return true;
  if(field_mode()=="quality")return false;
- if(field_root_gate())return !field_root_visible.contains(field_step)&&physical_frame%4==0;
+ // A visible root with the wrong selection/history state must not be clicked
+ // again: that would execute an unintended command while waiting for its ack.
+ if(field_root_gate())return !field_root_open&&physical_frame%4==0;
  if(field_reset())return field_step==40||field_step==46;
  // Changed resize and history retire the old input lease. Reopen the
  // actual root menu before selecting its Save action; Cancel retains page31.
@@ -88,7 +97,7 @@ bool field_click(){
  return field_step==42;
 }
 int field_sector(){
- if(field_root_gate())return field_root_visible.contains(field_step)?6:-1;
+ if(field_root_gate())return field_root_open?6:-1;
  if(field_step>=12&&field_step<=14)return 9;
  if(field_step>=18&&field_step<=20)return 1;
  if(field_step>=24&&field_step<=26)return 6;
@@ -531,19 +540,56 @@ FN(ReleaseSwapchainImage, XrSwapchain p, const XrSwapchainImageReleaseInfo *) {
     }
   }
   if(!field_mode().empty()){
-    // Capture the actual initial ROOT title glyph mask, then require that exact
-    // public bitmap signature at reopen gates. Any blue panel is insufficient.
-    if(s->eye==0&&(field_step==9||field_root_gate())){
+    // Public palette geometry/colors from palette.cpp: the 640px panel spans
+    // .6m at z=-.66, ROOT title is at (320,345); radial cells have radius220,
+    // 110x40 extents. Save6 is centered(100,320), Redo5(129,210).
+    // Inspect displayed sRGB, including the renderer's real linear conversion.
+    // This observes released GL images, never Document state or a test marker.
+    if(s->eye==0){
       auto point=[&](double px,double py){const double wx=(px/640-.5)*.6,wy=1.56+(.5-py/640)*.6;return std::pair{int(std::lround(s->width*.5*(1+(wx+.032)/(.66*std::tan(.6))))),int(std::lround(s->height*.5*(1+(wy-1.6)/(.66*std::tan(.6)))))};};
-      const auto a=point(245,334),b=point(395,358);std::vector<uint8_t> signature;
-      for(int y=std::min(a.second,b.second);y<=std::max(a.second,b.second);++y)for(int x=std::min(a.first,b.first);x<=std::max(a.first,b.first);++x){const auto at=(size_t(y)*s->width+x)*4;signature.push_back(displayed(bytes[at])>180&&displayed(bytes[at+1])>180&&displayed(bytes[at+2])>180);}
+      auto pixels=[&](double left,double top,double right,double bottom,auto inspect){
+        const auto a=point(left,top),b=point(right,bottom);
+        for(int y=std::max(0,std::min(a.second,b.second));y<=std::min(int(s->height)-1,std::max(a.second,b.second));++y)
+          for(int x=std::max(0,std::min(a.first,b.first));x<=std::min(int(s->width)-1,std::max(a.first,b.first));++x){const auto at=(size_t(y)*s->width+x)*4;inspect(displayed(bytes[at]),displayed(bytes[at+1]),displayed(bytes[at+2]));}
+      };
+      std::vector<uint8_t> signature;
+      pixels(245,334,395,358,[&](int r,int g,int b){signature.push_back(r>180&&g>180&&b>180);});
       const auto lit=std::count(signature.begin(),signature.end(),uint8_t(1));
       if(field_step==9&&lit>=12){field_root_signature=signature;report["field_root_signature_pixels"]=lit;}
+      const bool same=!field_root_signature.empty()&&signature==field_root_signature;
+      // Four empty panel corners distinguish an absent palette from a changed
+      // title or page. Dark bg=(31,37,45), fg=(231,235,241), disabled fg is their
+      // integer midpoint. The separated bands allow framebuffer quantization.
+      int background=0,background_total=0,accent=0,accent_total=0,redo_bright=0,redo_dim=0;
+      for(const auto &corner:std::array<std::array<int,2>,4>{{{16,16},{600,16},{16,600},{600,600}}})
+        pixels(corner[0],corner[1],corner[0]+24,corner[1]+24,[&](int r,int g,int b){++background_total;background+=r>=25&&r<=40&&g>=30&&g<=45&&b>=38&&b<=55;});
+      // Left interior of Save's cell excludes its centered text and border.
+      pixels(56,307,70,333,[&](int r,int g,int b){++accent_total;accent+=r<150&&g>130&&b>220;});
+      pixels(100,195,160,225,[&](int r,int g,int b){redo_bright+=r>180&&g>180&&b>180;redo_dim+=r>=112&&r<=170&&g>=116&&g<=175&&b>=120&&b<=185;});
+      const bool panel=background_total&&background*4>=background_total*3;
+      field_root_open=same&&panel;
+      const bool selected=accent_total&&accent*4>=accent_total*3;
+      const bool redo_enabled=redo_bright>=4;
+      const bool redo_disabled=redo_bright==0&&redo_dim>=4;
+      const bool closed=!same&&background_total&&background*4<background_total;
+      auto &ui=report["field_ui"][std::to_string(field_step)];
+      if(!ui.contains("first_physical_frame"))ui["first_physical_frame"]=physical_frame;
+      ui["last_physical_frame"]=physical_frame;ui["root_title"]=same;ui["panel_present"]=panel;
+      ui["save_selected"]=selected;ui["redo_enabled"]=redo_enabled;ui["redo_disabled"]=redo_disabled;ui["menu_absent"]=closed;
+      ui["background_pixels"]=background;ui["background_samples"]=background_total;ui["save_accent_pixels"]=accent;ui["save_samples"]=accent_total;ui["redo_bright_pixels"]=redo_bright;ui["redo_dim_pixels"]=redo_dim;
       if(field_root_gate()){
-        const bool same=!field_root_signature.empty()&&signature==field_root_signature;
         report["field_root_title_match"][std::to_string(field_step)]=same;
-        if(same){auto[it,first]=field_root_visible.try_emplace(field_step,physical_frame,physical_frame);it->second.second=physical_frame;report["field_root_visible"][std::to_string(field_step)]={{"first",it->second.first},{"last",physical_frame},{"title_pixels",lit}};}
+        // Undo55 must expose a real available Redo; accepted39 and redone69
+        // must expose it disabled. A stale ROOT title alone cannot pass.
+        const bool history_ready=field_step==55?redo_enabled:redo_disabled;
+        const bool ready=field_root_open&&selected&&history_ready;
+        ui["expected_redo_enabled"]=field_step==55;ui["valid_root_acknowledgment"]=ready;
+        if(ready){auto[it,first]=field_root_visible.try_emplace(field_step,physical_frame,physical_frame);it->second.second=physical_frame;report["field_root_visible"][std::to_string(field_step)]={{"first",it->second.first},{"last",physical_frame},{"title_pixels",lit},{"save_selected",selected},{"redo_enabled",redo_enabled},{"redo_disabled",redo_disabled}};}
         else field_root_visible.erase(field_step);
+      }
+      if(field_close_gate()){
+        if(closed){auto[it,first]=field_menu_closed.try_emplace(field_step,physical_frame,physical_frame);it->second.second=physical_frame;report["field_menu_closed"][std::to_string(field_step)]={{"first",it->second.first},{"last",physical_frame},{"root_title",same},{"panel_present",panel}};}
+        else field_menu_closed.erase(field_step);
       }
     }
     report["field_images"][std::to_string(field_step)][std::to_string(s->eye)]=std::count_if(bytes.begin(),bytes.end(),[](uint8_t v){return v!=0;});
@@ -554,10 +600,13 @@ FN(ReleaseSwapchainImage, XrSwapchain p, const XrSwapchainImageReleaseInfo *) {
       report["field_apply_background_accent"]=std::max(report.value("field_apply_background_accent",0),accent);
       if(total&&accent*2>total){field_panel_ready=true;report["field_panel_ready"]=true;}
     }
-    const bool capture=(field_step==27&&field_panel_ready)||field_step==37||field_step==39||field_step==43||field_step==46||field_step==74||(!field_history()&&field_step==(field_mode()=="quality"?60u:50u));
+    const bool save_attempt=field_history()&&(field_step==42||field_step==56||field_step==70);
+    const bool capture=(field_step==27&&field_panel_ready)||field_step==37||field_step==39||field_step==43||field_step==46||field_step==74||save_attempt||(!field_history()&&field_step==(field_mode()=="quality"?60u:50u));
     const bool root_capture=field_root_gate()&&field_root_visible.contains(field_step)&&field_root_visible.at(field_step).second==physical_frame;
-    const auto key=std::to_string(field_step)+(root_capture?"-root-":"-")+std::to_string(s->eye);
-    if((capture||root_capture)&&!report["field_captures"].contains(key))if(const auto*path=getenv("DOME_XR_FIXTURE_REPORT")){
+    const bool closed_capture=field_close_gate()&&field_menu_closed.contains(field_step)&&field_menu_closed.at(field_step).second==physical_frame;
+    const bool waiting_capture=(field_root_gate()||field_close_gate()||(field_history()&&(field_step==45||field_step==59||field_step==73)))&&physical_frame%300==0;
+    const auto key=std::to_string(field_step)+(waiting_capture?"-wait-"+std::to_string(physical_frame)+"-":root_capture?"-root-":closed_capture?"-closed-":"-")+std::to_string(s->eye);
+    if((capture||root_capture||closed_capture||waiting_capture)&&!report["field_captures"].contains(key))if(const auto*path=getenv("DOME_XR_FIXTURE_REPORT")){
       const auto target=std::string(path)+".field-"+key+".ppm";std::ofstream image(target,std::ios::binary);image<<"P6\n"<<s->width<<' '<<s->height<<"\n255\n";
       for(int y=int(s->height)-1;y>=0;--y)for(unsigned x=0;x<s->width;++x)for(int c=0;c<3;++c)image.put(char(displayed(bytes[(size_t(y)*s->width+x)*4+c])));
       report["field_captures"][key]=target;
