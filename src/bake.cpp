@@ -174,7 +174,7 @@ void validate(const Mesh &low,const BakeSource &source,const BakeOptions &o) {
       throw std::invalid_argument("Physical emission Bake requires its actual float sampling/output adapter");
     if (!std::isfinite(m.normal_strength)||m.normal_strength<0||m.normal_strength>4) throw std::invalid_argument("Invalid normal-map strength");
     if (m.maps) {
-      if(m.maps->overlay&&(!m.maps->source_only||m.maps->overlay->source_maps()!=m.maps->source_maps))
+      if(m.maps->overlay&&((m.maps->source_only&&m.maps->overlay->source_maps()!=m.maps->source_maps)||(!m.maps->source_only&&!m.resolved_emission)))
         throw std::invalid_argument("Bake overlay differs from its immutable source coordinate owner");
       if(m.maps->source_maps)m.maps->source_maps->validate_surface(source.mesh);
       if(m.maps->baked_base&&m.maps->source_only){
