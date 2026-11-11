@@ -6,12 +6,15 @@
 #include "render-buffer-size.hpp"
 #include <cstdlib>
 #include <iostream>
+#include <map>
 #include <unistd.h>
 using namespace dome;
 #include "render-upload-target.hpp"
 namespace {
 size_t checks=0,array_bytes=0,index_bytes=0,array_calls=0,index_calls=0;
-bool capture=false,inject_error=false;
+bool capture=false,inject_error=false;std::map<const void*,const char*>source_names;
+GLenum binding_name(GLenum target){return target==GL_COPY_WRITE_BUFFER?GL_COPY_WRITE_BUFFER_BINDING:target==GL_ARRAY_BUFFER?GL_ARRAY_BUFFER_BINDING:target==GL_ELEMENT_ARRAY_BUFFER?GL_ELEMENT_ARRAY_BUFFER_BINDING:target==GL_TEXTURE_BUFFER?GL_TEXTURE_BUFFER_BINDING:target==GL_PIXEL_PACK_BUFFER?GL_PIXEL_PACK_BUFFER_BINDING:GL_PIXEL_UNPACK_BUFFER_BINDING;}
+const char*source_name(const void*p){auto i=source_names.find(p);return i==source_names.end()?"unknown":i->second;}
 void check(bool yes,const char*label){if(!yes)throw std::runtime_error(label);++checks;std::cout<<"PASS "<<label<<std::endl;}
 struct Home {
  std::filesystem::path path;
@@ -83,10 +86,16 @@ std::shared_ptr<const MeshSnapshot> ready(Document&doc){
 }
 extern "C" void __real_glBufferData(GLenum,GLsizeiptr,const void*,GLenum);
 extern "C" void __wrap_glBufferData(GLenum target,GLsizeiptr size,const void*data,GLenum usage){
+ if(capture){GLint buffer=0;glGetIntegerv(binding_name(target),&buffer);std::cout<<"TRACE_DATA buffer="<<buffer<<" target="<<target<<" bytes="<<size<<" source="<<(data?source_name(data):"null")<<" usage="<<usage<<std::endl;}
  if(capture){if(render_upload_test::vertex(target,data,usage)){array_bytes+=size;++array_calls;}if(render_upload_test::index(target,data,usage)){index_bytes+=size;++index_calls;}}
  if(capture&&inject_error&&render_upload_test::vertex(target,data,usage)&&size>0){inject_error=false;__real_glBufferData(target,-1,data,usage);return;}
  __real_glBufferData(target,size,data,usage);
 }
+extern "C" void __real_glBufferSubData(GLenum,GLintptr,GLsizeiptr,const void*);
+extern "C" void __wrap_glBufferSubData(GLenum target,GLintptr offset,GLsizeiptr size,const void*data){if(capture){GLint buffer=0;glGetIntegerv(binding_name(target),&buffer);std::cout<<"TRACE_SUB buffer="<<buffer<<" target="<<target<<" offset="<<offset<<" bytes="<<size<<" source="<<source_name(data)<<std::endl;}__real_glBufferSubData(target,offset,size,data);}
+extern "C" void __real_glDrawElements(GLenum,GLsizei,GLenum,const void*);
+extern "C" void __wrap_glDrawElements(GLenum mode,GLsizei count,GLenum type,const void*indices){if(capture){GLint vao=0,element=0,prior=0;glGetIntegerv(GL_VERTEX_ARRAY_BINDING,&vao);glGetIntegerv(GL_ELEMENT_ARRAY_BUFFER_BINDING,&element);glGetIntegerv(GL_COPY_READ_BUFFER_BINDING,&prior);glBindBuffer(GL_COPY_READ_BUFFER,GLuint(element));GLint64 bytes=0;glGetBufferParameteri64v(GL_COPY_READ_BUFFER,GL_BUFFER_SIZE,&bytes);glBindBuffer(GL_COPY_READ_BUFFER,GLuint(prior));std::cout<<"TRACE_DRAW vao="<<vao<<" ebo="<<element<<" ebo_bytes="<<bytes<<" count="<<count<<std::endl;for(GLuint a=0;a<16;++a){GLint enabled=0,buffer=0,stride=0,components=0;glGetVertexAttribiv(a,GL_VERTEX_ATTRIB_ARRAY_ENABLED,&enabled);if(!enabled)continue;glGetVertexAttribiv(a,GL_VERTEX_ATTRIB_ARRAY_BUFFER_BINDING,&buffer);glGetVertexAttribiv(a,GL_VERTEX_ATTRIB_ARRAY_STRIDE,&stride);glGetVertexAttribiv(a,GL_VERTEX_ATTRIB_ARRAY_SIZE,&components);void*offset=nullptr;glGetVertexAttribPointerv(a,GL_VERTEX_ATTRIB_ARRAY_POINTER,&offset);glBindBuffer(GL_COPY_READ_BUFFER,GLuint(buffer));glGetBufferParameteri64v(GL_COPY_READ_BUFFER,GL_BUFFER_SIZE,&bytes);glBindBuffer(GL_COPY_READ_BUFFER,GLuint(prior));std::cout<<"TRACE_ATTR vao="<<vao<<" attr="<<a<<" buffer="<<buffer<<" store_bytes="<<bytes<<" stride="<<stride<<" components="<<components<<" offset="<<uintptr_t(offset)<<std::endl;}}__real_glDrawElements(mode,count,type,indices);}
+
 int main(int argc,char**argv)try{
  Home home;bool old=argc>1&&std::string(argv[1])=="--expect-rejection";const bool large_buffer=argc>1&&std::string(argv[1])=="--large-buffer";
  const size_t limit=size_t(std::numeric_limits<GLsizeiptr>::max());
@@ -98,7 +107,7 @@ int main(int argc,char**argv)try{
  NativeGraphics graphics;std::string device=reinterpret_cast<const char*>(glGetString(GL_RENDERER));std::cout<<"GPU "<<device<<std::endl;
  check(argc<2||std::string(argv[1])!="--hardware"||(device.find("llvmpipe")==std::string::npos&&device.find("softpipe")==std::string::npos),"Capacity fixture executes on requested graphics device");
  Target target;SurfaceRenderer renderer;Document doc;
- auto render=[&](std::shared_ptr<const MeshSnapshot> mesh){array_bytes=index_bytes=array_calls=index_calls=0;capture=true;try{renderer.draw(std::move(mesh),{},identity,{0,0,2},Target::size,Target::size,true);}catch(...){capture=false;throw;}capture=false;std::vector<uint8_t> pixels(Target::size*Target::size*4);glReadPixels(0,0,Target::size,Target::size,GL_RGBA,GL_UNSIGNED_BYTE,pixels.data());return pixels;};
+ auto render=[&](std::shared_ptr<const MeshSnapshot> mesh){source_names.clear();auto source=[&](const auto&values,const char*name){if(!values.empty())source_names.emplace(values.data(),name);};source(mesh->mesh.positions,"positions");source(mesh->mesh.normals,"normals");source(mesh->mesh.uv,"uv0");source(mesh->mesh.indices,"indices");source(mesh->tangents,"tangents");source(mesh->source_normals,"source_normals");source(mesh->canonical_normals,"canonical_normals");source(mesh->source_tangents,"source_tangents");source(mesh->normal_coordinates,"normal_coordinates");source(mesh->paint_coordinates,"paint_coordinates");source(mesh->source_colors,"source_colors");source(mesh->selected_weights,"weights");source(mesh->sculpt_masks,"masks");std::cout<<"TRACE_FRAME positions="<<mesh->mesh.positions.size()<<" normals="<<mesh->mesh.normals.size()<<" uv0="<<mesh->mesh.uv.size()<<" tangents="<<mesh->tangents.size()<<" source_normals="<<mesh->source_normals.size()<<" canonical_normals="<<mesh->canonical_normals.size()<<" source_tangents="<<mesh->source_tangents.size()<<" colors="<<mesh->source_colors.size()<<" normal_coordinates="<<mesh->normal_coordinates.size()<<" paint_coordinates="<<mesh->paint_coordinates.size()<<std::endl;array_bytes=index_bytes=array_calls=index_calls=0;capture=true;try{renderer.draw(std::move(mesh),{},identity,{0,0,2},Target::size,Target::size,true);}catch(...){capture=false;throw;}capture=false;std::cout<<"TRACE_TOTAL array_calls="<<array_calls<<" array_bytes="<<array_bytes<<" index_calls="<<index_calls<<" index_bytes="<<index_bytes<<" retained_vertex_bytes="<<renderer.buffer_stats().vertex_bytes<<std::endl;std::vector<uint8_t> pixels(Target::size*Target::size*4);glReadPixels(0,0,Target::size,Target::size,GL_RGBA,GL_UNSIGNED_BYTE,pixels.data());return pixels;};
  if(large_buffer){
   // Separate >256MiB requested-store control. Preserve the original default
   // three-actor4.8M command below; this case uses six independently valid native
