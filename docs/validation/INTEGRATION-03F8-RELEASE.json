@@ -1,0 +1,659 @@
+{
+  "schema": 1,
+  "source": "03f8edf15b265932cab5e1ddbd22d5878f1d8c26",
+  "source_root": "/home/blux/de-xr/dome-sculpt/artifacts/texture-resolution-loader-838",
+  "scope": "Current optimized CPU Release integration checkpoint; selected native, reader, software/strict Arc rendering, original production-size inventory, export validation and selected ordinary GUI/synthetic-loader XR workflows only.",
+  "not_qualified": [
+    "matching ASan/UBSan",
+    "default ALL",
+    "main admission",
+    "physical HMD/controller acceptance",
+    "sustained production performance",
+    "goal completion"
+  ],
+  "release32": {
+    "state": "terminal",
+    "exit": 0,
+    "targets": 32,
+    "build_steps": 314,
+    "initial_owned_outputs": 312,
+    "native_suites": 22,
+    "manual_workspaces": [
+      "workspace-small",
+      "placed-workspace-small"
+    ],
+    "commands": {
+      "configure": [
+        "cmake",
+        "-S",
+        "/home/blux/de-xr/dome-sculpt/artifacts/texture-resolution-loader-838",
+        "-B",
+        "/tmp/dome-sculpt-integration-final-release",
+        "-G",
+        "Ninja",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DDOME_COMPUTE_BACKEND=CPU",
+        "-DDOME_BUILD_UI=ON",
+        "-DDOME_BUILD_XR=ON",
+        "-DBUILD_TESTING=ON",
+        "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+        "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/share/fltk",
+        "-U*DOME_BITMAP_RUNTIME*",
+        "-U*NATIVEGL*",
+        "-U*RENDERFONTS*",
+        "-DCMAKE_CXX_FLAGS_RELEASE=-O3 -DNDEBUG -ffunction-sections -fdata-sections",
+        "-DCMAKE_C_FLAGS_RELEASE=-O3 -DNDEBUG -ffunction-sections -fdata-sections",
+        "-DCMAKE_EXE_LINKER_FLAGS=-Wl,--gc-sections",
+        "-DCMAKE_CXX_ARCHIVE_CREATE=<CMAKE_AR> qcT <TARGET> <LINK_FLAGS> <OBJECTS>",
+        "-DCMAKE_C_ARCHIVE_CREATE=<CMAKE_AR> qcT <TARGET> <LINK_FLAGS> <OBJECTS>",
+        "-DCMAKE_PROJECT_INCLUDE=/home/blux/de-xr/dome-sculpt/artifacts/integration-final-release/orchestration.cmake"
+      ],
+      "build": [
+        "cmake",
+        "--build",
+        "/tmp/dome-sculpt-integration-final-release",
+        "--parallel",
+        "2",
+        "--target",
+        "dome-sculpt",
+        "dome-sculpt-native-authoring-inspect",
+        "dome-sculpt-texture-sets-test",
+        "dome-sculpt-texture-set-surfaces-test",
+        "dome-sculpt-texture-set-native-test",
+        "dome-sculpt-texture-set-export-test",
+        "dome-sculpt-texture-set-polygon-mixed-test",
+        "dome-sculpt-polygon-surface-native-test",
+        "dome-sculpt-polygon-surface-render-test",
+        "dome-sculpt-texture-set-polygon-render-test",
+        "dome-sculpt-sculpt-surface-chunks-test",
+        "dome-sculpt-sculpt-chunk-pipeline-test",
+        "dome-sculpt-sculpt-chunk-render-test",
+        "dome-sculpt-local-surface-integration-test",
+        "dome-sculpt-surface-query-oblique-test",
+        "dome-sculpt-retopo-input-admission-test",
+        "dome-sculpt-polygon-retopo-affine-test",
+        "dome-sculpt-render-direct-upload-test",
+        "dome-sculpt-triangle-remesh-test",
+        "dome-sculpt-texture-set-field-source-test",
+        "dome-sculpt-texture-set-history-test",
+        "dome-sculpt-texture-set-resolution-test",
+        "dome-sculpt-texture-set-source-export-test",
+        "dome-sculpt-texture-set-resolution-fixture",
+        "dome-sculpt-texture-resolution-runtime",
+        "dome-sculpt-sculpt-chunk-workspace-test",
+        "dome-sculpt-sculpt-sustained",
+        "dome-sculpt-vrm1-background-fixture-test",
+        "dome-sculpt-vrm1-expression-layer-authoring-test",
+        "dome-sculpt-vrm1-expression-targets-faults-test",
+        "dome-sculpt-sculpt-placed-workspace-test",
+        "dome-sculpt-texture-set-source-render-test"
+      ],
+      "app-version": [
+        "/tmp/dome-sculpt-integration-final-release/dome-sculpt",
+        "--version"
+      ],
+      "native": [
+        "ctest",
+        "--test-dir",
+        "/tmp/dome-sculpt-integration-final-release",
+        "--output-on-failure",
+        "-R",
+        "^(polygon-retopo-affine|retopology-input-admission|surface-query-oblique|triangle-remesh|sculpt-surface-chunks|sculpt-chunk-pipeline|authenticated-local-surface|vrm1-background-fixture|vrm1-targets-uniform-roles-uv-authoring|vrm1-targets-preflight-order|dome-sculpt-texture-sets|dome-sculpt-texture-sets-polygon|dome-sculpt-texture-sets-plan|dome-sculpt-texture-set-surfaces|dome-sculpt-texture-set-native|dome-sculpt-texture-set-export|polygon-surface-native-owning|dome-sculpt-texture-set-polygon-mixed|dome-sculpt-texture-set-field-source|dome-sculpt-texture-set-source-export|dome-sculpt-texture-set-history|dome-sculpt-texture-set-resolution)$"
+      ],
+      "workspace-small": [
+        "/tmp/dome-sculpt-integration-final-release/dome-sculpt-sculpt-chunk-workspace-test"
+      ],
+      "placed-workspace-small": [
+        "/tmp/dome-sculpt-integration-final-release/dome-sculpt-sculpt-placed-workspace-test"
+      ]
+    },
+    "status_sha256": "babf6767c1ddbfbc97bfbb6c12b1993bb179887720dfb247ed69ca6941c01c60"
+  },
+  "readers": {
+    "exit": 0,
+    "new_whole_TUs": 11,
+    "new_ELFs": 11,
+    "new_outputs": 22,
+    "logical_cases": 35,
+    "actual_new_cases": 33,
+    "graphics_cases": 11,
+    "full_factory_controls": 12060,
+    "reused_native0": [
+      "vrm1-background-fixture",
+      "vrm1-targets-uniform-roles-uv-authoring"
+    ],
+    "preservation_passes": 70,
+    "post_terminal_unique_pins": 3950,
+    "seal_sha256": "6e305fb7805c691d628f54a20dd164798af7a64e63334703127ff5e6c8dd9d83",
+    "commands_location": "readers/control/plan.json in verified archive",
+    "identity_scope": "Original inherited-role observer records private software EGL/driver maps and on-disk ELF hashes/metadata; no strictArc or mount-certified identity claim for these11 graphics cases."
+  },
+  "benchmark": {
+    "exit": 0,
+    "smoke": {
+      "status": "smoke-pass-not-production",
+      "options": {
+        "allocation_instrumentation": true,
+        "device": "software",
+        "height": 128,
+        "held_pairs": 4,
+        "inventory_only": false,
+        "masks": 3,
+        "objects": 4,
+        "pairs": 8,
+        "repetitions": 1,
+        "smoke": true,
+        "strokes": 4,
+        "tier": "production",
+        "voxel": 0.03999999910593033,
+        "width": 128
+      },
+      "initial_size": {
+        "chunks": 224,
+        "retained_chunk_bytes": 80265209,
+        "scalar_bytes": 57176,
+        "stored_samples": 114620,
+        "visible_triangles": 100704,
+        "visible_vertices": 57176
+      },
+      "warmup": {
+        "exact_undo": true,
+        "excluded_ns": 162575432,
+        "real_strokes": 1
+      },
+      "independent_checkpoints": [
+        {
+          "ordered_corners": 302112,
+          "checked_scalars": 14294,
+          "typed_queries": 8,
+          "exact_frame_modes": 3
+        },
+        {
+          "ordered_corners": 302160,
+          "checked_scalars": 14302,
+          "typed_queries": 8,
+          "exact_frame_modes": 3
+        },
+        {
+          "ordered_corners": 302160,
+          "checked_scalars": 14302,
+          "typed_queries": 8,
+          "exact_frame_modes": 3
+        },
+        {
+          "ordered_corners": 302196,
+          "checked_scalars": 14308,
+          "typed_queries": 8,
+          "exact_frame_modes": 3
+        }
+      ],
+      "sustained_work_executed": null,
+      "history": {
+        "cancel_exact": true,
+        "ordered_save_reopen_exact": true,
+        "real_factory_return_barrier_reached": true,
+        "retired_native_generation_exact": true,
+        "undo_redo_exact": true
+      },
+      "software_witness_initial": {
+        "authenticated": true,
+        "drm_node_scope": "software GL, no hardware claim",
+        "renderer": "llvmpipe (LLVM 19.1.7, 256 bits)",
+        "requested": "software",
+        "vendor": "Mesa",
+        "version": "4.6 (Core Profile) Mesa 26.2.5"
+      },
+      "software_witness_final": {
+        "authenticated": true,
+        "drm_node_scope": "software GL, no hardware claim",
+        "renderer": "llvmpipe (LLVM 19.1.7, 256 bits)",
+        "requested": "software",
+        "vendor": "Mesa",
+        "version": "4.6 (Core Profile) Mesa 26.2.5"
+      },
+      "anonymous_shared_data_observations": [
+        {
+          "classification": "exact non-executable Mesa llvmpipe shared pixel data",
+          "device": "00:01",
+          "inode": 924814,
+          "name": "/memfd:lp_dma_buf (deleted)",
+          "offset": "00000000",
+          "permissions": "rw-s",
+          "range": "7f58d1803000-7f58d1804000"
+        }
+      ],
+      "sampled_DRI_observations": [],
+      "result_sha256": "d778ea8dd0f6ce6db30b255de12aa5d600a9d4363fa47c711df9da3b3d231939",
+      "raw_rows_sha256": "40653a73e33f6c53fa679f5d15eb966db35fb215f5c55911b083a643cf46ae1a"
+    },
+    "original_P1": {
+      "status": "production-inventory-admitted",
+      "options": {
+        "allocation_instrumentation": false,
+        "device": "software",
+        "height": 768,
+        "held_pairs": 120,
+        "inventory_only": true,
+        "masks": 120,
+        "objects": 1,
+        "pairs": 2000,
+        "repetitions": 3,
+        "smoke": false,
+        "strokes": 300,
+        "tier": "production",
+        "voxel": 0.012500000186264515,
+        "width": 768
+      },
+      "initial_size": {
+        "chunks": 632,
+        "retained_chunk_bytes": 210674322,
+        "scalar_bytes": 591728,
+        "stored_samples": 588739,
+        "visible_triangles": 258852,
+        "visible_vertices": 147932
+      },
+      "warmup": {
+        "exact_undo": true,
+        "excluded_ns": 1140939532,
+        "real_strokes": 1
+      },
+      "independent_checkpoints": [
+        {
+          "ordered_corners": 776556,
+          "checked_scalars": 147932,
+          "typed_queries": 2,
+          "exact_frame_modes": 3
+        },
+        {
+          "ordered_corners": 776556,
+          "checked_scalars": 147932,
+          "typed_queries": 2,
+          "exact_frame_modes": 3
+        }
+      ],
+      "sustained_work_executed": false,
+      "history": null,
+      "software_witness_initial": {
+        "authenticated": true,
+        "drm_node_scope": "software GL, no hardware claim",
+        "renderer": "llvmpipe (LLVM 19.1.7, 256 bits)",
+        "requested": "software",
+        "vendor": "Mesa",
+        "version": "4.6 (Core Profile) Mesa 26.2.5"
+      },
+      "software_witness_final": {
+        "authenticated": true,
+        "drm_node_scope": "software GL, no hardware claim",
+        "renderer": "llvmpipe (LLVM 19.1.7, 256 bits)",
+        "requested": "software",
+        "vendor": "Mesa",
+        "version": "4.6 (Core Profile) Mesa 26.2.5"
+      },
+      "anonymous_shared_data_observations": [
+        {
+          "classification": "exact non-executable Mesa llvmpipe shared pixel data",
+          "device": "00:01",
+          "inode": 881991,
+          "name": "/memfd:lp_dma_buf (deleted)",
+          "offset": "00000000",
+          "permissions": "rw-s",
+          "range": "7f9a00ee8000-7f9a00ee9000"
+        }
+      ],
+      "sampled_DRI_observations": [],
+      "result_sha256": "41a2686b8491a9b15b52f8c5337c6b2ac19839ef4316debbc8fd02fc21c6cc4d",
+      "raw_rows_sha256": "fb51181d9921495733af0cc35cbeb15ff792cd16fc62140bf8b5d0809f3e10fe"
+    },
+    "commands": {
+      "smoke": [
+        "/tmp/dome-sculpt-integration-final-release/dome-sculpt-sculpt-sustained",
+        "--output",
+        "/tmp/dome-sculpt-final-sustained-plan-dwfp3ebo/run-01/smoke",
+        "--smoke",
+        "--allocations",
+        "--device",
+        "software"
+      ],
+      "p1": [
+        "/tmp/dome-sculpt-integration-final-release/dome-sculpt-sculpt-sustained",
+        "--output",
+        "/tmp/dome-sculpt-final-sustained-plan-dwfp3ebo/run-01/p1",
+        "--inventory-only",
+        "--device",
+        "software",
+        "--tier",
+        "production",
+        "--objects",
+        "1",
+        "--voxel",
+        ".0125",
+        "--width",
+        "768",
+        "--height",
+        "768"
+      ]
+    },
+    "P1_RSS_peak_bytes": 800759808,
+    "seal_sha256": "607132302c55ab3b6728f4d77c900cf23f53e27b4f639adc71edd95a8506cbd3",
+    "meaning": "Inventory admission includes original grouped oracle, both independent whole geometry/scalar/query/three-frame checkpoints and real warm stroke/exact Undo; retained-byte correction is accounting, not a claimed memory or speed improvement."
+  },
+  "software_GL": {
+    "exit": 0,
+    "consumers": {
+      "existing-field-GL": 51,
+      "balanced-mixed-GL": 537,
+      "sculpt-chunk-GL": 72,
+      "direct-upload-GL": 73,
+      "sourceful-same-object-GL": 994
+    },
+    "checks": 1727,
+    "commands": {
+      "existing-field-GL": [
+        "/tmp/dome-sculpt-integration-final-release/dome-sculpt-polygon-surface-render-test",
+        "/tmp/dome-sculpt-integration-final-release/polygon-surface-native",
+        "/tmp/dome-sculpt-root-final-graphics-03f8/release-v3/existing-field-GL"
+      ],
+      "balanced-mixed-GL": [
+        "/tmp/dome-sculpt-integration-final-release/dome-sculpt-texture-set-polygon-render-test",
+        "/tmp/dome-sculpt-root-final-graphics-03f8/release-v3/balanced-mixed-GL"
+      ],
+      "sculpt-chunk-GL": [
+        "/tmp/dome-sculpt-integration-final-release/dome-sculpt-sculpt-chunk-render-test",
+        "/tmp/dome-sculpt-root-final-graphics-03f8/release-v3/sculpt-chunk-GL"
+      ],
+      "direct-upload-GL": [
+        "/tmp/dome-sculpt-integration-final-release/dome-sculpt-render-direct-upload-test",
+        "direct",
+        "/tmp/dome-sculpt-root-final-graphics-03f8/release-v3/direct-upload-GL"
+      ],
+      "sourceful-same-object-GL": [
+        "/tmp/dome-sculpt-integration-final-release/dome-sculpt-texture-set-source-render-test",
+        "/tmp/dome-sculpt-root-final-graphics-03f8/release-v3/sourceful-same-object-GL"
+      ]
+    },
+    "sourceful_cases": [
+      "000",
+      "001",
+      "010",
+      "011",
+      "100",
+      "101",
+      "110",
+      "111"
+    ],
+    "sourceful_oracle_recorded_checks": 993,
+    "sourceful_terminal_checks": 994,
+    "sourceful_note": "Oracle counter precedes final saved-report check; terminal checks include it.",
+    "sourceful_max_byte_error": 2,
+    "status_sha256": "0c908662e2e35d476866a1b584cba9754e3921847060a45bad82afeb8aeb1064"
+  },
+  "strict_Arc": {
+    "exit": 0,
+    "checks": 1727,
+    "consumers": {
+      "existing-field-GL": 51,
+      "balanced-mixed-GL": 537,
+      "sculpt-chunk-GL": 72,
+      "direct-upload-GL": 73,
+      "sourceful-same-object-GL": 994
+    },
+    "device_authentication": "Actual strictIntelArcA770 EGL/device/node+liveFD+certified mapped ELF proof; see status",
+    "commands": {
+      "existing-field-GL": [
+        "/tmp/dome-sculpt-integration-final-release/dome-sculpt-polygon-surface-render-test",
+        "/tmp/dome-sculpt-integration-final-release/polygon-surface-native",
+        "/tmp/dome-sculpt-final-arc-orchestration/final-03f8-release-v1/existing-field-GL"
+      ],
+      "balanced-mixed-GL": [
+        "/tmp/dome-sculpt-integration-final-release/dome-sculpt-texture-set-polygon-render-test",
+        "/tmp/dome-sculpt-final-arc-orchestration/final-03f8-release-v1/balanced-mixed-GL"
+      ],
+      "sculpt-chunk-GL": [
+        "/tmp/dome-sculpt-integration-final-release/dome-sculpt-sculpt-chunk-render-test",
+        "/tmp/dome-sculpt-final-arc-orchestration/final-03f8-release-v1/sculpt-chunk-GL"
+      ],
+      "direct-upload-GL": [
+        "/tmp/dome-sculpt-integration-final-release/dome-sculpt-render-direct-upload-test",
+        "direct",
+        "/tmp/dome-sculpt-final-arc-orchestration/final-03f8-release-v1/direct-upload-GL"
+      ],
+      "sourceful-same-object-GL": [
+        "/tmp/dome-sculpt-integration-final-release/dome-sculpt-texture-set-source-render-test",
+        "/tmp/dome-sculpt-final-arc-orchestration/final-03f8-release-v1/sourceful-same-object-GL"
+      ],
+      "uhd-counter-balanced-mixed-GL": [
+        "/tmp/dome-sculpt-integration-final-release/dome-sculpt-texture-set-polygon-render-test",
+        "/tmp/dome-sculpt-final-arc-orchestration/final-03f8-release-v1/uhd-counter-balanced-mixed-GL"
+      ],
+      "uhd-counter-sourceful-same-object-GL": [
+        "/tmp/dome-sculpt-integration-final-release/dome-sculpt-texture-set-source-render-test",
+        "/tmp/dome-sculpt-final-arc-orchestration/final-03f8-release-v1/uhd-counter-sourceful-same-object-GL"
+      ]
+    },
+    "UHD_expected_refusals": {
+      "uhd-counter-balanced-mixed-GL": 1,
+      "uhd-counter-sourceful-same-object-GL": 1
+    },
+    "sourceful_max_byte_error": 1,
+    "receipt_sha256": "c474f4eb867cc1f5d4d38ca922df9b61cd4ef2c7a5efdbfbba8fdf5b834ab200"
+  },
+  "software_Arc_pairs": {
+    "pairs": 56,
+    "maximum_RGB_difference": 2,
+    "RGB_tolerance": 6,
+    "maximum_alpha_difference": 0,
+    "alpha_exact": true,
+    "groups": {
+      "sourceful-same-object-GL": {
+        "pairs": 48,
+        "max_RGB": 2,
+        "max_alpha": 0
+      },
+      "balanced-mixed-GL": {
+        "pairs": 8,
+        "max_RGB": 2,
+        "max_alpha": 0
+      }
+    },
+    "receipt_sha256": "b349fc299e69c99f056a3a9b3133e764f1a743a6e73e530bfb81c4d6a02e15ad"
+  },
+  "Khronos": {
+    "exit": 0,
+    "actual_exports": 10,
+    "errors": 0,
+    "warnings": 5,
+    "infos": 12,
+    "commands": [
+      [
+        "node",
+        "/tmp/dome-sculpt-integration-final-khronos/validate.cjs",
+        "/tmp/dome-sculpt-integration-final-release/texture-set-export-output",
+        "/tmp/dome-sculpt-integration-final-khronos/ordinary"
+      ],
+      [
+        "node",
+        "/tmp/dome-sculpt-integration-final-khronos/validate.cjs",
+        "/tmp/dome-sculpt-integration-final-release/texture-set-source-export-output",
+        "/tmp/dome-sculpt-integration-final-khronos/sourceful"
+      ]
+    ],
+    "status_sha256": "3946fb9769cb0d09fa405afda797e32f4b3f451e6f2dbad31fba5e304ef94076"
+  },
+  "GUI_XR": {
+    "whole_exit": 0,
+    "normal": {
+      "complete": true,
+      "checks": 81,
+      "geometry": {
+        "width": 576,
+        "height": 560,
+        "row": 28,
+        "expected_width": 576,
+        "expected_height": 560,
+        "clamped": false,
+        "scroll_viewport_height": 504
+      }
+    },
+    "compact": {
+      "complete": true,
+      "checks": 81,
+      "geometry": {
+        "width": 576,
+        "height": 480,
+        "row": 28,
+        "expected_width": 576,
+        "expected_height": 480,
+        "clamped": true,
+        "scroll_viewport_height": 424
+      }
+    },
+    "substage_scope": "Explicit private-Xvfb/GLX ordinary FLTK normal+compact; not Wayland/physical acceptance",
+    "commands": {
+      "fixture-producer": [
+        "/tmp/dome-sculpt-integration-final-release/dome-sculpt-texture-set-resolution-fixture",
+        "/tmp/dome-sculpt-final-resolution-03f8/release-v1/fixtures"
+      ],
+      "gui-normal": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+        "/home/blux/de-xr/dome-sculpt/artifacts/texture-resolution-loader-838/tests/texture-set-menu.py"
+      ],
+      "gui-compact": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+        "/home/blux/de-xr/dome-sculpt/artifacts/texture-resolution-loader-838/tests/texture-set-menu.py"
+      ],
+      "xr-eight-cases": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+        "/home/blux/de-xr/dome-sculpt/artifacts/texture-resolution-loader-838/tests/texture-set-resolution-xr.py",
+        "/tmp/dome-sculpt-integration-final-release/dome-sculpt",
+        "/tmp/dome-sculpt-integration-final-release/libdome-sculpt-texture-resolution-runtime.so",
+        "/tmp/dome-sculpt-integration-final-release/dome-sculpt-native-authoring-inspect",
+        "/tmp/dome-sculpt-final-resolution-03f8/release-v1/fixtures/manifest.json",
+        "/tmp/dome-sculpt-final-resolution-03f8/release-v1/xr"
+      ]
+    },
+    "XR_complete": true,
+    "XR_report_count": 99,
+    "XR_error": null,
+    "XR_cases": [
+      {
+        "name": "extra64",
+        "mode": "apply-extra",
+        "runtime_report": "/tmp/dome-sculpt-final-resolution-03f8/release-v1/xr/extra64/runtime.json",
+        "runtime_sha256": "1313a8fffeb2cd34e94dcf129a2ea6e5161e20ac7135993fdcf5425e7f419437",
+        "native_sha256": "412f4daddc6f256f855a9c390870f141849d23ed752b4d38f95cac167d79fc06",
+        "maps_sha256": "463d98099d59e91473691017afe25a40ab21cd5f659ecf2d75a9516c81b7532e",
+        "renderer": "llvmpipe (LLVM 19.1.7, 256 bits)",
+        "tracking": "synthetic",
+        "scope": "Ordinary app; no private product observer"
+      },
+      {
+        "name": "extra256",
+        "mode": "apply-extra",
+        "runtime_report": "/tmp/dome-sculpt-final-resolution-03f8/release-v1/xr/extra256/runtime.json",
+        "runtime_sha256": "38a21695d38ea9bf767aabfde9b449f2abe60c6cb51f038aa364f9813df9c728",
+        "native_sha256": "750c2dc5f54d92fa6b2f90627d3f30d9e77aac2b86d4b99938f7f551871b22f6",
+        "maps_sha256": "62ef1ec075654a6af09b24a2eaa42b8e528b08895471e4867e4bc655c0f04e81",
+        "renderer": "llvmpipe (LLVM 19.1.7, 256 bits)",
+        "tracking": "synthetic",
+        "scope": "Ordinary app; no private product observer"
+      },
+      {
+        "name": "primary128",
+        "mode": "apply-primary",
+        "runtime_report": "/tmp/dome-sculpt-final-resolution-03f8/release-v1/xr/primary128/runtime.json",
+        "runtime_sha256": "eafb904a67da70bf12e61d23440d7a4dc0436390ad339cbd99c660c590f7f629",
+        "native_sha256": "ddebc55d7ee8cfecbaec3d1821ed8a19a4038d2419b891bba6ba00fe8d6f2aac",
+        "maps_sha256": "448576610b88f36104f3007d8c9e953909079790dfda46de475c66d8154d8b5c",
+        "renderer": "llvmpipe (LLVM 19.1.7, 256 bits)",
+        "tracking": "synthetic",
+        "scope": "Ordinary app; no private product observer"
+      },
+      {
+        "name": "cancel",
+        "mode": "cancel",
+        "runtime_report": "/tmp/dome-sculpt-final-resolution-03f8/release-v1/xr/cancel/runtime.json",
+        "runtime_sha256": "93111d3b96b9e8f3fd97ce6299d8d644fdf166ba7ca84cf4388ababab83af44c",
+        "native_sha256": "37f7af98bc01f3c56f65905b6120acf1fd942bd74330077960602ddc26f1458c",
+        "maps_sha256": "f2419f367abd5458bc8a240a6df02eb0d2d50ac9a71abc63117cfe6931d19e5c",
+        "renderer": "llvmpipe (LLVM 19.1.7, 256 bits)",
+        "tracking": "synthetic",
+        "scope": "Ordinary app; no private product observer"
+      },
+      {
+        "name": "focus",
+        "mode": "focus",
+        "runtime_report": "/tmp/dome-sculpt-final-resolution-03f8/release-v1/xr/focus/runtime.json",
+        "runtime_sha256": "3365fd66cc9101ec9e46ec667e2e983bbb74ee42881ad2cb775048ee4d9108bb",
+        "native_sha256": "37f7af98bc01f3c56f65905b6120acf1fd942bd74330077960602ddc26f1458c",
+        "maps_sha256": "52d4f0b57e0f7f2e659cf08488f33a274b89a4e6dcce446d6f963ef28341cd1d",
+        "renderer": "llvmpipe (LLVM 19.1.7, 256 bits)",
+        "tracking": "synthetic",
+        "scope": "Ordinary app; no private product observer"
+      },
+      {
+        "name": "reference",
+        "mode": "reference",
+        "runtime_report": "/tmp/dome-sculpt-final-resolution-03f8/release-v1/xr/reference/runtime.json",
+        "runtime_sha256": "0fd5f3a9aa98b51ac4ad62a256b717ebaf2c6aeaa2531b8e8fa8ea5dce6a8820",
+        "native_sha256": "37f7af98bc01f3c56f65905b6120acf1fd942bd74330077960602ddc26f1458c",
+        "maps_sha256": "1b9f109b60b415c7ad110cc79d59da736189c9543ff6170fe479a1f2bc6809c1",
+        "renderer": "llvmpipe (LLVM 19.1.7, 256 bits)",
+        "tracking": "synthetic",
+        "scope": "Ordinary app; no private product observer"
+      },
+      {
+        "name": "noop",
+        "mode": "noop",
+        "runtime_report": "/tmp/dome-sculpt-final-resolution-03f8/release-v1/xr/noop/runtime.json",
+        "runtime_sha256": "74752f146742063c9d4431c7e39267e263adc5c1ef34da07b8bae42a2e2f3a40",
+        "native_sha256": "37f7af98bc01f3c56f65905b6120acf1fd942bd74330077960602ddc26f1458c",
+        "maps_sha256": "c7507e40277c5d515c0ef4c430c5496fd04c219a78f4d3cc4c15836ccc7b0a73",
+        "renderer": "llvmpipe (LLVM 19.1.7, 256 bits)",
+        "tracking": "synthetic",
+        "scope": "Ordinary app; no private product observer"
+      },
+      {
+        "name": "quality",
+        "mode": "quality",
+        "runtime_report": "/tmp/dome-sculpt-final-resolution-03f8/release-v1/xr/quality/runtime.json",
+        "runtime_sha256": "d87d87d961c0db76dfdcf469d24d343575ee5d1f7ec6bb6c399c9f970d7799be",
+        "native_sha256": "62e83492f91f9373cbcd5b5dfdcafeba77251cf342cacaf56f2d4b150cb30b05",
+        "maps_sha256": "12614a5c47a662363448a18af443408bad3a5541713a8d5c446be7b1388a7627",
+        "renderer": "llvmpipe (LLVM 19.1.7, 256 bits)",
+        "tracking": "synthetic",
+        "scope": "Ordinary app; no private product observer"
+      }
+    ],
+    "XR_tracking": "synthetic",
+    "XR_scope": "Actual ordinary XR app/loader/GL, synthetic actions and durable native Save inspection; no observer or physical headset claim",
+    "whole_error": null,
+    "status_sha256": "f95d70a32e1198a5cc32e3b4c30f49e3448b5bd7b012b3cf75f632675837ac42"
+  },
+  "prior_checkpoint": {
+    "source": "83805b8731fa536abd0dc0f1a0ef25cf68cf925a",
+    "summary_sha256": "d13b7d6ff3c822dd4ed856e0530d81b54f60a68ed7b71f802eb55c95a5eca392",
+    "scope": "Older Release checkpoint/GUI81+81 with failed XR sequence retained separately; not relabelled as final03f8 proof."
+  },
+  "collection": {
+    "metadata_only": true,
+    "closed_control_files": 356,
+    "raw_control_logical_bytes": 13661417,
+    "archived_member_count": 357,
+    "archive_SHA256": "71b0474956b522f68e6ef64b7835311c0b3e4defcc57b30295fdfb448cef3d34",
+    "all_archived_file_bytes_SHA256_verified": true,
+    "selected_raw_control_drift": [],
+    "approved_old_input_rehash_count": 3418,
+    "approved_old_input_drift": [],
+    "raw_deleted": false,
+    "private_HOME_captured": false,
+    "binaries_images_native_projects_copied": false,
+    "live_XR_diagnostics_captured": false,
+    "source_or_docs_edits": false,
+    "source_or_docs_commits": false,
+    "manifest_SHA256": "957bc675bf92fd0ac65b065aae127d80f15f180c9d49a546680025c4561cfd6a",
+    "verification_SHA256": "6b0b13ae3e19c95ec22193ba3ee4d773ee261d09115b9809e7c656e7857d3de2"
+  },
+  "pending_for_resume": [
+    "Separate11-target ASan+UBSan inherited-role reader build/33case execution; explicitly not started at the user-requested pause boundary. Main product admission remains deferred."
+  ]
+}

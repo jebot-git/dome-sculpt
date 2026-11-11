@@ -10,6 +10,19 @@ continues without weakened endpoints. ArmorPaint GPU-painting integration is
 being assessed from current native-C source. All original requirements remain
 incomplete; earlier pause entries below are historical.
 
+## Requested pause after current build — 2026-11-06
+
+Current03f8edf1 is pushed on work/authoring-final-integration. Fresh Release and
+SAN32 builds/native22/workspace2 pass; software graphics1727/profile and both
+GUI81+81/profile pass. Release also passes fullXR99, strictArc1727, inherited35
+logical role cases, originalP1 and export controls. SanitizedXR extra256 fails
+its saved-Redo gate73 after accepted/Undo; no sanitizer diagnostic, internalRedo
+outcome unproven. R/Scomparison and separate11-target roleSAN remain unrun.
+Read [PAUSE-CHECKPOINT-03F8-20261106.md](PAUSE-CHECKPOINT-03F8-20261106.md).
+User requested pause after finalising this build. Preserve all failures and the
+complete original objective; main product admission/full-goal completion remain
+pending. No further build, tests or features start without resumption.
+
 ## Final integration candidate frozen for matched builds — 2026-11-06
 
 Ready product milestones and repaired test drivers are now composed with main
