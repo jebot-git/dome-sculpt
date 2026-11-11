@@ -67,6 +67,74 @@ void quality_oracle(const detail::GltfDocument &d,const EmissionInterchangeImage
  check(std::abs(static_cast<long double>(f.at("maximumRelativeError").get<double>())-maximum_relative)<=precision*std::max(1.L,maximum_relative),"reported dimensionless ratio agrees with independent extended-precision oracle");
  check(f.at("erasedNonzeroSamples")==erased&&erased==0,"measured current fallback retains every nonzero sample in this actual HDR/tiny-value fixture");
 }
+void uv1_worker_controls(const std::filesystem::path &directory){
+  std::filesystem::create_directories(directory);
+  for(const bool typed:{false,true})for(const float coverage:{.25f,0x1p-24f}){
+    const auto name=std::string(typed?"mtoon-":"pbr-")+(coverage<.001f?"tiny":"quarter");
+    const auto folder=directory/name;std::filesystem::create_directories(folder);
+    std::cout<<"UV1_WORKER_CASE "<<name<<std::endl;
+    auto f=fixture();auto &source=f.scene.object(f.source);
+    auto white=std::make_shared<const Image>(image({255,255,255,255}));
+    auto pattern=std::make_shared<const Image>(Image{2,2,{255,0,255,255,0,255,0,255,0,0,0,255,255,255,255,255}});
+    auto maps=std::make_shared<PaintSourceMaps>();maps->color.image=white;maps->color.texcoord=1;
+    maps->uv1=std::make_shared<const std::vector<std::array<float,2>>>(std::vector<std::array<float,2>>{{1,0},{0,0},{0,1},{1,1}});
+    maps->emission.image=pattern;maps->emission.texcoord=1;maps->emission.uv_transform={1,0,0,1,-.5f,0};maps->emission.min_filter=maps->emission.mag_filter=9728;
+    auto mesh=quad();for(auto &v:mesh.positions)v.z=.005f;
+    source.painted=PaintedMesh::from_maps(mesh,maps,64);
+    BakedTextures base;base.maps.color=image({24,65,117,255});base.maps.metal_rough=image({177,42,99,255});base.maps.normal=image({128,128,255,255});base.coverage.assign(4096,coverage<.001f?0:191);
+    std::vector<BakedEmissionSample> input(4096);
+    for(size_t i=0;i<input.size();++i)input[i]={{coverage*.25f,coverage*.5f,0},{coverage*(50000+32*float(i%64)),coverage*.00001f*float(i/64+1),coverage*2},coverage};
+    base.emission_field=BakedEmissionField::create(64,input);source.painted->install_bake(std::move(base));
+    source.material.emissive=typed?std::array<float,3>{.4f,.15f,.4f}:std::array<float,3>{2,4,8};
+    if(typed){
+      auto binding=std::make_shared<SourceMaterialBindings>();binding->native_reference.emission={.2f,.3f,.4f};binding->native_reference.color=source.material.color;
+      binding->material.parameters.base_color=source.material.color;binding->material.parameters.emission={.25f,.5f,.75f};binding->material.parameters.emission_strength=3.5f;
+      auto &slot=binding->material.textures[size_t(MToonSlot::Emission)];slot.index=0;slot.texcoord=1;slot.offset={-.5f,0};slot.encoding=MToonEncoding::Srgb;
+      auto &role=binding->roles[size_t(MToonSlot::Emission)];role.image=pattern;role.mag_filter=role.min_filter=9728;
+      source.material_bindings=std::move(binding);
+    }
+    source.painted->add_layer("Actual hidden source physical data");
+    PaintSettings ink;ink.channel=PaintChannel::Emission;ink.emission_units=PaintEmissionUnits::Physical;ink.emission={7,.000005f,1};ink.front_only=false;
+    Brush brush;brush.from=brush.to={0,0,.005f};brush.normal={0,0,1};brush.radius=.3f;brush.strength=.37f;
+    source.painted->begin_stroke();source.painted->stamp(brush,ink);check(source.painted->end_stroke(),"actual source owns nonempty hidden physical tiles");source.painted->layer_properties("Actual hidden source physical data",false,.375f);
+    auto &target=*f.scene.active().painted;target.layer_properties("Retained hidden target",true,1);
+    ink={};ink.color={.2f,.7f,.1f,.4f};ink.front_only=false;brush.from=brush.to={0,0,0};
+    target.begin_stroke();target.stamp(brush,ink);check(target.end_stroke(),"actual target owns hidden editable color/mask data before Bake");target.layer_properties("Retained hidden target",false,.25f);
+    f.scene.validate();const auto before=f.scene.encode(),source_before=source.painted->encode();const auto source_binding=source.material_bindings;const auto layers=target.layers();
+    ObjectBakeSettings options;options.front_mm=10;options.back_mm=2;options.padding=2;options.ao_samples=0;
+    Document doc;doc.replace(f.scene);std::cout<<"UV1_ADMISSION can_bake="<<doc.frame().state->can_bake<<" source="<<doc.frame().state->bake_source<<std::endl;
+    doc.bake_from_object(f.source,options);auto save=doc.save_async(folder/"accepted.dsculpt");finish(doc);saved(std::move(save));
+    const auto accepted=doc.copy_scene();const auto after=accepted.encode();const auto &paint=*accepted.active().painted;
+    check(after!=before&&paint.baked()&&paint.baked()->emission_field&&paint.baked()->maps.emission.rgba.empty(),"actual UV1 worker adopts resolved FLOAT rather than RGB8 emission");
+    check(accepted.object(f.source).painted->encode()==source_before&&source.painted->encode()==source_before&&accepted.object(f.source).visible==false&&accepted.object(f.source).locked,"worker keeps hidden locked actual source/UV/image/field/hidden tiles exact");
+    if(typed)check(accepted.object(f.source).material_bindings->material.encode()==source_binding->material.encode(),"worker preserves actual typed material/alternate-role transform/strength");
+    check(paint.layers().size()==layers.size(),"worker retains target editable-layer count");
+    for(size_t i=0;i<layers.size();++i){const auto &a=layers[i],&b=paint.layers()[i];check(a.tiles==b.tiles&&a.emission_tiles==b.emission_tiles&&a.pbr_tiles==b.pbr_tiles&&a.name==b.name&&a.visible==b.visible&&a.opacity==b.opacity,"actual target hidden editable ownership survives field adoption");}
+    const auto values=paint.baked()->emission_field->values();
+    const std::array<double,3> background=typed?std::array<double,3>{1.75,.875,2.625}:std::array<double,3>{2,4,8};const double strength=typed?3.5:1;
+    for(size_t i=0;i<values.size();++i){
+      const auto x=i%64,y=i/64;const std::array<double,3> texture=y<32?(x<32?std::array<double,3>{1,0,1}:std::array<double,3>{0,1,0}):(x<32?std::array<double,3>{0,0,0}:std::array<double,3>{1,1,1});
+      check(values[i].coverage==1&&values[i].legacy==std::array<float,3>{},"actual target FLOAT grid is resolved absolute with full projection coverage");
+      for(size_t k=0;k<3;++k){const double wanted=background[k]*texture[k]*(1-coverage)+double(input[i].legacy[k])*strength+input[i].absolute[k];check(std::isfinite(values[i].absolute[k])&&std::abs(double(values[i].absolute[k])-wanted)<=std::max(1e-10,std::abs(wanted)*2e-6),"actual worker agrees with independent authored UV1/filter/affine/FLOAT coverage oracle");}
+    }
+    // An emission-stripped ordinary control carries the exact same visible
+    // color/normal/ORM source. It never replaces the actual hidden source.
+    auto ordinary=f.scene.snapshot();auto &control=ordinary.object(f.source);control.painted=control.painted->snapshot();control.painted->delete_layer();
+    auto old=*control.painted->baked();old.emission_field.reset();old.maps.emission=image({0,0,0,255});control.painted->clear_bake();control.painted->install_bake(std::move(old));control.material.emissive={};
+    if(typed){auto binding=std::make_shared<SourceMaterialBindings>(*control.material_bindings);binding->material.parameters.emission={};binding->material.parameters.emission_strength=1;control.material_bindings=std::move(binding);}
+    bake_object(ordinary,f.source,options);const auto &other=*ordinary.active().painted->baked(),&actual=*paint.baked();
+    check(actual.maps.color.rgba==other.maps.color.rgba&&actual.maps.metal_rough.rgba==other.maps.metal_rough.rgba&&actual.maps.normal.rgba==other.maps.normal.rgba&&actual.coverage==other.coverage&&actual.color_interpretation==other.color_interpretation&&actual.normal_interpretation==other.normal_interpretation,"actual FLOAT Bake leaves every other color/ORM/normal/common-coverage interpretation byte-exact to nonemissive Bake control");
+    check(doc.undo()&&doc.copy_scene().encode()==before,"UV1 worker has one exact complete Undo boundary");saved(doc.save_async(folder/"undone.dsculpt"));check(doc.redo()&&doc.copy_scene().encode()==after,"UV1 worker has one exact complete Redo boundary");saved(doc.save_async(folder/"redone.dsculpt"));
+    Document reopened;reopened.open(folder/"accepted.dsculpt");check(reopened.copy_scene().encode()==after,"fresh Document publication restores complete UV1/source/typed/hidden/FLOAT owners");check(Scene::load(folder/"undone.dsculpt").encode()==before&&Scene::load(folder/"redone.dsculpt").encode()==after,"ordered native history saves retain complete exact UV1 states");
+    auto owner=std::make_shared<const Scene>(accepted.snapshot());auto native=std::make_shared<NativeEmissionExport>();native->scene=owner;native->scope=NativeEmissionExport::Scope::WholeScene;native->allow_measured_core_fallback=true;GltfExportOptions export_options;export_options.emission=native;
+    const auto file=folder/"actual-uv1-bake.glb";export_glb(emission_export_surfaces(*owner),file,export_options);const auto bytes=read(file);const auto recovered=extract_native_emission(bytes);check(recovered&&recovered->encode()==after,"actual UV1 worker native GLB preserves complete editable and hidden typed/source payload");
+    const auto document=gltf(bytes);const auto &record=document.json.at("extras").at("domeSculptEmission").at("images").at(0);const auto exr=view(document,record.at("bufferView").get<size_t>());const auto decoded=decode_emission_exr(exr);
+    check(decoded.version==2&&decoded.width==64&&decoded.height==64,"actual exported view is explicit FLOAT32 resolved EXR2");
+    for(size_t i=0;i<values.size();++i){check(decoded.pixels[i][9]==1,"actual EXR coverage is independent and exact");for(size_t k=0;k<3;++k)check(decoded.pixels[i][k]==values[i].absolute[k]&&decoded.pixels[i][3+k]==0&&decoded.pixels[i][6+k]==values[i].absolute[k],"actual EXR retains every resolved/legacy/absolute FLOAT coefficient bit");}
+    check(f.scene.encode()==before,"complete original UV1/field/source input remains immutable across worker/control/history/export");
+    std::cout<<"UV1_WORKER_COMPLETE "<<name<<std::endl;
+  }
+}
 void source_controls(){
   Scene scene;auto &source=scene.active();source.mesh_active=true;
   auto maps=std::make_shared<PaintSourceMaps>();maps->color.image=std::make_shared<const Image>(image({255,255,255,255}));maps->color.texcoord=1;
@@ -178,6 +246,9 @@ void public_fixtures(const std::filesystem::path &directory){
 } // namespace
 int main(int argc,char **argv)try{
   using namespace dome;
+  if(argc==3&&std::string_view(argv[1])=="--source-worker-controls"){
+    uv1_worker_controls(argv[2]);std::cout<<"Baked emission UV1 worker "<<checks<<" checks PASS\n";return 0;
+  }
   if(argc==2&&std::string_view(argv[1])=="--source-controls"){
     source_controls();std::cout<<"Baked emission source "<<checks<<" checks PASS\n";return 0;
   }
