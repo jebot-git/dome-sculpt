@@ -1,0 +1,1968 @@
+{
+  "schema": 1,
+  "date": "2026-11-11",
+  "source": "82257f3b651f9702383ba039d03776a4969f69fa",
+  "integration_merge": "0f72a81738bbfac0ffc0ca9186b30320c27468a1",
+  "merged_main": "6e431f9dfb7fcce4081b7cc6f2dcc76d6a1bdd78",
+  "scope": "Affected whole-TU renderer/store-ledger change and component consumers in matching Release/strictSAN software and authenticatedArc. No wholebuild/fullapp/publicGUI/P1/performance/HMD/newHDRABI combination claim.",
+  "changes": [
+    "Empty packed selection publishes transactional metadata without allocating zero-byte VBO/EBO/VAO; previous accepted stores survive rejected late resolve, and packed/sculpt/empty retries remain exact.",
+    "Empty store ledger emits no GPU fence only when no active OR retired nodes exist. Zero-byte active/retired names still protect their latest use epoch.",
+    "Empty un-ranged draws and zero-count packed ranges submit no GL draw; all source/material/range validation remains before this skip."
+  ],
+  "profiles": {
+    "release": {
+      "build": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release/status.json",
+        "sha256": "cf371f04c2fa0b1264b3a526ebce82c62673034c0f4e30e00005b84e3eeeca1b"
+      },
+      "build_scope": "Five current whole private-header-dependent TUs, one four-member render archive replacement and selected real consumers; not whole-build qualification.",
+      "compiled_whole_TUs": 5,
+      "fresh_consumer_links": 8,
+      "steps": [
+        {
+          "kind": "compile-render.cpp.o",
+          "command": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-20261111/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-20261111/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-20261111/third_party/nlohmann",
+            "-isystem",
+            "/usr/include/freetype2",
+            "-isystem",
+            "/usr/include/libpng16",
+            "-isystem",
+            "/usr/include/harfbuzz",
+            "-isystem",
+            "/usr/include/glib-2.0",
+            "-isystem",
+            "/usr/lib64/glib-2.0/include",
+            "-isystem",
+            "/usr/include/sysprof-6",
+            "-isystem",
+            "/usr/include/libxml2",
+            "-O3",
+            "-DNDEBUG",
+            "-ffunction-sections",
+            "-fdata-sections",
+            "-std=gnu++20",
+            "-pthread",
+            "-DWITH_GZFILEOP",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release/CMakeFiles/dome-sculpt-render.dir/src/render.cpp.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-20261111/src/render.cpp",
+            "-MMD",
+            "-MF",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release/CMakeFiles/dome-sculpt-render.dir/src/render.cpp.o.d"
+          ],
+          "exit": 0,
+          "seconds": 16.583408480044454
+        },
+        {
+          "kind": "compile-paint-overlay-gpu.cpp.o",
+          "command": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-20261111/src",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-20261111/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-20261111/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-20261111/third_party/nlohmann",
+            "-isystem",
+            "/usr/include/freetype2",
+            "-isystem",
+            "/usr/include/libpng16",
+            "-isystem",
+            "/usr/include/harfbuzz",
+            "-isystem",
+            "/usr/include/glib-2.0",
+            "-isystem",
+            "/usr/lib64/glib-2.0/include",
+            "-isystem",
+            "/usr/include/sysprof-6",
+            "-isystem",
+            "/usr/include/libxml2",
+            "-O3",
+            "-DNDEBUG",
+            "-ffunction-sections",
+            "-fdata-sections",
+            "-std=gnu++20",
+            "-pthread",
+            "-DWITH_GZFILEOP",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release/CMakeFiles/dome-sculpt-paint-overlay-gpu-test.dir/tests/paint-overlay-gpu.cpp.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-20261111/tests/paint-overlay-gpu.cpp",
+            "-MMD",
+            "-MF",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release/CMakeFiles/dome-sculpt-paint-overlay-gpu-test.dir/tests/paint-overlay-gpu.cpp.o.d"
+          ],
+          "exit": 0,
+          "seconds": 11.550555359979626
+        },
+        {
+          "kind": "compile-current-paint-preview-gpu.cpp.o",
+          "command": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-20261111/src",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-20261111/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-20261111/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-20261111/third_party/nlohmann",
+            "-isystem",
+            "/usr/include/freetype2",
+            "-isystem",
+            "/usr/include/libpng16",
+            "-isystem",
+            "/usr/include/harfbuzz",
+            "-isystem",
+            "/usr/include/glib-2.0",
+            "-isystem",
+            "/usr/lib64/glib-2.0/include",
+            "-isystem",
+            "/usr/include/sysprof-6",
+            "-isystem",
+            "/usr/include/libxml2",
+            "-O3",
+            "-DNDEBUG",
+            "-ffunction-sections",
+            "-fdata-sections",
+            "-std=gnu++20",
+            "-pthread",
+            "-DWITH_GZFILEOP",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release/CMakeFiles/dome-sculpt-current-paint-preview-gpu-test.dir/tests/current-paint-preview-gpu.cpp.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-20261111/tests/current-paint-preview-gpu.cpp",
+            "-MMD",
+            "-MF",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release/CMakeFiles/dome-sculpt-current-paint-preview-gpu-test.dir/tests/current-paint-preview-gpu.cpp.o.d"
+          ],
+          "exit": 0,
+          "seconds": 6.1036266250303015
+        },
+        {
+          "kind": "compile-render-store-ledger.cpp.o",
+          "command": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-20261111/src",
+            "-O3",
+            "-DNDEBUG",
+            "-ffunction-sections",
+            "-fdata-sections",
+            "-std=gnu++20",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release/CMakeFiles/dome-sculpt-render-store-ledger-test.dir/tests/render-store-ledger.cpp.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-20261111/tests/render-store-ledger.cpp",
+            "-MMD",
+            "-MF",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release/CMakeFiles/dome-sculpt-render-store-ledger-test.dir/tests/render-store-ledger.cpp.o.d"
+          ],
+          "exit": 0,
+          "seconds": 1.8767808499978855
+        },
+        {
+          "kind": "compile-renderer-recovery.cpp.o",
+          "command": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-20261111/src",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-20261111/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-20261111/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-20261111/third_party/nlohmann",
+            "-isystem",
+            "/usr/include/freetype2",
+            "-isystem",
+            "/usr/include/libpng16",
+            "-isystem",
+            "/usr/include/harfbuzz",
+            "-isystem",
+            "/usr/include/glib-2.0",
+            "-isystem",
+            "/usr/lib64/glib-2.0/include",
+            "-isystem",
+            "/usr/include/sysprof-6",
+            "-isystem",
+            "/usr/include/libxml2",
+            "-O3",
+            "-DNDEBUG",
+            "-ffunction-sections",
+            "-fdata-sections",
+            "-std=gnu++20",
+            "-pthread",
+            "-DWITH_GZFILEOP",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release/CMakeFiles/dome-sculpt-renderer-recovery-test.dir/tests/renderer-recovery.cpp.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-20261111/tests/renderer-recovery.cpp",
+            "-MMD",
+            "-MF",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release/CMakeFiles/dome-sculpt-renderer-recovery-test.dir/tests/renderer-recovery.cpp.o.d"
+          ],
+          "exit": 0,
+          "seconds": 15.518762652005535
+        },
+        {
+          "kind": "archive-render",
+          "command": [
+            "/usr/bin/ar",
+            "r",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release/libdome-sculpt-render.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release/CMakeFiles/dome-sculpt-render.dir/src/render.cpp.o"
+          ],
+          "exit": 0,
+          "seconds": 0.01993812998989597
+        },
+        {
+          "kind": "link-dome-sculpt-renderer-recovery-test",
+          "command": [
+            "/usr/bin/c++",
+            "-O3",
+            "-DNDEBUG",
+            "-ffunction-sections",
+            "-fdata-sections",
+            "-Wl,--gc-sections",
+            "-Wl,--wrap=glGenBuffers",
+            "-Wl,--wrap=glGenTextures",
+            "-Wl,--wrap=glGenSamplers",
+            "-Wl,--wrap=glGenVertexArrays",
+            "-Wl,--wrap=glBufferData",
+            "-Wl,--wrap=glTexBuffer",
+            "-Wl,--wrap=glTexImage2D",
+            "-Wl,--wrap=glGenerateMipmap",
+            "-Wl,--wrap=glFenceSync",
+            "-Wl,--wrap=glClientWaitSync",
+            "-Wl,--wrap=glDrawElements",
+            "-Wl,--wrap=glMultiDrawElementsBaseVertex",
+            "-Wl,--wrap=glDrawArrays",
+            "-Wl,--wrap=glReadPixels",
+            "-Wl,--wrap=glGetTexImage",
+            "-Wl,--wrap=glGetBufferSubData",
+            "-Wl,--wrap=glFinish",
+            "-Wl,--dependency-file=/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release/dome-sculpt-renderer-recovery-test.link.d",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release/CMakeFiles/dome-sculpt-renderer-recovery-test.dir/tests/renderer-recovery.cpp.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release/dome-sculpt-renderer-recovery-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release/libdome-sculpt-render.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-owning-20261111/release-v3/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libdome-sculpt-paint-gpu.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libdome-sculpt-native-graphics.a",
+            "/usr/lib64/libOpenGL.so",
+            "/usr/lib64/libEGL.so",
+            "/usr/lib64/libGL.so",
+            "/usr/lib64/libfontconfig.so",
+            "/usr/lib64/libfreetype.so",
+            "/usr/lib64/libharfbuzz.so",
+            "/usr/lib64/libicui18n.so",
+            "/usr/lib64/libicuuc.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 0.5126482960185967
+        },
+        {
+          "kind": "link-dome-sculpt-render-store-ledger-test",
+          "command": [
+            "/usr/bin/c++",
+            "-O3",
+            "-DNDEBUG",
+            "-ffunction-sections",
+            "-fdata-sections",
+            "-Wl,--gc-sections",
+            "-Wl,--wrap=glGenBuffers",
+            "-Wl,--wrap=glDeleteBuffers",
+            "-Wl,--wrap=glFenceSync",
+            "-Wl,--wrap=glClientWaitSync",
+            "-Wl,--dependency-file=/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release/dome-sculpt-render-store-ledger-test.link.d",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release/CMakeFiles/dome-sculpt-render-store-ledger-test.dir/tests/render-store-ledger.cpp.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release/dome-sculpt-render-store-ledger-test",
+            "/usr/lib64/libOpenGL.so",
+            "/usr/lib64/libEGL.so"
+          ],
+          "exit": 0,
+          "seconds": 0.05797827400965616
+        },
+        {
+          "kind": "link-dome-sculpt-current-paint-preview-gpu-test",
+          "command": [
+            "/usr/bin/c++",
+            "-O3",
+            "-DNDEBUG",
+            "-ffunction-sections",
+            "-fdata-sections",
+            "-Wl,--gc-sections",
+            "-Wl,--wrap=glGetTexImage",
+            "-Wl,--wrap=glReadPixels",
+            "-Wl,--wrap=glGetBufferSubData",
+            "-Wl,--wrap=glClientWaitSync",
+            "-Wl,--wrap=glFenceSync",
+            "-Wl,--wrap=glBufferData",
+            "-Wl,--wrap=glCopyBufferSubData",
+            "-Wl,--wrap=glBufferSubData",
+            "-Wl,--wrap=glFinish",
+            "-Wl,--dependency-file=/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release/dome-sculpt-current-paint-preview-gpu-test.link.d",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release/CMakeFiles/dome-sculpt-current-paint-preview-gpu-test.dir/tests/current-paint-preview-gpu.cpp.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release/dome-sculpt-current-paint-preview-gpu-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release/libdome-sculpt-render.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-owning-20261111/release-v3/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libdome-sculpt-paint-gpu.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libdome-sculpt-native-graphics.a",
+            "/usr/lib64/libOpenGL.so",
+            "/usr/lib64/libEGL.so",
+            "/usr/lib64/libGL.so",
+            "/usr/lib64/libfontconfig.so",
+            "/usr/lib64/libfreetype.so",
+            "/usr/lib64/libharfbuzz.so",
+            "/usr/lib64/libicui18n.so",
+            "/usr/lib64/libicuuc.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 0.5650477549643256
+        },
+        {
+          "kind": "link-dome-sculpt-paint-overlay-gpu-test",
+          "command": [
+            "/usr/bin/c++",
+            "-O3",
+            "-DNDEBUG",
+            "-ffunction-sections",
+            "-fdata-sections",
+            "-Wl,--gc-sections",
+            "-Wl,--dependency-file=/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release/dome-sculpt-paint-overlay-gpu-test.link.d",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release/CMakeFiles/dome-sculpt-paint-overlay-gpu-test.dir/tests/paint-overlay-gpu.cpp.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release/dome-sculpt-paint-overlay-gpu-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release/libdome-sculpt-render.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-owning-20261111/release-v3/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libdome-sculpt-paint-gpu.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libdome-sculpt-native-graphics.a",
+            "/usr/lib64/libOpenGL.so",
+            "/usr/lib64/libEGL.so",
+            "/usr/lib64/libGL.so",
+            "/usr/lib64/libfontconfig.so",
+            "/usr/lib64/libfreetype.so",
+            "/usr/lib64/libharfbuzz.so",
+            "/usr/lib64/libicui18n.so",
+            "/usr/lib64/libicuuc.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 0.27374900894938037
+        },
+        {
+          "kind": "link-dome-sculpt-source-paint-overlay-test",
+          "command": [
+            "/usr/bin/c++",
+            "-O3",
+            "-DNDEBUG",
+            "-ffunction-sections",
+            "-fdata-sections",
+            "-Wl,--gc-sections",
+            "-Wl,--dependency-file=/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release/dome-sculpt-source-paint-overlay-test.link.d",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/CMakeFiles/dome-sculpt-source-paint-overlay-test.dir/tests/source-paint-overlay.cpp.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release/dome-sculpt-source-paint-overlay-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release/libdome-sculpt-render.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-owning-20261111/release-v3/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libdome-sculpt-paint-gpu.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libdome-sculpt-native-graphics.a",
+            "/usr/lib64/libOpenGL.so",
+            "/usr/lib64/libEGL.so",
+            "/usr/lib64/libGL.so",
+            "/usr/lib64/libfontconfig.so",
+            "/usr/lib64/libfreetype.so",
+            "/usr/lib64/libharfbuzz.so",
+            "/usr/lib64/libicui18n.so",
+            "/usr/lib64/libicuuc.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 0.33380875596776605
+        },
+        {
+          "kind": "link-dome-sculpt-document-render-buffers-test",
+          "command": [
+            "/usr/bin/c++",
+            "-O3",
+            "-DNDEBUG",
+            "-ffunction-sections",
+            "-fdata-sections",
+            "-Wl,--gc-sections",
+            "-Wl,--wrap=glBufferData",
+            "-Wl,--wrap=glBufferSubData",
+            "-Wl,--wrap=glCopyBufferSubData",
+            "-Wl,--wrap=glDrawArrays",
+            "-Wl,--dependency-file=/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release/dome-sculpt-document-render-buffers-test.link.d",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-query-owning-20261111/release/CMakeFiles/dome-sculpt-document-render-buffers-test.dir/tests/document-render-buffers.cpp.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release/dome-sculpt-document-render-buffers-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release/libdome-sculpt-render.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-owning-20261111/release-v3/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libdome-sculpt-paint-gpu.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libdome-sculpt-native-graphics.a",
+            "/usr/lib64/libOpenGL.so",
+            "/usr/lib64/libEGL.so",
+            "/usr/lib64/libGL.so",
+            "/usr/lib64/libfontconfig.so",
+            "/usr/lib64/libfreetype.so",
+            "/usr/lib64/libharfbuzz.so",
+            "/usr/lib64/libicui18n.so",
+            "/usr/lib64/libicuuc.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 0.4879489619634114
+        },
+        {
+          "kind": "link-dome-sculpt-document-render-capacity-test",
+          "command": [
+            "/usr/bin/c++",
+            "-O3",
+            "-DNDEBUG",
+            "-ffunction-sections",
+            "-fdata-sections",
+            "-Wl,--gc-sections",
+            "-Wl,--wrap=glBufferData",
+            "-Wl,--dependency-file=/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release/dome-sculpt-document-render-capacity-test.link.d",
+            "/home/blux/de-xr/dome-sculpt/artifacts/packed-eligibility-final-proof-20261111/release/document-render-capacity.cpp.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release/dome-sculpt-document-render-capacity-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release/libdome-sculpt-render.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-owning-20261111/release-v3/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libdome-sculpt-paint-gpu.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libdome-sculpt-native-graphics.a",
+            "/usr/lib64/libOpenGL.so",
+            "/usr/lib64/libEGL.so",
+            "/usr/lib64/libGL.so",
+            "/usr/lib64/libfontconfig.so",
+            "/usr/lib64/libfreetype.so",
+            "/usr/lib64/libharfbuzz.so",
+            "/usr/lib64/libicui18n.so",
+            "/usr/lib64/libicuuc.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 0.5475718399975449
+        },
+        {
+          "kind": "link-dome-sculpt-render-buffers-test",
+          "command": [
+            "/usr/bin/c++",
+            "-O3",
+            "-DNDEBUG",
+            "-ffunction-sections",
+            "-fdata-sections",
+            "-Wl,--gc-sections",
+            "-Wl,--wrap=glBufferData",
+            "-Wl,--dependency-file=/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release/dome-sculpt-render-buffers-test.link.d",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-query-owning-20261111/release/CMakeFiles/dome-sculpt-render-buffers-test.dir/tests/render-buffers.cpp.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release/dome-sculpt-render-buffers-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release/libdome-sculpt-render.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-owning-20261111/release-v3/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libdome-sculpt-paint-gpu.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libdome-sculpt-native-graphics.a",
+            "/usr/lib64/libOpenGL.so",
+            "/usr/lib64/libEGL.so",
+            "/usr/lib64/libGL.so",
+            "/usr/lib64/libfontconfig.so",
+            "/usr/lib64/libfreetype.so",
+            "/usr/lib64/libharfbuzz.so",
+            "/usr/lib64/libicui18n.so",
+            "/usr/lib64/libicuuc.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 0.32465831900481135
+        }
+      ],
+      "selected_source_or_object_provider_pin_count": 9065,
+      "render_archive_sha256": "2ffdf0619fc5908f62bd2dd0d377189ff191973257326d31f81c7c819b6a3080",
+      "render_archive_scope": "Four-member current render archive; only render.cpp member replaced, three unchanged actual member payloads checked. Current e993 core/support/SDK retained read-only.",
+      "software": {
+        "status": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release-software-v2/status.json",
+          "sha256": "24384280283c0f3383d5a260d9b2d0f0c0e1921aff9310f3f485922e4eb32bd1"
+        },
+        "cases": [
+          {
+            "name": "source-paint-overlay",
+            "native_controls": 44,
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release/dome-sculpt-source-paint-overlay-test"
+            ],
+            "deadline_seconds": 180.0,
+            "seconds": 0.20706402900395915,
+            "peak_RSS_bytes": 115208192,
+            "exit": 0,
+            "guard": null,
+            "log": {
+              "path": "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release-software-v2/source-paint-overlay.log",
+              "sha256": "ca6802a02f87716566885678385b9a0a3232737aa682b535ba8b9816d6dbd72b"
+            },
+            "actual_last_log_line": "PASS 44 source paint overlay checks max_pair_error=1"
+          },
+          {
+            "name": "paint-overlay-gpu",
+            "native_controls": 42,
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release/dome-sculpt-paint-overlay-gpu-test"
+            ],
+            "deadline_seconds": 180.0,
+            "seconds": 0.21031371399294585,
+            "peak_RSS_bytes": 15822848,
+            "exit": 0,
+            "guard": null,
+            "log": {
+              "path": "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release-software-v2/paint-overlay-gpu.log",
+              "sha256": "5b2cc8f87e6176bf1fa047bf3c5f42323f401edbe84ba0a70fc5cfa9b214a41f"
+            },
+            "actual_last_log_line": "Sparse GPU overlay: 42 checks maximum_relative=2.36515e-07"
+          },
+          {
+            "name": "render-buffer-reuse",
+            "native_controls": 24,
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release/dome-sculpt-render-buffers-test"
+            ],
+            "deadline_seconds": 180,
+            "seconds": 0.21085117297479883,
+            "peak_RSS_bytes": 114487296,
+            "exit": 0,
+            "guard": null,
+            "log": {
+              "path": "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release-software-v2/render-buffer-reuse.log",
+              "sha256": "ccf4d6efe61df22e9195c163fc5f1beff83a50b70e556513b54c640e1d253b0c"
+            },
+            "actual_last_log_line": "GPU buffer reuse complete: 24 checks"
+          },
+          {
+            "name": "document-render-capacity",
+            "native_controls": 64,
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release/dome-sculpt-document-render-capacity-test"
+            ],
+            "deadline_seconds": 240.0,
+            "seconds": 3.923555469023995,
+            "peak_RSS_bytes": 1292660736,
+            "exit": 0,
+            "guard": null,
+            "log": {
+              "path": "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release-software-v2/document-render-capacity.log",
+              "sha256": "3e3a7ae6863e8341d22a49793406dc263d1d73c3f58e58fdcabcc892680212f0"
+            },
+            "actual_last_log_line": "64 Document capacity checks passed"
+          },
+          {
+            "name": "document-render-large-buffer",
+            "native_controls": 63,
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release/dome-sculpt-document-render-capacity-test",
+              "--large-buffer"
+            ],
+            "deadline_seconds": 240.0,
+            "seconds": 2.1180235220235772,
+            "peak_RSS_bytes": 1689284608,
+            "exit": 0,
+            "guard": null,
+            "log": {
+              "path": "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release-software-v2/document-render-large-buffer.log",
+              "sha256": "63dd60db69f75a5de0d2a91721da8d5139d0a9562d2770abe52a4783524e601b"
+            },
+            "actual_last_log_line": "63 Separate large-buffer checks passed"
+          },
+          {
+            "name": "document-render-buffer-reuse",
+            "native_controls": 31,
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release/dome-sculpt-document-render-buffers-test"
+            ],
+            "deadline_seconds": 180,
+            "seconds": 1.013285787019413,
+            "peak_RSS_bytes": 155607040,
+            "exit": 0,
+            "guard": null,
+            "log": {
+              "path": "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release-software-v2/document-render-buffer-reuse.log",
+              "sha256": "a7fae7771719c88ae2037441ec0381e2af8a17956afdf1d301216344e438662b"
+            },
+            "actual_last_log_line": "Document GPU reuse complete: 31 checks"
+          },
+          {
+            "name": "current-paint-preview-gpu",
+            "native_controls": 98815,
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release/dome-sculpt-current-paint-preview-gpu-test"
+            ],
+            "deadline_seconds": 180.0,
+            "seconds": 0.8102616829564795,
+            "peak_RSS_bytes": 155860992,
+            "exit": 0,
+            "guard": null,
+            "log": {
+              "path": "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release-software-v2/current-paint-preview-gpu.log",
+              "sha256": "12c91bbcf78e57e20371f4ec8b242a29029d4072e9d2ad25068cbaa032cf6d1c"
+            },
+            "actual_last_log_line": "PASS 98815 current-grid GPU/reference/cache/resource checks"
+          },
+          {
+            "name": "render-store-ledger",
+            "native_controls": 94,
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release/dome-sculpt-render-store-ledger-test"
+            ],
+            "deadline_seconds": 180.0,
+            "seconds": 0.10784277599304914,
+            "peak_RSS_bytes": 15085568,
+            "exit": 0,
+            "guard": null,
+            "log": {
+              "path": "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release-software-v2/render-store-ledger.log",
+              "sha256": "bc590c970998d0a1a719defc6c03953bcae871a44b2cdf5341c57c63bff38b98"
+            },
+            "actual_last_log_line": "PASS 94 real GL store lifecycle/budget/failure controls"
+          },
+          {
+            "name": "renderer-recovery",
+            "native_controls": 828,
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release/dome-sculpt-renderer-recovery-test"
+            ],
+            "deadline_seconds": 180.0,
+            "seconds": 3.620282828982454,
+            "peak_RSS_bytes": 233414656,
+            "exit": 0,
+            "guard": null,
+            "log": {
+              "path": "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release-software-v2/renderer-recovery.log",
+              "sha256": "f4a452bfd108f84b3fa12ecf04b12514f5d3f2a38ccdd8dc948f13a8cc6bf560"
+            },
+            "actual_last_log_line": "PASS 828 actual accepted/Pending renderer recovery checks"
+          }
+        ],
+        "total_cases": 9,
+        "rss_limit": 4294967296
+      },
+      "Arc": [
+        {
+          "case": "ledger",
+          "status": {
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release-arc-ledger-v2/status.json",
+            "sha256": "d8179c34a43fbba809e2ce9bcfabc2e3139c54a130d8fa7caeb5a8cf109ccb44"
+          },
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release/dome-sculpt-render-store-ledger-test",
+            "--hardware"
+          ],
+          "native_controls": 96,
+          "native_exit": 0,
+          "coordinator_exit": 0,
+          "seconds": 0.04969614197034389,
+          "peak_RSS_bytes": 49750016,
+          "limits": {
+            "seconds": 180,
+            "rss_bytes": 4294967296
+          },
+          "actual_device_authenticated": true,
+          "actual_device_report": "vendor=Intel\nrenderer=Mesa Intel(R) Arc(tm) A770 Graphics (DG2)\nrender_node=/dev/dri/renderD129\npci=/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0\nvendor_id=0x8086\ndevice_id=0x56a0\nfd=3\nfd=4\nfd=5\nfd=6\n",
+          "actual_live_DRM_FDs": [
+            "/dev/dri/renderD129"
+          ],
+          "mapped_ELF_count": 41,
+          "all_mapped_ELFs_pre_pinned_and_post_hash_exact": true,
+          "lease_released_epoch": 1794436951.935093,
+          "source_provider_output_drift": [],
+          "performance_claim": false
+        },
+        {
+          "case": "recovery",
+          "status": {
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release-arc-recovery-v2/status.json",
+            "sha256": "1c3e3bf95c68c1b79d764ac7de16b5286a3cc2c9217e835f9cb5fe9b58c1240c"
+          },
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release/dome-sculpt-renderer-recovery-test",
+            "--hardware"
+          ],
+          "native_controls": 831,
+          "native_exit": 0,
+          "coordinator_exit": 0,
+          "seconds": 3.8327342900447547,
+          "peak_RSS_bytes": 115941376,
+          "limits": {
+            "seconds": 180,
+            "rss_bytes": 4294967296
+          },
+          "actual_device_authenticated": true,
+          "actual_device_report": "vendor=Intel\nrenderer=Mesa Intel(R) Arc(tm) A770 Graphics (DG2)\nrender_node=/dev/dri/renderD129\npci=/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0\nvendor_id=0x8086\ndevice_id=0x56a0\nfd=3\nfd=4\nfd=5\nfd=6\n",
+          "actual_live_DRM_FDs": [
+            "/dev/dri/renderD129"
+          ],
+          "mapped_ELF_count": 71,
+          "all_mapped_ELFs_pre_pinned_and_post_hash_exact": true,
+          "lease_released_epoch": 1794436969.5809896,
+          "source_provider_output_drift": [],
+          "performance_claim": false
+        },
+        {
+          "case": "buffers",
+          "status": {
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release-arc-buffers-v2/status.json",
+            "sha256": "5ea2e8e82a467814d9af79fc44a13681c5548dd0319e8bf734b6b51a0feec5e2"
+          },
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release/dome-sculpt-document-render-buffers-test"
+          ],
+          "native_controls": 31,
+          "native_exit": 0,
+          "coordinator_exit": 0,
+          "seconds": 0.37178377603413537,
+          "peak_RSS_bytes": 111263744,
+          "limits": {
+            "seconds": 180,
+            "rss_bytes": 4294967296
+          },
+          "actual_device_authenticated": true,
+          "actual_device_report": "vendor=Intel\nrenderer=Mesa Intel(R) Arc(tm) A770 Graphics (DG2)\nrender_node=/dev/dri/renderD129\npci=/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0\nvendor_id=0x8086\ndevice_id=0x56a0\nfd=3\nfd=4\nfd=5\nfd=6\n",
+          "actual_live_DRM_FDs": [
+            "/dev/dri/renderD129"
+          ],
+          "mapped_ELF_count": 71,
+          "all_mapped_ELFs_pre_pinned_and_post_hash_exact": true,
+          "lease_released_epoch": 1794436972.3014135,
+          "source_provider_output_drift": [],
+          "performance_claim": false
+        },
+        {
+          "case": "large",
+          "status": {
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release-arc-large-v2/status.json",
+            "sha256": "c65887a14174d319cae6d7114a6817ac39cc44c3fd92194fe281511161740cee"
+          },
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release/dome-sculpt-document-render-capacity-test",
+            "--large-buffer"
+          ],
+          "native_controls": 63,
+          "native_exit": 0,
+          "coordinator_exit": 0,
+          "seconds": 1.9292409079498611,
+          "peak_RSS_bytes": 1489129472,
+          "limits": {
+            "seconds": 240,
+            "rss_bytes": 4294967296
+          },
+          "actual_device_authenticated": true,
+          "actual_device_report": "vendor=Intel\nrenderer=Mesa Intel(R) Arc(tm) A770 Graphics (DG2)\nrender_node=/dev/dri/renderD129\npci=/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0\nvendor_id=0x8086\ndevice_id=0x56a0\nfd=3\nfd=4\nfd=5\nfd=6\n",
+          "actual_live_DRM_FDs": [
+            "/dev/dri/renderD129"
+          ],
+          "mapped_ELF_count": 71,
+          "all_mapped_ELFs_pre_pinned_and_post_hash_exact": true,
+          "lease_released_epoch": 1794436976.5646658,
+          "source_provider_output_drift": [],
+          "performance_claim": false
+        }
+      ],
+      "strict_sanitizers": false
+    },
+    "sanitize": {
+      "build": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize/status.json",
+        "sha256": "565ab62d627f6922817847d2644d79cf39fcf5eb8833547d8c2b4d0278cfc871"
+      },
+      "build_scope": "Five current whole private-header-dependent TUs, one four-member render archive replacement and selected real consumers; not whole-build qualification.",
+      "compiled_whole_TUs": 5,
+      "fresh_consumer_links": 8,
+      "steps": [
+        {
+          "kind": "compile-render.cpp.o",
+          "command": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-20261111/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-20261111/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-20261111/third_party/nlohmann",
+            "-isystem",
+            "/usr/include/freetype2",
+            "-isystem",
+            "/usr/include/libpng16",
+            "-isystem",
+            "/usr/include/harfbuzz",
+            "-isystem",
+            "/usr/include/glib-2.0",
+            "-isystem",
+            "/usr/lib64/glib-2.0/include",
+            "-isystem",
+            "/usr/include/sysprof-6",
+            "-isystem",
+            "/usr/include/libxml2",
+            "-O1",
+            "-g1",
+            "-DNDEBUG",
+            "-ffunction-sections",
+            "-fdata-sections",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-std=gnu++20",
+            "-pthread",
+            "-DWITH_GZFILEOP",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize/CMakeFiles/dome-sculpt-render.dir/src/render.cpp.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-20261111/src/render.cpp",
+            "-MMD",
+            "-MF",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize/CMakeFiles/dome-sculpt-render.dir/src/render.cpp.o.d"
+          ],
+          "exit": 0,
+          "seconds": 33.90536517900182
+        },
+        {
+          "kind": "compile-paint-overlay-gpu.cpp.o",
+          "command": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-20261111/src",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-20261111/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-20261111/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-20261111/third_party/nlohmann",
+            "-isystem",
+            "/usr/include/freetype2",
+            "-isystem",
+            "/usr/include/libpng16",
+            "-isystem",
+            "/usr/include/harfbuzz",
+            "-isystem",
+            "/usr/include/glib-2.0",
+            "-isystem",
+            "/usr/lib64/glib-2.0/include",
+            "-isystem",
+            "/usr/include/sysprof-6",
+            "-isystem",
+            "/usr/include/libxml2",
+            "-O1",
+            "-g1",
+            "-DNDEBUG",
+            "-ffunction-sections",
+            "-fdata-sections",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-std=gnu++20",
+            "-pthread",
+            "-DWITH_GZFILEOP",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize/CMakeFiles/dome-sculpt-paint-overlay-gpu-test.dir/tests/paint-overlay-gpu.cpp.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-20261111/tests/paint-overlay-gpu.cpp",
+            "-MMD",
+            "-MF",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize/CMakeFiles/dome-sculpt-paint-overlay-gpu-test.dir/tests/paint-overlay-gpu.cpp.o.d"
+          ],
+          "exit": 0,
+          "seconds": 20.789294591988437
+        },
+        {
+          "kind": "compile-current-paint-preview-gpu.cpp.o",
+          "command": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-20261111/src",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-20261111/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-20261111/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-20261111/third_party/nlohmann",
+            "-isystem",
+            "/usr/include/freetype2",
+            "-isystem",
+            "/usr/include/libpng16",
+            "-isystem",
+            "/usr/include/harfbuzz",
+            "-isystem",
+            "/usr/include/glib-2.0",
+            "-isystem",
+            "/usr/lib64/glib-2.0/include",
+            "-isystem",
+            "/usr/include/sysprof-6",
+            "-isystem",
+            "/usr/include/libxml2",
+            "-O1",
+            "-g1",
+            "-DNDEBUG",
+            "-ffunction-sections",
+            "-fdata-sections",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-std=gnu++20",
+            "-pthread",
+            "-DWITH_GZFILEOP",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize/CMakeFiles/dome-sculpt-current-paint-preview-gpu-test.dir/tests/current-paint-preview-gpu.cpp.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-20261111/tests/current-paint-preview-gpu.cpp",
+            "-MMD",
+            "-MF",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize/CMakeFiles/dome-sculpt-current-paint-preview-gpu-test.dir/tests/current-paint-preview-gpu.cpp.o.d"
+          ],
+          "exit": 0,
+          "seconds": 10.116009466000833
+        },
+        {
+          "kind": "compile-render-store-ledger.cpp.o",
+          "command": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-20261111/src",
+            "-O1",
+            "-g1",
+            "-DNDEBUG",
+            "-ffunction-sections",
+            "-fdata-sections",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-std=gnu++20",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize/CMakeFiles/dome-sculpt-render-store-ledger-test.dir/tests/render-store-ledger.cpp.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-20261111/tests/render-store-ledger.cpp",
+            "-MMD",
+            "-MF",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize/CMakeFiles/dome-sculpt-render-store-ledger-test.dir/tests/render-store-ledger.cpp.o.d"
+          ],
+          "exit": 0,
+          "seconds": 2.368388619972393
+        },
+        {
+          "kind": "compile-renderer-recovery.cpp.o",
+          "command": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-20261111/src",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-20261111/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-20261111/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-20261111/third_party/nlohmann",
+            "-isystem",
+            "/usr/include/freetype2",
+            "-isystem",
+            "/usr/include/libpng16",
+            "-isystem",
+            "/usr/include/harfbuzz",
+            "-isystem",
+            "/usr/include/glib-2.0",
+            "-isystem",
+            "/usr/lib64/glib-2.0/include",
+            "-isystem",
+            "/usr/include/sysprof-6",
+            "-isystem",
+            "/usr/include/libxml2",
+            "-O1",
+            "-g1",
+            "-DNDEBUG",
+            "-ffunction-sections",
+            "-fdata-sections",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-std=gnu++20",
+            "-pthread",
+            "-DWITH_GZFILEOP",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize/CMakeFiles/dome-sculpt-renderer-recovery-test.dir/tests/renderer-recovery.cpp.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-20261111/tests/renderer-recovery.cpp",
+            "-MMD",
+            "-MF",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize/CMakeFiles/dome-sculpt-renderer-recovery-test.dir/tests/renderer-recovery.cpp.o.d"
+          ],
+          "exit": 0,
+          "seconds": 23.588491689006332
+        },
+        {
+          "kind": "archive-render",
+          "command": [
+            "/usr/bin/ar",
+            "r",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize/libdome-sculpt-render.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize/CMakeFiles/dome-sculpt-render.dir/src/render.cpp.o"
+          ],
+          "exit": 0,
+          "seconds": 0.23960455297492445
+        },
+        {
+          "kind": "link-dome-sculpt-renderer-recovery-test",
+          "command": [
+            "/usr/bin/c++",
+            "-O1",
+            "-g1",
+            "-DNDEBUG",
+            "-ffunction-sections",
+            "-fdata-sections",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-Wl,--gc-sections",
+            "-fsanitize=address,undefined",
+            "-Wl,--wrap=glGenBuffers",
+            "-Wl,--wrap=glGenTextures",
+            "-Wl,--wrap=glGenSamplers",
+            "-Wl,--wrap=glGenVertexArrays",
+            "-Wl,--wrap=glBufferData",
+            "-Wl,--wrap=glTexBuffer",
+            "-Wl,--wrap=glTexImage2D",
+            "-Wl,--wrap=glGenerateMipmap",
+            "-Wl,--wrap=glFenceSync",
+            "-Wl,--wrap=glClientWaitSync",
+            "-Wl,--wrap=glDrawElements",
+            "-Wl,--wrap=glMultiDrawElementsBaseVertex",
+            "-Wl,--wrap=glDrawArrays",
+            "-Wl,--wrap=glReadPixels",
+            "-Wl,--wrap=glGetTexImage",
+            "-Wl,--wrap=glGetBufferSubData",
+            "-Wl,--wrap=glFinish",
+            "-Wl,--dependency-file=/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize/dome-sculpt-renderer-recovery-test.link.d",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize/CMakeFiles/dome-sculpt-renderer-recovery-test.dir/tests/renderer-recovery.cpp.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize/dome-sculpt-renderer-recovery-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize/libdome-sculpt-render.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-owning-20261111/sanitize-v3/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libdome-sculpt-paint-gpu.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libdome-sculpt-native-graphics.a",
+            "/usr/lib64/libOpenGL.so",
+            "/usr/lib64/libEGL.so",
+            "/usr/lib64/libGL.so",
+            "/usr/lib64/libfontconfig.so",
+            "/usr/lib64/libfreetype.so",
+            "/usr/lib64/libharfbuzz.so",
+            "/usr/lib64/libicui18n.so",
+            "/usr/lib64/libicuuc.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 13.9360239180387
+        },
+        {
+          "kind": "link-dome-sculpt-render-store-ledger-test",
+          "command": [
+            "/usr/bin/c++",
+            "-O1",
+            "-g1",
+            "-DNDEBUG",
+            "-ffunction-sections",
+            "-fdata-sections",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-Wl,--gc-sections",
+            "-fsanitize=address,undefined",
+            "-Wl,--wrap=glGenBuffers",
+            "-Wl,--wrap=glDeleteBuffers",
+            "-Wl,--wrap=glFenceSync",
+            "-Wl,--wrap=glClientWaitSync",
+            "-Wl,--dependency-file=/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize/dome-sculpt-render-store-ledger-test.link.d",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize/CMakeFiles/dome-sculpt-render-store-ledger-test.dir/tests/render-store-ledger.cpp.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize/dome-sculpt-render-store-ledger-test",
+            "/usr/lib64/libOpenGL.so",
+            "/usr/lib64/libEGL.so"
+          ],
+          "exit": 0,
+          "seconds": 0.0822977980133146
+        },
+        {
+          "kind": "link-dome-sculpt-current-paint-preview-gpu-test",
+          "command": [
+            "/usr/bin/c++",
+            "-O1",
+            "-g1",
+            "-DNDEBUG",
+            "-ffunction-sections",
+            "-fdata-sections",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-Wl,--gc-sections",
+            "-fsanitize=address,undefined",
+            "-Wl,--wrap=glGetTexImage",
+            "-Wl,--wrap=glReadPixels",
+            "-Wl,--wrap=glGetBufferSubData",
+            "-Wl,--wrap=glClientWaitSync",
+            "-Wl,--wrap=glFenceSync",
+            "-Wl,--wrap=glBufferData",
+            "-Wl,--wrap=glCopyBufferSubData",
+            "-Wl,--wrap=glBufferSubData",
+            "-Wl,--wrap=glFinish",
+            "-Wl,--dependency-file=/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize/dome-sculpt-current-paint-preview-gpu-test.link.d",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize/CMakeFiles/dome-sculpt-current-paint-preview-gpu-test.dir/tests/current-paint-preview-gpu.cpp.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize/dome-sculpt-current-paint-preview-gpu-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize/libdome-sculpt-render.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-owning-20261111/sanitize-v3/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libdome-sculpt-paint-gpu.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libdome-sculpt-native-graphics.a",
+            "/usr/lib64/libOpenGL.so",
+            "/usr/lib64/libEGL.so",
+            "/usr/lib64/libGL.so",
+            "/usr/lib64/libfontconfig.so",
+            "/usr/lib64/libfreetype.so",
+            "/usr/lib64/libharfbuzz.so",
+            "/usr/lib64/libicui18n.so",
+            "/usr/lib64/libicuuc.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 13.464978272037115
+        },
+        {
+          "kind": "link-dome-sculpt-paint-overlay-gpu-test",
+          "command": [
+            "/usr/bin/c++",
+            "-O1",
+            "-g1",
+            "-DNDEBUG",
+            "-ffunction-sections",
+            "-fdata-sections",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-Wl,--gc-sections",
+            "-fsanitize=address,undefined",
+            "-Wl,--dependency-file=/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize/dome-sculpt-paint-overlay-gpu-test.link.d",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize/CMakeFiles/dome-sculpt-paint-overlay-gpu-test.dir/tests/paint-overlay-gpu.cpp.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize/dome-sculpt-paint-overlay-gpu-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize/libdome-sculpt-render.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-owning-20261111/sanitize-v3/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libdome-sculpt-paint-gpu.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libdome-sculpt-native-graphics.a",
+            "/usr/lib64/libOpenGL.so",
+            "/usr/lib64/libEGL.so",
+            "/usr/lib64/libGL.so",
+            "/usr/lib64/libfontconfig.so",
+            "/usr/lib64/libfreetype.so",
+            "/usr/lib64/libharfbuzz.so",
+            "/usr/lib64/libicui18n.so",
+            "/usr/lib64/libicuuc.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 7.665105604042765
+        },
+        {
+          "kind": "link-dome-sculpt-source-paint-overlay-test",
+          "command": [
+            "/usr/bin/c++",
+            "-O1",
+            "-g1",
+            "-DNDEBUG",
+            "-ffunction-sections",
+            "-fdata-sections",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-Wl,--gc-sections",
+            "-fsanitize=address,undefined",
+            "-Wl,--dependency-file=/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize/dome-sculpt-source-paint-overlay-test.link.d",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/CMakeFiles/dome-sculpt-source-paint-overlay-test.dir/tests/source-paint-overlay.cpp.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize/dome-sculpt-source-paint-overlay-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize/libdome-sculpt-render.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-owning-20261111/sanitize-v3/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libdome-sculpt-paint-gpu.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libdome-sculpt-native-graphics.a",
+            "/usr/lib64/libOpenGL.so",
+            "/usr/lib64/libEGL.so",
+            "/usr/lib64/libGL.so",
+            "/usr/lib64/libfontconfig.so",
+            "/usr/lib64/libfreetype.so",
+            "/usr/lib64/libharfbuzz.so",
+            "/usr/lib64/libicui18n.so",
+            "/usr/lib64/libicuuc.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 8.695443361008074
+        },
+        {
+          "kind": "link-dome-sculpt-document-render-buffers-test",
+          "command": [
+            "/usr/bin/c++",
+            "-O1",
+            "-g1",
+            "-DNDEBUG",
+            "-ffunction-sections",
+            "-fdata-sections",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-Wl,--gc-sections",
+            "-fsanitize=address,undefined",
+            "-Wl,--wrap=glBufferData",
+            "-Wl,--wrap=glBufferSubData",
+            "-Wl,--wrap=glCopyBufferSubData",
+            "-Wl,--wrap=glDrawArrays",
+            "-Wl,--dependency-file=/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize/dome-sculpt-document-render-buffers-test.link.d",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-query-owning-20261111/sanitize/CMakeFiles/dome-sculpt-document-render-buffers-test.dir/tests/document-render-buffers.cpp.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize/dome-sculpt-document-render-buffers-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize/libdome-sculpt-render.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-owning-20261111/sanitize-v3/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libdome-sculpt-paint-gpu.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libdome-sculpt-native-graphics.a",
+            "/usr/lib64/libOpenGL.so",
+            "/usr/lib64/libEGL.so",
+            "/usr/lib64/libGL.so",
+            "/usr/lib64/libfontconfig.so",
+            "/usr/lib64/libfreetype.so",
+            "/usr/lib64/libharfbuzz.so",
+            "/usr/lib64/libicui18n.so",
+            "/usr/lib64/libicuuc.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 13.322618098987732
+        },
+        {
+          "kind": "link-dome-sculpt-document-render-capacity-test",
+          "command": [
+            "/usr/bin/c++",
+            "-O1",
+            "-g1",
+            "-DNDEBUG",
+            "-ffunction-sections",
+            "-fdata-sections",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-Wl,--gc-sections",
+            "-fsanitize=address,undefined",
+            "-Wl,--wrap=glBufferData",
+            "-Wl,--dependency-file=/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize/dome-sculpt-document-render-capacity-test.link.d",
+            "/home/blux/de-xr/dome-sculpt/artifacts/packed-eligibility-final-proof-20261111/sanitize/document-render-capacity.cpp.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize/dome-sculpt-document-render-capacity-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize/libdome-sculpt-render.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-owning-20261111/sanitize-v3/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libdome-sculpt-paint-gpu.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libdome-sculpt-native-graphics.a",
+            "/usr/lib64/libOpenGL.so",
+            "/usr/lib64/libEGL.so",
+            "/usr/lib64/libGL.so",
+            "/usr/lib64/libfontconfig.so",
+            "/usr/lib64/libfreetype.so",
+            "/usr/lib64/libharfbuzz.so",
+            "/usr/lib64/libicui18n.so",
+            "/usr/lib64/libicuuc.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 13.650048470997717
+        },
+        {
+          "kind": "link-dome-sculpt-render-buffers-test",
+          "command": [
+            "/usr/bin/c++",
+            "-O1",
+            "-g1",
+            "-DNDEBUG",
+            "-ffunction-sections",
+            "-fdata-sections",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-Wl,--gc-sections",
+            "-fsanitize=address,undefined",
+            "-Wl,--wrap=glBufferData",
+            "-Wl,--dependency-file=/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize/dome-sculpt-render-buffers-test.link.d",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-query-owning-20261111/sanitize/CMakeFiles/dome-sculpt-render-buffers-test.dir/tests/render-buffers.cpp.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize/dome-sculpt-render-buffers-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize/libdome-sculpt-render.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-owning-20261111/sanitize-v3/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libdome-sculpt-paint-gpu.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libdome-sculpt-native-graphics.a",
+            "/usr/lib64/libOpenGL.so",
+            "/usr/lib64/libEGL.so",
+            "/usr/lib64/libGL.so",
+            "/usr/lib64/libfontconfig.so",
+            "/usr/lib64/libfreetype.so",
+            "/usr/lib64/libharfbuzz.so",
+            "/usr/lib64/libicui18n.so",
+            "/usr/lib64/libicuuc.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 8.522140302986372
+        }
+      ],
+      "selected_source_or_object_provider_pin_count": 9065,
+      "render_archive_sha256": "02845c847d690b79c8e780d3284be54ffcc24a228e300c79f71177d462f44259",
+      "render_archive_scope": "Four-member current render archive; only render.cpp member replaced, three unchanged actual member payloads checked. Current e993 core/support/SDK retained read-only.",
+      "software": {
+        "status": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize-software-v2/status.json",
+          "sha256": "4388e36ec6b534810421f7eb615d1f3a7a485cc2e1f941d97191b4e7ace73581"
+        },
+        "cases": [
+          {
+            "name": "source-paint-overlay",
+            "native_controls": 44,
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize/dome-sculpt-source-paint-overlay-test"
+            ],
+            "deadline_seconds": 180.0,
+            "seconds": 0.4056477230042219,
+            "peak_RSS_bytes": 425328640,
+            "exit": 0,
+            "guard": null,
+            "log": {
+              "path": "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize-software-v2/source-paint-overlay.log",
+              "sha256": "ca6802a02f87716566885678385b9a0a3232737aa682b535ba8b9816d6dbd72b"
+            },
+            "actual_last_log_line": "PASS 44 source paint overlay checks max_pair_error=1"
+          },
+          {
+            "name": "paint-overlay-gpu",
+            "native_controls": 42,
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize/dome-sculpt-paint-overlay-gpu-test"
+            ],
+            "deadline_seconds": 180.0,
+            "seconds": 0.409399444994051,
+            "peak_RSS_bytes": 368947200,
+            "exit": 0,
+            "guard": null,
+            "log": {
+              "path": "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize-software-v2/paint-overlay-gpu.log",
+              "sha256": "5b2cc8f87e6176bf1fa047bf3c5f42323f401edbe84ba0a70fc5cfa9b214a41f"
+            },
+            "actual_last_log_line": "Sparse GPU overlay: 42 checks maximum_relative=2.36515e-07"
+          },
+          {
+            "name": "render-buffer-reuse",
+            "native_controls": 24,
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize/dome-sculpt-render-buffers-test"
+            ],
+            "deadline_seconds": 180,
+            "seconds": 0.4151448159827851,
+            "peak_RSS_bytes": 480387072,
+            "exit": 0,
+            "guard": null,
+            "log": {
+              "path": "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize-software-v2/render-buffer-reuse.log",
+              "sha256": "ccf4d6efe61df22e9195c163fc5f1beff83a50b70e556513b54c640e1d253b0c"
+            },
+            "actual_last_log_line": "GPU buffer reuse complete: 24 checks"
+          },
+          {
+            "name": "document-render-capacity",
+            "native_controls": 64,
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize/dome-sculpt-document-render-capacity-test"
+            ],
+            "deadline_seconds": 240.0,
+            "seconds": 24.478820523014292,
+            "peak_RSS_bytes": 2142076928,
+            "exit": 0,
+            "guard": null,
+            "log": {
+              "path": "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize-software-v2/document-render-capacity.log",
+              "sha256": "3e3a7ae6863e8341d22a49793406dc263d1d73c3f58e58fdcabcc892680212f0"
+            },
+            "actual_last_log_line": "64 Document capacity checks passed"
+          },
+          {
+            "name": "document-render-large-buffer",
+            "native_controls": 63,
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize/dome-sculpt-document-render-capacity-test",
+              "--large-buffer"
+            ],
+            "deadline_seconds": 240.0,
+            "seconds": 8.028730604972225,
+            "peak_RSS_bytes": 2369871872,
+            "exit": 0,
+            "guard": null,
+            "log": {
+              "path": "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize-software-v2/document-render-large-buffer.log",
+              "sha256": "63dd60db69f75a5de0d2a91721da8d5139d0a9562d2770abe52a4783524e601b"
+            },
+            "actual_last_log_line": "63 Separate large-buffer checks passed"
+          },
+          {
+            "name": "document-render-buffer-reuse",
+            "native_controls": 31,
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize/dome-sculpt-document-render-buffers-test"
+            ],
+            "deadline_seconds": 180,
+            "seconds": 2.1133721240330487,
+            "peak_RSS_bytes": 996880384,
+            "exit": 0,
+            "guard": null,
+            "log": {
+              "path": "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize-software-v2/document-render-buffer-reuse.log",
+              "sha256": "a7fae7771719c88ae2037441ec0381e2af8a17956afdf1d301216344e438662b"
+            },
+            "actual_last_log_line": "Document GPU reuse complete: 31 checks"
+          },
+          {
+            "name": "current-paint-preview-gpu",
+            "native_controls": 98815,
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize/dome-sculpt-current-paint-preview-gpu-test"
+            ],
+            "deadline_seconds": 180.0,
+            "seconds": 2.818364846985787,
+            "peak_RSS_bytes": 808411136,
+            "exit": 0,
+            "guard": null,
+            "log": {
+              "path": "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize-software-v2/current-paint-preview-gpu.log",
+              "sha256": "12c91bbcf78e57e20371f4ec8b242a29029d4072e9d2ad25068cbaa032cf6d1c"
+            },
+            "actual_last_log_line": "PASS 98815 current-grid GPU/reference/cache/resource checks"
+          },
+          {
+            "name": "render-store-ledger",
+            "native_controls": 94,
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize/dome-sculpt-render-store-ledger-test"
+            ],
+            "deadline_seconds": 180.0,
+            "seconds": 0.10752504999982193,
+            "peak_RSS_bytes": 27078656,
+            "exit": 0,
+            "guard": null,
+            "log": {
+              "path": "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize-software-v2/render-store-ledger.log",
+              "sha256": "bc590c970998d0a1a719defc6c03953bcae871a44b2cdf5341c57c63bff38b98"
+            },
+            "actual_last_log_line": "PASS 94 real GL store lifecycle/budget/failure controls"
+          },
+          {
+            "name": "renderer-recovery",
+            "native_controls": 828,
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize/dome-sculpt-renderer-recovery-test"
+            ],
+            "deadline_seconds": 180.0,
+            "seconds": 7.428793031955138,
+            "peak_RSS_bytes": 1252519936,
+            "exit": 0,
+            "guard": null,
+            "log": {
+              "path": "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize-software-v2/renderer-recovery.log",
+              "sha256": "f4a452bfd108f84b3fa12ecf04b12514f5d3f2a38ccdd8dc948f13a8cc6bf560"
+            },
+            "actual_last_log_line": "PASS 828 actual accepted/Pending renderer recovery checks"
+          }
+        ],
+        "total_cases": 9,
+        "rss_limit": 8589934592
+      },
+      "Arc": [
+        {
+          "case": "ledger",
+          "status": {
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize-arc-ledger-v2/status.json",
+            "sha256": "a4f54a86d063d3d0e70ad014698850d84a0ff4c48b8e9a47ea388b426e56f714"
+          },
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize/dome-sculpt-render-store-ledger-test",
+            "--hardware"
+          ],
+          "native_controls": 96,
+          "native_exit": 0,
+          "coordinator_exit": 0,
+          "seconds": 0.08194888400612399,
+          "peak_RSS_bytes": 89460736,
+          "limits": {
+            "seconds": 180,
+            "rss_bytes": 8589934592
+          },
+          "actual_device_authenticated": true,
+          "actual_device_report": "vendor=Intel\nrenderer=Mesa Intel(R) Arc(tm) A770 Graphics (DG2)\nrender_node=/dev/dri/renderD129\npci=/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0\nvendor_id=0x8086\ndevice_id=0x56a0\nfd=3\nfd=4\nfd=5\nfd=6\n",
+          "actual_live_DRM_FDs": [
+            "/dev/dri/renderD129"
+          ],
+          "mapped_ELF_count": 43,
+          "all_mapped_ELFs_pre_pinned_and_post_hash_exact": true,
+          "lease_released_epoch": 1794437003.8510687,
+          "source_provider_output_drift": [],
+          "performance_claim": false
+        },
+        {
+          "case": "recovery",
+          "status": {
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize-arc-recovery-v2/status.json",
+            "sha256": "6bfc642ecb483457f148d9d290b34f779bbc31a9eb2ca2924eb576979bfe6c9e"
+          },
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize/dome-sculpt-renderer-recovery-test",
+            "--hardware"
+          ],
+          "native_controls": 831,
+          "native_exit": 0,
+          "coordinator_exit": 0,
+          "seconds": 7.815631847013719,
+          "peak_RSS_bytes": 1033613312,
+          "limits": {
+            "seconds": 180,
+            "rss_bytes": 8589934592
+          },
+          "actual_device_authenticated": true,
+          "actual_device_report": "vendor=Intel\nrenderer=Mesa Intel(R) Arc(tm) A770 Graphics (DG2)\nrender_node=/dev/dri/renderD129\npci=/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0\nvendor_id=0x8086\ndevice_id=0x56a0\nfd=3\nfd=4\nfd=5\nfd=6\n",
+          "actual_live_DRM_FDs": [
+            "/dev/dri/renderD129"
+          ],
+          "mapped_ELF_count": 73,
+          "all_mapped_ELFs_pre_pinned_and_post_hash_exact": true,
+          "lease_released_epoch": 1794437031.726136,
+          "source_provider_output_drift": [],
+          "performance_claim": false
+        },
+        {
+          "case": "buffers",
+          "status": {
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize-arc-buffers-v2/status.json",
+            "sha256": "01e48903cd4d426e57ffe5b7983fc1db76953eaa427fabcfcef1dd2cd2d65488"
+          },
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize/dome-sculpt-document-render-buffers-test"
+          ],
+          "native_controls": 31,
+          "native_exit": 0,
+          "coordinator_exit": 0,
+          "seconds": 1.2356472840183415,
+          "peak_RSS_bytes": 845328384,
+          "limits": {
+            "seconds": 180,
+            "rss_bytes": 8589934592
+          },
+          "actual_device_authenticated": true,
+          "actual_device_report": "vendor=Intel\nrenderer=Mesa Intel(R) Arc(tm) A770 Graphics (DG2)\nrender_node=/dev/dri/renderD129\npci=/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0\nvendor_id=0x8086\ndevice_id=0x56a0\nfd=3\nfd=4\nfd=5\nfd=6\n",
+          "actual_live_DRM_FDs": [
+            "/dev/dri/renderD129"
+          ],
+          "mapped_ELF_count": 73,
+          "all_mapped_ELFs_pre_pinned_and_post_hash_exact": true,
+          "lease_released_epoch": 1794437051.6215432,
+          "source_provider_output_drift": [],
+          "performance_claim": false
+        },
+        {
+          "case": "large",
+          "status": {
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize-arc-large-v2/status.json",
+            "sha256": "d374f8855533df1bf29b64b633070abf10c918ca884d8565ac94ac17dafb7828"
+          },
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/sanitize/dome-sculpt-document-render-capacity-test",
+            "--large-buffer"
+          ],
+          "native_controls": 63,
+          "native_exit": 0,
+          "coordinator_exit": 0,
+          "seconds": 7.131780908966903,
+          "peak_RSS_bytes": 2214199296,
+          "limits": {
+            "seconds": 240,
+            "rss_bytes": 8589934592
+          },
+          "actual_device_authenticated": true,
+          "actual_device_report": "vendor=Intel\nrenderer=Mesa Intel(R) Arc(tm) A770 Graphics (DG2)\nrender_node=/dev/dri/renderD129\npci=/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0\nvendor_id=0x8086\ndevice_id=0x56a0\nfd=3\nfd=4\nfd=5\nfd=6\n",
+          "actual_live_DRM_FDs": [
+            "/dev/dri/renderD129"
+          ],
+          "mapped_ELF_count": 73,
+          "all_mapped_ELFs_pre_pinned_and_post_hash_exact": true,
+          "lease_released_epoch": 1794437076.441131,
+          "source_provider_output_drift": [],
+          "performance_claim": false
+        }
+      ],
+      "strict_sanitizers": true
+    }
+  },
+  "negative_controls": {
+    "old_e993_wholeTU": {
+      "status": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-proof-20261111/counterfactual-release/status.json",
+        "sha256": "0b0a5d4823b5d9e62cb9ac49aa3be7545680c00b727ad40b335f604999336de0"
+      },
+      "coordinator_exit": 0,
+      "native_exits": [
+        1,
+        1
+      ],
+      "meaning": "Actual old product negative fails intended new empty-ledger/empty-flat assertions; coordinator0 classifies the expected native1 outcomes, not native success.",
+      "logs": [
+        {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-proof-20261111/counterfactual-release/native-render-store-ledger.cpp.log",
+          "sha256": "2e67091714075a5b3870e2c8d32aada8e67be89e10fc1adfafbc834d933d1abe"
+        },
+        {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-proof-20261111/counterfactual-release/native-renderer-recovery.cpp.log",
+          "sha256": "50d6997188b2cef6e0cd8815d4f58c78c78eec837f10f921201918d10b5d9d50"
+        }
+      ]
+    },
+    "zero_range_public_probe": {
+      "original_status": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-zero-range-probe-20261111/status.json",
+        "sha256": "17ee9221b8de399670bf6c2a6b08608d5d6d1e36653fa1abbe5415ee4cd808ec"
+      },
+      "fixed_status": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-zero-range-probe-20261111/fixed-822.json",
+        "sha256": "0102c062d3ad108f3fb967ad650473994d35ce70aaf1014f48f9c9c4286184df"
+      },
+      "source": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-zero-range-probe-20261111/probe.cpp",
+        "sha256": "dd00408e808dd6776140947897134e35d1e7b902b899956d0e41ffed2325c7ac"
+      },
+      "same_actual_probe_object_SHA256": "613107ff85fe1dabd6c83aca9f3c43f366acb06bc1b4871f0806e6a4d663324b",
+      "fresh_compile_not_repeated_for_fixed_link": true,
+      "native_results": {
+        "old_e993": 0,
+        "intermediate25c": 1,
+        "final822": 0
+      },
+      "actual_intermediate_GL_error": 1282,
+      "final_log_byteidentical_old": true,
+      "scope": "Independent public API probe uses empty positions/normals/indices and one SurfaceRange(object1,first0,count0); only renderer archive changes, same actual object/core/ABI. No Arc/negativeoffset claim from this probe.",
+      "invalid_offset1_scope": "Only root final822 renderer-recovery cases test zero-count first1 rejection in both paths, not independent public probe.",
+      "actual_log_pins": {
+        "old-e993.log": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-zero-range-probe-20261111/old-e993.log",
+          "sha256": "f1b3195a2a030fd53500cf523a8f26c7b4f1dbbeb0287975dc72f8b1227e3450"
+        },
+        "new-25c.log": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-zero-range-probe-20261111/new-25c.log",
+          "sha256": "e250cca2e7fd93ef8a65913037e850b09ae734bd8a69bdfde2f83372e6aa7b78"
+        },
+        "fixed-822.log": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-zero-range-probe-20261111/fixed-822.log",
+          "sha256": "f1b3195a2a030fd53500cf523a8f26c7b4f1dbbeb0287975dc72f8b1227e3450"
+        }
+      },
+      "same_object_and_old_fixed_logs_independently_verified_at_seal": true,
+      "independent_source_review": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-zero-range-probe-20261111/review-final-822.json",
+        "sha256": "06a3b9f08aa5f1a48b3a4463a3cb8c4ff4b22c821688f1d59cc6a38a432862cb",
+        "no_remaining_blocker": true,
+        "negative_and_deferred_scope": "Root822 renderer-recovery, not the independent public probe."
+      }
+    },
+    "first_Arc_observer_failure": {
+      "status": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-range-proof-20261111/release-arc-ledger/status.json",
+        "sha256": "2711fe2fc32b89e96f6cfe70cac68bc79f95131d582ffdf8f1998bebdcb6b553"
+      },
+      "native_exit": 0,
+      "observer_coordinator_exit": 1,
+      "actual_device_authenticated": false,
+      "meaning": "Native actual96 checks pass, but first measurement coordinator misses the fast process live DRM FD while hashing runtimeELFs; this is retained as observer1, not hardware qualification.",
+      "correction": "V2 pre-pins same-profile independently authenticated runtime ELFs before launch, uses cheap live FD/maps/RSS sampling, requires every actual mapped ELF pre-pinned and all posthash exact; device and native predicates unchanged.",
+      "all_v2_R_S_four_cases_each_exit0": true
+    }
+  },
+  "prior_25c": {
+    "release": {
+      "build": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-proof-20261111/release/status.json",
+        "sha256": "2dc9042e8b62b9cf6465a9a4ab05edd465d2c93f393960c2074fd1373a966390"
+      },
+      "whole_TUs": 5,
+      "fresh_links": 8,
+      "runtime_scope": "Nine Release software cases0, retained separately from final822.",
+      "software_status": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-proof-20261111/release-software-v2/status.json",
+        "sha256": "0cf33dea824cb7a2cc63a5ef3c4cb21455fc835de5e2eba406d4b0ab73368786"
+      }
+    },
+    "sanitize": {
+      "build": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-proof-20261111/sanitize/status.json",
+        "sha256": "a8bb2a99cba23db3926038edd417b0d654bab61e4439c183b2773af4b13da2c8"
+      },
+      "whole_TUs": 5,
+      "fresh_links": 8,
+      "runtime_scope": "No sanitizer runtime attributed to25c; build only."
+    }
+  },
+  "no_new_runtime_work_for_metadata": true,
+  "no_bound_or_quality_relaxation": true,
+  "all_handles_and_Arc_leases_closed": true,
+  "remaining": "Full new HDR ABI owning combination/application qualification and performance/90Hz/physical-HMD goals remain open. Prior196public/P1 apply to e993, not a new822 run.",
+  "strict_SAN": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+    "LSAN_OPTIONS": null,
+    "suppressions": false,
+    "diagnostics": false
+  },
+  "limitations": [
+    "No new822 wholeapp/wholebuild, GUI196 or fullP1 run is claimed; those earlier successes aree993 scope.",
+    "Functional timings may overlap authorized CPU validation; no benchmark, speedup,90Hz orphysicalHMD acceptance.",
+    "New HDR ABI combination and full owning application qualification remain required.",
+    "No publicheader/layout/default/schema changes; no systeminstall or desktop/HMD restart.",
+    "Earlier source/tests/ELFs/statuses/failures are kept; no old native or observer failure relabelled."
+  ],
+  "evidence_archive": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-seal-20261111/empty-flat-evidence.tar.zst",
+    "sha256": "bb6dee01634f839b9f6c2fb7a9146e510eec5eb097139f43f8d809e4e10716c3",
+    "bytes": 321707,
+    "members": 219,
+    "manifest": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-seal-20261111/evidence-members.json",
+      "sha256": "1653a26bb28659af71f8545fb4649fafea2ee7d61b64a8b1f989bc092fdf116e"
+    },
+    "all_streamed_SHA_mode_UID_GID_nsmtime_verified": true,
+    "originals_retained": true,
+    "ELFs_objects_archives_copied": false,
+    "source_drift": []
+  },
+  "metadata_verifier": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/empty-flat-seal-20261111/verify-final.py",
+    "sha256": "8c15892145b1e88737579a84ae42304d3500d637932f066cba8b9769d8b34ecb"
+  }
+}
