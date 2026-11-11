@@ -1,0 +1,25 @@
+{
+  "run": {
+    "source": "b6e366fd",
+    "input": "/home/blux/de-xr/dome-sculpt/artifacts/sustained-four-objects-shared-20261111/full-p1/rep-0/accepted.dsculpt",
+    "input_sha256": "64dd4cb54388f99c95e26c9f5e344bc9994cbf971d23ce12414606e999325038",
+    "command": [
+      "/home/blux/de-xr/dome-sculpt/artifacts/shared-sculpt-reopen-probe-20261111/probe",
+      "/home/blux/de-xr/dome-sculpt/artifacts/sustained-four-objects-shared-20261111/full-p1/rep-0/accepted.dsculpt"
+    ],
+    "scope": "Diagnostic real native Document reopen, no GL caller; not a product test or repaired proof.",
+    "state": "terminal",
+    "pid": 279525,
+    "child_pid": 279751,
+    "probe_sha256": "4dcde5208749293daa3824b1d11301cca19557a847e12c6c2d2268a12a9bff9c",
+    "exit": 1,
+    "seconds": 122.98492774600163,
+    "peak_RSS": 1552715776,
+    "guard": null,
+    "log_sha256": "74ab7e3f37815b5abd91ac5b2ebad56b0a63e2b98ec4272f103fcc4f7b0c2531"
+  },
+  "log": "loaded_geometry_owners=4\nready=0 error=Sculpt manifest retained byte limit exceeded\n",
+  "scope": "Real nativeDocument reopen diagnostic on b6 matching current-ABI core; noGL caller, no repaired qualification.",
+  "initial_unused_probe": "Original unused source/ELF preserved before run when review caught temporary Scene range lifetime. The actual run uses an explicitly retained Scene.",
+  "next_candidate": "e3ccf2a0; native-reader bit-exact COW storage interning, unqualified/private."
+}

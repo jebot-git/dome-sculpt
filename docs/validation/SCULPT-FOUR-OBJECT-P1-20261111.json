@@ -1,0 +1,538 @@
+{
+  "source": "b6e366fd8c45829b00bc1d1327ecdfc25aeedf49",
+  "scope": "Full unchanged original production4-object workload on private b6 COW-sharing/current-preview/arena source; CPU geometry with actual Arc rendering. Not full fresh owning/app/painting-recovery/physical-HMD or whole matrix proof.",
+  "run": {
+    "state": "terminal",
+    "source": "b6e366fd8c45829b00bc1d1327ecdfc25aeedf49",
+    "command": [
+      "/home/blux/de-xr/dome-sculpt/artifacts/shared-sculpt-p1-build-20261111/release/dome-sculpt-sculpt-sustained",
+      "--output",
+      "/home/blux/de-xr/dome-sculpt/artifacts/sustained-four-objects-shared-20261111/full-p1",
+      "--device",
+      "arc",
+      "--tier",
+      "production",
+      "--objects",
+      "4",
+      "--voxel",
+      ".0125",
+      "--width",
+      "768",
+      "--height",
+      "768",
+      "--strokes",
+      "300",
+      "--masks",
+      "120",
+      "--pairs",
+      "2000",
+      "--held-pairs",
+      "120",
+      "--repetitions",
+      "3"
+    ],
+    "binary_sha256": "df1bc91e350eaa0c56395698125e18cd6c2911ce5d8262341a097346b97db096",
+    "scope": "Full original production four-object correctness workload on actual Arc graphics with CPU brushes/mesher. Current private COW-sharing/preview/arena source; scoped untextured sculpt workload. Not physical headset pacing, painting recovery admission, exclusive-system performance or full production-matrix qualification.",
+    "conditions": "Other CPU development/qualification may remain active; exclusive Arc lock required. Record measurements as observed under these conditions.",
+    "limits": {
+      "external_timeout_seconds": 5400,
+      "process_rss_bytes": 5368709120,
+      "output_allocated_bytes": 2147483648,
+      "workspace_free_floor_bytes": 21474836480
+    },
+    "original_native_limits": "Unchanged benchmark source, original full arguments, field/working-byte/native/frame/source/Undo/history/cancellation/timer assertions and120second publication waits; current renderer implementation differs.",
+    "benchmark_source_sha256": "dd82b0435406f94e75f43b1836c41440b286a8fc29a80c76933820a465de5154",
+    "baseline_full_P1": "artifacts/sustained-current-20261111/full-p1/result.json",
+    "phase": "/home/blux/de-xr/dome-sculpt/artifacts/sustained-four-objects-shared-20261111",
+    "lock": "/tmp/dome-sculpt-arc-device.lock",
+    "pid": 231677,
+    "environment": {
+      "LD_LIBRARY_PATH": "/home/blux/de-xr/dome-sculpt/artifacts/sdk-20261111/toolkit-release/lib:/usr/lib64",
+      "DRI_PRIME": "pci-0000_03_00_0",
+      "EGL_PLATFORM": "surfaceless",
+      "MESA_SHADER_CACHE_DISABLE": "1",
+      "LP_NUM_THREADS": "2"
+    },
+    "lock_acquired_utc": "2026-11-11T18:22:16Z",
+    "child_pid": 231720,
+    "seconds": 273.15577294304967,
+    "peak_rss_bytes": 4941914112,
+    "allocated_output_bytes": 163762176,
+    "exit": 0,
+    "external_guard": null,
+    "protected_drift": [],
+    "result_status": "production-workload-pass",
+    "result_sha256": "ad1f5bcb82becf19bfcb1b9e17f66ca2a3c11746c6f05cab7ed6c5bd41dcd306",
+    "complete_planned_counts": true,
+    "completed_repetitions": 3,
+    "success": true,
+    "log_sha256": "2794e9f49f0d736f5a0194a7d9d5fa9e1efe038fed429ee42bcd8d32c8fad17b",
+    "script_sha256": "3f386c3ffc9756bb1a31507c8beca27c0acdc79e4f5e75bd7f9199056e8e2a46"
+  },
+  "options": {
+    "allocation_instrumentation": false,
+    "device": "arc",
+    "height": 768,
+    "held_pairs": 120,
+    "inventory_only": false,
+    "masks": 120,
+    "objects": 4,
+    "pairs": 2000,
+    "repetitions": 3,
+    "smoke": false,
+    "strokes": 300,
+    "tier": "production",
+    "voxel": 0.012500000186264515,
+    "width": 768
+  },
+  "initial_size": {
+    "chunks": 2528,
+    "retained_chunk_bytes": 228304233,
+    "scalar_bytes": 591728,
+    "stored_samples": 2354956,
+    "visible_triangles": 1035408,
+    "visible_vertices": 591728
+  },
+  "benchmark_source_unchanged": true,
+  "old_failed_result_sha256": "309abbe4b5c3d6d393a66bb098a7ce5306b0265fb3a8e643ef40cfe265dfc5c5",
+  "same_options_as_original_failed_four_object_run": true,
+  "link_receipt_sha256": "a181366b70ea067f54bab256b4d505b26f0807d3d896446a09cc8a63587f6794",
+  "device_initial": {
+    "authenticated": true,
+    "device_id": "0x56a0\n",
+    "device_major": 226,
+    "device_minor": 129,
+    "driver": "/sys/bus/pci/drivers/i915",
+    "open_fds": [
+      {
+        "fd": 4,
+        "target": "/dev/dri/renderD129"
+      },
+      {
+        "fd": 5,
+        "target": "/dev/dri/renderD129"
+      },
+      {
+        "fd": 6,
+        "target": "/dev/dri/renderD129"
+      },
+      {
+        "fd": 7,
+        "target": "/dev/dri/renderD129"
+      }
+    ],
+    "pci": "/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0",
+    "render_node": "/dev/dri/renderD129",
+    "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+    "requested": "arc",
+    "vendor": "Intel",
+    "vendor_id": "0x8086\n",
+    "version": "4.6 (Core Profile) Mesa 26.2.5"
+  },
+  "device_final": {
+    "authenticated": true,
+    "device_id": "0x56a0\n",
+    "device_major": 226,
+    "device_minor": 129,
+    "driver": "/sys/bus/pci/drivers/i915",
+    "open_fds": [
+      {
+        "fd": 4,
+        "target": "/dev/dri/renderD129"
+      },
+      {
+        "fd": 5,
+        "target": "/dev/dri/renderD129"
+      },
+      {
+        "fd": 6,
+        "target": "/dev/dri/renderD129"
+      },
+      {
+        "fd": 7,
+        "target": "/dev/dri/renderD129"
+      }
+    ],
+    "pci": "/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0",
+    "render_node": "/dev/dri/renderD129",
+    "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+    "requested": "arc",
+    "vendor": "Intel",
+    "vendor_id": "0x8086\n",
+    "version": "4.6 (Core Profile) Mesa 26.2.5"
+  },
+  "repetitions": [
+    {
+      "index": 0,
+      "counts": {
+        "stroke": 300,
+        "mask_mode": 2,
+        "mask": 120,
+        "mask_fill": 1,
+        "mask_clear": 1,
+        "view_pair": 2000,
+        "held_pair": 120,
+        "authored_placement": 2
+      },
+      "checkpoints": 14,
+      "history": {
+        "cancel_exact": true,
+        "ordered_save_reopen_exact": true,
+        "real_factory_return_barrier_reached": true,
+        "retired_native_generation_exact": true,
+        "undo_redo_exact": true
+      },
+      "warmup": {
+        "exact_undo": true,
+        "excluded_ns": 1094450766,
+        "real_strokes": 1
+      },
+      "view": {
+        "accepted_snapshot_caller_cpu_ns": {
+          "count": 0
+        },
+        "accepted_snapshot_ns": {
+          "count": 0
+        },
+        "caller_thread_cpu_ns": {
+          "count": 2000,
+          "max_ns": 3939456.0,
+          "mean_ns": 1329415.705,
+          "p50_ns": 1155685.0,
+          "p90_ns": 1840108.0,
+          "p95_ns": 2643498.0,
+          "p99_ns": 3617681.0
+        },
+        "first_draw_caller_cpu_ns": {
+          "count": 0
+        },
+        "first_draw_submission_ns": {
+          "count": 0
+        },
+        "wall_ns": {
+          "count": 2000,
+          "max_ns": 11609336.0,
+          "mean_ns": 9248244.6975,
+          "p50_ns": 9080941.0,
+          "p90_ns": 9741085.0,
+          "p95_ns": 10591550.0,
+          "p99_ns": 11345533.0
+        }
+      },
+      "held": {
+        "accepted_snapshot_caller_cpu_ns": {
+          "count": 0
+        },
+        "accepted_snapshot_ns": {
+          "count": 0
+        },
+        "caller_thread_cpu_ns": {
+          "count": 120,
+          "max_ns": 1390106.0,
+          "mean_ns": 948323.4833333333,
+          "p50_ns": 920829.0,
+          "p90_ns": 1176290.0,
+          "p95_ns": 1237822.0,
+          "p99_ns": 1334383.0
+        },
+        "first_draw_caller_cpu_ns": {
+          "count": 0
+        },
+        "first_draw_submission_ns": {
+          "count": 0
+        },
+        "wall_ns": {
+          "count": 120,
+          "max_ns": 8856859.0,
+          "mean_ns": 8489576.733333332,
+          "p50_ns": 8479532.0,
+          "p90_ns": 8575382.0,
+          "p95_ns": 8605561.0,
+          "p99_ns": 8680835.0
+        }
+      },
+      "gpu_timers": {
+        "counter_bits": 64,
+        "disjoint_observed": false,
+        "disjoint_supported": false,
+        "distribution_ns": {
+          "count": 2000,
+          "max_ns": 10977083.0,
+          "mean_ns": 8557285.8715,
+          "p50_ns": 8516458.0,
+          "p90_ns": 8827604.0,
+          "p95_ns": 9258906.0,
+          "p99_ns": 10239531.0
+        },
+        "distribution_qualified": true,
+        "expected_pairs": 2000,
+        "pending_after_bounded_drain": 0,
+        "reset_query_supported": true,
+        "reset_status": 0,
+        "skipped_indices": [],
+        "supported": true,
+        "valid_coverage": 1.0,
+        "valid_samples": 2000
+      }
+    },
+    {
+      "index": 1,
+      "counts": {
+        "stroke": 300,
+        "mask_mode": 2,
+        "mask": 120,
+        "mask_fill": 1,
+        "mask_clear": 1,
+        "view_pair": 2000,
+        "held_pair": 120,
+        "authored_placement": 2
+      },
+      "checkpoints": 14,
+      "history": {
+        "cancel_exact": true,
+        "ordered_save_reopen_exact": true,
+        "real_factory_return_barrier_reached": true,
+        "retired_native_generation_exact": true,
+        "undo_redo_exact": true
+      },
+      "warmup": {
+        "exact_undo": true,
+        "excluded_ns": 860255701,
+        "real_strokes": 1
+      },
+      "view": {
+        "accepted_snapshot_caller_cpu_ns": {
+          "count": 0
+        },
+        "accepted_snapshot_ns": {
+          "count": 0
+        },
+        "caller_thread_cpu_ns": {
+          "count": 2000,
+          "max_ns": 3957947.0,
+          "mean_ns": 1313603.566,
+          "p50_ns": 1152832.0,
+          "p90_ns": 1768934.0,
+          "p95_ns": 2512158.0,
+          "p99_ns": 3568370.0
+        },
+        "first_draw_caller_cpu_ns": {
+          "count": 0
+        },
+        "first_draw_submission_ns": {
+          "count": 0
+        },
+        "wall_ns": {
+          "count": 2000,
+          "max_ns": 11853478.0,
+          "mean_ns": 9235370.1585,
+          "p50_ns": 9085983.0,
+          "p90_ns": 9658412.0,
+          "p95_ns": 10464421.0,
+          "p99_ns": 11318180.0
+        }
+      },
+      "held": {
+        "accepted_snapshot_caller_cpu_ns": {
+          "count": 0
+        },
+        "accepted_snapshot_ns": {
+          "count": 0
+        },
+        "caller_thread_cpu_ns": {
+          "count": 120,
+          "max_ns": 1343646.0,
+          "mean_ns": 955204.6083333333,
+          "p50_ns": 964736.0,
+          "p90_ns": 1141882.0,
+          "p95_ns": 1208217.0,
+          "p99_ns": 1329310.0
+        },
+        "first_draw_caller_cpu_ns": {
+          "count": 0
+        },
+        "first_draw_submission_ns": {
+          "count": 0
+        },
+        "wall_ns": {
+          "count": 120,
+          "max_ns": 9011878.0,
+          "mean_ns": 8582285.741666667,
+          "p50_ns": 8578094.0,
+          "p90_ns": 8674030.0,
+          "p95_ns": 8698411.0,
+          "p99_ns": 8886766.0
+        }
+      },
+      "gpu_timers": {
+        "counter_bits": 64,
+        "disjoint_observed": false,
+        "disjoint_supported": false,
+        "distribution_ns": {
+          "count": 2000,
+          "max_ns": 11370625.0,
+          "mean_ns": 8563476.172,
+          "p50_ns": 8520000.0,
+          "p90_ns": 8805833.0,
+          "p95_ns": 9307968.0,
+          "p99_ns": 10260260.0
+        },
+        "distribution_qualified": true,
+        "expected_pairs": 2000,
+        "pending_after_bounded_drain": 0,
+        "reset_query_supported": true,
+        "reset_status": 0,
+        "skipped_indices": [],
+        "supported": true,
+        "valid_coverage": 1.0,
+        "valid_samples": 2000
+      }
+    },
+    {
+      "index": 2,
+      "counts": {
+        "stroke": 300,
+        "mask_mode": 2,
+        "mask": 120,
+        "mask_fill": 1,
+        "mask_clear": 1,
+        "view_pair": 2000,
+        "held_pair": 120,
+        "authored_placement": 2
+      },
+      "checkpoints": 14,
+      "history": {
+        "cancel_exact": true,
+        "ordered_save_reopen_exact": true,
+        "real_factory_return_barrier_reached": true,
+        "retired_native_generation_exact": true,
+        "undo_redo_exact": true
+      },
+      "warmup": {
+        "exact_undo": true,
+        "excluded_ns": 855544109,
+        "real_strokes": 1
+      },
+      "view": {
+        "accepted_snapshot_caller_cpu_ns": {
+          "count": 0
+        },
+        "accepted_snapshot_ns": {
+          "count": 0
+        },
+        "caller_thread_cpu_ns": {
+          "count": 2000,
+          "max_ns": 4028065.0,
+          "mean_ns": 1341410.6335,
+          "p50_ns": 1164086.0,
+          "p90_ns": 1882026.0,
+          "p95_ns": 2653488.0,
+          "p99_ns": 3608437.0
+        },
+        "first_draw_caller_cpu_ns": {
+          "count": 0
+        },
+        "first_draw_submission_ns": {
+          "count": 0
+        },
+        "wall_ns": {
+          "count": 2000,
+          "max_ns": 12174009.0,
+          "mean_ns": 9255936.5185,
+          "p50_ns": 9094421.0,
+          "p90_ns": 9765662.0,
+          "p95_ns": 10552680.0,
+          "p99_ns": 11360312.0
+        }
+      },
+      "held": {
+        "accepted_snapshot_caller_cpu_ns": {
+          "count": 0
+        },
+        "accepted_snapshot_ns": {
+          "count": 0
+        },
+        "caller_thread_cpu_ns": {
+          "count": 120,
+          "max_ns": 1353781.0,
+          "mean_ns": 925350.3416666667,
+          "p50_ns": 890319.0,
+          "p90_ns": 1184032.0,
+          "p95_ns": 1276486.0,
+          "p99_ns": 1347954.0
+        },
+        "first_draw_caller_cpu_ns": {
+          "count": 0
+        },
+        "first_draw_submission_ns": {
+          "count": 0
+        },
+        "wall_ns": {
+          "count": 120,
+          "max_ns": 8764613.0,
+          "mean_ns": 8586768.508333333,
+          "p50_ns": 8585144.0,
+          "p90_ns": 8666137.0,
+          "p95_ns": 8679098.0,
+          "p99_ns": 8715268.0
+        }
+      },
+      "gpu_timers": {
+        "counter_bits": 64,
+        "disjoint_observed": false,
+        "disjoint_supported": false,
+        "distribution_ns": {
+          "count": 2000,
+          "max_ns": 11568489.0,
+          "mean_ns": 8567080.1075,
+          "p50_ns": 8533697.0,
+          "p90_ns": 8803541.0,
+          "p95_ns": 9183697.0,
+          "p99_ns": 10090937.0
+        },
+        "distribution_qualified": true,
+        "expected_pairs": 2000,
+        "pending_after_bounded_drain": 0,
+        "reset_query_supported": true,
+        "reset_status": 0,
+        "skipped_indices": [],
+        "supported": true,
+        "valid_coverage": 1.0,
+        "valid_samples": 2000
+      }
+    }
+  ],
+  "timing_limits": "Observed offscreen768 uncapped stereo pairs with concurrent CPU development; not isolated GPU busy percent or physical-HMD pacing.",
+  "completed_counts": {
+    "stroke": 900,
+    "mask_mode": 6,
+    "mask": 360,
+    "mask_fill": 3,
+    "mask_clear": 3,
+    "view_pair": 6000,
+    "held_pair": 360,
+    "authored_placement": 6
+  },
+  "independent_checkpoints": 42,
+  "grouped_regression": {
+    "checked_scalars": 5092,
+    "exact_frame_modes": 3,
+    "kind": "original_grouped_regression",
+    "observer_ns_excluded": 130681406,
+    "ordered_corners": 52008,
+    "raw_write_ns_excluded": 38644,
+    "repetition": 0,
+    "sequence": 0,
+    "typed_queries": 4,
+    "whole_extraction_and_checks_ns": 23064898
+  },
+  "protected_inputs_rechecked": 3739,
+  "input_drift": [],
+  "archive": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/sustained-four-objects-shared-evidence-20261111.tar.gz",
+    "sha256": "0a8684f26b2d84ff45d8f14bd9790f10eb7e06f10100ddeecb695b8e6989259a",
+    "members": 12,
+    "bytes": 45518325,
+    "all_member_content_sha256_verified": true
+  }
+}

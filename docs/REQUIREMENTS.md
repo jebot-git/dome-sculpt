@@ -9,6 +9,11 @@ Read [RESUMED-PROGRESS-20261111.md](RESUMED-PROGRESS-20261111.md) for the
 current renderer recovery findings, original four-object failure and private
 fix/qualification boundaries.
 
+The private COW candidate now passes the full original four-object workload;
+fresh nativeDocument reopening exposes a separate reader-sharing failure. Read
+[SCULPT-FOUR-OBJECT-P1-20261111.md](SCULPT-FOUR-OBJECT-P1-20261111.md) for exact
+proof and the unqualified follow-on reader candidate.
+
 Main `3eb77a8a` retains qualified native GPU painting and ordered sculpt batching.
 Private preview `f47348eb` now composes with it at `ccb2b7b5` in
 `artifacts/preview-arena-integration-20261111`. Fresh coherent Release/SAN owning
