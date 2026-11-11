@@ -26,8 +26,24 @@ they select different original UV1/image coordinates from the separate nonunifor
 writable UV0 FLOAT field. A new27th assertion rejects a forged second affine in
 the typed image role, retaining the existing ownership contract.
 
-This source child is unqualified until complete new emission-bake-source.cpp
-and fixture translation units replace the matching193-member4977 core member
-and fresh test ELF under exact source/header/provider pins. No frozen4977/5bb
-source, provider or previous failure artifact is modified. Actual public app/
-stereo/high-range final framebuffer tests remain separate.
+Frozen source63c3199d now has a terminal0 Release closure: both complete
+translation units, one complete member replacement in the193-member current4977
+core,192 byte-exact untouched members,103 byte-exact public headers and exact
+source/provider pins. Source27, original worker16417, public fixture producer32794
+and all seven complete native inspectors pass with original deadlines; source/
+provider drift is empty. Accepted/redone and original/undone endpoints are exact.
+Desktop slider-roundtrip and XR defaults happen to produce identical native
+endpoints for this actual fixture, rather than being assumed equal.
+
+The adjacent Release JSON pins exact source/core/ELFs/logs and durable evidence.
+The earlier8b-vs223 actual legacy1 export regression also passed32 old controls:
+whole/subset/second-cycle GLBs and logs are byte-exact, preserving v1 wire/data.
+Its separate legacy-v1-byte-compare-v1 receipt retains both binary/source identities;
+no cross-ABI linking was performed.
+
+This milestone validates callback27 and actual plain-source/default producer
+workflows. It does not qualify full UV1 or typed-source Document Bake adoption.
+Those real worker/Save/history/export cases are the next separate test child.
+Actual public app/stereo/high-range final framebuffer tests and strict sanitizer
+corrected-source closure remain separate. No frozen4977/5bb source/provider or
+original failure artifact is changed by this documentation child.

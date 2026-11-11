@@ -1,0 +1,152 @@
+{
+  "schema": 1,
+  "product_source": "63c3199dc0ca3889156bf7ee4a9920000c19ba30",
+  "matching_root_product_source": "4977fb320afcc9b4d0ed486d4152c62b8018c324",
+  "scope": "Release native source callback27, original worker16417 and default public fixture producer32794/full native inspectors; no actual typed-source Bake worker, application, final renderer, GPU or sanitizer admission.",
+  "artifact_root": "/home/blux/de-xr/dome-sculpt/artifacts/radiance-bake-source-resolution-proof-20261112",
+  "public_headers_byte_exact": 103,
+  "core_member_count": 193,
+  "complete_members_replaced": 1,
+  "unchanged_members_verified": 192,
+  "core_sha256": "8dcf0ee51b5070076f0b9b30bdc655ed6ee055130441cc3635b8dd25fb157d81",
+  "root_core_sha256": "8a3a7fd7b3db54b8d71d816841a69f88c10bea75859d2f7aa48681be88366df2",
+  "cases": [
+    {
+      "name": "source-controls",
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/radiance-bake-source-resolution-proof-20261112/release-v1/dome-sculpt-baked-emission-workflow-test",
+        "--source-controls"
+      ],
+      "native_exit": 0,
+      "deadline": 60,
+      "log_sha256": "ab73a85e4061866266085d9ea5efa44ce266e860b57fba3c712bd9210a52ae49"
+    },
+    {
+      "name": "original-worker",
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/radiance-bake-source-resolution-proof-20261112/release-v1/dome-sculpt-baked-emission-workflow-test",
+        "/home/blux/de-xr/dome-sculpt/artifacts/radiance-bake-source-resolution-proof-20261112/native-release-v1/worker"
+      ],
+      "native_exit": 0,
+      "deadline": 900,
+      "log_sha256": "536147bd07f4599ce084da08c68ff6a90df3f2f2bffc3968db5dbe39fc3606c3"
+    },
+    {
+      "name": "public-fixtures",
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/radiance-bake-source-resolution-proof-20261112/release-v1/dome-sculpt-baked-emission-workflow-test",
+        "--public-fixtures",
+        "/home/blux/de-xr/dome-sculpt/artifacts/radiance-bake-source-resolution-proof-20261112/native-release-v1/fixtures"
+      ],
+      "native_exit": 0,
+      "deadline": 900,
+      "log_sha256": "e26b5858ea586a0ccd2bb83aec1e07858051e25e72cf93611f41c275b105c000"
+    },
+    {
+      "name": "inspect-desktop-accepted",
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/radiance-bake-source-resolution-proof-20261112/release-v1/dome-sculpt-baked-emission-workflow-test",
+        "--inspect",
+        "/home/blux/de-xr/dome-sculpt/artifacts/radiance-bake-source-resolution-proof-20261112/native-release-v1/fixtures/desktop-accepted.dsculpt"
+      ],
+      "native_exit": 0,
+      "deadline": 60,
+      "log_sha256": "07982f326d0f21ac1fd08f927877d62b97777387660e8d86ef877cb982ee4d91"
+    },
+    {
+      "name": "inspect-desktop-redone",
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/radiance-bake-source-resolution-proof-20261112/release-v1/dome-sculpt-baked-emission-workflow-test",
+        "--inspect",
+        "/home/blux/de-xr/dome-sculpt/artifacts/radiance-bake-source-resolution-proof-20261112/native-release-v1/fixtures/desktop-redone.dsculpt"
+      ],
+      "native_exit": 0,
+      "deadline": 60,
+      "log_sha256": "07982f326d0f21ac1fd08f927877d62b97777387660e8d86ef877cb982ee4d91"
+    },
+    {
+      "name": "inspect-desktop-undone",
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/radiance-bake-source-resolution-proof-20261112/release-v1/dome-sculpt-baked-emission-workflow-test",
+        "--inspect",
+        "/home/blux/de-xr/dome-sculpt/artifacts/radiance-bake-source-resolution-proof-20261112/native-release-v1/fixtures/desktop-undone.dsculpt"
+      ],
+      "native_exit": 0,
+      "deadline": 60,
+      "log_sha256": "46b263a4cd660c44c3ac5afd38d8123f7faf702454418fe98ccb0c33587c746f"
+    },
+    {
+      "name": "inspect-original",
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/radiance-bake-source-resolution-proof-20261112/release-v1/dome-sculpt-baked-emission-workflow-test",
+        "--inspect",
+        "/home/blux/de-xr/dome-sculpt/artifacts/radiance-bake-source-resolution-proof-20261112/native-release-v1/fixtures/original.dsculpt"
+      ],
+      "native_exit": 0,
+      "deadline": 60,
+      "log_sha256": "46b263a4cd660c44c3ac5afd38d8123f7faf702454418fe98ccb0c33587c746f"
+    },
+    {
+      "name": "inspect-xr-accepted",
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/radiance-bake-source-resolution-proof-20261112/release-v1/dome-sculpt-baked-emission-workflow-test",
+        "--inspect",
+        "/home/blux/de-xr/dome-sculpt/artifacts/radiance-bake-source-resolution-proof-20261112/native-release-v1/fixtures/xr-accepted.dsculpt"
+      ],
+      "native_exit": 0,
+      "deadline": 60,
+      "log_sha256": "07982f326d0f21ac1fd08f927877d62b97777387660e8d86ef877cb982ee4d91"
+    },
+    {
+      "name": "inspect-xr-redone",
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/radiance-bake-source-resolution-proof-20261112/release-v1/dome-sculpt-baked-emission-workflow-test",
+        "--inspect",
+        "/home/blux/de-xr/dome-sculpt/artifacts/radiance-bake-source-resolution-proof-20261112/native-release-v1/fixtures/xr-redone.dsculpt"
+      ],
+      "native_exit": 0,
+      "deadline": 60,
+      "log_sha256": "07982f326d0f21ac1fd08f927877d62b97777387660e8d86ef877cb982ee4d91"
+    },
+    {
+      "name": "inspect-xr-undone",
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/radiance-bake-source-resolution-proof-20261112/release-v1/dome-sculpt-baked-emission-workflow-test",
+        "--inspect",
+        "/home/blux/de-xr/dome-sculpt/artifacts/radiance-bake-source-resolution-proof-20261112/native-release-v1/fixtures/xr-undone.dsculpt"
+      ],
+      "native_exit": 0,
+      "deadline": 60,
+      "log_sha256": "46b263a4cd660c44c3ac5afd38d8123f7faf702454418fe98ccb0c33587c746f"
+    }
+  ],
+  "exact_endpoints": {
+    "desktop-undone": true,
+    "xr-undone": true,
+    "desktop-redo": true,
+    "xr-redo": true
+  },
+  "default_desktop_xr_equal": true,
+  "input_drift": [],
+  "evidence": {
+    "build-v1.py": "0acc2144b50318c798f108bd68bc522ef4b2c6f5bf0c7ab103eb7548b1cc2e26",
+    "run-native-v1.py": "f277228df67f355e9e20a85c17c3d20d123362f7563edc0aa6e623ecd3ca907a",
+    "release-v1/status.json": "8e50d58a7eb703bc980b22f341b8933774e85dc15c263ae3f96f4606af4a6198",
+    "release-v1/inputs-before.json": "bb2734a21e3d83b49dbed82b704f3339f143c252e3b15cfb4a0cc8f9c8f0458c",
+    "release-v1/inputs-after.json": "bb2734a21e3d83b49dbed82b704f3339f143c252e3b15cfb4a0cc8f9c8f0458c",
+    "native-release-v1/status.json": "50df39ca6bc289969ed25bfdae769660afcdf32c630e7000207825f47815ca08",
+    "native-release-v1/inputs-before.json": "fa68b8f34b60c8ab7dfcdc6cd4b386822b98e1d9662673d255c8c1a6ecbc14c5",
+    "native-release-v1/inputs-after.json": "fa68b8f34b60c8ab7dfcdc6cd4b386822b98e1d9662673d255c8c1a6ecbc14c5"
+  },
+  "failures_preserved": {
+    "fixture_uv1_unpaired": "radiance-bake-current-native-proof-20261111/native-release-v1/source-controls.log",
+    "actual_unresolved_uv1_callback": "radiance-bake-current-native-proof-20261111/native-release-v2/source-controls.log"
+  },
+  "legacy_v1_bytes": "radiance-bake-fallback2-proof-20261111/legacy-v1-byte-compare-v1/status.json",
+  "remaining": [
+    "actual UV1 original/typed-source Document Bake adoption/history/Save/export",
+    "fresh current public desktop/stereo actual application",
+    "final high-range SurfaceRenderer behavior",
+    "strict sanitizer corrected-source closure"
+  ]
+}
