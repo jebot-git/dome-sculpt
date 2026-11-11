@@ -29,11 +29,14 @@ std::shared_ptr<const MeshSnapshot> publish(Document&doc,const Scene&s){doc.repl
 void render(SurfaceRenderer&r,const std::shared_ptr<const MeshSnapshot>&f,bool deferred){r.draw(f,{},identity,{0,0,2},96,96,true);if(deferred)r.resolve();}
 void case_check(BakedEmissionSample sample,float strength,float background,bool covered,bool deferred,bool outline=false,float alpha=1,float expected_red=-1){
  auto s=native_source(sample,strength,background,covered,outline,alpha);const auto original=s.encode();check(Scene::decode(original).encode()==original,"Full native FLOAT field and material restart exactly");Document doc;auto frame=publish(doc,s);SurfaceRenderer r;r.set_frame_time(0);r.set_deferred_resolve(deferred);r.set_output_encoding(SurfaceOutputEncoding::Linear);FloatTarget target;target.bind();render(r,frame,deferred);auto pixel=target.sample();std::cout<<"CASE strength="<<strength<<" background="<<background<<" covered="<<covered<<" deferred="<<deferred<<" outline="<<outline<<" alpha="<<alpha<<" expected_red="<<expected_red<<" pixel="<<pixel[0]<<","<<pixel[1]<<","<<pixel[2]<<","<<pixel[3]<<std::endl;
- if(covered)check(std::abs(pixel[0]-.5f)<.004f&&pixel[1]==0&&pixel[2]==0&&pixel[3]==1,"Opaque-alpha foreground survives real HDR overdraw without NaN contamination");
+ // This deliberately coplanar double-sided outline fixture uses LEQUAL;
+ // its back-face outline also covers the center. Green is correct there.
+ if(outline)check(pixel[0]<.01f&&pixel[1]>.99f&&pixel[2]<.01f&&pixel[3]==1,"Coplanar outline center retains its declared green material");
+ else if(covered)check(std::abs(pixel[0]-.5f)<.004f&&pixel[1]==0&&pixel[2]==0&&pixel[3]==1,"Opaque-alpha foreground survives real HDR overdraw without NaN contamination");
  else if(expected_red>=0)check(std::abs(pixel[0]-expected_red)<std::max(.003f,expected_red*.003f),"Finite HDR times small alpha preserves independent physical product before HALF storage");
  else check(pixel[0]>=60000&&std::abs(pixel[2]-2)<.004f&&pixel[3]==1,"Large positive emission remains bright and preserves independent finite channels");
  if(outline){auto border=target.sample(9,48);check(border[0]<.01f&&border[1]>.99f&&border[2]<.01f&&border[3]==1,"Zero-lighting-mix green outline survives large-emission shading");}
- {Fbo display;r.set_output_encoding(SurfaceOutputEncoding::Srgb);display.bind();render(r,frame,deferred);auto p=at(read());if(covered)check(close(p,{188,0,0,255},2),"Actual sRGB foreground remains red after HDR background");else if(expected_red<0)check(p[0]>=250&&p[1]<=1&&p[2]>=250,"Actual sRGB presentation saturates bright radiance instead of turning black");}
+ {Fbo display;r.set_output_encoding(SurfaceOutputEncoding::Srgb);display.bind();render(r,frame,deferred);auto p=at(read());if(covered)check(close(p,{188,0,0,255},2),"Actual sRGB foreground remains red after HDR background");else if(outline)check(close(p,{0,255,0,255},2),"Actual sRGB coplanar outline retains green");else if(expected_red<0)check(p[0]>=250&&p[1]<=1&&p[2]>=250,"Actual sRGB presentation saturates bright radiance instead of turning black");}
  check(s.encode()==original&&doc.copy_scene().encode()==original,"Display handling preserves exact full native coefficients, material and scene authority");
 }
 }
