@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/bake-authoring.hpp"
 #include "dome/bake-distance.hpp"
+#include "dome/material-bindings.hpp"
 #include "dome/document.hpp"
 #include "dome/gltf-export.hpp"
 #include "emission-bake-source.hpp"
@@ -66,6 +67,64 @@ void quality_oracle(const detail::GltfDocument &d,const EmissionInterchangeImage
  check(std::abs(static_cast<long double>(f.at("maximumRelativeError").get<double>())-maximum_relative)<=precision*std::max(1.L,maximum_relative),"reported dimensionless ratio agrees with independent extended-precision oracle");
  check(f.at("erasedNonzeroSamples")==erased&&erased==0,"measured current fallback retains every nonzero sample in this actual HDR/tiny-value fixture");
 }
+void source_controls(){
+  Scene scene;auto &source=scene.active();source.mesh_active=true;
+  auto maps=std::make_shared<PaintSourceMaps>();maps->color.image=std::make_shared<const Image>(image({255,255,255,255}));
+  maps->uv1=std::make_shared<const std::vector<std::array<float,2>>>(std::vector<std::array<float,2>>{{1,0},{0,0},{0,1},{1,1}});
+  source.painted=PaintedMesh::from_maps(quad(),maps,64);
+  const float coverage=.25f;
+  BakedTextures baked;baked.maps.color=image({24,65,117,255});baked.maps.metal_rough=image({177,42,99,255});baked.coverage.assign(4096,255);
+  std::vector<BakedEmissionSample> field(4096);
+  for(size_t i=0;i<field.size();++i)field[i]={{coverage*.25f,coverage*.5f,0},{coverage*(50000+32*float(i%64)),coverage*.00001f*float(i/64+1),coverage*2},coverage};
+  baked.emission_field=BakedEmissionField::create(64,std::move(field));
+  source.painted->install_bake(std::move(baked));
+  auto texture=std::make_shared<const Image>(Image{2,2,{255,0,255,255,0,255,0,255,0,0,0,255,255,255,255,255}});
+  auto binding=std::make_shared<SourceMaterialBindings>();
+  binding->material.parameters.emission={.25f,.5f,.75f};
+  binding->native_reference.emission={.2f,.3f,.4f};source.material.emissive={.4f,.15f,.4f};
+  auto &slot=binding->material.textures[size_t(MToonSlot::Emission)];slot.index=0;slot.texcoord=1;slot.offset={-.5f,0};slot.encoding=MToonEncoding::Srgb;
+  auto &role=binding->roles[size_t(MToonSlot::Emission)];role.image=texture;role.mag_filter=role.min_filter=9728;role.wrap_s=role.wrap_t=10497;
+  const std::array<float,3> bary{.75f,.125f,.125f};
+  auto expected=[&](float strength,std::array<double,3> background){
+    std::array<double,3> result;const std::array<double,3> legacy{coverage*.25f,coverage*.5f,0},absolute{12624,coverage*.00001f*8.5,coverage*2};
+    // Actual writable UV0=(.25,.125) bilinearly averages x15/16,y7/8.
+    // The authored affine source field therefore gives red12624 and green
+    // coverage*1e-5*8.5 independently from the alternate image's UV1.
+    for(size_t k=0;k<3;++k)result[k]=background[k]*(1-coverage)+legacy[k]*strength+absolute[k];
+    return result;
+  };
+  auto matches=[&](const auto &actual,const auto &wanted){for(size_t k=0;k<3;++k)check(std::isfinite(actual[k])&&std::abs(double(actual[k])-wanted[k])<=std::max(1e-10,std::abs(wanted[k])*2e-6),"actual immutable source sampler agrees with independent typed/absolute/coverage oracle");};
+  const auto held_paint=source.painted;
+  auto original_roles=std::make_shared<PaintSourceMaps>(*maps);auto &original_emission=original_roles->emission;
+  original_emission.image=texture;original_emission.texcoord=1;original_emission.uv_transform={1,0,0,1,-.5f,0};original_emission.mag_filter=original_emission.min_filter=9728;original_emission.wrap_s=original_emission.wrap_t=10497;
+  source.painted=PaintedMesh::from_maps(quad(),original_roles,64);source.painted->install_bake(*held_paint->baked());source.material.emissive={2,4,8};
+  const auto original=detail::emission_bake_source(source);check(bool(original),"PBR source samples its actual independently owned alternate-UV texture role");
+  matches(original(0,bary),expected(1,{2,0,8}));
+  source.painted=held_paint;source.material.emissive={.4f,.15f,.4f};
+  for(const float strength:{0.f,.5f,3.5f}){
+    auto current=std::make_shared<SourceMaterialBindings>(*binding);current->material.parameters.emission_strength=strength;source.material_bindings=current;
+    const auto sampler=detail::emission_bake_source(source);check(bool(sampler),"genuine FLOAT source remains sampleable at zero and nonunit typed strength");
+    // Authored UV1 at this exact triangle barycentric is(.75,.125); the typed
+    // offset selects image texel(0,0)=(1,0,1). UV0 would select green texel(1,0).
+    // Typed/current native correction is(.5,.25,.75), before strength.
+    matches(sampler(0,bary),expected(strength,{.5*strength,0,.75*strength}));
+  }
+  auto current=std::make_shared<SourceMaterialBindings>(*binding);current->material.parameters.emission_strength=3.5f;current->physical_emission=std::array<float,3>{3,4,5};source.material_bindings=current;
+  const auto fixed=detail::emission_bake_source(source);matches(fixed(0,bary),expected(3.5f,{3,4,5}));
+  auto zero=std::make_shared<SourceMaterialBindings>(*current);zero->material.parameters.emission_strength=0;zero->physical_emission=std::array<float,3>{0,0,0};source.material_bindings=zero;
+  const auto zero_sample=detail::emission_bake_source(source);matches(zero_sample(0,bary),expected(0,{0,0,0}));
+  const auto held=fixed(0,bary);source.material.emissive={};source.painted->clear_bake();source.material_bindings={};
+  check(fixed(0,bary)==held,"captured source material/field/UV owners remain immutable after original source replacement");
+  bool caught=false;try{fixed(2,bary);}catch(const std::out_of_range&){caught=true;}
+  check(caught,"source sampler refuses an actual out-of-range source triangle");
+  bool cancelled=false;source.material_bindings=current;
+  const auto cancellable=detail::emission_bake_source(source,[&]{return cancelled;});cancelled=true;caught=false;
+  try{cancellable(0,bary);}catch(const std::exception&){caught=true;}
+  check(caught,"late cancellation is polled by the owning source sampler");
+  auto animated=std::make_shared<SourceMaterialBindings>(*current);animated->material.parameters.scroll={.1f,0};source.material_bindings=animated;caught=false;
+  try{detail::emission_bake_source(source);}catch(const std::invalid_argument&){caught=true;}
+  check(caught,"animated typed source still requires explicit time freezing, not implicit time zero");
+}
 // New producer modes supply real native files and independent numeric oracles
 // for ordinary app tests. They never observe or manipulate the application.
 void public_endpoint(const Fixture &f,const ObjectBakeSettings &settings,
@@ -116,13 +175,16 @@ void public_fixtures(const std::filesystem::path &directory){
 } // namespace
 int main(int argc,char **argv)try{
   using namespace dome;
+  if(argc==2&&std::string_view(argv[1])=="--source-controls"){
+    source_controls();std::cout<<"Baked emission source "<<checks<<" checks PASS\n";return 0;
+  }
   if(argc==3&&std::string_view(argv[1])=="--inspect"){
     std::cout<<Scene::load(argv[2]).encode().dump()<<'\n';return 0;
   }
   if(argc==3&&std::string_view(argv[1])=="--public-fixtures"){
     public_fixtures(argv[2]);std::cout<<"Baked emission public producer "<<checks<<" checks PASS\n";return 0;
   }
-  if(argc!=2)throw std::invalid_argument("baked-emission-workflow output-directory | --inspect FILE | --public-fixtures DIRECTORY");
+  if(argc!=2)throw std::invalid_argument("baked-emission-workflow output-directory | --inspect FILE | --public-fixtures DIRECTORY | --source-controls");
   const auto directory=std::filesystem::path(argv[1]);std::filesystem::create_directories(directory);
   auto f=fixture();const auto before=f.scene.encode();const auto source=f.scene.object(f.source).painted;
   const auto source_value=source->encode();const auto target_layers=f.scene.active().painted->layers();
