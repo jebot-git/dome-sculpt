@@ -51,6 +51,11 @@ def drive_case(name,mode,source_key,expected_key,target,set_id):
     try:actual=inspect(project,env)
     except subprocess.CalledProcessError:actual=None
     if actual==wanted:
+     if history:
+      root_step,close_step={'accepted':(39,43),'undone':(55,57),'redone':(69,71)}[marker]
+      root=state.get('field_root_visible',{}).get(str(root_step),{});closed=state.get('field_menu_closed',{}).get(str(close_step),{})
+      check(root.get('save_selected') is True and root.get('redo_enabled') is (marker=='undone') and root.get('redo_disabled') is (marker!='undone') and root.get('last',0)-root.get('first',0)>=2,name+': '+marker+' public ROOT shows selected Save and the exact history availability')
+      check(closed.get('root_title') is False and closed.get('panel_present') is False and closed.get('last',0)-closed.get('first',0)>=2,name+': '+marker+' public palette disappears after the Save press')
      check(True,name+': actual controller '+marker+' Save reaches the complete exact native endpoint')
      check(same_sibling(original,actual,set_id),name+': '+marker+' preserves every sibling field byte')
      (gates/marker).write_text('Actual native Save inspected and matched\n');stamp=project.stat().st_mtime_ns;break
