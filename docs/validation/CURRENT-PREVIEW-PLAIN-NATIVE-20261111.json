@@ -1,0 +1,279 @@
+{
+  "state": "genuine-plain-native-producer-qualified",
+  "date": "2026-11-11",
+  "test_source": "b795e0e7e4963e16ef636f0d933e07eae577fce7",
+  "product_source": "b6e366fd8c45829b00bc1d1327ecdfc25aeedf49",
+  "DomeD_SDK_source": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "Fresh whole producer TU/link per profile against audited b6 current-TextureMaps-ABI core. Actual plain Document packet selection/native history and hardware ColorBlur with independent pixel oracle. No SurfaceRenderer/current-grid GPU-resolve, app GUI/XR draw or wholefresh app/core claim.",
+  "product_tree_equal_to_frozen_b6": true,
+  "original_source_workflow_body_preserved": true,
+  "original_source_workflow_not_reexecuted_here": true,
+  "old_GUI10_XR39_runtime_and_source_font_oracles_unchanged": true,
+  "profiles": {
+    "release": {
+      "build": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/current-preview-public-proof-20261111/producer-b6-release/status.json",
+        "sha256": "32f80192db381d311bd8b2e95cbf70809a8ba1fabdcc89be952326f770ddae6f"
+      },
+      "status": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/current-preview-public-proof-20261111/plain-b6-release-v1/status.json",
+        "sha256": "cdba7e3e240755e938513c883623b9252a06c02d9ff042498f41b42d8fa9e525"
+      },
+      "whole_fresh_producer_TUs": 1,
+      "fresh_links": 1,
+      "producer_ELF": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/current-preview-public-proof-20261111/producer-b6-release/dome-sculpt-plain-workflow-fixture",
+        "sha256": "edf570d585d1c745234c9f47bb828928ee4b29e983e86ec40516c5c166561dda"
+      },
+      "core_provider": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-shared-qualification-20261111/release/libdome-sculpt-core.a",
+        "sha256": "291c9c75a34ae22663b204f68f95b3e4206ff60562cb542da2a3ec7946cd06c9",
+        "qualification_receipt": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-shared-qualification-20261111/release-status.json",
+        "qualification_sha256": "819aed2770a7bd15e58892d5d12ae476610496dfa18405920148b98d21ea25fb"
+      },
+      "native_checks": 67677,
+      "manifest_checks_before_final_write": 67676,
+      "seconds": 0.1909820350119844,
+      "peak_RSS": 76447744,
+      "critical_observed": [
+        "consumer",
+        "observer",
+        "system_EGL",
+        "system_gallium"
+      ],
+      "actual_device_reports": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/current-preview-public-proof-20261111/plain-b6-release-v1/actual-device/egl-query-0/device.txt": "681ad24b81aaa3d954e466092fe2d461629e24bd83b9926ec753db1c83d178f2"
+      },
+      "actual_context_maps": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/current-preview-public-proof-20261111/plain-b6-release-v1/actual-device/egl-query-0/context-maps.txt": "4c8550c28758b4b858571b2c5eed45fb8869ac811dca99379077498cc13dcb32"
+      },
+      "external_FD_sampler": {
+        "evidence": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/current-preview-public-proof-20261111/plain-b6-release-v1/readable-DRI.json",
+          "sha256": "9dd53693cdbd44caeb21000f05b4b48912d96b5012352e04615840bc3964cbda"
+        },
+        "live_descriptors_observed": [
+          {
+            "fd": "3",
+            "target": "/dev/dri/renderD129",
+            "rdev": 57985,
+            "major": 226,
+            "minor": 129
+          },
+          {
+            "fd": "4",
+            "target": "/dev/dri/renderD129",
+            "rdev": 57985,
+            "major": 226,
+            "minor": 129
+          },
+          {
+            "fd": "5",
+            "target": "/dev/dri/renderD129",
+            "rdev": 57985,
+            "major": 226,
+            "minor": 129
+          },
+          {
+            "fd": "6",
+            "target": "/dev/dri/renderD129",
+            "rdev": 57985,
+            "major": 226,
+            "minor": 129
+          }
+        ],
+        "sampled_live_window": true
+      },
+      "in_context_live_FD_witness": {
+        "source": "Actual GL renderer-query observer enumerates /proc/self/fd and fstats selected node rdev; requires nonempty match, logs read_symlink targets at current nonzero EGL context.",
+        "actual_FDs": [
+          {
+            "fd": 3,
+            "target": "/dev/dri/renderD129"
+          },
+          {
+            "fd": 4,
+            "target": "/dev/dri/renderD129"
+          },
+          {
+            "fd": 5,
+            "target": "/dev/dri/renderD129"
+          },
+          {
+            "fd": 6,
+            "target": "/dev/dri/renderD129"
+          }
+        ],
+        "log": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/current-preview-public-proof-20261111/plain-b6-release-v1/process.log",
+          "sha256": "9ec3cda7b7e288fe915f63adc9c220eba95c432bc20e78a54f0439056bd63bfb"
+        }
+      },
+      "mapped_ELFs": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/current-preview-public-proof-20261111/plain-b6-release-v1/mapped-ELFs.json",
+        "sha256": "5ddb44f9a464e3470ea78196124b926fc2d452ff2f2ee6235b43867b91191794"
+      },
+      "manifest": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/current-preview-public-proof-20261111/plain-b6-release-v1/native/manifest.json",
+        "sha256": "3159714e844419fee87380c4707202eb1004b8c75c8a7607473e7c95037f8864"
+      },
+      "native_files": {
+        "accepted": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/current-preview-public-proof-20261111/plain-b6-release-v1/native/accepted.dsculpt",
+          "sha256": "4ee109172943e381108637404c16558b0d49bd1569e70fb542d55fa98bc1bb1a"
+        },
+        "original": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/current-preview-public-proof-20261111/plain-b6-release-v1/native/original.dsculpt",
+          "sha256": "0ae76f7679a0de2fd993179f7e702928b34a0e6c3761daa0cfff56c3216ab678"
+        }
+      },
+      "input_output_provider_drift": []
+    },
+    "sanitize": {
+      "build": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/current-preview-public-proof-20261111/producer-b6-sanitize/status.json",
+        "sha256": "2f5cb14a1cd8c2b9ffd532ab8c942b9d777675eeb9353f0cf5d346ca1c7bf7ff"
+      },
+      "status": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/current-preview-public-proof-20261111/plain-b6-sanitize-v1/status.json",
+        "sha256": "6e5fea73e661e110edfa14168351fedb882abe5b0d75e40861a92756c9c17c7b"
+      },
+      "whole_fresh_producer_TUs": 1,
+      "fresh_links": 1,
+      "producer_ELF": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/current-preview-public-proof-20261111/producer-b6-sanitize/dome-sculpt-plain-workflow-fixture",
+        "sha256": "b089185b5f05d8d7e5ad34bfc0f0e10c5f890bdce4b4db6ae10a99d2ec798806"
+      },
+      "core_provider": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-shared-qualification-20261111/sanitize/libdome-sculpt-core.a",
+        "sha256": "b1812ec010feda7f879ab2cce8e4b3321f192afc909e2a3492bf3433e4a85f78",
+        "qualification_receipt": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-shared-qualification-20261111/sanitize-status.json",
+        "qualification_sha256": "d8bea0491c17151214e81bcebafbdace84a4056b364e8f5bc721f8040debb845"
+      },
+      "native_checks": 67677,
+      "manifest_checks_before_final_write": 67676,
+      "seconds": 0.40650597104104236,
+      "peak_RSS": 520036352,
+      "critical_observed": [
+        "consumer",
+        "observer",
+        "system_EGL",
+        "system_gallium"
+      ],
+      "actual_device_reports": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/current-preview-public-proof-20261111/plain-b6-sanitize-v1/actual-device/egl-query-0/device.txt": "70479f270da23048633d4e3665dcb554d19a4f1a15567e2fc239a1170d824860"
+      },
+      "actual_context_maps": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/current-preview-public-proof-20261111/plain-b6-sanitize-v1/actual-device/egl-query-0/context-maps.txt": "185f507ce091004311bbe3cede6f07102f42759d96dd3634e64556c88c219f47"
+      },
+      "external_FD_sampler": {
+        "evidence": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/current-preview-public-proof-20261111/plain-b6-sanitize-v1/readable-DRI.json",
+          "sha256": "774256484d0cc1683c1074d58ec6353448cac03c5b0e69d50050c1900ebc4f28"
+        },
+        "live_descriptors_observed": [],
+        "sampled_live_window": false
+      },
+      "in_context_live_FD_witness": {
+        "source": "Actual GL renderer-query observer enumerates /proc/self/fd and fstats selected node rdev; requires nonempty match, logs read_symlink targets at current nonzero EGL context.",
+        "actual_FDs": [
+          {
+            "fd": 3,
+            "target": "/dev/dri/renderD129"
+          },
+          {
+            "fd": 4,
+            "target": "/dev/dri/renderD129"
+          },
+          {
+            "fd": 5,
+            "target": "/dev/dri/renderD129"
+          },
+          {
+            "fd": 6,
+            "target": "/dev/dri/renderD129"
+          }
+        ],
+        "log": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/current-preview-public-proof-20261111/plain-b6-sanitize-v1/process.log",
+          "sha256": "9ec3cda7b7e288fe915f63adc9c220eba95c432bc20e78a54f0439056bd63bfb"
+        }
+      },
+      "mapped_ELFs": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/current-preview-public-proof-20261111/plain-b6-sanitize-v1/mapped-ELFs.json",
+        "sha256": "21256e5ad32d5bc444cca3b19515333809b93ad82c3953abe16ceea30e5d50eb"
+      },
+      "manifest": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/current-preview-public-proof-20261111/plain-b6-sanitize-v1/native/manifest.json",
+        "sha256": "3159714e844419fee87380c4707202eb1004b8c75c8a7607473e7c95037f8864"
+      },
+      "native_files": {
+        "accepted": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/current-preview-public-proof-20261111/plain-b6-sanitize-v1/native/accepted.dsculpt",
+          "sha256": "4ee109172943e381108637404c16558b0d49bd1569e70fb542d55fa98bc1bb1a"
+        },
+        "original": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/current-preview-public-proof-20261111/plain-b6-sanitize-v1/native/original.dsculpt",
+          "sha256": "0ae76f7679a0de2fd993179f7e702928b34a0e6c3761daa0cfff56c3216ab678"
+        }
+      },
+      "input_output_provider_drift": []
+    }
+  },
+  "native_pair": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/current-preview-public-proof-20261111/plain-b6-native-RS-pairs.json",
+    "sha256": "0f28029bd6b3a1251ee801ded40ba0da5953c88de83276f3309e555430067d00"
+  },
+  "recipes": {
+    "build-producer-b6.py": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/current-preview-public-proof-20261111/build-producer-b6.py",
+      "sha256": "ae8fbfaa79d5f383061fceadd357b1185cd629c4090bb88b8b046f482c49ae38"
+    },
+    "run-producer-b6.py": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/current-preview-public-proof-20261111/run-producer-b6.py",
+      "sha256": "615a974e453baa0190bd2bc7d6237ba0cae6206eca1981577defa7becc05e58b"
+    }
+  },
+  "source": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/current-preview-public-workflow-20261111/tests/gpu-color-blur-native.cpp",
+    "sha256": "b62f6ed531f9bf227bce613034dcc11c93bdb4e0812d460e7a013dfc1adc12ee"
+  },
+  "observer_source": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/paint-workflow-dso-build-20261111/device-auth-all-egl.cpp",
+    "sha256": "ec871abd22d163f16351e92e79e9fb4e3b3059a7924046c5ef1524520286802b"
+  },
+  "FD_sampling_limit": "SAN external sampler records one empty startup sample and misses the short live context while hashing the451MB ELF. Its direct in-context fstat/read_symlink witness and context maps authenticate actual node129 FDs; no external descriptor observation or global absence of other nodes is claimed for SAN. No rerun/count/deadline change.",
+  "native_authority": [
+    "Genuine strictUV64 plain PaintedMesh with no fabricated imported/projected/baked/polygon/retained-domain authority.",
+    "Real RGB/authored-alpha/distinct coverage, metal/roughness, independent mask, mixed legacy/physicalFLOAT emission, measured subUNORM8 HDR coverage, hidden zero-opacity layer.",
+    "Actual Document worker packet and exact ordered UV/material/actor authentication before operation, after acceptance, Undo, Redo and native reopen of each endpoint; CPU image payloads absent.",
+    "Public defaultFlow1 paint_command BlurColorLayer, hardware-only native command, ordered Save and full exact native global Undo/Redo/reopen.",
+    "Unchanged independent64x64 cross-kernel RGB/authored-alpha/coverage/PBR fallback oracle; unrelated common components, emission values, hidden COW owners and source/geometry authority stay exact."
+  ],
+  "measurement": {
+    "GL": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+    "EGL": "Actual nonzero display/context on native worker thread",
+    "PCI": "0000:03:00.0",
+    "vendor_device": "8086:56a0",
+    "render_node": "/dev/dri/renderD129",
+    "driver": "i915",
+    "observer": "Pass-through glGetString observer, actual unchanged results, EGL/DRM/PCI/in-context-fstat/maps; no product manipulation or UI progress authority.",
+    "flock": "/tmp/dome-sculpt-arc-device.lock",
+    "lease_released": true
+  },
+  "sanitizers": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+    "LSAN_OPTIONS": null,
+    "suppressions": false,
+    "observed_reports": false,
+    "native_exit": 0
+  },
+  "bounds": {
+    "producer_external_seconds": 180,
+    "RSS": 4294967296,
+    "original_native_worker_deadlines_and_oracle_counts_not_loosened": true,
+    "CPU_fallback": false
+  },
+  "pending": "Final recovered whole owning application build and actual desktop/XR source+plain workflows; no app case is executed under this proof."
+}
