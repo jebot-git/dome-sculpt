@@ -1,4 +1,4 @@
-# Resolved FLOAT fallback metrics: source contract, qualification pending
+# Resolved FLOAT fallback metrics: Release CPU qualification
 
 The ef0 Release controls passed field579, EXR648 and native69 checks. The real
 worker workflow then passed16403 checks, including projection-source values,
@@ -45,7 +45,7 @@ metric storage is double; all TUs seeing that changed private definition must
 be rebuilt. All103 public headers remain intended byte-exact8b; this does not
 permit mixing old private-layout consumers.
 
-The planned reader checks actual glTF factors/scale, captured RGBA8 PNG and EXR
+The reader checks actual glTF factors/scale, captured RGBA8 PNG and EXR
 extents, typed view and all old resource quotas before allocation. PNG replay
 uses only the writer's bounded noninterlaced RGBA8 representation, excluding
 compressed profiles/text. It recomputes quality from actual PNG/FLOAT data and
@@ -60,9 +60,32 @@ reconstruction in extended precision, no-erasure checks, rehashed wrong units,
 wrong quality, stripped/fake version2, foreign contributions and a real Scene41
 whose named current field is absent. Actual original failures remain evidence.
 
-These changes are source-only and unqualified while root runs quiet original
-P1. No new compile/native/hash/archive/GPU jobs may start until that window
-closes. Afterward the codec's complete TUs and every actual dependent private
-consumer need fresh owning compilation/linking, original deadlines, before/
-after source/provider pins, native controls and independently coordinated
-software/hardware/application qualification.
+The source frozen at2238315b6d49bf782c7b9970001b35e6fcd9f2d4 now has an audited
+Release closure:18 complete dependent translation units,11 replaced core members,
+182 byte-exact untouched core members, both complete codec translation units,
+11 freshly linked existing fixtures and the new metric leaf. Actual Ninja
+header dependencies selected every consumer of the changed private metric
+layout. All103 public headers equal the fresh owning8b baseline; literal asset
+paths and all unchanged providers remain pinned. Source/provider drift is empty.
+
+All11 native CPU cases pass with original deadlines: metric16, field579,
+EXR648, native69, worker16417, owningEXR553, and the original Bake,
+baked-textures, Bake-workflow, emission-export32 and emission-scene37 suites.
+The worker now completes the previously failing real GLB export, verifies the
+actual PNG reconstruction and rejects six rehashed corruptions without losing
+full native authority. Accepted and redone native files are byte-exact at
+SHA25656b8676dab90f45212ad0abc7dfa949e9561173cb4604475916cefdc1cd27d46.
+Legacy owningEXR still reports18014 encoded bytes; this alone is a size check,
+not an old/new byte-identity claim.
+
+Evidence and exact ELF/log/status pins are recorded in the adjacent Release
+JSON and persistent `artifacts/radiance-bake-fallback2-proof-20261111` tree.
+The original runner emitted its before manifest before adding the metric leaf;
+a supplemental receipt records the leaf's build, pre-execution and post-execution
+hash agreement without rewriting the original evidence. All other before/after
+keysets agree. Original counterfactual writer and16403-positive export failure
+remain intact.
+
+This milestone qualifies CPU core/codec/native worker/export behavior only.
+Fresh strict sanitizer closure, actual GPU preview and current owning GUI/XR
+Bake workflows remain required. No actual GL/GPU/application run is claimed.
