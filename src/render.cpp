@@ -225,6 +225,15 @@ struct SurfaceRenderer::TextureState {
     add(0,3,mesh.mesh.positions);const auto normal=add(1,3,mesh.mesh.normals);add(2,2,original_uv0.empty()?mesh.mesh.uv:original_uv0);add(3,2,uv1);add(5,4,mesh.tangents);
     const bool frames=!mesh.source_normals.empty()||!mesh.canonical_normals.empty()||!mesh.source_tangents.empty();if(frames&&mesh.source_normals.empty())alias(7,3,normal);else add(7,3,mesh.source_normals);add(8,4,mesh.source_tangents);if(frames&&mesh.canonical_normals.empty())alias(9,3,normal);else add(9,3,mesh.canonical_normals);add(10,4,mesh.source_colors);add(11,4,mesh.normal_coordinates);add(12,2,paint_coordinates);for(size_t i=0;i<3;++i)add(GLuint(13+i),4,extra_uv[i]);
     const auto index_bytes=render_detail::buffer_bytes(mesh.mesh.indices.size(),sizeof(uint32_t));
+    // A sculpt-only snapshot uses the independent chunk arena. Keep the empty
+    // packed selection transactional, without inventing zero-size GL stores or
+    // a VAO. In particular, packed -> empty commits release the old leases only
+    // after a successful draw/resolve; a rejected proposal keeps them intact.
+    if(!geometry_bytes&&!index_bytes&&mesh.selected_weights.empty()&&mesh.sculpt_masks.empty()){
+      next.stats.vertex_bytes=next.stats.index_bytes=0;
+      next.stats.weight_bytes=next.stats.mask_bytes=0;
+      return next;
+    }
     size_t new_bytes=reuse?0:render_detail::buffer_sum(geometry_bytes,index_bytes);for(const auto*v:{&mesh.selected_weights,&mesh.sculpt_masks})new_bytes=render_detail::buffer_sum(new_bytes,render_detail::buffer_bytes(v->size(),sizeof(float)));ledger->preflight(Ledger::Domain::Geometry,new_bytes);
     if(reuse){if(geometry_bytes!=flat.stats.vertex_bytes||index_bytes!=flat.stats.index_bytes||!flat.vao)throw std::invalid_argument("Shared flat geometry lost its exact accepted layout");next.vertices=flat.vertices;next.indices=flat.indices;}
     else{
@@ -1088,7 +1097,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
 
   if(drawing->ranges.empty()&&!drawing->sculpt_chunks) {
     glUniform1i(glGetUniformLocation(program_,"weight_pass"),!drawing->selected_weights.empty());
-    draw_range(Material{},0,drawing_count,0,nullptr,false,false,drawing->pbr_view);
+    if(drawing_count)draw_range(Material{},0,drawing_count,0,nullptr,false,false,drawing->pbr_view);
   }else {
     auto is_ghost=[&](uint64_t id){auto i=std::find_if(display.begin(),display.end(),[&](const auto &o){return o.id==id;});return i!=display.end()&&i->ghost;};
     auto begin_object=[&](uint64_t id,bool world_valid,CanvasTransform world,const std::optional<AffineTransform> &affine,bool local_geometry=false,const SurfaceRange *range=nullptr){
