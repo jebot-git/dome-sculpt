@@ -1,0 +1,309 @@
+{
+  "schema": 1,
+  "date": "2026-11-11",
+  "state": "qualified-scoped",
+  "source": "27f01cad7910a9c6b6dd383a4422f3feffdbc61c",
+  "baseline_source": "775f92b837da757aa5bfb8583e2f426685eade50",
+  "documentation_only": true,
+  "scope": "Independent matched-source provider audit and six current painting+arena Arc consumers per profile. Not whole-fresh core, GUI/XR, P1 or performance admission.",
+  "source_audit": {
+    "frozen_files": 2747,
+    "public_header_files_equal_775": 102,
+    "unchanged_product_files_equal_775": 714,
+    "providers_per_profile": 331,
+    "fresh_complete_TUs_per_profile": 4,
+    "relinked_ELFs_per_profile": 9,
+    "render_archive_members": 4,
+    "old_render_member_present": false,
+    "old_b8_project_providers": false,
+    "compiler_dependency_files": 516,
+    "project_dependency_files": 118,
+    "source_provider_dependency_and_actual_map_drift": []
+  },
+  "profiles": {
+    "release": {
+      "tool_handle": 36174,
+      "observer_pid": 3290900,
+      "exit": 0,
+      "lease_released": true,
+      "graphics_checks": 1753,
+      "arena_checks": 405,
+      "steps": [
+        {
+          "name": "direct",
+          "argv": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-arena-build-20261111/release/dome-sculpt-render-direct-upload-test",
+            "direct",
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-arena-qualification-20261111/arc-release-v1/direct"
+          ],
+          "RSS_peak_bytes": 95137792,
+          "timeout_seconds": 180,
+          "exit": 0,
+          "seconds": 0.37269633397227153,
+          "log_sha256": "1e8dd352a7875121e9cc7010c69cf20801a33ba7b8a5ec51d148cfb3a6345f42",
+          "actual_checks": 73,
+          "device_report_sha256": "263bf74fabdab2191523e95d249385e17ed264aea37f8d6168bb195da85e0324"
+        },
+        {
+          "name": "polygon",
+          "argv": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-arena-build-20261111/release/dome-sculpt-polygon-surface-render-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/polygon-surface-native",
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-arena-qualification-20261111/arc-release-v1/polygon"
+          ],
+          "RSS_peak_bytes": 606326784,
+          "timeout_seconds": 180,
+          "exit": 0,
+          "seconds": 4.582040507986676,
+          "log_sha256": "8a7f2769aad56fb37eb1a65753e0b2d2367da6e2e59abd54440321d12fa0b98c",
+          "actual_checks": 51,
+          "device_report_sha256": "263bf74fabdab2191523e95d249385e17ed264aea37f8d6168bb195da85e0324"
+        },
+        {
+          "name": "chunk",
+          "argv": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-arena-build-20261111/release/dome-sculpt-sculpt-chunk-render-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-arena-qualification-20261111/arc-release-v1/chunk"
+          ],
+          "RSS_peak_bytes": 116928512,
+          "timeout_seconds": 180,
+          "exit": 0,
+          "seconds": 1.0406026319833472,
+          "log_sha256": "90133180e7e4747f8886bca8b697d94884700b3f15d07e690dba641f151e8663",
+          "actual_checks": 98,
+          "device_report_sha256": "263bf74fabdab2191523e95d249385e17ed264aea37f8d6168bb195da85e0324"
+        },
+        {
+          "name": "mixed",
+          "argv": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-arena-build-20261111/release/dome-sculpt-texture-set-polygon-render-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-arena-qualification-20261111/arc-release-v1/mixed"
+          ],
+          "RSS_peak_bytes": 118747136,
+          "timeout_seconds": 180,
+          "exit": 0,
+          "seconds": 0.7221284070401452,
+          "log_sha256": "5d7a02cab066c023c00139811f8030477488c129417de0aaebe0e0d06b067ae8",
+          "actual_checks": 537,
+          "device_report_sha256": "263bf74fabdab2191523e95d249385e17ed264aea37f8d6168bb195da85e0324"
+        },
+        {
+          "name": "source",
+          "argv": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-arena-build-20261111/release/dome-sculpt-texture-set-source-render-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-arena-qualification-20261111/arc-release-v1/source"
+          ],
+          "RSS_peak_bytes": 128761856,
+          "timeout_seconds": 180,
+          "exit": 0,
+          "seconds": 2.1571017100359313,
+          "log_sha256": "441ca007cabdc50ced53ca0a09ea4ff01baf5b561465448264c66287fb27cb6b",
+          "actual_checks": 994,
+          "device_report_sha256": "263bf74fabdab2191523e95d249385e17ed264aea37f8d6168bb195da85e0324"
+        },
+        {
+          "name": "arena",
+          "argv": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-arena-build-20261111/release/dome-sculpt-sculpt-gpu-arena-test"
+          ],
+          "RSS_peak_bytes": 83218432,
+          "timeout_seconds": 180,
+          "exit": 0,
+          "seconds": 0.41583198099397123,
+          "log_sha256": "5bccb3133f1d891bbdc120e832b86a782e1b281ed3a7c2930d568880ee07ecbc",
+          "actual_checks": 405,
+          "device_report_sha256": "263bf74fabdab2191523e95d249385e17ed264aea37f8d6168bb195da85e0324"
+        }
+      ],
+      "strict_SAN": false,
+      "environment": {
+        "LD_LIBRARY_PATH": "/home/blux/de-xr/dome-sculpt/artifacts/sdk-20261111/toolkit-release/lib:/usr/lib64",
+        "LD_PRELOAD": "/home/blux/de-xr/dome-sculpt/artifacts/paint-arena-qualification-20261111/control/device-auth-release.so",
+        "__EGL_VENDOR_LIBRARY_FILENAMES": "/home/blux/de-xr/dome-sculpt/artifacts/paint-arena-qualification-20261111/arc-release-v1/egl-vendor.json",
+        "LIBGL_DRIVERS_PATH": "/usr/lib64/dri",
+        "LIBGL_ALWAYS_SOFTWARE": "0",
+        "DRI_PRIME": "pci-0000_03_00_0",
+        "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+        "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+        "LSAN_OPTIONS": null
+      },
+      "actual_device": "Intel Arc A770 / PCI0000:03:00.0 / i915",
+      "source_provider_input_drift": [],
+      "existing_software_layout_checks": 2097166,
+      "software_results_are_reused_root_evidence": true
+    },
+    "sanitize": {
+      "tool_handle": 73957,
+      "observer_pid": 3298906,
+      "exit": 0,
+      "lease_released": true,
+      "graphics_checks": 1753,
+      "arena_checks": 405,
+      "steps": [
+        {
+          "name": "direct",
+          "argv": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-arena-build-20261111/sanitize/dome-sculpt-render-direct-upload-test",
+            "direct",
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-arena-qualification-20261111/arc-sanitize-v1/direct"
+          ],
+          "RSS_peak_bytes": 517287936,
+          "timeout_seconds": 180,
+          "exit": 0,
+          "seconds": 0.7160387859912589,
+          "log_sha256": "1e8dd352a7875121e9cc7010c69cf20801a33ba7b8a5ec51d148cfb3a6345f42",
+          "actual_checks": 73,
+          "device_report_sha256": "263bf74fabdab2191523e95d249385e17ed264aea37f8d6168bb195da85e0324"
+        },
+        {
+          "name": "polygon",
+          "argv": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-arena-build-20261111/sanitize/dome-sculpt-polygon-surface-render-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/polygon-surface-native",
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-arena-qualification-20261111/arc-sanitize-v1/polygon"
+          ],
+          "RSS_peak_bytes": 2781474816,
+          "timeout_seconds": 180,
+          "exit": 0,
+          "seconds": 10.32997105101822,
+          "log_sha256": "8a7f2769aad56fb37eb1a65753e0b2d2367da6e2e59abd54440321d12fa0b98c",
+          "actual_checks": 51,
+          "device_report_sha256": "263bf74fabdab2191523e95d249385e17ed264aea37f8d6168bb195da85e0324"
+        },
+        {
+          "name": "chunk",
+          "argv": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-arena-build-20261111/sanitize/dome-sculpt-sculpt-chunk-render-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-arena-qualification-20261111/arc-sanitize-v1/chunk"
+          ],
+          "RSS_peak_bytes": 970031104,
+          "timeout_seconds": 180,
+          "exit": 0,
+          "seconds": 4.873014004027937,
+          "log_sha256": "90133180e7e4747f8886bca8b697d94884700b3f15d07e690dba641f151e8663",
+          "actual_checks": 98,
+          "device_report_sha256": "263bf74fabdab2191523e95d249385e17ed264aea37f8d6168bb195da85e0324"
+        },
+        {
+          "name": "mixed",
+          "argv": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-arena-build-20261111/sanitize/dome-sculpt-texture-set-polygon-render-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-arena-qualification-20261111/arc-sanitize-v1/mixed"
+          ],
+          "RSS_peak_bytes": 1223409664,
+          "timeout_seconds": 180,
+          "exit": 0,
+          "seconds": 3.7443823289941065,
+          "log_sha256": "5d7a02cab066c023c00139811f8030477488c129417de0aaebe0e0d06b067ae8",
+          "actual_checks": 537,
+          "device_report_sha256": "263bf74fabdab2191523e95d249385e17ed264aea37f8d6168bb195da85e0324"
+        },
+        {
+          "name": "source",
+          "argv": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-arena-build-20261111/sanitize/dome-sculpt-texture-set-source-render-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-arena-qualification-20261111/arc-sanitize-v1/source"
+          ],
+          "RSS_peak_bytes": 1481465856,
+          "timeout_seconds": 180,
+          "exit": 0,
+          "seconds": 22.41732290800428,
+          "log_sha256": "441ca007cabdc50ced53ca0a09ea4ff01baf5b561465448264c66287fb27cb6b",
+          "actual_checks": 994,
+          "device_report_sha256": "263bf74fabdab2191523e95d249385e17ed264aea37f8d6168bb195da85e0324"
+        },
+        {
+          "name": "arena",
+          "argv": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-arena-build-20261111/sanitize/dome-sculpt-sculpt-gpu-arena-test"
+          ],
+          "RSS_peak_bytes": 552087552,
+          "timeout_seconds": 180,
+          "exit": 0,
+          "seconds": 1.2573579919990152,
+          "log_sha256": "5bccb3133f1d891bbdc120e832b86a782e1b281ed3a7c2930d568880ee07ecbc",
+          "actual_checks": 405,
+          "device_report_sha256": "263bf74fabdab2191523e95d249385e17ed264aea37f8d6168bb195da85e0324"
+        }
+      ],
+      "strict_SAN": true,
+      "environment": {
+        "LD_LIBRARY_PATH": "/home/blux/de-xr/dome-sculpt/artifacts/sdk-20261111/toolkit-sanitize/lib:/usr/lib64",
+        "LD_PRELOAD": "/usr/lib64/libasan.so.8.0.0:/home/blux/de-xr/dome-sculpt/artifacts/paint-arena-qualification-20261111/control/device-auth-sanitize.so",
+        "__EGL_VENDOR_LIBRARY_FILENAMES": "/home/blux/de-xr/dome-sculpt/artifacts/paint-arena-qualification-20261111/arc-sanitize-v1/egl-vendor.json",
+        "LIBGL_DRIVERS_PATH": "/usr/lib64/dri",
+        "LIBGL_ALWAYS_SOFTWARE": "0",
+        "DRI_PRIME": "pci-0000_03_00_0",
+        "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+        "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+        "LSAN_OPTIONS": null
+      },
+      "actual_device": "Intel Arc A770 / PCI0000:03:00.0 / i915",
+      "source_provider_input_drift": [],
+      "existing_software_layout_checks": 2097166,
+      "software_results_are_reused_root_evidence": true
+    }
+  },
+  "comparisons": [
+    {
+      "kind": "software-R-S",
+      "pairs": 98,
+      "images": 94,
+      "native": 4
+    },
+    {
+      "kind": "arc-R-S",
+      "pairs": 98,
+      "images": 94,
+      "native": 4
+    },
+    {
+      "kind": "release-software-Arc",
+      "pairs": 56,
+      "RGB_tolerance": 6,
+      "alpha_exact": true,
+      "maximum_RGB_difference": 2
+    },
+    {
+      "kind": "sanitize-software-Arc",
+      "pairs": 56,
+      "RGB_tolerance": 6,
+      "alpha_exact": true,
+      "maximum_RGB_difference": 2
+    }
+  ],
+  "preserved_failures": {
+    "current_initial_software_count_mapping": "Original wrapper exit1; native direct73 actual exit0. v2 explicitly reuses same hashed execution, corrects independent mapping, original retained.",
+    "standalone": "Original source5796 and all negatives, including original180s sanitizer miss, remain separate unchanged history."
+  },
+  "limits": {
+    "native_deadline_seconds": 180,
+    "validation_RSS_bytes": 4294967296,
+    "arena_known_requested_store_budget_bytes": 536870912,
+    "opaque_driver_heap_measured": false,
+    "new_long_P1": false,
+    "new_GUI_XR": false,
+    "physical_headset_session_actions": false
+  },
+  "artifacts": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/paint-arena-qualification-20261111/audit.json": "3fb059b1f81759c52922018652c4e47e074bd6828b754f58203bed575c94c1dc",
+    "/home/blux/de-xr/dome-sculpt/artifacts/paint-arena-qualification-20261111/header-closure.json": "90149a300192a6d70a5a13aa4babef0092e117f5b9d7775a2c88d04eb22db30f",
+    "/home/blux/de-xr/dome-sculpt/artifacts/paint-arena-qualification-20261111/dependency-after.json": "8c0f390b93fb7c84ec9c46e0590e092dcd834077653ee52b74671dd5c8f5c118",
+    "/home/blux/de-xr/dome-sculpt/artifacts/paint-arena-qualification-20261111/mapped-input-after.json": "791480bda9a3eb29f95cfc3a401ebfa7c4920b3b9ee334c0e74fce9847c90c25",
+    "/home/blux/de-xr/dome-sculpt/artifacts/paint-arena-qualification-20261111/image-comparisons.json": "00004154ae5cf7d9b24fcc31a3f853136692ed1cc404464a9ffc54518fb89571",
+    "/home/blux/de-xr/dome-sculpt/artifacts/paint-arena-qualification-20261111/seal/evidence-ledger.json": "2dedf6a7cbe66b0edd5114b4e1912417e2d34381b69ddbeeb0294988016d119e",
+    "/home/blux/de-xr/dome-sculpt/artifacts/paint-arena-qualification-20261111/arc-release-v1/status.json": "b6342b8cf85c0cd2980bd81c9c38cdfab9308e9c87cc1af5c03f5aa994850a11",
+    "/home/blux/de-xr/dome-sculpt/artifacts/paint-arena-qualification-20261111/arc-sanitize-v1/status.json": "1fa05792173be6e58e289b86a3778b99a84af1451bc3d13a769ab155b5efd68b",
+    "/home/blux/de-xr/dome-sculpt/artifacts/paint-arena-build-20261111/software-v2-release/status.json": "a58f4a265863864eedb14eca1a380989dbbac96b07ba475a56f7d8a70f9f4f1d",
+    "/home/blux/de-xr/dome-sculpt/artifacts/paint-arena-build-20261111/software-v2-sanitize/status.json": "a441383c3cd2262160a890ea4d14c3c8e067d0e418a3d1d2b6fcddd4e6e02b01"
+  },
+  "evidence_archive": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/paint-arena-qualification-20261111/seal/current-union-evidence.tar.zst",
+    "sha256": "616c6f7a84d87e5037c4b0ad0f63f8ba1a17fafe8ca58e9870e73d0ba671b182",
+    "bytes": 626065,
+    "verified_all_members": true,
+    "raw_bytes": 12940962,
+    "scope": "Additional self-contained evidence copy; originals retained; not archival deletion or a project build/provider distribution."
+  },
+  "metadata_setup_note": "First documentation write used wrong relative destination and created no file; corrected without any runtime/validation rerun or change."
+}
