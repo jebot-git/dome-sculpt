@@ -47,5 +47,39 @@ int main()try{
  {auto dense=large;dense.indices.clear();for(size_t i=0;i<70000;++i)dense.indices.insert(dense.indices.end(),large.indices.begin(),large.indices.begin()+3);auto split=limits;split.part_triangles=40000;Query global_budget(dense,{},split);check(global_budget.closest(point).triangle==0,"Legacy default closest retains2M budget rather than narrowing to65536");SurfaceQueryOptions bounded;bounded.max_triangle_tests=65536;check(refusal([&]{global_budget.nearest(point,bounded);})&&refusal([&]{global_budget.raycast(point,direction,1000,bounded);}),"Explicit65536 is shared across two individually-smaller partitions");}
  one.front().pbr_view=false;used->mtoon_json="{\"shader\":0,\"shader\":\"VRM/MToon\"}";{MaterialSurfaceQuery q(selected,one);check(bool(q.raycast({.2f,.1f,3},{0,0,-1},5)),"Duplicate root shader follows actual last string value and ignores unused material metadata");}used->mtoon_json="{\"shader\":\"VRM/MToon\",\"shader\":0}";check(rejects([&]{MaterialSurfaceQuery q(selected,one);}),"Duplicate final nonstring shader is rejected before copies");used->mtoon_json="{\"nested\":{\"shader\":\"VRM/MToon\"}}";used->material_json="{}";{MaterialSurfaceQuery q(selected,one);check(bool(q.raycast({.2f,.1f,3},{0,0,-1},5)),"Nested shader cannot impersonate the root VRM0 selection");}
  {const auto plain_tie=fixture(false,true);SurfaceQuery old_tie(plain_tie);Query small_tie(plain_tie);const auto a=old_tie.raycast({0,0,1000},direction,1000),b=small_tie.raycast({0,0,1000},direction,1000,{});check(a&&b&&a->triangle==b->triangle,"Old small shared-edge ray tie remains exactly delegated instead of being silently recharacterized");std::cout<<"TIE_POLICY legacy_small_ray="<<a->triangle<<" admitted_aggregate_ray="<<tie.raycast({0,0,1000},direction,1000,{})->triangle<<'\n';}
+ {
+  // A farther selected owner behind >65536 nearer ineligible triangles. The
+  // ordinary arbitrary filter must retain its original shared work budget.
+  auto dense=large;dense.indices.clear();
+  for(size_t i=0;i<70000;++i)dense.indices.insert(dense.indices.end(),large.indices.begin()+6,large.indices.begin()+9);
+  dense.indices.insert(dense.indices.end(),large.indices.begin(),large.indices.begin()+6);
+  dense.indices.insert(dense.indices.end(),large.indices.begin(),large.indices.begin()+6);
+  auto opaque=material;opaque.alpha=Material::AlphaMode::Opaque;
+  std::vector<SurfaceRange>owners{{7,0,70000*3,opaque,{},{},0},{11,70000*3,6,opaque,{},{},0},{13,70002*3,6,opaque,{},{},0}};
+  MaterialSurfaceQuery selection(dense,owners);const auto geometric=selection.closest_target(point,11);
+  check(geometric.object==11&&geometric.surface.triangle==70000&&geometric.surface.position.z==1&&geometric.surface.barycentric==reference.closest(point).barycentric,
+    "Authenticated per-object nearest skips nearer excluded domains without spending or raising65536 budget");
+  check(selection.closest(point,11).triangle==70000&&selection.raycast(point,direction,1000,0,11)->triangle==70000&&selection.raycast_target(point,direction,1000,0,11)->surface.triangle==70000,
+    "Legacy and typed object-only ray/contact retain original global IDs through node-boundary ranges");
+  const std::array<uint64_t,2>objects{7,13};const std::array<SurfaceMaterialIdentity,2>materials{{{7,0},{13,0}}};
+  check(selection.raycast_excluding(point,direction,1000,0,objects)->triangle==70000&&selection.raycast_excluding_target(point,direction,1000,0,objects)->surface.triangle==70000&&selection.raycast_excluding_materials(point,direction,1000,0,materials)->triangle==70000&&selection.raycast_excluding_materials_target(point,direction,1000,0,materials)->surface.triangle==70000,
+    "All object/material exclusion facades preserve eligible source geometry and exact global namespace");
+  auto split=limits;split.part_triangles=40000;Query bounded(dense,{},split);SurfaceQueryOptions filter;filter.max_triangle_tests=65536;filter.triangle_filter=[](uint32_t t){return t>=70000&&t<70002;};
+  check(refusal([&]{bounded.nearest(point,filter);})&&refusal([&]{bounded.raycast(point,direction,1000,filter);}),
+    "Arbitrary rejection predicates still consume original65536 total across partitions");
+  Query::Eligibility all=[](uint32_t,uint32_t){return true;};
+  check(refusal([&]{bounded.nearest(point,filter,all);})&&refusal([&]{bounded.raycast(point,direction,1000,filter,all);}),
+    "Unrestrictive interval hint cannot reset or bypass generic triangle budget");
+  Query::Eligibility selected=[](uint32_t first,uint32_t count){return size_t(first)<70002&&size_t(first)+count>70000;};
+  auto nearest=bounded.nearest_result(point,filter,selected),ray=bounded.raycast_result(point,direction,1000,filter,selected);
+  check(nearest&&ray&&nearest->surface.triangle==70000&&ray->surface.triangle==70000&&nearest->surface.barycentric==geometric.surface.barycentric,
+    "Conservative gapped intervals prune only proven ineligible IDs and retain independent barycentrics");
+  auto off=selection.closest_target({.74f,-.74f,1000},11);
+  check(off.surface.triangle==70000&&length(off.surface.position-Vec3{.74f,-.74f,1})<1e-5f&&selection.closest_target({2,0,1000},11).surface.position.x==.75f,
+    "Off-part interior and outside-edge nearest retain selected original geometry");
+  const std::vector<uint64_t>excess(262145,999);const std::vector<SurfaceMaterialIdentity>excess_material(262145,{999,0});
+  check(refusal([&]{selection.raycast_excluding_target(point,direction,1000,0,excess);})&&refusal([&]{selection.raycast_excluding(point,direction,1000,0,excess);})&&refusal([&]{selection.raycast_excluding_materials_target(point,direction,1000,0,excess_material);})&&refusal([&]{selection.raycast_excluding_materials(point,direction,1000,0,excess_material);}),
+    "Legacy and typed exclusion routing has explicit bounded metadata work allowance");
+ }
  std::cout<<"PASS "<<checks<<" native packed-query composition checks\n";return 0;
 }catch(const std::exception&e){deny_from=SIZE_MAX;std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
