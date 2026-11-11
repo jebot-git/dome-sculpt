@@ -4887,7 +4887,7 @@ if(BUILD_TESTING AND TARGET dome-sculpt-render)
   add_executable(dome-sculpt-sculpt-chunk-render-test tests/sculpt-chunk-render.cpp)
   target_include_directories(dome-sculpt-sculpt-chunk-render-test PRIVATE src)
   target_link_libraries(dome-sculpt-sculpt-chunk-render-test PRIVATE dome-sculpt-render)
-  target_link_options(dome-sculpt-sculpt-chunk-render-test PRIVATE -Wl,--wrap=glBufferData -Wl,--wrap=glGetUniformLocation)
+  target_link_options(dome-sculpt-sculpt-chunk-render-test PRIVATE -Wl,--wrap=glBufferData -Wl,--wrap=glGetUniformLocation -Wl,--wrap=glVertexAttrib4f)
   add_test(NAME sculpt-chunk-render COMMAND dome-sculpt-sculpt-chunk-render-test ${CMAKE_CURRENT_BINARY_DIR}/sculpt-chunk-render)
 endif()
 

@@ -695,19 +695,25 @@ struct SurfaceRenderer::ChunkState {
       }
     });
   }
-  void bind(uint64_t object,const detail::SculptPlacedChunk::Ptr &chunk) const {
+  void bind(uint64_t object,const detail::SculptPlacedChunk::Ptr &chunk,bool defaults) const {
     auto i=entries.find({object,chunk->geometry_owner().get()});
     if(i==entries.end()||i->second.geometry!=chunk->geometry_owner()||
        i->second.geometry.owner_before(chunk->geometry_owner())||chunk->geometry_owner().owner_before(i->second.geometry))
       throw std::logic_error("Sculpt GPU packet lost its actual immutable geometry owner");
     glBindVertexArray(i->second.vao);
-    glVertexAttrib2f(2,0,0);glVertexAttrib2f(3,0,0);glVertexAttrib1f(4,-1);
-    glVertexAttrib4f(5,1,0,0,1);
+    // These arrays stay disabled in every chunk VAO, so their context-wide
+    // constants remain valid across this object's draws. Scalar attribute6
+    // can be enabled by a masked chunk; its constant still needs resetting
+    // whenever a later chunk disables that array.
+    if(defaults){
+      glVertexAttrib2f(2,0,0);glVertexAttrib2f(3,0,0);glVertexAttrib1f(4,-1);
+      glVertexAttrib4f(5,1,0,0,1);
+      glVertexAttrib3f(7,0,0,1);glVertexAttrib4f(8,1,0,0,1);glVertexAttrib3f(9,0,0,1);
+      glVertexAttrib4f(10,1,1,1,1);glVertexAttrib4f(11,0,0,0,0);glVertexAttrib2f(12,0,0);
+      for(GLuint attribute=13;attribute<16;++attribute)glVertexAttrib4f(attribute,0,0,0,0);
+    }
     if(i->second.mask){glBindBuffer(GL_ARRAY_BUFFER,i->second.scalar);glVertexAttribPointer(6,1,GL_FLOAT,GL_FALSE,sizeof(float),nullptr);glEnableVertexAttribArray(6);}
     else {glDisableVertexAttribArray(6);glVertexAttrib1f(6,-1);}
-    glVertexAttrib3f(7,0,0,1);glVertexAttrib4f(8,1,0,0,1);glVertexAttrib3f(9,0,0,1);
-    glVertexAttrib4f(10,1,1,1,1);glVertexAttrib4f(11,0,0,0,0);glVertexAttrib2f(12,0,0);
-    for(GLuint attribute=13;attribute<16;++attribute)glVertexAttrib4f(attribute,0,0,0,0);
   }
 };
 SurfaceBufferStats SurfaceRenderer::buffer_stats() const {
@@ -1246,7 +1252,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
         // Set them once, rather than repeating material setup for every cell-
         // ordered run. Keep all draws in their original order.
         bool material_bound=false;
-        auto flush=[&]{if(!pending)return;const auto placed=object.placed->find(pending->chunk);chunks_->bind(object.object,placed);
+        auto flush=[&]{if(!pending)return;const auto placed=object.placed->find(pending->chunk);chunks_->bind(object.object,placed,!material_bound);
           if(!material_bound){
             draw_range(object.material,pending->first,pending->count,object.object,nullptr,false,false,cached_->pbr_view);
             material_bound=true;

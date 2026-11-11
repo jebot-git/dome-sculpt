@@ -11,6 +11,7 @@ namespace {
 bool fail_scalar_upload=false;
 bool count_material_setups=false;
 size_t material_setups=0;
+size_t tangent_defaults=0;
 std::shared_ptr<MeshSnapshot> mixed(const Scene &scene,const SculptSceneChunks::Ptr &previous={},bool masks=false,
     const std::shared_ptr<const void> &flat_identity={}) {
   const auto full=reference(scene);auto captured=SculptSceneChunks::capture(scene,{7,1,1,masks,true},previous);
@@ -32,6 +33,11 @@ Pixels render(SurfaceRenderer &renderer,const std::shared_ptr<MeshSnapshot> &sce
 }
 }
 extern "C" GLint __real_glGetUniformLocation(GLuint,const GLchar*);
+extern "C" void __real_glVertexAttrib4f(GLuint,GLfloat,GLfloat,GLfloat,GLfloat);
+extern "C" void __wrap_glVertexAttrib4f(GLuint index,GLfloat x,GLfloat y,GLfloat z,GLfloat w) {
+  if(count_material_setups&&index==5)++tangent_defaults;
+  __real_glVertexAttrib4f(index,x,y,z,w);
+}
 extern "C" GLint __wrap_glGetUniformLocation(GLuint program,const GLchar *name) {
   if(count_material_setups&&std::strcmp(name,"base_color")==0)++material_setups;
   return __real_glGetUniformLocation(program,name);
@@ -51,11 +57,13 @@ int main(int argc,char **argv)try{
     scene.object(2).material=scene.object(1).material;scene.object(2).material.color={.1f,.8f,.2f,.4f};
     if(sign<0)scene.object(1).affine_edit=std::make_shared<NativeAffineEdit>(AffineTransform(std::array<double,16>{-1,0,0,0,.27,1.2,0,0,.13,.09,.8,0,.1,-.2,.15,1}));
     const auto flat=reference(scene);auto chunked=mixed(scene);auto oracle=render(expected,flat);
-    material_setups=0;count_material_setups=true;auto image=render(actual,chunked);count_material_setups=false;
+    material_setups=0;tangent_defaults=0;count_material_setups=true;auto image=render(actual,chunked);count_material_setups=false;
     check(image==oracle,"Actual GL chunk draw equals independent whole-mesher reference for opaque/Blend/Mask and reflected/sheared geometry");
     const auto setup_limit=chunked->ranges.size()+chunked->sculpt_chunks->objects().size();
     std::cout<<"MATERIAL_SETUP case="<<cases<<" actual="<<material_setups<<" object_range_limit="<<setup_limit<<'\n';
     check(material_setups>0&&material_setups<=setup_limit,"Material state submission is bounded by actual objects/ranges, not ordered sculpt cell runs");
+    std::cout<<"CONSTANT_ATTRIBUTES case="<<cases<<" actual="<<tangent_defaults<<" object_range_limit="<<setup_limit+1<<'\n';
+    check(tangent_defaults>0&&tangent_defaults<=setup_limit+1,"Disabled-array constants are submitted per object/range rather than every sculpt cell run");
     check(std::any_of(image.begin(),image.end(),[](uint8_t v){return v!=0;}),"Reference and chunk geometry produce a nonblank framebuffer");
     const auto prefix=output/("case-"+std::to_string(cases++));pixel_file(prefix.string()+"-reference.rgba",oracle);pixel_file(prefix.string()+"-chunk.rgba",image);
     const auto transfers=actual.buffer_stats();check(render(actual,chunked)==image&&actual.buffer_stats().geometry_uploads==transfers.geometry_uploads&&actual.buffer_stats().mask_uploads==transfers.mask_uploads,"Second eye reuses actual GPU geometry/scalar packets without a transfer");
