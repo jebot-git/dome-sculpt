@@ -1,3 +1,61 @@
+## Combined owning build complete; large-scene query repair pending — 2026-11-11
+
+Frozen private source `a904a2d6` completed fresh Release and strict sanitizer
+builds of all 63 selected owning targets from zero project objects. Each selected
+CTest run passed 48/53; the original five failures remain preserved. Supplemental
+workspace checks pass 27 chunk and 373 placed-owner controls in each profile.
+Read [OWNING-BUILD-OBSERVER-20261111.md](OWNING-BUILD-OBSERVER-20261111.md).
+
+The native color test-only correction passes 96 controls in both profiles against
+those exact owning providers. Other private fixture corrections preserve genuine
+images/native scenes, zero unchanged transfers and original capacity inputs.
+**Capacity is a real product blocker:** the single global material query rejects
+valid combined meshes above standalone SurfaceQuery limits. A bounded private
+partitioned query is being implemented with original global primitive/attribute
+identity, shared work budgets and full validation. No cap increase, disabled
+picking or capacity pass is claimed. The frozen source/providers stay unchanged
+while current application proofs finish.
+
+Current owning software and authenticated Arc graphics pass in both profiles;
+all 98 image/native pairs match exactly across Release/sanitizer, with maximum
+software/Arc RGB difference 2 within bound 6 and exact alpha/native scenes. Read
+[CURRENT-OWNING-GRAPHICS-20261111.md](CURRENT-OWNING-GRAPHICS-20261111.md).
+Actual current public source/plain GUI and real-loader XR workflows are separate
+qualification. Final query integration and current production workload acceptance
+remain required; the combined product is not admitted to main.
+
+The complete original objective and later controller trays/spatial node editing
+and history remain active and incomplete. No installation or headset/session
+restart occurs. The earlier build-running checkpoint below is historical.
+
+## Historical combined owning build launch — 2026-11-11
+
+Private combined source `a904a2d6` is frozen in
+`artifacts/authoring-production-union-20261111`. Fresh Release and strict-SAN
+owning builds are running from zero project objects, with 63 targets/profile,
+current canonical DomeD `acc2b70` SDKs and all 418 SDK pins verified. Read
+`artifacts/authoring-production-build-20261111/freeze.json` for exact targets.
+Current build processes must be inspected before any restart. This is not yet
+combined application admission or full-goal completion.
+
+Native sharing and actual production-file reopening pass matching native scopes;
+responsive native read cancellation passes 92 controls plus 17 scope controls
+per profile. Actual old-reader counterfactual failure is retained. Read
+[NATIVE-READ-CANCEL-20261111.md](NATIVE-READ-CANCEL-20261111.md).
+Renderer recovery passes 656 software and 659 authenticated Arc checks in each
+profile, including strict sanitizer checks; its coherent owning application and
+actual public desktop/XR workflows remain required.
+
+The more compact renderer layout exposes stale byte forecasts in legacy tests.
+Test-only follow-ups preserve original inputs, image/native oracles and zero
+unchanged-view transfers. The original 4.8M-vertex capacity input remains; a
+separate explicit case will preserve real above-256MiB buffer coverage. Keep the
+initial frozen build and any original fixture failures intact. Product code and
+resource caps are unchanged by these fixture repairs.
+
+The complete original objective and later controller trays/spatial node phase
+remain active and incomplete. No installation or headset session restart occurs.
+
 ## Goal resumed; combined GPU preview integration — 2026-11-11
 
 The user explicitly reactivated the complete production goal after the prior
