@@ -122,6 +122,13 @@ int main(int argc,char **argv)try{
   fail_scalar_upload=true;check(rejects([&]{render(actual,after);})&&!fail_scalar_upload,"A real GL scalar-buffer upload failure is surfaced before metadata acceptance");
   check(render(actual,before)==baseline,"Previous accepted snapshot recovers exact pixels after failed staged scalar upload");
   check(render(actual,after)==changed,"Retry after failed scalar upload draws the exact current accepted pixels");
+  auto geometric=scene.snapshot();geometric.object(1).volume=std::make_shared<Volume>(*scene.object(1).volume);
+  stamp(*geometric.object(1).volume,{.12f,.03f,.01f},.19f);
+  auto edited=mixed(geometric,after->sculpt_chunks,true,after->geometry_identity);
+  const auto geometry_picture=render(actual,edited);
+  check(geometry_picture==render(expected,reference(geometric,true)),"Actual local sculpt geometry edit preserves ordered whole-reference geometry and scalar pixels");
+  check(geometry_picture!=changed,"Genuine geometry edit reaches a different accepted framebuffer");
+  render(actual,after);
   auto hidden=scene.snapshot();hidden.object(1).visible=false;hidden.object(3).visible=false;auto reduced=mixed(hidden,after->sculpt_chunks,true);
   const auto full_bytes=actual.buffer_stats().vertex_bytes+actual.buffer_stats().index_bytes;render(actual,reduced);
   check(actual.buffer_stats().vertex_bytes+actual.buffer_stats().index_bytes<full_bytes,"GPU cache prunes actual obsolete/replaced chunk owners");

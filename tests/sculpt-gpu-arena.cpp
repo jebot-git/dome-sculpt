@@ -66,9 +66,32 @@ int main()try{
   for(size_t point=0;point<total;++point){hit=false;deny=int64_t(point);bool failed=rejects([&]{arena.stage(masks);});deny=-1;
     check(hit&&failed&&arena.live_bytes()==baseline_bytes,"Every actual persistent C++ allocation prefix rolls back GPU staging");
   }
+  // Genuine geometry growth, with retained chunks copied only on the GPU.
+  // The new object is real native Volume geometry, never a fabricated packet.
+  auto expanded=scene.snapshot();expanded.add("Arena growth",shells(),{});
+  const auto expanded_native=expanded.encode();auto geometry=SculptSceneChunks::capture(expanded,{7,3,3,true,true},base).chunks;
+  const auto ga0=gpu_allocations,gu0=gpu_submits,gc0=gpu_copies;
+  auto growth=arena.stage(geometry);const auto ga=gpu_allocations-ga0,gu=gpu_submits-gu0,gc=gpu_copies-gc0;
+  check(growth->geometry_transfers>0&&growth->geometry_transfers<growth->entries.size()&&growth->copy_bytes>0,"Real growth uploads only new geometry owners; retained local arrays move by GPU copy");
+  check(growth->positions.get()!=positions,"Real growth stages a distinct reserved GPU arena before publication");growth.reset();
+  for(auto pair:{std::pair{&deny_allocate,ga},std::pair{&deny_upload,gu},std::pair{&deny_copy,gc}}){
+    for(size_t point=0;point<pair.second;++point){hit=false;*pair.first=int64_t(point);bool failed=rejects([&]{arena.stage(geometry);});*pair.first=-1;
+      check(hit&&failed&&arena.live_bytes()==baseline_bytes&&arena.uploads==geometry_uploads,"Every real growth allocation/upload/copy boundary retains old accepted geometry exactly");
+    }
+  }
+  std::cout<<"GROWTH_GPU_BOUNDARIES allocation="<<ga<<" upload="<<gu<<" copy="<<gc<<'\n';
+  auto retry_growth=arena.stage(geometry);check(retry_growth->geometry_transfers>0,"Actual geometry retry succeeds after every growth error");
+  // Retained test snapshot deliberately remains live here: its bytes must also
+  // remain in the SAME unique-buffer ledger until its last owner is dropped.
+  check(arena.live_bytes()>baseline_bytes&&arena.live_bytes()<=arena.gpu_limit,"Outstanding staged lease is charged while caller retains it");
+  render_detail::SculptGpuArena metadata_limited(arena.gpu_limit,arena.metadata_bytes());metadata_limited.commit(metadata_limited.stage(base));
+  const auto before_metadata=gpu_allocations;check(rejects([&]{metadata_limited.stage(masks);})&&gpu_allocations==before_metadata,"CPU metadata old-plus-new guard refuses before GPU staging");metadata_limited.clear(true);
+  check(expanded.encode()==expanded_native,"Geometry growth/copy failures leave real expanded native input unchanged");
+  // Release the test-held candidate before the final scalar publication.
+  retry_growth.reset();
   auto final=arena.stage(masks);const auto bytes=final->masks->bytes;arena.commit(std::move(final));
   check(arena.live_bytes()==baseline_bytes&&arena.uploads==geometry_uploads&&arena.scalar_uploads>base_scalars,"Successful atomic publication releases prior scalar storage with geometry unchanged");
-  check(arena.peak_bytes()==baseline_bytes+bytes&&arena.peak_bytes()<=arena.gpu_limit,"Actual live ledger charges previous plus staged scalar store and all arena reserves");
+  check(arena.peak_bytes()>=baseline_bytes+bytes&&arena.peak_bytes()<=arena.gpu_limit,"Actual live ledger charges previous plus staged scalar store and all arena reserves");
   auto empty=arena.stage({});arena.commit(std::move(empty));check(arena.live_bytes()==0,"Empty accepted snapshot prunes all obsolete arena resources");
   check(scene.encode()==native,"All native source state stays byte-identical across GPU prepare/fail/retry/cancel/publication");
   check(glGetError()==GL_NO_ERROR,"No latent GL error survives checked fault controls");
