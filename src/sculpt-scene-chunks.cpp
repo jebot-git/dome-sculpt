@@ -52,7 +52,7 @@ bool SculptObjectChunks::reflected() const {return affine&&affine->orientation()
 std::vector<ObjectSurface> SculptScenePreviewAccess::surfaces(const Scene &scene,
     const LocalSurfaceCache::Cancel &cancel,const Scene::SculptMesher &mesher,
     const std::function<bool(const SculptObject &)> &capture) {
-  return scene.surfaces_impl(false,true,cancel,mesher,true,&capture);
+  return scene.surfaces_impl(false,true,cancel,mesher,true,&capture,true);
 }
 const SculptObjectChunks *SculptSceneChunks::find(uint64_t object) const {
   auto i=std::find_if(objects_.begin(),objects_.end(),[&](const auto &o){return o.object==object;});
@@ -106,9 +106,46 @@ SculptScenePreview SculptSceneChunks::capture_geometry(const Scene &scene,Sculpt
     if(o.mesh_active||(o.polygon&&o.polygon->active))return false;
     o.material.validate();
     const auto remaining=limits.retained_bytes-out->bytes_;
+    // Duplicated Volumes share their immutable COW geometry, even when their
+    // object IDs, placement, material or masks differ. Share only the complete
+    // authenticated local geometry owner; placed/query/scalar owners below
+    // remain object-specific. Equal values or recycled raw addresses do not
+    // authorize reuse.
+    SculptSurfaceChunks::Ptr geometry;
+    for(const auto &entry:out->caches_) {
+      stop(cancel);
+      const auto &source=*entry.geometry->source_owner();
+      if(owner_same(source.geometry_owner(),o.volume->geometry_owner())&&
+          scalar_same(source.voxel_size(),o.volume->voxel_size())&&
+          scalar_same(source.band(),o.volume->band())) {
+        geometry=entry.geometry;break;
+      }
+    }
+    if(geometry) {
+      const size_t shared=geometry->report().retained_bytes;
+      if(shared>out->bytes_||out->bytes_>limits.working_bytes||
+          prior>limits.working_bytes-out->bytes_||
+          group_scratch>limits.working_bytes-out->bytes_-prior)
+        throw std::length_error("Shared sculpt geometry lacks its actual scene reservation");
+      auto shared_limits=limits.geometry;
+      shared_limits.retained_bytes=std::min(shared_limits.retained_bytes,remaining+shared);
+      shared_limits.working_bytes=std::min(shared_limits.working_bytes,
+          limits.working_bytes-out->bytes_-prior-group_scratch+shared);
+      shared_limits.extraction.bytes=std::min(shared_limits.extraction.bytes,shared_limits.retained_bytes);
+      // Retain all ordinary per-operation limits, including reduced callers.
+      // The exact owner/context above makes update return its original owner.
+      geometry=geometry->update(*o.volume,shared_limits,cancel);
+    } else {
     SculptSurfaceChunks::Ptr old;
     if(before&&before->context_.generation==context.generation)
-      for(const auto &entry:before->caches_)if(entry.object==o.id){old=entry.geometry;break;}
+      for(const auto &entry:before->caches_) {
+        stop(cancel);
+        const auto &source=*entry.geometry->source_owner();
+        if(owner_same(source.geometry_owner(),o.volume->geometry_owner())&&
+            scalar_same(source.voxel_size(),o.volume->voxel_size())&&
+            scalar_same(source.band(),o.volume->band())) {old=entry.geometry;break;}
+        if(entry.object==o.id)old=entry.geometry;
+      }
     // The nested producer reserves its genuine previous owner. Keep all other
     // previous Scene allocations outside that scope, without reserving this
     // same immutable directory twice. Different COW roots receive no credit.
@@ -121,12 +158,13 @@ SculptScenePreview SculptSceneChunks::capture_geometry(const Scene &scene,Sculpt
     if(group_scratch>limits.working_bytes-out->bytes_-prior_other)throw std::length_error("Sculpt group working limit exceeded");
     object_limits.working_bytes=std::min(object_limits.working_bytes,limits.working_bytes-out->bytes_-prior_other-group_scratch);
     object_limits.extraction.bytes=std::min(object_limits.extraction.bytes,object_limits.retained_bytes);
-    auto geometry=old?old->update(*o.volume,object_limits,cancel):SculptSurfaceChunks::build(*o.volume,object_limits,cancel);
+    geometry=old?old->update(*o.volume,object_limits,cancel):SculptSurfaceChunks::build(*o.volume,object_limits,cancel);
     // A reused owner's original limits never override this caller's reduced
     // aggregate cap. Its complete immutable footprint must still fit.
     if(geometry->report().retained_bytes>remaining)
       throw std::length_error("Sculpt scene retained geometry limit exceeded");
     out->bytes_+=geometry->report().retained_bytes;
+    }
     out->caches_.push_back({o.id,geometry});
     if(geometry->representation()!=SculptSurfaceChunks::Representation::Chunks) {
       legacy_repairs.push_back({o.id,geometry});return false;

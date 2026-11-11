@@ -143,7 +143,8 @@ private:
   friend NativeSceneAppend append_native_scene(const Scene &,const Scene &,
                                                 const std::function<bool()> &);
   std::vector<ObjectSurface> surfaces_impl(bool, bool, const std::function<bool()> &, const SculptMesher & = {},
-      bool texture_bundles = false, const std::function<bool(const SculptObject &)> * = nullptr) const;
+      bool texture_bundles = false, const std::function<bool(const SculptObject &)> * = nullptr,
+      bool render_only = false) const;
   std::vector<SculptObject> objects_;
   uint64_t active_ = 1, next_ = 2;
   std::vector<SceneGroup> groups_;
