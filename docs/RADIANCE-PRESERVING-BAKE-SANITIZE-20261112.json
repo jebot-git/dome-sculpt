@@ -1,0 +1,179 @@
+{
+  "schema": 1,
+  "baseline_source": "5bb34971651f6200bea7caf5af21a515cef8492f",
+  "scope": "Fresh owning strict sanitizer CPU core/codec/dependency/fixture closure and11 native regressions; no corrected63, current4977 renderer/app, GL/GPU/hardware/physical-headset claim.",
+  "artifact_root": "/home/blux/de-xr/dome-sculpt/artifacts/radiance-bake-sanitize-proof-20261111",
+  "build": {
+    "status": 0,
+    "actual_ninja_steps": 245,
+    "targets": 12,
+    "owned_outputs": 244,
+    "borrowed_project_objects": 0,
+    "core_members": 193,
+    "core_sha256": "9cfb6e093a4c1a07fd1b9c56e757faba345aaf6eb55aec2739c79ad133288814",
+    "compile_flags": "Debug -O1 -g -fsanitize=address,undefined -fno-omit-frame-pointer, onecompilerjob",
+    "source_drift": [],
+    "input_drift": []
+  },
+  "runtime_policy": {
+    "LD_LIBRARY_PATH": "/home/blux/de-xr/dome-sculpt/artifacts/sdk-20261111/toolkit-sanitize/lib:/usr/lib64",
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+  },
+  "suppressions": false,
+  "cases": [
+    {
+      "name": "baked-emission-fallback",
+      "native_exit": 0,
+      "timeout_seconds": 60.0,
+      "seconds": 0.0164945125579834,
+      "elf_sha256": "3253a61ec330fca0219c3af2947685f7aa654d967f7b2f20dd4c68fd64bc564e",
+      "log_sha256": "2326e0639f43371703432c4581958b25a1c1edaff435561344206f4311ef1425",
+      "checks": 16
+    },
+    {
+      "name": "baked-emission",
+      "native_exit": 0,
+      "timeout_seconds": 60.0,
+      "seconds": 0.0169832706451416,
+      "elf_sha256": "426b14a7155eaacfd7cacd815996fdc2df68fabf6548006c507e050f8ce0a49f",
+      "log_sha256": "7ecda2dc99c4ab207c7fb5eb6a282bc742a67b48b2d4dcb6698a1e75a66684d6",
+      "checks": 579
+    },
+    {
+      "name": "baked-emission-exr",
+      "native_exit": 0,
+      "timeout_seconds": 60.0,
+      "seconds": 0.01710677146911621,
+      "elf_sha256": "463852d20706428cba06c8dcff5ca3b5d4472b57d34f66ea22cccfed311d7976",
+      "log_sha256": "4d286c51c22bdb3aaae054dc887b54d7ec3728367039e5c57e8b8114b84e58ab",
+      "checks": 648
+    },
+    {
+      "name": "baked-emission-native",
+      "native_exit": 0,
+      "timeout_seconds": 180.0,
+      "seconds": 1.2405242919921875,
+      "elf_sha256": "56360ad653eeb3eae918bd0c42f6ee8741bc5e9d2bc26781991f207471d8f4a4",
+      "log_sha256": "875a8a141978fff9cd39a8d34ff37e89f40b9f785aacaa01da706d522bbd63f1",
+      "checks": 69
+    },
+    {
+      "name": "baked-emission-workflow",
+      "native_exit": 0,
+      "timeout_seconds": 900.0,
+      "seconds": 1.379530668258667,
+      "elf_sha256": "694bed265f8ce1a05789be4005321c54587562257c0bad7f61ebf42cbd06c5d8",
+      "log_sha256": "536147bd07f4599ce084da08c68ff6a90df3f2f2bffc3968db5dbe39fc3606c3",
+      "checks": 16417
+    },
+    {
+      "name": "emission-exr-owned",
+      "native_exit": 0,
+      "timeout_seconds": 1500.0,
+      "seconds": 0.11661529541015625,
+      "elf_sha256": "9e450cfb5ad16626c4ba0103bf0cd3f2d2fc6c00d889b90ea4e9c8d4efe4ab6e",
+      "log_sha256": "9e9d19ddeeddfbba8ecbb29ab1a940408efedf21957559d27ac5764649f3370e",
+      "checks": 553
+    },
+    {
+      "name": "bake",
+      "native_exit": 0,
+      "timeout_seconds": 1500.0,
+      "seconds": 3.9067459106445312,
+      "elf_sha256": "f8a532571a11adff8119dcf0c6499c9678224b24df578dc86f78932c443c47eb",
+      "log_sha256": "45f1bf82ff74ac70bd098d59427bb3028a4e6ba56426357c3d60ea2b6a75d893"
+    },
+    {
+      "name": "baked-textures",
+      "native_exit": 0,
+      "timeout_seconds": 1500.0,
+      "seconds": 1.1046130657196045,
+      "elf_sha256": "83fbd38bf890b38970fcdbbaa9664638b70c09bcfe0b3c046ab2dde10c8de91f",
+      "log_sha256": "553f48660eaaf8068f924e9433dea55d72900a2ff1d6805b1588304496b68ded"
+    },
+    {
+      "name": "bake-workflow",
+      "native_exit": 0,
+      "timeout_seconds": 1500.0,
+      "seconds": 53.48412466049194,
+      "elf_sha256": "b4315b7fc1dbf1b8b6872772991b4ccc6d2633eb67e9827027a99971be0e49bd",
+      "log_sha256": "b13a86b16c938a8e506e5e0d4ae661e7a9920b3c20c237d987dac0769beaa62f"
+    },
+    {
+      "name": "emission-export",
+      "native_exit": 0,
+      "timeout_seconds": 1500.0,
+      "seconds": 1.2874455451965332,
+      "elf_sha256": "482adf24caf536837c15504b1b5129d442f7110112c7801734274532eb112a50",
+      "log_sha256": "ed4c53e5611fe74c9e74928c81527bcc24a8db27d798e1b70b2b97bc7a26bb43",
+      "checks": 32
+    },
+    {
+      "name": "emission-scene",
+      "native_exit": 0,
+      "timeout_seconds": 1500.0,
+      "seconds": 35.14676856994629,
+      "elf_sha256": "07f57b3c6a162616c2e1fa8ded2005416f5bbe512817f20580cf6be48f79c49c",
+      "log_sha256": "4711b2fabff39a64d328672a2a20e903d321fcb067c354a8f9418c6e99d4d2f5",
+      "checks": 37
+    }
+  ],
+  "input_drift": [],
+  "sanitizer_reports": {
+    "baked-emission-fallback": false,
+    "baked-emission": false,
+    "baked-emission-exr": false,
+    "baked-emission-native": false,
+    "baked-emission-workflow": false,
+    "emission-exr-owned": false,
+    "bake": false,
+    "baked-textures": false,
+    "bake-workflow": false,
+    "emission-export": false,
+    "emission-scene": false
+  },
+  "wire_scope": {
+    "new_immutable_field": 1,
+    "baked_textures_envelope": 6,
+    "owning_scene_envelope": 41,
+    "actual_resolved_float32_exr": 2,
+    "resolved_png_fallback_metrics": 2,
+    "legacy_wire_and_bounds_preserved": true
+  },
+  "profile_pairs": {
+    "files": 20,
+    "exact_files": 19,
+    "logs": 11,
+    "exact_logs": 10
+  },
+  "evidence": {
+    "run-build.py": "1989cd9fe49c70a8ce009ed91d8b9e88b44d14986a02797e8d740f6cf6fd60c2",
+    "run-native.py": "bf3ff8cf82e778b6131ea6f4e8472d615dee3be5a56d318d0371c3bc2f6026b0",
+    "core-ready.json": "16242a8962024d7a4225aaf53765227291a1b212222742abc3e63f9c7f4b9e7d",
+    "current4977-core-delta.json": "83e28cb592727b4f7db44909a6a08227055c7124cdbf472c830dd145f90e249e",
+    "release-sanitize-pairs.json": "c9da125db0a3699de2c895f49c4c7e0a77791ecd8e8051fa137885e572b80515",
+    "sanitize/status.json": "86e8b0ef8163bb06b7845e910c2b8b238c36d9b41374d6834e1dae584025b867",
+    "sanitize/source-before.json": "e56802a3fb79af9256126308121f84d9bc5850e344441ab1b01599f665713422",
+    "sanitize/source-after.json": "e56802a3fb79af9256126308121f84d9bc5850e344441ab1b01599f665713422",
+    "sanitize/inputs-before.json": "fba2a2b8a9009421e58fb5f561b48212c5f6c358f0b8959d958daf549f11c62b",
+    "sanitize/inputs-after.json": "fba2a2b8a9009421e58fb5f561b48212c5f6c358f0b8959d958daf549f11c62b",
+    "sanitize/owned.json": "049f23acb1beba283f6e9edf598670ce3c24867207ac84fa1c495b46f4bf04c1",
+    "native-sanitize-v1/status.json": "6a990dc4d32e888765808f14cddc32cd01e29834f2defde55ec900ca61e684ea",
+    "native-sanitize-v1/inputs-before.json": "56d2e97686bc3c5fd491ce6dda518651ca44b78c71eb08c75e91d3f88386b692",
+    "native-sanitize-v1/inputs-after.json": "56d2e97686bc3c5fd491ce6dda518651ca44b78c71eb08c75e91d3f88386b692"
+  },
+  "original_failures_preserved": [
+    "radiance-bake-writer-proof-20261111/counter-v1",
+    "radiance-bake-export-proof-20261111/native-release-v1",
+    "radiance-bake-export-proof-20261111/fallback-diagnostic-v1",
+    "radiance-bake-current-native-proof-20261111/native-release-v1",
+    "radiance-bake-current-native-proof-20261111/native-release-v2"
+  ],
+  "remaining": [
+    "strict sanitizer corrected/current source replacement qualification",
+    "full UV1 typed-source Document Bake worker/history/persistence/export",
+    "actual highrange SurfaceRenderer precision/finiteness",
+    "fresh current owning public app desktop/stereo Bake workflows"
+  ]
+}
