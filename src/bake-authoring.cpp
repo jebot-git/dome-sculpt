@@ -71,7 +71,8 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   }
   // Authenticate ordered REST geometry before evaluation. Skin/morph changes
   // positions/normals later, never the source field's corner identity or RGBA.
-  auto source_maps=source.mesh_active?source.painted->preview(source.material,cancelled):std::shared_ptr<const TextureMaps>{};
+  auto source_maps=detail::raw_bake_source(source,cancelled);
+  if(!source_maps&&source.mesh_active)source_maps=source.painted->preview(source.material,cancelled);
   auto source_colors=source.mesh_active?detail::current_vertex_colors(source.painted->mesh(),current?&*current:nullptr,
       source.appearance.get(),source.material_bindings.get(),source_maps.get(),cancelled):std::vector<PolygonRgba>{};
   std::shared_ptr<const PolygonColorSurface> target_current;

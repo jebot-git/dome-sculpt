@@ -174,9 +174,16 @@ void validate(const Mesh &low,const BakeSource &source,const BakeOptions &o) {
       throw std::invalid_argument("Physical emission Bake requires its actual float sampling/output adapter");
     if (!std::isfinite(m.normal_strength)||m.normal_strength<0||m.normal_strength>4) throw std::invalid_argument("Invalid normal-map strength");
     if (m.maps) {
-      if(m.maps->overlay&&!m.resolved_emission&&(!m.maps->source_only||m.maps->overlay->source_maps()!=m.maps->source_maps))
+      if(m.maps->overlay&&(!m.maps->source_only||m.maps->overlay->source_maps()!=m.maps->source_maps))
         throw std::invalid_argument("Bake overlay differs from its immutable source coordinate owner");
       if(m.maps->source_maps)m.maps->source_maps->validate_surface(source.mesh);
+      if(m.maps->baked_base&&m.maps->source_only){
+        if(!m.maps->overlay||m.maps->overlay->baked()!=m.maps->baked_base)
+          throw std::invalid_argument("Raw Bake normal differs from its actual immutable overlay owner");
+        const auto &b=*m.maps->baked_base;b.validate(m.maps->overlay->resolution());
+        if(b.normal_interpretation!=BakedNormalInterpretation::CanonicalMikk||b.normal_field||b.normal_authority)
+          throw std::invalid_argument("Raw Bake normal requires its explicit prepared frame adapter");
+      }
       if(m.maps->source_only){
         // Explicit empty role bundles are valid untextured source captures.
         // The source-owned paint packet, when present, is independent of images.
@@ -251,8 +258,12 @@ BakeResult bake_mesh(const Mesh &low,const BakeSource &source,const BakeOptions 
   auto low_frames = o.low_tangents.empty() ? tangent_corners(low, o.cancelled)
                                          : std::vector<Tangent>{};
   std::vector<Tangent> high_frames;
-  if (source.tangents.empty() && std::any_of(source.materials.begin(), source.materials.end(),
-        [](const auto &material) { return normal_image(material) && material.normal_strength > 0; })) {
+  const bool raw_baked_normals=std::any_of(source.materials.begin(),source.materials.end(),[](const auto &m){
+    return m.maps&&m.maps->source_only&&m.maps->overlay&&m.maps->baked_base&&
+        !m.maps->baked_base->maps.normal.rgba.empty()&&m.normal_strength>0;
+  });
+  if (source.tangents.empty() && (std::any_of(source.materials.begin(), source.materials.end(),
+        [](const auto &material) { return normal_image(material) && material.normal_strength > 0; }) || raw_baked_normals)) {
     high_frames = tangent_corners(source.mesh, o.cancelled);
     for (size_t t = 0; t < source.mesh.indices.size()/3; ++t) {
       auto id = source.triangle_materials.empty() ? 0 : source.triangle_materials[t];
@@ -362,6 +373,32 @@ BakeResult bake_mesh(const Mesh &low,const BakeSource &source,const BakeOptions 
           double size=std::hypot(x,y,z);
           if(size>1e-20)high_normal=TangentFrame{supplied.tangent,supplied.bitangent,supplied.normal}.to_world(
             {float(x/size),float(y/size),float(z/size)});
+        }
+      }
+      if(m.maps&&m.maps->source_only&&m.maps->overlay&&m.maps->baked_base&&
+         !m.maps->baked_base->maps.normal.rgba.empty()&&m.normal_strength>0){
+        // Filter decoded legacy RGB8 vectors premultiplied by the independent
+        // common coverage, through the same immutable padding owner as all
+        // other paint planes. The original normal keeps its role UV basis;
+        // canonical baked detail keeps current UV0 Mikk corner frames.
+        const auto &packet=*m.maps->overlay;const auto &baked=*m.maps->baked_base;
+        const auto r=packet.resolution();const float x=std::clamp(high_uv[0],0.f,1.f)*r-.5f,
+          y=std::clamp(high_uv[1],0.f,1.f)*r-.5f;
+        const int ix=int(std::floor(x)),iy=int(std::floor(y));const float fx=x-ix,fy=y-iy;
+        Vec3 sum;float coverage=0;
+        for(int dy=0;dy<2;++dy)for(int dx=0;dx<2;++dx){
+          const auto owner=packet.padding()->at(size_t(std::clamp(iy+dy,0,int(r)-1))*r+size_t(std::clamp(ix+dx,0,int(r)-1)));
+          if(owner<0)continue;const size_t at=size_t(owner);
+          const float w=(dx?fx:1-fx)*(dy?fy:1-fy)*(baked.coverage.at(at)/255.f);
+          coverage+=w;const auto *q=baked.maps.normal.rgba.data()+at*4;
+          sum+=Vec3{q[0]/255.f*2-1,q[1]/255.f*2-1,q[2]/255.f*2-1}*w;
+        }
+        if(coverage>0){
+          TangentFrame canonical;
+          if(source.tangents.empty())canonical=tangent_frame(source.mesh,high_frames,hit->triangle,hit->barycentric);
+          else {auto b=basis(source.mesh,hit->triangle,normalized(hit->normal),hit->barycentric,source.tangents);canonical={b.tangent,b.bitangent,b.normal};}
+          const auto baked_world=canonical.to_world(sum/coverage);
+          high_normal=normalized(high_normal*(1-coverage)+baked_world*coverage);
         }
       }
       Vec3 mapped;

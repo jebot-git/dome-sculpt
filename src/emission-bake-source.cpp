@@ -4,6 +4,7 @@
 #include "dome/material-bindings.hpp"
 #include "dome/material-visibility.hpp"
 #include "dome/humanoid-creator.hpp"
+#include "dome/deformation.hpp"
 #include "dome/source-maps.hpp"
 #include <algorithm>
 #include <limits>
@@ -56,6 +57,41 @@ struct Source {
     return replacement.resolve(original,legacy_strength);
   }
 };
+}
+std::shared_ptr<const TextureMaps> raw_bake_source(const SculptObject &object,
+    const std::function<bool()> &cancelled){
+  if(!object.mesh_active||!object.painted||!object.painted->source_maps()||
+     !object.painted->source_maps()->uses_alternate_uv())return {};
+  const auto &paint=*object.painted;const auto &binding=object.material_bindings;
+  if(cancelled&&cancelled())throw std::runtime_error("Raw source Bake cancelled");
+  if(paint.source_sampling_prepared()||paint.color_projection()||paint.normal_projection()||
+     (binding&&(binding->canonical_attributes||binding->canonical_uv||binding->canonical_paint_sampling||
+                binding->native_paint_sampling||binding->native_paint_frames||binding->normal_frames)))
+    throw std::invalid_argument("Raw source Bake requires its explicit prepared attribute/frame adapter");
+  if(!paint.valid_source_sampling_attachment()||
+     (paint.paint_sampling_domain()&&!paint.valid_paint_sampling_attachment()))
+    throw std::invalid_argument("Raw source Bake lost its actual immutable coordinate attachment");
+  if(const auto &baked=paint.baked();baked&&(baked->normal_field||baked->normal_authority||
+      baked->normal_interpretation!=BakedNormalInterpretation::CanonicalMikk))
+    throw std::invalid_argument("Raw source Bake requires canonical legacy normal data");
+  if(object.deformation){
+    const auto posed=object.deformation->preview(paint.mesh());const auto &rest=paint.mesh();
+    for(size_t i=0;i<rest.positions.size();++i){
+      if((i&1023)==0&&cancelled&&cancelled())throw std::runtime_error("Raw source Bake cancelled");
+      if(length(posed.positions[i]-rest.positions[i])>1e-6f||length(posed.normals[i]-rest.normals[i])>1e-5f)
+        throw std::invalid_argument("Raw source Bake needs explicit posed source-frame transport");
+    }
+  }
+  // Typed normal roles have an independent interpretation. Never silently use
+  // the generic PBR role as their source-frame authority.
+  const auto typed=binding&&binding->has_mtoon?std::optional<MToonMaterial>(binding->material):
+      (object.appearance?retained_mtoon(object.appearance.get()):std::optional<MToonMaterial>{});
+  if(typed&&typed->textures[size_t(MToonSlot::Normal)].index>=0)
+    throw std::invalid_argument("Raw typed normal Bake requires its explicit source-frame adapter");
+  auto maps=std::make_shared<TextureMaps>();maps->source_maps=paint.source_maps();maps->source_only=true;
+  maps->source_maps->validate_surface(paint.mesh());
+  maps->overlay=PaintOverlayFactory::capture(paint,cancelled);maps->baked_base=paint.baked();
+  return maps;
 }
 std::function<std::array<float,3>(uint32_t,std::array<float,3>)>
 emission_bake_source(const SculptObject &object,const std::function<bool()> &cancelled){

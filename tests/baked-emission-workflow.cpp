@@ -79,11 +79,13 @@ void uv1_worker_controls(const std::filesystem::path &directory){
     auto white=std::make_shared<const Image>(image({255,255,255,255}));
     auto pattern=std::make_shared<const Image>(Image{2,2,{255,0,255,255,0,255,0,255,0,0,0,255,255,255,255,255}});
     auto maps=std::make_shared<PaintSourceMaps>();maps->color.image=white;maps->color.texcoord=1;
+    maps->normal.image=std::make_shared<const Image>(image({156,128,250,255}));maps->normal.texcoord=1;
     maps->uv1=std::make_shared<const std::vector<std::array<float,2>>>(std::vector<std::array<float,2>>{{1,0},{0,0},{0,1},{1,1}});
     maps->emission.image=pattern;maps->emission.texcoord=1;maps->emission.uv_transform={1,0,0,1,-.5f,0};maps->emission.min_filter=maps->emission.mag_filter=9728;
     auto mesh=quad();for(auto &v:mesh.positions)v.z=.005f;
     source.painted=PaintedMesh::from_maps(mesh,maps,64);
-    BakedTextures base;base.maps.color=image({24,65,117,255});base.maps.metal_rough=image({177,42,99,255});base.maps.normal=image({128,128,255,255});base.coverage.assign(4096,coverage<.001f?0:191);
+    BakedTextures base;base.maps.color=image({24,65,117,255});base.maps.metal_rough=image({177,42,99,255});base.maps.normal=image({128,204,230,255});base.coverage.resize(4096);
+    for(size_t i=0;i<4096;++i)base.coverage[i]=coverage<.001f?0:(i%64<32?191:65);
     std::vector<BakedEmissionSample> input(4096);
     for(size_t i=0;i<input.size();++i)input[i]={{coverage*.25f,coverage*.5f,0},{coverage*(50000+32*float(i%64)),coverage*.00001f*float(i/64+1),coverage*2},coverage};
     base.emission_field=BakedEmissionField::create(64,input);source.painted->install_bake(std::move(base));
@@ -108,6 +110,7 @@ void uv1_worker_controls(const std::filesystem::path &directory){
     auto &target=*f.scene.active().painted;target.layer_properties("Retained hidden target",true,1);
     ink={};ink.color={.2f,.7f,.1f,.4f};ink.front_only=false;brush.from=brush.to={0,0,0};
     target.begin_stroke();target.stamp(brush,ink);check(target.end_stroke(),"actual target owns hidden editable color/mask data before Bake");target.layer_properties("Retained hidden target",false,.25f);
+    for(auto id:{f.target,f.source}){auto &t=f.scene.object(id).transform;t.orientation={0,0,float(std::sqrt(.5)),float(std::sqrt(.5))};t.scale=1.25f;}
     f.scene.validate();const auto before=f.scene.encode(),source_before=source.painted->encode();const auto source_binding=source.material_bindings;const auto layers=target.layers();const auto sibling_before=f.scene.object(sibling).painted->encode();
     ObjectBakeSettings options;options.front_mm=10;options.back_mm=2;options.padding=2;options.ao_samples=0;
     Document doc;doc.replace(f.scene);std::cout<<"UV1_ADMISSION can_bake="<<doc.frame().state->can_bake<<" source="<<doc.frame().state->bake_source<<std::endl;
@@ -125,6 +128,16 @@ void uv1_worker_controls(const std::filesystem::path &directory){
       const auto x=i%64,y=i/64;const std::array<double,3> texture=y<32?(x<32?std::array<double,3>{1,0,1}:std::array<double,3>{0,1,0}):(x<32?std::array<double,3>{0,0,0}:std::array<double,3>{1,1,1});
       check(values[i].coverage==1&&values[i].legacy==std::array<float,3>{},"actual target FLOAT grid is resolved absolute with full projection coverage");
       for(size_t k=0;k<3;++k){const double wanted=background[k]*texture[k]*(1-coverage)+double(input[i].legacy[k])*strength+input[i].absolute[k];check(std::isfinite(values[i].absolute[k])&&std::abs(double(values[i].absolute[k])-wanted)<=std::max(1e-10,std::abs(wanted)*2e-6),"actual worker agrees with independent authored UV1/filter/affine/FLOAT coverage oracle");}
+    }
+    // Independent planar-frame oracle: original UV1 mirrors U; current baked
+    // normal is in UV0. Decode before filtering/blending and normalize in the
+    // common geometry space, independently of the emission-specific coverage.
+    const auto original=normalized(Vec3{-(156.f/255*2-1),128.f/255*2-1,250.f/255*2-1});
+    const auto detail=normalized(Vec3{128.f/255*2-1,204.f/255*2-1,230.f/255*2-1});
+    for(size_t i=0;i<4096;++i){const float a=coverage<.001f?0:float(i%64<32?191:65)/255;
+      const auto n=normalized(original*(1-a)+detail*a);const std::array<float,3> v{n.x,n.y,n.z};
+      for(size_t k=0;k<3;++k){const int wanted=int(std::lround((v[k]*.5f+.5f)*255));
+        check(std::abs(int(paint.baked()->maps.normal.rgba[i*4+k])-wanted)<=1,"actual UV1 original and current canonical normal blend matches independent geometry-space oracle");}
     }
     // An emission-stripped ordinary control carries the exact same visible
     // color/normal/ORM source. It never replaces the actual hidden source.
