@@ -13,7 +13,12 @@ then refused before EGL because a detached PBR paint had no matching retained
 Scene color-preparation binding. That failure remains in release-fixtures-v1.
 The producer now builds the genuine imported source/normal/rig fixture and uses
 public `prepare_source_colors` to retain the paint and binding together; it keeps
-Scene validation and the independent pixel oracle.
+Scene validation and the independent pixel oracle. The next attempt refused
+before EGL because conversion followed physical-emission authoring. Its v2
+evidence remains. Preparation now precedes those later typed paint edits, as in
+the actual native workflow; no physical-emission adapter guard is bypassed.
+Source-color preparation on already authored physical-emission paint remains an
+explicit full-goal adapter limitation; changing fixture order does not solve it.
 
 Existing GUI 81/XR 117 scripts, inputs and deadlines remain byte-identical. Current
 139378 software/139458 Arc native controls retain their original dispatch. An
