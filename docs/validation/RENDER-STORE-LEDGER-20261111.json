@@ -1,0 +1,235 @@
+{
+  "schema": 1,
+  "date": "2026-11-11",
+  "state": "qualified-helper-only",
+  "base": "ccb2b7b5803d92b1b3bf65c38f422366c9128b94",
+  "product_source": "23227f52946a6b38dd5cae169f729d28906af88a",
+  "initial_product_source": "ed5609534261b7104d3aec4e218c8e0e6bf3eeb8",
+  "source_pins": {
+    "src/render-store-ledger.hpp": "e0b0452b0f82d9ed05b48c0ef386001d6cfb6a8eb4af95ebbe8520299186bc35",
+    "tests/render-store-ledger.cpp": "8ae978e11faddab3b8a0d9b114e5c721fbcd49153fb3f15dfe6366dd0265452e"
+  },
+  "scope": "Fresh standalone actual-GL store lease/retirement lifecycle. Not completed renderer recovery, wholeapp/SANapp/GUI/XR/P1 or physical-memory/device-loss qualification.",
+  "API": [
+    "Kind Buffer/Texture/Sampler/VertexArray",
+    "Domain Material/Geometry",
+    "copyable Store name/bytes/kind/domain/group",
+    "create_group/create(kind,bytes,domain,group,dependencies)",
+    "preflight/usage(domain)/usage(group)",
+    "mark_used noexcept/seal(force)/seal_noexcept/collect zero-time",
+    "terminal clear(releaseGL)/abandon"
+  ],
+  "limits": {
+    "default_material_bytes": 1073741824,
+    "default_images": 1024,
+    "default_samplers": 128,
+    "default_geometry_bytes": 1073741824,
+    "default_CPU_metadata_bytes": 134217728,
+    "maximum_groups": 1024,
+    "maximum_stores": 65536,
+    "maximum_dependencies_per_store": 64,
+    "group_metadata_charge": 512,
+    "fixed_metadata_charge": 4096,
+    "arena_limit_changed": false,
+    "whole_physical_VRAM_claim": false
+  },
+  "software": {
+    "handle": 3356,
+    "status": "/home/blux/de-xr/dome-sculpt/artifacts/render-store-ledger-20261111/artifacts/ledger-proof/software-v4/status.json",
+    "exit": 0,
+    "source_drift": [],
+    "checks_per_profile": 93,
+    "fresh_test_TUs_per_profile": 1,
+    "project_archive_links": 0,
+    "strict_SAN": true,
+    "suppression": false,
+    "steps": [
+      {
+        "name": "release-compile",
+        "command": [
+          "/usr/bin/c++",
+          "-std=c++20",
+          "-O3",
+          "-DNDEBUG",
+          "-Wall",
+          "-Wextra",
+          "-Wpedantic",
+          "-Isrc",
+          "tests/render-store-ledger.cpp",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/render-store-ledger-20261111/artifacts/ledger-proof/software-v4/dome-sculpt-render-store-ledger-test-release",
+          "-Wl,--wrap=glGenBuffers",
+          "-Wl,--wrap=glDeleteBuffers",
+          "-Wl,--wrap=glFenceSync",
+          "-Wl,--wrap=glClientWaitSync",
+          "-lEGL",
+          "-lGL",
+          "-pthread"
+        ],
+        "exit": 0,
+        "seconds": 1.767946441017557,
+        "log_sha256": "05e81a34ab88b0f072a0e894f8bcf7d97adcb2bf810bd68accbadad397c1858e"
+      },
+      {
+        "name": "release-software",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/render-store-ledger-20261111/artifacts/ledger-proof/software-v4/dome-sculpt-render-store-ledger-test-release"
+        ],
+        "exit": 0,
+        "seconds": 0.06436818605288863,
+        "log_sha256": "8ffbd35ee6bbe90b2ae25494195e78e2745fdde52f976ecb1a26d7c487a283af"
+      },
+      {
+        "name": "sanitize-compile",
+        "command": [
+          "/usr/bin/c++",
+          "-std=c++20",
+          "-O1",
+          "-g1",
+          "-DNDEBUG",
+          "-fsanitize=address,undefined",
+          "-fno-omit-frame-pointer",
+          "-Wall",
+          "-Wextra",
+          "-Wpedantic",
+          "-Isrc",
+          "tests/render-store-ledger.cpp",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/render-store-ledger-20261111/artifacts/ledger-proof/software-v4/dome-sculpt-render-store-ledger-test-sanitize",
+          "-Wl,--wrap=glGenBuffers",
+          "-Wl,--wrap=glDeleteBuffers",
+          "-Wl,--wrap=glFenceSync",
+          "-Wl,--wrap=glClientWaitSync",
+          "-lEGL",
+          "-lGL",
+          "-pthread"
+        ],
+        "exit": 0,
+        "seconds": 2.6198951799888164,
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": "sanitize-software",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/render-store-ledger-20261111/artifacts/ledger-proof/software-v4/dome-sculpt-render-store-ledger-test-sanitize"
+        ],
+        "exit": 0,
+        "seconds": 0.165076379023958,
+        "log_sha256": "8ffbd35ee6bbe90b2ae25494195e78e2745fdde52f976ecb1a26d7c487a283af"
+      }
+    ],
+    "ELFs": {
+      "/home/blux/de-xr/dome-sculpt/artifacts/render-store-ledger-20261111/artifacts/ledger-proof/software-v4/dome-sculpt-render-store-ledger-test-release": "59377d3a7077d1e1e501d2bf8cfa81fee5aea52361d786b5c5f17634616e8733",
+      "/home/blux/de-xr/dome-sculpt/artifacts/render-store-ledger-20261111/artifacts/ledger-proof/software-v4/dome-sculpt-render-store-ledger-test-sanitize": "5fb8a072ecc3b0ee77b6420228c1d7ba3526fda71463b3d5545cd7757953ce02"
+    }
+  },
+  "Arc": {
+    "release": {
+      "runner_pid": 365517,
+      "exit": 0,
+      "lease_released": true,
+      "checks": 95,
+      "actual_device": "PCI0000:03:00.0 IntelArcA770 8086:56a0 i915",
+      "steps": [
+        {
+          "name": "ledger",
+          "argv": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/render-store-ledger-20261111/artifacts/ledger-proof/software-v4/dome-sculpt-render-store-ledger-test-release",
+            "--hardware"
+          ],
+          "expected_checks": 95,
+          "state": "terminal",
+          "RSS_peak_bytes": 51830784,
+          "timeout_seconds": 180,
+          "pid": 365527,
+          "exit": 0,
+          "seconds": 0.2570975529961288,
+          "log_sha256": "a11410f0f435e4695c0f18fe2e0db1aa708ef5f412e572b8babe41d26ddc5b98",
+          "actual_checks": 95,
+          "device_report_sha256": "263bf74fabdab2191523e95d249385e17ed264aea37f8d6168bb195da85e0324"
+        }
+      ],
+      "actual_mapped_ELFs": 43,
+      "drift": [],
+      "mapped_drift": []
+    },
+    "sanitize": {
+      "runner_pid": 365576,
+      "exit": 0,
+      "lease_released": true,
+      "checks": 95,
+      "actual_device": "PCI0000:03:00.0 IntelArcA770 8086:56a0 i915",
+      "steps": [
+        {
+          "name": "ledger",
+          "argv": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/render-store-ledger-20261111/artifacts/ledger-proof/software-v4/dome-sculpt-render-store-ledger-test-sanitize",
+            "--hardware"
+          ],
+          "expected_checks": 95,
+          "state": "terminal",
+          "RSS_peak_bytes": 95784960,
+          "timeout_seconds": 180,
+          "pid": 365591,
+          "exit": 0,
+          "seconds": 0.310342660988681,
+          "log_sha256": "a11410f0f435e4695c0f18fe2e0db1aa708ef5f412e572b8babe41d26ddc5b98",
+          "actual_checks": 95,
+          "device_report_sha256": "263bf74fabdab2191523e95d249385e17ed264aea37f8d6168bb195da85e0324"
+        }
+      ],
+      "actual_mapped_ELFs": 45,
+      "drift": [],
+      "mapped_drift": []
+    }
+  },
+  "fault_scope": {
+    "persistent_owned_pre_GL_Cpp_prefixes": 2,
+    "controlled_timeout_override": true,
+    "actual_GL_invalid_argument_errors": [
+      "FenceSync flags",
+      "ClientWaitSync flags",
+      "DeleteBuffers count"
+    ],
+    "actual_driver_resource_exhaustion": false,
+    "driver_cpp_allocations_exhaustively_swept": false,
+    "validation_only_finish": true,
+    "product_blocking_wait": false,
+    "product_CPU_fallback": false
+  },
+  "preserved_failures": [
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/render-store-ledger-20261111/artifacts/ledger-proof/software-v1/status.json",
+      "scope": "LLVM setup abort from test aligned allocator; raw source and unchanged-ELF diagnostic retained."
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/render-store-ledger-20261111/artifacts/ledger-proof/arc-release-v1/status.json",
+      "scope": "Native95/exit0; coordinator failed missed fast live-map window, retained as wrapperfailure1."
+    }
+  ],
+  "pending": [
+    "allcache/flatgeometry integration by repair owner",
+    "CMake registration in combined source",
+    "actual full renderer failure/retry and mixedcache sharedbudget tests",
+    "owning current application/source/history/GUI/XR and image acceptance"
+  ],
+  "artifacts": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/render-store-ledger-20261111/artifacts/ledger-proof/software-v4/before.json": "29e6696225602af22c9524dc704d18d6696ed68c49dbdb324720b1a225771ea2",
+    "/home/blux/de-xr/dome-sculpt/artifacts/render-store-ledger-20261111/artifacts/ledger-proof/software-v4/status.json": "35bb4bdc08adf967cd8297ee000e7fb8a1f5507f53064e755a2484e6b96b8357",
+    "/home/blux/de-xr/dome-sculpt/artifacts/render-store-ledger-20261111/artifacts/ledger-proof/arc-release-v3/status.json": "a1b489d8b4c9abdf72cafc6ad392eee9610541996df065be13f962699e70b6de",
+    "/home/blux/de-xr/dome-sculpt/artifacts/render-store-ledger-20261111/artifacts/ledger-proof/arc-sanitize-v3/status.json": "1d4c1ece11fbf44d7745e6e701b7c7d8b207ad8b072715a2c87b9ac0c3d33c3c",
+    "/home/blux/de-xr/dome-sculpt/artifacts/render-store-ledger-20261111/artifacts/ledger-proof/arc-release-v3/mapped-after.json": "5af21d4c6b4bdd0355381f02e13334922771b84d2dbdd76cb302323ac30dca32",
+    "/home/blux/de-xr/dome-sculpt/artifacts/render-store-ledger-20261111/artifacts/ledger-proof/arc-sanitize-v3/mapped-after.json": "5580cdde76dbb1a66731a17f293adfea19e92c5a09784b9d109adeeb8e1ca801",
+    "/home/blux/de-xr/dome-sculpt/artifacts/render-store-ledger-20261111/artifacts/ledger-proof/software-v1/status.json": "d87dca648ebfd3647dfc1b65a28b12cff1ecb87476c666a88e23a5e72d77efb9",
+    "/home/blux/de-xr/dome-sculpt/artifacts/render-store-ledger-20261111/artifacts/ledger-proof/arc-release-v1/status.json": "77802e35522d71dfe39b3eccca1124013d8ba6378367cac60b5e756644f685ad",
+    "/home/blux/de-xr/dome-sculpt/artifacts/render-store-ledger-20261111/artifacts/ledger-proof/seal-final/evidence-ledger.json": "046a985c7e99eec2dece41cf3f894249f91ba4ebe597c09cbe145563fa61370b"
+  },
+  "evidence_archive": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/render-store-ledger-20261111/artifacts/ledger-proof/seal-final/render-store-ledger-final-evidence.tar.zst",
+    "sha256": "5a738727638b3a8b65dd96b663779ae828fcfc1d3c16d7fb0e49ee88bb9ebf0c",
+    "bytes": 1117538,
+    "verified_all_members": true,
+    "raw_bytes": 5332552,
+    "scope": "Additional self-contained evidence copy; originals retained; not archival deletion or a project build/provider distribution."
+  }
+}
