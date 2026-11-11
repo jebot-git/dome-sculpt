@@ -1,3 +1,15 @@
+## Goal active; additional spatial node/history phase — 2026-11-11
+
+The user reactivated the full goal and added spatial node-based editing/history
+alongside controller trays as a later XR phase. Read
+[ADDITIONAL-REQUIREMENTS-2026-11-11.md](ADDITIONAL-REQUIREMENTS-2026-11-11.md).
+Basic targets remain first. Current resumed source is on
+work/resume-integration-20261111; original03f8 temporary builds/worktree are gone,
+so sources and latest canonical SDKs were restored without discarding history.
+ArmorPaint integration is being assessed from current native-C source, with a
+separate GPU-kernel feasibility prototype; no whole-engine integration claim.
+Earlier pause records below are historical. Full objective active and incomplete.
+
 ## Requested pause after current build — 2026-11-06
 
 Current03f8edf1 is pushed on work/authoring-final-integration. Fresh Release and

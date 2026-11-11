@@ -1618,3 +1618,17 @@ HDR/painting and broader workflow requirements stay
 open. This is not an all535-test or full-goal completion claim.
 
 VRM1 expression preflight repair is independently qualified on public0b6 matching support: source-material Rim relevance is collected during existing scan, no-relevant rejection precedes role work, exact old poll/image/work bounds unchanged. Registered unused-material/foreign-Rim controls and complete affected fault/Cancel/native worker suites R/S pass, plus matching actual normal/compact FLTK smoke. One product TU, no new layout/schema/domain admission; current37/Normal and remaining full-VRM requirements stay separate. Evidence: VRM1-EXPRESSION-PREFLIGHT.md/JSON.
+
+## Additional user specification — 2026-11-11: spatial nodes and history
+
+Read [ADDITIONAL-REQUIREMENTS-2026-11-11.md](ADDITIONAL-REQUIREMENTS-2026-11-11.md).
+This is an additional required later XR phase alongside controller trays, after
+basic authoring targets; it does not reduce or defer existing basic requirements.
+
+| Additional requirement | Current status | Required completion evidence |
+| --- | --- | --- |
+| Spatial node-based editing/history | Required; queued alongside controller trays after basic targets; not implemented or qualified | Interactive spatial editing nodes and history inspection/navigation using controllers; clear connections/parameters and active state; native persistence and exact Undo/Redo/cancel/save/source-authority safeguards; no unintended scene edits during graph focus; native/controller and physical-headset usability evidence |
+
+Graph semantics, exact node types, layout and history branching remain design
+work. The application remains native FLTK/OpenXR and the full original objective
+remains incomplete.
