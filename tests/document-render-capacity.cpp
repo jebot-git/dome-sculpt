@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
+#include "dome/material-visibility.hpp"
 #include "dome/render.hpp"
 #include "graphics.h"
 #include "render-buffer-size.hpp"
@@ -30,6 +31,42 @@ Scene indexed_scene(){Scene s;constexpr uint32_t side=600;
   m.indices.reserve(size_t(side)*side*6);for(uint32_t y=0;y<side;++y)for(uint32_t x=0;x<side;++x){auto a=y*(side+1)+x,b=a+1,c=a+side+2,d=a+side+1;m.indices.insert(m.indices.end(),{a,b,c,a,c,d});}
   auto id=object?s.add("Independent indexed grid",Volume{}):s.active().id;auto&o=s.object(id);o.painted=std::make_shared<PaintedMesh>(std::move(m),64);o.mesh_active=true;o.material.color={1,1,1,1};o.material.unlit=true;
  }s.validate();return s;}
+// Use the actual worker-published picker, never a replacement query over a
+// simplified mesh. The same interior point is triangle0 of each large quad;
+// on the600x600 grid it is in cell(369,186), triangle1 (global local223939).
+void picking(const MeshSnapshot &snapshot,uint32_t local_triangle,bool stable_ties=false){
+ check(bool(snapshot.picking)&&!snapshot.ranges.empty(),"Actual capacity publication retains its worker-built picker");
+ const Vec3 point{.173f,-.283f,0},origin=point+Vec3{0,0,1};
+ auto correct=[&](const MaterialSurfaceHit &hit,const SurfaceRange &range){
+  const auto triangle=uint32_t(range.first/3)+local_triangle;
+  const auto &s=hit.surface;
+  return hit.packed()&&hit.object==range.object&&s.triangle==triangle&&
+   snapshot.picking->logical_triangle(s.triangle)==local_triangle&&
+   snapshot.picking->material_identity(s.triangle)==SurfaceMaterialIdentity{range.object,range.texture_set}&&
+   length(s.position-point)<1e-5f&&length(s.normal-Vec3{0,0,1})<1e-5f&&
+   std::abs(s.barycentric[0]+s.barycentric[1]+s.barycentric[2]-1)<1e-5f&&
+   std::all_of(s.barycentric.begin(),s.barycentric.end(),[](float b){return b>=0&&b<=1;});
+ };
+ for(const auto &range:snapshot.ranges){
+  auto ray=snapshot.picking->raycast_target(origin,{0,0,-1},2,0,range.object);
+  check(ray&&correct(*ray,range)&&std::abs(ray->surface.distance-1)<1e-5f,"Every original capacity actor remains ray-selectable with exact global triangle/material identity");
+  const auto contact=snapshot.picking->closest_target(point+Vec3{0,0,.02f},range.object);
+  check(correct(contact,range)&&std::abs(contact.surface.distance-.02f)<1e-5f,"Every original capacity actor supports direct controller contact with original geometry and barycentrics");
+  const auto legacy=snapshot.picking->closest(point+Vec3{0,0,.02f},range.object);
+  check(legacy.triangle==contact.surface.triangle&&length(legacy.position-contact.surface.position)<1e-5f,"Legacy and typed direct-contact callers retain the same global source namespace");
+  std::vector<uint64_t> excluded;for(const auto &other:snapshot.ranges)if(other.object!=range.object)excluded.push_back(other.object);
+  const auto isolated=snapshot.picking->raycast_excluding_target(origin,{0,0,-1},2,0,excluded);
+  check(isolated&&correct(*isolated,range),"Object exclusion retains all other original capacity actors instead of pruning their query data");
+ }
+ std::vector<uint64_t> excluded;for(const auto &range:snapshot.ranges)excluded.push_back(range.object);
+ check(!snapshot.picking->raycast_excluding_target(origin,{0,0,-1},2,0,excluded)&&
+       !snapshot.picking->nearby_target(point+Vec3{0,0,.02f},.01f),"Capacity picking respects complete exclusion and direct-contact distance bounds");
+ if(stable_ties){
+  const auto ray=snapshot.picking->raycast_target(origin,{0,0,-1},2);
+  const auto contact=snapshot.picking->nearby_target(point+Vec3{0,0,.02f},.04f);
+  check(ray&&contact&&correct(*ray,snapshot.ranges.front())&&correct(*contact,snapshot.ranges.front()),"Oversized coplanar actors retain earliest global primitive selection for visible ray and contact ties");
+ }
+}
 struct Target {
  GLuint f=0,c=0,d=0;static constexpr int size=32;
  Target(){glGenFramebuffers(1,&f);glBindFramebuffer(GL_FRAMEBUFFER,f);glGenTextures(1,&c);glBindTexture(GL_TEXTURE_2D,c);glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA8,size,size,0,GL_RGBA,GL_UNSIGNED_BYTE,nullptr);glFramebufferTexture2D(GL_FRAMEBUFFER,GL_COLOR_ATTACHMENT0,GL_TEXTURE_2D,c,0);glGenRenderbuffers(1,&d);glBindRenderbuffer(GL_RENDERBUFFER,d);glRenderbufferStorage(GL_RENDERBUFFER,GL_DEPTH_COMPONENT24,size,size);glFramebufferRenderbuffer(GL_FRAMEBUFFER,GL_DEPTH_ATTACHMENT,GL_RENDERBUFFER,d);if(glCheckFramebufferStatus(GL_FRAMEBUFFER)!=GL_FRAMEBUFFER_COMPLETE)throw std::runtime_error("Incomplete capacity framebuffer");}
@@ -65,8 +102,9 @@ int main(int argc,char**argv)try{
   //1.6M sources and the same exact small-scene pixel oracle. Before invocation,
   // qualification selects RSS guards4GiB Release/8GiB SAN and240s (CTest).
   constexpr size_t per=1'600'004,actors=6,total=per*actors;
-  doc.replace(scene(4,actors));const auto small=ready(doc);const auto baseline=render(small);doc.replace(scene(per,actors));const auto large=ready(doc);
+  doc.replace(scene(4,actors));const auto small=ready(doc);picking(*small,0);const auto baseline=render(small);doc.replace(scene(per,actors));const auto large=ready(doc);
   check(large->mesh.positions.size()==total&&large->mesh.normals.size()==total&&large->mesh.uv.size()==total&&large->mesh.indices.size()==actors*6&&large->ranges.size()==actors,"Separate large-buffer case publishes all six original native ordinary actors with full positions/normals/UV0");
+  picking(*large,0,true);
   auto native=doc.copy_scene();bool intact=native.objects().size()==actors;for(const auto&o:native.objects())intact&=o.mesh_active&&o.volume->voxels().empty()&&o.painted&&o.painted->mesh().positions.size()==per&&o.painted->mesh().indices.size()==6&&!o.appearance&&!o.material_bindings&&!o.deformation;
   check(intact&&large->source_normals.empty()&&large->canonical_normals.empty()&&large->source_tangents.empty()&&large->sculpt_masks.empty()&&large->selected_weights.empty(),"Large-buffer sources retain ordinary native identity without invented retained frames or scalar flags");
   const size_t payload=(large->mesh.positions.size()+large->mesh.normals.size())*sizeof(Vec3)+large->mesh.uv.size()*sizeof(std::array<float,2>);
@@ -75,13 +113,14 @@ int main(int argc,char**argv)try{
   std::cout<<"MEASURE separate_large_buffer actors "<<actors<<" vertices "<<total<<" actual_vertex_bytes "<<array_bytes<<" actual_index_bytes "<<index_bytes<<std::endl;
   check(render(large)==picture&&array_calls==0&&index_calls==0,"Separate >256MiB second eye performs zero geometry or scalar allocations");check(glGetError()==GL_NO_ERROR,"Separate large-buffer case leaves the actual GL error queue clean");std::cout<<checks<<" Separate large-buffer checks passed"<<std::endl;return 0;
  }
- doc.replace(scene(4));auto small=ready(doc);auto baseline=render(small);
+ doc.replace(scene(4));auto small=ready(doc);picking(*small,0);auto baseline=render(small);
  check(baseline[(Target::size/2*Target::size+Target::size/2)*4]==255,"Small ordinary three-object scene produces a nonblank independent pixel baseline");
  constexpr size_t per_object=1'600'004,total=3*per_object;
  doc.replace(scene(per_object));std::shared_ptr<const MeshSnapshot> large;
  try{large=ready(doc);}catch(const std::exception&e){if(!old||std::string(e.what()).find("Packed surface preview exceeds native renderer geometry limits")==std::string::npos)throw;std::cout<<"EXPECTED PRE-FIX FAILURE "<<e.what()<<std::endl;return 0;}
  if(old)throw std::runtime_error("Expected old c0 Document aggregate rejection did not occur");
  check(large->mesh.positions.size()==total&&large->mesh.indices.size()==18&&large->ranges.size()==3,"Actual Document packs all4.8M ordinary vertices and preserves independent object ranges");
+ picking(*large,0,true);
  check(large->source_normals.empty()&&large->canonical_normals.empty()&&large->source_tangents.empty()&&large->sculpt_masks.empty()&&large->selected_weights.empty(),"Ordinary painted meshes acquire no retained-frame or SDF visualization arrays");
  auto sources=doc.copy_scene();bool intact=sources.objects().size()==3;
  for(const auto&o:sources.objects())intact&=o.mesh_active&&o.volume->voxels().empty()&&o.painted&&o.painted->mesh().positions.size()==per_object&&o.painted->mesh().indices.size()==6&&!o.appearance&&!o.material_bindings&&!o.deformation;
@@ -101,6 +140,7 @@ int main(int argc,char**argv)try{
  check(render(small)==baseline&&array_calls==1&&index_calls==1,"A failed staged upload retries the proposed valid source without invalidating the accepted scene");
  large.reset();doc.replace(indexed_scene());auto indexed=ready(doc);
  check(indexed->mesh.positions.size()==1'083'603&&indexed->mesh.indices.size()==6'480'000,"Actual Document preserves independently valid ordinary grids above6M aggregate indices");
+ picking(*indexed,223939,true);
  check(render(indexed)==baseline&&index_calls==1&&index_bytes==6'480'000*sizeof(uint32_t),"The driver receives every index above the former aggregate cap and preserves baseline pixels");
  std::cout<<"MEASURE indexed vertices "<<indexed->mesh.positions.size()<<" indices "<<indexed->mesh.indices.size()<<" actual vertex upload bytes "<<array_bytes<<" actual index upload bytes "<<index_bytes<<std::endl;
  check(render(indexed)==baseline&&array_calls==0&&index_calls==0,"Second-eye rendering reuses the complete above6M index buffer");
