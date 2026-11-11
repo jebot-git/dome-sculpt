@@ -16,7 +16,7 @@ inline Scene fixture(uint32_t resolution=64,bool physical=false){
  auto p=std::make_shared<PaintedMesh>(quad(),resolution);PaintSettings s;s.color={.017f,.47f,.81f,.23f};s.metallic=.83f;s.roughness=.17f;s.emission={.91f,.031f,.27f};
  for(int layer=0;layer<3;++layer){if(layer)p->add_layer("Layer "+std::to_string(layer));for(int c=0;c<5;++c){s.channel=PaintChannel(c);s.mask=.41f;stroke(*p,s,{-.31f+layer*.27f,-.36f+c*.17f,0});}p->layer_properties("Layer "+std::to_string(layer),layer!=2,layer==0?.73f:.37f);}
  p->select_layer(p->layers().front().id);
- if(physical){s.channel=PaintChannel::Emission;s.emission_units=PaintEmissionUnits::Physical;s.emission={10000,.0003f,7};stroke(*p,s,{.03f,0,0},.00002f);}
+ if(physical){s.channel=PaintChannel::Emission;s.emission_units=PaintEmissionUnits::Physical;s.emission={10000,.0003f,7};stroke(*p,s,{.03f,0,0},.00002f);stroke(*p,s,{.45f,.4f,0},.67f,.13f);}
  Scene scene;auto&o=scene.active();o.painted=p;o.mesh_active=true;o.material.color={.23f,.61f,.037f,.67f};o.material.emissive={.013f,.037f,.071f};o.material.metallic=.31f;o.material.roughness=.68f;return scene;
 }
 inline std::shared_ptr<const MeshSnapshot> published(Document&d,const Scene&s){d.replace(s);check(d.wait_mesh(),"Actual document worker publishes frame");check(d.frame().state->error.empty(),"Actual document worker reports no error");auto frame=d.frame().surface;check(frame&&!frame->ranges.empty(),"Actual document frame owns material ranges");return frame;}

@@ -2832,7 +2832,7 @@ endif()
 
 if(BUILD_TESTING AND TARGET dome-sculpt-render)
   add_executable(dome-sculpt-paint-composite-render-test tests/paint-composite-render.cpp)
-  target_include_directories(dome-sculpt-paint-composite-render-test PRIVATE third_party/cgltf)
+  target_include_directories(dome-sculpt-paint-composite-render-test PRIVATE src third_party/cgltf)
   target_link_libraries(dome-sculpt-paint-composite-render-test PRIVATE dome-sculpt-render)
   target_link_options(dome-sculpt-paint-composite-render-test PRIVATE -Wl,--wrap=_ZN4dome15compute_backendEv)
   add_test(NAME paint-composite-render COMMAND dome-sculpt-paint-composite-render-test ${CMAKE_CURRENT_BINARY_DIR}/paint-composite-render)

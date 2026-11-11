@@ -243,7 +243,7 @@ public:
  size_t bytes()const noexcept{return requested_;}size_t image_count()const noexcept{return images_;}
  void clear(bool release){
   if(release){for(auto&[key,e]:entries_){for(auto&s:e.images)destroy(s);destroy(e.directory);destroy(e.view);}for(auto&[key,p]:padding_){destroy(p.buffer);destroy(p.view);}destroy(common_.buffer);destroy(common_.view);destroy(emission_.buffer);destroy(emission_.view);for(auto&s:retired_)destroy(s);if(fence_)glDeleteSync(fence_);if(program_)glDeleteProgram(program_);if(vao_)glDeleteVertexArrays(1,&vao_);}
-  entries_.clear();padding_.clear();common_={};emission_={};retired_.clear();fence_=nullptr;program_=vao_=0;requested_=images_=0;epoch_=sealed_=completed_=0;dirty_=false;
+  entries_.clear();padding_.clear();common_={};emission_={};retired_.clear();fence_=nullptr;program_=vao_=0;requested_=images_=0;epoch_=sealed_=completed_=0;dirty_=false;stats_.retired_bytes=0;
  }
  ~CurrentPaintPreviewCompiler(){clear(true);}
 };
