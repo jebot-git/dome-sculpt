@@ -1,3 +1,26 @@
+## Goal resumed; combined GPU preview integration — 2026-11-11
+
+The user explicitly reactivated the complete production goal after the prior
+milestone pause. All original and additional requirements remain required and
+incomplete; no smaller checkpoint redefines completion. The pause records below
+are historical.
+
+Main `3eb77a8a` retains qualified native GPU painting and ordered sculpt batching.
+Private preview `f47348eb` now composes with it at `ccb2b7b5` in
+`artifacts/preview-arena-integration-20261111`. Fresh coherent Release/SAN owning
+builds and combined native/render/public desktop/XR qualification are next.
+The new TextureMaps layout forbids borrowing old project objects as ABI proof.
+Current DomeD and freshly fetched origin/main remain `acc2b70`; canonical SDKs
+are unchanged. No new source admission, installation or headset acceptance is
+claimed for this candidate.
+
+Parallel reviews cover real preview resource/source authority, remaining
+painting adapters and a genuine plain-grid public application fixture. The old
+source-backed blur fixture is retained and does not prove the new preview route.
+Controller trays and spatial node-based editing/history stay required later
+phases after basic targets. Do not mark the full goal complete from build or
+selected-test success.
+
 ## Current milestone complete; goal paused — 2026-11-11
 
 The qualified native GPU painting and ordered sculpt arena composition is now
