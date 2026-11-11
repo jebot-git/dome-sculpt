@@ -12,6 +12,7 @@ bool fail_scalar_upload=false;
 bool count_material_setups=false;
 size_t material_setups=0;
 size_t tangent_defaults=0;
+size_t batch_submissions=0,batch_runs=0;
 std::shared_ptr<MeshSnapshot> mixed(const Scene &scene,const SculptSceneChunks::Ptr &previous={},bool masks=false,
     const std::shared_ptr<const void> &flat_identity={}) {
   const auto full=reference(scene);auto captured=SculptSceneChunks::capture(scene,{7,1,1,masks,true},previous);
@@ -44,8 +45,13 @@ extern "C" GLint __wrap_glGetUniformLocation(GLuint program,const GLchar *name) 
 }
 extern "C" void __real_glBufferData(GLenum,GLsizeiptr,const void*,GLenum);
 extern "C" void __wrap_glBufferData(GLenum target,GLsizeiptr size,const void *data,GLenum usage) {
-  if(fail_scalar_upload&&target==GL_ARRAY_BUFFER&&usage==GL_DYNAMIC_DRAW&&data){fail_scalar_upload=false;__real_glBufferData(target,-1,data,usage);return;}
+  if(fail_scalar_upload&&target==GL_ARRAY_BUFFER&&usage==GL_DYNAMIC_DRAW&&size>0){fail_scalar_upload=false;__real_glBufferData(target,-1,data,usage);return;}
   __real_glBufferData(target,size,data,usage);
+}
+extern "C" void __real_glMultiDrawElementsBaseVertex(GLenum,const GLsizei*,GLenum,const void *const*,GLsizei,const GLint*);
+extern "C" void __wrap_glMultiDrawElementsBaseVertex(GLenum mode,const GLsizei *counts,GLenum type,const void *const*offsets,GLsizei count,const GLint *bases) {
+  if(count_material_setups){++batch_submissions;batch_runs+=size_t(count);}
+  __real_glMultiDrawElementsBaseVertex(mode,counts,type,offsets,count,bases);
 }
 int main(int argc,char **argv)try{
   check(argc==2,"Usage: sculpt-chunk-render output-directory");const std::filesystem::path output=argv[1];std::filesystem::create_directories(output);
@@ -57,8 +63,10 @@ int main(int argc,char **argv)try{
     scene.object(2).material=scene.object(1).material;scene.object(2).material.color={.1f,.8f,.2f,.4f};
     if(sign<0)scene.object(1).affine_edit=std::make_shared<NativeAffineEdit>(AffineTransform(std::array<double,16>{-1,0,0,0,.27,1.2,0,0,.13,.09,.8,0,.1,-.2,.15,1}));
     const auto flat=reference(scene);auto chunked=mixed(scene);auto oracle=render(expected,flat);
-    material_setups=0;tangent_defaults=0;count_material_setups=true;auto image=render(actual,chunked);count_material_setups=false;
+    material_setups=0;tangent_defaults=0;batch_submissions=0;batch_runs=0;count_material_setups=true;auto image=render(actual,chunked);count_material_setups=false;
     check(image==oracle,"Actual GL chunk draw equals independent whole-mesher reference for opaque/Blend/Mask and reflected/sheared geometry");
+    check(batch_submissions==chunked->sculpt_chunks->objects().size()&&batch_runs>batch_submissions,"Actual ordered run stream is batched once per sculpt object without chunk sorting");
+    std::cout<<"ORDERED_BATCHES case="<<cases<<" actual="<<batch_submissions<<" original_runs="<<batch_runs<<'\n';
     const auto setup_limit=chunked->ranges.size()+chunked->sculpt_chunks->objects().size();
     std::cout<<"MATERIAL_SETUP case="<<cases<<" actual="<<material_setups<<" object_range_limit="<<setup_limit<<'\n';
     check(material_setups>0&&material_setups<=setup_limit,"Material state submission is bounded by actual objects/ranges, not ordered sculpt cell runs");

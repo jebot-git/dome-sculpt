@@ -26,6 +26,7 @@
 #include "source-vrm1-background.hpp"
 #include "sculpt-placed-chunks.hpp"
 #include "sculpt-chunk-masks.hpp"
+#include "sculpt-gpu-arena.hpp"
 #include <chrono>
 #include <unordered_set>
 namespace dome {
@@ -617,110 +618,12 @@ struct SurfaceRenderer::TextureState {
 // GL context-owned cache, independently keyed by actual immutable placed
 // geometry and scalar owners. CPU arrays go directly to the driver; live
 // held/canvas motion never enters either key or rebuilds geometry.
-struct SurfaceRenderer::ChunkState {
-  struct Entry {
-    std::shared_ptr<const Mesh> geometry;
-    detail::SculptChunkMasks::Values mask;
-    GLuint vao=0,vertices=0,indices=0,scalar=0;
-    size_t vertex_bytes=0,index_bytes=0,mask_bytes=0;
-    void clear(bool context){if(context){glDeleteVertexArrays(1,&vao);glDeleteBuffers(1,&vertices);glDeleteBuffers(1,&indices);glDeleteBuffers(1,&scalar);}vao=vertices=indices=scalar=0;}
-  };
-  struct Key {uint64_t object;const Mesh *mesh;bool operator==(const Key &) const=default;};
-  struct Hash {size_t operator()(const Key &key) const {return std::hash<const Mesh*>{}(key.mesh)^(std::hash<uint64_t>{}(key.object)+0x9e3779b9u);}};
-  std::unordered_map<Key,Entry,Hash> entries;
-  size_t bytes=0;
-  uint64_t generation=0,uploads=0,scalar_uploads=0;
-  static constexpr size_t limit=512*1024*1024;
-  void clear(bool context){for(auto &[_,entry]:entries)entry.clear(context);entries.clear();bytes=0;}
-  ~ChunkState(){clear(true);}
-  void prepare(const detail::SculptSceneChunks::Ptr &scene) {
-    if(!scene){clear(true);return;}
-    if(generation!=scene->context().generation){clear(true);generation=scene->context().generation;}
-    std::unordered_set<Key,Hash> wanted;
-    for(const auto &object:scene->objects())object.placed->for_each([&](const auto &chunk){
-      if(wanted.size()>=65536)throw std::length_error("Sculpt GPU packet count limit exceeded");
-      wanted.insert({object.object,chunk->geometry_owner().get()});
-    });
-    for(auto i=entries.begin();i!=entries.end();)if(!wanted.contains(i->first)){
-      bytes-=i->second.vertex_bytes+i->second.index_bytes+i->second.mask_bytes;i->second.clear(true);i=entries.erase(i);
-    }else ++i;
-    for(const auto &object:scene->objects())object.placed->for_each([&](const auto &chunk){
-      const auto &owner=chunk->geometry_owner();
-      const Key key{object.object,owner.get()};auto i=entries.find(key);
-      if(i==entries.end()) {
-        const auto &mesh=*owner;
-        if(mesh.normals.size()!=mesh.positions.size()||mesh.indices.size()>size_t(std::numeric_limits<GLsizei>::max()))
-          throw std::length_error("Invalid sculpt GPU packet attributes or draw count");
-        const auto pbytes=render_detail::buffer_bytes(mesh.positions.size(),sizeof(Vec3));
-        const auto vbytes=render_detail::buffer_sum(pbytes,pbytes);
-        const auto ibytes=render_detail::buffer_bytes(mesh.indices.size(),sizeof(uint32_t));
-        const auto needed=render_detail::buffer_sum(vbytes,ibytes);
-        if(bytes>limit||needed>limit-bytes)throw std::length_error("Sculpt GPU geometry byte limit exceeded");
-        Entry entry;entry.geometry=owner;entry.vertex_bytes=vbytes;entry.index_bytes=ibytes;
-        try {
-          glGenVertexArrays(1,&entry.vao);glGenBuffers(1,&entry.vertices);glGenBuffers(1,&entry.indices);
-          glBindVertexArray(entry.vao);glBindBuffer(GL_ARRAY_BUFFER,entry.vertices);
-          glBufferData(GL_ARRAY_BUFFER,GLsizeiptr(vbytes),nullptr,GL_STATIC_DRAW);check_surface_buffer("Sculpt packet allocation failed");
-          glBufferSubData(GL_ARRAY_BUFFER,0,GLsizeiptr(pbytes),mesh.positions.data());
-          glBufferSubData(GL_ARRAY_BUFFER,GLintptr(pbytes),GLsizeiptr(pbytes),mesh.normals.data());
-          glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,sizeof(Vec3),nullptr);glEnableVertexAttribArray(0);
-          glVertexAttribPointer(1,3,GL_FLOAT,GL_FALSE,sizeof(Vec3),reinterpret_cast<void*>(pbytes));glEnableVertexAttribArray(1);
-          glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,entry.indices);glBufferData(GL_ELEMENT_ARRAY_BUFFER,GLsizeiptr(ibytes),mesh.indices.data(),GL_STATIC_DRAW);
-          check_surface_buffer("Sculpt packet upload failed");
-          i=entries.emplace(key,std::move(entry)).first;bytes+=needed;++uploads;
-        }catch(...){entry.clear(true);throw;}
-      }
-      auto &entry=i->second;
-      const auto mask=object.masks?object.masks->find(chunk->source()):nullptr;
-      if(mask!=entry.mask) {
-        const auto needed=mask?render_detail::buffer_bytes(mask->values.size(),sizeof(float)):0;
-        if(mask&&mask->values.size()!=owner->positions.size())throw std::invalid_argument("Sculpt scalar GPU alignment differs from geometry");
-        // Both prior accepted bytes and the staged allocation are live until
-        // commit; the prospective peak must fit, not only the final total.
-        if(bytes>limit||needed>limit-bytes)throw std::length_error("Sculpt GPU scalar staging byte limit exceeded");
-        // Stage a separate buffer before replacing the accepted scalar owner.
-        // A failed allocation/upload cannot mutate the prior packet in place.
-        GLuint next=0;
-        try {
-          if(mask){glGenBuffers(1,&next);glBindBuffer(GL_ARRAY_BUFFER,next);glBufferData(GL_ARRAY_BUFFER,GLsizeiptr(needed),mask->values.data(),GL_DYNAMIC_DRAW);check_surface_buffer("Sculpt scalar upload failed");}
-          // Detach the old scalar association even when disabling protection.
-          // Merely disabling an attribute retains its buffer in an unbound VAO.
-          glBindVertexArray(entry.vao);glBindBuffer(GL_ARRAY_BUFFER,mask?next:entry.vertices);
-          glVertexAttribPointer(6,1,GL_FLOAT,GL_FALSE,sizeof(float),nullptr);
-          if(mask)glEnableVertexAttribArray(6);else glDisableVertexAttribArray(6);
-          check_surface_buffer("Sculpt scalar attribute staging failed");
-        }catch(...){glDeleteBuffers(1,&next);throw;}
-        glDeleteBuffers(1,&entry.scalar);entry.scalar=next;
-        bytes=bytes-entry.mask_bytes+needed;entry.mask_bytes=needed;entry.mask=mask;++scalar_uploads;
-      }
-    });
-  }
-  void bind(uint64_t object,const detail::SculptPlacedChunk::Ptr &chunk,bool defaults) const {
-    auto i=entries.find({object,chunk->geometry_owner().get()});
-    if(i==entries.end()||i->second.geometry!=chunk->geometry_owner()||
-       i->second.geometry.owner_before(chunk->geometry_owner())||chunk->geometry_owner().owner_before(i->second.geometry))
-      throw std::logic_error("Sculpt GPU packet lost its actual immutable geometry owner");
-    glBindVertexArray(i->second.vao);
-    // These arrays stay disabled in every chunk VAO, so their context-wide
-    // constants remain valid across this object's draws. Scalar attribute6
-    // can be enabled by a masked chunk; its constant still needs resetting
-    // whenever a later chunk disables that array.
-    if(defaults){
-      glVertexAttrib2f(2,0,0);glVertexAttrib2f(3,0,0);glVertexAttrib1f(4,-1);
-      glVertexAttrib4f(5,1,0,0,1);
-      glVertexAttrib3f(7,0,0,1);glVertexAttrib4f(8,1,0,0,1);glVertexAttrib3f(9,0,0,1);
-      glVertexAttrib4f(10,1,1,1,1);glVertexAttrib4f(11,0,0,0,0);glVertexAttrib2f(12,0,0);
-      for(GLuint attribute=13;attribute<16;++attribute)glVertexAttrib4f(attribute,0,0,0,0);
-    }
-    if(i->second.mask){glBindBuffer(GL_ARRAY_BUFFER,i->second.scalar);glVertexAttribPointer(6,1,GL_FLOAT,GL_FALSE,sizeof(float),nullptr);glEnableVertexAttribArray(6);}
-    else {glDisableVertexAttribArray(6);glVertexAttrib1f(6,-1);}
-  }
-};
+struct SurfaceRenderer::ChunkState : render_detail::SculptGpuArena {};
 SurfaceBufferStats SurfaceRenderer::buffer_stats() const {
   auto result=buffers_;
   if(chunks_) {
     result.geometry_uploads+=chunks_->uploads;result.mask_uploads+=chunks_->scalar_uploads;
-    for(const auto &[_,entry]:chunks_->entries){result.vertex_bytes+=entry.vertex_bytes;result.index_bytes+=entry.index_bytes;result.mask_bytes+=entry.mask_bytes;}
+    result.vertex_bytes+=chunks_->vertex_bytes();result.index_bytes+=chunks_->index_bytes();result.mask_bytes+=chunks_->mask_bytes();
   }
   return result;
 }
@@ -828,6 +731,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
                            ob::Vec3 camera, int width, int height,
                            bool transparent, bool toon, bool light, std::span<const ObjectInfo> display, uint64_t replaced_object) {
   if(!mesh)throw std::invalid_argument("Missing sculpt mesh snapshot");
+  ChunkState::Pending staged_chunks;
   try{
   textures_->target.begin(width,height,textures_->output);
   glViewport(0, 0, width, height);
@@ -840,6 +744,9 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
   glClearColor(background, background, background, transparent ? 0 : 1);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   if (mesh != cached_) {
+    // Stage arena owners before touching accepted metadata. All dirty writes
+    // target unused ranges or new buffers; commit is nonthrowing.
+    staged_chunks=chunks_->stage(mesh->sculpt_chunks);
     const auto &identity=mesh->geometry_identity;
     bool reuse=identity && cached_ && cached_->geometry_identity &&
       identity==cached_->geometry_identity &&
@@ -946,7 +853,6 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
     };
     scalar(weights_,4,mesh->selected_weights,buffers_.weight_bytes,buffers_.weight_uploads);
     scalar(masks_,6,mesh->sculpt_masks,buffers_.mask_bytes,buffers_.mask_uploads);
-    chunks_->prepare(mesh->sculpt_chunks);
     count_=mesh->mesh.indices.size();
     cached_=std::move(mesh);
   }
@@ -996,7 +902,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
   };
   bool ghost_pass=false;
   auto draw_range = [&](const Material &original, size_t first, size_t count,
-                        uint64_t id, const TextureMaps *maps,bool use_source=false,bool use_canonical=false,bool force_pbr=false,bool paint_domain=false,bool normal_domain=false,const SourceMaterialBindings *binding=nullptr,const detail::Vrm1SourceBackground *background=nullptr,uint32_t texture_set=0) {
+                        uint64_t id, const TextureMaps *maps,bool use_source=false,bool use_canonical=false,bool force_pbr=false,bool paint_domain=false,bool normal_domain=false,const SourceMaterialBindings *binding=nullptr,const detail::Vrm1SourceBackground *background=nullptr,uint32_t texture_set=0,bool submit=true) {
     const TextureState::MaterialKey key{id,texture_set};
     const bool native_float=TextureState::native_float(original,maps,binding);
     const auto polygon=maps?maps->polygon_surface:nullptr;glUniform1i(glGetUniformLocation(program_,"polygon_mode"),polygon?int(polygon->model()):0);
@@ -1070,6 +976,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
       glDepthMask(GL_TRUE);
     }
     if(ghost_pass){glEnable(GL_BLEND);glBlendFuncSeparate(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA,GL_ONE,GL_ONE_MINUS_SRC_ALPHA);glDepthMask(GL_FALSE);glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE);}
+    if(!submit)return;
     if(polygon){
       const auto range=std::find_if(cached_->ranges.begin(),cached_->ranges.end(),[&](const auto&r){return r.object==id&&r.texture_set==texture_set&&r.first==first&&r.count==count;});if(range==cached_->ranges.end())throw std::invalid_argument("Polygon draw lost its actual current range");
       textures_->polygon_frames.draw(*polygon,detail::polygon_range_world(*range),first,count,range->texture_set_proof?range->texture_set_proof->field().domain:nullptr,[&](size_t offset,size_t n){glDrawElements(GL_TRIANGLES,GLsizei(n),GL_UNSIGNED_INT,reinterpret_cast<void*>(offset*sizeof(uint32_t)));});
@@ -1243,26 +1150,12 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
         const auto affine=object.affine?std::optional<AffineTransform>(object.affine->world()):std::nullopt;
         if(!begin_object(object.object,!object.affine,object.world,affine,true))continue;
         glUniform1i(glGetUniformLocation(program_,"weight_pass"),0);
-        // Always retain original cell/triangle order, including opaque ties.
-        // Chunk-major sorting would change Blend/ghost and GL_LESS results.
-        std::optional<detail::SculptSurfaceRun> pending;
-        // Every run of this object has the same immutable material and plain
-        // (untextured) shader state. Binding the next chunk changes only vertex
-        // inputs; it cannot change those uniforms, textures or raster settings.
-        // Set them once, rather than repeating material setup for every cell-
-        // ordered run. Keep all draws in their original order.
-        bool material_bound=false;
-        auto flush=[&]{if(!pending)return;const auto placed=object.placed->find(pending->chunk);chunks_->bind(object.object,placed,!material_bound);
-          if(!material_bound){
-            draw_range(object.material,pending->first,pending->count,object.object,nullptr,false,false,cached_->pbr_view);
-            material_bound=true;
-          }else glDrawElements(GL_TRIANGLES,GLsizei(pending->count),GL_UNSIGNED_INT,
-                              reinterpret_cast<void*>(pending->first*sizeof(uint32_t)));
-          pending.reset();};
-        object.geometry->for_each_run([&](const detail::SculptSurfaceRun &run){
-          if(pending&&pending->chunk==run.chunk&&pending->first+pending->count==run.first)pending->count+=run.count;
-          else {flush();pending=run;}
-        });flush();
+        // Commands keep exact original cell/triangle order. Basevertex changes
+        // only arena placement: raw immutable local indices remain unchanged.
+        if(chunks_->has_commands(object.object,staged_chunks)){
+          draw_range(object.material,0,0,object.object,nullptr,false,false,cached_->pbr_view,false,false,nullptr,nullptr,0,false);
+          chunks_->draw(object.object,staged_chunks);
+        }
         continue;
       }
       auto r=item.packed;
@@ -1300,7 +1193,8 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
   glUseProgram(0);
   if (glGetError() != GL_NO_ERROR){textures_->clear(true);cached_.reset();count_=0;throw std::runtime_error("Sculpt GPU rendering failed");}
   if(!textures_->deferred)resolve();
-  }catch(...){cached_.reset();count_=0;chunks_->clear(true);textures_->target.abort();throw;}
+  if(staged_chunks)chunks_->commit(std::move(staged_chunks));
+  }catch(...){cached_.reset();count_=0;textures_->target.abort();throw;}
 }
 
 namespace {
