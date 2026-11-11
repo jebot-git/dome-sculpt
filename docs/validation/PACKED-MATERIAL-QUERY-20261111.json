@@ -2126,13 +2126,13 @@
   },
   "evidence": {
     "path": "docs/validation/PACKED-MATERIAL-QUERY-20261111-evidence.tar.gz",
-    "sha256": "c255098660a37b0a3c4daa9fd08aa18fc5680cd5ce039c935ba0bc821611c158",
-    "bytes": 195768,
+    "sha256": "b9e41b22608a0695ebb1a4e36d1bd5a62951aa197a1606d0b5733a8be4d0006f",
+    "bytes": 195766,
     "members": 87,
     "every_member_decoded_and_sha256_checked": true
   },
   "no_system_install_or_session_launch": true,
-  "remaining": "Original full layered painting/material/baking, real source/projected/physical-emission adapters, and whole final owning/UI/XR/hardware/P1 admission remain separate requirements. This bounded query/preview milestone is not full-goal completion.",
   "agent_jobs_closed": true,
-  "agent_has_hardware_lease": false
+  "agent_has_hardware_lease": false,
+  "remaining": "Original full layered painting/material/baking, real source/projected/physical-emission adapters, and whole final owning/UI/XR/hardware/P1 admission remain separate requirements. This bounded query/preview milestone is not full-goal completion."
 }
