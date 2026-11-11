@@ -5,6 +5,10 @@ milestone pause. All original and additional requirements remain required and
 incomplete; no smaller checkpoint redefines completion. The pause records below
 are historical.
 
+Read [RESUMED-PROGRESS-20261111.md](RESUMED-PROGRESS-20261111.md) for the
+current renderer recovery findings, original four-object failure and private
+fix/qualification boundaries.
+
 Main `3eb77a8a` retains qualified native GPU painting and ordered sculpt batching.
 Private preview `f47348eb` now composes with it at `ccb2b7b5` in
 `artifacts/preview-arena-integration-20261111`. Fresh coherent Release/SAN owning

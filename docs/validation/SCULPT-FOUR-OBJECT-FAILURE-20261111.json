@@ -1,0 +1,110 @@
+{
+  "run": {
+    "state": "terminal",
+    "source": "27f01cad7910a9c6b6dd383a4422f3feffdbc61c",
+    "command": [
+      "/home/blux/de-xr/dome-sculpt/artifacts/paint-arena-build-20261111/release/dome-sculpt-sculpt-sustained",
+      "--output",
+      "/home/blux/de-xr/dome-sculpt/artifacts/sustained-four-objects-20261111/full-p1",
+      "--device",
+      "arc",
+      "--tier",
+      "production",
+      "--objects",
+      "4",
+      "--voxel",
+      ".0125",
+      "--width",
+      "768",
+      "--height",
+      "768",
+      "--strokes",
+      "300",
+      "--masks",
+      "120",
+      "--pairs",
+      "2000",
+      "--held-pairs",
+      "120",
+      "--repetitions",
+      "3"
+    ],
+    "binary_sha256": "5fd74a2afae3d2c1c5409b019d4e70030a11baf7856662ed2d89f6c13c891fd9",
+    "scope": "Full original production four-object correctness workload on actual Arc graphics with CPU brushes/mesher. Not physical headset pacing, exclusive-system performance or full production-matrix qualification; this adds its four-object row only.",
+    "conditions": "Other CPU development/qualification may remain active; exclusive Arc lock required. Record measurements as observed under these conditions.",
+    "limits": {
+      "external_timeout_seconds": 5400,
+      "process_rss_bytes": 5368709120,
+      "output_allocated_bytes": 2147483648,
+      "workspace_free_floor_bytes": 21474836480
+    },
+    "original_native_limits": "Unchanged benchmark source, original full arguments, field/working-byte/native/frame/source/Undo/history/cancellation/timer assertions and120second publication waits; current renderer implementation differs.",
+    "benchmark_source_sha256": "dd82b0435406f94e75f43b1836c41440b286a8fc29a80c76933820a465de5154",
+    "baseline_full_P1": "artifacts/sustained-current-20261111/full-p1/result.json",
+    "phase": "/home/blux/de-xr/dome-sculpt/artifacts/sustained-four-objects-20261111",
+    "lock": "/tmp/dome-sculpt-arc-device.lock",
+    "pid": 137497,
+    "environment": {
+      "LD_LIBRARY_PATH": "/home/blux/de-xr/dome-sculpt/artifacts/sdk-20261111/toolkit-release/lib:/usr/lib64",
+      "DRI_PRIME": "pci-0000_03_00_0",
+      "EGL_PLATFORM": "surfaceless",
+      "MESA_SHADER_CACHE_DISABLE": "1",
+      "LP_NUM_THREADS": "2"
+    },
+    "lock_acquired_utc": "2026-11-11T18:10:53Z",
+    "child_pid": 137693,
+    "seconds": 6.010428233013954,
+    "peak_rss_bytes": 582770688,
+    "allocated_output_bytes": 512000,
+    "exit": 1,
+    "external_guard": null,
+    "protected_drift": [],
+    "result_status": "failed",
+    "result_sha256": "309abbe4b5c3d6d393a66bb098a7ce5306b0265fb3a8e643ef40cfe265dfc5c5",
+    "complete_planned_counts": false,
+    "completed_repetitions": 0,
+    "success": false,
+    "log_sha256": "7b88c764006bad711431dccd3a2c0e813e24d6b821478b6c333a3798e1c6bf89",
+    "script_sha256": "d883c1f06ca42ac7f607554e73e0bb89929582cd7d0f1c797b9e59d5b338d8cb"
+  },
+  "actual_native_result": {
+    "status": "failed",
+    "reason": "Document error: Sculpt manifest retained byte limit exceeded",
+    "backend": "CPU",
+    "device_witness_initial": {
+      "authenticated": true,
+      "device_id": "0x56a0\n",
+      "device_major": 226,
+      "device_minor": 129,
+      "driver": "/sys/bus/pci/drivers/i915",
+      "open_fds": [
+        {
+          "fd": 4,
+          "target": "/dev/dri/renderD129"
+        },
+        {
+          "fd": 5,
+          "target": "/dev/dri/renderD129"
+        },
+        {
+          "fd": 6,
+          "target": "/dev/dri/renderD129"
+        },
+        {
+          "fd": 7,
+          "target": "/dev/dri/renderD129"
+        }
+      ],
+      "pci": "/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0",
+      "render_node": "/dev/dri/renderD129",
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "requested": "arc",
+      "vendor": "Intel",
+      "vendor_id": "0x8086\n",
+      "version": "4.6 (Core Profile) Mesa 26.2.5"
+    }
+  },
+  "scope": "Real original production4-object failure on admitted27f; not new preview or new shared-instance qualification.",
+  "candidate": "b6e366fd; private actual COW geometry sharing, native qualification pending.",
+  "original_files_preserved": true
+}
