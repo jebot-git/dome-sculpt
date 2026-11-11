@@ -73,7 +73,9 @@ void uv1_worker_controls(const std::filesystem::path &directory){
     const auto name=std::string(typed?"mtoon-":"pbr-")+(coverage<.001f?"tiny":"quarter");
     const auto folder=directory/name;std::filesystem::create_directories(folder);
     std::cout<<"UV1_WORKER_CASE "<<name<<std::endl;
-    auto f=fixture();auto &source=f.scene.object(f.source);
+    auto f=fixture();const auto sibling=f.scene.add("Retained hidden physical sibling",Volume{});
+    {auto &held=f.scene.active();held.mesh_active=true;held.painted=std::make_shared<PaintedMesh>(quad(),64);held.visible=false;held.locked=true;}
+    f.scene.select(f.target);auto &source=f.scene.object(f.source);
     auto white=std::make_shared<const Image>(image({255,255,255,255}));
     auto pattern=std::make_shared<const Image>(Image{2,2,{255,0,255,255,0,255,0,255,0,0,0,255,255,255,255,255}});
     auto maps=std::make_shared<PaintSourceMaps>();maps->color.image=white;maps->color.texcoord=1;
@@ -93,20 +95,27 @@ void uv1_worker_controls(const std::filesystem::path &directory){
       auto &role=binding->roles[size_t(MToonSlot::Emission)];role.image=pattern;role.mag_filter=role.min_filter=9728;
       source.material_bindings=std::move(binding);
     }
-    source.painted->add_layer("Actual hidden source physical data");
+    // Original alternate-coordinate sources are readonly until their explicit
+    // atlas workspace is prepared. Preserve that guard, rather than forging a
+    // writable source domain simply to author a fixture stroke.
+    const auto raw=source.painted->encode();auto attempted=source.painted->snapshot();bool refused=false;
+    try{attempted->begin_stroke();attempted->cancel_stroke();}catch(const std::logic_error &e){refused=std::string_view(e.what())=="Prepare an editable texture atlas before painting these original source coordinates";}
+    check(refused&&attempted->encode()==raw,"raw UV1 source painting remains explicitly refused without changing actual field/image owners");
+    auto &held=*f.scene.object(sibling).painted;held.add_layer("Actual hidden physical data");
     PaintSettings ink;ink.channel=PaintChannel::Emission;ink.emission_units=PaintEmissionUnits::Physical;ink.emission={7,.000005f,1};ink.front_only=false;
-    Brush brush;brush.from=brush.to={0,0,.005f};brush.normal={0,0,1};brush.radius=.3f;brush.strength=.37f;
-    source.painted->begin_stroke();source.painted->stamp(brush,ink);check(source.painted->end_stroke(),"actual source owns nonempty hidden physical tiles");source.painted->layer_properties("Actual hidden source physical data",false,.375f);
+    Brush brush;brush.from=brush.to={0,0,0};brush.normal={0,0,1};brush.radius=.3f;brush.strength=.37f;
+    held.begin_stroke();held.stamp(brush,ink);check(held.end_stroke(),"actual hidden locked sibling owns nonempty physical editable tiles");held.layer_properties("Actual hidden physical data",false,.375f);
     auto &target=*f.scene.active().painted;target.layer_properties("Retained hidden target",true,1);
     ink={};ink.color={.2f,.7f,.1f,.4f};ink.front_only=false;brush.from=brush.to={0,0,0};
     target.begin_stroke();target.stamp(brush,ink);check(target.end_stroke(),"actual target owns hidden editable color/mask data before Bake");target.layer_properties("Retained hidden target",false,.25f);
-    f.scene.validate();const auto before=f.scene.encode(),source_before=source.painted->encode();const auto source_binding=source.material_bindings;const auto layers=target.layers();
+    f.scene.validate();const auto before=f.scene.encode(),source_before=source.painted->encode();const auto source_binding=source.material_bindings;const auto layers=target.layers();const auto sibling_before=f.scene.object(sibling).painted->encode();
     ObjectBakeSettings options;options.front_mm=10;options.back_mm=2;options.padding=2;options.ao_samples=0;
     Document doc;doc.replace(f.scene);std::cout<<"UV1_ADMISSION can_bake="<<doc.frame().state->can_bake<<" source="<<doc.frame().state->bake_source<<std::endl;
     doc.bake_from_object(f.source,options);auto save=doc.save_async(folder/"accepted.dsculpt");finish(doc);saved(std::move(save));
     const auto accepted=doc.copy_scene();const auto after=accepted.encode();const auto &paint=*accepted.active().painted;
     check(after!=before&&paint.baked()&&paint.baked()->emission_field&&paint.baked()->maps.emission.rgba.empty(),"actual UV1 worker adopts resolved FLOAT rather than RGB8 emission");
     check(accepted.object(f.source).painted->encode()==source_before&&source.painted->encode()==source_before&&accepted.object(f.source).visible==false&&accepted.object(f.source).locked,"worker keeps hidden locked actual source/UV/image/field/hidden tiles exact");
+    check(accepted.object(sibling).painted->encode()==sibling_before&&!accepted.object(sibling).visible&&accepted.object(sibling).locked,"actual hidden sibling physical/editable ownership survives source Bake");
     if(typed)check(accepted.object(f.source).material_bindings->material.encode()==source_binding->material.encode(),"worker preserves actual typed material/alternate-role transform/strength");
     check(paint.layers().size()==layers.size(),"worker retains target editable-layer count");
     for(size_t i=0;i<layers.size();++i){const auto &a=layers[i],&b=paint.layers()[i];check(a.tiles==b.tiles&&a.emission_tiles==b.emission_tiles&&a.pbr_tiles==b.pbr_tiles&&a.name==b.name&&a.visible==b.visible&&a.opacity==b.opacity,"actual target hidden editable ownership survives field adoption");}
@@ -119,7 +128,7 @@ void uv1_worker_controls(const std::filesystem::path &directory){
     }
     // An emission-stripped ordinary control carries the exact same visible
     // color/normal/ORM source. It never replaces the actual hidden source.
-    auto ordinary=f.scene.snapshot();auto &control=ordinary.object(f.source);control.painted=control.painted->snapshot();control.painted->delete_layer();
+    auto ordinary=f.scene.snapshot();auto &control=ordinary.object(f.source);control.painted=control.painted->snapshot();
     auto old=*control.painted->baked();old.emission_field.reset();old.maps.emission=image({0,0,0,255});control.painted->clear_bake();control.painted->install_bake(std::move(old));control.material.emissive={};
     if(typed){auto binding=std::make_shared<SourceMaterialBindings>(*control.material_bindings);binding->material.parameters.emission={};binding->material.parameters.emission_strength=1;control.material_bindings=std::move(binding);}
     bake_object(ordinary,f.source,options);const auto &other=*ordinary.active().painted->baked(),&actual=*paint.baked();

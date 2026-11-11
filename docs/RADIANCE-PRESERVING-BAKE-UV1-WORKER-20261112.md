@@ -26,3 +26,12 @@ or authority borrowed from callback27. The existing native32/prepared-normal Bak
 guards remain; these four cases do not claim their full coordinate/frame transport.
 Actual authored-MToon final rendering/Linear framebuffer precision is a separate
 root-owned diagnostic and current public application workflows remain separate.
+
+The first5d17 prototype run failed before0 assertions at its attempted brush
+stroke on the raw UV1 source, before any Document Bake. Preserve
+`radiance-bake-uv1-worker-proof-20261112/native-release-v1`. The new test child
+keeps the real raw source readonly with its nonempty FLOAT base, explicitly
+asserts the painting refusal, and retains real nonempty hidden physical editable
+tiles in a separate hidden locked sibling. All scene owners remain covered by
+exact native/history/export checks. It does not fabricate a native32 source
+domain or remove the existing source-aware editable-atlas/Bake guards.
