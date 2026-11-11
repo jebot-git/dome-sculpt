@@ -75,6 +75,7 @@ void shared_instances(){
   Scene scene;const auto field=shells();scene.active().volume=std::make_shared<Volume>(field);
   for(size_t i=1;i<4;++i){auto id=scene.add("Shared immutable sculpt",field);scene.object(id).transform.position={float(i)*1.3f,0,0};}
   scene.object(4).affine_edit=std::make_shared<NativeAffineEdit>(AffineTransform(std::array<double,16>{-1,0,0,0,.17,1.1,0,0,.07,.09,.85,0,0,0,0,1}));
+  scene.select(1);
   auto first=SculptSceneChunks::capture(scene,{27,1,1,true,true});
   const auto owner=first.chunks->find(1)->geometry;
   for(uint64_t id=2;id<=4;++id)
