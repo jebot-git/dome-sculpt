@@ -1,0 +1,87 @@
+{
+  "schema": 1,
+  "product_source": "2238315b6d49bf782c7b9970001b35e6fcd9f2d4",
+  "owning_worktree_head": "5bb34971651f6200bea7caf5af21a515cef8492f",
+  "scope": "Release GPU packing/shader functional qualification. No whole SurfaceRenderer/application/HMD/physical pacing or sanitizer claim.",
+  "elf_sha256": "e99b35f75527472436a6d98c8f43bad5aeba4b1aa32fa463b6d5d5b116160585",
+  "public_headers_equal_own8b": 103,
+  "native_checks_per_case": 172040,
+  "assertions": [
+    "Independent binary64 comparison of actual five released FLOAT GPU coefficient planes",
+    "HDR50000, tiny nonzero radiance and sub-UNORM8 FLOAT coverage independently from RGB8 common fallback",
+    "Visible and hidden genuine physical sparse overlay composition",
+    "Unchanged color/alpha/ORM/coverage plane semantics",
+    "Actual forecast-minus-one refusal before publication and exact forecast acceptance",
+    "Actual resource ledger clear and context teardown"
+  ],
+  "runtime_authority": "Unmodified glGetString forwarding observer; actual EGLDevice/DRM char node/PCI8086:56a0 plus current liveFD and prelaunch-pinned mappedELFs; no shader/native result changes",
+  "observer_source_sha256": "f13b90442862bdc64bd0e707a728305a68ecd45d726d54a09982b6c1bdae260e",
+  "driver": "/home/blux/de-xr/dome-sculpt/artifacts/radiance-bake-gpu-proof-20261111/run.py",
+  "driver_sha256": "c4693b98f74246df2ea80c16dba09b40ab675801b32dbad1fbcd3b3ad460e278",
+  "cases": [
+    {
+      "profile": "release",
+      "case": "software",
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/radiance-bake-fallback2-proof-20261111/release/dome-sculpt-baked-emission-gpu-test"
+      ],
+      "native_exit": 0,
+      "exit": 0,
+      "guard": null,
+      "seconds": 0.12252613896271214,
+      "maxrss_bytes": 110034944,
+      "actual_device_authenticated": false,
+      "actual_software_renderer_authenticated": true,
+      "actual_live_DRM_FDs": [],
+      "device_report": "",
+      "native_check_count_exact": true,
+      "expected_original_native_checks": 172040,
+      "input_drift": [],
+      "source_drift": [],
+      "output_drift": [],
+      "mapped_ELF_provider_drift": [],
+      "unpinned_mapped_ELFs": [],
+      "sanitizer_diagnostics": false,
+      "lease_released_epoch": 1794437239.7840536,
+      "receipt": "/home/blux/de-xr/dome-sculpt/artifacts/radiance-bake-gpu-proof-20261111/release-software-v1/status.json",
+      "receipt_sha256": "710cf46ce2221bb846a52fb62928582d5ed61ef27ff2b8724fea1c5175379726",
+      "process_log_sha256": "40db9bc90960819228446b03ac6421930248ff77c6f9d29dc046a5ce1ac7cdb5"
+    },
+    {
+      "profile": "release",
+      "case": "arc",
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/radiance-bake-fallback2-proof-20261111/release/dome-sculpt-baked-emission-gpu-test"
+      ],
+      "native_exit": 0,
+      "exit": 0,
+      "guard": null,
+      "seconds": 0.07888070697663352,
+      "maxrss_bytes": 67485696,
+      "actual_device_authenticated": true,
+      "actual_software_renderer_authenticated": false,
+      "actual_live_DRM_FDs": [
+        "/dev/dri/renderD129"
+      ],
+      "device_report": "vendor=Intel\nrenderer=Mesa Intel(R) Arc(tm) A770 Graphics (DG2)\nrender_node=/dev/dri/renderD129\npci=/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0\nvendor_id=0x8086\ndevice_id=0x56a0\nfd=3\nfd=4\nfd=5\nfd=6\n",
+      "native_check_count_exact": true,
+      "expected_original_native_checks": 172040,
+      "input_drift": [],
+      "source_drift": [],
+      "output_drift": [],
+      "mapped_ELF_provider_drift": [],
+      "unpinned_mapped_ELFs": [],
+      "sanitizer_diagnostics": false,
+      "lease_released_epoch": 1794437261.2983458,
+      "receipt": "/home/blux/de-xr/dome-sculpt/artifacts/radiance-bake-gpu-proof-20261111/release-arc-v1/status.json",
+      "receipt_sha256": "54742b60d408e9f84bbbc7b3461dee2eae41b57b6b0b3f6595fd074ed33dc644",
+      "process_log_sha256": "b9a6914f002f075699aacbdfe8820f32910d92147f4389e7b83d3c8aa5bbde91"
+    }
+  ],
+  "remaining": [
+    "strict sanitizer fresh owning closure/native regression and GPU qualification",
+    "fresh current combined owning app/core/renderer",
+    "actual public desktop and loader stereo Bake workflows",
+    "independent typed-source sampling controls"
+  ]
+}
