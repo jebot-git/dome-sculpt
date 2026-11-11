@@ -1689,6 +1689,8 @@ if(BUILD_TESTING AND TARGET dome-sculpt-render)
   target_link_libraries(dome-sculpt-document-render-capacity-test PRIVATE dome-sculpt-render)
   target_link_options(dome-sculpt-document-render-capacity-test PRIVATE -Wl,--wrap=glBufferData)
   add_test(NAME document-render-capacity COMMAND dome-sculpt-document-render-capacity-test)
+  add_test(NAME document-render-large-buffer COMMAND dome-sculpt-document-render-capacity-test --large-buffer)
+  set_tests_properties(document-render-large-buffer PROPERTIES TIMEOUT 240 ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2")
   set_tests_properties(document-render-capacity PROPERTIES TIMEOUT 240 ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2")
 endif()
 

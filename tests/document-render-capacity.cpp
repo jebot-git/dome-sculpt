@@ -21,8 +21,8 @@ struct Home {
 Mesh quad(size_t count){Mesh m;m.positions.assign(count,{0,0,0});m.normals.assign(count,{0,0,1});m.uv.assign(count,{.5f,.5f});
  m.positions[0]={-.75f,-.75f,0};m.positions[1]={.75f,-.75f,0};m.positions[2]={.75f,.75f,0};m.positions[3]={-.75f,.75f,0};
  m.uv[0]={0,0};m.uv[1]={1,0};m.uv[2]={1,1};m.uv[3]={0,1};m.indices={0,1,2,0,2,3};m.validate();return m;}
-Scene scene(size_t vertices){Scene s;
- for(int i=0;i<3;++i){auto id=i?s.add("Independent ordinary mesh",Volume{}):s.active().id;auto&o=s.object(id);o.painted=std::make_shared<PaintedMesh>(quad(vertices),64);o.mesh_active=true;o.material.color={1,1,1,1};o.material.unlit=true;}
+Scene scene(size_t vertices,int actors=3){Scene s;
+ for(int i=0;i<actors;++i){auto id=i?s.add("Independent ordinary mesh",Volume{}):s.active().id;auto&o=s.object(id);o.painted=std::make_shared<PaintedMesh>(quad(vertices),64);o.mesh_active=true;o.material.color={1,1,1,1};o.material.unlit=true;}
  s.validate();return s;}
 Scene indexed_scene(){Scene s;constexpr uint32_t side=600;
  for(int object=0;object<3;++object){Mesh m;m.positions.reserve(size_t(side+1)*(side+1));m.normals.reserve(m.positions.capacity());m.uv.reserve(m.positions.capacity());
@@ -48,7 +48,7 @@ extern "C" void __wrap_glBufferData(GLenum target,GLsizeiptr size,const void*dat
  __real_glBufferData(target,size,data,usage);
 }
 int main(int argc,char**argv)try{
- Home home;bool old=argc>1&&std::string(argv[1])=="--expect-rejection";
+ Home home;bool old=argc>1&&std::string(argv[1])=="--expect-rejection";const bool large_buffer=argc>1&&std::string(argv[1])=="--large-buffer";
  const size_t limit=size_t(std::numeric_limits<GLsizeiptr>::max());
  check(render_detail::buffer_bytes(limit,1)==limit&&render_detail::buffer_sum(limit-1,1)==limit,"Per-buffer size checks accept the exact GLsizeiptr boundary");
  bool overflow=false;try{render_detail::buffer_bytes(limit/56+1,56);}catch(const std::length_error&){overflow=true;}
@@ -59,6 +59,22 @@ int main(int argc,char**argv)try{
  check(argc<2||std::string(argv[1])!="--hardware"||(device.find("llvmpipe")==std::string::npos&&device.find("softpipe")==std::string::npos),"Capacity fixture executes on requested graphics device");
  Target target;SurfaceRenderer renderer;Document doc;
  auto render=[&](std::shared_ptr<const MeshSnapshot> mesh){array_bytes=index_bytes=array_calls=index_calls=0;capture=true;try{renderer.draw(std::move(mesh),{},identity,{0,0,2},Target::size,Target::size,true);}catch(...){capture=false;throw;}capture=false;std::vector<uint8_t> pixels(Target::size*Target::size*4);glReadPixels(0,0,Target::size,Target::size,GL_RGBA,GL_UNSIGNED_BYTE,pixels.data());return pixels;};
+ if(large_buffer){
+  // Separate >256MiB requested-store control. Preserve the original default
+  // three-actor4.8M command below; this case uses six independently valid native
+  //1.6M sources and the same exact small-scene pixel oracle. Before invocation,
+  // qualification selects RSS guards4GiB Release/8GiB SAN and240s (CTest).
+  constexpr size_t per=1'600'004,actors=6,total=per*actors;
+  doc.replace(scene(4,actors));const auto small=ready(doc);const auto baseline=render(small);doc.replace(scene(per,actors));const auto large=ready(doc);
+  check(large->mesh.positions.size()==total&&large->mesh.normals.size()==total&&large->mesh.uv.size()==total&&large->mesh.indices.size()==actors*6&&large->ranges.size()==actors,"Separate large-buffer case publishes all six original native ordinary actors with full positions/normals/UV0");
+  auto native=doc.copy_scene();bool intact=native.objects().size()==actors;for(const auto&o:native.objects())intact&=o.mesh_active&&o.volume->voxels().empty()&&o.painted&&o.painted->mesh().positions.size()==per&&o.painted->mesh().indices.size()==6&&!o.appearance&&!o.material_bindings&&!o.deformation;
+  check(intact&&large->source_normals.empty()&&large->canonical_normals.empty()&&large->source_tangents.empty()&&large->sculpt_masks.empty()&&large->selected_weights.empty(),"Large-buffer sources retain ordinary native identity without invented retained frames or scalar flags");
+  const size_t payload=(large->mesh.positions.size()+large->mesh.normals.size())*sizeof(Vec3)+large->mesh.uv.size()*sizeof(std::array<float,2>);
+  check(payload>256ull*1024*1024&&payload+small->mesh.positions.size()*32+large->mesh.indices.size()*sizeof(uint32_t)+small->mesh.indices.size()*sizeof(uint32_t)<512ull*1024*1024,"Actual >256MiB compact vertex payload has a bounded old-plus-new geometry endpoint below512MiB");
+  const auto picture=render(large);check(picture==baseline&&array_calls==1&&array_bytes==payload&&index_calls==1&&index_bytes==actors*6*sizeof(uint32_t)&&renderer.buffer_stats().vertex_bytes==payload,"Real driver allocation exceeds256MiB and preserves every independent source and exact original baseline pixel");
+  std::cout<<"MEASURE separate_large_buffer actors "<<actors<<" vertices "<<total<<" actual_vertex_bytes "<<array_bytes<<" actual_index_bytes "<<index_bytes<<std::endl;
+  check(render(large)==picture&&array_calls==0&&index_calls==0,"Separate >256MiB second eye performs zero geometry or scalar allocations");check(glGetError()==GL_NO_ERROR,"Separate large-buffer case leaves the actual GL error queue clean");std::cout<<checks<<" Separate large-buffer checks passed"<<std::endl;return 0;
+ }
  doc.replace(scene(4));auto small=ready(doc);auto baseline=render(small);
  check(baseline[(Target::size/2*Target::size+Target::size/2)*4]==255,"Small ordinary three-object scene produces a nonblank independent pixel baseline");
  constexpr size_t per_object=1'600'004,total=3*per_object;
@@ -72,8 +88,8 @@ int main(int argc,char**argv)try{
  check(intact&&std::all_of(large->ranges.begin(),large->ranges.end(),[](const auto&r){return !r.source_frame&&!r.canonical_frame;}),"Actual Scene retains all independently valid ordinary sources without adding SDF or retained-frame flags");
  auto uploaded=renderer.buffer_stats().geometry_uploads;auto pixels=render(large);
  check(pixels==baseline,"Large ordinary aggregate preserves the exact small-scene baseline pixels");
- constexpr size_t bytes=total*56;
- check(bytes>256ull*1024*1024&&array_calls==1&&array_bytes==bytes&&index_calls==1&&index_bytes==18*sizeof(uint32_t)&&renderer.buffer_stats().vertex_bytes==bytes,"Real geometry upload exceeds256MiB without an invented aggregate scene cap");
+ const size_t bytes=(large->mesh.positions.size()+large->mesh.normals.size())*sizeof(Vec3)+large->mesh.uv.size()*sizeof(std::array<float,2>);
+ check(bytes==total*32&&array_calls==1&&array_bytes==bytes&&index_calls==1&&index_bytes==18*sizeof(uint32_t)&&renderer.buffer_stats().vertex_bytes==bytes,"Original4.8M aggregate uploads its true compact native positions/normals/UV0 payload without an invented scene cap");
  std::cout<<"MEASURE ordinary vertices "<<total<<" actual vertex upload bytes "<<array_bytes<<" actual index upload bytes "<<index_bytes<<std::endl;
  check(renderer.buffer_stats().geometry_uploads==uploaded+1,"The large publication completes exactly one geometry upload");
  check(render(large)==baseline&&array_calls==0&&index_calls==0,"Second-eye rendering reuses all large geometry without glBufferData traffic");
@@ -81,6 +97,7 @@ int main(int argc,char**argv)try{
  try{render(small);}catch(const std::runtime_error&e){if(std::string(e.what()).find("Surface staged geometry allocation failed (GL error 1281)")==std::string::npos)throw;failed=true;std::cout<<"EXPECTED DRIVER FAILURE "<<e.what()<<std::endl;}
  check(failed&&!inject_error&&renderer.buffer_stats().geometry_uploads==before_failure,"A real invalid-size driver upload is reported before successful geometry publication");
  check(glGetError()==GL_NO_ERROR,"Upload failure consumes its GL error and leaves a recoverable error queue");
+ check(render(large)==pixels&&array_calls==0&&index_calls==0,"Failed staged upload preserves accepted large-frame pixels and GPU stores without rebuilding");
  check(render(small)==baseline&&array_calls==1&&index_calls==1,"A failed staged upload retries the proposed valid source without invalidating the accepted scene");
  large.reset();doc.replace(indexed_scene());auto indexed=ready(doc);
  check(indexed->mesh.positions.size()==1'083'603&&indexed->mesh.indices.size()==6'480'000,"Actual Document preserves independently valid ordinary grids above6M aggregate indices");
