@@ -1,0 +1,2685 @@
+{
+  "schema": 1,
+  "units": "nanoseconds unless explicitly named seconds/bytes",
+  "scope": "Observed running-desktop offscreen uncapped stereo CPU/GL workload; no physical HMD, 90Hz, exclusive-system or causal performance acceptance. Current coordinated quiet window stops agent competing jobs but not desktop/OS activity. Historical b6 had other development activity; clocks/conditions are not controlled equivalence.",
+  "current_source": "e9931f7286f75746af47d52f2d901b731510cbb5",
+  "historical_source": "b6e366fd8c45829b00bc1d1327ecdfc25aeedf49",
+  "current": {
+    "status": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-query-p1-20261111/status.json",
+      "sha256": "83e862e650ae2851540bfd410a34f67c4617c46c5782badc1230460ed9f0fdb5"
+    },
+    "result": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-query-p1-20261111/full-p1/result.json",
+      "sha256": "b76c21df94500f203f199fe20bd45eae6c0c6073d8b1b6ab96dddce7455adeeb"
+    },
+    "seconds": 300.1798035710235,
+    "host_before": {
+      "utc": "2026-11-11T22:13:27Z",
+      "load_average": [
+        7.07275390625,
+        7.5439453125,
+        7.814453125
+      ],
+      "logical_cpus": 20,
+      "memory_available_bytes": 51111964672
+    },
+    "host_after": {
+      "utc": "2026-11-11T22:18:28Z",
+      "load_average": [
+        7.18505859375,
+        7.57861328125,
+        7.77294921875
+      ],
+      "logical_cpus": 20,
+      "memory_available_bytes": 50443010048
+    },
+    "repetitions": [
+      {
+        "index": 0,
+        "all_phase_distributions": {
+          "authored_placement": {
+            "accepted_snapshot_caller_cpu_ns": {
+              "count": 2,
+              "max_ns": 82805.0,
+              "mean_ns": 71143.5,
+              "p50_ns": 59482.0,
+              "p90_ns": 82805.0,
+              "p95_ns": 82805.0,
+              "p99_ns": 82805.0
+            },
+            "accepted_snapshot_ns": {
+              "count": 2,
+              "max_ns": 2332494.0,
+              "mean_ns": 2070714.5,
+              "p50_ns": 1808935.0,
+              "p90_ns": 2332494.0,
+              "p95_ns": 2332494.0,
+              "p99_ns": 2332494.0
+            },
+            "caller_thread_cpu_ns": {
+              "count": 2,
+              "max_ns": 2073820.0,
+              "mean_ns": 2037527.0,
+              "p50_ns": 2001234.0,
+              "p90_ns": 2073820.0,
+              "p95_ns": 2073820.0,
+              "p99_ns": 2073820.0
+            },
+            "first_draw_caller_cpu_ns": {
+              "count": 2,
+              "max_ns": 1987395.0,
+              "mean_ns": 1963943.5,
+              "p50_ns": 1940492.0,
+              "p90_ns": 1987395.0,
+              "p95_ns": 1987395.0,
+              "p99_ns": 1987395.0
+            },
+            "first_draw_submission_ns": {
+              "count": 2,
+              "max_ns": 6041835.0,
+              "mean_ns": 6013562.5,
+              "p50_ns": 5985290.0,
+              "p90_ns": 6041835.0,
+              "p95_ns": 6041835.0,
+              "p99_ns": 6041835.0
+            },
+            "wall_ns": {
+              "count": 2,
+              "max_ns": 8376525.0,
+              "mean_ns": 8088575.0,
+              "p50_ns": 7800625.0,
+              "p90_ns": 8376525.0,
+              "p95_ns": 8376525.0,
+              "p99_ns": 8376525.0
+            }
+          },
+          "held_pair": {
+            "accepted_snapshot_caller_cpu_ns": {
+              "count": 0
+            },
+            "accepted_snapshot_ns": {
+              "count": 0
+            },
+            "caller_thread_cpu_ns": {
+              "count": 120,
+              "max_ns": 1588893.0,
+              "mean_ns": 1155269.7666666666,
+              "p50_ns": 1130024.0,
+              "p90_ns": 1447545.0,
+              "p95_ns": 1508367.0,
+              "p99_ns": 1579089.0
+            },
+            "first_draw_caller_cpu_ns": {
+              "count": 0
+            },
+            "first_draw_submission_ns": {
+              "count": 0
+            },
+            "wall_ns": {
+              "count": 120,
+              "max_ns": 10514137.0,
+              "mean_ns": 8973276.491666667,
+              "p50_ns": 8851315.0,
+              "p90_ns": 9531438.0,
+              "p95_ns": 9879655.0,
+              "p99_ns": 9992934.0
+            }
+          },
+          "mask": {
+            "accepted_snapshot_caller_cpu_ns": {
+              "count": 120,
+              "max_ns": 242623.0,
+              "mean_ns": 140846.20833333334,
+              "p50_ns": 135943.0,
+              "p90_ns": 186014.0,
+              "p95_ns": 202087.0,
+              "p99_ns": 220146.0
+            },
+            "accepted_snapshot_ns": {
+              "count": 120,
+              "max_ns": 37902773.0,
+              "mean_ns": 32075700.275,
+              "p50_ns": 32517900.0,
+              "p90_ns": 33763463.0,
+              "p95_ns": 34093512.0,
+              "p99_ns": 37493065.0
+            },
+            "caller_thread_cpu_ns": {
+              "count": 120,
+              "max_ns": 3935306.0,
+              "mean_ns": 2698799.1666666665,
+              "p50_ns": 2619263.0,
+              "p90_ns": 3292025.0,
+              "p95_ns": 3448738.0,
+              "p99_ns": 3876597.0
+            },
+            "first_draw_caller_cpu_ns": {
+              "count": 120,
+              "max_ns": 3781870.0,
+              "mean_ns": 2555537.0083333333,
+              "p50_ns": 2471067.0,
+              "p90_ns": 3156737.0,
+              "p95_ns": 3242837.0,
+              "p99_ns": 3677781.0
+            },
+            "first_draw_submission_ns": {
+              "count": 120,
+              "max_ns": 10908229.0,
+              "mean_ns": 7801633.958333333,
+              "p50_ns": 7671518.0,
+              "p90_ns": 8709730.0,
+              "p95_ns": 8953877.0,
+              "p99_ns": 9154434.0
+            },
+            "wall_ns": {
+              "count": 120,
+              "max_ns": 45776112.0,
+              "mean_ns": 39881678.50833333,
+              "p50_ns": 40229112.0,
+              "p90_ns": 41759033.0,
+              "p95_ns": 42281466.0,
+              "p99_ns": 45079517.0
+            }
+          },
+          "mask_clear": {
+            "accepted_snapshot_caller_cpu_ns": {
+              "count": 1,
+              "max_ns": 74579.0,
+              "mean_ns": 74579.0,
+              "p50_ns": 74579.0,
+              "p90_ns": 74579.0,
+              "p95_ns": 74579.0,
+              "p99_ns": 74579.0
+            },
+            "accepted_snapshot_ns": {
+              "count": 1,
+              "max_ns": 3461975.0,
+              "mean_ns": 3461975.0,
+              "p50_ns": 3461975.0,
+              "p90_ns": 3461975.0,
+              "p95_ns": 3461975.0,
+              "p99_ns": 3461975.0
+            },
+            "caller_thread_cpu_ns": {
+              "count": 1,
+              "max_ns": 2486825.0,
+              "mean_ns": 2486825.0,
+              "p50_ns": 2486825.0,
+              "p90_ns": 2486825.0,
+              "p95_ns": 2486825.0,
+              "p99_ns": 2486825.0
+            },
+            "first_draw_caller_cpu_ns": {
+              "count": 1,
+              "max_ns": 2410326.0,
+              "mean_ns": 2410326.0,
+              "p50_ns": 2410326.0,
+              "p90_ns": 2410326.0,
+              "p95_ns": 2410326.0,
+              "p99_ns": 2410326.0
+            },
+            "first_draw_submission_ns": {
+              "count": 1,
+              "max_ns": 7343624.0,
+              "mean_ns": 7343624.0,
+              "p50_ns": 7343624.0,
+              "p90_ns": 7343624.0,
+              "p95_ns": 7343624.0,
+              "p99_ns": 7343624.0
+            },
+            "wall_ns": {
+              "count": 1,
+              "max_ns": 10808719.0,
+              "mean_ns": 10808719.0,
+              "p50_ns": 10808719.0,
+              "p90_ns": 10808719.0,
+              "p95_ns": 10808719.0,
+              "p99_ns": 10808719.0
+            }
+          },
+          "mask_fill": {
+            "accepted_snapshot_caller_cpu_ns": {
+              "count": 1,
+              "max_ns": 88139.0,
+              "mean_ns": 88139.0,
+              "p50_ns": 88139.0,
+              "p90_ns": 88139.0,
+              "p95_ns": 88139.0,
+              "p99_ns": 88139.0
+            },
+            "accepted_snapshot_ns": {
+              "count": 1,
+              "max_ns": 3906172.0,
+              "mean_ns": 3906172.0,
+              "p50_ns": 3906172.0,
+              "p90_ns": 3906172.0,
+              "p95_ns": 3906172.0,
+              "p99_ns": 3906172.0
+            },
+            "caller_thread_cpu_ns": {
+              "count": 1,
+              "max_ns": 3112157.0,
+              "mean_ns": 3112157.0,
+              "p50_ns": 3112157.0,
+              "p90_ns": 3112157.0,
+              "p95_ns": 3112157.0,
+              "p99_ns": 3112157.0
+            },
+            "first_draw_caller_cpu_ns": {
+              "count": 1,
+              "max_ns": 3021888.0,
+              "mean_ns": 3021888.0,
+              "p50_ns": 3021888.0,
+              "p90_ns": 3021888.0,
+              "p95_ns": 3021888.0,
+              "p99_ns": 3021888.0
+            },
+            "first_draw_submission_ns": {
+              "count": 1,
+              "max_ns": 8293220.0,
+              "mean_ns": 8293220.0,
+              "p50_ns": 8293220.0,
+              "p90_ns": 8293220.0,
+              "p95_ns": 8293220.0,
+              "p99_ns": 8293220.0
+            },
+            "wall_ns": {
+              "count": 1,
+              "max_ns": 12203649.0,
+              "mean_ns": 12203649.0,
+              "p50_ns": 12203649.0,
+              "p90_ns": 12203649.0,
+              "p95_ns": 12203649.0,
+              "p99_ns": 12203649.0
+            }
+          },
+          "mask_mode": {
+            "accepted_snapshot_caller_cpu_ns": {
+              "count": 0
+            },
+            "accepted_snapshot_ns": {
+              "count": 0
+            },
+            "caller_thread_cpu_ns": {
+              "count": 2,
+              "max_ns": 96055.0,
+              "mean_ns": 70980.5,
+              "p50_ns": 45906.0,
+              "p90_ns": 96055.0,
+              "p95_ns": 96055.0,
+              "p99_ns": 96055.0
+            },
+            "first_draw_caller_cpu_ns": {
+              "count": 0
+            },
+            "first_draw_submission_ns": {
+              "count": 0
+            },
+            "wall_ns": {
+              "count": 2,
+              "max_ns": 265428.0,
+              "mean_ns": 181578.5,
+              "p50_ns": 97729.0,
+              "p90_ns": 265428.0,
+              "p95_ns": 265428.0,
+              "p99_ns": 265428.0
+            }
+          },
+          "stroke": {
+            "accepted_snapshot_caller_cpu_ns": {
+              "count": 300,
+              "max_ns": 199763.0,
+              "mean_ns": 85045.69333333333,
+              "p50_ns": 80685.0,
+              "p90_ns": 105453.0,
+              "p95_ns": 116959.0,
+              "p99_ns": 153087.0
+            },
+            "accepted_snapshot_ns": {
+              "count": 300,
+              "max_ns": 103073613.0,
+              "mean_ns": 67940974.62,
+              "p50_ns": 69241653.0,
+              "p90_ns": 86442494.0,
+              "p95_ns": 92747816.0,
+              "p99_ns": 102684791.0
+            },
+            "caller_thread_cpu_ns": {
+              "count": 300,
+              "max_ns": 15458592.0,
+              "mean_ns": 8915871.156666666,
+              "p50_ns": 8661980.0,
+              "p90_ns": 10907346.0,
+              "p95_ns": 11332115.0,
+              "p99_ns": 12049722.0
+            },
+            "first_draw_caller_cpu_ns": {
+              "count": 300,
+              "max_ns": 15363208.0,
+              "mean_ns": 8828199.543333333,
+              "p50_ns": 8568504.0,
+              "p90_ns": 10824634.0,
+              "p95_ns": 11245818.0,
+              "p99_ns": 11971082.0
+            },
+            "first_draw_submission_ns": {
+              "count": 300,
+              "max_ns": 20409003.0,
+              "mean_ns": 13232981.25,
+              "p50_ns": 12937523.0,
+              "p90_ns": 15386086.0,
+              "p95_ns": 15774817.0,
+              "p99_ns": 16774544.0
+            },
+            "wall_ns": {
+              "count": 300,
+              "max_ns": 118638357.0,
+              "mean_ns": 81178811.21666667,
+              "p50_ns": 82455378.0,
+              "p90_ns": 100484569.0,
+              "p95_ns": 107938824.0,
+              "p99_ns": 117783413.0
+            }
+          },
+          "view_pair": {
+            "accepted_snapshot_caller_cpu_ns": {
+              "count": 0
+            },
+            "accepted_snapshot_ns": {
+              "count": 0
+            },
+            "caller_thread_cpu_ns": {
+              "count": 2000,
+              "max_ns": 4169044.0,
+              "mean_ns": 1674758.135,
+              "p50_ns": 1530076.0,
+              "p90_ns": 2318410.0,
+              "p95_ns": 3166719.0,
+              "p99_ns": 3843719.0
+            },
+            "first_draw_caller_cpu_ns": {
+              "count": 0
+            },
+            "first_draw_submission_ns": {
+              "count": 0
+            },
+            "wall_ns": {
+              "count": 2000,
+              "max_ns": 12889619.0,
+              "mean_ns": 9790196.7575,
+              "p50_ns": 9590234.0,
+              "p90_ns": 10734444.0,
+              "p95_ns": 11311402.0,
+              "p99_ns": 11983049.0
+            }
+          }
+        },
+        "gpu_elapsed_distribution_ns": {
+          "count": 2000,
+          "max_ns": 14612135.0,
+          "mean_ns": 9159531.202,
+          "p50_ns": 9004687.0,
+          "p90_ns": 11477500.0,
+          "p95_ns": 12280312.0,
+          "p99_ns": 13457604.0
+        },
+        "gpu_timers_complete": {
+          "counter_bits": 64,
+          "disjoint_observed": false,
+          "disjoint_supported": false,
+          "distribution_ns": {
+            "count": 2000,
+            "max_ns": 14612135.0,
+            "mean_ns": 9159531.202,
+            "p50_ns": 9004687.0,
+            "p90_ns": 11477500.0,
+            "p95_ns": 12280312.0,
+            "p99_ns": 13457604.0
+          },
+          "distribution_qualified": true,
+          "expected_pairs": 2000,
+          "pending_after_bounded_drain": 0,
+          "reset_query_supported": true,
+          "reset_status": 0,
+          "skipped_indices": [],
+          "supported": true,
+          "valid_coverage": 1.0,
+          "valid_samples": 2000
+        },
+        "actual_view_ray_contact_stage_totals": {
+          "affine_nearest": {
+            "rows": 2000,
+            "total_calls": 34000,
+            "sum_wall_ns": 799344451,
+            "sum_thread_cpu_ns": 789631169,
+            "minimum_row_wall_ns": 176633,
+            "maximum_row_wall_ns": 2388372,
+            "scope": "Actual native stage instrumentation on view rows, not the complete controller/API elapsed time. Complete row timings remain in raw archive."
+          },
+          "affine_ray": {
+            "rows": 2000,
+            "total_calls": 10000,
+            "sum_wall_ns": 25333869,
+            "sum_thread_cpu_ns": 24884466,
+            "minimum_row_wall_ns": 5896,
+            "maximum_row_wall_ns": 132227,
+            "scope": "Actual native stage instrumentation on view rows, not the complete controller/API elapsed time. Complete row timings remain in raw archive."
+          }
+        }
+      },
+      {
+        "index": 1,
+        "all_phase_distributions": {
+          "authored_placement": {
+            "accepted_snapshot_caller_cpu_ns": {
+              "count": 2,
+              "max_ns": 121099.0,
+              "mean_ns": 95410.0,
+              "p50_ns": 69721.0,
+              "p90_ns": 121099.0,
+              "p95_ns": 121099.0,
+              "p99_ns": 121099.0
+            },
+            "accepted_snapshot_ns": {
+              "count": 2,
+              "max_ns": 2685735.0,
+              "mean_ns": 2204903.0,
+              "p50_ns": 1724071.0,
+              "p90_ns": 2685735.0,
+              "p95_ns": 2685735.0,
+              "p99_ns": 2685735.0
+            },
+            "caller_thread_cpu_ns": {
+              "count": 2,
+              "max_ns": 2827312.0,
+              "mean_ns": 2592032.5,
+              "p50_ns": 2356753.0,
+              "p90_ns": 2827312.0,
+              "p95_ns": 2827312.0,
+              "p99_ns": 2827312.0
+            },
+            "first_draw_caller_cpu_ns": {
+              "count": 2,
+              "max_ns": 2703820.0,
+              "mean_ns": 2494255.5,
+              "p50_ns": 2284691.0,
+              "p90_ns": 2703820.0,
+              "p95_ns": 2703820.0,
+              "p99_ns": 2703820.0
+            },
+            "first_draw_submission_ns": {
+              "count": 2,
+              "max_ns": 7363254.0,
+              "mean_ns": 6839475.0,
+              "p50_ns": 6315696.0,
+              "p90_ns": 7363254.0,
+              "p95_ns": 7363254.0,
+              "p99_ns": 7363254.0
+            },
+            "wall_ns": {
+              "count": 2,
+              "max_ns": 10054465.0,
+              "mean_ns": 9049120.0,
+              "p50_ns": 8043775.0,
+              "p90_ns": 10054465.0,
+              "p95_ns": 10054465.0,
+              "p99_ns": 10054465.0
+            }
+          },
+          "held_pair": {
+            "accepted_snapshot_caller_cpu_ns": {
+              "count": 0
+            },
+            "accepted_snapshot_ns": {
+              "count": 0
+            },
+            "caller_thread_cpu_ns": {
+              "count": 120,
+              "max_ns": 2043508.0,
+              "mean_ns": 1185820.0666666667,
+              "p50_ns": 1145663.0,
+              "p90_ns": 1467677.0,
+              "p95_ns": 1589727.0,
+              "p99_ns": 1668566.0
+            },
+            "first_draw_caller_cpu_ns": {
+              "count": 0
+            },
+            "first_draw_submission_ns": {
+              "count": 0
+            },
+            "wall_ns": {
+              "count": 120,
+              "max_ns": 10354946.0,
+              "mean_ns": 9020600.041666666,
+              "p50_ns": 8941663.0,
+              "p90_ns": 9405222.0,
+              "p95_ns": 9589220.0,
+              "p99_ns": 10224083.0
+            }
+          },
+          "mask": {
+            "accepted_snapshot_caller_cpu_ns": {
+              "count": 120,
+              "max_ns": 270790.0,
+              "mean_ns": 145538.80833333332,
+              "p50_ns": 142578.0,
+              "p90_ns": 186150.0,
+              "p95_ns": 207833.0,
+              "p99_ns": 232158.0
+            },
+            "accepted_snapshot_ns": {
+              "count": 120,
+              "max_ns": 35899700.0,
+              "mean_ns": 32028833.341666665,
+              "p50_ns": 32399095.0,
+              "p90_ns": 34027707.0,
+              "p95_ns": 34627314.0,
+              "p99_ns": 35829299.0
+            },
+            "caller_thread_cpu_ns": {
+              "count": 120,
+              "max_ns": 4057603.0,
+              "mean_ns": 2790052.9833333334,
+              "p50_ns": 2744489.0,
+              "p90_ns": 3324186.0,
+              "p95_ns": 3636330.0,
+              "p99_ns": 3823201.0
+            },
+            "first_draw_caller_cpu_ns": {
+              "count": 120,
+              "max_ns": 3871808.0,
+              "mean_ns": 2641931.2333333334,
+              "p50_ns": 2606804.0,
+              "p90_ns": 3124806.0,
+              "p95_ns": 3362515.0,
+              "p99_ns": 3768842.0
+            },
+            "first_draw_submission_ns": {
+              "count": 120,
+              "max_ns": 12872861.0,
+              "mean_ns": 7882769.783333333,
+              "p50_ns": 7700660.0,
+              "p90_ns": 8669247.0,
+              "p95_ns": 9000368.0,
+              "p99_ns": 10351600.0
+            },
+            "wall_ns": {
+              "count": 120,
+              "max_ns": 44034274.0,
+              "mean_ns": 39916312.93333333,
+              "p50_ns": 39994693.0,
+              "p90_ns": 41897318.0,
+              "p95_ns": 43322678.0,
+              "p99_ns": 43839577.0
+            }
+          },
+          "mask_clear": {
+            "accepted_snapshot_caller_cpu_ns": {
+              "count": 1,
+              "max_ns": 83739.0,
+              "mean_ns": 83739.0,
+              "p50_ns": 83739.0,
+              "p90_ns": 83739.0,
+              "p95_ns": 83739.0,
+              "p99_ns": 83739.0
+            },
+            "accepted_snapshot_ns": {
+              "count": 1,
+              "max_ns": 3431106.0,
+              "mean_ns": 3431106.0,
+              "p50_ns": 3431106.0,
+              "p90_ns": 3431106.0,
+              "p95_ns": 3431106.0,
+              "p99_ns": 3431106.0
+            },
+            "caller_thread_cpu_ns": {
+              "count": 1,
+              "max_ns": 2302245.0,
+              "mean_ns": 2302245.0,
+              "p50_ns": 2302245.0,
+              "p90_ns": 2302245.0,
+              "p95_ns": 2302245.0,
+              "p99_ns": 2302245.0
+            },
+            "first_draw_caller_cpu_ns": {
+              "count": 1,
+              "max_ns": 2214115.0,
+              "mean_ns": 2214115.0,
+              "p50_ns": 2214115.0,
+              "p90_ns": 2214115.0,
+              "p95_ns": 2214115.0,
+              "p99_ns": 2214115.0
+            },
+            "first_draw_submission_ns": {
+              "count": 1,
+              "max_ns": 7215733.0,
+              "mean_ns": 7215733.0,
+              "p50_ns": 7215733.0,
+              "p90_ns": 7215733.0,
+              "p95_ns": 7215733.0,
+              "p99_ns": 7215733.0
+            },
+            "wall_ns": {
+              "count": 1,
+              "max_ns": 10652994.0,
+              "mean_ns": 10652994.0,
+              "p50_ns": 10652994.0,
+              "p90_ns": 10652994.0,
+              "p95_ns": 10652994.0,
+              "p99_ns": 10652994.0
+            }
+          },
+          "mask_fill": {
+            "accepted_snapshot_caller_cpu_ns": {
+              "count": 1,
+              "max_ns": 102054.0,
+              "mean_ns": 102054.0,
+              "p50_ns": 102054.0,
+              "p90_ns": 102054.0,
+              "p95_ns": 102054.0,
+              "p99_ns": 102054.0
+            },
+            "accepted_snapshot_ns": {
+              "count": 1,
+              "max_ns": 3865829.0,
+              "mean_ns": 3865829.0,
+              "p50_ns": 3865829.0,
+              "p90_ns": 3865829.0,
+              "p95_ns": 3865829.0,
+              "p99_ns": 3865829.0
+            },
+            "caller_thread_cpu_ns": {
+              "count": 1,
+              "max_ns": 3231033.0,
+              "mean_ns": 3231033.0,
+              "p50_ns": 3231033.0,
+              "p90_ns": 3231033.0,
+              "p95_ns": 3231033.0,
+              "p99_ns": 3231033.0
+            },
+            "first_draw_caller_cpu_ns": {
+              "count": 1,
+              "max_ns": 3125768.0,
+              "mean_ns": 3125768.0,
+              "p50_ns": 3125768.0,
+              "p90_ns": 3125768.0,
+              "p95_ns": 3125768.0,
+              "p99_ns": 3125768.0
+            },
+            "first_draw_submission_ns": {
+              "count": 1,
+              "max_ns": 8207160.0,
+              "mean_ns": 8207160.0,
+              "p50_ns": 8207160.0,
+              "p90_ns": 8207160.0,
+              "p95_ns": 8207160.0,
+              "p99_ns": 8207160.0
+            },
+            "wall_ns": {
+              "count": 1,
+              "max_ns": 12079170.0,
+              "mean_ns": 12079170.0,
+              "p50_ns": 12079170.0,
+              "p90_ns": 12079170.0,
+              "p95_ns": 12079170.0,
+              "p99_ns": 12079170.0
+            }
+          },
+          "mask_mode": {
+            "accepted_snapshot_caller_cpu_ns": {
+              "count": 0
+            },
+            "accepted_snapshot_ns": {
+              "count": 0
+            },
+            "caller_thread_cpu_ns": {
+              "count": 2,
+              "max_ns": 109171.0,
+              "mean_ns": 77191.0,
+              "p50_ns": 45211.0,
+              "p90_ns": 109171.0,
+              "p95_ns": 109171.0,
+              "p99_ns": 109171.0
+            },
+            "first_draw_caller_cpu_ns": {
+              "count": 0
+            },
+            "first_draw_submission_ns": {
+              "count": 0
+            },
+            "wall_ns": {
+              "count": 2,
+              "max_ns": 357263.0,
+              "mean_ns": 239353.0,
+              "p50_ns": 121443.0,
+              "p90_ns": 357263.0,
+              "p95_ns": 357263.0,
+              "p99_ns": 357263.0
+            }
+          },
+          "stroke": {
+            "accepted_snapshot_caller_cpu_ns": {
+              "count": 300,
+              "max_ns": 189552.0,
+              "mean_ns": 84817.71666666666,
+              "p50_ns": 82033.0,
+              "p90_ns": 105143.0,
+              "p95_ns": 118035.0,
+              "p99_ns": 145565.0
+            },
+            "accepted_snapshot_ns": {
+              "count": 300,
+              "max_ns": 110190029.0,
+              "mean_ns": 67342886.5,
+              "p50_ns": 68471258.0,
+              "p90_ns": 87354549.0,
+              "p95_ns": 91948794.0,
+              "p99_ns": 99073906.0
+            },
+            "caller_thread_cpu_ns": {
+              "count": 300,
+              "max_ns": 14842479.0,
+              "mean_ns": 8920688.86,
+              "p50_ns": 8844788.0,
+              "p90_ns": 10900514.0,
+              "p95_ns": 11225667.0,
+              "p99_ns": 12439092.0
+            },
+            "first_draw_caller_cpu_ns": {
+              "count": 300,
+              "max_ns": 14755868.0,
+              "mean_ns": 8833188.466666667,
+              "p50_ns": 8774647.0,
+              "p90_ns": 10813890.0,
+              "p95_ns": 11095671.0,
+              "p99_ns": 12370485.0
+            },
+            "first_draw_submission_ns": {
+              "count": 300,
+              "max_ns": 19119219.0,
+              "mean_ns": 13186189.826666666,
+              "p50_ns": 13040838.0,
+              "p90_ns": 15202450.0,
+              "p95_ns": 15630820.0,
+              "p99_ns": 16834109.0
+            },
+            "wall_ns": {
+              "count": 300,
+              "max_ns": 124110528.0,
+              "mean_ns": 80534137.00666666,
+              "p50_ns": 81219151.0,
+              "p90_ns": 100900416.0,
+              "p95_ns": 105134676.0,
+              "p99_ns": 114212746.0
+            }
+          },
+          "view_pair": {
+            "accepted_snapshot_caller_cpu_ns": {
+              "count": 0
+            },
+            "accepted_snapshot_ns": {
+              "count": 0
+            },
+            "caller_thread_cpu_ns": {
+              "count": 2000,
+              "max_ns": 4091360.0,
+              "mean_ns": 1688765.3355,
+              "p50_ns": 1549063.0,
+              "p90_ns": 2389424.0,
+              "p95_ns": 3089567.0,
+              "p99_ns": 3860424.0
+            },
+            "first_draw_caller_cpu_ns": {
+              "count": 0
+            },
+            "first_draw_submission_ns": {
+              "count": 0
+            },
+            "wall_ns": {
+              "count": 2000,
+              "max_ns": 13512717.0,
+              "mean_ns": 9795971.9895,
+              "p50_ns": 9595212.0,
+              "p90_ns": 10745697.0,
+              "p95_ns": 11302706.0,
+              "p99_ns": 12062473.0
+            }
+          }
+        },
+        "gpu_elapsed_distribution_ns": {
+          "count": 2000,
+          "max_ns": 14857187.0,
+          "mean_ns": 9171683.6055,
+          "p50_ns": 8960208.0,
+          "p90_ns": 11705937.0,
+          "p95_ns": 12620468.0,
+          "p99_ns": 13922291.0
+        },
+        "gpu_timers_complete": {
+          "counter_bits": 64,
+          "disjoint_observed": false,
+          "disjoint_supported": false,
+          "distribution_ns": {
+            "count": 2000,
+            "max_ns": 14857187.0,
+            "mean_ns": 9171683.6055,
+            "p50_ns": 8960208.0,
+            "p90_ns": 11705937.0,
+            "p95_ns": 12620468.0,
+            "p99_ns": 13922291.0
+          },
+          "distribution_qualified": true,
+          "expected_pairs": 2000,
+          "pending_after_bounded_drain": 0,
+          "reset_query_supported": true,
+          "reset_status": 0,
+          "skipped_indices": [],
+          "supported": true,
+          "valid_coverage": 1.0,
+          "valid_samples": 2000
+        },
+        "actual_view_ray_contact_stage_totals": {
+          "affine_nearest": {
+            "rows": 2000,
+            "total_calls": 34000,
+            "sum_wall_ns": 809832351,
+            "sum_thread_cpu_ns": 800536552,
+            "minimum_row_wall_ns": 179271,
+            "maximum_row_wall_ns": 2378206,
+            "scope": "Actual native stage instrumentation on view rows, not the complete controller/API elapsed time. Complete row timings remain in raw archive."
+          },
+          "affine_ray": {
+            "rows": 2000,
+            "total_calls": 10000,
+            "sum_wall_ns": 26348156,
+            "sum_thread_cpu_ns": 26072630,
+            "minimum_row_wall_ns": 6214,
+            "maximum_row_wall_ns": 73616,
+            "scope": "Actual native stage instrumentation on view rows, not the complete controller/API elapsed time. Complete row timings remain in raw archive."
+          }
+        }
+      },
+      {
+        "index": 2,
+        "all_phase_distributions": {
+          "authored_placement": {
+            "accepted_snapshot_caller_cpu_ns": {
+              "count": 2,
+              "max_ns": 86547.0,
+              "mean_ns": 82965.0,
+              "p50_ns": 79383.0,
+              "p90_ns": 86547.0,
+              "p95_ns": 86547.0,
+              "p99_ns": 86547.0
+            },
+            "accepted_snapshot_ns": {
+              "count": 2,
+              "max_ns": 2485877.0,
+              "mean_ns": 2098050.5,
+              "p50_ns": 1710224.0,
+              "p90_ns": 2485877.0,
+              "p95_ns": 2485877.0,
+              "p99_ns": 2485877.0
+            },
+            "caller_thread_cpu_ns": {
+              "count": 2,
+              "max_ns": 2341272.0,
+              "mean_ns": 2189904.5,
+              "p50_ns": 2038537.0,
+              "p90_ns": 2341272.0,
+              "p95_ns": 2341272.0,
+              "p99_ns": 2341272.0
+            },
+            "first_draw_caller_cpu_ns": {
+              "count": 2,
+              "max_ns": 2252169.0,
+              "mean_ns": 2104473.5,
+              "p50_ns": 1956778.0,
+              "p90_ns": 2252169.0,
+              "p95_ns": 2252169.0,
+              "p99_ns": 2252169.0
+            },
+            "first_draw_submission_ns": {
+              "count": 2,
+              "max_ns": 6289742.0,
+              "mean_ns": 6201823.5,
+              "p50_ns": 6113905.0,
+              "p90_ns": 6289742.0,
+              "p95_ns": 6289742.0,
+              "p99_ns": 6289742.0
+            },
+            "wall_ns": {
+              "count": 2,
+              "max_ns": 8603830.0,
+              "mean_ns": 8303946.5,
+              "p50_ns": 8004063.0,
+              "p90_ns": 8603830.0,
+              "p95_ns": 8603830.0,
+              "p99_ns": 8603830.0
+            }
+          },
+          "held_pair": {
+            "accepted_snapshot_caller_cpu_ns": {
+              "count": 0
+            },
+            "accepted_snapshot_ns": {
+              "count": 0
+            },
+            "caller_thread_cpu_ns": {
+              "count": 120,
+              "max_ns": 1583660.0,
+              "mean_ns": 1142425.8916666666,
+              "p50_ns": 1117016.0,
+              "p90_ns": 1454432.0,
+              "p95_ns": 1507832.0,
+              "p99_ns": 1580421.0
+            },
+            "first_draw_caller_cpu_ns": {
+              "count": 0
+            },
+            "first_draw_submission_ns": {
+              "count": 0
+            },
+            "wall_ns": {
+              "count": 120,
+              "max_ns": 11270707.0,
+              "mean_ns": 8917961.458333334,
+              "p50_ns": 8815540.0,
+              "p90_ns": 9211562.0,
+              "p95_ns": 9941665.0,
+              "p99_ns": 10193670.0
+            }
+          },
+          "mask": {
+            "accepted_snapshot_caller_cpu_ns": {
+              "count": 120,
+              "max_ns": 223640.0,
+              "mean_ns": 145052.80833333332,
+              "p50_ns": 142285.0,
+              "p90_ns": 192403.0,
+              "p95_ns": 201107.0,
+              "p99_ns": 221213.0
+            },
+            "accepted_snapshot_ns": {
+              "count": 120,
+              "max_ns": 36569455.0,
+              "mean_ns": 31948452.475,
+              "p50_ns": 32347909.0,
+              "p90_ns": 34054864.0,
+              "p95_ns": 34524599.0,
+              "p99_ns": 35674297.0
+            },
+            "caller_thread_cpu_ns": {
+              "count": 120,
+              "max_ns": 3805133.0,
+              "mean_ns": 2701925.175,
+              "p50_ns": 2674186.0,
+              "p90_ns": 3113795.0,
+              "p95_ns": 3238588.0,
+              "p99_ns": 3672629.0
+            },
+            "first_draw_caller_cpu_ns": {
+              "count": 120,
+              "max_ns": 3656069.0,
+              "mean_ns": 2554440.7666666666,
+              "p50_ns": 2544525.0,
+              "p90_ns": 3000738.0,
+              "p95_ns": 3079601.0,
+              "p99_ns": 3521904.0
+            },
+            "first_draw_submission_ns": {
+              "count": 120,
+              "max_ns": 10576117.0,
+              "mean_ns": 7744440.283333333,
+              "p50_ns": 7689486.0,
+              "p90_ns": 8386233.0,
+              "p95_ns": 8831650.0,
+              "p99_ns": 9414090.0
+            },
+            "wall_ns": {
+              "count": 120,
+              "max_ns": 44733010.0,
+              "mean_ns": 39697489.5,
+              "p50_ns": 39818001.0,
+              "p90_ns": 41847569.0,
+              "p95_ns": 42895543.0,
+              "p99_ns": 44110004.0
+            }
+          },
+          "mask_clear": {
+            "accepted_snapshot_caller_cpu_ns": {
+              "count": 1,
+              "max_ns": 71797.0,
+              "mean_ns": 71797.0,
+              "p50_ns": 71797.0,
+              "p90_ns": 71797.0,
+              "p95_ns": 71797.0,
+              "p99_ns": 71797.0
+            },
+            "accepted_snapshot_ns": {
+              "count": 1,
+              "max_ns": 3637912.0,
+              "mean_ns": 3637912.0,
+              "p50_ns": 3637912.0,
+              "p90_ns": 3637912.0,
+              "p95_ns": 3637912.0,
+              "p99_ns": 3637912.0
+            },
+            "caller_thread_cpu_ns": {
+              "count": 1,
+              "max_ns": 3118639.0,
+              "mean_ns": 3118639.0,
+              "p50_ns": 3118639.0,
+              "p90_ns": 3118639.0,
+              "p95_ns": 3118639.0,
+              "p99_ns": 3118639.0
+            },
+            "first_draw_caller_cpu_ns": {
+              "count": 1,
+              "max_ns": 3042531.0,
+              "mean_ns": 3042531.0,
+              "p50_ns": 3042531.0,
+              "p90_ns": 3042531.0,
+              "p95_ns": 3042531.0,
+              "p99_ns": 3042531.0
+            },
+            "first_draw_submission_ns": {
+              "count": 1,
+              "max_ns": 8018947.0,
+              "mean_ns": 8018947.0,
+              "p50_ns": 8018947.0,
+              "p90_ns": 8018947.0,
+              "p95_ns": 8018947.0,
+              "p99_ns": 8018947.0
+            },
+            "wall_ns": {
+              "count": 1,
+              "max_ns": 11663715.0,
+              "mean_ns": 11663715.0,
+              "p50_ns": 11663715.0,
+              "p90_ns": 11663715.0,
+              "p95_ns": 11663715.0,
+              "p99_ns": 11663715.0
+            }
+          },
+          "mask_fill": {
+            "accepted_snapshot_caller_cpu_ns": {
+              "count": 1,
+              "max_ns": 69953.0,
+              "mean_ns": 69953.0,
+              "p50_ns": 69953.0,
+              "p90_ns": 69953.0,
+              "p95_ns": 69953.0,
+              "p99_ns": 69953.0
+            },
+            "accepted_snapshot_ns": {
+              "count": 1,
+              "max_ns": 3474152.0,
+              "mean_ns": 3474152.0,
+              "p50_ns": 3474152.0,
+              "p90_ns": 3474152.0,
+              "p95_ns": 3474152.0,
+              "p99_ns": 3474152.0
+            },
+            "caller_thread_cpu_ns": {
+              "count": 1,
+              "max_ns": 2103301.0,
+              "mean_ns": 2103301.0,
+              "p50_ns": 2103301.0,
+              "p90_ns": 2103301.0,
+              "p95_ns": 2103301.0,
+              "p99_ns": 2103301.0
+            },
+            "first_draw_caller_cpu_ns": {
+              "count": 1,
+              "max_ns": 2030769.0,
+              "mean_ns": 2030769.0,
+              "p50_ns": 2030769.0,
+              "p90_ns": 2030769.0,
+              "p95_ns": 2030769.0,
+              "p99_ns": 2030769.0
+            },
+            "first_draw_submission_ns": {
+              "count": 1,
+              "max_ns": 7124935.0,
+              "mean_ns": 7124935.0,
+              "p50_ns": 7124935.0,
+              "p90_ns": 7124935.0,
+              "p95_ns": 7124935.0,
+              "p99_ns": 7124935.0
+            },
+            "wall_ns": {
+              "count": 1,
+              "max_ns": 10603076.0,
+              "mean_ns": 10603076.0,
+              "p50_ns": 10603076.0,
+              "p90_ns": 10603076.0,
+              "p95_ns": 10603076.0,
+              "p99_ns": 10603076.0
+            }
+          },
+          "mask_mode": {
+            "accepted_snapshot_caller_cpu_ns": {
+              "count": 0
+            },
+            "accepted_snapshot_ns": {
+              "count": 0
+            },
+            "caller_thread_cpu_ns": {
+              "count": 2,
+              "max_ns": 101657.0,
+              "mean_ns": 83176.0,
+              "p50_ns": 64695.0,
+              "p90_ns": 101657.0,
+              "p95_ns": 101657.0,
+              "p99_ns": 101657.0
+            },
+            "first_draw_caller_cpu_ns": {
+              "count": 0
+            },
+            "first_draw_submission_ns": {
+              "count": 0
+            },
+            "wall_ns": {
+              "count": 2,
+              "max_ns": 370381.0,
+              "mean_ns": 259501.0,
+              "p50_ns": 148621.0,
+              "p90_ns": 370381.0,
+              "p95_ns": 370381.0,
+              "p99_ns": 370381.0
+            }
+          },
+          "stroke": {
+            "accepted_snapshot_caller_cpu_ns": {
+              "count": 300,
+              "max_ns": 196407.0,
+              "mean_ns": 86820.97333333333,
+              "p50_ns": 81897.0,
+              "p90_ns": 108123.0,
+              "p95_ns": 121146.0,
+              "p99_ns": 148610.0
+            },
+            "accepted_snapshot_ns": {
+              "count": 300,
+              "max_ns": 109698345.0,
+              "mean_ns": 66880748.60333333,
+              "p50_ns": 68169431.0,
+              "p90_ns": 86576093.0,
+              "p95_ns": 91807113.0,
+              "p99_ns": 99815407.0
+            },
+            "caller_thread_cpu_ns": {
+              "count": 300,
+              "max_ns": 14057097.0,
+              "mean_ns": 9029933.476666667,
+              "p50_ns": 8965768.0,
+              "p90_ns": 10943469.0,
+              "p95_ns": 11269997.0,
+              "p99_ns": 12032144.0
+            },
+            "first_draw_caller_cpu_ns": {
+              "count": 300,
+              "max_ns": 13984878.0,
+              "mean_ns": 8940456.496666666,
+              "p50_ns": 8869391.0,
+              "p90_ns": 10859196.0,
+              "p95_ns": 11192535.0,
+              "p99_ns": 11965705.0
+            },
+            "first_draw_submission_ns": {
+              "count": 300,
+              "max_ns": 18820584.0,
+              "mean_ns": 13276917.72,
+              "p50_ns": 13174805.0,
+              "p90_ns": 15331136.0,
+              "p95_ns": 15923082.0,
+              "p99_ns": 16418630.0
+            },
+            "wall_ns": {
+              "count": 300,
+              "max_ns": 126026050.0,
+              "mean_ns": 80162869.1,
+              "p50_ns": 81872143.0,
+              "p90_ns": 101046609.0,
+              "p95_ns": 104639963.0,
+              "p99_ns": 115044044.0
+            }
+          },
+          "view_pair": {
+            "accepted_snapshot_caller_cpu_ns": {
+              "count": 0
+            },
+            "accepted_snapshot_ns": {
+              "count": 0
+            },
+            "caller_thread_cpu_ns": {
+              "count": 2000,
+              "max_ns": 4104927.0,
+              "mean_ns": 1620821.0165,
+              "p50_ns": 1484152.0,
+              "p90_ns": 2118587.0,
+              "p95_ns": 2739937.0,
+              "p99_ns": 3747468.0
+            },
+            "first_draw_caller_cpu_ns": {
+              "count": 0
+            },
+            "first_draw_submission_ns": {
+              "count": 0
+            },
+            "wall_ns": {
+              "count": 2000,
+              "max_ns": 12733466.0,
+              "mean_ns": 9636055.678,
+              "p50_ns": 9447545.0,
+              "p90_ns": 10463332.0,
+              "p95_ns": 10992990.0,
+              "p99_ns": 11776357.0
+            }
+          }
+        },
+        "gpu_elapsed_distribution_ns": {
+          "count": 2000,
+          "max_ns": 15174114.0,
+          "mean_ns": 9105085.327,
+          "p50_ns": 8858958.0,
+          "p90_ns": 11900000.0,
+          "p95_ns": 12660989.0,
+          "p99_ns": 13955520.0
+        },
+        "gpu_timers_complete": {
+          "counter_bits": 64,
+          "disjoint_observed": false,
+          "disjoint_supported": false,
+          "distribution_ns": {
+            "count": 2000,
+            "max_ns": 15174114.0,
+            "mean_ns": 9105085.327,
+            "p50_ns": 8858958.0,
+            "p90_ns": 11900000.0,
+            "p95_ns": 12660989.0,
+            "p99_ns": 13955520.0
+          },
+          "distribution_qualified": true,
+          "expected_pairs": 2000,
+          "pending_after_bounded_drain": 0,
+          "reset_query_supported": true,
+          "reset_status": 0,
+          "skipped_indices": [],
+          "supported": true,
+          "valid_coverage": 1.0,
+          "valid_samples": 2000
+        },
+        "actual_view_ray_contact_stage_totals": {
+          "affine_nearest": {
+            "rows": 2000,
+            "total_calls": 34000,
+            "sum_wall_ns": 718749610,
+            "sum_thread_cpu_ns": 708609611,
+            "minimum_row_wall_ns": 178441,
+            "maximum_row_wall_ns": 2363200,
+            "scope": "Actual native stage instrumentation on view rows, not the complete controller/API elapsed time. Complete row timings remain in raw archive."
+          },
+          "affine_ray": {
+            "rows": 2000,
+            "total_calls": 10000,
+            "sum_wall_ns": 27373197,
+            "sum_thread_cpu_ns": 27069932,
+            "minimum_row_wall_ns": 6564,
+            "maximum_row_wall_ns": 98399,
+            "scope": "Actual native stage instrumentation on view rows, not the complete controller/API elapsed time. Complete row timings remain in raw archive."
+          }
+        }
+      }
+    ]
+  },
+  "historical_b6": {
+    "status": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/sustained-four-objects-shared-20261111/status.json",
+      "sha256": "540dd9cd5e2bc0784ba13f6a6af0d9d7637db636d2df8889754a25f0b2c53c1e"
+    },
+    "result": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/sustained-four-objects-shared-20261111/full-p1/result.json",
+      "sha256": "ad1f5bcb82becf19bfcb1b9e17f66ca2a3c11746c6f05cab7ed6c5bd41dcd306"
+    },
+    "seconds": 273.15577294304967,
+    "conditions": "Other CPU development/qualification may remain active; exclusive Arc lock required. Record measurements as observed under these conditions.",
+    "repetitions": [
+      {
+        "index": 0,
+        "all_phase_distributions": {
+          "authored_placement": {
+            "accepted_snapshot_caller_cpu_ns": {
+              "count": 2,
+              "max_ns": 85679.0,
+              "mean_ns": 77027.0,
+              "p50_ns": 68375.0,
+              "p90_ns": 85679.0,
+              "p95_ns": 85679.0,
+              "p99_ns": 85679.0
+            },
+            "accepted_snapshot_ns": {
+              "count": 2,
+              "max_ns": 2137853.0,
+              "mean_ns": 1850905.5,
+              "p50_ns": 1563958.0,
+              "p90_ns": 2137853.0,
+              "p95_ns": 2137853.0,
+              "p99_ns": 2137853.0
+            },
+            "caller_thread_cpu_ns": {
+              "count": 2,
+              "max_ns": 1747939.0,
+              "mean_ns": 1637902.5,
+              "p50_ns": 1527866.0,
+              "p90_ns": 1747939.0,
+              "p95_ns": 1747939.0,
+              "p99_ns": 1747939.0
+            },
+            "first_draw_caller_cpu_ns": {
+              "count": 2,
+              "max_ns": 1660541.0,
+              "mean_ns": 1559345.5,
+              "p50_ns": 1458150.0,
+              "p90_ns": 1660541.0,
+              "p95_ns": 1660541.0,
+              "p99_ns": 1660541.0
+            },
+            "first_draw_submission_ns": {
+              "count": 2,
+              "max_ns": 5177369.0,
+              "mean_ns": 5044678.0,
+              "p50_ns": 4911987.0,
+              "p90_ns": 5177369.0,
+              "p95_ns": 5177369.0,
+              "p99_ns": 5177369.0
+            },
+            "wall_ns": {
+              "count": 2,
+              "max_ns": 7317620.0,
+              "mean_ns": 6897887.0,
+              "p50_ns": 6478154.0,
+              "p90_ns": 7317620.0,
+              "p95_ns": 7317620.0,
+              "p99_ns": 7317620.0
+            }
+          },
+          "held_pair": {
+            "accepted_snapshot_caller_cpu_ns": {
+              "count": 0
+            },
+            "accepted_snapshot_ns": {
+              "count": 0
+            },
+            "caller_thread_cpu_ns": {
+              "count": 120,
+              "max_ns": 1390106.0,
+              "mean_ns": 948323.4833333333,
+              "p50_ns": 920829.0,
+              "p90_ns": 1176290.0,
+              "p95_ns": 1237822.0,
+              "p99_ns": 1334383.0
+            },
+            "first_draw_caller_cpu_ns": {
+              "count": 0
+            },
+            "first_draw_submission_ns": {
+              "count": 0
+            },
+            "wall_ns": {
+              "count": 120,
+              "max_ns": 8856859.0,
+              "mean_ns": 8489576.733333332,
+              "p50_ns": 8479532.0,
+              "p90_ns": 8575382.0,
+              "p95_ns": 8605561.0,
+              "p99_ns": 8680835.0
+            }
+          },
+          "mask": {
+            "accepted_snapshot_caller_cpu_ns": {
+              "count": 120,
+              "max_ns": 220794.0,
+              "mean_ns": 134895.03333333333,
+              "p50_ns": 130310.0,
+              "p90_ns": 177266.0,
+              "p95_ns": 186506.0,
+              "p99_ns": 218020.0
+            },
+            "accepted_snapshot_ns": {
+              "count": 120,
+              "max_ns": 35646592.0,
+              "mean_ns": 30973982.35,
+              "p50_ns": 31640803.0,
+              "p90_ns": 32345013.0,
+              "p95_ns": 32634052.0,
+              "p99_ns": 33404092.0
+            },
+            "caller_thread_cpu_ns": {
+              "count": 120,
+              "max_ns": 3008914.0,
+              "mean_ns": 2194292.3583333334,
+              "p50_ns": 2142567.0,
+              "p90_ns": 2567144.0,
+              "p95_ns": 2717524.0,
+              "p99_ns": 2955129.0
+            },
+            "first_draw_caller_cpu_ns": {
+              "count": 120,
+              "max_ns": 2879142.0,
+              "mean_ns": 2056796.6416666666,
+              "p50_ns": 2005248.0,
+              "p90_ns": 2436982.0,
+              "p95_ns": 2614203.0,
+              "p99_ns": 2759410.0
+            },
+            "first_draw_submission_ns": {
+              "count": 120,
+              "max_ns": 9636542.0,
+              "mean_ns": 7136387.258333334,
+              "p50_ns": 7063545.0,
+              "p90_ns": 7503753.0,
+              "p95_ns": 7653642.0,
+              "p99_ns": 7925732.0
+            },
+            "wall_ns": {
+              "count": 120,
+              "max_ns": 42664347.0,
+              "mean_ns": 38114895.85,
+              "p50_ns": 38655128.0,
+              "p90_ns": 39767223.0,
+              "p95_ns": 40049375.0,
+              "p99_ns": 40407832.0
+            }
+          },
+          "mask_clear": {
+            "accepted_snapshot_caller_cpu_ns": {
+              "count": 1,
+              "max_ns": 48884.0,
+              "mean_ns": 48884.0,
+              "p50_ns": 48884.0,
+              "p90_ns": 48884.0,
+              "p95_ns": 48884.0,
+              "p99_ns": 48884.0
+            },
+            "accepted_snapshot_ns": {
+              "count": 1,
+              "max_ns": 3286819.0,
+              "mean_ns": 3286819.0,
+              "p50_ns": 3286819.0,
+              "p90_ns": 3286819.0,
+              "p95_ns": 3286819.0,
+              "p99_ns": 3286819.0
+            },
+            "caller_thread_cpu_ns": {
+              "count": 1,
+              "max_ns": 2043408.0,
+              "mean_ns": 2043408.0,
+              "p50_ns": 2043408.0,
+              "p90_ns": 2043408.0,
+              "p95_ns": 2043408.0,
+              "p99_ns": 2043408.0
+            },
+            "first_draw_caller_cpu_ns": {
+              "count": 1,
+              "max_ns": 1991942.0,
+              "mean_ns": 1991942.0,
+              "p50_ns": 1991942.0,
+              "p90_ns": 1991942.0,
+              "p95_ns": 1991942.0,
+              "p99_ns": 1991942.0
+            },
+            "first_draw_submission_ns": {
+              "count": 1,
+              "max_ns": 6973694.0,
+              "mean_ns": 6973694.0,
+              "p50_ns": 6973694.0,
+              "p90_ns": 6973694.0,
+              "p95_ns": 6973694.0,
+              "p99_ns": 6973694.0
+            },
+            "wall_ns": {
+              "count": 1,
+              "max_ns": 10264209.0,
+              "mean_ns": 10264209.0,
+              "p50_ns": 10264209.0,
+              "p90_ns": 10264209.0,
+              "p95_ns": 10264209.0,
+              "p99_ns": 10264209.0
+            }
+          },
+          "mask_fill": {
+            "accepted_snapshot_caller_cpu_ns": {
+              "count": 1,
+              "max_ns": 75627.0,
+              "mean_ns": 75627.0,
+              "p50_ns": 75627.0,
+              "p90_ns": 75627.0,
+              "p95_ns": 75627.0,
+              "p99_ns": 75627.0
+            },
+            "accepted_snapshot_ns": {
+              "count": 1,
+              "max_ns": 3371550.0,
+              "mean_ns": 3371550.0,
+              "p50_ns": 3371550.0,
+              "p90_ns": 3371550.0,
+              "p95_ns": 3371550.0,
+              "p99_ns": 3371550.0
+            },
+            "caller_thread_cpu_ns": {
+              "count": 1,
+              "max_ns": 1776205.0,
+              "mean_ns": 1776205.0,
+              "p50_ns": 1776205.0,
+              "p90_ns": 1776205.0,
+              "p95_ns": 1776205.0,
+              "p99_ns": 1776205.0
+            },
+            "first_draw_caller_cpu_ns": {
+              "count": 1,
+              "max_ns": 1698451.0,
+              "mean_ns": 1698451.0,
+              "p50_ns": 1698451.0,
+              "p90_ns": 1698451.0,
+              "p95_ns": 1698451.0,
+              "p99_ns": 1698451.0
+            },
+            "first_draw_submission_ns": {
+              "count": 1,
+              "max_ns": 6828525.0,
+              "mean_ns": 6828525.0,
+              "p50_ns": 6828525.0,
+              "p90_ns": 6828525.0,
+              "p95_ns": 6828525.0,
+              "p99_ns": 6828525.0
+            },
+            "wall_ns": {
+              "count": 1,
+              "max_ns": 10203100.0,
+              "mean_ns": 10203100.0,
+              "p50_ns": 10203100.0,
+              "p90_ns": 10203100.0,
+              "p95_ns": 10203100.0,
+              "p99_ns": 10203100.0
+            }
+          },
+          "mask_mode": {
+            "accepted_snapshot_caller_cpu_ns": {
+              "count": 0
+            },
+            "accepted_snapshot_ns": {
+              "count": 0
+            },
+            "caller_thread_cpu_ns": {
+              "count": 2,
+              "max_ns": 83023.0,
+              "mean_ns": 62665.5,
+              "p50_ns": 42308.0,
+              "p90_ns": 83023.0,
+              "p95_ns": 83023.0,
+              "p99_ns": 83023.0
+            },
+            "first_draw_caller_cpu_ns": {
+              "count": 0
+            },
+            "first_draw_submission_ns": {
+              "count": 0
+            },
+            "wall_ns": {
+              "count": 2,
+              "max_ns": 191379.0,
+              "mean_ns": 154993.5,
+              "p50_ns": 118608.0,
+              "p90_ns": 191379.0,
+              "p95_ns": 191379.0,
+              "p99_ns": 191379.0
+            }
+          },
+          "stroke": {
+            "accepted_snapshot_caller_cpu_ns": {
+              "count": 300,
+              "max_ns": 165514.0,
+              "mean_ns": 84896.66666666667,
+              "p50_ns": 82638.0,
+              "p90_ns": 105831.0,
+              "p95_ns": 114752.0,
+              "p99_ns": 148301.0
+            },
+            "accepted_snapshot_ns": {
+              "count": 300,
+              "max_ns": 96911088.0,
+              "mean_ns": 59846774.906666666,
+              "p50_ns": 60940034.0,
+              "p90_ns": 77477819.0,
+              "p95_ns": 80975144.0,
+              "p99_ns": 90938217.0
+            },
+            "caller_thread_cpu_ns": {
+              "count": 300,
+              "max_ns": 10560617.0,
+              "mean_ns": 7001502.656666666,
+              "p50_ns": 6747425.0,
+              "p90_ns": 8656626.0,
+              "p95_ns": 9161817.0,
+              "p99_ns": 10025735.0
+            },
+            "first_draw_caller_cpu_ns": {
+              "count": 300,
+              "max_ns": 10463230.0,
+              "mean_ns": 6913943.056666667,
+              "p50_ns": 6646347.0,
+              "p90_ns": 8572747.0,
+              "p95_ns": 9091121.0,
+              "p99_ns": 9932701.0
+            },
+            "first_draw_submission_ns": {
+              "count": 300,
+              "max_ns": 13997216.0,
+              "mean_ns": 10590245.89,
+              "p50_ns": 10352145.0,
+              "p90_ns": 12414739.0,
+              "p95_ns": 13009506.0,
+              "p99_ns": 13860060.0
+            },
+            "wall_ns": {
+              "count": 300,
+              "max_ns": 108186158.0,
+              "mean_ns": 70441700.09,
+              "p50_ns": 71852181.0,
+              "p90_ns": 89006189.0,
+              "p95_ns": 92149154.0,
+              "p99_ns": 102025247.0
+            }
+          },
+          "view_pair": {
+            "accepted_snapshot_caller_cpu_ns": {
+              "count": 0
+            },
+            "accepted_snapshot_ns": {
+              "count": 0
+            },
+            "caller_thread_cpu_ns": {
+              "count": 2000,
+              "max_ns": 3939456.0,
+              "mean_ns": 1329415.705,
+              "p50_ns": 1155685.0,
+              "p90_ns": 1840108.0,
+              "p95_ns": 2643498.0,
+              "p99_ns": 3617681.0
+            },
+            "first_draw_caller_cpu_ns": {
+              "count": 0
+            },
+            "first_draw_submission_ns": {
+              "count": 0
+            },
+            "wall_ns": {
+              "count": 2000,
+              "max_ns": 11609336.0,
+              "mean_ns": 9248244.6975,
+              "p50_ns": 9080941.0,
+              "p90_ns": 9741085.0,
+              "p95_ns": 10591550.0,
+              "p99_ns": 11345533.0
+            }
+          }
+        },
+        "gpu_elapsed_distribution_ns": {
+          "count": 2000,
+          "max_ns": 10977083.0,
+          "mean_ns": 8557285.8715,
+          "p50_ns": 8516458.0,
+          "p90_ns": 8827604.0,
+          "p95_ns": 9258906.0,
+          "p99_ns": 10239531.0
+        },
+        "gpu_timers_complete": {
+          "counter_bits": 64,
+          "disjoint_observed": false,
+          "disjoint_supported": false,
+          "distribution_ns": {
+            "count": 2000,
+            "max_ns": 10977083.0,
+            "mean_ns": 8557285.8715,
+            "p50_ns": 8516458.0,
+            "p90_ns": 8827604.0,
+            "p95_ns": 9258906.0,
+            "p99_ns": 10239531.0
+          },
+          "distribution_qualified": true,
+          "expected_pairs": 2000,
+          "pending_after_bounded_drain": 0,
+          "reset_query_supported": true,
+          "reset_status": 0,
+          "skipped_indices": [],
+          "supported": true,
+          "valid_coverage": 1.0,
+          "valid_samples": 2000
+        },
+        "actual_view_ray_contact_stage_totals": {
+          "affine_nearest": {
+            "rows": 2000,
+            "total_calls": 34000,
+            "sum_wall_ns": 685138733,
+            "sum_thread_cpu_ns": 679854400,
+            "minimum_row_wall_ns": 163297,
+            "maximum_row_wall_ns": 2330425,
+            "scope": "Actual native stage instrumentation on view rows, not the complete controller/API elapsed time. Complete row timings remain in raw archive."
+          },
+          "affine_ray": {
+            "rows": 2000,
+            "total_calls": 10000,
+            "sum_wall_ns": 18763898,
+            "sum_thread_cpu_ns": 18652790,
+            "minimum_row_wall_ns": 3758,
+            "maximum_row_wall_ns": 81886,
+            "scope": "Actual native stage instrumentation on view rows, not the complete controller/API elapsed time. Complete row timings remain in raw archive."
+          }
+        }
+      },
+      {
+        "index": 1,
+        "all_phase_distributions": {
+          "authored_placement": {
+            "accepted_snapshot_caller_cpu_ns": {
+              "count": 2,
+              "max_ns": 74244.0,
+              "mean_ns": 64354.0,
+              "p50_ns": 54464.0,
+              "p90_ns": 74244.0,
+              "p95_ns": 74244.0,
+              "p99_ns": 74244.0
+            },
+            "accepted_snapshot_ns": {
+              "count": 2,
+              "max_ns": 2063515.0,
+              "mean_ns": 1756415.0,
+              "p50_ns": 1449315.0,
+              "p90_ns": 2063515.0,
+              "p95_ns": 2063515.0,
+              "p99_ns": 2063515.0
+            },
+            "caller_thread_cpu_ns": {
+              "count": 2,
+              "max_ns": 1827003.0,
+              "mean_ns": 1692157.5,
+              "p50_ns": 1557312.0,
+              "p90_ns": 1827003.0,
+              "p95_ns": 1827003.0,
+              "p99_ns": 1827003.0
+            },
+            "first_draw_caller_cpu_ns": {
+              "count": 2,
+              "max_ns": 1749272.0,
+              "mean_ns": 1624372.5,
+              "p50_ns": 1499473.0,
+              "p90_ns": 1749272.0,
+              "p95_ns": 1749272.0,
+              "p99_ns": 1749272.0
+            },
+            "first_draw_submission_ns": {
+              "count": 2,
+              "max_ns": 5244124.0,
+              "mean_ns": 5100990.5,
+              "p50_ns": 4957857.0,
+              "p90_ns": 5244124.0,
+              "p95_ns": 5244124.0,
+              "p99_ns": 5244124.0
+            },
+            "wall_ns": {
+              "count": 2,
+              "max_ns": 7312320.0,
+              "mean_ns": 6862078.0,
+              "p50_ns": 6411836.0,
+              "p90_ns": 7312320.0,
+              "p95_ns": 7312320.0,
+              "p99_ns": 7312320.0
+            }
+          },
+          "held_pair": {
+            "accepted_snapshot_caller_cpu_ns": {
+              "count": 0
+            },
+            "accepted_snapshot_ns": {
+              "count": 0
+            },
+            "caller_thread_cpu_ns": {
+              "count": 120,
+              "max_ns": 1343646.0,
+              "mean_ns": 955204.6083333333,
+              "p50_ns": 964736.0,
+              "p90_ns": 1141882.0,
+              "p95_ns": 1208217.0,
+              "p99_ns": 1329310.0
+            },
+            "first_draw_caller_cpu_ns": {
+              "count": 0
+            },
+            "first_draw_submission_ns": {
+              "count": 0
+            },
+            "wall_ns": {
+              "count": 120,
+              "max_ns": 9011878.0,
+              "mean_ns": 8582285.741666667,
+              "p50_ns": 8578094.0,
+              "p90_ns": 8674030.0,
+              "p95_ns": 8698411.0,
+              "p99_ns": 8886766.0
+            }
+          },
+          "mask": {
+            "accepted_snapshot_caller_cpu_ns": {
+              "count": 120,
+              "max_ns": 247247.0,
+              "mean_ns": 132528.90833333333,
+              "p50_ns": 127893.0,
+              "p90_ns": 177269.0,
+              "p95_ns": 194073.0,
+              "p99_ns": 233151.0
+            },
+            "accepted_snapshot_ns": {
+              "count": 120,
+              "max_ns": 36673747.0,
+              "mean_ns": 30857335.366666667,
+              "p50_ns": 31462225.0,
+              "p90_ns": 32174870.0,
+              "p95_ns": 32346664.0,
+              "p99_ns": 33312398.0
+            },
+            "caller_thread_cpu_ns": {
+              "count": 120,
+              "max_ns": 3153559.0,
+              "mean_ns": 2259870.05,
+              "p50_ns": 2168333.0,
+              "p90_ns": 2681382.0,
+              "p95_ns": 2875348.0,
+              "p99_ns": 3072612.0
+            },
+            "first_draw_caller_cpu_ns": {
+              "count": 120,
+              "max_ns": 3007652.0,
+              "mean_ns": 2124621.2083333335,
+              "p50_ns": 2031768.0,
+              "p90_ns": 2515334.0,
+              "p95_ns": 2741614.0,
+              "p99_ns": 3004788.0
+            },
+            "first_draw_submission_ns": {
+              "count": 120,
+              "max_ns": 9821846.0,
+              "mean_ns": 7179865.216666667,
+              "p50_ns": 7104138.0,
+              "p90_ns": 7550896.0,
+              "p95_ns": 7783729.0,
+              "p99_ns": 8433519.0
+            },
+            "wall_ns": {
+              "count": 120,
+              "max_ns": 43544248.0,
+              "mean_ns": 38041757.041666664,
+              "p50_ns": 38511108.0,
+              "p90_ns": 39478127.0,
+              "p95_ns": 39666929.0,
+              "p99_ns": 40477015.0
+            }
+          },
+          "mask_clear": {
+            "accepted_snapshot_caller_cpu_ns": {
+              "count": 1,
+              "max_ns": 51992.0,
+              "mean_ns": 51992.0,
+              "p50_ns": 51992.0,
+              "p90_ns": 51992.0,
+              "p95_ns": 51992.0,
+              "p99_ns": 51992.0
+            },
+            "accepted_snapshot_ns": {
+              "count": 1,
+              "max_ns": 3325153.0,
+              "mean_ns": 3325153.0,
+              "p50_ns": 3325153.0,
+              "p90_ns": 3325153.0,
+              "p95_ns": 3325153.0,
+              "p99_ns": 3325153.0
+            },
+            "caller_thread_cpu_ns": {
+              "count": 1,
+              "max_ns": 1697189.0,
+              "mean_ns": 1697189.0,
+              "p50_ns": 1697189.0,
+              "p90_ns": 1697189.0,
+              "p95_ns": 1697189.0,
+              "p99_ns": 1697189.0
+            },
+            "first_draw_caller_cpu_ns": {
+              "count": 1,
+              "max_ns": 1643156.0,
+              "mean_ns": 1643156.0,
+              "p50_ns": 1643156.0,
+              "p90_ns": 1643156.0,
+              "p95_ns": 1643156.0,
+              "p99_ns": 1643156.0
+            },
+            "first_draw_submission_ns": {
+              "count": 1,
+              "max_ns": 6704778.0,
+              "mean_ns": 6704778.0,
+              "p50_ns": 6704778.0,
+              "p90_ns": 6704778.0,
+              "p95_ns": 6704778.0,
+              "p99_ns": 6704778.0
+            },
+            "wall_ns": {
+              "count": 1,
+              "max_ns": 10032664.0,
+              "mean_ns": 10032664.0,
+              "p50_ns": 10032664.0,
+              "p90_ns": 10032664.0,
+              "p95_ns": 10032664.0,
+              "p99_ns": 10032664.0
+            }
+          },
+          "mask_fill": {
+            "accepted_snapshot_caller_cpu_ns": {
+              "count": 1,
+              "max_ns": 70224.0,
+              "mean_ns": 70224.0,
+              "p50_ns": 70224.0,
+              "p90_ns": 70224.0,
+              "p95_ns": 70224.0,
+              "p99_ns": 70224.0
+            },
+            "accepted_snapshot_ns": {
+              "count": 1,
+              "max_ns": 3306781.0,
+              "mean_ns": 3306781.0,
+              "p50_ns": 3306781.0,
+              "p90_ns": 3306781.0,
+              "p95_ns": 3306781.0,
+              "p99_ns": 3306781.0
+            },
+            "caller_thread_cpu_ns": {
+              "count": 1,
+              "max_ns": 1975821.0,
+              "mean_ns": 1975821.0,
+              "p50_ns": 1975821.0,
+              "p90_ns": 1975821.0,
+              "p95_ns": 1975821.0,
+              "p99_ns": 1975821.0
+            },
+            "first_draw_caller_cpu_ns": {
+              "count": 1,
+              "max_ns": 1903233.0,
+              "mean_ns": 1903233.0,
+              "p50_ns": 1903233.0,
+              "p90_ns": 1903233.0,
+              "p95_ns": 1903233.0,
+              "p99_ns": 1903233.0
+            },
+            "first_draw_submission_ns": {
+              "count": 1,
+              "max_ns": 6934259.0,
+              "mean_ns": 6934259.0,
+              "p50_ns": 6934259.0,
+              "p90_ns": 6934259.0,
+              "p95_ns": 6934259.0,
+              "p99_ns": 6934259.0
+            },
+            "wall_ns": {
+              "count": 1,
+              "max_ns": 10244349.0,
+              "mean_ns": 10244349.0,
+              "p50_ns": 10244349.0,
+              "p90_ns": 10244349.0,
+              "p95_ns": 10244349.0,
+              "p99_ns": 10244349.0
+            }
+          },
+          "mask_mode": {
+            "accepted_snapshot_caller_cpu_ns": {
+              "count": 0
+            },
+            "accepted_snapshot_ns": {
+              "count": 0
+            },
+            "caller_thread_cpu_ns": {
+              "count": 2,
+              "max_ns": 87800.0,
+              "mean_ns": 61417.5,
+              "p50_ns": 35035.0,
+              "p90_ns": 87800.0,
+              "p95_ns": 87800.0,
+              "p99_ns": 87800.0
+            },
+            "first_draw_caller_cpu_ns": {
+              "count": 0
+            },
+            "first_draw_submission_ns": {
+              "count": 0
+            },
+            "wall_ns": {
+              "count": 2,
+              "max_ns": 333640.0,
+              "mean_ns": 216729.0,
+              "p50_ns": 99818.0,
+              "p90_ns": 333640.0,
+              "p95_ns": 333640.0,
+              "p99_ns": 333640.0
+            }
+          },
+          "stroke": {
+            "accepted_snapshot_caller_cpu_ns": {
+              "count": 300,
+              "max_ns": 183047.0,
+              "mean_ns": 83854.02666666667,
+              "p50_ns": 82863.0,
+              "p90_ns": 102245.0,
+              "p95_ns": 108200.0,
+              "p99_ns": 133936.0
+            },
+            "accepted_snapshot_ns": {
+              "count": 300,
+              "max_ns": 96235519.0,
+              "mean_ns": 59706551.36666667,
+              "p50_ns": 60941133.0,
+              "p90_ns": 77755161.0,
+              "p95_ns": 81319622.0,
+              "p99_ns": 89253638.0
+            },
+            "caller_thread_cpu_ns": {
+              "count": 300,
+              "max_ns": 10371905.0,
+              "mean_ns": 7078331.833333333,
+              "p50_ns": 6861790.0,
+              "p90_ns": 8725914.0,
+              "p95_ns": 9446978.0,
+              "p99_ns": 9831809.0
+            },
+            "first_draw_caller_cpu_ns": {
+              "count": 300,
+              "max_ns": 10298023.0,
+              "mean_ns": 6991719.38,
+              "p50_ns": 6786612.0,
+              "p90_ns": 8664702.0,
+              "p95_ns": 9357831.0,
+              "p99_ns": 9760786.0
+            },
+            "first_draw_submission_ns": {
+              "count": 300,
+              "max_ns": 13807334.0,
+              "mean_ns": 10657084.363333333,
+              "p50_ns": 10389364.0,
+              "p90_ns": 12338844.0,
+              "p95_ns": 12980385.0,
+              "p99_ns": 13439994.0
+            },
+            "wall_ns": {
+              "count": 300,
+              "max_ns": 108218396.0,
+              "mean_ns": 70368468.41666667,
+              "p50_ns": 71735074.0,
+              "p90_ns": 89071411.0,
+              "p95_ns": 93654242.0,
+              "p99_ns": 100340903.0
+            }
+          },
+          "view_pair": {
+            "accepted_snapshot_caller_cpu_ns": {
+              "count": 0
+            },
+            "accepted_snapshot_ns": {
+              "count": 0
+            },
+            "caller_thread_cpu_ns": {
+              "count": 2000,
+              "max_ns": 3957947.0,
+              "mean_ns": 1313603.566,
+              "p50_ns": 1152832.0,
+              "p90_ns": 1768934.0,
+              "p95_ns": 2512158.0,
+              "p99_ns": 3568370.0
+            },
+            "first_draw_caller_cpu_ns": {
+              "count": 0
+            },
+            "first_draw_submission_ns": {
+              "count": 0
+            },
+            "wall_ns": {
+              "count": 2000,
+              "max_ns": 11853478.0,
+              "mean_ns": 9235370.1585,
+              "p50_ns": 9085983.0,
+              "p90_ns": 9658412.0,
+              "p95_ns": 10464421.0,
+              "p99_ns": 11318180.0
+            }
+          }
+        },
+        "gpu_elapsed_distribution_ns": {
+          "count": 2000,
+          "max_ns": 11370625.0,
+          "mean_ns": 8563476.172,
+          "p50_ns": 8520000.0,
+          "p90_ns": 8805833.0,
+          "p95_ns": 9307968.0,
+          "p99_ns": 10260260.0
+        },
+        "gpu_timers_complete": {
+          "counter_bits": 64,
+          "disjoint_observed": false,
+          "disjoint_supported": false,
+          "distribution_ns": {
+            "count": 2000,
+            "max_ns": 11370625.0,
+            "mean_ns": 8563476.172,
+            "p50_ns": 8520000.0,
+            "p90_ns": 8805833.0,
+            "p95_ns": 9307968.0,
+            "p99_ns": 10260260.0
+          },
+          "distribution_qualified": true,
+          "expected_pairs": 2000,
+          "pending_after_bounded_drain": 0,
+          "reset_query_supported": true,
+          "reset_status": 0,
+          "skipped_indices": [],
+          "supported": true,
+          "valid_coverage": 1.0,
+          "valid_samples": 2000
+        },
+        "actual_view_ray_contact_stage_totals": {
+          "affine_nearest": {
+            "rows": 2000,
+            "total_calls": 34000,
+            "sum_wall_ns": 651154657,
+            "sum_thread_cpu_ns": 646064105,
+            "minimum_row_wall_ns": 163401,
+            "maximum_row_wall_ns": 2317659,
+            "scope": "Actual native stage instrumentation on view rows, not the complete controller/API elapsed time. Complete row timings remain in raw archive."
+          },
+          "affine_ray": {
+            "rows": 2000,
+            "total_calls": 10000,
+            "sum_wall_ns": 21433465,
+            "sum_thread_cpu_ns": 21314730,
+            "minimum_row_wall_ns": 4166,
+            "maximum_row_wall_ns": 133742,
+            "scope": "Actual native stage instrumentation on view rows, not the complete controller/API elapsed time. Complete row timings remain in raw archive."
+          }
+        }
+      },
+      {
+        "index": 2,
+        "all_phase_distributions": {
+          "authored_placement": {
+            "accepted_snapshot_caller_cpu_ns": {
+              "count": 2,
+              "max_ns": 111744.0,
+              "mean_ns": 89135.0,
+              "p50_ns": 66526.0,
+              "p90_ns": 111744.0,
+              "p95_ns": 111744.0,
+              "p99_ns": 111744.0
+            },
+            "accepted_snapshot_ns": {
+              "count": 2,
+              "max_ns": 1994575.0,
+              "mean_ns": 1994067.5,
+              "p50_ns": 1993560.0,
+              "p90_ns": 1994575.0,
+              "p95_ns": 1994575.0,
+              "p99_ns": 1994575.0
+            },
+            "caller_thread_cpu_ns": {
+              "count": 2,
+              "max_ns": 1983521.0,
+              "mean_ns": 1900061.0,
+              "p50_ns": 1816601.0,
+              "p90_ns": 1983521.0,
+              "p95_ns": 1983521.0,
+              "p99_ns": 1983521.0
+            },
+            "first_draw_caller_cpu_ns": {
+              "count": 2,
+              "max_ns": 1914689.0,
+              "mean_ns": 1808855.5,
+              "p50_ns": 1703022.0,
+              "p90_ns": 1914689.0,
+              "p95_ns": 1914689.0,
+              "p99_ns": 1914689.0
+            },
+            "first_draw_submission_ns": {
+              "count": 2,
+              "max_ns": 5684634.0,
+              "mean_ns": 5563374.0,
+              "p50_ns": 5442114.0,
+              "p90_ns": 5684634.0,
+              "p95_ns": 5684634.0,
+              "p99_ns": 5684634.0
+            },
+            "wall_ns": {
+              "count": 2,
+              "max_ns": 7682617.0,
+              "mean_ns": 7560897.0,
+              "p50_ns": 7439177.0,
+              "p90_ns": 7682617.0,
+              "p95_ns": 7682617.0,
+              "p99_ns": 7682617.0
+            }
+          },
+          "held_pair": {
+            "accepted_snapshot_caller_cpu_ns": {
+              "count": 0
+            },
+            "accepted_snapshot_ns": {
+              "count": 0
+            },
+            "caller_thread_cpu_ns": {
+              "count": 120,
+              "max_ns": 1353781.0,
+              "mean_ns": 925350.3416666667,
+              "p50_ns": 890319.0,
+              "p90_ns": 1184032.0,
+              "p95_ns": 1276486.0,
+              "p99_ns": 1347954.0
+            },
+            "first_draw_caller_cpu_ns": {
+              "count": 0
+            },
+            "first_draw_submission_ns": {
+              "count": 0
+            },
+            "wall_ns": {
+              "count": 120,
+              "max_ns": 8764613.0,
+              "mean_ns": 8586768.508333333,
+              "p50_ns": 8585144.0,
+              "p90_ns": 8666137.0,
+              "p95_ns": 8679098.0,
+              "p99_ns": 8715268.0
+            }
+          },
+          "mask": {
+            "accepted_snapshot_caller_cpu_ns": {
+              "count": 120,
+              "max_ns": 267728.0,
+              "mean_ns": 135469.89166666666,
+              "p50_ns": 132197.0,
+              "p90_ns": 172900.0,
+              "p95_ns": 191975.0,
+              "p99_ns": 247878.0
+            },
+            "accepted_snapshot_ns": {
+              "count": 120,
+              "max_ns": 33912747.0,
+              "mean_ns": 30965256.383333333,
+              "p50_ns": 31589475.0,
+              "p90_ns": 32288949.0,
+              "p95_ns": 32466620.0,
+              "p99_ns": 33358758.0
+            },
+            "caller_thread_cpu_ns": {
+              "count": 120,
+              "max_ns": 3270905.0,
+              "mean_ns": 2192333.808333333,
+              "p50_ns": 2111227.0,
+              "p90_ns": 2720892.0,
+              "p95_ns": 2912163.0,
+              "p99_ns": 3060605.0
+            },
+            "first_draw_caller_cpu_ns": {
+              "count": 120,
+              "max_ns": 3123872.0,
+              "mean_ns": 2054380.25,
+              "p50_ns": 1985402.0,
+              "p90_ns": 2602800.0,
+              "p95_ns": 2674635.0,
+              "p99_ns": 2884769.0
+            },
+            "first_draw_submission_ns": {
+              "count": 120,
+              "max_ns": 10323036.0,
+              "mean_ns": 7141542.216666667,
+              "p50_ns": 7014333.0,
+              "p90_ns": 7585190.0,
+              "p95_ns": 7918991.0,
+              "p99_ns": 8827871.0
+            },
+            "wall_ns": {
+              "count": 120,
+              "max_ns": 41182250.0,
+              "mean_ns": 38111439.275,
+              "p50_ns": 38494396.0,
+              "p90_ns": 39447927.0,
+              "p95_ns": 39830765.0,
+              "p99_ns": 40565028.0
+            }
+          },
+          "mask_clear": {
+            "accepted_snapshot_caller_cpu_ns": {
+              "count": 1,
+              "max_ns": 54107.0,
+              "mean_ns": 54107.0,
+              "p50_ns": 54107.0,
+              "p90_ns": 54107.0,
+              "p95_ns": 54107.0,
+              "p99_ns": 54107.0
+            },
+            "accepted_snapshot_ns": {
+              "count": 1,
+              "max_ns": 3478727.0,
+              "mean_ns": 3478727.0,
+              "p50_ns": 3478727.0,
+              "p90_ns": 3478727.0,
+              "p95_ns": 3478727.0,
+              "p99_ns": 3478727.0
+            },
+            "caller_thread_cpu_ns": {
+              "count": 1,
+              "max_ns": 2398272.0,
+              "mean_ns": 2398272.0,
+              "p50_ns": 2398272.0,
+              "p90_ns": 2398272.0,
+              "p95_ns": 2398272.0,
+              "p99_ns": 2398272.0
+            },
+            "first_draw_caller_cpu_ns": {
+              "count": 1,
+              "max_ns": 2342370.0,
+              "mean_ns": 2342370.0,
+              "p50_ns": 2342370.0,
+              "p90_ns": 2342370.0,
+              "p95_ns": 2342370.0,
+              "p99_ns": 2342370.0
+            },
+            "first_draw_submission_ns": {
+              "count": 1,
+              "max_ns": 7307053.0,
+              "mean_ns": 7307053.0,
+              "p50_ns": 7307053.0,
+              "p90_ns": 7307053.0,
+              "p95_ns": 7307053.0,
+              "p99_ns": 7307053.0
+            },
+            "wall_ns": {
+              "count": 1,
+              "max_ns": 10788315.0,
+              "mean_ns": 10788315.0,
+              "p50_ns": 10788315.0,
+              "p90_ns": 10788315.0,
+              "p95_ns": 10788315.0,
+              "p99_ns": 10788315.0
+            }
+          },
+          "mask_fill": {
+            "accepted_snapshot_caller_cpu_ns": {
+              "count": 1,
+              "max_ns": 101181.0,
+              "mean_ns": 101181.0,
+              "p50_ns": 101181.0,
+              "p90_ns": 101181.0,
+              "p95_ns": 101181.0,
+              "p99_ns": 101181.0
+            },
+            "accepted_snapshot_ns": {
+              "count": 1,
+              "max_ns": 3440173.0,
+              "mean_ns": 3440173.0,
+              "p50_ns": 3440173.0,
+              "p90_ns": 3440173.0,
+              "p95_ns": 3440173.0,
+              "p99_ns": 3440173.0
+            },
+            "caller_thread_cpu_ns": {
+              "count": 1,
+              "max_ns": 2083902.0,
+              "mean_ns": 2083902.0,
+              "p50_ns": 2083902.0,
+              "p90_ns": 2083902.0,
+              "p95_ns": 2083902.0,
+              "p99_ns": 2083902.0
+            },
+            "first_draw_caller_cpu_ns": {
+              "count": 1,
+              "max_ns": 1978401.0,
+              "mean_ns": 1978401.0,
+              "p50_ns": 1978401.0,
+              "p90_ns": 1978401.0,
+              "p95_ns": 1978401.0,
+              "p99_ns": 1978401.0
+            },
+            "first_draw_submission_ns": {
+              "count": 1,
+              "max_ns": 7213413.0,
+              "mean_ns": 7213413.0,
+              "p50_ns": 7213413.0,
+              "p90_ns": 7213413.0,
+              "p95_ns": 7213413.0,
+              "p99_ns": 7213413.0
+            },
+            "wall_ns": {
+              "count": 1,
+              "max_ns": 10659658.0,
+              "mean_ns": 10659658.0,
+              "p50_ns": 10659658.0,
+              "p90_ns": 10659658.0,
+              "p95_ns": 10659658.0,
+              "p99_ns": 10659658.0
+            }
+          },
+          "mask_mode": {
+            "accepted_snapshot_caller_cpu_ns": {
+              "count": 0
+            },
+            "accepted_snapshot_ns": {
+              "count": 0
+            },
+            "caller_thread_cpu_ns": {
+              "count": 2,
+              "max_ns": 108132.0,
+              "mean_ns": 90729.5,
+              "p50_ns": 73327.0,
+              "p90_ns": 108132.0,
+              "p95_ns": 108132.0,
+              "p99_ns": 108132.0
+            },
+            "first_draw_caller_cpu_ns": {
+              "count": 0
+            },
+            "first_draw_submission_ns": {
+              "count": 0
+            },
+            "wall_ns": {
+              "count": 2,
+              "max_ns": 286461.0,
+              "mean_ns": 219645.0,
+              "p50_ns": 152829.0,
+              "p90_ns": 286461.0,
+              "p95_ns": 286461.0,
+              "p99_ns": 286461.0
+            }
+          },
+          "stroke": {
+            "accepted_snapshot_caller_cpu_ns": {
+              "count": 300,
+              "max_ns": 194161.0,
+              "mean_ns": 85352.97,
+              "p50_ns": 82915.0,
+              "p90_ns": 106487.0,
+              "p95_ns": 117977.0,
+              "p99_ns": 143076.0
+            },
+            "accepted_snapshot_ns": {
+              "count": 300,
+              "max_ns": 97062617.0,
+              "mean_ns": 57867164.096666664,
+              "p50_ns": 58803751.0,
+              "p90_ns": 75181679.0,
+              "p95_ns": 79610946.0,
+              "p99_ns": 87485650.0
+            },
+            "caller_thread_cpu_ns": {
+              "count": 300,
+              "max_ns": 10002847.0,
+              "mean_ns": 6897478.616666666,
+              "p50_ns": 6623306.0,
+              "p90_ns": 8387805.0,
+              "p95_ns": 8963367.0,
+              "p99_ns": 9814777.0
+            },
+            "first_draw_caller_cpu_ns": {
+              "count": 300,
+              "max_ns": 9911220.0,
+              "mean_ns": 6809177.3,
+              "p50_ns": 6528856.0,
+              "p90_ns": 8289596.0,
+              "p95_ns": 8890581.0,
+              "p99_ns": 9710266.0
+            },
+            "first_draw_submission_ns": {
+              "count": 300,
+              "max_ns": 13716558.0,
+              "mean_ns": 10483297.246666666,
+              "p50_ns": 10194842.0,
+              "p90_ns": 12002777.0,
+              "p95_ns": 12702749.0,
+              "p99_ns": 13450482.0
+            },
+            "wall_ns": {
+              "count": 300,
+              "max_ns": 109107425.0,
+              "mean_ns": 68355233.46666667,
+              "p50_ns": 69789899.0,
+              "p90_ns": 86361777.0,
+              "p95_ns": 91007756.0,
+              "p99_ns": 97899713.0
+            }
+          },
+          "view_pair": {
+            "accepted_snapshot_caller_cpu_ns": {
+              "count": 0
+            },
+            "accepted_snapshot_ns": {
+              "count": 0
+            },
+            "caller_thread_cpu_ns": {
+              "count": 2000,
+              "max_ns": 4028065.0,
+              "mean_ns": 1341410.6335,
+              "p50_ns": 1164086.0,
+              "p90_ns": 1882026.0,
+              "p95_ns": 2653488.0,
+              "p99_ns": 3608437.0
+            },
+            "first_draw_caller_cpu_ns": {
+              "count": 0
+            },
+            "first_draw_submission_ns": {
+              "count": 0
+            },
+            "wall_ns": {
+              "count": 2000,
+              "max_ns": 12174009.0,
+              "mean_ns": 9255936.5185,
+              "p50_ns": 9094421.0,
+              "p90_ns": 9765662.0,
+              "p95_ns": 10552680.0,
+              "p99_ns": 11360312.0
+            }
+          }
+        },
+        "gpu_elapsed_distribution_ns": {
+          "count": 2000,
+          "max_ns": 11568489.0,
+          "mean_ns": 8567080.1075,
+          "p50_ns": 8533697.0,
+          "p90_ns": 8803541.0,
+          "p95_ns": 9183697.0,
+          "p99_ns": 10090937.0
+        },
+        "gpu_timers_complete": {
+          "counter_bits": 64,
+          "disjoint_observed": false,
+          "disjoint_supported": false,
+          "distribution_ns": {
+            "count": 2000,
+            "max_ns": 11568489.0,
+            "mean_ns": 8567080.1075,
+            "p50_ns": 8533697.0,
+            "p90_ns": 8803541.0,
+            "p95_ns": 9183697.0,
+            "p99_ns": 10090937.0
+          },
+          "distribution_qualified": true,
+          "expected_pairs": 2000,
+          "pending_after_bounded_drain": 0,
+          "reset_query_supported": true,
+          "reset_status": 0,
+          "skipped_indices": [],
+          "supported": true,
+          "valid_coverage": 1.0,
+          "valid_samples": 2000
+        },
+        "actual_view_ray_contact_stage_totals": {
+          "affine_nearest": {
+            "rows": 2000,
+            "total_calls": 34000,
+            "sum_wall_ns": 682728032,
+            "sum_thread_cpu_ns": 677154376,
+            "minimum_row_wall_ns": 160757,
+            "maximum_row_wall_ns": 2318855,
+            "scope": "Actual native stage instrumentation on view rows, not the complete controller/API elapsed time. Complete row timings remain in raw archive."
+          },
+          "affine_ray": {
+            "rows": 2000,
+            "total_calls": 10000,
+            "sum_wall_ns": 19156467,
+            "sum_thread_cpu_ns": 19020674,
+            "minimum_row_wall_ns": 4006,
+            "maximum_row_wall_ns": 60648,
+            "scope": "Actual native stage instrumentation on view rows, not the complete controller/API elapsed time. Complete row timings remain in raw archive."
+          }
+        }
+      }
+    ]
+  },
+  "performance_90Hz_HMD_accepted": false,
+  "interpretation": "Current view and GPU upper-tail timings are worse than b6 despite correctness/resource/timer completion. Do not infer physical-HMD pacing from offscreen pairs. Root assigns performance source audit separately.",
+  "inclusive_stages_must_not_be_summed": true,
+  "GPU_timer_scope": "offscreen uncapped stereo pairs; asynchronous GL timers measure eye draws; CPU pair includes real controller queries; no measured pixel readback or glFinish",
+  "comparison_ms": [
+    {
+      "repetition": 0,
+      "current_view_p50_ms": 9.590234,
+      "b6_view_p50_ms": 9.080941,
+      "current_view_p95_ms": 11.311402,
+      "b6_view_p95_ms": 10.59155,
+      "current_GPU_p95_ms": 12.280312,
+      "b6_GPU_p95_ms": 9.258906
+    },
+    {
+      "repetition": 1,
+      "current_view_p50_ms": 9.595212,
+      "b6_view_p50_ms": 9.085983,
+      "current_view_p95_ms": 11.302706,
+      "b6_view_p95_ms": 10.464421,
+      "current_GPU_p95_ms": 12.620468,
+      "b6_GPU_p95_ms": 9.307968
+    },
+    {
+      "repetition": 2,
+      "current_view_p50_ms": 9.447545,
+      "b6_view_p50_ms": 9.094421,
+      "current_view_p95_ms": 10.99299,
+      "b6_view_p95_ms": 10.55268,
+      "current_GPU_p95_ms": 12.660989,
+      "b6_GPU_p95_ms": 9.183697
+    }
+  ]
+}

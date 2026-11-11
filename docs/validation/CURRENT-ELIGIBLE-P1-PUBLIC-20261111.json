@@ -1,0 +1,919 @@
+{
+  "schema": 1,
+  "date": "2026-11-11",
+  "metadata_parent": "265086da5061fef2def44487a032b770d5f52218",
+  "qualified_private_source": "e9931f7286f75746af47d52f2d901b731510cbb5",
+  "qualified_runtime": "2ef16028ae3928a7907f8f7fc46a76d673eb261d",
+  "scope": "Scoped current65 audited-incremental Release/strictSAN public196 and original full four-object Release CPU-sculpt/Arc-GL P1 correctness/resource/timer qualification. Not main product admission, whole-goal completion, 90Hz/physicalHMD acceptance or full accelerator backend proof.",
+  "P1": {
+    "status": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-query-p1-20261111/status.json",
+      "sha256": "83e862e650ae2851540bfd410a34f67c4617c46c5782badc1230460ed9f0fdb5"
+    },
+    "result": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-query-p1-20261111/full-p1/result.json",
+      "sha256": "b76c21df94500f203f199fe20bd45eae6c0c6073d8b1b6ab96dddce7455adeeb"
+    },
+    "script": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-query-p1-20261111/run.py",
+      "sha256": "f1435d52dbbfc2db15390fca68818dae3fbdbf3ae598856b3e326d656ae81984"
+    },
+    "approved_admission": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-query-p1-20261111/admission-current-approved.json",
+      "sha256": "92e1563dec1481b0cf5d5dea7f79680a30ea7559162325ba8c184e5b8abf2261"
+    },
+    "source": "e9931f7286f75746af47d52f2d901b731510cbb5",
+    "native_exit": 0,
+    "external_guard": null,
+    "seconds": 300.1798035710235,
+    "limits": {
+      "external_timeout_seconds": 5400,
+      "process_rss_bytes": 5368709120,
+      "output_allocated_bytes": 2147483648,
+      "workspace_free_floor_bytes": 21474836480
+    },
+    "options": {
+      "allocation_instrumentation": false,
+      "device": "arc",
+      "height": 768,
+      "held_pairs": 120,
+      "inventory_only": false,
+      "masks": 120,
+      "objects": 4,
+      "pairs": 2000,
+      "repetitions": 3,
+      "smoke": false,
+      "strokes": 300,
+      "tier": "production",
+      "voxel": 0.012500000186264515,
+      "width": 768
+    },
+    "initial_size": {
+      "chunks": 2528,
+      "retained_chunk_bytes": 228304233,
+      "scalar_bytes": 591728,
+      "stored_samples": 2354956,
+      "visible_triangles": 1035408,
+      "visible_vertices": 591728
+    },
+    "sampled_peak_RSS_bytes": 4431769600,
+    "native_getrusage_peak_RSS_bytes": 4429049856,
+    "allocated_output_bytes": 169820160,
+    "completed_counts": {
+      "stroke": 900,
+      "mask_mode": 6,
+      "mask": 360,
+      "mask_fill": 3,
+      "mask_clear": 3,
+      "view_pair": 6000,
+      "held_pair": 360,
+      "authored_placement": 6
+    },
+    "independent_checkpoints": 42,
+    "repetitions": [
+      {
+        "index": 0,
+        "counts": {
+          "stroke": 300,
+          "mask_mode": 2,
+          "mask": 120,
+          "mask_fill": 1,
+          "mask_clear": 1,
+          "view_pair": 2000,
+          "held_pair": 120,
+          "authored_placement": 2
+        },
+        "checkpoints": 14,
+        "history": {
+          "cancel_exact": true,
+          "ordered_save_reopen_exact": true,
+          "real_factory_return_barrier_reached": true,
+          "retired_native_generation_exact": true,
+          "undo_redo_exact": true
+        },
+        "warmup": {
+          "exact_undo": true,
+          "excluded_ns": 1191091631,
+          "real_strokes": 1
+        },
+        "GPU_timers": {
+          "counter_bits": 64,
+          "disjoint_observed": false,
+          "disjoint_supported": false,
+          "distribution_ns": {
+            "count": 2000,
+            "max_ns": 14612135.0,
+            "mean_ns": 9159531.202,
+            "p50_ns": 9004687.0,
+            "p90_ns": 11477500.0,
+            "p95_ns": 12280312.0,
+            "p99_ns": 13457604.0
+          },
+          "distribution_qualified": true,
+          "expected_pairs": 2000,
+          "pending_after_bounded_drain": 0,
+          "reset_query_supported": true,
+          "reset_status": 0,
+          "skipped_indices": [],
+          "supported": true,
+          "valid_coverage": 1.0,
+          "valid_samples": 2000
+        }
+      },
+      {
+        "index": 1,
+        "counts": {
+          "stroke": 300,
+          "mask_mode": 2,
+          "mask": 120,
+          "mask_fill": 1,
+          "mask_clear": 1,
+          "view_pair": 2000,
+          "held_pair": 120,
+          "authored_placement": 2
+        },
+        "checkpoints": 14,
+        "history": {
+          "cancel_exact": true,
+          "ordered_save_reopen_exact": true,
+          "real_factory_return_barrier_reached": true,
+          "retired_native_generation_exact": true,
+          "undo_redo_exact": true
+        },
+        "warmup": {
+          "exact_undo": true,
+          "excluded_ns": 927214909,
+          "real_strokes": 1
+        },
+        "GPU_timers": {
+          "counter_bits": 64,
+          "disjoint_observed": false,
+          "disjoint_supported": false,
+          "distribution_ns": {
+            "count": 2000,
+            "max_ns": 14857187.0,
+            "mean_ns": 9171683.6055,
+            "p50_ns": 8960208.0,
+            "p90_ns": 11705937.0,
+            "p95_ns": 12620468.0,
+            "p99_ns": 13922291.0
+          },
+          "distribution_qualified": true,
+          "expected_pairs": 2000,
+          "pending_after_bounded_drain": 0,
+          "reset_query_supported": true,
+          "reset_status": 0,
+          "skipped_indices": [],
+          "supported": true,
+          "valid_coverage": 1.0,
+          "valid_samples": 2000
+        }
+      },
+      {
+        "index": 2,
+        "counts": {
+          "stroke": 300,
+          "mask_mode": 2,
+          "mask": 120,
+          "mask_fill": 1,
+          "mask_clear": 1,
+          "view_pair": 2000,
+          "held_pair": 120,
+          "authored_placement": 2
+        },
+        "checkpoints": 14,
+        "history": {
+          "cancel_exact": true,
+          "ordered_save_reopen_exact": true,
+          "real_factory_return_barrier_reached": true,
+          "retired_native_generation_exact": true,
+          "undo_redo_exact": true
+        },
+        "warmup": {
+          "exact_undo": true,
+          "excluded_ns": 923437227,
+          "real_strokes": 1
+        },
+        "GPU_timers": {
+          "counter_bits": 64,
+          "disjoint_observed": false,
+          "disjoint_supported": false,
+          "distribution_ns": {
+            "count": 2000,
+            "max_ns": 15174114.0,
+            "mean_ns": 9105085.327,
+            "p50_ns": 8858958.0,
+            "p90_ns": 11900000.0,
+            "p95_ns": 12660989.0,
+            "p99_ns": 13955520.0
+          },
+          "distribution_qualified": true,
+          "expected_pairs": 2000,
+          "pending_after_bounded_drain": 0,
+          "reset_query_supported": true,
+          "reset_status": 0,
+          "skipped_indices": [],
+          "supported": true,
+          "valid_coverage": 1.0,
+          "valid_samples": 2000
+        }
+      }
+    ],
+    "grouped_original_oracle": {
+      "checked_scalars": 5092,
+      "exact_frame_modes": 3,
+      "kind": "original_grouped_regression",
+      "observer_ns_excluded": 149876497,
+      "ordered_corners": 52008,
+      "raw_write_ns_excluded": 31361,
+      "repetition": 0,
+      "sequence": 0,
+      "typed_queries": 4,
+      "whole_extraction_and_checks_ns": 24410844
+    },
+    "actual_device_initial": {
+      "authenticated": true,
+      "device_id": "0x56a0\n",
+      "device_major": 226,
+      "device_minor": 129,
+      "driver": "/sys/bus/pci/drivers/i915",
+      "open_fds": [
+        {
+          "fd": 4,
+          "target": "/dev/dri/renderD129"
+        },
+        {
+          "fd": 5,
+          "target": "/dev/dri/renderD129"
+        },
+        {
+          "fd": 6,
+          "target": "/dev/dri/renderD129"
+        },
+        {
+          "fd": 7,
+          "target": "/dev/dri/renderD129"
+        }
+      ],
+      "pci": "/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0",
+      "render_node": "/dev/dri/renderD129",
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "requested": "arc",
+      "vendor": "Intel",
+      "vendor_id": "0x8086\n",
+      "version": "4.6 (Core Profile) Mesa 26.2.5"
+    },
+    "actual_device_final": {
+      "authenticated": true,
+      "device_id": "0x56a0\n",
+      "device_major": 226,
+      "device_minor": 129,
+      "driver": "/sys/bus/pci/drivers/i915",
+      "open_fds": [
+        {
+          "fd": 4,
+          "target": "/dev/dri/renderD129"
+        },
+        {
+          "fd": 5,
+          "target": "/dev/dri/renderD129"
+        },
+        {
+          "fd": 6,
+          "target": "/dev/dri/renderD129"
+        },
+        {
+          "fd": 7,
+          "target": "/dev/dri/renderD129"
+        }
+      ],
+      "pci": "/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0",
+      "render_node": "/dev/dri/renderD129",
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "requested": "arc",
+      "vendor": "Intel",
+      "vendor_id": "0x8086\n",
+      "version": "4.6 (Core Profile) Mesa 26.2.5"
+    },
+    "mapped_initial": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-query-p1-20261111/mapped-initial-pins.json",
+      "sha256": "3fb6de85690e425d79e6075b087ec5e6279dc96a5f21aef1eeb45756c59723a3"
+    },
+    "mapped_final": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-query-p1-20261111/mapped-final-pins.json",
+      "sha256": "3fb6de85690e425d79e6075b087ec5e6279dc96a5f21aef1eeb45756c59723a3"
+    },
+    "mapped_files_initial": 70,
+    "mapped_files_final": 70,
+    "all_protected_pin_count": 7466,
+    "protected_drift": [],
+    "mapped_elf_drift": [],
+    "observed_timing_scope": "Observed running-desktop offscreen uncapped stereo CPU/GL workload; no physical HMD, 90Hz, exclusive-system or causal performance acceptance. Current coordinated quiet window stops agent competing jobs but not desktop/OS activity. Historical b6 had other development activity; clocks/conditions are not controlled equivalence.",
+    "no_restart_source_or_bound_change": true
+  },
+  "public": {
+    "summary": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/all-summary.json",
+      "sha256": "ebd25e9e8c8a9f594b2138b6c17812a4d87b7482fee5b97b21509432c4b244ae"
+    },
+    "checks": 196,
+    "profiles": {
+      "release": {
+        "summary": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/release-summary.json",
+          "sha256": "1354eba48106c9597525eb4c3727fea4b56461f7dfe5e7c174761e8ee6e2ca0b"
+        },
+        "cohort": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/cohort-release/receipt.json",
+          "sha256": "c33cb59e17e7cd351abcd0eb02db4e0831e36783ec344aaf5f16781c01f7e010"
+        },
+        "source": "e9931f7286f75746af47d52f2d901b731510cbb5",
+        "all_pins": 7470,
+        "targets": 65,
+        "cases": [
+          {
+            "domain": "source",
+            "interface": "gui",
+            "checks": 10,
+            "status": {
+              "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/release-gui-source-v1/status.json",
+              "sha256": "0a308f871595136ef4aad1954ce5f46d6521fdb83de7003d43145bbaf701d015"
+            },
+            "report": {
+              "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/release-gui-source-v1/workflow/report.json",
+              "sha256": "f2c5bc94d85672740f7d45b5cae8115ad42e1fb50993e426dce9d7da272a783c"
+            },
+            "seconds": 16.257236460980494,
+            "peak_RSS": 373710848,
+            "actual_app_pids": [
+              1651891,
+              1653135
+            ],
+            "critical_observed": [
+              "canonical_FLTK",
+              "consumer",
+              "observer",
+              "system_EGL",
+              "system_gallium"
+            ],
+            "actual_device_reports": {
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/release-gui-source-v1/actual-device/egl-query-0/device.txt": "094e5749abe2b2987ee941f590cafb4d200a2cfe0bd60d6b3711f1f0faa13d3f"
+            },
+            "mapped_app_ELFs": {
+              "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/release-gui-source-v1/mapped-app-ELFs.json",
+              "sha256": "26c8c69f31e163a1d112e85f70057e1690959d2f850efa1b675d189a7d801842"
+            },
+            "input_provider_drift": [],
+            "limits": {
+              "public_step_seconds": 50,
+              "phase_seconds": 900,
+              "RSS_bytes": 6442450944
+            }
+          },
+          {
+            "domain": "source",
+            "interface": "xr",
+            "checks": 39,
+            "status": {
+              "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/release-xr-source-v1/status.json",
+              "sha256": "a830999a184b40a303d95e41c159a104f9c7a01a066eb967df9e599af1873b90"
+            },
+            "report": {
+              "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/release-xr-source-v1/workflow/report.json",
+              "sha256": "1646bc87a07fb4883e87706dd787ea836fd37424c987690934976f83f3b82dca"
+            },
+            "seconds": 15.465004308964126,
+            "peak_RSS": 225693696,
+            "actual_app_pids": [
+              1654747
+            ],
+            "critical_observed": [
+              "canonical_FLTK",
+              "consumer",
+              "observer",
+              "real_OpenXR_loader",
+              "runtime",
+              "system_EGL",
+              "system_gallium"
+            ],
+            "actual_device_reports": {
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/release-xr-source-v1/actual-device/egl-query-0/device.txt": "691c1b7aecc004c25b6921f62a999782f2b83052354e80def62721a00e7cba0b",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/release-xr-source-v1/actual-device/egl-query-1/device.txt": "691c1b7aecc004c25b6921f62a999782f2b83052354e80def62721a00e7cba0b",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/release-xr-source-v1/actual-device/egl-query-2/device.txt": "bf69a965da9e8df235fa3da44adf08256128a92546e42f9eabdb24f8b423cbfc"
+            },
+            "mapped_app_ELFs": {
+              "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/release-xr-source-v1/mapped-app-ELFs.json",
+              "sha256": "199b242905c3bcb4cbf3447afd9e459c5d540d586ee6877d017fdc8eafeb7591"
+            },
+            "input_provider_drift": [],
+            "runtime": {
+              "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/release-xr-source-v1/workflow/apply-history/runtime.json",
+              "sha256": "1fd8fa8346615d773ce8d737f4b8c017b7ad76b58e4b2f35a8481becbe5da646"
+            },
+            "frames": 164,
+            "limits": {
+              "frames": 6000,
+              "seconds": 240
+            },
+            "both_eyes_actual_source_font_and_checkbox_controls": true
+          },
+          {
+            "domain": "plain",
+            "interface": "gui",
+            "checks": 10,
+            "status": {
+              "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/release-gui-plain-v1/status.json",
+              "sha256": "e4a9e09ec4836331c2620e1c496e676a4b3d3435c3a015ef5b05d69df35c30f9"
+            },
+            "report": {
+              "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/release-gui-plain-v1/workflow/report.json",
+              "sha256": "11ea11c099e3d0d2baf0d2fd296aa3717458f9afe02ccbf42a117191776b6988"
+            },
+            "seconds": 14.568271810014267,
+            "peak_RSS": 370810880,
+            "actual_app_pids": [
+              1658019,
+              1659155
+            ],
+            "critical_observed": [
+              "canonical_FLTK",
+              "consumer",
+              "observer",
+              "system_EGL",
+              "system_gallium"
+            ],
+            "actual_device_reports": {
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/release-gui-plain-v1/actual-device/egl-query-0/device.txt": "ea337bf27741b7c142ddd9d5df3429849e84d49cc6c4fe6a8fb4d3c7da9a9d35"
+            },
+            "mapped_app_ELFs": {
+              "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/release-gui-plain-v1/mapped-app-ELFs.json",
+              "sha256": "411efa8f0e4cbab4af153b94124b9d6477d45f3071cfb31311fb1c9ae472bedc"
+            },
+            "input_provider_drift": [],
+            "limits": {
+              "public_step_seconds": 50,
+              "phase_seconds": 900,
+              "RSS_bytes": 6442450944
+            }
+          },
+          {
+            "domain": "plain",
+            "interface": "xr",
+            "checks": 39,
+            "status": {
+              "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/release-xr-plain-v1/status.json",
+              "sha256": "600c2ea4e11d8875e6e973352e6953153581f437ade18afa40e124796d0a0f0a"
+            },
+            "report": {
+              "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/release-xr-plain-v1/workflow/report.json",
+              "sha256": "c98ac27023914bb141ffe89af4fd07ec8173f6058eb86e3170c799e2e88b85db"
+            },
+            "seconds": 14.098112637002487,
+            "peak_RSS": 204640256,
+            "actual_app_pids": [
+              1660841
+            ],
+            "critical_observed": [
+              "canonical_FLTK",
+              "consumer",
+              "observer",
+              "real_OpenXR_loader",
+              "runtime",
+              "system_EGL",
+              "system_gallium"
+            ],
+            "actual_device_reports": {
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/release-xr-plain-v1/actual-device/egl-query-0/device.txt": "909dd33f956469c5fe28f06485e13ad7ca28fdb6be195b105fb4f0710904fc62",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/release-xr-plain-v1/actual-device/egl-query-1/device.txt": "909dd33f956469c5fe28f06485e13ad7ca28fdb6be195b105fb4f0710904fc62",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/release-xr-plain-v1/actual-device/egl-query-2/device.txt": "ec3e13e8089e1720c29f7ebd864926eb0104c9a710426b793a92d9719d49a765"
+            },
+            "mapped_app_ELFs": {
+              "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/release-xr-plain-v1/mapped-app-ELFs.json",
+              "sha256": "15e01d16be72a1e89a7f50d2a6746bb4c64b5407b0659e03a01a54c1c81cc3b8"
+            },
+            "input_provider_drift": [],
+            "runtime": {
+              "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/release-xr-plain-v1/workflow/apply-history/runtime.json",
+              "sha256": "25350eb7dfd261de2a3ccbc827c55fd76c7d7165a0b5204618c90ed0eadd5d4f"
+            },
+            "frames": 163,
+            "limits": {
+              "frames": 6000,
+              "seconds": 240
+            },
+            "both_eyes_actual_source_font_and_checkbox_controls": true
+          }
+        ],
+        "native_producers": [
+          {
+            "domain": "source",
+            "status": {
+              "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/release-producer-source-v1/status.json",
+              "sha256": "e4427a03e8e6788ff5a8082c25a61a83b154cdb1c1fc3f4ae5f7df7f9b3125c2"
+            },
+            "native_checks": 57853,
+            "seconds": 0.24597676598932594,
+            "peak_RSS": 77529088,
+            "actual_device_reports": {
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/release-producer-source-v1/actual-device/egl-query-0/device.txt": "990fe21f6f290f5969677e1124100ca0310c3fe70a189d51c31b34bb4d0114e9"
+            },
+            "actual_context_maps": {
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/release-producer-source-v1/actual-device/egl-query-0/context-maps.txt": "0895a108fc039475b727aab8d5efeb1994cdc4a68fa0d1ed47a61cd3e8ac898a"
+            }
+          },
+          {
+            "domain": "plain",
+            "status": {
+              "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/release-producer-plain-v1/status.json",
+              "sha256": "7f826cddddcdd2cd6abdef5faed6f253c7c5291dc5b7d9237c654b53415663a9"
+            },
+            "native_checks": 67677,
+            "seconds": 0.18072334898170084,
+            "peak_RSS": 71798784,
+            "actual_device_reports": {
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/release-producer-plain-v1/actual-device/egl-query-0/device.txt": "c8384eb4edbace4f36149e957fae31fff1c92c512652e449d78af244319cf08d"
+            },
+            "actual_context_maps": {
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/release-producer-plain-v1/actual-device/egl-query-0/context-maps.txt": "d4f9ae5593053222e566f771c8ee0e8230ae7097f5ef1ab65ebe695ad2976e67"
+            }
+          }
+        ],
+        "font": {
+          "status": {
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/font-release/status.json",
+            "sha256": "bd6de34d771f1555d5aa27b88cdf25bfcd28283c4e9958dbc1fc912dfc8d2767"
+          },
+          "reference": {
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/font-release/titles.json",
+            "sha256": "688507b89f7eb34f7492ebdaa327f9090976636877e5f45c5ae16a0bf8562566"
+          },
+          "actual_font": {
+            "path": "/home/blux/.cache/de-xr/bundled/fonts/unifont-17.0.04.bdf",
+            "sha256": "f2b2952312fa189f8963c85eb50fda14606a6df5d8dbe9e01651138eb2cecea9"
+          },
+          "actual_style": {
+            "font_pixels": 16,
+            "unit": 1,
+            "light": false,
+            "opacity": 255
+          }
+        },
+        "canvas_analysis": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/release-canvas-analysis.json",
+          "sha256": "308f359c1774f499b55a6cf3833c7cda85bbea474573fa76479aa63be9e288b4"
+        },
+        "native_pairs": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/release-native-pairs.json",
+          "sha256": "4087dd35b236808812926f87005bbad1e0e79947d986b6c12ed195b5e40a90ff"
+        },
+        "source_SDK_provider_drift": []
+      },
+      "sanitize": {
+        "summary": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/sanitize-summary.json",
+          "sha256": "2b0ece0ac174e995ef6245ea7d4e62150c7be7efede613d4529e7f84813c976d"
+        },
+        "cohort": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/cohort-sanitize/receipt.json",
+          "sha256": "eb5f8371d482a484cd49dc2522e75f354cb0b3784f700ee4aab2edd87cf322ab"
+        },
+        "source": "e9931f7286f75746af47d52f2d901b731510cbb5",
+        "all_pins": 7470,
+        "targets": 65,
+        "cases": [
+          {
+            "domain": "source",
+            "interface": "gui",
+            "checks": 10,
+            "status": {
+              "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/sanitize-gui-source-v1/status.json",
+              "sha256": "904546acf5b3ce140cc92c6141bb7082aee76c465595b42cdd54ec032e649fb6"
+            },
+            "report": {
+              "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/sanitize-gui-source-v1/workflow/report.json",
+              "sha256": "458c83583ed5ebcb2e770dddf194bce02c9a4359e8f742a3056826ef8f035a6f"
+            },
+            "seconds": 38.68343494803412,
+            "peak_RSS": 2543775744,
+            "actual_app_pids": [
+              1771248,
+              1773927,
+              1774007,
+              1774773
+            ],
+            "critical_observed": [
+              "canonical_FLTK",
+              "consumer",
+              "observer",
+              "system_EGL",
+              "system_gallium"
+            ],
+            "actual_device_reports": {
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/sanitize-gui-source-v1/actual-device/egl-query-0/device.txt": "7dd1fbbac1109da76029a2d362af5e6627d54e7789f632de886d80ed145b6939"
+            },
+            "mapped_app_ELFs": {
+              "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/sanitize-gui-source-v1/mapped-app-ELFs.json",
+              "sha256": "460f8f7077fe7998f0bd17c1e9a32d8c4372c27cad65af60c53cb295d620d53b"
+            },
+            "input_provider_drift": [],
+            "limits": {
+              "public_step_seconds": 50,
+              "phase_seconds": 900,
+              "RSS_bytes": 6442450944
+            }
+          },
+          {
+            "domain": "source",
+            "interface": "xr",
+            "checks": 39,
+            "status": {
+              "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/sanitize-xr-source-v1/status.json",
+              "sha256": "b33897826059a358f5e7f78834dbf6e2620ed55955cd97f61e9c5be967712d82"
+            },
+            "report": {
+              "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/sanitize-xr-source-v1/workflow/report.json",
+              "sha256": "fe03663c55b494715af91c2a430cdeae0fda95ee551e5f4f84d9deccec88dcae"
+            },
+            "seconds": 49.29327582701808,
+            "peak_RSS": 2066616320,
+            "actual_app_pids": [
+              1783026,
+              1786379
+            ],
+            "critical_observed": [
+              "canonical_FLTK",
+              "consumer",
+              "observer",
+              "real_OpenXR_loader",
+              "runtime",
+              "system_EGL",
+              "system_gallium"
+            ],
+            "actual_device_reports": {
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/sanitize-xr-source-v1/actual-device/egl-query-0/device.txt": "8bc222f53feca1481ea31e4ecae277a97abcc4ffdcd7d5f3e8aae525d47503cf",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/sanitize-xr-source-v1/actual-device/egl-query-1/device.txt": "8bc222f53feca1481ea31e4ecae277a97abcc4ffdcd7d5f3e8aae525d47503cf",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/sanitize-xr-source-v1/actual-device/egl-query-2/device.txt": "27dec4a3a7c300fd6a983a4324d61da6c0ead71f4e945f9a95a5e1f0db453d84"
+            },
+            "mapped_app_ELFs": {
+              "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/sanitize-xr-source-v1/mapped-app-ELFs.json",
+              "sha256": "5d142a6b702ed96508dbce1d2844ef296a233b8638e7cd8269a75e844bd723a7"
+            },
+            "input_provider_drift": [],
+            "runtime": {
+              "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/sanitize-xr-source-v1/workflow/apply-history/runtime.json",
+              "sha256": "b894fb7f3f1ac5abd8deb03d96c6e893beb2fc1e356cec4c7b921a826dcaea5a"
+            },
+            "frames": 471,
+            "limits": {
+              "frames": 6000,
+              "seconds": 240
+            },
+            "both_eyes_actual_source_font_and_checkbox_controls": true
+          },
+          {
+            "domain": "plain",
+            "interface": "gui",
+            "checks": 10,
+            "status": {
+              "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/sanitize-gui-plain-v1/status.json",
+              "sha256": "a5e7d2e1e448a7fd4d15501caecdba2c5d2545019f557fffe4f10d510d1e834f"
+            },
+            "report": {
+              "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/sanitize-gui-plain-v1/workflow/report.json",
+              "sha256": "e44f4c12e88f78c1c6a057f408d5be8578581b290c813be91b281314df729a84"
+            },
+            "seconds": 34.7848520539701,
+            "peak_RSS": 2491228160,
+            "actual_app_pids": [
+              1794296,
+              1796693,
+              1796786,
+              1797465
+            ],
+            "critical_observed": [
+              "canonical_FLTK",
+              "consumer",
+              "observer",
+              "system_EGL",
+              "system_gallium"
+            ],
+            "actual_device_reports": {
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/sanitize-gui-plain-v1/actual-device/egl-query-0/device.txt": "61118c9aa660fb1d9bf4168c0415a7ab2dd053fe34608e6221954fd19ba06dc2"
+            },
+            "mapped_app_ELFs": {
+              "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/sanitize-gui-plain-v1/mapped-app-ELFs.json",
+              "sha256": "de429fc991b283781cfae7b4a6cc9dd591d853fb26ff61206941ec99e9e7fd1c"
+            },
+            "input_provider_drift": [],
+            "limits": {
+              "public_step_seconds": 50,
+              "phase_seconds": 900,
+              "RSS_bytes": 6442450944
+            }
+          },
+          {
+            "domain": "plain",
+            "interface": "xr",
+            "checks": 39,
+            "status": {
+              "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/sanitize-xr-plain-v1/status.json",
+              "sha256": "e5dea6c2317a796d880a9b174cf70e1978d97aa83a140fb0c8c4ca359aa82fc7"
+            },
+            "report": {
+              "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/sanitize-xr-plain-v1/workflow/report.json",
+              "sha256": "dc4bc800fb1fea9f15c48f5ae35e5945fee6855dd5b7a4e79de027e25c956f27"
+            },
+            "seconds": 46.035908168996684,
+            "peak_RSS": 2081759232,
+            "actual_app_pids": [
+              1805449,
+              1808578
+            ],
+            "critical_observed": [
+              "canonical_FLTK",
+              "consumer",
+              "observer",
+              "real_OpenXR_loader",
+              "runtime",
+              "system_EGL",
+              "system_gallium"
+            ],
+            "actual_device_reports": {
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/sanitize-xr-plain-v1/actual-device/egl-query-0/device.txt": "88b91150a81481d3bb9451cb46d539ff1abeb5f8f9ed79ba3a93c952fe2a49f2",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/sanitize-xr-plain-v1/actual-device/egl-query-1/device.txt": "88b91150a81481d3bb9451cb46d539ff1abeb5f8f9ed79ba3a93c952fe2a49f2",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/sanitize-xr-plain-v1/actual-device/egl-query-2/device.txt": "77fc050be49a66cfff9f85dca06342cc91e9ec233b371fbf4222539f14689b77"
+            },
+            "mapped_app_ELFs": {
+              "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/sanitize-xr-plain-v1/mapped-app-ELFs.json",
+              "sha256": "0b63a0dd0a83c77096a32ba234dfc2e087d0ba449fd0835d1e11ecc0b9b41477"
+            },
+            "input_provider_drift": [],
+            "runtime": {
+              "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/sanitize-xr-plain-v1/workflow/apply-history/runtime.json",
+              "sha256": "448e8b659541eabdfa1054747d8fde3d6719ee1cc4307550221d22014255d75d"
+            },
+            "frames": 445,
+            "limits": {
+              "frames": 6000,
+              "seconds": 240
+            },
+            "both_eyes_actual_source_font_and_checkbox_controls": true
+          }
+        ],
+        "native_producers": [
+          {
+            "domain": "source",
+            "status": {
+              "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/sanitize-producer-source-v1/status.json",
+              "sha256": "df2caa4e5ec4d9573bd57d23b64de35c7535675ecf6edc37a3d566d5096c1109"
+            },
+            "native_checks": 57853,
+            "seconds": 1.136450173042249,
+            "peak_RSS": 1110458368,
+            "actual_device_reports": {
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/sanitize-producer-source-v1/actual-device/egl-query-0/device.txt": "e48e2ec4e5e94e43d59ab1b93308e29801b6f6f4660d41666c339dfcb57827eb"
+            },
+            "actual_context_maps": {
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/sanitize-producer-source-v1/actual-device/egl-query-0/context-maps.txt": "326b455f969461d980929b0a70a2b95f8d6eb6e769c1aac3fed0bb9f17f2335e"
+            }
+          },
+          {
+            "domain": "plain",
+            "status": {
+              "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/sanitize-producer-plain-v1/status.json",
+              "sha256": "3df0b20f4e5e817e9e170fd0980e45834292e8cd2822fe27535abfb5306a6478"
+            },
+            "native_checks": 67677,
+            "seconds": 0.4848395030130632,
+            "peak_RSS": 482418688,
+            "actual_device_reports": {
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/sanitize-producer-plain-v1/actual-device/egl-query-0/device.txt": "8926a0e873ba657088ee953b629a99fae4bfd91654c55dcfe6538633837adac5"
+            },
+            "actual_context_maps": {
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/sanitize-producer-plain-v1/actual-device/egl-query-0/context-maps.txt": "a61a93ab77fb7dffb3ed3963a43b3a1041126b311678fbc52c599d8f56f76f14"
+            }
+          }
+        ],
+        "font": {
+          "status": {
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/font-sanitize/status.json",
+            "sha256": "63dc6eb639b26cc4ad333c71e9faaf375f2b35f7732c89b68761621812c056fa"
+          },
+          "reference": {
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/font-sanitize/titles.json",
+            "sha256": "688507b89f7eb34f7492ebdaa327f9090976636877e5f45c5ae16a0bf8562566"
+          },
+          "actual_font": {
+            "path": "/home/blux/.cache/de-xr/bundled/fonts/unifont-17.0.04.bdf",
+            "sha256": "f2b2952312fa189f8963c85eb50fda14606a6df5d8dbe9e01651138eb2cecea9"
+          },
+          "actual_style": {
+            "font_pixels": 16,
+            "unit": 1,
+            "light": false,
+            "opacity": 255
+          }
+        },
+        "canvas_analysis": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/sanitize-canvas-analysis.json",
+          "sha256": "4d2e8b021f5655d034f99c0328f90b4508ecb3e961ec641cb3e395c34908937f"
+        },
+        "native_pairs": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/sanitize-native-pairs.json",
+          "sha256": "296d2686914fc3765f9d6c13ac2c1ba80f5c06991bcdb21969daa7032aa1e8aa"
+        },
+        "source_SDK_provider_drift": []
+      }
+    },
+    "canvas_pairs_R_S": 10,
+    "whole_native_file_pairs_R_S": 6,
+    "normal_GUI_cases": 4,
+    "actual_loader_synthetic_XR_cases": 4,
+    "strict_SAN": {
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+      "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+      "LSAN_OPTIONS": null,
+      "suppressions": false
+    },
+    "all_app_native_exits0": true,
+    "original_scenarios_predicates_thresholds_unchanged": true
+  },
+  "owning_provider_boundary": {
+    "Release": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-owning-20261111/release-v3/status.json",
+      "sha256": "7b2e4a34d29717b151db576b95a860414f674ef1ac251f8412c7a48381d58992"
+    },
+    "SAN": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-owning-20261111/sanitize-v3/status.json",
+      "sha256": "54879c928836bf32d56d44bbf049165401ebc3aa5b12069ce1300eab028c3201"
+    },
+    "scope": "Each65 current outputs:63 freshly linked and2 byte-identical matched qualified fresh consumers;307 whole-object providers=4qualified2ef+7previous44be completeTUs+296 authenticated unchanged a904 objects.192 core members190 unchanged. Not a fresh whole build. Public headers/assets exact;418 official SDK pins/profile.",
+    "Release_CPU_gates": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-owning-20261111/release-gates/status.json",
+      "sha256": "9c82495259bb4ffb3a0283c838f8e358d84661e9005fd79235fe1e6b88e58edd"
+    },
+    "SAN_CPU_gates": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-owning-20261111/sanitize-gates/status.json",
+      "sha256": "3ae4bb3d97918bc1fb51b2ea10bca923b6fe152e70807408b061b111c9f81664"
+    },
+    "actual_current_scopes": "56/56 selected+appversion+workspace27/373 per profile; separate capacityArc64/63 perprofile is recorded in its own receipt, not attributed to this public/P1 run."
+  },
+  "performance": {
+    "timing_file": "CURRENT-ELIGIBLE-P1-PUBLIC-TIMINGS-20261111.json",
+    "performance_accepted": false,
+    "current_observed_total_seconds": 300.1798035710235,
+    "historical_b6_observed_total_seconds": 273.15577294304967,
+    "view_and_GPU_tails_regressed": true
+  },
+  "archives": {
+    "p1": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/current-eligible-p1-public-seal-20261111/p1-evidence.tar.zst",
+      "sha256": "af20c1acd6beb59af3a373d00db4120c008f088d9e1fae98395985d343aef7a3",
+      "bytes": 3816624,
+      "members": 21,
+      "manifest": "/home/blux/de-xr/dome-sculpt/artifacts/current-eligible-p1-public-seal-20261111/p1-members.json",
+      "manifest_sha256": "af7a02123753c7ff7df096a161226d9803295a50d62721f12b8c07576656fb06",
+      "all_streamed_content_SHA_mode_UID_GID_nsmtime_verified": true,
+      "xattrs_preserved_in_manifest": true,
+      "originals_retained": true,
+      "source_drift": [],
+      "seconds": 0.9777994499891065
+    },
+    "public": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/current-eligible-p1-public-seal-20261111/public-evidence.tar.zst",
+      "sha256": "aebdcf9d74612f3a8b5f6a04a3ff88440988da92cef0588941c17b65dd7e2dfc",
+      "bytes": 1859366,
+      "members": 4658,
+      "manifest": "/home/blux/de-xr/dome-sculpt/artifacts/current-eligible-p1-public-seal-20261111/public-members.json",
+      "manifest_sha256": "4cb1b5cad2d92ff9cb77b86a8bc40b8219447d2916dca1d75c4955f8194d3f45",
+      "all_streamed_content_SHA_mode_UID_GID_nsmtime_verified": true,
+      "xattrs_preserved_in_manifest": true,
+      "originals_retained": true,
+      "source_drift": [],
+      "seconds": 1.3693862449727021
+    }
+  },
+  "source_and_hardware_restarts_or_installation": false,
+  "all_handles_and_Arc_leases_closed": true,
+  "limitations": [
+    "P1 is CPU brushes/mesher and actual Arc graphics on an offscreen uncapped running desktop; no physical headset/90Hz pacing or OneAPI kernels are qualified.",
+    "PrivateXvfb desktop exported-menu actions are not shell globalmenu/nativeWayland acceptance. GUI GLX canvas may be software while actual native EGL blur worker authenticatesArc. XR uses real loader and actual Arc stereo with synthetic actions.",
+    "Public Save is next public action, not forced busyworker concurrency; separate native transaction tests retain authority.",
+    "Prior original4object retention failure, build-driver/audit failures, old48/53 and54/56 runs, forecast failures and intermediate small-policy regression remain untouched historical failures.",
+    "Complete original authoring/painting/baking/avatar/interoperability/accelerator and controller workflow goals remain active; this milestone does not redefine completion."
+  ],
+  "metadata_recipes": {
+    "archive.py": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/current-eligible-p1-public-seal-20261111/archive.py",
+      "sha256": "a05e5cb264fffbd0f32c5543cc1a03c18ae5b4a0621f2fc12642d0686052a08c"
+    },
+    "seal.py": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/current-eligible-p1-public-seal-20261111/seal.py",
+      "sha256": "d5d1bce2cb1fd6a95473cc37f61fd4fad66b326eb63cdf958c01f64e16506e77"
+    },
+    "archives.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/current-eligible-p1-public-seal-20261111/archives.json",
+      "sha256": "d31b1ed5bf030c5ca3ad8db6b529c6f4a6181d76376069c7f9d2c071e52d1b9a"
+    }
+  }
+}
