@@ -10,7 +10,8 @@ current renderer recovery findings, original four-object failure and private
 fix/qualification boundaries.
 
 The private COW candidate now passes the full original four-object workload;
-fresh nativeDocument reopening exposes a separate reader-sharing failure. Read
+the separate fresh nativeDocument reopening failure is now repaired and
+qualified privately in Release/SAN. Read
 [SCULPT-FOUR-OBJECT-P1-20261111.md](SCULPT-FOUR-OBJECT-P1-20261111.md) for exact
 proof and the unqualified follow-on reader candidate.
 

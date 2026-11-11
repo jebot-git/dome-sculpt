@@ -51,7 +51,9 @@ Private fix `b6e366fd` shares complete local geometry only between exact COW
 owners with matching voxel/band context, charging that owner once. Placement,
 queries and masks remain object-specific. It preserves the original resource
 caps and includes independent geometry, divergence, restoration, identity,
-budget and cancellation regressions. Its native qualification is pending.
+budget and cancellation regressions. Its native qualification now passes Release/SAN, and the original full
+four-object workload passes unchanged. Read
+[SCULPT-FOUR-OBJECT-P1-20261111.md](SCULPT-FOUR-OBJECT-P1-20261111.md).
 Independent equal-valued fields still have distinct identity; this optimization
 alone does not prove all unique-object or native-reopened dense scene workloads.
 
@@ -59,3 +61,23 @@ No installation or physical-headset acceptance occurs here. Full painting,
 material/baking, remaining source adapters, interoperability and accelerator
 work remain required. Controller trays and spatial node editing/history remain
 later phases after basic authoring targets.
+
+## Native reopening and public plain producer qualification
+
+Private reader `9c521366` also closes the actual 49 MB native-file publication
+failure in Release and strict SAN, with full input equality and two genuine
+geometry owners. The persisted lifetime test is test-only child `af10a07d`. Read
+[NATIVE-SCENE-GEOMETRY-SCOPE-20261111.md](NATIVE-SCENE-GEOMETRY-SCOPE-20261111.md)
+for matched-source closure, preserved verifier failures and instrumentation bounds.
+
+The genuine plain-grid public workflow producer passes 67,677 native controls
+in each profile on authenticated Arc; it preserves independent native endpoints
+for the later real application tests. Read
+[CURRENT-PREVIEW-PLAIN-NATIVE-20261111.md](CURRENT-PREVIEW-PLAIN-NATIVE-20261111.md).
+It is not GUI/XR caller proof. Private `9c44723d` now propagates existing native
+reader cancellation through scoped callbacks, sample/layer/mask/recompose and
+sharing walks, including file and native-package callers. Focused tests are
+underway; the CBOR DOM parser remains bounded with before/after checks.
+
+The full renderer transaction and coherent combined owning application remain
+in progress. Product source admission and complete-goal completion remain open.

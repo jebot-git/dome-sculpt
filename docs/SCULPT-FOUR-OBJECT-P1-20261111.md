@@ -54,7 +54,7 @@ under `artifacts/sustained-four-objects-shared-20261111`; the 12-member archive
 Every archived member's content hash was independently verified. Original failed
 four-object files remain in their separate namespace.
 
-## Fresh Document reopening remains a separate failure
+## Fresh Document reopening: preserved failure and qualified reader repair
 
 The benchmark validates loaded native data against saved data. An additional
 real `Document.open` probe of its 49 MB accepted file demonstrates that fresh
@@ -73,6 +73,10 @@ Volume decoding passes its actual evaluated storage after complete validation.
 Public headers remain byte-exact with `b6e366fd`. An earlier unexecuted friend-
 declaration prototype `e3ccf2a0` was superseded: layout compatibility alone would
 not justify combining token-different class definitions with reused objects.
-The new design replaces both complete Scene and Volume translation units. Its
-native and real reopening qualification is pending. Neither this private reader change nor the broader preview composition
-is admitted by this workload pass. The full goal remains active and incomplete.
+The new design replaces both complete Scene and Volume translation units. Its native and real reopening qualification is now closed in both Release and
+strict SAN; see [NATIVE-SCENE-GEOMETRY-SCOPE-20261111.md](NATIVE-SCENE-GEOMETRY-SCOPE-20261111.md).
+The complete native input is preserved and both decoded/published snapshots have
+two genuine geometry owners. Responsive read cancellation is a further private
+child `9c44723d`, with focused qualification underway. Neither this private reader
+change nor the broader preview composition is admitted by the workload pass or
+these native checks alone. The full goal remains active and incomplete.
