@@ -75,6 +75,15 @@ struct Target {
  Target(){glGenFramebuffers(1,&f);glBindFramebuffer(GL_FRAMEBUFFER,f);glGenTextures(1,&c);glBindTexture(GL_TEXTURE_2D,c);glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA8,size,size,0,GL_RGBA,GL_UNSIGNED_BYTE,nullptr);glFramebufferTexture2D(GL_FRAMEBUFFER,GL_COLOR_ATTACHMENT0,GL_TEXTURE_2D,c,0);glGenRenderbuffers(1,&d);glBindRenderbuffer(GL_RENDERBUFFER,d);glRenderbufferStorage(GL_RENDERBUFFER,GL_DEPTH_COMPONENT24,size,size);glFramebufferRenderbuffer(GL_FRAMEBUFFER,GL_DEPTH_ATTACHMENT,GL_RENDERBUFFER,d);if(glCheckFramebufferStatus(GL_FRAMEBUFFER)!=GL_FRAMEBUFFER_COMPLETE)throw std::runtime_error("Incomplete capacity framebuffer");}
  ~Target(){glDeleteRenderbuffers(1,&d);glDeleteTextures(1,&c);glDeleteFramebuffers(1,&f);}
 };
+// The real ordinary worker publication includes a canonical tangent at every
+// vertex even without retained source frames. A real GL store/attribute trace
+// verifies that these four separate streams occupy the same VBO (attributes
+// 0,1,2,5); material input pools are distinct buffers and are not geometry.
+size_t ordinary_vertex_bytes(const MeshSnapshot &snapshot){
+ return (snapshot.mesh.positions.size()+snapshot.mesh.normals.size())*sizeof(Vec3)
+       +snapshot.mesh.uv.size()*sizeof(std::array<float,2>)
+       +snapshot.tangents.size()*sizeof(std::array<float,4>);
+}
 const Mat4 identity{1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1};
 std::shared_ptr<const MeshSnapshot> ready(Document&doc){
  auto until=std::chrono::steady_clock::now()+std::chrono::seconds(120);
@@ -109,9 +118,9 @@ int main(int argc,char**argv)try{
   check(large->mesh.positions.size()==total&&large->mesh.normals.size()==total&&large->mesh.uv.size()==total&&large->mesh.indices.size()==actors*6&&large->ranges.size()==actors,"Separate large-buffer case publishes all six original native ordinary actors with full positions/normals/UV0");
   picking(*large,0,true);
   auto native=doc.copy_scene();bool intact=native.objects().size()==actors;for(const auto&o:native.objects())intact&=o.mesh_active&&o.volume->voxels().empty()&&o.painted&&o.painted->mesh().positions.size()==per&&o.painted->mesh().indices.size()==6&&!o.appearance&&!o.material_bindings&&!o.deformation;
-  check(intact&&large->source_normals.empty()&&large->canonical_normals.empty()&&large->source_tangents.empty()&&large->sculpt_masks.empty()&&large->selected_weights.empty(),"Large-buffer sources retain ordinary native identity without invented retained frames or scalar flags");
-  const size_t payload=(large->mesh.positions.size()+large->mesh.normals.size())*sizeof(Vec3)+large->mesh.uv.size()*sizeof(std::array<float,2>);
-  check(payload>256ull*1024*1024&&payload+small->mesh.positions.size()*32+large->mesh.indices.size()*sizeof(uint32_t)+small->mesh.indices.size()*sizeof(uint32_t)<512ull*1024*1024,"Actual >256MiB compact vertex payload has a bounded old-plus-new geometry endpoint below512MiB");
+  check(intact&&large->source_normals.empty()&&large->canonical_normals.empty()&&large->source_tangents.empty()&&large->source_colors.empty()&&large->normal_coordinates.empty()&&large->paint_coordinates.empty()&&large->sculpt_masks.empty()&&large->selected_weights.empty()&&large->tangents.size()==total&&std::all_of(large->tangents.begin(),large->tangents.end(),[](auto t){return t==std::array<float,4>{1,0,0,1};}),"Large-buffer sources retain ordinary native identity without invented retained frames or scalar flags");
+  const size_t payload=ordinary_vertex_bytes(*large);
+  check(payload>256ull*1024*1024&&payload+ordinary_vertex_bytes(*small)+large->mesh.indices.size()*sizeof(uint32_t)+small->mesh.indices.size()*sizeof(uint32_t)<512ull*1024*1024,"Actual >256MiB compact vertex payload has a bounded old-plus-new geometry endpoint below512MiB");
   const auto picture=render(large);check(picture==baseline&&array_calls==1&&array_bytes==payload&&index_calls==1&&index_bytes==actors*6*sizeof(uint32_t)&&renderer.buffer_stats().vertex_bytes==payload,"Real driver allocation exceeds256MiB and preserves every independent source and exact original baseline pixel");
   std::cout<<"MEASURE separate_large_buffer actors "<<actors<<" vertices "<<total<<" actual_vertex_bytes "<<array_bytes<<" actual_index_bytes "<<index_bytes<<std::endl;
   check(render(large)==picture&&array_calls==0&&index_calls==0,"Separate >256MiB second eye performs zero geometry or scalar allocations");check(glGetError()==GL_NO_ERROR,"Separate large-buffer case leaves the actual GL error queue clean");std::cout<<checks<<" Separate large-buffer checks passed"<<std::endl;return 0;
@@ -124,14 +133,14 @@ int main(int argc,char**argv)try{
  if(old)throw std::runtime_error("Expected old c0 Document aggregate rejection did not occur");
  check(large->mesh.positions.size()==total&&large->mesh.indices.size()==18&&large->ranges.size()==3,"Actual Document packs all4.8M ordinary vertices and preserves independent object ranges");
  picking(*large,0,true);
- check(large->source_normals.empty()&&large->canonical_normals.empty()&&large->source_tangents.empty()&&large->sculpt_masks.empty()&&large->selected_weights.empty(),"Ordinary painted meshes acquire no retained-frame or SDF visualization arrays");
+ check(large->source_normals.empty()&&large->canonical_normals.empty()&&large->source_tangents.empty()&&large->source_colors.empty()&&large->normal_coordinates.empty()&&large->paint_coordinates.empty()&&large->sculpt_masks.empty()&&large->selected_weights.empty()&&large->tangents.size()==total&&std::all_of(large->tangents.begin(),large->tangents.end(),[](auto t){return t==std::array<float,4>{1,0,0,1};}),"Ordinary painted meshes acquire no retained-frame or SDF visualization arrays");
  auto sources=doc.copy_scene();bool intact=sources.objects().size()==3;
  for(const auto&o:sources.objects())intact&=o.mesh_active&&o.volume->voxels().empty()&&o.painted&&o.painted->mesh().positions.size()==per_object&&o.painted->mesh().indices.size()==6&&!o.appearance&&!o.material_bindings&&!o.deformation;
  check(intact&&std::all_of(large->ranges.begin(),large->ranges.end(),[](const auto&r){return !r.source_frame&&!r.canonical_frame;}),"Actual Scene retains all independently valid ordinary sources without adding SDF or retained-frame flags");
  auto uploaded=renderer.buffer_stats().geometry_uploads;auto pixels=render(large);
  check(pixels==baseline,"Large ordinary aggregate preserves the exact small-scene baseline pixels");
- const size_t bytes=(large->mesh.positions.size()+large->mesh.normals.size())*sizeof(Vec3)+large->mesh.uv.size()*sizeof(std::array<float,2>);
- check(bytes==total*32&&array_calls==1&&array_bytes==bytes&&index_calls==1&&index_bytes==18*sizeof(uint32_t)&&renderer.buffer_stats().vertex_bytes==bytes,"Original4.8M aggregate uploads its true compact native positions/normals/UV0 payload without an invented scene cap");
+ const size_t bytes=ordinary_vertex_bytes(*large);
+ check(bytes==total*(2*sizeof(Vec3)+sizeof(std::array<float,2>)+sizeof(std::array<float,4>))&&array_calls==1&&array_bytes==bytes&&index_calls==1&&index_bytes==18*sizeof(uint32_t)&&renderer.buffer_stats().vertex_bytes==bytes,"Original4.8M aggregate uploads its true native positions/normals/UV0/canonical-tangent payload without an invented scene cap");
  std::cout<<"MEASURE ordinary vertices "<<total<<" actual vertex upload bytes "<<array_bytes<<" actual index upload bytes "<<index_bytes<<std::endl;
  check(renderer.buffer_stats().geometry_uploads==uploaded+1,"The large publication completes exactly one geometry upload");
  check(render(large)==baseline&&array_calls==0&&index_calls==0,"Second-eye rendering reuses all large geometry without glBufferData traffic");
