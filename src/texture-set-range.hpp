@@ -21,7 +21,7 @@ public:
 private:
   friend std::shared_ptr<const TextureSetRangeProof> prepare_texture_set_range(
       std::shared_ptr<const TextureSetSurfacePlan>,std::shared_ptr<const TextureSetPackedGeometry>,
-      size_t,size_t,size_t,const std::function<bool()>&);
+      size_t,size_t,size_t,const std::function<bool()>&,bool);
   TextureSetRangeProof()=default;
   TextureSetRangeProof(TextureSetRangeProof&&)=default;
   mutable std::weak_ptr<const TextureSetRangeProof>self_;
@@ -33,5 +33,5 @@ private:
 std::shared_ptr<const TextureSetRangeProof> prepare_texture_set_range(
     std::shared_ptr<const TextureSetSurfacePlan>,std::shared_ptr<const TextureSetPackedGeometry>,
     size_t field,size_t object_first_index,size_t object_first_vertex,
-    const std::function<bool()> &cancelled = {});
+    const std::function<bool()> &cancelled = {},bool render_only=false);
 } // namespace dome::detail

@@ -49,6 +49,8 @@ inline bool overlay_uses_float_emission(const PaintOverlayPacket &packet) noexce
   return false;
 }
 struct PaintOverlayFactory {
+ static std::shared_ptr<const TextureMaps> capture_current_grid(const PaintedMesh &,
+     const Material &,const std::function<bool()> &cancelled={});
  // Read only the sealed original coordinate owners; no sparse tile packet or
  // padding upload is needed by a CPU asset worker.
  static std::array<std::shared_ptr<const std::vector<std::array<float,2>>>,2>

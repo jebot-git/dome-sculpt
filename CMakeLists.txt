@@ -2741,6 +2741,7 @@ if(BUILD_TESTING)
 endif()
 
 target_sources(dome-sculpt-core PRIVATE src/paint-composite.cpp ${paint_compute_source})
+target_sources(dome-sculpt-core PRIVATE src/current-paint-preview.cpp)
 
 # Standalone actual-backend component: no old-core overlay or per-query CPU staging.
 if(BUILD_TESTING)
@@ -4965,4 +4966,25 @@ if(BUILD_TESTING)
   add_executable(dome-sculpt-sculpt-chunk-workspace-test EXCLUDE_FROM_ALL tests/sculpt-chunk-workspace.cpp)
   target_include_directories(dome-sculpt-sculpt-chunk-workspace-test PRIVATE src)
   target_link_libraries(dome-sculpt-sculpt-chunk-workspace-test PRIVATE dome-sculpt-core)
+endif()
+
+if(BUILD_TESTING)
+  add_executable(dome-sculpt-current-paint-preview-native-test tests/current-paint-preview-native.cpp)
+  target_include_directories(dome-sculpt-current-paint-preview-native-test PRIVATE src)
+  target_link_libraries(dome-sculpt-current-paint-preview-native-test PRIVATE dome-sculpt-core)
+  target_link_options(dome-sculpt-current-paint-preview-native-test PRIVATE
+    -Wl,--wrap=_ZNK4dome11PaintedMesh7previewERKNS_8MaterialERKSt8functionIFbvEE
+    -Wl,--wrap=_ZN4dome6detail20EmissionExportAccess7previewERKNS_11PaintedMeshERKNS_8MaterialERKSt8functionIFbvEE)
+  add_test(NAME current-paint-preview-native COMMAND dome-sculpt-current-paint-preview-native-test)
+  set_tests_properties(current-paint-preview-native PROPERTIES TIMEOUT 180)
+endif()
+if(BUILD_TESTING AND TARGET dome-sculpt-render)
+  add_executable(dome-sculpt-current-paint-preview-gpu-test tests/current-paint-preview-gpu.cpp)
+  target_include_directories(dome-sculpt-current-paint-preview-gpu-test PRIVATE src)
+  target_link_libraries(dome-sculpt-current-paint-preview-gpu-test PRIVATE dome-sculpt-render)
+  foreach(_current_gl GetTexImage ReadPixels GetBufferSubData ClientWaitSync FenceSync BufferData Finish)
+    target_link_options(dome-sculpt-current-paint-preview-gpu-test PRIVATE -Wl,--wrap=gl${_current_gl})
+  endforeach()
+  add_test(NAME current-paint-preview-gpu COMMAND dome-sculpt-current-paint-preview-gpu-test)
+  set_tests_properties(current-paint-preview-gpu PROPERTIES TIMEOUT 180 ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2")
 endif()

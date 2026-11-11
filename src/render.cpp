@@ -21,6 +21,7 @@
 #include "render-target.hpp"
 #include "render-source-pack.hpp"
 #include "render-paint-overlay.hpp"
+#include "render-current-paint-preview.hpp"
 #include "render-buffer-size.hpp"
 #include "prepared-color-state.hpp"
 #include "source-vrm1-background.hpp"
@@ -165,6 +166,7 @@ struct SurfaceRenderer::TextureState {
   };
   static bool native_float(const Material &material,const TextureMaps *maps,
       const SourceMaterialBindings *binding) noexcept {
+    if(maps&&maps->current_grid_preview)return maps->current_grid_preview->physical_emission();
     if(!maps||!maps->overlay||!maps->overlay->native_geometry())return false;
     auto hdr=[](const auto &values){return std::any_of(values.begin(),values.end(),[](float value){return value>1;});};
     return detail::overlay_uses_float_emission(*maps->overlay)||hdr(material.emissive)||
@@ -187,6 +189,7 @@ struct SurfaceRenderer::TextureState {
   MToonSourcePacks packed_sources;
   detail::PolygonSurfaceGpu polygon_frames;
   detail::PaintOverlayCompiler paint_overlays;
+  detail::CurrentPaintPreviewCompiler current_paint;
   MaterialMap<std::array<float,3>> physical_backgrounds;
   std::vector<std::array<float,2>> uv1;
   std::vector<std::array<float,2>> original_uv0,paint_coordinates;
@@ -211,8 +214,8 @@ struct SurfaceRenderer::TextureState {
   static size_t storage(const Image&i,bool mips){size_t bytes=0;uint32_t w=i.width,h=i.height;for(;;){bytes+=size_t(w)*h*4;if(!mips||(w==1&&h==1))return bytes;w=std::max(1u,w/2);h=std::max(1u,h/2);}}
   static Sampler sampler(const PaintSourceTexture&s){return {s.wrap_s,s.wrap_t,s.min_filter?s.min_filter:GL_LINEAR,s.mag_filter?s.mag_filter:GL_LINEAR};}
   static bool mipmapped(const Sampler&s){return s[2]>=9984&&s[2]<=9987;}
-  SurfaceTextureStats stats()const{size_t bytes=0;for(auto &[key,r]:images)bytes+=r.bytes;return {images.size()+packed_sources.size()+paint_overlays.image_count()+polygon_frames.images(),samplers.size(),bytes+packed_sources.bytes()+paint_overlays.bytes()+polygon_frames.bytes(),uploads,packed_sources.bytes()+polygon_frames.bytes(),packed_sources.builds()};}
-  void clear(bool release){polygon_frames.clear(release);paint_overlays.clear(release);physical_backgrounds.clear();packed_sources.clear(release);if(release){for(auto &[key,r]:images)glDeleteTextures(1,&r.id);for(auto &[key,id]:samplers)glDeleteSamplers(1,&id);}bindings.clear();images.clear();samplers.clear();toons.clear();uv1.clear();original_uv0.clear();paint_coordinates.clear();for(auto &values:extra_uv)values.clear();source_maps.clear();weighted.clear();vertex_alpha.clear();}
+  SurfaceTextureStats stats()const{size_t bytes=0;for(auto &[key,r]:images)bytes+=r.bytes;return {images.size()+packed_sources.size()+paint_overlays.image_count()+polygon_frames.images()+current_paint.image_count(),samplers.size(),bytes+packed_sources.bytes()+paint_overlays.bytes()+polygon_frames.bytes()+current_paint.bytes(),uploads,packed_sources.bytes()+polygon_frames.bytes(),packed_sources.builds()};}
+  void clear(bool release){current_paint.clear(release);polygon_frames.clear(release);paint_overlays.clear(release);physical_backgrounds.clear();packed_sources.clear(release);if(release){for(auto &[key,r]:images)glDeleteTextures(1,&r.id);for(auto &[key,id]:samplers)glDeleteSamplers(1,&id);}bindings.clear();images.clear();samplers.clear();toons.clear();uv1.clear();original_uv0.clear();paint_coordinates.clear();for(auto &values:extra_uv)values.clear();source_maps.clear();weighted.clear();vertex_alpha.clear();}
   void prepare(const MeshSnapshot&mesh,bool geometry_changed){
     if(geometry_changed && (!mesh.mesh.positions.empty() || !mesh.mesh.indices.empty()))mesh.mesh.validate();
     const auto count=mesh.mesh.positions.size();
@@ -271,8 +274,16 @@ struct SurfaceRenderer::TextureState {
     MaterialMap<std::shared_ptr<const PaintSourceMaps>> next_source_maps;
     MaterialMap<std::array<float,3>> next_physical_backgrounds;
     std::vector<detail::PaintOverlayCompiler::Input> overlay_inputs;
+    std::vector<std::shared_ptr<const detail::CurrentGridPaintPreview>> current_inputs;
+    MaterialMap<std::shared_ptr<const detail::CurrentGridPaintPreview>> current_fields;
+    const Sampler current_sampler{GL_CLAMP_TO_EDGE,GL_CLAMP_TO_EDGE,GL_LINEAR,GL_LINEAR};
     for(auto &range:mesh.ranges){
       auto maps=range.textures;auto &plan=planned[material_key(range)];
+      if(maps&&maps->current_grid_preview){
+        const auto&owner=maps->current_grid_preview;owner->authenticate_range(mesh.mesh,range,geometry_changed);
+        current_inputs.push_back(owner);current_fields.emplace(material_key(range),owner);
+        wanted_samplers.insert(current_sampler);continue;
+      }
       if(range.material_bindings&&range.material_bindings->physical_emission)
         next_physical_backgrounds.emplace(material_key(range),*range.material_bindings->physical_emission);
       if(maps&&maps->overlay&&maps->overlay->native_geometry()){
@@ -565,12 +576,16 @@ struct SurfaceRenderer::TextureState {
       overlay_sizes.emplace(identity,size);overlay_bytes+=size;
     }
     if(overlay_images>limits.max_images-wanted.size())throw std::length_error("GPU overlay image count exceeded");
-    packed_sources.preflight(source_packs,bytes+overlay_bytes,wanted.size()+overlay_images,limits);
+    const size_t current_bytes=current_paint.forecast(current_inputs),current_images=current_paint.forecast_images(current_inputs);
+    if(bytes>limits.max_bytes||overlay_bytes>limits.max_bytes-bytes||current_bytes>limits.max_bytes-bytes-overlay_bytes||
+       wanted.size()+overlay_images>limits.max_images||current_images>limits.max_images-wanted.size()-overlay_images)
+      throw std::length_error("Current-grid old/new/retirement stores exceed shared material GPU budget");
+    packed_sources.preflight(source_packs,bytes+overlay_bytes+current_bytes,wanted.size()+overlay_images+current_images,limits);
     for(auto it=images.begin();it!=images.end();)if(!wanted.contains(it->first)){glDeleteTextures(1,&it->second.id);it=images.erase(it);}else ++it;
     for(auto it=samplers.begin();it!=samplers.end();)if(!wanted_samplers.contains(it->first)){glDeleteSamplers(1,&it->second);it=samplers.erase(it);}else ++it;
-    if(packed_sources.bytes()>limits.max_bytes-bytes||packed_sources.size()>limits.max_images-wanted.size())
+    if(packed_sources.bytes()>limits.max_bytes-bytes-current_bytes||packed_sources.size()>limits.max_images-wanted.size()-current_images)
       throw std::length_error("GPU source pack leaves no overlay budget");
-    paint_overlays.prepare(overlay_inputs,limits.max_bytes-bytes-packed_sources.bytes(),limits.max_images-wanted.size()-packed_sources.size());
+    paint_overlays.prepare(overlay_inputs,limits.max_bytes-bytes-packed_sources.bytes()-current_bytes,limits.max_images-wanted.size()-packed_sources.size()-current_images);
     glActiveTexture(GL_TEXTURE0);glPixelStorei(GL_UNPACK_ALIGNMENT,1);
     for(auto &[key,desired]:wanted){
       auto found=images.find(key);
@@ -606,11 +621,17 @@ struct SurfaceRenderer::TextureState {
       }
       source_packs.push_back(toon.packed_inputs);
     }
-    packed_sources.prepare(source_packs,bytes+overlay_bytes,wanted.size()+overlay_images,limits);
-    polygon_frames.prepare(mesh,bytes+paint_overlays.bytes()+packed_sources.bytes(),wanted.size()+paint_overlays.image_count()+packed_sources.size(),limits);
+    packed_sources.prepare(source_packs,bytes+overlay_bytes+current_bytes,wanted.size()+overlay_images+current_images,limits);
+    current_paint.prepare(current_inputs,limits.max_bytes-bytes-paint_overlays.bytes()-packed_sources.bytes(),limits.max_images-wanted.size()-paint_overlays.image_count()-packed_sources.size());
+    polygon_frames.prepare(mesh,bytes+paint_overlays.bytes()+packed_sources.bytes()+current_paint.bytes(),wanted.size()+paint_overlays.image_count()+packed_sources.size()+current_paint.image_count(),limits);
     polygon_active=std::any_of(mesh.ranges.begin(),mesh.ranges.end(),[](const auto&r){return r.textures&&bool(r.textures->polygon_surface);});
     MaterialMap<Binding> ready;
     for(auto &[object,plan]:planned){auto &binding=ready[object];for(int n=0;n<16;++n)if(plan[n].present)binding[n]={images.at(plan[n].key).id,samplers.at(plan[n].sampler),plan[n].uv,plan[n].coordinate};}
+    for(const auto&[key,owner]:current_fields){const auto&resource=current_paint.at(owner);auto&binding=ready[key];
+      const auto sampler=samplers.at(current_sampler);binding[0]={resource.textures[0],sampler};binding[1]={resource.textures[1],sampler};
+      if(!resource.physical)binding[2]={resource.textures[2],sampler};
+      else{binding[9]={resource.textures[2],sampler};binding[10]={resource.textures[3],sampler};binding[13]={resource.textures[4],sampler};}
+    }
     bindings=std::move(ready);toons=std::move(next_toons);physical_backgrounds=std::move(next_physical_backgrounds);if(geometry_changed){uv1=std::move(next_uv1);extra_uv=std::move(next_extra_uv);original_uv0=std::move(next_original_uv0);paint_coordinates=next_paint_coordinates.empty()?mesh.paint_coordinates:std::move(next_paint_coordinates);}source_maps=std::move(next_source_maps);weighted=std::move(next_weighted);
   }
 };
@@ -1033,7 +1054,9 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
       const auto &view=binding[5];glUniform1i(glGetUniformLocation(program_,"original_normal_coordinate"),view.coordinate);glUniform1i(glGetUniformLocation(program_,"original_normal_present"),view.image!=0);
       glUniform3f(glGetUniformLocation(program_,"original_normal_x"),view.uv[0],view.uv[1],view.uv[4]);glUniform3f(glGetUniformLocation(program_,"original_normal_y"),view.uv[2],view.uv[3],view.uv[5]);}
     const bool visible_overlay=maps&&maps->overlay&&!maps->overlay->empty()&&(!maps->overlay->native_geometry()||native_float);
-    glUniform1i(glGetUniformLocation(program_,"overlay_mode"),visible_overlay?(maps->overlay->native_geometry()?2:1):0);
+    const bool current_float=maps&&maps->current_grid_preview&&maps->current_grid_preview->physical_emission();
+    glUniform1i(glGetUniformLocation(program_,"overlay_mode"),current_float?2:visible_overlay?(maps->overlay->native_geometry()?2:1):0);
+    if(current_float){const auto&binding=textures_->bindings.at(key);for(int n:{9,10,13}){glActiveTexture(GL_TEXTURE0+n);glBindTexture(GL_TEXTURE_2D,binding[n].image);glBindSampler(n,binding[n].sampler);}}
     if(visible_overlay){const auto &overlay=textures_->paint_overlays.at(maps->overlay,true);
       constexpr std::array<int,5> slots{7,8,9,10,13};
       for(size_t n=0;n<slots.size();++n){glActiveTexture(GL_TEXTURE0+slots[n]);glBindTexture(GL_TEXTURE_2D,overlay.planes[n]);glBindSampler(slots[n],0);}}
