@@ -61,7 +61,7 @@ void threads(const nlohmann::json&volume){
   detail::NativeSceneGeometryIntern scope;
   together.arrive_and_wait();a[index]=Volume::decode(volume);
   together.arrive_and_wait();b[index]=Volume::decode(volume);
- }catch(...){errors[index]=std::current_exception();}};
+ }catch(...){errors[index]=std::current_exception();together.arrive_and_drop();}};
  std::thread first(worker,0),second(worker,1);first.join();second.join();
  for(const auto&e:errors)if(e)std::rethrow_exception(e);
  check(a[0]&&a[1]&&b[0]&&b[1],"Both concurrent native read scopes complete");

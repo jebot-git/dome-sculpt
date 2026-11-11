@@ -702,6 +702,7 @@ nlohmann::json Scene::encode() const {
   return j;
 }
 Scene Scene::decode(const nlohmann::json &j) {
+  detail::NativeReadScope::check();
   Scene result;
   if(!j.is_object() || (!j.at("format").is_string() || j.at("format").get_ref<const std::string&>()!="dome-sculpt") || !j.at("version").is_number_integer())
     throw std::runtime_error("Unsupported scene format or version type");
@@ -1200,6 +1201,7 @@ Scene Scene::decode(const nlohmann::json &j) {
   detail::NativeSceneGeometryIntern decoded_geometry;
   size_t samples = 0, texels = 0, deformation_entries = material_fields?SourceMaterialArchive::deformation_entries(j.at("source_materials")):0, paint_bytes = 0;
   for (auto &v : objects) {
+    detail::NativeReadScope::check();
     SculptObject o;
     o.id = id(v.at("id"));
     if (archives) o.group = nonnegative_id(v.at("group"));

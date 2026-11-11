@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 #include "dome/volume.hpp"
+#include "native-read-scope.hpp"
 #include <bit>
 #include <stdexcept>
 #include <vector>
@@ -22,16 +23,20 @@ class NativeSceneGeometryIntern {
   // equality checks fit eight million visits; adversarial candidate collisions
   // cannot turn this optional optimization into quadratic unbounded work.
   size_t remaining_=8'000'000;
+  size_t visits_=0;
+  void checkpoint(){if((visits_++&255)==0)NativeReadScope::check();}
   static uint64_t mix(uint64_t v)noexcept {
     v=(v^(v>>30))*0xbf58476d1ce4e5b9ull;
     v=(v^(v>>27))*0x94d049bb133111ebull;return v^(v>>31);
   }
   void intern(Cells &cells,float voxel,float band) {
+    NativeReadScope::check();
     const auto count=cells.size();
     if(count>remaining_)return;
     remaining_-=count;
     Key key{count,(uint64_t(std::bit_cast<uint32_t>(voxel))<<32)|std::bit_cast<uint32_t>(band),0,0};
     for(const auto &[p,value]:cells.read()) {
+      checkpoint();
       const auto h=mix(uint32_t(p.x))^std::rotl(mix(uint32_t(p.y)),21)^std::rotl(mix(uint32_t(p.z)),42)^
           std::rotl(mix(std::bit_cast<uint32_t>(value)),7);
       key.sum+=mix(h);key.xor_sum^=mix(h^0x9e3779b97f4a7c15ull);
@@ -41,6 +46,7 @@ class NativeSceneGeometryIntern {
       remaining_-=count;
       bool same=true;const auto candidate=entry.cells.read();
       for(const auto &[p,value]:cells.read()) {
+        checkpoint();
         const auto at=candidate.find(p);
         if(at==candidate.end()||std::bit_cast<uint32_t>(at->second)!=std::bit_cast<uint32_t>(value)){same=false;break;}
       }
