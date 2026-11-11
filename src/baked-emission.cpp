@@ -156,8 +156,8 @@ std::vector<uint8_t> BakedEmissionField::encode(const BakedEmissionLimits &limit
   stop(limits);
   return out;
 }
-std::shared_ptr<const BakedEmissionField>
-BakedEmissionField::decode(std::span<const uint8_t> bytes, const BakedEmissionLimits &limits) {
+uint32_t BakedEmissionField::encoded_resolution(std::span<const uint8_t> bytes,
+                                                const BakedEmissionLimits &limits) {
   stop(limits);
   if (bytes.size() < encoded_header_bytes || !std::equal(magic.begin(), magic.end(), bytes.begin()))
     throw std::invalid_argument("Invalid baked emission field header");
@@ -174,8 +174,14 @@ BakedEmissionField::decode(std::span<const uint8_t> bytes, const BakedEmissionLi
     if ((i & 4095) == 0) stop(limits);
     read(bytes, offset).validate();
   }
+  stop(limits);
+  return r;
+}
+std::shared_ptr<const BakedEmissionField>
+BakedEmissionField::decode(std::span<const uint8_t> bytes, const BakedEmissionLimits &limits) {
+  const uint32_t r = encoded_resolution(bytes, limits);
   std::vector<BakedEmissionSample> values(size_t(r)*r);
-  offset = encoded_header_bytes;
+  size_t offset = encoded_header_bytes;
   for (size_t i = 0; i < values.size(); ++i) {
     if ((i & 4095) == 0) stop(limits);
     values[i] = read(bytes, offset);

@@ -44,6 +44,9 @@ public:
          const BakedEmissionLimits & = {});
   static std::shared_ptr<const BakedEmissionField>
   decode(std::span<const uint8_t>, const BakedEmissionLimits & = {});
+  // Complete wire/coefficient validation without allocating retained storage.
+  static uint32_t encoded_resolution(std::span<const uint8_t>,
+                                     const BakedEmissionLimits & = {});
   std::vector<uint8_t> encode(const BakedEmissionLimits & = {}) const;
 
   uint32_t resolution() const noexcept { return resolution_; }

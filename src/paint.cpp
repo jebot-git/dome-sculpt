@@ -3,8 +3,11 @@
 #include "texture-set-resample.hpp"
 #include "source-paint-parameters.hpp"
 #include "paint-overlay-packet.hpp"
+#include "baked-emission-access.hpp"
+#include "baked-emission-codec.hpp"
 #include "current-paint-preview.hpp"
 #include "emission-paint-access.hpp"
+#include "emission-authority.hpp"
 #include "native-weight-paint-access.hpp"
 #include "native-weight-state.hpp"
 #include "paint-blur-gpu.hpp"
@@ -150,7 +153,7 @@ BakedPixel baked_pixel(const BakedTextures &baked, size_t at) {
   }
   for (int c = 0; c < 3; ++c) {
     result[4 + c] = unit(m.metal_rough.rgba[i + c]);
-    result[7 + c] = srgb_to_linear(unit(m.emission.rgba[i + c]));
+    result[7 + c] = baked.emission_field ? 0 : srgb_to_linear(unit(m.emission.rgba[i + c]));
     result[10 + c] = m.normal.rgba.empty() ? (c == 2 ? 1 : 0)
                                            : unit(m.normal.rgba[i + c]) * 2 - 1;
   }
@@ -163,9 +166,10 @@ void baked_pixel(BakedTextures &baked, size_t at, BakedPixel values, bool write_
     m.color.rgba[i + c] = byte(c < 3 ? linear_to_srgb(values[c]) : values[c]);
   for (int c = 0; c < 3; ++c) {
     m.metal_rough.rgba[i + c] = byte(values[4 + c]);
-    m.emission.rgba[i + c] = byte(linear_to_srgb(values[7 + c]));
+    if (!baked.emission_field) m.emission.rgba[i + c] = byte(linear_to_srgb(values[7 + c]));
   }
-  m.metal_rough.rgba[i + 3] = m.emission.rgba[i + 3] = 255;
+  m.metal_rough.rgba[i + 3] = 255;
+  if (!baked.emission_field) m.emission.rgba[i + 3] = 255;
   if (write_normal && !m.normal.rgba.empty()) {
     auto n = Vec3{values[10], values[11], values[12]};
     n = length(n) > 1e-8f ? normalized(n) : Vec3{0, 0, 1};
@@ -1177,6 +1181,7 @@ PaintEmissionValue PaintedMesh::emission_pixel(uint64_t id,uint32_t x,uint32_t y
   return result;
 }
 bool PaintedMesh::has_physical_emission() const noexcept {
+  if(baked_&&baked_->emission_field)return true;
   for(const auto &l:layers_)if(emission_tile_count(l))return true;
   return false;
 }
@@ -1553,6 +1558,11 @@ std::shared_ptr<PaintedMesh> detail::EmissionExportAccess::without_emission(cons
   const auto token=next_composite_token();
   auto detached=paint.snapshot();
   detached->composite_cache_=std::move(cache);detached->composite_token_=token;
+  if(detached->baked_&&detached->baked_->emission_field){
+    auto baked=std::make_shared<BakedTextures>(*detached->baked_);
+    baked->emission_field.reset();baked->maps.emission=blank_image(paint.resolution());
+    detached->baked_=std::move(baked);
+  }
   for(auto &layer:detached->layers_){layer.emission_tiles.clear();for(auto &tile:layer.tiles)if(tile){bool emission=false;for(const auto &pixel:tile->pixels)emission|=pixel.data[6]||pixel.data[7]||pixel.data[8]||pixel.data[12];if(emission){auto copy=std::make_shared<PaintTile>(*tile);for(auto &pixel:copy->pixels){pixel.data[6]=pixel.data[7]=pixel.data[8]=pixel.data[12]=0;}tile=std::move(copy);}}}
   return detached;
 }
@@ -2221,6 +2231,7 @@ std::shared_ptr<PaintedMesh> SourceNormalPreparationAccess::adopt_canonical(cons
   baked->maps.color=source.baked_->maps.color;baked->maps.metal_rough=source.baked_->maps.metal_rough;
   baked->maps.emission=source.baked_->maps.emission;baked->maps.pbr_color=source.baked_->maps.pbr_color;
   baked->maps.transparent=source.baked_->maps.transparent;baked->coverage=source.baked_->coverage;
+  baked->emission_field=source.baked_->emission_field;
   baked->color_interpretation=source.baked_->color_interpretation;
   // Only the normal role moves into the explicitly converted intrinsic plane.
   // Material channels, coverage, editable sparse layers and source maps remain.
@@ -2432,7 +2443,10 @@ void BakedTextures::validate(uint32_t resolution) const {
   if (resolution < 64 || resolution > 2048 ||
       coverage.size() != size_t(resolution) * resolution)
     throw std::invalid_argument("Baked coverage differs from the painting surface");
+  if(emission_field&&(emission_field->resolution()!=resolution||!maps.emission.rgba.empty()||maps.emission.width||maps.emission.height))
+    throw std::invalid_argument("FLOAT baked emission needs its exact grid and no duplicate RGB8 authority");
   for (auto image : {&maps.color, &maps.metal_rough, &maps.emission, &maps.normal, &maps.pbr_color,&maps.mtoon_normal}) {
+    if(image==&maps.emission&&emission_field)continue;
     if ((image == &maps.normal || image == &maps.pbr_color||image==&maps.mtoon_normal) && image->rgba.empty() && !image->width && !image->height)
       continue;
     image->validate();
@@ -2442,7 +2456,7 @@ void BakedTextures::validate(uint32_t resolution) const {
 }
 size_t BakedTextures::storage_bytes() const {
   return maps.color.rgba.size() + maps.metal_rough.rgba.size() +
-         maps.emission.rgba.size() + maps.normal.rgba.size() + maps.mtoon_normal.rgba.size()+maps.pbr_color.rgba.size() + coverage.size()+(normal_field?normal_field->retained_bytes():0);
+         maps.emission.rgba.size() + maps.normal.rgba.size() + maps.mtoon_normal.rgba.size()+maps.pbr_color.rgba.size() + coverage.size()+(normal_field?normal_field->retained_bytes():0)+(emission_field?emission_field->storage_bytes():0);
 }
 size_t PaintedMesh::storage_bytes() const {
   size_t result = (baked_ ? baked_->storage_bytes() : 0)+(color_projection_?color_projection_->vertex_rgba->rgba.size():0);
@@ -2512,6 +2526,18 @@ void PaintedMesh::install_bake(BakedTextures incoming,BakedNormalWrite normal_wr
       throw std::invalid_argument("Different normal interpretations require explicit source-retaining conversion");
     auto merged = *baked_;
     merged.normal_field=incoming.normal_field;
+    if(merged.emission_field||incoming.emission_field){
+      // Independent FLOAT coverage, including values far below one R8 step.
+      // Other channels continue their original common-coverage merge below.
+      const size_t bytes=BakedEmissionField::required_bytes(resolution());
+      const size_t replacement=merged.storage_bytes()-merged.maps.emission.rgba.size()-(merged.emission_field?merged.emission_field->storage_bytes():0)+bytes;
+      if(storage_bytes()-baked_->storage_bytes()+replacement>128*1024*1024)
+        throw std::length_error("Merged FLOAT baked emission exceeds paint storage budget");
+      std::vector<BakedEmissionSample> values(incoming.coverage.size());
+      for(size_t i=0;i<values.size();++i)
+        values[i]=BakedEmissionField::over(detail::baked_emission_texel(*baked_,i),detail::baked_emission_texel(incoming,i));
+      merged.emission_field=BakedEmissionField::create(resolution(),values);merged.maps.emission={};
+    }
     if (merged.maps.normal.rgba.empty() && !incoming.maps.normal.rgba.empty())
       merged.maps.normal = blank_image(resolution(), true);
     if(merged.normal_interpretation==BakedNormalInterpretation::PreparedAttributes&&merged.maps.mtoon_normal.rgba.empty()&&!incoming.maps.mtoon_normal.rgba.empty())merged.maps.mtoon_normal=blank_image(resolution(),true);
@@ -2744,7 +2770,16 @@ PaintColorPreparationResult SourceColorPreparationAccess::prepare(
     baked->color_interpretation=BakedColorInterpretation::ResolvedPbr;baked->validate(r);result->baked_=std::move(baked);
   }
   result->composite_token_=next_composite_token();++result->revision_;
-  const auto before=source.preview(material),after=result->composite(material);
+  auto before=source.preview(material,options.cancelled);
+  // Preparation explicitly needs the actual colour pixels for its quality
+  // proof. A render-only current-grid marker is not that image authority.
+  if(before->current_grid_preview)before=source.composite(material,options.cancelled);
+  // Only colour is being prepared. Retain original FLOAT emission owners and
+  // editable/hidden layers in result; stage emission-free OTHER channels for
+  // the existing colour quality check instead of quantizing physical energy.
+  const auto after=(result->has_physical_emission()||detail::hdr_emission(material.emissive))
+      ?detail::EmissionExportAccess::other_channels(*result,material,options.cancelled)
+      :result->composite(material,options.cancelled);
   if(!before->source_only && before->color.rgba!=after->color.rgba)
     throw std::logic_error("Color preparation changed the common MToon paint authority");
   auto view=[](const std::shared_ptr<const TextureMaps> &owner,const Image *image) {
@@ -3384,6 +3419,11 @@ nlohmann::json PaintedMesh::encode_impl(PaintImageArchive *archive,NormalSamplin
       j["baked"]["version"]=5;j["baked"]["normal_interpretation"]="independent-baked-field-v1";
       j["baked"]["normal_field"]=detail::BakedNormalArchive::writer().add_field(baked_->normal_field);
     }
+    if(baked_->emission_field){
+      j["baked"]["base_version"]=j["baked"]["version"];
+      j["baked"]["version"]=6;
+      j["baked"]["float_emission"]=nlohmann::json::binary(baked_->emission_field->encode());
+    }
   }
   if(source_sampling_prepared()) {
     if(sampling||baked_||color_projection_||normal_projection_||surface_->diagnostics.policy!=PaintUvPolicy::Strict)
@@ -3698,15 +3738,15 @@ std::shared_ptr<PaintedMesh> PaintedMesh::decode_impl(const nlohmann::json &inpu
     }
     result->layers_.push_back(std::move(l));
   }
-  if(physical&&!result->has_physical_emission())throw std::invalid_argument("Paint3 requires genuine physical emission tiles");
   result->layer(result->active_);
   if (j.contains("baked")) {
     const auto &v = j.at("baked");
     if(v.contains("normal_authority")&&!domains)
       throw std::invalid_argument("Retained normal bake requires a complete owning sampling archive context");
-    if(!v.at("version").is_number_integer() || (v.at("version")!=1 && v.at("version")!=2 && v.at("version")!=3 && v.at("version")!=4&&v.at("version")!=5))throw std::runtime_error("Unsupported baked texture version");
-    const bool retained=v.at("version")==4;
-    const bool layered=v.at("version")==5;
+    const auto baked_version=detail::baked_legacy_version(v,context.baked_emission);
+    const bool floating=v.at("version")==6;
+    const bool retained=baked_version==4;
+    const bool layered=baked_version==5;
     if(layered){
       (void)detail::BakedNormalArchive::reader();
       if(!v.contains("normal_field")||v.at("normal_interpretation")!="independent-baked-field-v1"||result->normal_projection_)
@@ -3716,7 +3756,7 @@ std::shared_ptr<PaintedMesh> PaintedMesh::decode_impl(const nlohmann::json &inpu
       throw std::invalid_argument("Retained normal metadata requires complete paired field context");
     if(!retained&&v.contains("normal_authority"))
       throw std::invalid_argument("Normal event identity requires baked metadata4");
-    if(v.at("version")==1 && (v.contains("color_interpretation") || v.contains("pbr_color")))throw std::runtime_error("Resolved baked colors require baked payload2");
+    if(baked_version==1 && (v.contains("color_interpretation") || v.contains("pbr_color")))throw std::runtime_error("Resolved baked colors require baked payload2");
     uint32_t r = result->resolution();
     auto bytes = [&](const char *key, size_t count, bool optional = false) {
       const auto &value = v.at(key);
@@ -3726,18 +3766,23 @@ std::shared_ptr<PaintedMesh> PaintedMesh::decode_impl(const nlohmann::json &inpu
       return std::vector<uint8_t>(value.get_binary().begin(), value.get_binary().end());
     };
     BakedTextures baked;
+    if(floating){
+      detail::baked_float_preflight(v,r,context.baked_emission);
+      baked.emission_field=BakedEmissionField::decode(v.at("float_emission").get_binary(),
+        {128*1024*1024,[]{detail::NativeReadScope::check();return false;}});
+    }
     baked.maps.color = {r, r, bytes("color", size_t(r)*r*4)};
     baked.maps.metal_rough = {r, r, bytes("orm", size_t(r)*r*4)};
-    baked.maps.emission = {r, r, bytes("emission", size_t(r)*r*4)};
+    if(!floating)baked.maps.emission = {r, r, bytes("emission", size_t(r)*r*4)};
     auto normal = bytes("normal", size_t(r)*r*4, true);
     if (!normal.empty()) baked.maps.normal = {r, r, std::move(normal)};
     baked.coverage = bytes("coverage", size_t(r)*r);
-    if(v.at("version")!=3&&!retained&&!layered&&(v.contains("normal_interpretation")||v.contains("mtoon_normal")))throw std::runtime_error("Prepared normals require baked payload3");
-    if(v.at("version")==2||((v.at("version")==3||retained||layered)&&(v.contains("color_interpretation")||v.contains("pbr_color")))) {
+    if(baked_version!=3&&!retained&&!layered&&(v.contains("normal_interpretation")||v.contains("mtoon_normal")))throw std::runtime_error("Prepared normals require baked payload3");
+    if(baked_version==2||((baked_version==3||retained||layered)&&(v.contains("color_interpretation")||v.contains("pbr_color")))) {
       if(v.at("color_interpretation")!="resolved-pbr")throw std::runtime_error("Unknown baked color interpretation");
       baked.color_interpretation=BakedColorInterpretation::ResolvedPbr;baked.maps.pbr_color={r,r,bytes("pbr_color",size_t(r)*r*4)};
     }
-    if(v.at("version")==3||retained){
+    if(baked_version==3||retained){
       const auto &kind=v.at("normal_interpretation");
       if(!kind.is_string()||kind.get_ref<const std::string&>()!=(retained?"retained-field-metadata-v1":"prepared-attributes-v1"))throw std::runtime_error("Unknown baked normal interpretation");
       baked.normal_interpretation=BakedNormalInterpretation::PreparedAttributes;
@@ -3764,7 +3809,9 @@ std::shared_ptr<PaintedMesh> PaintedMesh::decode_impl(const nlohmann::json &inpu
       result->baked_=std::make_shared<const BakedTextures>(std::move(baked));
       result->composite_token_=next_composite_token();++result->revision_;
     }else result->install_bake(std::move(baked));
+    if(floating)context.baked_emission->note_validated_field();
   }
+  if(physical&&!result->has_physical_emission())throw std::invalid_argument("Paint3 requires genuine physical emission ownership");
   result->allocated_tiles_ = 0;
   for(const auto &layer:result->layers_)result->allocated_tiles_+=tile_count(layer);
   if(result->surface_->source_capture_only &&
