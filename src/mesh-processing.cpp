@@ -753,7 +753,7 @@ struct PackedMaterialQuery::Impl {
  struct Plan {size_t first,triangles,vertices,nodes;};
  struct Part {
   Mesh mesh;uint32_t first;Bvh tree;
-  Part(Mesh m,uint32_t offset,size_t nodes,const std::function<bool()>&fn):mesh(std::move(m)),first(offset),tree(mesh,fn,nodes){tree.cancelled={};}
+  Part(Mesh m,uint32_t offset,size_t nodes,const std::function<bool()>&fn):mesh(std::move(m)),first(offset),tree(mesh,fn?std::function<bool()>(std::cref(fn)):std::function<bool()>{},nodes){tree.cancelled={};}
  };
  std::unique_ptr<SurfaceQuery>small;
  Mesh original;std::vector<std::unique_ptr<Part>>parts;Usage used;
@@ -771,7 +771,7 @@ struct PackedMaterialQuery::Impl {
   }
   validate_packed_original(m,fn);const size_t triangles=m.indices.size()/3,count=(triangles+limits.part_triangles-1)/limits.part_triangles;
   if(count>limits.partitions)throw std::length_error("Packed query partition budget exceeded before copy");
-  retained=packed_sum(retained,count,16384);std::vector<Plan>plan;plan.reserve(count);size_t all_nodes=0,vertices=0,peak_refs=0;
+  retained=packed_sum(retained,count,16384);if(retained>limits.retained_bytes||retained>limits.working_bytes)throw std::length_error("Packed query plan metadata exceeds prospective byte budget");std::vector<Plan>plan;plan.reserve(count);size_t all_nodes=0,vertices=0,peak_refs=0;
   // Plan one bounded ref list at a time; no input-vertex-sized remap exists.
   for(size_t first=0;first<triangles;){cancel(fn);const auto n=std::min(limits.part_triangles,triangles-first);if(packed_sum(retained,n*3,sizeof(uint32_t))>limits.working_bytes)throw std::length_error("Packed query planning scratch exceeds byte budget before allocation");const auto refs=packed_references(m,first,n,fn);const auto nodes=chunk_bvh_nodes(n);if(nodes>limits.nodes-all_nodes)throw std::length_error("Packed query total BVH node budget exceeded");all_nodes+=nodes;vertices=packed_sum(vertices,refs.size());retained=packed_sum(retained,refs.size(),2*sizeof(Vec3));retained=packed_sum(retained,n,3*sizeof(uint32_t)+sizeof(uint32_t));retained=packed_sum(retained,nodes,sizeof(Bvh::Node));peak_refs=std::max(peak_refs,n*3*sizeof(uint32_t));if(retained>limits.retained_bytes||packed_sum(retained,peak_refs)>limits.working_bytes)throw std::length_error("Packed query retained/build byte budget exceeded before source/part copies");plan.push_back({first,n,refs.size(),nodes});first+=n;}
   const auto working=packed_sum(retained,peak_refs);if(working>limits.working_bytes)throw std::length_error("Packed query build byte budget exceeded");
