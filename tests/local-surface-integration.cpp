@@ -726,7 +726,8 @@ int main(int argc, char **argv) try {
     const auto native_after=d.copy_scene();
     const auto color_after=native_after.active().painted->preview(native_after.active().material)->color.rgba;
     check(native_after.active().painted->has_paint_data() &&
-              native_after.encode()!=native_before.encode() && color_after!=color_before,
+              native_after.encode()!=native_before.encode() &&
+              color_before.size()==64*64*4&&color_after.size()==64*64*4&&color_after!=color_before,
           "Product color painting actually changes texture data");
     const auto old_packet=before->ranges[0].textures->current_grid_preview;
     const auto new_packet=after->ranges[0].textures->current_grid_preview;
