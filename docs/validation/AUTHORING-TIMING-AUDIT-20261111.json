@@ -1,0 +1,1190 @@
+{
+  "schema": 1,
+  "scope": "Finite READ-ONLY source/record audit. No application, GPU, compile, performance rerun, source/provider/threshold mutation. Correctness results remain valid; measured performance tails remain open before production-performance acceptance.",
+  "baseline_source": "b6e366fd8c45829b00bc1d1327ecdfc25aeedf49",
+  "current_source": "e9931f7286f75746af47d52f2d901b731510cbb5",
+  "baseline_actual_fresh_renderer_link": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/shared-sculpt-p1-build-20261111/link-status.json",
+    "sha256": "a181366b70ea067f54bab256b4d505b26f0807d3d896446a09cc8a63587f6794",
+    "renderer_member": "/home/blux/de-xr/dome-sculpt/artifacts/shared-sculpt-p1-build-20261111/release/CMakeFiles/dome-sculpt-render.dir/src/render.cpp.o",
+    "scope": "Incremental ABI-matched Release benchmark: three fresh complete TUs (renderer, unchanged benchmark, agent sculpt-scene core replacement), own render/core archives, reused191 qualified current core objects and matching current dependent providers. No whole-build/app/SAN/GPU qualification claim."
+  },
+  "same_native_options_and_initial_scene": true,
+  "same_recorded_environment": true,
+  "equal_CPU_GPU_clocks_established": false,
+  "CPU_GPU_frequency_power_thermal_core_affinity_recorded": false,
+  "same_reported_Arc_GL_Mesa": "IntelArcA770/DG2;GL4.6Core;Mesa26.2.5; actualEGLnodePCI03/renderD129",
+  "shader_source_evidence": {
+    "raw_render_GLSL_blocks": [
+      {
+        "bytes": 967,
+        "sha256": "6505ba5cebd3af9e672d8cb1576568de5468e55bdaf37f358d184530f99bc4f9"
+      },
+      {
+        "bytes": 6492,
+        "sha256": "b22177bf0bf09eb1f1a0fc49d6b6cc9a58cb6995243360955e8c441155bc2aef"
+      }
+    ],
+    "old_b6_equals_current_e993": true,
+    "b6_already_includes_current_f473_preview_path": true,
+    "shader_program_binary_or_register_pressure_measurement": "Not recorded or claimed; identical source does not prove identical execution clocks/driver scheduling.",
+    "same_pbr_source_specialization_helper_sha256": "42d7bb0b332e9db18577cd88da1d6cee1bfca1fd05bdc058bb1494f92253c31f"
+  },
+  "unchanged_headers": {
+    "src/render-mtoon.hpp": {
+      "bytes": 14555,
+      "old_b6_sha256": "35ca48a07968bad63064dae3c19fce4e6fa02d19c8c0e82cb42e638ee65de3ff",
+      "current_e993_sha256": "35ca48a07968bad63064dae3c19fce4e6fa02d19c8c0e82cb42e638ee65de3ff",
+      "byteidentical": true
+    },
+    "src/sculpt-gpu-arena.hpp": {
+      "bytes": 20779,
+      "old_b6_sha256": "47b5f65676adc1e924447323c9a542632b5224aca46a1291448680b7755cef39",
+      "current_e993_sha256": "47b5f65676adc1e924447323c9a542632b5224aca46a1291448680b7755cef39",
+      "byteidentical": true
+    }
+  },
+  "hot_member_payloads": [
+    {
+      "member": "sculpt-mask.cpp.o",
+      "bytes": 90816,
+      "old_actual_member_path": "/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-build-20261111/release/CMakeFiles/dome-sculpt-core.dir/src/sculpt-mask.cpp.o",
+      "old_sha256": "958db76c734e5f8bcb73c5fd2e8a9547d1b6f9be9ec440b449d38d776d11c2e0",
+      "current_sha256": "958db76c734e5f8bcb73c5fd2e8a9547d1b6f9be9ec440b449d38d776d11c2e0",
+      "byteidentical": true,
+      "old_historical_link_pin_verified": true
+    },
+    {
+      "member": "mtoon.cpp.o",
+      "bytes": 475488,
+      "old_actual_member_path": "/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-build-20261111/release/CMakeFiles/dome-sculpt-core.dir/src/mtoon.cpp.o",
+      "old_sha256": "161abf7ae7e97078cadbb3f94534434ceadd67ab51b0ff48824039c562270d8d",
+      "current_sha256": "161abf7ae7e97078cadbb3f94534434ceadd67ab51b0ff48824039c562270d8d",
+      "byteidentical": true,
+      "old_historical_link_pin_verified": true
+    },
+    {
+      "member": "local-surface.cpp.o",
+      "bytes": 163096,
+      "old_actual_member_path": "/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-build-20261111/release/CMakeFiles/dome-sculpt-core.dir/src/local-surface.cpp.o",
+      "old_sha256": "38699f2edd7971aed797cc20cd387513b6d558c24d1cbe4731f4b474c7901ad4",
+      "current_sha256": "38699f2edd7971aed797cc20cd387513b6d558c24d1cbe4731f4b474c7901ad4",
+      "byteidentical": true,
+      "old_historical_link_pin_verified": true
+    },
+    {
+      "member": "sculpt-surface-chunks.cpp.o",
+      "bytes": 407336,
+      "old_actual_member_path": "/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-build-20261111/release/CMakeFiles/dome-sculpt-core.dir/src/sculpt-surface-chunks.cpp.o",
+      "old_sha256": "60ea6c590a45ee5b201e930eefd164c67c24c6b17cfa0c8e0cdc76d74a2e4b11",
+      "current_sha256": "60ea6c590a45ee5b201e930eefd164c67c24c6b17cfa0c8e0cdc76d74a2e4b11",
+      "byteidentical": true,
+      "old_historical_link_pin_verified": true
+    },
+    {
+      "member": "sculpt-scene-chunks.cpp.o",
+      "bytes": 118528,
+      "old_actual_member_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-shared-qualification-20261111/release/CMakeFiles/dome-sculpt-core.dir/src/sculpt-scene-chunks.cpp.o",
+      "old_sha256": "2a08ab4b8f8d16b634a06661fa74c1e336cb5289663aea843ff29e5c17a856ea",
+      "current_sha256": "2a08ab4b8f8d16b634a06661fa74c1e336cb5289663aea843ff29e5c17a856ea",
+      "byteidentical": true,
+      "old_historical_link_pin_verified": true
+    },
+    {
+      "member": "sculpt-placed-chunk.cpp.o",
+      "bytes": 32272,
+      "old_actual_member_path": "/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-build-20261111/release/CMakeFiles/dome-sculpt-core.dir/src/sculpt-placed-chunk.cpp.o",
+      "old_sha256": "b5a5d8674b3f00fd928bc4980dcbf47de311a82e30f9d22c14d22f9ca10f0e90",
+      "current_sha256": "b5a5d8674b3f00fd928bc4980dcbf47de311a82e30f9d22c14d22f9ca10f0e90",
+      "byteidentical": true,
+      "old_historical_link_pin_verified": true
+    },
+    {
+      "member": "sculpt-placed-chunks.cpp.o",
+      "bytes": 119032,
+      "old_actual_member_path": "/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-build-20261111/release/CMakeFiles/dome-sculpt-core.dir/src/sculpt-placed-chunks.cpp.o",
+      "old_sha256": "2fca3bc79605edcc471469f562c40d5d2abbdd47a341e0c9a7918c249183c416",
+      "current_sha256": "2fca3bc79605edcc471469f562c40d5d2abbdd47a341e0c9a7918c249183c416",
+      "byteidentical": true,
+      "old_historical_link_pin_verified": true
+    },
+    {
+      "member": "sculpt-chunk-masks.cpp.o",
+      "bytes": 86800,
+      "old_actual_member_path": "/home/blux/de-xr/dome-sculpt/artifacts/plain-gpu-preview-build-20261111/release/CMakeFiles/dome-sculpt-core.dir/src/sculpt-chunk-masks.cpp.o",
+      "old_sha256": "3b347dad996559cbd076549abaadb66ff4e754bd75f89909a78f2573e0ad4749",
+      "current_sha256": "3b347dad996559cbd076549abaadb66ff4e754bd75f89909a78f2573e0ad4749",
+      "byteidentical": true,
+      "old_historical_link_pin_verified": true
+    }
+  ],
+  "actual_profiles": {
+    "baseline_b6": {
+      "run_status": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/sustained-four-objects-shared-20261111/status.json",
+        "sha256": "540dd9cd5e2bc0784ba13f6a6af0d9d7637db636d2df8889754a25f0b2c53c1e"
+      },
+      "raw_result": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/sustained-four-objects-shared-20261111/full-p1/result.json",
+        "sha256": "ad1f5bcb82becf19bfcb1b9e17f66ca2a3c11746c6f05cab7ed6c5bd41dcd306"
+      },
+      "total_seconds": 273.15577294304967,
+      "environment": {
+        "LD_LIBRARY_PATH": "/home/blux/de-xr/dome-sculpt/artifacts/sdk-20261111/toolkit-release/lib:/usr/lib64",
+        "DRI_PRIME": "pci-0000_03_00_0",
+        "EGL_PLATFORM": "surfaceless",
+        "MESA_SHADER_CACHE_DISABLE": "1",
+        "LP_NUM_THREADS": "2"
+      },
+      "recorded_conditions": "Other CPU development/qualification may remain active; exclusive Arc lock required. Record measurements as observed under these conditions.",
+      "recorded_host_before": null,
+      "recorded_host_after": null,
+      "repetitions": [
+        {
+          "index": 0,
+          "timing_summaries_ns": {
+            "stroke": {
+              "wall_ns": {
+                "count": 300,
+                "max_ns": 108186158.0,
+                "mean_ns": 70441700.09,
+                "p50_ns": 71852181.0,
+                "p90_ns": 89006189.0,
+                "p95_ns": 92149154.0,
+                "p99_ns": 102025247.0
+              },
+              "caller_thread_cpu_ns": {
+                "count": 300,
+                "max_ns": 10560617.0,
+                "mean_ns": 7001502.656666666,
+                "p50_ns": 6747425.0,
+                "p90_ns": 8656626.0,
+                "p95_ns": 9161817.0,
+                "p99_ns": 10025735.0
+              },
+              "first_draw_submission_ns": {
+                "count": 300,
+                "max_ns": 13997216.0,
+                "mean_ns": 10590245.89,
+                "p50_ns": 10352145.0,
+                "p90_ns": 12414739.0,
+                "p95_ns": 13009506.0,
+                "p99_ns": 13860060.0
+              },
+              "first_draw_caller_cpu_ns": {
+                "count": 300,
+                "max_ns": 10463230.0,
+                "mean_ns": 6913943.056666667,
+                "p50_ns": 6646347.0,
+                "p90_ns": 8572747.0,
+                "p95_ns": 9091121.0,
+                "p99_ns": 9932701.0
+              }
+            },
+            "mask": {
+              "wall_ns": {
+                "count": 120,
+                "max_ns": 42664347.0,
+                "mean_ns": 38114895.85,
+                "p50_ns": 38655128.0,
+                "p90_ns": 39767223.0,
+                "p95_ns": 40049375.0,
+                "p99_ns": 40407832.0
+              },
+              "caller_thread_cpu_ns": {
+                "count": 120,
+                "max_ns": 3008914.0,
+                "mean_ns": 2194292.3583333334,
+                "p50_ns": 2142567.0,
+                "p90_ns": 2567144.0,
+                "p95_ns": 2717524.0,
+                "p99_ns": 2955129.0
+              },
+              "first_draw_submission_ns": {
+                "count": 120,
+                "max_ns": 9636542.0,
+                "mean_ns": 7136387.258333334,
+                "p50_ns": 7063545.0,
+                "p90_ns": 7503753.0,
+                "p95_ns": 7653642.0,
+                "p99_ns": 7925732.0
+              },
+              "first_draw_caller_cpu_ns": {
+                "count": 120,
+                "max_ns": 2879142.0,
+                "mean_ns": 2056796.6416666666,
+                "p50_ns": 2005248.0,
+                "p90_ns": 2436982.0,
+                "p95_ns": 2614203.0,
+                "p99_ns": 2759410.0
+              }
+            },
+            "view_pair": {
+              "wall_ns": {
+                "count": 2000,
+                "max_ns": 11609336.0,
+                "mean_ns": 9248244.6975,
+                "p50_ns": 9080941.0,
+                "p90_ns": 9741085.0,
+                "p95_ns": 10591550.0,
+                "p99_ns": 11345533.0
+              },
+              "caller_thread_cpu_ns": {
+                "count": 2000,
+                "max_ns": 3939456.0,
+                "mean_ns": 1329415.705,
+                "p50_ns": 1155685.0,
+                "p90_ns": 1840108.0,
+                "p95_ns": 2643498.0,
+                "p99_ns": 3617681.0
+              },
+              "first_draw_submission_ns": {
+                "count": 0
+              },
+              "first_draw_caller_cpu_ns": {
+                "count": 0
+              }
+            },
+            "held_pair": {
+              "wall_ns": {
+                "count": 120,
+                "max_ns": 8856859.0,
+                "mean_ns": 8489576.733333332,
+                "p50_ns": 8479532.0,
+                "p90_ns": 8575382.0,
+                "p95_ns": 8605561.0,
+                "p99_ns": 8680835.0
+              },
+              "caller_thread_cpu_ns": {
+                "count": 120,
+                "max_ns": 1390106.0,
+                "mean_ns": 948323.4833333333,
+                "p50_ns": 920829.0,
+                "p90_ns": 1176290.0,
+                "p95_ns": 1237822.0,
+                "p99_ns": 1334383.0
+              },
+              "first_draw_submission_ns": {
+                "count": 0
+              },
+              "first_draw_caller_cpu_ns": {
+                "count": 0
+              }
+            }
+          },
+          "gpu_elapsed_distribution_ns": {
+            "count": 2000,
+            "max_ns": 10977083.0,
+            "mean_ns": 8557285.8715,
+            "p50_ns": 8516458.0,
+            "p90_ns": 8827604.0,
+            "p95_ns": 9258906.0,
+            "p99_ns": 10239531.0
+          },
+          "valid_gpu_samples": 2000,
+          "positive_size_GL_buffer_calls": {
+            "strokes": 8076,
+            "masks": 81240,
+            "view_pairs": 0,
+            "held_pairs": 0
+          },
+          "capture_CPU_mean_ns": 58272940.906666666,
+          "update_CPU_mean_ns": 57379730.24,
+          "mask_scalar_CPU_mean_ns": 29670337.233333334
+        },
+        {
+          "index": 1,
+          "timing_summaries_ns": {
+            "stroke": {
+              "wall_ns": {
+                "count": 300,
+                "max_ns": 108218396.0,
+                "mean_ns": 70368468.41666667,
+                "p50_ns": 71735074.0,
+                "p90_ns": 89071411.0,
+                "p95_ns": 93654242.0,
+                "p99_ns": 100340903.0
+              },
+              "caller_thread_cpu_ns": {
+                "count": 300,
+                "max_ns": 10371905.0,
+                "mean_ns": 7078331.833333333,
+                "p50_ns": 6861790.0,
+                "p90_ns": 8725914.0,
+                "p95_ns": 9446978.0,
+                "p99_ns": 9831809.0
+              },
+              "first_draw_submission_ns": {
+                "count": 300,
+                "max_ns": 13807334.0,
+                "mean_ns": 10657084.363333333,
+                "p50_ns": 10389364.0,
+                "p90_ns": 12338844.0,
+                "p95_ns": 12980385.0,
+                "p99_ns": 13439994.0
+              },
+              "first_draw_caller_cpu_ns": {
+                "count": 300,
+                "max_ns": 10298023.0,
+                "mean_ns": 6991719.38,
+                "p50_ns": 6786612.0,
+                "p90_ns": 8664702.0,
+                "p95_ns": 9357831.0,
+                "p99_ns": 9760786.0
+              }
+            },
+            "mask": {
+              "wall_ns": {
+                "count": 120,
+                "max_ns": 43544248.0,
+                "mean_ns": 38041757.041666664,
+                "p50_ns": 38511108.0,
+                "p90_ns": 39478127.0,
+                "p95_ns": 39666929.0,
+                "p99_ns": 40477015.0
+              },
+              "caller_thread_cpu_ns": {
+                "count": 120,
+                "max_ns": 3153559.0,
+                "mean_ns": 2259870.05,
+                "p50_ns": 2168333.0,
+                "p90_ns": 2681382.0,
+                "p95_ns": 2875348.0,
+                "p99_ns": 3072612.0
+              },
+              "first_draw_submission_ns": {
+                "count": 120,
+                "max_ns": 9821846.0,
+                "mean_ns": 7179865.216666667,
+                "p50_ns": 7104138.0,
+                "p90_ns": 7550896.0,
+                "p95_ns": 7783729.0,
+                "p99_ns": 8433519.0
+              },
+              "first_draw_caller_cpu_ns": {
+                "count": 120,
+                "max_ns": 3007652.0,
+                "mean_ns": 2124621.2083333335,
+                "p50_ns": 2031768.0,
+                "p90_ns": 2515334.0,
+                "p95_ns": 2741614.0,
+                "p99_ns": 3004788.0
+              }
+            },
+            "view_pair": {
+              "wall_ns": {
+                "count": 2000,
+                "max_ns": 11853478.0,
+                "mean_ns": 9235370.1585,
+                "p50_ns": 9085983.0,
+                "p90_ns": 9658412.0,
+                "p95_ns": 10464421.0,
+                "p99_ns": 11318180.0
+              },
+              "caller_thread_cpu_ns": {
+                "count": 2000,
+                "max_ns": 3957947.0,
+                "mean_ns": 1313603.566,
+                "p50_ns": 1152832.0,
+                "p90_ns": 1768934.0,
+                "p95_ns": 2512158.0,
+                "p99_ns": 3568370.0
+              },
+              "first_draw_submission_ns": {
+                "count": 0
+              },
+              "first_draw_caller_cpu_ns": {
+                "count": 0
+              }
+            },
+            "held_pair": {
+              "wall_ns": {
+                "count": 120,
+                "max_ns": 9011878.0,
+                "mean_ns": 8582285.741666667,
+                "p50_ns": 8578094.0,
+                "p90_ns": 8674030.0,
+                "p95_ns": 8698411.0,
+                "p99_ns": 8886766.0
+              },
+              "caller_thread_cpu_ns": {
+                "count": 120,
+                "max_ns": 1343646.0,
+                "mean_ns": 955204.6083333333,
+                "p50_ns": 964736.0,
+                "p90_ns": 1141882.0,
+                "p95_ns": 1208217.0,
+                "p99_ns": 1329310.0
+              },
+              "first_draw_submission_ns": {
+                "count": 0
+              },
+              "first_draw_caller_cpu_ns": {
+                "count": 0
+              }
+            }
+          },
+          "gpu_elapsed_distribution_ns": {
+            "count": 2000,
+            "max_ns": 11370625.0,
+            "mean_ns": 8563476.172,
+            "p50_ns": 8520000.0,
+            "p90_ns": 8805833.0,
+            "p95_ns": 9307968.0,
+            "p99_ns": 10260260.0
+          },
+          "valid_gpu_samples": 2000,
+          "positive_size_GL_buffer_calls": {
+            "strokes": 8076,
+            "masks": 81240,
+            "view_pairs": 0,
+            "held_pairs": 0
+          },
+          "capture_CPU_mean_ns": 58191399.63333333,
+          "update_CPU_mean_ns": 57306623.27,
+          "mask_scalar_CPU_mean_ns": 29604478.375
+        },
+        {
+          "index": 2,
+          "timing_summaries_ns": {
+            "stroke": {
+              "wall_ns": {
+                "count": 300,
+                "max_ns": 109107425.0,
+                "mean_ns": 68355233.46666667,
+                "p50_ns": 69789899.0,
+                "p90_ns": 86361777.0,
+                "p95_ns": 91007756.0,
+                "p99_ns": 97899713.0
+              },
+              "caller_thread_cpu_ns": {
+                "count": 300,
+                "max_ns": 10002847.0,
+                "mean_ns": 6897478.616666666,
+                "p50_ns": 6623306.0,
+                "p90_ns": 8387805.0,
+                "p95_ns": 8963367.0,
+                "p99_ns": 9814777.0
+              },
+              "first_draw_submission_ns": {
+                "count": 300,
+                "max_ns": 13716558.0,
+                "mean_ns": 10483297.246666666,
+                "p50_ns": 10194842.0,
+                "p90_ns": 12002777.0,
+                "p95_ns": 12702749.0,
+                "p99_ns": 13450482.0
+              },
+              "first_draw_caller_cpu_ns": {
+                "count": 300,
+                "max_ns": 9911220.0,
+                "mean_ns": 6809177.3,
+                "p50_ns": 6528856.0,
+                "p90_ns": 8289596.0,
+                "p95_ns": 8890581.0,
+                "p99_ns": 9710266.0
+              }
+            },
+            "mask": {
+              "wall_ns": {
+                "count": 120,
+                "max_ns": 41182250.0,
+                "mean_ns": 38111439.275,
+                "p50_ns": 38494396.0,
+                "p90_ns": 39447927.0,
+                "p95_ns": 39830765.0,
+                "p99_ns": 40565028.0
+              },
+              "caller_thread_cpu_ns": {
+                "count": 120,
+                "max_ns": 3270905.0,
+                "mean_ns": 2192333.808333333,
+                "p50_ns": 2111227.0,
+                "p90_ns": 2720892.0,
+                "p95_ns": 2912163.0,
+                "p99_ns": 3060605.0
+              },
+              "first_draw_submission_ns": {
+                "count": 120,
+                "max_ns": 10323036.0,
+                "mean_ns": 7141542.216666667,
+                "p50_ns": 7014333.0,
+                "p90_ns": 7585190.0,
+                "p95_ns": 7918991.0,
+                "p99_ns": 8827871.0
+              },
+              "first_draw_caller_cpu_ns": {
+                "count": 120,
+                "max_ns": 3123872.0,
+                "mean_ns": 2054380.25,
+                "p50_ns": 1985402.0,
+                "p90_ns": 2602800.0,
+                "p95_ns": 2674635.0,
+                "p99_ns": 2884769.0
+              }
+            },
+            "view_pair": {
+              "wall_ns": {
+                "count": 2000,
+                "max_ns": 12174009.0,
+                "mean_ns": 9255936.5185,
+                "p50_ns": 9094421.0,
+                "p90_ns": 9765662.0,
+                "p95_ns": 10552680.0,
+                "p99_ns": 11360312.0
+              },
+              "caller_thread_cpu_ns": {
+                "count": 2000,
+                "max_ns": 4028065.0,
+                "mean_ns": 1341410.6335,
+                "p50_ns": 1164086.0,
+                "p90_ns": 1882026.0,
+                "p95_ns": 2653488.0,
+                "p99_ns": 3608437.0
+              },
+              "first_draw_submission_ns": {
+                "count": 0
+              },
+              "first_draw_caller_cpu_ns": {
+                "count": 0
+              }
+            },
+            "held_pair": {
+              "wall_ns": {
+                "count": 120,
+                "max_ns": 8764613.0,
+                "mean_ns": 8586768.508333333,
+                "p50_ns": 8585144.0,
+                "p90_ns": 8666137.0,
+                "p95_ns": 8679098.0,
+                "p99_ns": 8715268.0
+              },
+              "caller_thread_cpu_ns": {
+                "count": 120,
+                "max_ns": 1353781.0,
+                "mean_ns": 925350.3416666667,
+                "p50_ns": 890319.0,
+                "p90_ns": 1184032.0,
+                "p95_ns": 1276486.0,
+                "p99_ns": 1347954.0
+              },
+              "first_draw_submission_ns": {
+                "count": 0
+              },
+              "first_draw_caller_cpu_ns": {
+                "count": 0
+              }
+            }
+          },
+          "gpu_elapsed_distribution_ns": {
+            "count": 2000,
+            "max_ns": 11568489.0,
+            "mean_ns": 8567080.1075,
+            "p50_ns": 8533697.0,
+            "p90_ns": 8803541.0,
+            "p95_ns": 9183697.0,
+            "p99_ns": 10090937.0
+          },
+          "valid_gpu_samples": 2000,
+          "positive_size_GL_buffer_calls": {
+            "strokes": 8076,
+            "masks": 81240,
+            "view_pairs": 0,
+            "held_pairs": 0
+          },
+          "capture_CPU_mean_ns": 56193873.93,
+          "update_CPU_mean_ns": 55303932.916666664,
+          "mask_scalar_CPU_mean_ns": 29556223.633333333
+        }
+      ]
+    },
+    "current_e993": {
+      "run_status": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-query-p1-20261111/status.json",
+        "sha256": "83e862e650ae2851540bfd410a34f67c4617c46c5782badc1230460ed9f0fdb5"
+      },
+      "raw_result": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-query-p1-20261111/full-p1/result.json",
+        "sha256": "b76c21df94500f203f199fe20bd45eae6c0c6073d8b1b6ab96dddce7455adeeb"
+      },
+      "total_seconds": 300.1798035710235,
+      "environment": {
+        "LD_LIBRARY_PATH": "/home/blux/de-xr/dome-sculpt/artifacts/sdk-20261111/toolkit-release/lib:/usr/lib64",
+        "DRI_PRIME": "pci-0000_03_00_0",
+        "EGL_PLATFORM": "surfaceless",
+        "MESA_SHADER_CACHE_DISABLE": "1",
+        "LP_NUM_THREADS": "2"
+      },
+      "recorded_conditions": "Do not execute during other compile/capacity work. Root must explicitly clear both owning closure and CPU capacity gates; common Arc lease is mandatory.",
+      "recorded_host_before": {
+        "utc": "2026-11-11T22:13:27Z",
+        "load_average": [
+          7.07275390625,
+          7.5439453125,
+          7.814453125
+        ],
+        "logical_cpus": 20,
+        "memory_available_bytes": 51111964672
+      },
+      "recorded_host_after": {
+        "utc": "2026-11-11T22:18:28Z",
+        "load_average": [
+          7.18505859375,
+          7.57861328125,
+          7.77294921875
+        ],
+        "logical_cpus": 20,
+        "memory_available_bytes": 50443010048
+      },
+      "repetitions": [
+        {
+          "index": 0,
+          "timing_summaries_ns": {
+            "stroke": {
+              "wall_ns": {
+                "count": 300,
+                "max_ns": 118638357.0,
+                "mean_ns": 81178811.21666667,
+                "p50_ns": 82455378.0,
+                "p90_ns": 100484569.0,
+                "p95_ns": 107938824.0,
+                "p99_ns": 117783413.0
+              },
+              "caller_thread_cpu_ns": {
+                "count": 300,
+                "max_ns": 15458592.0,
+                "mean_ns": 8915871.156666666,
+                "p50_ns": 8661980.0,
+                "p90_ns": 10907346.0,
+                "p95_ns": 11332115.0,
+                "p99_ns": 12049722.0
+              },
+              "first_draw_submission_ns": {
+                "count": 300,
+                "max_ns": 20409003.0,
+                "mean_ns": 13232981.25,
+                "p50_ns": 12937523.0,
+                "p90_ns": 15386086.0,
+                "p95_ns": 15774817.0,
+                "p99_ns": 16774544.0
+              },
+              "first_draw_caller_cpu_ns": {
+                "count": 300,
+                "max_ns": 15363208.0,
+                "mean_ns": 8828199.543333333,
+                "p50_ns": 8568504.0,
+                "p90_ns": 10824634.0,
+                "p95_ns": 11245818.0,
+                "p99_ns": 11971082.0
+              }
+            },
+            "mask": {
+              "wall_ns": {
+                "count": 120,
+                "max_ns": 45776112.0,
+                "mean_ns": 39881678.50833333,
+                "p50_ns": 40229112.0,
+                "p90_ns": 41759033.0,
+                "p95_ns": 42281466.0,
+                "p99_ns": 45079517.0
+              },
+              "caller_thread_cpu_ns": {
+                "count": 120,
+                "max_ns": 3935306.0,
+                "mean_ns": 2698799.1666666665,
+                "p50_ns": 2619263.0,
+                "p90_ns": 3292025.0,
+                "p95_ns": 3448738.0,
+                "p99_ns": 3876597.0
+              },
+              "first_draw_submission_ns": {
+                "count": 120,
+                "max_ns": 10908229.0,
+                "mean_ns": 7801633.958333333,
+                "p50_ns": 7671518.0,
+                "p90_ns": 8709730.0,
+                "p95_ns": 8953877.0,
+                "p99_ns": 9154434.0
+              },
+              "first_draw_caller_cpu_ns": {
+                "count": 120,
+                "max_ns": 3781870.0,
+                "mean_ns": 2555537.0083333333,
+                "p50_ns": 2471067.0,
+                "p90_ns": 3156737.0,
+                "p95_ns": 3242837.0,
+                "p99_ns": 3677781.0
+              }
+            },
+            "view_pair": {
+              "wall_ns": {
+                "count": 2000,
+                "max_ns": 12889619.0,
+                "mean_ns": 9790196.7575,
+                "p50_ns": 9590234.0,
+                "p90_ns": 10734444.0,
+                "p95_ns": 11311402.0,
+                "p99_ns": 11983049.0
+              },
+              "caller_thread_cpu_ns": {
+                "count": 2000,
+                "max_ns": 4169044.0,
+                "mean_ns": 1674758.135,
+                "p50_ns": 1530076.0,
+                "p90_ns": 2318410.0,
+                "p95_ns": 3166719.0,
+                "p99_ns": 3843719.0
+              },
+              "first_draw_submission_ns": {
+                "count": 0
+              },
+              "first_draw_caller_cpu_ns": {
+                "count": 0
+              }
+            },
+            "held_pair": {
+              "wall_ns": {
+                "count": 120,
+                "max_ns": 10514137.0,
+                "mean_ns": 8973276.491666667,
+                "p50_ns": 8851315.0,
+                "p90_ns": 9531438.0,
+                "p95_ns": 9879655.0,
+                "p99_ns": 9992934.0
+              },
+              "caller_thread_cpu_ns": {
+                "count": 120,
+                "max_ns": 1588893.0,
+                "mean_ns": 1155269.7666666666,
+                "p50_ns": 1130024.0,
+                "p90_ns": 1447545.0,
+                "p95_ns": 1508367.0,
+                "p99_ns": 1579089.0
+              },
+              "first_draw_submission_ns": {
+                "count": 0
+              },
+              "first_draw_caller_cpu_ns": {
+                "count": 0
+              }
+            }
+          },
+          "gpu_elapsed_distribution_ns": {
+            "count": 2000,
+            "max_ns": 14612135.0,
+            "mean_ns": 9159531.202,
+            "p50_ns": 9004687.0,
+            "p90_ns": 11477500.0,
+            "p95_ns": 12280312.0,
+            "p99_ns": 13457604.0
+          },
+          "valid_gpu_samples": 2000,
+          "positive_size_GL_buffer_calls": {
+            "strokes": 8076,
+            "masks": 81240,
+            "view_pairs": 0,
+            "held_pairs": 0
+          },
+          "capture_CPU_mean_ns": 66024356.74666667,
+          "update_CPU_mean_ns": 65068383.66,
+          "mask_scalar_CPU_mean_ns": 30705140.866666667
+        },
+        {
+          "index": 1,
+          "timing_summaries_ns": {
+            "stroke": {
+              "wall_ns": {
+                "count": 300,
+                "max_ns": 124110528.0,
+                "mean_ns": 80534137.00666666,
+                "p50_ns": 81219151.0,
+                "p90_ns": 100900416.0,
+                "p95_ns": 105134676.0,
+                "p99_ns": 114212746.0
+              },
+              "caller_thread_cpu_ns": {
+                "count": 300,
+                "max_ns": 14842479.0,
+                "mean_ns": 8920688.86,
+                "p50_ns": 8844788.0,
+                "p90_ns": 10900514.0,
+                "p95_ns": 11225667.0,
+                "p99_ns": 12439092.0
+              },
+              "first_draw_submission_ns": {
+                "count": 300,
+                "max_ns": 19119219.0,
+                "mean_ns": 13186189.826666666,
+                "p50_ns": 13040838.0,
+                "p90_ns": 15202450.0,
+                "p95_ns": 15630820.0,
+                "p99_ns": 16834109.0
+              },
+              "first_draw_caller_cpu_ns": {
+                "count": 300,
+                "max_ns": 14755868.0,
+                "mean_ns": 8833188.466666667,
+                "p50_ns": 8774647.0,
+                "p90_ns": 10813890.0,
+                "p95_ns": 11095671.0,
+                "p99_ns": 12370485.0
+              }
+            },
+            "mask": {
+              "wall_ns": {
+                "count": 120,
+                "max_ns": 44034274.0,
+                "mean_ns": 39916312.93333333,
+                "p50_ns": 39994693.0,
+                "p90_ns": 41897318.0,
+                "p95_ns": 43322678.0,
+                "p99_ns": 43839577.0
+              },
+              "caller_thread_cpu_ns": {
+                "count": 120,
+                "max_ns": 4057603.0,
+                "mean_ns": 2790052.9833333334,
+                "p50_ns": 2744489.0,
+                "p90_ns": 3324186.0,
+                "p95_ns": 3636330.0,
+                "p99_ns": 3823201.0
+              },
+              "first_draw_submission_ns": {
+                "count": 120,
+                "max_ns": 12872861.0,
+                "mean_ns": 7882769.783333333,
+                "p50_ns": 7700660.0,
+                "p90_ns": 8669247.0,
+                "p95_ns": 9000368.0,
+                "p99_ns": 10351600.0
+              },
+              "first_draw_caller_cpu_ns": {
+                "count": 120,
+                "max_ns": 3871808.0,
+                "mean_ns": 2641931.2333333334,
+                "p50_ns": 2606804.0,
+                "p90_ns": 3124806.0,
+                "p95_ns": 3362515.0,
+                "p99_ns": 3768842.0
+              }
+            },
+            "view_pair": {
+              "wall_ns": {
+                "count": 2000,
+                "max_ns": 13512717.0,
+                "mean_ns": 9795971.9895,
+                "p50_ns": 9595212.0,
+                "p90_ns": 10745697.0,
+                "p95_ns": 11302706.0,
+                "p99_ns": 12062473.0
+              },
+              "caller_thread_cpu_ns": {
+                "count": 2000,
+                "max_ns": 4091360.0,
+                "mean_ns": 1688765.3355,
+                "p50_ns": 1549063.0,
+                "p90_ns": 2389424.0,
+                "p95_ns": 3089567.0,
+                "p99_ns": 3860424.0
+              },
+              "first_draw_submission_ns": {
+                "count": 0
+              },
+              "first_draw_caller_cpu_ns": {
+                "count": 0
+              }
+            },
+            "held_pair": {
+              "wall_ns": {
+                "count": 120,
+                "max_ns": 10354946.0,
+                "mean_ns": 9020600.041666666,
+                "p50_ns": 8941663.0,
+                "p90_ns": 9405222.0,
+                "p95_ns": 9589220.0,
+                "p99_ns": 10224083.0
+              },
+              "caller_thread_cpu_ns": {
+                "count": 120,
+                "max_ns": 2043508.0,
+                "mean_ns": 1185820.0666666667,
+                "p50_ns": 1145663.0,
+                "p90_ns": 1467677.0,
+                "p95_ns": 1589727.0,
+                "p99_ns": 1668566.0
+              },
+              "first_draw_submission_ns": {
+                "count": 0
+              },
+              "first_draw_caller_cpu_ns": {
+                "count": 0
+              }
+            }
+          },
+          "gpu_elapsed_distribution_ns": {
+            "count": 2000,
+            "max_ns": 14857187.0,
+            "mean_ns": 9171683.6055,
+            "p50_ns": 8960208.0,
+            "p90_ns": 11705937.0,
+            "p95_ns": 12620468.0,
+            "p99_ns": 13922291.0
+          },
+          "valid_gpu_samples": 2000,
+          "positive_size_GL_buffer_calls": {
+            "strokes": 8076,
+            "masks": 81240,
+            "view_pairs": 0,
+            "held_pairs": 0
+          },
+          "capture_CPU_mean_ns": 65301682.946666665,
+          "update_CPU_mean_ns": 64350021.596666664,
+          "mask_scalar_CPU_mean_ns": 30644914.966666665
+        },
+        {
+          "index": 2,
+          "timing_summaries_ns": {
+            "stroke": {
+              "wall_ns": {
+                "count": 300,
+                "max_ns": 126026050.0,
+                "mean_ns": 80162869.1,
+                "p50_ns": 81872143.0,
+                "p90_ns": 101046609.0,
+                "p95_ns": 104639963.0,
+                "p99_ns": 115044044.0
+              },
+              "caller_thread_cpu_ns": {
+                "count": 300,
+                "max_ns": 14057097.0,
+                "mean_ns": 9029933.476666667,
+                "p50_ns": 8965768.0,
+                "p90_ns": 10943469.0,
+                "p95_ns": 11269997.0,
+                "p99_ns": 12032144.0
+              },
+              "first_draw_submission_ns": {
+                "count": 300,
+                "max_ns": 18820584.0,
+                "mean_ns": 13276917.72,
+                "p50_ns": 13174805.0,
+                "p90_ns": 15331136.0,
+                "p95_ns": 15923082.0,
+                "p99_ns": 16418630.0
+              },
+              "first_draw_caller_cpu_ns": {
+                "count": 300,
+                "max_ns": 13984878.0,
+                "mean_ns": 8940456.496666666,
+                "p50_ns": 8869391.0,
+                "p90_ns": 10859196.0,
+                "p95_ns": 11192535.0,
+                "p99_ns": 11965705.0
+              }
+            },
+            "mask": {
+              "wall_ns": {
+                "count": 120,
+                "max_ns": 44733010.0,
+                "mean_ns": 39697489.5,
+                "p50_ns": 39818001.0,
+                "p90_ns": 41847569.0,
+                "p95_ns": 42895543.0,
+                "p99_ns": 44110004.0
+              },
+              "caller_thread_cpu_ns": {
+                "count": 120,
+                "max_ns": 3805133.0,
+                "mean_ns": 2701925.175,
+                "p50_ns": 2674186.0,
+                "p90_ns": 3113795.0,
+                "p95_ns": 3238588.0,
+                "p99_ns": 3672629.0
+              },
+              "first_draw_submission_ns": {
+                "count": 120,
+                "max_ns": 10576117.0,
+                "mean_ns": 7744440.283333333,
+                "p50_ns": 7689486.0,
+                "p90_ns": 8386233.0,
+                "p95_ns": 8831650.0,
+                "p99_ns": 9414090.0
+              },
+              "first_draw_caller_cpu_ns": {
+                "count": 120,
+                "max_ns": 3656069.0,
+                "mean_ns": 2554440.7666666666,
+                "p50_ns": 2544525.0,
+                "p90_ns": 3000738.0,
+                "p95_ns": 3079601.0,
+                "p99_ns": 3521904.0
+              }
+            },
+            "view_pair": {
+              "wall_ns": {
+                "count": 2000,
+                "max_ns": 12733466.0,
+                "mean_ns": 9636055.678,
+                "p50_ns": 9447545.0,
+                "p90_ns": 10463332.0,
+                "p95_ns": 10992990.0,
+                "p99_ns": 11776357.0
+              },
+              "caller_thread_cpu_ns": {
+                "count": 2000,
+                "max_ns": 4104927.0,
+                "mean_ns": 1620821.0165,
+                "p50_ns": 1484152.0,
+                "p90_ns": 2118587.0,
+                "p95_ns": 2739937.0,
+                "p99_ns": 3747468.0
+              },
+              "first_draw_submission_ns": {
+                "count": 0
+              },
+              "first_draw_caller_cpu_ns": {
+                "count": 0
+              }
+            },
+            "held_pair": {
+              "wall_ns": {
+                "count": 120,
+                "max_ns": 11270707.0,
+                "mean_ns": 8917961.458333334,
+                "p50_ns": 8815540.0,
+                "p90_ns": 9211562.0,
+                "p95_ns": 9941665.0,
+                "p99_ns": 10193670.0
+              },
+              "caller_thread_cpu_ns": {
+                "count": 120,
+                "max_ns": 1583660.0,
+                "mean_ns": 1142425.8916666666,
+                "p50_ns": 1117016.0,
+                "p90_ns": 1454432.0,
+                "p95_ns": 1507832.0,
+                "p99_ns": 1580421.0
+              },
+              "first_draw_submission_ns": {
+                "count": 0
+              },
+              "first_draw_caller_cpu_ns": {
+                "count": 0
+              }
+            }
+          },
+          "gpu_elapsed_distribution_ns": {
+            "count": 2000,
+            "max_ns": 15174114.0,
+            "mean_ns": 9105085.327,
+            "p50_ns": 8858958.0,
+            "p90_ns": 11900000.0,
+            "p95_ns": 12660989.0,
+            "p99_ns": 13955520.0
+          },
+          "valid_gpu_samples": 2000,
+          "positive_size_GL_buffer_calls": {
+            "strokes": 8076,
+            "masks": 81240,
+            "view_pairs": 0,
+            "held_pairs": 0
+          },
+          "capture_CPU_mean_ns": 64949469.86333334,
+          "update_CPU_mean_ns": 63991074.25333333,
+          "mask_scalar_CPU_mean_ns": 30563005.791666668
+        }
+      ]
+    }
+  },
+  "source_line_evidence": {
+    "draw_new_owner_branch": {
+      "source": "src/render.cpp",
+      "line": 847,
+      "permalink": "https://github.com/jebot-git/dome-sculpt/blob/e9931f7286f75746af47d52f2d901b731510cbb5/src/render.cpp#L847"
+    },
+    "transactional_flat": {
+      "source": "src/render.cpp",
+      "line": 215,
+      "permalink": "https://github.com/jebot-git/dome-sculpt/blob/e9931f7286f75746af47d52f2d901b731510cbb5/src/render.cpp#L215"
+    },
+    "force_seal_new_owner_only": {
+      "source": "src/render.cpp",
+      "line": 1228,
+      "permalink": "https://github.com/jebot-git/dome-sculpt/blob/e9931f7286f75746af47d52f2d901b731510cbb5/src/render.cpp#L1228"
+    },
+    "seal_fence_flush": {
+      "source": "src/render-store-ledger.hpp",
+      "line": 89,
+      "permalink": "https://github.com/jebot-git/dome-sculpt/blob/e9931f7286f75746af47d52f2d901b731510cbb5/src/render-store-ledger.hpp#L89"
+    },
+    "collect_zero_timeout": {
+      "source": "src/render-store-ledger.hpp",
+      "line": 138,
+      "permalink": "https://github.com/jebot-git/dome-sculpt/blob/e9931f7286f75746af47d52f2d901b731510cbb5/src/render-store-ledger.hpp#L138"
+    },
+    "atomic_frame_load": {
+      "source": "src/document.cpp",
+      "line": 185,
+      "permalink": "https://github.com/jebot-git/dome-sculpt/blob/e9931f7286f75746af47d52f2d901b731510cbb5/src/document.cpp#L185"
+    },
+    "read_only_pick": {
+      "source": "src/document-interaction.cpp",
+      "line": 191,
+      "permalink": "https://github.com/jebot-git/dome-sculpt/blob/e9931f7286f75746af47d52f2d901b731510cbb5/src/document-interaction.cpp#L191"
+    },
+    "unchanged_arena_owner": {
+      "source": "src/sculpt-gpu-arena.hpp",
+      "line": 188,
+      "permalink": "https://github.com/jebot-git/dome-sculpt/blob/e9931f7286f75746af47d52f2d901b731510cbb5/src/sculpt-gpu-arena.hpp#L188"
+    },
+    "helper_shader_generators": {
+      "source": "src/render-mtoon.hpp",
+      "line": 6,
+      "permalink": "https://github.com/jebot-git/dome-sculpt/blob/e9931f7286f75746af47d52f2d901b731510cbb5/src/render-mtoon.hpp#L6"
+    },
+    "view_timer_scope": {
+      "source": "tests/sculpt-sustained.cpp",
+      "line": 303,
+      "permalink": "https://github.com/jebot-git/dome-sculpt/blob/e9931f7286f75746af47d52f2d901b731510cbb5/tests/sculpt-sustained.cpp#L303"
+    },
+    "positive_size_only_API_counter": {
+      "source": "tests/sculpt-sustained.cpp",
+      "line": 236,
+      "permalink": "https://github.com/jebot-git/dome-sculpt/blob/e9931f7286f75746af47d52f2d901b731510cbb5/tests/sculpt-sustained.cpp#L236"
+    },
+    "native_decode_recompose": {
+      "source": "src/volume.cpp",
+      "line": 92,
+      "permalink": "https://github.com/jebot-git/dome-sculpt/blob/e9931f7286f75746af47d52f2d901b731510cbb5/src/volume.cpp#L92"
+    }
+  },
+  "findings": [
+    {
+      "finding": "No unconditional current per-view material ledger seal/flush.",
+      "evidence": "render.cpp1228 force-seals onlymesh!=cached_;847collect onlychangedowner andmark_used itselfCPU/noGL. Document::frame185 atomicloads andpick_object191const doesnotpublish.",
+      "limit": "Buffer counters prove only positive-sizeData/SubData, not all GL calls; no newcalltrace was run."
+    },
+    {
+      "finding": "No new f473 shader-source/register-pressure branch relative to the actual b6 renderer.",
+      "evidence": "Both967/6492-byte rawGLSLblocks and fullrender-mtoon.hpp exactequal. Oldlinkreceipt proves freshb6renderTU, not27f renderer borrowing; arenaheader andeightactualhotcorememberpayloads match.",
+      "limit": "Compiler program binaries, GPU clocks and scheduling were not recorded; no causal execution claim."
+    },
+    {
+      "finding": "Changed-snapshot transactions contain additional real work.",
+      "evidence": "prepare_flat215\u2013240 creates newbuffer/VAOleases for empty packedMesh, ornewVAO onreuse;changedframe1228forcesglFenceSync+glFlush beforecommit. Earlierb6flatnames were reusable. Emptycurrentpaint inputs do not add builds.",
+      "limit": "Onlychangedowner route; cannot explain steadyunchanged-view p95 on its own. Zero-sizeBufferData, VAOnames andfence/flush are not counted by benchmark236\u2013237."
+    },
+    {
+      "finding": "Observed timing worsens in code paths whose hot object payloads are unchanged.",
+      "evidence": "Capture/updateCPUmeans~58/57ms baseline versus65/64ms current;view callerCPUmedian~1.15\u21921.5ms. GPUelapsedmean~8.56\u21929.14ms butp95~9.25\u219212.52ms;minima also fall, indicating broader distribution.",
+      "limit": "These observations do not establish cause or equal clocks. Oldrun explicitly permits concurrentCPUdevelopment and has nohost/frequency data; currenthostload~7 on20logicalCPUs. NeitherrecordsCPU/GPUclock,power,thermal,affinity orotherGPUclient activity."
+    }
+  ],
+  "scoped_future_option_not_implemented": "Transactional explicitEmptyFlat state for empty packed geometry, avoiding pointless zero-store/VAO construction; skip sharedmaterial-ledger force seal ONLY when no active/retired stores exist in either domain. Must preserve packed\u2194empty transitions, accurateacceptedstats, real-store latest-use fences/debt, stagedarena atomicrollback/commit andfailure/retry controls. It is a dirty-publication optimization candidate, not a demonstrated explanation or fix for unchanged-view tails.",
+  "next_performance_action_not_run": "Root-coordinated paired oldb6/current original full workload in a separately cleared quiet window withCPUcore/frequency andGPUfrequency/power/thermal telemetry; preserve all original counts/timers/assertions/recovery/budgets. Do not label production performance from correctness alone.",
+  "all_audit_jobs_closed": true,
+  "performance_causal_attribution": null,
+  "performance_pass_claim": false,
+  "full_goal_complete": false,
+  "timing_interpretation": "Inclusive capture/update statistics overlap and must not be summed. Overall elapsed also includes cold start, excluded checkpoints and exact native history work; it is not a pure draw-loop metric."
+}

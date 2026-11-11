@@ -1,3 +1,86 @@
+## Integrated authoring and large-mesh query milestone — 2026-11-11
+
+Main now contains the qualified `e9931f72` product source, preserving all prior
+main commits and qualification metadata through `4d19efa7`. Product,
+public/private headers, tests, assets, third-party and CMake/build-source bytes
+remain identical to `e9931f72`. Frozen qualification sources and providers are
+unchanged. No new compilation or test run is claimed for this metadata-only
+merge of the qualified product tree.
+
+Both Release and strict sanitizer profiles completed the audited incremental
+65-target closure: 63 fresh links and two byte-identical qualified consumers,
+using 307 authenticated whole-object providers and a 192-member core with 190
+unchanged members. This is not a fresh whole build. Each actual current run
+passes all 56 selected native/software tests, app version, workspace27 and
+workspace373, with no provider/source drift. Read
+[AUTHORING-ELIGIBLE-OWNERSHIP-20261111.md](AUTHORING-ELIGIBLE-OWNERSHIP-20261111.md).
+
+The original and separate large capacity cases pass on authenticated Arc A770 in
+both profiles: four runs, 64/63 controls per profile, including actual picking,
+global/material/logical IDs, barycentrics, images, unchanged-eye transfers and
+failure recovery. Standalone query caps and shared work limits remain unchanged;
+small exclusion behavior is preserved. The flat geometry ledger defaults to
+1 GiB, the separate sculpt arena retains its 512 MiB bound, and the capacity
+test's 512 MiB endpoint envelope is not a product cap.
+
+All eight current source/plain normal desktop GUI10 and actual-loader XR39 cases
+pass: 196 public checks, strict unsuppressed ASan/UBSan with leak detection 1,
+exact native Save/Undo/Redo/reopen endpoints and R/S canvases. Desktop uses private
+Xvfb; actual EGL work and synthetic real-loader stereo authenticate Arc. This is
+not native-Wayland shell or physical-headset usability acceptance.
+
+The unchanged original full four-object P1 passes correctness, resource and
+timer gates: 900 strokes, 360 masks, 6000 view pairs, 360 held pairs, three
+repetitions, 42 independent checkpoints and 6000/6000 valid timer samples.
+Sampled peak RSS is 4,431,769,600 B, below the original 5 GiB bound. **Performance
+is not accepted:** observed total is 300.18 s versus b6's 273.16 s, with slower
+view/GPU tails. These running-desktop offscreen measurements do not establish
+90 Hz or physical-HMD pacing. Read
+[CURRENT-ELIGIBLE-P1-PUBLIC-20261111.md](CURRENT-ELIGIBLE-P1-PUBLIC-20261111.md)
+for exact scope, limits, conditions, timings and retained evidence.
+
+All earlier source/build/audit/forecast/capacity/policy failures remain preserved;
+none is relabelled by this candidate. No default, installation, desktop session
+or physical-headset session changes. The full original authoring, painting,
+material/baking, UV, rigging/avatar, interoperability, accelerator and performance
+goals remain active and incomplete. Required later controller-mounted
+tool/function/selection trays and spatial node-based editing/history remain
+required, as recorded in
+[ADDITIONAL-REQUIREMENTS-2026-11-11.md](ADDITIONAL-REQUIREMENTS-2026-11-11.md).
+This checkpoint does not narrow the objective or mark the full goal complete.
+
+Earlier checkpoint and pause/pending wording below is historical; this active
+candidate status takes precedence. Root admission remains separate.
+
+## Private large-mesh query repair qualified; owning integration pending — 2026-11-11
+
+Private runtime source `2ef16028` passes matching Release/strict sanitizer controls:
+61 native queries, 64 original 4.8M-vertex/indexed-6.48M controls and 63 separate
+9.6M-vertex controls in each profile. Actual VBO stores include canonical tangents:
+230,400,576 B and 460,801,152 B respectively. Read
+[PACKED-MATERIAL-QUERY-20261111.md](PACKED-MATERIAL-QUERY-20261111.md).
+
+The fix preserves standalone limits, the shared 65536 triangle budget, exact global
+IDs and original small behavior. Independent root probes confirm old small API
+success, intermediate metadata-budget rejection, then final success on identical
+65000-triangle/eight-exclusion inputs; old/fixed logs match byte-for-byte. Read
+[the counterfactual receipt](validation/SMALL-QUERY-POLICY-20261111.json).
+
+Earlier combined `44be6d0d` built all 65 consumers in each profile; a linker-option
+classification error in the driver is preserved separately from the verified
+remaining-link completion. Its actual native/software run remains 54/56 per
+profile, with both original upload-forecast failures intact; workspace27/373 pass.
+The later 48-byte trace and real indexed traversal failures are preserved too.
+None of those raw statuses is relabelled as a pass.
+
+Canonical candidate `e9931f72` in `artifacts/authoring-eligible-integration-20261111`
+has the exact qualified product bytes, with new complete owning/application
+integration being prepared. Appropriate current regression/GUI/XR/hardware/P1
+qualification and main product admission remain required. The full original goal,
+remaining painting/baking/avatar/interoperability/accelerator requirements and
+later controller trays/spatial node editing/history remain active and incomplete.
+No installation or physical session change is claimed.
+
 ## Combined owning build complete; large-scene query repair pending — 2026-11-11
 
 Frozen private source `a904a2d6` completed fresh Release and strict sanitizer
