@@ -1,0 +1,164 @@
+{
+  "state": "CPU-reference-qualified-runtime-oracle-not-executed",
+  "product_source": "775f92b837da757aa5bfb8583e2f426685eade50",
+  "source_rules": [
+    "palette.cpp: GL_SRGB8_ALPHA8 texture, GL_NEAREST min/mag, opaque bitmap alpha!=0 at exactcenter/baseline/advance",
+    "xr.cpp: palette linearOutput=true, actual320RGBA8eyes, +/-32mm anddeclaredFOV/quadpose",
+    "No learned pixelminimum, no privateappstate orcallbacks, no changed6000/240/old117/ROOTconditions"
+  ],
+  "audited_reused_objects": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/CMakeFiles/dome-sculpt-render.dir/src/palette-text.cpp.o": "64635d7bbd1b159c937df4b21715c6eff63497df5d5ab4c91489acdfd4073b44",
+    "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/CMakeFiles/dome-sculpt.dir/src/session-appearance.cpp.o": "76f9f9fd0d92c57935409c09ec8f38b11733707bf5f367576f7c4d9c51938738"
+  },
+  "prototype_tools": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/paint-workflow-dso-build-20261111/font-reference/font-reference-v2.cpp": "1449d00f6ff72f5c54306f2154f47a87ddf282c165f6d704e175b665869cb20c",
+    "/home/blux/de-xr/dome-sculpt/artifacts/paint-workflow-dso-build-20261111/font-reference/font-reference-v2.o": "63f3827ed65180e3c36645d87246470acc6f6e5a4f38ee92da9f6458df5c09b0",
+    "/home/blux/de-xr/dome-sculpt/artifacts/paint-workflow-dso-build-20261111/font-reference/font-reference-v2": "c7ed2e0370ded8fb6979b3474b390a54eb60e5f5e6061f2c95ec0bf0e2ad84da",
+    "/home/blux/de-xr/dome-sculpt/artifacts/paint-workflow-dso-build-20261111/font-reference/visual-reference.hpp": "716911f655b1ce44a6300949e8ed6b0e4203638f092c782d5aa10c0405767a11",
+    "/home/blux/de-xr/dome-sculpt/artifacts/paint-workflow-dso-build-20261111/font-reference/check-diagnostic.cpp": "3693d38f93bfb0e2028e0bd12fa960a41b0c66610b5870c3f44f4ecc07922539",
+    "/home/blux/de-xr/dome-sculpt/artifacts/paint-workflow-dso-build-20261111/font-reference/check-diagnostic": "1f9aee6841dde15490fe4a40b3e3a719cced656c08cb8936f5215d5ed1ff08a9",
+    "/home/blux/de-xr/dome-sculpt/artifacts/paint-workflow-dso-build-20261111/font-reference/titles-v2.json": "688507b89f7eb34f7492ebdaa327f9090976636877e5f45c5ae16a0bf8562566",
+    "/home/blux/de-xr/dome-sculpt/artifacts/paint-workflow-dso-build-20261111/font-reference/diagnostic-comparison.json": "3a38944fe245b7072ba8c5867f12a26b54b61917303f3e69f61f52a69d9892f1"
+  },
+  "font": {
+    "path": "/home/blux/.cache/de-xr/bundled/fonts/unifont-17.0.04.bdf",
+    "sha256": "f2b2952312fa189f8963c85eb50fda14606a6df5d8dbe9e01651138eb2cecea9",
+    "pixels": 16,
+    "manifest": "/home/blux/.cache/de-xr/bundled/fonts/unifont-17.0.04.bdf index=0 pixels=16 scale=1.000000\n",
+    "opacity": 255,
+    "width": 640,
+    "height": 640
+  },
+  "source_masks": {
+    "Brush controls": {
+      "bounds": [
+        265,
+        334,
+        375,
+        345
+      ],
+      "source_ink_texels": 240
+    },
+    "Dome Sculpt": {
+      "bounds": [
+        277,
+        334,
+        362,
+        347
+      ],
+      "source_ink_texels": 204
+    },
+    "Paint filters / controls": {
+      "bounds": [
+        225,
+        334,
+        415,
+        345
+      ],
+      "source_ink_texels": 357
+    },
+    "Painting": {
+      "bounds": [
+        289,
+        334,
+        351,
+        347
+      ],
+      "source_ink_texels": 154
+    },
+    "checkbox-absent": {
+      "bounds": [
+        379,
+        506,
+        387,
+        514
+      ],
+      "source_ink_texels": 0
+    },
+    "checkbox-checked": {
+      "bounds": [
+        379,
+        506,
+        387,
+        514
+      ],
+      "source_ink_texels": 44
+    },
+    "checkbox-unchecked": {
+      "bounds": [
+        379,
+        506,
+        387,
+        514
+      ],
+      "source_ink_texels": 28
+    }
+  },
+  "diagnostic_matches": {
+    "0": {
+      "Painting": {
+        "error": "",
+        "expected_ink_pixels": 13,
+        "matching": true,
+        "mismatches": 0,
+        "observed_ink_pixels": 13,
+        "samples": 132
+      },
+      "checked_vs_unchecked_difference": 1,
+      "unchecked": {
+        "error": "",
+        "expected_ink_pixels": 5,
+        "matching": true,
+        "mismatches": 0,
+        "observed_ink_pixels": 5,
+        "samples": 16
+      }
+    },
+    "1": {
+      "Painting": {
+        "error": "",
+        "expected_ink_pixels": 10,
+        "matching": true,
+        "mismatches": 0,
+        "observed_ink_pixels": 10,
+        "samples": 132
+      },
+      "checked_vs_unchecked_difference": 1,
+      "unchecked": {
+        "error": "",
+        "expected_ink_pixels": 5,
+        "matching": true,
+        "mismatches": 0,
+        "observed_ink_pixels": 5,
+        "samples": 16
+      }
+    }
+  },
+  "diagnostic_raw": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/paint-workflow-dso-build-20261111/release-xr-diagnostic48-v2/runtime.json.field-21-page-evidence-0.ppm.rgba": "9b2424ebaf21c0c2b7613920121e6e085e60ec90e25d8eeed08c9c4e41f72fb3",
+    "/home/blux/de-xr/dome-sculpt/artifacts/paint-workflow-dso-build-20261111/release-xr-diagnostic48-v2/runtime.json.field-21-page-evidence-1.ppm.rgba": "1551568d661348421c47dfe60a4d03a0ef5d9462b85507940ceb7ae70a04572a"
+  },
+  "first_failed_full_XR": {
+    "receipt": "/home/blux/de-xr/dome-sculpt/artifacts/paint-workflow-dso-build-20261111/release-xr-v1/status.json",
+    "sha256": "9eafcc1e279a5faf5b48440a108169323d24f0f47a716a9da5c0ac2ee3effa0b",
+    "exit": 1,
+    "field_step": 21,
+    "physical_frame_ceiling": 6000
+  },
+  "capture_only_diagnostic": {
+    "receipt": "/home/blux/de-xr/dome-sculpt/artifacts/paint-workflow-dso-build-20261111/release-xr-diagnostic48-v2/status.json",
+    "sha256": "2a855b278046e41178f7295b4d6c4736197276e33f26974b69ce30698587a1a1",
+    "frames": 48,
+    "not_full_gate_pass": true
+  },
+  "checkbox_observability": "Expectedchecked andunchecked masks differ1pixel inEACHeye withidenticalbackground. Source-exactshape replacesunjustified>=2checkedprobe; preservesactualvisiblechecked/unchecked/absent distinction. Coarsecounts retaineddiagnostics.",
+  "correction": "GL_NEAREST, not earlierassumedbilinear. Actualfont hasPainting154inktexels; projectionpredicts13left/10right exactly andbothrawimagesmatchwith0mismatches. ROOT9literalexpectedshape isrequired beforeanyshorttitlegate canadvance.",
+  "source_pins": {
+    "tests/gpu-color-blur-font-reference.cpp": "d5093a6e3134568b704f292a38bf42ff271121d7539f8b338c9c3b74e2a7687d",
+    "tests/gpu-color-blur-visual-reference.hpp": "716911f655b1ce44a6300949e8ed6b0e4203638f092c782d5aa10c0405767a11",
+    "tests/gpu-color-blur-runtime.cpp": "fd9adaf602fc2de114fad2917d401a9e18adf3068ba13fe0757934bcc2155fd8",
+    "tests/gpu-color-blur-xr.py": "5241d6323274ef2bba67975a494c99358f4eeedd52bf3739cd119c065f41e722",
+    "CMakeLists.txt": "76760f6d10313bf9160a1eb9af9518841018325f687ccde653ff224f84a22f94"
+  },
+  "remaining": "NeworacleDSOs mustcompileR/S andrealXRgates mustpass; no productGPUbug/rootcause claim fromoldfixturethreshold."
+}

@@ -43,7 +43,7 @@ window screenshots and actual DBus menu properties acknowledge state. Failure
 diagnostics capture root/windows/focus. Limits remain 50 seconds per wait and 900
 seconds per phase. The shell's rendered global menu is outside this Xvfb scope.
 
-`tests/gpu-color-blur-xr.py APP RUNTIME INSPECTOR MANIFEST OUTPUT` loads the separate
+`tests/gpu-color-blur-xr.py APP RUNTIME INSPECTOR MANIFEST TITLE_REFERENCE OUTPUT` loads the separate
 `dome-sculpt-gpu-color-blur-runtime` module. It derives genuine loader/swapchain
 plumbing from the retained public-ack runtime and supplies synthetic OpenXR
 Boolean/vector/pose input. Independent left/right released stereo pixels acknowledge actual radial
@@ -94,3 +94,32 @@ Producer v3 completed57853 controls, but its coordinator then expected i915 in
 the wrong text file. Its failed raw status remains. Corrected v4 independently
 checks stdout/sysfs driver identity and records native exit0 before acceptance.
 The native receipt pins all outcomes and exact unchanged root providers.
+
+The first full XR case failed at its original6000-frame ceiling on Painting21,
+before any blur. The generic12-nearly-white-title-pixel condition admitted left13
+and rejected right10. Original images lacked a failed-right capture; the new
+diagnostic code captures both first/evidence/ready views and raw linearRGBA8
+without changing acceptance. A separately labelled48-frame diagnostic then
+captured both eyes; it is not a full-gate pass.
+
+Source audit found GL_NEAREST in palette.cpp, rather than bilinear filtering.
+A pure CPU reference generator now uses the audited native palette font layout
+and session appearance, exact640px bitmap placement, selected BDF and actual eye
+projection. Painting's154source ink texels project to13left/10right; both actual
+diagnostic images match the predicted pattern with zero pixel mismatches. No
+observed minimum is baked into the validator. New ROOT9 must first match the
+literal source-font pattern/pose, then each page matches its own complete title.
+The old ROOT foreground/history/closure conditions, original117 module and all
+6000/240 limits remain.
+
+The same source geometry generates the8x8 checkbox border,4x4 fill and absent
+Filters marker. Checked versus unchecked differs by one actually observable
+pixel in each320px eye with identical cell backgrounds. An exact full-pattern
+comparison replaces the unjustified two-pixel filled-center probe; coarse counts
+remain diagnostics. This preserves the meaning of both-eye checked/unchecked/
+absent proof. New font references are explicit immutable test inputs, generated
+without GL or an application callback. The CPU receipt pins font/session object
+hashes, BDF contents, source masks, actual raw captures and zero-mismatch results.
+These oracle changes still need the real full XR qualification.
+
+Generate the immutable title/stencil reference with `dome-sculpt-gpu-color-blur-font-reference OUTPUT.json` under the same private appearance settings. The XR script pins both that file and its selected BDF. The source reference generator performs no GL work. ROOT9 recognition validates the actual font and declared pose before the page oracles are trusted.

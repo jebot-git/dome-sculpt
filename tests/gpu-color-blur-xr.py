@@ -6,11 +6,11 @@ only synthetic controller actions and released GL images drive this test.
 import hashlib,json,os,signal,subprocess,sys,time,shutil
 from pathlib import Path
 signal.pthread_sigmask(signal.SIG_SETMASK,[])
-if len(sys.argv)!=6:raise SystemExit('usage: gpu-color-blur-xr.py APP RUNTIME INSPECTOR FIXTURE_MANIFEST OUTPUT')
-app,runtime,inspector,manifest_path,out=map(lambda p:Path(p).resolve(),sys.argv[1:]);out.mkdir(parents=True,exist_ok=True)
-manifest=json.loads(manifest_path.read_text());fixtures={k:manifest_path.parent/v for k,v in manifest['files'].items()}
+if len(sys.argv)!=7:raise SystemExit('usage: gpu-color-blur-xr.py APP RUNTIME INSPECTOR FIXTURE_MANIFEST TITLE_REFERENCE OUTPUT')
+app,runtime,inspector,manifest_path,title_reference,out=map(lambda p:Path(p).resolve(),sys.argv[1:]);out.mkdir(parents=True,exist_ok=True)
+title_manifest=json.loads(title_reference.read_text());font_file=Path(title_manifest['font_file']);manifest=json.loads(manifest_path.read_text());fixtures={k:manifest_path.parent/v for k,v in manifest['files'].items()}
 sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
-pins={str(p):sha(p) for p in [app,runtime,inspector,manifest_path,Path(__file__).resolve(),*fixtures.values()]}
+pins={str(p):sha(p) for p in [app,runtime,inspector,manifest_path,title_reference,font_file,Path(__file__).resolve(),*fixtures.values()]}
 checks=[];case_reports=[];process=None
 
 def report(complete=False,error=None):
@@ -29,7 +29,7 @@ def drive_case(name,mode):
  case=out/name;case.mkdir(exist_ok=False);home=case/'home';home.mkdir();gates=case/'gates';gates.mkdir();project=case/'input.dsculpt';project.write_bytes(fixtures[source_key].read_bytes());result=case/'final.dsculpt';runtime_report=case/'runtime.json';runtime_manifest=case/'loader.json'
  runtime_manifest.write_text(json.dumps({'file_format_version':'1.0.0','runtime':{'library_path':str(runtime)}}))
  env={k:v for k,v in os.environ.items() if not k.startswith('DOME_XR_FIXTURE_') and not k.startswith('DOME_XR_PAINT_') and not k.startswith('DOME_XR_TEXTURE_')}
- env.update({'XR_RUNTIME_JSON':str(runtime_manifest),'DOME_XR_FIXTURE_REPORT':str(runtime_report),'DOME_XR_PAINT_BLUR':mode,'DOME_XR_PAINT_GATES':str(gates),'HOME':str(home),'XDG_RUNTIME_DIR':str(home/'runtime'),'XDG_CONFIG_HOME':str(home/'config'),'XDG_STATE_HOME':str(home/'state'),'XDG_CACHE_HOME':str(home/'cache'),'LP_NUM_THREADS':'2','MESA_SHADER_CACHE_DISABLE':'true'})
+ env.update({'XR_RUNTIME_JSON':str(runtime_manifest),'DOME_XR_FIXTURE_REPORT':str(runtime_report),'DOME_XR_PAINT_BLUR':mode,'DOME_XR_PAINT_GATES':str(gates),'DOME_XR_PAINT_TITLE_REFERENCE':str(title_reference),'HOME':str(home),'XDG_RUNTIME_DIR':str(home/'runtime'),'XDG_CONFIG_HOME':str(home/'config'),'XDG_STATE_HOME':str(home/'state'),'XDG_CACHE_HOME':str(home/'cache'),'LP_NUM_THREADS':'2','MESA_SHADER_CACHE_DISABLE':'true'})
  for k in ['WAYLAND_DISPLAY','WAYLAND_SOCKET']:env.pop(k,None)
  if os.environ.get('DOME_BLUR_APP_PRELOAD'):env['LD_PRELOAD']=os.environ['DOME_BLUR_APP_PRELOAD']
  for k in ['XDG_RUNTIME_DIR','XDG_CONFIG_HOME','XDG_STATE_HOME','XDG_CACHE_HOME']:Path(env[k]).mkdir(mode=0o700)
@@ -65,10 +65,11 @@ def drive_case(name,mode):
  check(project.read_bytes()!=fixtures['original'].read_bytes(),name+': real controller Save replaced the writable project, not its immutable original fixture')
  state=stable_json(runtime_report);check(state.get('frames_waited')==state.get('frames_begun')==state.get('frames_ended') and state.get('acquires')==state.get('image_waits')==state.get('releases') and state.get('swapchains_destroyed')==2,name+': real loader balances all stereo frame/image/session ownership')
  check(state.get('left_eye_nonblank',0)>0 and state.get('right_eye_nonblank',0)>0 and state.get('palette_images',0)>0 and all(str(step)+'-page-ready-'+str(eye) in state.get('field_captures',{}) for step in [21,31,43,49,55] for eye in [0,1]),name+': both real GL eyes capture actual brush Filters and Blur palette navigation')
+ check(all(state.get('blur_root_font_shape',{}).get(eye,{}).get('matching') is True for eye in ['0','1']),name+': both ROOT9 images first match the source-font bitmap and actual eye projection')
  for eye in ['0','1']:
   for step in [21,31,43,49,55]:
-   ui=state.get('blur_page_ui',{}).get(str(step),{}).get(eye,{});check(ui.get('ready') is True and ui.get('checkbox_state_valid') is True and ui.get('label_bright_pixels',0)>=6 and ui.get('selected_pixels',0)*4>=ui.get('selected_samples',1)*3 and ui.get('last',0)-ui.get('first',0)>=2,name+': eye'+eye+' page'+str(ui.get('page'))+' publicly presents the actual highlighted label before its controller click')
-  ui=state.get('blur_page_ui',{});check(ui.get('21',{}).get(eye,{}).get('erase_checkbox_fill_pixels')==0 and ui.get('43',{}).get(eye,{}).get('erase_checkbox_fill_pixels',0)>=2 and ui.get('49',{}).get(eye,{}).get('erase_checkbox_mark_pixels')==0,name+': eye'+eye+' real Painting Erase becomes checked while Filters navigation remains unmarked')
+   ui=state.get('blur_page_ui',{}).get(str(step),{}).get(eye,{});check(ui.get('ready') is True and ui.get('title_shape',{}).get('matching') is True and ui.get('checkbox_state_valid') is True and ui.get('label_bright_pixels',0)>=6 and ui.get('selected_pixels',0)*4>=ui.get('selected_samples',1)*3 and ui.get('last',0)-ui.get('first',0)>=2,name+': eye'+eye+' page'+str(ui.get('page'))+' publicly presents the actual highlighted label before its controller click')
+  ui=state.get('blur_page_ui',{});check(ui.get('21',{}).get(eye,{}).get('erase_checkbox_fill_pixels')==0 and ui.get('43',{}).get(eye,{}).get('checkbox_shape',{}).get('matching') is True and ui.get('43',{}).get(eye,{}).get('checkbox_distinguishing_pixels',0)>0 and ui.get('49',{}).get(eye,{}).get('erase_checkbox_mark_pixels')==0,name+': eye'+eye+' real Painting Erase becomes checked while Filters navigation remains unmarked')
  check({8,14,20,26,30,36,42,48,54,60}.issubset({v['step'] for v in state.get('field_buttons',[])}) and not state.get('field_pressures',[]),name+': real loader Boolean/vector actions navigate the complete route and blur without inventing a paint stroke')
  if history:check(any(v['action']=='undo' and v['step']==74 for v in state.get('field_buttons',[])) and any(v['action']=='redo' and v['step']==88 for v in state.get('field_buttons',[])),name+': real loader Boolean history actions produce one exact Undo and Redo')
  renderer=os.environ.get('DOME_BLUR_XR_REQUIRE_RENDERER','Arc');check(renderer in state.get('gl_renderer','') and 'llvmpipe' not in state.get('gl_renderer','').lower(),name+': actual stereo context uses the explicitly required hardware renderer')

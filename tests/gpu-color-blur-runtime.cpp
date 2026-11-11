@@ -3,6 +3,7 @@
 // Source base tests/xr_runtime.cpp SHA256 9ecf93ce86fbd1d33b20ee39acb34ae4659cf9cdefd5135f7ceabba3ef5a063a
 // Reuses actual loader/swapchain plumbing; blur actions and native Save gates are below.
 #include "../include/dome/bake-distance.hpp"
+#include "gpu-color-blur-visual-reference.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 // A deterministic OpenXR test runtime. It creates real GL swapchain images;
 // poses and actions are synthetic fixtures, never evidence of hardware
@@ -64,6 +65,14 @@ std::array<std::map<unsigned,std::pair<unsigned,unsigned>>,2> field_root_visible
 std::array<std::map<unsigned,std::pair<unsigned,unsigned>>,2> field_menu_closed;
 std::array<bool,2> field_root_eye_open{};
 bool field_root_open=false;
+blur_visual_reference::Reference&visual_reference(){
+ const auto*file=getenv("DOME_XR_PAINT_TITLE_REFERENCE");if(!file)throw std::runtime_error("Missing source-font reference input");static blur_visual_reference::Reference reference(file);return reference;
+}
+blur_visual_reference::Match visual_match(const std::string&name,int eye,int width,int height,std::span<const uint8_t>pixels,blur_visual_reference::Background background=blur_visual_reference::Background::Panel,bool empty=false){
+ try{return visual_reference().match(name,eye,width,height,pixels,background,empty);}catch(const std::exception&e){blur_visual_reference::Match m;m.error=e.what();return m;}
+}
+size_t visual_checkbox_difference(int eye,int width,int height){try{return visual_reference().difference("checkbox-checked","checkbox-unchecked",eye,width,height);}catch(...){return 0;}}
+
 
 std::string field_mode(){const auto*p=getenv("DOME_XR_PAINT_BLUR");return p?p:"";}
 bool field_history(){return field_mode()=="apply";}
@@ -553,7 +562,12 @@ FN(ReleaseSwapchainImage, XrSwapchain p, const XrSwapchainImageReleaseInfo *) {
       std::vector<uint8_t> signature;
       pixels(245,334,395,358,[&](int r,int g,int b){signature.push_back(r>180&&g>180&&b>180);});
       const auto lit=std::count(signature.begin(),signature.end(),uint8_t(1));
-      if(field_step==9&&lit>=12){field_root_signature=signature;report["field_root_signature_pixels"][std::to_string(s->eye)]=lit;}
+      if(field_step==9){
+        const auto root_shape=visual_match("Dome Sculpt",s->eye,s->width,s->height,bytes);report["blur_root_font_shape"][std::to_string(s->eye)]=root_shape.json();
+        // Keep the inherited ROOT foreground condition, additionally requiring
+        // the literal source bitmap at the actual eye projection before use.
+        if(lit>=12&&root_shape.matching){field_root_signature=signature;report["field_root_signature_pixels"][std::to_string(s->eye)]=lit;}
+      }
       const bool same=!field_root_signature.empty()&&signature==field_root_signature;
       // Four empty panel margins distinguish an absent palette from a changed
       // title or page. Dark bg=(31,37,45), fg=(231,235,241), disabled fg is their
@@ -590,9 +604,20 @@ FN(ReleaseSwapchainImage, XrSwapchain p, const XrSwapchainImageReleaseInfo *) {
         const int ex=int(320+220*std::cos(erase_angle)),ey=int(320-220*std::sin(erase_angle));
         pixels(ex-48,ey-1,ex-47,ey,[&](int r,int g,int b){erase_fill+=r>180&&g>180&&b>180;});
         pixels(ex-52,ey-5,ex-43,ey+4,[&](int r,int g,int b){erase_mark+=r>180&&g>180&&b>180;});
-        const bool checkbox=field_step==21?(erase_fill==0&&erase_mark>=4):field_step==43?erase_fill>=2:field_step==49?erase_mark==0:true;
-        const bool ready=panel&&lit>=12&&selected_samples&&selected_pixels*4>=selected_samples*3&&label_bright>=6&&checkbox&&(field_step!=31||same);
+        const char*title=field_step==31?"Dome Sculpt":field_step==49?"Brush controls":field_step==55?"Paint filters / controls":"Painting";
+        const auto title_shape=visual_match(title,s->eye,s->width,s->height,bytes);
+        const size_t checkbox_difference=visual_checkbox_difference(s->eye,s->width,s->height);
+        blur_visual_reference::Match checkbox_shape;bool checkbox=true;
+        if(field_step==21||field_step==43||field_step==49){
+          const bool absent=field_step==49;const char*mask=absent?"checkbox-absent":field_step==43?"checkbox-checked":"checkbox-unchecked";
+          checkbox_shape=visual_match(mask,s->eye,s->width,s->height,bytes,field_step==43?blur_visual_reference::Background::Cell:blur_visual_reference::Background::Accent,absent);
+          checkbox=checkbox_shape.matching&&checkbox_difference>0;
+          if(field_step==21)checkbox=checkbox&&erase_fill==0&&erase_mark>=4;
+          if(absent)checkbox=checkbox&&erase_mark==0;
+        }
+        const bool ready=panel&&title_shape.matching&&selected_samples&&selected_pixels*4>=selected_samples*3&&label_bright>=6&&checkbox&&(field_step!=31||same);
         auto&detail=report["blur_page_ui"][std::to_string(field_step)][std::to_string(s->eye)];detail={{"page",field_step==31?0:field_step==49?6:field_step==55?32:3},{"sector",sector},{"panel_present",panel},{"title_pixels",lit},{"label_bright_pixels",label_bright},{"selected_pixels",selected_pixels},{"selected_samples",selected_samples},{"erase_checkbox_fill_pixels",erase_fill},{"erase_checkbox_mark_pixels",erase_mark},{"checkbox_state_valid",checkbox},{"ready",ready}};
+        detail["title_reference"]=title;detail["title_shape"]=title_shape.json();detail["checkbox_shape"]=checkbox_shape.json();detail["checkbox_distinguishing_pixels"]=checkbox_difference;
         if(ready){auto[it,first]=page_visible.try_emplace(field_step,physical_frame,physical_frame);it->second.second=physical_frame;detail["first"]=it->second.first;detail["last"]=physical_frame;}
         else page_visible.erase(field_step);
       }
@@ -613,10 +638,10 @@ FN(ReleaseSwapchainImage, XrSwapchain p, const XrSwapchainImageReleaseInfo *) {
     }
     report["field_images"][std::to_string(field_step)][std::to_string(s->eye)]=std::count_if(bytes.begin(),bytes.end(),[](uint8_t v){return v!=0;});
     const bool save_attempt=field_history()&&(field_step==64||field_step==78||field_step==92);
-    const bool capture=blur_page_gate()||field_step==59||field_step==61||field_step==65||field_step==68||field_step==96||save_attempt;
+    const bool capture=field_step==9||blur_page_gate()||field_step==59||field_step==61||field_step==65||field_step==68||field_step==96||save_attempt;
     const bool root_capture=field_root_gate()&&field_root_visible[s->eye].contains(field_step)&&field_root_visible[s->eye].at(field_step).second==physical_frame;
     const bool closed_capture=field_close_gate()&&field_menu_closed[s->eye].contains(field_step)&&field_menu_closed[s->eye].at(field_step).second==physical_frame;
-    const bool waiting_capture=(blur_page_gate()||field_root_gate()||field_close_gate()||(field_history()&&(field_step==67||field_step==81||field_step==95)))&&physical_frame%300==0;
+    const bool waiting_capture=(field_step==9||blur_page_gate()||field_root_gate()||field_close_gate()||(field_history()&&(field_step==67||field_step==81||field_step==95)))&&physical_frame%300==0;
     const auto key=std::to_string(field_step)+(waiting_capture?"-wait-"+std::to_string(physical_frame)+"-":root_capture?"-root-":closed_capture?"-closed-":"-")+std::to_string(s->eye);
     auto save_image=[&](const std::string&name){
       if(report["field_captures"].contains(name))return;
