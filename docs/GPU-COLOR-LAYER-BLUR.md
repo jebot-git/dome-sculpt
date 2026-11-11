@@ -132,8 +132,9 @@ elapsed). Those failures remain recorded. Explicit test-only
 with a bounded 600-second allowance; they passed in 77.17s and 157.09s respectively.
 Those are separate instrumentation results, not a claim that the original
 180-second attempts passed. Defaults and product deadlines remain unchanged.
-Compact receipts pin actual sources, commands, outputs, retained failures and
-their verification limits.
+The [source-pinned compact receipt](validation/GPU-COLOR-LAYER-BLUR-20261111.json)
+retains actual sources, commands, outputs, original failures and verification
+limits.
 
 Reproduction targets are `dome-sculpt-gpu-color-blur-kernel-test`,
 `dome-sculpt-gpu-color-blur-native-test`, `dome-sculpt-native-graphics-shared-test`
