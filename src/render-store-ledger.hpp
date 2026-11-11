@@ -65,7 +65,7 @@ private:
   Node(Kind k,Domain d,Group g,size_t b,size_t m,std::vector<Node*>p):kind(k),domain(d),group(g),bytes(b),metadata(m),dependencies(std::move(p)){}
  };
  Limits limits_;std::array<Usage,2> usage_{};std::vector<Usage> groups_{1};std::list<Node> nodes_;
- size_t metadata_=4096+128;bool terminal_=false,dirty_=false,epoch_exhausted_=false;
+ size_t metadata_=4096+512;bool terminal_=false,dirty_=false,epoch_exhausted_=false;
  uint64_t used_=0,sealed_=0,completed_=0;GLsync fence_=nullptr;
  enum class Error {None,CreateFence,QueryFence,DeleteStore};Error error_=Error::None;GLenum gl_error_=GL_NO_ERROR;
  static size_t index(Domain d)noexcept{return d==Domain::Material?0:1;}
@@ -99,7 +99,8 @@ public:
  explicit ContextStoreLedger(Limits l):limits_(l){if(l.metadata_bytes<metadata_)throw std::length_error("GPU store fixed CPU metadata budget exceeded");}
  ContextStoreLedger(const ContextStoreLedger&)=delete;ContextStoreLedger&operator=(const ContextStoreLedger&)=delete;
  ~ContextStoreLedger(){clear(true);}
- Group create_group(){active();if(groups_.size()>=1024||metadata_>limits_.metadata_bytes||128>limits_.metadata_bytes-metadata_)throw std::length_error("GPU store group CPU metadata budget exceeded");groups_.emplace_back();metadata_+=128;return Group(groups_.size()-1);}
+ // 512B/group includes old-plus-new Usage-vector capacity during growth.
+ Group create_group(){active();if(groups_.size()>=1024||metadata_>limits_.metadata_bytes||512>limits_.metadata_bytes-metadata_)throw std::length_error("GPU store group CPU metadata budget exceeded");groups_.emplace_back();metadata_+=512;return Group(groups_.size()-1);}
  Usage usage(Domain d)const noexcept{return usage_[index(d)];}
  Usage usage(Group g)const{if(g>=groups_.size())throw std::out_of_range("Unknown GPU store group");return groups_[g];}
  size_t metadata_bytes()const noexcept{return metadata_;}
