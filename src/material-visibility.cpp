@@ -14,6 +14,7 @@
 #include "dome/color-paint-sampling.hpp"
 #include "prepared-color-state.hpp"
 #include "paint-overlay-alpha.hpp"
+#include "current-paint-preview.hpp"
 #include "source-vrm1-background.hpp"
 #include "sculpt-placed-chunks.hpp"
 namespace dome {
@@ -50,6 +51,7 @@ struct Visibility {
   std::optional<MToonMaterial> toon;
   PaintSourceTexture color, mask, coverage, pbr;
   std::shared_ptr<const detail::PaintOverlayPacket> overlay;
+  std::shared_ptr<const detail::CurrentGridPaintPreview> current_grid;
   const ImportedPrimitive *primitive = nullptr;
   std::shared_ptr<const std::vector<std::array<float,2>>> owned_uv0;
   std::shared_ptr<const std::vector<std::array<float,2>>> owned_uv1;
@@ -123,7 +125,8 @@ struct Visibility {
     const bool sealed=sealed24||detail::native_frame_preview_metadata(r.material_bindings,r.paint_sampling_attachment);
     const bool prepared=detail::prepared_color_state(r.material_bindings.get(),maps.get(),!sealed);
     if (maps) {
-      if (maps->source_only) {
+      if(maps->current_grid_preview){current_grid=maps->current_grid_preview;current_grid->authenticate_range(mesh,r,true);factor=1;}
+      else if (maps->source_only) {
         auto present=[](const Image &i){return i.width || i.height || !i.rgba.empty();};
         if(!maps->source_maps || present(maps->color) || present(maps->metal_rough) ||
            present(maps->emission) || present(maps->normal) || present(maps->color_coverage) ||
@@ -276,7 +279,8 @@ struct Visibility {
         if(replacement!=0)opacity = sample(derived, primary) + (opacity - range.material.color[3]*sample(pbr,primary)) * (1-replacement);
       }
     } else {
-      opacity = factor * sample(color, color.texcoord!=0?uv(m,triangle,bary,color.texcoord):sampling);
+      opacity = current_grid?current_grid->sample_alpha(sampling[0],sampling[1]):
+        factor * sample(color, color.texcoord!=0?uv(m,triangle,bary,color.texcoord):sampling);
       if(overlay){const auto paint=detail::sample_overlay_alpha(*overlay,sampling[0],sampling[1],true);
         opacity=opacity*(1-paint.coverage)+paint.premultiplied;}
       if(!vertex_colors.empty()){float a=0;for(size_t k=0;k<3;++k)a+=bary[k]*vertex_colors.at(m.indices[first+k]-range.first_vertex)[3];opacity*=a;}

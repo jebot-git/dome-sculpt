@@ -2,6 +2,7 @@
 #include "texture-set-worker.hpp"
 #include "affine-surface.hpp"
 #include "paint-overlay-packet.hpp"
+#include "current-paint-preview.hpp"
 #include "polygon-surface-preview.hpp"
 #include <limits>
 namespace dome::detail {
@@ -13,6 +14,7 @@ size_t map_bytes(const TextureMaps&m){
   if(i->rgba.size()>SIZE_MAX-bytes)throw std::length_error("Texture-set map storage overflow");bytes+=i->rgba.size();
  }
  if(m.overlay){const auto extra=m.overlay->storage_bytes();if(extra>SIZE_MAX-bytes)throw std::length_error("Texture-set overlay storage overflow");bytes+=extra;}
+ if(m.current_grid_preview){const auto extra=m.current_grid_preview->layers()->storage_bytes();if(extra>SIZE_MAX-bytes)throw std::length_error("Texture-set current-grid storage overflow");bytes+=extra;}
  return bytes;
 }
 }
@@ -53,10 +55,14 @@ void append_texture_set_surface(MeshSnapshot&snapshot,const ObjectSurface&o,
  preview_work+=corners+vertices;
  for(const auto&field:plan->fields()){
   const size_t pixels=size_t(field.painted->resolution())*field.painted->resolution();
-  // Plain composite maps, coverage, legacy normal and native F32 preview packet
-  // plus its detached compositing scratch; complex source fields remain guarded.
-  charge(bytes,pixels,128,limits);
   const auto layers=field.painted->layers().size();
+  if(view.render_only&&CurrentGridPaintPreview::eligible_field(plan->object(),field)){
+   // The renderer borrows actual COW inputs and padding: no dense CPU colour,
+   // normal or FLOAT composite is created. Charge retained native stores plus
+   // captured sparse owner directories and exact alpha-classification metadata.
+   charge(bytes,1,field.painted->storage_bytes(),limits);
+   charge(bytes,pixels/1024,layers*3*sizeof(std::shared_ptr<const PaintTile>)+8,limits);
+  }else charge(bytes,pixels,128,limits);
   if(pixels&&(layers+1)>(limits.maximum_work-preview_work)/pixels/32)throw std::length_error("Texture-set field preview exceeds its charged work bound");
   preview_work+=pixels*(layers+1)*32;
  }
@@ -68,7 +74,7 @@ void append_texture_set_surface(MeshSnapshot&snapshot,const ObjectSurface&o,
  std::vector<SurfaceRange>ranges;ranges.reserve(plan->draws().size());
  for(size_t f=0;f<plan->draws().size();++f){
   stop(limits);if(!plan->draws()[f].count)continue;
-  auto proof=prepare_texture_set_range(plan,layout,f,first,offset,limits.cancelled);
+  auto proof=prepare_texture_set_range(plan,layout,f,first,offset,limits.cancelled,view.render_only);
   SurfaceRange range{o.id,proof->first_index(),proof->draw().count,proof->field().material,proof->textures(),nullptr,offset};
   range.object_world=world;range.world_frame_valid=!affine;if(frame)range.affine_world=frame->world();
   if(const auto&packet=range.textures->polygon_surface){packet->validate_world(frame->world(),1e-6,limits.cancelled);range.material_bindings=proof->field().material_bindings;range.paint_sampling_attachment=packet->attachment();range.source_frame=true;range.source_normal_only=packet->model()==PolygonSurfaceNormalModel::NativeNOnly;}

@@ -52,7 +52,7 @@ bool SculptObjectChunks::reflected() const {return affine&&affine->orientation()
 std::vector<ObjectSurface> SculptScenePreviewAccess::surfaces(const Scene &scene,
     const LocalSurfaceCache::Cancel &cancel,const Scene::SculptMesher &mesher,
     const std::function<bool(const SculptObject &)> &capture) {
-  return scene.surfaces_impl(false,true,cancel,mesher,true,&capture);
+  return scene.surfaces_impl(false,true,cancel,mesher,true,&capture,true);
 }
 const SculptObjectChunks *SculptSceneChunks::find(uint64_t object) const {
   auto i=std::find_if(objects_.begin(),objects_.end(),[&](const auto &o){return o.object==object;});
