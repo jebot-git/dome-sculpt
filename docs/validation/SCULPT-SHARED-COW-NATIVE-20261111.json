@@ -1,0 +1,359 @@
+{
+  "state": "focused-shared-COW-native-qualified",
+  "date": "2026-11-11",
+  "product_source": "b6e366fd8c45829b00bc1d1327ecdfc25aeedf49",
+  "qualified_source_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-shared-instances-20261111",
+  "scope": "Independent source audit plus Release/SAN native pipeline/local/surface/manual-workspace consumers built against a complete new sculpt-scene-chunks TU in a replacement thin core archive using191 exact audited current f473 TextureMaps-ABI owning objects. No product edits, whole-fresh core/app, GPU or production four-object benchmark acceptance.",
+  "unchanged_providers_source": "f47348eb (documentation seal; product1452ddec, extended consumeracff27fe)",
+  "profiles": {
+    "release": {
+      "status": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-shared-qualification-20261111/release-status.json",
+        "sha256": "819aed2770a7bd15e58892d5d12ae476610496dfa18405920148b98d21ea25fb"
+      },
+      "scope": "Focused native CPU composition: one fresh whole sculpt-scene-chunks TU, replacement thin core archive with 191 exact current f473 ABI objects, six fresh test TUs and five fresh consumer links. No whole-fresh core/app/GPU/benchmark admission.",
+      "thin_core_archive": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-shared-qualification-20261111/release/libdome-sculpt-core.a",
+        "sha256": "291c9c75a34ae22663b204f68f95b3e4206ff60562cb542da2a3ec7946cd06c9"
+      },
+      "fresh_complete_TUs": 7,
+      "fresh_consumer_links": 5,
+      "unchanged_core_objects": 191,
+      "audited_original_core_members": 192,
+      "same_product_files": 710,
+      "source_differences": [
+        "src/render.cpp",
+        "src/sculpt-gpu-arena-layout.hpp",
+        "src/sculpt-gpu-arena.hpp",
+        "src/sculpt-scene-chunks.cpp"
+      ],
+      "changed_core_TUs": [
+        "src/sculpt-scene-chunks.cpp"
+      ],
+      "input_count": 3712,
+      "fresh_output_count": 13,
+      "source_and_provider_drift": [],
+      "fresh_output_drift": [],
+      "sanitizer_environment": {
+        "ASAN_OPTIONS": null,
+        "UBSAN_OPTIONS": null,
+        "LSAN_OPTIONS": null
+      },
+      "native_runs": [
+        {
+          "name": "run-dome-sculpt-sculpt-chunk-pipeline-test",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-shared-qualification-20261111/release/dome-sculpt-sculpt-chunk-pipeline-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-shared-qualification-20261111/release/native-pipeline"
+          ],
+          "exit": 0,
+          "seconds": 0.5166145789553411,
+          "peak_RSS": 57815040,
+          "log": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-shared-qualification-20261111/release/run-dome-sculpt-sculpt-chunk-pipeline-test.log",
+          "log_sha256": "f9771eaffbccc716d78db61dce136cfd0917da8569d6ae6335199894c7c42f9a",
+          "external_timeout": 180,
+          "maps": {
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-shared-qualification-20261111/release/run-dome-sculpt-sculpt-chunk-pipeline-test-maps.json",
+            "sha256": "1354259dd7a61a343b3133521b933469cbbb6e4b959aff63a976d1533e98f4a9"
+          },
+          "actual_DRI_targets": [],
+          "critical_observed": [
+            "consumer"
+          ],
+          "terminal_stdout": "PASS total 78"
+        },
+        {
+          "name": "run-dome-sculpt-local-surface-test",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-shared-qualification-20261111/release/dome-sculpt-local-surface-test"
+          ],
+          "exit": 0,
+          "seconds": 0.6394904019543901,
+          "peak_RSS": 22708224,
+          "log": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-shared-qualification-20261111/release/run-dome-sculpt-local-surface-test.log",
+          "log_sha256": "946f09eafe2d5c448e3c6949b079d20b67077bfb7179283cff9bf52837748448",
+          "external_timeout": 180,
+          "maps": {
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-shared-qualification-20261111/release/run-dome-sculpt-local-surface-test-maps.json",
+            "sha256": "03172b7ce01379b4d7446b603988e5a3fa133e9e288c3b0484874234825d81d2"
+          },
+          "actual_DRI_targets": [],
+          "critical_observed": [
+            "consumer"
+          ],
+          "terminal_stdout": "77 local surface checks passed"
+        },
+        {
+          "name": "run-dome-sculpt-sculpt-surface-chunks-test",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-shared-qualification-20261111/release/dome-sculpt-sculpt-surface-chunks-test"
+          ],
+          "exit": 0,
+          "seconds": 0.11454653099644929,
+          "peak_RSS": 18554880,
+          "log": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-shared-qualification-20261111/release/run-dome-sculpt-sculpt-surface-chunks-test.log",
+          "log_sha256": "8b36aed9a443a79f3400658dfbf00c67d8d6d286560fd56d141e91f207c52905",
+          "external_timeout": 180,
+          "maps": {
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-shared-qualification-20261111/release/run-dome-sculpt-sculpt-surface-chunks-test-maps.json",
+            "sha256": "2821c7634f097b13f18c69c22cb548d5311b6e925f57f6150191691b5f7e40c8"
+          },
+          "actual_DRI_targets": [],
+          "critical_observed": [
+            "consumer"
+          ],
+          "terminal_stdout": "22 sculpt chunk checks passed"
+        },
+        {
+          "name": "run-dome-sculpt-sculpt-chunk-workspace-test",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-shared-qualification-20261111/release/dome-sculpt-sculpt-chunk-workspace-test"
+          ],
+          "exit": 0,
+          "seconds": 0.24355293001281098,
+          "peak_RSS": 47796224,
+          "log": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-shared-qualification-20261111/release/run-dome-sculpt-sculpt-chunk-workspace-test.log",
+          "log_sha256": "b4dacfac59d17baa45a405a3cd0a456d3191e1f5aeb8391bc762fdb204ca6d49",
+          "external_timeout": 300,
+          "maps": {
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-shared-qualification-20261111/release/run-dome-sculpt-sculpt-chunk-workspace-test-maps.json",
+            "sha256": "032471c3bfaeca899f1ba4e74b5b4bf7cec5aa10a4e545ad9465615ae67a326d"
+          },
+          "actual_DRI_targets": [],
+          "critical_observed": [
+            "consumer"
+          ],
+          "terminal_stdout": "PASS total 27"
+        },
+        {
+          "name": "run-dome-sculpt-sculpt-placed-workspace-test",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-shared-qualification-20261111/release/dome-sculpt-sculpt-placed-workspace-test"
+          ],
+          "exit": 0,
+          "seconds": 0.30703413602896035,
+          "peak_RSS": 65814528,
+          "log": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-shared-qualification-20261111/release/run-dome-sculpt-sculpt-placed-workspace-test.log",
+          "log_sha256": "b84f753363a7b03bf014dc9a98b174f490f1987e822a9db90aa601d808633b1a",
+          "external_timeout": 300,
+          "maps": {
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-shared-qualification-20261111/release/run-dome-sculpt-sculpt-placed-workspace-test-maps.json",
+            "sha256": "eedb4e9d75060a3aa7563dd1c33b7002ed8b025b3260a6004ccab3d8f2a352f8"
+          },
+          "actual_DRI_targets": [],
+          "critical_observed": [
+            "consumer"
+          ],
+          "terminal_stdout": "PASS 373 placed-owner workspace controls"
+        }
+      ]
+    },
+    "sanitize": {
+      "status": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-shared-qualification-20261111/sanitize-status.json",
+        "sha256": "d8bea0491c17151214e81bcebafbdace84a4056b364e8f5bc721f8040debb845"
+      },
+      "scope": "Focused native CPU composition: one fresh whole sculpt-scene-chunks TU, replacement thin core archive with 191 exact current f473 ABI objects, six fresh test TUs and five fresh consumer links. No whole-fresh core/app/GPU/benchmark admission.",
+      "thin_core_archive": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-shared-qualification-20261111/sanitize/libdome-sculpt-core.a",
+        "sha256": "b1812ec010feda7f879ab2cce8e4b3321f192afc909e2a3492bf3433e4a85f78"
+      },
+      "fresh_complete_TUs": 7,
+      "fresh_consumer_links": 5,
+      "unchanged_core_objects": 191,
+      "audited_original_core_members": 192,
+      "same_product_files": 710,
+      "source_differences": [
+        "src/render.cpp",
+        "src/sculpt-gpu-arena-layout.hpp",
+        "src/sculpt-gpu-arena.hpp",
+        "src/sculpt-scene-chunks.cpp"
+      ],
+      "changed_core_TUs": [
+        "src/sculpt-scene-chunks.cpp"
+      ],
+      "input_count": 3712,
+      "fresh_output_count": 13,
+      "source_and_provider_drift": [],
+      "fresh_output_drift": [],
+      "sanitizer_environment": {
+        "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+        "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+        "LSAN_OPTIONS": null
+      },
+      "native_runs": [
+        {
+          "name": "run-dome-sculpt-sculpt-chunk-pipeline-test",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-shared-qualification-20261111/sanitize/dome-sculpt-sculpt-chunk-pipeline-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-shared-qualification-20261111/sanitize/native-pipeline"
+          ],
+          "exit": 0,
+          "seconds": 3.916462303022854,
+          "peak_RSS": 1618821120,
+          "log": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-shared-qualification-20261111/sanitize/run-dome-sculpt-sculpt-chunk-pipeline-test.log",
+          "log_sha256": "f9771eaffbccc716d78db61dce136cfd0917da8569d6ae6335199894c7c42f9a",
+          "external_timeout": 180,
+          "maps": {
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-shared-qualification-20261111/sanitize/run-dome-sculpt-sculpt-chunk-pipeline-test-maps.json",
+            "sha256": "8f980ba40d174898a365de556a1bd3fc96c148ba26e4273e4de7c65998224d79"
+          },
+          "actual_DRI_targets": [],
+          "critical_observed": [
+            "consumer"
+          ],
+          "terminal_stdout": "PASS total 78"
+        },
+        {
+          "name": "run-dome-sculpt-local-surface-test",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-shared-qualification-20261111/sanitize/dome-sculpt-local-surface-test"
+          ],
+          "exit": 0,
+          "seconds": 6.174591051996686,
+          "peak_RSS": 789127168,
+          "log": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-shared-qualification-20261111/sanitize/run-dome-sculpt-local-surface-test.log",
+          "log_sha256": "946f09eafe2d5c448e3c6949b079d20b67077bfb7179283cff9bf52837748448",
+          "external_timeout": 180,
+          "maps": {
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-shared-qualification-20261111/sanitize/run-dome-sculpt-local-surface-test-maps.json",
+            "sha256": "ef4c41e02bcf76c5ada23fbfc57daa2f317e072b919201195eb1e80fba1dc0ea"
+          },
+          "actual_DRI_targets": [],
+          "critical_observed": [
+            "consumer"
+          ],
+          "terminal_stdout": "77 local surface checks passed"
+        },
+        {
+          "name": "run-dome-sculpt-sculpt-surface-chunks-test",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-shared-qualification-20261111/sanitize/dome-sculpt-sculpt-surface-chunks-test"
+          ],
+          "exit": 0,
+          "seconds": 0.703313433972653,
+          "peak_RSS": 237043712,
+          "log": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-shared-qualification-20261111/sanitize/run-dome-sculpt-sculpt-surface-chunks-test.log",
+          "log_sha256": "8b36aed9a443a79f3400658dfbf00c67d8d6d286560fd56d141e91f207c52905",
+          "external_timeout": 180,
+          "maps": {
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-shared-qualification-20261111/sanitize/run-dome-sculpt-sculpt-surface-chunks-test-maps.json",
+            "sha256": "db5799421e3d76916200132d47976ce9edf9a6d690d5d0518cba8715a7c58141"
+          },
+          "actual_DRI_targets": [],
+          "critical_observed": [
+            "consumer"
+          ],
+          "terminal_stdout": "22 sculpt chunk checks passed"
+        },
+        {
+          "name": "run-dome-sculpt-sculpt-chunk-workspace-test",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-shared-qualification-20261111/sanitize/dome-sculpt-sculpt-chunk-workspace-test"
+          ],
+          "exit": 0,
+          "seconds": 2.377822083013598,
+          "peak_RSS": 457973760,
+          "log": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-shared-qualification-20261111/sanitize/run-dome-sculpt-sculpt-chunk-workspace-test.log",
+          "log_sha256": "b4dacfac59d17baa45a405a3cd0a456d3191e1f5aeb8391bc762fdb204ca6d49",
+          "external_timeout": 300,
+          "maps": {
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-shared-qualification-20261111/sanitize/run-dome-sculpt-sculpt-chunk-workspace-test-maps.json",
+            "sha256": "4bf608ebd8c9c45dcb1c12d97e20ae5d751365f216f9a28a82fd200655320df8"
+          },
+          "actual_DRI_targets": [],
+          "critical_observed": [
+            "consumer"
+          ],
+          "terminal_stdout": "PASS total 27"
+        },
+        {
+          "name": "run-dome-sculpt-sculpt-placed-workspace-test",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-shared-qualification-20261111/sanitize/dome-sculpt-sculpt-placed-workspace-test"
+          ],
+          "exit": 0,
+          "seconds": 3.431527625012677,
+          "peak_RSS": 1422393344,
+          "log": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-shared-qualification-20261111/sanitize/run-dome-sculpt-sculpt-placed-workspace-test.log",
+          "log_sha256": "b84f753363a7b03bf014dc9a98b174f490f1987e822a9db90aa601d808633b1a",
+          "external_timeout": 300,
+          "maps": {
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-shared-qualification-20261111/sanitize/run-dome-sculpt-sculpt-placed-workspace-test-maps.json",
+            "sha256": "bea63939b2bc91fed792bc2f6ad0e54dfdec16bd549c146a2ff78c2d80604a08"
+          },
+          "actual_DRI_targets": [],
+          "critical_observed": [
+            "consumer"
+          ],
+          "terminal_stdout": "PASS 373 placed-owner workspace controls"
+        }
+      ]
+    }
+  },
+  "review": {
+    "identity": "Exact geometry control block and pointer plus bit-identical voxel size/band; numerical equality alone receives no reuse credit.",
+    "ownership": "Complete local geometry shared; per-object placement/query/mask authority retained.",
+    "limits": "Unique complete geometry charged once in aggregate; original per-operation geometry/extraction/working caps remain and update validates requested limits before unchanged-owner return. No cap is raised.",
+    "history": "Real edit detaches one object; genuine source restore reuses unaffected owner; canceled candidates preserve preceding complete published owner.",
+    "source_references": {
+      "src/sculpt-scene-chunks.cpp": {
+        "sha256": "07b9027273975964eafb2d1a549e3f7fedb293ce114536bd77a8174dbc03df93",
+        "identity_and_reservation_start": 106,
+        "prior_owner_search": 139,
+        "unique_charge": 166
+      },
+      "src/sculpt-surface-chunks.cpp": {
+        "sha256": "bf2720ed9d18a607301f67bb4c2e15b9478bed199255fb69cbeb5e0ff9f11446",
+        "reduced_operation_checks_before_unchanged_return": 586
+      },
+      "tests/sculpt-chunk-pipeline.cpp": {
+        "sha256": "e1163d675f603bd4a0c8cd3864c759bd2152fa9b3b1248fa0a328914019a6311",
+        "shared_instances_start": 74
+      }
+    }
+  },
+  "original_failure": {
+    "status": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/sustained-four-objects-20261111/status.json",
+      "sha256": "5777f61b4f44593e2541f1eb84397d48726195f84e9a5514121f98c185f38401"
+    },
+    "source": "27f01cad7910a9c6b6dd383a4422f3feffdbc61c",
+    "seconds": 6.010428233013954,
+    "peak_RSS": 582770688,
+    "exit": 1,
+    "reason": "Sculpt manifest retained byte limit exceeded",
+    "external_guard": null,
+    "protected_drift": [],
+    "complete_repetitions": 0,
+    "preserved": true,
+    "not_renamed_as_success": true,
+    "result": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/sustained-four-objects-20261111/full-p1/result.json",
+      "sha256": "309abbe4b5c3d6d393a66bb098a7ce5306b0265fb3a8e643ef40cfe265dfc5c5"
+    },
+    "process_log": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/sustained-four-objects-20261111/process.log",
+      "sha256": "7b88c764006bad711431dccd3a2c0e813e24d6b821478b6c333a3798e1c6bf89"
+    }
+  },
+  "comparison": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-shared-qualification-20261111/native-RS-pairs.json",
+    "sha256": "a1a97e7cbcf9f48506d85b427061530618465ffa6eaf911ac9826ae34847f89c"
+  },
+  "runner": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-shared-qualification-20261111/run.py",
+    "sha256": "505dcc253129259ead333c34d015f5431f5cbfbe924c4aa729d01668aec2c96d"
+  },
+  "no_live_jobs_or_device_lease": true,
+  "limits": {
+    "compile_and_link_timeout_seconds": 300,
+    "native_pipeline_local_surface_timeout_seconds": 180,
+    "manual_small_workspace_timeout_seconds": 300,
+    "RSS_instrumentation_guard_bytes": 4294967296,
+    "internal_native_deadlines_and_counts_unchanged": true,
+    "strict_SAN_leaks": 1,
+    "suppressions": false
+  },
+  "next_required": "Root coherent current renderer/core composition and unchanged original full four-object production benchmark; this native proof does not replace them."
+}
