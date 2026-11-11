@@ -1,0 +1,160 @@
+{
+  "date": "2026-11-11",
+  "scope": "Test-fixture public X11 acknowledgments against unchanged b8 actual FLTK application; software/privateXvfb only",
+  "test_commit": "479ceadc0c56380f846e0d722dd21b546767a03d",
+  "test_base": "0b4991ba",
+  "application_source": "b8c469ce875eb2542c220300c3c63edbf1526570",
+  "fixture_script_sha256": "7a3cfbe68ab5fc43a6e23cf147cc39ca2154e41003bb3169bccebd4cd5f24b74",
+  "status": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/gui-public-ack-20261111/artifacts/gui-controls/execution-v2/status.json",
+    "sha256": "ba29c447587e2459a497150f8f53a9c0a04ca4f5c6867ae15439ab5448c40f48",
+    "exit": 0
+  },
+  "wrapper": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/gui-public-ack-20261111/artifacts/gui-controls/run-v2.py",
+    "sha256": "9841c2219577a10ab893222401eecfd5cb5a9aaab5c68db13979006074e275df"
+  },
+  "application_sha256": {
+    "release": "9bf85d3bbc3418951703ad1aabb0d55a467d36d9ed621ede664007b6c930b244",
+    "sanitize": "38978d63d7248629ae34969bfd3fd6a8af0ae168222926d42ef6c41f42d13f8e"
+  },
+  "SDK_source": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "preserved_limits": {
+    "checks_per_case": 81,
+    "step_wait_seconds": 50,
+    "phase_seconds": 900,
+    "menu_row_pixels": 28,
+    "whole_process_group_RSS_bytes": 6442450944
+  },
+  "cases": [
+    {
+      "profile": "release",
+      "mode": "normal",
+      "exit": 0,
+      "seconds": 109.6384109390201,
+      "peak_process_group_rss_bytes": 537690112,
+      "log": "/home/blux/de-xr/dome-sculpt/artifacts/gui-public-ack-20261111/artifacts/gui-controls/execution-v2/release-normal.log",
+      "log_sha256": "7aa0e3be0e730fa57f307bc249d12f83b737ff57d31c4c8177ed983cadc7ffbf",
+      "checks": 81,
+      "public_acknowledgments": 149,
+      "ack_kinds": {
+        "document-title-visible": 6,
+        "framed-view-presented": 3,
+        "manager-presented": 17,
+        "choice-popup-presented": 23,
+        "choice-highlight-presented": 60,
+        "choice-popup-closed": 23,
+        "manager-closed": 17
+      },
+      "frame_ack_count": 3,
+      "frame_background_fraction_min": 1.0,
+      "frame_center_nonbackground_fraction_min": 1.0,
+      "SAN_options": {
+        "ASAN_OPTIONS": null,
+        "UBSAN_OPTIONS": null,
+        "LSAN_OPTIONS": null
+      }
+    },
+    {
+      "profile": "release",
+      "mode": "compact",
+      "exit": 0,
+      "seconds": 107.90997623599833,
+      "peak_process_group_rss_bytes": 496455680,
+      "log": "/home/blux/de-xr/dome-sculpt/artifacts/gui-public-ack-20261111/artifacts/gui-controls/execution-v2/release-compact.log",
+      "log_sha256": "7aa0e3be0e730fa57f307bc249d12f83b737ff57d31c4c8177ed983cadc7ffbf",
+      "checks": 81,
+      "public_acknowledgments": 149,
+      "ack_kinds": {
+        "document-title-visible": 6,
+        "framed-view-presented": 3,
+        "manager-presented": 17,
+        "choice-popup-presented": 23,
+        "choice-highlight-presented": 60,
+        "choice-popup-closed": 23,
+        "manager-closed": 17
+      },
+      "frame_ack_count": 3,
+      "frame_background_fraction_min": 1.0,
+      "frame_center_nonbackground_fraction_min": 1.0,
+      "SAN_options": {
+        "ASAN_OPTIONS": null,
+        "UBSAN_OPTIONS": null,
+        "LSAN_OPTIONS": null
+      }
+    },
+    {
+      "profile": "sanitize",
+      "mode": "normal",
+      "exit": 0,
+      "seconds": 233.75319796800613,
+      "peak_process_group_rss_bytes": 2620424192,
+      "log": "/home/blux/de-xr/dome-sculpt/artifacts/gui-public-ack-20261111/artifacts/gui-controls/execution-v2/sanitize-normal.log",
+      "log_sha256": "7aa0e3be0e730fa57f307bc249d12f83b737ff57d31c4c8177ed983cadc7ffbf",
+      "checks": 81,
+      "public_acknowledgments": 149,
+      "ack_kinds": {
+        "document-title-visible": 6,
+        "framed-view-presented": 3,
+        "manager-presented": 17,
+        "choice-popup-presented": 23,
+        "choice-highlight-presented": 60,
+        "choice-popup-closed": 23,
+        "manager-closed": 17
+      },
+      "frame_ack_count": 3,
+      "frame_background_fraction_min": 1.0,
+      "frame_center_nonbackground_fraction_min": 1.0,
+      "SAN_options": {
+        "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+        "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+        "LSAN_OPTIONS": null
+      }
+    },
+    {
+      "profile": "sanitize",
+      "mode": "compact",
+      "exit": 0,
+      "seconds": 228.49109146994306,
+      "peak_process_group_rss_bytes": 2610159616,
+      "log": "/home/blux/de-xr/dome-sculpt/artifacts/gui-public-ack-20261111/artifacts/gui-controls/execution-v2/sanitize-compact.log",
+      "log_sha256": "7aa0e3be0e730fa57f307bc249d12f83b737ff57d31c4c8177ed983cadc7ffbf",
+      "checks": 81,
+      "public_acknowledgments": 149,
+      "ack_kinds": {
+        "document-title-visible": 6,
+        "framed-view-presented": 3,
+        "manager-presented": 17,
+        "choice-popup-presented": 23,
+        "choice-highlight-presented": 60,
+        "choice-popup-closed": 23,
+        "manager-closed": 17
+      },
+      "frame_ack_count": 3,
+      "frame_background_fraction_min": 1.0,
+      "frame_center_nonbackground_fraction_min": 1.0,
+      "SAN_options": {
+        "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+        "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+        "LSAN_OPTIONS": null
+      }
+    }
+  ],
+  "source_drift": [],
+  "owned_drift": {
+    "release": [],
+    "sanitize": []
+  },
+  "image_analysis": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/gui-public-ack-20261111/artifacts/gui-controls/image-analysis-v2.json",
+    "sha256": "8ede9cd96430741901d977d89c8fb2092198f4b436f058e2c0897a489d511be7",
+    "scope": "Full PNG comparisons remain authoritative. Only actual main-window images have a source-defined28pixel status row (src/app.cpp); manager images are compared in full. Canvas-only equality does not imply full-window equality.",
+    "full_exact_pairs": 6,
+    "main_window_canvas_exact_pairs": 10,
+    "complete_manager_exact_pairs": 2,
+    "all_full_window_differences_in_status_row": true
+  },
+  "old_failure": "gui-recovery-20261111/execution-v2 sanitize-compact failed58 waiting same-size128 Apply modalclose (50s). Timeout-capture-only execution-v3 passed81. Root cause unproven; preserved failures are not superseded or reclassified.",
+  "prototype": "execution-v1 release-normal81 is earlier calibration, excluded from final479 scope",
+  "limits": "No changed product behavior, physical headset, compositor, nativeWayland, hardware GPU, performance or universal flake-free claim. Native saved-state/history/input checks remain authoritative."
+}
