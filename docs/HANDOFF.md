@@ -3,10 +3,18 @@
 Current b8c469ce passes matched Release/SAN32-target builds, native22,
 workspace27/373, softwareGL1727 perprofile,42 exact native pairs/168crossreads
 and94 exact image pairs. Read [COMBINED-BUILD-20261111.md](COMBINED-BUILD-20261111.md)
-for precise scopes, retained warnings and log limitation. Current XR stronger
-fixture/driver recovery and11-TU inherited-role SAN qualification are in progress.
+for precise scopes, retained warnings and log limitation. Stronger XR workflows
+now pass8cases/117checks perprofile, with16exact native pairs; read
+[XR-SAVED-REDO-20261111.md](XR-SAVED-REDO-20261111.md). Fixture-only causation is
+unproven; original failures and the separate systemMesa leak remain preserved.
+Current11-TU inherited-role SAN and ordinary GUI qualification are in progress.
 Main product admission, broader current regression and full requirements remain
 pending. All historical pause notes below remain historical; the goal is active.
+
+Main9ee7a2b3 also includes the reviewed opt-in ArmorPaint blur extraction,
+independent software/Arc and unsuppressed sanitizer controls, licenses and the
+native hosting boundary in [ARMORPAINT-EXPERIMENT.md](ARMORPAINT-EXPERIMENT.md).
+It does not implement the full painting backend or alter product defaults.
 
 ## Goal active; additional spatial node/history phase — 2026-11-11
 

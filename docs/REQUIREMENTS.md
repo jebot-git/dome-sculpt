@@ -4,8 +4,12 @@ The full goal is active. Current b8c469ce has matched Release/SAN32-target
 builds,22native suites, workspace27/373, softwareGL1727 perprofile,42exact native
 pairs/168crossreads and94exact image pairs. Read
 [COMBINED-BUILD-20261111.md](COMBINED-BUILD-20261111.md) for actual scope and limits.
-XR/public-menu regression, inherited-role sanitizer readers and broader current
-qualification remain pending; no main product admission or full completion.
+The stronger XR/public-menu fixture passes8cases/117checks perprofile and16exact
+native pairs; see [XR-SAVED-REDO-20261111.md](XR-SAVED-REDO-20261111.md) for scope,
+driver recovery and retained failures. Inherited-role sanitizer readers, ordinary
+GUI and broader current qualification remain pending; no main product admission
+or full completion. The opt-in ArmorPaint extraction is a bounded GPU proof,
+not the full painting backend; see [ARMORPAINT-EXPERIMENT.md](ARMORPAINT-EXPERIMENT.md).
 The later controller-tray and spatial node/history requirements remain required.
 Historical pause entries follow and do not revoke the user's resumption.
 
