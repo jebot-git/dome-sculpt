@@ -9,6 +9,7 @@
 #include <EGL/egl.h>
 #include <condition_variable>
 #include <iostream>
+#include <fstream>
 using namespace dome;
 namespace {
 size_t checks=0;std::atomic_bool gate=false;std::mutex gate_mutex;std::condition_variable gate_changed;bool entered=false,released=false;
@@ -90,6 +91,23 @@ struct Controller{
  void sector(int i){const float a=i*3.14159265358979323846f/6;send(std::cos(a),std::sin(a));send(std::cos(a),std::sin(a),true);send();}
  void open_filters(){doc.cancel_spatial_menu();send();send(0,0,true);send();sector(9);sector(3);sector(11);check(doc.frame().state->menu_page==6,"Existing controller brush-controls shortcut is preserved");sector(10);check(doc.frame().state->menu_page==32,"Controller discovers actual painting filter controls");}
 };
+// Explicit native producer for public application/loader workflows. It does
+// not run or replace the original software/hardware control matrix.
+void workflow_fixtures(const std::filesystem::path&out){
+ if(std::filesystem::exists(out/"original.dsculpt")||std::filesystem::exists(out/"accepted.dsculpt")||std::filesystem::exists(out/"manifest.json"))throw std::runtime_error("Use fresh workflow fixture outputs");
+ std::filesystem::create_directories(out);
+ Scene scene;scene.active().name="Nonuniform color 日本語";scene.active().mesh_active=true;
+ scene.active().painted=field(true);scene.validate();
+ const auto before=scene.snapshot();scene.save(out/"original.dsculpt");
+ Document document;document.replace(scene);ready(document);document.blur_color_layer();
+ auto saved=document.save_async(out/"accepted.dsculpt");saved.get();ready(document);
+ const auto accepted=document.copy_scene();check(accepted.encode()!=before.encode(),"Workflow fixture contains a genuine nonuniform accepted color change");
+ oracle(*before.active().painted,*accepted.active().painted,1);
+ check(document.undo()&&document.copy_scene().encode()==before.encode(),"Workflow expected endpoint has one exact global Undo");
+ check(document.redo()&&document.copy_scene().encode()==accepted.encode(),"Workflow expected endpoint has one exact global Redo");
+ check(Scene::load(out/"original.dsculpt").encode()==before.encode()&&Scene::load(out/"accepted.dsculpt").encode()==accepted.encode(),"Both workflow fixtures reopen with exact full native ownership");
+ std::ofstream manifest(out/"manifest.json");manifest<<nlohmann::json{{"version",1},{"flow",1},{"resolution",64},{"independent_pixel_oracle",true},{"native_checks",checks},{"files",{{"original","original.dsculpt"},{"accepted","accepted.dsculpt"}}}}.dump(2)<<'\n';check(bool(manifest),"Workflow manifest writes completely");
+}
 void document(){
  Scene scene;scene.active().mesh_active=true;scene.active().painted=field(false);const auto original=scene.encode();Document d;d.replace(scene);ready(d);check(d.frame().state->can_blur_color_layer,"Desktop/XR availability advertises the genuine current field");
  d.blur_color_layer();auto save=d.save_async("gpu-layer-blur.dsculpt");save.get();ready(d);const auto after=d.copy_scene().encode();check(after!=original&&Scene::load("gpu-layer-blur.dsculpt").encode()==after,"Ordered Save/reopen captures the full GPU-accepted layer");check(d.undo()&&d.copy_scene().encode()==original,"One global Undo restores the exact pre-tool Scene");check(d.redo()&&d.copy_scene().encode()==after,"One global Redo restores the exact accepted Scene");
@@ -116,4 +134,4 @@ extern "C" EGLContext __wrap_eglCreateContext(EGLDisplay d,EGLConfig c,EGLContex
  if(gate.exchange(false)){std::unique_lock lock(gate_mutex);entered=true;gate_changed.notify_all();gate_changed.wait(lock,[]{return released;});}
  return __real_eglCreateContext(d,c,shared,attributes);
 }
-int main(int argc,char**argv)try{const bool software=argc>1&&std::string(argv[1])=="software";if(argc>2){std::filesystem::create_directories(argv[2]);std::filesystem::current_path(argv[2]);}detached(software);if(software)software_document_refusal();else document();std::cout<<"PASS "<<checks<<" actual native GPU color blur controls\n";return 0;}catch(const std::exception&e){release();std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
+int main(int argc,char**argv)try{if(argc==3&&std::string(argv[1])=="--workflow-fixtures"){workflow_fixtures(std::filesystem::absolute(argv[2]));std::cout<<"PASS "<<checks<<" native workflow fixture controls\n";return 0;}const bool software=argc>1&&std::string(argv[1])=="software";if(argc>2){std::filesystem::create_directories(argv[2]);std::filesystem::current_path(argv[2]);}detached(software);if(software)software_document_refusal();else document();std::cout<<"PASS "<<checks<<" actual native GPU color blur controls\n";return 0;}catch(const std::exception&e){release();std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

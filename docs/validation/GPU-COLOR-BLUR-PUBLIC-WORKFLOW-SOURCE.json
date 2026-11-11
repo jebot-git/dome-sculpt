@@ -1,0 +1,87 @@
+{
+  "state": "source-reviewed-not-runtime-qualified",
+  "application_base": "775f92b8",
+  "checks": [
+    {
+      "command": [
+        "c++",
+        "-std=c++20",
+        "-fsyntax-only",
+        "-Iinclude",
+        "-Isrc",
+        "-Ithird_party/openbrush",
+        "tests/gpu-color-blur-native.cpp"
+      ],
+      "exit": 0,
+      "seconds": 2.1259466820047237,
+      "log": "artifacts/paint-workflow-source-review-v2/0.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "c++",
+        "-std=c++20",
+        "-fsyntax-only",
+        "tests/gpu-color-blur-runtime.cpp"
+      ],
+      "exit": 0,
+      "seconds": 1.586884947028011,
+      "log": "artifacts/paint-workflow-source-review-v2/1.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "python3",
+        "-m",
+        "py_compile",
+        "tests/gpu-color-blur-menu.py",
+        "tests/gpu-color-blur-xr.py"
+      ],
+      "exit": 0,
+      "seconds": 0.039672158018220216,
+      "log": "artifacts/paint-workflow-source-review-v2/2.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit": 0,
+      "seconds": 0.004350836970843375,
+      "log": "artifacts/paint-workflow-source-review-v2/3.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "source_pins": {
+    "CMakeLists.txt": "9699592ddeebcb5e25cca5d1feeb41106b6205eee38441b605c6063389f7753e",
+    "tests/gpu-color-blur-native.cpp": "c007ae1c9d9f9eecdfe29aebcb459fb7f27cf6cf2b03d1804cb3b97c2544af4a",
+    "tests/gpu-color-blur-runtime.cpp": "717bb2d29b59e0c7ac1d4be68a0bdcab87f432e275b9b205db1e37d03487d285",
+    "tests/gpu-color-blur-menu.py": "9d2e0a1e5f235573d86ca47273ada6fa3eafef7fc68cec375ef27b9622c7fbf2",
+    "tests/gpu-color-blur-xr.py": "f3de68a11ba8c0cb166ae25213f05ffbe43fc0af8792a39421880c6cd1a99bd2",
+    "tests/texture-set-menu.py": "7a3cfbe68ab5fc43a6e23cf147cc39ca2154e41003bb3169bccebd4cd5f24b74",
+    "tests/texture-set-resolution-runtime.cpp": "931454ae4c1f8d9737472d0f0f81d037fa1d4fcd29f60a9df608b9e02fd5c864",
+    "tests/texture-set-resolution-xr.py": "dcd43627e69b046d1986aa35839f3fcf74bde36fda77fd0fc150f733fcb22e0c",
+    "src/palette.cpp": "f3cfe0bc0722c5f87c678091215b7e26faa3024414756332fe33db7a399d9917",
+    "third_party/sources.json": "4dd9199aabace7f6b42307ff4014d27d1f17c5dafc6957197d68a04c5ab42516"
+  },
+  "GPU_contexts": 0,
+  "product_compiles": 0,
+  "core_builds": 0,
+  "HMD_launches": 0,
+  "limits": {
+    "GUI_step_seconds": 50,
+    "GUI_phase_seconds": 900,
+    "XR_physical_frames": 6000,
+    "XR_phase_seconds": 240
+  },
+  "old_scopes_preserved": "Original81/117 scripts andinputs unchanged; current139378software/139458Arc nativecontrols branch unchanged except explicitnewproducer dispatch.",
+  "first_source_review": "Earlier82basedsource-only syntax review retained atartifacts/paint-workflow-source-review; currentbase775 includes correctedcanonicalBDFmetadata andlatestnativecontrols; originalmissingnavigationinclude manualprobe corrected.",
+  "original_scripts_unchanged": {
+    "tests/texture-set-menu.py": true,
+    "tests/texture-set-resolution-runtime.cpp": true,
+    "tests/texture-set-resolution-xr.py": true
+  },
+  "product_source_unchanged_from_775": true
+}
