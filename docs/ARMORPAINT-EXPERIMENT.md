@@ -37,6 +37,14 @@ profile outputs, exit statuses and sanitizer options. Builds and generated
 shader/evidence files stay outside tracked source directories; generation is
 offline, hash-checked and deterministic. Reproduction is in the experiment README.
 
+Fresh source milestone `a5a6973e977c49fb9e35cfd73712e33e8e228607` passes all four
+profiles: seven cases and31,521 assertions each. Both sanitized runs enable leak
+detection and strict UBSan and exit0 without reports. Release/SAN outputs are
+byte-identical per device;15,708 software/Arc float components differ by at most
+`4.76837158203125e-7`. The source tree remains clean after configuration/build and
+validation; generated fragment shaders match across both builds. These scoped
+results do not establish production throughput or physical-headset usability.
+
 Fixtures cover sub-UNORM8 FLOAT coverage, HDR radiance, independent nontrivial
 masks, rectangular clamp edges, cross-only impulse, zero coverage/strength/mask,
 unchanged input bytes and rejected aliases/invalid formats/domains/budgets. Wrong
@@ -102,6 +110,13 @@ brush and independent destination mask, with per-channel dirty tiles and one
 native transaction. It must demonstrate native Save/restart/Undo/Redo/Cancel,
 stale/held/pose rejection, desktop and actual-controller workflow and independent
 all-channel before/after checks. This is larger than the texture-only proof.
+
+In particular, native color's authored alpha (`PaintPixel::data[3]`) and its
+paint coverage (`data[9]`) are different values. The experiment's RGBA carries
+RGB plus coverage only; a full color/opacity tool needs an additional typed alpha
+plane or a separately specified treatment. It cannot reuse composite color alpha
+as paint coverage. Normal/tangent values likewise cannot be treated as generic
+RGB, and physical emission must retain its separate legacy/physical contributions.
 
 The broader objective still requires clone/smudge, stencils/projection, robust
 layer/group/mask/material authoring, texture sets, procedural material/brush
