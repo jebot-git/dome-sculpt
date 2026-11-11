@@ -2,6 +2,7 @@
 #include "dome/document.hpp"
 #include "dome/rig-fit.hpp"
 #include "dome/skin-authoring.hpp"
+#include "dome/source-placement.hpp"
 #include "cgltf.h"
 #include <fstream>
 #include <iostream>
