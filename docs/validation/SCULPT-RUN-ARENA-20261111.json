@@ -1,0 +1,857 @@
+{
+  "schema": 1,
+  "date": "2026-11-11",
+  "source": "ad091d89e877d299fc227af8eaaa9257ce1c764f",
+  "parent": "7415d581b1a4ba4fbecc6aefdd08d0aa20b6b9fb",
+  "baseline_provider_source": "b8c469ce875eb2542c220300c3c63edbf1526570",
+  "state": "Component-qualified R/S/software/Arc; private review checkpoint, no main admission or sustained P1 speed claim",
+  "product_sources": {
+    "src/render.cpp": "6597d08cc0bcb9aeb60bad2c17820c7d25356c1f869db4a366b19261bc24460f",
+    "src/sculpt-gpu-arena-layout.hpp": "15bab6b1afda09f806cdb5279595eb4ffedf4a8678013dad98dc758529b0fe9f",
+    "src/sculpt-gpu-arena.hpp": "47b5f65676adc1e924447323c9a542632b5224aca46a1291448680b7755cef39"
+  },
+  "changed_source_test_build_files": {
+    "CMakeLists.txt": "5f3982bce4ccc9f12d8b3dea3c4d01cd1589e3522e764b0ed162436cfb4c18e0",
+    "src/render.cpp": "6597d08cc0bcb9aeb60bad2c17820c7d25356c1f869db4a366b19261bc24460f",
+    "src/sculpt-gpu-arena-layout.hpp": "15bab6b1afda09f806cdb5279595eb4ffedf4a8678013dad98dc758529b0fe9f",
+    "src/sculpt-gpu-arena.hpp": "47b5f65676adc1e924447323c9a542632b5224aca46a1291448680b7755cef39",
+    "tests/sculpt-chunk-render.cpp": "12686773fff773de7cf01e93c7068ffa3f483086aa80f3f811bbc16f13502100",
+    "tests/sculpt-gpu-arena-layout.cpp": "f0dd73e7139715d049e64c8a764c95f475a6a7dbf845c3cf0f47cdbdc86ce4f6",
+    "tests/sculpt-gpu-arena.cpp": "01bd15c579e134738a2c10e8bae08f1f2748b29b972a330b107c8f96aa644388"
+  },
+  "public_header_changes": [],
+  "public_headers_byte_equal_count": 101,
+  "scene_schema_default_changes": false,
+  "scope": {
+    "fresh_whole_affected_TUs_per_profile": [
+      "src/render.cpp",
+      "tests/sculpt-gpu-arena.cpp"
+    ],
+    "reused_whole_chunk_fixture": "Exact source+actual full dependency closure, no modified arena header inclusion; coalesced whole fixture compiled fresh in prior immutable component",
+    "other_providers": "Immutable current b8 whole core/render/support/frontend objects; actual old thin renderer member excluded from every final map. No archive rewrite/copy; no fresh ALL claim.",
+    "complete_links_per_profile": 8,
+    "current_software_processes_per_profile": 7,
+    "current_Arc_processes_per_profile": 6,
+    "current_forced_software_refusals_per_profile": 2,
+    "total_current_processes": 30,
+    "original_1739_semantic_controls_preserved": true,
+    "five_current_graphics_checks_per_profile_per_device": 1753,
+    "additional_arena_checks_per_profile_per_device": 405,
+    "separate_chunk_replay_checks": 98,
+    "pure_allocator_reused_scope": {
+      "checks_per_profile": 2097166,
+      "source_header_sha256": "15bab6b1afda09f806cdb5279595eb4ffedf4a8678013dad98dc758529b0fe9f",
+      "scope": "Previously executed R/S pure bitmap-oracle/budget test; exact source/header unchanged, not relabelled new current executions.",
+      "release": {
+        "path": "artifacts/sculpt-run-arena-20261111/artifacts/arena-proof/layout-release",
+        "sha256": "58d1561e05ba72d648ff71ce2832f8e6d8574b3d2ae92e04690f6bd98a6b47d7",
+        "bytes": 23192
+      },
+      "sanitize": {
+        "path": "artifacts/sculpt-run-arena-20261111/artifacts/arena-proof/sanitize-cohort-v1/layout",
+        "sha256": "2437e1db26fa1dfb09d137d3f0f9e212326e9d8af1671fc6b19f7e35f2573ae5",
+        "bytes": 234656
+      },
+      "sanitize_success_row_with_original_failed_profile_retained": {
+        "path": "artifacts/sculpt-run-arena-20261111/artifacts/arena-proof/runtime-sanitize-v1/status.json",
+        "sha256": "447e59b97b340a96248793440f23ba5709f310b6e61ab74e80cba75b0e96bb00",
+        "bytes": 2745
+      }
+    }
+  },
+  "design": {
+    "geometry": "Shared position/normal/index arena stores, immutable original local CPU arrays uploaded directly only when dirty. Retained arena relocation uses GPU copies.",
+    "commands": "Actual immutable geometry owner caches ordered count/byteoffset/basevertex arrays; only adjacent contiguous same-owner runs coalesce. Raw reserved-run count retained separately.",
+    "dispatch": "Two sculpt objects: actual2 glMultiDrawElementsBaseVertex API submissions carrying580 logical draws; independent old-rule coalescer yields580 from1324 raw runs. Packed-object draw remains separate. No FPS claim.",
+    "mask6": "Always enabled actual scalar array; unmasked vertices contain genuine-1 sent from fixed1024-float (4096B) block, avoiding unspecified current attribute values.",
+    "transaction": "Stage new stores/VAO/owners/commands; free-hole writes cannot modify occupied accepted ranges. Nonthrowing commit after successful rendering; retired stores remain charged. Existing native scene/worker/paint/source authorities remain unchanged.",
+    "shader_ID_audit": "Sculpt vertex path does not use gl_VertexID. Fullscreen shader uses are separate. Polygon gl_PrimitiveID path stays disabled for existing eligible plain sculpt chunks; future complex admission remains guarded.",
+    "API_compatibility": "Uses GL3.3-compatible basevertex multidraw/copy/sync APIs; actual tests use contemporary Mesa contexts, not a3.3-only hardware claim."
+  },
+  "limits": {
+    "per_sculpt_arena_requested_GL_store_bytes": 536870912,
+    "CPU_scene_metadata_charge_limit_bytes": 134217728,
+    "fixed_CPU_metadata_charge_bytes": 1024,
+    "packet_limit": 65536,
+    "capacity_growth_reserve": "25%, minimum256 vertices/indices; all unused capacity and fragmentation charged",
+    "budget_scope": "All known active/staged/deleted-but-unconfirmed requested buffer stores per arena; driver opaque heaps/pools/implicit renaming and preexisting flat/texture/FBO budgets are separate. Not total physical VRAM measurement.",
+    "retirement": "Deleted stores remain charged until latest actual GL3.2 fence signals; zero-time query only before dirty allocation or explicit maintenance. Fence create/query failures keep debt and are reported. No production blocking wait/glFinish.",
+    "CPU_scope": "Conservative fixed+per-entry/per-object/raw-vector capacity reservation, including old+next; existing immutable geometry/input arrays and driver allocations separate.",
+    "per_consumer_deadline_seconds": 180,
+    "external_RSS_bytes": 4294967296,
+    "maximum_compile_jobs": 2,
+    "links": "serial"
+  },
+  "failure_controls": {
+    "calling_thread_Cpp_allocation": "46 remeasured persistent prefixes of actual mask-only stage; every rollback checked, later actual publication/retry. Not all scene/driver allocations.",
+    "preparation_cancel": "100 remeasured actual mask-stage polling boundaries; no claim of new Document/controller cancellation path",
+    "mask_GL_error_API_boundaries": {
+      "allocation": 1,
+      "upload": 16,
+      "copy": 1
+    },
+    "growth_GL_error_API_boundaries": {
+      "allocation": 4,
+      "upload": 80,
+      "copy": 112
+    },
+    "GL_injection": "One-shot actual invalid-size/enum/flags API rejection at each boundary; not physical OOM/device-loss evidence.",
+    "pending_completion_control": "Explicit withheld-completion query shim proves conservative debt/refusal. Actual glFinish is TEST-only drain, followed by real signaled-fence query. No physical-duration inference from shim.",
+    "tight_budget_accepted_store_bytes": 277860,
+    "pending_scalar_store_bytes": 22980,
+    "tight_accepted_plus_staged_limit_bytes": 300840,
+    "observed_fixture_requested_store_peak_bytes": 694636,
+    "native_source": "Actual Scene.encode values stay byte-identical across prepare/error/cancel/retry/growth; original full-image controls preserve pixel/order/owners. No new Scene mutator/worker API."
+  },
+  "profiles": {
+    "release": {
+      "software_consumers": [
+        {
+          "name": "existing-field-GL",
+          "argv": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/release-rest-v2/dome-sculpt-polygon-surface-render-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/build-20261111/release/polygon-surface-native",
+            "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/runtime-release-graphics-v2/existing-field-GL"
+          ],
+          "ELF_sha256": "db1b56a8edbe3b5b4d17cf1f31683d280a5c022420235fd600c63b71411044c6",
+          "timeout_seconds": 180,
+          "state": "terminal",
+          "RSS_peak_bytes": 353804288,
+          "pid": 3051741,
+          "exit": 0,
+          "seconds": 10.155346426006872,
+          "log_sha256": "2d656815b696f7d16c0fe804d9d4964ec410a557acaccce7ac26f13b8d792dd6",
+          "actual_maps": true
+        },
+        {
+          "name": "balanced-mixed-GL",
+          "argv": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/release-rest-v2/dome-sculpt-texture-set-polygon-render-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/runtime-release-graphics-v2/balanced-mixed-GL"
+          ],
+          "ELF_sha256": "939c02c8030b8476880296fe674bae0c962c0764b358f0ed2499c2d10659dd13",
+          "timeout_seconds": 180,
+          "state": "terminal",
+          "RSS_peak_bytes": 158773248,
+          "pid": 3053081,
+          "exit": 0,
+          "seconds": 1.2943750789854676,
+          "log_sha256": "c6b73be35e8aefe920a5d0703cb09567dc664dda618b4daffcbd27e1ea6d6817",
+          "actual_maps": true
+        },
+        {
+          "name": "sculpt-chunk-GL",
+          "argv": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/release-link-v2/chunks",
+            "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/runtime-release-graphics-v2/sculpt-chunk-GL"
+          ],
+          "ELF_sha256": "f3d7dbb0a82acc55f6a446269195f0027e3d51c4b2e9949e5040e1f37015899e",
+          "timeout_seconds": 180,
+          "state": "terminal",
+          "RSS_peak_bytes": 156844032,
+          "pid": 3053336,
+          "exit": 0,
+          "seconds": 2.359844846010674,
+          "log_sha256": "ac783063429fbcc6eeb7ebded08d1f2966e774733969cee7b31ff58fa12c5652",
+          "actual_maps": true
+        },
+        {
+          "name": "direct-upload-GL",
+          "argv": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/release-rest-v2/dome-sculpt-render-direct-upload-test",
+            "direct",
+            "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/runtime-release-graphics-v2/direct-upload-GL"
+          ],
+          "ELF_sha256": "9a45e40c6bb114caa47c7b8d75de30d2caeec850bddd8b2be68f7a3e35acf1cb",
+          "timeout_seconds": 180,
+          "state": "terminal",
+          "RSS_peak_bytes": 128700416,
+          "pid": 3053609,
+          "exit": 0,
+          "seconds": 0.483725032012444,
+          "log_sha256": "88f7e637ac7b0c8af710ec73cd3bc8a8847c36a826960be012656f015afa031e",
+          "actual_maps": true
+        },
+        {
+          "name": "sourceful-same-object-GL",
+          "argv": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/release-rest-v2/dome-sculpt-texture-set-source-render-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/runtime-release-graphics-v2/sourceful-same-object-GL"
+          ],
+          "ELF_sha256": "b0c1c6799184979a106264d8945d4cd3e8ad34a936f2566e5134ca541ad7e1f9",
+          "timeout_seconds": 180,
+          "state": "terminal",
+          "RSS_peak_bytes": 165429248,
+          "pid": 3053672,
+          "exit": 0,
+          "seconds": 4.137653673009481,
+          "log_sha256": "7b1d743872006d04407ded4bfbdbbd58d181beb9991b74488f4176b652f49b09",
+          "actual_maps": true
+        }
+      ],
+      "additional_resource_consumer": {
+        "name": "arena",
+        "argv": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/release-link-v2/arena"
+        ],
+        "ELF_sha256": "340aaa9a7e2a864a373e03ade5f2e4f9460992e069d6d53eaee79558ccae55b7",
+        "timeout_seconds": 180,
+        "state": "terminal",
+        "RSS_peak_bytes": 101531648,
+        "pid": 3051693,
+        "exit": 0,
+        "seconds": 0.1292506229947321,
+        "log_sha256": "66b69b8927547e2c213bb0606fd4e61fbb60e54bc3b3d6ee3f862ccf28dd16e2",
+        "actual_maps": true
+      },
+      "separate_chunk_replay": {
+        "name": "chunks",
+        "argv": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/release-link-v2/chunks",
+          "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/runtime-release-native-v2/images"
+        ],
+        "ELF_sha256": "f3d7dbb0a82acc55f6a446269195f0027e3d51c4b2e9949e5040e1f37015899e",
+        "timeout_seconds": 180,
+        "state": "terminal",
+        "RSS_peak_bytes": 156811264,
+        "pid": 3051419,
+        "exit": 0,
+        "seconds": 2.3846530899754725,
+        "log_sha256": "ac783063429fbcc6eeb7ebded08d1f2966e774733969cee7b31ff58fa12c5652",
+        "actual_maps": true
+      },
+      "Arc_consumers": [
+        {
+          "name": "existing-field-GL",
+          "argv": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/release-rest-v2/dome-sculpt-polygon-surface-render-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/build-20261111/release/polygon-surface-native",
+            "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/arc-release-v1/existing-field-GL"
+          ],
+          "expected_checks": 51,
+          "state": "terminal",
+          "RSS_peak_bytes": 566214656,
+          "timeout_seconds": 180,
+          "pid": 3077044,
+          "exit": 0,
+          "seconds": 4.620294196996838,
+          "log_sha256": "8a7f2769aad56fb37eb1a65753e0b2d2367da6e2e59abd54440321d12fa0b98c",
+          "actual_checks": 51,
+          "device_report_sha256": "263bf74fabdab2191523e95d249385e17ed264aea37f8d6168bb195da85e0324"
+        },
+        {
+          "name": "balanced-mixed-GL",
+          "argv": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/release-rest-v2/dome-sculpt-texture-set-polygon-render-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/arc-release-v1/balanced-mixed-GL"
+          ],
+          "expected_checks": 537,
+          "state": "terminal",
+          "RSS_peak_bytes": 129085440,
+          "timeout_seconds": 180,
+          "pid": 3077712,
+          "exit": 0,
+          "seconds": 0.7399582550278865,
+          "log_sha256": "5d7a02cab066c023c00139811f8030477488c129417de0aaebe0e0d06b067ae8",
+          "actual_checks": 537,
+          "device_report_sha256": "263bf74fabdab2191523e95d249385e17ed264aea37f8d6168bb195da85e0324"
+        },
+        {
+          "name": "sculpt-chunk-GL",
+          "argv": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/release-link-v2/chunks",
+            "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/arc-release-v1/sculpt-chunk-GL"
+          ],
+          "expected_checks": 98,
+          "state": "terminal",
+          "RSS_peak_bytes": 116809728,
+          "timeout_seconds": 180,
+          "pid": 3077921,
+          "exit": 0,
+          "seconds": 1.060173261037562,
+          "log_sha256": "90133180e7e4747f8886bca8b697d94884700b3f15d07e690dba641f151e8663",
+          "actual_checks": 98,
+          "device_report_sha256": "263bf74fabdab2191523e95d249385e17ed264aea37f8d6168bb195da85e0324"
+        },
+        {
+          "name": "direct-upload-GL",
+          "argv": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/release-rest-v2/dome-sculpt-render-direct-upload-test",
+            "direct",
+            "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/arc-release-v1/direct-upload-GL"
+          ],
+          "expected_checks": 73,
+          "state": "terminal",
+          "RSS_peak_bytes": 92422144,
+          "timeout_seconds": 180,
+          "pid": 3078043,
+          "exit": 0,
+          "seconds": 0.37086133600678295,
+          "log_sha256": "1e8dd352a7875121e9cc7010c69cf20801a33ba7b8a5ec51d148cfb3a6345f42",
+          "actual_checks": 73,
+          "device_report_sha256": "263bf74fabdab2191523e95d249385e17ed264aea37f8d6168bb195da85e0324"
+        },
+        {
+          "name": "sourceful-same-object-GL",
+          "argv": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/release-rest-v2/dome-sculpt-texture-set-source-render-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/arc-release-v1/sourceful-same-object-GL"
+          ],
+          "expected_checks": 994,
+          "state": "terminal",
+          "RSS_peak_bytes": 128733184,
+          "timeout_seconds": 180,
+          "pid": 3078088,
+          "exit": 0,
+          "seconds": 2.175450162962079,
+          "log_sha256": "441ca007cabdc50ced53ca0a09ea4ff01baf5b561465448264c66287fb27cb6b",
+          "actual_checks": 994,
+          "device_report_sha256": "263bf74fabdab2191523e95d249385e17ed264aea37f8d6168bb195da85e0324"
+        },
+        {
+          "name": "arena",
+          "argv": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/release-link-v2/arena"
+          ],
+          "expected_checks": 405,
+          "state": "terminal",
+          "RSS_peak_bytes": 83279872,
+          "timeout_seconds": 180,
+          "pid": 3078697,
+          "exit": 0,
+          "seconds": 0.4109890880063176,
+          "log_sha256": "5bccb3133f1d891bbdc120e832b86a782e1b281ed3a7c2930d568880ee07ecbc",
+          "actual_checks": 405,
+          "device_report_sha256": "263bf74fabdab2191523e95d249385e17ed264aea37f8d6168bb195da85e0324"
+        }
+      ],
+      "Arc_lease_released": true,
+      "source_drift": [],
+      "Arc_input_drift": [],
+      "environment": {
+        "software": {
+          "LD_LIBRARY_PATH": "/home/blux/de-xr/dome-sculpt/artifacts/xr-recovery-20261111/llvm19-package/usr/lib64/llvm19/lib:/home/blux/de-xr/dome-sculpt/artifacts/mesa-xr-leak-26.2.5/build-patched-v2/src/gallium/targets/dri:/home/blux/de-xr/dome-sculpt/artifacts/sdk-20261111/toolkit-release/lib:/usr/lib64",
+          "__EGL_VENDOR_LIBRARY_FILENAMES": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/runtime-release-graphics-v2/egl-vendor.json",
+          "LIBGL_DRIVERS_PATH": "/home/blux/de-xr/dome-sculpt/artifacts/mesa-xr-leak-26.2.5/build-patched-v2/src/gallium/targets/dri",
+          "LIBGL_ALWAYS_SOFTWARE": "1",
+          "MESA_LOADER_DRIVER_OVERRIDE": "llvmpipe",
+          "GALLIUM_DRIVER": "llvmpipe",
+          "LP_NUM_THREADS": "2",
+          "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+          "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+          "LSAN_OPTIONS": null
+        },
+        "Arc": {
+          "LD_LIBRARY_PATH": "/home/blux/de-xr/dome-sculpt/artifacts/sdk-20261111/toolkit-release/lib:/usr/lib64",
+          "LD_PRELOAD": "/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-constant-20261111/control/device-auth-release.so",
+          "__EGL_VENDOR_LIBRARY_FILENAMES": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/arc-release-v1/egl-vendor.json",
+          "LIBGL_DRIVERS_PATH": "/usr/lib64/dri",
+          "LIBGL_ALWAYS_SOFTWARE": "0",
+          "DRI_PRIME": "pci-0000_03_00_0",
+          "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+          "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+          "LSAN_OPTIONS": null
+        }
+      },
+      "strict_observer": {
+        "source": "/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-constant-20261111/control/device-auth.cpp",
+        "source_sha256": "f13b90442862bdc64bd0e707a728305a68ecd45d726d54a09982b6c1bdae260e",
+        "preload": "/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-constant-20261111/control/device-auth-release.so",
+        "preload_sha256": "c27dbee4f9dfbe6318da3380b3ca4fb6b9c2d9630905aaa66a8eb5d4ac140edb",
+        "mount_helper_sha256": "1e2c6a322ae8797c78f9a2693d7e2e18aab9dd8d6472babbeb81334971904c81"
+      }
+    },
+    "sanitize": {
+      "software_consumers": [
+        {
+          "name": "existing-field-GL",
+          "argv": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/sanitize-rest-v2/dome-sculpt-polygon-surface-render-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/build-20261111/sanitize/polygon-surface-native",
+            "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/runtime-sanitize-graphics-v2/existing-field-GL"
+          ],
+          "ELF_sha256": "2781edc96cf3aa9464ed65f2fa17ed4fc6903b90073a77fa25235833ac951390",
+          "timeout_seconds": 180,
+          "state": "terminal",
+          "RSS_peak_bytes": 2316619776,
+          "pid": 3055560,
+          "exit": 0,
+          "seconds": 18.39245074300561,
+          "log_sha256": "2d656815b696f7d16c0fe804d9d4964ec410a557acaccce7ac26f13b8d792dd6",
+          "actual_maps": true
+        },
+        {
+          "name": "balanced-mixed-GL",
+          "argv": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/sanitize-rest-v2/dome-sculpt-texture-set-polygon-render-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/runtime-sanitize-graphics-v2/balanced-mixed-GL"
+          ],
+          "ELF_sha256": "839df6b6abfef6429d30649a6fbdd6ba16654d345e6c55cd5a6f926e639e1d44",
+          "timeout_seconds": 180,
+          "state": "terminal",
+          "RSS_peak_bytes": 1227812864,
+          "pid": 3057876,
+          "exit": 0,
+          "seconds": 4.3260819999850355,
+          "log_sha256": "c6b73be35e8aefe920a5d0703cb09567dc664dda618b4daffcbd27e1ea6d6817",
+          "actual_maps": true
+        },
+        {
+          "name": "sculpt-chunk-GL",
+          "argv": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/sanitize-link-v2/chunks",
+            "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/runtime-sanitize-graphics-v2/sculpt-chunk-GL"
+          ],
+          "ELF_sha256": "7475f4d7c7812a2cdb605372042d12c0e680430cf4761a822be6a44df5cf5556",
+          "timeout_seconds": 180,
+          "state": "terminal",
+          "RSS_peak_bytes": 1138003968,
+          "pid": 3058511,
+          "exit": 0,
+          "seconds": 6.659888766007498,
+          "log_sha256": "ac783063429fbcc6eeb7ebded08d1f2966e774733969cee7b31ff58fa12c5652",
+          "actual_maps": true
+        },
+        {
+          "name": "direct-upload-GL",
+          "argv": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/sanitize-rest-v2/dome-sculpt-render-direct-upload-test",
+            "direct",
+            "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/runtime-sanitize-graphics-v2/direct-upload-GL"
+          ],
+          "ELF_sha256": "f5674660af63017323544681eb322929d821c06258ce1ae14e9f1dd350e4c939",
+          "timeout_seconds": 180,
+          "state": "terminal",
+          "RSS_peak_bytes": 854192128,
+          "pid": 3059322,
+          "exit": 0,
+          "seconds": 0.9204368679784238,
+          "log_sha256": "88f7e637ac7b0c8af710ec73cd3bc8a8847c36a826960be012656f015afa031e",
+          "actual_maps": true
+        },
+        {
+          "name": "sourceful-same-object-GL",
+          "argv": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/sanitize-rest-v2/dome-sculpt-texture-set-source-render-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/runtime-sanitize-graphics-v2/sourceful-same-object-GL"
+          ],
+          "ELF_sha256": "1d5246d2a3609e68dacb244e2ac9694e38d2753a6c12832156ffd2a27a6f1b38",
+          "timeout_seconds": 180,
+          "state": "terminal",
+          "RSS_peak_bytes": 1617825792,
+          "pid": 3059470,
+          "exit": 0,
+          "seconds": 25.461047958990093,
+          "log_sha256": "7b1d743872006d04407ded4bfbdbbd58d181beb9991b74488f4176b652f49b09",
+          "actual_maps": true
+        }
+      ],
+      "additional_resource_consumer": {
+        "name": "arena",
+        "argv": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/sanitize-link-v2/arena"
+        ],
+        "ELF_sha256": "a344762954a24914f1bb711bfcc08b6824a0df42a1a73b0484e60fccf32066c5",
+        "timeout_seconds": 180,
+        "state": "terminal",
+        "RSS_peak_bytes": 694784000,
+        "pid": 3055380,
+        "exit": 0,
+        "seconds": 0.7904553120024502,
+        "log_sha256": "66b69b8927547e2c213bb0606fd4e61fbb60e54bc3b3d6ee3f862ccf28dd16e2",
+        "actual_maps": true
+      },
+      "separate_chunk_replay": {
+        "name": "chunks",
+        "argv": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/sanitize-link-v2/chunks",
+          "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/runtime-sanitize-native-v2/images"
+        ],
+        "ELF_sha256": "7475f4d7c7812a2cdb605372042d12c0e680430cf4761a822be6a44df5cf5556",
+        "timeout_seconds": 180,
+        "state": "terminal",
+        "RSS_peak_bytes": 1140244480,
+        "pid": 3054578,
+        "exit": 0,
+        "seconds": 6.638530520023778,
+        "log_sha256": "ac783063429fbcc6eeb7ebded08d1f2966e774733969cee7b31ff58fa12c5652",
+        "actual_maps": true
+      },
+      "Arc_consumers": [
+        {
+          "name": "existing-field-GL",
+          "argv": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/sanitize-rest-v2/dome-sculpt-polygon-surface-render-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/build-20261111/sanitize/polygon-surface-native",
+            "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/arc-sanitize-v1/existing-field-GL"
+          ],
+          "expected_checks": 51,
+          "state": "terminal",
+          "RSS_peak_bytes": 2777821184,
+          "timeout_seconds": 180,
+          "pid": 3109094,
+          "exit": 0,
+          "seconds": 10.388944000005722,
+          "log_sha256": "8a7f2769aad56fb37eb1a65753e0b2d2367da6e2e59abd54440321d12fa0b98c",
+          "actual_checks": 51,
+          "device_report_sha256": "263bf74fabdab2191523e95d249385e17ed264aea37f8d6168bb195da85e0324"
+        },
+        {
+          "name": "balanced-mixed-GL",
+          "argv": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/sanitize-rest-v2/dome-sculpt-texture-set-polygon-render-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/arc-sanitize-v1/balanced-mixed-GL"
+          ],
+          "expected_checks": 537,
+          "state": "terminal",
+          "RSS_peak_bytes": 1222508544,
+          "timeout_seconds": 180,
+          "pid": 3110451,
+          "exit": 0,
+          "seconds": 3.8096337859751657,
+          "log_sha256": "5d7a02cab066c023c00139811f8030477488c129417de0aaebe0e0d06b067ae8",
+          "actual_checks": 537,
+          "device_report_sha256": "263bf74fabdab2191523e95d249385e17ed264aea37f8d6168bb195da85e0324"
+        },
+        {
+          "name": "sculpt-chunk-GL",
+          "argv": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/sanitize-link-v2/chunks",
+            "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/arc-sanitize-v1/sculpt-chunk-GL"
+          ],
+          "expected_checks": 98,
+          "state": "terminal",
+          "RSS_peak_bytes": 969986048,
+          "timeout_seconds": 180,
+          "pid": 3111005,
+          "exit": 0,
+          "seconds": 4.892362477025017,
+          "log_sha256": "90133180e7e4747f8886bca8b697d94884700b3f15d07e690dba641f151e8663",
+          "actual_checks": 98,
+          "device_report_sha256": "263bf74fabdab2191523e95d249385e17ed264aea37f8d6168bb195da85e0324"
+        },
+        {
+          "name": "direct-upload-GL",
+          "argv": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/sanitize-rest-v2/dome-sculpt-render-direct-upload-test",
+            "direct",
+            "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/arc-sanitize-v1/direct-upload-GL"
+          ],
+          "expected_checks": 73,
+          "state": "terminal",
+          "RSS_peak_bytes": 518426624,
+          "timeout_seconds": 180,
+          "pid": 3111572,
+          "exit": 0,
+          "seconds": 0.6939063949976116,
+          "log_sha256": "1e8dd352a7875121e9cc7010c69cf20801a33ba7b8a5ec51d148cfb3a6345f42",
+          "actual_checks": 73,
+          "device_report_sha256": "263bf74fabdab2191523e95d249385e17ed264aea37f8d6168bb195da85e0324"
+        },
+        {
+          "name": "sourceful-same-object-GL",
+          "argv": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/sanitize-rest-v2/dome-sculpt-texture-set-source-render-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/arc-sanitize-v1/sourceful-same-object-GL"
+          ],
+          "expected_checks": 994,
+          "state": "terminal",
+          "RSS_peak_bytes": 1484656640,
+          "timeout_seconds": 180,
+          "pid": 3111652,
+          "exit": 0,
+          "seconds": 22.581397803034633,
+          "log_sha256": "441ca007cabdc50ced53ca0a09ea4ff01baf5b561465448264c66287fb27cb6b",
+          "actual_checks": 994,
+          "device_report_sha256": "263bf74fabdab2191523e95d249385e17ed264aea37f8d6168bb195da85e0324"
+        },
+        {
+          "name": "arena",
+          "argv": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/sanitize-link-v2/arena"
+          ],
+          "expected_checks": 405,
+          "state": "terminal",
+          "RSS_peak_bytes": 549228544,
+          "timeout_seconds": 180,
+          "pid": 3114643,
+          "exit": 0,
+          "seconds": 1.2349358249921352,
+          "log_sha256": "5bccb3133f1d891bbdc120e832b86a782e1b281ed3a7c2930d568880ee07ecbc",
+          "actual_checks": 405,
+          "device_report_sha256": "263bf74fabdab2191523e95d249385e17ed264aea37f8d6168bb195da85e0324"
+        }
+      ],
+      "Arc_lease_released": true,
+      "source_drift": [],
+      "Arc_input_drift": [],
+      "environment": {
+        "software": {
+          "LD_LIBRARY_PATH": "/home/blux/de-xr/dome-sculpt/artifacts/xr-recovery-20261111/llvm19-package/usr/lib64/llvm19/lib:/home/blux/de-xr/dome-sculpt/artifacts/mesa-xr-leak-26.2.5/build-patched-v2/src/gallium/targets/dri:/home/blux/de-xr/dome-sculpt/artifacts/sdk-20261111/toolkit-sanitize/lib:/usr/lib64",
+          "__EGL_VENDOR_LIBRARY_FILENAMES": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/runtime-sanitize-graphics-v2/egl-vendor.json",
+          "LIBGL_DRIVERS_PATH": "/home/blux/de-xr/dome-sculpt/artifacts/mesa-xr-leak-26.2.5/build-patched-v2/src/gallium/targets/dri",
+          "LIBGL_ALWAYS_SOFTWARE": "1",
+          "MESA_LOADER_DRIVER_OVERRIDE": "llvmpipe",
+          "GALLIUM_DRIVER": "llvmpipe",
+          "LP_NUM_THREADS": "2",
+          "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+          "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+          "LSAN_OPTIONS": null
+        },
+        "Arc": {
+          "LD_LIBRARY_PATH": "/home/blux/de-xr/dome-sculpt/artifacts/sdk-20261111/toolkit-sanitize/lib:/usr/lib64",
+          "LD_PRELOAD": "/usr/lib64/libasan.so.8.0.0:/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-constant-20261111/control/device-auth-sanitize.so",
+          "__EGL_VENDOR_LIBRARY_FILENAMES": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/arc-sanitize-v1/egl-vendor.json",
+          "LIBGL_DRIVERS_PATH": "/usr/lib64/dri",
+          "LIBGL_ALWAYS_SOFTWARE": "0",
+          "DRI_PRIME": "pci-0000_03_00_0",
+          "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+          "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+          "LSAN_OPTIONS": null
+        }
+      },
+      "strict_observer": {
+        "source": "/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-constant-20261111/control/device-auth.cpp",
+        "source_sha256": "f13b90442862bdc64bd0e707a728305a68ecd45d726d54a09982b6c1bdae260e",
+        "preload": "/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-constant-20261111/control/device-auth-sanitize.so",
+        "preload_sha256": "8fa0baa9fe46b921f2524e9ac09b9d27e2e50eccf384e03449f19d5238ad0aa9",
+        "mount_helper_sha256": "1e2c6a322ae8797c78f9a2693d7e2e18aab9dd8d6472babbeb81334971904c81"
+      }
+    }
+  },
+  "images": {
+    "software_R_S_byte_exact_pairs": 98,
+    "Arc_R_S_byte_exact_pairs": 98,
+    "images_per_exact_profile_comparison": 94,
+    "native_per_exact_profile_comparison": 4,
+    "software_Arc_PNG_pairs_per_profile": 56,
+    "unchanged_RGB_tolerance": 6,
+    "observed_maximum_RGB_difference": 2,
+    "alpha_exact": true,
+    "evidence": {
+      "path": "artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/image-comparisons.json",
+      "sha256": "8dcd3a418cd30f6564576fe9fb4b4a0840f40c05577e224b2755875329c0a4de",
+      "bytes": 106279
+    }
+  },
+  "sanitizers": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+    "LSAN_OPTIONS": null,
+    "suppressions": false,
+    "successful_final_diagnostics": []
+  },
+  "SDK": {
+    "path": "artifacts/sdk-20261111/verified-sdk.json",
+    "sha256": "3a1d3014a5eb13e37f28f39e60b0d8596a5accf80a540b516aa88806b86983f0",
+    "bytes": 46384
+  },
+  "driver_scope": "Software uses actual recovered patchedMesa26.2.5+signed privately extracted LLVM19, no install. Arc uses actual systemMesa+PCI03A770/i915; every context has actualEGLDevice/DRMFD and live certifiedmount/inode/ELF observations. No physical HMD/session or compute-kernel claim.",
+  "preserved_unsuccessful_scopes": [
+    {
+      "scope": "Pre-checkpoint syntax checks",
+      "result": "FAIL (namespace typo detail::LocalSurfaceCache); corrected before7a432d2b, logs preserved",
+      "evidence": [
+        {
+          "path": "artifacts/sculpt-run-arena-20261111/artifacts/arena-proof/syntax.log",
+          "sha256": "8efe96d66120b6e3531f290903779be95bd60bd59faaf318dc1c2dfb8bd221a0",
+          "bytes": 1400
+        },
+        {
+          "path": "artifacts/sculpt-run-arena-20261111/artifacts/arena-proof/syntax-v2.log",
+          "sha256": "8efe96d66120b6e3531f290903779be95bd60bd59faaf318dc1c2dfb8bd221a0",
+          "bytes": 1400
+        }
+      ]
+    },
+    {
+      "scope": "First build coordinator setup",
+      "result": "FAIL before compiler/native start; absent release-status.json corrected to actual release-native-status.json",
+      "evidence": [
+        {
+          "path": "artifacts/sculpt-run-arena-20261111/artifacts/arena-proof/release-v1/setup-failure.json",
+          "sha256": "ea3c96151c9572b33d794165aefc9345ee4ad86c97b7d2fa7c8b5ef46d3bcd1a",
+          "bytes": 242
+        }
+      ]
+    },
+    {
+      "scope": "First optional app link",
+      "result": "FAIL duplicate complete render.o insertion when recipe repeated archive; failed partial/map retained, only affected app+benchmark relinked at new paths",
+      "evidence": [
+        {
+          "path": "artifacts/sculpt-run-arena-20261111/artifacts/arena-proof/release-cohort-v1/status.json",
+          "sha256": "26aa172a5f88b80901e0d35224969622744c0607676dc078784bbd1507a1e062",
+          "bytes": 553340
+        },
+        {
+          "path": "artifacts/sculpt-run-arena-20261111/artifacts/arena-proof/release-link-resume-v1/status.json",
+          "sha256": "b675c088389ecd6b68374d34803ffb38a0645c8c0f577ec093bc42e856db0140",
+          "bytes": 8623
+        }
+      ]
+    },
+    {
+      "scope": "Dependent worktree setup",
+      "result": "FAIL from reading testfile/index before yielded checkout finished. Real git lock retained; checkout0 then header-only diff audited. No compiler/native started",
+      "evidence": [
+        {
+          "path": "artifacts/sculpt-run-coalesced-20261111/artifacts/arena-proof/worktree-setup-failure.json",
+          "sha256": "1316734436aff186867220c7db2f19e0a382a30ac15add11c378a0e43702de46",
+          "bytes": 353
+        }
+      ]
+    },
+    {
+      "scope": "First arena SAN fixture",
+      "result": "FAIL -6 alloc-dealloc-mismatch during EGL/LLVM setup before product arena preparation; incomplete TEST nothrow allocator family. Real report retained. Complete replacement family+selfcheck repaired, no suppression",
+      "evidence": [
+        {
+          "path": "artifacts/sculpt-run-arena-20261111/artifacts/arena-proof/runtime-sanitize-v1/status.json",
+          "sha256": "447e59b97b340a96248793440f23ba5709f310b6e61ab74e80cba75b0e96bb00",
+          "bytes": 2745
+        },
+        {
+          "path": "artifacts/sculpt-run-arena-20261111/artifacts/arena-proof/runtime-sanitize-v1/arena.log",
+          "sha256": "48e9f73e67d5306e10b64bd7c5fc688a3e6527266bb06050165215e0a7a65d6f",
+          "bytes": 6700
+        }
+      ]
+    },
+    {
+      "scope": "Original198 SAN sourceful timing gate",
+      "semantic_exit": 0,
+      "original_180s_timing_gate": "FAIL",
+      "actual_seconds": 183.43960620398866,
+      "result": "900s coordinator allowed completion; original180s deadline was missed. Not relabelled. Final source reruns enforce180s and pass independently.",
+      "evidence": [
+        {
+          "path": "artifacts/sculpt-run-arena-20261111/artifacts/arena-proof/graphics-sanitize-v1/status.json",
+          "sha256": "4fc7c86b05a10c3b35eaac866cf38a15b2adfac003c367192ee6c155138769f9",
+          "bytes": 4528
+        }
+      ]
+    },
+    {
+      "scope": "a861 source audit",
+      "result": "Known requested-store ledger undercharged deleted-but-inflight stores. No observed physical VRAM overflow claimed. Original source/proofs preserved; fixed with fence-backed retirement debt in fbb3b56c."
+    },
+    {
+      "scope": "fbb source audit",
+      "result": "Empty operation fixed CPU controller/Snapshot overhead was missing. No observed native corruption/OOM claimed. Added conservative1KiB charge+zero-workspace refusal in ad091d89."
+    }
+  ],
+  "audit": {
+    "path": "artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/final-audit/summary.json",
+    "sha256": "5226a9c7d8607f0e691920a0f7cf9befc01e097c8c9cb2259c2697e1493d2f2a",
+    "bytes": 16651
+  },
+  "evidence": {
+    "compile-v2/status.json": {
+      "path": "artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/compile-v2/status.json",
+      "sha256": "a3f56f23b2cb6276042126a9ee883afe415b4e78939d0c32ccd2a08929eee5fe",
+      "bytes": 492981
+    },
+    "release-link-v2/status.json": {
+      "path": "artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/release-link-v2/status.json",
+      "sha256": "1c5bb0f13959f494e0797d98b8dd1aa8e0846d7cf7e2aea0e2cbcb5cf98ea621",
+      "bytes": 7818
+    },
+    "sanitize-link-v2/status.json": {
+      "path": "artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/sanitize-link-v2/status.json",
+      "sha256": "013cf813552f65dc51e9468fb7b67afb2b0a3e0c54994a077e72537df868696e",
+      "bytes": 8152
+    },
+    "release-rest-v2/status.json": {
+      "path": "artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/release-rest-v2/status.json",
+      "sha256": "b9d4337028efb5d2a4c51ae0d8a06f66d2bb20e13bdb4d8643db17c25e90e52a",
+      "bytes": 23720
+    },
+    "sanitize-rest-v2/status.json": {
+      "path": "artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/sanitize-rest-v2/status.json",
+      "sha256": "9218fec4bf8dd797f18fcc59938352151ad0b2b552615d725bc1b1c97c7b0101",
+      "bytes": 24759
+    },
+    "final-runtime-parent.json": {
+      "path": "artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/final-runtime-parent.json",
+      "sha256": "9064ab141372952fef101eb7bfb7106226bf6d38eefd3fe3bb765ae0c5f097da",
+      "bytes": 695
+    },
+    "runtime-release-native-v2/status.json": {
+      "path": "artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/runtime-release-native-v2/status.json",
+      "sha256": "e9800d72cf801d52bda34f783c3afa87b8116cf8fe807b43f3fe091eeb577d4d",
+      "bytes": 486184
+    },
+    "runtime-release-graphics-v2/status.json": {
+      "path": "artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/runtime-release-graphics-v2/status.json",
+      "sha256": "d69be9a2ee0d566c1969dcb9d4d0d06f8dacaa1f0de0fe331cf6c9175886224d",
+      "bytes": 488779
+    },
+    "runtime-sanitize-native-v2/status.json": {
+      "path": "artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/runtime-sanitize-native-v2/status.json",
+      "sha256": "e45ed1d6f2741ab273fc6d0708399fcfba5dc906c6f2f01bb2f467e4811b2064",
+      "bytes": 486190
+    },
+    "runtime-sanitize-graphics-v2/status.json": {
+      "path": "artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/runtime-sanitize-graphics-v2/status.json",
+      "sha256": "4261165e06a76cc4ca131bad831545baa9b05b4ff3f80074a8f5f44355a6e9cf",
+      "bytes": 488798
+    },
+    "arc-release-v1/status.json": {
+      "path": "artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/arc-release-v1/status.json",
+      "sha256": "fd0f77bfb4ebb36f8b35f6941f76a135afc5caa458277433736bd86893242121",
+      "bytes": 27570
+    },
+    "arc-sanitize-v1/status.json": {
+      "path": "artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/arc-sanitize-v1/status.json",
+      "sha256": "98448d68ebfb2b806ea08a1eff2745df598ce9449c78e71de381ceeaabea65ae",
+      "bytes": 27636
+    },
+    "strict-software-refusals-v1/status.json": {
+      "path": "artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/strict-software-refusals-v1/status.json",
+      "sha256": "3b70cdb1264c896bfccfd503ceb042cc1d21935a480c6507ceb2197138943a15",
+      "bytes": 2320
+    },
+    "image-comparisons.json": {
+      "path": "artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/image-comparisons.json",
+      "sha256": "8dcd3a418cd30f6564576fe9fb4b4a0840f40c05577e224b2755875329c0a4de",
+      "bytes": 106279
+    },
+    "final-audit/summary.json": {
+      "path": "artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/final-audit/summary.json",
+      "sha256": "5226a9c7d8607f0e691920a0f7cf9befc01e097c8c9cb2259c2697e1493d2f2a",
+      "bytes": 16651
+    },
+    "seal/verification.json": {
+      "path": "artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/seal/verification.json",
+      "sha256": "c74e52096a66074b3564c964fe68287b209a62b441c4cf46fc096128918b30d8",
+      "bytes": 715
+    },
+    "seal/members.json": {
+      "path": "artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/seal/members.json",
+      "sha256": "78ec0094af6415a219ffb059e2c2d2b1c4e2cb1bb77b1016969b5f985b9186e1",
+      "bytes": 189153
+    },
+    "seal/large-link-maps.json": {
+      "path": "artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/seal/large-link-maps.json",
+      "sha256": "7cccd9ae831f346565874b859f1a2fb59dbb78f793e091dcda8624629a4cfbf1",
+      "bytes": 27761
+    }
+  },
+  "control_archive": {
+    "path": "artifacts/sculpt-run-retirement-20261111/artifacts/arena-proof/seal/control-evidence.tar.zst",
+    "sha256": "d0dd998fb18994420ac9b1df4f14b202c21a0d4a7e8e9cc707aa56aa27b899d1",
+    "bytes": 489286,
+    "members": 476,
+    "raw_bytes": 16264151,
+    "PAX_SHA_metadata_verified": true,
+    "originals_removed": false,
+    "large_maps_inventory_count": 67
+  },
+  "remaining": [
+    "Root review and actual coherent current-main+painting integration; this private component is not main admission.",
+    "Original sustained P1 old/new candidate comparison and frame-cost measurement; explicitly deferred until root review/other workflow gates close.",
+    "Physical device-loss/OOM/hotplug/production headset behavior and broader original authoring requirements.",
+    "Generic retirement helper extraction for texture/paint-preview pools needs separate owner/FBO lifetime qualification."
+  ]
+}
