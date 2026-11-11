@@ -1,8 +1,10 @@
 # Current-grid GPU render preview
 
-Implementation branch from `775f92b8`. This is an in-progress product change;
-source compilation, fresh owning builds and runtime qualification are separate
-steps. It does not complete the full painting/material/baking objective.
+Private implementation branch `work/plain-gpu-preview-20261111` from `775f92b8`.
+Product source `1452ddec` passed fresh owning Release/SAN builds and the selected
+controls below; extended consumer `acff27fe` changes tests and link wrappers only.
+It remains unmerged and uninstalled. It does not complete the full
+painting/material/baking objective.
 
 The actual Document mesh producer requests a private render-only interpretation
 before it calls the old image compositor. The packet retains the genuine plain
@@ -59,3 +61,41 @@ Fresh core, render, native graphics, UI/XR application and matched consumers are
 required because `TextureMaps` gains a typed pointer. Reusing an older core ELF
 or archive does not qualify this source or its public byte ABI. No installation
 or physical-headset acceptance is implied by these tests.
+
+
+## Qualification and pause boundary
+
+Both profiles passed the same ten selected software controls at product source
+`1452ddec`: current native authority/history (8,401 assertions), current GPU
+preview (49,569), existing compositor-native/render/export, texture-set
+surfaces/native, old sparse overlay, source overlay, MToon renderer (81), and
+native GPU blur software controls (139,378). Sanitizers used leak detection and
+strict UBSan without suppressions. The software provider was actual system Mesa
+26.2.5 / LLVM 22.1.8; it was not a patched LLVM19 overlay.
+
+The final test-only extension passed 98,815 assertions on software GL and 98,818
+on authenticated Arc A770 in each Release/SAN profile. The three extra hardware
+checks pair actual current EGLDevice `/dev/dri/renderD129`, PCI `0000:03:00.0`
+`8086:56a0`, and GL renderer identity; recorded live DRM FDs contain only 129.
+Actual hardware times were 0.52s Release and 1.92s SAN. These are bounded correctness
+controls, not a frame-pacing benchmark or a headset acceptance test.
+
+The extension uses five genuine duplicate actors in one native Scene. It records
+actual GL common-buffer sizes 68,608→134,144 bytes (capacity 4→8), one GPU copy of
+68,608 bytes, and exactly one 16,384-byte new native slot upload. It then changes
+four actual materials to force fresh resolves from every copied old slot, with
+zero old-slot CPU reuploads and exact legacy byte outputs on all five fields.
+Bare HDR background and hidden-FLOAT legacy-quantization cases also pass.
+
+The full fresh SAN owning build compiled 277 steps with UI/XR enabled. The fresh
+Release closure includes an original retained consumer include-path failure,
+then successful corrected ownership and shader-consumer refreshes. The first
+actual shader failure (integer returns in float GLSL functions) is retained and
+fixed at `1452ddec`. Every recorded source manifest has no drift. Exact source,
+binary/provider hashes, commands, prior failures and per-profile receipts are in
+[the qualification record](validation/CURRENT-GRID-GPU-PREVIEW-20261111.json).
+
+The parent has finalized main independently and paused the goal. This private
+preview milestone is sealed for later review/integration; no jobs or hardware
+leases remain, and no installation or session launch was performed. Resume notes
+are in [the private handoff](CURRENT-GRID-GPU-PREVIEW-HANDOFF.md).
