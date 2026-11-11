@@ -121,6 +121,9 @@ void source_controls(){
   const auto cancellable=detail::emission_bake_source(source,[&]{return cancelled;});cancelled=true;caught=false;
   try{cancellable(0,bary);}catch(const std::exception&){caught=true;}
   check(caught,"late cancellation is polled by the owning source sampler");
+  auto doubled=std::make_shared<SourceMaterialBindings>(*current);doubled->roles[size_t(MToonSlot::Emission)].uv_transform={1,0,0,1,-.5f,0};source.material_bindings=doubled;caught=false;
+  try{detail::emission_bake_source(source);}catch(const std::invalid_argument&){caught=true;}
+  check(caught,"typed image role cannot apply a second affine after the genuine nonidentity MToon transform");
   auto animated=std::make_shared<SourceMaterialBindings>(*current);animated->material.parameters.scroll={.1f,0};source.material_bindings=animated;caught=false;
   try{detail::emission_bake_source(source);}catch(const std::invalid_argument&){caught=true;}
   check(caught,"animated typed source still requires explicit time freezing, not implicit time zero");

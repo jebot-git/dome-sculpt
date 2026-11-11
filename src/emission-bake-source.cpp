@@ -39,7 +39,11 @@ struct Source {
     if(role.image&&!physical_background){
       auto uv=coordinates(triangle,bary,toon?mtoon_coordinate(toon->textures[size_t(MToonSlot::Emission)]):role.texcoord,true);
       if(toon)uv=mtoon_uv(*toon,MToonSlot::Emission,uv,0);
-      const auto value=sample_source_texture(role,uv[0],uv[1],true);
+      // coordinates() has authenticated and resolved the actual source set.
+      // The ordinary image sampler accepts only a resolved coordinate pair;
+      // retain its affine/filter/image, without reinterpreting UV1 as UV0.
+      auto resolved=role;resolved.texcoord=0;
+      const auto value=sample_source_texture(resolved,uv[0],uv[1],true);
       for(size_t k=0;k<3;++k){const double radiance=double(original[k])*value[k];if(radiance>std::numeric_limits<float>::max())throw std::overflow_error("Emission Bake source multiplication overflows FLOAT");original[k]=float(radiance);}
     }
     BakedEmissionSample replacement;
