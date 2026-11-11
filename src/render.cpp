@@ -1164,7 +1164,9 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
     struct DrawItem {const SurfaceRange *packed=nullptr;const detail::SculptObjectChunks *chunk=nullptr;uint64_t object=0;};
     std::vector<DrawItem> ordered;
     ordered.reserve(drawing->ranges.size()+(drawing->sculpt_chunks?drawing->sculpt_chunks->objects().size():0));
-    for(const auto &range:drawing->ranges)ordered.push_back({&range,nullptr,range.object});
+    // Empty ranges still pass material/source validation above, but submit no
+    // primitive. An empty flat selection intentionally owns no core-profile VAO.
+    for(const auto &range:drawing->ranges)if(range.count)ordered.push_back({&range,nullptr,range.object});
     if(drawing->sculpt_chunks) {
       for(const auto &object:drawing->sculpt_chunks->objects())ordered.push_back({nullptr,&object,object.object});
       const auto &scene_order=drawing->sculpt_chunks->object_order();

@@ -132,6 +132,16 @@ void empty_flat_controls(const Fixture&f,bool deferred){
  check(allocations==prior&&zero_buffers==empty_calls&&only.buffer_stats().geometry_uploads==counts.geometry_uploads,"Changed pure-sculpt snapshots allocate no flat buffer/VAO and report no phantom geometry upload");
  fbo.bind();const auto empty_pixels=render(only,blank,deferred);
  check(std::all_of(empty_pixels.begin(),empty_pixels.end(),[](uint8_t x){return x==0;})&&only.buffer_stats().vertex_bytes==0&&only.buffer_stats().index_bytes==0,"Fully empty selection resolves transparent with zero accepted geometry capacity");
+ auto empty_range=std::make_shared<MeshSnapshot>(*blank);empty_range->ranges.push_back(SurfaceRange{});empty_range->ranges.back().object=1;
+ fbo.bind();check(render(only,empty_range,deferred)==empty_pixels,"Valid zero-count material range renders an empty core-profile selection without a VAO");
+ auto invalid_range=std::make_shared<MeshSnapshot>(*empty_range);invalid_range->ranges.back().first=1;
+ const auto before_invalid=allocations;fbo.bind();check(reject([&]{render(only,invalid_range,deferred);})&&allocations==before_invalid,"Zero-count ranges still receive full bounds validation before allocation");
+ fbo.bind();check(render(only,empty_range,deferred)==empty_pixels,"Rejected zero-count range preserves exact accepted empty-selection pixels");
+ auto packed_again=warm(renderer,f.old_frame,fbo,deferred);pending=true;arm(Fault::Resolve);fbo.bind();
+ check(reject([&]{render(renderer,empty_range,deferred);})&&fired==1,"Packed-to-zero-range proposal can fail at actual late resolve");fault=Fault::None;live(packed_again.resources);
+ fbo.bind();check(render(renderer,packed_again.frame,deferred)==packed_again.pixels,"Failed zero-range publication preserves exact accepted packed geometry");pending=false;
+ fbo.bind();check(render(renderer,empty_range,deferred)==empty_pixels,"Zero-range publication retries to the exact independently checked empty result");
+ fbo.bind();check(render(renderer,f.old_frame,deferred)==accepted.pixels,"Packed geometry returns after accepted zero-count range without stale VAO state");
  fbo.bind();check(render(only,pure,deferred)==expected,"Pure sculpt reopens after a fully empty selection without stale flat names");
  check(glGetError()==GL_NO_ERROR,"Packed/sculpt/empty transitions leave the actual GL error queue clean");
 }
