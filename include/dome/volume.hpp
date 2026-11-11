@@ -12,7 +12,7 @@
 #include <unordered_map>
 #include <vector>
 namespace dome {
-namespace detail {struct NativeWeightVolumeAccess;}
+namespace detail {struct NativeWeightVolumeAccess;class NativeSceneGeometryIntern;}
 
 struct CsgBox;
 struct ProceduralSculptOptions;
@@ -109,6 +109,7 @@ public:
 private:
   friend class Document;
   friend struct detail::NativeWeightVolumeAccess;
+  friend class detail::NativeSceneGeometryIntern;
   void swap_state(Volume &) noexcept;
   struct GeometryHistory;
   using GeometryHistoryPtr = std::shared_ptr<const GeometryHistory>;

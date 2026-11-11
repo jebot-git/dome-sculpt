@@ -76,6 +76,22 @@ void shared_instances(){
   for(size_t i=1;i<4;++i){auto id=scene.add("Shared immutable sculpt",field);scene.object(id).transform.position={float(i)*1.3f,0,0};}
   scene.object(4).affine_edit=std::make_shared<NativeAffineEdit>(AffineTransform(std::array<double,16>{-1,0,0,0,.17,1.1,0,0,.07,.09,.85,0,0,0,0,1}));
   scene.select(1);
+  const auto hidden=scene.object(2).volume->add_layer("Independent hidden layer");
+  scene.object(2).volume->layer_properties(hidden,"Independent hidden layer",false,true,.37f);
+  scene.object(2).volume->fill_mask(.23f);
+  const auto archive=scene.encode();auto reopened=Scene::decode(archive);
+  pipeline_check(reopened.encode()==archive,"Native decoding preserves every object/layer/mask/material/placement field while sharing verified evaluated storage");
+  const auto decoded_owner=reopened.object(1).volume->geometry_owner();
+  for(uint64_t id=2;id<=4;++id)pipeline_check(reopened.object(id).volume->geometry_owner()==decoded_owner,
+      "Freshly decoded duplicate Volumes own genuine shared COW storage before mesh publication");
+  auto decoded=SculptSceneChunks::capture(reopened,{28,1,1,true,true});corners_equal(reopened,decoded);
+  stamp(*reopened.object(1).volume,{.08f,.04f,0});
+  pipeline_check(reopened.object(1).volume->geometry_owner()!=decoded_owner&&reopened.object(2).volume->geometry_owner()==decoded_owner,
+      "Editing a decoded shared Volume detaches its geometry without changing another decoded object");
+  const auto second_before=reopened.object(2).volume->encode();
+  reopened.object(1).volume->fill_mask(.6f);
+  pipeline_check(reopened.object(2).volume->encode()==second_before,
+      "Decoded COW storage sharing never merges independent masks, layers or edit histories");
   auto first=SculptSceneChunks::capture(scene,{27,1,1,true,true});
   const auto owner=first.chunks->find(1)->geometry;
   for(uint64_t id=2;id<=4;++id)

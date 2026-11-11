@@ -10,6 +10,7 @@
 #include "polygon-surface-preview.hpp"
 #include "color-bound-memo.hpp"
 #include "emission-paint-access.hpp"
+#include "native-scene-geometry-intern.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/scene.hpp"
 #include "current-paint-preview.hpp"
@@ -1196,6 +1197,7 @@ Scene Scene::decode(const nlohmann::json &j) {
     }
   }
   result.objects_.clear();
+  detail::NativeSceneGeometryIntern decoded_geometry;
   size_t samples = 0, texels = 0, deformation_entries = material_fields?SourceMaterialArchive::deformation_entries(j.at("source_materials")):0, paint_bytes = 0;
   for (auto &v : objects) {
     SculptObject o;
@@ -1231,6 +1233,7 @@ Scene Scene::decode(const nlohmann::json &j) {
     if (samples > 4'000'000)
       throw std::length_error("Scene sample limit exceeded");
     o.volume = std::make_shared<Volume>(Volume::decode(v.at("volume")));
+    decoded_geometry.intern(*o.volume);
     if (o.volume->stored_samples() > v.at("volume").at("samples").size())
       samples +=
           o.volume->stored_samples() - v.at("volume").at("samples").size();
