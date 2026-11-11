@@ -613,15 +613,28 @@ FN(ReleaseSwapchainImage, XrSwapchain p, const XrSwapchainImageReleaseInfo *) {
     }
     report["field_images"][std::to_string(field_step)][std::to_string(s->eye)]=std::count_if(bytes.begin(),bytes.end(),[](uint8_t v){return v!=0;});
     const bool save_attempt=field_history()&&(field_step==64||field_step==78||field_step==92);
-    const bool capture=(blur_page_gate()&&blur_page_visible[s->eye].contains(field_step))||field_step==59||field_step==61||field_step==65||field_step==68||field_step==96||save_attempt;
+    const bool capture=blur_page_gate()||field_step==59||field_step==61||field_step==65||field_step==68||field_step==96||save_attempt;
     const bool root_capture=field_root_gate()&&field_root_visible[s->eye].contains(field_step)&&field_root_visible[s->eye].at(field_step).second==physical_frame;
     const bool closed_capture=field_close_gate()&&field_menu_closed[s->eye].contains(field_step)&&field_menu_closed[s->eye].at(field_step).second==physical_frame;
-    const bool waiting_capture=(field_root_gate()||field_close_gate()||(field_history()&&(field_step==67||field_step==81||field_step==95)))&&physical_frame%300==0;
+    const bool waiting_capture=(blur_page_gate()||field_root_gate()||field_close_gate()||(field_history()&&(field_step==67||field_step==81||field_step==95)))&&physical_frame%300==0;
     const auto key=std::to_string(field_step)+(waiting_capture?"-wait-"+std::to_string(physical_frame)+"-":root_capture?"-root-":closed_capture?"-closed-":"-")+std::to_string(s->eye);
-    if((capture||root_capture||closed_capture||waiting_capture)&&!report["field_captures"].contains(key))if(const auto*path=getenv("DOME_XR_FIXTURE_REPORT")){
-      const auto target=std::string(path)+".field-"+key+".ppm";std::ofstream image(target,std::ios::binary);image<<"P6\n"<<s->width<<' '<<s->height<<"\n255\n";
-      for(int y=int(s->height)-1;y>=0;--y)for(unsigned x=0;x<s->width;++x)for(int c=0;c<3;++c)image.put(char(displayed(bytes[(size_t(y)*s->width+x)*4+c])));
-      report["field_captures"][key]=target;
+    auto save_image=[&](const std::string&name){
+      if(report["field_captures"].contains(name))return;
+      if(const auto*path=getenv("DOME_XR_FIXTURE_REPORT")){
+        const auto target=std::string(path)+".field-"+name+".ppm";std::ofstream image(target,std::ios::binary);image<<"P6\n"<<s->width<<' '<<s->height<<"\n255\n";
+        for(int y=int(s->height)-1;y>=0;--y)for(unsigned x=0;x<s->width;++x)for(int c=0;c<3;++c)image.put(char(displayed(bytes[(size_t(y)*s->width+x)*4+c])));
+        std::ofstream raw(target+".rgba",std::ios::binary);raw.write(reinterpret_cast<const char*>(bytes.data()),std::streamsize(bytes.size()));
+        report["field_captures"][name]=target;report["field_capture_layout"][name]={{"width",s->width},{"height",s->height},{"raw",target+".rgba"},{"row_order","bottom_to_top"},{"encoding","linearRGBA8;xr.cpp palette linearOutput=true"}};
+      }
+    };
+    if(capture||root_capture||closed_capture||waiting_capture)save_image(key);
+    if(blur_page_gate()){
+      const auto&ui=report["blur_page_ui"][std::to_string(field_step)][std::to_string(s->eye)];
+      // Diagnostic evidence ignores the title predicate, never the gate. Both
+      // first frames and actual highlighted/checkbox frames survive failures.
+      if(ui.value("panel_present",false)&&ui.value("checkbox_state_valid",false)&&ui.value("label_bright_pixels",0)>=6&&ui.value("selected_pixels",0)*4>=ui.value("selected_samples",1)*3)
+        save_image(std::to_string(field_step)+"-page-evidence-"+std::to_string(s->eye));
+      if(blur_page_visible[s->eye].contains(field_step))save_image(std::to_string(field_step)+"-page-ready-"+std::to_string(s->eye));
     }
   }
   int opaque = 0, blue = 0;

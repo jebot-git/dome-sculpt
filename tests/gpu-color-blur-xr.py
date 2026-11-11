@@ -64,7 +64,7 @@ def drive_case(name,mode):
  final=inspect(result,env);check(final==expected,name+': final native Save/fresh reopen is exact')
  check(project.read_bytes()!=fixtures['original'].read_bytes(),name+': real controller Save replaced the writable project, not its immutable original fixture')
  state=stable_json(runtime_report);check(state.get('frames_waited')==state.get('frames_begun')==state.get('frames_ended') and state.get('acquires')==state.get('image_waits')==state.get('releases') and state.get('swapchains_destroyed')==2,name+': real loader balances all stereo frame/image/session ownership')
- check(state.get('left_eye_nonblank',0)>0 and state.get('right_eye_nonblank',0)>0 and state.get('palette_images',0)>0 and all(str(step)+'-'+str(eye) in state.get('field_captures',{}) for step in [21,31,43,49,55] for eye in [0,1]),name+': both real GL eyes capture actual brush Filters and Blur palette navigation')
+ check(state.get('left_eye_nonblank',0)>0 and state.get('right_eye_nonblank',0)>0 and state.get('palette_images',0)>0 and all(str(step)+'-page-ready-'+str(eye) in state.get('field_captures',{}) for step in [21,31,43,49,55] for eye in [0,1]),name+': both real GL eyes capture actual brush Filters and Blur palette navigation')
  for eye in ['0','1']:
   for step in [21,31,43,49,55]:
    ui=state.get('blur_page_ui',{}).get(str(step),{}).get(eye,{});check(ui.get('ready') is True and ui.get('checkbox_state_valid') is True and ui.get('label_bright_pixels',0)>=6 and ui.get('selected_pixels',0)*4>=ui.get('selected_samples',1)*3 and ui.get('last',0)-ui.get('first',0)>=2,name+': eye'+eye+' page'+str(ui.get('page'))+' publicly presents the actual highlighted label before its controller click')
