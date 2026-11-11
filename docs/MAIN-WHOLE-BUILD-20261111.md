@@ -32,6 +32,13 @@ header, source and bitmap-library checks match. External bitmap libraries retain
 their previously recorded platform instrumentation policy; this is not a claim
 that every system library was rebuilt with sanitizers.
 
+A subsequent metadata correction aligns the generic `source_sha256` entry for
+`third_party/desktop/bdf_font.hpp` with the unchanged canonical helper bytes,
+already correctly recorded by `desktop.bitmap_helper`. All 33 generic source
+entries now match their actual files. The build evidence above remains tied to
+`82074315`; this metadata edit does not claim another build or change any compiled
+helper, runtime or header.
+
 ## Scope and remaining integration
 
 This closes the fresh owning-build gate for main820. It does not rerun or broaden
