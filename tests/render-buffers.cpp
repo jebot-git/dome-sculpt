@@ -3,6 +3,7 @@
 #include "mtoon-render.cpp"
 #undef main
 #include <limits>
+#include "render-upload-target.hpp"
 namespace {
 struct Traffic {size_t vertex_bytes=0,index_bytes=0;unsigned vertex_calls=0,index_calls=0;};
 Traffic traffic;
@@ -10,8 +11,8 @@ bool capture=false;
 }
 extern "C" void __real_glBufferData(GLenum,GLsizeiptr,const void*,GLenum);
 extern "C" void __wrap_glBufferData(GLenum target,GLsizeiptr size,const void *data,GLenum usage) {
-  if(capture && target==GL_ARRAY_BUFFER){traffic.vertex_bytes+=size;traffic.vertex_calls++;}
-  if(capture && target==GL_ELEMENT_ARRAY_BUFFER){traffic.index_bytes+=size;traffic.index_calls++;}
+  if(capture && render_upload_test::vertex(target,data,usage)){traffic.vertex_bytes+=size;traffic.vertex_calls++;}
+  if(capture && render_upload_test::index(target,data,usage)){traffic.index_bytes+=size;traffic.index_calls++;}
   __real_glBufferData(target,size,data,usage);
 }
 int main(int argc,char **argv)try {
@@ -84,8 +85,8 @@ int main(int argc,char **argv)try {
         "Equal raw addresses with different ownership control blocks do not alias geometry");
   auto invalid=std::make_shared<MeshSnapshot>(*alias2);invalid->mesh.indices.resize(3);invalid->ranges[0].count=3;
   check(rejects([&]{render(invalid);}),"Reused geometry with changed packed counts rejects before publication");
-  check(render(alias2)==baseline&&traffic.index_calls==1,
-        "Rejected geometry publication invalidates the cache and recovers the previous valid scene");
+  check(render(alias2)==baseline&&traffic.vertex_calls==0&&traffic.index_calls==0,
+        "Rejected geometry publication preserves the accepted scene with zero geometry or scalar reuploads");
   invalid=std::make_shared<MeshSnapshot>(*alias2);invalid->sculpt_masks.assign(4,std::numeric_limits<float>::quiet_NaN());
   check(rejects([&]{render(invalid);}),"Invalid scalar data cannot enter a retained geometry buffer");
   check(render(alias2)==baseline,"Scalar failure retains recoverable source geometry and material data");

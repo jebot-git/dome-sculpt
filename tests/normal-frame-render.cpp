@@ -5,6 +5,7 @@
 #include "../src/source-frame-skin.hpp"
 #include "dome/material-bindings.hpp"
 #include "normal-frame-fixtures.hpp"
+#include "render-upload-target.hpp"
 namespace {
 void frames(MeshSnapshot &s,Vec3 N,Vec3 T,float sign=1) {
   s.source_normals.assign(s.mesh.positions.size(),N);s.source_tangents.assign(s.mesh.positions.size(),{T.x,T.y,T.z,sign});s.ranges[0].source_frame=true;
@@ -17,9 +18,9 @@ Image flat64(std::array<uint8_t,4> p){Image out{64,64,std::vector<uint8_t>(64*64
 bool capture_buffers=false;size_t array_bytes=0,index_bytes=0;
 }
 extern "C" void __real_glBufferData(GLenum,GLsizeiptr,const void*,GLenum);
-extern "C" void __wrap_glBufferData(GLenum target,GLsizeiptr bytes,const void *data,GLenum usage){if(capture_buffers){if(target==GL_ARRAY_BUFFER)array_bytes+=bytes;if(target==GL_ELEMENT_ARRAY_BUFFER)index_bytes+=bytes;}__real_glBufferData(target,bytes,data,usage);}
+extern "C" void __wrap_glBufferData(GLenum target,GLsizeiptr bytes,const void *data,GLenum usage){if(capture_buffers){if(render_upload_test::vertex(target,data,usage))array_bytes+=bytes;if(render_upload_test::index(target,data,usage))index_bytes+=bytes;}__real_glBufferData(target,bytes,data,usage);}
 extern "C" void __real_glBufferSubData(GLenum,GLintptr,GLsizeiptr,const void*);
-extern "C" void __wrap_glBufferSubData(GLenum target,GLintptr offset,GLsizeiptr bytes,const void *data){if(capture_buffers){if(target==GL_ARRAY_BUFFER)array_bytes+=bytes;if(target==GL_ELEMENT_ARRAY_BUFFER)index_bytes+=bytes;}__real_glBufferSubData(target,offset,bytes,data);}
+extern "C" void __wrap_glBufferSubData(GLenum target,GLintptr offset,GLsizeiptr bytes,const void *data){if(capture_buffers){if(render_upload_test::subvertex(target))array_bytes+=bytes;if(target==GL_ELEMENT_ARRAY_BUFFER)index_bytes+=bytes;}__real_glBufferSubData(target,offset,bytes,data);}
 int main(int argc,char **argv)try {
  NativeGraphics graphics;std::string device=reinterpret_cast<const char*>(glGetString(GL_RENDERER));std::cout<<"GPU "<<device<<'\n';
  check(argc<2||std::string(argv[1])!="--hardware"||(device.find("llvmpipe")==std::string::npos&&device.find("softpipe")==std::string::npos),"Original-frame rendering runs on requested hardware");

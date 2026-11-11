@@ -7,6 +7,7 @@
 #include <iostream>
 #include <unistd.h>
 using namespace dome;
+#include "render-upload-target.hpp"
 namespace {
 size_t checks=0,array_bytes=0,index_bytes=0,array_calls=0,index_calls=0;
 bool capture=false,inject_error=false;
@@ -42,8 +43,8 @@ std::shared_ptr<const MeshSnapshot> ready(Document&doc){
 }
 extern "C" void __real_glBufferData(GLenum,GLsizeiptr,const void*,GLenum);
 extern "C" void __wrap_glBufferData(GLenum target,GLsizeiptr size,const void*data,GLenum usage){
- if(capture){if(target==GL_ARRAY_BUFFER){array_bytes+=size;++array_calls;}if(target==GL_ELEMENT_ARRAY_BUFFER){index_bytes+=size;++index_calls;}}
- if(capture&&inject_error&&target==GL_ARRAY_BUFFER&&size>0){inject_error=false;__real_glBufferData(target,-1,data,usage);return;}
+ if(capture){if(render_upload_test::vertex(target,data,usage)){array_bytes+=size;++array_calls;}if(render_upload_test::index(target,data,usage)){index_bytes+=size;++index_calls;}}
+ if(capture&&inject_error&&render_upload_test::vertex(target,data,usage)&&size>0){inject_error=false;__real_glBufferData(target,-1,data,usage);return;}
  __real_glBufferData(target,size,data,usage);
 }
 int main(int argc,char**argv)try{
@@ -77,10 +78,10 @@ int main(int argc,char**argv)try{
  check(renderer.buffer_stats().geometry_uploads==uploaded+1,"The large publication completes exactly one geometry upload");
  check(render(large)==baseline&&array_calls==0&&index_calls==0,"Second-eye rendering reuses all large geometry without glBufferData traffic");
  auto before_failure=renderer.buffer_stats().geometry_uploads;inject_error=true;bool failed=false;
- try{render(small);}catch(const std::runtime_error&e){if(std::string(e.what()).find("Surface vertex buffer upload failed (GL error 1281)")==std::string::npos)throw;failed=true;std::cout<<"EXPECTED DRIVER FAILURE "<<e.what()<<std::endl;}
+ try{render(small);}catch(const std::runtime_error&e){if(std::string(e.what()).find("Surface staged geometry allocation failed (GL error 1281)")==std::string::npos)throw;failed=true;std::cout<<"EXPECTED DRIVER FAILURE "<<e.what()<<std::endl;}
  check(failed&&!inject_error&&renderer.buffer_stats().geometry_uploads==before_failure,"A real invalid-size driver upload is reported before successful geometry publication");
  check(glGetError()==GL_NO_ERROR,"Upload failure consumes its GL error and leaves a recoverable error queue");
- check(render(small)==baseline&&array_calls==1&&index_calls==1,"A failed upload invalidates the cache and retries the same valid source successfully");
+ check(render(small)==baseline&&array_calls==1&&index_calls==1,"A failed staged upload retries the proposed valid source without invalidating the accepted scene");
  large.reset();doc.replace(indexed_scene());auto indexed=ready(doc);
  check(indexed->mesh.positions.size()==1'083'603&&indexed->mesh.indices.size()==6'480'000,"Actual Document preserves independently valid ordinary grids above6M aggregate indices");
  check(render(indexed)==baseline&&index_calls==1&&index_bytes==6'480'000*sizeof(uint32_t),"The driver receives every index above the former aggregate cap and preserves baseline pixels");

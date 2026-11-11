@@ -249,7 +249,10 @@ public:
    if(p.wanted.empty()&&!preserve_existing){retire(common_.view);retire(common_.buffer);retire(emission_.view);retire(emission_.buffer);common_={};emission_={};}
   }catch(...){for(auto&[key,entry]:added)retire(entry);try{seal();}catch(...){}if(own_ledger_)ledger_->seal_noexcept();throw;}
  }
- const Resource&at(const Data&owner)const{return entries_.at(owner->contribution_owner()?owner->contribution_owner():owner).resource;}
+ // Raw references are invalidated by pruning prepare/retain/clear. Reacquire
+ // before each submission, or mark_used() before submitting retained refs.
+ void mark_used()noexcept{ledger_->mark_used();}
+ const Resource&at(const Data&owner)const{ledger_->mark_used();return entries_.at(owner->contribution_owner()?owner->contribution_owner():owner).resource;}
  Stats stats()const{auto out=stats_;const auto u=ledger_->usage(group_);out.requested_bytes=u.bytes;out.retired_bytes=u.retired_bytes;out.peak_bytes=std::max(out.peak_bytes,u.peak_bytes);return out;}
  size_t bytes()const noexcept{return ledger_->usage(group_).bytes;}size_t image_count()const noexcept{return ledger_->usage(group_).images;}
  void clear(bool release){
