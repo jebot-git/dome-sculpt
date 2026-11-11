@@ -2,7 +2,10 @@
 #include "dome/scene.hpp"
 #include "dome/color-preparation.hpp"
 #include "dome/normal-preparation.hpp"
+#include "dome/texture-sets.hpp"
+#include "dome/source-maps.hpp"
 #include "baked-emission-access.hpp"
+#include "baked-emission-write-scope.hpp"
 #include "native-read-scope.hpp"
 #include "paint-overlay-sample.hpp"
 #include <bit>
@@ -21,9 +24,60 @@ Image image(std::array<uint8_t,4> value){Image i{64,64,std::vector<uint8_t>(64*6
 BakedTextures legacy(){BakedTextures b;b.maps.color=image({22,47,92,255});b.maps.metal_rough=image({113,62,31,255});b.maps.emission=image({180,92,33,255});b.maps.normal=image({128,128,255,255});b.coverage.assign(4096,255);return b;}
 BakedTextures floating(BakedEmissionSample value,uint8_t common=255){auto b=legacy();b.maps.emission={};b.coverage.assign(4096,common);b.emission_field=BakedEmissionField::create(64,std::vector<BakedEmissionSample>(4096,value));return b;}
 Scene scene(std::shared_ptr<PaintedMesh> p){Scene s;s.active().mesh_active=true;s.active().painted=std::move(p);return s;}
+void writer_controls(){
+  for(bool forged:{false,true}){
+    auto raw=MToonMaterial{}.source_json();
+    raw["extras"]["opaque"]={{"baked",{{"version",6}}}};
+    if(forged){
+      const auto field=BakedEmissionField::create(8,std::vector<BakedEmissionSample>(64,BakedEmissionSample{{},{50000,0,0},1}));
+      raw["extras"]["opaque"]={{"resolution",64},{"active",1},{"next_id",2},{"layers",nlohmann::json::array()},
+        {"baked",{{"version",6},{"base_version",1},{"float_emission",nlohmann::json::binary(field->encode())},{"emission",nlohmann::json::binary(std::vector<uint8_t>{})}}}};
+    }
+    auto binding=std::make_shared<SourceMaterialBindings>();binding->material=MToonMaterial::from_vrm1(raw);binding->validate();
+    auto value=scene(std::make_shared<PaintedMesh>(quad(),64));value.active().material_bindings=binding;
+    const auto encoded=value.encode();
+    check(encoded.at("version")!=41,"retained opaque MToon JSON cannot fabricate a FLOAT writer capability");
+    check(Scene::decode(encoded).encode()==encoded,"opaque bare/forged-paint/binary material metadata preserves exact old wire");
+  }
+  auto paint=std::make_shared<PaintedMesh>(quad(),64);paint->install_bake(floating({{},{50000,.00001f,2},1}));
+  {
+    PaintImageArchive real,foreign;detail::BakedEmissionWriteScope outer;outer.begin(real);
+    (void)paint->encode();(void)paint->encode(&foreign);
+    check(!outer.emitted(),"discarded/null/foreign-archive hash encodes cannot manufacture writer feature");
+    const auto nested=scene(paint).encode();
+    check(nested.at("version")==41&&!outer.emitted(),"actual nested Scene encoder binds its own archive without contaminating parent");
+    bool child_emitted=false;
+    try{
+      PaintImageArchive child;detail::BakedEmissionWriteScope inner;inner.begin(child);
+      (void)paint->encode(&child);child_emitted=inner.emitted();
+      throw std::runtime_error("intentional writer unwind");
+    }catch(const std::runtime_error&){}
+    check(child_emitted,"nested scope recognizes actual child field bytes");
+    check(!outer.emitted(),"writer exception unwind restores clean outer scope");
+    (void)paint->encode(&real);check(outer.emitted(),"only actual successfully emitted owning archive grants writer feature");
+  }
+  ColorPreparationOptions options;options.resolve_identity=true;
+  const auto prepared=prepare_source_colors({paint,{},{},{},Material{}},options);
+  auto retained=scene(prepared.paint->snapshot());retained.active().material_bindings=prepared.material_bindings;
+  retained.active().painted->clear_bake();
+  check(!retained.active().painted->baked()&&retained.active().material_bindings->color_preparation->original_paint->baked()->emission_field,"actual persisted source history retains FLOAT after current base is cleared");
+  const auto history=retained.encode();check(history.at("version")==41&&Scene::decode(history).encode()==history,"writer feature follows actual emitted history owner rather than only current paint");
+  Scene sets;std::array<TextureSetInitialField,2> fields;for(auto &field:fields)field.resolution=64;
+  initialize_texture_sets(sets,sets.active().id,quad(),fields,std::array<TextureSetId,2>{0,1});
+  check(edit_texture_set(sets,sets.active().id,1,[](PaintedMesh &paint,Material &){paint.install_bake(floating({{},{50000,.00001f,2},1}));return true;}),"actual public set mutation adopts independent FLOAT owner");
+  check(!sets.active().painted->baked()&&sets.active().texture_sets->at(1).painted->baked()->emission_field,"additional set is the genuine FLOAT owner, primary remains legacy");
+  const auto encoded=sets.encode();check(encoded.at("version")==41&&encoded.at("payload").at("version")==40,"Scene41 retains actual Scene40 set ownership beneath its envelope");
+  check(Scene::decode(encoded).encode()==encoded,"nonprimary shared-geometry field and Scene40/Paint7 capabilities restart exactly");
+  refuses([&]{Scene::decode(encoded.at("payload"));},"old Scene40 cannot claim new baked data without its explicit envelope");
+}
 } // namespace
-int main()try{
+int main(int argc,char **argv)try{
   using namespace dome;
+  writer_controls();
+  if(argc==2&&std::string_view(argv[1])=="--writer-controls"){
+    std::cout<<"Baked emission writer "<<checks<<" checks PASS\n";return 0;
+  }
+  if(argc!=1)throw std::invalid_argument("baked-emission-native [--writer-controls]");
   auto paint=std::make_shared<PaintedMesh>(quad(),64);
   paint->install_bake(legacy());
   const auto old_scene=scene(paint).encode();
@@ -78,6 +132,8 @@ int main()try{
   fake["payload"]=encoded;refuses([&]{Scene::decode(fake);},"direct nested Scene41 envelopes refused");
   fake=encoded;fake["version"]=41.;refuses([&]{Scene::decode(fake);},"Scene41 version must be an integer");
   fake=encoded;fake["extra"]=1;refuses([&]{Scene::decode(fake);},"Scene41 exact wrapper shape");
+  fake=encoded;fake["payload"]["objects"][0]["painted"]["payload"]["baked"]["absolute_units"]="half";
+  refuses([&]{Scene::decode(fake);},"unknown new FLOAT interpretation metadata cannot be silently discarded");
   auto unbaked=std::make_shared<PaintedMesh>(quad(),64);
   auto independent=floating(incoming,0);unbaked->install_bake(independent);
   auto independent_packet=detail::PaintOverlayFactory::capture_native_emission(*unbaked);

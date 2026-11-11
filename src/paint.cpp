@@ -3423,6 +3423,7 @@ nlohmann::json PaintedMesh::encode_impl(PaintImageArchive *archive,NormalSamplin
       j["baked"]["base_version"]=j["baked"]["version"];
       j["baked"]["version"]=6;
       j["baked"]["float_emission"]=nlohmann::json::binary(baked_->emission_field->encode());
+      detail::BakedEmissionWriteScope::field_emitted(archive);
     }
   }
   if(source_sampling_prepared()) {

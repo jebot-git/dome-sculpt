@@ -2,9 +2,10 @@
 #pragma once
 #include "dome/baked-emission.hpp"
 #include "native-read-scope.hpp"
+#include "baked-emission-write-scope.hpp"
 #include <nlohmann/json.hpp>
 
-namespace dome { class Scene; }
+namespace dome { class Scene; class PaintImageArchive; }
 namespace dome::detail {
 // An explicit short-lived native reader capability, not a global/TLS switch.
 // Only the actual Scene41 envelope creates it. Copies of existing decode
@@ -32,6 +33,14 @@ inline unsigned baked_legacy_version(const nlohmann::json &b,
      !b.at("float_emission").is_binary()||!b.at("emission").is_binary()||
      !b.at("emission").get_binary().empty())
     throw std::invalid_argument("Baked6 needs genuine Scene41 ownership and no RGB8 emission authority");
+  for(const auto &entry:b.items()){
+    const auto &key=entry.key();
+    if(key!="version"&&key!="base_version"&&key!="float_emission"&&
+       key!="color"&&key!="orm"&&key!="emission"&&key!="normal"&&key!="coverage"&&
+       key!="color_interpretation"&&key!="pbr_color"&&key!="normal_interpretation"&&
+       key!="mtoon_normal"&&key!="normal_authority"&&key!="normal_field")
+      throw std::invalid_argument("Unknown FLOAT baked emission metadata");
+  }
   return b.at("base_version").get<unsigned>();
 }
 inline size_t baked_float_preflight(const nlohmann::json &b, uint32_t r,
@@ -44,21 +53,5 @@ inline size_t baked_float_preflight(const nlohmann::json &b, uint32_t r,
   if(BakedEmissionField::encoded_resolution(bytes,{128*1024*1024,check})!=r)
     throw std::invalid_argument("FLOAT baked emission differs from actual paint grid");
   return BakedEmissionField::required_bytes(r,{128*1024*1024,check});
-}
-// Used only on the writer's own completed native records, never as reader
-// authority. Skip independently enveloped child scenes and geometric arrays.
-inline bool encoded_baked_float(const nlohmann::json &value, size_t depth=0) {
-  if(depth>256)throw std::length_error("Baked emission scene metadata depth exceeded");
-  if(value.is_object()){
-    if(value.contains("format")&&value.at("format")=="dome-sculpt"&&
-       value.contains("version")&&value.at("version")==41)return false;
-    if(value.contains("baked")&&value.at("baked").is_object()&&
-       value.at("baked").contains("version")&&value.at("baked").at("version")==6)return true;
-    for(const auto &item:value.items()){
-      if(item.key()=="samples"||item.key()=="sculpt_layers"||item.key()=="sculpt_mask")continue;
-      if(encoded_baked_float(item.value(),depth+1))return true;
-    }
-  }else if(value.is_array())for(const auto &child:value)if(encoded_baked_float(child,depth+1))return true;
-  return false;
 }
 } // namespace dome::detail

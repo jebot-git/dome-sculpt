@@ -562,6 +562,7 @@ void Scene::validate(bool deep_sources) const {
   object(active_);
 }
 nlohmann::json Scene::encode() const {
+  detail::BakedEmissionWriteScope baked_emission_write;
   detail::ColorBoundScope color_bound_scope;
   validate();
   bool baked = std::any_of(objects_.begin(), objects_.end(), [](const auto &o) { return o.painted && o.painted->baked(); });
@@ -584,6 +585,7 @@ nlohmann::json Scene::encode() const {
                       {"next_id", next_},
                       {"objects", nlohmann::json::array()}};
   PaintImageArchive source_images;
+  baked_emission_write.begin(source_images);
   detail::BakedNormalArchive layered_normals(source_images);
   CreatorAssetArchive source_models;
   SourceMaterialArchive source_materials;
@@ -700,7 +702,7 @@ nlohmann::json Scene::encode() const {
   if(!layered_normals.empty())j["baked_normal_fields"]=layered_normals.encode();
   j["source_images"] = source_images.encode();
   j["source_models"] = source_models.encode();
-  if(detail::encoded_baked_float(j))
+  if(baked_emission_write.emitted())
     return {{"format","dome-sculpt"},{"version",41},{"payload",std::move(j)}};
   return j;
 }
