@@ -1,0 +1,246 @@
+{
+  "schema": 1,
+  "product_commit": "f4f165f2",
+  "test_commits": [
+    "96c3e35e",
+    "6702d027"
+  ],
+  "baseline": "a904a2d644eca7885e38e51528057790232e8418",
+  "issue": "Public copied SurfaceQuery::Impl retains std::function build callback in Bvh after construction even though subsequent queries never use it. Any captured worker/model owner is unnecessarily kept alive until query destruction. This is not a claim of an observed actual Document cycle or unreachable heap leak.",
+  "fix": "Clear tree.cancelled immediately after copied Bvh construction, as immutable constructor already does. No query/math/budget/public-header/layout/schema change.",
+  "actual_old_counterfactual": {
+    "status": "/home/blux/de-xr/dome-sculpt/artifacts/surface-query-callback-proof-20261111/old-release-v2/status.json",
+    "sha256": "b94be500e6ac7cb6e0f5a0f9787ae5c5a76bdf39a0e492782a080e5da17ba5ff",
+    "native_exit": 1,
+    "coordinator_exit": 0,
+    "captured_payload_bytes": 1048576,
+    "retained_after_build": 1,
+    "callback_calls": 22
+  },
+  "fixed": {
+    "retained_after_build": 0,
+    "callback_calls": 22,
+    "profiles": {
+      "release": {
+        "status": "/home/blux/de-xr/dome-sculpt/artifacts/surface-query-callback-proof-20261111/release/status.json",
+        "sha256": "03cfb2143490180708c67d0ca6d55acc1e0cbbb8fb9bff679b02725d20e163d0",
+        "controls": {
+          "callback_lifetime": 23,
+          "oblique_families": 108,
+          "material_visibility": 40
+        },
+        "steps": [
+          {
+            "name": "compile-whole-mesh-processing",
+            "exit": 0,
+            "seconds": 2.2190520639996976,
+            "timeout": 300,
+            "log_sha256": "f4c595a5667bb4b46a27e9e438c2c3ae5c852c5ddb2274c5fd6267b25071a087"
+          },
+          {
+            "name": "thin-core",
+            "exit": 0,
+            "seconds": 0.11454520799452439,
+            "timeout": 180,
+            "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "compile-surface-query-callback-lifetime",
+            "exit": 0,
+            "seconds": 1.6676837399718352,
+            "timeout": 180,
+            "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "link-surface-query-callback-lifetime",
+            "exit": 0,
+            "seconds": 0.21467100200243294,
+            "timeout": 180,
+            "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "run-surface-query-callback-lifetime",
+            "exit": 0,
+            "seconds": 0.008312671969179064,
+            "timeout": 180,
+            "log_sha256": "1066b1ceb4be72f1be1e538b3da33302042159dcc985ce01ec7e6155ea8bb668"
+          },
+          {
+            "name": "compile-surface-query-oblique",
+            "exit": 0,
+            "seconds": 0.6157621850143187,
+            "timeout": 180,
+            "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "link-surface-query-oblique",
+            "exit": 0,
+            "seconds": 0.11469241400482133,
+            "timeout": 180,
+            "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "run-surface-query-oblique",
+            "exit": 0,
+            "seconds": 0.008042775036301464,
+            "timeout": 180,
+            "log_sha256": "2d24410ab4969e67baa6acd7cb2965145a0db5a5d2809cf945cebb82ada7f712"
+          },
+          {
+            "name": "compile-material-visibility",
+            "exit": 0,
+            "seconds": 4.073397102009039,
+            "timeout": 180,
+            "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "link-material-visibility",
+            "exit": 0,
+            "seconds": 0.21493125800043344,
+            "timeout": 180,
+            "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "run-material-visibility",
+            "exit": 0,
+            "seconds": 0.01637047401163727,
+            "timeout": 180,
+            "log_sha256": "4e16a19b5d0243e274725f4aa14c695a8688a617292829b75afa0e0425a37b02"
+          }
+        ],
+        "sanitizer_environment": {
+          "ASAN_OPTIONS": null,
+          "UBSAN_OPTIONS": null,
+          "LSAN_OPTIONS": null
+        },
+        "input_output_drift": [],
+        "executables": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/surface-query-callback-proof-20261111/release/dome-sculpt-surface-query-callback-lifetime-test": "ee9f568e71e1e490ef058492d92a447ff7fc579f48c301bac8b8d98fbf3df5ff",
+          "/home/blux/de-xr/dome-sculpt/artifacts/surface-query-callback-proof-20261111/release/dome-sculpt-surface-query-oblique-test": "86e04f4d13107d9a121084c0bef1f7d8661a2f716d23980e66b36ad3bc6f2c8f",
+          "/home/blux/de-xr/dome-sculpt/artifacts/surface-query-callback-proof-20261111/release/dome-sculpt-material-visibility-test": "d52ec1b3fdd14ca006a4a00b0550db26f1168a22e23bb6be2c81abdb4a56c024"
+        }
+      },
+      "sanitize": {
+        "status": "/home/blux/de-xr/dome-sculpt/artifacts/surface-query-callback-proof-20261111/sanitize/status.json",
+        "sha256": "488051d363298d9ca665377046af6bba7fcbb17fe86a91cec888a408d8932ea8",
+        "controls": {
+          "callback_lifetime": 23,
+          "oblique_families": 108,
+          "material_visibility": 40
+        },
+        "steps": [
+          {
+            "name": "compile-whole-mesh-processing",
+            "exit": 0,
+            "seconds": 4.473132900020573,
+            "timeout": 300,
+            "log_sha256": "f4c595a5667bb4b46a27e9e438c2c3ae5c852c5ddb2274c5fd6267b25071a087"
+          },
+          {
+            "name": "thin-core",
+            "exit": 0,
+            "seconds": 1.569446868961677,
+            "timeout": 180,
+            "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "compile-surface-query-callback-lifetime",
+            "exit": 0,
+            "seconds": 2.2697228059987538,
+            "timeout": 180,
+            "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "link-surface-query-callback-lifetime",
+            "exit": 0,
+            "seconds": 6.728816414019093,
+            "timeout": 180,
+            "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "run-surface-query-callback-lifetime",
+            "exit": 0,
+            "seconds": 0.11454357299953699,
+            "timeout": 180,
+            "log_sha256": "1066b1ceb4be72f1be1e538b3da33302042159dcc985ce01ec7e6155ea8bb668"
+          },
+          {
+            "name": "compile-surface-query-oblique",
+            "exit": 0,
+            "seconds": 0.7655614830437116,
+            "timeout": 180,
+            "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "link-surface-query-oblique",
+            "exit": 0,
+            "seconds": 0.41548443998908624,
+            "timeout": 180,
+            "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "run-surface-query-oblique",
+            "exit": 0,
+            "seconds": 0.01624652004102245,
+            "timeout": 180,
+            "log_sha256": "2d24410ab4969e67baa6acd7cb2965145a0db5a5d2809cf945cebb82ada7f712"
+          },
+          {
+            "name": "compile-material-visibility",
+            "exit": 0,
+            "seconds": 6.8786957950214855,
+            "timeout": 180,
+            "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "link-material-visibility",
+            "exit": 0,
+            "seconds": 6.829728707962204,
+            "timeout": 180,
+            "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "run-material-visibility",
+            "exit": 0,
+            "seconds": 0.1147075149929151,
+            "timeout": 180,
+            "log_sha256": "4e16a19b5d0243e274725f4aa14c695a8688a617292829b75afa0e0425a37b02"
+          }
+        ],
+        "sanitizer_environment": {
+          "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+          "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+          "LSAN_OPTIONS": null
+        },
+        "input_output_drift": [],
+        "executables": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/surface-query-callback-proof-20261111/sanitize/dome-sculpt-surface-query-callback-lifetime-test": "e0779d5541fe0df73f920afb98ca43b6fffdb01326c4a669e2f41542152d2c5a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/surface-query-callback-proof-20261111/sanitize/dome-sculpt-surface-query-oblique-test": "cfd6c0ea47a9b014bf8fde97eaef3cd684064662c09be7a8922ccb21b8965528",
+          "/home/blux/de-xr/dome-sculpt/artifacts/surface-query-callback-proof-20261111/sanitize/dome-sculpt-material-visibility-test": "7614bb0a684e12c3288ea4387cfcabd12371e854aedbe4723fd7dcdfe66d2098"
+        }
+      }
+    }
+  },
+  "oracles": [
+    "Weak captured-owner lifetime on actual copied SurfaceQuery and actual MaterialSurfaceQuery composition.",
+    "Exact binary64 nearest/ray fields versus independent callback-free query, analytic triangle/barycentrics, and defensive mesh copy after caller mutation.",
+    "Separate per-query cancellation still runs; first/mid/final actual constructor cancellation and thrown callback exceptions release partial owner state and allow actual retry.",
+    "Unchanged108oblique scale/aspect/reflection/winding families and40material-visibility native assertions."
+  ],
+  "provider_scope": "One fresh complete mesh-processing.cpp product TU, three fresh test TUs, thin192-member core replacing/excluding oldmesh-processing. Other191core members and support are byte-pinned immutablea904 actualowning providers; fresh linkmaps verify exclusion, actualcompiler deps recorded. This is not a fresh wholecore/app build or graphics qualification.",
+  "initial_setup_failure": "96c test Vec3== compile failure preserved; 6702 correction uses exact components, no tolerance change or native failure relabel.",
+  "scope_limits": [
+    "No full-allocation-prefix sweep, actual Document-cycle reproduction, GUI/GPU/headset/P1/large-query completion claim.",
+    "No frozena904/source/provider modifications; independent child source. Armor later integrated product hunk in its separate adapter branch; this receipt qualifies the narrow original callback cleanup only."
+  ],
+  "evidence": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/surface-query-callback-proof-20261111/surface-query-callback-evidence.tar.zst",
+    "sha256": "f830ceab67b5b3ace464a5ccc052e35336d047203145e8b233875189a9d40c3c",
+    "bytes": 17774045,
+    "members": 58,
+    "manifest": "/home/blux/de-xr/dome-sculpt/artifacts/surface-query-callback-proof-20261111/evidence-members.json",
+    "manifest_sha256": "788e7bcfc798f0a1ba1321b3d7dd4b440e30f45a614f5c09fec6f9f0a85cafdb",
+    "full_decode_SHA_mode_UID_GID_nsmtime": true,
+    "originals_retained": true
+  }
+}
