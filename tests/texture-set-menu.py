@@ -18,10 +18,12 @@ root=Path(__file__).resolve().parents[1]
 build=Path(os.environ['DOME_FIELD_MENU_BUILD']).resolve();inspector=Path(os.environ['DOME_FIELD_MENU_INSPECTOR']).resolve();fixture=Path(os.environ['DOME_FIELD_MENU_FIXTURE']).resolve();out=Path(os.environ['DOME_FIELD_MENU_OUT']).resolve();out.mkdir(parents=True,exist_ok=True)
 manifest_path=Path(os.environ["DOME_FIELD_RESOLUTION_MANIFEST"]).resolve();manifest=json.loads(manifest_path.read_text());fixtures={k:(manifest_path.parent/v).resolve() for k,v in manifest["files"].items()}
 processes=[];checks=[];app=None;legacy_count=0
+diagnostic_snapshot=lambda why:None
+public_acks=[];last_action='startup'
 sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
 pins={str(p):sha(p) for p in [build/'dome-sculpt',inspector,fixture,manifest_path,Path(__file__).resolve(),*fixtures.values()]}
 def report(complete=False,problem=None):
- (out/'report.json').write_text(json.dumps({'complete':complete,'error':problem,'checks':checks,'count':len(checks),'inputs':pins,'drift':[p for p,v in pins.items() if sha(p)!=v],'legacy_manager_checks':legacy_count,'scope':'Actual FLTK manager51 plus independent active-field resizing, modal/focus/Cancel/UndoRedo/orderedSave/freshreopen; no product observer or physical headset claim'},indent=2)+'\n')
+ (out/'report.json').write_text(json.dumps({'complete':complete,'error':problem,'checks':checks,'count':len(checks),'inputs':pins,'drift':[p for p,v in pins.items() if sha(p)!=v],'legacy_manager_checks':legacy_count,'public_acknowledgments':public_acks,'last_action':last_action,'scope':'Actual FLTK manager51 plus independent active-field resizing, modal/focus/Cancel/UndoRedo/orderedSave/freshreopen; public X11 window/pixel acknowledgments, no product observer or physical headset claim'},indent=2)+'\n')
 def check(value,label):
  checks.append({'passed':bool(value),'label':label});report();print(('PASS ' if value else 'FAIL ')+label,flush=True);assert value,label
 async def wait(fn,seconds=50):
@@ -31,9 +33,10 @@ async def wait(fn,seconds=50):
   if value:return value
   if app is not None and app.poll() is not None:raise RuntimeError(('ordinary app exited',app.returncode))
   await asyncio.sleep(.05)
+ diagnostic_snapshot('wait-timeout')
  raise TimeoutError('Actual FLTK workflow did not reach its expected state')
 async def main():
- global app,legacy_count
+ global app,legacy_count,diagnostic_snapshot,last_action
  bus=await MessageBus().connect();await bus.request_name('com.canonical.AppMenu.Registrar')
  home=out/'home';home.mkdir();rd,wr=os.pipe();xlog=(out/'xvfb.log').open('w');xvfb=subprocess.Popen(['Xvfb','-displayfd',str(wr),'-screen','0',os.environ.get('DOME_FIELD_MENU_SCREEN','1100x800x24'),'-nolisten','tcp'],pass_fds=(wr,),stdout=xlog,stderr=xlog);processes.append(xvfb);os.close(wr)
  with os.fdopen(rd) as p:screen=':'+p.readline().strip()
@@ -41,23 +44,90 @@ async def main():
  for name in ['WAYLAND_DISPLAY','WAYLAND_SOCKET','__EGL_VENDOR_LIBRARY_FILENAMES','LIBGL_DRIVERS_PATH','MESA_LOADER_DRIVER_OVERRIDE']:env.pop(name,None)
  for name,suffix in [('XDG_STATE_HOME','state'),('XDG_CONFIG_HOME','config'),('XDG_CACHE_HOME','cache'),('XDG_DATA_HOME','data'),('XDG_RUNTIME_DIR','runtime')]:env[name]=str(home/suffix);Path(env[name]).mkdir(mode=0o700)
  project=home/'actual.dsculpt';project.write_bytes(fixture.read_bytes());d=display.Display(screen)
+ def focus_id():
+  value=d.get_input_focus().focus;return getattr(value,'id',value)
+ def visible(window):
+  try:return window.get_attributes().map_state==X.IsViewable
+  except error.BadWindow:return False
+ def image(window):
+  g=window.get_geometry();raw=window.get_image(0,0,g.width,g.height,X.ZPixmap,0xffffffff)
+  return Image.frombytes('RGB',(g.width,g.height),raw.data,'raw','BGRX')
+ def window_info(window):
+  g=window.get_geometry();a=window.get_attributes()
+  return {'id':window.id,'parent':window.query_tree().parent.id,'name':str(window.get_wm_name() or ''),'class':str(window.get_wm_class()),'x':g.x,'y':g.y,'width':g.width,'height':g.height,'map_state':a.map_state,'override_redirect':a.override_redirect}
+ def acknowledge(kind,**values):
+  row={'kind':kind,'time':time.monotonic(),'focus':focus_id(),**values};public_acks.append(row)
+  with (out/'public-acks.jsonl').open('a') as f:f.write(json.dumps(row)+'\n')
+ def diagnostic_snapshot(why):
+  prefix='failure-'+str(len(list(out.glob('failure-*.json')))).zfill(3)
+  evidence={'reason':why,'last_action':last_action,'checks':len(checks),'app_poll':app.poll() if app else None,'windows':[]}
+  try:
+   evidence['focus']=focus_id()
+   for window in d.screen().root.query_tree().children:
+    try:
+     info=window_info(window);evidence['windows'].append(info)
+     if info['map_state']==X.IsViewable:image(window).save(out/(prefix+'-window-'+str(window.id)+'.png'))
+    except (error.BadWindow,error.BadMatch):pass
+   image(d.screen().root).save(out/(prefix+'-root.png'))
+  except Exception as failure:evidence['capture_error']=repr(failure)
+  (out/(prefix+'.json')).write_text(json.dumps(evidence,indent=2)+'\n')
  def inspect():return json.loads(subprocess.check_output([str(inspector),str(project)],env=env))
  def named(title):
   for w in d.screen().root.query_tree().children:
    try:
-    if title in str(w.get_wm_name() or ''):return w
+    if visible(w) and title in str(w.get_wm_name() or ''):return w
    except error.BadWindow:pass
  def key(name,down=None):
   code=d.keysym_to_keycode(XK.string_to_keysym(name))
   for kind in ([X.KeyPress,X.KeyRelease] if down is None else [X.KeyPress if down else X.KeyRelease]):xtest.fake_input(d,kind,code)
   d.sync()
+ async def focus(window):
+  window.set_input_focus(X.RevertToParent,X.CurrentTime);d.sync();await wait(lambda:focus_id()==window.id)
+ def canvas_window(window):
+  # FLTK's GL subwindow is public X11 geometry, not a private editor observer.
+  g=window.get_geometry();candidates=[]
+  for child in window.query_tree().children:
+   try:
+    z=child.get_geometry()
+    if visible(child) and z.width==g.width and z.height>=g.height*.75:candidates.append((z.width*z.height,child))
+   except error.BadWindow:pass
+  return max(candidates,key=lambda v:v[0])[1] if candidates else None
+ async def framed_view(window):
+  # Independent source-file geometry and documented 45-degree framing policy.
+  # All fixtures here have one identity-placed mesh. Do not accept a learned
+  # old screenshot, an arbitrary stable image or the overzoomed initial view.
+  scene=inspect();objects=scene['objects'];meshes=scene['texture_set_geometry']['meshes']
+  assert len(objects)==len(meshes)==1 and objects[0]['rotation']==[0,0,0,1] and objects[0]['scale']==1 and objects[0]['translation']==[0,0,0]
+  positions=list(struct.iter_unpack('<3f',bytes(meshes[0]['positions']['bytes'])))
+  low=[min(v[i] for v in positions) for i in range(3)];high=[max(v[i] for v in positions) for i in range(3)];extent=[(b-a)/2 for a,b in zip(low,high)]
+  last={}
+  def presented():
+   nonlocal last
+   canvas=canvas_window(window)
+   if canvas is None:return False
+   im=image(canvas);width,height=im.size;tangent=math.tan(math.pi/8)
+   distance=max(extent[0]/(tangent*width/height),extent[1]/tangent)*1.12+extent[2]+max(.0001,math.sqrt(sum(v*v for v in extent))*.01)
+   half_y=height*.5*extent[1]/(tangent*(distance-extent[2]));half_x=height*.5*extent[0]/(tangent*(distance-extent[2]))
+   left=width/2-half_x;top=height/2-half_y;assert left>2 and top>2
+   # Source renderer clears to displayed gray48 (dark) or208 (light). Probe
+   # all four independently derived background margins and a central interior.
+   boxes=[(2,2,max(3,int(left/2)),height-2),(width-max(3,int(left/2)),2,width-2,height-2),(2,2,width-2,max(3,int(top/2))),(2,height-max(3,int(top/2)),width-2,height-2)]
+   def background(rgb):return any(max(abs(c-value) for c in rgb)<=2 for value in (48,208))
+   margins=[]
+   for box in boxes:
+    values=list(im.crop(box).getdata());margins.append(sum(background(v) for v in values)/len(values))
+   center=(int(width/2-half_x*.2),int(height/2-half_y*.2),int(width/2+half_x*.2),int(height/2+half_y*.2));values=list(im.crop(center).getdata());inside=sum(not background(v) for v in values)/len(values)
+   last={'canvas':window_info(canvas),'fixture_bounds':[low,high],'projected_half_extent':[half_x,half_y],'margin_boxes':boxes,'background_fractions':margins,'center_box':center,'center_nonbackground_fraction':inside}
+   return min(margins)>=.99 and inside>=.95
+  await wait(presented);acknowledge('framed-view-presented',**last)
  def mouse(w,x,y,down=None):
   g=w.get_geometry();xtest.fake_input(d,X.MotionNotify,x=g.x+int(x),y=g.y+int(y))
   if down is not None:xtest.fake_input(d,X.ButtonPress if down else X.ButtonRelease,1)
   d.sync()
  async def launch(number):
   global app
-  log=(out/('app-'+str(number)+'.log')).open('w');app=subprocess.Popen([str(build/'dome-sculpt'),str(project)],env=env,cwd=home,stdout=log,stderr=log);processes.append(app);w=await wait(lambda:named('Dome Sculpt'));w.set_input_focus(X.RevertToParent,X.CurrentTime);d.sync()
+  log=(out/('app-'+str(number)+'.log')).open('w');app=subprocess.Popen([str(build/'dome-sculpt'),str(project)],env=env,cwd=home,stdout=log,stderr=log);processes.append(app);w=await wait(lambda:named('Dome Sculpt'));await focus(w)
+  await wait(lambda:project.name in str(w.get_wm_name() or ''));acknowledge('document-title-visible',window=window_info(w))
   def prop(name):
    p=w.get_full_property(d.intern_atom(name),X.AnyPropertyType);return bytes(p.value).decode() if p else None
   service=await wait(lambda:prop('_KDE_NET_WM_APPMENU_SERVICE_NAME'));path=await wait(lambda:prop('_KDE_NET_WM_APPMENU_OBJECT_PATH'));menu=bus.get_proxy_object(service,path,await bus.introspect(service,path)).get_interface('com.canonical.dbusmenu')
@@ -68,13 +138,17 @@ async def main():
     for c in children:walk(c.value)
    walk(r[1]);return values
   async def command(label,pause=.15):
+   global last_action
+   last_action='universal menu '+label
    for _ in range(1000):
     nodes=await layout()
     if label in nodes and nodes[label][1].get('enabled',True):break
     await asyncio.sleep(.05)
    else:raise AssertionError(('Actual universal menu command disabled',label))
    with (out/'commands.jsonl').open('a') as f:f.write(json.dumps({'label':label,'time':time.monotonic()})+'\n')
-   await menu.call_event(nodes[label][0],'clicked',Variant('i',0),0);await asyncio.sleep(pause)
+   await menu.call_event(nodes[label][0],'clicked',Variant('i',0),0)
+   if label=='Frame all':await framed_view(w)
+   elif label!='Texture sets...' and pause:await asyncio.sleep(pause)
   (out/('runtime-maps-'+str(number)+'.txt')).write_text(Path('/proc/'+str(app.pid)+'/maps').read_text());return w,layout,command
  async def save(command,immediate=False):
   stamp=project.stat().st_mtime_ns;await command('Save',pause=0 if immediate else .15);await wait(lambda:project.stat().st_mtime_ns!=stamp);return inspect()
@@ -103,30 +177,55 @@ async def main():
   for c in value:key('space' if c==' ' else 'period' if c=='.' else c)
  combo_state={}
  async def manager(command):
-  await command('Texture sets...');dialog=await wait(lambda:named('Material texture sets'));dialog.set_input_focus(X.RevertToParent,X.CurrentTime);d.sync();g=dialog.get_geometry();row=int(os.environ.get('DOME_FIELD_MENU_ROW','28'));assert 28<=row<=96;assert g.height<=row*20+2
+  await command('Texture sets...');dialog=await wait(lambda:named('Material texture sets'));await focus(dialog);g=dialog.get_geometry();row=int(os.environ.get('DOME_FIELD_MENU_ROW','28'));assert 28<=row<=96;assert g.height<=row*20+2
+  await wait(lambda:len(image(dialog).getcolors(65536) or [])>=3);acknowledge('manager-presented',window=window_info(dialog),row=row)
   check(dialog.get_wm_transient_for().id==w.id,'Texture manager is an actual document-owned FLTK modal')
   current=inspect();combo_state[(dialog.id,1)]=collection(current)['active'];combo_state[(dialog.id,2)]=0;active=primary(current) if collection(current)['active']==0 else next(v['painted'] for v in collection(current)['additional'] if v['id']==collection(current)['active']);combo_state[(dialog.id,3)]=int(math.log2(payload(active)['resolution']))-6
   return dialog,row
  async def choice(dialog,row,index,value):
-  g=dialog.get_geometry();old=combo_state[(dialog.id,index)];mouse(dialog,g.width*.7,row*(index+.4),True);mouse(dialog,g.width*.7,row*(index+.4),False);await asyncio.sleep(.08)
-  for _ in range(abs(value-old)):key('Down' if value>old else 'Up')
-  key('Return');await asyncio.sleep(.08);combo_state[(dialog.id,index)]=value
+  global last_action
+  last_action='choice row '+str(index)+' '+str(combo_state[(dialog.id,index)])+' -> '+str(value)
+  await focus(dialog);g=dialog.get_geometry();old=combo_state[(dialog.id,index)]
+  before={z.id for z in d.screen().root.query_tree().children if visible(z)};px=g.x+int(g.width*.7);py=g.y+int(row*(index+.4))
+  text_box=(int(g.width*2/5)+10,row*index+5,g.width-65,row*(index+1)-9);old_label=image(dialog).crop(text_box).tobytes()
+  mouse(dialog,g.width*.7,row*(index+.4),True);mouse(dialog,g.width*.7,row*(index+.4),False)
+  def popup():
+   candidates=[]
+   for z in d.screen().root.query_tree().children:
+    try:
+     a=z.get_attributes();q=z.get_geometry()
+     if z.id not in before and a.map_state==X.IsViewable and a.override_redirect and q.height>=row and q.x<=px<=q.x+q.width and q.y<=py<=q.y+q.height:candidates.append((q.width*q.height,z))
+    except error.BadWindow:pass
+   return min(candidates,key=lambda v:v[0])[1] if candidates else None
+  menu_window=await wait(popup)
+  await wait(lambda:len(image(menu_window).getcolors(65536) or [])>=3)
+  acknowledge('choice-popup-presented',row=index,old=old,target=value,window=window_info(menu_window))
+  for step in range(abs(value-old)):
+   prior=image(menu_window).tobytes();key('Down' if value>old else 'Up')
+   await wait(lambda:visible(menu_window) and image(menu_window).tobytes()!=prior)
+   acknowledge('choice-highlight-presented',row=index,step=step+1,window=menu_window.id)
+  key('Return');await wait(lambda:not visible(menu_window));await wait(lambda:visible(dialog));await focus(dialog)
+  if value!=old:await wait(lambda:image(dialog).crop(text_box).tobytes()!=old_label)
+  acknowledge('choice-popup-closed',row=index,target=value,window=menu_window.id,label_redrawn=value!=old,label_box=text_box,label_sha256=hashlib.sha256(image(dialog).crop(text_box).tobytes()).hexdigest());combo_state[(dialog.id,index)]=value
  async def entry(dialog,row,index,value):
   index+=1 if index>=4 else 0 # Real new resolution row precedes old name/material fields.
   g=dialog.get_geometry();xtest.fake_input(d,X.MotionNotify,x=g.x+int(g.width*2/5)+16,y=g.y+int(row*(index+.4)));xtest.fake_input(d,X.ButtonPress,1);xtest.fake_input(d,X.ButtonRelease,1);d.sync();text(value);key('Tab');await asyncio.sleep(.06)
  async def finish(dialog,row,accept=True,shortcut=None):
+  global last_action
+  last_action='manager '+(shortcut or ('Apply' if accept else 'Cancel'))
   if shortcut:
    if shortcut=='Ctrl+W':key('Control_L',True);key('w');key('Control_L',False)
    else:key(shortcut)
   else:
    g=dialog.get_geometry();mouse(dialog,g.width/2+(80 if accept else -80),g.height-row,True);mouse(dialog,g.width/2+(80 if accept else -80),g.height-row,False)
   await wait(lambda:named('Material texture sets') is None)
+  acknowledge('manager-closed',requested_button_accept=accept if shortcut is None else None,shortcut=shortcut,window=dialog.id)
  async def select_set(command,set_id):
   dialog,row=await manager(command);await choice(dialog,row,1,set_id);await finish(dialog,row);return await save(command)
  async def history(command,before,after,label):
   await command('Undo');check(await save(command)==before,label+' has exact one-step Undo');await command('Redo');check(await save(command)==after,label+' has exact one-step Redo')
  def picture(label):
-  g=w.get_geometry();raw=w.get_image(0,0,g.width,g.height,X.ZPixmap,0xffffffff);im=Image.frombytes('RGB',(g.width,g.height),raw.data,'raw','BGRX');im.save(out/(label+'.png'));return im
+  im=image(w);im.save(out/(label+'.png'));return im
  async def stroke(x,y,cancel=False):
   w.set_input_focus(X.RevertToParent,X.CurrentTime);d.sync();key('Shift_L',True);mouse(w,x,y,True);await asyncio.sleep(.15)
   for dx in [2,4,6]:mouse(w,x+dx,y);await asyncio.sleep(.05)
@@ -215,7 +314,7 @@ async def main():
  check(not [p for p,v in pins.items() if sha(p)!=v],'All actual application, inspector, native fixtures and script inputs remain unchanged')
  report(True);d.close();bus.disconnect()
 try:asyncio.run(main())
-except BaseException as e:report(problem=repr(e));raise
+except BaseException as e:diagnostic_snapshot('exception');report(problem=repr(e));raise
 finally:
  for p in reversed(processes):
   if p.poll() is None:p.terminate()
