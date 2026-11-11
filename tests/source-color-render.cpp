@@ -35,9 +35,12 @@ int main(int argc,char **argv)try {
  // assuming a diagnostic counter proves immutable geometry reuse.
  {Document document;document.replace(original);check(document.wait_mesh(),"Colored source reaches the worker before GPU traffic measurements");auto base=document.frame().surface;
   auto measured=[&](std::shared_ptr<const MeshSnapshot> value){array_bytes=index_bytes=0;capture_buffers=true;auto pixels=draw(native,std::move(value));capture_buffers=false;return pixels;};
-  auto baseline=measured(base);struct BaseVertex{Vec3 p,n;std::array<float,2> uv0,uv1;std::array<float,4> tangent;};struct FrameVertex{Vec3 source,canonical;std::array<float,4> tangent;};
-  const auto bytes=base->mesh.positions.size()*(sizeof(BaseVertex)+sizeof(FrameVertex)+sizeof(std::array<float,4>));
-  check(native.buffer_stats().vertex_bytes==bytes && array_bytes==bytes*2 && index_bytes==base->mesh.indices.size()*sizeof(uint32_t),"Compiler-sized base, frame and RGBA blocks allocate and upload exactly once through real GL Data/SubData calls");
+  auto baseline=measured(base);
+  // Forecast from the actual immutable native source payloads. Missing UV1 or
+  // tangent streams are GL constants, not per-vertex default structs.
+  const size_t bytes=(base->mesh.positions.size()+base->mesh.normals.size()+base->source_normals.size()+base->canonical_normals.size())*sizeof(Vec3)+base->mesh.uv.size()*sizeof(std::array<float,2>)+(base->tangents.size()+base->source_tangents.size()+base->source_colors.size()+base->normal_coordinates.size())*sizeof(std::array<float,4>)+base->paint_coordinates.size()*sizeof(std::array<float,2>);
+  std::cout<<"SOURCE_PAYLOAD_BYTES native="<<bytes<<" retained="<<native.buffer_stats().vertex_bytes<<" real_Data_SubData="<<array_bytes<<" indices="<<index_bytes<<'\n';
+  check(native.buffer_stats().vertex_bytes==bytes && array_bytes==bytes*2 && index_bytes==base->mesh.indices.size()*sizeof(uint32_t),"Actual source-array base, optional frame and RGBA payloads allocate and upload exactly once through real GL Data/SubData calls");
   check(measured(base)==baseline && array_bytes==0 && index_bytes==0,"Second-eye colored draw uploads no vertex, frame, RGBA or index bytes");
   auto material=std::make_shared<MeshSnapshot>(*base);material->ranges[0].material.emissive={.3f,.1f,0};auto lit=measured(material);check(lit!=baseline && array_bytes==0 && index_bytes==0,"Material-only emission edit changes pixels while retaining the source color stream unchanged");
   auto protected_mesh=std::make_shared<MeshSnapshot>(*base);protected_mesh->sculpt_masks.assign(base->mesh.positions.size(),.6f);check(measured(protected_mesh)!=baseline && array_bytes==base->mesh.positions.size()*sizeof(float) && index_bytes==0,"Mask-only feedback uploads only its scalar stream and never multiplies or uploads source colors twice");
