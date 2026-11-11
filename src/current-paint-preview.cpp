@@ -45,7 +45,7 @@ void CurrentGridPaintPreview::authenticate_range(const Mesh&mesh,const SurfaceRa
   const auto maps=r.textures;
   if(!maps||!maps->current_grid_preview)throw std::invalid_argument("Current-grid range omitted its actual packet");
   authenticate_owner(maps->current_grid_preview);
-  if(object_!=r.object||!matches_material(r.material)||r.appearance||r.material_bindings||
+  if(maps->transparent!=transparent_||object_!=r.object||!matches_material(r.material)||r.appearance||r.material_bindings||
      r.paint_sampling_attachment||r.normal_preview_proof||r.source_frame||r.canonical_frame||
      maps->source_maps||maps->source_only||maps->overlay||maps->baked_base||maps->normal_projection||
      maps->color_projection||maps->polygon_surface)

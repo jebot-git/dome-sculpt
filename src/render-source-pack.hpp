@@ -16,6 +16,7 @@ namespace dome {
 // fence wait or CPU resampling is involved.
 class MToonSourcePacks {
 public:
+  using Ledger=detail::ContextStoreLedger;
   struct Input {
     std::shared_ptr<const Image> owner;GLuint texture=0;bool mips=false,srgb=true;
     // Actual floating GPU plane authority; no fabricated byte Image is needed.
@@ -26,6 +27,7 @@ public:
   using Inputs=std::array<Input,view_count>;
   using Key=std::array<std::tuple<uintptr_t,bool,bool,uint32_t>,view_count>;
   struct Resource {
+    Ledger::Store texture_store,buffer_store;
     GLuint texture=0,buffer=0;size_t bytes=0;bool floating=false;
     Inputs owners;
     // offset (RGBA texels), width, height, reserved, for view_count*14 levels.
@@ -34,6 +36,7 @@ public:
   };
 private:
   std::map<Key,Resource> cache_;
+  std::shared_ptr<Ledger> ledger_;Ledger::Group group_=0;bool own_ledger_=false;
   uint64_t builds_=0;
   static Resource specification(const Inputs &inputs) {
     Resource output;output.owners=inputs;
@@ -79,11 +82,11 @@ private:
       for(size_t n=0;n<names.size();++n)glPixelStorei(names[n],values[n]);
     }
   };
-  static void allocate(Resource &resource) {
+  void allocate(Resource &resource) {
     if(!resource.bytes)return;
     PackState state;
     try {
-      glGenBuffers(1,&resource.buffer);glBindBuffer(GL_PIXEL_PACK_BUFFER,resource.buffer);
+      resource.buffer_store=ledger_->create(Ledger::Kind::Buffer,resource.bytes,Ledger::Domain::Material,group_);resource.buffer=resource.buffer_store.name();glBindBuffer(GL_PIXEL_PACK_BUFFER,resource.buffer);
       glBufferData(GL_PIXEL_PACK_BUFFER,GLsizeiptr(resource.bytes),nullptr,GL_STATIC_COPY);
       if(glGetError()!=GL_NO_ERROR)throw std::runtime_error("GPU source pack allocation failed");
       std::set<GLint> copied;
@@ -96,12 +99,11 @@ private:
                       reinterpret_cast<void*>(uintptr_t(offset)*(resource.floating?16:4)));
         if(glGetError()!=GL_NO_ERROR)throw std::runtime_error("GPU source mip copy into buffer failed");
       }
-      glGenTextures(1,&resource.texture);glBindTexture(GL_TEXTURE_BUFFER,resource.texture);
+      resource.texture_store=ledger_->create(Ledger::Kind::Texture,0,Ledger::Domain::Material,group_,std::span(&resource.buffer_store,1));resource.texture=resource.texture_store.name();glBindTexture(GL_TEXTURE_BUFFER,resource.texture);
       glTexBuffer(GL_TEXTURE_BUFFER,resource.floating?GL_RGBA32F:GL_RGBA8,resource.buffer);
       if(glGetError()!=GL_NO_ERROR)throw std::runtime_error("GPU packed source view allocation failed");
     } catch(...) {
-      if(resource.texture)glDeleteTextures(1,&resource.texture);
-      if(resource.buffer)glDeleteBuffers(1,&resource.buffer);
+      resource.texture_store.reset();resource.buffer_store.reset();
       resource.texture=resource.buffer=0;throw;
     }
   }
@@ -123,40 +125,48 @@ private:
   }
   void sweep(const std::map<Key,Resource> &wanted) {
     for(auto it=cache_.begin();it!=cache_.end();)if(!wanted.contains(it->first)) {
-      if(it->second.texture)glDeleteTextures(1,&it->second.texture);if(it->second.buffer)glDeleteBuffers(1,&it->second.buffer);it=cache_.erase(it);
+      it=cache_.erase(it);
     }else ++it;
   }
 public:
+  explicit MToonSourcePacks(std::shared_ptr<Ledger> ledger={}):ledger_(ledger?ledger:std::make_shared<Ledger>(Ledger::Limits{2ull*1024*1024*1024,2048,256})),own_ledger_(!ledger){group_=ledger_->create_group();}
+  Ledger::Group group()const noexcept{return group_;}
+  struct Demand{size_t bytes=0,images=0;};
+  Demand additional(const std::vector<Inputs>&inputs,const SurfaceTextureLimits&limits)const{auto wanted=planning(inputs,0,0,limits);Demand d;for(const auto&[key,s]:wanted)if(!cache_.contains(key)){if(s.bytes>SIZE_MAX-d.bytes)throw std::length_error("Source pack forecast overflow");d.bytes+=s.bytes;++d.images;}return d;}
   static Key key(const Inputs &inputs) {
     Key result;for(size_t n=0;n<view_count;++n)result[n]={reinterpret_cast<uintptr_t>(inputs[n].overlay?static_cast<const void*>(inputs[n].overlay.get()):static_cast<const void*>(inputs[n].owner.get())),inputs[n].mips,inputs[n].srgb,inputs[n].overlay?inputs[n].plane+1+(inputs[n].overlay_pbr?5u:0u):0u};return result;
   }
+  using Selection=std::set<Key>;
+  static Selection selection(const std::vector<Inputs>&inputs){Selection result;for(const auto&input:inputs)if(std::any_of(input.begin(),input.end(),[](const auto&i){return bool(i.owner)||bool(i.overlay);}))result.insert(key(input));return result;}
+  void retain(const Selection&wanted)noexcept {for(auto it=cache_.begin();it!=cache_.end();)if(!wanted.contains(it->first)){it=cache_.erase(it);}else ++it;}
   void preflight(const std::vector<Inputs> &inputs,size_t base_bytes,size_t base_images,const SurfaceTextureLimits &limits) {
-    auto wanted=planning(inputs,base_bytes,base_images,limits);sweep(wanted);
+    (void)planning(inputs,base_bytes,base_images,limits);
   }
-  void prepare(const std::vector<Inputs> &inputs,size_t base_bytes,size_t base_images,const SurfaceTextureLimits &limits) {
-    auto wanted=planning(inputs,base_bytes,base_images,limits);
+  void prepare(const std::vector<Inputs> &inputs,size_t base_bytes,size_t base_images,const SurfaceTextureLimits &limits,bool preserve_existing=false) {
+    if(own_ledger_)ledger_->collect();
+    auto wanted=planning(inputs,base_bytes,base_images,limits);const auto delta=additional(inputs,limits);const auto used=ledger_->usage(group_);
+    if(base_bytes>limits.max_bytes||used.bytes>limits.max_bytes-base_bytes||delta.bytes>limits.max_bytes-base_bytes-used.bytes||base_images>limits.max_images||used.images>limits.max_images-base_images||delta.images>limits.max_images-base_images-used.images)throw std::length_error("Source pack old/new/debt quota exceeded");ledger_->preflight(Ledger::Domain::Material,delta.bytes,delta.images);
     std::vector<Key> added;added.reserve(wanted.size());
     try {
       for(auto &[id,spec]:wanted)if(!cache_.contains(id)) {
         allocate(spec);
         try {cache_.emplace(id,std::move(spec));added.push_back(id);++builds_;}
-        catch(...) {if(spec.texture)glDeleteTextures(1,&spec.texture);if(spec.buffer)glDeleteBuffers(1,&spec.buffer);throw;}
+        catch(...) {throw;}
       }
     } catch(...) {
-      for(const auto &id:added){auto &r=cache_.at(id);if(r.texture)glDeleteTextures(1,&r.texture);if(r.buffer)glDeleteBuffers(1,&r.buffer);cache_.erase(id);}throw;
+      for(const auto &id:added)cache_.erase(id);if(own_ledger_)ledger_->seal_noexcept();throw;
     }
-    sweep(wanted);
+    if(own_ledger_&&delta.bytes)ledger_->seal(true);if(!preserve_existing)sweep(wanted);
   }
   const Resource &at(const Inputs &input) const {
     if(std::none_of(input.begin(),input.end(),[](const auto &v){return bool(v.owner)||bool(v.overlay);})) {static const Resource empty;return empty;}
     return cache_.at(key(input));
   }
-  size_t bytes() const {size_t result=0;for(const auto &[key,r]:cache_)result+=r.bytes;return result;}
+  size_t bytes() const {return ledger_->usage(group_).bytes;}
   size_t size() const {return cache_.size();}
   uint64_t builds() const {return builds_;}
   void clear(bool release) {
-    if(release)for(const auto &[key,r]:cache_){if(r.texture)glDeleteTextures(1,&r.texture);if(r.buffer)glDeleteBuffers(1,&r.buffer);}
-    cache_.clear();
+    cache_.clear();if(own_ledger_)ledger_->clear(release);
   }
   ~MToonSourcePacks(){clear(true);}
 };
