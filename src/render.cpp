@@ -804,7 +804,7 @@ return gl_FrontFacing?N:-N;}
 // Masking darkens final linear RGB, retaining the material's lighting, alpha,
 // cutout, depth and blend rules. Zero and the ordinary-object sentinel are exact.
 vec3 sculpt_mask_color(vec3 rgb){return mask_value>0?rgb*(1.0-.72*clamp(mask_value,0.0,1.0)):rgb;}
-vec4 ghost_color(vec4 c){c.rgb=mix(c.rgb,selection_color,selection_amount);return ghost_opacity<1.0?vec4(mix(c.rgb,vec3(.35,.5,.7),.5),c.a*ghost_opacity):c;}
+vec4 ghost_color(vec4 c){c.rgb=dome_preview_positive_finite(c.rgb);c.rgb=mix(c.rgb,selection_color,selection_amount);return ghost_opacity<1.0?vec4(mix(c.rgb,vec3(.35,.5,.7),.5),c.a*ghost_opacity):c;}
 void main(){if(clip_enabled==1&&dot(clip_plane.xyz,cut_position)<clip_plane.w)discard;if(weight_pass==1){if(weight_value<0)discard;float opacity;
 if(mt_mode==1){bool killed;vec4 source=mt_surface(n,unit(camera-world),killed);if(killed)discard;opacity=source.a;}
 else{opacity=base_color.a;if(slots[0]==1)opacity*=texture(tex0,source_uv(0)).a;
