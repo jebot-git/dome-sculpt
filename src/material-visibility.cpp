@@ -48,16 +48,18 @@ PaintSourceTexture derived_view(const std::shared_ptr<const TextureMaps> &maps,
 // second retained JSON tree. It covers decoded strings, map/array nodes and
 // temporary/copy growth before the ordinary typed parser makes those copies.
 struct VisibilityJsonBudget : nlohmann::json_sax<nlohmann::json> {
- size_t &bytes;const std::function<bool()>&cancelled;size_t events=0,depth=0;
- VisibilityJsonBudget(size_t&n,const std::function<bool()>&fn):bytes(n),cancelled(fn){}
+ size_t &bytes;const std::function<bool()>&cancelled;size_t events=0,depth=0;bool inspect_shader=false,root_object=false,root_shader_key=false,vrm0=false;enum class Shader{Absent,String,Other};Shader shader=Shader::Absent;
+ VisibilityJsonBudget(size_t&n,const std::function<bool()>&fn,bool inspect):bytes(n),cancelled(fn),inspect_shader(inspect){}
  void add(size_t n,size_t width=1){if(bytes>512ull*1024*1024||(width&&n>(512ull*1024*1024-bytes)/width))throw std::length_error("Material query typed metadata exceeds prospective budget");bytes+=n*width;}
  bool event(){if(depth>32||++events>100000)throw std::length_error("Material query typed metadata exceeds source depth/token bounds");if((events&255)==0&&cancelled&&cancelled())throw std::runtime_error("Material query JSON preflight cancelled");add(1,256);return true;}
- bool null()override{return event();}bool boolean(bool)override{return event();}bool number_integer(number_integer_t)override{return event();}bool number_unsigned(number_unsigned_t)override{return event();}bool number_float(number_float_t,const string_t&)override{return event();}
- bool string(string_t&s)override{add(s.size()+1,4);return event();}bool binary(binary_t&s)override{add(s.size(),4);return event();}bool key(string_t&s)override{add(s.size()+1,4);return event();}
- bool start_object(std::size_t)override{event();++depth;return true;}bool end_object()override{if(!depth)throw std::invalid_argument("Invalid typed JSON object depth");--depth;return event();}bool start_array(std::size_t)override{event();++depth;return true;}bool end_array()override{if(!depth)throw std::invalid_argument("Invalid typed JSON array depth");--depth;return event();}
+ void value(bool string_value=false,bool vrm=false){if(inspect_shader&&depth==1&&root_shader_key){shader=string_value?Shader::String:Shader::Other;vrm0=vrm;root_shader_key=false;}}
+ bool null()override{value();return event();}bool boolean(bool)override{value();return event();}bool number_integer(number_integer_t)override{value();return event();}bool number_unsigned(number_unsigned_t)override{value();return event();}bool number_float(number_float_t,const string_t&)override{value();return event();}
+ bool string(string_t&s)override{value(true,s=="VRM/MToon");add(s.size()+1,4);return event();}bool binary(binary_t&s)override{value();add(s.size(),4);return event();}bool key(string_t&s)override{if(inspect_shader&&depth==1)root_shader_key=s=="shader";add(s.size()+1,4);return event();}
+ bool start_object(std::size_t)override{if(depth==0)root_object=true;value();event();++depth;return true;}bool end_object()override{if(!depth)throw std::invalid_argument("Invalid typed JSON object depth");--depth;return event();}bool start_array(std::size_t)override{value();event();++depth;return true;}bool end_array()override{if(!depth)throw std::invalid_argument("Invalid typed JSON array depth");--depth;return event();}
  bool parse_error(std::size_t,const std::string&,const nlohmann::detail::exception&)override{return false;}
 };
-void visibility_json_budget(size_t&bytes,const std::string&text,const std::function<bool()>&cancelled){if(text.empty())return;if(text.size()>2*1024*1024)throw std::length_error("MToon source metadata exceeds renderer bounds");if(cancelled&&cancelled())throw std::runtime_error("Material query JSON preflight cancelled");VisibilityJsonBudget budget(bytes,cancelled);if(!nlohmann::json::sax_parse(text,&budget))throw std::invalid_argument("Malformed material query typed JSON");}
+bool visibility_json_budget(size_t&bytes,const std::string&text,const std::function<bool()>&cancelled,bool inspect_shader=false){if(text.empty())return false;if(text.size()>2*1024*1024)throw std::length_error("MToon source metadata exceeds renderer bounds");if(cancelled&&cancelled())throw std::runtime_error("Material query JSON preflight cancelled");VisibilityJsonBudget budget(bytes,cancelled,inspect_shader);if(!nlohmann::json::sax_parse(text,&budget))throw std::invalid_argument("Malformed material query typed JSON");if(inspect_shader&&(!budget.root_object||budget.shader==VisibilityJsonBudget::Shader::Other))throw std::invalid_argument("MToon shader metadata requires an object/string value");return budget.vrm0;}
+
 struct Visibility {
   SurfaceRange range;
   MToonCull cull = MToonCull::Back;
@@ -338,7 +340,7 @@ struct MaterialSurfaceQuery::Impl {
       }
       if(range.appearance){const auto&appearance=*range.appearance;color_domain=std::max(color_domain,appearance.source_vertices.size());charge(metadata,appearance.source_vertices.size(),sizeof(std::array<float,2>));}
       if(range.material_bindings){if(range.material_bindings->has_mtoon&&!range.pbr_view){if(metadata>512ull*1024*1024)throw std::length_error("Material query metadata exceeds budget");charge(metadata,range.material_bindings->material.copy_working_bytes(512ull*1024*1024-metadata,cancelled),1);}}
-      else if(range.appearance&&!range.pbr_view){visibility_json_budget(metadata,range.appearance->mtoon_json,cancelled);visibility_json_budget(metadata,range.appearance->material_json,cancelled);}
+      else if(range.appearance&&!range.pbr_view){if(!visibility_json_budget(metadata,range.appearance->mtoon_json,cancelled,true))visibility_json_budget(metadata,range.appearance->material_json,cancelled);}
       // Color copies cover the complete referenced/source vertex DOMAIN,
       // including unused gaps. They are independent of corner paint coordinates.
       charge(metadata,color_domain,sizeof(std::array<float,4>));
