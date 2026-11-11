@@ -4,6 +4,7 @@
 #undef main
 #include "dome/document.hpp"
 #include <nlohmann/json.hpp>
+#include "render-upload-target.hpp"
 namespace {
 std::shared_ptr<const Image> pattern(bool transpose=false){
  Image out{64,64,{}};out.rgba.reserve(64*64*4);
@@ -26,8 +27,8 @@ std::shared_ptr<MeshSnapshot> model(const std::shared_ptr<const PaintSourceMaps>
 namespace {size_t allocated=0,uploaded=0,index_bytes=0;bool capture=false;}
 extern "C" void __real_glBufferData(GLenum,GLsizeiptr,const void*,GLenum);
 extern "C" void __real_glBufferSubData(GLenum,GLintptr,GLsizeiptr,const void*);
-extern "C" void __wrap_glBufferData(GLenum target,GLsizeiptr size,const void *data,GLenum usage){if(capture&&target==GL_ARRAY_BUFFER)allocated+=size;if(capture&&target==GL_ELEMENT_ARRAY_BUFFER)index_bytes+=size;__real_glBufferData(target,size,data,usage);}
-extern "C" void __wrap_glBufferSubData(GLenum target,GLintptr offset,GLsizeiptr size,const void *data){if(capture&&target==GL_ARRAY_BUFFER)uploaded+=size;__real_glBufferSubData(target,offset,size,data);}
+extern "C" void __wrap_glBufferData(GLenum target,GLsizeiptr size,const void *data,GLenum usage){if(capture&&render_upload_test::vertex(target,data,usage))allocated+=size;if(capture&&render_upload_test::index(target,data,usage))index_bytes+=size;__real_glBufferData(target,size,data,usage);}
+extern "C" void __wrap_glBufferSubData(GLenum target,GLintptr offset,GLsizeiptr size,const void *data){if(capture&&render_upload_test::subvertex(target))uploaded+=size;__real_glBufferSubData(target,offset,size,data);}
 int main(int argc,char **argv)try{
  NativeGraphics graphics;const std::string vendor=reinterpret_cast<const char*>(glGetString(GL_VENDOR)),gpu=reinterpret_cast<const char*>(glGetString(GL_RENDERER));std::cout<<"GL_VENDOR "<<vendor<<"\nGL_RENDERER "<<gpu<<'\n';
  check(argc<2||std::string(argv[1])!="--hardware"||(vendor.find("Intel")!=std::string::npos&&gpu.find("Arc")!=std::string::npos&&gpu.find("A770")!=std::string::npos),"Requested Arc renderer is the actual device");Fbo fbo;fbo.bind();SurfaceRenderer renderer;

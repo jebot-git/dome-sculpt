@@ -161,7 +161,10 @@ public:
  }
  static Selection selection(const std::vector<Input>&inputs){Selection result;for(const auto&i:inputs)result.emplace(contribution(i.owner).get(),i.pbr);return result;}
  void retain(const Selection&wanted)noexcept {for(auto it=cache_.begin();it!=cache_.end();)if(!wanted.contains(it->first)){it=cache_.erase(it);}else ++it;}
- const Resource &at(const std::shared_ptr<const PaintOverlayPacket> &packet,bool pbr)const{return cache_.at({contribution(packet).get(),pbr});}
+ // Raw references are invalidated by pruning prepare/retain/clear. Reacquire
+ // before each submission, or mark_used() before submitting retained refs.
+ void mark_used()noexcept{ledger_->mark_used();}
+ const Resource &at(const std::shared_ptr<const PaintOverlayPacket> &packet,bool pbr)const{ledger_->mark_used();return cache_.at({contribution(packet).get(),pbr});}
  size_t bytes()const{return ledger_->usage(group_).bytes;}
  size_t size()const noexcept{return cache_.size();}
  size_t image_count()const noexcept{return ledger_->usage(group_).images;}

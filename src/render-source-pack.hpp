@@ -158,7 +158,11 @@ public:
     }
     if(own_ledger_&&delta.bytes)ledger_->seal(true);if(!preserve_existing)sweep(wanted);
   }
+  // Reacquire before each submission, or mark_used() before submitting a
+  // retained raw ref. Pruning prepare/retain/clear invalidates such refs.
+  void mark_used()noexcept{ledger_->mark_used();}
   const Resource &at(const Inputs &input) const {
+    ledger_->mark_used();
     if(std::none_of(input.begin(),input.end(),[](const auto &v){return bool(v.owner)||bool(v.overlay);})) {static const Resource empty;return empty;}
     return cache_.at(key(input));
   }

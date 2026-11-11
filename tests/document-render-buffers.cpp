@@ -3,6 +3,7 @@
 #include "mtoon-render.cpp"
 #undef main
 #include <unistd.h>
+#include "render-upload-target.hpp"
 namespace {
 size_t vertex_bytes=0,index_calls=0;
 bool capture=false;
@@ -23,8 +24,8 @@ struct Home {
 }
 extern "C" void __real_glBufferData(GLenum,GLsizeiptr,const void*,GLenum);
 extern "C" void __wrap_glBufferData(GLenum target,GLsizeiptr size,const void *data,GLenum usage) {
-  if(capture&&target==GL_ARRAY_BUFFER)vertex_bytes+=size;
-  if(capture&&target==GL_ELEMENT_ARRAY_BUFFER)index_calls++;
+  if(capture&&render_upload_test::vertex(target,data,usage))vertex_bytes+=size;
+  if(capture&&render_upload_test::index(target,data,usage))index_calls++;
   __real_glBufferData(target,size,data,usage);
 }
 int main(int argc,char **argv)try {

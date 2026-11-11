@@ -69,7 +69,7 @@ public:
  }
  template<class Draw>void draw(const PolygonSurfacePreview&p,const AffineTransform&world,size_t first,size_t count,const std::shared_ptr<const TextureSetFaceDomain>&domain,Draw&&draw){
   auto found=std::find_if(entries_.begin(),entries_.end(),[&](const Entry&e){return same(e,p,world,domain);});if(found==entries_.end()||count!=(domain?domain->triangles().size():p.geometric_frames().size())*3)throw std::invalid_argument("Polygon draw has no matching immutable primitive-frame upload");
-  Bind restore;for(const auto&chunk:found->chunks){glBindTexture(GL_TEXTURE_BUFFER,chunk.texture);draw(first+chunk.first*3,chunk.count*3);}
+  ledger_->mark_used();Bind restore;for(const auto&chunk:found->chunks){glBindTexture(GL_TEXTURE_BUFFER,chunk.texture);draw(first+chunk.first*3,chunk.count*3);}
  }
 };
 inline std::string polygon_surface_glsl(){return R"GLSL(

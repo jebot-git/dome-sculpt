@@ -6,13 +6,14 @@
 #include "dome/source-uv-bake.hpp"
 #include "source-color-consumer.hpp"
 #include "source-color-fixtures.hpp"
+#include "render-upload-target.hpp"
 namespace {
 bool capture_buffers=false;size_t array_bytes=0,index_bytes=0;
 }
 extern "C" void __real_glBufferData(GLenum,GLsizeiptr,const void*,GLenum);
-extern "C" void __wrap_glBufferData(GLenum target,GLsizeiptr bytes,const void *data,GLenum usage){if(capture_buffers){if(target==GL_ARRAY_BUFFER)array_bytes+=bytes;if(target==GL_ELEMENT_ARRAY_BUFFER)index_bytes+=bytes;}__real_glBufferData(target,bytes,data,usage);}
+extern "C" void __wrap_glBufferData(GLenum target,GLsizeiptr bytes,const void *data,GLenum usage){if(capture_buffers){if(render_upload_test::vertex(target,data,usage))array_bytes+=bytes;if(render_upload_test::index(target,data,usage))index_bytes+=bytes;}__real_glBufferData(target,bytes,data,usage);}
 extern "C" void __real_glBufferSubData(GLenum,GLintptr,GLsizeiptr,const void*);
-extern "C" void __wrap_glBufferSubData(GLenum target,GLintptr offset,GLsizeiptr bytes,const void *data){if(capture_buffers){if(target==GL_ARRAY_BUFFER)array_bytes+=bytes;if(target==GL_ELEMENT_ARRAY_BUFFER)index_bytes+=bytes;}__real_glBufferSubData(target,offset,bytes,data);}
+extern "C" void __wrap_glBufferSubData(GLenum target,GLintptr offset,GLsizeiptr bytes,const void *data){if(capture_buffers){if(render_upload_test::subvertex(target))array_bytes+=bytes;if(target==GL_ELEMENT_ARRAY_BUFFER)index_bytes+=bytes;}__real_glBufferSubData(target,offset,bytes,data);}
 namespace {
 void uv_adopt(Scene &scene){auto &o=scene.active();SourceUvBakeInput in;in.paint=o.painted;in.appearance=o.appearance;in.current_material=o.material_bindings;in.current_deformation=o.deformation;const auto &mesh=o.painted->mesh();for(auto v:mesh.indices){in.source_vertices.push_back(v);in.target.positions.push_back(mesh.positions[v]);in.target.normals.push_back(mesh.normals[v]);auto uv=mesh.uv[v];in.target.uv.push_back({1-uv[1],uv[0]});in.target.indices.push_back(uint32_t(in.target.positions.size()-1));}SourceUvBakeOptions options;options.resolution=64;auto result=adopt_source_uv_bake(bake_source_uv(in,options));o.painted=result.paint;o.appearance=result.appearance;o.deformation=result.deformation;o.material_bindings=result.material_bindings;}
 void paint(Scene &scene){auto &o=scene.active();o.painted=o.painted->snapshot();Brush brush;brush.from=brush.to={0,0,0};brush.normal={0,0,1};brush.radius=.65f;PaintSettings settings;settings.color={.9f,.2f,.4f,.6f};settings.front_only=false;o.painted->begin_stroke();o.painted->stamp(brush,settings);o.painted->end_stroke();}

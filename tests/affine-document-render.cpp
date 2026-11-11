@@ -9,7 +9,7 @@ namespace {
 bool capture=false;size_t upload_bytes=0;
 }
 extern "C" void __real_glBufferData(GLenum,GLsizeiptr,const void*,GLenum);
-extern "C" void __wrap_glBufferData(GLenum target,GLsizeiptr bytes,const void*p,GLenum usage){if(capture&&(target==GL_ARRAY_BUFFER||target==GL_ELEMENT_ARRAY_BUFFER))upload_bytes+=bytes;__real_glBufferData(target,bytes,p,usage);}
+extern "C" void __wrap_glBufferData(GLenum target,GLsizeiptr bytes,const void*p,GLenum usage){if(capture&&(target==GL_ARRAY_BUFFER||target==GL_ELEMENT_ARRAY_BUFFER||target==GL_COPY_WRITE_BUFFER))upload_bytes+=bytes;__real_glBufferData(target,bytes,p,usage);}
 int main(int argc,char**argv)try {
  auto home=std::filesystem::temp_directory_path()/("dome-affine-gpu-"+std::to_string(getpid()));std::filesystem::create_directories(home);
  setenv("HOME",home.c_str(),1);setenv("XDG_STATE_HOME",home.c_str(),1);setenv("XDG_CONFIG_HOME",home.c_str(),1);

@@ -33,16 +33,16 @@ void bytes(const std::filesystem::path&p,const Pixels&data){std::ofstream f(p,st
 }
 extern "C" void __real_glBufferData(GLenum,GLsizeiptr,const void*,GLenum);
 extern "C" void __wrap_glBufferData(GLenum target,GLsizeiptr size,const void *data,GLenum usage){
- if(capture&&(target==GL_ARRAY_BUFFER||target==GL_ELEMENT_ARRAY_BUFFER)){
+ if(capture&&(target==GL_ARRAY_BUFFER||target==GL_ELEMENT_ARRAY_BUFFER||target==GL_COPY_WRITE_BUFFER)){
   ++allocations;
-  if(data&&std::find(sources.begin(),sources.end(),data)==sources.end())unknown=true;
+  if(data){if(std::find(sources.begin(),sources.end(),data)==sources.end())unknown=true;GLint buffer=0;glGetIntegerv(target==GL_COPY_WRITE_BUFFER?GL_COPY_WRITE_BUFFER_BINDING:target==GL_ELEMENT_ARRAY_BUFFER?GL_ELEMENT_ARRAY_BUFFER_BINDING:GL_ARRAY_BUFFER_BINDING,&buffer);transfers.push_back({GLuint(buffer),0,size,data});}
  }
  __real_glBufferData(target,size,data,usage);
 }
 extern "C" void __real_glBufferSubData(GLenum,GLintptr,GLsizeiptr,const void*);
 extern "C" void __wrap_glBufferSubData(GLenum target,GLintptr offset,GLsizeiptr size,const void *data){
- if(capture&&target==GL_ARRAY_BUFFER){
-  GLint buffer=0;glGetIntegerv(GL_ARRAY_BUFFER_BINDING,&buffer);
+ if(capture&&(target==GL_ARRAY_BUFFER||target==GL_COPY_WRITE_BUFFER)){
+  GLint buffer=0;glGetIntegerv(target==GL_COPY_WRITE_BUFFER?GL_COPY_WRITE_BUFFER_BINDING:GL_ARRAY_BUFFER_BINDING,&buffer);
   transfers.push_back({GLuint(buffer),offset,size,data});
   if(std::find(sources.begin(),sources.end(),data)==sources.end())unknown=true;
  }
@@ -72,7 +72,7 @@ int main(int argc,char**argv)try{
  };
  const auto baseline=render(scene,"plain");
  check(std::any_of(baseline.begin(),baseline.end(),[](auto v){return v!=0;}),"Large mesh actually draws nonblank pixels");
- if(direct)check(renderer.buffer_stats().vertex_bytes==scene->mesh.positions.size()*2*sizeof(Vec3),"Plain sculpt geometry stores positions/normals without duplicated default attributes");
+ if(direct)check(transfers.size()==3&&renderer.buffer_stats().vertex_bytes==scene->mesh.positions.size()*2*sizeof(Vec3),"Plain sculpt geometry stores positions/normals without duplicated default attributes");
  const auto again=render(scene,"stereo");check(again==baseline&&allocations==0&&transfers.empty(),"Second eye retains pixels and issues no geometry/scalar transfer");
  auto complete=std::make_shared<MeshSnapshot>(*scene);complete->geometry_identity=std::make_shared<const int>(2);
  const auto n=complete->mesh.positions.size();complete->mesh.uv.assign(n,{.25f,.75f});complete->tangents.assign(n,{1,0,0,1});
