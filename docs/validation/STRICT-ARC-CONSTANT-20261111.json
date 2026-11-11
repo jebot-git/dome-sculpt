@@ -1,0 +1,241 @@
+{
+  "state": "positive-qualified-negative-SAN-cleanup-open",
+  "date": "2026-11-11",
+  "source": "7415d581b1a4ba4fbecc6aefdd08d0aa20b6b9fb",
+  "baseline": "b8c469ce875eb2542c220300c3c63edbf1526570",
+  "scope": "Five actual consumer1739 gates/profile on physical authenticatedArc, two fullconsumerUHDrefusals/profile, no productcode/build changes by coordinator. Partial2TU/sevenrelink cohort with frozenb8 providers; no freshwhole32claim.",
+  "SDK_source": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "checks": [
+    51,
+    537,
+    84,
+    73,
+    994
+  ],
+  "original1727_preserved": true,
+  "additional_chunk_checks": {
+    "material": 6,
+    "constant": 6
+  },
+  "timeouts_seconds": 180,
+  "descendant_RSS_envelopes_GiB": {
+    "release": 3,
+    "sanitize": 4
+  },
+  "Arc_device": {
+    "node": "/dev/dri/renderD129",
+    "PCI": "0000:03:00.0",
+    "vendor": "8086",
+    "device": "56a0",
+    "driver": "i915"
+  },
+  "authentication": "Actual unmodified glGetString forwarding plus EGLDevice/DRM/PCI/liveFD and exactmappedELF/mount checks; no requeststring-only claim. NegativeUHD throws at renderer check before laterEGLDevice checks.",
+  "profiles": {
+    "release": {
+      "raw_behavioral_status": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-constant-20261111/control/release-v1/status.json",
+        "sha256": "3d7f16b9ce1cfbcd1bd56be0b986a3ba14a06468e1f5fa86e92075ef4274566c"
+      },
+      "raw_behavioral_exit": 0,
+      "seconds": 20.363373768981546,
+      "positive_checks": 1739,
+      "positive_clean": true,
+      "positive_rows": [
+        {
+          "name": "existing-field-GL",
+          "checks": 51,
+          "exit": 0,
+          "consumer_sha256": "0e82eebedd375dec12c44df9e540e711d852de902babb63a72d517f118d7d0ca",
+          "peak_descendant_RSS": 606523392
+        },
+        {
+          "name": "balanced-mixed-GL",
+          "checks": 537,
+          "exit": 0,
+          "consumer_sha256": "fecac7a708ba16d05744aa56254e2c1c77b1cc4e3aba8ca4b614924c187b5f72",
+          "peak_descendant_RSS": 119234560
+        },
+        {
+          "name": "sculpt-chunk-GL",
+          "checks": 84,
+          "exit": 0,
+          "consumer_sha256": "4eec0c0a6c1912c15751d9c6d9c862d6bda74cac3c686c6f46ac34055f6b8fe2",
+          "peak_descendant_RSS": 117452800
+        },
+        {
+          "name": "direct-upload-GL",
+          "checks": 73,
+          "exit": 0,
+          "consumer_sha256": "32c9e888cc0c39a0d9fdd89869ed8e37d4498cf7f64f5b2c599aaf3546e0ca87",
+          "peak_descendant_RSS": 84901888
+        },
+        {
+          "name": "sourceful-same-object-GL",
+          "checks": 994,
+          "exit": 0,
+          "consumer_sha256": "13a4d137b0ac6a5ed4d5dc1a1d765841ce1f9fd89af8b88ec4784dcd6c1340fd",
+          "peak_descendant_RSS": 130482176
+        }
+      ],
+      "negative_rows": [
+        {
+          "name": "uhd-counter-balanced-mixed-GL",
+          "exit": 1,
+          "negative_sanitizer_cleanup_clean": true,
+          "negative_leak_summaries": []
+        },
+        {
+          "name": "uhd-counter-sourceful-same-object-GL",
+          "exit": 1,
+          "negative_sanitizer_cleanup_clean": true,
+          "negative_leak_summaries": []
+        }
+      ],
+      "all_negative_sanitizer_clean": true,
+      "protected_count": 6007,
+      "owned_count": 11,
+      "drift": [],
+      "image_pairs": {
+        "pair_count": 56,
+        "image_inputs": 112,
+        "maximum_RGB_difference": 2,
+        "maximum_alpha_difference": 0,
+        "RGB_tolerance": 6,
+        "alpha_exact": true,
+        "input_drift": []
+      },
+      "build_receipt": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-constant-state-build-20261111/release/status.json",
+        "sha256": "4bb7c1b2b4d40680c307d0e579d0bbb1b4fd85542df3a4130561bb77befb5966"
+      },
+      "application_sha256": "e82df5662ed9c66f5e23275658bf565ac37cffeeb88b4423f9f4105529c8d0a3"
+    },
+    "sanitize": {
+      "raw_behavioral_status": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-constant-20261111/control/sanitize-v1/status.json",
+        "sha256": "d3e4a1e84dbd26f3597d397203b7c96419de9addb108bf30e75e3e1940a71c70"
+      },
+      "raw_behavioral_exit": 0,
+      "seconds": 158.668021511985,
+      "positive_checks": 1739,
+      "positive_clean": true,
+      "positive_rows": [
+        {
+          "name": "existing-field-GL",
+          "checks": 51,
+          "exit": 0,
+          "consumer_sha256": "96c250a23adb8db52fe2ffdf81dd47fbde5afacd12da9eff7752b91d67718519",
+          "peak_descendant_RSS": 3609346048
+        },
+        {
+          "name": "balanced-mixed-GL",
+          "checks": 537,
+          "exit": 0,
+          "consumer_sha256": "7e6367a52dab822b1060e4ecb875b4530b780b9891449469fd3d3836515e9845",
+          "peak_descendant_RSS": 2442493952
+        },
+        {
+          "name": "sculpt-chunk-GL",
+          "checks": 84,
+          "exit": 0,
+          "consumer_sha256": "61a587e92e067153f7b25f7e5d4d10e4445714fdabfc5cb1e6699c7ce1c32fce",
+          "peak_descendant_RSS": 1877409792
+        },
+        {
+          "name": "direct-upload-GL",
+          "checks": 73,
+          "exit": 0,
+          "consumer_sha256": "3db288414b3e92941b28a7f6871c061d67adba976d4da3864c9185b97badba33",
+          "peak_descendant_RSS": 359428096
+        },
+        {
+          "name": "sourceful-same-object-GL",
+          "checks": 994,
+          "exit": 0,
+          "consumer_sha256": "b35557b5a3505f148622d406d8a4f7a2131cf739f1f2e1e91b1515231bd9f1b8",
+          "peak_descendant_RSS": 2715901952
+        }
+      ],
+      "negative_rows": [
+        {
+          "name": "uhd-counter-balanced-mixed-GL",
+          "exit": -6,
+          "negative_sanitizer_cleanup_clean": false,
+          "negative_leak_summaries": [
+            "SUMMARY: AddressSanitizer: 132268 byte(s) leaked in 1142 allocation(s)."
+          ]
+        },
+        {
+          "name": "uhd-counter-sourceful-same-object-GL",
+          "exit": -6,
+          "negative_sanitizer_cleanup_clean": false,
+          "negative_leak_summaries": [
+            "SUMMARY: AddressSanitizer: 132268 byte(s) leaked in 1142 allocation(s)."
+          ]
+        }
+      ],
+      "all_negative_sanitizer_clean": false,
+      "protected_count": 6008,
+      "owned_count": 10,
+      "drift": [],
+      "image_pairs": {
+        "pair_count": 56,
+        "image_inputs": 112,
+        "maximum_RGB_difference": 2,
+        "maximum_alpha_difference": 0,
+        "RGB_tolerance": 6,
+        "alpha_exact": true,
+        "input_drift": []
+      },
+      "build_receipt": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-constant-state-build-20261111/sanitize/status.json",
+        "sha256": "78ce3c8efe5867e45a8b50c7d1b043fcbddcc9310428dfb10d73af72384e006a"
+      },
+      "application_sha256": "1efb96511d04d5a4bb03f3b1f5932a5067d28617539cc9dc6e34d2300ce888f0"
+    }
+  },
+  "Arc_RS_images": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-constant-20261111/control/Arc-RS-images.json",
+    "sha256": "4f62a04b1752e12fa58271e7eba943b76563d4a6eaa2aa5d2f7d7ef62203a525"
+  },
+  "Arc_RS_byte_exact_pairs": 56,
+  "software_Arc_RGB_tolerance": 6,
+  "alpha_exact": true,
+  "commands": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-constant-20261111/control/commands.json",
+    "sha256": "836011ccc5635b9c8ff0032087fe24ec71897f3890e3e74fbdca46b018da7c60"
+  },
+  "observer_derivation": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-constant-20261111/control/device-auth-derivation.json",
+    "sha256": "972b56ca386d07204223a34470cc0591bd77fca74bbce6463b66c40d3e6d934b"
+  },
+  "tools": {
+    "arc-constant.py": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-constant-20261111/control/arc-constant.py",
+      "sha256": "22ed5cdb7d9611a6cb2d6e9a9f8bb4d2c6ac3dfa1957431bdaba73a7c6153c00"
+    },
+    "graphics-v3.py": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-constant-20261111/control/graphics-v3.py",
+      "sha256": "0606a923f5fbe1a4da5ffd973ae3b541d0bb343cd55614a33ee2f3edef9f6a7a"
+    },
+    "mount_identity.py": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-constant-20261111/control/mount_identity.py",
+      "sha256": "1e2c6a322ae8797c78f9a2693d7e2e18aab9dd8d6472babbeb81334971904c81"
+    },
+    "device-auth.cpp": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-constant-20261111/control/device-auth.cpp",
+      "sha256": "f13b90442862bdc64bd0e707a728305a68ecd45d726d54a09982b6c1bdae260e"
+    },
+    "device-auth-release.so": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-constant-20261111/control/device-auth-release.so",
+      "sha256": "c27dbee4f9dfbe6318da3380b3ca4fb6b9c2d9630905aaa66a8eb5d4ac140edb"
+    },
+    "device-auth-sanitize.so": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-constant-20261111/control/device-auth-sanitize.so",
+      "sha256": "8fa0baa9fe46b921f2524e9ac09b9d27e2e50eccf384e03449f19d5238ad0aa9"
+    }
+  },
+  "historical_helper_authenticity": "archive-hash verified, not cryptographically signed",
+  "obsolete494_plan": "strict-arc-state-20261111/control supersededunexecuted, read-only preflightfailedsourceidentity retained; no obsoleteGPUrun",
+  "limits": "No productpatch/systeminstall/physicalHMD/performance/generalgoalclaim. Rawstatus0 on behavioralUHDrefusal is not cleanSANnegative."
+}
