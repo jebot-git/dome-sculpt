@@ -1,0 +1,286 @@
+{
+  "schema": 1,
+  "generated_utc": "2026-11-11T14:09:49.324660+00:00",
+  "implementation_commit": "507d6edaae1abd0e9172b28fe8ace7d600c46131",
+  "qualified_source_commit": "58e856a3d6ba8863d5f5bda0555cc708e9042498",
+  "branch": "work/gpu-layer-blur-20261111",
+  "baseline_commit": "b8c469ce875eb2542c220300c3c63edbf1526570",
+  "scope": "Genuine native active-color-layer GPU operation; partial backend milestone, not full layered material/baking completion. No installation or physical-session acceptance.",
+  "source_sha256": {
+    "CMakeLists.txt": "f32cfda1b14d001fb18635697c699393e0c7446fa768d86b463231ccb7752f05",
+    "THIRD-PARTY.md": "429a75d9721fad248aa5853750d7dcd75cc6e5d5290257602a0824fda63b637a",
+    "cmake/armorpaint-blur-weights.cmake": "428485bdaa5c109cdc92e44fcfa33e161066c83135ae7bdd32f97ec15797cf75",
+    "docs/ARMORPAINT-EXPERIMENT.md": "03c8c16d612b9886d6f1775cabc4b25581c9bf1c525cab68c67c8157c0f1da33",
+    "docs/GPU-COLOR-LAYER-BLUR.md": "a084dc7b9492e57329c03577e95830e218c64511209c5dff22ab3b4076d83cd5",
+    "docs/validation/ARMORPAINT-BLUR-20261111.json": "3d49a47a820c3e780c0f6030877d76df4d52793aba361de525a74664463439f2",
+    "experiments/armorpaint-blur/CMakeLists.txt": "4f339727f0ea63a425c17534a20f93f5c69f140f86229d0552e4f52949adea04",
+    "experiments/armorpaint-blur/NOTICE.txt": "71171622263ae8e9ca82a4079f5781b55ede52775fa518f947e12b90f75a4dec",
+    "experiments/armorpaint-blur/README.md": "a8e290c06801b7ad4e93d8744aae61ca113eb82bc29fec2f553d224c9f0263eb",
+    "experiments/armorpaint-blur/blur_adapter.cpp": "6c5db0f60f9f9671ef0a3007149834b5722038f1d6e05d211b1bb9ce397a66a1",
+    "experiments/armorpaint-blur/blur_adapter.hpp": "e2c65ed7c040865e02fc83ea5c65c72be0d2b2201b0975a3cbf65c1884992ecb",
+    "experiments/armorpaint-blur/generate_shader.py": "a892168a14f4d27b4d6671f53c0fa3f1fd1ab8e0381daacf015c6249f565738c",
+    "experiments/armorpaint-blur/proof.cpp": "3a52f413dc8ef425cf8d61b54dda635199cd0b32db9e5abe2d51a0407d2b75df",
+    "experiments/armorpaint-blur/validate.py": "7a63cbc436f1f5bec448653a8f91a6972889e3bfe1f979954fec7c2d604280d9",
+    "experiments/armorpaint-blur/vendor/LICENSE.armorpaint": "a3efbc800206c5e0d24dfc38dfdc1997cef977cb2e48d77c64ae30427a9a4e84",
+    "experiments/armorpaint-blur/vendor/make_blur.c": "a2403c5ef2ffd23fc5a1798b47c04b29ecc9e5362faa8f16f20e4f842314fbf4",
+    "include/dome/document.hpp": "6a0fbf33433bf740d72ae356ceccd4f023452df50130d10f4d44f9b4f475bfd4",
+    "include/dome/input.hpp": "47ef34a6c54bcb4c6cb971695f7d376659adca79af71ec2e68764b532dd9437f",
+    "include/dome/paint-blur.hpp": "5fed9cf0515718c9778fc8eed82335b3c9ca00bac260de79c9e9846500773470",
+    "include/dome/paint.hpp": "922c71b9a24d38a3c65376e26784f952ed4206d9eb3725c3ce7126430f731d5c",
+    "src/app.cpp": "c922e8ae3b828b6fd21e41195b5d812c877506193d04fc63fde64b5d753efe85",
+    "src/document-paint-blur.cpp": "7a70cdcd20afb404e65473edc6c3508f4b645c8019eee1d8e8da88dea50364da",
+    "src/document.cpp": "6c6ed3f02d9619d5b6040d490c63ff2ff48f74f2ac24dadef7f509e776377e62",
+    "src/input.cpp": "5e3acd47b62f92f8d550ad3e223495a94b068c8195498bd14dfe38163755751e",
+    "src/paint-blur-gpu.cpp": "638f54652fb2556f992e5279b0498908b5e99fde17fbd3189b4f2a2c4af0bebe",
+    "src/paint-blur-gpu.hpp": "279e82836c8ce050ef11f68f9212967c7fdc4f788608c17dfa8f30cde37ba6d8",
+    "src/paint.cpp": "24e4c67437aeac7324473b75f7148e853209e87c62042b9624b996b5fdfc65a6",
+    "src/palette.cpp": "c98aa5a7580824942238d0dbfd1a51d91ae172b38324b13b2d0a519026e7ae01",
+    "src/texture-set-stroke.cpp": "f4c5788c4a8dc4f09c375de36b25f93f94f4e5a93df56403221bd29dcdbb076a",
+    "tests/document.cpp": "361563cc3defdc25b1375da5262fc886925e3a8aa1d5a823319f8dd0b8911994",
+    "tests/gpu-color-blur-kernel.cpp": "5ae16c790d3838a2ae8a24cac81e0b1cd330fc411ed20a19bf35cbf9e336ae9c",
+    "tests/gpu-color-blur-native.cpp": "3a189e86745776a7ac2865be2e3ec2af8c962f1bd697649829fea97ae41b4c08",
+    "tests/native-graphics-lifetime.cpp": "a85bd1663573c99abb625af795025db656e2be0d5c123e043ce26b5f119133b7",
+    "tests/native-graphics-shared.cpp": "ce69c4af7429c7f52705905c196c8e61178bcae9424feb92e859c0f51233e6e4",
+    "tests/paint.cpp": "5dc259c15e530314f363fe539995763770377213b68b8505ae574e4c74500763",
+    "tests/vr-controls.cpp": "b5bae18aa470c196d598354538fdf2a6a56acb21662a5c1ecea79ed3234412b9",
+    "third_party/armorpaint/NOTICE": "ee66f0fcfd2ad3acbdae75dc834a57f24de9dc3d0e7a596622ba85964ad70000",
+    "third_party/openbrush/graphics.cpp": "49d48cb07bbbf3b57ec3845d3dec4a67a40a066b867b8b3c23a8a062c56e2016",
+    "third_party/sources.json": "f1c3f01da2cd414568c7b4d96d46426b7b804a9aa104d68c8fec4d92cab7cf43"
+  },
+  "product_bytes_unchanged_since_implementation": true,
+  "upstream": {
+    "repository": "https://github.com/armory3d/armorpaint",
+    "commit": "629f8e77b3f19d533c60a1baa4fe9d4db9ee1163",
+    "source_sha256": "a2403c5ef2ffd23fc5a1798b47c04b29ecc9e5362faa8f16f20e4f842314fbf4",
+    "license_sha256": "a3efbc800206c5e0d24dfc38dfdc1997cef977cb2e48d77c64ae30427a9a4e84",
+    "license": "zlib/libpng",
+    "altered_notice": "third_party/armorpaint/NOTICE"
+  },
+  "runtime": {
+    "software": "System llvmpipe (LLVM 22.1.8, 256 bits); no patched LLVM19 qualification",
+    "software_environment": {
+      "LD_LIBRARY_PATH": "/usr/lib64",
+      "LIBGL_ALWAYS_SOFTWARE": "1",
+      "LP_NUM_THREADS": "2"
+    },
+    "arc_environment": {
+      "LD_LIBRARY_PATH": "/usr/lib64",
+      "DRI_PRIME": "pci-0000_03_00_0"
+    },
+    "arc_lock": "/tmp/dome-sculpt-arc-device.lock; exclusive flock per profile",
+    "device_policy": "Product accepts hardware EGLDevice/DRM plus GL 3.3 FLOAT-MRT capability without an Arc vendor restriction. Strict kernel test separately requires Arc renderer, EGL renderD129 and sysfs PCI 0000:03:00.0/8086:56a0. EGL display node alone does not identify an offloaded GL context."
+  },
+  "profiles": {
+    "release": {
+      "configuration": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_CXX_FLAGS_RELEASE": "-O3 -DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO": "-O2 -g -DNDEBUG",
+        "CMAKE_C_FLAGS_RELWITHDEBINFO": "-O2 -g -DNDEBUG",
+        "DOME_BUILD_UI": "ON",
+        "DOME_BUILD_XR": "ON",
+        "DOME_COMPUTE_BACKEND": "CPU",
+        "FLTK_DIR": "/home/blux/de-xr/dome-sculpt/artifacts/sdk-20261111/toolkit-release/share/fltk"
+      },
+      "arc_kernel": {
+        "exit_status": 0,
+        "elapsed_seconds": 1.2011966879945248,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/gpu-layer-blur-20261111/build-blur-release/dome-sculpt-gpu-color-blur-kernel-test",
+          "hardware"
+        ],
+        "output": "DEVICE Mesa Intel(R) Arc(tm) A770 Graphics (DG2) | /dev/dri/renderD129\nPASS 61444 native GPU blur kernel controls max_error=1.75032e-07\nNative XR graphics: windowless EGL 1.5\n",
+        "binary_sha256": "e5e79e10f491246cf6a9bcae87af014a44394295811383fd88aca42531694a85"
+      },
+      "arc_shared_display": {
+        "exit_status": 0,
+        "elapsed_seconds": 0.4868998599704355,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/gpu-layer-blur-20261111/build-blur-release/dome-sculpt-native-graphics-shared-test",
+          "hardware"
+        ],
+        "output": "PASS 12 real shared/borrowed EGL display ownership controls\nNative XR graphics: windowless EGL 1.5\nNative XR graphics: windowless EGL 1.5\nNative XR graphics: windowless EGL 1.5\nNative XR graphics: windowless EGL 1.5\n",
+        "binary_sha256": "967c93e9c95a2d3e05601ae5490e684d0090acfc2d1370260b81e80ced3d488a"
+      },
+      "native_software_and_arc": {
+        "software": {
+          "exit_status": 0,
+          "elapsed_seconds": 0.5162957460270263,
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/gpu-layer-blur-20261111/build-blur-release/dome-sculpt-gpu-color-blur-native-test",
+            "software",
+            "/home/blux/de-xr/dome-sculpt/artifacts/gpu-layer-blur-20261111/build-blur-release/qualified-native-software"
+          ],
+          "output": "EXPECTED GPU layer blur cancelled\nEXPECTED GPU layer blur retained authority/history budget exceeded\nEXPECTED GPU layer blur cancelled\nEXPECTED GPU layer blur retained authority/history budget exceeded\nEXPECTED GPU layer blur requires an unambiguous current strict UV field; retained/repeated/overlapping source-coordinate domains need their separate authenticated tool\nEXPECTED Native blur commands require hardware GPU execution; software validation is detached only\nPASS 139378 actual native GPU color blur controls\nNative XR graphics: windowless EGL 1.5\nNative XR graphics: windowless EGL 1.5\nNative XR graphics: windowless EGL 1.5\nNative XR graphics: windowless EGL 1.5\nNative XR graphics: windowless EGL 1.5\nNative XR graphics: windowless EGL 1.5\nNative XR graphics: windowless EGL 1.5\n",
+          "binary_sha256": "41c9809b8dafd23a0f61ca56cea54461098d231fd1e284e6fdca0a173eadb3e2"
+        },
+        "arc": {
+          "exit_status": 0,
+          "elapsed_seconds": 0.7424764719908126,
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/gpu-layer-blur-20261111/build-blur-release/dome-sculpt-gpu-color-blur-native-test",
+            "hardware",
+            "/home/blux/de-xr/dome-sculpt/artifacts/gpu-layer-blur-20261111/build-blur-release/qualified-native-arc"
+          ],
+          "output": "EXPECTED GPU layer blur cancelled\nEXPECTED GPU layer blur retained authority/history budget exceeded\nEXPECTED GPU layer blur cancelled\nEXPECTED GPU layer blur retained authority/history budget exceeded\nEXPECTED GPU layer blur requires an unambiguous current strict UV field; retained/repeated/overlapping source-coordinate domains need their separate authenticated tool\nPASS 139458 actual native GPU color blur controls\nNative XR graphics: windowless EGL 1.5\nNative XR graphics: windowless EGL 1.5\nNative XR graphics: windowless EGL 1.5\nNative XR graphics: windowless EGL 1.5\nNative XR graphics: windowless EGL 1.5\nNative XR graphics: windowless EGL 1.5\nNative XR graphics: windowless EGL 1.5\nNative XR graphics: windowless EGL 1.5\nNative XR graphics: windowless EGL 1.5\nNative XR graphics: windowless EGL 1.5\nNative XR graphics: windowless EGL 1.5\nNative XR graphics: windowless EGL 1.5\nNative XR graphics: windowless EGL 1.5\n",
+          "binary_sha256": "41c9809b8dafd23a0f61ca56cea54461098d231fd1e284e6fdca0a173eadb3e2"
+        }
+      },
+      "software_ctest": {
+        "path": "build-blur-release/final-software-regressions.log",
+        "sha256": "3e3154078dc6a8edf565028d61dd2f8e344d7d34e02d09779d76633aed2eb2e3",
+        "output": "Test project /home/blux/de-xr/dome-sculpt/artifacts/gpu-layer-blur-20261111/build-blur-release\n    Start    1: gpu-color-blur-kernel-software\n1/7 Test    #1: gpu-color-blur-kernel-software ....   Passed    2.09 sec\n    Start    2: gpu-color-blur-native-software\n2/7 Test    #2: gpu-color-blur-native-software ....   Passed    2.15 sec\n    Start    3: native-graphics-shared-software\n3/7 Test    #3: native-graphics-shared-software ...   Passed    2.15 sec\n    Start   24: input-rebind-publication\n4/7 Test   #24: input-rebind-publication ..........   Passed    0.11 sec\n    Start  179: texture-painting\n5/7 Test  #179: texture-painting ..................   Passed   31.10 sec\n    Start  235: native-graphics-lifetime\n6/7 Test  #235: native-graphics-lifetime ..........   Passed    0.02 sec\n    Start 1289: dome-sculpt-texture-set-native\n7/7 Test #1289: dome-sculpt-texture-set-native ....   Passed    0.23 sec\n\n100% tests passed, 0 tests failed out of 7\n\nTotal Test time (real) =  38.00 sec\n"
+      },
+      "mock_lifetime_binary_sha256": "b6387f8fbda0068c665ddf48d82ea0324d2fcf66cd9261115cb58782d84de527",
+      "legacy_controller_and_document": {
+        "path": "build-blur-release/refined-legacy-regressions.log",
+        "sha256": "ed263c2ce14bd86b7e5c4f1471517fcc03b3516b3aecc7d0b312fd350ebc8e80",
+        "output": "Test project /home/blux/de-xr/dome-sculpt/artifacts/gpu-layer-blur-20261111/build-blur-release\n    Start 178: controller-controls\n1/2 Test #178: controller-controls ..............   Passed   23.95 sec\n    Start 181: shared-document\n2/2 Test #181: shared-document ..................   Passed   50.56 sec\n\n100% tests passed, 0 tests failed out of 2\n\nTotal Test time (real) =  74.71 sec\n"
+      },
+      "full_native_application_elf_sha256": "89f408d62e6afd81a1475d6da240f2098743ca9ed1c927d43f17f77d1b6c18ea",
+      "current_ordinary_test_defaults": {
+        "controller": {
+          "path": "build-blur-release/controller-profile-default.log",
+          "sha256": "39d5b2e739e32ed9b7cb343776c511139e4e8a2c1664f45e5e601e55c7b4b9af",
+          "output": "PASS Unavailable radial commands stay visibly disabled and cannot activate\nPASS A joystick press opens a continuous material slider\nPASS Held thumbstick motion previews continuous parameter changes\nPASS A controller aim ray and trigger drag the same slider to its absolute position\nPASS A secondary stylus can drag a slider opened by the controller\nPASS Press confirmation returns to the parent menu\nPASS A complete slider gesture is one exact undo transaction\nPASS Slider capture prevents trigger input from sculpting behind the panel\nPASS The logarithmic brush-size slider doubles naturally at full stick deflection\nPASS Vertical wheel motion provides a slower fine adjustment\nPASS Focus loss cancels a transient wheel adjustment\nPASS VR color controls expose separate RGBA sliders\nPASS Thumbstick row selection adjusts only the chosen color component\nPASS A ray-clickable Cancel button restores the original color without recording an edit\nPASS Layer controls use a prepared stable painting mesh\nPASS The controller controls page exposes a layer-opacity slider\nPASS Layer opacity follows continuous input and commits with a ray-clickable Done button\nPASS Layer slider undo restores the saved layer and its history\nPASS Painting retains the direct brush-controls shortcut\nPASS The former duplicate Erase slot exposes native filters\nPASS Filter Back returns to the original brush-controls page\nPASS Focus loss cancels the filter menu without authoring an edit\nPASS The original Painting Erase command still toggles the live brush\nPASS Erase can be toggled back without altering the saved layer\n"
+        },
+        "paint": {
+          "path": "build-blur-release/paint-profile-default.log",
+          "sha256": "d1306cc968be36cb01f00974313fcaefb39eb5c3e066b8922f9d48d97127dc3f",
+          "output": "PASS Pinned Blender-style picking finds exact local-space mesh intersections\nPASS A swept pressure brush commits a native texture transaction\nPASS World-space painting crosses separate UV seam islands continuously\nPASS Painting leaves unrelated texels unchanged\nPASS Paint undo restores exact original texture bytes\nPASS A worker's paint snapshot remains immutable across later undo\nPASS Paint redo restores exact committed texture bytes\nPASS Cancelling a paint stroke restores its tiles exactly\nPASS A second layer composites independently above earlier paint\nPASS Layer visibility reveals the unchanged lower layer\nPASS Painting a layer mask reveals lower paint without deleting either layer\nPASS Layer mask painting has exact independent undo\nPASS Metalness and roughness paint into independent linear glTF B/G channels\nPASS Emission is retained as an independent sRGB map\nPASS Persistent mesh buffers, UVs, layers, masks and channels round-trip exactly\nPASS The native PNG encoder produces a decodable image\nPASS PNG decoding preserves exported texture rows and color bytes\nPASS Out-of-range persisted tile references are rejected\nPASS Mismatched persisted mesh/UV buffers are rejected\nPASS Pressure changes the physical footprint of the paint brush\nPASS XR render snapshots remain responsive while mesh/UV preparation runs\nPASS The background worker publishes a durable painting mesh\nPASS A painted mesh accepts a desktop texture transaction\nPASS Texture painting preserves sculpt source samples and stable mesh topology\nPASS Texture strokes participate in shared document undo/redo\nPASS Version-three projects restore the painted mesh and editable layers\nPASS Undoing a layer command returns to the clean saved painting state\nPASS A prepared mesh accepts a fresh spatial baseline\nPASS A tracked controller begins a texture stroke\nPASS XR focus loss cancels transient texture edits exactly and retains the saved state\nPASS A rejected last-layer deletion preserves earlier stroke history\n"
+        }
+      }
+    },
+    "sanitize": {
+      "configuration": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+        "CMAKE_CXX_FLAGS_RELEASE": "-O3 -DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO": "-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer",
+        "CMAKE_C_FLAGS_RELWITHDEBINFO": "-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer",
+        "DOME_BUILD_UI": "OFF",
+        "DOME_BUILD_XR": "OFF",
+        "DOME_COMPUTE_BACKEND": "CPU"
+      },
+      "arc_kernel": {
+        "exit_status": 0,
+        "elapsed_seconds": 1.864865429000929,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/gpu-layer-blur-20261111/build-blur-sanitize/dome-sculpt-gpu-color-blur-kernel-test",
+          "hardware"
+        ],
+        "output": "DEVICE Mesa Intel(R) Arc(tm) A770 Graphics (DG2) | /dev/dri/renderD129\nPASS 61444 native GPU blur kernel controls max_error=1.75032e-07\nNative XR graphics: windowless EGL 1.5\n",
+        "binary_sha256": "58081fcc1502dd1c5a4314841e180eae6d1b3cf2a89f25e3f0e5975f23106cc1"
+      },
+      "arc_shared_display": {
+        "exit_status": 0,
+        "elapsed_seconds": 1.056841476005502,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/gpu-layer-blur-20261111/build-blur-sanitize/dome-sculpt-native-graphics-shared-test",
+          "hardware"
+        ],
+        "output": "PASS 12 real shared/borrowed EGL display ownership controls\nNative XR graphics: windowless EGL 1.5\nNative XR graphics: windowless EGL 1.5\nNative XR graphics: windowless EGL 1.5\nNative XR graphics: windowless EGL 1.5\n",
+        "binary_sha256": "169dba594acb16b754ab4ef62189ca33a39697ea065ef16a90dcc6d4b05a8c6f"
+      },
+      "native_software_and_arc": {
+        "software": {
+          "exit_status": 0,
+          "elapsed_seconds": 1.7241870719590224,
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/gpu-layer-blur-20261111/build-blur-sanitize/dome-sculpt-gpu-color-blur-native-test",
+            "software",
+            "/home/blux/de-xr/dome-sculpt/artifacts/gpu-layer-blur-20261111/build-blur-sanitize/qualified-native-software"
+          ],
+          "output": "EXPECTED GPU layer blur cancelled\nEXPECTED GPU layer blur retained authority/history budget exceeded\nEXPECTED GPU layer blur cancelled\nEXPECTED GPU layer blur retained authority/history budget exceeded\nEXPECTED GPU layer blur requires an unambiguous current strict UV field; retained/repeated/overlapping source-coordinate domains need their separate authenticated tool\nEXPECTED Native blur commands require hardware GPU execution; software validation is detached only\nPASS 139378 actual native GPU color blur controls\nNative XR graphics: windowless EGL 1.5\nNative XR graphics: windowless EGL 1.5\nNative XR graphics: windowless EGL 1.5\nNative XR graphics: windowless EGL 1.5\nNative XR graphics: windowless EGL 1.5\nNative XR graphics: windowless EGL 1.5\nNative XR graphics: windowless EGL 1.5\n",
+          "binary_sha256": "9658838832ae61d972fb55cc065abc7da2f899ebf17b32d9646e8fb11c11d2db"
+        },
+        "arc": {
+          "exit_status": 0,
+          "elapsed_seconds": 2.187561364029534,
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/gpu-layer-blur-20261111/build-blur-sanitize/dome-sculpt-gpu-color-blur-native-test",
+            "hardware",
+            "/home/blux/de-xr/dome-sculpt/artifacts/gpu-layer-blur-20261111/build-blur-sanitize/qualified-native-arc"
+          ],
+          "output": "EXPECTED GPU layer blur cancelled\nEXPECTED GPU layer blur retained authority/history budget exceeded\nEXPECTED GPU layer blur cancelled\nEXPECTED GPU layer blur retained authority/history budget exceeded\nEXPECTED GPU layer blur requires an unambiguous current strict UV field; retained/repeated/overlapping source-coordinate domains need their separate authenticated tool\nPASS 139458 actual native GPU color blur controls\nNative XR graphics: windowless EGL 1.5\nNative XR graphics: windowless EGL 1.5\nNative XR graphics: windowless EGL 1.5\nNative XR graphics: windowless EGL 1.5\nNative XR graphics: windowless EGL 1.5\nNative XR graphics: windowless EGL 1.5\nNative XR graphics: windowless EGL 1.5\nNative XR graphics: windowless EGL 1.5\nNative XR graphics: windowless EGL 1.5\nNative XR graphics: windowless EGL 1.5\nNative XR graphics: windowless EGL 1.5\nNative XR graphics: windowless EGL 1.5\nNative XR graphics: windowless EGL 1.5\n",
+          "binary_sha256": "9658838832ae61d972fb55cc065abc7da2f899ebf17b32d9646e8fb11c11d2db"
+        }
+      },
+      "software_ctest": {
+        "path": "build-blur-sanitize/final-software-regressions.log",
+        "sha256": "f190bcfa6274c4763429b0dd3c9f158af35ba644bbace00ff3415909146539d8",
+        "output": "Test project /home/blux/de-xr/dome-sculpt/artifacts/gpu-layer-blur-20261111/build-blur-sanitize\n    Start    1: gpu-color-blur-kernel-software\n1/9 Test    #1: gpu-color-blur-kernel-software ....   Passed    2.24 sec\n    Start    2: gpu-color-blur-native-software\n2/9 Test    #2: gpu-color-blur-native-software ....   Passed    4.33 sec\n    Start    3: native-graphics-shared-software\n3/9 Test    #3: native-graphics-shared-software ...   Passed    1.45 sec\n    Start   24: input-rebind-publication\n4/9 Test   #24: input-rebind-publication ..........   Passed    1.08 sec\n    Start  178: controller-controls\n5/9 Test  #178: controller-controls ...............***Failed  206.78 sec\nPASS Unavailable radial commands stay visibly disabled and cannot activate\nPASS A joystick press opens a continuous material slider\nPASS Held thumbstick motion previews continuous parameter changes\nPASS A controller aim ray and trigger drag the same slider to its absolute position\nPASS A secondary stylus can drag a slider opened by the controller\nPASS Press confirmation returns to the parent menu\nPASS A complete slider gesture is one exact undo transaction\nPASS Slider capture prevents trigger input from sculpting behind the panel\nPASS The logarithmic brush-size slider doubles naturally at full stick deflection\nPASS Vertical wheel motion provides a slower fine adjustment\nPASS Focus loss cancels a transient wheel adjustment\nPASS VR color controls expose separate RGBA sliders\nPASS Thumbstick row selection adjusts only the chosen color component\nPASS A ray-clickable Cancel button restores the original color without recording an edit\nPackCharts: ComputeCharts must be called first.\nFAIL Layer controls use a prepared stable painting mesh\n\n    Start  179: texture-painting\n6/9 Test  #179: texture-painting ..................***Failed  190.72 sec\nPASS Pinned Blender-style picking finds exact local-space mesh intersections\nPASS A swept pressure brush commits a native texture transaction\nPASS World-space painting crosses separate UV seam islands continuously\nPASS Painting leaves unrelated texels unchanged\nPASS Paint undo restores exact original texture bytes\nPASS A worker's paint snapshot remains immutable across later undo\nPASS Paint redo restores exact committed texture bytes\nPASS Cancelling a paint stroke restores its tiles exactly\nPASS A second layer composites independently above earlier paint\nPASS Layer visibility reveals the unchanged lower layer\nPASS Painting a layer mask reveals lower paint without deleting either layer\nPASS Layer mask painting has exact independent undo\nPASS Metalness and roughness paint into independent linear glTF B/G channels\nPASS Emission is retained as an independent sRGB map\nPASS Persistent mesh buffers, UVs, layers, masks and channels round-trip exactly\nPASS The native PNG encoder produces a decodable image\nPASS PNG decoding preserves exported texture rows and color bytes\nPASS Out-of-range persisted tile references are rejected\nPASS Mismatched persisted mesh/UV buffers are rejected\nPASS Pressure changes the physical footprint of the paint brush\nPASS XR render snapshots remain responsive while mesh/UV preparation runs\nPackCharts: ComputeCharts must be called first.\nFAIL The background worker publishes a durable painting mesh\n\n    Start  181: shared-document\n7/9 Test  #181: shared-document ...................   Passed  209.35 sec\n    Start  235: native-graphics-lifetime\n8/9 Test  #235: native-graphics-lifetime ..........   Passed    0.05 sec\n    Start 1259: dome-sculpt-texture-set-native\n9/9 Test #1259: dome-sculpt-texture-set-native ....   Passed    2.59 sec\n\n78% tests passed, 2 tests failed out of 9\n\nTotal Test time (real) = 618.69 sec\n\nThe following tests FAILED:\n\t178 - controller-controls (Failed)\n\t179 - texture-painting (Failed)\nErrors while running CTest\n"
+      },
+      "mock_lifetime_binary_sha256": "2e6beec164b47def645a1ebd7ebaeac8043869b18832084b582a3fae9f2151f9",
+      "sanitizer_environment": {
+        "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+        "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+        "LSAN_OPTIONS": "unset; no suppression"
+      },
+      "configured_instrumented_core_translation_units": 191,
+      "ordinary_legacy_scope": "Nine-test run:7pass,2 original180s atlas preparation waits expired; this run is not all-pass.",
+      "separate_extended_instrumentation_profiles": {
+        "controller": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/gpu-layer-blur-20261111/build-blur-sanitize/dome-sculpt-controls-test",
+            "--instrumented-assets"
+          ],
+          "exit_status": 0,
+          "elapsed_seconds": 77.17211253201822,
+          "output": "PASS Unavailable radial commands stay visibly disabled and cannot activate\nPASS A joystick press opens a continuous material slider\nPASS Held thumbstick motion previews continuous parameter changes\nPASS A controller aim ray and trigger drag the same slider to its absolute position\nPASS A secondary stylus can drag a slider opened by the controller\nPASS Press confirmation returns to the parent menu\nPASS A complete slider gesture is one exact undo transaction\nPASS Slider capture prevents trigger input from sculpting behind the panel\nPASS The logarithmic brush-size slider doubles naturally at full stick deflection\nPASS Vertical wheel motion provides a slower fine adjustment\nPASS Focus loss cancels a transient wheel adjustment\nPASS VR color controls expose separate RGBA sliders\nPASS Thumbstick row selection adjusts only the chosen color component\nPASS A ray-clickable Cancel button restores the original color without recording an edit\nPASS Layer controls use a prepared stable painting mesh\nPASS The controller controls page exposes a layer-opacity slider\nPASS Layer opacity follows continuous input and commits with a ray-clickable Done button\nPASS Layer slider undo restores the saved layer and its history\nPASS Painting retains the direct brush-controls shortcut\nPASS The former duplicate Erase slot exposes native filters\nPASS Filter Back returns to the original brush-controls page\nPASS Focus loss cancels the filter menu without authoring an edit\nPASS The original Painting Erase command still toggles the live brush\nPASS Erase can be toggled back without altering the saved layer\n",
+          "binary_sha256": "96506efffae891a6cae79daf89ddd98e5ee4a01dc7bb967e51630f3aab8f0531"
+        },
+        "paint": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/gpu-layer-blur-20261111/build-blur-sanitize/dome-sculpt-paint-test",
+            "--instrumented-assets"
+          ],
+          "exit_status": 0,
+          "elapsed_seconds": 157.09254488901934,
+          "output": "PASS Pinned Blender-style picking finds exact local-space mesh intersections\nPASS A swept pressure brush commits a native texture transaction\nPASS World-space painting crosses separate UV seam islands continuously\nPASS Painting leaves unrelated texels unchanged\nPASS Paint undo restores exact original texture bytes\nPASS A worker's paint snapshot remains immutable across later undo\nPASS Paint redo restores exact committed texture bytes\nPASS Cancelling a paint stroke restores its tiles exactly\nPASS A second layer composites independently above earlier paint\nPASS Layer visibility reveals the unchanged lower layer\nPASS Painting a layer mask reveals lower paint without deleting either layer\nPASS Layer mask painting has exact independent undo\nPASS Metalness and roughness paint into independent linear glTF B/G channels\nPASS Emission is retained as an independent sRGB map\nPASS Persistent mesh buffers, UVs, layers, masks and channels round-trip exactly\nPASS The native PNG encoder produces a decodable image\nPASS PNG decoding preserves exported texture rows and color bytes\nPASS Out-of-range persisted tile references are rejected\nPASS Mismatched persisted mesh/UV buffers are rejected\nPASS Pressure changes the physical footprint of the paint brush\nPASS XR render snapshots remain responsive while mesh/UV preparation runs\nPASS The background worker publishes a durable painting mesh\nPASS A painted mesh accepts a desktop texture transaction\nPASS Texture painting preserves sculpt source samples and stable mesh topology\nPASS Texture strokes participate in shared document undo/redo\nPASS Version-three projects restore the painted mesh and editable layers\nPASS Undoing a layer command returns to the clean saved painting state\nPASS A prepared mesh accepts a fresh spatial baseline\nPASS A tracked controller begins a texture stroke\nPASS XR focus loss cancels transient texture edits exactly and retains the saved state\nPASS A rejected last-layer deletion preserves earlier stroke history\n",
+          "binary_sha256": "c9f29d8d1271ee81152a694eae034ea4d78a780b29996a7a5aa27fccc7919b95"
+        }
+      },
+      "no_sanitizer_reports": "No ASan/LSan/UBSan report in the recorded controls; not a blanket driver/application claim."
+    }
+  },
+  "one_exact_release_sanitize_native_project_pair": {
+    "sha256": "e67af71f38520f1d0a5cd1f729e02512cce8b1f53020b3f31881a81cd0db7383",
+    "paths": [
+      "build-blur-release/qualified-native-arc/gpu-layer-blur.dsculpt",
+      "build-blur-sanitize/qualified-native-arc/gpu-layer-blur.dsculpt"
+    ],
+    "scope": "One actual ordered Save/reopen fixture; not every source format or every output."
+  },
+  "retained_failures": {
+    "first_plain_recipient_adoption": {
+      "path": "build-blur-release/arc-first-plain-adoption-failure.log",
+      "sha256": "c92ac05ec3f66a740c923d7af908a91a451a7c5baec70c8f8058faecf3f55d02",
+      "output": "Native XR graphics: windowless EGL 1.5\nNative XR graphics: windowless EGL 1.5\nEXPECTED GPU layer blur cancelled\nEXPECTED GPU layer blur retained authority/history budget exceeded\nNative XR graphics: windowless EGL 1.5\nNative XR graphics: windowless EGL 1.5\nEXPECTED GPU layer blur cancelled\nEXPECTED GPU layer blur retained authority/history budget exceeded\nNative XR graphics: windowless EGL 1.5\nNative XR graphics: windowless EGL 1.5\nEXPECTED GPU layer blur requires an unambiguous current strict UV field; retained/repeated/overlapping source-coordinate domains need their separate authenticated tool\nNative XR graphics: windowless EGL 1.5\nFAIL Explicit texture-set editing needs actual membership\n"
+    },
+    "invalid_initial_negative_fixture": {
+      "path": "build-blur-release/native-software-first-fixture-failure.log",
+      "sha256": "c2057a950890a76f92df3841ba16f0a6819538a1fa40beca82649284e8d279c7",
+      "output": "Native XR graphics: windowless EGL 1.5\nNative XR graphics: windowless EGL 1.5\nEXPECTED GPU layer blur cancelled\nEXPECTED GPU layer blur retained authority/history budget exceeded\nNative XR graphics: windowless EGL 1.5\nNative XR graphics: windowless EGL 1.5\nEXPECTED GPU layer blur cancelled\nEXPECTED GPU layer blur retained authority/history budget exceeded\nNative XR graphics: windowless EGL 1.5\nFAIL Untextured source-authored UV persistence requires explicit original-source authority\n"
+    },
+    "obsolete_packed_mesh_assertion": {
+      "path": "build-blur-release/legacy-regressions.log",
+      "sha256": "224951c19e33f3f2939c0b64d2dd8785d4f6dd67fdfdd756e172ad1637a5c12d",
+      "output": "Test project /home/blux/de-xr/dome-sculpt/artifacts/gpu-layer-blur-20261111/build-blur-release\n    Start   24: input-rebind-publication\n1/4 Test   #24: input-rebind-publication .........   Passed    0.01 sec\n    Start  179: texture-painting\n2/4 Test  #179: texture-painting .................   Passed    2.59 sec\n    Start  181: shared-document\n3/4 Test  #181: shared-document ..................***Failed    0.05 sec\nPASS Mesher publishes an initial immutable surface\nFAIL A clean document has a rendered surface\n\n    Start 1289: dome-sculpt-texture-set-native\n4/4 Test #1289: dome-sculpt-texture-set-native ...   Passed    0.02 sec\n\n75% tests passed, 1 tests failed out of 4\n\nTotal Test time (real) =   2.68 sec\n\nThe following tests FAILED:\n\t181 - shared-document (Failed)\nErrors while running CTest\n"
+    },
+    "seed_diagnostic": {
+      "path": "build-blur-release/seed-diagnostic.log",
+      "sha256": "bdfc60d53f6818db8729b05b51e1e81eef845a30cb4208034b01015adf9f2cb6",
+      "output": "wait=1\ndirty=0 error= packed_triangles=0 chunk_objects=1 chunk_triangles=19944 samples=20835\n"
+    },
+    "unchanged_b8_mesh_loop_sha256": "91fa15055128c1979d0d8f2ce62d3d6762e8d9dd942c64142e95d76a43fbf44c",
+    "baseline_legacy_test_sha256": "71fdab908bed71dfe063eedd03747465712118aa54ec8e85887d6fc7b859c9c7",
+    "note": "The original packed-mesh predicate failed in the new worktree, whose mesh-loop body is exactly b8; no separate old-b8 executable was rebuilt for that observation. The stronger repaired test copies actual indexed chunk/packed values and validates change, old-owner immutability and exact Undo. The two ordinary SAN 180s failures remain in profiles.sanitize.software_ctest."
+  },
+  "remaining_required_work": [
+    "Broader authenticated original/repeated/overlapping coordinate transport",
+    "Separately typed normals, physical FLOAT emission and broader MToon/PBR tools",
+    "Clone/smudge, procedural brush/material nodes and GPU baking/cages",
+    "GPU-resident typed tile/cache/history boundary and larger-grid production budgets",
+    "Production device/failure/performance coverage and physical XR authoring acceptance"
+  ]
+}
