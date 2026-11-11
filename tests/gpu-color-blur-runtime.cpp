@@ -58,10 +58,11 @@ int instance_tag, session_tag, action_set_tag;
 unsigned frame = 0, physical_frame = 0, event = 0, restart_phase = 0;
 unsigned menu_completion_event = 0;
 unsigned field_step=0;bool field_panel_ready=false;
-std::map<unsigned,std::pair<unsigned,unsigned>> blur_page_visible;
-std::vector<uint8_t> field_root_signature;
-std::map<unsigned,std::pair<unsigned,unsigned>> field_root_visible;
-std::map<unsigned,std::pair<unsigned,unsigned>> field_menu_closed;
+std::array<std::map<unsigned,std::pair<unsigned,unsigned>>,2> blur_page_visible;
+std::array<std::vector<uint8_t>,2> field_root_signatures;
+std::array<std::map<unsigned,std::pair<unsigned,unsigned>>,2> field_root_visible;
+std::array<std::map<unsigned,std::pair<unsigned,unsigned>>,2> field_menu_closed;
+std::array<bool,2> field_root_eye_open{};
 bool field_root_open=false;
 
 std::string field_mode(){const auto*p=getenv("DOME_XR_PAINT_BLUR");return p?p:"";}
@@ -73,10 +74,11 @@ bool field_mark(const char*name){const auto*p=getenv("DOME_XR_PAINT_GATES");retu
 uint32_t field_target(){return 64;}
 bool blur_page_gate(){return field_step==21||field_step==31||field_step==43||field_step==49||field_step==55;}
 bool field_wait(){
- if(field_step==9&&field_root_signature.empty())return true;
- if(field_root_gate()){const auto at=field_root_visible.find(field_step);return at==field_root_visible.end()||at->second.second+1!=physical_frame||physical_frame<at->second.first+3;}
- if(field_close_gate()){const auto at=field_menu_closed.find(field_step);return at==field_menu_closed.end()||at->second.second+1!=physical_frame||physical_frame<at->second.first+3;}
- if(blur_page_gate()){const auto at=blur_page_visible.find(field_step);return at==blur_page_visible.end()||at->second.second+1!=physical_frame||physical_frame<at->second.first+3;}
+ if(field_step==9&&(field_root_signatures[0].empty()||field_root_signatures[1].empty()))return true;
+ auto pending=[&](const auto&eyes){for(const auto&visible:eyes){const auto at=visible.find(field_step);if(at==visible.end()||at->second.second+1!=physical_frame||physical_frame<at->second.first+3)return true;}return false;};
+ if(field_root_gate())return pending(field_root_visible);
+ if(field_close_gate())return pending(field_menu_closed);
+ if(blur_page_gate())return pending(blur_page_visible);
  return (field_step==67&&!field_mark("accepted"))||(field_step==81&&!field_mark("undone"))||(field_step==95&&!field_mark("redone"));
 }
 bool field_click(){
@@ -536,8 +538,13 @@ FN(ReleaseSwapchainImage, XrSwapchain p, const XrSwapchainImageReleaseInfo *) {
     // 110x40 extents. Save6 is centered(100,320), Redo5(129,210).
     // Inspect displayed sRGB, including the renderer's real linear conversion.
     // This observes released GL images, never Document state or a test marker.
-    if(s->eye==0){
-      auto point=[&](double px,double py){const double wx=(px/640-.5)*.6,wy=1.56+(.5-py/640)*.6;return std::pair{int(std::lround(s->width*.5*(1+(wx+.032)/(.66*std::tan(.6))))),int(std::lround(s->height*.5*(1+(wy-1.6)/(.66*std::tan(.6)))))};};
+    {
+      // Each actual eye has its own projection, observations and consecutive
+      // acknowledgments. A left-eye glyph cannot authorize the right eye.
+      const double eye=s->eye?.032:-.032;
+      auto&field_root_signature=field_root_signatures[s->eye];
+      auto&root_visible=field_root_visible[s->eye];auto&menu_closed=field_menu_closed[s->eye];auto&page_visible=blur_page_visible[s->eye];
+      auto point=[&](double px,double py){const double wx=(px/640-.5)*.6,wy=1.56+(.5-py/640)*.6;return std::pair{int(std::lround(s->width*.5*(1+(wx-eye)/(.66*std::tan(.6))))),int(std::lround(s->height*.5*(1+(wy-1.6)/(.66*std::tan(.6)))))};};
       auto pixels=[&](double left,double top,double right,double bottom,auto inspect){
         const auto a=point(left,top),b=point(right,bottom);
         for(int y=std::max(0,std::min(a.second,b.second));y<=std::min(int(s->height)-1,std::max(a.second,b.second));++y)
@@ -546,7 +553,7 @@ FN(ReleaseSwapchainImage, XrSwapchain p, const XrSwapchainImageReleaseInfo *) {
       std::vector<uint8_t> signature;
       pixels(245,334,395,358,[&](int r,int g,int b){signature.push_back(r>180&&g>180&&b>180);});
       const auto lit=std::count(signature.begin(),signature.end(),uint8_t(1));
-      if(field_step==9&&lit>=12){field_root_signature=signature;report["field_root_signature_pixels"]=lit;}
+      if(field_step==9&&lit>=12){field_root_signature=signature;report["field_root_signature_pixels"][std::to_string(s->eye)]=lit;}
       const bool same=!field_root_signature.empty()&&signature==field_root_signature;
       // Four empty panel margins distinguish an absent palette from a changed
       // title or page. Dark bg=(31,37,45), fg=(231,235,241), disabled fg is their
@@ -560,12 +567,12 @@ FN(ReleaseSwapchainImage, XrSwapchain p, const XrSwapchainImageReleaseInfo *) {
       pixels(100,195,160,225,[&](int r,int g,int b){redo_bright+=r>180&&g>180&&b>180;redo_dim+=r>=112&&r<=170&&g>=116&&g<=175&&b>=120&&b<=185;});
       pixels(180,115,240,155,[&](int r,int g,int b){undo_bright+=r>180&&g>180&&b>180;});
       const bool panel=background_total&&background*4>=background_total*3;
-      field_root_open=same&&panel;
+      field_root_eye_open[s->eye]=same&&panel;field_root_open=field_root_eye_open[0]&&field_root_eye_open[1];
       const bool selected=accent_total&&accent*4>=accent_total*3;
       const bool redo_enabled=redo_bright>=4;
       const bool redo_disabled=redo_bright==0&&redo_dim>=4;
       const bool closed=!same&&background_total&&background*4<background_total;
-      auto &ui=report["field_ui"][std::to_string(field_step)];
+      auto &ui=report["field_ui"][std::to_string(field_step)][std::to_string(s->eye)];
       if(!ui.contains("first_physical_frame"))ui["first_physical_frame"]=physical_frame;
       ui["last_physical_frame"]=physical_frame;ui["root_title"]=same;ui["panel_present"]=panel;
       ui["save_selected"]=selected;ui["redo_enabled"]=redo_enabled;ui["redo_disabled"]=redo_disabled;ui["menu_absent"]=closed;
@@ -585,30 +592,30 @@ FN(ReleaseSwapchainImage, XrSwapchain p, const XrSwapchainImageReleaseInfo *) {
         pixels(ex-52,ey-5,ex-43,ey+4,[&](int r,int g,int b){erase_mark+=r>180&&g>180&&b>180;});
         const bool checkbox=field_step==21?(erase_fill==0&&erase_mark>=4):field_step==43?erase_fill>=2:field_step==49?erase_mark==0:true;
         const bool ready=panel&&lit>=12&&selected_samples&&selected_pixels*4>=selected_samples*3&&label_bright>=6&&checkbox&&(field_step!=31||same);
-        auto&detail=report["blur_page_ui"][std::to_string(field_step)];detail={{"page",field_step==31?0:field_step==49?6:field_step==55?32:3},{"sector",sector},{"panel_present",panel},{"title_pixels",lit},{"label_bright_pixels",label_bright},{"selected_pixels",selected_pixels},{"selected_samples",selected_samples},{"erase_checkbox_fill_pixels",erase_fill},{"erase_checkbox_mark_pixels",erase_mark},{"checkbox_state_valid",checkbox},{"ready",ready}};
-        if(ready){auto[it,first]=blur_page_visible.try_emplace(field_step,physical_frame,physical_frame);it->second.second=physical_frame;detail["first"]=it->second.first;detail["last"]=physical_frame;}
-        else blur_page_visible.erase(field_step);
+        auto&detail=report["blur_page_ui"][std::to_string(field_step)][std::to_string(s->eye)];detail={{"page",field_step==31?0:field_step==49?6:field_step==55?32:3},{"sector",sector},{"panel_present",panel},{"title_pixels",lit},{"label_bright_pixels",label_bright},{"selected_pixels",selected_pixels},{"selected_samples",selected_samples},{"erase_checkbox_fill_pixels",erase_fill},{"erase_checkbox_mark_pixels",erase_mark},{"checkbox_state_valid",checkbox},{"ready",ready}};
+        if(ready){auto[it,first]=page_visible.try_emplace(field_step,physical_frame,physical_frame);it->second.second=physical_frame;detail["first"]=it->second.first;detail["last"]=physical_frame;}
+        else page_visible.erase(field_step);
       }
       if(field_root_gate()){
-        report["field_root_title_match"][std::to_string(field_step)]=same;
+        report["field_root_title_match"][std::to_string(field_step)][std::to_string(s->eye)]=same;
         // Undo77 must expose a real available Redo; accepted61 and redone91
         // must expose it disabled. A stale ROOT title alone cannot pass.
         const bool history_ready=field_step==77?(redo_enabled&&undo_bright==0):(redo_disabled&&undo_bright>=4);
-        const bool ready=field_root_open&&selected&&history_ready;
+        const bool ready=field_root_eye_open[s->eye]&&selected&&history_ready;
         ui["undo_bright_pixels"]=undo_bright;ui["expected_redo_enabled"]=field_step==77;ui["valid_root_acknowledgment"]=ready;
-        if(ready){auto[it,first]=field_root_visible.try_emplace(field_step,physical_frame,physical_frame);it->second.second=physical_frame;report["field_root_visible"][std::to_string(field_step)]={{"first",it->second.first},{"last",physical_frame},{"title_pixels",lit},{"save_selected",selected},{"redo_enabled",redo_enabled},{"redo_disabled",redo_disabled}};}
-        else field_root_visible.erase(field_step);
+        if(ready){auto[it,first]=root_visible.try_emplace(field_step,physical_frame,physical_frame);it->second.second=physical_frame;report["field_root_visible"][std::to_string(field_step)][std::to_string(s->eye)]={{"first",it->second.first},{"last",physical_frame},{"title_pixels",lit},{"save_selected",selected},{"redo_enabled",redo_enabled},{"redo_disabled",redo_disabled}};}
+        else root_visible.erase(field_step);
       }
       if(field_close_gate()){
-        if(closed){auto[it,first]=field_menu_closed.try_emplace(field_step,physical_frame,physical_frame);it->second.second=physical_frame;report["field_menu_closed"][std::to_string(field_step)]={{"first",it->second.first},{"last",physical_frame},{"root_title",same},{"panel_present",panel}};}
-        else field_menu_closed.erase(field_step);
+        if(closed){auto[it,first]=menu_closed.try_emplace(field_step,physical_frame,physical_frame);it->second.second=physical_frame;report["field_menu_closed"][std::to_string(field_step)][std::to_string(s->eye)]={{"first",it->second.first},{"last",physical_frame},{"root_title",same},{"panel_present",panel}};}
+        else menu_closed.erase(field_step);
       }
     }
     report["field_images"][std::to_string(field_step)][std::to_string(s->eye)]=std::count_if(bytes.begin(),bytes.end(),[](uint8_t v){return v!=0;});
     const bool save_attempt=field_history()&&(field_step==64||field_step==78||field_step==92);
-    const bool capture=(blur_page_gate()&&blur_page_visible.contains(field_step))||field_step==59||field_step==61||field_step==65||field_step==68||field_step==96||save_attempt;
-    const bool root_capture=field_root_gate()&&field_root_visible.contains(field_step)&&field_root_visible.at(field_step).second==physical_frame;
-    const bool closed_capture=field_close_gate()&&field_menu_closed.contains(field_step)&&field_menu_closed.at(field_step).second==physical_frame;
+    const bool capture=(blur_page_gate()&&blur_page_visible[s->eye].contains(field_step))||field_step==59||field_step==61||field_step==65||field_step==68||field_step==96||save_attempt;
+    const bool root_capture=field_root_gate()&&field_root_visible[s->eye].contains(field_step)&&field_root_visible[s->eye].at(field_step).second==physical_frame;
+    const bool closed_capture=field_close_gate()&&field_menu_closed[s->eye].contains(field_step)&&field_menu_closed[s->eye].at(field_step).second==physical_frame;
     const bool waiting_capture=(field_root_gate()||field_close_gate()||(field_history()&&(field_step==67||field_step==81||field_step==95)))&&physical_frame%300==0;
     const auto key=std::to_string(field_step)+(waiting_capture?"-wait-"+std::to_string(physical_frame)+"-":root_capture?"-root-":closed_capture?"-closed-":"-")+std::to_string(s->eye);
     if((capture||root_capture||closed_capture||waiting_capture)&&!report["field_captures"].contains(key))if(const auto*path=getenv("DOME_XR_FIXTURE_REPORT")){

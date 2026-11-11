@@ -30,8 +30,12 @@ seconds per phase. The shell's rendered global menu is outside this Xvfb scope.
 `tests/gpu-color-blur-xr.py APP RUNTIME INSPECTOR MANIFEST OUTPUT` loads the separate
 `dome-sculpt-gpu-color-blur-runtime` module. It derives genuine loader/swapchain
 plumbing from the retained public-ack runtime and supplies synthetic OpenXR
-Boolean/vector/pose input. Released stereo pixels acknowledge actual radial
-labels, selected cells, panel and checkbox state. It first proves Painting's
+Boolean/vector/pose input. Independent left/right released stereo pixels acknowledge actual radial
+labels, selected cells, panel and checkbox state. Each eye uses its own +/-32mm
+projection, reference title and consecutive visibility history; every page, Save
+readiness and disappearance gate requires both eyes. The initial c74 source review
+had left-only acknowledgments with both-eye captures; it was never run and is
+retained as unqualified source history. The stronger scenario first proves Painting's
 unchecked Erase, toggles it on, reopens Painting to prove the filled checkbox,
 enters Brush controls and proves Filters has no Erase checkbox, then opens Filters
 and invokes Blur. The same single scenario uses ROOT Save with correct public
