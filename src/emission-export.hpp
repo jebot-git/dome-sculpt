@@ -4,6 +4,7 @@
 namespace dome::detail {
 EmissionInterchangeImage canonical_paint_emission_field(const SculptObject &,const std::function<bool()> &);
 EmissionInterchangeImage native_paint_emission_field(const SculptObject &,const std::function<bool()> &);
+EmissionInterchangeImage baked_emission_field(const SculptObject &,const std::function<bool()> &,bool authored_mtoon);
 bool requires_native_emission_package(const Scene &,const std::function<bool()> & = {});
 class EmissionExportProof;
 struct EmissionExportPrepared {

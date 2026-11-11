@@ -10,6 +10,10 @@ struct BakeMaterial {
   // textures use false, so linear material factors are applied exactly once.
   bool maps_are_composited = true, repeat_uv = false;
   float normal_strength = 1;
+  // Explicit linear source authority at the actual projection hit. Worker
+  // authoring captures immutable native/typed sources; it never supplies a
+  // display RGB8 approximation. Nonempty selects resolved FLOAT Bake output.
+  std::function<std::array<float,3>(uint32_t,std::array<float,3>)> resolved_emission;
 };
 struct BakeSource {
   Mesh mesh;
@@ -49,6 +53,9 @@ struct BakeOptions {
 struct BakeResult {
   TextureMaps maps; // Composited sRGB base/emission; linear ORM R=AO,G=rough,B=metal.
   Image normal, ambient_occlusion;
+  // Resolved absolute radiance, independent FLOAT coverage. maps.emission is
+  // empty when this is present; no duplicate RGB8 authority is emitted.
+  std::shared_ptr<const BakedEmissionField> emission_field;
   // 0=outside UV, 1=projected hit, 2=padding, 3=missed projection, 4=protected. Missed/protected texels
   // are never filled by padding, so projection errors cannot be concealed.
   std::vector<uint8_t> coverage;
