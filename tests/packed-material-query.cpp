@@ -81,5 +81,18 @@ int main()try{
   check(refusal([&]{selection.raycast_excluding_target(point,direction,1000,0,excess);})&&refusal([&]{selection.raycast_excluding(point,direction,1000,0,excess);})&&refusal([&]{selection.raycast_excluding_materials_target(point,direction,1000,0,excess_material);})&&refusal([&]{selection.raycast_excluding_materials(point,direction,1000,0,excess_material);}),
     "Legacy and typed exclusion routing has explicit bounded metadata work allowance");
  }
+ {
+  auto coplanar=small;coplanar.indices.clear();
+  for(size_t i=0;i<65000;++i)coplanar.indices.insert(coplanar.indices.end(),small.indices.begin(),small.indices.begin()+3);
+  auto opaque=material;opaque.alpha=Material::AlphaMode::Opaque;
+  const std::vector<SurfaceRange>owners{{7,0,coplanar.indices.size(),opaque,{},{},0}};
+  MaterialSurfaceQuery retained(coplanar,owners);SurfaceQuery ordinary(coplanar);
+  SurfaceQueryOptions budget;budget.max_triangle_tests=65536;const auto expected=ordinary.raycast(point,direction,1000,budget);
+  const std::array<uint64_t,8>excluded{21,22,23,24,25,26,27,28};const std::array<SurfaceMaterialIdentity,8>excluded_material{{{21,0},{22,0},{23,0},{24,0},{25,0},{26,0},{27,0},{28,0}}};
+  const auto a=retained.raycast_excluding(point,direction,1000,0,excluded);const auto b=retained.raycast_excluding_target(point,direction,1000,0,excluded);
+  const auto c=retained.raycast_excluding_materials(point,direction,1000,0,excluded_material);const auto d=retained.raycast_excluding_materials_target(point,direction,1000,0,excluded_material);
+  check(expected&&a&&b&&c&&d&&a->triangle==expected->triangle&&b->surface.triangle==expected->triangle&&c->triangle==expected->triangle&&d->surface.triangle==expected->triangle,
+    "Small65000-triangle coplanar exclusions preserve original math/ties and65536 budget despite520k metadata comparisons");
+ }
  std::cout<<"PASS "<<checks<<" native packed-query composition checks\n";return 0;
 }catch(const std::exception&e){deny_from=SIZE_MAX;std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
