@@ -1,3 +1,18 @@
+## Fresh combined native/software-GL milestone — 2026-11-11
+
+The full goal is active. Current b8c469ce has matched Release/SAN32-target
+builds,22native suites, workspace27/373, softwareGL1727 perprofile,42exact native
+pairs/168crossreads and94exact image pairs. Read
+[COMBINED-BUILD-20261111.md](COMBINED-BUILD-20261111.md) for actual scope and limits.
+The stronger XR/public-menu fixture passes8cases/117checks perprofile and16exact
+native pairs; see [XR-SAVED-REDO-20261111.md](XR-SAVED-REDO-20261111.md) for scope,
+driver recovery and retained failures. Inherited-role sanitizer readers, ordinary
+GUI and broader current qualification remain pending; no main product admission
+or full completion. The opt-in ArmorPaint extraction is a bounded GPU proof,
+not the full painting backend; see [ARMORPAINT-EXPERIMENT.md](ARMORPAINT-EXPERIMENT.md).
+The later controller-tray and spatial node/history requirements remain required.
+Historical pause entries follow and do not revoke the user's resumption.
+
 ## Goal resumed with restored sources — 2026-11-11
 
 The user reactivated the full original goal. Read
@@ -1707,3 +1722,17 @@ HDR/painting and broader workflow requirements stay
 open. This is not an all535-test or full-goal completion claim.
 
 VRM1 expression preflight repair is independently qualified on public0b6 matching support: source-material Rim relevance is collected during existing scan, no-relevant rejection precedes role work, exact old poll/image/work bounds unchanged. Registered unused-material/foreign-Rim controls and complete affected fault/Cancel/native worker suites R/S pass, plus matching actual normal/compact FLTK smoke. One product TU, no new layout/schema/domain admission; current37/Normal and remaining full-VRM requirements stay separate. Evidence: VRM1-EXPRESSION-PREFLIGHT.md/JSON.
+
+## Additional user specification — 2026-11-11: spatial nodes and history
+
+Read [ADDITIONAL-REQUIREMENTS-2026-11-11.md](ADDITIONAL-REQUIREMENTS-2026-11-11.md).
+This is an additional required later XR phase alongside controller trays, after
+basic authoring targets; it does not reduce or defer existing basic requirements.
+
+| Additional requirement | Current status | Required completion evidence |
+| --- | --- | --- |
+| Spatial node-based editing/history | Required; queued alongside controller trays after basic targets; not implemented or qualified | Interactive spatial editing nodes and history inspection/navigation using controllers; clear connections/parameters and active state; native persistence and exact Undo/Redo/cancel/save/source-authority safeguards; no unintended scene edits during graph focus; native/controller and physical-headset usability evidence |
+
+Graph semantics, exact node types, layout and history branching remain design
+work. The application remains native FLTK/OpenXR and the full original objective
+remains incomplete.

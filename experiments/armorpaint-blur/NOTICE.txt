@@ -1,0 +1,39 @@
+Experimental altered ArmorPaint blur-family feasibility proof, 2026-11-11.
+
+Source: https://github.com/armory3d/armorpaint
+Exact commit: 629f8e77b3f19d533c60a1baa4fe9d4db9ee1163
+vendor/make_blur.c is an unaltered source copy, licensed under
+vendor/LICENSE.armorpaint (zlib/libpng). Retain that notice in distribution.
+
+generate_shader.py copies the original get_blur_tool_weight function exactly
+and checks the complete upstream make_blur.c SHA256. blur.frag is an ALTERED
+GLSL adaptation of the texture-space blur branch at make_blur.c:86-121.
+Preserved: 15 horizontal + 15 vertical samples, duplicated center, the exact
+weights, coverage-associated color accumulation and independent coverage.
+Changes: explicit caller-owned textures/context, integer texelFetch with clamp
+for rectangular grids, linear FLOAT input/output, separate destination R32F
+mask and strength, associated-space gate against original data. No g_context,
+gbuffer/screen coordinates, app UI, node graph/runtime shader compiler, history,
+packed material IDs, tangent normals, subsurface, emission-role inference,
+discard threshold or .arm serialization. This is not upstream ArmorPaint and
+not its whole blur brush/smudge/projection workflow. The masked output blend is
+an explicit Dome-side contract, not a claim of byte-equivalent upstream output.
+
+Host/test glue uses GPL-3.0-or-later notices consistent with Dome Sculpt.
+Dome Sculpt NativeGraphics is linked unchanged from this repository's
+third_party/openbrush/graphics.cpp/.h,
+which carry their existing MIT notice in LICENSE.native-graphics in that same
+directory. No FLTK, Qt, GTK or X11 app is introduced. Shader generation is
+offline at build time into the binary directory; it never modifies tracked files.
+
+The adapter writes only a caller-supplied destination GL_RGBA32F texture, on the
+caller's current GL context. Source/mask/target must be distinct. Callers must
+provide a clean GL error state at entry and valid 2D texture names; wrong-target
+names are checked before reading their metadata or writing any target. Callers
+provide finite linear data, [0,1] coverage and mask; no document-authority claim
+is inferred from a texture. It leaves document snapshots, paint histories,
+original source/UV/normal/material roles, rig, morph and VRM graph untouched.
+The prototype caps each dimension at512 and caller texture bytes at4MiB by
+default. Only validation performs pixel readback. It does not install or become
+a production default, create windows, perform ordered saves, publish scenes,
+or claim actual headset/controller usability or full engine integration.

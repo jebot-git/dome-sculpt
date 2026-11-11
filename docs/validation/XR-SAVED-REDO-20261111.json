@@ -1,0 +1,635 @@
+{
+  "status": "scoped-qualified",
+  "date": "2026-11-11",
+  "product_source": "b8c469ce875eb2542c220300c3c63edbf1526570",
+  "fixture_code_commits": [
+    "296d8433af2da4f443144d37c2b4a552b08e78c6",
+    "17cd3b66124d403ea6a88ce844b252d72eff6ff5"
+  ],
+  "product_changed": false,
+  "physical_headset": false,
+  "main_admission": false,
+  "full_goal_complete": false,
+  "invariants": {
+    "frame_ceiling": 6000,
+    "per_case_deadline_seconds": 240,
+    "original_check_count": 99,
+    "additional_public_ui_checks": 18,
+    "case_count": 8,
+    "exact_native_oracles": true,
+    "all_sibling_fields": true,
+    "history_actions": true,
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+    "LSAN_OPTIONS": null,
+    "suppressions": false,
+    "product_observer": false,
+    "wrapped_submit": false,
+    "synchronous_worker_wait": false
+  },
+  "sdk": {
+    "domed_source": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+    "receipt": "artifacts/sdk-20261111/verified-sdk.json",
+    "receipt_sha256": "3a1d3014a5eb13e37f28f39e60b0d8596a5accf80a540b516aa88806b86983f0"
+  },
+  "profiles": {
+    "release": {
+      "exit": 0,
+      "seconds": 111.74920133501291,
+      "checks": 117,
+      "cases": [
+        "extra64",
+        "extra256",
+        "primary128",
+        "cancel",
+        "focus",
+        "reference",
+        "noop",
+        "quality"
+      ],
+      "report": "artifacts/xr-recovery-20261111/release/recovered-v2-improved-eight/report.json",
+      "report_sha256": "44015dc2c9220b6b2b432bc42c3de48f84f0709652eb113b92dfa715d17194ae",
+      "status": "artifacts/xr-recovery-20261111/release/recovered-v2-improved-eight-status.json",
+      "status_sha256": "79ac22a10d7658a2a05bc7ea33c885bf17207175ce5ee00e82b99b49a1fc88fb",
+      "app_sha256": "9bf85d3bbc3418951703ad1aabb0d55a467d36d9ed621ede664007b6c930b244",
+      "improved_runtime_sha256": "5eee15b0e543b06089c5866f42f4904d9de2c7fcec2cb605a7e242c00ea82422",
+      "mapped_elf_count": 84,
+      "input_drift": [],
+      "extra256_public_ack": {
+        "field_root_visible": {
+          "39": {
+            "first": 47,
+            "last": 50,
+            "redo_disabled": true,
+            "redo_enabled": false,
+            "save_selected": true,
+            "title_pixels": 19
+          },
+          "55": {
+            "first": 87,
+            "last": 89,
+            "redo_disabled": false,
+            "redo_enabled": true,
+            "save_selected": true,
+            "title_pixels": 19
+          },
+          "69": {
+            "first": 115,
+            "last": 117,
+            "redo_disabled": true,
+            "redo_enabled": false,
+            "save_selected": true,
+            "title_pixels": 19
+          }
+        },
+        "field_menu_closed": {
+          "43": {
+            "first": 54,
+            "last": 57,
+            "panel_present": false,
+            "root_title": false
+          },
+          "57": {
+            "first": 92,
+            "last": 94,
+            "panel_present": false,
+            "root_title": false
+          },
+          "71": {
+            "first": 120,
+            "last": 122,
+            "panel_present": false,
+            "root_title": false
+          }
+        }
+      },
+      "extra256_root_ui": {
+        "39": {
+          "background_pixels": 324,
+          "background_samples": 324,
+          "expected_redo_enabled": false,
+          "first_physical_frame": 39,
+          "last_physical_frame": 50,
+          "menu_absent": false,
+          "panel_present": true,
+          "redo_bright_pixels": 0,
+          "redo_dim_pixels": 6,
+          "redo_disabled": true,
+          "redo_enabled": false,
+          "root_title": true,
+          "save_accent_pixels": 45,
+          "save_samples": 45,
+          "save_selected": true,
+          "valid_root_acknowledgment": true
+        },
+        "55": {
+          "background_pixels": 324,
+          "background_samples": 324,
+          "expected_redo_enabled": true,
+          "first_physical_frame": 85,
+          "last_physical_frame": 89,
+          "menu_absent": false,
+          "panel_present": true,
+          "redo_bright_pixels": 6,
+          "redo_dim_pixels": 0,
+          "redo_disabled": false,
+          "redo_enabled": true,
+          "root_title": true,
+          "save_accent_pixels": 45,
+          "save_samples": 45,
+          "save_selected": true,
+          "valid_root_acknowledgment": true
+        },
+        "69": {
+          "background_pixels": 324,
+          "background_samples": 324,
+          "expected_redo_enabled": false,
+          "first_physical_frame": 113,
+          "last_physical_frame": 117,
+          "menu_absent": false,
+          "panel_present": true,
+          "redo_bright_pixels": 0,
+          "redo_dim_pixels": 6,
+          "redo_disabled": true,
+          "redo_enabled": false,
+          "root_title": true,
+          "save_accent_pixels": 45,
+          "save_samples": 45,
+          "save_selected": true,
+          "valid_root_acknowledgment": true
+        }
+      }
+    },
+    "sanitize": {
+      "exit": 0,
+      "seconds": 263.8215727600036,
+      "checks": 117,
+      "cases": [
+        "extra64",
+        "extra256",
+        "primary128",
+        "cancel",
+        "focus",
+        "reference",
+        "noop",
+        "quality"
+      ],
+      "report": "artifacts/xr-recovery-20261111/sanitize/recovered-v2-improved-eight/report.json",
+      "report_sha256": "8b59ea3bb1b774808d3ca8870c502b315935df635938add09ee4b6a88e73f0d3",
+      "status": "artifacts/xr-recovery-20261111/sanitize/recovered-v2-improved-eight-status.json",
+      "status_sha256": "09f144b259d589118dbce1c5b671e87d6d67f6864279f7440657b0be66f188d2",
+      "app_sha256": "38978d63d7248629ae34969bfd3fd6a8af0ae168222926d42ef6c41f42d13f8e",
+      "improved_runtime_sha256": "4e36b2ff613c2fdb8b1c2e9267baca5ba9a51de3c0bb109ccf582caefb7a9d86",
+      "mapped_elf_count": 86,
+      "input_drift": [],
+      "extra256_public_ack": {
+        "field_root_visible": {
+          "39": {
+            "first": 41,
+            "last": 43,
+            "redo_disabled": true,
+            "redo_enabled": false,
+            "save_selected": true,
+            "title_pixels": 19
+          },
+          "55": {
+            "first": 152,
+            "last": 155,
+            "redo_disabled": false,
+            "redo_enabled": true,
+            "save_selected": true,
+            "title_pixels": 19
+          },
+          "69": {
+            "first": 239,
+            "last": 241,
+            "redo_disabled": true,
+            "redo_enabled": false,
+            "save_selected": true,
+            "title_pixels": 19
+          }
+        },
+        "field_menu_closed": {
+          "43": {
+            "first": 47,
+            "last": 50,
+            "panel_present": false,
+            "root_title": false
+          },
+          "57": {
+            "first": 157,
+            "last": 159,
+            "panel_present": false,
+            "root_title": false
+          },
+          "71": {
+            "first": 243,
+            "last": 246,
+            "panel_present": false,
+            "root_title": false
+          }
+        }
+      },
+      "extra256_root_ui": {
+        "39": {
+          "background_pixels": 324,
+          "background_samples": 324,
+          "expected_redo_enabled": false,
+          "first_physical_frame": 39,
+          "last_physical_frame": 43,
+          "menu_absent": false,
+          "panel_present": true,
+          "redo_bright_pixels": 0,
+          "redo_dim_pixels": 6,
+          "redo_disabled": true,
+          "redo_enabled": false,
+          "root_title": true,
+          "save_accent_pixels": 45,
+          "save_samples": 45,
+          "save_selected": true,
+          "valid_root_acknowledgment": true
+        },
+        "55": {
+          "background_pixels": 324,
+          "background_samples": 324,
+          "expected_redo_enabled": true,
+          "first_physical_frame": 150,
+          "last_physical_frame": 155,
+          "menu_absent": false,
+          "panel_present": true,
+          "redo_bright_pixels": 6,
+          "redo_dim_pixels": 0,
+          "redo_disabled": false,
+          "redo_enabled": true,
+          "root_title": true,
+          "save_accent_pixels": 45,
+          "save_samples": 45,
+          "save_selected": true,
+          "valid_root_acknowledgment": true
+        },
+        "69": {
+          "background_pixels": 324,
+          "background_samples": 324,
+          "expected_redo_enabled": false,
+          "first_physical_frame": 236,
+          "last_physical_frame": 241,
+          "menu_absent": false,
+          "panel_present": true,
+          "redo_bright_pixels": 0,
+          "redo_dim_pixels": 6,
+          "redo_disabled": true,
+          "redo_enabled": false,
+          "root_title": true,
+          "save_accent_pixels": 45,
+          "save_samples": 45,
+          "save_selected": true,
+          "valid_root_acknowledgment": true
+        }
+      }
+    }
+  },
+  "native_pairs": [
+    {
+      "case": "extra64",
+      "file": "input.dsculpt",
+      "release_sha256": "412f4daddc6f256f855a9c390870f141849d23ed752b4d38f95cac167d79fc06",
+      "sanitize_sha256": "412f4daddc6f256f855a9c390870f141849d23ed752b4d38f95cac167d79fc06",
+      "exact": true
+    },
+    {
+      "case": "extra64",
+      "file": "final.dsculpt",
+      "release_sha256": "412f4daddc6f256f855a9c390870f141849d23ed752b4d38f95cac167d79fc06",
+      "sanitize_sha256": "412f4daddc6f256f855a9c390870f141849d23ed752b4d38f95cac167d79fc06",
+      "exact": true
+    },
+    {
+      "case": "extra256",
+      "file": "input.dsculpt",
+      "release_sha256": "750c2dc5f54d92fa6b2f90627d3f30d9e77aac2b86d4b99938f7f551871b22f6",
+      "sanitize_sha256": "750c2dc5f54d92fa6b2f90627d3f30d9e77aac2b86d4b99938f7f551871b22f6",
+      "exact": true
+    },
+    {
+      "case": "extra256",
+      "file": "final.dsculpt",
+      "release_sha256": "750c2dc5f54d92fa6b2f90627d3f30d9e77aac2b86d4b99938f7f551871b22f6",
+      "sanitize_sha256": "750c2dc5f54d92fa6b2f90627d3f30d9e77aac2b86d4b99938f7f551871b22f6",
+      "exact": true
+    },
+    {
+      "case": "primary128",
+      "file": "input.dsculpt",
+      "release_sha256": "ddebc55d7ee8cfecbaec3d1821ed8a19a4038d2419b891bba6ba00fe8d6f2aac",
+      "sanitize_sha256": "ddebc55d7ee8cfecbaec3d1821ed8a19a4038d2419b891bba6ba00fe8d6f2aac",
+      "exact": true
+    },
+    {
+      "case": "primary128",
+      "file": "final.dsculpt",
+      "release_sha256": "ddebc55d7ee8cfecbaec3d1821ed8a19a4038d2419b891bba6ba00fe8d6f2aac",
+      "sanitize_sha256": "ddebc55d7ee8cfecbaec3d1821ed8a19a4038d2419b891bba6ba00fe8d6f2aac",
+      "exact": true
+    },
+    {
+      "case": "cancel",
+      "file": "input.dsculpt",
+      "release_sha256": "37f7af98bc01f3c56f65905b6120acf1fd942bd74330077960602ddc26f1458c",
+      "sanitize_sha256": "37f7af98bc01f3c56f65905b6120acf1fd942bd74330077960602ddc26f1458c",
+      "exact": true
+    },
+    {
+      "case": "cancel",
+      "file": "final.dsculpt",
+      "release_sha256": "37f7af98bc01f3c56f65905b6120acf1fd942bd74330077960602ddc26f1458c",
+      "sanitize_sha256": "37f7af98bc01f3c56f65905b6120acf1fd942bd74330077960602ddc26f1458c",
+      "exact": true
+    },
+    {
+      "case": "focus",
+      "file": "input.dsculpt",
+      "release_sha256": "37f7af98bc01f3c56f65905b6120acf1fd942bd74330077960602ddc26f1458c",
+      "sanitize_sha256": "37f7af98bc01f3c56f65905b6120acf1fd942bd74330077960602ddc26f1458c",
+      "exact": true
+    },
+    {
+      "case": "focus",
+      "file": "final.dsculpt",
+      "release_sha256": "37f7af98bc01f3c56f65905b6120acf1fd942bd74330077960602ddc26f1458c",
+      "sanitize_sha256": "37f7af98bc01f3c56f65905b6120acf1fd942bd74330077960602ddc26f1458c",
+      "exact": true
+    },
+    {
+      "case": "reference",
+      "file": "input.dsculpt",
+      "release_sha256": "37f7af98bc01f3c56f65905b6120acf1fd942bd74330077960602ddc26f1458c",
+      "sanitize_sha256": "37f7af98bc01f3c56f65905b6120acf1fd942bd74330077960602ddc26f1458c",
+      "exact": true
+    },
+    {
+      "case": "reference",
+      "file": "final.dsculpt",
+      "release_sha256": "37f7af98bc01f3c56f65905b6120acf1fd942bd74330077960602ddc26f1458c",
+      "sanitize_sha256": "37f7af98bc01f3c56f65905b6120acf1fd942bd74330077960602ddc26f1458c",
+      "exact": true
+    },
+    {
+      "case": "noop",
+      "file": "input.dsculpt",
+      "release_sha256": "37f7af98bc01f3c56f65905b6120acf1fd942bd74330077960602ddc26f1458c",
+      "sanitize_sha256": "37f7af98bc01f3c56f65905b6120acf1fd942bd74330077960602ddc26f1458c",
+      "exact": true
+    },
+    {
+      "case": "noop",
+      "file": "final.dsculpt",
+      "release_sha256": "37f7af98bc01f3c56f65905b6120acf1fd942bd74330077960602ddc26f1458c",
+      "sanitize_sha256": "37f7af98bc01f3c56f65905b6120acf1fd942bd74330077960602ddc26f1458c",
+      "exact": true
+    },
+    {
+      "case": "quality",
+      "file": "input.dsculpt",
+      "release_sha256": "62e83492f91f9373cbcd5b5dfdcafeba77251cf342cacaf56f2d4b150cb30b05",
+      "sanitize_sha256": "62e83492f91f9373cbcd5b5dfdcafeba77251cf342cacaf56f2d4b150cb30b05",
+      "exact": true
+    },
+    {
+      "case": "quality",
+      "file": "final.dsculpt",
+      "release_sha256": "62e83492f91f9373cbcd5b5dfdcafeba77251cf342cacaf56f2d4b150cb30b05",
+      "sanitize_sha256": "62e83492f91f9373cbcd5b5dfdcafeba77251cf342cacaf56f2d4b150cb30b05",
+      "exact": true
+    }
+  ],
+  "all16_native_pairs_byte_exact": true,
+  "public_probe": {
+    "root_title_roi": [
+      245,
+      334,
+      395,
+      358
+    ],
+    "save_accent_roi": [
+      56,
+      307,
+      70,
+      333
+    ],
+    "redo_label_roi": [
+      100,
+      195,
+      160,
+      225
+    ],
+    "empty_panel_margin_origins": [
+      [
+        16,
+        100
+      ],
+      [
+        600,
+        100
+      ],
+      [
+        16,
+        500
+      ],
+      [
+        600,
+        500
+      ]
+    ],
+    "margin_size": [
+      24,
+      24
+    ],
+    "palette_source": "src/palette.cpp",
+    "displayed_srgb": true,
+    "runtime_images_are_actual_released_swapchains": true
+  },
+  "evidence_root": "artifacts/xr-recovery-20261111",
+  "attempts": [
+    {
+      "profile": "sanitize",
+      "name": "baseline-extra256",
+      "exit": 1,
+      "seconds": 22.4090237999917,
+      "report": "artifacts/xr-recovery-20261111/sanitize/baseline-extra256/report.json",
+      "report_sha256": "534caa2e369546e812855de75d31ad191273f0762aec4aa117512960b83d8292",
+      "checks": 1,
+      "complete": false,
+      "error": "RuntimeError(('extra256', 'app ended before durable native phase', 'accepted', 1))",
+      "drift": []
+    },
+    {
+      "profile": "sanitize",
+      "name": "system-baseline-extra256",
+      "exit": 1,
+      "seconds": 218.74073905899422,
+      "report": "artifacts/xr-recovery-20261111/sanitize/system-baseline-extra256/report.json",
+      "report_sha256": "a041b0179507371651debcc915280979daa43a9c21294d1ac927088606181694",
+      "checks": 5,
+      "complete": false,
+      "error": "RuntimeError(('extra256', 'app ended before durable native phase', 'redone', -6))",
+      "drift": []
+    },
+    {
+      "profile": "release",
+      "name": "system-improved-eight",
+      "exit": 1,
+      "seconds": 69.09338776598452,
+      "report": "artifacts/xr-recovery-20261111/release/system-improved-eight/report.json",
+      "report_sha256": "e45e0d71b9ed1ea966f8df7670351d402c7e4b9374a536a807e57f70b4d5a559",
+      "checks": 1,
+      "complete": false,
+      "error": "RuntimeError(('extra64', 'app ended before durable native phase', 'accepted', 0))",
+      "drift": []
+    },
+    {
+      "profile": "release",
+      "name": "system-v2-improved-eight",
+      "exit": 0,
+      "seconds": 103.41420225502225,
+      "report": "artifacts/xr-recovery-20261111/release/system-v2-improved-eight/report.json",
+      "report_sha256": "72eb558c68e1fd910c65041036e3656fd371ac40b88e2e5a93194a4aa7cc352b",
+      "checks": 117,
+      "complete": true,
+      "error": null,
+      "drift": []
+    },
+    {
+      "profile": "sanitize",
+      "name": "system-v2-improved-eight",
+      "exit": 1,
+      "seconds": 34.3818371790112,
+      "report": "artifacts/xr-recovery-20261111/sanitize/system-v2-improved-eight/report.json",
+      "report_sha256": "23c654e2d7fd06e87c7ee96f155ba22529d08e84aacdc63f6abb7d5a2d9b8166",
+      "checks": 14,
+      "complete": false,
+      "error": "AssertionError('extra64: ordinary XR app exits cleanly after actual session and workers drain')",
+      "drift": []
+    },
+    {
+      "profile": "sanitize",
+      "name": "recovered-control-baseline-extra256",
+      "exit": 0,
+      "seconds": 59.213723480002955,
+      "report": "artifacts/xr-recovery-20261111/sanitize/recovered-control-baseline-extra256/report.json",
+      "report_sha256": "4dbb85097e2172a9b779280cf8e89f757db8f39cdfcf10ee0f2f8a5627c96895",
+      "checks": 17,
+      "complete": true,
+      "error": null,
+      "drift": []
+    },
+    {
+      "profile": "sanitize",
+      "name": "system-v2-improved-extra256",
+      "exit": 1,
+      "seconds": 48.390457795001566,
+      "report": "artifacts/xr-recovery-20261111/sanitize/system-v2-improved-extra256/report.json",
+      "report_sha256": "e409350c70aacccd1b5d2653ea610ae79657d1c1b1597db8469585c47390891d",
+      "checks": 14,
+      "complete": false,
+      "error": "AssertionError('extra256: ordinary XR app exits cleanly after actual session and workers drain')",
+      "drift": []
+    }
+  ],
+  "interpretation": "Stronger public-image synchronization closes all eight current workflows. Original same-recovered-driver control also passes, so fixture-only causation and a general application input-loss bug are not established. Failed original current-system workflow and independent driver leak remain retained.",
+  "recovery": {
+    "package_url": "https://use.nobaraproject.org/rolling/fedora/x86_64/Packages/l/llvm19-libs-19.1.7-18.fc44.x86_64.rpm",
+    "signature_verification": "llvm19-libs-19.1.7-18.fc44.x86_64.rpm:\n    Header OpenPGP V4 RSA/SHA256 signature, key fingerprint: 36f612dcf27f7d1a48a835e4dbfcf71c6d9f90a6: OK\n    Header SHA256 digest: OK\n    Payload SHA256 digest: OK\n",
+    "license": "Apache-2.0 WITH LLVM-exception OR NCSA",
+    "license_file": "artifacts/xr-recovery-20261111/llvm19-package/usr/share/licenses/llvm19-libs/LICENSE.TXT",
+    "system_installation": false,
+    "files": {
+      "/home/blux/de-xr/dome-sculpt/artifacts/xr-recovery-20261111/llvm19-package/llvm19-libs-19.1.7-18.fc44.x86_64.rpm": "0449fcdf119a271d785727e95d6d87cdae75ce35dc1c375ae26bcd51113b3b52",
+      "/home/blux/de-xr/dome-sculpt/artifacts/xr-recovery-20261111/llvm19-package/usr/lib64/llvm19/lib/libLLVM.so.19.1": "b4bc4658b1ad3d53bd8c9d8d507cf7bc985bb13bb08e0814390c7070e267639a",
+      "/home/blux/de-xr/dome-sculpt/artifacts/xr-recovery-20261111/llvm19-package/usr/share/licenses/llvm19-libs/LICENSE.TXT": "8d85c1057d742e597985c7d4e6320b015a9139385cff4cbae06ffc0ebe89afee",
+      "/home/blux/de-xr/dome-sculpt/artifacts/mesa-xr-leak-26.2.5/build-patched-v2/src/gallium/targets/dri/libgallium-26.2.5.so": "d8cf7ee81cf354f7595d5b98c5d2e45d5d52cf06e88fb6a82edf08bd203fd132",
+      "/home/blux/de-xr/dome-sculpt/artifacts/mesa-xr-leak-26.2.5/build-patched-v2/src/egl/libEGL_mesa.so.0.0.0": "1a6aedf2eb11801863d1d24fdb8880a16a5ced8feb437d54916dec1b57e4a75e",
+      "/home/blux/de-xr/dome-sculpt/artifacts/xr-recovery-20261111/egl-vendor.json": "9600317ae52352487179172921a345072dc5ca51044f7eb9819b6f98b64bbae6",
+      "/home/blux/de-xr/dome-sculpt/artifacts/xr-recovery-20261111/egl-context-probe.c": "efb160b4c7dfb11e25b259bb62e89b507b59f7e4d4e450f321faf8e6e1aac28b",
+      "/home/blux/de-xr/dome-sculpt/artifacts/xr-recovery-20261111/egl-context-probe-sanitize": "958fd48c00e14665cb3567f95bbc25961fb5ecb8be845d12957cd95b9b1f87a5"
+    },
+    "provenance": "artifacts/xr-recovery-20261111/runtime-recovery.json",
+    "historical_environment_equivalence": false
+  },
+  "artifact_receipts": {
+    "matched-xr-success.json": "bee637c83ca46200b8a3aa8a7c636f2b7100fe0026f950d220f7781131136269",
+    "saved-redo-diagnosis.json": "d193af8001952d74f5db1e7864d807e29a05ee45944607b24287d87c813ef7bc",
+    "runtime-recovery.json": "6ab9444e6ca9ca9fd457d264cf7552c7793e8d8a473b854df25a26e0d53608f5",
+    "baseline-extra256-derivation.json": "edad0aa74e199795a1f9b88e713f4eb378257d5762e7c5af4c1bebe8a5f5df5a",
+    "improved-extra256-derivation.json": "6e54adfabb53a0f9801a012a4a5607e44db260aeef49443bc13fb13a9ebb0416"
+  },
+  "original_same_recovered_driver": {
+    "renderer": "llvmpipe (LLVM 19.1.7, 256 bits)",
+    "runtime_step": 80,
+    "frames_waited": 267,
+    "checks_passed": 17,
+    "checks_failed": 0,
+    "input_sha256": "750c2dc5f54d92fa6b2f90627d3f30d9e77aac2b86d4b99938f7f551871b22f6",
+    "expected256_sha256": "750c2dc5f54d92fa6b2f90627d3f30d9e77aac2b86d4b99938f7f551871b22f6",
+    "input_equals_expected256": true
+  },
+  "improved_same_system_driver": {
+    "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+    "runtime_step": 80,
+    "frames_waited": 337,
+    "checks_passed": 13,
+    "checks_failed": 1,
+    "input_sha256": "750c2dc5f54d92fa6b2f90627d3f30d9e77aac2b86d4b99938f7f551871b22f6",
+    "expected256_sha256": "750c2dc5f54d92fa6b2f90627d3f30d9e77aac2b86d4b99938f7f551871b22f6",
+    "input_equals_expected256": true,
+    "public_ack": {
+      "field_root_visible": {
+        "39": {
+          "first": 41,
+          "last": 43,
+          "redo_disabled": true,
+          "redo_enabled": false,
+          "save_selected": true,
+          "title_pixels": 19
+        },
+        "55": {
+          "first": 151,
+          "last": 153,
+          "redo_disabled": false,
+          "redo_enabled": true,
+          "save_selected": true,
+          "title_pixels": 19
+        },
+        "69": {
+          "first": 235,
+          "last": 237,
+          "redo_disabled": true,
+          "redo_enabled": false,
+          "save_selected": true,
+          "title_pixels": 19
+        }
+      },
+      "field_menu_closed": {
+        "43": {
+          "first": 47,
+          "last": 50,
+          "panel_present": false,
+          "root_title": false
+        },
+        "57": {
+          "first": 155,
+          "last": 157,
+          "panel_present": false,
+          "root_title": false
+        },
+        "71": {
+          "first": 239,
+          "last": 241,
+          "panel_present": false,
+          "root_title": false
+        }
+      }
+    },
+    "overall_sanitizer_pass": false,
+    "exit_failure": "112-byte/two-allocation Mesa rtasm JIT leak"
+  }
+}
