@@ -34,6 +34,18 @@ independent review when executed.
 
 Current scope is source preparation only. No compilation, producer execution,
 actual application, GPU or stereo verification is claimed. The existing strict
-sanitizer build continues from the separate frozen5bb worktree. The dedicated
-stereo Bake scenario and independent typed-source sampler controls remain to be
-implemented and qualified, together with fresh owning current-ABI app providers.
+sanitizer build continues from the separate frozen5bb worktree. A separate `baked-emission-runtime.cpp`/`baked-emission-xr.py` source prototype
+now follows actual ROOT → Objects → Mesh tools → Mesh baking → Bake surface.
+It derives released-image title masks from the actual bitmap font and original
+640px palette text layout, independently for both eye projections. Before each
+navigation click it requires the actual expected title and highlighted cell.
+The inherited ROOT9 and per-eye Save/history/menu-disappearance gates remain;
+accepted/undone/redone files must exactly match complete native fixtures before
+advancing. The original6000-frame/240s bounds are preserved. The runtime uses real
+OpenXR loader/GL swapchains and synthetic controller actions; it reads no product
+state and performs no Document callbacks. New font-reference/runtime CMake targets
+are test-only. Existing blur39 and resolution117 files remain byte-unchanged.
+
+Both source prototypes still need compilation and real application qualification.
+Independent typed-source sampler controls also remain to be implemented, together
+with fresh owning current-ABI app providers.
