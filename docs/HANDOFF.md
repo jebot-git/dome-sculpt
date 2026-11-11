@@ -20,9 +20,14 @@ Current owning software and authenticated Arc graphics pass in both profiles;
 all 98 image/native pairs match exactly across Release/sanitizer, with maximum
 software/Arc RGB difference 2 within bound 6 and exact alpha/native scenes. Read
 [CURRENT-OWNING-GRAPHICS-20261111.md](CURRENT-OWNING-GRAPHICS-20261111.md).
-Actual current public source/plain GUI and real-loader XR workflows are separate
-qualification. Final query integration and current production workload acceptance
-remain required; the combined product is not admitted to main.
+All eight current public source/plain desktop and real-loader XR workflows now
+pass in Release and strict sanitizer builds (196 public controls). Exact native
+history/reopen endpoints and complete model canvases match across profiles. Read
+[AUTHORING-PUBLIC-WORKFLOWS-20261111.md](AUTHORING-PUBLIC-WORKFLOWS-20261111.md).
+Desktop uses private Xvfb; XR uses the real loader with synthetic controls. These
+are not native-Wayland shell or physical-headset usability acceptance. Final
+query integration and current production workload acceptance remain required;
+the combined product is not admitted to main.
 
 The complete original objective and later controller trays/spatial node editing
 and history remain active and incomplete. No installation or headset/session
