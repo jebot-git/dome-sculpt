@@ -311,9 +311,9 @@ struct MaterialSurfaceQuery::Impl {
   std::unique_ptr<detail::PackedMaterialQuery> query;
   detail::SculptSceneChunks::Ptr chunks;
   std::vector<Visibility> surfaces;
-  template<class T> static bool policy_contains(std::span<const T> excluded,const T &value,size_t &metadata_tests){
+  template<class T> static bool policy_contains(std::span<const T> excluded,const T &value,size_t &metadata_tests,bool bounded=true){
     for(const auto &candidate:excluded){
-      if(++metadata_tests>262144)throw std::length_error("Material query bounds work budget exceeded");
+      if(bounded&&++metadata_tests>262144)throw std::length_error("Material query bounds work budget exceeded");
       if(candidate==value)return true;
     }return false;
   }
@@ -434,9 +434,9 @@ std::optional<MaterialSurfaceHit> MaterialSurfaceQuery::Impl::target(Vec3 point,
      (ray&&(!finite(direction)||!std::isfinite(length(direction))||length(direction)<1e-12f||!std::isfinite(maximum))))
     throw std::invalid_argument("Invalid mixed material query");
   if(ray)direction=normalized(direction);
-  size_t triangle_tests=0,metadata_tests=0;
-  auto allowed=[&](uint64_t object){return (!only||only==object)&&!policy_contains(excluded,object,metadata_tests);};
-  auto material_allowed=[&](SurfaceMaterialIdentity identity){return !policy_contains(excluded_materials,identity,metadata_tests);};
+  size_t triangle_tests=0,metadata_tests=0;const bool partitioned=query&&query->usage().partitioned;
+  auto allowed=[&](uint64_t object){return (!only||only==object)&&!policy_contains(excluded,object,metadata_tests,partitioned);};
+  auto material_allowed=[&](SurfaceMaterialIdentity identity){return !policy_contains(excluded_materials,identity,metadata_tests,partitioned);};
   auto count=[&](uint32_t){if(++triangle_tests>65536)throw std::length_error("Mixed scene triangle work budget exceeded");return true;};
   std::optional<MaterialSurfaceHit> best;double best_distance2=INFINITY;
   auto upper_limit=[&]{return best?std::min(maximum,std::nextafter(float(std::sqrt(best_distance2)),INFINITY)):maximum;};
@@ -584,7 +584,7 @@ std::optional<SurfaceHit> MaterialSurfaceQuery::raycast_excluding(Vec3 origin, V
     float maximum,double seconds,std::span<const uint64_t> excluded) const {
   if(impl_->chunks||!impl_->query)throw std::logic_error("A mixed scene requires a typed material hit");
   if(!std::isfinite(seconds))throw std::invalid_argument("Invalid visibility animation time");
-  size_t metadata_tests=0;SurfaceQueryOptions options;options.max_triangle_tests=65536;
+  size_t metadata_tests=0;const bool partitioned=impl_->query->usage().partitioned;SurfaceQueryOptions options;options.max_triangle_tests=65536;
   options.ray_filter=[&](uint32_t triangle,const std::array<float,3> &bary) {
     const size_t index=size_t(triangle)*3;
     auto found=std::upper_bound(impl_->surfaces.begin(),impl_->surfaces.end(),index,
@@ -592,7 +592,7 @@ std::optional<SurfaceHit> MaterialSurfaceQuery::raycast_excluding(Vec3 origin, V
     if(found==impl_->surfaces.begin())return false;
     --found;
     return index<found->range.first+found->range.count &&
-      !Impl::policy_contains(excluded,found->range.object,metadata_tests) &&
+      !Impl::policy_contains(excluded,found->range.object,metadata_tests,partitioned) &&
       found->visible(impl_->query->mesh(),triangle,bary,direction,seconds);
   };
   detail::PackedMaterialQuery::Eligibility eligible;
@@ -618,13 +618,13 @@ std::optional<SurfaceHit> MaterialSurfaceQuery::raycast_excluding_materials(Vec3
     float maximum,double seconds,std::span<const SurfaceMaterialIdentity>excluded)const{
  if(impl_->chunks||!impl_->query)throw std::logic_error("A mixed scene requires a typed material hit");
  if(!std::isfinite(seconds))throw std::invalid_argument("Invalid visibility animation time");
- size_t metadata_tests=0;SurfaceQueryOptions options;options.max_triangle_tests=65536;
+ size_t metadata_tests=0;const bool partitioned=impl_->query->usage().partitioned;SurfaceQueryOptions options;options.max_triangle_tests=65536;
  options.ray_filter=[&](uint32_t triangle,const std::array<float,3>&bary){
   const auto corner=size_t(triangle)*3;
   auto found=std::upper_bound(impl_->surfaces.begin(),impl_->surfaces.end(),corner,[](size_t at,const Visibility&v){return at<v.range.first;});
   if(found==impl_->surfaces.begin())return false;--found;
   const SurfaceMaterialIdentity identity{found->range.object,found->range.texture_set};
-  return corner<found->range.first+found->range.count&&!Impl::policy_contains(excluded,identity,metadata_tests)&&found->visible(impl_->query->mesh(),triangle,bary,direction,seconds);
+  return corner<found->range.first+found->range.count&&!Impl::policy_contains(excluded,identity,metadata_tests,partitioned)&&found->visible(impl_->query->mesh(),triangle,bary,direction,seconds);
  };
  detail::PackedMaterialQuery::Eligibility eligible;
  if(!excluded.empty())eligible=[&](uint32_t first,uint32_t count){
