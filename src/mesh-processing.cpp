@@ -426,7 +426,11 @@ struct SurfaceQuery::Impl {
   const Mesh &mesh;
   Bvh tree;
   Impl(const Mesh &m, const std::function<bool()> &fn)
-      : copied(m),mesh(copied),tree(mesh, fn) {}
+      : copied(m),mesh(copied),tree(mesh, fn) {
+    // Construction callbacks may own worker/model state. The completed BVH
+    // never uses this build-only callback during later queries.
+    tree.cancelled={};
+  }
   Impl(std::shared_ptr<const Mesh> m,const std::function<bool()> &fn,size_t nodes)
       : immutable(std::move(m)),mesh(*immutable),
         tree(mesh,fn?std::function<bool()>(std::cref(fn)):std::function<bool()>{},nodes) {
