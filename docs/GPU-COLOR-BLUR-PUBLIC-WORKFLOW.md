@@ -8,7 +8,12 @@ Root's frozen build is untouched. The earlier 82-based review remains archived. 
 unexecuted producer mismatch: direct blur options default to0.5 while public
 commands use default Flow1. The producer now asserts actual public Flow1 and
 invokes `paint_command(BlurColorLayer)`; the independent oracle still checks1.
-Existing product defaults remain unchanged.
+Existing product defaults remain unchanged. The first actual producer attempt
+then refused before EGL because a detached PBR paint had no matching retained
+Scene color-preparation binding. That failure remains in release-fixtures-v1.
+The producer now builds the genuine imported source/normal/rig fixture and uses
+public `prepare_source_colors` to retain the paint and binding together; it keeps
+Scene validation and the independent pixel oracle.
 
 Existing GUI 81/XR 117 scripts, inputs and deadlines remain byte-identical. Current
 139378 software/139458 Arc native controls retain their original dispatch. An

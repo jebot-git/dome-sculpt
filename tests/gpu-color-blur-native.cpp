@@ -96,8 +96,17 @@ struct Controller{
 void workflow_fixtures(const std::filesystem::path&out){
  if(std::filesystem::exists(out/"original.dsculpt")||std::filesystem::exists(out/"accepted.dsculpt")||std::filesystem::exists(out/"manifest.json"))throw std::runtime_error("Use fresh workflow fixture outputs");
  std::filesystem::create_directories(out);
- Scene scene;scene.active().name="Nonuniform color 日本語";scene.active().mesh_active=true;
- scene.active().painted=field(true);scene.validate();
+ // A detached prepared paint alone is not a native Scene authority. Start
+ // from the genuine imported source/normal/rig owners and retain the public
+ // color-preparation result together with its matching material binding.
+ Scene scene=source_color_fixture::model();auto&o=scene.active();o.name="Nonuniform color 日本語";o.painted=o.painted->snapshot();
+ PaintSettings ink;ink.color={.9f,.1f,.4f,.23f};stroke(*o.painted,ink,{-.13f,.03f,0},.63f);ink.color={.1f,.8f,.3f,.83f};stroke(*o.painted,ink,{.2f,.08f,0},.57f);
+ ink.channel=PaintChannel::Metallic;ink.metallic=.67f;stroke(*o.painted,ink,{.02f,-.1f,0},.71f);
+ ink.channel=PaintChannel::Roughness;ink.roughness=.21f;stroke(*o.painted,ink,{.1f,.1f,0},.66f);
+ ink.channel=PaintChannel::Emission;ink.emission_units=PaintEmissionUnits::Physical;ink.emission={10000,.0003f,7};stroke(*o.painted,ink,{.03f,0,0},.00002f);
+ ink.channel=PaintChannel::Mask;ink.mask=.23f;stroke(*o.painted,ink,{-.1f,.13f,0},.81f);
+ const auto first=o.painted->active_layer();o.painted->add_layer("Hidden untouched 日本語");ink.channel=PaintChannel::Color;ink.color={.2f,.4f,.8f,.45f};stroke(*o.painted,ink,{0,0,0},.4f);o.painted->layer_properties("Hidden untouched 日本語",false,0);o.painted->select_layer(first);
+ const auto prepared=prepare_source_colors({o.painted,o.appearance,o.material_bindings,o.deformation,o.material});check(prepared.converted&&prepared.paint->color_projection()&&prepared.material_bindings->color_preparation,"Workflow keeps actual paired source-color preparation authority");o.painted=prepared.paint;o.material_bindings=prepared.material_bindings;scene.validate();
  const auto before=scene.snapshot();scene.save(out/"original.dsculpt");
  Document document;document.replace(scene);ready(document);
  check(document.frame().state->paint.flow==1,"Workflow starts with the actual public default Flow1");
