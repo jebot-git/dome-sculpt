@@ -1,0 +1,99 @@
+{
+  "schema": 1,
+  "date": "2026-11-11",
+  "scope": "Independent read-only source review; no native execution/build/GPU/admission; repair verification pending.",
+  "composition_source": "ccb2b7b5803d92b1b3bf65c38f422366c9128b94",
+  "preview_source": "f47348eb12b573799880f2bb8fb4946b4aa9731e",
+  "composition_pins": {
+    "src/render.cpp": "dc109276c2bc39328411482a3c63eb5aee7c4bcc2d853709d58bb345267d3c4f",
+    "src/current-paint-preview.cpp": "caa38727398f50d5793c9649eb363231231fadb95e0065fc77c7eb3341209938",
+    "src/current-paint-preview.hpp": "0681267c3ed24d456ea2e7cba0be4d41bdacbf0e662e7827765a2ba2bb5241fd",
+    "src/render-current-paint-preview.hpp": "11c1997d8b37284ce00ffcb759b0cb42f44450470b2e1094eacfdf4e2d3ccade",
+    "src/render-paint-state.hpp": "a879f5a803f361753588960dd78f563aa71f262a5bd1facf0127f0a4a5e665bf",
+    "src/render-paint-overlay.hpp": "2452edf692210365795d2908a842b4f118c301c8107bb0a5b34e2defa0e1e2e1",
+    "src/render-source-pack.hpp": "a7ff25ff20f908bec06a40423cc417524d85aa064a5d5d340ca08c53f36386aa",
+    "src/polygon-surface-gpu.hpp": "6db092b31e1b37f7cb38d8bc5698f9bd5159be1981c6fe6b5694e6843fa019db",
+    "src/paint.cpp": "2933b09f97d8178c95b4a1209311012595abe101c364e71cd508086c26d877cf",
+    "src/material-visibility.cpp": "0ea10808a66f9b7773ac80dd25e09352323b8a91940424ab27025e1e965397b5",
+    "src/export.cpp": "f4091cd2149cc3ebf43a5cabc57e8f342d6d5191e927f2139af0be66dd5ae0fa",
+    "src/scene.cpp": "b575d9dd42c4c318402ac2db7d6f134c606476cf8a38c57ab5e078f331b613f8",
+    "src/sculpt-gpu-arena.hpp": "47b5f65676adc1e924447323c9a542632b5224aca46a1291448680b7755cef39",
+    "src/texture-set-range.cpp": "84c730ee672b66708dc731450788c4c7edae77101bf30f86a81e44a766557291",
+    "src/texture-set-worker.cpp": "da313f118648e5fa8b78b40ecbb31f9b5c1b81562b2f8ef84f38dc542bdd060f",
+    "include/dome/paint.hpp": "bcfacf2509cffdcd16d7c79dd5cfe4f498583be073fef63f3856510bcfbc64fe",
+    "include/dome/scene.hpp": "702dacb03a8c891328c59c23423e06765a1abf657563b035a1beed456e4085e9",
+    "include/dome/render.hpp": "1bf22d6f00d7b2c36a1f8160154ce87c73969a5c623cd5b257dad3786e3449bb",
+    "tests/current-paint-preview-gpu.cpp": "a66150f67a28f165baa274474474a90ce0d0609ffb6ed7c1b11765db74f7b389",
+    "tests/current-paint-preview-native.cpp": "5389c74b2de1b42ad18e51821d0402cc7d1e5d72b3843d1b354e32126dac8966",
+    "CMakeLists.txt": "7ac707ee9fe6417e978558e142feaae74a1686bf689355c1e89726c292b295dc"
+  },
+  "preview_leaf_exact_in_composition": {
+    "src/current-paint-preview.cpp": true,
+    "src/current-paint-preview.hpp": true,
+    "src/render-current-paint-preview.hpp": true,
+    "src/render-paint-state.hpp": true,
+    "src/render-paint-overlay.hpp": true,
+    "src/render-source-pack.hpp": true,
+    "src/polygon-surface-gpu.hpp": true,
+    "src/paint.cpp": true,
+    "src/material-visibility.cpp": true,
+    "src/export.cpp": true,
+    "src/scene.cpp": true,
+    "src/texture-set-range.cpp": true,
+    "src/texture-set-worker.cpp": true,
+    "include/dome/paint.hpp": true,
+    "include/dome/scene.hpp": true,
+    "include/dome/render.hpp": true,
+    "tests/current-paint-preview-gpu.cpp": true,
+    "tests/current-paint-preview-native.cpp": true
+  },
+  "findings": [
+    {
+      "id": "R1",
+      "status": "source-confirmed; executed caller counter pending",
+      "severity": "high",
+      "problem": "Recoverable renderer catch clears accepted preview and resets unconfirmed requested-store debt.",
+      "locations": [
+        "src/render.cpp:793",
+        "src/render.cpp:1217",
+        "src/render.cpp:219",
+        "src/render-current-paint-preview.hpp:244"
+      ],
+      "existing_test_gap": "Direct compiler error controls do not invoke renderer catch."
+    },
+    {
+      "id": "R2",
+      "status": "missing predicate source-confirmed; legal-copy graphical counter pending",
+      "severity": "medium",
+      "problem": "Genuine preview marker does not authenticate mutable wrapper transparency consumed by automatic blend classification.",
+      "locations": [
+        "src/current-paint-preview.cpp:43",
+        "src/render.cpp:919"
+      ],
+      "control": "Legal make_shared<TextureMaps> copy retaining exact marker, toggle transparent; no const_cast; ordinary set0 and genuine set controls."
+    },
+    {
+      "id": "R3",
+      "status": "shared transaction/accounting gap; partly inherited",
+      "severity": "high",
+      "problem": "Destructive other-cache preflight/pruning and omitted old polygon stores break strict common old/new/debt admission.",
+      "locations": [
+        "src/render-source-pack.hpp:133",
+        "src/render-paint-overlay.hpp:131",
+        "src/render.cpp:585",
+        "src/render.cpp:626",
+        "src/polygon-surface-gpu.hpp:45"
+      ]
+    }
+  ],
+  "not_claimed": [
+    "new runtime failure reproduction",
+    "new owning build",
+    "new GPU execution",
+    "main or default admission",
+    "whole-app physical VRAM bound"
+  ],
+  "builds_started": 0,
+  "GPU_jobs_started": 0,
+  "product_changes": false
+}
