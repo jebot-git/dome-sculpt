@@ -1,3 +1,13 @@
+## Fresh combined native/software-GL milestone — 2026-11-11
+
+Current b8c469ce passes matched Release/SAN32-target builds, native22,
+workspace27/373, softwareGL1727 perprofile,42 exact native pairs/168crossreads
+and94 exact image pairs. Read [COMBINED-BUILD-20261111.md](COMBINED-BUILD-20261111.md)
+for precise scopes, retained warnings and log limitation. Current XR stronger
+fixture/driver recovery and11-TU inherited-role SAN qualification are in progress.
+Main product admission, broader current regression and full requirements remain
+pending. All historical pause notes below remain historical; the goal is active.
+
 ## Goal active; additional spatial node/history phase — 2026-11-11
 
 The user reactivated the full goal and added spatial node-based editing/history

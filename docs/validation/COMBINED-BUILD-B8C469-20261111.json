@@ -1,0 +1,114 @@
+{
+  "schema": 1,
+  "date": "2026-11-11",
+  "source": "b8c469ce875eb2542c220300c3c63edbf1526570",
+  "source_branch": "work/resume-integration-20261111",
+  "status": "fresh combined native and software graphics milestone; full production goal incomplete",
+  "scope": "Current canonical DomeD acc2b70 SDKs and bitmap helper; native CPU build backend. Matching Release and ASan/LSan/UBSan providers; current system Mesa software GL. No ordinary GUI, Wayland compositor, physical headset, hardware renderer, accelerator or full interoperability qualification is claimed by this receipt.",
+  "profiles": {
+    "release": {
+      "targets": 32,
+      "owned_objects_archives_elfs": 312,
+      "native_suites": 22,
+      "workspace_controls": [
+        27,
+        373
+      ],
+      "native_exit": 0,
+      "graphics_consumers": 5,
+      "graphics_checks": 1727,
+      "graphics_exit": 0,
+      "actual_software_renderer": "GL_RENDERER llvmpipe (LLVM 22.1.8, 256 bits)",
+      "khronos": {
+        "actual_exports": 10,
+        "errors": 0,
+        "warnings": 5,
+        "infos": 12,
+        "hints": 0
+      },
+      "sanitizer_environment": {
+        "ASAN_OPTIONS": null,
+        "UBSAN_OPTIONS": null,
+        "LSAN_OPTIONS": null
+      },
+      "status_sha256": {
+        "-native-status.json": "17cade8636be25e6555971f8eace9554423dd52e99605297bd2bb79f89b7f821",
+        "-softwareGL-status.json": "7d8067657ff77dbc101290fb15e9ce514a2ea3512b96c9ff3f7a770fafca53d1",
+        "-khronos.json": "348ae339f7e5093e0e30bf1213e8c859407f39a2b1a3e8f40f67edb6dca51c46"
+      },
+      "application_sha256": "9bf85d3bbc3418951703ad1aabb0d55a467d36d9ed621ede664007b6c930b244"
+    },
+    "sanitize": {
+      "targets": 32,
+      "owned_objects_archives_elfs": 312,
+      "native_suites": 22,
+      "workspace_controls": [
+        27,
+        373
+      ],
+      "native_exit": 0,
+      "graphics_consumers": 5,
+      "graphics_checks": 1727,
+      "graphics_exit": 0,
+      "actual_software_renderer": "GL_RENDERER llvmpipe (LLVM 22.1.8, 256 bits)",
+      "khronos": {
+        "actual_exports": 10,
+        "errors": 0,
+        "warnings": 5,
+        "infos": 12,
+        "hints": 0
+      },
+      "sanitizer_environment": {
+        "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+        "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+        "LSAN_OPTIONS": null
+      },
+      "status_sha256": {
+        "-native-status.json": "82cf97443b4b1369113ee950df38134fd5c3dac8dde1cf7d512aecbaf771168d",
+        "-softwareGL-status.json": "f29aae9d95d80b6256b172f997f356a63386729733811e17810e5b5d312b26cf",
+        "-khronos.json": "cf1a6e58f2e4eae6c465fafbb71c3a29d5f9f8f1add7752cbad08edad7d8f46e"
+      },
+      "application_sha256": "38978d63d7248629ae34969bfd3fd6a8af0ae168222926d42ef6c41f42d13f8e"
+    }
+  },
+  "pairs": {
+    "native": {
+      "state": "terminal",
+      "scope": "All native .dsculpt outputs from the selected22 regression suites, two produced profiles and both reader profiles; no graphics/interoperability/physical qualification",
+      "exit": 0,
+      "pairs": 42,
+      "actual_reads": 168,
+      "all_binary_equal": true,
+      "all_semantic_equal": true,
+      "script_sha256": "c20285730b3a756d0a06e735c846c783d3b682a7d70a1339e21ca0b9b502b20e",
+      "receipt_sha256": "e9c683c9d6e43c77754ac563e7f828912d7075409a7db64f2721b614c770e2d3"
+    },
+    "graphics": {
+      "state": "terminal",
+      "exit": 0,
+      "scope": "Corresponding actual current softwareGL outputs from the five unchanged consumers; encoded PNG and rawRGBA bytes compared exactly, not headset or hardware equivalence",
+      "pairs": 94,
+      "all_exact": true,
+      "receipt_sha256": "c5a51a8d8a180c63731c059d3595d106ae417477edf51e0b53fd5560cba2b376"
+    }
+  },
+  "limitations": [
+    "Main product admission remains pending the current XR, inherited-role reader and broader regression evidence.",
+    "Initial five-target build logs were overwritten by the following55-step native build; terminal tool results and SAN coordinator hashes survive. Logs in the seal describe the later55-step closure, not the initial259steps.",
+    "Five skinned-node-parent glTF warnings remain perprofile; zero structural errors is not full VRM semantic proof.",
+    "Old saved-Redo fixture failure and current Mesa XR JIT leak are preserved separately; new public-UI acknowledgement fixture and recovered patched-driver route are under validation."
+  ],
+  "control_seal": {
+    "scope": "Current b8c469ce combined native/softwareGL evidence controls only; raw binaries/projects/images remain in persistent build directory, not inside compact archive",
+    "archive": "/home/blux/de-xr/dome-sculpt/artifacts/build-20261111/control-seal/controls.tar.zst",
+    "sha256": "16dcdfd108209785751aff4c446b9eddba36533188ccbe739ed33f18837864b5",
+    "bytes": 188195,
+    "verified_control_files": 33,
+    "member_hashes_match": true
+  },
+  "pending": [
+    "Current stronger actual-loader OpenXR fixture in both profiles, with all original native endpoints and public-UI acknowledgement.",
+    "Current11-TU inherited-role sanitizer readers.",
+    "Current ordinary GUI/compositor/device/performance regression and remaining full requirements, including later controller trays and spatial node/history editing."
+  ]
+}
