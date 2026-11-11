@@ -43,8 +43,8 @@
     "CMakeLists.txt": "9699592ddeebcb5e25cca5d1feeb41106b6205eee38441b605c6063389f7753e",
     "tests/gpu-color-blur-native.cpp": "0cd801d2dbccdf270c3f1fd4fab5a96be2bb130fbb27eafdfddb3e1606a047f8",
     "tests/gpu-color-blur-runtime.cpp": "c46f24a5240042a3cb63e49d88ae4778f641365ad7446187fd10ec0ecfa4118e",
-    "tests/gpu-color-blur-menu.py": "9d2e0a1e5f235573d86ca47273ada6fa3eafef7fc68cec375ef27b9622c7fbf2",
-    "tests/gpu-color-blur-xr.py": "416870cc43dc1228e428532be9961a1ee6ecbe736f8c6c6bfa8fcaf454ec847e",
+    "tests/gpu-color-blur-menu.py": "5f6383649fb7ca807b99f35571956c9983dca6b34820dcbf6ceec0471c91b392",
+    "tests/gpu-color-blur-xr.py": "44b779c9cfec71f3ec4f74e9529f5296afdcd0eb437cd53ac7fb8bfeb98ce5e3",
     "tests/texture-set-menu.py": "7a3cfbe68ab5fc43a6e23cf147cc39ca2154e41003bb3169bccebd4cd5f24b74",
     "tests/texture-set-resolution-runtime.cpp": "931454ae4c1f8d9737472d0f0f81d037fa1d4fcd29f60a9df608b9e02fd5c864",
     "tests/texture-set-resolution-xr.py": "dcd43627e69b046d1986aa35839f3fcf74bde36fda77fd0fc150f733fcb22e0c",
@@ -108,5 +108,6 @@
     "retained": true,
     "correction": "Perform genuine paired source-color preparation after RGB stamps and BEFORE later metallic/roughness/physicalFLOAT/mask/hidden authoring; retain every channel/guard."
   },
-  "remaining_product_adapter_limit": "prepare_source_colors on alreadyphysical-emission paint refuses without linearcompositeadapter; fixtureorderingdoesnotimplementthatfullgoaladapter."
+  "remaining_product_adapter_limit": "prepare_source_colors on alreadyphysical-emission paint refuses without linearcompositeadapter; fixtureorderingdoesnotimplementthatfullgoaladapter.",
+  "app_only_auth_instrumentation": "OptionalDOME_BLUR_APP_PRELOAD setsLD_PRELOAD onlyforapp/inspector env, notouterXvfb/Python; externalactualGLdeviceevidence neverauthorizesUIcompletion."
 }

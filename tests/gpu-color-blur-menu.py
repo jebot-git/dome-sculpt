@@ -41,6 +41,7 @@ async def main():
  with os.fdopen(rd) as p:screen=':'+p.readline().strip()
  env={**os.environ,'HOME':str(home),'DISPLAY':screen,'XDG_CURRENT_DESKTOP':'Dome','FLTK_BACKEND':'x11','LP_NUM_THREADS':'2','XMODIFIERS':'@im=none','MESA_SHADER_CACHE_DISABLE':'true'}
  for name in ['WAYLAND_DISPLAY','WAYLAND_SOCKET']:env.pop(name,None)
+ if os.environ.get('DOME_BLUR_APP_PRELOAD'):env['LD_PRELOAD']=os.environ['DOME_BLUR_APP_PRELOAD']
  for name,suffix in [('XDG_STATE_HOME','state'),('XDG_CONFIG_HOME','config'),('XDG_CACHE_HOME','cache'),('XDG_DATA_HOME','data'),('XDG_RUNTIME_DIR','runtime')]:env[name]=str(home/suffix);Path(env[name]).mkdir(mode=0o700)
  project=home/'actual.dsculpt';project.write_bytes(fixture.read_bytes());d=display.Display(screen)
  def focus_id():

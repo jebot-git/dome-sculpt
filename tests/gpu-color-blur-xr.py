@@ -31,6 +31,7 @@ def drive_case(name,mode):
  env={k:v for k,v in os.environ.items() if not k.startswith('DOME_XR_FIXTURE_') and not k.startswith('DOME_XR_PAINT_') and not k.startswith('DOME_XR_TEXTURE_')}
  env.update({'XR_RUNTIME_JSON':str(runtime_manifest),'DOME_XR_FIXTURE_REPORT':str(runtime_report),'DOME_XR_PAINT_BLUR':mode,'DOME_XR_PAINT_GATES':str(gates),'HOME':str(home),'XDG_RUNTIME_DIR':str(home/'runtime'),'XDG_CONFIG_HOME':str(home/'config'),'XDG_STATE_HOME':str(home/'state'),'XDG_CACHE_HOME':str(home/'cache'),'LP_NUM_THREADS':'2','MESA_SHADER_CACHE_DISABLE':'true'})
  for k in ['WAYLAND_DISPLAY','WAYLAND_SOCKET']:env.pop(k,None)
+ if os.environ.get('DOME_BLUR_APP_PRELOAD'):env['LD_PRELOAD']=os.environ['DOME_BLUR_APP_PRELOAD']
  for k in ['XDG_RUNTIME_DIR','XDG_CONFIG_HOME','XDG_STATE_HOME','XDG_CACHE_HOME']:Path(env[k]).mkdir(mode=0o700)
  original=inspect(project,env);expected=inspect(fixtures[expected_key],env);stamp=project.stat().st_mtime_ns
  args=[str(app),'--xr','--open',str(project),'--save',str(result)]

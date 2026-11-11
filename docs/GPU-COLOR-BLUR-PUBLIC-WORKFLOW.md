@@ -1,8 +1,10 @@
 # Public GPU color blur workflow fixtures
 
 This test-only continuation adds actual universal-menu and OpenXR-loader workflows
-for native GPU blur. C++/Python syntax and source checks pass. No new target link,
-GUI, loader or hardware execution is claimed yet. The private branch now starts
+for native GPU blur. The two new runtime DSOs compile/link in Release and SAN
+(6.28/9.83 seconds, one job). The corrected Release producer passes57853 native
+controls on authenticated Arc, including independent pixels and full native
+history/reopen. Actual public GUI/loader scenarios are still unexecuted. The private branch now starts
 from root `775f92b8`; product sources and canonical dependency metadata are unchanged.
 Root's frozen build is untouched. The earlier 82-based review remains archived. Root source review caught an
 unexecuted producer mismatch: direct blur options default to0.5 while public
@@ -81,3 +83,14 @@ The companion source receipt records syntax commands and exact inputs, rather
 than claiming runtime qualification. Software-refusal presentation, further
 busy/modal/unsupported-domain GUI cases, compositor behavior, production throughput
 and physical controller usability remain outside this minimal added scenario.
+
+The optional `DOME_BLUR_APP_PRELOAD` parameter applies measurement only to the
+ordinary app and native inspector, leaving Xvfb/Python unpreloaded. The external
+authentication adapter passes through GLX queries unchanged and authenticates
+every actual EGL renderer query independently, with unique context/display/thread
+reports. Its GL/EGL/DRM/PCI/liveFD checks retain the original full body and real
+return pointer. The scripts never consult these reports for UI progression.
+Producer v3 completed57853 controls, but its coordinator then expected i915 in
+the wrong text file. Its failed raw status remains. Corrected v4 independently
+checks stdout/sysfs driver identity and records native exit0 before acceptance.
+The native receipt pins all outcomes and exact unchanged root providers.
