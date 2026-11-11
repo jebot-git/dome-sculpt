@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 #include "dome/avatar.hpp"
+#include <algorithm>
 namespace dome::detail {
 // Only declared anatomical continuations choose another landmark as the tail.
 // A hand follows the middle metacarpal, never whichever finger sorts first.
