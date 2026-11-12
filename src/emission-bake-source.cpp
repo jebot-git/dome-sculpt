@@ -38,7 +38,9 @@ struct Source {
   std::array<float,3> sample(uint32_t triangle,std::array<float,3> bary)const{
     stop();auto original=background;
     if(role.image&&!physical_background){
-      auto uv=coordinates(triangle,bary,toon?mtoon_coordinate(toon->textures[size_t(MToonSlot::Emission)]):role.texcoord,true);
+      // PBR roles already name transported current carriers. Typed slots keep
+      // their original logical ordinal, including separately retained artist UV1.
+      auto uv=coordinates(triangle,bary,toon?mtoon_coordinate(toon->textures[size_t(MToonSlot::Emission)]):role.texcoord,bool(toon));
       if(toon)uv=mtoon_uv(*toon,MToonSlot::Emission,uv,0);
       // coordinates() has authenticated and resolved the actual source set.
       // The ordinary image sampler accepts only a resolved coordinate pair;
