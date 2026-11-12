@@ -2032,7 +2032,11 @@ void Document::mesh_loop() {
         // agree with the original local primitive. Rest indices stay untouched.
         if(reflected)for(size_t c=first;c<snapshot->mesh.indices.size();c+=3)std::swap(snapshot->mesh.indices[c+1],snapshot->mesh.indices[c+2]);
         auto textures=o.textures;
-        if(packed_uv1||!packed_extra_uv.empty()){auto maps=std::make_shared<PaintSourceMaps>(*textures->source_maps);if(packed_uv1)maps->uv1=std::move(packed_uv1);for(auto &[set,values]:packed_extra_uv)maps->extra_uv_sets[set]=std::move(values);auto packed=std::make_shared<TextureMaps>(*textures);packed->source_maps=std::move(maps);
+        // Original logical UV0 is independent of image-role carriers. Even an
+        // empty-role Source8 packet must follow the actual packed->current
+        // vertex map when canonical Mikk expands shared vertices to corners.
+        const bool packed_logical=textures&&textures->overlay&&textures->overlay->original_uv0();
+        if(packed_uv1||!packed_extra_uv.empty()||packed_logical){auto maps=std::make_shared<PaintSourceMaps>(*textures->source_maps);if(packed_uv1)maps->uv1=std::move(packed_uv1);for(auto &[set,values]:packed_extra_uv)maps->extra_uv_sets[set]=std::move(values);auto packed=std::make_shared<TextureMaps>(*textures);packed->source_maps=std::move(maps);
           if(packed->overlay)packed->overlay=detail::PaintOverlayFactory::pack_source_maps(packed->overlay,packed->source_maps,overlay_vertices,cancelled);
           textures=std::move(packed);}
         snapshot->ranges.push_back({o.id, first, o.mesh.indices.size(), o.material, std::move(textures), std::move(appearance), offset, o.material_bindings, bool(retained), bool(retained && canonical), bool(retained && retained_pose->tangents[source_role].empty()),world,!affine});

@@ -59,6 +59,12 @@ public:
                         const nlohmann::json *, const nlohmann::json *,
                         const nlohmann::json *,
                         const nlohmann::json *texture_geometry);
+  // The owning Scene supplies its real, short-lived native read capability.
+  // Retained origins must receive the same context as current paint records.
+  static void preflight(const nlohmann::json &, const nlohmann::json &,
+                        const nlohmann::json *, const nlohmann::json *,
+                        const nlohmann::json *, const nlohmann::json *,
+                        const SourcePaintDecodeContext &);
   static PolygonSceneArchive decode(const nlohmann::json &,
                                     const PaintImageArchive &,
                                     const CreatorAssetArchive &,

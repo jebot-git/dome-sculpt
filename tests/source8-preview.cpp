@@ -6,6 +6,8 @@
 #include "dome/material-bindings.hpp"
 #include "dome/source-paint.hpp"
 #include "source4-baked.hpp"
+#include "dome/bake-authoring.hpp"
+#include "dome/polygon-scene.hpp"
 #include "source-paint-parameters.hpp"
 #include <future>
 #include <fstream>
@@ -13,8 +15,8 @@
 #include <numeric>
 namespace {
 Image grid(std::array<uint8_t,4> q){Image a{64,64,std::vector<uint8_t>(4096*4)};for(size_t i=0;i<4096;++i)std::copy(q.begin(),q.end(),a.rgba.begin()+i*4);return a;}
-Mesh varied(){auto q=quad();q.positions[0].z=.02f;q.positions[1].z=-.03f;q.positions[2].z=.06f;q.positions[3].z=-.02f;
- q.normals={normalized(Vec3{.1f,-.2f,1}),normalized(Vec3{.35f,.15f,1}),normalized(Vec3{-.25f,.4f,1}),normalized(Vec3{-.3f,-.1f,1})};Mesh m;
+Mesh varied(bool shared=false){auto q=quad();q.positions[0].z=.02f;q.positions[1].z=-.03f;q.positions[2].z=.06f;q.positions[3].z=-.02f;
+ q.normals={normalized(Vec3{.1f,-.2f,1}),normalized(Vec3{.35f,.15f,1}),normalized(Vec3{-.25f,.4f,1}),normalized(Vec3{-.3f,-.1f,1})};if(shared){for(auto&p:q.positions)p.z=0;return q;}Mesh m;
  for(auto i:q.indices){m.indices.push_back(uint32_t(m.positions.size()));m.positions.push_back(q.positions[i]);m.normals.push_back(q.normals[i]);m.uv.push_back(q.uv[i]);}return m;}
 struct Sample{Vec3 detail{},radiance{};float common=0,opacity=0;};
 Sample coefficients(float u,float v,float e,bool alpha){const double x=7.5+.75*(64*u),y=3.5+.875*(64*v);const int ix=int(std::floor(x)),iy=int(std::floor(y));const double fx=x-ix,fy=y-iy;Sample s;
@@ -22,8 +24,9 @@ Sample coefficients(float u,float v,float e,bool alpha){const double x=7.5+.75*(
  }return s;}
 struct Basis{Vec3 t,b;};
 Basis derivative(const Mesh&m,size_t tri,const std::vector<std::array<float,2>>&uv,Vec3 N){const auto a=m.indices[tri*3],b=m.indices[tri*3+1],c=m.indices[tri*3+2];auto p=m.positions[b]-m.positions[a],q=m.positions[c]-m.positions[a];const auto x=uv[b],y=uv[c],z=uv[a];const float du=x[0]-z[0],dv=x[1]-z[1],eu=y[0]-z[0],ev=y[1]-z[1],det=du*ev-eu*dv;auto t=(p*ev-q*dv)/det,rawb=(q*du-p*eu)/det;t=normalized(t-N*dot(t,N));return {t,cross(N,t)*(dot(cross(N,t),rawb)<0?-1.f:1.f)};}
-void run(bool typed_view,float emission_coverage,bool alpha){
- auto rest=varied(),atlas=rest;for(auto&uv:atlas.uv){uv[0]=.125f+.75f*uv[0];uv[1]=.0625f+.875f*uv[1];}
+void run(bool typed_view,float emission_coverage,bool alpha,bool shared=false){
+ std::cout<<"SOURCE8_ACTUAL_SHARED_VERTICES "<<shared<<std::endl;
+ auto rest=varied(shared),atlas=rest;for(auto&uv:atlas.uv){uv[0]=.125f+.75f*uv[0];uv[1]=.0625f+.875f*uv[1];}
  auto maps=std::make_shared<PaintSourceMaps>();maps->color.image=image({255,255,255,uint8_t(alpha?96:255)});maps->color.texcoord=1;maps->normal.image=image({156,128,250,255});maps->normal.texcoord=1;maps->normal_scale=.8f;maps->normal.uv_transform={.9f,.25f,-.15f,1.1f,.1f,-.2f};maps->emission.image=image({128,32,64,255});maps->emission.texcoord=1;
  auto original_uv=std::make_shared<std::vector<std::array<float,2>>>();for(auto uv:rest.uv)original_uv->push_back({.1f+.8f*uv[1],1-.7f*uv[0]-.2f*uv[1]});maps->uv1=original_uv;
  auto raw=PaintedMesh::from_maps(rest,maps,64);std::vector<uint32_t> ids(rest.positions.size());std::iota(ids.begin(),ids.end(),0);auto paint=prepare_source_paint(raw,atlas,ids);
@@ -106,4 +109,81 @@ void run(bool typed_view,float emission_coverage,bool alpha){
  check(glGetError()==GL_NO_ERROR,"Source8 preview and independent controls leave the real GL error queue empty");
 }
 }
-int main()try{NativeGraphics graphics;std::cout<<"ACTUAL_RENDERER "<<glGetString(GL_RENDERER)<<'\n';for(bool alpha:{false,true})for(bool typed:{false,true})for(float coverage:{.25f,0x1p-24f})run(typed,coverage,alpha);std::cout<<"PASS "<<checks<<" Source8 actual visible normal/FLOAT/ownership controls\n";return 0;}catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
+
+namespace {
+Scene polygon_source8(bool physical, bool images, bool mixed) {
+ Scene scene;auto &target=scene.active();target.mesh_active=true;
+ auto maps=std::make_shared<PaintSourceMaps>();auto mesh=quad();
+ if(images){maps->color.image=std::make_shared<const Image>(grid({136,136,136,255}));maps->color.texcoord=1;maps->uv1=std::make_shared<const std::vector<std::array<float,2>>>(std::vector<std::array<float,2>>{{1,0},{0,0},{0,1},{1,1}});}
+ auto original=capture_source_sampling(mesh,maps,64);auto atlas=mesh;
+ for(auto &uv:atlas.uv){uv[0]=.125f+.75f*uv[0];uv[1]=.0625f+.875f*uv[1];}
+ const std::array<uint32_t,4> ids{0,1,2,3};target.painted=prepare_source_paint(original,atlas,ids);
+ target.painted->add_layer("Hidden original polygon data");PaintSettings ink;ink.color={.3f,.2f,.1f,.5f};ink.front_only=false;Brush brush;brush.from=brush.to={0,0,0};brush.normal={0,0,1};brush.radius=.3f;
+ target.painted->begin_stroke();target.painted->stamp(brush,ink);check(target.painted->end_stroke(),"Polygon fixture has actual hidden sparse paint");target.painted->layer_properties("Hidden original polygon data",false,.375f);
+ const auto id=target.id,source=scene.add("Genuine public Bake source",Volume{});auto &o=scene.active();o.mesh_active=true;o.visible=false;o.locked=true;
+ for(auto &p:mesh.positions)p.z=.005f;o.painted=std::make_shared<PaintedMesh>(mesh,64);o.material.emissive={.2f,.3f,.4f};
+ BakedTextures baked;baked.maps.color=grid({136,136,136,255});baked.maps.metal_rough=grid({255,255,0,255});baked.maps.normal=grid({128,128,255,255});baked.coverage.assign(4096,255);
+ if(physical){std::vector<BakedEmissionSample> field(4096);for(auto &v:field)v={{},{8,.000001f,2},1};baked.emission_field=BakedEmissionField::create(64,field);}else baked.maps.emission=grid({32,64,96,255});
+ o.painted->install_bake(std::move(baked));scene.select(id);ObjectBakeSettings options;options.front_mm=10;options.back_mm=2;options.ao_samples=0;options.padding=2;bake_object(scene,source,options);
+ if(mixed){scene.add("Independent ordinary FLOAT sibling",Volume{});auto &s=scene.active();s.mesh_active=true;s.visible=false;s.painted=std::make_shared<PaintedMesh>(quad(),64);BakedTextures b;b.maps.color=grid({136,136,136,255});b.maps.metal_rough=grid({255,255,0,255});b.maps.normal=grid({128,128,255,255});b.coverage.assign(4096,255);std::vector<BakedEmissionSample> f(4096);for(auto &v:f)v={{},{123,.000001f,2},.25f};b.emission_field=BakedEmissionField::create(64,f);s.painted->install_bake(std::move(b));scene.select(id);}
+ return scene;
+}
+void polygon_source8_history(bool physical,bool images,bool mixed) {
+ auto input=polygon_source8(physical,images,mixed);const auto before=input.encode();const auto paint=input.active().painted;
+ check(before.at("version")==42&&Scene::decode(before).encode()==before,"Polygon input is a genuine roundtripping Scene42/Paint8");
+ Document doc;doc.replace(input);const bool ready=doc.wait_mesh();std::cout<<"SOURCE8_POLYGON_INPUT physical="<<physical<<" images="<<images<<" mixed="<<mixed<<" ready="<<ready<<" can_polygon="<<doc.frame().state->can_polygon<<" error="<<doc.frame().state->error<<std::endl;check(ready&&doc.frame().state->error.empty()&&doc.frame().state->can_polygon,"Actual Source8 frame admits the public Polygon command");
+ auto prepare=[&]{doc.begin_polygon(false);check(doc.wait_polygon(),"Source8 Polygon source worker reaches its original deadline");};
+ auto extrude=[&]{doc.edit_polygon(PolygonAction::SelectAll);check(doc.wait_polygon(),"Source8 Polygon selection completes");doc.edit_polygon(PolygonAction::Extrude);check(doc.wait_polygon()&&doc.frame().state->error.empty(),"Source8 Polygon extrusion completes in local history");};
+ prepare();
+ if(physical){check(!doc.frame().state->polygon&&!doc.frame().state->error.empty()&&doc.copy_scene().encode()==before,"Existing FLOAT Source8 Polygon capture refusal remains atomic");return;}
+ extrude();
+ if(images){doc.end_polygon(true);check(doc.wait_polygon()&&!doc.frame().state->error.empty()&&doc.copy_scene().encode()==before,"Existing UV1-image Source8 Polygon Apply refusal retains exact original authority");return;}
+ check(doc.undo()&&doc.wait_polygon()&&!doc.frame().state->polygon->changed&&doc.copy_scene().encode()==before,"Polygon local Undo retains complete Source8 before/current owners");
+ check(doc.redo()&&doc.wait_polygon()&&doc.frame().state->polygon->changed&&doc.copy_scene().encode()==before,"Polygon local Redo does not prematurely replace Source8 scene authority");
+ doc.end_polygon(false);check(!doc.frame().state->polygon&&doc.copy_scene().encode()==before&&!doc.frame().state->can_undo,"Polygon Cancel leaves exact Source8 scene and global history");
+ prepare();extrude();
+ const auto output=std::filesystem::temp_directory_path()/("dome-source8-polygon-"+std::to_string(std::chrono::steady_clock::now().time_since_epoch().count()));std::filesystem::create_directory(output);const auto path=output/"accepted.dsculpt";
+ doc.end_polygon(true);auto saved=doc.save_async(path);saved.get();check(doc.wait_polygon()&&doc.wait_mesh()&&doc.frame().state->error.empty(),"Actual Source8 Polygon Apply and immediately ordered Save complete");
+ auto accepted_scene=doc.copy_scene();const auto accepted=accepted_scene.encode();const auto &current=accepted_scene.active();
+ check(accepted!=before&&accepted.at("version")==42&&current.polygon&&current.polygon->origin&&current.painted->baked()==paint->baked(),"Accepted Polygon derivative retains current bake and genuine source-bearing origin");
+ check(current.polygon->origin->paint->source_sampling_prepared()&&current.polygon->origin->paint->encode()==paint->encode(),"Retained Polygon origin owns exact original/current/baked Source8 graph and hidden sparse layer");
+ check(Scene::load(path).encode()==accepted,"Native Save/reopen forwards actual Scene42 capability into retained-origin preflight");
+ Fbo f;SurfaceRenderer renderer;renderer.set_frame_time(0);f.bind();const auto image=draw(renderer,doc.frame().surface);
+ Document reopened;reopened.open(path);check(reopened.wait_mesh()&&reopened.frame().state->error.empty()&&reopened.copy_scene().encode()==accepted,"Fresh native Document reopens accepted Source8 Polygon graph exactly");f.bind();check(delta(image,draw(renderer,reopened.frame().surface))<=1,"Fresh reopened Polygon Source8 scene renders the same complete production image");
+ check(doc.undo()&&doc.wait_mesh()&&doc.copy_scene().encode()==before&&!doc.frame().state->can_undo,"Accepted Source8 Polygon edit has exactly one global Undo");check(doc.redo()&&doc.wait_mesh()&&doc.copy_scene().encode()==accepted,"Global Redo restores exact retained Source8 Polygon ownership");f.bind();check(delta(image,draw(renderer,doc.frame().surface))<=1,"Global Source8 Polygon Redo restores the actual production render");
+ auto downgraded=accepted.at("payload");bool rejected=false;try{(void)Scene::decode(downgraded);}catch(const std::exception&){rejected=true;}check(rejected,"Unwrapped older Scene cannot borrow genuine nested Paint8 authority");
+ auto wrong_context=accepted;wrong_context["version"]=41;rejected=false;try{(void)Scene::decode(wrong_context);}catch(const std::exception&){rejected=true;}check(rejected,"Genuine FLOAT-only Scene41 capability cannot admit retained Source8 Paint8");
+ auto forged=nlohmann::json{{"format","dome-sculpt"},{"version",42},{"payload",Scene{}.encode()}};rejected=false;try{(void)Scene::decode(forged);}catch(const std::exception&){rejected=true;}check(rejected,"Bare Scene42 wrapper without an actual decoded Source8 owner cannot manufacture admission");
+ auto excessive=accepted;auto &paints=excessive["payload"]["polygon_sources"]["paints"];const auto first=paints.at(0);while(paints.size()<=512)paints.push_back(first);rejected=false;try{(void)Scene::decode(excessive);}catch(const std::exception&){rejected=true;}check(rejected,"Nested Source8 capability forwarding preserves retained-paint record quotas");
+ size_t polls=0;(void)Scene::load(path,[&]{++polls;return false;});check(polls>2,"Owning retained Source8 native read preserves cancellation checkpoints");size_t cancelled=0;rejected=false;try{(void)Scene::load(path,[&]{return ++cancelled>=polls-1;});}catch(const std::exception&){rejected=true;}check(rejected&&doc.copy_scene().encode()==accepted&&Scene::load(path).encode()==accepted,"Late native read cancellation cannot mutate committed Source8 scene or its saved file");
+ std::cout<<"SOURCE8_POLYGON_HISTORY physical="<<physical<<" images="<<images<<" mixed="<<mixed<<" native_polls="<<polls<<" top_version="<<accepted.at("version")<<'\n';std::filesystem::remove_all(output);
+}
+}
+namespace {
+Scene shared_source8(bool physical, bool images, bool mixed) {
+ Scene scene;auto &target=scene.active();target.mesh_active=true;
+ auto maps=std::make_shared<PaintSourceMaps>();auto mesh=quad();
+ if(images){maps->color.image=std::make_shared<const Image>(grid({136,136,136,255}));maps->color.texcoord=1;maps->uv1=std::make_shared<const std::vector<std::array<float,2>>>(std::vector<std::array<float,2>>{{1,0},{0,0},{0,1},{1,1}});}
+ auto original=capture_source_sampling(mesh,maps,64);auto atlas=mesh;
+ for(auto &uv:atlas.uv){uv[0]=.125f+.75f*uv[0];uv[1]=.0625f+.875f*uv[1];}
+ const std::array<uint32_t,4> ids{0,1,2,3};target.painted=prepare_source_paint(original,atlas,ids);
+ target.painted->add_layer("Hidden original polygon data");PaintSettings ink;ink.color={.3f,.2f,.1f,.5f};ink.front_only=false;Brush brush;brush.from=brush.to={0,0,0};brush.normal={0,0,1};brush.radius=.3f;
+ target.painted->begin_stroke();target.painted->stamp(brush,ink);check(target.painted->end_stroke(),"Polygon fixture has actual hidden sparse paint");target.painted->layer_properties("Hidden original polygon data",false,.375f);
+ const auto id=target.id,source=scene.add("Genuine public Bake source",Volume{});auto &o=scene.active();o.mesh_active=true;o.visible=false;o.locked=true;
+ for(auto &p:mesh.positions)p.z=.005f;o.painted=std::make_shared<PaintedMesh>(mesh,64);o.material.emissive={.2f,.3f,.4f};
+ BakedTextures baked;baked.maps.color=grid({136,136,136,255});baked.maps.metal_rough=grid({255,255,0,255});baked.maps.normal=grid({128,128,255,255});baked.coverage.assign(4096,255);
+ if(physical){std::vector<BakedEmissionSample> field(4096);for(auto &v:field)v={{},{8,.000001f,2},1};baked.emission_field=BakedEmissionField::create(64,field);}else baked.maps.emission=grid({32,64,96,255});
+ o.painted->install_bake(std::move(baked));scene.select(id);ObjectBakeSettings options;options.front_mm=10;options.back_mm=2;options.ao_samples=0;options.padding=2;bake_object(scene,source,options);
+ if(mixed){scene.add("Independent ordinary FLOAT sibling",Volume{});auto &s=scene.active();s.mesh_active=true;s.visible=false;s.painted=std::make_shared<PaintedMesh>(quad(),64);BakedTextures b;b.maps.color=grid({136,136,136,255});b.maps.metal_rough=grid({255,255,0,255});b.maps.normal=grid({128,128,255,255});b.coverage.assign(4096,255);std::vector<BakedEmissionSample> f(4096);for(auto &v:f)v={{},{123,.000001f,2},.25f};b.emission_field=BakedEmissionField::create(64,f);s.painted->install_bake(std::move(b));scene.select(id);}
+ return scene;
+}
+
+void shared_publication(bool physical,bool images,bool mixed){
+ auto input=shared_source8(physical,images,mixed);const auto before=input.encode();const auto paint=input.active().painted;check(before.at("version")==42&&Scene::decode(before).encode()==before,"Exact shared4 public Bake input is genuine roundtripping Scene42/Paint8");
+ Document doc;doc.replace(input);doc.shading(false);const bool ready=doc.wait_mesh();std::cout<<"SOURCE8_SHARED_PUBLICATION physical="<<physical<<" images="<<images<<" mixed="<<mixed<<" ready="<<ready<<" error="<<doc.frame().state->error<<std::endl;check(ready&&doc.frame().state->error.empty(),"Exact shared4 Source8 Bake publishes valid material visibility and render geometry");const auto frame=doc.frame().surface;check(frame&&frame->mesh.positions.size()==6&&frame->ranges.size()==1,"Shared4 native vertices expand to six actual current Mikk corners");
+ const auto packet=frame->ranges[0].textures->overlay;check(packet&&packet->original_uv0()&&packet->original_uv0()->size()==6&&packet->contribution_owner()&&packet->contribution_owner()->original_uv0()->size()==4,"Render-only packet retains genuine four-vertex logical root and explicit six-corner mapped view");
+ bool exact=true;for(size_t c=0;c<6;++c){const auto v=frame->mesh.indices[c];exact=exact&&packet->original_uv0()->at(v)==paint->source_sampling_original()->mesh().uv.at(paint->mesh().indices[c]);if(images)exact=exact&&packet->original_uv1()->at(v)==paint->source_maps()->uv1->at(paint->mesh().indices[c]);}check(exact,"Every published logical original UV0/UV1 follows the actual packed corner-to-current-to-authored vertex map");
+ auto control=input;auto ordinary=std::make_shared<PaintedMesh>(paint->mesh(),paint->resolution());ordinary->install_bake(*paint->baked());control.active().painted=std::move(ordinary);Document reference;reference.replace(control);reference.shading(false);check(reference.wait_mesh()&&reference.frame().state->error.empty(),"Independent ordinary current-Mikk baked control publishes");Fbo f;SurfaceRenderer renderer;renderer.set_frame_time(0);f.bind();const auto actual=draw(renderer,frame);f.bind();check(delta(actual,draw(renderer,reference.frame().surface))<=1,"Shared4 Source8 actual rendered RGB8/FLOAT image matches independent ordinary current-Mikk control");check(doc.copy_scene().encode()==before&&input.encode()==before,"Packed logical publication preserves exact authoritative four-vertex Scene and hidden paint/FLOAT owners");check(glGetError()==GL_NO_ERROR,"Shared4 publication and ordinary control leave GL error queue empty");
+}
+}
+int main()try{NativeGraphics graphics;std::cout<<"ACTUAL_RENDERER "<<glGetString(GL_RENDERER)<<'\n';for(bool alpha:{false,true})for(bool typed:{false,true})for(float coverage:{.25f,0x1p-24f})run(typed,coverage,alpha);for(bool physical:{false,true})for(bool images:{false,true})polygon_source8_history(physical,images,false);polygon_source8_history(false,false,true);for(bool physical:{false,true})for(bool images:{false,true})shared_publication(physical,images,false);shared_publication(false,false,true);for(bool alpha:{false,true})for(bool typed:{false,true})for(float coverage:{.25f,0x1p-24f})run(typed,coverage,alpha,true);std::cout<<"PASS "<<checks<<" Source8 actual visible normal/FLOAT/ownership controls\n";return 0;}catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
