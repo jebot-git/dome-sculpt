@@ -742,7 +742,7 @@ SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,
   size_t texels=0,vertices=0,tile_bytes=0,metadata=0;
   std::function<void(const nlohmann::json&)> preflight_paint=[&](const nlohmann::json &record) {
     const auto &paint=detail::paint_archive_payload(record,native_paint||canonical_paint||detail::material_archive_base_version(input)==9||(keyed&&keyed_paint),context);
-    if(record.contains("version")&&record.at("version")==4){
+    if(record.contains("version")&&(record.at("version")==4||record.at("version")==8)){
       tile_bytes+=record.at("vertices").get_binary().size();preflight_paint(record.at("before"));
     }
     if(paint.contains("source_maps"))tile_bytes+=detail::source_uv_archive_measure(paint.at("source_maps")).bytes;

@@ -702,21 +702,26 @@ nlohmann::json Scene::encode() const {
   if(!layered_normals.empty())j["baked_normal_fields"]=layered_normals.encode();
   j["source_images"] = source_images.encode();
   j["source_models"] = source_models.encode();
+  baked_emission_write.publish(*this);
+  if(baked_emission_write.source_bake_emitted())
+    return {{"format","dome-sculpt"},{"version",42},{"payload",std::move(j)}};
   if(baked_emission_write.emitted())
     return {{"format","dome-sculpt"},{"version",41},{"payload",std::move(j)}};
   return j;
 }
 Scene Scene::decode(const nlohmann::json &j) {
   detail::NativeReadScope::check();
-  if(j.is_object()&&j.contains("version")&&j.at("version")==41){
+  if(j.is_object()&&j.contains("version")&&(j.at("version")==41||j.at("version")==42)){
+    const bool source_bake=j.at("version")==42;
     if(j.size()!=3||!j.at("version").is_number_integer()||j.at("format")!="dome-sculpt"||!j.at("payload").is_object()||
        !j.at("payload").at("version").is_number_integer()||
        j.at("payload").at("version").get<int64_t>()<2||
        j.at("payload").at("version").get<int64_t>()>40)
       throw std::invalid_argument("Scene41 requires one genuine prior owning scene, not nested envelopes");
-    detail::BakedEmissionReadCapability capability;
+    detail::BakedEmissionReadCapability capability(source_bake);
     auto result=decode_owning(j.at("payload"),&capability);
-    if(!capability.admitted_)throw std::invalid_argument("Scene41 requires genuine decoded FLOAT baked emission ownership");
+    if(source_bake){if(!capability.admitted_source_bake_)throw std::invalid_argument("Scene42 requires genuine decoded source Bake ownership");}
+    else if(!capability.admitted_)throw std::invalid_argument("Scene41 requires genuine decoded FLOAT baked emission ownership");
     return result;
   }
   return decode_owning(j,nullptr);
@@ -1027,7 +1032,7 @@ Scene Scene::decode_owning(const nlohmann::json &j,
     preflight_grid=[&](const nlohmann::json &record,std::optional<bool> source_physical) {
       if(record.is_null())return;const auto &paint=detail::paint_archive_payload(record,paint_context,source_paint_context);
       if(source_physical&&(version!=40||record.contains("version")||record.contains("mesh")))throw std::invalid_argument("Source grid requires its actual inspected shared field envelope");
-      if(record.contains("version")&&record.at("version")==4){
+      if(record.contains("version")&&(record.at("version")==4||record.at("version")==8)){
         storage+=record.at("vertices").get_binary().size();preflight(record.at("before"));
       }
       if(paint.contains("source_maps")){auto coordinates=detail::source_uv_archive_measure(paint.at("source_maps"),unsigned(version));storage+=coordinates.bytes;}

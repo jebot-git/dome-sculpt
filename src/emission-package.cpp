@@ -332,7 +332,7 @@ std::optional<Scene> extract_native_emission(std::span<const uint8_t> bytes,cons
  }
  stop(limits.cancelled);std::vector<uint8_t> expanded;if(compressed){expanded=native_deflate(native,false,decoded_bytes,limits.cancelled);native=expanded;}cbor_preflight(native,limits.cancelled);const auto value=Json::from_cbor(native.begin(),native.end(),true,true);detail::NativeReadScope native_read(limits.cancelled);auto result=Scene::decode(value);for(auto id:owners)result.object(id);
  for(auto id:resolved_owners){const auto &object=result.object(id);
-  if(value.at("version")!=41||!object.mesh_active||!object.painted||!object.painted->baked()||!object.painted->baked()->emission_field)
+  if((value.at("version")!=41&&value.at("version")!=42)||!object.mesh_active||!object.painted||!object.painted->baked()||!object.painted->baked()->emission_field)
    throw std::invalid_argument("Resolved fallback2 requires its actual Scene41 current FLOAT field owner");
  }
  for(const auto &entry:images)if(resolved_owners.contains(entry.at("object").get<uint64_t>())&&!entry.contains("domain")){
