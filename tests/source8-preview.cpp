@@ -5,6 +5,7 @@
 #include "dome/document.hpp"
 #include "dome/material-bindings.hpp"
 #include "dome/source-paint.hpp"
+#include "dome/bake-authoring.hpp"
 #include "source4-baked.hpp"
 #include "source-paint-parameters.hpp"
 #include <future>
@@ -106,4 +107,51 @@ void run(bool typed_view,float emission_coverage,bool alpha){
  check(glGetError()==GL_NO_ERROR,"Source8 preview and independent controls leave the real GL error queue empty");
 }
 }
-int main()try{NativeGraphics graphics;std::cout<<"ACTUAL_RENDERER "<<glGetString(GL_RENDERER)<<'\n';for(bool alpha:{false,true})for(bool typed:{false,true})for(float coverage:{.25f,0x1p-24f})run(typed,coverage,alpha);std::cout<<"PASS "<<checks<<" Source8 actual visible normal/FLOAT/ownership controls\n";return 0;}catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
+namespace {
+Scene polygon_source8(bool physical, bool images, bool mixed) {
+ Scene scene;auto &target=scene.active();target.mesh_active=true;
+ auto maps=std::make_shared<PaintSourceMaps>();auto mesh=quad();
+ if(images){maps->color.image=std::make_shared<const Image>(grid({136,136,136,255}));maps->color.texcoord=1;maps->uv1=std::make_shared<const std::vector<std::array<float,2>>>(std::vector<std::array<float,2>>{{1,0},{0,0},{0,1},{1,1}});}
+ auto original=capture_source_sampling(mesh,maps,64);auto atlas=mesh;
+ for(auto &uv:atlas.uv){uv[0]=.125f+.75f*uv[0];uv[1]=.0625f+.875f*uv[1];}
+ const std::array<uint32_t,4> ids{0,1,2,3};target.painted=prepare_source_paint(original,atlas,ids);
+ target.painted->add_layer("Hidden original polygon data");PaintSettings ink;ink.color={.3f,.2f,.1f,.5f};ink.front_only=false;Brush brush;brush.from=brush.to={0,0,0};brush.normal={0,0,1};brush.radius=.3f;
+ target.painted->begin_stroke();target.painted->stamp(brush,ink);check(target.painted->end_stroke(),"Polygon fixture has actual hidden sparse paint");target.painted->layer_properties("Hidden original polygon data",false,.375f);
+ const auto id=target.id,source=scene.add("Genuine public Bake source",Volume{});auto &o=scene.active();o.mesh_active=true;o.visible=false;o.locked=true;
+ for(auto &p:mesh.positions)p.z=.005f;o.painted=std::make_shared<PaintedMesh>(mesh,64);o.material.emissive={.2f,.3f,.4f};
+ BakedTextures baked;baked.maps.color=grid({136,136,136,255});baked.maps.metal_rough=grid({255,255,0,255});baked.maps.normal=grid({128,128,255,255});baked.coverage.assign(4096,255);
+ if(physical){std::vector<BakedEmissionSample> field(4096);for(auto &v:field)v={{},{8,.000001f,2},1};baked.emission_field=BakedEmissionField::create(64,field);}else baked.maps.emission=grid({32,64,96,255});
+ o.painted->install_bake(std::move(baked));scene.select(id);ObjectBakeSettings options;options.front_mm=10;options.back_mm=2;options.ao_samples=0;options.padding=2;bake_object(scene,source,options);
+ if(mixed){scene.add("Independent ordinary FLOAT sibling",Volume{});auto &s=scene.active();s.mesh_active=true;s.visible=false;s.painted=std::make_shared<PaintedMesh>(quad(),64);BakedTextures b;b.maps.color=grid({136,136,136,255});b.maps.metal_rough=grid({255,255,0,255});b.maps.normal=grid({128,128,255,255});b.coverage.assign(4096,255);std::vector<BakedEmissionSample> f(4096);for(auto &v:f)v={{},{123,.000001f,2},.25f};b.emission_field=BakedEmissionField::create(64,f);s.painted->install_bake(std::move(b));scene.select(id);}
+ return scene;
+}
+void polygon_source8_history(bool physical,bool images,bool mixed) {
+ auto input=polygon_source8(physical,images,mixed);const auto before=input.encode();const auto paint=input.active().painted;
+ check(before.at("version")==42&&Scene::decode(before).encode()==before,"Polygon input is a genuine roundtripping Scene42/Paint8");
+ Document doc;doc.replace(input);check(doc.wait_mesh()&&doc.frame().state->error.empty()&&doc.frame().state->can_polygon,"Actual Source8 frame admits the public Polygon command");
+ auto prepare=[&]{doc.begin_polygon(false);check(doc.wait_polygon(),"Source8 Polygon source worker reaches its original deadline");};
+ auto extrude=[&]{doc.edit_polygon(PolygonAction::SelectAll);check(doc.wait_polygon(),"Source8 Polygon selection completes");doc.edit_polygon(PolygonAction::Extrude);check(doc.wait_polygon()&&doc.frame().state->error.empty(),"Source8 Polygon extrusion completes in local history");};
+ prepare();
+ if(physical){check(!doc.frame().state->polygon&&!doc.frame().state->error.empty()&&doc.copy_scene().encode()==before,"Existing FLOAT Source8 Polygon capture refusal remains atomic");return;}
+ extrude();
+ if(images){doc.end_polygon(true);check(doc.wait_polygon()&&!doc.frame().state->error.empty()&&doc.copy_scene().encode()==before,"Existing UV1-image Source8 Polygon Apply refusal retains exact original authority");return;}
+ check(doc.undo()&&doc.wait_polygon()&&!doc.frame().state->polygon->changed&&doc.copy_scene().encode()==before,"Polygon local Undo retains complete Source8 before/current owners");
+ check(doc.redo()&&doc.wait_polygon()&&doc.frame().state->polygon->changed&&doc.copy_scene().encode()==before,"Polygon local Redo does not prematurely replace Source8 scene authority");
+ doc.end_polygon(false);check(!doc.frame().state->polygon&&doc.copy_scene().encode()==before&&!doc.frame().state->can_undo,"Polygon Cancel leaves exact Source8 scene and global history");
+ prepare();extrude();
+ const auto output=std::filesystem::temp_directory_path()/("dome-source8-polygon-"+std::to_string(std::chrono::steady_clock::now().time_since_epoch().count()));std::filesystem::create_directory(output);const auto path=output/"accepted.dsculpt";
+ doc.end_polygon(true);auto saved=doc.save_async(path);saved.get();check(doc.wait_polygon()&&doc.wait_mesh()&&doc.frame().state->error.empty(),"Actual Source8 Polygon Apply and immediately ordered Save complete");
+ auto accepted_scene=doc.copy_scene();const auto accepted=accepted_scene.encode();const auto &current=accepted_scene.active();
+ check(accepted!=before&&accepted.at("version")==42&&current.polygon&&current.polygon->origin&&current.painted->baked()==paint->baked(),"Accepted Polygon derivative retains current bake and genuine source-bearing origin");
+ check(current.polygon->origin->paint->source_sampling_prepared()&&current.polygon->origin->paint->encode()==paint->encode(),"Retained Polygon origin owns exact original/current/baked Source8 graph and hidden sparse layer");
+ check(Scene::load(path).encode()==accepted,"Native Save/reopen forwards actual Scene42 capability into retained-origin preflight");
+ Fbo f;SurfaceRenderer renderer;renderer.set_frame_time(0);f.bind();const auto image=draw(renderer,doc.frame().surface);
+ Document reopened;reopened.open(path);check(reopened.wait_mesh()&&reopened.frame().state->error.empty()&&reopened.copy_scene().encode()==accepted,"Fresh native Document reopens accepted Source8 Polygon graph exactly");f.bind();check(delta(image,draw(renderer,reopened.frame().surface))<=1,"Fresh reopened Polygon Source8 scene renders the same complete production image");
+ check(doc.undo()&&doc.wait_mesh()&&doc.copy_scene().encode()==before&&!doc.frame().state->can_undo,"Accepted Source8 Polygon edit has exactly one global Undo");check(doc.redo()&&doc.wait_mesh()&&doc.copy_scene().encode()==accepted,"Global Redo restores exact retained Source8 Polygon ownership");f.bind();check(delta(image,draw(renderer,doc.frame().surface))<=1,"Global Source8 Polygon Redo restores the actual production render");
+ auto downgraded=accepted.at("payload");bool rejected=false;try{(void)Scene::decode(downgraded);}catch(const std::exception&){rejected=true;}check(rejected,"Unwrapped older Scene cannot borrow genuine nested Paint8 authority");
+ auto excessive=accepted;auto &paints=excessive["payload"]["polygon_sources"]["paints"];const auto first=paints.at(0);while(paints.size()<=512)paints.push_back(first);rejected=false;try{(void)Scene::decode(excessive);}catch(const std::exception&){rejected=true;}check(rejected,"Nested Source8 capability forwarding preserves retained-paint record quotas");
+ size_t polls=0;(void)Scene::load(path,[&]{++polls;return false;});check(polls>2,"Owning retained Source8 native read preserves cancellation checkpoints");size_t cancelled=0;rejected=false;try{(void)Scene::load(path,[&]{return ++cancelled>=polls-1;});}catch(const std::exception&){rejected=true;}check(rejected&&doc.copy_scene().encode()==accepted&&Scene::load(path).encode()==accepted,"Late native read cancellation cannot mutate committed Source8 scene or its saved file");
+ std::cout<<"SOURCE8_POLYGON_HISTORY physical="<<physical<<" images="<<images<<" mixed="<<mixed<<" native_polls="<<polls<<" top_version="<<accepted.at("version")<<'\n';std::filesystem::remove_all(output);
+}
+}
+int main()try{NativeGraphics graphics;std::cout<<"ACTUAL_RENDERER "<<glGetString(GL_RENDERER)<<'\n';for(bool alpha:{false,true})for(bool typed:{false,true})for(float coverage:{.25f,0x1p-24f})run(typed,coverage,alpha);for(bool physical:{false,true})for(bool images:{false,true})polygon_source8_history(physical,images,false);polygon_source8_history(false,false,true);std::cout<<"PASS "<<checks<<" Source8 actual visible normal/FLOAT/ownership controls\n";return 0;}catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
