@@ -1,3 +1,58 @@
+## Current round closed; user-requested pause — 2026-11-12
+
+The user requested “Pause after this round.” The running jobs have finished;
+all three delegated agents are stopped, with no owned active handles or graphics
+lease. The full production goal is incomplete and paused. Do not start another
+build, test, feature or installation round until the user resumes it. This
+entry supersedes older active/pending entries below, which remain historical.
+
+The preserved source checkpoint is commit `3d164382` on branch
+`work/authoring-paused-uv-domain-20261112`, worktree
+`artifacts/authoring-paused-uv-domain-20261112`. It combines frozen application
+ad99ff8b, qualified missing-logical-UV1 source e10b2456/product41ac6f7b and latest
+main metadata/history. Relative to ad99, only CMake, the complete emission source
+TU and the new missing-UV1 test change outside documentation. Artist-normal WIP
+is excluded. This final combined source has NOT been whole-built or admitted to
+main. Its prospective native selection is87, retaining every prior86 case.
+
+The guard passes62 new controls plus19 retained regressions in both Release and
+strict ASan/UBSan. Original old-core counterfactuals fail in both profiles; all
+source/provider drift is zero. Actual LDR/HDR Bake and dependent Save refuse a
+missing authored emission UV1 instead of using the generated PBR carrier, while
+valid prepared/unprepared UV1 and unused-image physical-background paths pass.
+Exact cancellation, Scene/history/path and prior-file preservation are covered.
+See [missing-UV1 proof](SOURCE-ROLE-MISSING-UV1-20261112.md).
+
+Pre-guard ad99 Release build64944 completed3 generators/264 complete TUs/686
+archive-links with zero drift. Exact86 native tests, workspace27/373/raw90159,
+source producers, four-case fixture/font checks and manual source rendering
+passed, including authenticated Intel Arc hardware. These are scoped ad99
+results, not final87 or physical-headset acceptance. Public desktop stopped
+following39 passing checks because the monitor read mountinfo while its owned
+process retired. Ten CPU controls qualify the v2 witness rollback; no repaired
+application/GL replay ran. Preserve the failure and read
+[monitor witness proof](PUBLIC-PROC-MOUNTINFO-WITNESS-V2-20261112.md).
+
+The already-running frozen5c strict sanitizer baseline15864 completed terminal0:
+3 generators,265 whole TUs,685 archive-links,1764 outputs,4606.786 seconds and
+zero final input drift. No product runtime/tests ran. Its known sampling defect
+prevents admission; it does not qualify ad99 or the final guard checkpoint.
+See [baseline-only seal](5C-SANITIZER-BASELINE-BUILD-20261112.md).
+
+On resume, inspect processes and immutable source/providers before deriving new
+matching whole-owner Release and strict sanitizer plans for the final87 source.
+Then qualify its exact native/helper/producer/font/manual consumers and public
+GUI/real-loader XR under unchanged assertions and limits. Retain all original
+timeouts, contrast failures, monitor failures and counterfactuals. Preserve the
+separate artist-normal branches and their outstanding consumer/graphics work.
+Main runtime remains the earlier qualified integration; this round publishes
+metadata only there. DomeD source/SDK used at the ad99 freeze was acc2b70a.
+No installation, physical-HMD launch or session restart occurred in this round.
+
+All original authoring, interoperation, device and accelerator requirements
+remain required. Later controller trays and spatial node editing/history remain
+queued; ArmorPaint remains a source/component assessment, not full integration.
+[Pinned pause receipt](validation/AUTHORING-PAUSE-20261112.json).
 ## New role-domain candidate frozen; combined Release compilation running — 2026-11-12
 
 New sourcead99ff8ba005c6cc4a22dfe5fcd6d1e2e4dec3e7 is FROZEN/CLEAN/PUSHED at

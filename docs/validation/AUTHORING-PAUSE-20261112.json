@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "status": "paused after current round by explicit user request",
+  "source_checkpoint_parent": "0d170efd32efa34a649a62fdbf5af9f3b4e2a767",
+  "branch": "work/authoring-paused-uv-domain-20261112",
+  "application_base": "ad99ff8ba005c6cc4a22dfe5fcd6d1e2e4dec3e7",
+  "guard_source": "e10b2456c927ff72d2799fec54df85b65df85167",
+  "guard_product": "41ac6f7bcf41358610a47274c8243cfd73f4c57f",
+  "non_document_delta_from_ad99": [
+    "CMakeLists.txt",
+    "src/emission-bake-source.cpp",
+    "tests/source-role-domain-missing-uv1.cpp"
+  ],
+  "verified_receipts": [
+    {
+      "path": "artifacts/source-artist-normal-proof-20261112/missing-logical-uv1-handoff-e10.json",
+      "sha256": "bb071ac49790e5d387647fa02ebfbbb19e5f50319c2160e8107176e6347c21b5"
+    },
+    {
+      "path": "artifacts/source-artist-normal-proof-20261112/missing-repair-release-v33/status.json",
+      "sha256": "e8e21f2f5fe4df914cd1d3fa241077f1db1c35d2eb3e58ee3486df3eba49bd7c"
+    },
+    {
+      "path": "artifacts/source-artist-normal-proof-20261112/missing-repair-sanitize-v33/status.json",
+      "sha256": "84797d5fa33dbc73dc3467348dd1edf6ba6f69167f91d3846994589d4d9c3b6f"
+    },
+    {
+      "path": "artifacts/source8-final-owning-plan-20261112/release-ad99-v1-native/status.json",
+      "sha256": "01ae44e3b72beae0369180dfc97ca5102cb19dee0ff99938d1dc1a177cba75d0"
+    },
+    {
+      "path": "artifacts/source8-final-owning-plan-20261112/release-ad99-v1-fixtures/status.json",
+      "sha256": "e71825368ec37dfdc095c71e00d682a8d327da8f248ead89865432a377566601"
+    },
+    {
+      "path": "artifacts/source8-final-owning-plan-20261112/release-ad99-v1-manual-arc/status.json",
+      "sha256": "7db54687da566914b18dac59311842cefcec0d24618ffd634815efd3884a6600"
+    }
+  ],
+  "new_combined_build_executed": false,
+  "prospective_native_cases": 87,
+  "full_goal_complete": false,
+  "main_runtime_admission": false,
+  "install_or_HMD_launch": false,
+  "agents": "All three delegated agents completed and report no owned active handle or graphics lease.",
+  "resume": "Inspect sources/processes and rederive exact whole-owner Release/strictSAN plans for final87 candidate before any runtime admission; preserve all historical failures and providers.",
+  "published_checkpoint": "3d164382"
+}
