@@ -223,7 +223,7 @@ async def main():
   check(descriptor['maximum_rgb_difference']==3 and max(abs(a-b)for a,b in zip(actual_rgb,expected_rgb))<=3,'Visible Source8 probe'+str(probe)+' matches independent original/current normal/FLOAT ordinary material control within original renderer bound3')
   check(descriptor['minimum_geometry_counterfactual_difference']==12 and max(abs(a-b)for a,b in zip(expected_rgb,hidden_rgb))>=12,'Visible Source8 probe'+str(probe)+' is actual geometry rather than shared empty/background pixels')
   (out/('source8-probe-'+str(probe)+'.json')).write_text(json.dumps({**descriptor,'actual_RGB':actual_rgb,'independent_RGB':expected_rgb,'hidden_RGB':hidden_rgb,'without_baked_detail_RGB':wrong_rgb},indent=2)+'\n')
- check(manifest['visible_minimum_case_normal_effect']==3 and max(v['independent_effect']for v in normal_effects)>=3 and max(v['actual_effect']for v in normal_effects)>=3,'Actual visible Source8 has measurable independent baked-normal sensitivity across declared four probes')
+ check(manifest['visible_minimum_case_normal_effect']==7 and any(v['independent_effect']>=7 and v['actual_effect']>3 for v in normal_effects),'Actual visible Source8 has disjoint independent baked-normal acceptance intervals and wrong-normal rejection across declared four probes')
  (out/'source8-normal-sensitivity.json').write_text(json.dumps(normal_effects,indent=2)+'\n')
  d.close();bus.disconnect();report(True)
 try:asyncio.run(asyncio.wait_for(main(),900))

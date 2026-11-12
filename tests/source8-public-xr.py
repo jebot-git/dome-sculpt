@@ -155,7 +155,7 @@ try:
    check(descriptor['minimum_geometry_counterfactual_difference']==12 and max(abs(a-b)for a,b in zip(wanted,hidden))>=12,'Actual eye'+str(eye)+' Source8 probe'+str(probe)+' cannot pass from shared empty/background imagery')
    (out/('source8-eye'+str(eye)+'-probe'+str(probe)+'.json')).write_text(json.dumps({**descriptor,'actual_RGB':got,'independent_RGB':wanted,'hidden_RGB':hidden,'without_baked_detail_RGB':wrong_rgb},indent=2)+'\n')
 
- for eye in [0,1]:check(manifest['visible_minimum_case_normal_effect']==3 and max(v['independent_effect']for v in normal_effects[eye])>=3 and max(v['actual_effect']for v in normal_effects[eye])>=3,'Actual eye'+str(eye)+' Source8 retains independently measurable normal-detail sensitivity')
+ for eye in [0,1]:check(manifest['visible_minimum_case_normal_effect']==7 and any(v['independent_effect']>=7 and v['actual_effect']>3 for v in normal_effects[eye]),'Actual eye'+str(eye)+' Source8 retains disjoint correct/wrong-normal acceptance intervals and actual wrong-normal rejection')
  (out/'source8-normal-sensitivity.json').write_text(json.dumps(normal_effects,indent=2)+'\n')
  check(not [p for p,v in pins.items() if sha(p)!=v],'All application/runtime/inspector/native fixture/script inputs remain unchanged')
  report(True)

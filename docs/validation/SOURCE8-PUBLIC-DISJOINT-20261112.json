@@ -1,0 +1,111 @@
+{
+  "state": "disjoint-negative-source-draft-NOT-executable-qualified",
+  "parent_source": "3f03ff104ad3d7783dde55a6efca26e5214b9d06",
+  "source_files": {
+    "tests/source8-public-fixture.cpp": "26dfb0bacabbb7edd5256988fe14b09bee387b584069158774f2b3fcf29c110b",
+    "tests/source8-public-menu.py": "131a5fc17859cad75b892b71497e7ef7154e9d412b9b91d960dc3cfe91dfaaeb",
+    "tests/source8-public-xr.py": "a2dba351bd0081984813060d673e17a54d307c889afab106d222c837d119df1e",
+    "tests/source8-public-runtime.cpp": "d6e6384ba3480b0c93bf128461d3d6ff0e6ebe7324a363da53d39471189db841",
+    "docs/SOURCE8-PUBLIC-WORKFLOW-CONTRACT-20261112.md": "89afacd022f9adea6fd37e9624d3cd8d19984c045729ac5d936f0df3eb037710"
+  },
+  "static_checks": {
+    "menu": {
+      "Python_syntax": true,
+      "actual_AST_interval_controls": [
+        {
+          "name": "overlap3",
+          "accepted_negative_gate": false,
+          "expected": false
+        },
+        {
+          "name": "touching6",
+          "accepted_negative_gate": false,
+          "expected": false
+        },
+        {
+          "name": "disjoint7_edge",
+          "accepted_negative_gate": true,
+          "expected": true
+        },
+        {
+          "name": "actual_is_wrong",
+          "accepted_negative_gate": false,
+          "expected": false
+        },
+        {
+          "name": "actual_still_close_to_wrong",
+          "accepted_negative_gate": false,
+          "expected": false
+        }
+      ],
+      "SHA256": "131a5fc17859cad75b892b71497e7ef7154e9d412b9b91d960dc3cfe91dfaaeb"
+    },
+    "xr": {
+      "Python_syntax": true,
+      "actual_AST_interval_controls": [
+        {
+          "name": "overlap3",
+          "accepted_negative_gate": false,
+          "expected": false
+        },
+        {
+          "name": "touching6",
+          "accepted_negative_gate": false,
+          "expected": false
+        },
+        {
+          "name": "disjoint7_edge",
+          "accepted_negative_gate": true,
+          "expected": true
+        },
+        {
+          "name": "actual_is_wrong",
+          "accepted_negative_gate": false,
+          "expected": false
+        },
+        {
+          "name": "actual_still_close_to_wrong",
+          "accepted_negative_gate": false,
+          "expected": false
+        }
+      ],
+      "SHA256": "a2dba351bd0081984813060d673e17a54d307c889afab106d222c837d119df1e"
+    }
+  },
+  "preserved_existing_sources": {
+    "tests/baked-emission-menu.py": "3119204ef5b40f0766640a7dcfec50dcd2479a103bdd4c0e93f9d68c35f7d1d0",
+    "tests/baked-emission-xr.py": "3db681141165dc7c3bd0aa38bb71d2732da0f597ae4239e92182a808bcbe260b",
+    "tests/baked-emission-runtime.cpp": "646151cff1953280ee1c854c10c4194b22d6037700a6ef7c710d4e7dd4f13c41",
+    "tests/baked-emission-workflow.cpp": "bbaefd41fc6176a7abc92f1de13e1039fd50764f8102aafab14334f86bbe1b1e",
+    "tests/source8-preview.cpp": "1f077fe46638d5789d2e17dcd4405fd784c853b8ad927d2415542ebb78f45be6"
+  },
+  "syntax_initial3f": {
+    "receipt": "artifacts/source8-public-syntax-3f-20261112/status.json",
+    "fixture_exit": 0,
+    "runtime_exit": 0,
+    "input_drift": [],
+    "mode": "Exact configuredRelease options relocated to identical isolated3f; -fsyntax-only, no product execution/object writes"
+  },
+  "stronger_contract": {
+    "correct_RGB_bound": 3,
+    "expected_vs_wrong_gap_min": 7,
+    "actual_vs_wrong_gap_strictly_greater_than": 3,
+    "same_probe_required": true,
+    "per_case_and_per_XR_eye": true,
+    "visible_left_normal": [
+      128,
+      30,
+      190
+    ],
+    "visible_right_normal": [
+      211,
+      102,
+      236
+    ],
+    "old_planar_worker_normals_unchanged": true,
+    "case_or_probe_dropped": false,
+    "bounds_weakened": false
+  },
+  "new_child_syntax_pending": true,
+  "public_or_native_execution": false
+}
