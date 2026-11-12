@@ -1,30 +1,25 @@
-## Repaired combined Release build executing — 2026-11-12
+## Combined Release owning build complete; qualification continues — 2026-11-12
 
-Frozen5c820f is unchanged. The new generated/compile/link DAG audit2370 is
-terminal0 with1030 TUs (263 fresh/767 exact whole objects),685 fresh/46 exact
-archive/link products, exactly3 genuine generators and85 selected native tests.
-Root independently verified the eight-layer topological closure and reviewed
-runnerbd41e490. The derived plan f12b1ec5 adds only toolchain pins/metadata to
-reviewed f2d16263. Read
+Frozen5c820f owning execution38148 is terminal0:3 genuine generators,263 fresh
+complete TUs and685 fresh archive/link steps succeeded;767 whole objects and46
+whole products were authenticated reuses. Final inputdrift is empty, no child
+remains, and root independently verified manifests for1764 owned outputs and813
+staged providers. Read
 [AUTHORING-RELEASE-GENERATED-DAG-20261112.md](AUTHORING-RELEASE-GENERATED-DAG-20261112.md).
 
-Actual execution38148/PID4039661 is LIVE: the current blur generator produced
-its required exact SHA, the previously failing paint-blur TU compiled, and root
-observed21 whole TUs complete with live compiler children. Full links and all
-native/public gates remain pending. The failed first execution73720 and v2
-metadata sentinel failure are preserved; no source/provider/flag weakening.
+Actual current85 native/helpers/raw qualification62399 is running. Fresh current
+producer/font, manual rendering and public desktop/OpenXR gates still follow;
+this build result is not public/physical/performance acceptance.
 
-Joint Source8 d07 Release AND strict sanitizer pass969 critical controls, Bake4,
-fixture generators3 and all17 affected historical consumers with zero drift.
-The separate old cc5 sanitizer remainder80747/PID3950346 is live with72 of100
-links complete after1642 independent verified copies. Its original7200-second
-ALL timeout remains failure; no remainder native pass is claimed yet.
+This branch is a PREPARED merge, not admitted main. Its parents preserve main39b
+and frozen5c; every1709 non-doc Git record matches frozen5c exactly. Read
+[AUTHORING-MAIN-MERGE-STAGING-20261112.md](AUTHORING-MAIN-MERGE-STAGING-20261112.md).
+Only documentation changes here while current5c qualification continues.
 
-Isolated artist-normal source cbae1fa4 passes actual CPU139 and legacy scopes,
-including genuine imported VRM1 normal-affine export/restoration. StrictSAN
-owning qualification34874 has begun; rendering/CC0 proofs remain pending. This
-future component is not in frozen5c. Full production goal remains active and
-incomplete; no installation, physical headset launch or session restart.
+Separate old cc5 strictSAN completion80747 has passed all100 links, exact82
+native cases, helpers27/373 and raw90159. Final original/provider/copy hash audit
+is still running; its original7200-second ALL timeout remains failure. Full
+production requirements remain active/incomplete; no install/session restart.
 
 ## Repaired85-test application source frozen; new owning audit live — 2026-11-12
 
