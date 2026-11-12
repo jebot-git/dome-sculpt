@@ -5136,8 +5136,11 @@ if(BUILD_TESTING)
   set_tests_properties(rig-fit-anatomical PROPERTIES TIMEOUT 180)
 endif()
 
-# Distinguish transported resolved PBR carriers from retained logical artist UVs.
-add_executable(dome-sculpt-source-role-domain-emission-test tests/source-role-domain-emission.cpp)
-target_include_directories(dome-sculpt-source-role-domain-emission-test PRIVATE src)
-target_link_libraries(dome-sculpt-source-role-domain-emission-test PRIVATE dome-sculpt-core)
-add_test(NAME source-role-domain-emission COMMAND dome-sculpt-source-role-domain-emission-test ${CMAKE_CURRENT_BINARY_DIR}/source-role-domain-emission.dsculpt)
+if(BUILD_TESTING)
+  # Distinguish transported PBR carriers from retained logical artist UVs.
+  add_executable(dome-sculpt-source-role-domain-emission-test tests/source-role-domain-emission.cpp)
+  target_include_directories(dome-sculpt-source-role-domain-emission-test PRIVATE src)
+  target_link_libraries(dome-sculpt-source-role-domain-emission-test PRIVATE dome-sculpt-core)
+  add_test(NAME source-role-domain-emission COMMAND dome-sculpt-source-role-domain-emission-test ${CMAKE_CURRENT_BINARY_DIR}/source-role-domain-emission.dsculpt)
+  set_tests_properties(source-role-domain-emission PROPERTIES TIMEOUT 180)
+endif()
