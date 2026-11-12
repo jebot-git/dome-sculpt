@@ -1,0 +1,280 @@
+{
+  "scope": "CPU-only exact owned-process mountinfo exit-race diagnosis and narrow monitor adapter. No completed public GUI or new app/GL retry; ad99 remains an immutable product baseline under separate typed-UV1 hold.",
+  "product_source": "ad99ff8ba005c6cc4a22dfe5fcd6d1e2e4dec3e7",
+  "public_failure": {
+    "exit": 1,
+    "workflow_prefix_passed": 39,
+    "ten_public_Bake_history_checks_passed": true,
+    "workflow_complete": false,
+    "error": "OSError(22, 'Invalid argument')",
+    "final_all_owned_absent": true,
+    "owned_identity_count": 34,
+    "input_drift": []
+  },
+  "natural_CPU_races": {
+    "children": 256,
+    "errors": [
+      {
+        "pid": 825753,
+        "operation": "actual-shared-map-monitor",
+        "exception": "OSError(22, 'Invalid argument')",
+        "errno": 22,
+        "traceback": "Traceback (most recent call last):\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/public-proc-exit-diagnostic-20261112/probe.py\", line 21, in <module>\n    try:fn()\n        ~~^^\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/public-proc-exit-diagnostic-20261112/probe.py\", line 20, in <lambda>\n    ('actual-shared-map-monitor',lambda:g.monitor(child,owned,critical,critical_stat,set(),{}, {},stage))]:\n                                        ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/graphics-v3.py\", line 158, in monitor\n    fp=elf_fingerprint(path,dev,ino,n)\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/graphics-v3.py\", line 127, in elf_fingerprint\n    certificate=certify_mapping(path,dev,ino,pid)\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/mount_identity.py\", line 41, in certify_mapping\n    proof=current_identity(path,pid)\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/mount_identity.py\", line 20, in current_identity\n    child=covering(pid,path);local=covering('self',path)\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/mount_identity.py\", line 11, in covering\n    for raw in(Path('/proc')/str(pid)/'mountinfo').read_text().splitlines():\n              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^\n  File \"/usr/lib64/python3.14/pathlib/__init__.py\", line 787, in read_text\n    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:\n         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib64/python3.14/pathlib/__init__.py\", line 771, in open\n    return io.open(self, mode, buffering, encoding, errors, newline)\n           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nOSError: [Errno 22] Invalid argument: '/proc/825753/mountinfo'\n",
+        "identity_now": {
+          "start": 38658544,
+          "pgrp": 825753,
+          "ppid": 825641,
+          "state": "Z"
+        }
+      },
+      {
+        "pid": 825756,
+        "operation": "actual-shared-map-monitor",
+        "exception": "OSError(22, 'Invalid argument')",
+        "errno": 22,
+        "traceback": "Traceback (most recent call last):\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/public-proc-exit-diagnostic-20261112/probe.py\", line 21, in <module>\n    try:fn()\n        ~~^^\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/public-proc-exit-diagnostic-20261112/probe.py\", line 20, in <lambda>\n    ('actual-shared-map-monitor',lambda:g.monitor(child,owned,critical,critical_stat,set(),{}, {},stage))]:\n                                        ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/graphics-v3.py\", line 158, in monitor\n    fp=elf_fingerprint(path,dev,ino,n)\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/graphics-v3.py\", line 127, in elf_fingerprint\n    certificate=certify_mapping(path,dev,ino,pid)\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/mount_identity.py\", line 41, in certify_mapping\n    proof=current_identity(path,pid)\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/mount_identity.py\", line 20, in current_identity\n    child=covering(pid,path);local=covering('self',path)\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/mount_identity.py\", line 11, in covering\n    for raw in(Path('/proc')/str(pid)/'mountinfo').read_text().splitlines():\n              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^\n  File \"/usr/lib64/python3.14/pathlib/__init__.py\", line 787, in read_text\n    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:\n         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib64/python3.14/pathlib/__init__.py\", line 771, in open\n    return io.open(self, mode, buffering, encoding, errors, newline)\n           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nOSError: [Errno 22] Invalid argument: '/proc/825756/mountinfo'\n",
+        "identity_now": {
+          "start": 38658546,
+          "pgrp": 825756,
+          "ppid": 825641,
+          "state": "Z"
+        }
+      },
+      {
+        "pid": 826017,
+        "operation": "actual-shared-map-monitor",
+        "exception": "OSError(22, 'Invalid argument')",
+        "errno": 22,
+        "traceback": "Traceback (most recent call last):\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/public-proc-exit-diagnostic-20261112/probe.py\", line 21, in <module>\n    try:fn()\n        ~~^^\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/public-proc-exit-diagnostic-20261112/probe.py\", line 20, in <lambda>\n    ('actual-shared-map-monitor',lambda:g.monitor(child,owned,critical,critical_stat,set(),{}, {},stage))]:\n                                        ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/graphics-v3.py\", line 158, in monitor\n    fp=elf_fingerprint(path,dev,ino,n)\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/graphics-v3.py\", line 127, in elf_fingerprint\n    certificate=certify_mapping(path,dev,ino,pid)\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/mount_identity.py\", line 41, in certify_mapping\n    proof=current_identity(path,pid)\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/mount_identity.py\", line 20, in current_identity\n    child=covering(pid,path);local=covering('self',path)\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/mount_identity.py\", line 11, in covering\n    for raw in(Path('/proc')/str(pid)/'mountinfo').read_text().splitlines():\n              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^\n  File \"/usr/lib64/python3.14/pathlib/__init__.py\", line 787, in read_text\n    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:\n         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib64/python3.14/pathlib/__init__.py\", line 771, in open\n    return io.open(self, mode, buffering, encoding, errors, newline)\n           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nOSError: [Errno 22] Invalid argument: '/proc/826017/mountinfo'\n",
+        "identity_now": {
+          "start": 38658697,
+          "pgrp": 826017,
+          "ppid": 825641,
+          "state": "Z"
+        }
+      },
+      {
+        "pid": 826040,
+        "operation": "actual-shared-map-monitor",
+        "exception": "OSError(22, 'Invalid argument')",
+        "errno": 22,
+        "traceback": "Traceback (most recent call last):\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/public-proc-exit-diagnostic-20261112/probe.py\", line 21, in <module>\n    try:fn()\n        ~~^^\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/public-proc-exit-diagnostic-20261112/probe.py\", line 20, in <lambda>\n    ('actual-shared-map-monitor',lambda:g.monitor(child,owned,critical,critical_stat,set(),{}, {},stage))]:\n                                        ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/graphics-v3.py\", line 158, in monitor\n    fp=elf_fingerprint(path,dev,ino,n)\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/graphics-v3.py\", line 127, in elf_fingerprint\n    certificate=certify_mapping(path,dev,ino,pid)\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/mount_identity.py\", line 41, in certify_mapping\n    proof=current_identity(path,pid)\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/mount_identity.py\", line 20, in current_identity\n    child=covering(pid,path);local=covering('self',path)\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/mount_identity.py\", line 11, in covering\n    for raw in(Path('/proc')/str(pid)/'mountinfo').read_text().splitlines():\n              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^\n  File \"/usr/lib64/python3.14/pathlib/__init__.py\", line 787, in read_text\n    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:\n         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib64/python3.14/pathlib/__init__.py\", line 771, in open\n    return io.open(self, mode, buffering, encoding, errors, newline)\n           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nOSError: [Errno 22] Invalid argument: '/proc/826040/mountinfo'\n",
+        "identity_now": {
+          "start": 38658704,
+          "pgrp": 826040,
+          "ppid": 825641,
+          "state": "Z"
+        }
+      },
+      {
+        "pid": 826050,
+        "operation": "actual-shared-map-monitor",
+        "exception": "OSError(22, 'Invalid argument')",
+        "errno": 22,
+        "traceback": "Traceback (most recent call last):\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/public-proc-exit-diagnostic-20261112/probe.py\", line 21, in <module>\n    try:fn()\n        ~~^^\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/public-proc-exit-diagnostic-20261112/probe.py\", line 20, in <lambda>\n    ('actual-shared-map-monitor',lambda:g.monitor(child,owned,critical,critical_stat,set(),{}, {},stage))]:\n                                        ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/graphics-v3.py\", line 158, in monitor\n    fp=elf_fingerprint(path,dev,ino,n)\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/graphics-v3.py\", line 127, in elf_fingerprint\n    certificate=certify_mapping(path,dev,ino,pid)\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/mount_identity.py\", line 41, in certify_mapping\n    proof=current_identity(path,pid)\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/mount_identity.py\", line 20, in current_identity\n    child=covering(pid,path);local=covering('self',path)\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/mount_identity.py\", line 11, in covering\n    for raw in(Path('/proc')/str(pid)/'mountinfo').read_text().splitlines():\n              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^\n  File \"/usr/lib64/python3.14/pathlib/__init__.py\", line 787, in read_text\n    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:\n         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib64/python3.14/pathlib/__init__.py\", line 771, in open\n    return io.open(self, mode, buffering, encoding, errors, newline)\n           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nOSError: [Errno 22] Invalid argument: '/proc/826050/mountinfo'\n",
+        "identity_now": {
+          "start": 38658707,
+          "pgrp": 826050,
+          "ppid": 825641,
+          "state": "Z"
+        }
+      },
+      {
+        "pid": 826089,
+        "operation": "actual-shared-map-monitor",
+        "exception": "OSError(22, 'Invalid argument')",
+        "errno": 22,
+        "traceback": "Traceback (most recent call last):\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/public-proc-exit-diagnostic-20261112/probe.py\", line 21, in <module>\n    try:fn()\n        ~~^^\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/public-proc-exit-diagnostic-20261112/probe.py\", line 20, in <lambda>\n    ('actual-shared-map-monitor',lambda:g.monitor(child,owned,critical,critical_stat,set(),{}, {},stage))]:\n                                        ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/graphics-v3.py\", line 158, in monitor\n    fp=elf_fingerprint(path,dev,ino,n)\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/graphics-v3.py\", line 127, in elf_fingerprint\n    certificate=certify_mapping(path,dev,ino,pid)\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/mount_identity.py\", line 41, in certify_mapping\n    proof=current_identity(path,pid)\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/mount_identity.py\", line 20, in current_identity\n    child=covering(pid,path);local=covering('self',path)\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/mount_identity.py\", line 11, in covering\n    for raw in(Path('/proc')/str(pid)/'mountinfo').read_text().splitlines():\n              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^\n  File \"/usr/lib64/python3.14/pathlib/__init__.py\", line 787, in read_text\n    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:\n         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib64/python3.14/pathlib/__init__.py\", line 771, in open\n    return io.open(self, mode, buffering, encoding, errors, newline)\n           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nOSError: [Errno 22] Invalid argument: '/proc/826089/mountinfo'\n",
+        "identity_now": {
+          "start": 38658730,
+          "pgrp": 826089,
+          "ppid": 825641,
+          "state": "Z"
+        }
+      }
+    ],
+    "every_error_same_original_start_and_Z": true,
+    "all_children_reaped": true,
+    "input_drift": []
+  },
+  "controlled_CPU_proof": {
+    "state": "terminal",
+    "exit": 0,
+    "scope": "CPU-only exact mountinfo exit-race counterfactual and narrow-guard controls.",
+    "controls": [
+      {
+        "mode": "old-Z-counterfactual",
+        "pid": 848726,
+        "original_identity": {
+          "start": 38679861,
+          "pgrp": 848726,
+          "ppid": 848712,
+          "state": "R"
+        },
+        "retired_before_actual_mountinfo_open": {
+          "start": 38679861,
+          "pgrp": 848726,
+          "ppid": 848712,
+          "state": "Z"
+        },
+        "errno": 22,
+        "filename": "/proc/848726/mountinfo",
+        "traceback": "Traceback (most recent call last):\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/public-proc-exit-diagnostic-20261112/repair-controls-v2.py\", line 29, in monitored\n    try:return g.monitor(*args)\n               ~~~~~~~~~^^^^^^^\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/graphics-v3.py\", line 158, in monitor\n    fp=elf_fingerprint(path,dev,ino,n)\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/graphics-v3.py\", line 127, in elf_fingerprint\n    certificate=certify_mapping(path,dev,ino,pid)\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/mount_identity.py\", line 41, in certify_mapping\n    proof=current_identity(path,pid)\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/mount_identity.py\", line 20, in current_identity\n    child=covering(pid,path);local=covering('self',path)\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/public-proc-exit-diagnostic-20261112/repair-controls-v2.py\", line 26, in exiting_covering\n    return covering(pid,path)\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/mount_identity.py\", line 11, in covering\n    for raw in(Path('/proc')/str(pid)/'mountinfo').read_text().splitlines():\n              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^\n  File \"/usr/lib64/python3.14/pathlib/__init__.py\", line 787, in read_text\n    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:\n         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib64/python3.14/pathlib/__init__.py\", line 771, in open\n    return io.open(self, mode, buffering, encoding, errors, newline)\n           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nOSError: [Errno 22] Invalid argument: '/proc/848726/mountinfo'\n",
+        "old_actual_error_retained": true,
+        "owned_after": {
+          "848726": {
+            "start": 38679861,
+            "pgrp": 848726,
+            "ppid": 848712,
+            "state": "R"
+          }
+        }
+      },
+      {
+        "mode": "repaired-Z",
+        "pid": 848727,
+        "original_identity": {
+          "start": 38679861,
+          "pgrp": 848727,
+          "ppid": 848712,
+          "state": "R"
+        },
+        "retired_before_actual_mountinfo_open": {
+          "start": 38679861,
+          "pgrp": 848727,
+          "ppid": 848712,
+          "state": "Z"
+        },
+        "errno": 22,
+        "filename": "/proc/848727/mountinfo",
+        "traceback": "Traceback (most recent call last):\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/public-proc-exit-diagnostic-20261112/repair-controls-v2.py\", line 29, in monitored\n    try:return g.monitor(*args)\n               ~~~~~~~~~^^^^^^^\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/graphics-v3.py\", line 158, in monitor\n    fp=elf_fingerprint(path,dev,ino,n)\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/graphics-v3.py\", line 127, in elf_fingerprint\n    certificate=certify_mapping(path,dev,ino,pid)\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/mount_identity.py\", line 41, in certify_mapping\n    proof=current_identity(path,pid)\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/mount_identity.py\", line 20, in current_identity\n    child=covering(pid,path);local=covering('self',path)\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/public-proc-exit-diagnostic-20261112/repair-controls-v2.py\", line 26, in exiting_covering\n    return covering(pid,path)\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/mount_identity.py\", line 11, in covering\n    for raw in(Path('/proc')/str(pid)/'mountinfo').read_text().splitlines():\n              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^\n  File \"/usr/lib64/python3.14/pathlib/__init__.py\", line 787, in read_text\n    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:\n         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib64/python3.14/pathlib/__init__.py\", line 771, in open\n    return io.open(self, mode, buffering, encoding, errors, newline)\n           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nOSError: [Errno 22] Invalid argument: '/proc/848727/mountinfo'\n",
+        "guard_returned": true,
+        "owned_after": {
+          "848727": {
+            "start": 38679861,
+            "pgrp": 848727,
+            "ppid": 848712,
+            "state": "R"
+          }
+        }
+      },
+      {
+        "mode": "repaired-absent",
+        "pid": 848728,
+        "original_identity": {
+          "start": 38679862,
+          "pgrp": 848728,
+          "ppid": 848712,
+          "state": "R"
+        },
+        "retired_before_actual_mountinfo_open": {
+          "start": 38679862,
+          "pgrp": 848728,
+          "ppid": 848712,
+          "state": "Z"
+        },
+        "errno": 22,
+        "filename": "/proc/848728/mountinfo",
+        "traceback": "Traceback (most recent call last):\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/public-proc-exit-diagnostic-20261112/repair-controls-v2.py\", line 29, in monitored\n    try:return g.monitor(*args)\n               ~~~~~~~~~^^^^^^^\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/graphics-v3.py\", line 158, in monitor\n    fp=elf_fingerprint(path,dev,ino,n)\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/graphics-v3.py\", line 127, in elf_fingerprint\n    certificate=certify_mapping(path,dev,ino,pid)\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/mount_identity.py\", line 41, in certify_mapping\n    proof=current_identity(path,pid)\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/mount_identity.py\", line 20, in current_identity\n    child=covering(pid,path);local=covering('self',path)\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/public-proc-exit-diagnostic-20261112/repair-controls-v2.py\", line 26, in exiting_covering\n    return covering(pid,path)\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/mount_identity.py\", line 11, in covering\n    for raw in(Path('/proc')/str(pid)/'mountinfo').read_text().splitlines():\n              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^\n  File \"/usr/lib64/python3.14/pathlib/__init__.py\", line 787, in read_text\n    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:\n         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib64/python3.14/pathlib/__init__.py\", line 771, in open\n    return io.open(self, mode, buffering, encoding, errors, newline)\n           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nOSError: [Errno 22] Invalid argument: '/proc/848728/mountinfo'\n",
+        "reaped_before_guard": -15,
+        "guard_returned": true,
+        "owned_after": {
+          "848728": {
+            "start": 38679862,
+            "pgrp": 848728,
+            "ppid": 848712,
+            "state": "R"
+          }
+        }
+      },
+      {
+        "mode": "live-EINVAL",
+        "correctly_preserved_original_error": true,
+        "original_identity": {
+          "start": 38679862,
+          "pgrp": 848729,
+          "ppid": 848712,
+          "state": "R"
+        }
+      },
+      {
+        "mode": "wrong-path",
+        "correctly_preserved_original_error": true,
+        "original_identity": {
+          "start": 38679862,
+          "pgrp": 848730,
+          "ppid": 848712,
+          "state": "R"
+        }
+      },
+      {
+        "mode": "wrong-errno",
+        "correctly_preserved_original_error": true,
+        "original_identity": {
+          "start": 38679862,
+          "pgrp": 848731,
+          "ppid": 848712,
+          "state": "R"
+        }
+      },
+      {
+        "mode": "wrong-original-start",
+        "correctly_preserved_original_error": true,
+        "original_identity": {
+          "start": 38679862,
+          "pgrp": 848732,
+          "ppid": 848712,
+          "state": "R"
+        }
+      },
+      {
+        "mode": "wrong-post-start",
+        "correctly_preserved_original_error": true,
+        "original_identity": {
+          "start": 38679862,
+          "pgrp": 848733,
+          "ppid": 848712,
+          "state": "R"
+        }
+      },
+      {
+        "mode": "unknown-owner",
+        "correctly_preserved_original_error": true,
+        "original_identity": {
+          "start": 38679862,
+          "pgrp": 848734,
+          "ppid": 848712,
+          "state": "R"
+        }
+      }
+    ],
+    "all_direct_children_reaped": true,
+    "input_drift": [],
+    "pins": {
+      "/home/blux/de-xr/dome-sculpt/artifacts/public-proc-exit-diagnostic-20261112/repair-controls-v2.py": "ed712b226363c1a2f8f41afcb97ef11d663321b3918eee84fd8d58fde5182d90",
+      "/home/blux/de-xr/dome-sculpt/artifacts/baked-emission-source8-public-ad99-20261112/monitor_lifetime.py": "8921abfda5b8c99307d47c34a4b8c458683388c0f289de099a5a5a0e92ec6c8a",
+      "/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/graphics-v3.py": "0606a923f5fbe1a4da5ffd973ae3b541d0bb343cd55614a33ee2f3edef9f6a7a",
+      "/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/mount_identity.py": "1e2c6a322ae8797c78f9a2693d7e2e18aab9dd8d6472babbeb81334971904c81",
+      "/usr/bin/sleep": "651468d5d1adbd00e0cf39813d90dc2c0deeb57c99ef06227f13d4407797e14b"
+    },
+    "seconds": 0.010075472993776202
+  },
+  "repair_scope": {
+    "condition": "ONLY EINVAL opening exact owned /proc/PID/mountinfo with expected/monitor original start equal and after identity absent or same-startZ/X",
+    "all_critical_ELF_maps_device_RSS_deadline_result_cleanup_predicates_unchanged": true,
+    "no_new_certificate_admitted_on_retired_read": true,
+    "future_runtime_requires_new_qualified_product_candidate_and_matching_admission": true
+  },
+  "receipts": {
+    "artifacts/baked-emission-source8-public-ad99-20261112/release-gui-pbr-quarter-v1/status.json": "eac57a4ffca5d52c5525d578384500b7d440a7461df96d1165d7fe7c988dcf63",
+    "artifacts/baked-emission-source8-public-ad99-20261112/release-gui-pbr-quarter-v1/workflow/report.json": "58b9ee8824d16caa480b75a0862aec1225122c8e254816218f0a3aeb28bb42c9",
+    "artifacts/baked-emission-source8-public-ad99-20261112/release-gui-pbr-quarter-v1/owned-processes-finally.json": "56899f54fb4676814a7d40f78d2225a4d9bd1fcb691fdbd7f335a4db9a5eba3a",
+    "artifacts/public-proc-exit-diagnostic-20261112/status.json": "a11c7f482c8ac9c4d3d58488d3ce5c98999631f327d400989fa2a515a2c5cb5c",
+    "artifacts/public-proc-exit-diagnostic-20261112/repair-controls-v1/failure.json": "4a178c1cff09afab6e6cd7e2ce313fc77564b6d8643a9a6688881f63e3a6a638",
+    "artifacts/public-proc-exit-diagnostic-20261112/repair-controls-v2/status.json": "fd13856f6a9621d63b78f1204f00dd47a8b2b3d57fe9bfd38cf15bdfa1d82cf0",
+    "artifacts/public-proc-exit-diagnostic-20261112/repair-controls-v2/guarded-retired-reads.jsonl": "144614976b3929861869a08d80f2d37991e501b36269f3b2afe2ad9564ea0d47",
+    "artifacts/baked-emission-source8-public-ad99-20261112/monitor_lifetime.py": "8921abfda5b8c99307d47c34a4b8c458683388c0f289de099a5a5a0e92ec6c8a",
+    "artifacts/baked-emission-source8-public-ad99-20261112/run-lifetime-v1.py": "5be51c0c2c8683867fa63c8f39a7b00ca6b97349be06598e4aa0adb0a2da83f6",
+    "artifacts/baked-emission-source8-public-ad99-20261112/run-lifetime-v1.diff": "2f81bf60c98187aaeedcfef39e7d2c0eef30e5b767ad35a939c22c0f5adf289e"
+  }
+}
