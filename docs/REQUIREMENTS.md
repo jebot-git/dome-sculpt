@@ -1,3 +1,25 @@
+## New role-domain repaired application source frozen — 2026-11-12
+
+This new candidate preserves main39b, frozen5c and all integration evidence,
+then merges qualified emission-role repair a8fa5424 and test-only oraclef9d57dcc.
+Read [AUTHORING-ROLE-DOMAIN-FROZEN-20261112.md](AUTHORING-ROLE-DOMAIN-FROZEN-20261112.md).
+Only one product TU changes: resolvedPBR sampling uses its actual current
+carrier, while typed slots retain original logicalUVs. Release19 and strictSAN19
+pass, with genuine old-core callback/Bake failures preserved. Headers, shaders,
+packets, wire and source guards remain unchanged; artist-normal WIP is excluded.
+
+The public one-point oracle repair preserves all41 native/view/manifest bytes,
+all4cases/botheyes and contrast12/correct3/wrong7 predicates. Oldpoint diagnostics
+prove real correct pixels rather than a product failure. Old GUI pbr-quarter52
+and pbr-tiny16+timeout remain scoped evidence, not new candidate acceptance.
+
+Next: a NEW whole-owning audit and coherent application build from this unique
+frozen source; exact86 native(old85+newdomaincase), helpers/raw/producers/font,
+manual software/Arc and public GUI/XR follow. Original5c sanitizer265TU/685link
+build continues unchanged as a baseline only; no new source qualification is
+inferred from it. Full original scope remains active/incomplete. No install or
+active-session restart. Earlier checkpoint entries below are historical.
+
 ## Combined Release gates pass; public and current sanitizer qualification continues — 2026-11-12
 
 Frozen5c820f owning execution38148 is terminal0:3 genuine generators,263 fresh
