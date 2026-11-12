@@ -41,6 +41,14 @@ void run(bool typed_view,float emission_coverage){
   auto control=snapshot();for(auto&p:control->mesh.positions)p.z=position.z;control->mesh.normals.assign(4,desired);control->ranges[0].material=o.material;control->ranges[0].material.emissive={emission.x,emission.y,emission.z};if(typed_view){auto b=std::make_shared<SourceMaterialBindings>(*binding);b->material.textures[size_t(MToonSlot::Emission)].index=-1;b->roles[size_t(MToonSlot::Emission)]={};b->material.parameters.emission=emission;b->material.parameters.emission_strength=1;b->native_reference.emission=control->ranges[0].material.emissive;control->ranges[0].material_bindings=b;}
   f.bind();const auto expected=at(draw(renderer,control),xy[0],xy[1]),got=at(actual,xy[0],xy[1]);std::cout<<"SOURCE8_ORACLE typed="<<typed_view<<" coverage="<<emission_coverage<<" pixel="<<xy[0]<<","<<xy[1]<<" actual="<<got[0]<<","<<got[1]<<","<<got[2]<<" expected="<<expected[0]<<","<<expected[1]<<","<<expected[2]<<'\n';check(close(got,expected,3),"Actual visible Source8 agrees with independent varied role/current-frame and premultiplied coverage point oracle");
  }
+
+ const auto held_packet=frame->ranges[0].textures->overlay;auto repeat=paint->preview(o.material);
+ check(repeat->overlay->source_baked_normal()==held_packet->source_baked_normal()&&repeat->overlay->source_baked_coverage()==held_packet->source_baked_coverage(),"Unchanged Source8 view retains exact immutable normal/coverage carrier owners after packed publication");
+ doc.clear_bake();check(doc.wait_asset(std::chrono::seconds(120))&&doc.wait_mesh()&&doc.frame().state->error.empty(),"Actual Clear Bake publishes the authentic legacy source view");auto cleared=doc.frame().surface;
+ check(cleared->geometry_identity!=frame->geometry_identity,"Source8 canonical frame removal changes the actual immutable geometry dependency owner");
+ f.bind();(void)draw(renderer,cleared);
+ check(doc.undo()&&doc.wait_mesh()&&doc.frame().state->error.empty(),"Actual Undo restores visible Source8 current-frame authority");auto restored=doc.frame().surface;
+ check(restored->geometry_identity!=cleared->geometry_identity,"Source8 canonical frame restoration invalidates legacy geometry identity");f.bind();check(delta(actual,draw(renderer,restored))<=1,"Source8 Clear/Undo restores the entire actual rendered original/current normal and FLOAT image");
  check(doc.copy_scene().encode()==before&&scene.encode()==before,"Visible Source8 display keeps exact original/FLOAT/hidden editable native owners");check(glGetError()==GL_NO_ERROR,"Source8 preview and independent controls leave the real GL error queue empty");
 }
 }

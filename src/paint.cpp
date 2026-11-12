@@ -198,6 +198,9 @@ struct PaintedMesh::CompositeCache {
   uint64_t preview_token=0;
   bool source_eligible=false;
   std::weak_ptr<const TextureMaps> source_preview;
+  uint64_t source_baked_token=0;
+  std::weak_ptr<const detail::PaintOverlayPacket> source_baked_packet;
+  bool source_baked_transparent=false;
   uint64_t native_emission_token=0;
   CompositeFactors native_emission_factors{};
   std::weak_ptr<const TextureMaps> native_emission_preview;
@@ -1095,9 +1098,11 @@ std::shared_ptr<const TextureMaps> detail::PaintOverlayFactory::capture_source_b
     throw std::invalid_argument("Source8 preview requires actual before/current/baked ownership");
   auto &cache=*paint.composite_cache_;
   {std::lock_guard lock(cache.mutex);
-    if(cache.preview_token==paint.composite_token_)if(auto previous=cache.source_preview.lock())
-      if(previous->baked_base==paint.baked_&&previous->source_maps==paint.source_maps_&&
-         previous->overlay&&previous->overlay->source_baked_geometry()==paint.mesh_owner())return previous;
+    if(cache.source_baked_token==paint.composite_token_)if(auto packet=cache.source_baked_packet.lock())
+      if(packet->baked()==paint.baked_&&packet->source_maps()==paint.source_maps_&&packet->source_baked_geometry()==paint.mesh_owner()){
+        auto view=std::make_shared<TextureMaps>();view->source_maps=paint.source_maps_;view->source_only=true;
+        view->baked_base=paint.baked_;view->overlay=std::move(packet);view->transparent=cache.source_baked_transparent;return view;
+      }
   }
   const auto r=paint.resolution();const size_t pixels=size_t(r)*r;
   const size_t extra=paint.baked_->maps.normal.rgba.empty()?0:pixels*8;
@@ -1123,7 +1128,7 @@ std::shared_ptr<const TextureMaps> detail::PaintOverlayFactory::capture_source_b
   for(const auto &layer:result->overlay->layers())for(const auto &tile:layer.tiles)if(tile)
     for(const auto &pixel:tile->pixels)if(pixel.data[13]&&pixel.data[9]&&pixel.data[3]!=255){result->transparent=true;break;}
   paint_compute::checkpoint(cancelled);
-  {std::lock_guard lock(cache.mutex);cache.preview_token=paint.composite_token_;cache.source_preview=result;}
+  {std::lock_guard lock(cache.mutex);cache.source_baked_token=paint.composite_token_;cache.source_baked_packet=result->overlay;cache.source_baked_transparent=result->transparent;}
   return result;
 }
 std::shared_ptr<const TextureMaps> detail::PaintOverlayFactory::capture_current_grid(
