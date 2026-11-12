@@ -1,3 +1,28 @@
+## Sanitizer baseline deadline retained; repaired Source8 joint qualification — 2026-11-12
+
+The actual cc5 strict sanitizer ALL driver38512 is now terminal1: its build hit
+the original7200-second limit (child exit124) after1642 of1742 actions. Source
+and SDK drift are zero. The selected82 tests had not begun. This is an actual
+build timeout, not an observation timeout or sanitizer test failure. Preserve
+the failed tree, partial outputs, logs and status; do not restart or relabel it.
+An agent is preparing a NEW isolated bounded remaining-action completion using
+explicitly authenticated complete objects and unchanged source/flags. Its plan
+must be reviewed before execution. The successful Release baseline is unchanged.
+
+The joint Source8 component d07cefaf combines genuine original-UV packing and
+typed nested reader-context propagation. Its Release and strict sanitizer969
+visible/native/history controls pass, including the original shared4 cases and
+real Polygon Save/Open, with exact counterfactual failures retained. All Release
+historical consumers pass; final strict sanitizer historical consumer cases are
+still running. This is component evidence, not new app/public acceptance.
+
+Root's UNFROZEN new assembly c91256fe also includes scoped R/S-qualified humanoid
+component support d7565e69. Main admits its evidence only, in
+[HUMANOID-POSE-QUALITY-20261112.md](HUMANOID-POSE-QUALITY-20261112.md).
+A final85-test source freeze and whole-owning Release compilation follow actual
+joint completion; failed/older9b and all component source/providers stay intact.
+Goal remains active/incomplete. No system install or active session restart.
+
 ## Shared-vertex publication repair also required — 2026-11-12
 
 The actual shared-four-vertex Source8 Polygon regression exposed a separate
