@@ -1,0 +1,163 @@
+{
+  "scope": "Test-only public Source8 probe contrast repair; complete CPU producer corpus equivalence. Not corrected-product, new-point image, public matrix or application admission.",
+  "baseline_product_source": "5c820f342f16d8544158410c2125372811c152f3",
+  "test_source": "f9d57dcc4bfe56ebc1032d2ffb2951e8c6356aff",
+  "change": {
+    "old_probe": [
+      0.31,
+      0.74
+    ],
+    "new_probe": [
+      0.21,
+      0.7
+    ],
+    "new_test_source": "f9d57dcc",
+    "only_changed_file": "tests/source8-public-fixture.cpp",
+    "same_triangle_and_common191_region": true,
+    "material_emission_geometry_native_view_fixture_changes": false,
+    "all41_generated_files_byte_identical": true,
+    "old_actual_RGB": [
+      50,
+      43,
+      44
+    ],
+    "old_independent_RGB": [
+      50,
+      43,
+      44
+    ],
+    "old_hidden_RGB": [
+      48,
+      48,
+      48
+    ],
+    "old_wrong_normal_RGB": [
+      126,
+      124,
+      124
+    ],
+    "old_correct_error": 0,
+    "old_geometry_gap": 5,
+    "old_wrong_normal_gap": 81,
+    "unchanged_acceptance": {
+      "correct_RGB_bound": 3,
+      "minimum_geometry_gap": 12,
+      "minimum_disjoint_normal_effect": 7,
+      "cases": 4,
+      "probes_per_case": 4,
+      "XR_eyes": 2,
+      "GUI_step_seconds": 50,
+      "GUI_case_seconds": 900,
+      "XR_aggregate_seconds_per_case": 240,
+      "XR_aggregate_frames_per_case": 6000
+    }
+  },
+  "corpus": {
+    "producer_exit": 0,
+    "files": 41,
+    "all_generated_native_view_manifest_bytes_identical": true,
+    "sha256_by_relative_path": {
+      "manifest.json": "2fe159bbeea0f391235ba36c7ba46deff8bb6413367b6edf31b66f6acc6aba1b",
+      "pbr-quarter/original.dsculpt": "bf97bb671d16ac5a4ed79e872ba85c111b725f0f6c5bb1fde3dd947aeb92d1a3",
+      "pbr-quarter/xr-accepted.dsculpt": "1cf95b528ab14bb24ad84d051deeb183d283a80cb249e425d51613e4edf1093e",
+      "pbr-quarter/xr-undone.dsculpt": "bf97bb671d16ac5a4ed79e872ba85c111b725f0f6c5bb1fde3dd947aeb92d1a3",
+      "pbr-quarter/xr-redone.dsculpt": "1cf95b528ab14bb24ad84d051deeb183d283a80cb249e425d51613e4edf1093e",
+      "pbr-quarter/desktop-accepted.dsculpt": "1cf95b528ab14bb24ad84d051deeb183d283a80cb249e425d51613e4edf1093e",
+      "pbr-quarter/desktop-undone.dsculpt": "bf97bb671d16ac5a4ed79e872ba85c111b725f0f6c5bb1fde3dd947aeb92d1a3",
+      "pbr-quarter/desktop-redone.dsculpt": "1cf95b528ab14bb24ad84d051deeb183d283a80cb249e425d51613e4edf1093e",
+      "pbr-quarter/source-view-original.dsculpt": "786c96670e058a8311ef3d102309fa768092e445e21391ecce65fe7391e64e77",
+      "pbr-quarter/source-view-empty.dsculpt": "f57c439fc45f83b27fd768cfca358d57a81d38ae2a8ce2990ddc13fbfbc4daee",
+      "pbr-quarter/manifest.json": "b282e86b20646570ce6911c413b323fa20f67b7516885f20934feeb23e87f040",
+      "pbr-tiny/original.dsculpt": "ad962c49c4652384639ee75ccf2ba4776de2a02ff2b738a32799ca326434e85c",
+      "pbr-tiny/xr-accepted.dsculpt": "7626a6f85ebe2d753a6637a347e5e53d518a5e6f98e9c146dd06c0b985a1ed97",
+      "pbr-tiny/xr-undone.dsculpt": "ad962c49c4652384639ee75ccf2ba4776de2a02ff2b738a32799ca326434e85c",
+      "pbr-tiny/xr-redone.dsculpt": "7626a6f85ebe2d753a6637a347e5e53d518a5e6f98e9c146dd06c0b985a1ed97",
+      "pbr-tiny/desktop-accepted.dsculpt": "7626a6f85ebe2d753a6637a347e5e53d518a5e6f98e9c146dd06c0b985a1ed97",
+      "pbr-tiny/desktop-undone.dsculpt": "ad962c49c4652384639ee75ccf2ba4776de2a02ff2b738a32799ca326434e85c",
+      "pbr-tiny/desktop-redone.dsculpt": "7626a6f85ebe2d753a6637a347e5e53d518a5e6f98e9c146dd06c0b985a1ed97",
+      "pbr-tiny/source-view-original.dsculpt": "72a636af33036a07c691f9b10cddf2c2eb1471cb92becab737a0ed987eb51eb4",
+      "pbr-tiny/source-view-empty.dsculpt": "fac422fbc7e06fd2fad1937004ccc89e9fac5ef8f2c93fb9bfedaf4c33691103",
+      "pbr-tiny/manifest.json": "ca6fda9378fa0f868579c27f281b1399f04f3e72c214bc11bca06fc3b6f04a01",
+      "mtoon-quarter/original.dsculpt": "43096048f4369f4cea943e2e5c41cb48433bb95dafd3cf0a7f9ee977398f5d69",
+      "mtoon-quarter/xr-accepted.dsculpt": "c7731d1ca463b0c62af91d0238c659f04827e4bbe85064880e049896b9ab4fc7",
+      "mtoon-quarter/xr-undone.dsculpt": "43096048f4369f4cea943e2e5c41cb48433bb95dafd3cf0a7f9ee977398f5d69",
+      "mtoon-quarter/xr-redone.dsculpt": "c7731d1ca463b0c62af91d0238c659f04827e4bbe85064880e049896b9ab4fc7",
+      "mtoon-quarter/desktop-accepted.dsculpt": "c7731d1ca463b0c62af91d0238c659f04827e4bbe85064880e049896b9ab4fc7",
+      "mtoon-quarter/desktop-undone.dsculpt": "43096048f4369f4cea943e2e5c41cb48433bb95dafd3cf0a7f9ee977398f5d69",
+      "mtoon-quarter/desktop-redone.dsculpt": "c7731d1ca463b0c62af91d0238c659f04827e4bbe85064880e049896b9ab4fc7",
+      "mtoon-quarter/source-view-original.dsculpt": "15988da40b5929ad9606d9220e4f0720bf2565478d4225952aa4457bb460ee51",
+      "mtoon-quarter/source-view-empty.dsculpt": "20f4e8e2ac87298ececbbc80dbf317a055fb5a78c1ba2c9e796525d7b22c9648",
+      "mtoon-quarter/manifest.json": "1c3d8393389838538486180774160bf57875e50b9c90e00e03e5c0e9b83b05cc",
+      "mtoon-tiny/original.dsculpt": "f2e3e54c882dcb0e6958166952dec2ed4f8720866d03ff5b5d76801a193c5e54",
+      "mtoon-tiny/xr-accepted.dsculpt": "7880709b8801f8bb0fab2bee765c23c2cc23b4dcfec65bedb719e7991c3787bb",
+      "mtoon-tiny/xr-undone.dsculpt": "f2e3e54c882dcb0e6958166952dec2ed4f8720866d03ff5b5d76801a193c5e54",
+      "mtoon-tiny/xr-redone.dsculpt": "7880709b8801f8bb0fab2bee765c23c2cc23b4dcfec65bedb719e7991c3787bb",
+      "mtoon-tiny/desktop-accepted.dsculpt": "7880709b8801f8bb0fab2bee765c23c2cc23b4dcfec65bedb719e7991c3787bb",
+      "mtoon-tiny/desktop-undone.dsculpt": "f2e3e54c882dcb0e6958166952dec2ed4f8720866d03ff5b5d76801a193c5e54",
+      "mtoon-tiny/desktop-redone.dsculpt": "7880709b8801f8bb0fab2bee765c23c2cc23b4dcfec65bedb719e7991c3787bb",
+      "mtoon-tiny/source-view-original.dsculpt": "5850a1f17c652a51c2d89c02c01fcbe2ef846985b88938de5166987c9149b329",
+      "mtoon-tiny/source-view-empty.dsculpt": "1b5a0fe775a6b9b3a1bae167d8160b0e01cd5727cadce6a5b822ec9950c9ce96",
+      "mtoon-tiny/manifest.json": "29c0a0e57634c3079e682c0ef776f8fcf5fa79613fcf2c41e49740e1a0a574e2"
+    },
+    "input_drift": []
+  },
+  "receipts": {
+    "baseline_owning": {
+      "path": "artifacts/source8-final-owning-plan-20261112/release-5c820f-v3-audit/execution-v1/status.json",
+      "sha256": "56f8686336b53f4570384ab3e3f4cac337380dd602f3ead95e236fac68803a36"
+    },
+    "baseline_native85_helpers_raw": {
+      "path": "artifacts/source8-final-owning-plan-20261112/release-5c-v2-native/status.json",
+      "sha256": "d6b6f2faa618b699afbfe966c5db972466491781c2828f22d55dd6e8bb25d0ae"
+    },
+    "baseline_producer_font": {
+      "path": "artifacts/source8-final-owning-plan-20261112/release-5c-v2-fixtures/status.json",
+      "sha256": "da43aa6b52f3059157fe72e1e26db9d20d9331d317e63b139e6da003ee7f5a86"
+    },
+    "baseline_manual_software": {
+      "path": "artifacts/source8-final-owning-plan-20261112/release-5c-v2-manual-software/status.json",
+      "sha256": "95b541201a70ea8d8bfedb3feb2747593cb9606f9274187083988374d75c68bd"
+    },
+    "baseline_manual_Arc": {
+      "path": "artifacts/source8-final-owning-plan-20261112/release-5c-v2-manual-arc/status.json",
+      "sha256": "453e02e1c903a6ac15a7b1322f60c3fae10ca348c918c61d25bcfd6eb069c6a7"
+    },
+    "old_public_case_positive": {
+      "path": "artifacts/baked-emission-source8-public-5c-20261112/release-gui-pbr-quarter-v1/status.json",
+      "sha256": "86039c40692d3da09a32cb70252992e34d9e727852ce97c6c03d96aace8209c2"
+    },
+    "old_public_case_failure": {
+      "path": "artifacts/baked-emission-source8-public-5c-20261112/release-gui-pbr-tiny-v1/status.json",
+      "sha256": "d08e4513053a6a7cbfadcefbeffe05f16de71b852f9635ad047cbcca7237a99e"
+    },
+    "oldpoint_causal_diagnostic": {
+      "path": "artifacts/baked-emission-source8-public-5c-20261112/release-diagnostic-oldprobe3-v1/status.json",
+      "sha256": "caa08332c3b5ec9d0f51e59c9e241a5d3b23c04802c7360bb5df6165f51333b6"
+    },
+    "new_oracle_owning_TU": {
+      "path": "artifacts/source8-public-probe-contrast-proof-20261112/release-v1/status.json",
+      "sha256": "912704d3adc9833a6007d04a7145a1fa8c9a60e8cecd80efc0be63e7f70509b6"
+    },
+    "new_oracle_corpus_equivalence": {
+      "path": "artifacts/source8-public-probe-contrast-proof-20261112/corpus-v1/status.json",
+      "sha256": "7ec40b11e0c4663fdf3fa2dbaf266ba060b7fa5a82f9988aedfa16dbf0821550"
+    }
+  },
+  "candidate_boundary": {
+    "required_product_input": "Exact new qualified domain-repair source/owning R+strictSAN receipts from raw agent; not yet assumed",
+    "required_test_input": "Exact f9 one-TU oracle delta with byte-identical original/current/native fixture corpus",
+    "assembly_owner": "Root will freeze NEW coherent source and own actual affected consumers/app/runtime/producers/font; no retargeting old5c provider claim",
+    "mandatory_execution": "Domain-specific regressions +coherent85/helper/raw/manual/producers/font +full4case GUI and real-loader XR, source/provider/SDK/font/ELF/lease/cleanup guards",
+    "new_app_or_GPU_execution_started": false
+  },
+  "preservation": {
+    "all_original_failures_retained": true,
+    "old5c_product_domain_defect_requires_new_qualified_candidate": true,
+    "no_new_probe_app_or_GPU_execution": true
+  },
+  "source_receipt_files": {
+    "artifacts/source8-public-probe-contrast-proof-20261112/corpus-v1/status.json": "7ec40b11e0c4663fdf3fa2dbaf266ba060b7fa5a82f9988aedfa16dbf0821550",
+    "artifacts/source8-public-probe-contrast-proof-20261112/release-v1/status.json": "912704d3adc9833a6007d04a7145a1fa8c9a60e8cecd80efc0be63e7f70509b6",
+    "artifacts/source8-public-probe-contrast-proof-20261112/CANDIDATE-BOUNDARY.json": "1bf958d6dd5480ef9827f809316b3cbdee8b9a93fc43603c40bdf2f7f7223fc4"
+  }
+}
