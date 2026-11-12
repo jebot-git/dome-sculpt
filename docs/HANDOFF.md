@@ -12,7 +12,15 @@ and canonical16px font reference all pass. Additional Source39/40 same-object
 sourceful rendering passes software994 controls and authenticated Arc hardware
 with71 mappedELFs and zero drift. See the
 [matching Release gates](validation/authoring-repaired-release-gates-20261112.json).
-These results permit public workflow checks; they do not establish their outcome.
+These results permit public workflow checks. Public GUI pbr-quarter12461 then
+passes52/52 with zero drift/owned survivors. Distinct pbr-tiny9190 passes the
+original Bake/history/reopen checks but times out after16 total checks at the
+added geometry-negative wait. Root and agent independently measured gaps
+[20,69,77,5] against the required12: oldprobe3 is a real dark surface near the
+48-gray background. See the [retained results](validation/authoring-source8-desktop-contrast-20261112.json).
+No assertion/deadline is weakened; oldpoint independent rendering is still being
+checked, and a new test-only one-probe child awaits whole-TU/corpus proof. Public
+matrix/XR progression is held until this is resolved; main remains unchanged.
 
 Exact5c public GUI then matched real-loader XR orchestration is reviewed with
 current expected361SDK/asset pins plus font, sourceHEAD/clean, genuine scenario

@@ -1,0 +1,137 @@
+{
+  "source": "5c820f342f16d8544158410c2125372811c152f3",
+  "scope": "Current public desktop results only; matrix/XR still incomplete. First52pass, second16then actual50s wait failure.",
+  "cases": {
+    "release-gui-pbr-quarter-v1": {
+      "exit": 0,
+      "checks": 52,
+      "last_action": "universal menu Close Window",
+      "error": null,
+      "drift": [],
+      "owned_survivors": [],
+      "shipped_evidence": {
+        "status": {
+          "file": "docs/validation/release-gui-pbr-quarter-v1-status-20261112.json.gz",
+          "gzip_sha256": "cece01b27f8c8a47caf26e18b975ff241ce44e7121c03bf797850bae7f224d9f",
+          "decompressed_sha256": "86039c40692d3da09a32cb70252992e34d9e727852ce97c6c03d96aace8209c2"
+        },
+        "report": {
+          "file": "docs/validation/release-gui-pbr-quarter-v1-report-20261112.json.gz",
+          "gzip_sha256": "00d32076b6d2a0fda85a6a1d6f9e10d526bdbf632c7157da1063336c36487558",
+          "decompressed_sha256": "8d11c5607a272be522752de38ea6c11bd8d6859a6d47f599c6b997f3698da6ee"
+        }
+      }
+    },
+    "release-gui-pbr-tiny-v1": {
+      "exit": 1,
+      "checks": 16,
+      "last_action": "universal menu Authored material",
+      "error": "TimeoutError('Actual FLTK workflow did not reach its expected state')",
+      "drift": [],
+      "owned_survivors": [],
+      "shipped_evidence": {
+        "status": {
+          "file": "docs/validation/release-gui-pbr-tiny-v1-status-20261112.json.gz",
+          "gzip_sha256": "aa6f5113cacca1b6620fbbcdfec8c43b2981f7dba30c1c53a8eb4a53b51f8b28",
+          "decompressed_sha256": "d08e4513053a6a7cbfadcefbeffe05f16de71b852f9635ad047cbcca7237a99e"
+        },
+        "report": {
+          "file": "docs/validation/release-gui-pbr-tiny-v1-report-20261112.json.gz",
+          "gzip_sha256": "d3a1fd26579628f60b6d671401477f743a33d293faed1cb19d565a35899bb1b5",
+          "decompressed_sha256": "7f69ff625651753404eb33aaf7f78c41cb5099de9e61b7077faa761189ca869f"
+        }
+      }
+    }
+  },
+  "root_retained_pixel_audit": [
+    {
+      "probe": 0,
+      "pixel": [
+        365,
+        481
+      ],
+      "actual": [
+        38,
+        28,
+        29
+      ],
+      "hidden": [
+        48,
+        48,
+        48
+      ],
+      "gap": 20,
+      "required": 12
+    },
+    {
+      "probe": 1,
+      "pixel": [
+        663,
+        493
+      ],
+      "actual": [
+        117,
+        115,
+        116
+      ],
+      "hidden": [
+        48,
+        48,
+        48
+      ],
+      "gap": 69,
+      "required": 12
+    },
+    {
+      "probe": 2,
+      "pixel": [
+        689,
+        255
+      ],
+      "actual": [
+        125,
+        124,
+        124
+      ],
+      "hidden": [
+        48,
+        48,
+        48
+      ],
+      "gap": 77,
+      "required": 12
+    },
+    {
+      "probe": 3,
+      "pixel": [
+        414,
+        220
+      ],
+      "actual": [
+        50,
+        43,
+        44
+      ],
+      "hidden": [
+        48,
+        48,
+        48
+      ],
+      "gap": 5,
+      "required": 12
+    }
+  ],
+  "pixel_audit_method": "Original currentowned --visible-control inspector derives all4 pixel locations; compare exactretained hidden canvas with matchingtop732rows of retained actualwindow screenshot. Both failure screenshots byte-identical.",
+  "interpretation": "Source geometry is visible; declared per-probe geometry-negative contrast is only5 atoldprobe3. Independent correct/wrong rendering atoldpoint remains tobe proven; no product-correctness conclusion or weakened predicate follows.",
+  "next_test_only_child": "f9d57dcc; onedeclaredUVpoint(.31,.74)\u2192(.21,.70), same triangle/common191region. No product/scenario/nativefixturepayload changes intended; corpus and actualownedTU proof required.",
+  "all_thresholds_retained": {
+    "geometry_min": 12,
+    "correct_max": 3,
+    "wrong_normal_min": 7,
+    "GUI_step_seconds": 50,
+    "GUI_phase_seconds": 900
+  },
+  "all_four_cases_and_both_XR_eyes_required": true,
+  "main_admitted": false,
+  "full_goal_complete": false
+}
