@@ -1,0 +1,37 @@
+{
+  "release-v1/status.json": {
+    "sha256": "62daf2f3b78bcfce648c259047d3d9d39cccafe94251ba14556bbb5dadf6f99d"
+  },
+  "native-release-v1/status.json": {
+    "sha256": "6befdaa372b78c76622a9c6f67ca5a079fd9cb0a43434c30f17db300a69d63ea"
+  },
+  "closure-plan-v1.json": {
+    "sha256": "201db387da304dd783cfe79ab041cee726540d3828034529dbd5938c56c6a2cf"
+  },
+  "source": "3e523e34189a9207eb8a42a082a1a3d0eb17437f",
+  "scope": "CPU native Release affected closure and actual worker/persistence/export proof only",
+  "core_sha256": "7d6defb12b821516e5f6c7fab95df1b8ac9ba413999e1e03a2b078dc1de4f0ac",
+  "changed_core_members": 13,
+  "unchanged_core_members": 180,
+  "public_headers_byte_exact": 103,
+  "native_case_exits": {
+    "source4-uv1-source-worker": 0,
+    "raw-uv1-source-worker": 0,
+    "source-controls": 0,
+    "original-worker": 0,
+    "public-fixtures": 0,
+    "inspect-desktop-accepted": 0,
+    "inspect-desktop-redone": 0,
+    "inspect-desktop-undone": 0,
+    "inspect-original": 0,
+    "inspect-xr-accepted": 0,
+    "inspect-xr-redone": 0,
+    "inspect-xr-undone": 0
+  },
+  "input_drift": [],
+  "status": 0,
+  "active_jobs": [],
+  "strict_sanitizer": "Not started for Source8 source",
+  "visible_source8_preview": "Still requires the genuine raw source/baked-normal preview adapter; generic UV1 composite guard retained",
+  "full_goal": "Incomplete; paused after current finite milestone per latest user steering"
+}

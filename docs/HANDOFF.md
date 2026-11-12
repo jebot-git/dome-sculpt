@@ -1,3 +1,20 @@
+## Private Source4/FLOAT worker milestone; pause after finite closure — 2026-11-12
+
+Private source `3e523e34` now passes actual full Source4/UV1/FLOAT Document
+worker180357 across four PBR/MToon/coverage cases, separate rawHDR90159,
+source27, original16417 and public fixture32794 plus seven native inspectors.
+Matched Release affected closure rebuilds13 whole core owners against frozen
+4977 core193, with180 exact retained members and all103 public headers unchanged.
+Read [the ownership and proof boundaries](SOURCE4-BAKED-OWNING-20261112.md).
+New Scene42/Paint8 requires authentic before/current source and baked ownership;
+raw/legacy guards and all earlier failed evidence remain. Main is unchanged.
+
+Honor the latest user steering to pause after finalising the current finite
+milestone. No new SAN or preview job started. Visible Source8 preview and
+strict sanitizer/public app/stereo qualification remain future work. The full
+production goal, controller trays and spatial node editing/history remain
+required and incomplete. No system installation or physical session changed.
+
 ## Integrated authoring and large-mesh query milestone — 2026-11-11
 
 Main now contains the qualified `e9931f72` product source, preserving all prior
