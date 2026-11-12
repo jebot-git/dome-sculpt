@@ -1,0 +1,31 @@
+{
+  "state": "staged merge only; NOT application acceptance",
+  "candidate": "5c820f342f16d8544158410c2125372811c152f3",
+  "main_parent": "39b27170d11eb4b484b39856fbb1ac31ff525734",
+  "staged_tree_before_this_docs_only_receipt": "af919623a1f07fddfb50c02180700b779f0c6f91",
+  "merge_head": "5c820f342f16d8544158410c2125372811c152f3",
+  "conflicts": [
+    "docs/HANDOFF.md"
+  ],
+  "resolution": "Keep latest main handoff; candidate freeze note retained in separate merged document. Preserve both commit histories.",
+  "non_docs_git_records": 1709,
+  "non_docs_git_records_sha256": "19a23af6c8f6f9ad0340ab109ac3f09ba16b0542865bd8edbb33804dabe094e7",
+  "identity_method": "Sorted NUL-delimited git ls-tree -rz --full-tree records excluding docs/; mode,type,blob identity,path all included. Candidate and staged records match exactly.",
+  "all_differences_from_frozen_candidate_are_documentation": true,
+  "different_documentation_paths": [
+    "docs/AUTHORING-RELEASE-GENERATED-DAG-20261112.md",
+    "docs/HANDOFF.md",
+    "docs/REQUIREMENTS.md",
+    "docs/SOURCE8-PACKED-LOGICAL-PUBLICATION-20261112.md",
+    "docs/SOURCE8-POLYGON-PUBLICATION-20261112.md",
+    "docs/validation/source8-polygon-publication-20261112.json"
+  ],
+  "remaining_admission_gates": [
+    "owning Release build terminal0 and final input/output audit",
+    "exact85 native/software and explicit helpers/raw/manual gates",
+    "fresh current producers/font and public desktop/OpenXR controls",
+    "final-cohort sanitizer and remaining production requirements"
+  ],
+  "main_runtime_changed": false,
+  "no_install_or_session_restart": true
+}

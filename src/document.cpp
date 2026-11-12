@@ -1798,7 +1798,8 @@ void Document::mesh_loop() {
           dep.frame_role=!job->pbr_view&&o.material_bindings->has_mtoon&&!geometry_detail::same_owner(frames->pbr,frames->mtoon)?1:0;
         }
         auto surface=std::find_if(objects.begin(),objects.end(),[&](const auto &s){return s.id==o.id;});
-        dep.canonical=surface!=objects.end()&&surface->textures&&!surface->textures->normal.rgba.empty();
+        dep.canonical=surface!=objects.end()&&surface->textures&&(!surface->textures->normal.rgba.empty()||
+          (surface->textures->overlay&&surface->textures->overlay->source_baked_geometry()&&surface->textures->overlay->source_baked_normal()));
         if(surface!=objects.end()&&surface->texture_set_surface){
           const auto&plan=*surface->texture_set_surface;dep.texture_membership=plan.collection()->primary_domain();
           for(const auto&field:plan.fields())dep.texture_frames.push_back({field.id,field.painted->baked()&&!field.painted->baked()->maps.normal.rgba.empty()});
@@ -1856,7 +1857,8 @@ void Document::mesh_loop() {
         }
         if(!colors.empty() && snapshot->source_colors.empty())snapshot->source_colors.assign(snapshot->mesh.positions.size(),{1,1,1,1});
         auto retained=o.material_bindings?o.material_bindings->normal_frames:nullptr;
-        const bool canonical=!polygon_field && o.textures && !o.textures->normal_projection && !o.textures->normal.rgba.empty();
+        const bool source8_normal=o.textures&&o.textures->overlay&&o.textures->overlay->source_baked_geometry()&&bool(o.textures->overlay->source_baked_normal());
+        const bool canonical=!polygon_field && o.textures && !o.textures->normal_projection && (!o.textures->normal.rgba.empty()||source8_normal);
         // Existing bakes without captured canonical authority use the historical
         // posed-mesh Mikk basis. Do not invent a persisted/rest export basis.
         const bool dynamic_canonical=retained && canonical && !retained->canonical;
@@ -2030,7 +2032,11 @@ void Document::mesh_loop() {
         // agree with the original local primitive. Rest indices stay untouched.
         if(reflected)for(size_t c=first;c<snapshot->mesh.indices.size();c+=3)std::swap(snapshot->mesh.indices[c+1],snapshot->mesh.indices[c+2]);
         auto textures=o.textures;
-        if(packed_uv1||!packed_extra_uv.empty()){auto maps=std::make_shared<PaintSourceMaps>(*textures->source_maps);if(packed_uv1)maps->uv1=std::move(packed_uv1);for(auto &[set,values]:packed_extra_uv)maps->extra_uv_sets[set]=std::move(values);auto packed=std::make_shared<TextureMaps>(*textures);packed->source_maps=std::move(maps);
+        // Original logical UV0 is independent of image-role carriers. Even an
+        // empty-role Source8 packet must follow the actual packed->current
+        // vertex map when canonical Mikk expands shared vertices to corners.
+        const bool packed_logical=textures&&textures->overlay&&textures->overlay->original_uv0();
+        if(packed_uv1||!packed_extra_uv.empty()||packed_logical){auto maps=std::make_shared<PaintSourceMaps>(*textures->source_maps);if(packed_uv1)maps->uv1=std::move(packed_uv1);for(auto &[set,values]:packed_extra_uv)maps->extra_uv_sets[set]=std::move(values);auto packed=std::make_shared<TextureMaps>(*textures);packed->source_maps=std::move(maps);
           if(packed->overlay)packed->overlay=detail::PaintOverlayFactory::pack_source_maps(packed->overlay,packed->source_maps,overlay_vertices,cancelled);
           textures=std::move(packed);}
         snapshot->ranges.push_back({o.id, first, o.mesh.indices.size(), o.material, std::move(textures), std::move(appearance), offset, o.material_bindings, bool(retained), bool(retained && canonical), bool(retained && retained_pose->tangents[source_role].empty()),world,!affine});

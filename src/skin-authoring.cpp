@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/skin-authoring.hpp"
 #include "skin-affine.hpp"
+#include "automatic-humanoid-bind.hpp"
 #include "normal-frame-runtime.hpp"
 #include "polygon-conversion.hpp"
 #include "source-rest-scene.hpp"
@@ -153,11 +154,17 @@ bool author_skin(Scene &scene,uint64_t target_id,const SkinAuthoringOptions &opt
     BindOptions bind; bind.limits=options.limits; bind.maximum_work=options.maximum_work;
     bind.maximum_seed_distance=options.seed_distance/reference_world.scale;
     bind.seed_margin=options.seed_margin/reference_world.scale; bind.falloff=options.falloff;
+    auto solve_automatic = [&](const Mesh &mesh, const Skeleton &rig) {
+      if (source.humanoid)
+        return detail::automatic_bind_humanoid(mesh, rig, *source.humanoid,
+                                               bind, cancelled);
+      return automatic_bind(mesh, rig, bind, cancelled);
+    };
     if(exact_metric){
       auto world_rig=detail::skin_reframe(*source.skeleton,reference_metric,placement_work);
       bind.maximum_seed_distance=options.seed_distance;bind.seed_margin=options.seed_margin;bind.maximum_work=placement_work.remaining();
-      weights=automatic_bind(rest,world_rig,bind,cancelled);
-    }else weights=automatic_bind(rest,*source.skeleton,bind,cancelled);
+      weights=solve_automatic(rest,world_rig);
+    }else weights=solve_automatic(rest,*source.skeleton);
   } else {
     if(exact_metric){
       auto source_mesh=detail::skin_world_mesh(reference.painted->mesh(),reference_metric,placement_work);

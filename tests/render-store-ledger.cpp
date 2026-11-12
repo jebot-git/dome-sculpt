@@ -44,6 +44,10 @@ int main(int argc,char**argv)try{
  Ledger::Limits limits;limits.material_bytes=512;limits.material_images=4;limits.material_samplers=2;limits.geometry_bytes=512;
  auto ledger=std::make_shared<Ledger>(limits);const auto a=ledger->create_group(),b=ledger->create_group();
  {
+  const auto before=fences;ledger->mark_used();ledger->seal(true);ledger->seal_noexcept(true);
+  check(fences==before&&ledger->collect(),"Empty ledger creates no fence for either forced publication or rollback");
+ }
+ {
   auto p=buffer(ledger,a,128);auto q=buffer(ledger,b,256);const auto id=p.name(),stable=q.name();auto copy=p;p.reset();check(glIsBuffer(id)&&ledger->usage(a).retired_stores==0,"Copyable lease keeps actual accepted resource alive");copy.reset();check(glIsBuffer(id)&&ledger->usage(a).bytes==128&&ledger->usage(a).retired_bytes==128,"Last lease drop neither deletes actual name nor credits bytes");
   const auto before=names;check(refuses([&]{ledger->create(Kind::Buffer,192,Domain::Material,b);})&&names==before,"Shared groups' old/new/debt quota refuses before actual GL generation");
   pending=true;check(!ledger->collect()&&glIsBuffer(id)&&ledger->usage(Domain::Material).bytes==384,"Controlled timeout retains real GL stores and shared charged debt");pending=false;drain(ledger);check(!glIsBuffer(id)&&ledger->usage(Domain::Material).bytes==256,"Real completed fence deletes prior name and releases exact shared bytes");exact(stable,256);
