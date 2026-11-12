@@ -49,6 +49,24 @@ public:
  // Packed coordinate metadata shares one actual immutable contribution owner.
  const std::shared_ptr<const PaintOverlayPacket>&contribution_owner()const noexcept{return contribution_owner_;}
 };
+// Validate a Source8 render view against the factory-owned original/current
+// packet and carriers. A copied public marker cannot replace these owners.
+inline bool source_baked_preview_metadata(const TextureMaps &maps){
+ const auto &p=maps.overlay;if(!p||!p->source_baked_geometry())return false;
+ const auto &root=p->contribution_owner()?p->contribution_owner():p;
+ if(!maps.source_only||!maps.source_maps||!maps.baked_base||maps.baked_base!=p->baked()||
+    maps.source_maps!=p->source_maps()||!root->original_uv0()||
+    root->original_uv0()->size()!=root->source_baked_geometry()->positions.size()||
+    (bool(p->source_baked_normal())!=!p->baked()->maps.normal.rgba.empty())||
+    bool(p->source_baked_normal())!=bool(p->source_baked_coverage()))
+   throw std::invalid_argument("Source8 preview differs from its actual immutable source/baked/carrier owners");
+ if(p->source_baked_normal()){
+   p->source_baked_normal()->validate();p->source_baked_coverage()->validate();
+   for(const auto &i:{p->source_baked_normal(),p->source_baked_coverage()})
+     if(i->width!=p->resolution()||i->height!=p->resolution())throw std::invalid_argument("Source8 normal carrier changed its current atlas domain");
+ }
+ return true;
+}
 // Captured layers already exclude hidden and zero-opacity metadata. A real
 // float tile keeps its interpretation even when its current value is zero.
 inline bool overlay_uses_float_emission(const PaintOverlayPacket &packet) noexcept {
