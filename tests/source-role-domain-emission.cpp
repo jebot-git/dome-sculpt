@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/scene.hpp"
 #include "dome/source-paint.hpp"
+#include "dome/source-maps.hpp"
+#include <nlohmann/json.hpp>
 #include "dome/bake-authoring.hpp"
 #include "emission-bake-source.hpp"
 #include <iostream>
