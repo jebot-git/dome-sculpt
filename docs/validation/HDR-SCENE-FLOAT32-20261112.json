@@ -1,0 +1,828 @@
+{
+  "source": "2bf632673ef9ce6fa74cbaa2117e5aa19bacb4eb",
+  "scope": "Qualified incremental full-FLOAT scene target component. Whole affected renderer TU plus9 fresh consumer TUs/profile; current193 core and3 exact renderer members reused. Not a fresh whole application build, app integration or performance/HMD acceptance.",
+  "changes_from_frozen291": [
+    "CMakeLists.txt",
+    "src/render-target.hpp",
+    "tests/linear-scene-target.cpp"
+  ],
+  "product_files": {
+    "CMakeLists.txt": "f413bbb4280e555dfc2416072cefc0a0488b08c1c231fd9a5106e48fb3cc44ec",
+    "src/render-target.hpp": "5ae1ba195a44b08baf6ccfd3329a39207b433a70e2c65a85f0cffaf3177a3ecb",
+    "tests/linear-scene-target.cpp": "9779db377bac8e3eef581c11318bd9d0b2085a8d1aa2e4355380bec4c9a2a6a2"
+  },
+  "public_header_files_unchanged": 103,
+  "resource_policy": {
+    "color": "RGBA32F",
+    "requested_bytes_per_pixel": {
+      "depth_slot4": 20,
+      "float_depth_stencil8": 24
+    },
+    "pool_max_bytes": 536870912,
+    "view_max_pixels": 16777216,
+    "pool_max_pixels": 33554432,
+    "pool_max_targets": 2,
+    "atomic_refusal": "Candidate plus accepted front must fit; oversized simultaneous transition refuses before allocation; older cached targets may be evicted."
+  },
+  "software": {
+    "release": {
+      "receipt": {
+        "path": "artifacts/hdr-scene-float32-fixture-proof-20261112/release-completion/status.json",
+        "sha256": "0848c4ff2f6f2cb5760bb733820c1d7807b415d6cb358ebae1e4dac6a915bf45",
+        "raw_exit": 0
+      },
+      "complete_steps": 30,
+      "fresh_render_TUs": 1,
+      "exact_other_render_members": 3,
+      "core_members": 193,
+      "fresh_consumer_TUs": 9,
+      "private_header_fresh_closure": [
+        "render.cpp.o",
+        "linear-scene-target.cpp.o"
+      ],
+      "render_member_routes": {
+        "render.cpp.o": {
+          "fresh": true,
+          "sha256": "6a1b1297fb4b01e804e86dab25d237bfd768d8ffcf1a980f479a5588a524475a"
+        },
+        "palette.cpp.o": {
+          "fresh": false,
+          "sha256": "6a5392330f15cadd55c6dfc4450977dc7e8366d4ffad895e908cd857fa5cfe30"
+        },
+        "palette-text.cpp.o": {
+          "fresh": false,
+          "sha256": "64635d7bbd1b159c937df4b21715c6eff63497df5d5ab4c91489acdfd4073b44"
+        },
+        "polygon-render.cpp.o": {
+          "fresh": false,
+          "sha256": "bf54a2e5a98acc7124939cb985db69009b4b030f4c2d6a1e4431e13582cc1915"
+        }
+      },
+      "core_archive_sha256": "8a3a7fd7b3db54b8d71d816841a69f88c10bea75859d2f7aa48681be88366df2",
+      "unchanged_core_compiler_routes": 193,
+      "asset_literal_policy": {
+        "actual_core_macro_preserved": "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/authoring-hdr-union-20261111/assets/humanoid\"",
+        "configure_only_old_literal": "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/authoring-hdr-union-20261111/assets/humanoid\"",
+        "configure_only_new_literal": "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/hdr-scene-float32-fixture-20261112/assets/humanoid\"",
+        "basis": "No actual core flags changed. All tracked current and frozen291 asset bytes exact; prior5bb literal assets retained in inherited SAN core proof. No other -D normalization."
+      },
+      "runs": [
+        {
+          "test": "linear-scene-target",
+          "native_exit": 0,
+          "footer": "PASS 56 actual FLOAT scene target controls",
+          "log_sha256": "7f4a105cd49c6e2611794294fb0de8cb3064d6a88aee11db03281825dd3bfc1c"
+        },
+        {
+          "test": "hdr-preview-overflow",
+          "native_exit": 0,
+          "footer": "PASS 281 actual HDR preview overflow, coverage, alpha, outline and native-retention controls",
+          "log_sha256": "cf46b783364d878d8ad7781209322cfd23998a3360aafb7a170339d4c3b1778b"
+        },
+        {
+          "test": "mtoon-render",
+          "native_exit": 0,
+          "footer": "Production MToon/linear target tests complete: 81 checks",
+          "log_sha256": "bb4eec5dcf9330fc64ba03a7de6f155bd598726802fe8be8c66f6b39b55e5108"
+        },
+        {
+          "test": "source-paint-overlay",
+          "native_exit": 0,
+          "footer": "PASS 44 source paint overlay checks max_pair_error=1",
+          "log_sha256": "ca6802a02f87716566885678385b9a0a3232737aa682b535ba8b9816d6dbd72b"
+        },
+        {
+          "test": "renderer-recovery",
+          "native_exit": 0,
+          "footer": "PASS 828 actual accepted/Pending renderer recovery checks",
+          "log_sha256": "f4a452bfd108f84b3fa12ecf04b12514f5d3f2a38ccdd8dc948f13a8cc6bf560"
+        },
+        {
+          "test": "document-render-buffers",
+          "native_exit": 0,
+          "footer": "Document GPU reuse complete: 31 checks",
+          "log_sha256": "a7fae7771719c88ae2037441ec0381e2af8a17956afdf1d301216344e438662b"
+        },
+        {
+          "test": "document-render-capacity",
+          "native_exit": 0,
+          "footer": "64 Document capacity checks passed",
+          "log_sha256": "3e3a7ae6863e8341d22a49793406dc263d1d73c3f58e58fdcabcc892680212f0"
+        },
+        {
+          "test": "normal-frame-render",
+          "native_exit": 0,
+          "footer": "Original frame renderer checks 47",
+          "log_sha256": "adcc08f405f74061b53b20ef744168e77a85506314c49e271cee931e60147965"
+        },
+        {
+          "test": "surface-program-switch",
+          "native_exit": 0,
+          "footer": "PASS 17 surface program transition checks",
+          "log_sha256": "5a79d76b12a3ab6308462d56cd51d9f9494c7c7b44b2e485252ed9dbf57cdef9"
+        }
+      ]
+    },
+    "strict_sanitizer": {
+      "receipt": {
+        "path": "artifacts/hdr-scene-float32-fixture-proof-20261112/sanitize/status.json",
+        "sha256": "eabf2a23943bc03f63df7e55f1eff656499cfc36e00c230ef15b48b354715484",
+        "raw_exit": 0
+      },
+      "complete_steps": 30,
+      "fresh_render_TUs": 1,
+      "exact_other_render_members": 3,
+      "core_members": 193,
+      "fresh_consumer_TUs": 9,
+      "private_header_fresh_closure": [
+        "render.cpp.o",
+        "linear-scene-target.cpp.o"
+      ],
+      "render_member_routes": {
+        "render.cpp.o": {
+          "fresh": true,
+          "sha256": "a246c956438083aa323edf966d7c276858b3f9304250b1976dab002a80b13b0c"
+        },
+        "palette.cpp.o": {
+          "fresh": false,
+          "sha256": "0e5953a103a4dbf0d5c562742b7d0882af622563c7b519a4b2503e54219fc745"
+        },
+        "palette-text.cpp.o": {
+          "fresh": false,
+          "sha256": "9dcff99e0331cd1f8d77b808d3e83afce6390e1979b06b4bd926c6ffcedbbd69"
+        },
+        "polygon-render.cpp.o": {
+          "fresh": false,
+          "sha256": "6758a305b4b8d35ab232d7d5246186e5527b7a3db2b7b208304d53975e8b7870"
+        }
+      },
+      "core_archive_sha256": "c3e98bebcad5a3e93c98426c72997e8a5ddbc2cf1b954aa0e6a7ed984de23426",
+      "unchanged_core_compiler_routes": 193,
+      "asset_literal_policy": {
+        "actual_core_macro_preserved": "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/radiance-bake-fallback-v2-20261111/assets/humanoid\"",
+        "configure_only_old_literal": "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/hdr-preview-blend-fixture-20261112/assets/humanoid\"",
+        "configure_only_new_literal": "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/hdr-scene-float32-fixture-20261112/assets/humanoid\"",
+        "basis": "No actual core flags changed. All tracked current and frozen291 asset bytes exact; prior5bb literal assets retained in inherited SAN core proof. No other -D normalization."
+      },
+      "runs": [
+        {
+          "test": "linear-scene-target",
+          "native_exit": 0,
+          "footer": "PASS 56 actual FLOAT scene target controls",
+          "log_sha256": "7f4a105cd49c6e2611794294fb0de8cb3064d6a88aee11db03281825dd3bfc1c"
+        },
+        {
+          "test": "hdr-preview-overflow",
+          "native_exit": 0,
+          "footer": "PASS 281 actual HDR preview overflow, coverage, alpha, outline and native-retention controls",
+          "log_sha256": "cf46b783364d878d8ad7781209322cfd23998a3360aafb7a170339d4c3b1778b"
+        },
+        {
+          "test": "mtoon-render",
+          "native_exit": 0,
+          "footer": "Production MToon/linear target tests complete: 81 checks",
+          "log_sha256": "bb4eec5dcf9330fc64ba03a7de6f155bd598726802fe8be8c66f6b39b55e5108"
+        },
+        {
+          "test": "source-paint-overlay",
+          "native_exit": 0,
+          "footer": "PASS 44 source paint overlay checks max_pair_error=1",
+          "log_sha256": "ca6802a02f87716566885678385b9a0a3232737aa682b535ba8b9816d6dbd72b"
+        },
+        {
+          "test": "renderer-recovery",
+          "native_exit": 0,
+          "footer": "PASS 828 actual accepted/Pending renderer recovery checks",
+          "log_sha256": "f4a452bfd108f84b3fa12ecf04b12514f5d3f2a38ccdd8dc948f13a8cc6bf560"
+        },
+        {
+          "test": "document-render-buffers",
+          "native_exit": 0,
+          "footer": "Document GPU reuse complete: 31 checks",
+          "log_sha256": "a7fae7771719c88ae2037441ec0381e2af8a17956afdf1d301216344e438662b"
+        },
+        {
+          "test": "document-render-capacity",
+          "native_exit": 0,
+          "footer": "64 Document capacity checks passed",
+          "log_sha256": "3e3a7ae6863e8341d22a49793406dc263d1d73c3f58e58fdcabcc892680212f0"
+        },
+        {
+          "test": "normal-frame-render",
+          "native_exit": 0,
+          "footer": "Original frame renderer checks 47",
+          "log_sha256": "adcc08f405f74061b53b20ef744168e77a85506314c49e271cee931e60147965"
+        },
+        {
+          "test": "surface-program-switch",
+          "native_exit": 0,
+          "footer": "PASS 17 surface program transition checks",
+          "log_sha256": "5a79d76b12a3ab6308462d56cd51d9f9494c7c7b44b2e485252ed9dbf57cdef9"
+        }
+      ]
+    }
+  },
+  "arc": {
+    "receipt": {
+      "path": "artifacts/hdr-scene-float32-fixture-proof-20261112/arc-v2/status.json",
+      "sha256": "e2871fb483177be882caa84b10784cfadb880a3d4a8b51f23ee01dfc5c402315",
+      "raw_exit": 0
+    },
+    "runs": [
+      {
+        "profile": "release",
+        "name": "linear-scene-target",
+        "native_exit": 0,
+        "exit": 0,
+        "seconds": 0.2502423810074106,
+        "limits": {
+          "seconds": 180,
+          "rss_bytes": 4294967296,
+          "basis": "Existing original functional native180s/capacity240s and Arc4/8GiB envelope."
+        },
+        "maxrss_bytes": 70131712,
+        "live_proc_samples": 28,
+        "independent_fast_live_samples": 28,
+        "actual_live_DRM_FDs": [
+          "/dev/dri/renderD129"
+        ],
+        "actual_device_authenticated": true,
+        "guard": null,
+        "unmatched_or_changed_mapped_ELFs": [],
+        "sanitizer_diagnostics": false,
+        "native_footer": "PASS 57 actual FLOAT scene target controls",
+        "mapped_ELF_provider_count": 71,
+        "log_sha256": "aa17600ec588b4502fec5af1e68a59cf077a08d13e2ee3001312ddcb26897117",
+        "status_path": "artifacts/hdr-scene-float32-fixture-proof-20261112/arc-v2/release-linear-scene-target/status.json",
+        "status_sha256": "be19ebec936f4d1b86415dc901b9cdf9fe156fd554fd0d4c495ab340defb768f"
+      },
+      {
+        "profile": "release",
+        "name": "hdr-preview-overflow",
+        "native_exit": 0,
+        "exit": 0,
+        "seconds": 2.3439808000111952,
+        "limits": {
+          "seconds": 180,
+          "rss_bytes": 4294967296,
+          "basis": "Existing original functional native180s/capacity240s and Arc4/8GiB envelope."
+        },
+        "maxrss_bytes": 93347840,
+        "live_proc_samples": 1840,
+        "independent_fast_live_samples": 1485,
+        "actual_live_DRM_FDs": [
+          "/dev/dri/renderD129"
+        ],
+        "actual_device_authenticated": true,
+        "guard": null,
+        "unmatched_or_changed_mapped_ELFs": [],
+        "sanitizer_diagnostics": false,
+        "native_footer": "PASS 282 actual HDR preview overflow, coverage, alpha, outline and native-retention controls",
+        "mapped_ELF_provider_count": 71,
+        "log_sha256": "0af22c468ccc9a09842eea6d8788eece4b7ced55dc228f9c8403fdb2b653f0e1",
+        "status_path": "artifacts/hdr-scene-float32-fixture-proof-20261112/arc-v2/release-hdr-preview-overflow/status.json",
+        "status_sha256": "12432479ce884fe108cbeab6ed4ee15995403647f3ac2002b3accc5872fa4f21"
+      },
+      {
+        "profile": "release",
+        "name": "mtoon-render",
+        "native_exit": 0,
+        "exit": 0,
+        "seconds": 0.25760319898836315,
+        "limits": {
+          "seconds": 180,
+          "rss_bytes": 4294967296,
+          "basis": "Existing original functional native180s/capacity240s and Arc4/8GiB envelope."
+        },
+        "maxrss_bytes": 81235968,
+        "live_proc_samples": 131,
+        "independent_fast_live_samples": 131,
+        "actual_live_DRM_FDs": [
+          "/dev/dri/renderD129"
+        ],
+        "actual_device_authenticated": true,
+        "guard": null,
+        "unmatched_or_changed_mapped_ELFs": [],
+        "sanitizer_diagnostics": false,
+        "native_footer": "Production MToon/linear target tests complete: 81 checks",
+        "mapped_ELF_provider_count": 71,
+        "log_sha256": "df215ce61fd3668425cb36dd3219dc8be36703704d1098a7a22c92f9be1ca60d",
+        "status_path": "artifacts/hdr-scene-float32-fixture-proof-20261112/arc-v2/release-mtoon-render/status.json",
+        "status_sha256": "b9a450f82dad43a78643ef8cc7c91dc103ab57635cb0107a4990f9f1827872fe"
+      },
+      {
+        "profile": "release",
+        "name": "source-paint-overlay",
+        "native_exit": 0,
+        "exit": 0,
+        "seconds": 0.2545309729757719,
+        "limits": {
+          "seconds": 180,
+          "rss_bytes": 4294967296,
+          "basis": "Existing original functional native180s/capacity240s and Arc4/8GiB envelope."
+        },
+        "maxrss_bytes": 78700544,
+        "live_proc_samples": 49,
+        "independent_fast_live_samples": 49,
+        "actual_live_DRM_FDs": [
+          "/dev/dri/renderD129"
+        ],
+        "actual_device_authenticated": true,
+        "guard": null,
+        "unmatched_or_changed_mapped_ELFs": [],
+        "sanitizer_diagnostics": false,
+        "native_footer": "PASS 44 source paint overlay checks max_pair_error=1",
+        "mapped_ELF_provider_count": 71,
+        "log_sha256": "ce80db28961c53b10704a74b986de2051f6f63e8cb12aff78048e58a476f50b5",
+        "status_path": "artifacts/hdr-scene-float32-fixture-proof-20261112/arc-v2/release-source-paint-overlay/status.json",
+        "status_sha256": "859f0b108e1010400a33fd6d48131800bf2187d3606cb061e257d17ee450d3bc"
+      },
+      {
+        "profile": "release",
+        "name": "renderer-recovery",
+        "native_exit": 0,
+        "exit": 0,
+        "seconds": 8.725303406012245,
+        "limits": {
+          "seconds": 180,
+          "rss_bytes": 4294967296,
+          "basis": "Existing original functional native180s/capacity240s and Arc4/8GiB envelope."
+        },
+        "maxrss_bytes": 585371648,
+        "live_proc_samples": 6949,
+        "independent_fast_live_samples": 5510,
+        "actual_live_DRM_FDs": [
+          "/dev/dri/renderD129"
+        ],
+        "actual_device_authenticated": true,
+        "guard": null,
+        "unmatched_or_changed_mapped_ELFs": [],
+        "sanitizer_diagnostics": false,
+        "native_footer": "PASS 831 actual accepted/Pending renderer recovery checks",
+        "mapped_ELF_provider_count": 71,
+        "log_sha256": "95ad2472f601c536e19acb20e9140af09b947a1d4ad2b61ad4b3a8d81f3a275d",
+        "status_path": "artifacts/hdr-scene-float32-fixture-proof-20261112/arc-v2/release-renderer-recovery/status.json",
+        "status_sha256": "5ab506777ef32af1d7e28ff1c2fb928532d103939433ec34d9150ee4d380cd43"
+      },
+      {
+        "profile": "release",
+        "name": "document-render-buffers",
+        "native_exit": 0,
+        "exit": 0,
+        "seconds": 0.3852848180104047,
+        "limits": {
+          "seconds": 180,
+          "rss_bytes": 4294967296,
+          "basis": "Existing original functional native180s/capacity240s and Arc4/8GiB envelope."
+        },
+        "maxrss_bytes": 115527680,
+        "live_proc_samples": 237,
+        "independent_fast_live_samples": 219,
+        "actual_live_DRM_FDs": [
+          "/dev/dri/renderD129"
+        ],
+        "actual_device_authenticated": true,
+        "guard": null,
+        "unmatched_or_changed_mapped_ELFs": [],
+        "sanitizer_diagnostics": false,
+        "native_footer": "Document GPU reuse complete: 31 checks",
+        "mapped_ELF_provider_count": 71,
+        "log_sha256": "75d2711a92495399e803e3dade388f33e6f8cf33a0c491220255c5f8a545fe28",
+        "status_path": "artifacts/hdr-scene-float32-fixture-proof-20261112/arc-v2/release-document-render-buffers/status.json",
+        "status_sha256": "d4955278b14b0ad65f4108b7a06ffa0a455e811a474613fca4189dccadbd5c6a"
+      },
+      {
+        "profile": "release",
+        "name": "document-render-capacity",
+        "native_exit": 0,
+        "exit": 0,
+        "seconds": 2.4713302300078794,
+        "limits": {
+          "seconds": 240,
+          "rss_bytes": 4294967296,
+          "basis": "Existing original functional native180s/capacity240s and Arc4/8GiB envelope."
+        },
+        "maxrss_bytes": 1018060800,
+        "live_proc_samples": 1940,
+        "independent_fast_live_samples": 1563,
+        "actual_live_DRM_FDs": [
+          "/dev/dri/renderD129"
+        ],
+        "actual_device_authenticated": true,
+        "guard": null,
+        "unmatched_or_changed_mapped_ELFs": [],
+        "sanitizer_diagnostics": false,
+        "native_footer": "64 Document capacity checks passed",
+        "mapped_ELF_provider_count": 71,
+        "log_sha256": "b0b366c851d4b83122c6532dcbd97f160f1152da8685c1fde5e26419eb54a0be",
+        "status_path": "artifacts/hdr-scene-float32-fixture-proof-20261112/arc-v2/release-document-render-capacity/status.json",
+        "status_sha256": "1f0026046b277c49a113166a2294e3218746663ede59c925b949d5c06dac2fb2"
+      },
+      {
+        "profile": "release",
+        "name": "normal-frame-render",
+        "native_exit": 0,
+        "exit": 0,
+        "seconds": 0.2705010590143502,
+        "limits": {
+          "seconds": 180,
+          "rss_bytes": 4294967296,
+          "basis": "Existing original functional native180s/capacity240s and Arc4/8GiB envelope."
+        },
+        "maxrss_bytes": 88666112,
+        "live_proc_samples": 125,
+        "independent_fast_live_samples": 125,
+        "actual_live_DRM_FDs": [
+          "/dev/dri/renderD129"
+        ],
+        "actual_device_authenticated": true,
+        "guard": null,
+        "unmatched_or_changed_mapped_ELFs": [],
+        "sanitizer_diagnostics": false,
+        "native_footer": "Original frame renderer checks 47",
+        "mapped_ELF_provider_count": 71,
+        "log_sha256": "6b7ef760aad7feb9c90d9b7e99ca4437ae5a6871df5a9617774150008d7cf4cf",
+        "status_path": "artifacts/hdr-scene-float32-fixture-proof-20261112/arc-v2/release-normal-frame-render/status.json",
+        "status_sha256": "33eb1ca20fa256c84b53705893be8dd58a0a174a17482da61cb31023d72e9871"
+      },
+      {
+        "profile": "release",
+        "name": "surface-program-switch",
+        "native_exit": 0,
+        "exit": 0,
+        "seconds": 0.26229886297369376,
+        "limits": {
+          "seconds": 180,
+          "rss_bytes": 4294967296,
+          "basis": "Existing original functional native180s/capacity240s and Arc4/8GiB envelope."
+        },
+        "maxrss_bytes": 78385152,
+        "live_proc_samples": 95,
+        "independent_fast_live_samples": 95,
+        "actual_live_DRM_FDs": [
+          "/dev/dri/renderD129"
+        ],
+        "actual_device_authenticated": true,
+        "guard": null,
+        "unmatched_or_changed_mapped_ELFs": [],
+        "sanitizer_diagnostics": false,
+        "native_footer": "PASS 17 surface program transition checks",
+        "mapped_ELF_provider_count": 71,
+        "log_sha256": "8fc565c8e56d01833050235c913edef6500af80e5507568a4b050e606675ba85",
+        "status_path": "artifacts/hdr-scene-float32-fixture-proof-20261112/arc-v2/release-surface-program-switch/status.json",
+        "status_sha256": "676b59150b7ee7db49ad67fbbcf9d13b03564cf62b6431d466450a8eb5d4beee"
+      },
+      {
+        "profile": "sanitize",
+        "name": "linear-scene-target",
+        "native_exit": 0,
+        "exit": 0,
+        "seconds": 0.5009918930009007,
+        "limits": {
+          "seconds": 180,
+          "rss_bytes": 8589934592,
+          "basis": "Existing original functional native180s/capacity240s and Arc4/8GiB envelope."
+        },
+        "maxrss_bytes": 362496000,
+        "live_proc_samples": 115,
+        "independent_fast_live_samples": 115,
+        "actual_live_DRM_FDs": [
+          "/dev/dri/renderD129"
+        ],
+        "actual_device_authenticated": true,
+        "guard": null,
+        "unmatched_or_changed_mapped_ELFs": [],
+        "sanitizer_diagnostics": false,
+        "native_footer": "PASS 57 actual FLOAT scene target controls",
+        "mapped_ELF_provider_count": 73,
+        "log_sha256": "aa17600ec588b4502fec5af1e68a59cf077a08d13e2ee3001312ddcb26897117",
+        "status_path": "artifacts/hdr-scene-float32-fixture-proof-20261112/arc-v2/sanitize-linear-scene-target/status.json",
+        "status_sha256": "f6d542ee705d7bb2d3d700223bcf187c7ae6a9243d18d2fdc0cd5eac9067e6b2"
+      },
+      {
+        "profile": "sanitize",
+        "name": "hdr-preview-overflow",
+        "native_exit": 0,
+        "exit": 0,
+        "seconds": 3.8066854989738204,
+        "limits": {
+          "seconds": 180,
+          "rss_bytes": 8589934592,
+          "basis": "Existing original functional native180s/capacity240s and Arc4/8GiB envelope."
+        },
+        "maxrss_bytes": 888786944,
+        "live_proc_samples": 2647,
+        "independent_fast_live_samples": 2177,
+        "actual_live_DRM_FDs": [
+          "/dev/dri/renderD129"
+        ],
+        "actual_device_authenticated": true,
+        "guard": null,
+        "unmatched_or_changed_mapped_ELFs": [],
+        "sanitizer_diagnostics": false,
+        "native_footer": "PASS 282 actual HDR preview overflow, coverage, alpha, outline and native-retention controls",
+        "mapped_ELF_provider_count": 73,
+        "log_sha256": "0af22c468ccc9a09842eea6d8788eece4b7ced55dc228f9c8403fdb2b653f0e1",
+        "status_path": "artifacts/hdr-scene-float32-fixture-proof-20261112/arc-v2/sanitize-hdr-preview-overflow/status.json",
+        "status_sha256": "0e2a841e45cce904d7b19941b17276fe68721bfb34ebecfa6f95569c5bd4917a"
+      },
+      {
+        "profile": "sanitize",
+        "name": "mtoon-render",
+        "native_exit": 0,
+        "exit": 0,
+        "seconds": 0.7049805070273578,
+        "limits": {
+          "seconds": 180,
+          "rss_bytes": 8589934592,
+          "basis": "Existing original functional native180s/capacity240s and Arc4/8GiB envelope."
+        },
+        "maxrss_bytes": 451043328,
+        "live_proc_samples": 323,
+        "independent_fast_live_samples": 322,
+        "actual_live_DRM_FDs": [
+          "/dev/dri/renderD129"
+        ],
+        "actual_device_authenticated": true,
+        "guard": null,
+        "unmatched_or_changed_mapped_ELFs": [],
+        "sanitizer_diagnostics": false,
+        "native_footer": "Production MToon/linear target tests complete: 81 checks",
+        "mapped_ELF_provider_count": 73,
+        "log_sha256": "df215ce61fd3668425cb36dd3219dc8be36703704d1098a7a22c92f9be1ca60d",
+        "status_path": "artifacts/hdr-scene-float32-fixture-proof-20261112/arc-v2/sanitize-mtoon-render/status.json",
+        "status_sha256": "fc9ca20dfb6552b8da8989609d28b477ee6906c376625d0a56996def773621dd"
+      },
+      {
+        "profile": "sanitize",
+        "name": "source-paint-overlay",
+        "native_exit": 0,
+        "exit": 0,
+        "seconds": 0.5084144129650667,
+        "limits": {
+          "seconds": 180,
+          "rss_bytes": 8589934592,
+          "basis": "Existing original functional native180s/capacity240s and Arc4/8GiB envelope."
+        },
+        "maxrss_bytes": 407732224,
+        "live_proc_samples": 178,
+        "independent_fast_live_samples": 178,
+        "actual_live_DRM_FDs": [
+          "/dev/dri/renderD129"
+        ],
+        "actual_device_authenticated": true,
+        "guard": null,
+        "unmatched_or_changed_mapped_ELFs": [],
+        "sanitizer_diagnostics": false,
+        "native_footer": "PASS 44 source paint overlay checks max_pair_error=1",
+        "mapped_ELF_provider_count": 73,
+        "log_sha256": "ce80db28961c53b10704a74b986de2051f6f63e8cb12aff78048e58a476f50b5",
+        "status_path": "artifacts/hdr-scene-float32-fixture-proof-20261112/arc-v2/sanitize-source-paint-overlay/status.json",
+        "status_sha256": "4fb37223aeb3717258da2b53bd66d7fbc442dc7403feaad8f53ad79b51c892ed"
+      },
+      {
+        "profile": "sanitize",
+        "name": "renderer-recovery",
+        "native_exit": 0,
+        "exit": 0,
+        "seconds": 7.385370097006671,
+        "limits": {
+          "seconds": 180,
+          "rss_bytes": 8589934592,
+          "basis": "Existing original functional native180s/capacity240s and Arc4/8GiB envelope."
+        },
+        "maxrss_bytes": 1054441472,
+        "live_proc_samples": 5288,
+        "independent_fast_live_samples": 4229,
+        "actual_live_DRM_FDs": [
+          "/dev/dri/renderD129"
+        ],
+        "actual_device_authenticated": true,
+        "guard": null,
+        "unmatched_or_changed_mapped_ELFs": [],
+        "sanitizer_diagnostics": false,
+        "native_footer": "PASS 831 actual accepted/Pending renderer recovery checks",
+        "mapped_ELF_provider_count": 73,
+        "log_sha256": "95ad2472f601c536e19acb20e9140af09b947a1d4ad2b61ad4b3a8d81f3a275d",
+        "status_path": "artifacts/hdr-scene-float32-fixture-proof-20261112/arc-v2/sanitize-renderer-recovery/status.json",
+        "status_sha256": "ce69387dbc9271a3bda266717e303b780b2fd8a96558695edadfbf9167cdded8"
+      },
+      {
+        "profile": "sanitize",
+        "name": "document-render-buffers",
+        "native_exit": 0,
+        "exit": 0,
+        "seconds": 1.2693147110403515,
+        "limits": {
+          "seconds": 180,
+          "rss_bytes": 8589934592,
+          "basis": "Existing original functional native180s/capacity240s and Arc4/8GiB envelope."
+        },
+        "maxrss_bytes": 856154112,
+        "live_proc_samples": 762,
+        "independent_fast_live_samples": 710,
+        "actual_live_DRM_FDs": [
+          "/dev/dri/renderD129"
+        ],
+        "actual_device_authenticated": true,
+        "guard": null,
+        "unmatched_or_changed_mapped_ELFs": [],
+        "sanitizer_diagnostics": false,
+        "native_footer": "Document GPU reuse complete: 31 checks",
+        "mapped_ELF_provider_count": 73,
+        "log_sha256": "75d2711a92495399e803e3dade388f33e6f8cf33a0c491220255c5f8a545fe28",
+        "status_path": "artifacts/hdr-scene-float32-fixture-proof-20261112/arc-v2/sanitize-document-render-buffers/status.json",
+        "status_sha256": "c9c21d72efcbd8afd61ecfee1b378718f897fc8645771b9c3201db0f67f3feb9"
+      },
+      {
+        "profile": "sanitize",
+        "name": "document-render-capacity",
+        "native_exit": 0,
+        "exit": 0,
+        "seconds": 22.184266335971188,
+        "limits": {
+          "seconds": 240,
+          "rss_bytes": 8589934592,
+          "basis": "Existing original functional native180s/capacity240s and Arc4/8GiB envelope."
+        },
+        "maxrss_bytes": 1828761600,
+        "live_proc_samples": 16893,
+        "independent_fast_live_samples": 13341,
+        "actual_live_DRM_FDs": [
+          "/dev/dri/renderD129"
+        ],
+        "actual_device_authenticated": true,
+        "guard": null,
+        "unmatched_or_changed_mapped_ELFs": [],
+        "sanitizer_diagnostics": false,
+        "native_footer": "64 Document capacity checks passed",
+        "mapped_ELF_provider_count": 73,
+        "log_sha256": "b0b366c851d4b83122c6532dcbd97f160f1152da8685c1fde5e26419eb54a0be",
+        "status_path": "artifacts/hdr-scene-float32-fixture-proof-20261112/arc-v2/sanitize-document-render-capacity/status.json",
+        "status_sha256": "eef30b0fb1e31485a9611fcd64a197a3a90311a25ac2511ad400ab3a7fa3c389"
+      },
+      {
+        "profile": "sanitize",
+        "name": "normal-frame-render",
+        "native_exit": 0,
+        "exit": 0,
+        "seconds": 0.7637749600107782,
+        "limits": {
+          "seconds": 180,
+          "rss_bytes": 8589934592,
+          "basis": "Existing original functional native180s/capacity240s and Arc4/8GiB envelope."
+        },
+        "maxrss_bytes": 595542016,
+        "live_proc_samples": 330,
+        "independent_fast_live_samples": 330,
+        "actual_live_DRM_FDs": [
+          "/dev/dri/renderD129"
+        ],
+        "actual_device_authenticated": true,
+        "guard": null,
+        "unmatched_or_changed_mapped_ELFs": [],
+        "sanitizer_diagnostics": false,
+        "native_footer": "Original frame renderer checks 47",
+        "mapped_ELF_provider_count": 73,
+        "log_sha256": "6b7ef760aad7feb9c90d9b7e99ca4437ae5a6871df5a9617774150008d7cf4cf",
+        "status_path": "artifacts/hdr-scene-float32-fixture-proof-20261112/arc-v2/sanitize-normal-frame-render/status.json",
+        "status_sha256": "ea533d512f54b98a06d68af836b87b585a7b12eba707e735ce72f6315ec03fcf"
+      },
+      {
+        "profile": "sanitize",
+        "name": "surface-program-switch",
+        "native_exit": 0,
+        "exit": 0,
+        "seconds": 0.5127145149745047,
+        "limits": {
+          "seconds": 180,
+          "rss_bytes": 8589934592,
+          "basis": "Existing original functional native180s/capacity240s and Arc4/8GiB envelope."
+        },
+        "maxrss_bytes": 419274752,
+        "live_proc_samples": 203,
+        "independent_fast_live_samples": 203,
+        "actual_live_DRM_FDs": [
+          "/dev/dri/renderD129"
+        ],
+        "actual_device_authenticated": true,
+        "guard": null,
+        "unmatched_or_changed_mapped_ELFs": [],
+        "sanitizer_diagnostics": false,
+        "native_footer": "PASS 17 surface program transition checks",
+        "mapped_ELF_provider_count": 73,
+        "log_sha256": "8fc565c8e56d01833050235c913edef6500af80e5507568a4b050e606675ba85",
+        "status_path": "artifacts/hdr-scene-float32-fixture-proof-20261112/arc-v2/sanitize-surface-program-switch/status.json",
+        "status_sha256": "d5b04cb6a1f75fc48045899cfa77c0d9cd0838f30f700b89494d9b231ea13b23"
+      }
+    ],
+    "lease_acquired_epoch": 1794444463.0625198,
+    "lease_released_epoch": 1794444525.0359201,
+    "sampled_RSS_peak_bytes": {
+      "release": 1018060800,
+      "sanitize": 1828761600
+    },
+    "actual_device": "Intel Arc A770 / EGL renderD129 / PCI0000:03:00.0 /8086:56a0",
+    "observer_source_sha256": "f13b90442862bdc64bd0e707a728305a68ecd45d726d54a09982b6c1bdae260e",
+    "mapped_context_file_identity_audit": {
+      "path": "artifacts/hdr-scene-float32-fixture-proof-20261112/arc-v2/context-identity-audit.json",
+      "sha256": "62a41681b9a85ce7093527893b61ef25cdd3df1dc1c0cd200f6c5990d008b0ce",
+      "raw_exit": 0
+    },
+    "original_gate_required_nonnull_first_live_SHA_for_every_ELF": false,
+    "missing_optional_first_live_full_hash_observations": [
+      {
+        "profile": "sanitize",
+        "name": "linear-scene-target",
+        "count": 25
+      },
+      {
+        "profile": "sanitize",
+        "name": "source-paint-overlay",
+        "count": 25
+      },
+      {
+        "profile": "sanitize",
+        "name": "normal-frame-render",
+        "count": 25
+      },
+      {
+        "profile": "sanitize",
+        "name": "surface-program-switch",
+        "count": 25
+      }
+    ],
+    "missing_optional_first_live_full_hash_total": 100,
+    "hardware_identity_basis": "Strict actual EGL/GL PCI device and liveFD, exact saved livecontext-map dev/inode reconciled with canonical current covering mount plus separately exact subvolume stat identity and certified physical Btrfs source/UUID, prelaunch/postrun payloadSHA. Current inherited namespace is inferred from directPopen; no retroactive childmount snapshot claim.",
+    "monitor_correction": "Independent1ms FD/RSS/maps sampler while original provider collector hashes mapped ELFs; no pause, GL-query/result, binary, argument, oracle, environment or bounds change."
+  },
+  "counterfactuals": {
+    "whole_HDR_test_object_pair": {
+      "path": "artifacts/hdr-scene-float32-fixture-proof-20261112/whole-hdr-test-object-pair.json",
+      "sha256": "3815f3b022992af1da3124a8b7e43e458cf26272014eec01a2bde3d8dd3fc346",
+      "raw_exit": true
+    },
+    "whole_HDR_object_SHA256": "950e79dd6162e45136e20075e2131b7358b5c51eeb0600ce2e59bb0b2e75ef37",
+    "old291_actualArc_native_exit": 1,
+    "new_fullFLOAT_actualArc_native_exit": 0,
+    "same_whole_target_object_old291": {
+      "path": "artifacts/hdr-scene-float32-fixture-proof-20261112/release-old291-counterfactual/status.json",
+      "sha256": "5baf5e3081d9a344a83e0d9e5ced32a31f398632e8737ac09bfa04f82919c19f",
+      "raw_exit": 0
+    },
+    "old291_target_format_native_exit": 1
+  },
+  "preserved_attempts": [
+    {
+      "label": "original291 actualArc finitealpha failure",
+      "path": "artifacts/hdr-preview-blend-qualification-20261112/arc-v1/status.json",
+      "sha256": "6f0749023c0bb6e8607e944e5023a40f37e9714e8ebbe0e40d864635e8f18e94",
+      "raw_exit": 1,
+      "classification": "native_product_failure"
+    },
+    {
+      "label": "cb934 superseded compile",
+      "path": "artifacts/hdr-scene-float32-proof-20261112/release/status.json",
+      "sha256": "d365f29e589ff8f6ec05597d45890caebcc4e26ca038e3e468f220f667189035",
+      "raw_exit": 1,
+      "classification": "code_review_cancelled_compile_minus15"
+    },
+    {
+      "label": "354 GLname fixture failure",
+      "path": "artifacts/hdr-scene-float32-bounded-proof-20261112/release/status.json",
+      "sha256": "091630e703deeb4a80d79b2229e0f35dc852117fca76a2d144513043a94a04ac",
+      "raw_exit": 1,
+      "classification": "native_fixture_assumed_no_GL_name_reuse"
+    },
+    {
+      "label": "2bf release path audit",
+      "path": "artifacts/hdr-scene-float32-fixture-proof-20261112/release/status.json",
+      "sha256": "31a25e1c5cb31a925bb4ae1b354afe7e247c745fdac5cc6fa6e2d1c78a54c2e6",
+      "raw_exit": 1,
+      "classification": "receipt_dependency_path_alias"
+    },
+    {
+      "label": "2bf firstArc live monitor",
+      "path": "artifacts/hdr-scene-float32-fixture-proof-20261112/arc-v1/status.json",
+      "sha256": "29fd1a5d585ba5cc8681b19bc5e6ccc42c4912475db3ebc8cdca78024636eb2e",
+      "raw_exit": 1,
+      "classification": "native57_pass_observer_missed_short_lifetime"
+    }
+  ],
+  "final_audit": {
+    "input_pin_count": 22856,
+    "original_historical_SAN_input_pins_checked": 6872,
+    "input_drift": [],
+    "source_clean": true,
+    "source_head_unchanged": true
+  },
+  "strict_SAN_policy": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+    "LSAN_OPTIONS": null,
+    "suppressions": false
+  },
+  "performance_claim": false,
+  "full_production_goal_complete": false,
+  "installation_or_session_restart": false
+}
