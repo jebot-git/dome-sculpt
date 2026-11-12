@@ -5105,6 +5105,10 @@ if(BUILD_TESTING)
 endif()
 
 if(BUILD_TESTING)
+  # Explicit descriptive measurement; output directory is supplied by its caller.
+  add_executable(dome-sculpt-humanoid-native-pose-quality EXCLUDE_FROM_ALL tests/humanoid-native-pose-quality.cpp)
+  target_include_directories(dome-sculpt-humanoid-native-pose-quality PRIVATE src third_party/cgltf)
+  target_link_libraries(dome-sculpt-humanoid-native-pose-quality PRIVATE dome-sculpt-core)
   add_executable(dome-sculpt-rig-fit-anatomical-test tests/rig-fit-anatomical.cpp)
   target_include_directories(dome-sculpt-rig-fit-anatomical-test PRIVATE third_party/cgltf)
   target_link_libraries(dome-sculpt-rig-fit-anatomical-test PRIVATE dome-sculpt-core)
