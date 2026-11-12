@@ -5106,6 +5106,10 @@ endif()
 
 if(BUILD_TESTING)
   # Explicit descriptive measurement; output directory is supplied by its caller.
+  add_executable(dome-sculpt-humanoid-component-bind-test tests/humanoid-component-bind.cpp)
+  target_link_libraries(dome-sculpt-humanoid-component-bind-test PRIVATE dome-sculpt-core)
+  add_test(NAME humanoid-component-bind COMMAND dome-sculpt-humanoid-component-bind-test)
+  set_tests_properties(humanoid-component-bind PROPERTIES TIMEOUT 120)
   add_executable(dome-sculpt-humanoid-native-pose-quality EXCLUDE_FROM_ALL tests/humanoid-native-pose-quality.cpp)
   target_include_directories(dome-sculpt-humanoid-native-pose-quality PRIVATE src third_party/cgltf)
   target_link_libraries(dome-sculpt-humanoid-native-pose-quality PRIVATE dome-sculpt-core)
