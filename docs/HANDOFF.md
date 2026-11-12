@@ -1,3 +1,13 @@
+## Frozen visible Source8/FLOAT32 application candidate — 2026-11-12
+
+This assembled worktree is now frozen for the next owning Release closure.
+Read [AUTHORING-VISIBLE-FLOAT32-FROZEN-20261112.md](AUTHORING-VISIBLE-FLOAT32-FROZEN-20261112.md).
+It combines genuine visible Source8, full-FLOAT scene targets, fitting and
+additive public workflows. It is not yet a qualified app or admitted main
+runtime. Preserve the completed cc5 Release provider and still-running cc5
+sanitizer tree; final component sanitizer/public/device gates remain separate.
+The full original goal remains active and incomplete.
+
 ## Resumed combined application integration — 2026-11-12
 
 The user reactivated the full goal. The previous turn made concrete progress:
