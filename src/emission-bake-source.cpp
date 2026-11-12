@@ -42,7 +42,9 @@ struct Source {
   std::array<float,3> sample(uint32_t triangle,std::array<float,3> bary)const{
     stop();auto original=background;
     if(role.image&&!physical_background){
-      auto uv=coordinates(triangle,bary,toon?mtoon_coordinate(toon->textures[size_t(MToonSlot::Emission)]):role.texcoord,true);
+      // Resolved PBR roles name current carriers; typed slots name original
+      // logical roles, which may independently retain artist-authored UV1.
+      auto uv=coordinates(triangle,bary,toon?mtoon_coordinate(toon->textures[size_t(MToonSlot::Emission)]):role.texcoord,bool(toon));
       if(toon)uv=mtoon_uv(*toon,MToonSlot::Emission,uv,0);
       // coordinates() has authenticated and resolved the actual source set.
       // The ordinary image sampler accepts only a resolved coordinate pair;
@@ -115,7 +117,7 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTr
       auto basis=normal_bake_basis(corners,weights,mode);result[role]=normalized(basis.n);
       auto view=role==0?coordinates.maps->normal:typed_role;const bool enabled=role==0||typed->parameters.normal_enabled;
       if(enabled&&view.image){
-        auto uv=coordinates.coordinates(triangle,bary,role==0?view.texcoord:mtoon_coordinate(typed->textures[size_t(MToonSlot::Normal)]),true);
+        auto uv=coordinates.coordinates(triangle,bary,role==0?view.texcoord:mtoon_coordinate(typed->textures[size_t(MToonSlot::Normal)]),role!=0);
         if(role)uv=mtoon_uv(*typed,MToonSlot::Normal,uv,0);
         view.texcoord=0;
         const auto value=sample_source_texture(view,uv[0],uv[1],false);const float scale=role==0?coordinates.maps->normal_scale:typed->parameters.normal_scale;
