@@ -3,6 +3,7 @@
 #include "rig.cpp"
 #undef main
 #include "dome/skin-authoring.hpp"
+#include "dome/source-placement.hpp"
 namespace {
 Mesh tapered_pair() {
   Mesh mesh;
@@ -52,6 +53,8 @@ int main()try{
  std::vector<JointTransform>pose;for(const auto&b:rig.bones)pose.push_back(b.rest);const double angle=std::acos(-1.)/3;pose[0].rotation={float(std::cos(angle/2)),0,0,float(std::sin(angle/2))};auto deformed=deform_mesh(mesh,weights,rig,pose);double maximum=0;
  for(size_t v=0;v<mesh.positions.size();++v){auto p=mesh.positions[v];Vec3 expected=p;if(p.x<0){const auto x=p.x+.12f;expected={float(-.12+std::cos(angle)*x-std::sin(angle)*p.y),float(std::sin(angle)*x+std::cos(angle)*p.y),p.z};}maximum=std::max(maximum,double(length(deformed.positions[v]-expected)));}
  require(maximum<2e-6,"Actual native deform_mesh keeps the declared second component fixed and first component rigid");
+ auto affine=before;const std::array<double,16>world{-1.2,.1,.02,0,.25,.85,.05,0,.1,.15,1.1,0,2,.3,-.4,1};affine.object(1).affine_edit=std::make_shared<const NativeAffineEdit>(AffineTransform(world));const auto affine_before=affine;author_skin(affine,1,options());require(affine.active().deformation->skin->vertices==weights.vertices,"Exact reflected/sheared world metric preserves the declared component families without world-axis guessing");only_authorized(affine,affine_before);
+
  // Keep the existing intrinsic hairpin contract even with explicit role IDs.
  auto hp=hairpin();unwrap(hp,64,0);Skeleton arms{{{"A",-1,{{.003f,0,0}},1},{"B",-1,{{.028f,0,0}},.1f}}};auto generic_options=BindOptions{};generic_options.maximum_seed_distance=.05f;generic_options.seed_margin=.0001f;auto expected=automatic_bind(hp,arms,generic_options);auto mixed=scene(hp,arms,roles());auto op=options();op.seed_distance=.05f;op.seed_margin=.0001f;author_skin(mixed,1,op);
  require(mixed.active().deformation->skin->vertices==expected.vertices&&weight(expected.vertices[10],1)>weight(expected.vertices[10],0),"Mixed-family connected hairpin keeps original intrinsic graph policy byte-for-byte");
