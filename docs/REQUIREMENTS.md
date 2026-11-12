@@ -1,3 +1,26 @@
+## Repaired85-test application source frozen; new owning audit live — 2026-11-12
+
+Frozen source5c820f342f16d8544158410c2125372811c152f3 is in
+`artifacts/authoring-source8-visible-float32-repaired-20261112/`. It preserves
+main5169 and combines parameter retention870, actual packed-original UV repair4f,
+typed nested reader context5d in jointd07, full-FLOAT target2bf, fitting9ce and
+qualified mapped-leg supportd756. Old9b and all component sources remain intact.
+
+The NEW whole-owning Release configure/dependency/provider audit46170 is live
+under `artifacts/source8-final-owning-plan-20261112/release-5c820f-v1-*`.
+The planner must rederive all changed owners, literal flags/assets and consumers
+from this exact source. Complete-TU compilation/linking follows audit0 under the
+existing authorization. Exact selected native manifest is85; helpers/raw/manual
+source rendering and fresh current producers/font precede any public GUI/XR.
+No public execution or full-cohort pass is claimed yet.
+
+Joint critical969 controls pass R/S and all Release historical consumers pass;
+remaining strict sanitizer historical cases continue under original limits.
+The separate cc5 ALL sanitizer timeout remains a genuine original failure;
+its isolated100-link remainder completion is being reviewed independently.
+Main runtime stays e993 until coherent application qualification. The full goal
+remains active/incomplete; no install or active-session restart.
+
 ## Sanitizer baseline deadline retained; repaired Source8 joint qualification — 2026-11-12
 
 The actual cc5 strict sanitizer ALL driver38512 is now terminal1: its build hit
