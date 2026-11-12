@@ -5,6 +5,7 @@
 #include <nlohmann/json.hpp>
 #include <map>
 namespace dome::detail {
+class BakedEmissionReadCapability;
 // One synchronous Scene codec owns this thread-local graph. Nested Scene
 // operations get independent scopes; the prior context is restored on unwind.
 // No capability or raw-pointer cache survives the owning operation.
@@ -16,7 +17,8 @@ public:
   BakedNormalArchive(const BakedNormalArchive&)=delete;
   static BakedNormalArchive &writer();
   static BakedNormalArchive &reader();
-  static size_t preflight(const nlohmann::json &,const nlohmann::json &material);
+  static size_t preflight(const nlohmann::json &,const nlohmann::json &material,
+                         const BakedEmissionReadCapability * = nullptr);
   uint32_t add_origin(std::shared_ptr<const CanonicalNormalConversion>);
   uint32_t add_uv(std::shared_ptr<const CanonicalNormalUv>);
   std::shared_ptr<const CanonicalNormalUv> uv_at(uint32_t);

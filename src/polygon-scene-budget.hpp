@@ -5,6 +5,7 @@
 #include "volume-archive.hpp"
 #include "source-uv-archive.hpp"
 #include "paint-archive-shape.hpp"
+#include "baked-emission-codec.hpp"
 #include <nlohmann/json.hpp>
 #include <optional>
 namespace dome::detail {
@@ -15,6 +16,7 @@ struct PolygonSceneBudget {
   bool owning_paint_domain=false;
   bool independent_source_paint=false;
   bool owning_physical_emission=false;
+  const BakedEmissionReadCapability *baked_emission=nullptr;
   size_t samples = 0, pixels = 0, paint_bytes = 0, deformations = 0, remaps = 0,
          retopo_entries = 0, retopo_bytes = 0, retained_vertices = 0;
   static void add(size_t &n, size_t amount, size_t maximum,
@@ -112,6 +114,7 @@ struct PolygonSceneBudget {
         add(paint_bytes, b.get_binary().size(), 256 * 1024 * 1024,
             "Scene retained baked storage exceeded");
       }
+    if(p.contains("baked"))add(paint_bytes,baked_float_preflight(p.at("baked"),uint32_t(n),baked_emission),256*1024*1024,"Scene retained FLOAT emission storage exceeded");
     if (p.contains("baked") && p.at("baked").contains("pbr_color")) {
       const auto &pbr = p.at("baked").at("pbr_color");
       if (!pbr.is_binary())

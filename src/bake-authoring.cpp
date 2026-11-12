@@ -13,6 +13,7 @@
 #include "normal-bake-encoding.hpp"
 #include "baked-normal-field.hpp"
 #include "canonical-normal-uv.hpp"
+#include "emission-bake-source.hpp"
 namespace dome {
 ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
                               ObjectBakeSettings settings,
@@ -117,6 +118,7 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   } else
     high.mesh = surface_mesh(*source.volume, cancelled);
   high.materials[0].material = source.material;
+  high.materials[0].resolved_emission=detail::emission_bake_source(source,cancelled);
   auto target_world = scene.world_transform(target.id);
   auto relative = ob::compose(ob::inverse(target_world), scene.world_transform(source.id));
   for (auto &p : high.mesh.positions) {
@@ -208,6 +210,7 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   if(prepared_normals)textures.normal_interpretation=BakedNormalInterpretation::PreparedAttributes;
   if(separate)textures.color_interpretation=BakedColorInterpretation::ResolvedPbr;
   textures.maps = std::move(result.maps);
+  textures.emission_field=std::move(result.emission_field);
   textures.maps.normal = std::move(result.normal);
   textures.coverage.reserve(result.coverage.size());
   for (auto c : result.coverage) textures.coverage.push_back(c==1 || c==2 ? 255 : 0);
