@@ -583,6 +583,7 @@ void PolygonSceneArchive::preflight(const nlohmann::json &j,
       if (paint.contains("payload") && paint.at("payload").is_object() &&
           paint.at("payload").contains("version") &&
           (paint.at("payload").at("version") == 4 ||
+           paint.at("payload").at("version") == 8 ||
            paint.at("payload").at("version") == 6))
         throw std::invalid_argument(
             "Nested source payload cannot borrow plain Paint7 authority");

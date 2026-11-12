@@ -117,6 +117,13 @@ bool requires_native_emission_package(const Scene &scene,const std::function<boo
  // including persisted history and nonprimary set containers. Opaque retained
  // material JSON is not physical-data authority.
  if(value.at("version")==41)return true;
+ if(value.at("version")==42){
+  const auto &native=value.at("payload");
+  std::function<bool(const nlohmann::json&)> floating=[&](const auto &node){
+    if(node.is_object()){if(node.contains("float_emission"))return true;for(const auto &entry:node.items())if(floating(entry.value()))return true;}
+    else if(node.is_array())for(const auto &child:node)if(floating(child))return true;return false;
+  };if(floating(native))return true;
+ }
  size_t visited=0;
  auto physical=[&](auto &&self,const nlohmann::json &node)->bool{if((++visited&4095)==0)stop(cancelled);if(node.is_object()){if(node.contains("physical_emission")&&!node.at("physical_emission").is_null())return true;if(node.contains("physical_emission_tiles")&&!node.at("physical_emission_tiles").empty())return true;if(node.contains("emissive")){const auto &v=node.at("emissive");if(v.is_array()&&v.size()==3)for(const auto &n:v)if(n.is_number()&&n.get<double>()>1)return true;}if(node.contains("native_reference")){const auto &v=node.at("native_reference");if(v.is_object()&&v.contains("emission"))for(const auto &n:v.at("emission"))if(n.get<double>()>1)return true;}for(const auto &child:node.items())if(self(self,child.value()))return true;}else if(node.is_array())for(const auto &child:node)if(self(self,child))return true;return false;};const bool result=physical(physical,value);stop(cancelled);return result;
 }

@@ -14,6 +14,7 @@
 #include "baked-normal-field.hpp"
 #include "canonical-normal-uv.hpp"
 #include "emission-bake-source.hpp"
+#include "source4-baked.hpp"
 namespace dome {
 ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
                               ObjectBakeSettings settings,
@@ -230,7 +231,10 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
     }else textures.normal_field=before->replace(textures,field_options);
     textures.maps.normal={};textures.maps.mtoon_normal={};
   }
-  painting->install_bake(std::move(textures));
+  if(painting->source_sampling_prepared()){
+    SourcePaintOptions source_options;source_options.cancelled=cancelled;
+    painting=detail::install_source_bake(*painting,std::move(textures),source_options);
+  }else painting->install_bake(std::move(textures));
   auto next = scene;
   next.active().painted = std::move(painting);
   next.active().material_bindings=target.material_bindings;

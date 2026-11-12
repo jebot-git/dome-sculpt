@@ -64,7 +64,7 @@ std::shared_ptr<const TextureMaps> raw_bake_source(const SculptObject &object,
      !object.painted->source_maps()->uses_alternate_uv())return {};
   const auto &paint=*object.painted;const auto &binding=object.material_bindings;
   if(cancelled&&cancelled())throw std::runtime_error("Raw source Bake cancelled");
-  if(paint.source_sampling_prepared()||paint.color_projection()||paint.normal_projection()||
+  if(paint.color_projection()||paint.normal_projection()||
      (binding&&(binding->canonical_attributes||binding->canonical_uv||binding->canonical_paint_sampling||
                 binding->native_paint_sampling||binding->native_paint_frames||binding->normal_frames)))
     throw std::invalid_argument("Raw source Bake requires its explicit prepared attribute/frame adapter");

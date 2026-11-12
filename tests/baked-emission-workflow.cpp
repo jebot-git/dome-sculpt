@@ -5,6 +5,7 @@
 #include "dome/document.hpp"
 #include "dome/gltf-export.hpp"
 #include "emission-bake-source.hpp"
+#include "source4-baked.hpp"
 #include "emission-export.hpp"
 #include "humanoid-sha256.hpp"
 #include <filesystem>
@@ -85,11 +86,12 @@ void uv1_worker_controls(const std::filesystem::path &directory,bool raw_only=fa
     maps->emission.image=pattern;maps->emission.texcoord=1;maps->emission.uv_transform={1,0,0,1,-.5f,0};maps->emission.min_filter=maps->emission.mag_filter=9728;
     auto mesh=quad();for(auto &v:mesh.positions)v.z=.005f;
     source.painted=PaintedMesh::from_maps(mesh,maps,64);
+    if(!raw_only){const std::array<uint32_t,4> vertices{0,1,2,3};source.painted=prepare_source_paint(source.painted,mesh,vertices);}
     BakedTextures base;base.maps.color=image({24,65,117,255});base.maps.metal_rough=image({177,42,99,255});base.maps.normal=image({128,204,230,255});base.coverage.resize(4096);
     for(size_t i=0;i<4096;++i)base.coverage[i]=coverage<.001f?0:(i%64<32?191:65);
     std::vector<BakedEmissionSample> input(4096);
     for(size_t i=0;i<input.size();++i)input[i]={{coverage*.25f,coverage*.5f,0},{coverage*(50000+32*float(i%64)),coverage*.00001f*float(i/64+1),coverage*2},coverage};
-    base.emission_field=BakedEmissionField::create(64,input);if(!raw_only)source.painted->install_bake(std::move(base));
+    base.emission_field=BakedEmissionField::create(64,input);if(!raw_only)source.painted=detail::install_source_bake(*source.painted,std::move(base));
     source.material.emissive=typed?std::array<float,3>{.4f,.15f,.4f}:std::array<float,3>{2,4,8};
     if(typed){
       auto binding=std::make_shared<SourceMaterialBindings>();binding->native_reference.emission={.2f,.3f,.4f};binding->native_reference.color=source.material.color;
@@ -101,7 +103,8 @@ void uv1_worker_controls(const std::filesystem::path &directory,bool raw_only=fa
     // Original alternate-coordinate sources are readonly until their explicit
     // atlas workspace is prepared. Preserve that guard, rather than forging a
     // writable source domain simply to author a fixture stroke.
-    const auto raw=source.painted->encode();auto attempted=source.painted->snapshot();bool refused=false;
+    const auto readonly=source.painted->source_sampling_original()?source.painted->source_sampling_original():source.painted;
+    const auto raw=readonly->encode();auto attempted=readonly->snapshot();bool refused=false;
     try{attempted->begin_stroke();attempted->cancel_stroke();}catch(const std::logic_error &e){refused=std::string_view(e.what())=="Prepare an editable texture atlas before painting these original source coordinates";}
     check(refused&&attempted->encode()==raw,"raw UV1 source painting remains explicitly refused without changing actual field/image owners");
     auto &held=*f.scene.object(sibling).painted;held.add_layer("Actual hidden physical data");
@@ -112,7 +115,24 @@ void uv1_worker_controls(const std::filesystem::path &directory,bool raw_only=fa
     ink={};ink.color={.2f,.7f,.1f,.4f};ink.front_only=false;brush.from=brush.to={0,0,0};
     target.begin_stroke();target.stamp(brush,ink);check(target.end_stroke(),"actual target owns hidden editable color/mask data before Bake");target.layer_properties("Retained hidden target",false,.25f);
     for(auto id:{f.target,f.source}){auto &t=f.scene.object(id).transform;t.orientation={0,0,float(std::sqrt(.5)),float(std::sqrt(.5))};t.scale=1.25f;}
+    if(!raw_only){
+      source.painted->add_layer("Retained source hidden physical data");
+      PaintSettings hidden_ink;hidden_ink.channel=PaintChannel::Emission;hidden_ink.emission_units=PaintEmissionUnits::Physical;hidden_ink.emission={7,.000005f,1};hidden_ink.front_only=false;
+      source.painted->begin_stroke();source.painted->stamp(brush,hidden_ink);check(source.painted->end_stroke(),"genuine Source4 current atlas owns actual editable physical data");
+      source.painted->layer_properties("Retained source hidden physical data",false,.375f);
+    }
     f.scene.validate();const auto before=f.scene.encode(),source_before=source.painted->encode();const auto source_binding=source.material_bindings;const auto layers=target.layers();const auto sibling_before=f.scene.object(sibling).painted->encode();
+    check(Scene::decode(before).encode()==before,"genuine raw/Source8 input already roundtrips before worker adoption");
+    if(!raw_only){
+      check(before.at("version")==42&&source_before.at("version")==8,"owning current baked Source4 has explicit Scene42/Paint8 wire identity");
+      auto rejects=[](const auto &value){try{(void)Scene::decode(value);return false;}catch(const std::exception&){return true;}};
+      auto downgraded=before;downgraded["version"]=41;check(rejects(downgraded),"Scene41 FLOAT authority cannot grant Source8 current Bake authority");
+      check(rejects(before.at("payload")),"ordinary Scene28 source context cannot mint Source8 current Bake authority");
+      auto forged=before;for(auto &o:forged["payload"]["objects"])if(o.at("id")==f.source){o["painted"]["version"]=4;break;}
+      check(rejects(forged),"legacy Paint4 baked prohibition remains intact inside genuine new envelope");
+      bool refused_direct=false;try{(void)PaintedMesh::decode(source_before);}catch(const std::exception&){refused_direct=true;}
+      check(refused_direct,"standalone Paint8 never borrows its caller's encoded version as owning capability");
+    }
     ObjectBakeSettings options;options.front_mm=10;options.back_mm=2;options.padding=2;options.ao_samples=0;
     Document doc;doc.replace(f.scene);std::cout<<"UV1_ADMISSION can_bake="<<doc.frame().state->can_bake<<" source="<<doc.frame().state->bake_source<<std::endl;
     doc.bake_from_object(f.source,options);auto save=doc.save_async(folder/"accepted.dsculpt");finish(doc);saved(std::move(save));
@@ -143,7 +163,7 @@ void uv1_worker_controls(const std::filesystem::path &directory,bool raw_only=fa
     // An emission-stripped ordinary control carries the exact same visible
     // color/normal/ORM source. It never replaces the actual hidden source.
     auto ordinary=f.scene.snapshot();auto &control=ordinary.object(f.source);control.painted=control.painted->snapshot();
-    if(!raw_only){auto old=*control.painted->baked();old.emission_field.reset();old.maps.emission=image({0,0,0,255});control.painted->clear_bake();control.painted->install_bake(std::move(old));}control.material.emissive={};
+    if(!raw_only){auto old=*control.painted->baked();old.emission_field.reset();old.maps.emission=image({0,0,0,255});control.painted->clear_bake();control.painted=detail::install_source_bake(*control.painted,std::move(old));}control.material.emissive={};
     if(typed){auto binding=std::make_shared<SourceMaterialBindings>(*control.material_bindings);binding->material.parameters.emission={};binding->material.parameters.emission_strength=1;control.material_bindings=std::move(binding);}
     bake_object(ordinary,f.source,options);const auto &other=*ordinary.active().painted->baked(),&actual=*paint.baked();
     check(actual.maps.color.rgba==other.maps.color.rgba&&actual.maps.metal_rough.rgba==other.maps.metal_rough.rgba&&actual.maps.normal.rgba==other.maps.normal.rgba&&actual.coverage==other.coverage&&actual.color_interpretation==other.color_interpretation&&actual.normal_interpretation==other.normal_interpretation,"actual FLOAT Bake leaves every other color/ORM/normal/common-coverage interpretation byte-exact to nonemissive Bake control");

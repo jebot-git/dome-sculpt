@@ -50,8 +50,8 @@ struct PolygonSceneBudget {
     if (input.is_null())
       return;
     if(source_physical&&(version!=40||!shared_set_geometry||input.contains("version")||input.contains("mesh")))throw std::invalid_argument("Source-grid counting requires its inspected Scene40 shared geometry context");
-    const auto &p=paint_archive_payload(input,owning_paint_domain,SourcePaintDecodeContext{independent_source_paint,owning_physical_emission&&version>=27});
-    if(input.contains("version")&&input.at("version")==4){
+    const auto &p=paint_archive_payload(input,owning_paint_domain,SourcePaintDecodeContext{independent_source_paint,owning_physical_emission&&version>=27,baked_emission});
+    if(input.contains("version")&&(input.at("version")==4||input.at("version")==8)){
       if(version<28)throw std::invalid_argument("Independent source paint requires its actual Scene28 feature");
       add(paint_bytes,input.at("vertices").get_binary().size(),256*1024*1024,"Source paint corner-map budget exceeded");
       if(const auto bytes=source_paint_authored_uv1_bytes(input)){
@@ -88,7 +88,7 @@ struct PolygonSceneBudget {
       }
       if(l.contains("physical_emission_tiles")){
         const auto &tiles=l.at("physical_emission_tiles");
-        if(!owning_physical_emission||version<27||!(source_physical.value_or(false)||physical_paint_authority(input,SourcePaintDecodeContext{independent_source_paint,owning_physical_emission&&version>=27}))||!tiles.is_array()||tiles.empty()||tiles.size()>4096)
+        if(!owning_physical_emission||version<27||!(source_physical.value_or(false)||physical_paint_authority(input,SourcePaintDecodeContext{independent_source_paint,owning_physical_emission&&version>=27,baked_emission}))||!tiles.is_array()||tiles.empty()||tiles.size()>4096)
           throw std::invalid_argument("Physical paint requires actual Scene27/Paint3 capability");
         add(paint_bytes,tiles.size()*sizeof(PaintEmissionTile),256*1024*1024,"Scene retained physical paint storage exceeded");
       }
