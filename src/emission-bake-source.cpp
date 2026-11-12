@@ -11,6 +11,21 @@
 #include <optional>
 
 namespace dome::detail {namespace {
+void require_original_emission_uv1(const SculptObject &object,
+    const std::optional<MToonMaterial> &typed){
+  if(!typed||!object.mesh_active||!object.painted||!object.painted->source_sampling_prepared())return;
+  // An explicit physical background does not sample the retained emission image.
+  if(object.material_bindings&&object.material_bindings->physical_emission)return;
+  const auto &slot=typed->textures[size_t(MToonSlot::Emission)];
+  if(slot.index<0||mtoon_coordinate(slot)!=1)return;
+  const auto &paint=*object.painted;
+  if(!paint.valid_source_sampling_attachment())
+    throw std::invalid_argument("Typed emission lost its genuine original sampling attachment");
+  const auto original=paint.source_sampling_original();
+  const auto maps=original?original->source_maps():nullptr;
+  if(!original||(!paint.source_sampling_authored_uv1()&&(!maps||!maps->uv1)))
+    throw std::invalid_argument("Typed emission UV1 lacks genuine original source coordinates");
+}
 struct Source {
   std::shared_ptr<const Mesh> mesh;
   std::shared_ptr<const PaintOverlayPacket> packet;
@@ -19,7 +34,7 @@ struct Source {
   std::optional<MToonMaterial> toon;
   std::array<float,3> background{};
   float legacy_strength=1;
-  bool physical_background=false;
+  bool physical_background=false,independent_source=false;
   std::function<bool()> cancelled;
   void stop()const{if(cancelled&&cancelled())throw std::runtime_error("Emission Bake cancelled");}
   std::array<float,2> coordinates(uint32_t triangle,std::array<float,3> bary,int set,bool original)const{
@@ -27,6 +42,8 @@ struct Source {
     const std::vector<std::array<float,2>> *values=nullptr;
     if(set==0)values=original&&packet&&packet->original_uv0()?packet->original_uv0().get():&mesh->uv;
     else if(set==1){
+      if(original&&independent_source&&(!packet||!packet->original_uv1()))
+        throw std::invalid_argument("Typed emission UV1 lacks genuine original source coordinates");
       if(original&&packet&&packet->original_uv1())values=packet->original_uv1().get();
       else if(maps&&maps->uv1)values=maps->uv1.get();
     }else if(maps){const auto i=maps->extra_uv_sets.find(set);if(i!=maps->extra_uv_sets.end())values=i->second.get();}
@@ -90,6 +107,7 @@ std::shared_ptr<const TextureMaps> raw_bake_source(const SculptObject &object,
       (object.appearance?retained_mtoon(object.appearance.get()):std::optional<MToonMaterial>{});
   if(typed&&typed->textures[size_t(MToonSlot::Normal)].index>=0)
     throw std::invalid_argument("Raw typed normal Bake requires its explicit source-frame adapter");
+  require_original_emission_uv1(object,typed);
   auto maps=std::make_shared<TextureMaps>();maps->source_maps=paint.source_maps();maps->source_only=true;
   maps->source_maps->validate_surface(paint.mesh());
   maps->overlay=PaintOverlayFactory::capture(paint,cancelled);maps->baked_base=paint.baked();
@@ -110,6 +128,7 @@ emission_bake_source(const SculptObject &object,const std::function<bool()> &can
   std::optional<MToonMaterial> typed;
   if(binding&&binding->has_mtoon)typed=binding->material;
   else if(object.appearance)typed=retained_mtoon(object.appearance.get());
+  require_original_emission_uv1(object,typed);
   const bool typed_hdr=typed&&(typed->parameters.emission_strength>1||
       typed->parameters.emission.x>1||typed->parameters.emission.y>1||typed->parameters.emission.z>1);
   const bool hdr=std::any_of(object.material.emissive.begin(),object.material.emissive.end(),[](float x){return x>1;});
@@ -118,6 +137,7 @@ emission_bake_source(const SculptObject &object,const std::function<bool()> &can
   auto source=std::make_shared<Source>();source->background=object.material.emissive;source->cancelled=cancelled;
   if(object.mesh_active&&object.painted){
     source->mesh=object.painted->mesh_owner();source->maps=object.painted->source_maps();
+    source->independent_source=object.painted->source_sampling_prepared();
     source->packet=PaintOverlayFactory::capture(*object.painted,cancelled);
     if(object.painted->paint_sampling_domain()&&!object.painted->valid_paint_sampling_attachment())
       throw std::invalid_argument("Emission Bake lost its exact current paint geometry attachment");
