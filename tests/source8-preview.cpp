@@ -6,6 +6,8 @@
 #include "dome/material-bindings.hpp"
 #include "dome/source-paint.hpp"
 #include "source4-baked.hpp"
+#include "source-paint-parameters.hpp"
+#include <future>
 #include "paint-overlay-packet.hpp"
 #include <numeric>
 namespace {
@@ -53,7 +55,36 @@ void run(bool typed_view,float emission_coverage,bool alpha){
  f.bind();(void)draw(renderer,cleared);
  check(doc.undo()&&doc.wait_mesh()&&doc.frame().state->error.empty(),"Actual Undo restores visible Source8 current-frame authority");auto restored=doc.frame().surface;
  check(restored->geometry_identity!=cleared->geometry_identity,"Source8 canonical frame restoration invalidates legacy geometry identity");f.bind();check(delta(actual,draw(renderer,restored))<=1,"Source8 Clear/Undo restores the entire actual rendered original/current normal and FLOAT image");
- check(doc.copy_scene().encode()==before&&scene.encode()==before,"Visible Source8 display keeps exact original/FLOAT/hidden editable native owners");check(glGetError()==GL_NO_ERROR,"Source8 preview and independent controls leave the real GL error queue empty");
+ check(doc.copy_scene().encode()==before&&scene.encode()==before,"Visible Source8 display keeps exact original/FLOAT/hidden editable native owners");
+ // Offset constant original images, leaving their normal derivative columns
+ // fixed. The visible image must stay exact while all original roles acquire
+ // new genuine parameters and current canonical/FLOAT data keep their owners.
+ std::array<std::array<float,6>,5> transforms;const std::array<const PaintSourceTexture*,5> roles{&maps->color,&maps->metal_rough,&maps->emission,&maps->normal,&maps->occlusion};
+ for(size_t k=0;k<roles.size();++k){transforms[k]=roles[k]->uv_transform;transforms[k][4]+=.173f;transforms[k][5]-=.291f;}
+ auto operation=[&](const SourcePaintOptions &options=SourcePaintOptions{}){return detail::rebind_source_paint_transforms(*paint,transforms,options);};
+ const auto unchanged=paint->encode(),raw_unchanged=raw->encode();auto changed=operation();
+ check(changed->baked()==paint->baked()&&changed->baked()->emission_field==paint->baked()->emission_field&&changed->valid_source_sampling_attachment(),"Actual source parameter edit retains the exact authenticated RGB8 normal/colour and FLOAT baked owners");
+ const auto &cm=changed->mesh(),&pm=paint->mesh();auto bytes=[](const auto&a,const auto&b){return a.size()==b.size()&&(a.empty()||!std::memcmp(a.data(),b.data(),a.size()*sizeof(a.front())));};
+ check(bytes(cm.positions,pm.positions)&&bytes(cm.normals,pm.normals)&&cm.uv==pm.uv&&cm.indices==pm.indices&&changed->source_sampling_original()->mesh().uv==paint->source_sampling_original()->mesh().uv&&*changed->source_maps()->uv1==*paint->source_maps()->uv1&&std::equal(changed->source_sampling_vertices().begin(),changed->source_sampling_vertices().end(),paint->source_sampling_vertices().begin(),paint->source_sampling_vertices().end()),"Source parameter edit keeps exact current geometry/UV0 and independent original UV0/UV1 coordinate traces");
+ check(changed->source_sampling_original()->source_maps()->normal.uv_transform==transforms[3]&&changed->source_maps()->emission.uv_transform==transforms[2]&&changed->source_sampling_original()->source_maps()->normal.image==maps->normal.image,"Only original/background role parameters change; image/sampler and current baked normal frames remain independent");
+ bool layers_same=changed->layers().size()==paint->layers().size();for(size_t k=0;k<paint->layers().size();++k){const auto&a=changed->layers()[k],&b=paint->layers()[k];layers_same=layers_same&&a.id==b.id&&a.name==b.name&&a.visible==b.visible&&a.opacity==b.opacity&&a.tiles==b.tiles&&a.pbr_tiles==b.pbr_tiles&&a.emission_tiles==b.emission_tiles;}
+ check(layers_same&&paint->encode()==unchanged&&raw->encode()==raw_unchanged,"Parameter edit retains all hidden editable physical tile owners and exact immutable input scenes");
+ size_t polls=0;SourcePaintOptions options;options.cancelled=[&]{++polls;return false;};check(operation(options)->encode()==changed->encode()&&polls>1,"Source8 parameter factory exposes genuine bounded cancellation polls");const auto total_polls=polls;
+ bool cancellations=true;for(size_t boundary=1;boundary<=total_polls;++boundary){polls=0;options.cancelled=[&]{return ++polls>=boundary;};bool refused=false;try{(void)operation(options);}catch(const std::runtime_error&){refused=true;}cancellations=cancellations&&refused&&polls==boundary&&paint->encode()==unchanged&&raw->encode()==raw_unchanged;}
+ check(cancellations,"Every genuine Source8 parameter cancellation boundary preserves all source/current/baked owners atomically");
+ options={};size_t low=1,high=options.max_working_bytes;while(low<high){const auto mid=low+(high-low)/2;options.max_working_bytes=mid;try{(void)operation(options);high=mid;}catch(const std::length_error&){low=mid+1;}}
+ options.max_working_bytes=low;check(operation(options)->encode()==changed->encode(),"Exact prospective parameter budget admits the unchanged Source8 payload");options.max_working_bytes=low-1;bool quota_refused=false;try{(void)operation(options);}catch(const std::length_error&){quota_refused=true;}
+ check(quota_refused&&paint->encode()==unchanged&&raw->encode()==raw_unchanged,"One-byte-under prospective parameter quota refuses atomically before replacing authority");
+ std::cout<<"SOURCE8_PARAMETER_BUDGET typed="<<typed_view<<" alpha="<<alpha<<" coverage="<<emission_coverage<<" minimum="<<low<<" cancellation_polls="<<total_polls<<'\n';
+ const auto output=std::filesystem::temp_directory_path()/("dome-source8-parameters-"+std::to_string(std::chrono::steady_clock::now().time_since_epoch().count()));std::filesystem::create_directory(output);
+ const auto id=doc.copy_scene().active().id;doc.edit_scene("Edit source UV parameters",[=](Scene&s,const auto&cancel){SourcePaintOptions o;o.cancelled=cancel;s.object(id).painted=detail::rebind_source_paint_transforms(*s.object(id).painted,transforms,o);},doc.begin_import());auto saved=doc.save_async(output/"parameters.dsculpt");saved.get();
+ check(doc.wait_asset(std::chrono::seconds(120))&&doc.wait_mesh()&&doc.frame().state->error.empty(),"Actual native parameter worker and immediately ordered Save complete");const auto edited=doc.copy_scene().encode();
+ check(Scene::load(output/"parameters.dsculpt").encode()==edited&&doc.copy_scene().active().painted->baked()==paint->baked(),"Native Save/reopen preserves the new before/current proof with exact RGB8 normal/colour and FLOAT payload");
+ f.bind();check(delta(actual,draw(renderer,doc.frame().surface))<=1,"Actual GL parameter edit keeps independent canonical baked normal and FLOAT image exact");
+ check(doc.undo()&&doc.wait_mesh()&&doc.copy_scene().encode()==before,"Actual native parameter Undo restores the exact original/current/baked scene");check(doc.redo()&&doc.wait_mesh()&&doc.copy_scene().encode()==edited,"Actual native parameter Redo restores the authenticated edited owner");
+ doc.clear_bake();check(doc.wait_asset(std::chrono::seconds(120))&&doc.wait_mesh()&&doc.frame().state->error.empty()&&!doc.copy_scene().active().painted->baked(),"Actual Clear after parameter edit removes the genuine baked owner without losing source parameters");check(doc.undo()&&doc.wait_mesh()&&doc.copy_scene().encode()==edited,"Actual Clear Undo after parameter edit restores exact baked RGB8/FLOAT and new source parameters");
+ f.bind();check(delta(actual,draw(renderer,doc.frame().surface))<=1,"Actual post-parameter Clear/Undo restores the entire rendered image");std::filesystem::remove_all(output);
+ check(glGetError()==GL_NO_ERROR,"Source8 preview and independent controls leave the real GL error queue empty");
 }
 }
 int main()try{NativeGraphics graphics;std::cout<<"ACTUAL_RENDERER "<<glGetString(GL_RENDERER)<<'\n';for(bool alpha:{false,true})for(bool typed:{false,true})for(float coverage:{.25f,0x1p-24f})run(typed,coverage,alpha);std::cout<<"PASS "<<checks<<" Source8 actual visible normal/FLOAT/ownership controls\n";return 0;}catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

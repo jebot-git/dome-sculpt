@@ -869,10 +869,20 @@ struct SourcePaintAccess {
       throw std::invalid_argument("Source parameter edit requires its genuine independent writable owner");
     paint_compute::checkpoint(o.cancelled);
     const auto &original=*current.source_sampling_original();pristine(original);
-    // Prospective check includes actual current sparse tiles, before deriving
-    // coordinate/raster copies. Parameter edits do not alter their sizes.
-    if(!o.max_working_bytes||o.max_working_bytes>SourcePaintOptions::maximum_working_bytes||working_bytes(current)>o.max_working_bytes)
+    // The old current raster stays alive while prepare derives its replacement.
+    // Source8 also retains its exact immutable bake; no merge or pixel copy is
+    // needed, but both current geometry/coordinate/raster owners coexist.
+    const auto working=working_bytes(current);
+    const uint64_t replacement=current.baked_?surface_copy_bytes(current)+geometry_bytes(current.mesh())+
+      coordinate_bytes(maps(current))+uint64_t(current.resolution())*current.resolution()/1024*16*3*sizeof(std::shared_ptr<const PaintTile>):0;
+    if(!o.max_working_bytes||o.max_working_bytes>SourcePaintOptions::maximum_working_bytes||working>o.max_working_bytes||replacement>o.max_working_bytes-working)
       throw std::length_error("Source parameter edit exceeds prospective working budget");
+    if(current.baked_){
+      current.baked_->validate(current.resolution());
+      if(current.baked_->normal_interpretation!=BakedNormalInterpretation::CanonicalMikk||current.baked_->normal_authority||current.baked_->normal_field||
+         current.baked_->color_interpretation!=BakedColorInterpretation::VertexComponent||current.color_projection_||current.normal_projection_||current.paint_sampling_domain())
+        throw std::invalid_argument("Source parameter edit requires its explicit current canonical baked owner");
+    }
     // Authenticate the old attachment independently before deriving a new one.
     auto old=detail::transport_source_sampling(original.mesh(),maps(original),current.mesh(),
       current.source_sampling_vertices(),limits(o,current.mesh().positions.size(),current.source_sampling_authored_uv1()?current.source_sampling_authored_uv1()->size():0));
@@ -886,10 +896,21 @@ struct SourcePaintAccess {
     auto result=prepare(before,current.mesh(),current.source_sampling_vertices(),o,current.source_sampling_authored_uv1());
     result->layers_=current.layers_;result->active_=current.active_;result->next_=current.next_;
     result->allocated_tiles_=current.allocated_tiles_;result->allocated_color_tiles_=current.allocated_color_tiles_;
+    if(current.baked_){
+      // prepare authenticated the new original parameters against the exact
+      // existing current mesh/UV trace. Pair that new proof with the unchanged
+      // current canonical bake, whose frame never follows the source affine.
+      auto proof=std::make_shared<PaintedMesh::SurfaceMap::OriginalSampling>(*result->surface_->original_sampling);
+      proof->baked=current.baked_;
+      if(result->surface_.use_count()!=1)throw std::logic_error("Source parameter attachment escaped before construction completed");
+      std::const_pointer_cast<PaintedMesh::SurfaceMap>(result->surface_)->original_sampling=std::move(proof);
+      result->baked_=current.baked_;
+    }
     result->revision_=current.revision_+1;
     if(working_bytes(*result)>o.max_working_bytes||retained_bytes(footprint(*before),footprint(*result),
        result->source_sampling_vertices().size()*sizeof(uint32_t),result->source_sampling_authored_uv1()?result->source_sampling_authored_uv1()->size()*sizeof(std::array<float,2>):0)>128*1024*1024)
       throw std::length_error("Source parameter edit exceeds cumulative paint storage budget");
+    if(!result->valid_source_sampling_attachment())throw std::logic_error("Source parameter edit failed its immutable current owner pairing");
     paint_compute::checkpoint(o.cancelled);return result;
   }
   static std::shared_ptr<PaintedMesh> prepare(std::shared_ptr<const PaintedMesh> before,Mesh target,
