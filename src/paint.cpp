@@ -198,6 +198,9 @@ struct PaintedMesh::CompositeCache {
   uint64_t preview_token=0;
   bool source_eligible=false;
   std::weak_ptr<const TextureMaps> source_preview;
+  uint64_t source_baked_token=0;
+  std::weak_ptr<const detail::PaintOverlayPacket> source_baked_packet;
+  bool source_baked_transparent=false;
   uint64_t native_emission_token=0;
   CompositeFactors native_emission_factors{};
   std::weak_ptr<const TextureMaps> native_emission_preview;
@@ -1036,7 +1039,13 @@ detail::PaintOverlayFactory::source_coordinates(const PaintedMesh &paint){
 }
 std::shared_ptr<const detail::PaintOverlayPacket> detail::PaintOverlayFactory::capture(const PaintedMesh &paint,const std::function<bool()> &cancelled){
   paint_compute::checkpoint(cancelled);
+  if(!paint.valid_source_sampling_attachment())throw std::invalid_argument("Overlay capture lost its actual source coordinate/baked owner");
   auto packet=std::shared_ptr<PaintOverlayPacket>(new PaintOverlayPacket);
+  if(paint.source_sampling_prepared()&&paint.baked_){
+    if(paint.baked_->normal_interpretation!=BakedNormalInterpretation::CanonicalMikk||paint.baked_->normal_authority||paint.baked_->normal_field)
+      throw std::invalid_argument("Source8 overlay needs its explicit normal-field adapter");
+    packet->source_baked_geometry_=paint.mesh_owner();
+  }
   packet->resolution_=paint.resolution();
   packet->padding_=std::shared_ptr<const std::vector<int32_t>>(paint.surface_,&paint.surface_->padding);
   packet->baked_=paint.baked_;packet->source_maps_=paint.source_maps_;
@@ -1080,6 +1089,47 @@ std::shared_ptr<const detail::PaintOverlayPacket> detail::PaintOverlayFactory::c
     }
   }
   paint_compute::checkpoint(cancelled);return packet;
+}
+std::shared_ptr<const TextureMaps> detail::PaintOverlayFactory::capture_source_baked(
+    const PaintedMesh &paint,const std::function<bool()> &cancelled){
+  paint_compute::checkpoint(cancelled);
+  if(!paint.source_sampling_prepared()||!paint.baked_||!paint.valid_source_sampling_attachment()||
+     !paint.source_maps_||paint.normal_projection_||paint.color_projection_||paint.paint_sampling_domain())
+    throw std::invalid_argument("Source8 preview requires actual before/current/baked ownership");
+  auto &cache=*paint.composite_cache_;
+  {std::lock_guard lock(cache.mutex);
+    if(cache.source_baked_token==paint.composite_token_)if(auto packet=cache.source_baked_packet.lock())
+      if(packet->baked()==paint.baked_&&packet->source_maps()==paint.source_maps_&&packet->source_baked_geometry()==paint.mesh_owner()){
+        auto view=std::make_shared<TextureMaps>();view->source_maps=paint.source_maps_;view->source_only=true;
+        view->baked_base=paint.baked_;view->overlay=std::move(packet);view->transparent=cache.source_baked_transparent;return view;
+      }
+  }
+  const auto r=paint.resolution();const size_t pixels=size_t(r)*r;
+  const size_t extra=paint.baked_->maps.normal.rgba.empty()?0:pixels*8;
+  if(extra>128*1024*1024||paint.storage_bytes()>128*1024*1024-extra)
+    throw std::length_error("Source8 preview normal carriers exceed existing paint storage budget");
+  auto result=std::make_shared<TextureMaps>();result->source_maps=paint.source_maps_;result->source_only=true;
+  auto packet=std::const_pointer_cast<PaintOverlayPacket>(capture(paint,cancelled));
+  result->baked_base=paint.baked_;
+  if(extra){
+    auto normal=std::make_shared<Image>(blank_image(r,true)),coverage=std::make_shared<Image>(blank_image(r));
+    for(size_t at=0;at<pixels;++at){
+      if((at&1023)==0)paint_compute::checkpoint(cancelled);
+      coverage->rgba[at*4+3]=255;
+      const auto owner=paint.surface_->padding[at];if(owner<0)continue;const size_t source=size_t(owner);
+      std::copy_n(paint.baked_->maps.normal.rgba.data()+source*4,4,normal->rgba.data()+at*4);
+      coverage->rgba[at*4]=paint.baked_->coverage[source];
+    }
+    packet->source_baked_normal_=std::move(normal);packet->source_baked_coverage_=std::move(coverage);packet->storage_bytes_+=extra;
+  }
+  result->overlay=std::move(packet);
+  if(const auto &image=paint.source_maps_->color.image)for(size_t at=3;at<image->rgba.size();at+=4)if(image->rgba[at]!=255){result->transparent=true;break;}
+  for(size_t at=0;at<pixels;++at)if(paint.baked_->coverage[at]&&paint.baked_->maps.color.rgba[at*4+3]!=255){result->transparent=true;break;}
+  for(const auto &layer:result->overlay->layers())for(const auto &tile:layer.tiles)if(tile)
+    for(const auto &pixel:tile->pixels)if(pixel.data[13]&&pixel.data[9]&&pixel.data[3]!=255){result->transparent=true;break;}
+  paint_compute::checkpoint(cancelled);
+  {std::lock_guard lock(cache.mutex);cache.source_baked_token=paint.composite_token_;cache.source_baked_packet=result->overlay;cache.source_baked_transparent=result->transparent;}
+  return result;
 }
 std::shared_ptr<const TextureMaps> detail::PaintOverlayFactory::capture_current_grid(
     const PaintedMesh &paint,const Material &material,const std::function<bool()> &cancelled){
@@ -2694,6 +2744,7 @@ std::shared_ptr<const TextureMaps> PaintedMesh::preview(const Material &material
 std::shared_ptr<const TextureMaps> PaintedMesh::preview(const Material &material,const std::function<bool()> &cancelled) const {
   paint_compute::checkpoint(cancelled);material.validate();
   if(surface_->paint_domain&&surface_->paint_domain->version()==3)throw std::invalid_argument("Polygon surface preview/export requires its actual current field adapter");
+  if(source_sampling_prepared()&&baked_)return detail::PaintOverlayFactory::capture_source_baked(*this,cancelled);
   if(detail::EmissionExportAccess::requires_preview(*this,material,nullptr))
     return detail::EmissionExportAccess::preview(*this,material,cancelled);
   if(baked_&&baked_->normal_authority&&(!normal_projection_||normal_projection_->version!=2))

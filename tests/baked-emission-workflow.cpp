@@ -6,6 +6,7 @@
 #include "dome/gltf-export.hpp"
 #include "emission-bake-source.hpp"
 #include "source4-baked.hpp"
+#include "paint-overlay-packet.hpp"
 #include "emission-export.hpp"
 #include "humanoid-sha256.hpp"
 #include <filesystem>
@@ -172,6 +173,15 @@ void uv1_worker_controls(const std::filesystem::path &directory,bool raw_only=fa
       check(rejects(forged),"legacy Paint4 baked prohibition remains intact inside genuine new envelope");
       bool refused_direct=false;try{(void)PaintedMesh::decode(source_before);}catch(const std::exception&){refused_direct=true;}
       check(refused_direct,"standalone Paint8 never borrows its caller's encoded version as owning capability");
+    }
+    if(!raw_only){
+      auto shown=f.scene.snapshot();shown.object(f.source).visible=true;shown.object(f.target).visible=false;
+      Document visible;visible.replace(shown);check(visible.wait_mesh()&&visible.frame().state->error.empty(),"actual visible Source8 publishes through Document current source/frame worker");
+      const auto frame=visible.frame().surface;bool found=false;
+      for(const auto &range:frame->ranges)if(range.object==f.source){const auto &maps=*range.textures;
+        check(detail::source_baked_preview_metadata(maps)&&maps.source_only&&maps.color.rgba.empty()&&maps.normal.rgba.empty()&&maps.emission.rgba.empty(),"Source8 publishes authentic packet-owned normal carriers without composite/image emission authority");
+        check(maps.overlay->baked()->emission_field==shown.object(f.source).painted->baked()->emission_field&&frame->tangents.size()==frame->mesh.positions.size(),"visible Source8 retains exact FLOAT owner and actual worker current Mikk corners");found=true;
+      }check(found&&visible.copy_scene().encode()==shown.encode(),"visible Source8 packing keeps full native hidden/editable/field ownership exact");
     }
     ObjectBakeSettings options;options.front_mm=10;options.back_mm=2;options.padding=2;options.ao_samples=0;
     auto late=f.scene.snapshot();bool stop=false,rejected=false;

@@ -477,7 +477,8 @@ struct SurfaceRenderer::TextureState {
       }
       if(maps&&maps->source_only) {
         auto present=[](const Image &image){return image.width||image.height||!image.rgba.empty();};
-        if(!maps->source_maps || maps->baked_base ||
+        const bool source8=detail::source_baked_preview_metadata(*maps);
+        if(!maps->source_maps || (maps->baked_base&&!source8) ||
            present(maps->color)||present(maps->metal_rough)||present(maps->emission)||present(maps->normal)||
            present(maps->color_coverage)||present(maps->emission_coverage)||present(maps->baked_normal)||present(maps->baked_coverage)||present(maps->mtoon_normal)||maps->normal_projection)
           throw std::invalid_argument("Raw source preview marker contains derived material payload");
@@ -578,6 +579,11 @@ struct SurfaceRenderer::TextureState {
             slot(13,std::shared_ptr<const Image>(maps,&maps->baked_normal),view,false);slot(15,std::shared_ptr<const Image>(maps,&maps->baked_coverage),view,false);toon.baked_normal=true;
           }
         }
+        if(maps&&detail::source_baked_preview_metadata(*maps)&&maps->overlay->source_baked_normal()){
+          if(mesh.tangents.size()!=mesh.mesh.positions.size())throw std::invalid_argument("Source8 normals require actual worker-generated current Mikk corners");
+          PaintSourceTexture view;view.wrap_s=view.wrap_t=GL_CLAMP_TO_EDGE;view.min_filter=view.mag_filter=GL_LINEAR;
+          slot(13,maps->overlay->source_baked_normal(),view,false);slot(15,maps->overlay->source_baked_coverage(),view,false);toon.baked_normal=true;
+        }
         if(needs_uv1&&maps&&maps->overlay){
           const auto &logical=maps->overlay->original_uv1();
           if(!logical)
@@ -621,6 +627,12 @@ struct SurfaceRenderer::TextureState {
             view.min_filter=view.mag_filter=GL_LINEAR;}
           slot(3,std::move(image),view,false);
         }else if(maps->source_maps)slot(3,maps->source_maps->normal.image,maps->source_maps->normal,false);
+      }
+      if(maps&&detail::source_baked_preview_metadata(*maps)&&maps->overlay->source_baked_normal()){
+        if(mesh.tangents.size()!=mesh.mesh.positions.size())throw std::invalid_argument("Source8 normals require actual current Mikk corners");
+        PaintSourceTexture view;view.wrap_s=view.wrap_t=33071;view.min_filter=view.mag_filter=GL_LINEAR;
+        slot(3,maps->overlay->source_baked_normal(),view,false);slot(6,maps->overlay->source_baked_coverage(),view,false);
+        if(maps->source_maps)slot(5,maps->source_maps->normal.image,maps->source_maps->normal,false);
       }
       if(!typed && range.source_frame && range.canonical_frame && maps && maps->baked_base && !maps->baked_normal.rgba.empty()) {
         PaintSourceTexture view;view.wrap_s=view.wrap_t=33071;view.min_filter=view.mag_filter=GL_LINEAR;
@@ -786,9 +798,12 @@ for(int y=0;y<2;++y)for(int x=0;x<2;++x){ivec2 q=clamp(base+ivec2(x,y),ivec2(0),
 return coverage>1e-8?sum/coverage:vec3(0,0,1);}
 vec3 surface_normal(){
 vec3 N=unit(source_frame==1?source_n:n);
-if(source_baked_frame==1){vec3 original=N;
+if(source_baked_frame>0){vec3 original=N;
 if(original_normal_present==1){vec2 input_uv=source_coordinate(original_normal_coordinate);vec2 q=vec2(dot(original_normal_x,vec3(input_uv,1)),dot(original_normal_y,vec3(input_uv,1)));vec3 encoded=texture(tex5,q).rgb;
-vec3 ts=unit(vec3((encoded.xy*2-1)*normal_scale,encoded.z*2-1));original=unit(unit(source_t)*ts.x+unit(source_b)*ts.y+N*ts.z);}
+vec3 ts=unit(vec3((encoded.xy*2-1)*normal_scale,encoded.z*2-1));
+if(source_baked_frame==1)original=unit(unit(source_t)*ts.x+unit(source_b)*ts.y+N*ts.z);
+else{vec2 a=dFdx(q),b=dFdy(q);vec3 x=dFdx(world),y=dFdy(world);float det=a.x*b.y-a.y*b.x;
+if(abs(det)>1e-8*max(length(a)*length(b),1e-20)){vec3 T=(x*b.y-y*a.y)/det,B=(y*a.x-x*b.x)/det;T=unit(T-N*dot(N,T));B=unit(cross(N,T))*(dot(cross(N,T),B)<0?-1:1);original=unit(T*ts.x+B*ts.y+N*ts.z);}}}
 float coverage;vec3 detail=source_baked_detail(coverage);vec3 canonical=unit(canonical_t*detail.x+canonical_b*detail.y+canonical_n*detail.z);
 N=unit(mix(original,canonical,coverage));return gl_FrontFacing?N:-N;}
 if(slots[3]==1&&baked_normal==1){vec3 detail=texture(tex3,paintcoord).xyz*2.0-1.0;
@@ -968,8 +983,9 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
     glUniform1iv(glGetUniformLocation(program_,"slots[0]"),5,present.data());
     glUniform1iv(glGetUniformLocation(program_,"source_coordinates[0]"),5,coordinates.data());
     glUniform3fv(glGetUniformLocation(program_,"uv_x[0]"),5,ux.data());glUniform3fv(glGetUniformLocation(program_,"uv_y[0]"),5,uy.data());
-    const bool source_bake=use_source && use_canonical && maps && maps->baked_base && !maps->baked_normal.rgba.empty();
-    glUniform1i(glGetUniformLocation(program_,"source_baked_frame"),source_bake);
+    const bool source8=maps&&detail::source_baked_preview_metadata(*maps)&&bool(maps->overlay->source_baked_normal());
+    const bool source_bake=source8||(use_source && use_canonical && maps && maps->baked_base && !maps->baked_normal.rgba.empty());
+    glUniform1i(glGetUniformLocation(program_,"source_baked_frame"),source8?2:source_bake?1:0);
     glUniform1i(glGetUniformLocation(program_,"original_normal_present"),0);
     if(source_bake){const auto &binding=textures_->bindings.at(key);
       for(int n:{5,6}){glActiveTexture(GL_TEXTURE0+n);glBindTexture(GL_TEXTURE_2D,binding[n].image);glBindSampler(n,binding[n].sampler);}

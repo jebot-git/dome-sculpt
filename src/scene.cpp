@@ -11,6 +11,7 @@
 #include "color-bound-memo.hpp"
 #include "emission-paint-access.hpp"
 #include "baked-emission-codec.hpp"
+#include "emission-bake-source.hpp"
 #include "native-scene-geometry-intern.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/scene.hpp"
@@ -1453,10 +1454,11 @@ std::vector<ObjectSurface> Scene::surfaces_impl(bool atlas, bool preview, const 
       // Only the actual render publisher may select a GPU-only marker. Public
       // preview/export/material-sampling callers still receive their real Images.
       const auto current_grid=render_only?detail::CurrentGridPaintPreview::for_render(o,cancelled):nullptr;
+      const auto source_baked=detail::source_baked_preview(o,cancelled);
       if(polygon_field&&!preview)throw std::invalid_argument("Polygon surface standard export requires its actual portable field compiler");
       result.push_back(
           {o.id, o.name, o.transform, o.material, std::move(mesh),
-           current_grid?current_grid:o.mesh_active ? (polygon_field ? detail::PolygonSurfacePaintCodec::preview(*o.painted,o.material_bindings,o.material,cancelled) : (preview||o.painted->source_sampling_prepared()) ? (detail::EmissionExportAccess::requires_preview(*o.painted,o.material,o.material_bindings.get()) ? detail::EmissionExportAccess::preview(*o.painted,o.material,cancelled) : o.painted->preview(o.material,cancelled)) : o.painted->composite(o.material,cancelled)) : nullptr,
+           source_baked?source_baked:current_grid?current_grid:o.mesh_active ? (polygon_field ? detail::PolygonSurfacePaintCodec::preview(*o.painted,o.material_bindings,o.material,cancelled) : (preview||o.painted->source_sampling_prepared()) ? (detail::EmissionExportAccess::requires_preview(*o.painted,o.material,o.material_bindings.get()) ? detail::EmissionExportAccess::preview(*o.painted,o.material,cancelled) : o.painted->preview(o.material,cancelled)) : o.painted->composite(o.material,cancelled)) : nullptr,
            o.mesh_active ? o.deformation : nullptr, group_path(o.group),
            o.mesh_active ? o.appearance : nullptr,
            o.mesh_active ? o.material_bindings : nullptr,

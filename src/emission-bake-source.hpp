@@ -6,6 +6,8 @@ namespace dome::detail {
 // the legacy UV0 dense-composite route unchanged.
 std::shared_ptr<const TextureMaps> raw_bake_source(const SculptObject &,
     const std::function<bool()> &cancelled={});
+std::shared_ptr<const TextureMaps> source_baked_preview(const SculptObject &,
+    const std::function<bool()> &cancelled={});
 // Actual immutable source radiance evaluated at the source projection hit.
 // Empty means the unchanged legacy Bake path is sufficient. No RGB8 composite
 // is accepted as physical radiance authority.
