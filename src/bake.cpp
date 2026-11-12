@@ -1,5 +1,6 @@
 #include "paint-overlay-packet.hpp"
 #include "emission-authority.hpp"
+#include "source-bake-normal.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/bake.hpp"
 #include "dome/mesh-processing.hpp"
@@ -244,7 +245,8 @@ void pad(BakeResult &result,const BakeOptions &o,std::vector<BakedEmissionSample
   }
 }
 } // namespace
-BakeResult bake_mesh(const Mesh &low,const BakeSource &source,const BakeOptions &o) {
+static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const BakeOptions &o,
+    const detail::SourceBakeNormalResolver &source_normals) {
   if(o.progress)o.progress(0);
   cancel(o); validate(low,source,o);
   const bool float_emission=std::any_of(source.materials.begin(),source.materials.end(),[](const auto &m){return bool(m.resolved_emission);});
@@ -346,6 +348,7 @@ BakeResult bake_mesh(const Mesh &low,const BakeSource &source,const BakeOptions 
         std::array<float,4> tint{};for(int i=0;i<3;++i)for(int c=0;c<4;++c)tint[c]+=source.colors[source.mesh.indices[hit->triangle*3+i]][c]*hit->barycentric[i];
         for(int c=0;c<4;++c){if(!o.separate_pbr_color)channels.color[c]*=tint[c];else if(!resolved_source)pbr_color[c]*=tint[c];}
       }
+      if(!source_normals){
       if (normal_image(m)&&m.normal_strength>0) {
         TangentFrame tangent;
         if (source.tangents.empty())
@@ -399,14 +402,23 @@ BakeResult bake_mesh(const Mesh &low,const BakeSource &source,const BakeOptions 
           high_normal=normalized(high_normal*(1-coverage)+baked_world*coverage);
         }
       }
-      Vec3 mapped;
+      }
+      auto desired=source_normals?source_normals(hit->triangle,hit->barycentric):std::array<Vec3,2>{high_normal,high_normal};
+      if(source_normals)for(auto &direction:desired){if(!finite(direction)||length(direction)<1e-10f)throw std::invalid_argument("Source normal resolver returned a singular direction");direction=normalized(direction);}
+      high_normal=desired[0];Vec3 mapped;
       if(o.encode_target_normal){
-        const auto encoded=o.encode_target_normal(uint32_t(triangle),bary,high_normal);
+        const auto pbr=o.encode_target_normal(uint32_t(triangle),bary,desired[0]);
+        const auto toon=source_normals?o.encode_target_normal(uint32_t(triangle),bary,desired[1]):pbr;
+        const std::array<std::array<uint8_t,4>,2> encoded{pbr[0],toon[1]};
         if(encoded[0][3]!=255||encoded[1][3]!=255)throw std::invalid_argument("Explicit target normal encoder returned malformed normal data alpha");
         std::copy_n(encoded[0].begin(),4,result.normal.rgba.data()+at*4);
         std::copy_n(encoded[1].begin(),4,result.maps.mtoon_normal.rgba.data()+at*4);
         if(o.normal_y_down){result.normal.rgba[at*4+1]=255-result.normal.rgba[at*4+1];result.maps.mtoon_normal.rgba[at*4+1]=255-result.maps.mtoon_normal.rgba[at*4+1];}
-      }else mapped=frame.to_tangent(high_normal);
+      }else {
+        if(source_normals&&length(desired[0]-desired[1])>1e-6f)
+          throw std::invalid_argument("Source PBR/MToon normals differ; enable genuine target normal preparation to retain both roles");
+        mapped=frame.to_tangent(high_normal);
+      }
       if (o.normal_y_down) mapped.y=-mapped.y;
       float ao=ambient(query,hit->position,normalized(hit->normal),o,result)*channels.ao;
       for (int c=0;c<3;++c) {
@@ -436,4 +448,9 @@ BakeResult bake_mesh(const Mesh &low,const BakeSource &source,const BakeOptions 
   if(o.progress)o.progress(1);
   return result;
 }
+BakeResult bake_mesh(const Mesh &low,const BakeSource &source,const BakeOptions &options){
+ return bake_mesh_impl(low,source,options,{});
+}
+BakeResult detail::bake_mesh_source_normals(const Mesh &low,const BakeSource &source,const BakeOptions &options,
+ const SourceBakeNormalResolver &normal){return bake_mesh_impl(low,source,options,normal);}
 } // namespace dome

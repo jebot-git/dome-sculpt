@@ -15,6 +15,7 @@
 #include "canonical-normal-uv.hpp"
 #include "emission-bake-source.hpp"
 #include "source4-baked.hpp"
+#include "source-bake-normal.hpp"
 namespace dome {
 ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
                               ObjectBakeSettings settings,
@@ -123,6 +124,8 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   high.materials[0].resolved_emission=detail::emission_bake_source(source,cancelled);
   auto target_world = scene.world_transform(target.id);
   auto relative = ob::compose(ob::inverse(target_world), scene.world_transform(source.id));
+  detail::SourceBakeNormalOptions source_normal_options;source_normal_options.cancelled=cancelled;
+  const auto source_normals=detail::source_bake_normals(source,relative,source_normal_options);
   for (auto &p : high.mesh.positions) {
     auto world = ob::transform(relative, {p.x,p.y,p.z});
     p = {world.x,world.y,world.z};
@@ -174,7 +177,7 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
         target.painted->mesh(),low_mesh,cancelled);
   const auto retained_uv=target.material_bindings?target.material_bindings->canonical_uv:nullptr;
   if(retained_uv&&progress)options.progress=[&](float value){progress(.1f+.4f*value);};
-  auto result = bake_mesh(low_mesh, high, options);
+  auto result = detail::bake_mesh_source_normals(low_mesh,high,options,source_normals);
   std::optional<BakeResult> retained_normal_write;
   if(retained_uv){
     retained_uv->validate_current(target.painted->mesh(),cancelled);
@@ -192,7 +195,7 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
       throw std::length_error("Retained normal rebake lacks aggregate projection/raster budget");
     normal_options.max_rays-=result.rays;normal_options.max_raster_samples-=result.raster_samples;
     if(progress)normal_options.progress=[&](float value){progress(.5f+.4f*value);};
-    retained_normal_write=bake_mesh(normal_low,high,normal_options);
+    retained_normal_write=detail::bake_mesh_source_normals(normal_low,high,normal_options,source_normals);
   }
   check();
   if(!result.projected)throw std::runtime_error("No target texels project onto the selected source");
