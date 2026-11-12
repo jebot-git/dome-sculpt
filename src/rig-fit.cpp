@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/rig-fit.hpp"
+#include "humanoid-fit-continuation.hpp"
 #include <limits>
 namespace dome {
 namespace {
@@ -80,6 +81,15 @@ RigFitResult author_humanoid_fit(Scene &scene,uint64_t id,const HumanLandmarks &
  const double up_length=std::sqrt(up[0]*up[0]+up[1]*up[1]+up[2]*up[2]);
  local_options.terminal_length=float(options.fit.terminal_length/up_length);
  auto fit=fit_humanoid(rest,landmarks,local_options,cancelled);
+ // Terminal length is an explicit world distance, including a hand/finger
+ // axis that differs from body-up. Landmark-to-landmark lengths stay exact.
+ const auto fitted_world=fit.skeleton.world();
+ for(const auto &role:human_roles())if(landmarks.points.contains(role.name)&&detail::humanoid_fit_continuation(role,landmarks).empty()){
+  const auto joint=fit.mapping.joints.at(role.name);const auto &m=fitted_world[joint];
+  const auto axis=world.direction({m[4],m[5],m[6]});
+  const auto scale=std::hypot(axis[0],axis[1],axis[2]);
+  fit.skeleton.bones[joint].length=float(options.fit.terminal_length/scale);
+ }
  const auto segments=fit.skeleton.segments();
  for(size_t b=0;b<segments.size();++b){
   if(length(point(world,segments[b][1])-point(world,segments[b][0]))<options.fit.minimum_segment_length)
