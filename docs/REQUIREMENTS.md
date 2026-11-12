@@ -32,6 +32,14 @@ matched renderer qualification are underway separately. The current frozen
 combined build includes291 and must retain this known unresolved limitation.
 No weaker alpha expectation or blanket hardware success is substituted.
 
+A second fresh owning build of the same cc5e6aed source is now running in
+`artifacts/authoring-source8-hdr-fit-owning-sanitize-20261112/` (session38512,
+driver PID2712363). It uses the sanitizer toolkit and strict ASan/UBSan with leak
+detection enabled and no suppressions. Its outputs are separate from Release;
+zero initial project objects and the exact same82 selected cases are required.
+Read-only CTest registration confirms all82 expected names in the configured
+Release tree; this is registration evidence, not completed test execution.
+
 Parallel work resumes the owned Xvfb wrapper lifetime repair/public Bake GUI
 and actual-loader XR gates, final HDR Arc qualification, and genuine visible
 Source8 source preview plus matching sanitizer coverage. These are scoped
