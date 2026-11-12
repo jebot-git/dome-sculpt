@@ -19,6 +19,19 @@ session56318, driver PID2688834. Inspect the live handle/process and exact logs
 before acting; an observation timeout does not authorize restarting the build.
 Frozen component sources, providers and failed evidence remain unchanged.
 
+The repaired copied Xvfb fixture now closes its owned Xserver correctly.
+Original4977 Release public Bake passes actual GUI10 and real-loader XR33,
+including authenticated Arc and both-eye history/source-font checks. Prior
+coordinator failures remain preserved. These results do not qualify the new
+combined candidate or establish physical-headset/performance acceptance.
+
+Actual Arc execution of291's unchanged HDR alpha regression fails: the HALF
+scene target clips100000 to65504 before alpha blending, unlike the software
+path. A new full-FLOAT target correction, accurate resource accounting and
+matched renderer qualification are underway separately. The current frozen
+combined build includes291 and must retain this known unresolved limitation.
+No weaker alpha expectation or blanket hardware success is substituted.
+
 Parallel work resumes the owned Xvfb wrapper lifetime repair/public Bake GUI
 and actual-loader XR gates, final HDR Arc qualification, and genuine visible
 Source8 source preview plus matching sanitizer coverage. These are scoped
