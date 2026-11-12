@@ -1,22 +1,30 @@
-## New Release audit passes; generated-header staging repair — 2026-11-12
+## Generated dependency repair and isolated sanitizer completion — 2026-11-12
 
-Final5c820f whole-owner audit completed:1030 configured TUs,263 full fresh
-compilations and767 authenticated whole-object reuses;731 archive/link nodes
-with685 fresh and46 exact products. The selected native manifest remains85.
-The execution plan and toolchain/asset/provider identities are separately pinned.
+The frozen5c820f candidate's first Release execution73720 is terminal1:
+paint-blur-gpu.cpp could not find generated blur_weights.hpp. No full fresh TU
+or link completed. The failed namespace and source/provider bytes are retained.
+The generated-input audit identified THREE prerequisites: blur_weights.hpp,
+appmenu-protocol.c and appmenu-client.h. A new execution must respect their
+actual Ninja custom/order/phony dependency graph; no source/flags are weakened.
+That repair is being audited, not yet executing. The original1030-TU audit
+remains terminal0 (263 fresh/767 exact whole objects,685 fresh/46 exact links),
+but the selected85 native tests and public desktop/XR gates have not begun.
 
-The first actual isolated compile attempt then failed at paint-blur-gpu.cpp
-because the new build include directory lacked generated blur_weights.hpp.
-This is a generated-artifact staging failure, not a source or native test pass.
-Its terminal1 status/log and original source/provider bytes remain preserved.
-The runner must enumerate actual CMake/Ninja generated inputs, prove generator/
-source/config equivalence and stage exact owned artifacts or execute the genuine
-current generator, then use a NEW execution namespace. No compiler flag, source,
-ABI or runtime gate may be relaxed to bypass this dependency.
+Joint Source8 d07 Release AND strict sanitizer now pass all969 critical controls,
+Bake4, genuine fixture generators3 and all17 affected historical consumers with
+zero drift. This is component evidence, not final5c application acceptance.
 
-Full goal stays active/incomplete. Original cc5 sanitizer build deadline remains
-terminal1; a new isolated100-link remainder plan is still under technical review.
-No app/public qualification, installation or active session change is claimed.
+Root reviewed the complete separate cc5 sanitizer remainder runner and verified
+100 distinct absent link outputs, no cross-pending link input, exact82 unique
+native names and byte-exact CTest namespace substitution. Plan5b6bdf0a and
+runner9bd32203 are approved under their sealed bounds. Actual execution80747,
+PID3950346 has begun input authentication in the NEW independent namespace.
+The old7200-second ALL timeout remains failure; no fresh-ALL or native pass is
+claimed. No original provider writes, source changes or suppression are allowed.
+
+Full goal stays active/incomplete. No install, physical headset launch or active
+session restart. Next: finish generated-order repair and actual combined build,
+then native/helpers/raw/manual, fresh producers/font and public desktop/XR.
 
 ## Repaired85-test application source frozen; new owning audit live — 2026-11-12
 
