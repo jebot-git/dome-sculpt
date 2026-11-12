@@ -12,6 +12,12 @@ class LinearSceneTarget {
   bool pending_=false,copy_depth_=false;
   int width_=0,height_=0;
   Target *active_=nullptr;
+  // Preserve the old HALF/depth pool's worst 512 MiB requested-store envelope.
+  // Color is now genuine FLOAT throughout blending; depth uses conservative
+  // four-byte slots except the eight-byte FLOAT depth/stencil format.
+  size_t max_bytes_=512ull*1024*1024;
+  static size_t target_bytes(const Target&t){return size_t(t.width)*t.height*(t.format==GL_DEPTH32F_STENCIL8?24:20);}
+  size_t pixels()const{size_t n=0;for(const auto&t:targets_)n+=size_t(t.width)*t.height;return n;}
   static GLuint compile(GLenum type,const char*text){auto id=glCreateShader(type);glShaderSource(id,1,&text,nullptr);glCompileShader(id);GLint ok=0;glGetShaderiv(id,GL_COMPILE_STATUS,&ok);if(!ok){char log[4096];glGetShaderInfoLog(id,sizeof(log),nullptr,log);glDeleteShader(id);throw std::runtime_error(log);}return id;}
   static void release(Target&t,bool gl){if(gl){glDeleteRenderbuffers(1,&t.depth);glDeleteTextures(1,&t.color);glDeleteFramebuffers(1,&t.fbo);}t={};}
   void initialise(){if(program_)return;GLuint v=0,f=0;try{v=compile(GL_VERTEX_SHADER,R"(#version 330 core
@@ -20,8 +26,9 @@ in vec2 uv;out vec4 color;uniform sampler2D scene;uniform int encode_srgb;
 vec3 encode(vec3 c){return mix(12.92*c,1.055*pow(max(c,vec3(0)),vec3(1.0/2.4))-.055,greaterThan(c,vec3(.0031308)));}
 void main(){vec4 c=texture(scene,uv);c.rgb=max(c.rgb,vec3(0));color=vec4(encode_srgb==1?encode(c.rgb):c.rgb,c.a);})");program_=glCreateProgram();glAttachShader(program_,v);glAttachShader(program_,f);glLinkProgram(program_);glDeleteShader(v);glDeleteShader(f);v=f=0;GLint ok=0;glGetProgramiv(program_,GL_LINK_STATUS,&ok);if(!ok)throw std::runtime_error("Linear scene resolve shader linking failed");glGenVertexArrays(1,&vao_);}catch(...){glDeleteShader(v);glDeleteShader(f);glDeleteProgram(program_);program_=0;throw;}}
 public:
+  explicit LinearSceneTarget(size_t max_bytes=512ull*1024*1024):max_bytes_(max_bytes){}
   bool pending()const{return pending_;}
-  size_t bytes()const{size_t bytes=0;for(const auto&t:targets_)bytes+=size_t(t.width)*t.height*(t.format==GL_DEPTH32F_STENCIL8?16:12);return bytes;}
+  size_t bytes()const{size_t n=0;for(const auto&t:targets_)n+=target_bytes(t);return n;}
   void clear(bool gl){if(pending_){if(gl)abort();else{pending_=false;active_=nullptr;}}for(auto&t:targets_)release(t,gl);targets_.clear();if(gl){glDeleteProgram(program_);glDeleteVertexArrays(1,&vao_);}program_=vao_=0;active_=nullptr;}
   void abort(){if(!pending_)return;glBindFramebuffer(GL_DRAW_FRAMEBUFFER,GLuint(destination_));glBindFramebuffer(GL_READ_FRAMEBUFFER,GLuint(read_));glDisable(GL_FRAMEBUFFER_SRGB);pending_=false;active_=nullptr;}
   void begin(int width,int height,SurfaceOutputEncoding output){
@@ -41,11 +48,21 @@ public:
     GLenum format=stencil?(depth==32?GL_DEPTH32F_STENCIL8:GL_DEPTH24_STENCIL8):depth<=16&&depth>0?GL_DEPTH_COMPONENT16:depth==32?(type==GL_FLOAT?GL_DEPTH_COMPONENT32F:GL_DEPTH_COMPONENT32):GL_DEPTH_COMPONENT24;
     width_=width;height_=height;pending_=true;
     try{
-      initialise();auto found=std::find_if(targets_.begin(),targets_.end(),[&](const auto&t){return t.width==width&&t.height==height&&t.format==format;});
+      auto found=std::find_if(targets_.begin(),targets_.end(),[&](const auto&t){return t.width==width&&t.height==height&&t.format==format;});
       if(found==targets_.end()){
-        size_t pixels=size_t(width)*height;auto total=[&]{size_t n=pixels;for(auto&t:targets_)n+=size_t(t.width)*t.height;return n;};while(!targets_.empty()&&(targets_.size()>=2||total()>32*1024*1024)){release(targets_.back(),true);targets_.pop_back();}
         Target target;target.width=width;target.height=height;target.format=format;
-        try{glGenFramebuffers(1,&target.fbo);glBindFramebuffer(GL_FRAMEBUFFER,target.fbo);glGenTextures(1,&target.color);glBindTexture(GL_TEXTURE_2D,target.color);glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA16F,width,height,0,GL_RGBA,GL_HALF_FLOAT,nullptr);glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);glFramebufferTexture2D(GL_FRAMEBUFFER,GL_COLOR_ATTACHMENT0,GL_TEXTURE_2D,target.color,0);glGenRenderbuffers(1,&target.depth);glBindRenderbuffer(GL_RENDERBUFFER,target.depth);glRenderbufferStorage(GL_RENDERBUFFER,format,width,height);glFramebufferRenderbuffer(GL_FRAMEBUFFER,stencil?GL_DEPTH_STENCIL_ATTACHMENT:GL_DEPTH_ATTACHMENT,GL_RENDERBUFFER,target.depth);if(glCheckFramebufferStatus(GL_FRAMEBUFFER)!=GL_FRAMEBUFFER_COMPLETE||glGetError()!=GL_NO_ERROR)throw std::runtime_error("Linear scene framebuffer allocation failed");targets_.push_front(target);}catch(...){release(target,true);throw;}
+        const size_t requested=target_bytes(target),next_pixels=size_t(width)*height;
+        // Keep the accepted front available until replacement allocation has
+        // succeeded. Only older cached views may be evicted to reserve space.
+        // Forecast includes the new target and every still-live old target.
+        if(requested>max_bytes_)throw std::length_error("Full-FLOAT linear scene target exceeds its byte pool bound");
+        while(targets_.size()>1&&(targets_.size()>=2||pixels()+next_pixels>32*1024*1024||bytes()>max_bytes_-requested)){
+          release(targets_.back(),true);targets_.pop_back();
+        }
+        if(bytes()>max_bytes_-requested||pixels()+next_pixels>32*1024*1024)
+          throw std::length_error("Full-FLOAT linear scene targets exceed their byte or pixel pool bound");
+        initialise();
+        try{glGenFramebuffers(1,&target.fbo);glBindFramebuffer(GL_FRAMEBUFFER,target.fbo);glGenTextures(1,&target.color);glBindTexture(GL_TEXTURE_2D,target.color);glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA32F,width,height,0,GL_RGBA,GL_FLOAT,nullptr);glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);glFramebufferTexture2D(GL_FRAMEBUFFER,GL_COLOR_ATTACHMENT0,GL_TEXTURE_2D,target.color,0);glGenRenderbuffers(1,&target.depth);glBindRenderbuffer(GL_RENDERBUFFER,target.depth);glRenderbufferStorage(GL_RENDERBUFFER,format,width,height);glFramebufferRenderbuffer(GL_FRAMEBUFFER,stencil?GL_DEPTH_STENCIL_ATTACHMENT:GL_DEPTH_ATTACHMENT,GL_RENDERBUFFER,target.depth);GLint actual=0;glGetTexLevelParameteriv(GL_TEXTURE_2D,0,GL_TEXTURE_INTERNAL_FORMAT,&actual);const auto status=glCheckFramebufferStatus(GL_FRAMEBUFFER);const auto error=glGetError();if(status!=GL_FRAMEBUFFER_COMPLETE||error!=GL_NO_ERROR||actual!=GL_RGBA32F)throw std::runtime_error("Full-FLOAT linear scene framebuffer allocation failed");targets_.push_front(target);}catch(...){release(target,true);while(glGetError()!=GL_NO_ERROR){}throw;}
       }else targets_.splice(targets_.begin(),targets_,found);
       active_=&targets_.front();glBindFramebuffer(GL_FRAMEBUFFER,active_->fbo);glViewport(0,0,width,height);glDisable(GL_FRAMEBUFFER_SRGB);glDisable(GL_SCISSOR_TEST);glDisable(GL_STENCIL_TEST);
     }catch(...){abort();throw;}
