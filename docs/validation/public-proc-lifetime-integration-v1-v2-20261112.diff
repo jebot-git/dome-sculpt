@@ -1,0 +1,20 @@
+--- run-lifetime-v1.py
++++ run-lifetime-v2.py
+@@ -5,7 +5,7 @@
+ _spec=importlib.util.spec_from_file_location('source8_cohort_ad99',Path(__file__).resolve().parent/'cohort.py');_cohort=importlib.util.module_from_spec(_spec);_spec.loader.exec_module(_cohort)
+ P,R,S,B,HEAD,TARGETS,G,sha,write,verify,admit=(_cohort.__dict__[key]for key in ['P','R','S','B','HEAD','TARGETS','G','sha','write','verify','admit'])
+ from process_observer import ProcessObserver
+-from monitor_lifetime import checked_monitor
++from monitor_lifetime_v2 import checked_monitor
+ C=R/'artifacts/strict-arc-20261111/control'
+ BUNDLE=R/'artifacts/gui-recovery-20261111'
+ OBS=R/'artifacts/paint-workflow-dso-build-20261111'
+@@ -27,7 +27,7 @@
+  cohort=admit(a.profile);out=P/(a.profile+'-'+a.phase+'-'+a.case+'-'+a.tag);out.mkdir(exist_ok=False)
+  pins=dict(cohort['pins']);write(out/'provider-admission.json',cohort);pins[str(out/'provider-admission.json')]=sha(out/'provider-admission.json')
+  targets={k:Path(v['path'])for k,v in cohort['targets'].items()};env=environment(a.profile,out)
+- for f in [Path(__file__).resolve(),P/'cohort.py',P/'process_observer.py',P/'monitor_lifetime.py',P/'scenario-provenance.json',P/'bin/Xvfb']:pins[str(f)]=sha(f)
++ for f in [Path(__file__).resolve(),P/'cohort.py',P/'process_observer.py',P/'monitor_lifetime_v2.py',P/'scenario-provenance.json',P/'bin/Xvfb']:pins[str(f)]=sha(f)
+  lease=None;active=None;all_owned={};app_owned={};seen=set();mapped={};dris={};apps=set();peak=0
+  critical={};critical_stat={};state={**plan(a),'state':'preparing','pins':pins,'external_guard':None,'exit':1,'authorization':'Existing root session authorization, conditional on exact current-owning native/input/provider gates; this record does not represent a separate signed clearance.'}
+  sys.path.insert(0,str(C));spec=importlib.util.spec_from_file_location('monitor',C/'graphics-v3.py');g=importlib.util.module_from_spec(spec);spec.loader.exec_module(g)
