@@ -60,7 +60,7 @@ void run(bool legacy,bool posed,const std::filesystem::path&out){auto f=fixture(
  auto source_export=source_only;auto source_path=out;source_path+=".source.glb";check(refuses([&]{parse_export(source_export,source_path);})&&!std::filesystem::exists(source_path),"Unsealed manual native normal-affine export retains its genuine PBR consumer-frame guard");check(f.scene.encode()==encoded&&source_export.object(f.source).painted==source_paint&&source_export.object(f.source).material_bindings==source_binding,"Actual source/target exports leave all artist source and dual normal owners exact");
 std::cout<<"ARTIST_CASE legacy="<<legacy<<" posed="<<posed<<" role_gap="<<role_gap<<" projected="<<report.projected<<" polls="<<count<<'\n';
 }
-void imported_artist(const std::filesystem::path &out){
+Scene imported_artist_scene(const std::filesystem::path &out){
  import_fixture::Fixture file;auto &primitive=file.j["meshes"][0]["primitives"][0];auto &attributes=primitive["attributes"];attributes.erase("COLOR_0");
  const std::array<Vec3,4> N{normalized(artistN[0]),normalized(artistN[1]),normalized(artistN[2]),normalized(artistN[5])};std::array<Vec3,4>T;for(size_t i=0;i<4;++i)T[i]=normalized(Vec3{1,0,0}-N[i]*N[i].x);
  // The base fixture ends with PNG bytes; FLOAT accessor views require real 4-byte alignment.
@@ -80,6 +80,8 @@ void imported_artist(const std::filesystem::path &out){
  cgltf_options parse_options{};cgltf_data* parsed=nullptr;check(cgltf_parse_file(&parse_options,portable.c_str(),&parsed)==cgltf_result_success,"Independent cgltf parses genuine sealed normal-affine artist VRM1 export");std::unique_ptr<cgltf_data,decltype(&cgltf_free)> data(parsed,cgltf_free);check(cgltf_load_buffers(&parse_options,parsed,portable.c_str())==cgltf_result_success&&cgltf_validate(parsed)==cgltf_result_success,"Independent consumer validates actual imported artist normal/tangent/UV/morph portable buffers");
  bool explicit_tangent=false,normal_texture=false;for(size_t m=0;m<parsed->meshes_count;++m)for(size_t p=0;p<parsed->meshes[m].primitives_count;++p){const auto&primitive=parsed->meshes[m].primitives[p];normal_texture|=primitive.material&&primitive.material->normal_texture.texture;for(size_t a=0;a<primitive.attributes_count;++a)explicit_tangent|=primitive.attributes[a].type==cgltf_attribute_type_tangent;}check(explicit_tangent&&normal_texture,"Sealed imported artist export retains actual tangent attributes and declared normal texture");
  std::cout<<"IMPORTED_ARTIST original_bytes="<<source.appearance->original_bytes->size()<<" normal_policy_gap="<<length(directions[0]-directions[1])<<'\n';
+ return scene;
 }
+void imported_artist(const std::filesystem::path &out){(void)imported_artist_scene(out);}
 
 }
