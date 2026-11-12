@@ -46,6 +46,14 @@ Source8 source preview plus matching sanitizer coverage. These are scoped
 qualification tasks; no physical-headset, performance, full interoperability or
 whole-goal success is claimed. No system installation or session restart.
 
+Independent native weight-quality measurement now compares Legacy, Surface
+Heat and Anatomical methods on genuine complete retained-source VRoid groups,
+with artist influences physically removed before solving. Surface Heat shows
+83.66%/81.84% mean shared mapped influence mass and strong head support; actual
+posed/silhouette quality and weaker hips/chest/palm regions remain to investigate.
+Read [the scoped native comparison](HUMANOID-NATIVE-WEIGHT-QUALITY-20261112.md).
+These are descriptive measurements, not full automatic-weight acceptance.
+
 Controller trays and spatial node-based editing/history remain required later
 work after basic targets. ArmorPaint remains a painting integration candidate
 under the existing native FLTK/OpenXR and source/document authority constraints.
