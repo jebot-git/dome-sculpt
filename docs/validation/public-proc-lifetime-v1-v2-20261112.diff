@@ -1,0 +1,21 @@
+--- monitor_lifetime.py
++++ monitor_lifetime_v2.py
+@@ -3,6 +3,7 @@
+ from pathlib import Path
+ 
+ def checked_monitor(monitor,identity,child,expected,owned,critical,critical_stat,seen,mapped,dris,stage,race_log):
++ prior_seen=set(seen)
+  try:
+   return monitor(child,owned,critical,critical_stat,seen,mapped,dris,stage)
+  except OSError as failure:
+@@ -14,6 +15,9 @@
+   if not expected or not observed or observed['start']!=expected['start']:raise
+   after=identity(child.pid)
+   if after is not None and(after['start']!=expected['start']or after['state']not in ['Z','X']):raise
+-  row={'epoch':time.time(),'pid':child.pid,'expected_identity':expected,'monitor_owned_identity':observed,'identity_after_failed_read':after,'operation':'open exact owned /proc/PID/mountinfo','errno':failure.errno,'filename':failure.filename,'exception':str(failure),'classification':'same-start retired or absent owned process; no new map certificate or ELF witness admitted','critical_seen_unchanged':sorted(seen),'prior_mapped_ELF_count':len(mapped)}
++  # The shared monitor records map inodes before certifying file fingerprints.
++  # A retired read must not promote those interrupted observations to witnesses.
++  seen.clear();seen.update(prior_seen)
++  row={'epoch':time.time(),'pid':child.pid,'expected_identity':expected,'monitor_owned_identity':observed,'identity_after_failed_read':after,'operation':'open exact owned /proc/PID/mountinfo','errno':failure.errno,'filename':failure.filename,'exception':str(failure),'classification':'same-start retired or absent owned process; no new map certificate or ELF witness admitted','critical_seen_before':sorted(prior_seen),'critical_seen_restored':sorted(seen),'prior_mapped_ELF_count':len(mapped)}
+   with Path(race_log).open('a')as stream:stream.write(json.dumps(row)+'\n')
+   return 0
