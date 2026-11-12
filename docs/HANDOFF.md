@@ -16,6 +16,16 @@ shader-cache disabling is an identified harness difference, not yet a proven
 cause; same-binary isolated diagnostics retain the deadline and all assertions.
 Current candidate remains unqualified and is not admitted to main.
 
+The same owned recovery binary then passes all ten cycles in33.539seconds with
+an empty isolated cache and normal caching, under the same180-second bound.
+Root verified exact binary identity, no input drift, cache573hits/65misses and
+lease acquisition before child launch. Read the
+[matched diagnostic](validation/authoring-recovery-cache-diagnostic-20261112.json).
+New full85 replay77360/PID136326 is actually running with reviewed runner3850142f:
+only the forced cache-disable override is removed from the lock-equipped runner.
+All predicates, source and deadlines remain intact. The original failed native
+run is preserved and is not retrospectively relabeled.
+
 This branch is a PREPARED merge, not admitted main. Its parents preserve main39b
 and frozen5c; every1709 non-doc Git record matches frozen5c exactly. Read
 [AUTHORING-MAIN-MERGE-STAGING-20261112.md](AUTHORING-MAIN-MERGE-STAGING-20261112.md).
