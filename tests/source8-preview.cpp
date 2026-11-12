@@ -6,6 +6,7 @@
 #include "dome/material-bindings.hpp"
 #include "dome/source-paint.hpp"
 #include "dome/bake-authoring.hpp"
+#include "dome/polygon-scene.hpp"
 #include "source4-baked.hpp"
 #include "source-paint-parameters.hpp"
 #include <future>
