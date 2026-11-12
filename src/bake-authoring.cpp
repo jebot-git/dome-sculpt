@@ -13,6 +13,8 @@
 #include "normal-bake-encoding.hpp"
 #include "baked-normal-field.hpp"
 #include "canonical-normal-uv.hpp"
+#include "emission-bake-source.hpp"
+#include "source4-baked.hpp"
 namespace dome {
 ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
                               ObjectBakeSettings settings,
@@ -70,7 +72,8 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   }
   // Authenticate ordered REST geometry before evaluation. Skin/morph changes
   // positions/normals later, never the source field's corner identity or RGBA.
-  auto source_maps=source.mesh_active?source.painted->preview(source.material,cancelled):std::shared_ptr<const TextureMaps>{};
+  auto source_maps=detail::raw_bake_source(source,cancelled);
+  if(!source_maps&&source.mesh_active)source_maps=source.painted->preview(source.material,cancelled);
   auto source_colors=source.mesh_active?detail::current_vertex_colors(source.painted->mesh(),current?&*current:nullptr,
       source.appearance.get(),source.material_bindings.get(),source_maps.get(),cancelled):std::vector<PolygonRgba>{};
   std::shared_ptr<const PolygonColorSurface> target_current;
@@ -117,6 +120,7 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   } else
     high.mesh = surface_mesh(*source.volume, cancelled);
   high.materials[0].material = source.material;
+  high.materials[0].resolved_emission=detail::emission_bake_source(source,cancelled);
   auto target_world = scene.world_transform(target.id);
   auto relative = ob::compose(ob::inverse(target_world), scene.world_transform(source.id));
   for (auto &p : high.mesh.positions) {
@@ -208,6 +212,7 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   if(prepared_normals)textures.normal_interpretation=BakedNormalInterpretation::PreparedAttributes;
   if(separate)textures.color_interpretation=BakedColorInterpretation::ResolvedPbr;
   textures.maps = std::move(result.maps);
+  textures.emission_field=std::move(result.emission_field);
   textures.maps.normal = std::move(result.normal);
   textures.coverage.reserve(result.coverage.size());
   for (auto c : result.coverage) textures.coverage.push_back(c==1 || c==2 ? 255 : 0);
@@ -226,7 +231,10 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
     }else textures.normal_field=before->replace(textures,field_options);
     textures.maps.normal={};textures.maps.mtoon_normal={};
   }
-  painting->install_bake(std::move(textures));
+  if(painting->source_sampling_prepared()){
+    SourcePaintOptions source_options;source_options.cancelled=cancelled;
+    painting=detail::install_source_bake(*painting,std::move(textures),source_options);
+  }else painting->install_bake(std::move(textures));
   auto next = scene;
   next.active().painted = std::move(painting);
   next.active().material_bindings=target.material_bindings;

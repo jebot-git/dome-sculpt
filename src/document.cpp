@@ -1798,7 +1798,8 @@ void Document::mesh_loop() {
           dep.frame_role=!job->pbr_view&&o.material_bindings->has_mtoon&&!geometry_detail::same_owner(frames->pbr,frames->mtoon)?1:0;
         }
         auto surface=std::find_if(objects.begin(),objects.end(),[&](const auto &s){return s.id==o.id;});
-        dep.canonical=surface!=objects.end()&&surface->textures&&!surface->textures->normal.rgba.empty();
+        dep.canonical=surface!=objects.end()&&surface->textures&&(!surface->textures->normal.rgba.empty()||
+          (surface->textures->overlay&&surface->textures->overlay->source_baked_geometry()&&surface->textures->overlay->source_baked_normal()));
         if(surface!=objects.end()&&surface->texture_set_surface){
           const auto&plan=*surface->texture_set_surface;dep.texture_membership=plan.collection()->primary_domain();
           for(const auto&field:plan.fields())dep.texture_frames.push_back({field.id,field.painted->baked()&&!field.painted->baked()->maps.normal.rgba.empty()});
@@ -1856,7 +1857,8 @@ void Document::mesh_loop() {
         }
         if(!colors.empty() && snapshot->source_colors.empty())snapshot->source_colors.assign(snapshot->mesh.positions.size(),{1,1,1,1});
         auto retained=o.material_bindings?o.material_bindings->normal_frames:nullptr;
-        const bool canonical=!polygon_field && o.textures && !o.textures->normal_projection && !o.textures->normal.rgba.empty();
+        const bool source8_normal=o.textures&&o.textures->overlay&&o.textures->overlay->source_baked_geometry()&&bool(o.textures->overlay->source_baked_normal());
+        const bool canonical=!polygon_field && o.textures && !o.textures->normal_projection && (!o.textures->normal.rgba.empty()||source8_normal);
         // Existing bakes without captured canonical authority use the historical
         // posed-mesh Mikk basis. Do not invent a persisted/rest export basis.
         const bool dynamic_canonical=retained && canonical && !retained->canonical;

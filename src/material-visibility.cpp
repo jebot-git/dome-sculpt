@@ -147,7 +147,7 @@ struct Visibility {
         auto present=[](const Image &i){return i.width || i.height || !i.rgba.empty();};
         if(!maps->source_maps || present(maps->color) || present(maps->metal_rough) ||
            present(maps->emission) || present(maps->normal) || present(maps->color_coverage) ||
-           present(maps->emission_coverage) || maps->baked_base || present(maps->baked_normal) || present(maps->baked_coverage))
+           present(maps->emission_coverage) || (maps->baked_base&&!detail::source_baked_preview_metadata(*maps)) || present(maps->baked_normal) || present(maps->baked_coverage))
           throw std::invalid_argument("Visibility source-only maps contain derived payloads");
         color = maps->source_maps->color;
       }

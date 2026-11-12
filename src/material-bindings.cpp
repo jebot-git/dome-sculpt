@@ -6,6 +6,7 @@
 #include "native-paint-frame-source.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/material-bindings.hpp"
+#include "baked-emission-codec.hpp"
 #include "normal-key-derivation.hpp"
 #include "key-derivation-codec.hpp"
 #include "frame-position-domain.hpp"
@@ -688,14 +689,14 @@ SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,
     if(input.contains("normal_preparations"))throw std::invalid_argument("Normal preparations require material archive4");
     for(const auto &b:input.at("bindings"))if(b.contains("normal_preparation"))throw std::invalid_argument("Normal preparation references require material archive4");
     for(const auto &record:input.at("paints"))detail::visit_paint_archive_payloads(record,(native_paint||detail::material_archive_base_version(input)==9),context,[&](const nlohmann::json &p){
-      if(p.contains("normal_projection")||(p.contains("baked")&&p.at("baked").at("version")==3))throw std::invalid_argument("Prepared normal paint requires material archive4");
+      if(p.contains("normal_projection")||(p.contains("baked")&&detail::baked_legacy_version(p.at("baked"),context.baked_emission)==3))throw std::invalid_argument("Prepared normal paint requires material archive4");
     });
   }
   if(!prepared) {
     if(input.contains("color_preparations"))throw std::runtime_error("Color preparations require material archive3");
     for(const auto &b:input.at("bindings"))if(b.contains("color_preparation"))throw std::runtime_error("Color preparation references require material archive3");
     for(const auto &record:input.at("paints"))detail::visit_paint_archive_payloads(record,(native_paint||detail::material_archive_base_version(input)==9),context,[&](const nlohmann::json &p) {
-      if(p.contains("color_projection") || (p.contains("baked") && p.at("baked").at("version")!=1&&!(layered&&p.at("baked").at("version")==5)))throw std::runtime_error("Prepared paint requires material archive3");
+      if(p.contains("color_projection") || (p.contains("baked") && detail::baked_legacy_version(p.at("baked"),context.baked_emission)!=1&&!(layered&&detail::baked_legacy_version(p.at("baked"),context.baked_emission)==5)))throw std::runtime_error("Prepared paint requires material archive3");
       for(const auto &l:p.at("layers"))if(!native_paint&&l.contains("pbr_color_tiles"))throw std::runtime_error("Prepared paint layers require material archive3");
     });
   }
@@ -741,7 +742,7 @@ SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,
   size_t texels=0,vertices=0,tile_bytes=0,metadata=0;
   std::function<void(const nlohmann::json&)> preflight_paint=[&](const nlohmann::json &record) {
     const auto &paint=detail::paint_archive_payload(record,native_paint||canonical_paint||detail::material_archive_base_version(input)==9||(keyed&&keyed_paint),context);
-    if(record.contains("version")&&record.at("version")==4){
+    if(record.contains("version")&&(record.at("version")==4||record.at("version")==8)){
       tile_bytes+=record.at("vertices").get_binary().size();preflight_paint(record.at("before"));
     }
     if(paint.contains("source_maps"))tile_bytes+=detail::source_uv_archive_measure(paint.at("source_maps")).bytes;
