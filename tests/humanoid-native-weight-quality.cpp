@@ -1,12 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Real retained-source authoring; no artist influence payload enters solvers.
-#define main established_legacy_weight_audit
-#include "humanoid-weight-quality.cpp"
-#undef main
+#include "humanoid-weight-reference.hpp"
 #define main established_anatomical_source_fixture
 #include "anatomical-fixture.cpp"
 #undef main
 #include "dome/skin-authoring.hpp"
+#include <chrono>
 namespace {
 struct PrimitiveIdentity {size_t offset=0,vertices=0;int mesh=-1;};
 std::map<std::pair<int,int>,PrimitiveIdentity> primitive_identity(const std::filesystem::path &path){
