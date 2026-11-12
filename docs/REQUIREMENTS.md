@@ -1,30 +1,30 @@
-## Generated dependency repair and isolated sanitizer completion — 2026-11-12
+## Repaired combined Release build executing — 2026-11-12
 
-The frozen5c820f candidate's first Release execution73720 is terminal1:
-paint-blur-gpu.cpp could not find generated blur_weights.hpp. No full fresh TU
-or link completed. The failed namespace and source/provider bytes are retained.
-The generated-input audit identified THREE prerequisites: blur_weights.hpp,
-appmenu-protocol.c and appmenu-client.h. A new execution must respect their
-actual Ninja custom/order/phony dependency graph; no source/flags are weakened.
-That repair is being audited, not yet executing. The original1030-TU audit
-remains terminal0 (263 fresh/767 exact whole objects,685 fresh/46 exact links),
-but the selected85 native tests and public desktop/XR gates have not begun.
+Frozen5c820f is unchanged. The new generated/compile/link DAG audit2370 is
+terminal0 with1030 TUs (263 fresh/767 exact whole objects),685 fresh/46 exact
+archive/link products, exactly3 genuine generators and85 selected native tests.
+Root independently verified the eight-layer topological closure and reviewed
+runnerbd41e490. The derived plan f12b1ec5 adds only toolchain pins/metadata to
+reviewed f2d16263. Read
+[AUTHORING-RELEASE-GENERATED-DAG-20261112.md](AUTHORING-RELEASE-GENERATED-DAG-20261112.md).
 
-Joint Source8 d07 Release AND strict sanitizer now pass all969 critical controls,
-Bake4, genuine fixture generators3 and all17 affected historical consumers with
-zero drift. This is component evidence, not final5c application acceptance.
+Actual execution38148/PID4039661 is LIVE: the current blur generator produced
+its required exact SHA, the previously failing paint-blur TU compiled, and root
+observed21 whole TUs complete with live compiler children. Full links and all
+native/public gates remain pending. The failed first execution73720 and v2
+metadata sentinel failure are preserved; no source/provider/flag weakening.
 
-Root reviewed the complete separate cc5 sanitizer remainder runner and verified
-100 distinct absent link outputs, no cross-pending link input, exact82 unique
-native names and byte-exact CTest namespace substitution. Plan5b6bdf0a and
-runner9bd32203 are approved under their sealed bounds. Actual execution80747,
-PID3950346 has begun input authentication in the NEW independent namespace.
-The old7200-second ALL timeout remains failure; no fresh-ALL or native pass is
-claimed. No original provider writes, source changes or suppression are allowed.
+Joint Source8 d07 Release AND strict sanitizer pass969 critical controls, Bake4,
+fixture generators3 and all17 affected historical consumers with zero drift.
+The separate old cc5 sanitizer remainder80747/PID3950346 is live with72 of100
+links complete after1642 independent verified copies. Its original7200-second
+ALL timeout remains failure; no remainder native pass is claimed yet.
 
-Full goal stays active/incomplete. No install, physical headset launch or active
-session restart. Next: finish generated-order repair and actual combined build,
-then native/helpers/raw/manual, fresh producers/font and public desktop/XR.
+Isolated artist-normal source cbae1fa4 passes actual CPU139 and legacy scopes,
+including genuine imported VRM1 normal-affine export/restoration. StrictSAN
+owning qualification34874 has begun; rendering/CC0 proofs remain pending. This
+future component is not in frozen5c. Full production goal remains active and
+incomplete; no installation, physical headset launch or session restart.
 
 ## Repaired85-test application source frozen; new owning audit live — 2026-11-12
 
