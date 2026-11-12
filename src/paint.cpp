@@ -2508,6 +2508,8 @@ void PaintedMesh::install_bake(BakedTextures incoming) {
 }
 void PaintedMesh::install_bake(BakedTextures incoming,BakedNormalWrite normal_write) {
   if(source_sampling_prepared())throw std::logic_error("Independent source paint requires its own source-aware bake adapter");
+  if(source_maps_&&source_maps_->uses_alternate_uv())
+    throw std::logic_error("Prepare genuine source atlas ownership before installing baked data on original coordinates");
   SourcePaintAccess::merge_bake(*this,std::move(incoming),normal_write);
 }
 void SourcePaintAccess::merge_bake(PaintedMesh &paint,BakedTextures incoming,BakedNormalWrite normal_write) {
@@ -3382,6 +3384,9 @@ nlohmann::json detail::TextureSetPaintAccess::encode_source_grid(const PaintedMe
 }
 nlohmann::json PaintedMesh::encode_impl(PaintImageArchive *archive,NormalSamplingArchive *domains,
     PaintSamplingArchive *paint_domains,const std::shared_ptr<const TextureSetFaceDomain> &membership,const detail::PolygonSurfaceOwner *polygon,const detail::TextureSetFieldSource*source_field) const {
+  if(!source_sampling_prepared()&&source_maps_&&source_maps_->uses_alternate_uv()&&baked_)
+    throw std::logic_error("Unowned original-coordinate Bake cannot be saved; prepare genuine source atlas ownership");
+
   if(polygon&&membership&&!source_field)throw std::invalid_argument("Polygon field Paint6 and texture-set Paint7 require their complete shared-field adapter");
   if(source_field&&(!source_field->owns_read_paint(*this)||source_field->polygon_owner().get()!=polygon||!membership||source_field->field().domain!=membership||source_field->field().domain.owner_before(membership)||membership.owner_before(source_field->field().domain)))throw std::invalid_argument("Source Paint7 omitted its actual original/read field and membership proof");
   if(polygon){if(!archive)throw std::invalid_argument("Polygon Paint6 requires its actual owning image archive");polygon->validate_current(*this);}

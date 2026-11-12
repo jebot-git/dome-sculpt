@@ -68,6 +68,42 @@ void quality_oracle(const detail::GltfDocument &d,const EmissionInterchangeImage
  check(std::abs(static_cast<long double>(f.at("maximumRelativeError").get<double>())-maximum_relative)<=precision*std::max(1.L,maximum_relative),"reported dimensionless ratio agrees with independent extended-precision oracle");
  check(f.at("erasedNonzeroSamples")==erased&&erased==0,"measured current fallback retains every nonzero sample in this actual HDR/tiny-value fixture");
 }
+void source_admission_controls(const std::filesystem::path &directory){
+  std::filesystem::create_directories(directory);Scene scene;auto &o=scene.active();o.mesh_active=true;
+  auto maps=std::make_shared<PaintSourceMaps>();maps->color.image=std::make_shared<const Image>(image({255,255,255,255}));maps->color.texcoord=1;
+  maps->uv1=std::make_shared<const std::vector<std::array<float,2>>>(std::vector<std::array<float,2>>{{1,0},{0,0},{0,1},{1,1}});
+  o.painted=PaintedMesh::from_maps(quad(),maps,64);const auto original=scene.encode();
+  BakedTextures data;data.maps.color=image({24,65,117,96});data.maps.metal_rough=image({177,42,99,255});data.maps.emission=image({14,27,83,255});data.maps.normal=image({128,204,230,255});data.coverage.assign(4096,127);
+  bool refused=false;try{o.painted->install_bake(data);}catch(const std::logic_error&){refused=true;}
+  check(refused&&scene.encode()==original,"public raw UV1 install atomically refuses unowned bake before changing native authority");
+  scene.save(directory/"raw-after-refusal.dsculpt");check(Scene::load(directory/"raw-after-refusal.dsculpt").encode()==original,"raw refusal leaves a valid save and reopen path");
+  const auto root=o.painted;const std::array<uint32_t,4> vertices{0,1,2,3};o.painted=prepare_source_paint(root,quad(),vertices);const auto prepared=scene.encode();
+  refused=false;try{o.painted->install_bake(data);}catch(const std::logic_error&){refused=true;}
+  check(refused&&scene.encode()==prepared,"ordinary Source4 public install guard remains intact with a genuine source adapter alternative");
+  SourcePaintOptions tiny;tiny.max_working_bytes=1;refused=false;
+  try{(void)detail::install_source_bake(*o.painted,data,tiny);}catch(const std::length_error&){refused=true;}
+  check(refused&&scene.encode()==prepared,"prospective source geometry/raster/baked/merge quotas refuse before authority mutation");
+  SourcePaintOptions cancelled;cancelled.cancelled=[] {return true;};refused=false;
+  try{(void)detail::install_source_bake(*o.painted,data,cancelled);}catch(const std::exception&){refused=true;}
+  check(refused&&scene.encode()==prepared,"cancelled source Bake adapter retains complete actual before/current graph");
+  o.painted=detail::install_source_bake(*o.painted,data);const auto accepted=scene.encode();
+  check(accepted.at("version")==42&&o.painted->encode().at("version")==8&&!o.painted->baked()->emission_field,"RGB8 source Bake owns explicit Source8 without manufacturing FLOAT authority");
+  check(o.painted->source_sampling_original()->encode()==root->encode()&&o.painted->valid_source_sampling_attachment(),"Source8 pairs exact current baked owner with the pristine original geometry/image trace");
+  check(Scene::decode(accepted).encode()==accepted,"RGB8 color alpha/ORM/normal/partial coverage source Bake roundtrips exactly");
+  auto rejects=[](const auto &v){try{(void)Scene::decode(v);return false;}catch(const std::exception&){return true;}};
+  auto fake=prepared;fake={{"format","dome-sculpt"},{"version",42},{"payload",fake}};
+  check(rejects(fake),"new owning envelope cannot claim Source8 from an ordinary unchanged Source4 record");
+  auto changed=accepted;changed["payload"]["objects"][0]["painted"]["vertices"].get_binary()[0]=1;
+  check(rejects(changed),"Source8 native reader replays and rejects changed ordered source vertex identity");
+  changed=accepted;changed["payload"]["objects"][0]["painted"]["payload"]["mesh"]["positions"].get_binary()[2]^=32;
+  check(rejects(changed),"Source8 native reader rejects finite changed current geometry against its exact before domain");
+  changed=accepted;changed["payload"]["objects"][0]["painted"]["payload"]["source_maps"]["source_uv1"]["data"].get_binary()[2]^=32;
+  check(rejects(changed),"Source8 native reader rejects a changed actual role coordinate against source transport");
+  changed=accepted;changed["payload"]["objects"][0]["painted"]["before"]["source_maps"]["color"]["uv_transform"][4]=.25f;
+  check(rejects(changed),"Source8 native reader rejects a changed original role affine against current sampling metadata");
+  o.painted->clear_bake();check(scene.encode()==prepared&&o.painted->valid_source_sampling_attachment(),"Clear Bake restores exact legacy Source4 wire and authentic source owner");
+  check(!detail::requires_native_emission_package(scene),"trusted writer does not infer physical radiance from source-owner metadata");
+}
 void uv1_worker_controls(const std::filesystem::path &directory,bool raw_only=false){
   std::filesystem::create_directories(directory);
   for(const bool typed:{false,true})for(const float coverage:{.25f,0x1p-24f}){
@@ -86,9 +122,13 @@ void uv1_worker_controls(const std::filesystem::path &directory,bool raw_only=fa
     maps->emission.image=pattern;maps->emission.texcoord=1;maps->emission.uv_transform={1,0,0,1,-.5f,0};maps->emission.min_filter=maps->emission.mag_filter=9728;
     auto mesh=quad();for(auto &v:mesh.positions)v.z=.005f;
     source.painted=PaintedMesh::from_maps(mesh,maps,64);
-    if(!raw_only){const std::array<uint32_t,4> vertices{0,1,2,3};source.painted=prepare_source_paint(source.painted,mesh,vertices);}
+    if(!raw_only){const std::array<uint32_t,4> vertices{0,1,2,3};auto atlas=mesh;
+      for(auto &uv:atlas.uv){uv[0]=.125f+.75f*uv[0];uv[1]=.0625f+.875f*uv[1];}
+      source.painted=prepare_source_paint(source.painted,std::move(atlas),vertices);
+    }
     BakedTextures base;base.maps.color=image({24,65,117,255});base.maps.metal_rough=image({177,42,99,255});base.maps.normal=image({128,204,230,255});base.coverage.resize(4096);
     for(size_t i=0;i<4096;++i)base.coverage[i]=coverage<.001f?0:(i%64<32?191:65);
+    for(size_t i=0;i<4096;++i)if(i%64>=32){const std::array<uint8_t,4> n{211,102,236,255};std::copy(n.begin(),n.end(),base.maps.normal.rgba.begin()+i*4);}
     std::vector<BakedEmissionSample> input(4096);
     for(size_t i=0;i<input.size();++i)input[i]={{coverage*.25f,coverage*.5f,0},{coverage*(50000+32*float(i%64)),coverage*.00001f*float(i/64+1),coverage*2},coverage};
     base.emission_field=BakedEmissionField::create(64,input);if(!raw_only)source.painted=detail::install_source_bake(*source.painted,std::move(base));
@@ -134,6 +174,9 @@ void uv1_worker_controls(const std::filesystem::path &directory,bool raw_only=fa
       check(refused_direct,"standalone Paint8 never borrows its caller's encoded version as owning capability");
     }
     ObjectBakeSettings options;options.front_mm=10;options.back_mm=2;options.padding=2;options.ao_samples=0;
+    auto late=f.scene.snapshot();bool stop=false,rejected=false;
+    try{bake_object(late,f.source,options,[&]{return stop;},[&](float p){if(p>=.8f)stop=true;});}catch(const std::exception&){rejected=true;}
+    check(rejected&&stop&&late.encode()==before,"late raw/Source8 worker cancellation keeps all actual source/target field owners exact");
     Document doc;doc.replace(f.scene);std::cout<<"UV1_ADMISSION can_bake="<<doc.frame().state->can_bake<<" source="<<doc.frame().state->bake_source<<std::endl;
     doc.bake_from_object(f.source,options);auto save=doc.save_async(folder/"accepted.dsculpt");finish(doc);saved(std::move(save));
     const auto accepted=doc.copy_scene();const auto after=accepted.encode();const auto &paint=*accepted.active().painted;
@@ -144,18 +187,35 @@ void uv1_worker_controls(const std::filesystem::path &directory,bool raw_only=fa
     check(paint.layers().size()==layers.size(),"worker retains target editable-layer count");
     for(size_t i=0;i<layers.size();++i){const auto &a=layers[i],&b=paint.layers()[i];check(a.tiles==b.tiles&&a.emission_tiles==b.emission_tiles&&a.pbr_tiles==b.pbr_tiles&&a.name==b.name&&a.visible==b.visible&&a.opacity==b.opacity,"actual target hidden editable ownership survives field adoption");}
     const auto values=paint.baked()->emission_field->values();
+    struct ExpectedField{std::array<double,3> legacy{},absolute{},normal{};double coverage=0,common=0;};
+    auto authored_field=[&](size_t i){
+      ExpectedField out;if(raw_only)return out;
+      // Exact independently chosen current atlas rectangle has covered texel
+      // owners x8..55/y4..59; edge padding clamps to that rectangle. UV1 still
+      // belongs to the original image, independently of this writable UV0.
+      const double x=7.5+.75*(double(i%64)+.5),y=3.5+.875*(double(i/64)+.5);
+      const int ix=int(std::floor(x)),iy=int(std::floor(y));const double fx=x-ix,fy=y-iy;
+      for(int dy=0;dy<2;++dy)for(int dx=0;dx<2;++dx){const size_t px=std::clamp(ix+dx,8,55),py=std::clamp(iy+dy,4,59),at=py*64+px;
+        const double w=(dx?fx:1-fx)*(dy?fy:1-fy);const auto &v=input[at];
+        for(size_t k=0;k<3;++k){out.legacy[k]+=double(v.legacy[k])*w;out.absolute[k]+=double(v.absolute[k])*w;}
+        out.coverage+=double(v.coverage)*w;const double common=coverage<.001f?0:double(px<32?191:65)/255;out.common+=common*w;
+        const std::array<double,3> normal=px<32?std::array<double,3>{128,204,230}:std::array<double,3>{211,102,236};
+        for(size_t k=0;k<3;++k)out.normal[k]+=(normal[k]/255*2-1)*common*w;
+      }return out;
+    };
     const std::array<double,3> background=typed?std::array<double,3>{1.75,.875,2.625}:std::array<double,3>{2,4,8};const double strength=typed?3.5:1;
     for(size_t i=0;i<values.size();++i){
       const auto x=i%64,y=i/64;const std::array<double,3> texture=y<32?(x<32?std::array<double,3>{1,0,1}:std::array<double,3>{0,1,0}):(x<32?std::array<double,3>{0,0,0}:std::array<double,3>{1,1,1});
       check(values[i].coverage==1&&values[i].legacy==std::array<float,3>{},"actual target FLOAT grid is resolved absolute with full projection coverage");
-      for(size_t k=0;k<3;++k){const double wanted=raw_only?background[k]*texture[k]:background[k]*texture[k]*(1-coverage)+double(input[i].legacy[k])*strength+input[i].absolute[k];check(std::isfinite(values[i].absolute[k])&&std::abs(double(values[i].absolute[k])-wanted)<=std::max(1e-10,std::abs(wanted)*2e-6),"actual worker agrees with independent authored UV1/filter/affine/FLOAT coverage oracle");}
+      const auto expected=authored_field(i);
+      for(size_t k=0;k<3;++k){const double wanted=background[k]*texture[k]*(1-expected.coverage)+expected.legacy[k]*strength+expected.absolute[k];check(std::isfinite(values[i].absolute[k])&&std::abs(double(values[i].absolute[k])-wanted)<=std::max(1e-10,std::abs(wanted)*2e-6),"actual worker agrees with independent authored UV1/filter/affine/FLOAT coverage oracle");}
     }
     // Independent planar-frame oracle: original UV1 mirrors U; current baked
     // normal is in UV0. Decode before filtering/blending and normalize in the
     // common geometry space, independently of the emission-specific coverage.
     const auto original=normalized(Vec3{-(156.f/255*2-1),128.f/255*2-1,250.f/255*2-1});
-    const auto detail=normalized(Vec3{128.f/255*2-1,204.f/255*2-1,230.f/255*2-1});
-    for(size_t i=0;i<4096;++i){const float a=raw_only||coverage<.001f?0:float(i%64<32?191:65)/255;
+    for(size_t i=0;i<4096;++i){const auto field=authored_field(i);const float a=float(field.common);
+      const auto detail=a>0?normalized(Vec3{float(field.normal[0]),float(field.normal[1]),float(field.normal[2])}):Vec3{0,0,1};
       const auto n=normalized(original*(1-a)+detail*a);const std::array<float,3> v{n.x,n.y,n.z};
       for(size_t k=0;k<3;++k){const int wanted=int(std::lround((v[k]*.5f+.5f)*255));
         check(std::abs(int(paint.baked()->maps.normal.rgba[i*4+k])-wanted)<=1,"actual UV1 original and current canonical normal blend matches independent geometry-space oracle");}
@@ -183,12 +243,14 @@ void source_controls(){
   auto maps=std::make_shared<PaintSourceMaps>();maps->color.image=std::make_shared<const Image>(image({255,255,255,255}));maps->color.texcoord=1;
   maps->uv1=std::make_shared<const std::vector<std::array<float,2>>>(std::vector<std::array<float,2>>{{1,0},{0,0},{0,1},{1,1}});
   source.painted=PaintedMesh::from_maps(quad(),maps,64);
+  const std::array<uint32_t,4> source_vertices{0,1,2,3};
+  source.painted=prepare_source_paint(source.painted,quad(),source_vertices);
   const float coverage=.25f;
   BakedTextures baked;baked.maps.color=image({24,65,117,255});baked.maps.metal_rough=image({177,42,99,255});baked.coverage.assign(4096,255);
   std::vector<BakedEmissionSample> field(4096);
   for(size_t i=0;i<field.size();++i)field[i]={{coverage*.25f,coverage*.5f,0},{coverage*(50000+32*float(i%64)),coverage*.00001f*float(i/64+1),coverage*2},coverage};
   baked.emission_field=BakedEmissionField::create(64,std::move(field));
-  source.painted->install_bake(std::move(baked));
+  source.painted=detail::install_source_bake(*source.painted,std::move(baked));
   auto texture=std::make_shared<const Image>(Image{2,2,{255,0,255,255,0,255,0,255,0,0,0,255,255,255,255,255}});
   auto binding=std::make_shared<SourceMaterialBindings>();
   binding->material.parameters.emission={.25f,.5f,.75f};
@@ -208,7 +270,7 @@ void source_controls(){
   const auto held_paint=source.painted;
   auto original_roles=std::make_shared<PaintSourceMaps>(*maps);auto &original_emission=original_roles->emission;
   original_emission.image=texture;original_emission.texcoord=1;original_emission.uv_transform={1,0,0,1,-.5f,0};original_emission.mag_filter=original_emission.min_filter=9728;original_emission.wrap_s=original_emission.wrap_t=10497;
-  source.painted=PaintedMesh::from_maps(quad(),original_roles,64);source.painted->install_bake(*held_paint->baked());source.material.emissive={2,4,8};
+  source.painted=PaintedMesh::from_maps(quad(),original_roles,64);source.painted=prepare_source_paint(source.painted,quad(),source_vertices);source.painted=detail::install_source_bake(*source.painted,*held_paint->baked());source.material.emissive={2,4,8};
   const auto original=detail::emission_bake_source(source);check(bool(original),"PBR source samples its actual independently owned alternate-UV texture role");
   matches(original(0,bary),expected(1,{2,0,8}));
   source.painted=held_paint;source.material.emissive={.4f,.15f,.4f};
@@ -293,7 +355,7 @@ int main(int argc,char **argv)try{
     uv1_worker_controls(argv[2],true);std::cout<<"Baked emission raw UV1 worker "<<checks<<" checks PASS\n";return 0;
   }
   if(argc==3&&std::string_view(argv[1])=="--source-worker-controls"){
-    uv1_worker_controls(argv[2]);std::cout<<"Baked emission UV1 worker "<<checks<<" checks PASS\n";return 0;
+    source_admission_controls(std::filesystem::path(argv[2])/"admission");uv1_worker_controls(argv[2]);std::cout<<"Baked emission UV1 worker "<<checks<<" checks PASS\n";return 0;
   }
   if(argc==2&&std::string_view(argv[1])=="--source-controls"){
     source_controls();std::cout<<"Baked emission source "<<checks<<" checks PASS\n";return 0;

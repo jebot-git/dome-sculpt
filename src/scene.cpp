@@ -702,6 +702,7 @@ nlohmann::json Scene::encode() const {
   if(!layered_normals.empty())j["baked_normal_fields"]=layered_normals.encode();
   j["source_images"] = source_images.encode();
   j["source_models"] = source_models.encode();
+  baked_emission_write.publish(*this);
   if(baked_emission_write.source_bake_emitted())
     return {{"format","dome-sculpt"},{"version",42},{"payload",std::move(j)}};
   if(baked_emission_write.emitted())
