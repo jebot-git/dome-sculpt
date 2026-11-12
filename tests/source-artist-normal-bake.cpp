@@ -62,6 +62,8 @@ std::cout<<"ARTIST_CASE legacy="<<legacy<<" posed="<<posed<<" role_gap="<<role_g
 void imported_artist(const std::filesystem::path &out){
  import_fixture::Fixture file;auto &primitive=file.j["meshes"][0]["primitives"][0];auto &attributes=primitive["attributes"];attributes.erase("COLOR_0");
  const std::array<Vec3,4> N{normalized(artistN[0]),normalized(artistN[1]),normalized(artistN[2]),normalized(artistN[5])};std::array<Vec3,4>T;for(size_t i=0;i<4;++i)T[i]=normalized(Vec3{1,0,0}-N[i]*N[i].x);
+ // The base fixture ends with PNG bytes; FLOAT accessor views require real 4-byte alignment.
+ while(file.bin.size()%4)file.bin.push_back(0);
  attributes["NORMAL"]=file.values({N[0].x,N[0].y,N[0].z,N[1].x,N[1].y,N[1].z,N[2].x,N[2].y,N[2].z,N[3].x,N[3].y,N[3].z},3,"VEC3");attributes["TANGENT"]=file.values({T[0].x,T[0].y,T[0].z,1,T[1].x,T[1].y,T[1].z,1,T[2].x,T[2].y,T[2].z,1,T[3].x,T[3].y,T[3].z,1},4,"VEC4");
  const auto png=normal_image().png();while(file.bin.size()%4)file.bin.push_back(0);const auto image_view=file.j["bufferViews"].size();file.j["bufferViews"].push_back({{"buffer",0},{"byteOffset",file.bin.size()},{"byteLength",png.size()}});file.bin.insert(file.bin.end(),png.begin(),png.end());file.j["images"][0]["bufferView"]=image_view;file.j["samplers"][0]={{"wrapS",10497},{"wrapT",10497},{"minFilter",9729},{"magFilter",9729}};
  auto &material=file.j["materials"][0];material["alphaMode"]="OPAQUE";material.erase("alphaCutoff");material["pbrMetallicRoughness"]={{"baseColorFactor",{.2462f,.2462f,.2462f,1}},{"metallicFactor",0},{"roughnessFactor",1}};
