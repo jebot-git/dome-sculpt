@@ -1,43 +1,51 @@
-## Current integration and qualified component fixes — 2026-11-12
+## Current build checkpoint and requested pause — 2026-11-12
 
-Main runtime remains the qualified e993 integration (`0d3965ff`). Private
-combined candidate `4977fb32` has an active fresh configured ALL Release build
-from zero project objects: 1,738 actions, current owning FLTK/OpenXR/core/renderer
-consumers, no borrowing across changed paint/scene layouts. Core193 and renderer4
-are fully linked and pinned, but the complete build and subsequent selected
-native/software/workspace gates are not yet qualified. Inspect the actual live
-job and logs in `artifacts/authoring-hdr-owning-build-20261111/` before resuming;
-do not restart after an observation timeout. Frozen sources/providers stay intact.
+The current finite build/validation milestone is finalised and the overall goal
+is paused at the user’s request. No implementation, integration or test campaign
+continues while paused. The full objective remains incomplete. This status supersedes older active-goal
+and build-running entries below.
 
-The reviewed empty-flat patch822 passes nine actual software cases and four Arc
-cases in each Release/strict sanitizer profile. Read
-[EMPTY-FLAT-RENDERER-20261111.md](EMPTY-FLAT-RENDERER-20261111.md).
-Its retained-zero-range regression and initial observer failure remain preserved.
-Those component results do not rerun the earlier196 public workflows/P1 or prove
-a frame-rate improvement. Actual slower timing tails and physical90Hz acceptance
-remain open.
+Main runtime remains the qualified e993 integration (`0d3965ff`). The frozen
+combined candidate `4977fb32` completed its fresh Release ALL build from zero
+project objects (1,738 actions), app version and all 68 selected native/software
+tests. The original coordinator retains exit 1 because two excluded workspace
+helpers had not been built. A separate explicit helper build and native 27/373
+checks completed with exit 0 and all 1,111 prior owned artifacts unchanged.
+This is composite qualification; the original failure is preserved.
 
-A separate source-role defect was reproduced and corrected privately in63c3199d:
-actual original UV1 coordinates were resolved, then incorrectly sent to a sampler
-still marked unresolved. Release callback27, original worker16417, default public
-fixture producer32794 and all seven native inspectors pass against a matched
-current core. Read [the scoped source fix](RADIANCE-PRESERVING-BAKE-SOURCE-RESOLUTION-20261112.md).
-Full UV1/typed-source Document Bake, actual public app/stereo, high-range final
-framebuffer and corrected-source sanitizer checks remain separate requirements.
+Actual Release Bake producer and font gates pass. Public desktop Bake completes
+all ten application checks, but its coordinator correctly fails because the
+sandbox wrapper leaves its owned Xvfb process alive. A separate instrumented
+run identifies that exact process and parent transition. It was interrupted
+for the user pause after 271 seconds of passive observation; original failure
+and zero input drift are retained, all owned live processes are cleaned up and
+the graphics lock is free. Fixture repair and the subsequent XR gate remain
+unstarted. No public-sequence pass or physical-headset acceptance
+is claimed.
 
-Private anatomical fitting improvements now align hand/finger continuations with
-declared landmarks/parent chains and preserve world terminal length under affine
-placement. Both actual CC0 VRoid meshes gain fingertip support from roughly0.35
-to0.78 with the existing solver. Eleven Release native suites pass; strengthened
-thumb/sparse-landmark coverage and strict sanitizer qualification are proceeding
-on separate branches. They are not admitted to main or claimed as full automatic
-weight/fitting completion. Existing-rig/rest, landmark recognition, heat weighting
-and wider avatar/interoperability requirements remain open.
+Private fitting improvements have Release and strict sanitizer evidence in
+[HUMANOID-FIT-CONTINUATIONS-20261112.md](HUMANOID-FIT-CONTINUATIONS-20261112.md).
+The FLOAT Bake baseline likewise has a sealed strict sanitizer closure. Later
+private Source4/Paint8 ownership and HDR preview fixes have separate scoped
+qualification; they are not integrated into main or qualified as a complete
+new application. Private Source8 candidate `3e523e34` completed its Release
+owning closure and full UV1/FLOAT worker checks; its strict sanitizer, visible
+source preview and broader typed-normal/pose/public/device requirements remain
+open. The separate HDR preview candidate `291d1ca7` completes its matched
+Release and strict sanitizer software closure (281 new controls plus seven
+existing renderer suites); actual Arc qualification of this final candidate
+remains unrun. Preserve frozen sources, providers and failed runs.
 
-The full production goal remains active and incomplete. Fresh combined owning,
-public desktop/real-loader XR, sanitizer/hardware/sustained/device/accelerator
-qualification still remains. Controller trays and spatial node editing/history
-stay required after basic targets. No installation or physical session changed.
+Spatial node-based editing and inspectable editing history are required future
+work alongside controller-mounted tool/function/selection trays, after basic
+authoring targets. Their controller interaction, clear active state, shared
+commands, history/persistence and physical-headset acceptance remain open. Read
+[the additional specification](ADDITIONAL-REQUIREMENTS-2026-11-11.md).
+
+ArmorPaint remains a painting integration option to evaluate, with native
+FLTK/OpenXR interaction and document authority preserved; see
+[the source-based assessment](ARMORPAINT-ASSESSMENT-20261111.md).
+No system installation or desktop/headset session change is part of this pause.
 
 ## Integrated authoring and large-mesh query milestone — 2026-11-11
 

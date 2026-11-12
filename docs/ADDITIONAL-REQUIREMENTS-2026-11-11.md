@@ -30,5 +30,7 @@ history and other basic functionality already required by the original goal
 remains required in its original priority. Animation and final scene rendering
 remain excluded. No implementation or qualification is claimed here.
 
-The current build milestone is finalised and the overall goal is paused at the
-user’s request. This addition records future scope; it does not resume work.
+The current finite build milestone is finalised and the overall goal is paused
+at the user’s request. This addition records future scope alongside controller
+trays; it does not resume work or start this later phase. See
+[HANDOFF.md](HANDOFF.md) for the actual checkpoint.
