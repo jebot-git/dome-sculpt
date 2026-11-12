@@ -94,8 +94,10 @@ frame/image/session lifetime and the required actual hardware renderer.
 Source versus independent control must differ by at most 3 RGB units at each
 probe. A hidden-geometry counterfactual must differ by at least 12 units, so
 shared blank/background pixels cannot pass. An additional ordinary control omits
-only baked normal detail; each case and each XR eye must have a measured effect
-of at least 3 RGB units across its four probes. Fully clipped-white equality is
+only baked normal detail; each case and each XR eye must have an independent correct/wrong-control gap
+of at least 7 RGB units (>2× the unchanged bound3) at a declared probe, and
+the actual source must also differ from that wrong control by more than 3.
+Thus a no-detail control cannot satisfy the same accepted normal oracle. Fully clipped-white equality is
 explicitly rejected. These thresholds are fixed before execution; no threshold
 learning, fallback or automatic retry is authorized.
 
@@ -107,3 +109,10 @@ cancellation and the complete production objective remain separate requirements.
 
 The source ledger is in
 [validation/SOURCE8-PUBLIC-WORKFLOW-DRAFT-20261112.json](validation/SOURCE8-PUBLIC-WORKFLOW-DRAFT-20261112.json).
+
+The disjoint-control child preserves the initial3f syntax receipt and original0a
+draft. Visible LEFT canonical normal is now `(128,30,190)`; RIGHT remains
+`(211,102,236)`, matching the strengthened source fixture. Existing planar
+worker normals and all four cases/probes are unchanged. Initial3f fixture and
+runtime both pass exact configured Release `-fsyntax-only`; no executable
+qualification or public application execution is implied.
