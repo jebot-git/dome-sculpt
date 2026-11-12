@@ -61,7 +61,7 @@ struct Source {
 std::shared_ptr<const TextureMaps> raw_bake_source(const SculptObject &object,
     const std::function<bool()> &cancelled){
   if(!object.mesh_active||!object.painted||!object.painted->source_maps()||
-     !object.painted->source_maps()->uses_alternate_uv())return {};
+     (!object.painted->source_maps()->uses_alternate_uv()&&!object.painted->source_sampling_prepared()))return {};
   const auto &paint=*object.painted;const auto &binding=object.material_bindings;
   if(cancelled&&cancelled())throw std::runtime_error("Raw source Bake cancelled");
   if(paint.color_projection()||paint.normal_projection()||

@@ -1093,6 +1093,12 @@ std::shared_ptr<const TextureMaps> detail::PaintOverlayFactory::capture_source_b
   if(!paint.source_sampling_prepared()||!paint.baked_||!paint.valid_source_sampling_attachment()||
      !paint.source_maps_||paint.normal_projection_||paint.color_projection_||paint.paint_sampling_domain())
     throw std::invalid_argument("Source8 preview requires actual before/current/baked ownership");
+  auto &cache=*paint.composite_cache_;
+  {std::lock_guard lock(cache.mutex);
+    if(cache.preview_token==paint.composite_token_)if(auto previous=cache.source_preview.lock())
+      if(previous->baked_base==paint.baked_&&previous->source_maps==paint.source_maps_&&
+         previous->overlay&&previous->overlay->source_baked_geometry()==paint.mesh_owner())return previous;
+  }
   const auto r=paint.resolution();const size_t pixels=size_t(r)*r;
   const size_t extra=paint.baked_->maps.normal.rgba.empty()?0:pixels*8;
   if(extra>128*1024*1024||paint.storage_bytes()>128*1024*1024-extra)
@@ -1116,7 +1122,9 @@ std::shared_ptr<const TextureMaps> detail::PaintOverlayFactory::capture_source_b
   for(size_t at=0;at<pixels;++at)if(paint.baked_->coverage[at]&&paint.baked_->maps.color.rgba[at*4+3]!=255){result->transparent=true;break;}
   for(const auto &layer:result->overlay->layers())for(const auto &tile:layer.tiles)if(tile)
     for(const auto &pixel:tile->pixels)if(pixel.data[13]&&pixel.data[9]&&pixel.data[3]!=255){result->transparent=true;break;}
-  paint_compute::checkpoint(cancelled);return result;
+  paint_compute::checkpoint(cancelled);
+  {std::lock_guard lock(cache.mutex);cache.preview_token=paint.composite_token_;cache.source_preview=result;}
+  return result;
 }
 std::shared_ptr<const TextureMaps> detail::PaintOverlayFactory::capture_current_grid(
     const PaintedMesh &paint,const Material &material,const std::function<bool()> &cancelled){
