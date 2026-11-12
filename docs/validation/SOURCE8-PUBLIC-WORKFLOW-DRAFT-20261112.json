@@ -1,0 +1,70 @@
+{
+  "state": "source-implementation-uncompiled-unexecuted",
+  "product_parent": "67bbdb54c88c5d4f3bd4c1dabe28af1d38f1d456",
+  "intended_owning_source": "Root unified visibleSource8 + genuine32F framebuffer + authoring/fitting cohort; latest assembly5fdf486e awaits final Source8 composition. No cc5/4977 provider admission.",
+  "files": {
+    "CMakeLists.txt": "d6bb144a066f07bbb13ddcb11468ff8efb32a75947696ce242728919c79a90fe",
+    "tests/source8-public-fixture.cpp": "4d69706d762484c03eccd24d0c5e6cdbf7e8ae119325a3fdfaecce833841e508",
+    "tests/source8-public-menu.py": "a6ee516db9771df54438602e6eeb84bc3408c1a11d6fb6f812ed88eb3b72dc61",
+    "tests/source8-public-xr.py": "1c3c459f7b6be503a327f30351aaab6d7338347fe3ee00436cd6ad22d7e12456",
+    "tests/source8-public-runtime.cpp": "d6e6384ba3480b0c93bf128461d3d6ff0e6ebe7324a363da53d39471189db841",
+    "docs/SOURCE8-PUBLIC-WORKFLOW-CONTRACT-20261112.md": "49e634307c9096710b2c58fc6216d1d3cb69efdf780ced9fc397323aecc3be67"
+  },
+  "preserved_existing_sources": {
+    "tests/baked-emission-menu.py": "3119204ef5b40f0766640a7dcfec50dcd2479a103bdd4c0e93f9d68c35f7d1d0",
+    "tests/baked-emission-xr.py": "3db681141165dc7c3bd0aa38bb71d2732da0f597ae4239e92182a808bcbe260b",
+    "tests/baked-emission-runtime.cpp": "646151cff1953280ee1c854c10c4194b22d6037700a6ef7c710d4e7dd4f13c41",
+    "tests/baked-emission-workflow.cpp": "bbaefd41fc6176a7abc92f1de13e1039fd50764f8102aafab14334f86bbe1b1e",
+    "tests/source8-preview.cpp": "1f077fe46638d5789d2e17dcd4405fd784c853b8ad927d2415542ebb78f45be6"
+  },
+  "static_checks": {
+    "Python_syntax": true,
+    "inherited_HOME": true,
+    "local_home_identifier_removed": true,
+    "original_GUI50_900_bounds": true,
+    "one_XR240_deadline_for_all_added_views": true,
+    "aggregate_XR6000_ceiling": true,
+    "existing_tests_unchanged": true
+  },
+  "CXX_compiled": false,
+  "native_producer_executed": false,
+  "public_GUI_executed": false,
+  "public_XR_executed": false,
+  "current_owning_cohort_admitted": false,
+  "fixtures": {
+    "variants": [
+      "pbr-quarter",
+      "pbr-tiny",
+      "mtoon-quarter",
+      "mtoon-tiny"
+    ],
+    "original_texcoord": 1,
+    "current_texcoord": 0,
+    "Scene": 42,
+    "Paint": 8,
+    "FLOAT_emission_coverage": [
+      0.25,
+      5.960464477539063e-08
+    ],
+    "common_normal_coverage": [
+      191,
+      65
+    ],
+    "independent_native_texels": 4096,
+    "source_views": "Varied source/current-frame actual apps plus ordinary material controls; gray typed data with normal-detail counterfactual sensitivity",
+    "numeric_bounds": {
+      "relative": 2e-06,
+      "absolute_floor": 1e-14,
+      "normal_RGB8": 1,
+      "display_RGB": 3,
+      "geometry_counterfactual_RGB": 12,
+      "case_eye_normal_effect_RGB": 3
+    }
+  },
+  "known_limits": [
+    "No results are claimed before C++ compilation, fresh owning providers and actual public workflows.",
+    "Public source projection assumptions and timing budgets are explicit gates requiring future qualification.",
+    "Independent source numerical fields are distinct from RGB8 display evidence.",
+    "No physicalHMD/nativeWayland/pacing/performance or deterministic mid-helper cancellation claim."
+  ]
+}
