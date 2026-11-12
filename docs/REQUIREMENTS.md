@@ -1,3 +1,26 @@
+## Combined Release baseline complete; next source frozen — 2026-11-12
+
+Fresh cc5e6aed Release ALL1742, app version, exact82 native/software tests,
+workspace27/373 and rawUV1worker90159 complete with exit0 and zero source/SDK
+drift. Complete post-terminal linkage evidence pins708 built products and the
+original1117 owning artifacts. Read
+[AUTHORING-CC5-RELEASE-OWNING-20261112.md](AUTHORING-CC5-RELEASE-OWNING-20261112.md).
+Its separate strict sanitizer ALL build remains live; inspect its actual handle.
+
+New source9b1f7508 is now FROZEN in
+`artifacts/authoring-source8-visible-float32-integration-20261112/`: visible
+Source8 productf678, strongalpha/normal fixturea5cf, disjoint public controlsbba5,
+qualified full-FLOAT target2bf and fitting9ce coexist. New Release affected-owner
+and consumer compilation is authorized after its exact dependency/flag/provider
+audit. Public execution waits for the coherent app/runtime/producers/font and
+84 required native/software plus explicit helper/raw/manual source-render gates.
+No provider/source tree may be mutated to manufacture that qualification.
+
+The original goal remains active and incomplete. Main runtime is still the prior
+qualified e993 integration, with metadata-only milestones. No install, physical
+headset launch or active-session restart. Earlier source/build-running entries
+below are historical snapshots; this checkpoint takes precedence.
+
 ## Resumed combined application integration — 2026-11-12
 
 The user reactivated the full goal. The previous turn made concrete progress:
