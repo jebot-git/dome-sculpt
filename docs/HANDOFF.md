@@ -1,3 +1,21 @@
+## Source-parameter preservation defect; next compilation held — 2026-11-12
+
+Before the new9b1 compile runner launched, a broader source audit found
+`SourcePaintAccess::parameters` recreates the source/current trace and copies
+layers but omits the accepted `baked_` owner. The newly admitted Source8 path
+therefore risks silently losing current RGB8/normal/FLOAT content during source
+UV parameter edits. The old function path previously could not own such a bake.
+This is a product-preservation defect, not a test-oracle adjustment.
+
+No9b1 project compilation/linking or app/public execution has started. Its frozen
+source and completed250-TU/683-link dependency audit remain preserved. The raw
+source agent is implementing genuine owner retention with prospective budget,
+cancellation, native roundtrip/history and visible parameter-edit coverage.
+Root will create and freeze a NEW repaired child and recompute the owning plan;
+do not edit9b1 or lift guards/discard data to manufacture acceptance. Existing
+cc5 sanitizer build continues and its Release82 result remains scoped as below.
+The goal is active; this is ongoing repair, not an external blocker or pause.
+
 ## Combined Release baseline complete; next source frozen — 2026-11-12
 
 Fresh cc5e6aed Release ALL1742, app version, exact82 native/software tests,
