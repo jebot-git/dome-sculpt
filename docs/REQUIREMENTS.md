@@ -1,3 +1,23 @@
+## New Release audit passes; generated-header staging repair — 2026-11-12
+
+Final5c820f whole-owner audit completed:1030 configured TUs,263 full fresh
+compilations and767 authenticated whole-object reuses;731 archive/link nodes
+with685 fresh and46 exact products. The selected native manifest remains85.
+The execution plan and toolchain/asset/provider identities are separately pinned.
+
+The first actual isolated compile attempt then failed at paint-blur-gpu.cpp
+because the new build include directory lacked generated blur_weights.hpp.
+This is a generated-artifact staging failure, not a source or native test pass.
+Its terminal1 status/log and original source/provider bytes remain preserved.
+The runner must enumerate actual CMake/Ninja generated inputs, prove generator/
+source/config equivalence and stage exact owned artifacts or execute the genuine
+current generator, then use a NEW execution namespace. No compiler flag, source,
+ABI or runtime gate may be relaxed to bypass this dependency.
+
+Full goal stays active/incomplete. Original cc5 sanitizer build deadline remains
+terminal1; a new isolated100-link remainder plan is still under technical review.
+No app/public qualification, installation or active session change is claimed.
+
 ## Repaired85-test application source frozen; new owning audit live — 2026-11-12
 
 Frozen source5c820f342f16d8544158410c2125372811c152f3 is in
