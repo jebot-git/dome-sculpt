@@ -26,8 +26,15 @@ class PaintOverlayPacket {
  // Independent native emission-only interpretation, never original Source4 UV.
  std::shared_ptr<const Mesh> native_geometry_;
  std::shared_ptr<const PaintSamplingDomain> native_domain_;
+ // Distinct Source8 proof: exact current geometry paired with the immutable
+ // baked owner by SourcePaintAccess, never a native32 or raw UV0 permission.
+ std::shared_ptr<const Mesh> source_baked_geometry_;
+ std::shared_ptr<const Image> source_baked_normal_,source_baked_coverage_;
  PaintOverlayPacket()=default;
 public:
+ const std::shared_ptr<const Image>&source_baked_normal()const noexcept{return contribution_owner_?contribution_owner_->source_baked_normal():source_baked_normal_;}
+ const std::shared_ptr<const Image>&source_baked_coverage()const noexcept{return contribution_owner_?contribution_owner_->source_baked_coverage():source_baked_coverage_;}
+ const std::shared_ptr<const Mesh>&source_baked_geometry()const noexcept{return contribution_owner_?contribution_owner_->source_baked_geometry():source_baked_geometry_;}
  const std::shared_ptr<const Mesh>&native_geometry()const noexcept{return contribution_owner_?contribution_owner_->native_geometry():native_geometry_;}
  const std::shared_ptr<const PaintSamplingDomain>&native_domain()const noexcept{return contribution_owner_?contribution_owner_->native_domain():native_domain_;}
  uint32_t resolution()const noexcept{return contribution_owner_?contribution_owner_->resolution():resolution_;}
@@ -50,6 +57,7 @@ inline bool overlay_uses_float_emission(const PaintOverlayPacket &packet) noexce
   return false;
 }
 struct PaintOverlayFactory {
+ static std::shared_ptr<const TextureMaps> capture_source_baked(const PaintedMesh &,const std::function<bool()> &cancelled={});
  static std::shared_ptr<const TextureMaps> capture_current_grid(const PaintedMesh &,
      const Material &,const std::function<bool()> &cancelled={});
  // Read only the sealed original coordinate owners; no sparse tile packet or

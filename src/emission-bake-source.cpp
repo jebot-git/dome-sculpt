@@ -93,6 +93,14 @@ std::shared_ptr<const TextureMaps> raw_bake_source(const SculptObject &object,
   maps->overlay=PaintOverlayFactory::capture(paint,cancelled);maps->baked_base=paint.baked();
   return maps;
 }
+std::shared_ptr<const TextureMaps> source_baked_preview(const SculptObject &object,
+    const std::function<bool()> &cancelled){
+  if(!object.mesh_active||!object.painted||!object.painted->source_sampling_prepared()||!object.painted->baked())return {};
+  // Same authenticated original/current role and rest-frame contract as Bake.
+  // This deliberately retains typed/prepared/changed-pose refusals.
+  (void)raw_bake_source(object,cancelled);
+  return PaintOverlayFactory::capture_source_baked(*object.painted,cancelled);
+}
 std::function<std::array<float,3>(uint32_t,std::array<float,3>)>
 emission_bake_source(const SculptObject &object,const std::function<bool()> &cancelled){
   if(cancelled&&cancelled())throw std::runtime_error("Emission Bake cancelled");
