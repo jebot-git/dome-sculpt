@@ -1,3 +1,34 @@
+## Resumed combined application integration — 2026-11-12
+
+The user reactivated the full goal. The previous turn made concrete progress:
+finite validation closures finished, future spatial nodes/history were recorded,
+and the pause checkpoint was committed. That pause is now superseded.
+The full objective remains active and incomplete.
+
+New frozen candidate `cc5e6aed` preserves main through `b8ce8296` and combines
+owning FLOAT baseline `4977fb32`, Source8/UV1 Bake ownership `3e523e34`, fitting
+`9cebf6ab` and HDR preview `291d1ca7`. Its fresh optimized Release ALL build is
+running from zero project objects, with UI/OpenXR enabled, explicit CPU backend
+and the verified current DomeD toolkit. The configured build has 1,742 actions;
+82 exact selected native/software tests, explicit excluded workspace helpers
+and the raw UV1 worker follow only after successful compilation. It is not yet
+a qualified combined application and has not been admitted as main runtime.
+
+Live owner: `artifacts/authoring-source8-hdr-fit-owning-build-20261112/`, unified
+session56318, driver PID2688834. Inspect the live handle/process and exact logs
+before acting; an observation timeout does not authorize restarting the build.
+Frozen component sources, providers and failed evidence remain unchanged.
+
+Parallel work resumes the owned Xvfb wrapper lifetime repair/public Bake GUI
+and actual-loader XR gates, final HDR Arc qualification, and genuine visible
+Source8 source preview plus matching sanitizer coverage. These are scoped
+qualification tasks; no physical-headset, performance, full interoperability or
+whole-goal success is claimed. No system installation or session restart.
+
+Controller trays and spatial node-based editing/history remain required later
+work after basic targets. ArmorPaint remains a painting integration candidate
+under the existing native FLTK/OpenXR and source/document authority constraints.
+
 ## Current build checkpoint and requested pause — 2026-11-12
 
 The current finite build/validation milestone is finalised and the overall goal
