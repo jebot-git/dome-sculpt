@@ -8,6 +8,7 @@
 #include "source4-baked.hpp"
 #include "source-paint-parameters.hpp"
 #include <future>
+#include <fstream>
 #include "paint-overlay-packet.hpp"
 #include <numeric>
 namespace {
