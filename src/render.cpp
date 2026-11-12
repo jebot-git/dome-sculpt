@@ -225,6 +225,15 @@ struct SurfaceRenderer::TextureState {
     add(0,3,mesh.mesh.positions);const auto normal=add(1,3,mesh.mesh.normals);add(2,2,original_uv0.empty()?mesh.mesh.uv:original_uv0);add(3,2,uv1);add(5,4,mesh.tangents);
     const bool frames=!mesh.source_normals.empty()||!mesh.canonical_normals.empty()||!mesh.source_tangents.empty();if(frames&&mesh.source_normals.empty())alias(7,3,normal);else add(7,3,mesh.source_normals);add(8,4,mesh.source_tangents);if(frames&&mesh.canonical_normals.empty())alias(9,3,normal);else add(9,3,mesh.canonical_normals);add(10,4,mesh.source_colors);add(11,4,mesh.normal_coordinates);add(12,2,paint_coordinates);for(size_t i=0;i<3;++i)add(GLuint(13+i),4,extra_uv[i]);
     const auto index_bytes=render_detail::buffer_bytes(mesh.mesh.indices.size(),sizeof(uint32_t));
+    // A sculpt-only snapshot uses the independent chunk arena. Keep the empty
+    // packed selection transactional, without inventing zero-size GL stores or
+    // a VAO. In particular, packed -> empty commits release the old leases only
+    // after a successful draw/resolve; a rejected proposal keeps them intact.
+    if(!geometry_bytes&&!index_bytes&&mesh.selected_weights.empty()&&mesh.sculpt_masks.empty()){
+      next.stats.vertex_bytes=next.stats.index_bytes=0;
+      next.stats.weight_bytes=next.stats.mask_bytes=0;
+      return next;
+    }
     size_t new_bytes=reuse?0:render_detail::buffer_sum(geometry_bytes,index_bytes);for(const auto*v:{&mesh.selected_weights,&mesh.sculpt_masks})new_bytes=render_detail::buffer_sum(new_bytes,render_detail::buffer_bytes(v->size(),sizeof(float)));ledger->preflight(Ledger::Domain::Geometry,new_bytes);
     if(reuse){if(geometry_bytes!=flat.stats.vertex_bytes||index_bytes!=flat.stats.index_bytes||!flat.vao)throw std::invalid_argument("Shared flat geometry lost its exact accepted layout");next.vertices=flat.vertices;next.indices=flat.indices;}
     else{
@@ -795,7 +804,7 @@ return gl_FrontFacing?N:-N;}
 // Masking darkens final linear RGB, retaining the material's lighting, alpha,
 // cutout, depth and blend rules. Zero and the ordinary-object sentinel are exact.
 vec3 sculpt_mask_color(vec3 rgb){return mask_value>0?rgb*(1.0-.72*clamp(mask_value,0.0,1.0)):rgb;}
-vec4 ghost_color(vec4 c){c.rgb=mix(c.rgb,selection_color,selection_amount);return ghost_opacity<1.0?vec4(mix(c.rgb,vec3(.35,.5,.7),.5),c.a*ghost_opacity):c;}
+vec4 ghost_color(vec4 c){c.rgb=dome_preview_positive_finite(c.rgb);c.rgb=mix(c.rgb,selection_color,selection_amount);return ghost_opacity<1.0?vec4(mix(c.rgb,vec3(.35,.5,.7),.5),c.a*ghost_opacity):c;}
 void main(){if(clip_enabled==1&&dot(clip_plane.xyz,cut_position)<clip_plane.w)discard;if(weight_pass==1){if(weight_value<0)discard;float opacity;
 if(mt_mode==1){bool killed;vec4 source=mt_surface(n,unit(camera-world),killed);if(killed)discard;opacity=source.a;}
 else{opacity=base_color.a;if(slots[0]==1)opacity*=texture(tex0,source_uv(0)).a;
@@ -1088,7 +1097,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
 
   if(drawing->ranges.empty()&&!drawing->sculpt_chunks) {
     glUniform1i(glGetUniformLocation(program_,"weight_pass"),!drawing->selected_weights.empty());
-    draw_range(Material{},0,drawing_count,0,nullptr,false,false,drawing->pbr_view);
+    if(drawing_count)draw_range(Material{},0,drawing_count,0,nullptr,false,false,drawing->pbr_view);
   }else {
     auto is_ghost=[&](uint64_t id){auto i=std::find_if(display.begin(),display.end(),[&](const auto &o){return o.id==id;});return i!=display.end()&&i->ghost;};
     auto begin_object=[&](uint64_t id,bool world_valid,CanvasTransform world,const std::optional<AffineTransform> &affine,bool local_geometry=false,const SurfaceRange *range=nullptr){
@@ -1155,7 +1164,9 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
     struct DrawItem {const SurfaceRange *packed=nullptr;const detail::SculptObjectChunks *chunk=nullptr;uint64_t object=0;};
     std::vector<DrawItem> ordered;
     ordered.reserve(drawing->ranges.size()+(drawing->sculpt_chunks?drawing->sculpt_chunks->objects().size():0));
-    for(const auto &range:drawing->ranges)ordered.push_back({&range,nullptr,range.object});
+    // Empty ranges still pass material/source validation above, but submit no
+    // primitive. An empty flat selection intentionally owns no core-profile VAO.
+    for(const auto &range:drawing->ranges)if(range.count)ordered.push_back({&range,nullptr,range.object});
     if(drawing->sculpt_chunks) {
       for(const auto &object:drawing->sculpt_chunks->objects())ordered.push_back({nullptr,&object,object.object});
       const auto &scene_order=drawing->sculpt_chunks->object_order();

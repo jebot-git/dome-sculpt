@@ -18,7 +18,7 @@ using namespace dome;
 namespace {
 thread_local bool allocation_failure=false;
 enum class Fault {None,Index,Polygon,Texture,EarlyFence,CommitFence,Query,AfterPolygon,Resolve,Mips,Arena};
-Fault fault=Fault::None;bool pending=false,audit=false,capture=false,surface_drawn=false;size_t fired=0,allocations=0,fences=0,reads=0,waits=0,finishes=0;GLsizeiptr index_bytes=0;
+Fault fault=Fault::None;bool pending=false,audit=false,capture=false,surface_drawn=false;size_t fired=0,allocations=0,fences=0,reads=0,waits=0,finishes=0,zero_buffers=0;GLsizeiptr index_bytes=0;
 struct Names {std::set<GLuint>textures,buffers,samplers,vaos;};Names names;
 void allocation(){if(allocation_failure){allocation_failure=false;throw std::bad_alloc();}}
 void record_bindings(){
@@ -40,7 +40,7 @@ void __real_glGenBuffers(GLsizei,GLuint*);void __wrap_glGenBuffers(GLsizei n,GLu
 void __real_glGenTextures(GLsizei,GLuint*);void __wrap_glGenTextures(GLsizei n,GLuint*p){if(audit)allocations+=size_t(n);__real_glGenTextures(n,p);}
 void __real_glGenSamplers(GLsizei,GLuint*);void __wrap_glGenSamplers(GLsizei n,GLuint*p){if(audit)allocations+=size_t(n);__real_glGenSamplers(n,p);}
 void __real_glGenVertexArrays(GLsizei,GLuint*);void __wrap_glGenVertexArrays(GLsizei n,GLuint*p){if(audit)allocations+=size_t(n);__real_glGenVertexArrays(n,p);}
-void __real_glBufferData(GLenum,GLsizeiptr,const void*,GLenum);void __wrap_glBufferData(GLenum a,GLsizeiptr b,const void*c,GLenum d){if((fault==Fault::Arena&&a==GL_ARRAY_BUFFER&&b>0)||(fault==Fault::Index&&a==GL_COPY_WRITE_BUFFER&&b==index_bytes)||(fault==Fault::Polygon&&a==GL_TEXTURE_BUFFER&&b==128)){fault=Fault::None;++fired;__real_glBufferData(a,-1,c,d);}else __real_glBufferData(a,b,c,d);}
+void __real_glBufferData(GLenum,GLsizeiptr,const void*,GLenum);void __wrap_glBufferData(GLenum a,GLsizeiptr b,const void*c,GLenum d){if(audit&&b==0)++zero_buffers;if((fault==Fault::Arena&&a==GL_ARRAY_BUFFER&&b>0)||(fault==Fault::Index&&a==GL_COPY_WRITE_BUFFER&&b==index_bytes)||(fault==Fault::Polygon&&a==GL_TEXTURE_BUFFER&&b==128)){fault=Fault::None;++fired;__real_glBufferData(a,-1,c,d);}else __real_glBufferData(a,b,c,d);}
 void __real_glTexBuffer(GLenum,GLenum,GLuint);void __wrap_glTexBuffer(GLenum a,GLenum b,GLuint c){__real_glTexBuffer(a,b,c);if(fault==Fault::AfterPolygon&&b==GL_RGBA32F){GLint bound=0;glGetIntegerv(GL_TEXTURE_BUFFER_BINDING,&bound);if(GLuint(bound)==c){GLint64 bytes=0;glGetBufferParameteri64v(GL_TEXTURE_BUFFER,GL_BUFFER_SIZE,&bytes);if(bytes==128){fault=Fault::None;++fired;allocation_failure=true;}}}}
 void __real_glGenerateMipmap(GLenum);void __wrap_glGenerateMipmap(GLenum a){if(fault==Fault::Mips){fault=Fault::None;++fired;__real_glGenerateMipmap(GLenum(0xdead));}else __real_glGenerateMipmap(a);}
 void __real_glTexImage2D(GLenum,GLint,GLint,GLsizei,GLsizei,GLint,GLenum,GLenum,const void*);void __wrap_glTexImage2D(GLenum a,GLint b,GLint c,GLsizei d,GLsizei e,GLint f,GLenum g,GLenum h,const void*i){if(fault==Fault::Texture&&d==2&&e==2&&i){fault=Fault::None;++fired;__real_glTexImage2D(a,b,c,-1,e,f,g,h,i);}else __real_glTexImage2D(a,b,c,d,e,f,g,h,i);}
@@ -100,6 +100,52 @@ void mip_controls(){
  auto mip=std::make_shared<PaintSourceMaps>(*maps);mip->color.min_filter=GL_LINEAR_MIPMAP_LINEAR;auto next=std::make_shared<MeshSnapshot>(*old);auto changed=PaintedMesh::from_maps(old->mesh,mip,64);next->ranges[0].textures=changed->preview(next->ranges[0].material);SurfaceRenderer renderer;renderer.set_frame_time(0);auto accepted=warm(renderer,old,fbo,false);pending=true;arm(Fault::Mips);fbo.bind();check(reject([&]{render(renderer,next);})&&fired==1,"A real mip upgrade API failure leaves the same native source image's accepted mipless version intact");fault=Fault::None;live(accepted.resources);const auto generated=allocations;fbo.bind();check(render(renderer,accepted.frame)==accepted.pixels&&allocations==generated,"Rejected immutable mip upgrade preserves exact accepted pixels without rebuilding image/geometry");pending=false;fbo.bind();auto actual=render(renderer,next);SurfaceRenderer reference;reference.set_frame_time(0);fbo.bind();check(actual==render(reference,next),"Same native image successfully retries with a new immutable mipped GPU version");
 }
 
+void empty_flat_controls(const Fixture&f,bool deferred){
+ Scene sculpt=f.before.snapshot();
+ for(const auto&o:sculpt.objects())if(o.mesh_active)sculpt.object(o.id).visible=false;
+ Document document;
+ auto publish=[&](const Scene&scene){document.replace(scene);check(document.wait_mesh(),"Empty-selection document worker completes");check(document.frame().state->error.empty(),"Empty-selection worker retains valid native sources");return document.frame().surface;};
+ auto pure=publish(sculpt);
+ check(pure&&pure->mesh.positions.empty()&&pure->mesh.indices.empty()&&pure->sculpt_chunks&&!pure->sculpt_chunks->objects().empty(),"Actual visibility producer publishes pure sculpt with no packed geometry");
+ auto blank_scene=sculpt.snapshot();for(const auto&o:blank_scene.objects())blank_scene.object(o.id).visible=false;
+ auto blank=publish(blank_scene);
+ check(blank&&blank->mesh.positions.empty()&&blank->mesh.indices.empty()&&(!blank->sculpt_chunks||blank->sculpt_chunks->objects().empty()),"Actual hidden scene publishes a genuinely empty selection");
+ Fbo fbo;SurfaceRenderer renderer;renderer.set_frame_time(0);renderer.set_deferred_resolve(deferred);
+ auto accepted=warm(renderer,f.old_frame,fbo,deferred);const auto before=renderer.buffer_stats();
+ pending=true;arm(Fault::Resolve);const auto zero_before=zero_buffers;fbo.bind();
+ check(reject([&]{render(renderer,pure,deferred);})&&fired==1,"Packed-to-empty flat proposal can fail at actual late resolve");fault=Fault::None;
+ check(zero_buffers==zero_before,"Rejected pure-sculpt proposal allocates no zero-byte flat stores");live(accepted.resources);
+ check(renderer.buffer_stats().geometry_uploads==before.geometry_uploads&&renderer.buffer_stats().vertex_bytes==before.vertex_bytes&&renderer.buffer_stats().index_bytes==before.index_bytes,"Late empty-flat rejection preserves accepted buffer counters and capacity");
+ const auto generated=allocations;fbo.bind();check(render(renderer,accepted.frame,deferred)==accepted.pixels&&allocations==generated,"Rejected packed-to-empty proposal preserves exact accepted pixels without rebuilding");
+ pending=false;SurfaceRenderer reference;reference.set_frame_time(0);fbo.bind();const auto expected=render(reference,pure);
+ fbo.bind();check(render(renderer,pure,deferred)==expected,"Packed-to-empty retry matches independently rendered native sculpt");
+ index_bytes=GLsizeiptr(f.old_frame->mesh.indices.size()*sizeof(uint32_t));pending=true;arm(Fault::Index);fbo.bind();
+ check(reject([&]{render(renderer,f.old_frame,deferred);})&&fired==1,"Empty-to-packed proposal can fail at actual index allocation");fault=Fault::None;
+ const auto after_reject=allocations;fbo.bind();check(render(renderer,pure,deferred)==expected&&allocations==after_reject,"Rejected empty-to-packed proposal preserves exact accepted sculpt without allocations");
+ pending=false;fbo.bind();check(render(renderer,f.old_frame,deferred)==accepted.pixels,"Packed geometry retries after empty-selection rejection with exact original pixels");
+ fbo.bind();render(renderer,pure,deferred);
+ // A separate pure-sculpt renderer has no material/flat debt. Repeated new
+ // immutable snapshot owners retain the same actual chunk geometry.
+ SurfaceRenderer only;only.set_frame_time(0);only.set_deferred_resolve(deferred);fbo.bind();check(render(only,pure,deferred)==expected,"Fresh pure-sculpt renderer matches the original accepted sculpt");
+ const auto prior=allocations,empty_calls=zero_buffers;const auto counts=only.buffer_stats();
+ for(int i=0;i<4;++i){auto next=std::make_shared<MeshSnapshot>(*pure);fbo.bind();check(render(only,next,deferred)==expected,"Changed pure-sculpt snapshot owner preserves exact pixels");}
+ check(allocations==prior&&zero_buffers==empty_calls&&only.buffer_stats().geometry_uploads==counts.geometry_uploads,"Changed pure-sculpt snapshots allocate no flat buffer/VAO and report no phantom geometry upload");
+ fbo.bind();const auto empty_pixels=render(only,blank,deferred);
+ check(std::all_of(empty_pixels.begin(),empty_pixels.end(),[](uint8_t x){return x==0;})&&only.buffer_stats().vertex_bytes==0&&only.buffer_stats().index_bytes==0,"Fully empty selection resolves transparent with zero accepted geometry capacity");
+ auto empty_range=std::make_shared<MeshSnapshot>(*blank);empty_range->ranges.push_back(SurfaceRange{});empty_range->ranges.back().object=1;
+ fbo.bind();check(render(only,empty_range,deferred)==empty_pixels,"Valid zero-count material range renders an empty core-profile selection without a VAO");
+ auto invalid_range=std::make_shared<MeshSnapshot>(*empty_range);invalid_range->ranges.back().first=1;
+ const auto before_invalid=allocations;fbo.bind();check(reject([&]{render(only,invalid_range,deferred);})&&allocations==before_invalid,"Zero-count ranges still receive full bounds validation before allocation");
+ fbo.bind();check(render(only,empty_range,deferred)==empty_pixels,"Rejected zero-count range preserves exact accepted empty-selection pixels");
+ auto packed_again=warm(renderer,f.old_frame,fbo,deferred);pending=true;arm(Fault::Resolve);fbo.bind();
+ check(reject([&]{render(renderer,empty_range,deferred);})&&fired==1,"Packed-to-zero-range proposal can fail at actual late resolve");fault=Fault::None;live(packed_again.resources);
+ fbo.bind();check(render(renderer,packed_again.frame,deferred)==packed_again.pixels,"Failed zero-range publication preserves exact accepted packed geometry");pending=false;
+ fbo.bind();check(render(renderer,empty_range,deferred)==empty_pixels,"Zero-range publication retries to the exact independently checked empty result");
+ fbo.bind();check(render(renderer,f.old_frame,deferred)==accepted.pixels,"Packed geometry returns after accepted zero-count range without stale VAO state");
+ fbo.bind();check(render(only,pure,deferred)==expected,"Pure sculpt reopens after a fully empty selection without stale flat names");
+ check(glGetError()==GL_NO_ERROR,"Packed/sculpt/empty transitions leave the actual GL error queue clean");
+}
+
 void abandoned_control(const Fixture&f){
  const auto display=eglGetCurrentDisplay(),draw=eglGetCurrentSurface(EGL_DRAW),read_surface=eglGetCurrentSurface(EGL_READ);const auto context=eglGetCurrentContext();std::unique_ptr<SurfaceRenderer>lost;
  {NativeGraphics separate;Fbo fbo;lost=std::make_unique<SurfaceRenderer>();lost->set_deferred_resolve(true);fbo.bind();lost->draw(f.old_frame,{},identity,{0,0,3},96,96,true);check(glGetError()==GL_NO_ERROR,"Real unresolved transaction exists before its separate GL context is destroyed");}
@@ -114,6 +160,6 @@ void identity_check(bool hardware){
 int main(int argc,char**argv)try{
  std::cout<<std::unitbuf;NativeGraphics graphics;identity_check(argc>1&&std::string_view(argv[1])=="--hardware");auto f=fixture();const auto original=f.before.encode(),after=f.after.encode();
  for(auto which:{Fault::Texture,Fault::Polygon,Fault::AfterPolygon,Fault::Arena,Fault::Index,Fault::EarlyFence,Fault::CommitFence,Fault::Resolve})recovery(f,which,false);
- recovery(f,Fault::Index,true);recovery(f,Fault::Resolve,true);budget(f);deferred_controls(f);mip_controls();polygon_controls(f);abandoned_control(f);
+ recovery(f,Fault::Index,true);recovery(f,Fault::Resolve,true);budget(f);deferred_controls(f);mip_controls();polygon_controls(f);abandoned_control(f);empty_flat_controls(f,false);empty_flat_controls(f,true);
  check(f.before.encode()==original&&f.after.encode()==after,"Complete old/new native scenes remain immutable through all real renderer failures");check(reads==0&&waits==0&&finishes==0,"Production recovery performs no host readback, nonzero CPU sync wait or glFinish");check(glGetError()==GL_NO_ERROR,"Actual recovery leaves no outstanding GL error");std::cout<<"PASS "<<checks<<" actual accepted/Pending renderer recovery checks\n";return 0;
 }catch(const std::exception&e){allocation_failure=audit=capture=pending=false;std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
