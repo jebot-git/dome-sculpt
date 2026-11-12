@@ -129,7 +129,7 @@ Scene polygon_source8(bool physical, bool images, bool mixed) {
 void polygon_source8_history(bool physical,bool images,bool mixed) {
  auto input=polygon_source8(physical,images,mixed);const auto before=input.encode();const auto paint=input.active().painted;
  check(before.at("version")==42&&Scene::decode(before).encode()==before,"Polygon input is a genuine roundtripping Scene42/Paint8");
- Document doc;doc.replace(input);check(doc.wait_mesh()&&doc.frame().state->error.empty()&&doc.frame().state->can_polygon,"Actual Source8 frame admits the public Polygon command");
+ Document doc;doc.replace(input);const bool ready=doc.wait_mesh();std::cout<<"SOURCE8_POLYGON_INPUT physical="<<physical<<" images="<<images<<" mixed="<<mixed<<" ready="<<ready<<" can_polygon="<<doc.frame().state->can_polygon<<" error="<<doc.frame().state->error<<std::endl;check(ready&&doc.frame().state->error.empty()&&doc.frame().state->can_polygon,"Actual Source8 frame admits the public Polygon command");
  auto prepare=[&]{doc.begin_polygon(false);check(doc.wait_polygon(),"Source8 Polygon source worker reaches its original deadline");};
  auto extrude=[&]{doc.edit_polygon(PolygonAction::SelectAll);check(doc.wait_polygon(),"Source8 Polygon selection completes");doc.edit_polygon(PolygonAction::Extrude);check(doc.wait_polygon()&&doc.frame().state->error.empty(),"Source8 Polygon extrusion completes in local history");};
  prepare();
