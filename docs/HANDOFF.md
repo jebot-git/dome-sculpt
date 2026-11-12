@@ -1,4 +1,4 @@
-## Combined Release owning build complete; qualification continues — 2026-11-12
+## Combined Release build passes; native recovery timeout under investigation — 2026-11-12
 
 Frozen5c820f owning execution38148 is terminal0:3 genuine generators,263 fresh
 complete TUs and685 fresh archive/link steps succeeded;767 whole objects and46
@@ -7,9 +7,14 @@ remains, and root independently verified manifests for1764 owned outputs and813
 staged providers. Read
 [AUTHORING-RELEASE-GENERATED-DAG-20261112.md](AUTHORING-RELEASE-GENERATED-DAG-20261112.md).
 
-Actual current85 native/helpers/raw qualification62399 is running. Fresh current
-producer/font, manual rendering and public desktop/OpenXR gates still follow;
-this build result is not public/physical/performance acceptance.
+Actual current85 qualification62399 is terminal1:84 cases passed but
+renderer-recovery timed out at its unchanged180-second bound; inputdrift is empty.
+Helpers/raw/producer/font/manual/public gates remain unstarted. The failure log
+and [scoped record](validation/authoring-native85-failure-20261112.json) are retained.
+The trace completed seven recovery loops without an assertion failure. Forced
+shader-cache disabling is an identified harness difference, not yet a proven
+cause; same-binary isolated diagnostics retain the deadline and all assertions.
+Current candidate remains unqualified and is not admitted to main.
 
 This branch is a PREPARED merge, not admitted main. Its parents preserve main39b
 and frozen5c; every1709 non-doc Git record matches frozen5c exactly. Read
