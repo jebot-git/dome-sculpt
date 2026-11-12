@@ -1,0 +1,15 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "dome/scene.hpp"
+#include "dome/source-paint.hpp"
+#include "dome/bake-authoring.hpp"
+#include "emission-bake-source.hpp"
+#include <iostream>
+#include <numeric>
+using namespace dome;
+int main()try{
+ Mesh raw;raw.positions={{-.6f,-.6f,0},{.6f,-.6f,0},{.6f,.6f,0},{-.6f,.6f,0}};raw.normals.assign(4,{0,0,1});raw.uv={{{0,0}},{{1,0}},{{1,1}},{{0,1}}};raw.indices={0,1,2,0,2,3};auto maps=std::make_shared<PaintSourceMaps>();maps->emission.image=std::make_shared<const Image>(Image{2,2,{255,0,0,255,0,0,255,255,255,0,0,255,0,0,255,255}});maps->emission.texcoord=0;maps->emission.min_filter=maps->emission.mag_filter=9729;
+ auto original=capture_source_sampling(raw,maps,64);auto atlas=raw;for(auto&q:atlas.uv){q[0]=.125f+.75f*q[0];q[1]=.125f+.75f*q[1];}auto authored=std::make_shared<std::vector<std::array<float,2>>>(raw.uv);for(auto&q:*authored)q[0]=1-q[0];const std::array<uint32_t,4>ids{0,1,2,3};auto paint=prepare_source_paint(original,atlas,ids,authored,{});Scene scene;auto&o=scene.active();o.mesh_active=true;o.painted=paint;o.material.emissive={2,1,4};scene.validate();const auto before=scene.encode();if(Scene::decode(before).encode()!=before)throw std::runtime_error("Native owner roundtrip mismatch");if(!paint->source_sampling_prepared()||!paint->source_sampling_authored_uv1()||paint->source_maps()->emission.texcoord!=1||*paint->source_maps()->uv1==*paint->source_sampling_authored_uv1())throw std::runtime_error("Invalid independent coordinate owner");
+ const auto resolve=detail::emission_bake_source(o);const auto actual=resolve(0,{.2f,.3f,.5f});const std::array<float,3>expected{.2f,0,3.6f};float callback_error=0;for(size_t k=0;k<3;++k)callback_error=std::max(callback_error,std::abs(actual[k]-expected[k]));std::cout<<"EMISSION_DOMAIN callback actual="<<actual[0]<<','<<actual[1]<<','<<actual[2]<<" expected=.2,0,3.6 error="<<callback_error<<std::endl;
+ const auto source=o.id;const auto target=scene.add("Independent target",Volume{});auto&t=scene.object(target);t.mesh_active=true;t.painted=std::make_shared<PaintedMesh>(raw,64);scene.select(target);ObjectBakeSettings options;options.front_mm=options.back_mm=2;options.padding=0;options.ao_samples=0;auto report=bake_object(scene,source,options);const auto&field=*scene.active().painted->baked()->emission_field;float worker_error=0;size_t checked=0;for(size_t y=16;y<48;++y)for(size_t x=16;x<48;++x){const float u=(x+.5f)/64;const float blue=u*2-.5f;const std::array<float,3>reference{2*(1-blue),0,4*blue};const auto&sample=field.values()[y*64+x];const auto got=sample.resolve({},1);for(size_t k=0;k<3;++k)worker_error=std::max(worker_error,std::abs(got[k]-reference[k]));++checked;}std::cout<<"EMISSION_DOMAIN actualBake projected="<<report.projected<<" independently_checked="<<checked<<" maximum_error="<<worker_error<<std::endl;
+ if(callback_error>2e-6f||worker_error>2e-5f)throw std::runtime_error("Resolved PBR carrier reads separate logical authoredUV1");std::cout<<"PASS source-role PBR emission owner domain"<<std::endl;return 0;
+}catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<std::endl;return 1;}
