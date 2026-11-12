@@ -1,3 +1,55 @@
+## Shared-vertex publication repair also required — 2026-11-12
+
+The actual shared-four-vertex Source8 Polygon regression exposed a separate
+visible-publication failure before its Save/Open check: canonical Mikk packing
+expands four authored vertices into six corners, but the empty-image-role path
+leaves the genuine original UV0 field unremapped for packed consumers. The
+worker reports “Visibility original UV0 index is outside its sealed domain”.
+The older isolated-six-vertex424 fixture does not cover this case.
+
+Product4f5a78fd routes overlays carrying authentic original UV0 through the
+existing render-only `pack_source_maps` path and its actual collected vertex
+map, even without UV1 image carriers. Original native UV domains/proofs remain
+unchanged; packet/header/shader/wire ABI is unchanged. Its shared-quad and varied
+shared-vertex native/rendering tests are running on a separate870 descendant.
+This is a genuine repair gate, not permission to substitute an isolated mesh or
+expand source coordinates without their actual authoring correspondence.
+
+The independent Polygon reader-context fix has passed actual old/new shared4
+Apply/Save/Open comparisons in Release and strict sanitizer: old reader fails,
+new reader reopens exactly, while both explicitly record the unrelated display
+error. All21 affected full TUs and9 core replacements build in each profile;
+remaining historical consumer fixture generation/validation is still running.
+Root assembly fb069 remains UNFROZEN and uncompiled until these compatible
+repairs are qualified and merged. Existing9b source/plan stays frozen and held.
+Full original goal remains active/incomplete; no installation or session change.
+
+## Parameter repair qualified; Polygon reader context repair in progress — 2026-11-12
+
+Source87095a5b/product3f9c03c8 passes Release and strict sanitizer424 visible
+controls plus all worker/source/original/producer scopes with zero drift. It
+retains the exact current bake across parameter edits, cancellation, history,
+Save/reopen and independent original-normal affine changes. Read
+[SOURCE8-PARAMETER-PRESERVATION-20261112.md](SOURCE8-PARAMETER-PRESERVATION-20261112.md).
+The unfrozen new root assembly currently fb069d91 includes this repair and all
+main353 checkpoints; old9b1 remains frozen and held, with no app compilation.
+
+A focused adjacent audit reproduced another real Save/Open defect: RGB8 Source8
+with empty image roles accepts actual Polygon Extrude/Apply and writes a file,
+but fresh Open fails. Top Scene version is already42 and retained original
+Paint8 is present. The actual PolygonSceneArchive preflight discards the owning
+SourcePaintDecodeContext capability via its hardcoded compatibility context.
+Private fix5d4ce4dc forwards the authentic typed context while preserving old
+no-cap overload behavior; it does not scan opaque JSON or invent permission.
+Its full21-TU component Release closure is running, followed by matching strict
+sanitizer/native/history/negative-capability qualification. This remains a known
+integration gate; do not replace genuine preservation with disabling the path.
+
+Root will merge qualified fixes into a NEW final candidate and re-audit the
+whole owning closure before application/public execution. Existing cc5 sanitizer
+ALL build38512 remains live. Full production objective stays active/incomplete;
+no installation, physical-headset launch or session restart.
+
 ## Source-parameter preservation defect; next compilation held — 2026-11-12
 
 Before the new9b1 compile runner launched, a broader source audit found
