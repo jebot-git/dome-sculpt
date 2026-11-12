@@ -619,7 +619,7 @@ std::shared_ptr<const std::vector<std::array<float,2>>> PaintedMesh::source_samp
 }
 struct SourcePaintAccess {
   using Coordinates=std::vector<std::array<float,2>>;
-  static void merge_bake(PaintedMesh &,BakedTextures,BakedNormalWrite);
+  static void merge_bake(PaintedMesh &,BakedTextures,BakedNormalWrite,const std::function<bool()> &cancelled={});
   static std::shared_ptr<PaintedMesh> install(const PaintedMesh &,BakedTextures,const SourcePaintOptions &);
   static void clear(PaintedMesh &);
   static size_t surface_copy_bytes(const PaintedMesh &p){
@@ -802,7 +802,13 @@ struct SourcePaintAccess {
     const auto before=measure(input.at("before"),true),current=measure(input.at("payload"),false);
     const auto remap=input.at("vertices").get_binary().size();
     const auto extra=detail::source_paint_authored_uv1_bytes(input);
-    if(working_bytes(before,current,remap,extra)>SourcePaintOptions::maximum_working_bytes||
+    // Source8 reserves the independent immutable proof/raster copy and current
+    // baked decode/adoption scratch BEFORE constructing either SurfaceMap.
+    const size_t source_bake_scratch=source_bake?current.tiles+remap+sizeof(PaintedMesh::SurfaceMap)+
+      sizeof(PaintedMesh::SurfaceMap::OriginalSampling)+current.pixels*(sizeof(PaintedMesh::SurfaceMap::Texel)+2*sizeof(int32_t))+
+      current.pixels/1024*(sizeof(PaintedMesh::SurfaceMap::Bounds)+16*3*sizeof(std::shared_ptr<const PaintTile>)):0;
+    const auto working=working_bytes(before,current,remap,extra);
+    if(working>SourcePaintOptions::maximum_working_bytes||source_bake_scratch>SourcePaintOptions::maximum_working_bytes-working||
        retained_bytes(before,current,remap,extra)>128*1024*1024)
       throw std::length_error("Encoded independent source paint exceeds cumulative working/storage budget");
     if(input.at("vertices").get_binary().size()/4!=input.at("payload").at("mesh").at("positions").get_binary().size()/12)
@@ -2512,7 +2518,8 @@ void PaintedMesh::install_bake(BakedTextures incoming,BakedNormalWrite normal_wr
     throw std::logic_error("Prepare genuine source atlas ownership before installing baked data on original coordinates");
   SourcePaintAccess::merge_bake(*this,std::move(incoming),normal_write);
 }
-void SourcePaintAccess::merge_bake(PaintedMesh &paint,BakedTextures incoming,BakedNormalWrite normal_write) {
+void SourcePaintAccess::merge_bake(PaintedMesh &paint,BakedTextures incoming,BakedNormalWrite normal_write,const std::function<bool()> &cancelled) {
+  paint_compute::checkpoint(cancelled);
   if(paint.surface_->source_capture_only)
     throw std::logic_error(detail::editable_texture_atlas_notice);
   if (paint.editing_) throw std::logic_error("Finish the paint stroke before baking");
@@ -2565,14 +2572,17 @@ void SourcePaintAccess::merge_bake(PaintedMesh &paint,BakedTextures incoming,Bak
       if(paint.storage_bytes()-paint.baked_->storage_bytes()+replacement>128*1024*1024)
         throw std::length_error("Merged FLOAT baked emission exceeds paint storage budget");
       std::vector<BakedEmissionSample> values(incoming.coverage.size());
-      for(size_t i=0;i<values.size();++i)
+      for(size_t i=0;i<values.size();++i){
+        if((i&1023)==0)paint_compute::checkpoint(cancelled);
         values[i]=BakedEmissionField::over(detail::baked_emission_texel(*paint.baked_,i),detail::baked_emission_texel(incoming,i));
-      merged.emission_field=BakedEmissionField::create(paint.resolution(),values);merged.maps.emission={};
+      }
+      merged.emission_field=BakedEmissionField::create(paint.resolution(),values,{128*1024*1024,cancelled});merged.maps.emission={};
     }
     if (merged.maps.normal.rgba.empty() && !incoming.maps.normal.rgba.empty())
       merged.maps.normal = blank_image(paint.resolution(), true);
     if(merged.normal_interpretation==BakedNormalInterpretation::PreparedAttributes&&merged.maps.mtoon_normal.rgba.empty()&&!incoming.maps.mtoon_normal.rgba.empty())merged.maps.mtoon_normal=blank_image(paint.resolution(),true);
     for (size_t i = 0; i < incoming.coverage.size(); ++i) {
+      if((i&1023)==0)paint_compute::checkpoint(cancelled);
       float a = unit(incoming.coverage[i]), b = unit(paint.baked_->coverage[i]);
       if (!a) continue;
       float coverage = a + b * (1 - a);
@@ -2610,6 +2620,8 @@ std::shared_ptr<PaintedMesh> SourcePaintAccess::install(const PaintedMesh &curre
   if(current.in_stroke()||!current.source_sampling_prepared()||!current.valid_source_sampling_attachment()||
      current.paint_sampling_domain()||current.color_projection_||current.normal_projection_)
     throw std::invalid_argument("Source Bake requires its genuine current source/atlas owner");
+  if(current.surface_->diagnostics.additional_candidates||!current.surface_->diagnostics.unpaintable_uv_faces.empty())
+    throw std::invalid_argument("Source Bake requires one exact writable atlas owner per current texel");
   const auto before=current.source_sampling_original();pristine(*before);
   budget(*before,current.mesh(),options,current.source_sampling_authored_uv1());
   authored(*before,current.source_sampling_authored_uv1(),options);
@@ -2635,7 +2647,7 @@ std::shared_ptr<PaintedMesh> SourcePaintAccess::install(const PaintedMesh &curre
      retained_bytes(prior,future,remap,authored_bytes)>128*1024*1024||
      current.storage_bytes()+incoming.storage_bytes()>128*1024*1024)
     throw std::length_error("Source Bake exceeds prospective retained/merge/replay working budgets");
-  auto result=current.snapshot();merge_bake(*result,std::move(incoming),BakedNormalWrite::Replace);stop();
+  auto result=current.snapshot();merge_bake(*result,std::move(incoming),BakedNormalWrite::Replace,options.cancelled);stop();
   auto surface=std::make_shared<PaintedMesh::SurfaceMap>(*current.surface_);
   auto proof=std::make_shared<PaintedMesh::SurfaceMap::OriginalSampling>(*current.surface_->original_sampling);
   proof->baked=result->baked_;surface->original_sampling=std::move(proof);result->surface_=std::move(surface);
@@ -2646,7 +2658,8 @@ std::shared_ptr<PaintedMesh> detail::install_source_bake(const PaintedMesh &curr
     const SourcePaintOptions &options){return SourcePaintAccess::install(current,std::move(incoming),options);}
 void SourcePaintAccess::clear(PaintedMesh &current){
   if(current.editing_||!current.valid_source_sampling_attachment())throw std::logic_error("Source Bake clear requires its exact finished current owner");
-  if(surface_copy_bytes(current)>SourcePaintOptions::maximum_working_bytes-working_bytes(current))
+  const auto working=working_bytes(current);
+  if(working>SourcePaintOptions::maximum_working_bytes||surface_copy_bytes(current)>SourcePaintOptions::maximum_working_bytes-working)
     throw std::length_error("Source Bake clear exceeds immutable proof copy budget");
   auto surface=std::make_shared<PaintedMesh::SurfaceMap>(*current.surface_);
   auto proof=std::make_shared<PaintedMesh::SurfaceMap::OriginalSampling>(*current.surface_->original_sampling);
