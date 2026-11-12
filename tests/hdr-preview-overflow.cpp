@@ -6,6 +6,13 @@
 #include "dome/document.hpp"
 #include "dome/material-bindings.hpp"
 #include <limits>
+#define mtoon_renderer_common fixture_common_source
+#define mtoon_renderer_vertex fixture_vertex_source
+#define mtoon_renderer_fragment fixture_fragment_source
+#include "../src/render-mtoon.hpp"
+#undef mtoon_renderer_common
+#undef mtoon_renderer_vertex
+#undef mtoon_renderer_fragment
 namespace {
 struct FloatTarget {
  GLuint f=0,c=0,d=0;
@@ -17,9 +24,9 @@ struct FloatTarget {
 Image constant_image(std::array<uint8_t,4> value){Image result{64,64,std::vector<uint8_t>(4096*4)};for(size_t i=0;i<result.rgba.size();++i)result.rgba[i]=value[i%4];return result;}
 Mesh outlined_mesh(){auto m=quad();for(auto&p:m.uv)p[0]*=.45f;for(size_t v=0;v<4;++v)m.normals[v]=normalized(Vec3{m.positions[v].x,m.positions[v].y,0});for(size_t v=0;v<4;++v){m.positions.push_back(m.positions[v]);m.normals.push_back(m.normals[v]);auto uv=m.uv[v];uv[0]+=.55f;m.uv.push_back(uv);}m.indices.insert(m.indices.end(),{6,5,4,7,6,4});return m;}
 Scene native_source(BakedEmissionSample emission,float strength,float background,bool covered,bool outline=false,float alpha=1){
- auto p=std::make_shared<PaintedMesh>(outline?outlined_mesh():quad(),64);BakedTextures base;base.maps.color=constant_image({0,0,0,255});base.maps.metal_rough=constant_image({255,255,0,255});base.maps.normal=constant_image({128,128,255,255});base.coverage.assign(4096,255);base.emission_field=BakedEmissionField::create(64,std::vector<BakedEmissionSample>(4096,emission));p->install_bake(base);
+ auto p=std::make_shared<PaintedMesh>(outline?outlined_mesh():quad(),64);BakedTextures base;base.maps.color=constant_image({0,0,0,uint8_t(std::lround(alpha*255))});base.maps.metal_rough=constant_image({255,255,0,255});base.maps.normal=constant_image({128,128,255,255});base.coverage.assign(4096,255);base.emission_field=BakedEmissionField::create(64,std::vector<BakedEmissionSample>(4096,emission));p->install_bake(base);
  Scene s;auto &o=s.active();o.mesh_active=true;o.painted=p;o.material.color={0,0,0,1};o.material.emissive={background,0,0};o.material.metallic=0;o.material.roughness=1;o.material.unlit=false;
- auto binding=std::make_shared<SourceMaterialBindings>();binding->has_mtoon=true;binding->material=alpha==1?typed(false):MToonMaterial::from_vrm1({{"alphaMode","BLEND"},{"extensions",{{"VRMC_materials_mtoon",{{"specVersion","1.0"}}}}}});auto &m=binding->material.parameters;m.base_color={0,0,0,alpha};m.shade_color={0,0,0};m.emission={1,1,1};m.emission_strength=strength;
+ auto binding=std::make_shared<SourceMaterialBindings>();binding->has_mtoon=true;binding->material=alpha==1?typed(false):MToonMaterial::from_vrm1({{"alphaMode","BLEND"},{"extensions",{{"VRMC_materials_mtoon",{{"specVersion","1.0"}}}}}});auto &m=binding->material.parameters;m.base_color={0,0,0,1};m.shade_color={0,0,0};m.emission={1,1,1};m.emission_strength=strength;
  if(outline){m.cull=MToonCull::Off;m.outline_cull=MToonCull::Front;m.outline=MToonOutline::World;m.outline_width=.1f;m.outline_color={0,1,0};m.outline_mix=0;}
  binding->validate();o.material_bindings=binding;
  if(covered){o.transform.position.z=.1f;auto id=s.add("Actual opaque-alpha blend foreground",Volume{});auto &front=s.object(id);front.mesh_active=true;front.painted=std::make_shared<PaintedMesh>(quad(),64);front.material.color={.5f,0,0,1};front.material.emissive={};front.material.unlit=true;front.material.alpha=Material::AlphaMode::Blend;}
@@ -39,20 +46,32 @@ void case_check(BakedEmissionSample sample,float strength,float background,bool 
  {Fbo display;r.set_output_encoding(SurfaceOutputEncoding::Srgb);display.bind();render(r,frame,deferred);auto p=at(read());if(covered)check(close(p,{188,0,0,255},2),"Actual sRGB foreground remains red after HDR background");else if(outline)check(close(p,{0,255,0,255},2),"Actual sRGB coplanar outline retains green");else if(expected_red<0)check(p[0]>=250&&p[1]<=1&&p[2]>=250,"Actual sRGB presentation saturates bright radiance instead of turning black");}
  check(s.encode()==original&&doc.copy_scene().encode()==original,"Display handling preserves exact full native coefficients, material and scene authority");
 }
+void retained_background_helper(){
+ // Compile the actual private helper bytes, not a copied scalar formula.
+ // Renamed C++ source generators above cannot interpose on the old renderer
+ // in the complete-product counterfactual.
+ const auto source=fixture_fragment_source();const auto first=source.find("vec3 mt_retained_emission(");const auto end=source.find("\nuniform samplerBuffer",first);check(first!=std::string::npos&&end!=std::string::npos,"Actual helper source has exact named boundaries");
+ const std::string fragment="#version 330 core\nuniform int mt_absolute_background;uniform vec3 mt_background,mt_effective_emission;uniform float mt_emission_strength;\n"+source.substr(first,end-first)+"\nout vec4 color;void main(){color=vec4(mt_retained_emission(vec3(1),.25),1);}";
+ const char*vertex="#version 330 core\nvoid main(){vec2 p=vec2((gl_VertexID<<1)&2,gl_VertexID&2);gl_Position=vec4(p*2-1,0,1);}";
+ auto compile=[](GLenum type,const char*text){GLuint s=glCreateShader(type);glShaderSource(s,1,&text,nullptr);glCompileShader(s);GLint ok=0;glGetShaderiv(s,GL_COMPILE_STATUS,&ok);if(!ok){char log[4096]{};glGetShaderInfoLog(s,sizeof(log),nullptr,log);throw std::runtime_error(log);}return s;};
+ GLuint vs=compile(GL_VERTEX_SHADER,vertex),fs=compile(GL_FRAGMENT_SHADER,fragment.c_str()),program=glCreateProgram(),vao=0;glAttachShader(program,vs);glAttachShader(program,fs);glLinkProgram(program);glDeleteShader(vs);glDeleteShader(fs);GLint linked=0;glGetProgramiv(program,GL_LINK_STATUS,&linked);check(linked,"Actual private source helper GPU program links");
+ FloatTarget target;target.bind();glViewport(0,0,96,96);glDisable(GL_DEPTH_TEST);glDisable(GL_BLEND);glDisable(GL_CULL_FACE);glUseProgram(program);glUniform1i(glGetUniformLocation(program,"mt_absolute_background"),0);glUniform3f(glGetUniformLocation(program,"mt_effective_emission"),2,0,0);glUniform1f(glGetUniformLocation(program,"mt_emission_strength"),std::numeric_limits<float>::max());glGenVertexArrays(1,&vao);glBindVertexArray(vao);glDrawArrays(GL_TRIANGLES,0,3);auto pixel=target.sample();
+ const float expected=float(.5L*static_cast<long double>(std::numeric_limits<float>::max()));check(pixel[0]==expected&&pixel[1]==0&&pixel[2]==0,"Actual helper recovers exact representable .25 times2 timesF32max without clipping its factors");
+ glBindVertexArray(0);glUseProgram(0);glDeleteVertexArrays(1,&vao);glDeleteProgram(program);
+}
 }
 int main(int argc,char**argv)try{
  NativeGraphics graphics;const auto device=std::string(reinterpret_cast<const char*>(glGetString(GL_RENDERER)));std::cout<<"ACTUAL_RENDERER "<<device<<'\n';if(argc>1&&std::string_view(argv[1])=="--hardware")check(device.find("Arc")!=std::string::npos&&device.find("UHD")==std::string::npos,"Requested actual Arc renderer is present");
+ retained_background_helper();
  const float largest=std::numeric_limits<float>::max();const BakedEmissionSample normal{{},{100000,1e-7f,2},1},overflow{{1,0,0},{largest,1e-7f,2},1},partial{{},{0,0,0},.75f};
  check(rejects([&]{(void)overflow.resolve({},largest);}),"Native radiance overflow still refuses instead of clamping stored/exported data");
  for(bool deferred:{false,true}){
   for(float strength:{0.f,3.5f,largest})for(bool covered:{false,true})case_check(normal,strength,2,covered,deferred);
   for(bool covered:{false,true})case_check(overflow,largest,0,covered,deferred);
   case_check(overflow,largest,0,false,deferred,true);
-  // Clamping finite RGB to HALFmax before alpha would incorrectly change1 to.655.
-  case_check(normal,3.5f,0,false,deferred,false,1e-5f,1.f);
-  // Old background2*F32max overflows, but its .25 uncovered fraction is finite.
-  const float alpha=1e-37f;const float expected=float(.5L*static_cast<long double>(largest)*alpha);
-  case_check(partial,largest,2,false,deferred,false,alpha,expected);
+  // Native color alpha is RGB8. Use its actual128/255 instead of assuming
+  // an unsupported tiny typed alpha overrides a fully resolved baked color.
+  case_check(normal,3.5f,0,false,deferred,false,.5f,100000.f*(128.f/255));
  }
  check(glGetError()==GL_NO_ERROR,"HDR display controls leave the actual GL error queue clean");std::cout<<"PASS "<<checks<<" actual HDR preview overflow, coverage, alpha, outline and native-retention controls\n";return 0;
 }catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
