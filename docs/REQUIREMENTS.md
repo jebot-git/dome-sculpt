@@ -40,11 +40,22 @@ zero initial project objects and the exact same82 selected cases are required.
 Read-only CTest registration confirms all82 expected names in the configured
 Release tree; this is registration evidence, not completed test execution.
 
-Parallel work resumes the owned Xvfb wrapper lifetime repair/public Bake GUI
-and actual-loader XR gates, final HDR Arc qualification, and genuine visible
-Source8 source preview plus matching sanitizer coverage. These are scoped
-qualification tasks; no physical-headset, performance, full interoperability or
-whole-goal success is claimed. No system installation or session restart.
+Private full-FLOAT target2bf63267 now has nine software suites/profile and
+18 actual Arc runs passing with strict sanitizer/device/resource evidence in
+[HDR-SCENE-FLOAT32-20261112.md](HDR-SCENE-FLOAT32-20261112.md). Its manifest
+explicitly distinguishes missing optional live hashes from actual live mapped
+file identities and matching pre/post payload hashes. This does not qualify the
+new application or establish physical-headset/performance acceptance.
+
+Second assembly `1af33317` in
+`artifacts/authoring-source8-visible-float32-integration-20261112/` preserves main
+and cc5, adds that full-FLOAT fix, genuine visible Source8 publication and new
+public UV1/FLOAT fixtures. A single CMake test-registration conflict was resolved
+by retaining both new test blocks. This assembly remains unfrozen/uncompiled:
+Source8 strict sanitizer and stronger fractional-alpha coverage are underway;
+the additive public fixture/scenario C++ has not yet compiled or executed.
+Parallel work also investigates native posed humanoid quality using genuine
+source identities. No installation or active session restart.
 
 Independent native weight-quality measurement now compares Legacy, Surface
 Heat and Anatomical methods on genuine complete retained-source VRoid groups,
