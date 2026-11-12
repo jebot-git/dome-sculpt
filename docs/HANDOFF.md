@@ -1,3 +1,42 @@
+## New role-domain candidate frozen; combined Release compilation running — 2026-11-12
+
+New sourcead99ff8ba005c6cc4a22dfe5fcd6d1e2e4dec3e7 is FROZEN/CLEAN/PUSHED at
+`artifacts/authoring-role-domain-integration-20261112/`, branch
+`work/authoring-role-domain-integration-20261112`. It preserves main39b, all5c
+features and evidence, then combines qualified emission-domain repaira8 and the
+unchanged-corpus public oraclef9. Main runtime remains the earlier qualified
+integration; metadata here does not admit the new runtime.
+
+A real mixed-coordinate defect was reproduced on frozen5c: resolvedPBRcarrier1
+incorrectly preferred separately retained logicalUV1. The one-product-TU repair
+passes Release19 and strictSAN19 plus historical worker/source/producer scopes;
+callback/Bake errors fall from3.2/3.875 to4.47e-8/2.38419e-7. All source guards,
+headers, shaders, packets and wire remain unchanged. Read
+[SOURCE-ROLE-DOMAIN-REPAIR-20261112.md](SOURCE-ROLE-DOMAIN-REPAIR-20261112.md).
+
+The old public tiny-case wait was separately a contrast-witness ambiguity: the
+actual oldpoint equals its independent correct control and differs81 from the
+wrong-normal control, but only5 from background. Test-onlyf9 moves one declared
+point within the same triangle/coverage region and preserves all41 corpus bytes,
+all4cases/botheyes and contrast12/correct3/wrong7 bounds. Read
+[SOURCE8-PUBLIC-PROBE-CONTRAST-20261112.md](SOURCE8-PUBLIC-PROBE-CONTRAST-20261112.md).
+Both original failures remain preserved; neither is reclassified as a pass.
+
+New Release audit61476 and final8963-pin audit88592 are terminal0. Exact plan
+759b79ca2329b92113b690db94e3670fb6a23e58070592f84828af1b0b62d920 owns
+1031 TUs:264 fresh/767 authenticated whole reuses,686 fresh/46 exact links and
+3 genuine generators. Native86 retains every old85 case and adds the role-domain
+regression; manual source rendering remains extra. Actual compile64944,
+PID622619, has begun under the reviewed7200s/2jobs/8GiB execution bounds.
+Current86/helpers/raw/freshproducers/font/manual/public qualification is pending.
+
+The separate5c SAN15864 build continues unchanged as a known-defective immutable
+baseline only; no runtime/admission is inferred. Artist-normal WIP remains
+separate. DomeD actual remoteHEAD/current source/SDK remainacc2b70a, verified at
+this freeze. Full original authoring/interoperability/device/accelerator goals
+and later controller trays/spatial nodes/history remain active/incomplete.
+No installation, physical-headset launch or active-session restart.
+
 ## New role-domain repaired application source frozen — 2026-11-12
 
 This new candidate preserves main39b, frozen5c and all integration evidence,
