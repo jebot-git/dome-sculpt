@@ -1,30 +1,41 @@
-## Repaired combined Release build executing — 2026-11-12
+## New role-domain candidate frozen; combined Release compilation running — 2026-11-12
 
-Frozen5c820f is unchanged. The new generated/compile/link DAG audit2370 is
-terminal0 with1030 TUs (263 fresh/767 exact whole objects),685 fresh/46 exact
-archive/link products, exactly3 genuine generators and85 selected native tests.
-Root independently verified the eight-layer topological closure and reviewed
-runnerbd41e490. The derived plan f12b1ec5 adds only toolchain pins/metadata to
-reviewed f2d16263. Read
-[AUTHORING-RELEASE-GENERATED-DAG-20261112.md](AUTHORING-RELEASE-GENERATED-DAG-20261112.md).
+New sourcead99ff8ba005c6cc4a22dfe5fcd6d1e2e4dec3e7 is FROZEN/CLEAN/PUSHED at
+`artifacts/authoring-role-domain-integration-20261112/`, branch
+`work/authoring-role-domain-integration-20261112`. It preserves main39b, all5c
+features and evidence, then combines qualified emission-domain repaira8 and the
+unchanged-corpus public oraclef9. Main runtime remains the earlier qualified
+integration; metadata here does not admit the new runtime.
 
-Actual execution38148/PID4039661 is LIVE: the current blur generator produced
-its required exact SHA, the previously failing paint-blur TU compiled, and root
-observed21 whole TUs complete with live compiler children. Full links and all
-native/public gates remain pending. The failed first execution73720 and v2
-metadata sentinel failure are preserved; no source/provider/flag weakening.
+A real mixed-coordinate defect was reproduced on frozen5c: resolvedPBRcarrier1
+incorrectly preferred separately retained logicalUV1. The one-product-TU repair
+passes Release19 and strictSAN19 plus historical worker/source/producer scopes;
+callback/Bake errors fall from3.2/3.875 to4.47e-8/2.38419e-7. All source guards,
+headers, shaders, packets and wire remain unchanged. Read
+[SOURCE-ROLE-DOMAIN-REPAIR-20261112.md](SOURCE-ROLE-DOMAIN-REPAIR-20261112.md).
 
-Joint Source8 d07 Release AND strict sanitizer pass969 critical controls, Bake4,
-fixture generators3 and all17 affected historical consumers with zero drift.
-The separate old cc5 sanitizer remainder80747/PID3950346 is live with72 of100
-links complete after1642 independent verified copies. Its original7200-second
-ALL timeout remains failure; no remainder native pass is claimed yet.
+The old public tiny-case wait was separately a contrast-witness ambiguity: the
+actual oldpoint equals its independent correct control and differs81 from the
+wrong-normal control, but only5 from background. Test-onlyf9 moves one declared
+point within the same triangle/coverage region and preserves all41 corpus bytes,
+all4cases/botheyes and contrast12/correct3/wrong7 bounds. Read
+[SOURCE8-PUBLIC-PROBE-CONTRAST-20261112.md](SOURCE8-PUBLIC-PROBE-CONTRAST-20261112.md).
+Both original failures remain preserved; neither is reclassified as a pass.
 
-Isolated artist-normal source cbae1fa4 passes actual CPU139 and legacy scopes,
-including genuine imported VRM1 normal-affine export/restoration. StrictSAN
-owning qualification34874 has begun; rendering/CC0 proofs remain pending. This
-future component is not in frozen5c. Full production goal remains active and
-incomplete; no installation, physical headset launch or session restart.
+New Release audit61476 and final8963-pin audit88592 are terminal0. Exact plan
+759b79ca2329b92113b690db94e3670fb6a23e58070592f84828af1b0b62d920 owns
+1031 TUs:264 fresh/767 authenticated whole reuses,686 fresh/46 exact links and
+3 genuine generators. Native86 retains every old85 case and adds the role-domain
+regression; manual source rendering remains extra. Actual compile64944,
+PID622619, has begun under the reviewed7200s/2jobs/8GiB execution bounds.
+Current86/helpers/raw/freshproducers/font/manual/public qualification is pending.
+
+The separate5c SAN15864 build continues unchanged as a known-defective immutable
+baseline only; no runtime/admission is inferred. Artist-normal WIP remains
+separate. DomeD actual remoteHEAD/current source/SDK remainacc2b70a, verified at
+this freeze. Full original authoring/interoperability/device/accelerator goals
+and later controller trays/spatial nodes/history remain active/incomplete.
+No installation, physical-headset launch or active-session restart.
 
 ## Repaired85-test application source frozen; new owning audit live — 2026-11-12
 
