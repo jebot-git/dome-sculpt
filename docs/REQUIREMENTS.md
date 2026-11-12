@@ -16,10 +16,13 @@ and frozen5c; every1709 non-doc Git record matches frozen5c exactly. Read
 [AUTHORING-MAIN-MERGE-STAGING-20261112.md](AUTHORING-MAIN-MERGE-STAGING-20261112.md).
 Only documentation changes here while current5c qualification continues.
 
-Separate old cc5 strictSAN completion80747 has passed all100 links, exact82
-native cases, helpers27/373 and raw90159. Final original/provider/copy hash audit
-is still running; its original7200-second ALL timeout remains failure. Full
-production requirements remain active/incomplete; no install/session restart.
+Separate old cc5 strictSAN completion80747 is terminal0: all100 links, exact82
+native cases, helpers27/373, raw90159 and final original/provider/copy audit pass
+with zero drift. Reviewed compressed evidence and runner are retained in
+[CC5-SANITIZER-REMAINDER-20261112.md](CC5-SANITIZER-REMAINDER-20261112.md).
+The original7200-second ALL timeout remains failure. This does not qualify
+final5c strictSAN; its fresh dependency plan is being prepared. Full production
+requirements remain active/incomplete; no install/session restart.
 
 ## Repaired85-test application source frozen; new owning audit live — 2026-11-12
 
