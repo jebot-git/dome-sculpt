@@ -7,6 +7,12 @@ inline std::string mtoon_renderer_common(){
   return std::string(mtoon_glsl())+R"GLSL(
 uniform int source_frame,canonical_frame,prepared_pbr_frame,retained_normal_domain;
 uniform int mt_mode,mt_outline,mt_present[16],mt_coord[16],mt_derived[16],mt_channel[16];
+// Display-only saturation of positive arithmetic overflow. Finite values,
+// including those above HALF range, keep their original bits until blending.
+// Never use this as native coefficient or interchange validation.
+vec3 dome_preview_positive_finite(vec3 value){
+bvec3 overflow=bvec3(isinf(value.x)&&value.x>0.,isinf(value.y)&&value.y>0.,isinf(value.z)&&value.z>0.);
+return mix(value,vec3(uintBitsToFloat(0x7f7fffffu)),overflow);}
 uniform vec4 mt[12];uniform vec2 mt_offset[16],mt_scale[16];uniform float mt_rotation[16],mt_time;
 uniform vec3 mt_camera_up,mt_camera_forward;uniform float mt_aspect;
 uniform vec3 mt_pbr_x[2],mt_pbr_y[2];
@@ -48,6 +54,20 @@ inline std::string mtoon_renderer_fragment(){return R"GLSL(
 uniform vec4 mt_effective_color,mt_native_color;uniform vec3 mt_effective_emission,mt_native_emission;
 uniform int mt_shade_alias,mt_baked_normal;
 uniform int mt_overlay,mt_absolute_background;uniform float mt_emission_strength;uniform vec3 mt_background;
+vec3 mt_retained_emission(vec3 original,float residual){
+vec3 factor=mt_absolute_background==1?mt_background:mt_effective_emission;
+vec3 background=mt_absolute_background==1?factor:factor*mt_emission_strength;
+vec3 retained=background*original*residual;
+if(any(isinf(background))){
+// A zero source sample or fully covered background contributes exactly zero,
+// even if the unused factor-times-strength product exceeds FLOAT range.
+vec3 weighted=vec3(0);
+if(residual!=0.){
+weighted=factor*original*residual;
+if(mt_absolute_background==0)weighted*=mt_emission_strength;
+weighted=mix(weighted,vec3(0),equal(original,vec3(0)));}
+retained=mix(retained,weighted,isinf(background));}
+return retained;}
 uniform samplerBuffer packedSources;
 uniform ivec4 mt_pack_levels[98],mt_pack_sampler[4];uniform ivec2 mt_pack_info[4];
 vec2 mt_packed_wrap(vec2 q,ivec2 wrap){for(int axis=0;axis<2;++axis){
@@ -138,17 +158,16 @@ vec3 generic=mt_packed_read(2,genericUV).rgb;
 s.emission=coverage==0?mt_effective_emission*original:max(vec3(0),s.emission+(mt_effective_emission*original-mt_native_emission*generic)*(1-coverage));}
 if(mt_overlay==1){float coverage=mt_paint_read(3,paintcoord).a;
 vec3 original=s.emission;
-vec3 background=mt_absolute_background==1?mt_background:mt_effective_emission*mt_emission_strength;
-s.emission=background*original*(1-coverage)+mt_paint_read(1,paintcoord).rgb*mt_emission_strength+mt_paint_read(2,paintcoord).rgb;
+s.emission=mt_retained_emission(original,1-coverage)+mt_paint_read(1,paintcoord).rgb*mt_emission_strength+mt_paint_read(2,paintcoord).rgb;
 }else if(mt_overlay>=2){
 // Native color/normal maps are already resolved. Only emission is evaluated
 // from these separate genuine coefficient fields, in its actual paint domain.
 float coverage=mt_overlay==2?mt_paint_read(6,paintcoord).a:0.;
 vec3 legacy=mt_overlay==2?mt_paint_read(4,paintcoord).rgb:vec3(0);
 vec3 physical=mt_overlay==2?mt_paint_read(5,paintcoord).rgb:vec3(0);
-vec3 background=mt_absolute_background==1?mt_background:mt_effective_emission*mt_emission_strength;
-s.emission=background*s.emission*(1.-coverage)+legacy*mt_emission_strength+physical;
+s.emission=mt_retained_emission(s.emission,1.-coverage)+legacy*mt_emission_strength+physical;
 }else if(mt_absolute_background==1)s.emission*=mt_background;
+s.emission=dome_preview_positive_finite(s.emission);
 s.rim=mt_read(4,mt_uv(4,texcoord,texcoord1,N,V,mask)).rgb;s.matcap=mt_read(5,mt_uv(5,texcoord,texcoord1,N,V,mask)).rgb;
 s.shift=mt_scalar(6,mt_read(6,mt_uv(6,texcoord,texcoord1,N,V,mask)));s.receiveShadow=mt_scalar(9,mt_read(9,mt_uv(9,texcoord,texcoord1,N,V,mask)));s.grade=mt_scalar(10,mt_read(10,mt_uv(10,texcoord,texcoord1,N,V,mask)));
 DomeMToonLight q;q.normal=N;q.view=V;q.direction=normalize(vec3(-.4,.8,.7));q.color=vec3(1);q.giUp=vec3(.25);q.giDown=vec3(.10);q.gi=mix(q.giDown,q.giUp,clamp(.5+.5*N.y,0,1));q.shadow=1;q.normalOriented=true;
