@@ -1,3 +1,14 @@
+## Repaired application candidate frozen for owning compilation — 2026-11-12
+
+This worktree is now FROZEN after genuine parameter, packed-coordinate and
+nested-reader repairs plus qualified mapped-leg support. Read
+[AUTHORING-SOURCE8-REPAIRED-FROZEN-20261112.md](AUTHORING-SOURCE8-REPAIRED-FROZEN-20261112.md).
+A new whole-owning Release audit/build is authorized; actual85/native/manual/
+producer/font gates precede public GUI/XR runs. This does not admit runtime to
+main or claim final historical sanitizer completion. Preserve this source, all
+old9b/cc5 source/providers and original sanitizer timeout. Full goal active and
+incomplete; no installation or active session restart.
+
 ## Sanitizer baseline deadline retained; repaired Source8 joint qualification — 2026-11-12
 
 The actual cc5 strict sanitizer ALL driver38512 is now terminal1: its build hit
