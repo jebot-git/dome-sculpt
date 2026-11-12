@@ -1,43 +1,30 @@
-## Combined Release build passes; native recovery timeout under investigation — 2026-11-12
+## Combined Release gates pass; public and current sanitizer qualification continues — 2026-11-12
 
 Frozen5c820f owning execution38148 is terminal0:3 genuine generators,263 fresh
-complete TUs and685 fresh archive/link steps succeeded;767 whole objects and46
-whole products were authenticated reuses. Final inputdrift is empty, no child
-remains, and root independently verified manifests for1764 owned outputs and813
-staged providers. Read
-[AUTHORING-RELEASE-GENERATED-DAG-20261112.md](AUTHORING-RELEASE-GENERATED-DAG-20261112.md).
+whole TUs and685 fresh archive/link steps complete with zero input drift.
+The corrected default-cache replay77360 passes exact85 native/software cases,
+workspace27/373 and raw90159; all original predicates and timeouts are unchanged.
+The original84/85 recovery timeout and matched33.539-second diagnostic remain
+separate preserved evidence, not retrospective passes.
 
-Actual current85 qualification62399 is terminal1:84 cases passed but
-renderer-recovery timed out at its unchanged180-second bound; inputdrift is empty.
-Helpers/raw/producer/font/manual/public gates remain unstarted. The failure log
-and [scoped record](validation/authoring-native85-failure-20261112.json) are retained.
-The trace completed seven recovery loops without an assertion failure. Forced
-shader-cache disabling is an identified harness difference, not yet a proven
-cause; same-binary isolated diagnostics retain the deadline and all assertions.
-Current candidate remains unqualified and is not admitted to main.
+Fresh current producers180373/27/16417/32794, four-case Source8 UV1/FLOAT producer
+and canonical16px font reference all pass. Additional Source39/40 same-object
+sourceful rendering passes software994 controls and authenticated Arc hardware
+with71 mappedELFs and zero drift. See the
+[matching Release gates](validation/authoring-repaired-release-gates-20261112.json).
+These results permit public workflow checks; they do not establish their outcome.
 
-The same owned recovery binary then passes all ten cycles in33.539seconds with
-an empty isolated cache and normal caching, under the same180-second bound.
-Root verified exact binary identity, no input drift, cache573hits/65misses and
-lease acquisition before child launch. Read the
-[matched diagnostic](validation/authoring-recovery-cache-diagnostic-20261112.json).
-New full85 replay77360/PID136326 is actually running with reviewed runner3850142f:
-only the forced cache-disable override is removed from the lock-equipped runner.
-All predicates, source and deadlines remain intact. The original failed native
-run is preserved and is not retrospectively relabeled.
+Exact5c public GUI then matched real-loader XR orchestration is reviewed with
+current expected361SDK/asset pins plus font, sourceHEAD/clean, genuine scenario
+copies and common-lease/lifetime/device/provider guards. Current5c strictSAN
+owning build15864/PID322583 has begun its initial SHA admission:265 fresh whole
+TUs,765 authenticSAN reuses,685 fresh/46 exact archive/link outputs,3 generators,
+85 native and explicit additional gates. No finalSAN/public acceptance yet.
 
-This branch is a PREPARED merge, not admitted main. Its parents preserve main39b
-and frozen5c; every1709 non-doc Git record matches frozen5c exactly. Read
-[AUTHORING-MAIN-MERGE-STAGING-20261112.md](AUTHORING-MAIN-MERGE-STAGING-20261112.md).
-Only documentation changes here while current5c qualification continues.
-
-Separate old cc5 strictSAN completion80747 is terminal0: all100 links, exact82
-native cases, helpers27/373, raw90159 and final original/provider/copy audit pass
-with zero drift. Reviewed compressed evidence and runner are retained in
-[CC5-SANITIZER-REMAINDER-20261112.md](CC5-SANITIZER-REMAINDER-20261112.md).
-The original7200-second ALL timeout remains failure. This does not qualify
-final5c strictSAN; its fresh dependency plan is being prepared. Full production
-requirements remain active/incomplete; no install/session restart.
+This prepared integration branch preserves both main39b and frozen5c histories;
+every1709 non-doc Git record remains identical to frozen5c. It is not admitted
+to main. Full original production scope and later trays/spatial nodes/history
+remain active/incomplete; no installation or active-session restart.
 
 ## Repaired85-test application source frozen; new owning audit live — 2026-11-12
 
