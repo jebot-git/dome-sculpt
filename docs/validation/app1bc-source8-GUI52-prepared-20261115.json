@@ -1,0 +1,124 @@
+{
+  "schema": 1,
+  "state": "prepared-NOT-executed",
+  "scope": "One unchanged52-check PBR-quarter Source8 GUI regression of App1bc component; old3d inspector/producers/fonts and all old owning/native prerequisites retained. No c54/runtimeDSO use, no new prepared-source GUI coverage, no wholeowning90/main/device/HMD/install acceptance.",
+  "plan": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/app1bc-source8-gui-regression-20261115/GUI-plan-v1.json",
+    "sha256": "d6b9f7db3f6438f72ac3d0a01ec663eadc2091f13d80e71336fdeda00ddfee53"
+  },
+  "actual_readonly_prepare": {
+    "tool": 38119,
+    "exit": 0,
+    "pins": 42008,
+    "drift": [],
+    "no_product_ldd_Xvfb_GUI_or_app_invocation": true
+  },
+  "exact_targets": {
+    "app": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/app1bc-public-component-link-20261115/trial-v2/dome-sculpt",
+      "sha256": "4988652c32940b4506fcceb66db6776f0949018972c8bdcc239421845ccdb042",
+      "source_role": "qualified App1bc application-component; old3d object/literalassets context"
+    },
+    "workflow": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/current-toolchain-guard87-release-20261115/release-3d1643-current-fresh-v2-owning/dome-sculpt-source8-public-fixture",
+      "sha256": "e63608260f9934264203803f49ca0d658dea6ce3be2c2016d3ef54a97981cf06"
+    },
+    "legacy_workflow": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/current-toolchain-guard87-release-20261115/release-3d1643-current-fresh-v2-owning/dome-sculpt-baked-emission-workflow-test",
+      "sha256": "afaa2d33031b347818ad85710b5861eeec2c8baa329e1bfd93775b99af16f150"
+    },
+    "font": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/current-toolchain-guard87-release-20261115/release-3d1643-current-fresh-v2-owning/dome-sculpt-baked-emission-font-reference",
+      "sha256": "b82ee27d5b3a8b2e5897f837eefe4ca155a1ef81a484c5a62f41ec955863d332"
+    },
+    "runtime": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/current-toolchain-guard87-release-20261115/release-3d1643-current-fresh-v2-owning/libdome-sculpt-source8-public-runtime.so",
+      "sha256": "fe2b900cce33fa8ecdd67909ce238d27b416dea137c187fea4cfe94ab0dcb6ad"
+    }
+  },
+  "retained_old_App_target": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/current-toolchain-guard87-release-20261115/release-3d1643-current-fresh-v2-owning/dome-sculpt",
+    "sha256": "0354d66aee34bd1ab08f1d5fb44d33a5f4e17cf1fdcbe4f83d8f832e8e2197b3"
+  },
+  "component_loader_admission": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/app1bc-component-loader-20261115/component-loader-admission-v1.json",
+    "sha256": "cf5f61a82d2931c19205314e8b55c550d535377746f2aa199a2dcb7558885119"
+  },
+  "scenario": {
+    "source": "Unchanged original3d source8-public-menu.py",
+    "sha256": "131a5fc17859cad75b892b71497e7ef7154e9d412b9b91d960dc3cfe91dfaaeb",
+    "byte_identical": true,
+    "required_checks": 52,
+    "original_correct_geometry_wrongnormal_bounds": [
+      3,
+      12,
+      7
+    ],
+    "original_step_seconds": 50,
+    "original_phase_seconds": 900,
+    "original_descendant_RSS_bytes": 6442450944,
+    "runtime_DSO_c54_used": false,
+    "no_fake_runtime_ELF_witness": true
+  },
+  "driver_review": {
+    "driver_sha256": "93ec92ab6ae1ae7badbf7d6a786218288d7d8a090ca9e20a69c7b446492c6727",
+    "cohort_sha256": "d527a34a61a7e2142ce5b398714af0bb8335eff46701625b8e7a22be05859ebe",
+    "only_GUI_pbr_quarter_CLI": true,
+    "old_prerequisites_and_checks_retained": true,
+    "new_app_path_hash_additive_only": true,
+    "old_private_Xvfb_health_and_provider_pins_exact": true,
+    "old_V3_V2_and_processobserver_byteidentical": true,
+    "root_pinned_review_required_before_GUI": true,
+    "NB_busy_waits_before_any_graphics_child": true,
+    "private_XDG_and_blocked_physical_XR": true
+  },
+  "not_coverage": [
+    "New prepared-source public UI scenarios",
+    "Whole source1bc/0ae/native90 owning build or main acceptance",
+    "Physical-HMD/performance/install/active desktop effects"
+  ],
+  "files": {
+    "cohort.py": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/app1bc-source8-gui-regression-20261115/cohort.py",
+      "raw_sha256": "d527a34a61a7e2142ce5b398714af0bb8335eff46701625b8e7a22be05859ebe",
+      "sha256": "d527a34a61a7e2142ce5b398714af0bb8335eff46701625b8e7a22be05859ebe",
+      "bytes": 3695
+    },
+    "run-component-gui-v1.py": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/app1bc-source8-gui-regression-20261115/run-component-gui-v1.py",
+      "raw_sha256": "93ec92ab6ae1ae7badbf7d6a786218288d7d8a090ca9e20a69c7b446492c6727",
+      "sha256": "93ec92ab6ae1ae7badbf7d6a786218288d7d8a090ca9e20a69c7b446492c6727",
+      "bytes": 17771
+    },
+    "prepare-v1.py": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/app1bc-source8-gui-regression-20261115/prepare-v1.py",
+      "raw_sha256": "7910ce6c5e69fd827fa15c772e04cd72fcacc3b2feb60d8ce92dad0087ca9250",
+      "sha256": "7910ce6c5e69fd827fa15c772e04cd72fcacc3b2feb60d8ce92dad0087ca9250",
+      "bytes": 3111
+    },
+    "GUI-plan-v1.json.gz": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/app1bc-source8-gui-regression-20261115/GUI-plan-v1.json",
+      "raw_sha256": "d6b9f7db3f6438f72ac3d0a01ec663eadc2091f13d80e71336fdeda00ddfee53",
+      "sha256": "374deb94b181c9d76ec5f6198ed161312552d7277e8b843dfad02b5629390c36",
+      "bytes": 1957947
+    },
+    "cohort-admission-preview-v1.json.gz": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/app1bc-source8-gui-regression-20261115/cohort-admission-preview-v1.json",
+      "raw_sha256": "c194a0c184194bd7f5eb7917a2745a437861a5516d53107485e1866e29781565",
+      "sha256": "ec566639512f39bcd7e53dca10333837e18fb42b80d76896cb62a51046abffbe",
+      "bytes": 1955074
+    },
+    "qualified-v4-to-component-v1.diff.gz": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/app1bc-source8-gui-regression-20261115/qualified-v4-to-component-v1.diff",
+      "raw_sha256": "3e561a7d0e20287e71a82ab65ee9309952201f75ac36046232121fccf94bb2da",
+      "sha256": "07119094931e51b21d250d6f603539f95ba7e4632844818b447c87c67c9b4d95",
+      "bytes": 3717
+    },
+    "prepare-v1.log.gz": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/app1bc-source8-gui-regression-20261115/prepare-v1.log",
+      "raw_sha256": "94b84eb74b80ad2896875dd984b1af3bcc48bcf03c222e53feff27632224d7bb",
+      "sha256": "bac44b85320d1451312d6cb6d0c7e3e277f4909eaeb2cb34bbbeb5f902d1e264",
+      "bytes": 500
+    }
+  }
+}
