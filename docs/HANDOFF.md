@@ -1,3 +1,29 @@
+## Goal resumed; final combined candidate qualification — 2026-11-15
+
+The user resumed the full production goal. The earlier pause is superseded;
+all original requirements and later controller trays/spatial nodes remain required.
+Frozen checkpoint `3d164382` remains the current combined source, with prospective
+87 native cases. Main runtime has not admitted it. Release and strict sanitizer
+whole-owner plans are being rederived in new `guard87-final-owning-*-20261115`
+artifact directories; no final87 application acceptance is claimed.
+
+The first unchanged Release audit correctly refused stale historical SDK paths.
+Project source2881, saved1117 owned products and708 whole link products remain
+byte-identical. Thirteen system font DSOs changed and three old Cairo paths are
+missing. All16 canonical counterparts under `/opt/fltk-vr/bdf-runtime/lib`
+match the original expected hashes exactly, and the canonical runtime checker
+passes there. New plans explicitly record the exact16 provider relocation,
+configure against the canonical prefix and rederive actual compiler/header/link
+closure; historical receipts and the failed audit remain unchanged. Default
+system font-runtime acceptance is not inferred. No system installation or
+active-session restart is needed for this private build.
+
+Next: finish coherent matching Release/SAN builds, exact87 native and all extra
+helper/producer/font/manual gates, then public GUI/real-loader XR before any
+runtime admission. Component62+19 R/S proof is retained; it does not substitute
+for the combined candidate. The full authoring/interoperability/device/backend
+objective remains incomplete. Read the [resume drift receipt](validation/RESUME-SYSTEM-PROVIDER-DRIFT-20261115.json).
+
 ## Current round closed; user-requested pause — 2026-11-12
 
 The user requested “Pause after this round.” The running jobs have finished;

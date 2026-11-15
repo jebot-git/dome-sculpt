@@ -1,0 +1,90 @@
+{
+  "baseline": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-source8-hdr-fit-owning-build-20261112/sdk-pins.json",
+  "checked": 418,
+  "mismatches": [
+    {
+      "path": "/usr/lib64/libfreetype.so.6.20.6",
+      "expected": "826c2bf3007f04253719b5492314fb0521e5f6c4a55b9d18e48995b7d1f95c97",
+      "actual": "7746f939164d12a6830163d9638e2ef90412e5852226a832401c75e2efb39133"
+    },
+    {
+      "path": "/usr/lib64/libharfbuzz.so.0.61410.0",
+      "expected": "0a4db8370eeb4f566cee39291bc3b287cb6f289c35da93dab2736e7e63c3964b",
+      "actual": "25f4dbbc5f7983f24de22f2ac09db78fb4894c07ac6ea06f0a4d004c1caa9613"
+    },
+    {
+      "path": "/usr/lib64/libharfbuzz-subset.so.0.61410.0",
+      "expected": "372f77867e3984a7ae9f30bc6406df116b5229236cc201f3e6587d1c00b989f5",
+      "actual": "60a5fba349a5e7b665f992ea50cceb5e72d6b344658b55c1224122c248f76927"
+    },
+    {
+      "path": "/usr/lib64/libharfbuzz-raster.so.0.61410.0",
+      "expected": "eed48e6d0c2e0fcb0898246103123b3df3d05393523f99e171072bcd04a813a6",
+      "actual": "5fd4af0b871370ef90c81302f6c7a9b65c90175be91d01f82537824736208359"
+    },
+    {
+      "path": "/usr/lib64/libharfbuzz-vector.so.0.61410.0",
+      "expected": "5dca459bb1dd5ecb39c9f86b202d180d21ce278577585d8bd63188d53c5d2427",
+      "actual": "a5068aefd542675639d84a83c30766f03ac83d697efeeb4aeac9e606a855b1dc"
+    },
+    {
+      "path": "/usr/lib64/libharfbuzz-gpu.so.0.61410.0",
+      "expected": "d191c008e4e8e5800ae60b82d0ef7860843027d119582068ff5177068c0187d9",
+      "actual": "d753615e2f64655925e061efff1ed3a2c5bd26e86baa1f059cb8f8003eadc4d7"
+    },
+    {
+      "path": "/usr/lib64/libharfbuzz-cairo.so.0.61410.0",
+      "expected": "32b015b0fcb9929be081a60a50be2472b31c858993f74a98099ff247d22090d6",
+      "actual": "0e8190382f13656b2b872ffc0fefe3165f30dac345db1749f1166a48b27b66b9"
+    },
+    {
+      "path": "/usr/lib64/libharfbuzz-icu.so.0.61410.0",
+      "expected": "e34a8244ec0c52242ee55ab2cdb615cef748ba3132c32b9d7f16550d681d826e",
+      "actual": "c846a0f2ef63b092321db3eb81ff926e69c4146104c6ce555b9a5305a3045dad"
+    },
+    {
+      "path": "/usr/lib64/libharfbuzz-gobject.so.0.61410.0",
+      "expected": "f587f187e228e72ab8a738369324088c1ad9d3ab30632f6136ea8241066a672e",
+      "actual": "92c611fae67d79c7bafa84f3e3258b42f1320c7bd60639ae4b50f7bb7678516e"
+    },
+    {
+      "path": "/usr/lib64/libpango-1.0.so.0.5701.0",
+      "expected": "ad013881745907f482bc5ca19cca65e271f7b633eaa9c5454b59a12df7d69508",
+      "actual": "e0802204ae1d47641f191390b72d618cde38b3488bd34830a00878491e508a6d"
+    },
+    {
+      "path": "/usr/lib64/libpangoft2-1.0.so.0.5701.0",
+      "expected": "35c87da88ff4e49e3a5f4aacffcadc4f7c5713f90a53d22e6d294e8b1529a150",
+      "actual": "933e2e51f802f8c1316b4e3de9d164bbea80886cc7896d57c6ac7063747969aa"
+    },
+    {
+      "path": "/usr/lib64/libpangoxft-1.0.so.0.5701.0",
+      "expected": "62a472dd00d461c7ba6338aa8f08d6c54ca938fb3859da0a91cf70239f9ed6bf",
+      "actual": "ee50e886513fbf8635571f27b736d8df621a87dd8b3fe5dd8cd88ff883e6ddb7"
+    },
+    {
+      "path": "/usr/lib64/libpangocairo-1.0.so.0.5701.0",
+      "expected": "5d54308b9de75f3187ffcf4d93e682343ceecb823783ac41c1146fc2ec628b5c",
+      "actual": "d9bf6aa89e5ad4690c349f3b3099c3b813c46140fd48ddfda66d1dcd8d9cdce9"
+    },
+    {
+      "path": "/usr/lib64/libcairo.so.2.11804.4",
+      "expected": "1ed911142499c8022051224ef7afe1cf07b91600976b7a16c26d5d0776911444",
+      "actual": null
+    },
+    {
+      "path": "/usr/lib64/libcairo-gobject.so.2.11804.4",
+      "expected": "0ac407f39338903444f04fb308ad96ed9f3c4d3d1a6fd568bdd6943eb0510125",
+      "actual": null
+    },
+    {
+      "path": "/usr/lib64/libcairo-script-interpreter.so.2.11804.4",
+      "expected": "41404a8e46b4d25889eb43bdaa943ef31f0963f0c0bc5e3b46cb1669b46857ec",
+      "actual": null
+    }
+  ],
+  "old_receipts_untouched": true,
+  "canonical_relocation_receipt": "artifacts/guard87-final-owning-release-plan-20261115/canonical-sdk-relocation.json",
+  "source_checkpoint": "3d1643827dd56e1b2ef1d57b8a9c6ff1e4211a2c",
+  "claim": "Original failures preserved; exact canonical counterparts verified, new build/runtime qualification required."
+}
