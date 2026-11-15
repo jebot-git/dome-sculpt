@@ -53,6 +53,7 @@ def drive_case(name,mode):
  original=inspect(project,env);expected=inspect(fixtures[expected_key],env);stamp=project.stat().st_mtime_ns
  args=[str(app),'--xr','--open',str(project),'--save',str(result)]
  (case/'invocation.json').write_text(json.dumps({'args':args,'mode':mode,'source':source_key,'expected':expected_key,'settings':manifest['default_settings']},indent=2)+'\n')
+ if not shader_cache_events:assert not any(p.is_file()for p in shader_cache_root.rglob('*')),'The first actual app starts before any shader code cache entry exists'
  log=(case/'app.log').open('w');case_started=time.monotonic();process=subprocess.Popen(args,env=env,stdout=log,stderr=subprocess.STDOUT);case_pid=process.pid
  history=True;phases=[('accepted',expected),('undone',original),('redone',expected)]
  deadline=suite_deadline
