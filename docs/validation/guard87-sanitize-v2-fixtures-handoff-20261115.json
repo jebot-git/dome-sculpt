@@ -1,0 +1,90 @@
+{
+  "state": "terminal",
+  "exit": 0,
+  "source": "3d1643827dd56e1b2ef1d57b8a9c6ff1e4211a2c",
+  "status": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-current-sanitize-completion-20261115/sanitize-completion-v2-fixtures/status.json",
+    "sha256": "157abb8ecf1f55b17552e79cc36a209a10a7119972dd0d96398d20ed66ef9314"
+  },
+  "steps": [
+    {
+      "name": "source-worker",
+      "exit": 0,
+      "seconds": 2.66902232170105,
+      "log_sha256": "a7ca7e1ab59a4671442801acaed48c5b6bd9c671d2ea93e2b47f84be2e1a92f6"
+    },
+    {
+      "name": "source-controls",
+      "exit": 0,
+      "seconds": 0.16431379318237305,
+      "log_sha256": "ab73a85e4061866266085d9ea5efa44ce266e860b57fba3c712bd9210a52ae49"
+    },
+    {
+      "name": "original-worker",
+      "exit": 0,
+      "seconds": 0.66538405418396,
+      "log_sha256": "536147bd07f4599ce084da08c68ff6a90df3f2f2bffc3968db5dbe39fc3606c3"
+    },
+    {
+      "name": "original-public-producer",
+      "exit": 0,
+      "seconds": 0.5154881477355957,
+      "log_sha256": "e26b5858ea586a0ccd2bb83aec1e07858051e25e72cf93611f41c275b105c000"
+    },
+    {
+      "name": "source8-public-producer",
+      "exit": 0,
+      "seconds": 3.2854955196380615,
+      "log_sha256": "244de9cedf83c859c36f3854bf28ed0c5e118ebdb39619ef000b6bae01f55e40"
+    },
+    {
+      "name": "font-reference",
+      "exit": 0,
+      "seconds": 12.238627910614014,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "input_drift": [],
+  "graphics_lease": {
+    "path": "/tmp/dome-sculpt-arc-device.lock",
+    "acquired_epoch": 1794767797.6790528,
+    "owner_pid": 3708058,
+    "stat": {
+      "device": 41,
+      "inode": 11487
+    },
+    "before_any_built_product": true,
+    "released_epoch": 1794768002.2077897
+  },
+  "independent_NB_probe": {
+    "epoch": 1794768059.2805693,
+    "inode": 11487,
+    "device": 41,
+    "available": true
+  },
+  "remaining_owned_processes": [],
+  "pids_gone": [
+    3708058,
+    3731978,
+    3732434,
+    3732461,
+    3732556,
+    3732654,
+    3733203
+  ],
+  "unit_terminal": {
+    "Id": "dome-sculpt-sanitize-fixtures-20261115-v2.service",
+    "ActiveState": "active",
+    "SubState": "exited",
+    "InvocationID": "ee846121d7114fe382e6754c449ee327",
+    "RuntimeMaxUSec": "1h 40min",
+    "MainPID": "0",
+    "Result": "success",
+    "ExecMainStartTimestamp": "Sun 2026-11-15 19:33:31 CET",
+    "ExecMainExitTimestamp": "Sun 2026-11-15 19:40:02 CET",
+    "ExecMainPID": "3708058",
+    "ExecMainCode": "1",
+    "ExecMainStatus": "0",
+    "ControlGroup": ""
+  }
+}

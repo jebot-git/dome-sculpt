@@ -1,0 +1,228 @@
+{
+  "source": "3d1643827dd56e1b2ef1d57b8a9c6ff1e4211a2c",
+  "scope": "Strict current baseline3d SAN source producers/font and independent Source39/40 software rendering only; no successor90 or full production goal completion.",
+  "state": "terminal",
+  "exit": 0,
+  "script_v2_sha256": "6f0de11f5b43c05ac0cb2a8849f9785d6ff47e66c080570887d8cf858efb02ee",
+  "same_complete_expected_before_and_uncached_after_files": true,
+  "native87_prerequisite": "terminal0/567.031933s,workspace27/workspace373/raw90159 all0",
+  "phase_results": {
+    "fixtures": {
+      "state": "terminal",
+      "exit": 0,
+      "status_sha256": "157abb8ecf1f55b17552e79cc36a209a10a7119972dd0d96398d20ed66ef9314",
+      "input_drift": [],
+      "steps": [
+        {
+          "name": "source-worker",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/guard87-current-sanitize-completion-20261115/sanitize-3d1643-completion-v1-owning/dome-sculpt-baked-emission-workflow-test",
+            "--source-worker-controls",
+            "/home/blux/de-xr/dome-sculpt/artifacts/guard87-current-sanitize-completion-20261115/sanitize-completion-v2-fixtures/source-worker"
+          ],
+          "timeout_seconds": 900,
+          "started": 1794767797.6792607,
+          "pid": 3731978,
+          "identity": {
+            "start": 27079668,
+            "pgrp": 3731978
+          },
+          "exit": 0,
+          "seconds": 2.66902232170105,
+          "log_sha256": "a7ca7e1ab59a4671442801acaed48c5b6bd9c671d2ea93e2b47f84be2e1a92f6"
+        },
+        {
+          "name": "source-controls",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/guard87-current-sanitize-completion-20261115/sanitize-3d1643-completion-v1-owning/dome-sculpt-baked-emission-workflow-test",
+            "--source-controls"
+          ],
+          "timeout_seconds": 60,
+          "started": 1794767800.3485727,
+          "pid": 3732434,
+          "identity": {
+            "start": 27079935,
+            "pgrp": 3732434
+          },
+          "exit": 0,
+          "seconds": 0.16431379318237305,
+          "log_sha256": "ab73a85e4061866266085d9ea5efa44ce266e860b57fba3c712bd9210a52ae49"
+        },
+        {
+          "name": "original-worker",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/guard87-current-sanitize-completion-20261115/sanitize-3d1643-completion-v1-owning/dome-sculpt-baked-emission-workflow-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/guard87-current-sanitize-completion-20261115/sanitize-completion-v2-fixtures/original-worker"
+          ],
+          "timeout_seconds": 900,
+          "started": 1794767800.513234,
+          "pid": 3732461,
+          "identity": {
+            "start": 27079951,
+            "pgrp": 3732461
+          },
+          "exit": 0,
+          "seconds": 0.66538405418396,
+          "log_sha256": "536147bd07f4599ce084da08c68ff6a90df3f2f2bffc3968db5dbe39fc3606c3"
+        },
+        {
+          "name": "original-public-producer",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/guard87-current-sanitize-completion-20261115/sanitize-3d1643-completion-v1-owning/dome-sculpt-baked-emission-workflow-test",
+            "--public-fixtures",
+            "/home/blux/de-xr/dome-sculpt/artifacts/guard87-current-sanitize-completion-20261115/sanitize-completion-v2-fixtures/original-fixtures"
+          ],
+          "timeout_seconds": 900,
+          "started": 1794767801.179051,
+          "pid": 3732556,
+          "identity": {
+            "start": 27080018,
+            "pgrp": 3732556
+          },
+          "exit": 0,
+          "seconds": 0.5154881477355957,
+          "log_sha256": "e26b5858ea586a0ccd2bb83aec1e07858051e25e72cf93611f41c275b105c000"
+        },
+        {
+          "name": "source8-public-producer",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/guard87-current-sanitize-completion-20261115/sanitize-3d1643-completion-v1-owning/dome-sculpt-source8-public-fixture",
+            "--public-fixtures",
+            "/home/blux/de-xr/dome-sculpt/artifacts/guard87-current-sanitize-completion-20261115/sanitize-completion-v2-fixtures/source8-fixtures"
+          ],
+          "timeout_seconds": 900,
+          "started": 1794767801.6951737,
+          "pid": 3732654,
+          "identity": {
+            "start": 27080071,
+            "pgrp": 3732654
+          },
+          "exit": 0,
+          "seconds": 3.2854955196380615,
+          "log_sha256": "244de9cedf83c859c36f3854bf28ed0c5e118ebdb39619ef000b6bae01f55e40"
+        },
+        {
+          "name": "font-reference",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/guard87-current-sanitize-completion-20261115/sanitize-3d1643-completion-v1-owning/dome-sculpt-baked-emission-font-reference",
+            "/home/blux/de-xr/dome-sculpt/artifacts/guard87-current-sanitize-completion-20261115/sanitize-completion-v2-fixtures/titles.json"
+          ],
+          "timeout_seconds": 180,
+          "started": 1794767804.9814134,
+          "pid": 3733203,
+          "identity": {
+            "start": 27080398,
+            "pgrp": 3733203
+          },
+          "exit": 0,
+          "seconds": 12.238627910614014,
+          "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "graphics_lease": {
+        "path": "/tmp/dome-sculpt-arc-device.lock",
+        "acquired_epoch": 1794767797.6790528,
+        "owner_pid": 3708058,
+        "stat": {
+          "device": 41,
+          "inode": 11487
+        },
+        "before_any_built_product": true,
+        "released_epoch": 1794768002.2077897
+      },
+      "references": {
+        "status.json": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-current-sanitize-completion-20261115/sanitize-completion-v2-fixtures/status.json",
+          "sha256": "157abb8ecf1f55b17552e79cc36a209a10a7119972dd0d96398d20ed66ef9314",
+          "compressed": "guard87-sanitize-v2-fixtures-status-json-20261115.gz",
+          "compressed_sha256": "5887d405c221ed4530c282bbe5a55ab80dbbcd31cfaf944399c1872d85c75d0e"
+        },
+        "inputs-before.json": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-current-sanitize-completion-20261115/sanitize-completion-v2-fixtures/inputs-before.json",
+          "sha256": "c5d7039372679992c07700d97564d00d5dd4c4ec21ca6ab5a9d9dc3f71f6b0bb",
+          "compressed": "guard87-sanitize-v2-fixtures-inputs-before-json-20261115.gz",
+          "compressed_sha256": "d52a6e8d35cc0bb56f5f8b239473e0cd7caa3c71738ad9e0aa7cbdc11dee1122"
+        },
+        "inputs-after.json": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-current-sanitize-completion-20261115/sanitize-completion-v2-fixtures/inputs-after.json",
+          "sha256": "efae69c6cbe204b6b6b0aa25ce8ef0a377c203864c28bf1f348cedb3fd0b1dc0",
+          "compressed": "guard87-sanitize-v2-fixtures-inputs-after-json-20261115.gz",
+          "compressed_sha256": "8b07f427caa9b6dcf07d3f181995cf0523e8e785f36d9849789ca40a37e9697c"
+        },
+        "generated_artifacts": {
+          "count": 221,
+          "compressed": "guard87-sanitize-v2-fixtures-generated-artifacts-20261115.json.gz",
+          "compressed_sha256": "358b3da5d837e7f9cb8b7c74769ef89050c1c1563869c8abd692b6e2e438c0d2",
+          "decompressed_sha256": "1adcdebfa417e82177b1522386fc121f861455a25c6097636008b61856a1c332"
+        }
+      }
+    },
+    "manual-software": {
+      "state": "terminal",
+      "exit": 0,
+      "status_sha256": "1900bf4f1271b5aa06f756a73f95783739485073118e613a52c18942278d2840",
+      "input_drift": [],
+      "steps": [
+        {
+          "name": "manual-source-render-software",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/guard87-current-sanitize-completion-20261115/sanitize-3d1643-completion-v1-owning/dome-sculpt-texture-set-source-render-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/guard87-current-sanitize-completion-20261115/sanitize-completion-v2-manual-software/source-render"
+          ],
+          "timeout_seconds": 900,
+          "started": 1794768246.8977125,
+          "pid": 3792366,
+          "identity": {
+            "start": 27124590,
+            "pgrp": 3792366
+          },
+          "exit": 0,
+          "seconds": 25.464288473129272,
+          "log_sha256": "6e6a1d2fac690b41b67270ff6558271df55a7228d2012244d6b9a9ae0c0d297e"
+        }
+      ],
+      "graphics_lease": {
+        "path": "/tmp/dome-sculpt-arc-device.lock",
+        "acquired_epoch": 1794768246.897515,
+        "owner_pid": 3766303,
+        "stat": {
+          "device": 41,
+          "inode": 11487
+        },
+        "before_any_built_product": true,
+        "released_epoch": 1794768455.6768563
+      },
+      "references": {
+        "status.json": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-current-sanitize-completion-20261115/sanitize-completion-v2-manual-software/status.json",
+          "sha256": "1900bf4f1271b5aa06f756a73f95783739485073118e613a52c18942278d2840",
+          "compressed": "guard87-sanitize-v2-manual-software-status-json-20261115.gz",
+          "compressed_sha256": "fdddcd35819ed4d62abdce304e92a36e39f04a4e1f212f94a6344121425088a2"
+        },
+        "inputs-before.json": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-current-sanitize-completion-20261115/sanitize-completion-v2-manual-software/inputs-before.json",
+          "sha256": "c5d7039372679992c07700d97564d00d5dd4c4ec21ca6ab5a9d9dc3f71f6b0bb",
+          "compressed": "guard87-sanitize-v2-manual-software-inputs-before-json-20261115.gz",
+          "compressed_sha256": "d52a6e8d35cc0bb56f5f8b239473e0cd7caa3c71738ad9e0aa7cbdc11dee1122"
+        },
+        "inputs-after.json": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-current-sanitize-completion-20261115/sanitize-completion-v2-manual-software/inputs-after.json",
+          "sha256": "9eca6e7374c3b8c305c903c729e930e5b69e6af0e691cfd08b5f0a6a73edeceb",
+          "compressed": "guard87-sanitize-v2-manual-software-inputs-after-json-20261115.gz",
+          "compressed_sha256": "54819d58751287713078aab6d78e78ff13b96ce60afb0cb795c46b78035f9241"
+        },
+        "generated_artifacts": {
+          "count": 85,
+          "compressed": "guard87-sanitize-v2-manual-software-generated-artifacts-20261115.json.gz",
+          "compressed_sha256": "971f4ccd7477548c18d337dd520fdef5267de3caa32d23e558dda6e4eb3fe5a6",
+          "decompressed_sha256": "aab9d55fc74d983978f38e26fb5ab510d15e495998f5ad1e348b1bd0a1a14f42"
+        }
+      }
+    }
+  },
+  "all_owned_services_stopped": true,
+  "all_owned_processes_gone": true,
+  "last_lease_released_epoch": 1794768455.6768563,
+  "last_independent_NB_probe_epoch": 1794768511.8300028,
+  "original143_and_historical_failures_unchanged": true
+}
