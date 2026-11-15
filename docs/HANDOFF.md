@@ -1,3 +1,27 @@
+## Prepared-normal native milestone integrated as a draft — 2026-11-15
+
+Functional product1bc13125 with finite-only fixture1740fb9d now passes current
+Release and monitored strict ASan/UBSan component scopes91+62/19/139/9/856/32,
+including both actual CC0 bases, source-role directions/radiance, native archive
+and ordered Save/Undo/Redo. Prior allocation/argument/ownership/external143
+failures remain unchanged. The strict run records no external signals, zero
+input drift and actual owned RSS below8GiB (about3.04GB); its transient user
+unit is finished/stopped. Read
+[the native component seal](ARTIST-PREPARED-SOURCE-NATIVE-20261115.md).
+
+Isolated draft branch `work/authoring-normal-integration-20261115` preserves
+qualified component1740, main118e metadata and both histories. Its non-document
+bytes remain EXACT1740:3 changed existing product TUs, one new private header,
+three new native cases (prospective90), with existing headers/shaders/packets/wires
+unchanged. It is UNFROZEN, not admitted to main runtime and has no owning build.
+Actual graphical artist/prepared-result consumers and a matching combined
+cohort remain required. Existing FLTK/XR Bake controls share the Document source
+picker/worker route; this adds native backend behavior, not another frontend.
+
+The separate frozen3d public GUI now launches after private test-display repair;
+its matrix/XR and full sanitizer completion remain pending. No system install or
+session restart. All original production requirements remain active/incomplete.
+
 ## Current Release native and hardware gates pass; public display repair — 2026-11-15
 
 Frozen source3d finishes all1032 compiler/733 archive-link/3 generator steps;
