@@ -9,15 +9,18 @@ namespace {
 // Independent double-precision consumer: no production basis, sampler or
 // source-normal resolver is used to derive the expected directions.
 using D=std::array<double,3>;
+void finite_sample(D a){for(auto v:a)if(!std::isfinite(v))throw std::runtime_error("Independent consumer encountered a nonfinite sample");}
 D add(D a,D b){for(size_t k=0;k<3;++k)a[k]+=b[k];return a;}
 D mul(D a,double s){for(auto &v:a)v*=s;return a;}
-D unit(D a){double n=0;for(auto v:a)n+=v*v;if(n<1e-20)throw std::runtime_error("Independent singular normal");return mul(a,1/std::sqrt(n));}
+D unit(D a){finite_sample(a);double n=0;for(auto v:a)n+=v*v;if(!std::isfinite(n)||n<1e-20)throw std::runtime_error("Independent singular normal");return mul(a,1/std::sqrt(n));}
 D vc(Vec3 a){return {a.x,a.y,a.z};}
 D crossd(D a,D b){return {a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]};}
 D sample(const Image &im,std::array<double,2> uv,bool srgb=false){
- const double x=uv[0]*im.width-.5,y=uv[1]*im.height-.5;const int ix=int(std::floor(x)),iy=int(std::floor(y));D out{};
+ if(!std::isfinite(uv[0])||!std::isfinite(uv[1])||!im.width||!im.height||im.rgba.size()!=size_t(im.width)*im.height*4)throw std::runtime_error("Independent consumer has invalid finite image/UV input");
+ const double x=uv[0]*im.width-.5,y=uv[1]*im.height-.5;
+ if(!std::isfinite(x)||!std::isfinite(y)||std::abs(x)>1e9||std::abs(y)>1e9)throw std::runtime_error("Independent consumer image coordinate exceeds finite bounds");const int ix=int(std::floor(x)),iy=int(std::floor(y));D out{};
  for(int dy=0;dy<2;++dy)for(int dx=0;dx<2;++dx){const auto px=std::clamp(ix+dx,0,int(im.width)-1),py=std::clamp(iy+dy,0,int(im.height)-1);const double w=(dx?x-ix:1-(x-ix))*(dy?y-iy:1-(y-iy));for(size_t c=0;c<3;++c){double value=im.rgba[(size_t(py)*im.width+px)*4+c]/255.;if(srgb)value=value<=.04045?value/12.92:std::pow((value+.055)/1.055,2.4);out[c]+=w*value;}}
- return out;
+ finite_sample(out);return out;
 }
 D direction(const SculptObject &o,size_t triangle,std::array<float,3> bary,size_t role){
  const auto &binding=*o.material_bindings;const auto &frames=role==0?*binding.normal_frames->pbr:*binding.normal_frames->mtoon;
@@ -29,7 +32,7 @@ D direction(const SculptObject &o,size_t triangle,std::array<float,3> bary,size_
  D ts{(encoded[0]*2-1)*scale,(encoded[1]*2-1)*scale,encoded[2]*2-1};
  return unit(add(add(mul(t,ts[0]),mul(b,ts[1])),mul(n,ts[2])));
 }
-double error(D a,Vec3 b){double e=0;for(size_t k=0;k<3;++k)e=std::max(e,std::abs(a[k]-vc(b)[k]));return e;}
+double error(D a,Vec3 b){finite_sample(a);finite_sample(vc(b));double e=0;for(size_t k=0;k<3;++k)e=std::max(e,std::abs(a[k]-vc(b)[k]));return e;}
 std::shared_ptr<const SourceMaterialBindings> blank_typed(bool legacy){
  auto b=std::make_shared<SourceMaterialBindings>();b->material=legacy?MToonMaterial::from_vrm0({{"shader","VRM/MToon"}}):MToonMaterial::from_vrm1({{"extensions",{{"VRMC_materials_mtoon",{{"specVersion","1.0"}}}}}});b->validate();return b;
 }
@@ -56,20 +59,22 @@ void emission_guards(const Scene &baseline,uint64_t source,const ObjectBakeSetti
   if(genuine){
    const std::array<float,3> bary{.2f,.3f,.5f};std::array<double,2> uv{};
    const auto &mesh=o.painted->mesh();for(size_t k=0;k<3;++k)for(size_t c=0;c<2;++c)uv[c]+=mesh.uv[mesh.indices[k]][c]*bary[k];
+   if(!std::isfinite(uv[0])||!std::isfinite(uv[1]))throw std::runtime_error("Independent emission coordinates are nonfinite");
    const double weight=std::clamp(2*(1-uv[0])-.5,0.,1.);const double wrong_weight=std::clamp(2*uv[0]-.5,0.,1.);
    const D wanted{(hdr?2:.5)*(1-weight),0,(hdr?4:1)*weight};
    const D wrong{(hdr?2:.5)*(1-wrong_weight),0,(hdr?4:1)*wrong_weight};
+   finite_sample(wanted);finite_sample(wrong);
    double gap=0;for(size_t c=0;c<3;++c)gap=std::max(gap,std::abs(wanted[c]-wrong[c]));
    check(gap>.1,"Independent emission UV1 positive differs visibly from current writable UV0");
    const auto callback=detail::emission_bake_source(o);
-   if(hdr){check(bool(callback),"Prepared HDR genuine UV1 retains its actual FLOAT callback");const auto value=callback(0,bary);double e=0;for(size_t c=0;c<3;++c)e=std::max(e,std::abs(wanted[c]-value[c]));check(e<3e-6,"Independent HDR emitter oracle proves original genuine UV1 rather than writable UV0 sampling");}
+   if(hdr){check(bool(callback),"Prepared HDR genuine UV1 retains its actual FLOAT callback");const auto value=callback(0,bary);finite_sample({value[0],value[1],value[2]});double e=0;for(size_t c=0;c<3;++c)e=std::max(e,std::abs(wanted[c]-value[c]));check(e<3e-6,"Independent HDR emitter oracle proves original genuine UV1 rather than writable UV0 sampling");}
    const auto raw=detail::raw_bake_source(o);check(bool(raw),"Prepared normal source retains genuine authored emission UV1 in raw capture");
-   if(!hdr){check(raw->source_only&&raw->normal_projection&&raw->overlay&&raw->source_maps&&raw->source_maps->emission.texcoord==1&&raw->source_maps->uv1,"Prepared LDR source retains actual independent raw material and normal owners");std::array<double,2> logical{};for(size_t k=0;k<3;++k)for(size_t c=0;c<2;++c)logical[c]+=raw->source_maps->uv1->at(mesh.indices[k])[c]*bary[k];auto value=sample(*raw->source_maps->emission.image,logical,true);for(size_t c=0;c<3;++c)value[c]*=o.material.emissive[c];double e=0;for(size_t c=0;c<3;++c)e=std::max(e,std::abs(wanted[c]-value[c]));check(e<3e-6,"Independent LDR raw-role decoder proves genuine UV1 transport before actual Bake");}
+   if(!hdr){check(raw->source_only&&raw->normal_projection&&raw->overlay&&raw->source_maps&&raw->source_maps->emission.texcoord==1&&raw->source_maps->uv1,"Prepared LDR source retains actual independent raw material and normal owners");std::array<double,2> logical{};for(size_t k=0;k<3;++k)for(size_t c=0;c<2;++c)logical[c]+=raw->source_maps->uv1->at(mesh.indices[k])[c]*bary[k];auto value=sample(*raw->source_maps->emission.image,logical,true);for(size_t c=0;c<3;++c)value[c]*=o.material.emissive[c];finite_sample(value);double e=0;for(size_t c=0;c<3;++c)e=std::max(e,std::abs(wanted[c]-value[c]));check(e<3e-6,"Independent LDR raw-role decoder proves genuine UV1 transport before actual Bake");}
    check(bake_object(scene,source,options).projected>0,"Prepared normal source with genuine emission UV1 remains usable for actual Bake");
    const auto &baked=*scene.active().painted->baked();D actual{};
    if(hdr){check(bool(baked.emission_field),"Prepared HDR repeated Bake retains actual FLOAT radiance field");const auto radiance=baked.emission_field->sample(float(uv[0]),float(uv[1])).resolve({},1);actual={radiance[0],radiance[1],radiance[2]};}
    else actual=sample(baked.maps.emission,uv,true);
-   double e=0;for(size_t c=0;c<3;++c)e=std::max(e,std::abs(wanted[c]-actual[c]));
+   finite_sample(actual);finite_sample(wanted);double e=0;for(size_t c=0;c<3;++c)e=std::max(e,std::abs(wanted[c]-actual[c]));
    check(e<(hdr?2e-5:.012),"Independent actual-Bake emission consumer preserves genuine original UV1 radiance for both LDR and HDR");continue;
   }
   check(refuses([&]{detail::emission_bake_source(o);}),"Prepared missing logical emission UV1 refuses emitter before HDR/LDR selection");
