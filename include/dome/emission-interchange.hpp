@@ -18,6 +18,10 @@ struct EmissionInterchangeLimits {
 struct EmissionInterchangeImage {
  uint32_t width=0,height=0;
  std::vector<std::array<float,10>> pixels;
+ // Version1 retains editable-paint bounds/wire bytes. Version2 additionally
+ // represents genuine resolved baked absolute FLOAT radiance, without the
+ // unrelated editable-brush10000 or historical resolved30000 limits.
+ uint32_t version=1;
  void validate(const EmissionInterchangeLimits & = {})const;
 };
 std::vector<uint8_t> encode_emission_exr(const EmissionInterchangeImage &,const EmissionInterchangeLimits & = {});

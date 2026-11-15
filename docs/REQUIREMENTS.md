@@ -1,3 +1,21 @@
+## Qualified baseline runtime integrated into main — 2026-11-15
+
+Main now includes the source-aware baking/HDR-native-field/mapped-humanoid
+integration from3d plus exercised reporter c54 and coordinator02d. All non-doc
+source bytes exactly match02d; application production bytes remain exact3d.
+Release native87/software994/actualArc994/publicGUI208/syntheticXR776 and strict
+SAN native87/workspaces/raw/producers/font/software994 pass in their explicitly
+recorded scopes. Read [the runtime admission](GUARD87-RUNTIME-ADMISSION-20261115.md)
+and [machine record](validation/guard87-runtime-admission-20261115.json).
+Original failures and source/module/build distinctions remain preserved.
+
+This is an incremental FUNCTIONAL runtime milestone, not completion of the full
+production objective or admission of the successor normal-source1bc/combined90.
+That separate draft now has native plus software/Arc component proof; actual
+public prepared-source UI tests and the matching combined build are next.
+All unfinished requirements, later controller trays and spatial nodes remain
+required. Goal active; no install, physical headset or session restart.
+
 ## Artist/prepared normal consumers qualify in software and Arc — 2026-11-15
 
 Functional product1bc with fixture7fb now passes24 actual graphical cases and

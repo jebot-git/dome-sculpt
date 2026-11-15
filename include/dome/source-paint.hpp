@@ -3,6 +3,7 @@
 #include "paint.hpp"
 #include <span>
 namespace dome {
+namespace detail {class BakedEmissionReadCapability;}
 struct SourcePaintOptions {
   // The reader and producer share this ceiling. max_working_bytes may impose
   // a smaller caller budget; it never creates a file requiring a larger one.
@@ -16,7 +17,10 @@ struct SourcePaintOptions {
 };
 // Capability is supplied by the owning reader, never inferred from a file's
 // version. Older overloads deliberately reject Paint4 even for empty layers.
-struct SourcePaintDecodeContext { bool independent_source=false,physical_emission=false; };
+struct SourcePaintDecodeContext {
+  bool independent_source=false,physical_emission=false;
+  const detail::BakedEmissionReadCapability *baked_emission=nullptr;
+};
 // Explicit first-source capture, including materials without PBR image roles.
 // An empty role bundle describes no images; no placeholder image is invented.
 std::shared_ptr<PaintedMesh> capture_source_sampling(Mesh,

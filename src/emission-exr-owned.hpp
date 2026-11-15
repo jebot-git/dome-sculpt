@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 #include "dome/emission-interchange.hpp"
+#include "emission-exr-access.hpp"
 namespace dome::detail {
 // Per-call raw storage provider, including deterministic null-return tests.
 // The codec owns every successful allocation until its paired release.
@@ -14,5 +15,7 @@ std::vector<uint8_t> encode_emission_exr_owned(const EmissionInterchangeImage &,
 EmissionInterchangeImage decode_emission_exr_owned(std::span<const uint8_t>,
  const EmissionInterchangeLimits & = {},EmissionExrMemory={});
 size_t emission_exr_owned_decoded_bytes(std::span<const uint8_t>,
+ const EmissionInterchangeLimits &,EmissionExrMemory={});
+EmissionExrDescription emission_exr_owned_description(std::span<const uint8_t>,
  const EmissionInterchangeLimits &,EmissionExrMemory={});
 }

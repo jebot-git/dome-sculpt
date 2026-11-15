@@ -1,0 +1,35 @@
+{
+  "state": "qualified-baseline-runtime-merge",
+  "production_source": "3d1643827dd56e1b2ef1d57b8a9c6ff1e4211a2c",
+  "Release_test_runtime_source": "c54f66f8feab6ff52331bb264b54fc55cdc14c01",
+  "operational_coordinator_source": "02d17f29dd63f4e379627489e9ec2d77f1147387",
+  "all_non_document_index_blobs_match": "02d17f29dd63f4e379627489e9ec2d77f1147387",
+  "non_document_files": 1711,
+  "non_document_blob_manifest_sha256": "2130874f1e7af049e147b70258aaac22052134bbce7898125e6ee84c276c1ecc",
+  "previous_main": "f183ed74714cabcbf0f0d20e2453085310a4627f",
+  "source_histories_preserved": true,
+  "runtime_scope": "Application/core/producers exact3d; Release test module explicitc54 overlay; coordinator02d. SAN whole cohort exact3d, optional repaired test module owning SAN qualification remains prospective90. No wholebuild02d claim.",
+  "verified_results": {
+    "Release_native": 87,
+    "strict_SAN_native": 87,
+    "workspace_controls": [
+      27,
+      373
+    ],
+    "raw_source_worker": 90159,
+    "Release_software_pixels": 994,
+    "Release_actual_Arc_pixels": 994,
+    "strict_SAN_software_pixels": 994,
+    "public_desktop_checks": 208,
+    "public_synthetic_XR_checks": 776,
+    "strict_SAN_producer_font_steps": 6,
+    "input_drift": []
+  },
+  "production_tree_includes_prepared_normal_source_1bc": false,
+  "successor_combined90": "Required next; not substituted by this baseline milestone. Draft0ae/nativecomponent1bc/graphics7fb and new public-UI test preparation remain separate.",
+  "original_failures": "Release outer143, originalSAN143, nullreporter/display/timeout failures retained without relabeling.",
+  "goal": "active and incomplete",
+  "installed": false,
+  "physical_headset_accepted": false,
+  "session_restarted": false
+}

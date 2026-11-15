@@ -10,7 +10,12 @@ struct EmissionExportImage {
  uint64_t object=0;
  int node=-1,material=-1;
  EmissionInterchangeImage image;
- float fallback_strength=1,maximum_absolute_error=0,maximum_relative_error=0;
+ float fallback_strength=1;
+ // Legacy metrics retain their original F32 calculation before conversion.
+ // Resolved fallback2 measures in binary64, including dimensionless ratios
+ // far beyond F32 when the real source is a positive F32 subnormal.
+ double maximum_absolute_error=0,maximum_relative_error=0;
+ bool authored_mtoon=false; // Resolved fallback2's actual source-view contract.
  std::array<float,3> fallback_factor{1,1,1};
  size_t erased_nonzero_samples=0;
  // Genuine native32 field; legacy images retain their implicit UV0 meaning.

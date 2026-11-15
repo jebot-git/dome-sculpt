@@ -5,6 +5,8 @@
 #include "dome/tangents.hpp"
 #include "dome/source-maps.hpp"
 #include "paint-normal-access.hpp"
+#include "emission-paint-access.hpp"
+#include "emission-authority.hpp"
 namespace dome::detail {
 namespace {
 bool touches(const std::array<std::array<double,2>,3> &t,double left,double bottom,double right,double top){
@@ -70,7 +72,10 @@ static CanonicalNormalConversionCandidate convert_native_normal_grid(
   charge(count,corner_bytes);charge(vertices,vertex_bytes);charge(pixels,96);
   auto frames=normal_bake_frame_candidate(mesh,input.deformation.get(),nullptr,
       {128*1024*1024,std::min(size_t(128*1024*1024),options.max_working_bytes),options.cancelled});
-  stop();auto maps=intrinsic?std::shared_ptr<const TextureMaps>{}:paint.composite(input.material,options.cancelled);
+  stop();auto maps=intrinsic?std::shared_ptr<const TextureMaps>{}:
+    (paint.has_physical_emission()||hdr_emission(input.material.emissive)
+      ?EmissionExportAccess::other_channels(paint,input.material,options.cancelled)
+      :paint.composite(input.material,options.cancelled));
   if(!intrinsic&&(maps->normal.rgba.empty()||maps->normal_projection||maps->source_only))
     throw std::invalid_argument("Canonical conversion lost its actual resolved legacy normal field");
   const auto &grid=intrinsic?*intrinsic:maps->normal;grid.validate();

@@ -2,6 +2,7 @@
 // Locked-weight normalization semantics adapt Blender BKE_defvert_normalize_ex;
 // see docs/RIGGING.md for pinned source, copyright, license and deviations.
 #include "dome/rig.hpp"
+#include "automatic-humanoid-support.hpp"
 #include <bitset>
 #include "dome/affine.hpp"
 #include <bit>
@@ -543,9 +544,10 @@ SkinWeights SkinWeights::decode(const nlohmann::json &j, size_t count,
   s.validate(count, bones);
   return s;
 }
-SkinWeights automatic_bind(const Mesh &m, const Skeleton &s,
+static SkinWeights automatic_bind_impl(const Mesh &m, const Skeleton &s,
                            BindOptions options,
-                           const std::function<bool()> &cancelled) {
+                           const std::function<bool()> &cancelled,
+                           const HumanoidMapping *humanoid) {
   mesh_valid(m);
   s.validate();
   stop(cancelled);
@@ -609,6 +611,16 @@ SkinWeights automatic_bind(const Mesh &m, const Skeleton &s,
       }
     }
   auto worlds = s.world();
+  detail::AutomaticHumanoidSupport support;
+  if (humanoid) {
+    std::vector<std::array<Vec3, 2>> segments;
+    segments.reserve(s.bones.size());
+    for (size_t bone = 0; bone < s.bones.size(); ++bone)
+      segments.push_back({point(worlds[bone], {}),
+                          point(worlds[bone], {0, s.bones[bone].length, 0})});
+    support = detail::automatic_humanoid_support(
+        p, components, s, *humanoid, segments, options, work, cancelled);
+  }
   std::vector<VertexWeights> candidate(p.size());
   std::vector<bool> seeded(components.size());
   float scale = 1e-5f;
@@ -628,7 +640,7 @@ SkinWeights automatic_bind(const Mesh &m, const Skeleton &s,
       using Item = std::pair<float, uint32_t>;
       std::priority_queue<Item, std::vector<Item>, std::greater<Item>> queue;
       for (size_t c = 0; c < components.size(); c++)
-        if (best[c] <= options.maximum_seed_distance) {
+        if (best[c] <= options.maximum_seed_distance && support.permits(c, b)) {
           seeded[c] = true;
           for (auto v : components[c])
             if (direct[v] <= best[c] + options.seed_margin) {
@@ -687,6 +699,15 @@ SkinWeights automatic_bind(const Mesh &m, const Skeleton &s,
   out.validate(n, s.bones.size());
   stop(cancelled);
   return out;
+}
+SkinWeights automatic_bind(const Mesh &m, const Skeleton &s, BindOptions options,
+                           const std::function<bool()> &cancelled) {
+  return automatic_bind_impl(m, s, options, cancelled, nullptr);
+}
+SkinWeights detail::automatic_bind_humanoid(
+    const Mesh &m, const Skeleton &s, const HumanoidMapping &mapping,
+    BindOptions options, const std::function<bool()> &cancelled) {
+  return automatic_bind_impl(m, s, options, cancelled, &mapping);
 }
 SkinWeights transfer_weights(const Mesh &source, const SkinWeights &w,
                              const Mesh &dest, size_t bones, float maximum,

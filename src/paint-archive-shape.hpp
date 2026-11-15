@@ -2,6 +2,7 @@
 #pragma once
 #include <nlohmann/json.hpp>
 #include "dome/source-paint.hpp"
+#include "baked-emission-codec.hpp"
 #include "polygon-surface-context.hpp"
 namespace dome::detail {
 // Independently authored logical UV1 has no image-role/carrier number. Its
@@ -42,8 +43,10 @@ inline const nlohmann::json &paint_archive_payload(const nlohmann::json &input,b
 }
 inline const nlohmann::json &paint_archive_payload(const nlohmann::json &input,bool owning_domain,
                                                   const SourcePaintDecodeContext &context){
-  if(!input.is_object()||!input.contains("version")||input.at("version")!=4)
+  if(!input.is_object()||!input.contains("version")||(input.at("version")!=4&&input.at("version")!=8))
     return paint_archive_payload(input,owning_domain,context.physical_emission);
+  if(input.at("version")==8&&(!context.baked_emission||!context.baked_emission->source_bake_allowed()||!input.at("payload").contains("baked")))
+    throw std::invalid_argument("Paint8 requires genuine Scene42 current Bake ownership");
   if(!context.independent_source||input.size()!=4+size_t(input.contains("authored_uv1"))||!input.at("version").is_number_integer()||
      !input.contains("payload")||!input.at("payload").is_object()||input.at("payload").contains("version")||
      !input.contains("before")||!input.at("before").is_object()||input.at("before").contains("version")||
@@ -59,12 +62,12 @@ inline const nlohmann::json &paint_archive_payload(const nlohmann::json &input,b
 inline bool physical_paint_authority(const nlohmann::json &input,const SourcePaintDecodeContext &context) {
   if(input.is_object()&&input.contains("version")&&input.at("version")==6)return polygon_surface_physical_payload(input);
   return context.physical_emission&&input.is_object()&&input.contains("version")&&
-    (input.at("version")==3||(context.independent_source&&input.at("version")==4));
+    (input.at("version")==3||(context.independent_source&&(input.at("version")==4||input.at("version")==8)));
 }
 template<class F> void visit_paint_archive_payloads(const nlohmann::json &input,bool owning_domain,
                                                     const SourcePaintDecodeContext &context,F &&visit){
   const auto &payload=paint_archive_payload(input,owning_domain,context);
-  if(input.contains("version")&&input.at("version")==4)visit(input.at("before"));
+  if(input.contains("version")&&(input.at("version")==4||input.at("version")==8))visit(input.at("before"));
   visit(payload);
 }
 } // namespace dome::detail

@@ -1,0 +1,136 @@
+{
+  "scope": "standalone immutable FLOAT field only; no product core or GPU/app jobs",
+  "source_head": "653074b40990da7e43efc44647af974619994873",
+  "inputs": {
+    "include/dome/baked-emission.hpp": "8b62a1828267c9fc366f171b6c69fdb79455fd1695f91a94cad3ded8d1eb6b9b",
+    "src/baked-emission.cpp": "bbba857a1d6b2491a738ef310768331cd573a3c9ee8b1caf2a0fbc16d0e98be6",
+    "tests/baked-emission.cpp": "066606b717f9efdf6bfd8a77b96e2944de175a191e94c0024327d1e55aa76d74",
+    "CMakeLists.txt": "78b62c318022e510f990b2ee9935457bac9ae8d48dc3803ffafade8a6dcd7d87",
+    "docs/RADIANCE-PRESERVING-BAKE-CONTRACT-20261111.md": "0a390fe88c6b794d1ee12a7684c087820d4e7302556a85b19e179089bc91360e"
+  },
+  "profiles": {
+    "release": {
+      "steps": [
+        {
+          "command": [
+            "cmake",
+            "--build",
+            "/home/blux/de-xr/dome-sculpt/artifacts/radiance-bake-proof-20261111/field-milestone/release",
+            "--target",
+            "dome-sculpt-baked-emission-test",
+            "-j1"
+          ],
+          "exit_status": 0,
+          "seconds": 1.1718692310387269,
+          "log": "/home/blux/de-xr/dome-sculpt/artifacts/radiance-bake-proof-20261111/field-milestone/release/step-0.log",
+          "log_sha256": "85013117c6cf8a07d4ae7326e06dc86c35e6d1c3ead5458f340448dfa7dbcfac"
+        },
+        {
+          "command": [
+            "ctest",
+            "--test-dir",
+            "/home/blux/de-xr/dome-sculpt/artifacts/radiance-bake-proof-20261111/field-milestone/release",
+            "-R",
+            "^baked-emission$",
+            "--output-on-failure",
+            "-V"
+          ],
+          "exit_status": 0,
+          "seconds": 0.024044411024078727,
+          "log": "/home/blux/de-xr/dome-sculpt/artifacts/radiance-bake-proof-20261111/field-milestone/release/step-1.log",
+          "log_sha256": "129f3c6024ae5e6c6de1f966d616a3acf4764d8cf01fa5187f50bfebd83d1743"
+        }
+      ],
+      "elf_sha256": "2d67681c34ca19472799eefd94b26bc10eda36a30dc41c030542201a6da72118",
+      "status": 0,
+      "provider_hashes": {
+        "CMakeFiles/dome-sculpt-baked-emission-test.dir/src/baked-emission.cpp.o": "61e0b099ec9ba3bae2b0fedf037b9d6773100f34ce14df969d0b79fb9905b278",
+        "CMakeFiles/dome-sculpt-baked-emission-test.dir/tests/baked-emission.cpp.o": "890fc413cd21eb0caee6f8310ca39d38a68936a1704f12b87569eb0069f5b44a"
+      },
+      "commands_sha256": "396fdf882674276ad5b9ebff8da1b0a85543b58e99a7c3eb558b4bf4e9e8e331",
+      "ctest_log_sha256": "59974a5076a543cc57b2abc957ebe23245586d79ea8089c45d023d441c657cc9"
+    },
+    "sanitize": {
+      "steps": [
+        {
+          "command": [
+            "cmake",
+            "-S",
+            "/home/blux/de-xr/dome-sculpt/artifacts/radiance-preserving-bake-20261111",
+            "-B",
+            "/home/blux/de-xr/dome-sculpt/artifacts/radiance-bake-proof-20261111/field-milestone/sanitize",
+            "-G",
+            "Ninja",
+            "-DDOME_BUILD_UI=OFF",
+            "-DDOME_BUILD_XR=OFF",
+            "-DBUILD_TESTING=ON",
+            "-DCMAKE_BUILD_TYPE=Debug",
+            "-DCMAKE_CXX_FLAGS=-O1 -g -fsanitize=address,undefined -fno-omit-frame-pointer",
+            "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined"
+          ],
+          "exit_status": 0,
+          "seconds": 2.8315760029945523,
+          "log": "/home/blux/de-xr/dome-sculpt/artifacts/radiance-bake-proof-20261111/field-milestone/sanitize/step-0.log",
+          "log_sha256": "ee46865f4b1b8df51756421a013d2638277caa56d71a01d17191f67227505b01"
+        },
+        {
+          "command": [
+            "cmake",
+            "--build",
+            "/home/blux/de-xr/dome-sculpt/artifacts/radiance-bake-proof-20261111/field-milestone/sanitize",
+            "--target",
+            "dome-sculpt-baked-emission-test",
+            "-j1"
+          ],
+          "exit_status": 0,
+          "seconds": 2.3608142340090126,
+          "log": "/home/blux/de-xr/dome-sculpt/artifacts/radiance-bake-proof-20261111/field-milestone/sanitize/step-1.log",
+          "log_sha256": "85013117c6cf8a07d4ae7326e06dc86c35e6d1c3ead5458f340448dfa7dbcfac"
+        },
+        {
+          "command": [
+            "ctest",
+            "--test-dir",
+            "/home/blux/de-xr/dome-sculpt/artifacts/radiance-bake-proof-20261111/field-milestone/sanitize",
+            "-R",
+            "^baked-emission$",
+            "--output-on-failure",
+            "-V"
+          ],
+          "exit_status": 0,
+          "seconds": 0.03088182699866593,
+          "log": "/home/blux/de-xr/dome-sculpt/artifacts/radiance-bake-proof-20261111/field-milestone/sanitize/step-2.log",
+          "log_sha256": "c7975953bf6f030b17b163d57e429d9336c6139f7e3f47041bdba1e36e9dad4f"
+        }
+      ],
+      "elf_sha256": "cf962a3c526822ceda8c8401c2eac35cfb4046738998055a44c3cf8ef6d357cc",
+      "status": 0,
+      "provider_hashes": {
+        "CMakeFiles/dome-sculpt-baked-emission-test.dir/src/baked-emission.cpp.o": "c27df78de64ce4c159a7db6bcda265e1a1c3e14c1ccb6658d122e62cb607c7e2",
+        "CMakeFiles/dome-sculpt-baked-emission-test.dir/tests/baked-emission.cpp.o": "c9a93a35f6e4681b3f6bfa30da480ba62707475a11c46ce709b82fe09899aa74"
+      },
+      "commands_sha256": "c14fb2ffc69de27f8427124ebfe72ece686084a2acb9208ac93d5ab1aed90bd5",
+      "ctest_log_sha256": "36c432309dcc45530870df4c450774941c4732133b4f74e2d3802e0431c8f375"
+    }
+  },
+  "strict_environment": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+  },
+  "schema": 1,
+  "checks_per_profile": 579,
+  "limits": {
+    "retained_bytes": 134217728,
+    "grid": [
+      8,
+      4096
+    ],
+    "test_timeout_seconds": 60
+  },
+  "compiler": {
+    "path": "/usr/bin/g++",
+    "sha256": "579d25c2d1e45abeed0c63a517b5c52f6d09ea811a787bf7a7c677a7fd0726f6",
+    "version": "g++ (GCC) 16.2.1 20260819 (Red Hat 16.2.1-2)"
+  },
+  "product_status": "Existing Bake guards and consumers unchanged; no application/GPU/export admission."
+}

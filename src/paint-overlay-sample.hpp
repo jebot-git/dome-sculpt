@@ -2,6 +2,7 @@
 #pragma once
 #include "paint-overlay-packet.hpp"
 #include "dome/source-maps.hpp"
+#include "baked-emission-access.hpp"
 #include <algorithm>
 #include <cmath>
 namespace dome::detail {
@@ -19,7 +20,9 @@ inline PaintOverlayValues sample_overlay_texel_values(const PaintOverlayPacket &
   if(const auto &baked=packet.baked()){
    const float a=baked->coverage.at(at)/255.f;const auto &colour=pbr&&baked->color_interpretation==BakedColorInterpretation::ResolvedPbr?baked->maps.pbr_color:baked->maps.color;
    for(size_t c=0;c<4;++c){const float sample=colour.rgba.at(at*4+c)/255.f;value[0][c]=(c<3?linear(sample):sample)*a;value[3][c]=a;}
-   for(size_t c=0;c<3;++c){value[1][c]=baked->maps.metal_rough.rgba.at(at*4+c)/255.f*a;value[2][c]=linear(baked->maps.emission.rgba.at(at*4+c)/255.f)*a;}
+   const auto emission=baked_emission_texel(*baked,at);
+   for(size_t c=0;c<3;++c){value[1][c]=baked->maps.metal_rough.rgba.at(at*4+c)/255.f*a;value[2][c]=emission.legacy[c];value[4][c]=emission.absolute[c];}
+   value[3][3]=emission.coverage;
    value[1][3]=a;
   }
   for(const auto &layer:packet.layers())if(const auto &common=layer.tiles.at(tile)){

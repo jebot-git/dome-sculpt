@@ -43,14 +43,16 @@ deadline and8GiB descendant-RSS bound. Each generator must return0 and produce
 its expected SHA before it becomes a completed dependency. Final output and
 input audits retain the original source/provider checks.
 
-Actual execution38148, driver4039661, is running. Root independently inspected
-live compiler children,21 completed whole TUs, and the current blur-header SHA;
-the blur generator and previously failing paint-blur TU have succeeded. These
-are observations during execution, not a terminal build or test result. The
-status initializes its exit field to1 until successful terminal acceptance;
-the running state and owned process identities determine liveness.
+Actual execution38148, driver4039661, is terminal0 after738.63 seconds.
+All3 generators,263 fresh complete TUs and685 fresh archive/link steps succeeded.
+There are1764 owned outputs and813 authenticated staged whole providers; root
+independently checked both manifest hashes/counts and the final empty input-drift
+list. No owned children remain. Peak descendantRSS is1843281920 bytes, below the
+8GiB bound. Timing is a build observation, not an application performance claim.
+The [owning receipt](validation/authoring-repaired-release-owning-20261112.json)
+records the exact terminal status and manifest identities.
 
-After successful links, the exact85 native cases, workspace helpers, raw UV1
+The exact85 native cases, workspace helpers, raw UV1
 worker and manual source-render oracle still must execute. Fresh current
 producers and font checks precede public desktop/OpenXR execution under the
 common graphics lease. Main runtime is unchanged, the frozen source remains

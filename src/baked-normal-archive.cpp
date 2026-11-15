@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "baked-normal-archive.hpp"
+#include "baked-emission-codec.hpp"
 #include "dome/source-maps.hpp"
 #include "paint-archive-shape.hpp"
 #include "material-archive-version.hpp"
@@ -34,20 +35,21 @@ BakedNormalArchive &BakedNormalArchive::reader(){
   if(!current_||!current_->input_)throw std::invalid_argument("Independent normals require their actual Scene33 archive");
   return *current_;
 }
-size_t BakedNormalArchive::preflight(const nlohmann::json &j,const nlohmann::json &material){
+size_t BakedNormalArchive::preflight(const nlohmann::json &j,const nlohmann::json &material,
+    const BakedEmissionReadCapability *baked_emission){
   if(!j.is_object()||!j.at("version").is_number_integer()||
      !((j.at("version")==1&&j.size()==3)||(j.at("version")==2&&j.size()==4))||!j.at("origins").is_array()||j.at("origins").empty()||
      j.at("origins").size()>256||!j.at("fields").is_array()||j.at("fields").size()>256||!material.at("paints").is_array())
     throw std::invalid_argument("Invalid Scene33 layered normal graph");
   size_t retained=0;
-  const SourcePaintDecodeContext context{false,physical_material_archive(material)};
+  const SourcePaintDecodeContext context{false,physical_material_archive(material),baked_emission};
   auto raw=[&](const nlohmann::json &c)->const nlohmann::json &{return paint_archive_payload(material.at("paints").at(ref(c.at("paint"),material.at("paints").size())),false,context);};
   for(const auto &c:j.at("origins")){
     if(!c.is_object()||c.size()!=7||!c.at("version").is_number_integer()||c.at("version")!=1||!c.at("receipt").is_object()||!c.at("frames").is_object())
       throw std::invalid_argument("Unsupported canonical attribute origin record");
     const auto &paint=raw(c);
     if(!paint.is_object()||paint.contains("version")||paint.contains("normal_projection")||!paint.contains("baked")||
-       paint.at("baked").at("version")!=1||!paint.at("baked").at("normal").is_binary()||paint.at("baked").at("normal").get_binary().empty())
+       baked_legacy_version(paint.at("baked"),baked_emission)!=1||!paint.at("baked").at("normal").is_binary()||paint.at("baked").at("normal").get_binary().empty())
       throw std::invalid_argument("Layered normal origin must reference its actual raw native canonical paint");
   }
   std::vector<uint32_t> depth;depth.reserve(j.at("fields").size());

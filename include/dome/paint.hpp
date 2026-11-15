@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 #include "emission.hpp"
+#include "baked-emission.hpp"
 #include "mesh.hpp"
 #include "paint-blur.hpp"
 #include <deque>
@@ -94,6 +95,9 @@ struct BakedTextures {
   std::shared_ptr<const NormalDetailAuthority> normal_authority;
   // Independently owned resolved baked normals; never intrinsic material data.
   std::shared_ptr<const detail::BakedNormalField> normal_field;
+  // Independent, immutable linear replacement coefficients. When present,
+  // maps.emission is empty: RGB8 is not a second emission authority.
+  std::shared_ptr<const BakedEmissionField> emission_field;
   void validate(uint32_t resolution) const;
   size_t storage_bytes() const;
 };

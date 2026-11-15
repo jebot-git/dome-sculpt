@@ -87,7 +87,9 @@ private:
  }
  bool retired()const noexcept{return usage_[0].retired_stores||usage_[1].retired_stores;}
  void try_seal(bool force)noexcept{
-  if(terminal_||epoch_exhausted_||(!force&&!dirty_))return;
+  // With no active OR retired stores there is no GPU ownership to protect.
+  // A later create marks a newer use epoch before its first real submission.
+  if(terminal_||epoch_exhausted_||nodes_.empty()||(!force&&!dirty_))return;
   GLsync next=nullptr;try{next=glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE,0);}catch(...){record(Error::CreateFence);return;}
   if(!next){record(Error::CreateFence);return;}
   try{glFlush();}catch(...){glDeleteSync(next);record(Error::CreateFence);return;}

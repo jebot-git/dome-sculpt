@@ -8,7 +8,7 @@
 #include "paint.hpp"
 #include <memory>
 namespace dome {
-namespace detail {struct SculptScenePreviewAccess;}
+namespace detail {struct SculptScenePreviewAccess;class BakedEmissionReadCapability;}
 struct PolygonColorSurface;
 struct CreatorAppearance;
 struct SourceMaterialBindings;
@@ -137,6 +137,8 @@ public:
   std::vector<ObjectSurface> preview_surface_bundles(const std::function<bool()> &, const SculptMesher & = {}) const;
 
 private:
+  static Scene decode_owning(const nlohmann::json &,
+      const detail::BakedEmissionReadCapability *);
   friend struct detail::SculptScenePreviewAccess;
   // Detached native append reserves nonlive provenance IDs without inventing
   // geometry or bypassing the live object/group quotas. No layout change.

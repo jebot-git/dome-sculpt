@@ -170,18 +170,25 @@ void validate(const Mesh &low,const BakeSource &source,const BakeOptions &o) {
   for (auto id:source.triangle_materials) if (id>=source.materials.size()) throw std::out_of_range("Unknown source triangle material");
   for (const auto &m:source.materials) {
     m.material.validate();
-    if(detail::hdr_emission(m.material.emissive)||(m.maps&&m.maps->overlay&&m.maps->overlay->native_geometry()))
+    if(!m.resolved_emission&&(detail::hdr_emission(m.material.emissive)||(m.maps&&m.maps->overlay&&m.maps->overlay->native_geometry())))
       throw std::invalid_argument("Physical emission Bake requires its actual float sampling/output adapter");
     if (!std::isfinite(m.normal_strength)||m.normal_strength<0||m.normal_strength>4) throw std::invalid_argument("Invalid normal-map strength");
     if (m.maps) {
-      if(m.maps->overlay&&(!m.maps->source_only||m.maps->overlay->source_maps()!=m.maps->source_maps))
+      if(m.maps->overlay&&((m.maps->source_only&&m.maps->overlay->source_maps()!=m.maps->source_maps)||(!m.maps->source_only&&!m.resolved_emission)))
         throw std::invalid_argument("Bake overlay differs from its immutable source coordinate owner");
       if(m.maps->source_maps)m.maps->source_maps->validate_surface(source.mesh);
+      if(m.maps->baked_base&&m.maps->source_only){
+        if(!m.maps->overlay||m.maps->overlay->baked()!=m.maps->baked_base)
+          throw std::invalid_argument("Raw Bake normal differs from its actual immutable overlay owner");
+        const auto &b=*m.maps->baked_base;b.validate(m.maps->overlay->resolution());
+        if(b.normal_interpretation!=BakedNormalInterpretation::CanonicalMikk||b.normal_field||b.normal_authority)
+          throw std::invalid_argument("Raw Bake normal requires its explicit prepared frame adapter");
+      }
       if(m.maps->source_only){
         // Explicit empty role bundles are valid untextured source captures.
         // The source-owned paint packet, when present, is independent of images.
         if(!m.maps->source_maps)throw std::invalid_argument("Raw bake source needs its explicit original texture role bundle");
-        if(m.maps->overlay)for(const auto &layer:m.maps->overlay->layers())
+        if(m.maps->overlay&&!m.resolved_emission)for(const auto &layer:m.maps->overlay->layers())
           for(const auto &tile:layer.emission_tiles)if(tile)for(const auto &pixel:tile->pixels)
             if(pixel.coverage>0&&std::any_of(pixel.physical.begin(),pixel.physical.end(),[](float v){return v!=0;}))
               throw std::invalid_argument("Physical source emission requires its explicit radiance-preserving bake adapter");
@@ -214,7 +221,7 @@ void validate(const Mesh &low,const BakeSource &source,const BakeOptions &o) {
     }
   }
 }
-void pad(BakeResult &result,const BakeOptions &o) {
+void pad(BakeResult &result,const BakeOptions &o,std::vector<BakedEmissionSample> &emission) {
   auto n=o.resolution; std::deque<std::pair<uint32_t,uint32_t>> queue;
   for (uint32_t i=0;i<result.coverage.size();++i) if (result.coverage[i]==1) queue.push_back({i,0});
   uint64_t visited=0;
@@ -228,7 +235,8 @@ void pad(BakeResult &result,const BakeOptions &o) {
       auto target=uint32_t((y+dy)*int(n)+x+dx);
       if (result.coverage[target]) continue; // Never cover a miss or another island.
       for (auto *image:{&result.maps.color,&result.maps.metal_rough,&result.maps.emission,&result.normal,&result.ambient_occlusion})
-        std::copy_n(image->rgba.data()+size_t(at)*4,4,image->rgba.data()+size_t(target)*4);
+        if(!image->rgba.empty())std::copy_n(image->rgba.data()+size_t(at)*4,4,image->rgba.data()+size_t(target)*4);
+      if(!emission.empty())emission[target]=emission[at];
       if(o.separate_pbr_color)std::copy_n(result.maps.pbr_color.rgba.data()+size_t(at)*4,4,result.maps.pbr_color.rgba.data()+size_t(target)*4);
       if(o.encode_target_normal)std::copy_n(result.maps.mtoon_normal.rgba.data()+size_t(at)*4,4,result.maps.mtoon_normal.rgba.data()+size_t(target)*4);
       result.coverage[target]=2; ++result.padded; queue.push_back({target,distance+1});
@@ -238,12 +246,24 @@ void pad(BakeResult &result,const BakeOptions &o) {
 } // namespace
 BakeResult bake_mesh(const Mesh &low,const BakeSource &source,const BakeOptions &o) {
   if(o.progress)o.progress(0);
-  cancel(o); validate(low,source,o); SurfaceQuery query(source.mesh,o.cancelled); cancel(o);
+  cancel(o); validate(low,source,o);
+  const bool float_emission=std::any_of(source.materials.begin(),source.materials.end(),[](const auto &m){return bool(m.resolved_emission);});
+  if(float_emission){
+    const size_t field=BakedEmissionField::required_bytes(o.resolution,{128*1024*1024,o.cancelled});
+    const uint64_t other=uint64_t(o.resolution)*o.resolution*(13+(o.separate_pbr_color?4:0)+(o.encode_target_normal?4:0));
+    if(other>128*1024*1024||field>128*1024*1024-other)
+      throw std::length_error("FLOAT Bake retained channels exceed unchanged paint budget");
+  }
+  SurfaceQuery query(source.mesh,o.cancelled); cancel(o);
   auto low_frames = o.low_tangents.empty() ? tangent_corners(low, o.cancelled)
                                          : std::vector<Tangent>{};
   std::vector<Tangent> high_frames;
-  if (source.tangents.empty() && std::any_of(source.materials.begin(), source.materials.end(),
-        [](const auto &material) { return normal_image(material) && material.normal_strength > 0; })) {
+  const bool raw_baked_normals=std::any_of(source.materials.begin(),source.materials.end(),[](const auto &m){
+    return m.maps&&m.maps->source_only&&m.maps->overlay&&m.maps->baked_base&&
+        !m.maps->baked_base->maps.normal.rgba.empty()&&m.normal_strength>0;
+  });
+  if ((source.tangents.empty() && std::any_of(source.materials.begin(), source.materials.end(),
+        [](const auto &material) { return normal_image(material) && material.normal_strength > 0; })) || raw_baked_normals) {
     high_frames = tangent_corners(source.mesh, o.cancelled);
     for (size_t t = 0; t < source.mesh.indices.size()/3; ++t) {
       auto id = source.triangle_materials.empty() ? 0 : source.triangle_materials[t];
@@ -253,10 +273,11 @@ BakeResult bake_mesh(const Mesh &low,const BakeSource &source,const BakeOptions 
   }
   size_t pixels=size_t(o.resolution)*o.resolution;
   BakeResult result; result.coverage.resize(pixels);
+  std::vector<BakedEmissionSample> emission;if(float_emission)emission.resize(pixels);
   if(o.encode_target_normal)result.maps.mtoon_normal={o.resolution,o.resolution,std::vector<uint8_t>(pixels*4)};
   if (!o.writable.empty()) for (size_t i=0;i<pixels;++i) if (!o.writable[i]) result.coverage[i]=4;
   for (auto *image:{&result.maps.color,&result.maps.metal_rough,&result.maps.emission,&result.normal,&result.ambient_occlusion})
-    *image={o.resolution,o.resolution,std::vector<uint8_t>(pixels*4)};
+    if(image!=&result.maps.emission||!float_emission)*image={o.resolution,o.resolution,std::vector<uint8_t>(pixels*4)};
   if(o.separate_pbr_color)result.maps.pbr_color={o.resolution,o.resolution,std::vector<uint8_t>(pixels*4)};
   std::vector<uint32_t> owner(pixels,UINT32_MAX);
   for (size_t triangle=0;triangle<low.indices.size()/3;++triangle) {
@@ -316,6 +337,8 @@ BakeResult bake_mesh(const Mesh &low,const BakeSource &source,const BakeOptions 
       const auto &m=source.materials[material_id];
       auto high_uv=source.mesh.uv.empty()?std::array<float,2>{}:texcoord(source.mesh,hit->triangle,hit->barycentric);
       auto channels=material(m,source.mesh,hit->triangle,hit->barycentric,high_uv); auto high_normal=normalized(hit->normal);
+      if(m.resolved_emission)channels.emission=m.resolved_emission(hit->triangle,hit->barycentric);
+      if(float_emission){emission[at]={{},channels.emission,1};emission[at].validate();}
       auto pbr_color=m.maps&&m.maps->overlay?material(m,source.mesh,hit->triangle,hit->barycentric,high_uv,true).color:channels.color;
       const bool resolved_source=m.maps&&!m.maps->pbr_color.rgba.empty();
       if(o.separate_pbr_color&&resolved_source)pbr_color=sample(m.maps->pbr_color,high_uv,false,true);
@@ -352,6 +375,30 @@ BakeResult bake_mesh(const Mesh &low,const BakeSource &source,const BakeOptions 
             {float(x/size),float(y/size),float(z/size)});
         }
       }
+      if(m.maps&&m.maps->source_only&&m.maps->overlay&&m.maps->baked_base&&
+         !m.maps->baked_base->maps.normal.rgba.empty()&&m.normal_strength>0){
+        // Filter decoded legacy RGB8 vectors premultiplied by the independent
+        // common coverage, through the same immutable padding owner as all
+        // other paint planes. The original normal keeps its role UV basis;
+        // canonical baked detail keeps current UV0 Mikk corner frames.
+        const auto &packet=*m.maps->overlay;const auto &baked=*m.maps->baked_base;
+        const auto r=packet.resolution();const float x=std::clamp(high_uv[0],0.f,1.f)*r-.5f,
+          y=std::clamp(high_uv[1],0.f,1.f)*r-.5f;
+        const int ix=int(std::floor(x)),iy=int(std::floor(y));const float fx=x-ix,fy=y-iy;
+        Vec3 sum;float coverage=0;
+        for(int dy=0;dy<2;++dy)for(int dx=0;dx<2;++dx){
+          const auto owner=packet.padding()->at(size_t(std::clamp(iy+dy,0,int(r)-1))*r+size_t(std::clamp(ix+dx,0,int(r)-1)));
+          if(owner<0)continue;const size_t at=size_t(owner);
+          const float w=(dx?fx:1-fx)*(dy?fy:1-fy)*(baked.coverage.at(at)/255.f);
+          coverage+=w;const auto *q=baked.maps.normal.rgba.data()+at*4;
+          sum+=Vec3{q[0]/255.f*2-1,q[1]/255.f*2-1,q[2]/255.f*2-1}*w;
+        }
+        if(coverage>0){
+          const auto canonical=tangent_frame(source.mesh,high_frames,hit->triangle,hit->barycentric);
+          const auto baked_world=canonical.to_world(sum/coverage);
+          high_normal=normalized(high_normal*(1-coverage)+baked_world*coverage);
+        }
+      }
       Vec3 mapped;
       if(o.encode_target_normal){
         const auto encoded=o.encode_target_normal(uint32_t(triangle),bary,high_normal);
@@ -364,11 +411,11 @@ BakeResult bake_mesh(const Mesh &low,const BakeSource &source,const BakeOptions 
       float ao=ambient(query,hit->position,normalized(hit->normal),o,result)*channels.ao;
       for (int c=0;c<3;++c) {
         result.maps.color.rgba[at*4+c]=byte(linear_to_srgb(channels.color[c]));
-        result.maps.emission.rgba[at*4+c]=byte(linear_to_srgb(channels.emission[c]));
+        if(!float_emission)result.maps.emission.rgba[at*4+c]=byte(linear_to_srgb(channels.emission[c]));
       }
       result.maps.color.rgba[at*4+3]=byte(channels.color[3]);
       if(o.separate_pbr_color)for(int c=0;c<4;++c)result.maps.pbr_color.rgba[at*4+c]=byte(c<3?linear_to_srgb(pbr_color[c]):pbr_color[c]);
-      result.maps.emission.rgba[at*4+3]=255;
+      if(!float_emission)result.maps.emission.rgba[at*4+3]=255;
       result.maps.metal_rough.rgba[at*4]=byte(ao); result.maps.metal_rough.rgba[at*4+1]=byte(channels.roughness);
       result.maps.metal_rough.rgba[at*4+2]=byte(channels.metallic); result.maps.metal_rough.rgba[at*4+3]=255;
       if(!o.encode_target_normal){result.normal.rgba[at*4]=byte(mapped.x*.5f+.5f);result.normal.rgba[at*4+1]=byte(mapped.y*.5f+.5f);
@@ -383,7 +430,9 @@ BakeResult bake_mesh(const Mesh &low,const BakeSource &source,const BakeOptions 
   if (result.missed&&o.fail_on_miss) throw std::runtime_error("Projection missed "+std::to_string(result.missed)+" low UV texels");
   if (!result.projected) throw std::runtime_error("No low UV texels projected onto the high source");
   if(o.progress)o.progress(.9f);
-  cancel(o); if (o.padding) pad(result,o); cancel(o);
+  cancel(o); if (o.padding) pad(result,o,emission); cancel(o);
+  if(float_emission)result.emission_field=BakedEmissionField::create(o.resolution,emission,{128*1024*1024,o.cancelled});
+  cancel(o);
   if(o.progress)o.progress(1);
   return result;
 }
