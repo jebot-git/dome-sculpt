@@ -1,0 +1,93 @@
+{
+  "schema": 1,
+  "source": "3d1643827dd56e1b2ef1d57b8a9c6ff1e4211a2c",
+  "owning_plan_sha256": "0d03a29a1d2251d1186cb8a9c94f22227566c86664245c51b050a66e458b7dec",
+  "scope": "Actual admitted Release native/producer/font/software/Arc gate results. Not public GUI/XR, physical HMD, performance, new mainruntime admission or fullgoal completion.",
+  "prerequisites": {
+    "independent_closed_artifact_audit_sha256": "39c71b267c63127b68b40acc959df021fd662a56fad38c809d0a92af741c6f3e",
+    "runtime_preflight_sha256": "949716280d10503f4899694790c1ade8779c7acce793b6f6c6d78408529129d4",
+    "original_outer_build_tool": {
+      "session": 12734,
+      "exit": 143,
+      "cause": "unknown; preserved, never relabeled0"
+    },
+    "actual_closed_artifacts": "1032complete current-toolchainTUs/733links/3generators,1768ownedoutputs,1032actualcompilerdeps433074incidences/errors0,zero provider reuse, zero source/input drift independently checked."
+  },
+  "actual_native": {
+    "outer_tool": 74901,
+    "outer_exit": 0,
+    "exact_CTests": 87,
+    "all_Passed": true,
+    "Skipped": false,
+    "CTest_seconds": 181.14,
+    "app_version": 0,
+    "workspace27": 0,
+    "workspace373": 0,
+    "raw90159": 0
+  },
+  "actual_fixtures": {
+    "outer_tool": 1510,
+    "outer_exit": 0,
+    "checks": [
+      "source-worker180373",
+      "source-controls27",
+      "original-worker16417",
+      "original-public-producer32794",
+      "four-case Source8 public producer",
+      "font-reference16"
+    ],
+    "font": "bundled unifont17.0.04 BDF pixels16"
+  },
+  "actual_manual_software": {
+    "outer_tool": 84059,
+    "outer_exit": 0,
+    "independent_source39_40_checks": 994
+  },
+  "actual_manual_Arc": {
+    "outer_tool": 22066,
+    "outer_exit": 0,
+    "native_exit": 0,
+    "actual_device_authenticated": true,
+    "render_node": "/dev/dri/renderD129",
+    "PCI": "0000:03:00.0",
+    "vendor_device": "8086:56a0",
+    "renderer": "A770",
+    "driver": "i915",
+    "live_samples": 1568,
+    "actual_mapped_ELFs": 71,
+    "count_not_assumed": true,
+    "independent_source39_40_checks": 994
+  },
+  "common_lease": "Every phase acquires actual common flock before any builtproduct and releases it after terminal; artist handoffs coordinated; all original timeouts/assertions remain.",
+  "results": {
+    "native": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-validation-admitted-v3-20261115/release-guard87-admitted-v3-native/status.json",
+      "sha256": "b95d0ec27a6a9f793c43b426837e24b048638dae2cf95610edf46748db9175a5",
+      "tracked_compressed": "docs/validation/guard87-admitted-release-native-20261115.json.gz",
+      "compressed_sha256": "1c16a61e88f84510a18e8958bdb0f7bf18826e75af534381887fee5758df1ade",
+      "exit": 0
+    },
+    "fixtures": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-validation-admitted-v3-20261115/release-guard87-admitted-v3-fixtures/status.json",
+      "sha256": "abc66b27ddcf4e124957abfa579773f2b45cbd8b479568176d7a59b3fbe67661",
+      "tracked_compressed": "docs/validation/guard87-admitted-release-fixtures-20261115.json.gz",
+      "compressed_sha256": "19e205cc2d958ab74e0326099a4abc86f94f1c6509bb76f0a19e1ba07993c1a1",
+      "exit": 0
+    },
+    "manual-software": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-validation-admitted-v3-20261115/release-guard87-admitted-v3-manual-software/status.json",
+      "sha256": "caceaacb1e1e2f5bcf0ba0137f62f538ae08e453a9f342cca28b2adf4a60d4a6",
+      "tracked_compressed": "docs/validation/guard87-admitted-release-manual-software-20261115.json.gz",
+      "compressed_sha256": "7a3e4c8cd7d0abee3c1cedc76c97dbade720faeff9d25b605811bc3c340b0b1b",
+      "exit": 0
+    },
+    "manual-arc": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-validation-admitted-v3-20261115/release-guard87-admitted-v3-manual-arc/status.json",
+      "sha256": "9c46a2a192af1735f419a25293045f77cb79de19c4d26f4eac30075f18e31268",
+      "tracked_compressed": "docs/validation/guard87-admitted-release-manual-arc-20261115.json.gz",
+      "compressed_sha256": "52834f5bc7a54728700a9f8dc38a88473c6234923a1a6a26ea18e273180b9b8b",
+      "exit": 0
+    }
+  },
+  "public_pending": "First pbr-quarter GUI execution currently live in separate artifacts; no public pass inferred here."
+}
