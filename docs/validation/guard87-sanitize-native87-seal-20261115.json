@@ -1,0 +1,62 @@
+{
+  "source": "3d1643827dd56e1b2ef1d57b8a9c6ff1e4211a2c",
+  "state": "terminal",
+  "exit": 0,
+  "scope": "Current combined-owner strict SAN native87/workspace/raw only; no successor90 or full production goal completion.",
+  "native_actual_passed_noSkip": 87,
+  "native_seconds": 567.0319330692291,
+  "workspace27": 0,
+  "workspace373": 0,
+  "raw90159": 0,
+  "app_version": 0,
+  "input_drift": [],
+  "lease_released_epoch": 1794767109.820888,
+  "independent_NB_probe_epoch": 1794767223.997001,
+  "owned_processes_remaining": [],
+  "transient_unit_stopped": true,
+  "actual_CTest_sanitizer_environment_overrides": [],
+  "references": {
+    "status.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-current-sanitize-completion-20261115/sanitize-completion-v1-native/status.json",
+      "sha256": "ba849e0d2f753f0b4c580f5415d167533c88acaa651230ac9442dc7c184f371a",
+      "compressed": "guard87-sanitize-native87-status-json-20261115.gz",
+      "compressed_sha256": "9c9dbc14eddba7cffa97ba3fa01fdd890cf6232654a71f8da8e80f10cee03fee"
+    },
+    "inputs-before.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-current-sanitize-completion-20261115/sanitize-completion-v1-native/inputs-before.json",
+      "sha256": "823502c3dcf3137a99551b614e1b97c87e786e4323372356b27c693fc58d7b4d",
+      "compressed": "guard87-sanitize-native87-inputs-before-json-20261115.gz",
+      "compressed_sha256": "6858594765f9457a2dc245b5519e8a25be8b5cb96f6c80bb9d5dcda215b519cf"
+    },
+    "inputs-after.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-current-sanitize-completion-20261115/sanitize-completion-v1-native/inputs-after.json",
+      "sha256": "58a8e3470b468959206c05841365e0c3daa008ae1ff018c6ee0ec546cd48cf0b",
+      "compressed": "guard87-sanitize-native87-inputs-after-json-20261115.gz",
+      "compressed_sha256": "ac2bd716a3d72b845808440390c7f05f02d9ca5727dbb2dd809b7fab775e46f1"
+    },
+    "selected-tests.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-current-sanitize-completion-20261115/sanitize-completion-v1-native/selected-tests.json",
+      "sha256": "62657766d99672c572ac5266b52848d9427d0294ea1a67457da3bb054aba7f6c",
+      "compressed": "guard87-sanitize-native87-selected-tests-json-20261115.gz",
+      "compressed_sha256": "4ae0d03fe346604018feb249645f5f45d3fd4140687ab78fe6a805cb001dbea9"
+    },
+    "native87.xml": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-current-sanitize-completion-20261115/sanitize-completion-v1-native/native87.xml",
+      "sha256": "2c00c43edb43b50be9a879672e474f381186dbdab0638d89cf19de18ee1dc7f4",
+      "compressed": "guard87-sanitize-native87-native87-xml-20261115.gz",
+      "compressed_sha256": "35f5b1bbf4dfddcf8ac6f0bc2fce42c596494924ebab52d864a5fb9d9b25be15"
+    },
+    "native87.log": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-current-sanitize-completion-20261115/sanitize-completion-v1-native/native87.log",
+      "sha256": "3e04f90cbb2178c324886bb248a441eeac26727a3ae5c3b635ce36deba7a5f47",
+      "compressed": "guard87-sanitize-native87-native87-log-20261115.gz",
+      "compressed_sha256": "048144dbb5e5bfbce53217eea2743aba876749b7cf19f647cdd15d30c5be4cc2"
+    }
+  },
+  "later_wrapper": {
+    "sha256": "6f0de11f5b43c05ac0cb2a8849f9785d6ff47e66c080570887d8cf858efb02ee",
+    "approved_by_parent": true,
+    "scope": "Later fixtures/manual only, not currentbf1 rewrite. Removes duplicate first owned-output hash pass while all same files/values remain in complete before-products hash and full uncached post hash; conflict-assert merges. No assertion/limit/env/scenario/lease change.",
+    "products_launched": false
+  }
+}

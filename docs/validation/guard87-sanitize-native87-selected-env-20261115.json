@@ -1,0 +1,6 @@
+{
+  "scope": "Read-only observation of actually selected87 CTest metadata; running bf1 unchanged",
+  "tests": 87,
+  "forbidden_sanitizer_or_preload_overrides": [],
+  "strict_parent_environment_retained": true
+}
