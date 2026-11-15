@@ -1,0 +1,16 @@
+{
+  "state": "plan-structurally-reviewed-NOT-executed",
+  "plan_sha256": "9641d8af4976d8937081f5be9d0a999a730196a48c902262ac3c5cff68e39140",
+  "nodes": 1768,
+  "current_closed_whole_providers": 538,
+  "fresh_complete_TUs": 494,
+  "fresh_links_archives": 733,
+  "fresh_generators": 3,
+  "closed_topological_layers_after_provider_seeds": 10,
+  "exact_native": 87,
+  "no_reused_products": true,
+  "all_literal_D_preserved": true,
+  "initial_destination_objects": 0,
+  "original_actual143_is_not_a_pass": true,
+  "original_current_input_drift": []
+}
