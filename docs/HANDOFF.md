@@ -1,32 +1,112 @@
-## Normal-source integration draft; not frozen or admitted — 2026-11-15
+## MToon XR timing and graphical fixture corrections — 2026-11-15
 
-This isolated branch combines frozen3d lineage (frozen3d plus
-functional product1bc13125 and finite-only test1740fb9d) with main118e1feb
-qualification history. Both histories are preserved. Current main handoff and
-requirements resolve the metadata-only merge conflicts; source3d and all
-component proof worktrees remain untouched.
+MToonquarter XR6524 reaches174 actual passing checks but hits the original
+240-second wall limit before its last independent eye controls. This is an
+actual timeout, preserved with zero drift/no survivors; no image predicate
+failed and the budget is not raised. Read-only timings show few captured frames
+and fast drain, but repeated cold context/shader setup. The frozen scenario
+explicitly disables Mesa's shader cache and gives each app fresh cache storage.
+A NEW operational child is being prepared with a case-scoped initially EMPTY
+shared compiled-code cache/default enabled behavior, while each app still loads
+fresh scene/config/state and keeps all240s/6000frame/12/3/7 checks. Actual
+cold-miss/subsequent-hit and complete final-matrix evidence remain required;
+old PBR194+194 passes are retained separately.
 
-Relative to frozen3d, product changes are3 existing complete TUs plus one NEW
-private header. Existing public/private headers, shaders, packets and native
-wire versions are unchanged. Three new native cases make the prospective
-selection90 (old87 plus artist-normal, prepared-normal and CC0CPU cases).
-The test-only per-eye runtime fix c54f66f8 is also integrated; its App3d/Testc54
-real-loader/Arc pbr-quarter replay passes194 checks. Old failed null-report
-runtime remains preserved; three other XR cases remain pending.
+Independent artist graphics identifies real TEST-fixture defects. Corrected
+depth1f80 uses clipZ=-dot(normal,p-center)/2 matching declared camera+normal*2
+and productionGL_LESS, plus per-probe frontmost ray guards. Female/rest PBR then
+matches all4 pixels EXACTLY instead of olderror61, confirming the projection
+cause. Its nextMT0 case has correctRGB0 but no negative sensitivity. Actual VRM
+material fields establish why: old neutral presentation multiplies gray twice,
+putting litgray² below shade and flattening MToon0. New test-only causal commits
+21cbd/87c preserve authentic assets/normalroles/UV/material transforms and all
+numeric bounds, add an independently forecast fifth imported probe while
+retaining the old4, and apply the existing reference-derived neutral tint
+consistently. Full fixture compiles/links pass; CPU field/algebra diagnostics
+and corrected software/Arc matrix still await actual qualification.
 
-Native component Release/strictSAN checks pass the finite91 and retained
-62/19/139/9/856/32 scopes, with genuine old-source counterfactuals and failures
-preserved. Proper original-frame and ordinary version1 prepared normal capture
-uses actual owned normal planes and material sampler authority, with exact
-Cancel/Undo/Save safeguards. Advanced reprojected/canonical/native32 adapters
-remain required and guarded; they are not final accepted omissions.
+The functional normal-source product remains EXACT1bc13125; no production
+renderer/header/wire changes were made for these fixture corrections. Initial
+weakcontrast/projection/tint failures and every PNG/RGB witness stay preserved.
+Main3d sanitizer completion is still active with current owner provenance and
+no final/native acceptance. All original production requirements remain active
+and incomplete. No installation, physicalHMD launch or session restart.
 
-This draft is UNFROZEN: graphical normal/prepared-result consumer qualification
-and current whole-candidate compile/native/public validation remain necessary.
-No new owning build is launched from this draft yet. The separately frozen3d
-public GUI/XR and full sanitizer completion are still in progress. All original
-production requirements remain active/incomplete; no installation or headset
-session changes are part of this draft assembly.
+## Two PBR stereo cases pass; remaining graphical work coordinated — 2026-11-15
+
+Explicit App3d/TestRuntimec54 replay now passes BOTH PBRquarter and PBRtiny
+real-loader synthetic XR cases,194checks each (388actual). Both-eye independent
+source/correct/wrong-normal controls, Save/history, actual Arc identity,
+240-second/6000-frame bounds, zero drift and no owned survivors are retained.
+Original null-report runtime failure remains preserved. Read the
+[first overlay proof](GUARD87-XR-REPORTER-OVERLAY-20261115.md).
+MToonquarter/tiny still await execution; this is not physical-HMD acceptance.
+
+Separate artist graphical consumer software runs strongmanual6 successfully,
+but actual importedMT1 has correctRGB0 and insufficient wrong-normal contrast
+(max5 versus7). That failure is preserved with full PNG/RGB witnesses; neither
+source nor thresholds change. A same-input independent forecast identifies an
+additional interior probe while preserving all original4; a new diagnostic
+fixture will require actual validation. Unchanged prepared8+CC0eight software
+continuation currently runs separately before the next main XR case. No full
+artist graphical/owning application acceptance is claimed.
+
+The native-qualified normal-source integration draft a31461cb is pushed,
+unfrozen and has no owning build; all original production requirements remain
+active/incomplete. The current main sanitizer completion service is still
+running with explicit current-owner provenance. No install, physical headset
+launch or session restart occurred.
+
+## Desktop public matrix passes; XR reporter repair isolated — 2026-11-15
+
+All4 current-source desktop GUI cases pass52checks each (208actual), including
+actual Bake/history/ordered Save/reopen and every independent geometry/correct/
+wrong-normal pixel control at unchanged12/3/7 bounds. Private Xvfb dependency
+closure and actual server/app ELF mappings are authenticated; zero drift and no
+owned survivors. The old missing-library and teardown-race failures remain.
+Read [private display and GUI proof](GUARD87-PRIVATE-DISPLAY-GUI-20261115.md).
+
+First real-loader synthetic XR pbr-quarter reaches41checks then times out;
+original failure is retained. Evidence locates a test-runtime JSON null-object
+exception in xrReleaseSwapchainImage before both-eye source reporting. Isolated
+c54f66f8 adds only per-eye Json::object initialization; App/core/producers remain
+exact admitted3d. One whole changed test TU and fresh shared link have actual
+379compiler/41link dependency proofs, unchanged headers/literal flags/186exports/
+SONAME/NEEDED/current29loader providers. NEW overlay admission explicitly declares
+App3d/TestRuntimec54 without replacing original1768 expected outputs. Replay is
+starting under the same scenarios/pixel and240s/6000-frame limits; XR acceptance
+is still pending, and no physical HMD is launched.
+
+The normal-source integration draft remains separate and unfrozen. Its complete
+nativeR/S milestone is recorded; graphical component consumers are prepared but
+not yet executed. The full current-source sanitizer completion service remains
+active with538 proved staged owners plus494 fresh TU targets/all733links/3gens;
+its final audit and runtime gates remain required. No goal completion, runtime
+admission to main, installation or session restart is inferred.
+
+## Prepared-normal native milestone integrated as a draft — 2026-11-15
+
+Functional product1bc13125 with finite-only fixture1740fb9d now passes current
+Release and monitored strict ASan/UBSan component scopes91+62/19/139/9/856/32,
+including both actual CC0 bases, source-role directions/radiance, native archive
+and ordered Save/Undo/Redo. Prior allocation/argument/ownership/external143
+failures remain unchanged. The strict run records no external signals, zero
+input drift and actual owned RSS below8GiB (about3.04GB); its transient user
+unit is finished/stopped. Read
+[the native component seal](ARTIST-PREPARED-SOURCE-NATIVE-20261115.md).
+
+Isolated draft branch `work/authoring-normal-integration-20261115` preserves
+qualified component1740, main118e metadata and both histories. Its non-document
+bytes remain EXACT1740:3 changed existing product TUs, one new private header,
+three new native cases (prospective90), with existing headers/shaders/packets/wires
+unchanged. It is UNFROZEN, not admitted to main runtime and has no owning build.
+Actual graphical artist/prepared-result consumers and a matching combined
+cohort remain required. Existing FLTK/XR Bake controls share the Document source
+picker/worker route; this adds native backend behavior, not another frontend.
+
+The separate frozen3d public GUI now launches after private test-display repair;
+its matrix/XR and full sanitizer completion remain pending. No system install or
+session restart. All original production requirements remain active/incomplete.
 
 ## Current Release native and hardware gates pass; public display repair — 2026-11-15
 

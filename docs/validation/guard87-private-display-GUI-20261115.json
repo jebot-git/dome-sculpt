@@ -1,0 +1,537 @@
+{
+  "schema": 1,
+  "source": "3d1643827dd56e1b2ef1d57b8a9c6ff1e4211a2c",
+  "scope": "Current actual four-case public FLTK desktop GUI208 checks with restored private testdisplay dependency. Functional GUI only; no physicalHMD/performance/strictSAN/fullgoal claim.",
+  "state": "terminal",
+  "exit": 0,
+  "original_gui_failure": "Actualtool97838exit1, zeroGUIchecks and zeroapplicationlaunches; Xvfb could notload missing hostlibselinux.so.1, then scenario saw emptydisplayfd and DisplayNameError(:). Original data untouched, never relabeledpass.",
+  "private_repair": {
+    "cached_RPM": "/home/blux/de-xr/artifacts/calligra-fltk-20261025/rpms/libselinux-3.11-2.fc44.x86_64.rpm",
+    "cached_RPM_sha256": "50fc29cc4e31824d87a2a709f4c3e4873fbc1785da333cd05dc5138a8eceea5f",
+    "signature_result": "rpmkeys digests signatures OK",
+    "system_install": false,
+    "Xvfb_bytes_unchanged": true,
+    "health1": "Displayfd/XTEST/41ELF functional proof passed, but immediate teardown snapshot saw exiting child and overall1. Preserved.",
+    "health2": "Existing20x50ms boundedowned-exit observation saw childR thenabsent50mslater, zeroowned/drift; overall0. No originalGUI/scenario remaining-owned assertion changed.",
+    "health2_status_sha256": "b5e8c05b161194e64d721cae422badcde8b395a38d82c74c7bd1b9f1bc3c64eb",
+    "expected_private_files_DSO_pins": 99,
+    "actual_server_mapped_ELFs": 41,
+    "identity_policy": "Actual serverexe stat/inode/hash, actualPIDs/start, explicit private /usr/bin bind actualfilesystem-path identity +childcoveringmount mapdevice/source/inode and unchangedhostcertificate; product same-namespace guard remains unchanged."
+  },
+  "unchanged": "Original frozenSource8GUIscenario/source and inputroster, actual FLTK universalmenu/Bake/Save/UndoRedo/reopen, all4pixelprobes, correct<=3/wrongnormal>=7/geometry>=12, originalstep50/phase900, RSS6GiB, V3transactional witness and all oldclassifier refusal rules, canonicalbitmap product runtime, commonleasebeforeproducts and finalzeroowned.",
+  "GUI_cases": [
+    {
+      "case": "pbr-quarter",
+      "exit": 0,
+      "checks": 52,
+      "seconds": 47.018662007001694,
+      "status_sha256": "55fdb2edf3c81827876b0e7bcc4cf448b46f9fd7dd3d87a217cf67bc791b814c",
+      "actual_private_Xvfb": {
+        "2892834": {
+          "identity": {
+            "start": 26438691,
+            "pgrp": 2892805,
+            "ppid": 2892833,
+            "state": "S"
+          },
+          "mapped_paths": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xvfb-private-20261115/deps/usr/lib64/libXfont2.so.2",
+            "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xvfb-private-20261115/deps/usr/lib64/libselinux.so.1",
+            "/opt/fltk-vr/bdf-runtime/lib/libfreetype.so.6.20.6",
+            "/usr/bin/Xvfb",
+            "/usr/lib64/dri/libdril_dri.so",
+            "/usr/lib64/ld-linux-x86-64.so.2",
+            "/usr/lib64/libGL.so.1.7.0",
+            "/usr/lib64/libGLX.so.0.0.0",
+            "/usr/lib64/libGLdispatch.so.0.0.0",
+            "/usr/lib64/libLLVM.so.22.1",
+            "/usr/lib64/libX11.so.6.4.0",
+            "/usr/lib64/libXau.so.6.0.0",
+            "/usr/lib64/libXdmcp.so.6.0.0",
+            "/usr/lib64/libXext.so.6.4.0",
+            "/usr/lib64/libaudit.so.1.0.0",
+            "/usr/lib64/libbrotlicommon.so.1.2.1",
+            "/usr/lib64/libbrotlidec.so.1.2.1",
+            "/usr/lib64/libbz2.so.1.0.8",
+            "/usr/lib64/libc.so.6",
+            "/usr/lib64/libcap-ng.so.0.0.0",
+            "/usr/lib64/libcrypto.so.3.5.9",
+            "/usr/lib64/libdrm.so.2.134.0",
+            "/usr/lib64/libedit.so.0.0.78",
+            "/usr/lib64/libexpat.so.1.13.0",
+            "/usr/lib64/libffi.so.8.2.0",
+            "/usr/lib64/libfontenc.so.1.0.0",
+            "/usr/lib64/libgbm.so.1.0.0",
+            "/usr/lib64/libgcc_s-16-20261029.so.1",
+            "/usr/lib64/liblzma.so.5.8.2",
+            "/usr/lib64/libm.so.6",
+            "/usr/lib64/libpcre2-8.so.0.16.1",
+            "/usr/lib64/libpixman-1.so.0.46.2",
+            "/usr/lib64/libpng16.so.16.59.0",
+            "/usr/lib64/libstdc++.so.6.0.36",
+            "/usr/lib64/libsystemd.so.0.42.0",
+            "/usr/lib64/libtinfo.so.6.6",
+            "/usr/lib64/libunwind.so.8.2.0",
+            "/usr/lib64/libxcb.so.1.1.0",
+            "/usr/lib64/libxml2.so.2.12.10",
+            "/usr/lib64/libz.so.1.3.1.zlib-ng",
+            "/usr/lib64/libzstd.so.1.5.7"
+          ],
+          "certificate_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-validation-admitted-v3-20261115/release-gui-pbr-quarter-private-xvfb-v4/actual-private-Xvfb-2892834.json",
+          "certificate_sha256": "156779a101a2edec0a070f8d442dc336d4fda92d88b9115ce7230f689118d2ab",
+          "mapped_ELFs": 41
+        }
+      },
+      "input_drift": [],
+      "remaining_owned_processes": {}
+    },
+    {
+      "case": "pbr-tiny",
+      "exit": 0,
+      "checks": 52,
+      "seconds": 45.83566321898252,
+      "status_sha256": "945214b3e4fcea3a1b97b8370069d7412c511d6e7461519b6615a283b8258641",
+      "actual_private_Xvfb": {
+        "2907552": {
+          "identity": {
+            "start": 26449689,
+            "pgrp": 2907497,
+            "ppid": 2907551,
+            "state": "S"
+          },
+          "mapped_paths": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xvfb-private-20261115/deps/usr/lib64/libXfont2.so.2",
+            "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xvfb-private-20261115/deps/usr/lib64/libselinux.so.1",
+            "/opt/fltk-vr/bdf-runtime/lib/libfreetype.so.6.20.6",
+            "/usr/bin/Xvfb",
+            "/usr/lib64/dri/libdril_dri.so",
+            "/usr/lib64/ld-linux-x86-64.so.2",
+            "/usr/lib64/libGL.so.1.7.0",
+            "/usr/lib64/libGLX.so.0.0.0",
+            "/usr/lib64/libGLdispatch.so.0.0.0",
+            "/usr/lib64/libLLVM.so.22.1",
+            "/usr/lib64/libX11.so.6.4.0",
+            "/usr/lib64/libXau.so.6.0.0",
+            "/usr/lib64/libXdmcp.so.6.0.0",
+            "/usr/lib64/libXext.so.6.4.0",
+            "/usr/lib64/libaudit.so.1.0.0",
+            "/usr/lib64/libbrotlicommon.so.1.2.1",
+            "/usr/lib64/libbrotlidec.so.1.2.1",
+            "/usr/lib64/libbz2.so.1.0.8",
+            "/usr/lib64/libc.so.6",
+            "/usr/lib64/libcap-ng.so.0.0.0",
+            "/usr/lib64/libcrypto.so.3.5.9",
+            "/usr/lib64/libdrm.so.2.134.0",
+            "/usr/lib64/libedit.so.0.0.78",
+            "/usr/lib64/libexpat.so.1.13.0",
+            "/usr/lib64/libffi.so.8.2.0",
+            "/usr/lib64/libfontenc.so.1.0.0",
+            "/usr/lib64/libgbm.so.1.0.0",
+            "/usr/lib64/libgcc_s-16-20261029.so.1",
+            "/usr/lib64/liblzma.so.5.8.2",
+            "/usr/lib64/libm.so.6",
+            "/usr/lib64/libpcre2-8.so.0.16.1",
+            "/usr/lib64/libpixman-1.so.0.46.2",
+            "/usr/lib64/libpng16.so.16.59.0",
+            "/usr/lib64/libstdc++.so.6.0.36",
+            "/usr/lib64/libsystemd.so.0.42.0",
+            "/usr/lib64/libtinfo.so.6.6",
+            "/usr/lib64/libunwind.so.8.2.0",
+            "/usr/lib64/libxcb.so.1.1.0",
+            "/usr/lib64/libxml2.so.2.12.10",
+            "/usr/lib64/libz.so.1.3.1.zlib-ng",
+            "/usr/lib64/libzstd.so.1.5.7"
+          ],
+          "certificate_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-validation-admitted-v3-20261115/release-gui-pbr-tiny-private-xvfb-v4/actual-private-Xvfb-2907552.json",
+          "certificate_sha256": "8e284a9bf67d86dced6c9a59ea20f2e63f59d87def0f33d749e5e3f5801573ce",
+          "mapped_ELFs": 41
+        }
+      },
+      "input_drift": [],
+      "remaining_owned_processes": {}
+    },
+    {
+      "case": "mtoon-quarter",
+      "exit": 0,
+      "checks": 52,
+      "seconds": 80.71617392002372,
+      "status_sha256": "e2342f79331aa6128feffb3ac7f0f138958940ebfa273a84061b886ee4b84dd4",
+      "actual_private_Xvfb": {
+        "2917435": {
+          "identity": {
+            "start": 26457155,
+            "pgrp": 2917405,
+            "ppid": 2917434,
+            "state": "S"
+          },
+          "mapped_paths": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xvfb-private-20261115/deps/usr/lib64/libXfont2.so.2",
+            "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xvfb-private-20261115/deps/usr/lib64/libselinux.so.1",
+            "/opt/fltk-vr/bdf-runtime/lib/libfreetype.so.6.20.6",
+            "/usr/bin/Xvfb",
+            "/usr/lib64/dri/libdril_dri.so",
+            "/usr/lib64/ld-linux-x86-64.so.2",
+            "/usr/lib64/libGL.so.1.7.0",
+            "/usr/lib64/libGLX.so.0.0.0",
+            "/usr/lib64/libGLdispatch.so.0.0.0",
+            "/usr/lib64/libLLVM.so.22.1",
+            "/usr/lib64/libX11.so.6.4.0",
+            "/usr/lib64/libXau.so.6.0.0",
+            "/usr/lib64/libXdmcp.so.6.0.0",
+            "/usr/lib64/libXext.so.6.4.0",
+            "/usr/lib64/libaudit.so.1.0.0",
+            "/usr/lib64/libbrotlicommon.so.1.2.1",
+            "/usr/lib64/libbrotlidec.so.1.2.1",
+            "/usr/lib64/libbz2.so.1.0.8",
+            "/usr/lib64/libc.so.6",
+            "/usr/lib64/libcap-ng.so.0.0.0",
+            "/usr/lib64/libcrypto.so.3.5.9",
+            "/usr/lib64/libdrm.so.2.134.0",
+            "/usr/lib64/libedit.so.0.0.78",
+            "/usr/lib64/libexpat.so.1.13.0",
+            "/usr/lib64/libffi.so.8.2.0",
+            "/usr/lib64/libfontenc.so.1.0.0",
+            "/usr/lib64/libgbm.so.1.0.0",
+            "/usr/lib64/libgcc_s-16-20261029.so.1",
+            "/usr/lib64/liblzma.so.5.8.2",
+            "/usr/lib64/libm.so.6",
+            "/usr/lib64/libpcre2-8.so.0.16.1",
+            "/usr/lib64/libpixman-1.so.0.46.2",
+            "/usr/lib64/libpng16.so.16.59.0",
+            "/usr/lib64/libstdc++.so.6.0.36",
+            "/usr/lib64/libsystemd.so.0.42.0",
+            "/usr/lib64/libtinfo.so.6.6",
+            "/usr/lib64/libunwind.so.8.2.0",
+            "/usr/lib64/libxcb.so.1.1.0",
+            "/usr/lib64/libxml2.so.2.12.10",
+            "/usr/lib64/libz.so.1.3.1.zlib-ng",
+            "/usr/lib64/libzstd.so.1.5.7"
+          ],
+          "certificate_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-validation-admitted-v3-20261115/release-gui-mtoon-quarter-private-xvfb-v4/actual-private-Xvfb-2917435.json",
+          "certificate_sha256": "8a9df810fa66f825b8abf4cc452697b5d2da0d2344ea67d803aa41e2d9a7eb3e",
+          "mapped_ELFs": 41
+        }
+      },
+      "input_drift": [],
+      "remaining_owned_processes": {}
+    },
+    {
+      "case": "mtoon-tiny",
+      "exit": 0,
+      "checks": 52,
+      "seconds": 81.08192185399821,
+      "status_sha256": "5f411e0b8546f7356dcbe75ba84949d34bdd93feb4cecd4950861cacb4cafb49",
+      "actual_private_Xvfb": {
+        "2932505": {
+          "identity": {
+            "start": 26468177,
+            "pgrp": 2932452,
+            "ppid": 2932504,
+            "state": "S"
+          },
+          "mapped_paths": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xvfb-private-20261115/deps/usr/lib64/libXfont2.so.2",
+            "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xvfb-private-20261115/deps/usr/lib64/libselinux.so.1",
+            "/opt/fltk-vr/bdf-runtime/lib/libfreetype.so.6.20.6",
+            "/usr/bin/Xvfb",
+            "/usr/lib64/dri/libdril_dri.so",
+            "/usr/lib64/ld-linux-x86-64.so.2",
+            "/usr/lib64/libGL.so.1.7.0",
+            "/usr/lib64/libGLX.so.0.0.0",
+            "/usr/lib64/libGLdispatch.so.0.0.0",
+            "/usr/lib64/libLLVM.so.22.1",
+            "/usr/lib64/libX11.so.6.4.0",
+            "/usr/lib64/libXau.so.6.0.0",
+            "/usr/lib64/libXdmcp.so.6.0.0",
+            "/usr/lib64/libXext.so.6.4.0",
+            "/usr/lib64/libaudit.so.1.0.0",
+            "/usr/lib64/libbrotlicommon.so.1.2.1",
+            "/usr/lib64/libbrotlidec.so.1.2.1",
+            "/usr/lib64/libbz2.so.1.0.8",
+            "/usr/lib64/libc.so.6",
+            "/usr/lib64/libcap-ng.so.0.0.0",
+            "/usr/lib64/libcrypto.so.3.5.9",
+            "/usr/lib64/libdrm.so.2.134.0",
+            "/usr/lib64/libedit.so.0.0.78",
+            "/usr/lib64/libexpat.so.1.13.0",
+            "/usr/lib64/libffi.so.8.2.0",
+            "/usr/lib64/libfontenc.so.1.0.0",
+            "/usr/lib64/libgbm.so.1.0.0",
+            "/usr/lib64/libgcc_s-16-20261029.so.1",
+            "/usr/lib64/liblzma.so.5.8.2",
+            "/usr/lib64/libm.so.6",
+            "/usr/lib64/libpcre2-8.so.0.16.1",
+            "/usr/lib64/libpixman-1.so.0.46.2",
+            "/usr/lib64/libpng16.so.16.59.0",
+            "/usr/lib64/libstdc++.so.6.0.36",
+            "/usr/lib64/libsystemd.so.0.42.0",
+            "/usr/lib64/libtinfo.so.6.6",
+            "/usr/lib64/libunwind.so.8.2.0",
+            "/usr/lib64/libxcb.so.1.1.0",
+            "/usr/lib64/libxml2.so.2.12.10",
+            "/usr/lib64/libz.so.1.3.1.zlib-ng",
+            "/usr/lib64/libzstd.so.1.5.7"
+          ],
+          "certificate_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-validation-admitted-v3-20261115/release-gui-mtoon-tiny-private-xvfb-v4/actual-private-Xvfb-2932505.json",
+          "certificate_sha256": "f1efbabb6e16e73bf99b8090aa182ba074174998f191c8a4b17a2be87cf5a1f4",
+          "mapped_ELFs": 41
+        }
+      },
+      "input_drift": [],
+      "remaining_owned_processes": {}
+    }
+  ],
+  "total_actual_checks": 208,
+  "outer_GUI_tool_exits": {
+    "47888": 0,
+    "82496": 0,
+    "69996": 0,
+    "6968": 0
+  },
+  "independent_artifact_admission_sha256": "39c71b267c63127b68b40acc959df021fd662a56fad38c809d0a92af741c6f3e",
+  "original_outer_build_exit143_preserved": true,
+  "real_loader_XR": "Firstcase launched separately after allGUI0; noXRpass inferred in this seal.",
+  "files": {
+    "guard87-private-Xvfb-prepared-20261115.json.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xvfb-private-20261115/private-closure-prepared-v1.json",
+      "sha256": "308e4673b63b8206c8f6d617a147125c5c8d6477a96900f407457d18426ee811",
+      "tracked_payload_sha256": "cee4a7473627d56f44dc0ebdde449e075d03611844b8c558e3d6292ec79c1073"
+    },
+    "guard87-private-Xvfb-health-failed-20261115.json.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xvfb-private-20261115/health-v1/status.json",
+      "sha256": "89b8c17768d2712915b4e4a3900b5c0ba7c60b40cdb5664a514bfbe158802c49",
+      "tracked_payload_sha256": "a41d86a964658697ea86e12f6d37405887063f6fde5cf5d9215ef0886119bbe3"
+    },
+    "guard87-private-Xvfb-health-20261115.json.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xvfb-private-20261115/health-v2/status.json",
+      "sha256": "b5e8c05b161194e64d721cae422badcde8b395a38d82c74c7bd1b9f1bc3c64eb",
+      "tracked_payload_sha256": "2181d7327d9f7de367c6be1ed1c0a004a36838c2a6653bab085152a4ad4d1c03"
+    },
+    "guard87-private-Xvfb-original-GUI-failure-20261115.json.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-validation-admitted-v3-20261115/release-gui-pbr-quarter-transaction-v3/status.json",
+      "sha256": "085e8f544e53d01a07998349f5c4bcd1cf1564c592594f48657edbcab8b2e0e0",
+      "tracked_payload_sha256": "a2a0ca06f05eb3b759431fd821adff0d63aac47fe70dea2d627a36c61e228e3b"
+    },
+    "guard87-private-Xvfb-identity-20261115.py": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xvfb-private-20261115/xvfb_identity.py",
+      "sha256": "79abd2a6800a7277f096e5066fe5dcbb7b4c4f5a79de707e4288c858d597ffd7",
+      "tracked_payload_sha256": "79abd2a6800a7277f096e5066fe5dcbb7b4c4f5a79de707e4288c858d597ffd7"
+    },
+    "guard87-private-Xvfb-health-20261115.py": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xvfb-private-20261115/health-v2.py",
+      "sha256": "151c6119148fdebe728cac5c4b1d0840a578a3cf11f521eb59e0b50cfce67746",
+      "tracked_payload_sha256": "151c6119148fdebe728cac5c4b1d0840a578a3cf11f521eb59e0b50cfce67746"
+    },
+    "guard87-private-Xvfb-GUI-run-20261115.py": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-validation-admitted-v3-20261115/run-xvfb-private-v4.py",
+      "sha256": "52e1762ebb79d8e4ec2750aa5abc747fbec2fb50a23753dd5bc6d561928652bd",
+      "tracked_payload_sha256": "52e1762ebb79d8e4ec2750aa5abc747fbec2fb50a23753dd5bc6d561928652bd"
+    },
+    "guard87-private-GUI-pbr-quarter-20261115.json.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-validation-admitted-v3-20261115/release-gui-pbr-quarter-private-xvfb-v4/status.json",
+      "sha256": "55fdb2edf3c81827876b0e7bcc4cf448b46f9fd7dd3d87a217cf67bc791b814c",
+      "tracked_payload_sha256": "1e981249e5829426b24a2224ba958aa024dec0d208debf363ba24ab78f8519a8"
+    },
+    "guard87-private-GUI-pbr-quarter-report-20261115.json.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-validation-admitted-v3-20261115/release-gui-pbr-quarter-private-xvfb-v4/workflow/report.json",
+      "sha256": "23e082b7f0f6d72f3bfe7cc118fc1aa2c007b6be7f1fd85002ab624870be42fc",
+      "tracked_payload_sha256": "b858da317d3a9d2e6546fc2c785068c8c20aa1fdad82a81090cd4e33d1092429"
+    },
+    "guard87-private-GUI-pbr-tiny-20261115.json.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-validation-admitted-v3-20261115/release-gui-pbr-tiny-private-xvfb-v4/status.json",
+      "sha256": "945214b3e4fcea3a1b97b8370069d7412c511d6e7461519b6615a283b8258641",
+      "tracked_payload_sha256": "68bd5ec0fdb3584e6d45a20cb98b42d1342e65f6504b5d48870a3cc39af79be9"
+    },
+    "guard87-private-GUI-pbr-tiny-report-20261115.json.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-validation-admitted-v3-20261115/release-gui-pbr-tiny-private-xvfb-v4/workflow/report.json",
+      "sha256": "b8cc22d499633e3a6ad861858ee7725bc586c9cac2cc399a25c44911fcc43f85",
+      "tracked_payload_sha256": "a58febfa2341b6c7f6882b3ebc810239891fea81d283bd3eef6bbf926530d5b2"
+    },
+    "guard87-private-GUI-mtoon-quarter-20261115.json.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-validation-admitted-v3-20261115/release-gui-mtoon-quarter-private-xvfb-v4/status.json",
+      "sha256": "e2342f79331aa6128feffb3ac7f0f138958940ebfa273a84061b886ee4b84dd4",
+      "tracked_payload_sha256": "9585419895290cda3079efb2dd0b8018392e562c4ca5be37773fe8da67ebfd90"
+    },
+    "guard87-private-GUI-mtoon-quarter-report-20261115.json.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-validation-admitted-v3-20261115/release-gui-mtoon-quarter-private-xvfb-v4/workflow/report.json",
+      "sha256": "b963eb8c01ef82158cf53c95caa08d6b48c4c92821446d6bc0737f0b181a3443",
+      "tracked_payload_sha256": "ccbde946e78fe6e3a0c7551e672ca98b67a71ce5f9d72f26d22aab448b99edba"
+    },
+    "guard87-private-GUI-mtoon-tiny-20261115.json.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-validation-admitted-v3-20261115/release-gui-mtoon-tiny-private-xvfb-v4/status.json",
+      "sha256": "5f411e0b8546f7356dcbe75ba84949d34bdd93feb4cecd4950861cacb4cafb49",
+      "tracked_payload_sha256": "743c3d68dbde6fc34b36fbe4efb40f0875ee5acd189551106ea07d64f74416d9"
+    },
+    "guard87-private-GUI-mtoon-tiny-report-20261115.json.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-validation-admitted-v3-20261115/release-gui-mtoon-tiny-private-xvfb-v4/workflow/report.json",
+      "sha256": "52f90c5a758c47a53716219d298506e7def166733757d8fe3942363edeade217",
+      "tracked_payload_sha256": "a73a5f2d9bc054775afa54499bf432db5e48db2d8052eb4e06f5c4b9e03ffdac"
+    },
+    "guard87-private-Xvfb-GUI-integration-20261115.diff.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-validation-admitted-v3-20261115/run-xvfb-private-v4.diff",
+      "sha256": "48620d269585e1f69c7ea9feec2787676beb0fd3f02a36df87aa7ac26ac629f3",
+      "tracked_payload_sha256": "d792e0b147a143d7fffbe926439cc2d58304a1d1212f47fad2379479a17e97c0"
+    },
+    "guard87-private-GUI-pbr-quarter-actual-private-Xvfb-2892834.json-20261115.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-validation-admitted-v3-20261115/release-gui-pbr-quarter-private-xvfb-v4/actual-private-Xvfb-2892834.json",
+      "sha256": "156779a101a2edec0a070f8d442dc336d4fda92d88b9115ce7230f689118d2ab",
+      "tracked_payload_sha256": "d17d883c47b5de08f9aec3f3d53ca5b7fa0e8eb27a1c30e95a51562c9df119ff"
+    },
+    "guard87-private-GUI-pbr-quarter-mapped-ELFs.json-20261115.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-validation-admitted-v3-20261115/release-gui-pbr-quarter-private-xvfb-v4/mapped-ELFs.json",
+      "sha256": "47fbfc737dc9aff8690e90b72b6aa8b9c56fef24310e2bc0178ec698974415d2",
+      "tracked_payload_sha256": "566c83f2ded8399317a70f798035b47f61dc4b0c034886d095d7da3a02aa55df"
+    },
+    "guard87-private-GUI-pbr-quarter-readable-DRI.json-20261115.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-validation-admitted-v3-20261115/release-gui-pbr-quarter-private-xvfb-v4/readable-DRI.json",
+      "sha256": "6027dec73e557d673e0de434729e14267e093cd6bd994a01b3bff8613d6fab98",
+      "tracked_payload_sha256": "86c901a4d4d05762544937d2cae3cd147dd6adb3816d6c04c4d7648936c0f4a0"
+    },
+    "guard87-private-GUI-pbr-quarter-source8-probe-0.json-20261115.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-validation-admitted-v3-20261115/release-gui-pbr-quarter-private-xvfb-v4/workflow/source8-probe-0.json",
+      "sha256": "8d3d47a3d12c753da3377ab84dc16a620a04f3965ba23d38191fc725bca3a424",
+      "tracked_payload_sha256": "6a3864e50b58b74f8e758b78d3a6abf905c22ba8c12f00caf5eea470b5944769"
+    },
+    "guard87-private-GUI-pbr-quarter-source8-probe-1.json-20261115.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-validation-admitted-v3-20261115/release-gui-pbr-quarter-private-xvfb-v4/workflow/source8-probe-1.json",
+      "sha256": "5db5e078522f80a0c0a7dd22d947abc99989d49f1ae8e714fbce534009cd4683",
+      "tracked_payload_sha256": "866aad9ffbb7313a3bc6dc9a174ccb305fb7b674b66e7f76b19a4e4d70956cba"
+    },
+    "guard87-private-GUI-pbr-quarter-source8-probe-2.json-20261115.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-validation-admitted-v3-20261115/release-gui-pbr-quarter-private-xvfb-v4/workflow/source8-probe-2.json",
+      "sha256": "e643c73d992efd8f2c9e3a66050852162f6ffc6794296d1b3324b90a612eb2fe",
+      "tracked_payload_sha256": "6e34f58fef643373549adcae89fde085e43dc4ede3ebe6289c399d5ade626660"
+    },
+    "guard87-private-GUI-pbr-quarter-source8-probe-3.json-20261115.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-validation-admitted-v3-20261115/release-gui-pbr-quarter-private-xvfb-v4/workflow/source8-probe-3.json",
+      "sha256": "67455dd28958d7842930316d5ddfb24dafe30e5d235527a02141d622d1a25d90",
+      "tracked_payload_sha256": "5933718f29a38997a29cf0505bee9ef26a287f742544ccfeccca197e69933dae"
+    },
+    "guard87-private-GUI-pbr-quarter-source8-normal-sensitivity.json-20261115.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-validation-admitted-v3-20261115/release-gui-pbr-quarter-private-xvfb-v4/workflow/source8-normal-sensitivity.json",
+      "sha256": "e47cc58f903c4f124b7f13075fff71dc16fc7120f41e8161880f29aea1c32731",
+      "tracked_payload_sha256": "6518f0faac8c37c2291ff2c57bce89cb2fd90e403710706f2d9a339fc30fcd55"
+    },
+    "guard87-private-GUI-pbr-tiny-actual-private-Xvfb-2907552.json-20261115.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-validation-admitted-v3-20261115/release-gui-pbr-tiny-private-xvfb-v4/actual-private-Xvfb-2907552.json",
+      "sha256": "8e284a9bf67d86dced6c9a59ea20f2e63f59d87def0f33d749e5e3f5801573ce",
+      "tracked_payload_sha256": "687d21d5e1683628848cbd0e46eb4e5317a5a274528c95db58b4f9f5bc36a877"
+    },
+    "guard87-private-GUI-pbr-tiny-mapped-ELFs.json-20261115.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-validation-admitted-v3-20261115/release-gui-pbr-tiny-private-xvfb-v4/mapped-ELFs.json",
+      "sha256": "9cc7a595c3b60bb34c202bc13d56071838b2a7910f4f5637208a7b5436fd8b9b",
+      "tracked_payload_sha256": "a7a277c0a3915966744ed6c5d977af4071fcbf9ec86310e795007579e419d096"
+    },
+    "guard87-private-GUI-pbr-tiny-readable-DRI.json-20261115.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-validation-admitted-v3-20261115/release-gui-pbr-tiny-private-xvfb-v4/readable-DRI.json",
+      "sha256": "95e9b44c4bbf83d84957925d3ddfa7135d91fdbe87a2cdce0b80a9ddedde1f9a",
+      "tracked_payload_sha256": "cd0a7112342c4214ac06db4e3f1dfafcd448babf39c144e6e7efd8f7b91206a7"
+    },
+    "guard87-private-GUI-pbr-tiny-source8-probe-0.json-20261115.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-validation-admitted-v3-20261115/release-gui-pbr-tiny-private-xvfb-v4/workflow/source8-probe-0.json",
+      "sha256": "ba45c97a7fac03407020bdfe072ceb1aee2ab58635d3b862535a9a2883e07a9b",
+      "tracked_payload_sha256": "492cccab37531d9adb80e9dc26805131e761def79807212d17c71dfa526b1f95"
+    },
+    "guard87-private-GUI-pbr-tiny-source8-probe-1.json-20261115.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-validation-admitted-v3-20261115/release-gui-pbr-tiny-private-xvfb-v4/workflow/source8-probe-1.json",
+      "sha256": "30a7406890a200730dd5e22738a44b52c11551fd29d36c4f5c3c97992985407c",
+      "tracked_payload_sha256": "4818e58f75dc5f8ca55f2c2b70c453bb5cd8e061c832418edcec6ba98ea358b8"
+    },
+    "guard87-private-GUI-pbr-tiny-source8-probe-2.json-20261115.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-validation-admitted-v3-20261115/release-gui-pbr-tiny-private-xvfb-v4/workflow/source8-probe-2.json",
+      "sha256": "980679daa9668ac0c0acd567ccba13311f01f2a47ce98802431bd404186bc62f",
+      "tracked_payload_sha256": "b399cbb52d37f466c6bef082c599b6daef08763ea4227504211820b8799d3ded"
+    },
+    "guard87-private-GUI-pbr-tiny-source8-probe-3.json-20261115.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-validation-admitted-v3-20261115/release-gui-pbr-tiny-private-xvfb-v4/workflow/source8-probe-3.json",
+      "sha256": "3ff573b2d706a57ac4a5ef46a8ecde56a013d32953de0f04a1260b547baa51cb",
+      "tracked_payload_sha256": "7a76183eb36594282116ae970ff9bdd75b87fb646ba422371de24d560c519d7e"
+    },
+    "guard87-private-GUI-pbr-tiny-source8-normal-sensitivity.json-20261115.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-validation-admitted-v3-20261115/release-gui-pbr-tiny-private-xvfb-v4/workflow/source8-normal-sensitivity.json",
+      "sha256": "0d6b9f3a88bfb42a44a116132c6be0f376a8926d064ca6186d1365e5646774ce",
+      "tracked_payload_sha256": "54d7bde8c4acb2be2426a140c05c5703cece118e6c5f45fca32fd42ac16065c2"
+    },
+    "guard87-private-GUI-mtoon-quarter-actual-private-Xvfb-2917435.json-20261115.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-validation-admitted-v3-20261115/release-gui-mtoon-quarter-private-xvfb-v4/actual-private-Xvfb-2917435.json",
+      "sha256": "8a9df810fa66f825b8abf4cc452697b5d2da0d2344ea67d803aa41e2d9a7eb3e",
+      "tracked_payload_sha256": "0c4c6f8288d255d8c2e709ffe36217257e0b4026c632800d78f2cd3098056090"
+    },
+    "guard87-private-GUI-mtoon-quarter-mapped-ELFs.json-20261115.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-validation-admitted-v3-20261115/release-gui-mtoon-quarter-private-xvfb-v4/mapped-ELFs.json",
+      "sha256": "c5195e6d3e9876de9e154658606ad87ab77f69bfcc61ecfadf64b2cf47b94177",
+      "tracked_payload_sha256": "96c2769e8ede828d89cbd9b2f85ddbfa1380c95cf2cf42d9443e962213bf7991"
+    },
+    "guard87-private-GUI-mtoon-quarter-readable-DRI.json-20261115.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-validation-admitted-v3-20261115/release-gui-mtoon-quarter-private-xvfb-v4/readable-DRI.json",
+      "sha256": "b1e235299d0b31f06d04e407a62908dc6f1647a71154b20e673b114a28090e72",
+      "tracked_payload_sha256": "16b17afeaa9aedc10029d6db59ac2202b0f4e7343549eafeebc6e3a566a985dd"
+    },
+    "guard87-private-GUI-mtoon-quarter-source8-probe-0.json-20261115.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-validation-admitted-v3-20261115/release-gui-mtoon-quarter-private-xvfb-v4/workflow/source8-probe-0.json",
+      "sha256": "ff5a65a9657002bff727b0b3db5c6d5756d0701b017be222dfc010dc565bcd93",
+      "tracked_payload_sha256": "2fc9bf2fe87893bb1c273368b24019fd3644a02d4d419a4bdcce22c10cd7b713"
+    },
+    "guard87-private-GUI-mtoon-quarter-source8-probe-1.json-20261115.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-validation-admitted-v3-20261115/release-gui-mtoon-quarter-private-xvfb-v4/workflow/source8-probe-1.json",
+      "sha256": "1e567a49df566b28b88c5eafaecd62944255a3844ffd10d4fdcb64059afb3d55",
+      "tracked_payload_sha256": "8e0d3234c554191734b5e6b537d3a065f8433c349cd0f1d61b0f774afe888442"
+    },
+    "guard87-private-GUI-mtoon-quarter-source8-probe-2.json-20261115.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-validation-admitted-v3-20261115/release-gui-mtoon-quarter-private-xvfb-v4/workflow/source8-probe-2.json",
+      "sha256": "eb57b7f99113c29bdc7e6bbf5d08c5dab3ed4bb31d548ec981bcab31d7b73aa3",
+      "tracked_payload_sha256": "87338b1667498a753ff9d7fe1e44894d8bbce8471f79e2cc618351c53260a4e7"
+    },
+    "guard87-private-GUI-mtoon-quarter-source8-probe-3.json-20261115.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-validation-admitted-v3-20261115/release-gui-mtoon-quarter-private-xvfb-v4/workflow/source8-probe-3.json",
+      "sha256": "326438da21e7ac972bee5625d9b046f59ab32802fe231dde151dc206d9369a41",
+      "tracked_payload_sha256": "aa0c7bb77b721c2aa8fcca9f6cd84b9192a633608d6060a6fbc0243aba05c41b"
+    },
+    "guard87-private-GUI-mtoon-quarter-source8-normal-sensitivity.json-20261115.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-validation-admitted-v3-20261115/release-gui-mtoon-quarter-private-xvfb-v4/workflow/source8-normal-sensitivity.json",
+      "sha256": "07e8415556b6d28d21161d5d62e15a9c5469008f0226c04130979f3dbaa1dacf",
+      "tracked_payload_sha256": "6b6d151241bf135bd35ba941de56c644cdf0b0d09e4c8add08d2e8698dbeab6a"
+    },
+    "guard87-private-GUI-mtoon-tiny-actual-private-Xvfb-2932505.json-20261115.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-validation-admitted-v3-20261115/release-gui-mtoon-tiny-private-xvfb-v4/actual-private-Xvfb-2932505.json",
+      "sha256": "f1efbabb6e16e73bf99b8090aa182ba074174998f191c8a4b17a2be87cf5a1f4",
+      "tracked_payload_sha256": "50bbd877bf632869833fff348fe3e540d983a410e6733d34e8321e0c0f3df9e4"
+    },
+    "guard87-private-GUI-mtoon-tiny-mapped-ELFs.json-20261115.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-validation-admitted-v3-20261115/release-gui-mtoon-tiny-private-xvfb-v4/mapped-ELFs.json",
+      "sha256": "7d9a1b6a7247a99a0771e1c9d1458a5c8625a9cb03de49549a44d7dd33ac3933",
+      "tracked_payload_sha256": "579805282e19af07a96c7c8993ba1a38e6aa43bff1c086de942abadf92a161d9"
+    },
+    "guard87-private-GUI-mtoon-tiny-readable-DRI.json-20261115.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-validation-admitted-v3-20261115/release-gui-mtoon-tiny-private-xvfb-v4/readable-DRI.json",
+      "sha256": "846e9f04ae778a2feb36f2870516d12503b878b83299109d45430d2602078204",
+      "tracked_payload_sha256": "d2f92d420d9ab229ee56d9c5d3d924d857f68580f54a168a0f9d42b4ba2fe033"
+    },
+    "guard87-private-GUI-mtoon-tiny-source8-probe-0.json-20261115.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-validation-admitted-v3-20261115/release-gui-mtoon-tiny-private-xvfb-v4/workflow/source8-probe-0.json",
+      "sha256": "c0b499d78650488ac949c3bbcc1d5bd158bd43d82fa34331400715dd68139a17",
+      "tracked_payload_sha256": "57ef2dd2de523e3fc7840079ff7e6686a2a81df5ec0c7bb7cfdfe933ad9f2d16"
+    },
+    "guard87-private-GUI-mtoon-tiny-source8-probe-1.json-20261115.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-validation-admitted-v3-20261115/release-gui-mtoon-tiny-private-xvfb-v4/workflow/source8-probe-1.json",
+      "sha256": "a1794084af6f38878ca6a4b9e741702241fef4d9319d2fb15469a95af5bd4edf",
+      "tracked_payload_sha256": "14f53b566f202a5608a89c4ccbbdb2cd762ee1aab6b62285c0108af835aa548b"
+    },
+    "guard87-private-GUI-mtoon-tiny-source8-probe-2.json-20261115.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-validation-admitted-v3-20261115/release-gui-mtoon-tiny-private-xvfb-v4/workflow/source8-probe-2.json",
+      "sha256": "1e481f6afc61e229de0fabe95a17963d51243c1d967b352adddcd6161041accc",
+      "tracked_payload_sha256": "0abeca204462e0611cc555b4d0e889ad86fa69907a0c3212a09b522d28fd7fe5"
+    },
+    "guard87-private-GUI-mtoon-tiny-source8-probe-3.json-20261115.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-validation-admitted-v3-20261115/release-gui-mtoon-tiny-private-xvfb-v4/workflow/source8-probe-3.json",
+      "sha256": "cab0324695c8057ff915b0c0b5295a35768c7bdacc4e0cbce24112f3d380cbbd",
+      "tracked_payload_sha256": "08400c29b07740107cfcf69f1e59ce51042df17fbc07ec5b4de279dfeca80808"
+    },
+    "guard87-private-GUI-mtoon-tiny-source8-normal-sensitivity.json-20261115.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-validation-admitted-v3-20261115/release-gui-mtoon-tiny-private-xvfb-v4/workflow/source8-normal-sensitivity.json",
+      "sha256": "6e37fbcd03c2ba102d7036136b689c91f3985abb51b16406188fdca8186d71e1",
+      "tracked_payload_sha256": "3ac70053f8c71942c4451a3da6379a81b3ed4d3ab97f7d8cfa8e483dd5ee4c96"
+    }
+  },
+  "evidence_encoding": "Exact unified integration diff stored gzip to preserve required patch context spaces without text whitespace-lint ambiguity; original raw hash unchanged. Actual server/app map and four independent RGB probe certificates retained alongside statuses."
+}
