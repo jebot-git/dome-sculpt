@@ -1,0 +1,61 @@
+{
+  "scope": "Draft-only fresh current compiler verification, not linked/run/application qualified. Parent fresh currentcore193 independent snapshot pending.",
+  "merge_base": "f1a9970e",
+  "source3d_preserved": true,
+  "compile_status": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-proof-v2-20261115/compile-status.json",
+    "sha256": "8d3d9ab8d299708d6fc6fa997d184f944460951f78bcdfc9733b0497fcc6927b"
+  },
+  "product_and_fixture_sha256": {
+    "src/emission-bake-source.cpp": "9a63685f2a9bd5913082898f30e7ebca6bfa522ebfb4946f00f4e8b2e8be31a3",
+    "src/bake.cpp": "233fcb4d07d223d589a2376065da577aae48c12a70a767b67c8987b15e8e118c",
+    "src/bake-authoring.cpp": "99c050a0f6b9302aa33fb570dd3ec05163c02b4dd5c86d298017be7d5722cae2",
+    "src/source-bake-normal.hpp": "29a343f01a154cfa9d1e8df859f44074e1b9d269e2fddeeac1eaa6d7034545a9",
+    "tests/source-prepared-normal-bake.cpp": "acabc19d660dd1209bd44f1e03a9aed795855c3cf98fc097ca3868d5b407eae1",
+    "CMakeLists.txt": "d6d1dccff66ee7f19906e92580f8c1a2eaa15c081d8cfc6d959ab584c364ec44"
+  },
+  "steps": [
+    {
+      "name": "preprocess-0",
+      "exit": 0,
+      "seconds": 0.11522030830383301
+    },
+    {
+      "name": "preprocess-1",
+      "exit": 0,
+      "seconds": 0.11567449569702148
+    },
+    {
+      "name": "preprocess-2",
+      "exit": 0,
+      "seconds": 0.11614775657653809
+    },
+    {
+      "name": "preprocess-3",
+      "exit": 0,
+      "seconds": 0.11528587341308594
+    },
+    {
+      "name": "compile-0",
+      "exit": 0,
+      "seconds": 3.371812105178833
+    },
+    {
+      "name": "compile-1",
+      "exit": 0,
+      "seconds": 2.978440284729004
+    },
+    {
+      "name": "compile-2",
+      "exit": 0,
+      "seconds": 4.526003837585449
+    },
+    {
+      "name": "compile-3",
+      "exit": 0,
+      "seconds": 8.03348159790039
+    }
+  ],
+  "runtime_executed": false,
+  "archive_reused_or_executed": false
+}

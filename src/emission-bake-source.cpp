@@ -4,6 +4,7 @@
 #include "source-bake-normal.hpp"
 #include "normal-frame-runtime.hpp"
 #include "normal-bake-encoding.hpp"
+#include "normal-preparation-state.hpp"
 #include <numeric>
 #include "dome/material-bindings.hpp"
 #include "dome/material-visibility.hpp"
@@ -86,27 +87,40 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTr
   const auto &binding=object.material_bindings;
   if(!binding||!binding->normal_frames)return {};
   auto stop=[&]{if(options.cancelled&&options.cancelled())throw std::runtime_error("Source normal capture cancelled");};stop();
+  const bool prepared=object.painted&&object.painted->normal_projection()&&binding->normal_preparation;
   if(!object.mesh_active||!object.painted||!object.painted->valid_source_sampling_attachment()||
      binding->canonical_attributes||binding->canonical_uv||binding->canonical_paint_sampling||binding->native_paint_sampling||binding->native_paint_frames||
-     binding->normal_preparation||object.painted->normal_projection()||object.painted->color_projection()||
-     (object.painted->baked()&&(!object.painted->baked()->maps.normal.rgba.empty()||object.painted->baked()->normal_field||object.painted->baked()->normal_authority)))
+     bool(binding->normal_preparation)!=bool(object.painted->normal_projection())||object.painted->color_projection()||
+     (object.painted->baked()&&((!prepared&&!object.painted->baked()->maps.normal.rgba.empty())||object.painted->baked()->normal_field||(!prepared&&object.painted->baked()->normal_authority))))
     throw std::invalid_argument("Artist source normal capture requires its unchanged original frame and separate current-normal adapter");
   const auto &mesh=object.painted->mesh();const auto &set=*binding->normal_frames;
   const uint64_t corners=mesh.indices.size();
   // Charge both posed role arrays, immutable evaluated corner columns and
   // layout scratch before allocating, including retained morph/frame payload.
-  const uint64_t work=set.storage_bytes()+corners*(3*sizeof(uint32_t)+2*(sizeof(Vec3)+sizeof(std::array<float,4>)+sizeof(NormalBakeVertex)));
+  const uint64_t preview_bytes=prepared?uint64_t(object.painted->resolution())*object.painted->resolution()*4*12:0;
+  const uint64_t work=preview_bytes+set.storage_bytes()+corners*(3*sizeof(uint32_t)+2*(sizeof(Vec3)+sizeof(std::array<float,4>)+sizeof(NormalBakeVertex)));
   if(!options.max_working_bytes||options.max_working_bytes>512*1024*1024||work>options.max_working_bytes)
     throw std::length_error("Artist source normal capture exceeds prospective working budget");
   normal_frame_current_authority(*binding,mesh,object.deformation.get(),options.cancelled);
   if(!set.pbr||(binding->has_mtoon&&!set.mtoon))throw std::invalid_argument("Artist source lost its explicitly declared PBR/MToon frame roles");
+  std::shared_ptr<const TextureMaps> current_normals;
+  std::optional<NormalCoordinateView> normal_coordinates;
+  if(prepared){
+    binding->normal_preparation->validate_current(mesh,object.appearance.get(),options.cancelled);
+    current_normals=object.painted->preview(object.material,options.cancelled);
+    if(!prepared_normal_state(binding.get(),current_normals.get(),true))
+      throw std::invalid_argument("Prepared source lacks its actual current normal interpretation");
+    if(auto retained=retained_normal_coordinates(binding.get(),current_normals.get()))normal_coordinates.emplace(*retained);
+    if(normal_coordinates){normal_coordinates->validate(options.cancelled);if(normal_coordinates->indices.size()!=corners)
+      throw std::invalid_argument("Prepared source normal coordinate corners differ from its actual surface");}
+  }
   Source coordinates;coordinates.mesh=object.painted->mesh_owner();coordinates.maps=object.painted->source_maps();coordinates.packet=PaintOverlayFactory::capture(*object.painted,options.cancelled);coordinates.cancelled=options.cancelled;
   if(!coordinates.maps)coordinates.maps=std::make_shared<const PaintSourceMaps>();
   coordinates.maps->validate_surface(mesh);
   const auto typed=binding->has_mtoon?std::optional<MToonMaterial>(binding->material):std::optional<MToonMaterial>{};
   if(typed&&(typed->parameters.scroll!=std::array<float,2>{}||typed->parameters.rotation_speed!=0))
     throw std::invalid_argument("Artist normal source requires an explicit frozen UV animation time");
-  PaintSourceTexture typed_role;if(typed&&typed->textures[size_t(MToonSlot::Normal)].index>=0){typed_role=binding->roles[size_t(MToonSlot::Normal)];if(!typed_role.image)throw std::invalid_argument("Artist source declared typed normal has no actual image owner");}
+  PaintSourceTexture typed_role;if(!prepared&&typed&&typed->textures[size_t(MToonSlot::Normal)].index>=0){typed_role=binding->roles[size_t(MToonSlot::Normal)];if(!typed_role.image)throw std::invalid_argument("Artist source declared typed normal has no actual image owner");}
   if((coordinates.maps->normal.image&&set.pbr->tangents.empty())||(typed&&typed->parameters.normal_enabled&&typed_role.image&&set.mtoon->tangents.empty()))
     throw std::invalid_argument("Artist normal texture requires its genuine declared tangent attribute role");
   NormalFrameLayout layout;layout.vertices=mesh.indices;layout.corners.resize(size_t(corners));std::iota(layout.corners.begin(),layout.corners.end(),0u);
@@ -118,14 +132,14 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTr
     for(size_t c=0;c<corners;++c){if((c&1023)==0)stop();auto N=posed.normals[role].at(c);Vec3 T{1,0,0};float w=1;
       if(!posed.tangents[role].empty()){const auto t=posed.tangents[role][c];T={t[0],t[1],t[2]};w=t[3];}
       auto n=ob::rotate(relative.orientation,{N.x,N.y,N.z}),t=ob::rotate(relative.orientation,{T.x,T.y,T.z});
-      if(has_tangent[role])out.push_back(normal_bake_vertex({n.x,n.y,n.z},{t.x,t.y,t.z},w,NormalVertexBitangent::RawCross));
+      if(has_tangent[role])out.push_back(normal_bake_vertex({n.x,n.y,n.z},{t.x,t.y,t.z},w,prepared?NormalVertexBitangent::UnitCross:NormalVertexBitangent::RawCross));
       else out.push_back({normalized(Vec3{n.x,n.y,n.z}),{},{},1});
     }
   }
   // W is a per-triangle discrete attribute, never a barycentric float sign.
   for(size_t role=0;role<(typed?2u:1u);++role)for(size_t c=0;c<corners;c+=3){if((c&1023)==0)stop();if(vertices->at(role)[c].w!=vertices->at(role)[c+1].w||vertices->at(role)[c].w!=vertices->at(role)[c+2].w)throw std::invalid_argument("Artist source tangent handedness changes inside a triangle");}
   stop();std::shared_ptr<const std::array<std::vector<NormalBakeVertex>,2>> immutable=std::move(vertices);
-  return [immutable,coordinates=std::move(coordinates),typed,typed_role,has_tangent](uint32_t triangle,std::array<float,3> bary){
+  return [immutable,coordinates=std::move(coordinates),typed,typed_role,has_tangent,prepared,current_normals,normal_coordinates,binding](uint32_t triangle,std::array<float,3> bary){
     coordinates.stop();const std::array<double,3> weights{bary[0],bary[1],bary[2]};std::array<Vec3,2> result;
     for(size_t role=0;role<(typed?2u:1u);++role){
       std::array<NormalBakeVertex,3> corners;for(size_t k=0;k<3;++k)corners[k]=immutable->at(role).at(size_t(triangle)*3+k);
@@ -133,11 +147,24 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTr
       const auto mode=role==0?NormalFragmentBasis::UnitColumns:typed->version()==MToonVersion::V0?NormalFragmentBasis::RawColumns:NormalFragmentBasis::UnitCross;
       auto basis=normal_bake_basis(corners,weights,mode);result[role]=normalized(basis.n);
       auto view=role==0?coordinates.maps->normal:typed_role;const bool enabled=role==0||typed->parameters.normal_enabled;
+      if(prepared){
+        view={};view.wrap_s=view.wrap_t=33071;view.min_filter=view.mag_filter=9729;
+        view.image=std::shared_ptr<const Image>(current_normals,role==0?&current_normals->normal:&current_normals->mtoon_normal);
+        if(current_normals->normal_projection->version==2){
+          const auto &projection=*current_normals->normal_projection;
+          const bool detail=current_normals->baked_base&&!current_normals->baked_base->maps.normal.rgba.empty();
+          view.image=role==0?(detail?projection.sampling_domain->resolved_pbr:projection.pbr):(detail?projection.sampling_domain->resolved_mtoon:projection.mtoon);
+        }
+      }
       if(enabled&&view.image){
-        auto uv=coordinates.coordinates(triangle,bary,role==0?view.texcoord:mtoon_coordinate(typed->textures[size_t(MToonSlot::Normal)]),role!=0);
-        if(role)uv=mtoon_uv(*typed,MToonSlot::Normal,uv,0);
+        std::array<float,2> uv{};
+        if(prepared&&normal_coordinates){
+          const auto &values=role==0||normal_coordinates->mtoon_coordinates.empty()?normal_coordinates->coordinates:normal_coordinates->mtoon_coordinates;
+          for(size_t k=0;k<3;++k){const auto v=values.at(normal_coordinates->indices.at(size_t(triangle)*3+k));for(size_t c=0;c<2;++c)uv[c]+=v[c]*bary[k];}
+        }else uv=coordinates.coordinates(triangle,bary,prepared?0:role==0?view.texcoord:mtoon_coordinate(typed->textures[size_t(MToonSlot::Normal)]),!prepared&&role!=0);
+        if(role&&!prepared)uv=mtoon_uv(*typed,MToonSlot::Normal,uv,0);
         view.texcoord=0;
-        const auto value=sample_source_texture(view,uv[0],uv[1],false);const float scale=role==0?coordinates.maps->normal_scale:typed->parameters.normal_scale;
+        const auto value=sample_source_texture(view,uv[0],uv[1],false);const float scale=role==0?(prepared?1:coordinates.maps->normal_scale):typed->parameters.normal_scale;
         const auto ts=mtoon_normal_map({value[0],value[1],value[2]},scale);
         result[role]=normalized(basis.t*ts.x+basis.b*ts.y+basis.n*ts.z);
       }
@@ -148,6 +175,13 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTr
 }
 std::shared_ptr<const TextureMaps> raw_bake_source(const SculptObject &object,
     const std::function<bool()> &cancelled){
+  if(object.mesh_active&&object.painted&&object.painted->normal_projection()){
+    // Current prepared planes are already independently composed and retain
+    // their owning coordinate recipe. Never reinterpret them as raw images.
+    if(!source_bake_normals(object,{},SourceBakeNormalOptions{256*1024*1024,cancelled}))
+      throw std::invalid_argument("Prepared normal source requires its actual frame adapter");
+    return object.painted->preview(object.material,cancelled);
+  }
   if(!object.mesh_active||!object.painted||!object.painted->source_maps()||
      (!object.painted->source_maps()->uses_alternate_uv()&&!object.painted->source_sampling_prepared()&&
       !(object.material_bindings&&object.material_bindings->normal_frames)))return {};
