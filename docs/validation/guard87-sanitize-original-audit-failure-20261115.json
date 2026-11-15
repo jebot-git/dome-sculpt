@@ -1,0 +1,15 @@
+{
+  "state": "terminal",
+  "exit": 1,
+  "session": 43894,
+  "pid": 2093658,
+  "phase": "initial unchanged historical expected-input verification before configure",
+  "error": "AssertionError at prepare-v1.py:94 verified(pins)",
+  "source": "3d1643827dd56e1b2ef1d57b8a9c6ff1e4211a2c",
+  "configured": false,
+  "initial_objects": 0,
+  "original_failed_audit_preserved": true,
+  "diagnostic": "16 system paths no longer expose historical canonical expected bitmap bytes; exact original payloads independently found at /opt/fltk-vr/bdf-runtime/lib; derived v2 separate boundary, no old receipt changes",
+  "script_sha256": "2ec36c2c2c801ca780cadeae973fbd73694d23b2b45392cc656ea2b32d800510",
+  "log_sha256": "0f611aa0c1e8b059c1b8387971ef8f73a92fecea822f206bf816efa783d58dc7"
+}
