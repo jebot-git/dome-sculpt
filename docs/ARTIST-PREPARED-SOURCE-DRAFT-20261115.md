@@ -101,3 +101,14 @@ new child under the current canonical Release context, zero input drift.
 Current runtime retry remains pending. Native source62/19/139 and artist/CC0
 9/856/32 regressions remain required; no full application/graphics acceptance
 is implied by this independent component group.
+
+The genuine95b780cb runtime failure is also preserved: raw material capture
+created an empty SourceMaps owner where the actual overlay retained nullptr;
+the unchanged owner guard correctly refused it before Bake. A new child keeps
+that source/artifact boundary frozen. Actual absence now selects ordinary
+composed material channels; the raw per-role route is used only with a real
+SourceMaps owner shared by its overlay packet. No pointer identity check is
+weakened. Public Bake requires the separate genuine normal resolver for both
+raw and composed normal-projection sources. Fresh complete current emission and
+Bake owners compile successfully; unchanged current authoring/fixture objects
+retain their authenticated current dependencies. Runtime remains pending.

@@ -191,9 +191,11 @@ std::shared_ptr<const TextureMaps> raw_bake_source(const SculptObject &object,
     // their owning coordinate recipe. Never reinterpret them as raw images.
     if(!source_bake_normals(object,{},SourceBakeNormalOptions{256*1024*1024,cancelled}))
       throw std::invalid_argument("Prepared normal source requires its actual frame adapter");
+    // No original image owner means ordinary composed material channels;
+    // preserve that genuine absence rather than fabricate an empty bundle.
+    if(!object.painted->source_maps())return object.painted->preview(object.material,cancelled);
     auto maps=std::make_shared<TextureMaps>();
     maps->source_maps=object.painted->source_maps();
-    if(!maps->source_maps)maps->source_maps=std::make_shared<const PaintSourceMaps>();
     maps->source_maps->validate_surface(object.painted->mesh());
     maps->source_only=true;maps->overlay=PaintOverlayFactory::capture(*object.painted,cancelled);
     // Material-only raw roles/paint contributions, not a legacy raw normal.
