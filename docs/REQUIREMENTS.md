@@ -1,3 +1,28 @@
+## Two PBR stereo cases pass; remaining graphical work coordinated — 2026-11-15
+
+Explicit App3d/TestRuntimec54 replay now passes BOTH PBRquarter and PBRtiny
+real-loader synthetic XR cases,194checks each (388actual). Both-eye independent
+source/correct/wrong-normal controls, Save/history, actual Arc identity,
+240-second/6000-frame bounds, zero drift and no owned survivors are retained.
+Original null-report runtime failure remains preserved. Read the
+[first overlay proof](GUARD87-XR-REPORTER-OVERLAY-20261115.md).
+MToonquarter/tiny still await execution; this is not physical-HMD acceptance.
+
+Separate artist graphical consumer software runs strongmanual6 successfully,
+but actual importedMT1 has correctRGB0 and insufficient wrong-normal contrast
+(max5 versus7). That failure is preserved with full PNG/RGB witnesses; neither
+source nor thresholds change. A same-input independent forecast identifies an
+additional interior probe while preserving all original4; a new diagnostic
+fixture will require actual validation. Unchanged prepared8+CC0eight software
+continuation currently runs separately before the next main XR case. No full
+artist graphical/owning application acceptance is claimed.
+
+The native-qualified normal-source integration draft a31461cb is pushed,
+unfrozen and has no owning build; all original production requirements remain
+active/incomplete. The current main sanitizer completion service is still
+running with explicit current-owner provenance. No install, physical headset
+launch or session restart occurred.
+
 ## Desktop public matrix passes; XR reporter repair isolated — 2026-11-15
 
 All4 current-source desktop GUI cases pass52checks each (208actual), including
