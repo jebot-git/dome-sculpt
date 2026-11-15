@@ -1,3 +1,41 @@
+## Fresh current-toolchain builds running — 2026-11-15
+
+The goal remains active and incomplete. The subsequent compiler audit proved
+that `/usr/bin/c++` changed despite reporting the same GCC16.2.1 version. The
+old-object reuse route was therefore rejected. Its owned Release driver was
+interrupted safely after123 complete compilations, with no links, no survivors
+and no input drift; exit1 and all partial outputs remain preserved under an
+explicit execution hold. That run is not acceptance.
+
+Both replacement plans build frozen source `3d164382` from zero:1032 complete
+TUs,733 archives/links and3 real generators, retaining exact87 native cases.
+No object or whole-product provider is staged. Release plan `0d03a29a` uses
+optimized C and C++ flags; sanitizer plan `a02ea7b2` explicitly instruments both
+C and C++ with ASan/UBSan, leak detection and halt-on-error. Historical CFLAGS
+and earlier timeouts remain unchanged in their own receipts. New full builds
+have18000-second materialization bounds,2 active tasks/8GiB each, and unchanged
+runtime test timeouts. Actual compiler commands emit genuine dependency files;
+all actual dependencies must match prebuild current pins or the3 owned generator
+outputs. The separate partial Release109-owner and SAN46-owner dependency
+preflights pass; neither substitutes for final1032-owner audit/build success.
+
+Current canonical bitmap bytes are selected explicitly from `/opt/fltk-vr`.
+Fresh headers/tools/library input boundaries replace historical reuse claims;
+current Mesa/runtime closure will be sealed independently after coherent build0.
+No candidate native/GUI/graphics/XR program has run in this new round. The fresh
+validation scripts retain native87/helpers/producers/font/manual software/Arc
+and public GUI/real-loader XR gates and the existing pixel/error/time limits.
+Main runtime remains the earlier admitted integration.
+
+Separate artist-normal work has a compile-only repeated-Bake draft and an
+independent direction fixture; it remains outside frozen3d until real component
+and consumer qualification. Its prepared source authority and emissionUV1 guard
+are under review. Controller trays/spatial nodes, broader authoring/interop,
+physical-device acceptance and accelerator requirements remain unfinished.
+No system installation, physical-HMD launch or active-session restart occurred.
+Read the [current fresh plan receipt](validation/guard87-current-fresh-round-20261115.json)
+and [strict sanitizer plan](GUARD87-SANITIZER-FRESH-PLAN-20261115.md).
+
 ## Goal resumed; final combined candidate qualification — 2026-11-15
 
 The user resumed the full production goal. The earlier pause is superseded;

@@ -1,0 +1,42 @@
+{
+  "source": "3d1643827dd56e1b2ef1d57b8a9c6ff1e4211a2c",
+  "plan_sha256": "0d03a29a1d2251d1186cb8a9c94f22227566c86664245c51b050a66e458b7dec",
+  "source_frozen_clean": true,
+  "review": "Entire fresh configured C/C++ compiler/generator/link closure from zero, actual -MD/-MF dependencies audited against current prebuild immutable pins, exact old86+newguard87, no old provider staging. Optimized Release both C/C++.",
+  "topological_layer_counts": [
+    72,
+    41,
+    11,
+    875,
+    1,
+    3,
+    486,
+    181,
+    6,
+    84,
+    6,
+    1,
+    1
+  ],
+  "summary": {
+    "configured_TUs": 1032,
+    "fresh_complete_TUs": 1032,
+    "reused_whole_objects": 0,
+    "all_configured_link_archive_nodes": 733,
+    "fresh_links_archives": 733,
+    "retained_whole_products": 0,
+    "mandatory_fresh_owning_targets": 90,
+    "selected_CTests": 87,
+    "additional_manual_source_render_gate": 1
+  },
+  "current_compiler": {
+    "resolved": "/usr/bin/c++",
+    "sha256": "ca48a2d27d0796399adc3387225eec4be62974e26fa299710edfde0c1af5aa63",
+    "roles": [
+      "CMAKE_CXX_COMPILER"
+    ]
+  },
+  "headers": 27424,
+  "source_prefix_define_policy": "Every actual literal define preserved in actual Ninja command; no rewrite.",
+  "runtime_executed": false
+}
