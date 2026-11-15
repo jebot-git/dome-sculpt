@@ -1,0 +1,56 @@
+{
+  "state": "terminal",
+  "exit": 0,
+  "scope": "NEW bounded completion after actual original143. Combined current1032 owners:538 documented whole providers+494 fresh complete TUs;733fresh links/3fresh generators. Not original143 pass or freshsingleinvocation. No native product yet.",
+  "source": "3d1643827dd56e1b2ef1d57b8a9c6ff1e4211a2c",
+  "status": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-current-sanitize-completion-20261115/sanitize-3d1643-completion-v1-audit/execution-v1/status.json",
+    "sha256": "5956c4955b9b831b30a51e8d4b275fc0a2c9a04688a88d024c9f89b368729299"
+  },
+  "seals": {
+    "actual_current_dependency_audit": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-current-sanitize-completion-20261115/sanitize-3d1643-completion-v1-audit/execution-v1/actual-fresh-dependencies.json",
+      "sha256": "0d72a4e5a2d5f1d80fe1a17d8ffcda0b62e9028b733bab4ff176ce996e1da0b5",
+      "owners": 1032,
+      "dependency_incidences": 433074,
+      "unique_resolved_dependencies": 2413,
+      "errors": 0
+    },
+    "owned_outputs": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-current-sanitize-completion-20261115/sanitize-3d1643-completion-v1-audit/execution-v1/owned-outputs.json",
+      "sha256": "abd9e945c7bbac0de0a7b04dc404eabd61d0a4598efe1749b631f29429ba3e56",
+      "count": 1768
+    },
+    "staged_whole_providers": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-current-sanitize-completion-20261115/sanitize-3d1643-completion-v1-audit/execution-v1/staged-whole-providers.json",
+      "sha256": "e884bc52bcc71732f276e4bf51a284baefcb1274db71c7307764967aaa02856a",
+      "count": 538
+    }
+  },
+  "seconds": 6452.0238365090045,
+  "peak_descendant_RSS_bytes": 6047260672,
+  "current_input_drift": [],
+  "service": {
+    "unit": "dome-sculpt-sanitize-completion-20261115-v1.service",
+    "properties": {
+      "Id": "dome-sculpt-sanitize-completion-20261115-v1.service",
+      "ActiveState": "active",
+      "SubState": "exited",
+      "InvocationID": "9ff470aeee854a2cb5ca8fe967ed1963",
+      "RuntimeMaxUSec": "5h 33min 20s",
+      "MainPID": "0",
+      "Result": "success",
+      "ExecMainStartTimestamp": "Sun 2026-11-15 17:11:26 CET",
+      "ExecMainExitTimestamp": "Sun 2026-11-15 18:59:07 CET",
+      "ExecMainPID": "2575295",
+      "ExecMainCode": "1",
+      "ExecMainStatus": "0",
+      "ControlGroup": ""
+    },
+    "terminal_properties_sha256": "eb9c1fdb1d3deca15f488933c4acd45f49b9add62b4441a9e5868fcbe3615457",
+    "journal_sha256": "7da5b244d0a61221d78843f74647bd142d3ab10f90b733f588cc611ea68eadef"
+  },
+  "original143_preserved": true,
+  "native_runtime_started": false,
+  "created_epoch": 1794765671.291817
+}

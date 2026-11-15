@@ -1,3 +1,21 @@
+## Current sanitizer build sealed; combined draft configuration verified — 2026-11-15
+
+The independent current-toolchain sanitizer completion is terminal0 with all
+1032 actual dependency owners,1768 outputs, zero errors and zero input drift.
+It retains538 proved current whole objects and compiles494 complete TUs freshly;
+all733 archive/link actions and3 generators are fresh. Original143 remains a
+separate failure. Actual transient-service terminal properties confirm success.
+Read [the completion seal](GUARD87-SANITIZER-COMPLETION-SEALED-20261115.md).
+Native sanitizer runtime gates are authorized after the stereo test lease slot;
+this build admission alone does not establish their results.
+
+Root configure-only review of unfrozen integration draft1d2b passes with actual
+1036 configured TUs and all90 intended native registrations. Its prepared-result
+graphics target remains manual. No object was compiled or staged in that review;
+read [the exact configure record](validation/normal-integration-configure-review-20261115.json).
+The final graphics fixture correction and combined build/runtime qualification
+remain pending. All original production requirements remain active/incomplete.
+
 ## First cache-enabled MToon stereo case qualified — 2026-11-15
 
 MToon-quarter now passes all194 actual stereo checks in175.953 seconds under

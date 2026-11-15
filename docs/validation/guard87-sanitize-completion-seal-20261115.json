@@ -1,0 +1,61 @@
+{
+  "state": "terminal",
+  "exit": 0,
+  "scope": "NEW bounded combined-owner current strict sanitizer completion; original external143 remains failure. Build/cohort admission only, no native/GUI/device/runtime acceptance.",
+  "source": "3d1643827dd56e1b2ef1d57b8a9c6ff1e4211a2c",
+  "fresh_complete_TUs": 494,
+  "closed_whole_current_providers": 538,
+  "full_current_owners": 1032,
+  "fresh_archive_link_actions": 733,
+  "fresh_generators": 3,
+  "owned_outputs": 1768,
+  "exact_selected_native_planned": 87,
+  "actual_dependency_incidences": 433074,
+  "actual_unique_dependencies": 2413,
+  "errors": 0,
+  "input_drift": [],
+  "materialization_and_sealing_seconds": 6452.0238365090045,
+  "peak_descendant_RSS_bytes": 6047260672,
+  "service_main_exit_status": 0,
+  "service_invocation": "9ff470aeee854a2cb5ca8fe967ed1963",
+  "transient_unit_stopped_after_terminal_capture": true,
+  "native_runtime_started": false,
+  "references": {
+    "status.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-current-sanitize-completion-20261115/sanitize-3d1643-completion-v1-audit/execution-v1/status.json",
+      "sha256": "5956c4955b9b831b30a51e8d4b275fc0a2c9a04688a88d024c9f89b368729299",
+      "compressed": "guard87-sanitize-completion-status-20261115.gz",
+      "compressed_sha256": "8c6664ee6a105db89961d36b9de61470e8e44a86b30706c31ad2fd1255a1b01c"
+    },
+    "inputs.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-current-sanitize-completion-20261115/sanitize-3d1643-completion-v1-audit/execution-v1/inputs.json",
+      "sha256": "7c566544bab941b431f67cc9af7af3f77972d29fde1b2fbb8c127247e756f0a4",
+      "compressed": "guard87-sanitize-completion-inputs-20261115.gz",
+      "compressed_sha256": "21405f2d5de0adec005f5f0f47e06fd59bef3396658f894a119aba71eb405b96"
+    },
+    "owned-outputs.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-current-sanitize-completion-20261115/sanitize-3d1643-completion-v1-audit/execution-v1/owned-outputs.json",
+      "sha256": "abd9e945c7bbac0de0a7b04dc404eabd61d0a4598efe1749b631f29429ba3e56",
+      "compressed": "guard87-sanitize-completion-owned-outputs-20261115.gz",
+      "compressed_sha256": "a992c2a79db2269d8d926089e8f253bac6d8cc70e0593d3c45ecbb10f8c97e72"
+    },
+    "staged-whole-providers.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-current-sanitize-completion-20261115/sanitize-3d1643-completion-v1-audit/execution-v1/staged-whole-providers.json",
+      "sha256": "e884bc52bcc71732f276e4bf51a284baefcb1274db71c7307764967aaa02856a",
+      "compressed": "guard87-sanitize-completion-staged-whole-providers-20261115.gz",
+      "compressed_sha256": "0bd435aeaf02ae75678927447e043483ff2b6a01ff2133458183cf4142cbade9"
+    },
+    "actual-fresh-dependencies.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-current-sanitize-completion-20261115/sanitize-3d1643-completion-v1-audit/execution-v1/actual-fresh-dependencies.json",
+      "sha256": "0d72a4e5a2d5f1d80fe1a17d8ffcda0b62e9028b733bab4ff176ce996e1da0b5",
+      "compressed": "guard87-sanitize-completion-actual-fresh-dependencies-20261115.gz",
+      "compressed_sha256": "df860b8748adb98e4f4e6399d1c72ee5031bc10efd84d27efc8d8fb5c18141d7"
+    },
+    "steps.jsonl": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-current-sanitize-completion-20261115/sanitize-3d1643-completion-v1-audit/execution-v1/steps.jsonl",
+      "sha256": "dc652eb0adb27a45e37558690989afb1a9166107cd664466a0efbc6b3887e362",
+      "compressed": "guard87-sanitize-completion-steps-jsonl-20261115.gz",
+      "compressed_sha256": "d5eaf5898406943a7f4f4fe6ed0e13991b0b63c90fc40070af9fd2acd04d3ee5"
+    }
+  }
+}
