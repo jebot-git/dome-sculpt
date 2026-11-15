@@ -1,3 +1,13 @@
+## Current assessment and requested pause — 2026-11-15
+
+The current round is closed at the successful four-TU public-test compilation.
+Work is paused at the user's request; the full production objective remains
+incomplete. Read [the current assessment and remaining goals](PROGRESS-ASSESSMENT-20261115.md)
+first. Baseline runtime is integrated; successor normal-source public workflow
+execution and complete combined90 Release/sanitizer qualification remain next.
+No new links, product runs, install, headset launch or session change are started.
+Historical entries below describe their original checkpoint states.
+
 ## Qualified baseline runtime integrated into main — 2026-11-15
 
 Main now includes the source-aware baking/HDR-native-field/mapped-humanoid
