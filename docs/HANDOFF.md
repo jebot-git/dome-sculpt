@@ -1,3 +1,21 @@
+## Complete four-case stereo matrix passes — 2026-11-15
+
+All four final-configuration real-loader synthetic XR cases pass194 checks each,
+776 in total, within original240-second/6000-frame/3-12-7 bounds. Each case starts
+with a separate empty shader-code cache and19 fresh application processes;
+actual cold misses and later hits are recorded for every case. All2616 final
+current pins rehash without drift or conflicts. Read
+[the complete matrix proof](GUARD87-XR-COMPLETE-MATRIX-20261115.md).
+This is explicit App3d/TestRuntimec54/coordinator02d evidence; it does not admit
+the combined normal-source draft or physical headset use. Prior failed runs and
+the unavailable PBR-quarter outer poll remain honestly separate observations.
+
+Current baseline sanitizer native87 is now running in an explicitly coordinated
+transient user service. Independent CC0 forecasts identify genuine female36 and
+male56 body triangles with sensitivity under the unchanged source/pose/material/
+light/camera recipe, and the new fixture7fb compiles/links; its software and Arc
+qualification remains pending. All original production requirements stay active.
+
 ## Current sanitizer build sealed; combined draft configuration verified — 2026-11-15
 
 The independent current-toolchain sanitizer completion is terminal0 with all
