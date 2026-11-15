@@ -1,0 +1,86 @@
+{
+  "state": "terminal",
+  "exit": 0,
+  "source": "3d1643827dd56e1b2ef1d57b8a9c6ff1e4211a2c",
+  "scope": "Strict current combined-owner native87/appVersion/workspace27/workspace373/raw90159 only; no full goal or successor90 acceptance",
+  "status": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-current-sanitize-completion-20261115/sanitize-completion-v1-native/status.json",
+    "sha256": "ba849e0d2f753f0b4c580f5415d167533c88acaa651230ac9442dc7c184f371a"
+  },
+  "native_passed": 87,
+  "steps": [
+    {
+      "name": "app-version",
+      "exit": 0,
+      "seconds": 0.36526966094970703,
+      "log_sha256": "9455a20a636a6599ace60120261649d3b29dc51fe2c774305994879190e7336b"
+    },
+    {
+      "name": "native87",
+      "exit": 0,
+      "seconds": 567.0319330692291,
+      "log_sha256": "3e04f90cbb2178c324886bb248a441eeac26727a3ae5c3b635ce36deba7a5f47"
+    },
+    {
+      "name": "workspace27",
+      "exit": 0,
+      "seconds": 2.4193239212036133,
+      "log_sha256": "b4dacfac59d17baa45a405a3cd0a456d3191e1f5aeb8391bc762fdb204ca6d49"
+    },
+    {
+      "name": "workspace373",
+      "exit": 0,
+      "seconds": 3.6234140396118164,
+      "log_sha256": "b84f753363a7b03bf014dc9a98b174f490f1987e822a9db90aa601d808633b1a"
+    },
+    {
+      "name": "raw90159",
+      "exit": 0,
+      "seconds": 0.9178206920623779,
+      "log_sha256": "8140630da001d09e6e1357711721664c2943508a7c97f27ed2f6ca2db19c7b3a"
+    }
+  ],
+  "input_drift": [],
+  "graphics_lease": {
+    "path": "/tmp/dome-sculpt-arc-device.lock",
+    "acquired_epoch": 1794766354.3397048,
+    "owner_pid": 3483206,
+    "stat": {
+      "device": 41,
+      "inode": 11487
+    },
+    "before_any_built_product": true,
+    "released_epoch": 1794767109.820888
+  },
+  "independent_NB_probe": {
+    "epoch": 1794767223.997001,
+    "device": 41,
+    "inode": 11487,
+    "available": true
+  },
+  "owned_pids_gone": [
+    3483206,
+    3531864,
+    3531943,
+    3619656,
+    3619961,
+    3620435
+  ],
+  "remaining_owned_processes": [],
+  "selected_sanitizer_environment_observation_sha256": "12a765a400f6316ebd0f93bf1961ce4ef0146b3670059e643001e6946c0f83bc",
+  "unit_terminal_properties": {
+    "Id": "dome-sculpt-sanitize-native87-20261115-v1.service",
+    "ActiveState": "active",
+    "SubState": "exited",
+    "InvocationID": "a052a0b114c34efe98035a6adf43e0ed",
+    "RuntimeMaxUSec": "1h 40min",
+    "MainPID": "0",
+    "Result": "success",
+    "ExecMainStartTimestamp": "Sun 2026-11-15 19:06:16 CET",
+    "ExecMainExitTimestamp": "Sun 2026-11-15 19:25:09 CET",
+    "ExecMainPID": "3483206",
+    "ExecMainCode": "1",
+    "ExecMainStatus": "0",
+    "ControlGroup": ""
+  }
+}

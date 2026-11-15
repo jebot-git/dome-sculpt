@@ -1,3 +1,22 @@
+## Strict native87 passes; corrected normal software consumer passes — 2026-11-15
+
+Current baseline strict ASan/UBSan/leak native87 completes87/87 actual CTests,
+no skips, plus app-version/workspace27/workspace373/raw90159, all0. Complete
+uncached post audit has zero drift; terminal unit success, no owned survivors
+and exact lease release are independently verified. Actual CTest environment
+contains only LIBGL_ALWAYS_SOFTWARE=1 and LP_NUM_THREADS=2 overrides, preserving
+strict sanitizer settings. Read [the native seal](GUARD87-SANITIZER-NATIVE87-20261115.md).
+The later reviewed v2 wrapper removes duplicate preflight hashing while retaining
+all expected files/values in full before/after checks; currentbf1 was unchanged.
+
+Separate normal-source fixture7fb now passes freshCPU44 and ALL24 software
+render cases with318 actual96x96 PNGs, correctRGBerror<=1 under unchanged bound3,
+and required negative gap7/disjoint predicates. Root independently rehashes every
+PNG and verifies actual llvmpipe/source identity. Arc phase is running on the
+same source/ELFs/bounds. Sanitizer producers/font/manual-software follow that slot.
+Combined draft0ae remains unfrozen/unbuilt. All original requirements remain
+active and incomplete; no physical-HMD or installation acceptance is claimed.
+
 ## Complete four-case stereo matrix passes — 2026-11-15
 
 All four final-configuration real-loader synthetic XR cases pass194 checks each,
