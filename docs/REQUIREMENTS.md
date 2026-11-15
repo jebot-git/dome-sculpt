@@ -1,3 +1,15 @@
+## First cache-enabled MToon stereo case qualified — 2026-11-15
+
+MToon-quarter now passes all194 actual stereo checks in175.953 seconds under
+unchanged240-second/6000-frame/pixel bounds. Its first fresh app records27 cold
+misses and cache creation;18 subsequent fresh app processes record443 disk hits.
+Only compiled shader code is shared within that case. Original timeout and
+cache-disabled PBR results remain separate. Read
+[the first-case proof](GUARD87-XR-CODE-CACHE-FIRSTCASE-20261115.md).
+The remaining three cases, current sanitizer acceptance, combined draft build
+and all unfinished production requirements remain open. No physical-HMD or
+installation acceptance follows from this synthetic-runtime milestone.
+
 ## Combined normal-source draft pushed — 2026-11-15
 
 Integration draft `1d2b7c57` now preserves main039f, native component ea131,

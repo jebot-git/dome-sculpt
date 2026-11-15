@@ -1,0 +1,254 @@
+{
+  "schema": 1,
+  "state": "terminal",
+  "exit": 0,
+  "scope": "First194 actual MToon-quarter XR controls under default-enabled initiallyempty ONEcase MesaCODEcache. Not an all4case matrix yet; no physicalHMD/performance/fullgoal or combineddraft admission.",
+  "application_source": "3d1643827dd56e1b2ef1d57b8a9c6ff1e4211a2c",
+  "test_runtime_source": "c54f66f8feab6ff52331bb264b54fc55cdc14c01",
+  "operational_scenario_source": "02d17f29dd63f4e379627489e9ec2d77f1147387",
+  "actual_result": {
+    "case": "mtoon-quarter",
+    "outer_tool": 19689,
+    "outer_exit": 0,
+    "phase_exit": 0,
+    "checks": 194,
+    "seconds": 175.95301878399914,
+    "phase_seconds_ceiling": 240,
+    "aggregate_physical_frame_ceiling": 6000,
+    "input_drift": [],
+    "remaining_owned": {},
+    "actual_App_processes": 19
+  },
+  "unchanged": {
+    "original_check_call_AST_exact": true,
+    "static_check_call_count": 29,
+    "per_eye_probe_count": 4,
+    "correct_RGB_maximum": 3,
+    "geometry_minimum": 12,
+    "wrong_normal_minimum": 7,
+    "original_native_input_roster": true,
+    "actual_App_core_producers_GLshader_driver_ELFs": true,
+    "fresh_every_App_configuration_state_scene_native_inputs": true,
+    "source_image_or_native_data_cache_reuse": false
+  },
+  "codecache": {
+    "initially_empty": true,
+    "absolute_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xr-case-cache-v6-20261115/release-xr-mtoon-quarter-case-code-cache-v6/workflow/mesa-shader-code-cache",
+    "scope": "SharedonlywithinthisONEcoordinatorcase,neveracrosscases/usercachedirs",
+    "first_App_PIDs": 3341963,
+    "first_disk_hits": 0,
+    "first_disk_misses": 27,
+    "first_created_cache_files": 28,
+    "later_fresh_Apps": 18,
+    "later_disk_hits": 443,
+    "all_App_PIDs_unique": true,
+    "per_App_elapsed_and_stats": [
+      {
+        "name": "apply-history",
+        "PID": 3341963,
+        "seconds": 12.861404669005424,
+        "hits": 0,
+        "misses": 27,
+        "cache_files": 28
+      },
+      {
+        "name": "source8-hidden-counterfactual",
+        "PID": 3343743,
+        "seconds": 8.678403369965963,
+        "hits": 20,
+        "misses": 0,
+        "cache_files": 28
+      },
+      {
+        "name": "source8-visible-original",
+        "PID": 3344891,
+        "seconds": 13.14567099197302,
+        "hits": 23,
+        "misses": 5,
+        "cache_files": 33
+      },
+      {
+        "name": "source8-control-eye0-probe0",
+        "PID": 3346596,
+        "seconds": 8.54409989900887,
+        "hits": 25,
+        "misses": 0,
+        "cache_files": 33
+      },
+      {
+        "name": "source8-without-baked-detail-eye0-probe0",
+        "PID": 3347728,
+        "seconds": 8.600427693978418,
+        "hits": 25,
+        "misses": 0,
+        "cache_files": 33
+      },
+      {
+        "name": "source8-control-eye0-probe1",
+        "PID": 3348883,
+        "seconds": 8.643904120021034,
+        "hits": 25,
+        "misses": 0,
+        "cache_files": 33
+      },
+      {
+        "name": "source8-without-baked-detail-eye0-probe1",
+        "PID": 3350031,
+        "seconds": 8.665845236973837,
+        "hits": 25,
+        "misses": 0,
+        "cache_files": 33
+      },
+      {
+        "name": "source8-control-eye0-probe2",
+        "PID": 3351195,
+        "seconds": 8.732230358000379,
+        "hits": 25,
+        "misses": 0,
+        "cache_files": 33
+      },
+      {
+        "name": "source8-without-baked-detail-eye0-probe2",
+        "PID": 3352350,
+        "seconds": 8.699868670024443,
+        "hits": 25,
+        "misses": 0,
+        "cache_files": 33
+      },
+      {
+        "name": "source8-control-eye0-probe3",
+        "PID": 3353562,
+        "seconds": 8.817534651025198,
+        "hits": 25,
+        "misses": 0,
+        "cache_files": 33
+      },
+      {
+        "name": "source8-without-baked-detail-eye0-probe3",
+        "PID": 3354719,
+        "seconds": 8.784737145004328,
+        "hits": 25,
+        "misses": 0,
+        "cache_files": 33
+      },
+      {
+        "name": "source8-control-eye1-probe0",
+        "PID": 3355894,
+        "seconds": 8.5015171149862,
+        "hits": 25,
+        "misses": 0,
+        "cache_files": 33
+      },
+      {
+        "name": "source8-without-baked-detail-eye1-probe0",
+        "PID": 3357016,
+        "seconds": 8.647893148998264,
+        "hits": 25,
+        "misses": 0,
+        "cache_files": 33
+      },
+      {
+        "name": "source8-control-eye1-probe1",
+        "PID": 3358181,
+        "seconds": 8.507592137961183,
+        "hits": 25,
+        "misses": 0,
+        "cache_files": 33
+      },
+      {
+        "name": "source8-without-baked-detail-eye1-probe1",
+        "PID": 3359293,
+        "seconds": 8.832526362966746,
+        "hits": 25,
+        "misses": 0,
+        "cache_files": 33
+      },
+      {
+        "name": "source8-control-eye1-probe2",
+        "PID": 3360470,
+        "seconds": 8.796448300010525,
+        "hits": 25,
+        "misses": 0,
+        "cache_files": 33
+      },
+      {
+        "name": "source8-without-baked-detail-eye1-probe2",
+        "PID": 3361621,
+        "seconds": 8.55547103198478,
+        "hits": 25,
+        "misses": 0,
+        "cache_files": 33
+      },
+      {
+        "name": "source8-control-eye1-probe3",
+        "PID": 3362751,
+        "seconds": 8.710846589994617,
+        "hits": 25,
+        "misses": 0,
+        "cache_files": 33
+      },
+      {
+        "name": "source8-without-baked-detail-eye1-probe3",
+        "PID": 3363904,
+        "seconds": 8.842078348970972,
+        "hits": 25,
+        "misses": 0,
+        "cache_files": 33
+      }
+    ]
+  },
+  "before_after": {
+    "original_disabled_perfreshApp_profile": "Actualtool6524exit1at240wallguard after174passingchecks; originalreport/data/timeout untouched, not relabeled0.",
+    "new_default_code_cache_profile": "All194actualchecks in175.953s under SAME240/6000; firstappcoldmiss +cachecreation and18freshprocess cachehits measured, not inferred.",
+    "read_only_stage_timing": "Originalsource-viewPBR~8.4s start-toqualified vsMToon~12.9; only3-5actualcaptures/eye and~0.07saftergate drain. Criticalmaps are observed coarse boundaries, not an internal GPUprofiler. V1runtime.maps-first label corrected becausephysicalframe10 overwrites it; V2usesactualAppPID/maps-first."
+  },
+  "cache_disabled_PBR_history": "OriginaltwoPBR194passes remain own cold-per-App scope; not mixed with this operationalmatrix.",
+  "remaining_operational_cases": "MToontinycurrentlyrunning separately; PBRquarter/tiny remain pending under this final config; everycase muststart independentemptycache.",
+  "files": {
+    "guard87-XR-codecache-MTquarter-status-20261115.json.gz": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xr-case-cache-v6-20261115/release-xr-mtoon-quarter-case-code-cache-v6/status.json",
+      "raw_sha256": "011eb61aa9cd301023ca72c8d43f327821d0d9e0eb0f19d4615c6947fbcfa290",
+      "compressed_sha256": "4166b7073d175d5258377b3d34019fce093e685c2253cd59f816204f3cda014f"
+    },
+    "guard87-XR-codecache-MTquarter-report-20261115.json.gz": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xr-case-cache-v6-20261115/release-xr-mtoon-quarter-case-code-cache-v6/workflow/report.json",
+      "raw_sha256": "2a0ac6819b4db32eaccf9c533770618d07aed6f50351bda4c575aa9e2bf19793",
+      "compressed_sha256": "07321a84d113167f24d69fd6fa1ab5428610c0a7169dbd642dda265e1bbb8685"
+    },
+    "guard87-XR-codecache-MTquarter-cold-hits-20261115.json.gz": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xr-case-cache-v6-20261115/release-xr-mtoon-quarter-case-code-cache-v6/workflow/shader-code-cache-provenance.json",
+      "raw_sha256": "6ee82a45bd1e5481e8c7940549756b7eb83470a1b6466d67586468c7380aad98",
+      "compressed_sha256": "c9f41f1be40556bb2078725ef5c3109dfc27a4b6b5d2452bb1c700e25198fb8c"
+    },
+    "guard87-XR-codecache-operational-review-20261115.json.gz": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xr-case-cache-v6-20261115/operational-review.json",
+      "raw_sha256": "6b8893b59b48a773185b98c3c62d6e9cd5f88cdfe4d73306d6583137a70712cd",
+      "compressed_sha256": "26e93a0e96113357d9590212ae7d52269264adfbdba67ec095c31b2c23083375"
+    },
+    "guard87-XR-codecache-original-MTquarter-timeout-20261115.json.gz": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xr-reporter-overlay-v5-20261115/release-xr-mtoon-quarter-report-overlay-v5/status.json",
+      "raw_sha256": "22f0ae4cc8e4e4dbd5230961376d80d4bac02e566ba1a00a2f2cea007769756a",
+      "compressed_sha256": "fed907bf76b8d4e18f2f009e659126f2496aa6488a1c3cbae528d6d4004e5500"
+    },
+    "guard87-XR-codecache-original-MTquarter-prefix-20261115.json.gz": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xr-reporter-overlay-v5-20261115/release-xr-mtoon-quarter-report-overlay-v5/workflow/report.json",
+      "raw_sha256": "b4c0a9e5b98d571f0ff7e3fd4df79f48704f8125f24f6beb19a630dea119204a",
+      "compressed_sha256": "bbea883e2d545e351829302ec32d75dda37da1dd7918afb0b97f3b57c872a0d3"
+    },
+    "guard87-XR-codecache-readonly-timing-v2-20261115.json.gz": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xr-reporter-overlay-v5-20261115/readonly-XR-case-timing-analysis-v2.json",
+      "raw_sha256": "fc6eb806579cbe0bba4914b1b640d3e523d8325f0555c83e8ec101f3acf55aca",
+      "compressed_sha256": "b2659daf6066913f6c86be3c497b3f2f7e0b5945cf3e5018db38f9a427c16b16"
+    },
+    "guard87-XR-codecache-operational-source-20261115.diff.gz": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xr-case-cache-v6-20261115/operational-scenario.diff",
+      "raw_sha256": "04fb42f084ec13effab42183d373b20eab4336eb8e77924d011438867e48c50c",
+      "compressed_sha256": "488783c86f141d1cedad8be4136a78e45bc360ff3f74f7d516505db09ca02cca"
+    },
+    "guard87-XR-codecache-operational-run-20261115.diff.gz": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xr-case-cache-v6-20261115/run.py.diff",
+      "raw_sha256": "c2537ecf0c133ae229b33a281da74c93e3439ad072717a482d1c667cacb15b8a",
+      "compressed_sha256": "0bf873e62f835651ae6c50a3faf8142102174969abae788a17a05fd8732eb7ec"
+    }
+  }
+}
