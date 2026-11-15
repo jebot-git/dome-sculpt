@@ -1,0 +1,263 @@
+{
+  "schema": 1,
+  "state": "terminal",
+  "exit": 0,
+  "scope": "First actual real-loader stereo Source8 case194checks with explicit TEST-only JSON-reporter overlay. No whole child application build, physicalHMD, performance, strictSAN/fullgoal claim.",
+  "application_source": "3d1643827dd56e1b2ef1d57b8a9c6ff1e4211a2c",
+  "test_runtime_source": "c54f66f8feab6ff52331bb264b54fc55cdc14c01",
+  "minimal_fix": "Only tests/source8-public-runtime.cpp initializes a null per-eye report slot to Json::object before value(frames,0). Actual released-eye images/counters/gates remain unchanged; no product/header/ABI/wire/scenario change.",
+  "original_failure": "ActualoldXR1 after41passes; actual loader type_error306 on value() with null at first source8-view left-eye report. source8_view{0:null}/fiveframes/nineacquires and actual app error log retained. Never relabeledpass.",
+  "overlay_audit": {
+    "complete_current_TU_compile": 0,
+    "actual_compile_dependency_count": 379,
+    "source_header_policy": "All child header/source bytes equal frozen3d except one report-only testTU; actualMD/MF dependencies verified against original prebuild physical expectations. Literal compilerflags/defines preserved.",
+    "new_fresh_shared_link": 0,
+    "actual_prepinned_link_dependencies": 41,
+    "exact_dynamic_exports": 186,
+    "SONAME_and_NEEDED": "Identical original runtime interface",
+    "current_ldd_provider_count": 29,
+    "all_DSO_providers_match_current_preflight": true,
+    "overlay_module_sha256": "58d18b30966f08a5d2351511782a2e41956582a24a65111e944f65261c346665",
+    "admission_sha256": "db8780b595f77d8cd4fe818fdee8cfcd9fc5c8dcdd01b915ef3469bd1143080f",
+    "original_frozen1768products": "Unmodified and still pinned; new runtime uses a distinct explicit path/hash, no original pin overwrite.",
+    "proof_failures_retained": [
+      "V1 lexically-spelled tests/../include dep lookup failed after realcompletecompile/link0; physicalfile already prepinned.",
+      "V2 first GNUld dependency parser consumed later phony target rules; prelink failure before newV2link.",
+      "V3 physicaldep proof + firstgenuineGNUlddependencyrule audit and NEWsharedlink0 close actual contracts without invented deps."
+    ]
+  },
+  "actual_XR": {
+    "case": "pbr-quarter",
+    "outer_tool": 51706,
+    "outer_exit": 0,
+    "phase_exit": 0,
+    "checks": 194,
+    "seconds": 174.06788296700688,
+    "frames_ceiling": 6000,
+    "phase_seconds_ceiling": 240,
+    "actual_application_PIDs": 19,
+    "both_eye_controls": "All4sourceprobes BOTH eyes: geometry>=12/correct<=3/wrongnormal>=7, no clipped-white equality; actual originalsource/hidden/independent/wrongnormal view comparisons.",
+    "public_actions": "Actual real-loader Boolean/vector/Save/UndoRedo routes and exact native reopen; source/control views invent no edits.",
+    "hardware": "Actual required ArcA770/renderD129/PCI03/8086:56a0/i915 auth; loader/GLcontexts/swapchains/worker/session ownership balances; no physicalcontroller tracking claim.",
+    "input_drift": [],
+    "remaining_owned_processes": {}
+  },
+  "other_XR_cases": "Not yet qualified by this first-case milestone; secondPBRtiny launched separately, MTooncases remain pending.",
+  "files": {
+    "guard87-XR-original-null-report-failure-20261115.json.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-validation-admitted-v3-20261115/release-xr-pbr-quarter-private-xvfb-v4/status.json",
+      "raw_sha256": "25b5ed2b3512b1cc1059e2ceb88e923b7c192c97e0468236836584edd9d0e09b",
+      "tracked_sha256": "d536c4264ab59e922f6e1c3f0ae2473b4d8dbf5105c70054bd844824b2df390a"
+    },
+    "guard87-XR-original-null-report-runtime-20261115.json.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-validation-admitted-v3-20261115/release-xr-pbr-quarter-private-xvfb-v4/workflow/source8-hidden-counterfactual/runtime.json",
+      "raw_sha256": "41b0c510be6a78efec5131be8f2b051ab3b16a46ea35018b9090df8ea1784050",
+      "tracked_sha256": "5da6f63140c3b010dc147db03fd973d39438862f73e42df40fdde985f11fc5f7"
+    },
+    "guard87-XR-original-null-report-app-20261115.log.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-validation-admitted-v3-20261115/release-xr-pbr-quarter-private-xvfb-v4/workflow/source8-hidden-counterfactual/app.log",
+      "raw_sha256": "e186eecaadeeada3714e584b0a10c6820bdb299ac3d02d16a36270b092808778",
+      "tracked_sha256": "28f0e538811d52649b9c21e864db5e00c8693d86a74b3e4c0825cc41424d4bdc"
+    },
+    "guard87-XR-overlay-complete-TU-first-proof-failed-20261115.json.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/source8-runtime-report-object-build-20261115/status.json",
+      "raw_sha256": "3f008436bbc955eb4b9556ca3d223ada38d86109fbd317bf292a20e070274817",
+      "tracked_sha256": "5b28a81f9eecef478284bb5519e9939854d17f521a13328eaa1ac60af9f42b1d"
+    },
+    "guard87-XR-overlay-prelink-parser-failed-20261115.json.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/source8-runtime-report-object-build-v2-20261115/prelink-failure-v2.json",
+      "raw_sha256": "e347ee1c6b7505e910c1bbbca5314fb2c941eeb887b3124c0d97bad0e1d880cc",
+      "tracked_sha256": "bb2999bba7a9cdd2561802e6ea86d49a0d821010f46544dfd104d8ff1bceeb8d"
+    },
+    "guard87-XR-overlay-audit-20261115.json.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/source8-runtime-report-object-build-v3-20261115/status.json",
+      "raw_sha256": "f7945c1b51ae8ad0f06404403d4ce59a9c127bc0ab97fe684f9a8a1388e9f2fe",
+      "tracked_sha256": "058eeb848eedfaa965814b1bd4efb22fd4d63ba30040b4a316c180a79f7c69d1"
+    },
+    "guard87-XR-overlay-admission-20261115.json.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/source8-runtime-report-object-build-v3-20261115/overlay-admission-v1.json",
+      "raw_sha256": "db8780b595f77d8cd4fe818fdee8cfcd9fc5c8dcdd01b915ef3469bd1143080f",
+      "tracked_sha256": "105504cb3573c2bf5d8adb8fbb4e65f7f82289f9694c55c0a1f5829d376f50e4"
+    },
+    "guard87-XR-pbr-quarter-status-20261115.json.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xr-reporter-overlay-v5-20261115/release-xr-pbr-quarter-report-overlay-v5/status.json",
+      "raw_sha256": "cf5dff0d4b0ba0681350bc26a4c94f5e49b07e74facdea02c97d5c702315a5ce",
+      "tracked_sha256": "9ef5506367c2af40de0471a17a0caed9090171487a5a590bc5881231012d7cd0"
+    },
+    "guard87-XR-pbr-quarter-report-20261115.json.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xr-reporter-overlay-v5-20261115/release-xr-pbr-quarter-report-overlay-v5/workflow/report.json",
+      "raw_sha256": "019e19ad67df3139e5be5def588117798c3abf4f354b540c799351c4f85cb717",
+      "tracked_sha256": "69603d9477e2a50b349da96d0675407fd1705167884c7b5b8c75ebf52fdd3db5"
+    },
+    "guard87-XR-pbr-quarter-mapped-ELFs-20261115.json.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xr-reporter-overlay-v5-20261115/release-xr-pbr-quarter-report-overlay-v5/mapped-ELFs.json",
+      "raw_sha256": "73c48075690017c8aa9b9a5dd0ff0671f6132930f6f36d216b9c7c73a87eaf30",
+      "tracked_sha256": "e9fdca5efd5bde069724e7dbb77615f05edf9f3f77ba1b477e2f155f2db9ffce"
+    },
+    "guard87-XR-pbr-quarter-readable-DRI-20261115.json.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xr-reporter-overlay-v5-20261115/release-xr-pbr-quarter-report-overlay-v5/readable-DRI.json",
+      "raw_sha256": "884f409a170ac17620005811b51f665c92202053aea5e32434bf68848cfed009",
+      "tracked_sha256": "e584b1a16f0ace5c31d75df7fd48fe5548fdfc56dd9190413fdd1ca96fc6e81d"
+    },
+    "guard87-XR-overlay-actual-complete-TU-builder-20261115.py": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/source8-runtime-report-object-build-20261115/build-overlay-v1.py",
+      "raw_sha256": "52bff997a5d9ab2dc35dec459c0025fef41ef7e1a2f92be5351902abdd03d15e",
+      "tracked_sha256": "52bff997a5d9ab2dc35dec459c0025fef41ef7e1a2f92be5351902abdd03d15e"
+    },
+    "guard87-XR-overlay-physical-deps-fresh-link-auditor-20261115.py": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/source8-runtime-report-object-build-v3-20261115/complete-overlay-v3.py",
+      "raw_sha256": "b01a3c9f3c9625e704bde7a780efccae26dd56711ee6f56d9ee9a02fbbcaa468",
+      "tracked_sha256": "b01a3c9f3c9625e704bde7a780efccae26dd56711ee6f56d9ee9a02fbbcaa468"
+    },
+    "guard87-XR-overlay-admission-helper-20261115.py": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xr-reporter-overlay-v5-20261115/test_runtime_overlay.py",
+      "raw_sha256": "366bb820dca8972176c751d081291296d3966d1b0839127dbeb269f4b678a3c7",
+      "tracked_sha256": "366bb820dca8972176c751d081291296d3966d1b0839127dbeb269f4b678a3c7"
+    },
+    "guard87-XR-overlay-phase-review-20261115.json.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xr-reporter-overlay-v5-20261115/overlay-phase-review.json",
+      "raw_sha256": "0db92115609522940450d26eb9f583b0be40f146bf33706282e0b98514c6d46a",
+      "tracked_sha256": "0306cc53974dd0a71ae3b384bc380527d8a3a2f01839fdceb6111b9a6428b85a"
+    },
+    "guard87-XR-pbr-quarter-apply-history-runtime-20261115.json.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xr-reporter-overlay-v5-20261115/release-xr-pbr-quarter-report-overlay-v5/workflow/apply-history/runtime.json",
+      "raw_sha256": "b0a3fc409c7ee4798adedefddc692d34cbf4ba5fbd96d1d5ba1a766460ae63fd",
+      "tracked_sha256": "a2adbeb8ffa329e91bfba79d9ed6d2bb4b312a818944a9968e23adeff4505eb3"
+    },
+    "guard87-XR-pbr-quarter-source8-hidden-counterfactual-runtime-20261115.json.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xr-reporter-overlay-v5-20261115/release-xr-pbr-quarter-report-overlay-v5/workflow/source8-hidden-counterfactual/runtime.json",
+      "raw_sha256": "d89581e97404e3270ba43b8076556afa2a21a3853817f522fe1d273faada826b",
+      "tracked_sha256": "8deb6596b6d79312efea21cc15974f7c1249150b7f04e3cb2cbd59d2d23d61c0"
+    },
+    "guard87-XR-pbr-quarter-source8-visible-original-runtime-20261115.json.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xr-reporter-overlay-v5-20261115/release-xr-pbr-quarter-report-overlay-v5/workflow/source8-visible-original/runtime.json",
+      "raw_sha256": "a5dc15b99c5bc0df657331ce87f6d528e419d7789357aa4739d0e51f2146e237",
+      "tracked_sha256": "327cc2bc7ec25fb1403cd45178ba5ddf8c67d292f56e5297c6e368b59d4ec29a"
+    },
+    "guard87-XR-pbr-quarter-source8-control-eye0-probe0-runtime-20261115.json.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xr-reporter-overlay-v5-20261115/release-xr-pbr-quarter-report-overlay-v5/workflow/source8-control-eye0-probe0/runtime.json",
+      "raw_sha256": "0e145b39aaf80aa6f840530d27531c34e7127ed9f2f1da221b8fea1d67fb7a22",
+      "tracked_sha256": "dd82785daa8d36be8bfc3e877e178910b9938c129b0154b3588445923f55e16a"
+    },
+    "guard87-XR-pbr-quarter-source8-without-baked-detail-eye0-probe0-runtime-20261115.json.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xr-reporter-overlay-v5-20261115/release-xr-pbr-quarter-report-overlay-v5/workflow/source8-without-baked-detail-eye0-probe0/runtime.json",
+      "raw_sha256": "f17d7340dd529dbe08004ab50365fc1abfe559f322a2b426303dee64e8f49e9a",
+      "tracked_sha256": "08b7dfd5dad1226afab1d06d60fe6d9a746b2c55344e75d17011869adcec9d90"
+    },
+    "guard87-XR-pbr-quarter-source8-control-eye0-probe1-runtime-20261115.json.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xr-reporter-overlay-v5-20261115/release-xr-pbr-quarter-report-overlay-v5/workflow/source8-control-eye0-probe1/runtime.json",
+      "raw_sha256": "425dfcbb76e977f7befbf47db8ea7b0d370e42826a2985f6f472d0edc93705a4",
+      "tracked_sha256": "47ff32c019247c082edba78029f82111647dd2f49a17e4f1d47f25d45c1ff890"
+    },
+    "guard87-XR-pbr-quarter-source8-without-baked-detail-eye0-probe1-runtime-20261115.json.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xr-reporter-overlay-v5-20261115/release-xr-pbr-quarter-report-overlay-v5/workflow/source8-without-baked-detail-eye0-probe1/runtime.json",
+      "raw_sha256": "16f45347536301bd35cee583db10c4efb6ab93413cd287b1d7a3f5e9831a6273",
+      "tracked_sha256": "003a14e9206765331581baa37847010bcab3ab800f58a0cfcb222e5014a58dfd"
+    },
+    "guard87-XR-pbr-quarter-source8-control-eye0-probe2-runtime-20261115.json.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xr-reporter-overlay-v5-20261115/release-xr-pbr-quarter-report-overlay-v5/workflow/source8-control-eye0-probe2/runtime.json",
+      "raw_sha256": "3664474f8890859e6a59c07ef6f7b8df2827bb1b9d33fdf6372b7c2712f29e9b",
+      "tracked_sha256": "5c60b781a284f585133b3d3465bcbff492094add16ab53c6a448d046589f51a3"
+    },
+    "guard87-XR-pbr-quarter-source8-without-baked-detail-eye0-probe2-runtime-20261115.json.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xr-reporter-overlay-v5-20261115/release-xr-pbr-quarter-report-overlay-v5/workflow/source8-without-baked-detail-eye0-probe2/runtime.json",
+      "raw_sha256": "714103ea3093d5822dc6061ae5b80a6e24bdf569662008ac60cdb2172aa9834f",
+      "tracked_sha256": "8a901be902d68915d82a536f9e295b8ed161164a73b12e04d76663a63de297f8"
+    },
+    "guard87-XR-pbr-quarter-source8-control-eye0-probe3-runtime-20261115.json.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xr-reporter-overlay-v5-20261115/release-xr-pbr-quarter-report-overlay-v5/workflow/source8-control-eye0-probe3/runtime.json",
+      "raw_sha256": "f85c5f328fea3596ecd53d337240a13acabd30ccc273d991ccaa6f2fbcf19064",
+      "tracked_sha256": "9b7e14efd692d86918c3b551fe0157c5b5c5b7eefe0f153b3ede500fb81a9cbf"
+    },
+    "guard87-XR-pbr-quarter-source8-without-baked-detail-eye0-probe3-runtime-20261115.json.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xr-reporter-overlay-v5-20261115/release-xr-pbr-quarter-report-overlay-v5/workflow/source8-without-baked-detail-eye0-probe3/runtime.json",
+      "raw_sha256": "94e3758bdda32f7544d3ce4f0de6d865f256f1064da5911b3ce5a3a33d3c5442",
+      "tracked_sha256": "04cc88ecc4d11f5873e549dc3932a48b0638ad5be86773bd7872996ccc56ab7a"
+    },
+    "guard87-XR-pbr-quarter-source8-control-eye1-probe0-runtime-20261115.json.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xr-reporter-overlay-v5-20261115/release-xr-pbr-quarter-report-overlay-v5/workflow/source8-control-eye1-probe0/runtime.json",
+      "raw_sha256": "f4415bd1a772ee70c653efcae8ce1d3eb82be8ace38556a0ecbfffd134e4cf72",
+      "tracked_sha256": "9733acb43dfffe53689488a8b6fc414fa35bb86ca09e9f058d1c6577db8587c1"
+    },
+    "guard87-XR-pbr-quarter-source8-without-baked-detail-eye1-probe0-runtime-20261115.json.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xr-reporter-overlay-v5-20261115/release-xr-pbr-quarter-report-overlay-v5/workflow/source8-without-baked-detail-eye1-probe0/runtime.json",
+      "raw_sha256": "0a95ced34a7adf1863e9187342e76cd209c636a0e527350936d7d5d17378a74c",
+      "tracked_sha256": "bce28ec5c59f38d0af3ce435362a2516dab61be66ad40f5e52ad18eb00688b45"
+    },
+    "guard87-XR-pbr-quarter-source8-control-eye1-probe1-runtime-20261115.json.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xr-reporter-overlay-v5-20261115/release-xr-pbr-quarter-report-overlay-v5/workflow/source8-control-eye1-probe1/runtime.json",
+      "raw_sha256": "13cd2e8ddc417fc36ad491c435054f17f33ef6a8bbd323795053fa4be12a2ea0",
+      "tracked_sha256": "c0710b36cdc6eb939c561e95cfa9e1c283884327f1cb1f500c9106f0037ab4b5"
+    },
+    "guard87-XR-pbr-quarter-source8-without-baked-detail-eye1-probe1-runtime-20261115.json.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xr-reporter-overlay-v5-20261115/release-xr-pbr-quarter-report-overlay-v5/workflow/source8-without-baked-detail-eye1-probe1/runtime.json",
+      "raw_sha256": "bf00cfd5ccb032be8f2a4e82d7993959fbd1f49924bccd94fe2b31a482a33772",
+      "tracked_sha256": "9203ac76c7212545e3c1a9e4630489d2cf75ca09d67460f41263017583a818e0"
+    },
+    "guard87-XR-pbr-quarter-source8-control-eye1-probe2-runtime-20261115.json.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xr-reporter-overlay-v5-20261115/release-xr-pbr-quarter-report-overlay-v5/workflow/source8-control-eye1-probe2/runtime.json",
+      "raw_sha256": "274e3b4f67f109c2546a89ccbacc68e66d506f2e8fee3f5ca9e056659c87e675",
+      "tracked_sha256": "ae8b296a69c95913c39c3a0b720798d38e39e0c1215d3cd14a7edbdd73b6c630"
+    },
+    "guard87-XR-pbr-quarter-source8-without-baked-detail-eye1-probe2-runtime-20261115.json.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xr-reporter-overlay-v5-20261115/release-xr-pbr-quarter-report-overlay-v5/workflow/source8-without-baked-detail-eye1-probe2/runtime.json",
+      "raw_sha256": "195f2368e776ffd4c2b6b6cc426b87756b352d3acbf93751719ec8d95e7d899d",
+      "tracked_sha256": "d26cba1cfaf98886715973a33ad98b216a7076acf626cbfa722ebe0c48ce3a06"
+    },
+    "guard87-XR-pbr-quarter-source8-control-eye1-probe3-runtime-20261115.json.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xr-reporter-overlay-v5-20261115/release-xr-pbr-quarter-report-overlay-v5/workflow/source8-control-eye1-probe3/runtime.json",
+      "raw_sha256": "cb6f0d694b0a491092f9bf123e3c2d6aea68f17f4e9e5584e153ed7019204bb8",
+      "tracked_sha256": "393a04767be8a0bd4cf318c716fb9cc2fe74e62d11034b423e9a5502aba722f1"
+    },
+    "guard87-XR-pbr-quarter-source8-without-baked-detail-eye1-probe3-runtime-20261115.json.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xr-reporter-overlay-v5-20261115/release-xr-pbr-quarter-report-overlay-v5/workflow/source8-without-baked-detail-eye1-probe3/runtime.json",
+      "raw_sha256": "87b036ce423761da3989ff5b6467cbfe4ba69b7189d0afd5941c53fc602bd2b4",
+      "tracked_sha256": "0cf0d202cc77d6ffd50df7aa61f23f711a8ce79232b8de26ca555978ff8fa90d"
+    },
+    "guard87-XR-pbr-quarter-source8-eye0-probe0.json-20261115.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xr-reporter-overlay-v5-20261115/release-xr-pbr-quarter-report-overlay-v5/workflow/source8-eye0-probe0.json",
+      "raw_sha256": "49e6acd55f784dfdaf23e3dc0faf7a5408398cc408d1a8186cfb9df29f9abe34",
+      "tracked_sha256": "8efbb419f2bab5d0295c660ad2f4ae8a177f7a57d2c45e17d816b2faf4669789"
+    },
+    "guard87-XR-pbr-quarter-source8-eye0-probe1.json-20261115.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xr-reporter-overlay-v5-20261115/release-xr-pbr-quarter-report-overlay-v5/workflow/source8-eye0-probe1.json",
+      "raw_sha256": "36b1f1547820730933828dfe1916690ead7526d203f339fb2d9df40bc6b460d7",
+      "tracked_sha256": "0c9ff40a1aeb6190f525dec05379a79aef81b4154d02c411cd0c7aa0b2663783"
+    },
+    "guard87-XR-pbr-quarter-source8-eye0-probe2.json-20261115.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xr-reporter-overlay-v5-20261115/release-xr-pbr-quarter-report-overlay-v5/workflow/source8-eye0-probe2.json",
+      "raw_sha256": "a8cc9fd8b264e7dc91d4767151c1dcbf8c272aefe37a1275e2f1889d6eb6ea47",
+      "tracked_sha256": "f57f695f3f809578488d114d3e4026b1e6969aefebb305a47f6ea11891c363c0"
+    },
+    "guard87-XR-pbr-quarter-source8-eye0-probe3.json-20261115.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xr-reporter-overlay-v5-20261115/release-xr-pbr-quarter-report-overlay-v5/workflow/source8-eye0-probe3.json",
+      "raw_sha256": "0acab2c947722c99db70754275167c11a8c1a01e1884016ef5f6d920990e6517",
+      "tracked_sha256": "3c2b9ca9d033454633871a0e9d934f491f4b7480df2d7b0111a2bd6db309f505"
+    },
+    "guard87-XR-pbr-quarter-source8-eye1-probe0.json-20261115.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xr-reporter-overlay-v5-20261115/release-xr-pbr-quarter-report-overlay-v5/workflow/source8-eye1-probe0.json",
+      "raw_sha256": "a4071b5d6ec222ab4d857207f63eaff519e1fcf69856560b9fb240aa7dd2b454",
+      "tracked_sha256": "bbccbcc93eb7fff7513c4f70a6573d1565d9aa0aca970f371cd17acaddc034bf"
+    },
+    "guard87-XR-pbr-quarter-source8-eye1-probe1.json-20261115.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xr-reporter-overlay-v5-20261115/release-xr-pbr-quarter-report-overlay-v5/workflow/source8-eye1-probe1.json",
+      "raw_sha256": "70850ea6b55f684cc67fd72c74e14cb703ff0a2aec5009f35d85801c2c901214",
+      "tracked_sha256": "2bb83572a63f5787cb1e0b74b4b5b1ec3a1f5822137ab4523bb8d68571d62099"
+    },
+    "guard87-XR-pbr-quarter-source8-eye1-probe2.json-20261115.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xr-reporter-overlay-v5-20261115/release-xr-pbr-quarter-report-overlay-v5/workflow/source8-eye1-probe2.json",
+      "raw_sha256": "4c0325c2dd2bee28b89f1e4bd9993076243f78478eba108ab088d1ec4ab66f73",
+      "tracked_sha256": "f42c7c5449fa8505d14aaa24c1120844fdab1af27fe44756e0015512bca04081"
+    },
+    "guard87-XR-pbr-quarter-source8-eye1-probe3.json-20261115.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xr-reporter-overlay-v5-20261115/release-xr-pbr-quarter-report-overlay-v5/workflow/source8-eye1-probe3.json",
+      "raw_sha256": "b4d0ba271c72d6337a38a9f34cd43964203c4f62da4fb837460cf9de5468dc2e",
+      "tracked_sha256": "51140a7ed2aefaff34842f576ce1102eaf40f1bb0bed3092df5501bd5c54e553"
+    },
+    "guard87-XR-pbr-quarter-normal-sensitivity-20261115.json.gz": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xr-reporter-overlay-v5-20261115/release-xr-pbr-quarter-report-overlay-v5/workflow/source8-normal-sensitivity.json",
+      "raw_sha256": "af88053e9b24f870fbf180313f6d785246ecc8d4a3be5a31bac862b67f526188",
+      "tracked_sha256": "64a4d18d36ca06f309174072d3d1a8d54918faa2e455084d6340955106a756d3"
+    }
+  }
+}
