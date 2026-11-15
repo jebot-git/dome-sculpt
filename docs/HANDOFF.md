@@ -1,13 +1,65 @@
-## Combined normal-source draft assembled — 2026-11-15
+## Complete four-case stereo matrix passes — 2026-11-15
 
-The separate integration branch now merges the qualified native component,
-corrected graphical fixtures, per-eye reporter repair and case-local shader
-code-cache scenario while preserving main039f and every source history. It is
-unfrozen with no combined build. Software manual/import controls pass, but the
-actual CC0 MToon0 negative lacks contrast despite exact correct-oracle agreement;
-full graphical acceptance remains open. Read
-[NORMAL-INTEGRATION-DRAFT-20261115.md](NORMAL-INTEGRATION-DRAFT-20261115.md).
-All original production requirements remain incomplete and required.
+All four final-configuration real-loader synthetic XR cases pass194 checks each,
+776 in total, within original240-second/6000-frame/3-12-7 bounds. Each case starts
+with a separate empty shader-code cache and19 fresh application processes;
+actual cold misses and later hits are recorded for every case. All2616 final
+current pins rehash without drift or conflicts. Read
+[the complete matrix proof](GUARD87-XR-COMPLETE-MATRIX-20261115.md).
+This is explicit App3d/TestRuntimec54/coordinator02d evidence; it does not admit
+the combined normal-source draft or physical headset use. Prior failed runs and
+the unavailable PBR-quarter outer poll remain honestly separate observations.
+
+Current baseline sanitizer native87 is now running in an explicitly coordinated
+transient user service. Independent CC0 forecasts identify genuine female36 and
+male56 body triangles with sensitivity under the unchanged source/pose/material/
+light/camera recipe, and the new fixture7fb compiles/links; its software and Arc
+qualification remains pending. All original production requirements stay active.
+
+## Current sanitizer build sealed; combined draft configuration verified — 2026-11-15
+
+The independent current-toolchain sanitizer completion is terminal0 with all
+1032 actual dependency owners,1768 outputs, zero errors and zero input drift.
+It retains538 proved current whole objects and compiles494 complete TUs freshly;
+all733 archive/link actions and3 generators are fresh. Original143 remains a
+separate failure. Actual transient-service terminal properties confirm success.
+Read [the completion seal](GUARD87-SANITIZER-COMPLETION-SEALED-20261115.md).
+Native sanitizer runtime gates are authorized after the stereo test lease slot;
+this build admission alone does not establish their results.
+
+Root configure-only review of unfrozen integration draft1d2b passes with actual
+1036 configured TUs and all90 intended native registrations. Its prepared-result
+graphics target remains manual. No object was compiled or staged in that review;
+read [the exact configure record](validation/normal-integration-configure-review-20261115.json).
+The final graphics fixture correction and combined build/runtime qualification
+remain pending. All original production requirements remain active/incomplete.
+
+## First cache-enabled MToon stereo case qualified — 2026-11-15
+
+MToon-quarter now passes all194 actual stereo checks in175.953 seconds under
+unchanged240-second/6000-frame/pixel bounds. Its first fresh app records27 cold
+misses and cache creation;18 subsequent fresh app processes record443 disk hits.
+Only compiled shader code is shared within that case. Original timeout and
+cache-disabled PBR results remain separate. Read
+[the first-case proof](GUARD87-XR-CODE-CACHE-FIRSTCASE-20261115.md).
+The remaining three cases, current sanitizer acceptance, combined draft build
+and all unfinished production requirements remain open. No physical-HMD or
+installation acceptance follows from this synthetic-runtime milestone.
+
+## Combined normal-source draft pushed — 2026-11-15
+
+Integration draft `1d2b7c57` now preserves main039f, native component ea131,
+graphical fixtures87c, runtime reporter c54 and stereo scenario02d through real
+merges. Product bytes remain exact1bc; no combined build/freeze/runtime admission
+is claimed. Read [the integration record](NORMAL-INTEGRATION-DRAFT-20261115.md).
+The actual corrected software matrix passes manual6/imported2 and female-rest
+PBR, then fails the MT0 negative-sensitivity requirement (correctRGBerror0,
+wrong-normal gap1<7); prepared mode is not reached. All results stay preserved.
+The stereo operational replay is running with actual initial cold misses and
+later fresh-app shader-code cache hits, but has no terminal acceptance yet.
+The same sanitizer completion has finished all494 fresh TUs and continues its
+remaining links/final audits. Full production requirements stay active/incomplete.
+No system install, physical headset test or session restart occurred.
 
 ## MToon XR timing and graphical fixture corrections — 2026-11-15
 
