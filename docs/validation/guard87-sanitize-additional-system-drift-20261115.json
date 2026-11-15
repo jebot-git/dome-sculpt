@@ -1,0 +1,53 @@
+{
+  "count": 53,
+  "mismatches": [
+    {
+      "path": "/usr/bin/c++",
+      "expected": "579d25c2d1e45abeed0c63a517b5c52f6d09ea811a787bf7a7c677a7fd0726f6",
+      "current": "ca48a2d27d0796399adc3387225eec4be62974e26fa299710edfde0c1af5aa63",
+      "resolved": "/usr/bin/c++"
+    },
+    {
+      "path": "/usr/lib64/libpng16.so.16.58.0",
+      "expected": "65cb04d6c4ec5c031f2f43a58ec5adc4bc9652be5703bb9fa1178f84a2e40446",
+      "current": null,
+      "resolved": "/usr/lib64/libpng16.so.16.58.0"
+    },
+    {
+      "path": "/usr/lib64/libz.so.1.3.1.zlib-ng",
+      "expected": "cc2d0ee053bda906e3d9de9118fe7eb62d4c193ee1df3c323e60dae88e60780e",
+      "current": "bbde8faec092a7c67b8bd76bbba4a826e61b05c171b97004ce6b308c5a090351",
+      "resolved": "/usr/lib64/libz.so.1.3.1.zlib-ng"
+    },
+    {
+      "path": "/usr/lib64/libicui18n.so.77.1",
+      "expected": "a7521c96c2517fa0c0eb40a1a93de584e9f2cb75a4515ccde17db9a6c76716b2",
+      "current": "0fcf90854b567a4e1807287c252fcb427e302b3bc18ec5ecb887b2d471d33e23",
+      "resolved": "/usr/lib64/libicui18n.so.77.1"
+    },
+    {
+      "path": "/usr/lib64/libicuuc.so.77.1",
+      "expected": "e7253748d03b2eeef515e621e7e9dd9940a42b1130ec8b90e5c72fdc19f14ab5",
+      "current": "2dd954df5964f2aa6c6e431873d6200af9198343ed4813c8b39240776311c5cb",
+      "resolved": "/usr/lib64/libicuuc.so.77.1"
+    },
+    {
+      "path": "/usr/lib64/libgio-2.0.so.0.8800.4",
+      "expected": "bca91d16d1ed9ee423d99284ab8bd749348fff7e75dda3bffe9b4f9f3e4907a0",
+      "current": "ab36f44b03c3d790fc7adfd213147b2b37dc7d337dfc0836e08da40c775c1eae",
+      "resolved": "/usr/lib64/libgio-2.0.so.0.8800.4"
+    },
+    {
+      "path": "/usr/lib64/libgobject-2.0.so.0.8800.4",
+      "expected": "60a60bc3961c5cdfba3730f0976124eae34d9c3789b7fc91e8be1088f6e37c15",
+      "current": "382377b2a6fecc3a09e474282a56f3cf0f27b2785ee319ea6e2dd2ea6836abf1",
+      "resolved": "/usr/lib64/libgobject-2.0.so.0.8800.4"
+    },
+    {
+      "path": "/usr/lib64/libglib-2.0.so.0.8800.4",
+      "expected": "e9a6099dac743c8f910fb201da63f45ad6d7b4025110409474ec2661e57fa91e",
+      "current": "7838c9cf93c8e09b83f020d3f3f5b0ddabd0cba7c09340d9f257dc1ae8700297",
+      "resolved": "/usr/lib64/libglib-2.0.so.0.8800.4"
+    }
+  ]
+}

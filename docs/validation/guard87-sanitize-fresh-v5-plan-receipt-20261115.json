@@ -1,0 +1,32 @@
+{
+  "source": "3d1643827dd56e1b2ef1d57b8a9c6ff1e4211a2c",
+  "state": "fresh-plan-audited-NOT-materialized",
+  "plan": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-final-owning-sanitize-plan-20261115/sanitize-3d1643-current-fresh-v5-audit/plan.json",
+    "sha256": "a02ea7b2d888728483e90b8aa1ccce28494b98d9cc7b8d90107a70497f2ddf4a",
+    "compressed": "guard87-sanitize-fresh-v5-plan-20261115.json.gz",
+    "compressed_sha256": "dfb2d69769455bbd847e69f70047218bd1c4fc9ee1959b43baa50609bfdc648e"
+  },
+  "selected_native": 87,
+  "whole_fresh_TUs": 1032,
+  "whole_fresh_links_archives": 733,
+  "genuine_generators": 3,
+  "current_input_pins": 30944,
+  "current_header_files": 27424,
+  "objects_or_products_reused": 0,
+  "actual_prebuild_objects": 0,
+  "bounds": {
+    "materialization_seconds": 18000,
+    "active_jobs": 2,
+    "descendant_RSS_bytes": 8589934592,
+    "prepost_input_audits_seconds": 600
+  },
+  "runtime_scope": "No app/native/software/graphics/HMD runtime or installation. Real tiny compiler dependency-helper controls only.",
+  "preserved_old_audits": {
+    "v1": "terminal1 beforeconfigure initial oldSDKhash mismatch",
+    "v2": "terminal1 beforeconfigure, additional currentcompiler/png/zlib/ICU/GLib mismatch",
+    "v3": "prepare0, draftCunins default-O3 preserved",
+    "v4": "prepare0, draftCunins with fullerELF forecast preserved"
+  },
+  "original_failures_unchanged": true
+}
