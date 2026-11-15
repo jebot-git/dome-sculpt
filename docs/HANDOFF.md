@@ -1,3 +1,18 @@
+## Combined normal-source draft pushed — 2026-11-15
+
+Integration draft `1d2b7c57` now preserves main039f, native component ea131,
+graphical fixtures87c, runtime reporter c54 and stereo scenario02d through real
+merges. Product bytes remain exact1bc; no combined build/freeze/runtime admission
+is claimed. Read [the integration record](NORMAL-INTEGRATION-DRAFT-20261115.md).
+The actual corrected software matrix passes manual6/imported2 and female-rest
+PBR, then fails the MT0 negative-sensitivity requirement (correctRGBerror0,
+wrong-normal gap1<7); prepared mode is not reached. All results stay preserved.
+The stereo operational replay is running with actual initial cold misses and
+later fresh-app shader-code cache hits, but has no terminal acceptance yet.
+The same sanitizer completion has finished all494 fresh TUs and continues its
+remaining links/final audits. Full production requirements stay active/incomplete.
+No system install, physical headset test or session restart occurred.
+
 ## MToon XR timing and graphical fixture corrections — 2026-11-15
 
 MToonquarter XR6524 reaches174 actual passing checks but hits the original
