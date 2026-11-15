@@ -3,7 +3,7 @@
 Existing blur39/resolution117 scenarios stay separate and unchanged. Only actual
 released GL images and full native Save oracles authorize the synthetic actions.
 """
-import hashlib,json,os,signal,subprocess,sys,time,shutil
+import hashlib,json,os,re,signal,subprocess,sys,time,shutil
 from pathlib import Path
 signal.pthread_sigmask(signal.SIG_SETMASK,[])
 if len(sys.argv)!=7:raise SystemExit('usage: source8-public-xr.py APP RUNTIME INSPECTOR FIXTURE_MANIFEST TITLE_REFERENCE OUTPUT')
@@ -14,6 +14,20 @@ pins={str(p):sha(p) for p in [app,runtime,inspector,manifest_path,title_referenc
 checks=[];case_reports=[];process=None
 suite_deadline=time.monotonic()+240
 physical_frames_consumed=0
+shader_cache_root=out/'mesa-shader-code-cache'
+shader_cache_root.mkdir(exist_ok=False)
+assert not any(shader_cache_root.iterdir()),'Each coordinator case starts with an empty shader code cache'
+shader_cache_events=[]
+
+def shader_cache_boundary(name,case,pid,started):
+ text=(case/'app.log').read_text()
+ stats=[{'hits':int(hit),'misses':int(miss)}for hit,miss in re.findall(r'disk shader cache:\s+hits\s*=\s*(\d+),\s*misses\s*=\s*(\d+)',text)]
+ files={str(p.relative_to(shader_cache_root)):{'sha256':sha(p),'bytes':p.stat().st_size}for p in shader_cache_root.rglob('*')if p.is_file()}
+ event={'name':name,'actual_app_pid':pid,'App_start_to_complete_seconds':time.monotonic()-started,'disk_cache_stats':stats,'disk_hits':sum(x['hits']for x in stats),'disk_misses':sum(x['misses']for x in stats),'cache_files':files,'cache_file_count':len(files)}
+ if not shader_cache_events:
+  assert event['disk_misses']>0 and files,'The first app must prove actual cold shader compilation/cache creation'
+ shader_cache_events.append(event)
+ (out/'shader-code-cache-provenance.json').write_text(json.dumps({'scope':'Initially empty cache shared only by this coordinator case; Mesa shader code only, no scene/frame/native-state cache','root':str(shader_cache_root),'initially_empty':True,'events':shader_cache_events},indent=2)+'\n')
 
 def report(complete=False,error=None):
  (out/'report.json').write_text(json.dumps({'complete':complete,'error':error,'checks':checks,'count':len(checks),'cases':case_reports,'pins':pins,'drift':[p for p,v in pins.items() if sha(p)!=v],'scope':'Actual ordinary XR app/loader/GL, synthetic actions and durable native Save inspection; no observer or physical headset claim'},indent=2)+'\n')
@@ -31,14 +45,15 @@ def drive_case(name,mode):
  case=out/name;case.mkdir(exist_ok=False);task_root=case/'home';task_root.mkdir();gates=case/'gates';gates.mkdir();project=case/'input.dsculpt';project.write_bytes(fixtures[source_key].read_bytes());result=case/'final.dsculpt';runtime_report=case/'runtime.json';runtime_manifest=case/'loader.json'
  runtime_manifest.write_text(json.dumps({'file_format_version':'1.0.0','runtime':{'library_path':str(runtime)}}))
  env={k:v for k,v in os.environ.items() if not k.startswith('DOME_XR_FIXTURE_') and not k.startswith('DOME_XR_PAINT_') and not k.startswith('DOME_XR_TEXTURE_') and not k.startswith('DOME_XR_BAKED_EMISSION')}
- env.update({'XR_RUNTIME_JSON':str(runtime_manifest),'DOME_XR_FIXTURE_REPORT':str(runtime_report),'DOME_XR_BAKED_EMISSION':mode,'DOME_XR_BAKED_EMISSION_GATES':str(gates),'DOME_XR_BAKED_EMISSION_TITLE_REFERENCE':str(title_reference),'XDG_RUNTIME_DIR':str(task_root/'runtime'),'XDG_CONFIG_HOME':str(task_root/'config'),'XDG_STATE_HOME':str(task_root/'state'),'XDG_CACHE_HOME':str(task_root/'cache'),'LP_NUM_THREADS':'2','MESA_SHADER_CACHE_DISABLE':'true'})
+ env.pop('MESA_SHADER_CACHE_DISABLE',None)
+ env.update({'XR_RUNTIME_JSON':str(runtime_manifest),'DOME_XR_FIXTURE_REPORT':str(runtime_report),'DOME_XR_BAKED_EMISSION':mode,'DOME_XR_BAKED_EMISSION_GATES':str(gates),'DOME_XR_BAKED_EMISSION_TITLE_REFERENCE':str(title_reference),'XDG_RUNTIME_DIR':str(task_root/'runtime'),'XDG_CONFIG_HOME':str(task_root/'config'),'XDG_STATE_HOME':str(task_root/'state'),'XDG_CACHE_HOME':str(task_root/'cache'),'LP_NUM_THREADS':'2','MESA_SHADER_CACHE_DIR':str(shader_cache_root),'MESA_SHADER_CACHE_SHOW_STATS':'1'})
  for k in ['WAYLAND_DISPLAY','WAYLAND_SOCKET']:env.pop(k,None)
  if os.environ.get('DOME_BAKED_EMISSION_APP_PRELOAD'):env['LD_PRELOAD']=os.environ['DOME_BAKED_EMISSION_APP_PRELOAD']
  for k in ['XDG_RUNTIME_DIR','XDG_CONFIG_HOME','XDG_STATE_HOME','XDG_CACHE_HOME']:Path(env[k]).mkdir(mode=0o700)
  original=inspect(project,env);expected=inspect(fixtures[expected_key],env);stamp=project.stat().st_mtime_ns
  args=[str(app),'--xr','--open',str(project),'--save',str(result)]
  (case/'invocation.json').write_text(json.dumps({'args':args,'mode':mode,'source':source_key,'expected':expected_key,'settings':manifest['default_settings']},indent=2)+'\n')
- log=(case/'app.log').open('w');process=subprocess.Popen(args,env=env,stdout=log,stderr=subprocess.STDOUT)
+ log=(case/'app.log').open('w');case_started=time.monotonic();process=subprocess.Popen(args,env=env,stdout=log,stderr=subprocess.STDOUT);case_pid=process.pid
  history=True;phases=[('accepted',expected),('undone',original),('redone',expected)]
  deadline=suite_deadline
  for marker,wanted in phases:
@@ -76,6 +91,7 @@ def drive_case(name,mode):
  renderer=os.environ.get('DOME_BAKED_EMISSION_XR_REQUIRE_RENDERER','Arc');check(renderer in state.get('gl_renderer','') and 'llvmpipe' not in state.get('gl_renderer','').lower(),name+': actual stereo context uses the explicitly required hardware renderer')
  maps=Path(str(runtime_report)+'.maps');check(maps.is_file() and str(app) in maps.read_text() and str(runtime) in maps.read_text(),name+': actual process maps contain the pinned ordinary app and new runtime module')
  physical_frames_consumed+=state['frames_waited'];check(physical_frames_consumed<=6000,name+': total original public frame ceiling6000 remains unchanged')
+ shader_cache_boundary(name,case,case_pid,case_started)
  case_reports.append({'name':name,'mode':mode,'runtime_report':str(runtime_report),'runtime_sha256':sha(runtime_report),'native_sha256':sha(result),'maps_sha256':sha(maps),'renderer':state.get('gl_renderer'),'tracking':'synthetic','scope':'Ordinary app; no private product observer'});report()
 
 try:
@@ -108,11 +124,12 @@ try:
   if time.monotonic()>=suite_deadline:raise TimeoutError('Original240s public workflow phase deadline reached before next source view')
   case=out/name;case.mkdir(exist_ok=False);task_root=case/'home';task_root.mkdir();gates=case/'gates';gates.mkdir();project=case/'input.dsculpt';project.write_bytes(scene.read_bytes());result=case/'final.dsculpt';runtime_report=case/'runtime.json';loader=case/'loader.json';loader.write_text(json.dumps({'file_format_version':'1.0.0','runtime':{'library_path':str(runtime)}}))
   env={k:v for k,v in os.environ.items()if not k.startswith('DOME_XR_FIXTURE_')and not k.startswith('DOME_XR_BAKED_EMISSION')}
-  env.update(XR_RUNTIME_JSON=str(loader),DOME_XR_FIXTURE_REPORT=str(runtime_report),DOME_XR_BAKED_EMISSION='source8-view',DOME_XR_BAKED_EMISSION_GATES=str(gates),DOME_XR_BAKED_EMISSION_TITLE_REFERENCE=str(title_reference),LP_NUM_THREADS='2',MESA_SHADER_CACHE_DISABLE='true')
+  env.pop('MESA_SHADER_CACHE_DISABLE',None)
+  env.update(XR_RUNTIME_JSON=str(loader),DOME_XR_FIXTURE_REPORT=str(runtime_report),DOME_XR_BAKED_EMISSION='source8-view',DOME_XR_BAKED_EMISSION_GATES=str(gates),DOME_XR_BAKED_EMISSION_TITLE_REFERENCE=str(title_reference),LP_NUM_THREADS='2',MESA_SHADER_CACHE_DIR=str(shader_cache_root),MESA_SHADER_CACHE_SHOW_STATS='1')
   for k in ['WAYLAND_DISPLAY','WAYLAND_SOCKET']:env.pop(k,None)
   if os.environ.get('DOME_BAKED_EMISSION_APP_PRELOAD'):env['LD_PRELOAD']=os.environ['DOME_BAKED_EMISSION_APP_PRELOAD']
   for key,suffix in [('XDG_RUNTIME_DIR','runtime'),('XDG_CONFIG_HOME','config'),('XDG_STATE_HOME','state'),('XDG_CACHE_HOME','cache')]:env[key]=str(task_root/suffix);Path(env[key]).mkdir(mode=0o700)
-  expected=inspect(scene,env);log=(case/'app.log').open('w');process=subprocess.Popen([str(app),'--xr','--open',str(project),'--save',str(result)],env=env,stdout=log,stderr=subprocess.STDOUT);deadline=suite_deadline;captured=None
+  expected=inspect(scene,env);log=(case/'app.log').open('w');case_started=time.monotonic();process=subprocess.Popen([str(app),'--xr','--open',str(project),'--save',str(result)],env=env,stdout=log,stderr=subprocess.STDOUT);case_pid=process.pid;deadline=suite_deadline;captured=None
   while process.poll()is None and time.monotonic()<deadline:
    state=stable_json(runtime_report)
    if all(state.get('source8_view',{}).get(str(eye),{}).get('frames',0)>=3 for eye in [0,1]):
@@ -133,6 +150,7 @@ try:
   maps=Path(str(runtime_report)+'.maps');check(maps.is_file()and str(app)in maps.read_text()and str(runtime)in maps.read_text(),name+': live source/control process maps include exact actual app and new runtime')
   check(not state.get('field_buttons')and not state.get('field_pressures')and not state.get('field_gate_exhausted'),name+': independent visible-source view invents no sculpt/paint/history action')
   check(os.environ.get('DOME_BAKED_EMISSION_XR_REQUIRE_RENDERER','Arc')in state.get('gl_renderer',''),name+': actual source/control views retain required hardware renderer')
+  shader_cache_boundary(name,case,case_pid,case_started)
   case_reports.append({'name':name,'mode':'source8-view','source_native_sha256':sha(scene),'final_native_sha256':sha(result),'runtime_report':str(runtime_report),'runtime_sha256':sha(runtime_report),'maps_sha256':sha(maps),'actual_eye_images':{str(eye):{'path':str(case/('qualified-eye-'+str(eye)+'.png')),'sha256':sha(case/('qualified-eye-'+str(eye)+'.png'))}for eye in [0,1]},'scope':'Actual both-eye released source/control imagery and fresh native load; independent ordinary-material oracle, no private product callback or physicalHMD'});report()
   return captured
  empty=drive_source_view('source8-hidden-counterfactual',view_files['empty'],lambda images:True)
@@ -158,6 +176,7 @@ try:
  for eye in [0,1]:check(manifest['visible_minimum_case_normal_effect']==7 and any(v['independent_effect']>=7 and v['actual_effect']>3 for v in normal_effects[eye]),'Actual eye'+str(eye)+' Source8 retains disjoint correct/wrong-normal acceptance intervals and actual wrong-normal rejection')
  (out/'source8-normal-sensitivity.json').write_text(json.dumps(normal_effects,indent=2)+'\n')
  check(not [p for p,v in pins.items() if sha(p)!=v],'All application/runtime/inspector/native fixture/script inputs remain unchanged')
+ assert any(event['disk_hits']>0 for event in shader_cache_events[1:]),'A fresh subsequent app must prove actual shared shader code cache hits'
  report(True)
 except BaseException as e:report(error=repr(e));raise
 finally:
