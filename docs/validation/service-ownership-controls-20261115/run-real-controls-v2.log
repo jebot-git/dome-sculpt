@@ -1,0 +1,27 @@
+{
+  "state": "terminal",
+  "exit": 0,
+  "run": "/home/blux/de-xr/dome-sculpt/artifacts/service-ownership-controls-20261115/real-cpu-v2-edf20693",
+  "controls": [
+    [
+      "healthy",
+      0
+    ],
+    [
+      "orphan",
+      0
+    ],
+    [
+      "term",
+      143
+    ],
+    [
+      "deadline",
+      124
+    ],
+    [
+      "rss",
+      1
+    ]
+  ]
+}

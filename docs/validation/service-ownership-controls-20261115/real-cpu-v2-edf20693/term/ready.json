@@ -1,0 +1,28 @@
+{
+  "unit": "ds-owner-control-term-edf20693.service",
+  "invocation": "303e9422aeb944978dd181291c776cd6",
+  "main": {
+    "start": 27327094,
+    "pgrp": 4051541,
+    "session": 4051541,
+    "ppid": 1203,
+    "state": "R"
+  },
+  "owned_live": {
+    "4051552": {
+      "start": 27327103,
+      "pgrp": 4051552,
+      "session": 4051552,
+      "ppid": 4051550,
+      "state": "R"
+    },
+    "4051550": {
+      "start": 27327100,
+      "pgrp": 4051550,
+      "session": 4051550,
+      "ppid": 4051541,
+      "state": "R"
+    }
+  },
+  "cgroup": "0::/user.slice/user-1000.slice/user@1000.service/app.slice/ds-owner-control-term-edf20693.service"
+}

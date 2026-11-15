@@ -1,0 +1,10 @@
+{
+  "pid": 4051170,
+  "start": 27326873,
+  "ppid": 4051161,
+  "pgrp": 4051170,
+  "session": 4051170,
+  "cgroup": "0::/user.slice/user-1000.slice/user@1000.service/app.slice/ds-owner-control-orphan-edf20693.service",
+  "allocated_touched_bytes": 0,
+  "monotonic_start": 273268.765182605
+}

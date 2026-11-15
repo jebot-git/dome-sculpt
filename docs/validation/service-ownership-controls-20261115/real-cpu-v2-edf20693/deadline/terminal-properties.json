@@ -1,0 +1,18 @@
+{
+  "Id": "ds-owner-control-deadline-edf20693.service",
+  "LoadState": "loaded",
+  "ActiveState": "failed",
+  "SubState": "failed",
+  "InvocationID": "57785013132743f0a6e93b5285e45c85",
+  "Type": "exec",
+  "RuntimeMaxUSec": "45s",
+  "RemainAfterExit": "yes",
+  "MainPID": "0",
+  "Result": "exit-code",
+  "ExecMainPID": "4051924",
+  "ExecMainCode": "1",
+  "ExecMainStatus": "124",
+  "ControlGroup": "",
+  "MemoryMax": "268435456",
+  "KillMode": "control-group"
+}

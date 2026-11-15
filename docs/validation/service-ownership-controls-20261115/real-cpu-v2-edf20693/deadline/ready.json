@@ -1,0 +1,28 @@
+{
+  "unit": "ds-owner-control-deadline-edf20693.service",
+  "invocation": "57785013132743f0a6e93b5285e45c85",
+  "main": {
+    "start": 27327325,
+    "pgrp": 4051924,
+    "session": 4051924,
+    "ppid": 1203,
+    "state": "R"
+  },
+  "owned_live": {
+    "4051936": {
+      "start": 27327330,
+      "pgrp": 4051936,
+      "session": 4051936,
+      "ppid": 4051924,
+      "state": "R"
+    },
+    "4051945": {
+      "start": 27327333,
+      "pgrp": 4051945,
+      "session": 4051945,
+      "ppid": 4051936,
+      "state": "R"
+    }
+  },
+  "cgroup": "0::/user.slice/user-1000.slice/user@1000.service/app.slice/ds-owner-control-deadline-edf20693.service"
+}

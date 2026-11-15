@@ -1,0 +1,10 @@
+{
+  "pid": 4050989,
+  "start": 27326779,
+  "ppid": 1203,
+  "pgrp": 4050989,
+  "session": 4050989,
+  "cgroup": "0::/user.slice/user-1000.slice/user@1000.service/app.slice/ds-owner-control-sentinel-edf20693.service",
+  "allocated_touched_bytes": 0,
+  "monotonic_start": 273267.842480545
+}

@@ -1,0 +1,21 @@
+{
+  "unit": "ds-owner-control-orphan-edf20693.service",
+  "invocation": "d93c264836b04dc792865ef041fbd7b3",
+  "main": {
+    "start": 27326865,
+    "pgrp": 4051155,
+    "session": 4051155,
+    "ppid": 1203,
+    "state": "R"
+  },
+  "owned_live": {
+    "4051170": {
+      "start": 27326873,
+      "pgrp": 4051170,
+      "session": 4051170,
+      "ppid": 1203,
+      "state": "R"
+    }
+  },
+  "cgroup": "0::/user.slice/user-1000.slice/user@1000.service/app.slice/ds-owner-control-orphan-edf20693.service"
+}

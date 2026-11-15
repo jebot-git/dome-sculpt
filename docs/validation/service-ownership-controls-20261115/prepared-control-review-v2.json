@@ -1,0 +1,11 @@
+{
+  "state": "v2-prepared-NOT-executed",
+  "causal_fix": "V1 own_cgroup closure unbound, statically rejected before any control; v2 explicitly binds validated actual service cgroup. All extracted primitive bodies unchanged.",
+  "v1_preserved_unrun": true,
+  "files": {
+    "ownership_primitives_v2.py": "b6122798b3a38c353ae947490dbb379b4b0239c2f58e29de08247294e90fd787",
+    "primitive_control_v2.py": "8b39533d7356f37462ed1d307de641e1feed62dfa58c5a4ef8cfefb2aba45eab",
+    "run-real-controls-v2.py": "4fd00beced0be1407be2ba1dfec4859990c3b79da21398c90cfb4a7aafd1c8cd",
+    "cpu_tree_v1.py": "1478d7b685fb12c0b47253f16e38226b8e3b6c08c719af214d334d48b75a5ded"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "unit": "ds-owner-control-healthy-edf20693.service",
+  "invocation": "9d7786fe74db4d13a1722d453ddbd388",
+  "main": {
+    "start": 27326787,
+    "pgrp": 4051007,
+    "session": 4051007,
+    "ppid": 1203,
+    "state": "R"
+  },
+  "owned_live": {
+    "4051018": {
+      "start": 27326792,
+      "pgrp": 4051018,
+      "session": 4051018,
+      "ppid": 4051007,
+      "state": "R"
+    },
+    "4051021": {
+      "start": 27326795,
+      "pgrp": 4051021,
+      "session": 4051021,
+      "ppid": 4051018,
+      "state": "R"
+    }
+  },
+  "cgroup": "0::/user.slice/user-1000.slice/user@1000.service/app.slice/ds-owner-control-healthy-edf20693.service"
+}

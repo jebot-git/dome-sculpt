@@ -1,0 +1,10 @@
+{
+  "pid": 4051021,
+  "start": 27326795,
+  "ppid": 4051018,
+  "pgrp": 4051021,
+  "session": 4051021,
+  "cgroup": "0::/user.slice/user-1000.slice/user@1000.service/app.slice/ds-owner-control-healthy-edf20693.service",
+  "counter": 2723051704,
+  "seconds": 0.5004759880248457
+}

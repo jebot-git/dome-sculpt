@@ -1,0 +1,97 @@
+{
+  "scope": "Real CPU ownership/resource primitives only, NOT whole mixed executor or compiler/project qualification. Actual negative 143/124/1 outcomes preserved.",
+  "exit": 0,
+  "audit_epoch": 1794770412.7241213,
+  "status_sha256": "942eccd9c494045ef5a33786207b9cb506ffe254951592ecbbcac4e729c1f8c5",
+  "launches_sha256": "d6087c171db3c05a1027ff2943d7f32de8df078bb1d279dcb1d79b68b323af3a",
+  "approved_sources_sha256": {
+    "ownership_primitives_v2.py": "b6122798b3a38c353ae947490dbb379b4b0239c2f58e29de08247294e90fd787",
+    "primitive_control_v2.py": "8b39533d7356f37462ed1d307de641e1feed62dfa58c5a4ef8cfefb2aba45eab",
+    "run-real-controls-v2.py": "4fd00beced0be1407be2ba1dfec4859990c3b79da21398c90cfb4a7aafd1c8cd",
+    "cpu_tree_v1.py": "1478d7b685fb12c0b47253f16e38226b8e3b6c08c719af214d334d48b75a5ded"
+  },
+  "held_executor_sha256": "2e6477ef1156d074ba6d1c6ed0e57a611b94ada0a8e70648a4395af4d7711d1a",
+  "all_units_not_found": {
+    "ds-owner-control-sentinel-edf20693.service": {
+      "LoadState": "not-found",
+      "ActiveState": "inactive",
+      "SubState": "dead",
+      "MainPID": "0"
+    },
+    "ds-owner-control-healthy-edf20693.service": {
+      "LoadState": "not-found",
+      "ActiveState": "inactive",
+      "SubState": "dead",
+      "MainPID": "0"
+    },
+    "ds-owner-control-orphan-edf20693.service": {
+      "LoadState": "not-found",
+      "ActiveState": "inactive",
+      "SubState": "dead",
+      "MainPID": "0"
+    },
+    "ds-owner-control-term-edf20693.service": {
+      "LoadState": "not-found",
+      "ActiveState": "inactive",
+      "SubState": "dead",
+      "MainPID": "0"
+    },
+    "ds-owner-control-deadline-edf20693.service": {
+      "LoadState": "not-found",
+      "ActiveState": "inactive",
+      "SubState": "dead",
+      "MainPID": "0"
+    },
+    "ds-owner-control-rss-edf20693.service": {
+      "LoadState": "not-found",
+      "ActiveState": "inactive",
+      "SubState": "dead",
+      "MainPID": "0"
+    }
+  },
+  "all_tracked_PIDs_absent": [
+    4050989,
+    4051007,
+    4051018,
+    4051021,
+    4051155,
+    4051161,
+    4051170,
+    4051541,
+    4051550,
+    4051552,
+    4051924,
+    4051936,
+    4051945,
+    4052582,
+    4052588,
+    4052597
+  ],
+  "sentinel_survived_all_five": true,
+  "no_oom_kill": true,
+  "actual_outcomes": [
+    [
+      "healthy",
+      0
+    ],
+    [
+      "orphan",
+      0
+    ],
+    [
+      "term",
+      143
+    ],
+    [
+      "deadline",
+      124
+    ],
+    [
+      "rss",
+      1
+    ]
+  ],
+  "RSS_real_peak_bytes": 102084608,
+  "RSS_declared_limit_bytes": 67108864,
+  "no_signal_action_in_this_final_audit": true
+}

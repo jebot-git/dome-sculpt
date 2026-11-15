@@ -1,0 +1,10 @@
+{
+  "pid": 4052597,
+  "start": 27327712,
+  "ppid": 4052588,
+  "pgrp": 4052597,
+  "session": 4052597,
+  "cgroup": "0::/user.slice/user-1000.slice/user@1000.service/app.slice/ds-owner-control-rss-edf20693.service",
+  "allocated_touched_bytes": 50331648,
+  "monotonic_start": 273277.161448931
+}

@@ -1,0 +1,879 @@
+{
+  "state": "terminal",
+  "exit": 0,
+  "scope": "Real isolated CPU ownership/resource primitives only. Deliberate deadline124/TERM143/RSS1 remain actual expected negative control outcomes. NOT compiler/project/mixed-executor qualification. No .o/.d or Ninja/build journal created.",
+  "extraction_receipt": {
+    "held_source": "/home/blux/de-xr/dome-sculpt/artifacts/native90-release-planning-20261115/execute-release-native90-v1.py",
+    "held_source_sha256": "2e6477ef1156d074ba6d1c6ed0e57a611b94ada0a8e70648a4395af4d7711d1a",
+    "extraction_only_no_held_mutation": true,
+    "functions": {
+      "OwnedTermination": {
+        "held_sha256": "33796f82aa351732613b8814a025ab9a5e4aeff2dd2cb48c4af5508da2b7b543",
+        "control_sha256": "33796f82aa351732613b8814a025ab9a5e4aeff2dd2cb48c4af5508da2b7b543",
+        "byte_identical_after_dedent": true
+      },
+      "received_signal": {
+        "held_sha256": "3009d3a3a1c4786d1853a186c0e4e0a3f55c64d893255b5308462b33229a108c",
+        "control_sha256": "3009d3a3a1c4786d1853a186c0e4e0a3f55c64d893255b5308462b33229a108c",
+        "byte_identical_after_dedent": true
+      },
+      "proc_identity": {
+        "held_sha256": "9c53f42866aed99e704510314a08a4835c2fa64741b104e1eaa8c486c032f22f",
+        "control_sha256": "9c53f42866aed99e704510314a08a4835c2fa64741b104e1eaa8c486c032f22f",
+        "byte_identical_after_dedent": true
+      },
+      "file_identity": {
+        "held_sha256": "152fba53910fe6eb04c8f46eefd3cb8e9bf816fa834e0e1e5174020512ae8682",
+        "control_sha256": "152fba53910fe6eb04c8f46eefd3cb8e9bf816fa834e0e1e5174020512ae8682",
+        "byte_identical_after_dedent": true
+      },
+      "atomic": {
+        "held_sha256": "1070d51269bfb41d29a662615deeb40ecf43696e9e2edf3e8b2ccb8336ab088c",
+        "control_sha256": "1070d51269bfb41d29a662615deeb40ecf43696e9e2edf3e8b2ccb8336ab088c",
+        "byte_identical_after_dedent": true
+      },
+      "descendants": {
+        "held_sha256": "bfec386725df9187013d3d66ddb136f883c3d871a9fb2c7dd596801b263d35a6",
+        "control_sha256": "bfec386725df9187013d3d66ddb136f883c3d871a9fb2c7dd596801b263d35a6",
+        "byte_identical_after_dedent": true
+      },
+      "service_pids": {
+        "held_sha256": "743279450dac71f58d38daeeb74b0a6bee66eebc48eb62a9c8db83d281c3c4fe",
+        "control_sha256": "743279450dac71f58d38daeeb74b0a6bee66eebc48eb62a9c8db83d281c3c4fe",
+        "byte_identical_after_dedent": true
+      },
+      "observe": {
+        "held_sha256": "d7d4d10ecd7c303bdff236fc5a23a59f74ef314a82b9f381004beb8b74e70a49",
+        "control_sha256": "d7d4d10ecd7c303bdff236fc5a23a59f74ef314a82b9f381004beb8b74e70a49",
+        "byte_identical_after_dedent": true
+      },
+      "sample": {
+        "held_sha256": "766316cf8c7b7ad72373f097ca88d481dd732cd00d4178dbf051c3b453b88deb",
+        "control_sha256": "4565f150b92834420a18cc1cbcfded0e5b03f5060b5926e08ba0f81af90e6775",
+        "byte_identical_after_dedent": false
+      },
+      "checkpoint": {
+        "held_sha256": "5be37069f59b2e43e074be8083a0824ce2d77fc303b8e69d32ca698048305d29",
+        "control_sha256": "8c9b9a3f38a30af124943101514ed1c1051cfea0d5917a59217404518d2263c6",
+        "byte_identical_after_dedent": false
+      },
+      "cleanup": {
+        "held_sha256": "7a4da4335e35c9e198bfdc0691c9d4b6a591e0fb058378f48f25b5546422b9fc",
+        "control_sha256": "7a4da4335e35c9e198bfdc0691c9d4b6a591e0fb058378f48f25b5546422b9fc",
+        "byte_identical_after_dedent": true
+      }
+    },
+    "control_module_sha256": "b6122798b3a38c353ae947490dbb379b4b0239c2f58e29de08247294e90fd787",
+    "scope": "Operational process ownership/resource primitives only. No compiler, staging, .o/.d or fake build/Ninja journals.",
+    "v1_preserved_unrun": true,
+    "factory_binding_fix": {
+      "own_cgroup": "Explicit validated actual cg[3:] from /proc/self/cgroup",
+      "cgroup_root": "Assert exact /sys/fs/cgroup/<own_cgroup> equivalence",
+      "primitive_bodies_changed_from_v1": false
+    },
+    "actual_service_limit_checks": {
+      "RuntimeMaxUSec": "45s",
+      "MemoryMax": "256MiB control/64MiB sentinel",
+      "TimeoutStopUSec": "10s for main harness"
+    }
+  },
+  "initial_sentinel": {
+    "unit": "ds-owner-control-sentinel-edf20693.service",
+    "properties": {
+      "Id": "ds-owner-control-sentinel-edf20693.service",
+      "LoadState": "loaded",
+      "ActiveState": "active",
+      "SubState": "running",
+      "InvocationID": "171b633a1a5047b59d07b063be09743d",
+      "Type": "exec",
+      "RuntimeMaxUSec": "45s",
+      "RemainAfterExit": "yes",
+      "MainPID": "4050989",
+      "Result": "success",
+      "ExecMainPID": "4050989",
+      "ExecMainCode": "0",
+      "ExecMainStatus": "0",
+      "ControlGroup": "/user.slice/user-1000.slice/user@1000.service/app.slice/ds-owner-control-sentinel-edf20693.service",
+      "MemoryMax": "67108864",
+      "KillMode": "control-group"
+    },
+    "identity": {
+      "start": 27326779,
+      "pgrp": 4050989,
+      "session": 4050989,
+      "ppid": 1203,
+      "state": "S"
+    },
+    "heartbeat": {
+      "pid": 4050989,
+      "start": 27326779,
+      "ppid": 1203,
+      "pgrp": 4050989,
+      "session": 4050989,
+      "cgroup": "0::/user.slice/user-1000.slice/user@1000.service/app.slice/ds-owner-control-sentinel-edf20693.service",
+      "counter": 2859901224,
+      "epoch": 1794770268.8371964
+    }
+  },
+  "final_sentinel": {
+    "unit": "ds-owner-control-sentinel-edf20693.service",
+    "properties": {
+      "Id": "ds-owner-control-sentinel-edf20693.service",
+      "LoadState": "loaded",
+      "ActiveState": "active",
+      "SubState": "running",
+      "InvocationID": "171b633a1a5047b59d07b063be09743d",
+      "Type": "exec",
+      "RuntimeMaxUSec": "45s",
+      "RemainAfterExit": "yes",
+      "MainPID": "4050989",
+      "Result": "success",
+      "ExecMainPID": "4050989",
+      "ExecMainCode": "0",
+      "ExecMainStatus": "0",
+      "ControlGroup": "/user.slice/user-1000.slice/user@1000.service/app.slice/ds-owner-control-sentinel-edf20693.service",
+      "MemoryMax": "67108864",
+      "KillMode": "control-group"
+    },
+    "identity": {
+      "start": 27326779,
+      "pgrp": 4050989,
+      "session": 4050989,
+      "ppid": 1203,
+      "state": "S"
+    },
+    "heartbeat": {
+      "pid": 4050989,
+      "start": 27326779,
+      "ppid": 1203,
+      "pgrp": 4050989,
+      "session": 4050989,
+      "cgroup": "0::/user.slice/user-1000.slice/user@1000.service/app.slice/ds-owner-control-sentinel-edf20693.service",
+      "counter": 2747929864,
+      "epoch": 1794770280.2709339
+    }
+  },
+  "controls": [
+    {
+      "mode": "healthy",
+      "expected_actual_exit": 0,
+      "actual_properties": {
+        "Id": "ds-owner-control-healthy-edf20693.service",
+        "LoadState": "loaded",
+        "ActiveState": "active",
+        "SubState": "exited",
+        "InvocationID": "9d7786fe74db4d13a1722d453ddbd388",
+        "Type": "exec",
+        "RuntimeMaxUSec": "45s",
+        "RemainAfterExit": "yes",
+        "MainPID": "0",
+        "Result": "success",
+        "ExecMainPID": "4051007",
+        "ExecMainCode": "1",
+        "ExecMainStatus": "0",
+        "ControlGroup": "",
+        "MemoryMax": "268435456",
+        "KillMode": "control-group"
+      },
+      "state": {
+        "mode": "healthy",
+        "unit": "ds-owner-control-healthy-edf20693.service",
+        "properties": {
+          "InvocationID": "9d7786fe74db4d13a1722d453ddbd388",
+          "Type": "exec",
+          "TimeoutStopUSec": "10s",
+          "RuntimeMaxUSec": "45s",
+          "MainPID": "4051007",
+          "ExecMainPID": "4051007",
+          "MemoryMax": "268435456",
+          "KillMode": "control-group"
+        },
+        "scope": "Real CPU ownership/resource primitives ONLY; not project executor/build/runtime qualification",
+        "state": "terminal",
+        "exit": 0,
+        "error": null,
+        "actual_signal": null,
+        "cleanup": null,
+        "ready_identity": {
+          "start": 27326787,
+          "pgrp": 4051007,
+          "session": 4051007,
+          "ppid": 1203,
+          "state": "R"
+        },
+        "leader_returncode": 0,
+        "seconds": 0.6090815889765508,
+        "peak_aggregate_RSS_bytes": 51728384,
+        "declared_RSS_limit_bytes": 201326592,
+        "remaining_owned_same_start": {},
+        "process_ledger": {
+          "4051018:27326792": {
+            "identity": {
+              "start": 27326792,
+              "pgrp": 4051018,
+              "session": 4051018,
+              "ppid": 4051007,
+              "state": "R"
+            },
+            "owning_job_root": 4051018,
+            "observed_epoch": 1794770268.9201202,
+            "authority": "dedicated reviewed current service cgroup"
+          },
+          "4051021:27326795": {
+            "identity": {
+              "start": 27326795,
+              "pgrp": 4051021,
+              "session": 4051021,
+              "ppid": 4051018,
+              "state": "R"
+            },
+            "owning_job_root": null,
+            "observed_epoch": 1794770269.001624,
+            "authority": "dedicated reviewed current service cgroup"
+          }
+        },
+        "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "sentinel_survived": {
+        "unit": "ds-owner-control-sentinel-edf20693.service",
+        "properties": {
+          "Id": "ds-owner-control-sentinel-edf20693.service",
+          "LoadState": "loaded",
+          "ActiveState": "active",
+          "SubState": "running",
+          "InvocationID": "171b633a1a5047b59d07b063be09743d",
+          "Type": "exec",
+          "RuntimeMaxUSec": "45s",
+          "RemainAfterExit": "yes",
+          "MainPID": "4050989",
+          "Result": "success",
+          "ExecMainPID": "4050989",
+          "ExecMainCode": "0",
+          "ExecMainStatus": "0",
+          "ControlGroup": "/user.slice/user-1000.slice/user@1000.service/app.slice/ds-owner-control-sentinel-edf20693.service",
+          "MemoryMax": "67108864",
+          "KillMode": "control-group"
+        },
+        "identity": {
+          "start": 27326779,
+          "pgrp": 4050989,
+          "session": 4050989,
+          "ppid": 1203,
+          "state": "R"
+        },
+        "heartbeat": {
+          "pid": 4050989,
+          "start": 27326779,
+          "ppid": 1203,
+          "pgrp": 4050989,
+          "session": 4050989,
+          "cgroup": "0::/user.slice/user-1000.slice/user@1000.service/app.slice/ds-owner-control-sentinel-edf20693.service",
+          "counter": 20335584,
+          "epoch": 1794770269.6052134
+        }
+      },
+      "all_owned_PIDs_gone": [
+        4051018,
+        4051021,
+        4051007
+      ],
+      "success_as_deliberate_control": true
+    },
+    {
+      "mode": "orphan",
+      "expected_actual_exit": 0,
+      "actual_properties": {
+        "Id": "ds-owner-control-orphan-edf20693.service",
+        "LoadState": "loaded",
+        "ActiveState": "active",
+        "SubState": "exited",
+        "InvocationID": "d93c264836b04dc792865ef041fbd7b3",
+        "Type": "exec",
+        "RuntimeMaxUSec": "45s",
+        "RemainAfterExit": "yes",
+        "MainPID": "0",
+        "Result": "success",
+        "ExecMainPID": "4051155",
+        "ExecMainCode": "1",
+        "ExecMainStatus": "0",
+        "ControlGroup": "",
+        "MemoryMax": "268435456",
+        "KillMode": "control-group"
+      },
+      "state": {
+        "mode": "orphan",
+        "unit": "ds-owner-control-orphan-edf20693.service",
+        "properties": {
+          "InvocationID": "d93c264836b04dc792865ef041fbd7b3",
+          "Type": "exec",
+          "TimeoutStopUSec": "10s",
+          "RuntimeMaxUSec": "45s",
+          "MainPID": "4051155",
+          "ExecMainPID": "4051155",
+          "MemoryMax": "268435456",
+          "KillMode": "control-group"
+        },
+        "scope": "Real CPU ownership/resource primitives ONLY; not project executor/build/runtime qualification",
+        "state": "terminal",
+        "exit": 0,
+        "error": null,
+        "actual_signal": null,
+        "cleanup": {
+          "signals": [
+            {
+              "pid": 4051170,
+              "start": 27326873,
+              "signal": 15
+            },
+            {
+              "pid": 4051170,
+              "start": 27326873,
+              "signal": 9
+            }
+          ],
+          "remaining_owned_same_start": {}
+        },
+        "ready_identity": {
+          "start": 27326865,
+          "pgrp": 4051155,
+          "session": 4051155,
+          "ppid": 1203,
+          "state": "R"
+        },
+        "leader_returncode": 0,
+        "orphan_before_cleanup": {
+          "4051170": {
+            "start": 27326873,
+            "pgrp": 4051170,
+            "session": 4051170,
+            "ppid": 1203,
+            "state": "R"
+          }
+        },
+        "seconds": 2.10605870798463,
+        "peak_aggregate_RSS_bytes": 34652160,
+        "declared_RSS_limit_bytes": 201326592,
+        "remaining_owned_same_start": {},
+        "process_ledger": {
+          "4051161:27326870": {
+            "identity": {
+              "start": 27326870,
+              "pgrp": 4051161,
+              "session": 4051161,
+              "ppid": 4051155,
+              "state": "R"
+            },
+            "owning_job_root": 4051161,
+            "observed_epoch": 1794770269.698608,
+            "authority": "dedicated reviewed current service cgroup"
+          },
+          "4051170:27326873": {
+            "identity": {
+              "start": 27326873,
+              "pgrp": 4051170,
+              "session": 4051170,
+              "ppid": 1203,
+              "state": "R"
+            },
+            "owning_job_root": null,
+            "observed_epoch": 1794770269.780268,
+            "authority": "dedicated reviewed current service cgroup"
+          }
+        },
+        "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "sentinel_survived": {
+        "unit": "ds-owner-control-sentinel-edf20693.service",
+        "properties": {
+          "Id": "ds-owner-control-sentinel-edf20693.service",
+          "LoadState": "loaded",
+          "ActiveState": "active",
+          "SubState": "running",
+          "InvocationID": "171b633a1a5047b59d07b063be09743d",
+          "Type": "exec",
+          "RuntimeMaxUSec": "45s",
+          "RemainAfterExit": "yes",
+          "MainPID": "4050989",
+          "Result": "success",
+          "ExecMainPID": "4050989",
+          "ExecMainCode": "0",
+          "ExecMainStatus": "0",
+          "ControlGroup": "/user.slice/user-1000.slice/user@1000.service/app.slice/ds-owner-control-sentinel-edf20693.service",
+          "MemoryMax": "67108864",
+          "KillMode": "control-group"
+        },
+        "identity": {
+          "start": 27326779,
+          "pgrp": 4050989,
+          "session": 4050989,
+          "ppid": 1203,
+          "state": "R"
+        },
+        "heartbeat": {
+          "pid": 4050989,
+          "start": 27326779,
+          "ppid": 1203,
+          "pgrp": 4050989,
+          "session": 4050989,
+          "cgroup": "0::/user.slice/user-1000.slice/user@1000.service/app.slice/ds-owner-control-sentinel-edf20693.service",
+          "counter": 2501484944,
+          "epoch": 1794770271.8988335
+        }
+      },
+      "all_owned_PIDs_gone": [
+        4051161,
+        4051170,
+        4051155
+      ],
+      "success_as_deliberate_control": true
+    },
+    {
+      "mode": "term",
+      "expected_actual_exit": 143,
+      "actual_properties": {
+        "Id": "ds-owner-control-term-edf20693.service",
+        "LoadState": "loaded",
+        "ActiveState": "failed",
+        "SubState": "failed",
+        "InvocationID": "303e9422aeb944978dd181291c776cd6",
+        "Type": "exec",
+        "RuntimeMaxUSec": "45s",
+        "RemainAfterExit": "yes",
+        "MainPID": "0",
+        "Result": "exit-code",
+        "ExecMainPID": "4051541",
+        "ExecMainCode": "1",
+        "ExecMainStatus": "143",
+        "ControlGroup": "",
+        "MemoryMax": "268435456",
+        "KillMode": "control-group"
+      },
+      "state": {
+        "mode": "term",
+        "unit": "ds-owner-control-term-edf20693.service",
+        "properties": {
+          "InvocationID": "303e9422aeb944978dd181291c776cd6",
+          "Type": "exec",
+          "TimeoutStopUSec": "10s",
+          "RuntimeMaxUSec": "45s",
+          "MainPID": "4051541",
+          "ExecMainPID": "4051541",
+          "MemoryMax": "268435456",
+          "KillMode": "control-group"
+        },
+        "scope": "Real CPU ownership/resource primitives ONLY; not project executor/build/runtime qualification",
+        "state": "terminal",
+        "exit": 143,
+        "error": "OwnedTermination('Received owned executor signal 15')",
+        "actual_signal": 15,
+        "cleanup": {
+          "signals": [
+            {
+              "pgrp": 4051550,
+              "signal": 15
+            },
+            {
+              "pid": 4051552,
+              "start": 27327103,
+              "signal": 15
+            },
+            {
+              "pgrp": 4051550,
+              "signal": 9
+            },
+            {
+              "pid": 4051552,
+              "start": 27327103,
+              "signal": 9
+            },
+            {
+              "pid": 4051550,
+              "key": "REAL_CPU_TREE_CONTROL",
+              "actual_cleanup_returncode": -9
+            }
+          ],
+          "remaining_owned_same_start": {}
+        },
+        "ready_identity": {
+          "start": 27327094,
+          "pgrp": 4051541,
+          "session": 4051541,
+          "ppid": 1203,
+          "state": "R"
+        },
+        "seconds": 2.121003321954049,
+        "peak_aggregate_RSS_bytes": 51740672,
+        "declared_RSS_limit_bytes": 201326592,
+        "remaining_owned_same_start": {},
+        "process_ledger": {
+          "4051550:27327100": {
+            "identity": {
+              "start": 27327100,
+              "pgrp": 4051550,
+              "session": 4051550,
+              "ppid": 4051541,
+              "state": "R"
+            },
+            "owning_job_root": 4051550,
+            "observed_epoch": 1794770272.0021327,
+            "authority": "dedicated reviewed current service cgroup"
+          },
+          "4051552:27327103": {
+            "identity": {
+              "start": 27327103,
+              "pgrp": 4051552,
+              "session": 4051552,
+              "ppid": 4051550,
+              "state": "R"
+            },
+            "owning_job_root": null,
+            "observed_epoch": 1794770272.083274,
+            "authority": "dedicated reviewed current service cgroup"
+          }
+        },
+        "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "sentinel_survived": {
+        "unit": "ds-owner-control-sentinel-edf20693.service",
+        "properties": {
+          "Id": "ds-owner-control-sentinel-edf20693.service",
+          "LoadState": "loaded",
+          "ActiveState": "active",
+          "SubState": "running",
+          "InvocationID": "171b633a1a5047b59d07b063be09743d",
+          "Type": "exec",
+          "RuntimeMaxUSec": "45s",
+          "RemainAfterExit": "yes",
+          "MainPID": "4050989",
+          "Result": "success",
+          "ExecMainPID": "4050989",
+          "ExecMainCode": "0",
+          "ExecMainStatus": "0",
+          "ControlGroup": "/user.slice/user-1000.slice/user@1000.service/app.slice/ds-owner-control-sentinel-edf20693.service",
+          "MemoryMax": "67108864",
+          "KillMode": "control-group"
+        },
+        "identity": {
+          "start": 27326779,
+          "pgrp": 4050989,
+          "session": 4050989,
+          "ppid": 1203,
+          "state": "S"
+        },
+        "heartbeat": {
+          "pid": 4050989,
+          "start": 27326779,
+          "ppid": 1203,
+          "pgrp": 4050989,
+          "session": 4050989,
+          "cgroup": "0::/user.slice/user-1000.slice/user@1000.service/app.slice/ds-owner-control-sentinel-edf20693.service",
+          "counter": 4112010048,
+          "epoch": 1794770274.1946745
+        }
+      },
+      "all_owned_PIDs_gone": [
+        4051550,
+        4051552,
+        4051541
+      ],
+      "success_as_deliberate_control": true
+    },
+    {
+      "mode": "deadline",
+      "expected_actual_exit": 124,
+      "actual_properties": {
+        "Id": "ds-owner-control-deadline-edf20693.service",
+        "LoadState": "loaded",
+        "ActiveState": "failed",
+        "SubState": "failed",
+        "InvocationID": "57785013132743f0a6e93b5285e45c85",
+        "Type": "exec",
+        "RuntimeMaxUSec": "45s",
+        "RemainAfterExit": "yes",
+        "MainPID": "0",
+        "Result": "exit-code",
+        "ExecMainPID": "4051924",
+        "ExecMainCode": "1",
+        "ExecMainStatus": "124",
+        "ControlGroup": "",
+        "MemoryMax": "268435456",
+        "KillMode": "control-group"
+      },
+      "state": {
+        "mode": "deadline",
+        "unit": "ds-owner-control-deadline-edf20693.service",
+        "properties": {
+          "InvocationID": "57785013132743f0a6e93b5285e45c85",
+          "Type": "exec",
+          "TimeoutStopUSec": "10s",
+          "RuntimeMaxUSec": "45s",
+          "MainPID": "4051924",
+          "ExecMainPID": "4051924",
+          "MemoryMax": "268435456",
+          "KillMode": "control-group"
+        },
+        "scope": "Real CPU ownership/resource primitives ONLY; not project executor/build/runtime qualification",
+        "state": "terminal",
+        "exit": 124,
+        "error": "TimeoutError('Declared control monotonic deadline exceeded')",
+        "actual_signal": null,
+        "cleanup": {
+          "signals": [
+            {
+              "pgrp": 4051936,
+              "signal": 15
+            },
+            {
+              "pid": 4051945,
+              "start": 27327333,
+              "signal": 15
+            },
+            {
+              "pgrp": 4051936,
+              "signal": 9
+            },
+            {
+              "pid": 4051945,
+              "start": 27327333,
+              "signal": 9
+            },
+            {
+              "pid": 4051936,
+              "key": "REAL_CPU_TREE_CONTROL",
+              "actual_cleanup_returncode": -9
+            }
+          ],
+          "remaining_owned_same_start": {}
+        },
+        "ready_identity": {
+          "start": 27327325,
+          "pgrp": 4051924,
+          "session": 4051924,
+          "ppid": 1203,
+          "state": "R"
+        },
+        "control_outcome": "Expected real monotonic expiry;124 is control mapping, not a whole-executor result",
+        "seconds": 3.6448786400142126,
+        "peak_aggregate_RSS_bytes": 51818496,
+        "declared_RSS_limit_bytes": 201326592,
+        "remaining_owned_same_start": {},
+        "process_ledger": {
+          "4051936:27327330": {
+            "identity": {
+              "start": 27327330,
+              "pgrp": 4051936,
+              "session": 4051936,
+              "ppid": 4051924,
+              "state": "R"
+            },
+            "owning_job_root": 4051936,
+            "observed_epoch": 1794770274.2958333,
+            "authority": "dedicated reviewed current service cgroup"
+          },
+          "4051945:27327333": {
+            "identity": {
+              "start": 27327333,
+              "pgrp": 4051945,
+              "session": 4051945,
+              "ppid": 4051936,
+              "state": "R"
+            },
+            "owning_job_root": null,
+            "observed_epoch": 1794770274.37704,
+            "authority": "dedicated reviewed current service cgroup"
+          }
+        },
+        "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "sentinel_survived": {
+        "unit": "ds-owner-control-sentinel-edf20693.service",
+        "properties": {
+          "Id": "ds-owner-control-sentinel-edf20693.service",
+          "LoadState": "loaded",
+          "ActiveState": "active",
+          "SubState": "running",
+          "InvocationID": "171b633a1a5047b59d07b063be09743d",
+          "Type": "exec",
+          "RuntimeMaxUSec": "45s",
+          "RemainAfterExit": "yes",
+          "MainPID": "4050989",
+          "Result": "success",
+          "ExecMainPID": "4050989",
+          "ExecMainCode": "0",
+          "ExecMainStatus": "0",
+          "ControlGroup": "/user.slice/user-1000.slice/user@1000.service/app.slice/ds-owner-control-sentinel-edf20693.service",
+          "MemoryMax": "67108864",
+          "KillMode": "control-group"
+        },
+        "identity": {
+          "start": 27326779,
+          "pgrp": 4050989,
+          "session": 4050989,
+          "ppid": 1203,
+          "state": "S"
+        },
+        "heartbeat": {
+          "pid": 4050989,
+          "start": 27326779,
+          "ppid": 1203,
+          "pgrp": 4050989,
+          "session": 4050989,
+          "cgroup": "0::/user.slice/user-1000.slice/user@1000.service/app.slice/ds-owner-control-sentinel-edf20693.service",
+          "counter": 3563531968,
+          "epoch": 1794770278.0264428
+        }
+      },
+      "all_owned_PIDs_gone": [
+        4051936,
+        4051945,
+        4051924
+      ],
+      "success_as_deliberate_control": true
+    },
+    {
+      "mode": "rss",
+      "expected_actual_exit": 1,
+      "actual_properties": {
+        "Id": "ds-owner-control-rss-edf20693.service",
+        "LoadState": "loaded",
+        "ActiveState": "failed",
+        "SubState": "failed",
+        "InvocationID": "8eee175199d249f48bc1a5140af87ee3",
+        "Type": "exec",
+        "RuntimeMaxUSec": "45s",
+        "RemainAfterExit": "yes",
+        "MainPID": "0",
+        "Result": "exit-code",
+        "ExecMainPID": "4052582",
+        "ExecMainCode": "1",
+        "ExecMainStatus": "1",
+        "ControlGroup": "",
+        "MemoryMax": "268435456",
+        "KillMode": "control-group"
+      },
+      "state": {
+        "mode": "rss",
+        "unit": "ds-owner-control-rss-edf20693.service",
+        "properties": {
+          "InvocationID": "8eee175199d249f48bc1a5140af87ee3",
+          "Type": "exec",
+          "TimeoutStopUSec": "10s",
+          "RuntimeMaxUSec": "45s",
+          "MainPID": "4052582",
+          "ExecMainPID": "4052582",
+          "MemoryMax": "268435456",
+          "KillMode": "control-group"
+        },
+        "scope": "Real CPU ownership/resource primitives ONLY; not project executor/build/runtime qualification",
+        "state": "terminal",
+        "exit": 1,
+        "error": "AssertionError('Owned control aggregateRSS exceeds declared test limit')",
+        "actual_signal": null,
+        "cleanup": {
+          "signals": [
+            {
+              "pgrp": 4052588,
+              "signal": 15
+            },
+            {
+              "pid": 4052597,
+              "start": 27327712,
+              "signal": 15
+            },
+            {
+              "pgrp": 4052588,
+              "signal": 9
+            },
+            {
+              "pid": 4052597,
+              "start": 27327712,
+              "signal": 9
+            },
+            {
+              "pid": 4052588,
+              "key": "REAL_CPU_TREE_CONTROL",
+              "actual_cleanup_returncode": -9
+            }
+          ],
+          "remaining_owned_same_start": {}
+        },
+        "control_outcome": "Expected RSS primitive assertion only if real peak exceeds limit",
+        "seconds": 2.130441974964924,
+        "peak_aggregate_RSS_bytes": 102084608,
+        "declared_RSS_limit_bytes": 67108864,
+        "remaining_owned_same_start": {},
+        "process_ledger": {
+          "4052588:27327709": {
+            "identity": {
+              "start": 27327709,
+              "pgrp": 4052588,
+              "session": 4052588,
+              "ppid": 4052582,
+              "state": "R"
+            },
+            "owning_job_root": 4052588,
+            "observed_epoch": 1794770278.0915647,
+            "authority": "dedicated reviewed current service cgroup"
+          },
+          "4052597:27327712": {
+            "identity": {
+              "start": 27327712,
+              "pgrp": 4052597,
+              "session": 4052597,
+              "ppid": 4052588,
+              "state": "R"
+            },
+            "owning_job_root": null,
+            "observed_epoch": 1794770278.1928298,
+            "authority": "dedicated reviewed current service cgroup"
+          }
+        },
+        "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "sentinel_survived": {
+        "unit": "ds-owner-control-sentinel-edf20693.service",
+        "properties": {
+          "Id": "ds-owner-control-sentinel-edf20693.service",
+          "LoadState": "loaded",
+          "ActiveState": "active",
+          "SubState": "running",
+          "InvocationID": "171b633a1a5047b59d07b063be09743d",
+          "Type": "exec",
+          "RuntimeMaxUSec": "45s",
+          "RemainAfterExit": "yes",
+          "MainPID": "4050989",
+          "Result": "success",
+          "ExecMainPID": "4050989",
+          "ExecMainCode": "0",
+          "ExecMainStatus": "0",
+          "ControlGroup": "/user.slice/user-1000.slice/user@1000.service/app.slice/ds-owner-control-sentinel-edf20693.service",
+          "MemoryMax": "67108864",
+          "KillMode": "control-group"
+        },
+        "identity": {
+          "start": 27326779,
+          "pgrp": 4050989,
+          "session": 4050989,
+          "ppid": 1203,
+          "state": "S"
+        },
+        "heartbeat": {
+          "pid": 4050989,
+          "start": 27326779,
+          "ppid": 1203,
+          "pgrp": 4050989,
+          "session": 4050989,
+          "cgroup": "0::/user.slice/user-1000.slice/user@1000.service/app.slice/ds-owner-control-sentinel-edf20693.service",
+          "counter": 2747929864,
+          "epoch": 1794770280.2709339
+        }
+      },
+      "all_owned_PIDs_gone": [
+        4052588,
+        4052597,
+        4052582
+      ],
+      "success_as_deliberate_control": true
+    }
+  ]
+}

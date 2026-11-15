@@ -1,0 +1,18 @@
+{
+  "Id": "ds-owner-control-rss-edf20693.service",
+  "LoadState": "loaded",
+  "ActiveState": "failed",
+  "SubState": "failed",
+  "InvocationID": "8eee175199d249f48bc1a5140af87ee3",
+  "Type": "exec",
+  "RuntimeMaxUSec": "45s",
+  "RemainAfterExit": "yes",
+  "MainPID": "0",
+  "Result": "exit-code",
+  "ExecMainPID": "4052582",
+  "ExecMainCode": "1",
+  "ExecMainStatus": "1",
+  "ControlGroup": "",
+  "MemoryMax": "268435456",
+  "KillMode": "control-group"
+}

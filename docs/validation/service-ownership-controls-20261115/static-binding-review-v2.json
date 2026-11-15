@@ -1,0 +1,20 @@
+{
+  "scope": "Static closure/global binding review only; no process controls run",
+  "results": [
+    {
+      "file": "ownership_primitives_v1.py",
+      "sha256": "daabf4c8d1e42e61547933b53dfebc656c533112727af4979dd4c5b0d0f7f507",
+      "unbound_global_references": [
+        {
+          "function": "genexpr",
+          "name": "own_cgroup"
+        }
+      ]
+    },
+    {
+      "file": "ownership_primitives_v2.py",
+      "sha256": "b6122798b3a38c353ae947490dbb379b4b0239c2f58e29de08247294e90fd787",
+      "unbound_global_references": []
+    }
+  ]
+}

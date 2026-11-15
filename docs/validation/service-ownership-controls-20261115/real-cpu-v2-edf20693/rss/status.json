@@ -1,0 +1,79 @@
+{
+  "mode": "rss",
+  "unit": "ds-owner-control-rss-edf20693.service",
+  "properties": {
+    "InvocationID": "8eee175199d249f48bc1a5140af87ee3",
+    "Type": "exec",
+    "TimeoutStopUSec": "10s",
+    "RuntimeMaxUSec": "45s",
+    "MainPID": "4052582",
+    "ExecMainPID": "4052582",
+    "MemoryMax": "268435456",
+    "KillMode": "control-group"
+  },
+  "scope": "Real CPU ownership/resource primitives ONLY; not project executor/build/runtime qualification",
+  "state": "terminal",
+  "exit": 1,
+  "error": "AssertionError('Owned control aggregateRSS exceeds declared test limit')",
+  "actual_signal": null,
+  "cleanup": {
+    "signals": [
+      {
+        "pgrp": 4052588,
+        "signal": 15
+      },
+      {
+        "pid": 4052597,
+        "start": 27327712,
+        "signal": 15
+      },
+      {
+        "pgrp": 4052588,
+        "signal": 9
+      },
+      {
+        "pid": 4052597,
+        "start": 27327712,
+        "signal": 9
+      },
+      {
+        "pid": 4052588,
+        "key": "REAL_CPU_TREE_CONTROL",
+        "actual_cleanup_returncode": -9
+      }
+    ],
+    "remaining_owned_same_start": {}
+  },
+  "control_outcome": "Expected RSS primitive assertion only if real peak exceeds limit",
+  "seconds": 2.130441974964924,
+  "peak_aggregate_RSS_bytes": 102084608,
+  "declared_RSS_limit_bytes": 67108864,
+  "remaining_owned_same_start": {},
+  "process_ledger": {
+    "4052588:27327709": {
+      "identity": {
+        "start": 27327709,
+        "pgrp": 4052588,
+        "session": 4052588,
+        "ppid": 4052582,
+        "state": "R"
+      },
+      "owning_job_root": 4052588,
+      "observed_epoch": 1794770278.0915647,
+      "authority": "dedicated reviewed current service cgroup"
+    },
+    "4052597:27327712": {
+      "identity": {
+        "start": 27327712,
+        "pgrp": 4052597,
+        "session": 4052597,
+        "ppid": 4052588,
+        "state": "R"
+      },
+      "owning_job_root": null,
+      "observed_epoch": 1794770278.1928298,
+      "authority": "dedicated reviewed current service cgroup"
+    }
+  },
+  "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+}

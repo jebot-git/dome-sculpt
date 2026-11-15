@@ -1,0 +1,18 @@
+{
+  "Id": "ds-owner-control-healthy-edf20693.service",
+  "LoadState": "loaded",
+  "ActiveState": "active",
+  "SubState": "exited",
+  "InvocationID": "9d7786fe74db4d13a1722d453ddbd388",
+  "Type": "exec",
+  "RuntimeMaxUSec": "45s",
+  "RemainAfterExit": "yes",
+  "MainPID": "0",
+  "Result": "success",
+  "ExecMainPID": "4051007",
+  "ExecMainCode": "1",
+  "ExecMainStatus": "0",
+  "ControlGroup": "",
+  "MemoryMax": "268435456",
+  "KillMode": "control-group"
+}

@@ -1,0 +1,17 @@
+--- held:sample
++++ control:sample
+@@ -12,4 +12,4 @@
+    after=proc_identity(pid)
+    if after and after['start']==wanted:rss+=value
+   except(FileNotFoundError,ProcessLookupError):pass
+- peak=max(peak,rss);assert peak<=8*2**30,'Owned executor+compiler aggregateRSS exceeds8GiB';return live
++ peak=max(peak,rss);assert peak<=rss_limit,'Owned control aggregateRSS exceeds declared test limit';return live
+--- held:checkpoint
++++ control:checkpoint
+@@ -1,5 +1,5 @@
+ def checkpoint():
+  nonlocal next_sample
+  now=time.monotonic()
+- if now>deadline:raise TimeoutError('Declared18000s complete materialization bound exceeded')
++ if now>deadline:raise TimeoutError('Declared control monotonic deadline exceeded')
+  if now>=next_sample:sample();next_sample=now+.2

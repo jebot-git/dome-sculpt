@@ -1,0 +1,30 @@
+[
+  {
+    "event": "process-observed",
+    "pid": 4051018,
+    "identity": {
+      "start": 27326792,
+      "pgrp": 4051018,
+      "session": 4051018,
+      "ppid": 4051007,
+      "state": "R"
+    },
+    "owning_job_root": 4051018,
+    "observed_epoch": 1794770268.9201202,
+    "authority": "dedicated reviewed current service cgroup"
+  },
+  {
+    "event": "process-observed",
+    "pid": 4051021,
+    "identity": {
+      "start": 27326795,
+      "pgrp": 4051021,
+      "session": 4051021,
+      "ppid": 4051018,
+      "state": "R"
+    },
+    "owning_job_root": null,
+    "observed_epoch": 1794770269.001624,
+    "authority": "dedicated reviewed current service cgroup"
+  }
+]

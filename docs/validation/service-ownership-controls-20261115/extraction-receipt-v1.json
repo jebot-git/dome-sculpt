@@ -1,0 +1,64 @@
+{
+  "held_source": "/home/blux/de-xr/dome-sculpt/artifacts/native90-release-planning-20261115/execute-release-native90-v1.py",
+  "held_source_sha256": "2e6477ef1156d074ba6d1c6ed0e57a611b94ada0a8e70648a4395af4d7711d1a",
+  "extraction_only_no_held_mutation": true,
+  "functions": {
+    "OwnedTermination": {
+      "held_sha256": "33796f82aa351732613b8814a025ab9a5e4aeff2dd2cb48c4af5508da2b7b543",
+      "control_sha256": "33796f82aa351732613b8814a025ab9a5e4aeff2dd2cb48c4af5508da2b7b543",
+      "byte_identical_after_dedent": true
+    },
+    "received_signal": {
+      "held_sha256": "3009d3a3a1c4786d1853a186c0e4e0a3f55c64d893255b5308462b33229a108c",
+      "control_sha256": "3009d3a3a1c4786d1853a186c0e4e0a3f55c64d893255b5308462b33229a108c",
+      "byte_identical_after_dedent": true
+    },
+    "proc_identity": {
+      "held_sha256": "9c53f42866aed99e704510314a08a4835c2fa64741b104e1eaa8c486c032f22f",
+      "control_sha256": "9c53f42866aed99e704510314a08a4835c2fa64741b104e1eaa8c486c032f22f",
+      "byte_identical_after_dedent": true
+    },
+    "file_identity": {
+      "held_sha256": "152fba53910fe6eb04c8f46eefd3cb8e9bf816fa834e0e1e5174020512ae8682",
+      "control_sha256": "152fba53910fe6eb04c8f46eefd3cb8e9bf816fa834e0e1e5174020512ae8682",
+      "byte_identical_after_dedent": true
+    },
+    "atomic": {
+      "held_sha256": "1070d51269bfb41d29a662615deeb40ecf43696e9e2edf3e8b2ccb8336ab088c",
+      "control_sha256": "1070d51269bfb41d29a662615deeb40ecf43696e9e2edf3e8b2ccb8336ab088c",
+      "byte_identical_after_dedent": true
+    },
+    "descendants": {
+      "held_sha256": "bfec386725df9187013d3d66ddb136f883c3d871a9fb2c7dd596801b263d35a6",
+      "control_sha256": "bfec386725df9187013d3d66ddb136f883c3d871a9fb2c7dd596801b263d35a6",
+      "byte_identical_after_dedent": true
+    },
+    "service_pids": {
+      "held_sha256": "743279450dac71f58d38daeeb74b0a6bee66eebc48eb62a9c8db83d281c3c4fe",
+      "control_sha256": "743279450dac71f58d38daeeb74b0a6bee66eebc48eb62a9c8db83d281c3c4fe",
+      "byte_identical_after_dedent": true
+    },
+    "observe": {
+      "held_sha256": "d7d4d10ecd7c303bdff236fc5a23a59f74ef314a82b9f381004beb8b74e70a49",
+      "control_sha256": "d7d4d10ecd7c303bdff236fc5a23a59f74ef314a82b9f381004beb8b74e70a49",
+      "byte_identical_after_dedent": true
+    },
+    "sample": {
+      "held_sha256": "766316cf8c7b7ad72373f097ca88d481dd732cd00d4178dbf051c3b453b88deb",
+      "control_sha256": "4565f150b92834420a18cc1cbcfded0e5b03f5060b5926e08ba0f81af90e6775",
+      "byte_identical_after_dedent": false
+    },
+    "checkpoint": {
+      "held_sha256": "5be37069f59b2e43e074be8083a0824ce2d77fc303b8e69d32ca698048305d29",
+      "control_sha256": "8c9b9a3f38a30af124943101514ed1c1051cfea0d5917a59217404518d2263c6",
+      "byte_identical_after_dedent": false
+    },
+    "cleanup": {
+      "held_sha256": "7a4da4335e35c9e198bfdc0691c9d4b6a591e0fb058378f48f25b5546422b9fc",
+      "control_sha256": "7a4da4335e35c9e198bfdc0691c9d4b6a591e0fb058378f48f25b5546422b9fc",
+      "byte_identical_after_dedent": true
+    }
+  },
+  "control_module_sha256": "daabf4c8d1e42e61547933b53dfebc656c533112727af4979dd4c5b0d0f7f507",
+  "scope": "Operational process ownership/resource primitives only. No compiler, staging, .o/.d or fake build/Ninja journals."
+}

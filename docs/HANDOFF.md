@@ -1,3 +1,14 @@
+## Real CPU ownership/resource controls qualified — 2026-11-15
+
+Five isolated regular-user transient-service controls close with actual outcomes
+healthy0/orphan0/TERM143/deadline124/RSS1, preserving expected negative codes.
+A separate-unit CPU sentinel survives all cases; all sixteen tracked PIDs and
+six new units are gone after cleanup, with no OOM kills. Read
+[the primitive control seal](SERVICE-OWNERSHIP-CONTROLS-20261115.md).
+This is ownership/resource primitive evidence only, not whole mixed-executor,
+compiler, successor90 or full production-goal qualification. Held executor and
+frozen inputs are unchanged; no project/graphics run, install or session restart.
+
 ## Current round closed; user-requested pause — 2026-11-12
 
 The user requested “Pause after this round.” The running jobs have finished;

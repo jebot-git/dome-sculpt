@@ -1,0 +1,20 @@
+{
+  "state": "prepared-NOT-executed",
+  "scope": "Real CPU ownership/resource primitives only; no compiler/project .o/.d/Ninja/build data",
+  "files": {
+    "extract-primitives-v1.py": "40209b8b145512ca482c94248936657c2077135a4ca49b4d1fcbb1dc7e89d2d0",
+    "ownership_primitives_v1.py": "daabf4c8d1e42e61547933b53dfebc656c533112727af4979dd4c5b0d0f7f507",
+    "cpu_tree_v1.py": "1478d7b685fb12c0b47253f16e38226b8e3b6c08c719af214d334d48b75a5ded",
+    "primitive_control_v1.py": "66631b4a237ab6b987a25c7360ccd831693bda72d9e1b0653201bd83f95d8e0f",
+    "run-real-controls-v1.py": "a4e9ccb64983b543efd0506e8bb7ea95d29c93788cdaecdc20c1778d3126a2eb"
+  },
+  "units": "Only fresh ds-owner-control-<case>-<random>.service,regularuser,RuntimeMax45s,MemoryMax256MiB (sentinel64MiB),KillModecontrol-group",
+  "expected_actual_outcomes": {
+    "healthy": 0,
+    "leader_exited_orphan_cleanup": 0,
+    "external_TERM_main": 143,
+    "actual_monotonic_deadline": 124,
+    "real_resident_memory_limit": 1
+  },
+  "held_executor_untouched": true
+}
