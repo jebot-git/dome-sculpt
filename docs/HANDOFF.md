@@ -1,6 +1,6 @@
 ## Normal-source integration draft; not frozen or admitted — 2026-11-15
 
-This isolated branch combines current source3d1740 lineage (frozen3d plus
+This isolated branch combines frozen3d lineage (frozen3d plus
 functional product1bc13125 and finite-only test1740fb9d) with main118e1feb
 qualification history. Both histories are preserved. Current main handoff and
 requirements resolve the metadata-only merge conflicts; source3d and all
@@ -10,6 +10,10 @@ Relative to frozen3d, product changes are3 existing complete TUs plus one NEW
 private header. Existing public/private headers, shaders, packets and native
 wire versions are unchanged. Three new native cases make the prospective
 selection90 (old87 plus artist-normal, prepared-normal and CC0CPU cases).
+The test-only per-eye runtime fix c54f66f8 is also integrated; its App3d/Testc54
+real-loader/Arc pbr-quarter replay passes194 checks. Old failed null-report
+runtime remains preserved; three other XR cases remain pending.
+
 Native component Release/strictSAN checks pass the finite91 and retained
 62/19/139/9/856/32 scopes, with genuine old-source counterfactuals and failures
 preserved. Proper original-frame and ordinary version1 prepared normal capture
