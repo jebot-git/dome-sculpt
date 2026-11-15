@@ -28,5 +28,13 @@
   },
   "graphics_software_latest": "Actual exit1: manual/import pass, female-rest MT0 correct0 but wrong-normal gap1<7; prepared not reached. All prior failures retained.",
   "whole_build_executed": false,
-  "installed": false
+  "installed": false,
+  "current_draft_continuation": {
+    "source_before_record": "a7a6176b10e970b605834cc120008e57d88ae51c",
+    "main_parent": "f108cc48",
+    "graphical_fixture": "7fb2cc1c",
+    "production_exact": "1bc13125",
+    "combined_build_executed": false,
+    "graphical_acceptance": "pending current source software and Arc; old failed geometric selector retained"
+  }
 }
