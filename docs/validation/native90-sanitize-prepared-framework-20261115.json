@@ -1,0 +1,17 @@
+{
+  "state": "templates-prepared-NOT-invoked",
+  "scope": "Successor native90 strict SAN prepare-only framework. No successor CMake configure, object staging, compilation, link or products. Final source freeze and root exact plan review required.",
+  "provider_source": "3d1643827dd56e1b2ef1d57b8a9c6ff1e4211a2c",
+  "provider_plan_sha256": "9641d8af4976d8937081f5be9d0a999a730196a48c902262ac3c5cff68e39140",
+  "provider_status_sha256": "5956c4955b9b831b30a51e8d4b275fc0a2c9a04688a88d024c9f89b368729299",
+  "actual_prior_lineage": "538 real original current-v5 compiler events/CWD +494 real completion compiler events/CWD; unchanged current MD snapshots retain actual original names and dependencies. All current seals must revalidate when invoked.",
+  "functional_source_path_policy": "Known four paths mandatory, plus conservative tracked C/C++ __FILE__/__BASE_FILE__/__builtin_FILE/source_location/date/time scan (currently seven). Literal attached or standalone-D operand never normalized.",
+  "ELF_prepare_policy": "Only explicit current compiler/generator/service tools and SDK/canonical external DSOs; HARD exclusions for old/new source/build and BOTH prior actual compiler cwd roots. No ldd/read execution of old project products.",
+  "execution": "No successor executor or mixed-ancestor audit admitted; template emits preserved execution HOLD.",
+  "scripts": {
+    "prepare-sanitize-native90-v1.py": "da594a1cdbfdb8857cb1f1eec7f3db5b44a06e52bd10625a5fe6337e2b9af968",
+    "provider_context_v1.py": "99fea61cc099a3d8b73942c348afdfa1dc4866670ebc4c76751ef084b5232770",
+    "current_provider_routes_v2.py": "de49f869d3bb699d76fba3381226f19ba9c411c14b3b7257a17cc0c6485c4ec4",
+    "ninja_audit.py": "7aa092c80d1632e6d8a6e68d53c478939911528ff19e34163c09e1d26fd5a264"
+  }
+}
