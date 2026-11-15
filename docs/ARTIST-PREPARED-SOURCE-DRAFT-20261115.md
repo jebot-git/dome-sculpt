@@ -35,3 +35,28 @@ parent's independent fresh current-toolchain193-member core snapshot. The full
 production goal remains incomplete; this draft is not admitted to main.
 
 See [compile-only receipt](validation/ARTIST-PREPARED-SOURCE-DRAFT-20261115.json).
+
+Root review follow-up moves typed emission UV1 refusal before **every** raw
+capture early return. For ordinary prepared normals it authenticates the
+normal recipe's actual original paint coordinates rather than treating normal
+metadata as authority for emission. Combined independent Source8 paint and
+normal projection remains explicitly invalid under the existing attachment
+contract; ordinary normal-prepared paint is valid because it has no Source8
+attachment. Genuine original UV1 remains accepted, including physical-background
+unused-image semantics inherited from the original guard.
+
+The new fixture also constructs real ordinary normal-prepared sources with
+missing/present emission UV1, tests raw/emitter/Bake/worker/dependent-Save refusal
+and exact data/prior-bytes/path/history for LDR and HDR, and retains genuine UV1
+positives. Those positives use flipped UV1 distinct from writable UV0 and an
+independent expected linear-radiance oracle, including current HDR callback,
+LDR composite and actual output FLOAT/linear-RGB data. Original artist poses
+include nonuniform skin plus morph displacement; normal roles are independently
+decoded. These are compiled fixture assertions, not yet runtime passes.
+
+The current emission owner and final fixture compile freshly with zero input
+drift. Original v3 fixture compilation failed because its newly used private
+emission functions lacked their declaration include; v4 adds the proper header,
+and v5 strengthens independent emission tests. All failed artifacts remain.
+The receipt identifies each current complete TU/object individually, including
+its actual source hash and containing run result; no failed run is relabeled.

@@ -18,12 +18,24 @@
 namespace dome::detail {namespace {
 void require_original_emission_uv1(const SculptObject &object,
     const std::optional<MToonMaterial> &typed){
-  if(!typed||!object.mesh_active||!object.painted||!object.painted->source_sampling_prepared())return;
+  if(!typed||!object.mesh_active||!object.painted)return;
   // An explicit physical background does not sample the retained emission image.
   if(object.material_bindings&&object.material_bindings->physical_emission)return;
   const auto &slot=typed->textures[size_t(MToonSlot::Emission)];
   if(slot.index<0||mtoon_coordinate(slot)!=1)return;
   const auto &paint=*object.painted;
+  if(!paint.source_sampling_prepared()){
+    // A normal-prepared plane authenticates normals only. Its retained input
+    // still owns the original logical coordinates of other typed image roles.
+    if(!paint.normal_projection()||!object.material_bindings||!object.material_bindings->normal_preparation)return;
+    const auto before=object.material_bindings->normal_preparation->original_paint;
+    const auto root=before&&before->source_sampling_prepared()?before->source_sampling_original():before;
+    const auto maps=root?root->source_maps():nullptr;
+    const bool authored=before&&before->source_sampling_prepared()&&before->source_sampling_authored_uv1();
+    if(!before||(before->source_sampling_prepared()&&!before->valid_source_sampling_attachment())||(!authored&&(!maps||!maps->uv1)))
+      throw std::invalid_argument("Prepared typed emission UV1 lacks genuine original source coordinates");
+    return;
+  }
   if(!paint.valid_source_sampling_attachment())
     throw std::invalid_argument("Typed emission lost its genuine original sampling attachment");
   const auto original=paint.source_sampling_original();
@@ -175,6 +187,11 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTr
 }
 std::shared_ptr<const TextureMaps> raw_bake_source(const SculptObject &object,
     const std::function<bool()> &cancelled){
+  if(cancelled&&cancelled())throw std::runtime_error("Raw source Bake cancelled");
+  const auto &binding=object.material_bindings;
+  const auto typed=binding&&binding->has_mtoon?std::optional<MToonMaterial>(binding->material):
+      (object.appearance?retained_mtoon(object.appearance.get()):std::optional<MToonMaterial>{});
+  require_original_emission_uv1(object,typed);
   if(object.mesh_active&&object.painted&&object.painted->normal_projection()){
     // Current prepared planes are already independently composed and retain
     // their owning coordinate recipe. Never reinterpret them as raw images.
@@ -185,8 +202,7 @@ std::shared_ptr<const TextureMaps> raw_bake_source(const SculptObject &object,
   if(!object.mesh_active||!object.painted||!object.painted->source_maps()||
      (!object.painted->source_maps()->uses_alternate_uv()&&!object.painted->source_sampling_prepared()&&
       !(object.material_bindings&&object.material_bindings->normal_frames)))return {};
-  const auto &paint=*object.painted;const auto &binding=object.material_bindings;
-  if(cancelled&&cancelled())throw std::runtime_error("Raw source Bake cancelled");
+  const auto &paint=*object.painted;
   const auto framed=source_bake_normals(object,CanvasTransform{},SourceBakeNormalOptions{256*1024*1024,cancelled});
   if(paint.color_projection()||paint.normal_projection()||
      (binding&&(binding->canonical_attributes||binding->canonical_uv||binding->canonical_paint_sampling||
@@ -208,11 +224,8 @@ std::shared_ptr<const TextureMaps> raw_bake_source(const SculptObject &object,
   }
   // Typed normal roles have an independent interpretation. Never silently use
   // the generic PBR role as their source-frame authority.
-  const auto typed=binding&&binding->has_mtoon?std::optional<MToonMaterial>(binding->material):
-      (object.appearance?retained_mtoon(object.appearance.get()):std::optional<MToonMaterial>{});
   if(!framed&&typed&&typed->textures[size_t(MToonSlot::Normal)].index>=0)
     throw std::invalid_argument("Raw typed normal Bake requires its explicit source-frame adapter");
-  require_original_emission_uv1(object,typed);
   auto maps=std::make_shared<TextureMaps>();maps->source_maps=paint.source_maps();maps->source_only=true;
   maps->source_maps->validate_surface(paint.mesh());
   maps->overlay=PaintOverlayFactory::capture(paint,cancelled);maps->baked_base=paint.baked();
