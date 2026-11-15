@@ -1,3 +1,417 @@
+## Current round closed; user-requested pause — 2026-11-12
+
+The user requested “Pause after this round.” The running jobs have finished;
+all three delegated agents are stopped, with no owned active handles or graphics
+lease. The full production goal is incomplete and paused. Do not start another
+build, test, feature or installation round until the user resumes it. This
+entry supersedes older active/pending entries below, which remain historical.
+
+The preserved source checkpoint is branch
+`work/authoring-paused-uv-domain-20261112`, worktree
+`artifacts/authoring-paused-uv-domain-20261112`. It combines frozen application
+ad99ff8b, qualified missing-logical-UV1 source e10b2456/product41ac6f7b and latest
+main metadata/history. Relative to ad99, only CMake, the complete emission source
+TU and the new missing-UV1 test change outside documentation. Artist-normal WIP
+is excluded. This final combined source has NOT been whole-built or admitted to
+main. Its prospective native selection is87, retaining every prior86 case.
+
+The guard passes62 new controls plus19 retained regressions in both Release and
+strict ASan/UBSan. Original old-core counterfactuals fail in both profiles; all
+source/provider drift is zero. Actual LDR/HDR Bake and dependent Save refuse a
+missing authored emission UV1 instead of using the generated PBR carrier, while
+valid prepared/unprepared UV1 and unused-image physical-background paths pass.
+Exact cancellation, Scene/history/path and prior-file preservation are covered.
+See [missing-UV1 proof](SOURCE-ROLE-MISSING-UV1-20261112.md).
+
+Pre-guard ad99 Release build64944 completed3 generators/264 complete TUs/686
+archive-links with zero drift. Exact86 native tests, workspace27/373/raw90159,
+source producers, four-case fixture/font checks and manual source rendering
+passed, including authenticated Intel Arc hardware. These are scoped ad99
+results, not final87 or physical-headset acceptance. Public desktop stopped
+following39 passing checks because the monitor read mountinfo while its owned
+process retired. Ten CPU controls qualify the v2 witness rollback; no repaired
+application/GL replay ran. Preserve the failure and read
+[monitor witness proof](PUBLIC-PROC-MOUNTINFO-WITNESS-V2-20261112.md).
+
+The already-running frozen5c strict sanitizer baseline15864 completed terminal0:
+3 generators,265 whole TUs,685 archive-links,1764 outputs,4606.786 seconds and
+zero final input drift. No product runtime/tests ran. Its known sampling defect
+prevents admission; it does not qualify ad99 or the final guard checkpoint.
+See [baseline-only seal](5C-SANITIZER-BASELINE-BUILD-20261112.md).
+
+On resume, inspect processes and immutable source/providers before deriving new
+matching whole-owner Release and strict sanitizer plans for the final87 source.
+Then qualify its exact native/helper/producer/font/manual consumers and public
+GUI/real-loader XR under unchanged assertions and limits. Retain all original
+timeouts, contrast failures, monitor failures and counterfactuals. Preserve the
+separate artist-normal branches and their outstanding consumer/graphics work.
+Main runtime remains the earlier qualified integration; this round publishes
+metadata only there. DomeD source/SDK used at the ad99 freeze was acc2b70a.
+No installation, physical-HMD launch or session restart occurred in this round.
+
+All original authoring, interoperation, device and accelerator requirements
+remain required. Later controller trays and spatial node editing/history remain
+queued; ArmorPaint remains a source/component assessment, not full integration.
+[Pinned pause receipt](validation/AUTHORING-PAUSE-20261112.json).
+
+## New role-domain candidate frozen; combined Release compilation running — 2026-11-12
+
+New sourcead99ff8ba005c6cc4a22dfe5fcd6d1e2e4dec3e7 is FROZEN/CLEAN/PUSHED at
+`artifacts/authoring-role-domain-integration-20261112/`, branch
+`work/authoring-role-domain-integration-20261112`. It preserves main39b, all5c
+features and evidence, then combines qualified emission-domain repaira8 and the
+unchanged-corpus public oraclef9. Main runtime remains the earlier qualified
+integration; metadata here does not admit the new runtime.
+
+A real mixed-coordinate defect was reproduced on frozen5c: resolvedPBRcarrier1
+incorrectly preferred separately retained logicalUV1. The one-product-TU repair
+passes Release19 and strictSAN19 plus historical worker/source/producer scopes;
+callback/Bake errors fall from3.2/3.875 to4.47e-8/2.38419e-7. All source guards,
+headers, shaders, packets and wire remain unchanged. Read
+[SOURCE-ROLE-DOMAIN-REPAIR-20261112.md](SOURCE-ROLE-DOMAIN-REPAIR-20261112.md).
+
+The old public tiny-case wait was separately a contrast-witness ambiguity: the
+actual oldpoint equals its independent correct control and differs81 from the
+wrong-normal control, but only5 from background. Test-onlyf9 moves one declared
+point within the same triangle/coverage region and preserves all41 corpus bytes,
+all4cases/botheyes and contrast12/correct3/wrong7 bounds. Read
+[SOURCE8-PUBLIC-PROBE-CONTRAST-20261112.md](SOURCE8-PUBLIC-PROBE-CONTRAST-20261112.md).
+Both original failures remain preserved; neither is reclassified as a pass.
+
+New Release audit61476 and final8963-pin audit88592 are terminal0. Exact plan
+759b79ca2329b92113b690db94e3670fb6a23e58070592f84828af1b0b62d920 owns
+1031 TUs:264 fresh/767 authenticated whole reuses,686 fresh/46 exact links and
+3 genuine generators. Native86 retains every old85 case and adds the role-domain
+regression; manual source rendering remains extra. Actual compile64944,
+PID622619, has begun under the reviewed7200s/2jobs/8GiB execution bounds.
+Current86/helpers/raw/freshproducers/font/manual/public qualification is pending.
+
+The separate5c SAN15864 build continues unchanged as a known-defective immutable
+baseline only; no runtime/admission is inferred. Artist-normal WIP remains
+separate. DomeD actual remoteHEAD/current source/SDK remainacc2b70a, verified at
+this freeze. Full original authoring/interoperability/device/accelerator goals
+and later controller trays/spatial nodes/history remain active/incomplete.
+No installation, physical-headset launch or active-session restart.
+
+## New role-domain repaired application source frozen — 2026-11-12
+
+This new candidate preserves main39b, frozen5c and all integration evidence,
+then merges qualified emission-role repair a8fa5424 and test-only oraclef9d57dcc.
+Read [AUTHORING-ROLE-DOMAIN-FROZEN-20261112.md](AUTHORING-ROLE-DOMAIN-FROZEN-20261112.md).
+Only one product TU changes: resolvedPBR sampling uses its actual current
+carrier, while typed slots retain original logicalUVs. Release19 and strictSAN19
+pass, with genuine old-core callback/Bake failures preserved. Headers, shaders,
+packets, wire and source guards remain unchanged; artist-normal WIP is excluded.
+
+The public one-point oracle repair preserves all41 native/view/manifest bytes,
+all4cases/botheyes and contrast12/correct3/wrong7 predicates. Oldpoint diagnostics
+prove real correct pixels rather than a product failure. Old GUI pbr-quarter52
+and pbr-tiny16+timeout remain scoped evidence, not new candidate acceptance.
+
+Next: a NEW whole-owning audit and coherent application build from this unique
+frozen source; exact86 native(old85+newdomaincase), helpers/raw/producers/font,
+manual software/Arc and public GUI/XR follow. Original5c sanitizer265TU/685link
+build continues unchanged as a baseline only; no new source qualification is
+inferred from it. Full original scope remains active/incomplete. No install or
+active-session restart. Earlier checkpoint entries below are historical.
+
+## Combined Release gates pass; public and current sanitizer qualification continues — 2026-11-12
+
+Frozen5c820f owning execution38148 is terminal0:3 genuine generators,263 fresh
+whole TUs and685 fresh archive/link steps complete with zero input drift.
+The corrected default-cache replay77360 passes exact85 native/software cases,
+workspace27/373 and raw90159; all original predicates and timeouts are unchanged.
+The original84/85 recovery timeout and matched33.539-second diagnostic remain
+separate preserved evidence, not retrospective passes.
+
+Fresh current producers180373/27/16417/32794, four-case Source8 UV1/FLOAT producer
+and canonical16px font reference all pass. Additional Source39/40 same-object
+sourceful rendering passes software994 controls and authenticated Arc hardware
+with71 mappedELFs and zero drift. See the
+[matching Release gates](validation/authoring-repaired-release-gates-20261112.json).
+These results permit public workflow checks. Public GUI pbr-quarter12461 then
+passes52/52 with zero drift/owned survivors. Distinct pbr-tiny9190 passes the
+original Bake/history/reopen checks but times out after16 total checks at the
+added geometry-negative wait. Root and agent independently measured gaps
+[20,69,77,5] against the required12: oldprobe3 is a real dark surface near the
+48-gray background. See the [retained results](validation/authoring-source8-desktop-contrast-20261112.json).
+No assertion/deadline is weakened; oldpoint independent rendering is still being
+checked, and a new test-only one-probe child awaits whole-TU/corpus proof. Public
+matrix/XR progression is held until this is resolved; main remains unchanged.
+
+Exact5c public GUI then matched real-loader XR orchestration is reviewed with
+current expected361SDK/asset pins plus font, sourceHEAD/clean, genuine scenario
+copies and common-lease/lifetime/device/provider guards. Current5c strictSAN
+owning build15864/PID322583 has begun its initial SHA admission:265 fresh whole
+TUs,765 authenticSAN reuses,685 fresh/46 exact archive/link outputs,3 generators,
+85 native and explicit additional gates. No finalSAN/public acceptance yet.
+
+This prepared integration branch preserves both main39b and frozen5c histories;
+every1709 non-doc Git record remains identical to frozen5c. It is not admitted
+to main. Full original production scope and later trays/spatial nodes/history
+remain active/incomplete; no installation or active-session restart.
+
+## Repaired85-test application source frozen; new owning audit live — 2026-11-12
+
+Frozen source5c820f342f16d8544158410c2125372811c152f3 is in
+`artifacts/authoring-source8-visible-float32-repaired-20261112/`. It preserves
+main5169 and combines parameter retention870, actual packed-original UV repair4f,
+typed nested reader context5d in jointd07, full-FLOAT target2bf, fitting9ce and
+qualified mapped-leg supportd756. Old9b and all component sources remain intact.
+
+The NEW whole-owning Release configure/dependency/provider audit46170 is live
+under `artifacts/source8-final-owning-plan-20261112/release-5c820f-v1-*`.
+The planner must rederive all changed owners, literal flags/assets and consumers
+from this exact source. Complete-TU compilation/linking follows audit0 under the
+existing authorization. Exact selected native manifest is85; helpers/raw/manual
+source rendering and fresh current producers/font precede any public GUI/XR.
+No public execution or full-cohort pass is claimed yet.
+
+Joint critical969 controls pass R/S and all Release historical consumers pass;
+remaining strict sanitizer historical cases continue under original limits.
+The separate cc5 ALL sanitizer timeout remains a genuine original failure;
+its isolated100-link remainder completion is being reviewed independently.
+Main runtime stays e993 until coherent application qualification. The full goal
+remains active/incomplete; no install or active-session restart.
+
+## Sanitizer baseline deadline retained; repaired Source8 joint qualification — 2026-11-12
+
+The actual cc5 strict sanitizer ALL driver38512 is now terminal1: its build hit
+the original7200-second limit (child exit124) after1642 of1742 actions. Source
+and SDK drift are zero. The selected82 tests had not begun. This is an actual
+build timeout, not an observation timeout or sanitizer test failure. Preserve
+the failed tree, partial outputs, logs and status; do not restart or relabel it.
+An agent is preparing a NEW isolated bounded remaining-action completion using
+explicitly authenticated complete objects and unchanged source/flags. Its plan
+must be reviewed before execution. The successful Release baseline is unchanged.
+
+The joint Source8 component d07cefaf combines genuine original-UV packing and
+typed nested reader-context propagation. Its Release and strict sanitizer969
+visible/native/history controls pass, including the original shared4 cases and
+real Polygon Save/Open, with exact counterfactual failures retained. All Release
+historical consumers pass; final strict sanitizer historical consumer cases are
+still running. This is component evidence, not new app/public acceptance.
+
+Root's UNFROZEN new assembly c91256fe also includes scoped R/S-qualified humanoid
+component support d7565e69. Main admits its evidence only, in
+[HUMANOID-POSE-QUALITY-20261112.md](HUMANOID-POSE-QUALITY-20261112.md).
+A final85-test source freeze and whole-owning Release compilation follow actual
+joint completion; failed/older9b and all component source/providers stay intact.
+Goal remains active/incomplete. No system install or active session restart.
+
+## Shared-vertex publication repair also required — 2026-11-12
+
+The actual shared-four-vertex Source8 Polygon regression exposed a separate
+visible-publication failure before its Save/Open check: canonical Mikk packing
+expands four authored vertices into six corners, but the empty-image-role path
+leaves the genuine original UV0 field unremapped for packed consumers. The
+worker reports “Visibility original UV0 index is outside its sealed domain”.
+The older isolated-six-vertex424 fixture does not cover this case.
+
+Product4f5a78fd routes overlays carrying authentic original UV0 through the
+existing render-only `pack_source_maps` path and its actual collected vertex
+map, even without UV1 image carriers. Original native UV domains/proofs remain
+unchanged; packet/header/shader/wire ABI is unchanged. Its shared-quad and varied
+shared-vertex native/rendering tests are running on a separate870 descendant.
+This is a genuine repair gate, not permission to substitute an isolated mesh or
+expand source coordinates without their actual authoring correspondence.
+
+The independent Polygon reader-context fix has passed actual old/new shared4
+Apply/Save/Open comparisons in Release and strict sanitizer: old reader fails,
+new reader reopens exactly, while both explicitly record the unrelated display
+error. All21 affected full TUs and9 core replacements build in each profile;
+remaining historical consumer fixture generation/validation is still running.
+Root assembly fb069 remains UNFROZEN and uncompiled until these compatible
+repairs are qualified and merged. Existing9b source/plan stays frozen and held.
+Full original goal remains active/incomplete; no installation or session change.
+
+## Parameter repair qualified; Polygon reader context repair in progress — 2026-11-12
+
+Source87095a5b/product3f9c03c8 passes Release and strict sanitizer424 visible
+controls plus all worker/source/original/producer scopes with zero drift. It
+retains the exact current bake across parameter edits, cancellation, history,
+Save/reopen and independent original-normal affine changes. Read
+[SOURCE8-PARAMETER-PRESERVATION-20261112.md](SOURCE8-PARAMETER-PRESERVATION-20261112.md).
+The unfrozen new root assembly currently fb069d91 includes this repair and all
+main353 checkpoints; old9b1 remains frozen and held, with no app compilation.
+
+A focused adjacent audit reproduced another real Save/Open defect: RGB8 Source8
+with empty image roles accepts actual Polygon Extrude/Apply and writes a file,
+but fresh Open fails. Top Scene version is already42 and retained original
+Paint8 is present. The actual PolygonSceneArchive preflight discards the owning
+SourcePaintDecodeContext capability via its hardcoded compatibility context.
+Private fix5d4ce4dc forwards the authentic typed context while preserving old
+no-cap overload behavior; it does not scan opaque JSON or invent permission.
+Its full21-TU component Release closure is running, followed by matching strict
+sanitizer/native/history/negative-capability qualification. This remains a known
+integration gate; do not replace genuine preservation with disabling the path.
+
+Root will merge qualified fixes into a NEW final candidate and re-audit the
+whole owning closure before application/public execution. Existing cc5 sanitizer
+ALL build38512 remains live. Full production objective stays active/incomplete;
+no installation, physical-headset launch or session restart.
+
+## Source-parameter preservation defect; next compilation held — 2026-11-12
+
+Before the new9b1 compile runner launched, a broader source audit found
+`SourcePaintAccess::parameters` recreates the source/current trace and copies
+layers but omits the accepted `baked_` owner. The newly admitted Source8 path
+therefore risks silently losing current RGB8/normal/FLOAT content during source
+UV parameter edits. The old function path previously could not own such a bake.
+This is a product-preservation defect, not a test-oracle adjustment.
+
+No9b1 project compilation/linking or app/public execution has started. Its frozen
+source and completed250-TU/683-link dependency audit remain preserved. The raw
+source agent is implementing genuine owner retention with prospective budget,
+cancellation, native roundtrip/history and visible parameter-edit coverage.
+Root will create and freeze a NEW repaired child and recompute the owning plan;
+do not edit9b1 or lift guards/discard data to manufacture acceptance. Existing
+cc5 sanitizer build continues and its Release82 result remains scoped as below.
+The goal is active; this is ongoing repair, not an external blocker or pause.
+
+## Combined Release baseline complete; next source frozen — 2026-11-12
+
+Fresh cc5e6aed Release ALL1742, app version, exact82 native/software tests,
+workspace27/373 and rawUV1worker90159 complete with exit0 and zero source/SDK
+drift. Complete post-terminal linkage evidence pins708 built products and the
+original1117 owning artifacts. Read
+[AUTHORING-CC5-RELEASE-OWNING-20261112.md](AUTHORING-CC5-RELEASE-OWNING-20261112.md).
+Its separate strict sanitizer ALL build remains live; inspect its actual handle.
+
+New source9b1f7508 is now FROZEN in
+`artifacts/authoring-source8-visible-float32-integration-20261112/`: visible
+Source8 productf678, strongalpha/normal fixturea5cf, disjoint public controlsbba5,
+qualified full-FLOAT target2bf and fitting9ce coexist. New Release affected-owner
+and consumer compilation is authorized after its exact dependency/flag/provider
+audit. Public execution waits for the coherent app/runtime/producers/font and
+84 required native/software plus explicit helper/raw/manual source-render gates.
+No provider/source tree may be mutated to manufacture that qualification.
+
+The original goal remains active and incomplete. Main runtime is still the prior
+qualified e993 integration, with metadata-only milestones. No install, physical
+headset launch or active-session restart. Earlier source/build-running entries
+below are historical snapshots; this checkpoint takes precedence.
+
+## Resumed combined application integration — 2026-11-12
+
+The user reactivated the full goal. The previous turn made concrete progress:
+finite validation closures finished, future spatial nodes/history were recorded,
+and the pause checkpoint was committed. That pause is now superseded.
+The full objective remains active and incomplete.
+
+New frozen candidate `cc5e6aed` preserves main through `b8ce8296` and combines
+owning FLOAT baseline `4977fb32`, Source8/UV1 Bake ownership `3e523e34`, fitting
+`9cebf6ab` and HDR preview `291d1ca7`. Its fresh optimized Release ALL build is
+running from zero project objects, with UI/OpenXR enabled, explicit CPU backend
+and the verified current DomeD toolkit. The configured build has 1,742 actions;
+82 exact selected native/software tests, explicit excluded workspace helpers
+and the raw UV1 worker follow only after successful compilation. It is not yet
+a qualified combined application and has not been admitted as main runtime.
+
+Live owner: `artifacts/authoring-source8-hdr-fit-owning-build-20261112/`, unified
+session56318, driver PID2688834. Inspect the live handle/process and exact logs
+before acting; an observation timeout does not authorize restarting the build.
+Frozen component sources, providers and failed evidence remain unchanged.
+
+The repaired copied Xvfb fixture now closes its owned Xserver correctly.
+Original4977 Release public Bake passes actual GUI10 and real-loader XR33,
+including authenticated Arc and both-eye history/source-font checks. Prior
+coordinator failures remain preserved. These results do not qualify the new
+combined candidate or establish physical-headset/performance acceptance.
+
+Actual Arc execution of291's unchanged HDR alpha regression fails: the HALF
+scene target clips100000 to65504 before alpha blending, unlike the software
+path. A new full-FLOAT target correction, accurate resource accounting and
+matched renderer qualification are underway separately. The current frozen
+combined build includes291 and must retain this known unresolved limitation.
+No weaker alpha expectation or blanket hardware success is substituted.
+
+A second fresh owning build of the same cc5e6aed source is now running in
+`artifacts/authoring-source8-hdr-fit-owning-sanitize-20261112/` (session38512,
+driver PID2712363). It uses the sanitizer toolkit and strict ASan/UBSan with leak
+detection enabled and no suppressions. Its outputs are separate from Release;
+zero initial project objects and the exact same82 selected cases are required.
+Read-only CTest registration confirms all82 expected names in the configured
+Release tree; this is registration evidence, not completed test execution.
+
+Private full-FLOAT target2bf63267 now has nine software suites/profile and
+18 actual Arc runs passing with strict sanitizer/device/resource evidence in
+[HDR-SCENE-FLOAT32-20261112.md](HDR-SCENE-FLOAT32-20261112.md). Its manifest
+explicitly distinguishes missing optional live hashes from actual live mapped
+file identities and matching pre/post payload hashes. This does not qualify the
+new application or establish physical-headset/performance acceptance.
+
+Second assembly `1af33317` in
+`artifacts/authoring-source8-visible-float32-integration-20261112/` preserves main
+and cc5, adds that full-FLOAT fix, genuine visible Source8 publication and new
+public UV1/FLOAT fixtures. A single CMake test-registration conflict was resolved
+by retaining both new test blocks. This assembly remains unfrozen/uncompiled:
+Source8 strict sanitizer and stronger fractional-alpha coverage are underway;
+the additive public fixture/scenario C++ has not yet compiled or executed.
+Parallel work also investigates native posed humanoid quality using genuine
+source identities. No installation or active session restart.
+
+Independent native weight-quality measurement now compares Legacy, Surface
+Heat and Anatomical methods on genuine complete retained-source VRoid groups,
+with artist influences physically removed before solving. Surface Heat shows
+83.66%/81.84% mean shared mapped influence mass and strong head support; actual
+posed/silhouette quality and weaker hips/chest/palm regions remain to investigate.
+Read [the scoped native comparison](HUMANOID-NATIVE-WEIGHT-QUALITY-20261112.md).
+These are descriptive measurements, not full automatic-weight acceptance.
+
+Controller trays and spatial node-based editing/history remain required later
+work after basic targets. ArmorPaint remains a painting integration candidate
+under the existing native FLTK/OpenXR and source/document authority constraints.
+
+## Current build checkpoint and requested pause — 2026-11-12
+
+The current finite build/validation milestone is finalised and the overall goal
+is paused at the user’s request. No implementation, integration or test campaign
+continues while paused. The full objective remains incomplete. This status supersedes older active-goal
+and build-running entries below.
+
+Main runtime remains the qualified e993 integration (`0d3965ff`). The frozen
+combined candidate `4977fb32` completed its fresh Release ALL build from zero
+project objects (1,738 actions), app version and all 68 selected native/software
+tests. The original coordinator retains exit 1 because two excluded workspace
+helpers had not been built. A separate explicit helper build and native 27/373
+checks completed with exit 0 and all 1,111 prior owned artifacts unchanged.
+This is composite qualification; the original failure is preserved.
+
+Actual Release Bake producer and font gates pass. Public desktop Bake completes
+all ten application checks, but its coordinator correctly fails because the
+sandbox wrapper leaves its owned Xvfb process alive. A separate instrumented
+run identifies that exact process and parent transition. It was interrupted
+for the user pause after 271 seconds of passive observation; original failure
+and zero input drift are retained, all owned live processes are cleaned up and
+the graphics lock is free. Fixture repair and the subsequent XR gate remain
+unstarted. No public-sequence pass or physical-headset acceptance
+is claimed.
+
+Private fitting improvements have Release and strict sanitizer evidence in
+[HUMANOID-FIT-CONTINUATIONS-20261112.md](HUMANOID-FIT-CONTINUATIONS-20261112.md).
+The FLOAT Bake baseline likewise has a sealed strict sanitizer closure. Later
+private Source4/Paint8 ownership and HDR preview fixes have separate scoped
+qualification; they are not integrated into main or qualified as a complete
+new application. Private Source8 candidate `3e523e34` completed its Release
+owning closure and full UV1/FLOAT worker checks; its strict sanitizer, visible
+source preview and broader typed-normal/pose/public/device requirements remain
+open. The separate HDR preview candidate `291d1ca7` completes its matched
+Release and strict sanitizer software closure (281 new controls plus seven
+existing renderer suites); actual Arc qualification of this final candidate
+remains unrun. Preserve frozen sources, providers and failed runs.
+
+Spatial node-based editing and inspectable editing history are required future
+work alongside controller-mounted tool/function/selection trays, after basic
+authoring targets. Their controller interaction, clear active state, shared
+commands, history/persistence and physical-headset acceptance remain open. Read
+[the additional specification](ADDITIONAL-REQUIREMENTS-2026-11-11.md).
+
+ArmorPaint remains a painting integration option to evaluate, with native
+FLTK/OpenXR interaction and document authority preserved; see
+[the source-based assessment](ARMORPAINT-ASSESSMENT-20261111.md).
+No system installation or desktop/headset session change is part of this pause.
+
 ## Integrated authoring and large-mesh query milestone — 2026-11-11
 
 Main now contains the qualified `e9931f72` product source, preserving all prior

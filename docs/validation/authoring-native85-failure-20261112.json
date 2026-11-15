@@ -1,0 +1,23 @@
+{
+  "state": "actual native qualification failure; candidate not admitted",
+  "source": "5c820f342f16d8544158410c2125372811c152f3",
+  "driver_handle": 62399,
+  "status_path": "artifacts/source8-final-owning-plan-20261112/release-5c-v1-native/status.json",
+  "status_sha256": "2cbf071ae0b24f40c427b4530dcf04b432017313b3dd10ed5b038a338db7a109",
+  "exit": 1,
+  "input_drift": [],
+  "native_passed": 84,
+  "native_expected": 85,
+  "failed_case": "renderer-recovery",
+  "failure": "Timeout180.03seconds; original TIMEOUT180 unchanged",
+  "preserved_log": "docs/validation/authoring-native85-failure-20261112.log.gz",
+  "preserved_log_gzip_sha256": "89e59423d771814464a137531e72bbde214ac378ca802517cb14b203da96f650",
+  "preserved_log_decompressed_sha256": "7842f6f0f46121697cb00d67c1dfddbf6f49c62cc51c9bdb950c82d6424e4387",
+  "root_trace_observation": "Seven of ten recovery loops completed; last observed statements passed retry/native-authority checks. No assertion failure printed before timeout.",
+  "orchestration_difference": "Runner explicitly forced MESA_SHADER_CACHE_DISABLE=true with isolated XDG_CACHE_HOME. Original CTest declares software GL andLP_NUM_THREADS2, without that forced cache disable.",
+  "cause": "Unproven. Investigate identical owned binary with empty isolated cache and ordinary cache enabled, unchanged180 deadline and all assertions. Earlier different-source full-FLOAT software component passed in41.9057seconds; this is contextual evidence, not a matched counterfactual.",
+  "remaining_native_helpers_raw_producers_font_manual_public": "not started after failed native gate",
+  "public_admission": false,
+  "main_runtime_changed": false,
+  "full_goal_complete": false
+}

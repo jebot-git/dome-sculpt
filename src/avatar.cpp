@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/avatar.hpp"
 #include "humanoid-placement.hpp"
+#include "humanoid-fit-continuation.hpp"
 #include <limits>
 #include <nlohmann/json.hpp>
 #include <set>
@@ -284,27 +285,11 @@ HumanFit fit_humanoid(const Mesh &mesh, const HumanLandmarks &l,
       continue;
     std::string p = parent(r, l.points);
     int pi = p.empty() ? -1 : int(out.mapping.joints.at(p));
-    Vec3 position = it->second, tail = position + l.up * o.terminal_length;
-    // Prefer the main anatomical continuation, never a side branch.
-    std::string continuation;
-    if (r.name == "hips")
-      continuation = "spine";
-    else if (r.name == "spine" || r.name == "chest" || r.name == "upperChest" ||
-             r.name == "neck") {
-      for (std::string candidate : {"chest", "upperChest", "neck", "head"})
-        if (l.points.contains(candidate) &&
-            parent(role(candidate), l.points) == r.name) {
-          continuation = candidate;
-          break;
-        }
-    } else if (r.name != "head" && !r.name.ends_with("Hand") &&
-               !r.name.ends_with("Foot"))
-      for (const auto &child : human_roles())
-        if (l.points.contains(child.name) &&
-            parent(child, l.points) == r.name) {
-          continuation = child.name;
-          break;
-        }
+    Vec3 position = it->second;
+    Vec3 tail = position +
+                detail::humanoid_fit_terminal_axis(r, l, p) * o.terminal_length;
+    // Prefer the explicit main anatomical continuation, never a side branch.
+    const auto continuation = detail::humanoid_fit_continuation(r, l);
     if (!continuation.empty())
       tail = l.points.at(continuation);
     else

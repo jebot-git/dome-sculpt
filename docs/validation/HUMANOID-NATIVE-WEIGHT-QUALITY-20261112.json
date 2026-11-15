@@ -1,0 +1,2168 @@
+{
+  "scope": "Independent descriptive actual source-authoring comparison, not universal quality acceptance, full auto-rig completion or graphical/headset evidence",
+  "source": "9560ac1ddc078f6013c8699869e663c4ea2a6fd0",
+  "provider_source": "cc5e6aed9f103da3998684c6188dd143e23e676b",
+  "provider_core_sha256": "8c0706bf85c51facabc5fc3de00116e4e982f1fc37b840512cc665642665d893",
+  "solver_artist_input": false,
+  "source_input": "Actual skin/JOINTS/WEIGHTS accessors and associated BIN bytes removed before retained-source import/fitting",
+  "association": "CreatorAppearance exact source_node/source_mesh/source_primitive/source_vertices; no positional or name matching",
+  "measurement_exit": 0,
+  "solver_outcomes": [
+    {
+      "asset": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-source8-hdr-fit-union-20261112/assets/humanoid/vroid/base-female.vrm",
+      "methods": [
+        {
+          "method": "legacy_automatic",
+          "status": "measured",
+          "error": null,
+          "seconds": 0.218173028
+        },
+        {
+          "method": "surface_heat",
+          "status": "measured",
+          "error": null,
+          "seconds": 2.092969487
+        },
+        {
+          "method": "anatomical",
+          "status": "measured",
+          "error": null,
+          "seconds": 1.719861547
+        }
+      ]
+    },
+    {
+      "asset": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-source8-hdr-fit-union-20261112/assets/humanoid/vroid/base-male.vrm",
+      "methods": [
+        {
+          "method": "legacy_automatic",
+          "status": "measured",
+          "error": null,
+          "seconds": 0.203665166
+        },
+        {
+          "method": "surface_heat",
+          "status": "measured",
+          "error": null,
+          "seconds": 1.839729956
+        },
+        {
+          "method": "anatomical",
+          "status": "measured",
+          "error": null,
+          "seconds": 1.768557464
+        }
+      ]
+    }
+  ],
+  "input_drift": [],
+  "local_evidence": {
+    "directory": "artifacts/humanoid-native-weight-quality-v2-proof-20261112",
+    "status_sha256": "4728f3a367696623b74dd57b80d768f093e27d69b4a2f88b9fddfca90c28daba",
+    "report_sha256": "45b6e713fd15c43dbdc88ebb33c896914a6b6485cc553078904d96552597f156",
+    "plan_sha256": "5784a6e1e5693ad106b536fca74734e8db3057821ee3d419b95b09a343ad50b3",
+    "driver_sha256": "2b9147eee6e5e85d9ea6c07e6f8970c5dbdf21a7618c8023aa5659b7f1f8aa41",
+    "input_pin_map_sha256": "15bcace2ab34a1d8b3cd713c3caec11dda0201a6ba60f67de1fa364360d1a207",
+    "steps": [
+      {
+        "name": "compile",
+        "exit": 0,
+        "seconds": 26.818449878017418,
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": "link",
+        "exit": 0,
+        "seconds": 0.31494031997863203,
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": "native",
+        "exit": 0,
+        "seconds": 9.032081989978906,
+        "log_sha256": "6ef74e72b11a04d2692accb604a7ef841e34f290cfe652858f31cab4e716e4ff"
+      }
+    ]
+  },
+  "quality": {
+    "assets": [
+      {
+        "artist_weights_in_solver_source": false,
+        "asset": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-source8-hdr-fit-union-20261112/assets/humanoid/vroid/base-female.vrm",
+        "bones": 54,
+        "methods": [
+          {
+            "agreement": {
+              "by_reference_dominant_humanoid_role": {
+                "chest": {
+                  "dominant_match_fraction": 0.6186046511627907,
+                  "mean_l1": 0.6773561981067739,
+                  "mean_reference_mass_retained": 0.6613219010202528,
+                  "vertices": 215
+                },
+                "head": {
+                  "dominant_match_fraction": 0.1656937584193983,
+                  "mean_l1": 1.5583315068871266,
+                  "mean_reference_mass_retained": 0.22083424654305453,
+                  "vertices": 2227
+                },
+                "hips": {
+                  "dominant_match_fraction": 0.5964285714285714,
+                  "mean_l1": 0.9250671807797243,
+                  "mean_reference_mass_retained": 0.5374664099111551,
+                  "vertices": 560
+                },
+                "leftEye": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 1.1123883338858847,
+                  "mean_reference_mass_retained": 0.4438058330875928,
+                  "vertices": 122
+                },
+                "leftFoot": {
+                  "dominant_match_fraction": 0.515850144092219,
+                  "mean_l1": 0.9315508237076556,
+                  "mean_reference_mass_retained": 0.5342245877180859,
+                  "vertices": 347
+                },
+                "leftHand": {
+                  "dominant_match_fraction": 0.3010752688172043,
+                  "mean_l1": 1.097874501520102,
+                  "mean_reference_mass_retained": 0.45106275038157023,
+                  "vertices": 93
+                },
+                "leftIndexDistal": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.5206557356955857,
+                  "mean_reference_mass_retained": 0.7396721312495407,
+                  "vertices": 65
+                },
+                "leftIndexIntermediate": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.5885732981840025,
+                  "mean_reference_mass_retained": 0.705713354555679,
+                  "vertices": 18
+                },
+                "leftIndexProximal": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.7206976241316159,
+                  "mean_reference_mass_retained": 0.6396511896291993,
+                  "vertices": 50
+                },
+                "leftLittleDistal": {
+                  "dominant_match_fraction": 0.9538461538461539,
+                  "mean_l1": 0.6328566429947431,
+                  "mean_reference_mass_retained": 0.683571678688893,
+                  "vertices": 65
+                },
+                "leftLittleIntermediate": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.7667380674969819,
+                  "mean_reference_mass_retained": 0.6166309646993048,
+                  "vertices": 18
+                },
+                "leftLittleProximal": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.80118485748435,
+                  "mean_reference_mass_retained": 0.5994075713941162,
+                  "vertices": 41
+                },
+                "leftLowerArm": {
+                  "dominant_match_fraction": 0.7142857142857143,
+                  "mean_l1": 0.8737803887459232,
+                  "mean_reference_mass_retained": 0.5631098053264053,
+                  "vertices": 182
+                },
+                "leftLowerLeg": {
+                  "dominant_match_fraction": 0.7416666666666667,
+                  "mean_l1": 0.6094002615764681,
+                  "mean_reference_mass_retained": 0.6952998694979534,
+                  "vertices": 240
+                },
+                "leftMiddleDistal": {
+                  "dominant_match_fraction": 0.9538461538461539,
+                  "mean_l1": 0.5502533321206724,
+                  "mean_reference_mass_retained": 0.7248733333378861,
+                  "vertices": 65
+                },
+                "leftMiddleIntermediate": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.7207140120491384,
+                  "mean_reference_mass_retained": 0.6396429943893519,
+                  "vertices": 18
+                },
+                "leftMiddleProximal": {
+                  "dominant_match_fraction": 0.9736842105263158,
+                  "mean_l1": 0.8348382457904516,
+                  "mean_reference_mass_retained": 0.5825808754872139,
+                  "vertices": 38
+                },
+                "leftRingDistal": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.6257642829733399,
+                  "mean_reference_mass_retained": 0.6871178569945577,
+                  "vertices": 65
+                },
+                "leftRingIntermediate": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.8584358166827986,
+                  "mean_reference_mass_retained": 0.5707820916586007,
+                  "vertices": 18
+                },
+                "leftRingProximal": {
+                  "dominant_match_fraction": 0.6739130434782609,
+                  "mean_l1": 0.8933653991811902,
+                  "mean_reference_mass_retained": 0.5533173013812198,
+                  "vertices": 46
+                },
+                "leftShoulder": {
+                  "dominant_match_fraction": 0.8518518518518519,
+                  "mean_l1": 0.6714276604562068,
+                  "mean_reference_mass_retained": 0.6642861713585942,
+                  "vertices": 108
+                },
+                "leftThumbDistal": {
+                  "dominant_match_fraction": 0.9538461538461539,
+                  "mean_l1": 0.475733949077244,
+                  "mean_reference_mass_retained": 0.7621330270446264,
+                  "vertices": 65
+                },
+                "leftThumbMetacarpal": {
+                  "dominant_match_fraction": 0.95,
+                  "mean_l1": 0.5257447808054425,
+                  "mean_reference_mass_retained": 0.7371276093178818,
+                  "vertices": 20
+                },
+                "leftThumbProximal": {
+                  "dominant_match_fraction": 0.9318181818181818,
+                  "mean_l1": 0.7777940685557895,
+                  "mean_reference_mass_retained": 0.611102966515846,
+                  "vertices": 44
+                },
+                "leftToes": {
+                  "dominant_match_fraction": 0.9465648854961832,
+                  "mean_l1": 1.1244845788609032,
+                  "mean_reference_mass_retained": 0.4377577119274311,
+                  "vertices": 131
+                },
+                "leftUpperArm": {
+                  "dominant_match_fraction": 0.6340694006309149,
+                  "mean_l1": 0.8490979407235384,
+                  "mean_reference_mass_retained": 0.5754510299165999,
+                  "vertices": 317
+                },
+                "leftUpperLeg": {
+                  "dominant_match_fraction": 0.6098901098901099,
+                  "mean_l1": 0.8564709933477735,
+                  "mean_reference_mass_retained": 0.5717645035870883,
+                  "vertices": 182
+                },
+                "neck": {
+                  "dominant_match_fraction": 0.3612040133779264,
+                  "mean_l1": 1.1602656715163946,
+                  "mean_reference_mass_retained": 0.41986716318277373,
+                  "vertices": 299
+                },
+                "rightEye": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 1.112387840804018,
+                  "mean_reference_mass_retained": 0.4438060798117372,
+                  "vertices": 122
+                },
+                "rightFoot": {
+                  "dominant_match_fraction": 0.515850144092219,
+                  "mean_l1": 0.9315478591240518,
+                  "mean_reference_mass_retained": 0.5342260702118533,
+                  "vertices": 347
+                },
+                "rightHand": {
+                  "dominant_match_fraction": 0.2903225806451613,
+                  "mean_l1": 1.0978806519084912,
+                  "mean_reference_mass_retained": 0.4510596739055553,
+                  "vertices": 93
+                },
+                "rightIndexDistal": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.5206584590404022,
+                  "mean_reference_mass_retained": 0.7396707695126562,
+                  "vertices": 65
+                },
+                "rightIndexIntermediate": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.5885715364838723,
+                  "mean_reference_mass_retained": 0.7057142320685048,
+                  "vertices": 18
+                },
+                "rightIndexProximal": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.7206938844125229,
+                  "mean_reference_mass_retained": 0.6396530597681425,
+                  "vertices": 50
+                },
+                "rightLittleDistal": {
+                  "dominant_match_fraction": 0.9538461538461539,
+                  "mean_l1": 0.6328691554997976,
+                  "mean_reference_mass_retained": 0.683565424327667,
+                  "vertices": 65
+                },
+                "rightLittleIntermediate": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.76674010336813,
+                  "mean_reference_mass_retained": 0.6166299501785802,
+                  "vertices": 18
+                },
+                "rightLittleProximal": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.8011882124262772,
+                  "mean_reference_mass_retained": 0.5994058952860637,
+                  "vertices": 41
+                },
+                "rightLowerArm": {
+                  "dominant_match_fraction": 0.7142857142857143,
+                  "mean_l1": 0.8737834750147706,
+                  "mean_reference_mass_retained": 0.5631082622239637,
+                  "vertices": 182
+                },
+                "rightLowerLeg": {
+                  "dominant_match_fraction": 0.7416666666666667,
+                  "mean_l1": 0.6094015124523102,
+                  "mean_reference_mass_retained": 0.6952992436802273,
+                  "vertices": 240
+                },
+                "rightMiddleDistal": {
+                  "dominant_match_fraction": 0.9538461538461539,
+                  "mean_l1": 0.5502700634413374,
+                  "mean_reference_mass_retained": 0.7248649697837755,
+                  "vertices": 65
+                },
+                "rightMiddleIntermediate": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.7207128711789845,
+                  "mean_reference_mass_retained": 0.6396435664283733,
+                  "vertices": 18
+                },
+                "rightMiddleProximal": {
+                  "dominant_match_fraction": 0.9736842105263158,
+                  "mean_l1": 0.83484020128356,
+                  "mean_reference_mass_retained": 0.5825799013188991,
+                  "vertices": 38
+                },
+                "rightRingDistal": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.6257742974133446,
+                  "mean_reference_mass_retained": 0.6871128497458994,
+                  "vertices": 65
+                },
+                "rightRingIntermediate": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.8584396992631319,
+                  "mean_reference_mass_retained": 0.5707801536798033,
+                  "vertices": 18
+                },
+                "rightRingProximal": {
+                  "dominant_match_fraction": 0.6739130434782609,
+                  "mean_l1": 0.8933737031512888,
+                  "mean_reference_mass_retained": 0.5533131478574635,
+                  "vertices": 46
+                },
+                "rightShoulder": {
+                  "dominant_match_fraction": 0.8504672897196262,
+                  "mean_l1": 0.6711490591161458,
+                  "mean_reference_mass_retained": 0.664425470642118,
+                  "vertices": 107
+                },
+                "rightThumbDistal": {
+                  "dominant_match_fraction": 0.9538461538461539,
+                  "mean_l1": 0.47570057679483524,
+                  "mean_reference_mass_retained": 0.7621497117601909,
+                  "vertices": 65
+                },
+                "rightThumbMetacarpal": {
+                  "dominant_match_fraction": 0.95,
+                  "mean_l1": 0.525739287820194,
+                  "mean_reference_mass_retained": 0.7371303584182093,
+                  "vertices": 20
+                },
+                "rightThumbProximal": {
+                  "dominant_match_fraction": 0.9318181818181818,
+                  "mean_l1": 0.7777966208317578,
+                  "mean_reference_mass_retained": 0.6111016895417882,
+                  "vertices": 44
+                },
+                "rightToes": {
+                  "dominant_match_fraction": 0.9465648854961832,
+                  "mean_l1": 1.1244898597229467,
+                  "mean_reference_mass_retained": 0.43775506998567626,
+                  "vertices": 131
+                },
+                "rightUpperArm": {
+                  "dominant_match_fraction": 0.6340694006309149,
+                  "mean_l1": 0.8490904134895115,
+                  "mean_reference_mass_retained": 0.5754547933969998,
+                  "vertices": 317
+                },
+                "rightUpperLeg": {
+                  "dominant_match_fraction": 0.6098901098901099,
+                  "mean_l1": 0.8564712657493923,
+                  "mean_reference_mass_retained": 0.5717643683713317,
+                  "vertices": 182
+                },
+                "spine": {
+                  "dominant_match_fraction": 0.6701030927835051,
+                  "mean_l1": 0.5873396033985746,
+                  "mean_reference_mass_retained": 0.7063301974870059,
+                  "vertices": 194
+                },
+                "upperChest": {
+                  "dominant_match_fraction": 0.4086629001883239,
+                  "mean_l1": 1.2773440590024059,
+                  "mean_reference_mass_retained": 0.3613279710600466,
+                  "vertices": 531
+                }
+              },
+              "mapped_only": {
+                "dominant_match_fraction": 0.552911566182359,
+                "mean_l1": 1.0454328495645653,
+                "mean_reference_mass_retained": 0.4772835753446279,
+                "vertices": 8741
+              },
+              "mean_unmapped_mass_all_referenced": 0.047702935973166265,
+              "referenced_native_vertices": 9851,
+              "unmapped_reference_vertices_excluded": 1110
+            },
+            "method": "legacy_automatic",
+            "seconds": 0.218173028,
+            "status": "measured"
+          },
+          {
+            "agreement": {
+              "by_reference_dominant_humanoid_role": {
+                "chest": {
+                  "dominant_match_fraction": 0.3209302325581395,
+                  "mean_l1": 0.9121839107935116,
+                  "mean_reference_mass_retained": 0.543908043994636,
+                  "vertices": 215
+                },
+                "head": {
+                  "dominant_match_fraction": 0.9829366861248316,
+                  "mean_l1": 0.029103965988425115,
+                  "mean_reference_mass_retained": 0.9854480170469012,
+                  "vertices": 2227
+                },
+                "hips": {
+                  "dominant_match_fraction": 0.2732142857142857,
+                  "mean_l1": 1.1772767767693493,
+                  "mean_reference_mass_retained": 0.41136161099936347,
+                  "vertices": 560
+                },
+                "leftEye": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.0,
+                  "mean_reference_mass_retained": 1.0,
+                  "vertices": 122
+                },
+                "leftFoot": {
+                  "dominant_match_fraction": 0.962536023054755,
+                  "mean_l1": 0.23124341634368123,
+                  "mean_reference_mass_retained": 0.8843782907762667,
+                  "vertices": 347
+                },
+                "leftHand": {
+                  "dominant_match_fraction": 0.41935483870967744,
+                  "mean_l1": 0.8405635554652819,
+                  "mean_reference_mass_retained": 0.5797182243107493,
+                  "vertices": 93
+                },
+                "leftIndexDistal": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.06633022769205026,
+                  "mean_reference_mass_retained": 0.966834884969582,
+                  "vertices": 65
+                },
+                "leftIndexIntermediate": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.38860540535230703,
+                  "mean_reference_mass_retained": 0.8056972982200524,
+                  "vertices": 18
+                },
+                "leftIndexProximal": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.22347554637024522,
+                  "mean_reference_mass_retained": 0.8882622271580844,
+                  "vertices": 50
+                },
+                "leftLittleDistal": {
+                  "dominant_match_fraction": 0.9538461538461539,
+                  "mean_l1": 0.07382159002921755,
+                  "mean_reference_mass_retained": 0.9630892053818679,
+                  "vertices": 65
+                },
+                "leftLittleIntermediate": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.40033348576010114,
+                  "mean_reference_mass_retained": 0.799833256325607,
+                  "vertices": 18
+                },
+                "leftLittleProximal": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.34519482904166815,
+                  "mean_reference_mass_retained": 0.8274025879358218,
+                  "vertices": 41
+                },
+                "leftLowerArm": {
+                  "dominant_match_fraction": 0.7472527472527473,
+                  "mean_l1": 0.42227028124914673,
+                  "mean_reference_mass_retained": 0.7888648589012968,
+                  "vertices": 182
+                },
+                "leftLowerLeg": {
+                  "dominant_match_fraction": 0.9416666666666667,
+                  "mean_l1": 0.15660958134836983,
+                  "mean_reference_mass_retained": 0.9216952094316632,
+                  "vertices": 240
+                },
+                "leftMiddleDistal": {
+                  "dominant_match_fraction": 0.9538461538461539,
+                  "mean_l1": 0.06839090049510511,
+                  "mean_reference_mass_retained": 0.9658045485062858,
+                  "vertices": 65
+                },
+                "leftMiddleIntermediate": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.39558326265502225,
+                  "mean_reference_mass_retained": 0.8022083685454627,
+                  "vertices": 18
+                },
+                "leftMiddleProximal": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.3403970807493183,
+                  "mean_reference_mass_retained": 0.8298014597914435,
+                  "vertices": 38
+                },
+                "leftRingDistal": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.07254987201012693,
+                  "mean_reference_mass_retained": 0.963725063475713,
+                  "vertices": 65
+                },
+                "leftRingIntermediate": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.39323221593972313,
+                  "mean_reference_mass_retained": 0.803383890777663,
+                  "vertices": 18
+                },
+                "leftRingProximal": {
+                  "dominant_match_fraction": 0.8260869565217391,
+                  "mean_l1": 0.48885458091755835,
+                  "mean_reference_mass_retained": 0.7555727111613865,
+                  "vertices": 46
+                },
+                "leftShoulder": {
+                  "dominant_match_fraction": 0.6574074074074074,
+                  "mean_l1": 0.4859936565677338,
+                  "mean_reference_mass_retained": 0.7570031745639972,
+                  "vertices": 108
+                },
+                "leftThumbDistal": {
+                  "dominant_match_fraction": 0.9538461538461539,
+                  "mean_l1": 0.05294363280316891,
+                  "mean_reference_mass_retained": 0.9735281846569135,
+                  "vertices": 65
+                },
+                "leftThumbMetacarpal": {
+                  "dominant_match_fraction": 0.95,
+                  "mean_l1": 0.4882414285079705,
+                  "mean_reference_mass_retained": 0.755879286592936,
+                  "vertices": 20
+                },
+                "leftThumbProximal": {
+                  "dominant_match_fraction": 0.9318181818181818,
+                  "mean_l1": 0.29261109490372567,
+                  "mean_reference_mass_retained": 0.8536944525331719,
+                  "vertices": 44
+                },
+                "leftToes": {
+                  "dominant_match_fraction": 0.9389312977099237,
+                  "mean_l1": 0.19018805638230932,
+                  "mean_reference_mass_retained": 0.9049059717873819,
+                  "vertices": 131
+                },
+                "leftUpperArm": {
+                  "dominant_match_fraction": 0.9905362776025236,
+                  "mean_l1": 0.1875997842479086,
+                  "mean_reference_mass_retained": 0.9062001078594898,
+                  "vertices": 317
+                },
+                "leftUpperLeg": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.18092071743933003,
+                  "mean_reference_mass_retained": 0.9095396425384433,
+                  "vertices": 182
+                },
+                "neck": {
+                  "dominant_match_fraction": 0.7491638795986622,
+                  "mean_l1": 0.5856970180339953,
+                  "mean_reference_mass_retained": 0.7071514896218386,
+                  "vertices": 299
+                },
+                "rightEye": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.0,
+                  "mean_reference_mass_retained": 1.0,
+                  "vertices": 122
+                },
+                "rightFoot": {
+                  "dominant_match_fraction": 0.9971181556195965,
+                  "mean_l1": 0.21366274079970962,
+                  "mean_reference_mass_retained": 0.8931686302453379,
+                  "vertices": 347
+                },
+                "rightHand": {
+                  "dominant_match_fraction": 0.41935483870967744,
+                  "mean_l1": 0.8405743830974516,
+                  "mean_reference_mass_retained": 0.5797128082149817,
+                  "vertices": 93
+                },
+                "rightIndexDistal": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.066328014545567,
+                  "mean_reference_mass_retained": 0.9668359924827165,
+                  "vertices": 65
+                },
+                "rightIndexIntermediate": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.38926121704007594,
+                  "mean_reference_mass_retained": 0.8053693934208237,
+                  "vertices": 18
+                },
+                "rightIndexProximal": {
+                  "dominant_match_fraction": 0.98,
+                  "mean_l1": 0.2374534344015839,
+                  "mean_reference_mass_retained": 0.8812732805363125,
+                  "vertices": 50
+                },
+                "rightLittleDistal": {
+                  "dominant_match_fraction": 0.9538461538461539,
+                  "mean_l1": 0.0738208614806275,
+                  "mean_reference_mass_retained": 0.9630895691201977,
+                  "vertices": 65
+                },
+                "rightLittleIntermediate": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.40033188422981975,
+                  "mean_reference_mass_retained": 0.7998340565289578,
+                  "vertices": 18
+                },
+                "rightLittleProximal": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.3451993452609469,
+                  "mean_reference_mass_retained": 0.827400326134122,
+                  "vertices": 41
+                },
+                "rightLowerArm": {
+                  "dominant_match_fraction": 0.7472527472527473,
+                  "mean_l1": 0.4222705576212719,
+                  "mean_reference_mass_retained": 0.7888647214286855,
+                  "vertices": 182
+                },
+                "rightLowerLeg": {
+                  "dominant_match_fraction": 0.8916666666666667,
+                  "mean_l1": 0.18556470172127063,
+                  "mean_reference_mass_retained": 0.9072176491762218,
+                  "vertices": 240
+                },
+                "rightMiddleDistal": {
+                  "dominant_match_fraction": 0.9538461538461539,
+                  "mean_l1": 0.06838662094111561,
+                  "mean_reference_mass_retained": 0.9658066894918591,
+                  "vertices": 65
+                },
+                "rightMiddleIntermediate": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.3955834759522461,
+                  "mean_reference_mass_retained": 0.8022082637409524,
+                  "vertices": 18
+                },
+                "rightMiddleProximal": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.34039138704411714,
+                  "mean_reference_mass_retained": 0.8298043103888645,
+                  "vertices": 38
+                },
+                "rightRingDistal": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.07254849482999443,
+                  "mean_reference_mass_retained": 0.9637257520318201,
+                  "vertices": 65
+                },
+                "rightRingIntermediate": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.3932307855111136,
+                  "mean_reference_mass_retained": 0.8033846093560877,
+                  "vertices": 18
+                },
+                "rightRingProximal": {
+                  "dominant_match_fraction": 0.8260869565217391,
+                  "mean_l1": 0.4888675444631104,
+                  "mean_reference_mass_retained": 0.7555662274084429,
+                  "vertices": 46
+                },
+                "rightShoulder": {
+                  "dominant_match_fraction": 0.6542056074766355,
+                  "mean_l1": 0.4852968931552102,
+                  "mean_reference_mass_retained": 0.757351551794213,
+                  "vertices": 107
+                },
+                "rightThumbDistal": {
+                  "dominant_match_fraction": 0.9538461538461539,
+                  "mean_l1": 0.05294599614720322,
+                  "mean_reference_mass_retained": 0.9735270004730958,
+                  "vertices": 65
+                },
+                "rightThumbMetacarpal": {
+                  "dominant_match_fraction": 0.95,
+                  "mean_l1": 0.4882642064785009,
+                  "mean_reference_mass_retained": 0.7558678959007312,
+                  "vertices": 20
+                },
+                "rightThumbProximal": {
+                  "dominant_match_fraction": 0.9318181818181818,
+                  "mean_l1": 0.29262270106396726,
+                  "mean_reference_mass_retained": 0.853688647939073,
+                  "vertices": 44
+                },
+                "rightToes": {
+                  "dominant_match_fraction": 0.9389312977099237,
+                  "mean_l1": 0.19018675903722995,
+                  "mean_reference_mass_retained": 0.904906618366966,
+                  "vertices": 131
+                },
+                "rightUpperArm": {
+                  "dominant_match_fraction": 0.9905362776025236,
+                  "mean_l1": 0.18765404013978482,
+                  "mean_reference_mass_retained": 0.9061729784858485,
+                  "vertices": 317
+                },
+                "rightUpperLeg": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.18092160717618389,
+                  "mean_reference_mass_retained": 0.9095391968695686,
+                  "vertices": 182
+                },
+                "spine": {
+                  "dominant_match_fraction": 0.8969072164948454,
+                  "mean_l1": 0.8225643766976969,
+                  "mean_reference_mass_retained": 0.5887178103455298,
+                  "vertices": 194
+                },
+                "upperChest": {
+                  "dominant_match_fraction": 0.4387947269303202,
+                  "mean_l1": 0.8429131341496346,
+                  "mean_reference_mass_retained": 0.5785434333092875,
+                  "vertices": 531
+                }
+              },
+              "mapped_only": {
+                "dominant_match_fraction": 0.8424665370094955,
+                "mean_l1": 0.32671556094896176,
+                "mean_reference_mass_retained": 0.8366422193860458,
+                "vertices": 8741
+              },
+              "mean_unmapped_mass_all_referenced": 0.047702935973166265,
+              "referenced_native_vertices": 9851,
+              "unmapped_reference_vertices_excluded": 1110
+            },
+            "method": "surface_heat",
+            "seconds": 2.092969487,
+            "status": "measured"
+          },
+          {
+            "agreement": {
+              "by_reference_dominant_humanoid_role": {
+                "chest": {
+                  "dominant_match_fraction": 0.2558139534883721,
+                  "mean_l1": 0.9176194945800003,
+                  "mean_reference_mass_retained": 0.5411902511938935,
+                  "vertices": 215
+                },
+                "head": {
+                  "dominant_match_fraction": 0.9775482712168837,
+                  "mean_l1": 0.041732941872460946,
+                  "mean_reference_mass_retained": 0.9791335290495508,
+                  "vertices": 2227
+                },
+                "hips": {
+                  "dominant_match_fraction": 0.060714285714285714,
+                  "mean_l1": 1.2836324924685296,
+                  "mean_reference_mass_retained": 0.35818375427796245,
+                  "vertices": 560
+                },
+                "leftEye": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.0,
+                  "mean_reference_mass_retained": 1.0,
+                  "vertices": 122
+                },
+                "leftFoot": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.30926856855794316,
+                  "mean_reference_mass_retained": 0.8453657156400701,
+                  "vertices": 347
+                },
+                "leftHand": {
+                  "dominant_match_fraction": 0.3978494623655914,
+                  "mean_l1": 0.9494472998291685,
+                  "mean_reference_mass_retained": 0.525276350145501,
+                  "vertices": 93
+                },
+                "leftIndexDistal": {
+                  "dominant_match_fraction": 0.8615384615384616,
+                  "mean_l1": 0.3412855671348996,
+                  "mean_reference_mass_retained": 0.8293572168946295,
+                  "vertices": 65
+                },
+                "leftIndexIntermediate": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.3666043774481531,
+                  "mean_reference_mass_retained": 0.8166978069556214,
+                  "vertices": 18
+                },
+                "leftIndexProximal": {
+                  "dominant_match_fraction": 0.96,
+                  "mean_l1": 0.5156297938292225,
+                  "mean_reference_mass_retained": 0.7421851074253518,
+                  "vertices": 50
+                },
+                "leftLittleDistal": {
+                  "dominant_match_fraction": 0.8153846153846154,
+                  "mean_l1": 0.44505903529089225,
+                  "mean_reference_mass_retained": 0.7774704823402258,
+                  "vertices": 65
+                },
+                "leftLittleIntermediate": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.42181457490142854,
+                  "mean_reference_mass_retained": 0.7890927111005618,
+                  "vertices": 18
+                },
+                "leftLittleProximal": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.5667342837239698,
+                  "mean_reference_mass_retained": 0.7166328543218642,
+                  "vertices": 41
+                },
+                "leftLowerArm": {
+                  "dominant_match_fraction": 0.7362637362637363,
+                  "mean_l1": 0.6818267155593235,
+                  "mean_reference_mass_retained": 0.6590866427806665,
+                  "vertices": 182
+                },
+                "leftLowerLeg": {
+                  "dominant_match_fraction": 0.7708333333333334,
+                  "mean_l1": 0.4961188271534304,
+                  "mean_reference_mass_retained": 0.7519405872850007,
+                  "vertices": 240
+                },
+                "leftMiddleDistal": {
+                  "dominant_match_fraction": 0.8153846153846154,
+                  "mean_l1": 0.3702080726799406,
+                  "mean_reference_mass_retained": 0.814895961568136,
+                  "vertices": 65
+                },
+                "leftMiddleIntermediate": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.40176520262534415,
+                  "mean_reference_mass_retained": 0.7991173981957966,
+                  "vertices": 18
+                },
+                "leftMiddleProximal": {
+                  "dominant_match_fraction": 0.9210526315789473,
+                  "mean_l1": 0.7111305547481258,
+                  "mean_reference_mass_retained": 0.6444347233611919,
+                  "vertices": 38
+                },
+                "leftRingDistal": {
+                  "dominant_match_fraction": 0.8615384615384616,
+                  "mean_l1": 0.37914083099537166,
+                  "mean_reference_mass_retained": 0.8104295841011291,
+                  "vertices": 65
+                },
+                "leftRingIntermediate": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.38416212918584514,
+                  "mean_reference_mass_retained": 0.8079189355105578,
+                  "vertices": 18
+                },
+                "leftRingProximal": {
+                  "dominant_match_fraction": 0.8043478260869565,
+                  "mean_l1": 0.7881385917792813,
+                  "mean_reference_mass_retained": 0.6059307030575599,
+                  "vertices": 46
+                },
+                "leftShoulder": {
+                  "dominant_match_fraction": 0.6574074074074074,
+                  "mean_l1": 0.5050199148803535,
+                  "mean_reference_mass_retained": 0.7474900420424215,
+                  "vertices": 108
+                },
+                "leftThumbDistal": {
+                  "dominant_match_fraction": 0.8153846153846154,
+                  "mean_l1": 0.3782781645850493,
+                  "mean_reference_mass_retained": 0.8108609194984803,
+                  "vertices": 65
+                },
+                "leftThumbMetacarpal": {
+                  "dominant_match_fraction": 0.9,
+                  "mean_l1": 0.35539878238215583,
+                  "mean_reference_mass_retained": 0.8223006089020544,
+                  "vertices": 20
+                },
+                "leftThumbProximal": {
+                  "dominant_match_fraction": 0.9545454545454546,
+                  "mean_l1": 0.4533185113909079,
+                  "mean_reference_mass_retained": 0.7733407435213885,
+                  "vertices": 44
+                },
+                "leftToes": {
+                  "dominant_match_fraction": 0.37404580152671757,
+                  "mean_l1": 0.9964097829898558,
+                  "mean_reference_mass_retained": 0.5017951080333567,
+                  "vertices": 131
+                },
+                "leftUpperArm": {
+                  "dominant_match_fraction": 0.9905362776025236,
+                  "mean_l1": 0.28998824672578233,
+                  "mean_reference_mass_retained": 0.8550058762566475,
+                  "vertices": 317
+                },
+                "leftUpperLeg": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.4098344213135716,
+                  "mean_reference_mass_retained": 0.795082789597793,
+                  "vertices": 182
+                },
+                "neck": {
+                  "dominant_match_fraction": 0.9096989966555183,
+                  "mean_l1": 0.5444890502951399,
+                  "mean_reference_mass_retained": 0.7277554750019396,
+                  "vertices": 299
+                },
+                "rightEye": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.0,
+                  "mean_reference_mass_retained": 1.0,
+                  "vertices": 122
+                },
+                "rightFoot": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.3402336355092355,
+                  "mean_reference_mass_retained": 0.829883181204962,
+                  "vertices": 347
+                },
+                "rightHand": {
+                  "dominant_match_fraction": 0.3978494623655914,
+                  "mean_l1": 0.9499903240740971,
+                  "mean_reference_mass_retained": 0.5250048377426384,
+                  "vertices": 93
+                },
+                "rightIndexDistal": {
+                  "dominant_match_fraction": 0.8615384615384616,
+                  "mean_l1": 0.34061715636430456,
+                  "mean_reference_mass_retained": 0.8296914215133769,
+                  "vertices": 65
+                },
+                "rightIndexIntermediate": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.3662190701427641,
+                  "mean_reference_mass_retained": 0.8168904688867389,
+                  "vertices": 18
+                },
+                "rightIndexProximal": {
+                  "dominant_match_fraction": 0.94,
+                  "mean_l1": 0.5145068258782226,
+                  "mean_reference_mass_retained": 0.742746586166819,
+                  "vertices": 50
+                },
+                "rightLittleDistal": {
+                  "dominant_match_fraction": 0.8153846153846154,
+                  "mean_l1": 0.44506591938378715,
+                  "mean_reference_mass_retained": 0.7774670399427414,
+                  "vertices": 65
+                },
+                "rightLittleIntermediate": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.42185975201427944,
+                  "mean_reference_mass_retained": 0.7890701238376399,
+                  "vertices": 18
+                },
+                "rightLittleProximal": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.5668423723859553,
+                  "mean_reference_mass_retained": 0.7165788136253011,
+                  "vertices": 41
+                },
+                "rightLowerArm": {
+                  "dominant_match_fraction": 0.7362637362637363,
+                  "mean_l1": 0.6818719172379581,
+                  "mean_reference_mass_retained": 0.6590640424952816,
+                  "vertices": 182
+                },
+                "rightLowerLeg": {
+                  "dominant_match_fraction": 0.65,
+                  "mean_l1": 0.5365871932157961,
+                  "mean_reference_mass_retained": 0.7317064023865646,
+                  "vertices": 240
+                },
+                "rightMiddleDistal": {
+                  "dominant_match_fraction": 0.8153846153846154,
+                  "mean_l1": 0.37015665014414023,
+                  "mean_reference_mass_retained": 0.8149216744479406,
+                  "vertices": 65
+                },
+                "rightMiddleIntermediate": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.4013745099595851,
+                  "mean_reference_mass_retained": 0.7993127424849404,
+                  "vertices": 18
+                },
+                "rightMiddleProximal": {
+                  "dominant_match_fraction": 0.9210526315789473,
+                  "mean_l1": 0.7259261626353338,
+                  "mean_reference_mass_retained": 0.6370369202018594,
+                  "vertices": 38
+                },
+                "rightRingDistal": {
+                  "dominant_match_fraction": 0.8615384615384616,
+                  "mean_l1": 0.37915849587779776,
+                  "mean_reference_mass_retained": 0.8104207529852597,
+                  "vertices": 65
+                },
+                "rightRingIntermediate": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.3841762374810871,
+                  "mean_reference_mass_retained": 0.807911883949944,
+                  "vertices": 18
+                },
+                "rightRingProximal": {
+                  "dominant_match_fraction": 0.8043478260869565,
+                  "mean_l1": 0.7871171056075579,
+                  "mean_reference_mass_retained": 0.6064414501116656,
+                  "vertices": 46
+                },
+                "rightShoulder": {
+                  "dominant_match_fraction": 0.6542056074766355,
+                  "mean_l1": 0.5122082844338163,
+                  "mean_reference_mass_retained": 0.7438958572434465,
+                  "vertices": 107
+                },
+                "rightThumbDistal": {
+                  "dominant_match_fraction": 0.8153846153846154,
+                  "mean_l1": 0.37830789217238237,
+                  "mean_reference_mass_retained": 0.8108460550170679,
+                  "vertices": 65
+                },
+                "rightThumbMetacarpal": {
+                  "dominant_match_fraction": 0.9,
+                  "mean_l1": 0.3554864801414265,
+                  "mean_reference_mass_retained": 0.8222567616987997,
+                  "vertices": 20
+                },
+                "rightThumbProximal": {
+                  "dominant_match_fraction": 0.9545454545454546,
+                  "mean_l1": 0.4534910254300842,
+                  "mean_reference_mass_retained": 0.7732544855704778,
+                  "vertices": 44
+                },
+                "rightToes": {
+                  "dominant_match_fraction": 0.7404580152671756,
+                  "mean_l1": 0.8587338522176293,
+                  "mean_reference_mass_retained": 0.570633076253594,
+                  "vertices": 131
+                },
+                "rightUpperArm": {
+                  "dominant_match_fraction": 0.9905362776025236,
+                  "mean_l1": 0.2880549428123441,
+                  "mean_reference_mass_retained": 0.855972527688212,
+                  "vertices": 317
+                },
+                "rightUpperLeg": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.4161448196176294,
+                  "mean_reference_mass_retained": 0.7919275900939596,
+                  "vertices": 182
+                },
+                "spine": {
+                  "dominant_match_fraction": 0.8969072164948454,
+                  "mean_l1": 0.5946276464205642,
+                  "mean_reference_mass_retained": 0.7026861778266544,
+                  "vertices": 194
+                },
+                "upperChest": {
+                  "dominant_match_fraction": 0.1167608286252354,
+                  "mean_l1": 1.285507587710816,
+                  "mean_reference_mass_retained": 0.35724620607092866,
+                  "vertices": 531
+                }
+              },
+              "mapped_only": {
+                "dominant_match_fraction": 0.7780574304999428,
+                "mean_l1": 0.4734516909883835,
+                "mean_reference_mass_retained": 0.7632741544903922,
+                "vertices": 8741
+              },
+              "mean_unmapped_mass_all_referenced": 0.047702935973166265,
+              "referenced_native_vertices": 9851,
+              "unmapped_reference_vertices_excluded": 1110
+            },
+            "method": "anatomical",
+            "seconds": 1.719861547,
+            "status": "measured"
+          }
+        ],
+        "parts": 19,
+        "reference": 12
+      },
+      {
+        "artist_weights_in_solver_source": false,
+        "asset": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-source8-hdr-fit-union-20261112/assets/humanoid/vroid/base-male.vrm",
+        "bones": 54,
+        "methods": [
+          {
+            "agreement": {
+              "by_reference_dominant_humanoid_role": {
+                "chest": {
+                  "dominant_match_fraction": 0.9333333333333333,
+                  "mean_l1": 0.579052175908701,
+                  "mean_reference_mass_retained": 0.7104739115489443,
+                  "vertices": 30
+                },
+                "head": {
+                  "dominant_match_fraction": 0.11821366024518389,
+                  "mean_l1": 1.543291090983243,
+                  "mean_reference_mass_retained": 0.22835445428981987,
+                  "vertices": 2284
+                },
+                "hips": {
+                  "dominant_match_fraction": 0.7468513853904282,
+                  "mean_l1": 1.092673698229092,
+                  "mean_reference_mass_retained": 0.4536631509517256,
+                  "vertices": 794
+                },
+                "leftEye": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 1.1059025411845231,
+                  "mean_reference_mass_retained": 0.4470487290718516,
+                  "vertices": 122
+                },
+                "leftFoot": {
+                  "dominant_match_fraction": 0.44562334217506633,
+                  "mean_l1": 0.9939179472355114,
+                  "mean_reference_mass_retained": 0.5030410269365295,
+                  "vertices": 377
+                },
+                "leftHand": {
+                  "dominant_match_fraction": 0.17204301075268819,
+                  "mean_l1": 1.1306311141730747,
+                  "mean_reference_mass_retained": 0.4346844420522395,
+                  "vertices": 93
+                },
+                "leftIndexDistal": {
+                  "dominant_match_fraction": 0.9846153846153847,
+                  "mean_l1": 0.5228661318226445,
+                  "mean_reference_mass_retained": 0.7385669345901591,
+                  "vertices": 65
+                },
+                "leftIndexIntermediate": {
+                  "dominant_match_fraction": 0.9444444444444444,
+                  "mean_l1": 0.5826229319336597,
+                  "mean_reference_mass_retained": 0.7086885319894347,
+                  "vertices": 18
+                },
+                "leftIndexProximal": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.7132655610959489,
+                  "mean_reference_mass_retained": 0.643367218557956,
+                  "vertices": 50
+                },
+                "leftLittleDistal": {
+                  "dominant_match_fraction": 0.9538461538461539,
+                  "mean_l1": 0.6337339975180534,
+                  "mean_reference_mass_retained": 0.6831330013412696,
+                  "vertices": 65
+                },
+                "leftLittleIntermediate": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.7470972262571255,
+                  "mean_reference_mass_retained": 0.6264513861470752,
+                  "vertices": 18
+                },
+                "leftLittleProximal": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.79019631437897,
+                  "mean_reference_mass_retained": 0.6049018414476038,
+                  "vertices": 41
+                },
+                "leftLowerArm": {
+                  "dominant_match_fraction": 0.5677083333333334,
+                  "mean_l1": 1.069348401575233,
+                  "mean_reference_mass_retained": 0.4653257995495031,
+                  "vertices": 192
+                },
+                "leftLowerLeg": {
+                  "dominant_match_fraction": 0.8465227817745803,
+                  "mean_l1": 0.5694054937543702,
+                  "mean_reference_mass_retained": 0.7152972533818875,
+                  "vertices": 417
+                },
+                "leftMiddleDistal": {
+                  "dominant_match_fraction": 0.9230769230769231,
+                  "mean_l1": 0.5545390170650178,
+                  "mean_reference_mass_retained": 0.7227304908800415,
+                  "vertices": 65
+                },
+                "leftMiddleIntermediate": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.6872989924748737,
+                  "mean_reference_mass_retained": 0.656350504797366,
+                  "vertices": 18
+                },
+                "leftMiddleProximal": {
+                  "dominant_match_fraction": 0.8157894736842105,
+                  "mean_l1": 0.8590652579613373,
+                  "mean_reference_mass_retained": 0.570467371754586,
+                  "vertices": 38
+                },
+                "leftRingDistal": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.6052095998393802,
+                  "mean_reference_mass_retained": 0.6973951984612414,
+                  "vertices": 65
+                },
+                "leftRingIntermediate": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.7804911589298873,
+                  "mean_reference_mass_retained": 0.6097544230185832,
+                  "vertices": 18
+                },
+                "leftRingProximal": {
+                  "dominant_match_fraction": 0.6739130434782609,
+                  "mean_l1": 0.86708990538136,
+                  "mean_reference_mass_retained": 0.5664550457706133,
+                  "vertices": 46
+                },
+                "leftShoulder": {
+                  "dominant_match_fraction": 0.38461538461538464,
+                  "mean_l1": 1.050714619335143,
+                  "mean_reference_mass_retained": 0.4746426900745238,
+                  "vertices": 130
+                },
+                "leftThumbDistal": {
+                  "dominant_match_fraction": 0.9538461538461539,
+                  "mean_l1": 0.5130732513156074,
+                  "mean_reference_mass_retained": 0.7434633741057836,
+                  "vertices": 65
+                },
+                "leftThumbMetacarpal": {
+                  "dominant_match_fraction": 0.95,
+                  "mean_l1": 0.5436009581205584,
+                  "mean_reference_mass_retained": 0.7281995212191174,
+                  "vertices": 20
+                },
+                "leftThumbProximal": {
+                  "dominant_match_fraction": 0.8863636363636364,
+                  "mean_l1": 0.7852830020746571,
+                  "mean_reference_mass_retained": 0.6073584991002531,
+                  "vertices": 44
+                },
+                "leftToes": {
+                  "dominant_match_fraction": 0.9202898550724637,
+                  "mean_l1": 1.1337475488037052,
+                  "mean_reference_mass_retained": 0.4331262260773063,
+                  "vertices": 138
+                },
+                "leftUpperArm": {
+                  "dominant_match_fraction": 0.6245733788395904,
+                  "mean_l1": 0.8993418953123576,
+                  "mean_reference_mass_retained": 0.5503290525170536,
+                  "vertices": 293
+                },
+                "leftUpperLeg": {
+                  "dominant_match_fraction": 0.8028985507246377,
+                  "mean_l1": 0.8845580598410676,
+                  "mean_reference_mass_retained": 0.5577209699188468,
+                  "vertices": 345
+                },
+                "neck": {
+                  "dominant_match_fraction": 0.32413793103448274,
+                  "mean_l1": 0.9045002986313693,
+                  "mean_reference_mass_retained": 0.5477498508448885,
+                  "vertices": 290
+                },
+                "rightEye": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 1.1059030196705804,
+                  "mean_reference_mass_retained": 0.4470484908975539,
+                  "vertices": 122
+                },
+                "rightFoot": {
+                  "dominant_match_fraction": 0.44562334217506633,
+                  "mean_l1": 0.9939182604885142,
+                  "mean_reference_mass_retained": 0.5030408688917375,
+                  "vertices": 377
+                },
+                "rightHand": {
+                  "dominant_match_fraction": 0.17204301075268819,
+                  "mean_l1": 1.130637837400755,
+                  "mean_reference_mass_retained": 0.4346810803983424,
+                  "vertices": 93
+                },
+                "rightIndexDistal": {
+                  "dominant_match_fraction": 0.9846153846153847,
+                  "mean_l1": 0.5228639593909509,
+                  "mean_reference_mass_retained": 0.7385680212286831,
+                  "vertices": 65
+                },
+                "rightIndexIntermediate": {
+                  "dominant_match_fraction": 0.9444444444444444,
+                  "mean_l1": 0.5826193597941846,
+                  "mean_reference_mass_retained": 0.7086903197148567,
+                  "vertices": 18
+                },
+                "rightIndexProximal": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.7132597898762185,
+                  "mean_reference_mass_retained": 0.643370105806949,
+                  "vertices": 50
+                },
+                "rightLittleDistal": {
+                  "dominant_match_fraction": 0.9538461538461539,
+                  "mean_l1": 0.6337494048315745,
+                  "mean_reference_mass_retained": 0.683125297670181,
+                  "vertices": 65
+                },
+                "rightLittleIntermediate": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.7471037924951976,
+                  "mean_reference_mass_retained": 0.626448109133376,
+                  "vertices": 18
+                },
+                "rightLittleProximal": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.7901967988484303,
+                  "mean_reference_mass_retained": 0.6049016020295566,
+                  "vertices": 41
+                },
+                "rightLowerArm": {
+                  "dominant_match_fraction": 0.5677083333333334,
+                  "mean_l1": 1.0693484381393454,
+                  "mean_reference_mass_retained": 0.46532578251406104,
+                  "vertices": 192
+                },
+                "rightLowerLeg": {
+                  "dominant_match_fraction": 0.8465227817745803,
+                  "mean_l1": 0.5694060205311471,
+                  "mean_reference_mass_retained": 0.7152969897059505,
+                  "vertices": 417
+                },
+                "rightMiddleDistal": {
+                  "dominant_match_fraction": 0.9230769230769231,
+                  "mean_l1": 0.5545337799086358,
+                  "mean_reference_mass_retained": 0.7227331093579362,
+                  "vertices": 65
+                },
+                "rightMiddleIntermediate": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.6872977657160825,
+                  "mean_reference_mass_retained": 0.6563511153310538,
+                  "vertices": 18
+                },
+                "rightMiddleProximal": {
+                  "dominant_match_fraction": 0.8157894736842105,
+                  "mean_l1": 0.8590646155448287,
+                  "mean_reference_mass_retained": 0.5704676917374157,
+                  "vertices": 38
+                },
+                "rightRingDistal": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.605212050192058,
+                  "mean_reference_mass_retained": 0.6973939765660235,
+                  "vertices": 65
+                },
+                "rightRingIntermediate": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.7804922749647726,
+                  "mean_reference_mass_retained": 0.609753862983275,
+                  "vertices": 18
+                },
+                "rightRingProximal": {
+                  "dominant_match_fraction": 0.6739130434782609,
+                  "mean_l1": 0.8670958276211197,
+                  "mean_reference_mass_retained": 0.5664520870802706,
+                  "vertices": 46
+                },
+                "rightShoulder": {
+                  "dominant_match_fraction": 0.38461538461538464,
+                  "mean_l1": 1.059810927518829,
+                  "mean_reference_mass_retained": 0.47009453528060685,
+                  "vertices": 130
+                },
+                "rightThumbDistal": {
+                  "dominant_match_fraction": 0.9538461538461539,
+                  "mean_l1": 0.5130320657669352,
+                  "mean_reference_mass_retained": 0.7434839693445425,
+                  "vertices": 65
+                },
+                "rightThumbMetacarpal": {
+                  "dominant_match_fraction": 0.95,
+                  "mean_l1": 0.5435927966614403,
+                  "mean_reference_mass_retained": 0.7282036000394652,
+                  "vertices": 20
+                },
+                "rightThumbProximal": {
+                  "dominant_match_fraction": 0.8863636363636364,
+                  "mean_l1": 0.7852888998653587,
+                  "mean_reference_mass_retained": 0.6073555520569642,
+                  "vertices": 44
+                },
+                "rightToes": {
+                  "dominant_match_fraction": 0.9202898550724637,
+                  "mean_l1": 1.133746293248782,
+                  "mean_reference_mass_retained": 0.43312685452626487,
+                  "vertices": 138
+                },
+                "rightUpperArm": {
+                  "dominant_match_fraction": 0.6279863481228669,
+                  "mean_l1": 0.8988898665770275,
+                  "mean_reference_mass_retained": 0.5505550668513435,
+                  "vertices": 293
+                },
+                "rightUpperLeg": {
+                  "dominant_match_fraction": 0.8028985507246377,
+                  "mean_l1": 0.8845561061820822,
+                  "mean_reference_mass_retained": 0.5577219467871446,
+                  "vertices": 345
+                },
+                "spine": {
+                  "dominant_match_fraction": 0.4868421052631579,
+                  "mean_l1": 0.7130618570793237,
+                  "mean_reference_mass_retained": 0.6434690719750173,
+                  "vertices": 152
+                },
+                "upperChest": {
+                  "dominant_match_fraction": 0.20665083135391923,
+                  "mean_l1": 1.3442693366559146,
+                  "mean_reference_mass_retained": 0.32786533137339985,
+                  "vertices": 842
+                }
+              },
+              "mapped_only": {
+                "dominant_match_fraction": 0.5298643450091112,
+                "mean_l1": 1.0723363324780206,
+                "mean_reference_mass_retained": 0.46383183375908366,
+                "vertices": 9878
+              },
+              "mean_unmapped_mass_all_referenced": 0.0,
+              "referenced_native_vertices": 9878,
+              "unmapped_reference_vertices_excluded": 0
+            },
+            "method": "legacy_automatic",
+            "seconds": 0.203665166,
+            "status": "measured"
+          },
+          {
+            "agreement": {
+              "by_reference_dominant_humanoid_role": {
+                "chest": {
+                  "dominant_match_fraction": 0.8,
+                  "mean_l1": 0.5419771521550719,
+                  "mean_reference_mass_retained": 0.7290114226186124,
+                  "vertices": 30
+                },
+                "head": {
+                  "dominant_match_fraction": 0.9658493870402802,
+                  "mean_l1": 0.04764038311879502,
+                  "mean_reference_mass_retained": 0.9761798084451894,
+                  "vertices": 2284
+                },
+                "hips": {
+                  "dominant_match_fraction": 0.5629722921914357,
+                  "mean_l1": 0.9072335565053654,
+                  "mean_reference_mass_retained": 0.5463832216557637,
+                  "vertices": 794
+                },
+                "leftEye": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.0,
+                  "mean_reference_mass_retained": 1.0,
+                  "vertices": 122
+                },
+                "leftFoot": {
+                  "dominant_match_fraction": 0.9257294429708223,
+                  "mean_l1": 0.2379519199956458,
+                  "mean_reference_mass_retained": 0.8810240401421273,
+                  "vertices": 377
+                },
+                "leftHand": {
+                  "dominant_match_fraction": 0.41935483870967744,
+                  "mean_l1": 0.8405001028122091,
+                  "mean_reference_mass_retained": 0.5797499482628004,
+                  "vertices": 93
+                },
+                "leftIndexDistal": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.06636696561422856,
+                  "mean_reference_mass_retained": 0.9668165178304206,
+                  "vertices": 65
+                },
+                "leftIndexIntermediate": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.3885693535106441,
+                  "mean_reference_mass_retained": 0.8057153237356535,
+                  "vertices": 18
+                },
+                "leftIndexProximal": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.2234677510802424,
+                  "mean_reference_mass_retained": 0.8882661211429154,
+                  "vertices": 50
+                },
+                "leftLittleDistal": {
+                  "dominant_match_fraction": 0.9538461538461539,
+                  "mean_l1": 0.074017859610697,
+                  "mean_reference_mass_retained": 0.9629910687748253,
+                  "vertices": 65
+                },
+                "leftLittleIntermediate": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.4013845434523683,
+                  "mean_reference_mass_retained": 0.799307728387907,
+                  "vertices": 18
+                },
+                "leftLittleProximal": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.34568265749196686,
+                  "mean_reference_mass_retained": 0.8271586697366686,
+                  "vertices": 41
+                },
+                "leftLowerArm": {
+                  "dominant_match_fraction": 0.7239583333333334,
+                  "mean_l1": 0.44463968591597136,
+                  "mean_reference_mass_retained": 0.7776801558616978,
+                  "vertices": 192
+                },
+                "leftLowerLeg": {
+                  "dominant_match_fraction": 0.9328537170263789,
+                  "mean_l1": 0.1406192358284197,
+                  "mean_reference_mass_retained": 0.9296903818631967,
+                  "vertices": 417
+                },
+                "leftMiddleDistal": {
+                  "dominant_match_fraction": 0.9538461538461539,
+                  "mean_l1": 0.06839849448289569,
+                  "mean_reference_mass_retained": 0.9658007521942457,
+                  "vertices": 65
+                },
+                "leftMiddleIntermediate": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.3955657294562803,
+                  "mean_reference_mass_retained": 0.802217135870661,
+                  "vertices": 18
+                },
+                "leftMiddleProximal": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.3407154923594779,
+                  "mean_reference_mass_retained": 0.8296422549764684,
+                  "vertices": 38
+                },
+                "leftRingDistal": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.07254106721287942,
+                  "mean_reference_mass_retained": 0.96372946824441,
+                  "vertices": 65
+                },
+                "leftRingIntermediate": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.39322369658502154,
+                  "mean_reference_mass_retained": 0.8033881532777822,
+                  "vertices": 18
+                },
+                "leftRingProximal": {
+                  "dominant_match_fraction": 0.8260869565217391,
+                  "mean_l1": 0.48883771255696973,
+                  "mean_reference_mass_retained": 0.7555811458519469,
+                  "vertices": 46
+                },
+                "leftShoulder": {
+                  "dominant_match_fraction": 0.7384615384615385,
+                  "mean_l1": 0.5110141329516051,
+                  "mean_reference_mass_retained": 0.7444929318827413,
+                  "vertices": 130
+                },
+                "leftThumbDistal": {
+                  "dominant_match_fraction": 0.9538461538461539,
+                  "mean_l1": 0.0511762718379614,
+                  "mean_reference_mass_retained": 0.9744118637488439,
+                  "vertices": 65
+                },
+                "leftThumbMetacarpal": {
+                  "dominant_match_fraction": 0.95,
+                  "mean_l1": 0.48943231102464607,
+                  "mean_reference_mass_retained": 0.7552838443028675,
+                  "vertices": 20
+                },
+                "leftThumbProximal": {
+                  "dominant_match_fraction": 0.9318181818181818,
+                  "mean_l1": 0.28954071105677803,
+                  "mean_reference_mass_retained": 0.8552296429427504,
+                  "vertices": 44
+                },
+                "leftToes": {
+                  "dominant_match_fraction": 0.927536231884058,
+                  "mean_l1": 0.19143892168221482,
+                  "mean_reference_mass_retained": 0.904280538882683,
+                  "vertices": 138
+                },
+                "leftUpperArm": {
+                  "dominant_match_fraction": 0.931740614334471,
+                  "mean_l1": 0.240034832780549,
+                  "mean_reference_mass_retained": 0.8799825830930575,
+                  "vertices": 293
+                },
+                "leftUpperLeg": {
+                  "dominant_match_fraction": 0.991304347826087,
+                  "mean_l1": 0.18373465100090858,
+                  "mean_reference_mass_retained": 0.9081326745929968,
+                  "vertices": 345
+                },
+                "neck": {
+                  "dominant_match_fraction": 0.7310344827586207,
+                  "mean_l1": 0.7501599528630414,
+                  "mean_reference_mass_retained": 0.6249200242404769,
+                  "vertices": 290
+                },
+                "rightEye": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.0,
+                  "mean_reference_mass_retained": 1.0,
+                  "vertices": 122
+                },
+                "rightFoot": {
+                  "dominant_match_fraction": 0.9708222811671088,
+                  "mean_l1": 0.22895347896854315,
+                  "mean_reference_mass_retained": 0.8855232605442644,
+                  "vertices": 377
+                },
+                "rightHand": {
+                  "dominant_match_fraction": 0.41935483870967744,
+                  "mean_l1": 0.8405122723386516,
+                  "mean_reference_mass_retained": 0.5797438626418376,
+                  "vertices": 93
+                },
+                "rightIndexDistal": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.06636710771944557,
+                  "mean_reference_mass_retained": 0.9668164459909733,
+                  "vertices": 65
+                },
+                "rightIndexIntermediate": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.38856313307862633,
+                  "mean_reference_mass_retained": 0.8057184302461788,
+                  "vertices": 18
+                },
+                "rightIndexProximal": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.22347013965590967,
+                  "mean_reference_mass_retained": 0.8882649321469585,
+                  "vertices": 50
+                },
+                "rightLittleDistal": {
+                  "dominant_match_fraction": 0.9538461538461539,
+                  "mean_l1": 0.07401824687128826,
+                  "mean_reference_mass_retained": 0.9629908759214271,
+                  "vertices": 65
+                },
+                "rightLittleIntermediate": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.40138287899935277,
+                  "mean_reference_mass_retained": 0.7993085600816024,
+                  "vertices": 18
+                },
+                "rightLittleProximal": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.3456810647848451,
+                  "mean_reference_mass_retained": 0.8271594659825099,
+                  "vertices": 41
+                },
+                "rightLowerArm": {
+                  "dominant_match_fraction": 0.7239583333333334,
+                  "mean_l1": 0.44463914784101904,
+                  "mean_reference_mass_retained": 0.7776804265005667,
+                  "vertices": 192
+                },
+                "rightLowerLeg": {
+                  "dominant_match_fraction": 0.9088729016786571,
+                  "mean_l1": 0.1565772906713462,
+                  "mean_reference_mass_retained": 0.9217113541623404,
+                  "vertices": 417
+                },
+                "rightMiddleDistal": {
+                  "dominant_match_fraction": 0.9538461538461539,
+                  "mean_l1": 0.06840143187141363,
+                  "mean_reference_mass_retained": 0.9657992840925995,
+                  "vertices": 65
+                },
+                "rightMiddleIntermediate": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.39557073044356206,
+                  "mean_reference_mass_retained": 0.80221463482814,
+                  "vertices": 18
+                },
+                "rightMiddleProximal": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.34072715075733034,
+                  "mean_reference_mass_retained": 0.8296364236139021,
+                  "vertices": 38
+                },
+                "rightRingDistal": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.07254231762452013,
+                  "mean_reference_mass_retained": 0.9637288413457191,
+                  "vertices": 65
+                },
+                "rightRingIntermediate": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.3932224263244923,
+                  "mean_reference_mass_retained": 0.8033887862860947,
+                  "vertices": 18
+                },
+                "rightRingProximal": {
+                  "dominant_match_fraction": 0.8260869565217391,
+                  "mean_l1": 0.48884170488535206,
+                  "mean_reference_mass_retained": 0.7555791515144956,
+                  "vertices": 46
+                },
+                "rightShoulder": {
+                  "dominant_match_fraction": 0.7384615384615385,
+                  "mean_l1": 0.5140745477613118,
+                  "mean_reference_mass_retained": 0.7429627250868295,
+                  "vertices": 130
+                },
+                "rightThumbDistal": {
+                  "dominant_match_fraction": 0.9538461538461539,
+                  "mean_l1": 0.05117900097111012,
+                  "mean_reference_mass_retained": 0.9744105001779704,
+                  "vertices": 65
+                },
+                "rightThumbMetacarpal": {
+                  "dominant_match_fraction": 0.95,
+                  "mean_l1": 0.48945495048981513,
+                  "mean_reference_mass_retained": 0.7552725262277462,
+                  "vertices": 20
+                },
+                "rightThumbProximal": {
+                  "dominant_match_fraction": 0.9318181818181818,
+                  "mean_l1": 0.28954762124943983,
+                  "mean_reference_mass_retained": 0.8552261872756289,
+                  "vertices": 44
+                },
+                "rightToes": {
+                  "dominant_match_fraction": 0.927536231884058,
+                  "mean_l1": 0.19143575590718226,
+                  "mean_reference_mass_retained": 0.9042821224799444,
+                  "vertices": 138
+                },
+                "rightUpperArm": {
+                  "dominant_match_fraction": 0.931740614334471,
+                  "mean_l1": 0.24035498107327455,
+                  "mean_reference_mass_retained": 0.879822510042971,
+                  "vertices": 293
+                },
+                "rightUpperLeg": {
+                  "dominant_match_fraction": 0.991304347826087,
+                  "mean_l1": 0.18531390735081948,
+                  "mean_reference_mass_retained": 0.9073430454276346,
+                  "vertices": 345
+                },
+                "spine": {
+                  "dominant_match_fraction": 0.7763157894736842,
+                  "mean_l1": 0.49151830019540094,
+                  "mean_reference_mass_retained": 0.7542408520429639,
+                  "vertices": 152
+                },
+                "upperChest": {
+                  "dominant_match_fraction": 0.1496437054631829,
+                  "mean_l1": 1.309404409285537,
+                  "mean_reference_mass_retained": 0.34529779494687407,
+                  "vertices": 842
+                }
+              },
+              "mapped_only": {
+                "dominant_match_fraction": 0.822433691030573,
+                "mean_l1": 0.3632387140328536,
+                "mean_reference_mass_retained": 0.8183806428731527,
+                "vertices": 9878
+              },
+              "mean_unmapped_mass_all_referenced": 0.0,
+              "referenced_native_vertices": 9878,
+              "unmapped_reference_vertices_excluded": 0
+            },
+            "method": "surface_heat",
+            "seconds": 1.839729956,
+            "status": "measured"
+          },
+          {
+            "agreement": {
+              "by_reference_dominant_humanoid_role": {
+                "chest": {
+                  "dominant_match_fraction": 0.6666666666666666,
+                  "mean_l1": 0.6673601233930206,
+                  "mean_reference_mass_retained": 0.6663199392969006,
+                  "vertices": 30
+                },
+                "head": {
+                  "dominant_match_fraction": 0.9811733800350263,
+                  "mean_l1": 0.031072803720667223,
+                  "mean_reference_mass_retained": 0.9844635981380347,
+                  "vertices": 2284
+                },
+                "hips": {
+                  "dominant_match_fraction": 0.6952141057934509,
+                  "mean_l1": 0.9333054831449477,
+                  "mean_reference_mass_retained": 0.5333472583383824,
+                  "vertices": 794
+                },
+                "leftEye": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.0,
+                  "mean_reference_mass_retained": 1.0,
+                  "vertices": 122
+                },
+                "leftFoot": {
+                  "dominant_match_fraction": 0.9681697612732095,
+                  "mean_l1": 0.4251640938147333,
+                  "mean_reference_mass_retained": 0.7874179525685323,
+                  "vertices": 377
+                },
+                "leftHand": {
+                  "dominant_match_fraction": 0.3978494623655914,
+                  "mean_l1": 0.9486729089538367,
+                  "mean_reference_mass_retained": 0.5256635456833091,
+                  "vertices": 93
+                },
+                "leftIndexDistal": {
+                  "dominant_match_fraction": 0.9076923076923077,
+                  "mean_l1": 0.3201707875129638,
+                  "mean_reference_mass_retained": 0.8399146056954706,
+                  "vertices": 65
+                },
+                "leftIndexIntermediate": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.36828669804542424,
+                  "mean_reference_mass_retained": 0.8158566507444572,
+                  "vertices": 18
+                },
+                "leftIndexProximal": {
+                  "dominant_match_fraction": 0.96,
+                  "mean_l1": 0.5147068390016754,
+                  "mean_reference_mass_retained": 0.7426465808903177,
+                  "vertices": 50
+                },
+                "leftLittleDistal": {
+                  "dominant_match_fraction": 0.8153846153846154,
+                  "mean_l1": 0.4237427651976736,
+                  "mean_reference_mass_retained": 0.7881286167456554,
+                  "vertices": 65
+                },
+                "leftLittleIntermediate": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.42582566776416375,
+                  "mean_reference_mass_retained": 0.7870871634015607,
+                  "vertices": 18
+                },
+                "leftLittleProximal": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.5673219174667615,
+                  "mean_reference_mass_retained": 0.7163390430384036,
+                  "vertices": 41
+                },
+                "leftLowerArm": {
+                  "dominant_match_fraction": 0.71875,
+                  "mean_l1": 0.6682793548256981,
+                  "mean_reference_mass_retained": 0.665860322556834,
+                  "vertices": 192
+                },
+                "leftLowerLeg": {
+                  "dominant_match_fraction": 0.8800959232613909,
+                  "mean_l1": 0.48142260130674125,
+                  "mean_reference_mass_retained": 0.7592886990696892,
+                  "vertices": 417
+                },
+                "leftMiddleDistal": {
+                  "dominant_match_fraction": 0.8615384615384616,
+                  "mean_l1": 0.34953665485071816,
+                  "mean_reference_mass_retained": 0.8252316724421066,
+                  "vertices": 65
+                },
+                "leftMiddleIntermediate": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.4079075620592468,
+                  "mean_reference_mass_retained": 0.7960462178579636,
+                  "vertices": 18
+                },
+                "leftMiddleProximal": {
+                  "dominant_match_fraction": 0.9210526315789473,
+                  "mean_l1": 0.7136163618508875,
+                  "mean_reference_mass_retained": 0.6431918202509637,
+                  "vertices": 38
+                },
+                "leftRingDistal": {
+                  "dominant_match_fraction": 0.8923076923076924,
+                  "mean_l1": 0.35730552922905634,
+                  "mean_reference_mass_retained": 0.8213472352959216,
+                  "vertices": 65
+                },
+                "leftRingIntermediate": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.39614566873278856,
+                  "mean_reference_mass_retained": 0.8019271670047197,
+                  "vertices": 18
+                },
+                "leftRingProximal": {
+                  "dominant_match_fraction": 0.8043478260869565,
+                  "mean_l1": 0.786423505621726,
+                  "mean_reference_mass_retained": 0.6067882472296292,
+                  "vertices": 46
+                },
+                "leftShoulder": {
+                  "dominant_match_fraction": 0.7076923076923077,
+                  "mean_l1": 0.5030754802452824,
+                  "mean_reference_mass_retained": 0.7484622584875391,
+                  "vertices": 130
+                },
+                "leftThumbDistal": {
+                  "dominant_match_fraction": 0.8153846153846154,
+                  "mean_l1": 0.35706859109722644,
+                  "mean_reference_mass_retained": 0.8214657040788577,
+                  "vertices": 65
+                },
+                "leftThumbMetacarpal": {
+                  "dominant_match_fraction": 0.9,
+                  "mean_l1": 0.35495326485707895,
+                  "mean_reference_mass_retained": 0.8225233715761476,
+                  "vertices": 20
+                },
+                "leftThumbProximal": {
+                  "dominant_match_fraction": 0.9545454545454546,
+                  "mean_l1": 0.45955335010285236,
+                  "mean_reference_mass_retained": 0.77022332585873,
+                  "vertices": 44
+                },
+                "leftToes": {
+                  "dominant_match_fraction": 0.8985507246376812,
+                  "mean_l1": 0.7364245368941145,
+                  "mean_reference_mass_retained": 0.631787732118991,
+                  "vertices": 138
+                },
+                "leftUpperArm": {
+                  "dominant_match_fraction": 0.9419795221843004,
+                  "mean_l1": 0.39413390677383076,
+                  "mean_reference_mass_retained": 0.8029330476055946,
+                  "vertices": 293
+                },
+                "leftUpperLeg": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.4285167933153317,
+                  "mean_reference_mass_retained": 0.7857416038565864,
+                  "vertices": 345
+                },
+                "neck": {
+                  "dominant_match_fraction": 0.9724137931034482,
+                  "mean_l1": 0.5788190389893778,
+                  "mean_reference_mass_retained": 0.7105904795033364,
+                  "vertices": 290
+                },
+                "rightEye": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.0,
+                  "mean_reference_mass_retained": 1.0,
+                  "vertices": 122
+                },
+                "rightFoot": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.33555094850212475,
+                  "mean_reference_mass_retained": 0.8322245252245285,
+                  "vertices": 377
+                },
+                "rightHand": {
+                  "dominant_match_fraction": 0.3978494623655914,
+                  "mean_l1": 0.9486654843301012,
+                  "mean_reference_mass_retained": 0.5256672583957457,
+                  "vertices": 93
+                },
+                "rightIndexDistal": {
+                  "dominant_match_fraction": 0.9076923076923077,
+                  "mean_l1": 0.32017269466816806,
+                  "mean_reference_mass_retained": 0.8399136543136405,
+                  "vertices": 65
+                },
+                "rightIndexIntermediate": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.368281665178231,
+                  "mean_reference_mass_retained": 0.815859169040699,
+                  "vertices": 18
+                },
+                "rightIndexProximal": {
+                  "dominant_match_fraction": 0.96,
+                  "mean_l1": 0.5146983603899676,
+                  "mean_reference_mass_retained": 0.7426508177374801,
+                  "vertices": 50
+                },
+                "rightLittleDistal": {
+                  "dominant_match_fraction": 0.8153846153846154,
+                  "mean_l1": 0.42374622824902713,
+                  "mean_reference_mass_retained": 0.7881268859184705,
+                  "vertices": 65
+                },
+                "rightLittleIntermediate": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.42582741145872416,
+                  "mean_reference_mass_retained": 0.7870862949949999,
+                  "vertices": 18
+                },
+                "rightLittleProximal": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.567319109143041,
+                  "mean_reference_mass_retained": 0.7163404470185424,
+                  "vertices": 41
+                },
+                "rightLowerArm": {
+                  "dominant_match_fraction": 0.71875,
+                  "mean_l1": 0.6682902876068496,
+                  "mean_reference_mass_retained": 0.6658548559261517,
+                  "vertices": 192
+                },
+                "rightLowerLeg": {
+                  "dominant_match_fraction": 0.7841726618705036,
+                  "mean_l1": 0.5153542369658991,
+                  "mean_reference_mass_retained": 0.7423228816429573,
+                  "vertices": 417
+                },
+                "rightMiddleDistal": {
+                  "dominant_match_fraction": 0.8615384615384616,
+                  "mean_l1": 0.34953853937478385,
+                  "mean_reference_mass_retained": 0.8252307306887191,
+                  "vertices": 65
+                },
+                "rightMiddleIntermediate": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.40790710669424796,
+                  "mean_reference_mass_retained": 0.7960464422032237,
+                  "vertices": 18
+                },
+                "rightMiddleProximal": {
+                  "dominant_match_fraction": 0.9210526315789473,
+                  "mean_l1": 0.7136167762404162,
+                  "mean_reference_mass_retained": 0.6431916120268428,
+                  "vertices": 38
+                },
+                "rightRingDistal": {
+                  "dominant_match_fraction": 0.8923076923076924,
+                  "mean_l1": 0.3573028474427186,
+                  "mean_reference_mass_retained": 0.8213485759419318,
+                  "vertices": 65
+                },
+                "rightRingIntermediate": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.39614087480157584,
+                  "mean_reference_mass_retained": 0.8019295611246181,
+                  "vertices": 18
+                },
+                "rightRingProximal": {
+                  "dominant_match_fraction": 0.8043478260869565,
+                  "mean_l1": 0.7864243093126156,
+                  "mean_reference_mass_retained": 0.6067878447363079,
+                  "vertices": 46
+                },
+                "rightShoulder": {
+                  "dominant_match_fraction": 0.7076923076923077,
+                  "mean_l1": 0.5026409514293874,
+                  "mean_reference_mass_retained": 0.7486795239700893,
+                  "vertices": 130
+                },
+                "rightThumbDistal": {
+                  "dominant_match_fraction": 0.8153846153846154,
+                  "mean_l1": 0.35707036995200003,
+                  "mean_reference_mass_retained": 0.8214648132186669,
+                  "vertices": 65
+                },
+                "rightThumbMetacarpal": {
+                  "dominant_match_fraction": 0.9,
+                  "mean_l1": 0.3549511488921894,
+                  "mean_reference_mass_retained": 0.822524424715715,
+                  "vertices": 20
+                },
+                "rightThumbProximal": {
+                  "dominant_match_fraction": 0.9545454545454546,
+                  "mean_l1": 0.4595448795970377,
+                  "mean_reference_mass_retained": 0.7702275606671425,
+                  "vertices": 44
+                },
+                "rightToes": {
+                  "dominant_match_fraction": 0.043478260869565216,
+                  "mean_l1": 1.057009201322445,
+                  "mean_reference_mass_retained": 0.47149539945645846,
+                  "vertices": 138
+                },
+                "rightUpperArm": {
+                  "dominant_match_fraction": 0.9419795221843004,
+                  "mean_l1": 0.3931420841850054,
+                  "mean_reference_mass_retained": 0.8034289576158629,
+                  "vertices": 293
+                },
+                "rightUpperLeg": {
+                  "dominant_match_fraction": 1.0,
+                  "mean_l1": 0.4297230273669213,
+                  "mean_reference_mass_retained": 0.7851384859440106,
+                  "vertices": 345
+                },
+                "spine": {
+                  "dominant_match_fraction": 0.5723684210526315,
+                  "mean_l1": 0.6481020651899622,
+                  "mean_reference_mass_retained": 0.6759489668413238,
+                  "vertices": 152
+                },
+                "upperChest": {
+                  "dominant_match_fraction": 0.035629453681710214,
+                  "mean_l1": 1.4185463695067426,
+                  "mean_reference_mass_retained": 0.29072681504310954,
+                  "vertices": 842
+                }
+              },
+              "mapped_only": {
+                "dominant_match_fraction": 0.8040089086859689,
+                "mean_l1": 0.49656892728540314,
+                "mean_reference_mass_retained": 0.7517155362614549,
+                "vertices": 9878
+              },
+              "mean_unmapped_mass_all_referenced": 0.0,
+              "referenced_native_vertices": 9878,
+              "unmapped_reference_vertices_excluded": 0
+            },
+            "method": "anatomical",
+            "seconds": 1.768557464,
+            "status": "measured"
+          }
+        ],
+        "parts": 19,
+        "reference": 12
+      }
+    ],
+    "scope": "Descriptive native source workflow quality measurement; exact source node/primitive/accessor correspondence, artist influence payload physically removed before fitting and all solver methods. Refusals retained; no universal visual-quality threshold."
+  },
+  "preserved_failure": "artifacts/humanoid-native-weight-quality-proof-20261112/status.json terminal1: duplicate fixture entry-point compile; source db1144e2 and raw logs unchanged",
+  "remaining": [
+    "Independent posed positions/normals/silhouette comparison around hips, chest, palms and shoulders",
+    "Broader models, edited topology, nonrigid current source, resource/failure and visual/headset workflows",
+    "Artist references are descriptive, not the only legitimate skinning result"
+  ]
+}

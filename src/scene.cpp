@@ -875,7 +875,7 @@ Scene Scene::decode_owning(const nlohmann::json &j,
     if(version<13 && j.at("polygon_sources").at("version")!=1)throw std::invalid_argument("Exact polygon placement requires Scene13");
     if(version<14 && j.at("polygon_sources").at("version")==3)
       throw std::invalid_argument("Current polygon corner colors require Scene14");
-    detail::PolygonSceneArchive::preflight(j.at("polygon_sources"),objects,(shared_corner_context||canonical_paint_context||polygon_surface_context)?&j.at("source_materials"):nullptr,canonical_paint_context?&j.at("canonical_paint"):nullptr,polygon_surface_context?&j.at("polygon_surfaces"):nullptr,version==40?&j.at("texture_set_geometry"):nullptr);
+    detail::PolygonSceneArchive::preflight(j.at("polygon_sources"),objects,(shared_corner_context||canonical_paint_context||polygon_surface_context)?&j.at("source_materials"):nullptr,canonical_paint_context?&j.at("canonical_paint"):nullptr,polygon_surface_context?&j.at("polygon_surfaces"):nullptr,version==40?&j.at("texture_set_geometry"):nullptr,source_paint_context);
     const auto &material_records=j.at("source_materials").at("bindings");
     const auto &model_records=j.at("source_models");
     if(!material_records.is_array() || material_records.size()>256 || !model_records.is_array() || model_records.size()>16)

@@ -1,0 +1,264 @@
+{
+  "state": "terminal-Release-original4977-functional-public-workflows-passed",
+  "epoch": 1794443176.266532,
+  "source": "4977fb320afcc9b4d0ed486d4152c62b8018c324",
+  "source_admission": {
+    "original": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-hdr-owning-build-20261111/release-owning-status.json",
+      "sha256": "fcc9a347b0df76f1d194ddead997eb5689a3e6e1d6b785f7cc468ff692682e27",
+      "exit": 1,
+      "failure_retained": true
+    },
+    "supplement": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-hdr-owning-build-20261111/release-helper-completion-v1/status.json",
+      "sha256": "5860336901888eac00a9137953550ec60dd7e4c1ff16891c0379ba72a2ad939d",
+      "exit": 0
+    },
+    "classification": "Explicit EXCLUDE_FROM_ALL helper completion; original failed driver is unchanged, not relabelled."
+  },
+  "scope": "Exact original4977 Release currentABI app/workflow/font/runtime and originalUV0 FLOAT public source. Reuses already qualified V4 CPU producer/font; new V6 GUI10/XR33 execute after copied Xvfb lifetime repair. No correctedSource8/HDR32F/fitting integration claim.",
+  "new_public_checks": 43,
+  "profiles": {
+    "release": {
+      "gui": {
+        "status": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/baked-emission-public-v6-20261112/release-gui-v1/status.json",
+          "sha256": "63b823dc43e2b938f15cf0919e7a1bef0e174886fdfa7cde9fa56462ba690a34"
+        },
+        "report": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/baked-emission-public-v6-20261112/release-gui-v1/workflow/report.json",
+          "sha256": "ec8734e9448a6ac0b01e13c757ca1dd607dd5595a6c1fd7b6e236cc4771eba8f"
+        },
+        "checks": 10,
+        "process_exit": 0,
+        "coordinator_exit": 0,
+        "input_drift": [],
+        "external_guard": null,
+        "remaining_owned_processes": {},
+        "actual_app_pids": [
+          2693258,
+          2694592
+        ],
+        "critical_observed": [
+          "canonical_FLTK",
+          "consumer",
+          "system_GLX",
+          "system_gallium"
+        ],
+        "seconds_observed_not_performance_acceptance": 14.099606433010194,
+        "peak_descendant_RSS_bytes": 365363200,
+        "lease_acquired_epoch": 1794443037.15642,
+        "lease_released_epoch": 1794443052.1826355,
+        "pins_reverified": 4441
+      },
+      "xr": {
+        "status": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/baked-emission-public-v6-20261112/release-xr-v1/status.json",
+          "sha256": "f722c08a0169c4418405ba1a89ad182da0ad0eed3a1988806c628997b5587e93"
+        },
+        "report": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/baked-emission-public-v6-20261112/release-xr-v1/workflow/report.json",
+          "sha256": "3f734eed98b7e725129b65d7f7b5b24b068ab6f623644d4d3346ba56c280f118"
+        },
+        "checks": 33,
+        "process_exit": 0,
+        "coordinator_exit": 0,
+        "input_drift": [],
+        "external_guard": null,
+        "remaining_owned_processes": {},
+        "actual_app_pids": [
+          2696853
+        ],
+        "critical_observed": [
+          "canonical_FLTK",
+          "consumer",
+          "observer",
+          "real_OpenXR_loader",
+          "runtime",
+          "system_EGL",
+          "system_gallium"
+        ],
+        "seconds_observed_not_performance_acceptance": 12.967707164003514,
+        "peak_descendant_RSS_bytes": 213049344,
+        "lease_acquired_epoch": 1794443066.3861444,
+        "lease_released_epoch": 1794443080.310443,
+        "pins_reverified": 4449
+      }
+    }
+  },
+  "provider_targets": {
+    "app": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-hdr-owning-build-20261111/release/dome-sculpt",
+      "sha256": "862ef91c6095680fa8b09666ea016bc3470c081b71e71d1a555b426b38e35bb7"
+    },
+    "workflow": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-hdr-owning-build-20261111/release/dome-sculpt-baked-emission-workflow-test",
+      "sha256": "540784d6d7c5f575f1ea55d2bebf0c3a46f1de4bbf4f519449ecaa26479e8e7f"
+    },
+    "font": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-hdr-owning-build-20261111/release/dome-sculpt-baked-emission-font-reference",
+      "sha256": "5a6d41cb3bb80abccf1d402c6f41abc9ab8223e849272829f8d305d45b40a425"
+    },
+    "runtime": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-hdr-owning-build-20261111/release/libdome-sculpt-baked-emission-runtime.so",
+      "sha256": "427507bff093f73129ce5a352a130b8ae9b53ff8a231aa0bdc207263b7a172a1"
+    }
+  },
+  "provider_pins_reverified": 4425,
+  "all_V1_V5_files_unchanged": 1228,
+  "fixture_repair": {
+    "source_path": "/home/blux/de-xr/dome-sculpt/artifacts/gui-recovery-20261111/bin/Xvfb",
+    "source_sha256": "f9477bb30479d0df433133f315740b0de60e38bd8d4caa8fb3be37c756575c76",
+    "staged_path": "/home/blux/de-xr/dome-sculpt/artifacts/baked-emission-public-v6-20261112/bin/Xvfb",
+    "staged_sha256": "a0cbc976ca65fec4a269ccf3b87f17776879a25d581ad52534763c0fcfeb972b",
+    "exact_change": "exec bwrap \u2192 exec bwrap --die-with-parent",
+    "underlying_Xvfb_provider": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/gui-recovery-20261111/deps/usr/bin/Xvfb",
+      "sha256": "83ee48fef2a12fd70572e2c63d5278735ff0afbed06864165076ee27d3d1f9ff"
+    },
+    "cause": "V5 exact owned Xvfb child outlived the tracked bwrap wrapper; original unchanged scenario finally terminates/waits wrapper. Parent-death binding keeps sandbox command lifetime owned. Original wrapper unchanged."
+  },
+  "native_canvas_proof": {
+    "state": "read-only-native-canvas-proof-passed",
+    "epoch": 1794443136.323766,
+    "native": {
+      "desktop": {
+        "actual": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/baked-emission-public-v6-20261112/release-gui-v1/workflow/home/actual.dsculpt",
+          "sha256": "b0bae1b50c6050d8a6bfd151abf1912281c9672da53de4b7519e4c094388d497"
+        },
+        "expected": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/baked-emission-public-v4-20261111/release-producer-v1/native/desktop-accepted.dsculpt",
+          "sha256": "b0bae1b50c6050d8a6bfd151abf1912281c9672da53de4b7519e4c094388d497"
+        },
+        "whole_file_byteexact": true
+      },
+      "XR": {
+        "actual": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/baked-emission-public-v6-20261112/release-xr-v1/workflow/apply-history/final.dsculpt",
+          "sha256": "b0bae1b50c6050d8a6bfd151abf1912281c9672da53de4b7519e4c094388d497"
+        },
+        "expected": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/baked-emission-public-v4-20261111/release-producer-v1/native/xr-accepted.dsculpt",
+          "sha256": "b0bae1b50c6050d8a6bfd151abf1912281c9672da53de4b7519e4c094388d497"
+        },
+        "whole_file_byteexact": true
+      }
+    },
+    "desktop_canvas": {
+      "size": [
+        1060,
+        760
+      ],
+      "source_defined_status_bar_excluded_pixels": 28,
+      "crop": [
+        0,
+        0,
+        1060,
+        732
+      ],
+      "checks": {
+        "visible_change": {
+          "whole_canvas_exact": false,
+          "changed_components": 484812,
+          "maximum_difference": 120,
+          "bbox": [
+            329,
+            165,
+            731,
+            567
+          ]
+        },
+        "Undo": {
+          "whole_canvas_exact": true,
+          "changed_components": 0,
+          "maximum_difference": 0,
+          "bbox": null
+        },
+        "Redo": {
+          "whole_canvas_exact": true,
+          "changed_components": 0,
+          "maximum_difference": 0,
+          "bbox": null
+        },
+        "fresh_reopen": {
+          "whole_canvas_exact": true,
+          "changed_components": 0,
+          "maximum_difference": 0,
+          "bbox": null
+        }
+      }
+    },
+    "XR_runtime_ownership": {
+      "frames_waited": 157,
+      "frames_begun": 157,
+      "frames_ended": 157,
+      "acquires": 270,
+      "image_waits": 270,
+      "releases": 270,
+      "swapchains_destroyed": 2,
+      "gl_renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)"
+    },
+    "source_images": {
+      "/home/blux/de-xr/dome-sculpt/artifacts/baked-emission-public-v6-20261112/release-gui-v1/workflow/before.png": "90088aea498cf7bafef672049f715a66b2bf9f99d47362d4d597fe338844aa25",
+      "/home/blux/de-xr/dome-sculpt/artifacts/baked-emission-public-v6-20261112/release-gui-v1/workflow/accepted.png": "382949cb53965a1878ed7d15952c3da745eb3930812501a8a4bcbe66edda731a",
+      "/home/blux/de-xr/dome-sculpt/artifacts/baked-emission-public-v6-20261112/release-gui-v1/workflow/undone.png": "dc215d65b127f440bac5c1ff81536960468e9802b17ace134f7b77fbe82f6b9d",
+      "/home/blux/de-xr/dome-sculpt/artifacts/baked-emission-public-v6-20261112/release-gui-v1/workflow/redone.png": "382949cb53965a1878ed7d15952c3da745eb3930812501a8a4bcbe66edda731a",
+      "/home/blux/de-xr/dome-sculpt/artifacts/baked-emission-public-v6-20261112/release-gui-v1/workflow/reopened.png": "4afd87d4fdabb0c3ec48c689f0b78d54e197513cf4e3df51f6208eff3854bb71"
+    },
+    "limitations": [
+      "Canvas equality excludes the original source-defined28px status bar, same prior predicate. No threshold learned.",
+      "FLOAT4096-texel numeric endpoint is independent of displayed-image oracle.",
+      "XR final fresh reopen is native Scene loader inspector, not second XR app.",
+      "No deterministic mid-helper cancellation, nativeWayland, physicalHMD, HDR calibration or performance acceptance."
+    ]
+  },
+  "no_live_owned_processes": true,
+  "common_graphics_lock_free_at_verification": true,
+  "original_failure_preservation": {
+    "V4_coordinator": 1,
+    "V5_coordinator": 1,
+    "V5_explicit_user_pause_session": 130,
+    "original_owning_coordinator": 1,
+    "neither_relabelled": true
+  },
+  "evidence": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/baked-emission-public-v6-20261112/release-gui-v1/status.json": "63b823dc43e2b938f15cf0919e7a1bef0e174886fdfa7cde9fa56462ba690a34",
+    "/home/blux/de-xr/dome-sculpt/artifacts/baked-emission-public-v6-20261112/release-gui-v1/workflow/report.json": "ec8734e9448a6ac0b01e13c757ca1dd607dd5595a6c1fd7b6e236cc4771eba8f",
+    "/home/blux/de-xr/dome-sculpt/artifacts/baked-emission-public-v6-20261112/release-gui-v1/owned-processes-driver-return.json": "a8b96703e70fc0d980cd3ebf03f6c10f21c574127cfc8e3f5323a6d8e82372c7",
+    "/home/blux/de-xr/dome-sculpt/artifacts/baked-emission-public-v6-20261112/release-gui-v1/owned-processes-finally.json": "0f2c82b5311ae5a0f4820fad092a48d848da5a6281484553fc908b2787c7df5c",
+    "/home/blux/de-xr/dome-sculpt/artifacts/baked-emission-public-v6-20261112/release-gui-v1/owned-process-observations.jsonl": "2ffb8a3d1aead22d6b29f62106ed14c0c3015a1328c4b443aae14261d7c19e05",
+    "/home/blux/de-xr/dome-sculpt/artifacts/baked-emission-public-v6-20261112/release-gui-v1/owned-process-ledger.json": "f6022b517a434953d4fe8fc8e749a65772b2c8b6c7e835d78d391fbb41719798",
+    "/home/blux/de-xr/dome-sculpt/artifacts/baked-emission-public-v6-20261112/release-gui-v1/mapped-ELFs.json": "e883a35c08c0d0967e54aeaeb0bedcdea621a2239aff0f2e6caa7976cde0de36",
+    "/home/blux/de-xr/dome-sculpt/artifacts/baked-emission-public-v6-20261112/release-gui-v1/readable-DRI.json": "d4993b1bdfccd1f41ca0417f7cbb38c6a8776552687121bfe21dffcda96c3bf1",
+    "/home/blux/de-xr/dome-sculpt/artifacts/baked-emission-public-v6-20261112/release-gui-v1/process.log": "380530dfd8d2e0c36c3df0cb35e73a8763664524fe77d7ca42c3040415c3d8ca",
+    "/home/blux/de-xr/dome-sculpt/artifacts/baked-emission-public-v6-20261112/release-xr-v1/status.json": "f722c08a0169c4418405ba1a89ad182da0ad0eed3a1988806c628997b5587e93",
+    "/home/blux/de-xr/dome-sculpt/artifacts/baked-emission-public-v6-20261112/release-xr-v1/workflow/report.json": "3f734eed98b7e725129b65d7f7b5b24b068ab6f623644d4d3346ba56c280f118",
+    "/home/blux/de-xr/dome-sculpt/artifacts/baked-emission-public-v6-20261112/release-xr-v1/owned-processes-driver-return.json": "1841eda88e9029b3256a98f5cc61e18c32bc97d533625b62532528da3eecf884",
+    "/home/blux/de-xr/dome-sculpt/artifacts/baked-emission-public-v6-20261112/release-xr-v1/owned-processes-finally.json": "3a0acca41a3cdea3a6afe64aca7dee10f5d7926ffcafc0333d2a7381d11fd1af",
+    "/home/blux/de-xr/dome-sculpt/artifacts/baked-emission-public-v6-20261112/release-xr-v1/owned-process-observations.jsonl": "150014e362e12639b4c52be945f4e89326687db8fdcaf6afcd4ad75bb4041218",
+    "/home/blux/de-xr/dome-sculpt/artifacts/baked-emission-public-v6-20261112/release-xr-v1/owned-process-ledger.json": "9233ea3f714086c13f1beb939140966f6f7afde3950cda3c3833034c84297c73",
+    "/home/blux/de-xr/dome-sculpt/artifacts/baked-emission-public-v6-20261112/release-xr-v1/mapped-ELFs.json": "038cd283fca77a4fe05f4fae50b38b58b493f9f660808e7df2c8dd38756c295b",
+    "/home/blux/de-xr/dome-sculpt/artifacts/baked-emission-public-v6-20261112/release-xr-v1/readable-DRI.json": "69ba9c37feb3b1ba37ff1a813fecd401083f33040ab0f3c1a55cca884ce7c3f5",
+    "/home/blux/de-xr/dome-sculpt/artifacts/baked-emission-public-v6-20261112/release-xr-v1/process.log": "237382401722b5bd653f8c7c7aabbf256ec1a9d7cd0f68638503d49499a72c3c",
+    "/home/blux/de-xr/dome-sculpt/artifacts/baked-emission-public-v6-20261112/release-xr-v1/actual-device/egl-query-0/context-maps.txt": "baa6ac8cabfe936e9c49ccb7c7d39f35fc4ed564b12396ee42d0a8b79e7fe164",
+    "/home/blux/de-xr/dome-sculpt/artifacts/baked-emission-public-v6-20261112/release-xr-v1/actual-device/egl-query-0/device.txt": "7c60bd3694334a2e758f3006db56e85548687e9c7223bcf1901df94e6616bcb4",
+    "/home/blux/de-xr/dome-sculpt/artifacts/baked-emission-public-v6-20261112/release-xr-v1/actual-device/egl-query-1/context-maps.txt": "baa6ac8cabfe936e9c49ccb7c7d39f35fc4ed564b12396ee42d0a8b79e7fe164",
+    "/home/blux/de-xr/dome-sculpt/artifacts/baked-emission-public-v6-20261112/release-xr-v1/actual-device/egl-query-1/device.txt": "7c60bd3694334a2e758f3006db56e85548687e9c7223bcf1901df94e6616bcb4",
+    "/home/blux/de-xr/dome-sculpt/artifacts/baked-emission-public-v6-20261112/wrapper-provenance.json": "c002cfdbcd11b6e569c19f734b617d92c90f37382cfb1f5a877d6035ac14f9e6",
+    "/home/blux/de-xr/dome-sculpt/artifacts/baked-emission-public-v6-20261112/wrapper.diff": "6a9a8cfe075f6a9e30456c5960919c3b5a2a10845d553ffa4a398f42ab0733da",
+    "/home/blux/de-xr/dome-sculpt/artifacts/baked-emission-public-v6-20261112/orchestration-v5-to-v6.diff": "9bf934f20a6c5639c6fe2a29f33340c3d54730f56059982394276a31c2622bf6",
+    "/home/blux/de-xr/dome-sculpt/artifacts/baked-emission-public-v6-20261112/scenario-provenance.json": "2d3369950a070e27b95bfbeaa1932cc2365d96bf06df24e361f5279b0fd71c39",
+    "/home/blux/de-xr/dome-sculpt/artifacts/baked-emission-public-v6-20261112/native-canvas-proof.json": "cf982644838ed03dfe74726acbb24d506384186b62f640ea34bee24b4cf5253e",
+    "/home/blux/de-xr/dome-sculpt/artifacts/baked-emission-public-v6-20261112/clearance-session-authorized-release.json": "3e4018338d7f5e0a8323fd48df0712d41e24d7b33b876d5f811a762adef4350b",
+    "/home/blux/de-xr/dome-sculpt/artifacts/baked-emission-public-v6-20261112/release-composite-admission.json": "e7cbb524b2e88ced00717aeb2c0b6f94a80bcb3d41e0a6a2afeaadc86ccacd5e"
+  },
+  "limitations": [
+    "Release functional scope only. Original frozen4977 source does not include later Source8/HDR32F/fitting candidates.",
+    "No strict sanitizer public workflow, nativeWayland shell, physicalHMD/device usability or timing/90Hz acceptance.",
+    "No deterministic mid-helper public cancellation from Save-next sequencing.",
+    "Desktop uses private Xvfb/software-requested GLX; XR uses actual OpenXR loader/Arc context with synthetic input.",
+    "XR final reopen uses a fresh native Scene loader inspector, not a second XR application.",
+    "Independent FLOAT4096-texel native numerical oracle and separate display/canvas/font checks retain their distinct scopes."
+  ]
+}

@@ -527,6 +527,16 @@ void PolygonSceneArchive::preflight(const nlohmann::json &j,
                                     const nlohmann::json *canonical_paint,
                                     const nlohmann::json *polygon_surfaces,
                                     const nlohmann::json *texture_geometry) {
+  preflight(j, objects, materials, canonical_paint, polygon_surfaces,
+            texture_geometry, SourcePaintDecodeContext{true, true});
+}
+void PolygonSceneArchive::preflight(const nlohmann::json &j,
+                                    const nlohmann::json &objects,
+                                    const nlohmann::json *materials,
+                                    const nlohmann::json *canonical_paint,
+                                    const nlohmann::json *polygon_surfaces,
+                                    const nlohmann::json *texture_geometry,
+                                    const SourcePaintDecodeContext &context) {
   if (!j.is_object() || !j.at("version").is_number_integer() ||
       (j.at("version") != 1 && j.at("version") != 2 && j.at("version") != 3 &&
        j.at("version") != 4 && j.at("version") != 5 && j.at("version") != 6 &&
@@ -904,7 +914,7 @@ void PolygonSceneArchive::preflight(const nlohmann::json &j,
         polygon_paint_policy(paint_archive_payload(
             j.at("paints")[polygon_archive_index(o.at("painted"),
                                                  j.at("paints").size())],
-            true, SourcePaintDecodeContext{true, true}))) {
+            true, context))) {
       if (o.at("mesh_active") != true || o.at("polygon").is_null())
         throw std::invalid_argument("Retained polygon-authored paint requires "
                                     "its own active authority");

@@ -1,0 +1,56 @@
+# Native humanoid pose comparison and mapped leg support
+
+Frozen product/test source: `d7565e69f478b0d79381353d2f4e382f5fb99363`, on `work/humanoid-component-leg-affine-20261112`. This changes Legacy Automatic's prospective seed domain for geometry-supported, explicitly mapped leg components. It does not change Surface Heat, Anatomical, the generic `automatic_bind` policy, public headers, source assets, default solver, or accepted weight locks. Qualification is scoped to native CPU consumers and the independent posed reference; it is not whole-application, XR, or performance qualification.
+
+## Independent reference
+
+`tests/humanoid-native-pose-quality.cpp` constructs both actual unskinned Creator sources and runs all three public authoring methods with their existing defaults and resource bounds. The fitting/solving source physically omits the original skin tables, joint-index accessors, inverse-bind matrices, weight accessors and their binary payloads. The existing source factory retains geometry/node hierarchy and supplies explicit human-role node positions as authoring landmarks; no original skin influences are supplied to fitting or solving. Only after **all three solver outputs have completed** does the fixture load the full original artist glTF/VRM reference.
+
+`tests/humanoid-pose-reference.hpp` independently evaluates the original node graph, full skin joint lists, inverse-bind matrices, affine local matrices, original morph defaults, and all positive source influences. It pairs every native vertex by the exact immutable `CreatorAppearance` node/mesh/primitive/source-vertex identity. It never substitutes nearest vertices or discards unmapped secondary joints. Both assets contain 19 native parts and 54 fitted bones: 9,851 female vertices and 9,878 male vertices. All are measured, including 1,110 female vertices with positive secondary artist-joint mass. The original graphs have 87/71 nodes, and two skins containing 83/67 joints each. These particular assets have no matrix-form nodes; preservation of general affine matrices is implemented, while the product's reflected/sheared world-metric path is exercised by the separate native regression.
+
+Before posing, native imported world positions agree with the full original artist rest skin within `4.35e-8 m` female / `6.51e-8 m` male. Actual native rest/deformation output is checked against a separate native LBS reconstruction. The fixed hard correctness bounds remain `1e-5 m` for rest and `2e-5` for the native operator checks; the descriptive artist-pose errors do not weaken those bounds. Each method has 23 poses using the same original physical joint pivot and declared world axis for both evaluations. Native exact local pose matrices preserve the native hierarchy, rest/space matrices and IBMs. The measured set includes hips, chest, head, both clavicles/arms/elbows/wrists/knees, and index/middle/thumb controls: 138 method/asset/pose comparisons in each qualification profile.
+
+Reports contain per-part/per-pose RMS/P95/max positions, authored-normal differences, geometric triangle-normal differences and native operator residuals. Authored normals use the stated weighted individual inverse-transpose convention; that is a descriptive convention, not a universal glTF shading oracle. Empty morph-weight vectors use the product's implicit-zero semantics. The whole accepted Scene is encoded before and after each complete const measurement loop and must remain exact. No source, paint, history or weight authority is mutated by comparison.
+
+## Visible defect and correction
+
+The independent comparison exposed severe Legacy Automatic calf/shoe tearing on knee bends. The existing intrinsic solver seeds each nearby bone at its own minimum on each disconnected component. A component belonging to one leg can therefore receive an opposite-leg seed at its top and retain that wrong influence over its entire surface. The original generic connected-hairpin regression also demonstrates why adding unconstrained per-vertex nearest-bone seeds would be wrong.
+
+The correction uses only the declared `leftUpperLeg` / `rightUpperLeg` roles and their descendant families. On the existing exact-position-welded connected components, every vertex must unanimously have the same **exact** nearest leg family. Cross-family ties and mixed components preserve the full original intrinsic domain. A unanimous component excludes only opposite-leg-family seeds. All other bones, component-minimum seed locations, surface-edge Dijkstra propagation, normalization and top-K behavior remain intact. Absent mirrored roles preserve the original policy. Generic non-humanoid callers never enter this analysis.
+
+The support query uses the existing exact nearest-source predicate and caller work ledger. Its extra storage is bounded by the existing component and bone limits; it does not allocate a vertex-by-bone array or increase work limits. An outward-rounded source box skips components where no old leg seed could be admitted. An authored rig outside the predicate's declared coordinate workspace keeps its original domain prospectively. Cancellation or budget refusal occurs before accepted Scene replacement. Positive user locks retain exact priority over the prospective support restriction.
+
+Whole-body knee error against the descriptive original artist reference, in millimetres:
+
+| Asset / knee | RMS before → after | P95 before → after | Maximum before → after |
+| --- | ---: | ---: | ---: |
+| Female left | 42.282 → 8.725 | 100.974 → 0.00016 | 332.769 → 114.963 |
+| Female right | 42.384 → 9.207 | 101.314 → 0.00024 | 332.770 → 115.545 |
+| Male left | 58.745 → 11.146 | 138.963 → 11.157 | 418.691 → 100.578 |
+| Male right | 58.761 → 11.230 | 138.963 → 11.259 | 418.691 → 100.578 |
+
+The calf/foot skin and shoes now follow their declared leg to floating precision. The remaining error is mainly thigh/pants deformation, so this is not a claim that automatic humanoid skinning is finished. All 92 Surface Heat/Anatomical pose reports are byte-exact before/after. The other 42 Legacy poses change position RMS/P95/max by at most `2.69e-11 m`; their complete reports are not claimed byte-exact. Source weight similarity alone would not establish this deformation result: for example, hips yaw remains effectively identical even where influence-mass similarity is weak.
+
+The committed before/after figures use the same CPU orthographic z-buffer and original-rest/posed camera bounds. Front/side panels shade actual posed normals and the final row shows positional error capped at 50 mm for display. They render solid geometry without material alpha or textures; these are geometric diagnostics, not screenshots of final material appearance. All numerical metrics still include all vertices. An additional female arm-lowering inspection showed shoulder differences but did not justify universal artist-matching changes.
+
+## Qualification and ownership
+
+Release and strict ASan/UBSan use the immutable, fresh `cc5e6aed9f103da3998684c6188dd143e23e676b` 193-member core provider. Each member is matched to its actual compilation route and whole object payload. Exactly `rig.cpp.o` and `skin-authoring.cpp.o` are replaced, with 191 member payloads unchanged. All 193 source/flag routes, full source/private-header closure, 103 public headers, literal asset macro strings, asset bytes and pinned SDK inputs are checked. The original provider is never written. The sanitizer core was independently snapshotted while its separate original ALL build could still run; that is not acceptance of that ALL build.
+
+Both final profiles are terminal success: all 45 Release steps and all 49 strict sanitizer steps pass. Each profile runs the 14 regression consumers plus the complete 138-pose comparison. All 138 final per-pose reports are byte-exact across Release and sanitizer. The final independent seal rechecks 12,481 unique frozen input pins with zero drift; no owned native executable remains live.
+
+Final Release reuses the qualified whole two-owner archive with byte-identical product source, then compiles and links all 14 consumer TUs afresh. It links the **same whole** frozen `ef8092df` independent pose-oracle object used on the unmodified baseline. Final strict sanitizer compilation rebuilds both whole changed owner TUs and the entire pose-oracle TU with the provider's exact flags, then compiles/links the 14 consumers. Leak detection is enabled, sanitizer failures halt, and no suppression or preload is introduced.
+
+The consumers cover mapped component support, generic intrinsic/hairpin behavior, skin authoring, affine skin/controller/export, fit authoring/controller/fault/import/metric, avatar, and rest-pose/authoring. The new actual public-authoring controls also cover exact reflected/sheared placement, ties, missing roles, positive foreign locks, fully locked no-op, tiny-work refusal, cancellation, whole Scene invariance and restart. Raw statuses, member snapshots, dependency closures, commands and logs are indexed by the accompanying JSON receipt.
+
+## Preserved failed attempts and limits
+
+The original measurement `v1` failed on an empty morph-weight vector; its raw native failure remains preserved. `v2` applies the product's actual implicit-zero morph semantics without changing artist influences. The first final qualification driver rejected an incorrect metadata assumption that every archive member came from `src/`; its corrected route identifies the actual compiler output, including third-party owners. The initial sanitizer plan was rejected before compilation because guessed Debug flags did not match the real Release sanitizer provider. The accepted plan uses the exact provider flags; neither flag gate nor provider was weakened. Original failed statuses and the initial failed font-dependent plot script remain untouched.
+
+Artist skin is a descriptive reference, not a sole universal quality target. Only the stated 23 poses and two bundled assets were measured. The generic tapered-component diagnostic still exposes the original unmapped policy; this patch intentionally requires real humanoid role authority. The CPU evidence does not claim textured renderer silhouettes, whole-app qualification, speed improvement, animation continuity or final humanoid-quality completion.
+
+Evidence shipped with this note:
+
+- [Scoped machine-readable receipt](validation/HUMANOID-POSE-QUALITY-20261112.json).
+- [Complete original baseline report, gzip JSON](validation/humanoid-pose-reference-before-20261112.json.gz), [complete Release report](validation/humanoid-pose-reference-release-20261112.json.gz), and [complete strict sanitizer report](validation/humanoid-pose-reference-sanitize-20261112.json.gz). Decompressing these yields the exact native JSON bytes, including every measured part and pose.
+- [Male knee before](validation/humanoid-pose-male-knee-before-20261112.png), [male knee after](validation/humanoid-pose-male-knee-after-20261112.png), and [female arm reference inspection](validation/humanoid-pose-female-arm-reference-20261112.png). The after figure is from the qualified product-identical Release prototype; the final affine-only test child preserves its product source and complete numerical comparison.

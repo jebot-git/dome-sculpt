@@ -1,0 +1,17 @@
+# Frozen 5c strict sanitizer build baseline
+
+The independently bounded strict ASan/UBSan materialization of frozen `5c820f342f16d8544158410c2125372811c152f3` completed with exit 0 and zero input drift. Three genuine generators, 265 whole translation units and 685 owning link/archive actions actually completed successfully. The final manifest contains 1,764 materialized outputs; 765 authenticated whole object files and 46 whole products were staged from matching sanitizer providers. No Release object or Release eligibility route was borrowed.
+
+This is **build-only baseline evidence**. Frozen 5c contains the confirmed mixed resolved-PBR-carrier / logical authored-UV1 emission sampling defect. The successful build does not grant product, public GUI/HMD, or later repair admission. No product application, native test, helper, producer, font renderer, software/Arc renderer, public GUI/HMD or installation was executed by this materialization. Genuine code generators ran as declared build prerequisites.
+
+The actual dependency graph retained compile, link, phony and order-only prerequisites. Every changed source/private-header/public-header/option owner uses a complete TU; affected consumers freshly link. Literal compiler defines, including source asset roots, are preserved. Actual source/profile/ALL boundaries, canonical sanitizer SDK, compiler/tool/runtime hashes and archive member provenance are pinned. The original 2284 plan remains preserved; its derived 3480 plan adds only the per-owner external-freshness audit and pins. All 765 reused owners were checked independently against 286,254 actual external dependency incidences across 683 distinct files, with zero newer-than-owner violations. The future planner fix applies that check per owner even when a dependency hash is already cached.
+
+The reviewed executor retained strict leak detection and halting sanitizer settings without suppressions. Its independent bound was 7,200 seconds for staging, generators, complete compilation, links and output sealing; at most two tasks and 8 GiB aggregate descendant RSS, with core dumps disabled. Initial and final immutable-input SHA audits each had a 600-second bound. All final archives were checked against complete own member payloads/order, and the complete output manifest was hashed. The final mandatory input audit reports no drift.
+
+The separately published immutable 193-member core archive and whole-object/source/SDK/flag receipts can support scoped repair qualification. They are independent read-only snapshots of completed source-5c owners and preserve the known defect. They never represent mutable partial output or acceptance of a repaired candidate.
+
+The original cc5 fresh ALL invocation remains a 7,200-second timeout/failure124. Its separately scoped remainder success remains distinct. All frozen source/provider trees, failure evidence and the disclosed inspection-created 121-byte LastTest log are preserved.
+
+The user requested: “Pause after this round.” After this baseline seal, no next-source configure, audit, build or runtime is launched. Prepared ad99/generic scripts remain unexecuted, and providers remain available for a later authorized continuation.
+
+[Machine-readable receipt](validation/5C-SANITIZER-BASELINE-BUILD-20261112.json) indexes the actual terminal status, action journal, staged-provider and owned-output SHA manifests, reviewed execution metadata and boundary/freshness evidence.

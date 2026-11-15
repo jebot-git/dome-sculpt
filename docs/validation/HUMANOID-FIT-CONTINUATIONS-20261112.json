@@ -1,0 +1,348 @@
+{
+  "schema": 1,
+  "source_base": "4977fb320afcc9b4d0ed486d4152c62b8018c324",
+  "source": "9cebf6abe933f87b7e978009a81ff26a8f8967a2",
+  "private_only": true,
+  "product_component": "Reviewed anatomical hand/finger continuation and full-affine explicit terminal world length; existing solver/default/UI commands preserved.",
+  "source_hashes": {
+    "src/avatar.cpp": "cf65aaaf1005ed58ee444999c33a45cfc129567395acd5abe453556f0dfe2cca",
+    "src/rig-fit.cpp": "aa86256fbfaa43a7a721e38e4ce9fad27bccd971af939c8451705876d5fb3165",
+    "src/humanoid-fit-continuation.hpp": "5e5b1f060f788bb7c7bbf81b694ccead969c11e5037a9215b567737b7153105a",
+    "tests/rig-fit-anatomical.cpp": "09964433693ffcf60f94c3bfc1be90f79fe791b0f593e64e1317d5bfba673e66",
+    "tests/skin-affine-controller.cpp": "1b2e396b54693dd27e52b0df5d7da1c0a454fddf7a23358396fef816e5dc878f",
+    "CMakeLists.txt": "9e92c42486485d33c6f650d5238c81801d782ea1756b7a12bc3696a5ed70680c"
+  },
+  "public_header_count": 103,
+  "public_header_manifest_sha256": "e1e6d478e96ab3f19a5f5c6d989c65aec6eca3c8f5bf4f36acd433515e6ad112",
+  "public_API_layout_or_scene_schema_changed": false,
+  "release": {
+    "scope": "Union of11 individual positive native cases over authenticated current4977 core with2complete owning TUs replaced/191memberbytesunchanged;freshconsumer TUs. Not a whole app build, and original raw failing cohorts remain failing.",
+    "cases": {
+      "rig-fit-anatomical": {
+        "receipt": "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-fitting-quality-proof-20261111/release-9cebf6/status.json",
+        "receipt_sha256": "a1c5aca60b6eea786b05674defab90df32a400bb428641e50bf70c9a81391b3b",
+        "individual_case": {
+          "name": "run-rig-fit-anatomical",
+          "native_exit": 0,
+          "seconds": 0.36491191200912,
+          "log_sha256": "448f85523c4917513a8c9d095c71c449c5c4df0a125b6916490f3ae4a353e05c"
+        },
+        "log_sha256": "448f85523c4917513a8c9d095c71c449c5c4df0a125b6916490f3ae4a353e05c",
+        "log_last_line": "PASS 725 anatomical fitting, actual CC0 support, deformation, affine, locks and history checks",
+        "raw_cohort_exit_preserved": 0
+      },
+      "avatar": {
+        "receipt": "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-fitting-quality-proof-20261111/release-a3684a/status.json",
+        "receipt_sha256": "81e9037442ff88c0502bdb48d5ddcc31b1667a55fbf5acbe9c74374c33c453b4",
+        "individual_case": {
+          "name": "run-avatar",
+          "native_exit": 0,
+          "seconds": 0.007867656007874757,
+          "log_sha256": "2a33f9bccceb56c1d0fd9a229566fd2f4d7732c5199e038e48b83d460018cfc8"
+        },
+        "log_sha256": "2a33f9bccceb56c1d0fd9a229566fd2f4d7732c5199e038e48b83d460018cfc8",
+        "log_last_line": "PASS 92 avatar checks",
+        "raw_cohort_exit_preserved": 1
+      },
+      "rig-fit-authoring": {
+        "receipt": "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-fitting-quality-proof-20261111/release-a3684a/status.json",
+        "receipt_sha256": "81e9037442ff88c0502bdb48d5ddcc31b1667a55fbf5acbe9c74374c33c453b4",
+        "individual_case": {
+          "name": "run-rig-fit-authoring",
+          "native_exit": 0,
+          "seconds": 0.016085496987216175,
+          "log_sha256": "1ebd11b90e949b58d39214a3af6e697c9a9c93483c069144772e2cf7d07f31c4"
+        },
+        "log_sha256": "1ebd11b90e949b58d39214a3af6e697c9a9c93483c069144772e2cf7d07f31c4",
+        "log_last_line": "22 humanoid rig-fit authoring checks passed",
+        "raw_cohort_exit_preserved": 1
+      },
+      "rig-fit-metric": {
+        "receipt": "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-fitting-quality-proof-20261111/release-a3684a/status.json",
+        "receipt_sha256": "81e9037442ff88c0502bdb48d5ddcc31b1667a55fbf5acbe9c74374c33c453b4",
+        "individual_case": {
+          "name": "run-rig-fit-metric",
+          "native_exit": 0,
+          "seconds": 0.01606820902088657,
+          "log_sha256": "8c241ee1ba3e636cfc311a0b076c478cf22015b6fcb1c356b0c84143d4caf2b8"
+        },
+        "log_sha256": "8c241ee1ba3e636cfc311a0b076c478cf22015b6fcb1c356b0c84143d4caf2b8",
+        "log_last_line": "PASS 56 world rig-length metric checks",
+        "raw_cohort_exit_preserved": 1
+      },
+      "rig-fit-faults": {
+        "receipt": "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-fitting-quality-proof-20261111/release-a3684a/status.json",
+        "receipt_sha256": "81e9037442ff88c0502bdb48d5ddcc31b1667a55fbf5acbe9c74374c33c453b4",
+        "individual_case": {
+          "name": "run-rig-fit-faults",
+          "native_exit": 0,
+          "seconds": 0.4650141620077193,
+          "log_sha256": "1e4e8cafe25489f968fe0b1df1003230801542d1c50f5bb0849d11c5ee204ccb"
+        },
+        "log_sha256": "1e4e8cafe25489f968fe0b1df1003230801542d1c50f5bb0849d11c5ee204ccb",
+        "log_last_line": "2001 persistent fitting allocation boundaries and 51 cancellation boundaries passed",
+        "raw_cohort_exit_preserved": 1
+      },
+      "skin-affine": {
+        "receipt": "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-fitting-quality-proof-20261111/release-a3684a/status.json",
+        "receipt_sha256": "81e9037442ff88c0502bdb48d5ddcc31b1667a55fbf5acbe9c74374c33c453b4",
+        "individual_case": {
+          "name": "run-skin-affine",
+          "native_exit": 0,
+          "seconds": 0.03210515796672553,
+          "log_sha256": "e13936c53dd8ad4e15e12c57777e50767d7c15cf9d6f0dd72aae96eb81772cdc"
+        },
+        "log_sha256": "e13936c53dd8ad4e15e12c57777e50767d7c15cf9d6f0dd72aae96eb81772cdc",
+        "log_last_line": "PASS 136 affine skin checks",
+        "raw_cohort_exit_preserved": 1
+      },
+      "skin-affine-controller": {
+        "receipt": "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-fitting-quality-proof-20261111/release-15fab7/status.json",
+        "receipt_sha256": "dacca4b14dbbc8c28eab90b7ded0c5b26465d24aa782520d5c6a5c3da8c7090a",
+        "individual_case": {
+          "name": "run-skin-affine-controller",
+          "native_exit": 0,
+          "seconds": 0.007884482969529927,
+          "log_sha256": "049a2c47d8e4f9615f02b8b51870cf5be59305e4181345219451c60c4f4cfb28"
+        },
+        "log_sha256": "049a2c47d8e4f9615f02b8b51870cf5be59305e4181345219451c60c4f4cfb28",
+        "log_last_line": "PASS 12 affine controller checks",
+        "raw_cohort_exit_preserved": 1
+      },
+      "skin-authoring": {
+        "receipt": "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-fitting-quality-proof-20261111/release-15fab7/status.json",
+        "receipt_sha256": "dacca4b14dbbc8c28eab90b7ded0c5b26465d24aa782520d5c6a5c3da8c7090a",
+        "individual_case": {
+          "name": "run-skin-authoring",
+          "native_exit": 0,
+          "seconds": 0.715428123017773,
+          "log_sha256": "40966dd688a48a845ea44b9e14fc6d35a66b314412cf20855a36ae34e667ead6"
+        },
+        "log_sha256": "40966dd688a48a845ea44b9e14fc6d35a66b314412cf20855a36ae34e667ead6",
+        "log_last_line": "PASS Focus loss cancels staged skin distances without changing accepted skin or configuration",
+        "raw_cohort_exit_preserved": 1
+      },
+      "rig-fit-import": {
+        "receipt": "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-fitting-quality-proof-20261111/release-15fab7/status.json",
+        "receipt_sha256": "dacca4b14dbbc8c28eab90b7ded0c5b26465d24aa782520d5c6a5c3da8c7090a",
+        "individual_case": {
+          "name": "run-rig-fit-import",
+          "native_exit": 0,
+          "seconds": 0.016180061968043447,
+          "log_sha256": "d981b2893208df4f06a50972f7a1aa24d112ebebe359a738ab6ec8bab60646eb"
+        },
+        "log_sha256": "d981b2893208df4f06a50972f7a1aa24d112ebebe359a738ab6ec8bab60646eb",
+        "log_last_line": "7 imported humanoid fit interop checks passed",
+        "raw_cohort_exit_preserved": 1
+      },
+      "skin-affine-export": {
+        "receipt": "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-fitting-quality-proof-20261111/release-final-two/status.json",
+        "receipt_sha256": "2ef4ac7d49b4e3605a3df6522865f0908a8231e19984b7eed800c9dffb997411",
+        "individual_case": {
+          "name": "skin-affine-export",
+          "argv": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-fitting-quality-proof-20261111/release-15fab7/dome-sculpt-skin-affine-export-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-fitting-quality-proof-20261111/release-final-two/skin-affine-exports"
+          ],
+          "native_exit": 0,
+          "seconds": 0.06429129501339048,
+          "log_sha256": "9c0ec20d37d6a2fa918068d0ce34998cd7803903490d5742ea7442434d50565c"
+        },
+        "log_sha256": "9c0ec20d37d6a2fa918068d0ce34998cd7803903490d5742ea7442434d50565c",
+        "log_last_line": "PASS 162 independent affine skin export checks; max_position_error=1.05367e-07",
+        "raw_cohort_exit_preserved": 0
+      },
+      "rig-fit-controller": {
+        "receipt": "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-fitting-quality-proof-20261111/release-final-two/status.json",
+        "receipt_sha256": "2ef4ac7d49b4e3605a3df6522865f0908a8231e19984b7eed800c9dffb997411",
+        "individual_case": {
+          "name": "rig-fit-controller",
+          "argv": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-fitting-quality-proof-20261111/release-final-two/dome-sculpt-rig-fit-controller-test"
+          ],
+          "native_exit": 0,
+          "seconds": 0.01646899402840063,
+          "log_sha256": "7efa79392bbde2427ace22a4354707fa755e1373cebdf832a0577fd6b82c6a56"
+        },
+        "log_sha256": "7efa79392bbde2427ace22a4354707fa755e1373cebdf832a0577fd6b82c6a56",
+        "log_last_line": "16 humanoid fitting controller checks passed",
+        "raw_cohort_exit_preserved": 0
+      }
+    }
+  },
+  "sanitize": {
+    "scope": "Audited incremental current-native closure:completed5bb193core,4complete current owning/query TUs replaced,189memberpayloadsunchanged,11freshcompleteconsumerTUs/ELFs. Public103/assets/thirdparty/private dependencies and actual literal compiler flags authenticated. Not a whole4977SAN/applicationbuild.",
+    "audit": "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-fitting-quality-proof-20261111/sanitize-9cebf6-v4/audit.json",
+    "audit_sha256": "7928685a178e32847c1686c264d6628daf40cc3da98b7a2676a2d677f1955a9f",
+    "receipt": "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-fitting-quality-proof-20261111/sanitize-9cebf6-v4/status.json",
+    "receipt_sha256": "a9fe6ac1fa07af05401b45b57093562d8bf43e73442752800529491f0f8303a5",
+    "native_cases": 11,
+    "all38_steps_native_exit": 0,
+    "core_sha256": "9ab8282b9ddf023445236cc3be51a50ad2af56c696e549019e10da6d1795a980",
+    "strict_runtime": {
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+      "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+      "suppressions": false
+    },
+    "source_provider_drift": [],
+    "actual_cases": [
+      {
+        "name": "run-rig-fit-anatomical",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-fitting-quality-proof-20261111/sanitize-9cebf6-v4/dome-sculpt-rig-fit-anatomical-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-fitting-quality-20261111/assets/humanoid"
+        ],
+        "native_exit": 0,
+        "seconds": 4.823055029963143,
+        "log_sha256": "448f85523c4917513a8c9d095c71c449c5c4df0a125b6916490f3ae4a353e05c"
+      },
+      {
+        "name": "run-avatar",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-fitting-quality-proof-20261111/sanitize-9cebf6-v4/dome-sculpt-avatar-test"
+        ],
+        "native_exit": 0,
+        "seconds": 0.03207322699017823,
+        "log_sha256": "2a33f9bccceb56c1d0fd9a229566fd2f4d7732c5199e038e48b83d460018cfc8"
+      },
+      {
+        "name": "run-rig-fit-authoring",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-fitting-quality-proof-20261111/sanitize-9cebf6-v4/dome-sculpt-rig-fit-authoring-test"
+        ],
+        "native_exit": 0,
+        "seconds": 0.21447129698935896,
+        "log_sha256": "1ebd11b90e949b58d39214a3af6e697c9a9c93483c069144772e2cf7d07f31c4"
+      },
+      {
+        "name": "run-rig-fit-metric",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-fitting-quality-proof-20261111/sanitize-9cebf6-v4/dome-sculpt-rig-fit-metric-test"
+        ],
+        "native_exit": 0,
+        "seconds": 0.2145260309916921,
+        "log_sha256": "8c241ee1ba3e636cfc311a0b076c478cf22015b6fcb1c356b0c84143d4caf2b8"
+      },
+      {
+        "name": "run-rig-fit-faults",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-fitting-quality-proof-20261111/sanitize-9cebf6-v4/dome-sculpt-rig-fit-faults-test"
+        ],
+        "native_exit": 0,
+        "seconds": 5.224772488989402,
+        "log_sha256": "1e4e8cafe25489f968fe0b1df1003230801542d1c50f5bb0849d11c5ee204ccb"
+      },
+      {
+        "name": "run-skin-affine",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-fitting-quality-proof-20261111/sanitize-9cebf6-v4/dome-sculpt-skin-affine-test"
+        ],
+        "native_exit": 0,
+        "seconds": 0.3147493429714814,
+        "log_sha256": "e13936c53dd8ad4e15e12c57777e50767d7c15cf9d6f0dd72aae96eb81772cdc"
+      },
+      {
+        "name": "run-skin-affine-controller",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-fitting-quality-proof-20261111/sanitize-9cebf6-v4/dome-sculpt-skin-affine-controller-test"
+        ],
+        "native_exit": 0,
+        "seconds": 0.21451099897967651,
+        "log_sha256": "049a2c47d8e4f9615f02b8b51870cf5be59305e4181345219451c60c4f4cfb28"
+      },
+      {
+        "name": "run-skin-authoring",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-fitting-quality-proof-20261111/sanitize-9cebf6-v4/dome-sculpt-skin-authoring-test"
+        ],
+        "native_exit": 0,
+        "seconds": 4.322656030009966,
+        "log_sha256": "40966dd688a48a845ea44b9e14fc6d35a66b314412cf20855a36ae34e667ead6"
+      },
+      {
+        "name": "run-rig-fit-import",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-fitting-quality-proof-20261111/sanitize-9cebf6-v4/dome-sculpt-rig-fit-import-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-fitting-quality-proof-20261111/sanitize-9cebf6-v4/plan/rig-fit-import"
+        ],
+        "native_exit": 0,
+        "seconds": 0.2644829819910228,
+        "log_sha256": "d981b2893208df4f06a50972f7a1aa24d112ebebe359a738ab6ec8bab60646eb"
+      },
+      {
+        "name": "run-skin-affine-export",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-fitting-quality-proof-20261111/sanitize-9cebf6-v4/dome-sculpt-skin-affine-export-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-fitting-quality-proof-20261111/sanitize-9cebf6-v4/plan/skin-affine-exports"
+        ],
+        "native_exit": 0,
+        "seconds": 0.3148506340221502,
+        "log_sha256": "9c0ec20d37d6a2fa918068d0ce34998cd7803903490d5742ea7442434d50565c"
+      },
+      {
+        "name": "run-rig-fit-controller",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-fitting-quality-proof-20261111/sanitize-9cebf6-v4/dome-sculpt-rig-fit-controller-test"
+        ],
+        "native_exit": 0,
+        "seconds": 0.21446798194665462,
+        "log_sha256": "7efa79392bbde2427ace22a4354707fa755e1373cebdf832a0577fd6b82c6a56"
+      }
+    ]
+  },
+  "final_counterfactual": {
+    "receipt": "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-fitting-quality-proof-20261111/old4977-final725-counterfactual.json",
+    "receipt_sha256": "101e7f0511a0096158d6978e5455ddceeff4dfd4ba04aded11c30381675c6cf7",
+    "same_final725_object": true,
+    "old4977_actual_native_exit": 1,
+    "intended_error": "FAIL Declared middle base is actual palm endpoint",
+    "fixed_actual_native_exit": 0
+  },
+  "original_models": {
+    "base-female.vrm": {
+      "sha256": "1995f174f6c8f2211f3c56c9e5fe4f9daf27ee5e648f129479582a259238149b",
+      "bytes": 16323872
+    },
+    "base-male.vrm": {
+      "sha256": "ab9af434a229283c192546486f9e6eb9cd855bf7d8d45b5037ac211938cb903c",
+      "bytes": 17914788
+    }
+  },
+  "limits_preserved": {
+    "fit_default_maximum_work": 20000000,
+    "bind_default_maximum_work": 50000000,
+    "default_maximum_influences": 4,
+    "coordinate_bone_and_mesh_caps": "unchanged",
+    "new_native_deadline_seconds": 180,
+    "existing_ctest_deadlines": "actual generated CTest commands/properties used by final SAN cases"
+  },
+  "preserved_failures": [
+    "release-fb3766: missing NativeAffineEdit definition in test include",
+    "release-b35586: overlapping synthetic UV islands",
+    "release-a3684a: legacy controller assumes old two-method slider; exact same object fails on original4977",
+    "release-15fab7: export runner missing required directory argument; same ELF passes proper command",
+    "sanitize audit v1: CTest JSON omitted command for unbuilt configure-only executable",
+    "sanitize v2: namespace preflight FileExistsError before any audit/provider mutation",
+    "sanitize audit v3: actual CTest aliases differ from executable basename"
+  ],
+  "peer_source_review": "merge_contracts read-only review found no blocking hunk; no runtime claim transferred from peer.",
+  "remaining_required": [
+    "Automatic geometry-only landmark recognition",
+    "General original-source/existing-rig mapping and full-domain rest transport",
+    "Absent-Toes foot inference, arbitrary bent-hand terminal accuracy and broader source quality",
+    "Volume-aware production weighting and broader independent deformation coverage",
+    "Physical controller/HMD acceptance and remaining full REQUIREMENTS"
+  ],
+  "GPU_GUI_HMD_install_session_or_production_performance_claim": false,
+  "no_live_lane_jobs_or_GPU_lease": true,
+  "evidence_archive": {
+    "file": "HUMANOID-FIT-CONTINUATIONS-20261112.tar.gz",
+    "sha256": "18000444f075552ab7f1c42b78bf6dd6eb3572c784ea97a1e05aa9bcfbf92da6",
+    "bytes": 5773769,
+    "decoded_members": 201,
+    "decoded_payload_bytes": 37070840,
+    "decoded_manifest_sha256": "fb1d32d069fd5afc85c228c06b428c95b5bd8deaa7190a910f4ca896d830274c",
+    "full_decoded_reverification": 0,
+    "binary_ELFs_objects_libraries_and_VRM_payloads_included": false
+  }
+}

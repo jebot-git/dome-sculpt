@@ -1,0 +1,1487 @@
+{
+  "schema": 1,
+  "scope": "Qualified native CPU mapped-leg component seed support and independent complete original artist posed reference. No whole-application/ALL, GPU/XR, performance, universal artist-similarity or final humanoid-quality acceptance claim.",
+  "source": "d7565e69f478b0d79381353d2f4e382f5fb99363",
+  "source_branch": "work/humanoid-component-leg-affine-20261112",
+  "source_base": "9560ac1ddc078f6013c8699869e663c4ea2a6fd0",
+  "source_stack": [
+    "bed30a31a2a5c353b26b9f3bf6a3807692e08da2",
+    "ef8092df7c72e5ebc9c86bfdd90c5b0f66d7bde0",
+    "18e492c40c271b15632adb19615da55824ebae3c",
+    "d7565e69f478b0d79381353d2f4e382f5fb99363"
+  ],
+  "core_provider_source": "cc5e6aed9f103da3998684c6188dd143e23e676b",
+  "profiles": {
+    "release": {
+      "status": "artifacts/humanoid-component-leg-support-proof-20261112/release-final-v2/status.json",
+      "status_sha256": "fc3608fbc23d2a71846a414ccd36d1f041a816686d4dcfa6ac75a0d3f2893d4b",
+      "exit": 0,
+      "steps": 45,
+      "all_steps_exit0": true,
+      "native_consumers": [
+        {
+          "name": "native-humanoid-component-bind",
+          "exit": 0,
+          "seconds": 0.03816343698417768,
+          "deadline": 180,
+          "log_sha256": "a1d0ee33b695a3bb50fe04de38f8a41cb75f1d3f63595896299135d5b72a11ab"
+        },
+        {
+          "name": "native-rig",
+          "exit": 0,
+          "seconds": 0.0067196739837527275,
+          "deadline": 180,
+          "log_sha256": "6e262db7cde7a26db92a72063e5383a2c0b04bc5f8905b13dd5a3c27089994a8"
+        },
+        {
+          "name": "native-skin-authoring",
+          "exit": 0,
+          "seconds": 0.620894332008902,
+          "deadline": 180,
+          "log_sha256": "40966dd688a48a845ea44b9e14fc6d35a66b314412cf20855a36ae34e667ead6"
+        },
+        {
+          "name": "native-skin-affine",
+          "exit": 0,
+          "seconds": 0.022996618994511664,
+          "deadline": 180,
+          "log_sha256": "e13936c53dd8ad4e15e12c57777e50767d7c15cf9d6f0dd72aae96eb81772cdc"
+        },
+        {
+          "name": "native-skin-affine-controller",
+          "exit": 0,
+          "seconds": 0.010754686023574322,
+          "deadline": 180,
+          "log_sha256": "049a2c47d8e4f9615f02b8b51870cf5be59305e4181345219451c60c4f4cfb28"
+        },
+        {
+          "name": "native-skin-affine-export",
+          "exit": 0,
+          "seconds": 0.04111423500580713,
+          "deadline": 180,
+          "log_sha256": "9c0ec20d37d6a2fa918068d0ce34998cd7803903490d5742ea7442434d50565c"
+        },
+        {
+          "name": "native-rig-fit-authoring",
+          "exit": 0,
+          "seconds": 0.010662562970537692,
+          "deadline": 180,
+          "log_sha256": "1ebd11b90e949b58d39214a3af6e697c9a9c93483c069144772e2cf7d07f31c4"
+        },
+        {
+          "name": "native-rig-fit-controller",
+          "exit": 0,
+          "seconds": 0.010448821994941682,
+          "deadline": 180,
+          "log_sha256": "7efa79392bbde2427ace22a4354707fa755e1373cebdf832a0577fd6b82c6a56"
+        },
+        {
+          "name": "native-rig-fit-faults",
+          "exit": 0,
+          "seconds": 0.4213221250101924,
+          "deadline": 180,
+          "log_sha256": "1e4e8cafe25489f968fe0b1df1003230801542d1c50f5bb0849d11c5ee204ccb"
+        },
+        {
+          "name": "native-rig-fit-import",
+          "exit": 0,
+          "seconds": 0.02427122200606391,
+          "deadline": 180,
+          "log_sha256": "d981b2893208df4f06a50972f7a1aa24d112ebebe359a738ab6ec8bab60646eb"
+        },
+        {
+          "name": "native-rig-fit-metric",
+          "exit": 0,
+          "seconds": 0.010817788017448038,
+          "deadline": 180,
+          "log_sha256": "8c241ee1ba3e636cfc311a0b076c478cf22015b6fcb1c356b0c84143d4caf2b8"
+        },
+        {
+          "name": "native-avatar",
+          "exit": 0,
+          "seconds": 0.007291911984793842,
+          "deadline": 180,
+          "log_sha256": "2a33f9bccceb56c1d0fd9a229566fd2f4d7732c5199e038e48b83d460018cfc8"
+        },
+        {
+          "name": "native-rig-rest-pose",
+          "exit": 0,
+          "seconds": 0.07028775697108358,
+          "deadline": 180,
+          "log_sha256": "edfe98457f9db54a6f4e2ced1bc5ba45b9407d6d419c4569a5ad2f468ee9bdb5"
+        },
+        {
+          "name": "native-rig-rest-authoring",
+          "exit": 0,
+          "seconds": 1.573151056014467,
+          "deadline": 180,
+          "log_sha256": "6267c2ea1febf8a6ae5b62d9069af398600026374882e43dbe2ee8c1d4331f0f"
+        },
+        {
+          "name": "native-pose-quality",
+          "exit": 0,
+          "seconds": 13.197134451998863,
+          "deadline": 600,
+          "log_sha256": "9611faa43f3a19bcd4b7a61fcda4d06c446d0b826ffceae4a4b72a836b92eef2"
+        }
+      ],
+      "input_pins": 12233,
+      "input_drift": [],
+      "compiler_routes_verified": 193,
+      "whole_changed_owners": [
+        "rig.cpp.o",
+        "skin-authoring.cpp.o"
+      ],
+      "unchanged_whole_member_payloads": 191,
+      "public_headers_byteexact": 103,
+      "complete_product_differences": [
+        "src/automatic-humanoid-bind.hpp",
+        "src/automatic-humanoid-support.hpp",
+        "src/rig.cpp",
+        "src/skin-authoring.cpp"
+      ],
+      "provider_core193_snapshot": {
+        "path": "artifacts/humanoid-component-leg-support-proof-20261112/release-final-v2/provider-core193.json",
+        "sha256": "b9704225067cbd1c7c0bf24c8533093823946e9cc7530c56f6b415736578037f",
+        "archive_sha256": "8c0706bf85c51facabc5fc3de00116e4e982f1fc37b840512cc665642665d893",
+        "source": "cc5e6aed9f103da3998684c6188dd143e23e676b",
+        "note": "Own exact core/object/source/SDK/flags snapshot while original ALL may still run; no ALL/application acceptance inferred."
+      },
+      "actual_asset_macro_literal": "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/authoring-source8-hdr-fit-union-20261112/assets/humanoid\"",
+      "new_plan_asset_macro_literal_only": "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/assets/humanoid\"",
+      "asset_bytes": "All original and candidate assets pinned and byte-exact; fresh owner objects retain the original literal macro string.",
+      "environment": {
+        "LD_LIBRARY_PATH": "/home/blux/de-xr/dome-sculpt/artifacts/sdk-20261111/toolkit-release/lib:/usr/lib64",
+        "ASAN_OPTIONS": null,
+        "UBSAN_OPTIONS": null,
+        "LSAN_OPTIONS": null,
+        "LIBGL_ALWAYS_SOFTWARE": "1",
+        "LP_NUM_THREADS": "2",
+        "OMP_NUM_THREADS": "2"
+      },
+      "core_archive_sha256": "7da0d2f2a7c59854a5a1d7eeb747bbb52aec16dd78575426e90b0714bd8d2de6",
+      "core_member_payloads": {
+        "source-rest-graph.cpp.o": "58ef58dba9dcdb9bbdafe7e5530b583fd6c4d1df0fbd1db6335893e6bc1aa130",
+        "source-rest-plan.cpp.o": "73c72fb3967f4b7ef7a23c2a1ef0de7c37183ceefac1111180ff874e73e7a801",
+        "source-rest-scene.cpp.o": "e240215287e4f1b8a391342bed0e37c27f7066c67b836c68ae9cb338fd029b3f",
+        "rig-rest-scene.cpp.o": "81e27ec426f20006a945e60c726412a1dfa7b9d5699c2e7dbd552158acf1b5a6",
+        "rig-rest.cpp.o": "49fcd81d533066653b2d6997d61ebe7901f6aca8783205d5a7c3162bf5f690e4",
+        "rig-fit.cpp.o": "ff533afa6a1a08773888633440e518971ce6f1bea7056b4374527dfa667640e6",
+        "rig-fit-tool.cpp.o": "da6e262817f9583e56e4b5965ccbc778338cdcebdd6aeee2bc8a70ed3ab039f7",
+        "document-rig-fit.cpp.o": "8dc16b58a23e9775b7ca013ce889b15a0aba18afb9e1a7dca33c5f7543b5cc94",
+        "projection-tool.cpp.o": "cb44b1ff47e581563c227f2a2fb8a2e1935347ac1cb37a6d0c0c0e0804f2d5b2",
+        "document-projection.cpp.o": "baecb618277db687c48eb499cac626f2148a0091293f69d2ed8738d665ee87b0",
+        "volume.cpp.o": "4c019426d1e865895f76dce723eb22571b01e86c96c1dbd87bd7b448c4c583de",
+        "volume-raycast.cpp.o": "ac505a7eb2ab37ce1b5fbefda01020e4dac628dea47864cb29b0a5d477bacd07",
+        "sculpt-mask.cpp.o": "958db76c734e5f8bcb73c5fd2e8a9547d1b6f9be9ec440b449d38d776d11c2e0",
+        "sculpt-resolution.cpp.o": "e7e0bb60775ca46114f2991ed74508bc0ed7289478aebd39b463a32b49f82740",
+        "procedural-sculpt.cpp.o": "8a79c3bd6f81fcb949061c15e82c575e47d4c9dd03bd3a24bc16d10f463016e7",
+        "scene.cpp.o": "365ce363f521280fc3800c89e5936427ffa823ec07e552ba95a7191a9a0cab28",
+        "groups.cpp.o": "a8db4b2fa1847f347bcd2f28e00b7444448f035ff78daa697e9a9901d0ec71da",
+        "creation.cpp.o": "43754b0d4972192fdf2da2dc8cc8187d75b341029094faf34e1f005a7e569b0c",
+        "mesh-authoring.cpp.o": "a9869cfbf8f162a5777a4552b13599ab464e88792e09993c7eeb327f1418073e",
+        "tangents.cpp.o": "371eb87e809af3d3a87328486f5136cdeab4a0e5760d5191e2a567311c072ea8",
+        "bake-authoring.cpp.o": "4454c176f36d7e71f8c88b492dee2d485765d17cb5dc312f9b20222e7a193411",
+        "bake-recipe.cpp.o": "887fd3696b6f0ee292e07a72deb3accf614319d1ed2e91206dc6f66be7d2897a",
+        "document-baking.cpp.o": "e1841dd8273b25a1e87463cf9a2c60c2819200338731d144da9926b60f4ca7d2",
+        "document-shapes.cpp.o": "bd411f3a5b864774adeda2d7436cb7f2a26621f70c37a9dce4ccf29b14d196cd",
+        "creator-archive.cpp.o": "09a1af5b03c19aad870737ae34de210989ee626bf9ab87094731680da2b03a81",
+        "paint.cpp.o": "dcca865bfc12edad841a28ade552a544bf6792e39e7be51b37d454ffeeabdc7b",
+        "projection.cpp.o": "19c6f7a0d3487e70d00d13bc765f051da6828d2bbee2e3a3388dede9a9200f38",
+        "source-maps.cpp.o": "73d3c6c0491a83f5993d98cff0308adf0ccc361f38cde122b9649199aeb40580",
+        "color-preparation.cpp.o": "f26427de939161e834eb245f2e859cce68198c24afcaddabb00850ebcd4d9c5d",
+        "material-bindings.cpp.o": "bd7b19a6c4ae683e486ba18639b3e97c0205f3ecdd6a38f641704bdd20bd3cdf",
+        "normal-frames.cpp.o": "a13786212c247178bd1303f1ee0b941915db95beec24aceb1f461c168f2980dd",
+        "normal-bake-frames.cpp.o": "40d5adcb88bec4bb6d79c7223765820139cc46969172f91c4a3ad330f3783e55",
+        "normal-preparation.cpp.o": "98eafc6d923b4819eb345fb35b4df3a6f905de9d33a631701e0364f56520fbe6",
+        "canonical-normal-conversion.cpp.o": "f6b581c0a0767bfeb5b0cf6228d20da68dddd8b873adcb732e0c006fd6550b4a",
+        "canonical-normal-owner.cpp.o": "16ccb1cb3bd146a7f54b0616e49268a74dcab21340c1114d4527daa048ab9603",
+        "normal-uv-reprojection.cpp.o": "277ec0a4f48fea49f1c548637bdf09a19798fd33eff260d51dd3176e8e092509",
+        "shapekey-authoring.cpp.o": "b8f8102c35a4bd6604f1dc5ff3894083f6afe22649fb1435e62de127d0eadd0a",
+        "shapekey-normal-preparation.cpp.o": "e2035ff840a60245799f1fbf42c8824529cd1dc8a4639111e7ba38a16f04bd81",
+        "source-uv-bake.cpp.o": "097aafc09f2bc83e2e6e17c639816ca8102d047fdad608e109080ddd5fd91453",
+        "mesh.cpp.o": "4ec8b02cff22504de8dd740abaf13a42de83d5fe6771599f5ebe6f6477e30638",
+        "atlas.cpp.o": "a88a5d68e56ba918c7f309eefecc819259f512339d9abe420ab3b0916ec6e692",
+        "uv.cpp.o": "e5bde752f03d4b5e4051196ab2f66d68b88f9236c6eb916c32c30f5b7a330b58",
+        "export.cpp.o": "b05afa5a3d43c4c4e8acaf0434e650c38ff22074cff3e3e7e92926048dd48ec1",
+        "source-morph.cpp.o": "94ecb40a6823a4b7ac3f4e19d1bc3a43f4f1b1bd4cc82e7de29efb1c8091edf0",
+        "vrm.cpp.o": "9419676290b1e366c9f76310e3a712f571aaa3e61faf81598430382a1e65ae2c",
+        "input.cpp.o": "4e84eb9f807acbde0a9b7682731135c2448db760d661cd5cc48d05bce97c5b3a",
+        "document.cpp.o": "5f3f6d347528bcc1ebff24443429209566ee7b366fc631e0ae053874abc2d9fb",
+        "document-interaction.cpp.o": "1c9ae791115f7e2ee5f6ed854517814e7ee2f66774b0d0105e8781eccab0ca9c",
+        "document-uv-solve.cpp.o": "0fb88bae0cb54355b430fcf6d476114457d2211766befae88f81368090396af3",
+        "document-recovery.cpp.o": "034336b526d9c2182c4882d5b5b23de75d9d4a8ef4f3dc5b282597b8818cbc10",
+        "document-assets.cpp.o": "04178b70ed84fbf5976fed8319880264657842aedc55890686586f562adc1b6d",
+        "recovery.cpp.o": "7b7961a683d25e92fa53d94382b715b4c861b4cf72125179a9d4000a6eb872d9",
+        "rig.cpp.o": "ed0a91660e5649f29ec0f5eb5846b5eb2230c49ebf829a1502c3f992c24ee3d0",
+        "avatar.cpp.o": "7352e4df687db21c5175a1f159412c1519563ce5fa58913fdbba4d31a1a76996",
+        "humanoid-creator.cpp.o": "5db5316eafb2a031c2b2473a37105c1648f25ffc3cc2b4630fe421fc3a92af53",
+        "vroid-creator.cpp.o": "0cf95bede0e1885f7c5fd6efc82e94344bda98c648406eabdd589b173e531490",
+        "vroid-groom.cpp.o": "5f8afa47c217e54e22febd699552166b345c72fd74ea17aefab3024470f05b31",
+        "deformation.cpp.o": "d759c4fec7c1c047f889a16daec92bb7f0ed5057dba9cea2fdaec2d00860e3fb",
+        "rig-edit.cpp.o": "3d84cd3af4b174a7ce9911d40061785c4f5423e7690c8fe196f646dc314a7069",
+        "weight-edit.cpp.o": "45a1aa0cf2d025eb641292961dba84754f802b858b5bac5d029ab94b8cca5653",
+        "weight-authoring.cpp.o": "adce8126c6d8f64badc311b4417153b27dc079d24733ac87d8b4b256807644f6",
+        "material-visibility.cpp.o": "fe01d1b3a16014bf7553df9f98a196ea6056f6f328b0dc2bb1cbb8e1e3276e87",
+        "skin-authoring.cpp.o": "c9be411a7e2017b849b02c63e00edbc86904b316b0eef3c36b4e905651f675bf",
+        "document-skin.cpp.o": "1f1d7b6f5e1906bb27f40caa22c9dd9a1950dd08926b010b9db4a5e88785171d",
+        "uv-solve.cpp.o": "0d1a5d6111e759fe1f71cea3e8915098b5c1b268f6bf53cc447bee706703883c",
+        "import.cpp.o": "38e354350677894c171f97c1703e4ad21051ebeae6c02f5002b565fbf9bd955e",
+        "bone-metadata.cpp.o": "25dfa946896137b84fc006c2bd7bb50d51e7756729ba95eb05042b64e8204b62",
+        "source-node-extras.cpp.o": "bf6bf5692aec8430243e43c8280df804e96659ad053a0224207a4f304efc7b17",
+        "source-decoded-images.cpp.o": "e8bf6dde31df12d65610fb3fa148f9ffa2d69053a8447c6f3a40dc6fd0c757c4",
+        "import-authoring.cpp.o": "32aae4f0751bb82acc1752c0119b6eddc7f5d69ef156a850ac87952b124aaae0",
+        "vrm-import.cpp.o": "2c3b1a88f70d08179f07252943a5fedea194d6a1d27ebc28dad29a29cb93c9ac",
+        "vrm-source-graph.cpp.o": "8b1b85f6945e4a9b969bebcb7c0e247763e6de171379ea537eca727e21a8d014",
+        "vrm-rest-metadata.cpp.o": "3d4f5c440a6a488f9c674c90cdeea2c22ca21a0524ee91a3173a13f653132b65",
+        "vrm1-metadata.cpp.o": "9fa4b18d6bb4604c3e9e48bc1caf884fe36a51a9244d9438863284983b2b8bbe",
+        "vrm1-export.cpp.o": "a2bd22c1cc3a1617ed04983d195699659f51b26813311e0b27deb37a63550d49",
+        "vrm1-authoring.cpp.o": "c97ed2e5f1aa65315d111401e08f5eda4c81a95aa60280b0de6b131738c0c5fe",
+        "vrm1-painted-material.cpp.o": "48d590bb08c760e6a58356d06a0f00ed51815144c2a6bb036072a36ec107f7bd",
+        "vrm1-expression-layer.cpp.o": "b1394cec1d56da62f9adccd7f742f5639670efafca76b8cd920b0b4a346cf923",
+        "vrm-expression.cpp.o": "5b58eee5c1518559b02a70153b494ba0ebb1faf88697c2853006e16de11789b6",
+        "vrm-expression-scene.cpp.o": "b795144a822e36532eef732ac9ccdd66884622c2674b3465e9a3dc638c0ea994",
+        "document-expressions.cpp.o": "7b3b82f41ee81cfac7159e866e928566fb270e6e4ca38d5adc287979ee325652",
+        "source-rigid-pose.cpp.o": "ac1fc9f4385b203673b069eeb4a61e813c4a129d74a349e8cae6810831e64125",
+        "import-options.cpp.o": "c02e3e427e9ef9f22861bf81d915a1f17ab51cc9d8c7ffacb5d1a08ee5df0dad",
+        "import-browser.cpp.o": "213e363fd8b6657622c405a6ce53dd1158fb70856b4da9d6f560c08efcddba77",
+        "document-import.cpp.o": "faf718069b050c6a0b9323619eeb31c300ff09e1dfff4b6c48720522e133fe2d",
+        "import-image.cpp.o": "8f12b8555fc052a6eb3ce289ed111dee15dfea5c4b5c12895b223fa980479e6d",
+        "import-jpeg.c.o": "4c006c19b9c11e3102bf4bbdd6946ce9fd9335a187ed8ccf0a01ee777a4c0c0f",
+        "import-source.cpp.o": "21971bc0b1f9426f19aa6ba7727daf0d70fffe6002833600ddc77e15b9f3ccf9",
+        "import-native.cpp.o": "c1a10f1ef5b0456acede47e556274047bd42373345533d381dc06c84080042f2",
+        "mesh-processing.cpp.o": "50a8911e1aad612e1f6eafcb3d10fc8d48c957f9e6ef7de72e4dc2999d87d05f",
+        "retopo.cpp.o": "33ddbcb65da24e6481d2ef01ef009e9b73434dfdb77da7cc1f3b5615fa9abcfe",
+        "remesh.cpp.o": "dbc4c18967c88d1e50c710957535d1bf4088945d7374ecf8e94fec8ce57029fb",
+        "bake.cpp.o": "b76e938640421be98102d7307237149cd98e131344f80ab19257e68bec245a36",
+        "mtoon.cpp.o": "161abf7ae7e97078cadbb3f94534434ceadd67ab51b0ff48824039c562270d8d",
+        "navigation.cpp.o": "0d4f8a07cd982852cadb6d7fad330609054721e63716db35653bfe9175f96b0b",
+        "controller-profiles.cpp.o": "470ff4db00329c44b76575cf58d52e04e26067489a4f2f40a609c77ce08e7e1c",
+        "paint-sampling.cpp.o": "40d9c2d9ba5520ecca24b65190a9372fa49be8943e78d14b801ec8ad49268f09",
+        "paint-sampling-archive.cpp.o": "98e531fb71012ca735a65efd08bf99343549512d333988b7546bf6c957b2ce4f",
+        "color-paint-sampling.cpp.o": "db8d99ba3db415276df28566650e83a066017ac37f90e78099404e44fae6a6f0",
+        "native-paint-sampling.cpp.o": "0cbdf3487e9db6b69e77d317e1896d61e1a93f821b9523cd0414630c84534828",
+        "native-paint-frame-source.cpp.o": "93544251399c456872f96dc6007523fafbc3c0b35929d8f3856682f655d508af",
+        "native-paint-metadata.cpp.o": "22924ce98b3105a2cdf7354cbea7cd14d4b75c8c9beec06199b7e0f86b019dd8",
+        "color-uv-reprojection.cpp.o": "41e79416839df6d43fcecf0b9d085dc1dd44082fcdf2a49d3d8939f791446e6d",
+        "normal-sampling.cpp.o": "eba130a07245b99c2d5523634b76faf95997f9228e11c3e45e19d378eee9a52c",
+        "normal-sampling-replay.cpp.o": "76406128420a532967b16448d4c24600877d72c2f78f2c88644ffcc14733e261",
+        "normal-preview.cpp.o": "88b9a7fce96c9847f3849f94791a8aa71828e63a4649dd557f2997a34e31512c",
+        "normal-sampling-surface.cpp.o": "e217b561c45fa464b539941c6850f1050b81728838b7f0b530c635de25b9560a",
+        "polygon-color-uv.cpp.o": "99cc892ec823adc97e29dc5db57d48385ea515d31ae8d6ad0b4a68c3f8d05572",
+        "shapekey-attributes.cpp.o": "366f66eb34211df78ad8f170f1b0c9140410bb5890208a9429b8442cb477146d",
+        "corner-key-expansion.cpp.o": "37eaa8595c72cb3565f7416af063acad3953ed0ce68164b8f4c4f893b073d228",
+        "frame-position-domain.cpp.o": "3fde6f9f5956c4f957a6efb0498ecbb6f0e3c9c8ffb59c119a622836c787c80c",
+        "key-frame-archive.cpp.o": "7d950a1ec14d39af9e8da13a38014edadb887345867851beb8b4b400565d4d4a",
+        "key-derivation-codec.cpp.o": "a7e367121df2503e361bbf994ee852edc4396661458d631f0b570558ea25f199",
+        "normal-key-derivation.cpp.o": "90db8d57ac487725763d58f65f297c92fb88d92dd1b5e3adb06461447a5afaef",
+        "key-archive-preflight.cpp.o": "2285de7003640323b547adb5b5fbe6c73938cb962b077325ff3c8ca5124c2cb2",
+        "key-mirror-correspondence.cpp.o": "fcfbf2b9000e9a28e7518310f323757d2fec25db1d5f7b67f5b4253f17b5387e",
+        "key-mirror-relative.cpp.o": "01cf8cfc22ef952c3d21b88f15dd4bc30d825ed1c37f155241295baad174550a",
+        "backend_cpu.cpp.o": "ff99c8f2aa84431e8fa5edcfb5a07ca25595a0f0b5e2a375b9c765329efc49ed",
+        "sparse-resample-cpu.cpp.o": "b8b70ddeda3460be87cb7489b66cb79f30978e5ba7c6fd73f9d492dcf891a251",
+        "emission-bake-source.cpp.o": "9d6abf3319e03f1dc859e87a6f5ad264605f841b641fee07fe135061b7d520aa",
+        "document-paint-blur.cpp.o": "1dd9a8d6ba44719607a5edb46db4f4674e99dd728f42d291bf0e8841eaa2e4e7",
+        "retopo-authoring.cpp.o": "0ffbe3624afca88de3e8b6176d2ca5a500a74efdcd72c7bd6006119d44a27d62",
+        "document-retopo.cpp.o": "efb15a2daa16488ed2879a3202eb2705e5f74c79bbbaaae35f35d60d838ed6f2",
+        "document-sculpt.cpp.o": "6a1170e5e7a65ceb0227c3cb4e16cd7e6f77d6e05c1b585cbd2827ee7f1fef1c",
+        "document-native.cpp.o": "a4290395b2c3a2188d8899446911eca2418de9ccdde77dc30c6fe87ab0bec912",
+        "document-contact.cpp.o": "4737983c40bc30bc3af98d13ef4ed01ded37b4a66692d39a12b85194e89e664d",
+        "document-transaction.cpp.o": "da7517118a6eeee6ea681cc780fde61e1a610860e8157c3b3faa979fbe3da115",
+        "texture-sets.cpp.o": "946ca7d32fba45257726481ad29aaa905d26ca4432f2d5771df2730fb6145b10",
+        "texture-set-graph.cpp.o": "22f86d0a34b75e2b3cf78cd28fea87bda26f932b9dd7166a3485763f5e31d4e8",
+        "texture-set-archive.cpp.o": "0ce1347f3f9f86c4e30568632a64822bc9cfdf7886b418c961f338d085226080",
+        "texture-set-surface.cpp.o": "5eb7ba369e52542ac6000270de2724f35fd6ca75a301adaf873d695cdad53ff5",
+        "texture-set-range.cpp.o": "9f6dd34e64b0d10ead06f8defa852e633cbb7df9673a3cfa7c5994bcef53b66d",
+        "texture-set-packed.cpp.o": "17279aef9a73121bb14e9588e2ca8051728e577055201fd3a57dcca38acf3777",
+        "texture-set-resample.cpp.o": "e97e611467ea98700cc705da45244ac516c4d7837f1cd088b34929572e398e00",
+        "texture-set-worker.cpp.o": "842dd1f394b7c5f86953a1da1752ba2c7f84d95f0fc55cfd0a65431eeac4ff4b",
+        "texture-set-stroke.cpp.o": "70017bd66ba0178395517230d055a25e71e0bec311f3c34ed535af1ce70397da",
+        "document-texture-sets.cpp.o": "30f3fe2f7fad4256ec6a9134da204898c5c3952baa7452449ce35eb7a0ed494f",
+        "texture-set-export.cpp.o": "49d098217bb187b69c692198dda7697fa6c2f906b77531eed72c00a57efdbf12",
+        "texture-set-field-source.cpp.o": "c2e83af25c06712f4ad113c02ffadb568d18a37530d6d7583823446fa3b803c0",
+        "texture-set-field-codec.cpp.o": "7500aa965784832e58ad8d02d0c5c87d1415b11b365bb3604031ae06722575f4",
+        "texture-set-portable-field.cpp.o": "ae762fd4c212da230ba88073e08769ac7ecb1f64df6688010b7132221750a4b9",
+        "cut-authoring.cpp.o": "7ce6ab60502cae981a36ed5e708c4b07de454a1b04d88a0ecec7f2c05f7bcaaa",
+        "cut-color.cpp.o": "6c79d0084cec6c8bb696c7afb55730930d85771058457aa246d873b78d208a86",
+        "document-cut.cpp.o": "a404f45067e117f16b16b108925e4d7f917029adf600686144c35c9ed99c2c7c",
+        "document-worker-errors.cpp.o": "037424bfa65a3c93ca79801e1b1090d75fd403a67a54f8e85988bed6a0c0afe0",
+        "object-selection.cpp.o": "7ae1552509613db4a642a0d62ce72cbd9f75b0de836e6b4144c4f70b6f68b794",
+        "source-sampling-transport.cpp.o": "43a78fa5ad407e60762f48f881444123fd6158f292ecb196e8ae6e84c50aebc4",
+        "source-placement.cpp.o": "bc9657f9911e48699b3a43b634e2c119f38d39c6393051c655492b90284f4c32",
+        "source-placement-archive.cpp.o": "f9b51ce7da5be0d5f63a996bc005c4f39131490c673e4b86c4e69e92b03480ca",
+        "polygon-authoring.cpp.o": "e838dba6fcb31dcaa8ca29e767abcb09e356d57657c46c035c29d42b59d7677f",
+        "polygon-source.cpp.o": "b7c29a9f0d0445bcb9d2783b6f0840710b3991b2c90f075dc45c31eddc74108f",
+        "polygon-color-source.cpp.o": "30e2bcca6f68d0201ed608946e69acc5a4dc684d848f97722c8cbe525ff94132",
+        "polygon-color-archive.cpp.o": "5a102bf07c2598e11e0694d5660e3b36543926195d6cf218e805910335aeb3b4",
+        "polygon-scene.cpp.o": "58c0ed9381fad3110729961de39bf68fcaad5e40fab585641035457a14d5c838",
+        "polygon-conversion.cpp.o": "2c8deeac040e7d34ee0220565412f6c15aa141100841474b355546ecd617ae9c",
+        "document-polygon.cpp.o": "3021af879f0c44b67c613de3e6296290585adb2d10fe5e558eba4cfaaaaa815f",
+        "polygon-surface-transfer.cpp.o": "863fcf15205a1dad3af2747cf30e2798a75377d5f8a48ba7fb550e0fa8ab129b",
+        "polygon-surface-owner.cpp.o": "6939e7d5dcdc1313ccfcf586b74ae06abed343f0480c7cefff6041d7ee81d553",
+        "polygon-surface-codec.cpp.o": "1a2ba25e03e549894503c944275067af11c7924f89f0d02c4fedf606c378fc33",
+        "polygon-surface-preview.cpp.o": "0282abd161392db755e7256d021ed0425edfce7dd13e880d4015559fc6200d5b",
+        "polygon-surface-paint.cpp.o": "ec30af83801a2ccaaba42fd49230caaaec23ad5a5821b023d672cd9a07b73a0d",
+        "polygon-surface-archive.cpp.o": "25cc144e9a7f86e8b36aed3106120541de4aed261a7d023583ae50eb56cf8e9a",
+        "scene-file.cpp.o": "d24b8d12c92b5d47a8e9805d744ed8bbcbd467e9317678912df68c3b11450b6c",
+        "native-scene-append.cpp.o": "ed34720987b7db5c4ddf0d41cb48c20fd0ba17fdef966972fbb31d2957ec4b29",
+        "emission-package.cpp.o": "e42b9849ff1543810da6622da26a821a9d28e51768781de3add0f1311339d5a4",
+        "native-authoring.cpp.o": "f25552e3c71f14b7b305d7e9b884487eb9bd7caedf5560dda72899e2b488109e",
+        "native-authoring-compiler.cpp.o": "621cd47f111477d7d15702226ea0586b36b5c3d0d9e725281e1ad2fa581b33af",
+        "emission-export.cpp.o": "a142e281078c382478de098da3103323728bb86170c8f3986bbd93b09aa325de",
+        "local-surface.cpp.o": "38699f2edd7971aed797cc20cd387513b6d558c24d1cbe4731f4b474c7901ad4",
+        "volume-geometry.cpp.o": "017a37f9e4ec633d2a36576cb723abd248db18f3501431e8976a4a90d5f691e4",
+        "sculpt-storage.cpp.o": "754391855481cbc45207fe858a8fbb02892aa62e85c815bd7da423e8d5d91282",
+        "ray-index.cpp.o": "b82b2eb049041b431038a4385618d39560c986ce48584c7b8f07f0207c8494bd",
+        "sculpt-surface-chunks.cpp.o": "60ea6c590a45ee5b201e930eefd164c67c24c6b17cfa0c8e0cdc76d74a2e4b11",
+        "sculpt-scene-chunks.cpp.o": "2a08ab4b8f8d16b634a06661fa74c1e336cb5289663aea843ff29e5c17a856ea",
+        "sculpt-placed-chunk.cpp.o": "b5a5d8674b3f00fd928bc4980dcbf47de311a82e30f9d22c14d22f9ca10f0e90",
+        "sculpt-placed-chunks.cpp.o": "2fca3bc79605edcc471469f562c40d5d2abbdd47a341e0c9a7918c249183c416",
+        "sculpt-chunk-masks.cpp.o": "3b347dad996559cbd076549abaadb66ff4e754bd75f89909a78f2573e0ad4749",
+        "shapekey-sculpt.cpp.o": "4766d2eda23ce0e1ea4693df38a0503993259fa01438c1cf74060c63ca9b2460",
+        "retopo-edges.cpp.o": "f589b2c04fcb555861f6912050e49e054f44f755607469f3081b1fcf7ffca3ed",
+        "paint-composite.cpp.o": "8cb84500bb85e0a8613a89e1ed7127cc19326111c9c0e719498cc4da092ed757",
+        "paint-composite-cpu.cpp.o": "f5e5be2acdc655422dbf3abbe4f1f756b0c4d5f3cd50303a4d2308e94a997349",
+        "current-paint-preview.cpp.o": "c39a3725291ee32c32b05c2ce9dbcb0dbf2c511f101f04502785fdf2d87bca21",
+        "baked-normal-field.cpp.o": "f37b005d0c3d77ca2571c9559c0de7a2a5ec1cecedcdef972042ba944fd8564c",
+        "baked-normal-archive.cpp.o": "9e35126773cbb49a9d2814e518620c8dfb57653c844ab54af8fd65acce2013d5",
+        "canonical-normal-uv.cpp.o": "3da3915c3df6ad481109e18e86e69634e129c22a796c8d37b87816083dfebc29",
+        "canonical-native-pose.cpp.o": "15a5640b7ed21edc7e12c15547477e0838f500d1d9464be76fbd9d0644fb1e25",
+        "anatomical-authoring.cpp.o": "87b13ab83ea8f12a5473ab9148ac2b139b1ff83f6352b4ba1dff10cae9da0e10",
+        "surface-heat-authoring.cpp.o": "1c16235cea0eba3fdf9469be4b0c26fb5b112c6bb9668c43bd69b45b65ecd4f6",
+        "canonical-paint-uv.cpp.o": "5d751ed207737de46d1f61d0dac747776c6f9e4fcd5f7e9d126818e92dae4df4",
+        "canonical-paint-native.cpp.o": "0da455bdf1aae77947d6cba6243940954a814ffcb270e4c3e9f688773617fbaa",
+        "canonical-paint-prospect.cpp.o": "07bb747b2577a91a129985464b47819cec3b7b225e7d2dc3c2b06e196bc1e0b6",
+        "canonical-paint-sampling.cpp.o": "6f3b745803cb08878924f266a2f3b4c35f737b66387231a3c4528fd829526247",
+        "canonical-paint-archive.cpp.o": "80fd82afb4fc3fce3e3cfbc4e8fb1b38ae555df745451ac53bfbee5469abc160"
+      },
+      "fresh_source_dependencies": {},
+      "same_whole_pose_oracle_object": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-native-pose-quality-proof-20261112/v2/quality.o",
+        "sha256": "09648520252a937c04966134342533cf2741e161c11c85aa160e5b95ea667af1",
+        "source": "ef8092df7c72e5ebc9c86bfdd90c5b0f66d7bde0"
+      },
+      "fresh_changed_owners": "Qualified release-v1 whole owners reused only after complete product-source equality, then14consumer TUs freshly compiled/linked.",
+      "unskinned_source_artifacts": [
+        {
+          "asset": "female",
+          "path": "artifacts/humanoid-component-leg-support-proof-20261112/release-final-v2/native/female/unskinned.glb",
+          "sha256": "5eedf09cd1d23653fa1ba81a9a7983180a953aa35411b98d93b7a5846bdef6af",
+          "bytes": 16050792,
+          "no_skin_tables_joint_weight_attributes": true
+        },
+        {
+          "asset": "male",
+          "path": "artifacts/humanoid-component-leg-support-proof-20261112/release-final-v2/native/male/unskinned.glb",
+          "sha256": "79e8a90e198986940ee51d310b8dc5b12bf8b9b25c51d39a00912113609357fa",
+          "bytes": 17644188,
+          "no_skin_tables_joint_weight_attributes": true
+        }
+      ],
+      "native_artifacts": [
+        {
+          "path": "artifacts/humanoid-component-leg-support-proof-20261112/release-final-v2/native/female/solver-progress.json",
+          "sha256": "d352e127747c53f33f2761cd18d0cba4af198a8ffe3465f14be114cc9365ad90",
+          "bytes": 407
+        },
+        {
+          "path": "artifacts/humanoid-component-leg-support-proof-20261112/release-final-v2/native/female/pose-progress.json",
+          "sha256": "73fcd2663facc03545751660a1d2be896b6dd57eed9ef7b68c954744533e4954",
+          "bytes": 1994889
+        },
+        {
+          "path": "artifacts/humanoid-component-leg-support-proof-20261112/release-final-v2/native/female/geometry.json",
+          "sha256": "0f3011d4ce090f9a962863ff9d9f3141a73c31ce0b00b4d8edc94595eb97cfaf",
+          "bytes": 1012205
+        },
+        {
+          "path": "artifacts/humanoid-component-leg-support-proof-20261112/release-final-v2/native/female/geometry.bin",
+          "sha256": "16f9a950c512a37558c19ed98c900a634a2f8d6beb3b4b6f36509c5992af48ef",
+          "bytes": 35523036
+        },
+        {
+          "path": "artifacts/humanoid-component-leg-support-proof-20261112/release-final-v2/native/male/solver-progress.json",
+          "sha256": "7508a55f4446d11254080edfbaca868d8c89f14b70711337a7f09e9cb058b922",
+          "bytes": 407
+        },
+        {
+          "path": "artifacts/humanoid-component-leg-support-proof-20261112/release-final-v2/native/male/pose-progress.json",
+          "sha256": "1c311a00840a07fb85e76ed15c6a021337dfd297ec8d60b3beb111113c2fc0fe",
+          "bytes": 1993960
+        },
+        {
+          "path": "artifacts/humanoid-component-leg-support-proof-20261112/release-final-v2/native/male/geometry.json",
+          "sha256": "5c98caeffb39cd059767cad79ec494f65372dc1ecc3df7def9f500b3aafffb93",
+          "bytes": 1011569
+        },
+        {
+          "path": "artifacts/humanoid-component-leg-support-proof-20261112/release-final-v2/native/male/geometry.bin",
+          "sha256": "06f547c8709bc3ba91b282a6b3f479579a6e898a108c6537182677db491cef45",
+          "bytes": 35624376
+        }
+      ]
+    },
+    "sanitize": {
+      "status": "artifacts/humanoid-component-leg-support-proof-20261112/sanitize-final-v3/status.json",
+      "status_sha256": "d7745c58d90eb067a596fd0d3eabd0a65fc6305c22e4887630aa068c35d6190a",
+      "exit": 0,
+      "steps": 49,
+      "all_steps_exit0": true,
+      "native_consumers": [
+        {
+          "name": "native-humanoid-component-bind",
+          "exit": 0,
+          "seconds": 0.3180583770154044,
+          "deadline": 180,
+          "log_sha256": "a1d0ee33b695a3bb50fe04de38f8a41cb75f1d3f63595896299135d5b72a11ab"
+        },
+        {
+          "name": "native-rig",
+          "exit": 0,
+          "seconds": 0.03634523000800982,
+          "deadline": 180,
+          "log_sha256": "6e262db7cde7a26db92a72063e5383a2c0b04bc5f8905b13dd5a3c27089994a8"
+        },
+        {
+          "name": "native-skin-authoring",
+          "exit": 0,
+          "seconds": 2.672352626977954,
+          "deadline": 180,
+          "log_sha256": "40966dd688a48a845ea44b9e14fc6d35a66b314412cf20855a36ae34e667ead6"
+        },
+        {
+          "name": "native-skin-affine",
+          "exit": 0,
+          "seconds": 0.2687603730009869,
+          "deadline": 180,
+          "log_sha256": "e13936c53dd8ad4e15e12c57777e50767d7c15cf9d6f0dd72aae96eb81772cdc"
+        },
+        {
+          "name": "native-skin-affine-controller",
+          "exit": 0,
+          "seconds": 0.2194785620085895,
+          "deadline": 180,
+          "log_sha256": "049a2c47d8e4f9615f02b8b51870cf5be59305e4181345219451c60c4f4cfb28"
+        },
+        {
+          "name": "native-skin-affine-export",
+          "exit": 0,
+          "seconds": 0.26897318998817354,
+          "deadline": 180,
+          "log_sha256": "9c0ec20d37d6a2fa918068d0ce34998cd7803903490d5742ea7442434d50565c"
+        },
+        {
+          "name": "native-rig-fit-authoring",
+          "exit": 0,
+          "seconds": 0.21883536700624973,
+          "deadline": 180,
+          "log_sha256": "1ebd11b90e949b58d39214a3af6e697c9a9c93483c069144772e2cf7d07f31c4"
+        },
+        {
+          "name": "native-rig-fit-controller",
+          "exit": 0,
+          "seconds": 0.21783233899623156,
+          "deadline": 180,
+          "log_sha256": "7efa79392bbde2427ace22a4354707fa755e1373cebdf832a0577fd6b82c6a56"
+        },
+        {
+          "name": "native-rig-fit-faults",
+          "exit": 0,
+          "seconds": 4.483861881017219,
+          "deadline": 180,
+          "log_sha256": "1e4e8cafe25489f968fe0b1df1003230801542d1c50f5bb0849d11c5ee204ccb"
+        },
+        {
+          "name": "native-rig-fit-import",
+          "exit": 0,
+          "seconds": 0.21808248100569472,
+          "deadline": 180,
+          "log_sha256": "d981b2893208df4f06a50972f7a1aa24d112ebebe359a738ab6ec8bab60646eb"
+        },
+        {
+          "name": "native-rig-fit-metric",
+          "exit": 0,
+          "seconds": 0.21936808002647012,
+          "deadline": 180,
+          "log_sha256": "8c241ee1ba3e636cfc311a0b076c478cf22015b6fcb1c356b0c84143d4caf2b8"
+        },
+        {
+          "name": "native-avatar",
+          "exit": 0,
+          "seconds": 0.035575144982431084,
+          "deadline": 180,
+          "log_sha256": "2a33f9bccceb56c1d0fd9a229566fd2f4d7732c5199e038e48b83d460018cfc8"
+        },
+        {
+          "name": "native-rig-rest-pose",
+          "exit": 0,
+          "seconds": 0.5695775880012661,
+          "deadline": 180,
+          "log_sha256": "edfe98457f9db54a6f4e2ced1bc5ba45b9407d6d419c4569a5ad2f468ee9bdb5"
+        },
+        {
+          "name": "native-rig-rest-authoring",
+          "exit": 0,
+          "seconds": 9.042422354978044,
+          "deadline": 180,
+          "log_sha256": "6267c2ea1febf8a6ae5b62d9069af398600026374882e43dbe2ee8c1d4331f0f"
+        },
+        {
+          "name": "native-pose-quality",
+          "exit": 0,
+          "seconds": 87.33798368700081,
+          "deadline": 600,
+          "log_sha256": "9611faa43f3a19bcd4b7a61fcda4d06c446d0b826ffceae4a4b72a836b92eef2"
+        }
+      ],
+      "input_pins": 6445,
+      "input_drift": [],
+      "compiler_routes_verified": 193,
+      "whole_changed_owners": [
+        "rig.cpp.o",
+        "skin-authoring.cpp.o"
+      ],
+      "unchanged_whole_member_payloads": 191,
+      "public_headers_byteexact": 103,
+      "complete_product_differences": [
+        "src/automatic-humanoid-bind.hpp",
+        "src/automatic-humanoid-support.hpp",
+        "src/rig.cpp",
+        "src/skin-authoring.cpp"
+      ],
+      "provider_core193_snapshot": {
+        "path": "artifacts/humanoid-component-leg-support-proof-20261112/sanitize-final-v3/provider-core193.json",
+        "sha256": "fa856e5f0e280cc374fcd3ee1aeba4cd2d191d2d45c18c9100ff05332a9fe7c9",
+        "archive_sha256": "8521c8a6f817961a28598cea569930e0cb493d2d6a3d325f4a46eacd1d9d33bf",
+        "source": "cc5e6aed9f103da3998684c6188dd143e23e676b",
+        "note": "Own exact core/object/source/SDK/flags snapshot while original ALL may still run; no ALL/application acceptance inferred."
+      },
+      "actual_asset_macro_literal": "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/authoring-source8-hdr-fit-union-20261112/assets/humanoid\"",
+      "new_plan_asset_macro_literal_only": "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/assets/humanoid\"",
+      "asset_bytes": "All original and candidate assets pinned and byte-exact; fresh owner objects retain the original literal macro string.",
+      "environment": {
+        "LD_LIBRARY_PATH": "/home/blux/de-xr/dome-sculpt/artifacts/sdk-20261111/toolkit-sanitize/lib:/usr/lib64",
+        "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+        "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+        "LSAN_OPTIONS": null,
+        "LIBGL_ALWAYS_SOFTWARE": "1",
+        "LP_NUM_THREADS": "2",
+        "OMP_NUM_THREADS": "2"
+      },
+      "core_archive_sha256": "15f91ba8a2bdf4b1d4dd4131d449801662de3a00184601e746b1fd2f245198a7",
+      "core_member_payloads": {
+        "source-rest-graph.cpp.o": "abf749b12544ab085a241fb690320462d0d072bb4e460756d074c2433470340d",
+        "source-rest-plan.cpp.o": "764ebd91a717cc9843c76c89c06f8af26a0fbd5baf007018fe0c6a856e0017d6",
+        "source-rest-scene.cpp.o": "7161308443a1d3be52aad274fd949a2f48898f95ef9c877a28ab0ea1cb1bb67a",
+        "rig-rest-scene.cpp.o": "3c0b49effc4bf499d1fd5e430950b2638e951c8ee900d6b89203eac27a0f57a1",
+        "rig-rest.cpp.o": "7ef6141b28038b953377b809a2e34ba13ed703b8c4970728105f458091076f4b",
+        "rig-fit.cpp.o": "25d8344313c0b365e4c4acd7f46a81a8973f90397dd5a40caddf38f3101152ae",
+        "rig-fit-tool.cpp.o": "1084bd569fdea230b41633357572c68e2c355ac78022d5fec625d77d6baee527",
+        "document-rig-fit.cpp.o": "bb64ae2514ad42af1cba802d8a24ae734197499aa1d05431529389dc416d64f8",
+        "projection-tool.cpp.o": "940198709b5690e4e716e32f67b9fde7bf07d0798e10faae101c7eccbaacbe9a",
+        "document-projection.cpp.o": "ba0429feeec3c03a55067da528b6df58f1fa5ddbfd7c77d2a2704e4ebfcdd7ec",
+        "volume.cpp.o": "aaeb3bc4f733da8b50d314c05c55838d444377229681bedd64a8deb3999a2604",
+        "volume-raycast.cpp.o": "a370feaf76c628aad6d4335320434412038d2672ae69f05ac7fde7bb2604cebb",
+        "sculpt-mask.cpp.o": "6a7cc6c29d558eb0daf16965551ad4e62d8d6b21befdc3d6982b999ab55c4327",
+        "sculpt-resolution.cpp.o": "022d42adab3fb9f0a35b12f5bcbd9c352db14d7a8f083540d19d6a44db494cae",
+        "procedural-sculpt.cpp.o": "4277891fc73260554c5e93e63db9c0f003cd3c4b6b52c95eabcd1f5ba172a5a3",
+        "scene.cpp.o": "e98b6e5839306a606e9fff4cb7858b45321e7b142b48d46a19e9c76b681bca19",
+        "groups.cpp.o": "1cb2a6ebca151675dc16338e94cc9c1f9f0e4ff2a30ff5845edd92d26dbd90ee",
+        "creation.cpp.o": "9e1e984a14c0f9200e50de5ab8c9ccf7a3fbeaf8da5b067fa4cb764aae0dade9",
+        "mesh-authoring.cpp.o": "8bba8e122dc9978c655616318d3bfc3571ec76d89eaa753d6f25920cb88451d2",
+        "tangents.cpp.o": "33a7cf233480f382f7bf8af0fa34dc4762987fe74b9bbbc9cd607cd4999b3d12",
+        "bake-authoring.cpp.o": "19acf5e70c4757b990b65bd473bc3f20e720f843e1a0bc8d8162a8dd2eb4fba2",
+        "bake-recipe.cpp.o": "cc50a64bb8bd8c9d01cb1e7fe05a4f43c191af8d3b39f89c4cbb2893f1295885",
+        "document-baking.cpp.o": "ebcd3c45da26ea4d691cf1e24805ff05e8a7f26690aa64d4376b15d021798804",
+        "document-shapes.cpp.o": "aae6308b3e3e9a1c5bbfa8c519ac3746d9506a8afb73757d60a3f3a30b57ae99",
+        "creator-archive.cpp.o": "4f09a06615b79c6d39a1511cb616d192cf29140101cad20435c0d9544a4e9c31",
+        "paint.cpp.o": "dbda20ae97431d1eabcf341b433fd900d2f592a86881a463ec2b4f8b0700f36e",
+        "projection.cpp.o": "2ae88aa62952110a904615b5aa7a8baf2bca06ba3624113540d049c94ec98513",
+        "source-maps.cpp.o": "f2b03f1625aef047e89dcd94662e9a9eadf62cbb5f7e6c50514bb968b32beaec",
+        "color-preparation.cpp.o": "31879461d1784dd507097f8a59d0d93f0079a4459b1ac8955d86daacc02aca71",
+        "material-bindings.cpp.o": "c465f522fc0768f6a8923ddeb0ba0bd4047bfff00c5dcfc5c8725cae9baa1943",
+        "normal-frames.cpp.o": "2a14f185f6bb988c0b0e4ac91041fc8d4a2ba1a236e66c131fbac56afbbe22cf",
+        "normal-bake-frames.cpp.o": "3cf5dfe5f3cf62c4dd11983e819a7307a82d86a51af86f67a47438fb8537119c",
+        "normal-preparation.cpp.o": "bafe0e6f15a14ae183c977cd369b200c42eef4de5b80dbefc08a79c38e376f3d",
+        "canonical-normal-conversion.cpp.o": "3eceefd8d642a7b7c92b46fb9776015e78c25dc4f02e295c5f08b376a882fcd3",
+        "canonical-normal-owner.cpp.o": "46e8af22c38c43fa582e4611654f78b09c05ea53255b416f56febd273252d17b",
+        "normal-uv-reprojection.cpp.o": "1c052aa8cdf173c757def48425f6deb2f932850561d8169b1b73e27d06668cec",
+        "shapekey-authoring.cpp.o": "fb281bdf0a4ff1dabff5535e8d2fdf99fb98f9e7d26391f0d5ac1ad2ad89609c",
+        "shapekey-normal-preparation.cpp.o": "3e3515ae6bd0a92e5159dcd291a3ac0d719c0b3224de5ec0f7fd712464a03157",
+        "source-uv-bake.cpp.o": "cb2e8417f02cb088beddb3150b6612f82abd28282c2efa2d7230a35fcea3f4fe",
+        "mesh.cpp.o": "30c99363566adbf47677d74bbb05e95b035dce4e9aca0b7172d023e384896378",
+        "atlas.cpp.o": "c26f44c89d1cae9b0e0638bcfe4b87a0b88a1fbd68be3401ab6a3f7b4d78b647",
+        "uv.cpp.o": "7a0b6dfab4191c39b3e848f15c09646c0b84a6a19ad3324ac1af4dd34724bd46",
+        "export.cpp.o": "0eac833315a8f51887edd9f136bbccad691842515b25d83c0b428b7a822406c4",
+        "source-morph.cpp.o": "b9a037d227ff6f0db2bc522f0a9370b4d3c1d3e27bf18016f0d09874ba848f0b",
+        "vrm.cpp.o": "f4964972ec01cab7b4b756bba6e9c488c3d349260a4fd359be0078a772e9cde0",
+        "input.cpp.o": "ca9c5dd1fea94544a6c82a59d5aea6fc1899e96b20c7e701ce31034ea0b6695a",
+        "document.cpp.o": "42992a9b14db3628547e35ef1cc7ac8791695862400e3a89025aba4dea8e3da6",
+        "document-interaction.cpp.o": "37c7d0db86414ae9c704ac73788ccc42f07690db762e1f0886d82480595f2642",
+        "document-uv-solve.cpp.o": "57113f7ee0e43316b7e697ab775cfcf638e37688e7296d83a06de05285099ebe",
+        "document-recovery.cpp.o": "3a65cf59fd01bf9f86d6df3de075e10c5b6407b0f89d7afbea40981126c90349",
+        "document-assets.cpp.o": "345f4a9431957bd33f9740cf8742f910380fd837dddd704191a52e8e7fb02b41",
+        "recovery.cpp.o": "7c59acae4eee1fb97ba7154b59bc66571c88b341d04f92551d41ba998ff062dc",
+        "rig.cpp.o": "20a30d27748d0263db0b7e11e0f96bf10fa147dc9fe0043247d72fc43f638923",
+        "avatar.cpp.o": "56850331dffe25fdf6d80b4ff4c82faac8dd7c0a3e24f2cecb7e9fe0951a8073",
+        "humanoid-creator.cpp.o": "6618bdbece38ba906d6b3c4a6e05e2c3bff7109586ac7939c59788143142034b",
+        "vroid-creator.cpp.o": "32f9a3aea9fbd83342d83429ed6983bd75916af38531b7cb0e6548045ff8e9bc",
+        "vroid-groom.cpp.o": "932ebff75b9af0be16fe7648224a489455589e861b4e131f43d887f8f5ca38f8",
+        "deformation.cpp.o": "a82fe15d253ec64ab87187ac97af180cf9d1583838b86ba5dcf880712528de53",
+        "rig-edit.cpp.o": "7581b6dea68d1c87f2fb62f2cc6e4c3f47a0e9830e46a22fa8839c71520e10dd",
+        "weight-edit.cpp.o": "c3d3d139f7d90b74c3ac0ebdc81f9396e1ab883403fca7d56615fe90f60663f4",
+        "weight-authoring.cpp.o": "ad9587367c1eb114cdc2aabd668fdf858ab6387e57ab022b8a6f590237c11bde",
+        "material-visibility.cpp.o": "b1bf8375d53838d2b545a62a3c2bf103204674ef60ef06939f45fdff84f1cf54",
+        "skin-authoring.cpp.o": "f614eadc0e4787ff9d56555d2a0651aa8bffcb312f435d61554c9a9cae454c2c",
+        "document-skin.cpp.o": "348538cc0cde2ec3d92cbf403bd98905871e4735cd2abaa2ac99fe68c167e4e9",
+        "uv-solve.cpp.o": "09fda14e9af72fb80893abc76292b3b14ca6c8874dd42901e8f2374a9b17898d",
+        "import.cpp.o": "a91a355a093959fcc7cd154804e41b14aa2215c28f9699202c1f7fc82277b9cf",
+        "bone-metadata.cpp.o": "9d15fa35e0d78c5a4720ac284101f329671c86cb41b7a7cdc9013089b98109c6",
+        "source-node-extras.cpp.o": "5e9ba6618099a74a3bbfa807d36447dd5d60b307d2758fcd7b13aa9770b40731",
+        "source-decoded-images.cpp.o": "649bd73217a37a78d61eee61d6e7b8bbb44b2ff67cc2c745227579f3fe0c3624",
+        "import-authoring.cpp.o": "c9e447b82497b797ba203a377c6f93cd0e62a8eab1e7e487e4886b6eba8210fd",
+        "vrm-import.cpp.o": "ded45c9d424776616476e93cf3681f84c63c450b201efdd21f7029a9b893cb22",
+        "vrm-source-graph.cpp.o": "33eecded82dde4603c48744c640362b76f9ae09211fb79092f048d3644208445",
+        "vrm-rest-metadata.cpp.o": "a27aaf2f532e1cbb2f4ffd2fdf5a35b58d03dc55abcd3b192380052d2aa172d1",
+        "vrm1-metadata.cpp.o": "0f5d92e042b78f93762119bd6ad8fc0b86eb7541186cad4afac27fd6d2659ddb",
+        "vrm1-export.cpp.o": "a5c03a1aa1d697906d8743313db43fe77a34a00a9e3a3992aea8c20d4d70c8fb",
+        "vrm1-authoring.cpp.o": "6a8963597d8d3411fe1676e68162e436a8dabddfa0a845271193731ead314157",
+        "vrm1-painted-material.cpp.o": "be571f1814a7ffc8ad5012cdb32f3c59b4a33cee46046a1e791b02a255269e31",
+        "vrm1-expression-layer.cpp.o": "5f1d7b40c759064f693d7694e0da7a02c91643fc88e8f9680b1baedd98b593f8",
+        "vrm-expression.cpp.o": "c68df973dc6d14b35b260a0aec4d29c62732430f650a6dc8991e284d8303a692",
+        "vrm-expression-scene.cpp.o": "9aabd51dea7505c081f4537b46ee96b62988b5aaac4c3ffc03ce824b3e7cae66",
+        "document-expressions.cpp.o": "d2437a74523fea1508440248684cafbdd344e25ab458a80f7d903f88d31b2c44",
+        "source-rigid-pose.cpp.o": "e9af89013d792d3b5b3073a4e77fc0388b67ede35be79bfa5f09ddcf27c24761",
+        "import-options.cpp.o": "810200203367ef4eb713d8d9a7207822e8f75b33fabc861f6529fb07d7301167",
+        "import-browser.cpp.o": "c004489347baac52da56f2ca96245536d3867d11bb252c08f24c7e6e4c0a6e99",
+        "document-import.cpp.o": "7f6e5e662d4a248efbe12163820cdd7f311291a62d37f24254934a883ec4f9c1",
+        "import-image.cpp.o": "fc2c6cac33e19f721739d72bd536af4919c87e918070ecbfc4eb9ae90bd5b94f",
+        "import-jpeg.c.o": "4c006c19b9c11e3102bf4bbdd6946ce9fd9335a187ed8ccf0a01ee777a4c0c0f",
+        "import-source.cpp.o": "c02281fee6bc884abedf0b52537b63dd7a39ee8ef54d3e67773a30967cf97d84",
+        "import-native.cpp.o": "a2db5fcc819daf3320d9d942925bcd6254873b25d1bc4022b5419029384f0b81",
+        "mesh-processing.cpp.o": "301611f076afb66604b9af1328fd157f59ba1b2b32a5834a5b71a927bfd5e169",
+        "retopo.cpp.o": "7a8112fd64385f45a4a1a806694812b9efe3afa64dad4510987b66e21a01ce31",
+        "remesh.cpp.o": "ff565b6c761bf8b4179fd4ad7dbff9a792c520760c4c38d6438dafa16036583a",
+        "bake.cpp.o": "fb9ac913c495b9b816bffb56d3493899ee8fbca6c15a9f9600d0a9b02304e6fa",
+        "mtoon.cpp.o": "54a2b18af4416ac3d4b6ace143987643ef9bb992049a084034399e14b8a573bc",
+        "navigation.cpp.o": "3dcb3f44fe91c4f4ebbece70e6973faddb0aaaa7b0c2ae69a791f54d0f3eebe2",
+        "controller-profiles.cpp.o": "80686a161b3872bb338b838754ecfdf243c9538a62400b20bdbe22f1e3240fc6",
+        "paint-sampling.cpp.o": "898efcdbe86781da72d9f4e82041cbb0fca5731aa41726bd6e2db51bc66d30bb",
+        "paint-sampling-archive.cpp.o": "a564a10f416f40d71301080f22c748275c0bc26f191e9dea84db7ba10a2a12d2",
+        "color-paint-sampling.cpp.o": "7b50bedc225c7496c1862ca9ca17ab5f2ae7f184aa769ab6ea71fcb709c69ae1",
+        "native-paint-sampling.cpp.o": "9e02bf070f9c758baffc8391c26a8e585eef62231acf92e68ee03c370807392b",
+        "native-paint-frame-source.cpp.o": "a05a7dc85192e4ec58158ad12035799901c02b2263128669b21af80ba0837b80",
+        "native-paint-metadata.cpp.o": "c9acaacd65e0bec8740268f20df9b272cea0e1eaa4974dcfd7122f6acf2fe4b7",
+        "color-uv-reprojection.cpp.o": "2a43c3901da48e41c89220266afe6507e9e2b2cc3a96ea85bee3bb6ca5124295",
+        "normal-sampling.cpp.o": "a296d38ad15db948892fc9795813e427296a112fcff6331546e858a18ea31a1b",
+        "normal-sampling-replay.cpp.o": "0609fe5239ef59aa0423e8042c21a2b921a6ec959edc84ceec7e5caa21276869",
+        "normal-preview.cpp.o": "8f242ee498e950e57f1c9885b1edcc781c90ec834a5b2bc90aaab46230a421d5",
+        "normal-sampling-surface.cpp.o": "f7809c18af2a0da151c9f31e70ecb91070f74283ea9deeaa19f438b1e9dc41ec",
+        "polygon-color-uv.cpp.o": "97ef508712ce3840f0a2446e1917c87a0ea1bdb54ea3d7e4dbeec94a3bfedb91",
+        "shapekey-attributes.cpp.o": "cf5b63a64611878f2c9567a321d461fe9bd446672795323c26b619a953bb87e4",
+        "corner-key-expansion.cpp.o": "d9376acf2723331f78b1744dd02b4b7652561c92f740903cc9248c7281627ed6",
+        "frame-position-domain.cpp.o": "ade38d81e001bd9c232c571873ee26b4ac271094e50f5a73dba96cc4f51a5c15",
+        "key-frame-archive.cpp.o": "7b46b267296b92b9463c4e5beeda3c3aca8ddadfa41438b8d3b09675fc27f773",
+        "key-derivation-codec.cpp.o": "3390f2e1e4460083824d20899ecd86c31f1781d22e1e9e5dfe77e710c26eeab2",
+        "normal-key-derivation.cpp.o": "ab99e56e29cc17befd81ea08483a6068c797188c05cc085c458be89030fc8372",
+        "key-archive-preflight.cpp.o": "970b3505581d3c58f5c4cc81d42134c10a939919019e2334762ff75a44959a13",
+        "key-mirror-correspondence.cpp.o": "8b12f9f9fe86675f7888e12db8a7414cf62179e145cf5f9e9dbc87d1b25925cb",
+        "key-mirror-relative.cpp.o": "798d3f3bdfa65cb86861bdf50f24f060b20b3ed80334bda84c8cc006cb0dba33",
+        "backend_cpu.cpp.o": "ba81b5c69d3fedf362d65e254160051606445246d935be1373b2e11f66863d5c",
+        "sparse-resample-cpu.cpp.o": "613513655fcaa2d7083d12cce65e8cf6b52a55efb3ae4fbbb4397589383434fb",
+        "emission-bake-source.cpp.o": "d5124e770cc81e55f0014bce52e51beffea3291e0a220fa5d319f3b993ea7e29",
+        "document-paint-blur.cpp.o": "87efa85c75a5f4527e9979668ae77c0169b8ec3f4ca507ddbac663934f1c5bcd",
+        "retopo-authoring.cpp.o": "82450187a379c97cf328e9270f1304e119672c0125e579f571784a44e7346713",
+        "document-retopo.cpp.o": "fb5564a4036e26dcaba9d255686cd6bf0f32329ba717a45a24f51da15432048c",
+        "document-sculpt.cpp.o": "33f665fae9d9216c5a9e03c217767f56b6d0e4f54daf9dd84e5f4a5dfee33d9a",
+        "document-native.cpp.o": "0a5e7ac7da0efbaf9c34b1e9b4bd7a77f854fc18ac42f83f2bd2440f3e1b32dc",
+        "document-contact.cpp.o": "2920c8080aee736cec2233967ea3803780e0e2e120565fcca03078adc3b900f6",
+        "document-transaction.cpp.o": "b47a0d185e6f5399d5678d7dfcb6a41ce968ef56e24a127d4d5de529e1d4ae68",
+        "texture-sets.cpp.o": "30f607aaf6e8c7d98af68b2746e79d851f585f41b4102d7df5606d615cbe9d3c",
+        "texture-set-graph.cpp.o": "fb7e30058a95aac0f06fa09304a73dcb3a2c1c5f6df8db7d02cc33de2d6bdf2b",
+        "texture-set-archive.cpp.o": "434598767f186c79d1ff94bcb25114486901422898f294edc5fea0f9c88c3af6",
+        "texture-set-surface.cpp.o": "83b2ce6fb957b818af22c00c23c06052c4e5cd05314efe029ae52c4b1b5e3623",
+        "texture-set-range.cpp.o": "9ed2d95c2cd49ec369874ee1508f298f98466d1453698a1bf2a5bba808762135",
+        "texture-set-packed.cpp.o": "c97f107a313c188065ace8415c547ee267a0b6bc5a3516d5fa7757537a686e7a",
+        "texture-set-resample.cpp.o": "a03d6f09600e2311151a75c33eda758a8b02a6d626a07b05f0e2cea84fada3d9",
+        "texture-set-worker.cpp.o": "c3f9c894bdae1df23c59268c83c2dc2495539d87e6ba02e6f7d88b0d435e904a",
+        "texture-set-stroke.cpp.o": "42171fa1c3f62ae1815d0affe7d7d4b5d7177381aa59623972022285014a45e6",
+        "document-texture-sets.cpp.o": "71f3d6c0f2e6268c1fb56fbd902fecca065815575e4f9619bea6757d7adfa461",
+        "texture-set-export.cpp.o": "cd860a4849d4937849182b8f54551700d93668ea7bd508fc17596946fb2372ea",
+        "texture-set-field-source.cpp.o": "72384126d31e5ae5783a3b61771bf818f0648951664f49c01723482f5ad6d30c",
+        "texture-set-field-codec.cpp.o": "1d26ab4eb4a56916de63ed0b5a9bc15e8d90a2338eb87ae2a2aa16fa87ae8a37",
+        "texture-set-portable-field.cpp.o": "2e86f68386f444b5f47feac7315e79ccd0823fbe95bc260d04aeeda817b59ae8",
+        "cut-authoring.cpp.o": "664a3c2e2d4a95236b9663d0814ff32a84bd93ab2e87bdc22498b3212b997d73",
+        "cut-color.cpp.o": "8ce3584822de45b9c37f8c6c0d21f4cd10ec04ba702f5661da04103d2303cc66",
+        "document-cut.cpp.o": "5b6457b6c7290de03a73f08f6de5ca334c84bb9cc49c4f15b2ef735033297f30",
+        "document-worker-errors.cpp.o": "68563a488fd3431cedc1a697192875a5b33734956473ce73f87b5ff13d041a1a",
+        "object-selection.cpp.o": "9cadbda59628d9ab6450025ba02df99d98f888cc57eef51fc2db32b26eb90895",
+        "source-sampling-transport.cpp.o": "dba7afc16f6c74c04aa3bba49d78d4c58cf61f7c2e21768063943be60a82af61",
+        "source-placement.cpp.o": "e16e655aca642f0a10e90e5bcaec2af436b806f558e90071a9e3554b64048ef6",
+        "source-placement-archive.cpp.o": "bd23302f53cb849b747d1848701e765ccb52fb2fb00fa50e9187d82193b85d56",
+        "polygon-authoring.cpp.o": "45973d364498d1fe1cf2ab764ce12742315529202eff86536933f6cda33abe86",
+        "polygon-source.cpp.o": "017fa821170dceb3f0ddd1c65cbd3d508b617784d3268b1698afeb8ebdf2abc4",
+        "polygon-color-source.cpp.o": "e8a23733265578c9e448805f8c323a9acf2a91f811709c988c884cfc48c8498f",
+        "polygon-color-archive.cpp.o": "959eab48a55f350766cc87772c70c0d256980f54cc80300420c66d51175c19c5",
+        "polygon-scene.cpp.o": "85424a65716b2be4290e686d418ea7c3d074d177240815d3373743daca4302a3",
+        "polygon-conversion.cpp.o": "e26de0ca062672ecda70c8f5c742bafad5d22c8a70b131494ed39449907b9286",
+        "document-polygon.cpp.o": "a9f86257595179b9c69edc6838b1335b19931401dac0132115fb5467224ba193",
+        "polygon-surface-transfer.cpp.o": "ab99c8d66969bbceae9e30dc87d4b41b484366b468fd92ff8eb79d9f880883b5",
+        "polygon-surface-owner.cpp.o": "a64f56a80da1074a386d10d71c3db5c340cd88e0cd90efa7a8505954cf75c8f7",
+        "polygon-surface-codec.cpp.o": "1322d84abb0067ee7dfbd1ab52192b26d611167b5db8fbe561c558359c05df06",
+        "polygon-surface-preview.cpp.o": "5910ffaa2d0babfa182f90bbd63814388980a9dd0ba812c0bac8ac7c52ba0c1d",
+        "polygon-surface-paint.cpp.o": "15faca7a38faea9e6e44809a007472a3f1a815f7197700de3e30bc38e1104b75",
+        "polygon-surface-archive.cpp.o": "f1c39744b23a0d43ea07af415b839dff742770dfaa6a416962d8b421c1914c32",
+        "scene-file.cpp.o": "53fd22bae657d5c4ae6f7b3d7002f2cd98a2c1a713cf039c5fb503d0d976f9a4",
+        "native-scene-append.cpp.o": "757972fe138900f5e3ad63c75cd96c00dffebf8c0ad2446f01872881d3900276",
+        "emission-package.cpp.o": "0c51fcf48b1862da8c4d2bb4f2ea8d014cfeae7756361fcfaf7ca71cff048507",
+        "native-authoring.cpp.o": "b78971c47da15b67a8b1120e353a6d877b1537628a4a04cfd904b15668fcdc39",
+        "native-authoring-compiler.cpp.o": "856b4bc1743a541ac9f8193e58425d2103c29b1cf97e56434add44fad9e52cc0",
+        "emission-export.cpp.o": "25726fe84c523672f79d82bfdb2714700a0dfade05559b38a32425e4e95a880b",
+        "local-surface.cpp.o": "84a1b9dbbae5519e47ccf3bd91b058988e528d33565d59227c734cf0d15ac0e9",
+        "volume-geometry.cpp.o": "13d38fedd59dd46264949cdbac14fb3ef31c01fb26a2f1fe63370d1d07678afc",
+        "sculpt-storage.cpp.o": "b8ec4b5182d873a92003a5fd84c21bd3c9af576f9eae7fb74f789b0743015155",
+        "ray-index.cpp.o": "d585f143d09659efd2f78ec7accb8bde3ac9b271be074f4d0c020b18bb73e383",
+        "sculpt-surface-chunks.cpp.o": "99f75d9d333ba7fc02098acca368ec4ed8f977c14dfbd1e6e20a6a2345a6819c",
+        "sculpt-scene-chunks.cpp.o": "c073d80bb3a248c5f2d6b3dc4f9a2a97ed38afb650b5d87cd29b4b61faae0c32",
+        "sculpt-placed-chunk.cpp.o": "23bfae6bb068f094fd4a8c3b218c99f02dbacd0bfa583f87ba1882c93ca7f76b",
+        "sculpt-placed-chunks.cpp.o": "cce1d1d2ced3b33b58aa6ffb27a5892d0d9249aec91cdf3f5115ae1a20fcbbdd",
+        "sculpt-chunk-masks.cpp.o": "d86597b0e9744ed28633bd3024b78611855cf4c786ccca23ba904a666160d16a",
+        "shapekey-sculpt.cpp.o": "b3a6e4e1feeee79471c23697018caa3c8422362fd516d45f941d4943581e0c44",
+        "retopo-edges.cpp.o": "f9af7dea055e9218333d678fce80f993c6ffecd5c5966583abc4e081db68c6da",
+        "paint-composite.cpp.o": "20137b85b67c8ab0c42c3911714e2590482957e9232bd65963fc1aa031eeeaf5",
+        "paint-composite-cpu.cpp.o": "098e7d280bb50eee6ff64a1aba6403deb41527bebef3730c6351d6d9d9af4844",
+        "current-paint-preview.cpp.o": "deb281d4cc9bd468bbd71ea77fe1d2f11ca705458b5a7186ffa8f4df2bd9de14",
+        "baked-normal-field.cpp.o": "9475f330159647ae58e7fe1d7188684a8cb68ab8480d7e6c3e32943272467763",
+        "baked-normal-archive.cpp.o": "2e1bb067e8e34f209cd00d354e0904cfad3a2c85df323eb23a96b9ec28d22812",
+        "canonical-normal-uv.cpp.o": "149dfe75f50a1a146fe19e2c3c8652976e224c86ad2d4d21886c1ba9e9c26f46",
+        "canonical-native-pose.cpp.o": "78119ef7a9546bf7191d8ab198b1747fe7592e27b5487a1f896af62cd44abafe",
+        "anatomical-authoring.cpp.o": "a6d1044972497886d628d9100f60d7af36dc62c65e228bcde9e00571639f4bba",
+        "surface-heat-authoring.cpp.o": "af070961ae81ec9e4d8b6d7cd733ca7e2bb74a9e48d017a2a31baef5bf02a87e",
+        "canonical-paint-uv.cpp.o": "a5312d792bf9cb30468505289d7c32a402b087c4ca40fb733143f6993f00d9ce",
+        "canonical-paint-native.cpp.o": "04be6589c28f4cf4fced11135e2c8c3512dce73fceb25149a7315a3229c239a5",
+        "canonical-paint-prospect.cpp.o": "8f32b97580b5bd64e46bfe4c1bfd1c163196cfebaa94b20bac6ce87663a5ba9a",
+        "canonical-paint-sampling.cpp.o": "f5a096c5a0757991f1d00a5a4609d9bd4a7d8039ddf046c52b710a3201ed6252",
+        "canonical-paint-archive.cpp.o": "d897793581907b39f7cb3750e4a3b8123d649b749b7508950507dd32f199d088"
+      },
+      "fresh_source_dependencies": {
+        "rig.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/rig.cpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/rig.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/mesh.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/volume.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/brush.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/math.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/cow-map.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/sculpt-storage.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/third_party/nlohmann/nlohmann/json_fwd.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/automatic-humanoid-support.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/automatic-humanoid-bind.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/avatar.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/weight-nearest-support.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/heat-source.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/humanoid-creator.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/deformation.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/import.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/paint.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/emission.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/baked-emission.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/paint-blur.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/heat-binding.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/volume-exact.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/weight-surface-system.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/mesh-processing.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/affine.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/third_party/nlohmann/nlohmann/json.hpp"
+        ],
+        "skin-authoring.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/skin-authoring.cpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/skin-authoring.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/scene.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/affine.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/deformation.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/avatar.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/rig.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/mesh.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/volume.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/brush.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/math.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/cow-map.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/sculpt-storage.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/third_party/nlohmann/nlohmann/json_fwd.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/groups.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/navigation.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/third_party/openbrush/navigation.h",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/third_party/openbrush/brush-math.h",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/paint.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/emission.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/baked-emission.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/paint-blur.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/skin-affine.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/affine-interaction.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/automatic-humanoid-bind.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/normal-frame-runtime.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/material-bindings.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/mtoon.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/third_party/nlohmann/nlohmann/json.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/source-maps.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/normal-frames.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/humanoid-creator.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/import.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/frame-position-domain.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/corner-key-expansion.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/source-frame-skin.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/source-tangent-frames.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/tangents.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/source-flat-normals.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/polygon-conversion.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/polygon-scene.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/polygon.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/source-rest-scene.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/source-rest-plan.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/source-rest-graph.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/rig-rest.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/source-placement.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/creator-archive.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/rig-edit.hpp"
+        ],
+        "pose-quality.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/tests/humanoid-native-pose-quality.cpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/tests/anatomical-fixture.cpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/import-authoring.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/import.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/mesh.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/volume.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/brush.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/math.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/cow-map.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/sculpt-storage.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/third_party/nlohmann/nlohmann/json_fwd.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/import-options.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/scene.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/affine.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/deformation.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/avatar.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/rig.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/groups.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/navigation.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/third_party/openbrush/navigation.h",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/third_party/openbrush/brush-math.h",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/paint.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/emission.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/baked-emission.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/paint-blur.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/rig-fit.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/source-maps.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/gltf-document.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/source-morph.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/humanoid-creator.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/third_party/nlohmann/nlohmann/json.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/native-anatomical-weights.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/native-weight-retention.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/native-weight-paint-access.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/native-weight-state.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/geometry-weight-authoring.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/anatomical-continuation.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/bone-shadow-query.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/bone-line-integral.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/bone-shadow-filter.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/bone-source-shadow.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/volume-exact.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/geometry-rig-correspondence.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/skin-affine.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/skin-authoring.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/affine-interaction.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/weight-surface-system.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/mesh-processing.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/heat-binding.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/geometry-reference-replay.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/heat-component-intent.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/heat-seams.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/volume-topology.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/heat-source.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/material-visibility-seams.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/native-unused-source.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/screened-continuation-solve.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/screened-sparse-ldl.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/weight-declared-support.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/weight-contact-intent.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/weight-nearest-support.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/weight-shared-simplex.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/weight-user-boundary.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/weight-equality-quotient.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/weight-hierarchical-partition.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/document-authority.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/polygon-conversion.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/polygon-scene.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/polygon.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/geometry-field-packing.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/creator-archive.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/material-bindings.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/mtoon.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/normal-frames.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/import-source.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/source-placement.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/bake-recipe.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/include/dome/bake-settings.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/native-head-geometry.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/native-anatomical-domain.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/rotary-cap-geometry.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/weight-boundary-sewing.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/native-carrier-continuation.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/src/native-localized-assembly.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/tests/humanoid-pose-reference.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-affine-20261112/third_party/cgltf/cgltf.h"
+        ]
+      },
+      "fresh_changed_owners": "Both complete changed owners and complete independent oracle TU freshly instrumented;14consumer TUs freshly compiled/linked.",
+      "unskinned_source_artifacts": [
+        {
+          "asset": "female",
+          "path": "artifacts/humanoid-component-leg-support-proof-20261112/sanitize-final-v3/native/female/unskinned.glb",
+          "sha256": "5eedf09cd1d23653fa1ba81a9a7983180a953aa35411b98d93b7a5846bdef6af",
+          "bytes": 16050792,
+          "no_skin_tables_joint_weight_attributes": true
+        },
+        {
+          "asset": "male",
+          "path": "artifacts/humanoid-component-leg-support-proof-20261112/sanitize-final-v3/native/male/unskinned.glb",
+          "sha256": "79e8a90e198986940ee51d310b8dc5b12bf8b9b25c51d39a00912113609357fa",
+          "bytes": 17644188,
+          "no_skin_tables_joint_weight_attributes": true
+        }
+      ],
+      "native_artifacts": [
+        {
+          "path": "artifacts/humanoid-component-leg-support-proof-20261112/sanitize-final-v3/native/female/solver-progress.json",
+          "sha256": "6980948f541ba0033dcb4e2fa69a15d0084a661c1f96df410713a7d315b27e38",
+          "bytes": 409
+        },
+        {
+          "path": "artifacts/humanoid-component-leg-support-proof-20261112/sanitize-final-v3/native/female/pose-progress.json",
+          "sha256": "e9f3687b707da5d329c2afe1e207195378672f28b9df17104ad4e7248da53eeb",
+          "bytes": 1994891
+        },
+        {
+          "path": "artifacts/humanoid-component-leg-support-proof-20261112/sanitize-final-v3/native/female/geometry.json",
+          "sha256": "0f3011d4ce090f9a962863ff9d9f3141a73c31ce0b00b4d8edc94595eb97cfaf",
+          "bytes": 1012205
+        },
+        {
+          "path": "artifacts/humanoid-component-leg-support-proof-20261112/sanitize-final-v3/native/female/geometry.bin",
+          "sha256": "16f9a950c512a37558c19ed98c900a634a2f8d6beb3b4b6f36509c5992af48ef",
+          "bytes": 35523036
+        },
+        {
+          "path": "artifacts/humanoid-component-leg-support-proof-20261112/sanitize-final-v3/native/male/solver-progress.json",
+          "sha256": "6a8e92e0fce4d54bf6d34c673363a042269af0ab43b7e4af0caa56651b48ee37",
+          "bytes": 408
+        },
+        {
+          "path": "artifacts/humanoid-component-leg-support-proof-20261112/sanitize-final-v3/native/male/pose-progress.json",
+          "sha256": "1a6490bcd20ae4fa401a50e0a0a1611e3d0980a9f372b952344e63c40f132dea",
+          "bytes": 1993961
+        },
+        {
+          "path": "artifacts/humanoid-component-leg-support-proof-20261112/sanitize-final-v3/native/male/geometry.json",
+          "sha256": "5c98caeffb39cd059767cad79ec494f65372dc1ecc3df7def9f500b3aafffb93",
+          "bytes": 1011569
+        },
+        {
+          "path": "artifacts/humanoid-component-leg-support-proof-20261112/sanitize-final-v3/native/male/geometry.bin",
+          "sha256": "06f547c8709bc3ba91b282a6b3f479579a6e898a108c6537182677db491cef45",
+          "bytes": 35624376
+        }
+      ]
+    }
+  },
+  "preserved_attempts": [
+    {
+      "path": "artifacts/humanoid-native-pose-quality-proof-20261112/v1/status.json",
+      "sha256": "ae48125383f27eb411753ad959d705ef89afe88df8635b02302ef246238781e8",
+      "exit": 1,
+      "input_drift": [],
+      "description": "Original native morph-vector failure, preserved as failure; zero-weight semantics corrected in test-only child.",
+      "error": "Traceback (most recent call last):\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/humanoid-native-pose-quality-proof-20261112/run-v1.py\", line 40, in <module>\n    elf=O/'quality';link[link.index('-o')+1]=str(elf);run(link,'link',120);pin(elf);run([str(elf),str(S/'assets/humanoid'),str(O/'native')],'native',600);result=json.load(open(O/'native/quality.json'));assert len(result['assets'])==2 and all(a['artist_weights_in_solver_source']is False and a['full_artist_reference_loaded_after_all3_solver_outputs']and a['no_native_vertices_excluded']and len(a['methods'])==3 for a in result['assets']);state['report_sha256']=sha(O/'native/quality.json');state['exit']=0\n                                                                                    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/humanoid-native-pose-quality-proof-20261112/run-v1.py\", line 13, in run\n    row.update(exit=code,seconds=time.monotonic()-start,log_sha256=sha(O/(name+'.log')));save();assert code==0,(name,code)\n                                                                                                       ^^^^^^^\nAssertionError: ('native', 1)\n"
+    },
+    {
+      "path": "artifacts/humanoid-component-leg-support-proof-20261112/release-final/status.json",
+      "sha256": "cf8024bac1643442af900f07d6dee217641e3cb1aa8d8f784b07c441562370b4",
+      "exit": 1,
+      "input_drift": [],
+      "description": "Preflight metadata route failure; actual third-party member-owning routes fixed in separate driver.",
+      "error": "Traceback (most recent call last):\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-support-proof-20261112/qualify-final.py\", line 26, in <module>\n    entry=before_core['src/'+name[:-2]];obj=Path(entry['output']);assert obj.is_file();h=sha(obj);assert hashlib.sha256(subprocess.check_output(['ar','p',str(archive),name])).hexdigest()==h;pin(obj);provider_members[name]=h\n          ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^\nKeyError: 'src/navigation.cpp'\n"
+    },
+    {
+      "path": "artifacts/humanoid-component-leg-support-proof-20261112/sanitize-final-v2/status.json",
+      "sha256": "c31796b8e8774f173b8ef512b3a8ae96f825bd917526e0ddd7b711e26dc01f52",
+      "exit": 1,
+      "input_drift": [],
+      "description": "Preflight strict flag mismatch rejection before compilation; exact real provider Release sanitizer flags used in separate v3 plan.",
+      "error": "Traceback (most recent call last):\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/humanoid-component-leg-support-proof-20261112/qualify-final-v2.py\", line 45, in <module>\n    args=shlex.split(e['command']);want=shlex.split(after_core[rel]['command']);got=[x.replace('-I'+str(C),'-I'+str(S))for x in args];got[got.index('-o')+1]=want[want.index('-o')+1];got[got.index('-c')+1]=str(S/rel);got=[newmacro if x==oldmacro else x for x in got];assert got==want,('all193flags',rel)\n                                                                                                                                                                                                                                                                                 ^^^^^^^^^\nAssertionError: ('all193flags', 'src/source-rest-graph.cpp')\n"
+    }
+  ],
+  "reports": {
+    "release": {
+      "raw_artifact": "artifacts/humanoid-component-leg-support-proof-20261112/release-final-v2/native/quality.json",
+      "raw_sha256": "5d38d76ab723fb229abe69b48a18607276f621edc197af40ae3f4abf3e96c36e",
+      "committed_gzip": "docs/validation/humanoid-pose-reference-release-20261112.json.gz",
+      "gzip_sha256": "83ab746491fdd1b859cebdb496558888393fecbab70a1e4c1695f0634136e7ff",
+      "decompressed_bytes": 4634380
+    },
+    "sanitize": {
+      "raw_artifact": "artifacts/humanoid-component-leg-support-proof-20261112/sanitize-final-v3/native/quality.json",
+      "raw_sha256": "db8ccb341baea2086ba6d778a98bc1cbd1801265f0a581766d470532cab466e6",
+      "committed_gzip": "docs/validation/humanoid-pose-reference-sanitize-20261112.json.gz",
+      "gzip_sha256": "5c3caa40858a8f5daa2164e97e9690ba46967ef8a626eacbaaed6419e2d6d9cc",
+      "decompressed_bytes": 4634383
+    },
+    "baseline": {
+      "committed_gzip": "docs/validation/humanoid-pose-reference-before-20261112.json.gz",
+      "gzip_sha256": "919e4ae11200fe06bd45ecc535d037211e5d7380d768a12a1dc35bed0cf01ff1",
+      "raw_sha256": "0e36e0f8d33cd8cefb0392b98c8a43463598d5a86cc10101ff2f110bc8710527"
+    }
+  },
+  "methodology": {
+    "artist_skin_in_solver_inputs": false,
+    "source_factory": "Existing full unskinned source factory; geometry/node hierarchy retained, explicit human-role node positions serve as authoring landmarks; skin tables, JOINTS/WEIGHTS/IBM accessors and binary payloads physically omitted.",
+    "artist_reference_loaded": "After all3 public native solver results for each asset are saved",
+    "reference": "Independent original cgltf graph/affine matrices/full skin joints/IBMs/all influences and morph defaults; exact CreatorAppearance source_node/source_mesh/source_primitive/source_vertices identities",
+    "all_native_vertices_included": true,
+    "secondary_joints_and_influences_included": true,
+    "poses_per_asset_method": 23,
+    "assets": 2,
+    "methods": [
+      "legacy_automatic",
+      "surface_heat",
+      "anatomical"
+    ],
+    "comparisons_per_profile": 138,
+    "rest_correctness_tolerance_m": 1e-05,
+    "native_operator_correctness_tolerance": 2e-05,
+    "artist_pose_errors": "Descriptive only, no artist-similarity acceptance threshold",
+    "normal_convention": "Weighted individual inverse-transposes normalized once; descriptive authored-normal convention; geometric triangle normals also reported",
+    "scene_immutability": "Exact encode before/after each complete const23pose measurement loop",
+    "rigid_pose_driver": "Same original physical joint pivot +declared world axis, exact native local affine pose matrices preserving native hierarchy/space/rest/IBMs"
+  },
+  "limitations": [
+    "Two bundled CC0 assets and23 stated poses, no animation or universal asset acceptance.",
+    "Artist skin is a descriptive reference; source weight similarity alone is insufficient.",
+    "Remaining Legacy thigh/pants knee error and shoulder/wrist differences remain documented.",
+    "Generic unmapped tapered-component leakage remains original policy; mapped role authority is required for this correction.",
+    "Figures render actual posed solid geometry and normals on CPU with no material alpha/textures; no final material silhouette claim.",
+    "No work, memory, source or normalization acceptance limits raised; solve time is not a performance benchmark."
+  ],
+  "baseline": {
+    "source": "ef8092df7c72e5ebc9c86bfdd90c5b0f66d7bde0",
+    "status": "artifacts/humanoid-native-pose-quality-proof-20261112/v2/status.json",
+    "status_sha256": "a052b54bc2c21da086554843ac5965fb8b3af0abf41c64c0c0226090ef561de7",
+    "exit": 0,
+    "input_drift": [],
+    "core_archive_sha256": "8c0706bf85c51facabc5fc3de00116e4e982f1fc37b840512cc665642665d893",
+    "raw_report": "artifacts/humanoid-native-pose-quality-proof-20261112/v2/native/quality.json",
+    "raw_report_sha256": "0e36e0f8d33cd8cefb0392b98c8a43463598d5a86cc10101ff2f110bc8710527",
+    "whole_R_oracle_object_sha256": "09648520252a937c04966134342533cf2741e161c11c85aa160e5b95ea667af1"
+  },
+  "comparison": {
+    "baseline": "ef8092df7c72e5ebc9c86bfdd90c5b0f66d7bde0",
+    "candidate": "d7565e69f478b0d79381353d2f4e382f5fb99363",
+    "assets": [
+      {
+        "asset": "base-female.vrm",
+        "native_vertices": 9851,
+        "parts": 19,
+        "bones": 54,
+        "original_rest_error_m": {
+          "count": 9851,
+          "max": 4.3437435269075894e-08,
+          "mean": 4.686639298116682e-09,
+          "p95": 3.0985177956971884e-08,
+          "rms": 1.0921130795013493e-08
+        },
+        "knees": [
+          {
+            "pose": "left_knee_flex",
+            "before": {
+              "count": 9851,
+              "max": 0.33276947655064704,
+              "mean": 0.012479015839765491,
+              "p95": 0.1009739964859525,
+              "rms": 0.04228186682419086
+            },
+            "after": {
+              "count": 9851,
+              "max": 0.11496302466579597,
+              "mean": 0.0013082297130201151,
+              "p95": 1.5856391046420442e-07,
+              "rms": 0.008724727038793388
+            },
+            "before_near15cm": {
+              "count": 294,
+              "max": 0.04356556572419816,
+              "mean": 0.009994684555912792,
+              "p95": 0.03386381427267556,
+              "rms": 0.01560091829692021
+            },
+            "after_near15cm": {
+              "count": 294,
+              "max": 0.04356556572419816,
+              "mean": 0.009994684555912792,
+              "p95": 0.03386381427267556,
+              "rms": 0.01560091829692021
+            },
+            "parts": [
+              {
+                "name": "Body.baked / 1",
+                "before": {
+                  "count": 508,
+                  "max": 0.2593852780125794,
+                  "mean": 0.11669894729153356,
+                  "p95": 0.2322270236718755,
+                  "rms": 0.13562422637767477
+                },
+                "after": {
+                  "count": 508,
+                  "max": 1.1134728835877937e-07,
+                  "mean": 3.846634011779551e-08,
+                  "p95": 8.725299721710648e-08,
+                  "rms": 4.594856334568066e-08
+                }
+              },
+              {
+                "name": "Body.baked / 7",
+                "before": {
+                  "count": 542,
+                  "max": 0.33276947655064704,
+                  "mean": 0.09365385005173325,
+                  "p95": 0.25716125124904904,
+                  "rms": 0.11776832823427938
+                },
+                "after": {
+                  "count": 542,
+                  "max": 1.1469072319933166e-07,
+                  "mean": 3.372079116448666e-08,
+                  "p95": 7.775998618929432e-08,
+                  "rms": 4.1534975782774516e-08
+                }
+              }
+            ]
+          },
+          {
+            "pose": "right_knee_flex",
+            "before": {
+              "count": 9851,
+              "max": 0.3327695751315715,
+              "mean": 0.012593580259169571,
+              "p95": 0.10131362045643162,
+              "rms": 0.04238404222764584
+            },
+            "after": {
+              "count": 9851,
+              "max": 0.11554503016671014,
+              "mean": 0.0014227941165080094,
+              "p95": 2.3842175578067803e-07,
+              "rms": 0.009207111843070553
+            },
+            "before_near15cm": {
+              "count": 294,
+              "max": 0.043565649327493405,
+              "mean": 0.009994724248245738,
+              "p95": 0.03386382313322396,
+              "rms": 0.015600956995387508
+            },
+            "after_near15cm": {
+              "count": 294,
+              "max": 0.043565649327493405,
+              "mean": 0.009994724248245738,
+              "p95": 0.03386382313322396,
+              "rms": 0.015600956995387508
+            },
+            "parts": [
+              {
+                "name": "Body.baked / 1",
+                "before": {
+                  "count": 508,
+                  "max": 0.259385234879427,
+                  "mean": 0.11669898214290006,
+                  "p95": 0.2322271047550611,
+                  "rms": 0.13562425569399478
+                },
+                "after": {
+                  "count": 508,
+                  "max": 1.6140097378253826e-07,
+                  "mean": 7.036413862059767e-08,
+                  "p95": 1.436558001025142e-07,
+                  "rms": 8.684806553716514e-08
+                }
+              },
+              {
+                "name": "Body.baked / 7",
+                "before": {
+                  "count": 542,
+                  "max": 0.3327695751315715,
+                  "mean": 0.09365388121839599,
+                  "p95": 0.25716120755390415,
+                  "rms": 0.11776835267683264
+                },
+                "after": {
+                  "count": 542,
+                  "max": 1.8841021324269483e-07,
+                  "mean": 6.736646202082848e-08,
+                  "p95": 1.413601200896727e-07,
+                  "rms": 8.607941099692159e-08
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "asset": "base-male.vrm",
+        "native_vertices": 9878,
+        "parts": 19,
+        "bones": 54,
+        "original_rest_error_m": {
+          "count": 9878,
+          "max": 6.507272858010017e-08,
+          "mean": 6.212497739557005e-09,
+          "p95": 6.426125764846802e-08,
+          "rms": 1.691752475673053e-08
+        },
+        "knees": [
+          {
+            "pose": "left_knee_flex",
+            "before": {
+              "count": 9878,
+              "max": 0.41869119623043916,
+              "mean": 0.01816582399183466,
+              "p95": 0.13896277835367343,
+              "rms": 0.058744681500074454
+            },
+            "after": {
+              "count": 9878,
+              "max": 0.10057776871349451,
+              "mean": 0.0022559563550244815,
+              "p95": 0.011156904551190673,
+              "rms": 0.011146138438237573
+            },
+            "before_near15cm": {
+              "count": 440,
+              "max": 0.055798574622331044,
+              "mean": 0.014653698872673915,
+              "p95": 0.04626947236609542,
+              "rms": 0.02159769568019982
+            },
+            "after_near15cm": {
+              "count": 440,
+              "max": 0.055798574622331044,
+              "mean": 0.014653698872673915,
+              "p95": 0.04626947236609542,
+              "rms": 0.02159769568019982
+            },
+            "parts": [
+              {
+                "name": "Body.baked / 1",
+                "before": {
+                  "count": 508,
+                  "max": 0.3319839613540392,
+                  "mean": 0.15558744434613445,
+                  "p95": 0.3057562410718826,
+                  "rms": 0.17651775500932565
+                },
+                "after": {
+                  "count": 508,
+                  "max": 2.666370436194981e-07,
+                  "mean": 1.0807167436218135e-07,
+                  "p95": 2.433748940548136e-07,
+                  "rms": 1.493231709114274e-07
+                }
+              },
+              {
+                "name": "Body.baked / 7",
+                "before": {
+                  "count": 536,
+                  "max": 0.41869119623043916,
+                  "mean": 0.1457450851249809,
+                  "p95": 0.31808994026194853,
+                  "rms": 0.17826185783808007
+                },
+                "after": {
+                  "count": 536,
+                  "max": 2.739138635787554e-07,
+                  "mean": 1.1182463554893625e-07,
+                  "p95": 2.555056353891072e-07,
+                  "rms": 1.5406420917880446e-07
+                }
+              }
+            ]
+          },
+          {
+            "pose": "right_knee_flex",
+            "before": {
+              "count": 9878,
+              "max": 0.4186909951693164,
+              "mean": 0.018185333635091193,
+              "p95": 0.13896296333727176,
+              "rms": 0.05876069876717567
+            },
+            "after": {
+              "count": 9878,
+              "max": 0.10057760648907099,
+              "mean": 0.002275452629661681,
+              "p95": 0.01125872758817387,
+              "rms": 0.011230212550661018
+            },
+            "before_near15cm": {
+              "count": 440,
+              "max": 0.055798397055873056,
+              "mean": 0.014653722492944589,
+              "p95": 0.046269545265402306,
+              "rms": 0.021597698337403826
+            },
+            "after_near15cm": {
+              "count": 440,
+              "max": 0.055798397055873056,
+              "mean": 0.014653722492944589,
+              "p95": 0.046269545265402306,
+              "rms": 0.021597698337403826
+            },
+            "parts": [
+              {
+                "name": "Body.baked / 1",
+                "before": {
+                  "count": 508,
+                  "max": 0.33198382266412807,
+                  "mean": 0.1555874916744882,
+                  "p95": 0.305756355657494,
+                  "rms": 0.17651778160164242
+                },
+                "after": {
+                  "count": 508,
+                  "max": 8.67655416123351e-08,
+                  "mean": 3.479049987742292e-08,
+                  "p95": 6.38812200326582e-08,
+                  "rms": 4.047081626287583e-08
+                }
+              },
+              {
+                "name": "Body.baked / 7",
+                "before": {
+                  "count": 536,
+                  "max": 0.4186909951693164,
+                  "mean": 0.14574513876145087,
+                  "p95": 0.31808978998255166,
+                  "rms": 0.17826187646798644
+                },
+                "after": {
+                  "count": 536,
+                  "max": 9.211494144542612e-08,
+                  "mean": 3.339845330914515e-08,
+                  "p95": 6.651306894775687e-08,
+                  "rms": 4.011159720864422e-08
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "surface_heat_and_anatomical_all92_pose_reports_byteexact": true,
+    "legacy_non_knee42_max_change_in_position_rms_p95_max_m": 2.6898980999907904e-11,
+    "legacy_substantive_pose_changes": [
+      "left_knee_flex",
+      "right_knee_flex"
+    ],
+    "quality_acceptance": "Descriptive original-skin error, fixed rest/operator correctness tolerances; no universal artist-similarity acceptance threshold."
+  },
+  "R_vs_S_all138_pose_reports_byteexact": true,
+  "reference_correctness_summary": [
+    {
+      "asset": "base-female.vrm",
+      "parts": 19,
+      "native_bones": 54,
+      "native_vertices": 9851,
+      "secondary_mass_vertices_included": 1110,
+      "imported_vs_full_original_rest_max_m": 4.3437435269075894e-08,
+      "actual_native_rest_max_m": 3.699597249669685e-07,
+      "actual_native_operator_position_max_m": 6.241012360183379e-07,
+      "actual_native_operator_normal_vector_max": 3.215091017170167e-07,
+      "original_nodes": 87,
+      "original_matrix_nodes": 0,
+      "original_skin_joints": [
+        83,
+        83
+      ],
+      "secondary_joint_slots_retained": 58
+    },
+    {
+      "asset": "base-male.vrm",
+      "parts": 19,
+      "native_bones": 54,
+      "native_vertices": 9878,
+      "secondary_mass_vertices_included": 0,
+      "imported_vs_full_original_rest_max_m": 6.507272858010017e-08,
+      "actual_native_rest_max_m": 3.761909203209534e-07,
+      "actual_native_operator_position_max_m": 4.904308719682351e-07,
+      "actual_native_operator_normal_vector_max": 3.0971170055709305e-07,
+      "original_nodes": 71,
+      "original_matrix_nodes": 0,
+      "original_skin_joints": [
+        67,
+        67
+      ],
+      "secondary_joint_slots_retained": 26
+    }
+  ],
+  "figures": [
+    {
+      "file": "docs/validation/humanoid-pose-male-knee-before-20261112.png",
+      "sha256": "3f183ef4a9201fb7b345e6c6ccf209d1c02fb1537c7bf221c509e5a729c68b56",
+      "original_artifact": "artifacts/humanoid-native-pose-quality-proof-20261112/visual-v2/male-left_knee_flex.png"
+    },
+    {
+      "file": "docs/validation/humanoid-pose-male-knee-after-20261112.png",
+      "sha256": "caf39636c9d4af83d78d8d7531333f894480dc1347ec1d6456eaefa2569a1062",
+      "original_artifact": "artifacts/humanoid-component-leg-support-proof-20261112/visual-release-v1/male-left_knee_flex.png"
+    },
+    {
+      "file": "docs/validation/humanoid-pose-female-arm-reference-20261112.png",
+      "sha256": "91a4e01a0b5b0d4e7a1cbd664fd38d8ded1a8c59757c86a848227b78244d1e26",
+      "original_artifact": "artifacts/humanoid-native-pose-quality-proof-20261112/visual-v2/female-left_arm_lower.png"
+    }
+  ],
+  "figure_generator": {
+    "before": {
+      "path": "artifacts/humanoid-native-pose-quality-proof-20261112/render-poses-bitmap.py",
+      "sha256": "9ceaf40627477bce570137c5cab176d87e1dae362fb8ed5a61b44754016116a6"
+    },
+    "after": {
+      "path": "artifacts/humanoid-component-leg-support-proof-20261112/render-after.py",
+      "sha256": "4cbafc9b4221e71718c9ceb3d98a3a6341033bd02019877d543b105537913c6e"
+    },
+    "camera": "Same original-rest/posed bounds, same actual positions/normals, CPU z-buffer. No material alpha/textures, all numerical vertices retained.",
+    "full138_pose_reports_prototype_vs_final_exact": true,
+    "geometry_prototype_vs_final": {
+      "female": {
+        "byteexact": true,
+        "sha256": "16f9a950c512a37558c19ed98c900a634a2f8d6beb3b4b6f36509c5992af48ef"
+      },
+      "male": {
+        "byteexact": true,
+        "sha256": "06f547c8709bc3ba91b282a6b3f479579a6e898a108c6537182677db491cef45"
+      }
+    }
+  },
+  "seal": {
+    "unique_frozen_input_pins": 12481,
+    "drift": [],
+    "time_unix": 1794450076.808846,
+    "metadata_inherited_source_byteexact": true,
+    "live_owned_native_executables_after_terminal": []
+  },
+  "seal_driver": {
+    "path": "artifacts/humanoid-component-leg-support-proof-20261112/seal-pose.py",
+    "sha256": "853d02073cff791832db375020ec4bcba2a0b4e79ae6238491bf020cf225034d"
+  },
+  "note_sha256": "707a4e66a7ddd13b56cb418090f1b14b7c68c5d8cb142637cf4cb3d347558ef2"
+}

@@ -1,0 +1,50 @@
+{
+  "state": "terminal",
+  "source": "5c820f342f16d8544158410c2125372811c152f3",
+  "profile": "release",
+  "scope": "Audited owning incremental whole-TU/link closure, not fresh ALL from zero; no built program/test/graphics execution.",
+  "summary": {
+    "configured_TUs": 1030,
+    "fresh_complete_TUs": 263,
+    "reused_whole_objects": 767,
+    "all_configured_link_archive_nodes": 731,
+    "fresh_links_archives": 685,
+    "retained_whole_products": 46,
+    "mandatory_fresh_owning_targets": 88,
+    "selected_CTests": 85,
+    "additional_manual_source_render_gate": 1
+  },
+  "completed_compilations": 263,
+  "completed_links": 685,
+  "completed_generators": 3,
+  "exit": 0,
+  "peak_descendant_RSS_bytes": 1843281920,
+  "seconds": 738.628131518024,
+  "owned_outputs": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/source8-final-owning-plan-20261112/release-5c820f-v3-audit/execution-v1/owned-outputs.json",
+    "sha256": "5765dd6c2b21ac06c528eac19c804d2abaf55d931727ce821745659ea59f3dbf",
+    "count": 1764
+  },
+  "staged_whole_providers": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/source8-final-owning-plan-20261112/release-5c820f-v3-audit/execution-v1/staged-whole-providers.json",
+    "sha256": "919df141faa12cd2c8c6d28d7787f2a9825c971050a0b183b843e04b066cef59",
+    "count": 813
+  },
+  "input_drift": [],
+  "status_path": "artifacts/source8-final-owning-plan-20261112/release-5c820f-v3-audit/execution-v1/status.json",
+  "status_sha256": "56f8686336b53f4570384ab3e3f4cac337380dd602f3ead95e236fac68803a36",
+  "reviewed_plan_sha256": "f12b1ec51692c39237700d153a5511adf92ce3a1462ee7a5653533da7f72bb50",
+  "reviewed_runner_sha256": "bd41e490e8133fdc4493b6fdf5ba3f660ee0dac5a496831b509b4f10c0277702",
+  "root_independent_checks": [
+    "terminal0 and no active owned process",
+    "exact3 generators263freshTUs685fresharchive/links",
+    "finalinputdrift empty",
+    "owned manifest hash and1764 records",
+    "staged provider manifest hash and813 records"
+  ],
+  "native_tests_qualified_by_this_receipt": false,
+  "public_gui_xr_qualified_by_this_receipt": false,
+  "main_runtime_admitted": false,
+  "performance_claim": false,
+  "full_goal_complete": false
+}

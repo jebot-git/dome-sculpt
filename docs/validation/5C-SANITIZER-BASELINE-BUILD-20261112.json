@@ -1,0 +1,175 @@
+{
+  "schema": 1,
+  "source": "5c820f342f16d8544158410c2125372811c152f3",
+  "scope": "StrictSAN whole-owner/consumer materialization baseline only. Confirmed mixed-coordinate emission defect prevents product admission. No product application/test/runtime/graphics/HMD/installation execution or acceptance. No ad99/guard-repair qualification.",
+  "result": {
+    "materialization_terminal_exit": 0,
+    "generators_actual0": 3,
+    "complete_TUs_actual0": 265,
+    "owning_link_archive_actions_actual0": 685,
+    "retained_whole_objects": 765,
+    "retained_whole_products": 46,
+    "materialized_outputs": 1764,
+    "independent_staged_whole_providers": 811,
+    "actual_successful_actions": 953,
+    "input_drift": [],
+    "live_owned_built_products": [],
+    "seconds": 4606.786025087989,
+    "peak_descendant_RSS_bytes": 6017757184
+  },
+  "plan": {
+    "original_preserved": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source8-final-owning-sanitize-plan-20261112/sanitize-5c820f-v1-audit/plan.json",
+      "sha256": "2284e44a5fbe9fea790b05477b24ef3d7633ba59984b5c5c17bc89f2b320f8bf"
+    },
+    "reviewed_derived": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source8-final-owning-sanitize-plan-20261112/sanitize-5c820f-v1-audit/plan-with-external-freshness-v2.json",
+      "sha256": "3480670e656289c51ebdcbb8907181b90115e8a56b37ac5b76bd1d99f18d677d"
+    },
+    "executor": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source8-final-owning-sanitize-plan-20261112/execute_sanitize-v1.py",
+      "sha256": "ab96502c2c92c513c60e091a049166bf5baa5b037b416cefface34873cae8f4b"
+    },
+    "source_profile_all_boundary": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source8-final-owning-sanitize-plan-20261112/sanitize-5c820f-v1-audit/source-profile-all-boundaries.json",
+      "sha256": "19dbe7e225786f1aea7b24111199c916a29af492e121602b7a619f3cc2edba39",
+      "baseline_all_sha256": "a11c5d3894689dc9c113daa67fac347698b178c94783fe32679a5a80c6dc4e75",
+      "candidate_all_sha256": "15c7c2e8cafde0e8144b3025af67b520f0b188a65ec154683e4fc8cbf9f0be17",
+      "baseline_all_material_count": 1742,
+      "candidate_all_material_count": 1752
+    },
+    "source_prefix_and_defines": {
+      "normalized_only_non_D_path_arguments": true,
+      "every_literal_D_preserved": true,
+      "asset_trees_byteidentical": true,
+      "asset_files": 7,
+      "whole_source_inputs_pinned": true,
+      "system_external_proof_scope": "CanonicalSDK inputs authenticated to baseline pins; other system/compiler headers must be Ninja VALID and not newer than old objects, with current hashes pinned. Historical content hashes are not invented.",
+      "baseline_provider_profile": "strictSAN actual source/SDK/flags/dependency provenance only; no Release object or route as eligibility evidence."
+    },
+    "per_owner_external_freshness": {
+      "state": "per-owner-external-freshness-proven",
+      "source": "5c820f342f16d8544158410c2125372811c152f3",
+      "original_plan_sha256": "2284e44a5fbe9fea790b05477b24ef3d7633ba59984b5c5c17bc89f2b320f8bf",
+      "reused_objects": 765,
+      "external_dependency_incidences": 286254,
+      "distinct_external_files": 683,
+      "newer_than_own_object": [],
+      "proof_scope": "Every actual external dependency is checked against EACH authenticated whole owner timestamp, regardless of historical/current mutable-pin membership. Complements actual SHA/tool/source/context proof; no invented historical content hash.",
+      "compressed": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/source8-final-owning-sanitize-plan-20261112/sanitize-5c820f-v1-audit/san-per-object-external-freshness-v2.json.gz",
+        "sha256": "d18ae4834444b5213e51693f0b5fbc3c300e3da6d5d60e64e41545df4f8b41cb",
+        "decompressed_sha256": "5d66752be4604a77fc6e6b2b30c9adddbe8f8eede23b7c4144eb9154a2d57f43"
+      },
+      "root_actual_audit": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/root-reuse-external-audit-20261112.json",
+        "sha256": "49c6367a4b03c459d91888ee525e502adda086db7c6d8484ee173c0dada3ebe7"
+      },
+      "summary_path": "/home/blux/de-xr/dome-sculpt/artifacts/source8-final-owning-sanitize-plan-20261112/sanitize-5c820f-v1-audit/san-per-object-external-freshness-v2-summary.json",
+      "summary_sha256": "0b4ceaabd392ed56314304339542fea217fd37fcc81486190be8a0a666a5e6af"
+    }
+  },
+  "resource_bounds": {
+    "independent_owning_seconds": 7200,
+    "max_active_tasks": 2,
+    "aggregate_descendant_RSS_bytes": 8589934592,
+    "core_bytes": 0,
+    "initial_input_audit_seconds": 600,
+    "final_input_audit_seconds": 600
+  },
+  "strict_environment": {
+    "LD_LIBRARY_PATH": "/home/blux/de-xr/dome-sculpt/artifacts/sdk-20261111/toolkit-sanitize/lib:/usr/lib64",
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+    "LSAN_OPTIONS": null,
+    "LD_PRELOAD": null,
+    "LP_NUM_THREADS": "2",
+    "OMP_NUM_THREADS": "2",
+    "OPENBLAS_NUM_THREADS": "2"
+  },
+  "historical_failures_preserved": {
+    "original_cc5_ALL": "Original7200s freshALL timeout remains failure124. Separate bounded remainder109stepcompletion0 never relabels it.",
+    "frozen5c_semantic_hold": "Strong real mixed resolved-PBR-carrier/logical-authored-UV1 callback/Bake counterexample is a confirmed product defect. Whole build success does not grant product/public admission.",
+    "other_candidates": "Ad99 and later guard-fix candidates require their own matching whole-owner and actual runtime evidence."
+  },
+  "immutable_core_ready": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/source8-final-owning-sanitize-plan-20261112/core193-ready-5c-v1/core-ready.json",
+    "sha256": "4c00c169d5e6e31e9981184d96ad23870c4e58d18ba0fe4fad5f65f27aaee558",
+    "archive": "/home/blux/de-xr/dome-sculpt/artifacts/source8-final-owning-sanitize-plan-20261112/core193-ready-5c-v1/libdome-sculpt-core.a",
+    "archive_sha256": "95475430acb16de13318314b9b27d92f9c3adf8745891278357ae039eea22e75",
+    "members": 193,
+    "scope": "Scoped whole193member provider readiness only; immutable snapshots preserve known5c code, not repaired sampling semantics."
+  },
+  "runtime_acceptance": {
+    "executed": false,
+    "native85": false,
+    "helpers": false,
+    "producers_font": false,
+    "manual_software_Arc": false,
+    "public_GUI_HMD": false
+  },
+  "pause": {
+    "user_instruction": "Pause after this round.",
+    "after_seal": "No next-source configure/audit/build/runtime. Prepared generic/ad99 scripts remain unexecuted; all providers retained."
+  },
+  "evidence": {
+    "5c-san-baseline-status-20261112.json.gz": {
+      "file": "docs/validation/5c-san-baseline-status-20261112.json.gz",
+      "sha256": "9272129526b53a247c76fbba147745275132aec254f3012f4e4663c143ffae05",
+      "decompressed_sha256": "9af8e0e3ad04777bf5d5a08a3a023cb060fd6c324f7e101dcb64d77d129fe98d",
+      "original_artifact": "artifacts/source8-final-owning-sanitize-plan-20261112/sanitize-5c820f-v1-audit/execution-v1/status.json"
+    },
+    "5c-san-baseline-owned-outputs-20261112.json.gz": {
+      "file": "docs/validation/5c-san-baseline-owned-outputs-20261112.json.gz",
+      "sha256": "83dfb1a379f4b7b23f41f6ce7e9571d98c79c8e31ca2f41a7736f47964dd45ae",
+      "decompressed_sha256": "a4692a1a5a78a2e244f8008fb5c41a7517874059147035cd33d3c28133a0f202",
+      "original_artifact": "artifacts/source8-final-owning-sanitize-plan-20261112/sanitize-5c820f-v1-audit/execution-v1/owned-outputs.json"
+    },
+    "5c-san-baseline-staged-whole-providers-20261112.json.gz": {
+      "file": "docs/validation/5c-san-baseline-staged-whole-providers-20261112.json.gz",
+      "sha256": "92af2a072550dad2a19268ae1997eb0310a81647f3e02204224999e26fcbc538",
+      "decompressed_sha256": "2c32204c5e888833ec4823aa95d269bbee33f1342a68f0ebc2749e18f64c704d",
+      "original_artifact": "artifacts/source8-final-owning-sanitize-plan-20261112/sanitize-5c820f-v1-audit/execution-v1/staged-whole-providers.json"
+    },
+    "5c-san-baseline-actual-steps-20261112.jsonl.gz": {
+      "file": "docs/validation/5c-san-baseline-actual-steps-20261112.jsonl.gz",
+      "sha256": "59017ef49b656c3bc834fdc8eb095d3d01032cd3e2e0645bc051448a8164da4c",
+      "decompressed_sha256": "ece8d11f3f7b6b157429ef77ff19cab34e0a461499faacb16b493f37180ebbbb",
+      "original_artifact": "artifacts/source8-final-owning-sanitize-plan-20261112/sanitize-5c820f-v1-audit/execution-v1/steps.jsonl"
+    },
+    "5c-san-baseline-execution-review-20261112.json.gz": {
+      "file": "docs/validation/5c-san-baseline-execution-review-20261112.json.gz",
+      "sha256": "6158f5d2698672c6b40d2a67e9ec319f8c7b6a9df5496bf305dc271e6dddf60c",
+      "decompressed_sha256": "94aad6bd6a7fb7558784bd1b813a0536ce9a6bc7c3273c31066689aaefa41f7b",
+      "original_artifact": "artifacts/source8-final-owning-sanitize-plan-20261112/sanitize-5c820f-v1-audit/execution-review-v1.json"
+    },
+    "5c-san-baseline-boundary-hashes-20261112.json.gz": {
+      "file": "docs/validation/5c-san-baseline-boundary-hashes-20261112.json.gz",
+      "sha256": "38c4c714863f18d9ce809ec6654f4c685dd1092b736f9db13f30a49c1b08012e",
+      "decompressed_sha256": "798d3cf89da1e59b1685af679c6cd1f369d5cdb13d0e51ef7376d12ef877149e",
+      "original_artifact": "artifacts/source8-final-owning-sanitize-plan-20261112/sanitize-5c820f-v1-audit/source-profile-all-hashes.json"
+    },
+    "5c-san-baseline-external-freshness-summary-20261112.json.gz": {
+      "file": "docs/validation/5c-san-baseline-external-freshness-summary-20261112.json.gz",
+      "sha256": "30654f04284ab715b90dfb6c3693fd3a810bf82fb5334779c32696ba726edec8",
+      "decompressed_sha256": "0b4ceaabd392ed56314304339542fea217fd37fcc81486190be8a0a666a5e6af",
+      "original_artifact": "artifacts/source8-final-owning-sanitize-plan-20261112/sanitize-5c820f-v1-audit/san-per-object-external-freshness-v2-summary.json"
+    }
+  },
+  "raw_status": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/source8-final-owning-sanitize-plan-20261112/sanitize-5c820f-v1-audit/execution-v1/status.json",
+    "sha256": "9af8e0e3ad04777bf5d5a08a3a023cb060fd6c324f7e101dcb64d77d129fe98d"
+  },
+  "initial_full_input_SHA_manifest": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/source8-final-owning-sanitize-plan-20261112/sanitize-5c820f-v1-audit/execution-v1/inputs.json",
+    "sha256": "079bfd043822709725702ff72c6c23aabd8a291af54269b00bbb0a96650cf81c"
+  },
+  "owned_output_SHA_manifest": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/source8-final-owning-sanitize-plan-20261112/sanitize-5c820f-v1-audit/execution-v1/owned-outputs.json",
+    "sha256": "a4692a1a5a78a2e244f8008fb5c41a7517874059147035cd33d3c28133a0f202",
+    "count": 1764
+  },
+  "seal_script_sha256": "c7150cd5dba9d073246a039938dce4bc5ce1965925fb8e301693f56e134adf13",
+  "sealed_unix": 1794460764.1734498,
+  "note_sha256": "74314917cf7798f577bde7e87e3166a2a192c6743ba6c20ddcd72ec9a8e7d79d"
+}

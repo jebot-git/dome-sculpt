@@ -1,0 +1,241 @@
+{
+  "schema": 1,
+  "source": "cc5e6aed9f103da3998684c6188dd143e23e676b",
+  "scope": "Separate bounded remainder completion +actual own-output acceptance, original7200s ALL run remains terminal failure. No new fresh-ALL or final HDR/weight assembly acceptance.",
+  "claim": "Separately bounded completion of100remaining original link actions using authenticated whole completed providers, plus actual own-namespace appVersion/exact82software/helper acceptance. The original fresh ALL invocation remains failure124 at7200seconds. No fresh-ALL, final integrated source, public GUI/HMD, installation or hardware qualification claim.",
+  "original_failure": {
+    "status": "artifacts/authoring-source8-hdr-fit-owning-sanitize-20261112/sanitize-owning-status.json",
+    "status_sha256": "b59e658666b5ac630bf0d069641de8d71111e5aa10ac476d51d5d425955a5609",
+    "build_log": "artifacts/authoring-source8-hdr-fit-owning-sanitize-20261112/sanitize-build.log",
+    "build_log_sha256": "3a300e5184e5ceac50dd4848f193355d72865bd2df0dd3cdbb5786b75ca33511",
+    "exit": 1,
+    "build_exit": 124,
+    "build_seconds": 7200.004947956011,
+    "source_drift": [],
+    "sdk_drift": [],
+    "relabeled_pass": false
+  },
+  "inspection_exception": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-source8-hdr-fit-owning-sanitize-20261112/sanitize/Testing/Temporary/LastTest.log",
+    "bytes": 121,
+    "sha256": "02f3e132901a134db96fa8dc53626fc6b29a252fdb9751d008715ca312128931",
+    "creation_command": [
+      "ctest",
+      "--test-dir",
+      "/home/blux/de-xr/dome-sculpt/artifacts/authoring-source8-hdr-fit-owning-sanitize-20261112/sanitize",
+      "--show-only=json-v1"
+    ],
+    "meaning": "Inspection-created start/end metadata only. No tests executed. Preserved as exception; failed tree is not claimed entirely byte-untouched."
+  },
+  "reviewed_plan": {
+    "sha256": "5b6bdf0a8d16683da68681093d48600d76e43384cf5538c345e959d714cad156",
+    "runner_sha256": "9bd32203876f842d01641a81ef6b276ae6110d38d608e25d9d519734e5fa535b",
+    "root_technical_clearance": "Exact plan5b6bdf0a8d16683da68681093d48600d76e43384cf5538c345e959d714cad156 / runner9bd32203876f842d01641a81ef6b276ae6110d38d608e25d9d519734e5fa535b cleared before execution.",
+    "bounds_seconds": {
+      "copy_verify_and100links_total": 1800,
+      "max_link_concurrency": 2,
+      "graphics_lock_wait": 600,
+      "exact82_suite": 2400,
+      "build2excluded_helpers": 300,
+      "workspace27": 300,
+      "placed_workspace373": 300,
+      "raw_source_worker90159": 300,
+      "final_original_and_copy_audit": 600,
+      "per_link_within_total_bound": 600
+    }
+  },
+  "ownership": {
+    "successful_ninja_records": 1645,
+    "distinct_successful_whole_files": 1642,
+    "generated_alias_records": "Three generated files each have both relative and absolute same-build aliases in the actual Ninja log; all6raw records retained, exactly3physical files copied.",
+    "whole_objects": 1019,
+    "archives": 14,
+    "archives_member_objects_matched": 215,
+    "copied_completed_ELF_link_products": 606,
+    "remaining_links_actual0": 100,
+    "new_fresh_helper_TUs": 2,
+    "new_fresh_helper_links": 2,
+    "own_ELF_link_products_after_completion": 708,
+    "independent_reflink_copies_not_hardlinks": true,
+    "all_copied_providers_readonly": true,
+    "no_Ninja_log_graph_cache_or_deps_forgery": true,
+    "old_binary_macro_owners_requiring_new_compile": 0,
+    "source_asset_literal": "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/authoring-source8-hdr-fit-union-20261112/assets/humanoid\"",
+    "source_asset_whole_owner_count": 193,
+    "snapshot_source_SDK_whole_objects_archives_flags": "Exact snapshot of 4,994 pins before copy, original source/SDK/status/log/archive/object hashes verified again at execution admission and final old+copy SHA audit; all14archive members matched215whole objects."
+  },
+  "acceptance": {
+    "app_version": {
+      "exit": 0,
+      "output": "Dome Sculpt 0.1.0 / CPU / Blender 5.4 Alpha trackball basis\n",
+      "log_sha256": "9455a20a636a6599ace60120261649d3b29dc51fe2c774305994879190e7336b"
+    },
+    "exact_native_software_tests": 82,
+    "selected_names": [
+      "affine-document-render",
+      "affine-held-render",
+      "authenticated-local-surface",
+      "bake",
+      "bake-workflow",
+      "baked-emission",
+      "baked-emission-exr",
+      "baked-emission-fallback",
+      "baked-emission-gpu",
+      "baked-emission-native",
+      "baked-emission-source",
+      "baked-emission-uv1-worker",
+      "baked-emission-workflow",
+      "baked-textures",
+      "controller-controls",
+      "current-paint-preview-gpu",
+      "current-paint-preview-native",
+      "document-render-buffer-reuse",
+      "document-render-capacity",
+      "document-render-large-buffer",
+      "dome-sculpt-texture-set-export",
+      "dome-sculpt-texture-set-field-source",
+      "dome-sculpt-texture-set-history",
+      "dome-sculpt-texture-set-native",
+      "dome-sculpt-texture-set-polygon-mixed",
+      "dome-sculpt-texture-set-resolution",
+      "dome-sculpt-texture-set-source-export",
+      "dome-sculpt-texture-set-surfaces",
+      "dome-sculpt-texture-sets",
+      "dome-sculpt-texture-sets-plan",
+      "dome-sculpt-texture-sets-polygon",
+      "emission-export",
+      "emission-exr-owned",
+      "emission-scene",
+      "gpu-color-blur-kernel-software",
+      "gpu-color-blur-native-software",
+      "hdr-preview-overflow",
+      "humanoid-authoring",
+      "mtoon-render",
+      "native-graphics-lifetime",
+      "native-graphics-shared-software",
+      "native-read-cancel",
+      "native-scene-geometry-intern",
+      "normal-frame-render",
+      "packed-material-query",
+      "paint-composite-native",
+      "paint-composite-render",
+      "paint-overlay-gpu",
+      "polygon-render",
+      "polygon-retopo-affine",
+      "polygon-surface-native-owning",
+      "render-buffer-reuse",
+      "render-direct-upload",
+      "render-store-ledger",
+      "renderer-recovery",
+      "retopology-input-admission",
+      "rig-fit-anatomical",
+      "rig-fit-authoring",
+      "rig-fit-controller",
+      "rig-fit-faults",
+      "rig-fit-import",
+      "rig-fit-metric",
+      "sculpt-chunk-pipeline",
+      "sculpt-chunk-render",
+      "sculpt-gpu-arena",
+      "sculpt-gpu-arena-layout",
+      "sculpt-surface-chunks",
+      "shared-document",
+      "skin-affine-authoring",
+      "skin-affine-controller",
+      "skin-affine-export",
+      "skin-authoring",
+      "source-color-render",
+      "source-extra-uv-render",
+      "source-paint-overlay",
+      "surface-query-callback-lifetime",
+      "surface-query-oblique",
+      "texture-painting",
+      "triangle-remesh",
+      "vrm1-background-fixture",
+      "vrm1-targets-preflight-order",
+      "vrm1-targets-uniform-roles-uv-authoring"
+    ],
+    "native_log_sha256": "8251fedad9186fab6e5fc293d6444596431040c882ae374f097ef5a7b62ec7a9",
+    "native_seconds": 429.5273752709618,
+    "helper27": {
+      "exit": 0,
+      "log_sha256": "b4dacfac59d17baa45a405a3cd0a456d3191e1f5aeb8391bc762fdb204ca6d49"
+    },
+    "helper373": {
+      "exit": 0,
+      "log_sha256": "b84f753363a7b03bf014dc9a98b174f490f1987e822a9db90aa601d808633b1a"
+    },
+    "raw90159": {
+      "exit": 0,
+      "log_sha256": "8140630da001d09e6e1357711721664c2943508a7c97f27ed2f6ca2db19c7b3a"
+    },
+    "environment": {
+      "LD_LIBRARY_PATH": "/home/blux/de-xr/dome-sculpt/artifacts/sdk-20261111/toolkit-sanitize/lib:/usr/lib64",
+      "LIBGL_ALWAYS_SOFTWARE": "1",
+      "LP_NUM_THREADS": "2",
+      "OMP_NUM_THREADS": "2",
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+      "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+      "LSAN_OPTIONS": null,
+      "LD_PRELOAD": null
+    },
+    "graphics_lease_acquired_unix": 1794452676.1863394,
+    "graphics_lease_released_unix": 1794453105.7162662,
+    "source_test_routing": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-source8-hdr-fit-owning-sanitize-20261112/sanitize/CTestTestfile.cmake",
+      "original_sha256": "bae21a4627aed8aa6940c1fc659b04eb02bee879e4813a3e8c38d6fdeafa0745",
+      "routed": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-source8-hdr-fit-sanitize-remainder-20261112/completed/CTestTestfile.cmake",
+      "routed_sha256": "9b6345d3fa12e66184327c367aa7036236f4b24cdf58059eb00468fb3a4d91c3",
+      "only_change": "Exact original build prefix replaced by the new namespace in executable/fixture/runtime/output/working-directory paths. Source paths, names, arguments, properties, timeouts, environment and fixture dependencies retained. Explicit derived manifest, no original CTest-run claim."
+    }
+  },
+  "seal": {
+    "separate_completion_exit": 0,
+    "input_and_copy_drift": [],
+    "frozen_original_pins": 4994,
+    "copied_whole_file_pins": 1642,
+    "all_runtime_steps_exit0": true,
+    "live_owned_native_executables": [],
+    "runtime_status_sha256": "1406f6414f8aacdcc228ff27e89c76a242c294e2d2c4bd902f14f789fa1abd11",
+    "seal_script_sha256": "7b85f8dea83c56466c3614a7d2a621326261475146dd62d15f9d585f084d06c4",
+    "time_unix": 1794453618.117049
+  },
+  "shipped_evidence": {
+    "cc5-sanitize-remainder-plan-20261112.json.gz": {
+      "file": "docs/validation/cc5-sanitize-remainder-plan-20261112.json.gz",
+      "gzip_sha256": "5b50f3256c7e76cdb50aa972e7ba69f7b52211dc9cacc257faf97c9e24a224c1",
+      "decompressed_sha256": "5b6bdf0a8d16683da68681093d48600d76e43384cf5538c345e959d714cad156",
+      "original_artifact": "artifacts/authoring-source8-hdr-fit-sanitize-remainder-20261112/plan.json"
+    },
+    "cc5-sanitize-original-success-outputs-20261112.json.gz": {
+      "file": "docs/validation/cc5-sanitize-original-success-outputs-20261112.json.gz",
+      "gzip_sha256": "f8c8c5715eda97ff688c4e6b1437c71384ae2e3f8e8511b0bb6359b9e74d8c37",
+      "decompressed_sha256": "95f016eeda50cc5253853b41881203f563f2847ddde72b633ce2024524292aaf",
+      "original_artifact": "artifacts/authoring-source8-hdr-fit-sanitize-remainder-20261112/success-record-outputs.json"
+    },
+    "cc5-sanitize-archive-members-20261112.json.gz": {
+      "file": "docs/validation/cc5-sanitize-archive-members-20261112.json.gz",
+      "gzip_sha256": "fa652662ba6f7dd230463281dff46b88bed48560010b997b0f1cecf9119b7a5a",
+      "decompressed_sha256": "1f84f465ec843ce40a8233676c91f1b72455db13a05290b03bdabae3a8e6310b",
+      "original_artifact": "artifacts/authoring-source8-hdr-fit-sanitize-remainder-20261112/archive-member-audit.json"
+    },
+    "cc5-sanitize-selected82-20261112.json.gz": {
+      "file": "docs/validation/cc5-sanitize-selected82-20261112.json.gz",
+      "gzip_sha256": "ef8752b5421403c48a0761cb3d936133bca5c8284f2673d4caefaf640ea726f8",
+      "decompressed_sha256": "b13ea92352024a4396170018013a191ab54fea8667aa5ba2c643c7b7766b519b",
+      "original_artifact": "artifacts/authoring-source8-hdr-fit-sanitize-remainder-20261112/selected-tests.json"
+    },
+    "cc5-sanitize-remainder-status-20261112.json.gz": {
+      "file": "docs/validation/cc5-sanitize-remainder-status-20261112.json.gz",
+      "gzip_sha256": "3a51c70821f657c018c8d5b954c0f1f1cf23a393a1d8b450a4f3af161cc5e7dd",
+      "decompressed_sha256": "1406f6414f8aacdcc228ff27e89c76a242c294e2d2c4bd902f14f789fa1abd11",
+      "original_artifact": "artifacts/authoring-source8-hdr-fit-sanitize-remainder-20261112/status.json"
+    }
+  },
+  "runner_copy": {
+    "file": "docs/validation/cc5-sanitize-remainder-runner-20261112.py",
+    "sha256": "9bd32203876f842d01641a81ef6b276ae6110d38d608e25d9d519734e5fa535b"
+  },
+  "raw_artifact_directory": "artifacts/authoring-source8-hdr-fit-sanitize-remainder-20261112",
+  "note_sha256": "c8dc135e64104301b1dcb0a8458db9864a3affc64d94d1ed8b78715d7d7f788c"
+}

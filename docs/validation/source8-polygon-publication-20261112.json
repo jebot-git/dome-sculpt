@@ -1,0 +1,354 @@
+{
+  "source": "d07cefaf75a3672fb42b53dedde4fbfebfcc11ae",
+  "component_parent": "87095a5b492f68774f9019ef6ed926af97b11f5b",
+  "publication_product": "4f5a78fdac7b308aacc4af0f0c47e1368a82ac9c",
+  "typed_reader_product": "5d4ce4dc0c73c993a1ea2d21ad1e826d70779b66",
+  "scope": "Source8 component qualification, not the combined RGBA32F/fitting/leg application or public GUI/XR admission.",
+  "public_headers_byte_identical": 103,
+  "object_layout_shader_or_wire_delta": false,
+  "private_API_delta": "One PolygonSceneArchive::preflight overload borrowing the actual SourcePaintDecodeContext; compatibility overload remains without a Scene42 capability.",
+  "profiles": {
+    "release": {
+      "build_receipt": "artifacts/source8-polygon-publication-joint-proof-20261112/release-v1/status.json",
+      "build_sha256": "332afbbe8d4ee72692c5188f0d2a7882fc675caa32c6f64af3fa2ccf08c1faaf",
+      "plan_sha256": "3a0e1107e03cf761fa7e48ea5abafaa71d4b520168426e939eabf5d00a72d22d",
+      "core_sha256": "4fc6bd15165d306cadef90c62b53547777126c32960e537178605462497c672b",
+      "changed_whole_core_members": 10,
+      "baseline_exact_core_members": 183,
+      "ordered_core_members": 193,
+      "fresh_joint_fixture_TUs": 1,
+      "authenticated_complete_object_inputs": 24,
+      "fresh_links_including_counterfactual": 17,
+      "native_receipt": "artifacts/source8-polygon-publication-joint-proof-20261112/native-release-v1/status.json",
+      "native_sha256": "2948e03a24b90c75637076c7d6bc72b6841edf1e36911f98a548b35d96385e7d",
+      "native_visible_checks": 969,
+      "actual_renderer": "ACTUAL_RENDERER llvmpipe (LLVM 22.1.8, 256 bits)",
+      "positive_native_cases": 25,
+      "affected_consumer_native_cases": 17,
+      "genuine_fixture_generator_cases": 3,
+      "existing_bake_source_scopes": 4,
+      "counterfactual": {
+        "name": "publication-only-counterfactual",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/source8-polygon-publication-joint-proof-20261112/release-v1/source8-publication-only-counterfactual"
+        ],
+        "started": 1794450289.4446957,
+        "deadline": 180,
+        "pid": 3731122,
+        "native_exit": 1,
+        "seconds": 41.59562015533447,
+        "log_sha256": "336da5fef635fa201f9724aba69261f3b3c922258479aa619c073939ffccb51a",
+        "expected_text_exact": true
+      },
+      "cases": [
+        {
+          "name": "source8-visible-polygon-joint",
+          "exit": 0,
+          "log_sha256": "c2dde9b3599ba56558ca4f4ca3348aa8b7c5ee4a1c3e22c936247e9b7f77598f"
+        },
+        {
+          "name": "source8-worker",
+          "exit": 0,
+          "log_sha256": "a7ca7e1ab59a4671442801acaed48c5b6bd9c671d2ea93e2b47f84be2e1a92f6"
+        },
+        {
+          "name": "source-controls",
+          "exit": 0,
+          "log_sha256": "ab73a85e4061866266085d9ea5efa44ce266e860b57fba3c712bd9210a52ae49"
+        },
+        {
+          "name": "original-worker",
+          "exit": 0,
+          "log_sha256": "536147bd07f4599ce084da08c68ff6a90df3f2f2bffc3968db5dbe39fc3606c3"
+        },
+        {
+          "name": "public-fixtures",
+          "exit": 0,
+          "log_sha256": "e26b5858ea586a0ccd2bb83aec1e07858051e25e72cf93611f41c275b105c000"
+        },
+        {
+          "name": "canonical-normal-owning",
+          "exit": 0,
+          "log_sha256": "441472533cdde32ac28850155ed4f0dfa53875f4edfe90b4e58f44d3ece2a005"
+        },
+        {
+          "name": "canonical-paint-fixture",
+          "exit": 0,
+          "log_sha256": "eac9c0d554e6c4ed5f3246bf46fa03ee3a3b5ef76a3108a2382d3c841f3028a1"
+        },
+        {
+          "name": "canonical-paint-native",
+          "exit": 0,
+          "log_sha256": "880f6d3a22ac4935ff384c0f2387571f87aedaf30f8e1ef9ddae1d16db730786"
+        },
+        {
+          "name": "input-rebind-publication",
+          "exit": 0,
+          "log_sha256": "cf594d73efd66b89318fdb43ccf4fb52ac3b2e33e2574eb04886d636e7eb9f24"
+        },
+        {
+          "name": "shapekey-sculpt",
+          "exit": 0,
+          "log_sha256": "72a7b0a37f22d498abf1bc601d6f775fdb863d54a1a32416c92067a5c3b912aa"
+        },
+        {
+          "name": "shapekey-strokes",
+          "exit": 0,
+          "log_sha256": "1f3031b1fe90ebe8563fee85daf1a980281520c1a3be5bb25d237d9627415624"
+        },
+        {
+          "name": "shapekey-allocation",
+          "exit": 0,
+          "log_sha256": "2790f5679ad667434b169c1127189b0ba99b598a7a4ba6d0f92067e2e304c7b0"
+        },
+        {
+          "name": "shapekey-document",
+          "exit": 0,
+          "log_sha256": "2c2b74ad22679419a4309d95d4f21281743bec1446f10694340bf280955f160d"
+        },
+        {
+          "name": "shapekey-authoring",
+          "exit": 0,
+          "log_sha256": "33b4d15403079ca8f470226e2307bf6492d65a74078c4000037ec270255a4e50"
+        },
+        {
+          "name": "key-archive-preflight-small",
+          "exit": 0,
+          "log_sha256": "93c385f7b6513f19c4709ca7df5259bbe10d82f6b631f404527e2a761e536a74"
+        },
+        {
+          "name": "key-archive-preflight-large",
+          "exit": 0,
+          "log_sha256": "142f38c783b9c42de4133b21e0a7ea0e4adc521b5d0c6a35b02f7c90bd26c2fa"
+        },
+        {
+          "name": "key-archive-preflight-zeros",
+          "exit": 0,
+          "log_sha256": "ee9fd8b07ced5b45ead85cf49dadea9ea23016d055e882c62707869745c88b4c"
+        },
+        {
+          "name": "key-archive-preflight-alias",
+          "exit": 0,
+          "log_sha256": "57826a26a5a826d5a93fcaeb517f00b3e9b9e3b14abc6f9f4468c75ddcfd7aa7"
+        },
+        {
+          "name": "key-archive-preflight-alias-faults",
+          "exit": 0,
+          "log_sha256": "fce5264f26e0ae242be5df2a6e02baf27c9d04645077998cee1892a2866c7bc3"
+        },
+        {
+          "name": "canonical-paint37-codec-0-0",
+          "exit": 0,
+          "log_sha256": "a048b78d5bdfe8bd4a49d9d438d991ad59ae021003c49d6aa63257654e080253"
+        },
+        {
+          "name": "canonical-paint37-codec-7-4",
+          "exit": 0,
+          "log_sha256": "a048b78d5bdfe8bd4a49d9d438d991ad59ae021003c49d6aa63257654e080253"
+        },
+        {
+          "name": "canonical-paint37-origin-reader",
+          "exit": 0,
+          "log_sha256": "5383196472aee22c89bc1dd8b419cc6c0971e992b58eda0922125356d9e2efea"
+        },
+        {
+          "name": "canonical-paint37-key-quota",
+          "exit": 0,
+          "log_sha256": "885b716a6fe412bc79b5d3c1ed2f839dedebbb98652a9ce807314920fb141bdc"
+        },
+        {
+          "name": "canonical-paint37-key-quota-boundary",
+          "exit": 0,
+          "log_sha256": "0f631b96be8bf2ef002ea319b9cb4ea0ba0f3afca0a55b39953db6d7db4c21b5"
+        },
+        {
+          "name": "dome-sculpt-texture-set-history",
+          "exit": 0,
+          "log_sha256": "014e7189f0d4fb75d94114dacc948c2c2d5cec5c2ca8d7d691c98db74edba464"
+        }
+      ]
+    },
+    "sanitize": {
+      "build_receipt": "artifacts/source8-polygon-publication-joint-proof-20261112/sanitize-v1/status.json",
+      "build_sha256": "d38fa58a0c366e8d6d24761e3571b8612cedcfed91619d56af3d26c80949f558",
+      "plan_sha256": "88e991b621f42cb9efa943557a8798062f76f1fca32e72ec4cd746d6bfc2a5d2",
+      "core_sha256": "6c38fdc5839fb9bb0e234c123d9ebd4aa25d2b280aa23be706ba61bb663e3de3",
+      "changed_whole_core_members": 10,
+      "baseline_exact_core_members": 183,
+      "ordered_core_members": 193,
+      "fresh_joint_fixture_TUs": 1,
+      "authenticated_complete_object_inputs": 24,
+      "fresh_links_including_counterfactual": 17,
+      "native_receipt": "artifacts/source8-polygon-publication-joint-proof-20261112/native-sanitize-v1/status.json",
+      "native_sha256": "8a47123b6539820bd4ce2bbfc20b8a60b30c11922a53fe76e06547ebe7c67cf6",
+      "native_visible_checks": 969,
+      "actual_renderer": "ACTUAL_RENDERER llvmpipe (LLVM 22.1.8, 256 bits)",
+      "positive_native_cases": 25,
+      "affected_consumer_native_cases": 17,
+      "genuine_fixture_generator_cases": 3,
+      "existing_bake_source_scopes": 4,
+      "counterfactual": {
+        "name": "publication-only-counterfactual",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/source8-polygon-publication-joint-proof-20261112/sanitize-v1/source8-publication-only-counterfactual"
+        ],
+        "started": 1794450434.1854212,
+        "deadline": 180,
+        "pid": 3752285,
+        "native_exit": 1,
+        "seconds": 59.82532072067261,
+        "log_sha256": "336da5fef635fa201f9724aba69261f3b3c922258479aa619c073939ffccb51a",
+        "expected_text_exact": true
+      },
+      "cases": [
+        {
+          "name": "source8-visible-polygon-joint",
+          "exit": 0,
+          "log_sha256": "c2dde9b3599ba56558ca4f4ca3348aa8b7c5ee4a1c3e22c936247e9b7f77598f"
+        },
+        {
+          "name": "source8-worker",
+          "exit": 0,
+          "log_sha256": "a7ca7e1ab59a4671442801acaed48c5b6bd9c671d2ea93e2b47f84be2e1a92f6"
+        },
+        {
+          "name": "source-controls",
+          "exit": 0,
+          "log_sha256": "ab73a85e4061866266085d9ea5efa44ce266e860b57fba3c712bd9210a52ae49"
+        },
+        {
+          "name": "original-worker",
+          "exit": 0,
+          "log_sha256": "536147bd07f4599ce084da08c68ff6a90df3f2f2bffc3968db5dbe39fc3606c3"
+        },
+        {
+          "name": "public-fixtures",
+          "exit": 0,
+          "log_sha256": "e26b5858ea586a0ccd2bb83aec1e07858051e25e72cf93611f41c275b105c000"
+        },
+        {
+          "name": "canonical-normal-owning",
+          "exit": 0,
+          "log_sha256": "441472533cdde32ac28850155ed4f0dfa53875f4edfe90b4e58f44d3ece2a005"
+        },
+        {
+          "name": "canonical-paint-fixture",
+          "exit": 0,
+          "log_sha256": "eac9c0d554e6c4ed5f3246bf46fa03ee3a3b5ef76a3108a2382d3c841f3028a1"
+        },
+        {
+          "name": "canonical-paint-native",
+          "exit": 0,
+          "log_sha256": "880f6d3a22ac4935ff384c0f2387571f87aedaf30f8e1ef9ddae1d16db730786"
+        },
+        {
+          "name": "input-rebind-publication",
+          "exit": 0,
+          "log_sha256": "cf594d73efd66b89318fdb43ccf4fb52ac3b2e33e2574eb04886d636e7eb9f24"
+        },
+        {
+          "name": "shapekey-sculpt",
+          "exit": 0,
+          "log_sha256": "72a7b0a37f22d498abf1bc601d6f775fdb863d54a1a32416c92067a5c3b912aa"
+        },
+        {
+          "name": "shapekey-strokes",
+          "exit": 0,
+          "log_sha256": "1f3031b1fe90ebe8563fee85daf1a980281520c1a3be5bb25d237d9627415624"
+        },
+        {
+          "name": "shapekey-allocation",
+          "exit": 0,
+          "log_sha256": "2790f5679ad667434b169c1127189b0ba99b598a7a4ba6d0f92067e2e304c7b0"
+        },
+        {
+          "name": "shapekey-document",
+          "exit": 0,
+          "log_sha256": "2c2b74ad22679419a4309d95d4f21281743bec1446f10694340bf280955f160d"
+        },
+        {
+          "name": "shapekey-authoring",
+          "exit": 0,
+          "log_sha256": "33b4d15403079ca8f470226e2307bf6492d65a74078c4000037ec270255a4e50"
+        },
+        {
+          "name": "key-archive-preflight-small",
+          "exit": 0,
+          "log_sha256": "93c385f7b6513f19c4709ca7df5259bbe10d82f6b631f404527e2a761e536a74"
+        },
+        {
+          "name": "key-archive-preflight-large",
+          "exit": 0,
+          "log_sha256": "142f38c783b9c42de4133b21e0a7ea0e4adc521b5d0c6a35b02f7c90bd26c2fa"
+        },
+        {
+          "name": "key-archive-preflight-zeros",
+          "exit": 0,
+          "log_sha256": "ee9fd8b07ced5b45ead85cf49dadea9ea23016d055e882c62707869745c88b4c"
+        },
+        {
+          "name": "key-archive-preflight-alias",
+          "exit": 0,
+          "log_sha256": "57826a26a5a826d5a93fcaeb517f00b3e9b9e3b14abc6f9f4468c75ddcfd7aa7"
+        },
+        {
+          "name": "key-archive-preflight-alias-faults",
+          "exit": 0,
+          "log_sha256": "fce5264f26e0ae242be5df2a6e02baf27c9d04645077998cee1892a2866c7bc3"
+        },
+        {
+          "name": "canonical-paint37-codec-0-0",
+          "exit": 0,
+          "log_sha256": "a048b78d5bdfe8bd4a49d9d438d991ad59ae021003c49d6aa63257654e080253"
+        },
+        {
+          "name": "canonical-paint37-codec-7-4",
+          "exit": 0,
+          "log_sha256": "a048b78d5bdfe8bd4a49d9d438d991ad59ae021003c49d6aa63257654e080253"
+        },
+        {
+          "name": "canonical-paint37-origin-reader",
+          "exit": 0,
+          "log_sha256": "5383196472aee22c89bc1dd8b419cc6c0971e992b58eda0922125356d9e2efea"
+        },
+        {
+          "name": "canonical-paint37-key-quota",
+          "exit": 0,
+          "log_sha256": "885b716a6fe412bc79b5d3c1ed2f839dedebbb98652a9ce807314920fb141bdc"
+        },
+        {
+          "name": "canonical-paint37-key-quota-boundary",
+          "exit": 0,
+          "log_sha256": "0f631b96be8bf2ef002ea319b9cb4ea0ba0f3afca0a55b39953db6d7db4c21b5"
+        },
+        {
+          "name": "dome-sculpt-texture-set-history",
+          "exit": 0,
+          "log_sha256": "014e7189f0d4fb75d94114dacc948c2c2d5cec5c2ca8d7d691c98db74edba464"
+        }
+      ]
+    }
+  },
+  "shared_quad_cases": {
+    "publication": [
+      "RGB8 empty image roles",
+      "RGB8 UV1 image roles",
+      "FLOAT empty image roles",
+      "FLOAT UV1 image roles",
+      "RGB8 empty roles plus independent FLOAT sibling"
+    ],
+    "supported_polygon_save_reopen_history_render": [
+      "RGB8 empty image roles",
+      "RGB8 empty roles plus independent FLOAT sibling"
+    ],
+    "protected_polygon_routes": "UV1 image-role Apply and FLOAT original capture retain their existing atomic refusals; no new support claimed."
+  },
+  "preserved_failures": {
+    "original_save_reopen": "artifacts/source8-mutation-proof-v5-20261112",
+    "separate_publication": "artifacts/source8-polygon-context-proof-20261112/release-test-v5/old-native.log",
+    "release_minimal_old_vs_fixed": "artifacts/source8-polygon-context-proof-20261112/native-release-diagnostic-v6/status.json",
+    "sanitize_minimal_old_vs_fixed": "artifacts/source8-polygon-context-proof-20261112/native-sanitize-diagnostic-v7/status.json"
+  },
+  "full_goal": "Active; combined whole-owning Release/native85/public desktop+real-loaderXR gates remain separate.",
+  "no_app_arc_physical_hmd_install_or_performance_admission": true
+}

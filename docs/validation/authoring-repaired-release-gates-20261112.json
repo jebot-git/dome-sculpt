@@ -1,0 +1,200 @@
+{
+  "source": "5c820f342f16d8544158410c2125372811c152f3",
+  "scope": "Actual matching repaired Release owning cohort native/helpers/raw/producers/font and additional manual source-render gates. Not public GUI/XR, current5c strictSAN, physicalHMD or performance qualification.",
+  "phases": {
+    "release-5c-v2-native": {
+      "status_path": "artifacts/source8-final-owning-plan-20261112/release-5c-v2-native/status.json",
+      "sha256": "d6b6f2faa618b699afbfe966c5db972466491781c2828f22d55dd6e8bb25d0ae",
+      "exit": 0,
+      "input_drift": [],
+      "steps": [
+        {
+          "name": "app-version",
+          "exit": 0
+        },
+        {
+          "name": "native85",
+          "exit": 0
+        },
+        {
+          "name": "workspace27",
+          "exit": 0
+        },
+        {
+          "name": "workspace373",
+          "exit": 0
+        },
+        {
+          "name": "raw90159",
+          "exit": 0
+        }
+      ],
+      "exact85_passed": [
+        "affine-document-render",
+        "affine-held-render",
+        "authenticated-local-surface",
+        "bake",
+        "bake-workflow",
+        "baked-emission",
+        "baked-emission-exr",
+        "baked-emission-fallback",
+        "baked-emission-gpu",
+        "baked-emission-native",
+        "baked-emission-source",
+        "baked-emission-uv1-worker",
+        "baked-emission-workflow",
+        "baked-textures",
+        "controller-controls",
+        "current-paint-preview-gpu",
+        "current-paint-preview-native",
+        "document-render-buffer-reuse",
+        "document-render-capacity",
+        "document-render-large-buffer",
+        "dome-sculpt-texture-set-export",
+        "dome-sculpt-texture-set-field-source",
+        "dome-sculpt-texture-set-history",
+        "dome-sculpt-texture-set-native",
+        "dome-sculpt-texture-set-polygon-mixed",
+        "dome-sculpt-texture-set-resolution",
+        "dome-sculpt-texture-set-source-export",
+        "dome-sculpt-texture-set-surfaces",
+        "dome-sculpt-texture-sets",
+        "dome-sculpt-texture-sets-plan",
+        "dome-sculpt-texture-sets-polygon",
+        "emission-export",
+        "emission-exr-owned",
+        "emission-scene",
+        "gpu-color-blur-kernel-software",
+        "gpu-color-blur-native-software",
+        "hdr-preview-overflow",
+        "humanoid-authoring",
+        "humanoid-component-bind",
+        "linear-scene-target",
+        "mtoon-render",
+        "native-graphics-lifetime",
+        "native-graphics-shared-software",
+        "native-read-cancel",
+        "native-scene-geometry-intern",
+        "normal-frame-render",
+        "packed-material-query",
+        "paint-composite-native",
+        "paint-composite-render",
+        "paint-overlay-gpu",
+        "polygon-render",
+        "polygon-retopo-affine",
+        "polygon-surface-native-owning",
+        "render-buffer-reuse",
+        "render-direct-upload",
+        "render-store-ledger",
+        "renderer-recovery",
+        "retopology-input-admission",
+        "rig-fit-anatomical",
+        "rig-fit-authoring",
+        "rig-fit-controller",
+        "rig-fit-faults",
+        "rig-fit-import",
+        "rig-fit-metric",
+        "sculpt-chunk-pipeline",
+        "sculpt-chunk-render",
+        "sculpt-gpu-arena",
+        "sculpt-gpu-arena-layout",
+        "sculpt-surface-chunks",
+        "shared-document",
+        "skin-affine-authoring",
+        "skin-affine-controller",
+        "skin-affine-export",
+        "skin-authoring",
+        "source-color-render",
+        "source-extra-uv-render",
+        "source-paint-overlay",
+        "source8-preview",
+        "surface-query-callback-lifetime",
+        "surface-query-oblique",
+        "texture-painting",
+        "triangle-remesh",
+        "vrm1-background-fixture",
+        "vrm1-targets-preflight-order",
+        "vrm1-targets-uniform-roles-uv-authoring"
+      ],
+      "shipped_status": "docs/validation/release-5c-v2-native-status-20261112.json.gz",
+      "shipped_status_gzip_sha256": "903772c2ed0b15ebfd46e2ed8e52b3ccc3d8c481566bde0d41e53a47ad53ad2d"
+    },
+    "release-5c-v2-fixtures": {
+      "status_path": "artifacts/source8-final-owning-plan-20261112/release-5c-v2-fixtures/status.json",
+      "sha256": "da43aa6b52f3059157fe72e1e26db9d20d9331d317e63b139e6da003ee7f5a86",
+      "exit": 0,
+      "input_drift": [],
+      "steps": [
+        {
+          "name": "source-worker",
+          "exit": 0
+        },
+        {
+          "name": "source-controls",
+          "exit": 0
+        },
+        {
+          "name": "original-worker",
+          "exit": 0
+        },
+        {
+          "name": "original-public-producer",
+          "exit": 0
+        },
+        {
+          "name": "source8-public-producer",
+          "exit": 0
+        },
+        {
+          "name": "font-reference",
+          "exit": 0
+        }
+      ],
+      "shipped_status": "docs/validation/release-5c-v2-fixtures-status-20261112.json.gz",
+      "shipped_status_gzip_sha256": "2a38ed48cc763cf14050014f7fcbc5b429d215ab8af51778d4f7ea6163590322"
+    },
+    "release-5c-v2-manual-software": {
+      "status_path": "artifacts/source8-final-owning-plan-20261112/release-5c-v2-manual-software/status.json",
+      "sha256": "95b541201a70ea8d8bfedb3feb2747593cb9606f9274187083988374d75c68bd",
+      "exit": 0,
+      "input_drift": [],
+      "steps": [
+        {
+          "name": "manual-source-render-software",
+          "exit": 0
+        }
+      ],
+      "shipped_status": "docs/validation/release-5c-v2-manual-software-status-20261112.json.gz",
+      "shipped_status_gzip_sha256": "262a189e8d333d107c39bdc7580c4d56358e2c95534be5274a71cb5b5a8f12fd"
+    },
+    "release-5c-v2-manual-arc": {
+      "status_path": "artifacts/source8-final-owning-plan-20261112/release-5c-v2-manual-arc/status.json",
+      "sha256": "453e02e1c903a6ac15a7b1322f60c3fae10ca348c918c61d25bcfd6eb069c6a7",
+      "exit": 0,
+      "input_drift": [],
+      "steps": [],
+      "actual_device_authenticated": true,
+      "native_exit": 0,
+      "mapped_ELF_count": 71,
+      "seconds": 1.9173066599760205,
+      "shipped_status": "docs/validation/release-5c-v2-manual-arc-status-20261112.json.gz",
+      "shipped_status_gzip_sha256": "ab7f86fff9e521e7e0ea3e4257e8b5ff463e05818af8c3791393ce6d5c12e2a5"
+    }
+  },
+  "initial_cache_disabled_failure_preserved": "authoring-native85-failure-20261112.json",
+  "matched_cache_diagnostic": "authoring-recovery-cache-diagnostic-20261112.json",
+  "public_orchestration_approved": {
+    "runner_sha256": "a74f73926e3b9ba2b741ad8dd9f4a6efe8511f698c65f2740cf3670df671e1c6",
+    "cohort_sha256": "a8fa7eea34e17f5c4b41d12158be00d7fc83a30b93934353a92ae8fc36d491db",
+    "predicate": "Exact5c clean;1764owned products/native85/currentproducers/font/manualsoftware/currentexpected361SDK/assets+font; manualArc+samecaseGUI precede XR; commonlease andV6 lifetime/dev-inode-SHA guards."
+  },
+  "strict_SAN_current": {
+    "handle": 15864,
+    "pid": 322583,
+    "state_observed": "initial immutable-input SHA admission; no compiler/test yet",
+    "plan_sha256": "3480670e656289c51ebdcbb8907181b90115e8a56b37ac5b76bd1d99f18d677d",
+    "runner_sha256": "ab96502c2c92c513c60e091a049166bf5baa5b037b416cefface34873cae8f4b"
+  },
+  "main_admitted": false,
+  "full_goal_complete": false
+}

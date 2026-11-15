@@ -1,0 +1,58 @@
+{
+  "source": "5c820f342f16d8544158410c2125372811c152f3",
+  "scope": "Same current owning renderer-recovery binary and assertions, original180seconds; fresh empty isolated cache with normal caching enabled. No source/timeout change, no full85 rerun, software GL only.",
+  "command": [
+    "/home/blux/de-xr/dome-sculpt/artifacts/source8-final-owning-plan-20261112/release-5c820f-v3-owning/dome-sculpt-renderer-recovery-test"
+  ],
+  "deadline_seconds": 180,
+  "binary_sha256": "ebf43574f34f8772aaa612acc34989ce3dc14366d5b68181e7c15cfa31d6c170",
+  "native_exit": 0,
+  "seconds": 33.53902069298783,
+  "input_drift": [],
+  "cache_initially_empty": true,
+  "graphics_lease": {
+    "owner_pid": 111207,
+    "acquired_epoch": 1794454274.2549026,
+    "path": "/tmp/dome-sculpt-arc-device.lock",
+    "before_child_launch": true,
+    "released_epoch": 1794454307.7995746
+  },
+  "last_native_lines": [
+    "PASS Complete old/new native scenes remain immutable through all real renderer failures",
+    "PASS Production recovery performs no host readback, nonzero CPU sync wait or glFinish",
+    "PASS Actual recovery leaves no outstanding GL error",
+    "PASS 828 actual accepted/Pending renderer recovery checks",
+    "MESA: info: disk shader cache:  hits = 573, misses = 65"
+  ],
+  "state": "terminal",
+  "exit": 0,
+  "actual_diagnostic_handle": 72243,
+  "status_sha256": "02d4abc319771baf08c5b5453f63d4bddb1f325e14e900848d0a1eebff705804",
+  "log_gzip_path": "docs/validation/authoring-recovery-cache-diagnostic-20261112.log.gz",
+  "log_gzip_sha256": "bbde48c6c5aa71844c818c3cc92b8a47e7ebf537f9fdeaec290e0b08817dc175",
+  "log_decompressed_sha256": "6f95b5b2a0b7d333523a5828b15aecd2eec26244268811491e7a8097829cee7f",
+  "same_owned_binary_independently_verified": true,
+  "recovery_loops_completed": 10,
+  "mesa_cache_hits": 573,
+  "mesa_cache_misses": 65,
+  "generated_cache_files": 67,
+  "source_or_assertion_or_deadline_change": false,
+  "original_native_failure_preserved": true,
+  "full_native85_qualification": false,
+  "full85_replay": {
+    "handle": 77360,
+    "pid": 136326,
+    "tag": "release-5c-v2",
+    "state_observed": "running",
+    "runner_sha256": "3850142f4c4f3ef8e9f0ec3ba8d62d26fb81d9b219bd4b60703f9cd2fe10011a",
+    "change_from_reviewed_lock_runner": "Remove only forcedMESA_SHADER_CACHE_DISABLE=true; normal caching in fresh isolated XDGcache.",
+    "graphics_lease_before_any_built_product": true
+  },
+  "selected_environment": {
+    "LIBGL_ALWAYS_SOFTWARE": "1",
+    "LP_NUM_THREADS": "2",
+    "EGL_PLATFORM": "surfaceless",
+    "MESA_SHADER_CACHE_DISABLE": null,
+    "MESA_SHADER_CACHE_SHOW_STATS": "true"
+  }
+}
