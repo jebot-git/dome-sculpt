@@ -651,7 +651,7 @@ FN(ReleaseSwapchainImage, XrSwapchain p, const XrSwapchainImageReleaseInfo *) {
         std::filesystem::rename(target+".writing",target);
         {std::ofstream raw(target+".rgba.writing",std::ios::binary);raw.write(reinterpret_cast<const char*>(bytes.data()),std::streamsize(bytes.size()));}
         std::filesystem::rename(target+".rgba.writing",target+".rgba");
-        auto&view=report["source8_view"][std::to_string(s->eye)];view["frames"]=view.value("frames",0)+1;view["physical_frame"]=physical_frame;view["width"]=s->width;view["height"]=s->height;view["image"]=target;view["raw"]=target+".rgba";view["scope"]="Actual released eye image; no product marker or observer";
+        auto&view=report["source8_view"][std::to_string(s->eye)];if(view.is_null())view=Json::object();view["frames"]=view.value("frames",0)+1;view["physical_frame"]=physical_frame;view["width"]=s->width;view["height"]=s->height;view["image"]=target;view["raw"]=target+".rgba";view["scope"]="Actual released eye image; no product marker or observer";
       }
     }
     if(capture||root_capture||closed_capture||waiting_capture)save_image(key);
