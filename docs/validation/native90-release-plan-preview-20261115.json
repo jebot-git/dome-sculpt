@@ -1,0 +1,187 @@
+{
+  "schema": 1,
+  "state": "preview-only-NOT-frozen-NOT-executable",
+  "exit": 0,
+  "source_body": "0ae03214d2a06473d6a3097c4076672c0af26617",
+  "graph_source": "1d2b7c5779b0d800e7e0158ca3187d39ff31bbf1",
+  "scope": "Read-only impact forecast over existing compatible1d2 graph and current0ae bodies. Not a configure/build invocation, final frozen plan, staged object, link or runtime acceptance. Recompute under final clean source freeze and owning destination.",
+  "actual_preview_summary": {
+    "configured_TUs": 1036,
+    "candidate_fresh_complete_TUs": 290,
+    "candidate_reusable_complete_objects": 746,
+    "all_final_links_fresh_policy": 737,
+    "products_reused": 0,
+    "archives": 14,
+    "generators_fresh_policy": 3,
+    "selected_native_tests": 90
+  },
+  "authority": {
+    "admission_path": "/home/blux/de-xr/dome-sculpt/artifacts/current-toolchain-guard87-release-20261115/closed-artifacts-independent-audit-v3.json",
+    "admission_sha256": "39c71b267c63127b68b40acc959df021fd662a56fad38c809d0a92af741c6f3e",
+    "baseline_plan_sha256": "0d03a29a1d2251d1186cb8a9c94f22227566c86664245c51b050a66e458b7dec",
+    "original_outer143_preserved": true,
+    "actual_dependency_manifest_sha256": "6aead1793cae61e46a9b3a9a2a366970b21ac86f5b970dedd425971daf11f5bc",
+    "actual_owners": 1032,
+    "actual_raw_depfiles_rechecked": 1032,
+    "all_old_input_pins_rechecked": 30961,
+    "all_old_owned_outputs_rechecked": 1768,
+    "current_toolchain_paths": 14
+  },
+  "policy": {
+    "literal_attached_D_unchanged": true,
+    "standalone_D_refused": true,
+    "sensitive_source_paths": [
+      "src/vroid-creator.cpp",
+      "tests/avatar.cpp",
+      "tests/layered-normal-native.cpp",
+      "tests/source-rest-ui-fixture.cpp",
+      "third_party/desktop/bdf_font.hpp",
+      "third_party/ufbx/ufbx.c",
+      "third_party/xatlas/xatlas.cpp"
+    ],
+    "source_sensitive_owner_count": 88,
+    "assets_byteidentical": true,
+    "asset_files": 7,
+    "configured_graph_CMake_inputs_verified": [
+      "CMakeLists.txt",
+      "cmake/armorpaint-blur-weights.cmake",
+      "experiments/armorpaint-blur/CMakeLists.txt",
+      "tests/sculpt-placed-workspace.cmake",
+      "tests/sculpt-sustained.cmake",
+      "tests/texture-set-resolution-workflows.cmake",
+      "tests/texture-set-source-render.cmake",
+      "third_party/desktop/desktop-menu.cmake"
+    ],
+    "actual_current_source_and_header_SHA_per_reused_owner": true,
+    "no_guessed_generated_aliases": true,
+    "all_final_links_fresh_for_path_embedded_RUNPATH_safety": true
+  },
+  "route_reason_counts": {
+    "Actual compiler/options/literal defines differ; complete TU required": 198,
+    "Changed or missing genuine project dependency:src/bake-authoring.cpp": 1,
+    "Changed or missing genuine project dependency:src/bake.cpp": 1,
+    "Changed or missing genuine project dependency:src/emission-bake-source.cpp": 1,
+    "Changed or missing genuine project dependency:tests/source8-public-runtime.cpp": 1,
+    "Functional/caller-conservative source-path dependency moved (__FILE__/source_location):src/vroid-creator.cpp": 1,
+    "Functional/caller-conservative source-path dependency moved (__FILE__/source_location):tests/avatar.cpp": 1,
+    "Functional/caller-conservative source-path dependency moved (__FILE__/source_location):tests/layered-normal-native.cpp": 1,
+    "Functional/caller-conservative source-path dependency moved (__FILE__/source_location):tests/source-rest-ui-fixture.cpp": 1,
+    "Functional/caller-conservative source-path dependency moved (__FILE__/source_location):third_party/desktop/bdf_font.hpp": 82,
+    "Functional/caller-conservative source-path dependency moved (__FILE__/source_location):third_party/ufbx/ufbx.c": 1,
+    "Functional/caller-conservative source-path dependency moved (__FILE__/source_location):third_party/xatlas/xatlas.cpp": 1,
+    "New configured complete TU has no current provider command": 4,
+    "No complete sealed current whole-object provider": 4,
+    "No genuine sealed CURRENT compiler dependency record": 4
+  },
+  "pins": {
+    "count": 37040,
+    "drift": []
+  },
+  "actual_project_objects_staged": 0,
+  "actual_project_compile_link_jobs": 0,
+  "actual_native_or_graphics_invocations": 0,
+  "new_CMake_configures": 0,
+  "first_failed_preview": {
+    "exit": 1,
+    "cause": "V1 harness asserted admission state passed; actual immutable admission is terminal0. Stopped before reading bodies or configuring anything. Raw log and source retained. V2 validates terminal0 plus exact SHA and full proof."
+  },
+  "final_plan_template": {
+    "state": "syntax-checked-only-NOT-invoked",
+    "takes_explicit_final_source_head_tag": true,
+    "source_freeze_required_before_preparation": true,
+    "standalone_and_attached_D_exact": true,
+    "all737_final_links_fresh": true,
+    "expected1036_TUs_native90": true,
+    "expected3_fresh_generators": true,
+    "exact_generator_input_role_path_and_body_compared": true,
+    "EXECUTION_HOLD_written_if_prepared": true,
+    "executor_or_combined_reused_fresh_dependency_audit_admitted": false,
+    "review_required_before_any_build": true
+  },
+  "files": {
+    "preview-release-v1.py": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/native90-release-planning-20261115/preview-release-v1.py",
+      "raw_sha256": "201f65a5393031696f2ab6a63c4fab00897a77cc74aed1242ef178b6c4a771ef",
+      "sha256": "201f65a5393031696f2ab6a63c4fab00897a77cc74aed1242ef178b6c4a771ef",
+      "bytes": 10416
+    },
+    "preview-release-v2.py": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/native90-release-planning-20261115/preview-release-v2.py",
+      "raw_sha256": "a04297c742075626fa2b30d46ca0e5a05b413145db5391125139c2066f0ace87",
+      "sha256": "a04297c742075626fa2b30d46ca0e5a05b413145db5391125139c2066f0ace87",
+      "bytes": 10418
+    },
+    "current_provider_routes.py": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/native90-release-planning-20261115/current_provider_routes.py",
+      "raw_sha256": "0588d7289e6634cae863a17d620655427d99b4d0b699bceff9ca1e78c471e5c5",
+      "sha256": "0588d7289e6634cae863a17d620655427d99b4d0b699bceff9ca1e78c471e5c5",
+      "bytes": 5708
+    },
+    "current_provider_routes_v2.py": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/native90-release-planning-20261115/current_provider_routes_v2.py",
+      "raw_sha256": "de49f869d3bb699d76fba3381226f19ba9c411c14b3b7257a17cc0c6485c4ec4",
+      "sha256": "de49f869d3bb699d76fba3381226f19ba9c411c14b3b7257a17cc0c6485c4ec4",
+      "bytes": 5917
+    },
+    "prepare-release-native90-v1.py": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/native90-release-planning-20261115/prepare-release-native90-v1.py",
+      "raw_sha256": "de65cca648ac2bd0d62fb10f5e92de4a706b00fd6dd48cdabe126fd6e50834b7",
+      "sha256": "de65cca648ac2bd0d62fb10f5e92de4a706b00fd6dd48cdabe126fd6e50834b7",
+      "bytes": 16498
+    },
+    "provider_context_v1.py": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/native90-release-planning-20261115/provider_context_v1.py",
+      "raw_sha256": "1360754041eab75ceff457408e048ee74addf86f8af6c3d73b9a6bb5ebc6a1b9",
+      "sha256": "1360754041eab75ceff457408e048ee74addf86f8af6c3d73b9a6bb5ebc6a1b9",
+      "bytes": 5852
+    },
+    "ninja_audit.py": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/native90-release-planning-20261115/ninja_audit.py",
+      "raw_sha256": "7aa092c80d1632e6d8a6e68d53c478939911528ff19e34163c09e1d26fd5a264",
+      "sha256": "7aa092c80d1632e6d8a6e68d53c478939911528ff19e34163c09e1d26fd5a264",
+      "bytes": 2986
+    },
+    "status.json.gz": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/native90-release-planning-20261115/preview-0ae03214-v2/status.json",
+      "raw_sha256": "ee2978fe12dbebe1d3136a7bc46b43760f303670e7a10c8979ef5bd63b88a9ca",
+      "sha256": "f88ee4ae94f9022a467ba26742a05721e67eac312a4c1e89a460ec9fd1f7bb80",
+      "bytes": 4007
+    },
+    "pins.json.gz": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/native90-release-planning-20261115/preview-0ae03214-v2/pins.json",
+      "raw_sha256": "4e453c4b23d14c6da1035287fc4822eab68072c41da81b3b9f0d7471b84bf63d",
+      "sha256": "583578ae4e62b40466eb3bd51547c063d64e60a682c3996aebd9c4623d970e9f",
+      "bytes": 1774976
+    },
+    "canonical-sdk-relocation.json.gz": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/native90-release-planning-20261115/canonical-sdk-relocation-v1.json",
+      "raw_sha256": "5882ebf0ec3d611634a9e349644bd6489ed3db8e28720c4bd12d235d09902c06",
+      "sha256": "3ac79d330484897800bc62323fe89d1a4c48e803b1f5f47f7cee794184430d3d",
+      "bytes": 15078
+    },
+    "preview-v2.log.gz": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/native90-release-planning-20261115/preview-release-v2.log",
+      "raw_sha256": "ee2978fe12dbebe1d3136a7bc46b43760f303670e7a10c8979ef5bd63b88a9ca",
+      "sha256": "f88ee4ae94f9022a467ba26742a05721e67eac312a4c1e89a460ec9fd1f7bb80",
+      "bytes": 4007
+    },
+    "first-parser-failure-v1.log.gz": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/native90-release-planning-20261115/preview-release-v1.log",
+      "raw_sha256": "0da0802c454186aec23cdba1c7cc40ef18ce083f87e8cba2c22050521b1380df",
+      "sha256": "b5a30af534cbc0078193624f17fd2ed73749cc461487cc5391113a91365f9af1",
+      "bytes": 269
+    },
+    "object-route-preview.json.gz": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/native90-release-planning-20261115/preview-0ae03214-v2/object-route-preview.json.gz",
+      "raw_sha256": "7c2b97668372ecc8b5c70bf653c99b8a7f032f943b03f7116598575353dc8280",
+      "sha256": "7c2b97668372ecc8b5c70bf653c99b8a7f032f943b03f7116598575353dc8280",
+      "bytes": 25388027
+    },
+    "existing-configure-review.json.gz": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/normal-integration-configure-review-20261115/status.json",
+      "raw_sha256": "54bcb6ffcaaa8d3baf522d3f928a1e802d93c40f5f49c1a13b3fa231fe624ff1",
+      "sha256": "8c0e798f24d0bc714e5861cb0d804cc34dbf7cc2f6bc5a6569ffc115f8ae991b",
+      "bytes": 1700
+    }
+  }
+}
