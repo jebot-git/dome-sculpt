@@ -1,0 +1,663 @@
+{
+  "schema": 1,
+  "state": "terminal",
+  "exit": 0,
+  "scope": "One unchanged existing Source8 PBR-quarter GUI52 regression on App1bc COMPONENT. Actual universal-menu Bake/orderedSave/UndoRedo/fresh reopen/pixel-controls. Old3d inspector/fixture/font retained; c54/runtimeDSO unused. Not new prepared-source UI or wholeowning90/main/HMD/install acceptance.",
+  "application": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/app1bc-public-component-link-20261115/trial-v2/dome-sculpt",
+    "sha256": "4988652c32940b4506fcceb66db6776f0949018972c8bdcc239421845ccdb042",
+    "source_tuple": {
+      "App_product": "1bc13125",
+      "component_context": "3d164382",
+      "literal_assets": "3d164382"
+    }
+  },
+  "actual_result": {
+    "outer_tool": 40285,
+    "outer_exit": 0,
+    "phase_exit": 0,
+    "process_exit": 0,
+    "checks": 52,
+    "seconds": 43.1910574400099,
+    "original_step_seconds": 50,
+    "original_phase_seconds": 900,
+    "original_descendant_RSS_bytes": 6442450944,
+    "correct_geometry_wrongnormal_bounds": [
+      3,
+      12,
+      7
+    ],
+    "input_drift": [],
+    "remaining_owned": {},
+    "actual_App_PIDs": [
+      4140700,
+      4142069,
+      4142435,
+      4142828,
+      4143213,
+      4143618,
+      4144002,
+      4144409,
+      4144799,
+      4145176,
+      4145581,
+      4145958
+    ],
+    "actual_App_PID_count": 12,
+    "all_App_PIDs_absent": true,
+    "critical_certified": [
+      "canonical_FLTK",
+      "consumer",
+      "system_GLX",
+      "system_gallium"
+    ],
+    "runtime_DSO_used": false
+  },
+  "private_display": {
+    "health_sha256": "b5e8c05b161194e64d721cae422badcde8b395a38d82c74c7bd1b9f1bc3c64eb",
+    "actual_certificates": {
+      "4140675": {
+        "identity": {
+          "start": 27396368,
+          "pgrp": 4140639,
+          "ppid": 4140674,
+          "state": "S"
+        },
+        "mapped_paths": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xvfb-private-20261115/deps/usr/lib64/libXfont2.so.2",
+          "/home/blux/de-xr/dome-sculpt/artifacts/guard87-xvfb-private-20261115/deps/usr/lib64/libselinux.so.1",
+          "/opt/fltk-vr/bdf-runtime/lib/libfreetype.so.6.20.6",
+          "/usr/bin/Xvfb",
+          "/usr/lib64/dri/libdril_dri.so",
+          "/usr/lib64/ld-linux-x86-64.so.2",
+          "/usr/lib64/libGL.so.1.7.0",
+          "/usr/lib64/libGLX.so.0.0.0",
+          "/usr/lib64/libGLdispatch.so.0.0.0",
+          "/usr/lib64/libLLVM.so.22.1",
+          "/usr/lib64/libX11.so.6.4.0",
+          "/usr/lib64/libXau.so.6.0.0",
+          "/usr/lib64/libXdmcp.so.6.0.0",
+          "/usr/lib64/libXext.so.6.4.0",
+          "/usr/lib64/libaudit.so.1.0.0",
+          "/usr/lib64/libbrotlicommon.so.1.2.1",
+          "/usr/lib64/libbrotlidec.so.1.2.1",
+          "/usr/lib64/libbz2.so.1.0.8",
+          "/usr/lib64/libc.so.6",
+          "/usr/lib64/libcap-ng.so.0.0.0",
+          "/usr/lib64/libcrypto.so.3.5.9",
+          "/usr/lib64/libdrm.so.2.134.0",
+          "/usr/lib64/libedit.so.0.0.78",
+          "/usr/lib64/libexpat.so.1.13.0",
+          "/usr/lib64/libffi.so.8.2.0",
+          "/usr/lib64/libfontenc.so.1.0.0",
+          "/usr/lib64/libgbm.so.1.0.0",
+          "/usr/lib64/libgcc_s-16-20261029.so.1",
+          "/usr/lib64/liblzma.so.5.8.2",
+          "/usr/lib64/libm.so.6",
+          "/usr/lib64/libpcre2-8.so.0.16.1",
+          "/usr/lib64/libpixman-1.so.0.46.2",
+          "/usr/lib64/libpng16.so.16.59.0",
+          "/usr/lib64/libstdc++.so.6.0.36",
+          "/usr/lib64/libsystemd.so.0.42.0",
+          "/usr/lib64/libtinfo.so.6.6",
+          "/usr/lib64/libunwind.so.8.2.0",
+          "/usr/lib64/libxcb.so.1.1.0",
+          "/usr/lib64/libxml2.so.2.12.10",
+          "/usr/lib64/libz.so.1.3.1.zlib-ng",
+          "/usr/lib64/libzstd.so.1.5.7"
+        ],
+        "certificate_path": "/home/blux/de-xr/dome-sculpt/artifacts/app1bc-source8-gui-regression-20261115/release-gui-pbr-quarter-app1bc-component-v1/actual-private-Xvfb-4140675.json",
+        "certificate_sha256": "9c7693194e4629d4b64aa43ecb9f2c2beb41e2383a425ace9567c57aec9f759b",
+        "mapped_ELFs": 41
+      }
+    }
+  },
+  "lease": {
+    "path": "/tmp/dome-sculpt-arc-device.lock",
+    "before_any_product": true,
+    "acquired_epoch": 1794770958.1903574,
+    "released_epoch": 1794771007.6018312,
+    "independent_NB_after_release": "available/released"
+  },
+  "status_sha256": "0850c7c0b9150ca87c0a8bcd9cba9448f40f28c78ec94170b3479ca430ab3f50",
+  "report": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/app1bc-source8-gui-regression-20261115/release-gui-pbr-quarter-app1bc-component-v1/workflow/report.json",
+    "sha256": "f3590b1700145cde49a5b3ec28fae2e4fe058811aed43faae45d2a10577c3dec"
+  },
+  "root_review": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/app1bc-source8-gui-regression-20261115/root-GUI-review-v1.json",
+    "sha256": "9b7d3a14bb96ba708c9e75b5cf2e374d9863fce35b27cb54d75dc82961ffdec1"
+  },
+  "raw_evidence_archive": {
+    "file": "app1bc-source8-GUI52-actual-20261115.tar.gz",
+    "sha256": "c50e720f1e3858eb9a6e2af3eb5354a3348b9d969163c83b80e59651ad0eb364",
+    "bytes": 4449146,
+    "members": [
+      {
+        "name": "actual-private-Xvfb-4140675.json",
+        "bytes": 80274,
+        "sha256": "9c7693194e4629d4b64aa43ecb9f2c2beb41e2383a425ace9567c57aec9f759b"
+      },
+      {
+        "name": "app-4140700/maps-first.txt",
+        "bytes": 62460,
+        "sha256": "5ce820f0e2eb993694bf79ba5daf285be0e3bd063af9c15aa1ebde9f814eafe8"
+      },
+      {
+        "name": "app-4140700/maps-last.txt",
+        "bytes": 66722,
+        "sha256": "1eae5f4deec7a7ce89a5b5b6bc25fb7a7ab04e918e02bcb15839c0100b4dfe3e"
+      },
+      {
+        "name": "app-4142069/maps-first.txt",
+        "bytes": 62171,
+        "sha256": "e5e01f23e98168b8dffcf45c4819dafbcf627eddf9197e9a19ad21efe0c4e93b"
+      },
+      {
+        "name": "app-4142069/maps-last.txt",
+        "bytes": 66134,
+        "sha256": "9e8e23963ab066dd4d8394f11bfaf9d56311cd57f486e5323f463c0c25f56b57"
+      },
+      {
+        "name": "app-4142435/maps-first.txt",
+        "bytes": 63489,
+        "sha256": "0bc695f1a3df5b3fc25c4dea30d67c73c0805ca7c691ad7ea83adf0f7cfaffad"
+      },
+      {
+        "name": "app-4142435/maps-last.txt",
+        "bytes": 65007,
+        "sha256": "568949308f7d61a64e143417c657f5ddacf840bb89e26b8db710d57d803bb965"
+      },
+      {
+        "name": "app-4142828/maps-first.txt",
+        "bytes": 64027,
+        "sha256": "e4d4dbe4bd5bea146026c05bf67ea2feb6ac590b2bad86ab2e7bd56492f67d8a"
+      },
+      {
+        "name": "app-4142828/maps-last.txt",
+        "bytes": 66036,
+        "sha256": "07486983243d4c8778bfaf0c7506c38cce014476d919d898c4a20ef4dfc2f309"
+      },
+      {
+        "name": "app-4143213/maps-first.txt",
+        "bytes": 62411,
+        "sha256": "3c401c0637b7f0fa82a2434f8b1890164d766e7683d69996136911176b40cc97"
+      },
+      {
+        "name": "app-4143213/maps-last.txt",
+        "bytes": 65448,
+        "sha256": "7fc84fdb5bffaaf19222c20ccf8d74c255673ebd690827a27c936491339a995b"
+      },
+      {
+        "name": "app-4143618/maps-first.txt",
+        "bytes": 64076,
+        "sha256": "574fc5b477ebcd486e66fd1b215e6bd91dfe71718a209ba0f301e93d4f9201fa"
+      },
+      {
+        "name": "app-4143618/maps-last.txt",
+        "bytes": 65595,
+        "sha256": "dbaca7d377a765eafebafc54ad6115272c99072152fc98f1e9c3ab5d0660781a"
+      },
+      {
+        "name": "app-4144002/maps-first.txt",
+        "bytes": 63880,
+        "sha256": "fe2b691f829323a81f61815f9a5fcc7f284da20b6297d3420a82aba5f6907500"
+      },
+      {
+        "name": "app-4144002/maps-last.txt",
+        "bytes": 65497,
+        "sha256": "5042eed282e67ed780972450695301c9086ae68d0229debff2d91c2cfd0e52e6"
+      },
+      {
+        "name": "app-4144409/maps-first.txt",
+        "bytes": 62558,
+        "sha256": "7bebe80c67754774c249cf277470504b302d4ffc920c981666926361f2fed11e"
+      },
+      {
+        "name": "app-4144409/maps-last.txt",
+        "bytes": 65742,
+        "sha256": "cd307b14f7f278068b49539e5fd1a3a5bbbf24930811e17401ea0fa0ea3c3922"
+      },
+      {
+        "name": "app-4144799/maps-first.txt",
+        "bytes": 63978,
+        "sha256": "d2c34a5a5c83e1f264c86792d17c00cdf1b520790ad6158dcf521b78b3898a54"
+      },
+      {
+        "name": "app-4144799/maps-last.txt",
+        "bytes": 65497,
+        "sha256": "1df12d991ec213b2e01a539d77a40d7ac43d341e4739f5a1963134935502ab8d"
+      },
+      {
+        "name": "app-4145176/maps-first.txt",
+        "bytes": 63929,
+        "sha256": "aa7fc315aa93fcb55e29296ac74557df707ee817a41b55c50841173dc94069f3"
+      },
+      {
+        "name": "app-4145176/maps-last.txt",
+        "bytes": 65546,
+        "sha256": "08e35b18f311d2e1e9f2988f4d690630151ff45d398e1a61def744f21234b110"
+      },
+      {
+        "name": "app-4145581/maps-first.txt",
+        "bytes": 62362,
+        "sha256": "cc19a61415a39d930f67fb2c0f8f1f16671d78f91ef520d4b5792e678083fabe"
+      },
+      {
+        "name": "app-4145581/maps-last.txt",
+        "bytes": 65497,
+        "sha256": "7d5ad5b4dda4f3145d65e9dd12a5c94fb11af5ad9cc5177301a06b68bb00c2b3"
+      },
+      {
+        "name": "app-4145958/maps-first.txt",
+        "bytes": 63929,
+        "sha256": "96814f5e78d30cbe2c6d00d9ac8a1f6531ac0b4065d290da2267682758ce5dcc"
+      },
+      {
+        "name": "app-4145958/maps-last.txt",
+        "bytes": 65546,
+        "sha256": "7b966751a63905ebbcb78b1536b3c30c94b1502ed99189aba0250300530d7f2c"
+      },
+      {
+        "name": "mapped-ELFs.json",
+        "bytes": 97549,
+        "sha256": "d495e6e8052096265e1d6e00350b91adf8544418b844b9446eef94f0e4b77f53"
+      },
+      {
+        "name": "owned-process-ledger.json",
+        "bytes": 41042,
+        "sha256": "86c6457e5d8be4e957d2a0febf6f4558fe272c49b7f66fb2e097148255758bda"
+      },
+      {
+        "name": "owned-process-observations.jsonl",
+        "bytes": 43007,
+        "sha256": "fa1ce6d68b3054542f8e7f1cb06ed41ec886fe0534997e1248a6b5d0cd53f415"
+      },
+      {
+        "name": "owned-processes-driver-return.json",
+        "bytes": 8504,
+        "sha256": "c87c008c54b61ae4ad12d0a9a570100092417da4a26a4ad8af5a93cc7ea90ff0"
+      },
+      {
+        "name": "owned-processes-finally.json",
+        "bytes": 8340,
+        "sha256": "8bd47ee74f71e647a52f60a4172b31896ab045063a69fd36e9c92f13096dad36"
+      },
+      {
+        "name": "process.log",
+        "bytes": 4687,
+        "sha256": "12f456c7b4fe9846667bea851cf6891e3638bf21aff540b326ce7744765f0514"
+      },
+      {
+        "name": "provider-admission.json",
+        "bytes": 6420919,
+        "sha256": "c194a0c184194bd7f5eb7917a2745a437861a5516d53107485e1866e29781565"
+      },
+      {
+        "name": "readable-DRI.json",
+        "bytes": 1264,
+        "sha256": "df5b785ceeaa78bb6326ad655f2af031ee3ecf9d57caa16a1d1a91099704880e"
+      },
+      {
+        "name": "status.json",
+        "bytes": 6434541,
+        "sha256": "0850c7c0b9150ca87c0a8bcd9cba9448f40f28c78ec94170b3479ca430ab3f50"
+      },
+      {
+        "name": "workflow/accepted.png",
+        "bytes": 6188,
+        "sha256": "c7a3788b02190df5c3013c155bc07e6e94dd02500ee08ca87e7004eeb566cc7e"
+      },
+      {
+        "name": "workflow/app-0.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": "workflow/app-1.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": "workflow/app-source8-control-0.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": "workflow/app-source8-control-1.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": "workflow/app-source8-control-2.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": "workflow/app-source8-control-3.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": "workflow/app-source8-hidden-counterfactual.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": "workflow/app-source8-visible.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": "workflow/app-source8-without-baked-detail-0.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": "workflow/app-source8-without-baked-detail-1.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": "workflow/app-source8-without-baked-detail-2.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": "workflow/app-source8-without-baked-detail-3.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": "workflow/bake-complete.png",
+        "bytes": 18275,
+        "sha256": "2b47a45743e3c3e86420c5a6f80fcdddc1a9203b8424cd749d55f40eed679c53"
+      },
+      {
+        "name": "workflow/bake-options.png",
+        "bytes": 18353,
+        "sha256": "a34aef790c84f9a3cf6b7542bece2bfafbb8fcadc15a560cb5956d089cce7b42"
+      },
+      {
+        "name": "workflow/before.png",
+        "bytes": 8385,
+        "sha256": "11b4c44ced3c6bc10658dc595b6ee81d67f48ed06ba71b4fa243152c56133997"
+      },
+      {
+        "name": "workflow/commands.jsonl",
+        "bytes": 1376,
+        "sha256": "bf1ebfa161d07a8b89ecf15e2d0279e59910a608eb5dd20aa79ef5ffe01d6b66"
+      },
+      {
+        "name": "workflow/home/actual.dsculpt",
+        "bytes": 775423,
+        "sha256": "1cf95b528ab14bb24ad84d051deeb183d283a80cb249e425d51613e4edf1093e"
+      },
+      {
+        "name": "workflow/home/config/dome/appearance.json",
+        "bytes": 66,
+        "sha256": "adb3a512ceeb0fed91de9481ee8401a520f4d3ade6d373526afdd42eee446a9f"
+      },
+      {
+        "name": "workflow/home/independent-control-0.dsculpt",
+        "bytes": 994,
+        "sha256": "9b55f65811c1b2d4022129f0d798cd32d54952d8b7f1bbaaa3d6a0c379bb4009"
+      },
+      {
+        "name": "workflow/home/independent-control-1.dsculpt",
+        "bytes": 994,
+        "sha256": "4213d45c4333997fae071d7591643abd5142479ae58129d7a2e6adfd523dbdd7"
+      },
+      {
+        "name": "workflow/home/independent-control-2.dsculpt",
+        "bytes": 994,
+        "sha256": "e5e9467b21ba0f49697e64086843b1e088a97a0c3cdce2b84703a6e74514e040"
+      },
+      {
+        "name": "workflow/home/independent-control-3.dsculpt",
+        "bytes": 994,
+        "sha256": "d83b285082d61496dc3b9c531033fdee70ac0d5804809b1c91679e506fef1bdc"
+      },
+      {
+        "name": "workflow/home/source8-control-0.dsculpt",
+        "bytes": 994,
+        "sha256": "9b55f65811c1b2d4022129f0d798cd32d54952d8b7f1bbaaa3d6a0c379bb4009"
+      },
+      {
+        "name": "workflow/home/source8-control-1.dsculpt",
+        "bytes": 994,
+        "sha256": "4213d45c4333997fae071d7591643abd5142479ae58129d7a2e6adfd523dbdd7"
+      },
+      {
+        "name": "workflow/home/source8-control-2.dsculpt",
+        "bytes": 994,
+        "sha256": "e5e9467b21ba0f49697e64086843b1e088a97a0c3cdce2b84703a6e74514e040"
+      },
+      {
+        "name": "workflow/home/source8-control-3.dsculpt",
+        "bytes": 994,
+        "sha256": "d83b285082d61496dc3b9c531033fdee70ac0d5804809b1c91679e506fef1bdc"
+      },
+      {
+        "name": "workflow/home/source8-hidden-counterfactual.dsculpt",
+        "bytes": 392141,
+        "sha256": "f57c439fc45f83b27fd768cfca358d57a81d38ae2a8ce2990ddc13fbfbc4daee"
+      },
+      {
+        "name": "workflow/home/source8-visible.dsculpt",
+        "bytes": 392141,
+        "sha256": "786c96670e058a8311ef3d102309fa768092e445e21391ecce65fe7391e64e77"
+      },
+      {
+        "name": "workflow/home/source8-without-baked-detail-0.dsculpt",
+        "bytes": 994,
+        "sha256": "fbf2f7015a6bb4a88eb1c797132ad1c4cde4af8738b2b03d56e4c128cb6d33ba"
+      },
+      {
+        "name": "workflow/home/source8-without-baked-detail-1.dsculpt",
+        "bytes": 994,
+        "sha256": "433eae0a13b39710c79aa1f49b5dc31acd2d585c61c16756ef457754d3e4fcc8"
+      },
+      {
+        "name": "workflow/home/source8-without-baked-detail-2.dsculpt",
+        "bytes": 994,
+        "sha256": "fdcdfcfde7be40794986b28f4b15ddff69a03ca6bae8d1c5447cf5611c41c69e"
+      },
+      {
+        "name": "workflow/home/source8-without-baked-detail-3.dsculpt",
+        "bytes": 994,
+        "sha256": "2ec3b7f457039febf4eed6884c2fbb57903934da23281ca401f8f4b047b88782"
+      },
+      {
+        "name": "workflow/home/without-baked-normal-0.dsculpt",
+        "bytes": 994,
+        "sha256": "fbf2f7015a6bb4a88eb1c797132ad1c4cde4af8738b2b03d56e4c128cb6d33ba"
+      },
+      {
+        "name": "workflow/home/without-baked-normal-1.dsculpt",
+        "bytes": 994,
+        "sha256": "433eae0a13b39710c79aa1f49b5dc31acd2d585c61c16756ef457754d3e4fcc8"
+      },
+      {
+        "name": "workflow/home/without-baked-normal-2.dsculpt",
+        "bytes": 994,
+        "sha256": "fdcdfcfde7be40794986b28f4b15ddff69a03ca6bae8d1c5447cf5611c41c69e"
+      },
+      {
+        "name": "workflow/home/without-baked-normal-3.dsculpt",
+        "bytes": 994,
+        "sha256": "2ec3b7f457039febf4eed6884c2fbb57903934da23281ca401f8f4b047b88782"
+      },
+      {
+        "name": "workflow/public-acks.jsonl",
+        "bytes": 13034,
+        "sha256": "4879ce7b9763c2fbfbd8a9951e7e5a59f2cec4b6b628bec3d935749a40b70eaa"
+      },
+      {
+        "name": "workflow/redone.png",
+        "bytes": 6188,
+        "sha256": "c7a3788b02190df5c3013c155bc07e6e94dd02500ee08ca87e7004eeb566cc7e"
+      },
+      {
+        "name": "workflow/reopened.png",
+        "bytes": 6152,
+        "sha256": "ce48cc02db303815679ab5e6c2b606c2aafe84e0ca1e882ad2facdd48cefa0d6"
+      },
+      {
+        "name": "workflow/report.json",
+        "bytes": 32081,
+        "sha256": "f3590b1700145cde49a5b3ec28fae2e4fe058811aed43faae45d2a10577c3dec"
+      },
+      {
+        "name": "workflow/runtime-maps-0.txt",
+        "bytes": 65546,
+        "sha256": "1f182182c6c8d06a97e0d214cfca2f7387f936196efeb529ee1c1881b95a9394"
+      },
+      {
+        "name": "workflow/runtime-maps-1.txt",
+        "bytes": 66134,
+        "sha256": "9e8e23963ab066dd4d8394f11bfaf9d56311cd57f486e5323f463c0c25f56b57"
+      },
+      {
+        "name": "workflow/runtime-maps-source8-control-0.txt",
+        "bytes": 65497,
+        "sha256": "4ae295ff7ecb69226d25d30879af676a9d4e21661081ded088df1aa96170da4b"
+      },
+      {
+        "name": "workflow/runtime-maps-source8-control-1.txt",
+        "bytes": 65497,
+        "sha256": "5042eed282e67ed780972450695301c9086ae68d0229debff2d91c2cfd0e52e6"
+      },
+      {
+        "name": "workflow/runtime-maps-source8-control-2.txt",
+        "bytes": 65497,
+        "sha256": "1df12d991ec213b2e01a539d77a40d7ac43d341e4739f5a1963134935502ab8d"
+      },
+      {
+        "name": "workflow/runtime-maps-source8-control-3.txt",
+        "bytes": 65497,
+        "sha256": "a9ae65c92686d0112ec9ed69747e4955d0a4dc480440cc9dde13a4ff5e382029"
+      },
+      {
+        "name": "workflow/runtime-maps-source8-hidden-counterfactual.txt",
+        "bytes": 65007,
+        "sha256": "568949308f7d61a64e143417c657f5ddacf840bb89e26b8db710d57d803bb965"
+      },
+      {
+        "name": "workflow/runtime-maps-source8-visible.txt",
+        "bytes": 66036,
+        "sha256": "2c18979a79dad42d821061041fd4e37a09c90f00b102df0a2963c60091d40912"
+      },
+      {
+        "name": "workflow/runtime-maps-source8-without-baked-detail-0.txt",
+        "bytes": 65595,
+        "sha256": "dbaca7d377a765eafebafc54ad6115272c99072152fc98f1e9c3ab5d0660781a"
+      },
+      {
+        "name": "workflow/runtime-maps-source8-without-baked-detail-1.txt",
+        "bytes": 65742,
+        "sha256": "cd307b14f7f278068b49539e5fd1a3a5bbbf24930811e17401ea0fa0ea3c3922"
+      },
+      {
+        "name": "workflow/runtime-maps-source8-without-baked-detail-2.txt",
+        "bytes": 65546,
+        "sha256": "08e35b18f311d2e1e9f2988f4d690630151ff45d398e1a61def744f21234b110"
+      },
+      {
+        "name": "workflow/runtime-maps-source8-without-baked-detail-3.txt",
+        "bytes": 65546,
+        "sha256": "7b966751a63905ebbcb78b1536b3c30c94b1502ed99189aba0250300530d7f2c"
+      },
+      {
+        "name": "workflow/source8-control-0.png",
+        "bytes": 4144,
+        "sha256": "b1dcd7f439907ab08a6d1424e50f1da646670d1916ec86b092fed530b88d0730"
+      },
+      {
+        "name": "workflow/source8-control-1.png",
+        "bytes": 4149,
+        "sha256": "cdea7d191083c478bbc20c58ebfc7137bf7afd0e653807aca7ce9cefcba4f09d"
+      },
+      {
+        "name": "workflow/source8-control-2.png",
+        "bytes": 5451,
+        "sha256": "dd0405b2750ee40a5c3769ab98945532181d738d5e49398354e6bc1c1c225c7b"
+      },
+      {
+        "name": "workflow/source8-control-3.png",
+        "bytes": 4146,
+        "sha256": "58c79a395fe7102076d5e40ada763f3d264b472f78bb15c01fc048df0c505043"
+      },
+      {
+        "name": "workflow/source8-hidden-counterfactual.png",
+        "bytes": 3932,
+        "sha256": "35fea9dc794b194e804ec4de9c1ccef12f683101fbb326fd3e07aeb8daa27ae4"
+      },
+      {
+        "name": "workflow/source8-normal-sensitivity.json",
+        "bytes": 315,
+        "sha256": "e47cc58f903c4f124b7f13075fff71dc16fc7120f41e8161880f29aea1c32731"
+      },
+      {
+        "name": "workflow/source8-probe-0.json",
+        "bytes": 1498,
+        "sha256": "73fe88eac853f19af2b09bd4848136d061584d082127eb526f52cfe9a509b2c7"
+      },
+      {
+        "name": "workflow/source8-probe-1.json",
+        "bytes": 1509,
+        "sha256": "f0d4e664c74c0d2275c5175d016b6a0845f2d8433cb18f8b850fa7c19e7a6f96"
+      },
+      {
+        "name": "workflow/source8-probe-2.json",
+        "bytes": 1515,
+        "sha256": "ac844762a422c408b5c1fe7354de36e76ff0d09d304f18aaac01f4d435f34f07"
+      },
+      {
+        "name": "workflow/source8-probe-3.json",
+        "bytes": 1509,
+        "sha256": "edead9d6ffc31a66e752cbdc04f1f716af527b9eef02512ee655815ce21b8e33"
+      },
+      {
+        "name": "workflow/source8-visible.png",
+        "bytes": 40931,
+        "sha256": "49d10849eccf14f08994d8d3439b3ecd5e2a051f61121557189c4706b713d551"
+      },
+      {
+        "name": "workflow/source8-without-baked-detail-0.png",
+        "bytes": 4816,
+        "sha256": "18e335e052dbea600c217dff722d615769aa063f472aabad37cffe5f84074d4f"
+      },
+      {
+        "name": "workflow/source8-without-baked-detail-1.png",
+        "bytes": 5972,
+        "sha256": "246316000af40e5ca996e143901826e7838dbeadf4c498ee3e747f3ddaeb4a26"
+      },
+      {
+        "name": "workflow/source8-without-baked-detail-2.png",
+        "bytes": 4568,
+        "sha256": "bc66bf0a45a7e3b8943868dc5108ca77b89b6ed63da48fc541d0e86ed0539e1e"
+      },
+      {
+        "name": "workflow/source8-without-baked-detail-3.png",
+        "bytes": 4147,
+        "sha256": "7e6cb14173778e4e0e523c92b44d72551c9e86dad1169727cf01b59f9dd49ab9"
+      },
+      {
+        "name": "workflow/undone.png",
+        "bytes": 8421,
+        "sha256": "222b701241e470bba3bd7190330562411d8058e3816283b83307d5560f4b023c"
+      },
+      {
+        "name": "workflow/xvfb.log",
+        "bytes": 1000,
+        "sha256": "f084be852f1732a30c1cd7aafa7b43e748d3a70874f74d2b63124f41f2b093d6"
+      }
+    ]
+  },
+  "remaining": [
+    "New prepared-source desktop/XR actual public source-choice/normal-toggle/two-Bake/nativeSave/history workflows",
+    "Final frozen native90 owning build and coherent full runtime qualification",
+    "All other original production requirements"
+  ]
+}
