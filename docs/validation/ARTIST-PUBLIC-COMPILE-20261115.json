@@ -1,0 +1,277 @@
+{
+  "version": 1,
+  "status": "Fresh complete fixture compilation passed; milestone paused before links/products",
+  "source_commit": "6c8f042cb1730fa017595e9a710b8c8c6015a9ea",
+  "product_commit": "1bc13125",
+  "scope": "Four actual current-toolchain complete test/font owner TUs only. No new fixture, ldd, app, GL, XR, system installation or physical HMD execution. Not native or application acceptance.",
+  "compile_plan": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-public-compile-v3-20261115/compile-plan.json",
+    "sha256": "d1cc23266d66b581378ef00c0abb1cfcee2cd41aaf27e5c7ba8627a991b0272e"
+  },
+  "compile_driver": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-public-compile-v3-20261115/compile-public-v3.py",
+    "sha256": "411fc0867ba9acfe3fe4e44f37b762797751fd8aefdabfa92801a6ed844428f4"
+  },
+  "compile_status": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-public-compile-v3-20261115/compile-status.json",
+    "sha256": "d23d18b87118a21113a60249ac1ef0c25510a605b6b8e87de11385127e25bb2a"
+  },
+  "compile_inputs": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-public-compile-v3-20261115/compile-inputs.json",
+    "sha256": "5b05d7a59da5cfb336e97dc827c676f8444e83819308c80b5920ee7d12a0eb7e",
+    "pins": 4696,
+    "drift": []
+  },
+  "actual_compiler_steps": 8,
+  "actual_complete_TUs": 4,
+  "actual_all_header_dependency_incidences": 1774,
+  "unique_actual_dependency_paths": 525,
+  "all_precheck_actual_rosters_identical": true,
+  "all14_tools_literal_resolved_pinned": true,
+  "compiler_cwd_env_explicit": true,
+  "pin_policy": "First expected literal/resolved hash is immutable; conflicts fail rather than overwriting",
+  "objects": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-public-compile-v3-20261115/prepared-fixture.o": {
+      "sha256": "c2983aafb6f0f0504213b0c472117cca2aa171062d8b74b0bcd5fe6906297e87",
+      "bytes": 988712,
+      "file": "tests/source-prepared-normal-bake.cpp"
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-public-compile-v3-20261115/public-runtime.o": {
+      "sha256": "ef30b13c0ad3ba4118efd19a8fc8e7509c18658f4851413e3f4038299c8aa2a2",
+      "bytes": 862840,
+      "file": "tests/source8-public-runtime.cpp"
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-public-compile-v3-20261115/font-reference.o": {
+      "sha256": "0820ef7e327e8968f112afec83ee491e39ed74c09c3d26d8ccc347e7e54f7882",
+      "bytes": 318728,
+      "file": "tests/baked-emission-font-reference.cpp"
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-public-compile-v3-20261115/font-session-appearance.o": {
+      "sha256": "4c98f1b9ab4da28120493932f760c40b7c158b74eb5c744d28a5593c7a2fe199",
+      "bytes": 466040,
+      "file": "src/session-appearance.cpp"
+    }
+  },
+  "unit": {
+    "name": "ds-artist-public-compile-v3-20261115.service",
+    "MainPID": 3991,
+    "InvocationID": "07da9d9e75fe4cb2ad75ec4bd3d02cb6",
+    "terminal_MainPID": 0,
+    "ExecMainStatus": 0,
+    "Result": "success",
+    "MemoryMax": 2147483648,
+    "MemoryPeak": 867729408,
+    "finished_unit_stopped": true,
+    "all_recorded_child_pids_absent_at_closure": true,
+    "common_graphics_lease_used": false
+  },
+  "earlier_plans_preserved": {
+    "artist-prepared-public-compile-20261115": {
+      "executed": false,
+      "reason": "Held after static review or pause boundary; no result/passing claim"
+    },
+    "artist-prepared-public-compile-v2-20261115": {
+      "executed": false,
+      "reason": "Held after static review or pause boundary; no result/passing claim"
+    },
+    "artist-prepared-public-link-20261115": {
+      "executed": false,
+      "reason": "Held after static review or pause boundary; no result/passing claim"
+    },
+    "artist-prepared-public-link-v2-20261115": {
+      "executed": false,
+      "reason": "Held after static review or pause boundary; no result/passing claim"
+    },
+    "artist-prepared-public-link-v3-20261115": {
+      "executed": false,
+      "reason": "Held after static review or pause boundary; no result/passing claim"
+    }
+  },
+  "native_and_graphical_prior_seals": {
+    "native": "ea13136d",
+    "graphics": "1b4fb828",
+    "production_unchanged": true,
+    "failed_run_histories_preserved": true
+  },
+  "scope_corrections_to_frozen_initial_design": {
+    "combined_graph": "1036 translation units,737 archive/link nodes; not1036targets",
+    "public_desktop": "Private-Xvfb softwareGL; native Wayland/DomeD GPU desktop remains broader required work",
+    "public_XR": "Future separately reviewed authenticatedArc synthetic-input application workflow",
+    "component_Arc24": "Already qualified separately; not a public prepared-source UI test"
+  },
+  "current_boundary": "Do not start links/native products/GUI/XR or further implementation until goal resumed and plans reviewed",
+  "text_evidence_archive": {
+    "path": "docs/validation/artist-public-compile-20261115/text-evidence.tar.xz",
+    "sha256": "c14a4a27c9670ca1f8d899d46de67bbf50a48951d40dfcd9c12d51dcc597cbac",
+    "bytes": 199316,
+    "members": {
+      "artist-prepared-public-compile-20261115/compile-plan.json": {
+        "sha256": "466045f4a3ff7ff0910d3e71ab0c60fabbce6736f314e4c0e273af6eb93cd32f",
+        "bytes": 7476
+      },
+      "artist-prepared-public-compile-20261115/compile-public-v1.py": {
+        "sha256": "5447d6451e9d4196f09a93efcafc094863e37109a4a41b030ac8519f35efb4af",
+        "bytes": 3124
+      },
+      "artist-prepared-public-compile-v2-20261115/compile-plan.json": {
+        "sha256": "42091fda681976190b7963b75de3285f3670fb3351d3f9b17516ae3b5141453f",
+        "bytes": 13209
+      },
+      "artist-prepared-public-compile-v2-20261115/compile-public-v2.py": {
+        "sha256": "7f4618a7ac5ed6483b132fbea855f3600fa6e95b6f9e9d13ffb72e8362267719",
+        "bytes": 4905
+      },
+      "artist-prepared-public-compile-v3-20261115/0.precheck-all.d": {
+        "sha256": "91eec9d3118b8273e1b2aa0a35c0c8ca175186f633b966f2ef2f037c0a75e003",
+        "bytes": 22924
+      },
+      "artist-prepared-public-compile-v3-20261115/1.precheck-all.d": {
+        "sha256": "31b7c0cffad5eb07d4de94c03fb66037995f124aca9b5259ef3c87b1c31c8907",
+        "bytes": 14700
+      },
+      "artist-prepared-public-compile-v3-20261115/2.precheck-all.d": {
+        "sha256": "591c917fa9eab4271aa2dcd9a357c9abb1ae10e2bb99e5c460a742a507188f7f",
+        "bytes": 21351
+      },
+      "artist-prepared-public-compile-v3-20261115/3.precheck-all.d": {
+        "sha256": "a8f4a6ba54e9faa6f6e0e991ca8aa4cd92b8bcd630fc61941b96a28caf8801ca",
+        "bytes": 22804
+      },
+      "artist-prepared-public-compile-v3-20261115/compile-0.log": {
+        "sha256": "4c46a3df934ee08017301c1777820904a16f14f2dedb1b2a20b8c1cdf7ec8463",
+        "bytes": 6556
+      },
+      "artist-prepared-public-compile-v3-20261115/compile-1.log": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "artist-prepared-public-compile-v3-20261115/compile-2.log": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "artist-prepared-public-compile-v3-20261115/compile-3.log": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "artist-prepared-public-compile-v3-20261115/compile-closure.json": {
+        "sha256": "47ea4ab577094edf8dfe431eb1efda2086761ef11be402e23b39ac9659430b16",
+        "bytes": 1597
+      },
+      "artist-prepared-public-compile-v3-20261115/compile-inputs.json": {
+        "sha256": "5b05d7a59da5cfb336e97dc827c676f8444e83819308c80b5920ee7d12a0eb7e",
+        "bytes": 922179
+      },
+      "artist-prepared-public-compile-v3-20261115/compile-plan.json": {
+        "sha256": "d1cc23266d66b581378ef00c0abb1cfcee2cd41aaf27e5c7ba8627a991b0272e",
+        "bytes": 13879
+      },
+      "artist-prepared-public-compile-v3-20261115/compile-public-v3.py": {
+        "sha256": "411fc0867ba9acfe3fe4e44f37b762797751fd8aefdabfa92801a6ed844428f4",
+        "bytes": 4989
+      },
+      "artist-prepared-public-compile-v3-20261115/compile-status.json": {
+        "sha256": "d23d18b87118a21113a60249ac1ef0c25510a605b6b8e87de11385127e25bb2a",
+        "bytes": 1209216
+      },
+      "artist-prepared-public-compile-v3-20261115/font-reference.d": {
+        "sha256": "9fc745b19a1962c6bfa5b416cca28f05333b5d6ef20dcea0253569fdef55871e",
+        "bytes": 21442
+      },
+      "artist-prepared-public-compile-v3-20261115/font-session-appearance.d": {
+        "sha256": "b7b1f2000c6afedabd0b68e442aa30ade12dc06f097b3a8431414928e542b08a",
+        "bytes": 22904
+      },
+      "artist-prepared-public-compile-v3-20261115/prepared-fixture.d": {
+        "sha256": "45c99c4285890d7af2b486cd5d0da2201dcd56ec64df83dae858f4f2c945d36b",
+        "bytes": 23017
+      },
+      "artist-prepared-public-compile-v3-20261115/preprocess-0.log": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "artist-prepared-public-compile-v3-20261115/preprocess-1.log": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "artist-prepared-public-compile-v3-20261115/preprocess-2.log": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "artist-prepared-public-compile-v3-20261115/preprocess-3.log": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "artist-prepared-public-compile-v3-20261115/public-runtime.d": {
+        "sha256": "b7630fcbc881038eeef17d2aae6c4bdb53bd1d5e4843744588de69ae5b7f18ca",
+        "bytes": 14791
+      },
+      "artist-prepared-public-compile-v3-20261115/unit-journal.txt": {
+        "sha256": "e717f87758eeb662413f5773d81ed35e99e4d27f39a6cf55b86a0f910d11c29e",
+        "bytes": 1086
+      },
+      "artist-prepared-public-compile-v3-20261115/unit-launch.txt": {
+        "sha256": "df4863ec35660066c614e4adb4d7f631ee63140a22fd27b7486815588ce0677b",
+        "bytes": 148
+      },
+      "artist-prepared-public-compile-v3-20261115/unit-terminal.txt": {
+        "sha256": "d5df276c82d0a0844bc76f17a0affed33e2d76632aa76854062eceb1de07aa97",
+        "bytes": 219
+      },
+      "artist-prepared-public-link-20261115/link-plan.json": {
+        "sha256": "63a5b4b2a8a0c52a3be97c49d951d534082e288d424e6ed81a8e96af7c8e2d0a",
+        "bytes": 9579
+      },
+      "artist-prepared-public-link-20261115/link-public-v1.py": {
+        "sha256": "a4fbe44d91089ab14f59f4f5dbf2e9a750462508e14a92b74c5bf15142befab2",
+        "bytes": 4997
+      },
+      "artist-prepared-public-link-20261115/native-public-plan-review-v1.json": {
+        "sha256": "e9ad91a8857ff27b446cf743dc5f71476193783f2b56f0e5ef760c93635480e7",
+        "bytes": 3176
+      },
+      "artist-prepared-public-link-20261115/run-native-public-v1.py": {
+        "sha256": "8e281ebb4d0f64d0446cc02fbe5457c559c5970dfb6a3966b79334d88cc5bbf1",
+        "bytes": 8196
+      },
+      "artist-prepared-public-link-v2-20261115/link-plan.json": {
+        "sha256": "583df931f601c854e349f59cf508129ba4ed48a7d7f63d788878d388238e0465",
+        "bytes": 10505
+      },
+      "artist-prepared-public-link-v2-20261115/link-public-v2.py": {
+        "sha256": "1f816e73d36bc543bec24342379fcea0f8c606f009661e47fbc77dbead3036d3",
+        "bytes": 5430
+      },
+      "artist-prepared-public-link-v2-20261115/native-public-plan-review-v1.json": {
+        "sha256": "0a3c51f2ed841e4ecf15fd67404b197432d7da5d7130194b573989aabcbafdc8",
+        "bytes": 3707
+      },
+      "artist-prepared-public-link-v2-20261115/run-native-public-v2.py": {
+        "sha256": "8e281ebb4d0f64d0446cc02fbe5457c559c5970dfb6a3966b79334d88cc5bbf1",
+        "bytes": 8196
+      },
+      "artist-prepared-public-link-v3-20261115/link-plan.json": {
+        "sha256": "de3e0bf5ebc8ff547c3608e36805348d137f0b3c36c0bf407d59d5fe8f78b043",
+        "bytes": 11088
+      },
+      "artist-prepared-public-link-v3-20261115/link-public-v3.py": {
+        "sha256": "38b6b3bd16a3184e8d588e850b28e4174ee4396b089efce089fb130001c521f5",
+        "bytes": 5504
+      },
+      "artist-prepared-public-link-v3-20261115/native-public-plan-review-v1.json": {
+        "sha256": "bb13571f9dd771154b2d1819adffca98cce7d6d3c145a60bc5eee98bce7614fe",
+        "bytes": 3849
+      },
+      "artist-prepared-public-link-v3-20261115/run-native-public-v3.py": {
+        "sha256": "b6754866703936de75d6a3f4762ce04dcde78dc6b46d4f9deb6a161b168c124f",
+        "bytes": 8410
+      }
+    },
+    "all_member_payloads_verified": true
+  },
+  "remaining": [
+    "Review/execute fresh component links; then native91 plus public four-case producer/32positive native phases/8wrong-Original refusals/default4+22bitmap references",
+    "Review and run genuine prepared-source public desktopsoftware and ArcXR actions for MT0/MT1 rest/posed: explicit Prepared source and normals toggle, secondBake, durableSave, UndoRedo/freshreopen with exact source-ID provenance and finite normal decoder",
+    "Merge/freeze combined source and qualify fresh owning optimizedRelease plus strictASAN/UBSAN/leak cohort1036TUs/737archive-linknodes/native90 and required public/render gates",
+    "Complete outstanding full-REQUIREMENTS source adapters including v2/reprojection/canonical/native32/changed owning-source pose and remaining main-goal work; this scoped milestone does not declare the full objective complete"
+  ]
+}
