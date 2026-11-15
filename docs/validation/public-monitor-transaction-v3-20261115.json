@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "scope": "CPU-only public test-harness critical witness transaction repair. No product/runtime/frontend/source or graphics assertion changes, no application/GL/physicalHMD acceptance.",
+  "state": "terminal",
+  "exit": 0,
+  "app_source": "3d1643827dd56e1b2ef1d57b8a9c6ff1e4211a2c",
+  "actual_root_reviewed_plan": "0d03a29a1d2251d1186cb8a9c94f22227566c86664245c51b050a66e458b7dec",
+  "counterfactual": "Unchanged monitor and unchanged v2 both promote consumer into seen after a genuine owned-process /proc/PID/mountinfo ENOENT swallowed before ANY fingerprint completes. Same-start child deliberately reaped immediately before the real filesystem read; no fake monitor or exception used for this proof.",
+  "qualified_cpu_controls": 15,
+  "controls_scope": "Genuine real-monitor live complete, first/partial ENOENT and EINVAL, exact EINVAL with reap-before-classifier, prior successful witnesses, real expected-hash/path refusals; six inherited exception classifier refusals retain their original error.",
+  "old_classifier": "V2 exact EINVAL+owned original start+exact mountinfo path+same-start Z/X or absent classifier remains byte-identical; no new exception class is excused.",
+  "transaction": "Monitor publishes observations to a private trial set. Only after normal or already-qualified retirement return, new witnessed critical names need a completed fingerprint matching prelaunch sealed expected path+SHA, mapping device/inode, stat device/inode and every corresponding mount certificate field. All candidates validate before caller seen changes. Fully completed fingerprints and witnesses survive partial later retirement; uncertified names remain withheld.",
+  "integration": "New run-transaction-v3.py requires each critical expected path/hash already in prelaunch sealed pins, refuses unknown or conflicting providers, pins both v3 and unchanged v2 helper, records expectedELFs, and preserves all original scenarios/limits/assertions/lease/device/map guards. Existing run.py remains unchanged.",
+  "original_v2_sha256": "e9d3c48156688d6041adaa7ecc90a3e502059ba84509843e71ad3744e9db8867",
+  "files": {
+    "public-monitor-transaction-v3-20261115.py": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/public-monitor-transaction-20261115/monitor_lifetime_v3.py",
+      "sha256": "8b502159e063c900c299912ca6a9af1a206e04b7604c9ec4b1e4f70b6db6b05f"
+    },
+    "public-monitor-transaction-v3-controls-20261115.py": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/public-monitor-transaction-20261115/transaction-controls-v1.py",
+      "sha256": "fb194bc7e9ffbfeb88218c055501734971e59f18926677d793688aebdb288042"
+    },
+    "public-monitor-transaction-v3-controls-20261115.json": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/public-monitor-transaction-20261115/transaction-controls-v1/status.json",
+      "sha256": "50d1d2550d4696fd7564852d8c1a4e1afecc3cb12b88f4397ba6605ca67a41f2"
+    },
+    "public-monitor-transaction-v3-counterfactual-20261115.py": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/public-monitor-transaction-20261115/reproduce-enoent-v1.py",
+      "sha256": "ccab6ea32ecd46445268f2e6b815970e7094f6b3ac745838c913c7a9e6fce62d"
+    },
+    "public-monitor-transaction-v3-counterfactual-20261115.json": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/public-monitor-transaction-20261115/enoent-counterfactual-v1/status.json",
+      "sha256": "2c8744dd085e58064ce0885d8f6e99e1ba09ec6e48fd0a0e3b1ea32ef8e8eea2"
+    },
+    "public-monitor-transaction-v3-integration-20261115.diff": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-validation-fresh-v2-20261115/run-transaction-v3.diff",
+      "sha256": "1431b1f7a7928bfb9ce85a8003a77cce65d672323a5bf4f7b6cc245a0efa194e"
+    },
+    "public-monitor-transaction-v3-run-20261115.py": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-validation-fresh-v2-20261115/run-transaction-v3.py",
+      "sha256": "5dd2e298cbdcab544ad2a4ace895c025a77df850c07ee43af6ba1b7f44230f7c"
+    }
+  },
+  "active_owned_processes": [],
+  "graphics_executed": false,
+  "next": "Await exact fresh whole-build+actual-depfile audit0, then current runtime preflight and native87/producers/font/software/actualArc gates before new public GUI/XR execution."
+}
