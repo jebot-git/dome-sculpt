@@ -1,0 +1,393 @@
+{
+  "scope": "Read-only corroboration of independently produced component archives versus genuinely completed owning archive actions. Whole-file byte comparison fails for nondeterministic ar timestamp metadata; that failure remains. No archive is normalized/rewritten, and no full application pass inferred.",
+  "source": "3d1643827dd56e1b2ef1d57b8a9c6ff1e4211a2c",
+  "component_receipt": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-sanitize-native-component-20261115/component-from-current-whole-objects-v1/component-ready.json",
+    "sha256": "5b0968591f822aaecb2b5890514c39dffc0a78b87c45b6f8ae495e8e390ae127"
+  },
+  "closed_owning_archives": 13,
+  "expected_native_archives": 13,
+  "whole_file_byte_pass": false,
+  "all_ordered_member_payloads_equal": true,
+  "all_section_payloads_equal": true,
+  "results": [
+    {
+      "archive": "libdome-sculpt-native-graphics.a",
+      "whole_container_byte_exact": false,
+      "component_sha256": "903790491f454f07eff285a39c9406451483d895c6f92f558ff4602ee4ccd074",
+      "owning_sha256": "98947d11ae05bd73eb01fc3136a2b91654479c456aab2bd0341fe06a7b0fda5e",
+      "ordered_member_payloads_equal": true,
+      "member_count": 1,
+      "all_section_payloads_equal": true,
+      "container_differences": [
+        {
+          "section": "/",
+          "delta": {
+            "mtime": {
+              "component": "1794757967  ",
+              "owning": "1794759097  "
+            }
+          }
+        }
+      ],
+      "owning_actual_completion": {
+        "event": "complete",
+        "kind": "link",
+        "key": "libdome-sculpt-native-graphics.a",
+        "pid": 2576713,
+        "exit": 0,
+        "seconds": 0.1060340499971062,
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "archive": "libdome-sculpt-affine.a",
+      "whole_container_byte_exact": false,
+      "component_sha256": "420c2c5def42511f8d356480626e21814b3f2d2151b134845aa3a0097efdeffe",
+      "owning_sha256": "4884d4441a68aabcd8074bbb26a4aebd2dc8d78a868beb9b275a46087e7cf9d2",
+      "ordered_member_payloads_equal": true,
+      "member_count": 4,
+      "all_section_payloads_equal": true,
+      "container_differences": [
+        {
+          "section": "/",
+          "delta": {
+            "mtime": {
+              "component": "1794757967  ",
+              "owning": "1794759097  "
+            }
+          }
+        }
+      ],
+      "owning_actual_completion": {
+        "event": "complete",
+        "kind": "link",
+        "key": "libdome-sculpt-affine.a",
+        "pid": 2576714,
+        "exit": 0,
+        "seconds": 0.10372507400461473,
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "archive": "libxatlas.a",
+      "whole_container_byte_exact": false,
+      "component_sha256": "f815dad27a868ca7dff80769f91b4535be31e52d52ac4d057e8e1ccbe4529197",
+      "owning_sha256": "5c18adde4a3f451101b667ed1a9cfe5124677ff8baa3400016e0e58b8ef428d6",
+      "ordered_member_payloads_equal": true,
+      "member_count": 1,
+      "all_section_payloads_equal": true,
+      "container_differences": [
+        {
+          "section": "/",
+          "delta": {
+            "mtime": {
+              "component": "1794757967  ",
+              "owning": "1794761422  "
+            }
+          }
+        }
+      ],
+      "owning_actual_completion": {
+        "event": "complete",
+        "kind": "link",
+        "key": "libxatlas.a",
+        "pid": 2897401,
+        "exit": 0,
+        "seconds": 0.2040788439917378,
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "archive": "libufbx.a",
+      "whole_container_byte_exact": false,
+      "component_sha256": "cc23ec7b8d55a8c45d9c87c692b84b1aeb52b8ff9899776624c91a09d45c5440",
+      "owning_sha256": "d34df65f710b0ffd7e44d05c6d53b608ec22e56a6cfb1b95289045557cc19e96",
+      "ordered_member_payloads_equal": true,
+      "member_count": 1,
+      "all_section_payloads_equal": true,
+      "container_differences": [
+        {
+          "section": "/",
+          "delta": {
+            "mtime": {
+              "component": "1794757967  ",
+              "owning": "1794761422  "
+            }
+          }
+        }
+      ],
+      "owning_actual_completion": {
+        "event": "complete",
+        "kind": "link",
+        "key": "libufbx.a",
+        "pid": 2897475,
+        "exit": 0,
+        "seconds": 0.20576735300710425,
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "archive": "libmikktspace.a",
+      "whole_container_byte_exact": false,
+      "component_sha256": "bbbb527458a99b2640e15bbbfb29f646f625b94db1c1ae60f879396920240c6a",
+      "owning_sha256": "1ab2852ee1e660a69eb059cfde6a8dacaf4e6716b291fe7c09dc15215980e4ce",
+      "ordered_member_payloads_equal": true,
+      "member_count": 1,
+      "all_section_payloads_equal": true,
+      "container_differences": [
+        {
+          "section": "/",
+          "delta": {
+            "mtime": {
+              "component": "1794757967  ",
+              "owning": "1794761422  "
+            }
+          }
+        }
+      ],
+      "owning_actual_completion": {
+        "event": "complete",
+        "kind": "link",
+        "key": "libmikktspace.a",
+        "pid": 2897518,
+        "exit": 0,
+        "seconds": 0.1033060519839637,
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "archive": "libdome-sculpt-polygon.a",
+      "whole_container_byte_exact": false,
+      "component_sha256": "81bf09b837b63cd2290cffd1218ea12981fccb6512a59834e9ead4a04c27b028",
+      "owning_sha256": "4d2d0050ca911b302683b324b8a93013d37ac73fc9a01e35140302e4abf8eab0",
+      "ordered_member_payloads_equal": true,
+      "member_count": 2,
+      "all_section_payloads_equal": true,
+      "container_differences": [
+        {
+          "section": "/",
+          "delta": {
+            "mtime": {
+              "component": "1794757967  ",
+              "owning": "1794761422  "
+            }
+          }
+        }
+      ],
+      "owning_actual_completion": {
+        "event": "complete",
+        "kind": "link",
+        "key": "libdome-sculpt-polygon.a",
+        "pid": 2897548,
+        "exit": 0,
+        "seconds": 0.2039877159986645,
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "archive": "libmikktspace-robust.a",
+      "whole_container_byte_exact": false,
+      "component_sha256": "6e5275cd03678f6255e4c55a56f92ad73b94b5cfebb1c01eaf7b4d6a13f0309c",
+      "owning_sha256": "40372e743d366b05d520fa92829cefa83b65da2731e25565feb1ddd12a96abbc",
+      "ordered_member_payloads_equal": true,
+      "member_count": 1,
+      "all_section_payloads_equal": true,
+      "container_differences": [
+        {
+          "section": "/",
+          "delta": {
+            "mtime": {
+              "component": "1794757968  ",
+              "owning": "1794761423  "
+            }
+          }
+        }
+      ],
+      "owning_actual_completion": {
+        "event": "complete",
+        "kind": "link",
+        "key": "libmikktspace-robust.a",
+        "pid": 2897606,
+        "exit": 0,
+        "seconds": 0.10344172100303695,
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "archive": "libdome-sculpt-spacenav.a",
+      "whole_container_byte_exact": false,
+      "component_sha256": "2529019626cc1d15ddee327d2284f26a268b4dcef57664d9b4d1d7bbcc2130d3",
+      "owning_sha256": "e052dab007386fb2feb6cf4281a19dcc85b18afb03c88c427c3f0ce824495e31",
+      "ordered_member_payloads_equal": true,
+      "member_count": 2,
+      "all_section_payloads_equal": true,
+      "container_differences": [
+        {
+          "section": "/",
+          "delta": {
+            "mtime": {
+              "component": "1794757968  ",
+              "owning": "1794761423  "
+            }
+          }
+        }
+      ],
+      "owning_actual_completion": {
+        "event": "complete",
+        "kind": "link",
+        "key": "libdome-sculpt-spacenav.a",
+        "pid": 2897635,
+        "exit": 0,
+        "seconds": 0.10373524500755593,
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "archive": "libdome-sculpt-baked-emission.a",
+      "whole_container_byte_exact": false,
+      "component_sha256": "ffeaf409b82bbd70e4279d5252f718338994214188a1e3c7733076d5afd4b242",
+      "owning_sha256": "acb1829e21db75a7aaa6cd7d3a059b8d1edeff99538ea0e92d9d632c403ad827",
+      "ordered_member_payloads_equal": true,
+      "member_count": 1,
+      "all_section_payloads_equal": true,
+      "container_differences": [
+        {
+          "section": "/",
+          "delta": {
+            "mtime": {
+              "component": "1794757968  ",
+              "owning": "1794761423  "
+            }
+          }
+        }
+      ],
+      "owning_actual_completion": {
+        "event": "complete",
+        "kind": "link",
+        "key": "libdome-sculpt-baked-emission.a",
+        "pid": 2897665,
+        "exit": 0,
+        "seconds": 0.10373424203135073,
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "archive": "libdome-sculpt-paint-gpu.a",
+      "whole_container_byte_exact": false,
+      "component_sha256": "2c43f63c49e8bc0697361a272e622ca834ff0fd36a557ab52d4a02ca17176605",
+      "owning_sha256": "d5a4557cfb54888d2518202c2fdbca5b325930166eb9a416930ac51e2c60a252",
+      "ordered_member_payloads_equal": true,
+      "member_count": 1,
+      "all_section_payloads_equal": true,
+      "container_differences": [
+        {
+          "section": "/",
+          "delta": {
+            "mtime": {
+              "component": "1794757968  ",
+              "owning": "1794759097  "
+            }
+          }
+        }
+      ],
+      "owning_actual_completion": {
+        "event": "complete",
+        "kind": "link",
+        "key": "libdome-sculpt-paint-gpu.a",
+        "pid": 2576744,
+        "exit": 0,
+        "seconds": 0.1028910220193211,
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "archive": "libdome-sculpt-emission-codec.a",
+      "whole_container_byte_exact": false,
+      "component_sha256": "0f8d0db7a39ca9d64b65feef8b6b11efe6d43574f3f94b8229f6bfd88d7fc807",
+      "owning_sha256": "c3e65040b143e5f535aa6089e54073d7950e6fa8266d01d563370784bf1edb75",
+      "ordered_member_payloads_equal": true,
+      "member_count": 2,
+      "all_section_payloads_equal": true,
+      "container_differences": [
+        {
+          "section": "/",
+          "delta": {
+            "mtime": {
+              "component": "1794757968  ",
+              "owning": "1794761423  "
+            }
+          }
+        }
+      ],
+      "owning_actual_completion": {
+        "event": "complete",
+        "kind": "link",
+        "key": "libdome-sculpt-emission-codec.a",
+        "pid": 2897688,
+        "exit": 0,
+        "seconds": 0.10418556199874729,
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "archive": "libdome-sculpt-core.a",
+      "whole_container_byte_exact": false,
+      "component_sha256": "3105dc1906ea548b323efa191031b8efd73814f43fa4aa6626f6227142a699f2",
+      "owning_sha256": "7be26e27397e7afaf42c5f63a9f273b8e66c33205a6fba2532598bc91679c2f7",
+      "ordered_member_payloads_equal": true,
+      "member_count": 193,
+      "all_section_payloads_equal": true,
+      "container_differences": [
+        {
+          "section": "/",
+          "delta": {
+            "mtime": {
+              "component": "1794757974  ",
+              "owning": "1794761431  "
+            }
+          }
+        }
+      ],
+      "owning_actual_completion": {
+        "event": "complete",
+        "kind": "link",
+        "key": "libdome-sculpt-core.a",
+        "pid": 2897733,
+        "exit": 0,
+        "seconds": 10.392246192030143,
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "archive": "libdome-sculpt-render.a",
+      "whole_container_byte_exact": false,
+      "component_sha256": "32bc4685f1d042d8988dcf31a5599fa97d3ac05d00149f3a1124ad06810331e8",
+      "owning_sha256": "39897695dd68aea95adf66d3c23666ef182f86217e2a098b58cbd02fbf38da96",
+      "ordered_member_payloads_equal": true,
+      "member_count": 4,
+      "all_section_payloads_equal": true,
+      "container_differences": [
+        {
+          "section": "/",
+          "delta": {
+            "mtime": {
+              "component": "1794757978  ",
+              "owning": "1794762128  "
+            }
+          }
+        }
+      ],
+      "owning_actual_completion": {
+        "event": "complete",
+        "kind": "link",
+        "key": "libdome-sculpt-render.a",
+        "pid": 2988581,
+        "exit": 0,
+        "seconds": 0.609522883023601,
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "created_epoch": 1794762397.2529938
+}

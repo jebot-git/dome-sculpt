@@ -1,0 +1,38 @@
+{
+  "state": "launched",
+  "unit": "dome-sculpt-sanitize-completion-20261115-v1.service",
+  "argv": [
+    "systemd-run",
+    "--user",
+    "--unit=dome-sculpt-sanitize-completion-20261115-v1.service",
+    "--service-type=exec",
+    "--property=RuntimeMaxSec=20000",
+    "--property=KillMode=control-group",
+    "--property=Nice=10",
+    "--property=TimeoutStopSec=45",
+    "--property=RemainAfterExit=yes",
+    "--working-directory=/home/blux/de-xr/dome-sculpt",
+    "--property=StandardOutput=append:/home/blux/de-xr/dome-sculpt/artifacts/guard87-current-sanitize-completion-20261115/service-output-v1.log",
+    "--property=StandardError=append:/home/blux/de-xr/dome-sculpt/artifacts/guard87-current-sanitize-completion-20261115/service-output-v1.log",
+    "/usr/bin/python3",
+    "/home/blux/de-xr/dome-sculpt/artifacts/guard87-current-sanitize-completion-20261115/execute-completion-v1.py",
+    "/home/blux/de-xr/dome-sculpt/artifacts/guard87-current-sanitize-completion-20261115/sanitize-3d1643-completion-v1-audit/plan.json",
+    "--execute"
+  ],
+  "launcher_exit": 0,
+  "launcher_stdout": "",
+  "launcher_stderr": "Running as unit: dome-sculpt-sanitize-completion-20261115-v1.service; invocation ID: 9ff470aeee854a2cb5ca8fe967ed1963\n",
+  "initial_properties": "Id=dome-sculpt-sanitize-completion-20261115-v1.service\nActiveState=active\nSubState=running\nInvocationID=9ff470aeee854a2cb5ca8fe967ed1963\nRuntimeMaxUSec=5h 33min 20s\nRemainAfterExit=yes\nMainPID=2575295\nResult=success\nExecMainPID=2575295\nExecMainStatus=0\nControlGroup=/user.slice/user-1000.slice/user@1000.service/app.slice/dome-sculpt-sanitize-completion-20261115-v1.service\nNice=10\n",
+  "selected_compiler_environment": {
+    "CPATH": null,
+    "C_INCLUDE_PATH": null,
+    "CPLUS_INCLUDE_PATH": null,
+    "OBJC_INCLUDE_PATH": null,
+    "LIBRARY_PATH": null,
+    "GCC_EXEC_PREFIX": null,
+    "COMPILER_PATH": null,
+    "SOURCE_DATE_EPOCH": null
+  },
+  "scope": "Independent bounded completion, original143 unchanged. Transient user unit only, no install/autostart. RemainAfterExit retains terminal audit metadata until explicit stop after recording; no program remains after success.",
+  "plan_sha256": "9641d8af4976d8937081f5be9d0a999a730196a48c902262ac3c5cff68e39140"
+}
