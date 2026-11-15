@@ -1,0 +1,47 @@
+{
+  "state": "admitted-component-loader-and-version-only",
+  "exit": 0,
+  "source_tuple": {
+    "application_product": "1bc13125",
+    "unchanged_component_context": "3d164382",
+    "literal_asset_context": "3d164382"
+  },
+  "application": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/app1bc-public-component-link-20261115/trial-v2/dome-sculpt",
+    "sha256": "4988652c32940b4506fcceb66db6776f0949018972c8bdcc239421845ccdb042",
+    "bytes": 16330736
+  },
+  "producer_status_sha256": "a3ee9ef96c86f58bc722a851bf99a75d17aea95332eb26c7367717b61ae9b385",
+  "root_link_review_sha256": "e459ac20da4670cd282be99aff5eabfd55a643be0da0b9e8d17e20f86c018c89",
+  "link_actual_exit": 0,
+  "actual_link_dependency_record_sha256": "9e10faefa6980b572bac902eb34a359d35b4e17ee9c463424f9e72db24b59ff2",
+  "loader_status_sha256": "57acc327c5b25a8399deeaa1d7430dd9b8804d3e18ced226f3f31f336bbc12aa",
+  "actual_loader_providers": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/app1bc-component-loader-20261115/actual-loader-providers.json",
+    "sha256": "40f45fe0f524f659d3aa15b1ecfdb4c5250b1f8968e6fab74c2359703055d537",
+    "count": 72
+  },
+  "prior_canonical_loader_boundary": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-validation-fresh-v2-20261115/runtime-preflight.json",
+    "sha256": "949716280d10503f4899694790c1ade8779c7acce793b6f6c6d78408529129d4"
+  },
+  "old_pins_preserved": true,
+  "version_actual_exit": 0,
+  "version_stdout": "Dome Sculpt 0.1.0 / CPU / Blender 5.4 Alpha trackball basis\n",
+  "scope": "Additive App1bc/components3d/literalassets3d component. Ready to bind reviewed test preparation only; no GUI/XR workflow/fullowning90/main/install/HMD acceptance.",
+  "lease": {
+    "path": "/tmp/dome-sculpt-arc-device.lock",
+    "owner": {
+      "pid": 4012092,
+      "start": 27296275,
+      "pgrp": 4012091,
+      "session": 4012091,
+      "ppid": 4012091,
+      "state": "R"
+    },
+    "acquired_epoch": 1794769964.190763,
+    "before_any_ldd_or_product_child": true,
+    "released_epoch": 1794769964.6361938
+  },
+  "input_drift": []
+}
