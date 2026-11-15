@@ -1,3 +1,23 @@
+## Artist/prepared normal consumers qualify in software and Arc — 2026-11-15
+
+Functional product1bc with fixture7fb now passes24 actual graphical cases and
+318 full96x96 PNGs in EACH software and authenticated Arc profile, freshCPU44
+first. Correct RGB error is at most1 under unchanged bound3, with required
+wrong-world/omitted gap7 and disjoint intervals. Actual ArcPCI03:00.0/renderD129/
+i915/liveFD and72 pinned mapped ELFs are authenticated. Root independently
+rehashes all636 current PNGs; both runs terminate0/no signals/no input drift.
+Read [the causal native/graphics seal](ARTIST-NORMAL-GRAPHICS-20261115.md).
+All old failed selectors/projections/tint/probe runs remain preserved separately.
+
+Actual PUBLIC desktop/XR selection of the prepared source, Bake, ordered Save
+and history still need direct application evidence. New test-only fixture/UI
+scenarios are being designed before final combined90 source freeze, including
+wrong-original-source counterfactuals and exact source-ID/recipe checks. No new
+frontend or production/schema change is intended. An additive fresh component
+application link is being prepared for that test development; it does not replace
+the held complete owning90 build. All original production requirements remain
+active/incomplete. No install, physical headset or session restart occurred.
+
 ## Strict native87 passes; corrected normal software consumer passes — 2026-11-15
 
 Current baseline strict ASan/UBSan/leak native87 completes87/87 actual CTests,
