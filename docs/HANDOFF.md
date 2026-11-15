@@ -1,3 +1,14 @@
+## Combined normal-source draft assembled — 2026-11-15
+
+The separate integration branch now merges the qualified native component,
+corrected graphical fixtures, per-eye reporter repair and case-local shader
+code-cache scenario while preserving main039f and every source history. It is
+unfrozen with no combined build. Software manual/import controls pass, but the
+actual CC0 MToon0 negative lacks contrast despite exact correct-oracle agreement;
+full graphical acceptance remains open. Read
+[NORMAL-INTEGRATION-DRAFT-20261115.md](NORMAL-INTEGRATION-DRAFT-20261115.md).
+All original production requirements remain incomplete and required.
+
 ## MToon XR timing and graphical fixture corrections — 2026-11-15
 
 MToonquarter XR6524 reaches174 actual passing checks but hits the original

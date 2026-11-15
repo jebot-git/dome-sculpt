@@ -1,0 +1,32 @@
+{
+  "state": "unfrozen-combined-source-draft",
+  "source_before_record": "d3fbe1b0dfb9a3f9b1bc4cfae987152cbd75ac92",
+  "baseline": "3d1643827dd56e1b2ef1d57b8a9c6ff1e4211a2c",
+  "qualification": "No combined owning build or runtime acceptance; component/native and baseline GUI/XR evidence remain separately scoped.",
+  "merged_histories": {
+    "039f158b": "039f158bee5e5bbc6937ec65cb41a4fd5a1c4a2f",
+    "ea13136d": "ea13136da1a31c4a9433e9a7f036b6c92ed7a7b8",
+    "87c5595b": "87c5595b7d401d6742f96e6f4b52ca4658d4ffce",
+    "c54f66f8": "c54f66f8feab6ff52331bb264b54fc55cdc14c01",
+    "02d17f29": "02d17f29dd63f4e379627489e9ec2d77f1147387"
+  },
+  "production_and_fixture_identity_checks": "Exact git object content matches asserted above; stereo scenario Python AST parses.",
+  "non_document_delta": {
+    "CMakeLists.txt": "c8450303445b6fd271bd3376b76a599c55bd2ba054107f9d3c3235eff67d9686",
+    "src/bake-authoring.cpp": "99c050a0f6b9302aa33fb570dd3ec05163c02b4dd5c86d298017be7d5722cae2",
+    "src/bake.cpp": "fc183cf3523bfd95e2e63369c83fb1ea415258ce5a0e2b9182c8db5bb85eaae5",
+    "src/emission-bake-source.cpp": "311f7abcb905ce5e8202b67c4825fadf780ab6c5a0d7cd574135f0bf7f09f251",
+    "src/source-bake-normal.hpp": "29a343f01a154cfa9d1e8df859f44074e1b9d269e2fddeeac1eaa6d7034545a9",
+    "tests/source-artist-normal-bake.cpp": "7ab22b49f8104ab24bc6c0358e1264042e479e58e64072ab44ff035c0f54e4b4",
+    "tests/source-artist-normal-fixture.hpp": "832426517a05f50c3b2a41f8509ef4abe0cb52847dfe398305d160e8a63520de",
+    "tests/source-artist-normal-oracle.hpp": "918c3ba9397f978a44655716c0cf3c7850b8bb455c83cf49f65634f85c271913",
+    "tests/source-artist-normal-render.cpp": "532a829d4561a8d0602542bebf5495631f51e435d82918c42364a0cbd746ba03",
+    "tests/source-prepared-normal-bake.cpp": "0aa1fe71a3f2f3ca03eb8826629aae7c064ffd745267a7ec8387e366778d7c71",
+    "tests/source-prepared-normal-render.cpp": "4a9b555a54989b4b72784101410581315337841001ff3f19c0fa0333fc8e1c9d",
+    "tests/source8-public-runtime.cpp": "24810b37a6a5ddc7eb6006a69aad27d92754ec60d02c47b8d6d6bd4fa35ac25e",
+    "tests/source8-public-xr.py": "d80456f6113dc4a2456dcc8c22e145ccc2e0f931d8933abf481b34f8ac63932e"
+  },
+  "graphics_software_latest": "Actual exit1: manual/import pass, female-rest MT0 correct0 but wrong-normal gap1<7; prepared not reached. All prior failures retained.",
+  "whole_build_executed": false,
+  "installed": false
+}
