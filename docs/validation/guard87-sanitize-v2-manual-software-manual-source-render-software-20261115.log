@@ -1,0 +1,997 @@
+Native XR graphics: windowless EGL 1.5
+GL_RENDERER llvmpipe (LLVM 22.1.8, 256 bits)
+PASS Independent sourceful target is complete
+PASS Actual source owns real FLOAT emission and coverage
+PASS Actual topology identifies the independently authored moved vertex
+PASS Actual topology identifies the independently authored moved vertex
+PASS Actual Move/Flip replay publishes its genuine39 source owner
+PASS One actual39 actor partitions into two real sourceful fields
+PASS Each detached source field owns only its genuine logical triangle
+PASS Source field refuses a sibling's logical triangle
+PASS Each detached source field owns only its genuine logical triangle
+PASS Source field refuses a sibling's logical triangle
+PASS Public collection creation retains the actual second source face
+PASS One Scene40 actor owns genuine sourceful geometry2 fields
+PASS Actual sourceful39/40 grids, fields and before roots survive codec replay
+PASS Both sources belong to one actual object and one shared geometry control block
+PASS Actual first sourceful object publishes exactly two complete field ranges
+PASS Ranges distinguish primary/additional material on the same actual object
+PASS Each draw retains actual sourceful member ownership
+PASS Both material fields retain their genuine raw-input packet and winding
+PASS Sourceful normal model comes from its real before N/T owner
+PASS N-only source does not invent artist T/W or a normal role UV
+PASS Packed corner matches independent edited/reflected source geometry
+PASS Packed before N belongs to the correct source triangle
+PASS Sourceful paint uses original logical corners rather than current atlas
+PASS Actual field proof keeps its shared logical triangle identity
+PASS Packed corner matches independent edited/reflected source geometry
+PASS Packed before N belongs to the correct source triangle
+PASS Sourceful paint uses original logical corners rather than current atlas
+PASS Actual field proof keeps its shared logical triangle identity
+PASS Packed corner matches independent edited/reflected source geometry
+PASS Packed before N belongs to the correct source triangle
+PASS Sourceful paint uses original logical corners rather than current atlas
+PASS Actual field proof keeps its shared logical triangle identity
+PASS Actual query keeps same-object material and shared logical triangle identity
+PASS Ranges distinguish primary/additional material on the same actual object
+PASS Each draw retains actual sourceful member ownership
+PASS Both material fields retain their genuine raw-input packet and winding
+PASS Sourceful normal model comes from its real before N/T owner
+PASS N-only source does not invent artist T/W or a normal role UV
+PASS Packed corner matches independent edited/reflected source geometry
+PASS Packed before N belongs to the correct source triangle
+PASS Sourceful paint uses original logical corners rather than current atlas
+PASS Actual field proof keeps its shared logical triangle identity
+PASS Packed corner matches independent edited/reflected source geometry
+PASS Packed before N belongs to the correct source triangle
+PASS Sourceful paint uses original logical corners rather than current atlas
+PASS Actual field proof keeps its shared logical triangle identity
+PASS Packed corner matches independent edited/reflected source geometry
+PASS Packed before N belongs to the correct source triangle
+PASS Sourceful paint uses original logical corners rather than current atlas
+PASS Actual field proof keeps its shared logical triangle identity
+PASS Actual query keeps same-object material and shared logical triangle identity
+PASS Selecting the additional source never removes the primary field
+PASS Actual sourceful frame saved
+PASS Both genuine source fields have substantial independent pixel interiors and background
+PASS Independent normal oracle rejects edited-geometric-only shading
+PASS Independent field oracle rejects borrowing sibling geometric transport rows
+PASS Second eye reuses exact sourceful fields/geometry/images
+PASS Field/ghost/cull programs leave the ordinary renderer state contract
+PASS Renderer refuses borrowing a sibling field proof on the same object
+PASS Accepted sourceful frame recovers exactly after a foreign-proof refusal
+PASS Both genuine source fields have substantial independent pixel interiors and background
+PASS Independent normal oracle rejects edited-geometric-only shading
+PASS Independent field oracle rejects borrowing sibling geometric transport rows
+PASS Canvas field transport remains uniforms without geometry upload
+PASS Actual sourceful object enters the supported held route
+PASS Actual held entry retains the original field appearance
+PASS Held sourceful motion retains its actual immutable geometry snapshot
+PASS Actual held state retains its complete affine source placement
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Both genuine source fields have substantial independent pixel interiors and background
+PASS Independent normal oracle rejects edited-geometric-only shading
+PASS Independent field oracle rejects borrowing sibling geometric transport rows
+PASS Actual sourceful frame saved
+PASS Held field transport remains uniforms without geometry upload
+PASS Held cancellation preserves complete sourceful native state
+PASS Actual sourceful field receives a finished saturated native color layer
+PASS Actual sourceful field receives a finished saturated native color layer
+PASS Both genuine source fields have substantial independent pixel interiors and background
+PASS Independent paint oracle rejects swapped same-object material bindings
+PASS Actual sourceful frame saved
+PASS Actual sourceful field receives a finished saturated native color layer
+PASS Additional source paint preserves actual primary COW/source ownership
+PASS Both genuine source fields have substantial independent pixel interiors and background
+PASS Independent paint oracle rejects swapped same-object material bindings
+PASS Actual sourceful frame saved
+PASS Retained previous same-object fields remain exactly drawable after sibling edit
+PASS Both genuine source fields have substantial independent pixel interiors and background
+PASS Independent paint oracle rejects swapped same-object material bindings
+PASS Actual sourceful frame saved
+PASS Field/ghost/cull programs leave the ordinary renderer state contract
+PASS Actual additional material alone changes cull policy
+PASS Both genuine source fields have substantial independent pixel interiors and background
+PASS Independent paint oracle rejects swapped same-object material bindings
+PASS Actual sourceful frame saved
+PASS Field/ghost/cull programs leave the ordinary renderer state contract
+PASS Opaque and normal fields recover exact state after ghost/additional-only cull
+PASS Edited sourceful FLOAT/paint/normal fields roundtrip with exact pixels and native state
+PASS All GPU/read/negative controls preserve the complete original sourceful Scene
+PASS Actual source owns real FLOAT emission and coverage
+PASS Actual topology identifies the independently authored moved vertex
+PASS Actual topology identifies the independently authored moved vertex
+PASS Actual Move/Flip replay publishes its genuine39 source owner
+PASS One actual39 actor partitions into two real sourceful fields
+PASS Each detached source field owns only its genuine logical triangle
+PASS Source field refuses a sibling's logical triangle
+PASS Each detached source field owns only its genuine logical triangle
+PASS Source field refuses a sibling's logical triangle
+PASS Public collection creation retains the actual second source face
+PASS One Scene40 actor owns genuine sourceful geometry2 fields
+PASS Actual sourceful39/40 grids, fields and before roots survive codec replay
+PASS Both sources belong to one actual object and one shared geometry control block
+PASS Actual first sourceful object publishes exactly two complete field ranges
+PASS Ranges distinguish primary/additional material on the same actual object
+PASS Each draw retains actual sourceful member ownership
+PASS Both material fields retain their genuine raw-input packet and winding
+PASS Sourceful normal model comes from its real before N/T owner
+PASS N-only source does not invent artist T/W or a normal role UV
+PASS Packed corner matches independent edited/reflected source geometry
+PASS Packed before N belongs to the correct source triangle
+PASS Sourceful paint uses original logical corners rather than current atlas
+PASS Actual field proof keeps its shared logical triangle identity
+PASS Packed corner matches independent edited/reflected source geometry
+PASS Packed before N belongs to the correct source triangle
+PASS Sourceful paint uses original logical corners rather than current atlas
+PASS Actual field proof keeps its shared logical triangle identity
+PASS Packed corner matches independent edited/reflected source geometry
+PASS Packed before N belongs to the correct source triangle
+PASS Sourceful paint uses original logical corners rather than current atlas
+PASS Actual field proof keeps its shared logical triangle identity
+PASS Actual query keeps same-object material and shared logical triangle identity
+PASS Ranges distinguish primary/additional material on the same actual object
+PASS Each draw retains actual sourceful member ownership
+PASS Both material fields retain their genuine raw-input packet and winding
+PASS Sourceful normal model comes from its real before N/T owner
+PASS N-only source does not invent artist T/W or a normal role UV
+PASS Packed corner matches independent edited/reflected source geometry
+PASS Packed before N belongs to the correct source triangle
+PASS Sourceful paint uses original logical corners rather than current atlas
+PASS Actual field proof keeps its shared logical triangle identity
+PASS Packed corner matches independent edited/reflected source geometry
+PASS Packed before N belongs to the correct source triangle
+PASS Sourceful paint uses original logical corners rather than current atlas
+PASS Actual field proof keeps its shared logical triangle identity
+PASS Packed corner matches independent edited/reflected source geometry
+PASS Packed before N belongs to the correct source triangle
+PASS Sourceful paint uses original logical corners rather than current atlas
+PASS Actual field proof keeps its shared logical triangle identity
+PASS Actual query keeps same-object material and shared logical triangle identity
+PASS Selecting the additional source never removes the primary field
+PASS Actual sourceful frame saved
+PASS Both genuine source fields have substantial independent pixel interiors and background
+PASS Independent normal oracle rejects edited-geometric-only shading
+PASS Independent field oracle rejects borrowing sibling geometric transport rows
+PASS Second eye reuses exact sourceful fields/geometry/images
+PASS Field/ghost/cull programs leave the ordinary renderer state contract
+PASS Renderer refuses borrowing a sibling field proof on the same object
+PASS Accepted sourceful frame recovers exactly after a foreign-proof refusal
+PASS Both genuine source fields have substantial independent pixel interiors and background
+PASS Independent normal oracle rejects edited-geometric-only shading
+PASS Independent field oracle rejects borrowing sibling geometric transport rows
+PASS Canvas field transport remains uniforms without geometry upload
+PASS Actual sourceful object enters the supported held route
+PASS Actual held entry retains the original field appearance
+PASS Held sourceful motion retains its actual immutable geometry snapshot
+PASS Actual held state retains its complete affine source placement
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Both genuine source fields have substantial independent pixel interiors and background
+PASS Independent normal oracle rejects edited-geometric-only shading
+PASS Independent field oracle rejects borrowing sibling geometric transport rows
+PASS Actual sourceful frame saved
+PASS Held field transport remains uniforms without geometry upload
+PASS Held cancellation preserves complete sourceful native state
+PASS Actual sourceful field receives a finished saturated native color layer
+PASS Actual sourceful field receives a finished saturated native color layer
+PASS Both genuine source fields have substantial independent pixel interiors and background
+PASS Independent paint oracle rejects swapped same-object material bindings
+PASS Actual sourceful frame saved
+PASS Actual sourceful field receives a finished saturated native color layer
+PASS Additional source paint preserves actual primary COW/source ownership
+PASS Both genuine source fields have substantial independent pixel interiors and background
+PASS Independent paint oracle rejects swapped same-object material bindings
+PASS Actual sourceful frame saved
+PASS Retained previous same-object fields remain exactly drawable after sibling edit
+PASS Both genuine source fields have substantial independent pixel interiors and background
+PASS Independent paint oracle rejects swapped same-object material bindings
+PASS Actual sourceful frame saved
+PASS Field/ghost/cull programs leave the ordinary renderer state contract
+PASS Actual additional material alone changes cull policy
+PASS Both genuine source fields have substantial independent pixel interiors and background
+PASS Independent paint oracle rejects swapped same-object material bindings
+PASS Additional-only backface cull retains a real independent blank mask
+PASS Actual sourceful frame saved
+PASS Field/ghost/cull programs leave the ordinary renderer state contract
+PASS Opaque and normal fields recover exact state after ghost/additional-only cull
+PASS Edited sourceful FLOAT/paint/normal fields roundtrip with exact pixels and native state
+PASS All GPU/read/negative controls preserve the complete original sourceful Scene
+PASS Actual source owns real FLOAT emission and coverage
+PASS Actual topology identifies the independently authored moved vertex
+PASS Actual topology identifies the independently authored moved vertex
+PASS Actual Move/Flip replay publishes its genuine39 source owner
+PASS One actual39 actor partitions into two real sourceful fields
+PASS Each detached source field owns only its genuine logical triangle
+PASS Source field refuses a sibling's logical triangle
+PASS Each detached source field owns only its genuine logical triangle
+PASS Source field refuses a sibling's logical triangle
+PASS Public collection creation retains the actual second source face
+PASS One Scene40 actor owns genuine sourceful geometry2 fields
+PASS Actual sourceful39/40 grids, fields and before roots survive codec replay
+PASS Both sources belong to one actual object and one shared geometry control block
+PASS Actual first sourceful object publishes exactly two complete field ranges
+PASS Ranges distinguish primary/additional material on the same actual object
+PASS Each draw retains actual sourceful member ownership
+PASS Both material fields retain their genuine raw-input packet and winding
+PASS Sourceful normal model comes from its real before N/T owner
+PASS N-only source does not invent artist T/W or a normal role UV
+PASS Packed corner matches independent edited/reflected source geometry
+PASS Packed before N belongs to the correct source triangle
+PASS Sourceful paint uses original logical corners rather than current atlas
+PASS Actual field proof keeps its shared logical triangle identity
+PASS Packed corner matches independent edited/reflected source geometry
+PASS Packed before N belongs to the correct source triangle
+PASS Sourceful paint uses original logical corners rather than current atlas
+PASS Actual field proof keeps its shared logical triangle identity
+PASS Packed corner matches independent edited/reflected source geometry
+PASS Packed before N belongs to the correct source triangle
+PASS Sourceful paint uses original logical corners rather than current atlas
+PASS Actual field proof keeps its shared logical triangle identity
+PASS Actual query keeps same-object material and shared logical triangle identity
+PASS Ranges distinguish primary/additional material on the same actual object
+PASS Each draw retains actual sourceful member ownership
+PASS Both material fields retain their genuine raw-input packet and winding
+PASS Sourceful normal model comes from its real before N/T owner
+PASS N-only source does not invent artist T/W or a normal role UV
+PASS Packed corner matches independent edited/reflected source geometry
+PASS Packed before N belongs to the correct source triangle
+PASS Sourceful paint uses original logical corners rather than current atlas
+PASS Actual field proof keeps its shared logical triangle identity
+PASS Packed corner matches independent edited/reflected source geometry
+PASS Packed before N belongs to the correct source triangle
+PASS Sourceful paint uses original logical corners rather than current atlas
+PASS Actual field proof keeps its shared logical triangle identity
+PASS Packed corner matches independent edited/reflected source geometry
+PASS Packed before N belongs to the correct source triangle
+PASS Sourceful paint uses original logical corners rather than current atlas
+PASS Actual field proof keeps its shared logical triangle identity
+PASS Actual query keeps same-object material and shared logical triangle identity
+PASS Selecting the additional source never removes the primary field
+PASS Actual sourceful frame saved
+PASS Both genuine source fields have substantial independent pixel interiors and background
+PASS Independent normal oracle rejects edited-geometric-only shading
+PASS Independent field oracle rejects borrowing sibling geometric transport rows
+PASS Second eye reuses exact sourceful fields/geometry/images
+PASS Field/ghost/cull programs leave the ordinary renderer state contract
+PASS Renderer refuses borrowing a sibling field proof on the same object
+PASS Accepted sourceful frame recovers exactly after a foreign-proof refusal
+PASS Both genuine source fields have substantial independent pixel interiors and background
+PASS Independent normal oracle rejects edited-geometric-only shading
+PASS Independent field oracle rejects borrowing sibling geometric transport rows
+PASS Canvas field transport remains uniforms without geometry upload
+PASS Actual sourceful object enters the supported held route
+PASS Actual held entry retains the original field appearance
+PASS Held sourceful motion retains its actual immutable geometry snapshot
+PASS Actual held state retains its complete affine source placement
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Both genuine source fields have substantial independent pixel interiors and background
+PASS Independent normal oracle rejects edited-geometric-only shading
+PASS Independent field oracle rejects borrowing sibling geometric transport rows
+PASS Actual sourceful frame saved
+PASS Held field transport remains uniforms without geometry upload
+PASS Held cancellation preserves complete sourceful native state
+PASS Actual sourceful field receives a finished saturated native color layer
+PASS Actual sourceful field receives a finished saturated native color layer
+PASS Both genuine source fields have substantial independent pixel interiors and background
+PASS Independent paint oracle rejects swapped same-object material bindings
+PASS Actual sourceful frame saved
+PASS Actual sourceful field receives a finished saturated native color layer
+PASS Additional source paint preserves actual primary COW/source ownership
+PASS Both genuine source fields have substantial independent pixel interiors and background
+PASS Independent paint oracle rejects swapped same-object material bindings
+PASS Actual sourceful frame saved
+PASS Retained previous same-object fields remain exactly drawable after sibling edit
+PASS Both genuine source fields have substantial independent pixel interiors and background
+PASS Independent paint oracle rejects swapped same-object material bindings
+PASS Actual sourceful frame saved
+PASS Field/ghost/cull programs leave the ordinary renderer state contract
+PASS Actual additional material alone changes cull policy
+PASS Both genuine source fields have substantial independent pixel interiors and background
+PASS Independent paint oracle rejects swapped same-object material bindings
+PASS Actual sourceful frame saved
+PASS Field/ghost/cull programs leave the ordinary renderer state contract
+PASS Opaque and normal fields recover exact state after ghost/additional-only cull
+PASS Edited sourceful FLOAT/paint/normal fields roundtrip with exact pixels and native state
+PASS All GPU/read/negative controls preserve the complete original sourceful Scene
+PASS Actual source owns real FLOAT emission and coverage
+PASS Actual topology identifies the independently authored moved vertex
+PASS Actual topology identifies the independently authored moved vertex
+PASS Actual Move/Flip replay publishes its genuine39 source owner
+PASS One actual39 actor partitions into two real sourceful fields
+PASS Each detached source field owns only its genuine logical triangle
+PASS Source field refuses a sibling's logical triangle
+PASS Each detached source field owns only its genuine logical triangle
+PASS Source field refuses a sibling's logical triangle
+PASS Public collection creation retains the actual second source face
+PASS One Scene40 actor owns genuine sourceful geometry2 fields
+PASS Actual sourceful39/40 grids, fields and before roots survive codec replay
+PASS Both sources belong to one actual object and one shared geometry control block
+PASS Actual first sourceful object publishes exactly two complete field ranges
+PASS Ranges distinguish primary/additional material on the same actual object
+PASS Each draw retains actual sourceful member ownership
+PASS Both material fields retain their genuine raw-input packet and winding
+PASS Sourceful normal model comes from its real before N/T owner
+PASS N-only source does not invent artist T/W or a normal role UV
+PASS Packed corner matches independent edited/reflected source geometry
+PASS Packed before N belongs to the correct source triangle
+PASS Sourceful paint uses original logical corners rather than current atlas
+PASS Actual field proof keeps its shared logical triangle identity
+PASS Packed corner matches independent edited/reflected source geometry
+PASS Packed before N belongs to the correct source triangle
+PASS Sourceful paint uses original logical corners rather than current atlas
+PASS Actual field proof keeps its shared logical triangle identity
+PASS Packed corner matches independent edited/reflected source geometry
+PASS Packed before N belongs to the correct source triangle
+PASS Sourceful paint uses original logical corners rather than current atlas
+PASS Actual field proof keeps its shared logical triangle identity
+PASS Actual query keeps same-object material and shared logical triangle identity
+PASS Ranges distinguish primary/additional material on the same actual object
+PASS Each draw retains actual sourceful member ownership
+PASS Both material fields retain their genuine raw-input packet and winding
+PASS Sourceful normal model comes from its real before N/T owner
+PASS N-only source does not invent artist T/W or a normal role UV
+PASS Packed corner matches independent edited/reflected source geometry
+PASS Packed before N belongs to the correct source triangle
+PASS Sourceful paint uses original logical corners rather than current atlas
+PASS Actual field proof keeps its shared logical triangle identity
+PASS Packed corner matches independent edited/reflected source geometry
+PASS Packed before N belongs to the correct source triangle
+PASS Sourceful paint uses original logical corners rather than current atlas
+PASS Actual field proof keeps its shared logical triangle identity
+PASS Packed corner matches independent edited/reflected source geometry
+PASS Packed before N belongs to the correct source triangle
+PASS Sourceful paint uses original logical corners rather than current atlas
+PASS Actual field proof keeps its shared logical triangle identity
+PASS Actual query keeps same-object material and shared logical triangle identity
+PASS Selecting the additional source never removes the primary field
+PASS Actual sourceful frame saved
+PASS Both genuine source fields have substantial independent pixel interiors and background
+PASS Independent normal oracle rejects edited-geometric-only shading
+PASS Independent field oracle rejects borrowing sibling geometric transport rows
+PASS Second eye reuses exact sourceful fields/geometry/images
+PASS Field/ghost/cull programs leave the ordinary renderer state contract
+PASS Renderer refuses borrowing a sibling field proof on the same object
+PASS Accepted sourceful frame recovers exactly after a foreign-proof refusal
+PASS Both genuine source fields have substantial independent pixel interiors and background
+PASS Independent normal oracle rejects edited-geometric-only shading
+PASS Independent field oracle rejects borrowing sibling geometric transport rows
+PASS Canvas field transport remains uniforms without geometry upload
+PASS Actual sourceful object enters the supported held route
+PASS Actual held entry retains the original field appearance
+PASS Held sourceful motion retains its actual immutable geometry snapshot
+PASS Actual held state retains its complete affine source placement
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Both genuine source fields have substantial independent pixel interiors and background
+PASS Independent normal oracle rejects edited-geometric-only shading
+PASS Independent field oracle rejects borrowing sibling geometric transport rows
+PASS Actual sourceful frame saved
+PASS Held field transport remains uniforms without geometry upload
+PASS Held cancellation preserves complete sourceful native state
+PASS Actual sourceful field receives a finished saturated native color layer
+PASS Actual sourceful field receives a finished saturated native color layer
+PASS Both genuine source fields have substantial independent pixel interiors and background
+PASS Independent paint oracle rejects swapped same-object material bindings
+PASS Actual sourceful frame saved
+PASS Actual sourceful field receives a finished saturated native color layer
+PASS Additional source paint preserves actual primary COW/source ownership
+PASS Both genuine source fields have substantial independent pixel interiors and background
+PASS Independent paint oracle rejects swapped same-object material bindings
+PASS Actual sourceful frame saved
+PASS Retained previous same-object fields remain exactly drawable after sibling edit
+PASS Both genuine source fields have substantial independent pixel interiors and background
+PASS Independent paint oracle rejects swapped same-object material bindings
+PASS Actual sourceful frame saved
+PASS Field/ghost/cull programs leave the ordinary renderer state contract
+PASS Actual additional material alone changes cull policy
+PASS Both genuine source fields have substantial independent pixel interiors and background
+PASS Independent paint oracle rejects swapped same-object material bindings
+PASS Additional-only backface cull retains a real independent blank mask
+PASS Actual sourceful frame saved
+PASS Field/ghost/cull programs leave the ordinary renderer state contract
+PASS Opaque and normal fields recover exact state after ghost/additional-only cull
+PASS Edited sourceful FLOAT/paint/normal fields roundtrip with exact pixels and native state
+PASS All GPU/read/negative controls preserve the complete original sourceful Scene
+PASS Actual source owns real FLOAT emission and coverage
+PASS Real before-role UV workspace opens
+PASS Primary source island gets a genuine different current atlas
+PASS Actual UV selection moves to the second disconnected island
+PASS Additional source island gets a genuine different current atlas
+PASS Actual topology identifies the independently authored moved vertex
+PASS Actual topology identifies the independently authored moved vertex
+PASS Actual Move/Flip replay publishes its genuine39 source owner
+PASS One actual39 actor partitions into two real sourceful fields
+PASS Each detached source field owns only its genuine logical triangle
+PASS Source field refuses a sibling's logical triangle
+PASS Each detached source field owns only its genuine logical triangle
+PASS Source field refuses a sibling's logical triangle
+PASS Public collection creation retains the actual second source face
+PASS One Scene40 actor owns genuine sourceful geometry2 fields
+PASS Actual sourceful39/40 grids, fields and before roots survive codec replay
+PASS Both sources belong to one actual object and one shared geometry control block
+PASS Actual first sourceful object publishes exactly two complete field ranges
+PASS Ranges distinguish primary/additional material on the same actual object
+PASS Each draw retains actual sourceful member ownership
+PASS Both material fields retain their genuine raw-input packet and winding
+PASS Sourceful normal model comes from its real before N/T owner
+PASS Packed corner matches independent edited/reflected source geometry
+PASS Packed before N belongs to the correct source triangle
+PASS Sourceful paint uses original logical corners rather than current atlas
+PASS Actual field proof keeps its shared logical triangle identity
+PASS Packed before T/W keeps actual original/reflected role inputs
+PASS Normal image uses independent original role UVs
+PASS Genuinely edited per-island UV0 remains separate from paint/normal roles
+PASS Packed corner matches independent edited/reflected source geometry
+PASS Packed before N belongs to the correct source triangle
+PASS Sourceful paint uses original logical corners rather than current atlas
+PASS Actual field proof keeps its shared logical triangle identity
+PASS Packed before T/W keeps actual original/reflected role inputs
+PASS Normal image uses independent original role UVs
+PASS Genuinely edited per-island UV0 remains separate from paint/normal roles
+PASS Packed corner matches independent edited/reflected source geometry
+PASS Packed before N belongs to the correct source triangle
+PASS Sourceful paint uses original logical corners rather than current atlas
+PASS Actual field proof keeps its shared logical triangle identity
+PASS Packed before T/W keeps actual original/reflected role inputs
+PASS Normal image uses independent original role UVs
+PASS Genuinely edited per-island UV0 remains separate from paint/normal roles
+PASS Actual query keeps same-object material and shared logical triangle identity
+PASS Ranges distinguish primary/additional material on the same actual object
+PASS Each draw retains actual sourceful member ownership
+PASS Both material fields retain their genuine raw-input packet and winding
+PASS Sourceful normal model comes from its real before N/T owner
+PASS Packed corner matches independent edited/reflected source geometry
+PASS Packed before N belongs to the correct source triangle
+PASS Sourceful paint uses original logical corners rather than current atlas
+PASS Actual field proof keeps its shared logical triangle identity
+PASS Packed before T/W keeps actual original/reflected role inputs
+PASS Normal image uses independent original role UVs
+PASS Genuinely edited per-island UV0 remains separate from paint/normal roles
+PASS Packed corner matches independent edited/reflected source geometry
+PASS Packed before N belongs to the correct source triangle
+PASS Sourceful paint uses original logical corners rather than current atlas
+PASS Actual field proof keeps its shared logical triangle identity
+PASS Packed before T/W keeps actual original/reflected role inputs
+PASS Normal image uses independent original role UVs
+PASS Genuinely edited per-island UV0 remains separate from paint/normal roles
+PASS Packed corner matches independent edited/reflected source geometry
+PASS Packed before N belongs to the correct source triangle
+PASS Sourceful paint uses original logical corners rather than current atlas
+PASS Actual field proof keeps its shared logical triangle identity
+PASS Packed before T/W keeps actual original/reflected role inputs
+PASS Normal image uses independent original role UVs
+PASS Genuinely edited per-island UV0 remains separate from paint/normal roles
+PASS Actual query keeps same-object material and shared logical triangle identity
+PASS Selecting the additional source never removes the primary field
+PASS Actual sourceful frame saved
+PASS Both genuine source fields have substantial independent pixel interiors and background
+PASS Independent normal oracle rejects edited-geometric-only shading
+PASS Independent field oracle rejects borrowing sibling geometric transport rows
+PASS Asymmetric normal oracle rejects current UV0 in place of original role coordinates
+PASS Second eye reuses exact sourceful fields/geometry/images
+PASS Field/ghost/cull programs leave the ordinary renderer state contract
+PASS Renderer refuses borrowing a sibling field proof on the same object
+PASS Accepted sourceful frame recovers exactly after a foreign-proof refusal
+PASS Both genuine source fields have substantial independent pixel interiors and background
+PASS Independent normal oracle rejects edited-geometric-only shading
+PASS Independent field oracle rejects borrowing sibling geometric transport rows
+PASS Asymmetric normal oracle rejects current UV0 in place of original role coordinates
+PASS Canvas field transport remains uniforms without geometry upload
+PASS Actual sourceful object enters the supported held route
+PASS Actual held entry retains the original field appearance
+PASS Held sourceful motion retains its actual immutable geometry snapshot
+PASS Actual held state retains its complete affine source placement
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Both genuine source fields have substantial independent pixel interiors and background
+PASS Independent normal oracle rejects edited-geometric-only shading
+PASS Independent field oracle rejects borrowing sibling geometric transport rows
+PASS Asymmetric normal oracle rejects current UV0 in place of original role coordinates
+PASS Actual sourceful frame saved
+PASS Held field transport remains uniforms without geometry upload
+PASS Held cancellation preserves complete sourceful native state
+PASS Actual sourceful field receives a finished saturated native color layer
+PASS Actual sourceful field receives a finished saturated native color layer
+PASS Both genuine source fields have substantial independent pixel interiors and background
+PASS Independent paint oracle rejects swapped same-object material bindings
+PASS Actual sourceful frame saved
+PASS Actual sourceful field receives a finished saturated native color layer
+PASS Additional source paint preserves actual primary COW/source ownership
+PASS Both genuine source fields have substantial independent pixel interiors and background
+PASS Independent paint oracle rejects swapped same-object material bindings
+PASS Actual sourceful frame saved
+PASS Retained previous same-object fields remain exactly drawable after sibling edit
+PASS Both genuine source fields have substantial independent pixel interiors and background
+PASS Independent paint oracle rejects swapped same-object material bindings
+PASS Actual sourceful frame saved
+PASS Field/ghost/cull programs leave the ordinary renderer state contract
+PASS Actual additional material alone changes cull policy
+PASS Both genuine source fields have substantial independent pixel interiors and background
+PASS Independent paint oracle rejects swapped same-object material bindings
+PASS Actual sourceful frame saved
+PASS Field/ghost/cull programs leave the ordinary renderer state contract
+PASS Opaque and normal fields recover exact state after ghost/additional-only cull
+PASS Edited sourceful FLOAT/paint/normal fields roundtrip with exact pixels and native state
+PASS All GPU/read/negative controls preserve the complete original sourceful Scene
+PASS Actual source owns real FLOAT emission and coverage
+PASS Real before-role UV workspace opens
+PASS Primary source island gets a genuine different current atlas
+PASS Actual UV selection moves to the second disconnected island
+PASS Additional source island gets a genuine different current atlas
+PASS Actual topology identifies the independently authored moved vertex
+PASS Actual topology identifies the independently authored moved vertex
+PASS Actual Move/Flip replay publishes its genuine39 source owner
+PASS One actual39 actor partitions into two real sourceful fields
+PASS Each detached source field owns only its genuine logical triangle
+PASS Source field refuses a sibling's logical triangle
+PASS Each detached source field owns only its genuine logical triangle
+PASS Source field refuses a sibling's logical triangle
+PASS Public collection creation retains the actual second source face
+PASS One Scene40 actor owns genuine sourceful geometry2 fields
+PASS Actual sourceful39/40 grids, fields and before roots survive codec replay
+PASS Both sources belong to one actual object and one shared geometry control block
+PASS Actual first sourceful object publishes exactly two complete field ranges
+PASS Ranges distinguish primary/additional material on the same actual object
+PASS Each draw retains actual sourceful member ownership
+PASS Both material fields retain their genuine raw-input packet and winding
+PASS Sourceful normal model comes from its real before N/T owner
+PASS Packed corner matches independent edited/reflected source geometry
+PASS Packed before N belongs to the correct source triangle
+PASS Sourceful paint uses original logical corners rather than current atlas
+PASS Actual field proof keeps its shared logical triangle identity
+PASS Packed before T/W keeps actual original/reflected role inputs
+PASS Normal image uses independent original role UVs
+PASS Genuinely edited per-island UV0 remains separate from paint/normal roles
+PASS Packed corner matches independent edited/reflected source geometry
+PASS Packed before N belongs to the correct source triangle
+PASS Sourceful paint uses original logical corners rather than current atlas
+PASS Actual field proof keeps its shared logical triangle identity
+PASS Packed before T/W keeps actual original/reflected role inputs
+PASS Normal image uses independent original role UVs
+PASS Genuinely edited per-island UV0 remains separate from paint/normal roles
+PASS Packed corner matches independent edited/reflected source geometry
+PASS Packed before N belongs to the correct source triangle
+PASS Sourceful paint uses original logical corners rather than current atlas
+PASS Actual field proof keeps its shared logical triangle identity
+PASS Packed before T/W keeps actual original/reflected role inputs
+PASS Normal image uses independent original role UVs
+PASS Genuinely edited per-island UV0 remains separate from paint/normal roles
+PASS Actual query keeps same-object material and shared logical triangle identity
+PASS Ranges distinguish primary/additional material on the same actual object
+PASS Each draw retains actual sourceful member ownership
+PASS Both material fields retain their genuine raw-input packet and winding
+PASS Sourceful normal model comes from its real before N/T owner
+PASS Packed corner matches independent edited/reflected source geometry
+PASS Packed before N belongs to the correct source triangle
+PASS Sourceful paint uses original logical corners rather than current atlas
+PASS Actual field proof keeps its shared logical triangle identity
+PASS Packed before T/W keeps actual original/reflected role inputs
+PASS Normal image uses independent original role UVs
+PASS Genuinely edited per-island UV0 remains separate from paint/normal roles
+PASS Packed corner matches independent edited/reflected source geometry
+PASS Packed before N belongs to the correct source triangle
+PASS Sourceful paint uses original logical corners rather than current atlas
+PASS Actual field proof keeps its shared logical triangle identity
+PASS Packed before T/W keeps actual original/reflected role inputs
+PASS Normal image uses independent original role UVs
+PASS Genuinely edited per-island UV0 remains separate from paint/normal roles
+PASS Packed corner matches independent edited/reflected source geometry
+PASS Packed before N belongs to the correct source triangle
+PASS Sourceful paint uses original logical corners rather than current atlas
+PASS Actual field proof keeps its shared logical triangle identity
+PASS Packed before T/W keeps actual original/reflected role inputs
+PASS Normal image uses independent original role UVs
+PASS Genuinely edited per-island UV0 remains separate from paint/normal roles
+PASS Actual query keeps same-object material and shared logical triangle identity
+PASS Selecting the additional source never removes the primary field
+PASS Actual sourceful frame saved
+PASS Both genuine source fields have substantial independent pixel interiors and background
+PASS Independent normal oracle rejects edited-geometric-only shading
+PASS Independent field oracle rejects borrowing sibling geometric transport rows
+PASS Asymmetric normal oracle rejects current UV0 in place of original role coordinates
+PASS Second eye reuses exact sourceful fields/geometry/images
+PASS Field/ghost/cull programs leave the ordinary renderer state contract
+PASS Renderer refuses borrowing a sibling field proof on the same object
+PASS Accepted sourceful frame recovers exactly after a foreign-proof refusal
+PASS Both genuine source fields have substantial independent pixel interiors and background
+PASS Independent normal oracle rejects edited-geometric-only shading
+PASS Independent field oracle rejects borrowing sibling geometric transport rows
+PASS Asymmetric normal oracle rejects current UV0 in place of original role coordinates
+PASS Canvas field transport remains uniforms without geometry upload
+PASS Actual sourceful object enters the supported held route
+PASS Actual held entry retains the original field appearance
+PASS Held sourceful motion retains its actual immutable geometry snapshot
+PASS Actual held state retains its complete affine source placement
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Both genuine source fields have substantial independent pixel interiors and background
+PASS Independent normal oracle rejects edited-geometric-only shading
+PASS Independent field oracle rejects borrowing sibling geometric transport rows
+PASS Asymmetric normal oracle rejects current UV0 in place of original role coordinates
+PASS Actual sourceful frame saved
+PASS Held field transport remains uniforms without geometry upload
+PASS Held cancellation preserves complete sourceful native state
+PASS Actual sourceful field receives a finished saturated native color layer
+PASS Actual sourceful field receives a finished saturated native color layer
+PASS Both genuine source fields have substantial independent pixel interiors and background
+PASS Independent paint oracle rejects swapped same-object material bindings
+PASS Actual sourceful frame saved
+PASS Actual sourceful field receives a finished saturated native color layer
+PASS Additional source paint preserves actual primary COW/source ownership
+PASS Both genuine source fields have substantial independent pixel interiors and background
+PASS Independent paint oracle rejects swapped same-object material bindings
+PASS Actual sourceful frame saved
+PASS Retained previous same-object fields remain exactly drawable after sibling edit
+PASS Both genuine source fields have substantial independent pixel interiors and background
+PASS Independent paint oracle rejects swapped same-object material bindings
+PASS Actual sourceful frame saved
+PASS Field/ghost/cull programs leave the ordinary renderer state contract
+PASS Actual additional material alone changes cull policy
+PASS Both genuine source fields have substantial independent pixel interiors and background
+PASS Independent paint oracle rejects swapped same-object material bindings
+PASS Additional-only backface cull retains a real independent blank mask
+PASS Actual sourceful frame saved
+PASS Field/ghost/cull programs leave the ordinary renderer state contract
+PASS Opaque and normal fields recover exact state after ghost/additional-only cull
+PASS Edited sourceful FLOAT/paint/normal fields roundtrip with exact pixels and native state
+PASS All GPU/read/negative controls preserve the complete original sourceful Scene
+PASS Actual source owns real FLOAT emission and coverage
+PASS Real before-role UV workspace opens
+PASS Primary source island gets a genuine different current atlas
+PASS Actual UV selection moves to the second disconnected island
+PASS Additional source island gets a genuine different current atlas
+PASS Actual topology identifies the independently authored moved vertex
+PASS Actual topology identifies the independently authored moved vertex
+PASS Actual Move/Flip replay publishes its genuine39 source owner
+PASS One actual39 actor partitions into two real sourceful fields
+PASS Each detached source field owns only its genuine logical triangle
+PASS Source field refuses a sibling's logical triangle
+PASS Each detached source field owns only its genuine logical triangle
+PASS Source field refuses a sibling's logical triangle
+PASS Public collection creation retains the actual second source face
+PASS One Scene40 actor owns genuine sourceful geometry2 fields
+PASS Actual sourceful39/40 grids, fields and before roots survive codec replay
+PASS Both sources belong to one actual object and one shared geometry control block
+PASS Actual first sourceful object publishes exactly two complete field ranges
+PASS Ranges distinguish primary/additional material on the same actual object
+PASS Each draw retains actual sourceful member ownership
+PASS Both material fields retain their genuine raw-input packet and winding
+PASS Sourceful normal model comes from its real before N/T owner
+PASS Packed corner matches independent edited/reflected source geometry
+PASS Packed before N belongs to the correct source triangle
+PASS Sourceful paint uses original logical corners rather than current atlas
+PASS Actual field proof keeps its shared logical triangle identity
+PASS Packed before T/W keeps actual original/reflected role inputs
+PASS Normal image uses independent original role UVs
+PASS Genuinely edited per-island UV0 remains separate from paint/normal roles
+PASS Packed corner matches independent edited/reflected source geometry
+PASS Packed before N belongs to the correct source triangle
+PASS Sourceful paint uses original logical corners rather than current atlas
+PASS Actual field proof keeps its shared logical triangle identity
+PASS Packed before T/W keeps actual original/reflected role inputs
+PASS Normal image uses independent original role UVs
+PASS Genuinely edited per-island UV0 remains separate from paint/normal roles
+PASS Packed corner matches independent edited/reflected source geometry
+PASS Packed before N belongs to the correct source triangle
+PASS Sourceful paint uses original logical corners rather than current atlas
+PASS Actual field proof keeps its shared logical triangle identity
+PASS Packed before T/W keeps actual original/reflected role inputs
+PASS Normal image uses independent original role UVs
+PASS Genuinely edited per-island UV0 remains separate from paint/normal roles
+PASS Actual query keeps same-object material and shared logical triangle identity
+PASS Ranges distinguish primary/additional material on the same actual object
+PASS Each draw retains actual sourceful member ownership
+PASS Both material fields retain their genuine raw-input packet and winding
+PASS Sourceful normal model comes from its real before N/T owner
+PASS Packed corner matches independent edited/reflected source geometry
+PASS Packed before N belongs to the correct source triangle
+PASS Sourceful paint uses original logical corners rather than current atlas
+PASS Actual field proof keeps its shared logical triangle identity
+PASS Packed before T/W keeps actual original/reflected role inputs
+PASS Normal image uses independent original role UVs
+PASS Genuinely edited per-island UV0 remains separate from paint/normal roles
+PASS Packed corner matches independent edited/reflected source geometry
+PASS Packed before N belongs to the correct source triangle
+PASS Sourceful paint uses original logical corners rather than current atlas
+PASS Actual field proof keeps its shared logical triangle identity
+PASS Packed before T/W keeps actual original/reflected role inputs
+PASS Normal image uses independent original role UVs
+PASS Genuinely edited per-island UV0 remains separate from paint/normal roles
+PASS Packed corner matches independent edited/reflected source geometry
+PASS Packed before N belongs to the correct source triangle
+PASS Sourceful paint uses original logical corners rather than current atlas
+PASS Actual field proof keeps its shared logical triangle identity
+PASS Packed before T/W keeps actual original/reflected role inputs
+PASS Normal image uses independent original role UVs
+PASS Genuinely edited per-island UV0 remains separate from paint/normal roles
+PASS Actual query keeps same-object material and shared logical triangle identity
+PASS Selecting the additional source never removes the primary field
+PASS Actual sourceful frame saved
+PASS Both genuine source fields have substantial independent pixel interiors and background
+PASS Independent normal oracle rejects edited-geometric-only shading
+PASS Independent field oracle rejects borrowing sibling geometric transport rows
+PASS Asymmetric normal oracle rejects current UV0 in place of original role coordinates
+PASS Second eye reuses exact sourceful fields/geometry/images
+PASS Field/ghost/cull programs leave the ordinary renderer state contract
+PASS Renderer refuses borrowing a sibling field proof on the same object
+PASS Accepted sourceful frame recovers exactly after a foreign-proof refusal
+PASS Both genuine source fields have substantial independent pixel interiors and background
+PASS Independent normal oracle rejects edited-geometric-only shading
+PASS Independent field oracle rejects borrowing sibling geometric transport rows
+PASS Asymmetric normal oracle rejects current UV0 in place of original role coordinates
+PASS Canvas field transport remains uniforms without geometry upload
+PASS Actual sourceful object enters the supported held route
+PASS Actual held entry retains the original field appearance
+PASS Held sourceful motion retains its actual immutable geometry snapshot
+PASS Actual held state retains its complete affine source placement
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Both genuine source fields have substantial independent pixel interiors and background
+PASS Independent normal oracle rejects edited-geometric-only shading
+PASS Independent field oracle rejects borrowing sibling geometric transport rows
+PASS Asymmetric normal oracle rejects current UV0 in place of original role coordinates
+PASS Actual sourceful frame saved
+PASS Held field transport remains uniforms without geometry upload
+PASS Held cancellation preserves complete sourceful native state
+PASS Actual sourceful field receives a finished saturated native color layer
+PASS Actual sourceful field receives a finished saturated native color layer
+PASS Both genuine source fields have substantial independent pixel interiors and background
+PASS Independent paint oracle rejects swapped same-object material bindings
+PASS Actual sourceful frame saved
+PASS Actual sourceful field receives a finished saturated native color layer
+PASS Additional source paint preserves actual primary COW/source ownership
+PASS Both genuine source fields have substantial independent pixel interiors and background
+PASS Independent paint oracle rejects swapped same-object material bindings
+PASS Actual sourceful frame saved
+PASS Retained previous same-object fields remain exactly drawable after sibling edit
+PASS Both genuine source fields have substantial independent pixel interiors and background
+PASS Independent paint oracle rejects swapped same-object material bindings
+PASS Actual sourceful frame saved
+PASS Field/ghost/cull programs leave the ordinary renderer state contract
+PASS Actual additional material alone changes cull policy
+PASS Both genuine source fields have substantial independent pixel interiors and background
+PASS Independent paint oracle rejects swapped same-object material bindings
+PASS Actual sourceful frame saved
+PASS Field/ghost/cull programs leave the ordinary renderer state contract
+PASS Opaque and normal fields recover exact state after ghost/additional-only cull
+PASS Edited sourceful FLOAT/paint/normal fields roundtrip with exact pixels and native state
+PASS All GPU/read/negative controls preserve the complete original sourceful Scene
+PASS Actual source owns real FLOAT emission and coverage
+PASS Real before-role UV workspace opens
+PASS Primary source island gets a genuine different current atlas
+PASS Actual UV selection moves to the second disconnected island
+PASS Additional source island gets a genuine different current atlas
+PASS Actual topology identifies the independently authored moved vertex
+PASS Actual topology identifies the independently authored moved vertex
+PASS Actual Move/Flip replay publishes its genuine39 source owner
+PASS One actual39 actor partitions into two real sourceful fields
+PASS Each detached source field owns only its genuine logical triangle
+PASS Source field refuses a sibling's logical triangle
+PASS Each detached source field owns only its genuine logical triangle
+PASS Source field refuses a sibling's logical triangle
+PASS Public collection creation retains the actual second source face
+PASS One Scene40 actor owns genuine sourceful geometry2 fields
+PASS Actual sourceful39/40 grids, fields and before roots survive codec replay
+PASS Both sources belong to one actual object and one shared geometry control block
+PASS Actual first sourceful object publishes exactly two complete field ranges
+PASS Ranges distinguish primary/additional material on the same actual object
+PASS Each draw retains actual sourceful member ownership
+PASS Both material fields retain their genuine raw-input packet and winding
+PASS Sourceful normal model comes from its real before N/T owner
+PASS Packed corner matches independent edited/reflected source geometry
+PASS Packed before N belongs to the correct source triangle
+PASS Sourceful paint uses original logical corners rather than current atlas
+PASS Actual field proof keeps its shared logical triangle identity
+PASS Packed before T/W keeps actual original/reflected role inputs
+PASS Normal image uses independent original role UVs
+PASS Genuinely edited per-island UV0 remains separate from paint/normal roles
+PASS Packed corner matches independent edited/reflected source geometry
+PASS Packed before N belongs to the correct source triangle
+PASS Sourceful paint uses original logical corners rather than current atlas
+PASS Actual field proof keeps its shared logical triangle identity
+PASS Packed before T/W keeps actual original/reflected role inputs
+PASS Normal image uses independent original role UVs
+PASS Genuinely edited per-island UV0 remains separate from paint/normal roles
+PASS Packed corner matches independent edited/reflected source geometry
+PASS Packed before N belongs to the correct source triangle
+PASS Sourceful paint uses original logical corners rather than current atlas
+PASS Actual field proof keeps its shared logical triangle identity
+PASS Packed before T/W keeps actual original/reflected role inputs
+PASS Normal image uses independent original role UVs
+PASS Genuinely edited per-island UV0 remains separate from paint/normal roles
+PASS Actual query keeps same-object material and shared logical triangle identity
+PASS Ranges distinguish primary/additional material on the same actual object
+PASS Each draw retains actual sourceful member ownership
+PASS Both material fields retain their genuine raw-input packet and winding
+PASS Sourceful normal model comes from its real before N/T owner
+PASS Packed corner matches independent edited/reflected source geometry
+PASS Packed before N belongs to the correct source triangle
+PASS Sourceful paint uses original logical corners rather than current atlas
+PASS Actual field proof keeps its shared logical triangle identity
+PASS Packed before T/W keeps actual original/reflected role inputs
+PASS Normal image uses independent original role UVs
+PASS Genuinely edited per-island UV0 remains separate from paint/normal roles
+PASS Packed corner matches independent edited/reflected source geometry
+PASS Packed before N belongs to the correct source triangle
+PASS Sourceful paint uses original logical corners rather than current atlas
+PASS Actual field proof keeps its shared logical triangle identity
+PASS Packed before T/W keeps actual original/reflected role inputs
+PASS Normal image uses independent original role UVs
+PASS Genuinely edited per-island UV0 remains separate from paint/normal roles
+PASS Packed corner matches independent edited/reflected source geometry
+PASS Packed before N belongs to the correct source triangle
+PASS Sourceful paint uses original logical corners rather than current atlas
+PASS Actual field proof keeps its shared logical triangle identity
+PASS Packed before T/W keeps actual original/reflected role inputs
+PASS Normal image uses independent original role UVs
+PASS Genuinely edited per-island UV0 remains separate from paint/normal roles
+PASS Actual query keeps same-object material and shared logical triangle identity
+PASS Selecting the additional source never removes the primary field
+PASS Actual sourceful frame saved
+PASS Both genuine source fields have substantial independent pixel interiors and background
+PASS Independent normal oracle rejects edited-geometric-only shading
+PASS Independent field oracle rejects borrowing sibling geometric transport rows
+PASS Asymmetric normal oracle rejects current UV0 in place of original role coordinates
+PASS Second eye reuses exact sourceful fields/geometry/images
+PASS Field/ghost/cull programs leave the ordinary renderer state contract
+PASS Renderer refuses borrowing a sibling field proof on the same object
+PASS Accepted sourceful frame recovers exactly after a foreign-proof refusal
+PASS Both genuine source fields have substantial independent pixel interiors and background
+PASS Independent normal oracle rejects edited-geometric-only shading
+PASS Independent field oracle rejects borrowing sibling geometric transport rows
+PASS Asymmetric normal oracle rejects current UV0 in place of original role coordinates
+PASS Canvas field transport remains uniforms without geometry upload
+PASS Actual sourceful object enters the supported held route
+PASS Actual held entry retains the original field appearance
+PASS Held sourceful motion retains its actual immutable geometry snapshot
+PASS Actual held state retains its complete affine source placement
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Live held placement matches independent affine composition
+PASS Both genuine source fields have substantial independent pixel interiors and background
+PASS Independent normal oracle rejects edited-geometric-only shading
+PASS Independent field oracle rejects borrowing sibling geometric transport rows
+PASS Asymmetric normal oracle rejects current UV0 in place of original role coordinates
+PASS Actual sourceful frame saved
+PASS Held field transport remains uniforms without geometry upload
+PASS Held cancellation preserves complete sourceful native state
+PASS Actual sourceful field receives a finished saturated native color layer
+PASS Actual sourceful field receives a finished saturated native color layer
+PASS Both genuine source fields have substantial independent pixel interiors and background
+PASS Independent paint oracle rejects swapped same-object material bindings
+PASS Actual sourceful frame saved
+PASS Actual sourceful field receives a finished saturated native color layer
+PASS Additional source paint preserves actual primary COW/source ownership
+PASS Both genuine source fields have substantial independent pixel interiors and background
+PASS Independent paint oracle rejects swapped same-object material bindings
+PASS Actual sourceful frame saved
+PASS Retained previous same-object fields remain exactly drawable after sibling edit
+PASS Both genuine source fields have substantial independent pixel interiors and background
+PASS Independent paint oracle rejects swapped same-object material bindings
+PASS Actual sourceful frame saved
+PASS Field/ghost/cull programs leave the ordinary renderer state contract
+PASS Actual additional material alone changes cull policy
+PASS Both genuine source fields have substantial independent pixel interiors and background
+PASS Independent paint oracle rejects swapped same-object material bindings
+PASS Additional-only backface cull retains a real independent blank mask
+PASS Actual sourceful frame saved
+PASS Field/ghost/cull programs leave the ordinary renderer state contract
+PASS Opaque and normal fields recover exact state after ghost/additional-only cull
+PASS Edited sourceful FLOAT/paint/normal fields roundtrip with exact pixels and native state
+PASS All GPU/read/negative controls preserve the complete original sourceful Scene
+PASS Independent sourceful per-pixel metrics saved
+PASS 994 actual sourceful same-object field appearance controls

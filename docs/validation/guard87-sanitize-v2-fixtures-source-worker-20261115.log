@@ -1,0 +1,13 @@
+UV1_WORKER_CASE pbr-quarter
+UV1_ADMISSION can_bake=1 source=2
+UV1_WORKER_COMPLETE pbr-quarter
+UV1_WORKER_CASE pbr-tiny
+UV1_ADMISSION can_bake=1 source=2
+UV1_WORKER_COMPLETE pbr-tiny
+UV1_WORKER_CASE mtoon-quarter
+UV1_ADMISSION can_bake=1 source=2
+UV1_WORKER_COMPLETE mtoon-quarter
+UV1_WORKER_CASE mtoon-tiny
+UV1_ADMISSION can_bake=1 source=2
+UV1_WORKER_COMPLETE mtoon-tiny
+Baked emission UV1 worker 180373 checks PASS
