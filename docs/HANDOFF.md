@@ -1,3 +1,37 @@
+## MToon XR timing and graphical fixture corrections — 2026-11-15
+
+MToonquarter XR6524 reaches174 actual passing checks but hits the original
+240-second wall limit before its last independent eye controls. This is an
+actual timeout, preserved with zero drift/no survivors; no image predicate
+failed and the budget is not raised. Read-only timings show few captured frames
+and fast drain, but repeated cold context/shader setup. The frozen scenario
+explicitly disables Mesa's shader cache and gives each app fresh cache storage.
+A NEW operational child is being prepared with a case-scoped initially EMPTY
+shared compiled-code cache/default enabled behavior, while each app still loads
+fresh scene/config/state and keeps all240s/6000frame/12/3/7 checks. Actual
+cold-miss/subsequent-hit and complete final-matrix evidence remain required;
+old PBR194+194 passes are retained separately.
+
+Independent artist graphics identifies real TEST-fixture defects. Corrected
+depth1f80 uses clipZ=-dot(normal,p-center)/2 matching declared camera+normal*2
+and productionGL_LESS, plus per-probe frontmost ray guards. Female/rest PBR then
+matches all4 pixels EXACTLY instead of olderror61, confirming the projection
+cause. Its nextMT0 case has correctRGB0 but no negative sensitivity. Actual VRM
+material fields establish why: old neutral presentation multiplies gray twice,
+putting litgray² below shade and flattening MToon0. New test-only causal commits
+21cbd/87c preserve authentic assets/normalroles/UV/material transforms and all
+numeric bounds, add an independently forecast fifth imported probe while
+retaining the old4, and apply the existing reference-derived neutral tint
+consistently. Full fixture compiles/links pass; CPU field/algebra diagnostics
+and corrected software/Arc matrix still await actual qualification.
+
+The functional normal-source product remains EXACT1bc13125; no production
+renderer/header/wire changes were made for these fixture corrections. Initial
+weakcontrast/projection/tint failures and every PNG/RGB witness stay preserved.
+Main3d sanitizer completion is still active with current owner provenance and
+no final/native acceptance. All original production requirements remain active
+and incomplete. No installation, physicalHMD launch or session restart.
+
 ## Two PBR stereo cases pass; remaining graphical work coordinated — 2026-11-15
 
 Explicit App3d/TestRuntimec54 replay now passes BOTH PBRquarter and PBRtiny
