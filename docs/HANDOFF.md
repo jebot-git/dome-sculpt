@@ -1,3 +1,30 @@
+## Desktop public matrix passes; XR reporter repair isolated — 2026-11-15
+
+All4 current-source desktop GUI cases pass52checks each (208actual), including
+actual Bake/history/ordered Save/reopen and every independent geometry/correct/
+wrong-normal pixel control at unchanged12/3/7 bounds. Private Xvfb dependency
+closure and actual server/app ELF mappings are authenticated; zero drift and no
+owned survivors. The old missing-library and teardown-race failures remain.
+Read [private display and GUI proof](GUARD87-PRIVATE-DISPLAY-GUI-20261115.md).
+
+First real-loader synthetic XR pbr-quarter reaches41checks then times out;
+original failure is retained. Evidence locates a test-runtime JSON null-object
+exception in xrReleaseSwapchainImage before both-eye source reporting. Isolated
+c54f66f8 adds only per-eye Json::object initialization; App/core/producers remain
+exact admitted3d. One whole changed test TU and fresh shared link have actual
+379compiler/41link dependency proofs, unchanged headers/literal flags/186exports/
+SONAME/NEEDED/current29loader providers. NEW overlay admission explicitly declares
+App3d/TestRuntimec54 without replacing original1768 expected outputs. Replay is
+starting under the same scenarios/pixel and240s/6000-frame limits; XR acceptance
+is still pending, and no physical HMD is launched.
+
+The normal-source integration draft remains separate and unfrozen. Its complete
+nativeR/S milestone is recorded; graphical component consumers are prepared but
+not yet executed. The full current-source sanitizer completion service remains
+active with538 proved staged owners plus494 fresh TU targets/all733links/3gens;
+its final audit and runtime gates remain required. No goal completion, runtime
+admission to main, installation or session restart is inferred.
+
 ## Prepared-normal native milestone integrated as a draft — 2026-11-15
 
 Functional product1bc13125 with finite-only fixture1740fb9d now passes current
