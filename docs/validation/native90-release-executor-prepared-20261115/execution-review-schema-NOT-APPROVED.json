@@ -1,0 +1,22 @@
+{
+  "state": "TEMPLATE-NOT-REVIEWED",
+  "source": "FULL_FINAL_FROZEN_SOURCE_SHA",
+  "destination": "ABSOLUTE_FINAL_OWNING_DIRECTORY",
+  "plan_sha256": "FINAL_PREPARED_PLAN_SHA256",
+  "prepare_hold_sha256": "UNCHANGED_PREPARE_HOLD_SHA256",
+  "executor_sha256": "2e6477ef1156d074ba6d1c6ed0e57a611b94ada0a8e70648a4395af4d7711d1a",
+  "mixed_audit_sha256": "4672b462dcd370998266a12af1a78678b0b6a5f2cc3fcee80dbec3c2edd13dd2",
+  "preserve_prepare_hold": true,
+  "no_products_tests_install_HMD": true,
+  "systemd_user_service": "ds-native90-release-UNUSED_TAG.service",
+  "service_runtime_max_seconds": 18600,
+  "service_memory_max_bytes": 8589934592,
+  "resource_bounds": {
+    "independent_owning_seconds": 18000,
+    "max_active_tasks": 2,
+    "aggregate_descendant_RSS_bytes": 8589934592,
+    "initial_input_audit_seconds": 600,
+    "final_input_audit_seconds": 600
+  },
+  "note": "Example schema only; never a real execution clearance. Root must review exact final plan/source/template hashes before producing a real reviewed-for-build-only receipt."
+}

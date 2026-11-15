@@ -1,0 +1,176 @@
+{
+  "schema": 1,
+  "state": "prepared-only-NOT-executed",
+  "scope": "Successor native90 Release executor, mixed actual-MD auditor and causal preparev2 correction. No final source freeze/configure/staging/build/products or genuine mixed-build acceptance.",
+  "unfrozen_source_at_task": "0ae03214d2a06473d6a3097c4076672c0af26617",
+  "forecast_only": {
+    "configured_owners": 1036,
+    "fresh_complete_TUs": 290,
+    "reused_current_whole_objects": 746,
+    "fresh_archive_link_actions": 737,
+    "fresh_generators": 3,
+    "selected_native_tests": 90,
+    "final_routes_must_recompute": true
+  },
+  "actual_template_validation": {
+    "syntax_checks": "Five new template/parser Python sources compile in memory; no template main/audit/execute invocation",
+    "readonly_existing_input_tool": 24662,
+    "readonly_existing_input_exit": 0,
+    "genuine_original_MD_owners": 1032,
+    "actual_dependency_incidences": 433074,
+    "actual_original_journal": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/current-toolchain-guard87-release-20261115/release-3d1643-current-fresh-v2-audit/execution-v1/steps.jsonl",
+      "sha256": "7d67803a3ab1b3556c079498f1a049cd30ca3fb64a9b7ed4fbbbdcb7e86b7929",
+      "launch_events": 1768,
+      "complete_events": 1768
+    },
+    "parser_inputs": {
+      "/home/blux/de-xr/dome-sculpt/artifacts/native90-release-planning-20261115/mixed_dependency_audit_v1.py": "4672b462dcd370998266a12af1a78678b0b6a5f2cc3fcee80dbec3c2edd13dd2",
+      "/home/blux/de-xr/dome-sculpt/artifacts/native90-release-planning-20261115/current_provider_routes_v2.py": "de49f869d3bb699d76fba3381226f19ba9c411c14b3b7257a17cc0c6485c4ec4",
+      "/home/blux/de-xr/dome-sculpt/artifacts/native90-release-planning-20261115/review-existing-provider-inputs-v2.py": "2b2d7b31daaed8872f3f3960c9a53c4811b4ddbcc4f0e2ac80e0349946804385"
+    },
+    "new_project_configures": 0,
+    "objects_staged": 0,
+    "new_compilers_or_links": 0,
+    "project_products_invoked": 0,
+    "new_user_services_started": 0,
+    "synthetic_compiler_outputs_created": 0
+  },
+  "future_contract": {
+    "independent_owning_seconds": 18000,
+    "max_active_jobs": 2,
+    "actual_owned_RSS_bytes": 8589934592,
+    "input_audit_seconds_each": 600,
+    "outer_service_RuntimeMaxSec": 18600,
+    "outer_service_TimeoutStopSec": 10,
+    "Type": "exec",
+    "RemainAfterExit": "yes",
+    "KillMode": "control-group",
+    "actual_cgroup_MainPID_Invocation_and_limits_verified": true,
+    "TERM_keeps_actual_exit143": true,
+    "cleanup_only_current_owned_unit_identities": true,
+    "readonly_independent_object_and_original_MD_snapshot_inodes": true,
+    "never_rewrite_MD_or_create_new_MD_for_reused_owner": true,
+    "original_command_CWD_and_physical_path_preserved": true,
+    "current_equivalence_separate_from_original_MD": true,
+    "no_cached_final_link_product": true,
+    "dynamic_all1036_owner_mixed_route_audit": true,
+    "all1776_output_SHA_and_ordered_archive_payloads_required": true,
+    "original_prepare_HOLD_preserved_by_pinned_future_review": true,
+    "review_example_is_NOT_APPROVED": true
+  },
+  "preparev2_causal_fix": {
+    "reviewed_v1_unchanged": true,
+    "old_PINS_product_ELF_seeding_removed": true,
+    "explicit_external_tool_SDK_canonical_seeds_only": true,
+    "old_new_source_build_ELF_roots_hard_excluded": true,
+    "project_ldd_requires_later_coordinated_runtime_preflight": true,
+    "captured_compiler_environment_and_default_search_order_guard": true
+  },
+  "remaining_unverified": [
+    "Final source freeze and freshly derived final owning plan",
+    "Actual readonly staging/whole-object copy audit",
+    "Owned dedicated-service normal/TERM/closure controls",
+    "Any fresh compiler/link/generator job in this successor",
+    "Final1036-route mixed actual-MD/output seal",
+    "Native90 and all coherent runtime consumer gates"
+  ],
+  "files": {
+    "prepare-release-native90-v2.py": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/native90-release-planning-20261115/prepare-release-native90-v2.py",
+      "raw_sha256": "3aae018021cda626d910dd895303547ae623fdea70702dae583b8e8c92643dd3",
+      "sha256": "3aae018021cda626d910dd895303547ae623fdea70702dae583b8e8c92643dd3",
+      "bytes": 18833
+    },
+    "provider_context_v2.py": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/native90-release-planning-20261115/provider_context_v2.py",
+      "raw_sha256": "a7c3303d85da2355e149e6301dba96dbbf6988b782ad4e35b1dac0d539e5fc15",
+      "sha256": "a7c3303d85da2355e149e6301dba96dbbf6988b782ad4e35b1dac0d539e5fc15",
+      "bytes": 7835
+    },
+    "execute-release-native90-v1.py": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/native90-release-planning-20261115/execute-release-native90-v1.py",
+      "raw_sha256": "2e6477ef1156d074ba6d1c6ed0e57a611b94ada0a8e70648a4395af4d7711d1a",
+      "sha256": "2e6477ef1156d074ba6d1c6ed0e57a611b94ada0a8e70648a4395af4d7711d1a",
+      "bytes": 21837
+    },
+    "mixed_dependency_audit_v1.py": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/native90-release-planning-20261115/mixed_dependency_audit_v1.py",
+      "raw_sha256": "4672b462dcd370998266a12af1a78678b0b6a5f2cc3fcee80dbec3c2edd13dd2",
+      "sha256": "4672b462dcd370998266a12af1a78678b0b6a5f2cc3fcee80dbec3c2edd13dd2",
+      "bytes": 14036
+    },
+    "review-existing-provider-inputs-v1.py": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/native90-release-planning-20261115/review-existing-provider-inputs-v1.py",
+      "raw_sha256": "aeab0dd687e6c19ba22d0c9dc6339b7523a1a594e0eb44911779434f7980aebc",
+      "sha256": "aeab0dd687e6c19ba22d0c9dc6339b7523a1a594e0eb44911779434f7980aebc",
+      "bytes": 2880
+    },
+    "review-existing-provider-inputs-v2.py": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/native90-release-planning-20261115/review-existing-provider-inputs-v2.py",
+      "raw_sha256": "2b2d7b31daaed8872f3f3960c9a53c4811b4ddbcc4f0e2ac80e0349946804385",
+      "sha256": "2b2d7b31daaed8872f3f3960c9a53c4811b4ddbcc4f0e2ac80e0349946804385",
+      "bytes": 3097
+    },
+    "MIXED-EXECUTOR-DESIGN-v1.md": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/native90-release-planning-20261115/MIXED-EXECUTOR-DESIGN-v1.md",
+      "raw_sha256": "3d0d2d8e8f55f560204e089b80b26ff569298e92d5198726d37e355e87379fbc",
+      "sha256": "3d0d2d8e8f55f560204e089b80b26ff569298e92d5198726d37e355e87379fbc",
+      "bytes": 8150
+    },
+    "execution-review-schema-NOT-APPROVED.json": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/native90-release-planning-20261115/execution-review-schema-NOT-APPROVED.json",
+      "raw_sha256": "c2c0791017e764fcd1a0e670e91ff5c9e3ffc8af6669930f0aae3a3e5d684c38",
+      "sha256": "c2c0791017e764fcd1a0e670e91ff5c9e3ffc8af6669930f0aae3a3e5d684c38",
+      "bytes": 1050
+    },
+    "prepare-v1-v2-external-forecast-and-mixed-contract.diff.gz": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/native90-release-planning-20261115/prepare-v1-v2-external-forecast-and-mixed-contract.diff",
+      "raw_sha256": "86f3dbf1c3251b34f11ccf70cc43aa458352deb2d1baf8fe2150e6baadab1e49",
+      "sha256": "8985ff70b230044aef1c76c0473e1a6d446b809fc51ea7c423f359411907ae45",
+      "bytes": 4177
+    },
+    "provider-context-v1-v2-genuine-command-cwd.diff.gz": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/native90-release-planning-20261115/provider-context-v1-v2-genuine-command-cwd.diff",
+      "raw_sha256": "22a911edaf28bb467b87c34feab1d44a50fb087ff886f18f3ef00fad062d489d",
+      "sha256": "8ec91eaa16bfd304cbad4f25a82dd6db107f284fe8f803671dbc5f95e3e36f72",
+      "bytes": 1795
+    },
+    "completion-executor-to-native90-mixed.diff.gz": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/native90-release-planning-20261115/completion-executor-to-native90-mixed.diff",
+      "raw_sha256": "66b87d2a0beec25c133b9015f89f9026e00216ad06fd7519a792ee9ad9c407d0",
+      "sha256": "5729899b6d67ca0076a5ceff505484ea1b9f2724650cec27343f72ddcac35b27",
+      "bytes": 9747
+    },
+    "completion-audit-to-native90-mixed.diff.gz": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/native90-release-planning-20261115/completion-audit-to-native90-mixed.diff",
+      "raw_sha256": "7ed098b536b41afc7d268bd1f4ceb30b73fc4a016d5c977059ec4ebaa8bcee2a",
+      "sha256": "f7d3659f51e3f8e0a3323b518926abda72cb96c5ec1e5f24d11df62f694c4a87",
+      "bytes": 5454
+    },
+    "existing-provider-parser-review-v1.json.gz": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/native90-release-planning-20261115/existing-provider-parser-review-v1.json",
+      "raw_sha256": "49932be6ebd93596b2d79ee6526c4c71c4cbe7f407eb28bd8b37d223f2d0bad0",
+      "sha256": "f57a6459854412c20df2e14b173e9efe7e029a1c0e4ca01db73f653161fc7b67",
+      "bytes": 121568
+    },
+    "existing-provider-parser-review-v2.json.gz": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/native90-release-planning-20261115/existing-provider-parser-review-v2.json",
+      "raw_sha256": "4b63bb39a9d97adf78f81d4528fd5945e6792a7483cc9eb02857c830530fd303",
+      "sha256": "3878a6eb3af2b591fe53ce51f0b2a8d03a457670566b503a1713ded064ab4243",
+      "bytes": 121810
+    },
+    "existing-provider-parser-review-v1.log.gz": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/native90-release-planning-20261115/existing-provider-parser-review-v1.log",
+      "raw_sha256": "9b10d6759eecef6a4acc7c6744ca3536472284d2a275665f8842d04516911b8f",
+      "sha256": "75550f25e07483105180b93c612caec03c4594f0edc899bed696e46158ef4499",
+      "bytes": 590
+    },
+    "existing-provider-parser-review-v2.log.gz": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/native90-release-planning-20261115/existing-provider-parser-review-v2.log",
+      "raw_sha256": "8e9d2550244cc07a27807f8b5d6c7ba6fba9285e1d1bda7e1bfc298eddad7d07",
+      "sha256": "5dd45cf944889a51db2efa178994bceb738adcd47696ac20853e273769c2e5bc",
+      "bytes": 806
+    }
+  }
+}
