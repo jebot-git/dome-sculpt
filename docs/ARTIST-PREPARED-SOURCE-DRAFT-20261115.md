@@ -5,9 +5,9 @@ through `f1a9970e`, preserving the missing logical emission UV1 refusal and all
 source histories. Current application sources/providers remain unchanged.
 
 The draft adds a prepared-source resolver that consumes actual current dual
-PBR/MToon normal planes and their owned frame/coordinate recipe. It uses the
-prepared vertex bitangent policy, independently retained sampling coordinates
-when present, existing morph/skin evaluation and bounded cancellation. Material
+PBR/MToon normal planes and their owned ordinary version1 preparation recipe
+with unchanged UV coordinates. It uses the prepared vertex bitangent policy,
+existing morph/skin evaluation and bounded cancellation. Material
 channels use the actual composed preview; prepared normals are not relabeled as
 raw original images. Canonical/native-paint/current-independent-field guards
 remain. The ordinary artist source route is retained.
@@ -60,3 +60,18 @@ emission functions lacked their declaration include; v4 adds the proper header,
 and v5 strengthens independent emission tests. All failed artifacts remain.
 The receipt identifies each current complete TU/object individually, including
 its actual source hash and containing run result; no failed run is relabeled.
+
+Final compile-only draft scope explicitly refuses version2, UV-reprojected,
+retained-domain or sampling-reparameterized normal sources before allocation.
+Genuine advanced negative fixtures are built through the real SourceUV Bake and
+adoption kernels (Rasterize and RetainSource), then require valid native
+roundtrip and unchanged Scene/source/target on explicit resolver/raw/Bake refusal.
+These adapters remain required future work, not completed by this component.
+
+The unchanged positive second-Bake consumer tolerance is0.035. On the exact same
+interior texels, independent neutral-world, omitted-source/geometric-normal and
+swapped-material-role controls must each differ by more than0.07. All measured
+values will be retained per MToon version and rest/posed artist source; they are
+not yet executed or asserted passing. Original source62/19/139 regressions and
+the artist9/CC0856/CC0Bake32 CPU fixture TUs also compile freshly with current
+toolchain/context, zero drift. No corresponding runtime pass is claimed.

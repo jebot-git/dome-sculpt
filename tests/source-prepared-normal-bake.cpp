@@ -3,6 +3,7 @@
 #include "emission-bake-source.hpp"
 #include "dome/normal-preparation.hpp"
 #include "dome/normal-sampling.hpp"
+#include "dome/source-uv-bake.hpp"
 using namespace source_artist_fixture;
 namespace {
 // Independent double-precision consumer: no production basis, sampler or
@@ -82,6 +83,17 @@ void emission_guards(const Scene &baseline,uint64_t source,const ObjectBakeSetti
  }
 }
 
+void advanced_recipe_guards(const Scene &baseline,uint64_t source,const ObjectBakeSettings &options){
+ for(const auto method:{SourceNormalUvMethod::Rasterize,SourceNormalUvMethod::RetainSource}){
+  auto scene=baseline.snapshot();const auto &o=scene.object(source);SourceUvBakeInput input;input.paint=o.painted;input.current_material=o.material_bindings;input.current_deformation=o.deformation;input.appearance=o.appearance;input.target=o.painted->mesh();input.source_vertices.resize(input.target.positions.size());std::iota(input.source_vertices.begin(),input.source_vertices.end(),0);
+  for(auto &uv:input.target.uv)for(auto &v:uv)v=.5f+(v-.5f)*.95f;
+  SourceUvBakeOptions settings;settings.normal_sampling=method;settings.max_normal_sample_error=.03;
+  auto adopted=adopt_source_uv_bake(bake_source_uv(input,settings));auto &current=scene.object(source);current.painted=adopted.paint;current.material_bindings=adopted.material_bindings;current.deformation=adopted.deformation;current.appearance=adopted.appearance;scene.validate();const auto before=scene.encode();
+  check(Scene::decode(before).encode()==before&&current.material_bindings->normal_preparation&&(current.material_bindings->normal_preparation->uv_reprojection||current.material_bindings->normal_preparation->sampling_domain),"Advanced negative owns a genuine native UV-reprojected or retained-domain normal recipe");
+  check(refuses([&]{detail::source_bake_normals(current,{});})&&refuses([&]{detail::raw_bake_source(current);})&&refuses([&]{bake_object(scene,source,options);})&&scene.encode()==before,"Advanced normal/material UV recipes remain explicitly refused before sampling with exact Scene/source/target preservation");
+ }
+}
+
 void run_case(bool legacy,bool posed,const std::filesystem::path &folder){
  auto f=fixture(legacy,posed);auto mesh=f.scene.object(f.source).deformation->preview(f.scene.object(f.source).painted->mesh());
  const auto first=target(f.scene,mesh,legacy);ObjectBakeSettings options;options.prepare_normals=true;options.normal_error=.03f;options.front_mm=options.back_mm=300;options.ao_samples=0;options.padding=0;
@@ -95,10 +107,10 @@ void run_case(bool legacy,bool posed,const std::filesystem::path &folder){
  bool cancelled=true;for(size_t point=1;point<=polls;++point){size_t at=0;limited.cancelled=[&]{return ++at>=point;};cancelled&=refuses([&]{detail::source_bake_normals(f.scene.object(first),{},limited);})&&f.scene.encode()==before;}
  check(cancelled&&polls>1,"Every prepared-source capture cancellation boundary preserves source, recipe and history");
  const auto second=target(f.scene,mesh,legacy);f.scene.select(second);const auto original=f.scene.encode();const auto native_before=f.scene.snapshot();
- if(!legacy&&posed)emission_guards(native_before,first,options,folder);
+ if(!legacy&&posed){emission_guards(native_before,first,options,folder);advanced_recipe_guards(native_before,first,options);}
  const auto report=bake_object(f.scene,first,options);check(report.projected&&f.scene.object(second).painted->baked(),"A real prepared Bake result is reusable as the source of a second Bake");
  check(f.scene.object(first).painted==prepared&&f.scene.object(first).material_bindings==binding,"Second Bake retains the exact immutable prepared source owners");
- double baked_error=0;size_t interior=0;
+ double baked_error=0,neutral_error=0,omitted_error=0,wrong_role_error=0;size_t interior=0;
  for(size_t y=0;y<64;++y)for(size_t x=0;x<64;++x){
   const std::array<double,2> q{(x+.5)/64.,(y+.5)/64.};
   for(size_t tri=0;tri<mesh.indices.size()/3;++tri){
@@ -108,16 +120,20 @@ void run_case(bool legacy,bool posed,const std::filesystem::path &folder){
    const double v=((c[1]-a[1])*(q[0]-c[0])+(a[0]-c[0])*(q[1]-c[1]))/d;
    if(std::min({u,v,1-u-v})<.06)continue;
    const std::array<float,3> bary{float(u),float(v),float(1-u-v)};
-   for(size_t role=0;role<2;++role){const auto wanted=direction(f.scene.object(first),tri,bary,role),actual=direction(f.scene.object(second),tri,bary,role);for(size_t k=0;k<3;++k)baked_error=std::max(baked_error,std::abs(wanted[k]-actual[k]));}
+   const auto &source_object=f.scene.object(first);D geometric{};
+   for(size_t k=0;k<3;++k)geometric=add(geometric,mul(vc(source_object.painted->mesh().normals[source_object.painted->mesh().indices[tri*3+k]]),bary[k]));
+   geometric=unit(geometric);const std::array<D,2> wanted{direction(source_object,tri,bary,0),direction(source_object,tri,bary,1)};
+   for(size_t role=0;role<2;++role){const auto actual=direction(f.scene.object(second),tri,bary,role);for(size_t k=0;k<3;++k){baked_error=std::max(baked_error,std::abs(wanted[role][k]-actual[k]));neutral_error=std::max(neutral_error,std::abs(wanted[role][k]-(k==2?1.:0.)));omitted_error=std::max(omitted_error,std::abs(wanted[role][k]-geometric[k]));wrong_role_error=std::max(wrong_role_error,std::abs(wanted[role][k]-wanted[1-role][k]));}}
    ++interior;break;
   }
  }
+ check(neutral_error>.07&&omitted_error>.07&&wrong_role_error>.07,"Same actual interior texels independently reject neutral, omitted and swapped material-role source directions with margin above the unchanged 0.035 Bake tolerance");
  check(interior>500&&baked_error<.035,"Independent decoding of actual second-Bake texels preserves both source directions within declared quantization tolerance");
 
  const auto encoded=f.scene.encode();check(Scene::decode(encoded).encode()==encoded,"Repeated prepared-source Bake roundtrips through the native archive exactly");
  Document doc;doc.replace(native_before);check(doc.wait_mesh(),"Prepared-source Document reaches its genuine initial geometry");doc.bake_from_object(first,options);const auto out=folder/(std::to_string(legacy)+std::to_string(posed)+".dsculpt");auto saved=doc.save_async(out);saved.get();check(doc.wait_asset(std::chrono::seconds(120))&&doc.wait_mesh()&&doc.frame().state->error.empty()&&doc.copy_scene().encode()==encoded&&Scene::load(out).encode()==encoded,"Native prepared-source Bake worker and immediately ordered Save publish exact second-Bake data");
  check(doc.undo()&&doc.wait_mesh()&&doc.copy_scene().encode()==original,"Second prepared-source Bake Undo restores the complete prior Scene");check(doc.redo()&&doc.wait_mesh()&&doc.copy_scene().encode()==encoded,"Second prepared-source Bake Redo restores exact current role planes");
- std::cout<<"PREPARED legacy="<<legacy<<" posed="<<posed<<" max_direction_error="<<maximum<<" baked_error="<<baked_error<<" decoded_texels="<<interior<<" projected="<<report.projected<<" polls="<<polls<<'\n';
+ std::cout<<"PREPARED legacy="<<legacy<<" posed="<<posed<<" max_direction_error="<<maximum<<" baked_error="<<baked_error<<" neutral_control_error="<<neutral_error<<" omitted_control_error="<<omitted_error<<" wrong_role_control_error="<<wrong_role_error<<" decoded_texels="<<interior<<" projected="<<report.projected<<" polls="<<polls<<'\n';
 }
 }
 int main(int argc,char **argv)try{if(argc!=2)return 2;std::filesystem::create_directories(argv[1]);for(bool legacy:{false,true})for(bool posed:{false,true})run_case(legacy,posed,argv[1]);std::cout<<"PASS "<<checks<<" prepared source controls\n";return 0;}catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

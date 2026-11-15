@@ -100,6 +100,9 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTr
   if(!binding||!binding->normal_frames)return {};
   auto stop=[&]{if(options.cancelled&&options.cancelled())throw std::runtime_error("Source normal capture cancelled");};stop();
   const bool prepared=object.painted&&object.painted->normal_projection()&&binding->normal_preparation;
+  if(prepared&&(object.painted->normal_projection()->version!=1||binding->normal_preparation->uv_reprojection||
+      binding->normal_preparation->sampling_domain||binding->sampling_reparameterized))
+    throw std::invalid_argument("Prepared source UV edits require their own normal/material coordinate authority adapter");
   if(!object.mesh_active||!object.painted||!object.painted->valid_source_sampling_attachment()||
      binding->canonical_attributes||binding->canonical_uv||binding->canonical_paint_sampling||binding->native_paint_sampling||binding->native_paint_frames||
      bool(binding->normal_preparation)!=bool(object.painted->normal_projection())||object.painted->color_projection()||
@@ -116,15 +119,11 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTr
   normal_frame_current_authority(*binding,mesh,object.deformation.get(),options.cancelled);
   if(!set.pbr||(binding->has_mtoon&&!set.mtoon))throw std::invalid_argument("Artist source lost its explicitly declared PBR/MToon frame roles");
   std::shared_ptr<const TextureMaps> current_normals;
-  std::optional<NormalCoordinateView> normal_coordinates;
   if(prepared){
     binding->normal_preparation->validate_current(mesh,object.appearance.get(),options.cancelled);
     current_normals=object.painted->preview(object.material,options.cancelled);
     if(!prepared_normal_state(binding.get(),current_normals.get(),true))
       throw std::invalid_argument("Prepared source lacks its actual current normal interpretation");
-    if(auto retained=retained_normal_coordinates(binding.get(),current_normals.get()))normal_coordinates.emplace(*retained);
-    if(normal_coordinates){normal_coordinates->validate(options.cancelled);if(normal_coordinates->indices.size()!=corners)
-      throw std::invalid_argument("Prepared source normal coordinate corners differ from its actual surface");}
   }
   Source coordinates;coordinates.mesh=object.painted->mesh_owner();coordinates.maps=object.painted->source_maps();coordinates.packet=PaintOverlayFactory::capture(*object.painted,options.cancelled);coordinates.cancelled=options.cancelled;
   if(!coordinates.maps)coordinates.maps=std::make_shared<const PaintSourceMaps>();
@@ -151,7 +150,7 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTr
   // W is a per-triangle discrete attribute, never a barycentric float sign.
   for(size_t role=0;role<(typed?2u:1u);++role)for(size_t c=0;c<corners;c+=3){if((c&1023)==0)stop();if(vertices->at(role)[c].w!=vertices->at(role)[c+1].w||vertices->at(role)[c].w!=vertices->at(role)[c+2].w)throw std::invalid_argument("Artist source tangent handedness changes inside a triangle");}
   stop();std::shared_ptr<const std::array<std::vector<NormalBakeVertex>,2>> immutable=std::move(vertices);
-  return [immutable,coordinates=std::move(coordinates),typed,typed_role,has_tangent,prepared,current_normals,normal_coordinates,binding](uint32_t triangle,std::array<float,3> bary){
+  return [immutable,coordinates=std::move(coordinates),typed,typed_role,has_tangent,prepared,current_normals](uint32_t triangle,std::array<float,3> bary){
     coordinates.stop();const std::array<double,3> weights{bary[0],bary[1],bary[2]};std::array<Vec3,2> result;
     for(size_t role=0;role<(typed?2u:1u);++role){
       std::array<NormalBakeVertex,3> corners;for(size_t k=0;k<3;++k)corners[k]=immutable->at(role).at(size_t(triangle)*3+k);
@@ -162,18 +161,9 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTr
       if(prepared){
         view={};view.wrap_s=view.wrap_t=33071;view.min_filter=view.mag_filter=9729;
         view.image=std::shared_ptr<const Image>(current_normals,role==0?&current_normals->normal:&current_normals->mtoon_normal);
-        if(current_normals->normal_projection->version==2){
-          const auto &projection=*current_normals->normal_projection;
-          const bool detail=current_normals->baked_base&&!current_normals->baked_base->maps.normal.rgba.empty();
-          view.image=role==0?(detail?projection.sampling_domain->resolved_pbr:projection.pbr):(detail?projection.sampling_domain->resolved_mtoon:projection.mtoon);
-        }
       }
       if(enabled&&view.image){
-        std::array<float,2> uv{};
-        if(prepared&&normal_coordinates){
-          const auto &values=role==0||normal_coordinates->mtoon_coordinates.empty()?normal_coordinates->coordinates:normal_coordinates->mtoon_coordinates;
-          for(size_t k=0;k<3;++k){const auto v=values.at(normal_coordinates->indices.at(size_t(triangle)*3+k));for(size_t c=0;c<2;++c)uv[c]+=v[c]*bary[k];}
-        }else uv=coordinates.coordinates(triangle,bary,prepared?0:role==0?view.texcoord:mtoon_coordinate(typed->textures[size_t(MToonSlot::Normal)]),!prepared&&role!=0);
+        auto uv=coordinates.coordinates(triangle,bary,prepared?0:role==0?view.texcoord:mtoon_coordinate(typed->textures[size_t(MToonSlot::Normal)]),!prepared&&role!=0);
         if(role&&!prepared)uv=mtoon_uv(*typed,MToonSlot::Normal,uv,0);
         view.texcoord=0;
         const auto value=sample_source_texture(view,uv[0],uv[1],false);const float scale=role==0?(prepared?1:coordinates.maps->normal_scale):typed->parameters.normal_scale;

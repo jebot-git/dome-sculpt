@@ -65,14 +65,13 @@
     "owned_current_compilations": [
       {
         "file": "src/emission-bake-source.cpp",
-        "source_sha256": "b2b666eb53204a8c5b174fcfd5480aceb85e9783169e66ce277eacdcd31dce5f",
-        "object": "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-proof-v3-20261115/emission-bake-source.cpp.o",
-        "object_sha256": "7733c77f75b1ef9e31215bef85de8a629108e5dae9f2bad8c5d4eee46accd28b",
-        "compile_status": "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-proof-v3-20261115/compile-status.json",
+        "source_sha256": "0260bb13cb1f820e4e661606a639b060be4fa108e421c8c715a3a7d05aaf4407",
+        "object": "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-proof-v7-20261115/emission-bake-source.cpp.o",
+        "object_sha256": "7ff8d40d4d0f6504c233d6dd67ab82fede41927476603e80bcf20249acc86c7a",
+        "compile_status": "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-proof-v7-20261115/compile-status.json",
         "compile_step": "compile-0",
         "compile_step_exit": 0,
-        "overall_run_exit": 1,
-        "scope": "Fresh current complete TU; overallv3 failure belongs only to initial fixture missing declaration include and remains preserved."
+        "overall_run_exit": 0
       },
       {
         "file": "src/bake.cpp",
@@ -82,8 +81,7 @@
         "compile_status": "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-proof-v2-20261115/compile-status.json",
         "compile_step": "compile-1",
         "compile_step_exit": 0,
-        "overall_run_exit": 0,
-        "scope": "Fresh current complete TU; overallv3 failure belongs only to initial fixture missing declaration include and remains preserved."
+        "overall_run_exit": 0
       },
       {
         "file": "src/bake-authoring.cpp",
@@ -93,23 +91,39 @@
         "compile_status": "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-proof-v2-20261115/compile-status.json",
         "compile_step": "compile-2",
         "compile_step_exit": 0,
-        "overall_run_exit": 0,
-        "scope": "Fresh current complete TU; overallv3 failure belongs only to initial fixture missing declaration include and remains preserved."
+        "overall_run_exit": 0
       },
       {
         "file": "tests/source-prepared-normal-bake.cpp",
-        "source_sha256": "59e8b0964de917aee2409c3c9a223c1de98b4ce3da9dd872b9def3890c69cbf4",
-        "object": "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-proof-v5-20261115/source-prepared-normal-bake.cpp.o",
-        "object_sha256": "b2dcaf9ee4c44169e919c620490e8ab9e1be129cbe66801d197551b2ad1ace50",
-        "compile_status": "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-proof-v5-20261115/compile-status.json",
-        "compile_step": "compile-0",
+        "source_sha256": "d8557a44198f737bc57cf4f1b9952ed07d053868bd8bd38c2721f31e9379b843",
+        "object": "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-proof-v7-20261115/source-prepared-normal-bake.cpp.o",
+        "object_sha256": "67ca22107b84dd04359aba050ecfb71052cb116da94832cae7cc1bd95547aecc",
+        "compile_status": "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-proof-v7-20261115/compile-status.json",
+        "compile_step": "compile-1",
         "compile_step_exit": 0,
-        "overall_run_exit": 0,
-        "scope": "Fresh current complete TU; overallv3 failure belongs only to initial fixture missing declaration include and remains preserved."
+        "overall_run_exit": 0
       }
     ],
     "runtime_executed": false,
     "existing62_and19_runtime": "queued unchanged after freshcore available",
     "fixture": "Both genuine/missing prepared original emissionUV1 in LDR/HDR; actual first/secondBake; independent normals and expected emission with UV1flip differingUV0 on nonuniform/morph initialsource; current output emission field/linearRGB consumer checks."
+  },
+  "current_scope": "Genuine ordinary version1 prepared-normal source with unchanged UV; actual repeatedBake fixture compiled, runtime pending. v2/UVreprojection/sampling/native32/canonical remain guarded and required.",
+  "negative_source_controls": {
+    "positive_second_Bake_error_bound_unchanged": 0.035,
+    "same_texel_neutral_omitted_swapped_role_minimum_error": 0.07,
+    "executed": false
+  },
+  "additional_compiled_regressions": {
+    "artist-prepared-regression-compile-20261115": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-regression-compile-20261115/compile-status.json",
+      "sha256": "0ba3ccb5e2c3938956fa28934eb6b18034d84fcc8c6314de9bb9f2ea3e82a0cc",
+      "runtime_executed": false
+    },
+    "artist-prepared-render-compile-20261115": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-render-compile-20261115/compile-status.json",
+      "sha256": "d1191d252e2e1d99cca99fdfa3afe32dabd19164562fb062445ffb9733fb1b1a",
+      "runtime_executed": false
+    }
   }
 }
