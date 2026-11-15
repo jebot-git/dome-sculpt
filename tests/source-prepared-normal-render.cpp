@@ -48,6 +48,7 @@ std::shared_ptr<MeshSnapshot> prepared_point(const SculptObject&o,std::array<flo
 void prepared_view(Scene scene,uint64_t first,uint64_t second,bool pbr,const std::string&label){
  for(const auto&o:scene.objects())scene.object(o.id).visible=o.id==second;scene.select(second);const auto before=scene.encode();const auto&o=scene.object(second);const auto&mesh=o.painted->mesh();constexpr uint32_t tri=0;std::array<Vec3,3> points;for(size_t k=0;k<3;++k)points[k]=mesh.positions.at(mesh.indices.at(k));
  const auto ex=points[1]-points[0],ey=points[2]-points[0];const auto n=normalized(cross(ex,ey)),x=normalized(ex),y=normalized(cross(n,x)),center=(points[0]+points[1]+points[2])/3;const float span=std::max({length(ex),length(ey),length(points[2]-points[1])})*.85f;const auto matrix=face_projection(center,x,y,n,span);const auto camera=center+n*2;
+ require_face_depth(matrix,center,n);require_visible_probes(mesh,tri,center,x,y,n,span);
  Document doc;doc.replace(scene);if(pbr)doc.shading(false);else doc.authored_shading();check(doc.wait_mesh()&&doc.frame().state->error.empty(),"Actual second-Bake target publishes through shared Document renderer route");
  Fbo f;SurfaceRenderer renderer;renderer.set_frame_time(0);f.bind();const auto actual=draw_view(renderer,doc.frame().surface,matrix,camera);retain_pixels(label+"-actual",actual);int maximum=0,wrong_sensitive=0,omitted_sensitive=0,wrong_gap_max=0,omitted_gap_max=0;
  auto omitted_object=scene.object(first);omitted_object.painted=omitted_object.painted->snapshot();omitted_object.painted->clear_bake();
