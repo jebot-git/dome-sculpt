@@ -4,7 +4,8 @@
 #include "source-bake-normal.hpp"
 #include "normal-frame-runtime.hpp"
 #include "normal-bake-encoding.hpp"
-#include "normal-preparation-state.hpp"
+#include "normal-projection-identity.hpp"
+#include "paint-normal-access.hpp"
 #include <numeric>
 #include "dome/material-bindings.hpp"
 #include "dome/material-visibility.hpp"
@@ -118,12 +119,15 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTr
     throw std::length_error("Artist source normal capture exceeds prospective working budget");
   normal_frame_current_authority(*binding,mesh,object.deformation.get(),options.cancelled);
   if(!set.pbr||(binding->has_mtoon&&!set.mtoon))throw std::invalid_argument("Artist source lost its explicitly declared PBR/MToon frame roles");
-  std::shared_ptr<const TextureMaps> current_normals;
+  std::shared_ptr<const PaintNormalProjection> current_normals;
   if(prepared){
     binding->normal_preparation->validate_current(mesh,object.appearance.get(),options.cancelled);
-    current_normals=object.painted->preview(object.material,options.cancelled);
-    if(!prepared_normal_state(binding.get(),current_normals.get(),true))
-      throw std::invalid_argument("Prepared source lacks its actual current normal interpretation");
+    if(!normal_projection_identity(*object.painted->normal_projection(),*binding->normal_preparation->projection))
+      throw std::invalid_argument("Prepared source lost its actual intrinsic normal authority");
+    // The owning accessor resolves actual intrinsic/detail normal events
+    // without asking unrelated material images to composite through UV0.
+    current_normals=SourceNormalPreparationAccess::resolved(*object.painted,options.cancelled);
+    current_normals->validate(object.painted->resolution());
   }
   Source coordinates;coordinates.mesh=object.painted->mesh_owner();coordinates.maps=object.painted->source_maps();coordinates.packet=PaintOverlayFactory::capture(*object.painted,options.cancelled);coordinates.cancelled=options.cancelled;
   if(!coordinates.maps)coordinates.maps=std::make_shared<const PaintSourceMaps>();
@@ -160,7 +164,7 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTr
       auto view=role==0?coordinates.maps->normal:typed_role;const bool enabled=role==0||typed->parameters.normal_enabled;
       if(prepared){
         view={};view.wrap_s=view.wrap_t=33071;view.min_filter=view.mag_filter=9729;
-        view.image=std::shared_ptr<const Image>(current_normals,role==0?&current_normals->normal:&current_normals->mtoon_normal);
+        view.image=role==0?current_normals->pbr:current_normals->mtoon;
       }
       if(enabled&&view.image){
         auto uv=coordinates.coordinates(triangle,bary,prepared?0:role==0?view.texcoord:mtoon_coordinate(typed->textures[size_t(MToonSlot::Normal)]),!prepared&&role!=0);
@@ -187,7 +191,15 @@ std::shared_ptr<const TextureMaps> raw_bake_source(const SculptObject &object,
     // their owning coordinate recipe. Never reinterpret them as raw images.
     if(!source_bake_normals(object,{},SourceBakeNormalOptions{256*1024*1024,cancelled}))
       throw std::invalid_argument("Prepared normal source requires its actual frame adapter");
-    return object.painted->preview(object.material,cancelled);
+    auto maps=std::make_shared<TextureMaps>();
+    maps->source_maps=object.painted->source_maps();
+    if(!maps->source_maps)maps->source_maps=std::make_shared<const PaintSourceMaps>();
+    maps->source_maps->validate_surface(object.painted->mesh());
+    maps->source_only=true;maps->overlay=PaintOverlayFactory::capture(*object.painted,cancelled);
+    // Material-only raw roles/paint contributions, not a legacy raw normal.
+    // This marker requires the separate authenticated normal resolver below.
+    maps->normal_projection=object.painted->normal_projection();
+    return maps;
   }
   if(!object.mesh_active||!object.painted||!object.painted->source_maps()||
      (!object.painted->source_maps()->uses_alternate_uv()&&!object.painted->source_sampling_prepared()&&

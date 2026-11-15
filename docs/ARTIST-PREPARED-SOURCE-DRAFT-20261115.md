@@ -75,3 +75,29 @@ values will be retained per MToon version and rest/posed artist source; they are
 not yet executed or asserted passing. Original source62/19/139 regressions and
 the artist9/CC0856/CC0Bake32 CPU fixture TUs also compile freshly with current
 toolchain/context, zero drift. No corresponding runtime pass is claimed.
+
+Independent current-toolchain component execution of frozen82c73ab9 is retained
+as a genuine failure. Its first MToon1/rest case completed actual repeated Bake,
+1826 independently decoded interior texels (maximum error0), source-direction
+error1.44e-7, neutral/omitted/wrong-role controls0.816/0.916/0.788 and real Document
+ordered Save/Undo/Redo. The original current-compiler f1 counterfactual completed
+its first artist Bake then refused the prepared source as expected. The fixed
+run later failed a valid authored-emission-UV1 positive: unrelated full material
+compositing refuses alternate PBR UVs. No failure is reclassified as a pass.
+
+A NEW child of82c73ab9 keeps that failed source/artifacts unchanged. The normal
+capture now calls the existing actual SourceNormalPreparationAccess::resolved
+accessor, which preserves byte-exact normalize/quantize-before-filter and normal
+detail ownership without requesting unrelated image compositing. Material Bake
+uses actual raw SourceMaps and an immutable PaintOverlayPacket for its separate
+channels. A normal_projection marker explicitly requires the private normal
+resolver; the public legacy Bake path refuses that material-only descriptor
+without its genuine normal adapter. The descriptor does not claim a historical
+raw normal/baked_base interpretation. The fixture tests this public refusal and
+keeps independent authored-UV1 radiance checks in LDR/HDR, including actual Bake.
+
+All three complete current owners and current fixture compile freshly in the
+new child under the current canonical Release context, zero input drift.
+Current runtime retry remains pending. Native source62/19/139 and artist/CC0
+9/856/32 regressions remain required; no full application/graphics acceptance
+is implied by this independent component group.

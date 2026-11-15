@@ -249,6 +249,14 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
     const detail::SourceBakeNormalResolver &source_normals) {
   if(o.progress)o.progress(0);
   cancel(o); validate(low,source,o);
+  for(const auto &material:source.materials)if(material.maps&&material.maps->source_only&&material.maps->normal_projection){
+    const auto &maps=*material.maps;
+    if(!source_normals||!maps.overlay||!maps.source_maps||maps.baked_base)
+      throw std::invalid_argument("Prepared raw material source requires its actual separate normal-frame resolver");
+    maps.normal_projection->validate(maps.overlay->resolution());
+    if(const auto &baked=maps.overlay->baked();baked&&(baked->normal_interpretation!=BakedNormalInterpretation::PreparedAttributes||baked->normal_field||baked->normal_authority))
+      throw std::invalid_argument("Prepared raw material source has a conflicting retained normal event");
+  }
   const bool float_emission=std::any_of(source.materials.begin(),source.materials.end(),[](const auto &m){return bool(m.resolved_emission);});
   if(float_emission){
     const size_t field=BakedEmissionField::required_bytes(o.resolution,{128*1024*1024,o.cancelled});

@@ -125,5 +125,22 @@
       "sha256": "d1191d252e2e1d99cca99fdfa3afe32dabd19164562fb062445ffb9733fb1b1a",
       "runtime_executed": false
     }
+  },
+  "v2_material_normal_adapter": {
+    "parent_source": "82c73ab9",
+    "prior_failure": "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-release-component-v1-20261115/status.json",
+    "prior_failure_sha256": "396ac62f5494d9b2c5ef48a7b36bb47f86b430da61a646ad5dc57346ff586946",
+    "source_path": "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-source-v2-20261115",
+    "normal_accessor": "SourceNormalPreparationAccess::resolved",
+    "material_channel_source": "Actual SourceMaps+PaintOverlayPacket; normal_projection requires private normal resolver; no legacy baked_base claim.",
+    "fresh_compile_status": "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-proof-v8-20261115/compile-status.json",
+    "fresh_compile_status_sha256": "d452b91563f0fe29cf421f7760300dcf94b4f848408f722d4cc5eea6cfcfbd83",
+    "source_sha256": {
+      "src/emission-bake-source.cpp": "a92975ec5dcf84e50a41cf0c41bc227e7f41e3274cb2178efdd9af9fbf6a0aae",
+      "src/bake.cpp": "80fcc0f47c8dd3b5c700ab0973e27d3d0278de865f10a5f2f36d0af132d79f93",
+      "src/bake-authoring.cpp": "99c050a0f6b9302aa33fb570dd3ec05163c02b4dd5c86d298017be7d5722cae2",
+      "tests/source-prepared-normal-bake.cpp": "5d9d81e936517d64f134513dd35b2ce36aa0e72239641fa60206a57e3d0fc7e2"
+    },
+    "runtime_retry_executed": false
   }
 }
