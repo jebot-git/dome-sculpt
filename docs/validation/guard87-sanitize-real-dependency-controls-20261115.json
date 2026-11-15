@@ -1,0 +1,81 @@
+{
+  "scope": "Six admission-helper controls using a REAL freshly compiled tiny C object and actual -MD/-MF depfile, no linked app or graphics; not final87 qualification.",
+  "compiler_argv": [
+    "/usr/bin/cc",
+    "-MD",
+    "-MF",
+    "control.o.d",
+    "-MT",
+    "control.o",
+    "-I",
+    "/home/blux/de-xr/dome-sculpt/artifacts/guard87-final-owning-sanitize-plan-20261115/dependency-controls-v5/alias",
+    "-I",
+    "/home/blux/de-xr/dome-sculpt/artifacts/guard87-final-owning-sanitize-plan-20261115/dependency-controls-v5/generated",
+    "-O1",
+    "-fsanitize=address,undefined",
+    "-c",
+    "/home/blux/de-xr/dome-sculpt/artifacts/guard87-final-owning-sanitize-plan-20261115/dependency-controls-v5/control.c",
+    "-o",
+    "control.o"
+  ],
+  "compiler_exit": 0,
+  "actual_depfile_sha256": "21ae4cca4012b61f2b654132bf1fa737eb5e816bb3747b5388a7cd2a91c10d33",
+  "prebuild_expected_pins": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/guard87-final-owning-sanitize-plan-20261115/dependency-controls-v5/control.c": "004a3c2a16cdde4b779413a6813c4427a1bf6954f90d532fd0a625214490516b",
+    "/home/blux/de-xr/dome-sculpt/artifacts/guard87-final-owning-sanitize-plan-20261115/dependency-controls-v5/include/control.h": "639949311999166588ec71253a26baa21d4efc2136594cafcf2cb7ff85ddbdc3",
+    "/usr/include/stdc-predef.h": "383ff8bd7dcc87deefedd062637f4afe28f85f8be443beda8b41d15e45ef1679"
+  },
+  "steps": [
+    {
+      "name": "actual-symlink-and-owned-generated",
+      "actual": "passed",
+      "expected": "passed",
+      "detail": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-final-owning-sanitize-plan-20261115/dependency-controls-v5/logs/actual-symlink-and-owned-generated/actual-fresh-dependencies.json",
+        "sha256": "eda71372bf57ed9662012b9a37bd793a0de9523497ba0e7efbc70f37201185b7",
+        "owners": 1,
+        "dependency_incidences": 4,
+        "unique_resolved_dependencies": 4,
+        "errors": 0
+      }
+    },
+    {
+      "name": "unpinned-actual-header",
+      "actual": "rejected",
+      "expected": "rejected",
+      "detail": "AssertionError(('Fresh actual depfile audit failed', {'path': '/home/blux/de-xr/dome-sculpt/artifacts/guard87-final-owning-sanitize-plan-20261115/dependency-controls-v5/logs/unpinned-actual-header/actual-fresh-dependencies.json', 'sha256': 'becbb2d15d27cb488c3541490115f287d5db6ebdf8675b8e22f94e7e013f180a', 'owners': 1, 'dependency_incidences': 4, 'unique_resolved_dependencies': 4, 'errors': 1}, [{'owner': 'control.o', 'path': '/home/blux/de-xr/dome-sculpt/artifacts/guard87-final-owning-sanitize-plan-20261115/dependency-controls-v5/alias/control.h', 'resolved': '/home/blux/de-xr/dome-sculpt/artifacts/guard87-final-owning-sanitize-plan-20261115/dependency-controls-v5/include/control.h', 'error': 'Actual fresh dependency was not pre-pinned or an owned generator'}]))"
+    },
+    {
+      "name": "changed-actual-header",
+      "actual": "rejected",
+      "expected": "rejected",
+      "detail": "AssertionError(('Fresh actual depfile audit failed', {'path': '/home/blux/de-xr/dome-sculpt/artifacts/guard87-final-owning-sanitize-plan-20261115/dependency-controls-v5/logs/changed-actual-header/actual-fresh-dependencies.json', 'sha256': 'f067edf2f41e06b9523c1388440117542fc15b3ca93d3d3c49276e1d683df419', 'owners': 1, 'dependency_incidences': 4, 'unique_resolved_dependencies': 4, 'errors': 1}, [{'owner': 'control.o', 'path': '/home/blux/de-xr/dome-sculpt/artifacts/guard87-final-owning-sanitize-plan-20261115/dependency-controls-v5/alias/control.h', 'resolved': '/home/blux/de-xr/dome-sculpt/artifacts/guard87-final-owning-sanitize-plan-20261115/dependency-controls-v5/include/control.h', 'error': 'Actual fresh dependency missing or changed from prebuild expectation'}]))"
+    },
+    {
+      "name": "changed-owned-generator",
+      "actual": "rejected",
+      "expected": "rejected",
+      "detail": "AssertionError(('Fresh actual depfile audit failed', {'path': '/home/blux/de-xr/dome-sculpt/artifacts/guard87-final-owning-sanitize-plan-20261115/dependency-controls-v5/logs/changed-owned-generator/actual-fresh-dependencies.json', 'sha256': '517ca0433779823c0c5d1c9b5a0144e2ddabfa69de9d9a21dcc2bd317bdc5f91', 'owners': 1, 'dependency_incidences': 4, 'unique_resolved_dependencies': 4, 'errors': 1}, [{'owner': 'control.o', 'path': '/home/blux/de-xr/dome-sculpt/artifacts/guard87-final-owning-sanitize-plan-20261115/dependency-controls-v5/generated/generated.h', 'resolved': '/home/blux/de-xr/dome-sculpt/artifacts/guard87-final-owning-sanitize-plan-20261115/dependency-controls-v5/generated/generated.h', 'error': 'Actual fresh dependency missing or changed from prebuild expectation'}]))"
+    },
+    {
+      "name": "wrong-actual-owner",
+      "actual": "rejected",
+      "expected": "rejected",
+      "detail": "AssertionError(('Actual depfile target mismatch', 'control.o', ['other.o']))"
+    },
+    {
+      "name": "restored-real-witness",
+      "actual": "passed",
+      "expected": "passed",
+      "detail": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-final-owning-sanitize-plan-20261115/dependency-controls-v5/logs/restored-real-witness/actual-fresh-dependencies.json",
+        "sha256": "eda71372bf57ed9662012b9a37bd793a0de9523497ba0e7efbc70f37201185b7",
+        "owners": 1,
+        "dependency_incidences": 4,
+        "unique_resolved_dependencies": 4,
+        "errors": 0
+      }
+    }
+  ],
+  "exit": 0
+}
