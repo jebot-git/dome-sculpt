@@ -1,0 +1,239 @@
+{
+  "schema": 1,
+  "state": "prepared-NOT-staged-NOT-linked",
+  "scope": "Additive App1bc application-component trial for public-UI/XR test development. Not whole-owning0ae/native90, main/runtime/install admission or replacement of planned whole90. All sources/frozen providers untouched; no project binary/ldd invoked in preparation.",
+  "scope_tuple": {
+    "application_product": "1bc13125",
+    "unchanged_component_context": "3d164382",
+    "literal_asset_context": "3d164382"
+  },
+  "plan": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/app1bc-public-component-link-20261115/plan-v3.json",
+    "sha256": "7935daa0e064eb9656fa90a63de567742dbb430a21615ef4cdac1f068aeaff3c"
+  },
+  "producer": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/app1bc-public-component-link-20261115/produce-link-v1.py",
+    "sha256": "2f2a46484b925c7d4cd3038a5da3b46c3a6aefeb2462c636270fa99e150074d2",
+    "syntax_only_NOT_executed": true
+  },
+  "actual_readonly_tools": {
+    "prepare_v1": {
+      "tool": 75929,
+      "exit": 1,
+      "cause": "Strict inherited source census found3 later documentary updates; no stage/link performed"
+    },
+    "prepare_v2": {
+      "tool": 85768,
+      "exit": 0,
+      "pins": 41812
+    },
+    "doc_role_refinement": {
+      "tool": 42541,
+      "exit": 0,
+      "final_pins": 41815,
+      "unique_deltas": 3,
+      "genuine_rosters_checked": 12
+    }
+  },
+  "summary": {
+    "whole_app_UI_objects": 27,
+    "ordered_unique_archives": 14,
+    "core_members": 193,
+    "core_unchanged_members": 190,
+    "genuine_replacement_compile_owners": 3,
+    "other_archive_owners": 22,
+    "total_complete_owner_members": 242,
+    "fresh_complete_app_links": 1,
+    "old_executables_reused": 0,
+    "new_compilations": 0
+  },
+  "interface_proof": {
+    "exact_shared_existing_ABI_headers": 435,
+    "product_body_delta": [
+      "src/bake-authoring.cpp",
+      "src/bake.cpp",
+      "src/emission-bake-source.cpp",
+      "src/source-bake-normal.hpp"
+    ],
+    "scope": "Actual unchanged existing header/shader/packet/wire/body hashes and same current codegen/literal defines. No fabricated binary layout or runtime ABI test."
+  },
+  "changed_owner_dependency_scope": {
+    "actual_user_MMD_counts": {
+      "bake-authoring.cpp.o": 72,
+      "bake.cpp.o": 34,
+      "emission-bake-source.cpp.o": 49
+    },
+    "separate_complete_M_preprocess_counts": {
+      "bake-authoring.cpp.o": 422,
+      "bake.cpp.o": 381,
+      "emission-bake-source.cpp.o": 399
+    },
+    "not_called_true_full_actual_MD": true,
+    "inherited_compile_CWD_not_recorded": true,
+    "all_actual_arguments_and_dependency_names_absolute": true,
+    "final_owning90_true_mixed_MD_requirement_retained": true
+  },
+  "original_core_creation": {
+    "overall_exit": 1,
+    "archive_fixed_exit": 0,
+    "index_fixed_exit": 0,
+    "qualified_same_exact_core_later": true,
+    "status_sha256": "8ce2cb759742045cf4ba837e3b671d5a2d28a8dedbdb51b135c3f4699f26e8fb"
+  },
+  "documentation_drift": [
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-source-v2-20261115/docs/ARTIST-PREPARED-SOURCE-DRAFT-20261115.md",
+      "historical_expected": "d8ddae6385c32bd4178011b3d033cb1dcfe1d717f27a8d3159ee0fd8913190f9",
+      "current_actual": "479ff472dc69d082cb295747b02962ada96919ddc7bdc9c57ab2c4eb10e6156b",
+      "actual_compiler_MMD_and_preprocessor_M_rosters_checked": 12,
+      "outside_all_actual_compiler_preprocessor_link_generator_argv": true,
+      "outside_tools_sources_and_generated_input_roles": true,
+      "historical_census_expected_pin_kept_unchanged": true,
+      "current_document_pin_separate": true
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-source-v2-20261115/docs/validation/ARTIST-PREPARED-SOURCE-DRAFT-20261115.json",
+      "historical_expected": "28d7cef5009633e8522957dcaee1f9f63e8eeac6a2a093e69b78fbd74d0a0afa",
+      "current_actual": "1139509f74491a2690859c081d65732ad49dec43575008c5e558fc8c75ec8ead",
+      "actual_compiler_MMD_and_preprocessor_M_rosters_checked": 12,
+      "outside_all_actual_compiler_preprocessor_link_generator_argv": true,
+      "outside_tools_sources_and_generated_input_roles": true,
+      "historical_census_expected_pin_kept_unchanged": true,
+      "current_document_pin_separate": true
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-source-v3-20261115/docs/ARTIST-PREPARED-SOURCE-DRAFT-20261115.md",
+      "historical_expected": "479ff472dc69d082cb295747b02962ada96919ddc7bdc9c57ab2c4eb10e6156b",
+      "current_actual": "1492f803a39a363fc7bd35690940285fd4da771f2df5f2bddc9d0f5d10bc4734",
+      "actual_compiler_MMD_and_preprocessor_M_rosters_checked": 12,
+      "outside_all_actual_compiler_preprocessor_link_generator_argv": true,
+      "outside_tools_sources_and_generated_input_roles": true,
+      "historical_census_expected_pin_kept_unchanged": true,
+      "current_document_pin_separate": true
+    }
+  ],
+  "command_verbatim_old_actual": true,
+  "actual_old_linker_roster_entries": 174,
+  "old_ELF_NEEDED_count": 45,
+  "old_RUNPATH": [
+    "/home/blux/de-xr/dome-sculpt/artifacts/sdk-20261111/toolkit-release/lib:/opt/fltk-vr/bdf-runtime/lib:"
+  ],
+  "new_ELF_NEEDED_RUNPATH_comparison_required_after_link": true,
+  "current_new_loader_admission": false,
+  "actual_new_executables_created": 0,
+  "actual_stage_actions": 0,
+  "no_project_ldd_or_app_invocation": true,
+  "source_frozen3d_untouched": true,
+  "not_final_whole0ae_native90_or_main_admission": true,
+  "remaining": [
+    "Root exact plan/producer review before any staged input or fresh link",
+    "Actual fresh linker174-provider audit/output SHA and NEEDED/RUNPATH comparison",
+    "Separately coordinated current product loader admission",
+    "Actual public GUI/XR first/second Bake/Save/history tests",
+    "Final source freeze and full native90 owning cohort/full original production scope"
+  ],
+  "files": {
+    "prepare-link-v1.py": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/app1bc-public-component-link-20261115/prepare-link-v1.py",
+      "raw_sha256": "2d04ddd56f6c540d41a17874a848926d2e1ad0057c4c4ff7b62c2004060b364f",
+      "sha256": "2d04ddd56f6c540d41a17874a848926d2e1ad0057c4c4ff7b62c2004060b364f",
+      "bytes": 12968
+    },
+    "prepare-link-v2.py": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/app1bc-public-component-link-20261115/prepare-link-v2.py",
+      "raw_sha256": "4c8a0881488e6eddfe949d7bff5176f548b2771fcbc8d76f4edf4f3877de2814",
+      "sha256": "4c8a0881488e6eddfe949d7bff5176f548b2771fcbc8d76f4edf4f3877de2814",
+      "bytes": 14429
+    },
+    "bind-documentation-roles-v1.py": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/app1bc-public-component-link-20261115/bind-documentation-roles-v1.py",
+      "raw_sha256": "bad0983d37ec963b099509397116c266d68050af72322b19bf98cee4763f5a2c",
+      "sha256": "bad0983d37ec963b099509397116c266d68050af72322b19bf98cee4763f5a2c",
+      "bytes": 4580
+    },
+    "produce-link-v1.py": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/app1bc-public-component-link-20261115/produce-link-v1.py",
+      "raw_sha256": "2f2a46484b925c7d4cd3038a5da3b46c3a6aefeb2462c636270fa99e150074d2",
+      "sha256": "2f2a46484b925c7d4cd3038a5da3b46c3a6aefeb2462c636270fa99e150074d2",
+      "bytes": 6550
+    },
+    "component_link_common.py": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/app1bc-public-component-link-20261115/component_link_common.py",
+      "raw_sha256": "a5b148cbd6a5e5add36143a0ec281e7c71acc4bafb90b2ac3eb110a4084ddbb4",
+      "sha256": "a5b148cbd6a5e5add36143a0ec281e7c71acc4bafb90b2ac3eb110a4084ddbb4",
+      "bytes": 2192
+    },
+    "ninja_audit.py": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/app1bc-public-component-link-20261115/ninja_audit.py",
+      "raw_sha256": "7aa092c80d1632e6d8a6e68d53c478939911528ff19e34163c09e1d26fd5a264",
+      "sha256": "7aa092c80d1632e6d8a6e68d53c478939911528ff19e34163c09e1d26fd5a264",
+      "bytes": 2986
+    },
+    "owned_monitor_v2.py": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/app1bc-public-component-link-20261115/owned_monitor_v2.py",
+      "raw_sha256": "b510ef5655e3214bd38e7b5f56022c37a79879070c3733f2dd059bad74f21269",
+      "sha256": "b510ef5655e3214bd38e7b5f56022c37a79879070c3733f2dd059bad74f21269",
+      "bytes": 4859
+    },
+    "plan-v2.json.gz": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/app1bc-public-component-link-20261115/plan-v2.json",
+      "raw_sha256": "8a64e5661abe4b9cd505033637ec1df208a34adec8eb9fff378b61fbc568319e",
+      "sha256": "270fa7c08e9e9972c1a2cc0e1b2198d0b0a4a2119895d7e6148f621879f41626",
+      "bytes": 2837925
+    },
+    "plan-v3.json.gz": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/app1bc-public-component-link-20261115/plan-v3.json",
+      "raw_sha256": "7935daa0e064eb9656fa90a63de567742dbb430a21615ef4cdac1f068aeaff3c",
+      "sha256": "663bb0a400f02fcb2dd8bdf1a36b1358aa99f95d8aac1f40a3307cc6bad258e7",
+      "bytes": 2838319
+    },
+    "documentation-role-certificate-v1.json.gz": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/app1bc-public-component-link-20261115/documentation-role-certificate-v1.json",
+      "raw_sha256": "3bf5017d8d096f4fee4448dfb8531c057998644fb650c9120242faf3efbe672c",
+      "sha256": "010b363025dd3a0cecc81301be645714b916191b1352dead80cd9bcd47c7f3f4",
+      "bytes": 9712
+    },
+    "native-qualification-v2.json.gz": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/app1bc-public-component-link-20261115/native-qualification-v2.json",
+      "raw_sha256": "207244e7ce3f3f2ed65a9b03e4c76d965d8b54433e2e91c933b1db9f84f6e930",
+      "sha256": "ffa4567f940bcb38169236a806237223e09289743f7cce07ffd5a6dde644f407",
+      "bytes": 4491
+    },
+    "graphics-qualification-v2.json.gz": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/app1bc-public-component-link-20261115/graphics-qualification-v2.json",
+      "raw_sha256": "c2b02faf88b4e31a379ee55fa094af6f6d6ebd80060b7227bf6efb5eda5a287a",
+      "sha256": "ec9122f1bb9e7cb9483ac692780e88a8b0afa08155fad61cd2cf8c5bf937c420",
+      "bytes": 50946
+    },
+    "legacy-compile-input-drift-v1.json.gz": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/app1bc-public-component-link-20261115/legacy-compile-input-drift-v1.json",
+      "raw_sha256": "23488a883324159fa573fdce84a3ead43c98e27d015e2514f534dff5fd22a5db",
+      "sha256": "96c7467542a68cd20871df4f9617a9146303f017556b3b3eb23dfc6047a46fc3",
+      "bytes": 629
+    },
+    "prepare-v1.log.gz": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/app1bc-public-component-link-20261115/prepare-v1.log",
+      "raw_sha256": "68e49ddd53c6de78b02692b6778109247362d0f37d92a0d6a2df3fdab7d2910b",
+      "sha256": "04050867b7da037f9507b8fce047589588b7216d6551f32d41a4156dc5ce98fd",
+      "bytes": 437
+    },
+    "prepare-v2.log.gz": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/app1bc-public-component-link-20261115/prepare-v2.log",
+      "raw_sha256": "b34ff3d1c9d37c3c55d01cfaac3ce2bf6337c88057ea712c3090327b5c03f74c",
+      "sha256": "2e40fd9c5be6180891525025eded8795bd82273d7312155c261ccfc8c66bdcb6",
+      "bytes": 332
+    },
+    "bind-documentation-roles-v1.log.gz": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/app1bc-public-component-link-20261115/bind-documentation-roles-v1.log",
+      "raw_sha256": "47a724fa21d3341444daf8120619f687a3b3dad78f25f154de5874cc9f9df32c",
+      "sha256": "e22b7aee39a942f250a5e9b50be903304a208c0a6c9cceb560753fc7f7902168",
+      "bytes": 430
+    },
+    "prepare-v1-v2-documentary-scope.diff.gz": {
+      "original": "/home/blux/de-xr/dome-sculpt/artifacts/app1bc-public-component-link-20261115/prepare-v1-v2-documentary-scope.diff",
+      "raw_sha256": "f90da58353c0e85e70769d85ceb59d924f90ad5e81ccc2ef69d4073f7822cfd7",
+      "sha256": "661a3c8b1644105c3ddb38138baf77b56c6945b38282d1675fe685245870110d",
+      "bytes": 3546
+    }
+  }
+}
