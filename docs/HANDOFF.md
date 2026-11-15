@@ -1,3 +1,35 @@
+## Independent native components ready; sanitizer whole-job interrupted — 2026-11-15
+
+The goal remains active and incomplete. The Release whole-job12734/driver2212298
+continues unchanged. SAN68704 exited143 unexpectedly after its last538 completed
+TUs/one link/one generator. Its driver2214518, parent shell and both recorded
+compiler groups are confirmed missing. Preserve the stale running JSON as
+historical; it is neither a live job nor a pass. No coordinated cancellation,
+runner deadline or OOM cause was established. A new isolated bounded completion
+plan is being derived from only genuinely completed current-toolchain outputs;
+no uncertain or partial TU may be reused, and original143 is not relabeled.
+
+To unblock component behavior checks, separate archive producers copied only
+complete whole current objects into independent read-only inodes, audited their
+actual compiler dependency records/current source/tool/header/SDK inputs and ran
+the actual relative archive commands in new stage directories. Release215owners
+produce14 archives; SAN214owners produce13 native archives, explicitly excluding
+XR. All ordered member payloads match and drift is zero. These are separate
+component consumers, not the original owning archive actions, zero-reuse whole
+application success or runtime acceptance. The running application tree is
+untouched. See the [component/interruption receipt](validation/guard87-component-and-interruption-20261115.json).
+
+Prepared-normal work has its first actual MT1/rest repeated-Bake positive,
+independent normal decoding and native ordered Save/Undo/Redo pass. The overall
+first run still fails at a genuineUV1 material preview refusal; its next draft
+fails at the unchanged actual raw-map pointer guard. Both failures are retained.
+The implementation is correcting real normal-only/material-source authority
+paths; no positive is removed and no guard is weakened. Remaining MT0/posed,
+UV1, native/history, existing62+19 and strict sanitizer behavior gates remain
+required before admitting that component. Full candidate GUI/XR/device/backend
+qualification and all broader production requirements remain unfinished.
+No system installation, physical headset launch or session restart occurred.
+
 ## Fresh current-toolchain builds running — 2026-11-15
 
 The goal remains active and incomplete. The subsequent compiler audit proved

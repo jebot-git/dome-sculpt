@@ -1,0 +1,31 @@
+{
+  "scope": "Separate native component readiness only; not live owning archives or whole application acceptance.",
+  "source": "3d1643827dd56e1b2ef1d57b8a9c6ff1e4211a2c",
+  "release": {
+    "component_receipt": "/home/blux/de-xr/dome-sculpt/artifacts/current-toolchain-guard87-release-20261115/component-from-current-whole-objects-v1/component-ready.json",
+    "sha256": "41a9d7a6d2318d4841d18d136f80c64c94f3006c7554a3179c8a42192cb01dd2",
+    "compressed": "docs/validation/guard87-release-native-component-ready-20261115.json.gz",
+    "compressed_sha256": "12ef041da560998f10a42430010c3db0f24b70e845364a96eca9097b564012c4",
+    "actual_closed_whole_object_providers": 215,
+    "independent_actual_archives": 14,
+    "genuine_dependency_incidences": 79454,
+    "unique_resolved_dependencies": 1181,
+    "dependency_errors": 0,
+    "source_tool_header_SDK_drift": []
+  },
+  "sanitize": {
+    "component_receipt": "artifacts/guard87-sanitize-native-component-20261115/component-from-current-whole-objects-v1/component-ready.json",
+    "sha256": "5b0968591f822aaecb2b5890514c39dffc0a78b87c45b6f8ae495e8e390ae127",
+    "actual_closed_whole_object_providers": 214,
+    "independent_actual_archives": 13,
+    "XR_excluded": true,
+    "genuine_dependency_incidences": 79030,
+    "unique_resolved_dependencies": 1174,
+    "dependency_errors": 0
+  },
+  "owning_builds": {
+    "release": "Same driver2212298/session12734 still running; no application acceptance.",
+    "sanitize": "Actual session68704 exit143 and driver2214518/parent/recordedcompilers confirmed missing; original stale running status preserved, not pass. No OOM evidence or coordinated cancellation; cause unknown. New isolated bounded completion being derived from only genuinely complete current outputs."
+  },
+  "artist_component": "First actual Release case passes repeated Bake, independent normal directions and ordered Save/Undo/Redo. Overall initial run1 at genuineUV1 PBR preview refusal, next run1 at genuine raw-map pointer guard; both preserved. Proper raw material and normal-only adapters under correction; no full component/application admission."
+}
