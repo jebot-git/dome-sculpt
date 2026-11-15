@@ -1,3 +1,48 @@
+## Current Release native and hardware gates pass; public display repair — 2026-11-15
+
+Frozen source3d finishes all1032 compiler/733 archive-link/3 generator steps;
+the driver seals and prints terminal0 with zero drift in3108.27s. Outer tool
+12734 nevertheless reports143. Both results remain recorded, cause unknown.
+Independent short auditor returns0 after verifying all30961 current inputs,
+1768 outputs and1032 actual compiler dependency files (433074 incidences,0errors),
+source clean and every archive member payload. This separate closed-artifact
+admission is the runtime authority; the outer143 is never relabeled as0.
+
+The admitted current source now passes actual native87/87/noSkip, app version,
+workspace27/373, raw90159, all6 source/producer/font steps, manual software994
+and authenticated Intel Arc994 (A770/03:00.0/renderD129/i915/liveFD). All phases
+return0 with zero drift and lease-before-products. Read
+[admitted Release gates](GUARD87-ADMITTED-RELEASE-GATES-20261115.md) and the
+[closed artifact admission](validation/guard87-release-admission-milestone-20261115.json).
+Independent component archives have identical ordered object/symbol payloads to
+the later owning archives; whole archive SHAs differ in mtime/permission headers.
+They are not described as byte-identical whole archives.
+
+The first public GUI attempt fails before ANY application/check because its
+private Xvfb dependency libselinux.so.1 disappeared from the system. A cached
+package is being verified/extracted into a NEW private test-display closure;
+source, scenarios, assertions, contrast bounds and V3 witness monitor remain
+unchanged. Original failure is preserved. No GUI/XR qualification is claimed.
+
+SAN original68704 remains actual143 with missing driver. Its separate reviewed
+completion runs in transient user service
+`dome-sculpt-sanitize-completion-20261115-v1.service`, invocation9ff470aeee854a2cb5ca8fe967ed1963,
+using538 proved complete CURRENT owners plus494 fresh TUs/all733 links/3generators.
+Original143, uncertain partial outputs and all prior toolchain failures stay
+untouched. Full1032 current dependency/owner provenance and runtime gates remain
+required; this is not a fresh single invocation or completed SAN acceptance.
+
+Separate prepared-normal source work now has Release91 new functional controls
+plus62/19/139/9/856/32 retained scopes passing across explicit continuations,
+including genuine mixedUV1 emission, both MToon modes/rest+posed, independent
+normal consumers and ordered Save/Undo/Redo. Its initial allocation/argument and
+external143 failures remain; finite-only fixture strengthening and properly
+monitored strictSAN gates are next. It remains OUTSIDE frozen3d/main runtime.
+
+The full original authoring/interoperability/device/backend goal remains active
+and incomplete. Controller trays and spatial nodes remain later required phases.
+No installation, physical-HMD launch or active-session restart occurred.
+
 ## Independent native components ready; sanitizer whole-job interrupted — 2026-11-15
 
 The goal remains active and incomplete. The Release whole-job12734/driver2212298
