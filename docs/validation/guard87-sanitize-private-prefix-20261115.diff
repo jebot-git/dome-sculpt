@@ -1,0 +1,53 @@
+--- prepare-v1.py
++++ prepare-v2.py
+@@ -11,6 +11,13 @@
+  if old and old[0]==key:SHA_COUNTS["stable_identity_cache_hits"]+=1;return old[1]
+  value=uncached_sha(p);after=p.stat();assert key==(after.st_dev,after.st_ino,after.st_size,after.st_mtime_ns,after.st_ctime_ns),("Input changed while hashing",str(p));SHA_CACHE[str(p)]=(key,value);SHA_COUNTS["content_hashes"]+=1;return value
+ P=Path(__file__).resolve().parent;R=P.parents[1]
++RELOCATION_PATH=P/'canonical-sdk-relocation-v1.json'
++RELOCATION=json.loads(RELOCATION_PATH.read_text());ALIASES=RELOCATION['mapping']
++assert RELOCATION['historical_manifest_count']==418 and len(ALIASES)==16
++for historical,row in ALIASES.items():
++ assert historical.startswith('/usr/lib64/') and row['current_path']=='/opt/fltk-vr/bdf-runtime/lib/'+Path(historical).name
++ assert sha(row['current_path'])==row['sha256']
++
+ parser=argparse.ArgumentParser(description=__doc__)
+ parser.add_argument('--source',type=Path,required=True)
+ parser.add_argument('--head',required=True)
+@@ -32,7 +39,11 @@
+ def write(path,value):path.write_text(json.dumps(value,indent=2)+'\n')
+ def verified(pins):return[path for path,value in pins.items()if not Path(path).is_file()or sha(path)!=value]
+ def merge(pins,extra):
+- for path,value in extra.items():assert path not in pins or pins[path]==value,('Conflicting expected pin',path);pins[path]=value
++ for path,value in extra.items():
++  if path in ALIASES:
++   row=ALIASES[path];assert value==row['sha256'],('Relocation expected historical payload mismatch',path)
++   path=row['current_path'];assert sha(path)==value,('Relocated canonical payload changed',path)
++  assert path not in pins or pins[path]==value,('Conflicting expected pin',path);pins[path]=value
+ 
+ def tree(source):return{p:sha(source/p)for p in subprocess.check_output(['git','ls-files','-z'],cwd=source,text=True).split('\0')if p}
+ def cc(build):
+@@ -91,9 +102,14 @@
+  merge(pins,owned_whole);current_tree=tree(SOURCE);merge(pins,{str(SOURCE/p):h for p,h in current_tree.items()})
+  for leaf in ['plan.json','run-remainder.py','success-record-outputs.json','archive-member-audit.json','frozen-inputs.json']:
+   pins[str(COMPLETION/leaf)]=sha(COMPLETION/leaf)
++ pins[str(RELOCATION_PATH)]=sha(RELOCATION_PATH)
++ for key in ['historical_sdk_manifest','canonical_manifest','canonical_checker','check_log']:
++  entry=RELOCATION[key];assert sha(entry['path'])==entry['sha256'];pins[entry['path']]=entry['sha256']
++ merge(pins,RELOCATION['effective_current_sdk_pins'])
++ assert not(set(pins)&set(ALIASES)), 'No changed historical system path may remain an executable input pin'
+  assert not verified(pins)
+  flags='-O1 -g1 -DNDEBUG -ffunction-sections -fdata-sections -fsanitize=address,undefined -fno-omit-frame-pointer';configure=['cmake','-G','Ninja','-S',str(SOURCE),'-B',str(DEST),'-DCMAKE_BUILD_TYPE=Release','-DBUILD_TESTING=ON','-DDOME_BUILD_UI=ON','-DDOME_BUILD_XR=ON','-DDOME_COMPUTE_BACKEND=CPU','-DCMAKE_EXPORT_COMPILE_COMMANDS=ON','-DFLTK_DIR='+str(SDK/'share/fltk'),'-DCMAKE_CXX_FLAGS_RELEASE='+flags,'-DCMAKE_EXE_LINKER_FLAGS=-Wl,--gc-sections -fsanitize=address,undefined']
+- env=dict(os.environ,PKG_CONFIG_PATH='/usr/lib64/pkgconfig',LD_LIBRARY_PATH=str(SDK/'lib')+':/usr/lib64')
++ env=dict(os.environ,PKG_CONFIG_PATH='/opt/fltk-vr/bdf-runtime/lib/pkgconfig:/usr/lib64/pkgconfig',LD_LIBRARY_PATH=str(SDK/'lib')+':/opt/fltk-vr/bdf-runtime/lib:/usr/lib64')
+  for key in ['ASAN_OPTIONS','UBSAN_OPTIONS','LSAN_OPTIONS','LD_PRELOAD']:env.pop(key,None)
+  env.update(ASAN_OPTIONS='detect_leaks=1:halt_on_error=1:abort_on_error=1',UBSAN_OPTIONS='halt_on_error=1:print_stacktrace=1')
+  with(AUDIT/'configure.log').open('w')as log:subprocess.run(configure,env=env,stdout=log,stderr=subprocess.STDOUT,check=True,timeout=180)
+@@ -252,6 +268,7 @@
+  assert not verified(pins)
+  summary={'configured_TUs':len(objects),'fresh_complete_TUs':sum(row['route']=='compile-complete-TU'for row in objects.values()),'reused_whole_objects':sum(row['route']!='compile-complete-TU'for row in objects.values()),'all_configured_link_archive_nodes':len(links),'fresh_links_archives':sum(row['route']=='fresh-current-link'for row in links.values()),'retained_whole_products':sum(row['route']!='fresh-current-link'for row in links.values()),'mandatory_fresh_owning_targets':len(required),'selected_CTests':len(selected),'additional_manual_source_render_gate':1}
+  result={'state':'audited-NOT-compiled','source':HEAD,'source_path':str(SOURCE),'profile':'sanitize','destination':str(DEST),'scope':'Whole configured owner/consumer closure from actual Ninja dependencies and exact options. Whole-object/provider reuse is explicit; all changed public/private/body/flag owners and every affected consumer freshly compile/link; mandatory app/runtimes/font/bothproducers/exact selected native cohort/workspaces/manual source renderer freshly link. Not a zero-object whole fresh build.','baseline_status':str(status),'baseline_original_failed_invocation_preserved':{'exit':1,'build_exit':124,'build_deadline_seconds':7200},'authenticated_bounded_completion_status':str(completion_status),'authenticated_bounded_completion_status_sha256':sha(completion_status),'additional_completed_SAN_provider':{'plan':str(PROVIDER_PLAN),'plan_sha256':sha(PROVIDER_PLAN),'status':str(PROVIDER_STATUS),'status_sha256':sha(PROVIDER_STATUS),'source':provider_state['source'],'outputs':str(provider_outputs),'outputs_sha256':sha(provider_outputs),'eligibility':'Only actualcc5SAN whole-byte/compiler/dependency equivalent objects/products may reuse without a fresh current TU/link. Fresh5cobjects lacking actualNinja dependency records are conservatively rebuilt; no synthetic deps record.'},'baseline_graph':str(OLD),'baseline_provider':str(PROVIDER),'baseline_source':baseline['source'],'summary':summary,'changed_project_paths':changed,'source_prefix_proof':{'normalized_only_non_D_path_arguments':True,'every_literal_D_preserved':True,'asset_trees_byteidentical':assets_identical,'asset_files':len(new_assets),'whole_source_inputs_pinned':True,'system_external_proof_scope':'CanonicalSDK inputs authenticated to baseline pins; other system/compiler headers must be Ninja VALID and not newer than old objects, with current hashes pinned. Historical content hashes are not invented.'},'selected_CTests':selected,'selected_commands':{name:tests[name]for name in selected},'required_targets':sorted(required),'objects':objects,'links':links,'generated_outputs':generators,'generated_dependency_audit':{'path':str(AUDIT/'generated-prerequisite-audit.json'),'sha256':sha(AUDIT/'generated-prerequisite-audit.json')},'archive_proofs':archives,'external_dependencies':external,'pins':pins,'allocation_forecast':{'whole_object_stage_bytes':sum((PROVIDER/name).stat().st_size for name,row in objects.items()if row['route']!='compile-complete-TU'),'all_provider_bytes':sum(Path(path).stat().st_size for path in owned_whole),'forecast_not_actual':True},'content_hash_cache_policy':'One observed SHA per stable dev/inode/size/mtime/ctime tuple; every verification restats the complete tuple, changed tuples rehash. This avoids repeated unchanged multi-hundred-GB snapshot loops without accepting changed bytes.','hash_cache_counts':dict(SHA_COUNTS),'compile_link_authorization_required_before_launch':True,'invocation':vars(args)|{'source':str(args.source),'cohort_manifest':str(args.cohort_manifest)},'native_gate_policy':'After coherent links, exact selected native tests actualPassed/noSkip plus workspace27/373/rawUV1worker/current strong joint Source8 visible/Polygon fixture may execute. Manual source-render software+Arc is additional, not an extra CTest.','public_runtime_policy':'No public GUI/XR before native/genuine currentproducer/font/input/provider gates and explicit commonArc lease.'}
++ result['current_bitmap_runtime_boundary']={'path':str(RELOCATION_PATH),'sha256':sha(RELOCATION_PATH),'effective_prefix':'/opt/fltk-vr/bdf-runtime','relocated_exact_payloads':16,'original_historical_receipts_unchanged':True,'command_policy':'Actual canonical include/link paths are compared literally and force complete owner/consumer recompilation when different; historical DSOs are not substitutes for compile-option equivalence.'}
+  from san_boundaries import supplement
+  supplement(result,pins,SOURCE,HEAD,OLD,PROVIDER,DEST,SDK,new_nodes,old_nodes,objects,links,generators,AUDIT,sha)
+  assert not verified(pins)

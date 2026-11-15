@@ -1,0 +1,8 @@
+{
+  "libfreetype.so.6": "/opt/fltk-vr/bdf-runtime/lib/libfreetype.so.6.20.6",
+  "libcairo.so.2": "/opt/fltk-vr/bdf-runtime/lib/libcairo.so.2.11804.4",
+  "libharfbuzz.so.0": "/opt/fltk-vr/bdf-runtime/lib/libharfbuzz.so.0.61410.0",
+  "libpango-1.0.so.0": "/opt/fltk-vr/bdf-runtime/lib/libpango-1.0.so.0.5701.0",
+  "libpangoft2-1.0.so.0": "/opt/fltk-vr/bdf-runtime/lib/libpangoft2-1.0.so.0.5701.0",
+  "libpangocairo-1.0.so.0": "/opt/fltk-vr/bdf-runtime/lib/libpangocairo-1.0.so.0.5701.0"
+}
