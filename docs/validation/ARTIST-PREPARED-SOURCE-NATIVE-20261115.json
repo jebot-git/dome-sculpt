@@ -1,0 +1,235 @@
+{
+  "schema": 1,
+  "source": "1740fb9d",
+  "product_source": "1bc13125",
+  "scope": "Current compiler optimized Release and strict ASAN/UBSAN/leak native COMPONENT qualification, not whole app/graphics/device acceptance. Genuine ordinaryv1 normal-prepared source reuse under unchanged UV.",
+  "source_hashes": {
+    "src/bake-authoring.cpp": "99c050a0f6b9302aa33fb570dd3ec05163c02b4dd5c86d298017be7d5722cae2",
+    "src/bake.cpp": "fc183cf3523bfd95e2e63369c83fb1ea415258ce5a0e2b9182c8db5bb85eaae5",
+    "src/emission-bake-source.cpp": "311f7abcb905ce5e8202b67c4825fadf780ab6c5a0d7cd574135f0bf7f09f251",
+    "src/source-bake-normal.hpp": "29a343f01a154cfa9d1e8df859f44074e1b9d269e2fddeeac1eaa6d7034545a9",
+    "tests/source-prepared-normal-bake.cpp": "0aa1fe71a3f2f3ca03eb8826629aae7c064ffd745267a7ec8387e366778d7c71"
+  },
+  "product_delta_from3d": [
+    "src/bake-authoring.cpp",
+    "src/bake.cpp",
+    "src/emission-bake-source.cpp",
+    "src/source-bake-normal.hpp"
+  ],
+  "public_headers_shaders_packets_native_wires_unchanged": true,
+  "finite_test_only_followup": {
+    "source": "1740fb9d",
+    "delta": "Reject nonfinite actual/expected vectors, UV/image coordinates and emission error samples before error reduction; bounds/count unchanged."
+  },
+  "actual_checks": {
+    "finite-release": {
+      "count": 91,
+      "exit": 0,
+      "seconds": 0.3610649108886719,
+      "peak_owned_RSS_bytes": 26517504,
+      "peak_observed_virtual_bytes": 719073280,
+      "monitor_samples": 35,
+      "log_file": "validation/artist-prepared-native-20261115/finite-release.log.gz",
+      "log_sha256": "c4722d404253518457ccdecace1a2632d69e40d40f4e5586799bd4a41e5d5450",
+      "compressed_sha256": "d1531d57264c0dc34c093d2df4f9f19c0be561eca646ebfefaedc3548fd85618"
+    },
+    "finite-sanitize": {
+      "count": 91,
+      "exit": 0,
+      "seconds": 2.8513097763061523,
+      "peak_owned_RSS_bytes": 1474207744,
+      "peak_observed_virtual_bytes": 21990929199104,
+      "monitor_samples": 270,
+      "log_file": "validation/artist-prepared-native-20261115/finite-sanitize.log.gz",
+      "log_sha256": "c4722d404253518457ccdecace1a2632d69e40d40f4e5586799bd4a41e5d5450",
+      "compressed_sha256": "d1531d57264c0dc34c093d2df4f9f19c0be561eca646ebfefaedc3548fd85618"
+    },
+    "strict-missing62": {
+      "count": 62,
+      "exit": 0,
+      "seconds": 0.8369956016540527,
+      "peak_owned_RSS_bytes": 957087744,
+      "peak_observed_virtual_bytes": 21990885814272,
+      "monitor_samples": 80,
+      "log_file": "validation/artist-prepared-native-20261115/strict-missing62.log.gz",
+      "log_sha256": "675141d6a71469d21d3d2517f2352ea042e77e01f49e2a09ba92c13d06072166",
+      "compressed_sha256": "fb1b0ea20af8048d7b42e34fe998542746d903e6c2a58dc89ea7eef02fcd9b58"
+    },
+    "strict-domain19": {
+      "count": 19,
+      "exit": 0,
+      "seconds": 0.3506340980529785,
+      "peak_owned_RSS_bytes": 855187456,
+      "peak_observed_virtual_bytes": 21990877392896,
+      "monitor_samples": 34,
+      "log_file": "validation/artist-prepared-native-20261115/strict-domain19.log.gz",
+      "log_sha256": "48c4715c2aae90bd58cbd09c1cbaea7f8c4763cae98a647f5fdf230df28cf633",
+      "compressed_sha256": "0ee462137a9fd6995e83a5f7949577345ca52d86cff3e981d8fe9f99fe45f739"
+    },
+    "strict-artist139": {
+      "count": 139,
+      "exit": 0,
+      "seconds": 1.4021966457366943,
+      "peak_owned_RSS_bytes": 1162321920,
+      "peak_observed_virtual_bytes": 21991100055552,
+      "monitor_samples": 134,
+      "log_file": "validation/artist-prepared-native-20261115/strict-artist139.log.gz",
+      "log_sha256": "71b3208587cdccece1dfea87994ccd234d5884e97946dfc99e79f62c81736d65",
+      "compressed_sha256": "6b7a7089d7a1faad7e6e4e34079d49ecb2a01e1f3da823ddb0d95e43ca4fd4ff"
+    },
+    "strict-role9": {
+      "count": 9,
+      "exit": 0,
+      "seconds": 0.2122952938079834,
+      "peak_owned_RSS_bytes": 832086016,
+      "peak_observed_virtual_bytes": 21990782869504,
+      "monitor_samples": 21,
+      "log_file": "validation/artist-prepared-native-20261115/strict-role9.log.gz",
+      "log_sha256": "76b8f9f988b11d14316c3552cfb751dcf3e86d1f2c0612396fe4683224180bfa",
+      "compressed_sha256": "0e6ca7453b8fb4647dc40338d76c7baf2d7b6307bd4398a963cce2419750a434"
+    },
+    "strict-cc0856": {
+      "count": 856,
+      "exit": 0,
+      "seconds": 21.656448364257812,
+      "peak_owned_RSS_bytes": 2360459264,
+      "peak_observed_virtual_bytes": 21991317123072,
+      "monitor_samples": 2075,
+      "log_file": "validation/artist-prepared-native-20261115/strict-cc0856.log.gz",
+      "log_sha256": "72b4bce1dd803df58019a8e4435367c8c16ff5a8595e790d0078c9fd2a758b1b",
+      "compressed_sha256": "7882b86af8e8e0f0e233a047a456e7002d8df4d3c3b7ba21436eb258439c2beb"
+    },
+    "strict-cc0bake32": {
+      "count": 32,
+      "exit": 0,
+      "seconds": 99.51006078720093,
+      "peak_owned_RSS_bytes": 2855993344,
+      "peak_observed_virtual_bytes": 21992447221760,
+      "monitor_samples": 9467,
+      "log_file": "validation/artist-prepared-native-20261115/strict-cc0bake32.log.gz",
+      "log_sha256": "c3aa1e2808e7720fa211f09baceb75537b5ce0748f2f3b8a781b35961184b4d6",
+      "compressed_sha256": "596322d13715a3f91edcb226170bf909d908510301a2993a30474a162246d545"
+    }
+  },
+  "strict_environment": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+    "LSAN_OPTIONS": null,
+    "LD_PRELOAD": null
+  },
+  "provider_contexts": {
+    "release": {
+      "objects": 215,
+      "archives": 14,
+      "receipt_sha256": "41a9d7a6d2318d4841d18d136f80c64c94f3006c7554a3179c8a42192cb01dd2"
+    },
+    "strictSAN": {
+      "objects": 214,
+      "archives": 13,
+      "XR_excluded": true,
+      "receipt_sha256": "5b0968591f822aaecb2b5890514c39dffc0a78b87c45b6f8ae495e8e390ae127"
+    },
+    "scope": "Actual closed complete current-toolchain objects, genuine compiler deps/current source/tool/SDK pins, independent readonly snapshots and actual archive commands/memberpayload/order. No old compiler archive. Not live owning archive actions or full application acceptance.",
+    "modified_current_core_members": 3,
+    "unchanged_core_members": 190,
+    "total_core_members": 193
+  },
+  "resource_monitor": {
+    "source": "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-strict-monitor-20261115/owned_monitor_v2.py",
+    "controls": "Actual tinyRSS-triggered own process termination, normal completion and timeout; independent control/driver exact identities preserved.",
+    "runtime_budget_RSS_bytes": 8589934592,
+    "per_step_seconds": 900,
+    "virtual_AS_cap": null,
+    "max_owned_RSS_bytes": 3041177600,
+    "max_observed_virtual_bytes": 21992447221760,
+    "unit_MemoryPeak_bytes": 3712765952,
+    "unit_MemoryMax_bytes": 8589934592
+  },
+  "actual_unit": {
+    "name": "ds-artist-strict-v2-20261115.service",
+    "Type": "exec",
+    "ExecMainPID": 2806514,
+    "ExecMainStatus": 0,
+    "Result": "success",
+    "MainPID_at_closed_audit": 0,
+    "terminal_state": "active/exited; then only this finished transient unit stopped, inactive",
+    "RuntimeMaxSec": 2400,
+    "OOMPolicy": "continue"
+  },
+  "lease": {
+    "path": "/tmp/dome-sculpt-arc-device.lock",
+    "owner_pid": 2806514,
+    "acquired_epoch": 1794760755.732404,
+    "before_any_built_product": true,
+    "released_epoch": 1794760882.9373107
+  },
+  "input_drift": [],
+  "external_signals": [],
+  "live_native_handles": [],
+  "preserved_failures": [
+    "Source82 alternateUV material-compositing failure",
+    "Source95 fabricatedemptySourceMaps/overlay owner mismatch",
+    "Required19case argvmissing harness failure",
+    "UnchangedCC0Bake32 with2GiB virtualAS cap bad_alloc (separate exactsamebinary actualRSSbounded run passes)",
+    "StrictSANv1 driver+lastchild absent with actualtool143 and stalestatus preserved; intendedRSSmonitor replacement didnotmatch indentation and was absent; no resource-budget qualification inferred. Cause143 unknown, no own signalbranch executed."
+  ],
+  "remaining": [
+    "Graphical originalartist/imported/CC0 and actual repeated-Bake prepared target independent consumers with full correct/omitted/wrong PNG/RGB evidence",
+    "v2/reprojected/retained normal+material coordinate authority adapters",
+    "Native32/canonical/independent currentnormal field/owning-source-pose adapters",
+    "Whole application integration and full original REQUIREMENTS/device/backend scope"
+  ],
+  "full_goal_complete": false,
+  "records": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-strict-native-service-v2-20261115/status.json": {
+      "sha256": "5ef187616d853df3ef1a35af83bafcc4f743bc3d40918b068dbea16fa862e2e4",
+      "compressed": "validation/artist-prepared-native-20261115/status.json.gz",
+      "compressed_sha256": "c425fb68b6072cbdcfac2c4f3317290b335c235beb1b1d62f39b8f0baf82422b"
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-strict-native-service-v2-20261115/verified-terminal-summary.json": {
+      "sha256": "2572aac95b4d014905d66241ac3ade51734e5dc50764f1742d26b80e03d92e71",
+      "compressed": "validation/artist-prepared-native-20261115/verified-terminal-summary.json.gz",
+      "compressed_sha256": "ec639b6bf3bfa06d96b3400cf10dd848b0bc9769093588881f52d66a17b92a30"
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-strict-native-service-v2-20261115/unit-terminal-before-stop.txt": {
+      "sha256": "a370357609ea0c1dd94030d03741e1c42e9ca48adad06d9e07d0304912a1cd20",
+      "compressed": "validation/artist-prepared-native-20261115/unit-terminal-before-stop.txt.gz",
+      "compressed_sha256": "8d701762ba4e99a8adb84d439034fcc6220188a8e22da9305447bbdb933eb509"
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-strict-native-service-v2-20261115/run-strict-service-v2.py": {
+      "sha256": "12beef61d3ff6bf3b52f482504b8ef1f2635042c87290a37ff0b7c2efc9ef465",
+      "compressed": "validation/artist-prepared-native-20261115/run-strict-service-v2.py.gz",
+      "compressed_sha256": "b59596e1383c831fc2f932e5a59f49a392569c3defb37fbe50cef010d2954378"
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-strict-monitor-20261115/owned_monitor_v2.py": {
+      "sha256": "b510ef5655e3214bd38e7b5f56022c37a79879070c3733f2dd059bad74f21269",
+      "compressed": "validation/artist-prepared-native-20261115/owned_monitor_v2.py.gz",
+      "compressed_sha256": "f9e86387a39949cffc9ac0ea12111b5539de145859c28e9452ba2b736e40a771"
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-strict-monitor-20261115/test-monitor-v2.py": {
+      "sha256": "3df7c5f3a4051dfba6a10bde8c4b63e643102861ca0ebf13b79ee3c27833650c",
+      "compressed": "validation/artist-prepared-native-20261115/test-monitor-v2.py.gz",
+      "compressed_sha256": "e524f6498ac76fc7f1a2a58ac1d99c20e6427596ec1e9b5f17c0d8458e20799c"
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-strict-monitor-20261115/controls-v2.json": {
+      "sha256": "fa75f12b812e2770ad4c60165751e0e4dc8e1349dc7236a1bf890e8618a9d690",
+      "compressed": "validation/artist-prepared-native-20261115/controls-v2.json.gz",
+      "compressed_sha256": "fd57ec3d19405821bc4379a8049d20aac16f42211aa8a485599deee8682b2022"
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-sanitize-component-v1-20261115/status.json": {
+      "sha256": "b94b9791340f642c94a0e43fcc6bddda6e11cb5be060b5fdfd59d0fd8c6472e9",
+      "compressed": "validation/artist-prepared-native-20261115/interrupted-v1-status.json.gz",
+      "compressed_sha256": "8a7ca6cf9036b8fb72dff64f4dc8944e3d763d344a63f4c0f48c3995579e5f9c"
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-sanitize-component-v1-20261115/external-termination-observation.json": {
+      "sha256": "0024d3438bd7a0e720534c009ced167515446e1517360382b170f3554b211bd5",
+      "compressed": "validation/artist-prepared-native-20261115/interrupted-v1-external-termination-observation.json.gz",
+      "compressed_sha256": "3e1b4d5c51bd5b9e36ec467799f46c781a5ff90991a126bcfc3e2454ee843884"
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/guard87-sanitize-native-component-20261115/component-from-current-whole-objects-v1/component-ready.json": {
+      "sha256": "5b0968591f822aaecb2b5890514c39dffc0a78b87c45b6f8ae495e8e390ae127",
+      "compressed": "validation/artist-prepared-native-20261115/component-ready.json.gz",
+      "compressed_sha256": "f90576150d6e732bcbe9d0090eab5fd2726dfd3d3133c79bd2dc659daea8f690"
+    }
+  }
+}

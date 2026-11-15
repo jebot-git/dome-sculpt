@@ -1,0 +1,288 @@
+{
+  "source": "1bc13125",
+  "branch": "work/artist-prepared-source-v3-20261115",
+  "scope": "Current-toolchain optimized Release independent native component ONLY: genuine ordinary version1 prepared-normal source re-Bake with unchanged UV, no newfrontend. Not full application integration, graphics, physical headset or full production goal completion.",
+  "source_histories": [
+    "2f89410c",
+    "3d164382",
+    "f1a9970e",
+    "82c73ab9",
+    "95b780cb",
+    "1bc13125"
+  ],
+  "qualified_steps": {
+    "native-prepared": {
+      "run": "component-v3",
+      "step_exit": 0,
+      "count": 91,
+      "log_sha256": "c4722d404253518457ccdecace1a2632d69e40d40f4e5586799bd4a41e5d5450",
+      "containing_run_exit": 1,
+      "seconds": 0.31870460510253906
+    },
+    "native-missing62": {
+      "run": "component-v3",
+      "step_exit": 0,
+      "count": 62,
+      "log_sha256": "675141d6a71469d21d3d2517f2352ea042e77e01f49e2a09ba92c13d06072166",
+      "containing_run_exit": 1,
+      "seconds": 0.11786079406738281
+    },
+    "domain19": {
+      "run": "remainder-v4",
+      "step_exit": 0,
+      "count": 19,
+      "log_sha256": "48c4715c2aae90bd58cbd09c1cbaea7f8c4763cae98a647f5fdf230df28cf633",
+      "containing_run_exit": 1,
+      "seconds": 0.034010887145996094
+    },
+    "artist139": {
+      "run": "remainder-v4",
+      "step_exit": 0,
+      "count": 139,
+      "log_sha256": "71b3208587cdccece1dfea87994ccd234d5884e97946dfc99e79f62c81736d65",
+      "containing_run_exit": 1,
+      "seconds": 0.16586947441101074
+    },
+    "role9": {
+      "run": "remainder-v4",
+      "step_exit": 0,
+      "count": 9,
+      "log_sha256": "76b8f9f988b11d14316c3552cfb751dcf3e86d1f2c0612396fe4683224180bfa",
+      "containing_run_exit": 1,
+      "seconds": 0.017830610275268555
+    },
+    "cc0856": {
+      "run": "remainder-v4",
+      "step_exit": 0,
+      "count": 856,
+      "log_sha256": "72b4bce1dd803df58019a8e4435367c8c16ff5a8595e790d0078c9fd2a758b1b",
+      "containing_run_exit": 1,
+      "seconds": 3.0215461254119873
+    },
+    "cc0bake32": {
+      "run": "cc0-rss-v5",
+      "step_exit": 0,
+      "count": 32,
+      "log_sha256": "c3aa1e2808e7720fa211f09baceb75537b5ce0748f2f3b8a781b35961184b4d6",
+      "containing_run_exit": 0,
+      "seconds": 12.160123825073242
+    }
+  },
+  "prepared_case_metrics": [
+    {
+      "legacy": "0",
+      "posed": "0",
+      "max_direction_error": "1.44328e-07",
+      "baked_error": "0",
+      "neutral_control_error": "0.816365",
+      "omitted_control_error": "0.91597",
+      "wrong_role_control_error": "0.788391",
+      "decoded_texels": "1826",
+      "projected": "2688",
+      "polls": "19"
+    },
+    {
+      "legacy": "0",
+      "posed": "1",
+      "max_direction_error": "2.33275e-07",
+      "baked_error": "0",
+      "neutral_control_error": "0.777136",
+      "omitted_control_error": "0.777136",
+      "wrong_role_control_error": "0.855058",
+      "decoded_texels": "1826",
+      "projected": "2688",
+      "polls": "19"
+    },
+    {
+      "legacy": "1",
+      "posed": "0",
+      "max_direction_error": "2.76607e-07",
+      "baked_error": "0",
+      "neutral_control_error": "0.788792",
+      "omitted_control_error": "0.852577",
+      "wrong_role_control_error": "0.829722",
+      "decoded_texels": "1826",
+      "projected": "2688",
+      "polls": "19"
+    },
+    {
+      "legacy": "1",
+      "posed": "1",
+      "max_direction_error": "2.64743e-07",
+      "baked_error": "0",
+      "neutral_control_error": "0.750574",
+      "omitted_control_error": "0.763636",
+      "wrong_role_control_error": "0.875427",
+      "decoded_texels": "1826",
+      "projected": "2688",
+      "polls": "19"
+    }
+  ],
+  "positive_actual_Bake_normal_bound": 0.035,
+  "same_texel_negative_minimum_required_error": 0.07,
+  "source_direct_direction_bound": 3e-06,
+  "provider": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/current-toolchain-guard87-release-20261115/component-from-current-whole-objects-v1/component-ready.json",
+    "sha256": "41a9d7a6d2318d4841d18d136f80c64c94f3006c7554a3179c8a42192cb01dd2",
+    "scope": "14 independent component archives from215 genuine complete current compiler objects; not live owning archive actions",
+    "core_members": 193,
+    "modified_owning_TUs": [
+      "bake-authoring.cpp.o",
+      "bake.cpp.o",
+      "emission-bake-source.cpp.o"
+    ],
+    "unchanged_members": 190,
+    "independent_fixed_core_sha256": "378b5560c1be841225fe02b1b48e4766f3db463aff93c3ef6bb5401daaead890"
+  },
+  "original_counterfactual": {
+    "source": "f1a9970e",
+    "current_compiler_fresh_owners": true,
+    "step_exit": 1,
+    "first_genuine_artist_Bake_passes": true,
+    "prepared_source_refusal": true,
+    "not_reclassified_as_pass": true
+  },
+  "failed_runs_preserved": {
+    "component-v1": "Genuine UV1 positive blocked by unrelated full-composite sourceUV1 refusal",
+    "component-v2": "Fabricated emptySourceMaps conflicted with actual overlay nullowner; unchanged guard correctlyrefused",
+    "component-v3": "Harness omitted required outputfile argument to unchanged19case;91+62prefix passes only",
+    "remainder-v4": "CC0Bake secondcase bad_alloc under newlyimposed2GiB virtualAS limit; prior19/139/9/856 prefixpasses only"
+  },
+  "cc0_actual_resource_result": {
+    "same_unchanged_binary": true,
+    "all32_checks_passed": true,
+    "actual_peak_owned_RSS_bytes": 2116554752,
+    "bound_bytes": 2147483648,
+    "virtual_AS_cap": null,
+    "VmPeak_not_recorded_no_claim": true,
+    "seconds": 12.160123825073242
+  },
+  "runtime_safety": {
+    "all_common_leases_released": true,
+    "all_input_drift_empty": true,
+    "no_owned_live_runtime_handles": true,
+    "no_old_compiler_archive_used": true,
+    "no_physical_runtime_or_GL_modes": true
+  },
+  "normal_material_adapter": "Actual SourceNormalPreparationAccess::resolved for normal events. Raw SourceMaps+PaintOverlayPacket only with actual source-map owner, otherwise ordinary composed material. Any normal_projection source requires separate normal resolver; marker never authorizes legacy normal reinterpretation.",
+  "retained_guards": [
+    "Version2 normal sampling",
+    "UV reprojected and retained coordinate domain",
+    "sampling_reparameterized",
+    "native32 paint/frame source",
+    "canonical and independent baked normal fields",
+    "Source8-independent paint combined with normal projection"
+  ],
+  "remaining": [
+    "Matching strict ASAN/UBSAN/leak native execution (all8 current TUs compile0)",
+    "Independent current source/import/CC0 graphical consumers",
+    "Proper version2/reprojected material-and-normal coordinate authority adapter",
+    "Owning-source pose/advanced prepared/current-normal source adapters",
+    "Whole application integration/device/backend/full original REQUIREMENTS"
+  ],
+  "runs": {
+    "component-v1": {
+      "raw_path": "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-release-component-v1-20261115/status.json",
+      "raw_sha256": "396ac62f5494d9b2c5ef48a7b36bb47f86b430da61a646ad5dc57346ff586946",
+      "compressed_file": "validation/artist-prepared-release-20261115/component-v1-status.json.gz",
+      "compressed_sha256": "f4c600334b9e8c3424f846da0bf4c6b4338d2a4f77d498106535a2b21716ff17",
+      "actual_overall_exit": 1,
+      "input_drift": []
+    },
+    "component-v2": {
+      "raw_path": "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-release-component-v2-20261115/status.json",
+      "raw_sha256": "7924c4c4e8c354411c6d06b25ac5175568c1cd323e65d953d90566e412e3eef9",
+      "compressed_file": "validation/artist-prepared-release-20261115/component-v2-status.json.gz",
+      "compressed_sha256": "f51513e56ea128a7f6b4d780d494dab82097951c34256deedb1fd068a386d80f",
+      "actual_overall_exit": 1,
+      "input_drift": []
+    },
+    "component-v3": {
+      "raw_path": "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-release-component-v3-20261115/status.json",
+      "raw_sha256": "8ce2cb759742045cf4ba837e3b671d5a2d28a8dedbdb51b135c3f4699f26e8fb",
+      "compressed_file": "validation/artist-prepared-release-20261115/component-v3-status.json.gz",
+      "compressed_sha256": "d22669b7f6988975052271750d0f44473632bc1c39470bb5d37989be0036f795",
+      "actual_overall_exit": 1,
+      "input_drift": []
+    },
+    "remainder-v4": {
+      "raw_path": "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-release-remainder-v4-20261115/status.json",
+      "raw_sha256": "805eef2c2bfd3a9b2958de5888d4ae34d82fd89d49c9f9c9b28e3547eb2e2569",
+      "compressed_file": "validation/artist-prepared-release-20261115/remainder-v4-status.json.gz",
+      "compressed_sha256": "8eb89fe356e76c7adb29a2ee831a10e1145f14844b56bee67c88a0f7be808491",
+      "actual_overall_exit": 1,
+      "input_drift": []
+    },
+    "cc0-rss-v5": {
+      "raw_path": "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-release-cc0-rss-v5-20261115/status.json",
+      "raw_sha256": "f623a7e7649abbf83fe74e8b675a9cd58cda723c2776d4edd91ab47abdd591d4",
+      "compressed_file": "validation/artist-prepared-release-20261115/cc0-rss-v5-status.json.gz",
+      "compressed_sha256": "fdb2afae73eb40d71e24c11f5a2675c8fbfc19af5e4ab09ce04cbd5fc3640934",
+      "actual_overall_exit": 0,
+      "input_drift": []
+    }
+  },
+  "logs": {
+    "component-v1/native-prepared": {
+      "raw_sha256": "2115a4f71368556b2eb2c2794cbe7e60425149e6fa13e26e0331e7a3bb7b02ad",
+      "file": "validation/artist-prepared-release-20261115/component-v1-native-prepared.log.gz",
+      "sha256": "29219bad3d589c7ccaf52201199fa18f1597933a19064f909d73712983855345"
+    },
+    "component-v2/native-prepared": {
+      "raw_sha256": "27bc310f9b66f2cb8e7e3f7f3bfa4c8273ff43157e1849a73c34d1b7430616a6",
+      "file": "validation/artist-prepared-release-20261115/component-v2-native-prepared.log.gz",
+      "sha256": "cfdc1c50297eaacc26de96c4abcb58cf14d2a280d2647c9153980589d5365432"
+    },
+    "component-v3/native-original": {
+      "raw_sha256": "719bedea787abc82da8ee13d08928ede081d256096bb0073fe22dbad40116de1",
+      "file": "validation/artist-prepared-release-20261115/component-v3-native-original.log.gz",
+      "sha256": "c46b487dc80879dc3f922517cc6a1958ea76e7f93fc6c142d0d1ee97a002d3c3"
+    },
+    "component-v3/native-prepared": {
+      "raw_sha256": "c4722d404253518457ccdecace1a2632d69e40d40f4e5586799bd4a41e5d5450",
+      "file": "validation/artist-prepared-release-20261115/component-v3-native-prepared.log.gz",
+      "sha256": "d1531d57264c0dc34c093d2df4f9f19c0be561eca646ebfefaedc3548fd85618"
+    },
+    "component-v3/native-missing62": {
+      "raw_sha256": "675141d6a71469d21d3d2517f2352ea042e77e01f49e2a09ba92c13d06072166",
+      "file": "validation/artist-prepared-release-20261115/component-v3-native-missing62.log.gz",
+      "sha256": "fb1b0ea20af8048d7b42e34fe998542746d903e6c2a58dc89ea7eef02fcd9b58"
+    },
+    "component-v3/native-domain19": {
+      "raw_sha256": "eca9b8aab15c95266a2eef3a8f117b3f391f29781ee7ca58827bf336095ef3fb",
+      "file": "validation/artist-prepared-release-20261115/component-v3-native-domain19.log.gz",
+      "sha256": "c40c36be0c0c859f10c685b006c16b2db8481d61fd061bcfafb3f45fd2f2a16e"
+    },
+    "remainder-v4/domain19": {
+      "raw_sha256": "48c4715c2aae90bd58cbd09c1cbaea7f8c4763cae98a647f5fdf230df28cf633",
+      "file": "validation/artist-prepared-release-20261115/remainder-v4-domain19.log.gz",
+      "sha256": "0ee462137a9fd6995e83a5f7949577345ca52d86cff3e981d8fe9f99fe45f739"
+    },
+    "remainder-v4/artist139": {
+      "raw_sha256": "71b3208587cdccece1dfea87994ccd234d5884e97946dfc99e79f62c81736d65",
+      "file": "validation/artist-prepared-release-20261115/remainder-v4-artist139.log.gz",
+      "sha256": "6b7a7089d7a1faad7e6e4e34079d49ecb2a01e1f3da823ddb0d95e43ca4fd4ff"
+    },
+    "remainder-v4/role9": {
+      "raw_sha256": "76b8f9f988b11d14316c3552cfb751dcf3e86d1f2c0612396fe4683224180bfa",
+      "file": "validation/artist-prepared-release-20261115/remainder-v4-role9.log.gz",
+      "sha256": "0e6ca7453b8fb4647dc40338d76c7baf2d7b6307bd4398a963cce2419750a434"
+    },
+    "remainder-v4/cc0856": {
+      "raw_sha256": "72b4bce1dd803df58019a8e4435367c8c16ff5a8595e790d0078c9fd2a758b1b",
+      "file": "validation/artist-prepared-release-20261115/remainder-v4-cc0856.log.gz",
+      "sha256": "7882b86af8e8e0f0e233a047a456e7002d8df4d3c3b7ba21436eb258439c2beb"
+    },
+    "remainder-v4/cc0bake32": {
+      "raw_sha256": "857f8a18e27c72afa755f95532d08e6991f628362f2cdfe345713afd81a31950",
+      "file": "validation/artist-prepared-release-20261115/remainder-v4-cc0bake32.log.gz",
+      "sha256": "071b077255f101bb1291d8ce9a5edac8d0716d675a030bf2b1b45376215c0923"
+    },
+    "cc0-rss-v5/cc0bake32": {
+      "raw_sha256": "c3aa1e2808e7720fa211f09baceb75537b5ce0748f2f3b8a781b35961184b4d6",
+      "file": "validation/artist-prepared-release-20261115/cc0-rss-v5-cc0bake32.log.gz",
+      "sha256": "596322d13715a3f91edcb226170bf909d908510301a2993a30474a162246d545"
+    }
+  },
+  "full_goal_complete": false
+}
