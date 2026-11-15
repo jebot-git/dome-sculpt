@@ -1,0 +1,54 @@
+{
+  "state": "completion-plan-audited-NOT-executed",
+  "source": "3d1643827dd56e1b2ef1d57b8a9c6ff1e4211a2c",
+  "original_actual_session_exit": 143,
+  "original_driver_and_groups_gone": true,
+  "original_last_completed_TUs": 538,
+  "original_error_cause": "Unknown external SIGTERM; not established as timeout/OOM or runner18k deadline",
+  "original_stale_running_status_preserved": true,
+  "new_completion": {
+    "configured_TUs": 1032,
+    "closed_current_whole_providers": 538,
+    "fresh_complete_TUs": 494,
+    "fresh_links_archives": 733,
+    "fresh_generators": 3,
+    "reused_products": 0,
+    "selected_native": 87,
+    "pins": 32037,
+    "input_drift": []
+  },
+  "references": {
+    "termination-observation": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-final-owning-sanitize-plan-20261115/unexpected-driver-exit-143-v1.json",
+      "original_sha256": "025ce7fee05101c6f7d4e703e0a9f7d5b35f112c1d28941a67348f89c27f9714",
+      "compressed": "guard87-sanitize-termination-observation-20261115.json.gz",
+      "compressed_sha256": "cbe1acc1d6af65c1535988ed06367679d6c0c45fed2a8e989c57b41ceecd58e1"
+    },
+    "exact-launch": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-final-owning-sanitize-plan-20261115/unexpected-exit-exact-launch-v1.json",
+      "original_sha256": "013f58554dc8d328bfc27f55ca8defcdf489bbeeecb028a086945d977d951bf0",
+      "compressed": "guard87-sanitize-exact-launch-20261115.json.gz",
+      "compressed_sha256": "3e1ed2df6df04271e5daabffcb4dd5fcb7725d1af1f7a6ed8a56d9cd6e9b5122"
+    },
+    "closed-providers": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-current-sanitize-completion-20261115/verified-closed-object-providers-v1.json",
+      "original_sha256": "b9865eca200a721ff0180cb3493618371fe36078465fbc2a9fbbbfb49dbc1e48",
+      "compressed": "guard87-sanitize-closed-providers-20261115.json.gz",
+      "compressed_sha256": "9432d2dbe3e1768b84c2573d3889a7cd854f5bb6e29beb251de2b30c4d005e66"
+    },
+    "closed-dependencies": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-current-sanitize-completion-20261115/closed-provider-dependency-proof-v1/actual-fresh-dependencies.json",
+      "original_sha256": "3989b73a870a6210dea66359e15a9404875d388a13242f059d7554e278d98627",
+      "compressed": "guard87-sanitize-closed-dependencies-20261115.json.gz",
+      "compressed_sha256": "7a2d85626f887eed048f9bdfb64387d78c12eec9aa2642e0c42018e904367616"
+    },
+    "completion-plan": {
+      "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-current-sanitize-completion-20261115/sanitize-3d1643-completion-v1-audit/plan.json",
+      "original_sha256": "9641d8af4976d8937081f5be9d0a999a730196a48c902262ac3c5cff68e39140",
+      "compressed": "guard87-sanitize-completion-plan-20261115.json.gz",
+      "compressed_sha256": "e406ff863531e6d63688184f74341259e83fdf04235d5af4c5164c4809f72523"
+    }
+  },
+  "native_component_group": "Separate214-owner/13-archive producer remains terminal0; not application acceptance",
+  "mitigation_planned": "Transient user systemd Type=exec,RuntimeMaxSec20000,KillModecontrol-group,Nice10; no persistent unit/autostart/install. Not launched pending review."
+}

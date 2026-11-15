@@ -1,0 +1,26 @@
+{
+  "scope": "Independent final fresh-SAN structural review; no product runtime",
+  "plan_sha256": "a02ea7b2d888728483e90b8aa1ccce28494b98d9cc7b8d90107a70497f2ddf4a",
+  "nodes": 1768,
+  "layers": 13,
+  "complete_fresh_TUs": 1032,
+  "complete_fresh_links": 733,
+  "generators": 3,
+  "exact_native": 87,
+  "mandatory_fresh_targets": 90,
+  "all_C_and_CXX_instrumented": true,
+  "all_actual_MD_MF_commands_and_source_authorities": true,
+  "current_compiler_sha256": "ca48a2d27d0796399adc3387225eec4be62974e26fa299710edfde0c1af5aa63",
+  "prebuild_pins": 30944,
+  "header_files": 27424,
+  "initial_objects": 0,
+  "provider_stage": 0,
+  "resource_bounds": {
+    "independent_owning_seconds": 18000,
+    "max_active_tasks": 2,
+    "aggregate_descendant_RSS_bytes": 8589934592,
+    "initial_input_audit_seconds": 600,
+    "final_input_audit_seconds": 600
+  },
+  "helper_control_status_sha256": "1a27a32e1e061e1d5253198b9b56005c0b212b4c37a208089823916e8a8b6609"
+}

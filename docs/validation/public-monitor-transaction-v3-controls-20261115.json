@@ -1,0 +1,269 @@
+{
+  "state": "terminal",
+  "exit": 0,
+  "scope": "CPU-only unchanged-monitor retirement and expected-ELF witness controls.",
+  "controls": [
+    {
+      "mode": "live-complete",
+      "pid": 2269114,
+      "expected": {
+        "start": 25976972,
+        "pgrp": 2269114,
+        "ppid": 2269106,
+        "state": "S"
+      },
+      "passed": true,
+      "seen_after": [
+        "consumer",
+        "libc"
+      ],
+      "mapped_after": {
+        "/usr/bin/sleep": "6f3b5fc0b5ee57c03c09794f7c2272103912f3c025ba90ab262b103e208e6a8e",
+        "/usr/lib64/libc.so.6": "a5c5ad9d59d3c69eda93aa8f82930ba06cc4e893a113e66c85ad6e96243d53c8",
+        "/usr/lib64/ld-linux-x86-64.so.2": "4e5d39355699e90fa29313d3100e82af4a23290028c58c364d6a249ef6a78e5e"
+      }
+    },
+    {
+      "mode": "ENOENT-first",
+      "pid": 2269120,
+      "expected": {
+        "start": 25976975,
+        "pgrp": 2269120,
+        "ppid": 2269106,
+        "state": "S"
+      },
+      "seen_before_actual_read": [],
+      "completed_fingerprints_before_actual_read": [],
+      "retired_identity": null,
+      "actual_errno": 2,
+      "actual_filename": "/proc/2269120/mountinfo",
+      "actual_stack": "Traceback (most recent call last):\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/public-monitor-transaction-20261115/transaction-controls-v1.py\", line 44, in controlled_covering\n    try:return covering(pid,path)\n               ~~~~~~~~^^^^^^^^^^\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/mount_identity.py\", line 11, in covering\n    for raw in(Path('/proc')/str(pid)/'mountinfo').read_text().splitlines():\n              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^\n  File \"/usr/lib64/python3.14/pathlib/__init__.py\", line 787, in read_text\n    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:\n         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib64/python3.14/pathlib/__init__.py\", line 771, in open\n    return io.open(self, mode, buffering, encoding, errors, newline)\n           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nFileNotFoundError: [Errno 2] No such file or directory: '/proc/2269120/mountinfo'\n",
+      "passed": true,
+      "seen_after": [],
+      "mapped_after": {}
+    },
+    {
+      "mode": "ENOENT-after-consumer",
+      "pid": 2269121,
+      "expected": {
+        "start": 25976975,
+        "pgrp": 2269121,
+        "ppid": 2269106,
+        "state": "S"
+      },
+      "seen_before_actual_read": [],
+      "completed_fingerprints_before_actual_read": [
+        "/usr/bin/sleep"
+      ],
+      "retired_identity": null,
+      "actual_errno": 2,
+      "actual_filename": "/proc/2269121/mountinfo",
+      "actual_stack": "Traceback (most recent call last):\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/public-monitor-transaction-20261115/transaction-controls-v1.py\", line 44, in controlled_covering\n    try:return covering(pid,path)\n               ~~~~~~~~^^^^^^^^^^\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/mount_identity.py\", line 11, in covering\n    for raw in(Path('/proc')/str(pid)/'mountinfo').read_text().splitlines():\n              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^\n  File \"/usr/lib64/python3.14/pathlib/__init__.py\", line 787, in read_text\n    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:\n         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib64/python3.14/pathlib/__init__.py\", line 771, in open\n    return io.open(self, mode, buffering, encoding, errors, newline)\n           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nFileNotFoundError: [Errno 2] No such file or directory: '/proc/2269121/mountinfo'\n",
+      "passed": true,
+      "seen_after": [
+        "consumer"
+      ],
+      "mapped_after": {
+        "/usr/bin/sleep": "6f3b5fc0b5ee57c03c09794f7c2272103912f3c025ba90ab262b103e208e6a8e"
+      }
+    },
+    {
+      "mode": "EINVAL-first",
+      "pid": 2269122,
+      "expected": {
+        "start": 25976976,
+        "pgrp": 2269122,
+        "ppid": 2269106,
+        "state": "S"
+      },
+      "seen_before_actual_read": [],
+      "completed_fingerprints_before_actual_read": [],
+      "retired_identity": {
+        "start": 25976976,
+        "pgrp": 2269122,
+        "ppid": 2269106,
+        "state": "Z"
+      },
+      "actual_errno": 22,
+      "actual_filename": "/proc/2269122/mountinfo",
+      "actual_stack": "Traceback (most recent call last):\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/public-monitor-transaction-20261115/transaction-controls-v1.py\", line 44, in controlled_covering\n    try:return covering(pid,path)\n               ~~~~~~~~^^^^^^^^^^\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/mount_identity.py\", line 11, in covering\n    for raw in(Path('/proc')/str(pid)/'mountinfo').read_text().splitlines():\n              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^\n  File \"/usr/lib64/python3.14/pathlib/__init__.py\", line 787, in read_text\n    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:\n         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib64/python3.14/pathlib/__init__.py\", line 771, in open\n    return io.open(self, mode, buffering, encoding, errors, newline)\n           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nOSError: [Errno 22] Invalid argument: '/proc/2269122/mountinfo'\n",
+      "passed": true,
+      "seen_after": [],
+      "mapped_after": {}
+    },
+    {
+      "mode": "EINVAL-after-consumer",
+      "pid": 2269123,
+      "expected": {
+        "start": 25976976,
+        "pgrp": 2269123,
+        "ppid": 2269106,
+        "state": "S"
+      },
+      "seen_before_actual_read": [],
+      "completed_fingerprints_before_actual_read": [
+        "/usr/bin/sleep"
+      ],
+      "retired_identity": {
+        "start": 25976976,
+        "pgrp": 2269123,
+        "ppid": 2269106,
+        "state": "Z"
+      },
+      "actual_errno": 22,
+      "actual_filename": "/proc/2269123/mountinfo",
+      "actual_stack": "Traceback (most recent call last):\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/public-monitor-transaction-20261115/transaction-controls-v1.py\", line 44, in controlled_covering\n    try:return covering(pid,path)\n               ~~~~~~~~^^^^^^^^^^\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/mount_identity.py\", line 11, in covering\n    for raw in(Path('/proc')/str(pid)/'mountinfo').read_text().splitlines():\n              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^\n  File \"/usr/lib64/python3.14/pathlib/__init__.py\", line 787, in read_text\n    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:\n         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib64/python3.14/pathlib/__init__.py\", line 771, in open\n    return io.open(self, mode, buffering, encoding, errors, newline)\n           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nOSError: [Errno 22] Invalid argument: '/proc/2269123/mountinfo'\n",
+      "passed": true,
+      "seen_after": [
+        "consumer"
+      ],
+      "mapped_after": {
+        "/usr/bin/sleep": "6f3b5fc0b5ee57c03c09794f7c2272103912f3c025ba90ab262b103e208e6a8e"
+      }
+    },
+    {
+      "mode": "EINVAL-first-reaped-at-classifier",
+      "pid": 2269124,
+      "expected": {
+        "start": 25976976,
+        "pgrp": 2269124,
+        "ppid": 2269106,
+        "state": "S"
+      },
+      "seen_before_actual_read": [],
+      "completed_fingerprints_before_actual_read": [],
+      "retired_identity": {
+        "start": 25976976,
+        "pgrp": 2269124,
+        "ppid": 2269106,
+        "state": "Z"
+      },
+      "actual_errno": 22,
+      "actual_filename": "/proc/2269124/mountinfo",
+      "actual_stack": "Traceback (most recent call last):\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/public-monitor-transaction-20261115/transaction-controls-v1.py\", line 44, in controlled_covering\n    try:return covering(pid,path)\n               ~~~~~~~~^^^^^^^^^^\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/mount_identity.py\", line 11, in covering\n    for raw in(Path('/proc')/str(pid)/'mountinfo').read_text().splitlines():\n              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^\n  File \"/usr/lib64/python3.14/pathlib/__init__.py\", line 787, in read_text\n    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:\n         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib64/python3.14/pathlib/__init__.py\", line 771, in open\n    return io.open(self, mode, buffering, encoding, errors, newline)\n           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nOSError: [Errno 22] Invalid argument: '/proc/2269124/mountinfo'\n",
+      "reaped_before_classifier_exit": -15,
+      "passed": true,
+      "seen_after": [],
+      "mapped_after": {}
+    },
+    {
+      "mode": "wrong-expected-sha",
+      "pid": 2269125,
+      "expected": {
+        "start": 25976977,
+        "pgrp": 2269125,
+        "ppid": 2269106,
+        "state": "S"
+      },
+      "expected_refusal": "RuntimeError(('Critical certified ELF differs from expected path/hash', 'consumer', '/usr/bin/sleep'))",
+      "passed": true,
+      "seen_after": [],
+      "mapped_after": {
+        "/usr/bin/sleep": "6f3b5fc0b5ee57c03c09794f7c2272103912f3c025ba90ab262b103e208e6a8e",
+        "/usr/lib64/libc.so.6": "a5c5ad9d59d3c69eda93aa8f82930ba06cc4e893a113e66c85ad6e96243d53c8",
+        "/usr/lib64/ld-linux-x86-64.so.2": "4e5d39355699e90fa29313d3100e82af4a23290028c58c364d6a249ef6a78e5e"
+      }
+    },
+    {
+      "mode": "wrong-expected-path",
+      "pid": 2269126,
+      "expected": {
+        "start": 25976979,
+        "pgrp": 2269126,
+        "ppid": 2269106,
+        "state": "S"
+      },
+      "expected_refusal": "RuntimeError(('Critical certified ELF differs from expected path/hash', 'consumer', '/usr/bin/sleep'))",
+      "passed": true,
+      "seen_after": [],
+      "mapped_after": {
+        "/usr/bin/sleep": "6f3b5fc0b5ee57c03c09794f7c2272103912f3c025ba90ab262b103e208e6a8e",
+        "/usr/lib64/libc.so.6": "a5c5ad9d59d3c69eda93aa8f82930ba06cc4e893a113e66c85ad6e96243d53c8",
+        "/usr/lib64/ld-linux-x86-64.so.2": "4e5d39355699e90fa29313d3100e82af4a23290028c58c364d6a249ef6a78e5e"
+      }
+    },
+    {
+      "mode": "prior-success-then-ENOENT",
+      "pid": 2269132,
+      "expected": {
+        "start": 25976981,
+        "pgrp": 2269132,
+        "ppid": 2269106,
+        "state": "S"
+      },
+      "prior_certified": [
+        "consumer",
+        "libc"
+      ],
+      "seen_before_actual_read": [
+        "consumer",
+        "libc"
+      ],
+      "completed_fingerprints_before_actual_read": [
+        "/usr/bin/sleep",
+        "/usr/lib64/libc.so.6"
+      ],
+      "retired_identity": null,
+      "actual_errno": 2,
+      "actual_filename": "/proc/2269132/mountinfo",
+      "actual_stack": "Traceback (most recent call last):\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/public-monitor-transaction-20261115/transaction-controls-v1.py\", line 44, in controlled_covering\n    try:return covering(pid,path)\n               ~~~~~~~~^^^^^^^^^^\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/mount_identity.py\", line 11, in covering\n    for raw in(Path('/proc')/str(pid)/'mountinfo').read_text().splitlines():\n              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^\n  File \"/usr/lib64/python3.14/pathlib/__init__.py\", line 787, in read_text\n    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:\n         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib64/python3.14/pathlib/__init__.py\", line 771, in open\n    return io.open(self, mode, buffering, encoding, errors, newline)\n           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nFileNotFoundError: [Errno 2] No such file or directory: '/proc/2269132/mountinfo'\n",
+      "passed": true,
+      "seen_after": [
+        "consumer",
+        "libc"
+      ],
+      "mapped_after": {
+        "/usr/bin/sleep": "6f3b5fc0b5ee57c03c09794f7c2272103912f3c025ba90ab262b103e208e6a8e",
+        "/usr/lib64/libc.so.6": "a5c5ad9d59d3c69eda93aa8f82930ba06cc4e893a113e66c85ad6e96243d53c8"
+      }
+    },
+    {
+      "mode": "live-EINVAL",
+      "passed": true,
+      "original_error_propagated": true,
+      "prior_seen_unchanged": true
+    },
+    {
+      "mode": "wrong-path",
+      "passed": true,
+      "original_error_propagated": true,
+      "prior_seen_unchanged": true
+    },
+    {
+      "mode": "wrong-errno",
+      "passed": true,
+      "original_error_propagated": true,
+      "prior_seen_unchanged": true
+    },
+    {
+      "mode": "wrong-original-start",
+      "passed": true,
+      "original_error_propagated": true,
+      "prior_seen_unchanged": true
+    },
+    {
+      "mode": "wrong-post-start",
+      "passed": true,
+      "original_error_propagated": true,
+      "prior_seen_unchanged": true
+    },
+    {
+      "mode": "unknown-owner",
+      "passed": true,
+      "original_error_propagated": true,
+      "prior_seen_unchanged": true
+    }
+  ],
+  "all_owned_children_reaped": true,
+  "pins": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/public-monitor-transaction-20261115/transaction-controls-v1.py": "fb194bc7e9ffbfeb88218c055501734971e59f18926677d793688aebdb288042",
+    "/home/blux/de-xr/dome-sculpt/artifacts/public-monitor-transaction-20261115/monitor_lifetime_v3.py": "8b502159e063c900c299912ca6a9af1a206e04b7604c9ec4b1e4f70b6db6b05f",
+    "/home/blux/de-xr/dome-sculpt/artifacts/public-monitor-transaction-20261115/monitor_lifetime_v2.py": "e9d3c48156688d6041adaa7ecc90a3e502059ba84509843e71ad3744e9db8867",
+    "/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/graphics-v3.py": "0606a923f5fbe1a4da5ffd973ae3b541d0bb343cd55614a33ee2f3edef9f6a7a",
+    "/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/mount_identity.py": "1e2c6a322ae8797c78f9a2693d7e2e18aab9dd8d6472babbeb81334971904c81",
+    "/usr/bin/sleep": "6f3b5fc0b5ee57c03c09794f7c2272103912f3c025ba90ab262b103e208e6a8e",
+    "/usr/lib64/libc.so.6": "a5c5ad9d59d3c69eda93aa8f82930ba06cc4e893a113e66c85ad6e96243d53c8"
+  },
+  "input_drift": [],
+  "seconds": 0.1393298470065929
+}

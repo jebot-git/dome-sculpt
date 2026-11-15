@@ -1,0 +1,26 @@
+{
+  "state": "terminal",
+  "exit": 0,
+  "source": "3d1643827dd56e1b2ef1d57b8a9c6ff1e4211a2c",
+  "scope": "Independent native component archive group only, not sole live owning archive actions or full application/runtime acceptance.",
+  "whole_closed_object_providers": 214,
+  "independent_actual_archives": 13,
+  "excluded": "libdome-sculpt-xr.a (its owner was not ready and is not needed for native component scope)",
+  "references": {
+    "component-ready.json": {
+      "raw_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-sanitize-native-component-20261115/component-from-current-whole-objects-v1/component-ready.json",
+      "raw_sha256": "5b0968591f822aaecb2b5890514c39dffc0a78b87c45b6f8ae495e8e390ae127",
+      "compressed": "guard87-sanitize-native-component-ready-20261115.json.gz",
+      "compressed_sha256": "f90576150d6e732bcbe9d0090eab5fd2726dfd3d3133c79bd2dc659daea8f690"
+    },
+    "actual-fresh-dependencies.json": {
+      "raw_path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-sanitize-native-component-20261115/component-from-current-whole-objects-v1/actual-fresh-dependencies.json",
+      "raw_sha256": "e09c8f108447502f174ad0b6f7fad3d93d351704d655084856f9ae8226f8f84e",
+      "compressed": "guard87-sanitize-native-actual-fresh-dependencies-20261115.json.gz",
+      "compressed_sha256": "718800b90618f991bd2488b7a1d5c8b45acdddc36618993fee2372c88ad4a3b7"
+    }
+  },
+  "input_drift": [],
+  "live_writer_modified": false,
+  "product_runtime_executed": false
+}

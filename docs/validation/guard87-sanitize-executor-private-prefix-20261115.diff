@@ -1,0 +1,11 @@
+--- execute_sanitize-v1.py
++++ execute_sanitize-v2.py
+@@ -39,7 +39,7 @@
+  atomic(out/'inputs.json',inputs);inputs_sha=sha(out/'inputs.json')
+  env={k:v for k,v in os.environ.items()if not k.startswith(('DOME_','MESA_','LIBGL_','GALLIUM_','DRI_'))}
+  for key in ['LD_PRELOAD','ASAN_OPTIONS','UBSAN_OPTIONS','LSAN_OPTIONS']:env.pop(key,None)
+- sdk=P.parents[1]/'artifacts/sdk-20261111/toolkit-sanitize/lib';env.update(LD_LIBRARY_PATH=str(sdk)+':/usr/lib64',LP_NUM_THREADS='2',OMP_NUM_THREADS='2',OPENBLAS_NUM_THREADS='2',ASAN_OPTIONS='detect_leaks=1:halt_on_error=1:abort_on_error=1',UBSAN_OPTIONS='halt_on_error=1:print_stacktrace=1')
++ sdk=P.parents[1]/'artifacts/sdk-20261111/toolkit-sanitize/lib';env.update(LD_LIBRARY_PATH=str(sdk)+':/opt/fltk-vr/bdf-runtime/lib:/usr/lib64',LP_NUM_THREADS='2',OMP_NUM_THREADS='2',OPENBLAS_NUM_THREADS='2',ASAN_OPTIONS='detect_leaks=1:halt_on_error=1:abort_on_error=1',UBSAN_OPTIONS='halt_on_error=1:print_stacktrace=1')
+  state={'state':'preparing','source':head,'profile':'sanitize','scope':'Independent final87 strictSAN owning whole-TU/link closure using proven completed5cSAN providers and actualcc5SAN dependency context; not fresh ALL from zero or extension/relabeling of originalcc5timeout; no built program/test/graphics execution.','resource_bounds':{'independent_owning_seconds':7200,'max_active_tasks':2,'aggregate_descendant_RSS_bytes':8*2**30,'core_bytes':0,'initial_input_audit_seconds':600,'final_input_audit_seconds':600},'strict_environment':{key:env.get(key)for key in ['LD_LIBRARY_PATH','ASAN_OPTIONS','UBSAN_OPTIONS','LSAN_OPTIONS','LD_PRELOAD','LP_NUM_THREADS','OMP_NUM_THREADS','OPENBLAS_NUM_THREADS']},'plan':{'path':str(plan_file),'sha256':sha(plan_file)},'inputs':{'path':str(out/'inputs.json'),'sha256':inputs_sha},'summary':plan['summary'],'completed_compilations':0,'completed_links':0,'completed_generators':0,'active':{},'steps_journal':str(out/'steps.jsonl'),'exit':1}
+  active={};completed=set();copied={};products={};started=time.monotonic();deadline=started+7200;peak_rss=0
+  def save():atomic(out/'status.json',state)

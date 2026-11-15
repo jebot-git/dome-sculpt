@@ -1,0 +1,45 @@
+{
+  "source": "3d1643827dd56e1b2ef1d57b8a9c6ff1e4211a2c",
+  "scope": "Current fresh Release whole-TU/archive/link plan and live build, not runtime qualification. No object/product reuse.",
+  "plan": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/current-toolchain-guard87-release-20261115/release-3d1643-current-fresh-v2-audit/plan.json",
+    "sha256": "0d03a29a1d2251d1186cb8a9c94f22227566c86664245c51b050a66e458b7dec",
+    "compressed": "docs/validation/guard87-release-current-fresh-v2-plan-20261115.json.gz",
+    "compressed_sha256": "75557b36ff249920e8db893f883d11a471dd91e893bbdfc13b454a95601e94dd"
+  },
+  "summary": {
+    "configured_TUs": 1032,
+    "fresh_complete_TUs": 1032,
+    "reused_whole_objects": 0,
+    "all_configured_link_archive_nodes": 733,
+    "fresh_links_archives": 733,
+    "retained_whole_products": 0,
+    "mandatory_fresh_owning_targets": 90,
+    "selected_CTests": 87,
+    "additional_manual_source_render_gate": 1
+  },
+  "current_source_header_tool_pins": 30960,
+  "physical_header_files": 27424,
+  "fresh_C_and_CXX_flags": "-O3 -DNDEBUG -ffunction-sections -fdata-sections",
+  "runtime_executed": false,
+  "original_incremental_hold": {
+    "reason": "Do not admit mixed historical compiler objects. Current compiler hash differs from frozen historical executable despite identical version. Replaced with new full fresh current-toolchain plan.",
+    "actual_exit": 1,
+    "completed_whole_TUs": 123,
+    "completed_links": 0,
+    "owned_cleanup_complete": true,
+    "status_sha256": "c943190e1b72e5410cbf78864c8324f5dc97cad5ba7185680bd27ca2eb18481e",
+    "no_runtime_execution": true
+  },
+  "actual_partial_dependency_preflight": {
+    "whole_TUs": 109,
+    "actual_dependency_incidences": 34972,
+    "unique_resolved_dependencies": 876,
+    "errors": 0,
+    "scope": "Read-only partial proof only; final1032owner audit still required",
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/current-toolchain-guard87-release-20261115/partial-genuine-dependencies-v1/actual-fresh-dependencies.json",
+    "sha256": "41c6bbdccf1504248d7c53c9e30b6fe52c5396ac2b62be96bf3528905681cd29"
+  },
+  "strict_SAN_plan": "a02ea7b2d888728483e90b8aa1ccce28494b98d9cc7b8d90107a70497f2ddf4a",
+  "future_artist_component": "c57b8ad9 is compile-only draft, not runtime-qualified or included in this candidate."
+}

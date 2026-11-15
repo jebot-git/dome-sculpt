@@ -1,0 +1,60 @@
+{
+  "source": "3d1643827dd56e1b2ef1d57b8a9c6ff1e4211a2c",
+  "driver_sealed_status": {
+    "state": "terminal",
+    "exit": 0,
+    "complete_TUs": 1032,
+    "archive_link_steps": 733,
+    "generators": 3,
+    "seconds": 3108.26685224197,
+    "drift": []
+  },
+  "outer_tool": {
+    "session": 12734,
+    "exit": 143,
+    "cause": "unknown; never relabeled0"
+  },
+  "independent_admission": {
+    "exit": 0,
+    "sha256": "39c71b267c63127b68b40acc959df021fd662a56fad38c809d0a92af741c6f3e",
+    "compressed": "docs/validation/guard87-release-closed-artifact-admission-20261115.json.gz",
+    "compressed_sha256": "d8169a9d06f27cf0c378b74d00ec91f7a3b4cbd7734d21cdb46a6e560467b5b8",
+    "current_input_pins": 30961,
+    "outputs": 1768,
+    "fresh_actual_dependency_owners": 1032,
+    "dependency_incidences": 433074,
+    "dependency_errors": 0
+  },
+  "native_gates": {
+    "native87": 0,
+    "workspace27": 0,
+    "workspace373": 0,
+    "raw90159": 0,
+    "six_producer_font_steps": 0,
+    "manual_software994": 0,
+    "actual_Intel_Arc994": 0,
+    "evidence": "GUARD87-ADMITTED-RELEASE-GATES-20261115.md"
+  },
+  "GUI": {
+    "first_attempt": "actual1 before any app/check; private Xvfb missinglibselinux.so.1",
+    "state": "new privateclosure beingprepared; originalfailurepreserved; no GUI/XR qualification"
+  },
+  "SAN_whole": {
+    "original": {
+      "session": 68704,
+      "exit": 143,
+      "driver_confirmed_missing": true,
+      "cause": "unknown"
+    },
+    "new_completion": {
+      "service": "dome-sculpt-sanitize-completion-20261115-v1.service",
+      "invocation": "9ff470aeee854a2cb5ca8fe967ed1963",
+      "MainPID": 2575295,
+      "scope": "538 proven current whole providers,494 fresh TUs,733freshlinks,3freshgenerators; actualcurrent1032owner audit required",
+      "state": "active running; no final/native acceptance"
+    }
+  },
+  "archive_corroboration": "All14 independent-vs-owning ordered object payloads and raw symbol-index/padding/layout match; whole archiveSHA differs only mtime/permissions headers, explicitly not whole-byte equality. Receipt74b101a115c0c3f42ba0cf628bb2251b2cf62a78c9bdc31fa438babd0849662a.",
+  "artist_component": "Release91+62+19+139+9+856+32 actualpasses across bounded distinctcontinuations; virtualASfailure/argumenterror/143 preserved; newfinite-only fixture and actual8GiBRSSstrictdriver pending. This future component is not main3d candidate.",
+  "full_goal_complete": false
+}
