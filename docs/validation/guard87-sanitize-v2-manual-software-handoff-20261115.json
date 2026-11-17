@@ -1,0 +1,67 @@
+{
+  "state": "terminal",
+  "exit": 0,
+  "source": "3d1643827dd56e1b2ef1d57b8a9c6ff1e4211a2c",
+  "scope": "Strict current Source39/40 same-object independent sourceful software pixel oracle only; no successor90/full goal acceptance",
+  "status": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/guard87-current-sanitize-completion-20261115/sanitize-completion-v2-manual-software/status.json",
+    "sha256": "1900bf4f1271b5aa06f756a73f95783739485073118e613a52c18942278d2840"
+  },
+  "steps": [
+    {
+      "name": "manual-source-render-software",
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/guard87-current-sanitize-completion-20261115/sanitize-3d1643-completion-v1-owning/dome-sculpt-texture-set-source-render-test",
+        "/home/blux/de-xr/dome-sculpt/artifacts/guard87-current-sanitize-completion-20261115/sanitize-completion-v2-manual-software/source-render"
+      ],
+      "timeout_seconds": 900,
+      "started": 1794768246.8977125,
+      "pid": 3792366,
+      "identity": {
+        "start": 27124590,
+        "pgrp": 3792366
+      },
+      "exit": 0,
+      "seconds": 25.464288473129272,
+      "log_sha256": "6e6a1d2fac690b41b67270ff6558271df55a7228d2012244d6b9a9ae0c0d297e"
+    }
+  ],
+  "input_drift": [],
+  "graphics_lease": {
+    "path": "/tmp/dome-sculpt-arc-device.lock",
+    "acquired_epoch": 1794768246.897515,
+    "owner_pid": 3766303,
+    "stat": {
+      "device": 41,
+      "inode": 11487
+    },
+    "before_any_built_product": true,
+    "released_epoch": 1794768455.6768563
+  },
+  "independent_NB_probe": {
+    "epoch": 1794768511.8300028,
+    "inode": 11487,
+    "device": 41,
+    "available": true
+  },
+  "remaining_owned_processes": [],
+  "pids_gone": [
+    3766303,
+    3792366
+  ],
+  "unit_terminal": {
+    "Id": "dome-sculpt-sanitize-manual-software-20261115-v2.service",
+    "ActiveState": "active",
+    "SubState": "exited",
+    "InvocationID": "b51cc2e0d0c744d7a25dd83fd711aca6",
+    "RuntimeMaxUSec": "1h 40min",
+    "MainPID": "0",
+    "Result": "success",
+    "ExecMainStartTimestamp": "Sun 2026-11-15 19:40:59 CET",
+    "ExecMainExitTimestamp": "Sun 2026-11-15 19:47:35 CET",
+    "ExecMainPID": "3766303",
+    "ExecMainCode": "1",
+    "ExecMainStatus": "0",
+    "ControlGroup": ""
+  }
+}

@@ -1,3 +1,70 @@
+## Current assessment and requested pause — 2026-11-15
+
+The current round is closed at the successful four-TU public-test compilation.
+Work is paused at the user's request; the full production objective remains
+incomplete. Read [the current assessment and remaining goals](PROGRESS-ASSESSMENT-20261115.md)
+first. Baseline runtime is integrated; successor normal-source public workflow
+execution and complete combined90 Release/sanitizer qualification remain next.
+No new links, product runs, install, headset launch or session change are started.
+Historical entries below describe their original checkpoint states.
+
+## Qualified baseline runtime integrated into main — 2026-11-15
+
+Main now includes the source-aware baking/HDR-native-field/mapped-humanoid
+integration from3d plus exercised reporter c54 and coordinator02d. All non-doc
+source bytes exactly match02d; application production bytes remain exact3d.
+Release native87/software994/actualArc994/publicGUI208/syntheticXR776 and strict
+SAN native87/workspaces/raw/producers/font/software994 pass in their explicitly
+recorded scopes. Read [the runtime admission](GUARD87-RUNTIME-ADMISSION-20261115.md)
+and [machine record](validation/guard87-runtime-admission-20261115.json).
+Original failures and source/module/build distinctions remain preserved.
+
+This is an incremental FUNCTIONAL runtime milestone, not completion of the full
+production objective or admission of the successor normal-source1bc/combined90.
+That separate draft now has native plus software/Arc component proof; actual
+public prepared-source UI tests and the matching combined build are next.
+All unfinished requirements, later controller trays and spatial nodes remain
+required. Goal active; no install, physical headset or session restart.
+
+## Artist/prepared normal consumers qualify in software and Arc — 2026-11-15
+
+Functional product1bc with fixture7fb now passes24 actual graphical cases and
+318 full96x96 PNGs in EACH software and authenticated Arc profile, freshCPU44
+first. Correct RGB error is at most1 under unchanged bound3, with required
+wrong-world/omitted gap7 and disjoint intervals. Actual ArcPCI03:00.0/renderD129/
+i915/liveFD and72 pinned mapped ELFs are authenticated. Root independently
+rehashes all636 current PNGs; both runs terminate0/no signals/no input drift.
+Read [the causal native/graphics seal](ARTIST-NORMAL-GRAPHICS-20261115.md).
+All old failed selectors/projections/tint/probe runs remain preserved separately.
+
+Actual PUBLIC desktop/XR selection of the prepared source, Bake, ordered Save
+and history still need direct application evidence. New test-only fixture/UI
+scenarios are being designed before final combined90 source freeze, including
+wrong-original-source counterfactuals and exact source-ID/recipe checks. No new
+frontend or production/schema change is intended. An additive fresh component
+application link is being prepared for that test development; it does not replace
+the held complete owning90 build. All original production requirements remain
+active/incomplete. No install, physical headset or session restart occurred.
+
+## Strict native87 passes; corrected normal software consumer passes — 2026-11-15
+
+Current baseline strict ASan/UBSan/leak native87 completes87/87 actual CTests,
+no skips, plus app-version/workspace27/workspace373/raw90159, all0. Complete
+uncached post audit has zero drift; terminal unit success, no owned survivors
+and exact lease release are independently verified. Actual CTest environment
+contains only LIBGL_ALWAYS_SOFTWARE=1 and LP_NUM_THREADS=2 overrides, preserving
+strict sanitizer settings. Read [the native seal](GUARD87-SANITIZER-NATIVE87-20261115.md).
+The later reviewed v2 wrapper removes duplicate preflight hashing while retaining
+all expected files/values in full before/after checks; currentbf1 was unchanged.
+
+Separate normal-source fixture7fb now passes freshCPU44 and ALL24 software
+render cases with318 actual96x96 PNGs, correctRGBerror<=1 under unchanged bound3,
+and required negative gap7/disjoint predicates. Root independently rehashes every
+PNG and verifies actual llvmpipe/source identity. Arc phase is running on the
+same source/ELFs/bounds. Sanitizer producers/font/manual-software follow that slot.
+Combined draft0ae remains unfrozen/unbuilt. All original requirements remain
+active and incomplete; no physical-HMD or installation acceptance is claimed.
+
 ## Complete four-case stereo matrix passes — 2026-11-15
 
 All four final-configuration real-loader synthetic XR cases pass194 checks each,
