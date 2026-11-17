@@ -1,0 +1,82 @@
+{
+  "state": "prepared-syntax-only-NOT-executed",
+  "intended_source": "090f009ede2c0623ca616fe892223b4f68f1c2c4",
+  "files": [
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native90-sanitize-planning-20261115/prepare-sanitize-native90-v2.py",
+      "sha256": "a710f11cf6608a37a9cd6ef7b4cf604b718fb66e9873123632b75f94e35a2ad7",
+      "syntax": 0
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native90-sanitize-planning-20261115/execute-sanitize-native90-v1.py",
+      "sha256": "736269655c2b1821d6ee21a7f92890dc3618e14d2ffffefe706facfc03fd53f5",
+      "syntax": 0
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native90-sanitize-planning-20261115/mixed_dependency_audit_v1.py",
+      "sha256": "d45fe0fa67a512bc18d13826f3be706a1fd827eaf66663461e0be496d78e6fa8",
+      "syntax": 0
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native90-sanitize-planning-20261115/provider_context_v1.py",
+      "sha256": "99fea61cc099a3d8b73942c348afdfa1dc4866670ebc4c76751ef084b5232770",
+      "syntax": 0
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native90-sanitize-planning-20261115/current_provider_routes_v2.py",
+      "sha256": "de49f869d3bb699d76fba3381226f19ba9c411c14b3b7257a17cc0c6485c4ec4",
+      "syntax": 0
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native90-sanitize-planning-20261115/ninja_audit.py",
+      "sha256": "7aa092c80d1632e6d8a6e68d53c478939911528ff19e34163c09e1d26fd5a264",
+      "syntax": 0
+    }
+  ],
+  "diffs": {
+    "prepare-v1-to-v2.diff": {
+      "source_sha256": "da594a1cdbfdb8857cb1f1eec7f3db5b44a06e52bd10625a5fe6337e2b9af968",
+      "destination_sha256": "a710f11cf6608a37a9cd6ef7b4cf604b718fb66e9873123632b75f94e35a2ad7",
+      "diff_sha256": "dde010e9829028ef5977cb5c26e1226e37c825333e40aded601fca957c831345"
+    },
+    "Release-to-SAN-executor.diff": {
+      "source_sha256": "2e6477ef1156d074ba6d1c6ed0e57a611b94ada0a8e70648a4395af4d7711d1a",
+      "destination_sha256": "736269655c2b1821d6ee21a7f92890dc3618e14d2ffffefe706facfc03fd53f5",
+      "diff_sha256": "c901cc27c23b6f3455b5d5fb07a383b182db821d103124b7f596299cc8cba81c"
+    },
+    "Release-to-SAN-mixed-audit.diff": {
+      "source_sha256": "4672b462dcd370998266a12af1a78678b0b6a5f2cc3fcee80dbec3c2edd13dd2",
+      "destination_sha256": "d45fe0fa67a512bc18d13826f3be706a1fd827eaf66663461e0be496d78e6fa8",
+      "diff_sha256": "41017e84312c645ea55ea0f0f98c1461b1ba6bcb49499c3a02a608ca0617412c"
+    }
+  },
+  "held_prepare_v1_sha256": "da594a1cdbfdb8857cb1f1eec7f3db5b44a06e52bd10625a5fe6337e2b9af968",
+  "source_policy": "No product/source/schema changes. Original prepare-v1 and all prior authorities unchanged.",
+  "executed": "Only Python compile() syntax checks; no configure/preparer/staging/executor/auditor/product invoked.",
+  "strict_flags": "-O1 -g1 -DNDEBUG -ffunction-sections -fdata-sections -fsanitize=address,undefined -fno-omit-frame-pointer",
+  "strict_link_flags": "-Wl,--gc-sections -fsanitize=address,undefined",
+  "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+  "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+  "suppressions": null,
+  "lineages": {
+    "original_before143": 538,
+    "fresh_completion": 494,
+    "each_has_actual_command_CWD_MD_journal": true
+  },
+  "review_required": "Root exact template review, separate final-source prepare run, final plan/hold/source/helper/limit review, dedicated bounded owning unit authorization. Syntax proof does not qualify operational branches or successful complete build.",
+  "resource_bounds": {
+    "independent_owning_seconds": 18000,
+    "max_active_tasks": 2,
+    "aggregate_descendant_RSS_bytes": 8589934592,
+    "initial_input_audit_seconds": 600,
+    "final_input_audit_seconds": 600
+  },
+  "owning_unit_requirements": {
+    "Type": "exec",
+    "RemainAfterExit": "yes",
+    "KillMode": "control-group",
+    "MemoryMax": 8589934592,
+    "RuntimeMaxSec": 18600,
+    "TimeoutStopSec": 10
+  }
+}
