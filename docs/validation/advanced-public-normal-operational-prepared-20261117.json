@@ -1,0 +1,98 @@
+{
+  "state": "prepared-unrun",
+  "native_status": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-public-normal-native-20261117/native-v3-20261117/status.json",
+    "sha256": "838778ae84e2d6065a3ea5133583f8ecc6fd71ac1f3b3791e00a1f3774909191"
+  },
+  "source_tuple": {
+    "product": "90fad800bc5aac3dc2421595532f4d2ef8429797",
+    "native_fixture": "27ff940b55bb43dc545db5e680bd49edd0630a12",
+    "runtime_scenarios": "8bb4072dc1ad60bb7b11b8a325c930f8b2c0c176",
+    "unchanged_UI_support_context": "090f009ede2c0623ca616fe892223b4f68f1c2c4",
+    "font": "6c8f042cb1730fa017595e9a710b8c8c6015a9ea"
+  },
+  "plan_sha256": "eb197d439bf7b9807465c78383d8333c0ea0fbc12536252cb5d4d57df188f0ba",
+  "driver_sha256": "a30083352a749f12ed2e32dc5949d3aa87a8b18c37ddc4661c63157aff27dc2b",
+  "cohort_sha256": "c003e8c9cd26145d5ad9263c78ab0a43894c8c2a980faa87eb9416a5e30225c8",
+  "static_validation": {
+    "cohorts": {
+      "source-use": {
+        "admission_exit": 0,
+        "pins": 5261
+      },
+      "uv-create": {
+        "admission_exit": 0,
+        "pins": 5261
+      }
+    },
+    "all16_case_manifests_schemas": true,
+    "all8_critical_GUI_XR_expected_ELF_paths": true,
+    "all6_Python_AST": true,
+    "private_Xvfb_original99pins_current": true,
+    "actual_product_UI_GL_execution": false
+  },
+  "scope": "Component only: App41a/native91b/runtimee6c/font1afa. No whole advanced owning build, nativeWayland, physicalHMD, install or mainproductadmission.",
+  "limits": {
+    "GUI_step_seconds": 50,
+    "GUI_suite_seconds": 240,
+    "XR_suite_seconds": 240,
+    "XR_frame_ceiling": 6000,
+    "GUI_owned_RSS_bytes": 6442450944,
+    "XR_owned_RSS_bytes": 4294967296,
+    "unit_MemoryMax_bytes": 8589934592,
+    "unit_RuntimeMax_seconds": 600
+  },
+  "workflow_scope": {
+    "source-use": {
+      "cases": [
+        "raster-mt0-rest",
+        "raster-mt0-posed",
+        "raster-mt1-rest",
+        "raster-mt1-posed",
+        "retained-mt0-rest",
+        "retained-mt0-posed",
+        "retained-mt1-rest",
+        "retained-mt1-posed"
+      ],
+      "gui": "Real Original\u2192Prepared choice, normals toggle, Bake, immediate Save, exact native endpoint/source/owner and independent both-role .035; Undo/Redo/fresh reopen.",
+      "xr": "Same source/history/native bounds plus actual both-eye bitmap labels three consecutive frames, real normal-toggle actions, cold code-cache and fresh-app hits."
+    },
+    "uv-create": {
+      "cases": [
+        "raster-mt0-rest",
+        "raster-mt0-posed",
+        "raster-mt1-rest",
+        "raster-mt1-posed",
+        "retained-mt0-rest",
+        "retained-mt0-posed",
+        "retained-mt1-rest",
+        "retained-mt1-posed"
+      ],
+      "gui": "Actual universal UV editor, optional Keep detail, six Turn+, Apply, immediately ordered Save, standard Undo/Redo, further draft Cancel, fresh reopen; exact native method endpoint and both-role .035.",
+      "xr": "Actual shared UV menu/controller pressure/Keep detail/Turn90/Apply/Save/fresh reopen; actual both-eye captures14/16/19/25/27 and source/native .035. No UV-specific XR Undo/Redo or font-shape-gated readiness claim."
+    }
+  },
+  "no_UI_GL_execution": true,
+  "archive": {
+    "file": "advanced-public-normal-operational-prepared-20261117.tar.gz",
+    "sha256": "ec099c50c3293f0158900aab16ff6939969bdd12a658e61b318557bbdf9131e1",
+    "bytes": 34522,
+    "members": {
+      "bin/Xvfb": "a0cbc976ca65fec4a269ccf3b87f17776879a25d581ad52534763c0fcfeb972b",
+      "cohort.py": "c003e8c9cd26145d5ad9263c78ab0a43894c8c2a980faa87eb9416a5e30225c8",
+      "monitor_lifetime_v2.py": "e9d3c48156688d6041adaa7ecc90a3e502059ba84509843e71ad3744e9db8867",
+      "monitor_lifetime_v3.py": "8b502159e063c900c299912ca6a9af1a206e04b7604c9ec4b1e4f70b6db6b05f",
+      "operational-plan-v1.json": "eb197d439bf7b9807465c78383d8333c0ea0fbc12536252cb5d4d57df188f0ba",
+      "process_observer.py": "c6c2c3c6594f17111b0669c18951369a2c8cb24a2153afe3141d37fc51f51529",
+      "run-v1.py": "a30083352a749f12ed2e32dc5949d3aa87a8b18c37ddc4661c63157aff27dc2b",
+      "run-v3-to-advanced-v1.diff.gz": "822eda6d3460b5a884c12a099c31b84c9273e83e086c91d390e339dda715dbf8",
+      "run-v3-v1.diff": "ad295d7dea01d35f6e3286e815c228f41489df373b2475fbd5b17bddfdc85aef",
+      "scenario-provenance.json": "7dcf3e91e907071ae7187f086a134b6a9c662f55317ba790191246dd05997b7c",
+      "scenarios/source-advanced-public-menu.py": "d42964108bf0e0faaef8ecff0d2befe8bed7d757f505307325b078ed3f656103",
+      "scenarios/source-advanced-public-xr.py": "d7b86417f81e4804bac3601e8e5ca8229281589686df0a967b8503d23f23fe44",
+      "scenarios/source-advanced-uv-menu.py": "1355afc89bbc6c4c6deb24c84ab4a2fad33be06a33c10ee4dbc7b2b542c8f86f",
+      "scenarios/source-advanced-uv-xr.py": "49ba1a80620f1ea75dc78eaca8475604594f02b3f475e60682a817ebee90d0a6",
+      "static-validation-v1.json": "dc91d22fee8dbdb2fbd83e8a8d050b01aed06073de53e5d90830a886e10bbaa7"
+    }
+  }
+}
