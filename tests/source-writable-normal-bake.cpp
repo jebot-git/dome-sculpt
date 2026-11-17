@@ -92,5 +92,25 @@ void negatives(){
   for(size_t boundary:{size_t(1),count/2,count}){size_t at=0;policy.cancelled=[&]{return ++at>=boundary;};require(refuses([&]{detail::source_bake_normals(s.active(),{},policy);})&&s.encode()==baseline,"Early/middle/final writable source capture cancellation preserves every owning source byte");}
  }
 }
+void negatives(){
+ for(bool canonical:{false,true}){
+  auto s=source(canonical);paint(s,true);uv(s,canonical,false);
+  auto alias=std::make_shared<SourceMaterialBindings>(*s.active().material_bindings);s.active().material_bindings=alias;s.validate();
+  const auto baseline=s.encode();const auto raw=detail::raw_bake_source(s.active());const auto resolver=detail::source_bake_normals(s.active(),{});
+  const std::array<float,3>bary{.2f,.3f,.5f};const auto expected=root_uv(s.active(),0,bary);
+  auto foreign=source(canonical);paint(foreign,true);uv(foreign,canonical,false);uv(foreign,canonical,false);
+  const auto native=alias->native_paint_sampling;const auto converted=alias->canonical_paint_sampling;
+  if(canonical)alias->canonical_paint_sampling=foreign.active().material_bindings->canonical_paint_sampling;
+  else alias->native_paint_sampling=foreign.active().material_bindings->native_paint_sampling;
+  const auto captured=detail::source_overlay_coordinates(*raw->overlay,0,bary,{.7f,.8f});
+  require(std::abs(captured[0]-expected[0])<1e-7&&std::abs(captured[1]-expected[1])<1e-7&&resolver.matches_prepared_source(*raw),"Captured normal/material/paint tuple remains immutable after legally mutable binding alias edits");
+  require(refuses([&]{detail::raw_bake_source(s.active());}),"A later mismatched mutable binding cannot mint a new factory packet");
+  alias->native_paint_sampling=native;alias->canonical_paint_sampling=converted;require(s.encode()==baseline,"Actual mutable binding probe restores exact complete source graph");
+  detail::SourceBakeNormalOptions policy;policy.max_working_bytes=1;
+  require(refuses([&]{detail::source_bake_normals(s.active(),{},policy);})&&s.encode()==baseline,"Prospective writable source quota refuses atomically");
+  size_t count=0;policy={};policy.cancelled=[&]{++count;return false;};detail::source_bake_normals(s.active(),{},policy);require(count>2,"Actual writable capture exposes genuine traversal polls");
+  for(size_t boundary:{size_t(1),count/2,count}){size_t at=0;policy.cancelled=[&]{return ++at>=boundary;};require(refuses([&]{detail::source_bake_normals(s.active(),{},policy);})&&s.encode()==baseline,"Early/middle/final writable source capture cancellation preserves every owning source byte");}
+ }
 }
-int main(int argc,char**argv)try{if(argc!=2)return 2;const std::filesystem::path out=argv[1];std::filesystem::create_directories(out);for(bool canonical:{false,true})for(bool seam:{false,true})for(bool keyed:{false,true})for(bool live:{false,true})for(bool repeat:{false,true})for(bool special:{false,true})writable_source::exercise(canonical,seam,keyed,live,repeat,special,out);writable_source::negatives();std::cout<<"PASS "<<writable_source::checks<<" writable source checks\n";return 0;}catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
+}
+int main(int argc,char**argv)try{if(argc!=2)return 2;const std::filesystem::path out=argv[1];std::filesystem::create_directories(out);for(bool canonical:{false,true})for(bool seam:{false,true})for(bool keyed:{false,true})for(bool live:{false,true})for(bool repeat:{false,true})for(bool special:{false,true})writable_source::exercise(canonical,seam,keyed,live,repeat,special,out);writable_source::negatives();writable_source::negatives();std::cout<<"PASS "<<writable_source::checks<<" writable source checks\n";return 0;}catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

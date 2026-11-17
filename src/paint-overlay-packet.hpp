@@ -31,6 +31,9 @@ class PaintOverlayPacket {
  // Exact factory-validated paint attachment, captured separately from a
  // legally mutable material DTO. Later samples read only this immutable lease.
  std::shared_ptr<const PaintSamplingAttachment> source_paint_attachment_;
+ // Exact factory-validated paint attachment, captured separately from a
+ // legally mutable material DTO. Later samples read only this immutable lease.
+ std::shared_ptr<const PaintSamplingAttachment> source_paint_attachment_;
  // Independent native emission-only interpretation, never original Source4 UV.
  std::shared_ptr<const Mesh> native_geometry_;
  std::shared_ptr<const PaintSamplingDomain> native_domain_;
@@ -40,6 +43,7 @@ class PaintOverlayPacket {
  std::shared_ptr<const Image> source_baked_normal_,source_baked_coverage_;
  PaintOverlayPacket()=default;
 public:
+ const auto &source_paint_attachment()const noexcept{return source_paint_attachment_;}
  const auto &source_paint_attachment()const noexcept{return source_paint_attachment_;}
  const auto &normal_source_binding()const noexcept{return normal_source_binding_;}
  const auto &normal_source_deformation()const noexcept{return normal_source_deformation_;}
