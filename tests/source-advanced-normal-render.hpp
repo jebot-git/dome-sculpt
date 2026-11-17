@@ -132,6 +132,7 @@ void view(const Case &family,bool source_view,bool pbr,std::span<const std::arra
             const auto decoded=prepared_pixel_oracle::direction(object,triangle,bary,role);
             double error=0;
             for(size_t axis=0;axis<3;++axis) error=std::max(error,std::abs(wanted[axis]-decoded[axis]));
+            std::cout<<"ADVANCED_TRANSFER_POINT label="<<label<<" xy="<<xy[0]<<','<<xy[1]<<" bary="<<bary[0]<<','<<bary[1]<<','<<bary[2]<<" UV="<<uv[0]<<','<<uv[1]<<" wanted="<<wanted[0]<<','<<wanted[1]<<','<<wanted[2]<<" decoded="<<decoded[0]<<','<<decoded[1]<<','<<decoded[2]<<" error="<<error<<std::endl;
             check(error<.035,"Independent advanced second-Bake direction retains unchanged .035 bound");
         }
         auto control=prepared_point(object,uv,prepared_pixel_oracle::vector(wanted),center,x,y,span,pbr);
