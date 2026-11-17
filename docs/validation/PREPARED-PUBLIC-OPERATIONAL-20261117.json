@@ -1,0 +1,68 @@
+{
+  "state": "prepared-NOT-products-executed",
+  "version": 1,
+  "source": "6c8f042cb1730fa017595e9a710b8c8c6015a9ea",
+  "product": "1bc13125",
+  "cases": [
+    "mt0-rest",
+    "mt0-posed",
+    "mt1-rest",
+    "mt1-posed"
+  ],
+  "files": {
+    "process_observer.py": "c6c2c3c6594f17111b0669c18951369a2c8cb24a2153afe3141d37fc51f51529",
+    "monitor_lifetime_v2.py": "e9d3c48156688d6041adaa7ecc90a3e502059ba84509843e71ad3744e9db8867",
+    "monitor_lifetime_v3.py": "8b502159e063c900c299912ca6a9af1a206e04b7604c9ec4b1e4f70b6db6b05f",
+    "scenario-provenance.json": "750a7d7f0193d3b3ec32eefb0bbfce3135593a159aeaf34f22a5a42926db7f3d",
+    "cohort.py": "544826aa46ee4d56435ac345c799d0d41a62bdf37ae8f42d199d9570748d27c1",
+    "run.py": "c3d503d3a9dc509b17bbb81437549457e14688a034b85cb16074a7ab610af338",
+    "gui-plan.json": "c5140dd5c948a3c55ef4155d6fd2ed859914e09331d47bef4f8e1e1ee75dd74b",
+    "xr-plan.json": "5c5ba9f896e26b8c77042a842ce54d0b2b801ae73a244eaebcfac60a4df68227",
+    "scenarios/source-prepared-public-menu.py": "e5c5656dd1f07863e3f1dd328fd1a188d41d6c55a8fc5d8c2adadb2b3cfc91b7",
+    "scenarios/source-prepared-public-xr.py": "81efc8d7f84c065557c4b2daf58f7ad95cfa8ea705a6063b984d9bd5b4fb1d7a",
+    "bin/Xvfb": "a0cbc976ca65fec4a269ccf3b87f17776879a25d581ad52534763c0fcfeb972b"
+  },
+  "requires": "Root exact-driver review plus completed native91/capsule32positive8negative/font4+22 admission before any product/GL/XR run. No generated native status expectations exist yet.",
+  "static_checks": {
+    "all_python_AST_valid": true,
+    "gui_prepare_exit": 0,
+    "xr_prepare_exit": 0,
+    "scenario_bytes_equal_frozen6c8": true,
+    "no_product_launch": true
+  },
+  "effective_provider_context": "Historical actualApp72/228pins remain authoritative. Nov17 unused global/usr16 drift must not replace those effective /opt provider expectations. Current_toolkit scoped proof is separate.",
+  "execution_invocation_template": [
+    "/usr/bin/python3",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-public-operational-20261117/run.py",
+    "release",
+    "gui|xr",
+    "--case",
+    "CASE",
+    "--native-status",
+    "STATUS",
+    "--native-sha",
+    "SHA",
+    "--review",
+    "ROOT_REVIEW",
+    "--review-sha",
+    "ROOT_REVIEW_SHA",
+    "--execute"
+  ],
+  "review_schema": {
+    "state": "reviewed-prepared-public-operational",
+    "driver_sha256": "c3d503d3a9dc509b17bbb81437549457e14688a034b85cb16074a7ab610af338",
+    "cohort_sha256": "544826aa46ee4d56435ac345c799d0d41a62bdf37ae8f42d199d9570748d27c1",
+    "scenario_sha256": "Exact selected phase scenario SHA",
+    "phase": "gui|xr",
+    "cases": [
+      "List of authorized cases"
+    ],
+    "native_status": "Exact absolute native terminal status path",
+    "native_status_sha256": "Actual native status SHA"
+  },
+  "archive": {
+    "path": "prepared-public-operational-20261117/prepared-wrappers.tar.xz",
+    "sha256": "2e2d6f70bd1cd18687e8f237c9db150c897703ccf546166332136a2e37d377dc",
+    "members": 12
+  }
+}
