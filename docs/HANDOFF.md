@@ -133,8 +133,9 @@ checks, plus prepared91 and artist139; read
 90fad800 bounds the full owning ancestor replay graph before deep validation;
 fixtureaa8db16a passes17 native cases/263495 checks plus prepared91/artist139,
 including chained edits, every observed traversal cancellation boundary, cycle
-refusal and atomic worker/Save quota refusal. The child proof seal is being
-prepared by its owning agent; native success is not strict sanitizer, graphics
+refusal and atomic worker/Save quota refusal. Read
+[the sealed child proof](ARTIST-ADVANCED-CHAIN-NATIVE-20261117.md);
+native success is not strict sanitizer, graphics
 or whole-App admission. Genuine first-Bake fixture setup
 and stale-event negatives were corrected without weakening source guards;
 original failures remain preserved. Canonical/native32/independent writable-paint

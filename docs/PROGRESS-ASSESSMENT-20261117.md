@@ -37,8 +37,9 @@ RetainSource normal sources. Its16-case native component matrix passes249415
 checks plus prepared91/artist139. Read
 [the scoped proof](ARTIST-ADVANCED-NATIVE-20261117.md).
 The separate prospective ancestor-budget child90fad800 with fixtureaa8db16a
-passes17 cases/263495 checks, prepared91 and artist139. Its exact native proof
-is being sealed. Strict sanitizer, actual graphics and public desktop/XR
+passes17 cases/263495 checks, prepared91 and artist139; read
+[its sealed native proof](ARTIST-ADVANCED-CHAIN-NATIVE-20261117.md).
+Strict sanitizer, actual graphics and public desktop/XR
 qualification remain outstanding for these new source families. Unsupported
 source families remain explicit refusals pending their actual implementations.
 
