@@ -181,12 +181,13 @@ swapped controls retain .05 sensitivity. Read
 [the desktop matrix](ADVANCED-PUBLIC-SOURCE-GUI-MATRIX-20261117.md).
 These are explicitly product90fad/fixture27ff/runtime-and-scenarios8bb, unchanged
 090f UI/support and font6c8. They do not admit advanced production into main.
-Source-use syntheticXR and separate UV-creation desktop/XR remain pending. The
-first Arc source-use canary is live under
-ds-advanced-source-xr-canary-v1-20261118.service, MainPID434,
-Invocation3f45f64e091a46a98cd91e3d8685f34e. Inspect that actual unit before
-acting; the agent retains the original bounds and common device lease.
-No physical-headset result follows from synthetic XR.
+Six source-use syntheticXR cases now pass65 checks each on authenticated Arc;
+the two remaining RetainSource/MT1 cases and separate UV-creation desktop/XR
+remain pending. The canary proof is integrated in main05987cbe; read
+[its scoped record](ADVANCED-PUBLIC-SOURCE-XR-CANARY-20261118.md).
+Operational statuses remain under artifacts/advanced-public-normal-operational-20261117.
+Each case retains the original bounds and common device lease. No
+physical-headset result follows from synthetic XR.
 
 The independent advanced renderer compiled and linked successfully, but its
 first actual software run failed the negative-control contrast requirement.
@@ -196,9 +197,16 @@ Both failures and all images are preserved. A CPU forecast across68 views
 calibrates all16 known PBR control colours within1 and finds interior PBR
 witnesses. Authored MToon estimates remain insensitive and graphically
 uncalibrated. Read [the actual contrast record](ADVANCED-NORMAL-CONTRAST-ACTUAL-20261117.md).
-The toolkit agent is implementing declared display-only presentation and extra
-interior probes while preserving genuine normal data, source ownership, the
-original probes and all numerical bounds. No advanced GL/Arc success is claimed.
+The declared display-only presentation and extra interior probes now compile
+and link. Its source2c687a1a preserves genuine normal data/source ownership and
+publishes through Document. The CPU forecast passes68 views and selects438
+probes including all272 original probes, with predicted contrast in both roles.
+Actual corrected software GL still fails: the first MToon pixel is231,217,209
+against ordinary-normal control196,207,197, beyond RGB3. This is distinct from
+the earlier weak-contrast failure and remains preserved under
+artifacts/advanced-normal-display-owner-build-20261118/software-display-v1-20261118.
+The agent is diagnosing actual material/normal transport; no advanced GL/Arc
+success is claimed and no threshold or genuine normal data is weakened.
 
 The next canonical normal-field source adapter is implemented separately at
 85eafc42. Its changed private headers invalidate142 existing owners; the selected
@@ -206,13 +214,36 @@ headless slice is49 core plus4 fixtures. The first compile stopped after28
 successful complete TUs on a missing HDR-authority include. The include-only
 child preserves that failure; compile-v3 prepares25 remaining complete TUs and
 authenticates the original28 through actual dependency files and byte-identical
-child inputs. Plan d5457921 and driver99a2c869 are reviewed; compile-v3 is live
-under ds-canonical-normal-compile-v3-20261118.service, MainPID4190480,
-Invocation4585a71ea6bc46c59bf9632754c8b8b5. Inspect the actual unit before acting.
-Archive/link/canonical32, other affected consumers, sanitizer,
-graphics and public application qualification remain pending. Do not reuse an
+child inputs. Compile-v3 completes0 with all25 fresh TUs and no drift; the193-member
+core archive (49 refreshed owners,144 authenticated unchanged owners) and four
+fresh fixture links also complete0. The first canonical runtime fails a test
+assertion comparing a deliberately detached conversion paint wrapper with its
+mutable original. Fixture-only childb11f9d42 preserves the failure and compares
+actual geometry/maps/event/content and detached deformation instead. Its fresh
+fixture compile/link pass; native execution is next, collecting advanced17,
+prepared91 and artist139 independently before the new canonical32 cases.
+Other affected consumers, sanitizer, graphics and public application
+qualification remain pending. Do not reuse an
 old renderer with the changed private packet layout. The32-case canonical
 matrix does not implement the separate native32 writable-paint source family.
+
+## Coherent integration build
+
+Isolated branch work/authoring-canonical-public-integration-20261118 is pushed at
+8a8ecea1. It merges current main, canonical85eafc42, public fixture27ff940b and
+independent graphics2c687a1a through real merges. All765 production/build/asset
+files match85 exactly; selected test/runtime roles are checked explicitly in
+its integration receipt. This is source composition, not main admission.
+
+Fresh Release configuration passes against the current canonical SDK. The whole
+production application target is now compiling in
+artifacts/authoring-canonical-public-release-20261118 under
+ds-canonical-public-release-app-20261118.service, MainPID113593,
+Invocation7d8c6f8b6e694690b7970cc3e097a259. It uses two jobs,6GiB aggregate
+memory,3GiB process address-space and7200-second unit bounds, and retains actual
+compiler dependency files. Inspect the actual unit/status before acting. This
+is an application-target build; no all-target/test or new runtime pass is claimed.
+Keep its source worktree frozen while building, including tests and CMake files.
 
 ## Canonical toolkit and full remaining goal
 
