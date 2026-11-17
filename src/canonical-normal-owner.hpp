@@ -19,6 +19,9 @@ public:
   const auto &before_deformation() const noexcept{return deformation_;}
   const auto &frames() const noexcept{return frames_;}
   const auto &projection() const noexcept{return projection_;}
+  // Immutable factory/decoder metadata only: no validation, replay or scratch.
+  // Callers must authenticate valid_owner before reading a preflight bound.
+  size_t maximum_working_bytes() const noexcept{return max_bytes_;}
   NormalPreparationReceipt receipt() const;
   nlohmann::json encode() const;
   void validate(bool deep=true) const;

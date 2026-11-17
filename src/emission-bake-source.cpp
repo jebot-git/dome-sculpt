@@ -170,6 +170,16 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTr
      bool(binding->normal_preparation)!=bool(object.painted->normal_projection())||(!canonical&&object.painted->color_projection())||
      (object.painted->baked()&&((!prepared&&!field_prepared&&!object.painted->baked()->maps.normal.rgba.empty())||(field&&!canonical)||(!prepared&&object.painted->baked()->normal_authority))))
     throw std::invalid_argument("Artist source normal capture requires its unchanged original frame and separate current-normal adapter");
+  // Cheap owning identity checks precede every deep validation/replay. Equal
+  // data or an unrelated conversion must not spend the caller's replay quota.
+  if(canonical){
+    if(!canonical->valid_owner(canonical)||binding->has_mtoon||object.appearance||binding->normal_preparation)
+      throw std::invalid_argument("Canonical source requires its exact native conversion, not an invented typed material");
+    if(field&&field->origin()!=canonical)
+      throw std::invalid_argument("Canonical source field borrowed a foreign conversion");
+    if(normal_uv&&(!normal_uv->valid_owner(normal_uv)||normal_uv->origin()!=canonical))
+      throw std::invalid_argument("Canonical source normal coordinates borrowed a foreign conversion");
+  }
   const auto &mesh=object.painted->mesh();const auto &set=*binding->normal_frames;
   const uint64_t corners=mesh.indices.size();
   // Charge both posed role arrays, immutable evaluated corner columns and
@@ -197,9 +207,17 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTr
     if(depth==active.size()||completed==complete.size())
       throw std::length_error("Source normal replay authority exceeds native graph limits");
     active[depth]=node;
-    if(node->canonical_attributes)replay_bytes=std::max<uint64_t>(replay_bytes,node->canonical_attributes->encode().at("maximum_bytes").get<uint64_t>());
+    if(const auto &origin=node->canonical_attributes){
+      if(!origin->valid_owner(origin))throw std::invalid_argument("Source normal ancestor lost its genuine canonical owner");
+      replay_bytes=std::max<uint64_t>(replay_bytes,origin->maximum_working_bytes());
+      self(self,origin->before_material().get(),depth+1);
+    }
     if(const auto &normal=node->normal_preparation){
-      if(normal->canonical_conversion)replay_bytes=std::max<uint64_t>(replay_bytes,normal->canonical_conversion->encode().at("maximum_bytes").get<uint64_t>());
+      if(const auto &origin=normal->canonical_conversion){
+        if(!origin->valid_owner(origin))throw std::invalid_argument("Source normal ancestor lost its genuine canonical conversion");
+        replay_bytes=std::max<uint64_t>(replay_bytes,origin->maximum_working_bytes());
+        self(self,origin->before_material().get(),depth+1);
+      }
       if(const auto &uv=normal->uv_reprojection){
         replay_bytes=std::max(replay_bytes,uv->receipt.max_working_bytes);
         self(self,uv->before_material.get(),depth+1);
@@ -221,8 +239,6 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTr
   if(!options.max_working_bytes||options.max_working_bytes>512*1024*1024||work>options.max_working_bytes)
     throw std::length_error("Artist source normal capture exceeds prospective working budget");
   if(canonical){
-    if(!canonical->valid_owner(canonical)||binding->has_mtoon||object.appearance||binding->normal_preparation)
-      throw std::invalid_argument("Canonical source requires its exact native conversion, not an invented typed material");
     canonical->validate();source_paint_pairing(object.painted.get(),binding.get(),nullptr,true);
     if(normal_uv)normal_uv->validate_current(mesh,options.cancelled);
     else{

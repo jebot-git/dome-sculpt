@@ -26,7 +26,10 @@ even if a caller strips the packet certificate or removes its entire material
 view; admission never depends only on the presence of an untrusted DTO marker. No persistent schema, frontend or
 public TextureMaps layout changes are introduced.
 
-Capture charges its bounded frame/field/domain arrays before allocation. Existing
+Capture checks genuine field/origin/correspondence identity before any deep
+validation and charges its bounded frame/field/domain arrays before allocation.
+Its DAG walk uses immutable constant-time canonical cap metadata and walks actual
+canonical before-material anchors before any deep checks. Existing
 active/done ancestor traversal, cycle/depth limits, cancellation and historical
 recipe-cap preflight remain. Higher historical declared caps are conservatively
 refused by a smaller caller; this is not unbounded replay support. Current mesh,
@@ -53,18 +56,21 @@ families or desktop/XR/graphical correctness.
 
 ## Recompilation boundary
 
-[The machine census](validation/CANONICAL-NORMAL-SOURCE-OWNER-CENSUS-20261117.json)
+[The machine census](validation/CANONICAL-NORMAL-SOURCE-OWNER-CENSUS-V2-20261117.json)
 reads both closed whole090f genuine MD manifests, preserves original reused-owner
 provenance, and rehashes every selected original MD byte record. Each context
-contains **64 affected existing owners: 20 core TUs, one render TU and 43 test/
+contains **142 affected existing owners: 49 core TUs, one render TU and 92 test/
 producer TUs**. The private `SourceBakeNormalResolver` and `PaintOverlayPacket`
-layouts both changed. Every selected owner used in a new link must be freshly
+layouts both changed. The canonical owner header also adds a nonvalidating
+immutable cap accessor; its dependents are included even though that class layout
+is unchanged. The earlier 64-owner census is preserved as superseded preparation,
+not complete authority for this child. Every selected owner used in a new link must be freshly
 compiled, regardless of whether its own source body changed. Additional advanced,
 public, graphical and this new fixture TU require their own complete compiler
 prechecks/actual MD census; absence from the older whole graph is not reuse proof.
 No compile plan or runtime admission is implied by this inventory.
 
-Next: parent static review, then coordinated one-job fresh complete core/fixture
+Next: parent static review, then coordinated one-job fresh complete 49 core/4 fixture
 compilation with genuine full depfiles and current compiler inputs. Only after
 those close may a fresh archive/link and lease-owned native run be scheduled.
 Strict sanitizer, real graphical consumers and public desktop/XR controls remain
