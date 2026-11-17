@@ -58,6 +58,7 @@ int execute(const std::filesystem::path &out,const std::filesystem::path &witnes
         render(construct(legacy,live,seam,method));
     render(construct(false,true,true,SourceNormalUvMethod::RetainSource,true));
     check(families==17&&views==68,"Display qualification retains all genuine families, source/target and roles");
+    std::cout<<"ACTUAL_FINAL_RENDERER "<<glGetString(GL_RENDERER)<<std::endl;
     std::cout<<"PASS "<<checks<<" advanced display source/second-Bake graphical controls families="<<families<<" views="<<views<<" points="<<points<<'\n';return 0;
 }
 } // namespace advanced_render::display

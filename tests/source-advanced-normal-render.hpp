@@ -106,6 +106,7 @@ void view(const Case &family,bool source_view,bool pbr,std::span<const std::arra
         check(found,"Display snapshot reaches actual production surface range");
     }
     const std::string label=family.name+(source_view?"-source":"-target")+(pbr?"-pbr":"-mtoon");
+    std::cout<<"ACTUAL_VIEW_RENDERER boundary=begin label="<<label<<" renderer="<<glGetString(GL_RENDERER)<<std::endl;
     Fbo f;SurfaceRenderer renderer;renderer.set_frame_time(0);f.bind();
     const auto actual=draw_view(renderer,document.frame().surface,matrix,camera);
     retain_pixels(label+"-actual",actual);
@@ -167,6 +168,7 @@ void view(const Case &family,bool source_view,bool pbr,std::span<const std::arra
     check(document.copy_scene().encode()==before && scene.encode()==before,
           "Advanced graphical consumer preserves exact complete scene/source/material/normal authority");
     check(glGetError()==GL_NO_ERROR,"Advanced graphical controls leave actual GL error queue empty");
+    std::cout<<"ACTUAL_VIEW_RENDERER boundary=end label="<<label<<" renderer="<<glGetString(GL_RENDERER)<<std::endl;
     std::cout<<"ADVANCED_GL_CASE label="<<label<<" correct_max="<<maximum
         <<" disjoint_wrong="<<sensitive[0]<<" omitted="<<sensitive[1]<<" swapped="<<sensitive[2]<<std::endl;
 }
