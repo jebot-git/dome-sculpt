@@ -24,7 +24,7 @@ int encoded(double linear) {
     return int(std::lround(std::clamp(linear<=.0031308?linear*12.92:1.055*std::pow(linear,1/2.4)-.055,0.,1.)*255));
 }
 struct Inputs {
-    Q base{},orm{},glow{},coverage{},emission_coverage{};
+    Q base{},orm{},glow{},coverage{},emission_coverage{},generic_color{},generic_emission{};
     MToonMaterial typed;
     MToonSamples samples;
     std::array<double,3> effective{},effective_emission{};
@@ -44,11 +44,12 @@ Inputs inputs(const SculptObject &o,std::array<float,2> uv) {
     auto generic=[&](const PaintSourceTexture &r){
         if(!r.image)return Q{1,1,1,1};
         require(r.texcoord==0,"Forecast generic correction source uses its actual UV0");
-        const auto &t=r.uv_transform;const std::array<float,2> q{t[0]*uv[0]+t[2]*uv[1]+t[4],t[1]*uv[0]+t[3]*uv[1]+t[5]};
+        const auto &t=r.uv_transform;const std::array<float,2> q{t[0]*uv[0]+t[1]*uv[1]+t[4],t[2]*uv[0]+t[3]*uv[1]+t[5]};
         return image(*r.image,q,true,r.wrap_s,r.wrap_t,r.mag_filter?r.mag_filter:9729);
     };
     const Q generic_color=maps.source_maps?generic(maps.source_maps->color):Q{1,1,1,1};
     const Q generic_emission=maps.source_maps?generic(maps.source_maps->emission):Q{1,1,1,1};
+    in.generic_color=generic_color;in.generic_emission=generic_emission;
     const auto &binding=*o.material_bindings;in.typed=binding.material;
     auto role=[&](MToonSlot slot){const auto at=size_t(slot);const auto &t=binding.material.textures[at];const auto &r=binding.roles[at];
         if(t.index<0||!r.image){const auto d=mtoon_default_texel(slot);return Q{d[0],d[1],d[2],d[3]};}
@@ -126,7 +127,7 @@ int run(const std::filesystem::path &output,bool display_mode=false) {
             const auto xy=std::array<int,2>{px,py};const bool original=std::find(original_render_probes.begin(),original_render_probes.end(),xy)!=original_render_probes.end();
             stream<<nlohmann::json{{"kind","point"},{"label",label},{"xy",xy},{"original",original},{"bary",bary},{"UV",uv},{"frontmost_triangle",hit->triangle},
                 {"correct_and3negative_normals",normals},{"correct_and3negative_RGB",rgb},{"negative_gaps",gaps},{"actual_filtered_linear_base",in.base},
-                {"actual_filtered_data_AO_rough_metal",in.orm},{"actual_filtered_linear_emission",in.glow},{"native_material_color",o.material.color},
+                {"actual_filtered_data_AO_rough_metal",in.orm},{"actual_filtered_linear_emission",in.glow},{"actual_filtered_generic_color",in.generic_color},{"actual_filtered_generic_emission",in.generic_emission},{"generic_current_UV0_domain_authenticated",true},{"native_material_color",o.material.color},
                 {"native_material_roughness",o.material.roughness},{"native_material_metallic",o.material.metallic},{"display_mode",display_mode},{"declared_shade",std::array<float,3>{o.material_bindings->material.parameters.shade_color.x,o.material_bindings->material.parameters.shade_color.y,o.material_bindings->material.parameters.shade_color.z}},{"declared_toony",o.material_bindings->material.parameters.toony}}.dump()<<'\n';++points;
         }
         stream<<nlohmann::json{{"kind","view"},{"label",label},{"points",points},{"maximum_gaps",maxima},{"witnesses",witnesses},{"PBR_model","independent GGX with genuine filtered material maps"},{"MToon_model","CPU reference presentation estimate; not graphical acceptance"},{"required_gap_unchanged",7},{"original_probes_unchanged",original_render_probes}}.dump()<<std::endl;

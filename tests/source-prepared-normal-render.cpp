@@ -46,7 +46,12 @@ std::shared_ptr<MeshSnapshot> prepared_point(const SculptObject&o,std::array<flo
  auto maps=std::make_shared<TextureMaps>(*o.painted->preview(o.material));maps->normal={};maps->mtoon_normal={};maps->normal_projection.reset();maps->baked_normal={};maps->baked_coverage={};maps->baked_base.reset();maps->overlay.reset();maps->current_grid_preview.reset();maps->polygon_surface.reset();
  // Generic color/emission are material correction inputs even for a fully
  // derived preview. Remove only normal sampling from the independent control.
- if(maps->source_maps){auto sources=std::make_shared<PaintSourceMaps>(*maps->source_maps);sources->normal={};maps->source_maps=std::move(sources);}
+ if(maps->source_maps){auto sources=std::make_shared<PaintSourceMaps>(*maps->source_maps);sources->normal={};
+  // This genuine fixture's generic material is explicitly reprojected into
+  // current UV0 by SourceUV. Refuse an alternate coordinate domain rather than
+  // mislabel a six-vertex source coordinate array as this four-vertex quad.
+  if(sources->uv1||!sources->extra_uv_sets.empty()||sources->uses_alternate_uv())throw std::runtime_error("Normal pixel control requires its explicit current UV0 material domain");
+  sources->validate_surface(result->mesh);maps->source_maps=std::move(sources);}
  maps->source_only=false;result->ranges[0].textures=std::move(maps);return result;
 }
 void prepared_view(Scene scene,uint64_t first,uint64_t second,bool pbr,const std::string&label){
