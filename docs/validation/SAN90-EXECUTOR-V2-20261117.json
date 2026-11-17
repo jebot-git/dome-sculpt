@@ -1,0 +1,36 @@
+{
+  "scope": "Additive reviewed-plan executor correction; original actual owning-v1 failure1 preserved, no source/options change",
+  "evidence": [
+    {
+      "path": "docs/validation/SAN90-EXECUTOR-V2-20261117/closure.json",
+      "sha256": "f0a9e2860cbc06c7f458df8789e952cc597eb455328a33194a5a875116605628",
+      "bytes": 2051
+    },
+    {
+      "path": "docs/validation/SAN90-EXECUTOR-V2-20261117/execute-sanitize-native90-v2.py",
+      "sha256": "f5df4e63948c161482e4846003c16a15d4cfb5c45ebb9510947c215b9ff1703f",
+      "bytes": 24127
+    },
+    {
+      "path": "docs/validation/SAN90-EXECUTOR-V2-20261117/executor-v1-to-v2.diff",
+      "sha256": "34d705a5813bb3f70683a2d95c038e25d82df8b040119169e7f6a863dbe68174",
+      "bytes": 3967
+    },
+    {
+      "path": "docs/validation/SAN90-EXECUTOR-V2-20261117/failed-v1-journal.txt",
+      "sha256": "b6ab3a44b5cb3ce42a3df90162c00345c278ecc008c3a6f1bb0675e5b035c273",
+      "bytes": 3626
+    },
+    {
+      "path": "docs/validation/SAN90-EXECUTOR-V2-20261117/failed-v1-unit.txt",
+      "sha256": "f147af946f9a11f800926fc6b5ba9c92db2a80a8b6bd50f026aa990d1e551b52",
+      "bytes": 1043
+    },
+    {
+      "path": "docs/validation/SAN90-EXECUTOR-V2-20261117/plan-v2-delta.json",
+      "sha256": "1df29fbdb894f3200c431125a2e591569512921316cfe345681bd01d85fb2f88",
+      "bytes": 1821
+    }
+  ],
+  "full_plan_delta_scope": "Original fullplan24db remains preserved in previous preparation capsule. Exact replacementexecution_templates andoneadditionalpin reconstructv2planSHA62116c27; do not rewrite oldfile or duplicate142MBplan."
+}
