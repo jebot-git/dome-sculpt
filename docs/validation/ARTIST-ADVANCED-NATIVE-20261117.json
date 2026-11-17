@@ -1,0 +1,317 @@
+{
+  "scope": "CPU-only component proof; no strict sanitizer, graphics, desktop/XR, installation or whole-app admission",
+  "product_commit": "102f0af4ec05560da340c9e51d415702c2f519de",
+  "fixture_commit": "7dd986d8ed4f07c3cc45c1a45901c59e3f0eda3d",
+  "advanced_actual_exit": 0,
+  "advanced_checks": 249415,
+  "advanced_cases": [
+    {
+      "legacy": 0.0,
+      "live": 0.0,
+      "seam": 0.0,
+      "retained": 0.0,
+      "direct_error": 2.60097e-07,
+      "wrong_domain": 0.341112,
+      "omitted": 0.263992,
+      "swapped": 0.331173,
+      "second_bake_error": 0.00342964,
+      "color_error": 8.75746e-07,
+      "interior": 812.0
+    },
+    {
+      "legacy": 0.0,
+      "live": 0.0,
+      "seam": 0.0,
+      "retained": 1.0,
+      "direct_error": 3.02385e-07,
+      "wrong_domain": 0.393641,
+      "omitted": 0.264441,
+      "swapped": 0.338425,
+      "second_bake_error": 0.00426066,
+      "color_error": 8.75746e-07,
+      "interior": 812.0
+    },
+    {
+      "legacy": 0.0,
+      "live": 0.0,
+      "seam": 1.0,
+      "retained": 0.0,
+      "direct_error": 2.60097e-07,
+      "wrong_domain": 0.341112,
+      "omitted": 0.263992,
+      "swapped": 0.331173,
+      "second_bake_error": 0.00342964,
+      "color_error": 8.75746e-07,
+      "interior": 812.0
+    },
+    {
+      "legacy": 0.0,
+      "live": 0.0,
+      "seam": 1.0,
+      "retained": 1.0,
+      "direct_error": 3.02385e-07,
+      "wrong_domain": 0.393641,
+      "omitted": 0.264441,
+      "swapped": 0.338425,
+      "second_bake_error": 0.00426066,
+      "color_error": 8.75746e-07,
+      "interior": 812.0
+    },
+    {
+      "legacy": 0.0,
+      "live": 1.0,
+      "seam": 0.0,
+      "retained": 0.0,
+      "direct_error": 2.53775e-07,
+      "wrong_domain": 0.340887,
+      "omitted": 0.263507,
+      "swapped": 0.331198,
+      "second_bake_error": 0.00443031,
+      "color_error": 8.75746e-07,
+      "interior": 812.0
+    },
+    {
+      "legacy": 0.0,
+      "live": 1.0,
+      "seam": 0.0,
+      "retained": 1.0,
+      "direct_error": 2.92137e-07,
+      "wrong_domain": 0.392387,
+      "omitted": 0.263952,
+      "swapped": 0.33846,
+      "second_bake_error": 0.00468619,
+      "color_error": 8.75746e-07,
+      "interior": 812.0
+    },
+    {
+      "legacy": 0.0,
+      "live": 1.0,
+      "seam": 1.0,
+      "retained": 0.0,
+      "direct_error": 2.53775e-07,
+      "wrong_domain": 0.340887,
+      "omitted": 0.263507,
+      "swapped": 0.331198,
+      "second_bake_error": 0.00463855,
+      "color_error": 8.75746e-07,
+      "interior": 812.0
+    },
+    {
+      "legacy": 0.0,
+      "live": 1.0,
+      "seam": 1.0,
+      "retained": 1.0,
+      "direct_error": 2.92137e-07,
+      "wrong_domain": 0.392387,
+      "omitted": 0.263952,
+      "swapped": 0.33846,
+      "second_bake_error": 0.00473739,
+      "color_error": 8.75746e-07,
+      "interior": 812.0
+    },
+    {
+      "legacy": 1.0,
+      "live": 0.0,
+      "seam": 0.0,
+      "retained": 0.0,
+      "direct_error": 3.16573e-07,
+      "wrong_domain": 0.680645,
+      "omitted": 0.629565,
+      "swapped": 0.592023,
+      "second_bake_error": 0.00351443,
+      "color_error": 8.75746e-07,
+      "interior": 812.0
+    },
+    {
+      "legacy": 1.0,
+      "live": 0.0,
+      "seam": 0.0,
+      "retained": 1.0,
+      "direct_error": 3.1882e-07,
+      "wrong_domain": 0.636858,
+      "omitted": 0.61198,
+      "swapped": 0.575879,
+      "second_bake_error": 0.00470385,
+      "color_error": 8.75746e-07,
+      "interior": 812.0
+    },
+    {
+      "legacy": 1.0,
+      "live": 0.0,
+      "seam": 1.0,
+      "retained": 0.0,
+      "direct_error": 3.16573e-07,
+      "wrong_domain": 0.680645,
+      "omitted": 0.629565,
+      "swapped": 0.592023,
+      "second_bake_error": 0.00351443,
+      "color_error": 8.75746e-07,
+      "interior": 812.0
+    },
+    {
+      "legacy": 1.0,
+      "live": 0.0,
+      "seam": 1.0,
+      "retained": 1.0,
+      "direct_error": 3.1882e-07,
+      "wrong_domain": 0.636858,
+      "omitted": 0.61198,
+      "swapped": 0.575879,
+      "second_bake_error": 0.00470385,
+      "color_error": 8.75746e-07,
+      "interior": 812.0
+    },
+    {
+      "legacy": 1.0,
+      "live": 1.0,
+      "seam": 0.0,
+      "retained": 0.0,
+      "direct_error": 3.5728e-07,
+      "wrong_domain": 0.677593,
+      "omitted": 0.626442,
+      "swapped": 0.588968,
+      "second_bake_error": 0.00444997,
+      "color_error": 8.75746e-07,
+      "interior": 812.0
+    },
+    {
+      "legacy": 1.0,
+      "live": 1.0,
+      "seam": 0.0,
+      "retained": 1.0,
+      "direct_error": 3.31037e-07,
+      "wrong_domain": 0.636518,
+      "omitted": 0.60905,
+      "swapped": 0.573014,
+      "second_bake_error": 0.00469773,
+      "color_error": 8.75746e-07,
+      "interior": 812.0
+    },
+    {
+      "legacy": 1.0,
+      "live": 1.0,
+      "seam": 1.0,
+      "retained": 0.0,
+      "direct_error": 3.5728e-07,
+      "wrong_domain": 0.677593,
+      "omitted": 0.626442,
+      "swapped": 0.588968,
+      "second_bake_error": 0.00477895,
+      "color_error": 8.75746e-07,
+      "interior": 812.0
+    },
+    {
+      "legacy": 1.0,
+      "live": 1.0,
+      "seam": 1.0,
+      "retained": 1.0,
+      "direct_error": 3.31037e-07,
+      "wrong_domain": 0.636518,
+      "omitted": 0.60905,
+      "swapped": 0.573014,
+      "second_bake_error": 0.00466044,
+      "color_error": 8.75746e-07,
+      "interior": 812.0
+    }
+  ],
+  "advanced_runner_exit": 1,
+  "advanced_runner_error": "Command '['/usr/bin/ldd', '/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-compile-20261117/links-v7/source-prepared-normal-bake']' returned non-zero exit status 1.",
+  "legacy_actual": [
+    [
+      "source-prepared-normal-bake",
+      0
+    ],
+    [
+      "source-artist-normal-bake",
+      0
+    ]
+  ],
+  "legacy_runner_exit": 0,
+  "legacy_prepared_checks": 91,
+  "legacy_artist_checks": 139,
+  "input_drift": [],
+  "lease": {
+    "independent_nonblocking_available": true,
+    "inode": 99618
+  },
+  "private_header_actual_core_owners": [
+    "CMakeFiles/dome-sculpt-core.dir/src/bake-authoring.cpp.o.d",
+    "CMakeFiles/dome-sculpt-core.dir/src/bake.cpp.o.d",
+    "CMakeFiles/dome-sculpt-core.dir/src/emission-bake-source.cpp.o.d"
+  ],
+  "replaced_core_members": [
+    "bake-authoring.cpp.o",
+    "bake.cpp.o",
+    "emission-bake-source.cpp.o"
+  ],
+  "source_worktree": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-source-20261117",
+  "unsupported": [
+    "canonical normal/material domains",
+    "native32 normal/material domains",
+    "independent writable-paint metadata domains",
+    "combined Source8/prepared-normal authority"
+  ],
+  "remaining_required": [
+    "ancestor-replay budget production child and tests",
+    "strict ASAN/UBSAN component qualification",
+    "actual graphical consumer and proper public desktop/XR controls",
+    "fresh combined integration build/qualification"
+  ],
+  "maximums": {
+    "direct_error": 3.5728e-07,
+    "second_bake_error": 0.00477895,
+    "color_error": 8.75746e-07
+  },
+  "bounds": {
+    "direct_normal_error": 3e-06,
+    "second_bake_normal_error": 0.035,
+    "material_error": 0.025,
+    "negative_sensitivity": 0.05
+  },
+  "minimums": {
+    "wrong_domain": 0.340887,
+    "omitted": 0.263507,
+    "swapped": 0.331173,
+    "interior": 812.0
+  },
+  "records": {
+    "native-links-v7/status.json": {
+      "sha256": "b9d76db63a37f8fe4f70ce020586a26effb51f56899c2c4d7a39d6ee76081a43",
+      "bytes": 1429
+    },
+    "native-legacy-v1/status.json": {
+      "sha256": "0096c0764047ce0a840ba722cb092a838255517f45d1235e75d6335b1aa33481",
+      "bytes": 2069
+    },
+    "links-v2/compile-closure.json": {
+      "sha256": "710b34ce4a11d1c131e1c2401f9980db19e1d2c4f2e79cd4f38cb5382e7517e8",
+      "bytes": 529766
+    },
+    "links-v2/archive-members.json": {
+      "sha256": "a17998aa8dfd330d7a46a08709a12443ab009b5f94a78ee44763e580909e4fbf",
+      "bytes": 45511
+    },
+    "links-v7/compile-closure.json": {
+      "sha256": "e22fd9b998983bf48f42ae866b1795502ab21d3c5362f8f3a2c11db5dea5e744",
+      "bytes": 531980
+    },
+    "links-v7/status.json": {
+      "sha256": "bffde42c77d424c7f68fe8a4d151112aa0df6658080c193f397d1fb94f2e6ea7",
+      "bytes": 8244
+    }
+  },
+  "evidence_archive": {
+    "path": "docs/validation/artist-advanced-native-20261117.tar.xz",
+    "sha256": "cea61d9c9fd8441bd25e6a0ee24729faa66e266c8d4d5f797dc120868a6a06ab",
+    "bytes": 185824,
+    "members": 190,
+    "manifest_sha256": "660ed7875e87c5f095653ae2d39667b0c4082658af5eca5c0b33ddf5b2c95c73"
+  },
+  "actual_status_files": {
+    "native-links-v7/status.json": "b9d76db63a37f8fe4f70ce020586a26effb51f56899c2c4d7a39d6ee76081a43",
+    "native-legacy-v1/status.json": "0096c0764047ce0a840ba722cb092a838255517f45d1235e75d6335b1aa33481",
+    "links-v2/status.json": "d0a636841593dd69cf9c38a0bf3ca8227cee979fd607857349a77811ac65a696",
+    "links-v2/archive-members.json": "a17998aa8dfd330d7a46a08709a12443ab009b5f94a78ee44763e580909e4fbf",
+    "links-v2/compile-closure.json": "710b34ce4a11d1c131e1c2401f9980db19e1d2c4f2e79cd4f38cb5382e7517e8"
+  }
+}
