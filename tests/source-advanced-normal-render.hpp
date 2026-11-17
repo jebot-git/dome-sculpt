@@ -28,10 +28,10 @@ struct Case {
     uint64_t source{}, destination{};
     std::string name;
 };
-Case construct(bool legacy,bool live,bool seam,SourceNormalUvMethod method,bool repeated=false) {
+Case construct(bool legacy,bool live,bool seam,SourceNormalUvMethod method,bool repeated=false,uint32_t destination_resolution=64) {
     const std::string name=std::string(legacy?"mt0":"mt1")+(live?"-posed":"-rest")+
         (seam?"-seam":"-shared")+(method==SourceNormalUvMethod::RetainSource?"-retained":"-raster")+
-        (repeated?"-three-edits":"");
+        (repeated?"-three-edits":"")+(destination_resolution==64?"":"-target-resolution-"+std::to_string(destination_resolution));
     std::cout<<"ADVANCED_GL_FAMILY "<<name<<std::endl;
     auto scene=advanced_fixture::uv_source(advanced_fixture::prepared(legacy,check),method,seam);
     if(repeated) {
@@ -49,7 +49,7 @@ Case construct(bool legacy,bool live,bool seam,SourceNormalUvMethod method,bool 
     const auto destination=scene.add("Advanced graphical destination",Volume{});
     auto &target=scene.object(destination);
     target.mesh_active=true;
-    target.painted=std::make_shared<PaintedMesh>(mesh,64);
+    target.painted=std::make_shared<PaintedMesh>(mesh,destination_resolution);
     target.material_bindings=blank_typed(legacy);
     scene.select(destination);
     ObjectBakeSettings options;
