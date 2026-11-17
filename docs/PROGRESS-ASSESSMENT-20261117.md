@@ -51,21 +51,42 @@ endpoint checks and32 expected negative refusals. All eight actual source-use
 desktop workflows pass128 checks across sixteen fresh Apps, including Save,
 Undo/Redo and reopen; see
 [the desktop matrix](ADVANCED-PUBLIC-SOURCE-GUI-MATRIX-20261117.md).
-These newer production changes are not integrated into main. Their source-use
-XR, UV-creation desktop/XR, graphical and combined qualification remain pending.
+All eight authenticated Arc synthetic-XR source-use cases now pass520 checks,
+and all eight desktop UV-creation cases pass112 checks. Read
+[source-use XR](ADVANCED-PUBLIC-SOURCE-XR-MATRIX-20261118.md) and
+[UV creation](ADVANCED-PUBLIC-UV-GUI-MATRIX-20261118.md).
+These newer production changes are not integrated into main. UV-creation XR
+first exposed test reporter/capture assumptions; an observation-only child
+preserves the actual input, render-skip and tracking-loss stream for rerunning.
 
 The advanced graphical test's first software run agrees on correct PBR colours
-but fails required contrast against omitted normals. A calibrated CPU forecast
-finds additional genuine PBR witness points; MToon needs further presentation
-and graphical calibration. This is an unresolved verification issue, not an
-advanced graphics pass; see
+but fails required contrast against omitted normals. Declared display-only
+presentation and genuine interior probes address contrast. A later MToon
+material-control mismatch was traced to incorrectly dropped generic source
+colour metadata and corrected without changing production images or thresholds.
+The next actual run exposes real between-texel normal-detail loss when retained
+source fields are baked into a compressed64-pixel target atlas. Fidelity checking
+and a genuine explicit higher-resolution workflow are now required; the original
+low-resolution failures remain. This is not an advanced graphics pass; see
 [the preserved results](ADVANCED-NORMAL-CONTRAST-ACTUAL-20261117.md).
 
-A canonical normal-field source adapter is implemented on a separate branch.
-Compilation stopped after28 successful source files because of a missing include.
-The include-only correction is pushed, and the25-file continuation is reviewed;
-native32, sanitizer and application validation remain pending. Other unsupported
-source families remain explicit refusals pending their actual adapters.
+A canonical normal-field source adapter is implemented separately and passes
+all32 native cases/525092 checks, including both normal roles, UV/key/pose,
+field replacement/Clear, physical emission, history and ordered Save. The four
+fixture/core component passes preserve both earlier compile and test failures;
+read [canonical source proof](ARTIST-CANONICAL-NORMAL-NATIVE-20261118.md).
+Native32/canonical writable-paint SOURCE adapters are now implemented on a
+further isolated child, with native qualification still pending; joint source
+colour/normal handling remains in progress.
+
+The coherent canonical/public candidate8a8ecea1 completes a fresh optimized
+application build:242 actual compiler dependency owners including all193 core
+members,260 build steps, ordinary loader72 and version0. Read
+[the exact build scope](CANONICAL-PUBLIC-RELEASE-APP-20261118.md).
+Its production files match canonical85; this does not establish new GUI/XR or
+all-target qualification. A fresh strict sanitizer core/four-fixture build is
+running separately. Other unsupported source families remain explicit refusals
+pending their actual adapters.
 
 The user-accepted controller selection/hierarchy/multiselection/ghost interface
 is preserved. Only the verified CC0 VRoid female/male creator bases are offered.

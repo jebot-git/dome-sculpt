@@ -181,10 +181,15 @@ swapped controls retain .05 sensitivity. Read
 [the desktop matrix](ADVANCED-PUBLIC-SOURCE-GUI-MATRIX-20261117.md).
 These are explicitly product90fad/fixture27ff/runtime-and-scenarios8bb, unchanged
 090f UI/support and font6c8. They do not admit advanced production into main.
-Six source-use syntheticXR cases now pass65 checks each on authenticated Arc;
-the two remaining RetainSource/MT1 cases and separate UV-creation desktop/XR
-remain pending. The canary proof is integrated in main05987cbe; read
-[its scoped record](ADVANCED-PUBLIC-SOURCE-XR-CANARY-20261118.md).
+All eight source-use syntheticXR cases pass65 checks each on authenticated Arc,
+total520. All eight separate desktop UV-creation cases pass112 checks. Read
+[source-use XR](ADVANCED-PUBLIC-SOURCE-XR-MATRIX-20261118.md) and
+[desktop UV creation](ADVANCED-PUBLIC-UV-GUI-MATRIX-20261118.md).
+UV-creation XR first fails a test reporter/capture contract: intended pressure
+was logged for unused float actions, and captures14/27 conflict with actual
+render skip/tracking loss. Test-only childb7d6ff17 records returned pressure and
+observes13/29 while preserving all action timings and original render/tracking
+events. Its full runtime TU/fresh DSO pass; all-eight rerun remains pending.
 Operational statuses remain under artifacts/advanced-public-normal-operational-20261117.
 Each case retains the original bounds and common device lease. No
 physical-headset result follows from synthetic XR.
@@ -201,9 +206,14 @@ The declared display-only presentation and extra interior probes now compile
 and link. Its source2c687a1a preserves genuine normal data/source ownership and
 publishes through Document. The CPU forecast passes68 views and selects438
 probes including all272 original probes, with predicted contrast in both roles.
-Actual corrected software GL still fails: the first MToon pixel is231,217,209
-against ordinary-normal control196,207,197, beyond RGB3. This is distinct from
-the earlier weak-contrast failure and remains preserved under
+The first corrected software GL fails a MToon material control:231,217,209
+against196,207,197. Dropped generic-source colour metadata caused that mismatch;
+the corrected ordinary control now agrees exactly, with the initial six views
+passing. The next actual failure is real continuous normal-detail loss: source
+RetainSource64 sampled through a compressed current atlas into target64 exceeds
+.035 between texel centres, with original-probe error up to .21789. All original
+low-resolution cases and probes are preserved; production fidelity checking and
+an explicit higher-resolution retry workflow are in progress. Results remain under
 artifacts/advanced-normal-display-owner-build-20261118/software-display-v1-20261118.
 The agent is diagnosing actual material/normal transport; no advanced GL/Arc
 success is claimed and no threshold or genuine normal data is weakened.
@@ -220,12 +230,17 @@ fresh fixture links also complete0. The first canonical runtime fails a test
 assertion comparing a deliberately detached conversion paint wrapper with its
 mutable original. Fixture-only childb11f9d42 preserves the failure and compares
 actual geometry/maps/event/content and detached deformation instead. Its fresh
-fixture compile/link pass; native execution is next, collecting advanced17,
-prepared91 and artist139 independently before the new canonical32 cases.
+fixture compile/link pass. Native execution passes advanced17/263495, prepared91
+and artist139 independently, then canonical32/525092 with32 ordered Save pairs.
+Read [canonical qualification](ARTIST-CANONICAL-NORMAL-NATIVE-20261118.md).
 Other affected consumers, sanitizer, graphics and public application
 qualification remain pending. Do not reuse an
 old renderer with the changed private packet layout. The32-case canonical
 matrix does not implement the separate native32 writable-paint source family.
+The latter and canonical writable-paint SOURCE adapters now have isolated code
+atf7428248 plus source-selection child4c7eb3bb; direct native first-case sampling
+passes but the whole64-case/native/public closure remains pending. Joint
+source-colour/normal handling is being implemented in a separate child.
 
 ## Coherent integration build
 
@@ -235,15 +250,21 @@ independent graphics2c687a1a through real merges. All765 production/build/asset
 files match85 exactly; selected test/runtime roles are checked explicitly in
 its integration receipt. This is source composition, not main admission.
 
-Fresh Release configuration passes against the current canonical SDK. The whole
-production application target is now compiling in
+Fresh Release configuration and the whole production application target pass in
 artifacts/authoring-canonical-public-release-20261118 under
-ds-canonical-public-release-app-20261118.service, MainPID113593,
-Invocation7d8c6f8b6e694690b7970cc3e097a259. It uses two jobs,6GiB aggregate
-memory,3GiB process address-space and7200-second unit bounds, and retains actual
-compiler dependency files. Inspect the actual unit/status before acting. This
-is an application-target build; no all-target/test or new runtime pass is claimed.
-Keep its source worktree frozen while building, including tests and CMake files.
+Invocation7d8c6f8b6e694690b7970cc3e097a259:242 compiler owners,93903 dependency
+incidences, all193 core members and260 build steps in670.415s. Ordinary loader
+exact72 and version also pass. Terminal/journal captured before stopping the
+completed unit. Read [fresh build proof](CANONICAL-PUBLIC-RELEASE-APP-20261118.md).
+No all-target/test or new application GUI/XR pass is claimed. Keep its source
+worktree frozen, including tests and CMake files.
+
+Fresh strict ASan/UBSan full core plus4 fixtures is now building from immutable
+b11 fixture/product85 under ds-canonical-headless-sanitize-build-20261118.service,
+MainPID267731/Invocation3470aba927444b6bb00cdd284a382716, in
+artifacts/canonical-normal-headless-sanitize-20261118. It uses the actual previous
+qualified O1/g1/instrumented CMake flags, two jobs and6GiB memory. Inspect the
+actual unit/status before acting; no sanitizer runtime result is claimed yet.
 
 ## Canonical toolkit and full remaining goal
 
