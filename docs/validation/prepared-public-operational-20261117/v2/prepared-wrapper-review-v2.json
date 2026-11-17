@@ -1,0 +1,34 @@
+{
+  "state": "prepared-NOT-executed",
+  "causal_change": "Corrected producer snapshot owner baseline f1e193c7; unchanged6c8 public scenarios/runtime/font and unchanged1bc product. Prior6c8 failed native producer and unexecuted v1 preserved.",
+  "source_tuple": {
+    "prepared_fixture": "f1e193c7563eacc4db1d40518235450975460b15",
+    "scenario": "6c8f042cb1730fa017595e9a710b8c8c6015a9ea",
+    "runtime_and_font": "6c8f042cb1730fa017595e9a710b8c8c6015a9ea",
+    "product": "1bc13125"
+  },
+  "files": {
+    "run-v2.py": "025227d2338664192b9aaa4510264e733f609b0925ea3bc08bafb94a38b3da8c",
+    "cohort_v2.py": "65e60766470286c15956bf949e1c64fc6c9a4d66b2f2a0019b27473700764f49",
+    "run-v2.py.diff": "b9b1b0373c3d0fc4ead1b1fd777d6d020567cbd8163d4a0e56bb477290c097ee",
+    "cohort_v2.py.diff": "916307f87379cae0e953553eb95d701be0c6467bda38ff01de5f066e0179b570",
+    "gui-plan-v2.json": "c4651381bcd15899aaee84a92b0e05172a1eadb513ee8ec0bc48879286fd76c3",
+    "xr-plan-v2.json": "d2b68a06b749323a465803a47ffab6e485876a6dcf049f5e43805111ffca48f7"
+  },
+  "preserved_v1": {
+    "run.py": "c3d503d3a9dc509b17bbb81437549457e14688a034b85cb16074a7ab610af338",
+    "cohort.py": "544826aa46ee4d56435ac345c799d0d41a62bdf37ae8f42d199d9570748d27c1",
+    "prepared-wrapper-review-v1.json": "5450d2e310211e24886132b41ac327dcd26a62b29a455065e76eb5c4f8096dba"
+  },
+  "scenario_provenance": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/prepared-public-operational-20261117/scenario-provenance.json",
+    "sha256": "750a7d7f0193d3b3ec32eefb0bbfce3135593a159aeaf34f22a5a42926db7f3d"
+  },
+  "static_checks": {
+    "all_python_AST_valid": true,
+    "gui_prepare_exit": 0,
+    "xr_prepare_exit": 0,
+    "no_product_launch": true
+  },
+  "requires_actual_native_terminal0_and_root_phase_case_review": true
+}
