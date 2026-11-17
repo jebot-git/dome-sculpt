@@ -25,7 +25,7 @@ Update this current summary at milestones rather than prepending more history.
   regression. This is separate from the full combined build and new workflow.
   Read [the GUI proof](APP1BC-SOURCE8-GUI52-PASSED-20261115.md).
 
-## Actual running jobs: inspect before acting
+## Build results and running jobs: inspect before acting
 
 Authoritative state is the current service/process and its output, not this
 snapshot. Never restart a job merely because an observation handle times out.
@@ -35,18 +35,26 @@ snapshot. Never restart a job merely because an observation handle times out.
    Plan: artifacts/native90-release-planning-20261115/
    release-090f00-20261117-audit/plan.json, SHAccf9931035481459d7f51ec03e829ee2572e424d381d2bbc69a29c1fe26e1661.
    Status is execution-native90-v1/status.json under that audit directory.
-   Actual291 compilations,737 links and3 generators have completed; the mixed
-   dependency/output/final-input audit is still pending in the last observation.
-  745 verified independent whole objects are explicitly reused. No reused object
-   is called newly compiled; original and new dependency records remain separate.
-   Require actual terminal0 and independent unit closure before product tests.
-2. Strict sanitizer prepare-only: ds-native90-sanitize-prepare-20261117.service,
-   MainPID2039800, InvocationIDb3efe8ba13c44307bd0571d5d4786dcb.
-   It hashes original/completion providers and configures the same frozen source;
-   no sanitizer compilation is authorized yet. Artifacts live under
-   artifacts/native90-sanitize-planning-20261115. Source-aware two-lineage
-   executor/auditor templates are prepared; see
-   [SAN90 preparation](SAN90-EXECUTOR-PREP-20261117.md).
+   Actual build and final audit terminate0 in799.133s:291 fresh compilations,
+  745 verified independent whole objects,737 fresh links,3 generators,1776
+   outputs and1036 dependency owners/434920 incidences with0errors/drift[].
+   Status SHA3c4fd01b2a6702ee0069a744375b9d4a087ef4d8ed6a7faff829d22fe49be36c.
+   The unit is independently captured as successful and stopped. No reused
+   object is called newly compiled; old/new compiler records remain separate.
+   Native90 execution waits for the public GUI/XR graphics lease handback.
+2. Strict sanitizer build: ds-native90-sanitize-build-v2-20261117.service,
+   InvocationIDf2bcbf89dda84a1dae2590e06d016dd4. Plan-v2 SHA
+  62116c27b70b37459d186e037acc51984d34fac8262760e5f50351ac8c21f8d9.
+   Status is artifacts/native90-sanitize-planning-20261115/
+   sanitize-090f00-20261117-audit/execution-native90-v2/status.json.
+   Prepare-only was actual0. First executor launch stopped before staging:
+   its policy incorrectly rejected two existing optimized CPU/FMA test owners.
+   The [v2 correction](SAN90-EXECUTOR-V2-20261117.md) preserves exactly those
+   two O3/march=native owners and O1 for the other1034, with ASan/UBSan and
+   frame-pointer instrumentation for ALL1036. Source/CMake/commands are unchanged;
+   original failure and expected pins remain preserved. The v2 build is live;
+   require actual terminal0 and separate review before any sanitizer products.
+
 
 Builds use regular-user bounded units, two compiler jobs and8GiB aggregate RSS.
 No system installation, physical-headset launch or session restart occurred.
@@ -62,14 +70,15 @@ artifacts/artist-prepared-public-link-v3-20261115/native-public-v3-20261117-v1.
 Test-only childf1e193c7563eacc4db1d40518235450975460b15 captures the pointer baseline
 inside the detached scene before Bake, additionally retaining full encoded input
 and original-scene checks. Production is unchanged. Its complete fixture TU and
-fresh link pass; runtime/font/scenarios remain explicitly6c8. The native capsule/
-font qualification is authorized under a new unit and must be checked for its
-actual result. Read the actor's artifact namespace
+fresh link pass; runtime/font/scenarios remain explicitly6c8. Native capsule/
+font qualification is now actual0, with all47 commands,4 genuine cases,
+32 positive phases,8 wrong-Original refusals and all bitmap checks passing.
+Read [the native seal](ARTIST-PUBLIC-NATIVE-20261117.md) and actor artifact namespace
 artifacts/artist-public-snapshot-link-20261117; do not blindly rerun old failures.
 
-Next: native91, four genuine cases,32 positive verifier calls,8 wrong-Original
-rejections, default4 bitmap masks unchanged plus22 additive labels; then actual
-GUI/XR source selection, Bake, immediate Save, Undo/Redo and reopen. Operational
+All4 actual desktop cases now pass16 checks each/64 total, including real
+source choice, Bake, ordered Save/history and reopening. Arc syntheticXR cases
+are running next; do not infer final acceptance until their wrappers close. Operational
 wrapperv2 is in artifacts/prepared-public-operational-20261117, with an explicit
 fixturef1/scenario6c8/runtime+font6c8/product1bc source tuple. Originalv1 remains
 unexecuted. Each actual phase/case must bind the true native terminal status.
