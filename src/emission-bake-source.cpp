@@ -6,6 +6,7 @@
 #include "normal-bake-encoding.hpp"
 #include "normal-projection-identity.hpp"
 #include "paint-normal-access.hpp"
+#include "normal-sampling-access.hpp"
 #include <numeric>
 #include "dome/material-bindings.hpp"
 #include "dome/material-visibility.hpp"
@@ -95,15 +96,30 @@ struct Source {
   }
 };
 }
+bool SourceBakeNormalResolver::matches_prepared_source(const TextureMaps &maps)const noexcept {
+ auto same=[](const auto &a,const auto &b){return a==b&&!a.owner_before(b)&&!b.owner_before(a);};
+ if(!sample_||!projection_||!packet_||!same(maps.normal_projection,projection_))return false;
+ if(!maps.source_only)return same(maps.baked_base,packet_->baked());
+ return maps.overlay&&same(maps.source_maps,packet_->source_maps())&&
+   same(maps.overlay->source_maps(),packet_->source_maps())&&
+   same(maps.overlay->baked(),packet_->baked())&&
+   same(maps.overlay->padding(),packet_->padding())&&
+   maps.overlay->resolution()==packet_->resolution();
+}
 SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTransform relative,
     const SourceBakeNormalOptions &options){
   const auto &binding=object.material_bindings;
   if(!binding||!binding->normal_frames)return {};
   auto stop=[&]{if(options.cancelled&&options.cancelled())throw std::runtime_error("Source normal capture cancelled");};stop();
   const bool prepared=object.painted&&object.painted->normal_projection()&&binding->normal_preparation;
-  if(prepared&&(object.painted->normal_projection()->version!=1||binding->normal_preparation->uv_reprojection||
-      binding->normal_preparation->sampling_domain||binding->sampling_reparameterized))
-    throw std::invalid_argument("Prepared source UV edits require their own normal/material coordinate authority adapter");
+  const auto preparation=prepared?binding->normal_preparation:nullptr;
+  const auto retained=prepared&&object.painted->normal_projection()->version==2
+    ?object.painted->normal_projection()->sampling_domain:nullptr;
+  if(prepared&&(preparation->canonical_conversion||object.painted->paint_sampling_domain()||
+      (preparation->sampling_domain&&preparation->sampling_domain->metadata_sampling_domain)))
+    throw std::invalid_argument("Prepared source independent canonical/writable-paint domains require their own material authority adapter");
+  if(prepared&&binding->sampling_reparameterized&&!preparation->uv_reprojection&&!preparation->sampling_domain)
+    throw std::invalid_argument("Prepared source UV reparameterization lost its owning normal/material recipe");
   if(!object.mesh_active||!object.painted||!object.painted->valid_source_sampling_attachment()||
      binding->canonical_attributes||binding->canonical_uv||binding->canonical_paint_sampling||binding->native_paint_sampling||binding->native_paint_frames||
      bool(binding->normal_preparation)!=bool(object.painted->normal_projection())||object.painted->color_projection()||
@@ -114,14 +130,28 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTr
   // Charge both posed role arrays, immutable evaluated corner columns and
   // layout scratch before allocating, including retained morph/frame payload.
   const uint64_t preview_bytes=prepared?uint64_t(object.painted->resolution())*object.painted->resolution()*4*12:0;
-  const uint64_t work=preview_bytes+set.storage_bytes()+corners*(3*sizeof(uint32_t)+2*(sizeof(Vec3)+sizeof(std::array<float,4>)+sizeof(NormalBakeVertex)));
+  const uint64_t capture_bytes=preview_bytes+set.storage_bytes()+corners*(3*sizeof(uint32_t)+2*(sizeof(Vec3)+sizeof(std::array<float,4>)+sizeof(NormalBakeVertex)))+(retained?retained->storage_bytes():0);
+  // Replay scratch dies before posed columns/packets are captured. Respect the
+  // owning recipe's declared replay cap as a separate, sequential stage rather
+  // than let it spend an unbounded amount below a smaller caller quota.
+  uint64_t replay_bytes=0;
+  if(preparation&&preparation->uv_reprojection)replay_bytes=preparation->uv_reprojection->receipt.max_working_bytes;
+  if(preparation&&preparation->sampling_domain)replay_bytes=preparation->sampling_domain->receipt.max_working_bytes;
+  const uint64_t work=std::max(capture_bytes,replay_bytes);
   if(!options.max_working_bytes||options.max_working_bytes>512*1024*1024||work>options.max_working_bytes)
     throw std::length_error("Artist source normal capture exceeds prospective working budget");
   normal_frame_current_authority(*binding,mesh,object.deformation.get(),options.cancelled);
   if(!set.pbr||(binding->has_mtoon&&!set.mtoon))throw std::invalid_argument("Artist source lost its explicitly declared PBR/MToon frame roles");
   std::shared_ptr<const PaintNormalProjection> current_normals;
   if(prepared){
-    binding->normal_preparation->validate_current(mesh,object.appearance.get(),options.cancelled);
+    if(preparation->uv_reprojection)preparation->uv_reprojection->validate(true,options.cancelled);
+    if(preparation->sampling_domain){
+      preparation->sampling_domain->validate(true,options.cancelled);
+      preparation->sampling_domain->validate_paint(*object.painted,*binding,true,options.cancelled);
+    }
+    preparation->validate_current(mesh,object.appearance.get(),options.cancelled);
+    if(retained&&(retained->indices!=mesh.indices||retained->coordinates.size()!=mesh.positions.size()))
+      throw std::invalid_argument("Prepared source retained normal coordinates lost exact current ordered corners");
     if(!normal_projection_identity(*object.painted->normal_projection(),*binding->normal_preparation->projection))
       throw std::invalid_argument("Prepared source lost its actual intrinsic normal authority");
     // The owning accessor resolves actual intrinsic/detail normal events
@@ -154,7 +184,8 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTr
   // W is a per-triangle discrete attribute, never a barycentric float sign.
   for(size_t role=0;role<(typed?2u:1u);++role)for(size_t c=0;c<corners;c+=3){if((c&1023)==0)stop();if(vertices->at(role)[c].w!=vertices->at(role)[c+1].w||vertices->at(role)[c].w!=vertices->at(role)[c+2].w)throw std::invalid_argument("Artist source tangent handedness changes inside a triangle");}
   stop();std::shared_ptr<const std::array<std::vector<NormalBakeVertex>,2>> immutable=std::move(vertices);
-  return [immutable,coordinates=std::move(coordinates),typed,typed_role,has_tangent,prepared,current_normals](uint32_t triangle,std::array<float,3> bary){
+  const auto packet=coordinates.packet;
+  auto sample=[immutable,coordinates=std::move(coordinates),typed,typed_role,has_tangent,prepared,current_normals,retained](uint32_t triangle,std::array<float,3> bary){
     coordinates.stop();const std::array<double,3> weights{bary[0],bary[1],bary[2]};std::array<Vec3,2> result;
     for(size_t role=0;role<(typed?2u:1u);++role){
       std::array<NormalBakeVertex,3> corners;for(size_t k=0;k<3;++k)corners[k]=immutable->at(role).at(size_t(triangle)*3+k);
@@ -167,7 +198,13 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTr
         view.image=role==0?current_normals->pbr:current_normals->mtoon;
       }
       if(enabled&&view.image){
-        auto uv=coordinates.coordinates(triangle,bary,prepared?0:role==0?view.texcoord:mtoon_coordinate(typed->textures[size_t(MToonSlot::Normal)]),!prepared&&role!=0);
+        std::array<float,2> uv{};
+        if(retained){
+          const auto &values=role&&!retained->mtoon_coordinates.empty()?retained->mtoon_coordinates:retained->coordinates;
+          std::array<double,2> point{};
+          for(size_t k=0;k<3;++k){const auto q=values.at(retained->indices.at(size_t(triangle)*3+k));for(size_t c=0;c<2;++c)point[c]+=double(q[c])*bary[k];}
+          for(size_t c=0;c<2;++c){if(!std::isfinite(point[c]))throw std::invalid_argument("Nonfinite retained source normal sample");uv[c]=float(point[c]);}
+        }else uv=coordinates.coordinates(triangle,bary,prepared?0:role==0?view.texcoord:mtoon_coordinate(typed->textures[size_t(MToonSlot::Normal)]),!prepared&&role!=0);
         if(role&&!prepared)uv=mtoon_uv(*typed,MToonSlot::Normal,uv,0);
         view.texcoord=0;
         const auto value=sample_source_texture(view,uv[0],uv[1],false);const float scale=role==0?(prepared?1:coordinates.maps->normal_scale):typed->parameters.normal_scale;
@@ -178,6 +215,7 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTr
     if(!typed)result[1]=result[0];
     return result;
   };
+  return SourceBakeNormalResolver(std::move(sample),prepared?object.painted->normal_projection():nullptr,packet);
 }
 std::shared_ptr<const TextureMaps> raw_bake_source(const SculptObject &object,
     const std::function<bool()> &cancelled){
