@@ -40,7 +40,7 @@ try:
    wanted={18,26}|({15}if m['uv_method']=='RetainSource'else set());press=state.get('advanced_uv_pressures',[])
    check({v['frame']for v in press}==wanted and all(v['action']=='paint_pressure'and v['pressure']>.8 for v in press),'Actual pressure edges select Keep detail only for RetainSource, then Turn90 and Apply')
    check(any(v['frame']==18 and v['x']==366 and v['y']==85 for v in state.get('advanced_uv_aims',[])),'Actual controller aim reaches the shared Turn90 button, not a replacement scene callback')
-   capture=state.get('advanced_uv_captures',{});check(all(str(frame)+'-'+str(eye)in capture for frame in [14,16,19,25,27]for eye in [0,1]),'Both actual released eyes capture UV state around mode choice, rotation and Apply')
+   capture=state.get('advanced_uv_captures',{});check(all(str(frame)+'-'+str(eye)in capture for frame in [13,16,19,25,29]for eye in [0,1]),'Both actual released eyes capture UV state around mode choice, rotation and Apply')
    for row in capture.values():check(Path(row['ppm']).is_file()and Path(row['rgba']).stat().st_size==row['width']*row['height']*4,'Captured UV eye has full actual PPM/RGBA payload')
   else:check(not state.get('advanced_uv_pressures'),'Fresh ordinary reopen injects no authoring pressure')
   previous=target

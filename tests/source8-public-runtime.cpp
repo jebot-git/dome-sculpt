@@ -555,7 +555,9 @@ FN(ReleaseSwapchainImage, XrSwapchain p, const XrSwapchainImageReleaseInfo *) {
       for(int y=int(s->height)-1;y>=0;--y)for(unsigned x=0;x<s->width;++x)for(int c=0;c<3;++c)capture.put(char(displayed(bytes[(size_t(y)*s->width+x)*4+c])));
     }
   }
-  if(!advanced_uv_mode().empty()&&(frame==14||frame==16||frame==19||frame==25||frame==27)){
+  // Observe actual released eyes around the unchanged input schedule. Frame14
+  // deliberately skips rendering; frame27 loses views and frame28 also skips.
+  if(!advanced_uv_mode().empty()&&(frame==13||frame==16||frame==19||frame==25||frame==29)){
     if(const auto path=getenv("DOME_XR_FIXTURE_REPORT")){
       const auto key=std::to_string(frame)+"-"+std::to_string(s->eye);
       const auto target=std::string(path)+".advanced-uv-"+key+".ppm";
@@ -1202,7 +1204,7 @@ FN(GetActionStateFloat, XrSession, const XrActionStateGetInfo *p,
     if (const auto mode=getenv("DOME_XR_FIXTURE_NORMAL_DOMAIN"))
       {const auto advanced=advanced_uv_mode();
        stroke=(frame==15&&(advanced.empty()||advanced=="RetainSource"))||frame==18||(std::string_view(mode)!="focus"&&frame==26);
-       if(!advanced.empty()&&stroke)report["advanced_uv_pressures"].push_back({{"frame",frame},{"action",a->name},{"pressure",.9}});
+       // Pressure evidence is recorded only after the queried action returns pressure below.
       }
     if (getenv("DOME_XR_FIXTURE_LAYERS"))
       stroke = frame >= 18 && frame <= 20;
@@ -1236,6 +1238,7 @@ FN(GetActionStateFloat, XrSession, const XrActionStateGetInfo *p,
         a->name == (ink() && frame >= 13 ? "tip_force" : "paint_pressure");
     if (stroke && correct) {
       out->currentState = .9f;
+      if(!advanced_uv_mode().empty())report["advanced_uv_pressures"].push_back({{"frame",frame},{"action",a->name},{"pressure",out->currentState}});
       if (!retopo_mode().empty()) count("retopo_pressure_samples");
       if(!polygon_mode().empty())count("polygon_pressure_samples");
       if (!cut_mode().empty()) count("cut_slider_samples");
