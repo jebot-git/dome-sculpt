@@ -1,0 +1,14 @@
+{
+  "state": "independent-archive-current-bytes-verified",
+  "archive_sha256": "bf42437851ba52d85af4db68bb02496b7d503d8ef69fa3710fc0894f11191761",
+  "summary_sha256": "e528bbb3410271d425dbcf4e8e8d1a29673f3fdb43c9b4320be0906ee2f7a575",
+  "all975members_match_recorded_hash_and_current_file": true,
+  "actual_test_units": 8,
+  "wholeApp_GUI_checks": 64,
+  "wholeApp_XR_checks": 260,
+  "uncached_expected_input_pins": 57773,
+  "uncached_postseal_input_drift": [],
+  "actual_sealer_observed_exit": 0,
+  "original_packaging_guard_exit": 1,
+  "no_product_reruns_for_packaging": true
+}
