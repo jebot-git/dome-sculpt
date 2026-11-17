@@ -1,0 +1,1171 @@
+{
+  "scope": "Strict CPU component; no new-family graphics/public desktopXR/whole application admission",
+  "product": "90fad800bc5aac3dc2421595532f4d2ef8429797",
+  "fixture": "aa8db16a3ebc8e664b5a1f7c4138e435e30dcbc0",
+  "release_native_seal_commit": "3d989ef5544895ef0cffe70bbc282d7d5285cac5",
+  "strict_source_tuple": "Same product90fad/fixtureaa8 as nativeRelease17, with exact owning SAN O1/g1,ASAN+UBSAN/framepointer flags. All3core private-header owners and3test owners newly compiled; fullM==genuineMD; new193-member archive/190unchanged whole payloads and3freshlinks.",
+  "runtime_status_sha256": "f8e9c649ebf0a324be9e3ba7ef48693eb662cf3fedcdb4281d47f694733dad03",
+  "runtime_plan_sha256": "bf2149c74637a4c4f00f2931f7b1dbea36ab3e91d6a0c1855fafd4f195db7e57",
+  "runtime_driver_sha256": "3296512daf71ef0ac44d4b1506839736f53ea20a75abcc4b7b5914c05b8cb7b1",
+  "compile_status_sha256": "bdd905f164d265a28c72023c0decca0fa4533910ab440c288fc3968a689c6a5a",
+  "link_status_sha256": "19175220d2a790c459e271a26fe655ba0053a7f89317eef3a254fe00bf64062a",
+  "archive_members_sha256": "743ba9faf5a8b172deb04bbf9385d95ec9e68cc93e0293d07355e5bd9b1797b9",
+  "owning_provider_authority": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/native90-sanitize-planning-20261115/sanitize-090f00-20261117-audit/execution-native90-v2/status.json",
+    "sha256": "83e43509ff25968bf4edbba2261b11454163af0fef1837b66df1059783b039b5",
+    "source": "090f009ede2c0623ca616fe892223b4f68f1c2c4",
+    "dependency_manifest": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native90-sanitize-planning-20261115/sanitize-090f00-20261117-audit/execution-native90-v2/actual-current-owner-dependencies.json",
+      "sha256": "922d61eda244728442db12d1ae626efcdd83101809b2b11069bf1742ece25356",
+      "owners": 1036,
+      "fresh_compiler_owners": 291,
+      "reused_current_whole_owners": 745,
+      "dependency_incidences": 434920,
+      "errors": 0
+    },
+    "outputs": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native90-sanitize-planning-20261115/sanitize-090f00-20261117-audit/execution-native90-v2/owned-outputs.json",
+      "sha256": "53e29cd9e6e9585060940607f217a86ada78e3c0675438d95c92198dcea82fa8",
+      "count": 1776
+    }
+  },
+  "exit": 0,
+  "pass_counts": {
+    "source-advanced-normal-bake": 263495,
+    "source-prepared-normal-bake": 91,
+    "source-artist-normal-bake": 139
+  },
+  "advanced_cases": [
+    {
+      "legacy": 0.0,
+      "live": 0.0,
+      "seam": 0.0,
+      "retained": 0.0,
+      "direct_error": 2.60097e-07,
+      "wrong_domain": 0.341112,
+      "omitted": 0.263992,
+      "swapped": 0.331173,
+      "second_bake_error": 0.00342964,
+      "interior_omitted": 0.788077,
+      "interior_swapped": 0.78415,
+      "interior_wrong": 0.784751,
+      "color_error": 8.75746e-07,
+      "interior": 812.0
+    },
+    {
+      "legacy": 0.0,
+      "live": 0.0,
+      "seam": 0.0,
+      "retained": 1.0,
+      "direct_error": 3.02385e-07,
+      "wrong_domain": 0.393641,
+      "omitted": 0.264441,
+      "swapped": 0.338425,
+      "second_bake_error": 0.00426066,
+      "interior_omitted": 0.790335,
+      "interior_swapped": 0.78379,
+      "interior_wrong": 0.786413,
+      "color_error": 8.75746e-07,
+      "interior": 812.0
+    },
+    {
+      "legacy": 0.0,
+      "live": 0.0,
+      "seam": 1.0,
+      "retained": 0.0,
+      "direct_error": 2.60097e-07,
+      "wrong_domain": 0.341112,
+      "omitted": 0.263992,
+      "swapped": 0.331173,
+      "second_bake_error": 0.00342964,
+      "interior_omitted": 0.788077,
+      "interior_swapped": 0.78415,
+      "interior_wrong": 0.784751,
+      "color_error": 8.75746e-07,
+      "interior": 812.0
+    },
+    {
+      "legacy": 0.0,
+      "live": 0.0,
+      "seam": 1.0,
+      "retained": 1.0,
+      "direct_error": 3.02385e-07,
+      "wrong_domain": 0.393641,
+      "omitted": 0.264441,
+      "swapped": 0.338425,
+      "second_bake_error": 0.00426066,
+      "interior_omitted": 0.790335,
+      "interior_swapped": 0.78379,
+      "interior_wrong": 0.786413,
+      "color_error": 8.75746e-07,
+      "interior": 812.0
+    },
+    {
+      "legacy": 0.0,
+      "live": 1.0,
+      "seam": 0.0,
+      "retained": 0.0,
+      "direct_error": 2.53775e-07,
+      "wrong_domain": 0.340887,
+      "omitted": 0.263507,
+      "swapped": 0.331198,
+      "second_bake_error": 0.00443031,
+      "interior_omitted": 0.783908,
+      "interior_swapped": 0.780051,
+      "interior_wrong": 0.779987,
+      "color_error": 8.75746e-07,
+      "interior": 812.0
+    },
+    {
+      "legacy": 0.0,
+      "live": 1.0,
+      "seam": 0.0,
+      "retained": 1.0,
+      "direct_error": 2.92137e-07,
+      "wrong_domain": 0.392387,
+      "omitted": 0.263952,
+      "swapped": 0.33846,
+      "second_bake_error": 0.00468619,
+      "interior_omitted": 0.786135,
+      "interior_swapped": 0.77966,
+      "interior_wrong": 0.782214,
+      "color_error": 8.75746e-07,
+      "interior": 812.0
+    },
+    {
+      "legacy": 0.0,
+      "live": 1.0,
+      "seam": 1.0,
+      "retained": 0.0,
+      "direct_error": 2.53775e-07,
+      "wrong_domain": 0.340887,
+      "omitted": 0.263507,
+      "swapped": 0.331198,
+      "second_bake_error": 0.00463855,
+      "interior_omitted": 0.783908,
+      "interior_swapped": 0.780051,
+      "interior_wrong": 0.779987,
+      "color_error": 8.75746e-07,
+      "interior": 812.0
+    },
+    {
+      "legacy": 0.0,
+      "live": 1.0,
+      "seam": 1.0,
+      "retained": 1.0,
+      "direct_error": 2.92137e-07,
+      "wrong_domain": 0.392387,
+      "omitted": 0.263952,
+      "swapped": 0.33846,
+      "second_bake_error": 0.00473739,
+      "interior_omitted": 0.786135,
+      "interior_swapped": 0.77966,
+      "interior_wrong": 0.782214,
+      "color_error": 8.75746e-07,
+      "interior": 812.0
+    },
+    {
+      "legacy": 1.0,
+      "live": 0.0,
+      "seam": 0.0,
+      "retained": 0.0,
+      "direct_error": 3.16573e-07,
+      "wrong_domain": 0.680645,
+      "omitted": 0.629565,
+      "swapped": 0.592023,
+      "second_bake_error": 0.00351443,
+      "interior_omitted": 0.694962,
+      "interior_swapped": 0.731016,
+      "interior_wrong": 0.894635,
+      "color_error": 8.75746e-07,
+      "interior": 812.0
+    },
+    {
+      "legacy": 1.0,
+      "live": 0.0,
+      "seam": 0.0,
+      "retained": 1.0,
+      "direct_error": 3.1882e-07,
+      "wrong_domain": 0.636858,
+      "omitted": 0.61198,
+      "swapped": 0.575879,
+      "second_bake_error": 0.00470385,
+      "interior_omitted": 0.692003,
+      "interior_swapped": 0.721136,
+      "interior_wrong": 1.1321,
+      "color_error": 8.75746e-07,
+      "interior": 812.0
+    },
+    {
+      "legacy": 1.0,
+      "live": 0.0,
+      "seam": 1.0,
+      "retained": 0.0,
+      "direct_error": 3.16573e-07,
+      "wrong_domain": 0.680645,
+      "omitted": 0.629565,
+      "swapped": 0.592023,
+      "second_bake_error": 0.00351443,
+      "interior_omitted": 0.694962,
+      "interior_swapped": 0.731016,
+      "interior_wrong": 0.894635,
+      "color_error": 8.75746e-07,
+      "interior": 812.0
+    },
+    {
+      "legacy": 1.0,
+      "live": 0.0,
+      "seam": 1.0,
+      "retained": 1.0,
+      "direct_error": 3.1882e-07,
+      "wrong_domain": 0.636858,
+      "omitted": 0.61198,
+      "swapped": 0.575879,
+      "second_bake_error": 0.00470385,
+      "interior_omitted": 0.692003,
+      "interior_swapped": 0.721136,
+      "interior_wrong": 1.1321,
+      "color_error": 8.75746e-07,
+      "interior": 812.0
+    },
+    {
+      "legacy": 1.0,
+      "live": 1.0,
+      "seam": 0.0,
+      "retained": 0.0,
+      "direct_error": 3.5728e-07,
+      "wrong_domain": 0.677593,
+      "omitted": 0.626442,
+      "swapped": 0.588968,
+      "second_bake_error": 0.00444997,
+      "interior_omitted": 0.691024,
+      "interior_swapped": 0.727374,
+      "interior_wrong": 0.892412,
+      "color_error": 8.75746e-07,
+      "interior": 812.0
+    },
+    {
+      "legacy": 1.0,
+      "live": 1.0,
+      "seam": 0.0,
+      "retained": 1.0,
+      "direct_error": 3.31037e-07,
+      "wrong_domain": 0.636518,
+      "omitted": 0.60905,
+      "swapped": 0.573014,
+      "second_bake_error": 0.00469773,
+      "interior_omitted": 0.688094,
+      "interior_swapped": 0.717632,
+      "interior_wrong": 1.13169,
+      "color_error": 8.75746e-07,
+      "interior": 812.0
+    },
+    {
+      "legacy": 1.0,
+      "live": 1.0,
+      "seam": 1.0,
+      "retained": 0.0,
+      "direct_error": 3.5728e-07,
+      "wrong_domain": 0.677593,
+      "omitted": 0.626442,
+      "swapped": 0.588968,
+      "second_bake_error": 0.00477895,
+      "interior_omitted": 0.691024,
+      "interior_swapped": 0.727374,
+      "interior_wrong": 0.892412,
+      "color_error": 8.75746e-07,
+      "interior": 812.0
+    },
+    {
+      "legacy": 1.0,
+      "live": 1.0,
+      "seam": 1.0,
+      "retained": 1.0,
+      "direct_error": 3.31037e-07,
+      "wrong_domain": 0.636518,
+      "omitted": 0.60905,
+      "swapped": 0.573014,
+      "second_bake_error": 0.00466044,
+      "interior_omitted": 0.688094,
+      "interior_swapped": 0.717632,
+      "interior_wrong": 1.13169,
+      "color_error": 8.75746e-07,
+      "interior": 812.0
+    },
+    {
+      "legacy": 0.0,
+      "live": 1.0,
+      "seam": 1.0,
+      "retained": 1.0,
+      "direct_error": 2.92137e-07,
+      "wrong_domain": 0.277578,
+      "omitted": 0.263952,
+      "swapped": 0.33846,
+      "second_bake_error": 0.00487417,
+      "interior_omitted": 0.790497,
+      "interior_swapped": 0.780046,
+      "interior_wrong": 0.738823,
+      "color_error": 0.0145202,
+      "interior": 2352.0
+    }
+  ],
+  "environment": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+    "LSAN_OPTIONS": null,
+    "LD_PRELOAD": null,
+    "LD_LIBRARY_PATH": "/home/blux/de-xr/dome-sculpt/artifacts/sdk-20261111/toolkit-sanitize/lib:/opt/fltk-vr/bdf-runtime/lib:/usr/lib64",
+    "LIBGL_ALWAYS_SOFTWARE": "1",
+    "LP_NUM_THREADS": "2",
+    "OPENBLAS_NUM_THREADS": "2",
+    "OMP_NUM_THREADS": "2",
+    "EGL_PLATFORM": "surfaceless",
+    "DISPLAY": null,
+    "WAYLAND_DISPLAY": null,
+    "DBUS_SESSION_BUS_ADDRESS": null,
+    "XR_RUNTIME_JSON": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-sanitize-20261117/native-v2/no-physical-runtime.json"
+  },
+  "providers": {
+    "source-advanced-normal-bake": [
+      {
+        "literal": "/usr/lib64/libasan.so.8",
+        "resolved": "/usr/lib64/libasan.so.8.0.0",
+        "sha256": "0e9878f315009d4a3b3f1d8c44467de841f9ff2ca404f996937bf89d1d966c37"
+      },
+      {
+        "literal": "/usr/lib64/libOpenGL.so.0",
+        "resolved": "/usr/lib64/libOpenGL.so.0.0.0",
+        "sha256": "07a014ea0624d5d9711f941fb0401a203c2025b683d34897bd1b261a32a83d69"
+      },
+      {
+        "literal": "/usr/lib64/libEGL.so.1",
+        "resolved": "/usr/lib64/libEGL.so.1.1.0",
+        "sha256": "76ffc090b8990696d028e7d1bc82606c564565fb05d2fa9e5f6122b61e9f1b60"
+      },
+      {
+        "literal": "/usr/lib64/liblapacke.so.3",
+        "resolved": "/usr/lib64/liblapacke.so.3.12.0",
+        "sha256": "4e74d393b6f5f294cbd96b777da8be3ada9995b1da98aaa0c1eb5fea4b294c7c"
+      },
+      {
+        "literal": "/usr/lib64/libpng16.so.16",
+        "resolved": "/usr/lib64/libpng16.so.16.59.0",
+        "sha256": "536a1ed876bffe5a7e9204aae387d4da2d4a969bf716bbcf4a03c30a8dea0cde"
+      },
+      {
+        "literal": "/usr/lib64/libjpeg.so.62",
+        "resolved": "/usr/lib64/libjpeg.so.62.4.0",
+        "sha256": "beb79376b4544260da3c31603784c908b58bdb959cbe1d8c48075dfa7d5bc80c"
+      },
+      {
+        "literal": "/usr/lib64/libz.so.1",
+        "resolved": "/usr/lib64/libz.so.1.3.1.zlib-ng",
+        "sha256": "bbde8faec092a7c67b8bd76bbba4a826e61b05c171b97004ce6b308c5a090351"
+      },
+      {
+        "literal": "/usr/lib64/libOpenEXR-3_2.so.31",
+        "resolved": "/usr/lib64/libOpenEXR-3_2.so.31.3.2.4",
+        "sha256": "efdbbe75b27b6a50e4a8e028e008fde32befa53280295e21ef6f036350225769"
+      },
+      {
+        "literal": "/usr/lib64/libOpenEXRUtil-3_2.so.31",
+        "resolved": "/usr/lib64/libOpenEXRUtil-3_2.so.31.3.2.4",
+        "sha256": "bafa0a2cb708d3ae952987c013d96e992badbb742e1a8e4fac6605c7eae5b5a0"
+      },
+      {
+        "literal": "/usr/lib64/libOpenEXRCore-3_2.so.31",
+        "resolved": "/usr/lib64/libOpenEXRCore-3_2.so.31.3.2.4",
+        "sha256": "bc6775af6f33d58d41f20e714d80db4b0fd21209796a6694cb5249739a49a331"
+      },
+      {
+        "literal": "/usr/lib64/libIex-3_2.so.31",
+        "resolved": "/usr/lib64/libIex-3_2.so.31.3.2.4",
+        "sha256": "da965da4711be1158555d457dc6ff17582ec88c1b86d98edc69f09cdcc4f6c7a"
+      },
+      {
+        "literal": "/usr/lib64/libIlmThread-3_2.so.31",
+        "resolved": "/usr/lib64/libIlmThread-3_2.so.31.3.2.4",
+        "sha256": "424321e69eb6257387820baa90e4fccb209c5dcb8c88589a8c5e1ccf4d4c23d6"
+      },
+      {
+        "literal": "/usr/lib64/libImath-3_1.so.29",
+        "resolved": "/usr/lib64/libImath-3_1.so.29.11.0",
+        "sha256": "1e86ce61e14061369bd937b73d53abb69305dff34df4700f99a459f5c024ab45"
+      },
+      {
+        "literal": "/usr/lib64/libgcc_s.so.1",
+        "resolved": "/usr/lib64/libgcc_s-16-20261029.so.1",
+        "sha256": "5a52ae4a6f1b119aa092aa1483c967e19d9ba036b1b0c2133236a8a2ce826ebf"
+      },
+      {
+        "literal": "/usr/lib64/libstdc++.so.6",
+        "resolved": "/usr/lib64/libstdc++.so.6.0.36",
+        "sha256": "49811507d8fc0283d8f8023546613774c673f876fe823b1b99d0c8d46039deda"
+      },
+      {
+        "literal": "/usr/lib64/libm.so.6",
+        "resolved": "/usr/lib64/libm.so.6",
+        "sha256": "16a03ce6d24c8a46742206d4a9c1d35bb6577ae2384f153dc6ef4a4b62b5357f"
+      },
+      {
+        "literal": "/usr/lib64/libubsan.so.1",
+        "resolved": "/usr/lib64/libubsan.so.1.0.0",
+        "sha256": "d4322305e0b1492398b7c5dabf56e1cdfe67548211b0149769c14f234cf3bb9d"
+      },
+      {
+        "literal": "/usr/lib64/libc.so.6",
+        "resolved": "/usr/lib64/libc.so.6",
+        "sha256": "a5c5ad9d59d3c69eda93aa8f82930ba06cc4e893a113e66c85ad6e96243d53c8"
+      },
+      {
+        "literal": "/usr/lib64/libGLdispatch.so.0",
+        "resolved": "/usr/lib64/libGLdispatch.so.0.0.0",
+        "sha256": "3c53e14fb731128afe1fa1c88e94944fe9a60cbe170f2e08c1134b709d771ec7"
+      },
+      {
+        "literal": "/usr/lib64/libtmglib.so.3",
+        "resolved": "/usr/lib64/libtmglib.so.3.12.0",
+        "sha256": "e497c25e923336dc4d95b2822f0845667ab113b985e8e7d16eadaf0379cdac87"
+      },
+      {
+        "literal": "/usr/lib64/liblapack.so.3",
+        "resolved": "/usr/lib64/liblapack.so.3.12.0",
+        "sha256": "10c786e4517845cac86595b22fd7d40b548bf328cbf7bf14c867b0c31e20661f"
+      },
+      {
+        "literal": "/usr/lib64/libdeflate.so.0",
+        "resolved": "/usr/lib64/libdeflate.so.0",
+        "sha256": "fee24c7738e4c31860f65fa43c862f572cdf4cd2ffcc30e5cd8bf1d46346b318"
+      },
+      {
+        "literal": "/lib64/ld-linux-x86-64.so.2",
+        "resolved": "/usr/lib64/ld-linux-x86-64.so.2",
+        "sha256": "4e5d39355699e90fa29313d3100e82af4a23290028c58c364d6a249ef6a78e5e"
+      },
+      {
+        "literal": "/usr/lib64/libblas.so.3",
+        "resolved": "/usr/lib64/libblas.so.3.12.0",
+        "sha256": "df2686da50030c23198f485115b84df323352325abb18a949515736e8f57b2f4"
+      },
+      {
+        "literal": "/usr/lib64/libmvec.so.1",
+        "resolved": "/usr/lib64/libmvec.so.1",
+        "sha256": "82ddf7efbb88b2eaf5570fa6c0ec41565d9c32a2dbd095200ceead862af0f3dc"
+      },
+      {
+        "literal": "/usr/lib64/libgfortran.so.5",
+        "resolved": "/usr/lib64/libgfortran.so.5.0.0",
+        "sha256": "d4b3a93cbd67561c5febd49d7bd035796d3b2b03a8d659d7ddf869321173f186"
+      }
+    ],
+    "source-prepared-normal-bake": [
+      {
+        "literal": "/usr/lib64/libasan.so.8",
+        "resolved": "/usr/lib64/libasan.so.8.0.0",
+        "sha256": "0e9878f315009d4a3b3f1d8c44467de841f9ff2ca404f996937bf89d1d966c37"
+      },
+      {
+        "literal": "/usr/lib64/libOpenGL.so.0",
+        "resolved": "/usr/lib64/libOpenGL.so.0.0.0",
+        "sha256": "07a014ea0624d5d9711f941fb0401a203c2025b683d34897bd1b261a32a83d69"
+      },
+      {
+        "literal": "/usr/lib64/libEGL.so.1",
+        "resolved": "/usr/lib64/libEGL.so.1.1.0",
+        "sha256": "76ffc090b8990696d028e7d1bc82606c564565fb05d2fa9e5f6122b61e9f1b60"
+      },
+      {
+        "literal": "/usr/lib64/liblapacke.so.3",
+        "resolved": "/usr/lib64/liblapacke.so.3.12.0",
+        "sha256": "4e74d393b6f5f294cbd96b777da8be3ada9995b1da98aaa0c1eb5fea4b294c7c"
+      },
+      {
+        "literal": "/usr/lib64/libpng16.so.16",
+        "resolved": "/usr/lib64/libpng16.so.16.59.0",
+        "sha256": "536a1ed876bffe5a7e9204aae387d4da2d4a969bf716bbcf4a03c30a8dea0cde"
+      },
+      {
+        "literal": "/usr/lib64/libjpeg.so.62",
+        "resolved": "/usr/lib64/libjpeg.so.62.4.0",
+        "sha256": "beb79376b4544260da3c31603784c908b58bdb959cbe1d8c48075dfa7d5bc80c"
+      },
+      {
+        "literal": "/usr/lib64/libz.so.1",
+        "resolved": "/usr/lib64/libz.so.1.3.1.zlib-ng",
+        "sha256": "bbde8faec092a7c67b8bd76bbba4a826e61b05c171b97004ce6b308c5a090351"
+      },
+      {
+        "literal": "/usr/lib64/libOpenEXR-3_2.so.31",
+        "resolved": "/usr/lib64/libOpenEXR-3_2.so.31.3.2.4",
+        "sha256": "efdbbe75b27b6a50e4a8e028e008fde32befa53280295e21ef6f036350225769"
+      },
+      {
+        "literal": "/usr/lib64/libOpenEXRUtil-3_2.so.31",
+        "resolved": "/usr/lib64/libOpenEXRUtil-3_2.so.31.3.2.4",
+        "sha256": "bafa0a2cb708d3ae952987c013d96e992badbb742e1a8e4fac6605c7eae5b5a0"
+      },
+      {
+        "literal": "/usr/lib64/libOpenEXRCore-3_2.so.31",
+        "resolved": "/usr/lib64/libOpenEXRCore-3_2.so.31.3.2.4",
+        "sha256": "bc6775af6f33d58d41f20e714d80db4b0fd21209796a6694cb5249739a49a331"
+      },
+      {
+        "literal": "/usr/lib64/libIex-3_2.so.31",
+        "resolved": "/usr/lib64/libIex-3_2.so.31.3.2.4",
+        "sha256": "da965da4711be1158555d457dc6ff17582ec88c1b86d98edc69f09cdcc4f6c7a"
+      },
+      {
+        "literal": "/usr/lib64/libIlmThread-3_2.so.31",
+        "resolved": "/usr/lib64/libIlmThread-3_2.so.31.3.2.4",
+        "sha256": "424321e69eb6257387820baa90e4fccb209c5dcb8c88589a8c5e1ccf4d4c23d6"
+      },
+      {
+        "literal": "/usr/lib64/libImath-3_1.so.29",
+        "resolved": "/usr/lib64/libImath-3_1.so.29.11.0",
+        "sha256": "1e86ce61e14061369bd937b73d53abb69305dff34df4700f99a459f5c024ab45"
+      },
+      {
+        "literal": "/usr/lib64/libgcc_s.so.1",
+        "resolved": "/usr/lib64/libgcc_s-16-20261029.so.1",
+        "sha256": "5a52ae4a6f1b119aa092aa1483c967e19d9ba036b1b0c2133236a8a2ce826ebf"
+      },
+      {
+        "literal": "/usr/lib64/libstdc++.so.6",
+        "resolved": "/usr/lib64/libstdc++.so.6.0.36",
+        "sha256": "49811507d8fc0283d8f8023546613774c673f876fe823b1b99d0c8d46039deda"
+      },
+      {
+        "literal": "/usr/lib64/libm.so.6",
+        "resolved": "/usr/lib64/libm.so.6",
+        "sha256": "16a03ce6d24c8a46742206d4a9c1d35bb6577ae2384f153dc6ef4a4b62b5357f"
+      },
+      {
+        "literal": "/usr/lib64/libubsan.so.1",
+        "resolved": "/usr/lib64/libubsan.so.1.0.0",
+        "sha256": "d4322305e0b1492398b7c5dabf56e1cdfe67548211b0149769c14f234cf3bb9d"
+      },
+      {
+        "literal": "/usr/lib64/libc.so.6",
+        "resolved": "/usr/lib64/libc.so.6",
+        "sha256": "a5c5ad9d59d3c69eda93aa8f82930ba06cc4e893a113e66c85ad6e96243d53c8"
+      },
+      {
+        "literal": "/usr/lib64/libGLdispatch.so.0",
+        "resolved": "/usr/lib64/libGLdispatch.so.0.0.0",
+        "sha256": "3c53e14fb731128afe1fa1c88e94944fe9a60cbe170f2e08c1134b709d771ec7"
+      },
+      {
+        "literal": "/usr/lib64/libtmglib.so.3",
+        "resolved": "/usr/lib64/libtmglib.so.3.12.0",
+        "sha256": "e497c25e923336dc4d95b2822f0845667ab113b985e8e7d16eadaf0379cdac87"
+      },
+      {
+        "literal": "/usr/lib64/liblapack.so.3",
+        "resolved": "/usr/lib64/liblapack.so.3.12.0",
+        "sha256": "10c786e4517845cac86595b22fd7d40b548bf328cbf7bf14c867b0c31e20661f"
+      },
+      {
+        "literal": "/usr/lib64/libdeflate.so.0",
+        "resolved": "/usr/lib64/libdeflate.so.0",
+        "sha256": "fee24c7738e4c31860f65fa43c862f572cdf4cd2ffcc30e5cd8bf1d46346b318"
+      },
+      {
+        "literal": "/lib64/ld-linux-x86-64.so.2",
+        "resolved": "/usr/lib64/ld-linux-x86-64.so.2",
+        "sha256": "4e5d39355699e90fa29313d3100e82af4a23290028c58c364d6a249ef6a78e5e"
+      },
+      {
+        "literal": "/usr/lib64/libblas.so.3",
+        "resolved": "/usr/lib64/libblas.so.3.12.0",
+        "sha256": "df2686da50030c23198f485115b84df323352325abb18a949515736e8f57b2f4"
+      },
+      {
+        "literal": "/usr/lib64/libmvec.so.1",
+        "resolved": "/usr/lib64/libmvec.so.1",
+        "sha256": "82ddf7efbb88b2eaf5570fa6c0ec41565d9c32a2dbd095200ceead862af0f3dc"
+      },
+      {
+        "literal": "/usr/lib64/libgfortran.so.5",
+        "resolved": "/usr/lib64/libgfortran.so.5.0.0",
+        "sha256": "d4b3a93cbd67561c5febd49d7bd035796d3b2b03a8d659d7ddf869321173f186"
+      }
+    ],
+    "source-artist-normal-bake": [
+      {
+        "literal": "/usr/lib64/libasan.so.8",
+        "resolved": "/usr/lib64/libasan.so.8.0.0",
+        "sha256": "0e9878f315009d4a3b3f1d8c44467de841f9ff2ca404f996937bf89d1d966c37"
+      },
+      {
+        "literal": "/usr/lib64/libOpenGL.so.0",
+        "resolved": "/usr/lib64/libOpenGL.so.0.0.0",
+        "sha256": "07a014ea0624d5d9711f941fb0401a203c2025b683d34897bd1b261a32a83d69"
+      },
+      {
+        "literal": "/usr/lib64/libEGL.so.1",
+        "resolved": "/usr/lib64/libEGL.so.1.1.0",
+        "sha256": "76ffc090b8990696d028e7d1bc82606c564565fb05d2fa9e5f6122b61e9f1b60"
+      },
+      {
+        "literal": "/usr/lib64/liblapacke.so.3",
+        "resolved": "/usr/lib64/liblapacke.so.3.12.0",
+        "sha256": "4e74d393b6f5f294cbd96b777da8be3ada9995b1da98aaa0c1eb5fea4b294c7c"
+      },
+      {
+        "literal": "/usr/lib64/libpng16.so.16",
+        "resolved": "/usr/lib64/libpng16.so.16.59.0",
+        "sha256": "536a1ed876bffe5a7e9204aae387d4da2d4a969bf716bbcf4a03c30a8dea0cde"
+      },
+      {
+        "literal": "/usr/lib64/libjpeg.so.62",
+        "resolved": "/usr/lib64/libjpeg.so.62.4.0",
+        "sha256": "beb79376b4544260da3c31603784c908b58bdb959cbe1d8c48075dfa7d5bc80c"
+      },
+      {
+        "literal": "/usr/lib64/libz.so.1",
+        "resolved": "/usr/lib64/libz.so.1.3.1.zlib-ng",
+        "sha256": "bbde8faec092a7c67b8bd76bbba4a826e61b05c171b97004ce6b308c5a090351"
+      },
+      {
+        "literal": "/usr/lib64/libOpenEXR-3_2.so.31",
+        "resolved": "/usr/lib64/libOpenEXR-3_2.so.31.3.2.4",
+        "sha256": "efdbbe75b27b6a50e4a8e028e008fde32befa53280295e21ef6f036350225769"
+      },
+      {
+        "literal": "/usr/lib64/libOpenEXRUtil-3_2.so.31",
+        "resolved": "/usr/lib64/libOpenEXRUtil-3_2.so.31.3.2.4",
+        "sha256": "bafa0a2cb708d3ae952987c013d96e992badbb742e1a8e4fac6605c7eae5b5a0"
+      },
+      {
+        "literal": "/usr/lib64/libOpenEXRCore-3_2.so.31",
+        "resolved": "/usr/lib64/libOpenEXRCore-3_2.so.31.3.2.4",
+        "sha256": "bc6775af6f33d58d41f20e714d80db4b0fd21209796a6694cb5249739a49a331"
+      },
+      {
+        "literal": "/usr/lib64/libIex-3_2.so.31",
+        "resolved": "/usr/lib64/libIex-3_2.so.31.3.2.4",
+        "sha256": "da965da4711be1158555d457dc6ff17582ec88c1b86d98edc69f09cdcc4f6c7a"
+      },
+      {
+        "literal": "/usr/lib64/libIlmThread-3_2.so.31",
+        "resolved": "/usr/lib64/libIlmThread-3_2.so.31.3.2.4",
+        "sha256": "424321e69eb6257387820baa90e4fccb209c5dcb8c88589a8c5e1ccf4d4c23d6"
+      },
+      {
+        "literal": "/usr/lib64/libImath-3_1.so.29",
+        "resolved": "/usr/lib64/libImath-3_1.so.29.11.0",
+        "sha256": "1e86ce61e14061369bd937b73d53abb69305dff34df4700f99a459f5c024ab45"
+      },
+      {
+        "literal": "/usr/lib64/libgcc_s.so.1",
+        "resolved": "/usr/lib64/libgcc_s-16-20261029.so.1",
+        "sha256": "5a52ae4a6f1b119aa092aa1483c967e19d9ba036b1b0c2133236a8a2ce826ebf"
+      },
+      {
+        "literal": "/usr/lib64/libstdc++.so.6",
+        "resolved": "/usr/lib64/libstdc++.so.6.0.36",
+        "sha256": "49811507d8fc0283d8f8023546613774c673f876fe823b1b99d0c8d46039deda"
+      },
+      {
+        "literal": "/usr/lib64/libm.so.6",
+        "resolved": "/usr/lib64/libm.so.6",
+        "sha256": "16a03ce6d24c8a46742206d4a9c1d35bb6577ae2384f153dc6ef4a4b62b5357f"
+      },
+      {
+        "literal": "/usr/lib64/libubsan.so.1",
+        "resolved": "/usr/lib64/libubsan.so.1.0.0",
+        "sha256": "d4322305e0b1492398b7c5dabf56e1cdfe67548211b0149769c14f234cf3bb9d"
+      },
+      {
+        "literal": "/usr/lib64/libc.so.6",
+        "resolved": "/usr/lib64/libc.so.6",
+        "sha256": "a5c5ad9d59d3c69eda93aa8f82930ba06cc4e893a113e66c85ad6e96243d53c8"
+      },
+      {
+        "literal": "/usr/lib64/libGLdispatch.so.0",
+        "resolved": "/usr/lib64/libGLdispatch.so.0.0.0",
+        "sha256": "3c53e14fb731128afe1fa1c88e94944fe9a60cbe170f2e08c1134b709d771ec7"
+      },
+      {
+        "literal": "/usr/lib64/libtmglib.so.3",
+        "resolved": "/usr/lib64/libtmglib.so.3.12.0",
+        "sha256": "e497c25e923336dc4d95b2822f0845667ab113b985e8e7d16eadaf0379cdac87"
+      },
+      {
+        "literal": "/usr/lib64/liblapack.so.3",
+        "resolved": "/usr/lib64/liblapack.so.3.12.0",
+        "sha256": "10c786e4517845cac86595b22fd7d40b548bf328cbf7bf14c867b0c31e20661f"
+      },
+      {
+        "literal": "/usr/lib64/libdeflate.so.0",
+        "resolved": "/usr/lib64/libdeflate.so.0",
+        "sha256": "fee24c7738e4c31860f65fa43c862f572cdf4cd2ffcc30e5cd8bf1d46346b318"
+      },
+      {
+        "literal": "/lib64/ld-linux-x86-64.so.2",
+        "resolved": "/usr/lib64/ld-linux-x86-64.so.2",
+        "sha256": "4e5d39355699e90fa29313d3100e82af4a23290028c58c364d6a249ef6a78e5e"
+      },
+      {
+        "literal": "/usr/lib64/libblas.so.3",
+        "resolved": "/usr/lib64/libblas.so.3.12.0",
+        "sha256": "df2686da50030c23198f485115b84df323352325abb18a949515736e8f57b2f4"
+      },
+      {
+        "literal": "/usr/lib64/libmvec.so.1",
+        "resolved": "/usr/lib64/libmvec.so.1",
+        "sha256": "82ddf7efbb88b2eaf5570fa6c0ec41565d9c32a2dbd095200ceead862af0f3dc"
+      },
+      {
+        "literal": "/usr/lib64/libgfortran.so.5",
+        "resolved": "/usr/lib64/libgfortran.so.5.0.0",
+        "sha256": "d4b3a93cbd67561c5febd49d7bd035796d3b2b03a8d659d7ddf869321173f186"
+      }
+    ]
+  },
+  "live_sanitizer_mappings": {
+    "source-advanced-normal-bake": {
+      "/usr/lib64/libasan.so.8.0.0": {
+        "literal": "/usr/lib64/libasan.so.8.0.0",
+        "resolved": "/usr/lib64/libasan.so.8.0.0",
+        "sha256": "0e9878f315009d4a3b3f1d8c44467de841f9ff2ca404f996937bf89d1d966c37"
+      },
+      "/usr/lib64/libubsan.so.1.0.0": {
+        "literal": "/usr/lib64/libubsan.so.1.0.0",
+        "resolved": "/usr/lib64/libubsan.so.1.0.0",
+        "sha256": "d4322305e0b1492398b7c5dabf56e1cdfe67548211b0149769c14f234cf3bb9d"
+      }
+    },
+    "source-prepared-normal-bake": {
+      "/usr/lib64/libasan.so.8.0.0": {
+        "literal": "/usr/lib64/libasan.so.8.0.0",
+        "resolved": "/usr/lib64/libasan.so.8.0.0",
+        "sha256": "0e9878f315009d4a3b3f1d8c44467de841f9ff2ca404f996937bf89d1d966c37"
+      },
+      "/usr/lib64/libubsan.so.1.0.0": {
+        "literal": "/usr/lib64/libubsan.so.1.0.0",
+        "resolved": "/usr/lib64/libubsan.so.1.0.0",
+        "sha256": "d4322305e0b1492398b7c5dabf56e1cdfe67548211b0149769c14f234cf3bb9d"
+      }
+    },
+    "source-artist-normal-bake": {
+      "/usr/lib64/libubsan.so.1.0.0": {
+        "literal": "/usr/lib64/libubsan.so.1.0.0",
+        "resolved": "/usr/lib64/libubsan.so.1.0.0",
+        "sha256": "d4322305e0b1492398b7c5dabf56e1cdfe67548211b0149769c14f234cf3bb9d"
+      },
+      "/usr/lib64/libasan.so.8.0.0": {
+        "literal": "/usr/lib64/libasan.so.8.0.0",
+        "resolved": "/usr/lib64/libasan.so.8.0.0",
+        "sha256": "0e9878f315009d4a3b3f1d8c44467de841f9ff2ca404f996937bf89d1d966c37"
+      }
+    }
+  },
+  "steps": [
+    {
+      "command": [
+        "/usr/bin/ldd",
+        "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-sanitize-20261117/link-v3/source-advanced-normal-bake"
+      ],
+      "started": 1794949292.1848805,
+      "timeout_seconds": 60,
+      "RSS_limit_bytes": 6442450944,
+      "virtual_AS_cap": null,
+      "pid": 3091057,
+      "start": 12721724,
+      "pgrp": 3091057,
+      "root": {
+        "pid": 3091057,
+        "start": 12721724,
+        "pgrp": 3091057,
+        "session": 3091057,
+        "ppid": 3089942,
+        "state": "R"
+      },
+      "known_processes": [
+        {
+          "pid": 3091057,
+          "start": 12721724,
+          "pgrp": 3091057,
+          "session": 3091057,
+          "ppid": 3089942,
+          "state": "R"
+        }
+      ],
+      "peak_owned_RSS_bytes": 1470464,
+      "peak_observed_virtual_bytes": 4259840,
+      "monitor_samples": 2,
+      "signals": [],
+      "exit": 0,
+      "seconds": 0.011957406997680664,
+      "name": "source-advanced-normal-bake-ldd"
+    },
+    {
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-sanitize-20261117/link-v3/source-advanced-normal-bake",
+        "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-sanitize-20261117/native-v2/source-advanced-normal-bake-outputs"
+      ],
+      "started": 1794949292.2406917,
+      "timeout_seconds": 900,
+      "RSS_limit_bytes": 6442450944,
+      "virtual_AS_cap": null,
+      "pid": 3091101,
+      "start": 12721730,
+      "pgrp": 3091101,
+      "root": {
+        "pid": 3091101,
+        "start": 12721730,
+        "pgrp": 3091101,
+        "session": 3091101,
+        "ppid": 3089942,
+        "state": "R"
+      },
+      "known_processes": [
+        {
+          "pid": 3091101,
+          "start": 12721730,
+          "pgrp": 3091101,
+          "session": 3091101,
+          "ppid": 3089942,
+          "state": "R"
+        }
+      ],
+      "peak_owned_RSS_bytes": 961482752,
+      "peak_observed_virtual_bytes": 21991023628288,
+      "monitor_samples": 1270,
+      "signals": [],
+      "exit": 0,
+      "seconds": 14.781425952911377,
+      "name": "source-advanced-normal-bake"
+    },
+    {
+      "command": [
+        "/usr/bin/ldd",
+        "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-sanitize-20261117/link-v3/source-prepared-normal-bake"
+      ],
+      "started": 1794949313.001519,
+      "timeout_seconds": 60,
+      "RSS_limit_bytes": 6442450944,
+      "virtual_AS_cap": null,
+      "pid": 3098199,
+      "start": 12723806,
+      "pgrp": 3098199,
+      "root": {
+        "pid": 3098199,
+        "start": 12723806,
+        "pgrp": 3098199,
+        "session": 3098199,
+        "ppid": 3089942,
+        "state": "R"
+      },
+      "known_processes": [
+        {
+          "pid": 3098199,
+          "start": 12723806,
+          "pgrp": 3098199,
+          "session": 3098199,
+          "ppid": 3089942,
+          "state": "R"
+        },
+        {
+          "pid": 3098207,
+          "start": 12723807,
+          "pgrp": 3098199,
+          "session": 3098199,
+          "ppid": 3098199,
+          "state": "R"
+        }
+      ],
+      "peak_owned_RSS_bytes": 4173824,
+      "peak_observed_virtual_bytes": 237805568,
+      "monitor_samples": 3,
+      "signals": [],
+      "exit": 0,
+      "seconds": 0.026498794555664062,
+      "name": "source-prepared-normal-bake-ldd"
+    },
+    {
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-sanitize-20261117/link-v3/source-prepared-normal-bake",
+        "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-sanitize-20261117/native-v2/source-prepared-normal-bake-outputs"
+      ],
+      "started": 1794949313.1136608,
+      "timeout_seconds": 900,
+      "RSS_limit_bytes": 6442450944,
+      "virtual_AS_cap": null,
+      "pid": 3098223,
+      "start": 12723817,
+      "pgrp": 3098223,
+      "root": {
+        "pid": 3098223,
+        "start": 12723817,
+        "pgrp": 3098223,
+        "session": 3098223,
+        "ppid": 3089942,
+        "state": "R"
+      },
+      "known_processes": [
+        {
+          "pid": 3098223,
+          "start": 12723817,
+          "pgrp": 3098223,
+          "session": 3098223,
+          "ppid": 3089942,
+          "state": "R"
+        },
+        {
+          "pid": 3099306,
+          "start": 12724427,
+          "pgrp": 3098223,
+          "session": 3098223,
+          "ppid": 3098223,
+          "state": "R"
+        }
+      ],
+      "peak_owned_RSS_bytes": 1492795392,
+      "peak_observed_virtual_bytes": 21990930853888,
+      "monitor_samples": 432,
+      "signals": [],
+      "exit": 0,
+      "seconds": 6.374582529067993,
+      "name": "source-prepared-normal-bake"
+    },
+    {
+      "command": [
+        "/usr/bin/ldd",
+        "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-sanitize-20261117/link-v3/source-artist-normal-bake"
+      ],
+      "started": 1794949325.451255,
+      "timeout_seconds": 60,
+      "RSS_limit_bytes": 6442450944,
+      "virtual_AS_cap": null,
+      "pid": 3100081,
+      "start": 12725051,
+      "pgrp": 3100081,
+      "root": {
+        "pid": 3100081,
+        "start": 12725051,
+        "pgrp": 3100081,
+        "session": 3100081,
+        "ppid": 3089942,
+        "state": "R"
+      },
+      "known_processes": [
+        {
+          "pid": 3100081,
+          "start": 12725051,
+          "pgrp": 3100081,
+          "session": 3100081,
+          "ppid": 3089942,
+          "state": "R"
+        },
+        {
+          "pid": 3100083,
+          "start": 12725052,
+          "pgrp": 3100081,
+          "session": 3100081,
+          "ppid": 3100081,
+          "state": "R"
+        },
+        {
+          "pid": 3100084,
+          "start": 12725052,
+          "pgrp": 3100081,
+          "session": 3100081,
+          "ppid": 3100083,
+          "state": "Z"
+        }
+      ],
+      "peak_owned_RSS_bytes": 6164480,
+      "peak_observed_virtual_bytes": 237805568,
+      "monitor_samples": 3,
+      "signals": [],
+      "exit": 0,
+      "seconds": 0.025270938873291016,
+      "name": "source-artist-normal-bake-ldd"
+    },
+    {
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-sanitize-20261117/link-v3/source-artist-normal-bake",
+        "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-sanitize-20261117/native-v2/source-artist-normal-bake-outputs"
+      ],
+      "started": 1794949325.5455225,
+      "timeout_seconds": 900,
+      "RSS_limit_bytes": 6442450944,
+      "virtual_AS_cap": null,
+      "pid": 3100099,
+      "start": 12725060,
+      "pgrp": 3100099,
+      "root": {
+        "pid": 3100099,
+        "start": 12725060,
+        "pgrp": 3100099,
+        "session": 3100099,
+        "ppid": 3089942,
+        "state": "R"
+      },
+      "known_processes": [
+        {
+          "pid": 3100099,
+          "start": 12725060,
+          "pgrp": 3100099,
+          "session": 3100099,
+          "ppid": 3089942,
+          "state": "R"
+        },
+        {
+          "pid": 3100586,
+          "start": 12725367,
+          "pgrp": 3100099,
+          "session": 3100099,
+          "ppid": 3100099,
+          "state": "R"
+        },
+        {
+          "pid": 3100587,
+          "start": 12725368,
+          "pgrp": 3100099,
+          "session": 3100099,
+          "ppid": 3100099,
+          "state": "R"
+        }
+      ],
+      "peak_owned_RSS_bytes": 1162625024,
+      "peak_observed_virtual_bytes": 21991100235776,
+      "monitor_samples": 248,
+      "signals": [],
+      "exit": 0,
+      "seconds": 3.295421838760376,
+      "name": "source-artist-normal-bake"
+    }
+  ],
+  "input_drift": [],
+  "remaining_owned": [],
+  "owner_absent": true,
+  "lease": {
+    "acquired": 1794949289.9282265,
+    "owner_pid": 3089942,
+    "before_any_ldd_or_product": true,
+    "inode": 99618,
+    "released": 1794949336.6220803
+  },
+  "independent_nb": {
+    "available": true,
+    "inode": 99618
+  },
+  "ordered_save_pairs": [
+    {
+      "native": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-sanitize-20261117/native-v2/source-advanced-normal-bake-outputs/mt0-posed-seam-raster.dsculpt",
+      "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-sanitize-20261117/native-v2/source-advanced-normal-bake-outputs/mt0-posed-seam-raster-ordered.dsculpt",
+      "sha256": "d29c44ae0a22a0db7836ddf1669dfe302c7ae8e07b419a7ccef2437ced557d97"
+    },
+    {
+      "native": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-sanitize-20261117/native-v2/source-advanced-normal-bake-outputs/mt0-posed-seam-retained.dsculpt",
+      "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-sanitize-20261117/native-v2/source-advanced-normal-bake-outputs/mt0-posed-seam-retained-ordered.dsculpt",
+      "sha256": "ba53ccacc38938f9f32df80be90e5c5a710358f48daf1b3a38fa5d18da0b3cbc"
+    },
+    {
+      "native": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-sanitize-20261117/native-v2/source-advanced-normal-bake-outputs/mt0-posed-shared-raster.dsculpt",
+      "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-sanitize-20261117/native-v2/source-advanced-normal-bake-outputs/mt0-posed-shared-raster-ordered.dsculpt",
+      "sha256": "bb2845c448aa0e7277c77c4a148115148b41d678eca6454cfffa6f9dd3cdf3b2"
+    },
+    {
+      "native": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-sanitize-20261117/native-v2/source-advanced-normal-bake-outputs/mt0-posed-shared-retained.dsculpt",
+      "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-sanitize-20261117/native-v2/source-advanced-normal-bake-outputs/mt0-posed-shared-retained-ordered.dsculpt",
+      "sha256": "0a7e9fd73c3e24d2997195b1cf29dff4fb5c4648da62cfcccd1a0a49f5b0a374"
+    },
+    {
+      "native": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-sanitize-20261117/native-v2/source-advanced-normal-bake-outputs/mt0-rest-seam-raster.dsculpt",
+      "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-sanitize-20261117/native-v2/source-advanced-normal-bake-outputs/mt0-rest-seam-raster-ordered.dsculpt",
+      "sha256": "db7eb735005eaa3dfc7de1601ffd04083b8eb19f37fa71f4c0362af940b7ac7e"
+    },
+    {
+      "native": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-sanitize-20261117/native-v2/source-advanced-normal-bake-outputs/mt0-rest-seam-retained.dsculpt",
+      "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-sanitize-20261117/native-v2/source-advanced-normal-bake-outputs/mt0-rest-seam-retained-ordered.dsculpt",
+      "sha256": "6dcd4381b04864db9869ec6f732e1383a673a7894dc03ca4985829ac4a3a8500"
+    },
+    {
+      "native": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-sanitize-20261117/native-v2/source-advanced-normal-bake-outputs/mt0-rest-shared-raster.dsculpt",
+      "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-sanitize-20261117/native-v2/source-advanced-normal-bake-outputs/mt0-rest-shared-raster-ordered.dsculpt",
+      "sha256": "ac4c27167035474a18629ee5de6a931a6daffbdb7f0c4924184bdeaa9c9dc639"
+    },
+    {
+      "native": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-sanitize-20261117/native-v2/source-advanced-normal-bake-outputs/mt0-rest-shared-retained.dsculpt",
+      "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-sanitize-20261117/native-v2/source-advanced-normal-bake-outputs/mt0-rest-shared-retained-ordered.dsculpt",
+      "sha256": "8223002fac6e3dc3c47fb61a0b5855cf12391cb04eae0e102f9eca649131a062"
+    },
+    {
+      "native": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-sanitize-20261117/native-v2/source-advanced-normal-bake-outputs/mt1-posed-seam-raster.dsculpt",
+      "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-sanitize-20261117/native-v2/source-advanced-normal-bake-outputs/mt1-posed-seam-raster-ordered.dsculpt",
+      "sha256": "23b41ae57ca6be92e9215a52bd7edead8ae18ee832605ea5029a142d3ca473a5"
+    },
+    {
+      "native": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-sanitize-20261117/native-v2/source-advanced-normal-bake-outputs/mt1-posed-seam-retained.dsculpt",
+      "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-sanitize-20261117/native-v2/source-advanced-normal-bake-outputs/mt1-posed-seam-retained-ordered.dsculpt",
+      "sha256": "d9d042e89334877b7d6151bebee6750a750a7961a2a33ea41c3afee01f80794b"
+    },
+    {
+      "native": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-sanitize-20261117/native-v2/source-advanced-normal-bake-outputs/mt1-posed-seam-retained-three-edits.dsculpt",
+      "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-sanitize-20261117/native-v2/source-advanced-normal-bake-outputs/mt1-posed-seam-retained-three-edits-ordered.dsculpt",
+      "sha256": "7bfc289cd9cff792ceee45fbba4c1b46da130a861d0ded89d5963fe7b30e0165"
+    },
+    {
+      "native": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-sanitize-20261117/native-v2/source-advanced-normal-bake-outputs/mt1-posed-shared-raster.dsculpt",
+      "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-sanitize-20261117/native-v2/source-advanced-normal-bake-outputs/mt1-posed-shared-raster-ordered.dsculpt",
+      "sha256": "e1c89a8f72395f1d02a7a178a84fada8da635c9deb84b48c708634eb3849ba86"
+    },
+    {
+      "native": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-sanitize-20261117/native-v2/source-advanced-normal-bake-outputs/mt1-posed-shared-retained.dsculpt",
+      "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-sanitize-20261117/native-v2/source-advanced-normal-bake-outputs/mt1-posed-shared-retained-ordered.dsculpt",
+      "sha256": "9f0e4cbe3043dfe3dde5b5c70a24fd1edc4d5cbe774fa7a2847cff514e272922"
+    },
+    {
+      "native": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-sanitize-20261117/native-v2/source-advanced-normal-bake-outputs/mt1-rest-seam-raster.dsculpt",
+      "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-sanitize-20261117/native-v2/source-advanced-normal-bake-outputs/mt1-rest-seam-raster-ordered.dsculpt",
+      "sha256": "b829bb7002c67cea72896e230132a21a46538daf79049a700643220cbd58aed1"
+    },
+    {
+      "native": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-sanitize-20261117/native-v2/source-advanced-normal-bake-outputs/mt1-rest-seam-retained.dsculpt",
+      "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-sanitize-20261117/native-v2/source-advanced-normal-bake-outputs/mt1-rest-seam-retained-ordered.dsculpt",
+      "sha256": "695de302e4615d38dd4fbcac06bf0bac7bde63efa98c2d9df65309ec95b945fc"
+    },
+    {
+      "native": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-sanitize-20261117/native-v2/source-advanced-normal-bake-outputs/mt1-rest-shared-raster.dsculpt",
+      "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-sanitize-20261117/native-v2/source-advanced-normal-bake-outputs/mt1-rest-shared-raster-ordered.dsculpt",
+      "sha256": "247419328e5d8016ee8fe2413241feecf9219e2fcdbf5a751422397e6498e504"
+    },
+    {
+      "native": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-sanitize-20261117/native-v2/source-advanced-normal-bake-outputs/mt1-rest-shared-retained.dsculpt",
+      "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-sanitize-20261117/native-v2/source-advanced-normal-bake-outputs/mt1-rest-shared-retained-ordered.dsculpt",
+      "sha256": "14edc2bef0b63378de40536744c452df76f154db18626fbf2a86165167a26b01"
+    }
+  ],
+  "maximums": {
+    "direct_error": 3.5728e-07,
+    "second_bake_error": 0.00487417,
+    "color_error": 0.0145202
+  },
+  "minimums": {
+    "interior_omitted": 0.688094,
+    "interior_swapped": 0.717632,
+    "interior_wrong": 0.738823
+  },
+  "unsupported": [
+    "canonical normal/material domains",
+    "native32 normal/material domains",
+    "independent writable-paint domains",
+    "combined Source8/prepared-normal authority"
+  ],
+  "still_required": [
+    "new-family graphical consumers with controls",
+    "actual public desktop/XR workflow controls",
+    "fresh combined integration qualification"
+  ],
+  "evidence_archive": {
+    "path": "docs/validation/artist-advanced-strict-20261117.tar.xz",
+    "sha256": "64f353dc8e56bd685682f21d7e3bcb2162ae0c64f0f3a633812fd54e003153d4",
+    "bytes": 295580,
+    "members": 123,
+    "manifest_sha256": "3b6a4287b88a932bcecf035941859acec30fc616d16ac7a567127a206686cc33"
+  }
+}
