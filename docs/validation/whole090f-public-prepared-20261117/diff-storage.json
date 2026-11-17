@@ -1,0 +1,19 @@
+{
+  "scope": "Lossless storage only: exact unified diff context whitespace is preserved; live runtime plans/sources/hashes unchanged.",
+  "diffs": {
+    "cohort_v3.py.diff": {
+      "stored": "cohort_v3.py.diff.gz",
+      "original_sha256": "4af0bf0e6874924f476ffec22b06ae9c5759a642deb36235145d4274ea817f80",
+      "stored_sha256": "c4d152a98248a74d16fc846fbe12f438d19dd28fe6fb7b84e2f736b4b46f751a",
+      "original_bytes": 7561,
+      "stored_bytes": 2770
+    },
+    "run-v3.py.diff": {
+      "stored": "run-v3.py.diff.gz",
+      "original_sha256": "7e24cd1db2f7e458d22efebb9d7dce7e89f9efc94d78207449173b498c954b08",
+      "stored_sha256": "04d9c471180977754719d5c66f9aa8f82eabdb521678d078546e60b72b994d9a",
+      "original_bytes": 10652,
+      "stored_bytes": 3145
+    }
+  }
+}

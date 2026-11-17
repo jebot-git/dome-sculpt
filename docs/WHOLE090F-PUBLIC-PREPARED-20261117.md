@@ -32,6 +32,12 @@ and full production requirements remain separate.
 [Exact source tuples/hashes and review prerequisites](validation/whole090f-public-prepared-20261117/whole-app-prepared-review-v3.json),
 [ordinary loader source](validation/whole090f-public-prepared-20261117/whole-app-loader-v1.py),
 [additive cohort](validation/whole090f-public-prepared-20261117/cohort_v3.py)
-and [small driver diff](validation/whole090f-public-prepared-20261117/run-v3.py.diff)
+and [small driver diff](validation/whole090f-public-prepared-20261117/run-v3.py.diff.gz)
 are recorded directly. The reviewed live namespace remains
 artifacts/prepared-public-operational-20261117.
+
+The exact unified diffs use gzip storage to preserve mandatory context-prefix
+whitespace without creating source whitespace lint warnings. The
+[storage map](validation/whole090f-public-prepared-20261117/diff-storage.json)
+records both original and compressed hashes; decompression recovers the exact
+reviewed diff bytes. Runtime artifact files are unchanged.
