@@ -1,0 +1,170 @@
+{
+  "scope": "Actual PREPARE ONLY exit0; no staged/compiled objects, fresh links, project products or tests",
+  "source": "090f009ede2c0623ca616fe892223b4f68f1c2c4",
+  "plan": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/native90-sanitize-planning-20261115/sanitize-090f00-20261117-audit/plan.json",
+    "sha256": "24db12cade792298072ad68b5435a52370b753b427437c285a86ac8b01fceaab"
+  },
+  "unit": {
+    "name": "ds-native90-sanitize-prepare-20261117.service",
+    "main_pid": 2039800,
+    "invocation": "b3efe8ba13c44307bd0571d5d4786dcb",
+    "terminal": {
+      "LoadState": "loaded",
+      "ActiveState": "active",
+      "SubState": "exited",
+      "InvocationID": "b3efe8ba13c44307bd0571d5d4786dcb",
+      "Type": "exec",
+      "RuntimeMaxUSec": "1h",
+      "RemainAfterExit": "yes",
+      "MainPID": "0",
+      "Result": "success",
+      "ExecMainStartTimestampMonotonic": "118932333834",
+      "ExecMainExitTimestampMonotonic": "119182845675",
+      "ExecMainPID": "2039800",
+      "ExecMainCode": "1",
+      "ExecMainStatus": "0",
+      "ControlGroup": "",
+      "MemoryPeak": "4294967296",
+      "MemoryMax": "4294967296",
+      "KillMode": "control-group"
+    },
+    "terminal_sha256": "87dc46e4db6d40f29f526c3736001387efd9cd1ccdecb3722690487738e861cc",
+    "journal_sha256": "c457a4fc9d855130759082474388a800ed8228d7cebb8413aa3afa74d9b4e2fa"
+  },
+  "unit_cgroup_after_exit": "ControlGroup empty, prior exact unit cgroup path absent, MainPID absent; no root-cgroup inference",
+  "elapsed_seconds": 250.511841,
+  "summary": {
+    "configured_TUs": 1036,
+    "fresh_complete_TUs": 291,
+    "reused_whole_objects": 745,
+    "all_configured_link_archive_nodes": 737,
+    "fresh_links_archives": 737,
+    "retained_whole_products": 0,
+    "mandatory_fresh_owning_targets": 94,
+    "selected_CTests": 90,
+    "additional_manual_source_render_gate": 2
+  },
+  "pins": 41032,
+  "current_header_files": 27424,
+  "input_drift": [],
+  "staged_or_compiled_objects": 0,
+  "owning_execution_started": false,
+  "hold_sha256": "0be8c5036d9df6d1741650f699c179d6df826f9ef3519eebbdd2096d850eb7dd",
+  "helper_sha256": {
+    "prepare-sanitize-native90-v2.py": "a710f11cf6608a37a9cd6ef7b4cf604b718fb66e9873123632b75f94e35a2ad7",
+    "execute-sanitize-native90-v1.py": "736269655c2b1821d6ee21a7f92890dc3618e14d2ffffefe706facfc03fd53f5",
+    "mixed_dependency_audit_v1.py": "d45fe0fa67a512bc18d13826f3be706a1fd827eaf66663461e0be496d78e6fa8"
+  },
+  "observation_failures_preserved": [
+    "A status/ps composite returned1 because ps found finished MainPID absent; independent terminal properties prove actual prepare0.",
+    "First observer misinterpreted terminal empty ControlGroup as root cgroup and asserted while inspecting root pids; corrected observer requires empty ControlGroup AND prior exact unit path absent. No preparation rerun or output relabeling."
+  ],
+  "evidence_members": [
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native90-sanitize-planning-20261115/sanitize-090f00-20261117-audit/plan.json",
+      "sha256": "24db12cade792298072ad68b5435a52370b753b427437c285a86ac8b01fceaab",
+      "bytes": 148507559,
+      "committed_gzip": "docs/validation/SAN90-PREPARE-20261117/plan.json.gz",
+      "gzip_sha256": "60d98b7ac8f42dcb189875ea89b2da99af5ecf44a629cb9de49ab6e760b76d7b"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native90-sanitize-planning-20261115/sanitize-090f00-20261117-audit/EXECUTION-HOLD.json",
+      "sha256": "0be8c5036d9df6d1741650f699c179d6df826f9ef3519eebbdd2096d850eb7dd",
+      "bytes": 215,
+      "committed_gzip": "docs/validation/SAN90-PREPARE-20261117/EXECUTION-HOLD.json.gz",
+      "gzip_sha256": "f47d06c825ecccd0eceac0779e1688204fe8f16f7457628966d5150a00b32fe7"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native90-sanitize-planning-20261115/sanitize-090f00-20261117-audit/configure.log",
+      "sha256": "7d24b133bda5c35e22b2e92a7dda191694c9a5b82b7be3811bc6aded40f894dc",
+      "bytes": 4522,
+      "committed_gzip": "docs/validation/SAN90-PREPARE-20261117/configure.log.gz",
+      "gzip_sha256": "2ce1545e1498d17eb2a5d336e5188920b12aa1b7fd85b54e253c6e2fa1ad8310"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native90-sanitize-planning-20261115/sanitize-090f00-20261117-owning/CMakeCache.txt",
+      "sha256": "74ff0a6da2bb1bcc643ff230bb0885154d815efb9d50ba1b2759f0f4da645431",
+      "bytes": 57426,
+      "committed_gzip": "docs/validation/SAN90-PREPARE-20261117/configured-CMakeCache.txt.gz",
+      "gzip_sha256": "43113ee3ad762b3c2000fe82fec1dd86ed5794bf723265256652decfdcee38f8"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native90-sanitize-planning-20261115/sanitize-090f00-20261117-owning/compile_commands.json",
+      "sha256": "2d8a54a0be2712d87372d53ec44a0f4a8965119f50f831251cc8068157de4c00",
+      "bytes": 1440230,
+      "committed_gzip": "docs/validation/SAN90-PREPARE-20261117/configured-compile_commands.json.gz",
+      "gzip_sha256": "5ebce16dd44f7d264161a06537a6a035ea945a7dc16ac2516039c61f302ec7ba"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native90-sanitize-planning-20261115/sanitize-090f00-20261117-owning/build.ninja",
+      "sha256": "0c9c8329a763c777c1efebf5e3553dd4ff3199829490d5b966222c83123c2e9d",
+      "bytes": 4335743,
+      "committed_gzip": "docs/validation/SAN90-PREPARE-20261117/configured-build.ninja.gz",
+      "gzip_sha256": "ce4e7c9611363645c679cf1a5e12a47315765b2ec8d3c39e2e8b990a6e55f138"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native90-sanitize-planning-20261115/sanitize-090f00-20261117-owning/CMakeFiles/rules.ninja",
+      "sha256": "10eb86947ce87f92de5e507f8a829c6bb5e1ca81afd87117747ace247ea7c9ee",
+      "bytes": 1517201,
+      "committed_gzip": "docs/validation/SAN90-PREPARE-20261117/configured-rules.ninja.gz",
+      "gzip_sha256": "0197cb18a0a282a99ab133246aa60a7d8bc11250e604a92e088baa6cdc210bb3"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native90-sanitize-planning-20261115/sanitize-090f00-20261117-owning/CTestTestfile.cmake",
+      "sha256": "0621e3260ab5052ae7bb40c4150a08c6af133b74d613a060d705fa50166d7c8d",
+      "bytes": 982482,
+      "committed_gzip": "docs/validation/SAN90-PREPARE-20261117/configured-CTestTestfile.cmake.gz",
+      "gzip_sha256": "429ebb6742f3b918664c7223926f3c4ca2a2aff119aa19e0206001952a41001d"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native90-sanitize-planning-20261115/sanitize-090f00-20261117-prepare-launch-request.json",
+      "sha256": "1c1fd9695a1cdde70dc10da46ac7c83659a62d360b8d3fb122a8a50f5db6dba6",
+      "bytes": 1725,
+      "committed_gzip": "docs/validation/SAN90-PREPARE-20261117/sanitize-090f00-20261117-prepare-launch-request.json.gz",
+      "gzip_sha256": "dd200a0e3a2b8217a1f7054e5d4da927639e8b0b0e3a0bd64f68bccca116d781"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native90-sanitize-planning-20261115/sanitize-090f00-20261117-prepare-launch-result.json",
+      "sha256": "b392d7d7f8d8c2483124f6b5366d2bde4cd4eeef5a43f6a663e01a96a5814cfc",
+      "bytes": 167,
+      "committed_gzip": "docs/validation/SAN90-PREPARE-20261117/sanitize-090f00-20261117-prepare-launch-result.json.gz",
+      "gzip_sha256": "202271a691404b24de6992b422ffb9cac7758d79149387bb119a51601acb4849"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native90-sanitize-planning-20261115/sanitize-090f00-20261117-prepare.log",
+      "sha256": "3d38cb5da6df491402b4848fa09e2646a1a06e5c63f3d985e21371217550df9b",
+      "bytes": 421,
+      "committed_gzip": "docs/validation/SAN90-PREPARE-20261117/sanitize-090f00-20261117-prepare.log.gz",
+      "gzip_sha256": "e0c24787af33a3f558037dc443c1b143f27bc15e67acf91cd4c6accf0cf86467"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native90-sanitize-planning-20261115/sanitize-090f00-20261117-prepare-unit-terminal.txt",
+      "sha256": "87dc46e4db6d40f29f526c3736001387efd9cd1ccdecb3722690487738e861cc",
+      "bytes": 392,
+      "committed_gzip": "docs/validation/SAN90-PREPARE-20261117/sanitize-090f00-20261117-prepare-unit-terminal.txt.gz",
+      "gzip_sha256": "09561b9751177c41ae4a9cf86e6f877f47c7c1bde1a8ddd6256b4c81eae71930"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native90-sanitize-planning-20261115/sanitize-090f00-20261117-prepare-unit-journal.txt",
+      "sha256": "c457a4fc9d855130759082474388a800ed8228d7cebb8413aa3afa74d9b4e2fa",
+      "bytes": 957,
+      "committed_gzip": "docs/validation/SAN90-PREPARE-20261117/sanitize-090f00-20261117-prepare-unit-journal.txt.gz",
+      "gzip_sha256": "0f27516f6935ebbf59e62f3cb6ba1b009b3986fb7b6854e37380bdea05f4803d"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native90-sanitize-planning-20261115/sanitize-090f00-20261117-prepare-unit-after-stop.txt",
+      "sha256": "4014b289bbdc652ff157c8ed15881904cba202ceb3f7792133d943d788fd7975",
+      "bytes": 65,
+      "committed_gzip": "docs/validation/SAN90-PREPARE-20261117/sanitize-090f00-20261117-prepare-unit-after-stop.txt.gz",
+      "gzip_sha256": "79e6e42d7bd7fe861b6f4c6374d759d7151468920b63100c11ae7582178fd8bd"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native90-sanitize-planning-20261115/sanitize-090f00-20261117-prepare-closure.json",
+      "sha256": "b9df9af3faf5d114d03918d816319d1351c2363b487ee2759990623efd78cde1",
+      "bytes": 2861,
+      "committed_gzip": "docs/validation/SAN90-PREPARE-20261117/sanitize-090f00-20261117-prepare-closure.json.gz",
+      "gzip_sha256": "991e1bd7ed8c861da76d1eae0b80308f5a03a94b54e5132976d2d829c848a128"
+    }
+  ]
+}
