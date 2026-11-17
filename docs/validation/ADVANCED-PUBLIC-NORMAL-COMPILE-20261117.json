@@ -1,0 +1,74 @@
+{
+  "state": "terminal",
+  "actual_exit": 0,
+  "source": "8bb4072dc1ad60bb7b11b8a325c930f8b2c0c176",
+  "status_sha256": "037e13aecb60a38a18dc8ec852ab18d825be41e65163a1d95c707b2b36168b1b",
+  "inputs_sha256": "6605a1627695bee89efdd6f939d138fb33647fcbfaf61e98b498cc93feb77d9d",
+  "complete_TUs": 2,
+  "dependencies": [
+    {
+      "source": "tests/source-advanced-normal-bake.cpp",
+      "actual_MD": 461,
+      "same_roster": true,
+      "object": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-public-normal-compile-20261117/advanced-native.o",
+      "object_sha256": "d06a815017deff5ee06c65f7cd13ada3b7cb1b356001a327819cfec3df15e795"
+    },
+    {
+      "source": "tests/source8-public-runtime.cpp",
+      "actual_MD": 379,
+      "same_roster": true,
+      "object": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-public-normal-compile-20261117/advanced-runtime.o",
+      "object_sha256": "70271a09cfad1bee8f3eb5af81d6efa53de72d520f2809fc9b5fb47d331cfa60"
+    }
+  ],
+  "tools": 14,
+  "input_pins": 4793,
+  "input_drift": [],
+  "all_recorded_processes_absent": true,
+  "unit_stopped": true,
+  "owned_records": 10,
+  "scope": "Exactly2 fresh complete Release test TUs only; advanced product90fad unchanged. No links, built products, ldd, GL, native fixture run or whole owning-source admission.",
+  "actual_compile_seconds": [
+    16.225558757781982,
+    8.583570718765259
+  ],
+  "actual_memory_peak_bytes": 1133260800,
+  "unit": "ds-advanced-public-compile-v1-20261117.service",
+  "unit_InvocationID": "24885c5cfc1848c488e110f48d7458b1",
+  "unit_MainPID": 3062450,
+  "unit_actual_exit": 0,
+  "unit_Result": "success",
+  "compiler_AS_bytes": 2147483648,
+  "owned_RSS_limit_bytes": 3221225472,
+  "source_clean_frozen": "8bb4072dc1ad60bb7b11b8a325c930f8b2c0c176",
+  "deferred_link_plan": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-public-normal-links-20261117/link-plan.json",
+    "sha256": "2706ed53c6a9c870a1cd40a85107d8b235cea2e85258a2c76cefa2111f808e55",
+    "executed": false
+  },
+  "archive": {
+    "path": "advanced-public-normal-compile-20261117/actual-compile-and-deferred-link-plan.tar.gz",
+    "sha256": "02d252dfcbd8c76370aefed142a6f5390b15f06ce60f1feebaabc11a065a0aab",
+    "bytes": 365285,
+    "members": {
+      "advanced-public-normal-compile-20261117/compile-plan.json": "8fde98ac2413fe9e9673ff6125680d4e03d6ff4298bba8892461c29845e7557b",
+      "advanced-public-normal-compile-20261117/compile-advanced-public-v1.py": "e85de82d2e65045e49811dcd48fd75211cc74f8a9d298bc2114aa53d77505a02",
+      "advanced-public-normal-compile-20261117/unit-launch.json": "0257c16323ab64f542e600a8309640ee24e3563a595dfc32d086f816495dd531",
+      "advanced-public-normal-compile-20261117/unit-initial.txt": "681c8e99464a2df49938125bb95b565b5c1033bfecccf9a81e77636738176ee6",
+      "advanced-public-normal-compile-20261117/compile-status.json": "037e13aecb60a38a18dc8ec852ab18d825be41e65163a1d95c707b2b36168b1b",
+      "advanced-public-normal-compile-20261117/preprocess-0.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "advanced-public-normal-compile-20261117/0.precheck-all.d": "7c84007261fd692e329487a6545caeeb88be7a54de9da776bec719dd4a535a57",
+      "advanced-public-normal-compile-20261117/preprocess-1.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "advanced-public-normal-compile-20261117/1.precheck-all.d": "0b73b039e1f8063e1ab0923faa21e5b200065a5815ac8c77d1cae8bf8024ba0e",
+      "advanced-public-normal-compile-20261117/compile-0.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "advanced-public-normal-compile-20261117/advanced-native.d": "fa7937b76473906d2c50e819d48c7be66d6485b861e791a837b99b79fa24007f",
+      "advanced-public-normal-compile-20261117/compile-1.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "advanced-public-normal-compile-20261117/advanced-runtime.d": "827f75e64b2d671d4ff83d8870a29005dfe183eae78fc576f5eb1e781c61136e",
+      "advanced-public-normal-compile-20261117/compile-inputs.json": "6605a1627695bee89efdd6f939d138fb33647fcbfaf61e98b498cc93feb77d9d",
+      "advanced-public-normal-compile-20261117/unit-terminal.txt": "9ccbd7d5a81d2c79bacbd3ba11a8fc16ffe970688aaf22d633d977793cfc9fb7",
+      "advanced-public-normal-compile-20261117/unit-journal.txt": "4ca901fa5fef64c3db0474298c6ef3d1277d6c0cc7678b52f1b049c94d80c957",
+      "advanced-public-normal-compile-20261117/compile-closure.json": "90c068adb7f60b301a3409c8ab4f3c72f1a74b77298ca6c727f872c9a9dc244d",
+      "advanced-public-normal-links-20261117/link-plan.json": "2706ed53c6a9c870a1cd40a85107d8b235cea2e85258a2c76cefa2111f808e55"
+    }
+  }
+}
