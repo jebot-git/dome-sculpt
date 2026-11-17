@@ -43,3 +43,24 @@ The ignored live namespace is artifacts/prepared-public-operational-20261117.
 Prepared code is not a runtime pass, main admission, combined90 qualification,
 installation or full-goal completion. Root review and actual native results are
 still required before execution.
+
+## Additive producer snapshot correction
+
+The initial6c8 native producer failed a pointer-identity comparison taken across
+Scene::snapshot(), which intentionally creates a new paint wrapper. The
+separate test-only f1e193c7 child captures that owner after detaching the snapshot
+and preserves exact source/native/owner checks. Its native results are still
+required before graphical execution; the old failure and unexecuted v1 remain.
+
+Operational v2 explicitly distinguishes fixture f1e193c7 from unchanged scenario,
+XR runtime and font6c8, with product1bc retained. The new native/link source must
+match the fixture child; runtime/font must equal the actual retained6c8 products,
+and scenario provenance still matches6c8. No source field or original pin is
+silently replaced. Native endpoint schemas, scenario bytes, oracles and budgets
+are unchanged. Static syntax and both planning commands pass; no products run.
+
+Only [the causal review](validation/prepared-public-operational-20261117/v2/prepared-wrapper-review-v2.json)
+and [cohort](validation/prepared-public-operational-20261117/v2/cohort_v2.py.diff)/
+[driver](validation/prepared-public-operational-20261117/v2/run-v2.py.diff) diffs
+are added. They transform the archived v1 sources into the exact reviewed live
+v2 files; native terminal0 and root phase/case approval remain prerequisites.
