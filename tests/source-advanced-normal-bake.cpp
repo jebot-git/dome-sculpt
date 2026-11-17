@@ -62,7 +62,7 @@ void negatives(SourceNormalUvMethod method){
  binding->normal_preparation=preparation;forged.material_bindings=binding;
  require(refuses([&]{detail::source_bake_normals(forged,{});})&&scene.encode()==before,"Changed ordered-corner/domain metadata is rejected by actual recipe replay");
  auto raw=detail::raw_bake_source(source);require(raw&&resolver.matches_prepared_source(*raw),"Actual independently captured material packet pairs with the factory-minted normal resolver");
- auto stale=std::make_shared<TextureMaps>(*raw);auto edited=source.painted->snapshot();auto payload=*edited->baked();edited->clear_bake();edited->install_bake(std::move(payload));stale->overlay=detail::PaintOverlayFactory::capture(*edited);
+ auto stale=std::make_shared<TextureMaps>(*raw);auto edited=source.painted->snapshot();auto payload=*edited->baked();edited->clear_bake();edited->install_bake(std::move(payload));if(stale->source_only)stale->overlay=detail::PaintOverlayFactory::capture(*edited);else stale->baked_base=edited->baked();
  BakeSource high;high.mesh=source.painted->mesh();high.materials[0].maps=stale;BakeOptions options;options.resolution=64;options.ao_samples=0;options.padding=0;
  require(!resolver.matches_prepared_source(*stale)&&refuses([&]{detail::bake_mesh_source_normals(high.mesh,high,options,resolver);})&&scene.encode()==before,"Byte-identical later normal event cannot borrow an earlier resolver's material owner");
  auto other=uv_source(prepared(false),method,true);auto foreign=detail::source_bake_normals(other.active(),{});require(!foreign.matches_prepared_source(*raw)&&refuses([&]{detail::bake_mesh_source_normals(high.mesh,high,options,foreign);}),"Independent genuine source with matching bytes cannot authorize another source's normal/material owners");
