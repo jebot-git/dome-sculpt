@@ -1,6 +1,6 @@
 # Advanced public source-use Arc XR matrix — 2026-11-18
 
-All eight authenticated Arc synthetic-XR source-use cases pass **520 checks in sixteen fresh ordinary Apps**. The previously recorded Rasterize/MT1/rest canary and six completed cases were reused; only the two remaining RetainSource/MT1 cases were executed during this continuation. Desktop source-use8/128 remains its separate matching authority.
+All eight authenticated Arc synthetic-XR source-use cases pass **520 checks in sixteen fresh ordinary Apps**. The six previously completed cases, including the Rasterize/MT1/rest canary, were reused; only the two remaining RetainSource/MT1 cases were executed during this continuation. Desktop source-use8/128 remains its separate matching authority.
 
 | Case | Checks | Actual seconds |
 | --- | ---: | ---: |
