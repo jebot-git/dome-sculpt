@@ -154,13 +154,23 @@ and stale-event negatives were corrected without weakening source guards;
 original failures remain preserved. Canonical/native32/independent writable-paint
 domains remain explicit refusals pending their own actual adapters.
 
-All six new strict component TUs and three fresh links now pass in
-artifacts/artist-advanced-normal-sanitize-20261117. Their runtime17/91/139 gate
-is being prepared; compilation/linking alone is not sanitizer runtime proof.
+All six new strict component TUs and three fresh links pass in
+artifacts/artist-advanced-normal-sanitize-20261117. The separate native-v2
+runtime now also completes0: advanced17/263495, prepared91 and artist139, with
+live ASan/UBSan witnesses for each ELF, leak detection, all17 exact ordered-save
+pairs, drift[]/owned[]/released lease. Status SHA
+f8e9c649ebf0a324be9e3ba7ef48693eb662cf3fedcdb4281d47f694733dad03.
+Root captures actual unit3089942/f021bca5 success before stopping it; the owning
+agent is sealing this scoped proof. Graphics/public/whole-App admission remains
+outstanding for advanced90fad.
+
 Public source checkpoint8bb4072d adds separate real source-use and public
-UV-creation desktop/XR scenarios; two fresh Release test TUs are being prepared
-before any products. Existing frontend UV controls already expose both methods.
-Independent new-family graphical consumer coverage is a separate next task.
+UV-creation desktop/XR scenarios. Two fresh Release test TUs now compile0;
+their three native/runtime/App links are authorized under plan2706ed53, with
+all new products still held for loader/native review. Existing frontend UV
+controls already expose both methods. Independent new-family graphical
+consumer coverage is being implemented separately under plan629dc9c6:
+both roles and both live-source/second-Bake stages for17 genuine families.
 
 ## Canonical toolkit and full remaining goal
 
