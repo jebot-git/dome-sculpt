@@ -1,3 +1,24 @@
+## Goal resumed; combined candidate building — 2026-11-17
+
+The user resumed the full production objective. Candidate090f009e preserves
+current main and both component/public-test histories through actual merges;
+production matches1bc and the new public test sources match6c8. The candidate is
+pushed on work/authoring-normal-integration-20261115 and remains frozen while
+its optimized Release build runs. Actual prepare closes with1036 owners:
+291 fresh complete TUs,745 verified whole-object providers,737 fresh archive/link
+actions and3 fresh generators. No complete build or runtime acceptance is yet
+claimed. The service is ds-native90-release-build-20261117, InvocationID
+f18eb32adee84544b99a1c6404d1d403; inspect its actual state before any continuation.
+
+[Canonical toolkit currency](CURRENT-TOOLKIT-20261117.md) is reverified against
+the effective private bitmap runtime. New public fixture links pass; native
+capsule/font qualification and actual prepared-source desktop/XR tests follow.
+[Operational wrappers](PREPARED-PUBLIC-OPERATIONAL-20261117.md) preserve the
+frozen scenarios and await their required native outputs. The full combined
+sanitizer build and all unfinished production requirements remain required.
+No install, physical headset launch or active-session restart is part of this
+round. Historical pause entries below are superseded by this explicit resume.
+
 ## Current assessment and requested pause — 2026-11-15
 
 The current round is closed at the successful four-TU public-test compilation.
