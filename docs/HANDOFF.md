@@ -1,3 +1,16 @@
+## Goal resumed; prepared-source combined candidate — 2026-11-17
+
+The user resumed the full production objective. This branch now merges current
+main302e847d and public-test source6c8f042c through real merges. Production
+src/include/third_party and the build graph match the native-qualified1bc
+component; public test bytes match6c8. It remains a candidate, not admission of
+the successor runtime to main. Public fixture links/native products and actual
+prepared-source desktop/XR workflows are being qualified. The complete combined
+Release/sanitizer builds and all unfinished production requirements remain open.
+Canonical DomeD/toolkit currency is being rechecked before the combined build.
+No system installation, physical headset launch or active session restart is
+part of this round. Historical pause statements below are superseded by resume.
+
 ## Current assessment and requested pause — 2026-11-15
 
 The current round is closed at the successful four-TU public-test compilation.
