@@ -1,0 +1,436 @@
+{
+  "state": "qualified-actual-native-Wayland-GPU-runtime",
+  "source": "090f009ede2c0623ca616fe892223b4f68f1c2c4",
+  "actual_result": {
+    "status_path": "/home/blux/de-xr/dome-sculpt/artifacts/whole090f-wayland-20261117/native-arc-v4-driver-status.json",
+    "status_sha256": "845e7c89ab7902771a9c33fe00a891d4b456e0d3f3a9c33c31092677459343ca",
+    "exit": 0,
+    "checks": 14,
+    "input_pin_count": 42913,
+    "uncached_current_recheck_drift": [],
+    "steps_seconds": [
+      0.012354850769042969,
+      35.12845420837402
+    ]
+  },
+  "application": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/native90-release-planning-20261115/release-090f00-20261117-owning/dome-sculpt",
+    "sha256": "9143ea5921d35a3612ab452c16eee086403813343a88b3d775196a8507eb8af1"
+  },
+  "compositor": {
+    "source": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+    "artifact_sha256": "378309b9d2866bc6774f89683021ba20a6dccfffed5748128882d7a321e71bf8",
+    "optimized_main_artifact": true,
+    "cargo_all_dependencies_fresh_claimed": false,
+    "source_pin_count": 1037,
+    "source_drift": []
+  },
+  "unit": {
+    "InvocationID": "6152d98f86ef4efcb671abc4501a015a",
+    "MainPID": "0",
+    "Result": "success",
+    "ExecMainPID": "2547653",
+    "ExecMainStatus": "0",
+    "MemoryPeak": "477929472"
+  },
+  "unit_current": "LoadState=not-found\nActiveState=inactive\nMainPID=0\n",
+  "source_observer_MD_count": 302,
+  "all_owned_same_start_absent": true,
+  "lease": {
+    "owner_pid": 2547653,
+    "acquired_epoch": 1794944943.7448814,
+    "before_any_ldd_or_product": true,
+    "released_epoch": 1794944990.985582
+  },
+  "scope_limits": [
+    "Private Xvfb host and nested diagnostic copy, no native DRM zero-copy/scanout or physical HMD claim",
+    "Cargo dependencies may reuse real fingerprints; optimized mainartifact is fresh, not fresh-all-crates",
+    "No install or active session restart"
+  ],
+  "archive": {
+    "path": "docs/validation/whole090f-wayland-20261117/runtime-evidence.tar.xz",
+    "sha256": "ca85da8b21a1294a2f57ab7b7359273736abe36a58691fe6eb6b22d1f88c0869",
+    "bytes": 4627336,
+    "members": [
+      {
+        "member": "runtime/build-compositor.py",
+        "sha256": "b91194693db8a4b241e6464a798781c2bcdd84d71f96b956db1dad01fd253989",
+        "bytes": 2294
+      },
+      {
+        "member": "runtime/compositor-artifact.json",
+        "sha256": "0ac378995ba8b5415972e8463511afdb8816e540fc9f0a3885f830f9d7f5c926",
+        "bytes": 885
+      },
+      {
+        "member": "runtime/compositor-build-status.json",
+        "sha256": "c99fbd98d2e33b7b5d60a92d0418d1a40e0a3dd5c7a6124264e1604e39876e14",
+        "bytes": 908
+      },
+      {
+        "member": "runtime/compositor-build-unit-terminal.txt",
+        "sha256": "149fcafcca4193ecb63e3e2989b5e281412da3a30cf4a6c41ee32eadda6176ad",
+        "bytes": 165
+      },
+      {
+        "member": "runtime/compositor-build.log",
+        "sha256": "d08aa844c65a51de482bc8b3e57e3696bc25fbdcbfebe25edfac030dd99ac630",
+        "bytes": 255576
+      },
+      {
+        "member": "runtime/compositor-source-before.json",
+        "sha256": "a82e2b66a59f1f4312b3c5255329c80c010f934b2bdee4ceac58156c4818726d",
+        "bytes": 118278
+      },
+      {
+        "member": "runtime/device-auth-native-wayland-compile.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      {
+        "member": "runtime/device-auth-native-wayland-v1.cpp",
+        "sha256": "21c4e8b3edf39b8625f3860099e5f986f100407f6af7e0dac9ae19e6c86940b3",
+        "bytes": 6001
+      },
+      {
+        "member": "runtime/device-auth-native-wayland-v1.d",
+        "sha256": "cda0280b32771cfc516c78456dd37431a4ec433f417ccd0826d5c67b12ac529d",
+        "bytes": 11410
+      },
+      {
+        "member": "runtime/dome-menu-native-gpu-v1.py",
+        "sha256": "8f4e499b1c2b45d2070dedab9fad7416a7d6ab5d3275de21bba611b39be5767c",
+        "bytes": 26877
+      },
+      {
+        "member": "runtime/dome-menu-native-gpu-v2.py",
+        "sha256": "b83166247e3829cfc77dde63a68074662b23f1178e7586fdde935cf7a316f04f",
+        "bytes": 27715
+      },
+      {
+        "member": "runtime/failed-native-v1-journal.txt",
+        "sha256": "9c527b9583ecea30268e05ba28dacb7d22f15842717214c4e7c1f46a0a0321dd",
+        "bytes": 1069
+      },
+      {
+        "member": "runtime/failed-native-v1-unit.txt",
+        "sha256": "0a971f4d0c8c6fbc5ca4f65243878896321156161a10f5b71f55725b1d2300f7",
+        "bytes": 130
+      },
+      {
+        "member": "runtime/failed-native-v2-journal.txt",
+        "sha256": "953dad85dfd366cfda5b29f2c9f6383f3a90c44dba8c114ce404f3320c85d496",
+        "bytes": 2270
+      },
+      {
+        "member": "runtime/failed-native-v2-unit.txt",
+        "sha256": "80a7c2b0bd20c96b673518c292956545ba5ceca6106f0b7b0063f95f466dd624",
+        "bytes": 131
+      },
+      {
+        "member": "runtime/failed-native-v3-journal.txt",
+        "sha256": "d55fcc532f7cd0dd7f337e41374e3011503ab7e365c8999e1d8e205bd816e0c3",
+        "bytes": 6896
+      },
+      {
+        "member": "runtime/failed-native-v3-unit.txt",
+        "sha256": "361fc0b069a4efef9a391c1fa8e8763ce2a332358a7ea83723760d95d4951e61",
+        "bytes": 131
+      },
+      {
+        "member": "runtime/native-arc-v1-driver-status.json",
+        "sha256": "668865d064ffd14b47419d7b3f8c2164281f147ec79319d388bc802ddef483bb",
+        "bytes": 139
+      },
+      {
+        "member": "runtime/native-arc-v1-inputs-final.json",
+        "sha256": "a01803a366fac89eefb965d2e9607aedfd00280adf284fbd7e009633bd6e083c",
+        "bytes": 6831176
+      },
+      {
+        "member": "runtime/native-arc-v2/compositor.log",
+        "sha256": "e11708ff3943ef0e9ee46b67d076e30ebcb6d9a45b80717c5008c8bf820c936b",
+        "bytes": 1003
+      },
+      {
+        "member": "runtime/native-arc-v2/xvfb.log",
+        "sha256": "41c2ca9be04a957f1715338c6693aa3dc92726b20cfec24b3e1dd9ccdec24069",
+        "bytes": 128
+      },
+      {
+        "member": "runtime/native-arc-v2-driver-status.json",
+        "sha256": "404f969dc07e8adf5ba4837b6a4c6c0fcd8b8b5755486b94df53c7d509c9502a",
+        "bytes": 4270
+      },
+      {
+        "member": "runtime/native-arc-v2-inputs-before.json",
+        "sha256": "13b45ceace9f4caa250efe6b41db9d7a3969c5d160df145e0703c317533e32d5",
+        "bytes": 6833181
+      },
+      {
+        "member": "runtime/native-arc-v2-inputs-final.json",
+        "sha256": "13b45ceace9f4caa250efe6b41db9d7a3969c5d160df145e0703c317533e32d5",
+        "bytes": 6833181
+      },
+      {
+        "member": "runtime/native-arc-v3/client.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      {
+        "member": "runtime/native-arc-v3/compositor.log",
+        "sha256": "82e564dd7ca2cba910dd4710fb4660ad9cbb502e6f067f39994f9fae77623ece",
+        "bytes": 1938
+      },
+      {
+        "member": "runtime/native-arc-v3/observed-desktop.png",
+        "sha256": "b77353d760ed9aca84ec4eb2c22f79dd98aad9ee7afcfc13c71d9fe15aeee0c9",
+        "bytes": 60928
+      },
+      {
+        "member": "runtime/native-arc-v3/render.ppm",
+        "sha256": "51e54882b1c5856d7a0868f51f4520905e2f47e0a2c0c46c296cec76f5d75182",
+        "bytes": 3072016
+      },
+      {
+        "member": "runtime/native-arc-v3/report.json",
+        "sha256": "edcf11bd9cfb8a604190d7b2e128a814f03bd2cebd0f556fe5d6e84b96d2dd25",
+        "bytes": 290
+      },
+      {
+        "member": "runtime/native-arc-v3/runtime-maps.json",
+        "sha256": "02206e251696814825ad1ed2a87943d682181084919db75444740c7ac59eb635",
+        "bytes": 5861
+      },
+      {
+        "member": "runtime/native-arc-v3/xvfb.log",
+        "sha256": "1ff88425b69511e78d9657176852cdcd57ed08f74bb59d59445c8740aa77f702",
+        "bytes": 532
+      },
+      {
+        "member": "runtime/native-arc-v3-driver-status.json",
+        "sha256": "7575d96be2630308662c32ac9f6e553ee9a5a2376f595a0e45e427350be50301",
+        "bytes": 16948
+      },
+      {
+        "member": "runtime/native-arc-v3-inputs-before.json",
+        "sha256": "79d84f2275a538a93937ece4e77ec299f3d41b7e0ccf79d155b2ccd1642036f8",
+        "bytes": 6840109
+      },
+      {
+        "member": "runtime/native-arc-v3-inputs-final.json",
+        "sha256": "79d84f2275a538a93937ece4e77ec299f3d41b7e0ccf79d155b2ccd1642036f8",
+        "bytes": 6840109
+      },
+      {
+        "member": "runtime/native-arc-v4/actual-device/egl-query-0/context-maps.txt",
+        "sha256": "a665a21da678b8917616f9167a7c9c9e56d6ada5459709a94fa653e0c3facd43",
+        "bytes": 61472
+      },
+      {
+        "member": "runtime/native-arc-v4/actual-device/egl-query-0/device.txt",
+        "sha256": "46ca5d846c17eb29f3ada3274b199963dca6524ca16e607234960f92b5362a5c",
+        "bytes": 302
+      },
+      {
+        "member": "runtime/native-arc-v4/client.log",
+        "sha256": "1a42366a24ac204ef0a2f96172fd4084bdd8a06fae25b73157e6fed1d0832ba8",
+        "bytes": 559
+      },
+      {
+        "member": "runtime/native-arc-v4/compositor.log",
+        "sha256": "1167621c78c96b2833a020312affb70eb7110d10da4c8e944c19998b7dbc8a36",
+        "bytes": 1938
+      },
+      {
+        "member": "runtime/native-arc-v4/dialog.json",
+        "sha256": "8d24433962833a8ec6dc732fde4ddaac701695d347dbbc3639d996a1bc149fc7",
+        "bytes": 17148
+      },
+      {
+        "member": "runtime/native-arc-v4/native-clay-viewport.png",
+        "sha256": "8fffdf30aed38bc800d6d0553c9bf6df4ad62598b3cdfd243272430362d289a5",
+        "bytes": 17954
+      },
+      {
+        "member": "runtime/native-arc-v4/render.ppm",
+        "sha256": "61d67d7ecfbf6a313cf01de73f4beef1c4d3030f18ba628d77750d4dd4cc3fcf",
+        "bytes": 3072016
+      },
+      {
+        "member": "runtime/native-arc-v4/report.json",
+        "sha256": "6bd20c3c03e3f6bf40afca17657f56c92b17360ea98f700db5c79bdf6b547187",
+        "bytes": 2053
+      },
+      {
+        "member": "runtime/native-arc-v4/runtime-maps.json",
+        "sha256": "8d1b5947386d64c5b25b708f495af31c34077c5d74177d123ebdc59ced971ab0",
+        "bytes": 5861
+      },
+      {
+        "member": "runtime/native-arc-v4/scene.json",
+        "sha256": "2d802b06a9c189c50c78117663239de0134e1525bf12459b387e6c5a05ed1814",
+        "bytes": 16222
+      },
+      {
+        "member": "runtime/native-arc-v4/universal-menu.png",
+        "sha256": "da1cbecaa2a7a4fa272c7e78af1f5f64e6ec0ebf7bd95e25019aa7d98d03044a",
+        "bytes": 72451
+      },
+      {
+        "member": "runtime/native-arc-v4/xvfb.log",
+        "sha256": "1ff88425b69511e78d9657176852cdcd57ed08f74bb59d59445c8740aa77f702",
+        "bytes": 532
+      },
+      {
+        "member": "runtime/native-arc-v4-driver-status.json",
+        "sha256": "845e7c89ab7902771a9c33fe00a891d4b456e0d3f3a9c33c31092677459343ca",
+        "bytes": 6583
+      },
+      {
+        "member": "runtime/native-arc-v4-inputs-before.json",
+        "sha256": "94fea3b04d2f9cbc188f21718c761e0bf9861339b713ddadbf3cd9f58f94a7ec",
+        "bytes": 6840796
+      },
+      {
+        "member": "runtime/native-arc-v4-inputs-final.json",
+        "sha256": "94fea3b04d2f9cbc188f21718c761e0bf9861339b713ddadbf3cd9f58f94a7ec",
+        "bytes": 6840796
+      },
+      {
+        "member": "runtime/native-arc-v4-unit-journal.txt",
+        "sha256": "74e0791c8823f8aa666b6c4105f3bc96ee1a4e40f0678d7acc2ea2f973ac20af",
+        "bytes": 580
+      },
+      {
+        "member": "runtime/native-arc-v4-unit-terminal.txt",
+        "sha256": "5471ec7a2bf3784642d449ffa6b0c89f8ecf4b5c71861f65a88de99c6a6b633b",
+        "bytes": 129
+      },
+      {
+        "member": "runtime/native-observer-compile-v1.json",
+        "sha256": "aa6a2946b05fb83123f73d49ac10fa97e308a686a41566e67c55f98d80f4c331",
+        "bytes": 1385
+      },
+      {
+        "member": "runtime/run-native-wayland-v1.py",
+        "sha256": "915a850a4297a8d70ed7735c8001c84ae15dbbcba19d3426cea8c49d7fc771da",
+        "bytes": 5064
+      },
+      {
+        "member": "runtime/run-native-wayland-v2.py",
+        "sha256": "dfe0d1093e843a101c0531ea6e05ffe3f4f5efc8f8601bf291d2c258d31faac5",
+        "bytes": 5073
+      },
+      {
+        "member": "runtime/run-native-wayland-v3.py",
+        "sha256": "851ad651f3f3f471ea4b832e04261476e951f8c87d0bef83b09a0e821c684dd7",
+        "bytes": 5404
+      },
+      {
+        "member": "runtime/run-native-wayland-v4.py",
+        "sha256": "2e41f559c7169208fc83e86e856fb0474b1d5ed483c1ac6e994d4ecf501657d1",
+        "bytes": 5987
+      },
+      {
+        "member": "runtime/scenario-derivation-v1.json",
+        "sha256": "59e6cfbb115da270597c9591961e65ee42eae14d1efe5baaa9fb777f64a36695",
+        "bytes": 546
+      },
+      {
+        "member": "runtime/seal-runtime-evidence-v1.py",
+        "sha256": "f69658b901b5ea4dc7c4a94a54f696f10d99f3a4b377d24fbc0eb1ebccf989a3",
+        "bytes": 6424
+      },
+      {
+        "member": "runtime/v2-compositor-ldd.log",
+        "sha256": "e4a9fe2c98c50dc71acea31c163d441e39249c70b673a3516d2d04a228e03343",
+        "bytes": 4168
+      },
+      {
+        "member": "runtime/v2-native-wayland-arc.log",
+        "sha256": "5cfbf3796b4a478ddd17d238a18ec8c5e9b9c26139d66e40d0b830fa6d245007",
+        "bytes": 1097
+      },
+      {
+        "member": "runtime/v2-staging-correction.json",
+        "sha256": "4c9b06e634f345c2ec0965c3effe894b8087d3253db218f036dd1a21e927edfb",
+        "bytes": 515
+      },
+      {
+        "member": "runtime/v3-compositor-ldd.log",
+        "sha256": "27ba43676dbe6ebb37e13759d1bb8d3bf7a162bd89605dc26772716330221f47",
+        "bytes": 4168
+      },
+      {
+        "member": "runtime/v3-display-correction.json",
+        "sha256": "8dbb827090b5d57b826db5e83270a25e7a1dfba310a0a517b722252eaa5c5f0f",
+        "bytes": 419
+      },
+      {
+        "member": "runtime/v3-native-wayland-arc.log",
+        "sha256": "55a636a96f11a002ca9f980ff7d9abbbc5c9e5fd6339c600f642cc84189414aa",
+        "bytes": 1715
+      },
+      {
+        "member": "runtime/v4-compositor-ldd.log",
+        "sha256": "d677bac48aee78ae2acfaf02b0d7223a4dcf2e094d8b4cb0558999ef08225604",
+        "bytes": 4168
+      },
+      {
+        "member": "runtime/v4-native-wayland-arc.log",
+        "sha256": "69c512d42b38ec086dd8a2bdf36f6373452f8cf8203c7bbd145ac9e15ee3dc8d",
+        "bytes": 1626
+      },
+      {
+        "member": "runtime/v4-observer-correction.json",
+        "sha256": "2620f4f752bcf01c634e43d8ae2691e360df14dd6c3e6b7430632ad48b6c6f84",
+        "bytes": 692
+      },
+      {
+        "member": "seal/observer-original-to-v4.diff",
+        "sha256": "cd64dc53f1cca2d6e96bf1fde4bbc645e6318174af8d38a0ca3b2512e9ff3563",
+        "bytes": 1114
+      },
+      {
+        "member": "seal/summary.json",
+        "sha256": "98d83fc63199802d889087d8e536272b43d241450b188a571aadbcce7894be02",
+        "bytes": 71299
+      },
+      {
+        "member": "references/original-observer.cpp",
+        "sha256": "ec871abd22d163f16351e92e79e9fb4e3b3059a7924046c5ef1524520286802b",
+        "bytes": 5085
+      },
+      {
+        "member": "references/original-dome-menu.py",
+        "sha256": "63e87b89dac6476131cd237f8287b36e65c942dc2e82d62b3d34d1079ff02e05",
+        "bytes": 25040
+      },
+      {
+        "member": "references/owned_monitor_v2.py",
+        "sha256": "b510ef5655e3214bd38e7b5f56022c37a79879070c3733f2dd059bad74f21269",
+        "bytes": 4859
+      }
+    ]
+  },
+  "excluded_binary_artifacts_recorded_only": [
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/whole090f-wayland-20261117/device-auth-native-wayland-v1.so",
+      "sha256": "c00633c197d1e8049bd9b154b9583afbb014bdf26e75b3aaf34258f24d987af3",
+      "bytes": 53856
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/whole090f-wayland-20261117/dome-compositor",
+      "sha256": "378309b9d2866bc6774f89683021ba20a6dccfffed5748128882d7a321e71bf8",
+      "bytes": 123426520
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/whole090f-wayland-20261117/dome-compositor-current",
+      "sha256": "378309b9d2866bc6774f89683021ba20a6dccfffed5748128882d7a321e71bf8",
+      "bytes": 123426520
+    }
+  ],
+  "runtime_summary_sha256": "98d83fc63199802d889087d8e536272b43d241450b188a571aadbcce7894be02",
+  "parent_runtime_note": "Initial failures v1/v2/v3 remain actual failures. Observer v4 correction changes only test instrumentation; product unchanged."
+}
