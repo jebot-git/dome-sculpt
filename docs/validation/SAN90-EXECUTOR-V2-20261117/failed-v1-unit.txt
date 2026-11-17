@@ -1,0 +1,9 @@
+LoadState=loaded
+ActiveState=failed
+SubState=failed
+InvocationID=4819ffcdc22b4b30895fbbf9e89770f2
+MainPID=0
+Result=exit-code
+ExecMainPID=2106798
+ExecMainStatus=1
+ExecStart={ path=/usr/bin/env ; argv[]=/usr/bin/env -u LD_PRELOAD -u ASAN_OPTIONS -u UBSAN_OPTIONS -u LSAN_OPTIONS LD_LIBRARY_PATH=/home/blux/de-xr/dome-sculpt/artifacts/sdk-20261111/toolkit-sanitize/lib:/opt/fltk-vr/bdf-runtime/lib:/usr/lib64 /usr/bin/python3 /home/blux/de-xr/dome-sculpt/artifacts/native90-sanitize-planning-20261115/execute-sanitize-native90-v1.py /home/blux/de-xr/dome-sculpt/artifacts/native90-sanitize-planning-20261115/sanitize-090f00-20261117-audit/plan.json --execute --execution-review /home/blux/de-xr/dome-sculpt/artifacts/native90-sanitize-planning-20261115/sanitize-090f00-20261117-audit/root-execution-review-20261117.json --review-sha256 6a4313bf59646b86e69912ac8e5302ff6bd588b04d0aced9f075b7906008ff60 ; ignore_errors=no ; start_time=[Tue 2026-11-17 19:52:01 CET] ; stop_time=[Tue 2026-11-17 19:52:02 CET] ; pid=2106798 ; code=exited ; status=1 }
