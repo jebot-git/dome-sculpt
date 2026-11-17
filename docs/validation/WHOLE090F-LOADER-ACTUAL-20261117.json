@@ -1,0 +1,67 @@
+{
+  "state": "terminal",
+  "exit": 0,
+  "application_source": "090f009ede2c0623ca616fe892223b4f68f1c2c4",
+  "production_body_exact": "1bc13125",
+  "application": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/native90-release-planning-20261115/release-090f00-20261117-owning/dome-sculpt",
+    "sha256": "9143ea5921d35a3612ab452c16eee086403813343a88b3d775196a8507eb8af1"
+  },
+  "status_sha256": "ad590ff2e59f0856b79bb165b87bf09503d493c22a141d27dcfb78ec9e2c02a4",
+  "scope": "Whole090f App direct loader and ordinary version only. Actual mapped ELF witnesses belong to forthcoming separately reviewed GUI/XR monitor, not this headless phase. No GUI/GL/HMD/install claim.",
+  "native90_admission": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/native90-release-gates-20261117/native90-v1-20261117/status.json",
+    "sha256": "8f496335c8b92cedc8887a9a53112d61c798ab20ecb465b37dbc853ceeddaaf2"
+  },
+  "whole_owning_admission": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/native90-release-planning-20261115/release-090f00-20261117-audit/execution-native90-v1/status.json",
+    "sha256": "3c4fd01b2a6702ee0069a744375b9d4a087ef4d8ed6a7faff829d22fe49be36c"
+  },
+  "actual_loader_providers": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/prepared-public-operational-20261117/whole090f-loader-v1-20261117/actual-loader-providers.json",
+    "sha256": "9e2a8080c4315e09c698647167f0189b35e16171e9c2680fc6003deb235640ac",
+    "count": 72
+  },
+  "actual_version_exit": 0,
+  "actual_version_stdout": "Dome Sculpt 0.1.0 / CPU / Blender 5.4 Alpha trackball basis\n",
+  "input_drift": [],
+  "closure": {
+    "actual_exit": 0,
+    "status_sha256": "ad590ff2e59f0856b79bb165b87bf09503d493c22a141d27dcfb78ec9e2c02a4",
+    "all_recorded_processes_absent": true,
+    "recorded_PIDs": [
+      2308970,
+      2309001
+    ],
+    "unit_stopped": true,
+    "lease_NB_free": true,
+    "actual_provider_count": 72,
+    "actual_version_exit": 0
+  },
+  "lease": {
+    "before_any_ldd_or_product": true,
+    "owner_pid": 2307580,
+    "acquired_epoch": 1794943047.0020719,
+    "released_epoch": 1794943058.229681
+  },
+  "archive": {
+    "path": "whole090f-loader-actual-20261117/actual-evidence.tar.gz",
+    "sha256": "f3f21fb3162d75b9c11e54e8c336d8d9eef2952683f989dfbc701f90b2359856",
+    "bytes": 3989383,
+    "members": {
+      "whole090f-loader-v1-20261117/status.json": "ad590ff2e59f0856b79bb165b87bf09503d493c22a141d27dcfb78ec9e2c02a4",
+      "whole090f-loader-v1-20261117/inputs-before.json": "040cd7efc0fc11af15982cec3e4d0b0fbc5b8637f24f68bce59351ff950cc590",
+      "whole090f-loader-v1-20261117/inputs-final.json": "040cd7efc0fc11af15982cec3e4d0b0fbc5b8637f24f68bce59351ff950cc590",
+      "whole090f-loader-v1-20261117/ldd.log": "45f8abe97907ab3e211ddf88263223ccd4c23e1b1ad5a50180d255a76c462bee",
+      "whole090f-loader-v1-20261117/version.log": "9455a20a636a6599ace60120261649d3b29dc51fe2c774305994879190e7336b",
+      "whole090f-loader-v1-20261117/actual-loader-providers.json": "9e2a8080c4315e09c698647167f0189b35e16171e9c2680fc6003deb235640ac",
+      "whole090f-loader-v1-20261117/closure.json": "aa704ebbc7aa3c32b313dbe4619fb5f978fb033b116b8216e81d6f3bdc84e003",
+      "whole-app-loader-v1.py": "a0ebfec624d20a62337777c075bb6aa65f3e38fdae5301d0204525dda9336b98",
+      "root-whole-loader-review-20261117.json": "b3dddaf379f8a9f5ada45207284bbe633369a85d9fc66f535984d4ed86ccd0fa",
+      "whole090f-loader-unit-launch-20261117.json": "9f5cb3276b7c1dd85bcab8cbcbaf93b2b9494636d085af74c9ec07cf9ae9d8d1",
+      "whole090f-loader-unit-initial-20261117.txt": "93e06653bf5984e9bb3c9fec744e646c9d3753f48daee4a78d20421395cc0715",
+      "whole090f-loader-unit-terminal-20261117.txt": "d73daba560fcb47a3b5b38e485578e0b5e2dc9754d85dea59acaa0b6467640d2",
+      "whole090f-loader-unit-journal-20261117.txt": "92b1d982c52b1ae7be0d87a2854eb7e784bacee576b7fec719e5e6f26664c05d"
+    }
+  }
+}
