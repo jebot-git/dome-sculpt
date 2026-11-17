@@ -1,0 +1,200 @@
+{
+  "scope": "Actual component CPU compile/link only; no graphics consumer, desktop/XR UI, Arc/HMD or wholecandidate admission.",
+  "source": "d8cc213552a0acd902fca54f0fa36ec05a39dd99",
+  "actual_compile": {
+    "unit": "ds-advanced-normal-graphics-compile-v1-20261117.service",
+    "MainPID": 3271655,
+    "InvocationID": "12518b94e6364da9a267690ee467469e",
+    "exit": 0,
+    "steps": [
+      {
+        "exit": 0,
+        "seconds": 0.14408063888549805,
+        "peak_owned_RSS_bytes": 25878528
+      },
+      {
+        "exit": 0,
+        "seconds": 22.75584578514099,
+        "peak_owned_RSS_bytes": 913424384
+      }
+    ],
+    "actual_full_TU_owners": 1,
+    "actual_MD_headers": 467,
+    "full_M_exact_roster": true,
+    "compiler_tool_identities": 14,
+    "object": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-normal-graphics-build-20261117/advanced-render.o",
+      "sha256": "064881d0c6a87c2cf64458fe08d5290ea13a8897cc2c7cfdee7f3bf2b3c37a42"
+    },
+    "status_sha256": "b320b4c88a465a868139b7012a70c771f0e3cb69a8075542cd2da751274dab42",
+    "genuine_MD_sha256": "65343a50e5e1da099915b024283b2700339581c8d5c5ffe1277513564e20dcc2",
+    "terminal_sha256": "e53410aa38b056a7cf1d6a195df9e19873775c9436449d3f9a5ab277d781256f"
+  },
+  "actual_link": {
+    "unit": "ds-advanced-normal-graphics-link-v1-20261117.service",
+    "InvocationID": "e0999aaae8ad41f095fed4c34e0c0c40",
+    "MainPID": 3375763,
+    "exit": 0,
+    "seconds": 0.5014746189117432,
+    "peak_owned_RSS_bytes": 144154624,
+    "input_pins": 639,
+    "GNUld_incidences": 105,
+    "unique_resolved": 71,
+    "roster_difference": {
+      "added": [],
+      "removed": []
+    },
+    "status_sha256": "2b7900b6509c2577fac081f37c2927187a750eba9992e10e2a9f58e62277421c",
+    "terminal_sha256": "5f9cf50affd0d03ffae725c30cf545d924dde9eb018b0d052b7628c0d4502801",
+    "link_depfile_sha256": "a14dc57c432e6ae94215d1146b86e6bd1961cad07254c0fc7cb7d8975dda7ca5",
+    "fresh_product": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-normal-graphics-build-20261117/dome-sculpt-source-prepared-normal-render-test",
+      "sha256": "0909069ce5743f548b88db47fbd75c22852d220d290542fa5039b09b4dc83249"
+    },
+    "static_ELF_contract_same": true,
+    "DT_NEEDED_count": 22,
+    "defined_dynamic_exports": 41,
+    "SONAME": [],
+    "RUNPATH": [
+      "/opt/fltk-vr/bdf-runtime/lib"
+    ]
+  },
+  "qualified_provider_scope": {
+    "advanced_core_sha256": "2e274228f72ee078c87e57b12fe158aa37d8e19ddd7091a1c1e7532b31bfffc5",
+    "ordered_core_members": 193,
+    "changed_core_owners": 3,
+    "other_core_members_exact_whole090f": 190,
+    "whole_archives_reused": 11,
+    "historical_implicit_provider_catalog_plan_sha256": "fe5547f4bcbb028a702cda4d92cdd4ac665a275fee8d78d2e33768c5589d6cfe",
+    "providers_observed_and_accepted_without_prior_binding": 0
+  },
+  "input_drift": [],
+  "owned_survivors": [],
+  "units_stopped_only_after_actual_terminal_and_journal_capture": true,
+  "runtime_result": "UNEXECUTED; software-first68view runtime separately held for root review/common lease, Arc separate.",
+  "archive": {
+    "path": "advanced-normal-graphics-cpu-20261117.tar.xz",
+    "sha256": "27da07fd2cba1ab9c7ed74173d9c3d254f07500b89907a3fd151654909f645b7",
+    "bytes": 75016,
+    "members": 30,
+    "ELF_payloads": 0,
+    "member_manifest": {
+      "build/prepare-plan-v1.py": {
+        "sha256": "8806808753de5c877a023970c4c72e2cae97986c34b9e3631e49908660267adb",
+        "bytes": 5536
+      },
+      "build/plan-v1.json": {
+        "sha256": "94e7f7e90b8d22e6368b51d8fe2d0bcb9f924a587cacb7864533540f4c3692a0",
+        "bytes": 23104
+      },
+      "build/compile-v1.py": {
+        "sha256": "506a6eb0400a4e30b47e80b7a1343074bea0e736a5fe79d0fb0351ff1ae13f3a",
+        "bytes": 5214
+      },
+      "build/compile-status.json": {
+        "sha256": "b320b4c88a465a868139b7012a70c771f0e3cb69a8075542cd2da751274dab42",
+        "bytes": 163093
+      },
+      "build/compile-inputs.json": {
+        "sha256": "b191ff04c074458520c5bb7760a39636d75be1644d1dae2869601509ca0f3bde",
+        "bytes": 64936
+      },
+      "build/compile-closure-v1.json": {
+        "sha256": "b024490b5d88b02cd86401dda32d30c8300d614a99cec36bbda39005a50eb593",
+        "bytes": 4913
+      },
+      "build/compile-unit-terminal-v1.txt": {
+        "sha256": "e53410aa38b056a7cf1d6a195df9e19873775c9436449d3f9a5ab277d781256f",
+        "bytes": 224
+      },
+      "build/compile-unit-journal-v1.txt": {
+        "sha256": "a1ff15eca42c0dc816c3c498316c38fd078581939fed58f54744d13e7d326361",
+        "bytes": 941
+      },
+      "build/compile-unit-after-stop-v1.txt": {
+        "sha256": "1bb2df7f546d287cd975fe25bfb13dd47edd52c675bc7cf6fb06dd970089cc0c",
+        "bytes": 51
+      },
+      "build/advanced-render.o.d": {
+        "sha256": "65343a50e5e1da099915b024283b2700339581c8d5c5ffe1277513564e20dcc2",
+        "bytes": 24346
+      },
+      "build/advanced-render-precheck.d": {
+        "sha256": "65343a50e5e1da099915b024283b2700339581c8d5c5ffe1277513564e20dcc2",
+        "bytes": 24346
+      },
+      "build/prepare-link-plan-v1.py": {
+        "sha256": "b14f3c87466495c5a212f5d21f0a85533acf59ead93fa61a39a425521d84f66d",
+        "bytes": 6026
+      },
+      "build/link-plan-v1.json": {
+        "sha256": "409f5ea9b3caf4eac811aa015f374a2675b940d554a26fd5ee75a2cdfc14d818",
+        "bytes": 280086
+      },
+      "build/link-v1.py": {
+        "sha256": "a2a54a266d9f50c6dc0b3b30da9e06bcd796539af8a54637eca75a06411dd40c",
+        "bytes": 4858
+      },
+      "build/link-status-v1.json": {
+        "sha256": "2b7900b6509c2577fac081f37c2927187a750eba9992e10e2a9f58e62277421c",
+        "bytes": 40781
+      },
+      "build/link-inputs-before-v1.json": {
+        "sha256": "55fe64f5557f7e88e2aaf7ad43559db6e9e40c9f20834564e2b2cbdc0f9110b5",
+        "bytes": 78790
+      },
+      "build/link-inputs-final-v1.json": {
+        "sha256": "55fe64f5557f7e88e2aaf7ad43559db6e9e40c9f20834564e2b2cbdc0f9110b5",
+        "bytes": 78790
+      },
+      "build/link-elf-metadata-v1.json": {
+        "sha256": "4a4992c53cd75bd7bb6427536e61f91007a9118eb760760c12b9be6db445b11b",
+        "bytes": 114760
+      },
+      "build/advanced-render-link.d": {
+        "sha256": "a14dc57c432e6ae94215d1146b86e6bd1961cad07254c0fc7cb7d8975dda7ca5",
+        "bytes": 10993
+      },
+      "build/link-unit-terminal-v1.txt": {
+        "sha256": "5f9cf50affd0d03ffae725c30cf545d924dde9eb018b0d052b7628c0d4502801",
+        "bytes": 8939
+      },
+      "build/link-unit-journal-v1.txt": {
+        "sha256": "b0e31763fdc98f3caf7a6990afc6c3434358e82043b59946b7f64f8df142dcb2",
+        "bytes": 666
+      },
+      "build/link-v1.log": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "build/compile-service-v1.log": {
+        "sha256": "bd4c0ad0dc26d0d584bfb69fd7bac9eb2ce5b0727023868121b0e9b0d326519a",
+        "bytes": 100
+      },
+      "build/full-M-precheck.log": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "build/compile-complete-render-TU.log": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "source/tests/source-advanced-normal-render.hpp": {
+        "sha256": "b4fb93114bfb3ef3ab904acdfa1c3310188c3bb3d56628defb83f50b9e59225c",
+        "bytes": 10588
+      },
+      "source/tests/source-prepared-normal-render.cpp": {
+        "sha256": "6bfa1ab9c290b6cf05a3808e015c78c0598b69da37caaf7d17456cc73ba0aef3",
+        "bytes": 12675
+      },
+      "source/tests/source-advanced-normal-fixture.hpp": {
+        "sha256": "5a443883a29e4aa9854d5df72779a2a3adae2466d9d9b06590c7efd247a64a94",
+        "bytes": 7340
+      },
+      "control/owned_monitor_v2.py": {
+        "sha256": "b510ef5655e3214bd38e7b5f56022c37a79879070c3733f2dd059bad74f21269",
+        "bytes": 4859
+      }
+    }
+  }
+}
