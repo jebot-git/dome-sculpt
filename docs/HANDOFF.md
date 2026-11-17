@@ -41,7 +41,9 @@ snapshot. Never restart a job merely because an observation handle times out.
    Status SHA3c4fd01b2a6702ee0069a744375b9d4a087ef4d8ed6a7faff829d22fe49be36c.
    The unit is independently captured as successful and stopped. No reused
    object is called newly compiled; old/new compiler records remain separate.
-   Native90 execution waits for the public GUI/XR graphics lease handback.
+   Native90 and both whole-App public desktop64/syntheticXR260 matrices now
+   pass; see NATIVE90-RELEASE-ACTUAL-20261117.md and
+   WHOLE090F-PUBLIC-UI64-XR260-20261117.md for exact source roles.
 2. Strict sanitizer build: ds-native90-sanitize-build-v2-20261117.service,
    InvocationIDf2bcbf89dda84a1dae2590e06d016dd4. Plan-v2 SHA
   62116c27b70b37459d186e037acc51984d34fac8262760e5f50351ac8c21f8d9.
@@ -76,24 +78,38 @@ font qualification is now actual0, with all47 commands,4 genuine cases,
 Read [the native seal](ARTIST-PUBLIC-NATIVE-20261117.md) and actor artifact namespace
 artifacts/artist-public-snapshot-link-20261117; do not blindly rerun old failures.
 
-All4 actual desktop cases pass16 checks each/64 total. All4 authenticated Arc
-syntheticXR cases pass65 each/260 total, with input/owned/unit/lease closure.
-These use the App1bc trial executable in the earlier3d component context; they
-do not qualify the fresh whole090f executable. A small additive whole-App
-loader/cohort is being prepared for that separate application acceptance. Operational
-wrapperv2 is in artifacts/prepared-public-operational-20261117, with an explicit
-fixturef1/scenario6c8/runtime+font6c8/product1bc source tuple. Originalv1 remains
-unexecuted. Each actual phase/case must bind the true native terminal status.
-Desktop is private-Xvfb software GL; Arc syntheticXR and native Wayland/DomeD
-are distinct evidence. Physical-device acceptance remains required.
+The earlier component App passes desktop64/Arc syntheticXR260 in its explicitly
+recorded3d context. The fresh whole090f App now ALSO passes desktop64 and
+Arc syntheticXR260, with ordinary loader/version0, all7 critical ELF roles,
+actual Arc PCI03/renderD129/i915/liveFD, exact source/normal/Save/history/reopen
+checks, unchanged time/frame bounds,0drift/noowned and stopped units. Read
+[whole-App qualification](WHOLE090F-PUBLIC-UI64-XR260-20261117.md). The two
+matrices are distinct, not relabeled. Both use fixturef1 and runtime/font/
+scenario6c8; no whole-f1 owning build is claimed.
+
+The fresh wholeApp also passes14 actual native Wayland/DomeD checks on Arc:
+application GL and canonical compositor Vulkan, visible clay canvas, real
+universal menu/text/modal commands, desktop-side action, Undo and normal close.
+Read [native Wayland GPU proof](WHOLE090F-WAYLAND-GPU-ACTUAL-20261117.md).
+The canonical compositoracc build is optimized and uses the current SDK/private
+bitmap stack; Cargo may reuse valid dependency artifacts. Private Xvfb presents
+the nested compositor, which has a diagnostic copy. This is not native DRM
+scanout/zero-copy or physical-headset acceptance. Failed staging/display/observer
+attempts remain preserved separately. The test-only observational EGL hook
+queries the actual context and changes no application rendering.
+
+Operational drivers are in artifacts/prepared-public-operational-20261117 and
+artifacts/whole090f-wayland-20261117. Use the common graphics lease before ldd/
+products/GL and release only after owned-process cleanup. SAN products still
+require the real owning-build success and separately bound root review.
 
 Combined native90 runner is prepared in artifacts/native90-release-gates-20261117;
 its exact driver SHA is55f06be3963aaff1726962b224d7a534015ea89b179cb13e9e935dfe4744f057.
 It now passes ALL90 actual native suites plus app-version/workspace27/373/
 raw90159, with full posthash0drift/noowned and successful stopped user unit.
 Actual status SHA8f496335c8b92cedc8887a9a53112d61c798ab20ecb465b37dbc853ceeddaaf2.
-The native run uses the genuine whole090f build; GUI/XR above remain component
-App evidence. Use the common lease
+The native run uses the genuine whole090f build. Whole-App GUI/XR and native
+Wayland evidence are recorded separately above. Use the common lease
 /tmp/dome-sculpt-arc-device.lock before ldd/products/GL and release only after
 owned cleanup. Original87/SAN/runtime failures remain honest separate records.
 
@@ -101,6 +117,17 @@ A further coherent source branch work/authoring-public-integration-20261117
 (commitc9de1c7cd00a18b23ce54eba650ca6fccdd5684c) merges the test-onlyf1 correction
 with090f without modifying the still-building frozen source. Product/tests/build
 files matchf1 exactly. No whole-buildc9 claim follows from this source merge.
+
+## Next production slice
+
+Agent artist_normal_completion is implementing owning Rasterize/RetainSource
+normal Bake-source adapters in a separate branch, preserving source domains,
+PBR/MToon roles, frame/pose transport and exact normal-event/material pairing.
+Checkpoint102f0af4 is pushed; targeted native testing is still in progress.
+Do not treat compile success as qualification. Genuine first-Bake fixture setup
+and stale-event negatives were corrected without weakening source guards;
+original failures remain preserved. Canonical/native32/independent writable-paint
+domains remain explicit refusals pending their own actual adapters.
 
 ## Canonical toolkit and full remaining goal
 
