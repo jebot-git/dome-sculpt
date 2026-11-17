@@ -3,6 +3,7 @@
 // Include after the ordinary prepared-render helpers. Reuse the exact genuine
 // advanced fixture and independent decoder; do not include another test TU.
 #include "dome/normal-sampling.hpp"
+#include "dome/normal-preview.hpp"
 #include "dome/source-uv-bake.hpp"
 #include <numeric>
 namespace advanced_render {
@@ -68,7 +69,9 @@ Case construct(bool legacy,bool live,bool seam,SourceNormalUvMethod method,bool 
     return {std::move(scene),source,destination,name};
 }
 
-void view(const Case &family,bool source_view,bool pbr) {
+void view(const Case &family,bool source_view,bool pbr,std::span<const std::array<int,2>> extra={},bool authenticate_display=false) {
+    std::vector<std::array<int,2>> probes(original_render_probes.begin(),original_render_probes.end());
+    for(const auto xy:extra){check(std::find(probes.begin(),probes.end(),xy)==probes.end(),"Display witnesses supplement rather than replace original probes");probes.push_back(xy);}
     auto scene=family.scene.snapshot();
     const auto drawn=source_view?family.source:family.destination;
     for(const auto &object:scene.objects()) scene.object(object.id).visible=object.id==drawn;
@@ -86,11 +89,22 @@ void view(const Case &family,bool source_view,bool pbr) {
     const auto matrix=face_projection(center,x,y,n,span);
     const auto camera=center+n*2;
     require_face_depth(matrix,center,n);
-    require_visible_probes(mesh,triangle,center,x,y,n,span);
+    require_visible_probes(mesh,triangle,center,x,y,n,span,probes);
     Document document;document.replace(scene.snapshot());
     if(pbr) document.shading(false); else document.authored_shading();
     check(document.wait_mesh() && document.frame().state->error.empty(),
           "Actual advanced source/target publishes through Document production render route");
+    if(authenticate_display){
+        bool found=false;
+        for(const auto &range:document.frame().surface->ranges)if(range.object==drawn){
+            found=true;check(range.material_bindings==object.material_bindings,"Display Document retains its declared material binding owner");
+            const auto preparation=range.material_bindings->normal_preparation;
+            if(preparation&&preparation->sampling_domain&&preparation->sampling_domain->has_sealed_metadata())
+                check(range.normal_preview_proof&&range.normal_preview_proof->matches(range.material_bindings,range.textures),
+                      "Document mints genuine owning normal preview proof for the display snapshot");
+        }
+        check(found,"Display snapshot reaches actual production surface range");
+    }
     const std::string label=family.name+(source_view?"-source":"-target")+(pbr?"-pbr":"-mtoon");
     Fbo f;SurfaceRenderer renderer;renderer.set_frame_time(0);f.bind();
     const auto actual=draw_view(renderer,document.frame().surface,matrix,camera);
@@ -98,7 +112,7 @@ void view(const Case &family,bool source_view,bool pbr) {
     const size_t role=pbr?0:1;
     std::array<unsigned,3> sensitive{};
     int maximum=0;
-    for(const auto xy:original_render_probes) {
+    for(const auto xy:probes) {
         const auto position=center+x*((xy[0]+.5f)/96*2-1)*span+y*((xy[1]+.5f)/96*2-1)*span;
         const auto r=position-points[0];
         const double d00=dot(ex,ex),d01=dot(ex,ey),d11=dot(ey,ey),d20=dot(r,ex),d21=dot(r,ey);
