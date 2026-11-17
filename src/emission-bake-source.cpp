@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "emission-bake-source.hpp"
+#include "emission-authority.hpp"
 #include "paint-overlay-sample.hpp"
 #include "source-bake-normal.hpp"
 #include "normal-frame-runtime.hpp"
