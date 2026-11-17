@@ -15,6 +15,8 @@
 #include "baked-normal-field.hpp"
 #include "source-paint-pairing.hpp"
 #include "source-writable-paint.hpp"
+#include "bake-source-capabilities.hpp"
+#include "cut-color.hpp"
 #include "native-paint-frame-source.hpp"
 #include <numeric>
 #include "dome/material-bindings.hpp"
@@ -129,6 +131,17 @@ std::shared_ptr<const PaintOverlayPacket> PaintOverlayFactory::capture_normal_so
  packet->normal_source_binding_=binding;packet->normal_source_deformation_=object.deformation;
  packet->storage_bytes_=sizeof(PaintOverlayPacket);
  return packet;
+}
+bool bake_source_supported(const SculptObject &object) noexcept {
+ const auto &binding=object.material_bindings;const auto &paint=object.painted;
+ if(binding&&binding->native_paint_sampling){
+  const auto &native=binding->native_paint_sampling;
+  return object.mesh_active&&paint&&!object.appearance&&!object.polygon&&
+    native->valid_owner(native)&&native->matches_current(*paint)&&!binding->has_mtoon&&
+    !binding->normal_preparation&&!binding->color_preparation&&!binding->canonical_attributes&&
+    (!binding->native_paint_frames||binding->native_paint_frames->valid_owner(binding->native_paint_frames));
+ }
+ return cut_color_supported(object);
 }
 bool SourceBakeNormalResolver::requires_source_pairing()const noexcept {
  return bool(projection_)||bool(canonical_)||(packet_&&bool(packet_->normal_source_binding()));
