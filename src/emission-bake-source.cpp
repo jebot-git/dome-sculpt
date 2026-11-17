@@ -130,7 +130,6 @@ std::shared_ptr<const PaintOverlayPacket> PaintOverlayFactory::capture_normal_so
  packet->source_maps_=object.painted->source_maps();
  packet->normal_source_binding_=binding;packet->normal_source_deformation_=object.deformation;
  packet->source_paint_attachment_=attachment;
- packet->source_paint_attachment_=attachment;
  packet->storage_bytes_=sizeof(PaintOverlayPacket);
  return packet;
 }
