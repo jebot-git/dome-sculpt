@@ -76,9 +76,11 @@ font qualification is now actual0, with all47 commands,4 genuine cases,
 Read [the native seal](ARTIST-PUBLIC-NATIVE-20261117.md) and actor artifact namespace
 artifacts/artist-public-snapshot-link-20261117; do not blindly rerun old failures.
 
-All4 actual desktop cases now pass16 checks each/64 total, including real
-source choice, Bake, ordered Save/history and reopening. Arc syntheticXR cases
-are running next; do not infer final acceptance until their wrappers close. Operational
+All4 actual desktop cases pass16 checks each/64 total. All4 authenticated Arc
+syntheticXR cases pass65 each/260 total, with input/owned/unit/lease closure.
+These use the App1bc trial executable in the earlier3d component context; they
+do not qualify the fresh whole090f executable. A small additive whole-App
+loader/cohort is being prepared for that separate application acceptance. Operational
 wrapperv2 is in artifacts/prepared-public-operational-20261117, with an explicit
 fixturef1/scenario6c8/runtime+font6c8/product1bc source tuple. Originalv1 remains
 unexecuted. Each actual phase/case must bind the true native terminal status.
@@ -87,10 +89,18 @@ are distinct evidence. Physical-device acceptance remains required.
 
 Combined native90 runner is prepared in artifacts/native90-release-gates-20261117;
 its exact driver SHA is55f06be3963aaff1726962b224d7a534015ea89b179cb13e9e935dfe4744f057.
-It requires true owning0/1776 outputs/1036 actual dependency owners and a separate
-review binding the actual status SHA before any products. Use the common lease
+It now passes ALL90 actual native suites plus app-version/workspace27/373/
+raw90159, with full posthash0drift/noowned and successful stopped user unit.
+Actual status SHA8f496335c8b92cedc8887a9a53112d61c798ab20ecb465b37dbc853ceeddaaf2.
+The native run uses the genuine whole090f build; GUI/XR above remain component
+App evidence. Use the common lease
 /tmp/dome-sculpt-arc-device.lock before ldd/products/GL and release only after
 owned cleanup. Original87/SAN/runtime failures remain honest separate records.
+
+A further coherent source branch work/authoring-public-integration-20261117
+(commitc9de1c7cd00a18b23ce54eba650ca6fccdd5684c) merges the test-onlyf1 correction
+with090f without modifying the still-building frozen source. Product/tests/build
+files matchf1 exactly. No whole-buildc9 claim follows from this source merge.
 
 ## Canonical toolkit and full remaining goal
 
