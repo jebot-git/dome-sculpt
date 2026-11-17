@@ -1,0 +1,37 @@
+{
+  "state": "source-only-NOT-compiled-or-executed",
+  "base": "d8cc213552a0acd902fca54f0fa36ec05a39dd99",
+  "scope": "Causal CPU-only contrast forecast plus narrow live nonELF buffer classification; no acceptance predicate/data changes.",
+  "source_files": {
+    "tests/source-advanced-normal-forecast.hpp": "c6981db5d35a22dd52819aec57b1dfded9cf06372365e56b51f5d1947eb809ae",
+    "tests/source-prepared-normal-render.cpp": "e35bad10e27548b170d8839dd99b0affde8b9bcb9da37cf228b6fb49085cc536",
+    "docs/validation/advanced-normal-nonelf-buffer-20261117.py": "1bd2926db99e70f6168998c3e0c6de1412bd4c4d01899aa631fc9e09d7481ce3",
+    "docs/validation/advanced-normal-software-v2-run-20261117.py": "7e1a8537f198b3265dce43a83439d9c7672c790c26f65584407d37fcc97fdb93"
+  },
+  "preserved_software_v1": {
+    "status_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-normal-graphics-build-20261117/software-v1-20261117/status.json",
+    "status_sha256": "7795730dbfcd92c3b05d20fed02cc22444a61a945f5fcbf17594ae7f9a8ba4fb",
+    "actual_executable_exit": 1,
+    "wrapper_exit": 1,
+    "actual_correct_RGB_errors": [
+      0,
+      1,
+      0,
+      1
+    ],
+    "omitted_RGB_gaps": [
+      3,
+      4,
+      1,
+      6
+    ],
+    "images": 17
+  },
+  "immutable_originals_verified": true,
+  "python_syntax": "passed",
+  "CXX_compiler_run": false,
+  "new_CPU_forecast_executed": false,
+  "new_GL_execution": false,
+  "existing68_view_mode_changed": false,
+  "future_admission": "Separate root-reviewed fullTU compile/link, CPUforecast then runtime; do not infer software0 or Arc0 from this source."
+}
