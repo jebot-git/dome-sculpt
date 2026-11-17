@@ -1,0 +1,56 @@
+{
+  "checked_utc": "2026-11-17T18:36:23.561234+00:00",
+  "scope": "Read-only source, existing SDK and exact effective dependency pins. No build/product/ldd/probe/graphics/install/session action.",
+  "remote": {
+    "DomeD": {
+      "local_HEAD": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+      "origin_main": "acc2b70ae61dedec2a23727f67c60c0303d0f76f\trefs/heads/main",
+      "status": ""
+    },
+    "fltk-vr": {
+      "local_HEAD": "4eb24b66eb89f2a518cf4656fa0725f97f66c6f4",
+      "origin_main": "4eb24b66eb89f2a518cf4656fa0725f97f66c6f4\trefs/heads/main",
+      "status": "M dome-compositor/packaging/dome-session\n?? dome-compositor/packaging/xwayland-satellite"
+    }
+  },
+  "prior_sdk_receipt": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/sdk-20261111/verified-sdk.json",
+    "sha256": "3a1d3014a5eb13e37f28f39e60b0d8596a5accf80a540b516aa88806b86983f0"
+  },
+  "current_whole_plan": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/native90-release-planning-20261115/release-090f00-20261117-audit/plan.json",
+    "sha256": "ccf9931035481459d7f51ec03e829ee2572e424d381d2bbc69a29c1fe26e1661",
+    "source": "090f009ede2c0623ca616fe892223b4f68f1c2c4",
+    "canonical_boundary": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native90-release-planning-20261115/canonical-sdk-relocation-v1.json",
+      "sha256": "5882ebf0ec3d611634a9e349644bd6489ed3db8e28720c4bd12d235d09902c06",
+      "effective_prefix": "/opt/fltk-vr/bdf-runtime",
+      "SDK": "/home/blux/de-xr/dome-sculpt/artifacts/sdk-20261111/toolkit-release"
+    },
+    "environment": {
+      "PKG_CONFIG_PATH": "/opt/fltk-vr/bdf-runtime/lib/pkgconfig:/usr/lib64/pkgconfig",
+      "LD_LIBRARY_PATH": "/home/blux/de-xr/dome-sculpt/artifacts/sdk-20261111/toolkit-release/lib:/opt/fltk-vr/bdf-runtime/lib:/usr/lib64",
+      "ASAN_OPTIONS": null,
+      "UBSAN_OPTIONS": null,
+      "LSAN_OPTIONS": null,
+      "LD_PRELOAD": null
+    }
+  },
+  "actual_loader_status": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/app1bc-component-loader-20261115/status.json",
+    "sha256": "57acc327c5b25a8399deeaa1d7430dd9b8804d3e18ced226f3f31f336bbc12aa",
+    "pin_count": 228,
+    "provider_count": 72,
+    "provider_record_sha256": "40f45fe0f524f659d3aa15b1ecfdb4c5250b1f8968e6fab74c2359703055d537"
+  },
+  "current_header_count": 27111,
+  "sdk_rebuild_required": false,
+  "conclusion": "Canonical DomeD source unchanged; effective relocated bitmap closure and current SDK match. Historical Nov11 system paths differ but are absent from actual loader and current whole-plan roles; this is not evidence of effective runtime drift. Retain explicit canonical prefix and runtime validation.",
+  "check_count": 27975,
+  "errors": [],
+  "historical_unused_system_mismatches": 16,
+  "legacy_system_intersection_with_loader": [],
+  "legacy_system_intersection_with_whole_plan": [],
+  "receipt_uncompressed_sha256": "357aa60104e50c04d847e0edd890db48d6fc5b71070c368cb413e07aaf4e2e7e",
+  "receipt_gzip_sha256": "9c61babae11ee41ea87a9a811345ee87fd32d4da6d15d5154b1c68e1e3dc8bf0"
+}

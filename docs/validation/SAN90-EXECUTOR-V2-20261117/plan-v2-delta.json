@@ -1,0 +1,29 @@
+{
+  "original_plan_sha256": "24db12cade792298072ad68b5435a52370b753b427437c285a86ac8b01fceaab",
+  "new_plan_sha256": "62116c27b70b37459d186e037acc51984d34fac8262760e5f50351ac8c21f8d9",
+  "only_changed_top_level_keys": [
+    "pins",
+    "execution_templates"
+  ],
+  "additional_pins": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/native90-sanitize-planning-20261115/execute-sanitize-native90-v2.py": "f5df4e63948c161482e4846003c16a15d4cfb5c45ebb9510947c215b9ff1703f"
+  },
+  "replacement_execution_templates": {
+    "state": "Additive executorv2 prepared; exact two pre-existing optimized CPU/FMA fixture owners allowed with all strict SAN flags. Root re-review required before owning execution.",
+    "requires_dedicated_user_service": true,
+    "executor": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native90-sanitize-planning-20261115/execute-sanitize-native90-v2.py",
+      "sha256": "f5df4e63948c161482e4846003c16a15d4cfb5c45ebb9510947c215b9ff1703f"
+    },
+    "mixed_audit": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native90-sanitize-planning-20261115/mixed_dependency_audit_v1.py",
+      "sha256": "d45fe0fa67a512bc18d13826f3be706a1fd827eaf66663461e0be496d78e6fa8"
+    },
+    "supersedes_failed_executor": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native90-sanitize-planning-20261115/execute-sanitize-native90-v1.py",
+      "sha256": "736269655c2b1821d6ee21a7f92890dc3618e14d2ffffefe706facfc03fd53f5",
+      "actual_failure": "Pre-staging assertion rejects two genuine CMake O3 contract owners; original exit1 preserved"
+    }
+  },
+  "reconstruction": "Load original unchanged plan.json; merge exactly additional_pins into pins without replacing existing values; replace execution_templates with this full object; json.dumps(indent=2) + newline yields recorded new SHA."
+}

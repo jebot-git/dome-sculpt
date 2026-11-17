@@ -1,0 +1,59 @@
+--- /home/blux/de-xr/dome-sculpt/artifacts/native90-release-planning-20261115/execute-release-native90-v1.py
++++ /home/blux/de-xr/dome-sculpt/artifacts/native90-sanitize-planning-20261115/execute-sanitize-native90-v1.py
+@@ -1,4 +1,4 @@
+-"""PREPARE-ONLY template for a reviewed mixed-current Release owning build.
++"""PREPARE-ONLY template for a reviewed mixed-current strict sanitizer owning build.
+ Default is read-only plan inspection. Never executes built products or tests.
+ Original prepare HOLD is preserved and requires a separately pinned root review.
+ """
+@@ -37,22 +37,26 @@
+     if time.monotonic()>deadline:raise TimeoutError('Declared18000s complete materialization bound exceeded')
+     h.update(b)
+   return h.hexdigest()
+- plan=json.loads(plan_file.read_bytes());assert plan['state']=='audited-NOT-compiled'and plan['profile']=='release'
++ plan=json.loads(plan_file.read_bytes());assert plan['state']=='audited-NOT-compiled'and plan['profile']=='sanitize'
+  assert len(plan['objects'])==1036 and len(plan['links'])==737 and plan['initial_objects']==0
+  assert set(plan['required_targets'])<=set(plan['links'])and plan['whole_provider_stage_count']==plan['summary']['reused_whole_objects']
+  assert plan['summary']['configured_TUs']==1036 and plan['summary']['all_configured_link_archive_nodes']==737 and len(plan['generated_outputs'])==3
+  assert plan['summary']['fresh_complete_TUs']+plan['summary']['reused_whole_objects']==1036
+  assert plan['summary']['fresh_links_archives']==737 and plan['summary']['retained_whole_products']==0
+  assert all(x['route']=='fresh-current-link'for x in plan['links'].values())
+- assert plan['resource_bounds']==LIMITS and plan['current_toolchain']['C_FLAGS_RELEASE']==plan['current_toolchain']['flags']=='-O3 -DNDEBUG -ffunction-sections -fdata-sections'
+- assert plan['current_toolchain']['link_flags']=='-Wl,--gc-sections'and len(plan['selected_CTests'])==len(set(plan['selected_CTests']))==plan['summary']['selected_CTests']==90
++ assert plan['resource_bounds']==LIMITS and plan['current_toolchain']['C_FLAGS_RELEASE']==plan['current_toolchain']['flags']=='-O1 -g1 -DNDEBUG -ffunction-sections -fdata-sections -fsanitize=address,undefined -fno-omit-frame-pointer'
++ assert plan['current_toolchain']['link_flags']=='-Wl,--gc-sections -fsanitize=address,undefined'and len(plan['selected_CTests'])==len(set(plan['selected_CTests']))==plan['summary']['selected_CTests']==90
++ assert plan['environment']['ASAN_OPTIONS']=='detect_leaks=1:halt_on_error=1:abort_on_error=1'and plan['environment']['UBSAN_OPTIONS']=='halt_on_error=1:print_stacktrace=1'and plan['environment']['LSAN_OPTIONS']is None and plan['environment']['LD_PRELOAD']is None
++ assert plan['provider_authority']['actual_compiler_CWD_routes']=={'fresh':494,'prior_closed':538}and plan['provider_authority']['original_actual_exit']==143 and plan['provider_authority']['original143_not_a_pass']is True
++ for owner in plan['objects'].values():
++  assert all(owner['command'].count(flag)==1 for flag in ['-O1','-g1','-DNDEBUG','-fsanitize=address,undefined','-fno-omit-frame-pointer'])and '-O3'not in owner['command'],('Strict C/C++ owner flags differ',owner['source'])
+  hold=plan_file.parent/'EXECUTION-HOLD.json';assert hold.is_file(),'Preparation HOLD must remain unchanged'
+  assert rawsha(review_file)==review_sha;review=json.loads(review_file.read_bytes())
+  assert review['state']=='reviewed-for-build-only'and review['source']==plan['source']and review['destination']==plan['destination']
+  assert review['plan_sha256']==rawsha(plan_file)and review['prepare_hold_sha256']==rawsha(hold)and review['resource_bounds']==LIMITS
+  assert review['executor_sha256']==rawsha(__file__)and review['mixed_audit_sha256']==rawsha(P/'mixed_dependency_audit_v1.py')
+  assert review['preserve_prepare_hold']is True and review['no_products_tests_install_HMD']is True
+- for path in[Path(__file__).resolve(),P/'mixed_dependency_audit_v1.py',P/'current_provider_routes_v2.py',P/'provider_context_v2.py',P/'ninja_audit.py',Path('/usr/bin/nice'),Path('/bin/bash'),Path('/usr/bin/env'),Path('/usr/bin/python3')]:
++ for path in[Path(__file__).resolve(),P/'mixed_dependency_audit_v1.py',P/'current_provider_routes_v2.py',P/'provider_context_v1.py',P/'ninja_audit.py',Path('/usr/bin/nice'),Path('/bin/bash'),Path('/usr/bin/env'),Path('/usr/bin/python3')]:
+   assert str(path)in plan['pins']and rawsha(path)==plan['pins'][str(path)],('Execution helper differs from reviewed plan',str(path))
+  assert Path('/proc/self/exe').resolve()==Path('/usr/bin/python3').resolve(),'Executor must use the explicitly pinned system Python interpreter'
+  assert not any(os.environ.get(k)for k in['LD_PRELOAD','ASAN_OPTIONS','UBSAN_OPTIONS','LSAN_OPTIONS']),'Launcher must clear inherited injection/instrumentation before executor starts'
+@@ -83,7 +87,7 @@
+  inputs=dict(plan['pins'])
+  for path,value in[(plan_file,rawsha(plan_file)),(review_file,review_sha),(hold,rawsha(hold))]:
+   assert str(path)not in inputs or inputs[str(path)]==value;inputs[str(path)]=value
+- state={'state':'preparing','exit':1,'source':head,'profile':'release','scope':'Explicit reused complete current objects plus genuinely new complete compiler owners; all737 archive/link actions and3 generators fresh. Reused original MD, command and CWD retained; no newly-compiled claim for reused owners. No product/test execution.','plan':{'path':str(plan_file),'sha256':rawsha(plan_file)},'execution_review':{'path':str(review_file),'sha256':review_sha},'prepare_hold_preserved':{'path':str(hold),'sha256':rawsha(hold)},'resource_bounds':LIMITS,'summary':plan['summary'],'completed_compilations':0,'completed_links':0,'completed_generators':0,'staged_whole_objects':0,'active':{},'external_signal':None,'cleanup':None,'input_drift':None,'initial_input_drift':None,'owned_user_service':{'unit':unit,'cgroup':own_cgroup,'properties':properties}}
++ state={'state':'preparing','exit':1,'source':head,'profile':'sanitize','scope':'Explicit reused complete current objects plus genuinely new complete compiler owners; all737 archive/link actions and3 generators fresh. Reused original MD, command and CWD retained; no newly-compiled claim for reused owners. No product/test execution.','plan':{'path':str(plan_file),'sha256':rawsha(plan_file)},'execution_review':{'path':str(review_file),'sha256':review_sha},'prepare_hold_preserved':{'path':str(hold),'sha256':rawsha(hold)},'resource_bounds':LIMITS,'summary':plan['summary'],'completed_compilations':0,'completed_links':0,'completed_generators':0,'staged_whole_objects':0,'active':{},'external_signal':None,'cleanup':None,'input_drift':None,'initial_input_drift':None,'owned_user_service':{'unit':unit,'cgroup':own_cgroup,'properties':properties}}
+  journal=out/'steps.jsonl'
+  def save():atomic(out/'status.json',state)
+  def record(value):
+@@ -164,7 +168,9 @@
+   else:env[key]=value
+  assert shutil.which('nice',path=env.get('PATH'))=='/usr/bin/nice'
+  env.update(PKG_CONFIG_PATH=plan['environment']['PKG_CONFIG_PATH'],LD_LIBRARY_PATH=plan['environment']['LD_LIBRARY_PATH'],LP_NUM_THREADS='2',OMP_NUM_THREADS='2',OPENBLAS_NUM_THREADS='2')
+- assert env['LD_LIBRARY_PATH']==str(P.parents[1]/'artifacts/sdk-20261111/toolkit-release/lib')+':/opt/fltk-vr/bdf-runtime/lib:/usr/lib64'
++ assert env['LD_LIBRARY_PATH']==str(P.parents[1]/'artifacts/sdk-20261111/toolkit-sanitize/lib')+':/opt/fltk-vr/bdf-runtime/lib:/usr/lib64'
++ env.update(ASAN_OPTIONS=plan['environment']['ASAN_OPTIONS'],UBSAN_OPTIONS=plan['environment']['UBSAN_OPTIONS'])
++ assert not env.get('LSAN_OPTIONS')and not env.get('LD_PRELOAD'),'No suppressions or injected libraries in strict cohort'
+  state['environment']={k:env.get(k)for k in['LD_LIBRARY_PATH','LD_PRELOAD','ASAN_OPTIONS','UBSAN_OPTIONS','LSAN_OPTIONS','LP_NUM_THREADS','OMP_NUM_THREADS','OPENBLAS_NUM_THREADS']}
+  def launch(key,row,kind):
+   target_path(key)
