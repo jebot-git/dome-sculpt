@@ -64,3 +64,7 @@ and [cohort](validation/prepared-public-operational-20261117/v2/cohort_v2.py.dif
 [driver](validation/prepared-public-operational-20261117/v2/run-v2.py.diff) diffs
 are added. They transform the archived v1 sources into the exact reviewed live
 v2 files; native terminal0 and root phase/case approval remain prerequisites.
+
+The v2 unified diffs are stored as gzip files to retain their exact context
+whitespace. [The storage map](validation/prepared-public-operational-20261117/v2/diff-storage.json)
+binds compressed files to the unchanged original review hashes.

@@ -1,0 +1,17 @@
+{
+  "reason": "Preserve exact reviewed unified diff bytes, including blank context prefixes, in compressed evidence. Original review hashes are unchanged.",
+  "members": {
+    "run-v2.py.diff": {
+      "uncompressed_sha256": "b9b1b0373c3d0fc4ead1b1fd777d6d020567cbd8163d4a0e56bb477290c097ee",
+      "stored_path": "run-v2.py.diff.gz",
+      "stored_sha256": "b7be40fec0c371bf6e9ed433aa2e5a2022ab004b1dd48439f6b7b397b2b2bcb5",
+      "uncompressed_bytes": 9514
+    },
+    "cohort_v2.py.diff": {
+      "uncompressed_sha256": "916307f87379cae0e953553eb95d701be0c6467bda38ff01de5f066e0179b570",
+      "stored_path": "cohort_v2.py.diff.gz",
+      "stored_sha256": "2702e49673c795aaacafaa60e0cd2b04d5e69f2c79cc5ac3d0f125c8d161eb17",
+      "uncompressed_bytes": 4683
+    }
+  }
+}
