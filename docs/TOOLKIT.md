@@ -1,5 +1,16 @@
 # Current canonical toolkit requirement
 
+The current workspace prefixes are
+`artifacts/sdk-20261111/toolkit-release` and
+`artifacts/sdk-20261111/toolkit-sanitize`, with the bitmap runtime at
+`/opt/fltk-vr/bdf-runtime`. The canonical DomeD checkout and remote remain
+`acc2b70ae61dedec2a23727f67c60c0303d0f76f`; its selected toolkit inputs retain
+the qualified runtime described below. Read
+[the effective-closure qualification](CURRENT-TOOLKIT-20261117.md) and use the
+current build example in [AGENTS.md](../AGENTS.md). Older prefix commands later
+in this document are historical reproductions. Do not change the runtime based
+on unused system font-library copies outside the selected dependency closure.
+
 Dome Sculpt now requires the qualified27-patch FLTK1.4.5 build with the official
 poll backend. Patches25/26/27 respectively provide compact bitmap file pickers,
 actual Enter callback authority and correct X11 clipboard replies/ownership.

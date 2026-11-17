@@ -23,6 +23,9 @@ their original dates and scopes; the current handoff takes precedence.
 - Rendering acquires immutable snapshots. Geometry extraction, UV/paint transfer
   and file work belong on workers. Preserve generation/source-identity checks,
   exact cancellation/undo and ordered saves. Never silently discard paint.
+- Retained normal domains serialize through their owning Scene sampling archive.
+  For geometry-only comparisons, inspect the Mesh; do not encode an unowned
+  PaintedMesh wrapper just to extract its mesh field.
 - Keep upstream commits, notices and hashes in third_party/sources.json current.
   Shared desktop helpers are canonical qimgvr copies; do not fork their behavior
   casually. Preserve unrelated work in the other de-xr repositories.
@@ -33,10 +36,10 @@ their original dates and scopes; the current handoff takes precedence.
 Build (prepare the current canonical DomeD toolkit as in [docs/TOOLKIT.md](docs/TOOLKIT.md) first):
 
 ```sh
-export PKG_CONFIG_PATH="$PWD/artifacts/bitmap-runtime-f797e0f/lib/pkgconfig"
-export LD_LIBRARY_PATH="$PWD/artifacts/toolkit-f797e0f/lib:$PWD/artifacts/bitmap-runtime-f797e0f/lib"
+export PKG_CONFIG_PATH="/opt/fltk-vr/bdf-runtime/lib/pkgconfig:/usr/lib64/pkgconfig"
+export LD_LIBRARY_PATH="$PWD/artifacts/sdk-20261111/toolkit-release/lib:/opt/fltk-vr/bdf-runtime/lib:/usr/lib64"
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release \
-  -DDOME_COMPUTE_BACKEND=CPU -DFLTK_DIR="$PWD/artifacts/toolkit-f797e0f/share/fltk" \
+  -DDOME_COMPUTE_BACKEND=CPU -DFLTK_DIR="$PWD/artifacts/sdk-20261111/toolkit-release/share/fltk" \
   '-U*DOME_BITMAP_RUNTIME*' '-U*NATIVEGL*' '-U*RENDERFONTS*'
 cmake --build build --parallel 2
 ctest --test-dir build --output-on-failure
