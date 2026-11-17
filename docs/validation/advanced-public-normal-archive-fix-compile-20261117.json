@@ -1,0 +1,58 @@
+{
+  "state": "terminal",
+  "exit": 0,
+  "scope": "One new complete nativefixture ReleaseTU only. No link/ldd/product/UI/GL execution.",
+  "fixture_source": "27ff940b55bb43dc545db5e680bd49edd0630a12",
+  "product": "90fad800bc5aac3dc2421595532f4d2ef8429797",
+  "retained_runtime_scenarios_source": "8bb4072dc1ad60bb7b11b8a325c930f8b2c0c176",
+  "compile_status_sha256": "90d354e57599edf6146cf45abbe21c9f8e63a5f6351ea912bba78a464a88537d",
+  "native_object": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-public-normal-archive-fix-compile-20261117/advanced-native.o",
+    "sha256": "148e5ff77d1d934ea965f79a3b2cadf71e536603de510162fb1898a6b2bc32e8"
+  },
+  "actual_compiler_MD_incidence_count": 461,
+  "full_M_equal": true,
+  "current_tools": 14,
+  "pins": 4782,
+  "input_drift": [],
+  "commands": [
+    [
+      "preprocess-0",
+      0,
+      0.10862016677856445
+    ],
+    [
+      "compile-0",
+      0,
+      20.824316263198853
+    ]
+  ],
+  "all5owned_absent": true,
+  "unit_ExecMainStatus": 0,
+  "unit_Result": "success",
+  "subsequent_native_link": "Prepared/unexecuted at this milestone; genuine compiledobjectSHA replaces prior placeholder. Runtime/App/font remain existingqualifiedroles.",
+  "archive": {
+    "file": "advanced-public-normal-archive-fix-compile-20261117.tar.gz",
+    "sha256": "7bb4d10590340c2a246fa3b5931d284eca4d3502e4ae0eb213de62dbbf4fc8cd",
+    "members": {
+      "advanced-public-normal-archive-fix-20261117/tests/source-advanced-normal-public.hpp": "33849d50bc27aa5d5af2b2036d8032106c1fabbe7100d39aa01bfcbf867072c3",
+      "advanced-public-normal-archive-fix-20261117/tests/source-advanced-normal-uv-public.hpp": "6b7a2416b1656e4f3465702b5d01de9b1178feafbac9440b940acb26234aa02d",
+      "advanced-public-normal-archive-fix-compile-20261117/0.precheck-all.d": "b50dcd11177ae035a78e22789102d155c6eb5ded286452a7c0fb6734023a7f77",
+      "advanced-public-normal-archive-fix-compile-20261117/advanced-native.d": "1505ffd6af2ca426b4c2bdf871d9fe5b0a58c43d84b63ad61451117fe1864c08",
+      "advanced-public-normal-archive-fix-compile-20261117/compile-0.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "advanced-public-normal-archive-fix-compile-20261117/compile-closure.json": "335c09528cc72107e61cb791403c4f8bfe139791fbb0b73b303aed06440a588a",
+      "advanced-public-normal-archive-fix-compile-20261117/compile-inputs.json": "21a5275e022c089bff5cad5c58723dabdaa0de1a85619aa7fbd196a61da49b28",
+      "advanced-public-normal-archive-fix-compile-20261117/compile-plan.json": "20fb833269cab90c39a83ef42738e1e5c881d7eba98ca797a2d50b6ccc4ae684",
+      "advanced-public-normal-archive-fix-compile-20261117/compile-status.json": "90d354e57599edf6146cf45abbe21c9f8e63a5f6351ea912bba78a464a88537d",
+      "advanced-public-normal-archive-fix-compile-20261117/compile-v1.py": "e85de82d2e65045e49811dcd48fd75211cc74f8a9d298bc2114aa53d77505a02",
+      "advanced-public-normal-archive-fix-compile-20261117/preprocess-0.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "advanced-public-normal-archive-fix-compile-20261117/unit-final.txt": "1bfed490b29b0625b686693a0d87dff55ec071de980b73ba908a230d22c69392",
+      "advanced-public-normal-archive-fix-compile-20261117/unit-journal.txt": "9d100eb52f924b0b2a628c9445ab3d04df08848f3d0d0b5758227a8a95e500cf",
+      "advanced-public-normal-archive-fix-links-20261117/link-plan-unrun.json": "871e5b5a7f64adef2b108426abef2453eb3b9990f27f6c4868b91cee1125b501",
+      "advanced-public-normal-archive-fix-links-20261117/link-plan-v1.json": "1179d8b0683a5f41855277cf97951ea0cd1a5a956edca14293e4c33c8f2b4f97",
+      "advanced-public-normal-archive-fix-links-20261117/link-v1.py": "16c27f7bc75e7cfea01398ea03bc7322ad5d21ce5304130e1bd4eceaabd0f1e2",
+      "advanced-public-normal-archive-fix-compile-20261117/unit-stopped.txt": "985c3867e695cbd7899293ae24e6fbc2ea1f3231ca2e2f9ec6bbdad87f699f69"
+    }
+  },
+  "unit_stopped": true
+}
