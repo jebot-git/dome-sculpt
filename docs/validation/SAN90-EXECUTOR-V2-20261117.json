@@ -32,5 +32,10 @@
       "bytes": 1821
     }
   ],
-  "full_plan_delta_scope": "Original fullplan24db remains preserved in previous preparation capsule. Exact replacementexecution_templates andoneadditionalpin reconstructv2planSHA62116c27; do not rewrite oldfile or duplicate142MBplan."
+  "full_plan_delta_scope": "Original fullplan24db remains preserved in previous preparation capsule. Exact replacementexecution_templates andoneadditionalpin reconstructv2planSHA62116c27; do not rewrite oldfile or duplicate142MBplan.",
+  "compressed_exact_diff": {
+    "path": "docs/validation/SAN90-EXECUTOR-V2-20261117/executor-v1-to-v2.diff.gz",
+    "sha256": "e9a1996a31815f2bcc007932ce045edf1d535d369ca479394641f07e6da5a44a",
+    "uncompressed_sha256": "34d705a5813bb3f70683a2d95c038e25d82df8b040119169e7f6a863dbe68174"
+  }
 }
