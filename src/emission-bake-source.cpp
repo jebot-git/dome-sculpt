@@ -7,6 +7,7 @@
 #include "normal-projection-identity.hpp"
 #include "paint-normal-access.hpp"
 #include "normal-sampling-access.hpp"
+#include "normal-key-derivation.hpp"
 #include <numeric>
 #include "dome/material-bindings.hpp"
 #include "dome/material-visibility.hpp"
@@ -135,8 +136,39 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTr
   // owning recipe's declared replay cap as a separate, sequential stage rather
   // than let it spend an unbounded amount below a smaller caller quota.
   uint64_t replay_bytes=0;
-  if(preparation&&preparation->uv_reprojection)replay_bytes=preparation->uv_reprojection->receipt.max_working_bytes;
-  if(preparation&&preparation->sampling_domain)replay_bytes=preparation->sampling_domain->receipt.max_working_bytes;
+  // Deep validators recurse into owning before-materials BEFORE allocating
+  // their target/reprojection/transfer scratch. Bound the whole actual DAG
+  // first, including key anchors: a smaller latest receipt cannot authorize a
+  // larger historical replay below the caller's working limit. These are the
+  // same 64-depth/256-binding limits as native material validation/archive.
+  std::array<const SourceMaterialBindings *,64> active{};
+  std::array<const SourceMaterialBindings *,256> complete{};size_t completed=0;
+  auto visit=[&](auto &&self,const SourceMaterialBindings *node,size_t depth)->void{
+    if(!node)return;stop();
+    if(std::find(active.begin(),active.begin()+depth,node)!=active.begin()+depth)
+      throw std::invalid_argument("Source normal replay authority is cyclic");
+    if(std::find(complete.begin(),complete.begin()+completed,node)!=complete.begin()+completed)return;
+    if(depth==active.size()||completed==complete.size())
+      throw std::length_error("Source normal replay authority exceeds native graph limits");
+    active[depth]=node;
+    if(const auto &normal=node->normal_preparation){
+      if(const auto &uv=normal->uv_reprojection){
+        replay_bytes=std::max(replay_bytes,uv->receipt.max_working_bytes);
+        self(self,uv->before_material.get(),depth+1);
+      }
+      if(const auto &uv=normal->sampling_domain){
+        replay_bytes=std::max(replay_bytes,uv->receipt.max_working_bytes);
+        self(self,uv->before_material.get(),depth+1);
+      }
+      if(normal->key_derivation)self(self,normal->key_derivation->before_material().get(),depth+1);
+      self(self,normal->original_material.get(),depth+1);
+    }
+    if(node->key_derivation)self(self,node->key_derivation->before_material().get(),depth+1);
+    active[depth]=nullptr;
+    if(completed==complete.size())throw std::length_error("Source normal replay authority exceeds native graph limits");
+    complete[completed++]=node;
+  };
+  if(prepared)visit(visit,binding.get(),0);
   const uint64_t work=std::max(capture_bytes,replay_bytes);
   if(!options.max_working_bytes||options.max_working_bytes>512*1024*1024||work>options.max_working_bytes)
     throw std::length_error("Artist source normal capture exceeds prospective working budget");
