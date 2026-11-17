@@ -1,0 +1,13 @@
+{
+  "state": "verified-existing-closed-artifacts",
+  "archive_sha256": "d0e8277ce9d6f6d3c912b07364f354f875b2bba062822af6ca7e4707ea396eee",
+  "summary_sha256": "9c5ac2cf90e44a2116c3ca1daded7e518c8a7fce7902d439c3a27fc4b1464a06",
+  "actual_members_verified": 982,
+  "all_current_members_match": true,
+  "observed_additional_sealer_invocation": {
+    "actual_exit": 1,
+    "failure": "FileExistsError at destination mkdir after complete input posthash. Existing complete summary/archive untouched; no product run or rerun.",
+    "not_relabelled": true
+  },
+  "scope": "Independent archive/member/current-byte verification plus actual case/unit0 evidence; additional sealer overall1 remains recorded separately."
+}
