@@ -42,3 +42,11 @@ This is an isolated source branch. Prepare one complete optimized renderer TU
 with real full-M/compiler-MD and a fresh qualified-provider link, then run the CPU
 forecast and reviewed bounded software mode at coordinated product-lease
 boundaries. Preserve all earlier failures and use new output namespaces.
+
+The additive ownership correction follows Scene::snapshot semantics: PaintedMesh
+wrappers detach while geometry/source/projection/baked and layer-tile owners
+remain shared. Capture the detached wrapper before display changes and verify
+that baseline plus exact immutable authorities. The earlier5499 compile0 is
+preserved as build evidence only; its incorrect cross-snapshot wrapper assertion
+was caught in source review before any link or product execution. The duplicate
+sampler check is removed. No source authority check is replaced by RGB success.

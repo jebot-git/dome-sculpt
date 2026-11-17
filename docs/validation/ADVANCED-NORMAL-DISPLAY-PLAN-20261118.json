@@ -3,7 +3,7 @@
   "base": "4fbd74a4ed2556fca6a80b657a9c8d769e924db5",
   "scope": "Explicit shade/toony display snapshot with original genuine normal/source owners and strict additional interior probes; genuine Document proof publication, no source/data/oracle substitution.",
   "source_files": {
-    "tests/source-advanced-normal-display.hpp": "cd2712da8be6c084d701819431c36cd36f754421506a9e90cebb5e7d39d8f03e",
+    "tests/source-advanced-normal-display.hpp": "a2db2a5b8e61998d927545d4e7603ce7216ba34cf7292da9fb8ce479091f82a9",
     "tests/source-advanced-normal-render.hpp": "272a154ccc4fde5c78c7ef15cf8f7ae4e676a52e024e70cfb7798868b97e6d0b",
     "tests/source-advanced-normal-forecast.hpp": "7ea5101e2e23b54a120d344efcb1398c987fd6456a8c8f40d13a987a3c857290",
     "tests/source-prepared-normal-render.cpp": "c461169e5efbddf62f210c5c2a0c55f81ee85ef45fe0cf930477fbc2a69766f2",
@@ -28,5 +28,6 @@
     "sha256": "06ba1bd486a81ce76dea9148e382c6656bc2095f9b5598d1262b270bbd04f403",
     "checks": 644,
     "drift": []
-  }
+  },
+  "ownership_correction": "Scene snapshots detach wrappers; compare the captured detached baseline and exact geometry/source/projection/baked/layer tile owners.5499 compiled but never linked/executed."
 }
