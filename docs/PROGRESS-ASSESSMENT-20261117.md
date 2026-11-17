@@ -1,4 +1,4 @@
-# Dome Sculpt progress assessment — 2026-11-17
+# Dome Sculpt progress assessment — updated 2026-11-18
 
 The full production objective is active and incomplete. The project has a
 functional native FLTK/OpenXR authoring baseline; recent work strengthens its
@@ -45,10 +45,27 @@ The separate prospective ancestor-budget child90fad800 with fixtureaa8db16a
 passes17 cases/263495 checks, prepared91 and artist139; read
 [its sealed native proof](ARTIST-ADVANCED-CHAIN-NATIVE-20261117.md).
 The strict component runtime now also passes17/91/139 with leak detection,
-actual ASan/UBSan mappings and zero drift/survivors. Actual graphics, public
-desktop/XR and combined application qualification remain outstanding for these
-new source families. Unsupported
-source families remain explicit refusals pending their actual implementations.
+actual ASan/UBSan mappings and zero drift/survivors. The corrected public native
+fixture now passes eight source-use and eight UV-creation cases with128 positive
+endpoint checks and32 expected negative refusals. All eight actual source-use
+desktop workflows pass128 checks across sixteen fresh Apps, including Save,
+Undo/Redo and reopen; see
+[the desktop matrix](ADVANCED-PUBLIC-SOURCE-GUI-MATRIX-20261117.md).
+These newer production changes are not integrated into main. Their source-use
+XR, UV-creation desktop/XR, graphical and combined qualification remain pending.
+
+The advanced graphical test's first software run agrees on correct PBR colours
+but fails required contrast against omitted normals. A calibrated CPU forecast
+finds additional genuine PBR witness points; MToon needs further presentation
+and graphical calibration. This is an unresolved verification issue, not an
+advanced graphics pass; see
+[the preserved results](ADVANCED-NORMAL-CONTRAST-ACTUAL-20261117.md).
+
+A canonical normal-field source adapter is implemented on a separate branch.
+Compilation stopped after28 successful source files because of a missing include.
+The include-only correction is pushed, and the25-file continuation is reviewed;
+native32, sanitizer and application validation remain pending. Other unsupported
+source families remain explicit refusals pending their actual adapters.
 
 The user-accepted controller selection/hierarchy/multiselection/ghost interface
 is preserved. Only the verified CC0 VRoid female/male creator bases are offered.
@@ -77,6 +94,8 @@ Current canonical DomeD FLTK and bitmap-font builds remain selected; see
 8. Implement controller tool/function/selection trays and spatial node-based
    editing/history after the basic production targets are met.
 
+The user resumed the full goal on2026-11-18. Three agents are continuing the
+canonical adapter, advanced graphical verification and public desktop/XR work.
 No percentage is assigned: implemented rows differ greatly in scope and several
 still have only partial qualification. No system installation, physical-headset
 test or active-session restart occurred during this round.

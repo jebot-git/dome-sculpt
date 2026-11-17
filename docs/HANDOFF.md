@@ -1,4 +1,4 @@
-# Dome Sculpt current handoff — 2026-11-17
+# Dome Sculpt current handoff — 2026-11-18
 
 The full production goal is ACTIVE after the user's resume. It is incomplete.
 Read [REQUIREMENTS.md](REQUIREMENTS.md) and the original
@@ -160,17 +160,59 @@ runtime now also completes0: advanced17/263495, prepared91 and artist139, with
 live ASan/UBSan witnesses for each ELF, leak detection, all17 exact ordered-save
 pairs, drift[]/owned[]/released lease. Status SHA
 f8e9c649ebf0a324be9e3ba7ef48693eb662cf3fedcdb4281d47f694733dad03.
-Root captures actual unit3089942/f021bca5 success before stopping it; the owning
-agent is sealing this scoped proof. Graphics/public/whole-App admission remains
+Root captured actual unit3089942/f021bca5 success before stopping it; the scoped
+proof is integrated in main0094ee24. Graphics/whole-App admission remains
 outstanding for advanced90fad.
 
-Public source checkpoint8bb4072d adds separate real source-use and public
-UV-creation desktop/XR scenarios. Two fresh Release test TUs now compile0;
-their three native/runtime/App links are authorized under plan2706ed53, with
-all new products still held for loader/native review. Existing frontend UV
-controls already expose both methods. Independent new-family graphical
-consumer coverage is being implemented separately under plan629dc9c6:
-both roles and both live-source/second-Bake stages for17 genuine families.
+Public source checkpoint8bb4072d adds separate source-use and UV-creation
+desktop/XR scenarios. Its two complete Release test TUs and three fresh links
+passed. The first retained-source producer exposed four geometry-only calls to
+context-free PaintedMesh encoding, which requires an owning sampling archive.
+Fixture-only child27ff940b compares the actual geometry directly instead; the
+original failures remain archived. Its fresh native TU/link and native-v3 gates
+pass: advanced17/263495, seventeen ordered-save pairs, eight source-use and eight
+UV-creation cases, 128 positive verifications, 32 expected negative refusals and
+bitmap checks. Read [the native proof](ADVANCED-PUBLIC-NORMAL-NATIVE-V3-20261117.md).
+
+All eight actual desktop source-use cases pass128 checks in sixteen fresh Apps,
+including real source/normal controls, second Bake, Save, Undo/Redo and reopen.
+The normal-error maximum is below .00510 against .035; wrong-domain/omitted/
+swapped controls retain .05 sensitivity. Read
+[the desktop matrix](ADVANCED-PUBLIC-SOURCE-GUI-MATRIX-20261117.md).
+These are explicitly product90fad/fixture27ff/runtime-and-scenarios8bb, unchanged
+090f UI/support and font6c8. They do not admit advanced production into main.
+Source-use syntheticXR and separate UV-creation desktop/XR remain pending. The
+first Arc source-use canary is live under
+ds-advanced-source-xr-canary-v1-20261118.service, MainPID434,
+Invocation3f45f64e091a46a98cd91e3d8685f34e. Inspect that actual unit before
+acting; the agent retains the original bounds and common device lease.
+No physical-headset result follows from synthetic XR.
+
+The independent advanced renderer compiled and linked successfully, but its
+first actual software run failed the negative-control contrast requirement.
+Correct PBR RGB errors were0,1,0,1; omitted-normal differences3,4,1,6 never
+reached7. A separate wrapper rejected a non-ELF deleted Mesa lp_dma_buf mapping.
+Both failures and all images are preserved. A CPU forecast across68 views
+calibrates all16 known PBR control colours within1 and finds interior PBR
+witnesses. Authored MToon estimates remain insensitive and graphically
+uncalibrated. Read [the actual contrast record](ADVANCED-NORMAL-CONTRAST-ACTUAL-20261117.md).
+The toolkit agent is implementing declared display-only presentation and extra
+interior probes while preserving genuine normal data, source ownership, the
+original probes and all numerical bounds. No advanced GL/Arc success is claimed.
+
+The next canonical normal-field source adapter is implemented separately at
+85eafc42. Its changed private headers invalidate142 existing owners; the selected
+headless slice is49 core plus4 fixtures. The first compile stopped after28
+successful complete TUs on a missing HDR-authority include. The include-only
+child preserves that failure; compile-v3 prepares25 remaining complete TUs and
+authenticates the original28 through actual dependency files and byte-identical
+child inputs. Plan d5457921 and driver99a2c869 are reviewed; compile-v3 is live
+under ds-canonical-normal-compile-v3-20261118.service, MainPID4190480,
+Invocation4585a71ea6bc46c59bf9632754c8b8b5. Inspect the actual unit before acting.
+Archive/link/canonical32, other affected consumers, sanitizer,
+graphics and public application qualification remain pending. Do not reuse an
+old renderer with the changed private packet layout. The32-case canonical
+matrix does not implement the separate native32 writable-paint source family.
 
 ## Canonical toolkit and full remaining goal
 
