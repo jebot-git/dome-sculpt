@@ -1,0 +1,60 @@
+{
+  "state": "prepared-only-NOT-executed",
+  "source": "090f009ede2c0623ca616fe892223b4f68f1c2c4",
+  "driver": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/native90-sanitize-gates-20261117/run-native90-v1.py",
+    "sha256": "b8530c37f8a8f6ee011ab50256a608105eb30953622f2861c2e7d766e7db9a62"
+  },
+  "predecessor_Release_driver": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/native90-release-gates-20261117/run-native90-v1.py",
+    "sha256": "55f06be3963aaff1726962b224d7a534015ea89b179cb13e9e935dfe4744f057"
+  },
+  "syntax": 0,
+  "default_plan_only_exit": 0,
+  "full_owning_acceptance_required_before_product": {
+    "plan_sha256": "62116c27b70b37459d186e037acc51984d34fac8262760e5f50351ac8c21f8d9",
+    "terminal_status_path": "/home/blux/de-xr/dome-sculpt/artifacts/native90-sanitize-planning-20261115/sanitize-090f00-20261117-audit/execution-native90-v2/status.json",
+    "native_MD_owners": 1036,
+    "owned_outputs": 1776,
+    "fresh_compilations": 291,
+    "reused_objects": 745,
+    "fresh_links": 737,
+    "fresh_generators": 3,
+    "owning_status_sha256_required_from_future_root_review": true,
+    "independent_unit_terminal_sha256_required": true,
+    "owning_unit_invocation": "f2bcbf89dda84a1dae2590e06d016dd4",
+    "strict_ASAN": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+    "strict_UBSAN": "halt_on_error=1:print_stacktrace=1",
+    "suppression_or_preload_overrides_allowed": false,
+    "dual_lineage_actual_CWD_MD_journal_required": true
+  },
+  "bounds": {
+    "preflight_seconds": 600,
+    "postflight_seconds": 600,
+    "selected_native_seconds": 2400,
+    "default_individual_CTest_seconds": 180,
+    "workspace27_seconds": 300,
+    "workspace373_seconds": 300,
+    "raw90159_seconds": 300,
+    "app_version_seconds": 60,
+    "aggregate_command_RSS_bytes": 6442450944
+  },
+  "scope": "Plan/syntax checks only. Does not imply terminal whole-SAN success, native90 pass or product run. Root review plus actual future terminal build and graphics lease handoff required.",
+  "evidence": [
+    {
+      "path": "docs/validation/SAN90-NATIVE-GATES-PREP-20261117/Release-to-SAN-native-gates.diff.gz",
+      "sha256": "85efa887d7121d8fa79193ec0acba549dd00d5580cf2833f8fca33cb41a909dd",
+      "bytes": 4687
+    },
+    {
+      "path": "docs/validation/SAN90-NATIVE-GATES-PREP-20261117/plan-review-v1.json",
+      "sha256": "8c8e1eeca32719a2313ac03b642932053a9b8f02a1c524c8ae3dfeff4aec69f0",
+      "bytes": 3966
+    },
+    {
+      "path": "docs/validation/SAN90-NATIVE-GATES-PREP-20261117/run-native90-v1.py",
+      "sha256": "b8530c37f8a8f6ee011ab50256a608105eb30953622f2861c2e7d766e7db9a62",
+      "bytes": 14225
+    }
+  ]
+}
