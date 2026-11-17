@@ -1,0 +1,60 @@
+{
+  "state": "source-only-plan-NOT-executed",
+  "base_source": "8bb4072dc1ad60bb7b11b8a325c930f8b2c0c176",
+  "functional_product": "90fad",
+  "existing_target": "dome-sculpt-source-prepared-normal-render-test",
+  "families": {
+    "regular": 16,
+    "genuine_retained_three_edits": 1,
+    "roles": 2,
+    "stages": [
+      "actual-live-advanced-source",
+      "actual-second-Bake-target"
+    ],
+    "planned_graphical_views": 68
+  },
+  "bounds": {
+    "size": [
+      96,
+      96
+    ],
+    "original_interior_probes": [
+      [
+        48,
+        48
+      ],
+      [
+        45,
+        47
+      ],
+      [
+        49,
+        45
+      ],
+      [
+        50,
+        50
+      ]
+    ],
+    "normal_max_error": 0.035,
+    "RGB_max_error": 3,
+    "negative_min_gap": 7,
+    "negative_disjoint_intervals_required": true,
+    "each_negative_each_view_required": true
+  },
+  "negative_directions": [
+    "wrong-domain",
+    "omitted",
+    "swapped-role"
+  ],
+  "preserve": [
+    "native17 bodies and all quota/cycle/cancel oracles",
+    "shared advanced fixture/decoder",
+    "source and material owner identity",
+    "original ordinary-v1 graphics modes and bounds",
+    "CMake graph/no new frontend",
+    "real default three-edit positive receipts"
+  ],
+  "plan_sha256": "e82a0857497d4ebbb3d516025299e4a331d7ec9052482f36ab0329153736de2f",
+  "runtime_authorized": false
+}
