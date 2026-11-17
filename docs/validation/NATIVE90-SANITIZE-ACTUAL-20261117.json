@@ -1,0 +1,393 @@
+{
+  "state": "qualified-actual-strict-native90-runtime",
+  "source": "090f009ede2c0623ca616fe892223b4f68f1c2c4",
+  "owning_status_sha256": "83e43509ff25968bf4edbba2261b11454163af0fef1837b66df1059783b039b5",
+  "plan": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/native90-sanitize-planning-20261115/sanitize-090f00-20261117-audit/plan-v2.json",
+    "sha256": "62116c27b70b37459d186e037acc51984d34fac8262760e5f50351ac8c21f8d9"
+  },
+  "driver": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/native90-sanitize-gates-20261117/run-native90-v1.py",
+    "sha256": "b8530c37f8a8f6ee011ab50256a608105eb30953622f2861c2e7d766e7db9a62"
+  },
+  "actual_native_status": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/native90-sanitize-gates-20261117/native90-v1-20261117/status.json",
+    "sha256": "fda26d5b71fec8fa8c1b821701eeb5ca619a535c2fd1ed7e8f47b37e280c4c5f",
+    "exit": 0,
+    "steps": [
+      {
+        "name": "app-version",
+        "exit": 0,
+        "seconds": 0.40683698654174805,
+        "peak_owned_RSS_bytes": 953573376,
+        "timeout_seconds": 60,
+        "RSS_limit_bytes": 6442450944,
+        "signals": [],
+        "log_sha256": "9455a20a636a6599ace60120261649d3b29dc51fe2c774305994879190e7336b"
+      },
+      {
+        "name": "selected-CTest-list",
+        "exit": 0,
+        "seconds": 0.04812479019165039,
+        "peak_owned_RSS_bytes": 21897216,
+        "timeout_seconds": 60,
+        "RSS_limit_bytes": 6442450944,
+        "signals": [],
+        "log_sha256": "2afe282431ae979901634a06c655592d4945a2b1495282278849ac16cc02a95c"
+      },
+      {
+        "name": "native90",
+        "exit": 0,
+        "seconds": 613.9249782562256,
+        "peak_owned_RSS_bytes": 3759112192,
+        "timeout_seconds": 2400,
+        "RSS_limit_bytes": 6442450944,
+        "signals": [],
+        "log_sha256": "67d26ed5a1ef441940f68981182426643376ba076c9da4526ef11aead77eda58"
+      },
+      {
+        "name": "workspace27",
+        "exit": 0,
+        "seconds": 2.446565628051758,
+        "peak_owned_RSS_bytes": 449470464,
+        "timeout_seconds": 300,
+        "RSS_limit_bytes": 6442450944,
+        "signals": [],
+        "log_sha256": "b4dacfac59d17baa45a405a3cd0a456d3191e1f5aeb8391bc762fdb204ca6d49"
+      },
+      {
+        "name": "workspace373",
+        "exit": 0,
+        "seconds": 3.7103075981140137,
+        "peak_owned_RSS_bytes": 1413201920,
+        "timeout_seconds": 300,
+        "RSS_limit_bytes": 6442450944,
+        "signals": [],
+        "log_sha256": "b84f753363a7b03bf014dc9a98b174f490f1987e822a9db90aa601d808633b1a"
+      },
+      {
+        "name": "raw90159",
+        "exit": 0,
+        "seconds": 1.0450119972229004,
+        "peak_owned_RSS_bytes": 1072537600,
+        "timeout_seconds": 300,
+        "RSS_limit_bytes": 6442450944,
+        "signals": [],
+        "log_sha256": "8140630da001d09e6e1357711721664c2943508a7c97f27ed2f6ca2db19c7b3a"
+      }
+    ],
+    "exact_native_passed": [
+      "affine-document-render",
+      "affine-held-render",
+      "authenticated-local-surface",
+      "bake",
+      "bake-workflow",
+      "baked-emission",
+      "baked-emission-exr",
+      "baked-emission-fallback",
+      "baked-emission-gpu",
+      "baked-emission-native",
+      "baked-emission-source",
+      "baked-emission-uv1-worker",
+      "baked-emission-workflow",
+      "baked-textures",
+      "controller-controls",
+      "current-paint-preview-gpu",
+      "current-paint-preview-native",
+      "document-render-buffer-reuse",
+      "document-render-capacity",
+      "document-render-large-buffer",
+      "dome-sculpt-texture-set-export",
+      "dome-sculpt-texture-set-field-source",
+      "dome-sculpt-texture-set-history",
+      "dome-sculpt-texture-set-native",
+      "dome-sculpt-texture-set-polygon-mixed",
+      "dome-sculpt-texture-set-resolution",
+      "dome-sculpt-texture-set-source-export",
+      "dome-sculpt-texture-set-surfaces",
+      "dome-sculpt-texture-sets",
+      "dome-sculpt-texture-sets-plan",
+      "dome-sculpt-texture-sets-polygon",
+      "emission-export",
+      "emission-exr-owned",
+      "emission-scene",
+      "gpu-color-blur-kernel-software",
+      "gpu-color-blur-native-software",
+      "hdr-preview-overflow",
+      "humanoid-authoring",
+      "humanoid-component-bind",
+      "linear-scene-target",
+      "mtoon-render",
+      "native-graphics-lifetime",
+      "native-graphics-shared-software",
+      "native-read-cancel",
+      "native-scene-geometry-intern",
+      "normal-frame-render",
+      "packed-material-query",
+      "paint-composite-native",
+      "paint-composite-render",
+      "paint-overlay-gpu",
+      "polygon-render",
+      "polygon-retopo-affine",
+      "polygon-surface-native-owning",
+      "render-buffer-reuse",
+      "render-direct-upload",
+      "render-store-ledger",
+      "renderer-recovery",
+      "retopology-input-admission",
+      "rig-fit-anatomical",
+      "rig-fit-authoring",
+      "rig-fit-controller",
+      "rig-fit-faults",
+      "rig-fit-import",
+      "rig-fit-metric",
+      "sculpt-chunk-pipeline",
+      "sculpt-chunk-render",
+      "sculpt-gpu-arena",
+      "sculpt-gpu-arena-layout",
+      "sculpt-surface-chunks",
+      "shared-document",
+      "skin-affine-authoring",
+      "skin-affine-controller",
+      "skin-affine-export",
+      "skin-authoring",
+      "source-artist-normal-bake",
+      "source-artist-normal-cc0-cpu",
+      "source-color-render",
+      "source-extra-uv-render",
+      "source-paint-overlay",
+      "source-prepared-normal-bake",
+      "source-role-domain-emission",
+      "source-role-missing-uv1",
+      "source8-preview",
+      "surface-query-callback-lifetime",
+      "surface-query-oblique",
+      "texture-painting",
+      "triangle-remesh",
+      "vrm1-background-fixture",
+      "vrm1-targets-preflight-order",
+      "vrm1-targets-uniform-roles-uv-authoring"
+    ],
+    "JUnit_cases": 90,
+    "JUnit_failures": 0,
+    "JUnit_errors": 0,
+    "JUnit_skipped": 0,
+    "input_pin_count_final": 43928,
+    "initial_pins_unchanged": 43927,
+    "additional_expected_appearance_pin": [
+      "/home/blux/de-xr/dome-sculpt/artifacts/native90-sanitize-gates-20261117/native90-v1-20261117/config/dome/appearance.json"
+    ],
+    "input_drift": [],
+    "remaining_owned_processes": []
+  },
+  "environment": {
+    "LD_LIBRARY_PATH": "/home/blux/de-xr/dome-sculpt/artifacts/sdk-20261111/toolkit-sanitize/lib:/opt/fltk-vr/bdf-runtime/lib:/usr/lib64",
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+    "LSAN_OPTIONS": null,
+    "LIBGL_ALWAYS_SOFTWARE": "1",
+    "LD_PRELOAD": null,
+    "LP_NUM_THREADS": "2",
+    "CTEST_PARALLEL_LEVEL": "1"
+  },
+  "bounds": {
+    "preflight_seconds": 600,
+    "postflight_seconds": 600,
+    "selected_native_seconds": 2400,
+    "default_individual_CTest_seconds": 180,
+    "workspace27_seconds": 300,
+    "workspace373_seconds": 300,
+    "raw90159_seconds": 300,
+    "app_version_seconds": 60,
+    "aggregate_command_RSS_bytes": 6442450944
+  },
+  "owning_manifest_scope": {
+    "outputs": 1776,
+    "MD_owners": 1036,
+    "dependency_routes": {
+      "compile-complete-TU": 291,
+      "reuse-authenticated-whole-object": 745
+    },
+    "retained_provider_lineage_counts": {
+      "closed-current-provider-before-original143": 331,
+      "fresh-in-current-completion": 414
+    }
+  },
+  "unit": {
+    "name": "ds-native90-sanitize-native-v1-20261117.service",
+    "captured_terminal": {
+      "ActiveState": "active",
+      "SubState": "exited",
+      "InvocationID": "7d8e087a2f1c4b858846632ada9d91a0",
+      "MainPID": "0",
+      "Result": "success",
+      "ExecMainPID": "2934532",
+      "ExecMainStatus": "0",
+      "MemoryPeak": "8589934592",
+      "MemoryMax": "8589934592"
+    },
+    "current_state": "LoadState=not-found\nActiveState=inactive\nSubState=dead\nMainPID=0\n",
+    "scope": "Root captured terminal and controls stop; sealing task does not stop/restart this unit."
+  },
+  "lease": {
+    "owner_pid": 2934532,
+    "before_any_product": true,
+    "acquired_epoch": 1794947920.87001,
+    "released_epoch": 1794948922.468875
+  },
+  "lease_scope": "Released by actual gate; seal does not reacquire a possibly reassigned lease.",
+  "independent_seal_checks": "Status/step/environment/JUnit/exactnames/rawcount/metadata/ownedidentity checks only; no duplicate massive ELF rehash or new product run. Actual driver performs complete pre/postflight hashes.",
+  "scope_limits": [
+    "Software GL/native corpus only, no new Arc/UI/physicalHMD proof",
+    "ASan/UBSan/leaks apply to owning code and selectedSANSDK; external bitmap/driver dependencies retain their recorded scopes",
+    "Selected90 native suites are not completion of every production requirement"
+  ],
+  "archive": {
+    "path": "docs/validation/native90-sanitize-actual-20261117/actual-native-evidence.tar.xz",
+    "sha256": "0970113de86dc135fb296dd5ba340e2d5789dd1b2064b014f86bd388b15e802e",
+    "bytes": 1503940,
+    "members": [
+      {
+        "member": "actual/app-version.log",
+        "sha256": "9455a20a636a6599ace60120261649d3b29dc51fe2c774305994879190e7336b",
+        "bytes": 60
+      },
+      {
+        "member": "actual/config/dome/appearance.json",
+        "sha256": "adb3a512ceeb0fed91de9481ee8401a520f4d3ade6d373526afdd42eee446a9f",
+        "bytes": 66
+      },
+      {
+        "member": "actual/inputs-before.json",
+        "sha256": "4253113ddb2847f5517586af1b0d6948792e9e668c694b74668ad6234a9e0200",
+        "bytes": 7128353
+      },
+      {
+        "member": "actual/inputs-final.json",
+        "sha256": "9aea067f42df6078018cdcb3425e14cbc7136f02438030301c6270ad7a3f797a",
+        "bytes": 7128547
+      },
+      {
+        "member": "actual/native90.log",
+        "sha256": "67d26ed5a1ef441940f68981182426643376ba076c9da4526ef11aead77eda58",
+        "bytes": 11377
+      },
+      {
+        "member": "actual/native90.xml",
+        "sha256": "f4177d9942ddc2e0536fbf3cc038ae934a24d740f4c0b5e35a7e9c3a0e40b3d0",
+        "bytes": 86546
+      },
+      {
+        "member": "actual/raw-uv1-worker/mtoon-raw-original/accepted.dsculpt",
+        "sha256": "e6c27e395442888912f998cf2c8e0cb06f0cab042e118bc79d19b9aeaad11d6f",
+        "bytes": 437241
+      },
+      {
+        "member": "actual/raw-uv1-worker/mtoon-raw-original/actual-uv1-bake.glb",
+        "sha256": "53b1331d0f79c6bf77d9f579745bff001053e9d74188af22ca84df0c96dd1c62",
+        "bytes": 446912
+      },
+      {
+        "member": "actual/raw-uv1-worker/mtoon-raw-original/redone.dsculpt",
+        "sha256": "e6c27e395442888912f998cf2c8e0cb06f0cab042e118bc79d19b9aeaad11d6f",
+        "bytes": 437241
+      },
+      {
+        "member": "actual/raw-uv1-worker/mtoon-raw-original/undone.dsculpt",
+        "sha256": "e2af1f8507db54ed07f4ea17dbd13ba324e177fcccbed04170a762c535210766",
+        "bytes": 268811
+      },
+      {
+        "member": "actual/raw-uv1-worker/pbr-raw-original/accepted.dsculpt",
+        "sha256": "6dced206b2a858cf68a2e8e9f989cfa6f64423d83ebcefa651e7299157dbdd7a",
+        "bytes": 434271
+      },
+      {
+        "member": "actual/raw-uv1-worker/pbr-raw-original/actual-uv1-bake.glb",
+        "sha256": "901010126259db330204da440b78027faddba1235c2ac4da716493e20c49ca80",
+        "bytes": 442900
+      },
+      {
+        "member": "actual/raw-uv1-worker/pbr-raw-original/redone.dsculpt",
+        "sha256": "6dced206b2a858cf68a2e8e9f989cfa6f64423d83ebcefa651e7299157dbdd7a",
+        "bytes": 434271
+      },
+      {
+        "member": "actual/raw-uv1-worker/pbr-raw-original/undone.dsculpt",
+        "sha256": "1db989b971117daf83dc1659398369693fac4a3b9b66a243be07b43fd341a0bd",
+        "bytes": 265841
+      },
+      {
+        "member": "actual/raw90159.log",
+        "sha256": "8140630da001d09e6e1357711721664c2943508a7c97f27ed2f6ca2db19c7b3a",
+        "bytes": 260
+      },
+      {
+        "member": "actual/selected-CTest-list.log",
+        "sha256": "2afe282431ae979901634a06c655592d4945a2b1495282278849ac16cc02a95c",
+        "bytes": 72711
+      },
+      {
+        "member": "actual/status.json",
+        "sha256": "fda26d5b71fec8fa8c1b821701eeb5ca619a535c2fd1ed7e8f47b37e280c4c5f",
+        "bytes": 65162
+      },
+      {
+        "member": "actual/workspace27.log",
+        "sha256": "b4dacfac59d17baa45a405a3cd0a456d3191e1f5aeb8391bc762fdb204ca6d49",
+        "bytes": 2251
+      },
+      {
+        "member": "actual/workspace373.log",
+        "sha256": "b84f753363a7b03bf014dc9a98b174f490f1987e822a9db90aa601d808633b1a",
+        "bytes": 28142
+      },
+      {
+        "member": "runner-review-unit/native90-unit-initial-20261117.txt",
+        "sha256": "4be199b0d617275407a97254265b32b23912041e01a527a8238f1b8b96003719",
+        "bytes": 195
+      },
+      {
+        "member": "runner-review-unit/native90-unit-journal-20261117.txt",
+        "sha256": "99e22ab2f58dbe39e91346c538c21e0fbcca7dc57d9f5098de8881abdc1523ce",
+        "bytes": 1383
+      },
+      {
+        "member": "runner-review-unit/native90-unit-launch-20261117.json",
+        "sha256": "c98a18f70e623a92f78ccd4a4ec272448a758084d78729bb3b9d5f7ecb9e7336",
+        "bytes": 989
+      },
+      {
+        "member": "runner-review-unit/native90-unit-terminal-20261117.txt",
+        "sha256": "ed2b0bc7852beed4f895658b95855b2f0ab74419709f074457e09a6bb3f05d8c",
+        "bytes": 186
+      },
+      {
+        "member": "runner-review-unit/plan-review-v1.json",
+        "sha256": "8c8e1eeca32719a2313ac03b642932053a9b8f02a1c524c8ae3dfeff4aec69f0",
+        "bytes": 3966
+      },
+      {
+        "member": "runner-review-unit/root-native90-review-20261117.json",
+        "sha256": "0833c413e5c1e4d29480d63d837ba9f0a0151e255d7d8ec7d04e657bc5b806cd",
+        "bytes": 1011
+      },
+      {
+        "member": "runner-review-unit/root-owning-unit-terminal-20261117.txt",
+        "sha256": "e157838ac5a338f8eff73b903cce5dcfb6e86d0a9348f1681a409e9471813879",
+        "bytes": 143
+      },
+      {
+        "member": "runner-review-unit/run-native90-v1.py",
+        "sha256": "b8530c37f8a8f6ee011ab50256a608105eb30953622f2861c2e7d766e7db9a62",
+        "bytes": 14225
+      },
+      {
+        "member": "runner-review-unit/owned_monitor_v2.py",
+        "sha256": "b510ef5655e3214bd38e7b5f56022c37a79879070c3733f2dd059bad74f21269",
+        "bytes": 4859
+      }
+    ]
+  },
+  "no_ELF_payloads_committed": true
+}
