@@ -28,6 +28,9 @@ class PaintOverlayPacket {
  // A material/normal event alone cannot identify current key/pose frame owners.
  std::shared_ptr<const SourceMaterialBindings> normal_source_binding_;
  std::shared_ptr<const DeformationState> normal_source_deformation_;
+ // Exact factory-validated paint attachment, captured separately from a
+ // legally mutable material DTO. Later samples read only this immutable lease.
+ std::shared_ptr<const PaintSamplingAttachment> source_paint_attachment_;
  // Independent native emission-only interpretation, never original Source4 UV.
  std::shared_ptr<const Mesh> native_geometry_;
  std::shared_ptr<const PaintSamplingDomain> native_domain_;
@@ -37,6 +40,7 @@ class PaintOverlayPacket {
  std::shared_ptr<const Image> source_baked_normal_,source_baked_coverage_;
  PaintOverlayPacket()=default;
 public:
+ const auto &source_paint_attachment()const noexcept{return source_paint_attachment_;}
  const auto &normal_source_binding()const noexcept{return normal_source_binding_;}
  const auto &normal_source_deformation()const noexcept{return normal_source_deformation_;}
  const std::shared_ptr<const Image>&source_baked_normal()const noexcept{return contribution_owner_?contribution_owner_->source_baked_normal():source_baked_normal_;}

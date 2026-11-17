@@ -9,8 +9,7 @@ namespace dome::detail {
 // its attachment; an arbitrary structural PaintSamplingDomain is insufficient.
 inline std::array<float,2> source_overlay_coordinates(const PaintOverlayPacket &packet,
     uint32_t triangle,std::array<float,3> bary,std::array<float,2> current) {
- const auto &binding=packet.normal_source_binding();
- const auto attachment=material_paint_attachment(binding.get());
+ const auto &attachment=packet.source_paint_attachment();
  if(!attachment)return current;
  const auto &domain=*attachment->domain();const auto &basis=*domain.basis();
  if(size_t(triangle)>=domain.source_corners().size()/3)

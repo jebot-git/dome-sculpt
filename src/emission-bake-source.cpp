@@ -129,6 +129,7 @@ std::shared_ptr<const PaintOverlayPacket> PaintOverlayFactory::capture_normal_so
  packet->contribution_owner_=object.painted->normal_projection()&&attachment?capture_prepared_source(object,cancelled):capture(*object.painted,cancelled);
  packet->source_maps_=object.painted->source_maps();
  packet->normal_source_binding_=binding;packet->normal_source_deformation_=object.deformation;
+ packet->source_paint_attachment_=attachment;
  packet->storage_bytes_=sizeof(PaintOverlayPacket);
  return packet;
 }
@@ -160,7 +161,8 @@ bool SourceBakeNormalResolver::matches_prepared_source(const TextureMaps &maps)c
  if(!sample_||!packet_)return false;
  if(packet_->normal_source_binding()&&(!maps.overlay||
     !same(maps.overlay->normal_source_binding(),packet_->normal_source_binding())||
-    !same(maps.overlay->normal_source_deformation(),packet_->normal_source_deformation())))return false;
+    !same(maps.overlay->normal_source_deformation(),packet_->normal_source_deformation())||
+    !same(maps.overlay->source_paint_attachment(),packet_->source_paint_attachment())))return false;
  if(projection_){if(!same(maps.normal_projection,projection_))return false;}
  else if(canonical_||packet_->normal_source_binding()){
   if(maps.normal_projection||!maps.overlay||
