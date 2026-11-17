@@ -10,6 +10,12 @@ void require(bool value, const char *why) {
   if (!value) throw std::runtime_error(why);
   ++checks;
 }
+// Inspect geometry directly: retained normal payloads require Scene-owned archives.
+bool same_positions(const Mesh &a, const Mesh &b) {
+  return std::equal(a.positions.begin(), a.positions.end(),
+                    b.positions.begin(), b.positions.end(),
+                    [](Vec3 p, Vec3 q) { return p.x == q.x && p.y == q.y && p.z == q.z; });
+}
 const char *family(SourceNormalUvMethod method) {
   return method == SourceNormalUvMethod::Rasterize ? "raster" : "retained";
 }
@@ -79,10 +85,10 @@ Json normal_oracle(const Scene &scene, uint64_t source_id, uint64_t target_id,
   advanced_authority(source, method);
   require(destination.painted->normal_projection() && destination.painted->baked(),
           "Actual advanced second Bake produces independent target normal planes");
-  const auto a = source.painted->encode().at("mesh");
-  const auto b = destination.painted->encode().at("mesh");
-  require(a.at("positions") == b.at("positions") &&
-          a.at("indices") == b.at("indices") && a.at("uv") == b.at("uv"),
+  const auto &a = source.painted->mesh();
+  const auto &b = destination.painted->mesh();
+  require(same_positions(a, b) &&
+          a.indices == b.indices && a.uv == b.uv,
           "Advanced public oracle uses exact ordered corresponding geometry and current UVs");
   const auto &mesh = destination.painted->mesh();
   std::array<double, 2> maximum{}, wrong_domain{}, omitted{}, swapped{};
