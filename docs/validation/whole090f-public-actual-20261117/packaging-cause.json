@@ -1,0 +1,8 @@
+{
+  "observed_previous_exit": 1,
+  "reason": "Copied packaging guard expected4 source roles; whole application has6 explicit roles. No product invocation or archive output occurred.",
+  "preserved_previous_source": "seal-actual-whole090f-failed-v1-20261117.py",
+  "previous_sha256": "e3083f5170f832b36dcf4b38c730ae29b4d238ec071f05b3fbf5b1db4a2f2b76",
+  "current_sha256": "496fa69a51d62cf10ba73dd0686c597a27bb670e54e419823b25d322516f554c",
+  "correction": "Require exact6-role dictionary (not merely count); all underlying actual case outputs/oracles/budgets remain unchanged."
+}
