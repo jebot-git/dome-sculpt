@@ -15,6 +15,8 @@
 #include "baked-normal-field.hpp"
 #include "source-paint-pairing.hpp"
 #include "source-writable-paint.hpp"
+#include "bake-source-capabilities.hpp"
+#include "cut-color.hpp"
 #include "native-paint-frame-source.hpp"
 #include <numeric>
 #include "dome/material-bindings.hpp"
@@ -124,11 +126,31 @@ std::shared_ptr<const PaintOverlayPacket> PaintOverlayFactory::capture_normal_so
  source_paint_pairing(object.painted.get(),binding.get(),object.appearance.get(),true);
  if(binding->normal_frames)normal_frame_current_authority(*binding,object.painted->mesh(),object.deformation.get(),cancelled);
  auto packet=std::shared_ptr<PaintOverlayPacket>(new PaintOverlayPacket);
- packet->contribution_owner_=capture(*object.painted,cancelled);
+ packet->contribution_owner_=object.painted->normal_projection()&&attachment?capture_prepared_source(object,cancelled):capture(*object.painted,cancelled);
  packet->source_maps_=object.painted->source_maps();
  packet->normal_source_binding_=binding;packet->normal_source_deformation_=object.deformation;
  packet->storage_bytes_=sizeof(PaintOverlayPacket);
  return packet;
+}
+bool bake_source_supported(const SculptObject &object) noexcept {
+ const auto &binding=object.material_bindings;const auto &paint=object.painted;
+ if(binding&&binding->native_paint_sampling){
+  const auto &native=binding->native_paint_sampling;
+  return object.mesh_active&&paint&&!object.appearance&&!object.polygon&&
+    native->valid_owner(native)&&native->matches_current(*paint)&&!binding->has_mtoon&&
+    !binding->normal_preparation&&!binding->color_preparation&&!binding->canonical_attributes&&
+    (!binding->native_paint_frames||binding->native_paint_frames->valid_owner(binding->native_paint_frames));
+ }
+ if(object.polygon&&object.polygon->active&&object.polygon->colors&&binding&&paint&&
+    paint->color_projection()&&paint->normal_projection()&&binding->color_preparation&&binding->normal_preparation){
+  const auto &color=*binding->color_preparation;const auto &normal=*binding->normal_preparation;
+  const auto &descriptor=color.current_descriptor();
+  return object.mesh_active&&!object.appearance&&!binding->has_mtoon&&descriptor&&
+    descriptor->field==object.polygon->colors&&color.paint_sampling&&color.paint_sampling->matches_current(*paint)&&
+    color.projection&&paint->color_projection()->vertex_rgba==color.projection->vertex_rgba&&
+    normal.projection&&normal_projection_identity(*paint->normal_projection(),*normal.projection);
+ }
+ return cut_color_supported(object);
 }
 bool SourceBakeNormalResolver::requires_source_pairing()const noexcept {
  return bool(projection_)||bool(canonical_)||(packet_&&bool(packet_->normal_source_binding()));
@@ -419,8 +441,18 @@ std::shared_ptr<const TextureMaps> raw_bake_source(const SculptObject &object,
        !writable->matches(object.painted->mesh_owner(),object.painted->paint_sampling_domain())||
        !source_bake_normals(object,{},SourceBakeNormalOptions{256*1024*1024,cancelled}))
       throw std::invalid_argument("Writable raw source requires its actual material/normal/frame adapter");
-    if(object.painted->color_projection())
-      throw std::invalid_argument("Joint prepared writable source needs its independently resolved colour factor adapter");
+    if(object.painted->color_projection()){
+      // Composed planes belong to the retained writable paint grid. The factory
+      // packet seals that correspondence separately from original typed images
+      // and the normal sampling domain. Sampling remaps each hit's real corners.
+      const auto view=object.painted->has_physical_emission()||hdr_emission(object.material.emissive)
+        ?EmissionExportAccess::other_channels(*object.painted,object.material,cancelled)
+        :object.painted->preview(object.material,cancelled);
+      auto maps=std::make_shared<TextureMaps>(*view);maps->baked_base=object.painted->baked();
+      maps->normal_projection=object.painted->normal_projection();
+      maps->overlay=PaintOverlayFactory::capture_normal_source(object,cancelled);
+      return maps;
+    }
     auto maps=std::make_shared<TextureMaps>();maps->source_only=true;
     maps->source_maps=object.painted->source_maps()?object.painted->source_maps():empty_source_maps();
     maps->source_maps->validate_surface(object.painted->mesh());

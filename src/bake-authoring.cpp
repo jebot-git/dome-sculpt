@@ -1,3 +1,4 @@
+#include "bake-source-capabilities.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/bake-authoring.hpp"
 #include "dome/bake-recipe.hpp"
@@ -41,7 +42,7 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
     throw std::logic_error("This corner-color target has shading roles that target baking cannot yet preserve");
   // This source route uses the same authenticated ordinary shading domain as
   // plane cutting. Other original/prepared roles still require their adapters.
-  if(current_source&&!detail::cut_color_supported(source))
+  if(current_source&&!detail::bake_source_supported(source))
     throw std::logic_error("This corner-color source has shading roles that source baking cannot yet preserve");
   if (source.id == target.id)
     throw std::invalid_argument("Choose a different source object for baking");
@@ -76,7 +77,7 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   // positions/normals later, never the source field's corner identity or RGBA.
   auto source_maps=detail::raw_bake_source(source,cancelled);
   if(!source_maps&&source.mesh_active)source_maps=source.painted->preview(source.material,cancelled);
-  auto source_colors=source.mesh_active?detail::current_vertex_colors(source.painted->mesh(),current?&*current:nullptr,
+  auto source_colors=source.mesh_active&&!source.painted->color_projection()?detail::current_vertex_colors(source.painted->mesh(),current?&*current:nullptr,
       source.appearance.get(),source.material_bindings.get(),source_maps.get(),cancelled):std::vector<PolygonRgba>{};
   std::shared_ptr<const PolygonColorSurface> target_current;
   if(current_target){

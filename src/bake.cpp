@@ -108,6 +108,7 @@ Channels material(const BakeMaterial &m, const Mesh &mesh, size_t triangle,
     }
     return result;
   }
+  if(m.maps->overlay)uv=detail::source_overlay_coordinates(*m.maps->overlay,uint32_t(triangle),bary,uv);
   auto color=sample(m.maps->color,uv,m.repeat_uv,true), orm=sample(m.maps->metal_rough,uv,m.repeat_uv,false),
        emission=sample(m.maps->emission,uv,m.repeat_uv,true);
   for (int i=0;i<4;++i) result.color[i]=color[i]*(m.maps_are_composited?1:result.color[i]);

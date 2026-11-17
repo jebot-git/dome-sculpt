@@ -82,6 +82,15 @@ inline bool overlay_uses_float_emission(const PaintOverlayPacket &packet) noexce
   return false;
 }
 struct PaintOverlayFactory {
+private:
+ static std::shared_ptr<const PaintOverlayPacket> capture_impl(const PaintedMesh &,
+     const std::function<bool()> &,const SourceMaterialBindings *);
+public:
+ // Actual owning joint normal/material/current-paint validation precedes
+ // capture of prepared Source8 contributions. Ordinary capture keeps its guard.
+ static std::shared_ptr<const PaintOverlayPacket> capture_prepared_source(
+     const SculptObject &,const std::function<bool()> &cancelled={});
+
  // Only an authentic current canonical object can mint this transient packet.
  // Existing render packets and persistent paint schemas remain independent.
  static std::shared_ptr<const PaintOverlayPacket> capture_normal_source(const SculptObject &,const std::function<bool()> &cancelled={});
