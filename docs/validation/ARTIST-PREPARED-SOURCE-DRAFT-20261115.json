@@ -1,0 +1,146 @@
+{
+  "scope": "Draft-only fresh current compiler verification, not linked/run/application qualified. Parent fresh currentcore193 independent snapshot pending.",
+  "merge_base": "f1a9970e",
+  "source3d_preserved": true,
+  "compile_status": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-proof-v2-20261115/compile-status.json",
+    "sha256": "8d3d9ab8d299708d6fc6fa997d184f944460951f78bcdfc9733b0497fcc6927b"
+  },
+  "product_and_fixture_sha256": {
+    "src/emission-bake-source.cpp": "9a63685f2a9bd5913082898f30e7ebca6bfa522ebfb4946f00f4e8b2e8be31a3",
+    "src/bake.cpp": "233fcb4d07d223d589a2376065da577aae48c12a70a767b67c8987b15e8e118c",
+    "src/bake-authoring.cpp": "99c050a0f6b9302aa33fb570dd3ec05163c02b4dd5c86d298017be7d5722cae2",
+    "src/source-bake-normal.hpp": "29a343f01a154cfa9d1e8df859f44074e1b9d269e2fddeeac1eaa6d7034545a9",
+    "tests/source-prepared-normal-bake.cpp": "acabc19d660dd1209bd44f1e03a9aed795855c3cf98fc097ca3868d5b407eae1",
+    "CMakeLists.txt": "d6d1dccff66ee7f19906e92580f8c1a2eaa15c081d8cfc6d959ab584c364ec44"
+  },
+  "steps": [
+    {
+      "name": "preprocess-0",
+      "exit": 0,
+      "seconds": 0.11522030830383301
+    },
+    {
+      "name": "preprocess-1",
+      "exit": 0,
+      "seconds": 0.11567449569702148
+    },
+    {
+      "name": "preprocess-2",
+      "exit": 0,
+      "seconds": 0.11614775657653809
+    },
+    {
+      "name": "preprocess-3",
+      "exit": 0,
+      "seconds": 0.11528587341308594
+    },
+    {
+      "name": "compile-0",
+      "exit": 0,
+      "seconds": 3.371812105178833
+    },
+    {
+      "name": "compile-1",
+      "exit": 0,
+      "seconds": 2.978440284729004
+    },
+    {
+      "name": "compile-2",
+      "exit": 0,
+      "seconds": 4.526003837585449
+    },
+    {
+      "name": "compile-3",
+      "exit": 0,
+      "seconds": 8.03348159790039
+    }
+  ],
+  "runtime_executed": false,
+  "archive_reused_or_executed": false,
+  "guard_followup": {
+    "raw_guard_before_all_returns": true,
+    "prepared_guard_original_coordinate_authority": true,
+    "source": "pending current draft commit",
+    "owned_current_compilations": [
+      {
+        "file": "src/emission-bake-source.cpp",
+        "source_sha256": "0260bb13cb1f820e4e661606a639b060be4fa108e421c8c715a3a7d05aaf4407",
+        "object": "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-proof-v7-20261115/emission-bake-source.cpp.o",
+        "object_sha256": "7ff8d40d4d0f6504c233d6dd67ab82fede41927476603e80bcf20249acc86c7a",
+        "compile_status": "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-proof-v7-20261115/compile-status.json",
+        "compile_step": "compile-0",
+        "compile_step_exit": 0,
+        "overall_run_exit": 0
+      },
+      {
+        "file": "src/bake.cpp",
+        "source_sha256": "233fcb4d07d223d589a2376065da577aae48c12a70a767b67c8987b15e8e118c",
+        "object": "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-proof-v2-20261115/bake.cpp.o",
+        "object_sha256": "8ec81d201f0eef9e6a691bde66b2d4b25542be6b0528a60f81ac2834a7218a11",
+        "compile_status": "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-proof-v2-20261115/compile-status.json",
+        "compile_step": "compile-1",
+        "compile_step_exit": 0,
+        "overall_run_exit": 0
+      },
+      {
+        "file": "src/bake-authoring.cpp",
+        "source_sha256": "99c050a0f6b9302aa33fb570dd3ec05163c02b4dd5c86d298017be7d5722cae2",
+        "object": "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-proof-v2-20261115/bake-authoring.cpp.o",
+        "object_sha256": "8e7ebb0083ae29d488436662e65e08b197cff7902fcd856f24d652a7128c2408",
+        "compile_status": "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-proof-v2-20261115/compile-status.json",
+        "compile_step": "compile-2",
+        "compile_step_exit": 0,
+        "overall_run_exit": 0
+      },
+      {
+        "file": "tests/source-prepared-normal-bake.cpp",
+        "source_sha256": "d8557a44198f737bc57cf4f1b9952ed07d053868bd8bd38c2721f31e9379b843",
+        "object": "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-proof-v7-20261115/source-prepared-normal-bake.cpp.o",
+        "object_sha256": "67ca22107b84dd04359aba050ecfb71052cb116da94832cae7cc1bd95547aecc",
+        "compile_status": "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-proof-v7-20261115/compile-status.json",
+        "compile_step": "compile-1",
+        "compile_step_exit": 0,
+        "overall_run_exit": 0
+      }
+    ],
+    "runtime_executed": false,
+    "existing62_and19_runtime": "queued unchanged after freshcore available",
+    "fixture": "Both genuine/missing prepared original emissionUV1 in LDR/HDR; actual first/secondBake; independent normals and expected emission with UV1flip differingUV0 on nonuniform/morph initialsource; current output emission field/linearRGB consumer checks."
+  },
+  "current_scope": "Genuine ordinary version1 prepared-normal source with unchanged UV; actual repeatedBake fixture compiled, runtime pending. v2/UVreprojection/sampling/native32/canonical remain guarded and required.",
+  "negative_source_controls": {
+    "positive_second_Bake_error_bound_unchanged": 0.035,
+    "same_texel_neutral_omitted_swapped_role_minimum_error": 0.07,
+    "executed": false
+  },
+  "additional_compiled_regressions": {
+    "artist-prepared-regression-compile-20261115": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-regression-compile-20261115/compile-status.json",
+      "sha256": "0ba3ccb5e2c3938956fa28934eb6b18034d84fcc8c6314de9bb9f2ea3e82a0cc",
+      "runtime_executed": false
+    },
+    "artist-prepared-render-compile-20261115": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-render-compile-20261115/compile-status.json",
+      "sha256": "d1191d252e2e1d99cca99fdfa3afe32dabd19164562fb062445ffb9733fb1b1a",
+      "runtime_executed": false
+    }
+  },
+  "v2_material_normal_adapter": {
+    "parent_source": "82c73ab9",
+    "prior_failure": "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-release-component-v1-20261115/status.json",
+    "prior_failure_sha256": "396ac62f5494d9b2c5ef48a7b36bb47f86b430da61a646ad5dc57346ff586946",
+    "source_path": "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-source-v2-20261115",
+    "normal_accessor": "SourceNormalPreparationAccess::resolved",
+    "material_channel_source": "Actual SourceMaps+PaintOverlayPacket; normal_projection requires private normal resolver; no legacy baked_base claim.",
+    "fresh_compile_status": "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-proof-v8-20261115/compile-status.json",
+    "fresh_compile_status_sha256": "d452b91563f0fe29cf421f7760300dcf94b4f848408f722d4cc5eea6cfcfbd83",
+    "source_sha256": {
+      "src/emission-bake-source.cpp": "a92975ec5dcf84e50a41cf0c41bc227e7f41e3274cb2178efdd9af9fbf6a0aae",
+      "src/bake.cpp": "80fcc0f47c8dd3b5c700ab0973e27d3d0278de865f10a5f2f36d0af132d79f93",
+      "src/bake-authoring.cpp": "99c050a0f6b9302aa33fb570dd3ec05163c02b4dd5c86d298017be7d5722cae2",
+      "tests/source-prepared-normal-bake.cpp": "5d9d81e936517d64f134513dd35b2ce36aa0e72239641fa60206a57e3d0fc7e2"
+    },
+    "runtime_retry_executed": false
+  }
+}
