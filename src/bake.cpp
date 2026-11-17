@@ -172,6 +172,8 @@ void validate(const Mesh &low,const BakeSource &source,const BakeOptions &o,cons
     throw std::invalid_argument("Invalid source material assignments");
   for (auto id:source.triangle_materials) if (id>=source.materials.size()) throw std::out_of_range("Unknown source triangle material");
   for (const auto &m:source.materials) {
+    if(source_normals.requires_source_pairing()&&(!m.maps||!source_normals.matches_prepared_source(*m.maps)))
+      throw std::invalid_argument("Prepared source resolver requires its complete paired material packet");
     m.material.validate();
     if(!m.resolved_emission&&(detail::hdr_emission(m.material.emissive)||(m.maps&&m.maps->overlay&&m.maps->overlay->native_geometry())))
       throw std::invalid_argument("Physical emission Bake requires its actual float sampling/output adapter");

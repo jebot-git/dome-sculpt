@@ -21,7 +21,9 @@ transient overlay packet binds the exact current material/frame and deformation
 owners, including Clear captures whose field event is absent. The normal
 resolver verifies this binding, material source owner, actual baked event and
 padding owner. Naked Bake, marker stripping, stale replacement events and
-foreign Clear frame owners must refuse. No persistent schema, frontend or
+foreign Clear frame owners must refuse. The resolver itself requires pairing
+even if a caller strips the packet certificate or removes its entire material
+view; admission never depends only on the presence of an untrusted DTO marker. No persistent schema, frontend or
 public TextureMaps layout changes are introduced.
 
 Capture charges its bounded frame/field/domain arrays before allocation. Existing
