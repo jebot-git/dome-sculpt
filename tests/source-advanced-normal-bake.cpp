@@ -12,9 +12,9 @@ template<class F>bool refuses(F f){try{f();return false;}catch(const std::except
 Scene prepared(bool legacy){
  Scene s;auto &low=s.active();Mesh m;m.positions={{-.5f,-.5f,0},{.5f,-.5f,0},{.5f,.5f,0},{-.5f,.5f,0}};m.normals.assign(4,{0,0,1});m.uv={{{0,0}},{{1,0}},{{1,1}},{{0,1}}};m.indices={0,1,2,0,2,3};
  low.mesh_active=true;
- // Genuine independent material data survives beside the normal field.
- auto maps=std::make_shared<PaintSourceMaps>();maps->color.image=std::make_shared<const Image>(Image{2,2,{255,60,90,255,50,220,80,255,30,70,240,255,210,180,30,255}});maps->color.texcoord=1;
- auto logical=m.uv;for(auto&q:logical){const auto u=q[0];q={.1f+.8f*q[1],.95f-.7f*u};}maps->uv1=std::make_shared<const std::vector<std::array<float,2>>>(logical);low.painted=capture_source_sampling(m,maps,64);low.material_bindings=blank_typed(legacy);
+ // Begin with an ordinary genuine first-Bake target. Independent current
+ // material maps will be produced by real SourceUV adoption after authoring.
+ low.painted=std::make_shared<PaintedMesh>(m,64);low.material_bindings=blank_typed(legacy);
  DeformationState deformation(m);deformation.morphs=MorphSet(m);auto key=m.positions;key[0].z=.045f;key[2].z=-.025f;deformation.morphs->set_target(m,"Retained native morph",key);deformation.skeleton=Skeleton{{{"root",-1,{},1},{"child",0,{},1}}};deformation.skin=SkinWeights{};deformation.skin->vertices={{{0,.7f},{1,.3f}},{{0,.2f},{1,.8f}},{{0,.4f},{1,.6f}},{{0,.9f},{1,.1f}}};s.set_deformation(1,deformation);
  auto artist=fixture(legacy,false);const auto id=s.add("Immutable artist high",Volume{});auto high=artist.scene.object(artist.source);high.id=id;high.transform.position.z=.15f;high.visible=false;high.locked=true;s.object(id)=std::move(high);s.select(1);s.validate();
  ObjectBakeSettings settings;settings.prepare_normals=true;settings.front_mm=settings.back_mm=500;settings.ao_samples=0;settings.padding=0;settings.normal_error=.03f;const auto original_high=s.object(id).painted;
