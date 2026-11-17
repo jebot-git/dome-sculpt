@@ -1,0 +1,520 @@
+{
+  "scope": "CPU-only component; no strict sanitizers, graphics, public desktop/XR or whole application admission",
+  "product_commit": "90fad800bc5aac3dc2421595532f4d2ef8429797",
+  "fixture_commit": "aa8db16a3ebc8e664b5a1f7c4138e435e30dcbc0",
+  "actual_status_sha256": "84f25915d37ea6e5c7e0ae4811de22a914f06b8c114155996076ac8f4393d358",
+  "actual_driver_sha256": "6cb82a61b16390ac376e05a07a4a08574537384913eee1c0b18c21182a43634b",
+  "actual_exit_code": 0,
+  "advanced_checks": 263495,
+  "cases": [
+    {
+      "legacy": 0.0,
+      "live": 0.0,
+      "seam": 0.0,
+      "retained": 0.0,
+      "direct_error": 2.60097e-07,
+      "wrong_domain": 0.341112,
+      "omitted": 0.263992,
+      "swapped": 0.331173,
+      "second_bake_error": 0.00342964,
+      "interior_omitted": 0.788077,
+      "interior_swapped": 0.78415,
+      "interior_wrong": 0.784751,
+      "color_error": 8.75746e-07,
+      "interior": 812.0
+    },
+    {
+      "legacy": 0.0,
+      "live": 0.0,
+      "seam": 0.0,
+      "retained": 1.0,
+      "direct_error": 3.02385e-07,
+      "wrong_domain": 0.393641,
+      "omitted": 0.264441,
+      "swapped": 0.338425,
+      "second_bake_error": 0.00426066,
+      "interior_omitted": 0.790335,
+      "interior_swapped": 0.78379,
+      "interior_wrong": 0.786413,
+      "color_error": 8.75746e-07,
+      "interior": 812.0
+    },
+    {
+      "legacy": 0.0,
+      "live": 0.0,
+      "seam": 1.0,
+      "retained": 0.0,
+      "direct_error": 2.60097e-07,
+      "wrong_domain": 0.341112,
+      "omitted": 0.263992,
+      "swapped": 0.331173,
+      "second_bake_error": 0.00342964,
+      "interior_omitted": 0.788077,
+      "interior_swapped": 0.78415,
+      "interior_wrong": 0.784751,
+      "color_error": 8.75746e-07,
+      "interior": 812.0
+    },
+    {
+      "legacy": 0.0,
+      "live": 0.0,
+      "seam": 1.0,
+      "retained": 1.0,
+      "direct_error": 3.02385e-07,
+      "wrong_domain": 0.393641,
+      "omitted": 0.264441,
+      "swapped": 0.338425,
+      "second_bake_error": 0.00426066,
+      "interior_omitted": 0.790335,
+      "interior_swapped": 0.78379,
+      "interior_wrong": 0.786413,
+      "color_error": 8.75746e-07,
+      "interior": 812.0
+    },
+    {
+      "legacy": 0.0,
+      "live": 1.0,
+      "seam": 0.0,
+      "retained": 0.0,
+      "direct_error": 2.53775e-07,
+      "wrong_domain": 0.340887,
+      "omitted": 0.263507,
+      "swapped": 0.331198,
+      "second_bake_error": 0.00443031,
+      "interior_omitted": 0.783908,
+      "interior_swapped": 0.780051,
+      "interior_wrong": 0.779987,
+      "color_error": 8.75746e-07,
+      "interior": 812.0
+    },
+    {
+      "legacy": 0.0,
+      "live": 1.0,
+      "seam": 0.0,
+      "retained": 1.0,
+      "direct_error": 2.92137e-07,
+      "wrong_domain": 0.392387,
+      "omitted": 0.263952,
+      "swapped": 0.33846,
+      "second_bake_error": 0.00468619,
+      "interior_omitted": 0.786135,
+      "interior_swapped": 0.77966,
+      "interior_wrong": 0.782214,
+      "color_error": 8.75746e-07,
+      "interior": 812.0
+    },
+    {
+      "legacy": 0.0,
+      "live": 1.0,
+      "seam": 1.0,
+      "retained": 0.0,
+      "direct_error": 2.53775e-07,
+      "wrong_domain": 0.340887,
+      "omitted": 0.263507,
+      "swapped": 0.331198,
+      "second_bake_error": 0.00463855,
+      "interior_omitted": 0.783908,
+      "interior_swapped": 0.780051,
+      "interior_wrong": 0.779987,
+      "color_error": 8.75746e-07,
+      "interior": 812.0
+    },
+    {
+      "legacy": 0.0,
+      "live": 1.0,
+      "seam": 1.0,
+      "retained": 1.0,
+      "direct_error": 2.92137e-07,
+      "wrong_domain": 0.392387,
+      "omitted": 0.263952,
+      "swapped": 0.33846,
+      "second_bake_error": 0.00473739,
+      "interior_omitted": 0.786135,
+      "interior_swapped": 0.77966,
+      "interior_wrong": 0.782214,
+      "color_error": 8.75746e-07,
+      "interior": 812.0
+    },
+    {
+      "legacy": 1.0,
+      "live": 0.0,
+      "seam": 0.0,
+      "retained": 0.0,
+      "direct_error": 3.16573e-07,
+      "wrong_domain": 0.680645,
+      "omitted": 0.629565,
+      "swapped": 0.592023,
+      "second_bake_error": 0.00351443,
+      "interior_omitted": 0.694962,
+      "interior_swapped": 0.731016,
+      "interior_wrong": 0.894635,
+      "color_error": 8.75746e-07,
+      "interior": 812.0
+    },
+    {
+      "legacy": 1.0,
+      "live": 0.0,
+      "seam": 0.0,
+      "retained": 1.0,
+      "direct_error": 3.1882e-07,
+      "wrong_domain": 0.636858,
+      "omitted": 0.61198,
+      "swapped": 0.575879,
+      "second_bake_error": 0.00470385,
+      "interior_omitted": 0.692003,
+      "interior_swapped": 0.721136,
+      "interior_wrong": 1.1321,
+      "color_error": 8.75746e-07,
+      "interior": 812.0
+    },
+    {
+      "legacy": 1.0,
+      "live": 0.0,
+      "seam": 1.0,
+      "retained": 0.0,
+      "direct_error": 3.16573e-07,
+      "wrong_domain": 0.680645,
+      "omitted": 0.629565,
+      "swapped": 0.592023,
+      "second_bake_error": 0.00351443,
+      "interior_omitted": 0.694962,
+      "interior_swapped": 0.731016,
+      "interior_wrong": 0.894635,
+      "color_error": 8.75746e-07,
+      "interior": 812.0
+    },
+    {
+      "legacy": 1.0,
+      "live": 0.0,
+      "seam": 1.0,
+      "retained": 1.0,
+      "direct_error": 3.1882e-07,
+      "wrong_domain": 0.636858,
+      "omitted": 0.61198,
+      "swapped": 0.575879,
+      "second_bake_error": 0.00470385,
+      "interior_omitted": 0.692003,
+      "interior_swapped": 0.721136,
+      "interior_wrong": 1.1321,
+      "color_error": 8.75746e-07,
+      "interior": 812.0
+    },
+    {
+      "legacy": 1.0,
+      "live": 1.0,
+      "seam": 0.0,
+      "retained": 0.0,
+      "direct_error": 3.5728e-07,
+      "wrong_domain": 0.677593,
+      "omitted": 0.626442,
+      "swapped": 0.588968,
+      "second_bake_error": 0.00444997,
+      "interior_omitted": 0.691024,
+      "interior_swapped": 0.727374,
+      "interior_wrong": 0.892412,
+      "color_error": 8.75746e-07,
+      "interior": 812.0
+    },
+    {
+      "legacy": 1.0,
+      "live": 1.0,
+      "seam": 0.0,
+      "retained": 1.0,
+      "direct_error": 3.31037e-07,
+      "wrong_domain": 0.636518,
+      "omitted": 0.60905,
+      "swapped": 0.573014,
+      "second_bake_error": 0.00469773,
+      "interior_omitted": 0.688094,
+      "interior_swapped": 0.717632,
+      "interior_wrong": 1.13169,
+      "color_error": 8.75746e-07,
+      "interior": 812.0
+    },
+    {
+      "legacy": 1.0,
+      "live": 1.0,
+      "seam": 1.0,
+      "retained": 0.0,
+      "direct_error": 3.5728e-07,
+      "wrong_domain": 0.677593,
+      "omitted": 0.626442,
+      "swapped": 0.588968,
+      "second_bake_error": 0.00477895,
+      "interior_omitted": 0.691024,
+      "interior_swapped": 0.727374,
+      "interior_wrong": 0.892412,
+      "color_error": 8.75746e-07,
+      "interior": 812.0
+    },
+    {
+      "legacy": 1.0,
+      "live": 1.0,
+      "seam": 1.0,
+      "retained": 1.0,
+      "direct_error": 3.31037e-07,
+      "wrong_domain": 0.636518,
+      "omitted": 0.60905,
+      "swapped": 0.573014,
+      "second_bake_error": 0.00466044,
+      "interior_omitted": 0.688094,
+      "interior_swapped": 0.717632,
+      "interior_wrong": 1.13169,
+      "color_error": 8.75746e-07,
+      "interior": 812.0
+    },
+    {
+      "legacy": 0.0,
+      "live": 1.0,
+      "seam": 1.0,
+      "retained": 1.0,
+      "direct_error": 2.92137e-07,
+      "wrong_domain": 0.277578,
+      "omitted": 0.263952,
+      "swapped": 0.33846,
+      "second_bake_error": 0.00487417,
+      "interior_omitted": 0.790497,
+      "interior_swapped": 0.780046,
+      "interior_wrong": 0.738823,
+      "color_error": 0.0145202,
+      "interior": 2352.0
+    }
+  ],
+  "legacy_counts": {
+    "prepared": 91,
+    "artist": 139
+  },
+  "steps": [
+    {
+      "name": "source-advanced-normal-bake",
+      "argv": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-compile-20261117/links-chain-v2/source-advanced-normal-bake",
+        "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-compile-20261117/native-links-chain-v2/source-advanced-normal-bake-outputs"
+      ],
+      "cwd": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-compile-20261117/native-links-chain-v2",
+      "exit_code": 0,
+      "elapsed": 1.6453649679897353,
+      "peak_aggregate_rss": 44941312,
+      "peak_aggregate_vmpeak": 667402240,
+      "guard": null,
+      "owned": [
+        {
+          "pid": 2830339,
+          "ppid": 2830222,
+          "pgrp": 2830339,
+          "start": "12468648",
+          "rss": 44941312,
+          "vmpeak": 667402240
+        }
+      ]
+    },
+    {
+      "name": "source-prepared-normal-bake",
+      "argv": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-compile-20261117/links-chain-v1/source-prepared-normal-bake",
+        "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-compile-20261117/native-links-chain-v2/source-prepared-normal-bake-outputs"
+      ],
+      "cwd": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-compile-20261117/native-links-chain-v2",
+      "exit_code": 0,
+      "elapsed": 0.3392324119922705,
+      "peak_aggregate_rss": 24981504,
+      "peak_aggregate_vmpeak": 719216640,
+      "guard": null,
+      "owned": [
+        {
+          "pid": 2830752,
+          "ppid": 2830222,
+          "pgrp": 2830752,
+          "start": "12468862",
+          "rss": 24981504,
+          "vmpeak": 719216640
+        }
+      ]
+    },
+    {
+      "name": "source-artist-normal-bake",
+      "argv": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-compile-20261117/links-chain-v1/source-artist-normal-bake",
+        "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-compile-20261117/native-links-chain-v2/source-artist-normal-bake-outputs"
+      ],
+      "cwd": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-compile-20261117/native-links-chain-v2",
+      "exit_code": 0,
+      "elapsed": 0.20240270700014662,
+      "peak_aggregate_rss": 24260608,
+      "peak_aggregate_vmpeak": 539676672,
+      "guard": null,
+      "owned": [
+        {
+          "pid": 2830913,
+          "ppid": 2830222,
+          "pgrp": 2830913,
+          "start": "12468943",
+          "rss": 24260608,
+          "vmpeak": 539676672
+        }
+      ]
+    }
+  ],
+  "input_drift": [],
+  "lease_release": 1794946765.0468695,
+  "owned_identity_absence_verified": true,
+  "lease_independent": {
+    "independent_nb_available": true,
+    "inode": 99618
+  },
+  "ordered_save_pairs": [
+    {
+      "native": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-compile-20261117/native-links-chain-v2/source-advanced-normal-bake-outputs/mt0-posed-seam-raster.dsculpt",
+      "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-compile-20261117/native-links-chain-v2/source-advanced-normal-bake-outputs/mt0-posed-seam-raster-ordered.dsculpt",
+      "native_sha256": "d29c44ae0a22a0db7836ddf1669dfe302c7ae8e07b419a7ccef2437ced557d97",
+      "ordered_sha256": "d29c44ae0a22a0db7836ddf1669dfe302c7ae8e07b419a7ccef2437ced557d97",
+      "identical": true
+    },
+    {
+      "native": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-compile-20261117/native-links-chain-v2/source-advanced-normal-bake-outputs/mt0-posed-seam-retained.dsculpt",
+      "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-compile-20261117/native-links-chain-v2/source-advanced-normal-bake-outputs/mt0-posed-seam-retained-ordered.dsculpt",
+      "native_sha256": "ba53ccacc38938f9f32df80be90e5c5a710358f48daf1b3a38fa5d18da0b3cbc",
+      "ordered_sha256": "ba53ccacc38938f9f32df80be90e5c5a710358f48daf1b3a38fa5d18da0b3cbc",
+      "identical": true
+    },
+    {
+      "native": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-compile-20261117/native-links-chain-v2/source-advanced-normal-bake-outputs/mt0-posed-shared-raster.dsculpt",
+      "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-compile-20261117/native-links-chain-v2/source-advanced-normal-bake-outputs/mt0-posed-shared-raster-ordered.dsculpt",
+      "native_sha256": "bb2845c448aa0e7277c77c4a148115148b41d678eca6454cfffa6f9dd3cdf3b2",
+      "ordered_sha256": "bb2845c448aa0e7277c77c4a148115148b41d678eca6454cfffa6f9dd3cdf3b2",
+      "identical": true
+    },
+    {
+      "native": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-compile-20261117/native-links-chain-v2/source-advanced-normal-bake-outputs/mt0-posed-shared-retained.dsculpt",
+      "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-compile-20261117/native-links-chain-v2/source-advanced-normal-bake-outputs/mt0-posed-shared-retained-ordered.dsculpt",
+      "native_sha256": "0a7e9fd73c3e24d2997195b1cf29dff4fb5c4648da62cfcccd1a0a49f5b0a374",
+      "ordered_sha256": "0a7e9fd73c3e24d2997195b1cf29dff4fb5c4648da62cfcccd1a0a49f5b0a374",
+      "identical": true
+    },
+    {
+      "native": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-compile-20261117/native-links-chain-v2/source-advanced-normal-bake-outputs/mt0-rest-seam-raster.dsculpt",
+      "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-compile-20261117/native-links-chain-v2/source-advanced-normal-bake-outputs/mt0-rest-seam-raster-ordered.dsculpt",
+      "native_sha256": "db7eb735005eaa3dfc7de1601ffd04083b8eb19f37fa71f4c0362af940b7ac7e",
+      "ordered_sha256": "db7eb735005eaa3dfc7de1601ffd04083b8eb19f37fa71f4c0362af940b7ac7e",
+      "identical": true
+    },
+    {
+      "native": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-compile-20261117/native-links-chain-v2/source-advanced-normal-bake-outputs/mt0-rest-seam-retained.dsculpt",
+      "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-compile-20261117/native-links-chain-v2/source-advanced-normal-bake-outputs/mt0-rest-seam-retained-ordered.dsculpt",
+      "native_sha256": "6dcd4381b04864db9869ec6f732e1383a673a7894dc03ca4985829ac4a3a8500",
+      "ordered_sha256": "6dcd4381b04864db9869ec6f732e1383a673a7894dc03ca4985829ac4a3a8500",
+      "identical": true
+    },
+    {
+      "native": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-compile-20261117/native-links-chain-v2/source-advanced-normal-bake-outputs/mt0-rest-shared-raster.dsculpt",
+      "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-compile-20261117/native-links-chain-v2/source-advanced-normal-bake-outputs/mt0-rest-shared-raster-ordered.dsculpt",
+      "native_sha256": "ac4c27167035474a18629ee5de6a931a6daffbdb7f0c4924184bdeaa9c9dc639",
+      "ordered_sha256": "ac4c27167035474a18629ee5de6a931a6daffbdb7f0c4924184bdeaa9c9dc639",
+      "identical": true
+    },
+    {
+      "native": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-compile-20261117/native-links-chain-v2/source-advanced-normal-bake-outputs/mt0-rest-shared-retained.dsculpt",
+      "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-compile-20261117/native-links-chain-v2/source-advanced-normal-bake-outputs/mt0-rest-shared-retained-ordered.dsculpt",
+      "native_sha256": "8223002fac6e3dc3c47fb61a0b5855cf12391cb04eae0e102f9eca649131a062",
+      "ordered_sha256": "8223002fac6e3dc3c47fb61a0b5855cf12391cb04eae0e102f9eca649131a062",
+      "identical": true
+    },
+    {
+      "native": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-compile-20261117/native-links-chain-v2/source-advanced-normal-bake-outputs/mt1-posed-seam-raster.dsculpt",
+      "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-compile-20261117/native-links-chain-v2/source-advanced-normal-bake-outputs/mt1-posed-seam-raster-ordered.dsculpt",
+      "native_sha256": "23b41ae57ca6be92e9215a52bd7edead8ae18ee832605ea5029a142d3ca473a5",
+      "ordered_sha256": "23b41ae57ca6be92e9215a52bd7edead8ae18ee832605ea5029a142d3ca473a5",
+      "identical": true
+    },
+    {
+      "native": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-compile-20261117/native-links-chain-v2/source-advanced-normal-bake-outputs/mt1-posed-seam-retained.dsculpt",
+      "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-compile-20261117/native-links-chain-v2/source-advanced-normal-bake-outputs/mt1-posed-seam-retained-ordered.dsculpt",
+      "native_sha256": "d9d042e89334877b7d6151bebee6750a750a7961a2a33ea41c3afee01f80794b",
+      "ordered_sha256": "d9d042e89334877b7d6151bebee6750a750a7961a2a33ea41c3afee01f80794b",
+      "identical": true
+    },
+    {
+      "native": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-compile-20261117/native-links-chain-v2/source-advanced-normal-bake-outputs/mt1-posed-seam-retained-three-edits.dsculpt",
+      "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-compile-20261117/native-links-chain-v2/source-advanced-normal-bake-outputs/mt1-posed-seam-retained-three-edits-ordered.dsculpt",
+      "native_sha256": "7bfc289cd9cff792ceee45fbba4c1b46da130a861d0ded89d5963fe7b30e0165",
+      "ordered_sha256": "7bfc289cd9cff792ceee45fbba4c1b46da130a861d0ded89d5963fe7b30e0165",
+      "identical": true
+    },
+    {
+      "native": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-compile-20261117/native-links-chain-v2/source-advanced-normal-bake-outputs/mt1-posed-shared-raster.dsculpt",
+      "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-compile-20261117/native-links-chain-v2/source-advanced-normal-bake-outputs/mt1-posed-shared-raster-ordered.dsculpt",
+      "native_sha256": "e1c89a8f72395f1d02a7a178a84fada8da635c9deb84b48c708634eb3849ba86",
+      "ordered_sha256": "e1c89a8f72395f1d02a7a178a84fada8da635c9deb84b48c708634eb3849ba86",
+      "identical": true
+    },
+    {
+      "native": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-compile-20261117/native-links-chain-v2/source-advanced-normal-bake-outputs/mt1-posed-shared-retained.dsculpt",
+      "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-compile-20261117/native-links-chain-v2/source-advanced-normal-bake-outputs/mt1-posed-shared-retained-ordered.dsculpt",
+      "native_sha256": "9f0e4cbe3043dfe3dde5b5c70a24fd1edc4d5cbe774fa7a2847cff514e272922",
+      "ordered_sha256": "9f0e4cbe3043dfe3dde5b5c70a24fd1edc4d5cbe774fa7a2847cff514e272922",
+      "identical": true
+    },
+    {
+      "native": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-compile-20261117/native-links-chain-v2/source-advanced-normal-bake-outputs/mt1-rest-seam-raster.dsculpt",
+      "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-compile-20261117/native-links-chain-v2/source-advanced-normal-bake-outputs/mt1-rest-seam-raster-ordered.dsculpt",
+      "native_sha256": "b829bb7002c67cea72896e230132a21a46538daf79049a700643220cbd58aed1",
+      "ordered_sha256": "b829bb7002c67cea72896e230132a21a46538daf79049a700643220cbd58aed1",
+      "identical": true
+    },
+    {
+      "native": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-compile-20261117/native-links-chain-v2/source-advanced-normal-bake-outputs/mt1-rest-seam-retained.dsculpt",
+      "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-compile-20261117/native-links-chain-v2/source-advanced-normal-bake-outputs/mt1-rest-seam-retained-ordered.dsculpt",
+      "native_sha256": "695de302e4615d38dd4fbcac06bf0bac7bde63efa98c2d9df65309ec95b945fc",
+      "ordered_sha256": "695de302e4615d38dd4fbcac06bf0bac7bde63efa98c2d9df65309ec95b945fc",
+      "identical": true
+    },
+    {
+      "native": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-compile-20261117/native-links-chain-v2/source-advanced-normal-bake-outputs/mt1-rest-shared-raster.dsculpt",
+      "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-compile-20261117/native-links-chain-v2/source-advanced-normal-bake-outputs/mt1-rest-shared-raster-ordered.dsculpt",
+      "native_sha256": "247419328e5d8016ee8fe2413241feecf9219e2fcdbf5a751422397e6498e504",
+      "ordered_sha256": "247419328e5d8016ee8fe2413241feecf9219e2fcdbf5a751422397e6498e504",
+      "identical": true
+    },
+    {
+      "native": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-compile-20261117/native-links-chain-v2/source-advanced-normal-bake-outputs/mt1-rest-shared-retained.dsculpt",
+      "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-compile-20261117/native-links-chain-v2/source-advanced-normal-bake-outputs/mt1-rest-shared-retained-ordered.dsculpt",
+      "native_sha256": "14edc2bef0b63378de40536744c452df76f154db18626fbf2a86165167a26b01",
+      "ordered_sha256": "14edc2bef0b63378de40536744c452df76f154db18626fbf2a86165167a26b01",
+      "identical": true
+    }
+  ],
+  "maximums": {
+    "direct_error": 3.5728e-07,
+    "second_bake_error": 0.00487417,
+    "color_error": 0.0145202
+  },
+  "minimums": {
+    "wrong_domain": 0.277578,
+    "omitted": 0.263507,
+    "swapped": 0.331173,
+    "interior_omitted": 0.688094,
+    "interior_swapped": 0.717632,
+    "interior_wrong": 0.738823
+  },
+  "ancestor_policy": "Higher historical declared replay caps are conservatively refused under smaller callers; explicit sufficient quota remains bounded at512MiB. Actual recursive material DAG is bounded64-depth/256-bindings with cancellation and cycle rejection. This is not unbounded support.",
+  "parent_proof_commit": "5c5eda25b86920eb7bce491c8f53f0a130a6a2bf",
+  "unsupported": [
+    "canonical normal/material domains",
+    "native32 normal/material domains",
+    "independent writable-paint metadata domains",
+    "combined Source8/prepared-normal authority"
+  ],
+  "required_next": [
+    "strict sanitizer component qualification",
+    "new-family graphical consumer controls",
+    "public desktop/XR controls",
+    "combined integration freeze/build/qualification"
+  ],
+  "evidence_archive": {
+    "path": "docs/validation/artist-advanced-chain-native-20261117.tar.xz",
+    "sha256": "bc1d9561b5557a0c7752d9ad7222ae525260344c663f46c7e3c0dbb7ffdec016",
+    "bytes": 191700,
+    "members": 107,
+    "manifest_sha256": "a4e4755b0625c4e00eb70890ae5e8a1bf1018f47fcf943af68399dd18e56fe9e"
+  }
+}
