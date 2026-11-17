@@ -114,17 +114,28 @@ Wayland evidence are recorded separately above. Use the common lease
 owned cleanup. Original87/SAN/runtime failures remain honest separate records.
 
 A further coherent source branch work/authoring-public-integration-20261117
-(commitc9de1c7cd00a18b23ce54eba650ca6fccdd5684c) merges the test-onlyf1 correction
+(commit5605520b) merges the test-onlyf1 correction
 with090f without modifying the still-building frozen source. Product/tests/build
-files matchf1 exactly. No whole-buildc9 claim follows from this source merge.
+files matchf1 exactly. No whole-build560 claim follows from this source merge.
+The separate pushed admission draft637ea1f4 on
+work/normal-runtime-admission-20261117 merges that source with main771031f8;
+read NORMAL-RUNTIME-ADMISSION-DRAFT-20261117.md in that worktree. Strict
+sanitizer closure still gates product admission into main.
 
 ## Next production slice
 
 Agent artist_normal_completion is implementing owning Rasterize/RetainSource
 normal Bake-source adapters in a separate branch, preserving source domains,
 PBR/MToon roles, frame/pose transport and exact normal-event/material pairing.
-Checkpoint102f0af4 is pushed; targeted native testing is still in progress.
-Do not treat compile success as qualification. Genuine first-Bake fixture setup
+Checkpoint102f0af4 now passes all16 actual native combinations with249415
+checks, plus prepared91 and artist139; read
+[the component proof](ARTIST-ADVANCED-NATIVE-20261117.md). Its separate child
+90fad800 bounds the full owning ancestor replay graph before deep validation;
+fixtureaa8db16a passes17 native cases/263495 checks plus prepared91/artist139,
+including chained edits, every observed traversal cancellation boundary, cycle
+refusal and atomic worker/Save quota refusal. The child proof seal is being
+prepared by its owning agent; native success is not strict sanitizer, graphics
+or whole-App admission. Genuine first-Bake fixture setup
 and stale-event negatives were corrected without weakening source guards;
 original failures remain preserved. Canonical/native32/independent writable-paint
 domains remain explicit refusals pending their own actual adapters.
@@ -138,8 +149,9 @@ runtime /opt/fltk-vr/bdf-runtime. Updated unrelated /usr font-library copies are
 outside the actual selected72-provider closure; do not rewrite old expectations
 or rebuild solely because an unused historical/global manifest differs.
 
-The [progress assessment](PROGRESS-ASSESSMENT-20261115.md) describes remaining
-production work; its requested-pause status is superseded by the user's resume.
+The [current progress assessment](PROGRESS-ASSESSMENT-20261117.md) describes
+remaining production work. Earlier requested pauses are superseded by the
+user's resume; the full goal remains active.
 Complete production sculpt/local meshing/recovery, painting/texture sets/baking,
 remesh/retopology/UV workflows, humanoid/rig/weight authoring, glTF/VRM coverage,
 physical XR/input and accelerator execution remain required. Controller trays
