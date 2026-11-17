@@ -1,0 +1,410 @@
+{
+  "state": "terminal",
+  "exit": 0,
+  "scope": "Three fresh Release component CPU links only; no product execution. v1native actual0 followed driver1 closure omission is retained separately.",
+  "source_tuple": {
+    "product": "90fad800bc5aac3dc2421595532f4d2ef8429797",
+    "test_fixture_and_runtime": "8bb4072dc1ad60bb7b11b8a325c930f8b2c0c176",
+    "unchanged_UI_support_literal_asset_context": "090f009ede2c0623ca616fe892223b4f68f1c2c4"
+  },
+  "source": "8bb4072dc1ad60bb7b11b8a325c930f8b2c0c176",
+  "v1_native_link_exit": 0,
+  "v1_driver_exit": 1,
+  "v1_status_sha256": "c8bdcd978e6f2b32115659a5844b11d5ada5bb96b6a0c42956347377ea2b4d74",
+  "v2_status_sha256": "f3c4408bd05b6cb1d0e27bf2696db715b0496c68151d53044907c82051d25fb6",
+  "v2_plan_sha256": "fe5547f4bcbb028a702cda4d92cdd4ac665a275fee8d78d2e33768c5589d6cfe",
+  "v2_driver_sha256": "fda4c8486e4d7b8cddb298182a284ca5e88e7a4bbe67e933dd3f05b04a711c95",
+  "actual_link_dependencies": {
+    "native": 84,
+    "runtime": 41,
+    "app": 174
+  },
+  "products": {
+    "native": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-public-normal-links-v2-20261117/advanced-public-native",
+      "sha256": "e7a7259550a9e2ec97c9d49913cc9700d0752c698e335da7e5c78e771ae8a789"
+    },
+    "runtime": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-public-normal-links-v2-20261117/libdome-sculpt-source8-public-runtime.so",
+      "sha256": "e6c9ea934416eddb2e0e1a595c2d2c7352549404f7b2937a51532c11cba02370"
+    },
+    "app": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-public-normal-links-v2-20261117/dome-sculpt",
+      "sha256": "41a7cf4e63535e64a682b822a602e3058a5d4591297c5d8629e0d6f715ca7d37"
+    }
+  },
+  "input_pin_count": 44469,
+  "input_drift": [],
+  "all_commands_exit_zero": true,
+  "all_recorded_children_absent": true,
+  "unit_stopped": {
+    "ActiveState": "inactive",
+    "SubState": "dead",
+    "Result": "success",
+    "ExecMainStatus": "0"
+  },
+  "lease_used": false,
+  "dynamic_boundaries": {
+    "native": {
+      "prior": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-compile-20261117/links-chain-v1/source-advanced-normal-bake",
+      "prior_sha256": "add4ddd80d6af3b7a67e48631b895d82d3fd737326a5313c90e43a785fd2c847",
+      "new": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-public-normal-links-v2-20261117/advanced-public-native",
+        "sha256": "e7a7259550a9e2ec97c9d49913cc9700d0752c698e335da7e5c78e771ae8a789"
+      },
+      "dynamic_boundary_exact": true,
+      "boundary": [
+        "0x0000000000000001 (NEEDED)             Shared library: [libOpenGL.so.0]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libEGL.so.1]",
+        "0x0000000000000001 (NEEDED)             Shared library: [liblapacke.so.3]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libpng16.so.16]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libjpeg.so.62]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libz.so.1]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libOpenEXR-3_2.so.31]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libOpenEXRUtil-3_2.so.31]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libOpenEXRCore-3_2.so.31]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libIex-3_2.so.31]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libIlmThread-3_2.so.31]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libImath-3_1.so.29]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libgcc_s.so.1]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libstdc++.so.6]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libm.so.6]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]"
+      ],
+      "prior_defined_dynamic_symbols": 43,
+      "new_defined_dynamic_symbols": 43,
+      "added_symbols": [],
+      "removed_symbols": [],
+      "actual_link_dependency_incidences": 84
+    },
+    "runtime": {
+      "prior": "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-public-link-v3-20261115/libdome-sculpt-source8-public-runtime.so",
+      "prior_sha256": "27052029731357a3c45507e2f08583b2a123ca921743db14d1f3b1880141f9b2",
+      "new": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-public-normal-links-v2-20261117/libdome-sculpt-source8-public-runtime.so",
+        "sha256": "e6c9ea934416eddb2e0e1a595c2d2c7352549404f7b2937a51532c11cba02370"
+      },
+      "dynamic_boundary_exact": true,
+      "boundary": [
+        "0x0000000000000001 (NEEDED)             Shared library: [libharfbuzz.so.0]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libEGL.so.1]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libGL.so.1]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libfontconfig.so.1]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libfreetype.so.6]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libicui18n.so.77]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libicuuc.so.77]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libstdc++.so.6]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libm.so.6]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libgcc_s.so.1]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]",
+        "0x000000000000000e (SONAME)             Library soname: [libdome-sculpt-source8-public-runtime.so]",
+        "0x000000000000001d (RUNPATH)            Library runpath: [/opt/fltk-vr/bdf-runtime/lib]"
+      ],
+      "prior_defined_dynamic_symbols": 182,
+      "new_defined_dynamic_symbols": 188,
+      "added_symbols": [
+        "_ZN8nlohmann16json_abi_v3_12_010basic_jsonISt3mapSt6vectorNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEblmdSaNS0_14adl_serializerES3_IhSaIhEEvEC1IRA2_KcA2_cLi0EEEOT_",
+        "_ZN8nlohmann16json_abi_v3_12_010basic_jsonISt3mapSt6vectorNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEblmdSaNS0_14adl_serializerES3_IhSaIhEEvEC1IRA9_KcA9_cLi0EEEOT_",
+        "_ZN8nlohmann16json_abi_v3_12_010basic_jsonISt3mapSt6vectorNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEblmdSaNS0_14adl_serializerES3_IhSaIhEEvEC1IS9_S9_Li0EEEOT_",
+        "_ZN8nlohmann16json_abi_v3_12_010basic_jsonISt3mapSt6vectorNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEblmdSaNS0_14adl_serializerES3_IhSaIhEEvEC2IRA2_KcA2_cLi0EEEOT_",
+        "_ZN8nlohmann16json_abi_v3_12_010basic_jsonISt3mapSt6vectorNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEblmdSaNS0_14adl_serializerES3_IhSaIhEEvEC2IRA9_KcA9_cLi0EEEOT_",
+        "_ZN8nlohmann16json_abi_v3_12_010basic_jsonISt3mapSt6vectorNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEblmdSaNS0_14adl_serializerES3_IhSaIhEEvEC2IS9_S9_Li0EEEOT_"
+      ],
+      "removed_symbols": [],
+      "actual_link_dependency_incidences": 41
+    },
+    "app": {
+      "prior": "/home/blux/de-xr/dome-sculpt/artifacts/native90-release-planning-20261115/release-090f00-20261117-owning/dome-sculpt",
+      "prior_sha256": "9143ea5921d35a3612ab452c16eee086403813343a88b3d775196a8507eb8af1",
+      "new": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-public-normal-links-v2-20261117/dome-sculpt",
+        "sha256": "41a7cf4e63535e64a682b822a602e3058a5d4591297c5d8629e0d6f715ca7d37"
+      },
+      "dynamic_boundary_exact": true,
+      "boundary": [
+        "0x0000000000000001 (NEEDED)             Shared library: [libfltk_images.so.1.4]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libfltk_gl.so.1.4]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libGLU.so.1]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libjpeg.so.62]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libpng16.so.16]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libfltk.so.1.4]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libcairo.so.2]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libX11.so.6]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libGL.so.1]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libSM.so.6]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libICE.so.6]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libXext.so.6]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libXinerama.so.1]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libXfixes.so.3]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libXcursor.so.1]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libXrender.so.1]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libfreetype.so.6]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libXft.so.2]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libwayland-egl.so.1]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libwayland-cursor.so.0]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libxkbcommon.so.0]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libGLX.so.0]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libOpenGL.so.0]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libz.so.1]",
+        "0x0000000000000001 (NEEDED)             Shared library: [liblapacke.so.3]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libOpenEXR-3_2.so.31]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libOpenEXRUtil-3_2.so.31]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libOpenEXRCore-3_2.so.31]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libIex-3_2.so.31]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libIlmThread-3_2.so.31]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libImath-3_1.so.29]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libEGL.so.1]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libharfbuzz.so.0]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libfontconfig.so.1]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libicui18n.so.77]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libicuuc.so.77]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libopenxr_loader.so.1]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libgio-2.0.so.0]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libgobject-2.0.so.0]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libglib-2.0.so.0]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libwayland-client.so.0]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libgcc_s.so.1]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libstdc++.so.6]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libm.so.6]",
+        "0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]",
+        "0x000000000000001d (RUNPATH)            Library runpath: [/home/blux/de-xr/dome-sculpt/artifacts/sdk-20261111/toolkit-release/lib:/opt/fltk-vr/bdf-runtime/lib:]"
+      ],
+      "prior_defined_dynamic_symbols": 110,
+      "new_defined_dynamic_symbols": 110,
+      "added_symbols": [],
+      "removed_symbols": [],
+      "actual_link_dependency_incidences": 174
+    }
+  },
+  "native_next_plan_sha256": "56ee03c37705633ac68ecf8a5022b782b31de45aedfcd37c368253c70c85e977",
+  "native_next_driver_sha256": "04b78846ff172b4a1ec169c61da2436bfcd853d953bc4086190beb5821a04a9e",
+  "native_next_state": "prepared-unrun-requires-root-review",
+  "archive": {
+    "file": "advanced-public-normal-links-20261117.tar.gz",
+    "sha256": "ca75057787d7ab5da407f3872ca5354302cba59b7846ae25594e965a98662f3b",
+    "members": [
+      {
+        "archive_member": "advanced-public-normal-links-20261117/execution-plan-v1.json",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-public-normal-links-20261117/execution-plan-v1.json",
+        "sha256": "7cf431f94ab9cc2877d8ea23a7255c1978bc8d5d510c9c13648814d1d0bc3945",
+        "bytes": 428
+      },
+      {
+        "archive_member": "advanced-public-normal-links-20261117/failure-closure.json",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-public-normal-links-20261117/failure-closure.json",
+        "sha256": "84a6051e8edc4194601ca28814a008b0e2738d798cc37ecee1500b359d7212a5",
+        "bytes": 245
+      },
+      {
+        "archive_member": "advanced-public-normal-links-20261117/inputs-before.json",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-public-normal-links-20261117/inputs-before.json",
+        "sha256": "6ef4c736f897eca577c96f257f3b4363f50b869f7c0918e57ca4e2258af91791",
+        "bytes": 7029104
+      },
+      {
+        "archive_member": "advanced-public-normal-links-20261117/inputs-final.json",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-public-normal-links-20261117/inputs-final.json",
+        "sha256": "abd429abd61363c52189234593960e2fa79d75bdf31d8e0c1264a41c4e490fd8",
+        "bytes": 7029441
+      },
+      {
+        "archive_member": "advanced-public-normal-links-20261117/link-native.log",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-public-normal-links-20261117/link-native.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      {
+        "archive_member": "advanced-public-normal-links-20261117/link-plan.json",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-public-normal-links-20261117/link-plan.json",
+        "sha256": "2706ed53c6a9c870a1cd40a85107d8b235cea2e85258a2c76cefa2111f808e55",
+        "bytes": 511727
+      },
+      {
+        "archive_member": "advanced-public-normal-links-20261117/link-v1.py",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-public-normal-links-20261117/link-v1.py",
+        "sha256": "5e751f8c06cb7eceb43786eea2920be78b444e0ffd85e1278984685cbeb185c0",
+        "bytes": 6422
+      },
+      {
+        "archive_member": "advanced-public-normal-links-20261117/native-dependency-discovery-v1.json",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-public-normal-links-20261117/native-dependency-discovery-v1.json",
+        "sha256": "b93432e3c73051a6e04a1358e6b291b0c9f42dc3e8cb0fb0c9012decf8b5a7cd",
+        "bytes": 6592
+      },
+      {
+        "archive_member": "advanced-public-normal-links-20261117/native-link.d",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-public-normal-links-20261117/native-link.d",
+        "sha256": "4ef26763de95d8d97d7b5f1ece9744e29d40456f2c0dc7cbf4227d1ebda1f261",
+        "bytes": 9495
+      },
+      {
+        "archive_member": "advanced-public-normal-links-20261117/status.json",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-public-normal-links-20261117/status.json",
+        "sha256": "c8bdcd978e6f2b32115659a5844b11d5ada5bb96b6a0c42956347377ea2b4d74",
+        "bytes": 4847
+      },
+      {
+        "archive_member": "advanced-public-normal-links-20261117/unit-final.txt",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-public-normal-links-20261117/unit-final.txt",
+        "sha256": "b2a6eaae566d8303457523ea950155cc0e9d42ca6769c6608cccedba1e859b91",
+        "bytes": 8828
+      },
+      {
+        "archive_member": "advanced-public-normal-links-20261117/unit-journal.txt",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-public-normal-links-20261117/unit-journal.txt",
+        "sha256": "6c831fd7823cfdead8fd9c52d71902a33c929214a7536bcf372730ca5a0e6698",
+        "bytes": 1131
+      },
+      {
+        "archive_member": "advanced-public-normal-links-v2-20261117/app-link.d",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-public-normal-links-v2-20261117/app-link.d",
+        "sha256": "415a6ac7e8e80b05afcf72ff5ecbf8ed1e6d989271f943f02ae22f8147c16d9c",
+        "bytes": 22517
+      },
+      {
+        "archive_member": "advanced-public-normal-links-v2-20261117/correction-summary.json",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-public-normal-links-v2-20261117/correction-summary.json",
+        "sha256": "cd5f52f87967079f14367f02389b46c1639424f52ebbb9b859308f320f0a0d84",
+        "bytes": 588
+      },
+      {
+        "archive_member": "advanced-public-normal-links-v2-20261117/driver-v1-v2.diff",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-public-normal-links-v2-20261117/driver-v1-v2.diff",
+        "sha256": "2aea99f92a894955892eb435a11b7dddc8d92e02856bcfb0a1c95c824ebfeb55",
+        "bytes": 1714
+      },
+      {
+        "archive_member": "advanced-public-normal-links-v2-20261117/exports-app.log",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-public-normal-links-v2-20261117/exports-app.log",
+        "sha256": "9cb211c0304af68f22791ce36086fd2c9b28088d172c4e0dcc493e8e03f6cf02",
+        "bytes": 87779
+      },
+      {
+        "archive_member": "advanced-public-normal-links-v2-20261117/exports-native.log",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-public-normal-links-v2-20261117/exports-native.log",
+        "sha256": "15e3c80698647dfe76d66816f3f8722036c0d66ef07deb1ae5d97ef75d5ed72b",
+        "bytes": 44537
+      },
+      {
+        "archive_member": "advanced-public-normal-links-v2-20261117/exports-runtime.log",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-public-normal-links-v2-20261117/exports-runtime.log",
+        "sha256": "fd3ec8f3afc0979957e2c5ba643929477b32ccc25cf1fdcaa830b5da94dadf5e",
+        "bytes": 49161
+      },
+      {
+        "archive_member": "advanced-public-normal-links-v2-20261117/inputs-before.json",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-public-normal-links-v2-20261117/inputs-before.json",
+        "sha256": "8cd486899c9e6e51809eff7a4359c8694a538f71a222cd89c9491a322d5820b8",
+        "bytes": 7032743
+      },
+      {
+        "archive_member": "advanced-public-normal-links-v2-20261117/inputs-final.json",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-public-normal-links-v2-20261117/inputs-final.json",
+        "sha256": "3f9629ac59d58f75d6e358d033b459352bd2de702830dedc40208def42bba42f",
+        "bytes": 7035139
+      },
+      {
+        "archive_member": "advanced-public-normal-links-v2-20261117/link-app.log",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-public-normal-links-v2-20261117/link-app.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      {
+        "archive_member": "advanced-public-normal-links-v2-20261117/link-closure.json",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-public-normal-links-v2-20261117/link-closure.json",
+        "sha256": "28a9acbb9da6d54bd30196fc95dd4a39a4fdfd7d6ec48867f20df986b4302698",
+        "bytes": 10411
+      },
+      {
+        "archive_member": "advanced-public-normal-links-v2-20261117/link-native.log",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-public-normal-links-v2-20261117/link-native.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      {
+        "archive_member": "advanced-public-normal-links-v2-20261117/link-plan.json",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-public-normal-links-v2-20261117/link-plan.json",
+        "sha256": "fe5547f4bcbb028a702cda4d92cdd4ac665a275fee8d78d2e33768c5589d6cfe",
+        "bytes": 530074
+      },
+      {
+        "archive_member": "advanced-public-normal-links-v2-20261117/link-runtime.log",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-public-normal-links-v2-20261117/link-runtime.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      {
+        "archive_member": "advanced-public-normal-links-v2-20261117/link-v2.py",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-public-normal-links-v2-20261117/link-v2.py",
+        "sha256": "fda4c8486e4d7b8cddb298182a284ca5e88e7a4bbe67e933dd3f05b04a711c95",
+        "bytes": 6649
+      },
+      {
+        "archive_member": "advanced-public-normal-links-v2-20261117/native-link.d",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-public-normal-links-v2-20261117/native-link.d",
+        "sha256": "1eb37172915e005e13f2fdbeaabd07adbcf6e768e64051af58f8cc40f38a2611",
+        "bytes": 9498
+      },
+      {
+        "archive_member": "advanced-public-normal-links-v2-20261117/readelf-app.log",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-public-normal-links-v2-20261117/readelf-app.log",
+        "sha256": "9becfda1aea089d28f87a861f9371a958398055871f8987adab8d904a71889c0",
+        "bytes": 4822
+      },
+      {
+        "archive_member": "advanced-public-normal-links-v2-20261117/readelf-native.log",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-public-normal-links-v2-20261117/readelf-native.log",
+        "sha256": "00f86dce1cf5df54e4487e2687e3e152feb91923684226bb25853be8848bf7bb",
+        "bytes": 2468
+      },
+      {
+        "archive_member": "advanced-public-normal-links-v2-20261117/readelf-runtime.log",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-public-normal-links-v2-20261117/readelf-runtime.log",
+        "sha256": "4e02454167e145522d636ddcb2443b186f9358a7d18531da5a23b244d5f42595",
+        "bytes": 2237
+      },
+      {
+        "archive_member": "advanced-public-normal-links-v2-20261117/runtime-link.d",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-public-normal-links-v2-20261117/runtime-link.d",
+        "sha256": "0304e1d2ee4949ca95f24aa0a8808ef2c96a803113c3155a17f13d699500d13d",
+        "bytes": 4010
+      },
+      {
+        "archive_member": "advanced-public-normal-links-v2-20261117/status.json",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-public-normal-links-v2-20261117/status.json",
+        "sha256": "f3c4408bd05b6cb1d0e27bf2696db715b0496c68151d53044907c82051d25fb6",
+        "bytes": 129593
+      },
+      {
+        "archive_member": "advanced-public-normal-links-v2-20261117/unit-final.txt",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-public-normal-links-v2-20261117/unit-final.txt",
+        "sha256": "9fd50441e6bb2151abc44ab8dab8d6808d9b3be27d126f56ccbb07d3b5f18538",
+        "bytes": 8720
+      },
+      {
+        "archive_member": "advanced-public-normal-links-v2-20261117/unit-journal.txt",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-public-normal-links-v2-20261117/unit-journal.txt",
+        "sha256": "a9fbab0927bbacc20152811aab99b5f07a57294c23c85fad99d30e86761e3545",
+        "bytes": 1035
+      },
+      {
+        "archive_member": "advanced-public-normal-links-v2-20261117/unit-stopped.txt",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-public-normal-links-v2-20261117/unit-stopped.txt",
+        "sha256": "985c3867e695cbd7899293ae24e6fbc2ea1f3231ca2e2f9ec6bbdad87f699f69",
+        "bytes": 67
+      },
+      {
+        "archive_member": "advanced-public-normal-native-20261117/plan.json",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-public-normal-native-20261117/plan.json",
+        "sha256": "56ee03c37705633ac68ecf8a5022b782b31de45aedfcd37c368253c70c85e977",
+        "bytes": 5400
+      },
+      {
+        "archive_member": "advanced-public-normal-native-20261117/run-v1.py",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-public-normal-native-20261117/run-v1.py",
+        "sha256": "04b78846ff172b4a1ec169c61da2436bfcd853d953bc4086190beb5821a04a9e",
+        "bytes": 11652
+      }
+    ]
+  }
+}
