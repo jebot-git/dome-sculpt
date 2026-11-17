@@ -1,0 +1,32 @@
+{
+  "state": "prepared-NOT-executed",
+  "scope": "New whole090f App loader and public UI follow-up; all previous component evidence and expectations retained, no new product execution yet.",
+  "source_tuple": {
+    "application": "090f009ede2c0623ca616fe892223b4f68f1c2c4",
+    "production_body": "1bc13125",
+    "prepared_fixture": "f1e193c7563eacc4db1d40518235450975460b15",
+    "scenario": "6c8f042cb1730fa017595e9a710b8c8c6015a9ea",
+    "runtime_and_font": "6c8f042cb1730fa017595e9a710b8c8c6015a9ea"
+  },
+  "files": {
+    "whole-app-loader-v1.py": "a0ebfec624d20a62337777c075bb6aa65f3e38fdae5301d0204525dda9336b98",
+    "whole-app-loader-plan-v1.json": "42c70a8e7de67258bb3f2b7ad791e0a83fcf2d0dd1b792028bd8ab33f67524e9",
+    "cohort_v3.py": "f850faee8e0a2869cba71598ee16bf91116c3c9bd78dde7bc865dd26e826bbb0",
+    "cohort_v3.py.diff": "4af0bf0e6874924f476ffec22b06ae9c5759a642deb36235145d4274ea817f80",
+    "run-v3.py": "a2eb2a9c61c944700ccb749d89fc0423c7b98d7be6a9c490ddb2e5974adb9776",
+    "run-v3.py.diff": "7e24cd1db2f7e458d22efebb9d7dce7e89f9efc94d78207449173b498c954b08",
+    "gui-plan-v3.json": "947265f1ffc6872ba2e80905f118c16979f1e4208dde4e1ab578dbeb73e48063",
+    "xr-plan-v3.json": "59d188ac0df213f3c8f960a592f16187795010b61cba715b132ee4f62d6e49f1"
+  },
+  "requires": [
+    "Root exact headless loader review binding new App/source/native90/whole-owning status",
+    "Actual directldd+ordinaryversion0 with exact72 effective providers",
+    "Separate root phase/case/UI review binding that actualloader status before newAppUI",
+    "Actual mapped-ELF certificates supplied by newApp GUI/XR monitor; not claimed by headlessversion"
+  ],
+  "static_checks": {
+    "all_python_AST_valid": true,
+    "loader_gui_xr_prepare_exit": 0,
+    "no_product_launch": true
+  }
+}

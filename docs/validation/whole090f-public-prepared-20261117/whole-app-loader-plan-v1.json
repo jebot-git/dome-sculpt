@@ -1,0 +1,36 @@
+{
+  "state": "prepared-NOT-executed",
+  "source": "090f009ede2c0623ca616fe892223b4f68f1c2c4",
+  "application": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/native90-release-planning-20261115/release-090f00-20261117-owning/dome-sculpt",
+    "sha256": "9143ea5921d35a3612ab452c16eee086403813343a88b3d775196a8507eb8af1"
+  },
+  "requires_native90_status": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/native90-release-gates-20261117/native90-v1-20261117/status.json",
+    "sha256": "8f496335c8b92cedc8887a9a53112d61c798ab20ecb465b37dbc853ceeddaaf2"
+  },
+  "requires_owning_status": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/native90-release-planning-20261115/release-090f00-20261117-audit/execution-native90-v1/status.json",
+    "sha256": "3c4fd01b2a6702ee0069a744375b9d4a087ef4d8ed6a7faff829d22fe49be36c"
+  },
+  "exact_effective_provider_reference": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/app1bc-component-loader-20261115/actual-loader-providers.json",
+    "sha256": "40f45fe0f524f659d3aa15b1ecfdb4c5250b1f8968e6fab74c2359703055d537",
+    "count": 72
+  },
+  "commands": [
+    [
+      "/usr/bin/ldd",
+      "/home/blux/de-xr/dome-sculpt/artifacts/native90-release-planning-20261115/release-090f00-20261117-owning/dome-sculpt"
+    ],
+    [
+      "/home/blux/de-xr/dome-sculpt/artifacts/native90-release-planning-20261115/release-090f00-20261117-owning/dome-sculpt",
+      "--version"
+    ]
+  ],
+  "limits": {
+    "each_command_seconds": 30,
+    "aggregate_command_RSS_bytes": 4294967296
+  },
+  "scope": "Whole090f App direct loader and ordinary version only. Actual mapped ELF witnesses belong to forthcoming separately reviewed GUI/XR monitor, not this headless phase. No GUI/GL/HMD/install claim."
+}
