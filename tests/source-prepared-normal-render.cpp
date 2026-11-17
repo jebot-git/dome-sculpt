@@ -43,7 +43,11 @@ std::shared_ptr<MeshSnapshot> prepared_point(const SculptObject&o,std::array<flo
  result->mesh.positions={center-x*span-y*span,center+x*span-y*span,center+x*span+y*span,center-x*span+y*span};result->mesh.normals.assign(4,desired);result->mesh.uv.assign(4,uv);
  // Retain the actual material fields and isolate only the normal consumer.
  // Neither expected direction nor ordinary control has prepared-frame authority.
- auto maps=std::make_shared<TextureMaps>(*o.painted->preview(o.material));maps->normal={};maps->mtoon_normal={};maps->normal_projection.reset();maps->baked_normal={};maps->baked_coverage={};maps->baked_base.reset();maps->overlay.reset();maps->current_grid_preview.reset();maps->polygon_surface.reset();maps->source_maps.reset();maps->source_only=false;result->ranges[0].textures=std::move(maps);return result;
+ auto maps=std::make_shared<TextureMaps>(*o.painted->preview(o.material));maps->normal={};maps->mtoon_normal={};maps->normal_projection.reset();maps->baked_normal={};maps->baked_coverage={};maps->baked_base.reset();maps->overlay.reset();maps->current_grid_preview.reset();maps->polygon_surface.reset();
+ // Generic color/emission are material correction inputs even for a fully
+ // derived preview. Remove only normal sampling from the independent control.
+ if(maps->source_maps){auto sources=std::make_shared<PaintSourceMaps>(*maps->source_maps);sources->normal={};maps->source_maps=std::move(sources);}
+ maps->source_only=false;result->ranges[0].textures=std::move(maps);return result;
 }
 void prepared_view(Scene scene,uint64_t first,uint64_t second,bool pbr,const std::string&label){
  for(const auto&o:scene.objects())scene.object(o.id).visible=o.id==second;scene.select(second);const auto before=scene.encode();const auto&o=scene.object(second);const auto&mesh=o.painted->mesh();constexpr uint32_t tri=0;std::array<Vec3,3> points;for(size_t k=0;k<3;++k)points[k]=mesh.positions.at(mesh.indices.at(k));

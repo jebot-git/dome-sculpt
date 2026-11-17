@@ -35,12 +35,20 @@ Inputs inputs(const SculptObject &o,std::array<float,2> uv) {
     // pack/overlay or normal authority, and constant UV (zero texture LOD).
     auto control=prepared_point(o,uv,{0,0,1},{},{1,0,0},{0,1,0},1,true);
     const auto &maps=*control->ranges.at(0).textures;
-    require(!maps.source_only&&!maps.source_maps&&!maps.overlay&&!maps.normal_projection&&maps.normal.rgba.empty(),
+    require(!maps.source_only&&!maps.overlay&&!maps.normal_projection&&maps.normal.rgba.empty(),
           "Forecast describes exact unchanged ordinary point material sampling");
     require(!maps.color_projection&&maps.pbr_color.rgba.empty(),"Forecast has no silently substituted prepared color plane");
     require(!o.material.unlit&&!o.material.toon,"Forecast explicitly models lit CorePBR rather than unlit or generic toon");
     Inputs in;in.base=image(maps.color,uv,true);in.orm=image(maps.metal_rough,uv,false);in.glow=image(maps.emission,uv,true);
     in.coverage=image(maps.color_coverage,uv,false);in.emission_coverage=image(maps.emission_coverage,uv,false);
+    auto generic=[&](const PaintSourceTexture &r){
+        if(!r.image)return Q{1,1,1,1};
+        require(r.texcoord==0,"Forecast generic correction source uses its actual UV0");
+        const auto &t=r.uv_transform;const std::array<float,2> q{t[0]*uv[0]+t[2]*uv[1]+t[4],t[1]*uv[0]+t[3]*uv[1]+t[5]};
+        return image(*r.image,q,true,r.wrap_s,r.wrap_t,r.mag_filter?r.mag_filter:9729);
+    };
+    const Q generic_color=maps.source_maps?generic(maps.source_maps->color):Q{1,1,1,1};
+    const Q generic_emission=maps.source_maps?generic(maps.source_maps->emission):Q{1,1,1,1};
     const auto &binding=*o.material_bindings;in.typed=binding.material;
     auto role=[&](MToonSlot slot){const auto at=size_t(slot);const auto &t=binding.material.textures[at];const auto &r=binding.roles[at];
         if(t.index<0||!r.image){const auto d=mtoon_default_texel(slot);return Q{d[0],d[1],d[2],d[3]};}
@@ -55,14 +63,14 @@ Inputs inputs(const SculptObject &o,std::array<float,2> uv) {
     for(size_t c=0;c<3;++c){in.effective[c]=mtoon_factor(binding.material.parameters.base_color[c],binding.native_reference.color[c],o.material.color[c]);
         const auto authored=std::array<float,3>{binding.material.parameters.emission.x,binding.material.parameters.emission.y,binding.material.parameters.emission.z};
         in.effective_emission[c]=mtoon_factor(authored[c],binding.native_reference.emission[c],o.material.emissive[c]);
-        const auto paint=in.coverage[0]==0?0.:std::max(0.,in.base[c]-double(o.material.color[c])*(1-in.coverage[0]));
-        in.samples.base[c]=float(in.coverage[0]==0?in.effective[c]*original[c]:std::max(0.,in.base[c]+(in.effective[c]*original[c]-o.material.color[c])*(1-in.coverage[0])));
+        const auto paint=in.coverage[0]==0?0.:std::max(0.,in.base[c]-double(o.material.color[c])*generic_color[c]*(1-in.coverage[0]));
+        in.samples.base[c]=float(in.coverage[0]==0?in.effective[c]*original[c]:std::max(0.,in.base[c]+(in.effective[c]*original[c]-o.material.color[c]*generic_color[c])*(1-in.coverage[0])));
         const double shade_value=in.alias?std::max(0.,shade[c]*(1-in.coverage[0])+(o.material.color[c]!=0?paint/o.material.color[c]:paint)):shade[c];
         shade_sample[c]=float(shade_value);
-        emission_sample[c]=float(in.emission_coverage[0]==0?in.effective_emission[c]*emission[c]:std::max(0.,in.glow[c]+(in.effective_emission[c]*emission[c]-o.material.emissive[c])*(1-in.emission_coverage[0])));
+        emission_sample[c]=float(in.emission_coverage[0]==0?in.effective_emission[c]*emission[c]:std::max(0.,in.glow[c]+(in.effective_emission[c]*emission[c]-o.material.emissive[c]*generic_emission[c])*(1-in.emission_coverage[0])));
     }
     in.samples.shade={shade_sample[0],shade_sample[1],shade_sample[2]};in.samples.emission={emission_sample[0],emission_sample[1],emission_sample[2]};
-    in.samples.base[3]=float(std::clamp(in.base[3]+(mtoon_factor(binding.material.parameters.base_color[3],binding.native_reference.color[3],o.material.color[3])*original[3]-o.material.color[3])*(1-in.coverage[0]),0.,1.));
+    in.samples.base[3]=float(std::clamp(in.base[3]+(mtoon_factor(binding.material.parameters.base_color[3],binding.native_reference.color[3],o.material.color[3])*original[3]-o.material.color[3]*generic_color[3])*(1-in.coverage[0]),0.,1.));
     require(!binding.roles[size_t(MToonSlot::Matcap)].image,"Forecast does not silently replace a direction-dependent matcap texture");
     require(binding.material.parameters.scroll==std::array<float,2>{}&&binding.material.parameters.rotation_speed==0,"Forecast declares actual nonanimated material coordinates");
     const auto rim=role(MToonSlot::Rim),matcap=role(MToonSlot::Matcap);
