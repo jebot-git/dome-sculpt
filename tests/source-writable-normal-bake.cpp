@@ -7,6 +7,7 @@
 #include "native-paint-frame-source.hpp"
 #include "baked-normal-field.hpp"
 #include "source-writable-paint.hpp"
+#include "emission-paint-access.hpp"
 #include "dome/shapekey-authoring.hpp"
 namespace writable_source {
 size_t checks=0;
