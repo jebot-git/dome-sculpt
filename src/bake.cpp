@@ -1,6 +1,7 @@
 #include "paint-overlay-packet.hpp"
 #include "emission-authority.hpp"
 #include "source-bake-normal.hpp"
+#include "source-writable-paint.hpp"
 #include "dome/normal-sampling.hpp"
 #include "baked-normal-field.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
@@ -97,7 +98,8 @@ Channels material(const BakeMaterial &m, const Mesh &mesh, size_t triangle,
     result.roughness*=orm[1];result.metallic*=orm[2];
     if(raw.occlusion.image)result.ao=1-raw.occlusion_strength*(1-sample_surface_texture(mesh,raw,raw.occlusion,triangle,bary,false)[0]);
     if(m.maps->overlay){
-      const auto contribution=detail::sample_overlay_values(*m.maps->overlay,uv[0],uv[1],pbr);
+      const auto paint_uv=detail::source_overlay_coordinates(*m.maps->overlay,uint32_t(triangle),bary,uv);
+      const auto contribution=detail::sample_overlay_values(*m.maps->overlay,paint_uv[0],paint_uv[1],pbr);
       for(size_t c=0;c<4;++c)result.color[c]=result.color[c]*(1-contribution[3][0])+contribution[0][c];
       result.ao=result.ao*(1-contribution[1][3])+contribution[1][0];
       result.roughness=result.roughness*(1-contribution[3][2])+contribution[1][1];

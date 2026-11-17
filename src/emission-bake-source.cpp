@@ -14,6 +14,8 @@
 #include "canonical-normal-uv.hpp"
 #include "baked-normal-field.hpp"
 #include "source-paint-pairing.hpp"
+#include "source-writable-paint.hpp"
+#include "native-paint-frame-source.hpp"
 #include <numeric>
 #include "dome/material-bindings.hpp"
 #include "dome/material-visibility.hpp"
@@ -99,7 +101,7 @@ struct Source {
     }
     BakedEmissionSample replacement;
     if(packet){
-      const auto uv=coordinates(triangle,bary,0,false);
+      const auto uv=source_overlay_coordinates(*packet,triangle,bary,coordinates(triangle,bary,0,false));
       const auto values=sample_overlay_values(*packet,uv[0],uv[1],false);
       for(size_t k=0;k<3;++k){replacement.legacy[k]=values[2][k];replacement.absolute[k]=values[4][k];}
       replacement.coverage=values[3][3];
@@ -112,10 +114,15 @@ std::shared_ptr<const PaintOverlayPacket> PaintOverlayFactory::capture_normal_so
     const SculptObject &object,const std::function<bool()> &cancelled){
  const auto &binding=object.material_bindings;
  const auto canonical=binding?binding->canonical_attributes:nullptr;
- if(!object.painted||!canonical||!canonical->valid_owner(canonical))
-   throw std::invalid_argument("Canonical normal packet requires its genuine current attribute owner");
+ const auto attachment=material_paint_attachment(binding.get());
+ if(!object.painted||!binding||(!canonical&&!attachment)||
+    (canonical&&!canonical->valid_owner(canonical)))
+   throw std::invalid_argument("Source normal packet requires its genuine current material/attribute owner");
+ if(attachment&&(!object.painted->valid_paint_sampling_attachment()||
+     !attachment->matches(object.painted->mesh_owner(),object.painted->paint_sampling_domain())))
+   throw std::invalid_argument("Writable source packet borrowed another current paint attachment");
  source_paint_pairing(object.painted.get(),binding.get(),object.appearance.get(),true);
- normal_frame_current_authority(*binding,object.painted->mesh(),object.deformation.get(),cancelled);
+ if(binding->normal_frames)normal_frame_current_authority(*binding,object.painted->mesh(),object.deformation.get(),cancelled);
  auto packet=std::shared_ptr<PaintOverlayPacket>(new PaintOverlayPacket);
  packet->contribution_owner_=capture(*object.painted,cancelled);
  packet->source_maps_=object.painted->source_maps();
@@ -123,11 +130,17 @@ std::shared_ptr<const PaintOverlayPacket> PaintOverlayFactory::capture_normal_so
  packet->storage_bytes_=sizeof(PaintOverlayPacket);
  return packet;
 }
+bool SourceBakeNormalResolver::requires_source_pairing()const noexcept {
+ return bool(projection_)||bool(canonical_)||(packet_&&bool(packet_->normal_source_binding()));
+}
 bool SourceBakeNormalResolver::matches_prepared_source(const TextureMaps &maps)const noexcept {
  auto same=[](const auto &a,const auto &b){return a==b&&!a.owner_before(b)&&!b.owner_before(a);};
  if(!sample_||!packet_)return false;
+ if(packet_->normal_source_binding()&&(!maps.overlay||
+    !same(maps.overlay->normal_source_binding(),packet_->normal_source_binding())||
+    !same(maps.overlay->normal_source_deformation(),packet_->normal_source_deformation())))return false;
  if(projection_){if(!same(maps.normal_projection,projection_))return false;}
- else if(canonical_){
+ else if(canonical_||packet_->normal_source_binding()){
   if(maps.normal_projection||!maps.overlay||
      !same(maps.overlay->normal_source_binding(),packet_->normal_source_binding())||
      !same(maps.overlay->normal_source_deformation(),packet_->normal_source_deformation()))return false;
@@ -146,6 +159,36 @@ bool SourceBakeNormalResolver::matches_prepared_source(const TextureMaps &maps)c
 SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTransform relative,
     const SourceBakeNormalOptions &options){
   const auto &binding=object.material_bindings;
+  const auto native=binding?binding->native_paint_sampling:nullptr;
+  if(native&&!binding->normal_frames){
+    auto stop=[&]{if(options.cancelled&&options.cancelled())throw std::runtime_error("Native writable source capture cancelled");};stop();
+    if(!object.mesh_active||!object.painted||object.appearance||!native->valid_owner(native)||
+       !native->matches_current(*object.painted)||binding->native_paint_frames||binding->key_derivation||
+       binding->has_mtoon||binding->normal_preparation||binding->canonical_attributes)
+      throw std::invalid_argument("Native writable source lost its actual current paint/frame authority");
+    uint64_t bytes=object.painted->storage_bytes()+uint64_t(object.painted->mesh().indices.size())*sizeof(Vec3)*2;
+    auto node=native;
+    for(size_t depth=0;node;++depth){stop();if(depth==32)throw std::length_error("Native writable source history exceeds32 owners");
+      if(!node->valid_owner(node))throw std::invalid_argument("Native source ancestor lost genuine owner");
+      bytes+=node->before_paint()->storage_bytes()+node->domain()->retained_bytes();
+      const auto &before=node->before_material();node=before?before->native_paint_sampling:nullptr;
+    }
+    if(!options.max_working_bytes||options.max_working_bytes>512*1024*1024||bytes>options.max_working_bytes)
+      throw std::length_error("Native source capture exceeds prospective working budget");
+    PaintSamplingLimits limits;limits.max_working_bytes=options.max_working_bytes;limits.cancelled=options.cancelled;
+    native->validate_current(*object.painted,limits);binding->validate();
+    const auto &mesh=object.painted->mesh();
+    auto evaluated=object.deformation?object.deformation->preview(mesh):mesh;
+    auto normals=std::make_shared<std::vector<Vec3>>();normals->reserve(mesh.indices.size());
+    for(size_t c=0;c<mesh.indices.size();++c){if((c&1023)==0)stop();const auto n=evaluated.normals.at(mesh.indices[c]);
+      const auto rotated=ob::rotate(relative.orientation,{n.x,n.y,n.z});normals->push_back(normalized(Vec3{rotated.x,rotated.y,rotated.z}));}
+    auto packet=PaintOverlayFactory::capture_normal_source(object,options.cancelled);
+    std::shared_ptr<const std::vector<Vec3>> immutable=std::move(normals);stop();
+    auto sample=[immutable,cancelled=options.cancelled](uint32_t triangle,std::array<float,3> bary){
+      if(cancelled&&cancelled())throw std::runtime_error("Native source normal sampling cancelled");
+      Vec3 n{};for(size_t k=0;k<3;++k)n+=immutable->at(size_t(triangle)*3+k)*bary[k];n=normalized(n);return std::array<Vec3,2>{n,n};};
+    return SourceBakeNormalResolver(std::move(sample),nullptr,std::move(packet));
+  }
   if(!binding||!binding->normal_frames){
     if((binding&&binding->canonical_attributes)||(object.painted&&object.painted->baked()&&object.painted->baked()->normal_field))
       throw std::invalid_argument("Canonical normal source lost its genuine attribute frame owner");
@@ -161,14 +204,19 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTr
   const bool dual_planes=field_prepared;
   const auto retained=prepared&&object.painted->normal_projection()->version==2
     ?object.painted->normal_projection()->sampling_domain:nullptr;
-  if(prepared&&(preparation->canonical_conversion||object.painted->paint_sampling_domain()||
-      (preparation->sampling_domain&&preparation->sampling_domain->metadata_sampling_domain)))
-    throw std::invalid_argument("Prepared source independent canonical/writable-paint domains require their own material authority adapter");
+  const auto writable=material_paint_attachment(binding.get());
+  if(object.painted&&object.painted->paint_sampling_domain()&&(!writable||
+      !writable->matches(object.painted->mesh_owner(),object.painted->paint_sampling_domain())))
+    throw std::invalid_argument("Prepared source writable paint lacks its actual material/geometry attachment");
+  if(prepared&&preparation->canonical_conversion)
+    throw std::invalid_argument("Prepared source canonical conversion requires its separate intrinsic-normal adapter");
   if(prepared&&binding->sampling_reparameterized&&!preparation->uv_reprojection&&!preparation->sampling_domain)
     throw std::invalid_argument("Prepared source UV reparameterization lost its owning normal/material recipe");
   if(!object.mesh_active||!object.painted||!object.painted->valid_source_sampling_attachment()||
-     (binding->canonical_uv&&!canonical)||binding->canonical_paint_sampling||binding->native_paint_sampling||binding->native_paint_frames||
-     bool(binding->normal_preparation)!=bool(object.painted->normal_projection())||(!canonical&&object.painted->color_projection())||
+     (binding->canonical_uv&&!canonical)||
+     (binding->canonical_paint_sampling&&!writable)||(binding->native_paint_sampling&&!writable)||
+     (binding->native_paint_frames&&!native)||
+     bool(binding->normal_preparation)!=bool(object.painted->normal_projection())||(!canonical&&!writable&&object.painted->color_projection())||
      (object.painted->baked()&&((!prepared&&!field_prepared&&!object.painted->baked()->maps.normal.rgba.empty())||(field&&!canonical)||(!prepared&&object.painted->baked()->normal_authority))))
     throw std::invalid_argument("Artist source normal capture requires its unchanged original frame and separate current-normal adapter");
   // Cheap owning identity checks precede every deep validation/replay. Equal
@@ -213,6 +261,21 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTr
       replay_bytes=std::max<uint64_t>(replay_bytes,origin->maximum_working_bytes());
       self(self,origin->before_material().get(),depth+1);
     }
+    if(const auto &paint=node->native_paint_sampling){
+      if(!paint->valid_owner(paint))throw std::invalid_argument("Source normal ancestor lost genuine native paint owner");
+      replay_bytes=std::max<uint64_t>(replay_bytes,paint->before_paint()->storage_bytes()+paint->domain()->retained_bytes());
+      self(self,paint->before_material().get(),depth+1);
+    }
+    if(const auto &frames=node->native_paint_frames){
+      if(!frames->valid_owner(frames))throw std::invalid_argument("Source normal ancestor lost native frame owner");
+      replay_bytes=std::max<uint64_t>(replay_bytes,128*1024*1024);
+      self(self,frames->before_material().get(),depth+1);
+    }
+    if(const auto &paint=node->canonical_paint_sampling){
+      if(!paint->valid_owner(paint))throw std::invalid_argument("Source normal ancestor lost canonical paint owner");
+      replay_bytes=std::max<uint64_t>(replay_bytes,paint->attachment()->domain()->retained_bytes());
+      self(self,paint->before()->material_bindings.get(),depth+1);
+    }
     if(const auto &normal=node->normal_preparation){
       if(const auto &origin=normal->canonical_conversion){
         if(!origin->valid_owner(origin))throw std::invalid_argument("Source normal ancestor lost its genuine canonical conversion");
@@ -235,10 +298,17 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTr
     if(completed==complete.size())throw std::length_error("Source normal replay authority exceeds native graph limits");
     complete[completed++]=node;
   };
-  if(prepared||canonical)visit(visit,binding.get(),0);
+  if(prepared||canonical||native)visit(visit,binding.get(),0);
   const uint64_t work=std::max(capture_bytes,replay_bytes);
   if(!options.max_working_bytes||options.max_working_bytes>512*1024*1024||work>options.max_working_bytes)
     throw std::length_error("Artist source normal capture exceeds prospective working budget");
+  if(writable){
+    PaintSamplingLimits limits;limits.max_working_bytes=options.max_working_bytes;limits.cancelled=options.cancelled;
+    binding->validate();source_paint_pairing(object.painted.get(),binding.get(),object.appearance.get(),true);
+    writable->domain()->validate_current(mesh,limits);
+    if(native)native->validate_current(*object.painted,limits);
+    if(binding->native_paint_frames)binding->native_paint_frames->validate_binding(*binding,true,options.cancelled);
+  }
   if(canonical){
     canonical->validate();source_paint_pairing(object.painted.get(),binding.get(),nullptr,true);
     if(normal_uv)normal_uv->validate_current(mesh,options.cancelled);
@@ -271,7 +341,7 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTr
     current_normals=SourceNormalPreparationAccess::resolved(*object.painted,options.cancelled);
     current_normals->validate(object.painted->resolution());
   }
-  Source coordinates;coordinates.mesh=object.painted->mesh_owner();coordinates.maps=object.painted->source_maps();coordinates.packet=canonical?PaintOverlayFactory::capture_normal_source(object,options.cancelled):PaintOverlayFactory::capture(*object.painted,options.cancelled);coordinates.cancelled=options.cancelled;
+  Source coordinates;coordinates.mesh=object.painted->mesh_owner();coordinates.maps=object.painted->source_maps();coordinates.packet=canonical||writable?PaintOverlayFactory::capture_normal_source(object,options.cancelled):PaintOverlayFactory::capture(*object.painted,options.cancelled);coordinates.cancelled=options.cancelled;
   if(!coordinates.maps)coordinates.maps=empty_source_maps();
   coordinates.maps->validate_surface(mesh);
   const auto typed=binding->has_mtoon?std::optional<MToonMaterial>(binding->material):std::optional<MToonMaterial>{};
@@ -343,6 +413,21 @@ std::shared_ptr<const TextureMaps> raw_bake_source(const SculptObject &object,
   require_original_emission_uv1(object,typed);
   const auto canonical=binding?binding->canonical_attributes:nullptr;
   const auto field=object.painted&&object.painted->baked()?object.painted->baked()->normal_field:nullptr;
+  const auto writable=material_paint_attachment(binding.get());
+  if(writable&&!canonical){
+    if(!object.mesh_active||!object.painted||!binding||
+       !writable->matches(object.painted->mesh_owner(),object.painted->paint_sampling_domain())||
+       !source_bake_normals(object,{},SourceBakeNormalOptions{256*1024*1024,cancelled}))
+      throw std::invalid_argument("Writable raw source requires its actual material/normal/frame adapter");
+    if(object.painted->color_projection())
+      throw std::invalid_argument("Joint prepared writable source needs its independently resolved colour factor adapter");
+    auto maps=std::make_shared<TextureMaps>();maps->source_only=true;
+    maps->source_maps=object.painted->source_maps()?object.painted->source_maps():empty_source_maps();
+    maps->source_maps->validate_surface(object.painted->mesh());
+    maps->overlay=PaintOverlayFactory::capture_normal_source(object,cancelled);
+    maps->normal_projection=object.painted->normal_projection();maps->baked_base=object.painted->baked();
+    return maps;
+  }
   if(canonical||field){
     if(!object.mesh_active||!object.painted||!canonical||
        !source_bake_normals(object,{},SourceBakeNormalOptions{256*1024*1024,cancelled}))
@@ -438,7 +523,7 @@ emission_bake_source(const SculptObject &object,const std::function<bool()> &can
   if(object.mesh_active&&object.painted){
     source->mesh=object.painted->mesh_owner();source->maps=object.painted->source_maps();
     source->independent_source=object.painted->source_sampling_prepared();
-    source->packet=PaintOverlayFactory::capture(*object.painted,cancelled);
+    source->packet=material_paint_attachment(binding.get())?PaintOverlayFactory::capture_normal_source(object,cancelled):PaintOverlayFactory::capture(*object.painted,cancelled);
     if(object.painted->paint_sampling_domain()&&!object.painted->valid_paint_sampling_attachment())
       throw std::invalid_argument("Emission Bake lost its exact current paint geometry attachment");
     if(source->maps){source->maps->validate_surface(*source->mesh);source->role=source->maps->emission;}

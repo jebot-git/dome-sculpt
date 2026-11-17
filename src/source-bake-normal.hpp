@@ -19,7 +19,7 @@ public:
  explicit operator bool()const noexcept{return bool(sample_);}
  std::array<Vec3,2> operator()(uint32_t triangle,std::array<float,3> bary)const{return sample_(triangle,bary);}
  bool matches_prepared_source(const TextureMaps &)const noexcept;
- bool requires_source_pairing()const noexcept{return bool(projection_)||bool(canonical_);}
+ bool requires_source_pairing()const noexcept;
 private:
  using Sample=std::function<std::array<Vec3,2>(uint32_t,std::array<float,3>)>;
  SourceBakeNormalResolver(Sample sample,std::shared_ptr<const PaintNormalProjection> projection,
