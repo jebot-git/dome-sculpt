@@ -1,0 +1,107 @@
+{
+  "state": "qualified-runtime-integration",
+  "date": "2026-11-17",
+  "scope": "Ordinary artist/prepared-v1 normal Bake sources; not advanced Rasterize/RetainSource90fad admission or full production completion",
+  "production": "1bc131251db8813ecd259cb837aae5fa10356a41",
+  "public_fixture": "f1e193c7563eacc4db1d40518235450975460b15",
+  "owning_source": "090f009ede2c0623ca616fe892223b4f68f1c2c4",
+  "test_runtime_fonts_scenarios": "6c8f042cb1730fa017595e9a710b8c8c6015a9ea",
+  "merge_parent": "1ad4261a70f742403096c57226ceb6466b63fd62",
+  "integration_parent": "637ea1f45e88620bb60bbeadc17a11ca857b1b01",
+  "source_body_comparison": {
+    "precommit_tree": "16248d88d2a1a4b44341cc99cb811989c1104c76",
+    "reference": "f1e193c7563eacc4db1d40518235450975460b15",
+    "excluded_documentation": [
+      "docs/",
+      "AGENTS.md",
+      "README.md"
+    ],
+    "differences_outside_documentation": [],
+    "matching_files": 1719
+  },
+  "proofs": {
+    "Release_owning": {
+      "path": "artifacts/native90-release-planning-20261115/release-090f00-20261117-audit/execution-native90-v1/status.json",
+      "sha256": "3c4fd01b2a6702ee0069a744375b9d4a087ef4d8ed6a7faff829d22fe49be36c"
+    },
+    "Release_native90": {
+      "path": "artifacts/native90-release-gates-20261117/native90-v1-20261117/status.json",
+      "sha256": "8f496335c8b92cedc8887a9a53112d61c798ab20ecb465b37dbc853ceeddaaf2"
+    },
+    "SAN_owning": {
+      "path": "artifacts/native90-sanitize-planning-20261115/sanitize-090f00-20261117-audit/execution-native90-v2/status.json",
+      "sha256": "83e43509ff25968bf4edbba2261b11454163af0fef1837b66df1059783b039b5"
+    },
+    "SAN_native90": {
+      "path": "artifacts/native90-sanitize-gates-20261117/native90-v1-20261117/status.json",
+      "sha256": "fda26d5b71fec8fa8c1b821701eeb5ca619a535c2fd1ed7e8f47b37e280c4c5f"
+    },
+    "SAN_unit_terminal": {
+      "path": "artifacts/native90-sanitize-gates-20261117/native90-unit-terminal-20261117.txt",
+      "sha256": "ed2b0bc7852beed4f895658b95855b2f0ab74419709f074457e09a6bb3f05d8c"
+    },
+    "SAN_root_review": {
+      "path": "artifacts/native90-sanitize-gates-20261117/root-native90-review-20261117.json",
+      "sha256": "0833c413e5c1e4d29480d63d837ba9f0a0151e255d7d8ec7d04e657bc5b806cd"
+    },
+    "Wayland_Arc14": {
+      "path": "artifacts/whole090f-wayland-20261117/native-arc-v4-driver-status.json",
+      "sha256": "845e7c89ab7902771a9c33fe00a891d4b456e0d3f3a9c33c31092677459343ca"
+    }
+  },
+  "strict_native_actual": {
+    "passed": 90,
+    "steps": [
+      {
+        "name": "app-version",
+        "exit": 0
+      },
+      {
+        "name": "selected-CTest-list",
+        "exit": 0
+      },
+      {
+        "name": "native90",
+        "exit": 0
+      },
+      {
+        "name": "workspace27",
+        "exit": 0
+      },
+      {
+        "name": "workspace373",
+        "exit": 0
+      },
+      {
+        "name": "raw90159",
+        "exit": 0
+      }
+    ],
+    "input_drift": [],
+    "remaining_owned_processes": [],
+    "strict_environment": {
+      "LD_LIBRARY_PATH": "/home/blux/de-xr/dome-sculpt/artifacts/sdk-20261111/toolkit-sanitize/lib:/opt/fltk-vr/bdf-runtime/lib:/usr/lib64",
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+      "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+      "LSAN_OPTIONS": null,
+      "LIBGL_ALWAYS_SOFTWARE": "1",
+      "LD_PRELOAD": null,
+      "LP_NUM_THREADS": "2",
+      "CTEST_PARALLEL_LEVEL": "1"
+    },
+    "lease": {
+      "owner_pid": 2934532,
+      "before_any_product": true,
+      "acquired_epoch": 1794947920.87001,
+      "released_epoch": 1794948922.468875
+    }
+  },
+  "not_claimed": [
+    "Whole owning build of f1",
+    "Advanced90fad source-family admission",
+    "Physical headset acceptance",
+    "Native DRM/zero-copy acceptance",
+    "System installation",
+    "Full production completion"
+  ]
+}

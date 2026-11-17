@@ -1,3 +1,12 @@
+Current draft continuation: source `a7a6176b` merges main `f108cc48` and the
+explicit genuine-body witness fixture `7fb2cc1c`. The original geometric selector
+and its failed fixed views remain unchanged; the new mode uses independently
+forecast real female36/male56 triangles in both poses, with the same material,
+lighting, camera recipe, probes and numerical limits. Both complete fixture TUs
+and links pass, but its actual software/Arc matrix is still pending. Production
+bytes remain exactly `1bc13125`; this is still an unfrozen, unbuilt combined
+draft. The earlier integration record and actual failed runs follow unchanged.
+
 # Combined normal-source integration draft — 2026-11-15
 
 The integration branch now preserves main `039f158b`, native-qualified component

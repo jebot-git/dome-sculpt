@@ -9,8 +9,13 @@ Update this current summary at milestones rather than prepending more history.
 
 ## Source and integration boundary
 
-- Main's admitted production baseline is3d164382 with the explicitly exercised
-  c54 test reporter/02d coordinator. Read
+- Main now admits product1bc13125 and public fixturef1e193c7 after complete
+  Release and strict sanitizer qualification. Read
+  [the current admission](NORMAL-RUNTIME-ADMISSION-20261117.md) for exact
+  owning-source/test/runtime roles. The newer advanced90fad product remains
+  separate and is not admitted by this milestone.
+- The earlier3d164382 baseline with the explicitly exercised
+  c54 test reporter/02d coordinator remains separately qualified. Read
   [baseline admission](GUARD87-RUNTIME-ADMISSION-20261115.md): Release87 and strict
   sanitizer87, desktop208, syntheticXR776 and separately qualified software/Arc.
 - The successor normal-source product1bc13125 has native/sanitizer and
@@ -54,8 +59,14 @@ snapshot. Never restart a job merely because an observation handle times out.
    The [v2 correction](SAN90-EXECUTOR-V2-20261117.md) preserves exactly those
    two O3/march=native owners and O1 for the other1034, with ASan/UBSan and
    frame-pointer instrumentation for ALL1036. Source/CMake/commands are unchanged;
-   original failure and expected pins remain preserved. The v2 build is live;
-   require actual terminal0 and separate review before any sanitizer products.
+   original failure and expected pins remain preserved. The v2 owning build
+   now terminates0 in5645.490s with1036 owners/1776 outputs, zero drift and
+   no survivors; read NATIVE90-SANITIZE-OWNING-20261117.md. Its separately
+   reviewed strict native90 run also passes ALL90 suites plus version,
+   workspace27/373 and raw90159, with final drift[]/owned[]/released lease.
+   Actual unit2934532/Invocation7d8e087a completed0 and was stopped only after
+   root captured terminal properties and journal. Read
+   NATIVE90-SANITIZE-ACTUAL-20261117.md for the scoped runtime proof.
 
 
 Builds use regular-user bounded units, two compiler jobs and8GiB aggregate RSS.
@@ -100,8 +111,9 @@ queries the actual context and changes no application rendering.
 
 Operational drivers are in artifacts/prepared-public-operational-20261117 and
 artifacts/whole090f-wayland-20261117. Use the common graphics lease before ldd/
-products/GL and release only after owned-process cleanup. SAN products still
-require the real owning-build success and separately bound root review.
+products/GL and release only after owned-process cleanup. The whole SAN runtime
+is now qualified separately above. New advanced-family products still require
+their own reviewed component gates.
 
 Combined native90 runner is prepared in artifacts/native90-release-gates-20261117;
 its exact driver SHA is55f06be3963aaff1726962b224d7a534015ea89b179cb13e9e935dfe4744f057.
@@ -115,12 +127,13 @@ owned cleanup. Original87/SAN/runtime failures remain honest separate records.
 
 A further coherent source branch work/authoring-public-integration-20261117
 (commit5605520b) merges the test-onlyf1 correction
-with090f without modifying the still-building frozen source. Product/tests/build
+with090f without modifying the frozen source. Product/tests/build
 files matchf1 exactly. No whole-build560 claim follows from this source merge.
 The separate pushed admission draft637ea1f4 on
 work/normal-runtime-admission-20261117 merges that source with main771031f8;
-read NORMAL-RUNTIME-ADMISSION-DRAFT-20261117.md in that worktree. Strict
-sanitizer closure still gates product admission into main.
+read NORMAL-RUNTIME-ADMISSION-DRAFT-20261117.md in that worktree. Its strict
+sanitizer condition is now satisfied; main merges this history in the current
+qualified admission. No whole-f1 owning build is claimed.
 
 ## Next production slice
 
@@ -140,6 +153,14 @@ or whole-App admission. Genuine first-Bake fixture setup
 and stale-event negatives were corrected without weakening source guards;
 original failures remain preserved. Canonical/native32/independent writable-paint
 domains remain explicit refusals pending their own actual adapters.
+
+All six new strict component TUs and three fresh links now pass in
+artifacts/artist-advanced-normal-sanitize-20261117. Their runtime17/91/139 gate
+is being prepared; compilation/linking alone is not sanitizer runtime proof.
+Public source checkpoint8bb4072d adds separate real source-use and public
+UV-creation desktop/XR scenarios; two fresh Release test TUs are being prepared
+before any products. Existing frontend UV controls already expose both methods.
+Independent new-family graphical consumer coverage is a separate next task.
 
 ## Canonical toolkit and full remaining goal
 

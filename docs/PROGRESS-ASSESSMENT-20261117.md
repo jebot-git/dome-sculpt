@@ -7,8 +7,10 @@ assessment does not replace the complete [requirements](REQUIREMENTS.md).
 
 ## Qualified baseline and combined successor
 
-Main's admitted product remains3d164382, with the qualified reporter/coordinator
-changes. It includes sculpt layers/masks/symmetry, polygon and UV editing,
+Main now admits product1bc13125 and public fixturef1e193c7; read
+[the current integration record](NORMAL-RUNTIME-ADMISSION-20261117.md).
+The earlier3d164382 baseline remains separately qualified. The suite includes
+sculpt layers/masks/symmetry, polygon and UV editing,
 layered paint/projection, rig/weight/morph tools, import/export subsets, ordered
 saves, recovery and edit history. These are implemented workflow subsets, not
 proof of the complete production requirements.
@@ -23,12 +25,15 @@ DomeD passes14 controls, canvas and GPU checks. See
 [public application](WHOLE090F-PUBLIC-UI64-XR260-20261117.md) and
 [native Wayland](WHOLE090F-WAYLAND-GPU-ACTUAL-20261117.md).
 
-The same whole sanitizer build has completed all291 fresh TUs,737 links and
-three generators and is still performing its final audits at this snapshot.
-Its actual successful terminal status and subsequent strict native runtime
-tests remain required. The pending integration draft is pushed separately;
-main does not yet admit this successor. Synthetic XR and nested diagnostic
-Wayland presentation do not establish physical headset or native DRM acceptance.
+The same whole sanitizer build completes successfully with1036 owners and1776
+outputs; its strict native90 run and version/workspace/raw checks also finish0,
+with zero input drift and no survivors. See
+[owning qualification](NATIVE90-SANITIZE-OWNING-20261117.md) and
+[runtime qualification](NATIVE90-SANITIZE-ACTUAL-20261117.md).
+Main now merges the qualified successor. The owning source remains090f, while
+the separately exercised public fixture isf1; no whole-f1 build is claimed.
+Synthetic XR and nested diagnostic Wayland presentation do not establish
+physical headset or native DRM acceptance.
 
 ## Further production work in progress
 
@@ -50,8 +55,9 @@ Current canonical DomeD FLTK and bitmap-font builds remain selected; see
 
 ## Main remaining goals
 
-1. Close combined sanitizer qualification, merge the tested successor, then
-   qualify the combined candidate in the physical headset/controller workflow.
+1. Qualify the newly integrated combined candidate in the physical
+   headset/controller workflow and finish the next baking adapters' own
+   sanitizer, graphical and public application qualification.
 2. Complete production-size sustained sculpting, local meshing, allocation and
    recovery hardening, topology/paint preservation, remeshing and retopology.
 3. Finish texture sets, broader layered paint/normal/AO/material baking and

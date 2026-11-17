@@ -4,6 +4,14 @@ Read [docs/HANDOFF.md](docs/HANDOFF.md) first for the latest checkpoint, remaini
 work and validation results. Preserve the full objective in
 [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md); this checkpoint is not completion.
 
+Current admission: product `1bc13125` and public fixture `f1e193c7` are integrated
+after Release90, strict sanitizer90, whole-application desktop64/syntheticXR260
+and native Wayland14 qualification. Read
+[docs/NORMAL-RUNTIME-ADMISSION-20261117.md](docs/NORMAL-RUNTIME-ADMISSION-20261117.md)
+for exact source roles. The newer advanced `90fad800` adapter is separate and
+must not be treated as admitted by those results. Historical notes below retain
+their original dates and scopes; the current handoff takes precedence.
+
 - Runtime: native C++20, FLTK frontends and direct EGL/OpenXR. Python is optional
   test orchestration only. Do not introduce Qt/GTK/Pango/Erlang runtime frontends.
 - Fonts: native BDF/PCF through the canonical DomeD Fontconfig/FreeType helpers. Preserve DomeD

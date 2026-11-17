@@ -78,17 +78,24 @@ blur_visual_reference::Match visual_match(const std::string&name,int eye,int wid
 
 std::string field_mode(){const auto*p=getenv("DOME_XR_BAKED_EMISSION");return p?p:"";}
 bool source8_view_mode(){return field_mode()=="source8-view";}
-bool field_history(){return field_mode()=="apply";}
+bool prepared_mode(){return field_mode()=="prepared-rebake";}
+bool prepared_reopen(){return field_mode()=="prepared-reopen";}
+bool prepared_label_gate(){return prepared_mode()&&(field_step==31||field_step==35||field_step==45||field_step==49||field_step==55);}
+std::array<std::map<unsigned,std::pair<unsigned,unsigned>>,2> prepared_labels_visible;
+const char*prepared_label_env(){return field_step==31?"DOME_XR_PREPARED_ORIGINAL_KEY":field_step==35?"DOME_XR_PREPARED_SOURCE_KEY":field_step==45?"DOME_XR_PREPARED_NORMALS_NO_KEY":field_step==49?"DOME_XR_PREPARED_NORMALS_YES_KEY":"DOME_XR_PREPARED_BAKING_KEY";}
+bool prepared_press(){return prepared_mode()&&(field_step==33||field_step==38||field_step==47||field_step==52);}
+bool field_history(){return field_mode()=="apply"||prepared_mode();}
 bool field_root_gate(){return field_step==61||field_step==77||field_step==91;}
 bool field_close_gate(){return field_step==65||field_step==79||field_step==93;}
 bool field_reset(){return false;}
 bool field_mark(const char*name){const auto*p=getenv("DOME_XR_BAKED_EMISSION_GATES");return p&&std::filesystem::exists(std::filesystem::path(p)/name);}
 uint32_t field_target(){return 64;}
-bool bake_page_gate(){return field_step==15||field_step==21||field_step==27;}
+bool bake_page_gate(){return !prepared_reopen()&&(field_step==15||field_step==21||field_step==27);}
 bool field_wait(){
  if(source8_view_mode())return field_step==5&&!field_mark("visible-inspected");
  if(field_step==9&&(field_root_signatures[0].empty()||field_root_signatures[1].empty()))return true;
  auto pending=[&](const auto&eyes){for(const auto&visible:eyes){const auto at=visible.find(field_step);if(at==visible.end()||at->second.second+1!=physical_frame||physical_frame<at->second.first+3)return true;}return false;};
+ if(prepared_label_gate())return pending(prepared_labels_visible);
  if(field_root_gate())return pending(field_root_visible);
  if(field_close_gate())return pending(field_menu_closed);
  if(bake_page_gate())return pending(bake_page_visible);
@@ -97,11 +104,15 @@ bool field_wait(){
 bool field_click(){
  if(source8_view_mode())return false;
  if(field_root_gate())return !field_root_open&&physical_frame%4==0;
+ if(prepared_reopen())return field_step==8||(field_step==60&&!field_root_open)||field_step==64;
+ if(prepared_mode()&&(field_step==44||field_step==58))return true;
  return field_step==8||field_step==14||field_step==20||field_step==26||field_step==30||field_step==60||field_step==64||field_step==76||field_step==78||field_step==90||field_step==92;
 }
 int field_sector(){
  if(source8_view_mode())return -1;
  if(field_root_gate())return field_root_open?6:-1;
+ if(prepared_reopen())return field_step>=62&&field_step<=64?6:-1;
+ if(prepared_mode()){if(field_step>=27&&field_step<=30)return 0;if(field_step>=42&&field_step<=44)return 9;if(field_step>=56&&field_step<=58)return 3;}
  if(field_step>=12&&field_step<=14)return 8; // ROOT -> Objects.
  if(field_step>=15&&field_step<=20)return 9; // Objects -> Mesh tools.
  if(field_step>=21&&field_step<=26)return 6; // Mesh tools -> Baking.
@@ -596,7 +607,7 @@ FN(ReleaseSwapchainImage, XrSwapchain p, const XrSwapchainImageReleaseInfo *) {
       if(bake_page_gate()){
         // Source input.cpp/palette.cpp: exact Objects -> Mesh tools -> Mesh
         // baking titles and actual highlighted command cells in each eye.
-        const int sector=field_step==15?9:field_step==21?6:3;
+        const int sector=field_step==15?9:field_step==21?6:prepared_mode()?0:3;
         const float a=sector*3.14159265358979323846f/6;
         const int x=int(320+220*std::cos(a)),y=int(320-220*std::sin(a));
         int selected_pixels=0,selected_samples=0,label_bright=0;
@@ -610,11 +621,16 @@ FN(ReleaseSwapchainImage, XrSwapchain p, const XrSwapchainImageReleaseInfo *) {
         if(ready){auto[it,first]=page_visible.try_emplace(field_step,physical_frame,physical_frame);it->second.second=physical_frame;detail["first"]=it->second.first;detail["last"]=physical_frame;}
         else page_visible.erase(field_step);
       }
+      if(prepared_label_gate()){
+        const auto*key=getenv(prepared_label_env());const auto shape=key?visual_match(key,s->eye,s->width,s->height,bytes):blur_visual_reference::Match{};
+        auto&detail=report["prepared_ui"][std::to_string(field_step)][std::to_string(s->eye)];detail={{"key",key?key:""},{"shape",shape.json()},{"ready",shape.matching}};
+        if(shape.matching){auto[it,first]=prepared_labels_visible[s->eye].try_emplace(field_step,physical_frame,physical_frame);it->second.second=physical_frame;detail["first"]=it->second.first;detail["last"]=physical_frame;}else prepared_labels_visible[s->eye].erase(field_step);
+      }
       if(field_root_gate()){
         report["field_root_title_match"][std::to_string(field_step)][std::to_string(s->eye)]=same;
         // Undo77 must expose a real available Redo; accepted61 and redone91
         // must expose it disabled. A stale ROOT title alone cannot pass.
-        const bool history_ready=field_step==77?(redo_enabled&&undo_bright==0):(redo_disabled&&undo_bright>=4);
+        const bool history_ready=prepared_reopen()?(redo_disabled&&undo_bright==0):field_step==77?(redo_enabled&&undo_bright==0):(redo_disabled&&undo_bright>=4);
         const bool ready=field_root_eye_open[s->eye]&&selected&&history_ready;
         ui["undo_bright_pixels"]=undo_bright;ui["expected_redo_enabled"]=field_step==77;ui["valid_root_acknowledgment"]=ready;
         if(ready){auto[it,first]=root_visible.try_emplace(field_step,physical_frame,physical_frame);it->second.second=physical_frame;report["field_root_visible"][std::to_string(field_step)][std::to_string(s->eye)]={{"first",it->second.first},{"last",physical_frame},{"title_pixels",lit},{"save_selected",selected},{"redo_enabled",redo_enabled},{"redo_disabled",redo_disabled}};}
@@ -626,8 +642,8 @@ FN(ReleaseSwapchainImage, XrSwapchain p, const XrSwapchainImageReleaseInfo *) {
       }
     }
     report["field_images"][std::to_string(field_step)][std::to_string(s->eye)]=std::count_if(bytes.begin(),bytes.end(),[](uint8_t v){return v!=0;});
-    const bool save_attempt=field_history()&&(field_step==64||field_step==78||field_step==92);
-    const bool capture=field_step==9||bake_page_gate()||field_step==59||field_step==61||field_step==65||field_step==68||field_step==96||save_attempt;
+    const bool save_attempt=(field_history()||prepared_reopen())&&(field_step==64||field_step==78||field_step==92);
+    const bool capture=field_step==9||bake_page_gate()||prepared_label_gate()||field_step==59||field_step==61||field_step==65||field_step==68||field_step==96||save_attempt;
     const bool root_capture=field_root_gate()&&field_root_visible[s->eye].contains(field_step)&&field_root_visible[s->eye].at(field_step).second==physical_frame;
     const bool closed_capture=field_close_gate()&&field_menu_closed[s->eye].contains(field_step)&&field_menu_closed[s->eye].at(field_step).second==physical_frame;
     const bool waiting_capture=(field_step==9||bake_page_gate()||field_root_gate()||field_close_gate()||(field_history()&&(field_step==67||field_step==81||field_step==95)))&&physical_frame%300==0;
@@ -655,6 +671,7 @@ FN(ReleaseSwapchainImage, XrSwapchain p, const XrSwapchainImageReleaseInfo *) {
       }
     }
     if(capture||root_capture||closed_capture||waiting_capture)save_image(key);
+    if(prepared_label_gate()&&prepared_labels_visible[s->eye].contains(field_step))save_image(std::to_string(field_step)+"-prepared-ready-"+std::to_string(s->eye));
     if(bake_page_gate()){
       const auto&ui=report["bake_page_ui"][std::to_string(field_step)][std::to_string(s->eye)];
       // Diagnostic evidence ignores the title predicate, never the gate. Both
@@ -830,7 +847,7 @@ FN(PollEvent, XrInstance, XrEventDataBuffer *out) {
   if(source8_view_mode()&&field_step>=8&&menu_completion_event<2){
     auto*e=reinterpret_cast<XrEventDataSessionStateChanged*>(out);e->type=XR_TYPE_EVENT_DATA_SESSION_STATE_CHANGED;e->session=reinterpret_cast<XrSession>(&session_tag);e->state=menu_completion_event++==0?XR_SESSION_STATE_STOPPING:XR_SESSION_STATE_EXITING;return XR_SUCCESS;
   }
-  if(!field_mode().empty()&&field_step>=102&&menu_completion_event<2){
+  if(!field_mode().empty()&&field_step>=(prepared_reopen()?70:102)&&menu_completion_event<2){
     auto*e=reinterpret_cast<XrEventDataSessionStateChanged*>(out);e->type=XR_TYPE_EVENT_DATA_SESSION_STATE_CHANGED;e->session=reinterpret_cast<XrSession>(&session_tag);e->state=menu_completion_event++==0?XR_SESSION_STATE_STOPPING:XR_SESSION_STATE_EXITING;return XR_SUCCESS;
   }
   if(field_mode()=="reference"&&field_step>=34&&!reference_event){
@@ -1141,8 +1158,10 @@ FN(GetActionStateFloat, XrSession, const XrActionStateGetInfo *p,
   out->isActive = active;
   out->currentState = 0;
   if(!field_mode().empty()){
-    // Blur uses only real joystick Boolean/vector actions; no paint stroke.
-    if(out->currentState>0)report["field_pressures"].push_back({{"step",field_step},{"pressure",out->currentState}});return XR_SUCCESS;
+    // Prepared-source controls use the existing real UI pressure action, while
+    // the legacy Source8 modes retain their original zero-pressure behavior.
+    if(prepared_press()&&right(p->subactionPath)&&a->name=="paint_pressure")out->currentState=.9f;
+    if(out->currentState>0)report["field_pressures"].push_back({{"step",field_step},{"pressure",out->currentState},{"action",a->name},{"purpose",field_step==33?"explicit Prepared source":field_step==47?"portable normals":"public controls Done"}});return XR_SUCCESS;
   }
   if(retopo_history())return XR_SUCCESS;
   if(!expression_mode().empty())return XR_SUCCESS;
@@ -1458,6 +1477,12 @@ FN(LocateSpace, XrSpace handle, XrSpace, XrTime, XrSpaceLocation *p) {
                      XR_SPACE_LOCATION_ORIENTATION_VALID_BIT;
   if(!field_mode().empty()){
     p->pose.orientation={0,0,0,1};p->pose.position=s->action?XrVector3f{right(s->hand)?0.f:-.3f,1.48f,-.48f}:XrVector3f{0,1.6f,0};
+    if(prepared_mode()&&s->action&&right(s->hand)&&s->action->name=="aim_pose"){
+      // Source and BakeColors public sliders / Done buttons; world ray stays
+      // over the panel between pressure edges, never over editable geometry.
+      float x=520,y=240;if(field_step>=36&&field_step<=39){x=470;y=609;}else if(field_step>=45&&field_step<=50)y=350;else if(field_step>=51&&field_step<=53){x=470;y=609;}
+      if(field_step>=31&&field_step<=53)p->pose.position={(x/640-.5f)*.6f,1.56f+(.5f-y/640)*.6f,-.3f};
+    }
     return XR_SUCCESS;
   }
   if(!canonical_conversion_mode().empty()){

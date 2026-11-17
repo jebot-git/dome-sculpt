@@ -1,3 +1,12 @@
+## Current integration — 2026-11-17
+
+Main now integrates product `1bc13125` and public fixture `f1e193c7` after
+Release90 and strict sanitizer90 runtime qualification, public desktop64 and
+syntheticXR260 workflows, and native Wayland14 checks. Exact owning/test/runtime
+roles are recorded in [the admission](NORMAL-RUNTIME-ADMISSION-20261117.md).
+This does not complete the production matrix below or admit advanced `90fad800`.
+The full goal remains active. Earlier checkpoint notes retain their dated scopes.
+
 ## Qualified baseline runtime integrated into main — 2026-11-15
 
 Main now includes the source-aware baking/HDR-native-field/mapped-humanoid
