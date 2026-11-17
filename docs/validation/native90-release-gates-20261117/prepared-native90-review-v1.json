@@ -1,0 +1,56 @@
+{
+  "state": "prepared-NOT-executed",
+  "driver": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/native90-release-gates-20261117/run-native90-v1.py",
+    "sha256": "55f06be3963aaff1726962b224d7a534015ea89b179cb13e9e935dfe4744f057"
+  },
+  "source": "090f009ede2c0623ca616fe892223b4f68f1c2c4",
+  "plan": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/native90-release-planning-20261115/release-090f00-20261117-audit/plan.json",
+    "sha256": "ccf9931035481459d7f51ec03e829ee2572e424d381d2bbc69a29c1fe26e1661"
+  },
+  "selected_native_tests": 90,
+  "owned_output_count_required": 1776,
+  "actual_MD_owners_required": 1036,
+  "routes": {
+    "fresh": 291,
+    "reused_complete": 745
+  },
+  "no_product_execution": true,
+  "preparation_checks": {
+    "AST": true,
+    "plan_exit": 0,
+    "planned_native_count": 90
+  },
+  "review_required_fields": {
+    "state": "reviewed-native90-Release",
+    "driver_sha256": "55f06be3963aaff1726962b224d7a534015ea89b179cb13e9e935dfe4744f057",
+    "source": "090f009ede2c0623ca616fe892223b4f68f1c2c4",
+    "plan_sha256": "ccf9931035481459d7f51ec03e829ee2572e424d381d2bbc69a29c1fe26e1661",
+    "owning_status_sha256": "actual terminal0 full owning status hash; not available while build runs"
+  },
+  "unit_recommendation": {
+    "Type": "exec",
+    "RemainAfterExit": true,
+    "MemoryMax": "6G",
+    "RuntimeMaxSec": 6000,
+    "KillMode": "control-group",
+    "TimeoutStopSec": 10
+  },
+  "preserved_limits": {
+    "preflight_seconds": 600,
+    "postflight_seconds": 600,
+    "selected_native_seconds": 2400,
+    "default_individual_CTest_seconds": 180,
+    "workspace27_seconds": 300,
+    "workspace373_seconds": 300,
+    "raw90159_seconds": 300,
+    "app_version_seconds": 60,
+    "aggregate_command_RSS_bytes": 6442450944
+  },
+  "monitor": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/artist-prepared-strict-monitor-20261115/owned_monitor_v2.py",
+    "sha256": "b510ef5655e3214bd38e7b5f56022c37a79879070c3733f2dd059bad74f21269"
+  },
+  "scope": "Combined090f Release whole materialization prerequisite, exact90selected native plusversion/workspaces/raw controls. No wrapper/source/build expectation rewriting, no install/HMD/session restart."
+}
