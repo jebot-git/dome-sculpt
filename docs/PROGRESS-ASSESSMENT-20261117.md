@@ -56,8 +56,9 @@ and all eight desktop UV-creation cases pass112 checks. Read
 [source-use XR](ADVANCED-PUBLIC-SOURCE-XR-MATRIX-20261118.md) and
 [UV creation](ADVANCED-PUBLIC-UV-GUI-MATRIX-20261118.md).
 These newer production changes are not integrated into main. UV-creation XR
-first exposed test reporter/capture assumptions; an observation-only child
-preserves the actual input, render-skip and tracking-loss stream for rerunning.
+passes all eight cases/208 checks using the observation-only child that preserves
+the actual input, render-skip and tracking-loss stream; read
+[the XR matrix](ADVANCED-PUBLIC-UV-XR-MATRIX-V2-20261118.md).
 
 The advanced graphical test's first software run agrees on correct PBR colours
 but fails required contrast against omitted normals. Declared display-only
@@ -75,18 +76,30 @@ all32 native cases/525092 checks, including both normal roles, UV/key/pose,
 field replacement/Clear, physical emission, history and ordered Save. The four
 fixture/core component passes preserve both earlier compile and test failures;
 read [canonical source proof](ARTIST-CANONICAL-NORMAL-NATIVE-20261118.md).
-Native32/canonical writable-paint SOURCE adapters are now implemented on a
-further isolated child, with native qualification still pending; joint source
-colour/normal handling remains in progress.
+Native32/canonical writable-paint and joint source-colour/normal SOURCE adapters
+are implemented on a further isolated child. All six Release component suites
+pass, including64 writable cases/619634 checks and8 joint cases/346305 checks,
+with121 exact ordered Save pairs. Read
+[the actual component result](ARTIST-WRITABLE-JOINT-NATIVE-20261118.md).
+Their new sanitizer/graphics/application gates remain pending.
 
 The coherent canonical/public candidate8a8ecea1 completes a fresh optimized
 application build:242 actual compiler dependency owners including all193 core
 members,260 build steps, ordinary loader72 and version0. Read
 [the exact build scope](CANONICAL-PUBLIC-RELEASE-APP-20261118.md).
-Its production files match canonical85; this does not establish new GUI/XR or
-all-target qualification. A fresh strict sanitizer core/four-fixture build is
-running separately. Other unsupported source families remain explicit refusals
-pending their actual adapters.
+Its production files match canonical85. One actual fresh-App desktop16 and
+matching Arc syntheticXR65 canary also pass; read
+[the precise source roles](CANONICAL-WHOLE-APP-SOURCE-CANARY-20261118.md).
+The fresh strict sanitizer core/four-fixture gate also passes all four native
+suites, including32 canonical cases, with leak detection and live runtime
+witnesses; read [the sanitizer proof](CANONICAL-NORMAL-STRICT-SANITIZE-20261118.md).
+These are distinct scoped results, not all-target or newer-product441 acceptance.
+
+The next independent creator slice implements a shared native XR draft for
+existing body/face/hair/tint controls and additive avatar variations. Real effects
+of26 controls on both CC0 models, source/skin/morph preservation and actual
+controller workflows are still under verification. Filtered normal quality and
+the explicit target-resolution workflow remain active production work.
 
 The user-accepted controller selection/hierarchy/multiselection/ghost interface
 is preserved. Only the verified CC0 VRoid female/male creator bases are offered.

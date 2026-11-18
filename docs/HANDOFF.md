@@ -189,7 +189,8 @@ UV-creation XR first fails a test reporter/capture contract: intended pressure
 was logged for unused float actions, and captures14/27 conflict with actual
 render skip/tracking loss. Test-only childb7d6ff17 records returned pressure and
 observes13/29 while preserving all action timings and original render/tracking
-events. Its full runtime TU/fresh DSO pass; all-eight rerun remains pending.
+events. Its full runtime TU/fresh DSO and all-eight rerun now pass208 checks;
+read [the faithful XR observation proof](ADVANCED-PUBLIC-UV-XR-MATRIX-V2-20261118.md).
 Operational statuses remain under artifacts/advanced-public-normal-operational-20261117.
 Each case retains the original bounds and common device lease. No
 physical-headset result follows from synthetic XR.
@@ -233,14 +234,22 @@ actual geometry/maps/event/content and detached deformation instead. Its fresh
 fixture compile/link pass. Native execution passes advanced17/263495, prepared91
 and artist139 independently, then canonical32/525092 with32 ordered Save pairs.
 Read [canonical qualification](ARTIST-CANONICAL-NORMAL-NATIVE-20261118.md).
-Other affected consumers, sanitizer, graphics and public application
+The fresh product85/b11 strict sanitizer core/four-fixture gate also passes;
+read [its exact scope](CANONICAL-NORMAL-STRICT-SANITIZE-20261118.md).
+Other affected consumers, new-family graphics and broader public application
 qualification remain pending. Do not reuse an
 old renderer with the changed private packet layout. The32-case canonical
 matrix does not implement the separate native32 writable-paint source family.
-The latter and canonical writable-paint SOURCE adapters now have isolated code
-atf7428248 plus source-selection child4c7eb3bb; direct native first-case sampling
-passes but the whole64-case/native/public closure remains pending. Joint
-source-colour/normal handling is being implemented in a separate child.
+The latter, canonical writable-paint and joint source-colour/normal adapters now
+qualify as SOURCE paths at product441d9985 with explicit fixtureaa8dfdbd/joint48d5dfa3.
+All six Release suites pass: advanced263495/prepared91/artist139/canonical525092,
+writable64/619634 and joint8/346305. All121 ordered Save pairs match exactly;
+read [the component proof](ARTIST-WRITABLE-JOINT-NATIVE-20261118.md).
+This adds immutable paint-attachment capture, source-menu eligibility, correct
+independent PBR/material sampling and bounded colour/normal ancestor replay.
+Original compile/link/fixture failures remain preserved. Strict sanitizer441,
+matching new-packet graphics and a new whole application remain pending;
+product85 sanitizer results do not qualify441.
 
 ## Coherent integration build
 
@@ -256,15 +265,46 @@ Invocation7d8c6f8b6e694690b7970cc3e097a259:242 compiler owners,93903 dependency
 incidences, all193 core members and260 build steps in670.415s. Ordinary loader
 exact72 and version also pass. Terminal/journal captured before stopping the
 completed unit. Read [fresh build proof](CANONICAL-PUBLIC-RELEASE-APP-20261118.md).
-No all-target/test or new application GUI/XR pass is claimed. Keep its source
-worktree frozen, including tests and CMake files.
+The fresh application additionally passes one source-use desktop16 and matching
+Arc syntheticXR65 canary, explicitly App8a/product85 with older unchanged
+fixture/runtime/font roles. Read
+[the coherent App canary](CANONICAL-WHOLE-APP-SOURCE-CANARY-20261118.md).
+No all-target/test or full new-family application matrix is claimed. Keep its
+source worktree frozen, including tests and CMake files.
 
-Fresh strict ASan/UBSan full core plus4 fixtures is now building from immutable
-b11 fixture/product85 under ds-canonical-headless-sanitize-build-20261118.service,
-MainPID267731/Invocation3470aba927444b6bb00cdd284a382716, in
-artifacts/canonical-normal-headless-sanitize-20261118. It uses the actual previous
-qualified O1/g1/instrumented CMake flags, two jobs and6GiB memory. Inspect the
-actual unit/status before acting; no sanitizer runtime result is claimed yet.
+Fresh strict ASan/UBSan full core plus4 fixtures completes0 from immutable b11/
+product85 in artifacts/canonical-normal-headless-sanitize-20261118:193 fresh core
+members/212 actual compiler owners,851.199s. Runtime Invocation96b5dcc1 also
+passes advanced263495/prepared91/artist139/canonical525092 with49 exact ordered
+pairs, live ASan/UBSan witnesses, leak detection, no address-space cap and empty
+drift/survivor lists. Both root units were captured then stopped successfully;
+do not restart them. The compressed scoped proof is committed above.
+
+## Active next slices — inspect actual units before acting
+
+- Filtered-quality agent owns advanced-normal-filter-fidelity source/build
+  worktrees. Versioned new-command quality policy preserves real legacy recipe
+  byte round trips; original64 failures remain negative cases. Explicit target
+  resolution studies show512 insufficient for all dense MToon samples;1024/2048
+  remain to qualify. Frozen7e2bdca3 compiles a complete selected core but its
+  actual diagnostic catches a pseudo-resize bug. The corrected child uses the
+  existing private raster-resize facility, and adds a shared validated generic
+  source sampler so prepared-target checks cannot silently skip ordinary/sculpt
+  sources. No higher-resolution accepted workflow or final GL matrix is claimed.
+- Writable-source agent is preparing strict sanitizer441, then new-packet
+  graphical/application qualification. The six-suite Release result above is
+  terminal; preserve all fixed source/test role boundaries and original failures.
+- Creator agent owns work/vroid-creator-workspace-20261118, source7f3911ca, with
+  CPU build ds-vroid-creator-release-v1-20261118.service/Invocationb08776c1.
+  The missing XR body/face/hair/tint controls now have an unqualified shared
+  native draft/Apply/Cancel implementation reusing existing desktop/backend
+  controls. Actual effects of26 controls on both CC0 bases, source/skin/morph
+  preservation, controller history/cancel/stale authority and export remain
+  under verification. Existing avatars are retained; variations create a new
+  avatar. This does not complete arbitrary existing-avatar or hair-guide editing.
+
+Root rechecked canonical DomeD local and remote main onNov18: both remainacc2b70.
+No system installation, physical-headset launch or active-session restart occurred.
 
 ## Canonical toolkit and full remaining goal
 
