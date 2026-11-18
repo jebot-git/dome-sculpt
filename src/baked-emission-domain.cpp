@@ -108,7 +108,7 @@ std::shared_ptr<const BakedEmissionDomain>BakedEmissionDomain::decode(const nloh
  stop(cancelled);if(!j.is_object()||j.size()!=7||j.at("version")!=1||!j.at("source").is_number_unsigned()||j.at("position").size()!=3||j.at("rotation").size()!=4)throw std::invalid_argument("Invalid retained emission source record");
  const auto bytes=nlohmann::json::to_cbor(j.at("before"));if(bytes.size()>retained_limit)throw std::length_error("Retained emission source archive exceeds bound");
  static thread_local size_t depth=0;if(depth>=8)throw std::length_error("Retained emission archive exceeds owning depth");struct Scope{size_t&depth;Scope(size_t&d):depth(d){++depth;}~Scope(){--depth;}}scope(depth);
- auto before=Scene::decode(j.at("before"));CanvasTransform t;t.position={j.at("position")[0].get<float>(),j.at("position")[1].get<float>(),j.at("position")[2].get<float>()};t.orientation={j.at("rotation")[3].get<float>(),j.at("rotation")[0].get<float>(),j.at("rotation")[1].get<float>(),j.at("rotation")[2].get<float>()};t.scale=j.at("scale").get<float>();
+ auto before=Scene::decode(j.at("before"));CanvasTransform t;t.position={j.at("position")[0].get<float>(),j.at("position")[1].get<float>(),j.at("position")[2].get<float>()};t.orientation.x=j.at("rotation")[0].get<float>();t.orientation.y=j.at("rotation")[1].get<float>();t.orientation.z=j.at("rotation")[2].get<float>();t.orientation.w=j.at("rotation")[3].get<float>();t.scale=j.at("scale").get<float>();validate_transform(t);
  auto result=capture(before,j.at("source").get<uint64_t>(),std::move(target),r,t,cancelled);if(result->field()->resolution()!=j.at("resolution").get<uint32_t>())throw std::invalid_argument("Retained emission replay changed its actual grid");return result;
 }
 } // namespace dome::detail
