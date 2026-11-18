@@ -316,11 +316,14 @@ new component code is on explicit branches until combined qualification.
 - **Combined integration:** frozen candidatef5998a18 on
   work/authoring-current-integration-20261118 merges checked63956, GPUe3de,
   HDR/SOURCE8export60a1, creatorde60 and filtered-normalc56 through real commits.
-  Configuration passes; its fresh Release App plus13 selected fixture build is
-  running in artifacts/authoring-current-combined-release-20261118, unit
-  ds-authoring-current-combined-release-v1-20261118.service,
-  Invocation3de2b138bc794f5db8ce854a708eb7b9/Main3713821. Inspect actual unit
-  before acting; no build/runtime admission follows from configuration or launch.
+  Fresh Release App plus13 selected fixtures now passes all290 build actions
+  in468.201s:259 fresh owners/197 core members,101708 actual dependencies,
+  all14 archives/219 member payloads and actual App link audit0. Read
+  [the composition/build proof](CURRENT-AUTHORING-COMPOSITION-20261118.md).
+  Actual terminal/journal were captured and unit stopped. Empty ControlGroup
+  observation limitation and first observer failure are explicitly preserved;
+  both actual recorded driver/Ninja PIDs are absent. Loader/native/public/current
+  sanitizer qualification remain pending; no runtime admission is inferred.
 - **Independent HDR GPU:** productc524/fixture212 now passes actual llvmpipe
   source64/current512 PBR and MToon, before/after editable physical paint.
   All original FLOAT coefficients survive GPU extraction exactly;4422 checks

@@ -184,7 +184,8 @@ Current canonical DomeD FLTK and bitmap-font builds remain selected; see
 
 The latest user resume revokes the previous round's pause. Current GPU,
 export, creator and normal-quality components are merged into frozen candidate
-f5998a18; its fresh App/13-fixture Release build is running. The component proof
+f5998a18; its fresh App/13-fixture Release build and actual audit now pass
+259 owners/197 core members. Loader and combined runtime gates remain pending. The component proof
 links and exact pending gates are in the current handoff.
 No percentage is assigned: implemented rows differ greatly in scope and several
 still have only partial qualification. No system installation, physical-headset

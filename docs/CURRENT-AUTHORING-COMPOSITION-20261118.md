@@ -19,8 +19,11 @@ Fresh CMake/Ninja configuration passes with native FLTK/OpenXR enabled, explicit
 CPU compute selection, optimized Release and the current selected private bitmap
 SDK. Configuration registers1050 compilation entries overall. The actual build
 selects the App plus13 SOURCE/HDR/creator/renderer fixtures rather than all targets.
-It has started290 build actions from an empty output tree, with two compiler
-jobs, per-compiler900s bounds, an8GiB regular-user unit and2400s whole limit.
+All290 build actions now complete successfully in468.201s from an empty output
+tree, with two compiler jobs, per-compiler900s bounds, an8GiB regular-user unit
+and2400s whole limit. The actual audit verifies259 fresh complete compiler
+owners,197 fresh core members,101708 actual dependency incidences/1665 unique
+paths,174 App linker inputs, and all219 members across14 actual archives.
 Actual compiler MDs and response files are retained; no object from a component
 build is copied into this fresh composition.
 
@@ -28,11 +31,21 @@ Source: `artifacts/authoring-current-integration-20261118`.
 Build: `artifacts/authoring-current-combined-release-20261118`.
 Unit: `ds-authoring-current-combined-release-v1-20261118.service`.
 Invocation: `3de2b138bc794f5db8ce854a708eb7b9`.
-Inspect actual service/status before acting. At this checkpoint configuration
-is0 and compilation is live; no successful build or runtime claim follows.
-Plans pin4567 source inputs plus selected external/configuration/tool inputs
-(5527 total). The actual owning dependency/archive/link audit follows a successful
-terminal build, before loader or selected native/public graphics execution.
+Configuration, selected compilation/link and actual dependency/archive audit
+are0. Plans pin4567 source inputs plus selected external/configuration/tool
+inputs (5527 total). One raw MD path contains tests/../third_party; its canonical
+source bytes match the before-pinned input. Three generated inputs retain their
+actual writer commands and data. Raw MDs/response files are preserved.
+
+The terminal unit/journal were captured before stopping. ControlGroup was empty;
+a first observer incorrectly read the root cgroup and is preserved as failed
+observation. No unrelated PID was treated as owned or signalled. The actual
+terminal MainPID is0/status0, and both recorded driver/Ninja PIDs are separately
+absent. No observed-empty-unit-cgroup claim is made. Loader/version, native,
+public UI/graphics and current sanitizer runtime remain pending.
+
+App SHA256: 44b5a5bb42480b23e30018a87a80572e2d58f49cf98255d819dbd25126d0eec0.
+See [actual build receipt](validation/CURRENT-COMBINED-RELEASE-20261118.json).
 
 No system installation, physical headset launch or session restart occurred.
 The complete original production requirements, later controller trays and
