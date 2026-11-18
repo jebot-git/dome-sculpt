@@ -117,7 +117,8 @@ void verify(const Scene &scene,const CreatedHumanoid &model,const std::filesyste
    ++spheres;
   }
  }
- check(spheres>0&&samples>10000,"Independent dense surface/interior samples lie inside every actual conservative shaped collider");
+ size_t authored_spheres=0;for(const auto &g:oldgroups)authored_spheres+=g.at("colliders").size();
+ check(spheres==authored_spheres && (spheres?samples>10000:newgroups.empty()),"Independent dense containment covers actual authored colliders; an empty genuine source stays empty");
  const auto &oldbones=original.at("secondaryAnimation").at("boneGroups"),&newbones=vrm.at("secondaryAnimation").at("boneGroups");
  for(size_t g=0;g<oldbones.size();++g){auto before=oldbones[g],after=newbones[g];check(after.at("hitRadius").get<float>()>=0,"Refitted spring hit radius is finite and nonnegative");for(size_t r=0;r<before.at("bones").size();++r){const auto source=before.at("bones")[r].get<uint32_t>();check(after.at("bones")[r]==nodes.at(source),"Spring root remains the genuine emitted joint");}
   before.erase("bones");after.erase("bones");before.erase("center");after.erase("center");before.erase("hitRadius");after.erase("hitRadius");check(before==after,"Spring authored force, drag, gravity, collider membership and tuning survive metadata adaptation");
