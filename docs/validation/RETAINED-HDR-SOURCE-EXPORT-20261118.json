@@ -5,20 +5,20 @@
   "parent_product": "ce88905d6f050fda6c251d6feaed5411cbfb57ee",
   "expanded_fixture": "b5b058e96f4142fdc5e8d31e8823f8d83fe84983",
   "legacy_fixture": "061c8a0be682576a9f16bfe92243262cc62f096f",
-  "actual_positive_export_checks": 16400,
+  "actual_positive_export_checks": 16405,
   "independent_dense_probes": 23707,
   "maximum_absolute_HDR_error": 2.51297e-06,
   "unchanged_HDR_bound": 0.0002,
   "native_status": "/home/blux/de-xr/dome-sculpt/artifacts/source-owning-hdr-source8-export-release-20261118/native-v1/status.json",
-  "strict_runtime": "prepared/unrun",
-  "expanded_fixture_runtime": "prepared/unrun",
-  "legacy_fixture_runtime": "prepared/unrun",
+  "strict_runtime": "actual0;80255checks;liveASANUBSAN/leaks/noAScap;noerrors/drift/owned",
+  "expanded_fixture_runtime": "actual0:R16405/S16405",
+  "legacy_fixture_runtime": "actual0:R16417/S16417;explicit transport0;production default1 unchanged",
   "original_refusal_retained": "/home/blux/de-xr/dome-sculpt/artifacts/source-owning-hdr-export-release-20261118/native-v1/export-controls.log",
   "archive": {
     "file": "RETAINED-HDR-SOURCE-EXPORT-20261118-evidence.tar.xz",
-    "sha256": "3805f64a1b8d40bd59ac16d916bf5e1d2d9ddde55891660ec5c3bfa5b7129f29",
-    "bytes": 993524,
-    "members": 529
+    "sha256": "e1b557f6c212199f109cf5b163c3ff537a41d50eb0d00b3718be79b3fd84a093",
+    "bytes": 1185768,
+    "members": 570
   },
   "archived_authorities": {
     "source-owning-hdr-export-controls-build-20261118/build.py": {
@@ -2436,6 +2436,211 @@
       "sha256": "0a2ef6ecbf96ccd4280930c6129bbcba70b696062f84087198e6be21d49f0c4d",
       "bytes": 8592
     },
+    "source-owning-hdr-source8-export-gates-20261118/consumer-validation/release-hidden-retained.glb.khronos.json": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-owning-hdr-source8-export-gates-20261118/consumer-validation/release-hidden-retained.glb.khronos.json",
+      "sha256": "7b59deacf06e093df74274d951d65e311c372e7506343d3b57a8af8a6c30c415",
+      "bytes": 3302
+    },
+    "source-owning-hdr-source8-export-gates-20261118/consumer-validation/release-retained-source-current.glb.khronos.json": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-owning-hdr-source8-export-gates-20261118/consumer-validation/release-retained-source-current.glb.khronos.json",
+      "sha256": "b9d203db603505267421deb2746fc362cf7dab99719da613fe2d5dbef231a6ab",
+      "bytes": 5339
+    },
+    "source-owning-hdr-source8-export-gates-20261118/consumer-validation/release-second.glb.khronos.json": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-owning-hdr-source8-export-gates-20261118/consumer-validation/release-second.glb.khronos.json",
+      "sha256": "c0697aace40619ad26a68be664303e20815949304dabea32ed29ee65bc1d5469",
+      "bytes": 5322
+    },
+    "source-owning-hdr-source8-export-gates-20261118/consumer-validation/release-worker.glb.khronos.json": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-owning-hdr-source8-export-gates-20261118/consumer-validation/release-worker.glb.khronos.json",
+      "sha256": "57fb57e9870c81e6abccd82eab5a1e8c7040fde1cf0d47178fe11f7bcdd1ab41",
+      "bytes": 5322
+    },
+    "source-owning-hdr-source8-export-gates-20261118/consumer-validation/sanitize-hidden-retained.glb.khronos.json": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-owning-hdr-source8-export-gates-20261118/consumer-validation/sanitize-hidden-retained.glb.khronos.json",
+      "sha256": "c7b231a2e4f560bc96ee4d878c35540d9ff09d1c289803097d94537a21056609",
+      "bytes": 3302
+    },
+    "source-owning-hdr-source8-export-gates-20261118/consumer-validation/sanitize-retained-source-current.glb.khronos.json": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-owning-hdr-source8-export-gates-20261118/consumer-validation/sanitize-retained-source-current.glb.khronos.json",
+      "sha256": "84deba037bd158ca9db07195576b1ef54206a661c6e87504e0fe8f358046d37e",
+      "bytes": 5339
+    },
+    "source-owning-hdr-source8-export-gates-20261118/consumer-validation/sanitize-second.glb.khronos.json": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-owning-hdr-source8-export-gates-20261118/consumer-validation/sanitize-second.glb.khronos.json",
+      "sha256": "34634c5d138d94fd2267560ac1132ea4436058673df713435cf465f3519ec731",
+      "bytes": 5322
+    },
+    "source-owning-hdr-source8-export-gates-20261118/consumer-validation/sanitize-worker.glb.khronos.json": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-owning-hdr-source8-export-gates-20261118/consumer-validation/sanitize-worker.glb.khronos.json",
+      "sha256": "8b1f5ebb0ff2b6b087ea572c487d10fac3b899b9abf83860f30befc124138e90",
+      "bytes": 5322
+    },
+    "source-owning-hdr-source8-export-gates-20261118/consumer-validation/status.json": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-owning-hdr-source8-export-gates-20261118/consumer-validation/status.json",
+      "sha256": "670f2d86adbcffa15114b69677d6384c143a33cd3cfed1c8f6e76fb90445c689",
+      "bytes": 3253
+    },
+    "source-owning-hdr-source8-export-gates-20261118/consumer-validation/validate.cjs": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-owning-hdr-source8-export-gates-20261118/consumer-validation/validate.cjs",
+      "sha256": "29128c83eba698d84f8e0586ffb1b2186cb6b443efa02bb216e7dc035c65fb8f",
+      "bytes": 1295
+    },
+    "source-owning-hdr-source8-export-gates-20261118/prepare.py": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-owning-hdr-source8-export-gates-20261118/prepare.py",
+      "sha256": "4066972d258cf3d86ff30644897166caf9f0fbb42e8401f46d7742f9532ac9e1",
+      "bytes": 3795
+    },
+    "source-owning-hdr-source8-export-gates-20261118/release/baked-workflow.ldd": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-owning-hdr-source8-export-gates-20261118/release/baked-workflow.ldd",
+      "sha256": "3b168f70c6df917c41d7dd08badeb6ff51abf690e5bd765053696ab4183e4780",
+      "bytes": 1654
+    },
+    "source-owning-hdr-source8-export-gates-20261118/release/baked-workflow.log": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-owning-hdr-source8-export-gates-20261118/release/baked-workflow.log",
+      "sha256": "536147bd07f4599ce084da08c68ff6a90df3f2f2bffc3968db5dbe39fc3606c3",
+      "bytes": 40
+    },
+    "source-owning-hdr-source8-export-gates-20261118/release/baked-workflow.maps": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-owning-hdr-source8-export-gates-20261118/release/baked-workflow.maps",
+      "sha256": "433736c38f7141eff9eaedb5a5a45a0757d16eac9f996bdf8857237024091bab",
+      "bytes": 6951
+    },
+    "source-owning-hdr-source8-export-gates-20261118/release/current-inputs.json": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-owning-hdr-source8-export-gates-20261118/release/current-inputs.json",
+      "sha256": "358f33825fb8b1b76542929bfa81131ce207505617017f9d1fb01448000cf6e7",
+      "bytes": 1398240
+    },
+    "source-owning-hdr-source8-export-gates-20261118/release/export-controls.ldd": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-owning-hdr-source8-export-gates-20261118/release/export-controls.ldd",
+      "sha256": "59fecc90c995c9da11c7375b2b12667448c55e8a7d88ff275c256b39c11294bb",
+      "bytes": 1654
+    },
+    "source-owning-hdr-source8-export-gates-20261118/release/export-controls.log": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-owning-hdr-source8-export-gates-20261118/release/export-controls.log",
+      "sha256": "73df9032ee3aa8ee12d6ce8c245f43d2cd8296842172a58fedd72d6756b4e3b6",
+      "bytes": 669
+    },
+    "source-owning-hdr-source8-export-gates-20261118/release/export-controls.maps": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-owning-hdr-source8-export-gates-20261118/release/export-controls.maps",
+      "sha256": "fc680dd1f1c72efebf838c2821f3638038ecc760c6e94ffdb65a4ff9b13e36e5",
+      "bytes": 11988
+    },
+    "source-owning-hdr-source8-export-gates-20261118/release/journal.log": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-owning-hdr-source8-export-gates-20261118/release/journal.log",
+      "sha256": "8cb18e15aa71b4044cf903fa1089fcaf759e64aa4ab386643e5414dbc4b7850e",
+      "bytes": 497
+    },
+    "source-owning-hdr-source8-export-gates-20261118/release/plan.json": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-owning-hdr-source8-export-gates-20261118/release/plan.json",
+      "sha256": "d6133daaddb8e4d5aa7135e26c7844c3f065510248b0cc25c1ecd13f58337756",
+      "bytes": 1484704
+    },
+    "source-owning-hdr-source8-export-gates-20261118/release/run.py": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-owning-hdr-source8-export-gates-20261118/release/run.py",
+      "sha256": "817c405feffb09df61517f0e149c8243be090049fa7fe46114df11d4a634d355",
+      "bytes": 5004
+    },
+    "source-owning-hdr-source8-export-gates-20261118/release/status.json": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-owning-hdr-source8-export-gates-20261118/release/status.json",
+      "sha256": "b78972797a49fa15ef918d84990c79c29be76d903b1200621e10f9a75157f366",
+      "bytes": 16210
+    },
+    "source-owning-hdr-source8-export-gates-20261118/release/unit-terminal.txt": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-owning-hdr-source8-export-gates-20261118/release/unit-terminal.txt",
+      "sha256": "004843f98ad592d4c55ba9518c7751d97b25405dcd7b6113561c807f2f19dceb",
+      "bytes": 123
+    },
+    "source-owning-hdr-source8-export-gates-20261118/sanitize/baked-workflow.ldd": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-owning-hdr-source8-export-gates-20261118/sanitize/baked-workflow.ldd",
+      "sha256": "514ee16744b4e81d2889e8f012e59f799f174604e93fc7b92f7797909f2fa086",
+      "bytes": 1780
+    },
+    "source-owning-hdr-source8-export-gates-20261118/sanitize/baked-workflow.log": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-owning-hdr-source8-export-gates-20261118/sanitize/baked-workflow.log",
+      "sha256": "536147bd07f4599ce084da08c68ff6a90df3f2f2bffc3968db5dbe39fc3606c3",
+      "bytes": 40
+    },
+    "source-owning-hdr-source8-export-gates-20261118/sanitize/baked-workflow.maps": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-owning-hdr-source8-export-gates-20261118/sanitize/baked-workflow.maps",
+      "sha256": "3d4c0c155bf42d7185dd97c61de76530a605faff8799a256f4880bac325f05c5",
+      "bytes": 20489
+    },
+    "source-owning-hdr-source8-export-gates-20261118/sanitize/current-inputs.json": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-owning-hdr-source8-export-gates-20261118/sanitize/current-inputs.json",
+      "sha256": "b3934078ea9779ff17504730c1c80199da83d1e5e4505ef3bc4a7f93c69706c1",
+      "bytes": 2040304
+    },
+    "source-owning-hdr-source8-export-gates-20261118/sanitize/export-controls.ldd": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-owning-hdr-source8-export-gates-20261118/sanitize/export-controls.ldd",
+      "sha256": "20fb0fe2425b1106b6b5b104b53552487394c3ab8ed6196c5da2d316f4741722",
+      "bytes": 1780
+    },
+    "source-owning-hdr-source8-export-gates-20261118/sanitize/export-controls.log": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-owning-hdr-source8-export-gates-20261118/sanitize/export-controls.log",
+      "sha256": "73df9032ee3aa8ee12d6ce8c245f43d2cd8296842172a58fedd72d6756b4e3b6",
+      "bytes": 669
+    },
+    "source-owning-hdr-source8-export-gates-20261118/sanitize/export-controls.maps": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-owning-hdr-source8-export-gates-20261118/sanitize/export-controls.maps",
+      "sha256": "522c1cc49ce5a0286d8716985d3df4df1a477e3d8c56c661a2ea96690156c71e",
+      "bytes": 29272
+    },
+    "source-owning-hdr-source8-export-gates-20261118/sanitize/joint-000-512.ldd": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-owning-hdr-source8-export-gates-20261118/sanitize/joint-000-512.ldd",
+      "sha256": "cb0e21795fdef616ed10fc726d3bb490e256f45b2856bc57a60f83d1a4faef3d",
+      "bytes": 1780
+    },
+    "source-owning-hdr-source8-export-gates-20261118/sanitize/joint-000-512.log": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-owning-hdr-source8-export-gates-20261118/sanitize/joint-000-512.log",
+      "sha256": "3be9ce4e9561a8e0432627b64df807ae228819b07dc2b21e77685b02bb503cb4",
+      "bytes": 1348
+    },
+    "source-owning-hdr-source8-export-gates-20261118/sanitize/joint-000-512.maps": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-owning-hdr-source8-export-gates-20261118/sanitize/joint-000-512.maps",
+      "sha256": "4b7bdc05535af5d13f3e50869d66aeaef54187d26e23865216720601f3f7c83e",
+      "bytes": 25458
+    },
+    "source-owning-hdr-source8-export-gates-20261118/sanitize/journal.log": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-owning-hdr-source8-export-gates-20261118/sanitize/journal.log",
+      "sha256": "a725834a4935782658bd8b0fde21a1a42568070e7393c17c2ce4e1fc700e97c1",
+      "bytes": 501
+    },
+    "source-owning-hdr-source8-export-gates-20261118/sanitize/owner-controls.ldd": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-owning-hdr-source8-export-gates-20261118/sanitize/owner-controls.ldd",
+      "sha256": "f049775da1a5dc4f593d4cf3934897487ef37d79bd8ad926f54ba500e34f5134",
+      "bytes": 1780
+    },
+    "source-owning-hdr-source8-export-gates-20261118/sanitize/owner-controls.log": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-owning-hdr-source8-export-gates-20261118/sanitize/owner-controls.log",
+      "sha256": "10011ba1983c1a14c6d86a41c86093fc3f5ee7cb06a00ec4f07e3411f8a74f05",
+      "bytes": 630
+    },
+    "source-owning-hdr-source8-export-gates-20261118/sanitize/owner-controls.maps": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-owning-hdr-source8-export-gates-20261118/sanitize/owner-controls.maps",
+      "sha256": "641c4416e7e39a33b02349dd3019c10859fd20ccb2435cc9a5bfdd102a7c261e",
+      "bytes": 26500
+    },
+    "source-owning-hdr-source8-export-gates-20261118/sanitize/plan.json": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-owning-hdr-source8-export-gates-20261118/sanitize/plan.json",
+      "sha256": "78cacdff691a8db13a14365b6d2b7b0da2b8fc67b4bb4c87a3ca4febb02220a8",
+      "bytes": 2133203
+    },
+    "source-owning-hdr-source8-export-gates-20261118/sanitize/run.py": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-owning-hdr-source8-export-gates-20261118/sanitize/run.py",
+      "sha256": "1e5cc72eb2688cfd68693e25e667b2cf8c86b9c9a658a525c0693bd888ecb95f",
+      "bytes": 5233
+    },
+    "source-owning-hdr-source8-export-gates-20261118/sanitize/status.json": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-owning-hdr-source8-export-gates-20261118/sanitize/status.json",
+      "sha256": "f1e46e87338121787866e084435096278387d1332322c48291a66c5c884992e7",
+      "bytes": 34116
+    },
+    "source-owning-hdr-source8-export-gates-20261118/sanitize/unit-terminal.txt": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-owning-hdr-source8-export-gates-20261118/sanitize/unit-terminal.txt",
+      "sha256": "edb5ac07e5fdcdcdbab311a156fe09382d842ac089ea01cc2876c9f6f9cc8c90",
+      "bytes": 123
+    },
     "source-owning-hdr-source8-export-release-20261118/CMakeFiles/dome-sculpt-baked-emission-workflow-test.dir/tests/baked-emission-workflow.cpp.o.d": {
       "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-owning-hdr-source8-export-release-20261118/CMakeFiles/dome-sculpt-baked-emission-workflow-test.dir/tests/baked-emission-workflow.cpp.o.d",
       "sha256": "62c7b7fc4af1fcaa4a237c375a68e3931b6263eb6f7b88ade5e2b14f4043256b",
@@ -2739,6 +2944,94 @@
     "/home/blux/de-xr/dome-sculpt/artifacts/source-owning-hdr-source8-export-release-20261118/native-v1/export-controls/worker.glb": {
       "sha256": "93cdd7fabb4a47487527dceabfbfd87a0b1ea7b5db75131a95b3f3a17ec78c32",
       "bytes": 11694596
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/source-owning-hdr-source8-export-gates-20261118/release/export-controls/retained-source-current.glb": {
+      "sha256": "93cdd7fabb4a47487527dceabfbfd87a0b1ea7b5db75131a95b3f3a17ec78c32",
+      "bytes": 11694596
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/source-owning-hdr-source8-export-gates-20261118/release/export-controls/second.glb": {
+      "sha256": "93cdd7fabb4a47487527dceabfbfd87a0b1ea7b5db75131a95b3f3a17ec78c32",
+      "bytes": 11694596
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/source-owning-hdr-source8-export-gates-20261118/release/export-controls/worker.glb": {
+      "sha256": "93cdd7fabb4a47487527dceabfbfd87a0b1ea7b5db75131a95b3f3a17ec78c32",
+      "bytes": 11694596
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/source-owning-hdr-source8-export-gates-20261118/release/export-controls/hidden-retained.glb": {
+      "sha256": "ee9ee88b9f0aeb4a56be4dd6fc4a09455d5ad90f0c0ca9b64f732d19436f02f8",
+      "bytes": 11111284
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/source-owning-hdr-source8-export-gates-20261118/sanitize/export-controls/retained-source-current.glb": {
+      "sha256": "8eb8608e229ae0cd9adf92f7eec350a24ee9d035bc0b1072092b1cb47d0f68df",
+      "bytes": 11694596
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/source-owning-hdr-source8-export-gates-20261118/sanitize/export-controls/second.glb": {
+      "sha256": "8eb8608e229ae0cd9adf92f7eec350a24ee9d035bc0b1072092b1cb47d0f68df",
+      "bytes": 11694596
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/source-owning-hdr-source8-export-gates-20261118/sanitize/export-controls/worker.glb": {
+      "sha256": "8eb8608e229ae0cd9adf92f7eec350a24ee9d035bc0b1072092b1cb47d0f68df",
+      "bytes": 11694596
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/source-owning-hdr-source8-export-gates-20261118/sanitize/export-controls/hidden-retained.glb": {
+      "sha256": "fdba7d0b9b08de2f9e65ca95e6ebed64089da63a908eceedb7d96608d3049c1d",
+      "bytes": 11111284
     }
-  }
+  },
+  "strict_actual": {
+    "status": "/home/blux/de-xr/dome-sculpt/artifacts/source-owning-hdr-source8-export-gates-20261118/sanitize/status.json",
+    "sha256": "f1e46e87338121787866e084435096278387d1332322c48291a66c5c884992e7",
+    "checks": 80255,
+    "cases": [
+      {
+        "name": "joint-000-512",
+        "seconds": 147.77364349365234,
+        "actual_pass_count": 47409,
+        "live_ASan_UBSan": true,
+        "peak_owned_RSS_bytes": 2228985856,
+        "peak_observed_virtual_bytes": 21991436644352,
+        "virtual_AS_cap": null
+      },
+      {
+        "name": "owner-controls",
+        "seconds": 239.89510297775269,
+        "actual_pass_count": 24,
+        "live_ASan_UBSan": true,
+        "peak_owned_RSS_bytes": 2637283328,
+        "peak_observed_virtual_bytes": 21991807836160,
+        "virtual_AS_cap": null
+      },
+      {
+        "name": "export-controls",
+        "seconds": 257.4555513858795,
+        "actual_pass_count": 16405,
+        "live_ASan_UBSan": true,
+        "peak_owned_RSS_bytes": 2829131776,
+        "peak_observed_virtual_bytes": 21992098930688,
+        "virtual_AS_cap": null
+      },
+      {
+        "name": "baked-workflow",
+        "seconds": 0.6138510704040527,
+        "actual_pass_count": 16417,
+        "live_ASan_UBSan": true,
+        "peak_owned_RSS_bytes": 970752000,
+        "peak_observed_virtual_bytes": 21991093514240,
+        "virtual_AS_cap": null
+      }
+    ]
+  },
+  "release_expanded_actual": {
+    "status": "/home/blux/de-xr/dome-sculpt/artifacts/source-owning-hdr-source8-export-gates-20261118/release/status.json",
+    "sha256": "b78972797a49fa15ef918d84990c79c29be76d903b1200621e10f9a75157f366",
+    "checks": 32822
+  },
+  "consumer_expanded_actual": {
+    "status": "/home/blux/de-xr/dome-sculpt/artifacts/source-owning-hdr-source8-export-gates-20261118/consumer-validation/status.json",
+    "sha256": "670f2d86adbcffa15114b69677d6384c143a33cd3cfed1c8f6e76fb90445c689",
+    "cases": 8,
+    "errors": 0,
+    "warning": "one NODE_SKINNED_MESH_NON_ROOT per case"
+  },
+  "initial_positive_export_checks": 16400
 }

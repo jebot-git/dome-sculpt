@@ -5,8 +5,9 @@ multi-grid export adapter. An immutable source64 FLOAT field keeps its original
 knots while current512 paint remains independently editable. Package5 records
 both FLOAT coefficient grids and the complete Scene43 owner. The current-grid
 resolved RGB/PNG is an explicitly permitted, measured static fallback; it is not
-substituted for the continuous source authority. Old package1–4 interpretations
-remain separate.
+substituted for the continuous source authority. Existing fallback error fields
+measure current-grid texel-centre quantization, not a global between-grid
+interpolation bound. Old package1–4 interpretations remain separate.
 
 The initial whole-scene attempt correctly refused the still-visible original
 Source8 object's independent writable coordinates. The child implements a real
@@ -42,21 +43,44 @@ All executed units have terminal/journal capture and owned-process cleanup.
 Current successful native invocationb113819d is captured then stopped; its input
 and survivor lists are empty, and the common device lease is released.
 
-## Remaining qualification
+## Expanded Release and strict runtime
 
 Current-source strict compilation/linking passes: twelve complete affected/new
-translation units, 208 qualified unchanged ASan/UBSan owners from the genuine old218-owner
-build, fresh archives/links, 122.380s. All source/public ABI changes participate
-in the actual MD closure; no optimized objects enter this profile. Strict
-runtime is prepared but **unrun** at this checkpoint.
+translation units, 208 qualified unchanged ASan/UBSan owners from the genuine
+old218-owner build, fresh archives/links, 122.380s. All source/public ABI changes
+participate in the actual MD closure; no optimized objects enter this profile.
 
 Test-onlyb5b058e9 adds emitted-UV/source-owner forgery refusals and a hidden
 retained Scene43 positive. Test-only061c8a0b makes the historical single-grid
 worker corpus explicitly select transport0; production default1 is unchanged.
-Both fixtures compile/link in Release and strict profiles; their expanded
-runtime cohorts are **unrun** here. Public GUI/XR, actual rendering, newer
-combined application admission and full production/VRM interoperability remain
-separate requirements. This component milestone does not complete the goal.
+Both complete fixture translation units and links pass in both profiles.
+
+Actual expanded Release completes0: export16405/18.630s plus historical
+worker16417/.085s, 32822 checks total. The strict cohort also completes0:
+
+| Suite | Checks | Seconds |
+| --- | ---: | ---: |
+| Joint source64/current512 | 47409 | 147.774 |
+| Owning domain, nonidentity and editable layer controls | 24 | 239.895 |
+| Expanded export/provenance/hidden owner | 16405 | 257.456 |
+| Historical single-grid FLOAT worker | 16417 | .614 |
+
+All80255 strict checks execute with live ASan/UBSan witnesses and leak
+detection, no address-space cap, original900-second per-case bound and4GiB RSS
+cap. There are no sanitizer errors, input drift or owned survivors. Invocation
+`dcdcce8a81e249ff9ead51118ac12c23` has actual terminal/journal capture before
+stopping; the released common lease is independently confirmed free before
+handoff to the next agent. No timeout or skipped suite is called a pass.
+
+Independent Khronos validation also passes all eight expanded R/S exports
+(direct, second, worker, hidden): zero errors and the same one non-root skinned
+node warning per file. Each profile's direct/second/worker files are byte exact;
+R and S use their own independently produced seed scenes and are not claimed
+byte-identical to each other.
+
+Public GUI/XR, actual rendering, newer combined application admission and full
+production/VRM interoperability remain separate requirements. This component
+milestone does not complete the goal.
 
 The [machine receipt](validation/RETAINED-HDR-SOURCE-EXPORT-20261118.json) identifies
 actual artifacts and source roles. Its scoped archive contains metadata/logs,
