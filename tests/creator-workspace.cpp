@@ -154,7 +154,7 @@ int main(int argc,char**argv)try{
  std::cout<<std::unitbuf;
  if(argc==5&&std::string_view(argv[1])=="--verify-xr"){
   const auto source=Scene::load(argv[2]);const auto actual=Scene::load(argv[3]);auto expected=source;
-  if(std::string_view(argv[4])=="accept"){
+  if(std::string_view(argv[4])=="accept"||std::string_view(argv[4])=="accept-desktop"){
    auto group=source.group(source.active().group);if(!group.humanoid)throw std::runtime_error("Creator XR input lacks genuine saved controls");
    check(actual.groups().size()==source.groups().size()+1&&bool(actual.groups().back().humanoid),"Actual creator adds one separate avatar with persisted genuine bounded controls");
    const auto &persisted=*actual.groups().back().humanoid;
@@ -164,7 +164,7 @@ int main(int argc,char**argv)try{
    controls.hair_recolor=humanoid_hair_recolor_value(controls);controls.hair_recolor->at(0)=persisted.hair_recolor->at(0);
    check(controls.encode()==persisted.encode(),"Actual source, preset and all other body/face/hair/tint settings exactly match selected native draft actions");
    CanvasTransform transform{};transform.position.y=-controls.height*.5f;
-   append_humanoid(expected,controls,group.name+" variation",transform);old_avatar_retained(source,actual);
+   append_humanoid(expected,controls,group.name+(std::string_view(argv[4])=="accept-desktop"?" copy":" variation"),transform);old_avatar_retained(source,actual);
   }
   check(actual.encode()==expected.encode(),"Actual loader creator endpoint equals independently generated native control result and exact prior authored source");
   std::cout<<"CREATOR CHECKS "<<checks<<'\n';return 0;

@@ -397,6 +397,7 @@ FN(EnumerateViewConfigurationViews, XrInstance, XrSystemId,
   *n = 2;
   if (!cap)
     return XR_SUCCESS;
+  if(!creator_mode().empty())report["creator_view_flags"].push_back({{"frame",frame},{"flags",state->viewStateFlags},{"capacity",cap}});
   if (cap < 2)
     return XR_ERROR_SIZE_INSUFFICIENT;
   for (int i = 0; i < 2; ++i) {
@@ -572,7 +573,7 @@ FN(ReleaseSwapchainImage, XrSwapchain p, const XrSwapchainImageReleaseInfo *) {
       for(int y=int(s->height)-1;y>=0;--y)for(unsigned x=0;x<s->width;++x)for(int c=0;c<3;++c)capture.put(char(displayed(bytes[(size_t(y)*s->width+x)*4+c])));
     }
   }
-  if(!creator_mode().empty()&&(frame==26||frame==29||frame==61||frame==67||frame==73||frame==79||frame==85||frame==89||frame==93||frame==97||frame==115||frame==120||frame==124||frame==130||frame==137||frame==275||frame==279||frame==283||frame==290)){
+  if(!creator_mode().empty()&&(frame==26||frame==29||frame==37||frame==61||frame==67||frame==73||frame==79||frame==85||frame==89||frame==93||frame==97||frame==115||frame==120||frame==124||frame==130||frame==137||frame==275||frame==279||frame==283||frame==290)){
     if(const auto*path=getenv("DOME_XR_FIXTURE_REPORT")){
       const auto key=std::to_string(frame)+"-"+std::to_string(s->eye);const auto target=std::string(path)+".creator-"+key+".ppm";
       std::ofstream image(target,std::ios::binary);image<<"P6\n"<<s->width<<' '<<s->height<<"\n255\n";for(int y=int(s->height)-1;y>=0;--y)for(unsigned x=0;x<s->width;++x)for(int c=0;c<3;++c)image.put(char(displayed(bytes[(size_t(y)*s->width+x)*4+c])));
@@ -1014,6 +1015,7 @@ FN(WaitFrame, XrSession, const XrFrameWaitInfo *, XrFrameState *p) {
   p->predictedDisplayTime = 1000000000 + physical_frame * 18000000;
   p->predictedDisplayPeriod = 18000000;
   p->shouldRender = frame % 7 ? XR_TRUE : XR_FALSE;
+  if(!creator_mode().empty())report["creator_frame_states"].push_back({{"frame",frame},{"should_render",bool(p->shouldRender)}});
   count("frames_waited");
   return XR_SUCCESS;
 }
@@ -1529,6 +1531,7 @@ FN(LocateSpace, XrSpace handle, XrSpace, XrTime, XrSpaceLocation *p) {
   p->locationFlags = XR_SPACE_LOCATION_POSITION_VALID_BIT |
                      XR_SPACE_LOCATION_ORIENTATION_VALID_BIT;
   if(!creator_mode().empty()){
+    if(frame==22&&s->action){p->locationFlags=0;count("tracking_losses");report["creator_space_flags"].push_back({{"frame",frame},{"flags",p->locationFlags}});}
     p->pose.orientation={0,0,0,1};p->pose.position=s->action?XrVector3f{right(s->hand)?0.f:-.3f,1.48f,-.48f}:XrVector3f{0,1.6f,0};
     if(s->action&&right(s->hand)&&s->action->name=="aim_pose"&&(frame==92||frame==96||frame==118||frame==122||frame==278||frame==282)){
       const float x=(frame==96||frame==122||frame==282)?470.f:394.f,y=(frame==96||frame==122||frame==282)?609.f:300.f;
