@@ -9,6 +9,13 @@ Update this current summary at milestones rather than prepending more history.
 
 ## Source and integration boundary
 
+- The separate writable/joint SOURCE production441 now also passes a fresh
+  strict sanitizer193-core/six-suite cohort, with all121 ordered Save pairs,
+  live ASan/UBSan and unchanged numerical/control bounds. Read
+  [SOURCE441 strict sanitizer](SOURCE441-STRICT-SANITIZE-20261118.md). This
+  extends its Release native component proof only; matching new-packet graphics,
+  whole-App and the separate quality/creator merged source remain unqualified.
+
 - Main's admitted production baseline is3d164382 with the explicitly exercised
   c54 test reporter/02d coordinator. Read
   [baseline admission](GUARD87-RUNTIME-ADMISSION-20261115.md): Release87 and strict
