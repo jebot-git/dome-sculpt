@@ -17,10 +17,14 @@ struct HumanoidControls {
   std::array<float, 4> skin_color{1, 1, 1, 1};
   std::array<float, 4> iris_color{1, 1, 1, 1};
   std::array<float, 4> hair_color{1, 1, 1, 1};
+  // Explicit linear RGB replaces authored hair base/shade colour only when
+  // present. Absent retains the historical multiplicative hair_color recipe.
+  std::optional<std::array<float,3>> hair_recolor;
   void validate() const;
   nlohmann::json encode() const;
   static HumanoidControls decode(const nlohmann::json &);
 };
+std::array<float,3> humanoid_hair_recolor_value(const HumanoidControls &);
 enum class HumanoidPreset { Neutral, Toon, Anime };
 HumanoidControls humanoid_baseline_defaults(std::string_view baseline);
 HumanoidControls

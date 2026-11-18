@@ -24,14 +24,15 @@ void Document::queue_texture_set_locked(TextureSetEdit edit,AssetSource expected
  finish_locked();require_authority_locked(expected);
  if((expected.generation&&expected.generation!=state_.generation)||(expected.revision&&expected.revision!=state_.revision)||(expected.object&&expected.object!=scene_.active().id))throw std::logic_error("The texture-set recipient changed while finishing its earlier gesture");
  const auto object=scene_.active().id;require_object_editable_locked(object);
- if(!detail::texture_set_plain_fields(scene_.active()))throw std::logic_error("Texture sets are not yet available for this prepared material");
- auto lease=detail::capture_texture_set_recipient(scene_,object);auto changed=std::make_shared<bool>(false);
+ const bool empty_target_resize=edit.action==TextureSetAction::Resolution&&edit.set==0&&detail::unpainted_bake_resolution_target(scene_.active());
+ if(!empty_target_resize&&!detail::texture_set_plain_fields(scene_.active()))throw std::logic_error("Texture sets are not yet available for this prepared material");
+ std::shared_ptr<const detail::TextureSetStrokeLease> lease;if(!empty_target_resize)lease=detail::capture_texture_set_recipient(scene_,object);auto changed=std::make_shared<bool>(false);
  const auto source=AssetSource{state_.generation,state_.revision,object,state_.edit_authority};
  const char*label=edit.action==TextureSetAction::Create?"Create texture set":edit.action==TextureSetAction::AssignFaces?"Assign material faces":edit.action==TextureSetAction::Select?"Select texture set":edit.action==TextureSetAction::Rename?"Rename texture set":edit.action==TextureSetAction::Material?"Edit texture-set material":edit.action==TextureSetAction::Resolution?"Resize texture-set paint":"Edit texture-set layer";
- queue_scene_operation_locked(label,[object,edit=std::move(edit),changed](Scene&scene,const auto&cancelled){
-  TextureSetLimits limits;limits.cancelled=cancelled;
+ queue_scene_operation_locked(label,[object,edit=std::move(edit),changed,empty_target_resize](Scene&scene,const auto&cancelled){
+  TextureSetLimits limits=empty_target_resize?detail::bake_target_resolution_limits():TextureSetLimits{};limits.cancelled=cancelled;
   switch(edit.action){
-  case TextureSetAction::Resolution:{TextureSetResolutionOptions options;options.resolution=edit.resolution;*changed=resample_texture_set(scene,object,edit.set,options,limits).changed;break;}
+  case TextureSetAction::Resolution:{if(empty_target_resize){*changed=detail::resize_unpainted_bake_target(scene,object,edit.resolution,limits);break;}TextureSetResolutionOptions options;options.resolution=edit.resolution;*changed=resample_texture_set(scene,object,edit.set,options,limits).changed;break;}
   case TextureSetAction::Create:dome::create_texture_set(scene,object,edit.faces,edit.name,edit.resolution,limits);*changed=true;break;
   case TextureSetAction::AssignFaces:*changed=assign_texture_set_faces(scene,object,edit.set,edit.faces,limits);break;
   case TextureSetAction::Select:if(cancelled())throw std::runtime_error("Texture-set selection cancelled");*changed=select_texture_set(scene,object,edit.set);break;

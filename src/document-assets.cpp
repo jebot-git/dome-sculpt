@@ -11,7 +11,7 @@
 namespace dome {
 SceneDraft Document::draft_scene() const {
   std::lock_guard lock(model_mutex_);
-  if (state_.cut || state_.retopology || state_.asset_busy || state_.recovery_busy || control_before_ || action_active_locked())
+  if (state_.creator || state_.cut || state_.retopology || state_.asset_busy || state_.recovery_busy || control_before_ || action_active_locked())
     throw std::logic_error("Finish the current action before opening the asset editor");
   return {scene_.snapshot(), {state_.generation, state_.revision, scene_.active().id,state_.edit_authority}};
 }
@@ -27,6 +27,7 @@ void Document::queue_scene_operation_locked(std::string label, SceneOperation op
                                       AssetSource expected, std::shared_ptr<std::string> report, std::shared_ptr<AssetWork> work, std::shared_ptr<bool> changed,
                                       std::shared_ptr<const MeshSnapshot> rollback_preview, uint64_t retopo_session, uint64_t cut_session, std::shared_ptr<CutHandoff> cut_handoff, std::optional<BakeAdmission> bake_admission, uint64_t uv_restore_session, std::optional<SkinAdmission> skin_admission, std::shared_ptr<const detail::TextureSetStrokeLease> texture_set_source) {
   require_authority_locked(expected);
+  if(state_.creator)throw std::logic_error("Apply or cancel the humanoid creator before starting authoring work");
   if(state_.expressions)throw std::logic_error("Apply or cancel expression preview before starting authoring work");
   if(state_.object_grabbing && !(work&&work->held_weight))throw std::logic_error("Release object motion before starting asset work");
   if(state_.isolate_held && state_.held_object)require_object_editable_locked(scene_.active().id);

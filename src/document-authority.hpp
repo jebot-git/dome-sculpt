@@ -22,6 +22,8 @@ inline bool same_humanoid_controls(const std::shared_ptr<const HumanoidControls>
  const auto x=scalars(*a),y=scalars(*b);
  for(size_t i=0;i<x.size();++i)
    if(std::bit_cast<uint32_t>(x[i])!=std::bit_cast<uint32_t>(y[i]))return false;
+ if(bool(a->hair_recolor)!=bool(b->hair_recolor))return false;
+ if(a->hair_recolor)for(size_t k=0;k<3;++k)if(std::bit_cast<uint32_t>((*a->hair_recolor)[k])!=std::bit_cast<uint32_t>((*b->hair_recolor)[k]))return false;
  const std::array colors_a{a->skin_color,a->iris_color,a->hair_color};
  const std::array colors_b{b->skin_color,b->iris_color,b->hair_color};
  for(size_t i=0;i<colors_a.size();++i)for(size_t c=0;c<4;++c)

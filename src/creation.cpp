@@ -2,6 +2,8 @@
 #include "dome/creation.hpp"
 #include "dome/material-bindings.hpp"
 #include "dome/material-visibility.hpp"
+#include <cctype>
+#include <cctype>
 namespace dome {
 uint64_t append_humanoid(Scene &scene, const HumanoidControls &controls,
                          std::string name, CanvasTransform transform,
@@ -53,6 +55,23 @@ uint64_t append_humanoid(Scene &scene, const HumanoidControls &controls,
       binding->has_mtoon=bool(typed);if(typed)binding->material=*typed;
       binding->normal_frames=part.normal_frames;binding->normal_frame=SourceMaterialNormalFrame::OriginalAttributes;
       binding->native_reference=native_source(*part.appearance);
+      if(controls.hair_recolor&&typed){
+        std::string material_name=part.appearance->asset->materials.at(size_t(part.appearance->material)).name;
+        std::transform(material_name.begin(),material_name.end(),material_name.begin(),[](unsigned char c){return char(std::tolower(c));});
+        if(material_name.find("hair")!=std::string::npos){
+          auto &p=binding->material.parameters;const auto original=p;
+          const auto luminance=[](float r,float g,float b){return .2126f*r+.7152f*g+.0722f*b;};
+          const float base=luminance(original.base_color[0],original.base_color[1],original.base_color[2]);
+          const float shade=luminance(original.shade_color.x,original.shade_color.y,original.shade_color.z);
+          const float contrast=base>1e-6f?std::clamp(shade/base,0.f,1.f):0.f;
+          for(size_t k=0;k<3;++k)p.base_color[k]=(*controls.hair_recolor)[k];
+          p.shade_color={p.base_color[0]*contrast,p.base_color[1]*contrast,p.base_color[2]*contrast};
+          for(size_t k=0;k<3;++k)binding->native_reference.color[k]=part.color[k];
+          // Comparison starts at the explicit new material, so future inspector
+          // edits remain relative to it rather than applying its factors twice.
+          binding->native_reference.color=part.color;
+        }
+      }
       if(typed)for(size_t role=0;role<binding->roles.size();++role) {
         int index=typed->textures[role].index;if(index<0)continue;
         const auto &texture=part.appearance->asset->textures.at(size_t(index));

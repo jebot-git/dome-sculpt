@@ -94,8 +94,8 @@ void advanced_recipe_guards(const Scene &baseline,uint64_t source,const ObjectBa
   for(auto &uv:input.target.uv)for(auto &v:uv)v=.5f+(v-.5f)*.95f;
   SourceUvBakeOptions settings;settings.normal_sampling=method;settings.max_normal_sample_error=.03;
   auto adopted=adopt_source_uv_bake(bake_source_uv(input,settings));auto &current=scene.object(source);current.painted=adopted.paint;current.material_bindings=adopted.material_bindings;current.deformation=adopted.deformation;current.appearance=adopted.appearance;scene.validate();const auto before=scene.encode();
-  check(Scene::decode(before).encode()==before&&current.material_bindings->normal_preparation&&(current.material_bindings->normal_preparation->uv_reprojection||current.material_bindings->normal_preparation->sampling_domain),"Advanced negative owns a genuine native UV-reprojected or retained-domain normal recipe");
-  check(refuses([&]{detail::source_bake_normals(current,{});})&&refuses([&]{detail::raw_bake_source(current);})&&refuses([&]{bake_object(scene,source,options);})&&scene.encode()==before,"Advanced normal/material UV recipes remain explicitly refused before sampling with exact Scene/source/target preservation");
+  check(Scene::decode(before).encode()==before&&current.material_bindings->normal_preparation&&(current.material_bindings->normal_preparation->uv_reprojection||current.material_bindings->normal_preparation->sampling_domain),"Advanced positive owns a genuine native UV-reprojected or retained-domain normal recipe");
+  const auto paint=current.painted;const auto binding=current.material_bindings;check(bool(detail::source_bake_normals(current,{}))&&bool(detail::raw_bake_source(current))&&bake_object(scene,source,options).projected>0&&scene.object(source).painted==paint&&scene.object(source).material_bindings==binding,"Genuine Rasterize and RetainSource normal recipes are usable Bake sources with exact source ownership");
  }
 }
 

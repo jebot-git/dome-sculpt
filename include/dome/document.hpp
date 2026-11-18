@@ -20,6 +20,7 @@
 #include "native-stroke.hpp"
 #include "texture-sets.hpp"
 #include "projection-tool.hpp"
+#include "creator-tool.hpp"
 #include "shapekey-authoring.hpp"
 #include <atomic>
 #include <condition_variable>
@@ -185,10 +186,11 @@ struct EditorState {
   uint64_t view_epoch = 1;
   std::shared_ptr<const RigFitView> rig_fit;
   std::shared_ptr<const VrmExpressionView> expressions;
+  std::shared_ptr<const HumanoidCreatorView> creator;
   uint32_t active_texture_set=0;
   std::vector<TextureSetInfo> texture_sets;
   Material texture_material;
-  bool can_edit_texture_sets=false,texture_face_select=false;
+  bool can_edit_texture_sets=false,can_resize_bake_target=false,texture_face_select=false;
   std::vector<uint64_t> texture_faces;
 };
 struct SurfaceRange {
@@ -343,6 +345,14 @@ public:
   // No callback may retain mutable aliases or access UI/Document/model state.
   using SceneOperation = std::function<void(Scene &, const std::function<bool()> &)>;
   void edit_scene(std::string label, SceneOperation, AssetSource expected = {});
+  // Creation is additive by default. Existing avatars are never regenerated
+  // from their parameter record; selected settings only seed a NEW avatar.
+  void create_humanoid_avatar(HumanoidControls, std::string name="Humanoid",
+                             AssetSource expected={},bool keep_existing=true);
+  void begin_humanoid_creator();
+  void configure_humanoid_creator(HumanoidCreatorSettings,uint64_t session,AssetSource expected={});
+  void end_humanoid_creator(bool apply,uint64_t session=0,AssetSource expected={});
+  void humanoid_creator_action(SpatialCommand);
   void import_asset(const std::filesystem::path &, uint32_t resolution = 512);
   AssetSource begin_import() const; // Capture before opening native options.
   ProjectionToolSettings projection_settings() const;
@@ -485,6 +495,7 @@ private:
   bool reject_texture_paint_locked();
   void require_authority_locked(AssetSource) const;
   EditorState state_;
+  uint64_t creator_serial_=0;
   bool desktop_ = false, anchored_ = false;
   uint64_t last_volume_ = 0, last_paint_ = 0, content_ = 1, saved_content_ = 1,
            next_content_ = 2;
@@ -760,6 +771,16 @@ private:
   void configure_expression_preview_locked(size_t,float,uint64_t,AssetSource);
   void end_expression_preview_locked(bool,uint64_t=0,AssetSource={});
   void expression_command_locked(SpatialCommand);
+  bool creator_source_matches_locked() const;
+  bool creator_command_enabled_locked(SpatialCommand) const;
+  void begin_humanoid_creator_locked();
+  void configure_humanoid_creator_locked(HumanoidCreatorSettings,uint64_t,AssetSource);
+  void end_humanoid_creator_locked(bool,uint64_t=0,AssetSource={});
+  void creator_command_locked(SpatialCommand);
+  bool creator_history_locked(bool);
+  void creator_control_locked(VrControlEvent);
+  void finish_creator_control_locked(bool);
+  void create_humanoid_avatar_locked(HumanoidControls,std::string,AssetSource,bool);
   struct MeshJob {
     uint64_t revision, generation;
     Scene scene;
