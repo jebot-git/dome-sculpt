@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "emission-bake-source.hpp"
+#include "baked-emission-domain.hpp"
 #include "emission-authority.hpp"
 #include "paint-overlay-sample.hpp"
 #include "source-bake-normal.hpp"
@@ -182,6 +183,7 @@ bool SourceBakeNormalResolver::matches_prepared_source(const TextureMaps &maps)c
 }
 SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTransform relative,
     const SourceBakeNormalOptions &options){
+  if(object.painted)BakedEmissionDomain::preflight(*object.painted,options.cancelled);
   const auto &binding=object.material_bindings;
   const auto native=binding?binding->native_paint_sampling:nullptr;
   if(native&&!binding->normal_frames){

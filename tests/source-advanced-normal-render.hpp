@@ -3,6 +3,7 @@
 // Include after the ordinary prepared-render helpers. Reuse the exact genuine
 // advanced fixture and independent decoder; do not include another test TU.
 #include "dome/normal-sampling.hpp"
+#include "dome/bake-recipe.hpp"
 #include "dome/normal-preview.hpp"
 #include "dome/source-uv-bake.hpp"
 #include <numeric>

@@ -81,7 +81,7 @@ inline bool source_baked_preview_metadata(const TextureMaps &maps){
 // Captured layers already exclude hidden and zero-opacity metadata. A real
 // float tile keeps its interpretation even when its current value is zero.
 inline bool overlay_uses_float_emission(const PaintOverlayPacket &packet) noexcept {
-  if(packet.baked()&&packet.baked()->emission_field)return true;
+  if(packet.baked()&&(packet.baked()->emission_field||packet.baked()->emission_domain))return true;
   for(const auto &layer:packet.layers())for(const auto &tile:layer.emission_tiles)if(tile)return true;
   return false;
 }

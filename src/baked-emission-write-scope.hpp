@@ -25,16 +25,18 @@ class BakedEmissionWriteScope final {
   inline static thread_local BakedEmissionWriteScope *current_=nullptr;
   BakedEmissionWriteScope *previous_;
   const PaintImageArchive *archive_=nullptr;
-  bool emitted_=false,source_bake_=false;
+  bool emitted_=false,source_bake_=false,domain_=false;
 public:
   BakedEmissionWriteScope():previous_(current_){current_=this;}
   ~BakedEmissionWriteScope(){current_=previous_;}
   BakedEmissionWriteScope(const BakedEmissionWriteScope&)=delete;
-  void begin(const PaintImageArchive &archive)noexcept{archive_=&archive;emitted_=source_bake_=false;}
+  void begin(const PaintImageArchive &archive)noexcept{archive_=&archive;emitted_=source_bake_=domain_=false;}
   bool emitted()const noexcept{return emitted_;}
   void publish(const dome::Scene &scene)const noexcept{
     if(auto *probe=SceneEmissionFeatureProbe::current_;probe&&probe->scene_==&scene){probe->emitted_=emitted_;probe->completed_=true;}
   }
+  bool domain_emitted()const noexcept{return domain_;}
+  static void domain_emitted(const PaintImageArchive *archive)noexcept{if(current_&&archive&&current_->archive_==archive){current_->domain_=true;current_->emitted_=true;}}
   bool source_bake_emitted()const noexcept{return source_bake_;}
   static void source_bake_emitted(const PaintImageArchive *archive)noexcept{
     if(current_&&archive&&current_->archive_==archive)current_->source_bake_=true;

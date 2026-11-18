@@ -1,0 +1,317 @@
+{
+  "scope": "Independent HDR source GPU component; llvmpipe only, not Arc, full application integration, physical headset or completion",
+  "production": "c52418bffafbb4ab65b612f5b6399a4368f3622b",
+  "fixture": "2122416b7709c9680ca1961699119e105e66098b",
+  "ELF": "ccd275252164098501c44b19c1c573090023fa2356b3172843b9585689d026f5",
+  "source_resolution": 64,
+  "editable_resolution": 512,
+  "source_coefficient_error": 0,
+  "PBR_RGB_errors": [
+    1,
+    1
+  ],
+  "MToon_RGB_errors": [
+    0,
+    0
+  ],
+  "RGB_bound": 2,
+  "new_checks": 4422,
+  "same_production_prior_positives": {
+    "legacy_FLOAT_checks": 172040,
+    "MToon_checks": 81,
+    "scope": "Both prior product steps0; whole prior wrapper1 from invalid new-fixture MToon factor, preserved separately"
+  },
+  "remaining": [
+    "Actual Arc execution",
+    "GPU resource/fault stress of new domain",
+    "Combined application/public UI qualification",
+    "Broader retained-source correspondences"
+  ],
+  "archive": {
+    "path": "scoped-proof.tar.xz",
+    "sha256": "fe2f9b832d24b1a053abeef6d9e060839487aac3da4be15475f73ee3b10e9b65",
+    "bytes": 367264
+  },
+  "members": {
+    "first-build/plan.json": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-hdr-gpu-build-v1-20261118/plan.json",
+      "sha256": "73009d63ff263956eab6ff3629037649bf19a759eeaaf7675d159cd4cba52654",
+      "bytes": 5106048
+    },
+    "first-build/build.py": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-hdr-gpu-build-v1-20261118/build.py",
+      "sha256": "b877a9caf4e6cc1fe89ae2503a69af7b6972a4c981c3848ac08e27be0448095a",
+      "bytes": 3007
+    },
+    "first-build/status.json": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-hdr-gpu-build-v1-20261118/status.json",
+      "sha256": "a1b1522e750fd494ed6e41423faf8835f229f0981032b4f06c4708c823116651",
+      "bytes": 8016
+    },
+    "first-build/hdr-fixture.log": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-hdr-gpu-build-v1-20261118/hdr-fixture.log",
+      "sha256": "513b9f56434c2ac78d987a2b1bc2d55bc4ae7afcba8e2a77e0d968fd50ace661",
+      "bytes": 1747
+    },
+    "first-build/terminal-unit.txt": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-hdr-gpu-build-v1-20261118/terminal-unit.txt",
+      "sha256": "c348e5cea68505eaf863fd1c3f09b5da16840cf016b273951f02ce6ef8fe58dd",
+      "bytes": 108
+    },
+    "first-build/terminal-journal.txt": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-hdr-gpu-build-v1-20261118/terminal-journal.txt",
+      "sha256": "d77e8e3e2e595f0695c16d811918dff858ad7042b144deaf48c3e3d88b54461b",
+      "bytes": 623
+    },
+    "build-v2/plan.json": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-hdr-gpu-build-v2-20261118/plan.json",
+      "sha256": "a922ff2631b50d2c87e8c1bcf9416fb44b83d4dfea169d048e725130cdb0eb4d",
+      "bytes": 5311151
+    },
+    "build-v2/build.py": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-hdr-gpu-build-v2-20261118/build.py",
+      "sha256": "e21a24ee099054ec0efce250f3cb85a55b9dedfc48343829568b76e99b037158",
+      "bytes": 2969
+    },
+    "build-v2/status.json": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-hdr-gpu-build-v2-20261118/status.json",
+      "sha256": "f1870322c8b0f4610d4515bacf37cb8e973b80803ae7412b4079771d436828c5",
+      "bytes": 5733
+    },
+    "build-v2/actual-MD-owners.json": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-hdr-gpu-build-v2-20261118/actual-MD-owners.json",
+      "sha256": "895add510f979fae9840192d1b1140004e491151f46d7a169d217dcfc024abcb",
+      "bytes": 57519
+    },
+    "build-v2/terminal-unit.txt": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-hdr-gpu-build-v2-20261118/terminal-unit.txt",
+      "sha256": "ed27be33009ae8c9b57ad1046cc96fe990317f3df1c7caef60cb7b8b14b2d964",
+      "bytes": 108
+    },
+    "build-v2/terminal-journal.txt": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-hdr-gpu-build-v2-20261118/terminal-journal.txt",
+      "sha256": "52ecebeb0e0f3dd45d5f951ae690403209a67ede7f3841ef46d551c6f68e9f46",
+      "bytes": 208
+    },
+    "build-v3/plan.json": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-hdr-gpu-build-v3-20261118/plan.json",
+      "sha256": "9e0abe93e1d74dbeed6b2bd362677d537609256d2d12b2a2f4ad4a88699ab930",
+      "bytes": 5244209
+    },
+    "build-v3/build.py": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-hdr-gpu-build-v3-20261118/build.py",
+      "sha256": "5b18a7d221fac9d98f0cb94e51824e2bc56e381f9c467ace5e9d897eec20dd17",
+      "bytes": 2933
+    },
+    "build-v3/status.json": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-hdr-gpu-build-v3-20261118/status.json",
+      "sha256": "4ff502da12bd60c13027b725307b474b7b1815285b7a637ce4508afecbbecaca",
+      "bytes": 7267
+    },
+    "build-v3/actual-MD-owners.json": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-hdr-gpu-build-v3-20261118/actual-MD-owners.json",
+      "sha256": "d85c97be5e43a9f1f92efa4d956f4e3731223a93a68457dea1150ae381621da2",
+      "bytes": 124042
+    },
+    "build-v3/terminal-unit.txt": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-hdr-gpu-build-v3-20261118/terminal-unit.txt",
+      "sha256": "79bff5891f01050973efafc65ffe804a5e659442b6e708f5ce27ee811720317f",
+      "bytes": 108
+    },
+    "build-v3/terminal-journal.txt": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-hdr-gpu-build-v3-20261118/terminal-journal.txt",
+      "sha256": "b027d7ae10d6320422bc0efb55959eff08bd529db40770a7449d3924748f823c",
+      "bytes": 208
+    },
+    "build-v4/plan.json": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-hdr-gpu-build-v4-20261118/plan.json",
+      "sha256": "a4f27eee4dcb2a63154a44f3a6c5944476f10b499317da9df3209368ccd4d29a",
+      "bytes": 5099407
+    },
+    "build-v4/build.py": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-hdr-gpu-build-v4-20261118/build.py",
+      "sha256": "beda505c1cc8075e16e465b6f6c283803ede182f239e3b35ef5f4d36c22eec56",
+      "bytes": 1220
+    },
+    "build-v4/status.json": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-hdr-gpu-build-v4-20261118/status.json",
+      "sha256": "b856edc64bb67e2fdfb252e493277f4b2eacb9800294eaa8f8a06a930454d4c4",
+      "bytes": 61056
+    },
+    "first-software/plan.json": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-hdr-gpu-build-v2-20261118/software-v1/plan.json",
+      "sha256": "9b59c6a77fd0311adf20ac5df83adc7020332056d75de6eb8b717edab53df348",
+      "bytes": 5170468
+    },
+    "first-software/run.py": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-hdr-gpu-build-v2-20261118/software-v1/run.py",
+      "sha256": "4b64eec5481dbc7c58fae75dd000e6db4c3acc19ac6341cc552bd57ff3965401",
+      "bytes": 5187
+    },
+    "first-software/status.json": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-hdr-gpu-build-v2-20261118/software-v1/status.json",
+      "sha256": "5a81e62504f127b621d5708387ce9b97a856b7cb373320061c620b62645781c4",
+      "bytes": 9287
+    },
+    "first-software/legacy.log": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-hdr-gpu-build-v2-20261118/software-v1/legacy.log",
+      "sha256": "40db9bc90960819228446b03ac6421930248ff77c6f9d29dc046a5ce1ac7cdb5",
+      "bytes": 137
+    },
+    "first-software/product.log": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-hdr-gpu-build-v2-20261118/software-v1/product.log",
+      "sha256": "31f963512f76c1ec9b250374c97fc51e394dc9796d71db2433aa941e3f63a783",
+      "bytes": 154
+    },
+    "first-software/ldd.log": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-hdr-gpu-build-v2-20261118/software-v1/ldd.log",
+      "sha256": "fcb42f65bfbc5cb0d08d6789ea21bfbb32cec59e5ed8866ebe8ace972f7bb0b8",
+      "bytes": 3014
+    },
+    "first-software/terminal-unit.txt": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-hdr-gpu-build-v2-20261118/software-v1/terminal-unit.txt",
+      "sha256": "be126e0311548c89bc59ec5609f2e855a8f3711b9b3b7f7382471e5a4356e65a",
+      "bytes": 108
+    },
+    "first-software/terminal-journal.txt": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-hdr-gpu-build-v2-20261118/software-v1/terminal-journal.txt",
+      "sha256": "5c5d540b9a786bba61165f9b353089817bbb2afd245bf3153c0102464621efa4",
+      "bytes": 645
+    },
+    "first-software/lease-free.json": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-hdr-gpu-build-v2-20261118/software-v1/lease-free.json",
+      "sha256": "1de8fd359533ab88ce361547dbded234f1232a5510324a06efb8ee9b756f8176",
+      "bytes": 55
+    },
+    "software-v2/plan.json": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-hdr-gpu-build-v3-20261118/software-v2/plan.json",
+      "sha256": "d1dbb7b2f52db8dbcafd7c6596391a91b27cd543114d1b53bc70c48116b31d0b",
+      "bytes": 5170761
+    },
+    "software-v2/run.py": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-hdr-gpu-build-v3-20261118/software-v2/run.py",
+      "sha256": "6923dd2b6610aa33e119ceb9d8706cb7a011d48f595a4be0e6f6c1a176daf8d5",
+      "bytes": 6131
+    },
+    "software-v2/status.json": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-hdr-gpu-build-v3-20261118/software-v2/status.json",
+      "sha256": "f471460441c24b78623daa544f74d93944194b64de76f8712846476bbfbe1810",
+      "bytes": 11203
+    },
+    "software-v2/legacy.log": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-hdr-gpu-build-v3-20261118/software-v2/legacy.log",
+      "sha256": "40db9bc90960819228446b03ac6421930248ff77c6f9d29dc046a5ce1ac7cdb5",
+      "bytes": 137
+    },
+    "software-v2/mtoon.log": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-hdr-gpu-build-v3-20261118/software-v2/mtoon.log",
+      "sha256": "bb4eec5dcf9330fc64ba03a7de6f155bd598726802fe8be8c66f6b39b55e5108",
+      "bytes": 7092
+    },
+    "software-v2/product.log": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-hdr-gpu-build-v3-20261118/software-v2/product.log",
+      "sha256": "35abd0d9a4d28b137b5ff4d137bc7ab7df3f8ff8049304f13f7b646254943766",
+      "bytes": 162
+    },
+    "software-v2/ldd.log": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-hdr-gpu-build-v3-20261118/software-v2/ldd.log",
+      "sha256": "25556fb52baab15bee8e26b3da6b943462021a1b1fb54922a74c37edf83e7446",
+      "bytes": 3014
+    },
+    "software-v2/terminal-unit.txt": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-hdr-gpu-build-v3-20261118/software-v2/terminal-unit.txt",
+      "sha256": "feadfa2126636308cfc78e00c9778805825b4bfd64b0bbf562b12aeeb786df42",
+      "bytes": 108
+    },
+    "software-v2/terminal-journal.txt": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-hdr-gpu-build-v3-20261118/software-v2/terminal-journal.txt",
+      "sha256": "fd496fd861f58d3781a3cfa6a2b1e1e39ead75399626fe817e381906e29f3ae4",
+      "bytes": 647
+    },
+    "software-v2/lease-free.json": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-hdr-gpu-build-v3-20261118/software-v2/lease-free.json",
+      "sha256": "a1d9b283fab097f82912dea59cc3e9a93f379ec8c1d38f228bd9bd7c4e163088",
+      "bytes": 58
+    },
+    "software-v3/plan.json": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-hdr-gpu-build-v4-20261118/software-v3/plan.json",
+      "sha256": "a74e56470f7e60397c18e8dd115a1000871d54951f07ff28e2d2c45362b95818",
+      "bytes": 5170591
+    },
+    "software-v3/run.py": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-hdr-gpu-build-v4-20261118/software-v3/run.py",
+      "sha256": "5fc3cf790a8ac55cf79ea5835ba4b3b24ce17682ade299485e9db32864b02c47",
+      "bytes": 4238
+    },
+    "software-v3/status.json": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-hdr-gpu-build-v4-20261118/software-v3/status.json",
+      "sha256": "167d229561837f040b80a67870440b38d81c5a5c20d3b9c8c7ca99ae4580d294",
+      "bytes": 7530
+    },
+    "software-v3/product.log": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-hdr-gpu-build-v4-20261118/software-v3/product.log",
+      "sha256": "31f69b42c44bba92d6092de351c7512b5d3d1f35070964f42b91c966f244538c",
+      "bytes": 312
+    },
+    "software-v3/ldd.log": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-hdr-gpu-build-v4-20261118/software-v3/ldd.log",
+      "sha256": "b873e87a441fd7b4ef95a6e5f55cee3ecac71a6795f9e9259b54cb5d76f4c563",
+      "bytes": 3014
+    },
+    "software-v3/actual-live.maps": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-hdr-gpu-build-v4-20261118/software-v3/actual-live.maps",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "software-v3/terminal-unit.txt": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-hdr-gpu-build-v4-20261118/software-v3/terminal-unit.txt",
+      "sha256": "782e72739bcf175cdcd4f14022b089204362207f2974d1ce8eacb2df24fbf2fd",
+      "bytes": 108
+    },
+    "software-v3/terminal-journal.txt": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-hdr-gpu-build-v4-20261118/software-v3/terminal-journal.txt",
+      "sha256": "46995139ab667c74ab2b2ec8bb8afeb855988c48bc422675aceb13ec8ef5454d",
+      "bytes": 221
+    },
+    "software-v3/lease-free.json": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-hdr-gpu-build-v4-20261118/software-v3/lease-free.json",
+      "sha256": "242aae67d555851c948f1bbdd158ac082b0c23915fe3909dd1c4241c467dfa43",
+      "bytes": 58
+    },
+    "legacy-fixture/plan.json": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-hdr-gpu-build-v2-20261118/legacy-fixture/plan.json",
+      "sha256": "424e5ab33b30c6218100d467f354d5ceb2de3c6195c836bddb0a7f1d407ff480",
+      "bytes": 5099254
+    },
+    "legacy-fixture/status.json": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-hdr-gpu-build-v2-20261118/legacy-fixture/status.json",
+      "sha256": "9605dcabe7af40342d11bb00fc3cc192ce1964fe615096e82bb6ee592e9a53cb",
+      "bytes": 56499
+    },
+    "mtoon-fixture/plan.json": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-hdr-gpu-build-v3-20261118/mtoon-fixture/plan.json",
+      "sha256": "74dd304e51c2b4a10f291e2b073f3bee291d3695ffc68bd697c98fd1657747cd",
+      "bytes": 5099239
+    },
+    "mtoon-fixture/build.py": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-hdr-gpu-build-v3-20261118/mtoon-fixture/build.py",
+      "sha256": "5866f1e83b1323754344397b4d1b6b9631b44846d2ea5d4446eaa51cefa7cdb4",
+      "bytes": 1223
+    },
+    "mtoon-fixture/status.json": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-hdr-gpu-build-v3-20261118/mtoon-fixture/status.json",
+      "sha256": "44640aa1de8a6e7342de183ec6e15b09ead174ef637cee1813975f8f626c1839",
+      "bytes": 58178
+    },
+    "reused-core/actual-core-members.json": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-owning-hdr-transform-release-20261118/actual-core-members.json",
+      "sha256": "a154bb86ad3a9fbda0d2d651c1cf5efc2fa6a8f01bdefeefcbee461a629fb70d",
+      "bytes": 37598
+    },
+    "source.diff": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/source-hdr-gpu-proof-20261118/source.diff",
+      "sha256": "085493fe8bb19f9479356df03d990def57f4a4c7fa6dc50ce354e7bd1cb09af3",
+      "bytes": 46040
+    }
+  }
+}

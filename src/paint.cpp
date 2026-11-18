@@ -1,3 +1,4 @@
+#include "baked-emission-domain.hpp"
 #include "texture-set-field-source.hpp"
 #include "texture-set-paint-access.hpp"
 #include "texture-set-resample.hpp"
@@ -154,7 +155,7 @@ BakedPixel baked_pixel(const BakedTextures &baked, size_t at) {
   }
   for (int c = 0; c < 3; ++c) {
     result[4 + c] = unit(m.metal_rough.rgba[i + c]);
-    result[7 + c] = baked.emission_field ? 0 : srgb_to_linear(unit(m.emission.rgba[i + c]));
+    result[7 + c] = (baked.emission_field||baked.emission_domain) ? 0 : srgb_to_linear(unit(m.emission.rgba[i + c]));
     result[10 + c] = m.normal.rgba.empty() ? (c == 2 ? 1 : 0)
                                            : unit(m.normal.rgba[i + c]) * 2 - 1;
   }
@@ -167,10 +168,10 @@ void baked_pixel(BakedTextures &baked, size_t at, BakedPixel values, bool write_
     m.color.rgba[i + c] = byte(c < 3 ? linear_to_srgb(values[c]) : values[c]);
   for (int c = 0; c < 3; ++c) {
     m.metal_rough.rgba[i + c] = byte(values[4 + c]);
-    if (!baked.emission_field) m.emission.rgba[i + c] = byte(linear_to_srgb(values[7 + c]));
+    if (!baked.emission_field&&!baked.emission_domain) m.emission.rgba[i + c] = byte(linear_to_srgb(values[7 + c]));
   }
   m.metal_rough.rgba[i + 3] = 255;
-  if (!baked.emission_field) m.emission.rgba[i + 3] = 255;
+  if (!baked.emission_field&&!baked.emission_domain) m.emission.rgba[i + 3] = 255;
   if (write_normal && !m.normal.rgba.empty()) {
     auto n = Vec3{values[10], values[11], values[12]};
     n = length(n) > 1e-8f ? normalized(n) : Vec3{0, 0, 1};
@@ -1308,7 +1309,7 @@ PaintEmissionValue PaintedMesh::emission_pixel(uint64_t id,uint32_t x,uint32_t y
   return result;
 }
 bool PaintedMesh::has_physical_emission() const noexcept {
-  if(baked_&&baked_->emission_field)return true;
+  if(baked_&&(baked_->emission_field||baked_->emission_domain))return true;
   for(const auto &l:layers_)if(emission_tile_count(l))return true;
   return false;
 }
@@ -1685,9 +1686,9 @@ std::shared_ptr<PaintedMesh> detail::EmissionExportAccess::without_emission(cons
   const auto token=next_composite_token();
   auto detached=paint.snapshot();
   detached->composite_cache_=std::move(cache);detached->composite_token_=token;
-  if(detached->baked_&&detached->baked_->emission_field){
+  if(detached->baked_&&(detached->baked_->emission_field||detached->baked_->emission_domain)){
     auto baked=std::make_shared<BakedTextures>(*detached->baked_);
-    baked->emission_field.reset();baked->maps.emission=blank_image(paint.resolution());
+    baked->emission_field.reset();baked->emission_domain.reset();baked->maps.emission=blank_image(paint.resolution());
     detached->baked_=std::move(baked);
   }
   for(auto &layer:detached->layers_){layer.emission_tiles.clear();for(auto &tile:layer.tiles)if(tile){bool emission=false;for(const auto &pixel:tile->pixels)emission|=pixel.data[6]||pixel.data[7]||pixel.data[8]||pixel.data[12];if(emission){auto copy=std::make_shared<PaintTile>(*tile);for(auto &pixel:copy->pixels){pixel.data[6]=pixel.data[7]=pixel.data[8]=pixel.data[12]=0;}tile=std::move(copy);}}}
@@ -2396,6 +2397,7 @@ std::shared_ptr<PaintedMesh> SourceNormalPreparationAccess::adopt_canonical(cons
   baked->maps.emission=source.baked_->maps.emission;baked->maps.pbr_color=source.baked_->maps.pbr_color;
   baked->maps.transparent=source.baked_->maps.transparent;baked->coverage=source.baked_->coverage;
   baked->emission_field=source.baked_->emission_field;
+  baked->emission_domain=source.baked_->emission_domain;
   baked->color_interpretation=source.baked_->color_interpretation;
   // Only the normal role moves into the explicitly converted intrinsic plane.
   // Material channels, coverage, editable sparse layers and source maps remain.
@@ -2607,10 +2609,11 @@ void BakedTextures::validate(uint32_t resolution) const {
   if (resolution < 64 || resolution > 2048 ||
       coverage.size() != size_t(resolution) * resolution)
     throw std::invalid_argument("Baked coverage differs from the painting surface");
+  if(emission_domain&&(!emission_domain->valid_owner(emission_domain)||emission_domain->target_resolution()!=resolution||emission_field||!maps.emission.rgba.empty()||maps.emission.width||maps.emission.height))throw std::invalid_argument("Retained emission needs one genuine source domain and no duplicate authority");
   if(emission_field&&(emission_field->resolution()!=resolution||!maps.emission.rgba.empty()||maps.emission.width||maps.emission.height))
     throw std::invalid_argument("FLOAT baked emission needs its exact grid and no duplicate RGB8 authority");
   for (auto image : {&maps.color, &maps.metal_rough, &maps.emission, &maps.normal, &maps.pbr_color,&maps.mtoon_normal}) {
-    if(image==&maps.emission&&emission_field)continue;
+    if(image==&maps.emission&&(emission_field||emission_domain))continue;
     if ((image == &maps.normal || image == &maps.pbr_color||image==&maps.mtoon_normal) && image->rgba.empty() && !image->width && !image->height)
       continue;
     image->validate();
@@ -2620,7 +2623,7 @@ void BakedTextures::validate(uint32_t resolution) const {
 }
 size_t BakedTextures::storage_bytes() const {
   return maps.color.rgba.size() + maps.metal_rough.rgba.size() +
-         maps.emission.rgba.size() + maps.normal.rgba.size() + maps.mtoon_normal.rgba.size()+maps.pbr_color.rgba.size() + coverage.size()+(normal_field?normal_field->retained_bytes():0)+(emission_field?emission_field->storage_bytes():0);
+         maps.emission.rgba.size() + maps.normal.rgba.size() + maps.mtoon_normal.rgba.size()+maps.pbr_color.rgba.size() + coverage.size()+(normal_field?normal_field->retained_bytes():0)+(emission_field?emission_field->storage_bytes():0)+(emission_domain?emission_domain->storage_bytes():0);
 }
 size_t PaintedMesh::storage_bytes() const {
   size_t result = (baked_ ? baked_->storage_bytes() : 0)+(color_projection_?color_projection_->vertex_rgba->rgba.size():0);
@@ -2657,6 +2660,8 @@ void SourcePaintAccess::merge_bake(PaintedMesh &paint,BakedTextures incoming,Bak
   if (paint.editing_) throw std::logic_error("Finish the paint stroke before baking");
   if(size_t(normal_write)>1)throw std::invalid_argument("Invalid normal bake write intent");
   incoming.validate(paint.resolution());
+  if(incoming.emission_domain)incoming.emission_domain->validate_current(paint.mesh_owner(),paint.resolution());
+  if(paint.baked_&&paint.baked_->emission_domain)paint.baked_->emission_domain->validate_current(paint.mesh_owner(),paint.resolution());
   if(incoming.normal_authority)
     throw std::invalid_argument("Retained normal identity requires a source-owning field transition");
   if(bool(paint.color_projection_)!=(incoming.color_interpretation==BakedColorInterpretation::ResolvedPbr))
@@ -2696,7 +2701,11 @@ void SourcePaintAccess::merge_bake(PaintedMesh &paint,BakedTextures incoming,Bak
       throw std::invalid_argument("Different normal interpretations require explicit source-retaining conversion");
     auto merged = *paint.baked_;
     merged.normal_field=incoming.normal_field;
-    if(merged.emission_field||incoming.emission_field){
+    if(merged.emission_domain||incoming.emission_domain){
+      if(!incoming.emission_domain)throw std::invalid_argument("Retained emission replacement needs its explicit source-domain adapter");
+      for(size_t i=0;i<incoming.coverage.size();++i)if(merged.coverage[i]&&incoming.coverage[i]!=255)throw std::invalid_argument("Partial retained emission replacement needs its exact multi-domain adapter");
+      merged.emission_domain=incoming.emission_domain;merged.emission_field.reset();merged.maps.emission={};
+    }else if(merged.emission_field||incoming.emission_field){
       // Independent FLOAT coverage, including values far below one R8 step.
       // Other channels continue their original common-coverage merge below.
       const size_t bytes=BakedEmissionField::required_bytes(paint.resolution());
@@ -3651,7 +3660,12 @@ nlohmann::json PaintedMesh::encode_impl(PaintImageArchive *archive,NormalSamplin
       j["baked"]["version"]=5;j["baked"]["normal_interpretation"]="independent-baked-field-v1";
       j["baked"]["normal_field"]=detail::BakedNormalArchive::writer().add_field(baked_->normal_field);
     }
-    if(baked_->emission_field){
+    if(baked_->emission_domain){
+      baked_->emission_domain->validate_current(mesh_owner(),resolution());
+      j["baked"]["base_version"]=j["baked"]["version"];j["baked"]["version"]=7;
+      j["baked"]["emission_domain"]=baked_->emission_domain->encode();
+      detail::BakedEmissionWriteScope::domain_emitted(archive);
+    }else if(baked_->emission_field){
       j["baked"]["base_version"]=j["baked"]["version"];
       j["baked"]["version"]=6;
       j["baked"]["float_emission"]=nlohmann::json::binary(baked_->emission_field->encode());
@@ -3990,7 +4004,8 @@ std::shared_ptr<PaintedMesh> PaintedMesh::decode_impl(const nlohmann::json &inpu
     if(v.contains("normal_authority")&&!domains)
       throw std::invalid_argument("Retained normal bake requires a complete owning sampling archive context");
     const auto baked_version=detail::baked_legacy_version(v,context.baked_emission);
-    const bool floating=v.at("version")==6;
+    const bool domain_emission=v.at("version")==7;
+    const bool floating=v.at("version")==6||domain_emission;
     const bool retained=baked_version==4;
     const bool layered=baked_version==5;
     if(layered){
@@ -4014,7 +4029,8 @@ std::shared_ptr<PaintedMesh> PaintedMesh::decode_impl(const nlohmann::json &inpu
     BakedTextures baked;
     if(floating){
       detail::baked_float_preflight(v,r,context.baked_emission);
-      baked.emission_field=BakedEmissionField::decode(v.at("float_emission").get_binary(),
+      if(domain_emission){baked.emission_domain=detail::BakedEmissionDomain::decode(v.at("emission_domain"),result->mesh_owner(),r);context.baked_emission->note_validated_domain();}
+      else baked.emission_field=BakedEmissionField::decode(v.at("float_emission").get_binary(),
         {128*1024*1024,[]{detail::NativeReadScope::check();return false;}});
     }
     baked.maps.color = {r, r, bytes("color", size_t(r)*r*4)};
