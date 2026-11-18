@@ -2,6 +2,7 @@
 #include "dome/bake-authoring.hpp"
 #include "dome/material-bindings.hpp"
 #include "dome/render.hpp"
+#include "dome/tangents.hpp"
 #include "baked-emission-domain.hpp"
 #include "render-paint-overlay.hpp"
 #include "render-source-pack.hpp"
@@ -26,7 +27,7 @@ Sample sample(const PaintedMesh&p,double u,double v,std::array<float,3>backgroun
   const double w=(dx?x-ix:1-(x-ix))*(dy?y-iy:1-(y-iy));for(int k=0;k<3;++k)out.rgb[k]+=rgb[k]*w;out.coverage+=coverage*w;
  }return out;}
 std::shared_ptr<SourceMaterialBindings> binding(const Material&m,float strength=1){auto b=std::make_shared<SourceMaterialBindings>();b->has_mtoon=true;b->material=MToonMaterial::from_vrm1({{"extensions",{{"VRMC_materials_mtoon",{{"specVersion","1.0"}}}}}});b->material.parameters.base_color=m.color;b->material.parameters.shade_color={0,0,0};b->material.parameters.emission={m.emissive[0],m.emissive[1],m.emissive[2]};b->material.parameters.emission_strength=strength;b->material.parameters.cull=MToonCull::Off;b->native_reference.color=m.color;b->native_reference.emission=m.emissive;b->native_reference.double_sided=m.double_sided;b->validate();return b;}
-std::shared_ptr<MeshSnapshot> snapshot(const PaintedMesh&p,Material m,bool toon,bool retained){auto s=std::make_shared<MeshSnapshot>();s->mesh=p.mesh();s->pbr_view=!toon;SurfaceRange range;range.object=1;range.count=s->mesh.indices.size();range.material=m;range.pbr_view=!toon;if(retained)range.textures=p.preview(m);if(toon)range.material_bindings=binding(m,retained?5:1);s->ranges.push_back(std::move(range));return s;}
+std::shared_ptr<MeshSnapshot> snapshot(const PaintedMesh&p,Material m,bool toon,bool retained){auto s=std::make_shared<MeshSnapshot>();s->mesh=p.mesh();const auto corners=tangent_corners(s->mesh);s->tangents.resize(s->mesh.positions.size());std::vector<bool>seen(s->mesh.positions.size());for(size_t c=0;c<corners.size();++c){const auto v=s->mesh.indices[c];if(seen[v])check(s->tangents[v]==corners[c],"Actual quad corner tangents have unambiguous vertex transport");s->tangents[v]=corners[c];seen[v]=true;}s->pbr_view=!toon;SurfaceRange range;range.object=1;range.count=s->mesh.indices.size();range.material=m;range.pbr_view=!toon;if(retained)range.textures=p.preview(m);if(toon)range.material_bindings=binding(m,retained?5:1);s->ranges.push_back(std::move(range));return s;}
 std::vector<uint8_t> draw(SurfaceRenderer&r,Target&t,const std::shared_ptr<MeshSnapshot>&s){glBindFramebuffer(GL_FRAMEBUFFER,t.f);r.draw(s,{},identity,{0,0,2},96,96,true);std::vector<uint8_t>pixels(96*96*4);glReadPixels(0,0,96,96,GL_RGBA,GL_UNSIGNED_BYTE,pixels.data());check(glGetError()==GL_NO_ERROR,"Actual material renderer completed without GL errors");return pixels;}
 }
 int main(int argc,char**argv)try{

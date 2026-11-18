@@ -820,6 +820,10 @@ vec3 encoded=texture(tex3,uv).xyz;vec3 ts=unit(vec3((encoded.xy*2.0-1.0)*normal_
 return gl_FrontFacing?N:-N;}
 // Masking darkens final linear RGB, retaining the material's lighting, alpha,
 // cutout, depth and blend rules. Zero and the ordinary-object sentinel are exact.
+// FLOAT source fields use explicit bilinear arithmetic, matching the owning
+// native sampler rather than device-dependent fixed-point filtering weights.
+vec3 retained_hdr_sample(vec2 uv){ivec2 size=textureSize(tex15,0);vec2 p=clamp(uv,vec2(0),vec2(1))*vec2(size)-.5,f=fract(p);ivec2 base=ivec2(floor(p));ivec2 a=clamp(base,ivec2(0),size-1),b=clamp(base+ivec2(1),ivec2(0),size-1);
+return mix(mix(texelFetch(tex15,a,0).rgb,texelFetch(tex15,ivec2(b.x,a.y),0).rgb,f.x),mix(texelFetch(tex15,ivec2(a.x,b.y),0).rgb,texelFetch(tex15,b,0).rgb,f.x),f.y);}
 vec3 sculpt_mask_color(vec3 rgb){return mask_value>0?rgb*(1.0-.72*clamp(mask_value,0.0,1.0)):rgb;}
 vec4 ghost_color(vec4 c){c.rgb=dome_preview_positive_finite(c.rgb);c.rgb=mix(c.rgb,selection_color,selection_amount);return ghost_opacity<1.0?vec4(mix(c.rgb,vec3(.35,.5,.7),.5),c.a*ghost_opacity):c;}
 void main(){if(clip_enabled==1&&dot(clip_plane.xyz,cut_position)<clip_plane.w)discard;if(weight_pass==1){if(weight_value<0)discard;float opacity;
@@ -832,7 +836,7 @@ if(opacity<=0)discard;float x=clamp(weight_value,0,1)*4;vec3 ramp=x<1?mix(vec3(0
 if(slots[0]==1)base*=texture(tex0,source_uv(0));
 if(slots[1]==1){vec3 orm=texture(tex1,source_uv(1)).rgb;metal*=orm.b;rough*=orm.g;if(map_mode==1)ao=orm.r;}
 if(slots[2]==1)glow*=texture(tex2,source_uv(2)).rgb;
-if(retained_emission_domain==1)glow=texture(tex15,paintcoord).rgb;
+if(retained_emission_domain==1)glow=retained_hdr_sample(paintcoord);
 if(map_mode==2&&slots[4]==1)ao=mix(1.0,texture(tex4,source_uv(4)).r,ao_strength);
 if(overlay_mode==1){vec4 contribution=texture(tex7,paintcoord),orm=texture(tex8,paintcoord),coverage=texture(tex10,paintcoord);
  base=base*(1-coverage.r)+contribution;metal=metal*(1-coverage.g)+orm.b;rough=rough*(1-coverage.b)+orm.g;ao=ao*(1-orm.a)+orm.r;
