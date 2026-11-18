@@ -3119,7 +3119,6 @@ void Document::control_event_locked(VrControlEvent event) {
 
 bool Document::command_enabled_locked(SpatialCommand command) const {
   if(creator_command(command)||state_.creator)return creator_command_enabled_locked(command);
-  if(state_.creator||creator_command(command))return creator_command_enabled_locked(command);
   if(command==SpatialCommand::BlurColorLayer){
     const auto&o=scene_.active();const auto field=o.painted?active_texture_set(o):TextureSetView{};
     return !state_.asset_busy&&!state_.recovery_busy&&!control_before_&&!action_active_locked()&&!state_.polygon&&!state_.cut&&!state_.retopology&&!state_.expressions&&!state_.object_grabbing&&!uv_&&object_editable_locked(o.id)&&o.mesh_active&&field.painted&&field.painted->gpu_color_blur_eligible();
@@ -3339,8 +3338,6 @@ void Document::sculpt_command(SpatialCommand command) {
   if(published_.load()==publication)publish_locked();
 }
 void Document::command_locked(SpatialCommand command) {
-  if(creator_command(command)||(state_.creator&&(command==SpatialCommand::Undo||command==SpatialCommand::Redo||command==SpatialCommand::CancelWork))){creator_command_locked(command);return;}
-  if(state_.creator&&command!=SpatialCommand::Center)return;
   if(creator_command(command)||(state_.creator&&(command==SpatialCommand::Undo||command==SpatialCommand::Redo||command==SpatialCommand::CancelWork))){creator_command_locked(command);return;}
   if(state_.creator&&command!=SpatialCommand::Center)return;
   if(command==SpatialCommand::BlurColorLayer){if(command_enabled_locked(command)){PaintBlurOptions options;options.strength=state_.paint.flow;queue_blur_color_locked(options);}return;}

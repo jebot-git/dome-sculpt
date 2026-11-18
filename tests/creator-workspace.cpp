@@ -46,6 +46,7 @@ void controls(const std::filesystem::path&root){
    const float value=parameter==0?c.height+.10f:parameter>=17?.35f:.45f;
    set_humanoid_creator_parameter(c,parameter,value);auto changed=create_humanoid(c);source_retained(original,changed);
    float geometry=0,color=0;for(size_t part=0;part<19;++part){geometry=std::max(geometry,difference(original.parts[part].mesh,changed.parts[part].mesh));for(size_t k=0;k<4;++k)color=std::max(color,std::abs(original.parts[part].color[k]-changed.parts[part].color[k]));}
+   std::cout<<"CONTROL "<<id<<" "<<parameter<<" "<<descriptor.label<<" geometry="<<geometry<<" material="<<color<<" parts="<<changed.parts.size()<<'\n';
    if(parameter<14)check(geometry>1e-5f,"Exposed body/face/style parameter changes genuine CC0 geometry");
    else if(parameter<17){check(changed.parts.size()==20&&geometry==0,"Hair controls add an original fitted groom without rewriting any source hair/body vertex");}
    else check(color>.01f&&geometry==0,"Exposed tint changes actual source material factors while retaining source geometry");
@@ -93,7 +94,7 @@ void workspace(const std::filesystem::path&root){
  driver.sector(6);driver.ray(.7f);driver.panel_button(true);check(std::abs(doc.frame().state->creator->settings.controls.height-1.9f)<1e-6f,"Controller ray applies a real bounded metric body parameter");
  for(int i=0;i<14;++i)driver.sector(1);
  for(float value:{.2f,.15f,.1f}){driver.sector(6);driver.ray(value);driver.panel_button(true);driver.sector(1);}
- check(doc.frame().state->creator->settings.controls.hair_length==.2f&&doc.frame().state->creator->settings.controls.hair_volume==.15f&&doc.frame().state->creator->settings.controls.fringe==.1f,"Actual controller sliders author length, volume and fringe in the native groom settings");
+ check(std::abs(doc.frame().state->creator->settings.controls.hair_length-.2f)<1e-6f&&std::abs(doc.frame().state->creator->settings.controls.hair_volume-.15f)<1e-6f&&std::abs(doc.frame().state->creator->settings.controls.fringe-.1f)<1e-6f,"Actual controller sliders author length, volume and fringe in the native groom settings");
  for(int i=0;i<6;++i)driver.sector(1);driver.sector(6);driver.ray(.3f);driver.panel_button(true);
  check(std::abs(doc.frame().state->creator->settings.controls.hair_color[0]-.3f)<1e-6f,"Actual controller slider authors a retained hair material tint");
  check(doc.copy_scene().encode()==baseline,"All body/face/hair drafts leave genuine prior geometry, paint, source and rig untouched");
