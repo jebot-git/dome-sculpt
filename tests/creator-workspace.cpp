@@ -169,7 +169,9 @@ int main(int argc,char**argv)try{
    // includes every old geometry/paint/source/rest/skin/morph/group byte.
    // In-process workspace tests retain old_avatar_retained() owner checks.
   }
-  check(actual.encode()==expected.encode(),"Actual loader creator endpoint equals independently generated native control result and exact prior authored source");
+  const auto actual_bytes=nlohmann::json::to_cbor(actual.encode());
+  const auto expected_bytes=nlohmann::json::to_cbor(expected.encode());
+  check(actual_bytes==expected_bytes,"Actual loader creator endpoint preserves complete canonical native bytes of the independent control result and every prior authored source");
   std::cout<<"CREATOR CHECKS "<<checks<<'\n';return 0;
  }
  const auto root=argc>2?std::filesystem::path(argv[2]):std::filesystem::temp_directory_path()/("creator-workspace-"+std::to_string(getpid()));std::filesystem::create_directories(root);
