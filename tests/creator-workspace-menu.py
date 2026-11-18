@@ -48,7 +48,13 @@ async def main():
    for child in children:walk(child.value)
   walk(result[1]);return nodes
  async def command(label):
-  nodes=await layout();check(label in nodes and nodes[label][1].get('enabled',True),'Actual native universal command available: '+label);stamp=project.stat().st_mtime_ns;await menu.call_event(nodes[label][0],'clicked',Variant('i',0),0)
+  deadline=time.monotonic()+45
+  while True:
+   nodes=await layout()
+   if label in nodes and nodes[label][1].get('enabled',True):break
+   if time.monotonic()>=deadline:raise TimeoutError('Native universal command remained unavailable: '+label)
+   await asyncio.sleep(.04)
+  check(label in nodes and nodes[label][1].get('enabled',True),'Actual native universal command available: '+label);stamp=project.stat().st_mtime_ns;await menu.call_event(nodes[label][0],'clicked',Variant('i',0),0)
   if label=='Save':await wait(lambda:project.stat().st_mtime_ns!=stamp)
   await asyncio.sleep(.15)
  def key(name,down=None):
