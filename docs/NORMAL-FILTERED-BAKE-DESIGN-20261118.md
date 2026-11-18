@@ -78,3 +78,9 @@ graphical mode explicitly retains its historical per-texel policy0. New witness
 manifests identify the selected target size, source64 and checked policy1. All68
 views keep their four original probes, independent directions and material
 controls. The original failed executions remain separate retained evidence.
+
+The registered source-advanced-normal-bake CTest now invokes the explicit checked
+workflow with the real legacy fixture and selected1024 target. The old per-texel
+acceptance helper remains preserved; it does not authorize a new policy1 Bake at
+64. Current CTest retains the original source-adapter ownership, replay, ancestor
+quota and cancellation regressions after its new refusal/recovery matrix.
