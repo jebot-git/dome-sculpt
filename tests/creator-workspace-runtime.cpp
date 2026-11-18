@@ -572,7 +572,7 @@ FN(ReleaseSwapchainImage, XrSwapchain p, const XrSwapchainImageReleaseInfo *) {
       for(int y=int(s->height)-1;y>=0;--y)for(unsigned x=0;x<s->width;++x)for(int c=0;c<3;++c)capture.put(char(displayed(bytes[(size_t(y)*s->width+x)*4+c])));
     }
   }
-  if(!creator_mode().empty()&&(frame==26||frame==29||frame==37||frame==61||frame==67||frame==73||frame==79||frame==85||frame==89||frame==93||frame==97||frame==115||frame==120||frame==124||frame==130||frame==137||frame==275||frame==279||frame==283||frame==290)){
+  if(!creator_mode().empty()&&((creator_mode()=="reopen"&&(frame==2||frame==4))||frame==26||frame==29||frame==37||frame==61||frame==67||frame==73||frame==79||frame==85||frame==89||frame==93||frame==97||frame==115||frame==120||frame==124||frame==130||frame==137||frame==275||frame==279||frame==283||frame==290)){
     if(const auto*path=getenv("DOME_XR_FIXTURE_REPORT")){
       const auto key=std::to_string(frame)+"-"+std::to_string(s->eye);const auto target=std::string(path)+".creator-"+key+".ppm";
       std::ofstream image(target,std::ios::binary);image<<"P6\n"<<s->width<<' '<<s->height<<"\n255\n";for(int y=int(s->height)-1;y>=0;--y)for(unsigned x=0;x<s->width;++x)for(int c=0;c<3;++c)image.put(char(displayed(bytes[(size_t(y)*s->width+x)*4+c])));

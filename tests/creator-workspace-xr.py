@@ -40,7 +40,9 @@ try:
    check(all(str(frame)+'-'+str(eye)in capture for frame in required for eye in [0,1]),'Both actually released eyes capture copied settings, local history, real sliders and completed creator state')
    check(all(Path(row['ppm']).is_file()and Path(row['ppm']).stat().st_size>row['width']*row['height']*3 for row in capture.values()),'Every captured stereo image contains full actual colour payload')
    if mode=='focus':check(state.get('focus_losses')==1 and state.get('focus_regains')==1,'Real focus-loss/regain events cancel the unaccepted new-avatar draft')
-  else:check(not state.get('creator_buttons')and not state.get('creator_pressures'),'Fresh ordinary reopen injects no creator command or pressure')
+  else:
+   check(not state.get('creator_buttons')and not state.get('creator_pressures'),'Fresh ordinary reopen injects no creator command or pressure')
+   capture=state.get('creator_captures',{});check(all(str(frame)+'-'+str(eye)in capture for frame in [2,4]for eye in [0,1]),'Both actual released eyes capture the saved creator result on ordinary reopen')
   previous=target
  check(not[p for p,h in pins.items()if sha(p)!=h],'All product/runtime/native/source inputs remain unchanged');report(True)
 except BaseException as error:report(error=repr(error));raise
