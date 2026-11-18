@@ -1,8 +1,8 @@
 # Dome Sculpt progress assessment — updated 2026-11-18
 
-The full production objective is incomplete. The current round is closing for
-the user-requested pause. The project has a functional native FLTK/OpenXR
-authoring baseline; recent work strengthens its
+The full production objective is active after the latest user resume and remains
+incomplete. The project has a functional native FLTK/OpenXR authoring baseline;
+recent work strengthens its
 combined build, source-aware baking and actual application qualification. This
 assessment does not replace the complete [requirements](REQUIREMENTS.md).
 
@@ -123,35 +123,35 @@ checks and55 normalized-sampler checks. It retains the correct64/1024 refusals,
 all history and complete Save/reopen comparisons. A valid RGBA8 interpolation
 rounded above1; correcting its producer preserves strict downstream validation.
 Read [native qualification](ADVANCED-NORMAL-FILTERED-WORKFLOW-20261118.md).
-Calibrated software/Arc graphics remain pending. The preparatory forecast was
-interrupted for the requested pause after23 complete views; partial results are
-not acceptance. Its terminal/journal are captured, owned processes cleaned and
-lease released. No replacement forecast or graphical run started.
+The calibrated CPU forecast now passes68 views/37968 dense points; software
+OpenGL passes68 views/432 probes/1796 images with maximum correct RGB error1.
+The same Arc product reports all3721 checks passed and the complete independent
+saved-evidence audit now passes, preserving the original wrapper's renderer-name
+parser failure. Root independently verifies the complete scoped Arc proof. These component
+results do not qualify the new combined App or a physical headset.
 
-A separate owning HDR-domain implementation at1a944c46 preserves source64
-FLOAT data while editable paint uses512, avoiding the measured grid-knot loss.
-Explicit quaternion component decoding fixes native replay. Its actual full
-native workflow passes47409 checks, including Save/reopen, ordered byte equality,
-Undo/Redo and source preservation. Dense4536900-point HDR error is3.064e-6 under
-the unchanged2e-4 bound; both normal roles also pass. This is native component
-evidence: GPU and export adapters remain unimplemented, and new-domain strict
-sanitizer runtime, further owner/transform controls and combined admission remain
-pending. The separate GPU integration worktree has no implementation changes.
+The independent owning HDR source preserves its source64 FLOAT grid while paint
+uses512. Native Save/reopen, ordered byte equality, history, transformed owner
+controls and dense fidelity checks pass. GPU productc524/fixture212 now also
+passes independent PBR/MToon preview checks before/after current512 paint:
+source coefficients are exact, max RGB error1 under bound2. Read
+[GPU qualification](HDR-INDEPENDENT-GPU-20261118.md).
+Actual GPU hardware and full combined/public workflow remain pending.
 
-The shared VRoid creator and true hair recolour now pass352 both-base native
-control/deformation/effective GLB/neutral19-part VRM checks plus44 controller
-checks. Root independently rehashes the recorded authorities; read
-[creator qualification](CREATOR-WORKSPACE-20261118.md). Public GUI/XR and full
-sanitizer qualification remain pending. A separate production slice implements
-actual Shaper-based first-person/collider metadata refit and generated-groom
-provenance/export, with stale/foreign-rest guards. The generated-holder MToon
-identity defect is corrected at its creation owner.
-A shaped female20-mesh VRM export passes independent graph/skin parsing, official
-VRM0 schemas and Khronos validation with zero errors (21 existing/naming warnings).
-The full run then exposes a consumer fixture's incorrect assumption that each
-mesh has a unique material. That fixture correction compiles and links but is
-unrun. Full current-source native, strict sanitizer, public GUI/XR and broader
-styled/groom VRM qualification remain pending.
+SOURCE8 and retained HDR export60a1 now preserves the complete visible source
+and target, separate64/512 coefficient witnesses and native Scene43 provenance.
+Native16400 controls and23707 independent probes pass under unchanged2e-4
+(error2.513e-6); direct/second/worker GLBs are byte-identical and independently
+pass Khronos with0 errors. Broader/mixed-source guards and current strict
+sanitizer runtime remain pending; this is component evidence, not admission.
+
+VRoid creator productb75/fixturede60 now passes448 VRM,44 workspace,352 controls
+and1 fixture checks, including all six female/male styled/reopened/posed exports
+and real stale/foreign/forged refusals. All six exports pass official schemas
+and Khronos with0 errors. An unrelated empty-object fixture dereference and
+an outer fixture-count expectation were corrected in explicitly scoped evidence;
+original failures remain. Read [native VRM qualification](CREATOR-NATIVE-VRM-20261118.md).
+Current strict and actual desktop/XR UI qualification remain pending.
 
 The user-accepted controller selection/hierarchy/multiselection/ghost interface
 is preserved. Only the verified CC0 VRoid female/male creator bases are offered.
@@ -160,11 +160,11 @@ Current canonical DomeD FLTK and bitmap-font builds remain selected; see
 
 ## Main remaining goals
 
-1. Finish retained HDR GPU/export adapters and current creator VRM validation;
-   merge the independently qualified components into one current application.
-   Complete its broader regression, strict sanitizer, software/Arc, public
-   desktop/XR and physical headset/controller qualification. Fresh combined
-   builds and selected tests already pass; the newest source is not yet admitted.
+1. Complete the fresh build and qualification of composed candidatef5998a18,
+   including current HDR GPU/export, creator VRM and normal fidelity components.
+   Finish broader regression, strict sanitizer, actual GPU hardware, public
+   desktop/XR and physical headset/controller gates. Component passes and old
+   combined builds do not admit this newly composed application.
 2. Complete production-size sustained sculpting, local meshing, allocation and
    recovery hardening, topology/paint preservation, remeshing and retopology.
 3. Finish texture sets, broader layered paint/normal/AO/material baking and
@@ -182,8 +182,10 @@ Current canonical DomeD FLTK and bitmap-font builds remain selected; see
 8. Implement controller tool/function/selection trays and spatial node-based
    editing/history after the basic production targets are met.
 
-The Nov18 round is closing at the user's requested pause boundary. Agents are
-preserving their checkpoints; no successor runtime or implementation is to start.
+The latest user resume revokes the previous round's pause. Current GPU,
+export, creator and normal-quality components are merged into frozen candidate
+f5998a18; its fresh App/13-fixture Release build is running. The component proof
+links and exact pending gates are in the current handoff.
 No percentage is assigned: implemented rows differ greatly in scope and several
 still have only partial qualification. No system installation, physical-headset
 test or active-session restart occurred during this round.

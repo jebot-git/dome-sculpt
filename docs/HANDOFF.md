@@ -1,7 +1,7 @@
 # Dome Sculpt current handoff — 2026-11-18
 
-The full production goal is INCOMPLETE. The current round is closing for the
-user-requested pause; no further implementation or test runs are to start.
+The full production goal is ACTIVE after the latest user resume and remains
+incomplete. The previous round's pause records below retain their dated scope.
 Read [REQUIREMENTS.md](REQUIREMENTS.md) and the original
 [HANDOFF-466ebd1.md](HANDOFF-466ebd1.md) for the complete scope. This concise file
 replaces the accumulated checkpoint diary; all previous text is preserved,
@@ -307,72 +307,57 @@ pairs, live ASan/UBSan witnesses, leak detection, no address-space cap and empty
 drift/survivor lists. Both root units were captured then stopped successfully;
 do not restart them. The compressed scoped proof is committed above.
 
-## Active next slices — inspect actual units before acting
+## Current resumed slices — 2026-11-18
 
-- **Filtered normal workflow:** productione006 with fixtured66 now passes all17
-  current checked families (646 checks), the complete historical17 corpus
-  (263495), and55 normalized-source sampler regressions. Source64 stays
-  unchanged; both target choices are explicit2048. Original64/1024, byte/work,
-  cancellation and stale-authority refusals remain. Full ordered/native byte
-  equality, history and fresh-process reopen pass under the unchanged AS2/RSS3
-  bounds, with an explicit task-local allocator profile. Valid RGBA8 bilinear
-  sampling previously rounded to1.00000012; the corrected producer preserves
-  the mathematical normalized range while all MToon/quality checks stay strict.
-  Read [native qualification](ADVANCED-NORMAL-FILTERED-WORKFLOW-20261118.md).
-  Root rehashed every scoped archive member against actual files. The68-view
-  calibrated forecast was interrupted at the user's pause boundary after23
-  complete views; its partial results are not acceptance. Terminal/journal were
-  captured, owned processes cleaned and device lease released. No successor
-  forecast, software or Arc run started; no new GL pass is claimed.
-- **Combined source:** ab497 and successor63956 retain their distinct fresh
-  Release build/audit proofs. App63956 additionally passes loader72/version0.
-  Its fresh217-owner strict sanitizer build/audit also passes, but selected
-  runtime is partial: canonical512 and writable512 pass; old7e joint64 reaches
-  the original900s deadline and controller44 is not reached. Read
-  [the exact scope](COMBINED-STRICT-SANITIZE-20261118.md). The failed unit is
-  captured/stopped with no drift or survivors. Helper-only source522 preserves
-  all probes and bounds while removing repeated immutable-map construction;
-  one fresh S fixture TU and link against the identical217-build archives pass.
-  Selected-v2 (joint64/controller44) now passes43302/9.308s and44/42.994s under
-  ds-authoring-combined-strict-selected-v2-20261118.service,
-  Main2515217/Invocation859ef46ed7e74ce49f8a6f90a8a45914. Actual terminal and
-  journal are captured before stopping; all selected ELFs have live ASan/UBSan
-  witnesses, leak detection, no address cap, empty drift/survivors. The four
-  distinct positive suites total67108 checks; no failed timeout is relabeled.
-  Full combined historical121 and all104 checked cases remain.
-- **HDR source-domain adapter:** source_hdr_resume_20261118 owns the replacement
-  SOURCE lane. Actual joint512 failure.021309 is double-filter knot loss: the
-  independent transfer residual is7.9e-7 and source64-knot error.0213089;2048
-  still cannot meet the unchanged2e-4 HDR bound. Genuine joint64 passes. A new
-  versioned emission_transport policy preserves missing/legacy0 and retains
-  an independently owned source64 FLOAT domain before current-grid paint.
-  Exact supporting-face/UV/current ray-column certificates, frozen before-scene
-  provenance, quotas and ancestor/cycle guards are implemented in isolated
-  production children; GPU/export still refuse the new domain until adapters.
-  Product1a944c46 fixes quaternion component decoding. Actual joint000512 now
-  passes47409 checks and complete native Save/reopen, ordered byte equality,
-  Undo/Redo and source preservation. Both normal roles and4536900 dense HDR
-  probes pass (HDR3.064e-6 under unchanged2e-4). Further transform/owner/current
-  paint controls compile but remain unrun; strict new-domain runtime is pending.
-  GPU/export remain explicit refusals. Root's GPU integration worktree at1a944
-  is clean: no adapter implementation or graphics/export acceptance is claimed.
-  Original failures remain frozen.
-- **Creator:** production75 now passes352 real both-base control/deformation/
-  GLB/effective-colour/neutral19-part VRM checks and44 controller/workspace checks;
-  root independently verifies the recorded authorities. Read
-  [creator qualification](CREATOR-WORKSPACE-20261118.md). Public GUI/XR and strict
-  sanitizer runtime remain unclaimed. Separate creator-export productione3ff
-  implements actual Shaper-based bone-local first-person/collider refit and
-  explicit generated-groom provenance/material/rig transport, with strict
-  stale/foreign-rest refusals. Fresh App/component builds pass; native canary
-  first detects generic genesis's default has_mtoon=true and correctly refuses
-  borrowed typed identity. The creation-owner fix is implemented. An actual
-  shaped female20-mesh VRM passes graph/skin and official schema/Khronos checks
-  with zero errors (21 naming/existing skinned-node warnings), before the full
-  run exposes a shared-material assumption in its consumer UV fixture. The
-  corrected test-only child compiles/links but remains unrun. Male empty physics
-  is preserved. Current-source native/SAN and public GUI/XR qualification remain
-  pending; this prototype is not full VRM admission.
+The latest user resume supersedes the previous round's pause. The original full
+production goal stays active and incomplete. Main still admits product1bc; the
+new component code is on explicit branches until combined qualification.
+
+- **Combined integration:** frozen candidatef5998a18 on
+  work/authoring-current-integration-20261118 merges checked63956, GPUe3de,
+  HDR/SOURCE8export60a1, creatorde60 and filtered-normalc56 through real commits.
+  Configuration passes; its fresh Release App plus13 selected fixture build is
+  running in artifacts/authoring-current-combined-release-20261118, unit
+  ds-authoring-current-combined-release-v1-20261118.service,
+  Invocation3de2b138bc794f5db8ce854a708eb7b9/Main3713821. Inspect actual unit
+  before acting; no build/runtime admission follows from configuration or launch.
+- **Independent HDR GPU:** productc524/fixture212 now passes actual llvmpipe
+  source64/current512 PBR and MToon, before/after editable physical paint.
+  All original FLOAT coefficients survive GPU extraction exactly;4422 checks
+  pass, PBR error1 and MToon0 under bound2. The same production's prior old
+  FLOAT172040 and complete MToon81 product steps pass separately; their failed
+  outer/new-fixture phases stay failed. Read
+  [the scoped proof](HDR-INDEPENDENT-GPU-20261118.md). Hardware, resource/fault
+  stress and actual combined/public application qualification remain pending.
+- **HDR/native export:** genuine1a joint51247409 and current controls752/24 now
+  pass on current exportcore. SOURCE8 export60a1 implements the actual owning
+  source corner/paint route while preserving the visible original source.
+  Native export16400 checks and23707 independent probes pass (HDR2.513e-6 under
+  unchanged2e-4), separate64/512 witnesses, Scene43 restore, byte-identical
+  second-cycle/worker export and real forgery refusals. Three actual GLBs have
+  Khronos0 errors. Original guard failure is preserved; current strict runtime
+  and broader/mixed guards remain pending. No combined/export admission yet.
+- **Filtered normals:** e006/c56 passes native17 current families plus historical
+  corpus. CPU forecast68/37968 dense points now passes under unchanged bounds,
+  and all68 software views/432 points/1796 PNGs pass3721 checks, max RGB1.
+  Root independently rehashes every archived member and actual image authority.
+  Read [forecast](ADVANCED-NORMAL-FORECAST-20261118.md) and
+  [software graphics](ADVANCED-NORMAL-FILTERED-GRAPHICS-20261118.md).
+  Arc's actual product and complete independent saved-evidence audit now pass,
+  including actualA770/renderD129/i915/136boundaries and all images/numerics.
+  The original outer renderer-prefix/parser failure remains preserved separately;
+  the full scoped software/Arc proof is linked above. Root independently
+  rehashes all1818 Arc archive members against actual authorities and audit0.
+- **Creator:** b75/de60 actual native448 VRM +44 workspace +352 controls +1
+  fixture checks pass, including six female/male styled/reopened/posed exports
+  and six genuine refusals. All six exports pass official schemas and Khronos
+  with0 errors (21 naming/existing skinned-node warnings each). An unrelated
+  empty Scene object was incorrectly dereferenced by the fixture; corrected
+  avatar-group scoping preserves unrelated objects. An outer metadata assertion
+  expected fixture0 instead of actual1; original1 is retained and a separate
+  read-only9518-pin review establishes the precise positive scope. Read
+  [native VRM proof](CREATOR-NATIVE-VRM-20261118.md). Current strict and actual
+  desktop/XR UI runtimes remain pending; do not borrow oldApp GUI results.
 
 Root rechecked canonical DomeD local and remote main onNov18: both remainacc2b70.
 No system installation, physical-headset launch or active-session restart occurred.
