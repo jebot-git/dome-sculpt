@@ -290,12 +290,27 @@ do not restart them. The compressed scoped proof is committed above.
   actual diagnostic catches a pseudo-resize bug. The corrected child uses the
   existing private raster-resize facility, and adds a shared validated generic
   source sampler so prepared-target checks cannot silently skip ordinary/sculpt
-  sources. No higher-resolution accepted workflow or final GL matrix is claimed.
-- Writable-source agent is preparing strict sanitizer441, then new-packet
-  graphical/application qualification. The six-suite Release result above is
-  terminal; preserve all fixed source/test role boundaries and original failures.
-- Creator agent owns work/vroid-creator-workspace-20261118, source7f3911ca, with
-  CPU build ds-vroid-creator-release-v1-20261118.service/Invocationb08776c1.
+  sources. Corrected production8ebacf8a completes a fresh193-core/209-TU native
+  build. Its first ordered diagnostic passes the full historical17 corpus and
+  real legacy recipe proof; a new ordinary normal-texture1024 retry still fails
+  the strict filtered bound and needs numeric diagnosis. No higher-resolution
+  accepted workflow or final GL matrix is claimed.
+- Writable-source agent now runs fresh strict sanitizer441 in
+  artifacts/source441-headless-sanitize-20261118 under
+  ds-source441-headless-sanitize-build-v1-20261118.service, Main1028537,
+  Invocation7d2d0e1ca81346d193559358927aee84. It builds193core+support+6fixtures
+  fresh with one compiler job; inspect the actual unit before acting. The
+  six-suite Release result above is terminal; preserve all fixed source/test
+  role boundaries and original failures. New-packet graphics/App remain pending.
+- Creator agent owns work/vroid-creator-workspace-20261118. Initial source7f3911ca
+  builds the whole App but its fixture first fails duplicate cgltf linkage, then
+  reveals a genuinely inert red hair tint on both original CC0 models. Existing
+  multiplicative tint semantics are retained; new optional hair recolour uses
+  explicit RGB, original grayscale textures/alpha and retained shade contrast.
+  Absence preserves exact version2 controls; the override is version3.
+  Fresh source75ee61fb now builds under
+  ds-vroid-creator-release-v2-build-20261118.service, Main1203476,
+  Invocation90d2f9ecf386482199622a84aa713962. No recolour proof is claimed yet.
   The missing XR body/face/hair/tint controls now have an unqualified shared
   native draft/Apply/Cancel implementation reusing existing desktop/backend
   controls. Actual effects of26 controls on both CC0 bases, source/skin/morph
