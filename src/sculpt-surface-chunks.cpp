@@ -8,6 +8,7 @@
 #include <queue>
 #include <set>
 #include <string>
+#include <type_traits>
 
 namespace dome::detail {
 bool SculptChunkBounds::empty() const { return minimum.x > maximum.x; }
@@ -96,6 +97,13 @@ SculptChunkBounds value_bounds(const SculptSurfaceRun &run) {return run.bounds;}
 template<class T> size_t value_bytes(const T &) { return 0; }
 size_t value_bytes(const Chunk &c) { return c?c->bytes:0; }
 size_t value_bytes(const Tile &t) { return t?t->bytes:0; }
+template<class T> bool same_owner(const std::shared_ptr<const T> &a,
+                                  const std::shared_ptr<const T> &b) {
+  return a.get()==b.get()&&!a.owner_before(b)&&!b.owner_before(a);
+}
+template<class T> bool shared_payload(const T &,const T &) {return false;}
+bool shared_payload(const Chunk &a,const Chunk &b) {return same_owner(a,b);}
+bool shared_payload(const Tile &a,const Tile &b) {return same_owner(a,b);}
 size_t sum(size_t a,size_t b) {
   if(b>std::numeric_limits<size_t>::max()-a)throw std::length_error("Sculpt chunk accounting overflow");
   return a+b;
@@ -152,7 +160,9 @@ struct TilePackets {
                    std::vector<Int3> &changed,Work &w) const {
     const auto &limits=w.limits.extraction;
     if(field.voxels().size()>limits.samples)throw std::length_error("Local surface sample limit exceeded");
-    if(regions.empty()||regions.size()>limits.regions)throw std::length_error("Invalid local surface region count");
+    // Empty is the closed full-comparison result: a distinct field owner has
+    // exactly the same sampled function. It still gets its own source owner.
+    if(regions.size()>limits.regions)throw std::length_error("Invalid local surface region count");
     std::set<Int3> dirty;
     for(auto r:regions) {
       w.tick();
@@ -220,6 +230,72 @@ TilePackets::Ptr full_packets(const Volume &field,Work &w) {
   w.charge(legacy->stats().bytes);
   w.advance(legacy->stats().samples_scanned);w.advance(legacy->stats().cells_evaluated);
   return TilePackets::capture(*legacy,w);
+}
+// Native reading intentionally discards ephemeral Volume ancestry. Recover
+// locality only by comparing the complete union of actual lattice samples,
+// including erased keys and the implicit band value. No hash or caller-supplied
+// dirty box authorizes reuse. Work/cancellation share the normal operation cap.
+Volume::GeometryChange checked_field_difference(const SurfaceGeometry &before,
+                                                const Volume &field,Work &w) {
+  Work::Phase phase(w,"complete field correspondence");
+  Volume::GeometryChange change;change.kind=Volume::GeometryChange::Kind::Local;
+  const auto old=before.voxels(),now=field.voxels();
+  if(old.size()>w.limits.extraction.samples||now.size()>w.limits.extraction.samples)
+    throw std::length_error("Local surface sample limit exceeded");
+  auto tile=[](int n){return n/16-(n%16<0);};
+  auto include=[&](Int3 p) {
+    const Int3 key{tile(p.x),tile(p.y),tile(p.z)};
+    for(size_t i=0;i<change.count;++i) {
+      const auto q=change.samples[i].minimum;
+      if(Int3{tile(q.x),tile(q.y),tile(q.z)}!=key)continue;
+      auto &r=change.samples[i];
+      r.minimum={std::min(r.minimum.x,p.x),std::min(r.minimum.y,p.y),std::min(r.minimum.z,p.z)};
+      r.maximum={std::max(r.maximum.x,p.x),std::max(r.maximum.y,p.y),std::max(r.maximum.z,p.z)};
+      return true;
+    }
+    if(change.count==change.samples.size())return false;
+    change.samples[change.count++]={p,p};return true;
+  };
+  auto equal=[](float a,float b){return std::bit_cast<uint32_t>(a)==std::bit_cast<uint32_t>(b);};
+  for(auto [p,value]:old) {
+    w.tick();const auto found=now.find(p);const float next=found==now.end()?field.band():found->second;
+    if(!equal(value,next)&&!include(p))return Volume::GeometryChange{};
+  }
+  for(auto [p,value]:now) {
+    w.tick();
+    if(!std::isfinite(value)||std::abs(value)>field.band())
+      throw std::invalid_argument("Invalid sculpt field correspondence sample");
+    if(old.find(p)==old.end()&&!equal(value,before.band())&&!include(p))
+      return Volume::GeometryChange{};
+  }
+  w.stop();return change;
+}
+
+// Directories remain persistent AVL trees. A matching actual node owns an
+// identical complete subtree, so skip it in one step. Changed search paths
+// can still retain an unchanged tile/chunk payload; credit that owner alone.
+template<class Index>
+size_t shared_directory_bytes(const Index &current,
+                             std::span<const Index *const> others,Work &w) {
+  const auto visit=[&](auto &&self,const typename Index::Ptr &node)->size_t {
+    if(!node)return 0;
+    w.tick();
+    for(const auto *other:others) {
+      w.tick();const auto found=other->node_owner(node->key);
+      if(found&&same_owner(node,*found)) {
+        if(node->count>SIZE_MAX/(sizeof(typename Index::Node)+128))
+          throw std::length_error("Shared sculpt subtree byte overflow");
+        return sum(node->count*(sizeof(typename Index::Node)+128),node->payload_bytes);
+      }
+    }
+    size_t shared=0;
+    if(value_bytes(node->value))for(const auto *other:others) {
+      w.tick();const auto found=other->find(node->key);
+      if(found&&shared_payload(node->value,*found)){shared=value_bytes(node->value);break;}
+    }
+    return sum(shared,sum(self(self,node->left),self(self,node->right)));
+  };
+  return visit(visit,current.root);
 }
 
 const SurfaceCell *cell_at(const TilePackets &cache,Int3 p) {
@@ -359,6 +435,13 @@ Chunk assemble(const SurfaceTile &tile,const Edges &edges,const Positions &posit
 } // namespace
 
 struct SculptSurfaceChunks::State {
+  // A work shortcut only, never equality/sharing authority. Independent cold
+  // factories cannot share directory nodes; descendants may, after checked
+  // ancestry or the complete field comparison above. Actual owners decide all
+  // byte credit below. The tiny family allocation is conservatively reserved
+  // in every manifest even when its token is shared.
+  struct Family {};
+  std::shared_ptr<const Family> family;
   SculptChunkLimits limits;
   TilePackets::Ptr cache;
   Edges edges;
@@ -375,7 +458,9 @@ struct SculptSurfaceChunks::State {
       Work &w) {
     w.stop();
     w.charge(sizeof(State)+sizeof(SculptSurfaceChunks)+256);
+    if(!before)w.charge(sizeof(Family)+128);
     auto out=std::make_shared<State>();out->cache=std::move(cache);out->limits=limits;
+    out->family=before?before->family:std::make_shared<const Family>();
     out->base=before;
     out->report.kind=before?SculptChunkReport::Kind::Local:SculptChunkReport::Kind::Rebuild;
     out->report.extraction_directory_copy=false;
@@ -561,6 +646,7 @@ struct SculptSurfaceChunks::State {
       retained+=n*width;
     };
     retain(1,sizeof(State)+sizeof(SculptSurfaceChunks)+256);
+    retain(1,sizeof(Family)+128);
     retain(Edges::n(out->edges.root),sizeof(Edges::Node)+128);
     retain(Positions::n(out->positions.root),sizeof(Positions::Node)+128);
     retain(Chunks::n(out->chunks.root),sizeof(Chunks::Node)+128);
@@ -591,11 +677,14 @@ SculptSurfaceChunks::Ptr SculptSurfaceChunks::update(const Volume &v,SculptChunk
       state_->cache->size()>limits.extraction.tiles||v.voxels().size()>limits.extraction.samples)
     throw std::length_error("Current sculpt owner exceeds the requested operation limits");
   const auto &source=*state_->cache->source_owner();
-  const auto change=v.geometry_change(source.geometry_owner());
+  auto change=v.geometry_change(source.geometry_owner());
   const bool context=v.voxel_size()==source.voxel_size()&&v.band()==source.band();
   if(context&&change.kind==Volume::GeometryChange::Kind::Unchanged)
     return shared_from_this();
   work.charge(state_->report.retained_bytes);
+  if(context&&change.kind==Volume::GeometryChange::Kind::Rebuild&&
+      representation()==Representation::Chunks)
+    change=checked_field_difference(source,v,work);
   std::vector<Int3> changed;
   const bool local=context&&change.kind==Volume::GeometryChange::Kind::Local;
   auto cache=local?state_->cache->local_update(v,change.regions(),changed,work):full_packets(v,work);
@@ -607,6 +696,34 @@ SculptSurfaceChunks::Ptr SculptSurfaceChunks::update(const Volume &v,SculptChunk
 }
 SculptSurfaceChunks::Representation SculptSurfaceChunks::representation() const {return state_->representation;}
 const SculptChunkReport &SculptSurfaceChunks::report() const {return state_->report;}
+size_t SculptSurfaceChunks::additional_retained_bytes(std::span<const Ptr> owners,
+                                                      Cancel cancel) const {
+  Work work{state_->limits,std::move(cancel)};work.validate();work.stop();
+  if(owners.size()>256)throw std::length_error("Sculpt retained owner quota exceeded");
+  Work::Scratch scratch(work,owners.size(),sizeof(const State *));
+  std::vector<const State *> sources;sources.reserve(owners.size());
+  const auto self=shared_from_this();
+  for(const auto &owner:owners) {
+    work.tick();if(!owner)continue;
+    if(same_owner(self,owner))return 0;
+    if(same_owner(state_->family,owner->state_->family))sources.push_back(owner->state_.get());
+  }
+  if(sources.empty())return report().retained_bytes;
+  auto shared=[&](const auto &index,auto select) {
+    using Index=std::remove_cvref_t<decltype(index)>;
+    Work::Scratch pointers(work,sources.size(),sizeof(const Index *));
+    std::vector<const Index *> other;other.reserve(sources.size());
+    for(const auto *source:sources)other.push_back(&select(*source));
+    return shared_directory_bytes(index,std::span<const Index *const>(other),work);
+  };
+  size_t discount=shared(state_->cache->tiles,[](const State &s)->const Tiles&{return s.cache->tiles;});
+  discount=sum(discount,shared(state_->edges,[](const State &s)->const Edges&{return s.edges;}));
+  discount=sum(discount,shared(state_->positions,[](const State &s)->const Positions&{return s.positions;}));
+  discount=sum(discount,shared(state_->chunks,[](const State &s)->const Chunks&{return s.chunks;}));
+  discount=sum(discount,shared(state_->runs,[](const State &s)->const Runs&{return s.runs;}));
+  if(discount>report().retained_bytes)throw std::logic_error("Shared sculpt storage exceeds its owning report");
+  work.stop();return report().retained_bytes-discount;
+}
 const LocalSurfaceCache::Owner &SculptSurfaceChunks::source_owner() const {return state_->cache->source_owner();}
 const SculptChunkBounds &SculptSurfaceChunks::bounds() const {return state_->bounds;}
 bool SculptSurfaceChunks::owns(const Chunk &chunk) const {
