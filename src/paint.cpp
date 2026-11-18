@@ -1788,6 +1788,43 @@ std::shared_ptr<PaintedMesh>detail::TextureSetPaintAccess::bind_raster(const Pai
   if(!domain||!valid_raster(before)||!valid_raster(prototype)||!owner(prototype.texture_set_domain_,domain)||!owner(prototype.mesh_owner(),before.mesh_owner())||!domain->matches(before.mesh_owner())||prototype.in_stroke()||before.in_stroke()||prototype.resolution()!=before.resolution()||prototype.surface_->options.policy!=before.surface_->options.policy||!owner(prototype.surface_->paint_domain,before.surface_->paint_domain)||!owner(prototype.surface_->original_sampling,before.surface_->original_sampling))throw std::invalid_argument("Source member raster cannot borrow another real source/domain/resolution proof");
   if(snapshot_bytes(before)>limits.maximum_bytes)throw std::length_error("Source member raster metadata exceeds its quota");auto result=before.snapshot();result->surface_=prototype.surface_;result->texture_set_domain_=domain;result->sampling_attachment_=prototype.sampling_attachment_;result->composite_cache_=std::make_shared<PaintedMesh::CompositeCache>();result->composite_token_=next_composite_token();return result;
 }
+std::shared_ptr<PaintedMesh>detail::TextureSetPaintAccess::resize_unpainted(const PaintedMesh&before,
+    uint32_t r,const TextureSetLimits&limits){
+  limits.validate();auto stop=[&]{if(limits.cancelled&&limits.cancelled())throw std::runtime_error("Target paint resolution change cancelled");};stop();
+  if(r<64||r>2048||(r&(r-1))||!valid_raster(before)||!before.surface_||
+      before.in_stroke()||before.has_paint_data()||before.has_physical_emission()||before.allocated_color_tiles_||before.texture_set_domain_||before.sampling_attachment_||
+      before.color_projection_||before.normal_projection_||before.baked_||before.surface_->paint_domain||
+      before.surface_->original_sampling||before.surface_->source_capture_only||
+      before.surface_->options.policy!=PaintUvPolicy::Strict)
+    throw std::invalid_argument("Target resizing requires an actual unpainted ordinary strict-UV grid");
+  if(r==before.resolution())return before.snapshot();
+  if(before.revision_==UINT64_MAX)throw std::overflow_error("Target paint revision exhausted");
+  const size_t after_bytes=working_bytes(before,r),before_bytes=working_bytes(before,before.resolution());
+  if(before_bytes>limits.maximum_bytes||after_bytes>limits.maximum_bytes-before_bytes)
+    throw std::length_error("Target resolution exceeds its prospective before/after raster byte budget");
+  const auto &mesh=before.mesh();size_t work=0,samples=0;
+  auto charge=[&](size_t count,size_t unit){if(work>limits.maximum_work||(unit&&count>(limits.maximum_work-work)/unit))throw std::length_error("Target resolution exceeds its prospective work budget");work+=count*unit;};
+  charge(mesh.positions.size()+mesh.normals.size()+mesh.uv.size()+mesh.indices.size(),4);charge(size_t(r)*r,20);
+  for(size_t triangle=0;triangle<mesh.indices.size()/3;++triangle){
+    if(!(triangle%64))stop();const auto a=mesh.uv.at(mesh.indices[triangle*3]),b=mesh.uv.at(mesh.indices[triangle*3+1]),c=mesh.uv.at(mesh.indices[triangle*3+2]);
+    const int x0=std::max(0,int(std::floor(std::min({a[0],b[0],c[0]})*r))),x1=std::min(int(r)-1,int(std::ceil(std::max({a[0],b[0],c[0]})*r))),
+      y0=std::max(0,int(std::floor(std::min({a[1],b[1],c[1]})*r))),y1=std::min(int(r)-1,int(std::ceil(std::max({a[1],b[1],c[1]})*r)));
+    const size_t count=size_t(std::max(0,x1-x0+1))*size_t(std::max(0,y1-y0+1));charge(count,1);samples+=count;
+  }
+  auto options=before.surface_->options;options.cancelled=limits.cancelled;
+  options.max_raster_samples=std::min({options.max_raster_samples,std::max(size_t(1),samples),limits.maximum_work});
+  options.max_candidate_checks=std::min(options.max_candidate_checks,limits.maximum_work);
+  auto surface=std::make_shared<PaintedMesh::SurfaceMap>(before.surface_->geometry,r,std::move(options));
+  surface->options.max_raster_samples=before.surface_->options.max_raster_samples;
+  surface->options.max_candidate_checks=before.surface_->options.max_candidate_checks;
+  auto result=before.snapshot();result->surface_=std::move(surface);
+  const size_t tiles=result->surface_->tiles.size();
+  for(auto &layer:result->layers_){layer.tiles.assign(tiles,{});layer.pbr_tiles.clear();layer.emission_tiles.clear();}
+  result->allocated_tiles_=result->allocated_color_tiles_=0;
+  result->composite_cache_=std::make_shared<PaintedMesh::CompositeCache>();result->composite_token_=next_composite_token();++result->revision_;
+  if(result->mesh_owner()!=before.mesh_owner()||!result->valid_paint_sampling_attachment()||!result->valid_source_sampling_attachment())throw std::invalid_argument("Target resolution lost its actual original geometry/ordinary raster ownership");
+  stop();return result;
+}
 std::shared_ptr<PaintedMesh>detail::TextureSetPaintAccess::bind(const PaintedMesh&before,
     std::shared_ptr<const TextureSetFaceDomain>domain,uint32_t r,const TextureSetLimits&limits){
   limits.validate();if(limits.cancelled&&limits.cancelled())throw std::runtime_error("Texture-set paint binding cancelled");if(domain)domain->authenticate_owner(domain);

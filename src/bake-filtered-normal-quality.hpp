@@ -88,6 +88,10 @@ inline void verify_filtered_normal_quality(const Mesh &low,const BakeSource &hig
           hit=SurfaceHit{};hit->triangle=options.source_triangles.at(triangle);hit->barycentric=mapped;
         }
         if(!hit)throw std::invalid_argument("Normal projection misses between texture samples; increase target paint resolution or adjust Bake projection");
+        if(!options.allow_backfaces){
+          const auto c=size_t(hit->triangle)*3;const auto a=high.mesh.positions.at(high.mesh.indices.at(c)),b=high.mesh.positions.at(high.mesh.indices.at(c+1)),d=high.mesh.positions.at(high.mesh.indices.at(c+2));
+          if(dot(cross(b-a,d-a),normal)<=0)throw std::invalid_argument("Normal projection reaches a refused backface between texture samples; increase target paint resolution or adjust Bake projection");
+        }
         const auto c=size_t(hit->triangle)*3;
         const auto a=high.mesh.positions.at(high.mesh.indices.at(c)),b=high.mesh.positions.at(high.mesh.indices.at(c+1)),d=high.mesh.positions.at(high.mesh.indices.at(c+2));
         if(!options.allow_backfaces&&dot(cross(b-a,d-a),normal)<=0)

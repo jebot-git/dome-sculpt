@@ -29,9 +29,10 @@ Original64 refusals remain separately named regressions.
 
 The existing TextureResolution control/worker and FLTK texture-set dialog gain a
 narrow unpainted-target route. It refuses original images, normal/prepared data,
-rigs, membership, authored paint and retained domains. It reuses the SourceUV
-explicit-resolution transfer/adoption with identity geometry correspondence;
-layers/IDs, material binding provenance and source Scene remain owned. Users
+rigs, membership, authored paint and retained domains. It reuses the existing private texture-set raster-resize foundation with a
+narrow unpartitioned/unpainted route. It preserves exact geometry and immutable
+material binding owners, layers/IDs and source Scene. SourceUV image resolution
+is a separate operation; it does not resize the ordinary editable paint grid. Users
 explicitly choose the higher target resolution; there is no automatic resize.
 FLTK exposes a resolution-only dialog for an eligible typed target. The existing
 XR panel stages the same control, with ordinary Cancel/accept semantics. Every

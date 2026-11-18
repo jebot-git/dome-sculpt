@@ -62,7 +62,7 @@ void positive(const Family &family,uint32_t resolution,const std::filesystem::pa
  const auto state=doc.frame().state;const AssetSource captured{state->generation,state->revision,family.target,state->edit_authority};
  TextureSetEdit edit;edit.action=TextureSetAction::Resolution;edit.set=0;edit.resolution=resolution;doc.edit_texture_set(edit,captured);
  auto save=doc.save_async(folder/(family.name+"-selected-resolution.dsculpt"));save.get();require(doc.wait_asset()&&doc.wait_mesh()&&doc.frame().state->error.empty(),"Existing resolution worker and immediately ordered Save complete before Bake");
- const auto resized=doc.copy_scene();require(resized.object(family.target).painted->resolution()==resolution&&resized.object(family.source).painted->resolution()==64,"Only explicit user-selected target map changes resolution; original source remains64");unchanged_source(resized,family.scene,family.target);
+ const auto resized=doc.copy_scene();require(resized.object(family.target).painted->mesh_owner()==family.scene.object(family.target).painted->mesh_owner()&&resized.object(family.target).material_bindings==family.scene.object(family.target).material_bindings,"Explicit blank-target resize retains exact geometry and immutable material binding owners");require(resized.object(family.target).painted->resolution()==resolution&&resized.object(family.source).painted->resolution()==64,"Only explicit user-selected target map changes resolution; original source remains64");unchanged_source(resized,family.scene,family.target);
  require(doc.undo()&&doc.wait_mesh()&&doc.copy_scene().encode()==initial,"One actual resize Undo restores exact original64 target and source");
  require(doc.redo()&&doc.wait_mesh()&&doc.copy_scene().encode()==resized.encode(),"One actual resize Redo restores exact selected higher-resolution endpoint");
  bool stale=false;try{doc.edit_texture_set(edit,captured);}catch(const std::exception&){stale=true;}require(stale&&doc.copy_scene().encode()==resized.encode(),"Stale resolution authority cannot publish over the accepted selected map");
@@ -72,8 +72,18 @@ void positive(const Family &family,uint32_t resolution,const std::filesystem::pa
  require(doc.undo()&&doc.wait_mesh()&&doc.copy_scene().encode()==resized.encode()&&doc.redo()&&doc.wait_mesh()&&doc.copy_scene().encode()==accepted.encode(),"Bake remains one exact separate Undo/Redo step after explicit resolution selection");
  std::cout<<"FILTERED_RESOLUTION_WORKFLOW "<<family.name<<" target_resolution="<<resolution<<" source_resolution=64\n";
 }
+void cancellation(uint32_t resolution){
+ auto family=before(false,false,false,SourceNormalUvMethod::Rasterize);
+ detail::resize_unpainted_bake_target(family.scene,family.target,resolution);
+ for(unsigned boundary:{1u,8u,64u}){
+  auto candidate=family.scene.snapshot();const auto encoded=candidate.encode();const auto paint=candidate.active().painted;
+  bool after_raster=false,requested=false,caught=false;unsigned polls=0;
+  try{bake_object(candidate,family.source,settings(),[&]{if(after_raster&&++polls==boundary){requested=true;return true;}return false;},[&](float progress){if(progress>=.8999f)after_raster=true;});}catch(const std::exception&){caught=true;}
+  require(after_raster&&requested&&caught&&candidate.encode()==encoded&&candidate.active().painted==paint,"Cancellation after actual normal rasterization preserves exact selected grid, source and unpublished Bake");
+ }
+}
 int run(const std::filesystem::path &folder,const std::filesystem::path &old,uint32_t resolution){
- std::filesystem::create_directories(folder);legacy(old,folder);unsigned positives=0,refusals=0;
+ std::filesystem::create_directories(folder);legacy(old,folder);cancellation(resolution);unsigned positives=0,refusals=0;
  for(bool legacy:{false,true})for(bool live:{false,true})for(bool seam:{false,true})for(auto method:{SourceNormalUvMethod::Rasterize,SourceNormalUvMethod::RetainSource}){
   auto family=before(legacy,live,seam,method);if(method==SourceNormalUvMethod::RetainSource){low_refusal(family,folder);++refusals;}positive(family,resolution,folder);++positives;
  }
