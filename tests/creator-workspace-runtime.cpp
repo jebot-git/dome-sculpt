@@ -397,7 +397,6 @@ FN(EnumerateViewConfigurationViews, XrInstance, XrSystemId,
   *n = 2;
   if (!cap)
     return XR_SUCCESS;
-  if(!creator_mode().empty())report["creator_view_flags"].push_back({{"frame",frame},{"flags",state->viewStateFlags},{"capacity",cap}});
   if (cap < 2)
     return XR_ERROR_SIZE_INSUFFICIENT;
   for (int i = 0; i < 2; ++i) {
@@ -1063,6 +1062,7 @@ FN(LocateViews, XrSession, const XrViewLocateInfo *, XrViewState *state,
   state->viewStateFlags = field_mode().empty() && frame == 27 && !getenv("DOME_XR_FIXTURE_FILES") && (cage_mode().empty()&&(mirror_mode().empty()&&expression_mode().empty())&&import_atlas_mode().empty()&&projection_mode().empty()&&rig_fit_mode().empty()) && !selection_fixture() && affine_contact_mode().empty() && (polygon_mode().empty()&&corner_uv_mode().empty()) && bake_policy_mode().empty() && procedural_mode().empty() && resolution_mode().empty() && skin_mode()!="focus" && retopo_mode().empty() && mask_mode().empty() && cut_mode().empty() ? 0
                                       : XR_VIEW_STATE_POSITION_VALID_BIT |
                                             XR_VIEW_STATE_ORIENTATION_VALID_BIT;
+  if(!creator_mode().empty())report["creator_view_flags"].push_back({{"frame",frame},{"flags",state->viewStateFlags},{"capacity",cap}});
   if (cap < 2)
     return XR_ERROR_SIZE_INSUFFICIENT;
   for (int i = 0; i < 2; ++i) {
