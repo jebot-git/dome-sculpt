@@ -177,7 +177,7 @@ if(BUILD_TESTING)
   target_link_libraries(dome-sculpt-source-advanced-normal-bake-test PRIVATE dome-sculpt-core)
   add_test(NAME source-advanced-normal-bake COMMAND dome-sculpt-source-advanced-normal-bake-test
     --filtered-workflow ${CMAKE_CURRENT_BINARY_DIR}/source-advanced-normal-bake
-    ${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/normal-filter-legacy64-retained.dsculpt 1024 2048)
+    ${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/normal-filter-legacy64-retained.dsculpt 2048 2048)
   add_test(NAME source-advanced-normal-bake-legacy COMMAND dome-sculpt-source-advanced-normal-bake-test
     ${CMAKE_CURRENT_BINARY_DIR}/source-advanced-normal-bake-legacy)
   set_tests_properties(source-advanced-normal-bake source-advanced-normal-bake-legacy PROPERTIES TIMEOUT 900)

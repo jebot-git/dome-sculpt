@@ -8,6 +8,13 @@ namespace filtered_workflow {
 unsigned checks=0;
 void require(bool yes,const char *why){if(!yes)throw std::runtime_error(why);++checks;std::cout<<"PASS "<<why<<'\n';}
 std::vector<uint8_t> bytes(const std::filesystem::path &path){std::ifstream f(path,std::ios::binary);return {std::istreambuf_iterator<char>(f),std::istreambuf_iterator<char>()};}
+bool byte_equal_files(const std::filesystem::path &a,const std::filesystem::path &b){
+ std::ifstream left(a,std::ios::binary),right(b,std::ios::binary);if(!left||!right)return false;
+ std::array<char,65536> x,y;
+ for(;;){left.read(x.data(),x.size());right.read(y.data(),y.size());const auto n=left.gcount();
+  if(n!=right.gcount()||!std::equal(x.begin(),x.begin()+n,y.begin())||left.bad()||right.bad())return false;
+  if(n!=std::streamsize(x.size()))return left.eof()&&right.eof();}
+}
 struct Family{Scene scene;uint64_t source,target;std::string name;};
 Family before(bool legacy,bool live,bool seam,SourceNormalUvMethod method,bool repeated=false){
  auto scene=advanced_fixture::uv_source(advanced_fixture::prepared(legacy,require),method,seam);
@@ -67,6 +74,10 @@ void probes(const Family &family,const Scene &scene){
  std::cout<<"FILTERED_RESOLUTION_DIRECTIONS "<<family.name<<" maximum="<<maximum<<'\n';
 }
 void positive(const Family &family,uint32_t resolution,const std::filesystem::path &folder,bool recover_after_refusal=false){
+ const auto path=folder/(family.name+"-filtered-resolution-"+std::to_string(resolution)+".dsculpt");
+ const auto accepted_path=folder/(family.name+"-accepted-memory.dsculpt"),reopened_path=folder/(family.name+"-reopened.dsculpt");
+ { // Close the completed live Document and every retained endpoint before a
+   // fresh independent reopen; never multiply whole2048 rasters for a test.
  Document doc;doc.replace(family.scene.snapshot());require(doc.wait_mesh(),"Higher-resolution Document starts from the original genuine64 target");
  const auto initial=doc.copy_scene().encode();
  if(recover_after_refusal){
@@ -82,10 +93,13 @@ void positive(const Family &family,uint32_t resolution,const std::filesystem::pa
  require(doc.undo()&&doc.wait_mesh()&&doc.copy_scene().encode()==initial,"One actual resize Undo restores exact original64 target and source");
  require(doc.redo()&&doc.wait_mesh()&&doc.copy_scene().encode()==resized.encode(),"One actual resize Redo restores exact selected higher-resolution endpoint");
  bool stale=false;try{doc.edit_texture_set(edit,captured);}catch(const std::exception&){stale=true;}require(stale&&doc.copy_scene().encode()==resized.encode(),"Stale resolution authority cannot publish over the accepted selected map");
- doc.bake_from_object(family.source,settings());const auto path=folder/(family.name+"-filtered-resolution-"+std::to_string(resolution)+".dsculpt");auto baked_save=doc.save_async(path);baked_save.get();require(doc.wait_asset()&&doc.wait_mesh()&&doc.frame().state->error.empty(),"Higher-resolution filtered Bake and ordered native Save succeed");
+ doc.bake_from_object(family.source,settings());auto baked_save=doc.save_async(path);baked_save.get();require(doc.wait_asset()&&doc.wait_mesh()&&doc.frame().state->error.empty(),"Higher-resolution filtered Bake and ordered native Save succeed");
  const auto accepted=doc.copy_scene();require(accepted.active().bake_recipe&&accepted.active().bake_recipe->settings.normal_filter_quality==1&&accepted.active().bake_recipe->encode()["settings"]["normal_filter_quality"]==1,"Accepted genuine Bake persists the checked quality version");
- require(Scene::load(path).encode()==accepted.encode(),"Fresh native reopen retains actual filtered Bake images, selected resolution and quality policy");unchanged_source(accepted,family.scene,family.target);probes(family,accepted);
+ accepted.save(accepted_path);require(byte_equal_files(path,accepted_path),"Ordered Save matches every native byte of the actual accepted filtered Scene, images, source and policy");unchanged_source(accepted,family.scene,family.target);probes(family,accepted);
  require(doc.undo()&&doc.wait_mesh()&&doc.copy_scene().encode()==resized.encode()&&doc.redo()&&doc.wait_mesh()&&doc.copy_scene().encode()==accepted.encode(),"Bake remains one exact separate Undo/Redo step after explicit resolution selection");
+ }
+ {auto reopened=Scene::load(path);reopened.save(reopened_path);}
+ require(byte_equal_files(path,reopened_path),"Fresh native reopen and re-save retain every actual filtered Bake/source/image/recipe byte");
  std::cout<<"FILTERED_RESOLUTION_WORKFLOW "<<family.name<<" target_resolution="<<resolution<<" source_resolution=64\n";
 }
 Family ordinary_plane(bool mapped){
