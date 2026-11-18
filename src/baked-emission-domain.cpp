@@ -8,6 +8,7 @@
 #include "native-read-scope.hpp"
 #include "volume-exact.hpp"
 #include "paint-sampling-access.hpp"
+#include "emission-source-payloads.hpp"
 #include <nlohmann/json.hpp>
 #include <algorithm>
 #include <cmath>
@@ -38,18 +39,21 @@ int outward(Vec3 a,Vec3 b,Vec3 c,Vec3 normal,Exact&exact){
 }
 size_t BakedEmissionDomain::preflight(const Scene &scene,const std::function<bool()>&cancelled){
  std::array<const BakedEmissionDomain*,64> active{};std::set<const BakedEmissionDomain*> done;size_t bytes=0;
- auto visit=[&](auto&&self,const Scene&s,size_t depth)->void{stop(cancelled);for(const auto&o:s.objects()){
-  if(o.volume){const auto count=o.volume->stored_samples();if(count>(retained_limit-bytes)/128)throw std::length_error("Retained emission before-volume exceeds prospective budget");bytes+=count*128;}
-  if(!o.painted)continue;const auto &mesh=o.painted->mesh();const auto raster=paint_sampling_surface_retained_bytes(mesh.positions.size(),mesh.indices.size(),o.painted->resolution());
-  if(raster>retained_limit-bytes)throw std::length_error("Retained emission before-raster exceeds prospective budget");bytes+=raster;
-  const auto &diagnostics=o.painted->surface_diagnostics();const size_t candidates=diagnostics.additional_candidates+diagnostics.linked_texels;
-  if(candidates>(retained_limit-bytes)/256)throw std::length_error("Retained emission before-candidate storage exceeds prospective budget");bytes+=candidates*256;
-  const auto paint_bytes=o.painted->storage_bytes();if(paint_bytes>retained_limit-bytes)throw std::length_error("Retained emission before-paint exceeds prospective budget");bytes+=paint_bytes;
-  const auto baked=o.painted->baked();const auto domain=baked?baked->emission_domain:nullptr;if(!domain)continue;
-  if(!domain->valid_owner(domain))throw std::invalid_argument("Retained emission ancestor lost its immutable owner");domain->validate_current(o.painted->mesh_owner(),o.painted->resolution());
-  if(std::find(active.begin(),active.begin()+depth,domain.get())!=active.begin()+depth)throw std::invalid_argument("Retained emission owner graph is cyclic");
-  if(done.contains(domain.get()))continue;if(depth==active.size()||done.size()==256)throw std::length_error("Retained emission owner graph exceeds64-depth/256-owner limit");
-  active[depth]=domain.get();self(self,*domain->before_,depth+1);done.insert(domain.get());
+ auto visit=[&](auto&&self,const Scene&s,size_t depth)->void{
+  stop(cancelled);const auto payloads=emission_source_payloads(s,cancelled);
+  for(const auto &volume:payloads.volumes){const auto count=volume->stored_samples();if(count>(retained_limit-bytes)/128)throw std::length_error("Retained emission before-volume exceeds prospective budget");bytes+=count*128;}
+  for(const auto &image:payloads.images){if(image->rgba.size()>retained_limit-bytes)throw std::length_error("Retained emission source image exceeds prospective budget");bytes+=image->rgba.size();}
+  for(const auto &paint:payloads.paints){
+   stop(cancelled);const auto &mesh=paint->mesh();const auto raster=paint_sampling_surface_retained_bytes(mesh.positions.size(),mesh.indices.size(),paint->resolution());
+   if(raster>retained_limit-bytes)throw std::length_error("Retained emission before-raster exceeds prospective budget");bytes+=raster;
+   const auto &diagnostics=paint->surface_diagnostics();const size_t candidates=diagnostics.additional_candidates+diagnostics.linked_texels;
+   if(candidates>(retained_limit-bytes)/256)throw std::length_error("Retained emission before-candidate storage exceeds prospective budget");bytes+=candidates*256;
+   const auto paint_bytes=paint->storage_bytes();if(paint_bytes>retained_limit-bytes)throw std::length_error("Retained emission before-paint exceeds prospective budget");bytes+=paint_bytes;
+   const auto baked=paint->baked();const auto domain=baked?baked->emission_domain:nullptr;if(!domain)continue;
+   if(!domain->valid_owner(domain))throw std::invalid_argument("Retained emission ancestor lost its immutable owner");domain->validate_current(paint->mesh_owner(),paint->resolution());
+   if(std::find(active.begin(),active.begin()+depth,domain.get())!=active.begin()+depth)throw std::invalid_argument("Retained emission owner graph is cyclic");
+   if(done.contains(domain.get()))continue;if(depth==active.size()||done.size()==256)throw std::length_error("Retained emission owner graph exceeds64-depth/256-owner limit");
+   active[depth]=domain.get();self(self,*domain->before_,depth+1);done.insert(domain.get());
  }};visit(visit,scene,0);return bytes;
 }
 void BakedEmissionDomain::preflight(const PaintedMesh &paint,const std::function<bool()>&cancelled){
@@ -58,8 +62,20 @@ void BakedEmissionDomain::preflight(const PaintedMesh &paint,const std::function
 }
 std::shared_ptr<const BakedEmissionDomain> BakedEmissionDomain::capture(const Scene &scene,uint64_t source_id,
  std::shared_ptr<const Mesh> target,uint32_t target_resolution,CanvasTransform target_world,const std::function<bool()> &cancelled){
+ auto context=emission_source_closure(scene,source_id,cancelled);
+ return capture_provenance(context,source_id,std::move(target),target_resolution,target_world,cancelled);
+}
+std::shared_ptr<const BakedEmissionDomain> BakedEmissionDomain::capture_provenance(const Scene &scene,uint64_t source_id,
+ std::shared_ptr<const Mesh> target,uint32_t target_resolution,CanvasTransform target_world,const std::function<bool()> &cancelled){
  const auto prospective=preflight(scene,cancelled);stop(cancelled);if(!target||target_resolution<64||target_resolution>2048||(target_resolution&(target_resolution-1)))throw std::invalid_argument("Invalid retained emission target");
- const auto &object=scene.object(source_id);const auto&paint=object.painted;const auto&binding=object.material_bindings;
+ // Freeze the bounded before-context before deriving coefficients. The
+ // retained field and certificate must describe the same immutable values,
+ // including externally aliased material DTOs from before capture.
+ const auto before_json=scene.encode();const auto before_bytes=nlohmann::json::to_cbor(before_json);
+ if(before_bytes.size()>retained_limit)throw std::length_error("Retained emission before-scene exceeds retained budget");
+ auto frozen=std::make_shared<const Scene>(Scene::decode(before_json));
+ const auto frozen_bytes=preflight(*frozen,cancelled);
+ const auto &object=frozen->object(source_id);const auto&paint=object.painted;const auto&binding=object.material_bindings;
  if(!object.mesh_active||!paint||object.appearance||(binding&&binding->has_mtoon)||(paint->source_maps()&&paint->source_maps()->emission.image)||
     (paint->baked()&&paint->baked()->emission_domain))throw std::invalid_argument("This emission function needs its explicit multi-domain transport adapter");
  // This initial certificate is intentionally narrow: no image or animated typed
@@ -71,7 +87,7 @@ std::shared_ptr<const BakedEmissionDomain> BakedEmissionDomain::capture(const Sc
  if(packet->resolution()!=paint->resolution())throw std::invalid_argument("Retained emission source changes contribution grid");
  if(target->indices.size()!=paint->mesh().indices.size()||target->indices.size()/3>1024)throw std::invalid_argument("Retained emission requires bounded exact ordered source corners");
  auto high=object.deformation?object.deformation->preview(paint->mesh()):paint->mesh();
- const auto relative=ob::compose(ob::inverse(target_world),scene.world_transform(source_id));
+ const auto relative=ob::compose(ob::inverse(target_world),frozen->world_transform(source_id));
  for(auto&p:high.positions){const auto q=ob::transform(relative,{p.x,p.y,p.z});p={q.x,q.y,q.z};}
  // Supporting-plane predicates prove that an outward ray from any interior
  // point cannot meet another source triangle before the corresponding point.
@@ -88,14 +104,17 @@ std::shared_ptr<const BakedEmissionDomain> BakedEmissionDomain::capture(const Sc
  }
  disjoint(charts,exact,cancelled);
  const auto r=paint->resolution();const auto background=binding&&binding->physical_emission?*binding->physical_emission:object.material.emissive;
- if(prospective>retained_limit||size_t(r)*r>(retained_limit-prospective)/sizeof(BakedEmissionSample))throw std::length_error("Retained emission source exceeds prospective field budget");
+ const auto payload_bytes=std::max(prospective,frozen_bytes);
+ if(before_bytes.size()>retained_limit-payload_bytes)throw std::length_error("Retained emission metadata plus resident payload exceeds retained budget");
+ const auto retained_before=payload_bytes+before_bytes.size();
+ if(retained_before>retained_limit||size_t(r)*r>(retained_limit-retained_before)/sizeof(BakedEmissionSample))throw std::length_error("Retained emission source exceeds prospective field budget");
  std::vector<BakedEmissionSample> values(size_t(r)*r);
  for(uint32_t y=0;y<r;++y){stop(cancelled);for(uint32_t x=0;x<r;++x){const auto v=sample_overlay_texel_values(*packet,int(x),int(y),false);BakedEmissionSample layer;layer.coverage=v[3][3];for(size_t c=0;c<3;++c){layer.legacy[c]=v[2][c];layer.absolute[c]=v[4][c];}values[size_t(y)*r+x]={{},layer.resolve(background,1),1};}}
  auto result=std::shared_ptr<BakedEmissionDomain>(new BakedEmissionDomain);result->field_=BakedEmissionField::create(r,values,{retained_limit,cancelled});
- const auto before_json=scene.encode();const auto before_bytes=nlohmann::json::to_cbor(before_json);if(before_bytes.size()>retained_limit-result->field_->storage_bytes())throw std::length_error("Retained emission before-scene exceeds retained budget");
- result->before_=std::make_shared<const Scene>(Scene::decode(before_json));result->target_=std::move(target);result->target_resolution_=target_resolution;result->target_world_=target_world;result->source_=source_id;
+ if(before_bytes.size()>retained_limit-result->field_->storage_bytes())throw std::length_error("Retained emission before-scene exceeds retained budget");
+ result->before_=std::move(frozen);result->target_=std::move(target);result->target_resolution_=target_resolution;result->target_world_=target_world;result->source_=source_id;
  const auto encoded=nlohmann::json::to_cbor(result->before_->encode());if(encoded.size()>retained_limit-result->field_->storage_bytes())throw std::length_error("Retained emission before-scene exceeds retained budget");
- result->retained_bytes_=std::max(prospective,encoded.size())+result->field_->storage_bytes()+sizeof(BakedEmissionDomain);result->self_=result;stop(cancelled);return result;
+ result->retained_bytes_=std::max(retained_before,encoded.size())+result->field_->storage_bytes()+sizeof(BakedEmissionDomain);result->self_=result;stop(cancelled);return result;
 }
 void BakedEmissionDomain::validate_current(const std::shared_ptr<const Mesh>&mesh,uint32_t r)const{
  if(!field_||!before_||mesh!=target_||mesh.owner_before(target_)||target_.owner_before(mesh)||r!=target_resolution_)throw std::invalid_argument("Retained emission borrowed another current geometry/grid owner");
@@ -109,6 +128,6 @@ std::shared_ptr<const BakedEmissionDomain>BakedEmissionDomain::decode(const nloh
  const auto bytes=nlohmann::json::to_cbor(j.at("before"));if(bytes.size()>retained_limit)throw std::length_error("Retained emission source archive exceeds bound");
  static thread_local size_t depth=0;if(depth>=8)throw std::length_error("Retained emission archive exceeds owning depth");struct Scope{size_t&depth;Scope(size_t&d):depth(d){++depth;}~Scope(){--depth;}}scope(depth);
  auto before=Scene::decode(j.at("before"));CanvasTransform t;t.position={j.at("position")[0].get<float>(),j.at("position")[1].get<float>(),j.at("position")[2].get<float>()};t.orientation.x=j.at("rotation")[0].get<float>();t.orientation.y=j.at("rotation")[1].get<float>();t.orientation.z=j.at("rotation")[2].get<float>();t.orientation.w=j.at("rotation")[3].get<float>();t.scale=j.at("scale").get<float>();validate_transform(t);
- auto result=capture(before,j.at("source").get<uint64_t>(),std::move(target),r,t,cancelled);if(result->field()->resolution()!=j.at("resolution").get<uint32_t>())throw std::invalid_argument("Retained emission replay changed its actual grid");return result;
+ auto result=capture_provenance(before,j.at("source").get<uint64_t>(),std::move(target),r,t,cancelled);if(result->field()->resolution()!=j.at("resolution").get<uint32_t>())throw std::invalid_argument("Retained emission replay changed its actual grid");return result;
 }
 } // namespace dome::detail

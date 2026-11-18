@@ -27,6 +27,10 @@ public:
  bool valid_owner(const std::shared_ptr<const BakedEmissionDomain>&)const noexcept;
  BakedEmissionDomain(const BakedEmissionDomain&)=delete;
 private:
+ // Decode replays the exact supplied context. New captures first select the
+ // source/dependency closure; existing Scene43 before-records are not rewritten.
+ static std::shared_ptr<const BakedEmissionDomain> capture_provenance(const Scene &,uint64_t,
+     std::shared_ptr<const Mesh>,uint32_t,CanvasTransform,const std::function<bool()> &);
  BakedEmissionDomain()=default;
  std::weak_ptr<const BakedEmissionDomain> self_;
  std::shared_ptr<const Scene> before_;

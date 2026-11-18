@@ -216,6 +216,17 @@ if(BUILD_TESTING)
     ${CMAKE_CURRENT_BINARY_DIR}/source-joint-writable-normal-bake-checked/000.dsculpt
     ${CMAKE_CURRENT_BINARY_DIR}/source-owning-hdr-domain)
   set_tests_properties(source-owning-hdr-domain PROPERTIES FIXTURES_REQUIRED owning-hdr-seed TIMEOUT 900)
+  add_executable(dome-sculpt-source-hdr-provenance-closure-test tests/source-hdr-provenance-closure.cpp)
+  target_include_directories(dome-sculpt-source-hdr-provenance-closure-test PRIVATE src)
+  target_link_libraries(dome-sculpt-source-hdr-provenance-closure-test PRIVATE dome-sculpt-core)
+  add_test(NAME source-hdr-provenance-closure-seed COMMAND dome-sculpt-source-joint-writable-normal-bake-test
+    --checked-case 000 2048 ${CMAKE_CURRENT_BINARY_DIR}/source-hdr-provenance-closure-seed)
+  set_tests_properties(source-hdr-provenance-closure-seed PROPERTIES FIXTURES_SETUP hdr-closure-seed TIMEOUT 900)
+  add_test(NAME source-hdr-provenance-closure COMMAND dome-sculpt-source-hdr-provenance-closure-test
+    ${CMAKE_CURRENT_BINARY_DIR}/source-hdr-provenance-closure-seed/selected-target-resolution.dsculpt
+    ${CMAKE_CURRENT_BINARY_DIR}/source-joint-writable-normal-bake-checked/000.dsculpt
+    ${CMAKE_CURRENT_BINARY_DIR}/source-hdr-provenance-closure)
+  set_tests_properties(source-hdr-provenance-closure PROPERTIES FIXTURES_REQUIRED "hdr-closure-seed;owning-hdr-seed" TIMEOUT 900)
   add_executable(dome-sculpt-source-owning-hdr-export-test tests/source-owning-hdr-export.cpp)
   target_include_directories(dome-sculpt-source-owning-hdr-export-test PRIVATE src)
   target_link_libraries(dome-sculpt-source-owning-hdr-export-test PRIVATE dome-sculpt-core)
