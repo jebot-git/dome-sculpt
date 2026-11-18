@@ -60,11 +60,16 @@ void create_humanoid_dialog(Document &document) {
   field("Hair length", controls.hair_length, 0, 1);
   field("Hair volume", controls.hair_volume, 0, 1);
   field("Fringe", controls.fringe, 0, 1);
-  const char *colors[] = {"Skin red", "Skin green", "Skin blue", "Iris red", "Iris green", "Iris blue", "Hair red", "Hair green", "Hair blue"};
-  for (int i = 0; i < 9; ++i) {
-    auto &color = i < 3 ? controls.skin_color : i < 6 ? controls.iris_color : controls.hair_color;
+  const char *colors[] = {"Skin red", "Skin green", "Skin blue", "Iris red", "Iris green", "Iris blue"};
+  for (int i = 0; i < 6; ++i) {
+    auto &color = i < 3 ? controls.skin_color : controls.iris_color;
     field(colors[i], color[i % 3], 0, 1);
   }
+  auto hair_recolor=humanoid_hair_recolor_value(controls);
+  Fl_Check_Button recolor(20,y,width-50,row,"Recolour hair (replaces old tint)");recolor.value(bool(controls.hair_recolor));y+=row;
+  std::vector<Fl_Value_Input*> hair_fields;
+  const char*hair_labels[]={"Hair recolour red","Hair recolour green","Hair recolour blue"};
+  for(size_t k=0;k<3;++k){field(hair_labels[k],hair_recolor[k],0,1);hair_fields.push_back(bindings.back().input);if(!recolor.value())hair_fields.back()->deactivate();}
   Fl_Check_Button keep(20, y, width - 50, row, "Keep existing objects");
   keep.value(1); y += row;
   content.size(width - 24, y + row);
@@ -77,26 +82,35 @@ void create_humanoid_dialog(Document &document) {
     HumanoidControls *controls;
     std::vector<Binding> *bindings;
     Fl_Choice *baseline;
+    Fl_Check_Button *recolor;
+    std::array<float,3> *hair_color;
+    std::vector<Fl_Value_Input*> *hair_fields;
     bool accepted = false;
-  } context{&window, &name, &controls, &bindings, &baseline};
+  } context{&window, &name, &controls, &bindings, &baseline,&recolor,&hair_recolor,&hair_fields};
+  recolor.callback([](Fl_Widget*,void*data){auto &c=*static_cast<Context*>(data);for(auto*input:*c.hair_fields){if(c.recolor->value())input->activate();else input->deactivate();}},&context);
   profile.callback([](Fl_Widget *w, void *data) {
     auto &c = *static_cast<Context *>(data);
     auto preset = static_cast<Fl_Choice *>(w)->value();
     const char *ids[] = {"vroid-beta-female", "vroid-beta-male"};
     *c.controls = humanoid_preset(HumanoidPreset(preset), ids[c.baseline->value()]);
+    *c.hair_color=humanoid_hair_recolor_value(*c.controls);c.recolor->value(bool(c.controls->hair_recolor));
     for (auto &binding : *c.bindings) binding.input->value(*binding.value);
+    for(auto*input:*c.hair_fields){if(c.recolor->value())input->activate();else input->deactivate();}
   }, &context);
   baseline.callback([](Fl_Widget *w, void *data) {
     auto &c = *static_cast<Context *>(data);
     const char *ids[] = {"vroid-beta-female", "vroid-beta-male"};
     *c.controls = humanoid_baseline_defaults(ids[static_cast<Fl_Choice *>(w)->value()]);
+    *c.hair_color=humanoid_hair_recolor_value(*c.controls);c.recolor->value(bool(c.controls->hair_recolor));
     for (auto &binding : *c.bindings) binding.input->value(*binding.value);
+    for(auto*input:*c.hair_fields){if(c.recolor->value())input->activate();else input->deactivate();}
   }, &context);
   cancel.callback([](Fl_Widget *w, void *) { w->window()->hide(); });
   create.callback([](Fl_Widget *, void *data) {
     auto &c = *static_cast<Context *>(data);
     try {
       for (auto &binding : *c.bindings) *binding.value = float(binding.input->value());
+      if(c.recolor->value())c.controls->hair_recolor=*c.hair_color;else c.controls->hair_recolor.reset();
       c.controls->validate();
       std::string name = c.name->value();
       if (name.empty() || name.size() > 128) throw std::invalid_argument("Name must contain 1 to 128 bytes");

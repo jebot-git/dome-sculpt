@@ -1,9 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/creator-tool.hpp"
 #include "dome/creation.hpp"
+#include "dome/vrm.hpp"
 #include "dome/document.hpp"
 #include "dome/normal-frames.hpp"
 #include "dome/rig-edit.hpp"
+#include "dome/source-maps.hpp"
+#include "dome/material-bindings.hpp"
+#include "dome/material-visibility.hpp"
 #include "document-authority.hpp"
 #include "import-controller-driver.hpp"
 #include "cgltf.h"
@@ -40,7 +44,18 @@ void controls(const std::filesystem::path&root){
  nlohmann::json evidence=nlohmann::json::array();
  for(const char*id:{"vroid-beta-female","vroid-beta-male"}){
   const auto original_controls=humanoid_baseline_defaults(id);const auto original=create_humanoid(original_controls);
-  for(size_t parameter=0;parameter<humanoid_creator_parameter_count;++parameter){
+  const auto legacy=original_controls.encode();check(legacy.at("version")==2&&!legacy.contains("hair_recolor")&&HumanoidControls::decode(legacy).encode()==legacy,"Absent recolour keeps the exact version2 legacy recipe and round trip");
+  auto enabled=original_controls;set_humanoid_creator_parameter(enabled,26,1);check(enabled.hair_recolor==std::optional(humanoid_hair_recolor_value(original_controls)),"Explicit recolour mode seeds the effective original tinted RGB without any white reset");set_humanoid_creator_parameter(enabled,26,0);check(enabled.encode()==legacy,"Returning to original tint exactly restores the complete old recipe");
+  for(size_t channel=0;channel<3;++channel){
+   auto a=original_controls;a.hair_length=a.hair_volume=a.fringe=.2f;a.hair_recolor=std::array<float,3>{.2f,.4f,.6f};auto b=a;(*b.hair_recolor)[channel]=.8f;
+   const auto before=create_humanoid(a),after=create_humanoid(b);source_retained(before,after);
+   const auto &x=*before.parts.back().source_maps->color.image,&y=*after.parts.back().source_maps->color.image;size_t changed=0;
+   for(size_t pixel=0;pixel<x.rgba.size();pixel+=4){changed+=x.rgba[pixel+channel]!=y.rgba[pixel+channel];if(x.rgba[pixel+3]!=y.rgba[pixel+3])throw std::runtime_error("Hair recolour changed groom alpha");}
+   check(changed>1000&&difference(before.parts.back().mesh,after.parts.back().mesh)==0,"Each absolute RGB channel changes actual fitted-groom strand pixels while preserving its geometry and alpha");
+   check(b.encode().at("version")==3&&HumanoidControls::decode(b.encode()).encode()==b.encode(),"Explicit absolute recolour uses a distinct versioned persisted recipe");
+  }
+
+  for(size_t parameter=0;parameter<26;++parameter){
    auto c=original_controls;const auto descriptor=humanoid_creator_parameter(c,parameter);
    const float value=parameter==0?c.height+.10f:parameter>=17?.35f:.45f;
    set_humanoid_creator_parameter(c,parameter,value);auto changed=create_humanoid(c);source_retained(original,changed);
@@ -58,7 +73,7 @@ void controls(const std::filesystem::path&root){
    else check(color>.01f&&geometry==0,"Exposed tint changes actual source material factors while retaining source geometry");
    evidence.push_back({{"baseline",id},{"parameter",descriptor.label},{"value",value},{"maximum_source_position_delta",geometry},{"maximum_material_factor_delta",color},{"parts",changed.parts.size()}});
   }
-  auto styled=humanoid_preset(HumanoidPreset::Anime,id);styled.hair_length=.35f;styled.hair_volume=.25f;styled.fringe=.2f;styled.skin_color={.8f,.6f,.5f,1};styled.iris_color={.4f,.6f,.9f,1};styled.hair_color={.3f,.2f,.15f,1};
+  auto styled=humanoid_preset(HumanoidPreset::Anime,id);styled.hair_length=.35f;styled.hair_volume=.25f;styled.fringe=.2f;styled.skin_color={.8f,.6f,.5f,1};styled.iris_color={.4f,.6f,.9f,1};styled.hair_color={.3f,.2f,.15f,1};styled.hair_recolor=std::array<float,3>{.8f,.2f,.1f};
   const auto model=create_humanoid(styled);source_retained(original,model);size_t moving=0,morphs=0;
   for(const auto&part:model.parts){auto deformation=part.deformation;const auto rest=deformation.preview(part.mesh);check(difference(rest,part.mesh)<2e-5f,"Rest skin/inverse binds preserve generated body and groom positions");
    for(const auto&m:deformation.skeleton->skin_matrices({}))for(size_t k=0;k<16;++k)if(std::abs(m[k]-(k%5==0?1.f:0.f))>2e-5f)throw std::runtime_error("Generated rest skin is not identity");
@@ -67,10 +82,27 @@ void controls(const std::filesystem::path&root){
    const auto preview=deformation.preview(part.mesh);preview.validate();check(preview.indices==part.mesh.indices&&preview.uv==part.mesh.uv,"Real posed/morphed creator output keeps its stable topology and authored UVs");moving+=difference(preview,part.mesh)>1e-5f;
   }
   check(moving>2&&morphs>0,"Real source head skin and authored facial targets remain usable after combined body/face/hair settings");
-  Scene scene;append_humanoid(scene,styled,"Creator output");const auto path=root/(std::string(id)+"-styled.glb");export_glb(scene.surfaces(true),path);
+  Scene scene;append_humanoid(scene,styled,"Creator output");
+  bool hair=false;for(const auto&o:scene.objects())if(o.material_bindings&&o.appearance&&o.name.find("HAIR")!=std::string::npos){
+   hair=true;const auto &binding=*o.material_bindings;const auto &p=binding.material.parameters;
+   check(o.material.color[0]==.8f&&o.material.color[1]==.2f&&o.material.color[2]==.1f&&p.base_color[0]==.8f&&p.base_color[1]==.2f&&p.base_color[2]==.1f,"Actual PBR and typed MToon creator base factors both use selected arbitrary RGB");
+   const auto source=retained_mtoon(o.appearance.get())->parameters;const auto lum=[](auto c){return .2126f*c[0]+.7152f*c[1]+.0722f*c[2];};const std::array shade{source.shade_color.x,source.shade_color.y,source.shade_color.z};
+   check(std::abs(p.shade_color.x/p.base_color[0]-lum(shade)/lum(source.base_color))<1e-6f&&std::abs(p.shade_color.y/p.base_color[1]-p.shade_color.x/p.base_color[0])<1e-6f,"Actual toon shade retains original source luminance contrast in the selected hair hue");
+   check(binding.roles[size_t(MToonSlot::Base)].image==binding.roles[size_t(MToonSlot::Shade)].image&&binding.uv_origin->material->encode()==retained_mtoon(o.appearance.get())->encode(),"Original grayscale shade/base images and original material provenance remain immutable");
+  }check(hair,"Combined creator fixture contains the genuine source hair material");
+  const auto saved=root/(std::string(id)+"-styled.dsculpt");scene.save(saved);check(Scene::load(saved).encode()==scene.encode(),"Real recoloured avatar save/reopen preserves exact geometry, textures, skin, morphs, typed colour and recipe");
+  const auto path=root/(std::string(id)+"-styled.glb");export_glb(scene.surfaces(true),path);
   cgltf_options options{};cgltf_data*raw=nullptr;check(cgltf_parse_file(&options,path.c_str(),&raw)==cgltf_result_success,"Independent cgltf parses actual styled creator export");std::unique_ptr<cgltf_data,decltype(&cgltf_free)>data(raw,cgltf_free);check(cgltf_load_buffers(&options,data.get(),path.c_str())==cgltf_result_success&&cgltf_validate(data.get())==cgltf_result_success,"Independent glTF consumer validates actual styled geometry, skins, morphs and image package");
   size_t primitives=0,skinned=0,targets=0;for(size_t n=0;n<data->nodes_count;++n)if(data->nodes[n].mesh){skinned+=bool(data->nodes[n].skin);for(size_t p=0;p<data->nodes[n].mesh->primitives_count;++p){++primitives;targets+=data->nodes[n].mesh->primitives[p].targets_count;}}
   check(primitives==20&&skinned>=19&&targets>0,"Export retains all real source primitives plus the authored groom and actual skin/morph payloads");
+  bool exported_colour=false;for(size_t i=0;i<data->materials_count;++i){const auto &p=data->materials[i].pbr_metallic_roughness;exported_colour|=std::abs(p.base_color_factor[0]-.8f)<1e-6f&&std::abs(p.base_color_factor[1]-.2f)<1e-6f&&std::abs(p.base_color_factor[2]-.1f)<1e-6f;}
+  check(exported_colour,"Independent glTF consumer sees actual arbitrary source-hair RGB factors");
+  auto source_only=styled;source_only.hair_length=source_only.hair_volume=source_only.fringe=0;Scene vrm;append_humanoid(vrm,source_only,"Recoloured source avatar");const auto vrm_path=root/(std::string(id)+"-recoloured.vrm");export_vrm(vrm.preview_surfaces(),vrm_path);
+  cgltf_data*vrm_raw=nullptr;check(cgltf_parse_file(&options,vrm_path.c_str(),&vrm_raw)==cgltf_result_success,"Independent consumer parses actual source-backed recoloured VRM export");std::unique_ptr<cgltf_data,decltype(&cgltf_free)>vrm_data(vrm_raw,cgltf_free);check(cgltf_load_buffers(&options,vrm_data.get(),vrm_path.c_str())==cgltf_result_success&&cgltf_validate(vrm_data.get())==cgltf_result_success,"Actual VRM retains valid complete source geometry, skin, morphs and images");
+  const auto document=nlohmann::json::parse(std::string_view(vrm_data->json,vrm_data->json_size));bool vrm_colour=false;
+  for(const auto &m:document.at("extensions").at("VRM").at("materialProperties"))if(m.at("name").get<std::string>().find("HAIR")!=std::string::npos){const auto &v=m.at("vectorProperties").at("_Color");vrm_colour=std::abs(srgb_to_linear(v[0].get<float>())-.8f)<1e-5f&&std::abs(srgb_to_linear(v[1].get<float>())-.2f)<1e-5f&&std::abs(srgb_to_linear(v[2].get<float>())-.1f)<1e-5f;}
+  check(vrm_colour,"Actual VRM toon material exports selected absolute RGB instead of silently retaining the old blue tint");
+
  }
  std::ofstream(root/"creator-control-effects.json")<<evidence.dump(2)<<'\n';
 }
@@ -102,7 +134,7 @@ void workspace(const std::filesystem::path&root){
  for(float value:{.2f,.15f,.1f}){driver.sector(6);driver.ray(value);driver.panel_button(true);driver.sector(1);}
  check(std::abs(doc.frame().state->creator->settings.controls.hair_length-.2f)<1e-6f&&std::abs(doc.frame().state->creator->settings.controls.hair_volume-.15f)<1e-6f&&std::abs(doc.frame().state->creator->settings.controls.fringe-.1f)<1e-6f,"Actual controller sliders author length, volume and fringe in the native groom settings");
  for(int i=0;i<6;++i)driver.sector(1);driver.sector(6);driver.ray(.3f);driver.panel_button(true);
- check(std::abs(doc.frame().state->creator->settings.controls.hair_color[0]-.3f)<1e-6f,"Actual controller slider authors a retained hair material tint");
+ check(doc.frame().state->creator->settings.controls.hair_recolor&&std::abs(doc.frame().state->creator->settings.controls.hair_recolor->at(0)-.3f)<1e-6f,"Actual controller slider enables and authors arbitrary red hair recolour");
  check(doc.copy_scene().encode()==baseline,"All body/face/hair drafts leave genuine prior geometry, paint, source and rig untouched");
  driver.sector(11);auto saved=doc.save_async(root/"created.dsculpt");saved.get();ready(doc);const auto accepted_scene=doc.copy_scene();const auto accepted=accepted_scene.encode();old_avatar_retained(source,accepted_scene);
  check(accepted_scene.objects().size()==source.objects().size()+20&&!doc.frame().state->creator,"Controller Apply creates a complete distinct avatar through the native ordered worker");check(Scene::load(root/"created.dsculpt").encode()==accepted,"Save ordered immediately after Apply/reopen retains complete old and new creator content");check(doc.undo()&&doc.copy_scene().encode()==baseline,"Exactly one global Undo removes only the newly applied avatar");ready(doc);check(doc.redo()&&doc.copy_scene().encode()==accepted,"Exactly one global Redo restores the complete created avatar");ready(doc);
@@ -110,7 +142,7 @@ void workspace(const std::filesystem::path&root){
  check(refuses([&]{doc.configure_humanoid_creator(old->settings,old->session);})&&doc.frame().state->creator==current,"Retired creator session cannot modify a new draft on the same source");check(refuses([&]{doc.end_humanoid_creator(false,old->session);})&&doc.frame().state->creator==current,"Retired cancellation cannot close another creator session");doc.end_humanoid_creator(false);
  doc.begin_humanoid_creator();auto epoch=doc.frame().state->creator;doc.hold_object(doc.frame().state->active_object);check(refuses([&]{doc.configure_humanoid_creator(epoch->settings,epoch->session);}),"Changed edit authority refuses an older creator draft");doc.end_humanoid_creator(false);doc.release_held_object();
  doc.begin_humanoid_creator();driver.frame.focused=false;driver.send();check(!doc.frame().state->creator&&doc.copy_scene().encode()==accepted,"Real focus loss cancels an unapplied creator draft without any geometry/history mutation");driver.frame.focused=true;driver.send();
- Document pending;ready(pending);const auto empty=pending.copy_scene().encode();struct Release{~Release(){release();}}release_guard;
+ Document pending;pending.replace(Scene{});ready(pending);const auto empty=pending.copy_scene().encode();struct Release{~Release(){release();}}release_guard;
  arm();auto blocked=pending.save_async(root/"before-cancel.dsculpt");await_gate();pending.begin_humanoid_creator();pending.end_humanoid_creator(true);pending.cancel_asset_work();release();blocked.get();ready(pending);check(pending.copy_scene().encode()==empty&&!pending.frame().state->can_undo,"Accepted queued creator Cancel preserves the complete source and global history");
  arm();blocked=pending.save_async(root/"before-replace.dsculpt");await_gate();pending.begin_humanoid_creator();pending.end_humanoid_creator(true);pending.replace(Volume(.07f));const auto replacement=pending.copy_scene().encode();release();blocked.get();ready(pending);check(pending.copy_scene().encode()==replacement&&!pending.frame().state->can_undo,"Stale accepted creator worker cannot overwrite a replacement generation");
  HumanoidCreatorSettings legacy;legacy.controls=humanoid_baseline_defaults("makehuman-hm08");check(refuses([&]{legacy.validate();}),"The creator never offers or falls back to removed MakeHuman geometry");
@@ -128,6 +160,8 @@ int main(int argc,char**argv)try{
    const auto &persisted=*actual.groups().back().humanoid;
    check(std::abs(persisted.height-1.9f)<1e-5f&&std::abs(persisted.build-.4f)<1e-5f,"Actual released pressure and controller ray reach requested height and build within native float precision");
    auto controls=humanoid_preset(HumanoidPreset::Anime,group.humanoid->baseline);controls.height=persisted.height;controls.build=persisted.build;
+   check(persisted.hair_recolor&&std::abs(persisted.hair_recolor->at(0)-.7f)<1e-5f,"Actual released XR pressure enables arbitrary red hair colour");
+   controls.hair_recolor=humanoid_hair_recolor_value(controls);controls.hair_recolor->at(0)=persisted.hair_recolor->at(0);
    check(controls.encode()==persisted.encode(),"Actual source, preset and all other body/face/hair/tint settings exactly match selected native draft actions");
    CanvasTransform transform{};transform.position.y=-controls.height*.5f;
    append_humanoid(expected,controls,group.name+" variation",transform);old_avatar_retained(source,actual);

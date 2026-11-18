@@ -18,7 +18,7 @@ struct HumanoidCreatorView {
   std::optional<HumanoidCreatorSettings> slider_before;
   std::vector<HumanoidCreatorSettings> undo,redo;
 };
-inline constexpr size_t humanoid_creator_parameter_count=26;
+inline constexpr size_t humanoid_creator_parameter_count=27;
 inline constexpr int humanoid_creator_page=33;
 struct HumanoidCreatorParameter {
   const char *label;

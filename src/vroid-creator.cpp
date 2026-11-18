@@ -498,6 +498,8 @@ CreatedHumanoid create_vroid(const HumanoidControls &c,
       tint = c.skin_color;
     for (size_t i = 0; i < 4; ++i)
       part.color[i] *= tint[i];
+    if(c.hair_recolor&&lower.find("hair")!=std::string::npos)
+      for(size_t k=0;k<3;++k)part.color[k]=(*c.hair_recolor)[k];
     for (auto vertex : original) {
       remap[vertex] = uint32_t(part.mesh.positions.size());
       part.mesh.positions.push_back(shape(p.mesh.positions[vertex]));

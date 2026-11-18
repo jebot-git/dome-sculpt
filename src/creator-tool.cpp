@@ -16,7 +16,7 @@ constexpr const char *labels[]={"Height (m)","Anime proportions","Build","Should
  "Waist width","Leg length","Arm length","Head width","Head height","Eye size",
  "Eye spacing","Nose size","Mouth width","Jaw width","Hair length","Hair volume","Fringe",
  "Skin red","Skin green","Skin blue","Iris red","Iris green","Iris blue",
- "Hair red","Hair green","Hair blue"};
+ "Hair recolour red","Hair recolour green","Hair recolour blue","Hair recolour enabled"};
 bool same(const HumanoidCreatorSettings&a,const HumanoidCreatorSettings&b){
  return a.name==b.name&&a.preset==b.preset&&a.controls.encode()==b.controls.encode();
 }
@@ -37,10 +37,10 @@ HumanoidCreatorParameter humanoid_creator_parameter(const HumanoidControls&c,siz
   value=c.*fields[index];
   if(index==0){lo=1.2f;hi=2.2f;}
   else if(index!=1&&index!=9&&index<14)lo=-1;
- }else{
-  const auto &color=index<20?c.skin_color:index<23?c.iris_color:c.hair_color;
-  value=color[(index-17)%3];
- }
+ }else if(index<23){
+  const auto &color=index<20?c.skin_color:c.iris_color;value=color[(index-17)%3];
+ }else if(index<26)value=humanoid_hair_recolor_value(c)[index-23];
+ else value=c.hair_recolor?1.f:0.f;
  return {labels[index],lo,hi,.01f,value};
 }
 void set_humanoid_creator_parameter(HumanoidControls&controls,size_t index,float value){
@@ -49,7 +49,9 @@ void set_humanoid_creator_parameter(HumanoidControls&controls,size_t index,float
   throw std::invalid_argument("Creator parameter is outside its native bounds");
  auto next=controls;
  if(index<std::size(fields))next.*fields[index]=value;
- else {auto &color=index<20?next.skin_color:index<23?next.iris_color:next.hair_color;color[(index-17)%3]=value;}
+ else if(index<23){auto &color=index<20?next.skin_color:next.iris_color;color[(index-17)%3]=value;}
+ else if(index<26){next.hair_recolor=humanoid_hair_recolor_value(next);(*next.hair_recolor)[index-23]=value;}
+ else if(value>=.5f)next.hair_recolor=humanoid_hair_recolor_value(next);else next.hair_recolor.reset();
  next.validate();controls=std::move(next);
 }
 std::string humanoid_creator_parameter_text(const HumanoidCreatorView&view){

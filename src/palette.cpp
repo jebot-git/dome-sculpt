@@ -545,7 +545,7 @@ void SpatialPalette::raster(const EditorState &s) {
     const auto &view=*s.creator;
     text(320*unit_,270*unit_,view.settings.controls.baseline=="vroid-beta-female"?"Female CC0":"Male CC0",fg);
     text(320*unit_,300*unit_,humanoid_creator_parameter_text(view),fg);
-    text(320*unit_,330*unit_,"New avatar; existing edits kept",fg);
+    text(320*unit_,330*unit_,view.settings.controls.hair_recolor?"New avatar; hair recolour":"New avatar; original hair tint",fg);
   }
   const char *page = s.menu_page==33 ? "Humanoid creator" : s.menu_page==32 ? "Paint filters / controls" : s.menu_page==31 ? "Material texture sets" : s.menu_page==30 ? "Emission / HDR" : s.menu_page==29 ? "VRM1 expression preview" : s.menu_page==28 ? "Export / editable project" : s.menu_page==27 ? "Humanoid rig fitting" : s.menu_page==25 ? "Image projection" : s.menu_page==24 ? "Shapekey tools" : s.menu_page==22 ? "Polygon topology" : s.menu_page==19 ? "Polygon edit" : s.menu_page == 23 ? "Import options" : s.menu_page == 21 ? "Import model" : s.menu_page == 20 ? "Holding / isolation" : s.menu_page == 18 ? "Procedural sculpt" : s.menu_page == 17 ? "Plane cut" : s.menu_page == 16 ? "Retopology" : s.menu_page == 15 ? "Masks / symmetry" : s.menu_page == 14 ? "Bind / transfer skin"
                      : s.menu_page == 13 ? "Skin weights"
