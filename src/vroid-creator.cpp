@@ -4,6 +4,9 @@
 #include "dome/source-maps.hpp"
 #include "humanoid-sha256.hpp"
 #include "vroid-groom.hpp"
+#include "vroid-shape-export.hpp"
+#include "creator-shape-interval.hpp"
+#include <queue>
 #include "dome/normal-frames.hpp"
 #include "source-frame-shape.hpp"
 #include <fstream>
@@ -86,9 +89,15 @@ struct Source {
 };
 std::shared_ptr<const Source> load(const AssetIdentity &id,
                                    const std::filesystem::path &root,
-                                   const std::function<bool()> &cancel) {
-  auto path = locate(id, root);
-  std::string key = path.string() + ":" + id.hash;
+                                   const std::function<bool()> &cancel,
+                                   std::shared_ptr<const std::vector<uint8_t>> embedded = {}) {
+  // A saved creator carries the immutable licensed source; export must not
+  // depend on files still being installed beside a different executable.
+  if (embedded && (embedded->size() > 64*1024*1024 || embedded->size() < 28 ||
+                   creator_detail::sha256(*embedded) != id.hash))
+    fail("embedded creator source SHA256 identity mismatch");
+  auto path = embedded ? std::filesystem::path{} : locate(id, root);
+  std::string key = embedded ? std::string("embedded:") + id.hash : path.string() + ":" + id.hash;
   static std::mutex mutex;
   static std::map<std::string, std::shared_ptr<const Source>> cache;
   {
@@ -99,16 +108,18 @@ std::shared_ptr<const Source> load(const AssetIdentity &id,
     }
   }
   stop(cancel);
-  auto size = std::filesystem::file_size(path);
+  auto size = embedded ? embedded->size() : std::filesystem::file_size(path);
   if (size > 64 * 1024 * 1024 || size < 28)
     fail("source byte size outside bounds");
-  std::ifstream input(path, std::ios::binary);
-  if (!input)
-    fail("source cannot be opened");
-  std::vector<uint8_t> bytes(size);
-  input.read(reinterpret_cast<char *>(bytes.data()), std::streamsize(size));
-  if (!input)
-    fail("source read incomplete");
+  std::vector<uint8_t> bytes;
+  if (embedded) bytes = *embedded;
+  else {
+    std::ifstream input(path, std::ios::binary);
+    if (!input) fail("source cannot be opened");
+    bytes.resize(size);
+    input.read(reinterpret_cast<char *>(bytes.data()), std::streamsize(size));
+    if (!input) fail("source read incomplete");
+  }
   if (creator_detail::sha256(bytes) != id.hash)
     fail("CC0 source SHA256 identity mismatch: " + path.string());
   if (word(bytes, 0) != 0x46546c67 || word(bytes, 4) != 2 ||
@@ -276,6 +287,47 @@ struct Shaper {
     p.x *= 1 + c.jaw_width * .08f * jaw;
     return p;
   }
+  creator_detail::ShapeBox bounds(creator_detail::ShapeBox original) const {
+    using namespace creator_detail;
+    auto p = original; p.x = -p.x; p.z = -p.z;
+    auto torso = creator_detail::interval_smooth(hips.y - .05f, hips.y + .08f, p.y) *
+                  (1 - creator_detail::interval_smooth(neck.y - .08f, neck.y, p.y));
+    auto upper = creator_detail::interval_smooth(hips.y + .1f, neck.y - .05f, p.y) *
+                  (1 - creator_detail::interval_smooth(neck.y, neck.y + .04f, p.y));
+    auto waist = creator_detail::interval_exp(-creator_detail::interval_pow2((p.y - (hips.y + .12f)) / .12f, 2.f));
+    p.x *= 1 + c.build * .08f * torso + c.shoulder_width * .1f * upper +
+           c.waist_width * .12f * waist;
+    p.z *= 1 + c.build * .10f * torso;
+    p.y = creator_detail::interval_leg(p.y, hips.y, c.leg_length);
+    float shoulder = std::max(.08f, std::abs(left_eye.x) * 3.5f);
+    p.x = creator_detail::interval_arm(p.x, shoulder, c.arm_length);
+    auto h = creator_detail::interval_smooth(neck.y - .015f, neck.y + .04f, p.y) *
+              (1 - creator_detail::interval_smooth(.12f, .22f, creator_detail::interval_abs(p.x)));
+    p.x *= 1 + h * (c.head_width * .10f + c.anime * .08f);
+    p.y += h * (p.y - neck.y) * (c.head_height * .08f + c.anime * .06f);
+    p.z += h * (p.z - head.z) * c.anime * .04f;
+    for (auto eye : {left_eye, right_eye}) {
+      auto d = p; d.x -= eye.x; d.y -= eye.y; d.z -= eye.z;
+      float rx = std::max(.025f, std::abs(left_eye.x - right_eye.x) * .75f),
+            ry = .045f;
+      auto w = creator_detail::interval_exp(-(square(d.x) / (rx * rx) + square(d.y) / (ry * ry))) *
+                creator_detail::interval_smooth(0, .1f, p.z - head.z);
+      p.x += (d.x * c.eye_size * .18f +
+              (eye.x < 0 ? -1.f : 1.f) * c.eye_spacing * .008f) *
+             w;
+      p.y += d.y * c.eye_size * .22f * w;
+    }
+    auto nose = creator_detail::interval_exp(-creator_detail::interval_pow2(p.x / .025f, 2.f) -
+                          creator_detail::interval_pow2((p.y - (left_eye.y - .035f)) / .035f, 2.f));
+    p.z += (p.z - head.z) * c.nose_size * .15f * nose;
+    auto mouth = creator_detail::interval_exp(-creator_detail::interval_pow2(p.x / .055f, 2.f) -
+                           creator_detail::interval_pow2((p.y - (left_eye.y - .075f)) / .025f, 2.f));
+    p.x *= 1 + c.mouth_width * .12f * mouth;
+    auto jaw = creator_detail::interval_exp(-creator_detail::interval_pow2((p.y - (head.y - .01f)) / .045f, 2.f));
+    p.x *= 1 + c.jaw_width * .08f * jaw;
+    p.x *= scale; p.y = (p.y - floor) * scale; p.z *= scale;
+    return p;
+  }
   Vec3 operator()(Vec3 p) const {
     p = raw(p);
     return {p.x * scale, (p.y - floor) * scale, p.z * scale};
@@ -322,7 +374,124 @@ struct Shaper {
         (cross(b, d) * n.x + cross(d, a) * n.y + cross(a, b) * n.z) / det);
   }
 };
+Shaper configured_shape(const HumanoidControls &c, const Source &source) {
+  auto worlds = source.skeleton.world();
+  auto anchor = [&](const char *role) {
+    auto m = worlds[source.mapping.joints.at(role)];
+    return flip({m[12], m[13], m[14]});
+  };
+  Shaper shape{c,
+               anchor("hips"),
+               anchor("neck"),
+               anchor("head"),
+               anchor("leftEye"),
+               anchor("rightEye")};
+  shape.floor = 1000;
+  float ceiling = -1000;
+  for (const auto &primitive : source.asset->primitives)
+    for (auto vertex : primitive.mesh.indices) {
+      auto p = shape.raw(primitive.mesh.positions[vertex]);
+      shape.floor = std::min(shape.floor, p.y);
+      ceiling = std::max(ceiling, p.y);
+    }
+  if (ceiling - shape.floor < 1)
+    fail("source body height is implausible");
+  shape.scale = c.height / (ceiling - shape.floor);
+  return shape;
+}
+Skeleton shaped_skeleton(const Source &source, const Shaper &shape) {
+  // These specific VRM0 sources are normalized. Preserve their joint axes and
+  // reject unexpected bind-frame variants, rather than changing authored IBMs.
+  auto worlds = source.skeleton.world();
+  Skeleton skeleton = source.skeleton;
+  std::vector<Vec3> joint_positions;
+  for (const auto &matrix : worlds) {
+    for (size_t k = 0; k < 12; ++k) {
+      float expected = k == 0 || k == 5 || k == 10 ? 1.f : 0.f;
+      if (std::abs(matrix[k] - expected) > 1e-5f)
+        fail("known VRM0 baseline is not normalized");
+    }
+    joint_positions.push_back(shape({matrix[12], matrix[13], matrix[14]}));
+  }
+  for (size_t i = 0; i < skeleton.bones.size(); ++i) {
+    auto &bone = skeleton.bones[i];
+    bone.rest.translation =
+        bone.parent < 0 ? joint_positions[i]
+                        : joint_positions[i] - joint_positions[bone.parent];
+    bone.rest.rotation = {};
+    bone.rest.scale = {1, 1, 1};
+    bone.length *= shape.scale;
+  }
+  skeleton.validate();
+  skeleton.inverse_bind();
+  source.mapping.validate(skeleton);
+  return skeleton;
+}
 } // namespace
+namespace creator_detail {
+struct CreatorShapeExport::Impl {
+  HumanoidControls controls;
+  std::shared_ptr<const Source> source;
+  Shaper shape;
+  Skeleton rest;
+  Impl(const HumanoidControls &c, std::shared_ptr<const Source> s)
+      : controls(c), source(std::move(s)), shape(configured_shape(controls,*source)),
+        rest(shaped_skeleton(*source,shape)) {}
+};
+CreatorShapeExport::CreatorShapeExport(const HumanoidControls &c,
+    std::shared_ptr<const std::vector<uint8_t>> bytes,
+    const std::function<bool()> &cancel) {
+  c.validate(); impl_=std::make_shared<const Impl>(c,load(identity(c.baseline),{},cancel,std::move(bytes)));
+}
+Vec3 CreatorShapeExport::point(Vec3 p) const { return impl_->shape(p); }
+const Skeleton &CreatorShapeExport::skeleton() const { return impl_->rest; }
+float CreatorShapeExport::scale() const { return impl_->shape.scale; }
+std::vector<uint32_t> CreatorShapeExport::joint_nodes() const {
+  std::vector<uint32_t> result(impl_->rest.bones.size());
+  for(size_t n=0;n<impl_->source->node_to_joint.size();++n)
+    if(impl_->source->node_to_joint[n]>=0) result.at(size_t(impl_->source->node_to_joint[n]))=uint32_t(n);
+  return result;
+}
+float CreatorShapeExport::sphere_radius(Vec3 center, float radius,
+    const std::function<bool()> &cancel) const {
+  if(!finite(center)||!std::isfinite(radius)||radius<0||radius>10) fail("invalid creator sphere");
+  if(!radius)return 0;
+  if(impl_->shape.neutral_frame())return std::nextafter(radius*scale(),INFINITY);
+  const auto mapped=point(center);
+  struct Cell { ShapeBox box; float upper; bool operator<(const Cell &b) const { return upper<b.upper; } };
+  auto bound=[&](ShapeBox box) {
+    double nearest=0;
+    for(auto [v,c]:{std::pair{box.x,center.x},std::pair{box.y,center.y},std::pair{box.z,center.z}}){double d=std::max({double(v.lo)-c,double(c)-v.hi,0.});nearest+=d*d;}
+    if(nearest>double(radius)*radius)return -1.f;
+    auto out=impl_->shape.bounds(box);double squared=0;
+    for(auto [v,c]:{std::pair{out.x,mapped.x},std::pair{out.y,mapped.y},std::pair{out.z,mapped.z}}){double d=std::max(std::abs(double(v.lo)-c),std::abs(double(v.hi)-c));squared+=d*d;}
+    return std::nextafter(float(std::sqrt(squared)),INFINITY);
+  };
+  float witness=0;
+  // Witnesses only stop subdivision; the returned radius ALWAYS comes from
+  // an interval cover of the complete sphere, never a sampled maximum.
+  for(int i=0;i<256;++i){float y=1-2*(i+.5f)/256,angle=i*2.39996323f,r=std::sqrt(1-y*y);witness=std::max(witness,length(point(center+Vec3{r*std::cos(angle),y,r*std::sin(angle)}*radius)-mapped));}
+  ShapeBox root{{ShapeInterval::down(center.x-radius),ShapeInterval::up(center.x+radius)},
+                {ShapeInterval::down(center.y-radius),ShapeInterval::up(center.y+radius)},
+                {ShapeInterval::down(center.z-radius),ShapeInterval::up(center.z+radius)}};
+  std::priority_queue<Cell> cells;cells.push({root,bound(root)});
+  for(size_t work=0;work<8192 && cells.top().upper>witness*1.02f+1e-6f;++work){
+    if((work&127)==0)stop(cancel);
+    auto cell=cells.top();cells.pop();auto left=cell.box,right=cell.box;
+    int axis=0;float width=left.x.hi-left.x.lo;
+    if(left.y.hi-left.y.lo>width){axis=1;width=left.y.hi-left.y.lo;}
+    if(left.z.hi-left.z.lo>width)axis=2;
+    auto &a=axis==0?left.x:axis==1?left.y:left.z;auto &b=axis==0?right.x:axis==1?right.y:right.z;
+    float mid=a.lo+(a.hi-a.lo)*.5f;if(mid==a.lo||mid==a.hi){cells.push(cell);break;}
+    a.hi=mid;b.lo=mid;
+    for(auto box:{left,right}){auto upper=bound(box);if(upper>=0)cells.push({box,upper});}
+    if(cells.empty())fail("creator sphere cover unexpectedly empty");
+  }
+  auto result=cells.top().upper;
+  if(!std::isfinite(result)||result>radius*scale()*8+1e-4f)fail("creator sphere enclosure exceeds conservative export budget");
+  return result;
+}
+} // namespace creator_detail
 namespace {
 std::shared_ptr<const PaintSourceMaps> source_maps(const Source &s,
                                                    const ImportedMaterial &m) {
@@ -396,56 +565,13 @@ std::optional<AvatarExpressions> expressions(const Source &s, int mesh,
 }
 CreatedHumanoid create_vroid(const HumanoidControls &c,
                              const std::function<bool()> &cancel,
-                             const std::filesystem::path &root) {
+                             const std::filesystem::path &root,
+                             std::shared_ptr<const Source> source = {}) {
   c.validate();
-  auto source = load(identity(c.baseline), root, cancel);
+  if (!source) source = load(identity(c.baseline), root, cancel);
   const auto &a = *source->asset;
-  auto worlds = source->skeleton.world();
-  auto anchor = [&](const char *role) {
-    auto m = worlds[source->mapping.joints.at(role)];
-    return flip({m[12], m[13], m[14]});
-  };
-  Shaper shape{c,
-               anchor("hips"),
-               anchor("neck"),
-               anchor("head"),
-               anchor("leftEye"),
-               anchor("rightEye")};
-  shape.floor = 1000;
-  float ceiling = -1000;
-  for (const auto &primitive : a.primitives)
-    for (auto vertex : primitive.mesh.indices) {
-      auto p = shape.raw(primitive.mesh.positions[vertex]);
-      shape.floor = std::min(shape.floor, p.y);
-      ceiling = std::max(ceiling, p.y);
-    }
-  if (ceiling - shape.floor < 1)
-    fail("source body height is implausible");
-  shape.scale = c.height / (ceiling - shape.floor);
-  // These specific VRM0 sources are normalized. Preserve their joint axes and
-  // reject unexpected bind-frame variants, rather than changing authored IBMs.
-  Skeleton skeleton = source->skeleton;
-  std::vector<Vec3> joint_positions;
-  for (const auto &matrix : worlds) {
-    for (size_t k = 0; k < 12; ++k) {
-      float expected = k == 0 || k == 5 || k == 10 ? 1.f : 0.f;
-      if (std::abs(matrix[k] - expected) > 1e-5f)
-        fail("known VRM0 baseline is not normalized");
-    }
-    joint_positions.push_back(shape({matrix[12], matrix[13], matrix[14]}));
-  }
-  for (size_t i = 0; i < skeleton.bones.size(); ++i) {
-    auto &bone = skeleton.bones[i];
-    bone.rest.translation =
-        bone.parent < 0 ? joint_positions[i]
-                        : joint_positions[i] - joint_positions[bone.parent];
-    bone.rest.rotation = {};
-    bone.rest.scale = {1, 1, 1};
-    bone.length *= shape.scale;
-  }
-  skeleton.validate();
-  skeleton.inverse_bind();
-  source->mapping.validate(skeleton);
+  auto shape = configured_shape(c, *source);
+  auto skeleton = shaped_skeleton(*source, shape);
   CreatedHumanoid output;
   output.controls = c;
   bool primary = false;
@@ -663,6 +789,9 @@ CreatedHumanoid create_vroid(const HumanoidControls &c,
   return output;
 }
 } // namespace
+CreatedHumanoid creator_detail::CreatorShapeExport::reference(const std::function<bool()> &cancel) const {
+  return create_vroid(impl_->shape.c,cancel,{},impl_->source);
+}
 CreatedHumanoid create_humanoid(const HumanoidControls &c,
                                 const std::function<bool()> &cancel,
                                 const std::filesystem::path &assets) {
