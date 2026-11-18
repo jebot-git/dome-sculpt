@@ -30,7 +30,7 @@ async def main():
  for key,leaf in [('XDG_CONFIG_HOME','config'),('XDG_STATE_HOME','state'),('XDG_CACHE_HOME','cache'),('XDG_RUNTIME_DIR','runtime')]:env[key]=str(home/leaf);Path(env[key]).mkdir(mode=0o700)
  appearance=Path(env['XDG_CONFIG_HOME'])/'dome/appearance.json';appearance.parent.mkdir();appearance.write_text(json.dumps({'font':'Unifont / Sans-Serif','font_size':16,'font_scale':1}))
  project=out/'author.dsculpt';project.write_bytes(source.read_bytes())
- with(out/'app.log').open('w')as log:processes.append(subprocess.Popen([str(app),'--open',str(project)],env=env,stdout=log,stderr=subprocess.STDOUT))
+ with(out/'app.log').open('w')as log:processes.append(subprocess.Popen([str(app),str(project)],env=env,stdout=log,stderr=subprocess.STDOUT))
  d=display.Display(screen)
  def named(title):
   for w in d.screen().root.query_tree().children:
