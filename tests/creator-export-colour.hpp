@@ -18,6 +18,7 @@ void consumer_sampler(const cgltf_texture*texture,const PaintSourceTexture&sourc
 }
 void consumer_pixels(const Image&actual,const Image&source,std::array<float,4>factor,std::array<float,3>expected,bool alpha,const char*label){
  check(actual.width==source.width&&actual.height==source.height,"Effective colour export retains original hair or generated-groom image dimensions");
+ for(float v:factor)if(!std::isfinite(v))throw std::runtime_error("Exported material colour contains a nonfinite factor");
  float maximum=0,low=1e9f,high=0,expected_low=1e9f,expected_high=0;size_t visible=0;
  for(size_t pixel=0;pixel<actual.rgba.size();pixel+=4){
   if(alpha&&std::abs(actual.rgba[pixel+3]/255.f*factor[3]-source.rgba[pixel+3]/255.f)>1.f/255+1e-6f)throw std::runtime_error("Export changed effective authored alpha");
