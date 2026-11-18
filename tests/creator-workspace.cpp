@@ -52,7 +52,7 @@ void controls(const std::filesystem::path&root){
     auto groom_controls=original_controls;groom_controls.hair_length=groom_controls.hair_volume=groom_controls.fringe=.2f;
     const auto groom_before=create_humanoid(groom_controls);set_humanoid_creator_parameter(groom_controls,parameter,.65f);const auto groom_after=create_humanoid(groom_controls);
     const auto &a=groom_before.parts.back().mesh,&b=groom_after.parts.back().mesh;
-    check(a.positions!=b.positions,"Each exposed hair parameter changes the actual fitted groom geometry when a groom already exists");
+    check((a.positions.size()!=b.positions.size()||difference(a,b)>1e-6f),"Each exposed hair parameter changes the actual fitted groom geometry when a groom already exists");
     std::cout<<"GROOM "<<id<<" "<<descriptor.label<<" before_vertices="<<a.positions.size()<<" after_vertices="<<b.positions.size()<<" position_delta="<<(a.positions.size()==b.positions.size()?difference(a,b):-1.f)<<'\n';
    }
    else check(color>.01f&&geometry==0,"Exposed tint changes actual source material factors while retaining source geometry");
