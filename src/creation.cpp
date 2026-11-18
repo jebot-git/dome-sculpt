@@ -67,6 +67,7 @@ uint64_t append_humanoid(Scene &scene, const HumanoidControls &controls,
       // Generated geometry owns a genesis record, never an invented imported
       // appearance, source-material identity, MToon payload or borrowed role.
       auto binding=std::make_shared<SourceMaterialBindings>();
+      binding->has_mtoon=false;
       binding->native_reference.color=object.material.color;
       binding->native_reference.emission=object.material.emissive;
       binding->native_reference.alpha=int(object.material.alpha);
