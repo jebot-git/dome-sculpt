@@ -35,10 +35,11 @@ Scene scene(const Scene &authentic,uint64_t drawn,bool pbr) {
         "Detached display layers retain exact common, PBR and emission tile owners");
     return shown;
 }
-int execute(const std::filesystem::path &out,const std::filesystem::path &witness_file) {
+int execute(const std::filesystem::path &out,const std::filesystem::path &witness_file,uint32_t resolution=64) {
     std::ifstream input(witness_file);const auto manifest=nlohmann::json::parse(input);
-    check(manifest.at("kind")=="advanced-normal-display-witnesses-v1"&&manifest.at("views").size()==68,
+    check(manifest.at("kind")== (resolution==64?"advanced-normal-display-witnesses-v1":"advanced-normal-filtered-resolution-display-witnesses-v1")&&manifest.at("views").size()==68,
           "Display graphics requires an explicit reviewed 68-view forecast witness manifest");
+    if(resolution!=64)check(manifest.at("target_resolution")==resolution&&manifest.at("source_resolution")==64&&manifest.at("normal_filter_quality")==1,"Filtered-resolution graphics binds the exact declared target grid and actually checked saved policy");
     graphics_output=out;NativeGraphics graphics;std::cout<<"ACTUAL_RENDERER "<<glGetString(GL_RENDERER)<<std::endl;
     unsigned families=0,views=0,points=0;
     auto render=[&](Case family){const auto original=family.scene.encode();const auto paint=family.scene.object(family.source).painted;
@@ -55,8 +56,8 @@ int execute(const std::filesystem::path &out,const std::filesystem::path &witnes
               "Full display matrix leaves exact authentic first/second Bake scene and source owners unchanged");++families;
     };
     for(bool legacy:{false,true})for(bool live:{false,true})for(bool seam:{false,true})for(auto method:{SourceNormalUvMethod::Rasterize,SourceNormalUvMethod::RetainSource})
-        render(construct(legacy,live,seam,method));
-    render(construct(false,true,true,SourceNormalUvMethod::RetainSource,true));
+        render(construct(legacy,live,seam,method,false,resolution));
+    render(construct(false,true,true,SourceNormalUvMethod::RetainSource,true,resolution));
     check(families==17&&views==68,"Display qualification retains all genuine families, source/target and roles");
     std::cout<<"ACTUAL_FINAL_RENDERER "<<glGetString(GL_RENDERER)<<std::endl;
     std::cout<<"PASS "<<checks<<" advanced display source/second-Bake graphical controls families="<<families<<" views="<<views<<" points="<<points<<'\n';return 0;

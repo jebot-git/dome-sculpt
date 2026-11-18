@@ -9,7 +9,11 @@ is explicit and bounded: version1 checks rest-space normal conditioning,
 quantization, and sampled filtered transfer against the same normal_error angle.
 It tests nine quarter/midpoints in each fully projected interior bilinear cell,
 using the actual target role basis, sampled RGBA8 vectors and authenticated source
-projection/normal resolver. Ordinary mesh and sculpt sources use a separate numeric
+projection/normal resolver. Prepared original/retained sources keep their sealed
+paired resolver. Ordinary meshes, original normal textures and actual sculpt
+meshes use a separate numeric-only sampler shared with the real raster encoder;
+it cannot authorize retained/prepared material pairing. Raw unprepared targets
+explicitly record policy0 and never claim this filtered check. Ordinary mesh and sculpt sources use a separate numeric
 sampler extracted from the actual generic Bake normal path: interpolated source
 normals, original texture UV/basis, explicit imported tangents and legacy raw
 coverage all follow the same validated function as rasterization. This numeric
@@ -66,3 +70,12 @@ Focused ordinary-source coverage also includes an unbound plain mesh, an actual
 original normal-map source with low-resolution refusal/retry, and a real spherical
 SDF sculpt projected into a prepared target. Its spherical direction is checked
 independently; none of these sources has a retained/prepared material resolver.
+
+The separately named --filtered-resolution-forecast and
+--filtered-resolution-render modes accept an explicit target size. They start
+with the same genuine64 source and ordinary64 target, run the actual blank-target
+resolution adapter, then perform a genuine checked second Bake. The original64
+graphical mode explicitly retains its historical per-texel policy0. New witness
+manifests identify the selected target size, source64 and checked policy1. All68
+views keep their four original probes, independent directions and material
+controls. The original failed executions remain separate retained evidence.
