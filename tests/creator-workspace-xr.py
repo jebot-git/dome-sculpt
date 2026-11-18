@@ -32,7 +32,7 @@ try:
    buttons=state.get('creator_buttons',[]);wanted={8,14,20,26,40,46,52,58,64,70,76,82,88,102,108,114}
    check(wanted<={row['frame']for row in buttons}and all(row['action']=='recenter'for row in buttons),'Actual returned joystick edges open creator, copy saved settings, select preset and perform local Undo/Redo')
    check(any(row['frame']==22 and row['flags']==0 for row in state.get('creator_space_flags',[]))and any(row['frame']==27 and row['flags']==0 for row in state.get('creator_view_flags',[]))and any(row['frame']==28 and not row['should_render']for row in state.get('creator_frame_states',[])),'Actual original pose/view tracking losses and normally skipped render samples remain present')
-   check(state.get('reference_changes')==1,'Actual reference-space event cancels the first unaccepted draft before its fresh reopen route')
+   check(state.get('reference_changes')==1,'Actual reference-space event remains present before the fresh creator route')
    pressures=state.get('creator_pressures',[]);wanted={92,96,118,122}if mode=='focus'else{92,96,118,122,278,282}
    check({row['frame']for row in pressures}==wanted and all(row['action']=='paint_pressure'and row['value']>.8 for row in pressures),'Actual returned pressure edges edit and confirm metric body controls and explicit red hair recolour')
    capture=state.get('creator_captures',{});required=[29,37,61,67,73,79,85,89,93,97,115,120,124]
