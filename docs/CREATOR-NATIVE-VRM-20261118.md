@@ -29,7 +29,7 @@ All four native products exit zero with actual matching ELF mappings and no
 signals. The driver subsequently exits one because its prepared `--fixture`
 expectation was zero; `authored()` intentionally checks real artist-painted
 pixels and prints one. The original status, unit failure, plan and logs remain
-unchanged. A separate read-only review exits zero after rehashing all 9,474
+unchanged. A separate read-only review exits zero after rehashing all 9,518
 current source/provider pins, checking all four executions and exact summaries,
 requiring six consumer phases, six refusals and six exported files, and checking
 that no owned processes remain. This is explicitly **positive product evidence

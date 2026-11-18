@@ -21,7 +21,7 @@
   ],
   "real_required_negative_refusals": 6,
   "all_actual_product_exits": 0,
-  "source_provider_pins_rehashed": 9474,
+  "source_provider_pins_rehashed": 9518,
   "VRM_files": [
     {
       "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-creator-export-build-20261118/native-v8/vrm/vroid-beta-female-posed.vrm",
@@ -256,5 +256,7 @@
     "/home/blux/de-xr/dome-sculpt/artifacts/vroid-creator-export-build-20261118/native-v8/vroid-beta-male-styled.vrm.khronos.json": "02df7a52223043428a13bb17bd6cb27c5aeda7da6cf89c24f02e39cbec1f0ebf",
     "/home/blux/de-xr/dome-sculpt/artifacts/vroid-creator-export-build-20261118/schema-tools-pip-report-v1.json": "91699f37008ed8b0138596b66874cb26edd1c82a86aa7db47060cbcfdd9534fa",
     "/home/blux/de-xr/dome-sculpt/artifacts/vroid-creator-export-build-20261118/schema-tools-pip-v1.log": "70c2af48ed7b6a72fe8cb867b05096eeb0ab5c77ab8c3b64856cb907b97e67da"
-  }
+  },
+  "prospective_input_pins": 9474,
+  "additional_literal_resolved_runtime_provider_pins": 44
 }
