@@ -11,8 +11,8 @@ Json oracle(const Scene &before, const Scene &after, SourceNormalUvMethod method
           old.bake_recipe->source.object==2 && before.objects().size()==2 && after.objects().size()==2 &&
           prepared_public::retained_sources(before,1)==prepared_public::retained_sources(after,1),
           "Public UV creation preserves the exact hidden artist and genuine first-Bake recipe");
-  const auto a=old.painted->encode().at("mesh"), b=now.painted->encode().at("mesh");
-  require(a.at("positions")==b.at("positions") && a.at("indices")==b.at("indices") && a.at("uv")!=b.at("uv"),
+  const auto &a=old.painted->mesh(), &b=now.painted->mesh();
+  require(advanced_public::same_positions(a,b) && a.indices==b.indices && a.uv!=b.uv,
           "Public UV rotation changes the actual chart without changing ordered physical geometry");
   double maximum=0;size_t interior=0;
   const auto &mesh=now.painted->mesh();
