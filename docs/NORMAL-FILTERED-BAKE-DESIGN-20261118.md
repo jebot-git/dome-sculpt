@@ -9,7 +9,13 @@ is explicit and bounded: version1 checks rest-space normal conditioning,
 quantization, and sampled filtered transfer against the same normal_error angle.
 It tests nine quarter/midpoints in each fully projected interior bilinear cell,
 using the actual target role basis, sampled RGBA8 vectors and authenticated source
-projection/normal resolver. Aggregate ray/raster budgets and cancellation bound
+projection/normal resolver. Ordinary mesh and sculpt sources use a separate numeric
+sampler extracted from the actual generic Bake normal path: interpolated source
+normals, original texture UV/basis, explicit imported tangents and legacy raw
+coverage all follow the same validated function as rasterization. This numeric
+sampler cannot mint prepared-frame authority. Missing ordinary-source frame
+bindings never skip the check. Explicit raw, unprepared Bakes record policy0
+and make no filtered-quality claim. Aggregate ray/raster budgets and cancellation bound
 all work. No empty interior certificate authorizes a field. This is a sampled
 rest-space contract, not an all-point or all-pose theorem. The independent native
 and GL corpora retain their original component `.035`, RGB3 and gap7 checks.
@@ -43,7 +49,9 @@ The focused workflow entry --filtered-workflow preserves eight original64
 refusals, exercises seventeen separately named higher-resolution families through
 Document's actual resolution worker/Bake/Save/Undo/Redo/reopen, checks all original
 probe directions independently, and validates the real historical fixture. A
-separate 64/128/256/512 study determines a sufficient explicit resolution before
+separate 64/128/256/512 study shows512 is still insufficient for the dense
+MToon corpus; the focused workflow therefore starts at an explicitly selected
+1024 and must pass actual checks before
 claiming any positive. Software and Arc graphics, full App/UI, native/sanitizer
 regressions and refreshed consumer dependency closure remain required.
 
@@ -53,3 +61,8 @@ render/XR and fixtures); the current242-owner App MD footprint provides the newe
 selected whole-App boundary. No stale owner with an obsolete settings/state
 layout may be reused. New complete-TU MD and fresh archive/link evidence must
 bind each selected production and test consumer before execution.
+
+Focused ordinary-source coverage also includes an unbound plain mesh, an actual
+original normal-map source with low-resolution refusal/retry, and a real spherical
+SDF sculpt projected into a prepared target. Its spherical direction is checked
+independently; none of these sources has a retained/prepared material resolver.

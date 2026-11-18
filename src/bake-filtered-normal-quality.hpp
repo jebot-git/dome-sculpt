@@ -11,10 +11,11 @@ namespace dome::detail {
 inline void verify_filtered_normal_quality(const Mesh &low,const BakeSource &high,
     const BakeOptions &options,const SourceBakeNormalResolver &source,
     const NormalFrameSet &frames,PreparedMToonNormalEvaluation mode,
-    double toon_scale,double maximum_angle,BakeResult &result){
+    double toon_scale,double maximum_angle,BakeResult &result,
+    const GenericBakeNormalSampler *generic=nullptr){
   using namespace normal_bake_math;
   const auto r=options.resolution;
-  if(!frames.pbr||(!frames.mtoon&&mode!=PreparedMToonNormalEvaluation::Absent)||!source||!std::isfinite(maximum_angle)||maximum_angle<0||
+  if(!frames.pbr||(!frames.mtoon&&mode!=PreparedMToonNormalEvaluation::Absent)||(!source&&(!generic||!bool(*generic)))||!std::isfinite(maximum_angle)||maximum_angle<0||
       frames.pbr->normals.size()!=low.indices.size()||frames.pbr->tangents.size()!=low.indices.size())
     throw std::invalid_argument("Filtered normal quality lost its actual target frame/projection owners");
   const auto &pbr=*frames.pbr;
@@ -86,17 +87,16 @@ inline void verify_filtered_normal_quality(const Mesh &low,const BakeSource &hig
         }else{
           std::array<float,3> mapped{};for(size_t k=0;k<3;++k)for(size_t c=0;c<3;++c)mapped[c]+=bary[k]*options.source_corner_barycentrics.at(triangle*3+k)[c];
           hit=SurfaceHit{};hit->triangle=options.source_triangles.at(triangle);hit->barycentric=mapped;
+          Vec3 projected{};for(size_t k=0;k<3;++k)projected+=high.mesh.normals.at(high.mesh.indices.at(size_t(hit->triangle)*3+k))*mapped[k];
+          if(length(projected)<1e-8f){const auto c=size_t(hit->triangle)*3;const auto a=high.mesh.positions.at(high.mesh.indices.at(c)),b=high.mesh.positions.at(high.mesh.indices.at(c+1)),d=high.mesh.positions.at(high.mesh.indices.at(c+2));projected=cross(b-a,d-a);}
+          hit->normal=normal_bake_math::unit(projected);
         }
         if(!hit)throw std::invalid_argument("Normal projection misses between texture samples; increase target paint resolution or adjust Bake projection");
         if(!options.allow_backfaces){
           const auto c=size_t(hit->triangle)*3;const auto a=high.mesh.positions.at(high.mesh.indices.at(c)),b=high.mesh.positions.at(high.mesh.indices.at(c+1)),d=high.mesh.positions.at(high.mesh.indices.at(c+2));
           if(dot(cross(b-a,d-a),normal)<=0)throw std::invalid_argument("Normal projection reaches a refused backface between texture samples; increase target paint resolution or adjust Bake projection");
         }
-        const auto c=size_t(hit->triangle)*3;
-        const auto a=high.mesh.positions.at(high.mesh.indices.at(c)),b=high.mesh.positions.at(high.mesh.indices.at(c+1)),d=high.mesh.positions.at(high.mesh.indices.at(c+2));
-        if(!options.allow_backfaces&&dot(cross(b-a,d-a),normal)<=0)
-          throw std::invalid_argument("Normal projection crosses a backface between texture samples; adjust Bake projection");
-        const auto desired=source(hit->triangle,hit->barycentric);
+        const auto desired=source?source(hit->triangle,hit->barycentric):(*generic)(*hit);
         const auto pb=normal_bake_basis(pv,weights,NormalFragmentBasis::UnitColumns);
         const auto tb=mode==PreparedMToonNormalEvaluation::Absent?pb:normal_bake_basis(tv,weights,mode==PreparedMToonNormalEvaluation::LegacyRawInterpolated?NormalFragmentBasis::RawColumns:NormalFragmentBasis::UnitCross);
         for(size_t role=0;role<2;++role){

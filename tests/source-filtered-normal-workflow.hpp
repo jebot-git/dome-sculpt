@@ -3,6 +3,7 @@
 #include "bake-target-resolution.hpp"
 #include "dome/bake-recipe.hpp"
 #include <fstream>
+#include <type_traits>
 namespace filtered_workflow {
 unsigned checks=0;
 void require(bool yes,const char *why){if(!yes)throw std::runtime_error(why);++checks;std::cout<<"PASS "<<why<<'\n';}
@@ -52,7 +53,16 @@ void probes(const Family &family,const Scene &scene){
   const auto position=center+x*((xy[0]+.5f)/96*2-1)*span+y*((xy[1]+.5f)/96*2-1)*span,r=position-a;
   const double d00=dot(ex,ex),d01=dot(ex,ey),d11=dot(ey,ey),den=d00*d11-d01*d01;const float v=float((d11*dot(r,ex)-d01*dot(r,ey))/den),w=float((d00*dot(r,ey)-d01*dot(r,ex))/den);const std::array<float,3>bary{1-v-w,v,w};
   require(*std::min_element(bary.begin(),bary.end())>.05f,"Every unchanged original graphical probe remains strictly interior");
-  for(size_t role=0;role<2;++role){const auto wanted=advanced_fixture::decode(source,0,bary,role),actual=direction(target,0,bary,role);double error=0;for(size_t c=0;c<3;++c)error=std::max(error,std::abs(wanted[c]-actual[c]));maximum=std::max(maximum,error);require(error<.035,"Explicit higher-resolution genuine Bake passes unchanged .035 at every original role/probe");}
+  for(size_t role=0;role<2;++role){
+   D wanted;
+   if(source.material_bindings&&source.material_bindings->normal_preparation)wanted=advanced_fixture::decode(source,0,bary,role);
+   else{
+    // Independent ordinary plane oracle: its source UV0 and declared data
+    // texture sampler are explicit, with no retained/prepared frame authority.
+    std::array<double,2> uv{};const auto &raw=source.painted->mesh();for(size_t k=0;k<3;++k)for(size_t axis=0;axis<2;++axis)uv[axis]+=raw.uv[raw.indices[k]][axis]*bary[k];
+    const auto maps=source.painted->source_maps();if(maps&&maps->normal.image){const auto &view=maps->normal;require(view.texcoord==0&&view.uv_transform==std::array<float,6>{1,0,0,1,0,0}&&view.wrap_s==33071&&view.wrap_t==33071&&view.mag_filter==9729,"Independent generic oracle authenticates its actual clamp/linear UV0 normal sampler");const auto q=sample(*view.image,uv);wanted=unit(D{(q[0]*2-1)*maps->normal_scale,(q[1]*2-1)*maps->normal_scale,q[2]*2-1});}else wanted={0,0,1};
+   }
+   const auto actual=direction(target,0,bary,role);double error=0;for(size_t c=0;c<3;++c)error=std::max(error,std::abs(wanted[c]-actual[c]));maximum=std::max(maximum,error);require(error<.035,"Explicit higher-resolution genuine Bake passes unchanged .035 at every original role/probe");}
  }
  std::cout<<"FILTERED_RESOLUTION_DIRECTIONS "<<family.name<<" maximum="<<maximum<<'\n';
 }
@@ -72,6 +82,27 @@ void positive(const Family &family,uint32_t resolution,const std::filesystem::pa
  require(doc.undo()&&doc.wait_mesh()&&doc.copy_scene().encode()==resized.encode()&&doc.redo()&&doc.wait_mesh()&&doc.copy_scene().encode()==accepted.encode(),"Bake remains one exact separate Undo/Redo step after explicit resolution selection");
  std::cout<<"FILTERED_RESOLUTION_WORKFLOW "<<family.name<<" target_resolution="<<resolution<<" source_resolution=64\n";
 }
+Family ordinary_plane(bool mapped){
+ Scene scene;auto &source=scene.active();Mesh mesh;mesh.positions={{-.5f,-.5f,0},{.5f,-.5f,0},{.5f,.5f,0},{-.5f,.5f,0}};mesh.normals.assign(4,{0,0,1});mesh.uv={{{0,0}},{{1,0}},{{1,1}},{{0,1}}};mesh.indices={0,1,2,0,2,3};source.mesh_active=true;
+ if(mapped){auto maps=std::make_shared<PaintSourceMaps>();auto im=std::make_shared<Image>();im->width=im->height=64;im->rgba.resize(64*64*4);for(size_t y=0;y<64;++y)for(size_t x=0;x<64;++x){const auto at=(y*64+x)*4;im->rgba[at]=128;im->rgba[at+1]=std::array<uint8_t,4>{64,112,160,208}[x%4];im->rgba[at+2]=245;im->rgba[at+3]=255;}maps->normal.image=im;maps->normal.wrap_s=maps->normal.wrap_t=33071;maps->normal.min_filter=maps->normal.mag_filter=9729;source.painted=capture_source_sampling(mesh,maps,64);}
+ else source.painted=std::make_shared<PaintedMesh>(mesh,64);
+ const auto id=source.id;auto low=mesh;if(mapped)for(auto &q:low.uv){const auto u=q[0];q={.2f+.6f*q[1],.8f-.6f*u};}
+ const auto target=scene.add("Ordinary source explicit target",Volume{});auto &o=scene.object(target);o.mesh_active=true;o.painted=std::make_shared<PaintedMesh>(low,64);o.material_bindings=blank_typed(false);scene.select(target);
+ return {std::move(scene),id,target,mapped?"unbound-normalmap":"unbound-plain-mesh"};
+}
+void ordinary_sources(const std::filesystem::path &folder,uint32_t resolution){
+ static_assert(!std::is_convertible_v<detail::GenericBakeNormalSampler,detail::SourceBakeNormalResolver>);
+ auto plain=ordinary_plane(false);require(!plain.scene.object(plain.source).material_bindings&&!detail::source_bake_normals(plain.scene.object(plain.source),{}),"Genuine ordinary source has no original/prepared material-frame resolver");
+ auto plane=plain.scene.snapshot();bake_object(plane,plain.source,settings());require(plane.active().bake_recipe->settings.normal_filter_quality==1,"Ordinary mesh to prepared-target Bake records an actually checked filtered policy");probes(plain,plane);unchanged_source(plane,plain.scene,plain.target);
+ auto raw=plain.scene.snapshot();auto legacy=settings();legacy.prepare_normals=false;bake_object(raw,plain.source,legacy);require(raw.active().bake_recipe->settings.normal_filter_quality==0&&!raw.active().bake_recipe->encode()["settings"].contains("normal_filter_quality"),"Unprepared raw Bake explicitly retains legacy semantics and never claims filtered preparation");
+ auto mapped=ordinary_plane(true);require(!mapped.scene.object(mapped.source).material_bindings&&!detail::source_bake_normals(mapped.scene.object(mapped.source),{}),"Actual ordinary original-normal texture does not borrow paired frame authority");low_refusal(mapped,folder);positive(mapped,resolution,folder);
+ Scene sculpt;sculpt.active().volume=std::make_shared<Volume>(.03f);sculpt.active().volume->begin_stroke();Brush brush;brush.radius=.4f;brush.blend=0;sculpt.active().volume->stamp(brush);sculpt.active().volume->end_stroke();const auto original=sculpt.active().volume->geometry_owner();
+ const auto source=sculpt.active().id;Mesh patch;patch.positions={{-.08f,-.08f,.35f},{.08f,-.08f,.35f},{.08f,.08f,.35f},{-.08f,.08f,.35f}};patch.normals.assign(4,{0,0,1});patch.uv={{{0,0}},{{1,0}},{{1,1}},{{0,1}}};patch.indices={0,1,2,0,2,3};
+ const auto target=sculpt.add("Actual sculpt prepared target",Volume{});sculpt.object(target).mesh_active=true;sculpt.object(target).painted=std::make_shared<PaintedMesh>(patch,64);sculpt.select(target);const auto before=sculpt.encode();
+ require(!sculpt.object(source).mesh_active&&!sculpt.object(source).material_bindings,"Actual sculpt source has neither painting nor material-frame adapter");bake_object(sculpt,source,settings());require(sculpt.active().bake_recipe->settings.normal_filter_quality==1&&sculpt.object(source).volume->geometry_owner()==original,"Actual sculpt-to-prepared-target Bake uses filtered generic normals and preserves exact volume authority");
+ const std::array<float,3>bary{.2f,.3f,.5f};Vec3 position{};for(size_t k=0;k<3;++k)position+=patch.positions[patch.indices[k]]*bary[k];const auto expected=unit(D{position.x,position.y,std::sqrt(.16-position.x*position.x-position.y*position.y)});for(size_t role=0;role<2;++role){const auto actual=direction(sculpt.active(),0,bary,role);double error=0;for(size_t c=0;c<3;++c)error=std::max(error,std::abs(expected[c]-actual[c]));require(error<.035,"Independent spherical SDF direction agrees at the actual generic sculpt projection");}
+ sculpt.save(folder/"ordinary-sculpt-filtered.dsculpt");require(Scene::load(folder/"ordinary-sculpt-filtered.dsculpt").encode()==sculpt.encode(),"Actual generic sculpt filtered result and checked policy survive native reopen");
+}
 void cancellation(uint32_t resolution){
  auto family=before(false,false,false,SourceNormalUvMethod::Rasterize);
  detail::resize_unpainted_bake_target(family.scene,family.target,resolution);
@@ -83,7 +114,7 @@ void cancellation(uint32_t resolution){
  }
 }
 int run(const std::filesystem::path &folder,const std::filesystem::path &old,uint32_t resolution){
- std::filesystem::create_directories(folder);legacy(old,folder);cancellation(resolution);unsigned positives=0,refusals=0;
+ std::filesystem::create_directories(folder);legacy(old,folder);ordinary_sources(folder,resolution);cancellation(resolution);unsigned positives=0,refusals=0;
  for(bool legacy:{false,true})for(bool live:{false,true})for(bool seam:{false,true})for(auto method:{SourceNormalUvMethod::Rasterize,SourceNormalUvMethod::RetainSource}){
   auto family=before(legacy,live,seam,method);if(method==SourceNormalUvMethod::RetainSource){low_refusal(family,folder);++refusals;}positive(family,resolution,folder);++positives;
  }
