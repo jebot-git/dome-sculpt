@@ -113,7 +113,7 @@ void verify(const Scene &scene,const CreatedHumanoid &model,const std::filesyste
   for(size_t i=0;i<old.at("colliders").size();++i){const auto &a=old.at("colliders")[i],&b=next.at("colliders")[i];auto center=position(asset,source)+unity(xyz(a.at("offset")));auto expected=shaped_world(source,center);auto actual=emitted_world(source,unity(xyz(b.at("offset"))));near(actual,expected);float r=a.at("radius"),emitted=b.at("radius");check(emitted>0&&emitted<r*warp.scale*8+1e-4f,"Conservative collider radius remains finite and bounded");
    // Independent surface and interior witnesses test containment, not the
    // interval implementation or its own claimed error estimates.
-   for(size_t k=0;k<4096;++k){float y=1-2*(k+.5f)/4096,angle=float(k)*2.39996323f,rr=std::sqrt(1-y*y);auto d=Vec3{rr*std::cos(angle),y,rr*std::sin(angle)};for(float interior:{.25f,.65f,1.f}){auto p=native_world(warp(center+d*(r*interior)));float scale=scene.groups().front().transform.scale;float margin=emitted*scale-length(p-actual);smallest_margin=std::min(smallest_margin,margin);if(margin < -2e-5f)throw std::runtime_error("Shaped source sphere escapes emitted conservative collider");++samples;}}
+   for(size_t k=0;k<4096;++k){float y=1-2*(k+.5f)/4096,angle=float(k)*2.39996323f,rr=std::sqrt(1-y*y);auto d=Vec3{rr*std::cos(angle),y,rr*std::sin(angle)};for(float interior:{.25f,.65f,1.f}){auto p=shaped_world(source,center+d*(r*interior));float scale=scene.groups().front().transform.scale;float margin=emitted*scale-length(p-actual);smallest_margin=std::min(smallest_margin,margin);if(margin < -2e-5f)throw std::runtime_error("Shaped source sphere escapes emitted conservative collider");++samples;}}
    ++spheres;
   }
  }
