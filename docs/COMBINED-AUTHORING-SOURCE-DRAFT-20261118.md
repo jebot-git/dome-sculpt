@@ -11,15 +11,17 @@ normal/material ownership checks. The merged helper retains those checks and
 receives the actual resolver from Bake. Generic numerical capture receives an
 empty resolver and cannot authorize prepared or canonical packets.
 
-Fresh CPU Release CMake configuration passes with the current canonical DomeD
-FLTK SDK and private bitmap runtime. A completely fresh whole application-target
-build is running under `ds-authoring-combined-release-app-20261118.service`,
+Fresh CPU Release CMake configuration and the whole application-target build
+now pass with the current canonical DomeD FLTK SDK and private bitmap runtime.
+Read [the actual build/audit/loader result](COMBINED-AUTHORING-APP-BUILD-20261118.md).
+The build runs under `ds-authoring-combined-release-app-20261118.service`,
 MainPID1327750/Invocation3721533d8d604d8c8c8a0b36d3b30149. Its1948 input pins,
 actual compiler commands and raw retained depfiles belong to
 `artifacts/authoring-combined-release-20261118`. One compiler job uses a900-second
 per-command timeout,3GiB per-command address limit and4GiB aggregate unit limit.
-No objects or archives are copied from parent builds. Inspect the actual unit
-and status before acting; this document does not assert build completion.
+No objects or archives are copied from parent builds. The completed unit is
+captured with its journal and stopped. The original source receipt remains the
+composition-time snapshot; the later proof records actual build completion.
 
 The original creator3666 runtime-reporter compile failure and correctionb0ca
 are separate. That reporter is not part of this App target. Merge the test-only

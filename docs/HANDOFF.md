@@ -247,9 +247,11 @@ writable64/619634 and joint8/346305. All121 ordered Save pairs match exactly;
 read [the component proof](ARTIST-WRITABLE-JOINT-NATIVE-20261118.md).
 This adds immutable paint-attachment capture, source-menu eligibility, correct
 independent PBR/material sampling and bounded colour/normal ancestor replay.
-Original compile/link/fixture failures remain preserved. Strict sanitizer441,
-matching new-packet graphics and a new whole application remain pending;
-product85 sanitizer results do not qualify441.
+Original compile/link/fixture failures remain preserved. Fresh strict sanitizer441
+now also passes all six suites/1754756 checks and121 exact ordered Save pairs;
+read [the strict component proof](SOURCE441-STRICT-SANITIZE-20261118.md).
+Matching new-packet graphics and the combined application's own native/sanitizer
+qualification remain pending. Product85 results are not relabeled441 or combined.
 
 ## Coherent integration build
 
@@ -274,15 +276,27 @@ source worktree frozen, including tests and CMake files.
 
 The newer real-merge draftab497007 on
 work/authoring-combined-source-20261118 combines main4416, SOURCE441/proof9bba,
-filtered-quality8eba and creator75/test3666. Fresh Release configuration passes;
-its fresh whole App target is actively compiling under
+filtered-quality8eba and creator75/test3666. Its fresh whole App target now
+passes244 actual compiler owners/195 core members and262 steps in1116.610s under
 ds-authoring-combined-release-app-20261118.service, Main1327750,
-Invocation3721533d8d604d8c8c8a0b36d3b30149. No borrowed objects or runtime
-qualification. Read
-[the integration draft](COMBINED-AUTHORING-SOURCE-DRAFT-20261118.md).
-Keep this source frozen until actual build closure. The test-only creator
-reporter correctionb0ca must be merged afterward; that reporter is not an App
-target input, and no all-target build is claimed.
+Invocation3721533d8d604d8c8c8a0b36d3b30149. Actual dependencies, the complete
+195-member archive and174 linker inputs are audited. Ordinary
+loader72/version0 also pass. The completed unit/journal are captured and stopped;
+read [the exact build scope](COMBINED-AUTHORING-APP-BUILD-20261118.md).
+No native/GL/application workflow or all-target acceptance is claimed for this
+union. Keep its source and artifact tree frozen.
+
+The separate pushed successor63956adc on
+work/authoring-combined-checked-source-20261118 real-merges the bounded2048
+target-resize childea838 and creator reporter/wordingd566. Its CMake conflict
+resolution retains current filtered and full legacy17 tests plus all canonical,
+writable and joint targets. Fresh App/seven-fixture compilation now completes0
+with251 actual compiler owners/195 core members,276 steps in551.078s under
+ds-authoring-combined-checked-release-20261118.service, Main1549843,
+Invocation5f3dc23a5a99429d80b4351fca6d9067. Actual dependency/archive/link audit
+also passes, and the terminal unit/journal are captured before stopping.
+Read [the exact selected scope](COMBINED-CHECKED-APP-FIXTURES-BUILD-20261118.md).
+No whole-family native or graphical qualification follows from compilation.
 
 Fresh strict ASan/UBSan full core plus4 fixtures completes0 from immutable b11/
 product85 in artifacts/canonical-normal-headless-sanitize-20261118:193 fresh core
@@ -307,18 +321,36 @@ do not restart them. The compressed scoped proof is committed above.
   real legacy recipe proof; a new ordinary normal-texture1024 retry fails
   the strict filtered bound. A full independent off-centre scan confirms actual
   .03706908-radian peaks above the .03 bound; the guard correctly refuses it.
-  A sparse earlier diagnostic missed those narrow peaks. Explicit2048 retry
-  and its bounded resize work allowance are next. No higher-resolution accepted
-  workflow or final GL matrix is claimed.
+  A sparse earlier diagnostic missed those narrow peaks. Bounded2048 resize
+  childea838 compiles and its actual ordinary-mapped2048 Document Bake/Save/
+  reopen/UndoRedo passes, alongside plain and sculpt controls. Caller64M/byte/
+  Cancel refusals remain. One advanced raster1024 case passes, but the next
+  retained case correctly refuses1024; an explicit2048/2048 cohort retry is next.
+  No complete checked-family or final GL matrix is claimed.
 - Writable-source agent completes fresh strict sanitizer441 compilation in
   artifacts/source441-headless-sanitize-20261118 under
   ds-source441-headless-sanitize-build-v1-20261118.service, Main1028537,
   Invocation7d2d0e1ca81346d193559358927aee84:214 actual owners/193core+15support+
   6fixtures,1782.096s, all fresh and no drift. Actual dependency/archive/flag
   audit passes; the terminal unit is captured then stopped. Strict six-suite
-  runtime now runs under ds-source441-headless-sanitize-native-v1-20261118.service,
-  Main1336741/Invocation694921ebb86a44da82e6bfe553c56da9. Inspect actual runtime
-  status before acting. The
+  runtime also completes0 under
+  ds-source441-headless-sanitize-native-v1-20261118.service,
+  Main1336741/Invocation694921ebb86a44da82e6bfe553c56da9. Terminal/journal and
+  cleanup are captured before stopping. Root independently rehashes30 evidence
+  artifacts,214 object/MD pairs,662 source pins and all121 native/ordered pairs.
+  Fixture-only child7e740963 rooted63956 preserves historical0 constructors and
+  adds selectable checked1/refusal routes for all32/64/8 axes; no production or
+  default downgrade. Six fresh R fixture TUs and six links against the audited
+  195-core/15-support archive set pass. Selected512 canonical00000 and writable
+  000000 canaries now pass real resize/history, currentchecked1, all-grid
+  independent extrema and full Save/reopen; joint000 is still running at this
+  snapshot. These are selected cases, not all104 or historical121 acceptance.
+  Root's fresh combined217-owner SAN build runs in
+  artifacts/authoring-combined-checked-sanitize-20261118 under
+  ds-authoring-combined-checked-sanitize-build-20261118.service, Main1700029 /
+  Invocation1a7e960333d2493f92fef7f4973304c9. Source7e remains frozen, production
+  exact63956, no inherited R/S payloads. Inspect actual unit/status before acting.
+  The
   six-suite Release result above is terminal; preserve all fixed source/test
   role boundaries and original failures. New-packet graphics/App remain pending.
 - Creator agent owns work/vroid-creator-workspace-20261118. Initial source7f3911ca
@@ -330,7 +362,16 @@ do not restart them. The compressed scoped proof is committed above.
   Fresh source75ee61fb completes its whole core/App/fixture/runtime build under
   ds-vroid-creator-release-v2-build-20261118.service, Main1203476,
   Invocation90d2f9ecf386482199622a84aa713962, all195core/266 build steps0 with no
-  drift, captured/stopped. No recolour runtime proof is claimed yet. Test-only
+  drift, captured/stopped. Actual female26 controls, fitted-groom RGB, source
+  metadata, rest/posed+morph and native save checks pass. The next GLB assertion
+  incorrectly assumed non-white baseColorFactor; actual export bakes the colour
+  into textures with factor1. Its independent effective-colour/UV/alpha oracle
+  is being corrected; male and full export acceptance remain incomplete.
+  The separate controller/workspace case now passes44 actual checks, including
+  current hair RGB, local/global history, queued Cancel, focus and retired
+  generation/session/authority. Its own unit is captured/stopped with free lease.
+  Generated-groom VRM transport remains a real later implementation requirement.
+  Test-only
   childb0ca corrects a reporter placement compile error retained from3666;
   production remains75. A fresh strict creator sanitizer build is separate.
   The missing XR body/face/hair/tint controls now have an unqualified shared

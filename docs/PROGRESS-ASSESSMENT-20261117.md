@@ -81,9 +81,11 @@ are implemented on a further isolated child. All six Release component suites
 pass, including64 writable cases/619634 checks and8 joint cases/346305 checks,
 with121 exact ordered Save pairs. Read
 [the actual component result](ARTIST-WRITABLE-JOINT-NATIVE-20261118.md).
-Their new sanitizer/graphics/application gates remain pending.
-The fresh six-fixture sanitizer compilation and dependency/archive audit now
-pass; actual strict runtime is underway and remains separate from that build.
+Their fresh strict sanitizer gate now also passes all six native suites:
+1754756 checks and121 exact ordered Save pairs. Root independently verifies
+the evidence, actual214 object/MD pairs and all saved pairs. Read
+[the scoped sanitizer proof](SOURCE441-STRICT-SANITIZE-20261118.md).
+New-family graphics and combined application qualification remain pending.
 
 The coherent canonical/public candidate8a8ecea1 completes a fresh optimized
 application build:242 actual compiler dependency owners including all193 core
@@ -99,18 +101,30 @@ These are distinct scoped results, not all-target or newer-product441 acceptance
 
 The newer isolated combined draftab497007 merges SOURCE441, filtered-quality8eba
 and creator75 through actual history. Fresh configuration passes and the whole
-App target is compiling with no inherited objects; see
-[the source-composition milestone](COMBINED-AUTHORING-SOURCE-DRAFT-20261118.md).
-This draft is not a new admitted application. A full independent scan confirms
+App target now completes with244 fresh compiler owners/195 core members,
+actual dependency/archive/link audit and ordinary loader72/version0; see
+[the combined build result](COMBINED-AUTHORING-APP-BUILD-20261118.md).
+This draft is not a new admitted application. A separate pushed63956 child adds
+bounded2048 resizing and the creator reporter fix; its fresh App/seven-fixture
+build and audit now also pass251 owners/195 core members. Read
+[the selected compilation proof](COMBINED-CHECKED-APP-FIXTURES-BUILD-20261118.md).
+Its combined strict sanitizer build is underway. A full independent scan confirms
 the quality guard correctly rejects1024-pixel narrow normal peaks; explicit2048
-recovery and bounded resize work remain to qualify.
+recovery now passes the ordinary-mapped Document workflow. The full advanced
+cohort still needs its explicit2048 retry after a correct retained1024 refusal.
 
 The next independent creator slice implements a shared native XR draft for
 existing body/face/hair/tint controls and additive avatar variations. Real effects
 of26 controls on both CC0 models, source/skin/morph preservation and actual
 controller workflows are still under verification. Its fresh complete native
 core/application build passes, but the new recolour runtime checks have not yet
-run. Filtered normal quality and
+complete. Female26 controls and fitted-groom RGB/native preservation pass;
+the export fixture needs to check effective baked texture colour rather than
+assuming the exporter stores colour in a factor. Male and broader desktop/XR
+checks remain pending. The controller workspace now passes44 checks, including
+Apply/Cancel, history, ordered Save and stale session/authority guards.
+Generated-groom VRM transport is a real implementation
+requirement. Filtered normal quality and
 the explicit target-resolution workflow remain active production work.
 
 The user-accepted controller selection/hierarchy/multiselection/ghost interface

@@ -1,0 +1,757 @@
+{
+  "state": "FRESH_COMBINED_APP_BUILD_AND_LOADER_PASSED_NOT_MAIN_ADMISSION",
+  "source": "ab497007be942fb0d5418b6c5749e7717fe27913",
+  "source_branch": "work/authoring-combined-source-20261118",
+  "build": {
+    "state": "actual_whole_App_build_audit_passed",
+    "source": "ab497007be942fb0d5418b6c5749e7717fe27913",
+    "scope": "Fresh optimized CPU whole application target only; no product/GL execution and no native/all-target/sanitizer acceptance",
+    "owner_count": 244,
+    "core_member_count": 195,
+    "dependency_incidences": 94819,
+    "actual_dependency_paths": 1630,
+    "actual_link_incidences": 174,
+    "application_sha256": "0e21b85fbada84b837dd8439b5e5a9eec280e2c0cb67f5bf3e1821ea5dccb6a4",
+    "core_archive_sha256": "ed4b6e9754d0a50943f4c80c1ac6cb8fe34829949dec36288492e1232b81bbc9",
+    "plan_sha256": "9ac2b9bf2a0ee651f93837eb8f44215d9485d0c2cd290280095ad26e38bcb782",
+    "build_status_sha256": "9bf881315356903b77dfef8e1ee0a4d05f38600fc725d6fc64b57c5de067bc30",
+    "audit_driver_sha256": "1c2f963cc6701872b72255b7de12f00124fe448651bba35f5a73d0bc5572464c",
+    "input_drift": [],
+    "artifacts": {
+      "actual-target-commands.txt": "c1633635c599a858b71985d602ad2c0a8bd4221945123c0e2f12d84227059a65",
+      "actual-MD-owners.json": "dd153bef074e01ec30804d6a752eedff12c8340c1d8e511f1e03bf73a79dbed3",
+      "actual-input-manifest.json": "897648129995a29ac4b1f8e823d3e9502b8bdb5495582581752bf04318fde563",
+      "actual-core-members.json": "8385b85438670d6f8472b5e31f47627989d1919289d1d92c914cde821369d123",
+      "actual-link-inputs.json": "e4c011ffc5ccc8bfa844bd3a6f559bb4c3057f24d99fe02f1c05023f2800d916",
+      "app-readelf-dynamic.txt": "68bfbd4ac2c445d46b182f72a4c23569268456e2172d1e871a37c221ff33c340"
+    }
+  },
+  "build_seconds": 1116.6100312219933,
+  "unit": {
+    "name": "ds-authoring-combined-release-app-20261118.service",
+    "main_pid": 1327750,
+    "invocation": "3721533d8d604d8c8c8a0b36d3b30149",
+    "actual_terminal_captured": true,
+    "actual_unit_journal_captured": true,
+    "cgroup_survivors": [],
+    "stopped_after_terminal_capture": true,
+    "memory_peak_bytes": 1034887168
+  },
+  "loader": {
+    "state": "terminal",
+    "source": "ab497007be942fb0d5418b6c5749e7717fe27913",
+    "application_sha256": "0e21b85fbada84b837dd8439b5e5a9eec280e2c0cb67f5bf3e1821ea5dccb6a4",
+    "prior_provider_status_sha256": "7af9e5177964f82d9fdef315a604c304e799337ed9b9ace94a6a15dadde873fb",
+    "steps": [
+      {
+        "name": "ldd",
+        "argv": [
+          "/usr/bin/ldd",
+          "/home/blux/de-xr/dome-sculpt/artifacts/authoring-combined-release-20261118/dome-sculpt"
+        ],
+        "exit": 0,
+        "seconds": 0.007032430992694572,
+        "log_sha256": "798fac3ffc3766cc4b8a814e3fbaf713fa7d3ddd4605e1061d00d75828a8fb95"
+      },
+      {
+        "name": "version",
+        "argv": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/authoring-combined-release-20261118/dome-sculpt",
+          "--version"
+        ],
+        "exit": 0,
+        "seconds": 0.014598918001865968,
+        "log_sha256": "9455a20a636a6599ace60120261649d3b29dc51fe2c774305994879190e7336b"
+      }
+    ],
+    "lease_acquired": 1794967501.8974328,
+    "lease_inode": 99618,
+    "lease_dev": 40,
+    "driver_sha256": "905fbce585c699e1538e19207398cd5420152714c99b6c82afa7f79a2df01293",
+    "providers": [
+      {
+        "literal": "/home/blux/de-xr/dome-sculpt/artifacts/sdk-20261111/toolkit-release/lib/libfltk_images.so.1.4",
+        "resolved": "/home/blux/de-xr/dome-sculpt/artifacts/sdk-20261111/toolkit-release/lib/libfltk_images.so.1.4.5",
+        "sha256": "0338c08509d74d955027cf416432123ed2bf76e26c66624aa31bda24320eb572"
+      },
+      {
+        "literal": "/home/blux/de-xr/dome-sculpt/artifacts/sdk-20261111/toolkit-release/lib/libfltk_gl.so.1.4",
+        "resolved": "/home/blux/de-xr/dome-sculpt/artifacts/sdk-20261111/toolkit-release/lib/libfltk_gl.so.1.4.5",
+        "sha256": "80fe06ef20f89d163887fa70ec2786ece51951b8b051b5a1c1e11ea518f9b39e"
+      },
+      {
+        "literal": "/usr/lib64/libGLU.so.1",
+        "resolved": "/usr/lib64/libGLU.so.1.3.1",
+        "sha256": "97e521f2ed137f15978a6122869933c1b507604ee1a5b8df3a1e1c47eaf091af"
+      },
+      {
+        "literal": "/usr/lib64/libjpeg.so.62",
+        "resolved": "/usr/lib64/libjpeg.so.62.4.0",
+        "sha256": "beb79376b4544260da3c31603784c908b58bdb959cbe1d8c48075dfa7d5bc80c"
+      },
+      {
+        "literal": "/usr/lib64/libpng16.so.16",
+        "resolved": "/usr/lib64/libpng16.so.16.59.0",
+        "sha256": "536a1ed876bffe5a7e9204aae387d4da2d4a969bf716bbcf4a03c30a8dea0cde"
+      },
+      {
+        "literal": "/home/blux/de-xr/dome-sculpt/artifacts/sdk-20261111/toolkit-release/lib/libfltk.so.1.4",
+        "resolved": "/home/blux/de-xr/dome-sculpt/artifacts/sdk-20261111/toolkit-release/lib/libfltk.so.1.4.5",
+        "sha256": "a2ad085ef43833b0c059590f514c05670a9c75b046ad83edacecd789eca5f4fd"
+      },
+      {
+        "literal": "/opt/fltk-vr/bdf-runtime/lib/libcairo.so.2",
+        "resolved": "/opt/fltk-vr/bdf-runtime/lib/libcairo.so.2.11804.4",
+        "sha256": "1ed911142499c8022051224ef7afe1cf07b91600976b7a16c26d5d0776911444"
+      },
+      {
+        "literal": "/usr/lib64/libX11.so.6",
+        "resolved": "/usr/lib64/libX11.so.6.4.0",
+        "sha256": "95b9ecfbde1b73c7f7380ae643e8ade9555234607a47d7e131ae6365a9899244"
+      },
+      {
+        "literal": "/usr/lib64/libGL.so.1",
+        "resolved": "/usr/lib64/libGL.so.1.7.0",
+        "sha256": "cc4380adee239f7d4e0b5674ffde3d3add2e030778fb48db290bd96eafaf50e5"
+      },
+      {
+        "literal": "/usr/lib64/libSM.so.6",
+        "resolved": "/usr/lib64/libSM.so.6.0.1",
+        "sha256": "7308114c821f61001c16dba6655d5110bb40e17f7ce174ec0b8a4b89df3f2a2b"
+      },
+      {
+        "literal": "/usr/lib64/libICE.so.6",
+        "resolved": "/usr/lib64/libICE.so.6.3.0",
+        "sha256": "b07cf955787c878295c219a80c8700d54bc4f0cf7de27046e6147339b5309b53"
+      },
+      {
+        "literal": "/usr/lib64/libXext.so.6",
+        "resolved": "/usr/lib64/libXext.so.6.4.0",
+        "sha256": "09056dd620dc643dc1c2ed20041fa11de6a981dd0f618d6785124b4bdc607a1e"
+      },
+      {
+        "literal": "/usr/lib64/libXinerama.so.1",
+        "resolved": "/usr/lib64/libXinerama.so.1.0.0",
+        "sha256": "c26b04205179ad676e6167d3a400096de6fbe7df37b9ac413c0c392219eadfba"
+      },
+      {
+        "literal": "/usr/lib64/libXfixes.so.3",
+        "resolved": "/usr/lib64/libXfixes.so.3.1.0",
+        "sha256": "6160ee5edaa0aa4e96d263b16fcc41892567e82aca7e6d5bbb2a3d2e2bc4fa6f"
+      },
+      {
+        "literal": "/usr/lib64/libXcursor.so.1",
+        "resolved": "/usr/lib64/libXcursor.so.1.0.2",
+        "sha256": "64b20bf5a9382108cdfd1be6cdc7f48b1847efec3687eafd87223e03d7e7e00c"
+      },
+      {
+        "literal": "/usr/lib64/libXrender.so.1",
+        "resolved": "/usr/lib64/libXrender.so.1.3.0",
+        "sha256": "4f7ea2102236e35b7844d83ba1bfc2ed6a74a62e6b51468e9801e3fa3b3ad31e"
+      },
+      {
+        "literal": "/opt/fltk-vr/bdf-runtime/lib/libfreetype.so.6",
+        "resolved": "/opt/fltk-vr/bdf-runtime/lib/libfreetype.so.6.20.6",
+        "sha256": "826c2bf3007f04253719b5492314fb0521e5f6c4a55b9d18e48995b7d1f95c97"
+      },
+      {
+        "literal": "/usr/lib64/libXft.so.2",
+        "resolved": "/usr/lib64/libXft.so.2.3.8",
+        "sha256": "acd4c412db6e9fe2bbfa79d0acdb4b7fed07363d96a85966503789f6fa2ab062"
+      },
+      {
+        "literal": "/usr/lib64/libwayland-egl.so.1",
+        "resolved": "/usr/lib64/libwayland-egl.so.1.26.0",
+        "sha256": "aadf6a7ce686e3857353f6cc6e4deae84d7907f5afbce3f952593685b0a9196d"
+      },
+      {
+        "literal": "/usr/lib64/libwayland-cursor.so.0",
+        "resolved": "/usr/lib64/libwayland-cursor.so.0.26.0",
+        "sha256": "a54964427c68e87ce5efebca336fd6db7dcdff92c875861b1480096080214445"
+      },
+      {
+        "literal": "/usr/lib64/libxkbcommon.so.0",
+        "resolved": "/usr/lib64/libxkbcommon.so.0.13.1",
+        "sha256": "4ca0a8544873c3b7feafe4b0086ddf74e389e3a739da1e3a940a2aa15a441819"
+      },
+      {
+        "literal": "/usr/lib64/libGLX.so.0",
+        "resolved": "/usr/lib64/libGLX.so.0.0.0",
+        "sha256": "e2b8a09e81b686d1184fd7d60e69673bc7bfc7a89ce0ff1ba843a2450542e01b"
+      },
+      {
+        "literal": "/usr/lib64/libOpenGL.so.0",
+        "resolved": "/usr/lib64/libOpenGL.so.0.0.0",
+        "sha256": "07a014ea0624d5d9711f941fb0401a203c2025b683d34897bd1b261a32a83d69"
+      },
+      {
+        "literal": "/usr/lib64/libz.so.1",
+        "resolved": "/usr/lib64/libz.so.1.3.1.zlib-ng",
+        "sha256": "bbde8faec092a7c67b8bd76bbba4a826e61b05c171b97004ce6b308c5a090351"
+      },
+      {
+        "literal": "/usr/lib64/liblapacke.so.3",
+        "resolved": "/usr/lib64/liblapacke.so.3.12.0",
+        "sha256": "4e74d393b6f5f294cbd96b777da8be3ada9995b1da98aaa0c1eb5fea4b294c7c"
+      },
+      {
+        "literal": "/usr/lib64/libOpenEXR-3_2.so.31",
+        "resolved": "/usr/lib64/libOpenEXR-3_2.so.31.3.2.4",
+        "sha256": "efdbbe75b27b6a50e4a8e028e008fde32befa53280295e21ef6f036350225769"
+      },
+      {
+        "literal": "/usr/lib64/libOpenEXRUtil-3_2.so.31",
+        "resolved": "/usr/lib64/libOpenEXRUtil-3_2.so.31.3.2.4",
+        "sha256": "bafa0a2cb708d3ae952987c013d96e992badbb742e1a8e4fac6605c7eae5b5a0"
+      },
+      {
+        "literal": "/usr/lib64/libOpenEXRCore-3_2.so.31",
+        "resolved": "/usr/lib64/libOpenEXRCore-3_2.so.31.3.2.4",
+        "sha256": "bc6775af6f33d58d41f20e714d80db4b0fd21209796a6694cb5249739a49a331"
+      },
+      {
+        "literal": "/usr/lib64/libIex-3_2.so.31",
+        "resolved": "/usr/lib64/libIex-3_2.so.31.3.2.4",
+        "sha256": "da965da4711be1158555d457dc6ff17582ec88c1b86d98edc69f09cdcc4f6c7a"
+      },
+      {
+        "literal": "/usr/lib64/libIlmThread-3_2.so.31",
+        "resolved": "/usr/lib64/libIlmThread-3_2.so.31.3.2.4",
+        "sha256": "424321e69eb6257387820baa90e4fccb209c5dcb8c88589a8c5e1ccf4d4c23d6"
+      },
+      {
+        "literal": "/usr/lib64/libImath-3_1.so.29",
+        "resolved": "/usr/lib64/libImath-3_1.so.29.11.0",
+        "sha256": "1e86ce61e14061369bd937b73d53abb69305dff34df4700f99a459f5c024ab45"
+      },
+      {
+        "literal": "/usr/lib64/libEGL.so.1",
+        "resolved": "/usr/lib64/libEGL.so.1.1.0",
+        "sha256": "76ffc090b8990696d028e7d1bc82606c564565fb05d2fa9e5f6122b61e9f1b60"
+      },
+      {
+        "literal": "/opt/fltk-vr/bdf-runtime/lib/libharfbuzz.so.0",
+        "resolved": "/opt/fltk-vr/bdf-runtime/lib/libharfbuzz.so.0.61410.0",
+        "sha256": "0a4db8370eeb4f566cee39291bc3b287cb6f289c35da93dab2736e7e63c3964b"
+      },
+      {
+        "literal": "/usr/lib64/libfontconfig.so.1",
+        "resolved": "/usr/lib64/libfontconfig.so.1.16.0",
+        "sha256": "ab67796a1071ee7fe53d89d4ece93a3805134d9c21931687a4f05fa5132036fd"
+      },
+      {
+        "literal": "/usr/lib64/libicui18n.so.77",
+        "resolved": "/usr/lib64/libicui18n.so.77.1",
+        "sha256": "0fcf90854b567a4e1807287c252fcb427e302b3bc18ec5ecb887b2d471d33e23"
+      },
+      {
+        "literal": "/usr/lib64/libicuuc.so.77",
+        "resolved": "/usr/lib64/libicuuc.so.77.1",
+        "sha256": "2dd954df5964f2aa6c6e431873d6200af9198343ed4813c8b39240776311c5cb"
+      },
+      {
+        "literal": "/usr/lib64/libopenxr_loader.so.1",
+        "resolved": "/usr/lib64/libopenxr_loader.so.1.1.65",
+        "sha256": "c5c40e418e83253fcea872a71da5ff59fd84ad53a2b539072554e65f2a9c1b21"
+      },
+      {
+        "literal": "/usr/lib64/libgio-2.0.so.0",
+        "resolved": "/usr/lib64/libgio-2.0.so.0.8800.4",
+        "sha256": "ab36f44b03c3d790fc7adfd213147b2b37dc7d337dfc0836e08da40c775c1eae"
+      },
+      {
+        "literal": "/usr/lib64/libgobject-2.0.so.0",
+        "resolved": "/usr/lib64/libgobject-2.0.so.0.8800.4",
+        "sha256": "382377b2a6fecc3a09e474282a56f3cf0f27b2785ee319ea6e2dd2ea6836abf1"
+      },
+      {
+        "literal": "/usr/lib64/libglib-2.0.so.0",
+        "resolved": "/usr/lib64/libglib-2.0.so.0.8800.4",
+        "sha256": "7838c9cf93c8e09b83f020d3f3f5b0ddabd0cba7c09340d9f257dc1ae8700297"
+      },
+      {
+        "literal": "/usr/lib64/libwayland-client.so.0",
+        "resolved": "/usr/lib64/libwayland-client.so.0.26.0",
+        "sha256": "cb517c02f6e808257932a4b3f1a4bd1232ce415cdd8e41a854ff0f0e918b51c9"
+      },
+      {
+        "literal": "/usr/lib64/libgcc_s.so.1",
+        "resolved": "/usr/lib64/libgcc_s-16-20261029.so.1",
+        "sha256": "5a52ae4a6f1b119aa092aa1483c967e19d9ba036b1b0c2133236a8a2ce826ebf"
+      },
+      {
+        "literal": "/usr/lib64/libstdc++.so.6",
+        "resolved": "/usr/lib64/libstdc++.so.6.0.36",
+        "sha256": "49811507d8fc0283d8f8023546613774c673f876fe823b1b99d0c8d46039deda"
+      },
+      {
+        "literal": "/usr/lib64/libm.so.6",
+        "resolved": "/usr/lib64/libm.so.6",
+        "sha256": "16a03ce6d24c8a46742206d4a9c1d35bb6577ae2384f153dc6ef4a4b62b5357f"
+      },
+      {
+        "literal": "/usr/lib64/libc.so.6",
+        "resolved": "/usr/lib64/libc.so.6",
+        "sha256": "a5c5ad9d59d3c69eda93aa8f82930ba06cc4e893a113e66c85ad6e96243d53c8"
+      },
+      {
+        "literal": "/usr/lib64/libxcb.so.1",
+        "resolved": "/usr/lib64/libxcb.so.1.1.0",
+        "sha256": "bf956c968976ceec84ec036337340f402086fe7e45f11f80ae4cd9f27d179af9"
+      },
+      {
+        "literal": "/usr/lib64/libxcb-render.so.0",
+        "resolved": "/usr/lib64/libxcb-render.so.0.0.0",
+        "sha256": "c7556acc3f5a6f95a50e07f74fac2cc32f08eed9b3f3290b7fbc5697550ec2a6"
+      },
+      {
+        "literal": "/usr/lib64/libxcb-shm.so.0",
+        "resolved": "/usr/lib64/libxcb-shm.so.0.0.0",
+        "sha256": "a95a7918831432d6b7c9318ae412f2860a1b032d41f1ccfdcd4eca7d90d30690"
+      },
+      {
+        "literal": "/usr/lib64/libpixman-1.so.0",
+        "resolved": "/usr/lib64/libpixman-1.so.0.46.2",
+        "sha256": "0af247f5d42793ed0db3295744cbe143bb4fa2f30242a6db734565fe4f876b18"
+      },
+      {
+        "literal": "/usr/lib64/libGLdispatch.so.0",
+        "resolved": "/usr/lib64/libGLdispatch.so.0.0.0",
+        "sha256": "3c53e14fb731128afe1fa1c88e94944fe9a60cbe170f2e08c1134b709d771ec7"
+      },
+      {
+        "literal": "/usr/lib64/libuuid.so.1",
+        "resolved": "/usr/lib64/libuuid.so.1.3.0",
+        "sha256": "66c47f52498891763e5e049f167d86af3e609cca195f36ddd8d6ba3143f77805"
+      },
+      {
+        "literal": "/usr/lib64/libbz2.so.1",
+        "resolved": "/usr/lib64/libbz2.so.1.0.8",
+        "sha256": "ef3c4ed7e70d03d7c406fb1cea9552e74d0b20006e7d8f66a60dc1a6009f4800"
+      },
+      {
+        "literal": "/usr/lib64/libbrotlidec.so.1",
+        "resolved": "/usr/lib64/libbrotlidec.so.1.2.1",
+        "sha256": "21868d1903d40115e32d81cf2b1bb6995ce3d418e149793d88dbf4780542d987"
+      },
+      {
+        "literal": "/usr/lib64/libtmglib.so.3",
+        "resolved": "/usr/lib64/libtmglib.so.3.12.0",
+        "sha256": "e497c25e923336dc4d95b2822f0845667ab113b985e8e7d16eadaf0379cdac87"
+      },
+      {
+        "literal": "/usr/lib64/liblapack.so.3",
+        "resolved": "/usr/lib64/liblapack.so.3.12.0",
+        "sha256": "10c786e4517845cac86595b22fd7d40b548bf328cbf7bf14c867b0c31e20661f"
+      },
+      {
+        "literal": "/usr/lib64/libdeflate.so.0",
+        "resolved": "/usr/lib64/libdeflate.so.0",
+        "sha256": "fee24c7738e4c31860f65fa43c862f572cdf4cd2ffcc30e5cd8bf1d46346b318"
+      },
+      {
+        "literal": "/usr/lib64/libgraphite2.so.3",
+        "resolved": "/usr/lib64/libgraphite2.so.3.2.1",
+        "sha256": "1e1e6f204c01d7e790d4d8fa55205ac030926863565327724ad1bea0b05071b8"
+      },
+      {
+        "literal": "/usr/lib64/libxml2.so.2",
+        "resolved": "/usr/lib64/libxml2.so.2.12.10",
+        "sha256": "8473a76caaed1e702f5c4f2dfac69b4aa92d2f18217edcf23c73214ea7750ab5"
+      },
+      {
+        "literal": "/usr/lib64/libicudata.so.77",
+        "resolved": "/usr/lib64/libicudata.so.77.1",
+        "sha256": "e8d1048888b9b6ffa1197bb68892313aea10b897aa0def2d80ab837468aa87b0"
+      },
+      {
+        "literal": "/usr/lib64/libjsoncpp.so.26",
+        "resolved": "/usr/lib64/libjsoncpp.so.1.9.6",
+        "sha256": "d79bf920aad7b040d33a39ac31f89f172af0be3fde7469160a81c29839080258"
+      },
+      {
+        "literal": "/usr/lib64/libgmodule-2.0.so.0",
+        "resolved": "/usr/lib64/libgmodule-2.0.so.0.8800.4",
+        "sha256": "81d80bc0f36b5c83bc96893d454974bec9670ea66933df8c5e24574df13e5d25"
+      },
+      {
+        "literal": "/usr/lib64/libmount.so.1",
+        "resolved": "/usr/lib64/libmount.so.1.1.0",
+        "sha256": "74c02eb17cc7ac750e9e9afefd6d39a2cb30a13bdb4fd153a31e2f0aa7974067"
+      },
+      {
+        "literal": "/usr/lib64/libffi.so.8",
+        "resolved": "/usr/lib64/libffi.so.8.2.0",
+        "sha256": "05bf4048cc0fd016140d7d880c4a4ec402096732f60463c8fb87b98d877d3628"
+      },
+      {
+        "literal": "/usr/lib64/libpcre2-8.so.0",
+        "resolved": "/usr/lib64/libpcre2-8.so.0.16.1",
+        "sha256": "2993edd0e39039306ea31368eff16879f03502c3938d4ea3e7ec6c7216d933f8"
+      },
+      {
+        "literal": "/lib64/ld-linux-x86-64.so.2",
+        "resolved": "/usr/lib64/ld-linux-x86-64.so.2",
+        "sha256": "4e5d39355699e90fa29313d3100e82af4a23290028c58c364d6a249ef6a78e5e"
+      },
+      {
+        "literal": "/usr/lib64/libXau.so.6",
+        "resolved": "/usr/lib64/libXau.so.6.0.0",
+        "sha256": "78e2e7a514a6844530b099c7dfb184a9992f7b0681c30105281ddb8e48dc8a59"
+      },
+      {
+        "literal": "/usr/lib64/libbrotlicommon.so.1",
+        "resolved": "/usr/lib64/libbrotlicommon.so.1.2.1",
+        "sha256": "d0501f380203f533498674319b3a6b7423d73291d275745d83f42e192b432b7b"
+      },
+      {
+        "literal": "/usr/lib64/libblas.so.3",
+        "resolved": "/usr/lib64/libblas.so.3.12.0",
+        "sha256": "df2686da50030c23198f485115b84df323352325abb18a949515736e8f57b2f4"
+      },
+      {
+        "literal": "/usr/lib64/libmvec.so.1",
+        "resolved": "/usr/lib64/libmvec.so.1",
+        "sha256": "82ddf7efbb88b2eaf5570fa6c0ec41565d9c32a2dbd095200ceead862af0f3dc"
+      },
+      {
+        "literal": "/usr/lib64/libgfortran.so.5",
+        "resolved": "/usr/lib64/libgfortran.so.5.0.0",
+        "sha256": "d4b3a93cbd67561c5febd49d7bd035796d3b2b03a8d659d7ddf869321173f186"
+      },
+      {
+        "literal": "/usr/lib64/liblzma.so.5",
+        "resolved": "/usr/lib64/liblzma.so.5.8.2",
+        "sha256": "18b4994cd29a3e39f35ad719702925740703e76057fb2ce8c0eb7c7ce7a3acef"
+      },
+      {
+        "literal": "/usr/lib64/libblkid.so.1",
+        "resolved": "/usr/lib64/libblkid.so.1.1.0",
+        "sha256": "7e12e4040df9d5d0926e4e714b0658e85b7bc5d9b31a210b9f3605a9e074120b"
+      }
+    ],
+    "version_stdout": "Dome Sculpt 0.1.0 / CPU / Blender 5.4 Alpha trackball basis\n",
+    "exit": 0,
+    "lease_released": 1794967501.994857,
+    "independent_NB_free": {
+      "time": 1794967501.9948642,
+      "inode": 99618,
+      "dev": 40
+    }
+  },
+  "bookkeeping_failures_retained": [
+    "First read-only audit used relative Ninja output keys against absolute compile_commands output keys; corrected key identity only. Actual build remained0.",
+    "First loader wrapper compared raw stdout with parent metadata that omitted the terminal LF; both product commands were already0/exact72. Corrected wrapper enforces exact prior line plus one LF; both rerun0."
+  ],
+  "manual_pairing_review": {
+    "reviewer": "canonical_resume_20261118",
+    "result": "No pairing regression found: SOURCE441 source-capabilities, packet, emission and adapter files remain exact441. Actual Bake forwards its sealed resolver; generic numerical sampler uses an empty resolver and still rejects canonical/prepared packets. Runtime tests on the union remain required."
+  },
+  "archive": {
+    "path": "docs/validation/COMBINED-AUTHORING-APP-BUILD-20261118-evidence.tar.xz",
+    "sha256": "77ba1e8eec1c34df31cf3767ab9fe631bdd9523126adda47115507037358f07d",
+    "bytes": 432508,
+    "member_count": 278,
+    "member_sha256": {
+      "build-app.py": "dc8492500d1560f59ed33b343229e25ff719aa9852035cffdbb7d1fdcb1906ab",
+      "build-plan.json": "9ac2b9bf2a0ee651f93837eb8f44215d9485d0c2cd290280095ad26e38bcb782",
+      "build-status.json": "9bf881315356903b77dfef8e1ee0a4d05f38600fc725d6fc64b57c5de067bc30",
+      "build.log": "8754901d879390241ab735a44cf5cabf5d3122c50931c67a156f60ebb0626230",
+      "configure-status.json": "8d26dce86f57b24af37220badc0f40da081cfba1e8b204c0e474f39451b13984",
+      "configure.log": "b0dddb39abf076cddb1f084f28ad01d088a187bb4c536c2cd95e704011ae702a",
+      "compile_commands.json": "94a097b1ae66f04e3435e0245405afe9fa16c963f5442f6650c10d896f83ad04",
+      "CMakeCache.txt": "31de323c99b42df6b6135e3db4f4bfd9c674efc162fd053d68ae055a73211354",
+      "build.ninja": "468de887e02522d0bcec844124465898e98dad04e45febb43ab467d1e1e3bc6e",
+      "CMakeFiles/rules.ninja": "cc692ebcbf68f22d3bcd37b217f6dc4d6e2daa85969bd83482eb0d164c00cf73",
+      "CMakeFiles/dome-sculpt.dir/link.d": "4a5a512c8a08a4486df08424f496556478a7d18c2eafd7a24ad6aae6f3fe5ebc",
+      "audit-build.py": "1c2f963cc6701872b72255b7de12f00124fe448651bba35f5a73d0bc5572464c",
+      "audit-build-v1.py": "5e1a3967eda82cc915ba599588c72085e47ce527a454646c2bf25e8b520f7ebc",
+      "audit-v1-failure.log": "ac5cb33838ad4d18b648f4309527f421e166cdd403bf89ebc0f20234486846fc",
+      "audit-v1-failure.json": "a6539aee89bcb80e47d1217d5d72d8d0ec7d44a13e2b0206cfd40fd71768f2c4",
+      "actual-target-commands.txt": "c1633635c599a858b71985d602ad2c0a8bd4221945123c0e2f12d84227059a65",
+      "actual-MD-owners.json": "dd153bef074e01ec30804d6a752eedff12c8340c1d8e511f1e03bf73a79dbed3",
+      "actual-input-manifest.json": "897648129995a29ac4b1f8e823d3e9502b8bdb5495582581752bf04318fde563",
+      "actual-core-members.json": "8385b85438670d6f8472b5e31f47627989d1919289d1d92c914cde821369d123",
+      "actual-link-inputs.json": "e4c011ffc5ccc8bfa844bd3a6f559bb4c3057f24d99fe02f1c05023f2800d916",
+      "app-readelf-dynamic.txt": "68bfbd4ac2c445d46b182f72a4c23569268456e2172d1e871a37c221ff33c340",
+      "build-audit-status.json": "2c6da7a2f54eba1c17fc2bf63f9c3a94e5f3af02b90c2323f03a219311d0a54f",
+      "unit-before-stop.txt": "62a7ffdfeb332f3d8a2758703c26def85d16e38c54cf8b167c6f3ec573c85f8d",
+      "unit-journal.txt": "b3b03b96734c1efab402fe0fd6c8ea497542b20b1fd9b57ebcd4d5c492ddcf51",
+      "unit-cgroup-survivors.json": "6b799ee5b4fd7e47cfbcac96c25aa870fe5a22f4008ae1b54fb7da2007e69ba8",
+      "unit-after-stop.txt": "44ec163655d8b11250e18d357c6138682c8d8474c78b105da4381725ac2bc0d4",
+      "check-loader-version.py": "905fbce585c699e1538e19207398cd5420152714c99b6c82afa7f79a2df01293",
+      "loader-version-status.json": "57f8cf24af95ce38b162d28180423fee92de244d4eaa205bba8fe860a87237cb",
+      "loader-ldd.log": "798fac3ffc3766cc4b8a814e3fbaf713fa7d3ddd4605e1061d00d75828a8fb95",
+      "loader-version.log": "9455a20a636a6599ace60120261649d3b29dc51fe2c774305994879190e7336b",
+      "v1-check-loader-version.py": "ba1fa9a0cf50dcd44c95b368b07309b405325d2df7c09d65f384cd0d52ceed06",
+      "v1-loader-version-status.json": "7ab8bf88c00005f13e7c1ccfedfe3ffc79f616c881ef69678a700066bb5b4bdb",
+      "v1-loader-ldd.log": "8bf5b7b357d54dbcb3d46ffb4b6724b2c5753735b9fe686bb3168779fe5b44d4",
+      "v1-loader-version.log": "9455a20a636a6599ace60120261649d3b29dc51fe2c774305994879190e7336b",
+      "CMakeFiles/dome-sculpt-affine.dir/src/affine-factor.cpp.o.d": "8e6ad5c33a5519c699e0098723d0898040e9c949808c44fe0dd01af1fc0a6c7f",
+      "CMakeFiles/dome-sculpt-affine.dir/src/affine-interaction.cpp.o.d": "4e23a918108dc0ce1474a53239c9b7a0ddf9858e29fba57d7bd99fd22f6e6730",
+      "CMakeFiles/dome-sculpt-affine.dir/src/affine.cpp.o.d": "bc441e1f8a3988997bd9203d523a21fdd72ff6d7fd16a9edb511ff676126eecd",
+      "CMakeFiles/dome-sculpt-affine.dir/src/import-affine.cpp.o.d": "348b1c7f38ff95ad0977f280e3153d034917106fee0753b0483f1fb9b8c01eb2",
+      "CMakeFiles/dome-sculpt-baked-emission.dir/src/baked-emission.cpp.o.d": "026a6c35bd11c89665b720f2694ce8b46157e92a0e1ad10612b36f0fb0ecafa7",
+      "CMakeFiles/dome-sculpt-core.dir/src/anatomical-authoring.cpp.o.d": "d5c4c417d5324ff4b426ae33749c6eb73920c144cd0f7de8bbab120b1d46babd",
+      "CMakeFiles/dome-sculpt-core.dir/src/atlas.cpp.o.d": "0e3375f213a7356dfd482f8ee9b58de6be342161aef93647e66293d2eea93df9",
+      "CMakeFiles/dome-sculpt-core.dir/src/avatar.cpp.o.d": "ae243f04628774c4253a44a77527c9bbebf2b5626ae429135cfc17ae71bcc574",
+      "CMakeFiles/dome-sculpt-core.dir/src/backend_cpu.cpp.o.d": "62e4630cc9b3642529a28514a085574975d96667897d254ff4585a7196eed553",
+      "CMakeFiles/dome-sculpt-core.dir/src/bake-authoring.cpp.o.d": "74ce9c2ad955400b6e7132a013d1d47eb7058469e2df2044a206ddb13760fbac",
+      "CMakeFiles/dome-sculpt-core.dir/src/bake-recipe.cpp.o.d": "15976294dc55407f60bedadcfd183444d44b94e0a38db85b918f9b3371f008a4",
+      "CMakeFiles/dome-sculpt-core.dir/src/bake.cpp.o.d": "33d4b82303fe9fe53cfe4933884ddf06c63fe3e27bc11ffca790ffdb3db22c0a",
+      "CMakeFiles/dome-sculpt-core.dir/src/baked-normal-archive.cpp.o.d": "01b4818e66e8ab79b6198f75f8b0476b11515b6b33dc3fc299c78e7ecc81c21f",
+      "CMakeFiles/dome-sculpt-core.dir/src/baked-normal-field.cpp.o.d": "f536e93e8e9f2eb5925df5b5521b9d35d23e21185bece2a3ad5b59328cdfcebf",
+      "CMakeFiles/dome-sculpt-core.dir/src/bone-metadata.cpp.o.d": "a24d88be8d7fc2f8feaa88414362f915f08634e7dacde65ac8b0a3beb4804a34",
+      "CMakeFiles/dome-sculpt-core.dir/src/canonical-native-pose.cpp.o.d": "2a986651f23650d4bb9f5079bdac64afdb4d5a87752317bb64af14c2b921fb98",
+      "CMakeFiles/dome-sculpt-core.dir/src/canonical-normal-conversion.cpp.o.d": "8b4fbf1bd65c1dc186403df7812b7690b50fdfb057b07ed2479bc041044cdbf3",
+      "CMakeFiles/dome-sculpt-core.dir/src/canonical-normal-owner.cpp.o.d": "4b2e9e2c7fe2ca35be0c8c5975b1e202a9f4a99d9aa24ebd233cff0f45bba025",
+      "CMakeFiles/dome-sculpt-core.dir/src/canonical-normal-uv.cpp.o.d": "9a3b0af14e168e72a32febc3f73c491a3fd70ee64219b80e9283023b45599003",
+      "CMakeFiles/dome-sculpt-core.dir/src/canonical-paint-archive.cpp.o.d": "f74546bc36a26bf04ab5e6a717da6b4a7e0d282798ef3c11a7a908bc9748975e",
+      "CMakeFiles/dome-sculpt-core.dir/src/canonical-paint-native.cpp.o.d": "30511c956009d2202218b4d2b9d4c6fd60da2e5098c73aebe70b4c9a200ffda6",
+      "CMakeFiles/dome-sculpt-core.dir/src/canonical-paint-prospect.cpp.o.d": "ae42eb17d44e1882dff8fa7b88e0b3e799b823be9288ad01f61171ebbc3d1beb",
+      "CMakeFiles/dome-sculpt-core.dir/src/canonical-paint-sampling.cpp.o.d": "1900bcd7f3b694ca9216cf2c1abd6bd106e84763f187d73b127a3f881a2cf902",
+      "CMakeFiles/dome-sculpt-core.dir/src/canonical-paint-uv.cpp.o.d": "fc089d8002ef4dc69db4ea51d343fc723b4b9fd0ee081a219dbc16ff3d8c85d5",
+      "CMakeFiles/dome-sculpt-core.dir/src/color-paint-sampling.cpp.o.d": "b69ec8c26c57b981048dd5120a319821920a6678752a3082c0a59550a25e808e",
+      "CMakeFiles/dome-sculpt-core.dir/src/color-preparation.cpp.o.d": "71a76f4eeccecd72647321faf0b823911d0ecdc8648ff3fb90c9fdb842ed245c",
+      "CMakeFiles/dome-sculpt-core.dir/src/color-uv-reprojection.cpp.o.d": "936492b5aa054538ce5f3910ce092a3ccab9040b7d6af26bc86b5d7926cc5a3a",
+      "CMakeFiles/dome-sculpt-core.dir/src/corner-key-expansion.cpp.o.d": "d1e144cb27b61a37aa40e68a5e74f91f4e1ac0f4e6bf9960207e4797bd170ef6",
+      "CMakeFiles/dome-sculpt-core.dir/src/creation.cpp.o.d": "5dfeb46460cd3aaf77c432578e4c0b658c925a3f2d0aef8f76313bbab24d2925",
+      "CMakeFiles/dome-sculpt-core.dir/src/creator-archive.cpp.o.d": "573936ad042d1292ed6309c60864440b36dae42590d204c9d4b62021c8bca0b7",
+      "CMakeFiles/dome-sculpt-core.dir/src/creator-tool.cpp.o.d": "25c44c16caf7da0c54188f72f2ff0f6d5ecc824cfa1742ec0b1518993b427d73",
+      "CMakeFiles/dome-sculpt-core.dir/src/current-paint-preview.cpp.o.d": "3d21de1fb6ba72ff1d57ed3056cc9394051d40a3586d0d091c00d9d79a9fdf7c",
+      "CMakeFiles/dome-sculpt-core.dir/src/cut-authoring.cpp.o.d": "92c1ee7503bbacf087fc60b55110c61dc1cec28d29376e085e083e0014956ddd",
+      "CMakeFiles/dome-sculpt-core.dir/src/cut-color.cpp.o.d": "fbd059b79f91608c20b5685b7c9f4f617e5c61898be009d06dd3ce84a076abe4",
+      "CMakeFiles/dome-sculpt-core.dir/src/deformation.cpp.o.d": "576dbb76c01053b0f6785a175743f55368762519c4883cc3c47e032c66ecbea3",
+      "CMakeFiles/dome-sculpt-core.dir/src/document-assets.cpp.o.d": "099ecdd2fa71e8144d35b3477d91af926e6880882310ec6945318149835448ef",
+      "CMakeFiles/dome-sculpt-core.dir/src/document-baking.cpp.o.d": "d054b72788041a3fb630bc7e79f6bb77402c0c14093500c4c9a56b45a69b1b9c",
+      "CMakeFiles/dome-sculpt-core.dir/src/document-contact.cpp.o.d": "3695182bf0877b2a111828cbad32f61d88d312e4503d2543be19c2874a517d32",
+      "CMakeFiles/dome-sculpt-core.dir/src/document-creator.cpp.o.d": "5b0c839e9506d075543ff9c098c70723d3ec262e4dafcf339ab0456ee84b3a26",
+      "CMakeFiles/dome-sculpt-core.dir/src/document-cut.cpp.o.d": "388dc5294991f47f9ad03b6260320b15bc7066230bd9635780cdd4e238930668",
+      "CMakeFiles/dome-sculpt-core.dir/src/document-expressions.cpp.o.d": "8fa0d10e3e6ada422b6033d22bfff38c947239849df64c8bdd137b6e86992d7d",
+      "CMakeFiles/dome-sculpt-core.dir/src/document-import.cpp.o.d": "c35349a4c7f1fa114cfbba562691986231fbc8394b85682da7f8139f65725070",
+      "CMakeFiles/dome-sculpt-core.dir/src/document-interaction.cpp.o.d": "e9e18d7602bdab9c295964bb4902deb5a03bab116fe22297cdd940bbc80dc46b",
+      "CMakeFiles/dome-sculpt-core.dir/src/document-native.cpp.o.d": "faa020c095bc0448af169c1ec4f5c147d0adfdee92fc880a6bac39d04c576ffb",
+      "CMakeFiles/dome-sculpt-core.dir/src/document-paint-blur.cpp.o.d": "4d2fe96634f1d955462506e56b0a741f103438a11da01ed9b534771eac4d4fbf",
+      "CMakeFiles/dome-sculpt-core.dir/src/document-polygon.cpp.o.d": "fcb906e912789d50628c096ef6e44e7cfe38ac07725d4c643f35dd36983f16d2",
+      "CMakeFiles/dome-sculpt-core.dir/src/document-projection.cpp.o.d": "faab6f5b87fcb16e79f608755f4296731bdabee16de0b0124a94e555c6b9dd99",
+      "CMakeFiles/dome-sculpt-core.dir/src/document-recovery.cpp.o.d": "7af2556d24c581ac2c853c5878720ddddf850011fd3545f805225a6310c110ca",
+      "CMakeFiles/dome-sculpt-core.dir/src/document-retopo.cpp.o.d": "b61d91146e44c1a154906c14fc55617b4da446c237eeeeded9e335c9df71b956",
+      "CMakeFiles/dome-sculpt-core.dir/src/document-rig-fit.cpp.o.d": "349d36f5911e3d61eb910f337af604f1dfcde99bfd807682796f2c43fc6ee4f6",
+      "CMakeFiles/dome-sculpt-core.dir/src/document-sculpt.cpp.o.d": "4f5964fd396820b0ea53c3ef3287411ade64405a901b2626d3848d92a0acc439",
+      "CMakeFiles/dome-sculpt-core.dir/src/document-shapes.cpp.o.d": "8209254b9782a74ee667d33a0c24245c9faae7b3ca002a3614a56307e30199d4",
+      "CMakeFiles/dome-sculpt-core.dir/src/document-skin.cpp.o.d": "f14b01c9391230b11d7f17096bf4f4730fc02b223f4c50907c49a0eb11f23290",
+      "CMakeFiles/dome-sculpt-core.dir/src/document-texture-sets.cpp.o.d": "700cc4bb6aa7e9c73f1e1c29b391d234d3c918731766eca8628e85004f542701",
+      "CMakeFiles/dome-sculpt-core.dir/src/document-transaction.cpp.o.d": "e8558c869feaedb85c15ebc660634600d3538257a740b93b74ba4475c6dd2cf4",
+      "CMakeFiles/dome-sculpt-core.dir/src/document-uv-solve.cpp.o.d": "c1f20f82cf39dd3171fe942f0f515a7c3284b6a08d583aa05182b045ec8c44ac",
+      "CMakeFiles/dome-sculpt-core.dir/src/document-worker-errors.cpp.o.d": "f1863366fde5e535ad8a0ccdfe766728e4c34c84494a7e86c14756c2eba192e3",
+      "CMakeFiles/dome-sculpt-core.dir/src/document.cpp.o.d": "9d12a5b6e689ac4aa06dc0e571f3e2d698902105307681a373c886f8ed425cdf",
+      "CMakeFiles/dome-sculpt-core.dir/src/emission-bake-source.cpp.o.d": "cd01fea32f31834bc16bd761c875693ea590ed85673a9c51b8f86f5a7a5644bf",
+      "CMakeFiles/dome-sculpt-core.dir/src/emission-export.cpp.o.d": "41bb3fdf4b541111aa7eba6a56e5c61360607ff43b23b47f83027e580acac54e",
+      "CMakeFiles/dome-sculpt-core.dir/src/emission-package.cpp.o.d": "a9e36818e8a514bc53b0ab61fcd964317bcfea813341aac60e9c80165b56f2aa",
+      "CMakeFiles/dome-sculpt-core.dir/src/export.cpp.o.d": "85c2e58a9cd22f7c4eb07c5a7fb4f3c9849e6b625b632eebf4e374a5ad9ef771",
+      "CMakeFiles/dome-sculpt-core.dir/src/frame-position-domain.cpp.o.d": "11fe6c274acb92c50f1804a886fc2236e9fa9a31162b5b738311578a947f7a9c",
+      "CMakeFiles/dome-sculpt-core.dir/src/groups.cpp.o.d": "0d7b372fd0d346dde1ad84c575bdbfebb6c12ae9e003eaf41007b2c6f7077eea",
+      "CMakeFiles/dome-sculpt-core.dir/src/humanoid-creator.cpp.o.d": "650c7a3bf5ad3a1b36ba13765c327d66657af6e5e125d38391c3b30a68d5c8d3",
+      "CMakeFiles/dome-sculpt-core.dir/src/import-authoring.cpp.o.d": "45049a60f3b7463230159eeffdb11c87107c696c342e47892ceb5d632ae7356c",
+      "CMakeFiles/dome-sculpt-core.dir/src/import-browser.cpp.o.d": "4dcb33d70cd559c17504cff82096ffde96b8e87c4647c2537ec58fd0c082fc23",
+      "CMakeFiles/dome-sculpt-core.dir/src/import-image.cpp.o.d": "690c8dbe59ffabd596889e4a7f84ca7495e812c404e997fd545826a858e5973b",
+      "CMakeFiles/dome-sculpt-core.dir/src/import-jpeg.c.o.d": "9a64218e8f08b9c33d06370c87423da094adce3a0296bfafdb7a150af3b25d3d",
+      "CMakeFiles/dome-sculpt-core.dir/src/import-native.cpp.o.d": "8109cbca04cc32a580f46f439f159f690a3b49904efad50865f081a3523cc74a",
+      "CMakeFiles/dome-sculpt-core.dir/src/import-options.cpp.o.d": "d13b8f7b541295256e6cb24e0a32016dc22e94a5e33900d21bd1a5f1dab31431",
+      "CMakeFiles/dome-sculpt-core.dir/src/import-source.cpp.o.d": "674b39cd8603a97684fea73de7d5a241072ebb31b68d79b3f41f4a47db559306",
+      "CMakeFiles/dome-sculpt-core.dir/src/import.cpp.o.d": "90ed80ce522e4a1cfefa257ff9f684ab4fd6577f81366a0b55d64fb98ba18b86",
+      "CMakeFiles/dome-sculpt-core.dir/src/input.cpp.o.d": "2e3b60511308128e0a9cbc1ffe4c9267b5755535b347144a3d8ef6700215fddd",
+      "CMakeFiles/dome-sculpt-core.dir/src/key-archive-preflight.cpp.o.d": "d551f48ba59927f5f6b08c299198205578f3d59ec6ae4b1c6fdfd7fe878af8e0",
+      "CMakeFiles/dome-sculpt-core.dir/src/key-derivation-codec.cpp.o.d": "224fc130a1a7096f1932d5685f1182623ff67473dd726e16a7487f9a38c0b6f5",
+      "CMakeFiles/dome-sculpt-core.dir/src/key-frame-archive.cpp.o.d": "52206059c86f95cfafe28f1b0c7b9c5710a29dc126cb7b8323f33b4859594ae5",
+      "CMakeFiles/dome-sculpt-core.dir/src/key-mirror-correspondence.cpp.o.d": "f41a88b76c830a7dccd2227b0b2643b1b18d75cf5b08c5636c06bf88dc663e9b",
+      "CMakeFiles/dome-sculpt-core.dir/src/key-mirror-relative.cpp.o.d": "e826383427490986cbc9652cc3a2498f4a0fd9d908b719122e8f0c07a64596fd",
+      "CMakeFiles/dome-sculpt-core.dir/src/local-surface.cpp.o.d": "080c706c2622eba82779f4ec256a40fa16250995d5a3b04132d4e030f8346dd3",
+      "CMakeFiles/dome-sculpt-core.dir/src/material-bindings.cpp.o.d": "dad725ede4481f0e7fb2c76b4ae0c0f533250a747b376f4a5cd95b543d8dd5cd",
+      "CMakeFiles/dome-sculpt-core.dir/src/material-visibility.cpp.o.d": "aef760787f616952e2a35720a591a37534d99c6b82efa30a1d5457f74b151bc7",
+      "CMakeFiles/dome-sculpt-core.dir/src/mesh-authoring.cpp.o.d": "fe1ed5a3965196a734ebbbb42821ae4c7fe0b403f43847cd8009cc3190627922",
+      "CMakeFiles/dome-sculpt-core.dir/src/mesh-processing.cpp.o.d": "82eabcdeffc76934a952ef75cb8dc54962d35a96e8ba0802aa8d578cd0e1d18f",
+      "CMakeFiles/dome-sculpt-core.dir/src/mesh.cpp.o.d": "9578f1885299826a046e40d58713191d243cfc3b1c7c0693e01c06400a2a52e2",
+      "CMakeFiles/dome-sculpt-core.dir/src/mtoon.cpp.o.d": "566d2edd3c8825621f86a790b3afca2c2c63cd40a82cb4cf808e0c26e1238be3",
+      "CMakeFiles/dome-sculpt-core.dir/src/native-authoring-compiler.cpp.o.d": "d8bdc3aa45e2bfd183f9a90062db9ecc9b8887c04c51f4bcd141a3b236984fa1",
+      "CMakeFiles/dome-sculpt-core.dir/src/native-authoring.cpp.o.d": "cc62ce7a5c4941a521158be9387aa6ef0873daefef0b28a5334062adf9bfd6cc",
+      "CMakeFiles/dome-sculpt-core.dir/src/native-paint-frame-source.cpp.o.d": "c9b3f7cc56928c220a440fb3ca0891c460fd5ff379a1ffaff067a5d2a87d286d",
+      "CMakeFiles/dome-sculpt-core.dir/src/native-paint-metadata.cpp.o.d": "41167954ce77558ea314f0ae5c625acca7cb0fc359a0746cc3d8ed4db79c999c",
+      "CMakeFiles/dome-sculpt-core.dir/src/native-paint-sampling.cpp.o.d": "8ca8f0b29fb7de6c6bda2923e3a11d0025ffd3c3147a8825539bd61b69a69664",
+      "CMakeFiles/dome-sculpt-core.dir/src/native-scene-append.cpp.o.d": "caa3b9039ca737020fb5210a82d0f74550cdcb621eaf29f1b3bd9e5d5a961dec",
+      "CMakeFiles/dome-sculpt-core.dir/src/normal-bake-frames.cpp.o.d": "4798084eb078ce8dbc26843c09d0230b15056fb311ea5c59d224e36ee0a41582",
+      "CMakeFiles/dome-sculpt-core.dir/src/normal-frames.cpp.o.d": "164f73505deee7a9eeee4347dd19879a501c33fffff592347e8e89dfe8c2594b",
+      "CMakeFiles/dome-sculpt-core.dir/src/normal-key-derivation.cpp.o.d": "424ee4fbe2f6d12803729bc8fe2cc81ceeb61ee31005e52951175456e9ebd287",
+      "CMakeFiles/dome-sculpt-core.dir/src/normal-preparation.cpp.o.d": "9679a2b86830dbdf27277fd057f8720e708f6210f6551fec28f7591f5d460d3e",
+      "CMakeFiles/dome-sculpt-core.dir/src/normal-preview.cpp.o.d": "52119a296c682338d2e99a3450dde48b94fb37f7127cbcf3e5a9e5822341aa11",
+      "CMakeFiles/dome-sculpt-core.dir/src/normal-sampling-replay.cpp.o.d": "1a64728ff120ebeda85a6628e088e9ff977f90cb67aa9f62bc196796c0122066",
+      "CMakeFiles/dome-sculpt-core.dir/src/normal-sampling-surface.cpp.o.d": "7e6d0977437ddb1b8e353b15d7ee9d1f343102b01ad46070d5a0a81fb93bea66",
+      "CMakeFiles/dome-sculpt-core.dir/src/normal-sampling.cpp.o.d": "454eaa954c778a61d6a3ff1eb30b7d88133b37f4a8c9420792e66331d2fcf9b6",
+      "CMakeFiles/dome-sculpt-core.dir/src/normal-uv-reprojection.cpp.o.d": "6749df53c9dfef6339300dd79687c26ef7b89cf2dfc0e6847d974b6a93a3f4c5",
+      "CMakeFiles/dome-sculpt-core.dir/src/object-selection.cpp.o.d": "1e3953907694f953a1513706b0bf0ddebecc65031a0d407cdd8a2340717234a1",
+      "CMakeFiles/dome-sculpt-core.dir/src/paint-composite-cpu.cpp.o.d": "c7090e72e35e502483a76a648be208178c160db5ba749de0d3898c557a892fff",
+      "CMakeFiles/dome-sculpt-core.dir/src/paint-composite.cpp.o.d": "9f3c9ac30ab1f92fb69b19af4ac0a496b1f2833f8748e7f4e2a43d5dfecd4e4f",
+      "CMakeFiles/dome-sculpt-core.dir/src/paint-sampling-archive.cpp.o.d": "3baf1915b293ec55ad01850a1fd6dd35fe75b693af37a221a08a7a303a663a69",
+      "CMakeFiles/dome-sculpt-core.dir/src/paint-sampling.cpp.o.d": "69ce3a443684235086de31276458d7722722c003e504072a8a582e68cf420fb3",
+      "CMakeFiles/dome-sculpt-core.dir/src/paint.cpp.o.d": "3277b9eee6256f9a32381e3c9f698d2d1e6c007d3d276ff346bcb62d7f41e943",
+      "CMakeFiles/dome-sculpt-core.dir/src/polygon-authoring.cpp.o.d": "d936968c49daa8cfb01198e9013d045fb9a06cf6fa426c1eca9d1986c18aef05",
+      "CMakeFiles/dome-sculpt-core.dir/src/polygon-color-archive.cpp.o.d": "ab92cc1b07251e196939840722ce86c7b8cf946e8c572a6776f5e2a9deca40c1",
+      "CMakeFiles/dome-sculpt-core.dir/src/polygon-color-source.cpp.o.d": "3ce82d72418218f5a618668b2dae09f24993dd5052cbef6dd2b25e9f93d017ca",
+      "CMakeFiles/dome-sculpt-core.dir/src/polygon-color-uv.cpp.o.d": "badd61a2b81b85f0700fde8b10eafac6b1b172009093cb8037f7c20425a492ce",
+      "CMakeFiles/dome-sculpt-core.dir/src/polygon-conversion.cpp.o.d": "f90302e1a95c48f4cc22d6d7e86528b10a4dec0568c093d3410ba598f33167fd",
+      "CMakeFiles/dome-sculpt-core.dir/src/polygon-scene.cpp.o.d": "43fcece9c90352dd08f79c363cea1e332fccd00f1e887098274f9d3b4e1852dc",
+      "CMakeFiles/dome-sculpt-core.dir/src/polygon-source.cpp.o.d": "80d5baf56ca45642faa974c907a4df191fc6fd163fb33d8b0b55f0360ffd72cb",
+      "CMakeFiles/dome-sculpt-core.dir/src/polygon-surface-archive.cpp.o.d": "fd6d4337c3eda5c12c2bc8557e5037c21bae8bea9c11d323525a6534f016aec5",
+      "CMakeFiles/dome-sculpt-core.dir/src/polygon-surface-codec.cpp.o.d": "da937c8842f15ca7f264c1c8a59e4cbfea9ebe04d951f0bf60be7fefcc620c97",
+      "CMakeFiles/dome-sculpt-core.dir/src/polygon-surface-owner.cpp.o.d": "b40e9e18a19462e5fde292c76c8266f68861689bf8e364257a72075f257149a0",
+      "CMakeFiles/dome-sculpt-core.dir/src/polygon-surface-paint.cpp.o.d": "7375ecc5a1fbe62f6703adbb804394ae1549938724bb1f876d042c182c78f617",
+      "CMakeFiles/dome-sculpt-core.dir/src/polygon-surface-preview.cpp.o.d": "d9045af2508240c59d2feed671fac4f53f790f9825aa0d9224e97d767b0b96d7",
+      "CMakeFiles/dome-sculpt-core.dir/src/polygon-surface-transfer.cpp.o.d": "66be5e025fcaf654416b022e9d006d39735161c1a02d647eac2a462df50dc628",
+      "CMakeFiles/dome-sculpt-core.dir/src/procedural-sculpt.cpp.o.d": "2b8fb837c6ee3dfa0fad7854c8f032d99157bc7656007077395e62534ffb127d",
+      "CMakeFiles/dome-sculpt-core.dir/src/projection-tool.cpp.o.d": "44712bf44e2d9a35a1678226af9acd25e31dc656af476e0e529fa1d7bed01aa0",
+      "CMakeFiles/dome-sculpt-core.dir/src/projection.cpp.o.d": "854df5a85a041cb478915419ec505b58dc140b4fc037afaed0aea0c8c8568d5c",
+      "CMakeFiles/dome-sculpt-core.dir/src/ray-index.cpp.o.d": "bb614bfe95c10a73e3e72e7f379f16d8f14e420ffc30b60cae7149a8e169c0c3",
+      "CMakeFiles/dome-sculpt-core.dir/src/recovery.cpp.o.d": "6c8ed73c94d57299f396ffcb4a1db3f485ae469bd8af4b613afd11d6be4def66",
+      "CMakeFiles/dome-sculpt-core.dir/src/remesh.cpp.o.d": "6483194f9f672a2afb400f0b9480bad29919b390605c38638cbd0864d5565b38",
+      "CMakeFiles/dome-sculpt-core.dir/src/retopo-authoring.cpp.o.d": "4b66c42c62bca207ceb4879bc47c4668a1b97ee8e93d432f524936a07d2fe7a7",
+      "CMakeFiles/dome-sculpt-core.dir/src/retopo-edges.cpp.o.d": "7c04e066b9b39c63a953376145a6f86edc1a2ba674979ed623f6cb92392f95c3",
+      "CMakeFiles/dome-sculpt-core.dir/src/retopo.cpp.o.d": "14ab396dc7163b2326e9215d7ae09ab7c256f1c45fbac10649dc86fa8802cea5",
+      "CMakeFiles/dome-sculpt-core.dir/src/rig-edit.cpp.o.d": "84812e43d11306e7d5aac23491069013523d4d530bc2703540f7343be8f8220a",
+      "CMakeFiles/dome-sculpt-core.dir/src/rig-fit-tool.cpp.o.d": "b4fe666a90da3b9b8e5bc9b665c4d7fcf7bfef2029b7a87f2aa8938b42a71563",
+      "CMakeFiles/dome-sculpt-core.dir/src/rig-fit.cpp.o.d": "521d9bcb43aab00f99147f9d5f4a664dc378f1d3c71997d0ca3e5d8e4edf425a",
+      "CMakeFiles/dome-sculpt-core.dir/src/rig-rest-scene.cpp.o.d": "7e9eb1612937322942a7e0ab668ca2df669a617de782f07d87024b14bfe82e87",
+      "CMakeFiles/dome-sculpt-core.dir/src/rig-rest.cpp.o.d": "78b8b167718caa19811fea1a0ec2ef7f29d0402938e9e1398e20cd57e26e3cc6",
+      "CMakeFiles/dome-sculpt-core.dir/src/rig.cpp.o.d": "75e706af06d49cd2bc2b44c8a5c76a9f90b257c50c3f153468422dceafa82932",
+      "CMakeFiles/dome-sculpt-core.dir/src/scene-file.cpp.o.d": "b9f9e4b835ef2dff39808cd3263a3eb80c8b65b55004275b71ecaf1a82e60865",
+      "CMakeFiles/dome-sculpt-core.dir/src/scene.cpp.o.d": "17c4eb74cf9db49a8087a25e138254f37ad3659d3a01a9c145a0f74f3bc18510",
+      "CMakeFiles/dome-sculpt-core.dir/src/sculpt-chunk-masks.cpp.o.d": "a4783a0da0b4db3f24c3239c9a1ed408035c92e16e8434eb58f94cea93217d53",
+      "CMakeFiles/dome-sculpt-core.dir/src/sculpt-mask.cpp.o.d": "cfa13db9b03665e9daf065021a8f2321db0c551d0b3d06546dd06e0036cc8fa0",
+      "CMakeFiles/dome-sculpt-core.dir/src/sculpt-placed-chunk.cpp.o.d": "b9a5884a845a313b48daaaea73366d53cf1de36c4cc50153aebdee0e7fe6823d",
+      "CMakeFiles/dome-sculpt-core.dir/src/sculpt-placed-chunks.cpp.o.d": "64e47ddc605b52d7e23a872fc085252c737fb2c087c4ca1eae2b9057c1a650b5",
+      "CMakeFiles/dome-sculpt-core.dir/src/sculpt-resolution.cpp.o.d": "a03dad9c23bae16be923246dabe5a8853ff045c12944304606930a39f82b371e",
+      "CMakeFiles/dome-sculpt-core.dir/src/sculpt-scene-chunks.cpp.o.d": "aaa76bd248224357d177d0a9b4153e7ea4ac4434e7c2ad5a9058006c9c5b5fef",
+      "CMakeFiles/dome-sculpt-core.dir/src/sculpt-storage.cpp.o.d": "e0903491d77002b2fb4b4246a900a6bb2f9a6940c8ba54ab98b84d1aa2a084e3",
+      "CMakeFiles/dome-sculpt-core.dir/src/sculpt-surface-chunks.cpp.o.d": "5cbf1649cf8df8920e242c4678d48b24631d8f0e5fe07bc75cf8fb0d61f63d1a",
+      "CMakeFiles/dome-sculpt-core.dir/src/shapekey-attributes.cpp.o.d": "bebd980ee9bc5c0b2e78e7f19fd04d3f16660e93a87f63da04b12be250321981",
+      "CMakeFiles/dome-sculpt-core.dir/src/shapekey-authoring.cpp.o.d": "ad030025f593ab4f15578a77898ac04db93b41159862098178d025779124476f",
+      "CMakeFiles/dome-sculpt-core.dir/src/shapekey-normal-preparation.cpp.o.d": "b69cf7ee4f748108e5e4addd4485ec6b4d612b07da9fc25b97db7818a36c5a76",
+      "CMakeFiles/dome-sculpt-core.dir/src/shapekey-sculpt.cpp.o.d": "e5ce35d303cab9d5cecdf54e5356e192e6d7e930dee6effdfd26a5d7db289425",
+      "CMakeFiles/dome-sculpt-core.dir/src/skin-authoring.cpp.o.d": "3dbaf2b390341e265164a630cf2b9aa527463f96f618ec49577e29a6c9318f2a",
+      "CMakeFiles/dome-sculpt-core.dir/src/source-decoded-images.cpp.o.d": "fa7147e4b9e857266c8b2b7cd2718fe757312d53a17de061f763fa0bf2bc20c8",
+      "CMakeFiles/dome-sculpt-core.dir/src/source-maps.cpp.o.d": "0785c0b00fc1a898235a36af641c89f7eee69636637d8c07be3858d9d3127ee7",
+      "CMakeFiles/dome-sculpt-core.dir/src/source-morph.cpp.o.d": "64519e4b5b8d183e4e693ebd15ee2647065fd77ab35aee2350a91594b60f9c0e",
+      "CMakeFiles/dome-sculpt-core.dir/src/source-node-extras.cpp.o.d": "45f5fa13eabe34bab7a995f7554eaffd0e3bc032f919153623fb85d1f08f7094",
+      "CMakeFiles/dome-sculpt-core.dir/src/source-placement-archive.cpp.o.d": "79df317b476fd7e7974fb808bb03b4f083a27038530b787ede46186316618755",
+      "CMakeFiles/dome-sculpt-core.dir/src/source-placement.cpp.o.d": "8fb07ead1af5c76773f231925bc5773e83f7fa36a4a78698e537da5245e6e3ab",
+      "CMakeFiles/dome-sculpt-core.dir/src/source-rest-graph.cpp.o.d": "f923bef80df77411e26cf7b978d5c0e81c15279223588478405f046853b43930",
+      "CMakeFiles/dome-sculpt-core.dir/src/source-rest-plan.cpp.o.d": "9d0fa1542caa8d04467d484d50891d0f9f7d356b68e825540cd8ae63bf4dc0ab",
+      "CMakeFiles/dome-sculpt-core.dir/src/source-rest-scene.cpp.o.d": "82fa031e50f46b2fa32b4534fcd82d28caca1a9f0616950097292b8f59c59683",
+      "CMakeFiles/dome-sculpt-core.dir/src/source-rigid-pose.cpp.o.d": "b4cd155a9c2f59aaf696c366adf013ced160ffe9dd32955ab02cdac507ba1272",
+      "CMakeFiles/dome-sculpt-core.dir/src/source-sampling-transport.cpp.o.d": "1aeb51ca35270aa5e02499fc5910dcb82e679320c221607104e23d2398b6df15",
+      "CMakeFiles/dome-sculpt-core.dir/src/source-uv-bake.cpp.o.d": "4b61890dd676286ef8c53aecc18881cef07fb63dddd1e85dde6b15ea623be812",
+      "CMakeFiles/dome-sculpt-core.dir/src/sparse-resample-cpu.cpp.o.d": "65fa46d05d8b5ce6cff330ea3fca30dc5ed846756cabfe742737bfff65704cff",
+      "CMakeFiles/dome-sculpt-core.dir/src/surface-heat-authoring.cpp.o.d": "548528ec015f906f8e420d979d2e2e1cbae45b6a98baf73e59eca12461a935b0",
+      "CMakeFiles/dome-sculpt-core.dir/src/tangents.cpp.o.d": "4337ba13ad1376759711e45a838ad9c157e1cd9ad4d63d9611f2fbc7f89a0c0f",
+      "CMakeFiles/dome-sculpt-core.dir/src/texture-set-archive.cpp.o.d": "0c0ee21cd8ad7b5cde4ef653b9869fe79b3d95956ca2f4deb7ee8f11a0cf1143",
+      "CMakeFiles/dome-sculpt-core.dir/src/texture-set-export.cpp.o.d": "3af7a6edf9c751499ccf22535eed06259fb5b1b26482ae025cbf38b6db3aec6b",
+      "CMakeFiles/dome-sculpt-core.dir/src/texture-set-field-codec.cpp.o.d": "4f915bea4ce11da714a70ba513e65c60721d8ad1b8aed9283784567e767da759",
+      "CMakeFiles/dome-sculpt-core.dir/src/texture-set-field-source.cpp.o.d": "945792a5f6e76116b68898c910834c898d0de7fef353bce798ac63c4ab7f18ec",
+      "CMakeFiles/dome-sculpt-core.dir/src/texture-set-graph.cpp.o.d": "6e339f3a825fef5bda4a3f87fd7e06e43e981d53d460ed2f75326b76408423c2",
+      "CMakeFiles/dome-sculpt-core.dir/src/texture-set-packed.cpp.o.d": "9074134bb13dfa8b90909b35b9144963296b0deb084e63fca1402c23fedeb14b",
+      "CMakeFiles/dome-sculpt-core.dir/src/texture-set-portable-field.cpp.o.d": "ca1ba64f9e228a6ecbc5198e53c16f1f78bf26111c3d4d7ff9576d3853a07d59",
+      "CMakeFiles/dome-sculpt-core.dir/src/texture-set-range.cpp.o.d": "56c1a597e814704f909643d4194afc42a5322a8b3554d06fa5dfff3428c55d9c",
+      "CMakeFiles/dome-sculpt-core.dir/src/texture-set-resample.cpp.o.d": "df259b53d1add324e68ac0adc3a89ae25b2174322cf3ce4f899060fad728b8a3",
+      "CMakeFiles/dome-sculpt-core.dir/src/texture-set-stroke.cpp.o.d": "e111aa9709c2c0e167df5c4ab46cafe916b04e87863ed657235a49b32eeaf23c",
+      "CMakeFiles/dome-sculpt-core.dir/src/texture-set-surface.cpp.o.d": "315d14ec911afa909cfc28d228b127d4e5745bd12436b8195390c67d61f25754",
+      "CMakeFiles/dome-sculpt-core.dir/src/texture-set-worker.cpp.o.d": "5e0948283d57f3b280b9f46698a1ea41f4b09f989b0fbeeee879547ff9ce66a8",
+      "CMakeFiles/dome-sculpt-core.dir/src/texture-sets.cpp.o.d": "219b7c18de2b32b4b390e7dd212b2b94b28b913df2f7f27b4d9899d2bce24e3d",
+      "CMakeFiles/dome-sculpt-core.dir/src/uv-solve.cpp.o.d": "fb9bd4f0b917b94fbcc9c725e3a8b8e711c078a374138d2d58a883b6bc75518a",
+      "CMakeFiles/dome-sculpt-core.dir/src/uv.cpp.o.d": "1ce85306a07951b33ffb7236f3594832e8f3d249a1e8ded7f937aeffb26990e0",
+      "CMakeFiles/dome-sculpt-core.dir/src/volume-geometry.cpp.o.d": "5086e4f03259da0346768efa5c94a12197b94d2f8e9c9f952f2113ce6b59408b",
+      "CMakeFiles/dome-sculpt-core.dir/src/volume-raycast.cpp.o.d": "1efb3d624285adc6ed7f3d4f460d19f293a1ca6fe9ff24076a0b6e57327d16af",
+      "CMakeFiles/dome-sculpt-core.dir/src/volume.cpp.o.d": "1f91defe6366084ebfa463bc665a5a5f948ce7a53004329db68cbf25d2888863",
+      "CMakeFiles/dome-sculpt-core.dir/src/vrm-expression-scene.cpp.o.d": "07548fc4d370d21ac31f8f1be2e14a52799928de95177fad8abfb16b06983704",
+      "CMakeFiles/dome-sculpt-core.dir/src/vrm-expression.cpp.o.d": "de3586e06b430621d3ffa2f273054ebbfbd1194e85e0d5a2d2fc9c561e9f10aa",
+      "CMakeFiles/dome-sculpt-core.dir/src/vrm-import.cpp.o.d": "7f353fc118329bd7a215ef186f456148224a2f4a751098f0ea2f393e817c6efc",
+      "CMakeFiles/dome-sculpt-core.dir/src/vrm-rest-metadata.cpp.o.d": "9ff42c2bfd3059ca6ac0bc11e5abe4237506ccb43162e2da34994de965d0e466",
+      "CMakeFiles/dome-sculpt-core.dir/src/vrm-source-graph.cpp.o.d": "40a0df838bb36ac072c51fcc0893513e8f3bdd6e16f8b07acfaef2f0cfaad0b8",
+      "CMakeFiles/dome-sculpt-core.dir/src/vrm.cpp.o.d": "805b971eec02d44c29e9d8e3c9e87458cfaf07e4617f3f8816a8e0c0f8ab2dc2",
+      "CMakeFiles/dome-sculpt-core.dir/src/vrm1-authoring.cpp.o.d": "583925d402db7d113b7f7b38b0184c50c34d86d2cf73a6e04b062e7f264d901f",
+      "CMakeFiles/dome-sculpt-core.dir/src/vrm1-export.cpp.o.d": "b6292cc06dada39482b5804642c73814f00f4a1caa8f95ef55e2aaef83fed9c7",
+      "CMakeFiles/dome-sculpt-core.dir/src/vrm1-expression-layer.cpp.o.d": "37cf850b3539f13f6404cd17fd2930992eef7d5624f7d77dd3d6c107c7f43d17",
+      "CMakeFiles/dome-sculpt-core.dir/src/vrm1-metadata.cpp.o.d": "91f3f6ac3896039558ec1b1bca83442d18a4d0d227d4769b12a8008fff9370c8",
+      "CMakeFiles/dome-sculpt-core.dir/src/vrm1-painted-material.cpp.o.d": "ff37bf9f6e391bb046664a8dea3bbfa65d980a1967bc964be616cd626fdd6f34",
+      "CMakeFiles/dome-sculpt-core.dir/src/vroid-creator.cpp.o.d": "e1e1b9db2788c491b5c7712f5c17efae75ff30bf18798fe5a7af9db26683fdc6",
+      "CMakeFiles/dome-sculpt-core.dir/src/vroid-groom.cpp.o.d": "b0075fddae8985c9661c959e6226fc7ac00760331c2cfe6b2316b84e887e95a1",
+      "CMakeFiles/dome-sculpt-core.dir/src/weight-authoring.cpp.o.d": "e15274581fb085a5a18a821c4d6d80eb89ef28d4fbdd0d6423b659b9a525d99e",
+      "CMakeFiles/dome-sculpt-core.dir/src/weight-edit.cpp.o.d": "28d6d90520a3d3850209e304e5abf24540d19e3f178324af8b6806f07338b32d",
+      "CMakeFiles/dome-sculpt-core.dir/third_party/openbrush/controller-profiles.cpp.o.d": "6db98cdff276ec4a6ac6822f9b7aa32958328068d1bcca33b3d652d18db05d45",
+      "CMakeFiles/dome-sculpt-core.dir/third_party/openbrush/navigation.cpp.o.d": "ac308f608be539f917f38989987550a2592d5d1ae3cb8bfd9f94e99175d5ce1a",
+      "CMakeFiles/dome-sculpt-emission-codec.dir/src/emission-exr-owned.cpp.o.d": "bfb49b8d3b9236644f021ac07ecdfac726388218dfd11e48ffcadbcdfccad4db",
+      "CMakeFiles/dome-sculpt-emission-codec.dir/src/emission-exr.cpp.o.d": "b385f8219ef2939761dd5dd662bf953efdaac2a7418d9145f4c4bc34bf05e2ce",
+      "CMakeFiles/dome-sculpt-native-graphics.dir/third_party/openbrush/graphics.cpp.o.d": "2e35dd2353342f1ec3a15bcc9082cc424aa0dbabb573983e6d288fecc68398e7",
+      "CMakeFiles/dome-sculpt-paint-gpu.dir/src/paint-blur-gpu.cpp.o.d": "b18a4d6c8bc8482e932b937fe11f2bf6ce87f6a93577c672360f7bf5d1f16d7d",
+      "CMakeFiles/dome-sculpt-polygon.dir/src/polygon-color.cpp.o.d": "dd80d3a2f43357c678bda2a2c90e3fc4128829fa21a62486df737e5170734439",
+      "CMakeFiles/dome-sculpt-polygon.dir/src/polygon.cpp.o.d": "b5673d8b54c8c5174dbb24a4c33791d1b3063cb26b1c7bc93cc841cd7f44e9d9",
+      "CMakeFiles/dome-sculpt-render.dir/src/palette-text.cpp.o.d": "212661d4dd9b8959e2e3b9b95d742c7c7110d559afb89f79d4ec9b0baeb1f8f7",
+      "CMakeFiles/dome-sculpt-render.dir/src/palette.cpp.o.d": "965342fe6f2a164469477250d1d4d5dd4064d9363b9488669cd7ec7a96578d01",
+      "CMakeFiles/dome-sculpt-render.dir/src/polygon-render.cpp.o.d": "7fa67cb2a4141ae833bb6cd4a2875abf0aea50a4eb24ccabff4b156d57dfb306",
+      "CMakeFiles/dome-sculpt-render.dir/src/render.cpp.o.d": "5bb317c1312fc5c36d1f5fc5619a2181db512384aa9f0a84cd8865c88d90d2b9",
+      "CMakeFiles/dome-sculpt-spacenav.dir/src/spacenav-unix.cpp.o.d": "8735e29e67102d42ca2e6835870b212fc95a2bbbafe2ed135a5890e038ac46b6",
+      "CMakeFiles/dome-sculpt-spacenav.dir/src/spacenav.cpp.o.d": "09b310798162a320dd49d483e994e3852fa9bafd7bf654c330d078b621a1b92a",
+      "CMakeFiles/dome-sculpt-xr.dir/src/xr.cpp.o.d": "63ce8024d3354f9892bbd5ea6e3a5a919d4d6b3ef6e2fa6e5a4207f14be6f766",
+      "CMakeFiles/dome-sculpt.dir/appmenu-protocol.c.o.d": "6a9b39e3ae6f5e411e675627724e0b0789e28d6efacf8e38b471dcf00312ca9b",
+      "CMakeFiles/dome-sculpt.dir/src/app.cpp.o.d": "ba22e6305745d47a152619a3f68fe93f0e588c5d582c902cf274b5cfcc56f97f",
+      "CMakeFiles/dome-sculpt.dir/src/bake-editor.cpp.o.d": "e65cf00fb848c29a1f60753c4f4adb1a83b2993d5c9c37f106b4cd969bb46a6d",
+      "CMakeFiles/dome-sculpt.dir/src/creator-editor.cpp.o.d": "8df1c59a7a16116a993bb271097f8a6d1e9a902bda01ddfc77b3b5bdb447bfd4",
+      "CMakeFiles/dome-sculpt.dir/src/export-editor.cpp.o.d": "93565fa55db97375913c1ae15098b749ec8398155541758b533a6d4513ca88f0",
+      "CMakeFiles/dome-sculpt.dir/src/import-editor.cpp.o.d": "b66a3e44cbd847e3cc71c7ac4ab629885f29ebe04289c548b007202c6d162518",
+      "CMakeFiles/dome-sculpt.dir/src/mesh-editor.cpp.o.d": "6c64a4dcc55cd710831d416462e844313df82abacec994d8da9186345b3cf9b8",
+      "CMakeFiles/dome-sculpt.dir/src/native-display-runtime.cpp.o.d": "2435a4f23bd5f645d78667ab4f5b737ffa45d53b48322ccf3dc1d8f7a822bacc",
+      "CMakeFiles/dome-sculpt.dir/src/object-editor.cpp.o.d": "7683b6a7ecbcb5c4b1fc9b329583c4fff956ce09596b8b8b3ccf542adbcc7a52",
+      "CMakeFiles/dome-sculpt.dir/src/paint-editor.cpp.o.d": "ddb0ad6183be928fe9b69ac419ae31e08b9a6c4ffbc8620b73ccdd5c417e86b3",
+      "CMakeFiles/dome-sculpt.dir/src/polygon-editor.cpp.o.d": "73420ad314f1d2b3f89b84e470b4a55adff75d1c3c20bf97e8b991a7fe068bab",
+      "CMakeFiles/dome-sculpt.dir/src/procedural-editor.cpp.o.d": "087300e3945817b221e52e06271043d1b5c505697224798f46e16c9cf9babbac",
+      "CMakeFiles/dome-sculpt.dir/src/projection-editor.cpp.o.d": "9dc01f03de242b2567389dd2e8384d7d495370b2ef28ad39dbf190a776ed2216",
+      "CMakeFiles/dome-sculpt.dir/src/resolution-editor.cpp.o.d": "c48612af4697152ca4ccbe26ea1da96fb848b8bb9c5535b0fb9f79904c56f178",
+      "CMakeFiles/dome-sculpt.dir/src/rig-editor.cpp.o.d": "75766bfb747cf660b5cc0f3d3cbe8075b34ed1e879a10bdb0fcf31caffb94d59",
+      "CMakeFiles/dome-sculpt.dir/src/rig-fit-editor.cpp.o.d": "5723edc24fa1ff552c8dc97b95141645957b53954c040187ac094f5ca5a9ef2a",
+      "CMakeFiles/dome-sculpt.dir/src/sculpt-editor.cpp.o.d": "37bb7b242a76147184d9d770a79ff4292a9bda0896b9ff98a955df01a4f8f2db",
+      "CMakeFiles/dome-sculpt.dir/src/session-appearance.cpp.o.d": "659c9c7e585be72cf3be1a517b96ca1226868c81bfda6b7b6b82903bfd9d7e1a",
+      "CMakeFiles/dome-sculpt.dir/src/shapekey-editor.cpp.o.d": "ed66c800e4c563b8ff0f7a422b506e5e6b189f2e7abccdc1f63d756611b2a889",
+      "CMakeFiles/dome-sculpt.dir/src/skin-editor.cpp.o.d": "73d3213155b4bf3cd2e27a21452685353e2ff6d410ea375e12048602c47d57b2",
+      "CMakeFiles/dome-sculpt.dir/src/spacenav-options.cpp.o.d": "115701f75b1820a83a2e70e9353227891fadda5b856c081ea18a1a0edc9c2e6d",
+      "CMakeFiles/dome-sculpt.dir/src/texture-set-editor.cpp.o.d": "fa50f1b0aa304d034ad06c056f410709834a44fe1b18fc1649e3f242735c2815",
+      "CMakeFiles/dome-sculpt.dir/src/ui-conventions.cpp.o.d": "4df36ca5a1615aeb59aee8600df00e654d9a33421ea6e7a289b4d36ed2b50079",
+      "CMakeFiles/dome-sculpt.dir/src/uv-editor.cpp.o.d": "93279cdf7052f9b282e502bc5382afb2b6347f9c8785b27d5a097c6a77eec818",
+      "CMakeFiles/dome-sculpt.dir/src/vrm-expression-editor.cpp.o.d": "844b4b05d3e1279ec48cc126cd9b44869593c982469d7585357aef5dc22d4f4c",
+      "CMakeFiles/dome-sculpt.dir/src/weight-editor.cpp.o.d": "61c9cdac2b614a4e11b9d46af8ce0f5331b351451443c2a5d4113d700d22e1c9",
+      "CMakeFiles/dome-sculpt.dir/third_party/desktop/desktop-menu.cpp.o.d": "d0a55e12fa3428f3f8ec89e771fdda2f9842bce118b652b8cb8bec7ce72a5b54",
+      "CMakeFiles/mikktspace-robust.dir/third_party/mikktspace/mikktspace.c.o.d": "7d7e376df4509a3fda0ca077755b71f71ecbe32754d24e1ae3fe5c7f29ba741a",
+      "CMakeFiles/mikktspace.dir/third_party/mikktspace/mikktspace.c.o.d": "7ee3cb1178d90340c2f60993d978d617b9a5ce62e896e7912d2a27be9a10ebcf",
+      "CMakeFiles/ufbx.dir/third_party/ufbx/ufbx.c.o.d": "36bf2a3b61953573ccda6991ef86470742bb1b7d99ee2e0b068f2fe25afc97a5",
+      "CMakeFiles/xatlas.dir/third_party/xatlas/xatlas.cpp.o.d": "8d652e8ea6f5b4d9c9d614d851380d6e64857c381944cbff434b3af7575114ff"
+    }
+  },
+  "scope": "Fresh whole optimized CPU application target only with ordinary loader/version checks; no selected native suite, GL/compositor/HMD, all-target or sanitizer result for this union. Main product remains1bc.",
+  "next_source": {
+    "source": "63956adcde86476ad11e73ebe565a85b61fe86dc",
+    "branch": "work/authoring-combined-checked-source-20261118",
+    "parents_added": [
+      "ea838415d64f4e439d36713a6fbde897774c9dce",
+      "d5662344abe92864a6c2cb36f9ac52f221ae4c62"
+    ],
+    "production_differences": [
+      "src/bake-target-resolution.hpp",
+      "src/document-texture-sets.cpp"
+    ],
+    "CMake_conflict_resolution": "Retain explicit currentchecked1 and full legacy17 tests, plus original canonical/writable/joint targets.",
+    "configure_exit": 0,
+    "build_unit": "ds-authoring-combined-checked-release-20261118.service",
+    "build_main_pid": 1549843,
+    "build_invocation": "5f3dc23a5a99429d80b4351fca6d9067",
+    "build_plan_sha256": "f416fa0e8c37c89da39e17160af39422505b6490194bca5af8f1e99fee4c7e95",
+    "fresh_expected_owners": 251,
+    "scope": "CPU Release App and seven native fixture targets compile only; build active, no completion or runtime acceptance follows."
+  }
+}
