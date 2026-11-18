@@ -2,7 +2,7 @@
 
 Original64 retained-source graphical target data fails `.035` at 18/136 original
 role probes; no original probe or bound is changed. This source draft is not yet
-compiled or admitted. See ADVANCED-NORMAL-MATERIAL-TRANSFER-20261118.md.
+qualified or admitted. See ADVANCED-NORMAL-MATERIAL-TRANSFER-20261118.md.
 
 New ObjectBakeSettings requests default normal_filter_quality1. The saved policy
 is explicit and bounded: version1 checks rest-space normal conditioning,
@@ -10,16 +10,13 @@ quantization, and sampled filtered transfer against the same normal_error angle.
 It tests nine quarter/midpoints in each fully projected interior bilinear cell,
 using the actual target role basis, sampled RGBA8 vectors and authenticated source
 projection/normal resolver. Prepared original/retained sources keep their sealed
-paired resolver. Ordinary meshes, original normal textures and actual sculpt
-meshes use a separate numeric-only sampler shared with the real raster encoder;
-it cannot authorize retained/prepared material pairing. Raw unprepared targets
-explicitly record policy0 and never claim this filtered check. Ordinary mesh and sculpt sources use a separate numeric
-sampler extracted from the actual generic Bake normal path: interpolated source
-normals, original texture UV/basis, explicit imported tangents and legacy raw
-coverage all follow the same validated function as rasterization. This numeric
-sampler cannot mint prepared-frame authority. Missing ordinary-source frame
-bindings never skip the check. Explicit raw, unprepared Bakes record policy0
-and make no filtered-quality claim. Aggregate ray/raster budgets and cancellation bound
+paired resolver. Ordinary mesh and sculpt sources use a separate numeric sampler
+extracted from the actual generic Bake normal path: interpolated source normals,
+original texture UV/basis, explicit imported tangents and legacy raw coverage
+follow the same validated function as rasterization. This numeric sampler cannot
+mint prepared-frame authority. Missing ordinary-source frame bindings never skip
+the check. Explicit raw, unprepared Bakes record policy0 and make no filtered
+quality claim. Aggregate ray/raster budgets and cancellation bound
 all work. No empty interior certificate authorizes a field. This is a sampled
 rest-space contract, not an all-point or all-pose theorem. The independent native
 and GL corpora retain their original component `.035`, RGB3 and gap7 checks.
@@ -51,7 +48,9 @@ Authored/prepared field resizing still needs its separate owning adapter.
 
 The focused workflow entry --filtered-workflow preserves eight original64
 refusals, exercises seventeen separately named higher-resolution families through
-Document's actual resolution worker/Bake/Save/Undo/Redo/reopen, checks all original
+Document's actual resolution worker/Bake/Save/Undo/Redo/reopen. Each of the eight
+retained64 cases also refuses and then recovers through resolution selection in
+the same live Document, preserving its prior save and history before retry. It checks all original
 probe directions independently, and validates the real historical fixture. A
 separate 64/128/256/512 study shows512 is still insufficient for the dense
 MToon corpus; the focused workflow therefore starts at an explicitly selected
