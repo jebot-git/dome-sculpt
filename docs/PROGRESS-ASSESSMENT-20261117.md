@@ -1,7 +1,8 @@
 # Dome Sculpt progress assessment — updated 2026-11-18
 
-The full production objective is active and incomplete. The project has a
-functional native FLTK/OpenXR authoring baseline; recent work strengthens its
+The full production objective is incomplete. The current round is closing for
+the user-requested pause. The project has a functional native FLTK/OpenXR
+authoring baseline; recent work strengthens its
 combined build, source-aware baking and actual application qualification. This
 assessment does not replace the complete [requirements](REQUIREMENTS.md).
 
@@ -122,13 +123,20 @@ checks and55 normalized-sampler checks. It retains the correct64/1024 refusals,
 all history and complete Save/reopen comparisons. A valid RGBA8 interpolation
 rounded above1; correcting its producer preserves strict downstream validation.
 Read [native qualification](ADVANCED-NORMAL-FILTERED-WORKFLOW-20261118.md).
-Calibrated software/Arc graphics remain pending.
+Calibrated software/Arc graphics remain pending. The preparatory forecast was
+interrupted for the requested pause after23 complete views; partial results are
+not acceptance. Its terminal/journal are captured, owned processes cleaned and
+lease released. No replacement forecast or graphical run started.
 
-A separate owning HDR-domain prototype addresses actual512 grid-knot loss
-without changing source64 FLOAT data or the original2e-4 bound. Dense native
-normal/HDR probes pass, but its Save/reopen certificate exposes a quaternion
-component-order bug; that fix and complete GPU/export adapters are in progress.
-No fullpositive or combined admission is inferred.
+A separate owning HDR-domain implementation at1a944c46 preserves source64
+FLOAT data while editable paint uses512, avoiding the measured grid-knot loss.
+Explicit quaternion component decoding fixes native replay. Its actual full
+native workflow passes47409 checks, including Save/reopen, ordered byte equality,
+Undo/Redo and source preservation. Dense4536900-point HDR error is3.064e-6 under
+the unchanged2e-4 bound; both normal roles also pass. This is native component
+evidence: GPU and export adapters remain unimplemented, and new-domain strict
+sanitizer runtime, further owner/transform controls and combined admission remain
+pending. The separate GPU integration worktree has no implementation changes.
 
 The shared VRoid creator and true hair recolour now pass352 both-base native
 control/deformation/effective GLB/neutral19-part VRM checks plus44 controller
@@ -136,9 +144,14 @@ checks. Root independently rehashes the recorded authorities; read
 [creator qualification](CREATOR-WORKSPACE-20261118.md). Public GUI/XR and full
 sanitizer qualification remain pending. A separate production slice implements
 actual Shaper-based first-person/collider metadata refit and generated-groom
-provenance/export, with stale/foreign-rest guards. Its first native run catches
-a generated-holder default claiming MToon identity; the narrow creation-owner
-fix is being tested. Styled/groom VRM remains unqualified until actual success.
+provenance/export, with stale/foreign-rest guards. The generated-holder MToon
+identity defect is corrected at its creation owner.
+A shaped female20-mesh VRM export passes independent graph/skin parsing, official
+VRM0 schemas and Khronos validation with zero errors (21 existing/naming warnings).
+The full run then exposes a consumer fixture's incorrect assumption that each
+mesh has a unique material. That fixture correction compiles and links but is
+unrun. Full current-source native, strict sanitizer, public GUI/XR and broader
+styled/groom VRM qualification remain pending.
 
 The user-accepted controller selection/hierarchy/multiselection/ghost interface
 is preserved. Only the verified CC0 VRoid female/male creator bases are offered.
@@ -147,9 +160,11 @@ Current canonical DomeD FLTK and bitmap-font builds remain selected; see
 
 ## Main remaining goals
 
-1. Qualify the newly integrated combined candidate in the physical
-   headset/controller workflow and finish the next baking adapters' own
-   sanitizer, graphical and public application qualification.
+1. Finish retained HDR GPU/export adapters and current creator VRM validation;
+   merge the independently qualified components into one current application.
+   Complete its broader regression, strict sanitizer, software/Arc, public
+   desktop/XR and physical headset/controller qualification. Fresh combined
+   builds and selected tests already pass; the newest source is not yet admitted.
 2. Complete production-size sustained sculpting, local meshing, allocation and
    recovery hardening, topology/paint preservation, remeshing and retopology.
 3. Finish texture sets, broader layered paint/normal/AO/material baking and
@@ -167,8 +182,8 @@ Current canonical DomeD FLTK and bitmap-font builds remain selected; see
 8. Implement controller tool/function/selection trays and spatial node-based
    editing/history after the basic production targets are met.
 
-The user resumed the full goal on2026-11-18. Three agents are continuing the
-canonical adapter, advanced graphical verification and public desktop/XR work.
+The Nov18 round is closing at the user's requested pause boundary. Agents are
+preserving their checkpoints; no successor runtime or implementation is to start.
 No percentage is assigned: implemented rows differ greatly in scope and several
 still have only partial qualification. No system installation, physical-headset
 test or active-session restart occurred during this round.

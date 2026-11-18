@@ -1,6 +1,7 @@
 # Dome Sculpt current handoff — 2026-11-18
 
-The full production goal is ACTIVE after the user's resume. It is incomplete.
+The full production goal is INCOMPLETE. The current round is closing for the
+user-requested pause; no further implementation or test runs are to start.
 Read [REQUIREMENTS.md](REQUIREMENTS.md) and the original
 [HANDOFF-466ebd1.md](HANDOFF-466ebd1.md) for the complete scope. This concise file
 replaces the accumulated checkpoint diary; all previous text is preserved,
@@ -319,7 +320,10 @@ do not restart them. The compressed scoped proof is committed above.
   the mathematical normalized range while all MToon/quality checks stay strict.
   Read [native qualification](ADVANCED-NORMAL-FILTERED-WORKFLOW-20261118.md).
   Root rehashed every scoped archive member against actual files. The68-view
-  calibrated forecast, software and Arc checks are next; no new GL pass claimed.
+  calibrated forecast was interrupted at the user's pause boundary after23
+  complete views; its partial results are not acceptance. Terminal/journal were
+  captured, owned processes cleaned and device lease released. No successor
+  forecast, software or Arc run started; no new GL pass is claimed.
 - **Combined source:** ab497 and successor63956 retain their distinct fresh
   Release build/audit proofs. App63956 additionally passes loader72/version0.
   Its fresh217-owner strict sanitizer build/audit also passes, but selected
@@ -345,10 +349,14 @@ do not restart them. The compressed scoped proof is committed above.
   Exact supporting-face/UV/current ray-column certificates, frozen before-scene
   provenance, quotas and ancestor/cycle guards are implemented in isolated
   production children; GPU/export still refuse the new domain until adapters.
-  Latest53ce numeric512 probes pass, including4536900 dense normal/HDR samples
-  (HDR3.06e-6), but native Save/reopen rejects a decoder quaternion-order bug.
-  Explicit component decoding is being fixed separately; no fullpositive or
-  GPU/export acceptance is claimed. Original failures remain frozen.
+  Product1a944c46 fixes quaternion component decoding. Actual joint000512 now
+  passes47409 checks and complete native Save/reopen, ordered byte equality,
+  Undo/Redo and source preservation. Both normal roles and4536900 dense HDR
+  probes pass (HDR3.064e-6 under unchanged2e-4). Further transform/owner/current
+  paint controls compile but remain unrun; strict new-domain runtime is pending.
+  GPU/export remain explicit refusals. Root's GPU integration worktree at1a944
+  is clean: no adapter implementation or graphics/export acceptance is claimed.
+  Original failures remain frozen.
 - **Creator:** production75 now passes352 real both-base control/deformation/
   GLB/effective-colour/neutral19-part VRM checks and44 controller/workspace checks;
   root independently verifies the recorded authorities. Read
@@ -358,8 +366,13 @@ do not restart them. The compressed scoped proof is committed above.
   explicit generated-groom provenance/material/rig transport, with strict
   stale/foreign-rest refusals. Fresh App/component builds pass; native canary
   first detects generic genesis's default has_mtoon=true and correctly refuses
-  borrowed typed identity. A single creation-owner fix is being prepared.
-  Male empty physics is preserved. This prototype is not full VRM admission.
+  borrowed typed identity. The creation-owner fix is implemented. An actual
+  shaped female20-mesh VRM passes graph/skin and official schema/Khronos checks
+  with zero errors (21 naming/existing skinned-node warnings), before the full
+  run exposes a shared-material assumption in its consumer UV fixture. The
+  corrected test-only child compiles/links but remains unrun. Male empty physics
+  is preserved. Current-source native/SAN and public GUI/XR qualification remain
+  pending; this prototype is not full VRM admission.
 
 Root rechecked canonical DomeD local and remote main onNov18: both remainacc2b70.
 No system installation, physical-headset launch or active-session restart occurred.
@@ -374,8 +387,8 @@ outside the actual selected72-provider closure; do not rewrite old expectations
 or rebuild solely because an unused historical/global manifest differs.
 
 The [current progress assessment](PROGRESS-ASSESSMENT-20261117.md) describes
-remaining production work. Earlier requested pauses are superseded by the
-user's resume; the full goal remains active.
+remaining production work. The latest user instruction requests a pause after
+this round. Preserve all incomplete requirements for the next explicit resume.
 Complete production sculpt/local meshing/recovery, painting/texture sets/baking,
 remesh/retopology/UV workflows, humanoid/rig/weight authoring, glTF/VRM coverage,
 physical XR/input and accelerator execution remain required. Controller trays
