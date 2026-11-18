@@ -727,6 +727,7 @@ void Document::publish_locked(bool force,bool checkpoint) {
   state_.texture_sets.clear();state_.active_texture_set=active.texture_sets?active.texture_sets->active():0;
   state_.texture_material=selected_field?selected_field->material:active.material;
   state_.can_edit_texture_sets=selected_field&&(!active.polygon||active.texture_sets)&&detail::texture_set_plain_fields(active)&&object_editable_locked(active.id)&&!state_.asset_busy&&!state_.recovery_busy&&!native_stroke_&&!control_before_&&!state_.polygon&&!state_.retopology&&!state_.cut&&!uv_;
+  state_.can_resize_bake_target=selected_field&&detail::unpainted_bake_resolution_target(active)&&object_editable_locked(active.id)&&!state_.asset_busy&&!state_.recovery_busy&&!native_stroke_&&!control_before_&&!state_.polygon&&!state_.retopology&&!state_.cut&&!uv_;
   if(selected_field){
     const auto primary=texture_set_view(active,0);state_.texture_sets.push_back({0,primary.name,primary.painted->resolution(),primary.domain?primary.domain->triangles().size():primary.painted->mesh().indices.size()/3});
     if(active.texture_sets)for(const auto&s:active.texture_sets->additional())state_.texture_sets.push_back({s.id,s.name,s.painted->resolution(),s.domain->triangles().size()});
@@ -2333,7 +2334,7 @@ bool Document::parameter_enabled_locked(VrParameter parameter) const {
   if (state_.asset_busy || parameter == VrParameter::None)
     return false;
   auto &o = scene_.active();
-  if(parameter==VrParameter::TextureResolution&&!o.texture_sets)return false;
+  if(parameter==VrParameter::TextureResolution&&!o.texture_sets)return object_editable_locked(o.id)&&detail::unpainted_bake_resolution_target(o)&&!action_active_locked()&&!state_.recovery_busy;
   if(o.texture_sets&&detail::texture_set_control(parameter))return object_editable_locked(o.id)&&detail::texture_set_plain_fields(o)&&!action_active_locked()&&!state_.recovery_busy;
   if (parameter == VrParameter::LayerOpacity ||
       parameter == VrParameter::LayerOrder)
@@ -2345,7 +2346,7 @@ bool Document::parameter_enabled_locked(VrParameter parameter) const {
 void Document::finish_control_locked(bool accept) {
   if (!control_before_)
     return;
-  if(control_before_->object(control_object_).texture_sets&&detail::texture_set_control(state_.controls.parameter)){
+  if((control_before_->object(control_object_).texture_sets||(state_.controls.parameter==VrParameter::TextureResolution&&detail::unpainted_bake_resolution_target(control_before_->object(control_object_))))&&detail::texture_set_control(state_.controls.parameter)){
     auto controls=std::move(state_.controls);const auto source=control_source_;
     auto before=std::move(control_before_);control_before_.reset();state_.controls={};const bool changed=control_changed_;control_changed_=false;
     try{if(accept&&changed){auto edit=detail::texture_set_control_request(before->object(control_object_),controls);queue_texture_set_locked(std::move(edit),source);}}
@@ -2711,8 +2712,8 @@ void Document::control_event_locked(VrControlEvent event) {
       for(int k=0;k<3;++k)c.value[k]=std::clamp(c.value[k],c.minimum,c.maximum);
       break;
     case VrParameter::TextureResolution:
-      if(!o.texture_sets)throw std::logic_error("Choose an actual texture field before resizing");
-      c.title="Selected material paint resolution";c.minimum=0;c.maximum=5;c.value[0]=float(std::countr_zero(active_texture_set(o).painted->resolution())-6);break;
+      if(!o.texture_sets&&!detail::unpainted_bake_resolution_target(o))throw std::logic_error("Choose an actual texture field before resizing");
+      c.title=o.texture_sets?"Selected material paint resolution":"Target paint resolution";c.minimum=0;c.maximum=5;c.value[0]=float(std::countr_zero(active_texture_set(o).painted->resolution())-6);break;
     case VrParameter::BakeColors:
       c.title="Color / normal preparation and maximum errors";c.components=4;
       c.value={state_.bake_settings.prepare_colors?1.f:0.f,state_.bake_settings.color_error,state_.bake_settings.prepare_normals?1.f:0.f,state_.bake_settings.normal_error*4};break;
@@ -2925,7 +2926,7 @@ void Document::control_event_locked(VrControlEvent event) {
   c.value[event.component] = value;
   auto &o = scene_.object(control_object_);
   auto &before = control_before_->object(control_object_);
-  if(o.texture_sets&&detail::texture_set_control(c.parameter)){
+  if((o.texture_sets||(c.parameter==VrParameter::TextureResolution&&detail::unpainted_bake_resolution_target(o)))&&detail::texture_set_control(c.parameter)){
     const auto original=active_texture_set(before);auto request=detail::texture_set_control_request(before,c);
     if(request.action==TextureSetAction::Resolution)control_changed_=request.resolution!=original.painted->resolution();
     else if(request.action==TextureSetAction::Material)control_changed_=!detail::same_texture_material(request.material,original.material);

@@ -14,5 +14,9 @@ struct ObjectBakeSettings {
   // Zero uses the ordinary normal-offset projection. Session configuration;
   // cage geometry is an ordinary editable/persistent scene mesh.
   uint64_t cage_object=0;
+  // 0: saved legacy per-texel conditioning/quantization semantics. Missing
+  // recipe fields decode to 0. New requests default to version1: additionally
+  // check sampled filtered transfer fidelity at the explicitly chosen grid.
+  uint32_t normal_filter_quality=1;
 };
 } // namespace dome

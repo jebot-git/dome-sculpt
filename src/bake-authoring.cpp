@@ -16,6 +16,7 @@
 #include "emission-bake-source.hpp"
 #include "source4-baked.hpp"
 #include "source-bake-normal.hpp"
+#include "bake-filtered-normal-quality.hpp"
 namespace dome {
 ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
                               ObjectBakeSettings settings,
@@ -53,7 +54,7 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
     throw std::invalid_argument("Select a source without prepared normal attributes for this bake; source-frame transport is required and both objects are retained");
   if(!std::isfinite(settings.color_error)||settings.color_error<0||settings.color_error>1)
     throw std::invalid_argument("Invalid vertex-color preparation tolerance");
-  if(!std::isfinite(settings.normal_error)||settings.normal_error<0||settings.normal_error>.25f)
+  if(!std::isfinite(settings.normal_error)||settings.normal_error<0||settings.normal_error>.25f||settings.normal_filter_quality>1)
     throw std::invalid_argument("Invalid normal preparation angular tolerance");
   for (auto mm : {settings.front_mm, settings.back_mm, settings.ao_distance_mm})
     if (!std::isfinite(mm) || mm < 0 || mm > 100'000)
@@ -178,6 +179,15 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   const auto retained_uv=target.material_bindings?target.material_bindings->canonical_uv:nullptr;
   if(retained_uv&&progress)options.progress=[&](float value){progress(.1f+.4f*value);};
   auto result = detail::bake_mesh_source_normals(low_mesh,high,options,source_normals);
+  auto verify_filtered=[&](const Mesh &mesh,const BakeOptions &policy,BakeResult &candidate){
+    if(prepared_normals&&source_normals&&settings.normal_filter_quality==1){
+      const auto frames=target.material_bindings->normal_frames;
+      const auto mode=canonical_attributes?PreparedMToonNormalEvaluation::Absent:target.material_bindings->normal_preparation->receipt.mtoon;
+      detail::verify_filtered_normal_quality(mesh,high,policy,source_normals,*frames,mode,
+          target.material_bindings->material.parameters.normal_scale,settings.normal_error,candidate);
+    }
+  };
+  if(!retained_uv)verify_filtered(low_mesh,options,result);
   std::optional<BakeResult> retained_normal_write;
   if(retained_uv){
     retained_uv->validate_current(target.painted->mesh(),cancelled);
@@ -196,6 +206,7 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
     normal_options.max_rays-=result.rays;normal_options.max_raster_samples-=result.raster_samples;
     if(progress)normal_options.progress=[&](float value){progress(.5f+.4f*value);};
     retained_normal_write=detail::bake_mesh_source_normals(normal_low,high,normal_options,source_normals);
+    verify_filtered(normal_low,normal_options,*retained_normal_write);
   }
   check();
   if(!result.projected)throw std::runtime_error("No target texels project onto the selected source");
