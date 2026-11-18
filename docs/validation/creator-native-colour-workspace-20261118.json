@@ -3,8 +3,7 @@
   "roles": {
     "production": "75ee61fbac22cf0c51be1b8837647d212878b34d",
     "controller_fixture": "3666e26021b24c859995e676493d4afa9641829f",
-    "colour_fixture": "e2d6a6f6",
-    "actual_colour_fixture_source": "e2d6e1b62c642e021d343a53fb0ebd5d4e560ff5",
+    "colour_fixture": "e2d6e1b62c642e021d343a53fb0ebd5d4e560ff5",
     "application_sha256": "0cfce3abb4514555fb849adf72f7d3639cd777c36f89be142494b9d8c3d5dcb2"
   },
   "actual_checks": {
