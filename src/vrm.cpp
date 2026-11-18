@@ -918,7 +918,6 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &original_input_obje
       const auto &pbr=material.at("pbrMetallicRoughness");
       if(!pbr.contains("baseColorTexture"))fail("generated groom is missing its current texture");
       auto factor=pbr.value("baseColorFactor",std::array<float,4>{1,1,1,1});
-      auto rgb=[](float v){return linear_to_srgb(v);};
       // Native groom is unlit: explicit MToon0 emission carries the current
       // colour field exactly; zero lit base/shade prevents double lighting.
       // PBR retains the same emitted KHR_materials_unlit material and image.
@@ -926,7 +925,7 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &original_input_obje
       const std::string name="Dome generated groom "+std::to_string(o.id);
       Json properties={{"name",name},{"shader","VRM/MToon"},{"renderQueue",2000},
         {"floatProperties",{{"_OutlineWidthMode",0},{"_ReceiveShadowRate",0},{"_IndirectLightIntensity",0},{"_LightColorAttenuation",1},{"_CullMode",material.value("doubleSided",false)?0:2}}},
-        {"vectorProperties",{{"_Color",{0,0,0,factor[3]}},{"_ShadeColor",{0,0,0,1}},{"_EmissionColor",{rgb(factor[0]),rgb(factor[1]),rgb(factor[2]),1}},{"_MainTex",{0,0,1,1}},{"_ShadeTexture",{0,0,1,1}},{"_EmissionMap",{0,0,1,1}}}},
+        {"vectorProperties",{{"_Color",{0,0,0,factor[3]}},{"_ShadeColor",{0,0,0,1}},{"_EmissionColor",{factor[0],factor[1],factor[2],1}},{"_MainTex",{0,0,1,1}},{"_ShadeTexture",{0,0,1,1}},{"_EmissionMap",{0,0,1,1}}}},
         {"textureProperties",{{"_MainTex",texture},{"_ShadeTexture",texture},{"_EmissionMap",texture}}},
         {"keywordMap",Json::object()},{"tagMap",{{"RenderType","Opaque"}}}};
       auto toon=MToonMaterial::from_vrm0(properties,j["textures"].size());
