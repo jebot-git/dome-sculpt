@@ -88,6 +88,12 @@ Vec3 consume(cgltf_node &node,size_t vertex){
 }
 std::string scene_hash(const Scene &s){auto bytes=s.encode().dump();return creator_detail::sha256(std::span<const uint8_t>(reinterpret_cast<const uint8_t*>(bytes.data()),bytes.size()));}
 void near(Vec3 a,Vec3 b){if(length(a-b)>2e-5f)throw std::runtime_error("Independent metadata point disagrees with actual shape");}
+void primitive_uv(const cgltf_primitive &primitive,const Mesh &mesh){
+ const auto *uv=cgltf_find_accessor(&primitive,cgltf_attribute_type_texcoord,0);
+ if(!uv||!primitive.indices||primitive.indices->count!=mesh.indices.size())throw std::runtime_error("Current primitive UV/corner stream is missing");
+ for(size_t c=0;c<mesh.indices.size();++c){float actual[2];if(!cgltf_accessor_read_float(uv,cgltf_accessor_read_index(primitive.indices,c),actual,2))throw std::runtime_error("Current primitive UV read failed");const auto expected=mesh.uv.at(mesh.indices[c]);if(std::abs(actual[0]-expected[0])>1e-6f||std::abs(actual[1]-expected[1])>1e-6f)throw std::runtime_error("Current primitive ordered UV corner changed");}
+ check(true,"Independent current primitive preserves every ordered UV corner even when source meshes share a material");
+}
 void verify(const Scene &scene,const CreatedHumanoid &model,const std::filesystem::path &file){
  const auto before=scene_hash(scene);auto surfaces=scene.surfaces(true);auto report=export_vrm(surfaces,file);check(report.meshes==20,"Styled body and generated groom export together as twenty real meshes");
  cgltf_options options{};cgltf_data *raw=nullptr;check(cgltf_parse_file(&options,file.c_str(),&raw)==cgltf_result_success,"Independent cgltf parses creator VRM");std::unique_ptr<cgltf_data,decltype(&cgltf_free)>data(raw,cgltf_free);
@@ -96,7 +102,7 @@ void verify(const Scene &scene,const CreatedHumanoid &model,const std::filesyste
  size_t parts=0,corners=0;float maximum=0;
  for(size_t n=0;n<raw->nodes_count;++n){auto &node=raw->nodes[n];if(!node.mesh)continue;size_t index=size_t(node.mesh-raw->meshes);const auto &surface=surfaces.at(index);const auto mesh=surface.preview_mesh();const auto world=surface.world_matrix();const auto &p=node.mesh->primitives[0];check(p.indices&&p.indices->count==mesh.indices.size(),"Original and generated ordered triangle corners survive VRM export");
   for(size_t c=0;c<mesh.indices.size();++c){auto v=mesh.positions[mesh.indices[c]];auto expected=world.point({v.x,v.y,v.z});auto actual=consume(node,cgltf_accessor_read_index(p.indices,c));float error=length(actual-flip({float(expected[0]),float(expected[1]),float(expected[2])}));maximum=std::max(maximum,error);if(error>3e-5f)throw std::runtime_error("Consumer posed own-IBM corner differs from native creator");++corners;}
-  consumer_uv(*raw,p.material,surface.mesh);++parts;
+  primitive_uv(p,surface.mesh);++parts;
  }
  check(parts==20&&corners>10000,"All body and groom corners independently deform with current rig, own inverse binds and facial targets");
  const auto &appearance=*model.parts.front().appearance;const auto &asset=*appearance.asset;const auto original=nlohmann::json::parse(*appearance.vrm_json);ConsumerShape warp(model.controls,asset,original);
