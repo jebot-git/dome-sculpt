@@ -1,0 +1,1943 @@
+{
+  "state": "STRICT_NATIVE_COMPONENT_COMPLETE_0",
+  "product": "85eafc420b0319ae9c3a553336df617590a6946d",
+  "fixture": "b11f9d422a050f45bb4ca3eb963c1009e4f9829e",
+  "fresh_core_members": 193,
+  "complete_actual_compiler_MD_owners": 212,
+  "all_actual_compiler_commands_ASAN_UBSAN": true,
+  "build_exit": 0,
+  "build_seconds": 851.1986653200001,
+  "build_status_sha256": "c21c070878c470c18d9363c0ca576a1eafa0d6e50177bd735e39cef76124d968",
+  "runtime_status_sha256": "060b39336aa6ff21e2107d1e73e98ac87bf5f1a416b6df9366e7368cbaaaba1e",
+  "steps": [
+    {
+      "name": "source-advanced-normal-bake-ldd",
+      "exit": 0,
+      "seconds": 0.012038469314575195,
+      "peak_owned_RSS_bytes": 1335296,
+      "signals": []
+    },
+    {
+      "name": "source-advanced-normal-bake",
+      "exit": 0,
+      "seconds": 13.454181909561157,
+      "peak_owned_RSS_bytes": 2125463552,
+      "signals": []
+    },
+    {
+      "name": "source-prepared-normal-bake-ldd",
+      "exit": 0,
+      "seconds": 0.012357473373413086,
+      "peak_owned_RSS_bytes": 1060864,
+      "signals": []
+    },
+    {
+      "name": "source-prepared-normal-bake",
+      "exit": 0,
+      "seconds": 2.925199031829834,
+      "peak_owned_RSS_bytes": 1494974464,
+      "signals": []
+    },
+    {
+      "name": "source-artist-normal-bake-ldd",
+      "exit": 0,
+      "seconds": 0.01224827766418457,
+      "peak_owned_RSS_bytes": 999424,
+      "signals": []
+    },
+    {
+      "name": "source-artist-normal-bake",
+      "exit": 0,
+      "seconds": 1.4099628925323486,
+      "peak_owned_RSS_bytes": 1192550400,
+      "signals": []
+    },
+    {
+      "name": "source-canonical-normal-bake-ldd",
+      "exit": 0,
+      "seconds": 0.012530803680419922,
+      "peak_owned_RSS_bytes": 3424256,
+      "signals": []
+    },
+    {
+      "name": "source-canonical-normal-bake",
+      "exit": 0,
+      "seconds": 301.91987705230713,
+      "peak_owned_RSS_bytes": 1913618432,
+      "signals": []
+    }
+  ],
+  "canonical_cases": [
+    {
+      "case": "00000",
+      "direct": 1.29495e-07,
+      "second": 2.22045e-16,
+      "material": 0.0,
+      "omit": 0.801105,
+      "swap": 0.789796,
+      "wrongUV": 0.0,
+      "emission": 0.0,
+      "peak": 0.0,
+      "interior": 2352.0
+    },
+    {
+      "case": "00001",
+      "direct": 1.76667e-07,
+      "second": 0.00475195,
+      "material": 0.0,
+      "omit": 0.68783,
+      "swap": 0.0,
+      "wrongUV": 0.0,
+      "emission": 0.0,
+      "peak": 0.0,
+      "interior": 2352.0
+    },
+    {
+      "case": "00010",
+      "direct": 1.47202e-07,
+      "second": 0.00459278,
+      "material": 0.0,
+      "omit": 0.798025,
+      "swap": 0.787191,
+      "wrongUV": 0.0,
+      "emission": 1.66893e-06,
+      "peak": 7.55471,
+      "interior": 2352.0
+    },
+    {
+      "case": "00011",
+      "direct": 1.66486e-07,
+      "second": 0.00464801,
+      "material": 0.0,
+      "omit": 0.685746,
+      "swap": 0.0,
+      "wrongUV": 0.0,
+      "emission": 1.66893e-06,
+      "peak": 7.55471,
+      "interior": 2352.0
+    },
+    {
+      "case": "00100",
+      "direct": 1.29495e-07,
+      "second": 2.22045e-16,
+      "material": 0.0,
+      "omit": 0.801105,
+      "swap": 0.789796,
+      "wrongUV": 0.0,
+      "emission": 0.0,
+      "peak": 0.0,
+      "interior": 2352.0
+    },
+    {
+      "case": "00101",
+      "direct": 1.76667e-07,
+      "second": 0.00475195,
+      "material": 0.0,
+      "omit": 0.68783,
+      "swap": 0.0,
+      "wrongUV": 0.0,
+      "emission": 0.0,
+      "peak": 0.0,
+      "interior": 2352.0
+    },
+    {
+      "case": "00110",
+      "direct": 1.36829e-07,
+      "second": 0.00458448,
+      "material": 0.0,
+      "omit": 0.796651,
+      "swap": 0.786003,
+      "wrongUV": 0.0,
+      "emission": 1.66893e-06,
+      "peak": 7.55471,
+      "interior": 2352.0
+    },
+    {
+      "case": "00111",
+      "direct": 1.40719e-07,
+      "second": 0.0046437,
+      "material": 0.0,
+      "omit": 0.684538,
+      "swap": 0.0,
+      "wrongUV": 0.0,
+      "emission": 1.66893e-06,
+      "peak": 7.55471,
+      "interior": 2352.0
+    },
+    {
+      "case": "01000",
+      "direct": 1.29495e-07,
+      "second": 0.00467752,
+      "material": 0.0,
+      "omit": 0.790335,
+      "swap": 0.786114,
+      "wrongUV": 0.602702,
+      "emission": 0.0,
+      "peak": 0.0,
+      "interior": 812.0
+    },
+    {
+      "case": "01001",
+      "direct": 1.10976e-07,
+      "second": 0.0045573,
+      "material": 0.0,
+      "omit": 0.68783,
+      "swap": 0.0,
+      "wrongUV": 0.0,
+      "emission": 0.0,
+      "peak": 0.0,
+      "interior": 812.0
+    },
+    {
+      "case": "01010",
+      "direct": 1.47202e-07,
+      "second": 0.0047652,
+      "material": 0.0,
+      "omit": 0.787362,
+      "swap": 0.783243,
+      "wrongUV": 0.599943,
+      "emission": 2.86102e-06,
+      "peak": 7.43394,
+      "interior": 812.0
+    },
+    {
+      "case": "01011",
+      "direct": 1.1488e-07,
+      "second": 0.00470847,
+      "material": 0.0,
+      "omit": 0.685737,
+      "swap": 0.0,
+      "wrongUV": 0.0,
+      "emission": 2.86102e-06,
+      "peak": 7.43394,
+      "interior": 812.0
+    },
+    {
+      "case": "01100",
+      "direct": 1.29495e-07,
+      "second": 0.00467752,
+      "material": 0.0,
+      "omit": 0.790335,
+      "swap": 0.786114,
+      "wrongUV": 0.602702,
+      "emission": 0.0,
+      "peak": 0.0,
+      "interior": 812.0
+    },
+    {
+      "case": "01101",
+      "direct": 1.10976e-07,
+      "second": 0.0045573,
+      "material": 0.0,
+      "omit": 0.68783,
+      "swap": 0.0,
+      "wrongUV": 0.0,
+      "emission": 0.0,
+      "peak": 0.0,
+      "interior": 812.0
+    },
+    {
+      "case": "01110",
+      "direct": 1.36829e-07,
+      "second": 0.00477032,
+      "material": 0.0,
+      "omit": 0.786037,
+      "swap": 0.781955,
+      "wrongUV": 0.598708,
+      "emission": 2.86102e-06,
+      "peak": 7.43394,
+      "interior": 812.0
+    },
+    {
+      "case": "01111",
+      "direct": 1.12867e-07,
+      "second": 0.00469645,
+      "material": 0.0,
+      "omit": 0.684531,
+      "swap": 0.0,
+      "wrongUV": 0.0,
+      "emission": 2.86102e-06,
+      "peak": 7.43394,
+      "interior": 812.0
+    },
+    {
+      "case": "10000",
+      "direct": 1.85676e-07,
+      "second": 2.22045e-16,
+      "material": 0.0,
+      "omit": 0.801301,
+      "swap": 0.844416,
+      "wrongUV": 0.0,
+      "emission": 0.0,
+      "peak": 0.0,
+      "interior": 2352.0
+    },
+    {
+      "case": "10001",
+      "direct": 1.76667e-07,
+      "second": 0.00475195,
+      "material": 0.0,
+      "omit": 0.68783,
+      "swap": 0.0,
+      "wrongUV": 0.0,
+      "emission": 0.0,
+      "peak": 0.0,
+      "interior": 2352.0
+    },
+    {
+      "case": "10010",
+      "direct": 1.82615e-07,
+      "second": 0.00465649,
+      "material": 0.0,
+      "omit": 0.798521,
+      "swap": 0.841691,
+      "wrongUV": 0.0,
+      "emission": 1.66893e-06,
+      "peak": 7.55471,
+      "interior": 2352.0
+    },
+    {
+      "case": "10011",
+      "direct": 1.66486e-07,
+      "second": 0.00464724,
+      "material": 0.0,
+      "omit": 0.685746,
+      "swap": 0.0,
+      "wrongUV": 0.0,
+      "emission": 1.66893e-06,
+      "peak": 7.55471,
+      "interior": 2352.0
+    },
+    {
+      "case": "10100",
+      "direct": 1.85676e-07,
+      "second": 2.22045e-16,
+      "material": 0.0,
+      "omit": 0.801301,
+      "swap": 0.844416,
+      "wrongUV": 0.0,
+      "emission": 0.0,
+      "peak": 0.0,
+      "interior": 2352.0
+    },
+    {
+      "case": "10101",
+      "direct": 1.76667e-07,
+      "second": 0.00475195,
+      "material": 0.0,
+      "omit": 0.68783,
+      "swap": 0.0,
+      "wrongUV": 0.0,
+      "emission": 0.0,
+      "peak": 0.0,
+      "interior": 2352.0
+    },
+    {
+      "case": "10110",
+      "direct": 1.87465e-07,
+      "second": 0.00466503,
+      "material": 0.0,
+      "omit": 0.797,
+      "swap": 0.840198,
+      "wrongUV": 0.0,
+      "emission": 1.66893e-06,
+      "peak": 7.55471,
+      "interior": 2352.0
+    },
+    {
+      "case": "10111",
+      "direct": 1.40719e-07,
+      "second": 0.00464334,
+      "material": 0.0,
+      "omit": 0.684538,
+      "swap": 0.0,
+      "wrongUV": 0.0,
+      "emission": 1.66893e-06,
+      "peak": 7.55471,
+      "interior": 2352.0
+    },
+    {
+      "case": "11000",
+      "direct": 1.85676e-07,
+      "second": 0.0047175,
+      "material": 0.0,
+      "omit": 0.797618,
+      "swap": 0.835515,
+      "wrongUV": 1.23105,
+      "emission": 0.0,
+      "peak": 0.0,
+      "interior": 812.0
+    },
+    {
+      "case": "11001",
+      "direct": 1.10976e-07,
+      "second": 0.0045573,
+      "material": 0.0,
+      "omit": 0.68783,
+      "swap": 0.0,
+      "wrongUV": 0.0,
+      "emission": 0.0,
+      "peak": 0.0,
+      "interior": 812.0
+    },
+    {
+      "case": "11010",
+      "direct": 1.82615e-07,
+      "second": 0.00480865,
+      "material": 0.0,
+      "omit": 0.794857,
+      "swap": 0.832808,
+      "wrongUV": 1.23114,
+      "emission": 2.86102e-06,
+      "peak": 7.43394,
+      "interior": 812.0
+    },
+    {
+      "case": "11011",
+      "direct": 1.1488e-07,
+      "second": 0.00470754,
+      "material": 0.0,
+      "omit": 0.685737,
+      "swap": 0.0,
+      "wrongUV": 0.0,
+      "emission": 2.86102e-06,
+      "peak": 7.43394,
+      "interior": 812.0
+    },
+    {
+      "case": "11100",
+      "direct": 1.85676e-07,
+      "second": 0.0047175,
+      "material": 0.0,
+      "omit": 0.797618,
+      "swap": 0.835515,
+      "wrongUV": 1.23105,
+      "emission": 0.0,
+      "peak": 0.0,
+      "interior": 812.0
+    },
+    {
+      "case": "11101",
+      "direct": 1.10976e-07,
+      "second": 0.0045573,
+      "material": 0.0,
+      "omit": 0.68783,
+      "swap": 0.0,
+      "wrongUV": 0.0,
+      "emission": 0.0,
+      "peak": 0.0,
+      "interior": 812.0
+    },
+    {
+      "case": "11110",
+      "direct": 1.87465e-07,
+      "second": 0.00480305,
+      "material": 0.0,
+      "omit": 0.793351,
+      "swap": 0.831329,
+      "wrongUV": 1.2311,
+      "emission": 2.86102e-06,
+      "peak": 7.43394,
+      "interior": 812.0
+    },
+    {
+      "case": "11111",
+      "direct": 1.12867e-07,
+      "second": 0.00469572,
+      "material": 0.0,
+      "omit": 0.684531,
+      "swap": 0.0,
+      "wrongUV": 0.0,
+      "emission": 2.86102e-06,
+      "peak": 7.43394,
+      "interior": 812.0
+    }
+  ],
+  "counts": {
+    "advanced_checks": 263495,
+    "prepared_checks": 91,
+    "artist_checks": 139,
+    "canonical_checks": 525092,
+    "canonical_cases": 32,
+    "advanced_ordered_pairs": 17,
+    "canonical_ordered_pairs": 32
+  },
+  "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+  "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+  "address_space_limit": null,
+  "live_sanitizer_mappings": {
+    "source-advanced-normal-bake": {
+      "/usr/lib64/libasan.so.8.0.0": {
+        "literal": "/usr/lib64/libasan.so.8.0.0",
+        "resolved": "/usr/lib64/libasan.so.8.0.0",
+        "sha256": "0e9878f315009d4a3b3f1d8c44467de841f9ff2ca404f996937bf89d1d966c37"
+      },
+      "/usr/lib64/libubsan.so.1.0.0": {
+        "literal": "/usr/lib64/libubsan.so.1.0.0",
+        "resolved": "/usr/lib64/libubsan.so.1.0.0",
+        "sha256": "d4322305e0b1492398b7c5dabf56e1cdfe67548211b0149769c14f234cf3bb9d"
+      }
+    },
+    "source-prepared-normal-bake": {
+      "/usr/lib64/libasan.so.8.0.0": {
+        "literal": "/usr/lib64/libasan.so.8.0.0",
+        "resolved": "/usr/lib64/libasan.so.8.0.0",
+        "sha256": "0e9878f315009d4a3b3f1d8c44467de841f9ff2ca404f996937bf89d1d966c37"
+      },
+      "/usr/lib64/libubsan.so.1.0.0": {
+        "literal": "/usr/lib64/libubsan.so.1.0.0",
+        "resolved": "/usr/lib64/libubsan.so.1.0.0",
+        "sha256": "d4322305e0b1492398b7c5dabf56e1cdfe67548211b0149769c14f234cf3bb9d"
+      }
+    },
+    "source-artist-normal-bake": {
+      "/usr/lib64/libasan.so.8.0.0": {
+        "literal": "/usr/lib64/libasan.so.8.0.0",
+        "resolved": "/usr/lib64/libasan.so.8.0.0",
+        "sha256": "0e9878f315009d4a3b3f1d8c44467de841f9ff2ca404f996937bf89d1d966c37"
+      },
+      "/usr/lib64/libubsan.so.1.0.0": {
+        "literal": "/usr/lib64/libubsan.so.1.0.0",
+        "resolved": "/usr/lib64/libubsan.so.1.0.0",
+        "sha256": "d4322305e0b1492398b7c5dabf56e1cdfe67548211b0149769c14f234cf3bb9d"
+      }
+    },
+    "source-canonical-normal-bake": {
+      "/usr/lib64/libubsan.so.1.0.0": {
+        "literal": "/usr/lib64/libubsan.so.1.0.0",
+        "resolved": "/usr/lib64/libubsan.so.1.0.0",
+        "sha256": "d4322305e0b1492398b7c5dabf56e1cdfe67548211b0149769c14f234cf3bb9d"
+      },
+      "/usr/lib64/libasan.so.8.0.0": {
+        "literal": "/usr/lib64/libasan.so.8.0.0",
+        "resolved": "/usr/lib64/libasan.so.8.0.0",
+        "sha256": "0e9878f315009d4a3b3f1d8c44467de841f9ff2ca404f996937bf89d1d966c37"
+      }
+    }
+  },
+  "input_drift": [],
+  "remaining_owned": [],
+  "independent_free_lease": {
+    "independently_NB_free": 1794960497.7962348,
+    "inode": 99618,
+    "dev": 40
+  },
+  "scope": "Fresh complete core plus four selected strict native fixtures only, not full application/all targets/other tests/new filtered-quality policy. Known between-texel transfer-quality defect remains separate.",
+  "archive": {
+    "file": "canonical-normal-strict-sanitize-20261118.tar.xz",
+    "sha256": "5ecbbee9b63d604171e5c88879032df95d2d079da7d21ab9ffe5fd8e6d9aecd9",
+    "bytes": 708100,
+    "members": 352,
+    "member_manifest": {
+      "configure-status.json": {
+        "sha256": "6379406c5b4641895d3672368a4b09442319aec5c9c14aa28858b8c779e50214",
+        "bytes": 1549
+      },
+      "configure.log": {
+        "sha256": "d889f9f5225e95e937fff5bbbf833fdb0eb9a23e93163bc5128e64407584743c",
+        "bytes": 4498
+      },
+      "build-plan.json": {
+        "sha256": "1daded3f67ff9814032a5bba71e3d85a58d8289b83c9dd4b8b5d8d086611500c",
+        "bytes": 354603
+      },
+      "build-native.py": {
+        "sha256": "cce5500ca30fa44369b73ddd4ad070fae8f48e3b166988971cb1415e5bb6ff0f",
+        "bytes": 2016
+      },
+      "build-status.json": {
+        "sha256": "c21c070878c470c18d9363c0ca576a1eafa0d6e50177bd735e39cef76124d968",
+        "bytes": 1589
+      },
+      "build.log": {
+        "sha256": "e0dc6d24f19abcb9be74a4f0eb3d35c99815a74b9d2115c8d3a6cdb29e68bb6e",
+        "bytes": 720398
+      },
+      "CMakeCache.txt": {
+        "sha256": "25be2ec73a6be99ef35c0656ab6bbd2bd79bc9a3af819d5572501889320027b0",
+        "bytes": 57338
+      },
+      "compile_commands.json": {
+        "sha256": "389c3c71f311afd92232dfd04bcd2e1ca03099b8752b0cc0bd7640305010fa5e",
+        "bytes": 1419162
+      },
+      "build.ninja": {
+        "sha256": "ed6f0bea5ea1e7213409efe98cff3d05e92a35bd9139e25f758394ea5326d3c6",
+        "bytes": 4367372
+      },
+      "CMakeFiles/rules.ninja": {
+        "sha256": "0631bae9d07f21697811a3516c022cc2517160054f41eb03df167525c63cc504",
+        "bytes": 1521401
+      },
+      ".ninja_log": {
+        "sha256": "a6951f37c1349ccec550b21351668baf88b1576aa606556617dadd8cbce344ea",
+        "bytes": 24867
+      },
+      ".ninja_deps": {
+        "sha256": "be7644dbc07e3aca605be90445c4acb0a344569e5a309abe94a34b7440f4d7b1",
+        "bytes": 426612
+      },
+      "actual-MD-owners.json": {
+        "sha256": "4ab55d6373b2a3675fac14d05230cdd89e7a0bc49e294e15f402751955f21721",
+        "bytes": 106829
+      },
+      "unit-terminal.txt": {
+        "sha256": "f6fc1351219593c90767e0d812eeba94733d8bdbb9b09dec7afba82522ba4478",
+        "bytes": 8628
+      },
+      "unit-journal.txt": {
+        "sha256": "59fe98932b7604c17ea0a1725a3a32b8a7365011b01ec7c570c7064ae6c85690",
+        "bytes": 495
+      },
+      "unit-after-stop.txt": {
+        "sha256": "6f18458cc2432a8b8b722c8eed8df49e1ca4622b54f8c9218476d2f9e38a2b24",
+        "bytes": 48
+      },
+      "CMakeFiles/dome-sculpt-affine.dir/src/affine-factor.cpp.o.d": {
+        "sha256": "113ac65cfc881dc9e6841cc2ba6366cc8719508f4faab73b3f956899d3ff62eb",
+        "bytes": 13762
+      },
+      "CMakeFiles/dome-sculpt-affine.dir/src/affine-interaction.cpp.o.d": {
+        "sha256": "518fef0e2daa834dd94654924c9e383625bb1f02099ef74e53843e4705a8b85b",
+        "bytes": 7838
+      },
+      "CMakeFiles/dome-sculpt-affine.dir/src/affine.cpp.o.d": {
+        "sha256": "6d29f6e8d5931522d505230d11d4136a3de6ae824ea64dc663afb4dc10fd9393",
+        "bytes": 7675
+      },
+      "CMakeFiles/dome-sculpt-affine.dir/src/import-affine.cpp.o.d": {
+        "sha256": "bd5d8f8a81ab843ef1da4ad73cdef4d060959bceba5c820099bd0f8dba691858",
+        "bytes": 13709
+      },
+      "CMakeFiles/dome-sculpt-baked-emission.dir/src/baked-emission.cpp.o.d": {
+        "sha256": "877ef2eb23f7f0513d159f0152d1083ec46ccbbc614131955091f4b0e07d31a9",
+        "bytes": 11257
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/anatomical-authoring.cpp.o.d": {
+        "sha256": "4be29510068c7fd885cd6b256adf59a778c809f2cf21e2d8e1528a31675c6157",
+        "bytes": 22674
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/atlas.cpp.o.d": {
+        "sha256": "0c90101f73ec15a5a30b9e2b603a86f674a75ae4bc04a1961534fbbc1cf592f5",
+        "bytes": 13610
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/avatar.cpp.o.d": {
+        "sha256": "41adeee0716d7d3477691993c8399ebfe482404137d2fe4c61280669455a5e4b",
+        "bytes": 14941
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/backend_cpu.cpp.o.d": {
+        "sha256": "8e1703162e926ff09f2d5c6c3607dffc4f8056b6e1b8746a6e1cd8b6dbe5a3ac",
+        "bytes": 8991
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/bake-authoring.cpp.o.d": {
+        "sha256": "a476b31923ce2c61fe0fe4c0201603756cdc3a9fc50dbd229dec59788ef22cda",
+        "bytes": 21461
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/bake-recipe.cpp.o.d": {
+        "sha256": "68f29a5bdaad0a9cd55fde769f1e30def36f5b487270a6e403910048e5248fcf",
+        "bytes": 16046
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/bake.cpp.o.d": {
+        "sha256": "8c55d0085081af2b804747c54d7f0712ead4bc9e7ccf80d4ea87c69470fa174b",
+        "bytes": 17750
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/baked-normal-archive.cpp.o.d": {
+        "sha256": "2d8977a2b64a0aaa411756b41c9d1f696b316b82266a90c8ef2ed41c61a945fc",
+        "bytes": 17907
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/baked-normal-field.cpp.o.d": {
+        "sha256": "e2430cb67d3f970ac8c26dcd1a3cf8002d02ddfc8895a2358217dd843df0f877",
+        "bytes": 16989
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/bone-metadata.cpp.o.d": {
+        "sha256": "dd9266e2a78efb5a9cca7b64d40609552432f8e70ed0b6e2955fcd91b161982b",
+        "bytes": 14589
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/canonical-native-pose.cpp.o.d": {
+        "sha256": "c8bd1981dd5804762bf2ef748bc0ab84db9fb58f5394c64f813c7203ef9247cb",
+        "bytes": 20291
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/canonical-normal-conversion.cpp.o.d": {
+        "sha256": "2009d5870117fd4bd004ebc55f9c137353192664589961b1c4a43ce31b54b74a",
+        "bytes": 17223
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/canonical-normal-owner.cpp.o.d": {
+        "sha256": "1b73d7a9235065c1a39dda8c81dad62ebba405d8ee76658e94a3e604d2695a6b",
+        "bytes": 16982
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/canonical-normal-uv.cpp.o.d": {
+        "sha256": "f80f7d043fb69cfcd4314b44b2714b739c1933e655e3a79d3c890ee5003d92e0",
+        "bytes": 16880
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/canonical-paint-archive.cpp.o.d": {
+        "sha256": "cddd65e17d770f942a32f01b27bfcda7034464c33476f75fd1b38521f717aea7",
+        "bytes": 19391
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/canonical-paint-native.cpp.o.d": {
+        "sha256": "8ba8db7dec964cac78d3a2bdd9c6aade198a576b036e04fa53e966c421d7ce86",
+        "bytes": 18141
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/canonical-paint-prospect.cpp.o.d": {
+        "sha256": "3adb7b793478ced5995b7cc282a95965d20bae9fab9ec8b9877ed9dc88f29479",
+        "bytes": 19879
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/canonical-paint-sampling.cpp.o.d": {
+        "sha256": "36a404bd0bbcfcc9de54f9e8a24ee48c73bccfdcdf2380f10435ec82af1606b0",
+        "bytes": 20874
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/canonical-paint-uv.cpp.o.d": {
+        "sha256": "b6c72549a9a864f1fdc7a55d008de69e0520bd7ad0cdbb72f6be8b00247517dd",
+        "bytes": 20634
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/color-paint-sampling.cpp.o.d": {
+        "sha256": "d715ed6d225e3f8483c669dde209eea68b51892fafbb71c7cd94aa6ad3c56142",
+        "bytes": 19285
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/color-preparation.cpp.o.d": {
+        "sha256": "8f3f0ce955573fff60f775d327be71acfde0c0b83c386037c05df593230806d4",
+        "bytes": 20846
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/color-uv-reprojection.cpp.o.d": {
+        "sha256": "6ca8e4620a78ea259dd6f86a7a64fd2695c5c617d105cfeed31276d2a9370de4",
+        "bytes": 19508
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/corner-key-expansion.cpp.o.d": {
+        "sha256": "e180feb6ebac8fcbe5ed39b511383579b80a1e5fb4acb8fdab73a4481ff5482a",
+        "bytes": 13298
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/creation.cpp.o.d": {
+        "sha256": "248dc15006192770383b160eab14106aea404a657cce398483113bd70db8acaa",
+        "bytes": 16853
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/creator-archive.cpp.o.d": {
+        "sha256": "dbd258b39cf6bfc0baa587f5fd6a17accb4050e1fd472f6d5f755f4799c6e7fc",
+        "bytes": 16297
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/current-paint-preview.cpp.o.d": {
+        "sha256": "6f02716fe536abfc9999f67855eea836e965e077b5007880edd48fc092a53413",
+        "bytes": 20341
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/cut-authoring.cpp.o.d": {
+        "sha256": "572d1fc7de4abc8983997006816a35d93721d8fb77ba12ed897b29e94341b301",
+        "bytes": 15493
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/cut-color.cpp.o.d": {
+        "sha256": "ce863983f89805eb708be5d6704a27611b20d2c8e68025fc547aa152d4a03351",
+        "bytes": 18990
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/deformation.cpp.o.d": {
+        "sha256": "cef85916b062da4d015dda9b2079ae40c9df68d051f678d7356a786333a5ae04",
+        "bytes": 14841
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/document-assets.cpp.o.d": {
+        "sha256": "697cd28e04307c4917929bdece25e3c6afde1bffe62fdbdb426359b739e04efd",
+        "bytes": 23050
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/document-baking.cpp.o.d": {
+        "sha256": "1aabd85d2c38201ae9d8810fc3c2b34fff14f7400da5910b02f9b58212dfe5cd",
+        "bytes": 21789
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/document-contact.cpp.o.d": {
+        "sha256": "51748b6516c430267919e362d4a76b2b5f40c02e9450ca92b18add6c0bf13cab",
+        "bytes": 20676
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/document-cut.cpp.o.d": {
+        "sha256": "c53c711f3b44d23255f65ff0d39a02afa85e9324dd67f874aeaa038c56c1e04c",
+        "bytes": 20544
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/document-expressions.cpp.o.d": {
+        "sha256": "91ae288c994a5fef7835971f7596bbe88f990509612abb534c14d6369bccb32e",
+        "bytes": 19893
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/document-import.cpp.o.d": {
+        "sha256": "c591ad32398340ebd36d3069a4a7a3f7abde5ab3d5e96764ca568d2e8266b6c1",
+        "bytes": 19759
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/document-interaction.cpp.o.d": {
+        "sha256": "cd6304f3dbeae5635d1364b3001c5906c3d9a04b7f28e646618530037550056b",
+        "bytes": 22143
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/document-native.cpp.o.d": {
+        "sha256": "e83e05a366597e385bfb0173ff912e29eeae0a1c128d50fcc41d65887445cc85",
+        "bytes": 25609
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/document-paint-blur.cpp.o.d": {
+        "sha256": "2cc349466084daae5f0ca5f26d5017875a8b992f231f61b2f424c871f88ab045",
+        "bytes": 20000
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/document-polygon.cpp.o.d": {
+        "sha256": "884ee43af552c6b6257e7ee0507ad8fb499f320c09852fab604371f86ac71bcf",
+        "bytes": 21700
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/document-projection.cpp.o.d": {
+        "sha256": "32affd49b0f63bf785024bbb77dc090b0c9f205da92a02e5308ff33fffee231a",
+        "bytes": 19882
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/document-recovery.cpp.o.d": {
+        "sha256": "a8029c8ae1c314ac301a91714b536a4afd3b7c972e71555c588f0a5743ddcaea",
+        "bytes": 19661
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/document-retopo.cpp.o.d": {
+        "sha256": "175e64e0ba645a7f2336f9a2a137ac32b5895d7a94b626d93900d39448659cfe",
+        "bytes": 19658
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/document-rig-fit.cpp.o.d": {
+        "sha256": "39ac06688a79fb416ba0cc5de7103985c4ecb2626b98b6ab101c2eb4dbb1440b",
+        "bytes": 20874
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/document-sculpt.cpp.o.d": {
+        "sha256": "def084a088f18440b511d81573664b2c893f9834d04c564b658cd8836229e325",
+        "bytes": 19659
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/document-shapes.cpp.o.d": {
+        "sha256": "d53d33e67a23eed4ad0100cef74e3ea109f8d62ac94eaafb915a4b8fcb8120ef",
+        "bytes": 19772
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/document-skin.cpp.o.d": {
+        "sha256": "c62aec793804a9221c9012800bd07fe6e7d6d56b05c3f9dd3be4c1638b1a57c0",
+        "bytes": 21445
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/document-texture-sets.cpp.o.d": {
+        "sha256": "0dbadfa293f862e3edb78d4d9e865aeb5dacd98d06cd5ae09cb9fbb655d98489",
+        "bytes": 22023
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/document-transaction.cpp.o.d": {
+        "sha256": "23b7382dc16fe111eff6a457bc404d936911278b439be8466bda44b02ebb46fc",
+        "bytes": 19667
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/document-uv-solve.cpp.o.d": {
+        "sha256": "a6c9254c872f50523997fecf6fde46aed1166cfd2c41b8951ac271f61b274202",
+        "bytes": 24305
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/document-worker-errors.cpp.o.d": {
+        "sha256": "7fb2b94f7c23d82cf9a8f10e19dd84be18a31595b3b452d35953c3b9afb61ac8",
+        "bytes": 19774
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/document.cpp.o.d": {
+        "sha256": "355d0d33eef35018fa67ec7f1f954b5913763b70fde73d97ae6ffc9fb2332ab1",
+        "bytes": 32510
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/emission-bake-source.cpp.o.d": {
+        "sha256": "994a73d12345d352466185ac31b882e5aa987574f69b77d9f9dae4f622535bbf",
+        "bytes": 21892
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/emission-export.cpp.o.d": {
+        "sha256": "0e28df84fe009d0033ab8f94bc3f9fc2abdd5fa75fa8202f027afb17d890e4ca",
+        "bytes": 21444
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/emission-package.cpp.o.d": {
+        "sha256": "89c22c5be8e2224430e1a1700bc823f5854dc1812080acf7625199a8877bc5c0",
+        "bytes": 23153
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/export.cpp.o.d": {
+        "sha256": "8270f0106db54afc3bdfe8b42a4a08bff93252b6cc4d1d097f1587a292823066",
+        "bytes": 25585
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/frame-position-domain.cpp.o.d": {
+        "sha256": "0e38b354c49152c2dd362f1ff1d76af397dd43e4161ab783bace94c30d9a25c1",
+        "bytes": 16180
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/groups.cpp.o.d": {
+        "sha256": "0b94a7c87dc9f00cee0df377e3ca6fa268107101cc603c69651bfb6f7ae7d5d2",
+        "bytes": 15951
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/humanoid-creator.cpp.o.d": {
+        "sha256": "8f2d0666f275b96314fad5872a2c92464884f56a603030fedff67a336a3d6c8d",
+        "bytes": 15378
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/import-authoring.cpp.o.d": {
+        "sha256": "d3a22dea379da635fb594029404b534ae618e8f0d4f903b2375e2f052d7a5699",
+        "bytes": 21005
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/import-browser.cpp.o.d": {
+        "sha256": "2179ed059bd96c21743006f3d157850cfbd3fca5617a7394d1e9f6b43ae1bc8f",
+        "bytes": 11633
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/import-image.cpp.o.d": {
+        "sha256": "96071088dff67745b23d54c7b86c84192a12ccbe0ae5fbafa0c5557c7967e30d",
+        "bytes": 14506
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/import-jpeg.c.o.d": {
+        "sha256": "5252d0ffc47aef9513a2b754886e1c86c80d78a68dd1fea89d0de88e283dbbea",
+        "bytes": 2678
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/import-native.cpp.o.d": {
+        "sha256": "9dab44e26bb680e467adff834cc42ff2d381dd36210f7acb4b8a287baccb07ad",
+        "bytes": 15320
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/import-options.cpp.o.d": {
+        "sha256": "5bba2ffa70d0deb59cf74032e46fc9b3024459c80cbec3fb616f9dd78c9351fd",
+        "bytes": 13644
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/import-source.cpp.o.d": {
+        "sha256": "9e0362ad8fac14e46df9e59a5f4348a145d73953a19dd1cb6b87d7a234075962",
+        "bytes": 15700
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/import.cpp.o.d": {
+        "sha256": "210e522d5cedc9abd12250dc01f5643f21eb27e57f8da5c9a928a00badf0d892",
+        "bytes": 17089
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/input.cpp.o.d": {
+        "sha256": "c7ea8bf97305506e13fe7d13b041420ec332b5462e390f6e18d6f757f75b1d26",
+        "bytes": 13829
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/key-archive-preflight.cpp.o.d": {
+        "sha256": "0eb11aabd898e2f7fe1ef3771dda2862202094718016414d57116c5a93ead787",
+        "bytes": 18603
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/key-derivation-codec.cpp.o.d": {
+        "sha256": "f03a50885609cc9d9deff6a859268b2d3be0922d93d03f4d8433865d2740b263",
+        "bytes": 17667
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/key-frame-archive.cpp.o.d": {
+        "sha256": "43d8a21bbcdc053d63a2d15e18b21d0736247fa2056d60f541562e08e315652c",
+        "bytes": 15174
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/key-mirror-correspondence.cpp.o.d": {
+        "sha256": "4da27eac2c7fa3da64af6c509e73097b66045b1ef10de194194e74d61a202f27",
+        "bytes": 13428
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/key-mirror-relative.cpp.o.d": {
+        "sha256": "097473f25dbd08f994e5fc052a239d490988951d0c55f81d5744429d77d1bd7d",
+        "bytes": 13528
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/local-surface.cpp.o.d": {
+        "sha256": "65784549378fc189a7b394503db040d3854ea2b60f0af1893c226edf4db25c04",
+        "bytes": 13678
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/material-bindings.cpp.o.d": {
+        "sha256": "8f4687dc571cc173721c9fb7071a488b39eb4dea09e6835efb32c055734da76c",
+        "bytes": 22799
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/material-visibility.cpp.o.d": {
+        "sha256": "e8eaf2edfe4c85a31e4ae69e5aa542211ce9649da5f61675612f97db7af8a8ab",
+        "bytes": 25223
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/mesh-authoring.cpp.o.d": {
+        "sha256": "3b39e56704a6e2b2f5a22be3e031beca17b08275fa7c7fb73decb8377c74e90f",
+        "bytes": 15504
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/mesh-processing.cpp.o.d": {
+        "sha256": "eab004ce1ee8d12c7743b092028b5d255d24da97737de9ef579ed257894e3044",
+        "bytes": 13849
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/mesh.cpp.o.d": {
+        "sha256": "4fdcdc64974be8f9531799328fb1cfa2d5d92a33bd364a2f39c091ae9fe8afbf",
+        "bytes": 13367
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/mtoon.cpp.o.d": {
+        "sha256": "4c53f0d1bf21727f78b6133235eb202d8555afd9a51c2ca2ba0f86eed00ea67a",
+        "bytes": 13800
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/native-authoring-compiler.cpp.o.d": {
+        "sha256": "3ea51d006da1af9d590ab5d034034782811e76c88c64cbd72865512f6a507266",
+        "bytes": 23740
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/native-authoring.cpp.o.d": {
+        "sha256": "27396c8d8b7c938df1e6cfff3ee97d6085f1b12bd924281186ddf1ef7e848f39",
+        "bytes": 18579
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/native-paint-frame-source.cpp.o.d": {
+        "sha256": "641db47c1e297ee4eba2a5b07c245ca4074ba74a18950b57645732fd2e6e6c42",
+        "bytes": 18244
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/native-paint-metadata.cpp.o.d": {
+        "sha256": "1b76b09007be83118c7b925b697dbf1f2fb18fa73ea3e065284488d7adae0a03",
+        "bytes": 17565
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/native-paint-sampling.cpp.o.d": {
+        "sha256": "1b21bd558a304c6f49b38109f361eafa555c421570382222e9d12e410811e68a",
+        "bytes": 20194
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/native-scene-append.cpp.o.d": {
+        "sha256": "3bf9db20884218b34740730f603ed83e69ba6224b7d175a7c3f213fe25ed4f18",
+        "bytes": 17434
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/normal-bake-frames.cpp.o.d": {
+        "sha256": "ab5d61fa2603baed7e624ff374549fb59d6e526331d237c39738d4e599aecbce",
+        "bytes": 16730
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/normal-frames.cpp.o.d": {
+        "sha256": "2b1495d500e52913b5b2ec37a838368f20a17e9077d951805eb816022007a837",
+        "bytes": 14717
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/normal-key-derivation.cpp.o.d": {
+        "sha256": "60aff4b2e07670663940ff2a396bcf4b76142047b88a583f18f42afb3d0fa455",
+        "bytes": 21426
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/normal-preparation.cpp.o.d": {
+        "sha256": "f69ad44e70d6eb54c0c3ae5a722479c0769c655c147a18cf8172f381db9c8351",
+        "bytes": 22003
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/normal-preview.cpp.o.d": {
+        "sha256": "ec3eba6202795a68c242bed66110ac4316d289fe41ae35aa2e5cc4fc40830491",
+        "bytes": 19511
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/normal-sampling-replay.cpp.o.d": {
+        "sha256": "d046d3e678e67171a608da051b8554f1d4e271b8617fb69275e7e6385e898300",
+        "bytes": 20522
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/normal-sampling-surface.cpp.o.d": {
+        "sha256": "6f98fb4ae45dead9e747edca574a3316aebe683d1ae46f8240361fcf324c914a",
+        "bytes": 19070
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/normal-sampling.cpp.o.d": {
+        "sha256": "0267fcf9c722259238fc20795ea97e0d8764d5a0c58fe70d4fba157d1b078888",
+        "bytes": 14952
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/normal-uv-reprojection.cpp.o.d": {
+        "sha256": "a8a11a456e2e15f2c95c059aa1afeecf7b5a339f0c5f254dfce00cece024f35a",
+        "bytes": 20399
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/object-selection.cpp.o.d": {
+        "sha256": "633a2fc265fe38ecb9d6eedc271b7f8a066f8b0b36517b637bde456971e26dc0",
+        "bytes": 20998
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/paint-composite-cpu.cpp.o.d": {
+        "sha256": "811050118ee428b1c2519766f6940ca79e924b6554624d9dea9286eaa0d70e59",
+        "bytes": 4333
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/paint-composite.cpp.o.d": {
+        "sha256": "168c365d39304198cf245c50d9c6d4a8c54dfc07eb17c54b0ed60c00843af7e1",
+        "bytes": 13951
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/paint-sampling-archive.cpp.o.d": {
+        "sha256": "607a0d4a93040903c01abf16176332cd01bbbf9368282ef47fbb9c27c2c19b25",
+        "bytes": 14404
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/paint-sampling.cpp.o.d": {
+        "sha256": "19e3d1fbbfca9ba62ea23248b4b89e716ee1d4748d8e2cdcd91f856b0ec3ffb3",
+        "bytes": 13395
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/paint.cpp.o.d": {
+        "sha256": "4cd3dca835b16473f1c2b63d6b54395a0cacee432a77f5c0faf5415458e842a8",
+        "bytes": 25482
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/polygon-authoring.cpp.o.d": {
+        "sha256": "b30983491e9b593c72f0e50572e14ce1984e8db13460211f3e6b27018ceef24b",
+        "bytes": 14073
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/polygon-color-archive.cpp.o.d": {
+        "sha256": "f920e4d8d918dc763312faafcd4a6abf4bbf05c703527817c800ec625ea0f525",
+        "bytes": 14729
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/polygon-color-source.cpp.o.d": {
+        "sha256": "60866aa3b04a9f0e20fbaef0ef8ca47adabd45754055b9fb3588ce9f5c10a8f3",
+        "bytes": 16061
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/polygon-color-uv.cpp.o.d": {
+        "sha256": "a4f4107bdf45e07a193658b0ffa214a447ba07c6222c7f4eb5862fcbe2025d6c",
+        "bytes": 17650
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/polygon-conversion.cpp.o.d": {
+        "sha256": "03116b254e4cee06c3d05dbcf140e440419e8fda97ad15c632c3961686e1d354",
+        "bytes": 18114
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/polygon-scene.cpp.o.d": {
+        "sha256": "9c9ca1a729d9a887191a7e4e98bea5768f69465d5647a96acfea568c2a98c26b",
+        "bytes": 23480
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/polygon-source.cpp.o.d": {
+        "sha256": "c2a1758dfe74c88900e971ba73d81d1eaefc3600ffc2e345a7362db8137c91e8",
+        "bytes": 15715
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/polygon-surface-archive.cpp.o.d": {
+        "sha256": "a26d5b7c14eddaf895c45ffae3c1aef6b5da9d5c1cff254a8ca9bc98831e4cb0",
+        "bytes": 19617
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/polygon-surface-codec.cpp.o.d": {
+        "sha256": "c3f6cbcbfbf17a62325a5a19bf79a18e81d11deb9088d877a5c6b7e95d944ecf",
+        "bytes": 16996
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/polygon-surface-owner.cpp.o.d": {
+        "sha256": "ad3b5ad2648533d210637e0200768eedec9df83ec1ec03ef711f0d4ad17788a3",
+        "bytes": 20980
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/polygon-surface-paint.cpp.o.d": {
+        "sha256": "bd0f187b1a0fb57a5047cd11d8ca76ed821bef713a216605a156f0fc5d41d737",
+        "bytes": 17448
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/polygon-surface-preview.cpp.o.d": {
+        "sha256": "c0c59ed3218f9d1b650e22907e0692da184a46f2ee735655e85ef745c09fa3b9",
+        "bytes": 19157
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/polygon-surface-transfer.cpp.o.d": {
+        "sha256": "b39e8fea3226571633c3018b6bacc22fa1606d414e1c56f0761ea6e5e6d2c8b7",
+        "bytes": 15198
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/procedural-sculpt.cpp.o.d": {
+        "sha256": "2756774256faba2fa4aa4d19269247763c7e1fb41bd3f2e51f4ef9ca47c0d91f",
+        "bytes": 15165
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/projection-tool.cpp.o.d": {
+        "sha256": "267d51bf4e2df9c47e1314ad0c28fcafbe46d8ddf7f24ae25e6e487744b441df",
+        "bytes": 14410
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/projection.cpp.o.d": {
+        "sha256": "25e09d76e7aa5cad55483384ca111e783df4443e2187c18519abca2deee8ce19",
+        "bytes": 16135
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/ray-index.cpp.o.d": {
+        "sha256": "932f231e294b9f0f9f550c0bd13035742c8db996634145675d69b8310cf07241",
+        "bytes": 13402
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/recovery.cpp.o.d": {
+        "sha256": "ba17ab136558db12a8f342bdc778ebf3e278ff14834cf4bbf6f9a77f8757a5bd",
+        "bytes": 17491
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/remesh.cpp.o.d": {
+        "sha256": "ba256d34153fc1638f46cfdb0fb84e1397c1ea4d0162a86316331f77a1d1eb72",
+        "bytes": 13713
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/retopo-authoring.cpp.o.d": {
+        "sha256": "89969f89f23af1508258c8a480f7a3c8b6c67332312c54880fb855ae6b6dd426",
+        "bytes": 15172
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/retopo-edges.cpp.o.d": {
+        "sha256": "2773d2865186ad3ba728813250c884c41297cf3d88e1dadd2f3c41fa58940a79",
+        "bytes": 13607
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/retopo.cpp.o.d": {
+        "sha256": "b979ed10872b82a3bf35ea1807226c998de24c8b4a1f58339b48685819fee240",
+        "bytes": 14694
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/rig-edit.cpp.o.d": {
+        "sha256": "301ad5c815aaa45d5936765f984de947ff07aa55946e2da197bcb3abc58f54e7",
+        "bytes": 21413
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/rig-fit-tool.cpp.o.d": {
+        "sha256": "ded324011020b8778c8393dc6b6b35656e3d1476dfacb9e53c68ac67b7ea1eee",
+        "bytes": 15162
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/rig-fit.cpp.o.d": {
+        "sha256": "53042f32dee4b585d34a5e81bc5bf75940937af43bd12b5e1f7029281fa0f285",
+        "bytes": 14939
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/rig-rest-scene.cpp.o.d": {
+        "sha256": "cf5a127fc58a177d9722740ba2519969f1de6c94acb852d5a6b8be971fd4f2e4",
+        "bytes": 17617
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/rig-rest.cpp.o.d": {
+        "sha256": "92ee5e86d179549eff2b5eb31838d83c4c089607cf7d747d09e82adc0d42dd86",
+        "bytes": 16033
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/rig.cpp.o.d": {
+        "sha256": "fe898c7b86b807d4fd5fd8b43315269ab9440c73a14e1498dc5405ec02c5b0ec",
+        "bytes": 16448
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/scene-file.cpp.o.d": {
+        "sha256": "76d2376731577c1bc724b6c38c0c62fd940e11a531b85c2f1a41001aebd3068b",
+        "bytes": 16591
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/scene.cpp.o.d": {
+        "sha256": "aa4d8239e9e8f5fc14821181a5e0f7849b717244200f0fa6a08886a221e12e88",
+        "bytes": 27722
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/sculpt-chunk-masks.cpp.o.d": {
+        "sha256": "532d20439e32d7df9ede0376ca1da3d516b613ac05bfb87f6403559eedd2cc98",
+        "bytes": 15408
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/sculpt-mask.cpp.o.d": {
+        "sha256": "31d92868b6850b59fb9f564d9e5e49c2b2c5e54bd97a9ff888d4ea5ffb7d2cfb",
+        "bytes": 13165
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/sculpt-placed-chunk.cpp.o.d": {
+        "sha256": "5b4e9dcc6b055f1e7423b759da05b7ecdd324831766de33b699d8c389d5f0d8f",
+        "bytes": 16208
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/sculpt-placed-chunks.cpp.o.d": {
+        "sha256": "841def7374255516c08a5376b6529cb858375edb9fdd2d6fe41bfc5f66a1a882",
+        "bytes": 15753
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/sculpt-resolution.cpp.o.d": {
+        "sha256": "5988005c10ed7d2d832792655ff63a74dc4c7eca9a7ae58a1a8e20fdae1db0b4",
+        "bytes": 15617
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/sculpt-scene-chunks.cpp.o.d": {
+        "sha256": "8e81d28db3199911d8c077c4bdf13c6056e2d079e5cde8455df1a18d763e3033",
+        "bytes": 16656
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/sculpt-storage.cpp.o.d": {
+        "sha256": "fe6d89bee1449443affa2e2ad50d3de879cf58761d79555d2f688e6643a2bb76",
+        "bytes": 9311
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/sculpt-surface-chunks.cpp.o.d": {
+        "sha256": "f2348b2fba513d10f8abf87fa4c333df45497f834bf152a706ccfb627a01cd2d",
+        "bytes": 13916
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/shapekey-attributes.cpp.o.d": {
+        "sha256": "05f8bc3ad3e0045115244083dacee6eb7d2477e4d4d568a635b40621dc5dca55",
+        "bytes": 15395
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/shapekey-authoring.cpp.o.d": {
+        "sha256": "5dadb251ac2c819308a8c1a8ed9f1817613d05c7a4af8dcb9fb870df5ef84227",
+        "bytes": 19348
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/shapekey-normal-preparation.cpp.o.d": {
+        "sha256": "815dfd1d53c504cf0384524ff2910e515b4d0ba690978bc67ddc197a6615f0a8",
+        "bytes": 19050
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/shapekey-sculpt.cpp.o.d": {
+        "sha256": "f8b0abef106cfb132557df0e479fa3c3d90b49103c0231b35bf011d08e5c824f",
+        "bytes": 14723
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/skin-authoring.cpp.o.d": {
+        "sha256": "fe6a3e7fcfb3370a63d2aaa1eec526d296a749f7b75742527e4a42069c7d6418",
+        "bytes": 18856
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/source-decoded-images.cpp.o.d": {
+        "sha256": "a499b24663cc492870cecb1f15b7a0cd8d515e1bcb7517c57667cf3747dcc9f4",
+        "bytes": 14074
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/source-maps.cpp.o.d": {
+        "sha256": "12fbec66dedde6f89b9d04321acb4fc0cc2a8ca24c268087811ccac48c82aa17",
+        "bytes": 15048
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/source-morph.cpp.o.d": {
+        "sha256": "9cee013f0c4731093e24e82d079ab0509785a17973bac652a6d3961f8ad64441",
+        "bytes": 15155
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/source-node-extras.cpp.o.d": {
+        "sha256": "ac8ecd2bd43bb241bd577029d9568ad83d524ea39a98d50b7d46dcd6e7351907",
+        "bytes": 14607
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/source-placement-archive.cpp.o.d": {
+        "sha256": "ce30763ea9e28b78dbd82723885eac54c491aa40b3481ad2ff9e13a28f16f584",
+        "bytes": 16637
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/source-placement.cpp.o.d": {
+        "sha256": "0701d74c003f33ab66841f416b5a5249a6ec02645b83a26720c41c07962ce5fb",
+        "bytes": 15617
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/source-rest-graph.cpp.o.d": {
+        "sha256": "691c0dfac798a1eb226fb810a70adc19e56e9aad2141a5451879854612e52316",
+        "bytes": 16617
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/source-rest-plan.cpp.o.d": {
+        "sha256": "250e9e774f1d258c4903536f69a24643b7a182177203d32763857def58097bd9",
+        "bytes": 17383
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/source-rest-scene.cpp.o.d": {
+        "sha256": "a9f13846e5ba5c0d891aad13d1e72698da3b7dbcea104a003dcd1d2fabb6ab89",
+        "bytes": 16295
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/source-rigid-pose.cpp.o.d": {
+        "sha256": "6c06f958d2ae9f777ee9c7a64d53db5c961f3e87e0f2f60cc1174fa37da888db",
+        "bytes": 16173
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/source-sampling-transport.cpp.o.d": {
+        "sha256": "995e2e6786bb01137ce0993373a6c8542af6f405653a305f470e960d5d57ba5c",
+        "bytes": 13426
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/source-uv-bake.cpp.o.d": {
+        "sha256": "0e6fa9ed35a371907fcf301a87e02ce6932b731de7eeeca4c7540eb15b33e08a",
+        "bytes": 21975
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/sparse-resample-cpu.cpp.o.d": {
+        "sha256": "598530a46a5553b138148ad8d1c89b05824d3159b937e9535ca8512b895e19a0",
+        "bytes": 11610
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/surface-heat-authoring.cpp.o.d": {
+        "sha256": "c57aced3047f8e121bf6c1085bbaf79b5eae847c01ac3f284288681b066f8e8f",
+        "bytes": 24510
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/tangents.cpp.o.d": {
+        "sha256": "b4957e191948fbc73f2a72ec0ad1403521544444bb65bb446ad740173f2dbb85",
+        "bytes": 13391
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/texture-set-archive.cpp.o.d": {
+        "sha256": "d714bace7386a56c7ecca69055ab43f1d3a51c173b248a04b76c0d17474b6131",
+        "bytes": 17196
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/texture-set-export.cpp.o.d": {
+        "sha256": "69377b4704075d611a616bb4cb5f8767c9b00aa189e9cb86afa618ae3a376457",
+        "bytes": 19134
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/texture-set-field-codec.cpp.o.d": {
+        "sha256": "616a155057c52f8535271a44f42e80a05b13c500d763093705a53e9855580f23",
+        "bytes": 19052
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/texture-set-field-source.cpp.o.d": {
+        "sha256": "99418410398c7e56051e60c685add51fb8f20faea9b84a2a7b904a78ef542d14",
+        "bytes": 17576
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/texture-set-graph.cpp.o.d": {
+        "sha256": "a1de399f99d9691675e569010d6b9176caa34bddbab9dfaf1c923bed25bf036c",
+        "bytes": 19522
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/texture-set-packed.cpp.o.d": {
+        "sha256": "03121db84654e5021a61c8e68922535056ec8299bccf5151f042c9c10a207868",
+        "bytes": 17780
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/texture-set-portable-field.cpp.o.d": {
+        "sha256": "e0706fa3ebf0c0ffe00ed40e796cde1fe6f2b1ac953e75ce5f6b1ab4eafbc6ec",
+        "bytes": 18710
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/texture-set-range.cpp.o.d": {
+        "sha256": "95fe791de000519a4da538fe94d9bdb7e1a3cac7750bed0bd9d5cf2a3ce5ed2d",
+        "bytes": 22699
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/texture-set-resample.cpp.o.d": {
+        "sha256": "62cabeb2763f1d7242171e5baefed134eb8c55c33e816b27409b35e42f3a489a",
+        "bytes": 15883
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/texture-set-stroke.cpp.o.d": {
+        "sha256": "b7a1fd6826e9fa4f21787896c31035ffd4803d381a9c1095cde8ffdf4142b3ea",
+        "bytes": 15761
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/texture-set-surface.cpp.o.d": {
+        "sha256": "717da30f4bd9ccf0ed6eba62f219c5bc8f8e55c1d60773ba3709accce9bb6fd5",
+        "bytes": 15420
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/texture-set-worker.cpp.o.d": {
+        "sha256": "210470546de0ba117ebd584336b8836498477199b66fb6ee3cbed001de61b762",
+        "bytes": 23032
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/texture-sets.cpp.o.d": {
+        "sha256": "4e1c3a770d101c1a0405d905186be0041259acfebe750c58809f863ba13b6518",
+        "bytes": 17869
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/uv-solve.cpp.o.d": {
+        "sha256": "78c02758c52fc91594acf3f7f8671cbd79df6d6d24a4ab38e2d9db7a8af7445e",
+        "bytes": 13599
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/uv.cpp.o.d": {
+        "sha256": "8ddb34d2754002e937324a13b9d43c207dc1e4a8cb002b2e65be2d7110870fdf",
+        "bytes": 13689
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/volume-geometry.cpp.o.d": {
+        "sha256": "62dfcf2912d775fb934f189137b8fd228be33416a649616ab538095001a67311",
+        "bytes": 13069
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/volume-raycast.cpp.o.d": {
+        "sha256": "7fc3ab2684f8b1eee56c1b240bb8d24766f5ef1b57564cdc3d3c8ef5be9e8a7c",
+        "bytes": 13276
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/volume.cpp.o.d": {
+        "sha256": "80666b938e491e99b3ccd2e3834a03383c007814a20f7d9e147bf0d89e70313d",
+        "bytes": 15753
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/vrm-expression-scene.cpp.o.d": {
+        "sha256": "2e7cc21b371dcb7b30b39d2769081cc3f5b8eefbdef1a047378a54e607db862d",
+        "bytes": 18574
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/vrm-expression.cpp.o.d": {
+        "sha256": "26f0928df4ec50aa2aa5e52b4ce9ed689b06d10184ad9e217d39c49b6346327b",
+        "bytes": 16046
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/vrm-import.cpp.o.d": {
+        "sha256": "5d75e68ac0ba4a9ca9d4571781faf444a15d64b5db99a8491a665593eb76b24d",
+        "bytes": 17338
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/vrm-rest-metadata.cpp.o.d": {
+        "sha256": "90410308605b93f5e4421cc36d89450b77904267ebbe92e147a7d565f5096243",
+        "bytes": 16832
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/vrm-source-graph.cpp.o.d": {
+        "sha256": "5f7b46e3a62986e0bbe7682ddf8c551ade7af99f58bec8e730290cde3ff18897",
+        "bytes": 18357
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/vrm.cpp.o.d": {
+        "sha256": "ba5e8b91d05f1fbcb90f4da8762b6e3f9ec0ed0667467bf0e2bf32e01876f61c",
+        "bytes": 21936
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/vrm1-authoring.cpp.o.d": {
+        "sha256": "f4c8cca4f09de4ea30d4060adc08ed9c022f5170c2097e05b1c055de5940874c",
+        "bytes": 21412
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/vrm1-export.cpp.o.d": {
+        "sha256": "7deba9b3bd17efe6bbf6ae9bee30527439976051008d6d4432f4d88d36741b22",
+        "bytes": 23908
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/vrm1-expression-layer.cpp.o.d": {
+        "sha256": "9c69f5d1063488351a3f41b86e6146f2ab1b188636356d43a93ed70b372e531f",
+        "bytes": 21438
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/vrm1-metadata.cpp.o.d": {
+        "sha256": "0b02d8d461aed686292ca615cb7d0f1d2cb62f3089d8fccbfa47448b57d2d539",
+        "bytes": 14697
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/vrm1-painted-material.cpp.o.d": {
+        "sha256": "297931da4371fe0e927fe63ebf4c65fc31c4f2fa0be328fe36beeccbe25ad715",
+        "bytes": 17206
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/vroid-creator.cpp.o.d": {
+        "sha256": "84902594ffc27791a98c8efc8ed1b919c0879920c51ef994e4a74445fc60df87",
+        "bytes": 17127
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/vroid-groom.cpp.o.d": {
+        "sha256": "9e221cae2a39ff8b64e4188ed44c46e54fcdf20efa9d7fda9c0237de8cf8c592",
+        "bytes": 14594
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/weight-authoring.cpp.o.d": {
+        "sha256": "ceb955d5f7e4ca5ba42f0f44f1bc3120a106a32fc67445afe85e40618de7587e",
+        "bytes": 16180
+      },
+      "CMakeFiles/dome-sculpt-core.dir/src/weight-edit.cpp.o.d": {
+        "sha256": "6470227784116d4d0f7d0723ee6a187fb5d7039005cd8ca690b61fc78d2ac548",
+        "bytes": 13490
+      },
+      "CMakeFiles/dome-sculpt-core.dir/third_party/openbrush/controller-profiles.cpp.o.d": {
+        "sha256": "fe2c46c0357eaaddaa041f7bd2d6a6e5a155a93d55fd019f6f67645b8dd63933",
+        "bytes": 6643
+      },
+      "CMakeFiles/dome-sculpt-core.dir/third_party/openbrush/navigation.cpp.o.d": {
+        "sha256": "b310d12aa22f9b1b800e85caba49e24115e9a59d8caae3e0019b5de524578d8d",
+        "bytes": 8107
+      },
+      "CMakeFiles/dome-sculpt-emission-codec.dir/src/emission-exr-owned.cpp.o.d": {
+        "sha256": "096a2bc54ef2d484c5b60c4d6c1690a4b6f6a14fd3fc9cdc4577740d4afb0cef",
+        "bytes": 9707
+      },
+      "CMakeFiles/dome-sculpt-emission-codec.dir/src/emission-exr.cpp.o.d": {
+        "sha256": "ad6d54706f2ae83b41a5131f3537d4d2405bbb60207606cbbd5d8b4b6e1ef6b9",
+        "bytes": 11412
+      },
+      "CMakeFiles/dome-sculpt-native-graphics.dir/third_party/openbrush/graphics.cpp.o.d": {
+        "sha256": "3399030e587fb4aa4ba7313fe1322687ed596589444055327aaba55f35140337",
+        "bytes": 9194
+      },
+      "CMakeFiles/dome-sculpt-paint-gpu.dir/src/paint-blur-gpu.cpp.o.d": {
+        "sha256": "18ad9256e036d7fc3d2bcb339b24ed86d7c3dde43e98b2e094f76b2070f85c57",
+        "bytes": 13260
+      },
+      "CMakeFiles/dome-sculpt-polygon.dir/src/polygon-color.cpp.o.d": {
+        "sha256": "bfbf673c728c29f531ef850a012af1202838995f1504e38dfa99ad885914f4a0",
+        "bytes": 13503
+      },
+      "CMakeFiles/dome-sculpt-polygon.dir/src/polygon.cpp.o.d": {
+        "sha256": "9ce96b922185d604bf30dc2571c6aecefefaa91cd6cd1fab15e982bdc2d4942f",
+        "bytes": 14475
+      },
+      "CMakeFiles/dome-sculpt-source-advanced-normal-bake-test.dir/tests/source-advanced-normal-bake.cpp.o.d": {
+        "sha256": "a7f39deabb6f5c8fe1e1caefa8c69f253c12417e58dcc728f585e455a4a34721",
+        "bytes": 23818
+      },
+      "CMakeFiles/dome-sculpt-source-artist-normal-bake-test.dir/tests/source-artist-normal-bake.cpp.o.d": {
+        "sha256": "21942d5bdf96aa1a01cde1fafaa4cbb9aaab97d65b293dad69c3836cf3aa0dae",
+        "bytes": 22640
+      },
+      "CMakeFiles/dome-sculpt-source-canonical-normal-bake-test.dir/tests/source-canonical-normal-bake.cpp.o.d": {
+        "sha256": "8d267473ceb2bcaca8759cb2a6143b01e22defe0d5f144efb898cb227007c0b3",
+        "bytes": 24393
+      },
+      "CMakeFiles/dome-sculpt-source-prepared-normal-bake-test.dir/tests/source-prepared-normal-bake.cpp.o.d": {
+        "sha256": "089549a424da538546b2f32a5ec96a7502306dee74d22ec0b8dc3613c864cfdb",
+        "bytes": 23583
+      },
+      "CMakeFiles/mikktspace-robust.dir/third_party/mikktspace/mikktspace.c.o.d": {
+        "sha256": "f52eb4bd35bc21c153c6dcc976fa7309453e2a1d5d3c216cd28d52173926931b",
+        "bytes": 2848
+      },
+      "CMakeFiles/mikktspace.dir/third_party/mikktspace/mikktspace.c.o.d": {
+        "sha256": "8d6dcaf681e2c421224550445f6c2e0267437d0acc3bb6b1af5edeff76168d23",
+        "bytes": 2841
+      },
+      "CMakeFiles/ufbx.dir/third_party/ufbx/ufbx.c.o.d": {
+        "sha256": "1697d9ad0e09ed40429f753423470da01a6455bb5b4bb8065f74a3b2427a8ffb",
+        "bytes": 3267
+      },
+      "CMakeFiles/xatlas.dir/third_party/xatlas/xatlas.cpp.o.d": {
+        "sha256": "1c18b083509b43079b63e0c89d67935f86bfcef00ddacef4491b0bac4117c442",
+        "bytes": 10968
+      },
+      "CMakeFiles/dome-sculpt-source-advanced-normal-bake-test.dir/link.d": {
+        "sha256": "0f48905c55c399e0b3b4aeedf1135b7d31945744f0b62202867d6ba2aa72426e",
+        "bytes": 8004
+      },
+      "CMakeFiles/dome-sculpt-source-artist-normal-bake-test.dir/link.d": {
+        "sha256": "f704a26fa8cb1bdf7507ad82dbf9ddc63c3a227e63b251df44a361e81aaa6b65",
+        "bytes": 7994
+      },
+      "CMakeFiles/dome-sculpt-source-canonical-normal-bake-test.dir/link.d": {
+        "sha256": "2e9e03a227452db175b60214cddd4758a4fe223b139eec09654048354cd7dc2e",
+        "bytes": 8009
+      },
+      "CMakeFiles/dome-sculpt-source-prepared-normal-bake-test.dir/link.d": {
+        "sha256": "d1fb73d456bcfa850501d871eee1b6922de60d3616003020186182ab3adb09b6",
+        "bytes": 8004
+      },
+      "native-v1/current-inputs.json": {
+        "sha256": "5afc2232cd4c775b63a7b23e6e97469bdd0fcb7bb61c407dddb8fb9d21765d3a",
+        "bytes": 499804
+      },
+      "native-v1/independent-lease-free.json": {
+        "sha256": "930b6704b7cc400c5e831cdad729b269437873aa6513859c52555092cd9cc8d1",
+        "bytes": 81
+      },
+      "native-v1/plan.json": {
+        "sha256": "d8c1ad6c87f287ddbc6305ecf0f5913b530d691c3032e6737a67efc0518b5892",
+        "bytes": 577859
+      },
+      "native-v1/run.py": {
+        "sha256": "90e33e3e77909c0dae3306a5f9af3f47a07fbb758cd7d713728f6170ada15544",
+        "bytes": 6933
+      },
+      "native-v1/source-advanced-normal-bake-outputs/mt0-posed-seam-raster-ordered.dsculpt": {
+        "sha256": "d29c44ae0a22a0db7836ddf1669dfe302c7ae8e07b419a7ccef2437ced557d97",
+        "bytes": 448124
+      },
+      "native-v1/source-advanced-normal-bake-outputs/mt0-posed-seam-raster.dsculpt": {
+        "sha256": "d29c44ae0a22a0db7836ddf1669dfe302c7ae8e07b419a7ccef2437ced557d97",
+        "bytes": 448124
+      },
+      "native-v1/source-advanced-normal-bake-outputs/mt0-posed-seam-retained-ordered.dsculpt": {
+        "sha256": "ba53ccacc38938f9f32df80be90e5c5a710358f48daf1b3a38fa5d18da0b3cbc",
+        "bytes": 487483
+      },
+      "native-v1/source-advanced-normal-bake-outputs/mt0-posed-seam-retained.dsculpt": {
+        "sha256": "ba53ccacc38938f9f32df80be90e5c5a710358f48daf1b3a38fa5d18da0b3cbc",
+        "bytes": 487483
+      },
+      "native-v1/source-advanced-normal-bake-outputs/mt0-posed-shared-raster-ordered.dsculpt": {
+        "sha256": "bb2845c448aa0e7277c77c4a148115148b41d678eca6454cfffa6f9dd3cdf3b2",
+        "bytes": 447845
+      },
+      "native-v1/source-advanced-normal-bake-outputs/mt0-posed-shared-raster.dsculpt": {
+        "sha256": "bb2845c448aa0e7277c77c4a148115148b41d678eca6454cfffa6f9dd3cdf3b2",
+        "bytes": 447845
+      },
+      "native-v1/source-advanced-normal-bake-outputs/mt0-posed-shared-retained-ordered.dsculpt": {
+        "sha256": "0a7e9fd73c3e24d2997195b1cf29dff4fb5c4648da62cfcccd1a0a49f5b0a374",
+        "bytes": 487188
+      },
+      "native-v1/source-advanced-normal-bake-outputs/mt0-posed-shared-retained.dsculpt": {
+        "sha256": "0a7e9fd73c3e24d2997195b1cf29dff4fb5c4648da62cfcccd1a0a49f5b0a374",
+        "bytes": 487188
+      },
+      "native-v1/source-advanced-normal-bake-outputs/mt0-rest-seam-raster-ordered.dsculpt": {
+        "sha256": "db7eb735005eaa3dfc7de1601ffd04083b8eb19f37fa71f4c0362af940b7ac7e",
+        "bytes": 447957
+      },
+      "native-v1/source-advanced-normal-bake-outputs/mt0-rest-seam-raster.dsculpt": {
+        "sha256": "db7eb735005eaa3dfc7de1601ffd04083b8eb19f37fa71f4c0362af940b7ac7e",
+        "bytes": 447957
+      },
+      "native-v1/source-advanced-normal-bake-outputs/mt0-rest-seam-retained-ordered.dsculpt": {
+        "sha256": "6dcd4381b04864db9869ec6f732e1383a673a7894dc03ca4985829ac4a3a8500",
+        "bytes": 487316
+      },
+      "native-v1/source-advanced-normal-bake-outputs/mt0-rest-seam-retained.dsculpt": {
+        "sha256": "6dcd4381b04864db9869ec6f732e1383a673a7894dc03ca4985829ac4a3a8500",
+        "bytes": 487316
+      },
+      "native-v1/source-advanced-normal-bake-outputs/mt0-rest-shared-raster-ordered.dsculpt": {
+        "sha256": "ac4c27167035474a18629ee5de6a931a6daffbdb7f0c4924184bdeaa9c9dc639",
+        "bytes": 447678
+      },
+      "native-v1/source-advanced-normal-bake-outputs/mt0-rest-shared-raster.dsculpt": {
+        "sha256": "ac4c27167035474a18629ee5de6a931a6daffbdb7f0c4924184bdeaa9c9dc639",
+        "bytes": 447678
+      },
+      "native-v1/source-advanced-normal-bake-outputs/mt0-rest-shared-retained-ordered.dsculpt": {
+        "sha256": "8223002fac6e3dc3c47fb61a0b5855cf12391cb04eae0e102f9eca649131a062",
+        "bytes": 487021
+      },
+      "native-v1/source-advanced-normal-bake-outputs/mt0-rest-shared-retained.dsculpt": {
+        "sha256": "8223002fac6e3dc3c47fb61a0b5855cf12391cb04eae0e102f9eca649131a062",
+        "bytes": 487021
+      },
+      "native-v1/source-advanced-normal-bake-outputs/mt1-posed-seam-raster-ordered.dsculpt": {
+        "sha256": "23b41ae57ca6be92e9215a52bd7edead8ae18ee832605ea5029a142d3ca473a5",
+        "bytes": 448333
+      },
+      "native-v1/source-advanced-normal-bake-outputs/mt1-posed-seam-raster.dsculpt": {
+        "sha256": "23b41ae57ca6be92e9215a52bd7edead8ae18ee832605ea5029a142d3ca473a5",
+        "bytes": 448333
+      },
+      "native-v1/source-advanced-normal-bake-outputs/mt1-posed-seam-retained-ordered.dsculpt": {
+        "sha256": "d9d042e89334877b7d6151bebee6750a750a7961a2a33ea41c3afee01f80794b",
+        "bytes": 487715
+      },
+      "native-v1/source-advanced-normal-bake-outputs/mt1-posed-seam-retained-three-edits-ordered.dsculpt": {
+        "sha256": "7bfc289cd9cff792ceee45fbba4c1b46da130a861d0ded89d5963fe7b30e0165",
+        "bytes": 811079
+      },
+      "native-v1/source-advanced-normal-bake-outputs/mt1-posed-seam-retained-three-edits.dsculpt": {
+        "sha256": "7bfc289cd9cff792ceee45fbba4c1b46da130a861d0ded89d5963fe7b30e0165",
+        "bytes": 811079
+      },
+      "native-v1/source-advanced-normal-bake-outputs/mt1-posed-seam-retained.dsculpt": {
+        "sha256": "d9d042e89334877b7d6151bebee6750a750a7961a2a33ea41c3afee01f80794b",
+        "bytes": 487715
+      },
+      "native-v1/source-advanced-normal-bake-outputs/mt1-posed-shared-raster-ordered.dsculpt": {
+        "sha256": "e1c89a8f72395f1d02a7a178a84fada8da635c9deb84b48c708634eb3849ba86",
+        "bytes": 448054
+      },
+      "native-v1/source-advanced-normal-bake-outputs/mt1-posed-shared-raster.dsculpt": {
+        "sha256": "e1c89a8f72395f1d02a7a178a84fada8da635c9deb84b48c708634eb3849ba86",
+        "bytes": 448054
+      },
+      "native-v1/source-advanced-normal-bake-outputs/mt1-posed-shared-retained-ordered.dsculpt": {
+        "sha256": "9f0e4cbe3043dfe3dde5b5c70a24fd1edc4d5cbe774fa7a2847cff514e272922",
+        "bytes": 487420
+      },
+      "native-v1/source-advanced-normal-bake-outputs/mt1-posed-shared-retained.dsculpt": {
+        "sha256": "9f0e4cbe3043dfe3dde5b5c70a24fd1edc4d5cbe774fa7a2847cff514e272922",
+        "bytes": 487420
+      },
+      "native-v1/source-advanced-normal-bake-outputs/mt1-rest-seam-raster-ordered.dsculpt": {
+        "sha256": "b829bb7002c67cea72896e230132a21a46538daf79049a700643220cbd58aed1",
+        "bytes": 448166
+      },
+      "native-v1/source-advanced-normal-bake-outputs/mt1-rest-seam-raster.dsculpt": {
+        "sha256": "b829bb7002c67cea72896e230132a21a46538daf79049a700643220cbd58aed1",
+        "bytes": 448166
+      },
+      "native-v1/source-advanced-normal-bake-outputs/mt1-rest-seam-retained-ordered.dsculpt": {
+        "sha256": "695de302e4615d38dd4fbcac06bf0bac7bde63efa98c2d9df65309ec95b945fc",
+        "bytes": 487548
+      },
+      "native-v1/source-advanced-normal-bake-outputs/mt1-rest-seam-retained.dsculpt": {
+        "sha256": "695de302e4615d38dd4fbcac06bf0bac7bde63efa98c2d9df65309ec95b945fc",
+        "bytes": 487548
+      },
+      "native-v1/source-advanced-normal-bake-outputs/mt1-rest-shared-raster-ordered.dsculpt": {
+        "sha256": "247419328e5d8016ee8fe2413241feecf9219e2fcdbf5a751422397e6498e504",
+        "bytes": 447887
+      },
+      "native-v1/source-advanced-normal-bake-outputs/mt1-rest-shared-raster.dsculpt": {
+        "sha256": "247419328e5d8016ee8fe2413241feecf9219e2fcdbf5a751422397e6498e504",
+        "bytes": 447887
+      },
+      "native-v1/source-advanced-normal-bake-outputs/mt1-rest-shared-retained-ordered.dsculpt": {
+        "sha256": "14edc2bef0b63378de40536744c452df76f154db18626fbf2a86165167a26b01",
+        "bytes": 487253
+      },
+      "native-v1/source-advanced-normal-bake-outputs/mt1-rest-shared-retained.dsculpt": {
+        "sha256": "14edc2bef0b63378de40536744c452df76f154db18626fbf2a86165167a26b01",
+        "bytes": 487253
+      },
+      "native-v1/source-advanced-normal-bake.ldd": {
+        "sha256": "90f74c1f206561ab55c60736bb687e62f5f40cf16c5a88220465ee58f61488c9",
+        "bytes": 1780
+      },
+      "native-v1/source-advanced-normal-bake.log": {
+        "sha256": "e2038baec68c418ee42dd6cfe4387a3daa1f8e92de9586c0c77b3869b9ec1cfc",
+        "bytes": 6265
+      },
+      "native-v1/source-artist-normal-bake-outputs/00.dsculpt.target.glb": {
+        "sha256": "96dadd00f8954160b10d9c0b4d29579ee9f021cb61f9bea01e065ba65a50484a",
+        "bytes": 5808
+      },
+      "native-v1/source-artist-normal-bake-outputs/01.dsculpt.target.glb": {
+        "sha256": "7b6f0dcb78014e048b038cc0fc6b1f25b5a33384a9f3c4300b3f5168202330b0",
+        "bytes": 6112
+      },
+      "native-v1/source-artist-normal-bake-outputs/10.dsculpt.target.glb": {
+        "sha256": "96dadd00f8954160b10d9c0b4d29579ee9f021cb61f9bea01e065ba65a50484a",
+        "bytes": 5808
+      },
+      "native-v1/source-artist-normal-bake-outputs/11.dsculpt.target.glb": {
+        "sha256": "7b6f0dcb78014e048b038cc0fc6b1f25b5a33384a9f3c4300b3f5168202330b0",
+        "bytes": 6112
+      },
+      "native-v1/source-artist-normal-bake-outputs/authored-normal-tangent-roundtrip.vrm": {
+        "sha256": "78f8a5b320eb6a199e4114596c22a1ef014024eaa66abf3bbe0ca8dfce0f4990",
+        "bytes": 38264
+      },
+      "native-v1/source-artist-normal-bake-outputs/authored-normal-tangent.vrm": {
+        "sha256": "08176e0c98bb869f3f4c8b97e91adfb3a7c2b374c01d4faae628de16a8584d22",
+        "bytes": 5644
+      },
+      "native-v1/source-artist-normal-bake.ldd": {
+        "sha256": "e8638685d321f57d2b296a0a742bde9b8cca8f78c605f38f82a689b97c4a9820",
+        "bytes": 1780
+      },
+      "native-v1/source-artist-normal-bake.log": {
+        "sha256": "71b3208587cdccece1dfea87994ccd234d5884e97946dfc99e79f62c81736d65",
+        "bytes": 15557
+      },
+      "native-v1/source-canonical-normal-bake-outputs/00000-ordered.dsculpt": {
+        "sha256": "18f72696b6b4d27d0ebc83c6183ad06cb3b221a5e6e1fc77181c93432332f8b5",
+        "bytes": 409161
+      },
+      "native-v1/source-canonical-normal-bake-outputs/00000.dsculpt": {
+        "sha256": "18f72696b6b4d27d0ebc83c6183ad06cb3b221a5e6e1fc77181c93432332f8b5",
+        "bytes": 409161
+      },
+      "native-v1/source-canonical-normal-bake-outputs/00001-ordered.dsculpt": {
+        "sha256": "642b8cbadb90e3d94282e5c3dadfb1e1bdc98384ec0297685c5bbe14700b7616",
+        "bytes": 285859
+      },
+      "native-v1/source-canonical-normal-bake-outputs/00001.dsculpt": {
+        "sha256": "642b8cbadb90e3d94282e5c3dadfb1e1bdc98384ec0297685c5bbe14700b7616",
+        "bytes": 285859
+      },
+      "native-v1/source-canonical-normal-bake-outputs/00010-ordered.dsculpt": {
+        "sha256": "b3a9fc791170c155a530ff00b414b5b9ceb2d252ac8a8636288a0537a582c740",
+        "bytes": 680031
+      },
+      "native-v1/source-canonical-normal-bake-outputs/00010.dsculpt": {
+        "sha256": "b3a9fc791170c155a530ff00b414b5b9ceb2d252ac8a8636288a0537a582c740",
+        "bytes": 680031
+      },
+      "native-v1/source-canonical-normal-bake-outputs/00011-ordered.dsculpt": {
+        "sha256": "d70ebb7bfc8987b25b55d5d69d9c23ea4e4b7a3ee84f05c05089f8d3cfc55b01",
+        "bytes": 556729
+      },
+      "native-v1/source-canonical-normal-bake-outputs/00011.dsculpt": {
+        "sha256": "d70ebb7bfc8987b25b55d5d69d9c23ea4e4b7a3ee84f05c05089f8d3cfc55b01",
+        "bytes": 556729
+      },
+      "native-v1/source-canonical-normal-bake-outputs/00100-ordered.dsculpt": {
+        "sha256": "301fcaa77d1102f287190edece61c2ab61137a3530c0b0e1323d75bf06daabb2",
+        "bytes": 636486
+      },
+      "native-v1/source-canonical-normal-bake-outputs/00100.dsculpt": {
+        "sha256": "301fcaa77d1102f287190edece61c2ab61137a3530c0b0e1323d75bf06daabb2",
+        "bytes": 636486
+      },
+      "native-v1/source-canonical-normal-bake-outputs/00101-ordered.dsculpt": {
+        "sha256": "c7a398e486288f4253f61e44a2826397a7843b2d061bde59331621e036c972c6",
+        "bytes": 583096
+      },
+      "native-v1/source-canonical-normal-bake-outputs/00101.dsculpt": {
+        "sha256": "c7a398e486288f4253f61e44a2826397a7843b2d061bde59331621e036c972c6",
+        "bytes": 583096
+      },
+      "native-v1/source-canonical-normal-bake-outputs/00110-ordered.dsculpt": {
+        "sha256": "387211d164d8cae88f38f2758b8062da501097434240edf20b3fdad8b8f7db92",
+        "bytes": 907356
+      },
+      "native-v1/source-canonical-normal-bake-outputs/00110.dsculpt": {
+        "sha256": "387211d164d8cae88f38f2758b8062da501097434240edf20b3fdad8b8f7db92",
+        "bytes": 907356
+      },
+      "native-v1/source-canonical-normal-bake-outputs/00111-ordered.dsculpt": {
+        "sha256": "aa7d91058cdccb17e6e3d455685fa3df78bae3ccd962ad152fc89914769d8d23",
+        "bytes": 853966
+      },
+      "native-v1/source-canonical-normal-bake-outputs/00111.dsculpt": {
+        "sha256": "aa7d91058cdccb17e6e3d455685fa3df78bae3ccd962ad152fc89914769d8d23",
+        "bytes": 853966
+      },
+      "native-v1/source-canonical-normal-bake-outputs/01000-ordered.dsculpt": {
+        "sha256": "86777bf6be55f1c73a37ef06bd8ab8da44d1eea95e56653aaf5b5779fb9901f5",
+        "bytes": 442216
+      },
+      "native-v1/source-canonical-normal-bake-outputs/01000.dsculpt": {
+        "sha256": "86777bf6be55f1c73a37ef06bd8ab8da44d1eea95e56653aaf5b5779fb9901f5",
+        "bytes": 442216
+      },
+      "native-v1/source-canonical-normal-bake-outputs/01001-ordered.dsculpt": {
+        "sha256": "410963cc1fe5c280a544a6a15f27ba6cc658e814c71d21a05e449c734dfb2f1f",
+        "bytes": 318914
+      },
+      "native-v1/source-canonical-normal-bake-outputs/01001.dsculpt": {
+        "sha256": "410963cc1fe5c280a544a6a15f27ba6cc658e814c71d21a05e449c734dfb2f1f",
+        "bytes": 318914
+      },
+      "native-v1/source-canonical-normal-bake-outputs/01010-ordered.dsculpt": {
+        "sha256": "65c7971920775590d672e255afaff5fc09543c57b6b5888492ec4f18eb8020a8",
+        "bytes": 713086
+      },
+      "native-v1/source-canonical-normal-bake-outputs/01010.dsculpt": {
+        "sha256": "65c7971920775590d672e255afaff5fc09543c57b6b5888492ec4f18eb8020a8",
+        "bytes": 713086
+      },
+      "native-v1/source-canonical-normal-bake-outputs/01011-ordered.dsculpt": {
+        "sha256": "f84e02bf8a7a636213430674a6a683f11d81959b14cb940625257a2a59ca06bd",
+        "bytes": 589784
+      },
+      "native-v1/source-canonical-normal-bake-outputs/01011.dsculpt": {
+        "sha256": "f84e02bf8a7a636213430674a6a683f11d81959b14cb940625257a2a59ca06bd",
+        "bytes": 589784
+      },
+      "native-v1/source-canonical-normal-bake-outputs/01100-ordered.dsculpt": {
+        "sha256": "a1c7308d828f9feb00b7498c108146ceeef36adaa8876a65e15e38b3b799b3e7",
+        "bytes": 669534
+      },
+      "native-v1/source-canonical-normal-bake-outputs/01100.dsculpt": {
+        "sha256": "a1c7308d828f9feb00b7498c108146ceeef36adaa8876a65e15e38b3b799b3e7",
+        "bytes": 669534
+      },
+      "native-v1/source-canonical-normal-bake-outputs/01101-ordered.dsculpt": {
+        "sha256": "a7cb3b704c90004392f03d19db365f52a32b4ecf11c750ebdaa14d89ff282fa9",
+        "bytes": 616144
+      },
+      "native-v1/source-canonical-normal-bake-outputs/01101.dsculpt": {
+        "sha256": "a7cb3b704c90004392f03d19db365f52a32b4ecf11c750ebdaa14d89ff282fa9",
+        "bytes": 616144
+      },
+      "native-v1/source-canonical-normal-bake-outputs/01110-ordered.dsculpt": {
+        "sha256": "57161387f393431e33cfd9ef2d663ecab92c0622758097047d7c52cee2a907bd",
+        "bytes": 940404
+      },
+      "native-v1/source-canonical-normal-bake-outputs/01110.dsculpt": {
+        "sha256": "57161387f393431e33cfd9ef2d663ecab92c0622758097047d7c52cee2a907bd",
+        "bytes": 940404
+      },
+      "native-v1/source-canonical-normal-bake-outputs/01111-ordered.dsculpt": {
+        "sha256": "c2f35ee520bb7b59248a317f68dbb525d8eb48da3a14cfa2ced52fe908c87879",
+        "bytes": 887014
+      },
+      "native-v1/source-canonical-normal-bake-outputs/01111.dsculpt": {
+        "sha256": "c2f35ee520bb7b59248a317f68dbb525d8eb48da3a14cfa2ced52fe908c87879",
+        "bytes": 887014
+      },
+      "native-v1/source-canonical-normal-bake-outputs/10000-ordered.dsculpt": {
+        "sha256": "1b2d4953aaccd5b558d41e2b39131859c8e74cc6b6ac9bbd030ec496511fd032",
+        "bytes": 409031
+      },
+      "native-v1/source-canonical-normal-bake-outputs/10000.dsculpt": {
+        "sha256": "1b2d4953aaccd5b558d41e2b39131859c8e74cc6b6ac9bbd030ec496511fd032",
+        "bytes": 409031
+      },
+      "native-v1/source-canonical-normal-bake-outputs/10001-ordered.dsculpt": {
+        "sha256": "997cc9e88571c730e92418363db40027e9aefe7cbeba5086e20ab021aa007a3d",
+        "bytes": 285729
+      },
+      "native-v1/source-canonical-normal-bake-outputs/10001.dsculpt": {
+        "sha256": "997cc9e88571c730e92418363db40027e9aefe7cbeba5086e20ab021aa007a3d",
+        "bytes": 285729
+      },
+      "native-v1/source-canonical-normal-bake-outputs/10010-ordered.dsculpt": {
+        "sha256": "100cbd91343ee9f6ce29c8d78fa4d13401529b00fc921e09270c148c06caaaeb",
+        "bytes": 679901
+      },
+      "native-v1/source-canonical-normal-bake-outputs/10010.dsculpt": {
+        "sha256": "100cbd91343ee9f6ce29c8d78fa4d13401529b00fc921e09270c148c06caaaeb",
+        "bytes": 679901
+      },
+      "native-v1/source-canonical-normal-bake-outputs/10011-ordered.dsculpt": {
+        "sha256": "fc540d8400b191afdec522dceb6f4e7a9ddbb08e78a739b7d14b47af554daace",
+        "bytes": 556599
+      },
+      "native-v1/source-canonical-normal-bake-outputs/10011.dsculpt": {
+        "sha256": "fc540d8400b191afdec522dceb6f4e7a9ddbb08e78a739b7d14b47af554daace",
+        "bytes": 556599
+      },
+      "native-v1/source-canonical-normal-bake-outputs/10100-ordered.dsculpt": {
+        "sha256": "28890b1652fab7b18e9f9f6a1fb22b5268eb250b9d1614a5afa1f0a052b7f078",
+        "bytes": 636356
+      },
+      "native-v1/source-canonical-normal-bake-outputs/10100.dsculpt": {
+        "sha256": "28890b1652fab7b18e9f9f6a1fb22b5268eb250b9d1614a5afa1f0a052b7f078",
+        "bytes": 636356
+      },
+      "native-v1/source-canonical-normal-bake-outputs/10101-ordered.dsculpt": {
+        "sha256": "4f3edede12271cb9df67a5860eff8f841b9c897aeec178c1648cdd14eba9b5c4",
+        "bytes": 582966
+      },
+      "native-v1/source-canonical-normal-bake-outputs/10101.dsculpt": {
+        "sha256": "4f3edede12271cb9df67a5860eff8f841b9c897aeec178c1648cdd14eba9b5c4",
+        "bytes": 582966
+      },
+      "native-v1/source-canonical-normal-bake-outputs/10110-ordered.dsculpt": {
+        "sha256": "3a92ddc8e1cd2dd0b31fd067c773673e616ac9f227078e4c5f943adee9a0ec45",
+        "bytes": 907226
+      },
+      "native-v1/source-canonical-normal-bake-outputs/10110.dsculpt": {
+        "sha256": "3a92ddc8e1cd2dd0b31fd067c773673e616ac9f227078e4c5f943adee9a0ec45",
+        "bytes": 907226
+      },
+      "native-v1/source-canonical-normal-bake-outputs/10111-ordered.dsculpt": {
+        "sha256": "6f169aa1ec5e0a5c728dc8cc027f8042029c05e1ac324ac4fa26cbdff0cac835",
+        "bytes": 853836
+      },
+      "native-v1/source-canonical-normal-bake-outputs/10111.dsculpt": {
+        "sha256": "6f169aa1ec5e0a5c728dc8cc027f8042029c05e1ac324ac4fa26cbdff0cac835",
+        "bytes": 853836
+      },
+      "native-v1/source-canonical-normal-bake-outputs/11000-ordered.dsculpt": {
+        "sha256": "df547095f55b3cc9f8012569909be30fb9b267aa892eb048b8a4c5494ffb58af",
+        "bytes": 442086
+      },
+      "native-v1/source-canonical-normal-bake-outputs/11000.dsculpt": {
+        "sha256": "df547095f55b3cc9f8012569909be30fb9b267aa892eb048b8a4c5494ffb58af",
+        "bytes": 442086
+      },
+      "native-v1/source-canonical-normal-bake-outputs/11001-ordered.dsculpt": {
+        "sha256": "26df67a7bbe29af05fa5b0434498c02dcdf9c8d9de709aae071d44c7ba293cfb",
+        "bytes": 318784
+      },
+      "native-v1/source-canonical-normal-bake-outputs/11001.dsculpt": {
+        "sha256": "26df67a7bbe29af05fa5b0434498c02dcdf9c8d9de709aae071d44c7ba293cfb",
+        "bytes": 318784
+      },
+      "native-v1/source-canonical-normal-bake-outputs/11010-ordered.dsculpt": {
+        "sha256": "66a7af3f1d0e0c996e36197b6b01ed8949fa423205e242b16b67c93c5c6605d2",
+        "bytes": 712956
+      },
+      "native-v1/source-canonical-normal-bake-outputs/11010.dsculpt": {
+        "sha256": "66a7af3f1d0e0c996e36197b6b01ed8949fa423205e242b16b67c93c5c6605d2",
+        "bytes": 712956
+      },
+      "native-v1/source-canonical-normal-bake-outputs/11011-ordered.dsculpt": {
+        "sha256": "ac3deb8cef59e47f6b8edbc5a8feb5a8a0464afe1c7ce875691d13a26b507f9b",
+        "bytes": 589654
+      },
+      "native-v1/source-canonical-normal-bake-outputs/11011.dsculpt": {
+        "sha256": "ac3deb8cef59e47f6b8edbc5a8feb5a8a0464afe1c7ce875691d13a26b507f9b",
+        "bytes": 589654
+      },
+      "native-v1/source-canonical-normal-bake-outputs/11100-ordered.dsculpt": {
+        "sha256": "856d676e162d9a03fa5a5007bc948b433c28cba306696185d023aa4210664cf0",
+        "bytes": 669404
+      },
+      "native-v1/source-canonical-normal-bake-outputs/11100.dsculpt": {
+        "sha256": "856d676e162d9a03fa5a5007bc948b433c28cba306696185d023aa4210664cf0",
+        "bytes": 669404
+      },
+      "native-v1/source-canonical-normal-bake-outputs/11101-ordered.dsculpt": {
+        "sha256": "97737463e6fd957041a2eebf2984ba140e5b085a362be23b864fd48721c082da",
+        "bytes": 616014
+      },
+      "native-v1/source-canonical-normal-bake-outputs/11101.dsculpt": {
+        "sha256": "97737463e6fd957041a2eebf2984ba140e5b085a362be23b864fd48721c082da",
+        "bytes": 616014
+      },
+      "native-v1/source-canonical-normal-bake-outputs/11110-ordered.dsculpt": {
+        "sha256": "125cac36a2fe0bed69161fe51f33dbd64e5572593404fdef38cc3f105b866f5f",
+        "bytes": 940274
+      },
+      "native-v1/source-canonical-normal-bake-outputs/11110.dsculpt": {
+        "sha256": "125cac36a2fe0bed69161fe51f33dbd64e5572593404fdef38cc3f105b866f5f",
+        "bytes": 940274
+      },
+      "native-v1/source-canonical-normal-bake-outputs/11111-ordered.dsculpt": {
+        "sha256": "0d54a1f78da79ce1d30ae8d31869125eb53cfa451060c2cd72b69c09ec5b616f",
+        "bytes": 886884
+      },
+      "native-v1/source-canonical-normal-bake-outputs/11111.dsculpt": {
+        "sha256": "0d54a1f78da79ce1d30ae8d31869125eb53cfa451060c2cd72b69c09ec5b616f",
+        "bytes": 886884
+      },
+      "native-v1/source-canonical-normal-bake.ldd": {
+        "sha256": "8a65a1aaa09ed25de856109e6415dcb7c68b80505afa2d92268b1334673f8f9a",
+        "bytes": 1780
+      },
+      "native-v1/source-canonical-normal-bake.log": {
+        "sha256": "4c154863f908af12837ee703411bc7e2faba0a9b2e3b6f29fb4cb709dccceb67",
+        "bytes": 9351
+      },
+      "native-v1/source-prepared-normal-bake.ldd": {
+        "sha256": "ee32119cdf8a361bed89f69b4b82f1e5eb166f16d5f2ef0d1ef11363c65b1a55",
+        "bytes": 1780
+      },
+      "native-v1/source-prepared-normal-bake.log": {
+        "sha256": "ec0d989eb70a35f91ade3146986b3f36d154b01dba186f8cebae256f73a46644",
+        "bytes": 14061
+      },
+      "native-v1/status.json": {
+        "sha256": "060b39336aa6ff21e2107d1e73e98ac87bf5f1a416b6df9366e7368cbaaaba1e",
+        "bytes": 57395
+      },
+      "native-v1/unit-after-stop.txt": {
+        "sha256": "6f18458cc2432a8b8b722c8eed8df49e1ca4622b54f8c9218476d2f9e38a2b24",
+        "bytes": 48
+      },
+      "native-v1/unit-journal.txt": {
+        "sha256": "811548ca00cda6dc65e5e8c90e498a7359797bcff59f8c7eb85a970c27d5028e",
+        "bytes": 505
+      },
+      "native-v1/unit-terminal.txt": {
+        "sha256": "b669edc6d28b15914ee1e3ae211745798520dd6d15d1d237fbcb8c88f3e66d5c",
+        "bytes": 8647
+      }
+    },
+    "ELF_object_staticarchive_payloads": 0
+  }
+}
