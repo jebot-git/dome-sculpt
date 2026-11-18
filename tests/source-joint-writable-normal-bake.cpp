@@ -92,4 +92,7 @@ void negatives(){
  std::cout<<"JOINT_QUOTA authority="<<authority<<" caller="<<limits.max_working_bytes<<" polls="<<polls<<std::endl;require(prospective&&polls<16&&larger.encode()==exact,"One byte below the actual joint replay allowance refuses before deep replay and preserves every source byte");
 }
 }
+#ifndef DOME_JOINT_SOURCE_EMBEDDED
 int main(int argc,char**argv)try{if(argc==5&&(std::string_view(argv[1])=="--checked-case"||std::string_view(argv[1])=="--checked-refusal")){const auto axes=owning_filtered::bits(argv[2],3);const auto selected=owning_filtered::resolution(argv[3]);const std::filesystem::path out=argv[4];std::filesystem::create_directories(out);joint_source::exercise(axes[0],axes[1],axes[2],out,selected,std::string_view(argv[1])=="--checked-refusal");std::cout<<"PASS "<<joint_source::checks<<" checked joint-writable SOURCE controls"<<std::endl;return 0;}if(argc==3&&std::string_view(argv[1])=="--legacy-controls"){argv[1]=argv[2];argc=2;}if(argc!=2)return 2;const std::filesystem::path out=argv[1];std::filesystem::create_directories(out);for(bool seam:{false,true})for(bool live:{false,true})for(bool repeat:{false,true})joint_source::exercise(seam,live,repeat,out);joint_source::negatives();std::cout<<"PASS "<<joint_source::checks<<" joint source checks\n";return 0;}catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
+
+#endif

@@ -208,6 +208,14 @@ if(BUILD_TESTING)
   add_test(NAME source-joint-writable-normal-bake COMMAND dome-sculpt-source-joint-writable-normal-bake-test
     --checked-case 000 512 ${CMAKE_CURRENT_BINARY_DIR}/source-joint-writable-normal-bake-checked)
   set_tests_properties(source-joint-writable-normal-bake source-joint-writable-normal-bake-legacy PROPERTIES TIMEOUT 900)
+  set_tests_properties(source-joint-writable-normal-bake PROPERTIES FIXTURES_SETUP owning-hdr-seed)
+  add_executable(dome-sculpt-source-owning-hdr-domain-test tests/source-owning-hdr-domain.cpp)
+  target_include_directories(dome-sculpt-source-owning-hdr-domain-test PRIVATE src)
+  target_link_libraries(dome-sculpt-source-owning-hdr-domain-test PRIVATE dome-sculpt-core)
+  add_test(NAME source-owning-hdr-domain COMMAND dome-sculpt-source-owning-hdr-domain-test
+    ${CMAKE_CURRENT_BINARY_DIR}/source-joint-writable-normal-bake-checked/000.dsculpt
+    ${CMAKE_CURRENT_BINARY_DIR}/source-owning-hdr-domain)
+  set_tests_properties(source-owning-hdr-domain PROPERTIES FIXTURES_REQUIRED owning-hdr-seed TIMEOUT 900)
   # Additive native producer; public GUI/XR execution is an explicit owning gate.
   add_executable(dome-sculpt-source8-public-fixture tests/source8-public-fixture.cpp)
   target_include_directories(dome-sculpt-source8-public-fixture PRIVATE src)
