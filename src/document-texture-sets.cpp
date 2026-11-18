@@ -30,7 +30,7 @@ void Document::queue_texture_set_locked(TextureSetEdit edit,AssetSource expected
  const auto source=AssetSource{state_.generation,state_.revision,object,state_.edit_authority};
  const char*label=edit.action==TextureSetAction::Create?"Create texture set":edit.action==TextureSetAction::AssignFaces?"Assign material faces":edit.action==TextureSetAction::Select?"Select texture set":edit.action==TextureSetAction::Rename?"Rename texture set":edit.action==TextureSetAction::Material?"Edit texture-set material":edit.action==TextureSetAction::Resolution?"Resize texture-set paint":"Edit texture-set layer";
  queue_scene_operation_locked(label,[object,edit=std::move(edit),changed,empty_target_resize](Scene&scene,const auto&cancelled){
-  TextureSetLimits limits;limits.cancelled=cancelled;
+  TextureSetLimits limits=empty_target_resize?detail::bake_target_resolution_limits():TextureSetLimits{};limits.cancelled=cancelled;
   switch(edit.action){
   case TextureSetAction::Resolution:{if(empty_target_resize){*changed=detail::resize_unpainted_bake_target(scene,object,edit.resolution,limits);break;}TextureSetResolutionOptions options;options.resolution=edit.resolution;*changed=resample_texture_set(scene,object,edit.set,options,limits).changed;break;}
   case TextureSetAction::Create:dome::create_texture_set(scene,object,edit.faces,edit.name,edit.resolution,limits);*changed=true;break;

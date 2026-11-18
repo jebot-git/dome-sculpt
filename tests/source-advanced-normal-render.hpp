@@ -6,6 +6,7 @@
 #include "dome/normal-preview.hpp"
 #include "dome/source-uv-bake.hpp"
 #include <numeric>
+#include "bake-target-resolution.hpp"
 namespace advanced_render {
 using source_artist_fixture::fixture;
 using prepared_pixel_oracle::D;
@@ -49,14 +50,26 @@ Case construct(bool legacy,bool live,bool seam,SourceNormalUvMethod method,bool 
     const auto destination=scene.add("Advanced graphical destination",Volume{});
     auto &target=scene.object(destination);
     target.mesh_active=true;
-    target.painted=std::make_shared<PaintedMesh>(mesh,destination_resolution);
+    target.painted=std::make_shared<PaintedMesh>(mesh,64);
     target.material_bindings=blank_typed(legacy);
     scene.select(destination);
+    if(destination_resolution!=64){
+        check(detail::resize_unpainted_bake_target(scene,destination,destination_resolution),"Explicit higher-resolution graphics uses the actual blank-target resolution adapter");
+        check(scene.object(destination).painted->resolution()==destination_resolution&&scene.object(source).painted->resolution()==64,"Explicit higher-resolution target preserves genuine source64 paint and all original normal images");
+    }
+    const auto bake_source_paint=scene.object(source).painted;
+    check(bake_source_paint->mesh_owner()==paint->mesh_owner()&&bake_source_paint->source_maps()==paint->source_maps()&&bake_source_paint->normal_projection()==paint->normal_projection()&&bake_source_paint->baked()==paint->baked(),
+          "Explicit target resolution preserves exact immutable genuine source geometry, images and normal events across Scene snapshots");
     ObjectBakeSettings options;
+    // The historical64 graphical corpus keeps its recorded per-texel policy;
+    // separately named higher-resolution families request actual filtered1.
+    options.normal_filter_quality=destination_resolution==64?0:1;
     options.prepare_normals=true;options.normal_error=.03f;
     options.front_mm=options.back_mm=500;options.ao_samples=0;options.padding=0;
     check(bake_object(scene,source,options).projected>0,"Actual second Bake consumes genuine advanced source");
-    check(scene.object(source).painted==paint && scene.object(source).material_bindings==binding,
+    check(scene.active().bake_recipe->settings.normal_filter_quality==options.normal_filter_quality,
+          "Graphical second Bake persists its explicit legacy or sampled-filtered policy without relabeling the original64 corpus");
+    check(scene.object(source).painted==bake_source_paint && scene.object(source).material_bindings==binding,
           "Advanced graphical construction preserves exact source paint/material authority owners");
     auto remaining=scene.snapshot();remaining.erase(destination);remaining.select(source);
     auto context=remaining.encode();

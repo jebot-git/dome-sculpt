@@ -104,7 +104,7 @@ std::array<int,3> toon(const Inputs &in,D normal,D view) {
     light.gi=light.gi_down*(.5f-.5f*light.normal.y)+light.gi_up*(.5f+.5f*light.normal.y);light.normal_oriented=true;
     const auto f=mtoon_shade(in.typed,in.samples,light);return {encoded(f.color[0]),encoded(f.color[1]),encoded(f.color[2])};
 }
-int run(const std::filesystem::path &output,bool display_mode=false) {
+int run(const std::filesystem::path &output,bool display_mode=false,uint32_t resolution=64) {
     std::ofstream stream(output);require(bool(stream),"CPU forecast creates explicit output");unsigned views=0;
     auto family=[&](Case f){for(bool source_view:{true,false})for(bool pbr_role:{true,false}){
         const auto drawn=source_view?f.source:f.destination;auto shown=display_mode?display::scene(f.scene,drawn,pbr_role):f.scene.snapshot();
@@ -130,15 +130,15 @@ int run(const std::filesystem::path &output,bool display_mode=false) {
             stream<<nlohmann::json{{"kind","point"},{"label",label},{"xy",xy},{"original",original},{"bary",bary},{"UV",uv},{"frontmost_triangle",hit->triangle},
                 {"correct_and3negative_normals",normals},{"independent_target_normal",target_normal},{"independent_transfer_error",transfer_error},{"correct_and3negative_RGB",rgb},{"negative_gaps",gaps},{"actual_filtered_linear_base",in.base},
                 {"actual_filtered_data_AO_rough_metal",in.orm},{"actual_filtered_linear_emission",in.glow},{"actual_filtered_generic_color",in.generic_color},{"actual_filtered_generic_emission",in.generic_emission},{"generic_current_UV0_domain_authenticated",true},{"native_material_color",o.material.color},
-                {"native_material_roughness",o.material.roughness},{"native_material_metallic",o.material.metallic},{"display_mode",display_mode},{"declared_shade",std::array<float,3>{o.material_bindings->material.parameters.shade_color.x,o.material_bindings->material.parameters.shade_color.y,o.material_bindings->material.parameters.shade_color.z}},{"declared_toony",o.material_bindings->material.parameters.toony}}.dump()<<'\n';++points;
+                {"native_material_roughness",o.material.roughness},{"native_material_metallic",o.material.metallic},{"display_mode",display_mode},{"target_resolution",resolution},{"source_resolution",source.painted->resolution()},{"target_normal_filter_quality",f.scene.object(f.destination).bake_recipe->settings.normal_filter_quality},{"declared_shade",std::array<float,3>{o.material_bindings->material.parameters.shade_color.x,o.material_bindings->material.parameters.shade_color.y,o.material_bindings->material.parameters.shade_color.z}},{"declared_toony",o.material_bindings->material.parameters.toony}}.dump()<<'\n';++points;
         }
         const auto projection=o.painted->normal_projection();const auto preview=o.painted->preview(o.material);
         nlohmann::json normal_metadata{{"source_view",source_view},{"projection_version",projection?projection->version:0},{"retained_projection_domain",projection&&bool(projection->sampling_domain)},{"retained_binding_domain",o.material_bindings->normal_preparation&&bool(o.material_bindings->normal_preparation->sampling_domain)},{"normal_image_size",std::array<uint32_t,2>{preview->normal.width,preview->normal.height}},{"mtoon_image_size",std::array<uint32_t,2>{preview->mtoon_normal.width,preview->mtoon_normal.height}},{"mesh_vertices",mesh.positions.size()},{"normal_scale",o.material_bindings->material.parameters.normal_scale}};
         stream<<nlohmann::json{{"kind","view"},{"normal_metadata",normal_metadata},{"label",label},{"points",points},{"maximum_gaps",maxima},{"witnesses",witnesses},{"PBR_model","independent GGX with genuine filtered material maps"},{"MToon_model","CPU reference presentation estimate; not graphical acceptance"},{"required_gap_unchanged",7},{"original_probes_unchanged",original_render_probes}}.dump()<<std::endl;
         require(f.scene.encode()==before,"CPU contrast forecast retains complete genuine scene authority");++views;
     }};
-    for(bool legacy:{false,true})for(bool live:{false,true})for(bool seam:{false,true})for(auto method:{SourceNormalUvMethod::Rasterize,SourceNormalUvMethod::RetainSource})family(construct(legacy,live,seam,method));
-    family(construct(false,true,true,SourceNormalUvMethod::RetainSource,true));require(views==68,"CPU forecast visits all genuine family/stage/role views");
+    for(bool legacy:{false,true})for(bool live:{false,true})for(bool seam:{false,true})for(auto method:{SourceNormalUvMethod::Rasterize,SourceNormalUvMethod::RetainSource})family(construct(legacy,live,seam,method,false,resolution));
+    family(construct(false,true,true,SourceNormalUvMethod::RetainSource,true,resolution));require(views==68,"CPU forecast visits all genuine family/stage/role views");
     std::cout<<(display_mode?"PASS CPU advanced display forecast views=":"PASS CPU advanced contrast forecast views=")<<views<<"; no GL context or normal/material mutation\n";return 0;
 }
 } // namespace advanced_render::forecast

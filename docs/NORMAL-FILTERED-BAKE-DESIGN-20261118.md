@@ -2,20 +2,21 @@
 
 Original64 retained-source graphical target data fails `.035` at 18/136 original
 role probes; no original probe or bound is changed. This source draft is not yet
-compiled or admitted. See ADVANCED-NORMAL-MATERIAL-TRANSFER-20261118.md.
+qualified or admitted. See ADVANCED-NORMAL-MATERIAL-TRANSFER-20261118.md.
 
 New ObjectBakeSettings requests default normal_filter_quality1. The saved policy
 is explicit and bounded: version1 checks rest-space normal conditioning,
 quantization, and sampled filtered transfer against the same normal_error angle.
 It tests nine quarter/midpoints in each fully projected interior bilinear cell,
 using the actual target role basis, sampled RGBA8 vectors and authenticated source
-projection/normal resolver. Ordinary mesh and sculpt sources use a separate numeric
-sampler extracted from the actual generic Bake normal path: interpolated source
-normals, original texture UV/basis, explicit imported tangents and legacy raw
-coverage all follow the same validated function as rasterization. This numeric
-sampler cannot mint prepared-frame authority. Missing ordinary-source frame
-bindings never skip the check. Explicit raw, unprepared Bakes record policy0
-and make no filtered-quality claim. Aggregate ray/raster budgets and cancellation bound
+projection/normal resolver. Prepared original/retained sources keep their sealed
+paired resolver. Ordinary mesh and sculpt sources use a separate numeric sampler
+extracted from the actual generic Bake normal path: interpolated source normals,
+original texture UV/basis, explicit imported tangents and legacy raw coverage
+follow the same validated function as rasterization. This numeric sampler cannot
+mint prepared-frame authority. Missing ordinary-source frame bindings never skip
+the check. Explicit raw, unprepared Bakes record policy0 and make no filtered
+quality claim. Aggregate ray/raster budgets and cancellation bound
 all work. No empty interior certificate authorizes a field. This is a sampled
 rest-space contract, not an all-point or all-pose theorem. The independent native
 and GL corpora retain their original component `.035`, RGB3 and gap7 checks.
@@ -47,11 +48,15 @@ Authored/prepared field resizing still needs its separate owning adapter.
 
 The focused workflow entry --filtered-workflow preserves eight original64
 refusals, exercises seventeen separately named higher-resolution families through
-Document's actual resolution worker/Bake/Save/Undo/Redo/reopen, checks all original
+Document's actual resolution worker/Bake/Save/Undo/Redo/reopen. Each of the eight
+retained64 cases also refuses and then recovers through resolution selection in
+the same live Document, preserving its prior save and history before retry. It checks all original
 probe directions independently, and validates the real historical fixture. A
 separate 64/128/256/512 study shows512 is still insufficient for the dense
-MToon corpus; the focused workflow therefore starts at an explicitly selected
-1024 and must pass actual checks before
+MToon corpus; the focused workflow therefore tested an explicitly selected
+1024. The additional genuine ordinary mapped field still reaches0.0370691rad
+at1024 under the unchanged0.03 limit, so the next workflow explicitly selects
+2048 and must pass actual checks before
 claiming any positive. Software and Arc graphics, full App/UI, native/sanitizer
 regressions and refreshed consumer dependency closure remain required.
 
@@ -66,3 +71,38 @@ Focused ordinary-source coverage also includes an unbound plain mesh, an actual
 original normal-map source with low-resolution refusal/retry, and a real spherical
 SDF sculpt projected into a prepared target. Its spherical direction is checked
 independently; none of these sources has a retained/prepared material resolver.
+
+The separately named --filtered-resolution-forecast and
+--filtered-resolution-render modes accept an explicit target size. They start
+with the same genuine64 source and ordinary64 target, run the actual blank-target
+resolution adapter, then perform a genuine checked second Bake. The original64
+graphical mode explicitly retains its historical per-texel policy0. New witness
+manifests identify the selected target size, source64 and checked policy1. All68
+views keep their four original probes, independent directions and material
+controls. The original failed executions remain separate retained evidence.
+
+The stronger --filtered-workflow path is registered as source-advanced-normal-bake,
+with the real legacy fixture and explicitly selected1024 advanced target and2048 ordinary mapped target. The COMPLETE historical17-family suite remains
+registered separately as source-advanced-normal-bake-legacy: its target Bake
+requests explicitly select persisted policy0, preserving all original texel,
+material, source-ownership, Save, Undo/Redo, ancestor-budget and cancellation
+checks. Its old64 inputs are not new-policy positives. Both suites must pass;
+run ctest -R '^source-advanced-normal-bake(-legacy)?$' --output-on-failure.
+The current policy1 suite independently requires the eight real64 refusals,
+seventeen explicit higher-resolution recovery/positive families and ordinary
+mesh/sculpt coverage. No old default1 known failure needs to be relabeled.
+
+The empty-target2048 resize uses a narrowly explicit128M work limit: its existing
+20-work/cell charge alone is83,886,080. Generic texture-set defaults remain64M;
+explicit caller64M and insufficient byte budgets still refuse atomically, and
+all selected early/raster cancellation boundaries retain exact scene/owners.
+The256MiB byte allowance, existing512M hard work cap, source64 texture, every
+normal sample and0.03 angular limit stay unchanged. Actual1024 mapped-field
+refusal is retained as a regression; its diagnostic0 raster is never admitted as
+checked1. Full-cell CPU analysis covers6,730,776 dual-role offcentre samples.
+
+The registered native command declares two separate user-selected sizes:
+--filtered-workflow OUTPUT LEGACYFILE 1024 2048. The original seventeen advanced
+families next test1024; the additional ordinary mapped field separately retries
+at2048 after its genuine1024 refusal. Neither size is silently substituted, and
+both must pass their actual checked policy before acceptance is claimed.
