@@ -18,8 +18,14 @@ inline bool unpainted_bake_resolution_target(const SculptObject &o)noexcept{
   }
   return true;
 }
+// 2048² cells at the unchanged conservative20-work/cell charge need more
+// than the generic64M limit. Only this ordinary empty-target workflow opts in;
+// caller-supplied smaller budgets remain binding and byte limits stay256MiB.
+inline TextureSetLimits bake_target_resolution_limits(){
+  TextureSetLimits limits;limits.maximum_work=128'000'000;return limits;
+}
 inline bool resize_unpainted_bake_target(Scene &scene,uint64_t object,uint32_t resolution,
-    const TextureSetLimits &limits={}){
+    const TextureSetLimits &limits=bake_target_resolution_limits()){
   limits.validate();auto stop=[&]{if(limits.cancelled&&limits.cancelled())throw std::runtime_error("Target paint resolution change cancelled");};stop();
   const auto &before=scene.object(object);
   if(!unpainted_bake_resolution_target(before)||resolution<64||resolution>2048||(resolution&(resolution-1)))

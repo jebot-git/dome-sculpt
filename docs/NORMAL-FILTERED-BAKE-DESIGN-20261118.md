@@ -53,8 +53,10 @@ retained64 cases also refuses and then recovers through resolution selection in
 the same live Document, preserving its prior save and history before retry. It checks all original
 probe directions independently, and validates the real historical fixture. A
 separate 64/128/256/512 study shows512 is still insufficient for the dense
-MToon corpus; the focused workflow therefore starts at an explicitly selected
-1024 and must pass actual checks before
+MToon corpus; the focused workflow therefore tested an explicitly selected
+1024. The additional genuine ordinary mapped field still reaches0.0370691rad
+at1024 under the unchanged0.03 limit, so the next workflow explicitly selects
+2048 and must pass actual checks before
 claiming any positive. Software and Arc graphics, full App/UI, native/sanitizer
 regressions and refreshed consumer dependency closure remain required.
 
@@ -80,7 +82,7 @@ views keep their four original probes, independent directions and material
 controls. The original failed executions remain separate retained evidence.
 
 The stronger --filtered-workflow path is registered as source-advanced-normal-bake,
-with the real legacy fixture and explicitly selected1024 target. The COMPLETE historical17-family suite remains
+with the real legacy fixture and explicitly selected1024 advanced target and2048 ordinary mapped target. The COMPLETE historical17-family suite remains
 registered separately as source-advanced-normal-bake-legacy: its target Bake
 requests explicitly select persisted policy0, preserving all original texel,
 material, source-ownership, Save, Undo/Redo, ancestor-budget and cancellation
@@ -89,3 +91,18 @@ run ctest -R '^source-advanced-normal-bake(-legacy)?$' --output-on-failure.
 The current policy1 suite independently requires the eight real64 refusals,
 seventeen explicit higher-resolution recovery/positive families and ordinary
 mesh/sculpt coverage. No old default1 known failure needs to be relabeled.
+
+The empty-target2048 resize uses a narrowly explicit128M work limit: its existing
+20-work/cell charge alone is83,886,080. Generic texture-set defaults remain64M;
+explicit caller64M and insufficient byte budgets still refuse atomically, and
+all selected early/raster cancellation boundaries retain exact scene/owners.
+The256MiB byte allowance, existing512M hard work cap, source64 texture, every
+normal sample and0.03 angular limit stay unchanged. Actual1024 mapped-field
+refusal is retained as a regression; its diagnostic0 raster is never admitted as
+checked1. Full-cell CPU analysis covers6,730,776 dual-role offcentre samples.
+
+The registered native command declares two separate user-selected sizes:
+--filtered-workflow OUTPUT LEGACYFILE 1024 2048. The original seventeen advanced
+families next test1024; the additional ordinary mapped field separately retries
+at2048 after its genuine1024 refusal. Neither size is silently substituted, and
+both must pass their actual checked policy before acceptance is claimed.

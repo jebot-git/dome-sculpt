@@ -96,6 +96,18 @@ Family ordinary_plane(bool mapped){
  const auto target=scene.add("Ordinary source explicit target",Volume{});auto &o=scene.object(target);o.mesh_active=true;o.painted=std::make_shared<PaintedMesh>(low,64);o.material_bindings=blank_typed(false);scene.select(target);
  return {std::move(scene),id,target,mapped?"unbound-normalmap":"unbound-plain-mesh"};
 }
+void resize_limits(){
+ auto family=ordinary_plane(true);const auto before=family.scene.encode();const auto paint=family.scene.active().painted;
+ TextureSetLimits old;bool work=false;try{detail::resize_unpainted_bake_target(family.scene,family.target,2048,old);}catch(const std::length_error&e){work=std::string(e.what()).find("work budget")!=std::string::npos;}
+ require(work&&family.scene.encode()==before&&family.scene.active().painted==paint,"Original64M resize-work budget genuinely refuses2048 atomically at unchanged accounting");
+ auto bytes=detail::bake_target_resolution_limits();bytes.maximum_bytes=1;bool bounded=false;try{detail::resize_unpainted_bake_target(family.scene,family.target,2048,bytes);}catch(const std::length_error&){bounded=true;}
+ require(bounded&&family.scene.encode()==before&&family.scene.active().painted==paint,"Calibrated2048 resize retains actual byte-budget rejection and exact original authority");
+ for(unsigned boundary:{1u,2u,8u,64u}){auto limits=detail::bake_target_resolution_limits();unsigned polls=0;limits.cancelled=[&]{return ++polls>=boundary;};bool refused=false;try{detail::resize_unpainted_bake_target(family.scene,family.target,2048,limits);}catch(const std::runtime_error&){refused=true;}
+  require(refused&&polls>=boundary&&family.scene.encode()==before&&family.scene.active().painted==paint,"Every selected early/raster resize cancellation keeps the exact original Scene and paint authority");}
+ auto selected=family.scene.snapshot();detail::resize_unpainted_bake_target(selected,family.target,1024);const auto baseline=selected.encode();const auto selected_paint=selected.active().painted;bool insufficient=false;
+ try{bake_object(selected,family.source,settings());}catch(const std::invalid_argument&e){insufficient=std::string(e.what()).find("1024 px; choose a larger target paint resolution")!=std::string::npos;}
+ require(insufficient&&selected.encode()==baseline&&selected.active().painted==selected_paint,"Actual1024 mapped-source fidelity refusal remains a regression with unchanged normal data and angular limit");
+}
 void ordinary_sources(const std::filesystem::path &folder,uint32_t resolution){
  static_assert(!std::is_convertible_v<detail::GenericBakeNormalSampler,detail::SourceBakeNormalResolver>);
  auto plain=ordinary_plane(false);require(!plain.scene.object(plain.source).material_bindings&&!detail::source_bake_normals(plain.scene.object(plain.source),{}),"Genuine ordinary source has no original/prepared material-frame resolver");
@@ -119,13 +131,13 @@ void cancellation(uint32_t resolution){
   require(after_raster&&requested&&caught&&candidate.encode()==encoded&&candidate.active().painted==paint,"Cancellation after actual normal rasterization preserves exact selected grid, source and unpublished Bake");
  }
 }
-int run(const std::filesystem::path &folder,const std::filesystem::path &old,uint32_t resolution){
- std::filesystem::create_directories(folder);legacy(old,folder);ordinary_sources(folder,resolution);cancellation(resolution);unsigned positives=0,refusals=0;
+int run(const std::filesystem::path &folder,const std::filesystem::path &old,uint32_t resolution,uint32_t ordinary_resolution){
+ std::filesystem::create_directories(folder);legacy(old,folder);resize_limits();ordinary_sources(folder,ordinary_resolution);cancellation(resolution);unsigned positives=0,refusals=0;
  for(bool legacy:{false,true})for(bool live:{false,true})for(bool seam:{false,true})for(auto method:{SourceNormalUvMethod::Rasterize,SourceNormalUvMethod::RetainSource}){
   auto family=before(legacy,live,seam,method);if(method==SourceNormalUvMethod::RetainSource){low_refusal(family,folder);++refusals;}positive(family,resolution,folder,method==SourceNormalUvMethod::RetainSource);++positives;
  }
  positive(before(false,true,true,SourceNormalUvMethod::RetainSource,true),resolution,folder);++positives;
  require(positives==17&&refusals==8,"All original64 retained refusals and separately named genuine higher-target-resolution families execute");
- std::cout<<"PASS "<<checks<<" filtered Bake workflow positives="<<positives<<" original64_refusals="<<refusals<<" target_resolution="<<resolution<<"\n";return 0;
+ std::cout<<"PASS "<<checks<<" filtered Bake workflow positives="<<positives<<" original64_refusals="<<refusals<<" target_resolution="<<resolution<<" ordinary_target_resolution="<<ordinary_resolution<<"\n";return 0;
 }
 } // namespace filtered_workflow
