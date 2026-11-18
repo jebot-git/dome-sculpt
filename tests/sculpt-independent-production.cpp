@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sculpt-scene-chunks.hpp"
+#include "sculpt-placed-chunks.hpp"
+#include "dome/source-placement.hpp"
 #include <nlohmann/json.hpp>
 #include <cmath>
 #include <filesystem>
