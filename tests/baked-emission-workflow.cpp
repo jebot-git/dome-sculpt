@@ -183,7 +183,9 @@ void uv1_worker_controls(const std::filesystem::path &directory,bool raw_only=fa
         check(maps.overlay->baked()->emission_field==shown.object(f.source).painted->baked()->emission_field&&frame->tangents.size()==frame->mesh.positions.size(),"visible Source8 retains exact FLOAT owner and actual worker current Mikk corners");found=true;
       }check(found&&visible.copy_scene().encode()==shown.encode(),"visible Source8 packing keeps full native hidden/editable/field ownership exact");
     }
-    ObjectBakeSettings options;options.front_mm=10;options.back_mm=2;options.padding=2;options.ao_samples=0;
+    // Historical single-grid FLOAT/UV1 corpus explicitly exercises policy0.
+    // The independent source-grid/default1 route has its own owning cohort.
+    ObjectBakeSettings options;options.emission_transport=0;options.front_mm=10;options.back_mm=2;options.padding=2;options.ao_samples=0;
     auto late=f.scene.snapshot();bool stop=false,rejected=false;
     try{bake_object(late,f.source,options,[&]{return stop;},[&](float p){if(p>=.8f)stop=true;});}catch(const std::exception&){rejected=true;}
     check(rejected&&stop&&late.encode()==before,"late raw/Source8 worker cancellation keeps all actual source/target field owners exact");
@@ -384,7 +386,7 @@ int main(int argc,char **argv)try{
   check(bool(sampler),"source sampler is derived from a genuine owning native FLOAT field");
   auto sample=sampler(0,{.25f,.25f,.5f});
   check(sample[0]>50000&&sample[1]>0,"actual immutable projection-source sampler retains HDR and tiny terms");
-  auto cancelled=f.scene;bool stop=false;ObjectBakeSettings settings;settings.front_mm=10;settings.back_mm=2;settings.padding=2;settings.ao_samples=0;
+  auto cancelled=f.scene;bool stop=false;ObjectBakeSettings settings;settings.emission_transport=0;settings.front_mm=10;settings.back_mm=2;settings.padding=2;settings.ao_samples=0;
   bool rejected=false;try{bake_object(cancelled,f.source,settings,[&]{return stop;},[&](float progress){if(progress>=.8f)stop=true;});}catch(const std::exception &){rejected=true;}
   check(rejected&&stop&&cancelled.encode()==before,"late actual Bake cancellation retains full source/target/history owners");
   Document document;document.replace(f.scene);document.bake_from_object(f.source,settings);
