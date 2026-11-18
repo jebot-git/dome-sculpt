@@ -1,0 +1,494 @@
+{
+  "source": "05f5d1ccfa4bb5b97d25e4a425a2fd9497b0d8c9",
+  "state": "selected_combined_release_runtime_passed",
+  "scope": "15 selected native/softwareGL cases; no fulllegacy121/all1050/wholeAppUI or sanitizer acceptance",
+  "actual_checks": 265913,
+  "cases": [
+    {
+      "name": "source-maps-regression",
+      "checks": 55,
+      "seconds": 0.03306102752685547,
+      "RSS_bytes": 12226560
+    },
+    {
+      "name": "source-advanced-normal-bake",
+      "checks": 646,
+      "seconds": 259.0862150192261,
+      "RSS_bytes": 1351163904
+    },
+    {
+      "name": "source-canonical-normal-bake",
+      "checks": 14068,
+      "seconds": 8.437276124954224,
+      "RSS_bytes": 105529344
+    },
+    {
+      "name": "source-writable-normal-bake",
+      "checks": 9694,
+      "seconds": 2.1089067459106445,
+      "RSS_bytes": 96960512
+    },
+    {
+      "name": "source-joint-writable-normal-bake",
+      "checks": 47409,
+      "seconds": 11.873444318771362,
+      "RSS_bytes": 204886016
+    },
+    {
+      "name": "source-owning-hdr-domain",
+      "checks": 24,
+      "seconds": 17.480040788650513,
+      "RSS_bytes": 455766016
+    },
+    {
+      "name": "source-owning-hdr-export",
+      "checks": 16400,
+      "seconds": 13.254668712615967,
+      "RSS_bytes": 473083904
+    },
+    {
+      "name": "source-prepared-normal-bake-legacy",
+      "checks": 91,
+      "seconds": 0.30431556701660156,
+      "RSS_bytes": 25645056
+    },
+    {
+      "name": "source-artist-normal-bake-legacy",
+      "checks": 139,
+      "seconds": 0.15393686294555664,
+      "RSS_bytes": 23740416
+    },
+    {
+      "name": "creator-workspace",
+      "checks": 44,
+      "seconds": 6.760508060455322,
+      "RSS_bytes": 1728663552
+    },
+    {
+      "name": "creator-controls-output",
+      "checks": 352,
+      "seconds": 80.16468095779419,
+      "RSS_bytes": 1534824448
+    },
+    {
+      "name": "creator-shaped-vrm",
+      "checks": 448,
+      "seconds": 115.13352465629578,
+      "RSS_bytes": 1944420352
+    },
+    {
+      "name": "source-owning-hdr-render",
+      "checks": 4422,
+      "seconds": 6.759305000305176,
+      "RSS_bytes": 491712512
+    },
+    {
+      "name": "baked-emission-gpu",
+      "checks": 172040,
+      "seconds": 0.12653589248657227,
+      "RSS_bytes": 106135552
+    },
+    {
+      "name": "mtoon-render",
+      "checks": 81,
+      "seconds": 30.203011989593506,
+      "RSS_bytes": 294830080
+    }
+  ],
+  "build_scope": "3 fresh complete TUs,257 qualified unchanged owners,197-member core update,15 fresh links; no header/layout change",
+  "App_sha256": "0391ebbede068e4e9413cca402cd6c036034d8102e415c589435ddf8430a6f40",
+  "core_sha256": "b9bc291b6f84af4da18417726eee41af290dec9379832f5a0a1875c1910344ae",
+  "loader_providers": 72,
+  "original_failure": "f599 included fixturec56 without its separately qualified producere006; thirteen positives and final MToon failure preserved",
+  "correction": "Real merge of production e006, preserving strict validation and all data/bounds; actual compiler MD closure rebuilt only affected owners plus new sampler regression",
+  "observational_limit": "Core and regression source-maps compile logs share a basename; exact argv/CWD/object/rawMD/exits remain distinct and verified; no unique separate stderr transcript claimed",
+  "lease": {
+    "acquired": 1794986876.1677878,
+    "inode": 99618,
+    "device": 40,
+    "before_any_ldd_or_product": true,
+    "released": 1794987429.9662364
+  },
+  "archive": {
+    "path": "scoped-proof.tar.xz",
+    "bytes": 371968,
+    "sha256": "50710f12d03c11ea739848129108e1b304f9e0ca3bed3a0f5dee9df0fb210c21"
+  },
+  "members": {
+    "build/prepare.py": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/prepare.py",
+      "sha256": "7c68fbe452f2d26d6ccbfbf5c32768612e1027e7f800a5ca83c5a32d2d314222",
+      "bytes": 5387
+    },
+    "build/build.py": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/build.py",
+      "sha256": "f8740e6c44f625520c3e64d1e75fed0f82c5efe496a57dd54fd59ef4f5a085cf",
+      "bytes": 4439
+    },
+    "build/plan.json": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/plan.json",
+      "sha256": "7a436ae04e6125d4c4a7b741db1c7d3d64dc3ea47ca63a61c706e0387101c2af",
+      "bytes": 2396041
+    },
+    "build/status.json": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/status.json",
+      "sha256": "5917b92c0125358d86b617ea5a76ee1b0d964ca4249c21a55e77374e79cf0af2",
+      "bytes": 54334
+    },
+    "build/actual-new-MD-owners.json": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/actual-new-MD-owners.json",
+      "sha256": "2003d50b5542920ced33a23f2f159b7806a263164c1e16cd6f2be8cdf5034167",
+      "bytes": 157057
+    },
+    "build/actual-link-dependencies.json": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/actual-link-dependencies.json",
+      "sha256": "4d156d0a0436d2c16e684d8c0cca0b316214c397c7bcdb830e76e027dcf02a20",
+      "bytes": 241393
+    },
+    "build/build-log-alias-observation.json": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/build-log-alias-observation.json",
+      "sha256": "ddbcd4cc87ac7d80b7082b7eb10dccd9d2e61d1eed2567cb6dd49144d3c90f97",
+      "bytes": 311
+    },
+    "build/unit-terminal.txt": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/unit-terminal.txt",
+      "sha256": "d0b95dfc0f21de9ea86036ef9821245e993e92b941fc8080c9c359bed99df381",
+      "bytes": 108
+    },
+    "build/unit-journal.txt": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/unit-journal.txt",
+      "sha256": "6e637f5d41447ede379b56250b9951da385d9bc889cc653c3fe325851eb71432",
+      "bytes": 231
+    },
+    "build/check-loader-version.py": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/check-loader-version.py",
+      "sha256": "9a90943e59043a6bc659c1e6ed80671c379086453ae9182a1c1abbecb84edb20",
+      "bytes": 3554
+    },
+    "build/loader-version-status.json": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/loader-version-status.json",
+      "sha256": "4f12b29f569225c8fa489ba98fcbdb5d3adf3d1cd6053ec42e37dd3f8badb03f",
+      "bytes": 15930
+    },
+    "build/loader-ldd.log": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/loader-ldd.log",
+      "sha256": "db5df761dc603cfa866006e0b925ff9827fa8bac09d71ee056deede1ab938756",
+      "bytes": 5151
+    },
+    "build/loader-version.log": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/loader-version.log",
+      "sha256": "9455a20a636a6599ace60120261649d3b29dc51fe2c774305994879190e7336b",
+      "bytes": 60
+    },
+    "runtime/plan.json": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/native-selected-v2/plan.json",
+      "sha256": "761601645039bab8bcd6405cae23377c16a2c905e139fd10a9e237351987d028",
+      "bytes": 2293223
+    },
+    "runtime/run.py": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/native-selected-v2/run.py",
+      "sha256": "9e916dfc7244556c9ab37f0e0d9a00ee961d165aba2e35ee3fd7cd9ccdd3667d",
+      "bytes": 7537
+    },
+    "runtime/status.json": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/native-selected-v2/status.json",
+      "sha256": "fe1fbfb074bca82d77cb5e5f739a5f7e434624fd36dbe809d85e8f7f4f750788",
+      "bytes": 127134
+    },
+    "runtime/actual-inputs.json": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/native-selected-v2/actual-inputs.json",
+      "sha256": "e0da5c9f8c158badb673b195586740f26d1a9089f71d55503d7d94c82b0663fa",
+      "bytes": 2195392
+    },
+    "runtime/unit-terminal.txt": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/native-selected-v2/unit-terminal.txt",
+      "sha256": "d9b3520eab6427384275b9a33ae5613772a2a0efec4d97266b3bf4d944606235",
+      "bytes": 108
+    },
+    "runtime/unit-journal.txt": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/native-selected-v2/unit-journal.txt",
+      "sha256": "ef75190b4385255835cc012cab04171b923a7a85eba5cf4d479aeeb55c7b43d5",
+      "bytes": 247
+    },
+    "runtime/lease-free.json": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/native-selected-v2/lease-free.json",
+      "sha256": "9c62f8f8b0f6eb970e0ecf60b5c3a573a379d4da1ffc95ed38480d9d3b5720b8",
+      "bytes": 65
+    },
+    "original-failed/plan.json": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-combined-release-20261118/native-selected-v1/plan.json",
+      "sha256": "ac4489e4d0a2da0f5f6593b6124185bf25514a2ba38e8843c8a573f9203ecaf3",
+      "bytes": 1167637
+    },
+    "original-failed/run.py": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-combined-release-20261118/native-selected-v1/run.py",
+      "sha256": "dd58550daccb276d76c89b87634f5ce1f0909fcf1063ff7f0a51d9b5de089806",
+      "bytes": 7263
+    },
+    "original-failed/status.json": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-combined-release-20261118/native-selected-v1/status.json",
+      "sha256": "0fcf2f70abed56815cfc85e124c8004c399f24e3348d3cdfbbf74a518726c9ec",
+      "bytes": 117434
+    },
+    "original-failed/source-advanced-normal-bake.log": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-combined-release-20261118/native-selected-v1/source-advanced-normal-bake.log",
+      "sha256": "89148902e269fcfa388ba93fce63ef53e601cfbc25187148b4c83a156bb7cf32",
+      "bytes": 23201
+    },
+    "original-failed/unit-terminal.txt": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-combined-release-20261118/native-selected-v1/unit-terminal.txt",
+      "sha256": "e07c00e8745a01a257e53f84bab68167e0c6a417e46637c3aea1910bd08d9dd3",
+      "bytes": 108
+    },
+    "original-failed/unit-journal.txt": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-combined-release-20261118/native-selected-v1/unit-journal.txt",
+      "sha256": "06f29b66974545a6c4608fe4f2912ef8aee6358dde76c4c7afe4747a777cdccd",
+      "bytes": 685
+    },
+    "original-failed/lease-free.json": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-combined-release-20261118/native-selected-v1/lease-free.json",
+      "sha256": "54798d024c08f0b6ef453452e4fdb2a14e4d3b5ebb58f176298380c59d535b33",
+      "bytes": 65
+    },
+    "raw-MD/CMakeFiles/dome-sculpt-source-maps-test.dir/tests/source-maps.cpp.o.d": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/CMakeFiles/dome-sculpt-source-maps-test.dir/tests/source-maps.cpp.o.d",
+      "sha256": "ae8c3738af6a8d19fa888ded40ede6f275d590da324e4d98da7134a5d4792d1e",
+      "bytes": 16485
+    },
+    "raw-MD/CMakeFiles/dome-sculpt-source-advanced-normal-bake-test.dir/tests/source-advanced-normal-bake.cpp.o.d": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/CMakeFiles/dome-sculpt-source-advanced-normal-bake-test.dir/tests/source-advanced-normal-bake.cpp.o.d",
+      "sha256": "471e78375108eea6ab9c8916033df585a32780e72f1bd40467f7fbc784c5b488",
+      "bytes": 26335
+    },
+    "raw-MD/CMakeFiles/dome-sculpt-core.dir/src/source-maps.cpp.o.d": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/CMakeFiles/dome-sculpt-core.dir/src/source-maps.cpp.o.d",
+      "sha256": "843b2a4bf20cd5f417107891bb4fc91428c3dccfe3928a25391aad912a0ea397",
+      "bytes": 15205
+    },
+    "raw-link/dome-sculpt.link.d": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/dome-sculpt.link.d",
+      "sha256": "81113cc7f02efcc46debed2643fdde6ab1f80284ae9e28b7712fdc296f32ac5e",
+      "bytes": 20667
+    },
+    "raw-link/dome-sculpt-source-advanced-normal-bake-test.link.d": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/dome-sculpt-source-advanced-normal-bake-test.link.d",
+      "sha256": "064719faf7d2071783e02e489ff95c4cc5934c3514265541889535b30f452bb9",
+      "bytes": 9228
+    },
+    "raw-link/dome-sculpt-source-artist-normal-bake-test.link.d": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/dome-sculpt-source-artist-normal-bake-test.link.d",
+      "sha256": "79396f4eb2d4776e0ffa81104adaac3c430f16550f8bef3c2507483466f634af",
+      "bytes": 9220
+    },
+    "raw-link/dome-sculpt-source-prepared-normal-bake-test.link.d": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/dome-sculpt-source-prepared-normal-bake-test.link.d",
+      "sha256": "5330ddb975b312bf734f42c6631166bd5a19a2a3a92d80f5f6e07588c2aa294a",
+      "bytes": 9230
+    },
+    "raw-link/dome-sculpt-source-canonical-normal-bake-test.link.d": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/dome-sculpt-source-canonical-normal-bake-test.link.d",
+      "sha256": "dae65f2408a2a000c82f7446875839cef6888942a8f9fee0f86262058e6cb304",
+      "bytes": 9235
+    },
+    "raw-link/dome-sculpt-source-writable-normal-bake-test.link.d": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/dome-sculpt-source-writable-normal-bake-test.link.d",
+      "sha256": "d1f2e3374cac0d2446a40780336f75ee2a31c11c7751e69e52aa19e9942a4088",
+      "bytes": 9230
+    },
+    "raw-link/dome-sculpt-source-joint-writable-normal-bake-test.link.d": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/dome-sculpt-source-joint-writable-normal-bake-test.link.d",
+      "sha256": "5b9cd7715233bd3cc958377f27fab4b2f267a7234bef4d7138339bc9fab5de23",
+      "bytes": 9260
+    },
+    "raw-link/dome-sculpt-source-owning-hdr-domain-test.link.d": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/dome-sculpt-source-owning-hdr-domain-test.link.d",
+      "sha256": "febdad047bfe5387df1677fd9d959abb43e3e5f4aefd7d50fcbd2e9b82746094",
+      "bytes": 9215
+    },
+    "raw-link/dome-sculpt-source-owning-hdr-export-test.link.d": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/dome-sculpt-source-owning-hdr-export-test.link.d",
+      "sha256": "b854ed413d4508308c807d3bd7ba6a9452fd9c4ab476d3a6c6c021563c453d8f",
+      "bytes": 9215
+    },
+    "raw-link/dome-sculpt-source-owning-hdr-render-test.link.d": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/dome-sculpt-source-owning-hdr-render-test.link.d",
+      "sha256": "7c25cdae65c4e1f3655e0bd362add169ebf38fee626f16d1d29bb76db7e67119",
+      "bytes": 10643
+    },
+    "raw-link/dome-sculpt-creator-workspace-test.link.d": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/dome-sculpt-creator-workspace-test.link.d",
+      "sha256": "2b97933e58d0c661c71f69dbbe5daf154d7ac3394f094fa55e7e90d6e60e5785",
+      "bytes": 9180
+    },
+    "raw-link/dome-sculpt-creator-vrm-test.link.d": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/dome-sculpt-creator-vrm-test.link.d",
+      "sha256": "845cde0199c9ceede02379543e4e2cd58d8fe7dc6a4ea8de0f1c704c415edab4",
+      "bytes": 9150
+    },
+    "raw-link/dome-sculpt-mtoon-render-test.link.d": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/dome-sculpt-mtoon-render-test.link.d",
+      "sha256": "8124a554490fe372133bd7d7925412d3e1c9c2cb1e001b5a31543fcc04fdb440",
+      "bytes": 10583
+    },
+    "raw-link/dome-sculpt-baked-emission-gpu-test.link.d": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/dome-sculpt-baked-emission-gpu-test.link.d",
+      "sha256": "001520ea76cdd64018124ac14d15754d9accf26899937c2b879b640de87bdffb",
+      "bytes": 9423
+    },
+    "raw-link/dome-sculpt-source-maps-test.link.d": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/dome-sculpt-source-maps-test.link.d",
+      "sha256": "f2a8e88535947c46e34e7381a657562fc8545c8ebb35532a1f988b594070cf9e",
+      "bytes": 9148
+    },
+    "runtime/source-maps-regression.log": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/native-selected-v2/source-maps-regression.log",
+      "sha256": "1a8199b3ed9b29a34c4ef2eb25989c760ff091841a41bfcd7048cc1887f5e9bb",
+      "bytes": 4500
+    },
+    "runtime/source-advanced-normal-bake.log": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/native-selected-v2/source-advanced-normal-bake.log",
+      "sha256": "4094f0ea3c05ee0ae7e213874e650aaf439054b11048230a422954ac77ff4067",
+      "bytes": 70416
+    },
+    "runtime/source-canonical-normal-bake.log": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/native-selected-v2/source-canonical-normal-bake.log",
+      "sha256": "0eb9b0a46401af3bf32db27b6f6c7bde5b6eee63e11de3785ac5f7183f480df4",
+      "bytes": 802
+    },
+    "runtime/source-writable-normal-bake.log": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/native-selected-v2/source-writable-normal-bake.log",
+      "sha256": "92ef9018c00791bdc800ceab4696ff92ce26a6f2ee3b650ae4719876aacfae42",
+      "bytes": 785
+    },
+    "runtime/source-joint-writable-normal-bake.log": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/native-selected-v2/source-joint-writable-normal-bake.log",
+      "sha256": "3be9ce4e9561a8e0432627b64df807ae228819b07dc2b21e77685b02bb503cb4",
+      "bytes": 1348
+    },
+    "runtime/source-owning-hdr-domain.log": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/native-selected-v2/source-owning-hdr-domain.log",
+      "sha256": "10011ba1983c1a14c6d86a41c86093fc3f5ee7cb06a00ec4f07e3411f8a74f05",
+      "bytes": 630
+    },
+    "runtime/source-owning-hdr-export.log": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/native-selected-v2/source-owning-hdr-export.log",
+      "sha256": "17d4fac9d42415bb3077087184e557f3d8827222e0b79eeb01a9f805d2f93675",
+      "bytes": 425
+    },
+    "runtime/source-prepared-normal-bake-legacy.log": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/native-selected-v2/source-prepared-normal-bake-legacy.log",
+      "sha256": "ec0d989eb70a35f91ade3146986b3f36d154b01dba186f8cebae256f73a46644",
+      "bytes": 14061
+    },
+    "runtime/source-artist-normal-bake-legacy.log": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/native-selected-v2/source-artist-normal-bake-legacy.log",
+      "sha256": "71b3208587cdccece1dfea87994ccd234d5884e97946dfc99e79f62c81736d65",
+      "bytes": 15557
+    },
+    "runtime/creator-workspace.log": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/native-selected-v2/creator-workspace.log",
+      "sha256": "2fd797ddf514e212ada3028b868d2c41a9aa19b1ce13204d9000c6b8602baae6",
+      "bytes": 3757
+    },
+    "runtime/creator-controls-output.log": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/native-selected-v2/creator-controls-output.log",
+      "sha256": "100ca75f03f2a35282d688984cf86f15914ca942c96a991d9dc6b14cd0380516",
+      "bytes": 36489
+    },
+    "runtime/creator-shaped-vrm.log": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/native-selected-v2/creator-shaped-vrm.log",
+      "sha256": "92ad5949a46db4c0270fee60486c338e4cf61a192f4b679c5041a71098c850a4",
+      "bytes": 41610
+    },
+    "runtime/source-owning-hdr-render.log": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/native-selected-v2/source-owning-hdr-render.log",
+      "sha256": "31f69b42c44bba92d6092de351c7512b5d3d1f35070964f42b91c966f244538c",
+      "bytes": 312
+    },
+    "runtime/baked-emission-gpu.log": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/native-selected-v2/baked-emission-gpu.log",
+      "sha256": "40db9bc90960819228446b03ac6421930248ff77c6f9d29dc046a5ce1ac7cdb5",
+      "bytes": 137
+    },
+    "runtime/mtoon-render.log": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/native-selected-v2/mtoon-render.log",
+      "sha256": "bb4eec5dcf9330fc64ba03a7de6f155bd598726802fe8be8c66f6b39b55e5108",
+      "bytes": 7092
+    },
+    "runtime/source-maps-regression.maps": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/native-selected-v2/source-maps-regression.maps",
+      "sha256": "17f0e354a6db93ab9cbc500da411460f12139a6b1e3702f12232e047d7e7624f",
+      "bytes": 11439
+    },
+    "runtime/source-advanced-normal-bake.maps": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/native-selected-v2/source-advanced-normal-bake.maps",
+      "sha256": "60bb9bb660133d59fdc5d49345de5233619a26ae205de75b54c00ca5bd3f8092",
+      "bytes": 12042
+    },
+    "runtime/source-canonical-normal-bake.maps": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/native-selected-v2/source-canonical-normal-bake.maps",
+      "sha256": "15c60ab50abb01d952603a734a8f0117f0bc95355b2dbf6b45abac8e45853c77",
+      "bytes": 12144
+    },
+    "runtime/source-writable-normal-bake.maps": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/native-selected-v2/source-writable-normal-bake.maps",
+      "sha256": "0dfdcf3cf1130bf234c3c97b52c80d2d5022a0fd212e0ea9e8c501568c6038e5",
+      "bytes": 12385
+    },
+    "runtime/source-joint-writable-normal-bake.maps": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/native-selected-v2/source-joint-writable-normal-bake.maps",
+      "sha256": "4e973b631a203ff47bcc263bb2ed1ab1a5274ae68df61783e98d0a1bcfb9d530",
+      "bytes": 12409
+    },
+    "runtime/source-owning-hdr-domain.maps": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/native-selected-v2/source-owning-hdr-domain.maps",
+      "sha256": "aa2e4e4ad441c2ee59400bf9aab5b7e159b603c405d92309b7aeb1a14023f0ec",
+      "bytes": 12912
+    },
+    "runtime/source-owning-hdr-export.maps": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/native-selected-v2/source-owning-hdr-export.maps",
+      "sha256": "3c3e6f140ebab2b565d12e4db5784a70489cdde2a1461f748d6b0435e8e801d4",
+      "bytes": 12667
+    },
+    "runtime/source-prepared-normal-bake-legacy.maps": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/native-selected-v2/source-prepared-normal-bake-legacy.maps",
+      "sha256": "588731d9ed531d5e2db09be1fd3f57767214a109f3ea8b74e33c0f1909a41acb",
+      "bytes": 11454
+    },
+    "runtime/source-artist-normal-bake-legacy.maps": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/native-selected-v2/source-artist-normal-bake-legacy.maps",
+      "sha256": "4521fb60e001c243dc8bd265eaece6a385fc93b8daa77599c9b9e53d6cc5c81a",
+      "bytes": 11691
+    },
+    "runtime/creator-workspace.maps": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/native-selected-v2/creator-workspace.maps",
+      "sha256": "3bc759fbf04838cee8b0113c8f1ec6893da04464168850ae997622adc6e0a14e",
+      "bytes": 12296
+    },
+    "runtime/creator-controls-output.maps": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/native-selected-v2/creator-controls-output.maps",
+      "sha256": "566a0cf871cac6ab8528ae56250e1ea0f3798d747ebaadf37f4ac6a41eeb2580",
+      "bytes": 11953
+    },
+    "runtime/creator-shaped-vrm.maps": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/native-selected-v2/creator-shaped-vrm.maps",
+      "sha256": "5d56a043b676104773cc15b93af6d67c1ed39e5b234a4db825792caab9612031",
+      "bytes": 12223
+    },
+    "runtime/source-owning-hdr-render.maps": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/native-selected-v2/source-owning-hdr-render.maps",
+      "sha256": "31e121c0790f8809362ed0c6e42d7bdb71050f96ab35a31cd34faae642b01898",
+      "bytes": 35579
+    },
+    "runtime/baked-emission-gpu.maps": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/native-selected-v2/baked-emission-gpu.maps",
+      "sha256": "3e4f73666b1519cc110e29f6dc5c7ba6a81dc0600a5351ff8ac66f2dc191a38f",
+      "bytes": 23157
+    },
+    "runtime/mtoon-render.maps": {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-sampler-release-20261118/native-selected-v2/mtoon-render.maps",
+      "sha256": "47e5a7b9d81dfeac6094f45fbd69d15183a31d7cb5d0afceebe07f6bb70d95bd",
+      "bytes": 35482
+    }
+  }
+}

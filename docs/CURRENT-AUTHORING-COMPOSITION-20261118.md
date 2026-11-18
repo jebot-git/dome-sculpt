@@ -41,8 +41,14 @@ The terminal unit/journal were captured before stopping. ControlGroup was empty;
 a first observer incorrectly read the root cgroup and is preserved as failed
 observation. No unrelated PID was treated as owned or signalled. The actual
 terminal MainPID is0/status0, and both recorded driver/Ninja PIDs are separately
-absent. No observed-empty-unit-cgroup claim is made. Loader/version, native,
-public UI/graphics and current sanitizer runtime remain pending.
+absent. No observed-empty-unit-cgroup claim is made. Loader/version now also
+pass, with exactly72 selected private library providers and the actual terminal
+newline preserved. The version reports native CPU/Blender5.4 basis as expected.
+The initial combined14-case run passes13 cases and exposes the missing separate
+e006 sampler producer in its final family. The corrected real-merge child05
+now passes all15 coherent Release cases (265913 checks), with original failure
+and strict bounds preserved. See [corrected runtime](CURRENT-COMBINED-SAMPLER-RUNTIME-20261118.md).
+Current strict and public UI/XR qualification remain pending.
 
 App SHA256: 44b5a5bb42480b23e30018a87a80572e2d58f49cf98255d819dbd25126d0eec0.
 See [actual build receipt](validation/CURRENT-COMBINED-RELEASE-20261118.json).

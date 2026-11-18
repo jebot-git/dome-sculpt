@@ -313,33 +313,48 @@ The latest user resume supersedes the previous round's pause. The original full
 production goal stays active and incomplete. Main still admits product1bc; the
 new component code is on explicit branches until combined qualification.
 
-- **Combined integration:** frozen candidatef5998a18 on
-  work/authoring-current-integration-20261118 merges checked63956, GPUe3de,
-  HDR/SOURCE8export60a1, creatorde60 and filtered-normalc56 through real commits.
-  Fresh Release App plus13 selected fixtures now passes all290 build actions
-  in468.201s:259 fresh owners/197 core members,101708 actual dependencies,
-  all14 archives/219 member payloads and actual App link audit0. Read
-  [the composition/build proof](CURRENT-AUTHORING-COMPOSITION-20261118.md).
-  Actual terminal/journal were captured and unit stopped. Empty ControlGroup
-  observation limitation and first observer failure are explicitly preserved;
-  both actual recorded driver/Ninja PIDs are absent. Loader/native/public/current
-  sanitizer qualification remain pending; no runtime admission is inferred.
+- **Combined integration:** frozenf599 Release App+13-fixture build/audit passes
+  259 owners/197 core members, but its selected runtime exposes a missing
+  separately qualified sampler producer. Root had merged fixturec56 without
+  productione006. The original13 positives and final MToon validation failure
+  remain preserved. Corrected real-merge child05f5d1cc adds e006 and its original
+  helper/regression, with exactly2 affected complete owners +new sampler TU,
+  257 qualified unchanged owners and15 fresh links. Loader/version72 pass.
+  All15 coherent Release cases now pass265913 checks, including full17-family
+  filtered workflow646 under originalAS2/RSS3 and all creator/HDR/legacy checks.
+  Read [corrected runtime proof](CURRENT-COMBINED-SAMPLER-RUNTIME-20261118.md)
+  and [initial owning build](CURRENT-AUTHORING-COMPOSITION-20261118.md).
+  Current05 strict15 cohort is actually running under
+  ds-authoring-current-sampler-sanitize-native-v2-20261118.service,
+  Invocation695aa961493d49299c1c84da387f9870/Main252918. No AS caps, original
+  RSS and900s case bounds; inspect actual handle before acting. Its first
+  fast-sampler observer miss is preserved, corrected observer holds actual
+  executable FD and captures maps before post-run hashing. Sampler55 has
+  actual live ASan/UBSan witness; full strict acceptance remains pending.
+  Public current App/desktop/XR and broader all-target admission remain pending.
 - **Independent HDR GPU:** productc524/fixture212 now passes actual llvmpipe
   source64/current512 PBR and MToon, before/after editable physical paint.
   All original FLOAT coefficients survive GPU extraction exactly;4422 checks
   pass, PBR error1 and MToon0 under bound2. The same production's prior old
   FLOAT172040 and complete MToon81 product steps pass separately; their failed
   outer/new-fixture phases stay failed. Read
-  [the scoped proof](HDR-INDEPENDENT-GPU-20261118.md). Hardware, resource/fault
-  stress and actual combined/public application qualification remain pending.
+  [the scoped proof](HDR-INDEPENDENT-GPU-20261118.md). Exact product hardware
+  now also passes on authenticated A770:105 reads share one EGL context,
+  all4422 checks/coefficients and four RGB phases pass unchanged. Read
+  [Arc proof](HDR-INDEPENDENT-GPU-ARC-20261118.md); root independently rehashes
+  all34 actual archived authorities. Resource/fault stress and actual combined/
+  public application qualification remain pending.
 - **HDR/native export:** genuine1a joint51247409 and current controls752/24 now
   pass on current exportcore. SOURCE8 export60a1 implements the actual owning
   source corner/paint route while preserving the visible original source.
   Native export16400 checks and23707 independent probes pass (HDR2.513e-6 under
   unchanged2e-4), separate64/512 witnesses, Scene43 restore, byte-identical
   second-cycle/worker export and real forgery refusals. Three actual GLBs have
-  Khronos0 errors. Original guard failure is preserved; current strict runtime
-  and broader/mixed guards remain pending. No combined/export admission yet.
+  Khronos0 errors. Expanded Release32822 and strict ASan/UBSan/leak80255
+  checks now pass, including actual coordinate/source-owner forgery, hidden
+  Scene43 restoration and legacy worker controls. Root rehashes all570 actual
+  archived authorities; read [source export proof](RETAINED-HDR-SOURCE-EXPORT-20261118.md).
+  Original guard failures remain preserved. No combined/public admission yet.
 - **Filtered normals:** e006/c56 passes native17 current families plus historical
   corpus. CPU forecast68/37968 dense points now passes under unchanged bounds,
   and all68 software views/432 points/1796 PNGs pass3721 checks, max RGB1.
@@ -361,6 +376,20 @@ new component code is on explicit branches until combined qualification.
   read-only9518-pin review establishes the precise positive scope. Read
   [native VRM proof](CREATOR-NATIVE-VRM-20261118.md). Current strict and actual
   desktop/XR UI runtimes remain pending; do not borrow oldApp GUI results.
+
+Two genuine production defects are now isolated from the qualified05 source:
+
+- HDR source capture's whole-before-Scene retains unrelated2048 destination
+  rasters (160MiB) against32MiB source quota. Exact joint2048 reproduces the
+  before-raster refusal. Source/dependency-only context closure is implemented
+  separately in6a7d55a8, compiling/qualifying without raising the quota; old
+  Scene43 contexts and full outer project restoration must stay exact.
+- Independent sculpt edits double-charge persistent shared storage across
+  different COW roots. Same fullsize4-object probe fails f599 at the second
+  edit and passes3aa7aea8 allfour within512MiB, final327634597 bytes versus
+  initial228304414, preserving density/queries/affine transforms/guards. Cold
+  reopen, recovery and original independent-authoring sustained benchmark remain
+  pending before this isolated feature can be integrated.
 
 Root rechecked canonical DomeD local and remote main onNov18: both remainacc2b70.
 No system installation, physical-headset launch or active-session restart occurred.

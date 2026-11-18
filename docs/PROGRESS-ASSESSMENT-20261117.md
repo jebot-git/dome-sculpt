@@ -136,14 +136,20 @@ controls and dense fidelity checks pass. GPU productc524/fixture212 now also
 passes independent PBR/MToon preview checks before/after current512 paint:
 source coefficients are exact, max RGB error1 under bound2. Read
 [GPU qualification](HDR-INDEPENDENT-GPU-20261118.md).
-Actual GPU hardware and full combined/public workflow remain pending.
+The exact independent HDR GPU product also passes4422 checks on authenticated
+Arc, all105 reads on one actual EGL context, with exact coefficients and phase
+RGB errors1/0/1/0. Read [hardware proof](HDR-INDEPENDENT-GPU-ARC-20261118.md).
+Full combined/public and extended resource/fault qualification remain pending.
 
 SOURCE8 and retained HDR export60a1 now preserves the complete visible source
 and target, separate64/512 coefficient witnesses and native Scene43 provenance.
 Native16400 controls and23707 independent probes pass under unchanged2e-4
 (error2.513e-6); direct/second/worker GLBs are byte-identical and independently
-pass Khronos with0 errors. Broader/mixed-source guards and current strict
-sanitizer runtime remain pending; this is component evidence, not admission.
+pass Khronos with0 errors. Expanded Release32822 and strict ASan/UBSan/leak80255 controls now pass; all
+570 archived/current authorities are independently rehashed. This is component
+evidence, not combined/public admission. Genuine2048 before-context quota
+failure is separately reproduced and a bounded dependency-closure fix is being
+qualified without raising32MiB.
 
 VRoid creator productb75/fixturede60 now passes448 VRM,44 workspace,352 controls
 and1 fixture checks, including all six female/male styled/reopened/posed exports
@@ -151,7 +157,8 @@ and real stale/foreign/forged refusals. All six exports pass official schemas
 and Khronos with0 errors. An unrelated empty-object fixture dereference and
 an outer fixture-count expectation were corrected in explicitly scoped evidence;
 original failures remain. Read [native VRM qualification](CREATOR-NATIVE-VRM-20261118.md).
-Current strict and actual desktop/XR UI qualification remain pending.
+The b75 component separately passes14 actual desktop checks. Current combined
+UI/XR and sanitizer qualification remain pending.
 
 The user-accepted controller selection/hierarchy/multiselection/ghost interface
 is preserved. Only the verified CC0 VRoid female/male creator bases are offered.
@@ -184,8 +191,12 @@ Current canonical DomeD FLTK and bitmap-font builds remain selected; see
 
 The latest user resume revokes the previous round's pause. Current GPU,
 export, creator and normal-quality components are merged into frozen candidate
-f5998a18; its fresh App/13-fixture Release build and actual audit now pass
-259 owners/197 core members. Loader and combined runtime gates remain pending. The component proof
+f5998a18; its fresh App/13-fixture Release build/audit passes259 owners/197core.
+The initial selected run exposes a missing separately qualified producer e006.
+Corrected real-merge child05f5d1cc passes all15 selected Release cases/265913
+checks plus72-provider loader/version. Read the current handoff and
+[coherent runtime proof](CURRENT-COMBINED-SAMPLER-RUNTIME-20261118.md).
+Its separate strict15 run is active with no AS cap and original RSS/time bounds. The component proof
 links and exact pending gates are in the current handoff.
 No percentage is assigned: implemented rows differ greatly in scope and several
 still have only partial qualification. No system installation, physical-headset
