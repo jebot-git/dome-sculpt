@@ -939,6 +939,9 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &original_input_obje
       auto id=int(variants.size());variants.push_back({-1,"",name,material_signature(material,properties),{}});
       output_materials.push_back(std::move(material));output_properties.push_back(std::move(properties));
       j["meshes"][emitted.mesh]["primitives"][0]["material"]=id;
+      j["meshes"][emitted.mesh]["extras"]["DomeSculptGeneratedPart"]={{"kind","vroid-groom"},{"version",1},
+          {"source_sha256",creator_detail::sha256(*origin->original_bytes)},
+          {"controls",o.groups.back().humanoid->encode()}};
       generated_meshes.push_back(emitted.mesh);check_budget();continue;
     }
     const auto &a=*o.appearance;
