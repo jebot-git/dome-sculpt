@@ -82,6 +82,21 @@ uint64_t append_humanoid(Scene &scene, const HumanoidControls &controls,
       origin->material=typed;origin->roles=binding->roles;origin->deformation=object.deformation;
       origin->creator_kind="vroid-shape";origin->creator_version=1;origin->creator_parameters=controls.encode().dump();
       binding->uv_origin=std::move(origin);binding->validate();object.material_bindings=std::move(binding);
+    } else if(!part.appearance) {
+      // Generated geometry owns a genesis record, never an invented imported
+      // appearance, source-material identity, MToon payload or borrowed role.
+      auto binding=std::make_shared<SourceMaterialBindings>();
+      binding->has_mtoon=false;
+      binding->native_reference.color=object.material.color;
+      binding->native_reference.emission=object.material.emissive;
+      binding->native_reference.alpha=int(object.material.alpha);
+      binding->native_reference.alpha_cutoff=object.material.alpha_cutoff;
+      binding->native_reference.double_sided=object.material.double_sided;
+      auto origin=std::make_shared<SourceUvOrigin>();
+      origin->paint=object.painted->snapshot();origin->deformation=object.deformation;
+      origin->creator_kind="vroid-groom";origin->creator_version=1;
+      origin->creator_parameters=controls.encode().dump();binding->uv_origin=std::move(origin);
+      binding->validate();object.material_bindings=std::move(binding);
     }
   }
   if (created.primary_part >= parts.size()) throw std::runtime_error("Invalid creator primary part");
