@@ -92,6 +92,7 @@ void Document::queue_bake_locked(uint64_t source,ObjectBakeSettings settings,Ass
     if(result.color_prepared){char quality[96];snprintf(quality,sizeof(quality),"; color error bound %.4f",double(*std::max_element(result.color_error_bound.begin(),result.color_error_bound.end())));*report+=quality;}
     if(result.canonical_captured)*report+="; verified normal frame captured";
     if(result.normal_prepared){char quality[128];snprintf(quality,sizeof(quality),"; portable normal attributes authored (rest quantization %.3f deg)",result.normal_initial_error*57.29577951308232);*report+=quality;}
+    if(scene.active().bake_recipe&&scene.active().bake_recipe->settings.normal_filter_quality==1)*report+="; filtered normal detail checked";
   },expected,report,work,{}, {},0,0,{},BakeAdmission{source,settings});
 }
 void Document::bake_from_object(uint64_t source,ObjectBakeSettings settings,AssetSource expected){

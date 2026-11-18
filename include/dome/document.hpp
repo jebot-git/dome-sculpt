@@ -188,7 +188,7 @@ struct EditorState {
   uint32_t active_texture_set=0;
   std::vector<TextureSetInfo> texture_sets;
   Material texture_material;
-  bool can_edit_texture_sets=false,texture_face_select=false;
+  bool can_edit_texture_sets=false,can_resize_bake_target=false,texture_face_select=false;
   std::vector<uint64_t> texture_faces;
 };
 struct SurfaceRange {

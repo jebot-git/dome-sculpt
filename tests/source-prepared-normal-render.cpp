@@ -43,7 +43,16 @@ std::shared_ptr<MeshSnapshot> prepared_point(const SculptObject&o,std::array<flo
  result->mesh.positions={center-x*span-y*span,center+x*span-y*span,center+x*span+y*span,center-x*span+y*span};result->mesh.normals.assign(4,desired);result->mesh.uv.assign(4,uv);
  // Retain the actual material fields and isolate only the normal consumer.
  // Neither expected direction nor ordinary control has prepared-frame authority.
- auto maps=std::make_shared<TextureMaps>(*o.painted->preview(o.material));maps->normal={};maps->mtoon_normal={};maps->normal_projection.reset();maps->baked_normal={};maps->baked_coverage={};maps->baked_base.reset();maps->overlay.reset();maps->current_grid_preview.reset();maps->polygon_surface.reset();maps->source_maps.reset();maps->source_only=false;result->ranges[0].textures=std::move(maps);return result;
+ auto maps=std::make_shared<TextureMaps>(*o.painted->preview(o.material));maps->normal={};maps->mtoon_normal={};maps->normal_projection.reset();maps->baked_normal={};maps->baked_coverage={};maps->baked_base.reset();maps->overlay.reset();maps->current_grid_preview.reset();maps->polygon_surface.reset();
+ // Generic color/emission are material correction inputs even for a fully
+ // derived preview. Remove only normal sampling from the independent control.
+ if(maps->source_maps){auto sources=std::make_shared<PaintSourceMaps>(*maps->source_maps);sources->normal={};
+  // This genuine fixture's generic material is explicitly reprojected into
+  // current UV0 by SourceUV. Refuse an alternate coordinate domain rather than
+  // mislabel a six-vertex source coordinate array as this four-vertex quad.
+  if(sources->uv1||!sources->extra_uv_sets.empty()||sources->uses_alternate_uv())throw std::runtime_error("Normal pixel control requires its explicit current UV0 material domain");
+  sources->validate_surface(result->mesh);maps->source_maps=std::move(sources);}
+ maps->source_only=false;result->ranges[0].textures=std::move(maps);return result;
 }
 void prepared_view(Scene scene,uint64_t first,uint64_t second,bool pbr,const std::string&label){
  for(const auto&o:scene.objects())scene.object(o.id).visible=o.id==second;scene.select(second);const auto before=scene.encode();const auto&o=scene.object(second);const auto&mesh=o.painted->mesh();constexpr uint32_t tri=0;std::array<Vec3,3> points;for(size_t k=0;k<3;++k)points[k]=mesh.positions.at(mesh.indices.at(k));
@@ -73,4 +82,10 @@ void prepared_render(){const auto normal=sensitive_normal();for(bool legacy:{fal
  const auto label=std::string("prepared")+(legacy?"MT0":"MT1")+(posed?"posed":"rest");prepared_view(f.scene,first,second,false,label);prepared_view(f.scene,first,second,true,label+"PBR");
  }}
 }
-int main(int argc,char**argv)try{if(argc!=3||std::string_view(argv[1])!="--prepared-render")throw std::runtime_error("Prepared graphics requires explicit coordinated mode and output directory");graphics_output=argv[2];NativeGraphics graphics;std::cout<<"ACTUAL_RENDERER "<<glGetString(GL_RENDERER)<<std::endl;prepared_render();std::cout<<"PASS "<<checks<<" actual prepared first-to-second Bake pixel controls\n";return 0;}catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
+#include "source-advanced-normal-render.hpp"
+#include "source-advanced-normal-display.hpp"
+#include "source-advanced-normal-forecast.hpp"
+#include "source-advanced-normal-diagnose.hpp"
+#include "source-advanced-normal-resolution-study.hpp"
+#include "source-advanced-normal-resolution-study.hpp"
+int main(int argc,char**argv)try{if(argc==3&&std::string_view(argv[1])=="--advanced-resolution-study")return advanced_render::resolution_study::run(argv[2]);if(argc==3&&std::string_view(argv[1])=="--advanced-resolution-study")return advanced_render::resolution_study::run(argv[2]);if(argc==3&&std::string_view(argv[1])=="--advanced-display-diagnose")return advanced_render::diagnose::run(argv[2]);if(argc==4&&std::string_view(argv[1])=="--advanced-display-render")return advanced_render::display::execute(argv[2],argv[3]);if(argc==3&&std::string_view(argv[1])=="--advanced-display-forecast")return advanced_render::forecast::run(argv[2],true);if(argc==3&&std::string_view(argv[1])=="--advanced-contrast-forecast")return advanced_render::forecast::run(argv[2]);if(argc==3&&std::string_view(argv[1])=="--advanced-render")return advanced_render::execute(argv[2]);if(argc!=3||std::string_view(argv[1])!="--prepared-render")throw std::runtime_error("Prepared graphics requires explicit coordinated mode and output directory");graphics_output=argv[2];NativeGraphics graphics;std::cout<<"ACTUAL_RENDERER "<<glGetString(GL_RENDERER)<<std::endl;prepared_render();std::cout<<"PASS "<<checks<<" actual prepared first-to-second Bake pixel controls\n";return 0;}catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
