@@ -82,6 +82,8 @@ pass, including64 writable cases/619634 checks and8 joint cases/346305 checks,
 with121 exact ordered Save pairs. Read
 [the actual component result](ARTIST-WRITABLE-JOINT-NATIVE-20261118.md).
 Their new sanitizer/graphics/application gates remain pending.
+The fresh six-fixture sanitizer compilation and dependency/archive audit now
+pass; actual strict runtime is underway and remains separate from that build.
 
 The coherent canonical/public candidate8a8ecea1 completes a fresh optimized
 application build:242 actual compiler dependency owners including all193 core
@@ -95,10 +97,20 @@ suites, including32 canonical cases, with leak detection and live runtime
 witnesses; read [the sanitizer proof](CANONICAL-NORMAL-STRICT-SANITIZE-20261118.md).
 These are distinct scoped results, not all-target or newer-product441 acceptance.
 
+The newer isolated combined draftab497007 merges SOURCE441, filtered-quality8eba
+and creator75 through actual history. Fresh configuration passes and the whole
+App target is compiling with no inherited objects; see
+[the source-composition milestone](COMBINED-AUTHORING-SOURCE-DRAFT-20261118.md).
+This draft is not a new admitted application. A full independent scan confirms
+the quality guard correctly rejects1024-pixel narrow normal peaks; explicit2048
+recovery and bounded resize work remain to qualify.
+
 The next independent creator slice implements a shared native XR draft for
 existing body/face/hair/tint controls and additive avatar variations. Real effects
 of26 controls on both CC0 models, source/skin/morph preservation and actual
-controller workflows are still under verification. Filtered normal quality and
+controller workflows are still under verification. Its fresh complete native
+core/application build passes, but the new recolour runtime checks have not yet
+run. Filtered normal quality and
 the explicit target-resolution workflow remain active production work.
 
 The user-accepted controller selection/hierarchy/multiselection/ghost interface

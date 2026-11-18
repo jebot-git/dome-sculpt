@@ -272,6 +272,18 @@ fixture/runtime/font roles. Read
 No all-target/test or full new-family application matrix is claimed. Keep its
 source worktree frozen, including tests and CMake files.
 
+The newer real-merge draftab497007 on
+work/authoring-combined-source-20261118 combines main4416, SOURCE441/proof9bba,
+filtered-quality8eba and creator75/test3666. Fresh Release configuration passes;
+its fresh whole App target is actively compiling under
+ds-authoring-combined-release-app-20261118.service, Main1327750,
+Invocation3721533d8d604d8c8c8a0b36d3b30149. No borrowed objects or runtime
+qualification. Read
+[the integration draft](COMBINED-AUTHORING-SOURCE-DRAFT-20261118.md).
+Keep this source frozen until actual build closure. The test-only creator
+reporter correctionb0ca must be merged afterward; that reporter is not an App
+target input, and no all-target build is claimed.
+
 Fresh strict ASan/UBSan full core plus4 fixtures completes0 from immutable b11/
 product85 in artifacts/canonical-normal-headless-sanitize-20261118:193 fresh core
 members/212 actual compiler owners,851.199s. Runtime Invocation96b5dcc1 also
@@ -292,14 +304,21 @@ do not restart them. The compressed scoped proof is committed above.
   source sampler so prepared-target checks cannot silently skip ordinary/sculpt
   sources. Corrected production8ebacf8a completes a fresh193-core/209-TU native
   build. Its first ordered diagnostic passes the full historical17 corpus and
-  real legacy recipe proof; a new ordinary normal-texture1024 retry still fails
-  the strict filtered bound and needs numeric diagnosis. No higher-resolution
-  accepted workflow or final GL matrix is claimed.
-- Writable-source agent now runs fresh strict sanitizer441 in
+  real legacy recipe proof; a new ordinary normal-texture1024 retry fails
+  the strict filtered bound. A full independent off-centre scan confirms actual
+  .03706908-radian peaks above the .03 bound; the guard correctly refuses it.
+  A sparse earlier diagnostic missed those narrow peaks. Explicit2048 retry
+  and its bounded resize work allowance are next. No higher-resolution accepted
+  workflow or final GL matrix is claimed.
+- Writable-source agent completes fresh strict sanitizer441 compilation in
   artifacts/source441-headless-sanitize-20261118 under
   ds-source441-headless-sanitize-build-v1-20261118.service, Main1028537,
-  Invocation7d2d0e1ca81346d193559358927aee84. It builds193core+support+6fixtures
-  fresh with one compiler job; inspect the actual unit before acting. The
+  Invocation7d2d0e1ca81346d193559358927aee84:214 actual owners/193core+15support+
+  6fixtures,1782.096s, all fresh and no drift. Actual dependency/archive/flag
+  audit passes; the terminal unit is captured then stopped. Strict six-suite
+  runtime now runs under ds-source441-headless-sanitize-native-v1-20261118.service,
+  Main1336741/Invocation694921ebb86a44da82e6bfe553c56da9. Inspect actual runtime
+  status before acting. The
   six-suite Release result above is terminal; preserve all fixed source/test
   role boundaries and original failures. New-packet graphics/App remain pending.
 - Creator agent owns work/vroid-creator-workspace-20261118. Initial source7f3911ca
@@ -308,9 +327,12 @@ do not restart them. The compressed scoped proof is committed above.
   multiplicative tint semantics are retained; new optional hair recolour uses
   explicit RGB, original grayscale textures/alpha and retained shade contrast.
   Absence preserves exact version2 controls; the override is version3.
-  Fresh source75ee61fb now builds under
+  Fresh source75ee61fb completes its whole core/App/fixture/runtime build under
   ds-vroid-creator-release-v2-build-20261118.service, Main1203476,
-  Invocation90d2f9ecf386482199622a84aa713962. No recolour proof is claimed yet.
+  Invocation90d2f9ecf386482199622a84aa713962, all195core/266 build steps0 with no
+  drift, captured/stopped. No recolour runtime proof is claimed yet. Test-only
+  childb0ca corrects a reporter placement compile error retained from3666;
+  production remains75. A fresh strict creator sanitizer build is separate.
   The missing XR body/face/hair/tint controls now have an unqualified shared
   native draft/Apply/Cancel implementation reusing existing desktop/backend
   controls. Actual effects of26 controls on both CC0 bases, source/skin/morph
