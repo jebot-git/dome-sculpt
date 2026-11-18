@@ -3,6 +3,7 @@
 #include "dome/paint.hpp"
 #include "source-uv-archive.hpp"
 #include <nlohmann/json.hpp>
+#include <algorithm>
 #include <set>
 #include <bit>
 namespace dome {
@@ -118,7 +119,12 @@ PaintImageArchive PaintImageArchive::decode(const nlohmann::json &j,PaintImageLi
       throw std::length_error("Invalid original texture archive payload");
     auto image=std::make_shared<Image>();image->width=w;image->height=h;
     image->rgba.assign(data.get_binary().begin(),data.get_binary().end());result.add(std::move(image));
-  }return result;
+  }
+  // RGBA8 samples and their linear-light RGB values are bounded by [0,1].
+  // Four rounded bilinear products can sum to one plus one float ULP;
+  // preserve the mathematical sample range before strict material decoding.
+  for(auto &value:result)value=std::clamp(value,0.f,1.f);
+  return result;
 }
 nlohmann::json encode_source_maps(const PaintSourceMaps&m,PaintImageArchive&a){
   m.validate();auto j=nlohmann::json::object();const char *names[]={"color","metal_rough","emission","normal","occlusion"};size_t k=0;
