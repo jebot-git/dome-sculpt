@@ -186,7 +186,7 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   const auto retained_uv=target.material_bindings?target.material_bindings->canonical_uv:nullptr;
   if(retained_uv&&progress)options.progress=[&](float value){progress(.1f+.4f*value);};
   std::shared_ptr<const detail::BakedEmissionDomain> emission_domain;
-  if(settings.emission_transport&&high.materials[0].resolved_emission){
+  if(settings.emission_transport&&high.materials[0].resolved_emission&&detail::exact_emission_projection_directions(low_mesh,options)){
     try{emission_domain=detail::BakedEmissionDomain::capture(scene,source_id,target.painted->mesh_owner(),options.resolution,target_world,cancelled);}
     catch(const std::invalid_argument&){/* Uncertified correspondence keeps the independently checked raster route. */}
   }

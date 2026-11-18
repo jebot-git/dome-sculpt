@@ -2,10 +2,24 @@
 #pragma once
 #include "baked-emission-domain.hpp"
 #include "dome/mesh-processing.hpp"
+#include "volume-exact.hpp"
 #include <limits>
 #include <sstream>
 #include <iomanip>
 namespace dome::detail {
+// The stored target mesh and its actual prepared projection columns are
+// separate owners. An artist frame may point through the surface while the
+// geometric mesh normals point out. Admit retained transport only when every
+// ACTUAL ray-normal corner is on its supporting face's outward side. Cages
+// retain the independently checked raster route until they have a certificate.
+inline bool exact_emission_projection_directions(const Mesh&low,const BakeOptions&o){
+ if(!o.cage_positions.empty())return false;
+ struct Work{const BakeOptions&o;size_t spent=0;void step(size_t count=1){if(count>8*1024*1024-spent)throw std::length_error("HDR ray certificate exceeds prospective exact-work budget");spent+=count;} }work{o};
+ volume_exact::Arithmetic exact(work);auto point=[](Vec3 p){return std::array<float,3>{p.x,p.y,p.z};};
+ for(size_t tri=0;tri<low.indices.size()/3;++tri){if(o.cancelled&&o.cancelled())throw std::runtime_error("HDR ray certificate cancelled");const auto a=point(low.positions.at(low.indices[tri*3])),b=point(low.positions.at(low.indices[tri*3+1])),c=point(low.positions.at(low.indices[tri*3+2]));
+  for(size_t corner=0;corner<3;++corner){const auto n=point(low.normals.at(low.indices[tri*3+corner]));std::array<volume_exact::Integer,3>x,y,z;for(size_t k=0;k<3;++k){const auto origin=exact.scalar(a[k]);x[k]=exact.subtract(exact.scalar(b[k]),origin);y[k]=exact.subtract(exact.scalar(c[k]),origin);z[k]=exact.scalar(n[k]);}auto term=[&](int i,int j,int k){return exact.multiply(x[i],exact.subtract(exact.multiply(y[j],z[k]),exact.multiply(y[k],z[j])));};if(exact.add(exact.add(term(0,1,2),term(1,2,0)),term(2,0,1)).sign<=0)return false;}
+ }return true;
+}
 // Version1 FLOAT transport policy. Samples the actual source hit and stored
 // continuous output independently. This is roundoff allowance, not permission
 // to blur physical source extrema. Work/rays share the existing Bake budgets.
