@@ -8,6 +8,7 @@
 #include "dome/color-paint-sampling.hpp"
 #include "dome/normal-sampling.hpp"
 #include "dome/creator-archive.hpp"
+#include "dome/source-placement.hpp"
 namespace dome::detail {
 // An identity ledger of the actual native payloads retained by one context.
 // Current fields, detached before-origins and texture-field source/read views
@@ -27,6 +28,8 @@ inline EmissionSourcePayloads emission_source_payloads(const Scene &scene,
  auto paint=[&](const std::shared_ptr<const PaintedMesh> &value){if(value&&paints.insert(value.get()).second){if(paints.size()>1024)throw std::length_error("HDR retained paint count exceeds bound");result.paints.push_back(value);}};
  auto volume=[&](const std::shared_ptr<const Volume>&value){if(value&&volumes.insert(value.get()).second)result.volumes.push_back(value);};
  auto appearance=[&](const std::shared_ptr<const CreatorAppearance>&value){if(value&&value->decoded_images)for(const auto &i:*value->decoded_images)image(i);};
+ auto placement=[&](const auto &groups){for(const auto &g:groups)if(g.source_placement&&g.source_placement->model&&g.source_placement->model->decoded_images)for(const auto &i:*g.source_placement->model->decoded_images)image(i);};
+ placement(scene.groups());
  auto binding=[&](const std::shared_ptr<const SourceMaterialBindings>&value){if(value)materials.add(value,false);};
  auto field=[&](const std::shared_ptr<const TextureSetFieldSource>&value){
   stop();if(!value||!fields.insert(value.get()).second)return;value->authenticate_owner(value);
@@ -47,7 +50,7 @@ inline EmissionSourcePayloads emission_source_payloads(const Scene &scene,
  for(;;){
   stop();collect_canonical_paint_controls(materials,polygons,false,cancelled);
   while(origin<polygons.origins().size()){
-   const auto v=polygons.origins()[origin++];paint(v->paint);volume(v->volume);binding(v->material_bindings);appearance(v->appearance);collection(v->texture_sets);
+   const auto v=polygons.origins()[origin++];paint(v->paint);volume(v->volume);binding(v->material_bindings);appearance(v->appearance);collection(v->texture_sets);if(v->placement)placement(v->placement->groups);
   }
   while(uv<materials.origins().size()){
    const auto v=materials.origins()[uv++];paint(v->paint);appearance(v->appearance);for(const auto &role:v->roles)image(role.image);
@@ -70,6 +73,7 @@ inline EmissionSourcePayloads emission_source_payloads(const Scene &scene,
     if(const auto &d=projection->sampling_domain){image(d->resolved_pbr);image(d->resolved_mtoon);if(d->detail){image(d->detail->pbr);image(d->detail->mtoon);}}
    }
   }
+  collect_canonical_paint_controls(materials,polygons,false,cancelled);
   if(origin==polygons.origins().size()&&material==materials.bindings().size()&&uv==materials.origins().size()&&p==result.paints.size())break;
  }
  stop();return result;

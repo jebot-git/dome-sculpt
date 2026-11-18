@@ -14,9 +14,22 @@
 #include <cmath>
 #include <cstring>
 #include <set>
+#include <ostream>
+#include <streambuf>
 namespace dome::detail {namespace {
 constexpr size_t retained_limit=32*1024*1024;
 void stop(const std::function<bool()>&cancelled){NativeReadScope::check();if(cancelled&&cancelled())throw std::runtime_error("Retained emission capture cancelled");}
+// Count real native bytes without first allocating an over-limit CBOR buffer.
+class BoundedCborSize final:public std::streambuf {
+ const std::function<bool()> &cancelled_;size_t bytes_=0,next_poll_=0;
+ void add(size_t n){if(n>retained_limit-bytes_)throw std::length_error("Retained emission source archive exceeds bound");if(bytes_>=next_poll_){stop(cancelled_);next_poll_=bytes_+65536;}bytes_+=n;}
+ std::streamsize xsputn(const char*,std::streamsize n)override{if(n<0)throw std::invalid_argument("Negative HDR CBOR byte count");add(size_t(n));return n;}
+ int_type overflow(int_type c)override{if(!traits_type::eq_int_type(c,traits_type::eof()))add(1);return traits_type::not_eof(c);}
+public:
+ explicit BoundedCborSize(const std::function<bool()>&cancelled):cancelled_(cancelled){}
+ size_t bytes()const noexcept{return bytes_;}
+};
+size_t cbor_size(const nlohmann::json &value,const std::function<bool()>&cancelled){BoundedCborSize sink(cancelled);std::ostream output(&sink);output.exceptions(std::ios::badbit|std::ios::failbit);nlohmann::json::to_cbor(value,output);stop(cancelled);return sink.bytes();}
 float component(Vec3 p,int k){return k==0?p.x:k==1?p.y:p.z;}
 bool same(Vec3 a,Vec3 b){return a.x==b.x&&a.y==b.y&&a.z==b.z;}
 using Point=std::array<float,2>;
@@ -71,8 +84,8 @@ std::shared_ptr<const BakedEmissionDomain> BakedEmissionDomain::capture_provenan
  // Freeze the bounded before-context before deriving coefficients. The
  // retained field and certificate must describe the same immutable values,
  // including externally aliased material DTOs from before capture.
- const auto before_json=scene.encode();const auto before_bytes=nlohmann::json::to_cbor(before_json);
- if(before_bytes.size()>retained_limit)throw std::length_error("Retained emission before-scene exceeds retained budget");
+ const auto before_json=scene.encode();const auto before_bytes=cbor_size(before_json,cancelled);
+ if(prospective>retained_limit-sizeof(BakedEmissionDomain)||before_bytes>retained_limit-sizeof(BakedEmissionDomain)-prospective)throw std::length_error("Retained emission metadata plus resident payload exceeds retained budget");
  auto frozen=std::make_shared<const Scene>(Scene::decode(before_json));
  const auto frozen_bytes=preflight(*frozen,cancelled);
  const auto &object=frozen->object(source_id);const auto&paint=object.painted;const auto&binding=object.material_bindings;
@@ -105,16 +118,16 @@ std::shared_ptr<const BakedEmissionDomain> BakedEmissionDomain::capture_provenan
  disjoint(charts,exact,cancelled);
  const auto r=paint->resolution();const auto background=binding&&binding->physical_emission?*binding->physical_emission:object.material.emissive;
  const auto payload_bytes=std::max(prospective,frozen_bytes);
- if(before_bytes.size()>retained_limit-payload_bytes)throw std::length_error("Retained emission metadata plus resident payload exceeds retained budget");
- const auto retained_before=payload_bytes+before_bytes.size();
- if(retained_before>retained_limit||size_t(r)*r>(retained_limit-retained_before)/sizeof(BakedEmissionSample))throw std::length_error("Retained emission source exceeds prospective field budget");
+ if(before_bytes>retained_limit-payload_bytes)throw std::length_error("Retained emission metadata plus resident payload exceeds retained budget");
+ const auto retained_before=payload_bytes+before_bytes;
+ if(retained_before>retained_limit-sizeof(BakedEmissionDomain)||size_t(r)*r>(retained_limit-sizeof(BakedEmissionDomain)-retained_before)/sizeof(BakedEmissionSample))throw std::length_error("Retained emission source exceeds prospective field budget");
  std::vector<BakedEmissionSample> values(size_t(r)*r);
  for(uint32_t y=0;y<r;++y){stop(cancelled);for(uint32_t x=0;x<r;++x){const auto v=sample_overlay_texel_values(*packet,int(x),int(y),false);BakedEmissionSample layer;layer.coverage=v[3][3];for(size_t c=0;c<3;++c){layer.legacy[c]=v[2][c];layer.absolute[c]=v[4][c];}values[size_t(y)*r+x]={{},layer.resolve(background,1),1};}}
  auto result=std::shared_ptr<BakedEmissionDomain>(new BakedEmissionDomain);result->field_=BakedEmissionField::create(r,values,{retained_limit,cancelled});
- if(before_bytes.size()>retained_limit-result->field_->storage_bytes())throw std::length_error("Retained emission before-scene exceeds retained budget");
+ if(before_bytes>retained_limit-result->field_->storage_bytes())throw std::length_error("Retained emission before-scene exceeds retained budget");
  result->before_=std::move(frozen);result->target_=std::move(target);result->target_resolution_=target_resolution;result->target_world_=target_world;result->source_=source_id;
- const auto encoded=nlohmann::json::to_cbor(result->before_->encode());if(encoded.size()>retained_limit-result->field_->storage_bytes())throw std::length_error("Retained emission before-scene exceeds retained budget");
- result->retained_bytes_=std::max(retained_before,encoded.size())+result->field_->storage_bytes()+sizeof(BakedEmissionDomain);result->self_=result;stop(cancelled);return result;
+ const auto encoded=cbor_size(result->before_->encode(),cancelled);if(encoded!=before_bytes)throw std::invalid_argument("HDR freeze changed its canonical native context");if(encoded>retained_limit-result->field_->storage_bytes())throw std::length_error("Retained emission before-scene exceeds retained budget");
+ result->retained_bytes_=retained_before+result->field_->storage_bytes()+sizeof(BakedEmissionDomain);result->self_=result;stop(cancelled);return result;
 }
 void BakedEmissionDomain::validate_current(const std::shared_ptr<const Mesh>&mesh,uint32_t r)const{
  if(!field_||!before_||mesh!=target_||mesh.owner_before(target_)||target_.owner_before(mesh)||r!=target_resolution_)throw std::invalid_argument("Retained emission borrowed another current geometry/grid owner");
@@ -125,7 +138,7 @@ nlohmann::json BakedEmissionDomain::encode()const{
 }
 std::shared_ptr<const BakedEmissionDomain>BakedEmissionDomain::decode(const nlohmann::json&j,std::shared_ptr<const Mesh>target,uint32_t r,const std::function<bool()>&cancelled){
  stop(cancelled);if(!j.is_object()||j.size()!=7||j.at("version")!=1||!j.at("source").is_number_unsigned()||j.at("position").size()!=3||j.at("rotation").size()!=4)throw std::invalid_argument("Invalid retained emission source record");
- const auto bytes=nlohmann::json::to_cbor(j.at("before"));if(bytes.size()>retained_limit)throw std::length_error("Retained emission source archive exceeds bound");
+ (void)cbor_size(j.at("before"),cancelled);
  static thread_local size_t depth=0;if(depth>=8)throw std::length_error("Retained emission archive exceeds owning depth");struct Scope{size_t&depth;Scope(size_t&d):depth(d){++depth;}~Scope(){--depth;}}scope(depth);
  auto before=Scene::decode(j.at("before"));CanvasTransform t;t.position={j.at("position")[0].get<float>(),j.at("position")[1].get<float>(),j.at("position")[2].get<float>()};t.orientation.x=j.at("rotation")[0].get<float>();t.orientation.y=j.at("rotation")[1].get<float>();t.orientation.z=j.at("rotation")[2].get<float>();t.orientation.w=j.at("rotation")[3].get<float>();t.scale=j.at("scale").get<float>();validate_transform(t);
  auto result=capture_provenance(before,j.at("source").get<uint64_t>(),std::move(target),r,t,cancelled);if(result->field()->resolution()!=j.at("resolution").get<uint32_t>())throw std::invalid_argument("Retained emission replay changed its actual grid");return result;
