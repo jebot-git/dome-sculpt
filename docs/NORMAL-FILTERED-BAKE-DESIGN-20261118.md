@@ -106,3 +106,18 @@ The registered native command declares two separate user-selected sizes:
 families next test1024; the additional ordinary mapped field separately retries
 at2048 after its genuine1024 refusal. Neither size is silently substituted, and
 both must pass their actual checked policy before acceptance is claimed.
+
+Actual2048 ordinary mapped workflow passes its original probes, ordered Save,
+history and reopen. Advanced1024 RetainSource still refuses sampled fidelity;
+the next command explicitly chooses2048 for BOTH advanced and ordinary cases.
+The first advanced2048 guarded Bake and Save succeed, then the original fixture
+hits its2GiB virtual-AS cap while holding the live Document, endpoint snapshots,
+a newly reopened Scene and two full JSON encodings (observed VM2,134,097,920,
+RSS1,408,638,976). The failure remains preserved. This test-only child instead
+stream-compares ordered Save against accepted-memory native bytes, checks all
+independent directions/history/source data, destroys the live Document and
+snapshots, then independently reopens/re-saves and stream-compares every byte.
+The processAS2/RSS3, source images, field/storage limits and quality bounds stay
+unchanged; the production tree remains exactlyea838. Both complete CTests remain
+registered, with current arguments explicitly2048 2048. No full admission follows
+until the corrected fixture actually completes.
