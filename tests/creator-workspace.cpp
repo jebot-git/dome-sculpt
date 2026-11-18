@@ -17,10 +17,12 @@
 #include <fstream>
 #include <iostream>
 #include <unistd.h>
+#include <png.h>
 using namespace dome;
 namespace {
 size_t checks=0;
 void check(bool value,const char*label){if(!value)throw std::runtime_error(label);++checks;std::cout<<"PASS "<<label<<'\n';}
+#include "creator-export-colour.hpp"
 template<class F>bool refuses(F action){try{action();return false;}catch(const std::exception&){return true;}}
 float difference(const Mesh&a,const Mesh&b){if(a.positions.size()!=b.positions.size())throw std::runtime_error("Unexpected vertex count");float maximum=0;for(size_t i=0;i<a.positions.size();++i)maximum=std::max(maximum,length(a.positions[i]-b.positions[i]));return maximum;}
 void source_retained(const CreatedHumanoid&base,const CreatedHumanoid&next){
@@ -95,13 +97,10 @@ void controls(const std::filesystem::path&root){
   cgltf_options options{};cgltf_data*raw=nullptr;check(cgltf_parse_file(&options,path.c_str(),&raw)==cgltf_result_success,"Independent cgltf parses actual styled creator export");std::unique_ptr<cgltf_data,decltype(&cgltf_free)>data(raw,cgltf_free);check(cgltf_load_buffers(&options,data.get(),path.c_str())==cgltf_result_success&&cgltf_validate(data.get())==cgltf_result_success,"Independent glTF consumer validates actual styled geometry, skins, morphs and image package");
   size_t primitives=0,skinned=0,targets=0;for(size_t n=0;n<data->nodes_count;++n)if(data->nodes[n].mesh){skinned+=bool(data->nodes[n].skin);for(size_t p=0;p<data->nodes[n].mesh->primitives_count;++p){++primitives;targets+=data->nodes[n].mesh->primitives[p].targets_count;}}
   check(primitives==20&&skinned>=19&&targets>0,"Export retains all real source primitives plus the authored groom and actual skin/morph payloads");
-  bool exported_colour=false;for(size_t i=0;i<data->materials_count;++i){const auto &p=data->materials[i].pbr_metallic_roughness;exported_colour|=std::abs(p.base_color_factor[0]-.8f)<1e-6f&&std::abs(p.base_color_factor[1]-.2f)<1e-6f&&std::abs(p.base_color_factor[2]-.1f)<1e-6f;}
-  check(exported_colour,"Independent glTF consumer sees actual arbitrary source-hair RGB factors");
+  consumer_glb_colours(*data,model);
   auto source_only=styled;source_only.hair_length=source_only.hair_volume=source_only.fringe=0;Scene vrm;append_humanoid(vrm,source_only,"Recoloured source avatar");const auto vrm_path=root/(std::string(id)+"-recoloured.vrm");export_vrm(vrm.preview_surfaces(),vrm_path);
   cgltf_data*vrm_raw=nullptr;check(cgltf_parse_file(&options,vrm_path.c_str(),&vrm_raw)==cgltf_result_success,"Independent consumer parses actual source-backed recoloured VRM export");std::unique_ptr<cgltf_data,decltype(&cgltf_free)>vrm_data(vrm_raw,cgltf_free);check(cgltf_load_buffers(&options,vrm_data.get(),vrm_path.c_str())==cgltf_result_success&&cgltf_validate(vrm_data.get())==cgltf_result_success,"Actual VRM retains valid complete source geometry, skin, morphs and images");
-  const auto document=nlohmann::json::parse(std::string_view(vrm_data->json,vrm_data->json_size));bool vrm_colour=false;
-  for(const auto &m:document.at("extensions").at("VRM").at("materialProperties"))if(m.at("name").get<std::string>().find("HAIR")!=std::string::npos){const auto &v=m.at("vectorProperties").at("_Color");vrm_colour=std::abs(srgb_to_linear(v[0].get<float>())-.8f)<1e-5f&&std::abs(srgb_to_linear(v[1].get<float>())-.2f)<1e-5f&&std::abs(srgb_to_linear(v[2].get<float>())-.1f)<1e-5f;}
-  check(vrm_colour,"Actual VRM toon material exports selected absolute RGB instead of silently retaining the old blue tint");
+  const auto original_hair=std::find_if(model.parts.begin(),model.parts.end(),[](const auto&p){return p.name.find("HAIR")!=std::string::npos;});check(original_hair!=model.parts.end(),"Native source keeps actual original hair identity");consumer_vrm_colours(*vrm_data,*original_hair,*styled.hair_recolor);
 
  }
  std::ofstream(root/"creator-control-effects.json")<<evidence.dump(2)<<'\n';
