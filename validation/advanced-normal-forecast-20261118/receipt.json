@@ -1,0 +1,180 @@
+{
+  "scope": "Calibrated native CPU forecast only; no softwareGL/Arc/currentwholeApp admission",
+  "production": "e006869d9ff18a30ea88e51d4037ba88988406e6",
+  "graphics_fixture": "c56a55aed95b77f41ee96b6b17047182b4020671",
+  "fixture_full_hash": "c56a55aed95b77f41ee96b6b17047182b4020671",
+  "product": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-normal-forecast-cache-build-20261118/dome-sculpt-filtered-normal-render-test",
+    "sha256": "e1c2c36b93bbb609650e0a828e103d3fc6029c18f07602fec574a7b9c9192617"
+  },
+  "status_sha256": "e675065388ef6395eb612dbf06c0a4f6be30383e9b81127c513edb293105088d",
+  "summary": {
+    "CPU_display_forecast_views": 68,
+    "families": 17,
+    "original_points": 272,
+    "dense_frontmost_points": 37968,
+    "calibrated_prior_PBR_triplets": 16,
+    "maximum_prior_RGB_error": 1,
+    "normals_or_materials_mutated": false,
+    "new_GL_tests_executed": false,
+    "Arc_executed": false,
+    "MToon_prior_source_controls_calibrated": true,
+    "new_GL_executed": false,
+    "witnesses_proposed_only": true
+  },
+  "seconds": 237.25688409805298,
+  "maximum_independent_dense_transfer_error": 0.011970789597705372,
+  "prior_partial_forecast_exact_prefix": {
+    "bytes": 19034211,
+    "sha256": "fd5863118d607bdac52919e355cd1f90e8099d6d9bf0ce36901c51cd1ab4bc00"
+  },
+  "prior_actual_source_control_triplets": 104,
+  "prior_actual_source_max_RGB_error": 2,
+  "manifest": {
+    "sha256": "5ec92fcde176b601b6da63616cb994b86ef5e6a505468365451c19438779e2a9",
+    "points": 432,
+    "PNG_count": 1796
+  },
+  "archive": {
+    "path": "scoped-proof.tar.xz",
+    "sha256": "c59ca3336253e55567860c3d20b2e672c680b6c09ecde5268fca7541ff4e9046",
+    "bytes": 3693972
+  },
+  "members": {
+    "build/build-v1.py": {
+      "sha256": "ce906e723da3b8cc0541a0d4ad89c64394eef54c85baeed236386c26fbff5ba5",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-normal-forecast-cache-build-20261118/build-v1.py",
+      "bytes": 3732
+    },
+    "build/build-plan-v1.json": {
+      "sha256": "26f3d109c96670c2ebe463a1c467b078159eac4c656a1de2ccc73612767dd506",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-normal-forecast-cache-build-20261118/build-plan-v1.json",
+      "bytes": 3182909
+    },
+    "build/build-status-v1.json": {
+      "sha256": "43c1d1743d8d98d36eff7721d0d710418b07ff3d3771a9585f05d917b2e2b557",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-normal-forecast-cache-build-20261118/build-status-v1.json",
+      "bytes": 299818
+    },
+    "build/actual-link-dependencies-v1.json": {
+      "sha256": "2ccd72d21633b223139c5a905bd8854d492c4cd48dc238d40ea40ba1e5185ed4",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-normal-forecast-cache-build-20261118/actual-link-dependencies-v1.json",
+      "bytes": 8829
+    },
+    "build/ELF-contract-audit-v1.json": {
+      "sha256": "7e3fc13c58ccbc11b0ef6c75202f974605609cbe2edd3d8645b92c07c0555ecf",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-normal-forecast-cache-build-20261118/ELF-contract-audit-v1.json",
+      "bytes": 2749
+    },
+    "build/prepare-v1-parser-failure.json": {
+      "sha256": "cd0b79e84eb037627f7c03b2769536fd47d71267a7b6120f2406c06715028e6d",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-normal-forecast-cache-build-20261118/prepare-v1-parser-failure.json",
+      "bytes": 211
+    },
+    "build/advanced-render.o.d": {
+      "sha256": "82aee7de0f4fb054afff8b28fec6c29859195b7b6cb349403b1e52ce51bae3de",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-normal-forecast-cache-build-20261118/advanced-render.o.d",
+      "bytes": 25886
+    },
+    "build/advanced-render-link.d": {
+      "sha256": "d5fa26f8a4e72b1481a71b2e797e1dd2da9a5e4fd662f7abd79585de0b10a017",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-normal-forecast-cache-build-20261118/advanced-render-link.d",
+      "bytes": 10860
+    },
+    "build/complete-fixture.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-normal-forecast-cache-build-20261118/complete-fixture.log",
+      "bytes": 0
+    },
+    "build/fresh-link.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-normal-forecast-cache-build-20261118/fresh-link.log",
+      "bytes": 0
+    },
+    "build/run-forecast-v1.py": {
+      "sha256": "5e2dff44215a68b17829b21f17b5240e2da319fe894e4fdb2bb3afa41e7b4d8f",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-normal-forecast-cache-build-20261118/run-forecast-v1.py",
+      "bytes": 7741
+    },
+    "build/forecast-plan-v1.json": {
+      "sha256": "38e337e3f7481c3d00c66c332d2ee1c481a31712849b7ff2b9d2af3a12f85dc6",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-normal-forecast-cache-build-20261118/forecast-plan-v1.json",
+      "bytes": 6161529
+    },
+    "build/select-witnesses-v1.py": {
+      "sha256": "470e5d6adf0a3093505d0f878d883a5e5361e09610fbea65c9564035492b988e",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-normal-forecast-cache-build-20261118/select-witnesses-v1.py",
+      "bytes": 2787
+    },
+    "build/display-witnesses-v1.json": {
+      "sha256": "5ec92fcde176b601b6da63616cb994b86ef5e6a505468365451c19438779e2a9",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-normal-forecast-cache-build-20261118/display-witnesses-v1.json",
+      "bytes": 515918
+    },
+    "build/ds-advanced-normal-forecast-cache-build-v1-20261118.service-terminal.txt": {
+      "sha256": "f3203c1362af589f0f582c81a750985552581cc2b806c1a0171c51b11e26a70d",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-normal-forecast-cache-build-20261118/ds-advanced-normal-forecast-cache-build-v1-20261118.service-terminal.txt",
+      "bytes": 8830
+    },
+    "build/ds-advanced-normal-forecast-cache-build-v1-20261118.service-journal.txt": {
+      "sha256": "08b96b6569697f5a4537f135f3c2ebf99024ae0e278fc10b37c63f97ffa3ecae",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-normal-forecast-cache-build-20261118/ds-advanced-normal-forecast-cache-build-v1-20261118.service-journal.txt",
+      "bytes": 365
+    },
+    "forecast/status.json": {
+      "sha256": "e675065388ef6395eb612dbf06c0a4f6be30383e9b81127c513edb293105088d",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-normal-forecast-cache-build-20261118/CPU-forecast-v1-20261118/status.json",
+      "bytes": 133036
+    },
+    "forecast/forecast.jsonl": {
+      "sha256": "f21d255d7d8f4c3e7994fee3caf7ba94ae222a786a229ac23c247034b72d976d",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-normal-forecast-cache-build-20261118/CPU-forecast-v1-20261118/forecast.jsonl",
+      "bytes": 56554555
+    },
+    "forecast/CPU-forecast.log": {
+      "sha256": "b4775b1ec74028fbe3e59873e90fac344805f943d619a99e00db0d85779af9ca",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-normal-forecast-cache-build-20261118/CPU-forecast-v1-20261118/CPU-forecast.log",
+      "bytes": 77662
+    },
+    "forecast/ldd.log": {
+      "sha256": "22be63a3cd3ce8444300e236ac2a09a3fb208b356e7d3dc5e3879ceea9200af5",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-normal-forecast-cache-build-20261118/CPU-forecast-v1-20261118/ldd.log",
+      "bytes": 3014
+    },
+    "forecast/closure-v1.json": {
+      "sha256": "29aab3216f828f5ffb382262d4ef0a0e560811f88e27419510cad43d32109d6c",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-normal-forecast-cache-build-20261118/CPU-forecast-v1-20261118/closure-v1.json",
+      "bytes": 359
+    },
+    "forecast/ds-advanced-normal-forecast-cache-forecast-v1-20261118.service-terminal.txt": {
+      "sha256": "e682ef33ba29e414a1509a778871315543cf0c29d09c82b3a2d6a2d217f85521",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-normal-forecast-cache-build-20261118/CPU-forecast-v1-20261118/ds-advanced-normal-forecast-cache-forecast-v1-20261118.service-terminal.txt",
+      "bytes": 8862
+    },
+    "forecast/ds-advanced-normal-forecast-cache-forecast-v1-20261118.service-journal.txt": {
+      "sha256": "457ce487ff7975026d1269489930e615b26ee88637ef6f392bae46a56aabf7c4",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-normal-forecast-cache-build-20261118/CPU-forecast-v1-20261118/ds-advanced-normal-forecast-cache-forecast-v1-20261118.service-journal.txt",
+      "bytes": 375
+    },
+    "prior-interrupted/pause-closure-v1.json": {
+      "sha256": "9ec06833e5f9d9e6306fb0acbbefca1cd0be6506b0cf2707caff099b0e8896a0",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-normal-sampler-range-render-build-20261118/CPU-forecast-v1-20261118/pause-closure-v1.json",
+      "bytes": 5230
+    },
+    "prior-interrupted/pause-request-v1.json": {
+      "sha256": "51e394c75356e751bdb8978a3a0577be9a1b379add1bb9067a2877d10113479b",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-normal-sampler-range-render-build-20261118/CPU-forecast-v1-20261118/pause-request-v1.json",
+      "bytes": 925
+    },
+    "prior-interrupted/status.json": {
+      "sha256": "ce4d0113144037604f7337fd83088dcf0f898befc1d5b4a5cfc9664acbdfe52d",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-normal-sampler-range-render-build-20261118/CPU-forecast-v1-20261118/status.json",
+      "bytes": 13548
+    },
+    "source/fixture-cache.diff": {
+      "sha256": "a55bb12734551e8c7201aee0e22e0bd13ea69bdccd25f4456805b458d3434ec6",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/advanced-normal-forecast-proof-source-20261118/validation/advanced-normal-forecast-20261118/fixture-cache.diff",
+      "bytes": 3751
+    }
+  }
+}
