@@ -1,3 +1,4 @@
+#include "bake-source-capabilities.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "cut-color.hpp"
 #include "dome/document.hpp"
@@ -38,14 +39,14 @@ void Document::cancel_background_work(){
 bool Document::bake_source_eligible_locked(uint64_t id) const {
   const auto at=std::find_if(scene_.objects().begin(),scene_.objects().end(),[id](const auto &o){return o.id==id;});
   return at!=scene_.objects().end()&&id!=scene_.active().id&&!scene_.has_affine_placement(id)&&
-    detail::cut_color_supported(*at)&&(at->mesh_active?at->painted&&!at->painted->mesh().indices.empty():!at->volume->voxels().empty());
+    detail::bake_source_supported(*at)&&(at->mesh_active?at->painted&&!at->painted->mesh().indices.empty():!at->volume->voxels().empty());
 }
 std::vector<uint64_t> Document::bake_sources_locked() const {
   std::vector<uint64_t> ids;
   const auto &target=scene_.active();
   if(!detail::corner_bake_target_supported(target))return ids;
   for(const auto &o:scene_.objects())if(o.id!=scene_.active().id && !scene_.has_affine_placement(o.id) &&
-      detail::cut_color_supported(o) &&
+      detail::bake_source_supported(o) &&
       (o.mesh_active ? o.painted && !o.painted->mesh().indices.empty() : !o.volume->voxels().empty()))ids.push_back(o.id);
   if(state_.bake_source==unavailable_bake_object||
       (target.bake_recipe&&target.bake_recipe->source.object==unavailable_bake_object))

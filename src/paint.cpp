@@ -1059,13 +1059,37 @@ detail::PaintOverlayFactory::source_coordinates(const PaintedMesh &paint){
   return {proof.original_uv0,proof.original_uv1};
 }
 std::shared_ptr<const detail::PaintOverlayPacket> detail::PaintOverlayFactory::capture(const PaintedMesh &paint,const std::function<bool()> &cancelled){
+ return capture_impl(paint,cancelled,nullptr);
+}
+std::shared_ptr<const detail::PaintOverlayPacket> detail::PaintOverlayFactory::capture_prepared_source(
+    const SculptObject &object,const std::function<bool()> &cancelled){
+ paint_compute::checkpoint(cancelled);const auto &binding=object.material_bindings;
+ if(!object.mesh_active||!object.painted||!binding||!binding->normal_preparation||!object.painted->normal_projection())
+   throw std::invalid_argument("Prepared Source8 capture requires its actual normal/paint/material owner");
+ const auto attachment=material_paint_attachment(binding.get());
+ if(!attachment||!attachment->matches(object.painted->mesh_owner(),object.painted->paint_sampling_domain()))
+   throw std::invalid_argument("Prepared Source8 capture borrowed another writable paint geometry attachment");
+ binding->validate();source_paint_pairing(object.painted.get(),binding.get(),object.appearance.get(),true);
+ return capture_impl(*object.painted,cancelled,binding.get());
+}
+std::shared_ptr<const detail::PaintOverlayPacket> detail::PaintOverlayFactory::capture_impl(
+    const PaintedMesh &paint,const std::function<bool()> &cancelled,const SourceMaterialBindings *authority){
   paint_compute::checkpoint(cancelled);
   if(!paint.valid_source_sampling_attachment())throw std::invalid_argument("Overlay capture lost its actual source coordinate/baked owner");
   auto packet=std::shared_ptr<PaintOverlayPacket>(new PaintOverlayPacket);
   if(paint.source_sampling_prepared()&&paint.baked_){
-    if(paint.baked_->normal_interpretation!=BakedNormalInterpretation::CanonicalMikk||paint.baked_->normal_authority||paint.baked_->normal_field)
-      throw std::invalid_argument("Source8 overlay needs its explicit normal-field adapter");
-    packet->source_baked_geometry_=paint.mesh_owner();
+    if(authority){
+      if(!authority->normal_preparation||!paint.normal_projection_||
+         !detail::normal_projection_identity(*paint.normal_projection_,*authority->normal_preparation->projection)||
+         paint.baked_->normal_field||paint.baked_->normal_interpretation!=BakedNormalInterpretation::PreparedAttributes||
+         (paint.baked_->normal_authority&&(!authority->normal_preparation->sampling_domain||
+          !paint.normal_projection_->sampling_domain||paint.baked_->normal_authority!=paint.normal_projection_->sampling_domain->detail)))
+        throw std::invalid_argument("Prepared Source8 contributions lost their actual intrinsic/detail normal event");
+    }else{
+      if(paint.baked_->normal_interpretation!=BakedNormalInterpretation::CanonicalMikk||paint.baked_->normal_authority||paint.baked_->normal_field)
+        throw std::invalid_argument("Source8 overlay needs its explicit normal-field adapter");
+      packet->source_baked_geometry_=paint.mesh_owner();
+    }
   }
   packet->resolution_=paint.resolution();
   packet->padding_=std::shared_ptr<const std::vector<int32_t>>(paint.surface_,&paint.surface_->padding);

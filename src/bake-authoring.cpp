@@ -1,3 +1,4 @@
+#include "bake-source-capabilities.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/bake-authoring.hpp"
 #include "dome/bake-recipe.hpp"
@@ -30,7 +31,6 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   auto target = scene.active();
   auto source = scene.object(source_id);
   if(target.material_bindings&&target.material_bindings->native_paint_sampling)throw std::logic_error("Retained native paint target requires its sampling-aware Bake adapter");
-  if(source.material_bindings&&source.material_bindings->native_paint_sampling)throw std::logic_error("Retained native paint source requires its sampling-aware Bake adapter");
   if(target.material_bindings&&target.material_bindings->normal_preparation&&target.material_bindings->normal_preparation->canonical_conversion){
     NormalPreparationOptions normal_options;normal_options.cancelled=cancelled;normal_options.max_angular_error=settings.normal_error;
     auto layered=convert_canonical_normals({target.painted,target.appearance,target.material_bindings,target.deformation,target.material,{}},normal_options);
@@ -42,15 +42,17 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
     throw std::logic_error("This corner-color target has shading roles that target baking cannot yet preserve");
   // This source route uses the same authenticated ordinary shading domain as
   // plane cutting. Other original/prepared roles still require their adapters.
-  if(current_source&&!detail::cut_color_supported(source))
+  if(current_source&&!detail::bake_source_supported(source))
     throw std::logic_error("This corner-color source has shading roles that source baking cannot yet preserve");
   if (source.id == target.id)
     throw std::invalid_argument("Choose a different source object for baking");
   if (!target.visible || target.locked || !target.mesh_active || !target.painted)
     throw std::logic_error("Show, unlock and prepare the target painting mesh before baking");
-  if(source.mesh_active&&source.painted&&
-      source.painted->baked()&&source.painted->baked()->normal_field)
-    throw std::invalid_argument("Select a source without prepared normal attributes for this bake; source-frame transport is required and both objects are retained");
+  if(source.mesh_active&&source.painted&&source.painted->baked()&&source.painted->baked()->normal_field&&
+      (!source.material_bindings||!source.material_bindings->canonical_attributes))
+    throw std::invalid_argument("Independent normal-field source requires its actual canonical attribute owner");
+  // The source adapter below authenticates the actual field/current frame/UV
+  // owners before sampling. It preserves both stored roles, not raw pixels.
   if(!std::isfinite(settings.color_error)||settings.color_error<0||settings.color_error>1)
     throw std::invalid_argument("Invalid vertex-color preparation tolerance");
   if(!std::isfinite(settings.normal_error)||settings.normal_error<0||settings.normal_error>.25f)
@@ -75,7 +77,7 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   // positions/normals later, never the source field's corner identity or RGBA.
   auto source_maps=detail::raw_bake_source(source,cancelled);
   if(!source_maps&&source.mesh_active)source_maps=source.painted->preview(source.material,cancelled);
-  auto source_colors=source.mesh_active?detail::current_vertex_colors(source.painted->mesh(),current?&*current:nullptr,
+  auto source_colors=source.mesh_active&&!source.painted->color_projection()?detail::current_vertex_colors(source.painted->mesh(),current?&*current:nullptr,
       source.appearance.get(),source.material_bindings.get(),source_maps.get(),cancelled):std::vector<PolygonRgba>{};
   std::shared_ptr<const PolygonColorSurface> target_current;
   if(current_target){
