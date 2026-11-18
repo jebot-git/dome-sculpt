@@ -1,0 +1,36 @@
+diff --git a/tests/source-advanced-normal-forecast.hpp b/tests/source-advanced-normal-forecast.hpp
+index d03ea39e..6dc2f041 100644
+--- a/tests/source-advanced-normal-forecast.hpp
++++ b/tests/source-advanced-normal-forecast.hpp
+@@ -30,11 +30,10 @@ struct Inputs {
+     std::array<double,3> effective{},effective_emission{};
+     bool alias{};
+ };
+-Inputs inputs(const SculptObject &o,std::array<float,2> uv) {
++Inputs inputs(const SculptObject &o,const MeshSnapshot &control,std::array<float,2> uv) {
+     // The exact ordinary point control deliberately has derived maps, no source
+     // pack/overlay or normal authority, and constant UV (zero texture LOD).
+-    auto control=prepared_point(o,uv,{0,0,1},{},{1,0,0},{0,1,0},1,true);
+-    const auto &maps=*control->ranges.at(0).textures;
++    const auto &maps=*control.ranges.at(0).textures;
+     require(!maps.source_only&&!maps.overlay&&!maps.normal_projection&&maps.normal.rgba.empty(),
+           "Forecast describes exact unchanged ordinary point material sampling");
+     require(!maps.color_projection&&maps.pbr_color.rgba.empty(),"Forecast has no silently substituted prepared color plane");
+@@ -114,13 +113,16 @@ int run(const std::filesystem::path &output,bool display_mode=false,uint32_t res
+         const auto center=a+(ex+ey)/3,n=normalized(cross(ex,ey)),x=normalized(ex),y=normalized(cross(n,x)),camera=center+n*2;
+         const float span=std::max({length(ex),length(ey),length(ey-ex)})*.85f;SurfaceQuery visibility(mesh);
+         const std::string label=f.name+(source_view?"-source":"-target")+(pbr_role?"-pbr":"-mtoon");
++        // A frozen view has one ordinary material packet; UV remains sampled
++        // independently at every point. Avoid copying2048 image planes561 times.
++        const auto material_control=prepared_point(o,{0,0},{0,0,1},{},{1,0,0},{0,1,0},1,true);
+         std::array<int,3> maxima{};std::array<std::array<int,2>,3> witnesses{};unsigned points=0;
+         for(int py=0;py<96;++py)for(int px=0;px<96;++px){const auto position=center+x*((px+.5f)/96*2-1)*span+y*((py+.5f)/96*2-1)*span,r=position-a;
+             const double d00=dot(ex,ex),d01=dot(ex,ey),d11=dot(ey,ey),den=d00*d11-d01*d01;
+             const float v=float((d11*dot(r,ex)-d01*dot(r,ey))/den),w=float((d00*dot(r,ey)-d01*dot(r,ex))/den);const std::array<float,3>bary{1-v-w,v,w};
+             if(*std::min_element(bary.begin(),bary.end())<=.05f)continue;const auto hit=visibility.raycast(position+n*2,n*-1,4);if(!hit||hit->triangle!=0)continue;
+             std::array<float,2> uv{};for(size_t k=0;k<3;++k)for(size_t axis=0;axis<2;++axis)uv[axis]+=o.painted->mesh().uv[mesh.indices[k]][axis]*bary[k];
+-            const auto in=inputs(o,uv);const auto view=unit(vc(camera-position));const size_t role=pbr_role?0:1;
++            const auto in=inputs(o,*material_control,uv);const auto view=unit(vc(camera-position));const size_t role=pbr_role?0:1;
+             const std::array<D,4> normals{advanced_fixture::decode(source,0,bary,role),advanced_fixture::decode(source,0,bary,role,true),advanced_fixture::decode(source,0,bary,role,false,true),advanced_fixture::decode(source,0,bary,1-role)};
+             const auto target_normal=source_view?normals[0]:prepared_pixel_oracle::direction(o,0,bary,role);
+             double transfer_error=0;for(size_t c=0;c<3;++c)transfer_error=std::max(transfer_error,std::abs(target_normal[c]-normals[0][c]));
