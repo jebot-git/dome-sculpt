@@ -37,6 +37,8 @@ CreatorVrmAuthority::CreatorVrmAuthority(const std::vector<ObjectSurface> &objec
     if(cancel&&cancel())throw std::runtime_error("Creator VRM authority cancelled");
     if(o.groups.empty()||o.groups.back().id!=objects.front().groups.back().id||!o.groups.back().humanoid||o.groups.back().humanoid->encode()!=encoded)
       fail("creator group or saved recipe differs");
+    if(o.affine_edit||std::any_of(o.groups.begin(),o.groups.end(),[](const auto &g){return bool(g.affine_edit);}))
+      fail("creator physics refitting requires a similarity placement, not an arbitrary affine edit");
     // No arbitrary bind-space edits can borrow a creator genesis certificate.
     if(!o.deformation||!o.deformation->skeleton||o.deformation->skeleton->encode()!=shape_.skeleton().encode())
       fail("current rest rig differs from the actual creator recipe");

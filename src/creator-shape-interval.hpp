@@ -32,7 +32,7 @@ inline ShapeInterval interval_leg(ShapeInterval p,float hips,float c){auto f=[&]
 inline ShapeInterval interval_arm(ShapeInterval p,float shoulder,float c){auto f=[&](float x){if(std::abs(x)>shoulder)x+=(x<0?-1.f:1.f)*(std::abs(x)-shoulder)*c*.12f;return x;};return {ShapeInterval::down(f(p.lo)),ShapeInterval::up(f(p.hi))};}
 struct ShapeBox{ShapeInterval x,y,z;};
 inline ShapeInterval interval_abs(ShapeInterval v){return abs(v);}
-inline ShapeInterval interval_pow2(ShapeInterval v,float){return square(v);}
+inline ShapeInterval interval_pow2(ShapeInterval v,float){auto r=square(v);for(int k=0;k<4;++k){r.lo=ShapeInterval::down(r.lo);r.hi=ShapeInterval::up(r.hi);}r.lo=std::max(0.f,r.lo);return r;}
 inline ShapeInterval interval_exp(ShapeInterval v){return exp(v);}
 inline ShapeInterval interval_smooth(float a,float b,ShapeInterval v){return smooth(a,b,v);}
 }
