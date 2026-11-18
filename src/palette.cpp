@@ -431,6 +431,7 @@ void SpatialPalette::raster(const EditorState &s) {
       if (sector == 6 && r.topology && !r.selected.empty())
         return std::all_of(r.selected.begin(), r.selected.end(), [&](auto id) { return r.topology->vertices().at(id).pinned; });
     }
+    if(s.menu_page==33&&s.creator&&s.creator->settings.preset){const auto preset=*s.creator->settings.preset;if(sector>=3&&sector<=5)return int(preset)==sector-3;}
     if(s.menu_page==20){if(sector==0)return s.object_grab_mode;if(sector==3)return s.isolate_held;if(sector==4&&current!=s.objects.end())return current->visible;}
     if(s.menu_page==15) {
       if(sector==0) return s.sculpt_settings.mask_edit;
@@ -499,7 +500,7 @@ void SpatialPalette::raster(const EditorState &s) {
     if (!s.menu_enabled[i])
       for (int c = 0; c < 3; ++c)
         label_color[c] = uint8_t((int(fg[c]) + bg[c]) / 2);
-    const std::string label = s.menu_page==14&&i==7&&s.skin_options.mode==SkinAuthoringMode::SurfaceHeat&&s.selected_objects.size()>1 ? "Bind selected" : s.menu_page==16 && s.retopology && i==3 && s.retopology->selected.size()==4 ? "Bridge edges" : s.menu_page==16 && s.retopology && i==1 ? (s.retopology->extruding?"Extrude edge":s.retopology->moving?"Move points":"Place points") : s.menu_page==27?rig_fit_tool_label(s.rig_fit.get(),i):s.menu_page==25?projection_tool_label(s.projection.get(),i):s.menu_page==19&&i==0 ? (s.polygon?"Resume editing":s.polygon_has_source?"Edit / original":s.polygon_requires_conversion?"Convert / source":"Start editing") : s.menu_page == 16 && i == 0 && s.retopology ? "Resume patch" : s.menu_page == 15 && i == 0 && s.sculpt_settings.mask_edit ? "Resume mask" : labels[i];
+    const std::string label = s.menu_page==33&&i==2&&s.creator?(s.creator->settings.controls.baseline=="vroid-beta-female"?"Switch to male":"Switch to female"):s.menu_page==14&&i==7&&s.skin_options.mode==SkinAuthoringMode::SurfaceHeat&&s.selected_objects.size()>1 ? "Bind selected" : s.menu_page==16 && s.retopology && i==3 && s.retopology->selected.size()==4 ? "Bridge edges" : s.menu_page==16 && s.retopology && i==1 ? (s.retopology->extruding?"Extrude edge":s.retopology->moving?"Move points":"Place points") : s.menu_page==27?rig_fit_tool_label(s.rig_fit.get(),i):s.menu_page==25?projection_tool_label(s.projection.get(),i):s.menu_page==19&&i==0 ? (s.polygon?"Resume editing":s.polygon_has_source?"Edit / original":s.polygon_requires_conversion?"Convert / source":"Start editing") : s.menu_page == 16 && i == 0 && s.retopology ? "Resume patch" : s.menu_page == 15 && i == 0 && s.sculpt_settings.mask_edit ? "Resume mask" : labels[i];
     int cell = 102 * unit_;
     auto fitted = text_font_->layout(label, cell);
     size_t split = std::string::npos;
@@ -540,7 +541,13 @@ void SpatialPalette::raster(const EditorState &s) {
     text(320*unit_,295*unit_,view.settings?rig_fit_parameter_text(view):rig_fit_selection_label(view),fg);
     text(320*unit_,320*unit_,view.rest_source?std::to_string(view.bone_heads.size())+" original bones":rig_fit_selection_point(view)?std::to_string(view.landmarks.points.size())+" landmarks placed":"Not placed",fg);
   }
-  const char *page = s.menu_page==32 ? "Paint filters / controls" : s.menu_page==31 ? "Material texture sets" : s.menu_page==30 ? "Emission / HDR" : s.menu_page==29 ? "VRM1 expression preview" : s.menu_page==28 ? "Export / editable project" : s.menu_page==27 ? "Humanoid rig fitting" : s.menu_page==25 ? "Image projection" : s.menu_page==24 ? "Shapekey tools" : s.menu_page==22 ? "Polygon topology" : s.menu_page==19 ? "Polygon edit" : s.menu_page == 23 ? "Import options" : s.menu_page == 21 ? "Import model" : s.menu_page == 20 ? "Holding / isolation" : s.menu_page == 18 ? "Procedural sculpt" : s.menu_page == 17 ? "Plane cut" : s.menu_page == 16 ? "Retopology" : s.menu_page == 15 ? "Masks / symmetry" : s.menu_page == 14 ? "Bind / transfer skin"
+  if(s.menu_page==33&&s.creator){
+    const auto &view=*s.creator;
+    text(320*unit_,270*unit_,view.settings.controls.baseline=="vroid-beta-female"?"Female CC0":"Male CC0",fg);
+    text(320*unit_,300*unit_,humanoid_creator_parameter_text(view),fg);
+    text(320*unit_,330*unit_,"New avatar; existing edits kept",fg);
+  }
+  const char *page = s.menu_page==33 ? "Humanoid creator" : s.menu_page==32 ? "Paint filters / controls" : s.menu_page==31 ? "Material texture sets" : s.menu_page==30 ? "Emission / HDR" : s.menu_page==29 ? "VRM1 expression preview" : s.menu_page==28 ? "Export / editable project" : s.menu_page==27 ? "Humanoid rig fitting" : s.menu_page==25 ? "Image projection" : s.menu_page==24 ? "Shapekey tools" : s.menu_page==22 ? "Polygon topology" : s.menu_page==19 ? "Polygon edit" : s.menu_page == 23 ? "Import options" : s.menu_page == 21 ? "Import model" : s.menu_page == 20 ? "Holding / isolation" : s.menu_page == 18 ? "Procedural sculpt" : s.menu_page == 17 ? "Plane cut" : s.menu_page == 16 ? "Retopology" : s.menu_page == 15 ? "Masks / symmetry" : s.menu_page == 14 ? "Bind / transfer skin"
                      : s.menu_page == 13 ? "Skin weights"
                      : s.menu_page == 12 ? "Mesh baking"
                      : s.menu_page == 11 ? "Rig and shapekeys"
@@ -689,6 +696,7 @@ void SpatialPalette::draw(const EditorState &s, const Mat4 &vp) {
   signature+=":polygon:"+std::to_string(s.polygon_requires_conversion)+":"+std::to_string(s.polygon_has_source)+":"+std::to_string(s.polygon_controls.move_mode)+":"+std::to_string(s.polygon_controls.additive)+":"+std::to_string(s.polygon_controls.distance_mm)+":"+std::to_string(s.polygon_controls.cuts);
   if(s.polygon)signature+=":"+std::to_string(s.polygon->revision)+":"+std::to_string(s.polygon->busy)+":"+std::to_string(s.polygon->committing)+s.polygon->error;
   signature += ":procedural:"+std::to_string(s.procedural_options.seed)+":"+std::to_string(unsigned(s.procedural_options.pattern));
+  if(s.creator){const auto &v=*s.creator;signature+=":creator:"+std::to_string(v.session)+":"+std::to_string(v.parameter)+":"+v.settings.controls.baseline+":"+v.settings.name+":"+std::to_string(v.settings.preset?int(*v.settings.preset):-1)+":"+std::to_string(v.can_copy_selected)+":"+std::to_string(!v.undo.empty())+":"+std::to_string(!v.redo.empty())+humanoid_creator_parameter_text(v);}
   if(s.projection){signature+=":projection:"+std::to_string(s.projection->request)+":"+std::to_string(s.projection->selected)+":"+std::to_string(s.projection->parameter)+":"+std::to_string(int(s.projection->panel))+std::to_string(s.projection->settings.enabled)+std::to_string(s.projection->settings.preview)+std::to_string(int(s.projection->settings.image.usage))+std::to_string(s.projection->loading)+std::to_string(s.projection->browsing)+s.projection->error+projection_parameter_text(s.projection->settings,s.projection->parameter);if(s.projection->image)signature+=s.projection->image->name;}
   if(s.expressions){
     const auto &view=*s.expressions;

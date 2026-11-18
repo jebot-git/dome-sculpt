@@ -108,12 +108,6 @@ void create_humanoid_dialog(Document &document) {
   if (!context.accepted) return;
   std::string chosen_name = name.value();
   bool retain = keep.value();
-  document.edit_scene("Create humanoid", [controls, chosen_name, retain](Scene &scene, const auto &cancelled) {
-    if (!retain) scene = Scene{};
-    auto empty = scene.active().id;
-    CanvasTransform transform{}; transform.position.y = -controls.height * .5f;
-    append_humanoid(scene, controls, chosen_name, transform, 256, cancelled);
-    if (!retain) scene.erase(empty);
-  }, draft.source);
+  document.create_humanoid_avatar(controls,chosen_name,draft.source,retain);
 }
 } // namespace dome

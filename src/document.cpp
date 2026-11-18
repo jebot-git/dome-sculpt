@@ -208,6 +208,7 @@ bool Document::action_active_locked() const {
   return o.mesh_active ? o.painted->in_stroke() : volume().in_stroke();
 }
 bool Document::pending_locked() const {
+  if(state_.creator)return true;
   if(state_.expressions)return true;
   if(state_.polygon)return state_.polygon->changed||polygon_stroking_||polygon_pending_.load()!=0;
   if(state_.object_grabbing)return true;
@@ -687,6 +688,7 @@ void Document::publish_locked(bool force,bool checkpoint) {
   state_.can_blur_color_layer=command_enabled_locked(SpatialCommand::BlurColorLayer);
   state_.can_convert_bake=canonical_conversion_ready_locked();
   auto work=asset_status();state_.can_cancel_asset=state_.asset_busy && work.cancellable;
+  state_.can_cancel_asset|=bool(state_.creator);
   state_.can_cancel_asset|=projection_load_&&!projection_load_->done.load()&&!projection_load_->cancelled.load();
   const auto asset=asset_work_.load();
   state_.can_save_after_asset=state_.asset_busy&&asset&&asset->accepted_scene&&!asset->cancelled.load();
@@ -818,6 +820,7 @@ void Document::publish_locked(bool force,bool checkpoint) {
 }
 
 void Document::finish_locked() {
+  if(state_.creator)throw std::logic_error("Apply or cancel the humanoid creator before changing or saving the document");
   if(state_.expressions)throw std::logic_error("Apply or cancel expression preview before changing or saving the document");
   if(state_.polygon)throw std::logic_error("Apply or cancel polygon editing before changing the document");
   if(state_.object_grabbing)finish_object_grab_locked(true,false);
@@ -866,6 +869,7 @@ void Document::replace(Scene next, bool clean) {
   replace_locked(std::move(next), clean);
 }
 void Document::replace_locked(Scene next,bool clean,std::filesystem::path adopted_path,std::string message) {
+  if(state_.creator)end_humanoid_creator_locked(false);
   AuthorityTransition authority(*this);invalidate_object_authority_locked();state_.held_object=0;
   if(native_stroke_)cancel_native_locked();
   if(state_.cut){finish_control_locked(false);cancel_cut_locked();}
@@ -1052,6 +1056,7 @@ Vec3 Document::gradient(Vec3 p) const {
 }
 bool Document::undo() {
   std::lock_guard lock(model_mutex_);
+  if(state_.creator)return creator_history_locked(false);
   if(state_.polygon){if(polygon_accepting_||!state_.polygon->surface)return false;bool available=state_.polygon->can_undo||polygon_stroking_;PolygonJob job;job.action=polygon_stroking_?PolygonAction::CancelDrag:PolygonAction::Undo;queue_polygon_locked(std::move(job));polygon_stroking_=false;return available;}
   if(native_stroke_){cancel_native_locked();publish_locked();return true;}
   if(state_.cut){bool available=!cut_undo_.empty()||bool(control_before_);cut_history_locked(false);publish_locked();return available;}
@@ -1082,6 +1087,7 @@ bool Document::undo() {
 }
 bool Document::redo() {
   std::lock_guard lock(model_mutex_);
+  if(state_.creator)return creator_history_locked(true);
   if(state_.polygon){if(polygon_accepting_||polygon_stroking_||!state_.polygon->surface)return false;bool available=state_.polygon->can_redo;PolygonJob job;job.action=PolygonAction::Redo;queue_polygon_locked(std::move(job));return available;}
   if(state_.cut){bool available=!cut_redo_.empty()&&!control_before_;cut_history_locked(true);publish_locked();return available;}
   if (state_.retopology) {
@@ -1387,6 +1393,7 @@ void Document::rebase_space(std::optional<CanvasTransform> old_from_new) {
 }
 void Document::rebase_space_locked(std::optional<CanvasTransform> old_from_new,RetopoInputScope &admission) {
   if (!desktop_) {
+    if(state_.creator)end_humanoid_creator_locked(false);
     if(state_.expressions)end_expression_preview_locked(false);
     bool accepted_uv = uv_accept_pending_;
     if (!accepted_uv) finish_control_locked(false);
@@ -1421,6 +1428,7 @@ void Document::finish_spatial() {
   std::lock_guard lock(model_mutex_);
   RetopoInputScope admission(*this,bool(state_.retopology)||(input_.menu_open()&&input_.menu_page()==16));
   if (!desktop_) {
+    if(state_.creator)end_humanoid_creator_locked(false);
     if(state_.expressions)end_expression_preview_locked(false);
     bool accepted_uv = uv_accept_pending_;
     if (!accepted_uv) finish_control_locked(false);
@@ -1443,6 +1451,7 @@ void Document::process_locked(const SpatialFrame &incoming) {
     if(f.hands[i].tracked.trigger<=.02f)state_.selection_release[i]=false;
     else f.hands[i].tracked.trigger=0;
   }
+  if(state_.creator&&(!f.focused||!f.head_valid||!ob::finite(f.head)||!std::isfinite(f.time)||f.time<0)){state_.hands=detail::history_only_hands(state_.hands);end_humanoid_creator_locked(false);return;}
   if(process_rig_fit_spatial_locked(f)){return;}
   if(process_projection_spatial_locked(f)){return;}
   if(native_stroke_&&native_stroke_->spatial_owner){if(native_stroke_->space==NativeStrokeSpace::Ray)process_shape_spatial_locked(f);else process_affine_paint_spatial_locked(f);return;}
@@ -1455,6 +1464,7 @@ void Document::process_locked(const SpatialFrame &incoming) {
     if(state_.object_grabbing&&held_weight_pending_locked()){
       input_.cancel();held_preview_transform_=held_start_transform_;object_navigation_.reset();navigation_.reset();state_.hands=detail::history_only_hands(state_.hands);publish_locked(false,false);return;
     }
+    if(state_.creator)end_humanoid_creator_locked(false);
     if(state_.expressions)end_expression_preview_locked(false);
     bool accepted_uv = uv_accept_pending_;
     if (!accepted_uv) finish_control_locked(false);
@@ -1596,23 +1606,25 @@ void Document::process_locked(const SpatialFrame &incoming) {
     state_.hands=f.hands;
     // Mask page commands already end their gesture on menu entry. Retain the
     // live page so toggles and Fill can be followed by Resume without losing it.
-    if (!state_.retopology && !state_.cut && !sculpt_mask_command(*c) && !import_command(*c) && !projection_command(*c) && !preview_command(*c) && !rig_fit_command(*c) && !expression_command(*c) &&
+    if (!state_.retopology && !state_.cut && !sculpt_mask_command(*c) && !import_command(*c) && !projection_command(*c) && !preview_command(*c) && !rig_fit_command(*c) && !expression_command(*c) && !creator_command(*c) && !state_.creator &&
         !(input_.menu_page()==15 && *c==SpatialCommand::CancelWork) &&
         input_.menu_page()!=31 && input_.menu_page()!=30 && input_.menu_page()!=24 && input_.menu_page()!=18 && input_.menu_page()!=20 && input_.menu_page()!=19 && input_.menu_page()!=22 && !state_.polygon) finish_locked();
+    const bool creator_owned_command=bool(state_.creator)||creator_command(*c);
     auto command_publication=published_.load();
     command_locked(*c);
-    import_published=(import_command(*c)||projection_command(*c)||rig_fit_command(*c)||expression_command(*c)||
+    import_published=(import_command(*c)||projection_command(*c)||rig_fit_command(*c)||expression_command(*c)||creator_owned_command||
                       *c==SpatialCommand::RetopoBegin||*c==SpatialCommand::RetopoApply||*c==SpatialCommand::RetopoCancel)&&
                      published_.load()!=command_publication;
     if((command_page==31&&*c!=SpatialCommand::TexturePickFaces)||(command_page==30)||(command_page==20)||(command_page==24&&*c!=SpatialCommand::ShapeSculpt)){input_.retain_page(command_page,command_owner,command_sector);publish_locked(false,false);}
     // Opening/Apply/Cancel already published this frame's actual hands and
     // immutable owner. Do not reinterpret simultaneous history against the
     // newly opened/closed namespace or add a fallible second publication.
-    if(import_published&&(*c==SpatialCommand::RetopoBegin||*c==SpatialCommand::RetopoApply||*c==SpatialCommand::RetopoCancel))return;
+    if(import_published&&(creator_owned_command||*c==SpatialCommand::RetopoBegin||*c==SpatialCommand::RetopoApply||*c==SpatialCommand::RetopoCancel))return;
   }
 
   if (undo_requested) {
-    if(state_.polygon){polygon_command_locked(SpatialCommand::Undo);
+    if(state_.creator){creator_history_locked(false);
+    }else if(state_.polygon){polygon_command_locked(SpatialCommand::Undo);
     } else if(state_.cut){cut_history_locked(false);
     } else if (state_.retopology) {
       if (!retopo_accepting_ && state_.retopology->source) {
@@ -1629,7 +1641,8 @@ void Document::process_locked(const SpatialFrame &incoming) {
     }
   }
   if (redo_requested) {
-    if(state_.polygon){polygon_command_locked(SpatialCommand::Redo);
+    if(state_.creator){creator_history_locked(true);
+    }else if(state_.polygon){polygon_command_locked(SpatialCommand::Redo);
     } else if(state_.cut){cut_history_locked(true);
     } else if (state_.retopology) {
       if (!retopo_accepting_ && !retopo_stroking_ && state_.retopology->source) queue_retopology_locked(RetopoAction::Redo);
@@ -1640,7 +1653,7 @@ void Document::process_locked(const SpatialFrame &incoming) {
       undo_locked(true);
     }
   }
-  if(!state_.selection_mode&&state_.shape_sculpt)process_shape_spatial_locked(f);
+  if(!state_.creator&&!state_.selection_mode&&state_.shape_sculpt)process_shape_spatial_locked(f);
   state_.hands = f.hands;
   // Detached import/image admission already published the current hands/menu. A second
   // fallible publication must not report failure after accepting its file job.
@@ -1651,6 +1664,7 @@ void Document::process_locked(const SpatialFrame &incoming) {
 }
 void Document::cancel_spatial_menu() {
   std::lock_guard lock(model_mutex_);
+  if(state_.creator){end_humanoid_creator_locked(false);return;}
   RetopoInputScope admission(*this,bool(state_.retopology)||(input_.menu_open()&&input_.menu_page()==16));
   finish_control_locked(false);
   if (!desktop_)
@@ -2277,6 +2291,7 @@ void Document::request_save(bool export_mesh) {
   file_locked(export_mesh);
 }
 bool Document::parameter_enabled_locked(VrParameter parameter) const {
+  if(state_.creator||parameter==VrParameter::CreatorValue)return parameter==VrParameter::CreatorValue&&creator_source_matches_locked()&&!state_.asset_busy&&!control_before_;
   if(parameter==VrParameter::ShapeMirror){const auto &o=scene_.active();return shape_target_ready_locked()&&o.deformation&&o.deformation->morphs&&state_.morph_target<o.deformation->morphs->targets.size();}
   if(parameter==VrParameter::MorphWeight&&state_.shape_sculpt)return false;
   if(parameter==VrParameter::ShapeRestore)return state_.can_restore_shapes;
@@ -2343,6 +2358,7 @@ bool Document::parameter_enabled_locked(VrParameter parameter) const {
   return true;
 }
 void Document::finish_control_locked(bool accept) {
+  if(state_.controls.parameter==VrParameter::CreatorValue){finish_creator_control_locked(accept);return;}
   if (!control_before_)
     return;
   if(control_before_->object(control_object_).texture_sets&&detail::texture_set_control(state_.controls.parameter)){
@@ -2579,6 +2595,7 @@ void Document::finish_control_locked(bool accept) {
 }
 
 void Document::control_event_locked(VrControlEvent event) {
+  if(event.parameter==VrParameter::CreatorValue){creator_control_locked(event);return;}
   if(event.type==VrControlEventType::Begin&&event.parameter==VrParameter::ShapeMirror){
     finish_control_locked(false);
     if(!parameter_enabled_locked(event.parameter))throw std::logic_error("Choose an editable shapekey before mirroring");
@@ -3101,6 +3118,8 @@ void Document::control_event_locked(VrControlEvent event) {
 }
 
 bool Document::command_enabled_locked(SpatialCommand command) const {
+  if(creator_command(command)||state_.creator)return creator_command_enabled_locked(command);
+  if(state_.creator||creator_command(command))return creator_command_enabled_locked(command);
   if(command==SpatialCommand::BlurColorLayer){
     const auto&o=scene_.active();const auto field=o.painted?active_texture_set(o):TextureSetView{};
     return !state_.asset_busy&&!state_.recovery_busy&&!control_before_&&!action_active_locked()&&!state_.polygon&&!state_.cut&&!state_.retopology&&!state_.expressions&&!state_.object_grabbing&&!uv_&&object_editable_locked(o.id)&&o.mesh_active&&field.painted&&field.painted->gpu_color_blur_eligible();
@@ -3320,6 +3339,10 @@ void Document::sculpt_command(SpatialCommand command) {
   if(published_.load()==publication)publish_locked();
 }
 void Document::command_locked(SpatialCommand command) {
+  if(creator_command(command)||(state_.creator&&(command==SpatialCommand::Undo||command==SpatialCommand::Redo||command==SpatialCommand::CancelWork))){creator_command_locked(command);return;}
+  if(state_.creator&&command!=SpatialCommand::Center)return;
+  if(creator_command(command)||(state_.creator&&(command==SpatialCommand::Undo||command==SpatialCommand::Redo||command==SpatialCommand::CancelWork))){creator_command_locked(command);return;}
+  if(state_.creator&&command!=SpatialCommand::Center)return;
   if(command==SpatialCommand::BlurColorLayer){if(command_enabled_locked(command)){PaintBlurOptions options;options.strength=state_.paint.flow;queue_blur_color_locked(options);}return;}
   if(texture_set_command(command)){texture_set_command_locked(command);return;}
   if(expression_command(command)){expression_command_locked(command);return;}
@@ -3485,11 +3508,7 @@ void Document::command_locked(SpatialCommand command) {
     if (!command_enabled_locked(command)) return;
     if (command == SpatialCommand::CreateFemale || command == SpatialCommand::CreateMale) {
       std::string baseline = command == SpatialCommand::CreateFemale ? "vroid-beta-female" : "vroid-beta-male";
-      queue_scene_operation_locked("Create humanoid", [baseline](Scene &scene, const auto &cancelled) {
-        auto controls = humanoid_baseline_defaults(baseline);
-        CanvasTransform transform{}; transform.position.y = -controls.height * .5f;
-        append_humanoid(scene, controls, "Humanoid", transform, 256, cancelled);
-      }, {}, {});
+      create_humanoid_avatar_locked(humanoid_baseline_defaults(baseline),"Humanoid",{},true);
     } else {
       auto group = scene_.active().group;
       bool erase = command == SpatialCommand::DeleteGroup;
