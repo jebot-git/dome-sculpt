@@ -52,7 +52,9 @@ async def main():
   while True:
    nodes=await layout()
    if label in nodes and nodes[label][1].get('enabled',True):break
-   if time.monotonic()>=deadline:raise TimeoutError('Native universal command remained unavailable: '+label)
+   if time.monotonic()>=deadline:
+    (out/'menu-unavailable.json').write_text(json.dumps({'requested':label,'actual_nodes':nodes},indent=2)+'\n')
+    raise TimeoutError('Native universal command remained unavailable: '+label)
    await asyncio.sleep(.04)
   check(label in nodes and nodes[label][1].get('enabled',True),'Actual native universal command available: '+label);stamp=project.stat().st_mtime_ns;await menu.call_event(nodes[label][0],'clicked',Variant('i',0),0)
   if label=='Save':await wait(lambda:project.stat().st_mtime_ns!=stamp)
