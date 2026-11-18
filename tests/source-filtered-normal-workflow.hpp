@@ -126,9 +126,6 @@ int run(const std::filesystem::path &folder,const std::filesystem::path &old,uin
  }
  positive(before(false,true,true,SourceNormalUvMethod::RetainSource,true),resolution,folder);++positives;
  require(positives==17&&refusals==8,"All original64 retained refusals and separately named genuine higher-target-resolution families execute");
- for(auto method:{SourceNormalUvMethod::Rasterize,SourceNormalUvMethod::RetainSource})advanced_source::negatives(method);
- advanced_source::ancestor_guards(folder);
- require(advanced_source::checks>0,"Current filtered workflow retains the actual source adapter ownership, replay, ancestor quota and cancellation regressions");
  std::cout<<"PASS "<<checks<<" filtered Bake workflow positives="<<positives<<" original64_refusals="<<refusals<<" target_resolution="<<resolution<<"\n";return 0;
 }
 } // namespace filtered_workflow

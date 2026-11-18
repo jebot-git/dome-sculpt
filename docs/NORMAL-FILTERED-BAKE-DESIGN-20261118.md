@@ -79,8 +79,13 @@ manifests identify the selected target size, source64 and checked policy1. All68
 views keep their four original probes, independent directions and material
 controls. The original failed executions remain separate retained evidence.
 
-The registered source-advanced-normal-bake CTest now invokes the explicit checked
-workflow with the real legacy fixture and selected1024 target. The old per-texel
-acceptance helper remains preserved; it does not authorize a new policy1 Bake at
-64. Current CTest retains the original source-adapter ownership, replay, ancestor
-quota and cancellation regressions after its new refusal/recovery matrix.
+The stronger --filtered-workflow path is registered as source-advanced-normal-bake,
+with the real legacy fixture and explicitly selected1024 target. The COMPLETE historical17-family suite remains
+registered separately as source-advanced-normal-bake-legacy: its target Bake
+requests explicitly select persisted policy0, preserving all original texel,
+material, source-ownership, Save, Undo/Redo, ancestor-budget and cancellation
+checks. Its old64 inputs are not new-policy positives. Both suites must pass;
+run ctest -R '^source-advanced-normal-bake(-legacy)?$' --output-on-failure.
+The current policy1 suite independently requires the eight real64 refusals,
+seventeen explicit higher-resolution recovery/positive families and ordinary
+mesh/sculpt coverage. No old default1 known failure needs to be relabeled.

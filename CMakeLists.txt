@@ -178,7 +178,9 @@ if(BUILD_TESTING)
   add_test(NAME source-advanced-normal-bake COMMAND dome-sculpt-source-advanced-normal-bake-test
     --filtered-workflow ${CMAKE_CURRENT_BINARY_DIR}/source-advanced-normal-bake
     ${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/normal-filter-legacy64-retained.dsculpt 1024)
-  set_tests_properties(source-advanced-normal-bake PROPERTIES TIMEOUT 900)
+  add_test(NAME source-advanced-normal-bake-legacy COMMAND dome-sculpt-source-advanced-normal-bake-test
+    ${CMAKE_CURRENT_BINARY_DIR}/source-advanced-normal-bake-legacy)
+  set_tests_properties(source-advanced-normal-bake source-advanced-normal-bake-legacy PROPERTIES TIMEOUT 900)
   # Additive native producer; public GUI/XR execution is an explicit owning gate.
   add_executable(dome-sculpt-source8-public-fixture tests/source8-public-fixture.cpp)
   target_include_directories(dome-sculpt-source8-public-fixture PRIVATE src)
