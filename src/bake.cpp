@@ -379,7 +379,10 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
       if(float_emission){emission[at]={{},channels.emission,1};emission[at].validate();}
       auto pbr_color=m.maps&&m.maps->overlay?material(m,source.mesh,hit->triangle,hit->barycentric,high_uv,true).color:channels.color;
       const bool resolved_source=m.maps&&!m.maps->pbr_color.rgba.empty();
-      if(o.separate_pbr_color&&resolved_source)pbr_color=sample(m.maps->pbr_color,high_uv,false,true);
+      if(o.separate_pbr_color&&resolved_source){
+        const auto pbr_uv=m.maps->overlay?detail::source_overlay_coordinates(*m.maps->overlay,hit->triangle,hit->barycentric,high_uv):high_uv;
+        pbr_color=sample(m.maps->pbr_color,pbr_uv,false,true);
+      }
       if(!source.colors.empty()){
         std::array<float,4> tint{};for(int i=0;i<3;++i)for(int c=0;c<4;++c)tint[c]+=source.colors[source.mesh.indices[hit->triangle*3+i]][c]*hit->barycentric[i];
         for(int c=0;c<4;++c){if(!o.separate_pbr_color)channels.color[c]*=tint[c];else if(!resolved_source)pbr_color[c]*=tint[c];}
