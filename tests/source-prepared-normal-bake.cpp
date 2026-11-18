@@ -101,7 +101,7 @@ void advanced_recipe_guards(const Scene &baseline,uint64_t source,const ObjectBa
 
 void run_case(bool legacy,bool posed,const std::filesystem::path &folder){
  auto f=fixture(legacy,posed);auto mesh=f.scene.object(f.source).deformation->preview(f.scene.object(f.source).painted->mesh());
- const auto first=target(f.scene,mesh,legacy);ObjectBakeSettings options;options.normal_filter_quality=0;options.prepare_normals=true;options.normal_error=.03f;options.front_mm=options.back_mm=300;options.ao_samples=0;options.padding=0;
+ const auto first=target(f.scene,mesh,legacy);ObjectBakeSettings options;options.normal_filter_quality=0;options.emission_transport=0;options.prepare_normals=true;options.normal_error=.03f;options.front_mm=options.back_mm=300;options.ao_samples=0;options.padding=0;
  const auto initial=bake_object(f.scene,f.source,options);check(initial.projected&&f.scene.object(first).painted->normal_projection(),"First genuine artist Bake produces a prepared source with explicit current normal planes");
  const auto before=f.scene.encode();const auto prepared=f.scene.object(first).painted;const auto binding=f.scene.object(first).material_bindings;
  const auto resolver=detail::source_bake_normals(f.scene.object(first),{});check(bool(resolver),"Prepared source exposes its actual owned frame/coordinate resolver");

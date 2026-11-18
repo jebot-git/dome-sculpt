@@ -18,5 +18,9 @@ struct ObjectBakeSettings {
   // recipe fields decode to 0. New requests default to version1: additionally
   // check sampled filtered transfer fidelity at the explicitly chosen grid.
   uint32_t normal_filter_quality=1;
+  // 0 preserves historical one-grid HDR Bake semantics. New requests retain
+  // certified source emission knots or check actual continuous FLOAT fidelity.
+  // Missing persisted settings decode to0, independently of normal quality.
+  uint32_t emission_transport=1;
 };
 } // namespace dome

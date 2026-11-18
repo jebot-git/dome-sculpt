@@ -35,7 +35,7 @@ void ObjectBakeRecipe::validate()const{
       throw std::invalid_argument("Invalid bake recipe distance");
   if(settings.ao_samples>256||settings.padding>64||
       !std::isfinite(settings.color_error)||settings.color_error<0||settings.color_error>1||
-      !std::isfinite(settings.normal_error)||settings.normal_error<0||settings.normal_error>.25f||settings.normal_filter_quality>1)
+      !std::isfinite(settings.normal_error)||settings.normal_error<0||settings.normal_error>.25f||settings.normal_filter_quality>1||settings.emission_transport>1)
     throw std::invalid_argument("Invalid bake recipe quality");
 }
 nlohmann::json ObjectBakeRecipe::encode()const{
@@ -48,6 +48,7 @@ nlohmann::json ObjectBakeRecipe::encode()const{
       {"color_error",s.color_error},{"prepare_normals",s.prepare_normals},{"normal_error",s.normal_error}}}};
   // Omit policy0 so genuine legacy recipes reencode byte-equivalent JSON.
   if(s.normal_filter_quality)out["settings"]["normal_filter_quality"]=s.normal_filter_quality;
+  if(s.emission_transport)out["settings"]["emission_transport"]=s.emission_transport;
   return out;
 }
 std::shared_ptr<const ObjectBakeRecipe> ObjectBakeRecipe::decode(const nlohmann::json &j){
@@ -56,7 +57,7 @@ std::shared_ptr<const ObjectBakeRecipe> ObjectBakeRecipe::decode(const nlohmann:
   auto result=std::make_shared<ObjectBakeRecipe>();result->source=decode_reference(j.at("source"));
   if(!j.at("cage").is_null())result->cage=decode_reference(j.at("cage"));
   const auto &v=j.at("settings");auto &s=result->settings;
-  if(!v.is_object()||v.size()!=11+size_t(v.contains("normal_filter_quality")))throw std::invalid_argument("Incomplete bake recipe settings");
+  if(!v.is_object()||v.size()!=11+size_t(v.contains("normal_filter_quality"))+size_t(v.contains("emission_transport")))throw std::invalid_argument("Incomplete bake recipe settings");
   auto real=[&](const char *key){if(!v.at(key).is_number())throw std::invalid_argument("Invalid bake recipe scalar");return v.at(key).get<float>();};
   auto flag=[&](const char *key){if(!v.at(key).is_boolean())throw std::invalid_argument("Invalid bake recipe flag");return v.at(key).get<bool>();};
   s.front_mm=real("front_mm");s.back_mm=real("back_mm");s.ao_distance_mm=real("ao_distance_mm");
@@ -66,6 +67,8 @@ std::shared_ptr<const ObjectBakeRecipe> ObjectBakeRecipe::decode(const nlohmann:
   s.allow_partial=flag("allow_partial");s.allow_backfaces=flag("allow_backfaces");
   s.prepare_colors=flag("prepare_colors");s.color_error=real("color_error");
   s.prepare_normals=flag("prepare_normals");s.normal_error=real("normal_error");
+  s.emission_transport=0;
+  if(v.contains("emission_transport")){const auto policy=number(v.at("emission_transport"));if(policy!=1)throw std::invalid_argument("Unsupported saved emission transport policy");s.emission_transport=uint32_t(policy);}
   s.normal_filter_quality=0;
   if(v.contains("normal_filter_quality")){
     const auto policy=number(v.at("normal_filter_quality"));

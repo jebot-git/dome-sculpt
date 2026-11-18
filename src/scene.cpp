@@ -1,3 +1,4 @@
+#include "baked-emission-domain.hpp"
 #include "texture-set-field-source.hpp"
 #include "texture-set-field-codec.hpp"
 #include "texture-set-source-preflight.hpp"
@@ -201,6 +202,7 @@ Scene Scene::snapshot() const {
   return result;
 }
 void Scene::validate(bool deep_sources) const {
+  for(const auto &o:objects_)if(o.painted&&o.painted->baked()&&o.painted->baked()->emission_domain)o.painted->baked()->emission_domain->validate_current(o.painted->mesh_owner(),o.painted->resolution());
   detail::validate_texture_set_graph(*this);
   detail::ColorBoundScope color_bound_scope;
   if (objects_.empty() || objects_.size() > 256)
@@ -704,6 +706,8 @@ nlohmann::json Scene::encode() const {
   j["source_images"] = source_images.encode();
   j["source_models"] = source_models.encode();
   baked_emission_write.publish(*this);
+  if(baked_emission_write.domain_emitted())
+    return {{"format","dome-sculpt"},{"version",43},{"payload",std::move(j)}};
   if(baked_emission_write.source_bake_emitted())
     return {{"format","dome-sculpt"},{"version",42},{"payload",std::move(j)}};
   if(baked_emission_write.emitted())
@@ -712,16 +716,18 @@ nlohmann::json Scene::encode() const {
 }
 Scene Scene::decode(const nlohmann::json &j) {
   detail::NativeReadScope::check();
-  if(j.is_object()&&j.contains("version")&&(j.at("version")==41||j.at("version")==42)){
-    const bool source_bake=j.at("version")==42;
+  if(j.is_object()&&j.contains("version")&&(j.at("version")==41||j.at("version")==42||j.at("version")==43)){
+    const bool domain=j.at("version")==43;
+    const bool source_bake=j.at("version")==42||domain;
     if(j.size()!=3||!j.at("version").is_number_integer()||j.at("format")!="dome-sculpt"||!j.at("payload").is_object()||
        !j.at("payload").at("version").is_number_integer()||
        j.at("payload").at("version").get<int64_t>()<2||
        j.at("payload").at("version").get<int64_t>()>40)
       throw std::invalid_argument("Scene41 requires one genuine prior owning scene, not nested envelopes");
-    detail::BakedEmissionReadCapability capability(source_bake);
+    detail::BakedEmissionReadCapability capability(source_bake,domain);
     auto result=decode_owning(j.at("payload"),&capability);
-    if(source_bake){if(!capability.admitted_source_bake_)throw std::invalid_argument("Scene42 requires genuine decoded source Bake ownership");}
+    if(domain){if(!capability.admitted_domain_)throw std::invalid_argument("Scene43 requires genuine decoded retained emission ownership");}
+    else if(source_bake){if(!capability.admitted_source_bake_)throw std::invalid_argument("Scene42 requires genuine decoded source Bake ownership");}
     else if(!capability.admitted_)throw std::invalid_argument("Scene41 requires genuine decoded FLOAT baked emission ownership");
     return result;
   }

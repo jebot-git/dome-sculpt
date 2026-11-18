@@ -4024,7 +4024,7 @@ if(BUILD_TESTING AND TARGET dome-sculpt AND TARGET dome-sculpt-test-runtime)
   set_tests_properties(bake-recipes-openxr PROPERTIES TIMEOUT 600)
 endif()
 
-target_sources(dome-sculpt-core PRIVATE src/baked-normal-field.cpp src/baked-normal-archive.cpp src/canonical-normal-uv.cpp src/canonical-native-pose.cpp)
+target_sources(dome-sculpt-core PRIVATE src/baked-emission-domain.cpp src/baked-normal-field.cpp src/baked-normal-archive.cpp src/canonical-normal-uv.cpp src/canonical-native-pose.cpp)
 if(BUILD_TESTING)
   foreach(case IN ITEMS canonical-native-pose layered-normal-archive-faults canonical-normal-uv layered-normal-uv-safety baked-normal-field baked-normal-field-faults canonical-normal-conversion canonical-normal-conversion-faults canonical-normal-owning canonical-normal-owning-faults)
     add_executable(dome-sculpt-${case}-test tests/${case}.cpp)

@@ -18,6 +18,7 @@
 #include "source4-baked.hpp"
 #include "source-bake-normal.hpp"
 #include "bake-filtered-normal-quality.hpp"
+#include "bake-filtered-emission-quality.hpp"
 namespace dome {
 ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
                               ObjectBakeSettings settings,
@@ -56,7 +57,7 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   // owners before sampling. It preserves both stored roles, not raw pixels.
   if(!std::isfinite(settings.color_error)||settings.color_error<0||settings.color_error>1)
     throw std::invalid_argument("Invalid vertex-color preparation tolerance");
-  if(!std::isfinite(settings.normal_error)||settings.normal_error<0||settings.normal_error>.25f||settings.normal_filter_quality>1)
+  if(!std::isfinite(settings.normal_error)||settings.normal_error<0||settings.normal_error>.25f||settings.normal_filter_quality>1||settings.emission_transport>1)
     throw std::invalid_argument("Invalid normal preparation angular tolerance");
   for (auto mm : {settings.front_mm, settings.back_mm, settings.ao_distance_mm})
     if (!std::isfinite(mm) || mm < 0 || mm > 100'000)
@@ -184,7 +185,13 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
         target.painted->mesh(),low_mesh,cancelled);
   const auto retained_uv=target.material_bindings?target.material_bindings->canonical_uv:nullptr;
   if(retained_uv&&progress)options.progress=[&](float value){progress(.1f+.4f*value);};
+  std::shared_ptr<const detail::BakedEmissionDomain> emission_domain;
+  if(settings.emission_transport&&high.materials[0].resolved_emission){
+    try{emission_domain=detail::BakedEmissionDomain::capture(scene,source_id,target.painted->mesh_owner(),options.resolution,target_world,cancelled);}
+    catch(const std::invalid_argument&){/* Uncertified correspondence keeps the independently checked raster route. */}
+  }
   auto result = detail::bake_mesh_source_normals(low_mesh,high,options,source_normals);
+  if(settings.emission_transport)detail::verify_filtered_emission_quality(low_mesh,high,options,result,emission_domain);
   auto verify_filtered=[&](const Mesh &mesh,const BakeOptions &policy,BakeResult &candidate){
     if(prepared_normals&&settings.normal_filter_quality==1){
       const auto frames=target.material_bindings->normal_frames;
@@ -234,7 +241,8 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   if(prepared_normals)textures.normal_interpretation=BakedNormalInterpretation::PreparedAttributes;
   if(separate)textures.color_interpretation=BakedColorInterpretation::ResolvedPbr;
   textures.maps = std::move(result.maps);
-  textures.emission_field=std::move(result.emission_field);
+  textures.emission_domain=std::move(emission_domain);
+  if(!textures.emission_domain)textures.emission_field=std::move(result.emission_field);
   textures.maps.normal = std::move(result.normal);
   textures.coverage.reserve(result.coverage.size());
   for (auto c : result.coverage) textures.coverage.push_back(c==1 || c==2 ? 255 : 0);

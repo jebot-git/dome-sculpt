@@ -75,6 +75,7 @@ void main(){
  Resource build(std::shared_ptr<const PaintOverlayPacket> packet,bool pbr,size_t budget,size_t working_budget){
   Resource result;result.owner=std::move(packet);result.pbr=pbr;result.resolution=result.owner->resolution();const auto &input=*result.owner;
   if(input.empty())return result;
+  if(input.baked()&&input.baked()->emission_domain)throw std::invalid_argument("Retained HDR domain requires its independent fragment sampling adapter");
   const size_t grid=size_t(input.resolution()/32)*(input.resolution()/32),pixels=size_t(input.resolution())*input.resolution();
   size_t mip_pixels=0;for(size_t width=input.resolution();;width=std::max(size_t(1),width/2)){mip_pixels+=width*width;if(width==1)break;}result.bytes=mip_pixels*16*5;
   if(result.bytes>budget)throw std::length_error("GPU overlay byte budget exceeded");
