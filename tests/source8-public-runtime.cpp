@@ -137,6 +137,7 @@ std::string mirror_mode(){auto p=getenv("DOME_XR_FIXTURE_MIRROR");return p?p:"";
 int mirror_method(){auto p=getenv("DOME_XR_FIXTURE_MIRROR_METHOD");return p?std::clamp(std::atoi(p),0,2):0;}
 bool mirror_click(){return frame==8||frame==14||frame==20||frame==26||frame==32;}
 int mirror_sector(){if(frame>=12&&frame<=14)return 8;if(frame>=18&&frame<=20)return 9;if(frame>=24&&frame<=26)return 7;if(frame>=30&&frame<=32)return 3;return -1;}
+std::string advanced_uv_mode(){auto mode=getenv("DOME_XR_ADVANCED_UV");return mode?mode:"";}
 std::string corner_uv_mode(){auto mode=getenv("DOME_XR_FIXTURE_CORNER_UV");return mode?mode:"";}
 std::string rig_fit_mode(){auto p=getenv("DOME_XR_FIXTURE_RIG_FIT");return p?p:"";}
 bool rig_fit_click(){return frame==8||frame==14||frame==20||frame==26||frame==32||frame==38||frame==58;}
@@ -552,6 +553,16 @@ FN(ReleaseSwapchainImage, XrSwapchain p, const XrSwapchainImageReleaseInfo *) {
       std::ofstream capture(std::string(path)+".selection-"+std::to_string(frame)+".ppm",std::ios::binary);
       capture<<"P6\n"<<s->width<<' '<<s->height<<"\n255\n";
       for(int y=int(s->height)-1;y>=0;--y)for(unsigned x=0;x<s->width;++x)for(int c=0;c<3;++c)capture.put(char(displayed(bytes[(size_t(y)*s->width+x)*4+c])));
+    }
+  }
+  if(!advanced_uv_mode().empty()&&(frame==14||frame==16||frame==19||frame==25||frame==27)){
+    if(const auto path=getenv("DOME_XR_FIXTURE_REPORT")){
+      const auto key=std::to_string(frame)+"-"+std::to_string(s->eye);
+      const auto target=std::string(path)+".advanced-uv-"+key+".ppm";
+      std::ofstream image(target,std::ios::binary);image<<"P6\n"<<s->width<<' '<<s->height<<"\n255\n";
+      for(int y=int(s->height)-1;y>=0;--y)for(unsigned x=0;x<s->width;++x)for(int c=0;c<3;++c)image.put(char(displayed(bytes[(size_t(y)*s->width+x)*4+c])));
+      std::ofstream raw(target+".rgba",std::ios::binary);raw.write(reinterpret_cast<const char*>(bytes.data()),std::streamsize(bytes.size()));
+      report["advanced_uv_captures"][key]={{"ppm",target},{"rgba",target+".rgba"},{"width",s->width},{"height",s->height}};
     }
   }
   if(!field_mode().empty()){
@@ -1189,7 +1200,10 @@ FN(GetActionStateFloat, XrSession, const XrActionStateGetInfo *p,
     if (getenv("DOME_XR_FIXTURE_UV"))
       stroke = frame == 14 || frame == 20;
     if (const auto mode=getenv("DOME_XR_FIXTURE_NORMAL_DOMAIN"))
-      stroke = frame==15 || frame==18 || (std::string_view(mode)!="focus" && frame==26);
+      {const auto advanced=advanced_uv_mode();
+       stroke=(frame==15&&(advanced.empty()||advanced=="RetainSource"))||frame==18||(std::string_view(mode)!="focus"&&frame==26);
+       if(!advanced.empty()&&stroke)report["advanced_uv_pressures"].push_back({{"frame",frame},{"action",a->name},{"pressure",.9}});
+      }
     if (getenv("DOME_XR_FIXTURE_LAYERS"))
       stroke = frame >= 18 && frame <= 20;
     if (getenv("DOME_XR_FIXTURE_RESTART"))
@@ -1337,7 +1351,7 @@ FN(GetActionStateVector2f, XrSession, const XrActionStateGetInfo *p,
     if (frame >= 15 && frame <= 18)
       out->currentState = {-1, 0};
     if(getenv("DOME_XR_FIXTURE_NORMAL_DOMAIN"))
-      out->currentState=frame>=20&&frame<=23?XrVector2f{-1,0}:frame>=15?XrVector2f{0,0}:out->currentState;
+      out->currentState=!advanced_uv_mode().empty()?(frame>=15?XrVector2f{0,0}:out->currentState):frame>=20&&frame<=23?XrVector2f{-1,0}:frame>=15?XrVector2f{0,0}:out->currentState;
   }
   if (getenv("DOME_XR_FIXTURE_LAYERS") && right(p->subactionPath) &&
       a->name == "right_stick") {
@@ -1565,9 +1579,10 @@ FN(LocateSpace, XrSpace handle, XrSpace, XrTime, XrSpaceLocation *p) {
   }
   if (const auto mode=getenv("DOME_XR_FIXTURE_NORMAL_DOMAIN");mode && s->action &&
       s->action->name=="aim_pose" && right(s->hand) && (frame==15||frame==18||frame==26)) {
-    const float x=frame==15?55:frame==18?178:std::string_view(mode)=="cancel"?170:470;
+    const float x=frame==15?55:frame==18?(!advanced_uv_mode().empty()?366:178):std::string_view(mode)=="cancel"?170:470;
     const float y=frame==15?(getenv("DOME_XR_FIXTURE_PAINT_DOMAIN")?322:270):frame==18?85:609;
     p->pose.position={.045f+(x/640-.5f)*.6f,1.56f+(.5f-y/640)*.6f,-.3f};
+    if(!advanced_uv_mode().empty())report["advanced_uv_aims"].push_back({{"frame",frame},{"x",x},{"y",y}});
   }
   if (auto mode = voxel_mode(); !mode.empty() && s->action &&
       s->action->name == "aim_pose" && right(s->hand) &&

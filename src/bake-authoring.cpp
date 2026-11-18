@@ -48,9 +48,11 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
     throw std::invalid_argument("Choose a different source object for baking");
   if (!target.visible || target.locked || !target.mesh_active || !target.painted)
     throw std::logic_error("Show, unlock and prepare the target painting mesh before baking");
-  if(source.mesh_active&&source.painted&&
-      source.painted->baked()&&source.painted->baked()->normal_field)
-    throw std::invalid_argument("Select a source without prepared normal attributes for this bake; source-frame transport is required and both objects are retained");
+  if(source.mesh_active&&source.painted&&source.painted->baked()&&source.painted->baked()->normal_field&&
+      (!source.material_bindings||!source.material_bindings->canonical_attributes))
+    throw std::invalid_argument("Independent normal-field source requires its actual canonical attribute owner");
+  // The source adapter below authenticates the actual field/current frame/UV
+  // owners before sampling. It preserves both stored roles, not raw pixels.
   if(!std::isfinite(settings.color_error)||settings.color_error<0||settings.color_error>1)
     throw std::invalid_argument("Invalid vertex-color preparation tolerance");
   if(!std::isfinite(settings.normal_error)||settings.normal_error<0||settings.normal_error>.25f)

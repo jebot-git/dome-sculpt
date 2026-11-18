@@ -1,6 +1,8 @@
 #include "paint-overlay-packet.hpp"
 #include "emission-authority.hpp"
 #include "source-bake-normal.hpp"
+#include "dome/normal-sampling.hpp"
+#include "baked-normal-field.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/bake.hpp"
 #include "dome/mesh-processing.hpp"
@@ -135,7 +137,7 @@ double edge(std::array<float,2> a,std::array<float,2> b,std::array<float,2> p) {
 bool top_left(std::array<float,2> a,std::array<float,2> b) {
   return b[1]>a[1]||(b[1]==a[1]&&b[0]<a[0]);
 }
-void validate(const Mesh &low,const BakeSource &source,const BakeOptions &o) {
+void validate(const Mesh &low,const BakeSource &source,const BakeOptions &o,const detail::SourceBakeNormalResolver &source_normals) {
   if (low.positions.size()>2'000'000||low.indices.size()/3>2'000'000) throw std::length_error("Low bake mesh exceeds surface limits");
   low.validate(); source.mesh.validate();
   for (auto n:low.normals) if (length(n)<1e-8f) throw std::invalid_argument("Low bake mesh contains a zero normal");
@@ -170,20 +172,35 @@ void validate(const Mesh &low,const BakeSource &source,const BakeOptions &o) {
     throw std::invalid_argument("Invalid source material assignments");
   for (auto id:source.triangle_materials) if (id>=source.materials.size()) throw std::out_of_range("Unknown source triangle material");
   for (const auto &m:source.materials) {
+    if(source_normals.requires_source_pairing()&&(!m.maps||!source_normals.matches_prepared_source(*m.maps)))
+      throw std::invalid_argument("Prepared source resolver requires its complete paired material packet");
     m.material.validate();
     if(!m.resolved_emission&&(detail::hdr_emission(m.material.emissive)||(m.maps&&m.maps->overlay&&m.maps->overlay->native_geometry())))
       throw std::invalid_argument("Physical emission Bake requires its actual float sampling/output adapter");
     if (!std::isfinite(m.normal_strength)||m.normal_strength<0||m.normal_strength>4) throw std::invalid_argument("Invalid normal-map strength");
     if (m.maps) {
-      if(m.maps->overlay&&((m.maps->source_only&&m.maps->overlay->source_maps()!=m.maps->source_maps)||(!m.maps->source_only&&!m.resolved_emission)))
+      const bool canonical_packet=m.maps->overlay&&bool(m.maps->overlay->normal_source_binding());
+      if(canonical_packet&&(!source_normals||!source_normals.matches_prepared_source(*m.maps)))
+        throw std::invalid_argument("Canonical current source requires its exact normal/material/frame packet");
+      const auto field=m.maps->baked_base&&m.maps->baked_base->normal_field?m.maps->baked_base->normal_field:
+        m.maps->overlay&&m.maps->overlay->baked()?m.maps->overlay->baked()->normal_field:nullptr;
+      if(field){
+        field->validate();
+        if(!source_normals||!source_normals.matches_prepared_source(*m.maps)||m.maps->normal_projection)
+          throw std::invalid_argument("Canonical material source requires its actual field/frame resolver");
+        if(!m.maps->source_only&&(m.maps->normal.rgba!=field->pbr()->rgba||m.maps->mtoon_normal.rgba!=field->mtoon()->rgba))
+          throw std::invalid_argument("Canonical source view differs from its actual resolved normal field");
+      }
+      if(m.maps->overlay&&((m.maps->source_only&&m.maps->overlay->source_maps()!=m.maps->source_maps&&!source_normals.matches_prepared_source(*m.maps))||(!m.maps->source_only&&!m.resolved_emission&&!canonical_packet)))
         throw std::invalid_argument("Bake overlay differs from its immutable source coordinate owner");
       if(m.maps->source_maps)m.maps->source_maps->validate_surface(source.mesh);
       if(m.maps->baked_base&&m.maps->source_only){
         if(!m.maps->overlay||m.maps->overlay->baked()!=m.maps->baked_base)
           throw std::invalid_argument("Raw Bake normal differs from its actual immutable overlay owner");
         const auto &b=*m.maps->baked_base;b.validate(m.maps->overlay->resolution());
-        if(b.normal_interpretation!=BakedNormalInterpretation::CanonicalMikk||b.normal_field||b.normal_authority)
-          throw std::invalid_argument("Raw Bake normal requires its explicit prepared frame adapter");
+        if(b.normal_authority||(!field&&b.normal_interpretation!=BakedNormalInterpretation::CanonicalMikk)||
+            (field&&(b.normal_interpretation!=BakedNormalInterpretation::PreparedAttributes||!source_normals.matches_prepared_source(*m.maps))))
+          throw std::invalid_argument("Raw Bake normal requires its actual prepared field/frame adapter");
       }
       if(m.maps->source_only){
         // Explicit empty role bundles are valid untextured source captures.
@@ -248,18 +265,20 @@ void pad(BakeResult &result,const BakeOptions &o,std::vector<BakedEmissionSample
 static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const BakeOptions &o,
     const detail::SourceBakeNormalResolver &source_normals) {
   if(o.progress)o.progress(0);
-  cancel(o); validate(low,source,o);
+  cancel(o); validate(low,source,o,source_normals);
   for(const auto &material:source.materials)if(material.maps&&material.maps->normal_projection){
     const auto &maps=*material.maps;
-    if(!source_normals)
-      throw std::invalid_argument("Prepared material source requires its actual separate normal-frame resolver");
+    if(!source_normals||!source_normals.matches_prepared_source(maps))
+      throw std::invalid_argument("Prepared material source requires its actual paired normal-frame resolver");
     const auto &projection=*maps.normal_projection;
     projection.validate(projection.pbr?projection.pbr->width:0);
     if(maps.source_only){
       if(!maps.overlay||!maps.source_maps||maps.baked_base)
         throw std::invalid_argument("Prepared raw material lost its actual separate channel owners");
       projection.validate(maps.overlay->resolution());
-      if(const auto &baked=maps.overlay->baked();baked&&(baked->normal_interpretation!=BakedNormalInterpretation::PreparedAttributes||baked->normal_field||baked->normal_authority))
+      if(const auto &baked=maps.overlay->baked();baked&&(baked->normal_interpretation!=BakedNormalInterpretation::PreparedAttributes||baked->normal_field||
+          (baked->normal_authority&&(projection.version!=2||!projection.sampling_domain||
+           baked->normal_authority!=projection.sampling_domain->detail))))
         throw std::invalid_argument("Prepared raw material source has a conflicting retained normal event");
     }
   }
