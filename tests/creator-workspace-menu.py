@@ -75,7 +75,7 @@ async def main():
   check(code==0,'Native endpoint retains exact original authoring and requested creator result: '+mode)
  await command('Create humanoid...');dialog=await wait(lambda:named('Create humanoid'));check(dialog.get_wm_transient_for().id==window.id,'Creator uses the actual native modal owned by the document');capture(dialog,'creator-before.png');key('Escape');await wait(lambda:not named('Create humanoid'));await command('Save');verify('cancel')
  await command('Create humanoid...');dialog=await wait(lambda:named('Create humanoid'));g=dialog.get_geometry();row=28
- tap(dialog,g.width*.75,row*3.5);await asyncio.sleep(.1);key('End');key('Return');await asyncio.sleep(.15)
+ tap(dialog,g.width*.75,row*3.5);await asyncio.sleep(.1);key('Down');key('Down');key('Return');await asyncio.sleep(.15);capture(dialog,'creator-anime-preset.png')
  tap(dialog,g.width*.75,row*4.5);text('1.9');tap(dialog,g.width*.75,row*6.5);text('0.4')
  for _ in range(32):tap(dialog,g.width*.5,g.height*.5,5)
  await asyncio.sleep(.2);capture(dialog,'creator-hair-source.png')
