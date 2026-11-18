@@ -308,78 +308,58 @@ do not restart them. The compressed scoped proof is committed above.
 
 ## Active next slices — inspect actual units before acting
 
-- Filtered-quality agent owns advanced-normal-filter-fidelity source/build
-  worktrees. Versioned new-command quality policy preserves real legacy recipe
-  byte round trips; original64 failures remain negative cases. Explicit target
-  resolution studies show512 insufficient for all dense MToon samples;1024/2048
-  remain to qualify. Frozen7e2bdca3 compiles a complete selected core but its
-  actual diagnostic catches a pseudo-resize bug. The corrected child uses the
-  existing private raster-resize facility, and adds a shared validated generic
-  source sampler so prepared-target checks cannot silently skip ordinary/sculpt
-  sources. Corrected production8ebacf8a completes a fresh193-core/209-TU native
-  build. Its first ordered diagnostic passes the full historical17 corpus and
-  real legacy recipe proof; a new ordinary normal-texture1024 retry fails
-  the strict filtered bound. A full independent off-centre scan confirms actual
-  .03706908-radian peaks above the .03 bound; the guard correctly refuses it.
-  A sparse earlier diagnostic missed those narrow peaks. Bounded2048 resize
-  childea838 compiles and its actual ordinary-mapped2048 Document Bake/Save/
-  reopen/UndoRedo passes, alongside plain and sculpt controls. Caller64M/byte/
-  Cancel refusals remain. One advanced raster1024 case passes, but the next
-  retained case correctly refuses1024; an explicit2048/2048 cohort retry is next.
-  No complete checked-family or final GL matrix is claimed.
-- Writable-source agent completes fresh strict sanitizer441 compilation in
-  artifacts/source441-headless-sanitize-20261118 under
-  ds-source441-headless-sanitize-build-v1-20261118.service, Main1028537,
-  Invocation7d2d0e1ca81346d193559358927aee84:214 actual owners/193core+15support+
-  6fixtures,1782.096s, all fresh and no drift. Actual dependency/archive/flag
-  audit passes; the terminal unit is captured then stopped. Strict six-suite
-  runtime also completes0 under
-  ds-source441-headless-sanitize-native-v1-20261118.service,
-  Main1336741/Invocation694921ebb86a44da82e6bfe553c56da9. Terminal/journal and
-  cleanup are captured before stopping. Root independently rehashes30 evidence
-  artifacts,214 object/MD pairs,662 source pins and all121 native/ordered pairs.
-  Fixture-only child7e740963 rooted63956 preserves historical0 constructors and
-  adds selectable checked1/refusal routes for all32/64/8 axes; no production or
-  default downgrade. Six fresh R fixture TUs and six links against the audited
-  195-core/15-support archive set pass. Selected512 canonical00000 and writable
-  000000 canaries now pass real resize/history, currentchecked1, all-grid
-  independent extrema and full Save/reopen; joint000 is still running at this
-  snapshot. These are selected cases, not all104 or historical121 acceptance.
-  Root's fresh combined217-owner SAN build runs in
-  artifacts/authoring-combined-checked-sanitize-20261118 under
-  ds-authoring-combined-checked-sanitize-build-20261118.service, Main1700029 /
-  Invocation1a7e960333d2493f92fef7f4973304c9. Source7e remains frozen, production
-  exact63956, no inherited R/S payloads. Inspect actual unit/status before acting.
-  The
-  six-suite Release result above is terminal; preserve all fixed source/test
-  role boundaries and original failures. New-packet graphics/App remain pending.
-- Creator agent owns work/vroid-creator-workspace-20261118. Initial source7f3911ca
-  builds the whole App but its fixture first fails duplicate cgltf linkage, then
-  reveals a genuinely inert red hair tint on both original CC0 models. Existing
-  multiplicative tint semantics are retained; new optional hair recolour uses
-  explicit RGB, original grayscale textures/alpha and retained shade contrast.
-  Absence preserves exact version2 controls; the override is version3.
-  Fresh source75ee61fb completes its whole core/App/fixture/runtime build under
-  ds-vroid-creator-release-v2-build-20261118.service, Main1203476,
-  Invocation90d2f9ecf386482199622a84aa713962, all195core/266 build steps0 with no
-  drift, captured/stopped. Actual female26 controls, fitted-groom RGB, source
-  metadata, rest/posed+morph and native save checks pass. The next GLB assertion
-  incorrectly assumed non-white baseColorFactor; actual export bakes the colour
-  into textures with factor1. Its independent effective-colour/UV/alpha oracle
-  is being corrected; male and full export acceptance remain incomplete.
-  The separate controller/workspace case now passes44 actual checks, including
-  current hair RGB, local/global history, queued Cancel, focus and retired
-  generation/session/authority. Its own unit is captured/stopped with free lease.
-  Generated-groom VRM transport remains a real later implementation requirement.
-  Test-only
-  childb0ca corrects a reporter placement compile error retained from3666;
-  production remains75. A fresh strict creator sanitizer build is separate.
-  The missing XR body/face/hair/tint controls now have an unqualified shared
-  native draft/Apply/Cancel implementation reusing existing desktop/backend
-  controls. Actual effects of26 controls on both CC0 bases, source/skin/morph
-  preservation, controller history/cancel/stale authority and export remain
-  under verification. Existing avatars are retained; variations create a new
-  avatar. This does not complete arbitrary existing-avatar or hair-guide editing.
+- **Filtered normal workflow:** productione006 with fixtured66 now passes all17
+  current checked families (646 checks), the complete historical17 corpus
+  (263495), and55 normalized-source sampler regressions. Source64 stays
+  unchanged; both target choices are explicit2048. Original64/1024, byte/work,
+  cancellation and stale-authority refusals remain. Full ordered/native byte
+  equality, history and fresh-process reopen pass under the unchanged AS2/RSS3
+  bounds, with an explicit task-local allocator profile. Valid RGBA8 bilinear
+  sampling previously rounded to1.00000012; the corrected producer preserves
+  the mathematical normalized range while all MToon/quality checks stay strict.
+  Read [native qualification](ADVANCED-NORMAL-FILTERED-WORKFLOW-20261118.md).
+  Root rehashed every scoped archive member against actual files. The68-view
+  calibrated forecast, software and Arc checks are next; no new GL pass claimed.
+- **Combined source:** ab497 and successor63956 retain their distinct fresh
+  Release build/audit proofs. App63956 additionally passes loader72/version0.
+  Its fresh217-owner strict sanitizer build/audit also passes, but selected
+  runtime is partial: canonical512 and writable512 pass; old7e joint64 reaches
+  the original900s deadline and controller44 is not reached. Read
+  [the exact scope](COMBINED-STRICT-SANITIZE-20261118.md). The failed unit is
+  captured/stopped with no drift or survivors. Helper-only source522 preserves
+  all probes and bounds while removing repeated immutable-map construction;
+  one fresh S fixture TU and link against the identical217-build archives pass.
+  Selected-v2 (joint64/controller44) now passes43302/9.308s and44/42.994s under
+  ds-authoring-combined-strict-selected-v2-20261118.service,
+  Main2515217/Invocation859ef46ed7e74ce49f8a6f90a8a45914. Actual terminal and
+  journal are captured before stopping; all selected ELFs have live ASan/UBSan
+  witnesses, leak detection, no address cap, empty drift/survivors. The four
+  distinct positive suites total67108 checks; no failed timeout is relabeled.
+  Full combined historical121 and all104 checked cases remain.
+- **HDR source-domain adapter:** source_hdr_resume_20261118 owns the replacement
+  SOURCE lane. Actual joint512 failure.021309 is double-filter knot loss: the
+  independent transfer residual is7.9e-7 and source64-knot error.0213089;2048
+  still cannot meet the unchanged2e-4 HDR bound. Genuine joint64 passes. A new
+  versioned emission_transport policy preserves missing/legacy0 and retains
+  an independently owned source64 FLOAT domain before current-grid paint.
+  Exact supporting-face/UV/current ray-column certificates, frozen before-scene
+  provenance, quotas and ancestor/cycle guards are implemented in isolated
+  production children; GPU/export still refuse the new domain until adapters.
+  Latest53ce numeric512 probes pass, including4536900 dense normal/HDR samples
+  (HDR3.06e-6), but native Save/reopen rejects a decoder quaternion-order bug.
+  Explicit component decoding is being fixed separately; no fullpositive or
+  GPU/export acceptance is claimed. Original failures remain frozen.
+- **Creator:** production75 now passes352 real both-base control/deformation/
+  GLB/effective-colour/neutral19-part VRM checks and44 controller/workspace checks;
+  root independently verifies the recorded authorities. Read
+  [creator qualification](CREATOR-WORKSPACE-20261118.md). Public GUI/XR and strict
+  sanitizer runtime remain unclaimed. Separate creator-export productione3ff
+  implements actual Shaper-based bone-local first-person/collider refit and
+  explicit generated-groom provenance/material/rig transport, with strict
+  stale/foreign-rest refusals. Fresh App/component builds pass; native canary
+  first detects generic genesis's default has_mtoon=true and correctly refuses
+  borrowed typed identity. A single creation-owner fix is being prepared.
+  Male empty physics is preserved. This prototype is not full VRM admission.
 
 Root rechecked canonical DomeD local and remote main onNov18: both remainacc2b70.
 No system installation, physical-headset launch or active-session restart occurred.

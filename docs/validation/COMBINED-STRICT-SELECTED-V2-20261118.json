@@ -1,0 +1,89 @@
+{
+  "state": "selected_joint64_and_controller44_strict_runtime_passed",
+  "production": "63956adcde86476ad11e73ebe565a85b61fe86dc",
+  "joint_fixture": "52295813951494b345c928ef8a197cc5f10063a3",
+  "controller_fixture": "7e74096347e6fd65a382031e122b49515ae6ee3c",
+  "runtime_status_sha256": "5e126963425d6bfe0f3997f4c03280a2bca9126e2a587054c148c56e70374dba",
+  "plan_sha256": "857d8618459d5d46b6ec511092f9d4be371e97863a3dc953bc836c4d1ed0504c",
+  "cleanup": {
+    "unit": "ds-authoring-combined-strict-selected-v2-20261118.service",
+    "invocation": "859ef46ed7e74ce49f8a6f90a8a45914",
+    "terminal_exit": 0,
+    "owned": [],
+    "stopped": true,
+    "separate_nonblocking_free": {
+      "time": 1794974312.4597085,
+      "inode": 99618,
+      "dev": 40
+    }
+  },
+  "positive_suites": [
+    {
+      "name": "checked-joint-writable-000-64",
+      "checks": 43302,
+      "seconds": 9.30818772315979
+    },
+    {
+      "name": "creator-workspace44",
+      "checks": 44,
+      "seconds": 42.9937310218811
+    }
+  ],
+  "live_sanitizer_mappings": {
+    "checked-joint-writable-000-64": {
+      "/usr/lib64/libasan.so.8.0.0": {
+        "literal": "/usr/lib64/libasan.so.8.0.0",
+        "resolved": "/usr/lib64/libasan.so.8.0.0",
+        "sha256": "0e9878f315009d4a3b3f1d8c44467de841f9ff2ca404f996937bf89d1d966c37"
+      },
+      "/usr/lib64/libubsan.so.1.0.0": {
+        "literal": "/usr/lib64/libubsan.so.1.0.0",
+        "resolved": "/usr/lib64/libubsan.so.1.0.0",
+        "sha256": "d4322305e0b1492398b7c5dabf56e1cdfe67548211b0149769c14f234cf3bb9d"
+      }
+    },
+    "creator-workspace44": {
+      "/usr/lib64/libasan.so.8.0.0": {
+        "literal": "/usr/lib64/libasan.so.8.0.0",
+        "resolved": "/usr/lib64/libasan.so.8.0.0",
+        "sha256": "0e9878f315009d4a3b3f1d8c44467de841f9ff2ca404f996937bf89d1d966c37"
+      },
+      "/usr/lib64/libubsan.so.1.0.0": {
+        "literal": "/usr/lib64/libubsan.so.1.0.0",
+        "resolved": "/usr/lib64/libubsan.so.1.0.0",
+        "sha256": "d4322305e0b1492398b7c5dabf56e1cdfe67548211b0149769c14f234cf3bb9d"
+      }
+    }
+  },
+  "scope": "Two selected suites only, same audited195core+15support. New joint observer caches immutable reads; no source/data/numeric-bound/probe changes. Original7e joint900s timeout remains. Earlier strict canonical512/writable512 results are separate; combinedfour positive suites67108 checks total, not full104/currentadvanced2048/legacy121/fullcreator/GUI/GL acceptance.",
+  "archive": {
+    "path": "docs/validation/COMBINED-STRICT-SELECTED-V2-20261118-evidence.tar.xz",
+    "sha256": "845d6ac52ceff5bd1a76293fca0b8cae4d15a76f36b2aad0bafcbbefacbcb16a",
+    "bytes": 159264,
+    "member_count": 22,
+    "member_sha256": {
+      "runtime/run.py": "b42464a8f12709b593299e36ccd4fd738e34fa50caf516d0a9804038f59dde7a",
+      "runtime/plan.json": "857d8618459d5d46b6ec511092f9d4be371e97863a3dc953bc836c4d1ed0504c",
+      "runtime/status.json": "5e126963425d6bfe0f3997f4c03280a2bca9126e2a587054c148c56e70374dba",
+      "runtime/checked-joint-writable-000-64.ldd": "a5525f12433ec30c7cdff504044ab06fdc6440f618b2e41b2fdfe790dd7c3066",
+      "runtime/checked-joint-writable-000-64.log": "bef5808d967fc4aef1467caffbc8266a7c1931c23b72ace285c61d9c33e05d59",
+      "runtime/creator-workspace44.ldd": "316b2ebdf12e076652f7a15f1222f5ed196ff5ca60e971cd0ae2e4d664528693",
+      "runtime/creator-workspace44.log": "2fd797ddf514e212ada3028b868d2c41a9aa19b1ce13204d9000c6b8602baae6",
+      "runtime/current-inputs.json": "b18626f8ab18252f7a4a60ec67d88272effb375a3dc11c9ad1973bbfabb9de75",
+      "runtime/unit-terminal.txt": "d3c3a2a3fdf025d9d6212dd798bb561340eed868e69fde7d4d8575e078d3a761",
+      "runtime/unit-journal.txt": "56e6398bb99f90bcbb63862451efd09b460e9fbd0740671bf5af770229077ee4",
+      "runtime/cleanup.json": "465c5d962a4e6c87f149ce0f9da26026f7d4d8b4ada19009eaf6d533833acdf9",
+      "fixture/plan.json": "d749c5c2e3148437c765b43e0e6e5e739906e6d68888e200c2448fe94cc16723",
+      "fixture/status.json": "67761e4a0fcb71dc12b200f320bce5b2906eaa0de9862ee9c5fad1544e1922f4",
+      "fixture/audit-status.json": "eb95eb533f2327e37b8d4334225d5318db7349d8c2b108657e4e35c8f20f63fa",
+      "fixture/compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "fixture/link.log": "4b057ebe6811dfc9ea5b3e12302cd814662032093a46d654ad3f9426e41910cc",
+      "fixture/build.py": "5da805f503cb109d2f6e6e0a4dd6c524fcab8ec096534928c8e0b917074eaa7a",
+      "fixture/joint.o.d": "0dfb6bf2cf8539a93f89ce1e9f38a092ff53bf65b504322969ed2c2dec0e6aae",
+      "fixture/link.d": "2a3370e98a462e2b70d25ab8cdcd729762c9a43f16a11f815f8ca5fb42ae2fb4",
+      "fixture/prepare-v1-failure.json": "aa60a9d2cf3a1adc9ae0f2f514363652e3269daaad95ba3099ef15c5765688ed",
+      "fixture/unit-terminal.txt": "748321626d3f22c597fbd9548a40358f0887b47a432ecf6741d4fc345e178b9e",
+      "fixture/unit-journal.txt": "18f23502b8389e62e0846bbbd6fb94d3efd734c074a6b893f5b03fd519e848d6"
+    }
+  }
+}

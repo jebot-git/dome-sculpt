@@ -108,24 +108,37 @@ This draft is not a new admitted application. A separate pushed63956 child adds
 bounded2048 resizing and the creator reporter fix; its fresh App/seven-fixture
 build and audit now also pass251 owners/195 core members. Read
 [the selected compilation proof](COMBINED-CHECKED-APP-FIXTURES-BUILD-20261118.md).
-Its combined strict sanitizer build is underway. A full independent scan confirms
-the quality guard correctly rejects1024-pixel narrow normal peaks; explicit2048
-recovery now passes the ordinary-mapped Document workflow. The full advanced
-cohort still needs its explicit2048 retry after a correct retained1024 refusal.
+Its combined strict sanitizer build/audit now passes217 owners/195 core members.
+Selected canonical512/writable512 strict runs pass; the old joint helper reaches
+its unchanged900s deadline. A helper-only immutable-map correction preserves all
+samples and bounds, and its separate strict joint64 plus creator44 run passes.
+The four distinct positive suites total67108 checks, with live ASan/UBSan and
+leak detection; see [the exact scope](COMBINED-STRICT-SANITIZE-20261118.md).
+This is not full combined104/legacy121 or new-domain acceptance.
 
-The next independent creator slice implements a shared native XR draft for
-existing body/face/hair/tint controls and additive avatar variations. Real effects
-of26 controls on both CC0 models, source/skin/morph preservation and actual
-controller workflows are still under verification. Its fresh complete native
-core/application build passes, but the new recolour runtime checks have not yet
-complete. Female26 controls and fitted-groom RGB/native preservation pass;
-the export fixture needs to check effective baked texture colour rather than
-assuming the exporter stores colour in a factor. Male and broader desktop/XR
-checks remain pending. The controller workspace now passes44 checks, including
-Apply/Cancel, history, ordered Save and stale session/authority guards.
-Generated-groom VRM transport is a real implementation
-requirement. Filtered normal quality and
-the explicit target-resolution workflow remain active production work.
+The filtered normal workflow now passes the full17-family native current cohort
+at explicit2048, with source64 unchanged,646 current checks,263495 historical
+checks and55 normalized-sampler checks. It retains the correct64/1024 refusals,
+all history and complete Save/reopen comparisons. A valid RGBA8 interpolation
+rounded above1; correcting its producer preserves strict downstream validation.
+Read [native qualification](ADVANCED-NORMAL-FILTERED-WORKFLOW-20261118.md).
+Calibrated software/Arc graphics remain pending.
+
+A separate owning HDR-domain prototype addresses actual512 grid-knot loss
+without changing source64 FLOAT data or the original2e-4 bound. Dense native
+normal/HDR probes pass, but its Save/reopen certificate exposes a quaternion
+component-order bug; that fix and complete GPU/export adapters are in progress.
+No fullpositive or combined admission is inferred.
+
+The shared VRoid creator and true hair recolour now pass352 both-base native
+control/deformation/effective GLB/neutral19-part VRM checks plus44 controller
+checks. Root independently rehashes the recorded authorities; read
+[creator qualification](CREATOR-WORKSPACE-20261118.md). Public GUI/XR and full
+sanitizer qualification remain pending. A separate production slice implements
+actual Shaper-based first-person/collider metadata refit and generated-groom
+provenance/export, with stale/foreign-rest guards. Its first native run catches
+a generated-holder default claiming MToon identity; the narrow creation-owner
+fix is being tested. Styled/groom VRM remains unqualified until actual success.
 
 The user-accepted controller selection/hierarchy/multiselection/ghost interface
 is preserved. Only the verified CC0 VRoid female/male creator bases are offered.

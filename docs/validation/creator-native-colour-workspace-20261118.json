@@ -1,0 +1,72 @@
+{
+  "state": "qualified_native_colour_and_controller_slice",
+  "roles": {
+    "production": "75ee61fbac22cf0c51be1b8837647d212878b34d",
+    "controller_fixture": "3666e26021b24c859995e676493d4afa9641829f",
+    "colour_fixture": "e2d6e1b62c642e021d343a53fb0ebd5d4e560ff5",
+    "application_sha256": "0cfce3abb4514555fb849adf72f7d3639cd777c36f89be142494b9d8c3d5dcb2"
+  },
+  "actual_checks": {
+    "genuine_bothbase_controls_colour_deformation_glb_and_neutral_source_vrm": 352,
+    "native_controller_workspace_history_ordered_save_cancellation": 44
+  },
+  "authorities": {
+    "colour_controls": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-creator-workspace-build-20261118/native-release-v4/status.json",
+      "sha256": "8138b19ecdbe6ad7a6a21c566e2fe7aa473208486184c2a8c92e70d9364341a4",
+      "driver_sha256": "3a95df8c1db10397641cadc3edc1fc3fa99e7879fc856d5ae93ec64a4d9d0fb7",
+      "plan_sha256": "5e02f47862fbcb46489146bce4a90bbf3d63351b8b5bdb45d5335811283f6e86",
+      "lease": {
+        "acquired": 1794970106.654374,
+        "owner_pid": 1932713,
+        "before_any_ldd_or_product": true,
+        "inode": 99618,
+        "released": 1794970194.24204
+      },
+      "unit_terminal": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-creator-workspace-build-20261118/native-release-v4/unit-terminal.txt",
+        "sha256": "aa6778a765b0c5a9c98cef594db65f29a6ace15d9088e12ff7c8985c73bd830a"
+      },
+      "journal": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-creator-workspace-build-20261118/native-release-v4/unit-journal.txt",
+        "sha256": "604771aefda3b40e1cba04620b2e4c3fa1b15b35abaea572f10753859231ebcb"
+      }
+    },
+    "controller_workspace": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-creator-workspace-build-20261118/native-workspace-v2/status.json",
+      "sha256": "e904852f715ad8f3856d4a4d48e051aee533f0244bae87a38c37969b29bcda82",
+      "driver_sha256": "3a95df8c1db10397641cadc3edc1fc3fa99e7879fc856d5ae93ec64a4d9d0fb7",
+      "plan_sha256": "ae1fde68441bd52799fa8a14bcebfc6173ad285719c2df380b8162ed4b32c543",
+      "lease": {
+        "acquired": 1794967912.2688308,
+        "owner_pid": 1621423,
+        "before_any_ldd_or_product": true,
+        "inode": 99618,
+        "released": 1794967923.8228278
+      },
+      "unit_terminal": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-creator-workspace-build-20261118/native-workspace-v2/unit-terminal.txt",
+        "sha256": "49c0bb4bd3d3452d7bf9d024cda4854fae89dc00ca319899fecc21e38848c100"
+      },
+      "journal": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-creator-workspace-build-20261118/native-workspace-v2/unit-journal.txt",
+        "sha256": "3b0fb20b4183cbde665023717fc2d02079b1b6e7c34c5630f1bc8d2ea14a3b7b"
+      }
+    }
+  },
+  "all26_continuous_controls_per_baseline": 52,
+  "effects": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-creator-workspace-build-20261118/native-release-v4/controls/creator-control-effects.json",
+    "sha256": "5ee0b0daa3622bdc4140fa3e6a0f054b7d183b4050d774e4089d76ddb5dab9d0"
+  },
+  "scope": "Both authentic CC0 bases and native/controller creation. No public GUI/XR or sanitizer runtime result claimed; no fullcreator/VRM completion. Styled nonlinear-body and generated-groom VRM remain actual refused routes needing creator-owned metadata/transport implementation.",
+  "original_failures_preserved": [
+    "release/build-status.json",
+    "fixture-v2/status.json",
+    "native-release-v1/status.json",
+    "native-workspace-v1/status.json",
+    "native-release-v2/status.json",
+    "native-release-v3/status.json",
+    "runtime-v2/status.json"
+  ]
+}
