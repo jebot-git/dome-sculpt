@@ -300,6 +300,21 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTr
       replay_bytes=std::max<uint64_t>(replay_bytes,paint->attachment()->domain()->retained_bytes());
       self(self,paint->before()->material_bindings.get(),depth+1);
     }
+    if(const auto &color=node->color_preparation){
+      // Colour owns independent ancestor recipes even when its latest Paint
+      // attachment shares geometry with normal metadata. Bound that actual DAG
+      // before material validation can recurse or allocate historical scratch.
+      if(color->original_paint)replay_bytes=std::max<uint64_t>(replay_bytes,color->original_paint->storage_bytes());
+      if(const auto &uv=color->uv_reprojection){
+        replay_bytes=std::max(replay_bytes,uv->receipt.max_working_bytes);
+        self(self,uv->before_material.get(),depth+1);
+      }
+      if(const auto &paint=color->paint_sampling){
+        replay_bytes=std::max<uint64_t>(replay_bytes,paint->domain()->retained_bytes()+paint->before_paint()->storage_bytes()+paint->layout()->storage_bytes());
+        self(self,paint->before_material().get(),depth+1);
+      }
+      self(self,color->original_material.get(),depth+1);
+    }
     if(const auto &normal=node->normal_preparation){
       if(const auto &origin=normal->canonical_conversion){
         if(!origin->valid_owner(origin))throw std::invalid_argument("Source normal ancestor lost its genuine canonical conversion");
