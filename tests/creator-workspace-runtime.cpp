@@ -31,6 +31,7 @@
 #include <openxr/openxr.h>
 #include <openxr/openxr_loader_negotiation.h>
 #include <openxr/openxr_platform.h>
+#include "xr-fixture-clock.hpp"
 #include <thread>
 #include <vector>
 namespace {
@@ -886,7 +887,7 @@ FN(PollEvent, XrInstance, XrEventDataBuffer *out) {
     auto*e=reinterpret_cast<XrEventDataSessionStateChanged*>(out);e->type=XR_TYPE_EVENT_DATA_SESSION_STATE_CHANGED;e->session=reinterpret_cast<XrSession>(&session_tag);e->state=menu_completion_event++==0?XR_SESSION_STATE_STOPPING:XR_SESSION_STATE_EXITING;return XR_SUCCESS;
   }
   if(field_mode()=="reference"&&field_step>=34&&!reference_event){
-    reference_event=true;auto*e=reinterpret_cast<XrEventDataReferenceSpaceChangePending*>(out);e->type=XR_TYPE_EVENT_DATA_REFERENCE_SPACE_CHANGE_PENDING;e->session=reinterpret_cast<XrSession>(&session_tag);e->referenceSpaceType=XR_REFERENCE_SPACE_TYPE_STAGE;e->changeTime=1000000000+(physical_frame+1)*18000000;e->poseValid=XR_TRUE;e->poseInPreviousSpace={{0,0,0,1},{0,0,0}};count("reference_changes");return XR_SUCCESS;
+    reference_event=true;auto*e=reinterpret_cast<XrEventDataReferenceSpaceChangePending*>(out);e->type=XR_TYPE_EVENT_DATA_REFERENCE_SPACE_CHANGE_PENDING;e->session=reinterpret_cast<XrSession>(&session_tag);e->referenceSpaceType=XR_REFERENCE_SPACE_TYPE_STAGE;e->changeTime=dome::test::xr_fixture_time(uint64_t(physical_frame)+1);e->poseValid=XR_TRUE;e->poseInPreviousSpace={{0,0,0,1},{0,0,0}};count("reference_changes");return XR_SUCCESS;
   }
   auto retopo = retopo_mode();
   unsigned focus_frame = !polygon_mode().empty()?polygon_stage():!cut_mode().empty()?cut_step:!mask_mode().empty() ? mask_step : retopo.empty() ? frame : retopo_step;
@@ -930,7 +931,7 @@ FN(PollEvent, XrInstance, XrEventDataBuffer *out) {
   if(retopo_history()&&frame>=12&&!reference_event){
     reference_event=true;auto e=reinterpret_cast<XrEventDataReferenceSpaceChangePending*>(out);
     e->type=XR_TYPE_EVENT_DATA_REFERENCE_SPACE_CHANGE_PENDING;e->session=reinterpret_cast<XrSession>(&session_tag);
-    e->referenceSpaceType=XR_REFERENCE_SPACE_TYPE_STAGE;e->changeTime=1000000000+(physical_frame+1)*18000000;
+    e->referenceSpaceType=XR_REFERENCE_SPACE_TYPE_STAGE;e->changeTime=dome::test::xr_fixture_time(uint64_t(physical_frame)+1);
     e->poseValid=XR_TRUE;e->poseInPreviousSpace={{0,0,0,1},{0,0,0}};count("reference_changes");return XR_SUCCESS;
   }
   if (field_mode().empty() && editable_avatar_mode().empty() && (cage_mode().empty()&&(mirror_mode().empty()&&expression_mode().empty())&&import_atlas_mode().empty()&&projection_mode().empty()&&rig_fit_mode().empty()) && !pbr_preview_fixture() && !selection_fixture() && (polygon_mode().empty()&&corner_uv_mode().empty()) && bake_policy_mode().empty() && procedural_mode().empty() && resolution_mode().empty() && retopo.empty() && mask_mode().empty() && cut_mode().empty() && frame >= 35 && !reference_event) {
@@ -939,7 +940,7 @@ FN(PollEvent, XrInstance, XrEventDataBuffer *out) {
     e->type = XR_TYPE_EVENT_DATA_REFERENCE_SPACE_CHANGE_PENDING;
     e->session = reinterpret_cast<XrSession>(&session_tag);
     e->referenceSpaceType = XR_REFERENCE_SPACE_TYPE_STAGE;
-    e->changeTime = 1000000000 + (physical_frame + 3) * 18000000;
+    e->changeTime = dome::test::xr_fixture_time(uint64_t(physical_frame)+3);
     e->poseValid = XR_TRUE;
     e->poseInPreviousSpace = {{0, 0, 0, 1}, {.2f, 0, 0}};
     count("reference_changes");
@@ -1011,7 +1012,7 @@ FN(WaitFrame, XrSession, const XrFrameWaitInfo *, XrFrameState *p) {
     report["polygon_script_step"]=polygon_stage();
     if(physical_frame>1200){report["polygon_gate_exhausted"]=true;save();return XR_ERROR_RUNTIME_FAILURE;}
   }
-  p->predictedDisplayTime = 1000000000 + physical_frame * 18000000;
+  p->predictedDisplayTime = dome::test::xr_fixture_time(physical_frame);
   p->predictedDisplayPeriod = 18000000;
   p->shouldRender = frame % 7 ? XR_TRUE : XR_FALSE;
   if(!creator_mode().empty())report["creator_frame_states"].push_back({{"frame",frame},{"should_render",bool(p->shouldRender)}});

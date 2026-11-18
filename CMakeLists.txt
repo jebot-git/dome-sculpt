@@ -1367,6 +1367,12 @@ if(DOME_BUILD_UI)
   install(TARGETS dome-sculpt RUNTIME DESTINATION bin)
   install(FILES packaging/org.domed.Sculpt.desktop DESTINATION share/applications)
 endif()
+if(BUILD_TESTING AND DOME_BUILD_XR)
+  add_executable(dome-sculpt-xr-fixture-clock-test tests/xr-fixture-clock.cpp)
+  target_link_libraries(dome-sculpt-xr-fixture-clock-test PRIVATE PkgConfig::OPENXR)
+  add_test(NAME xr-fixture-clock COMMAND dome-sculpt-xr-fixture-clock-test)
+  set_tests_properties(xr-fixture-clock PROPERTIES TIMEOUT 30)
+endif()
 # A login session can inherit older same-SONAME FLTK libraries. Exercise the
 # toolkit selected at configure time, not the login session's installation.
 if(BUILD_TESTING AND TARGET dome-sculpt AND DOME_BUILD_XR)
