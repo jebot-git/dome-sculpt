@@ -1,10 +1,12 @@
 # Filtered normal graphical qualification — 2026-11-18
 
-Production `e006869d` with complete graphics fixture `c56a55ae` passes the full
-software OpenGL matrix. This is a component result, not current combined-App,
-public workflow or physical headset admission. Arc remains pending at this
-checkpoint. The preceding calibrated CPU forecast is recorded separately in
-[the forecast proof](ADVANCED-NORMAL-FORECAST-20261118.md).
+Production `e006869d` with complete graphics fixture `c56a55ae` has actual
+software and Intel Arc products completing the full matrix successfully. The
+Arc product is additionally qualified by a separate complete read-only audit;
+its original wrapper's renderer-string parser failure remains unchanged.
+This is a component result, not current combined-App, public workflow or
+physical headset admission. The preceding calibrated CPU forecast is recorded
+separately in [the forecast proof](ADVANCED-NORMAL-FORECAST-20261118.md).
 
 ## Complete software result
 
@@ -47,3 +49,44 @@ and its scoped archive retain exact plans/drivers, source roles, actual status,
 logs/maps, manifest, all 1,796 PNGs and terminal/lease closure. No object or ELF
 payload is included. Earlier failed low-resolution or contrast profiles and the
 user-interrupted forecast remain their original results.
+
+
+## Actual Arc product and independent qualification
+
+The same immutable product/manifest completes all 17 families, 68 views, 432
+probes, 1,796 PNGs and 3,721 checks on actual Intel Arc A770 in 255.389s. Maximum
+correct RGB error is 1 under unchanged bound 3. The 136 begin/end boundaries and
+final context all report `Mesa Intel(R) Arc(tm) A770 Graphics (DG2)`. Independent
+observer/context records, live renderD129 FDs, PCI03:00.0/vendor8086/device56a0
+and kernel i915 identity agree. There are 151,601 live samples and 71 pinned
+mapped ELFs. Software fallback is explicitly refused.
+
+The original Arc wrapper exits 1 after the successful product. Its initial
+regex expects a renderer beginning `Intel`, while real Mesa starts `Mesa Intel`.
+The pinned observation shim also prints its first device report inside the
+initial streamed `ACTUAL_RENDERER` line. Every actual per-view and final
+renderer remains recorded correctly. The original driver, plan, status and
+failure are immutable; no successful wrapper exit is substituted.
+
+A separate read-only audit starts zero products and binds 32,367 input pins.
+It authenticates that exact interleaved initial device report, actual Mesa
+renderer at all 136 boundaries/final, live FD/sysfs/context/ELF provenance, every
+432 actual/correct/negative RGB triple, all three sensitive disjoint negative
+controls per view, all 215 actual target transfer probes under `.035`, and
+every 96x96 PNG against its retained SHA. The complete audit exits 0.
+An initial audit-count assertion incorrectly matched `target-resolution` inside
+both source and target family names. Its failure is preserved; the corrected
+observer uses the exact `-target-pbr`/`-target-mtoon` stage suffix. No product,
+normal/material data, GL image, probe or numerical bound changes.
+
+Actual Arc unit `ds-advanced-normal-forecast-cache-arc-v1-20261118.service`,
+Invocation `0273079697bd4dc8b9fa4ec99c5b0d15`, has terminal properties and journal
+captured before stop, retaining wrapper1/product0 separately. Drift and
+survivors are empty. The common lease is independently NB-free at
+`1794983072.101003`, device40/inode99618, then handed to the queued creator.
+
+The additional `Arc-receipt.json` and `scoped-Arc-proof.tar.xz` in the same
+validation directory preserve the complete actual matrix, all 1,796 hardware
+PNGs, original wrapper failure, both read-only audit versions/results and
+terminal/device records. Hardware qualification rests on actual product0 plus
+the complete independent audit0, not a relabeled original wrapper result.
