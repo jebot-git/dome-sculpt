@@ -7,7 +7,7 @@
 #include <tuple>
 #include <climits>
 namespace dome {
-// Seven bounded views share one fragment texture unit. Legacy uses the first
+// Eight bounded views share one fragment texture unit. Legacy uses the first
 // four; native emission adds three independent floating contribution views. Mips
 // stay GPU-resident: texture -> pixel-pack buffer -> texture-buffer attachment. Linear overlay
 // views promote the shared destination to RGBA32F; legacy source-only packs
@@ -22,8 +22,9 @@ public:
     // Actual floating GPU plane authority; no fabricated byte Image is needed.
     std::shared_ptr<const detail::PaintOverlayPacket> overlay;uint32_t plane=0;bool overlay_pbr=false;
     static Input linear(const detail::PaintOverlayCompiler::Resource &resource,uint32_t plane,bool mips=false){if(plane>=5)throw std::invalid_argument("Invalid GPU overlay plane");Input in;in.texture=resource.planes[plane];in.mips=mips;in.srgb=false;in.overlay=resource.owner;in.plane=plane;in.overlay_pbr=resource.pbr;return in;}
+    static Input retained(const detail::PaintOverlayCompiler::Resource &resource){Input in;in.texture=resource.retained_emission;in.srgb=false;in.overlay=resource.owner;in.plane=5;in.overlay_pbr=resource.pbr;return in;}
   };
-  static constexpr size_t view_count=7;
+  static constexpr size_t view_count=8;
   using Inputs=std::array<Input,view_count>;
   using Key=std::array<std::tuple<uintptr_t,bool,bool,uint32_t>,view_count>;
   struct Resource {
@@ -45,15 +46,16 @@ private:
     size_t texels=0;
     for(size_t view=0;view<view_count;++view) {
       const auto &input=inputs[view];if(!input.owner&&!input.overlay)continue;
-      if(input.overlay){if(input.owner||input.overlay->empty()||input.srgb||input.plane>=5)throw std::invalid_argument("Invalid linear overlay source-pack authority");}
+      if(input.overlay){if(input.owner||input.overlay->empty()||input.srgb||input.plane>5||(input.plane==5&&(input.mips||!input.overlay->baked()||!input.overlay->baked()->emission_domain)))throw std::invalid_argument("Invalid linear overlay source-pack authority");}
       else input.owner->validate();
-      auto key=std::tuple{reinterpret_cast<uintptr_t>(input.overlay?static_cast<const void*>(input.overlay.get()):static_cast<const void*>(input.owner.get())),input.mips,input.srgb,input.overlay?input.plane+1+(input.overlay_pbr?5u:0u):0u};
+      auto key=std::tuple{reinterpret_cast<uintptr_t>(input.overlay?static_cast<const void*>(input.overlay.get()):static_cast<const void*>(input.owner.get())),input.mips,input.srgb,input.overlay?(input.plane==5?11u+uint32_t(input.overlay_pbr):input.plane+1+(input.overlay_pbr?5u:0u)):0u};
       if(auto found=shared.find(key);found!=shared.end()) {
         auto previous=found->second;output.info[view]=output.info[previous];
         std::copy_n(output.levels.begin()+previous*14,14,output.levels.begin()+view*14);continue;
       }
       shared.emplace(key,view);
       uint32_t width=input.overlay?input.overlay->resolution():input.owner->width,height=input.overlay?input.overlay->resolution():input.owner->height;
+      if(input.overlay&&input.plane==5)width=height=input.overlay->baked()->emission_domain->field()->resolution();
       for(size_t level=0;;++level) {
         if(level>=14 || texels>size_t(INT_MAX)-size_t(width)*height)
           throw std::length_error("GPU source pack metadata exceeds index limits");
@@ -134,7 +136,7 @@ public:
   struct Demand{size_t bytes=0,images=0;};
   Demand additional(const std::vector<Inputs>&inputs,const SurfaceTextureLimits&limits)const{auto wanted=planning(inputs,0,0,limits);Demand d;for(const auto&[key,s]:wanted)if(!cache_.contains(key)){if(s.bytes>SIZE_MAX-d.bytes)throw std::length_error("Source pack forecast overflow");d.bytes+=s.bytes;++d.images;}return d;}
   static Key key(const Inputs &inputs) {
-    Key result;for(size_t n=0;n<view_count;++n)result[n]={reinterpret_cast<uintptr_t>(inputs[n].overlay?static_cast<const void*>(inputs[n].overlay.get()):static_cast<const void*>(inputs[n].owner.get())),inputs[n].mips,inputs[n].srgb,inputs[n].overlay?inputs[n].plane+1+(inputs[n].overlay_pbr?5u:0u):0u};return result;
+    Key result;for(size_t n=0;n<view_count;++n)result[n]={reinterpret_cast<uintptr_t>(inputs[n].overlay?static_cast<const void*>(inputs[n].overlay.get()):static_cast<const void*>(inputs[n].owner.get())),inputs[n].mips,inputs[n].srgb,inputs[n].overlay?(inputs[n].plane==5?11u+uint32_t(inputs[n].overlay_pbr):inputs[n].plane+1+(inputs[n].overlay_pbr?5u:0u)):0u};return result;
   }
   using Selection=std::set<Key>;
   static Selection selection(const std::vector<Inputs>&inputs){Selection result;for(const auto&input:inputs)if(std::any_of(input.begin(),input.end(),[](const auto&i){return bool(i.owner)||bool(i.overlay);}))result.insert(key(input));return result;}
