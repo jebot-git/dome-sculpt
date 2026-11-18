@@ -3,6 +3,7 @@
 #include "dome/paint.hpp"
 #include "source-uv-archive.hpp"
 #include <nlohmann/json.hpp>
+#include <algorithm>
 #include <set>
 #include <bit>
 namespace dome {
@@ -188,7 +189,12 @@ std::array<float,4> sample_source_texture(const PaintSourceTexture&t,float u,flo
   for(int k=0;k<(nearest?1:4);++k){int sx=address(bx+(k&1),int(im.width),t.wrap_s),sy=address(by+(k>>1),int(im.height),t.wrap_t);
     float weight=nearest?1:((k&1)?fx:1-fx)*((k>>1)?fy:1-fy);size_t at=(size_t(sy)*im.width+sx)*4;
     for(int c=0;c<4;++c){float value=im.rgba[at+c]/255.f;if(srgb&&c<3)value=srgb_to_linear(value);result[c]+=weight*value;}
-  }return result;
+  }
+  // RGBA8 samples and their linear-light RGB values are bounded by [0,1].
+  // Four rounded bilinear products can sum to one plus one float ULP;
+  // preserve the mathematical sample range before strict material decoding.
+  for(auto &value:result)value=std::clamp(value,0.f,1.f);
+  return result;
 }
 std::span<const std::array<float,2>> source_texture_coordinates(const Mesh &mesh,const PaintSourceMaps &maps,int coordinate){
   if(coordinate==0){if(mesh.uv.size()!=mesh.positions.size())throw std::invalid_argument("Source UV0 vertex domain is unavailable");return mesh.uv;}

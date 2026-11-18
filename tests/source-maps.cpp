@@ -3,6 +3,7 @@
 #include "dome/source-maps.hpp"
 #include "dome/scene.hpp"
 #include "dome/projection.hpp"
+#include "dome/mtoon.hpp"
 #include <iostream>
 #include <fstream>
 #include <nlohmann/json.hpp>
@@ -43,6 +44,14 @@ int main(int argc,char **argv)try{
   sampler.wrap_s=33071;check(sample_source_texture(sampler,4,.5f,false)[2]==1&&sample_source_texture(sampler,-4,.5f,false)[0]==1,"Clamp addressing retains edge texels outside the image");
   sampler.mag_filter=9729;auto middle=sample_source_texture(sampler,.5f,.5f,true);
   check(near(middle[0],.5f)&&near(middle[2],.5f)&&near(middle[3],.5f),"Bilinear original texture filtering uses linear RGB and independent linear alpha");
+  PaintSourceTexture endpoint;endpoint.image=flat({255,255,255,255});endpoint.mag_filter=9729;
+  for(int wrap:{10497,33648,33071})for(bool linear_rgb:{false,true}){
+    endpoint.wrap_s=endpoint.wrap_t=wrap;
+    const auto value=sample_source_texture(endpoint,.505f,.557f,linear_rgb);
+    check(value==std::array<float,4>{1,1,1,1},"Filtered RGBA8 endpoints remain exactly in range despite rounded bilinear weights");
+    const auto normal=mtoon_normal_map({value[0],value[1],value[2]},1);
+    check(std::isfinite(normal.x)&&std::isfinite(normal.y)&&std::isfinite(normal.z),"A valid filtered endpoint passes unchanged strict MToon normal decoding");
+  }
   sampler.uv_transform={-1,0,0,1,1,0};sampler.mag_filter=9728;
   check(sample_source_texture(sampler,.1f,.5f,false)[2]==1,"Affine source UV mirroring is applied before original sampler addressing");
   sampler.uv_transform={0,0,0,0,.1f,.5f};

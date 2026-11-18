@@ -67,7 +67,7 @@ void run(bool legacy,bool live,bool seam,SourceNormalUvMethod method,const std::
 #include "source-advanced-normal-public.hpp"
 #include "source-advanced-normal-uv-public.hpp"
 #include "source-filtered-normal-workflow.hpp"
-int main(int argc,char**argv)try{if((argc==5||argc==6)&&std::string_view(argv[1])=="--filtered-workflow")return filtered_workflow::run(argv[2],argv[3],uint32_t(std::stoul(argv[4])),uint32_t(std::stoul(argv[argc==6?5:4])));
+int main(int argc,char**argv)try{if(argc==4&&std::string_view(argv[1])=="--filtered-reopen")return filtered_workflow::reopen_file(argv[2],argv[3]);if((argc==5||argc==6)&&std::string_view(argv[1])=="--filtered-workflow")return filtered_workflow::run(argv[2],argv[3],uint32_t(std::stoul(argv[4])),uint32_t(std::stoul(argv[argc==6?5:4])));
  if(argc==3&&std::string_view(argv[1])=="--advanced-public-fixtures"){advanced_public::emit(argv[2]);std::cout<<"PASS "<<advanced_public::checks<<" advanced public normal capsules\n";return 0;}
  if(argc==3&&std::string_view(argv[1])=="--advanced-uv-fixtures"){advanced_uv_public::emit(argv[2]);std::cout<<"PASS "<<advanced_uv_public::checks<<" advanced public UV capsules\n";return 0;}
  if(argc==6&&std::string_view(argv[1])=="--verify-advanced-uv"){std::cout<<advanced_uv_public::verify(argv[2],argv[3],argv[4],argv[5]).dump()<<'\n';return 0;}
