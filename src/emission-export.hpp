@@ -2,6 +2,7 @@
 #pragma once
 #include "emission-package.hpp"
 namespace dome::detail {
+EmissionInterchangeImage source_paint_emission_field(const SculptObject &,const std::function<bool()> &,bool authored_mtoon=false);
 EmissionInterchangeImage canonical_paint_emission_field(const SculptObject &,const std::function<bool()> &);
 EmissionInterchangeImage native_paint_emission_field(const SculptObject &,const std::function<bool()> &);
 EmissionInterchangeImage retained_source_emission_field(const SculptObject &,const std::function<bool()> &);
