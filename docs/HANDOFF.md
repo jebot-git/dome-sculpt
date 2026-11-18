@@ -1,7 +1,10 @@
 # Dome Sculpt current handoff — 2026-11-18
 
-The full production goal is ACTIVE after the latest user resume and remains
-incomplete. The previous round's pause records below retain their dated scope.
+The full production goal is PAUSED at the user's request after this round and
+remains incomplete. See [the current assessment](PROGRESS-ASSESSMENT-20261118.md)
+for qualified results and the main remaining goals. Do not launch prepared
+runtime jobs until an explicit resume. Earlier pause/resume records below retain
+their dated scope.
 Read [REQUIREMENTS.md](REQUIREMENTS.md) and the original
 [HANDOFF-466ebd1.md](HANDOFF-466ebd1.md) for the complete scope. This concise file
 replaces the accumulated checkpoint diary; all previous text is preserved,
@@ -324,10 +327,15 @@ new component code is on explicit branches until combined qualification.
   filtered workflow646 under originalAS2/RSS3 and all creator/HDR/legacy checks.
   Read [corrected runtime proof](CURRENT-COMBINED-SAMPLER-RUNTIME-20261118.md)
   and [initial owning build](CURRENT-AUTHORING-COMPOSITION-20261118.md).
-  Current05 strict15 cohort is actually running under
+  Current05 strict15 cohort has terminated unsuccessfully under
   ds-authoring-current-sampler-sanitize-native-v2-20261118.service,
-  Invocation695aa961493d49299c1c84da387f9870/Main252918. No AS caps, original
-  RSS and900s case bounds; inspect actual handle before acting. Its first
+  Invocation695aa961493d49299c1c84da387f9870 (former Main252918). No AS caps,
+  original RSS and900s case bounds. Sampler55 passes; advanced17 exceeds the
+  original deadline at900.127s/-15 with peak owned RSS2625769472 below3GiB.
+  Remaining cases do not run. Terminal/journal capture and process-identity
+  cleanup are complete; the device lease is independently free. See
+  native-selected-v2/terminal-closure.json in the strict artifact directory.
+  Its first
   fast-sampler observer miss is preserved, corrected observer holds actual
   executable FD and captures maps before post-run hashing. Sampler55 has
   actual live ASan/UBSan witness; full strict acceptance remains pending.
@@ -403,7 +411,7 @@ runtime /opt/fltk-vr/bdf-runtime. Updated unrelated /usr font-library copies are
 outside the actual selected72-provider closure; do not rewrite old expectations
 or rebuild solely because an unused historical/global manifest differs.
 
-The [current progress assessment](PROGRESS-ASSESSMENT-20261117.md) describes
+The [current progress assessment](PROGRESS-ASSESSMENT-20261118.md) describes
 remaining production work. The latest user instruction requests a pause after
 this round. Preserve all incomplete requirements for the next explicit resume.
 Complete production sculpt/local meshing/recovery, painting/texture sets/baking,
