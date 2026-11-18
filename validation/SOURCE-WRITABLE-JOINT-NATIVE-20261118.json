@@ -1,0 +1,1736 @@
+{
+  "schema": 1,
+  "scope": "Release component native SOURCE adapters only; no sanitizer441, graphics441, full-App441, installation or physical-XR admission",
+  "production": "441d9985dc03cfc6202632af8222874a5e319f0f",
+  "joint_fixture": "48d5dfa3f9abeafc48dd87e635389ff6205fe541",
+  "other_fixture_body_equivalence": "aa8dfdbd15c6dfefcb5fe1d59c0444d9165b3d8d",
+  "source_tree": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-quota-boundary-20261118",
+  "unit": "ds-writable-joint-source-native-final-v2-20261118.service",
+  "invocation": "2e289775b5384c90a143bdf7c537df81",
+  "actual_launch_pid": 807064,
+  "plan_sha256": "8777d9e5d07a66fff3a001490dc9676128589f1751e8f4b72c955135808380ed",
+  "driver_sha256": "74ea17d77299fa3b7576a3387eca6b6ae8c4df665309c77e705093520448a14f",
+  "status_path": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/status.json",
+  "status_sha256": "8b826defea715b254728f8e1c80a8b05550f34e2d2de671d1deca75212e0d8a6",
+  "exit_code": 0,
+  "input_drift": [],
+  "owned_remaining": [],
+  "lease": {
+    "free": true,
+    "dev": 40,
+    "inode": 99618,
+    "observed_at": 1794962514.9104984
+  },
+  "native": [
+    {
+      "name": "source-advanced-normal-bake",
+      "exit": 0,
+      "actual_pass_count": 263495,
+      "ordered_pairs": [
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-advanced-normal-bake-outputs/mt0-posed-seam-raster.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-advanced-normal-bake-outputs/mt0-posed-seam-raster-ordered.dsculpt",
+          "sha256": "d29c44ae0a22a0db7836ddf1669dfe302c7ae8e07b419a7ccef2437ced557d97"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-advanced-normal-bake-outputs/mt0-posed-seam-retained.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-advanced-normal-bake-outputs/mt0-posed-seam-retained-ordered.dsculpt",
+          "sha256": "ba53ccacc38938f9f32df80be90e5c5a710358f48daf1b3a38fa5d18da0b3cbc"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-advanced-normal-bake-outputs/mt0-posed-shared-raster.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-advanced-normal-bake-outputs/mt0-posed-shared-raster-ordered.dsculpt",
+          "sha256": "bb2845c448aa0e7277c77c4a148115148b41d678eca6454cfffa6f9dd3cdf3b2"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-advanced-normal-bake-outputs/mt0-posed-shared-retained.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-advanced-normal-bake-outputs/mt0-posed-shared-retained-ordered.dsculpt",
+          "sha256": "0a7e9fd73c3e24d2997195b1cf29dff4fb5c4648da62cfcccd1a0a49f5b0a374"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-advanced-normal-bake-outputs/mt0-rest-seam-raster.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-advanced-normal-bake-outputs/mt0-rest-seam-raster-ordered.dsculpt",
+          "sha256": "db7eb735005eaa3dfc7de1601ffd04083b8eb19f37fa71f4c0362af940b7ac7e"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-advanced-normal-bake-outputs/mt0-rest-seam-retained.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-advanced-normal-bake-outputs/mt0-rest-seam-retained-ordered.dsculpt",
+          "sha256": "6dcd4381b04864db9869ec6f732e1383a673a7894dc03ca4985829ac4a3a8500"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-advanced-normal-bake-outputs/mt0-rest-shared-raster.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-advanced-normal-bake-outputs/mt0-rest-shared-raster-ordered.dsculpt",
+          "sha256": "ac4c27167035474a18629ee5de6a931a6daffbdb7f0c4924184bdeaa9c9dc639"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-advanced-normal-bake-outputs/mt0-rest-shared-retained.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-advanced-normal-bake-outputs/mt0-rest-shared-retained-ordered.dsculpt",
+          "sha256": "8223002fac6e3dc3c47fb61a0b5855cf12391cb04eae0e102f9eca649131a062"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-advanced-normal-bake-outputs/mt1-posed-seam-raster.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-advanced-normal-bake-outputs/mt1-posed-seam-raster-ordered.dsculpt",
+          "sha256": "23b41ae57ca6be92e9215a52bd7edead8ae18ee832605ea5029a142d3ca473a5"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-advanced-normal-bake-outputs/mt1-posed-seam-retained.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-advanced-normal-bake-outputs/mt1-posed-seam-retained-ordered.dsculpt",
+          "sha256": "d9d042e89334877b7d6151bebee6750a750a7961a2a33ea41c3afee01f80794b"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-advanced-normal-bake-outputs/mt1-posed-seam-retained-three-edits.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-advanced-normal-bake-outputs/mt1-posed-seam-retained-three-edits-ordered.dsculpt",
+          "sha256": "7bfc289cd9cff792ceee45fbba4c1b46da130a861d0ded89d5963fe7b30e0165"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-advanced-normal-bake-outputs/mt1-posed-shared-raster.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-advanced-normal-bake-outputs/mt1-posed-shared-raster-ordered.dsculpt",
+          "sha256": "e1c89a8f72395f1d02a7a178a84fada8da635c9deb84b48c708634eb3849ba86"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-advanced-normal-bake-outputs/mt1-posed-shared-retained.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-advanced-normal-bake-outputs/mt1-posed-shared-retained-ordered.dsculpt",
+          "sha256": "9f0e4cbe3043dfe3dde5b5c70a24fd1edc4d5cbe774fa7a2847cff514e272922"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-advanced-normal-bake-outputs/mt1-rest-seam-raster.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-advanced-normal-bake-outputs/mt1-rest-seam-raster-ordered.dsculpt",
+          "sha256": "b829bb7002c67cea72896e230132a21a46538daf79049a700643220cbd58aed1"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-advanced-normal-bake-outputs/mt1-rest-seam-retained.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-advanced-normal-bake-outputs/mt1-rest-seam-retained-ordered.dsculpt",
+          "sha256": "695de302e4615d38dd4fbcac06bf0bac7bde63efa98c2d9df65309ec95b945fc"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-advanced-normal-bake-outputs/mt1-rest-shared-raster.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-advanced-normal-bake-outputs/mt1-rest-shared-raster-ordered.dsculpt",
+          "sha256": "247419328e5d8016ee8fe2413241feecf9219e2fcdbf5a751422397e6498e504"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-advanced-normal-bake-outputs/mt1-rest-shared-retained.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-advanced-normal-bake-outputs/mt1-rest-shared-retained-ordered.dsculpt",
+          "sha256": "14edc2bef0b63378de40536744c452df76f154db18626fbf2a86165167a26b01"
+        }
+      ],
+      "live_maps_witness": [
+        {
+          "pid": 808006,
+          "start": 14013892,
+          "providers": [
+            {
+              "literal": "/usr/lib64/libOpenGL.so.0",
+              "resolved": "/usr/lib64/libOpenGL.so.0.0.0",
+              "sha256": "07a014ea0624d5d9711f941fb0401a203c2025b683d34897bd1b261a32a83d69"
+            },
+            {
+              "literal": "/usr/lib64/libEGL.so.1",
+              "resolved": "/usr/lib64/libEGL.so.1.1.0",
+              "sha256": "76ffc090b8990696d028e7d1bc82606c564565fb05d2fa9e5f6122b61e9f1b60"
+            },
+            {
+              "literal": "/usr/lib64/liblapacke.so.3",
+              "resolved": "/usr/lib64/liblapacke.so.3.12.0",
+              "sha256": "4e74d393b6f5f294cbd96b777da8be3ada9995b1da98aaa0c1eb5fea4b294c7c"
+            },
+            {
+              "literal": "/usr/lib64/libpng16.so.16",
+              "resolved": "/usr/lib64/libpng16.so.16.59.0",
+              "sha256": "536a1ed876bffe5a7e9204aae387d4da2d4a969bf716bbcf4a03c30a8dea0cde"
+            },
+            {
+              "literal": "/usr/lib64/libjpeg.so.62",
+              "resolved": "/usr/lib64/libjpeg.so.62.4.0",
+              "sha256": "beb79376b4544260da3c31603784c908b58bdb959cbe1d8c48075dfa7d5bc80c"
+            },
+            {
+              "literal": "/usr/lib64/libz.so.1",
+              "resolved": "/usr/lib64/libz.so.1.3.1.zlib-ng",
+              "sha256": "bbde8faec092a7c67b8bd76bbba4a826e61b05c171b97004ce6b308c5a090351"
+            },
+            {
+              "literal": "/usr/lib64/libOpenEXR-3_2.so.31",
+              "resolved": "/usr/lib64/libOpenEXR-3_2.so.31.3.2.4",
+              "sha256": "efdbbe75b27b6a50e4a8e028e008fde32befa53280295e21ef6f036350225769"
+            },
+            {
+              "literal": "/usr/lib64/libOpenEXRUtil-3_2.so.31",
+              "resolved": "/usr/lib64/libOpenEXRUtil-3_2.so.31.3.2.4",
+              "sha256": "bafa0a2cb708d3ae952987c013d96e992badbb742e1a8e4fac6605c7eae5b5a0"
+            },
+            {
+              "literal": "/usr/lib64/libOpenEXRCore-3_2.so.31",
+              "resolved": "/usr/lib64/libOpenEXRCore-3_2.so.31.3.2.4",
+              "sha256": "bc6775af6f33d58d41f20e714d80db4b0fd21209796a6694cb5249739a49a331"
+            },
+            {
+              "literal": "/usr/lib64/libIex-3_2.so.31",
+              "resolved": "/usr/lib64/libIex-3_2.so.31.3.2.4",
+              "sha256": "da965da4711be1158555d457dc6ff17582ec88c1b86d98edc69f09cdcc4f6c7a"
+            },
+            {
+              "literal": "/usr/lib64/libIlmThread-3_2.so.31",
+              "resolved": "/usr/lib64/libIlmThread-3_2.so.31.3.2.4",
+              "sha256": "424321e69eb6257387820baa90e4fccb209c5dcb8c88589a8c5e1ccf4d4c23d6"
+            },
+            {
+              "literal": "/usr/lib64/libImath-3_1.so.29",
+              "resolved": "/usr/lib64/libImath-3_1.so.29.11.0",
+              "sha256": "1e86ce61e14061369bd937b73d53abb69305dff34df4700f99a459f5c024ab45"
+            },
+            {
+              "literal": "/usr/lib64/libgcc_s.so.1",
+              "resolved": "/usr/lib64/libgcc_s-16-20261029.so.1",
+              "sha256": "5a52ae4a6f1b119aa092aa1483c967e19d9ba036b1b0c2133236a8a2ce826ebf"
+            },
+            {
+              "literal": "/usr/lib64/libstdc++.so.6",
+              "resolved": "/usr/lib64/libstdc++.so.6.0.36",
+              "sha256": "49811507d8fc0283d8f8023546613774c673f876fe823b1b99d0c8d46039deda"
+            },
+            {
+              "literal": "/lib64/ld-linux-x86-64.so.2",
+              "resolved": "/usr/lib64/ld-linux-x86-64.so.2",
+              "sha256": "4e5d39355699e90fa29313d3100e82af4a23290028c58c364d6a249ef6a78e5e"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "source-prepared-normal-bake",
+      "exit": 0,
+      "actual_pass_count": 91,
+      "ordered_pairs": [],
+      "live_maps_witness": [
+        {
+          "pid": 809285,
+          "start": 14014693,
+          "providers": [
+            {
+              "literal": "/usr/lib64/libOpenGL.so.0",
+              "resolved": "/usr/lib64/libOpenGL.so.0.0.0",
+              "sha256": "07a014ea0624d5d9711f941fb0401a203c2025b683d34897bd1b261a32a83d69"
+            },
+            {
+              "literal": "/usr/lib64/libEGL.so.1",
+              "resolved": "/usr/lib64/libEGL.so.1.1.0",
+              "sha256": "76ffc090b8990696d028e7d1bc82606c564565fb05d2fa9e5f6122b61e9f1b60"
+            },
+            {
+              "literal": "/usr/lib64/liblapacke.so.3",
+              "resolved": "/usr/lib64/liblapacke.so.3.12.0",
+              "sha256": "4e74d393b6f5f294cbd96b777da8be3ada9995b1da98aaa0c1eb5fea4b294c7c"
+            },
+            {
+              "literal": "/usr/lib64/libpng16.so.16",
+              "resolved": "/usr/lib64/libpng16.so.16.59.0",
+              "sha256": "536a1ed876bffe5a7e9204aae387d4da2d4a969bf716bbcf4a03c30a8dea0cde"
+            },
+            {
+              "literal": "/usr/lib64/libjpeg.so.62",
+              "resolved": "/usr/lib64/libjpeg.so.62.4.0",
+              "sha256": "beb79376b4544260da3c31603784c908b58bdb959cbe1d8c48075dfa7d5bc80c"
+            },
+            {
+              "literal": "/usr/lib64/libz.so.1",
+              "resolved": "/usr/lib64/libz.so.1.3.1.zlib-ng",
+              "sha256": "bbde8faec092a7c67b8bd76bbba4a826e61b05c171b97004ce6b308c5a090351"
+            },
+            {
+              "literal": "/usr/lib64/libOpenEXR-3_2.so.31",
+              "resolved": "/usr/lib64/libOpenEXR-3_2.so.31.3.2.4",
+              "sha256": "efdbbe75b27b6a50e4a8e028e008fde32befa53280295e21ef6f036350225769"
+            },
+            {
+              "literal": "/usr/lib64/libOpenEXRUtil-3_2.so.31",
+              "resolved": "/usr/lib64/libOpenEXRUtil-3_2.so.31.3.2.4",
+              "sha256": "bafa0a2cb708d3ae952987c013d96e992badbb742e1a8e4fac6605c7eae5b5a0"
+            },
+            {
+              "literal": "/usr/lib64/libOpenEXRCore-3_2.so.31",
+              "resolved": "/usr/lib64/libOpenEXRCore-3_2.so.31.3.2.4",
+              "sha256": "bc6775af6f33d58d41f20e714d80db4b0fd21209796a6694cb5249739a49a331"
+            },
+            {
+              "literal": "/usr/lib64/libIex-3_2.so.31",
+              "resolved": "/usr/lib64/libIex-3_2.so.31.3.2.4",
+              "sha256": "da965da4711be1158555d457dc6ff17582ec88c1b86d98edc69f09cdcc4f6c7a"
+            },
+            {
+              "literal": "/usr/lib64/libIlmThread-3_2.so.31",
+              "resolved": "/usr/lib64/libIlmThread-3_2.so.31.3.2.4",
+              "sha256": "424321e69eb6257387820baa90e4fccb209c5dcb8c88589a8c5e1ccf4d4c23d6"
+            },
+            {
+              "literal": "/usr/lib64/libImath-3_1.so.29",
+              "resolved": "/usr/lib64/libImath-3_1.so.29.11.0",
+              "sha256": "1e86ce61e14061369bd937b73d53abb69305dff34df4700f99a459f5c024ab45"
+            },
+            {
+              "literal": "/usr/lib64/libgcc_s.so.1",
+              "resolved": "/usr/lib64/libgcc_s-16-20261029.so.1",
+              "sha256": "5a52ae4a6f1b119aa092aa1483c967e19d9ba036b1b0c2133236a8a2ce826ebf"
+            },
+            {
+              "literal": "/usr/lib64/libstdc++.so.6",
+              "resolved": "/usr/lib64/libstdc++.so.6.0.36",
+              "sha256": "49811507d8fc0283d8f8023546613774c673f876fe823b1b99d0c8d46039deda"
+            },
+            {
+              "literal": "/usr/lib64/libm.so.6",
+              "resolved": "/usr/lib64/libm.so.6",
+              "sha256": "16a03ce6d24c8a46742206d4a9c1d35bb6577ae2384f153dc6ef4a4b62b5357f"
+            },
+            {
+              "literal": "/usr/lib64/libc.so.6",
+              "resolved": "/usr/lib64/libc.so.6",
+              "sha256": "a5c5ad9d59d3c69eda93aa8f82930ba06cc4e893a113e66c85ad6e96243d53c8"
+            },
+            {
+              "literal": "/usr/lib64/libGLdispatch.so.0",
+              "resolved": "/usr/lib64/libGLdispatch.so.0.0.0",
+              "sha256": "3c53e14fb731128afe1fa1c88e94944fe9a60cbe170f2e08c1134b709d771ec7"
+            },
+            {
+              "literal": "/lib64/ld-linux-x86-64.so.2",
+              "resolved": "/usr/lib64/ld-linux-x86-64.so.2",
+              "sha256": "4e5d39355699e90fa29313d3100e82af4a23290028c58c364d6a249ef6a78e5e"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "source-artist-normal-bake",
+      "exit": 0,
+      "actual_pass_count": 139,
+      "ordered_pairs": [],
+      "live_maps_witness": [
+        {
+          "pid": 810272,
+          "start": 14015364,
+          "providers": [
+            {
+              "literal": "/usr/lib64/libOpenGL.so.0",
+              "resolved": "/usr/lib64/libOpenGL.so.0.0.0",
+              "sha256": "07a014ea0624d5d9711f941fb0401a203c2025b683d34897bd1b261a32a83d69"
+            },
+            {
+              "literal": "/usr/lib64/libEGL.so.1",
+              "resolved": "/usr/lib64/libEGL.so.1.1.0",
+              "sha256": "76ffc090b8990696d028e7d1bc82606c564565fb05d2fa9e5f6122b61e9f1b60"
+            },
+            {
+              "literal": "/usr/lib64/liblapacke.so.3",
+              "resolved": "/usr/lib64/liblapacke.so.3.12.0",
+              "sha256": "4e74d393b6f5f294cbd96b777da8be3ada9995b1da98aaa0c1eb5fea4b294c7c"
+            },
+            {
+              "literal": "/usr/lib64/libpng16.so.16",
+              "resolved": "/usr/lib64/libpng16.so.16.59.0",
+              "sha256": "536a1ed876bffe5a7e9204aae387d4da2d4a969bf716bbcf4a03c30a8dea0cde"
+            },
+            {
+              "literal": "/usr/lib64/libjpeg.so.62",
+              "resolved": "/usr/lib64/libjpeg.so.62.4.0",
+              "sha256": "beb79376b4544260da3c31603784c908b58bdb959cbe1d8c48075dfa7d5bc80c"
+            },
+            {
+              "literal": "/usr/lib64/libz.so.1",
+              "resolved": "/usr/lib64/libz.so.1.3.1.zlib-ng",
+              "sha256": "bbde8faec092a7c67b8bd76bbba4a826e61b05c171b97004ce6b308c5a090351"
+            },
+            {
+              "literal": "/usr/lib64/libOpenEXR-3_2.so.31",
+              "resolved": "/usr/lib64/libOpenEXR-3_2.so.31.3.2.4",
+              "sha256": "efdbbe75b27b6a50e4a8e028e008fde32befa53280295e21ef6f036350225769"
+            },
+            {
+              "literal": "/usr/lib64/libOpenEXRUtil-3_2.so.31",
+              "resolved": "/usr/lib64/libOpenEXRUtil-3_2.so.31.3.2.4",
+              "sha256": "bafa0a2cb708d3ae952987c013d96e992badbb742e1a8e4fac6605c7eae5b5a0"
+            },
+            {
+              "literal": "/usr/lib64/libOpenEXRCore-3_2.so.31",
+              "resolved": "/usr/lib64/libOpenEXRCore-3_2.so.31.3.2.4",
+              "sha256": "bc6775af6f33d58d41f20e714d80db4b0fd21209796a6694cb5249739a49a331"
+            },
+            {
+              "literal": "/usr/lib64/libIex-3_2.so.31",
+              "resolved": "/usr/lib64/libIex-3_2.so.31.3.2.4",
+              "sha256": "da965da4711be1158555d457dc6ff17582ec88c1b86d98edc69f09cdcc4f6c7a"
+            },
+            {
+              "literal": "/usr/lib64/libIlmThread-3_2.so.31",
+              "resolved": "/usr/lib64/libIlmThread-3_2.so.31.3.2.4",
+              "sha256": "424321e69eb6257387820baa90e4fccb209c5dcb8c88589a8c5e1ccf4d4c23d6"
+            },
+            {
+              "literal": "/usr/lib64/libImath-3_1.so.29",
+              "resolved": "/usr/lib64/libImath-3_1.so.29.11.0",
+              "sha256": "1e86ce61e14061369bd937b73d53abb69305dff34df4700f99a459f5c024ab45"
+            },
+            {
+              "literal": "/usr/lib64/libgcc_s.so.1",
+              "resolved": "/usr/lib64/libgcc_s-16-20261029.so.1",
+              "sha256": "5a52ae4a6f1b119aa092aa1483c967e19d9ba036b1b0c2133236a8a2ce826ebf"
+            },
+            {
+              "literal": "/usr/lib64/libstdc++.so.6",
+              "resolved": "/usr/lib64/libstdc++.so.6.0.36",
+              "sha256": "49811507d8fc0283d8f8023546613774c673f876fe823b1b99d0c8d46039deda"
+            },
+            {
+              "literal": "/usr/lib64/libm.so.6",
+              "resolved": "/usr/lib64/libm.so.6",
+              "sha256": "16a03ce6d24c8a46742206d4a9c1d35bb6577ae2384f153dc6ef4a4b62b5357f"
+            },
+            {
+              "literal": "/usr/lib64/libc.so.6",
+              "resolved": "/usr/lib64/libc.so.6",
+              "sha256": "a5c5ad9d59d3c69eda93aa8f82930ba06cc4e893a113e66c85ad6e96243d53c8"
+            },
+            {
+              "literal": "/usr/lib64/libGLdispatch.so.0",
+              "resolved": "/usr/lib64/libGLdispatch.so.0.0.0",
+              "sha256": "3c53e14fb731128afe1fa1c88e94944fe9a60cbe170f2e08c1134b709d771ec7"
+            },
+            {
+              "literal": "/usr/lib64/libtmglib.so.3",
+              "resolved": "/usr/lib64/libtmglib.so.3.12.0",
+              "sha256": "e497c25e923336dc4d95b2822f0845667ab113b985e8e7d16eadaf0379cdac87"
+            },
+            {
+              "literal": "/usr/lib64/liblapack.so.3",
+              "resolved": "/usr/lib64/liblapack.so.3.12.0",
+              "sha256": "10c786e4517845cac86595b22fd7d40b548bf328cbf7bf14c867b0c31e20661f"
+            },
+            {
+              "literal": "/usr/lib64/libdeflate.so.0",
+              "resolved": "/usr/lib64/libdeflate.so.0",
+              "sha256": "fee24c7738e4c31860f65fa43c862f572cdf4cd2ffcc30e5cd8bf1d46346b318"
+            },
+            {
+              "literal": "/lib64/ld-linux-x86-64.so.2",
+              "resolved": "/usr/lib64/ld-linux-x86-64.so.2",
+              "sha256": "4e5d39355699e90fa29313d3100e82af4a23290028c58c364d6a249ef6a78e5e"
+            },
+            {
+              "literal": "/usr/lib64/libblas.so.3",
+              "resolved": "/usr/lib64/libblas.so.3.12.0",
+              "sha256": "df2686da50030c23198f485115b84df323352325abb18a949515736e8f57b2f4"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "source-canonical-normal-bake",
+      "exit": 0,
+      "actual_pass_count": 525092,
+      "ordered_pairs": [
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/00000.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/00000-ordered.dsculpt",
+          "sha256": "18f72696b6b4d27d0ebc83c6183ad06cb3b221a5e6e1fc77181c93432332f8b5"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/00001.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/00001-ordered.dsculpt",
+          "sha256": "642b8cbadb90e3d94282e5c3dadfb1e1bdc98384ec0297685c5bbe14700b7616"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/00010.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/00010-ordered.dsculpt",
+          "sha256": "b3a9fc791170c155a530ff00b414b5b9ceb2d252ac8a8636288a0537a582c740"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/00011.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/00011-ordered.dsculpt",
+          "sha256": "d70ebb7bfc8987b25b55d5d69d9c23ea4e4b7a3ee84f05c05089f8d3cfc55b01"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/00100.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/00100-ordered.dsculpt",
+          "sha256": "301fcaa77d1102f287190edece61c2ab61137a3530c0b0e1323d75bf06daabb2"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/00101.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/00101-ordered.dsculpt",
+          "sha256": "c7a398e486288f4253f61e44a2826397a7843b2d061bde59331621e036c972c6"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/00110.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/00110-ordered.dsculpt",
+          "sha256": "387211d164d8cae88f38f2758b8062da501097434240edf20b3fdad8b8f7db92"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/00111.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/00111-ordered.dsculpt",
+          "sha256": "aa7d91058cdccb17e6e3d455685fa3df78bae3ccd962ad152fc89914769d8d23"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/01000.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/01000-ordered.dsculpt",
+          "sha256": "86777bf6be55f1c73a37ef06bd8ab8da44d1eea95e56653aaf5b5779fb9901f5"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/01001.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/01001-ordered.dsculpt",
+          "sha256": "410963cc1fe5c280a544a6a15f27ba6cc658e814c71d21a05e449c734dfb2f1f"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/01010.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/01010-ordered.dsculpt",
+          "sha256": "65c7971920775590d672e255afaff5fc09543c57b6b5888492ec4f18eb8020a8"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/01011.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/01011-ordered.dsculpt",
+          "sha256": "f84e02bf8a7a636213430674a6a683f11d81959b14cb940625257a2a59ca06bd"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/01100.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/01100-ordered.dsculpt",
+          "sha256": "a1c7308d828f9feb00b7498c108146ceeef36adaa8876a65e15e38b3b799b3e7"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/01101.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/01101-ordered.dsculpt",
+          "sha256": "a7cb3b704c90004392f03d19db365f52a32b4ecf11c750ebdaa14d89ff282fa9"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/01110.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/01110-ordered.dsculpt",
+          "sha256": "57161387f393431e33cfd9ef2d663ecab92c0622758097047d7c52cee2a907bd"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/01111.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/01111-ordered.dsculpt",
+          "sha256": "c2f35ee520bb7b59248a317f68dbb525d8eb48da3a14cfa2ced52fe908c87879"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/10000.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/10000-ordered.dsculpt",
+          "sha256": "1b2d4953aaccd5b558d41e2b39131859c8e74cc6b6ac9bbd030ec496511fd032"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/10001.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/10001-ordered.dsculpt",
+          "sha256": "997cc9e88571c730e92418363db40027e9aefe7cbeba5086e20ab021aa007a3d"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/10010.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/10010-ordered.dsculpt",
+          "sha256": "100cbd91343ee9f6ce29c8d78fa4d13401529b00fc921e09270c148c06caaaeb"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/10011.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/10011-ordered.dsculpt",
+          "sha256": "fc540d8400b191afdec522dceb6f4e7a9ddbb08e78a739b7d14b47af554daace"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/10100.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/10100-ordered.dsculpt",
+          "sha256": "28890b1652fab7b18e9f9f6a1fb22b5268eb250b9d1614a5afa1f0a052b7f078"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/10101.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/10101-ordered.dsculpt",
+          "sha256": "4f3edede12271cb9df67a5860eff8f841b9c897aeec178c1648cdd14eba9b5c4"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/10110.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/10110-ordered.dsculpt",
+          "sha256": "3a92ddc8e1cd2dd0b31fd067c773673e616ac9f227078e4c5f943adee9a0ec45"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/10111.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/10111-ordered.dsculpt",
+          "sha256": "6f169aa1ec5e0a5c728dc8cc027f8042029c05e1ac324ac4fa26cbdff0cac835"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/11000.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/11000-ordered.dsculpt",
+          "sha256": "df547095f55b3cc9f8012569909be30fb9b267aa892eb048b8a4c5494ffb58af"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/11001.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/11001-ordered.dsculpt",
+          "sha256": "26df67a7bbe29af05fa5b0434498c02dcdf9c8d9de709aae071d44c7ba293cfb"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/11010.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/11010-ordered.dsculpt",
+          "sha256": "66a7af3f1d0e0c996e36197b6b01ed8949fa423205e242b16b67c93c5c6605d2"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/11011.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/11011-ordered.dsculpt",
+          "sha256": "ac3deb8cef59e47f6b8edbc5a8feb5a8a0464afe1c7ce875691d13a26b507f9b"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/11100.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/11100-ordered.dsculpt",
+          "sha256": "856d676e162d9a03fa5a5007bc948b433c28cba306696185d023aa4210664cf0"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/11101.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/11101-ordered.dsculpt",
+          "sha256": "97737463e6fd957041a2eebf2984ba140e5b085a362be23b864fd48721c082da"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/11110.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/11110-ordered.dsculpt",
+          "sha256": "125cac36a2fe0bed69161fe51f33dbd64e5572593404fdef38cc3f105b866f5f"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/11111.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-canonical-normal-bake-outputs/11111-ordered.dsculpt",
+          "sha256": "0d54a1f78da79ce1d30ae8d31869125eb53cfa451060c2cd72b69c09ec5b616f"
+        }
+      ],
+      "actual_canonical_cases": [
+        "00000",
+        "00001",
+        "00010",
+        "00011",
+        "00100",
+        "00101",
+        "00110",
+        "00111",
+        "01000",
+        "01001",
+        "01010",
+        "01011",
+        "01100",
+        "01101",
+        "01110",
+        "01111",
+        "10000",
+        "10001",
+        "10010",
+        "10011",
+        "10100",
+        "10101",
+        "10110",
+        "10111",
+        "11000",
+        "11001",
+        "11010",
+        "11011",
+        "11100",
+        "11101",
+        "11110",
+        "11111"
+      ],
+      "live_maps_witness": [
+        {
+          "pid": 811236,
+          "start": 14016000,
+          "providers": [
+            {
+              "literal": "/usr/lib64/libOpenGL.so.0",
+              "resolved": "/usr/lib64/libOpenGL.so.0.0.0",
+              "sha256": "07a014ea0624d5d9711f941fb0401a203c2025b683d34897bd1b261a32a83d69"
+            },
+            {
+              "literal": "/usr/lib64/libEGL.so.1",
+              "resolved": "/usr/lib64/libEGL.so.1.1.0",
+              "sha256": "76ffc090b8990696d028e7d1bc82606c564565fb05d2fa9e5f6122b61e9f1b60"
+            },
+            {
+              "literal": "/usr/lib64/liblapacke.so.3",
+              "resolved": "/usr/lib64/liblapacke.so.3.12.0",
+              "sha256": "4e74d393b6f5f294cbd96b777da8be3ada9995b1da98aaa0c1eb5fea4b294c7c"
+            },
+            {
+              "literal": "/usr/lib64/libpng16.so.16",
+              "resolved": "/usr/lib64/libpng16.so.16.59.0",
+              "sha256": "536a1ed876bffe5a7e9204aae387d4da2d4a969bf716bbcf4a03c30a8dea0cde"
+            },
+            {
+              "literal": "/usr/lib64/libjpeg.so.62",
+              "resolved": "/usr/lib64/libjpeg.so.62.4.0",
+              "sha256": "beb79376b4544260da3c31603784c908b58bdb959cbe1d8c48075dfa7d5bc80c"
+            },
+            {
+              "literal": "/usr/lib64/libz.so.1",
+              "resolved": "/usr/lib64/libz.so.1.3.1.zlib-ng",
+              "sha256": "bbde8faec092a7c67b8bd76bbba4a826e61b05c171b97004ce6b308c5a090351"
+            },
+            {
+              "literal": "/usr/lib64/libOpenEXR-3_2.so.31",
+              "resolved": "/usr/lib64/libOpenEXR-3_2.so.31.3.2.4",
+              "sha256": "efdbbe75b27b6a50e4a8e028e008fde32befa53280295e21ef6f036350225769"
+            },
+            {
+              "literal": "/usr/lib64/libOpenEXRUtil-3_2.so.31",
+              "resolved": "/usr/lib64/libOpenEXRUtil-3_2.so.31.3.2.4",
+              "sha256": "bafa0a2cb708d3ae952987c013d96e992badbb742e1a8e4fac6605c7eae5b5a0"
+            },
+            {
+              "literal": "/usr/lib64/libOpenEXRCore-3_2.so.31",
+              "resolved": "/usr/lib64/libOpenEXRCore-3_2.so.31.3.2.4",
+              "sha256": "bc6775af6f33d58d41f20e714d80db4b0fd21209796a6694cb5249739a49a331"
+            },
+            {
+              "literal": "/usr/lib64/libIex-3_2.so.31",
+              "resolved": "/usr/lib64/libIex-3_2.so.31.3.2.4",
+              "sha256": "da965da4711be1158555d457dc6ff17582ec88c1b86d98edc69f09cdcc4f6c7a"
+            },
+            {
+              "literal": "/usr/lib64/libIlmThread-3_2.so.31",
+              "resolved": "/usr/lib64/libIlmThread-3_2.so.31.3.2.4",
+              "sha256": "424321e69eb6257387820baa90e4fccb209c5dcb8c88589a8c5e1ccf4d4c23d6"
+            },
+            {
+              "literal": "/usr/lib64/libImath-3_1.so.29",
+              "resolved": "/usr/lib64/libImath-3_1.so.29.11.0",
+              "sha256": "1e86ce61e14061369bd937b73d53abb69305dff34df4700f99a459f5c024ab45"
+            },
+            {
+              "literal": "/usr/lib64/libgcc_s.so.1",
+              "resolved": "/usr/lib64/libgcc_s-16-20261029.so.1",
+              "sha256": "5a52ae4a6f1b119aa092aa1483c967e19d9ba036b1b0c2133236a8a2ce826ebf"
+            },
+            {
+              "literal": "/usr/lib64/libstdc++.so.6",
+              "resolved": "/usr/lib64/libstdc++.so.6.0.36",
+              "sha256": "49811507d8fc0283d8f8023546613774c673f876fe823b1b99d0c8d46039deda"
+            },
+            {
+              "literal": "/usr/lib64/libm.so.6",
+              "resolved": "/usr/lib64/libm.so.6",
+              "sha256": "16a03ce6d24c8a46742206d4a9c1d35bb6577ae2384f153dc6ef4a4b62b5357f"
+            },
+            {
+              "literal": "/usr/lib64/libc.so.6",
+              "resolved": "/usr/lib64/libc.so.6",
+              "sha256": "a5c5ad9d59d3c69eda93aa8f82930ba06cc4e893a113e66c85ad6e96243d53c8"
+            },
+            {
+              "literal": "/usr/lib64/libGLdispatch.so.0",
+              "resolved": "/usr/lib64/libGLdispatch.so.0.0.0",
+              "sha256": "3c53e14fb731128afe1fa1c88e94944fe9a60cbe170f2e08c1134b709d771ec7"
+            },
+            {
+              "literal": "/usr/lib64/libtmglib.so.3",
+              "resolved": "/usr/lib64/libtmglib.so.3.12.0",
+              "sha256": "e497c25e923336dc4d95b2822f0845667ab113b985e8e7d16eadaf0379cdac87"
+            },
+            {
+              "literal": "/usr/lib64/liblapack.so.3",
+              "resolved": "/usr/lib64/liblapack.so.3.12.0",
+              "sha256": "10c786e4517845cac86595b22fd7d40b548bf328cbf7bf14c867b0c31e20661f"
+            },
+            {
+              "literal": "/usr/lib64/libdeflate.so.0",
+              "resolved": "/usr/lib64/libdeflate.so.0",
+              "sha256": "fee24c7738e4c31860f65fa43c862f572cdf4cd2ffcc30e5cd8bf1d46346b318"
+            },
+            {
+              "literal": "/lib64/ld-linux-x86-64.so.2",
+              "resolved": "/usr/lib64/ld-linux-x86-64.so.2",
+              "sha256": "4e5d39355699e90fa29313d3100e82af4a23290028c58c364d6a249ef6a78e5e"
+            },
+            {
+              "literal": "/usr/lib64/libblas.so.3",
+              "resolved": "/usr/lib64/libblas.so.3.12.0",
+              "sha256": "df2686da50030c23198f485115b84df323352325abb18a949515736e8f57b2f4"
+            },
+            {
+              "literal": "/usr/lib64/libmvec.so.1",
+              "resolved": "/usr/lib64/libmvec.so.1",
+              "sha256": "82ddf7efbb88b2eaf5570fa6c0ec41565d9c32a2dbd095200ceead862af0f3dc"
+            },
+            {
+              "literal": "/usr/lib64/libgfortran.so.5",
+              "resolved": "/usr/lib64/libgfortran.so.5.0.0",
+              "sha256": "d4b3a93cbd67561c5febd49d7bd035796d3b2b03a8d659d7ddf869321173f186"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "source-writable-normal-bake",
+      "exit": 0,
+      "actual_pass_count": 619634,
+      "ordered_pairs": [
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/000000.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/000000-ordered.dsculpt",
+          "sha256": "549d08637b01d0b4e77b90bbcdab5714d8a7abcc2703108a218d336cba5fe401"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/000001.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/000001-ordered.dsculpt",
+          "sha256": "321067b5407d430ea8a9a48e80e9e238037211728be5cb5b48e70e761ae473b1"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/000010.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/000010-ordered.dsculpt",
+          "sha256": "6e958894abcb9306db7307344a4ae65560f9f6bb573b074519c0129fb55e0f2a"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/000011.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/000011-ordered.dsculpt",
+          "sha256": "775a3b66abd971de9f25d95ea1eb136ec4ef0149cf7e747a9a463757afc38198"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/000100.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/000100-ordered.dsculpt",
+          "sha256": "9f761696bfac15198dab80925d0bdc0253324f1e7d19ed62708310b39c7214fb"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/000101.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/000101-ordered.dsculpt",
+          "sha256": "225c4665a59662219b619f62941bc3d980a66ac80d0709d2ac44189662c16648"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/000110.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/000110-ordered.dsculpt",
+          "sha256": "6b2d44aa346e576f9bc06b3d8e0d8b0a01d5aad9478a00fbdcb7e9af9a6c58db"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/000111.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/000111-ordered.dsculpt",
+          "sha256": "c11e72be078cd139bcf170a8d881013bcd4aa7bd5d0dfc8e5a598b678ef7ff7f"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/001000.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/001000-ordered.dsculpt",
+          "sha256": "b4e8e5c719b2309e5b7f4c1bc4479266c6927b334bfac36e06cab714241d8da2"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/001001.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/001001-ordered.dsculpt",
+          "sha256": "f611d173c301cd6e177338d74c3933f82145b1160ddec068f2064eeced214ea6"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/001010.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/001010-ordered.dsculpt",
+          "sha256": "8198a26e45f4777c2a0348f8ca894a8e60cd0ce84c04e39128f18ceaa26ef800"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/001011.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/001011-ordered.dsculpt",
+          "sha256": "49a0a1b9ac68727f0532eea7a55b8ab5977395fd7db05035c2b6b81fcbdff4b6"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/001100.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/001100-ordered.dsculpt",
+          "sha256": "3c53908a4f88b4999d551b26bfdb660e5c15311e49d6cfb2aaf2dd07b24d7e8c"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/001101.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/001101-ordered.dsculpt",
+          "sha256": "262f8b80288c4f9020c0225c25963395092030511650163a5c7b184956533560"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/001110.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/001110-ordered.dsculpt",
+          "sha256": "21340e835388e6336ba9534e27361c9c5e93690d3c6586ce9f236eed1fb165c2"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/001111.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/001111-ordered.dsculpt",
+          "sha256": "4eaf92131b4321d1349eec1ee38899e9768833de15199945a4a238ab59853d4a"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/010000.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/010000-ordered.dsculpt",
+          "sha256": "678116dfc6088ccb389b297a2cbf46179a0295788e2b850b8c46d13dcd583c38"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/010001.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/010001-ordered.dsculpt",
+          "sha256": "fbf7fb4cefd557c8c8401b63387b9ec0defc316ad337557a35b5d4e289803bbd"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/010010.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/010010-ordered.dsculpt",
+          "sha256": "0d443ce2edd7558bade9fa0a0c03a867adf2c38201566f2a85903780ec734530"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/010011.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/010011-ordered.dsculpt",
+          "sha256": "9f06664e85d474ed26fe793666eca9186cb7cb0b26e20554f495657b2b1377c1"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/010100.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/010100-ordered.dsculpt",
+          "sha256": "fdd801b681d78afeaf97aa0d0865a78334f6caee0318ed5dde1c20e2b1cb6a80"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/010101.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/010101-ordered.dsculpt",
+          "sha256": "bb819ebaa12d825c061f59be62f85bcf4aa13f91685c0137880d5cf897e8bac7"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/010110.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/010110-ordered.dsculpt",
+          "sha256": "69b05d395027d12ce75b84316509fdb2a4f55a42d4b1c63375809aea1d350be0"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/010111.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/010111-ordered.dsculpt",
+          "sha256": "add830d94043bc92726a9f63ac8400d1f785dc6561937f8d1690addd43720a7f"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/011000.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/011000-ordered.dsculpt",
+          "sha256": "c47a9a7b556ce100c4d7111501d07340ff0758d104efdad6fb1add5c6e1e19f8"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/011001.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/011001-ordered.dsculpt",
+          "sha256": "b3aabf2a7ec24fb834892417548b3955bcd70c8b0063fc566bb35e09fa4947d9"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/011010.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/011010-ordered.dsculpt",
+          "sha256": "a68756308a45fac8d617610892dbc5bc4257c731969a09d360672612392885d0"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/011011.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/011011-ordered.dsculpt",
+          "sha256": "a6f151b382f265885e538bc3dfe784d5056ea8665e06bb6acb0169b4977674e9"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/011100.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/011100-ordered.dsculpt",
+          "sha256": "98e079678c9044df487c009f1e49083024a5c9bfa29b61886d812b7f1d57e5cd"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/011101.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/011101-ordered.dsculpt",
+          "sha256": "64d1842b5f5441dd0f9aebfeaf53ca7b1c3f46ddd7787043fe5c03f547bce519"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/011110.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/011110-ordered.dsculpt",
+          "sha256": "d493ddce4ec6d57c9cc6c943fa01b87218f7546f69c3190ab669c8f8bf9493b6"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/011111.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/011111-ordered.dsculpt",
+          "sha256": "5dd411411c17e571dc6028ed3c597f6202a8846291c0e251fdb66dc22ecb6fab"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/100000.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/100000-ordered.dsculpt",
+          "sha256": "971d72e1d13e625a4a6d5e6315be70f6490c69acdf71748037691ff0bb97fd12"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/100001.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/100001-ordered.dsculpt",
+          "sha256": "57b8980bf4e4059365bcee1b1b321a526871fcdda95f672141652b6c91fd055e"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/100010.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/100010-ordered.dsculpt",
+          "sha256": "f028872ce85c1e2cda152724ec6bcea3c5b865b7bd19e056d27bb00aac309f26"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/100011.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/100011-ordered.dsculpt",
+          "sha256": "c21d5f415523d94b70ab063e741d9dd914f5e300b8ec9b98267dad1ec6c76d08"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/100100.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/100100-ordered.dsculpt",
+          "sha256": "1600be238aa20c3a92980f895be580823857601c70eaa9ccf4514edbd9dc8588"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/100101.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/100101-ordered.dsculpt",
+          "sha256": "5a355517ae8a5e90524f3fd7ae0e498d71322ec054f3577979301d259e32672a"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/100110.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/100110-ordered.dsculpt",
+          "sha256": "bd7b0788059a2be79db7662f956ca260c66624c72a9e8385b41f042a4a7aec63"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/100111.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/100111-ordered.dsculpt",
+          "sha256": "e87d73d309d97b1daebefe920599547061fb9b2f7f2ba2d353b2c5d6d1c115df"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/101000.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/101000-ordered.dsculpt",
+          "sha256": "6af04fa7a2f8d2a68cb82cea90ef4f1a76353cfad545dec76a09bf73ea0c69ac"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/101001.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/101001-ordered.dsculpt",
+          "sha256": "221f20c76e3763d81108216f20ed919a1f41a993abfa965f6afa76cfd96aa289"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/101010.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/101010-ordered.dsculpt",
+          "sha256": "ab1a8517d4f46c63a81bad12dbe42c8d44e185d131f6ae7ccf080e9e7c1ae88e"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/101011.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/101011-ordered.dsculpt",
+          "sha256": "7e5c5cacee280373958b6df8e2bc3f23c7b609230c4508c29c7ad5b4db601f2c"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/101100.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/101100-ordered.dsculpt",
+          "sha256": "99cdb56d581ccca1c66973052f41f7c34c134dab5e4e43a32f677e4468ea2436"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/101101.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/101101-ordered.dsculpt",
+          "sha256": "7cb1e3a1ae338c19c8fefdb653e5389978dafb1c196eb51a0a3ebe464a81317e"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/101110.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/101110-ordered.dsculpt",
+          "sha256": "a8520e3f5355a9f3dc9e91b1378b175652373a5cd086473f91d4b618283121f0"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/101111.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/101111-ordered.dsculpt",
+          "sha256": "da1469228dca0b2de3c2036143f569d788d074c5859ae32e8f1a04c1b91407d8"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/110000.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/110000-ordered.dsculpt",
+          "sha256": "2d13fc97125f7a6a0e45a0585aba07873212e3531313d78e3257dd88ce22d293"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/110001.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/110001-ordered.dsculpt",
+          "sha256": "657b5779c3a03ed8bc40125209c550f2626559cbe0721d5a08f2b5172d065b56"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/110010.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/110010-ordered.dsculpt",
+          "sha256": "bfd48c4df56c121efab244fcfea26df275b3b220f9cc090b571f9e70137c9bcd"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/110011.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/110011-ordered.dsculpt",
+          "sha256": "b6a4573cd413d5d11e5d597b224c67081a04a114bdb388c96df94a35e98f4374"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/110100.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/110100-ordered.dsculpt",
+          "sha256": "cc53d6ca68bf3ef967a5879af11d0cae36d9707f9fd0c37c7db7260a307819b7"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/110101.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/110101-ordered.dsculpt",
+          "sha256": "6ce547fa1f6c3e2f58e44207147b03490e5bc75db70fceac5b6e7b3f42023431"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/110110.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/110110-ordered.dsculpt",
+          "sha256": "4475cdcab999ceb4138dd957a45e5eb98688e80266e8f166e51b5f7b8efa4cdc"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/110111.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/110111-ordered.dsculpt",
+          "sha256": "962e1104f513dda2f3d4d5cdea2a5c06bee44568a319955c02def14de28d4f91"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/111000.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/111000-ordered.dsculpt",
+          "sha256": "7a0c6cc0e4c6b52464bffb75e6ad5d8638cdc885bf78bb402b190f89a26d9500"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/111001.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/111001-ordered.dsculpt",
+          "sha256": "5b761bdafa25386c1677b7b70985acbf4b3f7e1ac3011110bbd01030b22452fa"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/111010.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/111010-ordered.dsculpt",
+          "sha256": "87f0b1be32cb033b794716aebaaf50cf1826757589efa444712a10cda2994496"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/111011.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/111011-ordered.dsculpt",
+          "sha256": "9c25fee7b42f783f0b2f86b86021fcafc64d6e5b3671192fe14839d8915d4b6b"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/111100.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/111100-ordered.dsculpt",
+          "sha256": "fd08db0f951a4f375bed87d65fdb269afbd4d474991c22a5c21555a9afaf734b"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/111101.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/111101-ordered.dsculpt",
+          "sha256": "0fdc74f03e738e982c7c493e217b357ac4034fe092f734d63f0bbb24fdcedb8b"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/111110.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/111110-ordered.dsculpt",
+          "sha256": "3a512f63ee97ce752154bcf8c6bf21475fefd4d26390aa94fc3db3b0d8613e2a"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/111111.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-writable-normal-bake-outputs/111111-ordered.dsculpt",
+          "sha256": "79927245de4c6faed29079ec2d738fbb2a07a3f1b744f596f598907167eea98b"
+        }
+      ],
+      "actual_writable_cases": [
+        "000000",
+        "000001",
+        "000010",
+        "000011",
+        "000100",
+        "000101",
+        "000110",
+        "000111",
+        "001000",
+        "001001",
+        "001010",
+        "001011",
+        "001100",
+        "001101",
+        "001110",
+        "001111",
+        "010000",
+        "010001",
+        "010010",
+        "010011",
+        "010100",
+        "010101",
+        "010110",
+        "010111",
+        "011000",
+        "011001",
+        "011010",
+        "011011",
+        "011100",
+        "011101",
+        "011110",
+        "011111",
+        "100000",
+        "100001",
+        "100010",
+        "100011",
+        "100100",
+        "100101",
+        "100110",
+        "100111",
+        "101000",
+        "101001",
+        "101010",
+        "101011",
+        "101100",
+        "101101",
+        "101110",
+        "101111",
+        "110000",
+        "110001",
+        "110010",
+        "110011",
+        "110100",
+        "110101",
+        "110110",
+        "110111",
+        "111000",
+        "111001",
+        "111010",
+        "111011",
+        "111100",
+        "111101",
+        "111110",
+        "111111"
+      ],
+      "live_maps_witness": [
+        {
+          "pid": 820316,
+          "start": 14022216,
+          "providers": [
+            {
+              "literal": "/usr/lib64/libOpenGL.so.0",
+              "resolved": "/usr/lib64/libOpenGL.so.0.0.0",
+              "sha256": "07a014ea0624d5d9711f941fb0401a203c2025b683d34897bd1b261a32a83d69"
+            },
+            {
+              "literal": "/usr/lib64/libEGL.so.1",
+              "resolved": "/usr/lib64/libEGL.so.1.1.0",
+              "sha256": "76ffc090b8990696d028e7d1bc82606c564565fb05d2fa9e5f6122b61e9f1b60"
+            },
+            {
+              "literal": "/usr/lib64/liblapacke.so.3",
+              "resolved": "/usr/lib64/liblapacke.so.3.12.0",
+              "sha256": "4e74d393b6f5f294cbd96b777da8be3ada9995b1da98aaa0c1eb5fea4b294c7c"
+            },
+            {
+              "literal": "/usr/lib64/libpng16.so.16",
+              "resolved": "/usr/lib64/libpng16.so.16.59.0",
+              "sha256": "536a1ed876bffe5a7e9204aae387d4da2d4a969bf716bbcf4a03c30a8dea0cde"
+            },
+            {
+              "literal": "/usr/lib64/libjpeg.so.62",
+              "resolved": "/usr/lib64/libjpeg.so.62.4.0",
+              "sha256": "beb79376b4544260da3c31603784c908b58bdb959cbe1d8c48075dfa7d5bc80c"
+            },
+            {
+              "literal": "/usr/lib64/libz.so.1",
+              "resolved": "/usr/lib64/libz.so.1.3.1.zlib-ng",
+              "sha256": "bbde8faec092a7c67b8bd76bbba4a826e61b05c171b97004ce6b308c5a090351"
+            },
+            {
+              "literal": "/usr/lib64/libOpenEXR-3_2.so.31",
+              "resolved": "/usr/lib64/libOpenEXR-3_2.so.31.3.2.4",
+              "sha256": "efdbbe75b27b6a50e4a8e028e008fde32befa53280295e21ef6f036350225769"
+            },
+            {
+              "literal": "/usr/lib64/libOpenEXRUtil-3_2.so.31",
+              "resolved": "/usr/lib64/libOpenEXRUtil-3_2.so.31.3.2.4",
+              "sha256": "bafa0a2cb708d3ae952987c013d96e992badbb742e1a8e4fac6605c7eae5b5a0"
+            },
+            {
+              "literal": "/usr/lib64/libOpenEXRCore-3_2.so.31",
+              "resolved": "/usr/lib64/libOpenEXRCore-3_2.so.31.3.2.4",
+              "sha256": "bc6775af6f33d58d41f20e714d80db4b0fd21209796a6694cb5249739a49a331"
+            },
+            {
+              "literal": "/usr/lib64/libIex-3_2.so.31",
+              "resolved": "/usr/lib64/libIex-3_2.so.31.3.2.4",
+              "sha256": "da965da4711be1158555d457dc6ff17582ec88c1b86d98edc69f09cdcc4f6c7a"
+            },
+            {
+              "literal": "/usr/lib64/libIlmThread-3_2.so.31",
+              "resolved": "/usr/lib64/libIlmThread-3_2.so.31.3.2.4",
+              "sha256": "424321e69eb6257387820baa90e4fccb209c5dcb8c88589a8c5e1ccf4d4c23d6"
+            },
+            {
+              "literal": "/usr/lib64/libImath-3_1.so.29",
+              "resolved": "/usr/lib64/libImath-3_1.so.29.11.0",
+              "sha256": "1e86ce61e14061369bd937b73d53abb69305dff34df4700f99a459f5c024ab45"
+            },
+            {
+              "literal": "/usr/lib64/libgcc_s.so.1",
+              "resolved": "/usr/lib64/libgcc_s-16-20261029.so.1",
+              "sha256": "5a52ae4a6f1b119aa092aa1483c967e19d9ba036b1b0c2133236a8a2ce826ebf"
+            },
+            {
+              "literal": "/lib64/ld-linux-x86-64.so.2",
+              "resolved": "/usr/lib64/ld-linux-x86-64.so.2",
+              "sha256": "4e5d39355699e90fa29313d3100e82af4a23290028c58c364d6a249ef6a78e5e"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "source-joint-writable-normal-bake",
+      "exit": 0,
+      "actual_pass_count": 346305,
+      "ordered_pairs": [
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-joint-writable-normal-bake-outputs/000.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-joint-writable-normal-bake-outputs/000-ordered.dsculpt",
+          "sha256": "e4184aee0fa6ae37c69693add72afb653854964e878c79db82e2c2e219277ff8"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-joint-writable-normal-bake-outputs/001.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-joint-writable-normal-bake-outputs/001-ordered.dsculpt",
+          "sha256": "75bdc53d75ef89d4529159299f4ebf65095072da1dc1c188f70bbbd05e17460e"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-joint-writable-normal-bake-outputs/010.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-joint-writable-normal-bake-outputs/010-ordered.dsculpt",
+          "sha256": "e74abca01e85a734f6ead5193918051bf481b83d17b2598ef95b11518463a173"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-joint-writable-normal-bake-outputs/011.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-joint-writable-normal-bake-outputs/011-ordered.dsculpt",
+          "sha256": "9e1e07b74cdffe10d55cceb210086079d9a34744d6b4d2923a0ae558a304d3bb"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-joint-writable-normal-bake-outputs/100.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-joint-writable-normal-bake-outputs/100-ordered.dsculpt",
+          "sha256": "09dd210d2db34cad8b589c8520df06d1b6f82a9ab5e85d7714c6c575f39edb7c"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-joint-writable-normal-bake-outputs/101.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-joint-writable-normal-bake-outputs/101-ordered.dsculpt",
+          "sha256": "ef55b4e7e259791bf9d81381f8cb18a415d9284e27ab9a1df0d1c1d3392ecd99"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-joint-writable-normal-bake-outputs/110.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-joint-writable-normal-bake-outputs/110-ordered.dsculpt",
+          "sha256": "90bf54708b333dd45e5405d582b929bbec70f52002c098a225923ca1c3f71605"
+        },
+        {
+          "expected": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-joint-writable-normal-bake-outputs/111.dsculpt",
+          "ordered": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/native-final-v2/source-joint-writable-normal-bake-outputs/111-ordered.dsculpt",
+          "sha256": "4531b223c9a54f866516a71ca4d595ea1ffb0802b3986b122f9c6ff98ffcdd18"
+        }
+      ],
+      "actual_joint_cases": [
+        "000",
+        "001",
+        "010",
+        "011",
+        "100",
+        "101",
+        "110",
+        "111"
+      ],
+      "live_maps_witness": [
+        {
+          "pid": 833818,
+          "start": 14031392,
+          "providers": [
+            {
+              "literal": "/usr/lib64/libOpenGL.so.0",
+              "resolved": "/usr/lib64/libOpenGL.so.0.0.0",
+              "sha256": "07a014ea0624d5d9711f941fb0401a203c2025b683d34897bd1b261a32a83d69"
+            },
+            {
+              "literal": "/usr/lib64/libEGL.so.1",
+              "resolved": "/usr/lib64/libEGL.so.1.1.0",
+              "sha256": "76ffc090b8990696d028e7d1bc82606c564565fb05d2fa9e5f6122b61e9f1b60"
+            },
+            {
+              "literal": "/usr/lib64/liblapacke.so.3",
+              "resolved": "/usr/lib64/liblapacke.so.3.12.0",
+              "sha256": "4e74d393b6f5f294cbd96b777da8be3ada9995b1da98aaa0c1eb5fea4b294c7c"
+            },
+            {
+              "literal": "/usr/lib64/libpng16.so.16",
+              "resolved": "/usr/lib64/libpng16.so.16.59.0",
+              "sha256": "536a1ed876bffe5a7e9204aae387d4da2d4a969bf716bbcf4a03c30a8dea0cde"
+            },
+            {
+              "literal": "/usr/lib64/libjpeg.so.62",
+              "resolved": "/usr/lib64/libjpeg.so.62.4.0",
+              "sha256": "beb79376b4544260da3c31603784c908b58bdb959cbe1d8c48075dfa7d5bc80c"
+            },
+            {
+              "literal": "/usr/lib64/libz.so.1",
+              "resolved": "/usr/lib64/libz.so.1.3.1.zlib-ng",
+              "sha256": "bbde8faec092a7c67b8bd76bbba4a826e61b05c171b97004ce6b308c5a090351"
+            },
+            {
+              "literal": "/usr/lib64/libOpenEXR-3_2.so.31",
+              "resolved": "/usr/lib64/libOpenEXR-3_2.so.31.3.2.4",
+              "sha256": "efdbbe75b27b6a50e4a8e028e008fde32befa53280295e21ef6f036350225769"
+            },
+            {
+              "literal": "/usr/lib64/libOpenEXRUtil-3_2.so.31",
+              "resolved": "/usr/lib64/libOpenEXRUtil-3_2.so.31.3.2.4",
+              "sha256": "bafa0a2cb708d3ae952987c013d96e992badbb742e1a8e4fac6605c7eae5b5a0"
+            },
+            {
+              "literal": "/usr/lib64/libOpenEXRCore-3_2.so.31",
+              "resolved": "/usr/lib64/libOpenEXRCore-3_2.so.31.3.2.4",
+              "sha256": "bc6775af6f33d58d41f20e714d80db4b0fd21209796a6694cb5249739a49a331"
+            },
+            {
+              "literal": "/usr/lib64/libIex-3_2.so.31",
+              "resolved": "/usr/lib64/libIex-3_2.so.31.3.2.4",
+              "sha256": "da965da4711be1158555d457dc6ff17582ec88c1b86d98edc69f09cdcc4f6c7a"
+            },
+            {
+              "literal": "/usr/lib64/libIlmThread-3_2.so.31",
+              "resolved": "/usr/lib64/libIlmThread-3_2.so.31.3.2.4",
+              "sha256": "424321e69eb6257387820baa90e4fccb209c5dcb8c88589a8c5e1ccf4d4c23d6"
+            },
+            {
+              "literal": "/usr/lib64/libImath-3_1.so.29",
+              "resolved": "/usr/lib64/libImath-3_1.so.29.11.0",
+              "sha256": "1e86ce61e14061369bd937b73d53abb69305dff34df4700f99a459f5c024ab45"
+            },
+            {
+              "literal": "/usr/lib64/libgcc_s.so.1",
+              "resolved": "/usr/lib64/libgcc_s-16-20261029.so.1",
+              "sha256": "5a52ae4a6f1b119aa092aa1483c967e19d9ba036b1b0c2133236a8a2ce826ebf"
+            },
+            {
+              "literal": "/usr/lib64/libstdc++.so.6",
+              "resolved": "/usr/lib64/libstdc++.so.6.0.36",
+              "sha256": "49811507d8fc0283d8f8023546613774c673f876fe823b1b99d0c8d46039deda"
+            },
+            {
+              "literal": "/lib64/ld-linux-x86-64.so.2",
+              "resolved": "/usr/lib64/ld-linux-x86-64.so.2",
+              "sha256": "4e5d39355699e90fa29313d3100e82af4a23290028c58c364d6a249ef6a78e5e"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "metrics": {
+    "source-canonical-normal-bake": {
+      "direct": {
+        "min": 1.10976e-07,
+        "max": 1.87465e-07
+      },
+      "emission": {
+        "min": 0.0,
+        "max": 2.86102e-06
+      },
+      "interior": {
+        "min": 812.0,
+        "max": 2352.0
+      },
+      "material": {
+        "min": 0.0,
+        "max": 0.0
+      },
+      "omit": {
+        "min": 0.684531,
+        "max": 0.801301
+      },
+      "peak": {
+        "min": 0.0,
+        "max": 7.55471
+      },
+      "second": {
+        "min": 2.22045e-16,
+        "max": 0.00480865
+      },
+      "swap": {
+        "min": 0.0,
+        "max": 0.844416
+      },
+      "wrongUV": {
+        "min": 0.0,
+        "max": 1.23114
+      }
+    },
+    "source-writable-normal-bake": {
+      "direct": {
+        "min": 0.0,
+        "max": 1.30053e-07
+      },
+      "emission": {
+        "min": 0.0,
+        "max": 3.36411e-06
+      },
+      "interior": {
+        "min": 982.0,
+        "max": 982.0
+      },
+      "material": {
+        "min": 0.00526356,
+        "max": 0.0057999
+      },
+      "normal": {
+        "min": 0.00392151,
+        "max": 0.0048704
+      },
+      "peak": {
+        "min": 0.0,
+        "max": 7.98035
+      },
+      "wrongMaterial": {
+        "min": 0.361387,
+        "max": 0.36535
+      }
+    },
+    "source-joint-writable-normal-bake": {
+      "direct": {
+        "min": 1.22302e-07,
+        "max": 1.2263e-07
+      },
+      "emission": {
+        "min": 2.61582e-06,
+        "max": 3.17206e-06
+      },
+      "interior": {
+        "min": 1680.0,
+        "max": 1680.0
+      },
+      "material": {
+        "min": 1.83527e-07,
+        "max": 1.83527e-07
+      },
+      "normal": {
+        "min": 4.44089e-16,
+        "max": 0.00420556
+      },
+      "omittedNormal": {
+        "min": 0.121568,
+        "max": 0.121703
+      },
+      "omittedPbr": {
+        "min": 0.368693,
+        "max": 0.368693
+      },
+      "peak": {
+        "min": 7.6954,
+        "max": 7.6954
+      },
+      "wrongMaterial": {
+        "min": 0.787769,
+        "max": 1.0
+      },
+      "wrongNormal": {
+        "min": 0.164777,
+        "max": 0.219907
+      }
+    }
+  },
+  "headless_core": {
+    "members": 193,
+    "current_packet_owners": 20,
+    "retained_members": 173,
+    "archive_sha256": "be77d65ce27dbdd2e527974f66e27f614636278e5dd58916ea65c4eb8f5d2221",
+    "retained_dependency_proof_sha256": "cac6e4f34f25290723a232ef33a1a7c05a65dfd0dac679bff0af6162f7fce8e8",
+    "actual_owners": [
+      {
+        "source": "/home/blux/de-xr/dome-sculpt/artifacts/artist-source-packet-lease-20261118/src/bake-authoring.cpp",
+        "object": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/compile-lease-v1/core_bake-authoring.cpp.o",
+        "object_sha256": "441b70801f519567e1004a9249c90250e4874d000fade5a48c0f5b161058b3d5",
+        "actual_MD": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/compile-lease-v1/core_bake-authoring.cpp.o.d",
+        "actual_MD_sha256": "4fdbde80ee64521bb398c735cae0d182c157872ece63120d422a8799f2d23380",
+        "dependencies": 423,
+        "context": "compile-lease-v1"
+      },
+      {
+        "source": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-pbr-source-20261118/src/bake.cpp",
+        "object": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/compile-pbr-v1/core_bake.cpp.o",
+        "object_sha256": "51fc1d7c0679f660be287c880eeb8238d68ba2ba3013a242ae6d521e10a4314b",
+        "actual_MD": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/compile-pbr-v1/core_bake.cpp.o.d",
+        "actual_MD_sha256": "51a23e74d739497f95d317fa5209beb1ba575419d2578e114c2a20def73cab54",
+        "dependencies": 406,
+        "context": "compile-pbr-v1"
+      },
+      {
+        "source": "/home/blux/de-xr/dome-sculpt/artifacts/artist-source-packet-lease-20261118/src/current-paint-preview.cpp",
+        "object": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/compile-lease-v1/core_current-paint-preview.cpp.o",
+        "object_sha256": "e230cd12627e19684ab357c4a74ab95e3e65a5ce3a1719be20418906c46514b9",
+        "actual_MD": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/compile-lease-v1/core_current-paint-preview.cpp.o.d",
+        "actual_MD_sha256": "beaebf8245ddc92d8ba9d5559872120a48e9c41ed53774938942572480be743e",
+        "dependencies": 409,
+        "context": "compile-lease-v1"
+      },
+      {
+        "source": "/home/blux/de-xr/dome-sculpt/artifacts/artist-source-packet-lease-20261118/src/document.cpp",
+        "object": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/compile-lease-v1/core_document.cpp.o",
+        "object_sha256": "ceb2b5c1a5958023590ad3f3081d17dcec5b308b5b941e1276f6b49babd6ae41",
+        "actual_MD": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/compile-lease-v1/core_document.cpp.o.d",
+        "actual_MD_sha256": "4e0da0b639bd7259666c61342fa918bd2203e5caa2e657741587ea02e76be710",
+        "dependencies": 542,
+        "context": "compile-lease-v1"
+      },
+      {
+        "source": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-pbr-source-20261118/src/emission-bake-source.cpp",
+        "object": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/compile-pbr-v1/core_emission-bake-source.cpp.o",
+        "object_sha256": "7be27266e242dc3559aa6185ccd287b5ee7be8cc8ba44e88eabd590b60d42d5c",
+        "actual_MD": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/compile-pbr-v1/core_emission-bake-source.cpp.o.d",
+        "actual_MD_sha256": "7501f9ab212eb6bb5018a581c399c032b70f6add323bde5426584d2abb3c15af",
+        "dependencies": 432,
+        "context": "compile-pbr-v1"
+      },
+      {
+        "source": "/home/blux/de-xr/dome-sculpt/artifacts/artist-source-packet-lease-20261118/src/emission-export.cpp",
+        "object": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/compile-lease-v1/core_emission-export.cpp.o",
+        "object_sha256": "94b1e47b7f59717ad116dcf489e74e0b5e50b5cf4f9b67366c602cad8495823c",
+        "actual_MD": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/compile-lease-v1/core_emission-export.cpp.o.d",
+        "actual_MD_sha256": "87b248817e2f023fac33630b9fe22f59144b537e4fd5d9c8c47672f5cc06aad6",
+        "dependencies": 421,
+        "context": "compile-lease-v1"
+      },
+      {
+        "source": "/home/blux/de-xr/dome-sculpt/artifacts/artist-source-packet-lease-20261118/src/export.cpp",
+        "object": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/compile-lease-v1/core_export.cpp.o",
+        "object_sha256": "5f68396e9a6241bf9e98a263f6fca3392b1925e3d02aadeacddf1da32ffe9cfe",
+        "actual_MD": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/compile-lease-v1/core_export.cpp.o.d",
+        "actual_MD_sha256": "4b2b400f19f0567436828fe1ed316164d0c7f1d2e9a074e4a6131be1406ed6e3",
+        "dependencies": 472,
+        "context": "compile-lease-v1"
+      },
+      {
+        "source": "/home/blux/de-xr/dome-sculpt/artifacts/artist-source-packet-lease-20261118/src/material-visibility.cpp",
+        "object": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/compile-lease-v1/core_material-visibility.cpp.o",
+        "object_sha256": "ef3e88055cae91641b346ec9cc2e2984bdb5f49c7f7f780ca42d08bbae19b23a",
+        "actual_MD": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/compile-lease-v1/core_material-visibility.cpp.o.d",
+        "actual_MD_sha256": "d0aea89fb35e7f4fe3643e4974bb1c404c9d052e34e42fa8634eecd92d143c37",
+        "dependencies": 468,
+        "context": "compile-lease-v1"
+      },
+      {
+        "source": "/home/blux/de-xr/dome-sculpt/artifacts/artist-source-packet-lease-20261118/src/native-authoring-compiler.cpp",
+        "object": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/compile-lease-v1/core_native-authoring-compiler.cpp.o",
+        "object_sha256": "a36341d6eec762492a12b8f91ab6e0e869d69562ec6ac4b8c26941d26b0cef05",
+        "actual_MD": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/compile-lease-v1/core_native-authoring-compiler.cpp.o.d",
+        "actual_MD_sha256": "0ed0da57ce9baa059a7251aa005e57c94ed0794ca695d349577e663a98d01ac5",
+        "dependencies": 441,
+        "context": "compile-lease-v1"
+      },
+      {
+        "source": "/home/blux/de-xr/dome-sculpt/artifacts/artist-source-packet-lease-20261118/src/paint.cpp",
+        "object": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/compile-lease-v1/core_paint.cpp.o",
+        "object_sha256": "79354fc545dd3e2e787ecc6f5c94d1f2c9e8570457dfb094a70221383beb4a1e",
+        "actual_MD": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/compile-lease-v1/core_paint.cpp.o.d",
+        "actual_MD_sha256": "8d7c64420ec1959944a4b3d27542c4133cef30622c0e76a38a74a687eec1d744",
+        "dependencies": 471,
+        "context": "compile-lease-v1"
+      },
+      {
+        "source": "/home/blux/de-xr/dome-sculpt/artifacts/artist-source-packet-lease-20261118/src/polygon-surface-preview.cpp",
+        "object": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/compile-lease-v1/core_polygon-surface-preview.cpp.o",
+        "object_sha256": "638fae7e95ac1da21b6401442ee920ac4efe07533f5151b190dd0f11365d3e7a",
+        "actual_MD": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/compile-lease-v1/core_polygon-surface-preview.cpp.o.d",
+        "actual_MD_sha256": "26f6b22b028b37853566e7081197431995b954c314cabace23012cffb6e9b6ab",
+        "dependencies": 401,
+        "context": "compile-lease-v1"
+      },
+      {
+        "source": "/home/blux/de-xr/dome-sculpt/artifacts/artist-source-packet-lease-20261118/src/scene.cpp",
+        "object": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/compile-lease-v1/core_scene.cpp.o",
+        "object_sha256": "910835f16dafd078120b37e74d8f38fc2da85c1adeaf08e79cf33fa05f2b1748",
+        "actual_MD": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/compile-lease-v1/core_scene.cpp.o.d",
+        "actual_MD_sha256": "31a2f867ef22428e5f3dd830b1fc4c5a5c5dad1ed108207ec5070e519fef292f",
+        "dependencies": 492,
+        "context": "compile-lease-v1"
+      },
+      {
+        "source": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-pbr-source-20261118/src/source-uv-bake.cpp",
+        "object": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/compile-srcuv-v1/core_source-uv-bake.cpp.o",
+        "object_sha256": "b3d30f564c96fbf8e090b5df5427d99f88ac9af19a3a81ed233335aee1e96c92",
+        "actual_MD": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/compile-srcuv-v1/core_source-uv-bake.cpp.o.d",
+        "actual_MD_sha256": "5ccf7230c8e1249daccdf99109e52331214cd234e56665c327f49d3bb60af812",
+        "dependencies": 426,
+        "context": "compile-srcuv-v1"
+      },
+      {
+        "source": "/home/blux/de-xr/dome-sculpt/artifacts/artist-source-packet-lease-20261118/src/texture-set-range.cpp",
+        "object": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/compile-lease-v1/core_texture-set-range.cpp.o",
+        "object_sha256": "51a96e7ce3a12973cd8b324556078ffaec65c73a7dc20420ece80fdcc2143a62",
+        "actual_MD": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/compile-lease-v1/core_texture-set-range.cpp.o.d",
+        "actual_MD_sha256": "e50739972876a461e4b7e8c442ecbafd8094dc460c459760e7d3b8d1d4be2bc9",
+        "dependencies": 446,
+        "context": "compile-lease-v1"
+      },
+      {
+        "source": "/home/blux/de-xr/dome-sculpt/artifacts/artist-source-packet-lease-20261118/src/texture-set-resample.cpp",
+        "object": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/compile-lease-v1/core_texture-set-resample.cpp.o",
+        "object_sha256": "50441947bc4f3a92e8dab7d32419618c76ecfa67a8f07cc0301b4c945837cb2b",
+        "actual_MD": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/compile-lease-v1/core_texture-set-resample.cpp.o.d",
+        "actual_MD_sha256": "cd6129f6d1a2f30a4c8f42081a2ad16a00431614775de225e555bf7df6415146",
+        "dependencies": 354,
+        "context": "compile-lease-v1"
+      },
+      {
+        "source": "/home/blux/de-xr/dome-sculpt/artifacts/artist-source-packet-lease-20261118/src/texture-set-worker.cpp",
+        "object": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/compile-lease-v1/core_texture-set-worker.cpp.o",
+        "object_sha256": "4fcc663f4d6a21cb18af6e371fd83545b7020f1812d29709475c73f80ba8d21f",
+        "actual_MD": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/compile-lease-v1/core_texture-set-worker.cpp.o.d",
+        "actual_MD_sha256": "aab3221fe903c289240af5840323be977d7ab834e840c4ff7f950dfcb559ba98",
+        "dependencies": 449,
+        "context": "compile-lease-v1"
+      },
+      {
+        "source": "/home/blux/de-xr/dome-sculpt/artifacts/artist-source-packet-lease-20261118/src/vrm1-authoring.cpp",
+        "object": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/compile-lease-v1/core_vrm1-authoring.cpp.o",
+        "object_sha256": "c8ac82227aa330832f60d245b6255bfdb5b90e61d5d473ea74622617d7921149",
+        "actual_MD": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/compile-lease-v1/core_vrm1-authoring.cpp.o.d",
+        "actual_MD_sha256": "9287f7e186d6d125af7832941a04aef9c6e5efa9b3367381067a57d5ed193483",
+        "dependencies": 421,
+        "context": "compile-lease-v1"
+      },
+      {
+        "source": "/home/blux/de-xr/dome-sculpt/artifacts/artist-source-packet-lease-20261118/src/vrm1-export.cpp",
+        "object": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/compile-lease-v1/core_vrm1-export.cpp.o",
+        "object_sha256": "ce5d72d284b68049f0fe996b7ef4f971078b32ac89a93a761ae176ab402bae46",
+        "actual_MD": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/compile-lease-v1/core_vrm1-export.cpp.o.d",
+        "actual_MD_sha256": "47b56f62dc74bf42562be7b6054f85da786d2665eb37c57d6695e1273aa892fa",
+        "dependencies": 443,
+        "context": "compile-lease-v1"
+      },
+      {
+        "source": "/home/blux/de-xr/dome-sculpt/artifacts/artist-source-packet-lease-20261118/src/vrm1-expression-layer.cpp",
+        "object": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/compile-lease-v1/core_vrm1-expression-layer.cpp.o",
+        "object_sha256": "5bd5fefc20b62ebc787e9e2879c18cb709e47b3866390e1353ac406dcc8120ce",
+        "actual_MD": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/compile-lease-v1/core_vrm1-expression-layer.cpp.o.d",
+        "actual_MD_sha256": "06bbc7a0571699deec6f6d97dda438c7b4799762370cf0192ce4e3cdc982032a",
+        "dependencies": 421,
+        "context": "compile-lease-v1"
+      },
+      {
+        "source": "/home/blux/de-xr/dome-sculpt/artifacts/artist-source-packet-lease-20261118/src/vrm1-painted-material.cpp",
+        "object": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/compile-lease-v1/core_vrm1-painted-material.cpp.o",
+        "object_sha256": "a205913085d7f077ca30fc3014f492e5973294e3f20b56c1ac38ea66918ae46e",
+        "actual_MD": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/compile-lease-v1/core_vrm1-painted-material.cpp.o.d",
+        "actual_MD_sha256": "3e88618101d07884c6b76ad045f2087008a800651d7542033db2d50d0f453185",
+        "dependencies": 384,
+        "context": "compile-lease-v1"
+      }
+    ]
+  },
+  "fixture_owners": [
+    {
+      "source": "/home/blux/de-xr/dome-sculpt/artifacts/artist-source-packet-lease-20261118/tests/source-artist-normal-bake.cpp",
+      "object": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/compile-lease-v1/fixture_source-artist-normal-bake.cpp.o",
+      "object_sha256": "f574c49202d60a276b152c3171722613475422c8e54c75e3a092c4aec05faa7d",
+      "actual_MD": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/compile-lease-v1/fixture_source-artist-normal-bake.cpp.o.d",
+      "actual_MD_sha256": "c362d5f7cb1345071c5a347f562af971f783c262166396ed2e3ab7df1563a260",
+      "dependencies": 448,
+      "context": "compile-lease-v1"
+    },
+    {
+      "source": "/home/blux/de-xr/dome-sculpt/artifacts/artist-source-packet-lease-20261118/tests/source-prepared-normal-bake.cpp",
+      "object": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/compile-lease-v1/fixture_source-prepared-normal-bake.cpp.o",
+      "object_sha256": "b136b4ca063e9299778ba88de857702dd8c126c5b9dd8993f50789e34e90028c",
+      "actual_MD": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/compile-lease-v1/fixture_source-prepared-normal-bake.cpp.o.d",
+      "actual_MD_sha256": "e6e75c025f5e2e430edf633fbbf0ea21acdca7393c3bd9e1a3c02a8295786b92",
+      "dependencies": 456,
+      "context": "compile-lease-v1"
+    },
+    {
+      "source": "/home/blux/de-xr/dome-sculpt/artifacts/artist-source-packet-lease-20261118/tests/source-advanced-normal-bake.cpp",
+      "object": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/compile-lease-v1/fixture_source-advanced-normal-bake.cpp.o",
+      "object_sha256": "12a190a58f8ea43e83878c60640b0b2199d71e418392626e222430968f2b02f3",
+      "actual_MD": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/compile-lease-v1/fixture_source-advanced-normal-bake.cpp.o.d",
+      "actual_MD_sha256": "d458c64d83d4c842d870c88272c28eea7c380814a3031b5d4f531540152b94a7",
+      "dependencies": 458,
+      "context": "compile-lease-v1"
+    },
+    {
+      "source": "/home/blux/de-xr/dome-sculpt/artifacts/artist-source-packet-lease-20261118/tests/source-canonical-normal-bake.cpp",
+      "object": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/compile-lease-v1/fixture_source-canonical-normal-bake.cpp.o",
+      "object_sha256": "adbe3b3837c46ca57bc278c2512e08aada83cb91aec6d38f960e133e26c48523",
+      "actual_MD": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/compile-lease-v1/fixture_source-canonical-normal-bake.cpp.o.d",
+      "actual_MD_sha256": "a17e5a07a7430d240b47bf9fc233595ce4d92dabcbaca385ce86c56267e7d24d",
+      "dependencies": 463,
+      "context": "compile-lease-v1"
+    },
+    {
+      "source": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-pbr-source-20261118/tests/source-writable-normal-bake.cpp",
+      "object": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/compile-pbr-v1/fixture_source-writable-normal-bake.cpp.o",
+      "object_sha256": "07adfe645bde9c7ec21ccaac0c0dbb9c24d61e6d3514ba6a776e5ddc28eaf500",
+      "actual_MD": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/compile-pbr-v1/fixture_source-writable-normal-bake.cpp.o.d",
+      "actual_MD_sha256": "61aad8503cffb1b0fd1401da28546b9f8baf3249f207655678850c79f84a669d",
+      "dependencies": 487,
+      "context": "compile-pbr-v1"
+    },
+    {
+      "source": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-quota-boundary-20261118/tests/source-joint-writable-normal-bake.cpp",
+      "object": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/compile-quota-v1/fixture_source-joint-writable-normal-bake.cpp.o",
+      "object_sha256": "b92356cf012f48790307f532a018f717a23c56d6fdda5c2ad9497b2cc9481a1b",
+      "actual_MD": "/home/blux/de-xr/dome-sculpt/artifacts/artist-joint-writable-compile-20261118/compile-quota-v1/fixture_source-joint-writable-normal-bake.cpp.o.d",
+      "actual_MD_sha256": "0efd90089c62cf0b6d6310a8243f08f6490dace94919a50cff913c4a67a4b262",
+      "dependencies": 499,
+      "context": "compile-quota-v1"
+    }
+  ],
+  "preserved_failures": [
+    "artist-canonical-normal-compile-20261117/native-v1",
+    "artist-writable-normal-compile-20261118/compile-v1",
+    "artist-writable-normal-compile-20261118/native-v1",
+    "artist-writable-normal-compile-20261118/native-selection-v1",
+    "artist-joint-writable-compile-20261118/links-pbr-v1",
+    "artist-joint-writable-compile-20261118/native-pbr-v1",
+    "artist-joint-writable-compile-20261118/native-observe-v1",
+    "artist-joint-writable-compile-20261118/native-visible-v1"
+  ]
+}

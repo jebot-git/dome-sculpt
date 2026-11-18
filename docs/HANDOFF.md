@@ -102,6 +102,20 @@ A further coherent source branch work/authoring-public-integration-20261117
 with090f without modifying the still-building frozen source. Product/tests/build
 files matchf1 exactly. No whole-buildc9 claim follows from this source merge.
 
+## Separate writable/joint SOURCE component checkpoint
+
+Canonical normal-field SOURCE product85eafc42 passes canonical32/525092 plus
+advanced17/prepared91/artist139; see
+[the canonical proof](ARTIST-CANONICAL-NORMAL-NATIVE-20261118.md).
+Its32-case matrix is separate from native32 writable paint. The owning
+writable/joint SOURCE child441d9985 now passes all6 Release native suites,
+including64 writable cases/619634 checks,8 joint Source8 cases/346305 checks,
+and121 exact ordered Save pairs. Read
+[the scoped native proof](ARTIST-WRITABLE-JOINT-NATIVE-20261118.md) for exact
+source/fixture/owner roles and preserved failures. This child remains separate
+from main admission: strict sanitizer441, graphics and whole-App qualification
+are outstanding. Earlier product85/90fad results do not admit this child.
+
 ## Canonical toolkit and full remaining goal
 
 [Nov17 effective-closure checks](CURRENT-TOOLKIT-20261117.md) confirm canonical
