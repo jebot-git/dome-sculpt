@@ -1,0 +1,23 @@
+{
+  "kind": "advanced-normal-filtered-workflow-native-20261118",
+  "production_source": "e006869d9ff18a30ea88e51d4037ba88988406e6",
+  "workflow_fixture": "d66c4bc7c47b4777f1bbc896fca9dbcad45a1208",
+  "native_ELF_sha256": "458ec4c1ae444f40a6a92a29770d90ab5c5e9b47bb769b37e9a009f0619a8930",
+  "core_archive_sha256": "2b998e5a62b38049c9e635a03c2e2d6914a4310f6915cc2f3eadfe2b3e305dfb",
+  "actual_source_map_checks": 55,
+  "actual_historical_checks": 263495,
+  "actual_checked_workflow_checks": 646,
+  "checked_advanced_families": 17,
+  "source_resolution": 64,
+  "explicit_target_resolution": 2048,
+  "legacy_status": "0; original complete17 suite and real persisted legacy byte/replay proof",
+  "native_status_sha256": "7c23f2fe2708a42d7780d1474b049affdb703d61d28d2f2cc6a069eab9cd684f",
+  "native_lease_free_receipt_sha256": "753f9e8ace4b62ce22ba49ee56022a3e648dfd991ea26db3f1330208fe34caec",
+  "scoped_proof_sha256": "476e4c067d1be960d316b309fbf2fb2f0a287be9bd621d67305ea58a9cfb367d",
+  "scoped_proof_bytes": 366032,
+  "GL_qualified": false,
+  "Arc_qualified": false,
+  "App_qualified": false,
+  "full_goal_complete": false,
+  "scope": "Production filtered-quality, explicit-resolution recovery and strict normalized sampler invariant; full native current cohort passed. New independent graphical forecast/software/Arc pending."
+}
