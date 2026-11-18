@@ -22,13 +22,13 @@ D sample(const Image &im,std::array<double,2> uv,bool srgb=false){
  for(int dy=0;dy<2;++dy)for(int dx=0;dx<2;++dx){const auto px=std::clamp(ix+dx,0,int(im.width)-1),py=std::clamp(iy+dy,0,int(im.height)-1);const double w=(dx?x-ix:1-(x-ix))*(dy?y-iy:1-(y-iy));for(size_t c=0;c<3;++c){double value=im.rgba[(size_t(py)*im.width+px)*4+c]/255.;if(srgb)value=value<=.04045?value/12.92:std::pow((value+.055)/1.055,2.4);out[c]+=w*value;}}
  finite_sample(out);return out;
 }
-D direction(const SculptObject &o,size_t triangle,std::array<float,3> bary,size_t role){
+D direction(const SculptObject &o,size_t triangle,std::array<float,3> bary,size_t role,const TextureMaps *cached=nullptr){
  const auto &binding=*o.material_bindings;const auto &frames=role==0?*binding.normal_frames->pbr:*binding.normal_frames->mtoon;
  D n{},t{},b{};std::array<double,2> uv{};const auto &mesh=o.painted->mesh();
  for(size_t k=0;k<3;++k){const auto c=triangle*3+k;const auto v=mesh.indices[c];const auto nt=unit(vc(frames.normals[c]));const auto tt=frames.tangents[c];const auto tangent=unit(D{tt[0],tt[1],tt[2]});n=add(n,mul(nt,bary[k]));t=add(t,mul(tangent,bary[k]));b=add(b,mul(unit(crossd(nt,tangent)),bary[k]*tt[3]));for(size_t q=0;q<2;++q)uv[q]+=mesh.uv[v][q]*bary[k];}
  const bool legacy=binding.material.version()==MToonVersion::V0;
  if(role==0){n=unit(n);t=unit(t);b=unit(b);}else if(!legacy){n=unit(n);t=unit(t);b=mul(unit(crossd(n,t)),frames.tangents[triangle*3][3]);}
- const auto maps=o.painted->preview(o.material);const auto encoded=sample(role==0?maps->normal:maps->mtoon_normal,uv);const double scale=role==0?1:binding.material.parameters.normal_scale;
+ const auto owned=cached?std::shared_ptr<const TextureMaps>{}:o.painted->preview(o.material);const auto *maps=cached?cached:owned.get();const auto encoded=sample(role==0?maps->normal:maps->mtoon_normal,uv);const double scale=role==0?1:binding.material.parameters.normal_scale;
  D ts{(encoded[0]*2-1)*scale,(encoded[1]*2-1)*scale,encoded[2]*2-1};
  return unit(add(add(mul(t,ts[0]),mul(b,ts[1])),mul(n,ts[2])));
 }
@@ -101,7 +101,7 @@ void advanced_recipe_guards(const Scene &baseline,uint64_t source,const ObjectBa
 
 void run_case(bool legacy,bool posed,const std::filesystem::path &folder){
  auto f=fixture(legacy,posed);auto mesh=f.scene.object(f.source).deformation->preview(f.scene.object(f.source).painted->mesh());
- const auto first=target(f.scene,mesh,legacy);ObjectBakeSettings options;options.prepare_normals=true;options.normal_error=.03f;options.front_mm=options.back_mm=300;options.ao_samples=0;options.padding=0;
+ const auto first=target(f.scene,mesh,legacy);ObjectBakeSettings options;options.normal_filter_quality=0;options.prepare_normals=true;options.normal_error=.03f;options.front_mm=options.back_mm=300;options.ao_samples=0;options.padding=0;
  const auto initial=bake_object(f.scene,f.source,options);check(initial.projected&&f.scene.object(first).painted->normal_projection(),"First genuine artist Bake produces a prepared source with explicit current normal planes");
  const auto before=f.scene.encode();const auto prepared=f.scene.object(first).painted;const auto binding=f.scene.object(first).material_bindings;
  const auto resolver=detail::source_bake_normals(f.scene.object(first),{});check(bool(resolver),"Prepared source exposes its actual owned frame/coordinate resolver");
