@@ -6,7 +6,6 @@
 #include "dome/rig-edit.hpp"
 #include "document-authority.hpp"
 #include "import-controller-driver.hpp"
-#define CGLTF_IMPLEMENTATION
 #include "cgltf.h"
 #include <nlohmann/json.hpp>
 #include <atomic>
@@ -48,7 +47,14 @@ void controls(const std::filesystem::path&root){
    float geometry=0,color=0;for(size_t part=0;part<19;++part){geometry=std::max(geometry,difference(original.parts[part].mesh,changed.parts[part].mesh));for(size_t k=0;k<4;++k)color=std::max(color,std::abs(original.parts[part].color[k]-changed.parts[part].color[k]));}
    std::cout<<"CONTROL "<<id<<" "<<parameter<<" "<<descriptor.label<<" geometry="<<geometry<<" material="<<color<<" parts="<<changed.parts.size()<<'\n';
    if(parameter<14)check(geometry>1e-5f,"Exposed body/face/style parameter changes genuine CC0 geometry");
-   else if(parameter<17){check(changed.parts.size()==20&&geometry==0,"Hair controls add an original fitted groom without rewriting any source hair/body vertex");}
+   else if(parameter<17){
+    check(changed.parts.size()==20&&geometry==0,"Hair controls add an original fitted groom without rewriting any source hair/body vertex");
+    auto groom_controls=original_controls;groom_controls.hair_length=groom_controls.hair_volume=groom_controls.fringe=.2f;
+    const auto groom_before=create_humanoid(groom_controls);set_humanoid_creator_parameter(groom_controls,parameter,.65f);const auto groom_after=create_humanoid(groom_controls);
+    const auto &a=groom_before.parts.back().mesh,&b=groom_after.parts.back().mesh;
+    check(a.positions!=b.positions,"Each exposed hair parameter changes the actual fitted groom geometry when a groom already exists");
+    std::cout<<"GROOM "<<id<<" "<<descriptor.label<<" before_vertices="<<a.positions.size()<<" after_vertices="<<b.positions.size()<<" position_delta="<<(a.positions.size()==b.positions.size()?difference(a,b):-1.f)<<'\n';
+   }
    else check(color>.01f&&geometry==0,"Exposed tint changes actual source material factors while retaining source geometry");
    evidence.push_back({{"baseline",id},{"parameter",descriptor.label},{"value",value},{"maximum_source_position_delta",geometry},{"maximum_material_factor_delta",color},{"parts",changed.parts.size()}});
   }
@@ -113,7 +119,23 @@ void workspace(const std::filesystem::path&root){
 extern "C" int __real_fsync(int);
 extern "C" int __wrap_fsync(int fd){if(gate.exchange(false)){std::unique_lock lock(gate_mutex);entered=true;changed.notify_all();if(!changed.wait_for(lock,std::chrono::seconds(60),[]{return released;}))return -1;}return __real_fsync(fd);}
 int main(int argc,char**argv)try{
- std::cout<<std::unitbuf;const auto root=argc>2?std::filesystem::path(argv[2]):std::filesystem::temp_directory_path()/("creator-workspace-"+std::to_string(getpid()));std::filesystem::create_directories(root);
+ std::cout<<std::unitbuf;
+ if(argc==5&&std::string_view(argv[1])=="--verify-xr"){
+  const auto source=Scene::load(argv[2]);const auto actual=Scene::load(argv[3]);auto expected=source;
+  if(std::string_view(argv[4])=="accept"){
+   auto group=source.group(source.active().group);if(!group.humanoid)throw std::runtime_error("Creator XR input lacks genuine saved controls");
+   check(actual.groups().size()==source.groups().size()+1&&bool(actual.groups().back().humanoid),"Actual creator adds one separate avatar with persisted genuine bounded controls");
+   const auto &persisted=*actual.groups().back().humanoid;
+   check(std::abs(persisted.height-1.9f)<1e-5f&&std::abs(persisted.build-.4f)<1e-5f,"Actual released pressure and controller ray reach requested height and build within native float precision");
+   auto controls=humanoid_preset(HumanoidPreset::Anime,group.humanoid->baseline);controls.height=persisted.height;controls.build=persisted.build;
+   check(controls.encode()==persisted.encode(),"Actual source, preset and all other body/face/hair/tint settings exactly match selected native draft actions");
+   CanvasTransform transform{};transform.position.y=-controls.height*.5f;
+   append_humanoid(expected,controls,group.name+" variation",transform);old_avatar_retained(source,actual);
+  }
+  check(actual.encode()==expected.encode(),"Actual loader creator endpoint equals independently generated native control result and exact prior authored source");
+  std::cout<<"CREATOR CHECKS "<<checks<<'\n';return 0;
+ }
+ const auto root=argc>2?std::filesystem::path(argv[2]):std::filesystem::temp_directory_path()/("creator-workspace-"+std::to_string(getpid()));std::filesystem::create_directories(root);
  if(argc>1&&std::string_view(argv[1])=="--controls")controls(root);
  else if(argc>1&&std::string_view(argv[1])=="--fixture"){authored().save(root/"creator-input.dsculpt");}
  else workspace(root);
