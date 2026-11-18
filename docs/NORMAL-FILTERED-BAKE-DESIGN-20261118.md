@@ -121,3 +121,14 @@ The processAS2/RSS3, source images, field/storage limits and quality bounds stay
 unchanged; the production tree remains exactlyea838. Both complete CTests remain
 registered, with current arguments explicitly2048 2048. No full admission follows
 until the corrected fixture actually completes.
+
+The sequential same-process attempt also reaches AS2 during fresh reopen after
+all advanced2048 role probes (maximum0.00337349), full ordered/accepted bytes and
+history checks pass. Its receipt remains preserved. This test-only child runs
+fresh reopen/re-save in the exact current executable via posix_spawn, after the
+Document and snapshots close. The owned child inherits the SAME2GiB AS cap and
+shares the existing aggregate3GiB RSS/unit4GiB deadline. It creates no session or
+new process group, prints VM/RSS at load/save boundaries, and both child and
+parent independently compare every file byte. This distinguishes retained
+allocator VM from intrinsic codec cost; no production or numerical/storage
+limits change. Full admission still requires the actual complete cohort.

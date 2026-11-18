@@ -4,6 +4,10 @@
 #include "dome/bake-recipe.hpp"
 #include <fstream>
 #include <type_traits>
+#include <cerrno>
+#include <spawn.h>
+#include <sys/wait.h>
+extern char **environ;
 namespace filtered_workflow {
 unsigned checks=0;
 void require(bool yes,const char *why){if(!yes)throw std::runtime_error(why);++checks;std::cout<<"PASS "<<why<<'\n';}
@@ -14,6 +18,22 @@ bool byte_equal_files(const std::filesystem::path &a,const std::filesystem::path
  for(;;){left.read(x.data(),x.size());right.read(y.data(),y.size());const auto n=left.gcount();
   if(n!=right.gcount()||!std::equal(x.begin(),x.begin()+n,y.begin())||left.bad()||right.bad())return false;
   if(n!=std::streamsize(x.size()))return left.eof()&&right.eof();}
+}
+void reopen_memory(const char *phase){
+ std::ifstream status("/proc/self/status");std::string line;std::cout<<"FRESH_REOPEN_MEMORY phase="<<phase;
+ while(std::getline(status,line))if(line.starts_with("VmSize:")||line.starts_with("VmRSS:")||line.starts_with("VmPeak:"))std::cout<<" ["<<line<<']';std::cout<<std::endl;
+}
+int reopen_file(const std::filesystem::path &input,const std::filesystem::path &output){
+ reopen_memory("child-start");{auto reopened=Scene::load(input);reopen_memory("child-loaded");reopened.save(output);reopen_memory("child-saved");}
+ require(byte_equal_files(input,output),"Independent fresh-process native reopen and re-save preserve every byte");reopen_memory("child-closed");return 0;
+}
+void fresh_reopen(const std::filesystem::path &input,const std::filesystem::path &output){
+ reopen_memory("parent-after-Document-close");auto exe=std::filesystem::read_symlink("/proc/self/exe").string();std::string mode="--filtered-reopen",from=input.string(),to=output.string();
+ std::array<char*,5>args{exe.data(),mode.data(),from.data(),to.data(),nullptr};pid_t child=-1;
+ const int error=posix_spawn(&child,exe.c_str(),nullptr,nullptr,args.data(),::environ);
+ require(error==0,"Fresh native reopen spawns the exact current executable under inherited AS/resource bounds");int status=0;pid_t waited;
+ do{waited=waitpid(child,&status,0);}while(waited<0&&errno==EINTR);
+ require(waited==child&&WIFEXITED(status)&&WEXITSTATUS(status)==0,"Owned independent fresh-process native reopen completes successfully");
 }
 struct Family{Scene scene;uint64_t source,target;std::string name;};
 Family before(bool legacy,bool live,bool seam,SourceNormalUvMethod method,bool repeated=false){
@@ -98,7 +118,7 @@ void positive(const Family &family,uint32_t resolution,const std::filesystem::pa
  accepted.save(accepted_path);require(byte_equal_files(path,accepted_path),"Ordered Save matches every native byte of the actual accepted filtered Scene, images, source and policy");unchanged_source(accepted,family.scene,family.target);probes(family,accepted);
  require(doc.undo()&&doc.wait_mesh()&&doc.copy_scene().encode()==resized.encode()&&doc.redo()&&doc.wait_mesh()&&doc.copy_scene().encode()==accepted.encode(),"Bake remains one exact separate Undo/Redo step after explicit resolution selection");
  }
- {auto reopened=Scene::load(path);reopened.save(reopened_path);}
+ fresh_reopen(path,reopened_path);
  require(byte_equal_files(path,reopened_path),"Fresh native reopen and re-save retain every actual filtered Bake/source/image/recipe byte");
  std::cout<<"FILTERED_RESOLUTION_WORKFLOW "<<family.name<<" target_resolution="<<resolution<<" source_resolution=64\n";
 }
