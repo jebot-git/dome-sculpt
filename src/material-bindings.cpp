@@ -247,7 +247,7 @@ void SourceMaterialBindings::validate(bool deep) const {
     if(uv_origin->creator_kind.empty()) {
       if(uv_origin->creator_version || !uv_origin->creator_parameters.empty())throw std::invalid_argument("Partial creator frame provenance");
     } else {
-      if(uv_origin->creator_kind!="vroid-shape" || uv_origin->creator_version!=1 || uv_origin->creator_parameters.size()>64*1024)throw std::invalid_argument("Unknown creator frame provenance");
+      if((uv_origin->creator_kind!="vroid-shape" && uv_origin->creator_kind!="vroid-groom") || uv_origin->creator_version!=1 || uv_origin->creator_parameters.size()>64*1024)throw std::invalid_argument("Unknown creator frame provenance");
       if(deep)HumanoidControls::decode(nlohmann::json::parse(uv_origin->creator_parameters)).validate();
     }
     if(uv_origin->appearance && uv_origin->appearance->source_vertices.size()!=uv_origin->paint->mesh().positions.size())
