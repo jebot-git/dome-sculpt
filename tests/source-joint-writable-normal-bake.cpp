@@ -61,9 +61,16 @@ void negatives(){
  require(cyclic&&s.encode()==baseline,"Whole independent colour/normal replay cycle refuses before deep validation and restores exact owning graph");
  detail::SourceBakeNormalOptions limits;limits.max_working_bytes=1;
  require(refuses([&]{detail::source_bake_normals(s.active(),{},limits);})&&s.encode()==baseline,"Joint prospective capture quota refuses atomically");
- auto larger=prepared(false);uv(larger,512*1024*1024);const auto exact=larger.encode();size_t polls=0;limits={};limits.cancelled=[&]{++polls;return false;};bool prospective=false;
+ auto larger=prepared(false);uv(larger,512*1024*1024);const auto exact=larger.encode();
+ // SourceUV's simultaneous colour and normal stages each own one half of
+ // the genuine512MiB request. Test the ACTUAL256MiB receipt boundary, rather
+ // than inventing a512MiB normal receipt from that aggregate request.
+ const auto authority=larger.active().material_bindings->normal_preparation->sampling_domain->receipt.max_working_bytes;
+ require(authority==256*1024*1024,"Actual joint replay receipt records its disjoint256MiB share of genuine512MiB transfer");
+ limits={};limits.max_working_bytes=authority;require(bool(detail::source_bake_normals(larger.active(),{},limits))&&larger.encode()==exact,"Exact actual owning replay allowance accepts without mutation");
+ size_t polls=0;limits={};limits.max_working_bytes=authority-1;limits.cancelled=[&]{++polls;return false;};bool prospective=false;
  try{detail::source_bake_normals(larger.active(),{},limits);}catch(const std::length_error&e){prospective=std::string_view(e.what()).find("prospective working budget")!=std::string_view::npos;}
- require(prospective&&polls<16&&larger.encode()==exact,"Genuine larger joint normal/colour ancestor budget refuses before replay under smaller caller allowance");
+ std::cout<<"JOINT_QUOTA authority="<<authority<<" caller="<<limits.max_working_bytes<<" polls="<<polls<<std::endl;require(prospective&&polls<16&&larger.encode()==exact,"One byte below the actual joint replay allowance refuses before deep replay and preserves every source byte");
 }
 }
 int main(int argc,char**argv)try{if(argc!=2)return 2;const std::filesystem::path out=argv[1];std::filesystem::create_directories(out);for(bool seam:{false,true})for(bool live:{false,true})for(bool repeat:{false,true})joint_source::exercise(seam,live,repeat,out);joint_source::negatives();std::cout<<"PASS "<<joint_source::checks<<" joint source checks\n";return 0;}catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
