@@ -3,6 +3,8 @@
 #include "baked-emission-domain.hpp"
 #include "dome/mesh-processing.hpp"
 #include <limits>
+#include <sstream>
+#include <iomanip>
 namespace dome::detail {
 // Version1 FLOAT transport policy. Samples the actual source hit and stored
 // continuous output independently. This is roundoff allowance, not permission
@@ -20,7 +22,7 @@ inline void verify_filtered_emission_quality(const Mesh&low,const BakeSource&hig
    for(double oy:offsets)for(double ox:offsets){charge();const auto b=bary(x+.5+ox,y+.5+oy);const std::array<float,3>weights{float(b[0]),float(b[1]),float(b[2])};Vec3 position{},normal{},cage{};for(size_t k=0;k<3;++k){const auto v=low.indices[tri*3+k];position+=low.positions[v]*weights[k];normal+=low.normals[v]*weights[k];if(!o.cage_positions.empty())cage+=o.cage_positions.at(v)*weights[k];}normal=normalized(normal);const Vec3 offset=o.cage_positions.empty()?normal*o.front_distance:cage-position;const float front=length(offset);const auto direction=front>1e-8f?offset/front:normal;
     if(++result.rays>o.max_rays)throw std::length_error("FLOAT emission transfer exceeds aggregate ray budget");const auto hit=query.raycast(position+offset,direction*-1,front+o.back_distance);if(!hit)throw std::invalid_argument("FLOAT emission projection misses between texture samples");const auto material=high.triangle_materials.empty()?0:high.triangle_materials.at(hit->triangle);const auto&source=high.materials.at(material);if(!source.resolved_emission)throw std::invalid_argument("Mixed physical emission projection requires its explicit material-domain adapter");
     const auto wanted=source.resolved_emission(hit->triangle,hit->barycentric);const float u=float((x+.5+ox)/r),v=float((y+.5+oy)/r);const auto actual=(domain?domain->field():result.emission_field)->sample(u,v).resolve({},1);
-    for(size_t k=0;k<3;++k){const double allowance=32*std::numeric_limits<float>::epsilon()*std::max({1.,double(wanted[k]),double(actual[k])});if(!std::isfinite(actual[k])||std::abs(double(actual[k])-wanted[k])>allowance)throw std::invalid_argument("Physical emission cannot retain source fidelity on this target grid; use a certified exact source-domain correspondence");}++tested;
+    for(size_t k=0;k<3;++k){const double allowance=32*std::numeric_limits<float>::epsilon()*std::max({1.,double(wanted[k]),double(actual[k])});if(!std::isfinite(actual[k])||std::abs(double(actual[k])-wanted[k])>allowance){std::ostringstream message;message<<std::setprecision(17)<<"Physical emission cannot retain source fidelity on this target grid; use a certified exact source-domain correspondence; retained="<<bool(domain)<<" grid="<<r<<" target_triangle="<<tri<<" source_triangle="<<hit->triangle<<" uv="<<u<<','<<v<<" axis="<<k<<" wanted="<<wanted[k]<<" actual="<<actual[k]<<" error="<<std::abs(double(actual[k])-wanted[k])<<" allowance="<<allowance;throw std::invalid_argument(message.str());}}++tested;
    }
   }
  }
