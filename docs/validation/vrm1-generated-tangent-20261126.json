@@ -1,0 +1,190 @@
+{
+  "source": "fc528acadc024ebc4cc54491e54b07dd1ca8e467",
+  "parent": "217b4ad28d152f786a146bb492a197fae859abec",
+  "branch": "work/vrm1-generated-tangent-20261126",
+  "tested_diff_sha256": "05344c81e82949d5e40e6c94d4890b3aca8ea788c3794d79850f600a7ef548d3",
+  "toolkit": {
+    "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+    "fltk": "/opt/fltk-vr/toolkit",
+    "bitmap": "/opt/fltk-vr/bdf-runtime"
+  },
+  "release": {
+    "invocation": "3ca7ef0c80414bdc86a609768ce40b3b",
+    "service": "ds-vrm1-generated-tangent-painted-release-20261126.service",
+    "exit": 0,
+    "cases": [
+      "source-extra-uv",
+      "vrm1-source-export",
+      "vrm1-background-fixture",
+      "vrm1-expression-preview-render",
+      "vrm1-expression-preview",
+      "vrm1-expression-parameters-faults",
+      "vrm1-expressions"
+    ],
+    "artifacts": {
+      "artifacts/vrm1-generated-tangent-release-20261126/ctest.xml": "1c7c9b5dd17ec2f9e756e4c1d8ef703dead4d838a5c587e02f11f3faa29f7ea3",
+      "artifacts/vrm1-generated-tangent-release-20261126/ctest.log": "44c1227d2ecf7c4cbf8ceb205762eb5d5f166af1f969f50a3b0e6287847ba9cc",
+      "artifacts/vrm1-generated-tangent-release-20261126/source-at-test": "711c4251be7372e4c37bf7e7b19f52a7bc477e72abfac172ccd7e4e020755b99",
+      "artifacts/vrm1-generated-tangent-release-20261126/build.log": "fae9f780794cef8b759d4d1bcf8d6a99201eb7c1a41e581dd49cb752c111f66b",
+      "artifacts/vrm1-generated-tangent-release-20261126/configure.log": "5e9417cbcc4db1dcce8599df23715d514ebdd5f02b103296051100257977c552"
+    }
+  },
+  "asan_ubsan_leaks": {
+    "invocation": "6be29ef587a84642a2503ac86e894b68",
+    "service": "ds-vrm1-generated-tangent-portable-asan-20261126.service",
+    "exit": 0,
+    "cases": [
+      "source-extra-uv",
+      "vrm1-source-export",
+      "vrm1-background-fixture",
+      "vrm1-expression-preview",
+      "vrm1-expression-parameters-faults",
+      "vrm1-expressions"
+    ],
+    "artifacts": {
+      "artifacts/vrm1-generated-tangent-asan-20261126/ctest.xml": "bb1944f90c4f74e94e3c323b6ac23c824a852e9abf45df9ee7aefc924ba0b186",
+      "artifacts/vrm1-generated-tangent-asan-20261126/ctest.log": "b09e16ac031ce8898e04eebfd51586587dc2fb6ce422b6ab2eb5fc15509bcf2a",
+      "artifacts/vrm1-generated-tangent-asan-20261126/source-at-test": "711c4251be7372e4c37bf7e7b19f52a7bc477e72abfac172ccd7e4e020755b99",
+      "artifacts/vrm1-generated-tangent-asan-20261126/build.log": "8c35b1682f73592d30612d7b0fabdb384fcfff35cb5a076cb48b85b1368aa794",
+      "artifacts/vrm1-generated-tangent-asan-20261126/configure.log": "e2df51bf74bbae6bbfd8949ab4625a349b063fbbe8be5a047403f367637f5daf"
+    },
+    "elf_witnesses": {
+      "artifacts/vrm1-generated-tangent-asan-20261126/dome-sculpt-source-extra-uv-test.elf-dynamic": "6c3351aa5083b95a09d46693bec667ad494daf29e2de4793d6dc6f83ccfc726e",
+      "artifacts/vrm1-generated-tangent-asan-20261126/dome-sculpt-vrm1-background-fixture-test.elf-dynamic": "fce6dc8946f3fc804b85c568bb9f6f7df87eb32a119aa23f4aa3f005097155b9",
+      "artifacts/vrm1-generated-tangent-asan-20261126/dome-sculpt-vrm1-expression-parameters-faults-test.elf-dynamic": "f2cd104eb49032dc9be180aa7e88aab19b6ceb4788e3ff2f4e3bda1a01c55ae6",
+      "artifacts/vrm1-generated-tangent-asan-20261126/dome-sculpt-vrm1-expression-preview-test.elf-dynamic": "fa996d636769ce03f4f66934e8ab2c41e9891cf527ed7ca55348f76404d2c49e",
+      "artifacts/vrm1-generated-tangent-asan-20261126/dome-sculpt-vrm1-expressions-test.elf-dynamic": "240fa69484b1c9a2e55e68e96f8a0439522eccb271f2bf3c675076566048db2f",
+      "artifacts/vrm1-generated-tangent-asan-20261126/dome-sculpt-vrm1-source-export-test.elf-dynamic": "48e6c8a70c127c6a85d5c2c9184d670a1dc316759d34f98fdd3de810f55f19f4"
+    },
+    "byte_identical_release_and_asan_outputs": {
+      "artifacts/vrm1-generated-tangent-release-20261126/vrm1-expressions/generated-mirror-atlas.dsculpt": "be94560ccd96236d09868a831ac07aa10d11919c40a27675a6764d27603444ae",
+      "artifacts/vrm1-generated-tangent-release-20261126/vrm1-expressions/generated-mirror-atlas.vrm": "cca4661da629fac8153dcf199624ee5f3e2341a4f9c1f2e465e5856a057a27ea",
+      "artifacts/vrm1-generated-tangent-release-20261126/vrm1-expressions/generated-mirror-original-applied.vrm": "fa0fedfc30ebd308c2f5077ca9f48389d8f454305723eb97ec66ae11e4d086fb",
+      "artifacts/vrm1-generated-tangent-release-20261126/vrm1-expressions/generated-mirror-original-portable-only.vrm": "c3b24862f05ca4b46cd49038b9f4eafc484039768e1590dc535e0e0b53138479",
+      "artifacts/vrm1-generated-tangent-release-20261126/vrm1-expressions/generated-mirror-original.dsculpt": "d9281d010533d1997105f9894d67bb7ebc5744241cc4e901907b587914cc50fe",
+      "artifacts/vrm1-generated-tangent-release-20261126/vrm1-expressions/generated-mirror-original.vrm": "cca4661da629fac8153dcf199624ee5f3e2341a4f9c1f2e465e5856a057a27ea",
+      "artifacts/vrm1-generated-tangent-release-20261126/vrm1-expressions/generated-rotate-atlas.dsculpt": "1416b0dacf5aa02d7428223ce3091b8f3bacbd9c9dbbef2b3114a24000286d4f",
+      "artifacts/vrm1-generated-tangent-release-20261126/vrm1-expressions/generated-rotate-atlas.vrm": "581177df8c47665cfa4bc8d8369a4890d7d4e7811d316ba56db8275f7c876786",
+      "artifacts/vrm1-generated-tangent-release-20261126/vrm1-expressions/generated-rotate-original-applied.vrm": "ac15b280abc916e01e93acb73eb8d51b2a618f11d67292a3515b77551592890a",
+      "artifacts/vrm1-generated-tangent-release-20261126/vrm1-expressions/generated-rotate-original-portable-only.vrm": "1e18b095d062b83a5916bfaca8d64060d31ae590ae8f4458a5368374a06e9587",
+      "artifacts/vrm1-generated-tangent-release-20261126/vrm1-expressions/generated-rotate-original.dsculpt": "95f744c063e75ad0e7c894c2f5a2b61720c27ee2c53a6cf83b389af1506b4620",
+      "artifacts/vrm1-generated-tangent-release-20261126/vrm1-expressions/generated-rotate-original.vrm": "581177df8c47665cfa4bc8d8369a4890d7d4e7811d316ba56db8275f7c876786",
+      "artifacts/vrm1-generated-tangent-release-20261126/vrm1-expressions/generated-singular.vrm": "61cdd6dd38885481e702af042d3b36f10e63df1c32a9b35aedbe3f13a65b0dcf"
+    }
+  },
+  "expression_checks_per_profile": 492,
+  "scope": [
+    "Generated frame for core glTF/VRM1 rotated, scaled and reflected normal samplers",
+    "Analytic rotated and mirrored UV1 tangent directions and handedness, morph tangent attributes, atlas paint retention",
+    "Static VRM1 material expression retains the initial source vertex frame",
+    "Source replay sealed export to explicit tangent attributes, genuine standalone portable import",
+    "Atomic singular-sampler rejection and forged-frame rejection with preserved prior output"
+  ],
+  "egl": {
+    "software": {
+      "renderer": "llvmpipe",
+      "rgb8_maxima": [
+        0,
+        0,
+        0
+      ]
+    },
+    "intel_arc": {
+      "renderer": "Arc A770",
+      "live_device": [
+        "/dev/dri/renderD129"
+      ],
+      "pci": "0000:03:00.0",
+      "rgb8_maxima": [
+        0,
+        1,
+        1
+      ]
+    },
+    "cases": [
+      "generated rotated original",
+      "generated mirrored original",
+      "authored original"
+    ],
+    "scope": "Headless EGL original source Preview/Cancel/Apply/native reopen and reimport of standalone portable copies",
+    "evidence": {
+      "artifacts/vrm1-generated-tangent-verification-20261126/generated-preview-render.cpp": "dd110a8a64acc4d518cc0e04b2b76c5b402e7cbfd872212d44b89656896e4072",
+      "artifacts/vrm1-generated-tangent-verification-20261126/generated-preview-render": "52f0da017a0b7f950886bbb212ceab81b8595224bad7cc43c03278b74f4dfc14",
+      "artifacts/vrm1-generated-tangent-verification-20261126/render.log": "36a4c9dba47185b21780c7afe8e4bfb0d966a9d5b087ac0506ecd88d3126ba85",
+      "artifacts/vrm1-generated-tangent-verification-20261126/render-arc.log": "6330984865071764110af5c3d10d4ea7887b4be7112a7df52fe16ce63bfbf8df",
+      "artifacts/vrm1-generated-tangent-verification-20261126/render-arc.json": "b3e3c9134544a47bd3894a13706bec52c2e7f0c5511332443c4c874f7bede7f7"
+    }
+  },
+  "external_validation": {
+    "vrm_spec_revision": "94e82dd346fa6cf0337c4421728640e5252dd38e",
+    "khronos_common_schema_revision": "3cd6f59b277ed7f6540dbabdacc7841a5fdc0ded",
+    "khronos_version": "2.0.0-dev.3.10",
+    "khronos_file_results": [
+      {
+        "file": "generated-rotate-original.vrm",
+        "errors": 0,
+        "warnings": 6
+      },
+      {
+        "file": "generated-rotate-atlas.vrm",
+        "errors": 0,
+        "warnings": 6
+      },
+      {
+        "file": "generated-rotate-original-applied.vrm",
+        "errors": 0,
+        "warnings": 4
+      },
+      {
+        "file": "generated-rotate-original-portable-only.vrm",
+        "errors": 0,
+        "warnings": 4
+      },
+      {
+        "file": "generated-mirror-original.vrm",
+        "errors": 0,
+        "warnings": 6
+      },
+      {
+        "file": "generated-mirror-atlas.vrm",
+        "errors": 0,
+        "warnings": 6
+      },
+      {
+        "file": "generated-mirror-original-applied.vrm",
+        "errors": 0,
+        "warnings": 4
+      },
+      {
+        "file": "generated-mirror-original-portable-only.vrm",
+        "errors": 0,
+        "warnings": 4
+      }
+    ],
+    "vrm_schema_instances": 46,
+    "vrm_schema_errors": 0,
+    "actual_resolver_controls": 2,
+    "artifacts": {
+      "artifacts/vrm1-generated-tangent-verification-20261126/khronos.json": "6ae9851f9181c1e1ee1794e910ec3ffa83af1b351c6feb67ca958233b5b4ab76",
+      "artifacts/vrm1-generated-tangent-verification-20261126/official.json": "761ec825f7a59372267d10e6e4e47495a4ab103525be69addcf2ab9395774f3b"
+    }
+  },
+  "combined_replay": {
+    "service": "ds-vrm1-generated-tangent-regressions-20261126.service",
+    "invocation": "e96334a66842430984c3ff9c051f91a2",
+    "status_path": "artifacts/vrm1-generated-tangent-release-20261126/combined-regression/status.json",
+    "candidate": "fc528acadc024ebc4cc54491e54b07dd1ca8e467",
+    "selected": 86,
+    "terminal": false
+  },
+  "harness_corrections": [
+    "Initial package reimport exercised the embedded project. The new fixture removes its project marker in a copied file and checks the ordinary source importer.",
+    "The first brush setup accepted a sample without changing paint. The accepted fixture explicitly checks committed native ink and nonempty sparse tiles.",
+    "The first Arc observer compared a renderer string with the wrong capitalization. Independent verification used the actual A770 renderer, exit zero and live renderD129 file descriptor."
+  ],
+  "open_scope": [
+    "Transformed generated normals in the mixed typed MToon path",
+    "The general portable GLB transformed-normal path",
+    "Portable live expressions over authored core paint and physical headset qualification"
+  ]
+}

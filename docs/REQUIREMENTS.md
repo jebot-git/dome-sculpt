@@ -23,9 +23,15 @@ application qualification remain open. See [the receipt](validation/source-autho
 Static VRM1 expression preview and Apply now cover original core PBR and
 unlit materials, including independently writable paint and ordered native
 Save. Unpainted PBR export preserves authored tangent frames and original
-emission expression units. Generated tangent transport and live painted
-Core PBR expression export remain open. See
+emission expression units. Live painted Core PBR expression export remains
+open. See
 [the validation receipt](validation/vrm1-core-pbr-expressions-20261126.json).
+
+Core glTF/VRM1 import now supports generated normal tangents under rotated,
+scaled or reflected source sampling. Static VRM1 expressions retain that
+frame across editable paint and native reopen. Unpainted portable VRM1 output
+replays and emits explicit base and morph tangents. See
+[the validation receipt](validation/vrm1-generated-tangent-20261126.json).
 
 ## Qualified integration — 2026-11-17
 

@@ -536,8 +536,9 @@ frame. Existing MToon frame and paint guards still apply.
 The six focused Release tests pass, including the existing software OpenGL
 preview and a 326-check static expression suite. A separate Mesa llvmpipe
 test renders the plain PBR and unlit original-source cases through Preview,
-Cancel, Apply and native reopen. The portable PBR reimport reproduces exactly
-the applied native pixels. An independent reader checks
+Cancel, Apply and native reopen. Reopening the exported PBR package reproduces
+the applied native pixels through its embedded project. The standalone
+portable payload is exercised separately below. An independent reader checks
 144 exact corner tuples and 201 texture and factor values in the unpainted
 portable PBR export. The export passes five pinned VRM1 extension checks and
 Khronos glTF validation with four skinned-node placement warnings.
@@ -550,6 +551,33 @@ skips across the same 86 tests. The expression test recovers and all previous
 passes hold. Generated tangent transport, live painted Core PBR expression
 export and external HDR adapter composition remain open.
 See [the validation receipt](validation/vrm1-core-pbr-expressions-20261126.json).
+
+### Generated normal tangents for core source materials
+
+Core glTF and VRM1 sources without authored tangents can generate their rest
+and morph tangent frames from a rotated, scaled or reflected normal sampler.
+Generation uses the effective KHR UV set and the sampler's linear transform.
+Offsets affect texture lookup independently. VRM1 texture expressions edit
+sampler scale and offset while keeping the imported vertex frame. Export
+replays the original frame and writes explicit glTF base and morph tangents.
+A singular sampler is rejected on import and a mismatched generated frame
+cannot replace an existing portable file.
+
+Candidate `fc528aca` passes seven focused Release tests and six headless
+ASan/UBSan tests with leak detection. The expression fixture passes 492
+checks in each profile. The focused tests exercise rotated and mirrored UV1 inputs, analytic tangent
+directions and handedness, genuinely painted atlas inputs, native reopen and
+standalone portable reimport. The portable tests strip the embedded project
+from a copy before importing. The separate OpenGL check compares the actual
+Preview, Cancel, Apply and native reopen pixels. Standalone portable reimport
+matches exactly on llvmpipe and within one RGB8 level on Intel Arc A770.
+That comparison also covers the earlier authored-tangent PBR fixture.
+Independent schema and Khronos validation find zero errors in the checked
+source and output files. Mixed MToon frame generation, portable live
+expressions over paint, and the general transformed-normal GLB export route
+still require separate qualification.
+The selected 86-case combined Release replay is running on the pushed commit.
+See [the validation receipt](validation/vrm1-generated-tangent-20261126.json).
 
 ## Source and integration boundary
 

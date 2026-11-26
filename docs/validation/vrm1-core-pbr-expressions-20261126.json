@@ -47,7 +47,7 @@
       "pbr-original initial_coverage=1862 preview_coverage=1697 preview_max_difference=255 portable_reimport_max_difference=0",
       "unlit-original initial_coverage=1862 preview_coverage=1697 preview_max_difference=255 portable_reimport_max_difference=-1"
     ],
-    "scope": "Actual Document raw core PBR and unlit preview, cancel, apply, native reopen and PBR portable reimport",
+    "scope": "Actual Document raw core PBR and unlit preview, cancel, apply, native reopen and PBR package reopen through the embedded native project",
     "artifacts": {
       "artifacts/vrm1-core-pbr-expression-interoperability-20261126/core-preview-render.cpp": "545a93a2b8ff15b238aa2ff173e10aa842e6f6c852c50355a26b6ec43f6f2d95",
       "artifacts/vrm1-core-pbr-expression-interoperability-20261126/core-preview-render": "8e1feba3fc4133953200fc9c80cc9ff8a5b91277ae8101e596abe48a32dba543",
