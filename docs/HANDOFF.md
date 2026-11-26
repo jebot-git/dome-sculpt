@@ -1336,6 +1336,20 @@ source domains still need their own Cut representation. A clean
 latest full regression and physical device acceptance remain open.
 [Plane cut and FLOAT validation](validation/cut-owning-materials-20261126.json)
 
+### Current controller regression fixtures
+
+The import, emission and two editable-export fixtures now exercise the
+33-page controller menu and the added texture and colour-blur actions.
+The anatomical binding fixture selects Surface Heat at the upper Method
+endpoint and Anatomical at the preceding detent. Method selection leaves
+the Scene and history intact. The following Bind, ordered Save and Undo
+operate on both bundled CC0 VRoid bases.
+
+All four menu and export cases and both 35-check anatomical replays pass
+in Release and ASan/UBSan. The frozen full Release run started before
+these fixture changes and still uses the earlier test sources.
+[Controller fixture evidence](validation/controller-page-fixtures-20261126.json)
+
 ## Source and integration boundary
 
 - Main now admits product1bc13125 and public fixturef1e193c7 after complete

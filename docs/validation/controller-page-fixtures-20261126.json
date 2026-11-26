@@ -1,0 +1,176 @@
+{
+  "product": "fadacc0076aef8f7b2ed8ec5a9a9cfbbbaa8ca17",
+  "fixture_commit": "cf8c9b9bb2235d93b40a08c80d2dd8f94c51e215",
+  "main_merge": "abc9c96a89609ac0ebd3219f247a6bca2278ae60",
+  "scope": "Existing controller behavior, latest page registry, actual anatomical and surface-heat Method control, native/GLB output, exact history and cancellation.",
+  "reused_native32_project_sha256": "8239128110c7d210dbe15dc2c3e603d590c881069b959b4d0de6e9d4f59ea871",
+  "profiles": {
+    "release": {
+      "pages": [
+        {
+          "test": "import-options-controller",
+          "exit": 0,
+          "last_lines": [
+            "PASS Controller flat import has exact single-operation Undo/Redo with no partial source adoption",
+            "PASS directory result quota refuses instead of silently omitting eligible assets",
+            "PASS Import21/23 preserve root Undo and existing cut controls",
+            "39 import options/controller checks passed"
+          ]
+        },
+        {
+          "test": "emission-controls",
+          "exit": 0,
+          "last_lines": [
+            "PASS Absolute radiance shares the exact leased object-property Undo action",
+            "PASS Actual configured HDR project exports through explicit editable policy with exact native authority",
+            "PASS Native project Open keeps actual control-authored float fields and raw provenance",
+            "PASS 33 emission controls checks"
+          ]
+        },
+        {
+          "test": "xr-editable-export",
+          "exit": 0,
+          "last_lines": [
+            "PASS Actual joystick opens the shared root menu",
+            "PASS Root export navigation discovers the shared explicit policy page",
+            "PASS Actual controller Cancel preserves old export bytes, live data and the following native Save",
+            "PASS 70 XR editable export checks"
+          ]
+        },
+        {
+          "test": "xr-native-paint32-export",
+          "exit": 0,
+          "last_lines": [
+            "PASS Actual joystick opens the shared root menu",
+            "PASS Root export navigation discovers the shared explicit policy page",
+            "PASS Actual controller Cancel preserves old export bytes, live data and the following native Save",
+            "PASS 69 XR editable export checks"
+          ]
+        }
+      ],
+      "anatomical": [
+        {
+          "base": "female",
+          "exit": 0,
+          "last": [
+            "PASS The upper Method endpoint stages surface heat without changing Scene or history",
+            "PASS Eligible raw source exposes actual anatomical Method without changing Scene/history",
+            "PASS Real joystick Bind executes the anatomical worker and accepted Save exactly",
+            "PASS Controller anatomical bind owns one complete Undo",
+            "Public anatomical worker checks 35"
+          ]
+        },
+        {
+          "base": "male",
+          "exit": 0,
+          "last": [
+            "PASS The upper Method endpoint stages surface heat without changing Scene or history",
+            "PASS Eligible raw source exposes actual anatomical Method without changing Scene/history",
+            "PASS Real joystick Bind executes the anatomical worker and accepted Save exactly",
+            "PASS Controller anatomical bind owns one complete Undo",
+            "Public anatomical worker checks 35"
+          ]
+        }
+      ]
+    },
+    "asan": {
+      "pages": [
+        {
+          "test": "import-options-controller",
+          "exit": 0,
+          "last_lines": [
+            "PASS Controller flat import has exact single-operation Undo/Redo with no partial source adoption",
+            "PASS directory result quota refuses instead of silently omitting eligible assets",
+            "PASS Import21/23 preserve root Undo and existing cut controls",
+            "39 import options/controller checks passed"
+          ]
+        },
+        {
+          "test": "emission-controls",
+          "exit": 0,
+          "last_lines": [
+            "PASS Absolute radiance shares the exact leased object-property Undo action",
+            "PASS Actual configured HDR project exports through explicit editable policy with exact native authority",
+            "PASS Native project Open keeps actual control-authored float fields and raw provenance",
+            "PASS 33 emission controls checks"
+          ]
+        },
+        {
+          "test": "xr-editable-export",
+          "exit": 0,
+          "last_lines": [
+            "PASS Actual joystick opens the shared root menu",
+            "PASS Root export navigation discovers the shared explicit policy page",
+            "PASS Actual controller Cancel preserves old export bytes, live data and the following native Save",
+            "PASS 70 XR editable export checks"
+          ]
+        },
+        {
+          "test": "xr-native-paint32-export",
+          "exit": 0,
+          "last_lines": [
+            "PASS Actual joystick opens the shared root menu",
+            "PASS Root export navigation discovers the shared explicit policy page",
+            "PASS Actual controller Cancel preserves old export bytes, live data and the following native Save",
+            "PASS 69 XR editable export checks"
+          ]
+        }
+      ],
+      "anatomical": [
+        {
+          "base": "female",
+          "exit": 0,
+          "last": [
+            "PASS The upper Method endpoint stages surface heat without changing Scene or history",
+            "PASS Eligible raw source exposes actual anatomical Method without changing Scene/history",
+            "PASS Real joystick Bind executes the anatomical worker and accepted Save exactly",
+            "PASS Controller anatomical bind owns one complete Undo",
+            "Public anatomical worker checks 35"
+          ]
+        },
+        {
+          "base": "male",
+          "exit": 0,
+          "last": [
+            "PASS The upper Method endpoint stages surface heat without changing Scene or history",
+            "PASS Eligible raw source exposes actual anatomical Method without changing Scene/history",
+            "PASS Real joystick Bind executes the anatomical worker and accepted Save exactly",
+            "PASS Controller anatomical bind owns one complete Undo",
+            "Public anatomical worker checks 35"
+          ]
+        }
+      ]
+    }
+  },
+  "raw": {
+    "archive": "controller-page-fixtures-20261126.tar.gz",
+    "sha256": "22d62be10f370c259dfcf2e24ec66480109f5e69eda8b6d3db290e6693890802",
+    "members": {
+      "asan/anatomical/female-generate.log": "1e43e916e55baf485be02d01f1fddd29b32ad65300dd2008f768329c55562b76",
+      "asan/anatomical/female-worker.log": "debf0b5e1324c235850b2131417a9a500fd892e242d3c8933c5885c1efb44b5e",
+      "asan/anatomical/male-generate.log": "7dc813a3f7b0d3571b7230e1f9fc6657aaabf47ea6a605ab73429ca195373c2f",
+      "asan/anatomical/male-worker.log": "debf0b5e1324c235850b2131417a9a500fd892e242d3c8933c5885c1efb44b5e",
+      "asan/anatomical/run.py": "8b8c1e7af1d0f0c6f034ad946cf66000e68bcde457a0450653b57e1d233dd0a2",
+      "asan/anatomical/status.json": "8e9f82f34ffdea0ffd656bb8cd3bec2a645932aadfd864896ef46e32609f85a6",
+      "asan/controls/emission-controls/run.log": "b0be0d64ed2cffe8a2b524c3e3f89e6b94278b98cf145cd43a69330c36f8720f",
+      "asan/controls/import-options-controller/run.log": "53370ed339e07e849464d2a6d2e14ce1873a8cc0712344ec77368282a11bb190",
+      "asan/controls/run.py": "b1c8c619fc7806e4d4f1f3001ef4636982ce44558d63da7d40a80493d55c415b",
+      "asan/controls/status.json": "89a85f975dcb32397e2683e94fb4d712012be05b5218754bcdd862db6db42073",
+      "asan/controls/xr-editable-export/run.log": "df6d3c85bfb57c11385a928079e5523ea84c5da4d2c3adee2751c4ac8b8be53e",
+      "asan/controls/xr-native-paint32-export/run.log": "feb6ce2f6bf98823c2de7cc189e6af2a82f16382d6dde020b187fe49a7cf93ec",
+      "release/anatomical/female-generate.log": "1e43e916e55baf485be02d01f1fddd29b32ad65300dd2008f768329c55562b76",
+      "release/anatomical/female-worker.log": "debf0b5e1324c235850b2131417a9a500fd892e242d3c8933c5885c1efb44b5e",
+      "release/anatomical/male-generate.log": "7dc813a3f7b0d3571b7230e1f9fc6657aaabf47ea6a605ab73429ca195373c2f",
+      "release/anatomical/male-worker.log": "debf0b5e1324c235850b2131417a9a500fd892e242d3c8933c5885c1efb44b5e",
+      "release/anatomical/run.py": "0d6c12a24c4b92fdb1f5cfeb6164e0def96a027a6f0c86ad301f25d6c0c0436f",
+      "release/anatomical/status.json": "8e9f82f34ffdea0ffd656bb8cd3bec2a645932aadfd864896ef46e32609f85a6",
+      "release/controls/emission-controls/run.log": "b0be0d64ed2cffe8a2b524c3e3f89e6b94278b98cf145cd43a69330c36f8720f",
+      "release/controls/import-options-controller/run.log": "1b147ef631c58f17cd098370c7f4bbccd19365cbc793438ec1ec48e43e85f23e",
+      "release/controls/run.py": "db496d869bb652bdc9df476a07ca7f95d9bcbd83a4f4d8c327223d66cae1edbe",
+      "release/controls/status.json": "89a85f975dcb32397e2683e94fb4d712012be05b5218754bcdd862db6db42073",
+      "release/controls/xr-editable-export/run.log": "df6d3c85bfb57c11385a928079e5523ea84c5da4d2c3adee2751c4ac8b8be53e",
+      "release/controls/xr-native-paint32-export/run.log": "feb6ce2f6bf98823c2de7cc189e6af2a82f16382d6dde020b187fe49a7cf93ec",
+      "validation-source/record.py": "02e107dd2261bdae0f3e95a3b01621dfe29c59af4597db3d9e4fb99396315e29"
+    }
+  }
+}

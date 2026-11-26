@@ -155,6 +155,13 @@ checks pass. Incompatible material policies, retained source domains
 and physical device acceptance remain open.
 [Plane cut material and cancellation evidence](validation/cut-owning-materials-20261126.json)
 
+Four controller regressions now exercise the current menu and two editable
+GLB policies. Both CC0 VRoid bases pass the updated Anatomical and Surface
+Heat selector, Bind, ordered Save and Undo checks. All six scoped cases
+pass in Release and ASan/UBSan. The ongoing full Release run uses the
+earlier fixtures.
+[Controller fixture evidence](validation/controller-page-fixtures-20261126.json)
+
 ## Qualified integration — 2026-11-17
 
 Main now integrates product `1bc13125` and public fixture `f1e193c7` after
