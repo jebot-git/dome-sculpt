@@ -387,6 +387,32 @@ fixture still drives the previous material page layout. Raw CTest and JUnit
 results are under `artifacts/production-original-hdr-regressions-release-20261126/`.
 Read [the original image result](ORIGINAL-IMAGE-EMISSION-20261126.md).
 
+On candidate `367a4313`, replaced GL material and geometry stores retire
+against completed GPU work even while more frames arrive or the active view
+stays unchanged. The earlier ledger fails the isolated regression. The new
+ledger passes 106 software controls with ASan/UBSan and leak detection, and
+108 on authenticated Intel Arc A770. Actual renderer recovery passes 828
+software and 831 Arc checks. Source GPU, packed MToon and native physical
+MToon pass in both profiles. Each cold material budget probe rejects a limit
+one byte below the measured requirement before material allocation. The
+exact limit reproduces the original pixels.
+
+The real-loader synthetic OpenXR client passes 150 checks with current
+Base Color and weight-transfer controls. Affine retopology, import, groups,
+emission and both editable XR export cases also pass. Both CC0 bases pass
+the anatomical native worker tests, including controller method selection,
+ordered Save and exact Undo. Creator VRM0 export now accepts changed UV
+seams when each rest corner's original accessor, position and normal still
+match. A 19-part avatar saves and reopens exactly, exports at three morph
+weights, and passes 27 independent checks each in software and on Arc. A
+forged source-corner remap leaves the existing export unchanged. Khronos
+glTF validation reports zero errors on six exports, with the VRM0 naming
+warning and 19 skinned-node hierarchy warnings per file. The focused logs
+are under `artifacts/gpu-retirement-progress-release-20261126/`.
+The same 86-case cohort is running on this frozen candidate in
+`ds-gpu-creator-regressions-20261126.service`. Product changes are on
+`work/gpu-retirement-progress-20261126`; main runtime admission is unchanged.
+
 ## Source and integration boundary
 
 - Main now admits product1bc13125 and public fixturef1e193c7 after complete
