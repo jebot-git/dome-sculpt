@@ -236,9 +236,6 @@ PortableTextureSetField portable_texture_set_field(const TextureSetView &field,
  if(field.material.toon)throw std::invalid_argument("Native toon source export requires its actual typed material compiler");
  const auto &preview=field.source->source_preview();
  if(!preview)throw std::invalid_argument("Portable retained field lacks genuine before role inputs");
- if(field.painted->has_physical_emission()||hdr_emission(field.material.emissive)||
-    field.material_bindings->physical_emission||hdr_emission(field.material_bindings->native_reference.emission))
-  throw std::invalid_argument("Retained texture-set FLOAT/HDR export needs its precision-qualified per-material emission compiler");
  const auto domain=field.domain->triangles();
  const auto count=domain.size()*3,full=preview->geometric_frames().size();
  if(count>limits.maximum_corners||full>limits.maximum_bytes/64||

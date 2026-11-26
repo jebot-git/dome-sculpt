@@ -28,7 +28,7 @@ bool physical_object(const SculptObject &o) {
     (o.material_bindings&&physical_emission(*o.material_bindings));
 }
 bool native_physical(const SculptObject &o) {
-  return physical_object(o)&&(!o.mesh_active||(o.painted&&
+  return !o.texture_sets&&physical_object(o)&&(!o.mesh_active||(o.painted&&
     !o.painted->source_sampling_prepared()&&
     o.painted->surface_diagnostics().policy!=PaintUvPolicy::SourceAuthored));
 }
@@ -41,7 +41,7 @@ NativeExtractionCost native_extraction_cost(const Scene &scene,const SourceUvBak
     throw std::length_error("Native physical geometry budget is outside its supported range");
   auto charge=[](size_t &total,size_t n,size_t unit,size_t cap,const char *message){
     if(total>cap||n>(cap-total)/unit)throw std::length_error(message);total+=n*unit;};
-  for(const auto &o:scene.objects())if(o.visible&&o.mesh_active&&(native_physical(o)||(o.material_bindings&&o.material_bindings->native_paint_sampling))){
+  for(const auto &o:scene.objects())if(o.visible&&!o.texture_sets&&o.mesh_active&&(native_physical(o)||(o.material_bindings&&o.material_bindings->native_paint_sampling))){
     if(cancelled&&cancelled())throw std::runtime_error("Native physical extraction cancelled");
     const auto &p=*o.painted;
     if(p.mesh().positions.size()>policy.max_vertices||p.mesh().indices.size()/3>policy.max_triangles)
@@ -241,12 +241,7 @@ std::vector<ObjectSurface> native_authoring_surfaces(const Scene &scene,
   bool sets=false;
   for(const auto &original:scene.objects()){
     if(cancelled&&cancelled())throw std::runtime_error("Native physical surface extraction cancelled");
-    if(original.visible&&original.texture_sets){
-      sets=true;TextureSetLimits limits;limits.cancelled=cancelled;limits.maximum_bytes=std::min(limits.maximum_bytes,policy.max_working_bytes);
-      const auto plan=prepare_texture_set_surface(original,limits);
-      for(const auto&field:plan->fields())if(hdr_emission(field.material.emissive)||field.painted->has_physical_emission())
-        throw std::invalid_argument("Texture-set native HDR export needs its per-material precision-qualified compiler");
-    }
+    sets|=original.visible&&bool(original.texture_sets);
     if(original.visible&&native_physical(original))omit_current_emission(detached.object(original.id));
   }
   auto surfaces=sets?detached.preview_surface_bundles(cancelled,{}):detached.preview_surfaces(cancelled);
@@ -296,7 +291,7 @@ NativeAuthoringCompilation compile_native_authoring(
       TextureSetLimits limits;limits.cancelled=stop;
       if(fixed>=policy.max_working_bytes)throw std::length_error("Native texture-set export working budget exhausted");
       limits.maximum_bytes=std::min(limits.maximum_bytes,policy.max_working_bytes-fixed);
-      reserve(texture_set_export_working_bound(surface,limits),1);continue;
+      reserve(texture_set_export_working_bound(surface,limits,true),1);continue;
     }
     if(native_physical(object)&&(mesh.positions.size()>policy.max_vertices||mesh.indices.size()/3>policy.max_triangles))
       throw std::length_error("Native physical captured geometry exceeds its budget before staging");
@@ -338,6 +333,7 @@ NativeAuthoringCompilation compile_native_authoring(
     for (auto &surface : result.surfaces) {
       check();
       const auto &object = capture.scene().object(surface.id);
+      if(surface.texture_set_surface)continue;
       if (object.painted && object.painted->source_sampling_prepared())
         source_paint_export(*object.painted,surface,stop);
       else if(physical(object)) {
@@ -378,7 +374,7 @@ NativeAuthoringCompilation compile_native_authoring(
   for (const auto &surface : capture.originals()) {
     check();
     const auto &object = capture.scene().object(surface.id);
-    if (!object.painted || !object.painted->source_sampling_prepared() ||
+    if (surface.texture_set_surface || !object.painted || !object.painted->source_sampling_prepared() ||
         (surface.textures->overlay->empty()&&!physical(object))) continue;
     SourceUvBakeOptions bounded = policy;
     bounded.cancelled = stop;
@@ -443,12 +439,12 @@ NativeAuthoringCompilation compile_native_authoring(
   // Reuse the capture's completed native nonemission maps and actual geometry;
   // do not rerasterize/duplicate those buffers during Source4 staging.
   auto extraction=staged;
-  for(const auto &surface:capture.originals())if(native_physical(capture.scene().object(surface.id)))
+  for(const auto &surface:capture.originals())if(surface.texture_set_surface||native_physical(capture.scene().object(surface.id)))
     extraction.object(surface.id).visible=false;
   auto changed=extraction.export_surfaces(stop);size_t next=0;
   result.surfaces.reserve(capture.ids().size());
   for(const auto &surface:capture.originals()){
-    if(native_physical(capture.scene().object(surface.id)))result.surfaces.push_back(surface);
+    if(surface.texture_set_surface||native_physical(capture.scene().object(surface.id)))result.surfaces.push_back(surface);
     else {if(next>=changed.size()||changed[next].id!=surface.id)throw std::logic_error("Native authoring staging lost exact object order");result.surfaces.push_back(std::move(changed[next++]));}
   }
   if(next!=changed.size())throw std::logic_error("Native authoring staging added an uncaptured object");

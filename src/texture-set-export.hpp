@@ -1,8 +1,17 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 #include "texture-set-surface.hpp"
+#include "emission-fallback-metrics.hpp"
+#include <optional>
 #include "dome/tangents.hpp"
 namespace dome::detail {
+struct TextureSetExportEmission {
+  Image image;
+  std::array<float,3> factor{};
+  float strength=1;
+  ResolvedFallbackMetrics measured;
+};
+bool texture_set_physical_emission(const TextureSetView &);
 struct TextureSetExportField {
   TextureSetId set=0;
   std::string name;
@@ -10,6 +19,7 @@ struct TextureSetExportField {
   Material material;
   std::shared_ptr<const TextureMaps> textures;
   bool normal_role=false;
+  std::optional<TextureSetExportEmission> emission;
 };
 // One REST geometry and deformation expansion for the entire mesh instance.
 // Material ranges refer into one index stream; no per-material mesh/rig copies.
@@ -21,7 +31,7 @@ struct TextureSetExport {
   size_t working_bound=0;
 };
 size_t texture_set_export_working_bound(const ObjectSurface &,
-    const TextureSetLimits & = {});
+    const TextureSetLimits & = {}, bool measured_physical=false);
 TextureSetExport compile_texture_set_export(const ObjectSurface &,
-    const TextureSetLimits & = {});
+    const TextureSetLimits & = {}, bool measured_physical=false);
 } // namespace dome::detail

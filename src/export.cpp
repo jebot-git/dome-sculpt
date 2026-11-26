@@ -72,6 +72,7 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
   for(const auto&object:input_objects)if(object.textures&&object.textures->current_grid_preview)
     throw std::invalid_argument("Render-only current-grid preview is not export image authority; materialize actual native field images");
   for(const auto &object:input_objects)if((object.textures&&object.textures->overlay)||detail::hdr_emission(object.material.emissive)||(object.material_bindings&&detail::physical_emission(*object.material_bindings))) {
+    if(object.texture_set_surface&&raw_authority)continue;
     if(!(physical&&matches_native_emission_surface(*physical,object,cancelled))&&(!raw_authority||(!native_paint_compiled_emission(*raw_authority,object,cancelled)&&!raw_source_emission(*raw_authority,object,cancelled))))
       throw std::invalid_argument("Physical emission requires a precision-qualified export adapter");
   }
@@ -93,7 +94,17 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
     TextureSetLimits limits;limits.cancelled=cancelled;
     if(bundle_working_bytes>=limits.maximum_bytes)throw std::length_error("Aggregate texture-set export budget exhausted");
     limits.maximum_bytes-=bundle_working_bytes;
-    bundles[i]=compile_texture_set_export(objects[i],limits);
+    bool measured=false;
+    if(raw_authority){
+      const auto &originals=raw_authority->originals();
+      const auto original=std::find_if(originals.begin(),originals.end(),[&](const auto &entry){return entry.id==objects[i].id;});
+      const auto &plan=objects[i].texture_set_surface;
+      if(original==originals.end()||original->texture_set_surface!=plan||
+         original->texture_set_surface.owner_before(plan)||plan.owner_before(original->texture_set_surface))
+        throw std::invalid_argument("Editable texture set borrowed another native surface plan");
+      measured=true;
+    }
+    bundles[i]=compile_texture_set_export(objects[i],limits,measured);
     bundle_working_bytes+=bundles[i]->working_bound;
   }
   auto object_at=[&](size_t i)->const ObjectSurface&{return bundles[i]?bundles[i]->surface:objects[i];};
@@ -720,7 +731,7 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
     }
     return info;
   };
-  auto write_textures=[&](const ObjectSurface&object,size_t i,int material_id,bool compiled_paint=false,bool compiled_role=false){
+  auto write_textures=[&](const ObjectSurface&object,size_t i,int material_id,bool compiled_paint=false,bool compiled_role=false,const TextureSetExportEmission *field_emission=nullptr){
     if(!object.textures)return;
     if(!j["meshes"][result.objects[i].mesh]["primitives"][0]["attributes"].contains("TEXCOORD_0")) throw std::invalid_argument("Textured meshes require UV coordinates");
     for(size_t coordinate=0;coordinate<8;++coordinate)uv_available[coordinate]=j["meshes"][result.objects[i].mesh]["primitives"][0]["attributes"].contains("TEXCOORD_"+std::to_string(coordinate));
@@ -759,8 +770,24 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
       pbr["metallicRoughnessTexture"]={{"index",orm}};
       material["occlusionTexture"]={{"index",orm}};
       if(!maps.normal.rgba.empty()&&!(maps.normal_projection&&maps.normal_projection->version==2)) material["normalTexture"]={{"index",texture(maps.normal,sampler)}};
-      material["emissiveTexture"]={{"index",texture(maps.emission,emission_sampler)}};
-      material["emissiveFactor"]={1,1,1};
+      if(field_emission){
+        material["emissiveTexture"]={{"index",texture(field_emission->image,sampler)}};
+        material["emissiveFactor"]=field_emission->factor;
+        if(field_emission->strength>1){
+          material["extensions"]["KHR_materials_emissive_strength"]={{"emissiveStrength",field_emission->strength}};
+          use_extension("KHR_materials_emissive_strength");
+        }
+        material["extras"]["domeSculptPortableEmission"]={{"version",1},
+          {"evaluation","finite-current-core-pbr-texture-set"},{"units","native-linear-radiance"},
+          {"lossless",false},{"unlitIgnoresEmission",object.material.unlit},
+          {"errorScope","encoded-texel-quantization"},{"betweenTexelErrorBound",nullptr},
+          {"maximumAbsoluteError",field_emission->measured.maximum_absolute_error},
+          {"maximumRelativeError",field_emission->measured.maximum_relative_error},
+          {"erasedNonzeroSamples",field_emission->measured.erased_nonzero_samples}};
+      }else{
+        material["emissiveTexture"]={{"index",texture(maps.emission,emission_sampler)}};
+        material["emissiveFactor"]={1,1,1};
+      }
       if(object.paint_sampling_attachment||compiled_paint) {
         const auto coordinate=retained_paint_sets.at(i);
         const auto &attributes=j["meshes"][result.objects[i].mesh]["primitives"][0]["attributes"];
@@ -803,11 +830,16 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
       material["normalTexture"]["scale"]=1;
     }
   };
-  for(size_t i=0;i<objects.size();++i)write_textures(object_at(i),i,result.objects[i].material,bundles[i]&&!bundles[i]->paint_coordinates.empty(),bundles[i]&&bundles[i]->fields.front().normal_role);
+  for(size_t i=0;i<objects.size();++i){
+    const auto *field=bundles[i]?&bundles[i]->fields.front():nullptr;
+    write_textures(object_at(i),i,result.objects[i].material,
+        field&&!bundles[i]->paint_coordinates.empty(),field&&field->normal_role,
+        field&&field->emission?&*field->emission:nullptr);
+  }
   for(const auto&extra:extra_materials){
     stop();const auto&field=bundles[extra.object]->fields[extra.field];ObjectSurface material_view;
     material_view.material=field.material;material_view.textures=field.textures;
-    write_textures(material_view,extra.object,extra.material,!bundles[extra.object]->paint_coordinates.empty(),field.normal_role);
+    write_textures(material_view,extra.object,extra.material,!bundles[extra.object]->paint_coordinates.empty(),field.normal_role,field.emission?&*field.emission:nullptr);
   }
   return result;
 }
@@ -827,6 +859,7 @@ GltfDocument make_gltf_authoring(const NativeAuthoringCapture &capture,
   for(size_t i=0;i<objects.size();++i) {
     if(cancelled&&cancelled())throw std::runtime_error("Raw source emission finish cancelled");
     const auto &object=objects[i];
+    if(object.texture_set_surface)continue;
     if(!hdr_emission(object.material.emissive)&&
        !(object.material_bindings&&physical_emission(*object.material_bindings)))continue;
     if(native_paint_compiled_emission(capture,object,cancelled))continue;

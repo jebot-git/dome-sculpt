@@ -48,6 +48,50 @@ void authoring(){
  auto portable=doc.export_asset("native-portable.glb",AssetExportFormat::Glb);portable.get();consumer("native-portable.glb",2);
  SourceUvBakeOptions policy;policy.max_working_bytes=1024;const auto old=bytes("editable.glb");refuses([&]{export_glb_authoring(owner,"editable.glb",{},policy);},"A small actual native working budget refuses before staging the material fields");check(bytes("editable.glb")==old,"Rejected native working budget preserves the previous durable output");
 }
+void editable_hdr(){
+ auto scene=fixture();
+ const auto object=scene.active().id;
+ for(TextureSetId set:{0u,1u})check(edit_texture_set(scene,object,set,[&](PaintedMesh &paint,Material &){
+   Brush brush;
+   brush.from=brush.to={0,0,set?.5f:0.f};
+   brush.normal={0,0,1};
+   brush.radius=2;
+   brush.strength=1;
+   PaintSettings settings;
+   settings.front_only=false;
+   settings.channel=PaintChannel::Emission;
+   settings.emission_units=PaintEmissionUnits::Physical;
+   settings.emission=set?std::array<float,3>{.15f,9.f,1.f}:std::array<float,3>{5.f,.2f,.3f};
+   paint.begin_stroke();
+   paint.stamp(brush,settings);
+   return paint.end_stroke();
+ }),"The actual native member has a distinct physical stroke");
+ const auto exact=scene.encode();
+ Document doc;
+ doc.replace(scene);
+ check(doc.wait_mesh(std::chrono::seconds(30)),"Plain FLOAT material ranges publish their actual shared mesh");
+ const std::filesystem::path path="editable-texture-set-hdr.glb";
+ doc.export_asset(path,AssetExportFormat::EditableGlb512).get();
+ consumer(path,2);
+ const auto payload=bytes(path);
+ const auto restored=extract_native_authoring(payload);
+ check(restored&&restored->encode()==exact&&doc.copy_scene().encode()==exact,
+       "Editable per-field HDR retains the exact native layers and shared deformation");
+ const auto json_length=uint32_t(payload.at(12))|(uint32_t(payload.at(13))<<8)|
+     (uint32_t(payload.at(14))<<16)|(uint32_t(payload.at(15))<<24);
+ const auto json=nlohmann::json::parse(payload.begin()+20,payload.begin()+20+json_length);
+ const auto &primitives=json.at("meshes").at(0).at("primitives");
+ for(size_t set=0;set<2;++set){
+   const auto &p=primitives.at(set);
+   const auto &m=json.at("materials").at(p.at("material").get<size_t>());
+   check(p.at("extras").at("dome_sculpt_texture_set").at("id")==set&&
+         m.at("emissiveFactor").at(set)==1&&m.at("emissiveTexture").value("texCoord",0)==0,
+         "Physical fallback keeps the actual set, dominant channel and native UV0");
+   const auto strength=m.at("extensions").at("KHR_materials_emissive_strength").at("emissiveStrength").get<float>();
+   check(strength>(set?7.f:3.f),"The portable material retains above-one radiance");
+ }
+}
+
 void authority(){
  auto scene=fixture();const auto exact=scene.encode();auto surfaces=scene.export_surfaces();const auto original=surfaces[0].texture_set_surface;
  surfaces[0].texture_set_surface=std::shared_ptr<const detail::TextureSetSurfacePlan>(original.get(),[](auto*){});refuses([&]{detail::make_gltf(surfaces);},"Borrowed plan address with a foreign control block cannot export");surfaces=scene.export_surfaces();surfaces[0].id++;refuses([&]{detail::make_gltf(surfaces);},"Another object identity cannot borrow a genuine material plan");surfaces=scene.export_surfaces();surfaces[0].deformation=std::make_shared<const DeformationState>(*scene.active().deformation);refuses([&]{detail::make_gltf(surfaces);},"Numerically equal pose with a foreign control block cannot replace plan authority");
@@ -55,4 +99,4 @@ void authority(){
  check(scene.encode()==exact,"Every plan/pose/budget/cancellation refusal keeps all authoring values exact");
 }
 }
-int main(int argc,char**argv)try{if(argc>1){std::filesystem::create_directories(argv[1]);std::filesystem::current_path(argv[1]);}portable();authoring();authority();std::cout<<"PASS "<<checks<<" texture-set multi-primitive export controls\n";return 0;}catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
+int main(int argc,char**argv)try{if(argc>1){std::filesystem::create_directories(argv[1]);std::filesystem::current_path(argv[1]);}portable();authoring();editable_hdr();authority();std::cout<<"PASS "<<checks<<" texture-set multi-primitive export controls\n";return 0;}catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

@@ -3,6 +3,7 @@
 #include "dome/bake-authoring.hpp"
 #include "dome/bake-recipe.hpp"
 #include "dome/native-scene-append.hpp"
+#include "dome/native-authoring.hpp"
 #include "dome/normal-preparation.hpp"
 #include "dome/gltf-export.hpp"
 #include "dome/projection.hpp"
@@ -102,6 +103,61 @@ uint32_t index_at(const detail::GltfDocument&d,int index,size_t n){const auto&a=
 Vec3 vector(const std::vector<float>&v){return {v.at(0),v.at(1),v.at(2)};}
 Vec3 unit(AffineVector v){return normalized(Vec3{float(v[0]),float(v[1]),float(v[2])});}
 Image texture_image(const detail::GltfDocument&d,const nlohmann::json&info){const auto&texture=d.json.at("textures").at(info.at("index").get<size_t>());const auto&image=d.json.at("images").at(texture.at("source").get<size_t>());const auto&view=d.json.at("bufferViews").at(image.at("bufferView").get<size_t>());const auto offset=view.value("byteOffset",size_t(0)),count=view.at("byteLength").get<size_t>();check(offset<=d.binary.size()&&count<=d.binary.size()-offset,"Actual material PNG lies within the emitted buffer");return decode_projection_png(std::span(d.binary).subspan(offset,count));}
+void retained_hdr_editable(){
+ auto scene=source(true,false);
+ const auto object=scene.active().id;
+ for(TextureSetId set:{0u,1u})check(edit_texture_set(scene,object,set,[&](PaintedMesh &paint,Material &material){
+   material.emissive=set?std::array<float,3>{.15f,.6f,.1f}:std::array<float,3>{.6f,.1f,.2f};
+   paint.add_layer("Distinct editable HDR field");
+   Brush brush;brush.from=brush.to={0,0,0};brush.normal={0,0,1};brush.radius=2;brush.strength=.8f;
+   PaintSettings settings;settings.front_only=false;settings.channel=PaintChannel::Emission;
+   settings.emission_units=PaintEmissionUnits::Physical;
+   settings.emission=set?std::array<float,3>{.05f,11.f,1.f}:std::array<float,3>{6.f,.03f,.5f};
+   paint.begin_stroke();paint.stamp(brush,settings);return paint.end_stroke();
+ }),"The retained texture set has independently authored FLOAT radiance");
+ const auto exact=scene.encode();
+ Document doc;
+ doc.replace(scene);ready(doc);
+ const std::filesystem::path file="editable-retained-hdr.glb";
+ doc.export_asset(file,AssetExportFormat::EditableGlb512).get();
+ std::ifstream stream(file,std::ios::binary);
+ const std::vector<uint8_t> bytes{std::istreambuf_iterator<char>(stream),{}};
+ const auto restored=extract_native_authoring(bytes);
+ check(restored&&restored->encode()==exact&&doc.copy_scene().encode()==exact,
+       "The actual export preserves every native retained HDR field and its membership");
+ const auto json_length=word(bytes,12);
+ detail::GltfDocument parsed;
+ parsed.json=nlohmann::json::parse(bytes.begin()+20,bytes.begin()+20+json_length);
+ parsed.binary.assign(bytes.begin()+28+json_length,bytes.end());
+ const auto &primitives=parsed.json.at("meshes").at(0).at("primitives");
+ check(primitives.size()==2,"Each retained field has its own emitted primitive");
+ for(TextureSetId set:{0u,1u}){
+   const auto member=texture_set_view(scene.active(),set);
+   const auto &expected=member.source->source_preview()->paint_coordinates();
+   const auto &p=primitives.at(set);
+   const auto &m=parsed.json.at("materials").at(p.at("material").get<size_t>());
+   const auto &info=m.at("emissiveTexture");
+   const auto coordinate=info.at("texCoord").get<int>();
+   const int uv=p.at("attributes").at("TEXCOORD_"+std::to_string(coordinate)).get<int>();
+   check(coordinate>0&&p.at("extras").at("dome_sculpt_texture_set").at("id")==set,
+       "The portable HDR image has the actual retained material and paint coordinates");
+   size_t emitted=0;
+   for(auto triangle:member.domain->triangles())for(size_t corner=0;corner<3;++corner){
+     const auto vertex=index_at(parsed,p.at("indices").get<int>(),emitted++);
+     const auto actual=attribute(parsed,uv,vertex,2);
+     const auto &uv_expected=expected.at(size_t(triangle)*3+corner);
+     check(actual[0]==uv_expected[0]&&actual[1]==uv_expected[1],
+         "Each emitted HDR corner retains the original material sampling coordinate");
+   }
+   const auto image=texture_image(parsed,info);
+   size_t peak=0;
+   for(size_t i=0;i<image.rgba.size();i+=4)peak=std::max(peak,size_t(image.rgba[i+set]));
+   const auto strength=m.at("extensions").at("KHR_materials_emissive_strength").at("emissiveStrength").get<float>();
+   check(image.width==64&&image.height==64&&peak==255&&m.at("emissiveFactor").at(set)==1&&
+         strength>(set?5.f:2.f),"Independent decoded PNG and strength keep the field's above-one dominant radiance");
+ }
+ std::cout<<"RETAINED_EDITABLE_HDR "<<bytes.size()<<" container bytes; native source exact\n";
+}
 void audit_normals(const detail::GltfDocument &output,const ObjectSurface &surface,float tolerance){
  float maximum=0;
  const auto &plan=*surface.texture_set_surface;
@@ -832,6 +888,12 @@ int main(int argc,char **argv)try {
   bake_retained_native(true,true);
   bake_retained_native(true,true,true);
   std::cout<<"PASS "<<checks<<" native-normal retained target checks\n";
+  return 0;
+ }
+ if(argc==3&&mode=="--retained-hdr-editable"){
+  std::filesystem::create_directories(argv[2]);std::filesystem::current_path(argv[2]);
+  retained_hdr_editable();
+  std::cout<<"PASS "<<checks<<" retained Editable HDR controls\n";
   return 0;
  }
  if(argc==3&&mode=="--retained-bake-target"){

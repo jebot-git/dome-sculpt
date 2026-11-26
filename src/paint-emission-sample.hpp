@@ -29,6 +29,10 @@ public:
   size_t work_per_sample() const noexcept { return 36+48*layer_count_; }
   size_t index_work() const noexcept { return index_work_; }
 
+  BakedEmissionSample sample_texel(uint32_t x,uint32_t y) const {
+    return texel(int(x),int(y));
+  }
+  size_t work_per_texel() const noexcept { return 7+12*layer_count_; }
   BakedEmissionSample sample(float u,float v) const {
     if(!std::isfinite(u)||!std::isfinite(v))
       throw std::invalid_argument("Nonfinite native paint emission sample");
