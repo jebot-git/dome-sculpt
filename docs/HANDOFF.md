@@ -445,10 +445,43 @@ projection suite passes all 16 checks, including save and reload of the
 actual selected policy and its baked output. The focused Release suite
 passes 9 tests. The independent physical-emission transfer sample also
 passes. Logs are under `artifacts/filtered-normal-authoring-release-20261126/`.
-The 86-case replay and the fresh strict build run on the frozen candidate
-in `ds-filtered-normal-authoring-regressions-20261126.service` and
-`ds-filtered-normal-authoring-strict-20261126.service` respectively.
+The 86-case Release replay finished with 74 passes, 12 failures and zero
+skips. The two avatar normal-domain consumers and zero-morph rest check
+recovered. All previous passes held. The fresh strict build passed all five
+selected tests with ASan, UBSan and leak detection. The raw JUnit reports are
+under the combined-regression subdirectory above and
+`artifacts/filtered-normal-authoring-strict-20261126/`.
 The candidate branch is `work/filtered-normal-authoring-20261126`.
+
+### Shared affine placement in creator VRM0 export
+
+Candidate `adb805a4` supports a complete creator avatar under one shared affine
+placement when its creator shape is uniform or it has no active spring
+geometry. Export preserves the placement in the glTF hierarchy and keeps
+first-person and spring parameters in the same bone-local frames. Nonlinear
+spring refitting remains supported under positive similarities. A divergent
+part placement or nonlinear spring refit under a reflected, sheared or
+non-uniform placement refuses atomically and preserves the existing output.
+This qualification covers geometry, metadata and native reimport. Dynamic
+spring simulation in an external runtime remains open.
+
+All five selected Release tests pass on the fresh FLTK/OpenXR-capable build.
+The two cases previously failing at the affine guard now complete. An
+independent cgltf reader checks 268,704 corners over six direct exports
+with a maximum world error of 0.431 µm. The native source-hint
+workflow passes 80 checks across both CC0 bases in ordinary and reflected
+sheared placements, including fit, ordered Save, Undo/Redo, pose, worker
+re-export and fresh reimport. All three ordinary female VRM outputs are
+byte-identical to `d39ebf8d`. Six direct exports and twelve source replay
+exports pass the pinned VRM0 schemas and Khronos glTF validation with zero
+errors. The existing VRM naming and skinned mesh hierarchy warnings remain.
+Both placement regressions also pass the fresh headless ASan/UBSan build with
+leak detection. All eighteen matching VRM outputs are byte-identical between
+the Release and sanitizer runs.
+
+The code is on `work/creator-vrm-placement-20261126`. The 86-case replay on
+that exact source is tracked by `ds-creator-vrm-placement-regressions-20261126.service`.
+See [the validation receipt](validation/creator-vrm-placement-20261126.json).
 
 ## Source and integration boundary
 

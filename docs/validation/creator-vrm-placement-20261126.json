@@ -1,0 +1,310 @@
+{
+  "source": "adb805a47638d07a9338775b99bdba26f1edb6e7",
+  "branch": "work/creator-vrm-placement-20261126",
+  "parent": "d39ebf8d0cec0872b80cdaddc585f34e57769ada",
+  "release": {
+    "application": "Dome Sculpt 0.1.0 / CPU / Blender 5.4 Alpha trackball basis",
+    "fltk": "/opt/fltk-vr/toolkit",
+    "bitmap_runtime": "/opt/fltk-vr/bdf-runtime",
+    "build_steps": [
+      271,
+      4
+    ],
+    "build_invocation": "8e7af67b7dca4c18847331c42248151c",
+    "test_invocation": "597c024ddad44d5db13d21c7ecbf2595",
+    "cases": {
+      "vrm-source-export": {
+        "status": "pass",
+        "seconds": 56.2822
+      },
+      "vrm-rest-source-export": {
+        "status": "pass",
+        "seconds": 78.7772
+      },
+      "bone-length-creator-basis": {
+        "status": "pass",
+        "seconds": 80.0161
+      },
+      "source-native-hints": {
+        "status": "pass",
+        "seconds": 164.194
+      },
+      "creator-shaped-vrm": {
+        "status": "pass",
+        "seconds": 145.486
+      }
+    },
+    "direct_cc0_corner_checks": {
+      "female-identity.vrm": {
+        "corners": 44412,
+        "maximum_error_metres": 3.62561e-07
+      },
+      "female-metric.vrm": {
+        "corners": 44412,
+        "maximum_error_metres": 3.79614e-07
+      },
+      "male-identity.vrm": {
+        "corners": 45528,
+        "maximum_error_metres": 1.68598e-07
+      },
+      "male-metric.vrm": {
+        "corners": 45528,
+        "maximum_error_metres": 4.30847e-07
+      },
+      "styled-identity.vrm": {
+        "corners": 44412,
+        "maximum_error_metres": 3.62561e-07
+      },
+      "styled-similarity.vrm": {
+        "corners": 44412,
+        "maximum_error_metres": 3.78149e-07
+      }
+    },
+    "source_native_hint_checks": 80,
+    "styled_creator_checks": 448,
+    "ordinary_female_outputs_identical_to_parent": {
+      "female-ordinary-independent.vrm": "ad2b55c115e5f93e2796d4af7861f3fde8281237531d2dbc124e43fc56d604c8",
+      "female-ordinary-initial.vrm": "9990f78beec46cd7b4635e9decba2c3260b928bb96baa29ca8a2cea9b729059e",
+      "female-ordinary-worker.vrm": "a3fa493de3dc09b3a20747c440020cb44da8c95354ed43ab7adeb08491fed8d3"
+    },
+    "validated_files": {
+      "bone-length-creator-basis/female-identity.vrm": {
+        "sha256": "1e5cd541d89664ab00a19f233d382b48961f941b5d9ec1a84d454bc1671d2179",
+        "vrm_schema_errors": 0,
+        "khronos_errors": 0,
+        "khronos_warnings": 20,
+        "warning_codes": [
+          "INVALID_EXTENSION_NAME_FORMAT",
+          "NODE_SKINNED_MESH_NON_ROOT"
+        ]
+      },
+      "bone-length-creator-basis/female-metric.vrm": {
+        "sha256": "b55a0f022ed69d17050ed44db5e63df3df037e393e7f3abca4cd7b8100b5a937",
+        "vrm_schema_errors": 0,
+        "khronos_errors": 0,
+        "khronos_warnings": 20,
+        "warning_codes": [
+          "INVALID_EXTENSION_NAME_FORMAT",
+          "NODE_SKINNED_MESH_NON_ROOT"
+        ]
+      },
+      "bone-length-creator-basis/male-identity.vrm": {
+        "sha256": "87a0bdc523c30094d7e7472e76fa6e9b3052095ff48a5c1e9e259dfffccaeafc",
+        "vrm_schema_errors": 0,
+        "khronos_errors": 0,
+        "khronos_warnings": 20,
+        "warning_codes": [
+          "INVALID_EXTENSION_NAME_FORMAT",
+          "NODE_SKINNED_MESH_NON_ROOT"
+        ]
+      },
+      "bone-length-creator-basis/male-metric.vrm": {
+        "sha256": "467b5417402d426310950344cf5d630516f2a68882931a822ef28574134e91fa",
+        "vrm_schema_errors": 0,
+        "khronos_errors": 0,
+        "khronos_warnings": 20,
+        "warning_codes": [
+          "INVALID_EXTENSION_NAME_FORMAT",
+          "NODE_SKINNED_MESH_NON_ROOT"
+        ]
+      },
+      "bone-length-creator-basis/styled-identity.vrm": {
+        "sha256": "7534e17874420dea76ee0d36f6a619658a525fdc9fd46e8f65a650feaae4fcd9",
+        "vrm_schema_errors": 0,
+        "khronos_errors": 0,
+        "khronos_warnings": 20,
+        "warning_codes": [
+          "INVALID_EXTENSION_NAME_FORMAT",
+          "NODE_SKINNED_MESH_NON_ROOT"
+        ]
+      },
+      "bone-length-creator-basis/styled-similarity.vrm": {
+        "sha256": "d1b1956de30b893fc91b8960dbed154a1e55a2e57eb780c30f56825b289b33a2",
+        "vrm_schema_errors": 0,
+        "khronos_errors": 0,
+        "khronos_warnings": 20,
+        "warning_codes": [
+          "INVALID_EXTENSION_NAME_FORMAT",
+          "NODE_SKINNED_MESH_NON_ROOT"
+        ]
+      },
+      "source-native-hints/female-ordinary-independent.vrm": {
+        "sha256": "ad2b55c115e5f93e2796d4af7861f3fde8281237531d2dbc124e43fc56d604c8",
+        "vrm_schema_errors": 0,
+        "khronos_errors": 0,
+        "khronos_warnings": 20,
+        "warning_codes": [
+          "INVALID_EXTENSION_NAME_FORMAT",
+          "NODE_SKINNED_MESH_NON_ROOT"
+        ]
+      },
+      "source-native-hints/female-ordinary-initial.vrm": {
+        "sha256": "9990f78beec46cd7b4635e9decba2c3260b928bb96baa29ca8a2cea9b729059e",
+        "vrm_schema_errors": 0,
+        "khronos_errors": 0,
+        "khronos_warnings": 20,
+        "warning_codes": [
+          "INVALID_EXTENSION_NAME_FORMAT",
+          "NODE_SKINNED_MESH_NON_ROOT"
+        ]
+      },
+      "source-native-hints/female-ordinary-worker.vrm": {
+        "sha256": "a3fa493de3dc09b3a20747c440020cb44da8c95354ed43ab7adeb08491fed8d3",
+        "vrm_schema_errors": 0,
+        "khronos_errors": 0,
+        "khronos_warnings": 20,
+        "warning_codes": [
+          "INVALID_EXTENSION_NAME_FORMAT",
+          "NODE_SKINNED_MESH_NON_ROOT"
+        ]
+      },
+      "source-native-hints/female-reflected-independent.vrm": {
+        "sha256": "f4762cc22f0b970ef00043219b2d571ea99434750a028654a908d08e335bcd75",
+        "vrm_schema_errors": 0,
+        "khronos_errors": 0,
+        "khronos_warnings": 20,
+        "warning_codes": [
+          "INVALID_EXTENSION_NAME_FORMAT",
+          "NODE_SKINNED_MESH_NON_ROOT"
+        ]
+      },
+      "source-native-hints/female-reflected-initial.vrm": {
+        "sha256": "f9ef6f744814ce11b9f46f69855ef74e57bcc6711abeae3961b53714b135a3d4",
+        "vrm_schema_errors": 0,
+        "khronos_errors": 0,
+        "khronos_warnings": 20,
+        "warning_codes": [
+          "INVALID_EXTENSION_NAME_FORMAT",
+          "NODE_SKINNED_MESH_NON_ROOT"
+        ]
+      },
+      "source-native-hints/female-reflected-worker.vrm": {
+        "sha256": "14b23a67a4ed92ff0c25c0266c4788bb8e3f033d898d7900ae46d291a6ac04a7",
+        "vrm_schema_errors": 0,
+        "khronos_errors": 0,
+        "khronos_warnings": 20,
+        "warning_codes": [
+          "INVALID_EXTENSION_NAME_FORMAT",
+          "NODE_SKINNED_MESH_NON_ROOT"
+        ]
+      },
+      "source-native-hints/male-ordinary-independent.vrm": {
+        "sha256": "68e34936bc6ce044dde1ec55e7017d6c9ec4fd483d66294d4b6eb6f82aaaff17",
+        "vrm_schema_errors": 0,
+        "khronos_errors": 0,
+        "khronos_warnings": 20,
+        "warning_codes": [
+          "INVALID_EXTENSION_NAME_FORMAT",
+          "NODE_SKINNED_MESH_NON_ROOT"
+        ]
+      },
+      "source-native-hints/male-ordinary-initial.vrm": {
+        "sha256": "ce69085c323b23909ec3e81a5f4710408f49c8556dd6d50f620ab9e9a9c17c5d",
+        "vrm_schema_errors": 0,
+        "khronos_errors": 0,
+        "khronos_warnings": 20,
+        "warning_codes": [
+          "INVALID_EXTENSION_NAME_FORMAT",
+          "NODE_SKINNED_MESH_NON_ROOT"
+        ]
+      },
+      "source-native-hints/male-ordinary-worker.vrm": {
+        "sha256": "aa06c6cefea07188d55eca82ae4eee18c5880f813ed027667b08e2495fcdbeed",
+        "vrm_schema_errors": 0,
+        "khronos_errors": 0,
+        "khronos_warnings": 20,
+        "warning_codes": [
+          "INVALID_EXTENSION_NAME_FORMAT",
+          "NODE_SKINNED_MESH_NON_ROOT"
+        ]
+      },
+      "source-native-hints/male-reflected-independent.vrm": {
+        "sha256": "e5918a4f766bdf1446a6284ca5ce3bb883fecc7a3cd3458e834091b1470d9d5d",
+        "vrm_schema_errors": 0,
+        "khronos_errors": 0,
+        "khronos_warnings": 20,
+        "warning_codes": [
+          "INVALID_EXTENSION_NAME_FORMAT",
+          "NODE_SKINNED_MESH_NON_ROOT"
+        ]
+      },
+      "source-native-hints/male-reflected-initial.vrm": {
+        "sha256": "e6202d053d8f27773ff6a816bdd3d18a99aa0e2bc6d1728fdff2e776bcd79065",
+        "vrm_schema_errors": 0,
+        "khronos_errors": 0,
+        "khronos_warnings": 20,
+        "warning_codes": [
+          "INVALID_EXTENSION_NAME_FORMAT",
+          "NODE_SKINNED_MESH_NON_ROOT"
+        ]
+      },
+      "source-native-hints/male-reflected-worker.vrm": {
+        "sha256": "a74ccc22eda0217d0e6a4debfaaa48bca77f6cd26ef649dd55bdaead9174571a",
+        "vrm_schema_errors": 0,
+        "khronos_errors": 0,
+        "khronos_warnings": 20,
+        "warning_codes": [
+          "INVALID_EXTENSION_NAME_FORMAT",
+          "NODE_SKINNED_MESH_NON_ROOT"
+        ]
+      }
+    },
+    "artifacts_sha256": {
+      "artifacts/creator-vrm-placement-release-20261126/build.log": "436f657d0ebaa6783b46af40e3dbf86020e03889545dff4786d1fb72cd9af3d2",
+      "artifacts/creator-vrm-placement-release-20261126/build-tests.log": "ebb5f5e36e77fa84feb74f897448d7c71c4d1b1ce64a2866ab11a8fd9cd9393f",
+      "artifacts/creator-vrm-placement-release-20261126/ctest.log": "ccdc768d9ead3efd596e918174816bb005d682e53b0f8185ffdb78ddf8b41bcb",
+      "artifacts/creator-vrm-placement-release-20261126/ctest.xml": "c69527f20728c97db00a776705ef8ec8df04b17874eb72afcaf69752e1c321d2",
+      "artifacts/creator-vrm-placement-release-20261126/version.log": "9455a20a636a6599ace60120261649d3b29dc51fe2c774305994879190e7336b",
+      "artifacts/creator-vrm-placement-release-20261126/official-vrm0.json": "949deb8a726cbcb239949bd2282992bfd13be9df848e6b5aee592f5ef95924dd",
+      "artifacts/creator-vrm-placement-release-20261126/khronos-direct.json": "a38c701920cff9d6583e050bb279501f67585a9897f0e28cf48d48e4d243c26c",
+      "artifacts/creator-vrm-placement-release-20261126/official-vrm0-source-replay.json": "a2915451b079da0869d1a1618579ab6c18f398887910d23cbc2fb5adb8c15c52",
+      "artifacts/creator-vrm-placement-release-20261126/khronos-source-replay.json": "03cf0071fbc0e751e92439927e775a9bc9d22a11ea493fc6933262c9d334412b"
+    }
+  },
+  "schema_checks": {
+    "vrm0_source": "https://github.com/vrm-c/vrm-specification/tree/94e82dd346fa6cf0337c4421728640e5252dd38e/specification/0.0/schema",
+    "verified_git_blobs": 15,
+    "jsonschema": "4.26.0",
+    "khronos_validator": "2.0.0-dev.3.10"
+  },
+  "strict": {
+    "build_invocation": "45ed88de84d74512a2a6c4f79f950882",
+    "build_steps": 229,
+    "test_invocation": "ebe9f838c955477199645e2584e2ec3d",
+    "sanitizers": "ASan/UBSan with leak detection",
+    "terminal": true,
+    "byte_identical_vrm_outputs_against_release": 18,
+    "log": "artifacts/creator-vrm-placement-strict-20261126/ctest.log",
+    "exit": 0,
+    "cases": {
+      "bone-length-creator-basis": {
+        "status": "pass",
+        "seconds": 156.986
+      },
+      "source-native-hints": {
+        "status": "pass",
+        "seconds": 593.963
+      }
+    },
+    "artifacts_sha256": {
+      "artifacts/creator-vrm-placement-strict-20261126/build.log": "7221eeceb8ab88974f8548f8837525686c323f3504a8dfc5437dc8f9fe86c237",
+      "artifacts/creator-vrm-placement-strict-20261126/ctest.log": "5302e77af71e63639b0ba8aa301f59f368491e2ea578ad3a1eee7a4a9fdb16a8",
+      "artifacts/creator-vrm-placement-strict-20261126/ctest.xml": "f456e27d0e45d6f0efcb7533e47359cf3b20cf4e4e2738f9f992f6b9c09af846"
+    }
+  },
+  "combined_regression": {
+    "cases": 86,
+    "unit": "ds-creator-vrm-placement-regressions-20261126.service",
+    "invocation": "0a508c528c4a49eeaa1171f4c5d256aa",
+    "status": "artifacts/creator-vrm-placement-release-20261126/combined-regression/status.json",
+    "parent_result": {
+      "passed": 74,
+      "failed": 12,
+      "skipped": 0
+    }
+  },
+  "limits": [
+    "Common affine placement preserves emitted rig, skin, first-person and spring metadata. Dynamic external spring simulation remains unverified.",
+    "Nonlinear spring refitting requires positive similarity placement. Divergent parts cannot share the emitted rig."
+  ]
+}

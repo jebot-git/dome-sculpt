@@ -6,6 +6,13 @@ remaining regression work. The dormant-paint fix on main has a fresh
 Release build and three focused native results. The full production goal
 remains active.
 
+The current creator VRM0 candidate supports shared affine placement for
+uniform creator shapes and avatars without spring geometry. The validation
+checks complete emitted skin geometry, first-person and spring metadata,
+native reimport, and atomic refusal of divergent part placement or unsupported
+nonlinear spring refitting. Dynamic spring simulation and admission of the
+combined candidate remain open. See [the receipt](validation/creator-vrm-placement-20261126.json).
+
 ## Qualified integration — 2026-11-17
 
 Main now integrates product `1bc13125` and public fixture `f1e193c7` after
