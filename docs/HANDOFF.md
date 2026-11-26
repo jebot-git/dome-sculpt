@@ -711,10 +711,9 @@ differently. [glTF alpha and sampler specification](https://registry.khronos.org
 
 Release and ASan/UBSan each pass 641 native expression checks and 45
 MToon worker checks. A startup preflight fix restores the failed MToon
-control and preserves cancellation through large binding tables. Release
-passes the whole 2,180-check MToon sweep, including 827 persistent
-allocation denial prefixes and 1,337 cancellation boundaries. The strict
-sanitizer controls pass and the full sanitizer sweep is still running. The source,
+control and preserves cancellation through large binding tables. Both
+profiles finish the 2,180-check MToon sweep, including 827 persistent
+allocation denial prefixes and 1,337 cancellation boundaries. The source,
 exported VRM and editable project are byte-identical across profiles.
 Independent OpenGL checks on llvmpipe and Intel Arc A770 cover five
 expression states, including a rotated, repeating original sampler with
@@ -730,7 +729,9 @@ additional paint channels remain open. The full Release and combined
 sanitizer runs are still using `ccbbe020`. Its sanitizer run reproduced
 the software Mesa teardown leak and an HDR fixture timeout. A fresh
 optimized owning application build has started on exact `e09f2f4b` with the
-canonical DomeD FLTK toolkit. The validation receipt records the service.
+canonical DomeD FLTK toolkit. The existing controller-driven editable export
+workflow is queued against that binary and the masked avatar. The validation
+receipt records both services.
 [Mesa teardown evidence](MESA-XR-RTASM-LIFETIME.md)
 
 ## Source and integration boundary

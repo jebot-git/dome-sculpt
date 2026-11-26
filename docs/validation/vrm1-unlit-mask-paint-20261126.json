@@ -26,9 +26,9 @@
       "profile_path": "artifacts/vrm1-unlit-mask-paint-validation-20261126/asan-verified-final",
       "vrm1_expression_checks": 641,
       "mtoon_worker_checks": 45,
-      "mtoon_fault_checks": null,
-      "allocation_denial_prefixes": null,
-      "cancellation_boundaries": null,
+      "mtoon_fault_checks": 2180,
+      "allocation_denial_prefixes": 827,
+      "cancellation_boundaries": 1337,
       "mtoon_other_controls": 16,
       "leak_detection": true,
       "archive_members_verified": 198,
@@ -36,10 +36,10 @@
       "logs": {
         "run.log": "7f82a11be729b21bf3e73a682bf47845177d5439b942265a42e1964730472756",
         "mtoon-mask.log": "98ac0378aae99f5a0362f7c94cb4cf14e40514a96e6a73ff5791ac8b93e3a014",
-        "mtoon-faults.log": "0f88104c048b427854978d8d35c18e99a2e885566065327d6d6a2df737e95271",
+        "mtoon-faults.log": "ba1a6604ae123159855b6bbd24897a42f0ef50e0d85bf2dd1974626fecc33ba0",
         "mtoon-control.log": "9178630670eaf688c0826d4736322e8721a969c686129fb898abe8cb0dfa44d7"
       },
-      "status": "Native, MToon worker and preflight controls passed. Full MToon sweep still running."
+      "status": "Completed. Native, MToon worker and the full Mask fault sweep exited zero with leak detection."
     }
   },
   "portable": {
@@ -220,7 +220,7 @@
   ],
   "evidence": {
     "path": "docs/validation/vrm1-unlit-mask-paint-20261126.tar.gz",
-    "sha256": "fab63f3e9c0fa02e9127f9755d20ba249f1c0555db934b660cf4fc9559101c28",
+    "sha256": "0f207e5d6024393b3d6da4a090c67d9e07caf96352d580cfeb15eb9854e4ff07",
     "local_artifacts": "artifacts/vrm1-unlit-mask-paint-validation-20261126"
   },
   "official_vrm_schemas": {
@@ -237,5 +237,12 @@
     "status_path": "artifacts/vrm1-unlit-mask-paint-validation-20261126/combined-release/status.json",
     "status_at_record": "Configured successfully with canonical DomeD FLTK. Optimized FLTK/OpenXR build active."
   },
-  "verification_note": "Original main evidence archive recorded the sanitizer fault run before it exited. The corrected receipt keeps that run pending and records the matching Release exit."
+  "verification_note": "The earlier archive sampled the sanitizer sweep before exit. The terminal result is now verified from the original process and archived here.",
+  "owning_public_xr": {
+    "unit": "ds-vrm1-mask-public-xr-20261126.service",
+    "invocation": "94027c8d724948b28d33880c0a695aea",
+    "candidate": "e09f2f4bcb9c35198cbb9a6168ae3403a95263ff",
+    "status_path": "artifacts/vrm1-unlit-mask-paint-validation-20261126/public-xr/status.json",
+    "status_at_record": "Waiting for matching optimized build. Synthetic OpenXR with the genuine candidate-produced project fixture."
+  }
 }
