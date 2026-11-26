@@ -36,7 +36,9 @@ read [the toolkit record](CURRENT-TOOLKIT-20261126.md).
 
 Creator's fresh clock regression passes6014 checks. The current05 application's
 actual Arc XR accept/cancel/focus workflows and ordinary fresh-App reopen now
-pass58 checks. Desktop's first private-Xvfb wrapper fails on read-only temporary
+pass58 checks. The [creator XR receipt](CREATOR-CURRENT-PUBLIC-XR-20261126.md)
+records the six application processes and the matched sanitizer build. Desktop's
+first private-Xvfb wrapper fails on read-only temporary
 socket storage before App functionality; its isolated wrapper correction and
 runtime remain pending. The prior-authored stress fixture
 moves the head joint5m, so its cropped screenshot does not establish ordinary
@@ -63,9 +65,13 @@ Invocation4699538f903b4a6bb3b954be5c0e8975, is live at this checkpoint. Inspect
 artifacts/current-normal-sanitize-20261126/native-selected-v1/status.json and
 the actual unit before acting. Its sampler55/canonical14068/writable9694/joint47409
 cases pass; this snapshot is not a complete strict14 result. HDR877's ready
-five-case cohort follows its natural release. Latest isolated integration draft
-5604ad54 composes05, HDR877, sculpt6d/fe94 and corrected creator fixtures550;
-it is pushed on work/production-resume-integration-20261126, not admitted to main.
+five-case cohort follows its natural release. The isolated integration candidate
+`5604ad54` combines current05, HDR877, sculpt6d/fe94 and corrected creator
+fixtures550. A fresh Release build for the application and selected fixtures
+is running in `artifacts/production-combined-release-20261126`, unit
+`ds-production-combined-release-20261126.service`, invocation
+`593996bfc65d47d0a641ffcb5e4769ef`. Its source remains frozen for the run.
+The branch is `work/production-resume-integration-20261126`.
 Full scope in REQUIREMENTS is unchanged.
 
 ## Source and integration boundary
