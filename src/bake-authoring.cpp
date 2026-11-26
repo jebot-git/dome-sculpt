@@ -191,7 +191,16 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
     try{emission_domain=detail::BakedEmissionDomain::capture(scene,source_id,target.painted->mesh_owner(),options.resolution,target_world,cancelled);}
     catch(const std::invalid_argument&){/* Uncertified correspondence keeps the independently checked raster route. */}
   }
-  auto result = emission_domain?
+  // A separately retained UV write basis may differ from the current mesh.
+  // Keep its existing raster route; sharing below requires the actual current
+  // grid correspondence, in addition to the source domain's certificate.
+  bool share_emission=bool(emission_domain)&&low_mesh.indices.size()==target.painted->mesh().indices.size();
+  if(share_emission)for(size_t c=0;c<low_mesh.indices.size();++c){
+    if(!(c%1024))check();const auto l=low_mesh.indices[c],t=target.painted->mesh().indices[c];
+    const auto a=low_mesh.positions[l],b=target.painted->mesh().positions[t];
+    if(a.x!=b.x||a.y!=b.y||a.z!=b.z||low_mesh.uv[l]!=target.painted->mesh().uv[t]){share_emission=false;break;}
+  }
+  auto result = share_emission?
     detail::bake_mesh_retained_emission(low_mesh,high,options,source_normals,emission_domain,target.painted->mesh_owner()):
     detail::bake_mesh_source_normals(low_mesh,high,options,source_normals);
   if(settings.emission_transport)detail::verify_filtered_emission_quality(low_mesh,high,options,result,emission_domain);
