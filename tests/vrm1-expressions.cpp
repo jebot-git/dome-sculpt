@@ -9,6 +9,7 @@
 #include "dome/vrm-authoring.hpp"
 #include "dome/gltf-export.hpp"
 #include "dome/native-authoring.hpp"
+#include "dome/projection.hpp"
 #include "import-skin-fixtures.hpp"
 #include <future>
 #include <condition_variable>
@@ -170,6 +171,129 @@ void core_expressions(const std::filesystem::path &out) {
       check(authority.scene->encode()==wanted,"Portable VRM1 export preserves all applied native project data");
     }
   }
+}
+
+void core_unlit_live_paint(const std::filesystem::path &out) {
+  auto fixture=core_source(true);
+  auto &material=fixture.j["materials"][0];
+  material["alphaMode"]="OPAQUE";
+  material.erase("alphaCutoff");
+  auto &expressions=fixture.j["extensions"]["VRMC_vrm"]["expressions"];
+  const auto happy=expressions.at("preset").at("happy");
+  expressions["custom"]["alternate"]={
+      {"isBinary",false},
+      {"materialColorBinds",{{{"material",0},{"type","color"},{"targetValue",{.7f,.2f,.5f,.9f}}}}},
+      {"textureTransformBinds",{{{"material",0},{"scale",{0,.6f}},{"offset",{-.3f,.1f}}}}}};
+  for (auto &node : fixture.j.at("nodes"))
+    if (node.contains("children") && node.at("children").empty())
+      node.erase("children");
+  const auto input=out/"unlit-live-input.vrm";
+  fixture.save(input);
+  Scene empty;empty.active().visible=false;
+  ImportAuthoringOptions import_options;
+  import_options.prepare_texture_atlas=true;
+  import_options.paint_resolution=64;
+  auto imported=prepare_authoring_import(empty,input,import_options);
+  imported.scene.select(imported.objects.front());
+  Document doc;
+  doc.replace(std::move(imported.scene));
+  end(doc);
+  ink(doc);
+  const auto live=doc.copy_scene();
+  const auto exact=live.encode();
+  const auto &active=live.active();
+  check(active.material.unlit&&active.material.alpha==Material::AlphaMode::Opaque&&
+        active.painted->source_sampling_prepared()&&active.painted->layers().size()>0,
+        "Opaque unlit export starts with real editable source-owned native paint");
+  const auto output=out/"unlit-live-output.vrm";
+  doc.export_asset(output,AssetExportFormat::EditableAvatar256).get();
+  const auto saved=out/"unlit-live-preserved.dsculpt";
+  doc.save_async(saved).get();
+  end(doc);
+  check(doc.copy_scene().encode()==exact&&Scene::load(saved).encode()==exact,
+        "Live unlit export and ordered Save preserve every native source, layer and pose");
+  auto output_json=json(output);
+  const size_t mesh_slot=output_json.at("nodes").at(
+    output_json.at("extensions").at("VRMC_vrm").at("expressions")
+      .at("preset").at("happy").at("morphTargetBinds")[0].at("node").get<size_t>())
+    .at("mesh").get<size_t>();
+  const auto &primitives=output_json.at("meshes").at(mesh_slot).at("primitives");
+  check(primitives.size()==2,"Exactly two portable draws preserve the original surface and fixed paint");
+  const size_t lower=primitives[0].at("material"),upper=primitives[1].at("material");
+  const auto &materials=output_json.at("materials");
+  for(const auto index:{lower,upper})check(materials.at(index).at("extensions").contains("KHR_materials_unlit")&&
+    !materials.at(index).at("extensions").contains("VRMC_materials_mtoon"),
+    "Both independently composed draws are standard unlit materials");
+  check(materials.at(lower).value("alphaMode","OPAQUE")=="OPAQUE"&&materials.at(upper).at("alphaMode")=="BLEND",
+        "Opaque source ignores source alpha while the derived draw uses paint coverage");
+  const auto output_bindings=output_json.at("extensions").at("VRMC_vrm").at("expressions");
+  for(const auto *table:{"preset","custom"})for(const auto &binding:output_bindings.at(table)){
+    for(const auto &entry:binding.value("materialColorBinds",J::array()))
+      check(entry.at("material")!=upper,"Colour expressions do not tint the paint draw");
+    for(const auto &entry:binding.value("textureTransformBinds",J::array()))
+      check(entry.at("material")!=upper,"Texture expressions do not move the paint draw");
+  }
+  const auto &original_color=happy.at("materialColorBinds")[0].at("targetValue");
+  const auto &remapped_happy=output_bindings.at("preset").at("happy");
+  check(remapped_happy.at("materialColorBinds")[0].at("material")==lower&&
+        remapped_happy.at("materialColorBinds")[0].at("targetValue")==original_color,
+        "Original active colour binding survives on the lower source role");
+  check(output_bindings.at("custom").at("alternate").at("textureTransformBinds")[0].at("scale")==J::array({0,.6f}),
+        "A distinct singular UV expression remains authored on the lower source role");
+
+  cgltf_options options{};
+  cgltf_data *raw=nullptr;
+  check(cgltf_parse_file(&options,output.c_str(),&raw)==cgltf_result_success,
+        "Independent glTF parser recognizes the exported avatar");
+  std::unique_ptr<cgltf_data,decltype(&cgltf_free)> parsed(raw,cgltf_free);
+  check(cgltf_load_buffers(&options,raw,output.c_str())==cgltf_result_success&&
+        cgltf_validate(raw)==cgltf_result_success,
+        "Independent glTF validator accepts portable unlit geometry and materials");
+  const auto &mesh=raw->meshes[mesh_slot];
+  const auto *lower_rgb=cgltf_find_accessor(&mesh.primitives[0],cgltf_attribute_type_color,0);
+  const auto *upper_rgb=cgltf_find_accessor(&mesh.primitives[1],cgltf_attribute_type_color,0);
+  check(lower_rgb&&upper_rgb&&lower_rgb->type==cgltf_type_vec4&&upper_rgb->type==cgltf_type_vec3&&
+        lower_rgb->count==upper_rgb->count&&mesh.primitives[0].indices==mesh.primitives[1].indices,
+        "Independent accessors preserve geometry and decouple paint coverage from source vertex alpha");
+  bool fractional_alpha=false;
+  for(size_t vertex=0;vertex<upper_rgb->count;++vertex){
+    std::array<float,4> source{},paint{0,0,0,1};
+    check(cgltf_accessor_read_float(lower_rgb,vertex,source.data(),4)&&
+          cgltf_accessor_read_float(upper_rgb,vertex,paint.data(),3)&&
+          std::equal(source.begin(),source.begin()+3,paint.begin()),
+          "Every renderer-visible vertex retains identical source RGB on both draws");
+    fractional_alpha|=source[3]<1;
+  }
+  check(fractional_alpha,"The independent source contains real non-unit vertex alpha");
+  const auto &picture=*mesh.primitives[1].material->pbr_metallic_roughness.base_color_texture.texture->image;
+  const auto *pixels=cgltf_buffer_view_data(picture.buffer_view);
+  const auto ink_image=decode_projection_png({pixels,picture.buffer_view->size});
+  uint8_t minimum=255,maximum=0;
+  for(size_t alpha=3;alpha<ink_image.rgba.size();alpha+=4){
+    minimum=std::min(minimum,ink_image.rgba[alpha]);
+    maximum=std::max(maximum,ink_image.rgba[alpha]);
+  }
+  check(minimum<maximum&&maximum>0,"Independent PNG decode observes spatially varying native paint coverage");
+  auto exported_subset=live.snapshot();
+  exported_subset.erase(empty.active().id);
+  check(Scene::load(output).encode()==exported_subset.encode(),
+        "The editable VRM reopens with exact source and paint for every exported object");
+
+  expressions["custom"]["alternate"]["materialColorBinds"][0]["targetValue"][0]=1.25f;
+  const auto invalid=out/"unlit-gamut-input.vrm";
+  fixture.save(invalid);
+  auto wide=prepare_authoring_import(empty,invalid,import_options);
+  wide.scene.select(wide.objects.front());
+  Document refusal;
+  refusal.replace(std::move(wide.scene));
+  end(refusal);
+  ink(refusal);
+  const auto original=refusal.copy_scene().encode();
+  const auto previous=bytes(output);
+  const auto failure=refuses([&]{refusal.export_asset(output,AssetExportFormat::EditableAvatar256).get();});
+  check(failure=="VRM1 unlit expression colour exceeds the unit composition gamut"&&
+        refusal.wait_asset()&&refusal.copy_scene().encode()==original&&bytes(output)==previous,
+        "An out-of-gamut live expression retains the old portable file and exact native source");
 }
 
 void core_generated_frames(const std::filesystem::path &out) {
@@ -474,6 +598,7 @@ int main(int argc,char **argv)try{
  auto entry=entered.get_future();check(entry.wait_for(std::chrono::seconds(120))==std::future_status::ready,"Actual expression computation completes before publication cancellation gate");entry.get();auto after=doc.save_async(out/"cancel.dsculpt");doc.cancel_background_work();release.set_value();const auto cancel_error=refuses([&]{after.get();});check(cancel_error=="Scene changed during Cancel static VRM1 expression"&&doc.wait_asset()&&doc.wait_mesh()&&doc.copy_scene().encode()==baseline_json&&bytes(out/"cancel.dsculpt")==old_cancel&&doc.frame().state->can_undo==cancel_undo&&doc.frame().state->can_redo==cancel_redo,"Actual native late Cancel refuses dependent Save and preserves exact Scene/prior file/history");doc.save_async(out/"cancel-retry.dsculpt").get();check(Scene::load(out/"cancel-retry.dsculpt").encode()==baseline_json,"Actual Save retry recovers after cancelled accepted expression endpoint");
  NativeAuthoringExport owner;owner.scene=std::make_shared<const Scene>(baked.snapshot());owner.allow_portable_fallback=true;VrmExportOptions export_options;export_options.paint_resolution=64;const auto error=refuses([&]{export_vrm_authoring(owner,out/"still-dynamic.vrm",export_options);});std::cout<<"STATIC_DYNAMIC_REFUSAL "<<error<<'\n';check(baked.active().material_bindings->material.parameters.alpha==MToonAlpha::Mask&&error=="VRM1 differing UV targets couple moving upper roles to fixed paint"&&!std::filesystem::exists(out/"still-dynamic.vrm")&&owner.scene->encode()==baked.encode(),"Incompatible moving UV targets and fixed paint refuse portable export atomically");
  core_expressions(out);
+ core_unlit_live_paint(out);
  core_generated_frames(out);
  core_glb_normal_frames(out);
  std::cout<<"PASS "<<checks<<" static VRM1 expression checks polls="<<polls<<'\n';return 0;

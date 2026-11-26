@@ -69,7 +69,7 @@ static VrmExportReport export_vrm1_impl(const std::vector<ObjectSurface> &object
       for (const auto &extension : node.at("extensions").items())
         require(extension.key() == "VRMC_node_constraint",
                 "node extension has no typed reference remapper");
-  struct ExpressionLayerIdentity {int source,lower,upper;bool forward_uv,shade_alias;std::array<float,3> shade_divisor;};
+  struct ExpressionLayerIdentity {int source,lower,upper;bool forward_uv,shade_alias,unlit;std::array<float,3> shade_divisor;};
   std::vector<ExpressionLayerIdentity> expression_layers;
   std::set<int> uv_expression_materials, color_expression_materials, emission_expression_materials;
   const auto &vrm = original.at("extensions").at("VRMC_vrm");
@@ -567,13 +567,18 @@ static VrmExportReport export_vrm1_impl(const std::vector<ObjectSurface> &object
         const size_t at=index_offset+c*4;const uint32_t actual=uint32_t(binary[at])|(uint32_t(binary[at+1])<<8)|(uint32_t(binary[at+2])<<16)|(uint32_t(binary[at+3])<<24);
         require(actual==frame.surface.mesh.indices[c]&&frame.rest_vertices.at(actual)==object.mesh.indices[c],"expression layer actual corner identity differs");
       }
-      auto upper=j["materials"][emitted.material];auto &toon=upper["extensions"]["VRMC_materials_mtoon"];
+      auto upper=j["materials"][emitted.material];
+      auto &extensions=upper.at("extensions");
+      J *toon=layer->unlit?nullptr:&extensions.at("VRMC_materials_mtoon");
+      if(layer->unlit)
+        require(extensions.contains("KHR_materials_unlit") && upper.value("alphaMode", "OPAQUE")=="OPAQUE",
+                "independent unlit paint lost its original opaque material");
       unsigned channel=0;std::set<unsigned> used;
       auto coordinate=[&](const J &info){unsigned c=info.value("texCoord",0u);if(info.contains("extensions")&&info.at("extensions").contains("KHR_texture_transform"))c=info.at("extensions").at("KHR_texture_transform").value("texCoord",c);used.insert(c);};
       // Every lower role, including the PBR fallback, retains its coordinates.
       const auto &pbr=upper.at("pbrMetallicRoughness");for(const char *key:{"baseColorTexture","metallicRoughnessTexture"})if(pbr.contains(key))coordinate(pbr.at(key));
       for(const char *key:{"normalTexture","occlusionTexture","emissiveTexture"})if(upper.contains(key))coordinate(upper.at(key));
-      for(const auto &entry:toon.items())if(entry.value().is_object()&&entry.value().contains("index"))coordinate(entry.value());
+      if(toon)for(const auto &entry:toon->items())if(entry.value().is_object()&&entry.value().contains("index"))coordinate(entry.value());
       while(channel<8&&used.contains(channel))++channel;
       require(channel<8,"expression layer has no unused genuine texture-coordinate set");
       require(frame.rest_vertices.size()<=(options.max_output_bytes-std::min(binary.size(),options.max_output_bytes))/8,"expression layer coordinates exceed output bound");
@@ -588,18 +593,53 @@ static VrmExportReport export_vrm1_impl(const std::vector<ObjectSurface> &object
         // The native shared image modifies the shade sample by P/nativeRGB.
         // Keep that independent contribution and its actual shade expressions,
         // rather than reuse the moving original image or tint the paint base.
-        toon["shadeMultiplyTexture"]=upper["pbrMetallicRoughness"]["baseColorTexture"];
-        auto factor=toon.value("shadeColorFactor",std::array<float,3>{1,1,1});
+        (*toon)["shadeMultiplyTexture"]=upper["pbrMetallicRoughness"]["baseColorTexture"];
+        auto factor=toon->value("shadeColorFactor",std::array<float,3>{1,1,1});
         for(size_t k=0;k<3;++k){const double value=double(factor[k])/layer->shade_divisor[k];require(std::isfinite(value)&&value>=0&&value<=1,"expression layer shade factor exceeds unit representation");factor[k]=float(value);}
-        toon["shadeColorFactor"]=factor;
+        (*toon)["shadeColorFactor"]=factor;
       }
-      upper["alphaMode"]="BLEND";upper.erase("alphaCutoff");toon["transparentWithZWrite"]=false;toon["renderQueueOffsetNumber"]=0;toon["outlineWidthMode"]="none";toon["outlineWidthFactor"]=0;
+      upper["alphaMode"]="BLEND";
+      upper.erase("alphaCutoff");
+      if(toon){
+        (*toon)["transparentWithZWrite"]=false;
+        (*toon)["renderQueueOffsetNumber"]=0;
+        (*toon)["outlineWidthMode"]="none";
+        (*toon)["outlineWidthFactor"]=0;
+      }
       upper["name"]=object.name+" independent paint contribution";
       // Source material extras stay on the original lower material. The upper
       // is a derived standard primitive, with no editor authority of its own.
-      upper.erase("extras");(void)MToonMaterial::from_vrm1(upper,j["textures"].size());
-      const int upper_material=int(j["materials"].size());j["materials"].push_back(std::move(upper));auto primitive=lower;primitive.erase("extras");primitive["material"]=upper_material;primitive["attributes"]["TEXCOORD_"+std::to_string(channel)]=uv_accessor;j["meshes"][emitted.mesh]["primitives"].push_back(std::move(primitive));
-      expression_layers.push_back({a.source_material,emitted.material,upper_material,layer->forward_uv,layer->shade_alias,layer->shade_divisor});budget();
+      upper.erase("extras");
+      if(toon)(void)MToonMaterial::from_vrm1(upper,j["textures"].size());
+      const int upper_material=int(j["materials"].size());
+      j["materials"].push_back(std::move(upper));
+      auto primitive=lower;
+      primitive.erase("extras");
+      primitive["material"]=upper_material;
+      auto &attributes=primitive["attributes"];
+      attributes["TEXCOORD_"+std::to_string(channel)]=uv_accessor;
+      if(layer->unlit && attributes.contains("COLOR_0")){
+        // The opaque lower material ignores vertex alpha. The upper must keep
+        // the same interpolated RGB while its alpha is exactly paint coverage.
+        // Read only RGB from the existing dedicated float4 vertex-colour stream.
+        auto rgb=j["accessors"].at(attributes.at("COLOR_0").get<size_t>());
+        require(rgb.at("componentType")==5126 && rgb.at("type")=="VEC4" &&
+                rgb.at("count").get<size_t>()==frame.rest_vertices.size(),
+                "unlit paint lost the actual exported vertex-colour stream");
+        auto &color_view=j["bufferViews"].at(rgb.at("bufferView").get<size_t>());
+        require(color_view.at("target")==34962 && color_view.value("byteStride",16u)==16 &&
+                color_view.at("byteLength").get<size_t>()==frame.rest_vertices.size()*16,
+                "unlit paint vertex-colour view has an incompatible layout");
+        color_view["byteStride"]=16;
+        rgb["type"]="VEC3";
+        rgb.erase("min");rgb.erase("max");
+        attributes["COLOR_0"]=j["accessors"].size();
+        j["accessors"].push_back(std::move(rgb));
+      }
+      j["meshes"][emitted.mesh]["primitives"].push_back(std::move(primitive));
+      expression_layers.push_back({a.source_material,emitted.material,upper_material,
+                                    layer->forward_uv,layer->shade_alias,layer->unlit,layer->shade_divisor});
+      budget();
     }
 
     ++report.meshes;
@@ -659,7 +699,7 @@ static VrmExportReport export_vrm1_impl(const std::vector<ObjectSurface> &object
         const auto original_binds=expression[kind];
         for(const auto &bind:original_binds)for(const auto &layer:expression_layers)if(bind.at("material").get<int>()==layer.lower){
           if(std::string_view(kind)=="textureTransformBinds"&&!layer.forward_uv)continue;
-          if(std::string_view(kind)=="materialColorBinds"&&(bind.at("type")=="color"||bind.at("type")=="outlineColor"))continue;
+          if(std::string_view(kind)=="materialColorBinds"&&(layer.unlit||bind.at("type")=="color"||bind.at("type")=="outlineColor"))continue;
           auto forwarded=bind;forwarded["material"]=layer.upper;
           if(layer.shade_alias&&std::string_view(kind)=="materialColorBinds"&&bind.at("type")=="shadeColor")for(size_t k=0;k<3;++k){const double value=bind.at("targetValue").at(k).get<double>()/layer.shade_divisor[k];require(std::isfinite(value)&&value>=0&&value<=1e20,"expression layer shade target exceeds finite nonnegative source representation");forwarded["targetValue"][k]=value;}
           expression[kind].push_back(std::move(forwarded));

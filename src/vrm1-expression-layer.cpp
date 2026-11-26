@@ -80,14 +80,20 @@ Vrm1ExpressionLayer compile_vrm1_expression_layer(const J &original,const Sculpt
  const PaintOverlayPacket &packet,uint32_t size,const SourceUvBakeOptions &limits,
  const std::function<bool()> &cancelled){
  auto stop=[&]{if(cancelled&&cancelled())throw std::runtime_error("VRM1 expression-layer compilation cancelled");};stop();
- if(!object.painted||!object.appearance||!object.material_bindings||!object.material_bindings->has_mtoon)
+ if(!object.painted||!object.appearance||!object.material_bindings)
   throw std::invalid_argument("VRM1 expression layer requires its actual paint and typed source owners");
  const auto &binding=*object.material_bindings;binding.validate();const auto &material=binding.material;
+ const bool unlit=!binding.has_mtoon&&object.material.unlit;
  const bool opaque=material.parameters.alpha==MToonAlpha::Opaque&&(object.material.alpha==Material::AlphaMode::Automatic||object.material.alpha==Material::AlphaMode::Opaque);
- const bool masked=material.parameters.alpha==MToonAlpha::Mask&&(object.material.alpha==Material::AlphaMode::Automatic||object.material.alpha==Material::AlphaMode::Mask||int(object.material.alpha)==binding.native_reference.alpha);
- if(material.version()!=MToonVersion::V1||(!opaque&&!masked)||
-    material.parameters.outline!=MToonOutline::None||material.parameters.scroll!=std::array<float,2>{}||material.parameters.rotation_speed!=0)
-  throw std::invalid_argument("VRM1 expression layer currently requires opaque outline-free nonanimated MToon1 source");
+ const bool masked=!unlit&&material.parameters.alpha==MToonAlpha::Mask&&(object.material.alpha==Material::AlphaMode::Automatic||object.material.alpha==Material::AlphaMode::Mask||int(object.material.alpha)==binding.native_reference.alpha);
+ if(unlit) {
+  const auto &authored=original.at("materials").at(size_t(object.appearance->source_material));
+  if(object.material.alpha!=Material::AlphaMode::Opaque ||
+     !authored.value("extensions",J::object()).contains("KHR_materials_unlit"))
+   throw std::invalid_argument("VRM1 unlit expression layers require an original opaque unlit material");
+ } else if(!binding.has_mtoon||material.version()!=MToonVersion::V1||(!opaque&&!masked)||
+           material.parameters.outline!=MToonOutline::None||material.parameters.scroll!=std::array<float,2>{}||material.parameters.rotation_speed!=0)
+  throw std::invalid_argument("VRM1 expression layer requires opaque unlit or outline-free nonanimated MToon1 source");
  if(binding.canonical_attributes||binding.canonical_uv||binding.native_paint_sampling||binding.normal_preparation||binding.color_preparation||binding.key_derivation||binding.physical_emission)
   throw std::invalid_argument("VRM1 prepared/absolute expression layers need their owning adapter");
  if(binding.roles[size_t(MToonSlot::Normal)].image&&!opaque)throw std::invalid_argument("VRM1 masked normal expression layers need their independent membership adapter");
@@ -98,7 +104,11 @@ Vrm1ExpressionLayer compile_vrm1_expression_layer(const J &original,const Sculpt
  // expression weight; both admitted fragments carry the same additive Rim.
  const auto &base=binding.roles[0],&shade=binding.roles[1];const auto &bt=material.textures[0],&st=material.textures[1];
  Vrm1ExpressionLayer result;bool found=false,colour=false,same_target=true;
- result.shade_alias=base.image&&base.image==shade.image&&base.wrap_s==shade.wrap_s&&base.wrap_t==shade.wrap_t&&base.min_filter==shade.min_filter&&base.mag_filter==shade.mag_filter&&mtoon_coordinate(bt)==mtoon_coordinate(st)&&bt.offset==st.offset&&bt.scale==st.scale&&bt.rotation==st.rotation;
+ result.unlit=unlit;
+ // The standard unlit upper material has a single UV-accessed role, the
+ // fixed paint. Its lower material keeps every live source expression.
+ result.forward_uv=!unlit;
+ result.shade_alias=!unlit&&base.image&&base.image==shade.image&&base.wrap_s==shade.wrap_s&&base.wrap_t==shade.wrap_t&&base.min_filter==shade.min_filter&&base.mag_filter==shade.mag_filter&&mtoon_coordinate(bt)==mtoon_coordinate(st)&&bt.offset==st.offset&&bt.scale==st.scale&&bt.rotation==st.rotation;
  if(result.shade_alias)for(size_t k=0;k<3;++k)result.shade_divisor[k]=object.material.color[k]!=0?object.material.color[k]:1;
  const std::array<float,3> initial_shade{material.parameters.shade_color.x,material.parameters.shade_color.y,material.parameters.shade_color.z};
  auto shade_factor=[&](const std::array<float,3> &factor,bool initial){if(result.shade_alias)for(size_t k=0;k<3;++k){const double value=double(factor[k])/result.shade_divisor[k];if(!std::isfinite(value)||value<0||value>1e20)throw std::invalid_argument(initial?"VRM1 shared painted initial shade coefficient exceeds finite source bounds":"VRM1 shared painted shade target exceeds finite nonnegative source representation");if(initial){double scale=1;while(scale<value)scale*=2;result.paint_rgb_scale[k]=float(scale);}}};
@@ -108,23 +118,40 @@ Vrm1ExpressionLayer compile_vrm1_expression_layer(const J &original,const Sculpt
  double alpha_low=initial_alpha,alpha_high=initial_alpha;
  const double cutoff=object.material.alpha_cutoff!=binding.native_reference.alpha_cutoff?object.material.alpha_cutoff:material.parameters.alpha_cutoff;
  const auto expressions=original.at("extensions").at("VRMC_vrm").value("expressions",J::object());
+ const std::array<double,3> unlit_initial{object.material.color[0],object.material.color[1],object.material.color[2]};
+ auto unlit_low=unlit_initial,unlit_high=unlit_initial;
  bool rim_relevant=bool(binding.roles[size_t(MToonSlot::Rim)].image)||material.parameters.rim_color.x!=0||material.parameters.rim_color.y!=0||material.parameters.rim_color.z!=0;
  for(const auto *table:{"preset","custom"})if(expressions.contains(table))for(const auto &expression:expressions.at(table)){
-  std::array<double,3> shade_delta{};double alpha_delta=0;
+  stop();
+  std::array<double,3> shade_delta{},unlit_delta{};double alpha_delta=0;
   for(const auto &bind:expression.value("materialColorBinds",J::array()))if(bind.at("material").get<int>()==object.appearance->source_material){
-   colour|=bind.at("type")=="color";
+   const bool base_colour=bind.at("type")=="color";
+   colour|=base_colour;
+   if(unlit&&base_colour)for(size_t k=0;k<3;++k)
+    unlit_delta[k]+=bind.at("targetValue").at(k).get<double>()-unlit_initial[k];
    rim_relevant|=bind.at("type")=="rimColor";
    if(masked&&bind.at("type")=="color"){const double alpha=bind.at("targetValue").at(3).get<double>();if(!std::isfinite(alpha)||std::abs(alpha)>1e20)throw std::invalid_argument("VRM1 mask colour target is outside finite source metadata bounds");alpha_delta+=alpha-initial_alpha;}
    if(bind.at("type")=="shadeColor"){const auto target=bind.at("targetValue").get<std::array<float,4>>();shade_factor({target[0],target[1],target[2]},false);if(result.shade_alias)for(size_t k=0;k<3;++k)shade_delta[k]+=(double(target[k])-initial_shade[k])/result.shade_divisor[k];}
   }
+  if(unlit)for(size_t k=0;k<3;++k){
+   unlit_low[k]+=std::min(0.,unlit_delta[k]);
+   unlit_high[k]+=std::max(0.,unlit_delta[k]);
+  }
   if(masked){alpha_low+=std::min(0.,alpha_delta);alpha_high+=std::max(0.,alpha_delta);}
   if(result.shade_alias)for(size_t k=0;k<3;++k){shade_low[k]+=std::min(0.,shade_delta[k]);shade_high[k]+=std::max(0.,shade_delta[k]);}
   for(const auto &bind:expression.value("textureTransformBinds",J::array()))if(bind.at("material").get<int>()==object.appearance->source_material){
+  if(unlit){found=true;continue;}
   const auto raw_scale=bind.value("scale",std::array<double,2>{1,1}),raw_offset=bind.value("offset",std::array<double,2>{});
   std::array<float,2> scale{},offset{};for(size_t k=0;k<2;++k){if(!std::isfinite(raw_scale[k])||!std::isfinite(raw_offset[k])||std::abs(raw_scale[k])>1e20||std::abs(raw_offset[k])>1e20)throw std::invalid_argument("VRM1 texture target is outside finite source metadata bounds");scale[k]=float(raw_scale[k]);offset[k]=float(raw_offset[k]);}
   if(found&&(result.scale!=scale||result.offset!=offset))same_target=false;
   if(!found){result.scale=scale;result.offset=offset;}found=true;
  }}
+ // Splitting an opaque unlit surface preserves its affine blend only when
+ // the lower draw is not clipped to the output gamut before composition.
+ if(unlit)for(size_t k=0;k<3;++k)
+  if(!std::isfinite(unlit_low[k])||!std::isfinite(unlit_high[k])||
+     unlit_low[k]<0||unlit_high[k]>1)
+   throw std::invalid_argument("VRM1 unlit expression colour exceeds the unit composition gamut");
  // VRM1 targetValue is an unrestricted float4. The serialized initial MToon
  // shade factor remains unit, while every expression may accumulate deltas.
  // Bound the entire [0,1] weight box, including simultaneous custom/presets,
@@ -132,7 +159,7 @@ Vrm1ExpressionLayer compile_vrm1_expression_layer(const J &original,const Sculpt
  if(result.shade_alias)for(size_t k=0;k<3;++k){const double bound=std::max(std::abs(shade_low[k]),std::abs(shade_high[k]));if(!std::isfinite(bound)||bound>1e20)throw std::invalid_argument("VRM1 accumulated shade coefficients exceed finite source bounds");result.maximum_shade_coefficient=std::max(result.maximum_shade_coefficient,bound);}
  if(masked&&(!std::isfinite(alpha_low)||!std::isfinite(alpha_high)||alpha_low<0||alpha_high>1||!std::isfinite(cutoff)||cutoff<0||cutoff>1))throw std::invalid_argument("VRM1 masked alpha expressions need their native unit-alpha adapter");
  const bool wide_shade=result.maximum_shade_coefficient>1;
- const double lighting_bound=std::max(1.,result.maximum_shade_coefficient)+.25;
+ const double lighting_bound=unlit?1:std::max(1.,result.maximum_shade_coefficient)+.25;
  // Source per-material bindings need not be copied onto an upper role
  // whose actual contribution is UV-invariant. Shared shade is the new paint
  // image itself; other shade/emission roles require immutable data proof.
@@ -154,8 +181,8 @@ Vrm1ExpressionLayer compile_vrm1_expression_layer(const J &original,const Sculpt
  if(size<64||size>4096||pixels>limits.max_image_pixels||native_pixels>limits.max_image_pixels)
   throw std::length_error("VRM1 expression-layer pixel limit exceeded");
  if(binding.roles[size_t(MToonSlot::Normal)].image)require_vrm1_authored_normal_frame(object,cancelled);
- const double additive_error=matcap_margin(expressions,object,result,limits,cancelled)+(rim_relevant?rim_margin(expressions,object,result,limits,cancelled):0);
- if(found&&(!same_target||result.scale[0]==0||result.scale[1]==0)){
+ const double additive_error=unlit?0:matcap_margin(expressions,object,result,limits,cancelled)+(rim_relevant?rim_margin(expressions,object,result,limits,cancelled):0);
+ if(!unlit&&found&&(!same_target||result.scale[0]==0||result.scale[1]==0)){
   bool invariant=result.shade_alias||invariant_image(shade,active_components({material.parameters.shade_color.x,material.parameters.shade_color.y,material.parameters.shade_color.z},"shadeColor"));
   const auto &emission=material.parameters.emission;std::array<float,3> effective{vrm_native_factor(emission.x,binding.native_reference.emission[0],object.material.emissive[0]),vrm_native_factor(emission.y,binding.native_reference.emission[1],object.material.emissive[1]),vrm_native_factor(emission.z,binding.native_reference.emission[2],object.material.emissive[2])};
   invariant=invariant&&(material.parameters.emission_strength==0||invariant_image(binding.roles[size_t(MToonSlot::Emission)],active_components(effective,"emissionColor")));
@@ -178,7 +205,7 @@ Vrm1ExpressionLayer compile_vrm1_expression_layer(const J &original,const Sculpt
  const size_t shared_centres=(n/divisor)%2&&(size/divisor)%2?divisor:0;
  const size_t knot_count=n+size-shared_centres+2,cells=knot_count-1;
  bool compensate_tent=wide_shade&&size>n&&size%n==0&&(size/n)%2==0;
- size_t prefilter_work=wide_shade?(compensate_tent?13:9):0;
+ size_t prefilter_work=wide_shade||unlit?(compensate_tent?13:9):0;
  // Forecast the full native sampling, optional prefilter and continuous proof
  // together, before dense allocations. The centre intersection count is exact:
  // n/g and size/g must both be odd to share the g rational centre knots.
@@ -245,7 +272,7 @@ Vrm1ExpressionLayer compile_vrm1_expression_layer(const J &original,const Sculpt
  // straight colour there, without changing coverage or positive-coverage data.
  // All reads come from the immutable native field (never propagated padding).
  // The continuous proof below still decides admission; this is no error waiver.
- if(wide_shade||support_reconstruction)for(uint32_t y=0;y<logical_size;++y){stop();for(uint32_t x=0;x<logical_size;++x){
+ if(wide_shade||unlit||support_reconstruction)for(uint32_t y=0;y<logical_size;++y){stop();for(uint32_t x=0;x<logical_size;++x){
   const double u=(x+.5)/logical_size,v=(y+.5)/logical_size;if(bilinear(native,uint32_t(n),u,v)[3]!=0)continue;
   Pixel sum{};for(int j=-1;j<=1;++j)for(int i=-1;i<=1;++i)if(i||j){const auto p=bilinear(native,uint32_t(n),(double(x)+i+.5)/logical_size,(double(y)+j+.5)/logical_size);for(size_t k=0;k<4;++k)sum[k]+=p[k];}
   if(sum[3]>0)for(size_t k=0;k<3;++k){const double value=std::clamp(sum[k]/sum[3]*result.paint_rgb_scale[k],0.,1.);const auto byte=uint8_t(std::clamp(std::lround(srgb(value)*255),0l,255l));const size_t at=size_t(y)*logical_size+x,image_at=(size_t(y+inset)*size+x+inset)*4;image->rgba[image_at+k]=byte;decoded[at][k]=linear(byte/255.)/result.paint_rgb_scale[k];}
