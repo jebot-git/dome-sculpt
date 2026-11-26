@@ -217,8 +217,12 @@ now passes all three repetitions, 900 strokes, 360 masks, 6,000 stereo pairs
 and 360 held pairs in 812.33 seconds. It completes three history and
 stale-generation sequences and 42 independent checkpoints under the original
 5 GiB cap. The `ec578e56` integrated App separately passes 14 native Wayland
-checks and 58 public creator synthetic OpenXR checks on Arc. Its own sustained
-run remains separate from the component proof. The earlier `07025cd3` full
+checks and 58 public creator synthetic OpenXR checks on Arc. Its own full
+sustained Arc run also completes all three repetitions in 1,036.979 seconds
+within the original 5 GiB limit, with 42 independent checkpoints and three
+exact history sequences. Both runs use the original matched allocator
+controls. Read [the integrated Arc receipt](SCULPT-INTEGRATED-EC-P1-20261126.md).
+The earlier `07025cd3` full
 sanitizer sculpt case exceeded 4 GiB after writing the Save and two recovery
 files. The exact integrated build passes five short sanitizer regressions.
 Its full sculpt case reached the successful exact-quota check at 164, then
