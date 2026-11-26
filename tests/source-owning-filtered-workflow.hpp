@@ -4,6 +4,7 @@
 #include "dome/bake-recipe.hpp"
 #include <fstream>
 #include <iomanip>
+#include <limits>
 
 namespace owning_filtered {
 inline uint32_t resolution(std::string_view text) {
@@ -66,7 +67,8 @@ void refusal(const Scene &input,uint64_t source,const ObjectBakeSettings &settin
       after->error.find("larger target paint resolution")!=std::string::npos,"Checked refusal preserves history/path and reports explicit resolution remedy");
 }
 template<class Expected,class Actual,class Require>
-void offcentre(const Scene &scene,uint64_t source,Expected expected,Actual actual,Require require) {
+uint64_t offcentre(const Scene &scene,uint64_t source,Expected expected,Actual actual,Require require,
+    size_t first_triangle=0,size_t end_triangle=std::numeric_limits<size_t>::max()) {
   const auto &target=scene.active();const auto &mesh=target.painted->mesh();const auto r=target.painted->resolution();
   require(target.bake_recipe&&target.bake_recipe->settings.normal_filter_quality==1&&
       target.bake_recipe->encode()["settings"]["normal_filter_quality"]==1,"Actual accepted SOURCE recipe persists checked1");
@@ -77,7 +79,10 @@ void offcentre(const Scene &scene,uint64_t source,Expected expected,Actual actua
   constexpr std::array<double,5> offsets{.001,.25,.5,.75,.999};
   std::array<double,2> maximum{},angle_max{};
   std::array<std::array<double,3>,2> worst{},angle_position{},angle_wanted{},angle_actual{};uint64_t samples=0;
-  for(size_t tri=0;tri<mesh.indices.size()/3;++tri){
+  const size_t triangles=mesh.indices.size()/3;
+  end_triangle=std::min(end_triangle,triangles);
+  if(first_triangle>=end_triangle)throw std::invalid_argument("Invalid checked oracle triangle partition");
+  for(size_t tri=first_triangle;tri<end_triangle;++tri){
     const auto a=mesh.uv[mesh.indices[tri*3]],b=mesh.uv[mesh.indices[tri*3+1]],c=mesh.uv[mesh.indices[tri*3+2]];
     const double det=(b[1]-c[1])*(a[0]-c[0])+(c[0]-b[0])*(a[1]-c[1]);
     require(std::isfinite(det)&&std::abs(det)>1e-20,"Independent checked SOURCE target chart is nonsingular");
@@ -110,5 +115,6 @@ void offcentre(const Scene &scene,uint64_t source,Expected expected,Actual actua
       <<" actual="<<angle_actual[role][0]<<','<<angle_actual[role][1]<<','<<angle_actual[role][2]<<std::endl;
     require(samples>300&&maximum[role]<.035&&angle_max[role]<=.03,"All independent current-grid offcentre role samples retain .035 components and selected .03-radian bound");}
   std::cout.precision(precision);
+  return samples;
 }
 } // namespace owning_filtered
