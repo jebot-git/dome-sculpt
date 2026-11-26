@@ -40,6 +40,43 @@
         }
       }
     },
+    "asan": {
+      "identity": {
+        "source": "a5a54e91ef4f9b843f3303472b4d7a7f8c34a699",
+        "mode": "asan",
+        "product_base": "c99296063b937f9d4d323e9ab995552980165416",
+        "archives": {
+          "libdome-sculpt-core.a": "7f6cd920405722acd4b6e28208df232d9f59282bead6cda5c5af0e1e121c503f",
+          "libdome-sculpt-render.a": "eb7dcb88ae55137e3068e522958259e8344329cd0d7e7dfd7e5d007c9283ce68",
+          "libdome-sculpt-xr.a": "85d12e5fc953c235dbec794083cc0488ba453b7a5522ffb66ce69495259a0eca"
+        }
+      },
+      "cases": {
+        "vrm": {
+          "exit": 0,
+          "executable_sha256": "8174c4439ea31248ee7d2f2ac420acbeb3482cd9e9797dbc4f4446f6baf0c51c",
+          "log_sha256": "5d09fe8ab195dccc80c8fe98d48c5be6c69dda0e5006fe46f620e8b3801b8b75",
+          "checks": 179
+        },
+        "source-color-vrm": {
+          "exit": 0,
+          "executable_sha256": "9f1e32dfb022f89135361888648de2145f5beb968708c7aa21c361a0fd01a71b",
+          "log_sha256": "354f48d2c929ad23560c5c05daf81637d0430b00d5e5d5bc70363e46f2370c95",
+          "checks": 42,
+          "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+          "maximum_comparison_rgb8": 1
+        },
+        "vrm-role-consumer": {
+          "exit": 0,
+          "executable_sha256": "4ff62bade080f30584eb827c0d5aeeb1ef963370fc1f583fe954c603b3a3a264",
+          "log_sha256": "96fdab55572a48d67ebd313ac198e860e278b96ce82111cf31105da04df0babf",
+          "checks": 21,
+          "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+          "maximum_comparison_rgb8": 1
+        }
+      },
+      "options": "ASan/UBSan with detect_leaks=1 and halt_on_error=1"
+    },
     "arc": {
       "identity": {
         "source": "a5a54e91ef4f9b843f3303472b4d7a7f8c34a699",
@@ -88,9 +125,15 @@
     "vrm-role-consumer-resolved-100.vrm": "081f269d65569c57fb64f190f300c976776bff518ff0b6ba31b702ad505d9400",
     "vrm-role-consumer-resolved-35.vrm": "0c126e1376d8e42ed0519e06ab7c6299b2609d0b6f6546d2328eb408a5882542"
   },
+  "selected_avatar_worker_and_ordered_save": {
+    "artifacts/vrm-export-female/painted-expression-worker.vrm": "24a78b17a83c5b43d7356fe9faaf7448ddb064ef1fb0394a579bee1eadcde6c7",
+    "artifacts/vrm-export-female/painted-expression-worker.dsculpt": "21e67fbcd23f7eee717d7f66e398fca3564a05bb2a00a4262d7ca0b22fc238eb",
+    "artifacts/vrm-export-male/painted-expression-worker.vrm": "7058baf62dbd9abeb8c355f083de20458f82554bb66c8edca1454f17a8747bb7",
+    "artifacts/vrm-export-male/painted-expression-worker.dsculpt": "4d1625caef9faf5b5439c9eab10370173e30700161aa2b599c10c09af340b137"
+  },
   "archive": {
     "name": "vrm-derived-source-20261126.tar.gz",
-    "sha256": "a817bd4bff508de802ca7cd8e6a6fc62fef6bbf31b26d28d56e598762ea8b979",
+    "sha256": "690035fd42611891d368c540695a0f63a3a7488f7cea99505edee0ccadfd12a0",
     "members": {
       "arc/identity.json": "7bcdb470b95ce272712ad3e81bac1f317169d7305e82862b999166517998ee1c",
       "arc/source-color-vrm-compile.log": "f3ebfe82ad7f2b75c1a757fbdf6950e9901d9b06e9e2b1e42944491ac4dcf4bf",
@@ -100,6 +143,17 @@
       "arc/vrm-role-consumer-compile.log": "2d728df59107e8f62e2a57e416d20cee78f8c31651c4a2a29b122600a1b9e383",
       "arc/vrm-role-consumer-link.log": "edd889f64a6d705cf0f608e26c135248505c099e29b517757592ec296bd2e5ef",
       "arc/vrm-role-consumer.log": "43237f45474b13b6fda45807067f9736659739bf68f07bb29d2337c3e925a893",
+      "asan/identity.json": "d43f1c1852406afb8a1d8b498bb7a3bc6a3ceffcf905e92cd673b4ff5c838e47",
+      "asan/source-color-vrm-compile.log": "bf5787fb6246f7b36ec074e3ac5a0fb55a9096753f072914395f8e2dc4423a74",
+      "asan/source-color-vrm-link.log": "d9415fb0a21ecf37ea26a2090e195cf9352502662cc095947dd94ae35bd1d598",
+      "asan/source-color-vrm.log": "354f48d2c929ad23560c5c05daf81637d0430b00d5e5d5bc70363e46f2370c95",
+      "asan/status.json": "b3e025d1cd957676a7b1f011412e194da441fab1bc5241874ee1232bdc4d2e04",
+      "asan/vrm-compile.log": "cb508acdea9fae93b7498688a80ab71889345e0f9ab9cc011e8fe2959e961407",
+      "asan/vrm-link.log": "8a853f28b302a9eb080ef260dd551749a44237dc7d9c3d0451abbc05de950f84",
+      "asan/vrm-role-consumer-compile.log": "bb67c141bb2117969f99b1d0b5911ac1766014f2c3722b8e025290f67d172747",
+      "asan/vrm-role-consumer-link.log": "5d25985d3a02e6668f92a2b267144b7e2353125fce44b8316cc179fc3e95cb36",
+      "asan/vrm-role-consumer.log": "96fdab55572a48d67ebd313ac198e860e278b96ce82111cf31105da04df0babf",
+      "asan/vrm.log": "5d09fe8ab195dccc80c8fe98d48c5be6c69dda0e5006fe46f620e8b3801b8b75",
       "software/identity.json": "89f65159aa08e17b161620171de08a3c5f37660b764a4998462e2710b03e104b",
       "software/source-color-vrm-compile.log": "70b499d2575cd872c13b92db74ad16729e5d99df4346cf3585185b93411a3d25",
       "software/source-color-vrm-link.log": "67ad269ed93091b7c0681eda9b9e5395a175d547c6b53a6bd6bdb21566025a5b",

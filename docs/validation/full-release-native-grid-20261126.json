@@ -1,0 +1,65 @@
+{
+  "scope": "Complete isolated software Release regression on the earlier authored paint resolution build",
+  "result": {
+    "candidate": "d9ea0716855609a2f8121fc4ffa9e652446b771e",
+    "terminal": true,
+    "invocation": "6fd979d1947746539488b79f2c40847a",
+    "toolkit": "/opt/fltk-vr/toolkit",
+    "phase": "complete",
+    "configure": [
+      "cmake",
+      "-S",
+      "/home/blux/de-xr/dome-sculpt/artifacts/native-grid-combined-source-20261126",
+      "-B",
+      "/home/blux/de-xr/dome-sculpt/artifacts/native-grid-combined-release-20261126/build",
+      "-G",
+      "Ninja",
+      "-DCMAKE_BUILD_TYPE=Release",
+      "-DDOME_COMPUTE_BACKEND=CPU",
+      "-DFLTK_DIR=/opt/fltk-vr/toolkit/share/fltk"
+    ],
+    "elapsed_seconds": 5925.422,
+    "cache_sha256": "9e20ca8d178a4ac14a6fa7c0a43dc62051b444b895598ae02a9bc9bcd78b21be",
+    "app_sha256": "8b021ccdf9861df936cf2e6e8d25638c391805a1b1a43368bc30e09dfb3f7fed",
+    "registered": 1339,
+    "exit": 8,
+    "totals": {
+      "pass": 1330,
+      "fail": 8,
+      "skip": 1
+    },
+    "failed": [
+      "canonical-paint37-key-replace-fault-part-86",
+      "normal-preparation-native",
+      "polygon-scene-archive",
+      "retopology-affine-openxr",
+      "source-color-vrm",
+      "vrm",
+      "vrm-role-consumer",
+      "vrm1-expressions"
+    ],
+    "skipped": [
+      "canonical-paint37-key-replace-faults"
+    ],
+    "junit_sha256": "8eb4bd541a12392071ebbfd81c985bd153dd5a12b81c7239846fb71a523eba49"
+  },
+  "skipped_detail": "The aggregate canonical paint fault case required every partition to pass. Partition 86 failed its outer mapping observer on this source.",
+  "follow_up": {
+    "canonical_paint_observer": "affine-artist-bake-20261126.json",
+    "polygon_archive_prepared_normal_and_vrm1_expressions": "retained-depth-authoring-20261126.json",
+    "affine_retopology_openxr": "affine-native-bake-20261126.json",
+    "vrm0_export_and_consumers": "vrm-derived-source-20261126.json"
+  },
+  "archive": {
+    "file": "full-release-native-grid-20261126.tar.gz",
+    "sha256": "39ff00a9c45464e9824de053db827080b6c1422646ea348801ff0a5961e9a426",
+    "members": {
+      "configure.log": "e2b1415aaddb947d42be430ef5d952ebaf372652aa871d8ff73e0446f51c4d34",
+      "build.log": "0b8b845e65653bb32c49ac389e3f9fc79592cb70ea4b4981cbe534a8d39f3f60",
+      "registered.json": "31c4aab42949fac9f017ce889e0a76917f836db06638f6e98285da6b271e7abc",
+      "ctest.log": "f60a7cbeef81c98b8e0b2db1a368053edd6fd94267f86a234a90a4287a29a1aa",
+      "full.xml": "8eb4bd541a12392071ebbfd81c985bd153dd5a12b81c7239846fb71a523eba49",
+      "status.json": "4337d5eb6f678876e1abfe1d6b26429eae51a367057fd6f5a5dc72f8f467d6ff"
+    }
+  }
+}

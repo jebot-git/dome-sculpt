@@ -1625,9 +1625,13 @@ out-of-range front and back endpoints. Release, ASan/UBSan, nested DomeD
 Wayland and software and Intel Arc synthetic OpenXR exercised the fix.
 
 The fresh all-target Release build on frozen `c9929606` is running in
-`ds-coincident-bake-ray-full-release-20261126.service`. Its all-case run waits
-for the existing `ds-native-grid-combined-release-20261126.service` sweep.
+`ds-coincident-bake-ray-full-release-20261126.service`. Its predecessor on
+`d9ea0716` completed with 1,330 passes, eight failures and one aggregate case
+skipped because its allocation-partition dependency failed. Focused follow-ups
+cover all eight failures. The archive preserves the original results and the
+separately verified corrections.
 [Coincident ray evidence](validation/coincident-bake-ray-20261126.json)
+[Completed older Release sweep](validation/full-release-native-grid-20261126.json)
 
 ### VRM0 export regressions on main
 
@@ -1638,12 +1642,38 @@ The selected-avatar worker exports a painted derivative while ordered Save
 retains the exact editable scene. A missing derived normal frame still refuses
 export and preserves an existing file.
 
-The two CC0 bases pass 179 Release checks. Independent vertex-color and MToon
-consumers pass 63 checks each on software GL and Intel Arc A770, with at most
-one RGB8 level of difference. All 15 consumer VRM files are byte-identical
-across those profiles. These three Release tests pass against the current
-product archives. The sanitizer replay and integrated all-case sweep continue.
+The two CC0 bases pass 179 checks each in Release and ASan/UBSan with leak
+detection. Independent vertex-color and MToon consumers pass 63 checks in
+each of software Release, software sanitizer and Intel Arc A770 Release,
+with at most one RGB8 level of difference. All 15 consumer VRM files agree
+byte for byte across profiles. Both selected-avatar exports and both
+ordered native saves also agree between Release and sanitizer runs.
+The integrated all-case sweep continues.
 [VRM0 export evidence](validation/vrm-derived-source-20261126.json)
+
+### Bake from UV-edited prepared normal sources
+
+Bake now accepts a prepared normal source after either Rasterize or Retain
+Source. Rasterize samples the edited atlas. Retain Source samples the saved
+PBR and MToon coordinates with their paired normal detail. Both paths use the
+placed, posed corner frames. The worker checks the complete UV replay graph
+against its existing quota and pairs the resolver with the current normal,
+material and sparse paint owners before projection.
+
+Release passes 16 tests and ASan/UBSan with leak detection passes 15. Each
+profile passes 263,498 advanced checks, including 17 normal and material
+cases, four reflection/shear cases, and rejection of missing, foreign or
+stale authority. Across the sampled cases, the maximum second-Bake normal
+component error is 0.004875 against the 0.035 limit. All 39 native project
+files match byte for byte across the two native profiles. Nested DomeD
+Wayland, software synthetic OpenXR and synthetic OpenXR on Intel Arc A770
+each pass 20 public action checks. All three routes save the same accepted
+project bytes for each UV method.
+
+The all-target build on frozen `afd3d40c` runs in
+`ds-uv-edited-normal-bake-full-release-20261126.service`. Its full test run
+queues behind the already-running `c9929606` sweep.
+[UV-edited normal Bake evidence](validation/uv-edited-normal-bake-20261126.json)
 
 ## Source and integration boundary
 

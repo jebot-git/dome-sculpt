@@ -65,9 +65,13 @@ imported VRM1 and tested VRM0 sources. It evaluates each material's normal
 role at the original coordinates, transports the posed corner columns, and
 retains reflected handedness. The same worker can rebake the initial prepared
 normal planes. Authenticated imported skins evaluate directly into the
-projection metric before float conversion. Advanced retained UV and polygon
-normal domains still need their own adapters. Physical headset qualification
-remains open. [Affine artist Bake evidence](validation/affine-artist-bake-20261126.json)
+projection metric before float conversion. Prepared normal sources can keep
+their original normal coordinates or use the edited atlas and still donate
+both PBR and MToon normals. Bake replays the saved UV authority and pairs it
+with the exact current material and paint. Independent writable-paint,
+canonical and polygon normal domains and physical headset qualification
+remain open. [Affine artist Bake evidence](validation/affine-artist-bake-20261126.json)
+[Prepared source UV evidence](validation/uv-edited-normal-bake-20261126.json)
 
 Strict Bake rays now recover source-edge contacts affected by float staging.
 An exact ray hit has priority. A missed ray can use an actual source edge
