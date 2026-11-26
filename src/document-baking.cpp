@@ -105,7 +105,7 @@ void Document::bake_from_object(uint64_t source,ObjectBakeSettings settings,Asse
 }
 void Document::queue_clear_bake_locked(AssetSource expected){
   const auto &target=scene_.active();
-  if(!bake_target_ready_locked() || !active_texture_set(target).painted->baked())
+  if(!bake_target_ready_locked() || !detail::texture_set_bake_present(active_texture_set(target)))
     throw std::logic_error("Select an editable baked target");
   auto lease=target.texture_sets?detail::capture_texture_set_stroke(scene_,target.id):nullptr;
   queue_scene_operation_locked("Clear baked surface",[](Scene &scene,const auto &cancelled){
@@ -113,10 +113,7 @@ void Document::queue_clear_bake_locked(AssetSource expected){
     auto &o=scene.active();
     if(o.texture_sets) {
       TextureSetLimits limits;limits.cancelled=cancelled;
-      dome::edit_texture_set(scene,o.id,o.texture_sets->active(),[](PaintedMesh &paint,Material &) {
-        paint.clear_bake();
-        return true;
-      },limits);
+      detail::clear_texture_set_bake(scene,limits);
       return;
     }
     if(o.material_bindings&&o.material_bindings->normal_preparation&&o.material_bindings->normal_preparation->canonical_conversion){

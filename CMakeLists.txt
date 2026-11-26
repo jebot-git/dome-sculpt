@@ -5057,6 +5057,10 @@ if(BUILD_TESTING)
   add_test(NAME texture-set-retained-bake-source COMMAND dome-sculpt-texture-set-source-export-test
     --retained-bake-source ${CMAKE_CURRENT_BINARY_DIR}/texture-set-retained-bake-source)
   set_tests_properties(texture-set-retained-bake-source PROPERTIES TIMEOUT 300)
+  add_test(NAME texture-set-retained-bake-target COMMAND dome-sculpt-texture-set-source-export-test
+    --retained-bake-target ${CMAKE_CURRENT_BINARY_DIR}/texture-set-retained-bake-target)
+  set_tests_properties(texture-set-retained-bake-target PROPERTIES TIMEOUT 300)
+
   if(TARGET dome-sculpt AND TARGET dome-sculpt-test-runtime)
     add_test(NAME texture-set-retained-source-openxr COMMAND ${Python3_EXECUTABLE}
       ${CMAKE_CURRENT_SOURCE_DIR}/tests/bake-recipes-xr.py

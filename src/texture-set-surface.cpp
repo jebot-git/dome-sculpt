@@ -5,6 +5,7 @@
 #include "cut-color.hpp"
 #include "texture-set-paint-access.hpp"
 #include "texture-set-field-source.hpp"
+#include "polygon-surface-preview.hpp"
 #include "dome/polygon-scene.hpp"
 #include <bit>
 namespace dome::detail {
@@ -37,9 +38,13 @@ bool bake_target_supported(const SculptObject &object) {
  if (!object.texture_sets)
    return corner_bake_target_supported(object);
  const auto field=active_texture_set(object);
- return (!object.polygon || !object.polygon->colors) &&
-        !field.source && field.domain && !field.domain->triangles().empty() &&
-        plain(field.painted.get(),field.appearance.get(),field.material_bindings.get());
+ if((object.polygon&&object.polygon->colors)||!field.domain||field.domain->triangles().empty())
+  return false;
+ if(field.source){
+  const auto &preview=field.source->source_preview();
+  return !object.deformation&&preview&&preview->model()==PolygonSurfaceNormalModel::PreparedCorePbr;
+ }
+ return plain(field.painted.get(),field.appearance.get(),field.material_bindings.get());
 }
 
 bool bake_source_supported(const SculptObject &object) {

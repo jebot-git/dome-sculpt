@@ -433,6 +433,92 @@ void retained_bake_xr_fixture(const std::filesystem::path &input,const std::file
  plain.save(reference);
 }
 }
+void bake_retained_recipient(TextureSetId id,bool physical){
+ auto scene=source(true,physical);
+ const auto target=scene.active().id;
+ if(!physical)scene.active().affine_edit.reset();
+ select_texture_set(scene,target,id);
+ const auto old=texture_set_view(scene.active(),id);
+ const auto neighbor=texture_set_view(scene.active(),id==0?1:0);
+ const auto world=scene.world_matrix(target);
+ const auto prior=old.painted->baked()->normal_field;
+ const auto &preview=*old.source->source_preview();
+ check(preview.paint_coordinates()!=preview.normal_coordinates(),
+       "Prepared target has independently edited paint and normal coordinates");
+ const auto covered=old.domain->triangles().front();
+ const auto old_normal=old.source->normal(covered,{.2,.3,.5},world,true);
+ Mesh high=scene.active().painted->mesh();
+ const auto local=normalized(Vec3{.18f,-.24f,-1.f});
+ for(auto &p:high.positions)p.z+=.012f;
+ high.normals.assign(high.positions.size(),local);
+ const auto placement=scene.active().affine_edit;
+ const auto donor=scene.add("Independent production Bake donor",Volume{});
+ auto &object=scene.active();object.mesh_active=true;
+ object.affine_edit=placement;
+ object.painted=std::make_shared<PaintedMesh>(high,64);
+ object.material.color={.82f,.11f,.27f,1};
+ if(physical)object.material.emissive={3.f,.1f,.2f};
+ // Affine donors use the ordinary texture-set placement path. Keep one real
+ // primary domain by first creating a secondary field and transferring it back.
+ if(placement){
+  const uint64_t face=1;
+  create_texture_set(scene,donor,std::array<uint64_t,1>{face},"Donor face",64);
+  edit_texture_set(scene,donor,1,[](PaintedMesh &,Material &m){
+   m.color={.82f,.11f,.27f,1};m.emissive={3.f,.1f,.2f};return true;
+  });
+ }
+ scene.select(target);
+ const auto baseline=scene.encode();
+ ObjectBakeSettings settings;settings.allow_backfaces=true;settings.padding=0;settings.ao_samples=2;
+ Document document;document.replace(scene);ready(document);
+ check(document.frame().state->can_bake&&!document.frame().state->can_clear_bake,
+       "Actual prepared retained target admits Bake and protects its inherited detail");
+ auto stopped=scene.snapshot();
+ bool cancelled=false;
+ refuses([&]{bake_object(stopped,donor,settings,[&]{return cancelled;},[&](float x){cancelled=x>.6f;});},
+         "Cancellation interrupts the second, independent role projection");
+ check(stopped.encode()==baseline,"An interrupted normal projection preserves both role grids");
+ document.bake_from_object(donor,settings);
+ const auto file=std::filesystem::path("retained-target.dsculpt");
+ document.save_async(file).get();ready(document);
+ auto accepted=document.copy_scene();
+ const auto saved=accepted.encode();
+ check(saved!=baseline&&Scene::load(file).encode()==saved,"Retained Bake saves and reopens exactly");
+ const auto current=texture_set_view(accepted.active(),id);
+ const auto other=texture_set_view(accepted.active(),id==0?1:0);
+ check(current.bake_recipe&&current.bake_recipe->source.object==donor&&
+       current.source->original_paint()->baked()==old.source->original_paint()->baked(),
+       "New recipe retains the original field owner");
+ check(other.source==neighbor.source&&other.painted->baked()==neighbor.painted->baked(),
+       "Bake changes only the selected material slot");
+ const auto baked=current.painted->baked();
+ check(baked->normal_field->prior()==prior&&baked->normal_field->pbr()->rgba!=prior->pbr()->rgba,
+       "New normal field descends from the exact original authority");
+ check(bool(baked->emission_field)==physical,"Projected FLOAT radiance is retained when present");
+ const auto N=current.source->normal(covered,{.2,.3,.5},world,true);
+ const auto expected=unit(world.normal({local.x,local.y,local.z}));
+ check(length(N-expected)<.018f&&length(N-old_normal)>.08f,
+       "Published normal resolves the projected direction under the actual placed basis");
+ check(document.undo()&&document.copy_scene().encode()==baseline&&
+       document.redo()&&document.copy_scene().encode()==saved,
+       "Retained Bake has exact Undo and Redo");
+ auto forged=saved;
+ auto &scene_wire=physical?forged.at("payload"):forged;
+ auto &paints=scene_wire.at("texture_set_geometry").at("paints");
+ auto member=std::find_if(paints.begin(),paints.end(),[](const auto &p){return p.at("painted").contains("field_bake");});
+ check(member!=paints.end(),"The saved current field has an explicit rebake envelope");
+ auto &paint=member->at("painted");
+ paint.erase("field_bake");
+ refuses([&]{Scene::decode(forged);},"An ordinary retained member cannot smuggle in an alternative bake");
+ document.clear_bake();ready(document);
+ const auto cleared=document.copy_scene();
+ const auto field=texture_set_view(cleared.active(),id);
+ check(field.painted->baked()==old.painted->baked()&&
+       field.bake_recipe->source.object==donor&&!document.frame().state->can_clear_bake,
+       "Clear restores inherited detail and keeps the last recipe available");
+ check(Scene::decode(cleared.encode()).encode()==cleared.encode()&&
+       document.undo()&&document.copy_scene().encode()==saved,"Clear survives cold replay and exact Undo");
+}
 void recipe_reference_remap(bool prepared) {
  auto scene = source(prepared,false,false,false,true);
  const auto before = scene.encode();
@@ -500,6 +586,13 @@ int main(int argc,char **argv)try {
  }
  if(argc==4&&mode=="--texture-set-xr-fixture"){
   retained_bake_xr_fixture(argv[2],argv[3]);
+  return 0;
+ }
+ if(argc==3&&mode=="--retained-bake-target"){
+  std::filesystem::create_directories(argv[2]);std::filesystem::current_path(argv[2]);
+  bake_retained_recipient(1,false);
+  bake_retained_recipient(0,true);
+  std::cout<<"PASS "<<checks<<" retained target Bake controls\n";
   return 0;
  }
  if(argc==3&&mode=="--retained-bake-source"){

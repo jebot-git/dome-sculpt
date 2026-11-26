@@ -71,7 +71,7 @@ Vec3 retained_source_normal(const detail::PolygonSurfacePreview &preview, size_t
  }
  const auto basis=detail::normal_bake_basis(vertices,bary,detail::NormalFragmentBasis::UnitColumns);
  PaintSourceTexture texture;
- texture.image=preview.field_owner()->before()->paint->baked()->normal_field->pbr();
+ texture.image=preview.baked()->normal_field->pbr();
  texture.wrap_s=texture.wrap_t=33071;texture.min_filter=texture.mag_filter=9729;
  const auto value=sample_source_texture(texture,(*normal_uv)[0],(*normal_uv)[1],false);
  Vec3 decoded{value[0]*2-1,value[1]*2-1,value[2]*2-1};
@@ -369,9 +369,26 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   if(progress)options.progress=[&](float value){progress(.1f+.8f*value);};
   const auto canonical_attributes=target.material_bindings?target.material_bindings->canonical_attributes:nullptr;
   const bool prepared_normals=bool(target.painted->normal_projection())||bool(canonical_attributes);
-  const bool canonical_captured=!prepared_normals&&detail::capture_new_bake_frame(target,cancelled);
+  const bool canonical_captured=!(recipient&&recipient->source)&&!prepared_normals&&detail::capture_new_bake_frame(target,cancelled);
   std::optional<Mesh> low;
-  if(prepared_normals){
+  const auto retained_recipient=recipient&&recipient->source?recipient->source->source_preview():nullptr;
+  if(retained_recipient){
+    const auto &mesh=target.painted->mesh();
+    if(mesh.indices.size()>2'000'000)
+      throw std::length_error("Retained Bake target exceeds the corner workspace");
+    low.emplace();
+    low->positions.reserve(mesh.indices.size());
+    low->normals.reserve(mesh.indices.size());
+    low->indices.reserve(mesh.indices.size());
+    for(size_t c=0;c<mesh.indices.size();++c){
+      if((c&1023)==0)check();
+      const auto vertex=mesh.indices[c];
+      low->indices.push_back(uint32_t(c));
+      low->positions.push_back(mesh.positions.at(vertex));
+      low->normals.push_back(mesh.normals.at(vertex));
+    }
+    low->uv=retained_recipient->paint_coordinates();
+  }else if(prepared_normals){
     const auto &frame=*target.material_bindings->normal_frames->pbr;const auto &mesh=target.painted->mesh();
     low.emplace();low->indices.resize(mesh.indices.size());
     for(size_t c=0;c<mesh.indices.size();++c){if((c&1023)==0)check();const auto v=mesh.indices[c];low->indices[c]=uint32_t(c);low->positions.push_back(mesh.positions[v]);low->normals.push_back(frame.normals[c]);low->uv.push_back(mesh.uv[v]);options.low_tangents.push_back(frame.tangents[c]);}
@@ -410,10 +427,41 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   }
   const auto &low_mesh=low?*low:target.painted->mesh();
   const auto retained_uv=target.material_bindings?target.material_bindings->canonical_uv:nullptr;
-  if(retained_uv&&progress)options.progress=[&](float value){progress(.1f+.4f*value);};
+  const bool split_recipient=retained_recipient&&low_mesh.uv!=retained_recipient->normal_coordinates();
   const auto target_triangles=recipient?recipient->domain->triangles():std::span<const uint32_t>{};
+  const auto encode_retained=[&](BakeOptions &options){
+    const auto world=target_placement?target_placement->world():AffineTransform{};
+    retained_recipient->validate_world(world,1e-6,cancelled);
+    options.encode_target_normal=[preview=retained_recipient,world,limit=double(settings.normal_error)](
+        uint32_t triangle,std::array<float,3> bary,Vec3 desired){
+      const auto [before,current]=preview->triangle_frames(triangle,world);
+      const auto direction=detail::transport_polygon_direction(desired,current,before);
+      const auto basis=preview->before_role_basis(triangle,{bary[0],bary[1],bary[2]},world);
+      const auto encoded=detail::encode_normal_bake(basis,direction);
+      if(!encoded||encoded->quantized_angle_radians>limit)
+        throw std::invalid_argument("Projected normal exceeds the retained target basis conditioning/quantization contract");
+      return std::array{encoded->rgba,encoded->rgba};
+    };
+  };
+  if(retained_recipient&&!split_recipient)encode_retained(options);
+  if((retained_uv||split_recipient)&&progress)options.progress=[&](float value){progress(.1f+.4f*value);};
   auto result = detail::bake_mesh_source_normals(low_mesh,high,options,source_normals,target_triangles,source_fields,source_placement,target_metric_corners);
   std::optional<BakeResult> retained_normal_write;
+  if(split_recipient){
+    auto normal_options=options;
+    if(result.rays>=options.max_rays||result.raster_samples>=options.max_raster_samples)
+      throw std::length_error("Retained texture-set normal bake lacks aggregate projection/raster budget");
+    normal_options.max_rays-=result.rays;
+    normal_options.max_raster_samples-=result.raster_samples;
+    if(progress)normal_options.progress=[&](float value){progress(.5f+.4f*value);};
+    encode_retained(normal_options);
+    Mesh normal_low=low_mesh;
+    normal_low.uv=retained_recipient->normal_coordinates();
+    retained_normal_write=detail::bake_mesh_source_normals(normal_low,high,normal_options,
+        source_normals,target_triangles,source_fields,source_placement,target_metric_corners);
+    if(!retained_normal_write->projected)
+      throw std::runtime_error("No retained normal texels project onto the selected source");
+  }
   if(retained_uv){
     retained_uv->validate_current(target.painted->mesh(),cancelled);
     if(!low||!canonical_attributes||low->positions.size()!=target.painted->mesh().indices.size())
@@ -447,7 +495,7 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
       if(result.coverage[i]==3 && prior->coverage[i])++report.preserved_misses;
     }
   BakedTextures textures;
-  if(prepared_normals)textures.normal_interpretation=BakedNormalInterpretation::PreparedAttributes;
+  if(prepared_normals||retained_recipient)textures.normal_interpretation=BakedNormalInterpretation::PreparedAttributes;
   if(separate)textures.color_interpretation=BakedColorInterpretation::ResolvedPbr;
   textures.maps = std::move(result.maps);
   textures.emission_field=std::move(result.emission_field);
@@ -469,15 +517,31 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
     }else textures.normal_field=before->replace(textures,field_options);
     textures.maps.normal={};textures.maps.mtoon_normal={};
   }
+  if(retained_recipient){
+    const auto &prior=target.painted->baked()->normal_field;
+    detail::BakedNormalFieldOptions field_options;field_options.cancelled=cancelled;
+    if(retained_normal_write){
+      BakedTextures normal_write;
+      normal_write.normal_interpretation=BakedNormalInterpretation::PreparedAttributes;
+      normal_write.maps=std::move(retained_normal_write->maps);
+      normal_write.maps.normal=std::move(retained_normal_write->normal);
+      normal_write.emission_field=std::move(retained_normal_write->emission_field);
+      normal_write.coverage.reserve(retained_normal_write->coverage.size());
+      for(auto c:retained_normal_write->coverage)normal_write.coverage.push_back(c==1||c==2?255:0);
+      textures.normal_field=prior->replace(normal_write,field_options);
+    }else textures.normal_field=prior->replace(textures,field_options);
+    textures.maps.normal={};textures.maps.mtoon_normal={};
+  }
   if(painting->source_sampling_prepared()){
     SourcePaintOptions source_options;source_options.cancelled=cancelled;
     painting=detail::install_source_bake(*painting,std::move(textures),source_options);
   }else painting->install_bake(std::move(textures));
   auto next = scene;
   auto recipe=capture_bake_recipe(scene,source_id,settings);
-  if(recipient)
-    detail::stage_texture_set_bake(next.active(),target.texture_sets,*recipient,std::move(painting),std::move(recipe));
-  else{
+  if(recipient){
+    TextureSetLimits limits;limits.cancelled=cancelled;
+    detail::stage_texture_set_bake(next.active(),target.texture_sets,*recipient,std::move(painting),std::move(recipe),limits);
+  }else{
     next.active().painted=std::move(painting);
     next.active().material_bindings=target.material_bindings;
     next.active().polygon=target.polygon;

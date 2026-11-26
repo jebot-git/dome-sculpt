@@ -1642,7 +1642,7 @@ std::shared_ptr<const TextureMaps> detail::PolygonSurfacePaintCodec::preview(con
   if(paint.baked_&&paint.baked_->normal_field){maps->normal=*paint.baked_->normal_field->pbr();maps->mtoon_normal=*paint.baked_->normal_field->mtoon();}
   maps->overlay=std::move(packet);PolygonSurfaceTransferLimits limits;limits.geometry.cancelled=cancelled;
   if(cached&&!cached->matches(binding,paint.paint_sampling_attachment()))throw std::invalid_argument("Cached polygon preview borrowed another actual source/material attachment");
-  maps->polygon_surface=cached?std::move(cached):PolygonSurfacePreview::create(paint,binding,limits);maps->polygon_surface->validate_maps(*maps);
+  maps->polygon_surface=cached?cached->with_bake(paint):PolygonSurfacePreview::create(paint,binding,limits);maps->polygon_surface->validate_maps(*maps);
   paint_compute::checkpoint(cancelled);return maps;
 }
 bool detail::EmissionExportAccess::requires_preview(const PaintedMesh &paint,const Material &material,
@@ -1827,20 +1827,26 @@ size_t detail::TextureSetPaintAccess::working_bytes(const PaintedMesh&paint,uint
   return bytes;
 }
 bool detail::TextureSetPaintAccess::valid_source_member(const PaintedMesh&member,const PaintedMesh&original,
-    const std::shared_ptr<const TextureSetFaceDomain>&domain)noexcept{
+    const std::shared_ptr<const TextureSetFaceDomain>&domain,const PaintedMesh *current_bake)noexcept{
   using native_weight_state::owner;
-  return !(!domain||!owner(member.texture_set_domain_,domain)||!member.surface_||!owner(member.surface_->set_domain,domain)||!domain->matches(original.mesh_owner())||!owner(member.mesh_owner(),original.mesh_owner())||member.editing_||original.editing_||member.resolution()!=original.resolution()||!member.valid_paint_sampling_attachment()||!original.valid_paint_sampling_attachment()||!member.valid_source_sampling_attachment()||!original.valid_source_sampling_attachment()||!owner(member.surface_->paint_domain,original.surface_->paint_domain)||!owner(member.surface_->original_sampling,original.surface_->original_sampling)||!owner(member.source_maps_,original.source_maps_)||!owner(member.color_projection_,original.color_projection_)||!owner(member.normal_projection_,original.normal_projection_)||!owner(member.baked_,original.baked_));
+  return !(!domain||!owner(member.texture_set_domain_,domain)||!member.surface_||!owner(member.surface_->set_domain,domain)||!domain->matches(original.mesh_owner())||!owner(member.mesh_owner(),original.mesh_owner())||member.editing_||original.editing_||member.resolution()!=original.resolution()||!member.valid_paint_sampling_attachment()||!original.valid_paint_sampling_attachment()||!member.valid_source_sampling_attachment()||!original.valid_source_sampling_attachment()||!owner(member.surface_->paint_domain,original.surface_->paint_domain)||!owner(member.surface_->original_sampling,original.surface_->original_sampling)||!owner(member.source_maps_,original.source_maps_)||!owner(member.color_projection_,original.color_projection_)||!owner(member.normal_projection_,original.normal_projection_)||!owner(member.baked_,current_bake?current_bake->baked_:original.baked_));
 }
 std::shared_ptr<const PaintedMesh>detail::TextureSetPaintAccess::field_source_view(const PaintedMesh&member,
-    const PaintedMesh&original,const std::shared_ptr<const TextureSetFaceDomain>&domain,const TextureSetLimits&limits){
+    const PaintedMesh&original,const std::shared_ptr<const TextureSetFaceDomain>&domain,const TextureSetLimits&limits,const PaintedMesh *current_bake){
   using native_weight_state::owner;
   limits.validate();if(limits.cancelled&&limits.cancelled())throw std::runtime_error("Texture-set source read view cancelled");
   if(domain)domain->authenticate_owner(domain);
-  if(!valid_source_member(member,original,domain))throw std::invalid_argument("Texture-set member cannot borrow another original raster/source attachment");
+  if(!valid_source_member(member,original,domain,current_bake))throw std::invalid_argument("Texture-set member cannot borrow another original raster/source attachment");
   if(snapshot_bytes(member)>limits.maximum_bytes)throw std::length_error("Texture-set source read metadata exceeds its byte quota");
   auto readable=member.snapshot();readable->surface_=original.surface_;readable->texture_set_domain_=original.texture_set_domain_;readable->sampling_attachment_=original.sampling_attachment_;readable->composite_cache_=std::make_shared<PaintedMesh::CompositeCache>();readable->composite_token_=next_composite_token();
   if(!valid_raster(*readable)||!readable->valid_paint_sampling_attachment()||!readable->valid_source_sampling_attachment())throw std::invalid_argument("Texture-set source view failed its actual original raster proof");
   if(limits.cancelled&&limits.cancelled())throw std::runtime_error("Texture-set source read view cancelled");return readable;
+}
+void detail::TextureSetPaintAccess::restore_source_bake(PaintedMesh &paint,const PaintedMesh &original){
+  const auto token=next_composite_token();
+  paint.baked_=original.baked_;
+  paint.composite_token_=token;
+  ++paint.revision_;
 }
 std::shared_ptr<PaintedMesh>detail::TextureSetPaintAccess::bind_raster(const PaintedMesh&before,
     std::shared_ptr<const TextureSetFaceDomain>domain,const PaintedMesh&prototype,const TextureSetLimits&limits){
@@ -3860,8 +3866,9 @@ std::shared_ptr<PaintedMesh> PaintedMesh::decode_impl(const nlohmann::json &inpu
   std::shared_ptr<PaintedMesh>result;
   if(source_field){
     using detail::native_weight_state::owner;
-    if(!polygon||!membership||!shared_raster||source_field->field().painted.get()!=shared_raster||!owner(source_field->field().domain,membership)||!owner(source_field->polygon_owner(),polygon->owner)||!owner(geometry,shared_raster->mesh_owner())||resolution.get<uint64_t>()!=shared_raster->resolution()||j.contains("baked")||j.contains("source_maps")||j.contains("normal_projection")||j.contains("color_projection"))throw std::invalid_argument("Source Paint7 current grid differs from its actual field/node prototype");
+    if(!polygon||!membership||!shared_raster||source_field->field().painted.get()!=shared_raster||!owner(source_field->field().domain,membership)||!owner(source_field->polygon_owner(),polygon->owner)||!owner(geometry,shared_raster->mesh_owner())||resolution.get<uint64_t>()!=shared_raster->resolution()||j.contains("source_maps")||j.contains("normal_projection")||j.contains("color_projection"))throw std::invalid_argument("Source Paint7 current grid differs from its actual field/node prototype");
     result=shared_raster->snapshot();result->allocated_tiles_=result->allocated_color_tiles_=0;
+    if(j.contains("baked"))result->baked_.reset();
     result->composite_cache_=std::make_shared<CompositeCache>();result->composite_token_=next_composite_token();
   }else if(shared_raster&&!polygon){
     using detail::native_weight_state::owner;
@@ -4091,7 +4098,7 @@ std::shared_ptr<PaintedMesh> PaintedMesh::decode_impl(const nlohmann::json &inpu
     if(result->storage_bytes()>128*1024*1024)throw std::length_error("Independent source paint exceeds total retained storage budget");
   }
   if(polygon&&!source_field)polygon->owner->validate_current(*result);
-  if(source_field&&!detail::TextureSetPaintAccess::valid_source_member(*result,*source_field->original_paint(),membership))throw std::invalid_argument("Decoded source member changed its genuine source/raster ownership");
+  if(source_field&&!detail::TextureSetPaintAccess::valid_source_member(*result,*source_field->original_paint(),membership,j.contains("baked")?result.get():nullptr))throw std::invalid_argument("Decoded source member changed its genuine source/raster ownership");
   return result;
 }
 void PaintedMesh::swap_state(PaintedMesh &other) noexcept {

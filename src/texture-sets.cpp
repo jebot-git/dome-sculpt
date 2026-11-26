@@ -77,28 +77,38 @@ struct TextureSetAccess {
  static void stage_bake(SculptObject &target,
        const std::shared_ptr<const TextureSetCollection> &membership,
        const TextureSetView &recipient, std::shared_ptr<PaintedMesh> paint,
-       std::shared_ptr<const ObjectBakeRecipe> recipe) {
+       std::shared_ptr<const ObjectBakeRecipe> recipe,const TextureSetLimits &limits) {
+  stop(limits);
   if (!same_owner(target.texture_sets,membership) || target.texture_sets->active()!=recipient.id)
    throw std::invalid_argument("The active texture set changed during Bake");
   const auto current=texture_set_view(target,recipient.id);
-  if (current.source || !same_owner(current.domain,recipient.domain) ||
+  if (current.source!=recipient.source || !same_owner(current.domain,recipient.domain) ||
       !TextureSetPaintAccess::same_current(*current.painted,*recipient.painted) ||
       !paint || paint->in_stroke() || !recipe ||
       !same_owner(TextureSetPaintAccess::domain(*paint),current.domain) ||
       !same_owner(TextureSetPaintAccess::raster_owner(*paint),
                   TextureSetPaintAccess::raster_owner(*current.painted)))
    throw std::invalid_argument("Bake lost the active texture field's paint, raster or face membership");
-  if (recipient.id==0) {
+  std::shared_ptr<const TextureSetFieldSource> source;
+  if(current.source){
+   auto next=current;next.painted=paint;next.bake_recipe=recipe;
+   source=current.source->with_bake(next,limits);
+  }
+  std::shared_ptr<TextureSetCollection> collection;
+  if(recipient.id||source)
+   collection=std::shared_ptr<TextureSetCollection>(new TextureSetCollection(*membership));
+  if(recipient.id==0){
    target.painted=std::move(paint);
    target.bake_recipe=std::move(recipe);
-   return;
+   if(collection)collection->primary_source_=std::move(source);
+  }else{
+   auto field=std::find_if(collection->additional_.begin(),collection->additional_.end(),
+                          [&](const auto &entry){return entry.id==recipient.id;});
+   field->painted=std::move(paint);
+   field->bake_recipe=std::move(recipe);
+   field->source=std::move(source);
   }
-  auto collection=std::shared_ptr<TextureSetCollection>(new TextureSetCollection(*membership));
-  auto field=std::find_if(collection->additional_.begin(),collection->additional_.end(),
-                         [&](const auto &entry){return entry.id==recipient.id;});
-  field->painted=std::move(paint);
-  field->bake_recipe=std::move(recipe);
-  target.texture_sets=std::move(collection);
+  if(collection)target.texture_sets=std::move(collection);
  }
  static std::shared_ptr<const TextureSetFieldSource> rebind_recipe(
      const TextureSetFieldSource &original, const std::shared_ptr<const ObjectBakeRecipe> &recipe,
@@ -208,8 +218,25 @@ struct TextureSetAccess {
 void stage_texture_set_bake(SculptObject &target,
     const std::shared_ptr<const TextureSetCollection> &membership,
     const TextureSetView &recipient, std::shared_ptr<PaintedMesh> paint,
-    std::shared_ptr<const ObjectBakeRecipe> recipe) {
- TextureSetAccess::stage_bake(target,membership,recipient,std::move(paint),std::move(recipe));
+    std::shared_ptr<const ObjectBakeRecipe> recipe,const TextureSetLimits &limits) {
+ TextureSetAccess::stage_bake(target,membership,recipient,std::move(paint),std::move(recipe),limits);
+}
+bool texture_set_bake_present(const TextureSetView &field) noexcept {
+ return field.painted&&field.painted->baked()&&(!field.source||field.painted->baked()!=field.source->original_paint()->baked());
+}
+void clear_texture_set_bake(Scene &scene,const TextureSetLimits &limits){
+ auto &object=scene.active();
+ const auto field=active_texture_set(object);
+ if(!texture_set_bake_present(field))throw std::invalid_argument("The selected texture set has no current Bake to clear");
+ if(field.source){
+  auto paint=field.painted->snapshot();
+  TextureSetPaintAccess::restore_source_bake(*paint,*field.source->original_paint());
+  stage_texture_set_bake(object,object.texture_sets,field,std::move(paint),field.bake_recipe,limits);
+  return;
+ }
+ edit_texture_set(scene,object.id,field.id,[](PaintedMesh &paint,Material &){
+  paint.clear_bake();return true;
+ },limits);
 }
 std::shared_ptr<const TextureSetCollection> BakeRecipeRemap::collection(
     const std::shared_ptr<const TextureSetCollection> &original, const OriginRemap &origin) {

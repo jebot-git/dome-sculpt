@@ -249,7 +249,14 @@ void PolygonSurfaceOwner::validate_current(const PaintedMesh&paint,const Polygon
  // Clear/rebake need the actual role write adapter. Neither clearing a field nor
  // accepting a different field with equal pixels is a valid first transition.
  const auto old_field=before_->paint->baked()?before_->paint->baked()->normal_field:nullptr,new_field=paint.baked()?paint.baked()->normal_field:nullptr;
- if(!own(old_field,new_field))throw std::invalid_argument("Polygon changed normal detail requires its actual current-field write adapter");
+ if(!own(old_field,new_field)){
+  auto ancestor=new_field;
+  while(ancestor&&!own(ancestor,old_field)){
+   stop(l);ancestor=ancestor->prior();
+  }
+  if(!old_field||!ancestor)
+   throw std::invalid_argument("Polygon normal detail must descend from its actual before field");
+ }
  const auto map=trace_->triangle_permutation(l);const auto actual=domain->source_corners();if(actual.size()!=map.size()*3)throw std::invalid_argument("Polygon current Paint lost its exact source corner stream");
  for(size_t t=0;t<map.size();++t)for(size_t c=0;c<3;++c){stop(l);size_t k=0;while(k<3&&map[t].source_barycentrics[c][k]!=1)++k;if(k==3)throw std::invalid_argument("Polygon current Paint requires its barycentric refinement adapter");const auto native=corners_->native.at(map[t].source_triangle*3+k);if(actual[t*3+c]!=(source?source->source_corners()[native]:native))throw std::invalid_argument("Polygon current Paint correspondence differs from its authentic edit replay");}
  stop(l);

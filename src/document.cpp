@@ -8,6 +8,7 @@
 #include "emission-control-scale.hpp"
 #include "emission-source-info.hpp"
 #include "dome/document.hpp"
+#include "texture-set-bake.hpp"
 #include "skin-methods.hpp"
 #include "native-paint-sampling.hpp"
 #include "dome/scene-file.hpp"
@@ -699,7 +700,7 @@ void Document::publish_locked(bool force,bool checkpoint) {
   if(std::find(state_.bake_sources.begin(),state_.bake_sources.end(),state_.bake_source)==state_.bake_sources.end())
     state_.bake_source=state_.bake_sources.empty()?0:state_.bake_sources.front();
   state_.can_bake=!state_.object_grabbing && bake_target_ready_locked() && !state_.bake_sources.empty();
-  state_.can_clear_bake=!state_.object_grabbing && selected_field && bake_target_ready_locked() && bool(selected_field->painted->baked());
+  state_.can_clear_bake=!state_.object_grabbing && selected_field && bake_target_ready_locked() && detail::texture_set_bake_present(*selected_field);
   state_.can_blur_color_layer=command_enabled_locked(SpatialCommand::BlurColorLayer);
   state_.can_convert_bake=canonical_conversion_ready_locked();
   auto work=asset_status();state_.can_cancel_asset=state_.asset_busy && work.cancellable;
