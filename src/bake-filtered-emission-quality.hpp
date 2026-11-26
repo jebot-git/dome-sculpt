@@ -25,7 +25,6 @@ inline bool exact_emission_projection_directions(const Mesh&low,const BakeOption
 // to blur physical source extrema. Work/rays share the existing Bake budgets.
 inline void verify_filtered_emission_quality(const Mesh&low,const BakeSource&high,
  const BakeOptions&o,BakeResult&result,const std::shared_ptr<const BakedEmissionDomain>&domain){
- if(!result.emission_field)return;
  if(domain){
   // The factory proves exact ordered placed geometry and paint coordinates,
   // non-occluding supporting faces and ONE genuine source contribution grid
@@ -38,6 +37,7 @@ inline void verify_filtered_emission_quality(const Mesh&low,const BakeSource&hig
    throw std::invalid_argument("FLOAT emission lost its genuine exact correspondence certificate");
   return;
  }
+ if(!result.emission_field)return;
  const auto r=o.resolution;SurfaceQuery query(high.mesh,o.cancelled);uint64_t tested=0;
  auto charge=[&]{if(!(result.raster_samples++%64)&&o.cancelled&&o.cancelled())throw std::runtime_error("FLOAT emission transfer cancelled");if(result.raster_samples>o.max_raster_samples)throw std::length_error("FLOAT emission transfer exceeds aggregate raster budget");};
  auto edge=[](auto a,auto b,std::array<double,2>q){return (double(b[0])-a[0])*(q[1]-a[1])-(double(b[1])-a[1])*(q[0]-a[0]);};
