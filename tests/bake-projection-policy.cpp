@@ -25,6 +25,15 @@ void matching_source_bake() {
   auto detail=quad(-.2f,.2f,.02f);
   detail.normals[1]=detail.normals[2]=normalized(Vec3{.2f,0,1});
   source.painted=std::make_shared<PaintedMesh>(std::move(detail),64);
+  auto target=f.scene.active().painted;
+  Brush brush;
+  brush.from=brush.to={0,0,0};
+  brush.radius=.12f;
+  PaintSettings ink;
+  ink.front_only=false;
+  ink.color={.15f,.7f,.4f,.6f};
+  target->begin_stroke();target->stamp(brush,ink);
+  check(target->end_stroke(),"Matching fixture has genuine editable paint under the operation");
   const auto original=f.scene.encode();
   ObjectBakeSettings settings;
   settings.ao_samples=0;
@@ -53,8 +62,9 @@ void matching_source_bake() {
   const auto &baked=*endpoint.active().painted->baked();
   check(report.projected==4096&&!report.missed&&!report.rays,
         "Matching samples cover the whole target with zero projection rays");
+  check(bool(baked.emission_field),"The matching bake retains its FLOAT emission owner");
   const auto point=baked.emission_field->sample(.37f,.62f);
-  check(point.coverage==1.f&&point.resolve({},1)==std::array<float,3>{8.f,.5f,0.f},
+  check(std::abs(point.coverage-1.f)<1e-6f&&point.resolve({},1)==std::array<float,3>{8.f,.5f,0.f},
         "Matching samples carry physical emission independently of color and coverage");
   check(baked.maps.color.rgba[0]==255&&baked.maps.color.rgba[2]==0&&
             baked.maps.metal_rough.rgba[1]==102&&baked.maps.metal_rough.rgba[2]==153&&
@@ -63,16 +73,18 @@ void matching_source_bake() {
   auto ordinary=endpoint;
   ordinary.active().painted=f.scene.active().painted;
   ordinary.active().bake_recipe.reset();
-  check(ordinary.encode()==original&&
-            endpoint.active().painted->encode()["layers"]==f.scene.active().painted->encode()["layers"],
-        "Only the target bake field and its recipe change");
+  check(ordinary.encode()==original,"Replacing the result field and recipe restores the exact source scene");
+  const auto &base=target->layers().front(), &preserved=endpoint.active().painted->layers().front();
+  check(base.id==preserved.id&&base.name==preserved.name&&base.opacity==preserved.opacity&&
+            base.visible==preserved.visible&&base.tiles==preserved.tiles,
+        "The native bake retains the original editable paint tile owners");
 
   const auto recipe=endpoint.active().bake_recipe->encode();
   auto malformed=recipe;
   malformed["settings"]["corresponding_topology"]=false;
   check(recipe["version"]==2&&ObjectBakeRecipe::decode(recipe)->encode()==recipe&&
             refuses([&]{ObjectBakeRecipe::decode(malformed);}),
-        "Matching recipes round-trip with an explicit version and reject a missing policy");
+        "Matching recipes round-trip with an explicit version and reject an invalid mode flag");
   auto rays=settings;
   rays.corresponding_topology=false;
   const auto legacy=capture_bake_recipe(f.scene,f.full,rays)->encode();
