@@ -982,18 +982,41 @@ Materials page and RGB sliders, uses separate ray gestures, and checks the
 exact saved RGB values. The same main app binary now passes all 153
 software checks and saves a second object with RGB `0.04, 0.12, 0.80`.
 This changes only the test fixture and the exact skin Restore oracle.
-The main Arc sanitizer replay is running.
+The main Arc sanitizer replay passes the material and UV cases. It stops
+after 146 checks at the Files deadline, after all 45 XR frames have rendered.
+The main versus combined timing replay uses the same synthetic runtime and
+produces four byte-identical native and GLB pairs. During the clean full
+build, the combined binary takes 48.61 and 46.97 seconds and the main
+binary takes 50.39 and 50.18 seconds in isolation. The diagnostic observes
+completion after the 40-second test limit. The original passing combined
+run and main timeout remain separate evidence.
 
 Candidate `5c977be9` combines the exact qualified atlas source with the
 matching full HDR preview cache source. Its full software Release and
 Arc ASan/UBSan replays both pass 153 checks under the original deadlines.
 Both produce the same GLB byte for byte. Khronos glTF Validator reports
-zero errors and zero warnings on both files. Integration merge
+zero errors and zero warnings on both files. The ordinary Document Import
+worker imports the exported mesh and passes exact Undo/Redo. After a native
+Save and re-export, the 20,320 triangles retain their positions, winding,
+UVs, 60,960 corner normals and materials. The round-trip GLB also passes
+Khronos validation with zero errors and warnings. Integration merge
 `4f083e6e` preserves main's history, the later mapped-emission evidence
 and the exact combined sources, assets, tooling and tests. A clean whole
 Release build and the 1,360-case private run are in progress against the
-combined source. Full-size native HDR history and nested DomeD Wayland
-replays remain in progress.
+combined source. The full-size native HDR history passes eight Release
+checks, with the ordered save matching the independent Bake capture.
+The sanitizer history remains in progress. The exact combined application
+passes all 14 native Wayland checks through the nested canonical DomeD
+compositor on Intel Arc, with no input drift or owned survivors.
+
+The headless `--export-project` port `7470d805` routes standard GLB export
+through the same Document worker as the native application. Both Release
+and ASan/UBSan produce the exact Files workflow GLB for the ordinary
+sculpt. A separate native fixture with genuine physical emission paint
+now exports and reopens to the exact original editable HDR scene. The
+prior executable refused this fixture before writing. Both new builds
+emit the same HDR GLB and pass Khronos validation without errors or
+warnings. A truncated project leaves an existing GLB byte-identical.
 [Preview and integration evidence](validation/hdr-preview-composite-20261126.json)
 [Cache and Arc rerun evidence](validation/atlas-grid-hdr-history-20261126.json)
 [Combined OpenXR and independent GLB evidence](validation/combined-atlas-hdr-openxr-20261126.json)

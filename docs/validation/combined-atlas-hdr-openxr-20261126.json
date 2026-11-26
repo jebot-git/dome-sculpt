@@ -160,6 +160,103 @@
     "scene_sha256": "5db8d7615ba86ecd2f47db1b49d91d6400e9d890588acfc40411f5a90fb8b8cf",
     "objects": 2
   },
+  "roundtrip": {
+    "candidate": "5c977be9be8d90f0a6ada3ef34df9d4d27769209",
+    "terminal": true,
+    "invocation": "05fe086e2b6f4fa799c0c30a8065d8df",
+    "phase": "complete",
+    "glb_input_sha256": "22200865cba16ae30ca9b64781d4d7203fc9307a55f48b28298d6402866171c6",
+    "consumer_sha256": "1a4813b5a49992447740930a4db5ec1befad418b78989ae44b994c57e595e3ed",
+    "native_sha256": "fe83de4df9fc26f3197082311e6acd72c4ad60958999fe60de3709a04ef5b9e8",
+    "glb_output_sha256": "3c4265cdf500ecacb80fdcbecff06a815b6ad9647cff5920598c425d91eeef34",
+    "triangle_count": [
+      20320,
+      20320
+    ],
+    "topology_positions_uv_exact": true,
+    "original_attributes": [
+      [
+        "INDICES",
+        "NORMAL",
+        "POSITION",
+        "TEXCOORD_0"
+      ]
+    ],
+    "reexported_attributes": [
+      [
+        "INDICES",
+        "NORMAL",
+        "POSITION",
+        "TEXCOORD_0"
+      ]
+    ],
+    "materials_exact": true,
+    "exit": 0,
+    "normals": {
+      "corner_normals": 60960,
+      "max_euclidean_difference": 0.0,
+      "tolerance": 2e-06,
+      "input_sha256": "22200865cba16ae30ca9b64781d4d7203fc9307a55f48b28298d6402866171c6",
+      "reexport_sha256": "3c4265cdf500ecacb80fdcbecff06a815b6ad9647cff5920598c425d91eeef34"
+    },
+    "khronos_issues": {
+      "numErrors": 0,
+      "numWarnings": 0,
+      "numInfos": 1,
+      "numHints": 0,
+      "messages": [
+        {
+          "code": "UNUSED_OBJECT",
+          "message": "This object may be unused.",
+          "severity": 2,
+          "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+        }
+      ],
+      "truncated": false
+    }
+  },
+  "hdr_history_release": {
+    "profile": "release",
+    "resolution": 2048,
+    "candidate": "5c977be9be8d90f0a6ada3ef34df9d4d27769209",
+    "terminal": true,
+    "invocation": "3bff2f9fc22d46998d3ee74cbc714c99",
+    "deadline_per_phase_seconds": 900,
+    "owned_RSS_limit_bytes": 4294967296,
+    "core_sha256": "a06784e3832d02ffe46988ab35b9b1d3791b8b9a2ea76b09943431f17cb456ad",
+    "fixture_source": "f9830df417d2ad2ab65905866b816468ab6d00ef",
+    "fixture_sha256": "fa2004d2c8c51c93466a30e409d5570159667e065584acac9e7a1509bf37fb81",
+    "phase": "complete",
+    "capture_inputs": {
+      "original-source.dsculpt": "6415086c94bb1d1570e167ee317e3b3bd73e510cd9b35d6c26da0e189cfab0d6",
+      "selected-target-resolution.dsculpt": "a2fb762266ccd6a3de39e44635521265397ad0b82e6411162daa84c90f2ad724",
+      "observed-source.json": "9ed2472ab7e8a7eb89f0b582c399dcfd07215fefab89a923577e7414561fcd17",
+      "observed-second-bake.dsculpt": "9c299cac73198075a602366fc7084e37409e6055f39a90d641f9ddf8add28673"
+    },
+    "seconds": 78.85,
+    "linked_paint_object_sha256": "871d79bc0a53ac199b6f8b058f86a30152c10a6946be0f12aa297072bb23046d",
+    "binary_sha256": "be5eeb83ba760373084bf44280a62ff5118838334f8effe4df68c7b1d0a51a34",
+    "runs": [
+      {
+        "label": "ordered-history",
+        "pid": 1486589,
+        "exit": 0,
+        "error": null,
+        "elapsed_seconds": 61.597,
+        "peak_owned_rss": 1868500992,
+        "libasan_mapped": false,
+        "libubsan_mapped": false,
+        "checks": [
+          8
+        ],
+        "log_sha256": "5c2537f527054a39f912fadf5122f90b24ac415405febc8f4653ea9513e79a21"
+      }
+    ],
+    "outputs": {
+      "000-ordered.dsculpt": "9c299cac73198075a602366fc7084e37409e6055f39a90d641f9ddf8add28673"
+    },
+    "exit": 0
+  },
   "combined_merge_candidate": {
     "merge": "4f083e6e5801d32c3e0b036ae5d3a92abd441d46",
     "validated": "5c977be9be8d90f0a6ada3ef34df9d4d27769209",
@@ -173,9 +270,251 @@
       "CMakeLists.txt"
     ]
   },
+  "main_arc_replay": {
+    "candidate": "518a1d895419e037cba752ad7c87b752c7835a53",
+    "app_source": "66d31263a3f5877dc0b22c96cffa54f7a41c02ec",
+    "invocation": "f5b32b1ad3f54464b4cc73855b52a980",
+    "profile": "arc-asan",
+    "terminal": true,
+    "phase": "complete",
+    "elapsed_seconds": 317.88,
+    "app_sha256": "28221c95cc8f8c2b572a8f424c2735434157d4b6fe58922904dc8a693ffff54b",
+    "runtime_sha256": "043aaf07f78bf6f69d92cd900ad7f18a11d85a0410ff0a4e1e24e3e7d9a4faba",
+    "runner_sha256": "60869bf047e814c1b3aec9e5281bde4f62b466883ab1c95af5295459e98849cb",
+    "exit": 1,
+    "loader_exit": 1,
+    "checks": 146,
+    "report_complete": false,
+    "error": "TimeoutExpired: Command '['/home/blux/de-xr/dome-sculpt/artifacts/main-rendered-xr-replay-validation-20261126/asan/dome-sculpt', '--xr', '--frames', '45', '--save', '/home/blux/de-xr/dome-sculpt/artifacts/main-rendered-xr-replay-validation-20261126/arc-asan/workflow/projects-ouo34iua/files.dsculpt']' timed out after 40 seconds",
+    "voxel": {
+      "exact_native_bytes": true,
+      "voxel_menu_pixels": 10141,
+      "voxel_menu_reopens": 1,
+      "voxel_menu_seen": true,
+      "voxel_open_pixels": 172,
+      "voxel_undo_pixels": 131,
+      "voxel_undo_seen": true,
+      "voxel_undo_wait_frames": 86
+    },
+    "uv": {
+      "uv_atlas_apply_accent": 207,
+      "uv_atlas_ready": true,
+      "uv_atlas_visible_pixels": 4997,
+      "uv_atlas_wait_frames": 26
+    },
+    "arc_witness_count": 39
+  },
+  "main_combined_matched_files": {
+    "terminal": true,
+    "invocation": "2284253ddf78434e9cddd938cfea7d2c",
+    "runs": [
+      {
+        "case": "combined-1",
+        "exit": 0,
+        "seconds": 48.612,
+        "arc_device": true,
+        "frames": 45,
+        "native_scene": true,
+        "stereo_export_panel": {
+          "0": 221824,
+          "1": 221608
+        },
+        "native_recovery": 1,
+        "valid_glb": 1,
+        "app_sha256": "60af079b03dc31751d7ca3f1b4aa3615777e18a7450b39b000aabc73a604f1f8",
+        "scene_sha256": "ca1248046485e3ede9122479fb12d0201fc12efd7726a67650d9eaac667e764c",
+        "process_cpu_seconds": 51.25,
+        "glb_sha256": [
+          "22200865cba16ae30ca9b64781d4d7203fc9307a55f48b28298d6402866171c6"
+        ],
+        "passed": true
+      },
+      {
+        "case": "main-1",
+        "exit": 0,
+        "seconds": 50.385,
+        "arc_device": true,
+        "frames": 45,
+        "native_scene": true,
+        "stereo_export_panel": {
+          "0": 221824,
+          "1": 221608
+        },
+        "native_recovery": 1,
+        "valid_glb": 1,
+        "app_sha256": "28221c95cc8f8c2b572a8f424c2735434157d4b6fe58922904dc8a693ffff54b",
+        "scene_sha256": "ca1248046485e3ede9122479fb12d0201fc12efd7726a67650d9eaac667e764c",
+        "process_cpu_seconds": 52.51,
+        "glb_sha256": [
+          "22200865cba16ae30ca9b64781d4d7203fc9307a55f48b28298d6402866171c6"
+        ],
+        "passed": true
+      },
+      {
+        "case": "main-2",
+        "exit": 0,
+        "seconds": 50.182,
+        "arc_device": true,
+        "frames": 45,
+        "native_scene": true,
+        "stereo_export_panel": {
+          "0": 221824,
+          "1": 221608
+        },
+        "native_recovery": 1,
+        "valid_glb": 1,
+        "app_sha256": "28221c95cc8f8c2b572a8f424c2735434157d4b6fe58922904dc8a693ffff54b",
+        "scene_sha256": "ca1248046485e3ede9122479fb12d0201fc12efd7726a67650d9eaac667e764c",
+        "process_cpu_seconds": 52.29,
+        "glb_sha256": [
+          "22200865cba16ae30ca9b64781d4d7203fc9307a55f48b28298d6402866171c6"
+        ],
+        "passed": true
+      },
+      {
+        "case": "combined-2",
+        "exit": 0,
+        "seconds": 46.968,
+        "arc_device": true,
+        "frames": 45,
+        "native_scene": true,
+        "stereo_export_panel": {
+          "0": 221824,
+          "1": 221608
+        },
+        "native_recovery": 1,
+        "valid_glb": 1,
+        "app_sha256": "60af079b03dc31751d7ca3f1b4aa3615777e18a7450b39b000aabc73a604f1f8",
+        "scene_sha256": "ca1248046485e3ede9122479fb12d0201fc12efd7726a67650d9eaac667e764c",
+        "process_cpu_seconds": 49.56,
+        "glb_sha256": [
+          "22200865cba16ae30ca9b64781d4d7203fc9307a55f48b28298d6402866171c6"
+        ],
+        "passed": true
+      }
+    ],
+    "phase": "complete",
+    "candidate": "66d31263a3f5877dc0b22c96cffa54f7a41c02ec",
+    "input_runtime_sha256": "043aaf07f78bf6f69d92cd900ad7f18a11d85a0410ff0a4e1e24e3e7d9a4faba",
+    "exit": 0,
+    "identical_glb": true,
+    "identical_native": true
+  },
+  "headless_export": {
+    "release": {
+      "profile": "release",
+      "invocation": "8fbb82b6d6a94df79c1d3937686cb3d0",
+      "terminal": true,
+      "phase": "complete",
+      "candidate": "7470d8052da2d5ba44dc9f5143a87d72fbfec975",
+      "core_source": "66d31263a3f5877dc0b22c96cffa54f7a41c02ec",
+      "app_sha256": "9c9ab14fb496f9ba6b7ffbc4ca8905c0ca17b4325e7aff20ba04d2244debaee1",
+      "native_input_sha256": "ca1248046485e3ede9122479fb12d0201fc12efd7726a67650d9eaac667e764c",
+      "expected": {
+        "sha256": "22200865cba16ae30ca9b64781d4d7203fc9307a55f48b28298d6402866171c6",
+        "triangles": 20320,
+        "attributes": [
+          "NORMAL",
+          "POSITION",
+          "TEXCOORD_0"
+        ]
+      },
+      "hdr": {
+        "input_sha256": "22c9c2d7a10e76d34f8bf6070a0304c341db289fe5d56171f69b090eddff4419",
+        "output_sha256": "51d25fcb9320ca399d998be17571b06bacd43764437a000995afede29ed7c77a",
+        "extensions": [
+          "KHR_materials_emissive_strength"
+        ],
+        "prior_exit": 1,
+        "no_prior_output": true
+      },
+      "exit": 0,
+      "export": {
+        "sha256": "22200865cba16ae30ca9b64781d4d7203fc9307a55f48b28298d6402866171c6",
+        "triangles": 20320,
+        "attributes": [
+          "NORMAL",
+          "POSITION",
+          "TEXCOORD_0"
+        ]
+      },
+      "previous_export": {
+        "sha256": "22200865cba16ae30ca9b64781d4d7203fc9307a55f48b28298d6402866171c6",
+        "triangles": 20320,
+        "attributes": [
+          "NORMAL",
+          "POSITION",
+          "TEXCOORD_0"
+        ]
+      },
+      "previous_exit": 0,
+      "exact_worker_glb": true,
+      "invalid_project_preserves_previous_output": true
+    },
+    "asan": {
+      "profile": "asan",
+      "invocation": "0c76781c788b4fc4841fdc5e5231ef82",
+      "terminal": true,
+      "phase": "complete",
+      "candidate": "7470d8052da2d5ba44dc9f5143a87d72fbfec975",
+      "core_source": "66d31263a3f5877dc0b22c96cffa54f7a41c02ec",
+      "app_sha256": "42559349d5183e438a689f4c6cfca219491fdbf820ac9a73a4263151a5399df0",
+      "native_input_sha256": "ca1248046485e3ede9122479fb12d0201fc12efd7726a67650d9eaac667e764c",
+      "expected": {
+        "sha256": "22200865cba16ae30ca9b64781d4d7203fc9307a55f48b28298d6402866171c6",
+        "triangles": 20320,
+        "attributes": [
+          "NORMAL",
+          "POSITION",
+          "TEXCOORD_0"
+        ]
+      },
+      "hdr": {
+        "input_sha256": "22c9c2d7a10e76d34f8bf6070a0304c341db289fe5d56171f69b090eddff4419",
+        "output_sha256": "51d25fcb9320ca399d998be17571b06bacd43764437a000995afede29ed7c77a",
+        "extensions": [
+          "KHR_materials_emissive_strength"
+        ],
+        "prior_exit": 1,
+        "no_prior_output": true
+      },
+      "exit": 0,
+      "export": {
+        "sha256": "22200865cba16ae30ca9b64781d4d7203fc9307a55f48b28298d6402866171c6",
+        "triangles": 20320,
+        "attributes": [
+          "NORMAL",
+          "POSITION",
+          "TEXCOORD_0"
+        ]
+      },
+      "previous_export": {
+        "sha256": "22200865cba16ae30ca9b64781d4d7203fc9307a55f48b28298d6402866171c6",
+        "triangles": 20320,
+        "attributes": [
+          "NORMAL",
+          "POSITION",
+          "TEXCOORD_0"
+        ]
+      },
+      "previous_exit": 0,
+      "exact_worker_glb": true,
+      "invalid_project_preserves_previous_output": true
+    }
+  },
+  "native_wayland": {
+    "terminal": true,
+    "source": "5c977be9be8d90f0a6ada3ef34df9d4d27769209",
+    "exit": 0,
+    "actual_checks": 14,
+    "plan_sha256": "acc0b2306f44230f5ba1b5a28aab044d1e70e418f4bf7d1a193cb695c0100f08",
+    "compositor_source": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+    "compositor_sha256": "47920142c8c803dcf5adb63ba643d2e347fbdcd1e15ecd8bce7c1a8dd47c0b7e",
+    "App_sha256": "c54aab6e5b4ff70e2eaf4ed1b938b2e54121f2c5e4264d30045863fb633b1c08"
+  },
   "archive": {
     "path": "docs/validation/combined-atlas-hdr-openxr-20261126.tar.gz",
-    "sha256": "fbea1894cb4026f2aefcb068a2d953fd408d6f0c2e1cb935e34c32f0a8d03d11",
-    "members": 14
+    "sha256": "0fa5057d8509321b1f15b834a6085cc391689150b27044c07ec3265eb4039715",
+    "members": 43
   }
 }

@@ -9,9 +9,10 @@ remains active.
 The current combined atlas and HDR cache source passes all 153 checks
 in both software Release and Intel Arc ASan/UBSan OpenXR replays. Its
 export is byte-identical across both profiles and independently validates
-without glTF errors or warnings. The full combined regression, compositor,
-and production input-device gates remain open. Main's rendered material
-controls replay independently passes 153 software checks.
+without glTF errors or warnings. The exact combined application passes
+14 nested native Wayland checks through current DomeD. The full combined
+regression and production input-device gates remain open. Main's rendered
+material controls replay independently passes 153 software checks.
 [Combined OpenXR evidence](validation/combined-atlas-hdr-openxr-20261126.json)
 
 The current creator VRM0 candidate supports shared affine placement for
