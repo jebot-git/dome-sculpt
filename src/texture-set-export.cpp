@@ -6,6 +6,7 @@
 #include "baked-normal-field.hpp"
 #include "normal-frame-runtime.hpp"
 #include "emission-authority.hpp"
+#include "emission-export.hpp"
 #include "paint-emission-sample.hpp"
 #include <bit>
 #include <map>
@@ -19,32 +20,52 @@ bool material(const Material&a,const Material&b){return a.name==b.name&&a.color=
 // The per-field exporter uses the same paint-grid coordinate as the fragment
 // shader. Contributions are composed before sampling. The original field and
 // its exact FLOAT values remain in the author's native Scene payload.
-TextureSetExportEmission compile_emission(const TextureSetView &field,
-    const PaintedMesh &paint,size_t &work,const TextureSetLimits &limits) {
- const PaintEmissionSampler sampler(paint,limits.cancelled);
- const auto &binding=field.material_bindings;
- const auto background=binding&&binding->physical_emission?*binding->physical_emission:field.material.emissive;
- const auto maps=paint.source_maps();
- const auto source=maps&&(!binding||!binding->physical_emission)?maps->emission:PaintSourceTexture{};
- if(source.image&&source.texcoord!=0)
-  throw std::invalid_argument("Texture-set HDR requires its actual alternate emission coordinates");
- const auto resolution=paint.resolution();
- const auto count=size_t(resolution)*resolution;
- charge(work,sampler.index_work(),1,limits.maximum_work);
- charge(work,count,2*(sampler.work_per_texel()+12+(source.image?16:0)),limits.maximum_work);
- const auto radiance=[&](uint32_t x,uint32_t y){
-  auto value=background;
-  if(source.image){
-   const auto sample=sample_source_texture(source,(float(x)+.5f)/resolution,(float(y)+.5f)/resolution,true);
-   for(size_t k=0;k<3;++k)value[k]*=sample[k];
+class TextureSetEmissionSamples {
+public:
+ TextureSetEmissionSamples(const TextureSetView &field,const TextureSetLimits &limits)
+     :paint_(texture_set_source_read_view(field,limits)),
+      sampler_(*paint_,limits.cancelled),resolution(paint_->resolution()) {
+  const auto &binding=field.material_bindings;
+  background_=binding&&binding->physical_emission?*binding->physical_emission:field.material.emissive;
+  if(const auto maps=paint_->source_maps();maps&&(!binding||!binding->physical_emission))
+   source_=maps->emission;
+  if(source_.image&&source_.texcoord!=0)
+   throw std::invalid_argument("Texture-set HDR requires its actual alternate emission coordinates");
+ }
+ EmissionExrPixel pixel(uint32_t x,uint32_t y)const{
+  auto background=background_;
+  if(source_.image){
+   const auto sample=sample_source_texture(source_,(float(x)+.5f)/resolution,(float(y)+.5f)/resolution,true);
+   for(size_t k=0;k<3;++k)background[k]*=sample[k];
   }
-  return sampler.sample_texel(x,y).resolve(value,1.f);
- };
+  const auto contribution=sampler_.sample_texel(x,y);
+  const auto rgb=contribution.resolve(background,1.f);
+  return {rgb[0],rgb[1],rgb[2],contribution.legacy[0],contribution.legacy[1],contribution.legacy[2],
+      contribution.absolute[0],contribution.absolute[1],contribution.absolute[2],contribution.coverage};
+ }
+ void charge_work(size_t &work,size_t passes,const TextureSetLimits &limits)const{
+  charge(work,sampler_.index_work(),1,limits.maximum_work);
+  charge(work,size_t(resolution)*resolution,passes*(sampler_.work_per_texel()+12+(source_.image?16:0)),
+      limits.maximum_work);
+ }
+private:
+ std::shared_ptr<const PaintedMesh> paint_;
+ PaintEmissionSampler sampler_;
+ std::array<float,3> background_{};
+ PaintSourceTexture source_;
+public:
+ uint32_t resolution;
+};
+TextureSetExportEmission compile_emission(const TextureSetView &field,size_t &work,const TextureSetLimits &limits) {
+ const TextureSetEmissionSamples samples(field,limits);
+ samples.charge_work(work,2,limits);
+ const auto resolution=samples.resolution;
+ const auto count=size_t(resolution)*resolution;
  std::array<float,3> peak{};
  for(uint32_t y=0;y<resolution;++y){
   stop(limits);
   for(uint32_t x=0;x<resolution;++x){
-   const auto rgb=radiance(x,y);
+   const auto rgb=samples.pixel(x,y);
    for(size_t k=0;k<3;++k)peak[k]=std::max(peak[k],rgb[k]);
   }
  }
@@ -59,7 +80,7 @@ TextureSetExportEmission compile_emission(const TextureSetView &field,
   stop(limits);
   for(uint32_t x=0;x<resolution;++x){
    const size_t at=(size_t(y)*resolution+x)*4;
-   const auto rgb=radiance(x,y);
+   const auto rgb=samples.pixel(x,y);
    for(size_t k=0;k<3;++k){
     const float linear=peak[k]>0?rgb[k]/peak[k]:0.f;
     const float srgb=linear<=.0031308f?linear*12.92f:1.055f*std::pow(linear,1.f/2.4f)-.055f;
@@ -128,6 +149,25 @@ bool texture_set_physical_emission(const TextureSetView &field) {
      (field.material_bindings&&physical_emission(*field.material_bindings));
 }
 
+EmissionExportRaster texture_set_emission_raster(const TextureSetView &field,const TextureSetLimits &limits){
+ if(!texture_set_physical_emission(field)||!field.domain||field.domain->triangles().empty()||
+    field.material.toon||field.appearance||(field.material_bindings&&field.material_bindings->has_mtoon))
+  throw std::invalid_argument("Texture-set HDR requires an actual physical PBR material member");
+ TextureSetEmissionSamples samples(field,limits);
+ size_t work=0;
+ samples.charge_work(work,1,limits);
+ const auto resolution=samples.resolution;
+ return {resolution,2,sizeof(TextureSetEmissionSamples),
+      [samples=std::move(samples),cancelled=limits.cancelled,resolution](uint32_t y,std::span<EmissionExrPixel> rows){
+        if(size_t(y)>resolution||rows.size()>size_t(resolution-y)*resolution)
+         throw std::logic_error("Texture-set HDR read exceeds its owning raster");
+        for(size_t i=0;i<rows.size();++i){
+         if((i&1023)==0&&cancelled&&cancelled())throw std::runtime_error("Texture-set HDR raster cancelled");
+         rows[i]=samples.pixel(uint32_t(i%resolution),y+uint32_t(i/resolution));
+        }
+      }};
+}
+
 size_t texture_set_export_working_bound(const ObjectSurface&input,const TextureSetLimits&limits,bool measured_physical){
  return export_bound(input,limits,measured_physical).bytes;
 }
@@ -157,7 +197,7 @@ TextureSetExport compile_texture_set_export(const ObjectSurface&input,const Text
   output.normal_role=portable&&portable->normal_role;
   if(texture_set_physical_emission(field)){
    const auto paint=texture_set_source_read_view(field,limits);
-   output.emission=compile_emission(field,*paint,work,limits);
+   output.emission=compile_emission(field,work,limits);
    output.material.emissive={};
    output.textures=portable?portable->maps:EmissionExportAccess::other_channels(
        *paint,output.material,limits.cancelled);

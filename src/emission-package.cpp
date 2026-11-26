@@ -2,6 +2,9 @@
 #include "emission-package.hpp"
 #include "scene-bake-archive.hpp"
 #include "emission-export.hpp"
+#include "texture-set-export.hpp"
+#include "texture-set-field-source.hpp"
+#include "polygon-surface-preview.hpp"
 #include "native-paint-sampling.hpp"
 #include "native-paint-frame-export-policy.hpp"
 #include "canonical-paint-export-policy.hpp"
@@ -33,7 +36,7 @@ size_t integer(const Json &v,size_t cap,const char *message){if(!v.is_number_uns
 std::string document_hash(Json j){auto &entry=j.at("extras").at(marker);entry.erase("documentSha256");const auto b=Json::to_cbor(j);return hash(b);}
 bool marker_object(const Json &j){
  if(!j.is_object()||j.size()!=6||!j.at("images").is_array())throw std::invalid_argument("Unknown native HDR package interpretation");
- const auto version=integer(j.at("version"),5,"Unknown native HDR package version");
+ const auto version=integer(j.at("version"),6,"Unknown native HDR package version");
  const auto &encoding=j.at("encoding").get_ref<const std::string&>();
  if((version==1&&encoding=="scene-cbor+openexr-float32-zip")||(version==2&&encoding=="scene-cbor-deflate+openexr-float32-zip"))return version==2;
  if(version==3){if(encoding=="scene-cbor+openexr-float32-zip+paint-domain-v1")return false;if(encoding=="scene-cbor-deflate+openexr-float32-zip+paint-domain-v1")return true;}
@@ -41,6 +44,10 @@ bool marker_object(const Json &j){
  if(version==5){
   if(encoding=="scene-cbor+openexr-float32-zip+bounded-scanlines")return false;
   if(encoding=="scene-cbor-deflate+openexr-float32-zip+bounded-scanlines")return true;
+ }
+ if(version==6){
+  if(encoding=="scene-cbor+openexr-float32-zip+texture-set-domains")return false;
+  if(encoding=="scene-cbor-deflate+openexr-float32-zip+texture-set-domains")return true;
  }
  throw std::invalid_argument("Unknown native HDR package interpretation");
 }
@@ -169,17 +176,17 @@ void validate_fallback2_metrics(const Json &j,const Json &entry,const EmissionIn
   throw std::invalid_argument("Resolved fallback metrics differ from actual PNG/FLOAT reconstruction");
 }
 void validate_streamed_image(const Json &j,std::span<const uint8_t> binary,const Json &entry,
-    const SculptObject &object,const NativeEmissionReadLimits &limits){
+    const detail::EmissionExportRaster &field,const NativeEmissionReadLimits &limits){
  const auto resource=view(j,binary,entry);
  auto image_limits=limits.image;
  image_limits.cancelled=limits.cancelled;
  const auto description=detail::emission_exr_owned_description(resource,image_limits,{},true);
- const bool authored=entry.at("view")=="authored-mtoon";
- const auto &node=j.at("nodes").at(entry.at("node").get<size_t>());
- const auto &mesh=j.at("meshes").at(node.at("mesh").get<size_t>());
- if(mesh.at("primitives").size()!=1||mesh.at("primitives").at(0).at("material")!=entry.at("material"))
-  throw std::invalid_argument("Streamed HDR lost its emitted material and node");
- const auto field=detail::export_emission_raster(object,limits.cancelled,authored);
+ if(!entry.contains("textureSet")){
+  const auto &node=j.at("nodes").at(entry.at("node").get<size_t>());
+  const auto &mesh=j.at("meshes").at(node.at("mesh").get<size_t>());
+  if(mesh.at("primitives").size()!=1||mesh.at("primitives").at(0).at("material")!=entry.at("material"))
+   throw std::invalid_argument("Streamed HDR lost its emitted material and node");
+ }
  if(field.resolution!=description.width||field.resolution!=description.height||field.version!=description.version)
   throw std::invalid_argument("Streamed EXR differs from its exact native raster");
  const auto scratch=size_t(description.width)*std::min(16u,description.height)*sizeof(detail::EmissionExrPixel);
@@ -247,6 +254,58 @@ DomainAccessor domain_accessor(const Json &j,std::span<const uint8_t> binary,con
  const auto begin=integer(view.value("byteOffset",Json(0)),binary.size(),"Native HDR coordinate view offset invalid"),length=integer(view.at("byteLength"),binary.size(),"Native HDR coordinate view length invalid");
  if(length>binary.size()-begin)throw std::invalid_argument("Native HDR coordinate view exceeds BIN");const auto offset=integer(a.value("byteOffset",Json(0)),length,"Native HDR coordinate accessor offset invalid");const auto needed=count*components*4;
  if((begin+offset)%4||needed>length-offset)throw std::invalid_argument("Native HDR coordinate accessor exceeds view");return {binary.subspan(begin+offset,needed),count,components};
+}
+using FieldIdentity=std::pair<uint64_t,std::optional<uint32_t>>;
+std::optional<uint32_t> texture_set_descriptor(const Json &entry,bool allowed){
+ if(!entry.contains("textureSet"))return {};
+ const auto &member=entry.at("textureSet");
+ if(!allowed||!member.is_object()||member.size()!=2||entry.contains("domain")||entry.at("view")!="pbr")
+  throw std::invalid_argument("Unknown native HDR texture-set domain");
+ integer(member.at("texCoord"),7,"Native HDR texture-set coordinate index exceeds policy");
+ return uint32_t(integer(member.at("id"),UINT32_MAX,"Invalid native HDR texture-set identity"));
+}
+void check_texture_set_domain(const Json &j,std::span<const uint8_t> binary,const Json &entry,
+    const SculptObject &object,const TextureSetView &field,const std::function<bool()> &cancelled){
+ if(!object.texture_sets||!field.domain||field.domain->triangles().empty()||
+    !detail::texture_set_physical_emission(field))
+  throw std::invalid_argument("HDR texture-set record lost its actual material member");
+ const auto coordinate=entry.at("textureSet").at("texCoord").get<unsigned>();
+ const auto &node=j.at("nodes").at(entry.at("node").get<size_t>());
+ const auto &mesh=j.at("meshes").at(node.at("mesh").get<size_t>());
+ const auto &primitives=mesh.at("primitives");
+ const Json *primitive=nullptr;
+ for(const auto &candidate:primitives){
+  if(!candidate.contains("extras")||!candidate.at("extras").contains("dome_sculpt_texture_set")||
+     candidate.at("extras").at("dome_sculpt_texture_set").at("id")!=field.id)continue;
+  if(primitive)throw std::invalid_argument("HDR texture-set primitive identity is ambiguous");
+  primitive=&candidate;
+ }
+ const auto &info=j.at("materials").at(entry.at("material").get<size_t>()).at("emissiveTexture");
+ if(!primitive||primitive->at("material")!=entry.at("material")||info.contains("extensions")||
+    info.value("texCoord",0u)!=coordinate)
+  throw std::invalid_argument("HDR texture-set record differs from its emitted primitive or coordinate");
+ const auto &attrs=primitive->at("attributes");
+ const auto indices=domain_accessor(j,binary,primitive->at("indices"),"SCALAR",1,6'000'000,5125);
+ const auto positions=domain_accessor(j,binary,attrs.at("POSITION"),"VEC3",3,2'000'000,5126);
+ const auto uv=domain_accessor(j,binary,attrs.at("TEXCOORD_"+std::to_string(coordinate)),
+     "VEC2",2,2'000'000,5126);
+ if(indices.count!=field.domain->triangles().size()*3||positions.count!=uv.count)
+  throw std::invalid_argument("HDR texture-set emitted corner count differs from its native membership");
+ const auto &rest=*field.domain->topology()->geometry();
+ const auto preview=field.source?field.source->source_preview():nullptr;
+ size_t at=0;
+ for(const auto triangle:field.domain->triangles())for(size_t corner=0;corner<3;++corner){
+  if((at&1023)==0)stop(cancelled);
+  const auto logical=size_t(triangle)*3+corner;
+  const auto vertex=indices.index(at++);
+  if(vertex>=positions.count)throw std::invalid_argument("HDR texture-set emitted vertex exceeds its accessor");
+  const auto native=rest.indices.at(logical);
+  const auto p=rest.positions.at(native);
+  const auto sample=preview?preview->paint_coordinates().at(logical):rest.uv.at(native);
+  if(positions.scalar(vertex,0)!=p.x||positions.scalar(vertex,1)!=p.y||positions.scalar(vertex,2)!=p.z||
+     uv.scalar(vertex,0)!=sample[0]||uv.scalar(vertex,1)!=sample[1])
+   throw std::invalid_argument("HDR texture-set emitted paint corner differs from its exact native member");
+ }
 }
 size_t domain_descriptor(const Json &domain,bool canonical_allowed=false){
  if(!domain.is_object()||domain.size()!=3||integer(domain.at("version"),1,"Unknown native HDR domain version")!=1||
@@ -365,6 +424,8 @@ Scene detail::emission_export_subset(const Scene &source,std::span<const uint64_
 }
 void detail::attach_native_emission(GltfDocument &document,const NativeEmissionExport &options,std::span<const uint64_t> exported,std::span<const EmissionExportImage> images,size_t max_bytes,const std::function<bool()> &cancelled,bool streaming){
  stop(cancelled);if(!options.scene||!options.allow_measured_core_fallback)throw std::invalid_argument("Exact HDR export requires its immutable native owner and explicit measured fallback permission");if(!max_bytes||max_bytes>256*1024*1024||images.size()>256)throw std::length_error("Native HDR package exceeds output limits");
+ const bool texture_sets=std::any_of(images.begin(),images.end(),[](const auto &entry){return entry.texture_set.has_value();});
+ if(texture_sets&&!streaming)throw std::invalid_argument("HDR texture sets require exact streamed fields");
  size_t total_samples=0;
  const size_t sample_limit=streaming?emission_stream_pixels:emission_dense_bytes/sizeof(EmissionExrPixel);
  for(const auto &entry:images){
@@ -376,7 +437,7 @@ void detail::attach_native_emission(GltfDocument &document,const NativeEmissionE
    throw std::invalid_argument("Streamed HDR image requires its actual on-demand raster");
   total_samples+=samples;
  }
- if(streaming&&total_samples<=emission_dense_bytes/sizeof(EmissionExrPixel))
+ if(streaming&&!texture_sets&&total_samples<=emission_dense_bytes/sizeof(EmissionExrPixel))
   throw std::invalid_argument("Streamed HDR requires its large-field witness");
  auto &j=document.json;if(j.contains("extras")&&!j["extras"].is_object())throw std::invalid_argument("Native HDR export cannot replace nonobject extras");if(j.contains("extras")&&(j["extras"].contains(marker)||j["extras"].contains("domeSculptAuthoring")))throw std::invalid_argument("Native HDR export refuses an existing reserved package");
  std::set<uint64_t> selected;for(auto id:exported){options.scene->object(id);if(!selected.insert(id).second)throw std::invalid_argument("Native HDR export has duplicate source objects");}if(selected.empty())throw std::invalid_argument("Native HDR export has no source objects");
@@ -387,12 +448,17 @@ void detail::attach_native_emission(GltfDocument &document,const NativeEmissionE
  auto append=[&](std::span<const uint8_t> bytes){stop(cancelled);auto &data=document.binary;size_t padding=(4-data.size()%4)%4;if(data.size()>max_bytes||padding>max_bytes-data.size()||bytes.size()>max_bytes-data.size()-padding)throw std::length_error("Native HDR package exceeds output byte budget");data.insert(data.end(),padding,0);const auto offset=data.size();data.insert(data.end(),bytes.begin(),bytes.end());if(j["bufferViews"].size()>=65536)throw std::length_error("Native HDR bufferView count exceeds read/write limit");int index=int(j["bufferViews"].size());j["bufferViews"].push_back({{"buffer",0},{"byteOffset",offset},{"byteLength",bytes.size()}});return Json{{"bufferView",index},{"sha256",hash(bytes)}};};
  const bool canonical_domains=std::any_of(images.begin(),images.end(),[](const auto &entry){return bool(entry.canonical_paint_domain);});
  const bool domains=canonical_domains||std::any_of(images.begin(),images.end(),[](const auto &entry){return entry.native_paint_domain;});
- Json package={{"version",streaming?5:canonical_domains?4:domains?3:compressed?2:1},{"encoding",compressed?"scene-cbor-deflate+openexr-float32-zip":"scene-cbor+openexr-float32-zip"},{"native",append(native)},{"images",Json::array()}};if(domains)package["encoding"]=canonical_domains?(compressed?"scene-cbor-deflate+openexr-float32-zip+paint-domain-v2":"scene-cbor+openexr-float32-zip+paint-domain-v2"):(compressed?"scene-cbor-deflate+openexr-float32-zip+paint-domain-v1":"scene-cbor+openexr-float32-zip+paint-domain-v1");if(streaming)package["encoding"]=compressed?"scene-cbor-deflate+openexr-float32-zip+bounded-scanlines":
-  "scene-cbor+openexr-float32-zip+bounded-scanlines";if(compressed)package["native"]["decodedBytes"]=decoded_bytes;std::vector<uint8_t>().swap(native);std::set<uint64_t> seen;size_t exr_bytes=0;
- for(const auto &entry:images){stop(cancelled);if(!selected.contains(entry.object)||!seen.insert(entry.object).second||entry.node<0||entry.material<0||size_t(entry.node)>=j.at("nodes").size()||size_t(entry.material)>=j.at("materials").size())throw std::invalid_argument("Native HDR image has no unique exported owner");if(exr_bytes>=128*1024*1024)throw std::length_error("Native HDR aggregate EXR budget exceeded");EmissionInterchangeLimits limits;limits.max_encoded_bytes=std::min(max_bytes,size_t(128*1024*1024)-exr_bytes);limits.cancelled=cancelled;const auto &current_object=owner.object(entry.object);const auto current_canonical=current_object.material_bindings?current_object.material_bindings->canonical_paint_sampling:nullptr;if(current_canonical&&(!entry.canonical_paint_domain||current_canonical!=entry.canonical_paint_domain||current_canonical.owner_before(entry.canonical_paint_domain)||entry.canonical_paint_domain.owner_before(current_canonical)))throw std::invalid_argument("Canonical HDR image omitted or borrowed its actual writable owner");if(entry.native_paint_domain&&entry.canonical_paint_domain)throw std::invalid_argument("Native HDR image claims competing writable owners");if(!streaming&&(entry.native_paint_domain||entry.canonical_paint_domain)){const auto &actual=owner.object(entry.object);if(entry.canonical_paint_domain){const auto expected=actual.material_bindings?actual.material_bindings->canonical_paint_sampling:nullptr;if(expected!=entry.canonical_paint_domain||expected.owner_before(entry.canonical_paint_domain)||entry.canonical_paint_domain.owner_before(expected))throw std::invalid_argument("Canonical HDR borrowed a foreign writable owner");}auto expected=entry.canonical_paint_domain?detail::canonical_paint_emission_field(actual,cancelled):detail::native_paint_emission_field(actual,cancelled);if(expected.width!=entry.image.width||expected.height!=entry.image.height||expected.pixels!=entry.image.pixels)throw std::invalid_argument("Native HDR field changed after its owning preparation");}
+ Json package={{"version",texture_sets?6:streaming?5:canonical_domains?4:domains?3:compressed?2:1},{"encoding",compressed?"scene-cbor-deflate+openexr-float32-zip":"scene-cbor+openexr-float32-zip"},{"native",append(native)},{"images",Json::array()}};if(domains)package["encoding"]=canonical_domains?(compressed?"scene-cbor-deflate+openexr-float32-zip+paint-domain-v2":"scene-cbor+openexr-float32-zip+paint-domain-v2"):(compressed?"scene-cbor-deflate+openexr-float32-zip+paint-domain-v1":"scene-cbor+openexr-float32-zip+paint-domain-v1");if(streaming)package["encoding"]=compressed?"scene-cbor-deflate+openexr-float32-zip+bounded-scanlines":
+  "scene-cbor+openexr-float32-zip+bounded-scanlines";if(texture_sets)package["encoding"]=compressed?"scene-cbor-deflate+openexr-float32-zip+texture-set-domains":
+  "scene-cbor+openexr-float32-zip+texture-set-domains";if(compressed)package["native"]["decodedBytes"]=decoded_bytes;std::vector<uint8_t>().swap(native);std::set<FieldIdentity> seen;size_t exr_bytes=0;
+ for(const auto &entry:images){stop(cancelled);if(!selected.contains(entry.object)||!seen.emplace(entry.object,entry.texture_set).second||entry.node<0||entry.material<0||size_t(entry.node)>=j.at("nodes").size()||size_t(entry.material)>=j.at("materials").size())throw std::invalid_argument("Native HDR image has no unique exported owner");if(exr_bytes>=128*1024*1024)throw std::length_error("Native HDR aggregate EXR budget exceeded");EmissionInterchangeLimits limits;limits.max_encoded_bytes=std::min(max_bytes,size_t(128*1024*1024)-exr_bytes);limits.cancelled=cancelled;const auto &current_object=owner.object(entry.object);const auto current_canonical=current_object.material_bindings?current_object.material_bindings->canonical_paint_sampling:nullptr;if(!entry.texture_set&&current_canonical&&(!entry.canonical_paint_domain||current_canonical!=entry.canonical_paint_domain||current_canonical.owner_before(entry.canonical_paint_domain)||entry.canonical_paint_domain.owner_before(current_canonical)))throw std::invalid_argument("Canonical HDR image omitted or borrowed its actual writable owner");if(entry.native_paint_domain&&entry.canonical_paint_domain)throw std::invalid_argument("Native HDR image claims competing writable owners");if(!streaming&&(entry.native_paint_domain||entry.canonical_paint_domain)){const auto &actual=owner.object(entry.object);if(entry.canonical_paint_domain){const auto expected=actual.material_bindings?actual.material_bindings->canonical_paint_sampling:nullptr;if(expected!=entry.canonical_paint_domain||expected.owner_before(entry.canonical_paint_domain)||entry.canonical_paint_domain.owner_before(expected))throw std::invalid_argument("Canonical HDR borrowed a foreign writable owner");}auto expected=entry.canonical_paint_domain?detail::canonical_paint_emission_field(actual,cancelled):detail::native_paint_emission_field(actual,cancelled);if(expected.width!=entry.image.width||expected.height!=entry.image.height||expected.pixels!=entry.image.pixels)throw std::invalid_argument("Native HDR field changed after its owning preparation");}
  std::vector<uint8_t> bytes;
  if(streaming){
-  const auto field=export_emission_raster(current_object,cancelled,entry.authored_mtoon);
+  TextureSetLimits set_limits;
+  set_limits.cancelled=cancelled;
+  const auto field=entry.texture_set?
+      texture_set_emission_raster(texture_set_view(current_object,*entry.texture_set),set_limits):
+      export_emission_raster(current_object,cancelled,entry.authored_mtoon);
   if(field.resolution!=entry.image.width||field.resolution!=entry.image.height||field.version!=entry.image.version)
    throw std::invalid_argument("Streamed HDR differs from its exact native raster");
   const auto scratch=size_t(field.resolution)*std::min(16u,field.resolution)*sizeof(EmissionExrPixel);
@@ -403,26 +469,43 @@ void detail::attach_native_emission(GltfDocument &document,const NativeEmissionE
   limits.max_encoded_bytes=std::min(limits.max_encoded_bytes,limits.max_working_bytes-forecast);
   bytes=encode_emission_exr_rows(field.resolution,field.resolution,field.version,field.read,limits);
  }else bytes=encode_emission_exr(entry.image,limits);
- exr_bytes+=bytes.size();auto record=append(bytes);record["object"]=entry.object;record["node"]=entry.node;record["material"]=entry.material;if(streaming)record["view"]=entry.authored_mtoon?"authored-mtoon":"pbr";record["fallback"]={{"strength",entry.fallback_strength},{"emissiveFactor",entry.fallback_factor},{"maximumAbsoluteError",entry.maximum_absolute_error},{"maximumRelativeError",entry.maximum_relative_error},{"erasedNonzeroSamples",entry.erased_nonzero_samples},{"evaluation","current-static-view"}};if(entry.image.version==2){record["fallback"]["version"]=2;record["fallback"]["units"]=detail::resolved_fallback_units;record["fallback"]["view"]=entry.authored_mtoon?"authored-mtoon":"pbr";}fallback(record.at("fallback"),entry.image.version);if(entry.native_paint_domain||entry.canonical_paint_domain){record["domain"]={{"version",1},{"kind",entry.canonical_paint_domain?"canonical-paint37":"native-paint32"},{"texCoord",entry.texcoord}};native_domain(j,document.binary,record,owner.object(entry.object),cancelled,canonical_domains);}package["images"].push_back(std::move(record));}
+ exr_bytes+=bytes.size();auto record=append(bytes);record["object"]=entry.object;record["node"]=entry.node;record["material"]=entry.material;if(streaming)record["view"]=entry.authored_mtoon?"authored-mtoon":"pbr";record["fallback"]={{"strength",entry.fallback_strength},{"emissiveFactor",entry.fallback_factor},{"maximumAbsoluteError",entry.maximum_absolute_error},{"maximumRelativeError",entry.maximum_relative_error},{"erasedNonzeroSamples",entry.erased_nonzero_samples},{"evaluation","current-static-view"}};if(entry.image.version==2){record["fallback"]["version"]=2;record["fallback"]["units"]=detail::resolved_fallback_units;record["fallback"]["view"]=entry.authored_mtoon?"authored-mtoon":"pbr";}fallback(record.at("fallback"),entry.image.version);if(entry.native_paint_domain||entry.canonical_paint_domain){record["domain"]={{"version",1},{"kind",entry.canonical_paint_domain?"canonical-paint37":"native-paint32"},{"texCoord",entry.texcoord}};native_domain(j,document.binary,record,owner.object(entry.object),cancelled,canonical_domains);}if(entry.texture_set){
+  record["textureSet"]={{"id",*entry.texture_set},{"texCoord",entry.texcoord}};
+  check_texture_set_domain(j,document.binary,record,current_object,texture_set_view(current_object,*entry.texture_set),cancelled);
+ }
+ package["images"].push_back(std::move(record));}
  while(document.binary.size()%4){if(document.binary.size()==max_bytes)throw std::length_error("Native HDR padding exceeds output limit");document.binary.push_back(0);}j["buffers"]={{{"byteLength",document.binary.size()}}};package["binarySha256"]=hash(document.binary);package["documentSha256"]="";j["extras"][marker]=std::move(package);j["extras"][marker]["documentSha256"]=document_hash(j);if(j.dump().size()>16*1024*1024)throw std::length_error("Native HDR document JSON exceeds16MiB read/write limit");stop(cancelled);
 }
 std::optional<Scene> extract_native_emission(std::span<const uint8_t> bytes,const NativeEmissionReadLimits &limits){
  stop(limits.cancelled);if(!limits.max_decoded_native_bytes||limits.max_decoded_native_bytes>256*1024*1024||!limits.max_container_bytes||limits.max_container_bytes>256*1024*1024||!limits.max_json_bytes||limits.max_json_bytes>16*1024*1024||!limits.max_native_bytes||limits.max_native_bytes>128*1024*1024||!limits.max_exr_bytes||limits.max_exr_bytes>128*1024*1024||!limits.max_images||limits.max_images>256||bytes.size()>limits.max_container_bytes)throw std::length_error("Invalid native HDR container limits");
  if(bytes.size()<20||word(bytes,0)!=0x46546c67||word(bytes,4)!=2||word(bytes,8)!=bytes.size()||word(bytes,16)!=0x4e4f534a)throw std::invalid_argument("Invalid native HDR GLB header");const auto length=word(bytes,12);if(length%4||length>limits.max_json_bytes||length>bytes.size()-20)throw std::length_error("Native HDR GLB JSON exceeds bounds");
- Json j=Json::parse(bytes.begin()+20,bytes.begin()+20+length,[&](int depth,Json::parse_event_t,Json&){stop(limits.cancelled);if(depth>128)throw std::length_error("Native HDR JSON depth exceeded");return true;});if(!j.is_object())throw std::invalid_argument("Invalid native HDR GLB root");if(!j.contains("extras"))return std::nullopt;if(!j.at("extras").is_object()){return std::nullopt;}if(!j.at("extras").contains(marker))return std::nullopt;if(j.at("extras").contains("domeSculptAuthoring"))throw std::invalid_argument("Competing native package authority");const auto &package=j.at("extras").at(marker);const bool compressed=marker_object(package);const bool streaming=package.at("version")==5;
+ Json j=Json::parse(bytes.begin()+20,bytes.begin()+20+length,[&](int depth,Json::parse_event_t,Json&){stop(limits.cancelled);if(depth>128)throw std::length_error("Native HDR JSON depth exceeded");return true;});if(!j.is_object())throw std::invalid_argument("Invalid native HDR GLB root");if(!j.contains("extras"))return std::nullopt;if(!j.at("extras").is_object()){return std::nullopt;}if(!j.at("extras").contains(marker))return std::nullopt;if(j.at("extras").contains("domeSculptAuthoring"))throw std::invalid_argument("Competing native package authority");const auto &package=j.at("extras").at(marker);const bool compressed=marker_object(package);const bool texture_sets=package.at("version")==6;const bool streaming=texture_sets||package.at("version")==5;
  const bool canonical_domains=package.at("version")==4;const bool domains=canonical_domains||package.at("version")==3;
  const bool allow_domains=domains||streaming, allow_canonical=canonical_domains||streaming;
  const auto position=20+size_t(length);if(position>bytes.size()||bytes.size()-position<8||word(bytes,position+4)!=0x004e4942)throw std::invalid_argument("Native HDR package has no captured BIN");const auto binary_length=word(bytes,position);if(binary_length%4||binary_length!=bytes.size()-position-8)throw std::invalid_argument("Native HDR BIN framing mismatch");auto binary=bytes.subspan(position+8,binary_length);if(j.at("buffers").size()!=1||integer(j.at("buffers")[0].at("byteLength"),binary.size(),"Invalid native HDR buffer length")!=binary.size())throw std::invalid_argument("Native HDR buffer declaration mismatch");
  if(package.at("binarySha256").get_ref<const std::string&>()!=hash(binary)||package.at("documentSha256").get_ref<const std::string&>()!=document_hash(j))throw std::invalid_argument("Native HDR core/resource binding digest mismatch");
  const auto &native_record=package.at("native");if(native_record.size()!=(compressed?3:2))throw std::invalid_argument("Invalid native HDR Scene descriptor");const size_t decoded_bytes=compressed?integer(native_record.at("decodedBytes"),limits.max_decoded_native_bytes,"Native HDR decoded byte limit exceeded"):0;auto native=view(j,binary,native_record);if(!compressed&&native.size()>limits.max_decoded_native_bytes)throw std::length_error("Native HDR decoded byte limit exceeded");if(native.size()>limits.max_native_bytes)throw std::length_error("Native HDR Scene payload exceeds read budget");const auto &images=package.at("images");if(images.size()>limits.max_images)throw std::length_error("Native HDR image count exceeds limits");size_t encoded=0,decoded_fields=0,domain_count=0,canonical_count=0;std::set<uint64_t> owners,resolved_owners;
+ std::set<FieldIdentity> fields;
+ size_t set_fields=0;
  // Validate all small descriptors and byte digests before EXR/Scene allocation.
- for(const auto &entry:images){stop(limits.cancelled);if(entry.size()!=(allow_domains&&entry.contains("domain")?7u:6u)+unsigned(streaming)||(!allow_domains&&entry.contains("domain"))||integer(entry.at("object"),UINT64_MAX,"Invalid native HDR object identity")==0||!owners.insert(integer(entry.at("object"),UINT64_MAX,"Invalid native HDR object identity")).second||integer(entry.at("node"),j.at("nodes").size(),"Invalid native HDR node")>=j.at("nodes").size()||integer(entry.at("material"),j.at("materials").size(),"Invalid native HDR material")>=j.at("materials").size())throw std::invalid_argument("Invalid native HDR image owner");fallback(entry.at("fallback"));if(entry.contains("domain")){domain_descriptor(entry.at("domain"),allow_canonical);++domain_count;if(entry.at("domain").at("kind")=="canonical-paint37")++canonical_count;}auto resource=view(j,binary,entry);if(encoded>limits.max_exr_bytes||resource.size()>limits.max_exr_bytes-encoded)throw std::length_error("Native HDR EXR bytes exceed aggregate limit");encoded+=resource.size();auto image_limits=limits.image;image_limits.cancelled=limits.cancelled;const auto description=detail::emission_exr_owned_description(resource,image_limits,{},streaming);
+ for(const auto &entry:images){
+  stop(limits.cancelled);
+  const auto set=texture_set_descriptor(entry,texture_sets);
+  const auto object=integer(entry.at("object"),UINT64_MAX,"Invalid native HDR object identity");
+  if(entry.size()!=(allow_domains&&entry.contains("domain")?7u:6u)+unsigned(streaming)+unsigned(bool(set))||
+     (!allow_domains&&entry.contains("domain"))||!object||!fields.emplace(object,set).second||
+     integer(entry.at("node"),j.at("nodes").size(),"Invalid native HDR node")>=j.at("nodes").size()||
+     integer(entry.at("material"),j.at("materials").size(),"Invalid native HDR material")>=j.at("materials").size())
+    throw std::invalid_argument("Invalid native HDR image owner");
+  owners.insert(object);
+  set_fields+=set.has_value();
+  fallback(entry.at("fallback"));if(entry.contains("domain")){domain_descriptor(entry.at("domain"),allow_canonical);++domain_count;if(entry.at("domain").at("kind")=="canonical-paint37")++canonical_count;}auto resource=view(j,binary,entry);if(encoded>limits.max_exr_bytes||resource.size()>limits.max_exr_bytes-encoded)throw std::length_error("Native HDR EXR bytes exceed aggregate limit");encoded+=resource.size();auto image_limits=limits.image;image_limits.cancelled=limits.cancelled;const auto description=detail::emission_exr_owned_description(resource,image_limits,{},streaming);
   fallback(entry.at("fallback"),description.version);
   if(streaming&&((entry.at("view")!="pbr"&&entry.at("view")!="authored-mtoon")||
       (description.version==2&&entry.at("fallback").at("view")!=entry.at("view"))))
    throw std::invalid_argument("Unknown streamed HDR emission view");
   if(description.version==2){
-   resolved_owners.insert(entry.at("object").get<uint64_t>());
+   if(!set)resolved_owners.insert(entry.at("object").get<uint64_t>());
    if(!streaming&&(resource.size()>image_limits.max_working_bytes||
        description.decoded_bytes>(image_limits.max_working_bytes-resource.size())/2))
     throw std::length_error("Resolved native replay exceeds existing image working budget");
@@ -435,7 +518,8 @@ std::optional<Scene> extract_native_emission(std::span<const uint8_t> bytes,cons
   if(raw>aggregate-decoded_fields)throw std::length_error("Native HDR aggregate decoded EXR fields exceed policy");
   decoded_fields+=raw;
  }
- if(streaming&&decoded_fields<=detail::emission_dense_bytes)
+ if(texture_sets&&!set_fields)throw std::invalid_argument("HDR texture-set package has no material member");
+ if(streaming&&!texture_sets&&decoded_fields<=detail::emission_dense_bytes)
   throw std::invalid_argument("Streamed HDR requires its large-field witness");
  if(canonical_domains&&!canonical_count)throw std::invalid_argument("Native HDR package4 has no genuine canonical writable-domain witness");
  if(domains&&!domain_count)throw std::invalid_argument("Native HDR package3 has no genuine coordinate-domain witness");
@@ -459,17 +543,39 @@ std::optional<Scene> extract_native_emission(std::span<const uint8_t> bytes,cons
  }
 
 
- for(const auto &entry:images){const auto &object=result.object(entry.at("object").get<uint64_t>());if(object.material_bindings&&object.material_bindings->canonical_paint_sampling&&(!allow_canonical||!entry.contains("domain")||entry.at("domain").at("kind")!="canonical-paint37"))throw std::invalid_argument("Canonical HDR package omitted its actual writable-domain witness");}
+ for(const auto &entry:images){const auto &object=result.object(entry.at("object").get<uint64_t>());if(!entry.contains("textureSet")&&object.material_bindings&&object.material_bindings->canonical_paint_sampling&&(!allow_canonical||!entry.contains("domain")||entry.at("domain").at("kind")!="canonical-paint37"))throw std::invalid_argument("Canonical HDR package omitted its actual writable-domain witness");}
 
  if(streaming)for(const auto &entry:images){
   stop(limits.cancelled);
   const auto &object=result.object(entry.at("object").get<uint64_t>());
+  if(const auto set=texture_set_descriptor(entry,texture_sets)){
+   if(!object.visible||!object.texture_sets)throw std::invalid_argument("HDR texture-set record needs its visible native collection");
+   const auto field=texture_set_view(object,*set);
+   check_texture_set_domain(j,binary,entry,object,field,limits.cancelled);
+   TextureSetLimits set_limits;
+   set_limits.cancelled=limits.cancelled;
+   validate_streamed_image(j,binary,entry,detail::texture_set_emission_raster(field,set_limits),limits);
+   continue;
+  }
+  if(texture_sets&&object.texture_sets)throw std::invalid_argument("HDR texture-set field omitted its material identity");
   const bool independent=object.material_bindings&&
       (object.material_bindings->canonical_paint_sampling||object.material_bindings->native_paint_sampling);
   if(independent!=entry.contains("domain"))
    throw std::invalid_argument("Streamed HDR lost its exact paint coordinate witness");
   if(independent)native_domain(j,binary,entry,object,limits.cancelled,true);
-  validate_streamed_image(j,binary,entry,object,limits);
+  validate_streamed_image(j,binary,entry,detail::export_emission_raster(object,limits.cancelled,
+      entry.at("view")=="authored-mtoon"),limits);
+ }
+
+ if(texture_sets)for(const auto &object:result.objects())if(object.visible&&object.texture_sets){
+  const auto require_field=[&](TextureSetId set){
+   const auto field=texture_set_view(object,set);
+   if(!field.domain->triangles().empty()&&detail::texture_set_physical_emission(field)&&
+      !fields.contains({object.id,set}))
+    throw std::invalid_argument("HDR texture-set package omitted a visible physical material");
+  };
+  require_field(0);
+  for(const auto &member:object.texture_sets->additional())require_field(member.id);
  }
 
  if(domains){size_t actual=0;for(const auto &entry:images)if(entry.contains("domain")){++actual;const auto &object=result.object(entry.at("object").get<uint64_t>());native_domain(j,binary,entry,object,limits.cancelled,canonical_domains);auto expected=entry.at("domain").at("kind")=="canonical-paint37"?detail::canonical_paint_emission_field(object,limits.cancelled):detail::native_paint_emission_field(object,limits.cancelled);auto image_limits=limits.image;image_limits.cancelled=limits.cancelled;auto image=decode_emission_exr(view(j,binary,entry),image_limits);if(image.version!=expected.version||image.width!=expected.width||image.height!=expected.height||image.pixels.size()!=expected.pixels.size())throw std::invalid_argument("Native HDR field differs from its retained paint owner");for(size_t p=0;p<image.pixels.size();++p){if((p&1023)==0)stop(limits.cancelled);if(image.pixels[p]!=expected.pixels[p])throw std::invalid_argument("Native HDR float planes differ from their exact native paint replay");}}

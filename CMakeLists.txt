@@ -5123,6 +5123,9 @@ if(BUILD_TESTING)
   add_test(NAME texture-set-retained-hdr-editable COMMAND dome-sculpt-texture-set-source-export-test
     --retained-hdr-editable ${CMAKE_CURRENT_BINARY_DIR}/texture-set-retained-hdr-editable)
   set_tests_properties(texture-set-retained-hdr-editable PROPERTIES TIMEOUT 300)
+  add_test(NAME texture-set-retained-hdr-standard COMMAND dome-sculpt-texture-set-source-export-test
+    --retained-hdr-standard ${CMAKE_CURRENT_BINARY_DIR}/texture-set-retained-hdr-standard)
+  set_tests_properties(texture-set-retained-hdr-standard PROPERTIES TIMEOUT 300)
   add_test(NAME texture-set-retained-bake-source COMMAND dome-sculpt-texture-set-source-export-test
     --retained-bake-source ${CMAKE_CURRENT_BINARY_DIR}/texture-set-retained-bake-source)
   set_tests_properties(texture-set-retained-bake-source PROPERTIES TIMEOUT 300)

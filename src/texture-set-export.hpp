@@ -12,6 +12,8 @@ struct TextureSetExportEmission {
   ResolvedFallbackMetrics measured;
 };
 bool texture_set_physical_emission(const TextureSetView &);
+struct EmissionExportRaster;
+EmissionExportRaster texture_set_emission_raster(const TextureSetView &,const TextureSetLimits &);
 struct TextureSetExportField {
   TextureSetId set=0;
   std::string name;

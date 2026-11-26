@@ -23,6 +23,7 @@ struct EmissionExportImage {
  // Genuine native32 field; legacy images retain their implicit UV0 meaning.
  bool native_paint_domain=false;
  unsigned texcoord=0;
+ std::optional<uint32_t> texture_set;
  // Package4 only: actual independently authenticated canonical writable owner.
  std::shared_ptr<const CanonicalPaintSampling> canonical_paint_domain;
 };

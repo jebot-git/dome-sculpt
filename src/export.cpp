@@ -72,7 +72,7 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
   for(const auto&object:input_objects)if(object.textures&&object.textures->current_grid_preview)
     throw std::invalid_argument("Render-only current-grid preview is not export image authority; materialize actual native field images");
   for(const auto &object:input_objects)if((object.textures&&object.textures->overlay)||detail::hdr_emission(object.material.emissive)||(object.material_bindings&&detail::physical_emission(*object.material_bindings))) {
-    if(object.texture_set_surface&&raw_authority)continue;
+    if(object.texture_set_surface&&(raw_authority||(physical&&matches_texture_set_emission_surface(*physical,object))))continue;
     if(!(physical&&matches_native_emission_surface(*physical,object,cancelled))&&(!raw_authority||(!native_paint_compiled_emission(*raw_authority,object,cancelled)&&!raw_source_emission(*raw_authority,object,cancelled))))
       throw std::invalid_argument("Physical emission requires a precision-qualified export adapter");
   }
@@ -94,7 +94,7 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
     TextureSetLimits limits;limits.cancelled=cancelled;
     if(bundle_working_bytes>=limits.maximum_bytes)throw std::length_error("Aggregate texture-set export budget exhausted");
     limits.maximum_bytes-=bundle_working_bytes;
-    bool measured=false;
+    bool measured=physical&&matches_texture_set_emission_surface(*physical,objects[i]);
     if(raw_authority){
       const auto &originals=raw_authority->originals();
       const auto original=std::find_if(originals.begin(),originals.end(),[&](const auto &entry){return entry.id==objects[i].id;});

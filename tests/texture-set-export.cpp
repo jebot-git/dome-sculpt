@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
 #include "dome/native-authoring.hpp"
+#include "dome/emission-native.hpp"
+#include "emission-export.hpp"
 #include "dome/source-uv-bake.hpp"
 #include "texture-set-export.hpp"
 #include "gltf-document.hpp"
@@ -90,6 +92,44 @@ void editable_hdr(){
    const auto strength=m.at("extensions").at("KHR_materials_emissive_strength").at("emissiveStrength").get<float>();
    check(strength>(set?7.f:3.f),"The portable material retains above-one radiance");
  }
+ const std::filesystem::path standard="standard-texture-set-hdr.glb";
+ doc.export_asset(standard,AssetExportFormat::Glb).get();
+ consumer(standard,2);
+ const auto reopened=extract_native_emission(bytes(standard));
+ check(reopened&&reopened->encode()==exact&&doc.copy_scene().encode()==exact,
+       "Standard per-field EXRs and native Scene reopen the exact plain texture sets");
+
+ const auto prior_surfaces=emission_export_surfaces(scene);
+ auto changed_material=scene.snapshot();
+ changed_material.active().material.emissive={.7f,.4f,.1f};
+ NativeEmissionExport stale;
+ stale.scene=std::make_shared<const Scene>(std::move(changed_material));
+ stale.allow_measured_core_fallback=true;
+ refuses([&]{detail::prepare_emission_export(prior_surfaces,stale,{});},
+         "An earlier plan cannot borrow a scene with different primary material factors");
+
+ auto mixed=scene.snapshot();
+ const auto single=mixed.add("Independent HDR primitive",Volume{});
+ auto &ordinary=mixed.object(single);
+ const auto &mesh=scene.active().painted->mesh();
+ Mesh triangle;
+ triangle.positions.assign(mesh.positions.begin(),mesh.positions.begin()+3);
+ triangle.normals.assign(mesh.normals.begin(),mesh.normals.begin()+3);
+ triangle.uv.assign(mesh.uv.begin(),mesh.uv.begin()+3);
+ triangle.indices={0,1,2};
+ ordinary.mesh_active=true;
+ ordinary.painted=std::make_shared<PaintedMesh>(std::move(triangle),64);
+ ordinary.material.emissive={4.f,.04f,1.5f};
+ const auto mixed_exact=mixed.encode();
+ Document both;
+ both.replace(mixed);
+ check(both.wait_mesh(std::chrono::seconds(30)),"Standalone HDR and texture-set HDR publish together");
+ const std::filesystem::path mixed_file="mixed-standard-hdr.glb";
+ both.export_asset(mixed_file,AssetExportFormat::Glb).get();
+ const auto mixed_package=extract_native_emission(bytes(mixed_file));
+ check(mixed_package&&mixed_package->encode()==mixed_exact,
+       "Standard GLB independently replays standalone HDR alongside multiple material fields");
+
 }
 
 void authority(){

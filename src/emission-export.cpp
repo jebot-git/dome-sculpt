@@ -8,6 +8,8 @@
 #include "emission-authority.hpp"
 #include "paint-overlay-packet.hpp"
 #include "native-paint-sampling.hpp"
+#include "texture-set-export.hpp"
+#include "texture-set-paint-access.hpp"
 #include "native-paint-export-policy.hpp"
 #include "native-paint-frame-export-policy.hpp"
 #include "canonical-paint-export-policy.hpp"
@@ -19,6 +21,7 @@
 #include <nlohmann/json.hpp>
 #include <bit>
 #include <set>
+#include <tuple>
 namespace dome::detail {namespace {
 void stop(const std::function<bool()> &cancelled){if(cancelled&&cancelled())throw std::runtime_error("HDR emission export cancelled");}
 float linear(float v){return v<=.04045f?v/12.92f:std::pow((v+.055f)/1.055f,2.4f);}
@@ -91,9 +94,11 @@ EmissionInterchangeImage materialize(const EmissionExportRaster &raster){
 class EmissionExportProof final {
  struct Entry {uint64_t id;Material material;std::shared_ptr<const TextureMaps> textures;std::shared_ptr<const SourceMaterialBindings> binding;};
  std::shared_ptr<const Scene> scene;std::vector<Entry> entries;
+ std::vector<std::pair<uint64_t,std::shared_ptr<const TextureSetSurfacePlan>>> texture_sets;
  EmissionExportProof()=default;
  friend EmissionExportPrepared prepare_emission_export(std::span<const ObjectSurface>,const NativeEmissionExport &,const std::function<bool()> &,bool);
  friend void validate_native_emission_surfaces(const EmissionExportPrepared &,const std::function<bool()> &);
+ friend bool matches_texture_set_emission_surface(const EmissionExportPrepared &,const ObjectSurface &);
  friend bool matches_native_emission_surface(const EmissionExportPrepared &,const ObjectSurface &,const std::function<bool()> &);
  friend void finish_emission_export(GltfDocument &,EmissionExportPrepared &,const NativeEmissionExport &,size_t,const std::function<bool()> &);
 };
@@ -109,8 +114,30 @@ bool matches_native_emission_surface(const EmissionExportPrepared &prepared,cons
  const auto attachment=canonical?canonical->attachment():native->attachment();
  if(!same(surface.paint_sampling_attachment,attachment)||surface.paint_corner_coordinates!=attachment->domain()->corner_coordinates(surface.mesh,limits))throw std::invalid_argument("Normalized native HDR view changed its owning paint corners");return true;
 }
+bool matches_texture_set_emission_surface(const EmissionExportPrepared &prepared,const ObjectSurface &surface){
+ const auto &proof=prepared.proof;
+ if(!proof||!surface.texture_set_surface)return false;
+ const auto found=std::find_if(proof->texture_sets.begin(),proof->texture_sets.end(),
+     [&](const auto &entry){return entry.first==surface.id;});
+ if(found==proof->texture_sets.end())return false;
+ const auto &plan=surface.texture_set_surface;
+ if(plan!=found->second||plan.owner_before(found->second)||found->second.owner_before(plan))
+  throw std::invalid_argument("Texture-set HDR compilation borrowed another owning surface plan");
+ const auto &object=proof->scene->object(surface.id);
+ if(surface.world_matrix().float_matrix()!=proof->scene->world_matrix(object.id).float_matrix())
+  throw std::invalid_argument("Texture-set HDR surface changed its owning world placement");
+ return true;
+}
 void validate_native_emission_surfaces(const EmissionExportPrepared &prepared,const std::function<bool()> &cancelled){
  if(!prepared.proof)return;
+ for(const auto &[object,plan]:prepared.proof->texture_sets){
+  stop(cancelled);
+  const auto member=std::find_if(prepared.surfaces.begin(),prepared.surfaces.end(),
+      [&](const auto &surface){return surface.id==object;});
+  if(member==prepared.surfaces.end()||!matches_texture_set_emission_surface(prepared,*member))
+   throw std::invalid_argument("Texture-set HDR lost its exact compiled subject");
+ }
+
  for(const auto &entry:prepared.proof->entries){stop(cancelled);const auto matches=[&](const auto &object){return object.id==entry.id;};
   if(std::count_if(prepared.surfaces.begin(),prepared.surfaces.end(),matches)!=1)throw std::invalid_argument("Native HDR prepared field lost its unique emitted subject");
   const auto surface=std::find_if(prepared.surfaces.begin(),prepared.surfaces.end(),matches);
@@ -177,26 +204,80 @@ bool requires_native_emission_package(const Scene &scene,const std::function<boo
  size_t visited=0;
  auto physical=[&](auto &&self,const nlohmann::json &node)->bool{if((++visited&4095)==0)stop(cancelled);if(node.is_object()){const auto direct=node.find("physical_emission");if(direct!=node.end()&&(direct->is_boolean()?direct->get<bool>():!direct->is_null()))return true;if(node.contains("physical_emission_tiles")&&!node.at("physical_emission_tiles").empty())return true;if(node.contains("emissive")){const auto &v=node.at("emissive");if(v.is_array()&&v.size()==3)for(const auto &n:v)if(n.is_number()&&n.get<double>()>1)return true;}if(node.contains("native_reference")){const auto &v=node.at("native_reference");if(v.is_object()&&v.contains("emission"))for(const auto &n:v.at("emission"))if(n.get<double>()>1)return true;}for(const auto &child:node.items())if(self(self,child.value()))return true;}else if(node.is_array())for(const auto &child:node)if(self(self,child))return true;return false;};const bool result=physical(physical,value);stop(cancelled);return result;
 }
+static void validate_texture_set_surface(const ObjectSurface &surface,const SculptObject &owner,
+    const Scene &scene,const std::function<bool()> &cancelled){
+ const auto &plan=surface.texture_set_surface;
+ const auto same=[](const auto &a,const auto &b){return a==b&&!a.owner_before(b)&&!b.owner_before(a);};
+ if(!plan||!owner.painted||!owner.visible||plan->object()!=owner.id||
+    !same(plan->collection(),owner.texture_sets)||!same(plan->geometry(),owner.painted->mesh_owner())||
+    !same(plan->deformation(),owner.deformation)||!same(surface.deformation,owner.deformation)||
+    !same(surface.rig_source,owner.rig_source)||
+    surface.world_matrix().float_matrix()!=scene.world_matrix(owner.id).float_matrix())
+  throw std::invalid_argument("Texture-set HDR surface differs from its immutable native source");
+ plan->authenticate_owner(plan);
+ const auto material_key=[](const Material &m){
+  return std::tie(m.name,m.color,m.metallic,m.roughness,m.emissive,m.toon,m.double_sided,
+      m.alpha,m.alpha_cutoff,m.unlit);
+ };
+ for(const auto &field:plan->fields()){
+  stop(cancelled);
+  const auto native=texture_set_view(owner,field.id);
+  if(field.name!=native.name||material_key(field.material)!=material_key(native.material)||
+     !same(field.domain,native.domain)||!same(field.source,native.source)||
+     !same(field.appearance,native.appearance)||!same(field.material_bindings,native.material_bindings)||
+     !same(field.bake_recipe,native.bake_recipe)||
+     !TextureSetPaintAccess::same_current(*field.painted,*native.painted))
+   throw std::invalid_argument("Texture-set HDR member differs from the current native scene");
+ }
+}
 EmissionExportPrepared prepare_emission_export(std::span<const ObjectSurface> objects,const NativeEmissionExport &options,const std::function<bool()> &cancelled,bool authored_mtoon){
  stop(cancelled);if(!options.scene||!options.allow_measured_core_fallback)throw std::invalid_argument("HDR export needs its immutable Scene and explicit measured fallback permission");options.scene->validate();
  size_t field_pixels=0;
- for(const auto &surface:objects){
-  stop(cancelled);
-  const auto &owner=options.scene->object(surface.id);
-  if(!hdr_emission(owner.material.emissive)&&!(owner.painted&&owner.painted->has_physical_emission())&&
-     !(owner.material_bindings&&physical_emission(*owner.material_bindings)))continue;
-  if(!owner.mesh_active||!owner.painted)throw std::invalid_argument("HDR export requires its editable mesh owner");
-  const auto resolution=owner.painted->resolution();
+ bool texture_set_hdr=false;
+ const auto charge_pixels=[&](uint32_t resolution){
   const auto required=size_t(resolution)*resolution;
   if(required>emission_stream_pixels-field_pixels)
    throw std::length_error("Aggregate HDR sample count exceeds streaming budget");
   field_pixels+=required;
+ };
+ for(const auto &surface:objects){
+  stop(cancelled);
+  const auto &owner=options.scene->object(surface.id);
+  if(owner.texture_sets){
+   validate_texture_set_surface(surface,owner,*options.scene,cancelled);
+   for(const auto &field:surface.texture_set_surface->fields())
+    if(!field.domain->triangles().empty()&&texture_set_physical_emission(field)){
+     if(authored_mtoon)throw std::invalid_argument("Texture-set HDR VRM needs its typed material adapter");
+     charge_pixels(field.painted->resolution());
+     texture_set_hdr=true;
+    }
+   continue;
+  }
+  if(!hdr_emission(owner.material.emissive)&&!(owner.painted&&owner.painted->has_physical_emission())&&
+     !(owner.material_bindings&&physical_emission(*owner.material_bindings)))continue;
+  if(!owner.mesh_active||!owner.painted)throw std::invalid_argument("HDR export requires its editable mesh owner");
+  charge_pixels(owner.painted->resolution());
  }
  std::shared_ptr<EmissionExportProof> proof;
  EmissionExportPrepared result;result.authored_mtoon=authored_mtoon;
- result.streaming=field_pixels>emission_dense_bytes/sizeof(EmissionExrPixel);
+ result.streaming=texture_set_hdr||field_pixels>emission_dense_bytes/sizeof(EmissionExrPixel);
  result.surfaces.assign(objects.begin(),objects.end());std::set<uint64_t> identities;
- for(size_t i=0;i<objects.size();++i){stop(cancelled);const auto &surface=objects[i];const auto &owner=options.scene->object(surface.id);const auto source_mesh=owner.mesh_active?Mesh{}:surface_mesh(*owner.volume,cancelled);const auto &expected=owner.mesh_active?owner.painted->mesh():source_mesh;if(!identities.insert(surface.id).second||!same_mesh(surface.mesh,expected)||surface.material.name!=owner.material.name||surface.material.toon!=owner.material.toon||surface.material.color!=owner.material.color||surface.material.emissive!=owner.material.emissive||surface.material.metallic!=owner.material.metallic||surface.material.roughness!=owner.material.roughness||surface.material.unlit!=owner.material.unlit||surface.material.alpha!=owner.material.alpha||surface.material.alpha_cutoff!=owner.material.alpha_cutoff||surface.material.double_sided!=owner.material.double_sided||surface.deformation!=owner.deformation||surface.appearance!=owner.appearance||surface.material_bindings!=owner.material_bindings||surface.world_matrix().float_matrix()!=options.scene->world_matrix(owner.id).float_matrix())throw std::invalid_argument("HDR export surface does not match its immutable native source");result.ids.push_back(surface.id);if(!hdr_emission(owner.material.emissive)&&!(owner.painted&&owner.painted->has_physical_emission())&&!(owner.material_bindings&&physical_emission(*owner.material_bindings)))continue;const bool native_domain=owner.material_bindings&&bool(owner.material_bindings->native_paint_sampling);const auto canonical=owner.material_bindings?owner.material_bindings->canonical_paint_sampling:nullptr;
+ for(size_t i=0;i<objects.size();++i){stop(cancelled);const auto &surface=objects[i];const auto &owner=options.scene->object(surface.id);if(owner.texture_sets){
+  if(!identities.insert(surface.id).second)throw std::invalid_argument("Repeated HDR export object");
+  result.ids.push_back(surface.id);
+  if(!proof){proof=std::shared_ptr<EmissionExportProof>(new EmissionExportProof);proof->scene=options.scene;}
+  proof->texture_sets.emplace_back(surface.id,surface.texture_set_surface);
+  for(const auto &field:surface.texture_set_surface->fields())
+   if(!field.domain->triangles().empty()&&texture_set_physical_emission(field)){
+    EmissionExportImage entry;
+    entry.object=owner.id;
+    entry.texture_set=field.id;
+    entry.image.width=entry.image.height=field.painted->resolution();
+    entry.image.version=2;
+    result.images.push_back(std::move(entry));
+   }
+  continue;
+ }const auto source_mesh=owner.mesh_active?Mesh{}:surface_mesh(*owner.volume,cancelled);const auto &expected=owner.mesh_active?owner.painted->mesh():source_mesh;if(!identities.insert(surface.id).second||!same_mesh(surface.mesh,expected)||surface.material.name!=owner.material.name||surface.material.toon!=owner.material.toon||surface.material.color!=owner.material.color||surface.material.emissive!=owner.material.emissive||surface.material.metallic!=owner.material.metallic||surface.material.roughness!=owner.material.roughness||surface.material.unlit!=owner.material.unlit||surface.material.alpha!=owner.material.alpha||surface.material.alpha_cutoff!=owner.material.alpha_cutoff||surface.material.double_sided!=owner.material.double_sided||surface.deformation!=owner.deformation||surface.appearance!=owner.appearance||surface.material_bindings!=owner.material_bindings||surface.world_matrix().float_matrix()!=options.scene->world_matrix(owner.id).float_matrix())throw std::invalid_argument("HDR export surface does not match its immutable native source");result.ids.push_back(surface.id);if(!hdr_emission(owner.material.emissive)&&!(owner.painted&&owner.painted->has_physical_emission())&&!(owner.material_bindings&&physical_emission(*owner.material_bindings)))continue;const bool native_domain=owner.material_bindings&&bool(owner.material_bindings->native_paint_sampling);const auto canonical=owner.material_bindings?owner.material_bindings->canonical_paint_sampling:nullptr;
  if(native_domain||canonical){if(surface.material_bindings.owner_before(owner.material_bindings)||owner.material_bindings.owner_before(surface.material_bindings))throw std::invalid_argument("Native HDR borrowed a foreign material control block");if(surface.deformation.owner_before(owner.deformation)||owner.deformation.owner_before(surface.deformation)||surface.rig_source!=owner.rig_source||surface.rig_source.owner_before(owner.rig_source)||owner.rig_source.owner_before(surface.rig_source))throw std::invalid_argument("Native HDR borrowed a foreign current model control block");const auto attachment=owner.painted->paint_sampling_attachment();if(attachment!=surface.paint_sampling_attachment||attachment.owner_before(surface.paint_sampling_attachment)||surface.paint_sampling_attachment.owner_before(attachment)||surface.paint_corner_coordinates!=attachment->domain()->corner_coordinates(owner.painted->mesh()))throw std::invalid_argument("Native HDR surface borrowed another paint coordinate owner");}
  EmissionInterchangeImage image;
  if(result.streaming){
@@ -211,6 +292,25 @@ void finish_emission_export(GltfDocument &document,EmissionExportPrepared &prepa
  using Json=nlohmann::json;if(prepared.proof&&(prepared.proof->scene!=options.scene||prepared.proof->scene.owner_before(options.scene)||options.scene.owner_before(prepared.proof->scene)))throw std::invalid_argument("Native HDR finisher borrowed another owning Scene");auto &j=document.json;auto &binary=document.binary;
  const bool native_domains=std::any_of(prepared.images.begin(),prepared.images.end(),[](const auto &entry){return entry.native_paint_domain||bool(entry.canonical_paint_domain);});
  for(auto &entry:prepared.images){stop(cancelled);const auto found=std::find(prepared.ids.begin(),prepared.ids.end(),entry.object);if(found==prepared.ids.end())throw std::logic_error("Missing HDR export object");const auto i=size_t(found-prepared.ids.begin());auto &identity=document.objects.at(i);entry.node=identity.node;
+  if(entry.texture_set){
+   const auto &primitives=j.at("meshes").at(identity.mesh).at("primitives");
+   const auto member=std::find_if(primitives.begin(),primitives.end(),[&](const auto &primitive){
+    return primitive.at("extras").at("dome_sculpt_texture_set").at("id")==*entry.texture_set;
+   });
+   if(member==primitives.end())throw std::logic_error("Texture-set HDR lost its emitted material");
+   entry.material=member->at("material").get<int>();
+   const auto &material=j.at("materials").at(entry.material);
+   const auto &receipt=material.at("extras").at("domeSculptPortableEmission");
+   entry.texcoord=material.at("emissiveTexture").value("texCoord",0u);
+   const auto extensions=material.find("extensions");
+   if(extensions!=material.end()&&extensions->contains("KHR_materials_emissive_strength"))
+    entry.fallback_strength=extensions->at("KHR_materials_emissive_strength").at("emissiveStrength").get<float>();
+   entry.fallback_factor=material.at("emissiveFactor").get<std::array<float,3>>();
+   entry.maximum_absolute_error=receipt.at("maximumAbsoluteError").get<double>();
+   entry.maximum_relative_error=receipt.at("maximumRelativeError").get<double>();
+   entry.erased_nonzero_samples=receipt.at("erasedNonzeroSamples").get<size_t>();
+   continue;
+  }
   if(native_domains){
    if(identity.mesh<0||identity.node<0||j.at("nodes").at(identity.node).at("mesh")!=identity.mesh)throw std::logic_error("Native HDR lost its actual emitted object mapping");
    size_t users=0;for(const auto &node:j.at("nodes"))if(node.contains("mesh")&&node.at("mesh")==identity.mesh)++users;
@@ -279,7 +379,7 @@ std::vector<ObjectSurface> emission_export_surfaces(const Scene &scene,const std
  auto detached=scene.snapshot();
  for(const auto &original:scene.objects()){
   if(cancelled&&cancelled())throw std::runtime_error("HDR export surface extraction cancelled");
-  if(!original.visible)continue;
+  if(!original.visible||original.texture_sets)continue;
   if(!detail::hdr_emission(original.material.emissive)&&
      !(original.painted&&original.painted->has_physical_emission())&&
      !(original.material_bindings&&detail::physical_emission(*original.material_bindings)))continue;
@@ -294,6 +394,6 @@ std::vector<ObjectSurface> emission_export_surfaces(const Scene &scene,const std
    object.material_bindings=std::move(binding);
   }
  }
- auto surfaces=detached.preview_surfaces(cancelled);for(auto &surface:surfaces){const auto &original=scene.object(surface.id);surface.material=original.material;surface.material_bindings=original.material_bindings;if(original.painted&&(original.painted->has_physical_emission()||detail::hdr_emission(original.material.emissive)||(original.material_bindings&&detail::physical_emission(*original.material_bindings)))){auto maps=std::make_shared<TextureMaps>(*surface.textures);maps->overlay=detail::PaintOverlayFactory::capture(*original.painted,cancelled);surface.textures=std::move(maps);}}return surfaces;
+ auto surfaces=detached.preview_surface_bundles(cancelled,{});for(auto &surface:surfaces){const auto &original=scene.object(surface.id);if(original.texture_sets)continue;surface.material=original.material;surface.material_bindings=original.material_bindings;if(original.painted&&(original.painted->has_physical_emission()||detail::hdr_emission(original.material.emissive)||(original.material_bindings&&detail::physical_emission(*original.material_bindings)))){auto maps=std::make_shared<TextureMaps>(*surface.textures);maps->overlay=detail::PaintOverlayFactory::capture(*original.painted,cancelled);surface.textures=std::move(maps);}}return surfaces;
 }
 }

@@ -4,6 +4,8 @@
 #include "dome/bake-recipe.hpp"
 #include "dome/native-scene-append.hpp"
 #include "dome/native-authoring.hpp"
+#include "dome/emission-native.hpp"
+#include "humanoid-sha256.hpp"
 #include "dome/normal-preparation.hpp"
 #include "dome/gltf-export.hpp"
 #include "dome/projection.hpp"
@@ -103,7 +105,7 @@ uint32_t index_at(const detail::GltfDocument&d,int index,size_t n){const auto&a=
 Vec3 vector(const std::vector<float>&v){return {v.at(0),v.at(1),v.at(2)};}
 Vec3 unit(AffineVector v){return normalized(Vec3{float(v[0]),float(v[1]),float(v[2])});}
 Image texture_image(const detail::GltfDocument&d,const nlohmann::json&info){const auto&texture=d.json.at("textures").at(info.at("index").get<size_t>());const auto&image=d.json.at("images").at(texture.at("source").get<size_t>());const auto&view=d.json.at("bufferViews").at(image.at("bufferView").get<size_t>());const auto offset=view.value("byteOffset",size_t(0)),count=view.at("byteLength").get<size_t>();check(offset<=d.binary.size()&&count<=d.binary.size()-offset,"Actual material PNG lies within the emitted buffer");return decode_projection_png(std::span(d.binary).subspan(offset,count));}
-void retained_hdr_editable(){
+void retained_hdr_export(bool standard){
  auto scene=source(true,false);
  const auto object=scene.active().id;
  for(TextureSetId set:{0u,1u})check(edit_texture_set(scene,object,set,[&](PaintedMesh &paint,Material &material){
@@ -118,11 +120,11 @@ void retained_hdr_editable(){
  const auto exact=scene.encode();
  Document doc;
  doc.replace(scene);ready(doc);
- const std::filesystem::path file="editable-retained-hdr.glb";
- doc.export_asset(file,AssetExportFormat::EditableGlb512).get();
+ const std::filesystem::path file=standard?"standard-retained-hdr.glb":"editable-retained-hdr.glb";
+ doc.export_asset(file,standard?AssetExportFormat::Glb:AssetExportFormat::EditableGlb512).get();
  std::ifstream stream(file,std::ios::binary);
  const std::vector<uint8_t> bytes{std::istreambuf_iterator<char>(stream),{}};
- const auto restored=extract_native_authoring(bytes);
+ const auto restored=standard?extract_native_emission(bytes):extract_native_authoring(bytes);
  check(restored&&restored->encode()==exact&&doc.copy_scene().encode()==exact,
        "The actual export preserves every native retained HDR field and its membership");
  const auto json_length=word(bytes,12);
@@ -156,7 +158,43 @@ void retained_hdr_editable(){
    check(image.width==64&&image.height==64&&peak==255&&m.at("emissiveFactor").at(set)==1&&
          strength>(set?5.f:2.f),"Independent decoded PNG and strength keep the field's above-one dominant radiance");
  }
- std::cout<<"RETAINED_EDITABLE_HDR "<<bytes.size()<<" container bytes; native source exact\n";
+ if(standard){
+   const auto &package=parsed.json.at("extras").at("domeSculptEmission");
+   check(package.at("version")==6&&package.at("images").size()==2,
+       "Standard HDR has a separate exact FLOAT resource per visible texture set");
+   for(TextureSetId set:{0u,1u}){
+     const auto &record=package.at("images").at(set);
+     const auto &view=parsed.json.at("bufferViews").at(record.at("bufferView").get<size_t>());
+     const auto raw=std::span(parsed.binary).subspan(view.at("byteOffset").get<size_t>(),
+         view.at("byteLength").get<size_t>());
+     const auto field=decode_emission_exr(raw);
+     check(record.at("textureSet").at("id")==set&&field.width==64&&field.version==2,
+         "The independent OpenEXR resource carries its actual member and full FLOAT grid");
+   }
+   auto bad_package=[&](const char *name,const char *expected,const auto &alter){
+     auto damaged=parsed;
+     auto &marker=damaged.json["extras"]["domeSculptEmission"];
+     alter(marker["images"]);
+     marker.erase("documentSha256");
+     marker["documentSha256"]=creator_detail::sha256(nlohmann::json::to_cbor(damaged.json));
+     detail::write_glb(std::move(damaged),name);
+     std::ifstream file(name,std::ios::binary);
+     const std::vector<uint8_t> damaged_bytes{std::istreambuf_iterator<char>(file),{}};
+     std::string refusal;
+     try{(void)extract_native_emission(damaged_bytes);}
+     catch(const std::invalid_argument &e){refusal=e.what();}
+     check(refusal.find(expected)!=std::string::npos,"Edited package cannot borrow per-field native authority");
+     std::cout<<"EXPECTED "<<refusal<<'\n';
+   };
+   bad_package("wrong-paint-coordinate.glb","differs from its emitted primitive or coordinate",[](auto &images){images[0]["textureSet"]["texCoord"]=0;});
+   bad_package("swapped-emission-fields.glb","FLOAT coefficients differ",[](auto &images){
+     std::swap(images[0]["bufferView"],images[1]["bufferView"]);
+     std::swap(images[0]["sha256"],images[1]["sha256"]);
+   });
+   bad_package("omitted-hdr-member.glb","omitted a visible physical material",[](auto &images){images.erase(1);});
+ }
+ std::cout<<"RETAINED_HDR "<<(standard?"Standard":"Editable")<<" "<<bytes.size()
+          <<" container bytes; native source exact\n";
 }
 void audit_normals(const detail::GltfDocument &output,const ObjectSurface &surface,float tolerance){
  float maximum=0;
@@ -890,10 +928,11 @@ int main(int argc,char **argv)try {
   std::cout<<"PASS "<<checks<<" native-normal retained target checks\n";
   return 0;
  }
- if(argc==3&&mode=="--retained-hdr-editable"){
+ if(argc==3&&(mode=="--retained-hdr-editable"||mode=="--retained-hdr-standard")){
   std::filesystem::create_directories(argv[2]);std::filesystem::current_path(argv[2]);
-  retained_hdr_editable();
-  std::cout<<"PASS "<<checks<<" retained Editable HDR controls\n";
+  const bool standard=mode=="--retained-hdr-standard";
+  retained_hdr_export(standard);
+  std::cout<<"PASS "<<checks<<" retained "<<(standard?"Standard":"Editable")<<" HDR controls\n";
   return 0;
  }
  if(argc==3&&mode=="--retained-bake-target"){
