@@ -47,9 +47,11 @@ The prior-authored stress fixture
 moves the head joint5m, so its cropped screenshot does not establish ordinary
 default-base presentation quality. A separate ordinary creation used the real
 initial XR canvas placement and found that 80.85% of evaluated vertices fit
-the synthetic vertical view. Check framing in a rendered ordinary workflow
-before changing default placement. Read
-[the geometry observation](DEFAULT-CREATOR-FRAMING-GEOMETRY-20261126.md).
+the synthetic vertical view. A normal rendered reopen confirmed cropping at
+the head, hands and feet while preserving all native bytes. Keep that case
+separate from the authored stress fixture when testing an initial view fit.
+Read [the rendered observation](DEFAULT-CREATOR-RENDERED9E4-20261126.md)
+and [the geometry observation](DEFAULT-CREATOR-FRAMING-GEOMETRY-20261126.md).
 
 The HDR2048 path first reached a 128 MiB paint-channel allocation refusal
 after the provenance fix. The isolated worker avoids the discarded 112 MiB
@@ -101,17 +103,23 @@ retains recipes in the texture-set archive. Its Release cohort passes 111,306
 checks, including the full 2048 and 512 inputs, export and historical replay.
 Read [HDR source closure](HDR-SOURCE-CLOSURE-RELEASE-20261126.md) for the
 component, source-projection fixture and independent exporter evidence.
+The [strict HDR receipt](HDR-SOURCE-CLOSURE-STRICT-20261126.md) preserves
+63,897 passing checks and the original full 2048 deadline. The full strict
+case completed its first native Bake and Save, then exceeded 900 seconds
+during the dense numerical oracle. The remaining original endpoint checks
+need separate verification.
 The new combined candidate `9e4f79f6` builds all 294 selected actions with
 261 complete translation units, 14 verified archives and 16 outputs. The
 eight native HDR and recipe tests passed in 229.77 seconds, including full
 2048, export and historical replay. Read the
 [combined native and loader receipt](validation/combined-native-and-open-20261126.json).
 Whole Release build `c26a8573` includes the corrected projection fixture and
-uses identical product source. The current build plan covers all default
-targets and both independent sculpt fixtures. Check
-`ds-production-full-regression-release-20261126.service` and
-`artifacts/production-full-regression-release-20261126/build-status.json`
-for its actual result. The exact combined candidate now passes all 14 native
+uses identical product source. It passed all 1,802 actions in 1,818.85
+seconds, including both separately requested sculpt fixtures. Its full
+1,349-test CTest suite is running in a private software-only environment.
+Check `ds-production-full-private-ctest-20261126.service` and
+`artifacts/production-full-regression-release-20261126/full-private-ctest/status.json`.
+The exact `9e4f79f6` combined candidate passes all 14 native
 Wayland assertions and clean private teardown on Arc. The original wrapper
 refused a deleted non-executable Mesa
 shared mapping belonging to the compositor because private cleanup removed
@@ -166,15 +174,42 @@ checks in 94.41 seconds at 3,553,742,848 bytes peak owned RSS, within the origin
 4 GiB limit. The earlier default-allocator failure with bounded Open alone
 remains in the original receipt. Read
 [the one-volume Save validation](validation/native-save-one-volume-20261126.json).
-The full-App build and matched sanitizer verification are separate.
-The source is pushed on `work/serialize-sculpt-objects-20261126`.
+The full-App build completes all 40 additional actions. The exact App passes
+[14 native Wayland checks](COMBINED07025-NATIVE-WAYLAND-20261126.md) and
+[58 public creator synthetic OpenXR checks](COMBINED07025-PUBLIC-XR-20261126.md),
+including three fresh ordinary reopens, with all complete wrappers exiting
+successfully. The 12 native HDR and creator CTests also pass, including the
+complete 2048 Bake and historical replay. The native file, recovery and
+atomic-write sanitizer cases pass. The full strict sculpt workflow runs
+separately. The source is pushed on `work/serialize-sculpt-objects-20261126`.
+
+The corrected projection fixture `2472718c` passes 11 checks against the
+same Save-qualified product core. The original fixture refuses an input
+that omitted its authored normal frame. The broad regression exposed a
+separate assertion in the layered-normal case that expected a genuine
+prepared source to be refused. Fixture `c0a67586` verifies Bake success,
+exact source preservation and native round trip, plus refusal when the
+field's owner is removed. The corrected fixture and its seven dependent
+cases pass. Product sources are unchanged in these fixture commits. Read
+[the build and fixture receipt](validation/production-bounded-project-integration-20261126.json).
 
 The original independent Arc sculpt run reached 300 strokes, 120 masks and
 2,000 stereo pairs in its first repetition, including 13 independent exact
 checkpoints. It then failed while charging new representative index paths
 against its internal working quota. The first repetition did not finish all
 post-edit checks. The original cap stays in force while live persistent index
-and scratch ownership are investigated.
+and scratch ownership are investigated. Candidate `8c3b9aea` credits only
+actual retirement of newly allocated persistent index nodes and retains the
+original source and live scratch charges. It passes the 26 surface and 92
+pipeline checks in Release and strict builds, including exact and one-byte
+tight working limits. Full native Release passes 167 checks on the sculpt
+component. The original Arc workload and strict sculpt are running on that
+component. Integrated candidate `ec578e56` combines it with the Save-qualified
+App and both fixture repairs. The integrated Release build completed seven
+whole translation units and five links. Its core archive retains 194 exact
+prior payloads and replaces the three translation units that include the
+changed index header. The integrated default-allocator sculpt regression is
+running separately from the component's sustained Arc run.
 Full scope in REQUIREMENTS is unchanged.
 
 ## Source and integration boundary

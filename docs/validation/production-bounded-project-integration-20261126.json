@@ -1,0 +1,604 @@
+{
+  "scope": "Fresh 1802-action predecessor Release build; exact 07025 full App and HDR/creator native12; standalone differential fixture qualification and original broad failure. Ongoing all-suite status is separate.",
+  "predecessor_full_build": {
+    "source": "c26a8573f467afef4966069ca3e58cde674b1f68",
+    "source_tree": "/home/blux/de-xr/dome-sculpt/artifacts/production-full-regression-source-20261126",
+    "cwd": "/home/blux/de-xr/dome-sculpt/artifacts/production-full-regression-release-20261126",
+    "command": [
+      "/usr/bin/ninja",
+      "-d",
+      "keepdepfile",
+      "-d",
+      "keeprsp",
+      "-j6",
+      "-v",
+      "all",
+      "dome-sculpt-sculpt-independent-workflow",
+      "dome-sculpt-sculpt-sustained"
+    ],
+    "terminal": true,
+    "started": 1795662773.1372552,
+    "exit": 0,
+    "seconds": 1818.849472284317
+  },
+  "app": {
+    "source": "07025cd3995626bd32a9d0a848a2564965583ada",
+    "command": [
+      "/usr/bin/ninja",
+      "-d",
+      "keepdepfile",
+      "-d",
+      "keeprsp",
+      "-v",
+      "-j3",
+      "dome-sculpt"
+    ],
+    "started": 1795664189.2356713,
+    "terminal": true,
+    "exit": 0,
+    "seconds": 74.84826731681824
+  },
+  "app_sha256": "ad24e8d91fc977e070e151c844422cb50755c4731d5f829d3431a9e23f98b32d",
+  "current_native": {
+    "source": "07025cd3995626bd32a9d0a848a2564965583ada",
+    "terminal": true,
+    "build": {
+      "argv": [
+        "/usr/bin/ninja",
+        "-d",
+        "keepdepfile",
+        "-d",
+        "keeprsp",
+        "-v",
+        "-j3",
+        "dome-sculpt-source-joint-writable-normal-bake-test",
+        "dome-sculpt-source-owning-hdr-domain-test",
+        "dome-sculpt-source-owning-hdr-export-test",
+        "dome-sculpt-source-hdr-provenance-closure-test",
+        "dome-sculpt-source-retained-emission-worker-test",
+        "dome-sculpt-texture-set-bake-recipe-test",
+        "dome-sculpt-creator-workspace-test",
+        "dome-sculpt-creator-vrm-test",
+        "dome-sculpt-creator-archive-test"
+      ],
+      "exit": 0,
+      "seconds": 49.06175418803468
+    },
+    "ctest": {
+      "argv": [
+        "ctest",
+        "-j1",
+        "--output-on-failure",
+        "--output-junit",
+        "regression.xml",
+        "-R",
+        "^(source-(hdr-provenance-closure|retained-emission-worker|owning-hdr-(domain|export))|texture-set-bake-recipe|creator-(controls-output|workspace|shaped-vrm|archive))$"
+      ],
+      "exit": 0,
+      "seconds": 578.8416195060126,
+      "junit": {
+        "name": "(empty)",
+        "tests": "12",
+        "failures": "0",
+        "disabled": "0",
+        "skipped": "0",
+        "hostname": "",
+        "time": "578",
+        "timestamp": "2026-11-26T04:41:30"
+      },
+      "cases": [
+        {
+          "name": "source-joint-writable-normal-bake",
+          "classname": "source-joint-writable-normal-bake",
+          "time": "22.794",
+          "status": "run"
+        },
+        {
+          "name": "source-owning-hdr-domain",
+          "classname": "source-owning-hdr-domain",
+          "time": "27.927",
+          "status": "run"
+        },
+        {
+          "name": "texture-set-bake-recipe",
+          "classname": "texture-set-bake-recipe",
+          "time": "0.0900542",
+          "status": "run"
+        },
+        {
+          "name": "source-retained-emission-worker",
+          "classname": "source-retained-emission-worker",
+          "time": "2.84745",
+          "status": "run"
+        },
+        {
+          "name": "source-hdr-provenance-closure-seed",
+          "classname": "source-hdr-provenance-closure-seed",
+          "time": "244.898",
+          "status": "run"
+        },
+        {
+          "name": "source-hdr-legacy-context-setup",
+          "classname": "source-hdr-legacy-context-setup",
+          "time": "0.0623046",
+          "status": "run"
+        },
+        {
+          "name": "source-hdr-provenance-closure",
+          "classname": "source-hdr-provenance-closure",
+          "time": "2.71823",
+          "status": "run"
+        },
+        {
+          "name": "source-owning-hdr-export",
+          "classname": "source-owning-hdr-export",
+          "time": "18.4726",
+          "status": "run"
+        },
+        {
+          "name": "creator-archive",
+          "classname": "creator-archive",
+          "time": "0.899209",
+          "status": "run"
+        },
+        {
+          "name": "creator-controls-output",
+          "classname": "creator-controls-output",
+          "time": "101.11",
+          "status": "run"
+        },
+        {
+          "name": "creator-workspace",
+          "classname": "creator-workspace",
+          "time": "8.04031",
+          "status": "run"
+        },
+        {
+          "name": "creator-shaped-vrm",
+          "classname": "creator-shaped-vrm",
+          "time": "148.928",
+          "status": "run"
+        }
+      ]
+    },
+    "app_sha256": "ad24e8d91fc977e070e151c844422cb50755c4731d5f829d3431a9e23f98b32d",
+    "exit": 0
+  },
+  "projection": {
+    "product_source": "07025cd3995626bd32a9d0a848a2564965583ada",
+    "combined_fixture_source": "2472718c898a300929240934fedbfe102b84a519",
+    "core_sha256": "afdf79d2eb081409928b31ef76010191423376f3d44855ee02127b9c2a5b7782",
+    "cases": {
+      "original": {
+        "source_sha256": "3dd403a4e98c2de7db807d900c9ec40ba689b9356ab430fe4e67e1892a5afb6c",
+        "compile": [
+          "/usr/bin/c++",
+          "-MD",
+          "-MF",
+          "/home/blux/de-xr/dome-sculpt/artifacts/production-bounded-project-projection-20261126/original/normal-projection-sharing.cpp.o.d",
+          "-MT",
+          "/home/blux/de-xr/dome-sculpt/artifacts/production-bounded-project-projection-20261126/original/normal-projection-sharing.cpp.o",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/serialize-sculpt-objects-source-20261126/src",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/serialize-sculpt-objects-source-20261126/include",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/serialize-sculpt-objects-source-20261126/third_party/openbrush",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/serialize-sculpt-objects-source-20261126/third_party/nlohmann",
+          "-O3",
+          "-DNDEBUG",
+          "-std=gnu++20",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/production-bounded-project-projection-20261126/original/normal-projection-sharing.cpp.o",
+          "-c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/serialize-sculpt-objects-source-20261126/tests/normal-projection-sharing.cpp"
+        ],
+        "link": [
+          "/usr/bin/c++",
+          "-O3",
+          "-DNDEBUG",
+          "-Wl,--dependency-file=/home/blux/de-xr/dome-sculpt/artifacts/production-bounded-project-projection-20261126/original/link.d",
+          "/home/blux/de-xr/dome-sculpt/artifacts/production-bounded-project-projection-20261126/original/normal-projection-sharing.cpp.o",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/production-bounded-project-projection-20261126/original/dome-sculpt-normal-projection-sharing-test",
+          "libdome-sculpt-core.a",
+          "libdome-sculpt-paint-gpu.a",
+          "libdome-sculpt-native-graphics.a",
+          "/usr/lib64/libOpenGL.so",
+          "/usr/lib64/libEGL.so",
+          "libdome-sculpt-affine.a",
+          "/usr/lib64/liblapacke.so",
+          "libdome-sculpt-polygon.a",
+          "libxatlas.a",
+          "libmikktspace.a",
+          "libmikktspace-robust.a",
+          "libufbx.a",
+          "/usr/lib64/libpng.so",
+          "/usr/lib64/libjpeg.so",
+          "/usr/lib64/libz.so",
+          "libdome-sculpt-emission-codec.a",
+          "libdome-sculpt-baked-emission.a",
+          "/usr/lib64/libOpenEXR-3_2.so",
+          "/usr/lib64/libOpenEXRUtil-3_2.so",
+          "/usr/lib64/libOpenEXRCore-3_2.so",
+          "/usr/lib64/libIex-3_2.so",
+          "/usr/lib64/libIlmThread-3_2.so",
+          "/usr/lib64/libImath-3_1.so",
+          "-lgcc_s_asneeded",
+          "-lgcc_s_asneeded"
+        ],
+        "exit": 1,
+        "checks": [],
+        "seconds": 0.030995739973150194,
+        "exe_sha256": "f49c4c96c052e9e95daeab419c6d99397c396621c3758ae7e3e5d0d70d2acd7e"
+      },
+      "corrected": {
+        "source_sha256": "f83cc169fa776a11c6c3cae51792799d9a1f703b327672d424b2d59cb709a18e",
+        "compile": [
+          "/usr/bin/c++",
+          "-MD",
+          "-MF",
+          "/home/blux/de-xr/dome-sculpt/artifacts/production-bounded-project-projection-20261126/corrected/normal-projection-sharing.cpp.o.d",
+          "-MT",
+          "/home/blux/de-xr/dome-sculpt/artifacts/production-bounded-project-projection-20261126/corrected/normal-projection-sharing.cpp.o",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/serialize-sculpt-objects-source-20261126/src",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/serialize-sculpt-objects-source-20261126/include",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/serialize-sculpt-objects-source-20261126/third_party/openbrush",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/serialize-sculpt-objects-source-20261126/third_party/nlohmann",
+          "-O3",
+          "-DNDEBUG",
+          "-std=gnu++20",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/production-bounded-project-projection-20261126/corrected/normal-projection-sharing.cpp.o",
+          "-c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/production-bounded-project-source-20261126/tests/normal-projection-sharing.cpp"
+        ],
+        "link": [
+          "/usr/bin/c++",
+          "-O3",
+          "-DNDEBUG",
+          "-Wl,--dependency-file=/home/blux/de-xr/dome-sculpt/artifacts/production-bounded-project-projection-20261126/corrected/link.d",
+          "/home/blux/de-xr/dome-sculpt/artifacts/production-bounded-project-projection-20261126/corrected/normal-projection-sharing.cpp.o",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/production-bounded-project-projection-20261126/corrected/dome-sculpt-normal-projection-sharing-test",
+          "libdome-sculpt-core.a",
+          "libdome-sculpt-paint-gpu.a",
+          "libdome-sculpt-native-graphics.a",
+          "/usr/lib64/libOpenGL.so",
+          "/usr/lib64/libEGL.so",
+          "libdome-sculpt-affine.a",
+          "/usr/lib64/liblapacke.so",
+          "libdome-sculpt-polygon.a",
+          "libxatlas.a",
+          "libmikktspace.a",
+          "libmikktspace-robust.a",
+          "libufbx.a",
+          "/usr/lib64/libpng.so",
+          "/usr/lib64/libjpeg.so",
+          "/usr/lib64/libz.so",
+          "libdome-sculpt-emission-codec.a",
+          "libdome-sculpt-baked-emission.a",
+          "/usr/lib64/libOpenEXR-3_2.so",
+          "/usr/lib64/libOpenEXRUtil-3_2.so",
+          "/usr/lib64/libOpenEXRCore-3_2.so",
+          "/usr/lib64/libIex-3_2.so",
+          "/usr/lib64/libIlmThread-3_2.so",
+          "/usr/lib64/libImath-3_1.so",
+          "-lgcc_s_asneeded",
+          "-lgcc_s_asneeded"
+        ],
+        "exit": 0,
+        "checks": [
+          "11"
+        ],
+        "seconds": 0.030433480977080762,
+        "exe_sha256": "d1a934bbb0a0ba91ec3406ca5c5e9cfbe46f4a9e14b39d1968fe421d0907d7e8"
+      }
+    },
+    "terminal": true,
+    "exit": 0
+  },
+  "layered_native": {
+    "fixture_source": "c0a67586",
+    "product_source": "07025cd3",
+    "diagnostic_baseline_product_source": "c26a8573",
+    "refusal_owner_guard_added": true,
+    "positive_source_and_project_roundtrip_checks_added": true,
+    "dependent_cohort": {
+      "fixture_source": "c0a67586",
+      "production_source": "07025cd3",
+      "terminal": true,
+      "build": {
+        "command": [
+          "/usr/bin/ninja",
+          "-j3",
+          "-d",
+          "keepdepfile",
+          "-d",
+          "keeprsp",
+          "-v",
+          "dome-sculpt-canonical-native-pose-test",
+          "dome-sculpt-canonical-normal-uv-test",
+          "dome-sculpt-layered-normal-uv-safety-test",
+          "dome-sculpt-layered-normal-uv-native-test",
+          "dome-sculpt-layered-normal-render-test",
+          "dome-sculpt-authoring-native-normal-union-test",
+          "dome-sculpt-native-paint32-export-test"
+        ],
+        "seconds": 49.92716659500729,
+        "exit": 0
+      },
+      "ctest": {
+        "command": [
+          "/usr/bin/bwrap",
+          "--die-with-parent",
+          "--unshare-all",
+          "--ro-bind",
+          "/",
+          "/",
+          "--bind",
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-authority-release-20261126/dependents",
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-authority-release-20261126/dependents",
+          "--dev",
+          "/dev",
+          "--proc",
+          "/proc",
+          "--tmpfs",
+          "/run/user",
+          "--tmpfs",
+          "/tmp",
+          "--clearenv",
+          "--setenv",
+          "PATH",
+          "/usr/bin:/bin",
+          "--setenv",
+          "LIBGL_ALWAYS_SOFTWARE",
+          "1",
+          "--setenv",
+          "LP_NUM_THREADS",
+          "2",
+          "--setenv",
+          "EGL_PLATFORM",
+          "surfaceless",
+          "--setenv",
+          "LD_LIBRARY_PATH",
+          "/opt/fltk-vr/toolkit/lib:/opt/fltk-vr/bdf-runtime/lib:/usr/lib64",
+          "/usr/bin/ctest",
+          "-j1",
+          "--test-dir",
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-authority-release-20261126/dependents",
+          "--output-on-failure",
+          "--output-junit",
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-authority-release-20261126/dependents/dependent.xml",
+          "-R",
+          "^(canonical-(native-pose|normal-uv)|layered-normal-(uv-native|uv-safety|render)|authoring-native-normal-union|native-paint32-fixture)$"
+        ],
+        "seconds": 7.717731847078539,
+        "exit": 0
+      },
+      "junit": {
+        "name": "(empty)",
+        "tests": "8",
+        "failures": "0",
+        "disabled": "0",
+        "skipped": "0",
+        "hostname": "",
+        "time": "7",
+        "timestamp": "2026-11-26T04:52:12"
+      },
+      "exit": 0
+    }
+  },
+  "authorities": {
+    "production-full-regression-release-20261126/build-plan.json": {
+      "bytes": 466,
+      "sha256": "ad6a394660aa072b2ed62b856c35808175fb503a84dcbc99db53af6bf76cc1e8"
+    },
+    "production-full-regression-release-20261126/build-status.json": {
+      "bytes": 563,
+      "sha256": "c3bc20fde41f7289b26a461b23f46b4290ef3f98d325dda402e1c59cd021502a"
+    },
+    "production-full-regression-release-20261126/build.log": {
+      "bytes": 2289404,
+      "sha256": "019e7c5c5638cf16c09b2f5b50d47a27e73adecba84ea40c16a74a7fa2d15c87"
+    },
+    "production-full-regression-release-20261126/CMakeCache.txt": {
+      "bytes": 57060,
+      "sha256": "9c985b06a6a4d9b959a7566594bc5383ea25ea8ab1c30f05d331a33badb4e8ce"
+    },
+    "production-full-regression-release-20261126/compile_commands.json": {
+      "bytes": 1340375,
+      "sha256": "c04a49eec9bfadb51fd096c8c1ea3de3bd13eadae11a2cff206ad69a4a32549c"
+    },
+    "production-full-regression-release-20261126/CTestTestfile.cmake": {
+      "bytes": 952349,
+      "sha256": "b8cd73cefa8a7ede5056d25cbea9c85c80d34804ed803e8416fd8586b0edb181"
+    },
+    "serialize-sculpt-objects-release-20261126/app-build-status.json": {
+      "bytes": 291,
+      "sha256": "3ce368d9472482ce0b4489cee119b09aac556f53a8295809c9230d95be624fee"
+    },
+    "serialize-sculpt-objects-release-20261126/app-build.log": {
+      "bytes": 45383,
+      "sha256": "6d3b247938b0fa0621dd2cb78dd9247ae2abd7a939e83cd94df1eaa1b9285e17"
+    },
+    "serialize-sculpt-objects-release-20261126/CMakeFiles/dome-sculpt.dir/link.d": {
+      "bytes": 13095,
+      "sha256": "f709f3000d014c124577a9151d29486d185d85514290ace31c9a8db3c6b1e5ca"
+    },
+    "serialize-sculpt-objects-release-20261126/CMakeCache.txt": {
+      "bytes": 57048,
+      "sha256": "133075583aedbb872aec5befb3ea29f8e1f4f47fd7a5cfa0a9a79fc4d3a31cca"
+    },
+    "serialize-sculpt-objects-release-20261126/regression-hdr-creator/run.py": {
+      "bytes": 2706,
+      "sha256": "29b9db216edf71948aa8135138df79331281292f6cd272a24992f47f49bfaa00"
+    },
+    "serialize-sculpt-objects-release-20261126/regression-hdr-creator/status.json": {
+      "bytes": 3405,
+      "sha256": "f90c154dd5501980797e2fa8a59f82ecb4acf686dd2922cce447c336d0ccc8a9"
+    },
+    "serialize-sculpt-objects-release-20261126/regression-hdr-creator/build.log": {
+      "bytes": 13959,
+      "sha256": "e852c37da4e96e326a0d050f63d4bd8152390220a9f65144ca1a637088bc854b"
+    },
+    "serialize-sculpt-objects-release-20261126/regression-hdr-creator/ctest.log": {
+      "bytes": 1665,
+      "sha256": "a8a94a26d9a56cc602472000e245d982cca9517912320e6abf4ea2f301084f68"
+    },
+    "serialize-sculpt-objects-release-20261126/regression-hdr-creator/regression.xml": {
+      "bytes": 11065,
+      "sha256": "5edd2b041c3b23053fdb0805f10d725a777dbbe18d7d13b2d52e5d5dfe6f55cc"
+    },
+    "serialize-sculpt-objects-release-20261126/regression-hdr-creator/Testing/Temporary/LastTest.log": {
+      "bytes": 102322,
+      "sha256": "b8f00cb52800fc741d8e1bb45375853f684019e69b1ba06979157965b470b168"
+    },
+    "production-bounded-project-projection-20261126/run.py": {
+      "bytes": 3635,
+      "sha256": "e9eeb0ca2700885db90cfe2a22b21c5173458843326139ca1f206b5c2b64fa62"
+    },
+    "production-bounded-project-projection-20261126/seal.py": {
+      "bytes": 5596,
+      "sha256": "fb5f8779bbeb334f035bb1fe433eabe73cbb365f9bbed94b94130fd1eb663c12"
+    },
+    "production-bounded-project-projection-20261126/status.json": {
+      "bytes": 5956,
+      "sha256": "41c344ba66e401b485a98ab8992c3ea958351037e02695fa80e58eef4f8fb262"
+    },
+    "production-bounded-project-projection-20261126/broad-original-layered-failure.log": {
+      "bytes": 6191,
+      "sha256": "c6c90fe2942ea80292219634f3f1abee517afddf498f0efd4647571d38b41b36"
+    },
+    "production-bounded-project-projection-20261126/original/build.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "production-bounded-project-projection-20261126/original/product.log": {
+      "bytes": 93,
+      "sha256": "7040477fa41d88c8d8073c11c6f82ee574c67324ce3267ea5f7675fefbc2d711"
+    },
+    "production-bounded-project-projection-20261126/original/normal-projection-sharing.cpp.o.d": {
+      "bytes": 16900,
+      "sha256": "e1dcc541ff559672866de3535adbed31f11d34f92d2346103daf5229cd0844e8"
+    },
+    "production-bounded-project-projection-20261126/original/link.d": {
+      "bytes": 7305,
+      "sha256": "1d6ee1067a4f8c97b7e28ead4654b5b5afa952429d568abbcb3d078c070af48e"
+    },
+    "production-bounded-project-projection-20261126/corrected/build.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "production-bounded-project-projection-20261126/corrected/product.log": {
+      "bytes": 43,
+      "sha256": "7147856da056769aa4db632937b88eb93744d82a586e884698c702286b32b949"
+    },
+    "production-bounded-project-projection-20261126/corrected/normal-projection-sharing.cpp.o.d": {
+      "bytes": 16903,
+      "sha256": "349ff5786a8f579bfd813479316b50da9b410312a391f77d076a238c5e54036c"
+    },
+    "production-bounded-project-projection-20261126/corrected/link.d": {
+      "bytes": 7308,
+      "sha256": "580bb0f718a67d2379d3afe23b412f50a27c38b4f62fc1b712d12a25542be5e9"
+    },
+    "layered-normal-native-diagnostic-20261126/plan.json": {
+      "bytes": 3806,
+      "sha256": "1165b520812bd57bbb92edd0c4f8c3d1e2448dd3e1a3cfd0a33839ed189ac8f8"
+    },
+    "layered-normal-native-diagnostic-20261126/result.json": {
+      "bytes": 1122,
+      "sha256": "b301d1098bd72daaf3306584365ee3f7366a5b8bfca4bbafadcd1785d5b86ab8"
+    },
+    "layered-normal-native-diagnostic-20261126/product.log": {
+      "bytes": 6192,
+      "sha256": "e6b648434d0e0f23b8bced90240837a71cf8b19a6ccc6ebd5b9142b87936b87d"
+    },
+    "layered-normal-native-diagnostic-20261126/layered-normal-native.cpp.o.d": {
+      "bytes": 22972,
+      "sha256": "66866be7547fd56d8b844999dfe6ad16dfe7dc54c3831b05aa69e44297c30806"
+    },
+    "layered-normal-native-diagnostic-20261126/link.d": {
+      "bytes": 8513,
+      "sha256": "78f8f6699d51ede830d0b8b9a61d254ab1b1bfdf7a5cf620857ddd3c425c52d1"
+    },
+    "layered-normal-authority-release-20261126/plan.json": {
+      "bytes": 3815,
+      "sha256": "62f2f9bbc17ae427a5953c5f42477c556bf8db2090f589172818da2618a41800"
+    },
+    "layered-normal-authority-release-20261126/result.json": {
+      "bytes": 1120,
+      "sha256": "f3d0517b316a4977403439fbb95b385c2409d76f5f1a7fd0b57b3a7ea8a7446b"
+    },
+    "layered-normal-authority-release-20261126/product.log": {
+      "bytes": 6391,
+      "sha256": "0f4d217ce9f5ea52fa222bf4d870eeee539f371e7e7db34823f65fc0cd455864"
+    },
+    "layered-normal-authority-release-20261126/layered-normal-native.cpp.o.d": {
+      "bytes": 22831,
+      "sha256": "359afdfccf3925cb4edb64223a71ca4d3e000c684cce7465f20964e2f308083a"
+    },
+    "layered-normal-authority-release-20261126/link.d": {
+      "bytes": 8513,
+      "sha256": "104836d8650913b17188ea0b172ca75aa55af1d686cc61e59a13d5f0c21886af"
+    },
+    "layered-normal-authority-release-20261126/dependents/run.py": {
+      "bytes": 3133,
+      "sha256": "cb720f87913e516ebf3f5c9205543ea0fb03b9d641add7a3a1e059eb8e623887"
+    },
+    "layered-normal-authority-release-20261126/dependents/status.json": {
+      "bytes": 2245,
+      "sha256": "d01b4b0466b73d266e15bad9a75b202685709e070084cb3296bc98dc77145974"
+    },
+    "layered-normal-authority-release-20261126/dependents/build.log": {
+      "bytes": 14872,
+      "sha256": "08ba04a7619a6a089581b43b2d8d7c3cda374dbcfa5b47bcd4818652e99ba3f8"
+    },
+    "layered-normal-authority-release-20261126/dependents/ctest.log": {
+      "bytes": 1063,
+      "sha256": "065b3530d882d5fc55e5a9ec59273b51a1acb8bb81808308034f7fadd93ce03d"
+    },
+    "layered-normal-authority-release-20261126/dependents/dependent.xml": {
+      "bytes": 9735,
+      "sha256": "90d8b0f6a6291c63f6693b9bca815962de2bb8cb885a89c716c926af76804ebf"
+    },
+    "layered-normal-authority-release-20261126/dependents/CTestTestfile.cmake": {
+      "bytes": 941320,
+      "sha256": "17531aa8e673ae802cb93ac96f93eba7dd8f8d04aa4f3a4a6d935057b3720ff8"
+    },
+    "layered-normal-authority-release-20261126/dependents/Testing/Temporary/LastTest.log": {
+      "bytes": 81768,
+      "sha256": "230958a4868de4e62fac49784e46416382a2e63fec3fec3669e0e469d3d5f8e1"
+    },
+    "production-bounded-project-projection-20261126/current-app.journal.txt": {
+      "bytes": 981,
+      "sha256": "37de02ba54bc47caaa16a868fa7d0ac26d1c975444f364ac38b2e0c8fae4cb2c"
+    },
+    "production-bounded-project-projection-20261126/current-native.journal.txt": {
+      "bytes": 3067,
+      "sha256": "01648fccdc4e1c551117a911e4973e31bd441a38bb8f6b06e16bdd58d089af0c"
+    },
+    "production-bounded-project-projection-20261126/full-build.journal.txt": {
+      "bytes": 797,
+      "sha256": "7989175139304b0f0e0e2d9aed8779a3ecc387a85544675547136bc78cc75662"
+    },
+    "production-bounded-project-projection-20261126/layered-corrected.journal.txt": {
+      "bytes": 1011,
+      "sha256": "fb428e7dba7dd3ac19d30af6e03b0d16cc692700afa4ddcf962cd43799d35e9a"
+    },
+    "production-bounded-project-projection-20261126/layered-dependents.journal.txt": {
+      "bytes": 414,
+      "sha256": "d66145d3dbef80143676fd788ce7ecf9aa69d85e51081c2ede592e3972547887"
+    },
+    "production-bounded-project-projection-20261126/layered-original-diagnostic.journal.txt": {
+      "bytes": 728,
+      "sha256": "fce40de9da0fe4ce9651551b6af0a9be15d096be50a2365d6e34267633cd1bc1"
+    },
+    "production-bounded-project-projection-20261126/projection-fixture.journal.txt": {
+      "bytes": 657,
+      "sha256": "4f37ecf0964f7c83690eb3bb4eea488ea78476108bfe8f63147cb98f7f900e84"
+    }
+  },
+  "archive": {
+    "name": "production-bounded-project-integration-20261126.tar.xz",
+    "bytes": 183580,
+    "sha256": "a60f938680fb978ee98cc37951098854d7b48e8f03de3ef9646e6a57392d2114"
+  }
+}
