@@ -74,8 +74,17 @@ Together the 14 selected cases pass 265,267 checks. The
 [native receipt](validation/strict-native-runtime-11-20261126.json) and
 [graphics receipt](validation/strict-graphics-tail-20261126.json) retain
 the original invocations, results, terminal logs and live sanitizer witnesses.
-The original and texel-reuse variants of the independent full-resolution
-advanced-normal workflow are running separately under the original limits.
+The full-resolution advanced-normal baseline and experimental texel-reuse
+variant each reached the 900-second deadline after seven of 17 families.
+The [deadline receipt](validation/advanced-normal-full-deadline-20261126.json)
+includes phase timings. The expensive intervals are the full Bake and ordered
+Save, with runs overlapping other bounded CPU jobs. The texel-reuse change
+remains experimental. The same 17 families and all original common checks are
+running in six independently monitored groups on the unchanged strict core.
+Group source `60b403e0` retains the ordinary full-workflow entry point. The
+common group passed 87 checks, including historical load, cancellation and
+ordinary mapped input. The remaining groups use the same 900-second and
+3 GiB limits per process.
 The HDR877 isolated 2048 worker passes its 22 checks. The complete 2048 joint
 Bake reaches a further `Baked maps exceed paint storage budget` refusal.
 The isolated integration candidate
@@ -87,8 +96,10 @@ the application and 13 selected fixtures passed all 290 actions in
 `593996bfc65d47d0a641ffcb5e4769ef`. The combined application version check and
 659 native sculpt and creator checks pass. Sculpt passes with the matched
 allocator environment under its original 4 GiB limit. The build record links
-the first memory refusal and the runtime observer correction. Public Wayland
-and XR, and combined HDR runtime qualification, are pending. The branch is
+the first memory refusal and the runtime observer correction. The combined
+renderer passes 4,422 retained HDR checks each on software and Intel Arc with
+the corrected fixture. Public Wayland and XR, and full HDR 2048 Bake, are
+pending. The branch is
 `work/production-resume-integration-20261126`.
 Full scope in REQUIREMENTS is unchanged.
 

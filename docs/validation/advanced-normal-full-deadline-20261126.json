@@ -1,0 +1,214 @@
+{
+  "fixture": "91a90a67",
+  "scope": "Full original 2048 test and experimental texel-reuse variant. Overlapping bounded workloads. Timing disclosure only, no speed ratio. Both complete case suites remain required.",
+  "attempts": [
+    {
+      "label": "baseline",
+      "source": "05f5d1cc",
+      "exit": -15,
+      "seconds": 900.1813087463379,
+      "rss": 2662195200,
+      "last_phase": [
+        847.065,
+        295,
+        "Stale resolution authority cannot publish over the accepted selected map"
+      ],
+      "completed_families": [
+        "unbound-normalmap",
+        "mt1-rest-shared-raster",
+        "mt1-rest-shared-retained",
+        "mt1-rest-seam-raster",
+        "mt1-rest-seam-retained",
+        "mt1-posed-shared-raster",
+        "mt1-posed-shared-retained"
+      ],
+      "largest_observed_intervals": [
+        [
+          123.598,
+          266,
+          "Higher-resolution filtered Bake and ordered native Save succeed"
+        ],
+        [
+          105.79,
+          230,
+          "Higher-resolution filtered Bake and ordered native Save succeed"
+        ],
+        [
+          101.423,
+          164,
+          "Higher-resolution filtered Bake and ordered native Save succeed"
+        ],
+        [
+          99.554,
+          200,
+          "Higher-resolution filtered Bake and ordered native Save succeed"
+        ],
+        [
+          94.752,
+          134,
+          "Higher-resolution filtered Bake and ordered native Save succeed"
+        ],
+        [
+          91.815,
+          98,
+          "Higher-resolution filtered Bake and ordered native Save succeed"
+        ],
+        [
+          69.335,
+          50,
+          "Higher-resolution filtered Bake and ordered native Save succeed"
+        ],
+        [
+          25.55,
+          85,
+          "Cancellation after actual normal rasterization preserves exact selected grid, source and unpublished Bake"
+        ],
+        [
+          24.298,
+          86,
+          "Cancellation after actual normal rasterization preserves exact selected grid, source and unpublished Bake"
+        ],
+        [
+          23.354,
+          87,
+          "Cancellation after actual normal rasterization preserves exact selected grid, source and unpublished Bake"
+        ],
+        [
+          8.309,
+          284,
+          "Owned independent fresh-process native reopen completes successfully"
+        ],
+        [
+          7.165,
+          76,
+          "Owned independent fresh-process native reopen completes successfully"
+        ]
+      ],
+      "signals": [
+        {
+          "pgid": 3036446,
+          "witness": {
+            "pid": 3036446,
+            "start": 83838461,
+            "pgrp": 3036446,
+            "session": 3036446,
+            "ppid": 3036391,
+            "state": "R"
+          },
+          "signal": "SIGTERM",
+          "reason": "Owned command exceeded declared deadline",
+          "epoch": 1795661359.556029
+        }
+      ],
+      "sha256": "c5923fef45a22340cc36b45e8a5516f5d571cfda7b38a3df1591806a2a99c5bb",
+      "live_sanitizers": true
+    },
+    {
+      "label": "texel-reuse",
+      "source": "b0d5f69a",
+      "exit": -15,
+      "seconds": 900.123893737793,
+      "rss": 2550218752,
+      "last_phase": [
+        872.477,
+        295,
+        "Stale resolution authority cannot publish over the accepted selected map"
+      ],
+      "completed_families": [
+        "unbound-normalmap",
+        "mt1-rest-shared-raster",
+        "mt1-rest-shared-retained",
+        "mt1-rest-seam-raster",
+        "mt1-rest-seam-retained",
+        "mt1-posed-shared-raster",
+        "mt1-posed-shared-retained"
+      ],
+      "largest_observed_intervals": [
+        [
+          135.406,
+          266,
+          "Higher-resolution filtered Bake and ordered native Save succeed"
+        ],
+        [
+          114.954,
+          230,
+          "Higher-resolution filtered Bake and ordered native Save succeed"
+        ],
+        [
+          100.648,
+          164,
+          "Higher-resolution filtered Bake and ordered native Save succeed"
+        ],
+        [
+          99.993,
+          200,
+          "Higher-resolution filtered Bake and ordered native Save succeed"
+        ],
+        [
+          97.436,
+          134,
+          "Higher-resolution filtered Bake and ordered native Save succeed"
+        ],
+        [
+          96.374,
+          98,
+          "Higher-resolution filtered Bake and ordered native Save succeed"
+        ],
+        [
+          68.577,
+          50,
+          "Higher-resolution filtered Bake and ordered native Save succeed"
+        ],
+        [
+          23.692,
+          85,
+          "Cancellation after actual normal rasterization preserves exact selected grid, source and unpublished Bake"
+        ],
+        [
+          22.972,
+          87,
+          "Cancellation after actual normal rasterization preserves exact selected grid, source and unpublished Bake"
+        ],
+        [
+          22.45,
+          86,
+          "Cancellation after actual normal rasterization preserves exact selected grid, source and unpublished Bake"
+        ],
+        [
+          8.034,
+          248,
+          "Owned independent fresh-process native reopen completes successfully"
+        ],
+        [
+          7.96,
+          284,
+          "Owned independent fresh-process native reopen completes successfully"
+        ]
+      ],
+      "signals": [
+        {
+          "pgid": 3045907,
+          "witness": {
+            "pid": 3045907,
+            "start": 83845943,
+            "pgrp": 3045907,
+            "session": 3045907,
+            "ppid": 3045864,
+            "state": "R"
+          },
+          "signal": "SIGTERM",
+          "reason": "Owned command exceeded declared deadline",
+          "epoch": 1795661434.3826458
+        }
+      ],
+      "sha256": "002d3b667c111c603b5d06bddca8c91cb028308b9d4a7f509adf1ce920786608",
+      "live_sanitizers": true
+    }
+  ],
+  "archive": {
+    "path": "docs/validation/advanced-normal-full-deadline-20261126.tar.xz",
+    "sha256": "0a33977145ee066b91f3ee02d64f508a7c247f7d3c0c3fa802e87e76399c9f7e",
+    "bytes": 18204,
+    "members": 18
+  }
+}
