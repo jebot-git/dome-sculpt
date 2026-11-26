@@ -1005,9 +1005,34 @@ and the exact combined sources, assets, tooling and tests. A clean whole
 Release build and the 1,360-case private run are in progress against the
 combined source. The full-size native HDR history passes eight Release
 checks, with the ordered save matching the independent Bake capture.
-The sanitizer history remains in progress. The exact combined application
+The exact combined application
 passes all 14 native Wayland checks through the nested canonical DomeD
 compositor on Intel Arc, with no input drift or owned survivors.
+
+The combined ASan/UBSan history run accepts the original Bake, writes the
+exact ordered Save and restores the exact native state through Undo/Redo.
+Redo's preview misses the original ten-second wait. A separate sampled
+Clear Bake/Undo run reaches the same publication boundary in 12.292 seconds
+with the same texture-map owner and no additional composite build. Four
+mesh-worker stacks show the prepared-color numerical validation under
+`MaterialSurfaceQuery`. Candidate `b458d7bd` reuses numerical bounds across
+jobs through exact weak owners and the existing image and field content
+checks. It keeps all receipt and cancellation checks, and clears the cache
+on a new document generation. Release and sanitizer builds and history
+replays are in progress.
+
+The wordwise atlas candidate `19f125ae` checks clipped overlap without
+splitting aligned chart words. A matched native export keeps the same
+GLB and native file bytes while packing placement search drops from
+14.01 to 3.07 seconds. Both profiles pass 734,580 independently evaluated
+overlap cases and six native cases. The software Release replay passes
+153 checks. The Arc run during the whole build stops after 135 checks
+at paint startup. The main port `5c8c8fb1` also passes six native cases in
+each profile and the full software replay, with Arc validation running.
+An experimental sorted-frontier child `4021dc13` keeps four mesh outputs
+exact, including 57,311 comparisons of cost ties and candidate face order.
+A matched headless run drops from 38.38 to 34.60 seconds overall.
+[Atlas packing and HDR publication evidence](validation/atlas-packing-and-hdr-redo-20261126.json)
 
 The headless `--export-project` port `7470d805` routes standard GLB export
 through the same Document worker as the native application. Both Release
