@@ -1460,6 +1460,35 @@ ten selected-avatar checks and emits the prior exact VRM. The synthetic
 OpenXR startup and exact Save pass on software GL and Intel Arc.
 [Source sampling validation](validation/paint-source-grid-20261126.json)
 
+### Current native paint resolution
+
+The universal Paint menu opens the FLTK resolution picker for an original
+source mesh. The XR Material Texture Sets page uses the same detached
+worker. Choosing the current size preserves the existing raster. Enlargement
+copies the stored planes and skips empty tile footprints. Reduction measures
+common paint, masks, alternate PBR color, and FLOAT/legacy emission. It also
+compares the visible overlay over common footprints while honoring padding.
+An over-budget or out-of-tolerance request leaves the source Scene intact.
+
+Both verified CC0 VRoid faces go from 128 to 256 and back to 128 with every
+tested authored color, mask and hidden emission byte recovered. Both empty
+faces resize to 2048. The desktop worker enlarges the sparse painted face to
+1024. A separate ordinary native mesh preserves hidden FLOAT emission with
+sub-UNORM8 coverage. Release and ASan/UBSan with leak detection each pass
+three suites, and all seven native project files match byte for byte.
+Nested DomeD Wayland passes 12 checks through the actual FLTK dialog and
+universal menu. The OpenXR loader passes 18 synthetic-controller checks each
+on software GL and Intel Arc, including the rendered dialog, Save, Undo and
+Redo. All three runtime paths write the same 256-pixel project bytes.
+
+Prepared and baked sampling domains, raw linked-source HDR authoring,
+accelerated painted resampling and physical headset checks remain required.
+The fresh combined Release build uses frozen `d9ea0716` in
+`artifacts/native-grid-combined-source-20261126`. Follow the user service
+`ds-native-grid-combined-release-20261126.service` and its status in
+`artifacts/native-grid-combined-release-20261126/status.json`.
+[Current resize evidence](validation/native-authored-grid-20261126.json)
+
 ## Source and integration boundary
 
 - Main now admits product1bc13125 and public fixturef1e193c7 after complete

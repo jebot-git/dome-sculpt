@@ -1,0 +1,215 @@
+{
+  "production": "562eca1dc01e2e8394b637cddce801abd695632e",
+  "qualified_integration": "d9ea0716855609a2f8121fc4ffa9e652446b771e",
+  "toolkit_compositor_source": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "release": {
+    "candidate": "d9ea0716855609a2f8121fc4ffa9e652446b771e",
+    "profile": "release",
+    "terminal": true,
+    "fltk": "/opt/fltk-vr/toolkit",
+    "invocation": "c3d8a71cb80b4a56ab2bb6f18126ab4a",
+    "phase": "complete",
+    "elapsed_seconds": 23.86,
+    "exact_product": "562eca1dc01e2e8394b637cddce801abd695632e",
+    "core_sha256": "146074b000ae44cc3124f8eb53acce5aacab3a16e621a1d6ee0234510ea36775",
+    "parent_core_sha256": "69642b3889e0ddf14cc93b02308c430b11e48bcc2100185b3cf82f7d470f1617",
+    "owned_objects": {
+      "document-texture-sets.cpp.o": "5d0e510c0217f4b3f3d26e9ba61164a0c3b291a08bd0c38bfc48415b9aa03105",
+      "document.cpp.o": "a85e2fe3fcdeb7b79c82d10f24d1776381c58915cfaed712dc2716cc887951f0",
+      "paint.cpp.o": "7775a962b11c6729cc42efecc90c9b47fa1cd8d5d5ea532180dd1917571b8686",
+      "texture-set-resample.cpp.o": "a14bc75838c42cd63dd0e3b9656fd215780b3750d48a2a6cb57c371ebf50cc42"
+    },
+    "binaries": {
+      "dome-sculpt-native-paint-resolution-test": "25448a070a8f7446e4abd111fc867abfe0a28687ee445159d8deefae9bc5b887",
+      "dome-sculpt-texture-set-resolution-test": "472a2f6333bd0a82fe7d01caed67030c7072c576bfe11177b28f04faf9b5d25d"
+    },
+    "app_sha256": "5450efb4ba4c5536b4153db7877911be42e71f4acccd4f450c34f6e7f0614aec",
+    "render_sha256": "f5b35f3b6091f14015f937b45f4c64f7a2a7df0fdf0f27fab059a607f164eb98",
+    "xr_sha256": "aec7fe47cf2ff52bf299a681372f003c0a1e66c01e87b4474fa2500988f6002f",
+    "exit": 0,
+    "failures": [],
+    "tests": 3,
+    "ctest_sha256": "91ca38ed5ba921496a555b4846ee759563c4c9479b6aef97932165a8040ff6a7",
+    "junit_sha256": "e95841436d30369078d5f618e19476fbd617f3ed26636ec042a8350a78ee190a"
+  },
+  "asan_ubsan_leak_detection": {
+    "candidate": "d9ea0716855609a2f8121fc4ffa9e652446b771e",
+    "profile": "asan",
+    "terminal": true,
+    "fltk": "/home/blux/de-xr/dome-sculpt/artifacts/sdk-20261126/toolkit-sanitize",
+    "invocation": "7c3c8d42337641a2baefddae16f4810d",
+    "phase": "complete",
+    "elapsed_seconds": 104.35,
+    "exact_product": "562eca1dc01e2e8394b637cddce801abd695632e",
+    "core_sha256": "9aaeeef1c87f61c315cc415923d742613cdcd85f42c1beaa327acced3c131946",
+    "parent_core_sha256": "6348a50ea8adc0cad509b3165405f24ca894bd1ea92a03a10cf0f6d4709e0675",
+    "owned_objects": {
+      "document-texture-sets.cpp.o": "d474547c4fc90f5af4eaefa030065ef4566acc060b98790254ae8ffb7b291a73",
+      "document.cpp.o": "66539c6c2a43acc8319ca31dcb757e4a562f25ecfbddfdeaaa39835a114c1b0e",
+      "paint.cpp.o": "5e8b595de543f57fc41fa8a3ad2a6cec4b45cb20c2c76632a35b1cfff50c07ff",
+      "texture-set-resample.cpp.o": "5c231e41bd86bbc7aa378f6f241e0e0858a19b893c0c8d9694fe614aae3f2ea2"
+    },
+    "binaries": {
+      "dome-sculpt-native-paint-resolution-test": "29536a5c02019e390c53fadc60593714fd95ae1c429af68c61c909a405f60a00",
+      "dome-sculpt-texture-set-resolution-test": "f59e6a4d8967240be884fb06b9791a49284de5d942d65ab3faaf26bf39b5c29a"
+    },
+    "app_sha256": "68eef069f13f345260312b613d2885b5a9906856e32cb3dce35cab083fbb18f3",
+    "render_sha256": "0a5aff19c3b7870febfa7905b08eddab1effd9b6992ec4f6d2dbc41c1deb42a6",
+    "xr_sha256": "dfcc553a0b94882d2dec24259ae341e6525f4a316c75fa08553f761f03e1c68e",
+    "exit": 0,
+    "failures": [],
+    "tests": 3,
+    "ctest_sha256": "70a2b0a5ee26d63a79d35e22a2f7332be91814a7d8ab30073c39c2f32d52bca5",
+    "junit_sha256": "c83d65f54742193f2801305a225265351e6f60d823ab3e86b76d8f5a77e8efa8"
+  },
+  "nested_wayland": {
+    "candidate": "d9ea0716855609a2f8121fc4ffa9e652446b771e",
+    "terminal": true,
+    "invocation": "4c27694423cd4661a17530eabf959ff1",
+    "phase": "complete",
+    "core_sha256": "146074b000ae44cc3124f8eb53acce5aacab3a16e621a1d6ee0234510ea36775",
+    "fixture_sha256": "f850c5717e7261604ec269f6769c350ede3206425d8a5e78425e4c3bd7fbbc4b",
+    "compositor_sha256": "47920142c8c803dcf5adb63ba643d2e347fbdcd1e15ecd8bce7c1a8dd47c0b7e",
+    "compositor_source": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+    "probe_sha256": "5bf11c670f66bbb68960073878933055b09582e5173ec1e3f472b413956c55aa",
+    "app_sha256": "5450efb4ba4c5536b4153db7877911be42e71f4acccd4f450c34f6e7f0614aec",
+    "exit": 0,
+    "checks": 12,
+    "report_sha256": "9142d3758dd86019136e10411778ed53444b89b018c4ebdf5028200368834f13",
+    "output_sha256": "9cae1e3a15945012053a46d3321760a9587ec7bf70e0931de4175fb6977bfdd8"
+  },
+  "synthetic_openxr_release": {
+    "software": {
+      "candidate": "d9ea0716855609a2f8121fc4ffa9e652446b771e",
+      "profile": "software",
+      "terminal": true,
+      "invocation": "2f4abc5d5164478fa80597603770ae5e",
+      "phase": "complete",
+      "app_sha256": "5450efb4ba4c5536b4153db7877911be42e71f4acccd4f450c34f6e7f0614aec",
+      "immutable_project_sha256": "f850c5717e7261604ec269f6769c350ede3206425d8a5e78425e4c3bd7fbbc4b",
+      "runtime_sha256": "e1331effc9dcc7942864aa6c0af4997a798758ed86155575769673ee179778a2",
+      "exit": 0,
+      "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+      "checks": 18,
+      "report_sha256": "d68a843be1b53ea29618a276f2ae95b995b33d1849997c7ec0999c88fb81f3fb",
+      "native_sha256": "9cae1e3a15945012053a46d3321760a9587ec7bf70e0931de4175fb6977bfdd8"
+    },
+    "arc": {
+      "candidate": "d9ea0716855609a2f8121fc4ffa9e652446b771e",
+      "profile": "arc",
+      "terminal": true,
+      "invocation": "a84a5a1f1e6a47a890db5bce821a1462",
+      "phase": "complete",
+      "app_sha256": "5450efb4ba4c5536b4153db7877911be42e71f4acccd4f450c34f6e7f0614aec",
+      "immutable_project_sha256": "f850c5717e7261604ec269f6769c350ede3206425d8a5e78425e4c3bd7fbbc4b",
+      "runtime_sha256": "e1331effc9dcc7942864aa6c0af4997a798758ed86155575769673ee179778a2",
+      "exit": 0,
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "checks": 18,
+      "report_sha256": "9017400feb7cfb694322422c3bf9d27e8dbb34e063f9fb01852086c2911644bd",
+      "native_sha256": "9cae1e3a15945012053a46d3321760a9587ec7bf70e0931de4175fb6977bfdd8"
+    }
+  },
+  "byte_identical_release_sanitizer_projects": {
+    "vroid-beta-female-face2048.dsculpt": {
+      "sha256": "f58919497db4cef4b28152d7dee9abbb6a3fc9150b3542372ce85ecf8b8067eb",
+      "bytes": 133537481
+    },
+    "vroid-beta-male-face2048.dsculpt": {
+      "sha256": "3330d9ce52878879a81310359f6f0297deee422ffd256bdd63d56bc9aa63b2d5",
+      "bytes": 138368785
+    },
+    "native-physical128.dsculpt": {
+      "sha256": "7f62548011310356e3a211b4576b56bdcdd949ab760cbfbda593695a7fdf2c94",
+      "bytes": 689753
+    },
+    "vroid-beta-female-painted128.dsculpt": {
+      "sha256": "f850c5717e7261604ec269f6769c350ede3206425d8a5e78425e4c3bd7fbbc4b",
+      "bytes": 133996740
+    },
+    "vroid-beta-female-painted256.dsculpt": {
+      "sha256": "9cae1e3a15945012053a46d3321760a9587ec7bf70e0931de4175fb6977bfdd8",
+      "bytes": 135374615
+    },
+    "vroid-beta-male-painted128.dsculpt": {
+      "sha256": "22c9b0144376cc6feb731852f692e4136596aa225a572e9a50806f7173722c16",
+      "bytes": 138828044
+    },
+    "vroid-beta-male-painted256.dsculpt": {
+      "sha256": "0eeb2dcf618b8ce5bc9eb4b52d90023bbb8d2b56fa7550d8322457e7c2339a07",
+      "bytes": 140205919
+    }
+  },
+  "combined_at_launch": {
+    "candidate": "d9ea0716855609a2f8121fc4ffa9e652446b771e",
+    "terminal": false,
+    "invocation": "6fd979d1947746539488b79f2c40847a",
+    "toolkit": "/opt/fltk-vr/toolkit",
+    "phase": "build all Release targets",
+    "configure": [
+      "cmake",
+      "-S",
+      "/home/blux/de-xr/dome-sculpt/artifacts/native-grid-combined-source-20261126",
+      "-B",
+      "/home/blux/de-xr/dome-sculpt/artifacts/native-grid-combined-release-20261126/build",
+      "-G",
+      "Ninja",
+      "-DCMAKE_BUILD_TYPE=Release",
+      "-DDOME_COMPUTE_BACKEND=CPU",
+      "-DFLTK_DIR=/opt/fltk-vr/toolkit/share/fltk"
+    ],
+    "elapsed_seconds": 6.363,
+    "cache_sha256": "9e20ca8d178a4ac14a6fa7c0a43dc62051b444b895598ae02a9bc9bcd78b21be"
+  },
+  "scope": [
+    "Original native single-material writable VRoid grids with source image, mesh, material and rig owners preserved.",
+    "Direct enlargement preserves bytes, layer order, active layer, opacity and hidden values. Reduction checks authored and composed overlay error.",
+    "Both VRoid bases reach 2048 with empty grids and recover all tested original painted cells after 128 to 256 to 128. Sparse painted source reaches 1024.",
+    "A separate supported native HDR grid retains sub-UNORM8 coverage and hidden FLOAT values across 64 to 128, Save, Undo and Redo.",
+    "Prepared and baked sampling domains, raw linked-source HDR authoring, accelerated painted resampling and physical headset operations remain open."
+  ],
+  "earlier_attempts": [
+    "The initial configure lacked the canonical bitmap PKG_CONFIG_PATH and failed before compilation.",
+    "The first fixture authored raw VRoid HDR paint through low-level calls. Existing document render authority for linked raw HDR refused that case. That fixture was replaced by an ordinary native HDR grid and a valid VRoid source paint workflow.",
+    "Both first actual-loader replays passed 18 checks. Their outer wrapper required 20 by mistake. The corrected wrapper reran both render profiles."
+  ],
+  "archive": {
+    "file": "native-authored-grid-20261126.tar.gz",
+    "sha256": "f1c46b715671435c436e39d75d197c8b2afce8ec0edee2115ac2eeca745a5b11",
+    "members": {
+      "combined-at-launch/status.json": "5e79b0585a4c02a9276c152e74d26a26159a0a57f1e1dbfcabb9d32a840a6a4d",
+      "initial/asan/configure-without-canonical-pkg-config.log": "7e017ec8c01de4c4b8222dd5da92e0e05fc89452ce2fa49a0f81a17452b461d4",
+      "initial/asan/ctest-raw-source-hdr.log": "5a189077b77fd0bcba784be8881a2920e1e8e68674d85a3e159279212179ab21",
+      "initial/openxr-arc-report.json": "a6224299fb57011e1965fe08052a136eb1e4fb406f1a140ab47e608e58a37c18",
+      "initial/openxr-arc-wrapper.json": "7db1a65555969f9fb839ec6aef11554bacccd20e93d2b85305757ea48291d6ff",
+      "initial/openxr-software-report.json": "d0abb155850e410c8557e6f84796320bb5dd59aab65f28d39add3a74122a6a88",
+      "initial/openxr-software-wrapper.json": "95137c8b72a2b5c29220b3abb183c9a2eb43a45504975776007ae4d98da1e06f",
+      "initial/release/configure-without-canonical-pkg-config.log": "643676a0bead6fb00c0a73d7b156641c0cadce31a0e92ef0f75dd6da060bb8dc",
+      "initial/release/ctest-raw-source-hdr.log": "d1ad584cd90ece3f25fe5e0e6e6244b6a3aaf539160003b244e1acd1a6a463a2",
+      "native/asan/authored-grid-tests.xml": "c83d65f54742193f2801305a225265351e6f60d823ab3e86b76d8f5a77e8efa8",
+      "native/asan/ctest.log": "70a2b0a5ee26d63a79d35e22a2f7332be91814a7d8ab30073c39c2f32d52bca5",
+      "native/asan/status.json": "b56835ec56adc075783ceac9103a580a8e63ba87b40ed6fe141c67170fc3f630",
+      "native/release/authored-grid-tests.xml": "e95841436d30369078d5f618e19476fbd617f3ed26636ec042a8350a78ee190a",
+      "native/release/ctest.log": "91ca38ed5ba921496a555b4846ee759563c4c9479b6aef97932165a8040ff6a7",
+      "native/release/status.json": "052f5e1067bbbc6a6341dfbc739a2d314d8f6e9f1354f2bdd29a964b28d1f4ea",
+      "native/run.py": "275b7af29fa5ef893c4b6fc49c4cbb1d6fcb9c1761b56e9d305b209ebc505e15",
+      "openxr/arc/report.json": "9017400feb7cfb694322422c3bf9d27e8dbb34e063f9fb01852086c2911644bd",
+      "openxr/arc/runtime.json": "2596a7e543d15c129b29d7641cdc24a6fcd5963657dbd38300e6f34f7c583ff0",
+      "openxr/arc/runtime.json.maps": "98ef98802e5da82f5dc4561851961f464bf7d193e058efd3a0e10174ecb19bb0",
+      "openxr/arc/status.json": "a1e4f7f528119739c84778569e2b74f9d0203d3dc17ad4ab9351cea2810f19e3",
+      "openxr/arc/xr.log": "a41d271570bd665fff3964200beacae7fb89304dfb628b0c36d174c590a8391e",
+      "openxr/replay.py": "241ab6b740ffc17ce45be446d0622aa3c6c8a1f48dff1370a42bc6fc35e65863",
+      "openxr/run.py": "ede66874a8487b4d46662f106bec2d810d8dc3790e1e7ebd43c8872bfbabafdc",
+      "openxr/software/report.json": "d68a843be1b53ea29618a276f2ae95b995b33d1849997c7ec0999c88fb81f3fb",
+      "openxr/software/runtime.json": "baa39ab5581a788f5a31bcc76bf194a57916e63eac6c6c67552baa66383b7860",
+      "openxr/software/runtime.json.maps": "d0f526ef0fd013031e4409bbe3cbe2f7e097b2af41898b56aa4ea1dba10b106e",
+      "openxr/software/status.json": "3b9028f736362bef13445632840b8e224c39712f2785c3347607f7926641f0bc",
+      "openxr/software/xr.log": "12694889a4bf0fcbb4a9c6e5ebecf9cfe1d29fa855c8f744d0ce6c37a119bf01",
+      "wayland/client-runtime-maps.txt": "4822ce14e8d42926b4bf6764d1224077da809a87c26f6df6a073855fd8083f71",
+      "wayland/dialog-replay.log": "fc02c0fbc8631dbabc9e6592d01ae6bc523db29bfdaeaae0bf4e44a222e3c00a",
+      "wayland/replay.py": "d46c5af8a142e57e4e196eedad9939ab81b1eac00f422008a693a8ab6d8ac6b3",
+      "wayland/status.json": "baa821c239be86f09f7293db4d21868f1fb4cc9c000c06e36e8c70e9040659e5",
+      "wayland/workflow.json": "9142d3758dd86019136e10411778ed53444b89b018c4ebdf5028200368834f13"
+    }
+  }
+}

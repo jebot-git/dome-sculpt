@@ -30,12 +30,18 @@ and physical headset acceptance remain open.
 [Completed creator sanitizer and format evidence](validation/creator-vrm0-strict-closure-20261126.json)
 [Earlier shared-placement candidate](validation/creator-vrm-placement-20261126.json)
 
-The painted-grid candidate preserves authored cells exactly when enlarging
-original writable grids and checks reconstruction error when reducing them.
-It retains source image, mesh
-and rig ownership, preserves all layers and supports exact Undo/Redo and
-ordered Save. Prepared and baked fields, accelerated resampling, and full
-application qualification remain open. See [the receipt](validation/source-authored-painted-grid-20261126.json).
+Main now resizes original single-material paint grids through the shared
+FLTK and XR worker. Enlargement preserves authored cells, including hidden
+layers, and reduction checks both the authored layers and the composed
+overlay before publication. The original mesh, images, rig and material keep
+their owners. Both CC0 VRoid faces pass exact 128→256→128 painted recovery and
+2048 empty-grid checks. A sparse painted face reaches 1024. A separate native
+fixture preserves hidden FLOAT emission, including sub-byte coverage.
+Release, ASan/UBSan with leak detection, nested DomeD Wayland and synthetic
+OpenXR with software GL and Intel Arc all pass. Prepared and baked fields,
+raw linked-source HDR authoring, accelerated painted resampling, physical XR
+and the new full Release sweep remain open.
+[Current receipt](validation/native-authored-grid-20261126.json)
 
 Static VRM1 expression preview and Apply now cover original core PBR and
 unlit materials, including independently writable paint and ordered native
