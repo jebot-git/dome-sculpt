@@ -10,8 +10,8 @@ These are scoped positives; the original full 2048 strict workflow does not pass
 Invocation `0b2fabbf1c8648448646a7ef510a8a52` runs the unchanged selected cohort
 with actual ASan/UBSan mappings, leak detection, no suppressions, original
 900-second per-case deadlines, 4-GiB owned-RSS limits and no virtual-AS cap.
-The first six cases take 21.570,165.906,422.948,308.297,.541 and 40.158 seconds,
-respectively. The current-as-old refusal returns 1 in 44.019 seconds.
+The first six cases take 21.574, 165.905, 422.950, 308.301, .542 and 40.163 seconds,
+respectively. The current-as-old refusal returns 1 in 44.016 seconds.
 All completed endpoints match their original checks; source/provider drift and
 owned-survivor lists are empty. These confirmed CPU-only cases never acquire a
 graphics lease and reject DRI descriptors or Mesa driver mappings.
