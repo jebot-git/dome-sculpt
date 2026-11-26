@@ -675,18 +675,20 @@ void Document::publish_locked(bool force,bool checkpoint) {
   state_.can_retopologize = !state_.polygon && !state_.cut && !state_.retopology && !uv_ && !state_.asset_busy && !state_.recovery_busy &&
       !control_before_ && !action_active_locked() && object_editable_locked(active.id) &&
       scene_.objects().size() < 256 && (active.mesh_active || !active.volume->voxels().empty());
-  const auto bake_field=active_texture_set(active);
-  if(state_.bake_settings_object!=active.id||state_.active_texture_set!=bake_field.id||
-      state_.bake_recipe!=bake_field.bake_recipe){
-    if(bake_field.bake_recipe){
-      state_.bake_source=bake_field.bake_recipe->source.object;
-      state_.bake_settings=bake_field.bake_recipe->settings;
+  const auto selected_field=active.mesh_active?std::optional<TextureSetView>(active_texture_set(active)):std::nullopt;
+  const auto field_id=selected_field?selected_field->id:0;
+  const auto recipe=selected_field?selected_field->bake_recipe:active.bake_recipe;
+  if(state_.bake_settings_object!=active.id||state_.active_texture_set!=field_id||
+      state_.bake_recipe!=recipe){
+    if(recipe){
+      state_.bake_source=recipe->source.object;
+      state_.bake_settings=recipe->settings;
     }else if(active.texture_sets){
       state_.bake_source=0;
       state_.bake_settings={};
     }
     state_.bake_settings_object=active.id;
-    state_.bake_recipe=bake_field.bake_recipe;
+    state_.bake_recipe=recipe;
   }
   if(active.texture_sets){
     state_.bake_settings.prepare_colors=false;
@@ -697,7 +699,7 @@ void Document::publish_locked(bool force,bool checkpoint) {
   if(std::find(state_.bake_sources.begin(),state_.bake_sources.end(),state_.bake_source)==state_.bake_sources.end())
     state_.bake_source=state_.bake_sources.empty()?0:state_.bake_sources.front();
   state_.can_bake=!state_.object_grabbing && bake_target_ready_locked() && !state_.bake_sources.empty();
-  state_.can_clear_bake=!state_.object_grabbing && bake_target_ready_locked() && bool(bake_field.painted->baked());
+  state_.can_clear_bake=!state_.object_grabbing && selected_field && bake_target_ready_locked() && bool(selected_field->painted->baked());
   state_.can_blur_color_layer=command_enabled_locked(SpatialCommand::BlurColorLayer);
   state_.can_convert_bake=canonical_conversion_ready_locked();
   auto work=asset_status();state_.can_cancel_asset=state_.asset_busy && work.cancellable;
@@ -736,7 +738,6 @@ void Document::publish_locked(bool force,bool checkpoint) {
       state_.sculpt_layer_opacity = l.opacity;
     }
   }
-  const auto selected_field=active.mesh_active?std::optional<TextureSetView>(active_texture_set(active)):std::nullopt;
   if(texture_face_object_!=active.id||!active.mesh_active||!active.painted||texture_face_geometry_!=active.painted->mesh_owner()){state_.texture_faces.clear();state_.texture_face_select=false;texture_face_geometry_.reset();texture_face_object_=0;}
   state_.texture_sets.clear();state_.active_texture_set=active.texture_sets?active.texture_sets->active():0;
   state_.texture_material=selected_field?selected_field->material:active.material;
@@ -2887,7 +2888,8 @@ void Document::control_event_locked(VrControlEvent event) {
   }
   if(event.type==VrControlEventType::RecallBakeRecipe){
     if(c.parameter!=VrParameter::BakeSource)return;
-    const auto recipe=active_texture_set(scene_.active()).bake_recipe;
+    const auto &target=scene_.active();
+    const auto recipe=target.texture_sets?active_texture_set(target).bake_recipe:target.bake_recipe;
     if(!recipe){state_.message="No successful bake has been saved for this target";return;}
     require_authority_locked(control_source_);
     if(control_source_.generation!=state_.generation||control_source_.revision!=state_.revision||control_source_.object!=scene_.active().id)

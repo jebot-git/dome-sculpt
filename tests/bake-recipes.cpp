@@ -33,7 +33,10 @@ void texture_set_bake(const std::filesystem::path &output) {
   auto &cage_object=scene.object(cage);
   cage_object.mesh_active=true;
   cage_object.visible=false;
-  cage_object.painted=std::make_shared<PaintedMesh>(material_quads(.030f),64);
+  auto cage_mesh=material_quads(.030f);
+  for(size_t vertex=0;vertex<cage_mesh.uv.size();++vertex)
+    cage_mesh.uv[vertex][0]=cage_mesh.uv[vertex][0]*.5f+(vertex<4?0.f:.5f);
+  cage_object.painted=std::make_shared<PaintedMesh>(std::move(cage_mesh),64);
   std::array<TextureSetInitialField,2> fields;
   fields[0].resolution=fields[1].resolution=64;
   fields[0].material.name="Left set";

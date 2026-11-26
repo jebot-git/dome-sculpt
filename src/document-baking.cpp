@@ -45,7 +45,7 @@ std::vector<uint64_t> Document::bake_sources_locked() const {
   std::vector<uint64_t> ids;
   const auto &target=scene_.active();
   if(!detail::bake_target_supported(target))return ids;
-  const auto recipe=active_texture_set(target).bake_recipe;
+  const auto recipe=target.texture_sets?active_texture_set(target).bake_recipe:target.bake_recipe;
   for(const auto &o:scene_.objects())if(o.id!=scene_.active().id && !scene_.has_affine_placement(o.id) &&
       detail::bake_source_supported(o) &&
       (o.mesh_active ? o.painted && !o.painted->mesh().indices.empty() : !o.volume->voxels().empty()))ids.push_back(o.id);
@@ -68,7 +68,8 @@ std::vector<uint64_t> Document::bake_cages_locked() const {
   if(state_.bake_settings.cage_object &&
       std::find(ids.begin(),ids.end(),state_.bake_settings.cage_object)==ids.end())
     ids.push_back(state_.bake_settings.cage_object);
-  const auto recipe=active_texture_set(scene_.active()).bake_recipe;
+  const auto &target=scene_.active();
+  const auto recipe=target.texture_sets?active_texture_set(target).bake_recipe:target.bake_recipe;
   if(recipe&&recipe->cage&&recipe->cage->object==unavailable_bake_object&&
       std::find(ids.begin(),ids.end(),unavailable_bake_object)==ids.end())
     ids.push_back(unavailable_bake_object);
