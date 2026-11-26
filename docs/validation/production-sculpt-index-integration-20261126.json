@@ -1,0 +1,368 @@
+{
+  "scope": "Exact combined Release native checks on default allocator, privately isolated from device and display. No current App graphics or sustained acceptance implied.",
+  "checks": {
+    "surface": 26,
+    "pipeline": 92,
+    "independent_full": 167
+  },
+  "build": {
+    "terminal": true,
+    "exit": 0,
+    "compile": [
+      {
+        "name": "src-sculpt-chunk-masks.cpp",
+        "exit": 0
+      },
+      {
+        "name": "src-sculpt-placed-chunks.cpp",
+        "exit": 0
+      },
+      {
+        "name": "src-sculpt-surface-chunks.cpp",
+        "exit": 0
+      },
+      {
+        "name": "tests-sculpt-surface-chunks.cpp",
+        "exit": 0
+      },
+      {
+        "name": "tests-sculpt-chunk-pipeline.cpp",
+        "exit": 0
+      },
+      {
+        "name": "tests-sculpt-independent-workflow.cpp",
+        "exit": 0
+      },
+      {
+        "name": "tests-sculpt-sustained.cpp",
+        "exit": 0
+      }
+    ],
+    "linked_archive": {
+      "members": 197,
+      "sha256": "4205a1ce30eeff5c57579a1a1e99f0f97606bdeeda429b86304394e3f65b889d",
+      "replacements": [
+        "sculpt-chunk-masks.cpp.o",
+        "sculpt-placed-chunks.cpp.o",
+        "sculpt-surface-chunks.cpp.o"
+      ]
+    },
+    "links": [
+      {
+        "name": "dome-sculpt",
+        "exit": 0
+      },
+      {
+        "name": "dome-sculpt-sculpt-surface-chunks-test",
+        "exit": 0
+      },
+      {
+        "name": "dome-sculpt-sculpt-chunk-pipeline-test",
+        "exit": 0
+      },
+      {
+        "name": "dome-sculpt-sculpt-independent-workflow",
+        "exit": 0
+      },
+      {
+        "name": "dome-sculpt-sculpt-sustained",
+        "exit": 0
+      }
+    ]
+  },
+  "runtime": {
+    "source": "ec578e561c99ec681e9db57f657c0823526b0151",
+    "terminal": true,
+    "cases": {
+      "sculpt-surface-chunks-test": {
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/production-sculpt-index-integration-release-20261126/dome-sculpt-sculpt-surface-chunks-test"
+        ],
+        "started": 1795665307.8572602,
+        "timeout_seconds": 900,
+        "RSS_limit_bytes": 4294967296,
+        "virtual_AS_cap": null,
+        "pid": 3,
+        "start": 84323292,
+        "pgrp": 3,
+        "root": {
+          "pid": 3,
+          "start": 84323292,
+          "pgrp": 3,
+          "session": 3,
+          "ppid": 2,
+          "state": "R"
+        },
+        "known_processes": [
+          {
+            "pid": 3,
+            "start": 84323292,
+            "pgrp": 3,
+            "session": 3,
+            "ppid": 2,
+            "state": "R"
+          }
+        ],
+        "peak_owned_RSS_bytes": 21573632,
+        "peak_observed_virtual_bytes": 45383680,
+        "monitor_samples": 21,
+        "signals": [],
+        "exit": 0,
+        "seconds": 0.21086359024047852,
+        "sha256": "0ce7df560f5320c0881e4f8d32fa7cbb086ede38b31ed12d0efdae255d183952",
+        "check_passed": true
+      },
+      "sculpt-chunk-pipeline-test": {
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/production-sculpt-index-integration-release-20261126/dome-sculpt-sculpt-chunk-pipeline-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/production-sculpt-index-integration-release-20261126/native-default/pipeline"
+        ],
+        "started": 1795665308.0694299,
+        "timeout_seconds": 900,
+        "RSS_limit_bytes": 4294967296,
+        "virtual_AS_cap": null,
+        "pid": 4,
+        "start": 84323313,
+        "pgrp": 4,
+        "root": {
+          "pid": 4,
+          "start": 84323313,
+          "pgrp": 4,
+          "session": 4,
+          "ppid": 2,
+          "state": "R"
+        },
+        "known_processes": [
+          {
+            "pid": 4,
+            "start": 84323313,
+            "pgrp": 4,
+            "session": 4,
+            "ppid": 2,
+            "state": "R"
+          }
+        ],
+        "peak_owned_RSS_bytes": 53657600,
+        "peak_observed_virtual_bytes": 672595968,
+        "monitor_samples": 71,
+        "signals": [],
+        "exit": 0,
+        "seconds": 0.7384738922119141,
+        "sha256": "eab3c2eb5db6d35edf497ce707ca0db3b0dfafb447266c0d89fa104da959c3ba",
+        "check_passed": true
+      },
+      "sculpt-independent-workflow": {
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/production-sculpt-index-integration-release-20261126/dome-sculpt-sculpt-independent-workflow",
+          "/home/blux/de-xr/dome-sculpt/artifacts/production-sculpt-index-integration-release-20261126/native-default/sculpt"
+        ],
+        "started": 1795665308.8203115,
+        "timeout_seconds": 900,
+        "RSS_limit_bytes": 4294967296,
+        "virtual_AS_cap": null,
+        "pid": 13,
+        "start": 84323388,
+        "pgrp": 13,
+        "root": {
+          "pid": 13,
+          "start": 84323388,
+          "pgrp": 13,
+          "session": 13,
+          "ppid": 2,
+          "state": "R"
+        },
+        "known_processes": [
+          {
+            "pid": 13,
+            "start": 84323388,
+            "pgrp": 13,
+            "session": 13,
+            "ppid": 2,
+            "state": "R"
+          }
+        ],
+        "peak_owned_RSS_bytes": 3554258944,
+        "peak_observed_virtual_bytes": 4437975040,
+        "monitor_samples": 6481,
+        "signals": [],
+        "exit": 0,
+        "seconds": 69.57769727706909,
+        "sha256": "e1501f7af602512bac780f8784f091f544da7823e37e1e4dafc1bd69957d4346",
+        "check_passed": true
+      }
+    },
+    "no_dri_nodes": true,
+    "allocator": "default",
+    "app_sha256": "ac190d53e2de588ac4365b63fc03093c8deab5810e01c7e806b3d9e3112ee363",
+    "exit": 0
+  },
+  "units": {
+    "build": "ds-production-sculpt-index-integration-release-20261126",
+    "native": "ds-production-sculpt-index-native-20261126"
+  },
+  "projects": {
+    "native-default/sculpt/accepted.dsculpt": {
+      "bytes": 50061799,
+      "sha256": "d32c725a02d3d9291f3208c879f78ecc343c33511de9e10b5c18d93bb95fd694"
+    },
+    "native-default/sculpt/recovery/5c2c58f05c6ffb5a1803b1375d3de604-c79fc0d6a87494c99c60bc4aecafb842.dsculpt": {
+      "bytes": 50061799,
+      "sha256": "d32c725a02d3d9291f3208c879f78ecc343c33511de9e10b5c18d93bb95fd694"
+    },
+    "native-default/sculpt/recovery/ef4b33cc8bcf0bfe9c639ff742b9f090-6b2fbdb3d25e337958842a95077c06f3.dsculpt": {
+      "bytes": 50061799,
+      "sha256": "d32c725a02d3d9291f3208c879f78ecc343c33511de9e10b5c18d93bb95fd694"
+    }
+  },
+  "authorities": {
+    "build.py": {
+      "bytes": 2445,
+      "sha256": "cc74f3a95ecb40ab54d03afbc7480e8c5f0cee5c416191b3d32e199783830535"
+    },
+    "prepare.py": {
+      "bytes": 3190,
+      "sha256": "ca74c9f91a07949163bed4dd6c1d47c369f39b590600adfc68bc63737f13adbd"
+    },
+    "run-native.py": {
+      "bytes": 2051,
+      "sha256": "3f4985fefd831f3062df5b179c81132ac31dd00380d400f37973bc28dc47fc48"
+    },
+    "owned_monitor.py": {
+      "bytes": 4859,
+      "sha256": "b510ef5655e3214bd38e7b5f56022c37a79879070c3733f2dd059bad74f21269"
+    },
+    "build-plan.json": {
+      "bytes": 25163,
+      "sha256": "958b436ffbf514ad3b66eb7848a0a0c7c269e935f5b1d7f291ddbc0cf757f0bc"
+    },
+    "build-status.json": {
+      "bytes": 1261,
+      "sha256": "861e8e62a25cc0df3e33e4d0943a6c33967829d3cd74e234d8afbca1d5a91b42"
+    },
+    "build.journal.txt": {
+      "bytes": 428,
+      "sha256": "1feba3094b4e5b249821ece9387fb34bd5c1721d9ea247107575634d7ae1b19b"
+    },
+    "native.journal.txt": {
+      "bytes": 853,
+      "sha256": "0a56297afbd940e04bb776fa677dc6f48079b499faf7f2735fa44749e14ef2ff"
+    },
+    "native-default/status.json": {
+      "bytes": 3665,
+      "sha256": "f6ad406dd3469bf024924fe32aacf27745a822c4c9ec3638811d410c74760293"
+    },
+    "dome-sculpt-sculpt-chunk-pipeline-test.link.d": {
+      "bytes": 7480,
+      "sha256": "b8a9f6f2a9f68789f97e217e2db695d805f8ae35b10eaad48621495afefa3ce8"
+    },
+    "dome-sculpt-sculpt-independent-workflow.link.d": {
+      "bytes": 7493,
+      "sha256": "0723c99a7e1e106cea37e847a3dba50ac771a79ac9721ab0bc65d3bcd82b7e09"
+    },
+    "dome-sculpt-sculpt-surface-chunks-test.link.d": {
+      "bytes": 7480,
+      "sha256": "60775581455c9f5116fcd234840168c9ef08385b5575c5bfa4b9bd9e15d21981"
+    },
+    "dome-sculpt-sculpt-sustained.link.d": {
+      "bytes": 8722,
+      "sha256": "3a622f69bf762e3a3a368cd3093e8b8e25c0d3501d772c5a6089bc44bebf8cde"
+    },
+    "dome-sculpt.link.d": {
+      "bytes": 13555,
+      "sha256": "eb4348b4a69360d452108d391ac5e4d7bc1714eb9e2e2230c105e7170697c2d1"
+    },
+    "src/sculpt-chunk-masks.cpp.o.d": {
+      "bytes": 15738,
+      "sha256": "03a10f6314e089a43ed114eb3bb0180684ac08bc81fee1dc4111281047100379"
+    },
+    "src/sculpt-placed-chunks.cpp.o.d": {
+      "bytes": 16113,
+      "sha256": "cf3fdbd118bad79890b8a8b29a66482247d346da779817269a6bb53a4367cf61"
+    },
+    "src/sculpt-surface-chunks.cpp.o.d": {
+      "bytes": 14123,
+      "sha256": "1f046a826ac9768c8fae009e40b10345023ed5e8be960ccdec367756219f1bf5"
+    },
+    "tests/sculpt-chunk-pipeline.cpp.o.d": {
+      "bytes": 23434,
+      "sha256": "8bd2b85d4f583dd69cc4ce3b52a90fa0c7df27cb250b775e1407284c4bbba659"
+    },
+    "tests/sculpt-independent-workflow.cpp.o.d": {
+      "bytes": 22888,
+      "sha256": "3aa20db670f8a02f2269e2b4b75c82d6f990d50c853b80a3e9af94da974eec3f"
+    },
+    "tests/sculpt-surface-chunks.cpp.o.d": {
+      "bytes": 13726,
+      "sha256": "9df9a5bd7b37eb5a3543dd05546af732267ce5d6542ecebc11a257387b7a9791"
+    },
+    "tests/sculpt-sustained.cpp.o.d": {
+      "bytes": 24980,
+      "sha256": "86dc6c880585ea85a60f15ef12d40b8769b47f679c36ec9e7828c3c1bf1ce255"
+    },
+    "dome-sculpt-sculpt-chunk-pipeline-test.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "dome-sculpt-sculpt-independent-workflow.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "dome-sculpt-sculpt-surface-chunks-test.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "dome-sculpt-sculpt-sustained.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "dome-sculpt.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "src-sculpt-chunk-masks.cpp.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "src-sculpt-placed-chunks.cpp.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "src-sculpt-surface-chunks.cpp.log": {
+      "bytes": 6152,
+      "sha256": "53aef80126c37fba1738fcca961040ddf6497cfcfb310fe2763498aa5840f96f"
+    },
+    "tests-sculpt-chunk-pipeline.cpp.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "tests-sculpt-independent-workflow.cpp.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "tests-sculpt-surface-chunks.cpp.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "tests-sculpt-sustained.cpp.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "native-default/sculpt-chunk-pipeline-test.log": {
+      "bytes": 7701,
+      "sha256": "351519a7b76bd86afa9043357287596d2ac1aafe1bfcd2c9870e39aa8ba4b15b"
+    },
+    "native-default/sculpt-independent-workflow.log": {
+      "bytes": 381,
+      "sha256": "3fea6c88b6383a4d9cd57f519a99b4fe98bca303e564517d28bdebd81c6f71a6"
+    },
+    "native-default/sculpt-surface-chunks-test.log": {
+      "bytes": 1954,
+      "sha256": "ebf78e916610192f405486b582e0ca5ab78b363141f709602c669e9a6ba4b101"
+    }
+  },
+  "archive": {
+    "path": "production-sculpt-index-integration-20261126.tar.xz",
+    "bytes": 15796,
+    "sha256": "1ce5853527d029c8c65b68f9ce02bb5f9d7fbef9a8135e5027d091e2dd864287"
+  }
+}

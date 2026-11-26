@@ -208,8 +208,13 @@ component. Integrated candidate `ec578e56` combines it with the Save-qualified
 App and both fixture repairs. The integrated Release build completed seven
 whole translation units and five links. Its core archive retains 194 exact
 prior payloads and replaces the three translation units that include the
-changed index header. The integrated default-allocator sculpt regression is
-running separately from the component's sustained Arc run.
+changed index header. The integrated Release native cohort passes all 285
+checks with the default allocator. The full sculpt case peaks at 3,554,258,944
+owned RSS bytes and produces the same native Save and two recovery files.
+Read [the integrated native receipt](validation/production-sculpt-index-integration-20261126.json).
+The separate component Arc run passed the history and stale-generation checks
+at the earlier failure boundary in its first repetition. Final sustained and
+integrated graphics qualification remain open.
 Full scope in REQUIREMENTS is unchanged.
 
 ## Source and integration boundary
