@@ -4,6 +4,9 @@
 #include "dome/polygon-scene.hpp"
 #include "dome/source-paint.hpp"
 #include "texture-set-paint-access.hpp"
+#include "texture-set-field-source.hpp"
+#include "polygon-surface-preview.hpp"
+#include "texture-set-recipe-wire.hpp"
 #include <algorithm>
 #include <bit>
 #include <map>
@@ -617,9 +620,37 @@ uint32_t TextureSetArchive::add_paint(const TextureSetView &f,
   for (size_t i = 0; i < paints_.size(); ++i) {
     step();
     if (same(paints_[i].owner, f.painted)) {
-      if (!same(paints_[i].source, f.source) && (paints_[i].source || f.source))
+      const auto &prior = paints_[i].source;
+      if (!same(prior, f.source) && (prior || f.source)) {
+        // Namespace-only variants can have different recipe and polygon
+        // owners while sharing their authenticated sampling and paint raster.
+        if (prior && f.source &&
+            same(prior->original_paint(), f.source->original_paint()) &&
+            prior->polygon_owner() && f.source->polygon_owner() &&
+            prior->polygon_owner()->shares_sampling(*f.source->polygon_owner()) &&
+            prior->source_preview() && f.source->source_preview() &&
+            prior->source_preview()->shares_streams(*f.source->source_preview()) &&
+            same(prior->field().painted, f.source->field().painted) &&
+            same(prior->field().domain, f.source->field().domain) &&
+            ((!prior->field().appearance && !f.source->field().appearance) ||
+             same(prior->field().appearance, f.source->field().appearance)) &&
+            (!same(prior->field().bake_recipe, f.source->field().bake_recipe) ||
+             !same(prior->field().material_bindings, f.source->field().material_bindings)))
+          continue;
         throw std::invalid_argument(
             "One paint owner has contradictory source authorities");
+      }
+      if (!f.source) {
+        const auto before = paints_[i].payload.contains("field_recipe")
+                                ? paints_[i].payload.at("field_recipe")
+                                : Json(nullptr);
+        const auto current = f.bake_recipe ? f.bake_recipe->encode() : Json(nullptr);
+        // The raster may be shared while a holder/history records different
+        // Bake settings. Keep separate metadata records, without losing either
+        // recipe or charging the same raster as independently allocated.
+        if (before != current)
+          continue;
+      }
       return uint32_t(i);
     }
   }
@@ -991,6 +1022,7 @@ TextureSetArchive::referenced_paints(const Json &holder, const Json &geometry) {
   if (!c.at("additional").is_array() || c.at("additional").empty() ||
       c.at("additional").size() > 63)
     throw std::length_error("Shared texture-set member count exceeded");
+  (void)texture_set_recipe_member(primary.at("painted"));
   std::vector<const Json *> result{&primary.at("painted")};
   for (const auto &field : c.at("additional")) {
     const auto &p = paints.at(index(field.at("painted"), paints.size()));
@@ -998,6 +1030,7 @@ TextureSetArchive::referenced_paints(const Json &holder, const Json &geometry) {
     if (index(r.at("domain"), domains.size()) !=
         index(field.at("domain"), domains.size()))
       throw std::invalid_argument("Shared additional field has foreign domain");
+    (void)texture_set_recipe_member(p.at("painted"));
     result.push_back(&p.at("painted"));
   }
   return result;
