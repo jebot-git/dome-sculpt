@@ -201,9 +201,22 @@
     "invocation": "ecca157699b24d96a052e95260d59de3",
     "cases": 86,
     "status_path": "artifacts/vrm-consumer-combined-20261126/combined-regression/status.json",
-    "terminal": false,
-    "phase_at_record": "Release build",
+    "terminal": true,
+    "phase_at_record": "private software CTest finished",
     "previous_invocation": "91c1e6034f75469998d175fe73abf8f0",
-    "previous_failure": "Runner output parent did not exist. Created the isolated build directory and used a new invocation before any source build or CTest."
+    "previous_failure": "Runner output parent did not exist. Created the isolated build directory and used a new invocation before any source build or CTest.",
+    "passed": 85,
+    "skipped": 0,
+    "failed": [
+      "resolution-quality-host-aggregate"
+    ],
+    "clean_final": true,
+    "build_exit": 0,
+    "ctest_exit": 8,
+    "junit": {
+      "path": "artifacts/vrm-consumer-combined-20261126/combined-regression/ctest.xml",
+      "sha256": "8cda7753a05353d1e1d7f7d85c5c44d65aad2994aad2e72dab369bd7e422838f"
+    },
+    "followup": "docs/validation/vrm-consumer-combined-public-20261126.json"
   }
 }

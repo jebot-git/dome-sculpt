@@ -649,9 +649,28 @@ maximum difference of one RGB8 step in both profiles under the original
 four-step tolerance. Arc execution was witnessed on `/dev/dri/renderD129`.
 The broad suite passes 167 checks under Release and ASan/UBSan. Both software
 graphics consumers also pass under ASan/UBSan, with leak detection enabled
-throughout that profile. The candidate changes test code. A fresh optimized FLTK build and the same
-86-case replay are running on the exact pushed source. See
-[the focused and combined-replay receipt](validation/vrm-consumer-source-20261126.json).
+throughout that profile. The candidate changes test code. The fresh optimized
+FLTK build and 86-case replay on the exact pushed source finished with 85
+passes and no skips. All three VRM cases pass. The sole failure was a host
+resolution fixture that rearmed a readback pause before the earlier worker
+had exited its wait. See [the VRM receipt](validation/vrm-consumer-source-20261126.json).
+
+The exact combined Release application passed 14 native Wayland checks through
+canonical DomeD on Intel Arc, 14 public creator desktop checks, and 58 public
+creator synthetic OpenXR checks on Intel Arc. XR covers accept, cancel, focus
+loss/regain and three ordinary reopens. The wrappers verify input digests and
+clean teardown. The native Wayland run uses a nested compositor with diagnostic
+presentation. Physical headset and scanout acceptance remain open.
+
+Fixture-only candidate `1ab9d535` deliberately queues a new resolution request
+while the previous generation is still paused after readback. Ticketed release
+keeps both waits valid and isolates the outgoing job from the new job's fault
+injection. The exact old scene and file survive cancellation and the injected
+failure, and the new transaction retries successfully. All 23 assertions pass
+in 20 Release and eight ASan/UBSan repetitions with leak detection. The whole
+Release build with all 1,360 registered CTests and the separately built 86-case
+sanitizer candidate are active on `ccbbe020`, with the fixture correction
+qualified separately. Read [the combined receipt](validation/vrm-consumer-combined-public-20261126.json).
 
 ## Source and integration boundary
 

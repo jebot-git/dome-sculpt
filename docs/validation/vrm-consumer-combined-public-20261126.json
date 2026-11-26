@@ -1,0 +1,296 @@
+{
+  "candidate": "ccbbe02093bed6997bdacdf0d36b3a11bc1f177d",
+  "release_app": {
+    "path": "artifacts/vrm-consumer-combined-20261126/dome-sculpt",
+    "sha256": "4b6335a00541127e43528b7f2c985cc24213a9fc7ef77d268a471aef9d926a1b"
+  },
+  "release": {
+    "passed": 85,
+    "failed": [
+      "resolution-quality-host-aggregate"
+    ],
+    "skipped": 0,
+    "status": {
+      "path": "artifacts/vrm-consumer-combined-20261126/combined-regression/status.json",
+      "sha256": "6964ca762d93bf0b74767539c6006385a2438b7cf3befc2d5c1c5c854f1c9409"
+    },
+    "junit": {
+      "path": "artifacts/vrm-consumer-combined-20261126/combined-regression/ctest.xml",
+      "sha256": "8cda7753a05353d1e1d7f7d85c5c44d65aad2994aad2e72dab369bd7e422838f"
+    },
+    "build_log": {
+      "path": "artifacts/vrm-consumer-combined-20261126/combined-regression/build.log",
+      "sha256": "3607a7ceec6768984f709585a12ea33d6a3c1e2ab41d7669fcb7315ad8884145"
+    },
+    "positive_vrm_recovers": [
+      "vrm",
+      "source-color-vrm",
+      "vrm-role-consumer"
+    ]
+  },
+  "public": {
+    "round": {
+      "path": "artifacts/vrm-consumer-public-20261126/status.json",
+      "sha256": "9e68552695f5823e1fb9c13523c7f5201cd618feb74a0d19dd1bab7e2ba7cdbf"
+    },
+    "cases": {
+      "wayland": {
+        "checks": 14,
+        "status": {
+          "path": "artifacts/creator-public-build-20261126/combined-waylandccbbe020-v1/status.json",
+          "sha256": "76b1d1a12277fc77387cef62070a46621f07e0976e27eedf09bb34e8f2bdb753"
+        },
+        "report": {
+          "path": "artifacts/creator-public-build-20261126/combined-waylandccbbe020-v1/workflow/report.json",
+          "sha256": "6bd20c3c03e3f6bf40afca17657f56c92b17360ea98f700db5c79bdf6b547187"
+        },
+        "wrapper_exit": 0,
+        "run": "actual combined native Wayland14",
+        "arc_observer_files": [
+          [
+            "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/combined-waylandccbbe020-v1/workflow/actual-device/egl-query-0/device.txt",
+            "dec762e08075446c368acb5354e5129f9c00b6576853837361ee7c5e9f8f62fc"
+          ]
+        ]
+      },
+      "desktop": {
+        "checks": 14,
+        "status": {
+          "path": "artifacts/creator-public-build-20261126/publicccbbe020-desktop-v1/status.json",
+          "sha256": "9ff2a022b8293b4c52481414b63adda89e2eecc9b6e85db048d1802c12045751"
+        },
+        "report": {
+          "path": "artifacts/creator-public-build-20261126/publicccbbe020-desktop-v1/workflow/report.json",
+          "sha256": "1e33aa17ac2ff3949897c6150358b497cc546e220781ca86b9fb02546f75f4a8"
+        },
+        "wrapper_exit": 0,
+        "run": "public desktop"
+      },
+      "accept": {
+        "checks": 19,
+        "status": {
+          "path": "artifacts/creator-public-build-20261126/publicccbbe020-accept-v1/status.json",
+          "sha256": "c2e10e014b42ccb9638198aff8ddaa6c5f86f8ad7ce80ec00205953bf56001d1"
+        },
+        "report": {
+          "path": "artifacts/creator-public-build-20261126/publicccbbe020-accept-v1/workflow/report.json",
+          "sha256": "f8d58651e00e11fa1d7642653be1d2905cf1850956cf8784e0c3bfec50d4b18e"
+        },
+        "wrapper_exit": 0,
+        "run": "public accept",
+        "arc_observer_files": [
+          [
+            "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/publicccbbe020-accept-v1/actual-device/3208761/device.txt",
+            "9b5f10292e8272fbbbb52723b98ec973dd221f43e157bb5c07ea8f3c2bcf96ff"
+          ],
+          [
+            "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/publicccbbe020-accept-v1/actual-device/3216398/device.txt",
+            "30dbebda439a2f51d5f0f6e26e74b0326b0e1bea1264feaf537fc2bd0cfd990e"
+          ]
+        ]
+      },
+      "cancel": {
+        "checks": 19,
+        "status": {
+          "path": "artifacts/creator-public-build-20261126/publicccbbe020-cancel-v1/status.json",
+          "sha256": "b08827cbe8ce62566c1b35c6d919d1cbb1e50c85e3841b23e12e7cf6d47a3c6d"
+        },
+        "report": {
+          "path": "artifacts/creator-public-build-20261126/publicccbbe020-cancel-v1/workflow/report.json",
+          "sha256": "f8d58651e00e11fa1d7642653be1d2905cf1850956cf8784e0c3bfec50d4b18e"
+        },
+        "wrapper_exit": 0,
+        "run": "public cancel",
+        "arc_observer_files": [
+          [
+            "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/publicccbbe020-cancel-v1/actual-device/3223585/device.txt",
+            "cba4277b8121e230a0e27bdcf8f9a367cd5dc1615cd417ddcaa28fbe115c88e0"
+          ],
+          [
+            "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/publicccbbe020-cancel-v1/actual-device/3228865/device.txt",
+            "7cd26fb15b593d68b031f1e982e8edfa0c00e6ce40004023476d75102fc3efbd"
+          ]
+        ]
+      },
+      "focus": {
+        "checks": 20,
+        "status": {
+          "path": "artifacts/creator-public-build-20261126/publicccbbe020-focus-v1/status.json",
+          "sha256": "f2fe52ef802adad30e904e2b92f7d4512902885ed537720a105ac2807d856816"
+        },
+        "report": {
+          "path": "artifacts/creator-public-build-20261126/publicccbbe020-focus-v1/workflow/report.json",
+          "sha256": "39a25aac499d9c5cd5dad043f4b3e394b015af46002d8145ae44cfaa9523002e"
+        },
+        "wrapper_exit": 0,
+        "run": "public focus",
+        "arc_observer_files": [
+          [
+            "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/publicccbbe020-focus-v1/actual-device/3234712/device.txt",
+            "067e875d1721f01c1cb5253ad11d7009da5ec688311e861cd3c63fc432312bfa"
+          ],
+          [
+            "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/publicccbbe020-focus-v1/actual-device/3239776/device.txt",
+            "1d00338ad140fa8bedb8deaa405c1df4edd71ee9a7d863d43d8dced3a6932b2e"
+          ]
+        ]
+      }
+    },
+    "compositor": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+    "device": "Intel Arc A770 PCI 0000:03:00.0 renderD129 i915",
+    "transport": "Native Wayland through a nested DomeD compositor; standalone creator desktop fixture and synthetic OpenXR loader replay."
+  },
+  "resolution_fixture": {
+    "source": "1ab9d535fda56eef2c2e577191de8c4b47335b06",
+    "branch": "work/resolution-aggregate-handoff-20261126",
+    "outcome": "Released aggregate tickets remain valid after rearming. The test deliberately accepts a new operation while the prior generation is held at readback.",
+    "profiles": {
+      "release": {
+        "runs": 20,
+        "checks_per_run": 23,
+        "logs": [
+          {
+            "path": "artifacts/resolution-aggregate-handoff-validation-20261126/release-traces/1.log",
+            "sha256": "2b825bcee603b96d00daee980428072e82c2abf71b5e21eedaab3acb26b27d76"
+          },
+          {
+            "path": "artifacts/resolution-aggregate-handoff-validation-20261126/release-traces/10.log",
+            "sha256": "2b825bcee603b96d00daee980428072e82c2abf71b5e21eedaab3acb26b27d76"
+          },
+          {
+            "path": "artifacts/resolution-aggregate-handoff-validation-20261126/release-traces/11.log",
+            "sha256": "2b825bcee603b96d00daee980428072e82c2abf71b5e21eedaab3acb26b27d76"
+          },
+          {
+            "path": "artifacts/resolution-aggregate-handoff-validation-20261126/release-traces/12.log",
+            "sha256": "2b825bcee603b96d00daee980428072e82c2abf71b5e21eedaab3acb26b27d76"
+          },
+          {
+            "path": "artifacts/resolution-aggregate-handoff-validation-20261126/release-traces/13.log",
+            "sha256": "2b825bcee603b96d00daee980428072e82c2abf71b5e21eedaab3acb26b27d76"
+          },
+          {
+            "path": "artifacts/resolution-aggregate-handoff-validation-20261126/release-traces/14.log",
+            "sha256": "2b825bcee603b96d00daee980428072e82c2abf71b5e21eedaab3acb26b27d76"
+          },
+          {
+            "path": "artifacts/resolution-aggregate-handoff-validation-20261126/release-traces/15.log",
+            "sha256": "2b825bcee603b96d00daee980428072e82c2abf71b5e21eedaab3acb26b27d76"
+          },
+          {
+            "path": "artifacts/resolution-aggregate-handoff-validation-20261126/release-traces/16.log",
+            "sha256": "2b825bcee603b96d00daee980428072e82c2abf71b5e21eedaab3acb26b27d76"
+          },
+          {
+            "path": "artifacts/resolution-aggregate-handoff-validation-20261126/release-traces/17.log",
+            "sha256": "2b825bcee603b96d00daee980428072e82c2abf71b5e21eedaab3acb26b27d76"
+          },
+          {
+            "path": "artifacts/resolution-aggregate-handoff-validation-20261126/release-traces/18.log",
+            "sha256": "2b825bcee603b96d00daee980428072e82c2abf71b5e21eedaab3acb26b27d76"
+          },
+          {
+            "path": "artifacts/resolution-aggregate-handoff-validation-20261126/release-traces/19.log",
+            "sha256": "2b825bcee603b96d00daee980428072e82c2abf71b5e21eedaab3acb26b27d76"
+          },
+          {
+            "path": "artifacts/resolution-aggregate-handoff-validation-20261126/release-traces/2.log",
+            "sha256": "2b825bcee603b96d00daee980428072e82c2abf71b5e21eedaab3acb26b27d76"
+          },
+          {
+            "path": "artifacts/resolution-aggregate-handoff-validation-20261126/release-traces/20.log",
+            "sha256": "2b825bcee603b96d00daee980428072e82c2abf71b5e21eedaab3acb26b27d76"
+          },
+          {
+            "path": "artifacts/resolution-aggregate-handoff-validation-20261126/release-traces/3.log",
+            "sha256": "2b825bcee603b96d00daee980428072e82c2abf71b5e21eedaab3acb26b27d76"
+          },
+          {
+            "path": "artifacts/resolution-aggregate-handoff-validation-20261126/release-traces/4.log",
+            "sha256": "2b825bcee603b96d00daee980428072e82c2abf71b5e21eedaab3acb26b27d76"
+          },
+          {
+            "path": "artifacts/resolution-aggregate-handoff-validation-20261126/release-traces/5.log",
+            "sha256": "2b825bcee603b96d00daee980428072e82c2abf71b5e21eedaab3acb26b27d76"
+          },
+          {
+            "path": "artifacts/resolution-aggregate-handoff-validation-20261126/release-traces/6.log",
+            "sha256": "2b825bcee603b96d00daee980428072e82c2abf71b5e21eedaab3acb26b27d76"
+          },
+          {
+            "path": "artifacts/resolution-aggregate-handoff-validation-20261126/release-traces/7.log",
+            "sha256": "2b825bcee603b96d00daee980428072e82c2abf71b5e21eedaab3acb26b27d76"
+          },
+          {
+            "path": "artifacts/resolution-aggregate-handoff-validation-20261126/release-traces/8.log",
+            "sha256": "2b825bcee603b96d00daee980428072e82c2abf71b5e21eedaab3acb26b27d76"
+          },
+          {
+            "path": "artifacts/resolution-aggregate-handoff-validation-20261126/release-traces/9.log",
+            "sha256": "2b825bcee603b96d00daee980428072e82c2abf71b5e21eedaab3acb26b27d76"
+          }
+        ],
+        "executable": {
+          "path": "artifacts/resolution-aggregate-handoff-validation-20261126/release-aggregate",
+          "sha256": "e1ae156ca20ab99208a47344d1b90c4b52901dbc33374f92511d2f7474952552"
+        }
+      },
+      "asan": {
+        "runs": 8,
+        "checks_per_run": 23,
+        "logs": [
+          {
+            "path": "artifacts/resolution-aggregate-handoff-validation-20261126/asan-traces/1.log",
+            "sha256": "2b825bcee603b96d00daee980428072e82c2abf71b5e21eedaab3acb26b27d76"
+          },
+          {
+            "path": "artifacts/resolution-aggregate-handoff-validation-20261126/asan-traces/2.log",
+            "sha256": "2b825bcee603b96d00daee980428072e82c2abf71b5e21eedaab3acb26b27d76"
+          },
+          {
+            "path": "artifacts/resolution-aggregate-handoff-validation-20261126/asan-traces/3.log",
+            "sha256": "2b825bcee603b96d00daee980428072e82c2abf71b5e21eedaab3acb26b27d76"
+          },
+          {
+            "path": "artifacts/resolution-aggregate-handoff-validation-20261126/asan-traces/4.log",
+            "sha256": "2b825bcee603b96d00daee980428072e82c2abf71b5e21eedaab3acb26b27d76"
+          },
+          {
+            "path": "artifacts/resolution-aggregate-handoff-validation-20261126/asan-traces/5.log",
+            "sha256": "2b825bcee603b96d00daee980428072e82c2abf71b5e21eedaab3acb26b27d76"
+          },
+          {
+            "path": "artifacts/resolution-aggregate-handoff-validation-20261126/asan-traces/6.log",
+            "sha256": "2b825bcee603b96d00daee980428072e82c2abf71b5e21eedaab3acb26b27d76"
+          },
+          {
+            "path": "artifacts/resolution-aggregate-handoff-validation-20261126/asan-traces/7.log",
+            "sha256": "2b825bcee603b96d00daee980428072e82c2abf71b5e21eedaab3acb26b27d76"
+          },
+          {
+            "path": "artifacts/resolution-aggregate-handoff-validation-20261126/asan-traces/8.log",
+            "sha256": "2b825bcee603b96d00daee980428072e82c2abf71b5e21eedaab3acb26b27d76"
+          }
+        ],
+        "executable": {
+          "path": "artifacts/resolution-aggregate-handoff-validation-20261126/asan-aggregate",
+          "sha256": "2394825a5de40f5a67f1bf15c8d95eadceb2cf12c0c86e1fe52c367bff74656c"
+        }
+      }
+    }
+  },
+  "full_release": {
+    "unit": "ds-vrm-consumer-full-release-20261126.service",
+    "invocation": "24af6aa6636246d69fbb40bb192389ef",
+    "terminal": false,
+    "phase_at_record": "Build remaining optimized Release targets",
+    "status_path": "artifacts/vrm-consumer-combined-20261126/full-private-ctest/status.json"
+  },
+  "selected_sanitizer": {
+    "unit": "ds-vrm-consumer-combined-asan-20261126.service",
+    "invocation": "79eca1b4ef0242df8264cf79de76d5cc",
+    "terminal": false,
+    "phase_at_record": "Sanitizer build",
+    "status_path": "artifacts/vrm-consumer-combined-asan-20261126/combined-regression/status.json"
+  }
+}
