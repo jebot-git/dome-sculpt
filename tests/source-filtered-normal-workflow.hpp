@@ -179,13 +179,45 @@ void cancellation(uint32_t resolution){
   require(after_raster&&requested&&caught&&candidate.encode()==encoded&&candidate.active().painted==paint,"Cancellation after actual normal rasterization preserves exact selected grid, source and unpublished Bake");
  }
 }
-int run(const std::filesystem::path &folder,const std::filesystem::path &old,uint32_t resolution,uint32_t ordinary_resolution){
- std::filesystem::create_directories(folder);legacy(old,folder);resize_limits();ordinary_sources(folder,ordinary_resolution);cancellation(resolution);unsigned positives=0,refusals=0;
- for(bool legacy:{false,true})for(bool live:{false,true})for(bool seam:{false,true})for(auto method:{SourceNormalUvMethod::Rasterize,SourceNormalUvMethod::RetainSource}){
-  auto family=before(legacy,live,seam,method);if(method==SourceNormalUvMethod::RetainSource){low_refusal(family,folder);++refusals;}positive(family,resolution,folder,method==SourceNormalUvMethod::RetainSource);++positives;
+// These groups allow instrumented executables to check every case in separate
+// processes. The ordinary invocation still runs the entire original workflow.
+constexpr std::array<std::string_view,6> groups{
+    "common", "mt1-rest", "mt1-posed", "mt0-rest", "mt0-posed", "three-edits"};
+
+int run(const std::filesystem::path &folder,const std::filesystem::path &old,
+        uint32_t resolution,uint32_t ordinary_resolution,std::string_view group={}) {
+ if(!group.empty()&&std::find(groups.begin(),groups.end(),group)==groups.end())
+  throw std::invalid_argument("Unknown filtered Bake workflow group");
+ const auto selected=[group](std::string_view name){return group.empty()||group==name;};
+ std::filesystem::create_directories(folder);
+ if(selected("common")){
+  legacy(old,folder);
+  resize_limits();
+  ordinary_sources(folder,ordinary_resolution);
+  cancellation(resolution);
  }
- positive(before(false,true,true,SourceNormalUvMethod::RetainSource,true),resolution,folder);++positives;
- require(positives==17&&refusals==8,"All original64 retained refusals and separately named genuine higher-target-resolution families execute");
+ unsigned positives=0,refusals=0;
+ for(bool legacy:{false,true})for(bool live:{false,true})for(bool seam:{false,true})for(auto method:{SourceNormalUvMethod::Rasterize,SourceNormalUvMethod::RetainSource}){
+  if(!selected(groups[1+2*unsigned(legacy)+unsigned(live)]))continue;
+  auto family=before(legacy,live,seam,method);
+  const bool retained=method==SourceNormalUvMethod::RetainSource;
+  if(retained){low_refusal(family,folder);++refusals;}
+  positive(family,resolution,folder,retained);
+  ++positives;
+ }
+ if(selected("three-edits")){
+  positive(before(false,true,true,SourceNormalUvMethod::RetainSource,true),resolution,folder);
+  ++positives;
+ }
+ if(group.empty())
+  require(positives==17&&refusals==8,"All original64 retained refusals and separately named genuine higher-target-resolution families execute");
+ else {
+  const unsigned expected_positives=group=="common"?0u:group=="three-edits"?1u:4u;
+  const unsigned expected_refusals=expected_positives==4?2u:0u;
+  if(positives!=expected_positives||refusals!=expected_refusals)
+   throw std::runtime_error("Filtered Bake group missed a workflow or refusal");
+  std::cout<<"FILTERED_WORKFLOW_GROUP "<<group<<'\n';
+ }
  std::cout<<"PASS "<<checks<<" filtered Bake workflow positives="<<positives<<" original64_refusals="<<refusals<<" target_resolution="<<resolution<<" ordinary_target_resolution="<<ordinary_resolution<<"\n";return 0;
 }
 } // namespace filtered_workflow
