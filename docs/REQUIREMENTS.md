@@ -108,6 +108,12 @@ sanitizer leak remains in the evidence.
 [Affine-source Bake evidence](validation/affine-texture-set-bake-source-20261126.json)
 [Affine-target Bake evidence](validation/affine-target-bake-20261126.json)
 [Prepared retained-target Bake evidence](validation/retained-target-bake-20261126.json)
+Non-HDR retained projects now use the standard GLB worker. Headless
+exports match byte for byte across Release and ASan/UBSan. Native HDR
+retained Bake remains writable and reopenable. Per-field portable HDR
+export is still required.
+[Standard GLB and UV archive evidence](validation/retained-target-export-worker-20261126.json)
+
 
 ## Qualified integration — 2026-11-17
 

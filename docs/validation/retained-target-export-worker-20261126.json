@@ -1,0 +1,68 @@
+{
+  "candidate": "eff4e04760a87cfc77191d5840cfbff85565c4c5",
+  "merge": "7a2510bbf0acbac2fbfc67ddc37631455d52f81c",
+  "validation": {
+    "release": {
+      "candidate": "eff4e04760a87cfc77191d5840cfbff85565c4c5",
+      "terminal": true,
+      "invocation": "7f7f040fc65f44efb9028a053c7ffaea",
+      "core_sha256": "5fe8311edf3642ec5ac81631c60f6a2f22486491fd77b9a1b541ba171a99c074",
+      "fixture_sha256": "6dc0185b1a4df03ac4545188f7cc01965d6c8a5f2e9b23f0183ab204422b3585",
+      "phase": "complete",
+      "app_sha256": "8f40dfaeaaec89532c42509636ed529e0edaf50d80b0ea1124d9887e1602c40b",
+      "exit": 0,
+      "headless_glb_sha256": "7ea70f7fb8689c1fe5de7572ef7b903c7c96a0aee7b8f6233de1849b845c5ae1",
+      "case_sha256": {
+        "corner-uv": "c6ee83e3ddbbf4959931444f19a9363d103acf2ba34165e2ab8a3288acad66b3",
+        "retained-target": "33480c0bd6e4c5e2b8a96d29694c1ca3006c69550db72830bc95e144e65368d5",
+        "hdr-worker": "348f7ffaff803b7c27f2f7b9633afe678bffbdb57bd05953f6ff00ec13b0b84e",
+        "headless-export": "8552f24787cc6bafcd7ef905d41dbc7279dea4017a029d8af45aaf3f76de5852"
+      }
+    },
+    "asan": {
+      "candidate": "eff4e04760a87cfc77191d5840cfbff85565c4c5",
+      "terminal": true,
+      "invocation": "181da3212fc643e0994467b5523597e9",
+      "core_sha256": "168b51026dbef2c4a9f7ce14926af452d1c7210fb15c38550ee1299037f1107b",
+      "fixture_sha256": "774604024d0ae088eae1b3cd6099c4acc40f56117adfd042ae086d1ce6c24a44",
+      "phase": "complete",
+      "app_sha256": "b6b796c3d626b05119b599c3fecd3658ebd3f4903cb5aff025969963df04bde2",
+      "exit": 0,
+      "headless_glb_sha256": "7ea70f7fb8689c1fe5de7572ef7b903c7c96a0aee7b8f6233de1849b845c5ae1",
+      "case_sha256": {
+        "corner-uv": "ddc3dd0eaff136eb398e3a471c53771e3b03b6bada0aaf48313001cbfd080700",
+        "retained-target": "f5a268fe112f6b10b778640814b8d99772e6d230be6351eb63d18874a297d5ff",
+        "hdr-worker": "431d8f09aae76cea843e77ddb02c605642dccaf729de12c3a35647ff60a27d18",
+        "headless-export": "0eaed8e6812727a9bb307a807b320745aae084e5e3e531720be2e1afe4bf86c5"
+      }
+    }
+  },
+  "scope": "Standard GLB worker, actual headless reopen/export, positive HDR worker, and malformed alternate-UV refusal with unchanged valid paired Bake.",
+  "archive": {
+    "file": "retained-target-export-worker-20261126.tar.gz",
+    "sha256": "387e80e6e4be0dae5d9015805de22c365baa865804e0609882669a33e7a3aa1b",
+    "members": {
+      "asan/app-link.log": "d3b96ea6478032c6107118ce727bd301bcc47179d05179a0204202dc2025bd7c",
+      "asan/corner-uv.log": "ddc3dd0eaff136eb398e3a471c53771e3b03b6bada0aaf48313001cbfd080700",
+      "asan/hdr-worker.log": "431d8f09aae76cea843e77ddb02c605642dccaf729de12c3a35647ff60a27d18",
+      "asan/headless-export.log": "0eaed8e6812727a9bb307a807b320745aae084e5e3e531720be2e1afe4bf86c5",
+      "asan/retained-target.log": "f5a268fe112f6b10b778640814b8d99772e6d230be6351eb63d18874a297d5ff",
+      "asan/status.json": "21e25a280c7a8a36a91e94b6c9927407d45fd6c23b42a2352f764b0d097fac3e",
+      "headless/prior-headless.log": "51b7eb50b23d6bff75370dcfda947cf0bac56bda7ff6336183494663a8bafe67",
+      "headless/retained.glb": "7ea70f7fb8689c1fe5de7572ef7b903c7c96a0aee7b8f6233de1849b845c5ae1",
+      "qualification.py": "9114bf9f4c7a253306be336122163221465e8563c07c01ce216dc6300ddf03ad",
+      "release/app-link.log": "c4321372bc05bb5deb72b6afd543af2cf43d55a91a69f147e1fe6e9de4254689",
+      "release/corner-uv.log": "c6ee83e3ddbbf4959931444f19a9363d103acf2ba34165e2ab8a3288acad66b3",
+      "release/hdr-worker.log": "348f7ffaff803b7c27f2f7b9633afe678bffbdb57bd05953f6ff00ec13b0b84e",
+      "release/headless-export.log": "8552f24787cc6bafcd7ef905d41dbc7279dea4017a029d8af45aaf3f76de5852",
+      "release/retained-target.log": "33480c0bd6e4c5e2b8a96d29694c1ca3006c69550db72830bc95e144e65368d5",
+      "release/status.json": "fd84925efd1538fff10aeb8d687538f928464a34ad9c4a44cd8afbe550532a5b",
+      "uv-guard/asan/corner-uv.log": "329b9b55040533c653766e27021e73e2d1284e837e620f016460ae594bd468ee",
+      "uv-guard/asan/retained-donor.log": "7b65b5b71d9b7ed8f1e964f35f7dfc081169df858e372d9d620d3b3414986e38",
+      "uv-guard/asan/status.json": "658908b25bb718a21562e3775e0ab8d14166c91f2a92bf706074425ce78121d2",
+      "uv-guard/release/corner-uv.log": "1bffa3c63579634d829690f6dd90038e6742e32fd6d9f48c265615be15dd318b",
+      "uv-guard/release/retained-donor.log": "5ef17010bf7c41e4fdcefcf02e1254c56d8039796ec8a3043c26a4060a97b1e2",
+      "uv-guard/release/status.json": "9d45e80b1853d8d46e779171683900b66230e02a23492fb07309ba3f993ec782"
+    }
+  }
+}

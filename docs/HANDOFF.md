@@ -1212,6 +1212,22 @@ each field. The broader production gate still includes N-only retained
 recipients, deformed retained sources and physical input.
 [Prepared retained-target Bake evidence](validation/retained-target-bake-20261126.json)
 
+The follow-up fixes a prepared retained project's standard GLB export.
+A false HDR capability in its material archive had routed the project
+through the physical-emission exporter. The normal GLB worker now
+exports the actual active and neighboring material primitives. A cold
+headless export of the accepted Wayland/XR scene is byte-identical in
+Release and ASan/UBSan. The genuine HDR export worker also passes in
+both profiles. Per-field portable HDR export remains open.
+
+The broader 1,334-case run on the older retained-donor build exposed
+a separate UV1 archive diagnostic. The reader now rejects writable
+alternate-UV data before calling the native bake installer if the
+input lacks its owning Paint4 context. The unchanged failing fixture,
+its valid paired UV Bake and both retained bake roles pass in Release
+and ASan/UBSan.
+[GLB worker and UV archive evidence](validation/retained-target-export-worker-20261126.json)
+
 ## Source and integration boundary
 
 - Main now admits product1bc13125 and public fixturef1e193c7 after complete
