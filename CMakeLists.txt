@@ -222,6 +222,12 @@ if(BUILD_TESTING)
   add_executable(dome-sculpt-source-retained-emission-worker-test tests/source-retained-emission-worker.cpp)
   target_include_directories(dome-sculpt-source-retained-emission-worker-test PRIVATE src)
   target_link_libraries(dome-sculpt-source-retained-emission-worker-test PRIVATE dome-sculpt-core)
+  add_executable(dome-sculpt-texture-set-bake-recipe-test tests/texture-set-bake-recipe.cpp)
+  target_include_directories(dome-sculpt-texture-set-bake-recipe-test PRIVATE src)
+  target_link_libraries(dome-sculpt-texture-set-bake-recipe-test PRIVATE dome-sculpt-core)
+  add_test(NAME texture-set-bake-recipe COMMAND dome-sculpt-texture-set-bake-recipe-test
+    ${CMAKE_CURRENT_BINARY_DIR}/texture-set-bake-recipe)
+  set_tests_properties(texture-set-bake-recipe PROPERTIES TIMEOUT 900)
   add_test(NAME source-retained-emission-worker COMMAND dome-sculpt-source-retained-emission-worker-test
     ${CMAKE_CURRENT_BINARY_DIR}/source-hdr-provenance-closure-seed/selected-target-resolution.dsculpt)
   set_tests_properties(source-retained-emission-worker PROPERTIES FIXTURES_REQUIRED hdr-closure-seed TIMEOUT 900)

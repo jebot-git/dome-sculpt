@@ -620,6 +620,17 @@ uint32_t TextureSetArchive::add_paint(const TextureSetView &f,
       if (!same(paints_[i].source, f.source) && (paints_[i].source || f.source))
         throw std::invalid_argument(
             "One paint owner has contradictory source authorities");
+      if (!f.source) {
+        const auto before = paints_[i].payload.contains("field_recipe")
+                                ? paints_[i].payload.at("field_recipe")
+                                : Json(nullptr);
+        const auto current = f.bake_recipe ? f.bake_recipe->encode() : Json(nullptr);
+        // The raster may be shared while a holder/history records different
+        // Bake settings. Keep separate metadata records, without losing either
+        // recipe or charging the same raster as independently allocated.
+        if (before != current)
+          continue;
+      }
       return uint32_t(i);
     }
   }

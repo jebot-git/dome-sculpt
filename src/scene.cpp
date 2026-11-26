@@ -613,7 +613,7 @@ nlohmann::json Scene::encode() const {
     if(feature_version==37&&!canonical_paints)throw std::invalid_argument("Scene37 writer lacks actual canonical paint ownership");
   }
   const auto sourceful=[](const auto&collection){if(!collection)return false;if(collection->primary_source())return true;return std::any_of(collection->additional().begin(),collection->additional().end(),[](const auto&field){return bool(field.source);});};
-  const bool shared_sets=texture_sets&&(std::any_of(objects_.begin(),objects_.end(),[&](const auto&o){return sourceful(o.texture_sets);})||std::any_of(polygons.origins().begin(),polygons.origins().end(),[](const auto&o){return bool(o->texture_sets);}));
+  const bool shared_sets=texture_sets&&(std::any_of(objects_.begin(),objects_.end(),[&](const auto&o){return sourceful(o.texture_sets)||(o.texture_sets&&(o.bake_recipe||std::any_of(o.texture_sets->additional().begin(),o.texture_sets->additional().end(),[](const auto&field){return bool(field.bake_recipe);})));})||std::any_of(polygons.origins().begin(),polygons.origins().end(),[](const auto&o){return bool(o->texture_sets);}));
   std::unique_ptr<detail::TextureSetFieldCodec>field_codec;
   if(shared_sets){texture_archive.shared_records();field_codec=std::make_unique<detail::TextureSetFieldCodec>();texture_archive.field_encoder([&](const TextureSetView&field,uint32_t geometry){return field_codec->encode(field,geometry,source_images,&normal_domains,&writable_domains,[&](auto binding){return source_materials.add(std::move(binding));});},[&]{return field_codec->records();});}
   // Keep old UV-only Scene26 records free of fabricated rig-history fields.

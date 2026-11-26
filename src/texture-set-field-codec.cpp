@@ -28,7 +28,18 @@ void TextureSetFieldCodec::preflight()const{
  }
 }
 nlohmann::json TextureSetFieldCodec::encode(const TextureSetView&view,uint32_t geometry,PaintImageArchive&images,NormalSamplingArchive*normal,PaintSamplingArchive*sampling,const MaterialWriter&materials){
- stop(limits_);if(!view.source)return TextureSetPaintAccess::encode(*view.painted,&images,normal,sampling);
+ stop(limits_);if(!view.source){
+  // A plain field's recipe is an independent future Bake context, not an
+  // original image/material/normal capability. Carry it in the actual Scene40
+  // membership envelope; source-backed fields keep their existing seed codec.
+  if(view.bake_recipe&&(view.material_bindings||view.appearance||view.painted->paint_sampling_domain()||
+      view.painted->source_sampling_prepared()||view.painted->source_maps()||view.painted->color_projection()||
+      view.painted->normal_projection()||(view.painted->baked()&&view.painted->baked()->normal_field)))
+    throw std::invalid_argument("Texture-set recipe field needs its actual source/material adapter");
+  auto result=TextureSetPaintAccess::encode(*view.painted,&images,normal,sampling);
+  if(view.bake_recipe){result["field_kind"]="bake_recipe";result["field_recipe"]=view.bake_recipe->encode();}
+  return result;
+ }
  view.source->authenticate_owner(view.source);view.source->validate_field(view,limits_);if(!materials||!view.material_bindings||!view.source->polygon_owner())throw std::invalid_argument("Source Paint7 requires its actual material/node writer");
  const auto binding=materials(view.material_bindings),node=PolygonSurfaceArchive::writer().add(view.material_bindings);size_t id=0;
  for(;id<written_.size();++id){const auto&w=written_[id];if(w.geometry==geometry&&owner(w.source->original_paint(),view.source->original_paint())&&owner(w.source->field().material_bindings,view.material_bindings)&&owner(w.source->field().bake_recipe,view.bake_recipe)){if(w.node!=node||w.binding!=binding)throw std::invalid_argument("Actual field seed changed its node/material archive identity");break;}}
@@ -42,6 +53,17 @@ nlohmann::json TextureSetFieldCodec::encode(const TextureSetView&view,uint32_t g
  return {{"version",7},{"set",view.id},{"field_source",id},{"physical_paint",view.painted->has_physical_emission()},{"payload",std::move(payload)}};
 }
 DecodedTextureSetField TextureSetFieldCodec::decode(const nlohmann::json&j,const std::shared_ptr<const TextureSetFaceDomain>&domain,uint32_t geometry,const Material&current,const PaintImageArchive&images,const NormalSamplingArchive*normal,const PaintSamplingArchive*sampling,const MaterialReader&materials,bool polygon,const PaintedMesh*raster,const SourcePaintDecodeContext&context){
+ if(j.is_object()&&(j.contains("field_kind")||j.contains("field_recipe"))){
+  stop(limits_);if(j.size()!=5||j.contains("field_source")||!j.at("version").is_number_integer()||j.at("version")!=7||
+      !j.contains("field_kind")||j.at("field_kind")!="bake_recipe"||!j.contains("field_recipe")||!j.at("field_recipe").is_object())
+    throw std::invalid_argument("Incomplete texture-set recipe field envelope");
+  auto recipe=ObjectBakeRecipe::decode(j.at("field_recipe"));auto payload=j;payload.erase("field_kind");payload.erase("field_recipe");
+  auto paint=TextureSetPaintAccess::decode(payload,&images,polygon,normal,sampling,context,domain,raster);
+  if(paint->paint_sampling_domain()||paint->source_sampling_prepared()||paint->source_maps()||paint->color_projection()||
+      paint->normal_projection()||(paint->baked()&&paint->baked()->normal_field))
+    throw std::invalid_argument("Texture-set recipe field cannot grant source/material capability");
+  return {std::move(paint),{},{},{},std::move(recipe)};
+ }
  stop(limits_);if(!j.is_object()||!j.contains("field_source"))return {TextureSetPaintAccess::decode(j,&images,polygon,normal,sampling,context,domain,raster),{},{},{},{}};
  preflight();if(!domain||!materials||!j.is_object()||j.size()!=5||!j.at("version").is_number_integer()||j.at("version")!=7||number(j.at("set"),UINT32_MAX)!=domain->set()||!j.at("physical_paint").is_boolean()||!j.at("payload").is_object()||j.at("payload").contains("mesh")||j.at("payload").contains("baked")||j.at("payload").contains("version"))throw std::invalid_argument("Source Paint7 lacks its actual member/current-grid envelope");domain->authenticate_owner(domain);
  PolygonSurfaceTransferLimits wire_policy;wire_policy.maximum_working_bytes=limits_.maximum_bytes;wire_policy.geometry.cancelled=limits_.cancelled;(void)PolygonSurfacePaintCodec::preflight_grid(j.at("payload"),j.at("physical_paint").get<bool>(),true,wire_policy);
