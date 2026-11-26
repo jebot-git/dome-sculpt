@@ -1715,11 +1715,15 @@ colour and normal cases and the LDR and HDR app-ready cases pass 346,313
 checks. Maximum sampled rebake normal error is 0.004871 against the existing
 0.035 bound. The cases include current poses and keys, reflected and sheared
 placement, HDR above 7.9, and exact ordered Save, reopen and Undo/Redo. The
-19-test focused Release suite passes.
+19-test focused Release suite and the 18-test ASan/UBSan suite with leak
+detection pass. Both profiles pass the same native checks. The 130 native
+and canonical projects match byte for byte. The 18 joint projects differ
+only in a generated import group name containing the fixture process ID.
 Nested DomeD Wayland, software OpenXR and Intel Arc A770 OpenXR with the
 Release application each pass 30 public checks. All three routes save
 identical project bytes for each tested source family.
-The scoped sanitizer build and its Arc replays are still running.
+Intel Arc with the sanitizer application also passes 30 public checks and
+saves the same accepted project bytes.
 [Independent writable source evidence](validation/independent-writable-donor-20261126.json)
 
 ## Source and integration boundary

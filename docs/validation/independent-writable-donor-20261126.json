@@ -86,6 +86,91 @@
       "joint_max_normal_error": 0.00420556,
       "joint_max_material_error": 1.83527e-07,
       "joint_max_emission_value": 7.6954
+    },
+    "asan": {
+      "candidate": "ac3b7093c183d82ae4dc8fe40b1bf0777f192aea",
+      "profile": "asan",
+      "terminal": true,
+      "fltk": "/home/blux/de-xr/dome-sculpt/artifacts/sdk-20261126/toolkit-sanitize",
+      "invocation": "5e3c2d69c1c645cd9b884a52c4feaa3b",
+      "phase": "complete",
+      "baseline": "5d9af062971dae1a5128200f65ece10e9a9f82f2",
+      "elapsed_seconds": 599.41,
+      "core_sha256": "df09131e254fd091943968b5172ab533abde2b45033fa54d5035dfef1ab62de0",
+      "rebuilt": {
+        "core": {
+          "scene.cpp.o": "cadc89a8af72f8e17edb428878ca3f7d48e6b7df89608fe35f576c75ddc7c8de",
+          "bake-authoring.cpp.o": "3e5b540162ada9cd2accfb2aae67c9da19ff2723ce56d5567fa39195d9e23f87",
+          "paint.cpp.o": "a7b5f91dbc108eb24bf44f8c37c790746ae2823e7c912004b9028f97b5475b5c",
+          "source-uv-bake.cpp.o": "722bb7adb5dc39785fc5f18986136e5e233c627fbe80a52155a564f19f1f9b54",
+          "export.cpp.o": "4fd54a367d642b97c4914f7f580f0ca95b1305d639880bb2fa144546cdff128e",
+          "document.cpp.o": "8ae3506746daa29f975f5391e9dcaaaaef40046a1d8826f087e4b90d897d234f",
+          "material-visibility.cpp.o": "476b3e54847f80d2b54a12616b899f3f3ba4b2567419e9a7049a8728808912ce",
+          "vrm1-export.cpp.o": "3fa0a763b263a3942ab25ecd29ef9389cd85eab303098d118bc5c305f62b645d",
+          "vrm1-authoring.cpp.o": "0785b5fd34f18d9ae217b359e679878d04d2c36d72d43bc3cec0d27ad6715605",
+          "vrm1-painted-material.cpp.o": "044d83e7b2e888711d1adc84866cfcdae20ee21a10566364064f799befadbfd1",
+          "vrm1-expression-layer.cpp.o": "cd365276907a21e876d90b2eea07e2666a2f1c395c9a0ee05230cbe55b0af755",
+          "bake.cpp.o": "fda46001c226728e497d78ec770e126405f6cf89eb3c5611914a15d3228c0b6a",
+          "emission-bake-source.cpp.o": "31db4f1ccd9fb7e0bd7ea3e30038aaea4a0357f942fc2258a23c890f89fe37a1",
+          "texture-set-surface.cpp.o": "80be11260af51c3c8907b994a5813adf4374d2dabb420f2103a07c2177b69766",
+          "texture-set-range.cpp.o": "216f91b7efa16b362b7c82d0b5386581a9a84d81c4c4b4b7a512acdfb6310fb6",
+          "texture-set-resample.cpp.o": "2d84784579bb317bc6189ba85664dd653f09ccfc372b8ff6902dd5cda971a9e0",
+          "texture-set-worker.cpp.o": "7bc063a676f90fde6937d4bdedf81159d560caf52a821f09e4c0a7bd077eb808",
+          "document-cut.cpp.o": "ae4f4c98fd5fdce3d4710a6043d00cbe56e884c81cfac87f6645aa8e1ba1115c",
+          "polygon-surface-preview.cpp.o": "f1fd9adef23cbe27da049ceb79e14a5d45634a1331ec6a0048914139096d10c7",
+          "native-authoring-compiler.cpp.o": "a06b35a8519b79b008cb1631c252b026d1081f3e42c78de679e6eca7c1c365ea",
+          "emission-export.cpp.o": "6ea10dde3c4eb562997b7882d0c0bf843c9d6d96aeb65067e2dd0b0fcad9205f",
+          "current-paint-preview.cpp.o": "f098cdf46e2876391401ae721b0663ca4475e057698d8798fc357973aaf4ee7a"
+        },
+        "render": {
+          "render.cpp.o": "42b0217c70f27a3de996ebb999e84a36ad3ff39214e2eb115d1d6712d570ea1e"
+        }
+      },
+      "render_sha256": "d269588407771c0e5d083ae452b6b278d2a2cd8b2f7f389104a7b9992200f6af",
+      "xr_sha256": "85d12e5fc953c235dbec794083cc0488ba453b7a5522ffb66ce69495259a0eca",
+      "owners": {
+        "core": 22,
+        "render": 1
+      },
+      "binaries": {
+        "dome-sculpt-source-joint-writable-normal-bake-test": "7eaed3a91430349cf4f9ff98bc8aa8c1145bc3d360a93445fdd83fcff6f8aad5",
+        "dome-sculpt-bake-test": "b9c456b0649bac595c5f8ab6272167a2a7e0c3806aba15e5e5161d251ffa0c8d",
+        "dome-sculpt-bake-cage-test": "845a66667002b2a140d1e1cb8d600b25713456ef20a13ac602bd5f0ed2b5a62e",
+        "dome-sculpt-vrm1-background-fixture-test": "92dfbf799960e9e502bf8d8cec3203bd9314d37000919b117e071888bd235a3a",
+        "dome-sculpt-bake-projection-policy-test": "af6fc4e1aee012fda58efa0d12ce24555bfffcb5ee9b03b9db5a27e2b8334bd1",
+        "dome-sculpt-surface-query-oblique-test": "166d616cb8c3699348e2f95acbfb5a21329f7941627d74fe1d6857cfc64f5cb3",
+        "dome-sculpt-source-advanced-normal-bake-test": "0c59161b85cdd0fb4bb5d4fc96d5a9a6e40c4c695d70bcbdbe456769496999ab",
+        "dome-sculpt-source-canonical-normal-bake-test": "7acf3b79d7c77c9bddcf9549c98b685abc04bebbf3fe80ba8e0579e43fae1871",
+        "dome-sculpt-bake-workflow-test": "44b0326bd245db69059c984371093994801ab6795a61f9f3d306ee95840f2292",
+        "dome-sculpt-source-prepared-normal-bake-test": "5b02aa078589373dad24d95e56a48e31d951fff0c5776bc7acbf60bf400c335c",
+        "dome-sculpt-source-role-missing-uv1-test": "bbfb9b3d840feae73af0948b4b30201e135bf774bbf17a47b9cdfdb53ad5ff0a",
+        "dome-sculpt-native-authoring-inspect": "ff13a0591e385d7eccd861d0aa7df80847374e761be223413c829616a0184bc6",
+        "dome-sculpt-texture-set-source-export-test": "64ba592c5e6a1fbe4b581b4010ef8583fdbb24216e7b711c6107bb88530c8863",
+        "dome-sculpt-texture-set-bake-recipe-test": "e28c4d0977af30d91dbb44208fc2b31a74ff44a37a1f0384d35fb0f21f589190",
+        "dome-sculpt-retopo-affine-ui-fixture": "02b1202d319d37cf9dff1a79fd0c85143191f16ca0d47ca0aa79ba830efefd83",
+        "dome-sculpt-retopo-affine-test": "a2c2fef998dd19b66cf4bfc2c195f67ab26a4cf340bf0f19dcfc36a855d82b9e",
+        "dome-sculpt-source-writable-normal-bake-test": "3431993cfb566f5f720161b929402b53a3c2065629f4c51c9191ed0ce78c5414",
+        "dome-sculpt-source-artist-normal-bake-test": "01ab3ed1c1afc37829d605ed4504dfc62bcfd8715819ebfb509c517e4b0a0db8",
+        "dome-sculpt-mesh-processing-test": "dc4ed64d21174c941d5bd4f90f78d3008409ca53eeb1e50546d30bae428fe2ec"
+      },
+      "app_sha256": "81c6166a0c6b446a4cd067989e4e6683bb03b2d5dfcd2044227a6500c4d0e5f1",
+      "runtime_sha256": "4f2bbe31ec88414cf8142d24037188bf32c03740e616d3a964024b448254cb4b",
+      "reused_app_source": "5159fdf48b1ee8070b3d944aaba9dca5fbfc32b9",
+      "exit": 0,
+      "failures": [],
+      "tests": 18,
+      "ctest_sha256": "61cf694c3bd04ac4cd7f6e65a694fcd975538f1a2caf65018ec2df65351e2fd9",
+      "junit_sha256": "df1ffc7d52f5ef283353b70018543698d728e1f83f251e042fbd5e7a6e746fa0",
+      "writable_cases": 64,
+      "writable_assertions": 619644,
+      "writable_max_normal_error": 0.0048704,
+      "writable_max_material_error": 0.0057999,
+      "writable_max_emission_value": 7.98035,
+      "joint_cases": 8,
+      "joint_assertions": 346313,
+      "joint_max_normal_error": 0.00420556,
+      "joint_max_material_error": 1.83527e-07,
+      "joint_max_emission_value": 7.6954
     }
   },
   "frontends": {
@@ -98,6 +183,21 @@
       "input_sha256": "9848195ad07191d7e71ad1ef10da308793f86fee10e38639255f101a68ffbe44",
       "inspector_sha256": "5c1e7e32c18ac5450124c142ccba62ff4a1453ae1abaa8bfaf8b717ebc225691",
       "verifier_sha256": "1d0b0835f14b340d9a722ba7af14dbbcacf83ac74d8e596b979cfbfffc6e45a8",
+      "run_script_sha256": "8151107349c68241bc8cf4eb7f110ed4cdf347582bb96d728fad1bcfb80a2975",
+      "exit": 0,
+      "checks": 10,
+      "report_sha256": "ffe30093dcf075204b9f1ebdcdfc115b652cf21b400cedd9db228c2ef89ca8f5",
+      "native_sha256": "3943df20d3cd46ffa18b050aae1ffd54f08099cab94647eb9a2f7fe097115463"
+    },
+    "arc-native": {
+      "mode": "arc",
+      "invocation": "849ccf29d2a14b62803b3df637b755ee",
+      "phase": "complete",
+      "terminal": true,
+      "app_sha256": "81c6166a0c6b446a4cd067989e4e6683bb03b2d5dfcd2044227a6500c4d0e5f1",
+      "input_sha256": "9848195ad07191d7e71ad1ef10da308793f86fee10e38639255f101a68ffbe44",
+      "inspector_sha256": "ff13a0591e385d7eccd861d0aa7df80847374e761be223413c829616a0184bc6",
+      "verifier_sha256": "3431993cfb566f5f720161b929402b53a3c2065629f4c51c9191ed0ce78c5414",
       "run_script_sha256": "8151107349c68241bc8cf4eb7f110ed4cdf347582bb96d728fad1bcfb80a2975",
       "exit": 0,
       "checks": 10,
@@ -152,6 +252,21 @@
       "report_sha256": "ffe30093dcf075204b9f1ebdcdfc115b652cf21b400cedd9db228c2ef89ca8f5",
       "native_sha256": "c449a9e9ae4f0f60274c6e9350c4c0c2971c56b42290862c257d17f34f5c80cd"
     },
+    "arc-canonical": {
+      "mode": "arc",
+      "invocation": "55775a0cef024666bf15f5a85dda9d47",
+      "phase": "complete",
+      "terminal": true,
+      "app_sha256": "81c6166a0c6b446a4cd067989e4e6683bb03b2d5dfcd2044227a6500c4d0e5f1",
+      "input_sha256": "81a669bb81707a81c3d3de76ba659172e0896a1d8f16e08fe70959805072ea7b",
+      "inspector_sha256": "ff13a0591e385d7eccd861d0aa7df80847374e761be223413c829616a0184bc6",
+      "verifier_sha256": "3431993cfb566f5f720161b929402b53a3c2065629f4c51c9191ed0ce78c5414",
+      "run_script_sha256": "8151107349c68241bc8cf4eb7f110ed4cdf347582bb96d728fad1bcfb80a2975",
+      "exit": 0,
+      "checks": 10,
+      "report_sha256": "ffe30093dcf075204b9f1ebdcdfc115b652cf21b400cedd9db228c2ef89ca8f5",
+      "native_sha256": "c449a9e9ae4f0f60274c6e9350c4c0c2971c56b42290862c257d17f34f5c80cd"
+    },
     "arc-release-canonical": {
       "mode": "arc-release",
       "invocation": "2aa36c291902471b95213f558545b802",
@@ -200,6 +315,21 @@
       "report_sha256": "79842adca5b640ce50947ed14318a8d6869766f267f7e1ffd33b54fa7a6b91bb",
       "native_sha256": "0b2146fd8820bc9d1888d23cfac232c0185a8cb4ed7eb8eb285fa10957e1c04a"
     },
+    "arc-joint": {
+      "mode": "arc",
+      "invocation": "c5cd718b13f449a18f1f51aaf4abeccf",
+      "phase": "complete",
+      "terminal": true,
+      "app_sha256": "81c6166a0c6b446a4cd067989e4e6683bb03b2d5dfcd2044227a6500c4d0e5f1",
+      "input_sha256": "5018252825c8a60212faee2bbfe6bd357757a651453c4ae549f5d6e5cbc67b97",
+      "inspector_sha256": "ff13a0591e385d7eccd861d0aa7df80847374e761be223413c829616a0184bc6",
+      "verifier_sha256": "3431993cfb566f5f720161b929402b53a3c2065629f4c51c9191ed0ce78c5414",
+      "run_script_sha256": "c412ef490f86e72a90467f42008392a0f412b8c23b73a89746c72ace73e8cdfa",
+      "exit": 0,
+      "checks": 10,
+      "report_sha256": "79842adca5b640ce50947ed14318a8d6869766f267f7e1ffd33b54fa7a6b91bb",
+      "native_sha256": "0b2146fd8820bc9d1888d23cfac232c0185a8cb4ed7eb8eb285fa10957e1c04a"
+    },
     "arc-release-joint": {
       "mode": "arc-release",
       "invocation": "601f64d3b8854d35834f59d8112b4fb0",
@@ -239,11 +369,309 @@
     "canonical": "c449a9e9ae4f0f60274c6e9350c4c0c2971c56b42290862c257d17f34f5c80cd",
     "joint": "0b2146fd8820bc9d1888d23cfac232c0185a8cb4ed7eb8eb285fa10957e1c04a"
   },
-  "matching_native_projects": {},
+  "matching_native_projects": {
+    "source-writable-normal-bake/000000-ordered.dsculpt": "549d08637b01d0b4e77b90bbcdab5714d8a7abcc2703108a218d336cba5fe401",
+    "source-writable-normal-bake/000000.dsculpt": "549d08637b01d0b4e77b90bbcdab5714d8a7abcc2703108a218d336cba5fe401",
+    "source-writable-normal-bake/000001-ordered.dsculpt": "321067b5407d430ea8a9a48e80e9e238037211728be5cb5b48e70e761ae473b1",
+    "source-writable-normal-bake/000001.dsculpt": "321067b5407d430ea8a9a48e80e9e238037211728be5cb5b48e70e761ae473b1",
+    "source-writable-normal-bake/000010-ordered.dsculpt": "6e958894abcb9306db7307344a4ae65560f9f6bb573b074519c0129fb55e0f2a",
+    "source-writable-normal-bake/000010.dsculpt": "6e958894abcb9306db7307344a4ae65560f9f6bb573b074519c0129fb55e0f2a",
+    "source-writable-normal-bake/000011-ordered.dsculpt": "775a3b66abd971de9f25d95ea1eb136ec4ef0149cf7e747a9a463757afc38198",
+    "source-writable-normal-bake/000011.dsculpt": "775a3b66abd971de9f25d95ea1eb136ec4ef0149cf7e747a9a463757afc38198",
+    "source-writable-normal-bake/000100-ordered.dsculpt": "9f761696bfac15198dab80925d0bdc0253324f1e7d19ed62708310b39c7214fb",
+    "source-writable-normal-bake/000100.dsculpt": "9f761696bfac15198dab80925d0bdc0253324f1e7d19ed62708310b39c7214fb",
+    "source-writable-normal-bake/000101-ordered.dsculpt": "225c4665a59662219b619f62941bc3d980a66ac80d0709d2ac44189662c16648",
+    "source-writable-normal-bake/000101.dsculpt": "225c4665a59662219b619f62941bc3d980a66ac80d0709d2ac44189662c16648",
+    "source-writable-normal-bake/000110-ordered.dsculpt": "6b2d44aa346e576f9bc06b3d8e0d8b0a01d5aad9478a00fbdcb7e9af9a6c58db",
+    "source-writable-normal-bake/000110.dsculpt": "6b2d44aa346e576f9bc06b3d8e0d8b0a01d5aad9478a00fbdcb7e9af9a6c58db",
+    "source-writable-normal-bake/000111-ordered.dsculpt": "c11e72be078cd139bcf170a8d881013bcd4aa7bd5d0dfc8e5a598b678ef7ff7f",
+    "source-writable-normal-bake/000111.dsculpt": "c11e72be078cd139bcf170a8d881013bcd4aa7bd5d0dfc8e5a598b678ef7ff7f",
+    "source-writable-normal-bake/001000-ordered.dsculpt": "b4e8e5c719b2309e5b7f4c1bc4479266c6927b334bfac36e06cab714241d8da2",
+    "source-writable-normal-bake/001000.dsculpt": "b4e8e5c719b2309e5b7f4c1bc4479266c6927b334bfac36e06cab714241d8da2",
+    "source-writable-normal-bake/001001-ordered.dsculpt": "f611d173c301cd6e177338d74c3933f82145b1160ddec068f2064eeced214ea6",
+    "source-writable-normal-bake/001001.dsculpt": "f611d173c301cd6e177338d74c3933f82145b1160ddec068f2064eeced214ea6",
+    "source-writable-normal-bake/001010-ordered.dsculpt": "8198a26e45f4777c2a0348f8ca894a8e60cd0ce84c04e39128f18ceaa26ef800",
+    "source-writable-normal-bake/001010.dsculpt": "8198a26e45f4777c2a0348f8ca894a8e60cd0ce84c04e39128f18ceaa26ef800",
+    "source-writable-normal-bake/001011-ordered.dsculpt": "49a0a1b9ac68727f0532eea7a55b8ab5977395fd7db05035c2b6b81fcbdff4b6",
+    "source-writable-normal-bake/001011.dsculpt": "49a0a1b9ac68727f0532eea7a55b8ab5977395fd7db05035c2b6b81fcbdff4b6",
+    "source-writable-normal-bake/001100-ordered.dsculpt": "3c53908a4f88b4999d551b26bfdb660e5c15311e49d6cfb2aaf2dd07b24d7e8c",
+    "source-writable-normal-bake/001100.dsculpt": "3c53908a4f88b4999d551b26bfdb660e5c15311e49d6cfb2aaf2dd07b24d7e8c",
+    "source-writable-normal-bake/001101-ordered.dsculpt": "262f8b80288c4f9020c0225c25963395092030511650163a5c7b184956533560",
+    "source-writable-normal-bake/001101.dsculpt": "262f8b80288c4f9020c0225c25963395092030511650163a5c7b184956533560",
+    "source-writable-normal-bake/001110-ordered.dsculpt": "21340e835388e6336ba9534e27361c9c5e93690d3c6586ce9f236eed1fb165c2",
+    "source-writable-normal-bake/001110.dsculpt": "21340e835388e6336ba9534e27361c9c5e93690d3c6586ce9f236eed1fb165c2",
+    "source-writable-normal-bake/001111-ordered.dsculpt": "4eaf92131b4321d1349eec1ee38899e9768833de15199945a4a238ab59853d4a",
+    "source-writable-normal-bake/001111.dsculpt": "4eaf92131b4321d1349eec1ee38899e9768833de15199945a4a238ab59853d4a",
+    "source-writable-normal-bake/010000-ordered.dsculpt": "678116dfc6088ccb389b297a2cbf46179a0295788e2b850b8c46d13dcd583c38",
+    "source-writable-normal-bake/010000.dsculpt": "678116dfc6088ccb389b297a2cbf46179a0295788e2b850b8c46d13dcd583c38",
+    "source-writable-normal-bake/010001-ordered.dsculpt": "fbf7fb4cefd557c8c8401b63387b9ec0defc316ad337557a35b5d4e289803bbd",
+    "source-writable-normal-bake/010001.dsculpt": "fbf7fb4cefd557c8c8401b63387b9ec0defc316ad337557a35b5d4e289803bbd",
+    "source-writable-normal-bake/010010-ordered.dsculpt": "0d443ce2edd7558bade9fa0a0c03a867adf2c38201566f2a85903780ec734530",
+    "source-writable-normal-bake/010010.dsculpt": "0d443ce2edd7558bade9fa0a0c03a867adf2c38201566f2a85903780ec734530",
+    "source-writable-normal-bake/010011-ordered.dsculpt": "9f06664e85d474ed26fe793666eca9186cb7cb0b26e20554f495657b2b1377c1",
+    "source-writable-normal-bake/010011.dsculpt": "9f06664e85d474ed26fe793666eca9186cb7cb0b26e20554f495657b2b1377c1",
+    "source-writable-normal-bake/010100-ordered.dsculpt": "fdd801b681d78afeaf97aa0d0865a78334f6caee0318ed5dde1c20e2b1cb6a80",
+    "source-writable-normal-bake/010100.dsculpt": "fdd801b681d78afeaf97aa0d0865a78334f6caee0318ed5dde1c20e2b1cb6a80",
+    "source-writable-normal-bake/010101-ordered.dsculpt": "bb819ebaa12d825c061f59be62f85bcf4aa13f91685c0137880d5cf897e8bac7",
+    "source-writable-normal-bake/010101.dsculpt": "bb819ebaa12d825c061f59be62f85bcf4aa13f91685c0137880d5cf897e8bac7",
+    "source-writable-normal-bake/010110-ordered.dsculpt": "69b05d395027d12ce75b84316509fdb2a4f55a42d4b1c63375809aea1d350be0",
+    "source-writable-normal-bake/010110.dsculpt": "69b05d395027d12ce75b84316509fdb2a4f55a42d4b1c63375809aea1d350be0",
+    "source-writable-normal-bake/010111-ordered.dsculpt": "add830d94043bc92726a9f63ac8400d1f785dc6561937f8d1690addd43720a7f",
+    "source-writable-normal-bake/010111.dsculpt": "add830d94043bc92726a9f63ac8400d1f785dc6561937f8d1690addd43720a7f",
+    "source-writable-normal-bake/011000-ordered.dsculpt": "c47a9a7b556ce100c4d7111501d07340ff0758d104efdad6fb1add5c6e1e19f8",
+    "source-writable-normal-bake/011000.dsculpt": "c47a9a7b556ce100c4d7111501d07340ff0758d104efdad6fb1add5c6e1e19f8",
+    "source-writable-normal-bake/011001-ordered.dsculpt": "b3aabf2a7ec24fb834892417548b3955bcd70c8b0063fc566bb35e09fa4947d9",
+    "source-writable-normal-bake/011001.dsculpt": "b3aabf2a7ec24fb834892417548b3955bcd70c8b0063fc566bb35e09fa4947d9",
+    "source-writable-normal-bake/011010-ordered.dsculpt": "a68756308a45fac8d617610892dbc5bc4257c731969a09d360672612392885d0",
+    "source-writable-normal-bake/011010.dsculpt": "a68756308a45fac8d617610892dbc5bc4257c731969a09d360672612392885d0",
+    "source-writable-normal-bake/011011-ordered.dsculpt": "a6f151b382f265885e538bc3dfe784d5056ea8665e06bb6acb0169b4977674e9",
+    "source-writable-normal-bake/011011.dsculpt": "a6f151b382f265885e538bc3dfe784d5056ea8665e06bb6acb0169b4977674e9",
+    "source-writable-normal-bake/011100-ordered.dsculpt": "98e079678c9044df487c009f1e49083024a5c9bfa29b61886d812b7f1d57e5cd",
+    "source-writable-normal-bake/011100.dsculpt": "98e079678c9044df487c009f1e49083024a5c9bfa29b61886d812b7f1d57e5cd",
+    "source-writable-normal-bake/011101-ordered.dsculpt": "64d1842b5f5441dd0f9aebfeaf53ca7b1c3f46ddd7787043fe5c03f547bce519",
+    "source-writable-normal-bake/011101.dsculpt": "64d1842b5f5441dd0f9aebfeaf53ca7b1c3f46ddd7787043fe5c03f547bce519",
+    "source-writable-normal-bake/011110-ordered.dsculpt": "d493ddce4ec6d57c9cc6c943fa01b87218f7546f69c3190ab669c8f8bf9493b6",
+    "source-writable-normal-bake/011110.dsculpt": "d493ddce4ec6d57c9cc6c943fa01b87218f7546f69c3190ab669c8f8bf9493b6",
+    "source-writable-normal-bake/011111-ordered.dsculpt": "5dd411411c17e571dc6028ed3c597f6202a8846291c0e251fdb66dc22ecb6fab",
+    "source-writable-normal-bake/011111.dsculpt": "5dd411411c17e571dc6028ed3c597f6202a8846291c0e251fdb66dc22ecb6fab",
+    "source-writable-normal-bake/100000-ordered.dsculpt": "971d72e1d13e625a4a6d5e6315be70f6490c69acdf71748037691ff0bb97fd12",
+    "source-writable-normal-bake/100000.dsculpt": "971d72e1d13e625a4a6d5e6315be70f6490c69acdf71748037691ff0bb97fd12",
+    "source-writable-normal-bake/100001-ordered.dsculpt": "57b8980bf4e4059365bcee1b1b321a526871fcdda95f672141652b6c91fd055e",
+    "source-writable-normal-bake/100001.dsculpt": "57b8980bf4e4059365bcee1b1b321a526871fcdda95f672141652b6c91fd055e",
+    "source-writable-normal-bake/100010-ordered.dsculpt": "f028872ce85c1e2cda152724ec6bcea3c5b865b7bd19e056d27bb00aac309f26",
+    "source-writable-normal-bake/100010.dsculpt": "f028872ce85c1e2cda152724ec6bcea3c5b865b7bd19e056d27bb00aac309f26",
+    "source-writable-normal-bake/100011-ordered.dsculpt": "c21d5f415523d94b70ab063e741d9dd914f5e300b8ec9b98267dad1ec6c76d08",
+    "source-writable-normal-bake/100011.dsculpt": "c21d5f415523d94b70ab063e741d9dd914f5e300b8ec9b98267dad1ec6c76d08",
+    "source-writable-normal-bake/100100-ordered.dsculpt": "1600be238aa20c3a92980f895be580823857601c70eaa9ccf4514edbd9dc8588",
+    "source-writable-normal-bake/100100.dsculpt": "1600be238aa20c3a92980f895be580823857601c70eaa9ccf4514edbd9dc8588",
+    "source-writable-normal-bake/100101-ordered.dsculpt": "5a355517ae8a5e90524f3fd7ae0e498d71322ec054f3577979301d259e32672a",
+    "source-writable-normal-bake/100101.dsculpt": "5a355517ae8a5e90524f3fd7ae0e498d71322ec054f3577979301d259e32672a",
+    "source-writable-normal-bake/100110-ordered.dsculpt": "bd7b0788059a2be79db7662f956ca260c66624c72a9e8385b41f042a4a7aec63",
+    "source-writable-normal-bake/100110.dsculpt": "bd7b0788059a2be79db7662f956ca260c66624c72a9e8385b41f042a4a7aec63",
+    "source-writable-normal-bake/100111-ordered.dsculpt": "e87d73d309d97b1daebefe920599547061fb9b2f7f2ba2d353b2c5d6d1c115df",
+    "source-writable-normal-bake/100111.dsculpt": "e87d73d309d97b1daebefe920599547061fb9b2f7f2ba2d353b2c5d6d1c115df",
+    "source-writable-normal-bake/101000-ordered.dsculpt": "6af04fa7a2f8d2a68cb82cea90ef4f1a76353cfad545dec76a09bf73ea0c69ac",
+    "source-writable-normal-bake/101000.dsculpt": "6af04fa7a2f8d2a68cb82cea90ef4f1a76353cfad545dec76a09bf73ea0c69ac",
+    "source-writable-normal-bake/101001-ordered.dsculpt": "221f20c76e3763d81108216f20ed919a1f41a993abfa965f6afa76cfd96aa289",
+    "source-writable-normal-bake/101001.dsculpt": "221f20c76e3763d81108216f20ed919a1f41a993abfa965f6afa76cfd96aa289",
+    "source-writable-normal-bake/101010-ordered.dsculpt": "ab1a8517d4f46c63a81bad12dbe42c8d44e185d131f6ae7ccf080e9e7c1ae88e",
+    "source-writable-normal-bake/101010.dsculpt": "ab1a8517d4f46c63a81bad12dbe42c8d44e185d131f6ae7ccf080e9e7c1ae88e",
+    "source-writable-normal-bake/101011-ordered.dsculpt": "7e5c5cacee280373958b6df8e2bc3f23c7b609230c4508c29c7ad5b4db601f2c",
+    "source-writable-normal-bake/101011.dsculpt": "7e5c5cacee280373958b6df8e2bc3f23c7b609230c4508c29c7ad5b4db601f2c",
+    "source-writable-normal-bake/101100-ordered.dsculpt": "99cdb56d581ccca1c66973052f41f7c34c134dab5e4e43a32f677e4468ea2436",
+    "source-writable-normal-bake/101100.dsculpt": "99cdb56d581ccca1c66973052f41f7c34c134dab5e4e43a32f677e4468ea2436",
+    "source-writable-normal-bake/101101-ordered.dsculpt": "7cb1e3a1ae338c19c8fefdb653e5389978dafb1c196eb51a0a3ebe464a81317e",
+    "source-writable-normal-bake/101101.dsculpt": "7cb1e3a1ae338c19c8fefdb653e5389978dafb1c196eb51a0a3ebe464a81317e",
+    "source-writable-normal-bake/101110-ordered.dsculpt": "a8520e3f5355a9f3dc9e91b1378b175652373a5cd086473f91d4b618283121f0",
+    "source-writable-normal-bake/101110.dsculpt": "a8520e3f5355a9f3dc9e91b1378b175652373a5cd086473f91d4b618283121f0",
+    "source-writable-normal-bake/101111-ordered.dsculpt": "da1469228dca0b2de3c2036143f569d788d074c5859ae32e8f1a04c1b91407d8",
+    "source-writable-normal-bake/101111.dsculpt": "da1469228dca0b2de3c2036143f569d788d074c5859ae32e8f1a04c1b91407d8",
+    "source-writable-normal-bake/110000-ordered.dsculpt": "2d13fc97125f7a6a0e45a0585aba07873212e3531313d78e3257dd88ce22d293",
+    "source-writable-normal-bake/110000.dsculpt": "2d13fc97125f7a6a0e45a0585aba07873212e3531313d78e3257dd88ce22d293",
+    "source-writable-normal-bake/110001-ordered.dsculpt": "657b5779c3a03ed8bc40125209c550f2626559cbe0721d5a08f2b5172d065b56",
+    "source-writable-normal-bake/110001.dsculpt": "657b5779c3a03ed8bc40125209c550f2626559cbe0721d5a08f2b5172d065b56",
+    "source-writable-normal-bake/110010-ordered.dsculpt": "bfd48c4df56c121efab244fcfea26df275b3b220f9cc090b571f9e70137c9bcd",
+    "source-writable-normal-bake/110010.dsculpt": "bfd48c4df56c121efab244fcfea26df275b3b220f9cc090b571f9e70137c9bcd",
+    "source-writable-normal-bake/110011-ordered.dsculpt": "b6a4573cd413d5d11e5d597b224c67081a04a114bdb388c96df94a35e98f4374",
+    "source-writable-normal-bake/110011.dsculpt": "b6a4573cd413d5d11e5d597b224c67081a04a114bdb388c96df94a35e98f4374",
+    "source-writable-normal-bake/110100-ordered.dsculpt": "cc53d6ca68bf3ef967a5879af11d0cae36d9707f9fd0c37c7db7260a307819b7",
+    "source-writable-normal-bake/110100.dsculpt": "cc53d6ca68bf3ef967a5879af11d0cae36d9707f9fd0c37c7db7260a307819b7",
+    "source-writable-normal-bake/110101-ordered.dsculpt": "6ce547fa1f6c3e2f58e44207147b03490e5bc75db70fceac5b6e7b3f42023431",
+    "source-writable-normal-bake/110101.dsculpt": "6ce547fa1f6c3e2f58e44207147b03490e5bc75db70fceac5b6e7b3f42023431",
+    "source-writable-normal-bake/110110-ordered.dsculpt": "4475cdcab999ceb4138dd957a45e5eb98688e80266e8f166e51b5f7b8efa4cdc",
+    "source-writable-normal-bake/110110.dsculpt": "4475cdcab999ceb4138dd957a45e5eb98688e80266e8f166e51b5f7b8efa4cdc",
+    "source-writable-normal-bake/110111-ordered.dsculpt": "962e1104f513dda2f3d4d5cdea2a5c06bee44568a319955c02def14de28d4f91",
+    "source-writable-normal-bake/110111.dsculpt": "962e1104f513dda2f3d4d5cdea2a5c06bee44568a319955c02def14de28d4f91",
+    "source-writable-normal-bake/111000-ordered.dsculpt": "7a0c6cc0e4c6b52464bffb75e6ad5d8638cdc885bf78bb402b190f89a26d9500",
+    "source-writable-normal-bake/111000.dsculpt": "7a0c6cc0e4c6b52464bffb75e6ad5d8638cdc885bf78bb402b190f89a26d9500",
+    "source-writable-normal-bake/111001-ordered.dsculpt": "5b761bdafa25386c1677b7b70985acbf4b3f7e1ac3011110bbd01030b22452fa",
+    "source-writable-normal-bake/111001.dsculpt": "5b761bdafa25386c1677b7b70985acbf4b3f7e1ac3011110bbd01030b22452fa",
+    "source-writable-normal-bake/111010-ordered.dsculpt": "87f0b1be32cb033b794716aebaaf50cf1826757589efa444712a10cda2994496",
+    "source-writable-normal-bake/111010.dsculpt": "87f0b1be32cb033b794716aebaaf50cf1826757589efa444712a10cda2994496",
+    "source-writable-normal-bake/111011-ordered.dsculpt": "9c25fee7b42f783f0b2f86b86021fcafc64d6e5b3671192fe14839d8915d4b6b",
+    "source-writable-normal-bake/111011.dsculpt": "9c25fee7b42f783f0b2f86b86021fcafc64d6e5b3671192fe14839d8915d4b6b",
+    "source-writable-normal-bake/111100-ordered.dsculpt": "fd08db0f951a4f375bed87d65fdb269afbd4d474991c22a5c21555a9afaf734b",
+    "source-writable-normal-bake/111100.dsculpt": "fd08db0f951a4f375bed87d65fdb269afbd4d474991c22a5c21555a9afaf734b",
+    "source-writable-normal-bake/111101-ordered.dsculpt": "0fdc74f03e738e982c7c493e217b357ac4034fe092f734d63f0bbb24fdcedb8b",
+    "source-writable-normal-bake/111101.dsculpt": "0fdc74f03e738e982c7c493e217b357ac4034fe092f734d63f0bbb24fdcedb8b",
+    "source-writable-normal-bake/111110-ordered.dsculpt": "3a512f63ee97ce752154bcf8c6bf21475fefd4d26390aa94fc3db3b0d8613e2a",
+    "source-writable-normal-bake/111110.dsculpt": "3a512f63ee97ce752154bcf8c6bf21475fefd4d26390aa94fc3db3b0d8613e2a",
+    "source-writable-normal-bake/111111-ordered.dsculpt": "79927245de4c6faed29079ec2d738fbb2a07a3f1b744f596f598907167eea98b",
+    "source-writable-normal-bake/111111.dsculpt": "79927245de4c6faed29079ec2d738fbb2a07a3f1b744f596f598907167eea98b",
+    "source-writable-normal-bake/canonical-affine-before.dsculpt": "81a669bb81707a81c3d3de76ba659172e0896a1d8f16e08fe70959805072ea7b",
+    "source-writable-normal-bake/native-affine-before.dsculpt": "9848195ad07191d7e71ad1ef10da308793f86fee10e38639255f101a68ffbe44"
+  },
+  "matching_joint_payloads_excluding_import_group_name": {
+    "source-joint-writable-normal-bake/000-ordered.dsculpt": {
+      "release_sha256": "3cf21db722f59e0bf2148be282bf80eed5619dda233ab69de0c6f7c1a35c1f9c",
+      "asan_sha256": "84c1a5c79d78eaf6f347895d84efe03be64ce1693e91ab89bcedff08404e2142",
+      "import_group_names": [
+        "dome-cut-color-source-703",
+        "dome-cut-color-source-710"
+      ]
+    },
+    "source-joint-writable-normal-bake/000.dsculpt": {
+      "release_sha256": "3cf21db722f59e0bf2148be282bf80eed5619dda233ab69de0c6f7c1a35c1f9c",
+      "asan_sha256": "84c1a5c79d78eaf6f347895d84efe03be64ce1693e91ab89bcedff08404e2142",
+      "import_group_names": [
+        "dome-cut-color-source-703",
+        "dome-cut-color-source-710"
+      ]
+    },
+    "source-joint-writable-normal-bake/001-ordered.dsculpt": {
+      "release_sha256": "d56815f4472c146edd2e98c0f75655fddd3b0856cfbe717469f427a0ffa7a5a7",
+      "asan_sha256": "1eb6264d858bcc5a81a7ca82ce10e6644fcb7a80029dd5d04b845dd0c81e5d1a",
+      "import_group_names": [
+        "dome-cut-color-source-703",
+        "dome-cut-color-source-710"
+      ]
+    },
+    "source-joint-writable-normal-bake/001.dsculpt": {
+      "release_sha256": "d56815f4472c146edd2e98c0f75655fddd3b0856cfbe717469f427a0ffa7a5a7",
+      "asan_sha256": "1eb6264d858bcc5a81a7ca82ce10e6644fcb7a80029dd5d04b845dd0c81e5d1a",
+      "import_group_names": [
+        "dome-cut-color-source-703",
+        "dome-cut-color-source-710"
+      ]
+    },
+    "source-joint-writable-normal-bake/010-ordered.dsculpt": {
+      "release_sha256": "f3a40413a0b0b2d454412746d1702ad41a9679dea6f1b36812820c386952eaa2",
+      "asan_sha256": "209218289f1b4b7c176b870e662b0407ff46f1f603ed429477df70313f58ed68",
+      "import_group_names": [
+        "dome-cut-color-source-703",
+        "dome-cut-color-source-710"
+      ]
+    },
+    "source-joint-writable-normal-bake/010.dsculpt": {
+      "release_sha256": "f3a40413a0b0b2d454412746d1702ad41a9679dea6f1b36812820c386952eaa2",
+      "asan_sha256": "209218289f1b4b7c176b870e662b0407ff46f1f603ed429477df70313f58ed68",
+      "import_group_names": [
+        "dome-cut-color-source-703",
+        "dome-cut-color-source-710"
+      ]
+    },
+    "source-joint-writable-normal-bake/011-ordered.dsculpt": {
+      "release_sha256": "8828a2b0329bf094265f2700d033fc12cc028daaba28b13dff7e6836c1d2de21",
+      "asan_sha256": "08aaf87174391ce02b9da3679bf0600dfd1f475e686b294dd41d9a565bb4c0f1",
+      "import_group_names": [
+        "dome-cut-color-source-703",
+        "dome-cut-color-source-710"
+      ]
+    },
+    "source-joint-writable-normal-bake/011.dsculpt": {
+      "release_sha256": "8828a2b0329bf094265f2700d033fc12cc028daaba28b13dff7e6836c1d2de21",
+      "asan_sha256": "08aaf87174391ce02b9da3679bf0600dfd1f475e686b294dd41d9a565bb4c0f1",
+      "import_group_names": [
+        "dome-cut-color-source-703",
+        "dome-cut-color-source-710"
+      ]
+    },
+    "source-joint-writable-normal-bake/100-ordered.dsculpt": {
+      "release_sha256": "e91e79a495e3f982c66e89fa3702051e9c49b6f21461d6b443723fb06728eb7c",
+      "asan_sha256": "04a43e272c06abdcd9b038b132c48fd77117d2cba76a9e2d6f58c21d52746211",
+      "import_group_names": [
+        "dome-cut-color-source-703",
+        "dome-cut-color-source-710"
+      ]
+    },
+    "source-joint-writable-normal-bake/100.dsculpt": {
+      "release_sha256": "e91e79a495e3f982c66e89fa3702051e9c49b6f21461d6b443723fb06728eb7c",
+      "asan_sha256": "04a43e272c06abdcd9b038b132c48fd77117d2cba76a9e2d6f58c21d52746211",
+      "import_group_names": [
+        "dome-cut-color-source-703",
+        "dome-cut-color-source-710"
+      ]
+    },
+    "source-joint-writable-normal-bake/101-ordered.dsculpt": {
+      "release_sha256": "2ed39b65f23af4ec892055fd794e580059353f9ccfb4f242cc2facf9f18c7b81",
+      "asan_sha256": "e360f503f79316cff3220034cb430059d58e9e2f0611ff59d975eeed3d9cbe9f",
+      "import_group_names": [
+        "dome-cut-color-source-703",
+        "dome-cut-color-source-710"
+      ]
+    },
+    "source-joint-writable-normal-bake/101.dsculpt": {
+      "release_sha256": "2ed39b65f23af4ec892055fd794e580059353f9ccfb4f242cc2facf9f18c7b81",
+      "asan_sha256": "e360f503f79316cff3220034cb430059d58e9e2f0611ff59d975eeed3d9cbe9f",
+      "import_group_names": [
+        "dome-cut-color-source-703",
+        "dome-cut-color-source-710"
+      ]
+    },
+    "source-joint-writable-normal-bake/110-ordered.dsculpt": {
+      "release_sha256": "fceb8ea29c994da447e91c9c7b1a261558b962bdbfc484dedf3fc672dcde5eb2",
+      "asan_sha256": "b1f796051ef02d391d134e3cc4701901f856f0e5dd69fd13691b34979c5f5971",
+      "import_group_names": [
+        "dome-cut-color-source-703",
+        "dome-cut-color-source-710"
+      ]
+    },
+    "source-joint-writable-normal-bake/110.dsculpt": {
+      "release_sha256": "fceb8ea29c994da447e91c9c7b1a261558b962bdbfc484dedf3fc672dcde5eb2",
+      "asan_sha256": "b1f796051ef02d391d134e3cc4701901f856f0e5dd69fd13691b34979c5f5971",
+      "import_group_names": [
+        "dome-cut-color-source-703",
+        "dome-cut-color-source-710"
+      ]
+    },
+    "source-joint-writable-normal-bake/111-ordered.dsculpt": {
+      "release_sha256": "8d19eb05aeab0d1d5f683f03b27813130863d80bba99f9537744c61378abf058",
+      "asan_sha256": "aaea66e64a92424e8b79cec3bce6c1324f7a0f5bf32fd8620085533cb7671a05",
+      "import_group_names": [
+        "dome-cut-color-source-703",
+        "dome-cut-color-source-710"
+      ]
+    },
+    "source-joint-writable-normal-bake/111.dsculpt": {
+      "release_sha256": "8d19eb05aeab0d1d5f683f03b27813130863d80bba99f9537744c61378abf058",
+      "asan_sha256": "aaea66e64a92424e8b79cec3bce6c1324f7a0f5bf32fd8620085533cb7671a05",
+      "import_group_names": [
+        "dome-cut-color-source-703",
+        "dome-cut-color-source-710"
+      ]
+    },
+    "source-joint-writable-normal-bake/joint-before.dsculpt": {
+      "release_sha256": "5018252825c8a60212faee2bbfe6bd357757a651453c4ae549f5d6e5cbc67b97",
+      "asan_sha256": "0735262160c1e8ce84fe4a539f9ac31c4cbf5a9ff94edce7cf29859f6e8615ed",
+      "import_group_names": [
+        "dome-cut-color-source-703",
+        "dome-cut-color-source-710"
+      ]
+    },
+    "source-joint-writable-normal-bake/observed-second-bake.dsculpt": {
+      "release_sha256": "8d19eb05aeab0d1d5f683f03b27813130863d80bba99f9537744c61378abf058",
+      "asan_sha256": "aaea66e64a92424e8b79cec3bce6c1324f7a0f5bf32fd8620085533cb7671a05",
+      "import_group_names": [
+        "dome-cut-color-source-703",
+        "dome-cut-color-source-710"
+      ]
+    }
+  },
   "archive": {
     "file": "independent-writable-donor-20261126.tar.gz",
-    "sha256": "9ff80bbbb300509a75230a66b368beae6dc6df57724df63bf3acb38848f4afde",
+    "sha256": "8cf4441203abf74fb8b9bc98c0aaa8079a6fd7408e897141340d88069d6ccde9",
     "members": {
+      "arc-canonical/accept.json": "5346c5bd18a1c0bdf3ee8e45eb355322e71a574428ee7ffac058a678b7c5b8e7",
+      "arc-canonical/accept.log": "cb075b665e8cbd14ae2eacceb79b5d19e4b7fca03973d632956822d9c4a5b414",
+      "arc-canonical/cancel.json": "00add5f801a23016855ba4ac8a4c65773648ad97a8f4cad20bb67047208fccb1",
+      "arc-canonical/cancel.log": "8e1dbc366f37a9bc6899e73703880d183f29d2a6989ed414507c544a57def4fd",
+      "arc-canonical/report.json": "ffe30093dcf075204b9f1ebdcdfc115b652cf21b400cedd9db228c2ef89ca8f5",
+      "arc-canonical/run.log": "a82440cf2036044b84e75b2155bbc89f7d4cda1212b9f2c5d7f373d60dd834db",
+      "arc-canonical/status.json": "7da42007b65620176a6bb050d6d9e9dd97fd2098833d48637fd1fb3ccfa324c6",
+      "arc-joint/accept.json": "5346c5bd18a1c0bdf3ee8e45eb355322e71a574428ee7ffac058a678b7c5b8e7",
+      "arc-joint/accept.log": "cb075b665e8cbd14ae2eacceb79b5d19e4b7fca03973d632956822d9c4a5b414",
+      "arc-joint/cancel.json": "00add5f801a23016855ba4ac8a4c65773648ad97a8f4cad20bb67047208fccb1",
+      "arc-joint/cancel.log": "8e1dbc366f37a9bc6899e73703880d183f29d2a6989ed414507c544a57def4fd",
+      "arc-joint/report.json": "79842adca5b640ce50947ed14318a8d6869766f267f7e1ffd33b54fa7a6b91bb",
+      "arc-joint/run.log": "460133dd34b853fb22b6cdc93f04c1c48664fc3b9dcf920e374e2e585005e19f",
+      "arc-joint/status.json": "8656ba7691034de722e54615ed227e1bd2264128d1bdd3038e60d525c6620af1",
+      "arc-native/accept.json": "5346c5bd18a1c0bdf3ee8e45eb355322e71a574428ee7ffac058a678b7c5b8e7",
+      "arc-native/accept.log": "cb075b665e8cbd14ae2eacceb79b5d19e4b7fca03973d632956822d9c4a5b414",
+      "arc-native/cancel.json": "00add5f801a23016855ba4ac8a4c65773648ad97a8f4cad20bb67047208fccb1",
+      "arc-native/cancel.log": "8e1dbc366f37a9bc6899e73703880d183f29d2a6989ed414507c544a57def4fd",
+      "arc-native/report.json": "ffe30093dcf075204b9f1ebdcdfc115b652cf21b400cedd9db228c2ef89ca8f5",
+      "arc-native/run.log": "b66c925966a72cac013981967c2907325b6251f84c3f276c9073f423762cfac4",
+      "arc-native/status.json": "ab7e1833bd7c0e1382d99e41cde214e65c89f110bbc35bd3dcfa76e59b1ff7b6",
       "arc-release-canonical/accept.json": "5346c5bd18a1c0bdf3ee8e45eb355322e71a574428ee7ffac058a678b7c5b8e7",
       "arc-release-canonical/accept.log": "cb075b665e8cbd14ae2eacceb79b5d19e4b7fca03973d632956822d9c4a5b414",
       "arc-release-canonical/cancel.json": "00add5f801a23016855ba4ac8a4c65773648ad97a8f4cad20bb67047208fccb1",
@@ -265,6 +693,19 @@
       "arc-release-native/report.json": "ffe30093dcf075204b9f1ebdcdfc115b652cf21b400cedd9db228c2ef89ca8f5",
       "arc-release-native/run.log": "19dbf4d47f30792ab8a220997f65f415bb15d14328b969459a397ab025b47157",
       "arc-release-native/status.json": "9de216939f8ac57aad5ef47fd48c9943eee179c1f7d67656872373181c6beeb9",
+      "asan/configure.log": "0a967ded4b073ea64a4caae2a84b9580fb2e2543daed85798c594090eccbbca6",
+      "asan/ctest.log": "61cf694c3bd04ac4cd7f6e65a694fcd975538f1a2caf65018ec2df65351e2fd9",
+      "asan/product/app-link.log": "f786617311626d3a06d371ba7d080d328a6b991a00a3717a514567adca17f482",
+      "asan/product/core-archive-link.log": "bd18bcfd421c2a03006c9f2a81501ec3af3ca52ceed1e5e5dc9377580e298b34",
+      "asan/product/ctest.log": "f801a0c763a28d369acc770bfb3664580b0b1f60fd911b2cf1e6d76eb6510228",
+      "asan/product/render-archive-link.log": "3ce159560b23ae65263cb0574e7ed08379040ad9359983b4354b91e0d10aa0ac",
+      "asan/product/status.json": "54a6c788d84de85e2f4347fde247fa17bc43d2cc5007341c9e3fe96ef7c4be4c",
+      "asan/regressions.xml": "df1ffc7d52f5ef283353b70018543698d728e1f83f251e042fbd5e7a6e746fa0",
+      "asan/source-joint-writable-normal-bake/link.log": "72e4db5c88b526bb9ffebd4df37a58c54b29b8d3584fed6902770de56f2b91a9",
+      "asan/source-joint-writable-normal-bake/source-joint-writable-normal-bake.cpp.log": "7fc700b88e01019e9a30d973662643a16740495b74d4501116d4e4307ce6653c",
+      "asan/source-writable-normal-bake/link.log": "13e44a1c49e0c0fd1527c1a9416dd5420371a94e09d210e9ecfd259a499dc56e",
+      "asan/source-writable-normal-bake/source-writable-normal-bake.cpp.log": "5372afe7d4b72cce359867ae65397cf51c38535916d8116a7ec2343b8230afae",
+      "asan/status.json": "068ff157a91710af088a9aa527cd1bccc6804c25cb027734811a224efe478dba",
       "drivers/canonical/run-release-arc.py": "0396839df1db4a324401db411bd6663132b246dc84ed3eaa5307fc1acbb52658",
       "drivers/canonical/run.py": "0731e48a0a89dc97147f1db1d4a1846f5dfeed50e0cdb888776d265176258041",
       "drivers/canonical/wayland.py": "273de1d09f1ae2d39f3a2c28a51eec757471b738cd9a70424dae5bb2a0149fbf",
@@ -273,9 +714,10 @@
       "drivers/joint/run.py": "8b33b8d76ca4ece5532eb3ae4d06a61f7e7f60c8a47496017cff01459da3bd94",
       "drivers/joint/wayland.py": "c964537dd18cc33d5d265e5f63b50e30ae71dcdc182e293f48ec7c2177c7f1d1",
       "drivers/joint/xr.py": "c412ef490f86e72a90467f42008392a0f412b8c23b73a89746c72ace73e8cdfa",
+      "drivers/native/joint-fixture.py": "55b0a9dd1c7542c663f4fbcf2a8bf2ae46eb6fe13dac8b30f506c019dc0d68b9",
+      "drivers/native/record.py": "2fa5cd196218dc35bdbeeb7c7f8e9ece10d32731422204699d5f253d9a8d06df",
       "drivers/native/run-release-arc.py": "0396839df1db4a324401db411bd6663132b246dc84ed3eaa5307fc1acbb52658",
       "drivers/native/run.py": "eaf93a8a9ada973688c5d0321b9782dd150517dc645b0a2c0394fb53ae64c230",
-      "drivers/native/test-fixture.py": "55b0a9dd1c7542c663f4fbcf2a8bf2ae46eb6fe13dac8b30f506c019dc0d68b9",
       "drivers/native/wayland.py": "273de1d09f1ae2d39f3a2c28a51eec757471b738cd9a70424dae5bb2a0149fbf",
       "drivers/native/xr.py": "8151107349c68241bc8cf4eb7f110ed4cdf347582bb96d728fad1bcfb80a2975",
       "release/configure.log": "a5e28929000dac819fed1ae45c8b0b3b0fd2253652bc6c9d311a51d87f0219e9",
