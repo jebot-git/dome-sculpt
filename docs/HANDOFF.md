@@ -1106,10 +1106,26 @@ the admitted HDR fix. Its test-only companion `6b5d338e` passes all ten
 native cases in optimized Release and ASan/UBSan. The matching applications
 each pass all 153 synthetic OpenXR checks, with exact voxel Undo bytes.
 The sanitizer XR process uses Intel Arc at `/dev/dri/renderD129`.
-Main integrates the qualified source as `06d1c5fe`.
-Active-set Bake/Clear/Recall and physical device verification remain open.
+Main integrates the qualified recipe-persistence source as `06d1c5fe`.
 [Texture-set recipe and reference evidence](validation/texture-set-bake-recipe-20261126.json)
 [Combined runtime evidence](validation/texture-set-recipe-runtime-20261126.json)
+
+Main merge `70e9855d` adds Bake, Clear and Recall for the selected plain
+native texture set. Projection uses the selected triangles, their complete
+mesh tangent frame and an optional full matched cage. A plain source with
+several texture sets supplies each hit's own material and maps. The Release
+and ASan/UBSan native cohorts each pass all eight tests, including ordinary
+Bake and 22 active-set assertions. The finalized app passes 15 desktop checks
+through nested canonical DomeD and 19 synthetic OpenXR checks per software
+Release and Intel Arc sanitizer profile. Cancel and focus loss preserve
+original project bytes. Accepted outputs match the independent recipe
+replay and agree byte for byte across the XR profiles. The original
+llvmpipe sanitizer run saved the exact accepted project and reported a
+112-byte leak at teardown, with both allocation addresses in Mesa's
+libgallium mapping. The Arc replay kept leak detection enabled and exited
+cleanly. Baking retained prepared texture-set fields and physical-input
+verification remain open.
+[Active-set acceptance and original leak evidence](validation/active-texture-set-bake-20261126.json)
 
 ## Source and integration boundary
 

@@ -1,0 +1,243 @@
+{
+  "product": "5ef38b520d9fdfa4e0e2049ce1aad75cfcf28cc1",
+  "native_product": "8378901c7ed4e699c0725dfc9d26e5f327a6670f",
+  "main_merge": "70e9855ddfd37f3ceecb5f7482471ff1bb14a5dc",
+  "scope": "Active plain texture-set Bake/Clear/Recall, including multi-material plain source, ordinary workflow regression, exact ordered save, cancellation/history and real-loader synthetic XR. Native desktop verification uses a private nested DomeD session. Retained prepared fields and physical input remain open.",
+  "profiles": {
+    "native-release": {
+      "candidate": "8378901c7ed4e699c0725dfc9d26e5f327a6670f",
+      "profile": "release",
+      "terminal": true,
+      "invocation": "4e1ea18ab2a241dda8ff34f534f21fd9",
+      "fltk": "/opt/fltk-vr/toolkit",
+      "phase": "complete",
+      "elapsed_seconds": 74.76,
+      "donor": "b89b1f8c2a3d3346f6b0127c830395df193ecbf3",
+      "rebuilt": [
+        "src/bake-authoring.cpp",
+        "src/bake.cpp",
+        "src/document-baking.cpp",
+        "src/document.cpp",
+        "src/emission-bake-source.cpp",
+        "src/texture-set-resample.cpp",
+        "src/texture-set-surface.cpp",
+        "src/texture-sets.cpp"
+      ],
+      "core_sha256": "f0f4db0e7cc5c92a4a1d377663efc6a3c5ab3a9da4372d3c2b35cc9614b90a51",
+      "parent_core_sha256": "5767b821a7d88b844ff9f1b7c6ea03c3736a20e8e9b30cd7766ce202232dff96",
+      "objects": {
+        "bake-authoring.cpp.o": "60414d715b76a6b5cf5d66080e0ee69803cf411c1cc814dce29e63db48240f8c",
+        "bake.cpp.o": "dc54a03528aad61e4835e32542d57c2f4dfabbb1d28498b0f95129b04e7def60",
+        "document-baking.cpp.o": "cc9c1868c5eb4c648894fb698a9ef805bcfb88e7bb8ee517db16ac9f381f883f",
+        "document.cpp.o": "416dfad87feb4e57412f3fa3c3b26a13c102a0a172682bff4e3fe0a065d06888",
+        "emission-bake-source.cpp.o": "12360f00138369d82f5e27fb495d85ed1921f013282143321440264ddbf9c883",
+        "texture-set-resample.cpp.o": "b894d6429082ca681d923de0a80df7e429cdb662056c99d94085cd892acdebfd",
+        "texture-set-surface.cpp.o": "f77eed0a90078db8a8fcc268eacc177c2b09dc7055dd6ac42e6da0a5b606241d",
+        "texture-sets.cpp.o": "c85b5b6d7cea9c2017542493f15d70385ad45d5397715b3e0703976afb103dd6"
+      },
+      "atlas_sha256": "230e1bf7593976ee61f3c0edfb31acf3d142ede218c495aa3a02da2c8207622a",
+      "app_sha256": "468868a923f05199f150a7281f5d3e0902fe157517f3f693b2b158a6baa2266e",
+      "binaries": {
+        "dome-sculpt-texture-set-native": "02c3c1288aeb6559598f60539a74dc346434979d33cef0a74d3ccb196ffdd5f2",
+        "dome-sculpt-texture-set-source-export": "91813b07876bcfbfc20b6f3876b0301930be511327698fa30ae0b271c7db44d6",
+        "texture-set-bake-recipe": "ecf119f05caad7ddf22adeaef867cf0fe462bbe742807b1b06d9d96c2f522fde",
+        "bake-recipes": "d768892d81aed84bab7c679653544c669081becda7133506869fd5026be5497c",
+        "bake-custom-cage": "6a70a1d057574c4def22ffb361a2e2c68fa00b3aca71c73dc1eeadade0ce9a27",
+        "bake-workflow": "5ef64a392caa76487bd671dc256d6712a97ffedfd0a3b9118a0bc5ab556540ce",
+        "bake-controls": "8fdb1e72731732789ad54751c6f3b0e8f44f5f440ec9c83f24fdbaf4ce7069fc"
+      },
+      "exit": 0,
+      "ctest_sha256": "00453ef93c462b6e34975354da7df048c2175b5c632d19ef93c27f80d6854fb7",
+      "native_tests": 8,
+      "active_set_assertions": 22
+    },
+    "native-sanitizer": {
+      "candidate": "8378901c7ed4e699c0725dfc9d26e5f327a6670f",
+      "profile": "asan",
+      "terminal": true,
+      "invocation": "1fe9541b6fdf4ee6a778cb15b2b58010",
+      "fltk": "/home/blux/de-xr/dome-sculpt/artifacts/sdk-20261126/toolkit-sanitize",
+      "phase": "complete",
+      "elapsed_seconds": 195.01,
+      "donor": "b89b1f8c2a3d3346f6b0127c830395df193ecbf3",
+      "rebuilt": [
+        "src/bake-authoring.cpp",
+        "src/bake.cpp",
+        "src/document-baking.cpp",
+        "src/document.cpp",
+        "src/emission-bake-source.cpp",
+        "src/texture-set-resample.cpp",
+        "src/texture-set-surface.cpp",
+        "src/texture-sets.cpp"
+      ],
+      "core_sha256": "64adaae4c8a94f815a0b030b1f2873f3cb9d60f257d5d75a2d39fb5a30b6cb55",
+      "parent_core_sha256": "625025e6b7d01a913e85c13a0a518c85a7cc24357ee3dc0adfee7002177d164a",
+      "objects": {
+        "bake-authoring.cpp.o": "fe6ffffbb3669ef9cb1cf110a34dd3d7d6a5c693b3ab8285c884829eb42c8706",
+        "bake.cpp.o": "fb20a0378eec503b7ee47c42baea9805100ca3cefe00f8aa4cd34f5b73eb70c9",
+        "document-baking.cpp.o": "99f81e473cfa67dd05708ce688a7e149e75d4dc8821fc5cec0da96a5d6803235",
+        "document.cpp.o": "98e54f045c327ee7d1377038c8457180834c152d1cb01b8b25dd2efd4c3176d3",
+        "emission-bake-source.cpp.o": "7ce2788122752ef2a0d6913962e7496aa528ca514f8496fb295d6f076c423dfb",
+        "texture-set-resample.cpp.o": "51970f765b4be44b0edae991085cb41c0194010428934c6786e6fc415cbf0bb8",
+        "texture-set-surface.cpp.o": "498c81624c430c3c9ae856e75d0363d7ff4a7f010869dd38fa68cbaf813a8afd",
+        "texture-sets.cpp.o": "838cebf7b91aa8e83f523c318e1a419484a11d08eb185d094c1e7839058b5b39"
+      },
+      "atlas_sha256": "2956c3f61d86b97853efacc7e798de11787ac931743ca658f4846da09e138a26",
+      "app_sha256": "4ec97500523c3b23980690abf266c4d7a7ddd96ba87159f70e96cfc7da595ba3",
+      "binaries": {
+        "dome-sculpt-texture-set-native": "3636a52731eea9c063b687572792d0cea7cb6f430fb2f14db1f645be2e2ceb95",
+        "dome-sculpt-texture-set-source-export": "8b96fef165fe196b295192ee53d03931aa9ff58f2c2d8a3866aa152b06b79665",
+        "texture-set-bake-recipe": "5b43039454a3d75448aa025b28e1804975e26ca74392985489bfceffec1b7292",
+        "bake-recipes": "98e78ac4aa55ba958fa398558c6220174558419ad9ed4af2ede131ce787d9f1c",
+        "bake-custom-cage": "b5ed9d5fb4726a9c575692e802ec0167263a53fead5e1161ab72e05bfc62a944",
+        "bake-workflow": "a9fc879c444fbc295f898e365d39e3434f531e7e853fa48239cc36ee8901448d",
+        "bake-controls": "01a45c503f7f80aa0815fa233e40d5cb28e1af288bfb3921d7aedeecddfec706"
+      },
+      "exit": 0,
+      "ctest_sha256": "5ca3a1046283266216d2c5c2d807506ec80826a76f49ca7b3cb254974bdf66da",
+      "native_tests": 8,
+      "active_set_assertions": 22
+    },
+    "software-openxr": {
+      "invocation": "5d47be5c4e33433c8e97cc0a379c8ef4",
+      "terminal": true,
+      "candidate": "5ef38b520d9fdfa4e0e2049ce1aad75cfcf28cc1",
+      "app_sha256": "33f4673b17aa9c065072f9ff0cd14e29ada1822a9eb5a0386ecee9ee842b2504",
+      "runtime_sha256": "e00b86390634f4c3e97694a50553e0364db6b3379153fd912a1c3f9d81027026",
+      "fixture_sha256": "296a9015c91c40840f1cce947cc383ad9e1074e7cb355d450525a0d01adcf3ac",
+      "phase": "complete",
+      "exit": 0,
+      "checks": 19,
+      "report_sha256": "528845174a2be985afa5ed69f32fdfc7bb9b7e6cf022d1df99eb0ef9bd1c9c78",
+      "native_endpoint_sha256": {
+        "source": "125edbbcd3c8d72df0420a434c91a73f4e64a72693ba4e099168725add56d280",
+        "reference": "4391b246e47412949b07eebd2e969ddec55ae4e35552259cf0a172f1846412ef",
+        "accept": "4391b246e47412949b07eebd2e969ddec55ae4e35552259cf0a172f1846412ef",
+        "cancel": "125edbbcd3c8d72df0420a434c91a73f4e64a72693ba4e099168725add56d280",
+        "focus": "125edbbcd3c8d72df0420a434c91a73f4e64a72693ba4e099168725add56d280"
+      }
+    },
+    "arc-sanitizer-openxr": {
+      "candidate": "5ef38b520d9fdfa4e0e2049ce1aad75cfcf28cc1",
+      "terminal": true,
+      "invocation": "f761436a668a41559cd0da288eb0bb2e",
+      "phase": "complete",
+      "core_sha256": "64adaae4c8a94f815a0b030b1f2873f3cb9d60f257d5d75a2d39fb5a30b6cb55",
+      "fixture_sha256": "193654819c719b71bb655d69c617869566e39e6d07ee96e1aea09a6ec1a3a62c",
+      "runtime_sha256": "3203579dbe7d26f550dc3197bec266148f0e38bf9cfe467804ae6c369f5faa98",
+      "app_sha256": "6a2101e571d7960744661f473a60a297cc3f2ace5a2a3e12fed15cbf9ab7dfa9",
+      "runner_sha256": "d38c59f192e568bb980596ce151eef5f29122c3be70ab85ded1486219d9718b4",
+      "witnesses": {
+        "accept": {
+          "pid": 3183238,
+          "node": "/dev/dri/renderD129",
+          "gallium": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "cancel": {
+          "pid": 3186857,
+          "node": "/dev/dri/renderD129",
+          "gallium": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "focus": {
+          "pid": 3188195,
+          "node": "/dev/dri/renderD129",
+          "gallium": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        }
+      },
+      "exit": 0,
+      "checks": 19,
+      "report_sha256": "9bccafa7fa21dca8dd6a4d63f955e9eb5c04880ff48fb475c7d6725e1e57072b",
+      "native_endpoint_sha256": {
+        "source": "125edbbcd3c8d72df0420a434c91a73f4e64a72693ba4e099168725add56d280",
+        "reference": "4391b246e47412949b07eebd2e969ddec55ae4e35552259cf0a172f1846412ef",
+        "accept": "4391b246e47412949b07eebd2e969ddec55ae4e35552259cf0a172f1846412ef",
+        "cancel": "125edbbcd3c8d72df0420a434c91a73f4e64a72693ba4e099168725add56d280",
+        "focus": "125edbbcd3c8d72df0420a434c91a73f4e64a72693ba4e099168725add56d280"
+      }
+    },
+    "nested-domed-wayland": {
+      "candidate": "5ef38b520d9fdfa4e0e2049ce1aad75cfcf28cc1",
+      "terminal": true,
+      "invocation": "676535e57419412fb87036967f74c750",
+      "phase": "complete",
+      "core_sha256": "f0f4db0e7cc5c92a4a1d377663efc6a3c5ab3a9da4372d3c2b35cc9614b90a51",
+      "fixture_sha256": "296a9015c91c40840f1cce947cc383ad9e1074e7cb355d450525a0d01adcf3ac",
+      "compositor_sha256": "47920142c8c803dcf5adb63ba643d2e347fbdcd1e15ecd8bce7c1a8dd47c0b7e",
+      "compositor_source": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+      "probe_sha256": "5bf11c670f66bbb68960073878933055b09582e5173ec1e3f472b413956c55aa",
+      "app_sha256": "33f4673b17aa9c065072f9ff0cd14e29ada1822a9eb5a0386ecee9ee842b2504",
+      "exit": 0,
+      "checks": 15,
+      "report_sha256": "37607002c48a02c531ca0e1b708edfc2187db1aa7d205f3f9bbf8556fb507410"
+    },
+    "software-sanitizer-openxr-original": {
+      "candidate": "b8eb5515390bfbc39f6eb50973fb6e6a040d0769",
+      "profile": "asan",
+      "invocation": "2812048ca5954b4284ea7328f6d4ca6e",
+      "terminal": true,
+      "phase": "exercise the real loader and ordered native Save",
+      "app_sha256": "4ec97500523c3b23980690abf266c4d7a7ddd96ba87159f70e96cfc7da595ba3",
+      "runtime_sha256": "3203579dbe7d26f550dc3197bec266148f0e38bf9cfe467804ae6c369f5faa98",
+      "fixture_sha256": "193654819c719b71bb655d69c617869566e39e6d07ee96e1aea09a6ec1a3a62c",
+      "exit": 1,
+      "error": "CalledProcessError(1, ['bwrap', '--die-with-parent', '--unshare-all', '--ro-bind', '/', '/', '--bind', PosixPath('/home/blux/de-xr/dome-sculpt/artifacts/active-texture-set-openxr-validation-20261126/asan'), PosixPath('/home/blux/de-xr/dome-sculpt/artifacts/active-texture-set-openxr-validation-20261126/asan'), '--proc', '/proc', '--dev', '/dev', '--tmpfs', '/tmp', '--tmpfs', '/run/user', '--clearenv', '--setenv', 'PATH', '/usr/bin:/bin', '--setenv', 'HOME', '/tmp', '--setenv', 'LD_LIBRARY_PATH', '/home/blux/de-xr/dome-sculpt/artifacts/sdk-20261126/toolkit-sanitize/lib:/opt/fltk-vr/bdf-runtime/lib:/usr/lib64', '--setenv', 'ASAN_OPTIONS', 'detect_leaks=1:halt_on_error=1', '--setenv', 'UBSAN_OPTIONS', 'halt_on_error=1:print_stacktrace=1', '/usr/bin/python3.14', PosixPath('/home/blux/de-xr/dome-sculpt/artifacts/active-texture-set-bake-openxr-source-20261126/tests/bake-recipes-xr.py'), PosixPath('/home/blux/de-xr/dome-sculpt/artifacts/active-texture-set-bake-guard-toolkit-validation-20261126/asan/build/dome-sculpt'), PosixPath('/home/blux/de-xr/dome-sculpt/artifacts/texture-set-recipe-and-hdr-validation-20261126/asan/build/libdome-sculpt-test-runtime.so'), PosixPath('/home/blux/de-xr/dome-sculpt/artifacts/active-texture-set-openxr-validation-20261126/asan/dome-sculpt-bake-recipes-test'), PosixPath('/home/blux/de-xr/dome-sculpt/artifacts/active-texture-set-openxr-validation-20261126/asan/workflow'), '--texture-set'])",
+      "saved_project_exact": true,
+      "leak_bytes": 112,
+      "allocation_module": "/usr/lib64/libgallium-26.2.7.so"
+    }
+  },
+  "archive": {
+    "file": "active-texture-set-bake-20261126.tar.gz",
+    "sha256": "d822607966a0da1da51baf8ead52f75d69e436ed418322c063c1979beddf4df2",
+    "members": {
+      "arc-sanitizer-openxr/arc-xr.py": "d38c59f192e568bb980596ce151eef5f29122c3be70ab85ded1486219d9718b4",
+      "arc-sanitizer-openxr/status.json": "8c1f99dc11fa5f4613b6217535585612fa6c4de999123d412a5097f0279c2394",
+      "arc-sanitizer-openxr/workflow/accept.dsculpt": "4391b246e47412949b07eebd2e969ddec55ae4e35552259cf0a172f1846412ef",
+      "arc-sanitizer-openxr/workflow/accept.json": "62d832e8482866fbf5a6e99f6327bd53c0e65ad84e18eb4d95087f98affe1f78",
+      "arc-sanitizer-openxr/workflow/accept.log": "b6a84d40240026f8f9a296c6fd5f794661bc8b44d6ed0a03f7ca745e62d386ad",
+      "arc-sanitizer-openxr/workflow/cancel.dsculpt": "125edbbcd3c8d72df0420a434c91a73f4e64a72693ba4e099168725add56d280",
+      "arc-sanitizer-openxr/workflow/cancel.json": "bf48b49280cbf5e3c17664bbef942d16b6386b3df8eb5313336ddd9c88ecdffb",
+      "arc-sanitizer-openxr/workflow/focus.dsculpt": "125edbbcd3c8d72df0420a434c91a73f4e64a72693ba4e099168725add56d280",
+      "arc-sanitizer-openxr/workflow/focus.json": "23a1d649c6b85adcd08ae4d204e091df8c4135100695bacb5e8be8b9ee80804c",
+      "arc-sanitizer-openxr/workflow/reference.dsculpt": "4391b246e47412949b07eebd2e969ddec55ae4e35552259cf0a172f1846412ef",
+      "arc-sanitizer-openxr/workflow/report.json": "9bccafa7fa21dca8dd6a4d63f955e9eb5c04880ff48fb475c7d6725e1e57072b",
+      "arc-sanitizer-openxr/workflow/source.dsculpt": "125edbbcd3c8d72df0420a434c91a73f4e64a72693ba4e099168725add56d280",
+      "arc-sanitizer-openxr/xr.log": "f4dffe8866e856568b8eb1405284bfba905df753fc8742d0ee88c016cc1c8875",
+      "native-release/ctest.log": "00453ef93c462b6e34975354da7df048c2175b5c632d19ef93c27f80d6854fb7",
+      "native-release/status.json": "9b922800c207407d6acc27239be835550342f1c403272f044dc54fe7bff5c5f3",
+      "native-sanitizer/ctest.log": "5ca3a1046283266216d2c5c2d807506ec80826a76f49ca7b3cb254974bdf66da",
+      "native-sanitizer/status.json": "e09528200f110957678153d76a5d396f688ca7f974f817650ea2b1f69277d108",
+      "nested-domed-wayland/status.json": "445b55f4caf85682de11052e348f65e99f6615f9f8d22c2ed6c41cd76b98bf89",
+      "nested-domed-wayland/wayland.log": "647ba2a491a78508e2c2bb37f56733af6e36d76906e3420c296ffedefb1e6927",
+      "nested-domed-wayland/workflow/client.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nested-domed-wayland/workflow/compositor.log": "b19c1f76436afbc6e5bfcc0bf0ddf0c122f20ebc6f2b92b3c41d7e4620d98970",
+      "nested-domed-wayland/workflow/report.json": "37607002c48a02c531ca0e1b708edfc2187db1aa7d205f3f9bbf8556fb507410",
+      "nested-domed-wayland/workflow/runtime-maps.txt": "d654c95077e907bff525b44649f53786ee194edf1a37f5551502f8bf4c597cdb",
+      "scripts/arc.py": "5244849c978ecbc8b4dbfa590589c8c57a2b14aa5896d65cc38327a81d0405b5",
+      "scripts/final-software.py": "0821c6b247437018a671bfa2c27092566195ed40b925b33c886fa2925434728e",
+      "scripts/wayland.py": "154fd4424bf2ea0d453b1fdf16417f7cc42e2712f2a809d6e0e561c4c171f1ce",
+      "software-openxr/status.json": "a6272d6b28f93d323c9ff30ff0b9b8c1c751db5929112c4d069592e7d9b83d93",
+      "software-openxr/workflow/accept.dsculpt": "4391b246e47412949b07eebd2e969ddec55ae4e35552259cf0a172f1846412ef",
+      "software-openxr/workflow/accept.json": "7560a001cb01b3d34331662815b82bb7c57bb1d293a765e175bf99935828cdb4",
+      "software-openxr/workflow/accept.log": "b6a84d40240026f8f9a296c6fd5f794661bc8b44d6ed0a03f7ca745e62d386ad",
+      "software-openxr/workflow/cancel.dsculpt": "125edbbcd3c8d72df0420a434c91a73f4e64a72693ba4e099168725add56d280",
+      "software-openxr/workflow/cancel.json": "a8620832e5d0507b742f9bea7d992a105d58b923cda98f0e04057aa4bf60101b",
+      "software-openxr/workflow/focus.dsculpt": "125edbbcd3c8d72df0420a434c91a73f4e64a72693ba4e099168725add56d280",
+      "software-openxr/workflow/focus.json": "d4b17c1b5b88a0c13ee1d9ae8ae630de70d990361291ef11cc0e5daa12d45a9e",
+      "software-openxr/workflow/reference.dsculpt": "4391b246e47412949b07eebd2e969ddec55ae4e35552259cf0a172f1846412ef",
+      "software-openxr/workflow/report.json": "528845174a2be985afa5ed69f32fdfc7bb9b7e6cf022d1df99eb0ef9bd1c9c78",
+      "software-openxr/workflow/source.dsculpt": "125edbbcd3c8d72df0420a434c91a73f4e64a72693ba4e099168725add56d280",
+      "software-openxr/xr.log": "a85d25f55168c280d82edc890c904065aaf584fb73c222ee062b8e7aba789ad5",
+      "software-sanitizer-openxr-original/status.json": "67444a9785a24582cc200e5aa65ef9b77dcd37f49982e3d14b4d3c4919b11a8a",
+      "software-sanitizer-openxr-original/workflow/accept.log": "974a0be2ad3d355c12c38b851211b82929ffab39bf403f947a41a9aa4060bce2",
+      "software-sanitizer-openxr-original/workflow/accept.maps": "27825a67b4ba652f81b142fbba6cdddd9ae183aa9719a7b73f2084e209de4d14",
+      "software-sanitizer-openxr-original/xr.log": "efabd2ef9ff05dc8e8067c830875d9c45b1a4f137e8941c2e8b00b9a0a13664e"
+    }
+  }
+}

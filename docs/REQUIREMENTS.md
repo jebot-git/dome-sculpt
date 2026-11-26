@@ -80,9 +80,16 @@ ASan/UBSan. The prepared polygon and canonical UV continuation passes
 preserving exact source sampling and archive replay. Main now integrates
 recipe persistence and reference remapping after ten native tests per
 profile and 153 synthetic OpenXR checks each in software Release and on
-Intel Arc with ASan/UBSan. Active-set Bake/Clear/Recall remains open.
+Intel Arc with ASan/UBSan. A subsequent merge adds active-set Bake, Clear
+and Recall for plain native texture sets, including per-hit source material
+selection, exact Undo/Redo, ordered Save and full-cage projection. Eight
+focused tests pass per native profile. The final app passes 15 nested DomeD
+Wayland checks and 19 synthetic OpenXR checks each in software Release and
+Arc with ASan/UBSan. Retained prepared-field Bake and physical controls
+remain open. The original software sanitizer leak remains in the evidence.
 [Texture-set recipe evidence](validation/texture-set-bake-recipe-20261126.json)
 [Combined runtime evidence](validation/texture-set-recipe-runtime-20261126.json)
+[Active-set Bake evidence](validation/active-texture-set-bake-20261126.json)
 
 ## Qualified integration — 2026-11-17
 
