@@ -13,11 +13,11 @@ struct PortableTextureSetField {
  std::shared_ptr<const TextureMaps>maps;
  bool normal_role=false;
 };
-// Compiles a genuine retained field only after proving that one constant
-// before role frame on each triangle has a standard glTF representation.
-// Smooth N-only fields also admit an exactly conformal current world matrix.
-// Current geometry, hierarchy and UV0 stay untouched; independent paint/role
-// coordinates remain separate arrays. No texture/normal sampling approximation.
+// The original texture grid is tried first. Independent charts allow a
+// distinct portable normal basis where source texture coordinates overlap.
+constexpr uint32_t portable_normal_export_max_resolution(uint32_t source)noexcept{
+ return source<1024?2*source:source;
+}
 PortableTextureSetField portable_texture_set_field(const TextureSetView&,
- const AffineTransform&,const TextureSetLimits& = {});
+ const AffineTransform&,size_t &work,const TextureSetLimits&);
 }

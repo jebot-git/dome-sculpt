@@ -73,22 +73,12 @@ Vec3 PolygonSurfacePreview::normal_at(size_t triangle,std::array<double,3>b,cons
   return native_bake_?sample_native_bake(triangle,b,world):owner_->native_normal(triangle,b,world,limits);
  if(own(baked_->normal_field,owner_->before()->paint->baked()->normal_field))
   return owner_->pbr_normal(triangle,b,world,limits);
- const auto [before,current]=triangle_frames(triangle,world);
- const size_t first=triangle*3;
  std::array<double,2> uv{};
  for(size_t k=0;k<3;++k){
-  const auto at=streams_->normal.at(first+k);
+  const auto at=streams_->normal.at(triangle*3+k);
   for(size_t axis=0;axis<2;++axis)uv[axis]+=at[axis]*b[k];
  }
- PaintSourceTexture texture;
- texture.image=baked_->normal_field->pbr();
- texture.wrap_s=texture.wrap_t=33071;
- texture.min_filter=texture.mag_filter=9729;
- const auto value=sample_source_texture(texture,float(uv[0]),float(uv[1]),false);
- Vec3 decoded{value[0]*2-1,value[1]*2-1,value[2]*2-1};
- if(std::max({std::abs(decoded.x),std::abs(decoded.y),std::abs(decoded.z)})<=1e-20f)decoded={0,0,1};
- const auto basis=before_role_basis(triangle,b,world);
- return transport_polygon_direction(basis.t*decoded.x+basis.b*decoded.y+basis.n*decoded.z,before,current);
+ return sample_baked_normal(triangle,b,world,{float(uv[0]),float(uv[1])});
 }
 Vec3 PolygonSurfacePreview::sample_native_bake(
     size_t triangle,std::array<double,3> b,const AffineTransform &world)const{
@@ -98,19 +88,23 @@ Vec3 PolygonSurfacePreview::sample_native_bake(
   const auto at=streams_->paint.at(triangle*3+k);
   for(size_t axis=0;axis<2;++axis)uv[axis]+=at[axis]*b[k];
  }
+ return sample_baked_normal(triangle,b,world,{float(uv[0]),float(uv[1])});
+}
+Vec3 PolygonSurfacePreview::sample_baked_normal(size_t triangle,std::array<double,3> b,
+    const AffineTransform &world,std::array<float,2> uv)const{
+ const auto image=native_bake_?native_bake_:baked_&&baked_->normal_field?baked_->normal_field->pbr():nullptr;
+ if(!image)throw std::invalid_argument("Polygon has no authored normal image");
  PaintSourceTexture texture;
- texture.image=native_bake_;
+ texture.image=image;
  texture.wrap_s=texture.wrap_t=33071;
  texture.min_filter=texture.mag_filter=9729;
- const auto e=sample_source_texture(texture,float(uv[0]),float(uv[1]),false);
+ const auto e=sample_source_texture(texture,uv[0],uv[1],false);
  const auto [before,current]=triangle_frames(triangle,world);
  const auto basis=before_role_basis(triangle,b,world);
- Vec3 normal=basis.n;
- if(e[3]>0){
-  const Vec3 components{e[0]*2-1,e[1]*2-1,e[2]*2-1};
-  if(length(components)>1e-8f)
-   normal=basis.t*components.x+basis.b*components.y+basis.n*components.z;
- }
+ const Vec3 detail{e[0]*2-1,e[1]*2-1,e[2]*2-1};
+ const bool available=native_bake_?e[3]>0&&length(detail)>1e-8f:
+     std::max({std::abs(detail.x),std::abs(detail.y),std::abs(detail.z)})>1e-20f;
+ const auto normal=available?basis.t*detail.x+basis.b*detail.y+basis.n*detail.z:basis.n;
  return transport_polygon_direction(normal,before,current);
 }
 std::shared_ptr<const PolygonSurfacePreview> PolygonSurfacePreview::with_bake(const PaintedMesh &paint)const{

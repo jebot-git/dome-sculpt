@@ -102,18 +102,91 @@ uint32_t index_at(const detail::GltfDocument&d,int index,size_t n){const auto&a=
 Vec3 vector(const std::vector<float>&v){return {v.at(0),v.at(1),v.at(2)};}
 Vec3 unit(AffineVector v){return normalized(Vec3{float(v[0]),float(v[1]),float(v[2])});}
 Image texture_image(const detail::GltfDocument&d,const nlohmann::json&info){const auto&texture=d.json.at("textures").at(info.at("index").get<size_t>());const auto&image=d.json.at("images").at(texture.at("source").get<size_t>());const auto&view=d.json.at("bufferViews").at(image.at("bufferView").get<size_t>());const auto offset=view.value("byteOffset",size_t(0)),count=view.at("byteLength").get<size_t>();check(offset<=d.binary.size()&&count<=d.binary.size()-offset,"Actual material PNG lies within the emitted buffer");return decode_projection_png(std::span(d.binary).subspan(offset,count));}
+void audit_normals(const detail::GltfDocument &output,const ObjectSurface &surface,float tolerance){
+ float maximum=0;
+ const auto &plan=*surface.texture_set_surface;
+ const auto world=surface.world_matrix();
+ const float reflection=world.orientation()==AffineOrientation::Reversing?-1.f:1.f;
+ const auto &primitives=output.json.at("meshes").at(0).at("primitives");
+ for(size_t f=0;f<primitives.size();++f){
+  const auto &primitive=primitives.at(f),&attrs=primitive.at("attributes");
+  const auto &material=output.json.at("materials").at(primitive.at("material").get<size_t>());
+  const auto &field=plan.fields()[f];
+  const auto &draw=plan.draws()[f];
+  const auto &preview=field.source->source_preview();
+  const bool mapped=preview->native_bake()||preview->model()==detail::PolygonSurfaceNormalModel::PreparedCorePbr;
+  check(material.contains("normalTexture")==mapped,"Portable material carries exactly its authored normal role");
+  const auto normal_attr=attrs.at("NORMAL").get<int>();
+  int tangent_attr=0,uv_attr=0;
+  std::optional<PaintSourceTexture> texture;
+  if(mapped){
+   check(attrs.contains("TANGENT"),"Mapped retained normals have an explicit glTF tangent");
+   tangent_attr=attrs.at("TANGENT").get<int>();
+   const auto &info=material.at("normalTexture");
+   const auto uv_set=info.value("texCoord",0u);
+   check(uv_set!=0,"The normal texture is routed outside the independent editable UV0");
+   uv_attr=attrs.at("TEXCOORD_"+std::to_string(uv_set)).get<int>();
+   texture.emplace();
+   texture->image=std::make_shared<const Image>(texture_image(output,info));
+   texture->wrap_s=texture->wrap_t=33071;
+   texture->min_filter=texture->mag_filter=9729;
+  }
+  const auto indices=primitive.at("indices").get<int>();
+  for(size_t c=0;c<draw.count;c+=3){
+   const auto triangle=plan.logical_corners()[draw.first+c]/3;
+   std::array<Vec3,3> normals{},tangents{},bitangents{};
+   std::array<std::vector<float>,3> uv;
+   for(size_t k=0;k<3;++k){
+    const auto id=index_at(output,indices,c+k);
+    const auto n=vector(attribute(output,normal_attr,id,3));
+    normals[k]=unit(world.normal({n.x,n.y,n.z}));
+    if(!mapped)continue;
+    const auto t=attribute(output,tangent_attr,id,4);
+    check(std::abs(dot(n,vector(t)))<2e-6f,"Exported vertex preserves an orthonormal local N/T frame");
+    tangents[k]=unit(world.direction({t[0],t[1],t[2]}));
+    bitangents[k]=normalized(cross(normals[k],tangents[k]))*(t[3]*reflection);
+    uv[k]=attribute(output,uv_attr,id,2);
+   }
+   constexpr int steps=24;
+   for(int i=0;i<=steps;++i)for(int j=0;j<=steps-i;++j){
+    const std::array<double,3> bary{double(i)/steps,double(j)/steps,double(steps-i-j)/steps};
+    Vec3 n{},t{},b{};
+    std::array<double,2> lookup{};
+    for(size_t k=0;k<3;++k){
+     n+=normals[k]*float(bary[k]);
+     if(!mapped)continue;
+     t+=tangents[k]*float(bary[k]);
+     b+=bitangents[k]*float(bary[k]);
+     for(size_t axis=0;axis<2;++axis)lookup[axis]+=uv[k][axis]*bary[k];
+    }
+    auto emitted=normalized(n);
+    if(texture){
+     const auto cell=sample_source_texture(*texture,float(lookup[0]),float(lookup[1]),false);
+     emitted=normalized(normalized(t)*(2*cell[0]-1)+normalized(b)*(2*cell[1]-1)+emitted*(2*cell[2]-1));
+    }
+    const auto expected=field.source->normal(triangle,bary,world,true);
+    const auto error=std::atan2(length(cross(expected,emitted)),dot(expected,emitted));
+    maximum=std::max(maximum,error);
+    if(error>tolerance)
+     throw std::runtime_error("GLB normal direction differs from the retained field by "+std::to_string(error)+" radians at "+std::to_string(i)+","+std::to_string(j));
+    ++checks;
+   }
+  }
+ }
+ std::cout<<"PORTABLE normal peak radians "<<maximum<<'\n';
+}
 void audit(bool prepared,bool reflected,bool varying=false){
- auto scene=source(prepared,reflected,false,varying);if(varying)scene.active().affine_edit.reset();const auto exact=scene.encode();const auto surfaces=scene.export_surfaces();check(surfaces.size()==1&&surfaces[0].texture_set_surface,"Real visible source actor yields one shared multi-material export bundle");const auto compiled=detail::compile_texture_set_export(surfaces[0]);const auto output=detail::make_gltf(surfaces);const auto&primitives=output.json.at("meshes").at(0).at("primitives");check(primitives.size()==2&&compiled.fields.size()==2,"Actual source bundle emits both nonempty material ranges");const auto&plan=*surfaces[0].texture_set_surface;const auto world=surfaces[0].world_matrix();
+ auto scene=source(prepared,reflected,false,varying);const auto exact=scene.encode();const auto surfaces=scene.export_surfaces();check(surfaces.size()==1&&surfaces[0].texture_set_surface,"Real visible source actor yields one shared multi-material export bundle");const auto compiled=detail::compile_texture_set_export(surfaces[0]);const auto output=detail::make_gltf(surfaces);const auto&primitives=output.json.at("meshes").at(0).at("primitives");check(primitives.size()==2&&compiled.fields.size()==2,"Actual source bundle emits both nonempty material ranges");const auto&plan=*surfaces[0].texture_set_surface;const auto world=surfaces[0].world_matrix();
  for(size_t f=0;f<2;++f){const auto&primitive=primitives.at(f);const auto&attrs=primitive.at("attributes");const auto&field=plan.fields()[f];const auto&draw=plan.draws()[f];const auto&material=output.json.at("materials").at(primitive.at("material").get<size_t>());check(primitive.at("extras").at("dome_sculpt_texture_set").at("id")==field.id,"Portable primitive retains its actual object-local material identity");if(f)check(material.at("name")==field.material.name,"Additional portable material retains current authored scalars/name");
   const auto paint_set=material.at("pbrMetallicRoughness").at("baseColorTexture").value("texCoord",0u);const auto paint_attr=attrs.at("TEXCOORD_"+std::to_string(paint_set)).get<int>();const auto native=field.source->source_preview();const auto color=texture_image(output,material.at("pbrMetallicRoughness").at("baseColorTexture"));check(color.rgba==compiled.fields[f].textures->color.rgba,"Actual emitted per-material PNG retains current composite bytes");
-  std::optional<PaintSourceTexture>normal_image;int normal_attr=0;
-  if(prepared){check(material.contains("normalTexture")&&attrs.contains("TANGENT"),"Prepared retained role exports its actual normal image and tangent attributes");const auto image=texture_image(output,material.at("normalTexture"));check(image.rgba==native->field_owner()->before()->paint->baked()->normal_field->pbr()->rgba,"Actual emitted normal image preserves complete original role bytes");PaintSourceTexture t;t.image=std::make_shared<const Image>(image);t.wrap_s=t.wrap_t=33071;t.min_filter=t.mag_filter=9729;normal_image=t;normal_attr=attrs.at("TEXCOORD_"+std::to_string(material.at("normalTexture").value("texCoord",0u)));}
+  int normal_attr=0;
+  if(prepared){check(material.contains("normalTexture")&&attrs.contains("TANGENT"),"Prepared retained role exports its actual normal image and tangent attributes");const auto image=texture_image(output,material.at("normalTexture"));check(image.rgba==native->field_owner()->before()->paint->baked()->normal_field->pbr()->rgba,"Actual emitted normal image preserves complete original role bytes");normal_attr=attrs.at("TEXCOORD_"+std::to_string(material.at("normalTexture").value("texCoord",0u)));}
   bool independent_uv=false;for(size_t c=0;c<draw.count;++c){const auto logical=plan.logical_corners()[draw.first+c],vertex=index_at(output,primitive.at("indices"),c);const auto raw_vertex=plan.geometry()->indices.at(logical);const auto uv=attribute(output,attrs.at("TEXCOORD_0"),vertex,2),paint=attribute(output,paint_attr,vertex,2);check(uv==std::vector<float>(plan.geometry()->uv.at(raw_vertex).begin(),plan.geometry()->uv.at(raw_vertex).end()),"Standard export retains current UV0 separately from original paint grid");check(paint==std::vector<float>(native->paint_coordinates().at(logical).begin(),native->paint_coordinates().at(logical).end()),"Material paint texture uses the actual retained logical corner coordinates");independent_uv|=uv!=paint;if(prepared){const auto role=attribute(output,normal_attr,vertex,2);check(role==std::vector<float>(native->normal_coordinates().at(logical).begin(),native->normal_coordinates().at(logical).end()),"Standard normal texture uses its actual independent role coordinates");}}
   check(independent_uv,"Each exported material keeps genuinely distinct current UV0 and original writable paint coordinates");
-  for(size_t c=0;c<draw.count;c+=3)for(const auto bary:{std::array<double,3>{.2,.3,.5},std::array<double,3>{.6,.2,.2}}){Vec3 N{},T{};double u=0,v=0;float w=1;for(size_t k=0;k<3;++k){const auto vertex=index_at(output,primitive.at("indices"),c+k);const auto n=vector(attribute(output,attrs.at("NORMAL"),vertex,3));N+=unit(world.normal({n.x,n.y,n.z}))*float(bary[k]);if(prepared){const auto t=attribute(output,attrs.at("TANGENT"),vertex,4);T+=unit(world.direction({t[0],t[1],t[2]}))*float(bary[k]);w=t[3];const auto uv=attribute(output,normal_attr,vertex,2);u+=uv[0]*bary[k];v+=uv[1]*bary[k];}}
-   N=normalized(N);Vec3 emitted=N;if(prepared){T=normalized(T);const auto B=normalized(cross(N,T))*(w*(world.orientation()==AffineOrientation::Reversing?-1.f:1.f));const auto texel=sample_source_texture(*normal_image,float(u),float(v),false);emitted=normalized(T*(texel[0]*2-1)+B*(texel[1]*2-1)+N*(texel[2]*2-1));}const auto triangle=plan.logical_corners()[draw.first+c]/3;check(length(emitted-field.source->normal(triangle,bary,world,true))<2e-5f,"Independent standard glTF N/T/image evaluation agrees with the genuine source owner under actual shear/reflection");}
  }
- const std::string file=varying?"native-smooth.glb":std::string(prepared?"prepared":"native")+(reflected?"-reflected.glb":"-sheared.glb");export_glb(surfaces,file);cgltf_options options{};cgltf_data*data=nullptr;check(cgltf_parse_file(&options,file.c_str(),&data)==cgltf_result_success,"Independent cgltf parses the actual durable GLB");struct Free{cgltf_data*p;~Free(){cgltf_free(p);}}free{data};check(cgltf_load_buffers(&options,data,file.c_str())==cgltf_result_success&&cgltf_validate(data)==cgltf_result_success,"Independent standard glTF consumer validates actual buffers, materials and attributes");check(data->meshes_count==1&&data->meshes[0].primitives_count==2,"Independent consumer sees one geometry with both material primitives");
+ audit_normals(output,surfaces.front(),2e-5f);
+ const std::string file=std::string(prepared?"prepared":"native")+
+     (varying?"-smooth":"")+(reflected?"-reflected.glb":"-sheared.glb");export_glb(surfaces,file);cgltf_options options{};cgltf_data*data=nullptr;check(cgltf_parse_file(&options,file.c_str(),&data)==cgltf_result_success,"Independent cgltf parses the actual durable GLB");struct Free{cgltf_data*p;~Free(){cgltf_free(p);}}free{data};check(cgltf_load_buffers(&options,data,file.c_str())==cgltf_result_success&&cgltf_validate(data)==cgltf_result_success,"Independent standard glTF consumer validates actual buffers, materials and attributes");check(data->meshes_count==1&&data->meshes[0].primitives_count==2,"Independent consumer sees one geometry with both material primitives");
  check(scene.encode()==exact,"Portable source compilation leaves all original normal/paint/recipe/native history exact");
 }
 void retained_bake_source(bool prepared,bool physical,bool affine=false,bool reflected=false) {
@@ -548,7 +621,7 @@ void bake_retained_recipient(TextureSetId id,bool physical){
  check(Scene::decode(cleared.encode()).encode()==cleared.encode()&&
        document.undo()&&document.copy_scene().encode()==saved,"Clear survives cold replay and exact Undo");
 }
-void bake_retained_native(bool reflected,bool smooth){
+void bake_retained_native(bool reflected,bool smooth,bool outward=false){
  auto scene=source(false,reflected,false,smooth);
  const auto target=scene.active().id;
  if(!reflected)scene.active().affine_edit.reset();
@@ -567,7 +640,8 @@ void bake_retained_native(bool reflected,bool smooth){
  const auto &mesh=old.painted->mesh();
  Mesh donor_mesh;
  const auto role=preview.normals().at(size_t(triangle)*3);
- const auto tilted=normalized(role+Vec3{.19f,-.28f,0});
+ auto tilted=normalized(role+Vec3{.19f,-.28f,0});
+ if(outward&&dot(unit(world.normal({tilted.x,tilted.y,tilted.z})),before)<0)tilted=tilted*-1;
  std::array<Vec3,3> positions;
  for(size_t k=0;k<3;++k)positions[k]=mesh.positions.at(mesh.indices.at(size_t(triangle)*3+k));
  donor_mesh.positions={positions[0],positions[0]*.44f+positions[1]*.56f,
@@ -594,7 +668,7 @@ void bake_retained_native(bool reflected,bool smooth){
  check(document.frame().state->can_bake&&!document.frame().state->can_clear_bake,
        "Native retained target admits the actual Bake command");
  document.bake_from_object(donor,settings);
- const auto path=std::filesystem::path("native-target.dsculpt");
+ const auto path=std::filesystem::path(outward?"native-target-smooth-portable.dsculpt":"native-target.dsculpt");
  document.save_async(path).get();ready(document);
  const auto accepted=document.copy_scene();
  const auto saved=accepted.encode();
@@ -618,18 +692,51 @@ void bake_retained_native(bool reflected,bool smooth){
  check(slot!=paints.end()&&slot->at("painted").at("field_bake")==2,"The native envelope names its actual normal image");
  slot->at("painted")["normal_detail"]=UINT32_MAX;
  refuses([&]{Scene::decode(malformed);},"An absent normal image cannot be borrowed by a native bake");
- if(!smooth){
-  const std::filesystem::path glb="native-normal-bake.glb";
-  document.export_asset(glb,AssetExportFormat::Glb).get();
-  cgltf_options options{};
-  cgltf_data *data=nullptr;
-  check(cgltf_parse_file(&options,glb.c_str(),&data)==cgltf_result_success,
-        "The portable GLB worker exports the native normal bake");
-  const std::unique_ptr<cgltf_data,decltype(&cgltf_free)> guard(data,cgltf_free);
-  check(cgltf_load_buffers(&options,data,glb.c_str())==cgltf_result_success&&
-        cgltf_validate(data)==cgltf_result_success&&data->meshes_count==1&&
-        data->meshes[0].primitives_count==2,"Independent glTF validates both material primitives");
+ if(!smooth||outward){
+  const auto surfaces=accepted.export_surfaces();
+  const auto portable=detail::make_gltf(surfaces);
+  audit_normals(portable,surfaces.front(),.02f);
+  if(outward){
+   const auto &normal_preview=*current.source->source_preview();
+   const auto normal_start=size_t(triangle)*3;
+   const auto &normal=normal_preview.normals();
+   check(length(normal.at(normal_start)-normal.at(normal_start+1))>1e-3f||
+         length(normal.at(normal_start)-normal.at(normal_start+2))>1e-3f,
+         "Smooth portable Bake fixture owns genuinely varying recorded vertex normals");
+   const auto compiled=detail::compile_texture_set_export(surfaces.front());
+   check(compiled.fields.at(1).textures->normal.rgba!=normal_preview.native_bake()->rgba,
+         "Varying Bake exports a reprojected image while retaining editable native pixels");
+   TextureSetLimits limited;
+   limited.maximum_bytes=64*1024;
+   refuses([&]{detail::compile_texture_set_export(surfaces.front(),limited);},
+           "Retained normal export reserves working storage before compiling");
+  }
+  const auto verify_file=[&](const std::filesystem::path &glb, AssetExportFormat format){
+   document.export_asset(glb,format).get();
+   cgltf_options options{};
+   cgltf_data *data=nullptr;
+   check(cgltf_parse_file(&options,glb.c_str(),&data)==cgltf_result_success,
+         "The portable GLB worker exports the native normal bake");
+   const std::unique_ptr<cgltf_data,decltype(&cgltf_free)> guard(data,cgltf_free);
+   check(cgltf_load_buffers(&options,data,glb.c_str())==cgltf_result_success&&
+         cgltf_validate(data)==cgltf_result_success&&data->meshes_count==1&&
+         data->meshes[0].primitives_count==2,"Independent glTF validates both material primitives");
+   const auto &mapped=data->meshes[0].primitives[1];
+   check(mapped.material&&mapped.material->normal_texture.texture&&
+         mapped.material->normal_texture.texcoord>0&&
+         cgltf_find_accessor(&mapped,cgltf_attribute_type_tangent,0),
+         "The actual GLB worker carries mapped tangents and its independent normal coordinates");
+  };
+  verify_file(smooth?"native-normal-smooth-bake.glb":"native-normal-bake.glb",AssetExportFormat::Glb);
+  if(outward)verify_file("native-normal-smooth-editable.glb",AssetExportFormat::EditableGlb256);
+ }else{
+  const std::filesystem::path target_path="opposed-normal-bake.glb";
+  std::filesystem::remove(target_path);
+  refuses([&]{document.export_asset(target_path,AssetExportFormat::Glb).get();},
+          "A varying normal field outside a portable positive-Z frame fails before writing");
+  check(!std::filesystem::exists(target_path),"Failed normal export leaves no partial file");
  }
+ check(document.copy_scene().encode()==saved,"Normal export preserves exact native Bake and source data");
  check(document.undo()&&document.copy_scene().encode()==baseline&&
        document.redo()&&document.copy_scene().encode()==saved,"Native retained texture Bake has exact history");
  document.clear_bake();ready(document);
@@ -713,6 +820,7 @@ int main(int argc,char **argv)try {
   std::filesystem::create_directories(argv[2]);std::filesystem::current_path(argv[2]);
   bake_retained_native(false,false);
   bake_retained_native(true,true);
+  bake_retained_native(true,true,true);
   std::cout<<"PASS "<<checks<<" native-normal retained target checks\n";
   return 0;
  }
@@ -737,10 +845,7 @@ int main(int argc,char **argv)try {
  }
  if(argc>1){std::filesystem::create_directories(argv[1]);std::filesystem::current_path(argv[1]);}
  for(bool prepared:{false,true})for(bool reflected:{false,true})audit(prepared,reflected);
- audit(false,false,true);
- auto varied=source(false,false,false,true);const auto before=varied.encode();
- refuses([&]{detail::make_gltf(varied.export_surfaces());},"A varying original role is explicitly refused pending its full interpolation adapter");
- check(varied.encode()==before,"Varying-role refusal preserves the actual native source");
+ for(bool prepared:{false,true})for(bool reflected:{false,true})audit(prepared,reflected,true);
  auto hdr=source(false,false,true);
  refuses([&]{detail::make_gltf(hdr.export_surfaces());},"Actual FLOAT source export retains its precision-qualified per-material guard");
  std::cout<<"PASS "<<checks<<" actual retained standard source export controls\n";

@@ -3,6 +3,7 @@
 #include "texture-set-paint-access.hpp"
 #include "texture-set-portable-field.hpp"
 #include "polygon-surface-preview.hpp"
+#include "baked-normal-field.hpp"
 #include "normal-frame-runtime.hpp"
 #include "emission-authority.hpp"
 #include <bit>
@@ -13,8 +14,9 @@ void stop(const TextureSetLimits&l){if(l.cancelled&&l.cancelled())throw std::run
 void charge(size_t&v,size_t n,size_t u,size_t cap){if(v>cap||(u&&n>(cap-v)/u))throw std::length_error("Texture-set export exceeds its working budget");v+=n*u;}
 template<class T>bool owner(const std::shared_ptr<const T>&a,const std::shared_ptr<const T>&b){return a==b&&!a.owner_before(b)&&!b.owner_before(a);}
 bool material(const Material&a,const Material&b){return a.name==b.name&&a.color==b.color&&a.metallic==b.metallic&&a.roughness==b.roughness&&a.emissive==b.emissive&&a.toon==b.toon&&a.double_sided==b.double_sided&&a.alpha==b.alpha&&a.alpha_cutoff==b.alpha_cutoff&&a.unlit==b.unlit;}
-}
-size_t texture_set_export_working_bound(const ObjectSurface&input,const TextureSetLimits&limits){
+
+struct ExportBound { size_t bytes, work; };
+ExportBound export_bound(const ObjectSurface&input,const TextureSetLimits&limits){
  limits.validate();stop(limits);const auto&plan=input.texture_set_surface;
  if(!plan)throw std::invalid_argument("Texture-set export requires its owning surface plan");plan->authenticate_owner(plan);
  if(input.id!=plan->object()||!owner(input.deformation,plan->deformation())||plan->fields().empty()||!material(input.material,plan->fields()[0].material)||
@@ -29,22 +31,44 @@ size_t texture_set_export_working_bound(const ObjectSurface&input,const TextureS
   stop(limits);const auto&field=plan->fields()[f];const auto&draw=plan->draws()[f];
   if(!draw.count)continue;
   charge(bytes,1,sizeof(TextureSetExportField)+field.name.size()+field.material.name.size()+258,limits.maximum_bytes);
-  if(field.source){field.source->authenticate_owner(field.source);field.source->validate_field(field,limits);const auto&p=field.source->source_preview();if(!p)throw std::invalid_argument("Retained export lacks actual before role data");charge(bytes,p->geometric_frames().size(),64,limits.maximum_bytes);charge(bytes,draw.count,sizeof(PortableTextureSetCorner)+2*sizeof(std::array<float,2>)+3*sizeof(float),limits.maximum_bytes);charge(work,p->normals().size(),128,limits.maximum_work);}
+  const auto resolution=field.painted->resolution();
+  charge(bytes,size_t(resolution)*resolution,64,limits.maximum_bytes);
+  scratch=std::max(scratch,TextureSetPaintAccess::working_bytes(*field.painted,resolution));
+  if(field.source){
+   field.source->authenticate_owner(field.source);field.source->validate_field(field,limits);
+   const auto&preview=field.source->source_preview();
+   if(!preview)throw std::invalid_argument("Retained export lacks actual before role data");
+   charge(bytes,preview->geometric_frames().size(),64,limits.maximum_bytes);
+   charge(bytes,draw.count,sizeof(PortableTextureSetCorner)+2*sizeof(std::array<float,2>)+3*sizeof(float),limits.maximum_bytes);
+   charge(work,preview->normals().size(),128,limits.maximum_work);
+   if(preview->native_bake()||preview->model()==PolygonSurfaceNormalModel::PreparedCorePbr){
+    const auto width=preview->native_bake()?preview->native_bake()->width:
+        preview->baked()->normal_field->pbr()->width;
+    const auto maximum=portable_normal_export_max_resolution(width);
+    const auto pixels=size_t(maximum)*maximum;
+    charge(bytes,pixels,4,limits.maximum_bytes);
+    if(pixels>limits.maximum_bytes/8)throw std::length_error("Portable normal raster exceeds its byte budget");
+    scratch=std::max(scratch,pixels*8);
+   }
+  }
   if(hdr_emission(field.material.emissive)||field.painted->has_physical_emission())throw std::invalid_argument("Texture-set HDR emission needs its per-material precision-qualified export compiler");
-  const bool canonical=field.painted->baked()&&!field.painted->baked()->maps.normal.rgba.empty();(void)canonical;
-  const auto r=field.painted->resolution();charge(bytes,size_t(r)*r,64,limits.maximum_bytes);
-  scratch=std::max(scratch,TextureSetPaintAccess::working_bytes(*field.painted,r));
-  charge(work,size_t(r)*r,16+8*field.painted->layers().size(),limits.maximum_work);
+  charge(work,size_t(resolution)*resolution,16+8*field.painted->layers().size(),limits.maximum_work);
  }
  charge(bytes,scratch,1,limits.maximum_bytes);
  if(input.deformation){const auto entries=input.deformation->resource_entries();charge(bytes,entries,32,limits.maximum_bytes);charge(work,entries,16,limits.maximum_work);}
- stop(limits);return bytes;
+ stop(limits);return {bytes,work};
+}
+} // namespace
+
+size_t texture_set_export_working_bound(const ObjectSurface&input,const TextureSetLimits&limits){
+ return export_bound(input,limits).bytes;
 }
 TextureSetExport compile_texture_set_export(const ObjectSurface&input,const TextureSetLimits&limits){
- TextureSetExport out;out.working_bound=texture_set_export_working_bound(input,limits);
+ auto [bytes,work]=export_bound(input,limits);
+ TextureSetExport out;out.working_bound=bytes;
  const auto&plan=input.texture_set_surface;const auto&rest=*plan->geometry();const auto count=plan->indices().size();
  const bool source=std::any_of(plan->fields().begin(),plan->fields().end(),[](const auto&f){return bool(f.source);});
- bool normal=false;for(size_t f=0;f<plan->fields().size();++f)if(plan->draws()[f].count){const auto&p=plan->fields()[f].painted;normal|=plan->fields()[f].source?plan->fields()[f].source->source_preview()->model()==PolygonSurfaceNormalModel::PreparedCorePbr:p->baked()&&!p->baked()->maps.normal.rgba.empty();}
+ bool normal=false;
  // Tangent basis is evaluated in REST, never the current pose. Include the
  // actual vertex and role-specific frame bits in every necessary split.
  const bool canonical_frames=std::any_of(plan->fields().begin(),plan->fields().end(),[](const auto&field){return !field.source&&field.painted->baked()&&!field.painted->baked()->maps.normal.rgba.empty();});
@@ -54,7 +78,8 @@ TextureSetExport compile_texture_set_export(const ObjectSurface&input,const Text
  for(size_t f=0;f<plan->fields().size();++f){
   stop(limits);const auto&field=plan->fields()[f];const auto&draw=plan->draws()[f];if(!draw.count)continue;
   const bool canonical=!field.source&&field.painted->baked()&&!field.painted->baked()->maps.normal.rgba.empty();
-  const auto portable=field.source?std::optional<PortableTextureSetField>(portable_texture_set_field(field,input.world_matrix(),limits)):std::nullopt;
+  const auto portable=field.source?std::optional<PortableTextureSetField>(portable_texture_set_field(field,input.world_matrix(),work,limits)):std::nullopt;
+  normal|=canonical||(portable&&portable->normal_role);
   TextureSetExportField output;output.set=field.id;output.name=field.name;output.first=mesh.indices.size();output.count=draw.count;output.material=field.material;output.textures=portable?portable->maps:field.painted->composite(field.material,limits.cancelled);output.normal_role=portable&&portable->normal_role;
   for(size_t c=0;c<draw.count;++c){
    if((c&1023)==0)stop(limits);const auto logical=plan->logical_corners()[draw.first+c];const auto vertex=rest.indices.at(logical);

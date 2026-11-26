@@ -25,6 +25,10 @@ public:
  std::shared_ptr<const PolygonSurfacePreview> with_bake(
      const PaintedMesh &,std::shared_ptr<const Image>)const;
  Vec3 sample_native_bake(size_t,std::array<double,3>,const AffineTransform &)const;
+ // Explicit image-space lookup used by export at raster centers and gutters.
+ // The barycentrics still address the genuine triangle frame.
+ Vec3 sample_baked_normal(size_t,std::array<double,3>,const AffineTransform &,
+     std::array<float,2> uv)const;
  void validate_world(size_t,const AffineTransform &,double minimum=1e-6,
      const std::function<bool()> &cancelled={})const;
  void validate_bake_world(std::span<const uint32_t>,const AffineTransform &,
