@@ -1,0 +1,122 @@
+{
+  "production_source": "05f5d1cc",
+  "fixture_source": "60b403e0",
+  "checks": 645,
+  "independent_coverage_check": 1,
+  "families": 17,
+  "common_additional_family": 1,
+  "low_refusals": 8,
+  "target_grid": 2048,
+  "source_grid": 64,
+  "groups": [
+    {
+      "group": "common",
+      "checks": 87,
+      "positives": 0,
+      "refusals": 0,
+      "families": [
+        "unbound-normalmap"
+      ],
+      "seconds": 233.66111421585083,
+      "peak_owned_RSS_bytes": 2292424704,
+      "sanitizer_witness": {
+        "pid": 3126398,
+        "start": 83909434
+      }
+    },
+    {
+      "group": "mt1-posed",
+      "checks": 132,
+      "positives": 4,
+      "refusals": 2,
+      "families": [
+        "mt1-posed-shared-raster",
+        "mt1-posed-shared-retained",
+        "mt1-posed-seam-raster",
+        "mt1-posed-seam-retained"
+      ],
+      "seconds": 585.0105555057526,
+      "peak_owned_RSS_bytes": 2613956608,
+      "sanitizer_witness": {
+        "pid": 3126400,
+        "start": 83909435
+      }
+    },
+    {
+      "group": "mt1-rest",
+      "checks": 132,
+      "positives": 4,
+      "refusals": 2,
+      "families": [
+        "mt1-rest-shared-raster",
+        "mt1-rest-shared-retained",
+        "mt1-rest-seam-raster",
+        "mt1-rest-seam-retained"
+      ],
+      "seconds": 585.3313748836517,
+      "peak_owned_RSS_bytes": 2666643456,
+      "sanitizer_witness": {
+        "pid": 3126399,
+        "start": 83909434
+      }
+    },
+    {
+      "group": "mt0-rest",
+      "checks": 132,
+      "positives": 4,
+      "refusals": 2,
+      "families": [
+        "mt0-rest-shared-raster",
+        "mt0-rest-shared-retained",
+        "mt0-rest-seam-raster",
+        "mt0-rest-seam-retained"
+      ],
+      "seconds": 499.7725899219513,
+      "peak_owned_RSS_bytes": 2672840704,
+      "sanitizer_witness": {
+        "pid": 3158418,
+        "start": 83932878
+      }
+    },
+    {
+      "group": "three-edits",
+      "checks": 30,
+      "positives": 1,
+      "refusals": 0,
+      "families": [
+        "mt1-posed-seam-retained-three-edits"
+      ],
+      "seconds": 363.59301137924194,
+      "peak_owned_RSS_bytes": 2472263680,
+      "sanitizer_witness": {
+        "pid": 3203879,
+        "start": 83968035
+      }
+    },
+    {
+      "group": "mt0-posed",
+      "checks": 132,
+      "positives": 4,
+      "refusals": 2,
+      "families": [
+        "mt0-posed-shared-raster",
+        "mt0-posed-shared-retained",
+        "mt0-posed-seam-raster",
+        "mt0-posed-seam-retained"
+      ],
+      "seconds": 516.8342728614807,
+      "peak_owned_RSS_bytes": 2611978240,
+      "sanitizer_witness": {
+        "pid": 3203833,
+        "start": 83968002
+      }
+    }
+  ],
+  "archive": {
+    "path": "docs/validation/advanced-normal-strict-groups-20261126.tar.xz",
+    "sha256": "dd1a3eba5fccf6a7167be3dc516f819ce5bb118d30780ad6e3d8a005a963e910",
+    "members": 29,
+    "bytes": 22004
+  },
+  "scope": "Complete 17-family advanced normal workflow and original common assertions across six independent strict processes. Original monolithic timeouts separately preserved. No sanitizer diagnostics or owned survivors."
+}

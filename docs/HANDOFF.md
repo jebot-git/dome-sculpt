@@ -59,9 +59,8 @@ Strict runtime and original sustained independent Arc acceptance remain pending.
 Inspect live units before taking action. Graphics, display and loader validation
 jobs take the common nonblocking lease, with no idle reservation. Confirmed
 CPU-only workflow checks can run concurrently in memory-bounded units. Record
-comparative timings in their own controlled runs. Root's opt-in timing fixture91a90a67
-compiles/links against the exact strict05 core without changing product, data,
-checks or resource limits; the full-resolution runtime diagnosis is pending.
+comparative timings in their own controlled runs. The timing fixture `91a90a67`
+uses the same strict05 core, data, checks and resource limits.
 The strict native/software cohort passed 88,724 checks across the first 11 cases.
 Its first graphics case stopped with `Frame range is invalid` because the test
 fixture left `SurfaceRange::first` uninitialized. The corrected fixture
@@ -79,14 +78,24 @@ variant each reached the 900-second deadline after seven of 17 families.
 The [deadline receipt](validation/advanced-normal-full-deadline-20261126.json)
 includes phase timings. The expensive intervals are the full Bake and ordered
 Save, with runs overlapping other bounded CPU jobs. The texel-reuse change
-remains experimental. The same 17 families and all original common checks are
-running in six independently monitored groups on the unchanged strict core.
+remains experimental. The same 17 families and all original common checks
+passed in six independently monitored groups on the unchanged strict core.
 Group source `60b403e0` retains the ordinary full-workflow entry point. The
-common group passed 87 checks, including historical load, cancellation and
-ordinary mapped input. The remaining groups use the same 900-second and
-3 GiB limits per process.
-The HDR877 isolated 2048 worker passes its 22 checks. The complete 2048 joint
-Bake reaches a further `Baked maps exceed paint storage budget` refusal.
+groups passed 645 native checks, and the runner separately verified complete
+family and refusal coverage. Each group used the original 900-second and
+3 GiB limits, including its fresh-process reopen. Read the
+[six-group receipt](validation/advanced-normal-strict-groups-20261126.json).
+The HDR877 isolated 2048 worker passes its 22 checks. Its complete 2048 joint
+Bake reached a further `Baked maps exceed paint storage budget` refusal.
+Component `725ea100` shares identical immutable intrinsic normal images and
+retains recipes in the texture-set archive. Its Release cohort passes 111,306
+checks, including the full 2048 and 512 inputs, export and historical replay.
+The new combined candidate `9e4f79f6` builds all 294 selected actions with
+261 complete translation units, 14 verified archives and 16 outputs. The
+native eight-test HDR and recipe gate is running under
+`ds-production-hdr-combined-native-20261126.service`, invocation
+`1e3a3ccded554518884279e9d643d9b8`. The independent projection test fixture
+still needs its corrected source frame before runtime.
 The isolated integration candidate
 `5604ad54` combines current05, HDR877, sculpt6d/fe94 and corrected creator
 fixtures550. The [fresh Release build](COMBINED-RELEASE-BUILD-20261126.md) for
@@ -101,6 +110,12 @@ renderer passes 4,422 retained HDR checks each on software and Intel Arc with
 the corrected fixture. Public Wayland and XR, and full HDR 2048 Bake, are
 pending. The branch is
 `work/production-resume-integration-20261126`.
+The [streamed native Save experiment](validation/stream-native-save-experiment-20261126.json)
+preserves atomic replacement, recovery and the exact 50,061,799-byte project.
+The default-allocator sculpt workflow still exceeds 4 GiB. The matched
+allocator run passes all 167 checks. The save-only probe measures similar
+memory peaks for the original and streamed writers on this project, so the
+change remains on its experimental branch.
 Full scope in REQUIREMENTS is unchanged.
 
 ## Source and integration boundary

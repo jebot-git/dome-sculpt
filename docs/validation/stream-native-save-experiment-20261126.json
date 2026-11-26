@@ -1,0 +1,146 @@
+{
+  "source": "d5778140",
+  "expected_previous_file_sha256": "d32c725a02d3d9291f3208c879f78ecc343c33511de9e10b5c18d93bb95fd694",
+  "full_sculpt_checks": 167,
+  "native_recovery_checks": 21,
+  "native_asset_checks": 18,
+  "atomic_allocation_and_failure_checks": 21,
+  "allocator_default_sculpt_result": {
+    "command": [
+      "/home/blux/de-xr/dome-sculpt/artifacts/stream-native-save-release-20261126/dome-sculpt-sculpt-independent-workflow",
+      "/home/blux/de-xr/dome-sculpt/artifacts/stream-native-save-release-20261126/native-default/sculpt"
+    ],
+    "started": 1795662062.195173,
+    "timeout_seconds": 900,
+    "RSS_limit_bytes": 4294967296,
+    "virtual_AS_cap": null,
+    "pid": 3243793,
+    "start": 83998725,
+    "pgrp": 3243793,
+    "root": {
+      "pid": 3243793,
+      "start": 83998725,
+      "pgrp": 3243793,
+      "session": 3243793,
+      "ppid": 3243709,
+      "state": "R"
+    },
+    "known_processes": [
+      {
+        "pid": 3243793,
+        "start": 83998725,
+        "pgrp": 3243793,
+        "session": 3243793,
+        "ppid": 3243709,
+        "state": "R"
+      }
+    ],
+    "peak_owned_RSS_bytes": 4295716864,
+    "peak_observed_virtual_bytes": 5401993216,
+    "monitor_samples": 5372,
+    "signals": [
+      {
+        "pgid": 3243793,
+        "witness": {
+          "pid": 3243793,
+          "start": 83998725,
+          "pgrp": 3243793,
+          "session": 3243793,
+          "ppid": 3243709,
+          "state": "R"
+        },
+        "signal": "SIGTERM",
+        "reason": "Owned aggregate RSS exceeded declared budget",
+        "epoch": 1795662120.4708173
+      }
+    ],
+    "error": "BudgetExceeded('Owned aggregate RSS exceeded declared budget')",
+    "exit": -15,
+    "seconds": 58.640116930007935,
+    "reference_sha256": "d32c725a02d3d9291f3208c879f78ecc343c33511de9e10b5c18d93bb95fd694",
+    "accepted_sha256": "d32c725a02d3d9291f3208c879f78ecc343c33511de9e10b5c18d93bb95fd694",
+    "byte_identical": true,
+    "verified": false,
+    "name": "sculpt-independent-workflow",
+    "executable_sha256": "e66192cf9ef01b323a28b9f9e9e512f72e578db6d4308a2d62dfab61aae80f2c"
+  },
+  "matched_full_sculpt_result": {
+    "command": [
+      "/home/blux/de-xr/dome-sculpt/artifacts/stream-native-save-release-20261126/dome-sculpt-sculpt-independent-workflow",
+      "/home/blux/de-xr/dome-sculpt/artifacts/stream-native-save-release-20261126/native-matched/sculpt"
+    ],
+    "started": 1795662146.6248124,
+    "timeout_seconds": 900,
+    "RSS_limit_bytes": 4294967296,
+    "virtual_AS_cap": null,
+    "pid": 3256619,
+    "start": 84007168,
+    "pgrp": 3256619,
+    "root": {
+      "pid": 3256619,
+      "start": 84007168,
+      "pgrp": 3256619,
+      "session": 3256619,
+      "ppid": 3256611,
+      "state": "R"
+    },
+    "known_processes": [
+      {
+        "pid": 3256619,
+        "start": 84007168,
+        "pgrp": 3256619,
+        "session": 3256619,
+        "ppid": 3256611,
+        "state": "R"
+      }
+    ],
+    "peak_owned_RSS_bytes": 2731536384,
+    "peak_observed_virtual_bytes": 3169972224,
+    "monitor_samples": 5946,
+    "signals": [],
+    "exit": 0,
+    "seconds": 65.5475640296936,
+    "reference_sha256": "d32c725a02d3d9291f3208c879f78ecc343c33511de9e10b5c18d93bb95fd694",
+    "accepted_sha256": "d32c725a02d3d9291f3208c879f78ecc343c33511de9e10b5c18d93bb95fd694",
+    "byte_identical": true,
+    "verified": true,
+    "name": "sculpt-independent-workflow",
+    "executable_sha256": "e66192cf9ef01b323a28b9f9e9e512f72e578db6d4308a2d62dfab61aae80f2c"
+  },
+  "save_only_peak_comparison": {
+    "scope": "Default allocator, each fresh single-thread native scene loader forks a save-only child. Same source and probe TU, different Scene save implementations. Warm copied scene resident pages count in each child.",
+    "cases": [
+      {
+        "label": "baseline",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/stream-native-save-release-20261126/baseline-peak",
+          "/home/blux/de-xr/dome-sculpt/artifacts/production-combined-release-20261126/native-sculpt-matched/sculpt/accepted.dsculpt",
+          "/home/blux/de-xr/dome-sculpt/artifacts/stream-native-save-release-20261126/baseline-peak.dsculpt"
+        ],
+        "peak_kib": 1067464,
+        "input_output_sha256": "d32c725a02d3d9291f3208c879f78ecc343c33511de9e10b5c18d93bb95fd694",
+        "bytes": 50061799,
+        "elf_sha256": "7002228db4637306dd9a42f00cadff4d4710003cf9bee85b3718ac620d9b68eb"
+      },
+      {
+        "label": "stream",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/stream-native-save-release-20261126/stream-peak",
+          "/home/blux/de-xr/dome-sculpt/artifacts/production-combined-release-20261126/native-sculpt-matched/sculpt/accepted.dsculpt",
+          "/home/blux/de-xr/dome-sculpt/artifacts/stream-native-save-release-20261126/stream-peak.dsculpt"
+        ],
+        "peak_kib": 1069628,
+        "input_output_sha256": "d32c725a02d3d9291f3208c879f78ecc343c33511de9e10b5c18d93bb95fd694",
+        "bytes": 50061799,
+        "elf_sha256": "da3e60a01146c33913059e39d5be0b5608134fee0c2a95cba20a12850b3aad6a"
+      }
+    ]
+  },
+  "admission": "Experimental branch. Exact serialization and atomic behavior verified. No reduction of isolated save peak on the measured scene and no default allocator workflow fit.",
+  "archive": {
+    "path": "docs/validation/stream-native-save-experiment-20261126.tar.xz",
+    "sha256": "9e19349a6c9219a2dc6f717ded1d0125830d7055700cfee55e7e59b6e43a2524",
+    "members": 23,
+    "bytes": 12660
+  }
+}
