@@ -3240,8 +3240,9 @@ public:
 		TaskGroup &group = m_groups[handle.value];
 		group.queueLock.lock();
 		group.queue.push_back(task);
-		group.queueLock.unlock();
+		// Count the task before a worker can take it from the queue.
 		group.ref++;
+		group.queueLock.unlock();
 		// Wake up a worker to run this task.
 		for (uint32_t i = 0; i < m_workers.size(); i++) {
 			m_workers[i].wakeup = true;
@@ -3266,11 +3267,13 @@ public:
 			if (!task)
 				break;
 			task->func(group.userData, task->userData);
-			group.ref--;
+			group.finishTask();
 		}
 		// Even though the task queue is empty, workers can still be running tasks.
-		while (group.ref > 0)
-			std::this_thread::yield();
+		// Waiting callers can be nested on other atlas workers. Let those threads
+		// sleep until the final task completes instead of competing for CPU time.
+		for (uint32_t pending = group.ref.load(); pending != 0; pending = group.ref.load())
+			group.ref.wait(pending);
 		group.free = true;
 		handle->value = UINT32_MAX;
 	}
@@ -3286,6 +3289,12 @@ private:
 		Spinlock queueLock;
 		std::atomic<uint32_t> ref; // Increment when a task is enqueued, decrement when a task finishes.
 		void *userData;
+
+		void finishTask()
+		{
+			if (ref.fetch_sub(1) == 1)
+				ref.notify_all();
+		}
 	};
 
 	struct Worker
@@ -3330,7 +3339,7 @@ private:
 				if (!task)
 					break;
 				task->func(group->userData, task->userData);
-				group->ref--;
+				group->finishTask();
 			}
 		}
 	}
