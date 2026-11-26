@@ -1,4 +1,4 @@
-# Dome Sculpt current handoff — 2026-11-26
+# Dome Sculpt current handoff — 2026-11-27
 
 The full production goal is ACTIVE after the user's Nov26 resume and remains
 incomplete. The Nov18 [assessment](PROGRESS-ASSESSMENT-20261118.md) preserves
@@ -1997,10 +1997,30 @@ Bake. The subsequent first-key command reaches the aggregate Scene paint
 limit because the archive still charges the Bake in several paint owners.
 The constant-radiance key converts its normals, then Standard HDR GLB
 reaches its aggregate extraction limit when staging ten floats per texel.
-Both limits reproduce against the exact Release build. Continue with shared
-immutable Bake storage and a bounded portable HDR export path. Physical
-headset verification remains open.
+Both limits reproduced against that Release build. The following checkpoint
+closes the native shapekey failure. Physical headset verification remains open.
 [Physical FLOAT Bake evidence](validation/native-hdr-compact-bake-2048-20261126.json)
+
+### Shared full-resolution HDR Bake through shapekey history
+
+Scene44 serializes a qualifying packed FLOAT Bake once when distinct native
+paint leaves share it. Each Baked7 leaf retains its own mesh, layers and
+sampling-domain reference. The reader checks the pool and every reference
+before it shares the immutable Bake. The per-paint and aggregate Scene
+budgets still apply, and unique Bakes keep the existing inline format.
+
+The varying 2048-square donor reaches first shapekey and saves a
+105,444,452-byte project. The live mesh, key frame and Restore state share
+the decoded Bake. Shape Restore recovers the original project byte for byte.
+The constant case now saves its keyed project in 54,940,517 bytes. Both
+Release and ASan/UBSan pass 14 focused CTests, reject the foreign-domain
+control, and write identical native projects. Nested DomeD Wayland and
+synthetic OpenXR on software GL and Intel Arc pass 10 frontend checks each.
+A separate ordered edit, normal conversion and cold reopen on the varying
+fixture preserve the exact FLOAT field. The Standard HDR GLB staging limit,
+full integrated regression for this product, and physical headset checks
+remain open.
+[Shared HDR Bake validation](validation/native-shared-hdr-bake-20261127.json)
 
 ## Source and integration boundary
 

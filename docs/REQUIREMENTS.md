@@ -1,4 +1,4 @@
-## Current validation — 2026-11-26
+## Current validation — 2026-11-27
 
 The [current handoff](HANDOFF.md) records the exact combined Release, Arc,
 Wayland and synthetic OpenXR checkpoints, focused sanitizer results and
@@ -106,11 +106,14 @@ Default Editable GLB also exports this project under the existing sample
 budget. It recovers the exact native scene, including the original Bake and
 Shape Restore data. Native 2048-square Bake now stores physical emission
 losslessly using shared constants, varying FLOAT channels and exact binary
-coverage where applicable. The constant-radiance native fixture supports
-first-key authoring and exact Shape Restore after reopen. A spatially varying
-Bake still reaches the aggregate scene quota at first key, and portable HDR
-export and physical headset verification remain open.
+coverage where applicable. A native Scene44 archive shares the exact packed
+Bake across the current paint, shapekey frame and Restore state. Constant and
+spatially varying 2048-square Bakes now survive first-key creation, ordered
+Save, Undo/Redo and exact Shape Restore after cold reopen. A subsequent key
+edit and normal conversion retain the exact FLOAT field on the varying
+fixture. Portable HDR export and physical headset verification remain open.
 [Full-resolution writable atlas evidence](validation/native-writable-raster-2048-20261126.json) · [Default AO evidence](validation/default-ao-bake-2048-20261126.json) · [First shapekey evidence](validation/native-writable-first-key-2048-20261126.json) · [Editable GLB evidence](validation/native-editable-glb-2048-20261126.json) · [Physical FLOAT Bake evidence](validation/native-hdr-compact-bake-2048-20261126.json)
+[Shared full-resolution HDR Bake evidence](validation/native-shared-hdr-bake-20261127.json)
 
 Strict Bake rays now recover source-edge contacts affected by float staging.
 An exact ray hit has priority. A missed ray can use an actual source edge

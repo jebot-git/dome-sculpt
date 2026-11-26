@@ -1,0 +1,141 @@
+{
+  "archive": {
+    "file": "native-shared-hdr-bake-20261127.tar.gz",
+    "members": 64,
+    "sha256": "495e9f6cdfe92e7618d735f6eb3f921d99d7d4ab8da3e3fde44cd209ed16d18e"
+  },
+  "edit_after_reopen": {
+    "bytes": 210302405,
+    "log_sha256": "a4d04b1dfc75e395d6cd16f9c2afd4affa5eccf8cb567173d776578f3802a993"
+  },
+  "frontends": {
+    "arc": {
+      "app_sha256": "6231599ab2ab0dfd33d8eec5acd01d5d392fc60eb39fdb65fdfcbbc894398fc3",
+      "checks": 10,
+      "exit": 0,
+      "input_sha256": "497a9db922ccef4aeeaa60701d4b0d191546c1eec555088f93c40f9450e437a2",
+      "inspector_sha256": "3c22b79b4d2f85710bd1892603491ddc71d0f975b75e5d3f47be5bd96197f845",
+      "invocation": "9ac6474bc70d43ae867555f2c9eada04",
+      "mode": "arc",
+      "native_sha256": "4d3d5c455e28213ac1edd8444d2ce1ead0f2ce737bf52c95344f3f6eb2a2d091",
+      "phase": "complete",
+      "report_sha256": "ef7b3e3faf43042d5a40c312b102aa53b04afe13cabc4c64fdfb6b2836d81e8e",
+      "run_script_sha256": "b9a7c58d28458c27e96a5fecb72fb0d81b764db59167d44bac3a63ada8f77b94",
+      "terminal": true,
+      "verifier_sha256": "3798949df6afc27b30ac5594bbfdcfe84f2717df4a3ec037a5d724bbd58e2877"
+    },
+    "software": {
+      "app_sha256": "4394166fcbafa03585970cb6fb2360e118d279e2b67ac56e44526d359dc9b32e",
+      "checks": 10,
+      "exit": 0,
+      "input_sha256": "497a9db922ccef4aeeaa60701d4b0d191546c1eec555088f93c40f9450e437a2",
+      "inspector_sha256": "3729f69c345dbab492aae65f867ccf55b85c23cd3900f8b703cb0d413115f793",
+      "invocation": "41119a2ee5d949248ddae8a67b824461",
+      "mode": "software",
+      "native_sha256": "4d3d5c455e28213ac1edd8444d2ce1ead0f2ce737bf52c95344f3f6eb2a2d091",
+      "phase": "complete",
+      "report_sha256": "ef7b3e3faf43042d5a40c312b102aa53b04afe13cabc4c64fdfb6b2836d81e8e",
+      "run_script_sha256": "b9a7c58d28458c27e96a5fecb72fb0d81b764db59167d44bac3a63ada8f77b94",
+      "terminal": true,
+      "verifier_sha256": "46588802741cd9bf8a766918af65228bb151c930b186d059f372d898b3bc1a9e"
+    },
+    "wayland": {
+      "app_sha256": "4394166fcbafa03585970cb6fb2360e118d279e2b67ac56e44526d359dc9b32e",
+      "checks": 10,
+      "compositor_sha256": "47920142c8c803dcf5adb63ba643d2e347fbdcd1e15ecd8bce7c1a8dd47c0b7e",
+      "compositor_source": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+      "exit": 0,
+      "input_sha256": "497a9db922ccef4aeeaa60701d4b0d191546c1eec555088f93c40f9450e437a2",
+      "inspector_sha256": "3729f69c345dbab492aae65f867ccf55b85c23cd3900f8b703cb0d413115f793",
+      "invocation": "aaccae4c95d74b998a4dd2a34da639c5",
+      "mode": "wayland",
+      "native_sha256": "ffd3a228f4287528112c9a6edf3600e3be94c5370756980191cef7504610addf",
+      "phase": "complete",
+      "probe_sha256": "5bf11c670f66bbb68960073878933055b09582e5173ec1e3f472b413956c55aa",
+      "report_sha256": "96baa9f49568767cb8c1b2e4ce46247f7bc2b6ef3f8dbf9c4fcde5da005f7abd",
+      "run_script_sha256": "0cd03ab3ae7d43f3896917bbb2ca9423f711694dbc7c380f7a1ea4f2d29f772a",
+      "terminal": true,
+      "verifier_sha256": "46588802741cd9bf8a766918af65228bb151c930b186d059f372d898b3bc1a9e"
+    }
+  },
+  "hdr": {
+    "baked": {
+      "bytes": 54731892,
+      "sha256": "a7ac2e4c7354a3f336092a4e320084ee95fcf48050749b71c2c66b40420223db"
+    },
+    "keyed": {
+      "bytes": 54940517,
+      "sha256": "8ebc3980c3cb57d7282db9894107e4c57d329e4f9a384f3a79a72ebcd5fa67c9"
+    },
+    "restored": {
+      "bytes": 54731892,
+      "sha256": "a7ac2e4c7354a3f336092a4e320084ee95fcf48050749b71c2c66b40420223db"
+    }
+  },
+  "open": "Portable HDR export and physical headset verification remain open. The measured Standard HDR export refusal is a distinct staging limit.",
+  "product": "511947b43c352023899a43b8446db13876819d0a",
+  "profiles": {
+    "asan": {
+      "app_sha256": "6231599ab2ab0dfd33d8eec5acd01d5d392fc60eb39fdb65fdfcbbc894398fc3",
+      "ctests": 14,
+      "invocation": "e64224555b0349adb2d750ca49452209",
+      "logs_sha256": {
+        "archive.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "baked-normal-archive.cpp.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "build/regressions.xml": "95a0e95e3eec2016835524aeb73e0b1d42ee25be7d77c2f8e05dc9f35412e3ff",
+        "canonical-paint-archive.cpp.log": "a07fd3f91a4db4abb0c15260d894f563b209324bc1ba841fb07f20efbbd1bffc",
+        "configure.log": "1b48f8542d6b5c50d24b5cf563a321e144f9314f05be84a940e44fc400afaece",
+        "ctest.log": "cdb1eea8dae78edb1b271b7d3cf2a4ac599c73a3e512e46df94a787e85a9eb19",
+        "document.cpp.log": "25319c54de01e3165a41177f6833ccb3ea24db7c25609c82ae22d33403bbf9d1",
+        "dome-sculpt-link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "emission-package.cpp.log": "a24a1d45d79da6ed76f5f0a5c5a2b8228c4c7811a54d162bee069db1db8f1508",
+        "material-bindings.cpp.log": "7892d0d4525817ec0499354edf15cff28b37aea47051815af0991047fe230bc0",
+        "paint.cpp.log": "49da78a83380798dfab5dfc7f4c4c7af4cf0b2d24129521208b0d6a347e12ccd",
+        "polygon-scene.cpp.log": "f0834780eb2e81b38845b479c6e06804ee6bdb15e9b238b67612ca1c214297f1",
+        "polygon-surface-archive.cpp.log": "3f22313b9366d490800b1f290fb9bce6a4e607cad5c725312865c31de7edb06f",
+        "scene-bake-archive.cpp.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "scene.cpp.log": "25385237944ea0295850c5896c18dec82f480f544fe3a7079df93ecd4f15ed07",
+        "status.json": "4a15dbdc7c5e740b168a8616c12606a302cf5abb3b372d76ea20b730eda10565"
+      }
+    },
+    "release": {
+      "app_sha256": "4394166fcbafa03585970cb6fb2360e118d279e2b67ac56e44526d359dc9b32e",
+      "ctests": 14,
+      "invocation": "b8b56c6b5aac483c8b00be86a28b2343",
+      "logs_sha256": {
+        "archive.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "baked-normal-archive.cpp.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "build/regressions.xml": "d71557d1b79c43054c23c369b641cfc90a7f87d08c4d7bba61222ddd86b1f682",
+        "canonical-paint-archive.cpp.log": "a07fd3f91a4db4abb0c15260d894f563b209324bc1ba841fb07f20efbbd1bffc",
+        "configure.log": "9754593768c187b08a3b9ab0a490ec1b4da429f67b45fffe240d15be29a7bdc8",
+        "ctest.log": "5649214d691f2b4143071ceb8a8e3157eb6d282e636b2d8f149df5a1662cc387",
+        "document.cpp.log": "25319c54de01e3165a41177f6833ccb3ea24db7c25609c82ae22d33403bbf9d1",
+        "dome-sculpt-link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "emission-package.cpp.log": "a24a1d45d79da6ed76f5f0a5c5a2b8228c4c7811a54d162bee069db1db8f1508",
+        "material-bindings.cpp.log": "7892d0d4525817ec0499354edf15cff28b37aea47051815af0991047fe230bc0",
+        "paint.cpp.log": "49da78a83380798dfab5dfc7f4c4c7af4cf0b2d24129521208b0d6a347e12ccd",
+        "polygon-scene.cpp.log": "f0834780eb2e81b38845b479c6e06804ee6bdb15e9b238b67612ca1c214297f1",
+        "polygon-surface-archive.cpp.log": "3f22313b9366d490800b1f290fb9bce6a4e607cad5c725312865c31de7edb06f",
+        "scene-bake-archive.cpp.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "scene.cpp.log": "25385237944ea0295850c5896c18dec82f480f544fe3a7079df93ecd4f15ed07",
+        "status.json": "b21e9c313245076129d03a275a3da9c960669a34eeab7b8557bbe17125e562fe"
+      }
+    }
+  },
+  "scope": "Share one immutable packed FLOAT Bake across native paint leaves on the same authenticated sampling domain. Covers authored varying and constant 2048-square emission, first shapekey, exact archive history and domain refusal.",
+  "source_patch_sha256": "868c90052a7f4dabf18022dc0966313df27bfeb131a3d180ae2e99e8ae82d396",
+  "varied-hdr": {
+    "baked": {
+      "bytes": 105235827,
+      "sha256": "497a9db922ccef4aeeaa60701d4b0d191546c1eec555088f93c40f9450e437a2"
+    },
+    "keyed": {
+      "bytes": 105444452,
+      "sha256": "ffd3a228f4287528112c9a6edf3600e3be94c5370756980191cef7504610addf"
+    },
+    "restored": {
+      "bytes": 105235827,
+      "sha256": "497a9db922ccef4aeeaa60701d4b0d191546c1eec555088f93c40f9450e437a2"
+    }
+  }
+}
