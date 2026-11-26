@@ -109,6 +109,26 @@ int main(int argc, char **argv) try {
   check(refuses([&]{complete(target.open_async(bad));}) && target.copy_scene().encode() == before &&
         target.frame().state->project_path == saved && !target.frame().state->asset_busy,
         "Corrupt package Open preserves the current scene, project identity and original file");
+  const auto trailing = out/"trailing.dsculpt";
+  const auto truncated = out/"truncated.dsculpt";
+  {
+    std::ofstream extra(trailing, std::ios::binary);
+    extra.write(reinterpret_cast<const char *>(original_project.data()), original_project.size());
+    extra.put('\0');
+    std::ofstream short_file(truncated, std::ios::binary);
+    short_file.write(reinterpret_cast<const char *>(original_project.data()), original_project.size() - 1);
+  }
+  for (const auto &invalid : {trailing, truncated}) {
+    check(refuses([&]{complete(target.open_async(invalid));}) && target.copy_scene().encode() == before &&
+          target.frame().state->project_path == saved && !target.frame().state->asset_busy,
+          "Malformed native stream preserves the current scene and saved-project identity");
+  }
+  size_t native_visits = 0;
+  check(load_scene_file(project,[&]{++native_visits;return false;}).scene.encode() == exact && native_visits > 3,
+        "Native stream and decoder carry the project cancellation callback");
+  size_t native_cancel_seen = 0;
+  check(refuses([&]{load_scene_file(project,[&]{return ++native_cancel_seen >= 3;});}) && read(project) == original_project,
+        "Cancellation during native stream input preserves the original file");
   Scene plain;
   plain.active().mesh_active = true;
   plain.active().painted = std::make_shared<PaintedMesh>(scene.object(1).painted->mesh(),64);
