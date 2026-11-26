@@ -283,7 +283,13 @@ frontend and renderer compiled and the app version check passed. Read
 The benchmark measures native CPU snapshot capture. Seven focused ASan/UBSan
 cases pass on this source. The full case reaches the original 900-second
 deadline during cold-capture quota checks at 4,075,298,816 bytes of owned RSS.
-The separate sustained Arc run is underway.
+The separate sustained Arc run passes all three repetitions in 843.133
+seconds, with 900 strokes, 360 mask edits, 6,000 stereo pairs, 360 held pairs,
+42 independent checkpoints and three exact history sequences. The fixed
+input and all three native project outputs match the earlier integrated run.
+Peak owned RSS was 3,949,670,400 bytes within the original 5 GiB limit. This
+run used the original allocator controls. Read
+[the Arc and fixture receipt](validation/sculpt-range-arc-and-combined-fixtures-20261126.json).
 
 The broad regression found that command availability could throw when a
 sculpt volume retained a dormant painting mesh. Candidate `c5fbb0bd` checks
@@ -310,7 +316,8 @@ scalar owners and current publication boundary. The corrected fixtures and
 regular native strokes pass against the exact `f9c20398` core. Read
 [the sculpt fixture assessment](SCULPT-PREVIEW-FIXTURES-20261126.md).
 Combined candidate `c90c9fed` includes the dormant-paint and cut fixes and the
-four fixture changes. Its rerun uses the verified `2aff79f7` product core.
+four fixture changes. All five focused cases also pass against its verified
+`2aff79f7` product core.
 The broad matrix and remaining failures are still under review.
 
 ## Source and integration boundary

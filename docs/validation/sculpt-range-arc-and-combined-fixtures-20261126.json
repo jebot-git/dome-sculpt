@@ -1,0 +1,486 @@
+{
+  "scope": "Full sustained Arc on exact f9c20398 with original allocator controls and original three repetitions, plus separate native fixture rerun at c90c9fed against the 2aff79f7 product core. Native project bytes share the archived original ec hash; application routing and physical headset behavior have separate evidence.",
+  "arc_invocation": "e67dd341403048fa8e87432462165fd1",
+  "arc": {
+    "production_source": "f9c20398b2a917ac85d22eac5f3d0d534312c5c2",
+    "fixture_source": "f9c20398b2a917ac85d22eac5f3d0d534312c5c2",
+    "terminal": true,
+    "started": 1795667800.7591588,
+    "command": [
+      "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-sharing-range-search-release-20261126/dome-sculpt-sculpt-sustained",
+      "--output",
+      "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-sharing-range-search-arc-20261126/arc-independent-p1-v1/workflow",
+      "--device",
+      "arc",
+      "--tier",
+      "production",
+      "--objects",
+      "4",
+      "--voxel",
+      ".0125",
+      "--independent"
+    ],
+    "timeout_seconds": 5400,
+    "rss_limit_bytes": 5368709120,
+    "AS_cap": null,
+    "output_limit_bytes": 2147483648,
+    "scope": "Original full sustained independent Arc P1: four production .0125m independently authored objects;900strokes360masks6000stereo/360held pairs across3repetitions; no HMD pacing or compute-acceleration claim",
+    "lease": {
+      "acquired": 1795667800.7593958,
+      "device": 40,
+      "inode": 99618,
+      "before_ldd_and_product": true,
+      "released": 1795668645.6107311
+    },
+    "executable_sha256": "868fb7f654205126ac4e67abc6a56d5bab3c790378438a50bfad69d43b2560bb",
+    "providers": 74,
+    "pid": 1278196,
+    "process_identity": {
+      "pid": 1278196,
+      "ppid": 1275060,
+      "pgrp": 1278196,
+      "start": 84572656,
+      "RSS": 1347584,
+      "state": "R"
+    },
+    "actual_executable_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-sharing-range-search-release-20261126/dome-sculpt-sculpt-sustained",
+    "product_exit": 0,
+    "seconds": 843.1330805249745,
+    "peak_owned_RSS_bytes": 3949670400,
+    "samples": 10830,
+    "mapped_witness": true,
+    "observed_output_bytes": 173345095,
+    "owned_survivors": [],
+    "input_drift": [],
+    "provider_drift": [],
+    "fixed_inputs_sha256": "85e82de7824ea1d90ff79938d46a4e8dbfc2e3c81602b6cdc4d5dc428aa4419d",
+    "exact_project_count": 3,
+    "completed_repetitions": 3,
+    "actual_row_counts": {
+      "stroke": 900,
+      "mask_mode": 6,
+      "mask": 360,
+      "mask_fill": 3,
+      "mask_clear": 3,
+      "view_pair": 6000,
+      "held_pair": 360,
+      "authored_placement": 6
+    },
+    "device_witness_initial": {
+      "authenticated": true,
+      "device_id": "0x56a0\n",
+      "device_major": 226,
+      "device_minor": 129,
+      "driver": "/sys/bus/pci/drivers/i915",
+      "open_fds": [
+        {
+          "fd": 4,
+          "target": "/dev/dri/renderD129"
+        },
+        {
+          "fd": 5,
+          "target": "/dev/dri/renderD129"
+        },
+        {
+          "fd": 6,
+          "target": "/dev/dri/renderD129"
+        },
+        {
+          "fd": 7,
+          "target": "/dev/dri/renderD129"
+        }
+      ],
+      "pci": "/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0",
+      "render_node": "/dev/dri/renderD129",
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "requested": "arc",
+      "vendor": "Intel",
+      "vendor_id": "0x8086\n",
+      "version": "4.6 (Core Profile) Mesa 26.2.7"
+    },
+    "device_witness_final": {
+      "authenticated": true,
+      "device_id": "0x56a0\n",
+      "device_major": 226,
+      "device_minor": 129,
+      "driver": "/sys/bus/pci/drivers/i915",
+      "open_fds": [
+        {
+          "fd": 4,
+          "target": "/dev/dri/renderD129"
+        },
+        {
+          "fd": 5,
+          "target": "/dev/dri/renderD129"
+        },
+        {
+          "fd": 6,
+          "target": "/dev/dri/renderD129"
+        },
+        {
+          "fd": 7,
+          "target": "/dev/dri/renderD129"
+        }
+      ],
+      "pci": "/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0",
+      "render_node": "/dev/dri/renderD129",
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "requested": "arc",
+      "vendor": "Intel",
+      "vendor_id": "0x8086\n",
+      "version": "4.6 (Core Profile) Mesa 26.2.7"
+    },
+    "exit": 0,
+    "state": "passed",
+    "finished": 1795668645.6107283
+  },
+  "exact_projects": {
+    "rep-0/accepted.dsculpt": {
+      "bytes": 50692148,
+      "sha256": "db9c506daedc1b13992838200b95e9e4569e98155bce306142803aca6cb8edb8"
+    },
+    "rep-1/accepted.dsculpt": {
+      "bytes": 50692148,
+      "sha256": "db9c506daedc1b13992838200b95e9e4569e98155bce306142803aca6cb8edb8"
+    },
+    "rep-2/accepted.dsculpt": {
+      "bytes": 50692148,
+      "sha256": "db9c506daedc1b13992838200b95e9e4569e98155bce306142803aca6cb8edb8"
+    }
+  },
+  "checkpoints": 42,
+  "history_sequences": 3,
+  "raw_rows": 7690,
+  "combined_fixtures_invocation": "d6d7d852f7f24b14b49463eeceffdccf",
+  "combined_fixtures": {
+    "base_core": "2aff79f7",
+    "fixture_commit": "c90c9fed",
+    "started": 1795668703.04793,
+    "terminal": true,
+    "cases": {
+      "scene-authoring": {
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/production-authoring-regressions-release-20261126/dome-sculpt-scene-test"
+        ],
+        "started": 1795668703.1586103,
+        "timeout_seconds": 180,
+        "RSS_limit_bytes": 4294967296,
+        "virtual_AS_cap": null,
+        "pid": 3,
+        "start": 84662822,
+        "pgrp": 3,
+        "root": {
+          "pid": 3,
+          "start": 84662822,
+          "pgrp": 3,
+          "session": 3,
+          "ppid": 2,
+          "state": "R"
+        },
+        "known_processes": [
+          {
+            "pid": 3,
+            "start": 84662822,
+            "pgrp": 3,
+            "session": 3,
+            "ppid": 2,
+            "state": "R"
+          }
+        ],
+        "peak_owned_RSS_bytes": 73973760,
+        "peak_observed_virtual_bytes": 316379136,
+        "monitor_samples": 54,
+        "signals": [],
+        "exit": 0,
+        "seconds": 0.5811057090759277,
+        "ELF_sha256": "718cc66a8e2508717f2efe88ff0b0298d5402d326774d681da4773fa15506071"
+      },
+      "native-live-preview": {
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/production-authoring-regressions-release-20261126/dome-sculpt-native-strokes-test",
+          "--preview-test"
+        ],
+        "started": 1795668703.7774951,
+        "timeout_seconds": 180,
+        "RSS_limit_bytes": 4294967296,
+        "virtual_AS_cap": null,
+        "pid": 12,
+        "start": 84662884,
+        "pgrp": 12,
+        "root": {
+          "pid": 12,
+          "start": 84662884,
+          "pgrp": 12,
+          "session": 12,
+          "ppid": 2,
+          "state": "R"
+        },
+        "known_processes": [
+          {
+            "pid": 12,
+            "start": 84662884,
+            "pgrp": 12,
+            "session": 12,
+            "ppid": 2,
+            "state": "R"
+          }
+        ],
+        "peak_owned_RSS_bytes": 22171648,
+        "peak_observed_virtual_bytes": 314519552,
+        "monitor_samples": 22,
+        "signals": [],
+        "exit": 0,
+        "seconds": 0.2335338592529297,
+        "ELF_sha256": "da25d832b324474862b0a6dd0bb3281f7b1d5eaa793122f977e0bd9cc6dd83b7"
+      },
+      "native-strokes": {
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/production-authoring-regressions-release-20261126/dome-sculpt-native-strokes-test"
+        ],
+        "started": 1795668704.0450282,
+        "timeout_seconds": 180,
+        "RSS_limit_bytes": 4294967296,
+        "virtual_AS_cap": null,
+        "pid": 21,
+        "start": 84662910,
+        "pgrp": 21,
+        "root": {
+          "pid": 21,
+          "start": 84662910,
+          "pgrp": 21,
+          "session": 21,
+          "ppid": 2,
+          "state": "R"
+        },
+        "known_processes": [
+          {
+            "pid": 21,
+            "start": 84662910,
+            "pgrp": 21,
+            "session": 21,
+            "ppid": 2,
+            "state": "R"
+          }
+        ],
+        "peak_owned_RSS_bytes": 46915584,
+        "peak_observed_virtual_bytes": 1802944512,
+        "monitor_samples": 42,
+        "signals": [],
+        "exit": 0,
+        "seconds": 0.46703362464904785,
+        "ELF_sha256": "da25d832b324474862b0a6dd0bb3281f7b1d5eaa793122f977e0bd9cc6dd83b7"
+      },
+      "sculpt-mask-document": {
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/production-authoring-regressions-release-20261126/dome-sculpt-mask-document-test"
+        ],
+        "started": 1795668704.550715,
+        "timeout_seconds": 180,
+        "RSS_limit_bytes": 4294967296,
+        "virtual_AS_cap": null,
+        "pid": 88,
+        "start": 84662961,
+        "pgrp": 88,
+        "root": {
+          "pid": 88,
+          "start": 84662961,
+          "pgrp": 88,
+          "session": 88,
+          "ppid": 2,
+          "state": "R"
+        },
+        "known_processes": [
+          {
+            "pid": 88,
+            "start": 84662961,
+            "pgrp": 88,
+            "session": 88,
+            "ppid": 2,
+            "state": "R"
+          }
+        ],
+        "peak_owned_RSS_bytes": 86556672,
+        "peak_observed_virtual_bytes": 918294528,
+        "monitor_samples": 14,
+        "signals": [],
+        "exit": 0,
+        "seconds": 0.14618206024169922,
+        "ELF_sha256": "827bc714136239fff76b8199d300669ecaa72db577c37de42d02a33e42762e9d"
+      },
+      "sculpt-mask-controller": {
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/production-authoring-regressions-release-20261126/dome-sculpt-mask-controller-test"
+        ],
+        "started": 1795668704.7350624,
+        "timeout_seconds": 180,
+        "RSS_limit_bytes": 4294967296,
+        "virtual_AS_cap": null,
+        "pid": 113,
+        "start": 84662979,
+        "pgrp": 113,
+        "root": {
+          "pid": 113,
+          "start": 84662979,
+          "pgrp": 113,
+          "session": 113,
+          "ppid": 2,
+          "state": "R"
+        },
+        "known_processes": [
+          {
+            "pid": 113,
+            "start": 84662979,
+            "pgrp": 113,
+            "session": 113,
+            "ppid": 2,
+            "state": "R"
+          }
+        ],
+        "peak_owned_RSS_bytes": 31072256,
+        "peak_observed_virtual_bytes": 315899904,
+        "monitor_samples": 17,
+        "signals": [],
+        "exit": 0,
+        "seconds": 0.1778419017791748,
+        "ELF_sha256": "569375949166a5cd63e45967c56af346195ac53a4930e44118453393b0430164"
+      }
+    },
+    "no_DRI_nodes": true,
+    "allocator": "default",
+    "scope": "Focused native fixtures only, private/dev CPU; no graphics/devicelease or productpatch",
+    "input_drift": [],
+    "exit": 0,
+    "finished": 1795668705.033641
+  },
+  "authorities": {
+    "sculpt-sharing-range-search-arc-20261126/runtime-before-input-pins.json": {
+      "bytes": 132838,
+      "sha256": "8a6d3d4e1e541d88abfb9c699ee8b24382f16362ad3ed71382132506b50af0f7"
+    },
+    "sculpt-sharing-range-search-arc-20261126/run-arc-independent-p1.py": {
+      "bytes": 8167,
+      "sha256": "529d5626927fff7d05eade557475a956a9a05f23b8c46ee62c24421a32b9e35e"
+    },
+    "sculpt-sharing-range-search-arc-20261126/seal.py": {
+      "bytes": 4500,
+      "sha256": "2e6b0f464c7812c49289915d412941ca4deaddadd6db2d4f7a1fa42d2d44b2b7"
+    },
+    "sculpt-sharing-range-search-arc-20261126/arc-independent-p1-v1/status.json": {
+      "bytes": 3817,
+      "sha256": "0c4de7d1a26e084cad3b000ea221d13bf1d6b9bdb65fddda6a8f09488dccb636"
+    },
+    "sculpt-sharing-range-search-arc-20261126/arc-independent-p1-v1/actual-maps.txt": {
+      "bytes": 29084,
+      "sha256": "6b3952d16c4682dff6872e0198deae73cb35d6a79cdd7009cfe70dedb0de39b4"
+    },
+    "sculpt-sharing-range-search-arc-20261126/arc-independent-p1-v1/product.log": {
+      "bytes": 66,
+      "sha256": "2794e9f49f0d736f5a0194a7d9d5fa9e1efe038fed429ee42bcd8d32c8fad17b"
+    },
+    "sculpt-sharing-range-search-arc-20261126/arc-independent-p1-v1/provider-before-pins.json": {
+      "bytes": 7759,
+      "sha256": "3cd14d7f577d2dd633289215520fa5463198e292b40230f5de4af006b335dcce"
+    },
+    "sculpt-sharing-range-search-arc-20261126/arc-independent-p1-v1/iris_dri.so.ldd": {
+      "bytes": 448,
+      "sha256": "39262e506a13e8a4e26be3249e173b48179617d1d8663d48ed05c2c41f303569"
+    },
+    "sculpt-sharing-range-search-arc-20261126/arc-independent-p1-v1/libEGL_mesa.so.0.ldd": {
+      "bytes": 2338,
+      "sha256": "9bb2c3357b5ce1de65f9647060a74a7cfdb18c39dce731712b28969f8174afb7"
+    },
+    "sculpt-sharing-range-search-arc-20261126/arc-independent-p1-v1/libGLX_mesa.so.0.ldd": {
+      "bytes": 2394,
+      "sha256": "ac98db042cb3800b9afc00738ca66b0074ac295b46a8e0a153f1d36a4791393b"
+    },
+    "sculpt-sharing-range-search-arc-20261126/arc-independent-p1-v1/ldd.txt": {
+      "bytes": 3014,
+      "sha256": "d05be096052f5fab36ee3b4b8615ee0f7429109edf5fedd42cccc411b4168029"
+    },
+    "sculpt-sharing-range-search-arc-20261126/arc-independent-p1-v1/workflow/result.json": {
+      "bytes": 13684926,
+      "sha256": "2d6f895e1c312cd618f59a33024001102886fcf9add2c15596db3af13d07cf79"
+    },
+    "sculpt-sharing-range-search-arc-20261126/arc-independent-p1-v1/workflow/raw-samples.ndjson": {
+      "bytes": 7020274,
+      "sha256": "983cdfce12555fdc4cf2aeaa0884e48ba28a0105c59635b2b8adbdaa5e66e89a"
+    },
+    "sculpt-sharing-range-search-arc-20261126/arc-independent-p1-v1/workflow/fixed-inputs.json": {
+      "bytes": 450786,
+      "sha256": "85e82de7824ea1d90ff79938d46a4e8dbfc2e3c81602b6cdc4d5dc428aa4419d"
+    },
+    "sculpt-sharing-range-search-arc-20261126/arc-independent-p1-v1/workflow/context-initial.maps": {
+      "bytes": 31451,
+      "sha256": "1d027174de78290b8d5cc33dec77aea7a76d1fbcb6a281e60f0c248009bee584"
+    },
+    "sculpt-sharing-range-search-release-20261126/build-plan.json": {
+      "bytes": 27951,
+      "sha256": "45c767fb2c7e865971ce89ce3798bba85339f713b10e3152b96e3f7b018479da"
+    },
+    "sculpt-sharing-range-search-release-20261126/build-status.json": {
+      "bytes": 1631,
+      "sha256": "4ca94763fd2ad151adfec6faa67781654be22d910a61b42363ec2201e3141aa8"
+    },
+    "sculpt-sharing-range-search-release-20261126/app-build/status.json": {
+      "bytes": 14375,
+      "sha256": "15d81e697b581c4642e407e747f2116b555ad8d58f5d9bcf6cdd55a2ec2f0cad"
+    },
+    "production-authoring-regressions-release-20261126/build.py": {
+      "bytes": 3794,
+      "sha256": "7039314edc7eb5ea59d483a936b3fe50147e81dcdc22b07a8ba49d2e3a47fbb9"
+    },
+    "production-authoring-regressions-release-20261126/run.py": {
+      "bytes": 1929,
+      "sha256": "3c931b733319185e250701842436c9f26bf29552cd63e81f9263c5a7d96711bc"
+    },
+    "production-authoring-regressions-release-20261126/run-combined.py": {
+      "bytes": 482,
+      "sha256": "0e5cf5641967df3963bbccc20e93ae64f435a4d50c3987b54569df9bb7493bd5"
+    },
+    "production-authoring-regressions-release-20261126/build-status.json": {
+      "bytes": 842,
+      "sha256": "23963f7413ed20df2ad664a45782328627ef0b4d4a269c37156d9f63bebe4f73"
+    },
+    "production-authoring-regressions-release-20261126/commands.json": {
+      "bytes": 13210,
+      "sha256": "3d23dac99a8ef7506e187815171160368238f2000db66c40cae89f7b9ef61b30"
+    },
+    "production-authoring-regressions-release-20261126/before-input-pins.json": {
+      "bytes": 57806,
+      "sha256": "88acafcf30d2549ec236137e666eb5ed207e49b607ad40a862932409cbab7b15"
+    },
+    "production-authoring-regressions-release-20261126/cpu-v1/status.json": {
+      "bytes": 5457,
+      "sha256": "e5f228f8e8e0a0d8a08a59e48e55b4ef8b43050877560278fd9bcce4c6101a50"
+    },
+    "production-authoring-regressions-release-20261126/cpu-v1/native-live-preview.log": {
+      "bytes": 583,
+      "sha256": "f8e7a41ef07a08a05083b8d9390f068c5fe226ad739b1b571c8f3dc6e176b7c5"
+    },
+    "production-authoring-regressions-release-20261126/cpu-v1/native-strokes.log": {
+      "bytes": 2957,
+      "sha256": "3e051386381520afff36f8b7a3a408e7118129e416010d8f197903d804edf3a7"
+    },
+    "production-authoring-regressions-release-20261126/cpu-v1/scene-authoring.log": {
+      "bytes": 1589,
+      "sha256": "881c8c0f3d7d0f077b7c9b385b230fe10a4ee0bfb65a719305cec44aed43e6a1"
+    },
+    "production-authoring-regressions-release-20261126/cpu-v1/sculpt-mask-controller.log": {
+      "bytes": 105,
+      "sha256": "af0f5b22705248d7c6b1c6c0c2108beab5e2a1340f78bad6c1bd23332da10a4f"
+    },
+    "production-authoring-regressions-release-20261126/cpu-v1/sculpt-mask-document.log": {
+      "bytes": 136,
+      "sha256": "28e956460bac281b81168879d8a8e80497d2b7be41dff8cfbfda0bcff22f1bda"
+    },
+    "sculpt-sharing-range-search-arc-20261126/ds-sculpt-sharing-range-search-arc-20261126.journal.txt": {
+      "bytes": 420,
+      "sha256": "0bbd11fab05e17cac231441e83cad0badba6da1a3020a58dbbb30746fdf20aa6"
+    }
+  },
+  "archive": {
+    "file": "sculpt-range-arc-and-combined-fixtures-20261126.tar.xz",
+    "bytes": 847372,
+    "sha256": "35a896086a647fc8345dd06540462519cb803c80ecaf9834360a8a0e7c5b910b"
+  }
+}
