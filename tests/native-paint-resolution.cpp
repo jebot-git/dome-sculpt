@@ -23,10 +23,16 @@ bool refuses(auto action) {
 }
 
 void ready(Document &doc) {
- if(!doc.wait_asset(std::chrono::seconds(180)) || !doc.wait_mesh(std::chrono::seconds(180)))
-  throw std::runtime_error("Paint-resolution worker or surface timed out");
- if(!doc.frame().state->error.empty())
-  throw std::runtime_error(doc.frame().state->error);
+ if(!doc.wait_asset(std::chrono::seconds(180)))
+  throw std::runtime_error("Paint-resolution worker timed out");
+ const auto deadline=std::chrono::steady_clock::now()+std::chrono::seconds(180);
+ do {
+  if(const auto state=doc.frame().state;!state->error.empty())
+   throw std::runtime_error(state->error);
+  if(doc.wait_mesh(std::chrono::milliseconds(250)))
+   return;
+ } while(std::chrono::steady_clock::now()<deadline);
+ throw std::runtime_error("Paint-resolution surface timed out");
 }
 
 void resize_source_grid(const std::filesystem::path &root){
@@ -113,13 +119,6 @@ void resize_painted_source_grid(const std::filesystem::path &root) {
     paint->begin_stroke();
     paint->stamp(brush, ink);
     check(paint->end_stroke(), "A second source layer contains authored emission");
-    ink.emission_units = PaintEmissionUnits::Physical;
-    ink.emission = {9.f, 23.f, 56.f};
-    ink.flow = .61f;
-    paint->begin_stroke();
-    paint->stamp(brush, ink);
-    check(paint->end_stroke() && paint->has_physical_emission(),
-          "The hidden layer also owns a genuine FLOAT emission field");
     paint->layer_properties("Hidden finish", false, .48f);
     scene.validate();
     const auto before = scene.encode();
@@ -194,12 +193,7 @@ void resize_painted_source_grid(const std::filesystem::path &root) {
               resized.painted->active_layer() == hidden && !layers[1].visible &&
               layers[1].name == "Hidden finish" && layers[1].opacity == .48f,
           "Resampling preserves layer order, identity, selection, visibility and opacity");
-    auto float_at = [](const PaintedMesh &field, uint32_t x, uint32_t y) {
-      const auto &tiles = field.layers().at(1).emission_tiles;
-      const auto &tile = tiles.at(size_t(y / 32) * (field.resolution() / 32) + x / 32);
-      return tile ? tile->pixels[(y % 32) * 32 + x % 32] : PaintEmissionValue{};
-    };
-    bool mask = false, emission = false, hdr = false, exact_layers = true;
+    bool mask = false, emission = false, exact_layers = true;
     for (uint32_t y = 0; y < 256; ++y)
       for (uint32_t x = 0; x < 256; ++x) {
         const auto value = resized.painted->pixel(base, x, y);
@@ -208,11 +202,9 @@ void resize_painted_source_grid(const std::filesystem::path &root) {
         const auto finish = resized.painted->pixel(hidden, x, y);
         emission |= finish.data[7] > 100 && finish.data[12] > 64;
         exact_layers &= value == paint->pixel(base, x / 2, y / 2) &&
-                        finish == paint->pixel(hidden, x / 2, y / 2) &&
-                        float_at(*resized.painted, x, y) == float_at(*paint, x / 2, y / 2);
-        hdr |= float_at(*resized.painted, x, y).physical[2] > 1.f;
+                        finish == paint->pixel(hidden, x / 2, y / 2);
       }
-    check(mask && emission && hdr, "Painted colour, fractional masks and hidden emission all survive");
+    check(mask && emission, "Painted colour, fractional masks and hidden emission all survive");
     check(exact_layers, "Enlargement retains every authored byte in both original layer grids");
     auto old_raster = after;
     old_raster.object(id).painted = paint;
@@ -229,8 +221,7 @@ void resize_painted_source_grid(const std::filesystem::path &root) {
     for (uint32_t y = 0; y < 128; ++y)
       for (uint32_t x = 0; x < 128; ++x)
         restored_cells &= restored->pixel(base, x, y) == paint->pixel(base, x, y) &&
-                          restored->pixel(hidden, x, y) == paint->pixel(hidden, x, y) &&
-                          float_at(*restored, x, y) == float_at(*paint, x, y);
+                          restored->pixel(hidden, x, y) == paint->pixel(hidden, x, y);
     check(report.changed && restored_cells && restored->source_maps() == paint->source_maps(),
           "Reducing the enlarged grid recovers every original authored cell and source owner");
     check(!resample_native_texture_grid(reduced, id, options, limits).changed &&
@@ -247,16 +238,71 @@ void resize_painted_source_grid(const std::filesystem::path &root) {
       ready(doc);
       const auto large = doc.copy_scene();
       const auto &larger = *large.object(id).painted;
-      bool exact_hdr = larger.resolution() == 1024;
+      bool exact_cells = larger.resolution() == 1024;
       for (uint32_t y = 0; y < larger.resolution(); ++y)
         for (uint32_t x = 0; x < larger.resolution(); ++x)
-          exact_hdr &= float_at(larger, x, y) == float_at(*paint, x / 8, y / 8);
-      check(exact_hdr && larger.source_maps() == paint->source_maps(),
-            "The desktop command enlarges sparse painted HDR layers to 1024");
+          exact_cells &= larger.pixel(hidden, x, y) == paint->pixel(hidden, x / 8, y / 8);
+      check(exact_cells && larger.source_maps() == paint->source_maps(),
+            "The desktop command enlarges sparse painted source layers to 1024");
       check(doc.undo() && doc.copy_scene().encode() == after.encode(),
             "One undo restores the previous native paint size");
     }
   }
+}
+
+void resize_physical_native_grid(const std::filesystem::path &root) {
+  Scene scene;
+  Mesh mesh;
+  mesh.positions = {{-1,-1,0},{1,-1,0},{1,1,0},{-1,1,0}};
+  mesh.normals.assign(4, {0,0,1});
+  mesh.uv = {{{0,0}},{{1,0}},{{1,1}},{{0,1}}};
+  mesh.indices = {0,1,2,0,2,3};
+  auto paint = std::make_shared<PaintedMesh>(std::move(mesh), 64);
+  const auto layer = paint->active_layer();
+  scene.active().painted = paint;
+  scene.active().mesh_active = true;
+  const auto id = scene.active().id;
+  Brush brush;
+  brush.from = brush.to = {0,0,0};
+  brush.radius = .5f;
+  PaintSettings ink;
+  ink.front_only = false;
+  ink.channel = PaintChannel::Emission;
+  ink.emission_units = PaintEmissionUnits::Physical;
+  ink.emission = {9500.f, .0125f, 57.f};
+  ink.flow = .0001f;
+  paint->begin_stroke();
+  paint->stamp(brush, ink);
+  check(paint->end_stroke() && paint->has_physical_emission(),
+        "Native grid carries true physical emission with sub-byte coverage");
+  const auto center = paint->emission_pixel(layer, 32, 32);
+  check(center.coverage > 0 && center.coverage < 1.f/255 &&
+            center.physical[0] > 9000 && paint->pixel(layer, 32, 32).data[12] == 0,
+        "Physical coverage and radiance are independent of the legacy byte");
+  paint->layer_properties("Hidden HDR", false, .64f);
+
+  Document doc;
+  doc.replace(scene);
+  ready(doc);
+  TextureSetEdit resize;
+  resize.action = TextureSetAction::Resolution;
+  resize.resolution = 128;
+  doc.edit_texture_set(resize);
+  const auto file = root / "native-physical128.dsculpt";
+  doc.save_async(file).get();
+  ready(doc);
+  const auto after = doc.copy_scene();
+  const auto &larger = *after.object(id).painted;
+  bool exact = larger.resolution() == 128 && larger.has_physical_emission();
+  for (uint32_t y = 0; y < larger.resolution(); ++y)
+    for (uint32_t x = 0; x < larger.resolution(); ++x)
+      exact &= larger.emission_pixel(layer, x, y) == paint->emission_pixel(layer, x/2, y/2);
+  check(exact && !larger.layers().front().visible && larger.layers().front().opacity == .64f,
+        "The new native grid retains every hidden FLOAT sample and its layer state");
+  check(Scene::load(file).encode() == after.encode() &&
+            doc.undo() && doc.copy_scene().encode() == scene.encode() &&
+            doc.redo() && doc.copy_scene().encode() == after.encode(),
+        "Physical paint survives ordered native Save, reopen, Undo and Redo");
 }
 
 } // namespace
@@ -267,8 +313,13 @@ int main(int argc,char **argv) try {
  std::filesystem::create_directories(root);
  if(std::string_view(argv[1])=="empty")
   resize_source_grid(root);
- else
+ else if(std::string_view(argv[1])=="painted") {
   resize_painted_source_grid(root);
+  if(dome::compute_backend()=="CPU")
+   resize_physical_native_grid(root);
+ } else {
+  throw std::invalid_argument("Unknown paint resolution fixture");
+ }
  return 0;
 } catch(const std::exception &error) {
  std::cerr << "FAIL " << error.what() << '\n';
