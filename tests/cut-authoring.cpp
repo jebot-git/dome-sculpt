@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
+#include "../src/sculpt-chunk-masks.hpp"
 #include "dome/source-maps.hpp"
 #include "dome/import.hpp"
 #include <nlohmann/json.hpp>
@@ -217,13 +218,24 @@ int main(int argc,char **argv)try{
     check(protected_cut.wait_cut()&&protected_cut.wait_mesh()&&protected_cut.frame().state->error.empty(),
           "A Volume3 protected symmetric source prepares a clipped preview with a cap");
     auto surface=protected_cut.frame().surface;bool source_mask=false,cap_mask=false,attributes=true;
-    for(const auto &range:surface->ranges)for(size_t k=range.first;k<range.first+range.count;++k){
-      auto value=surface->sculpt_masks.at(surface->mesh.indices[k]);
-      if(range.object==1){source_mask=true;attributes&=value==.75f;}
-      else if(range.object==UINT64_MAX){cap_mask=true;attributes&=value==-1;}
+    const auto *source=surface->sculpt_chunks?surface->sculpt_chunks->find(1):nullptr;
+    check(source&&source->masks,"Clipped Volume source retains its genuine immutable scalar directory");
+    source->geometry->for_each_chunk([&](const auto &chunk){
+      const auto values=source->masks->find(chunk);
+      attributes&=values->geometry==chunk&&values->values.size()==chunk->mesh.positions.size();
+      for(float value:values->values){source_mask=true;attributes&=value==.75f;}
+    });
+    attributes&=surface->sculpt_masks.empty()||surface->sculpt_masks.size()==surface->mesh.positions.size();
+    for(const auto &range:surface->ranges){
+      attributes&=range.object!=1; // Chunk sources never invent packed ranges.
+      if(range.object==UINT64_MAX&&range.count){
+        cap_mask=true;
+        if(!surface->sculpt_masks.empty())for(size_t k=range.first;k<range.first+range.count;++k)
+          attributes&=surface->sculpt_masks.at(surface->mesh.indices[k])==-1;
+      }
     }
-    check(source_mask&&cap_mask&&attributes&&surface->sculpt_masks.size()==surface->mesh.positions.size(),
-          "Original protection feedback stays exact while ephemeral cap vertices use ordinary unmasked material");
+    check(source_mask&&cap_mask&&attributes,
+          "Original chunk protection stays exact while the genuine packed cap uses ordinary unmasked material");
     check(!protected_cut.frame().state->can_configure_sculpt&&!protected_cut.begin_desktop()&&
           rejects([&]{protected_cut.sculpt_settings(mask_settings);})&&rejects([&]{protected_cut.sculpt_mask_fill(0);})&&
           rejects([&]{protected_cut.sculpt_mask_invert();}),
@@ -236,7 +248,9 @@ int main(int argc,char **argv)try{
           "Protected source publishes grouped static cut geometry through the ordered worker");
     auto cut_scene=protected_cut.copy_scene();
     check(cut_scene.encode()["objects"][0]["volume"]==protected_before["objects"][0]["volume"]&&
-          !cut_scene.object(1).visible&&protected_cut.frame().surface->sculpt_masks.empty(),
+          !cut_scene.object(1).visible&&protected_cut.frame().surface->sculpt_masks.empty()&&
+          (!protected_cut.frame().surface->sculpt_chunks||
+           !protected_cut.frame().surface->sculpt_chunks->find(1)),
           "Accepted cuts retain all original mask/symmetry data and leave no stale protection overlay on new mesh outputs");
     auto baked=cut_scene.active().painted->baked();bool white=baked!=nullptr;
     if(baked)for(size_t k=0;k<baked->coverage.size();++k)if(baked->coverage[k])

@@ -22,7 +22,9 @@ int main(int argc,char**argv)try{
  if(argc==3&&std::string(argv[1])=="--inspect"){auto s=Scene::load(argv[2]);auto out=nlohmann::json::array();for(const auto&o:s.objects())out.push_back({{"id",o.id},{"x",o.transform.position.x},{"visible",o.visible},{"locked",o.locked},{"color",o.material.color}});std::cout<<out.dump()<<'\n';return 0;}
 
  Document d;d.replace(scene());check(d.wait_mesh(),"Initial immutable mesh is ready");auto base=d.copy_scene();auto a=base.active().id,b=base.objects().back().id;auto exact=base.encode();auto mesh=d.frame().surface;
- check(!d.frame().surface->picking,"Ordinary scenes do not allocate an unused object-picking BVH");
+ const auto ordinary_hit=d.raycast({0,0,2.2f},{0,0,-1});
+ check(d.frame().surface->picking&&ordinary_hit&&std::abs(ordinary_hit->z)<1e-6f,
+       "Ordinary painted editing prepares material-aware picking used by native rays");
  check(d.object_editable(a)&&d.object_editable(b)&&!d.frame().state->object_grab_mode,"Ordinary editing and workspace-grip mode remain the default");
  d.configure_object_grab(true,true);check(d.wait_mesh()&&d.pick_object({0,0,2.2f},{0,0,-1})==a,"Explicit object mode prepares material-aware object picking on the worker");mesh=d.frame().surface;d.hold_object(a);auto state=d.frame().state;
  check(d.copy_scene().encode()==exact && d.frame().surface==mesh,"Holding and ghost isolation preserve exact native scene and immutable geometry");
