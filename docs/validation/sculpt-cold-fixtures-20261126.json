@@ -1,0 +1,575 @@
+{
+  "fixture_commit": "8b5dad2e",
+  "base_core": "e375b31d",
+  "core_sha256": "2c0e4f40211e17c6ef57c92b54c24db47d38593385e0f6266995b149dbdf911f",
+  "scope": "Five stale current-preview fixtures corrected: valid bootstrapmeshing, workingnativepaintedpicking, chunk/capmaskownership andheldmodaldrawcorner.434focused ReleaseCPU checks pass; noproductionpatch/no graphics/devicelease/no sanitizer or wholeumbrella claim.",
+  "original_failure_capture": {
+    "source": "c26a8573f467afef4966069ca3e58cde674b1f68",
+    "original_log": "/home/blux/de-xr/dome-sculpt/artifacts/production-full-regression-release-20261126/full-private-ctest/ctest.log",
+    "captured_prefix_bytes": 303366,
+    "sha256": "25fd72d98b72ab45427869af4c6556ba700ef09294df0f6609307a0e4af914c6",
+    "scope": "Original negative umbrella output retained, no rewrite or fullsuiteacceptance claim",
+    "ELFs": {
+      "dome-sculpt-local-surface-integration-test": "bc9eef3f37a236cde2808ee055e5943a04d8514990b704e35db88313768cd8b2",
+      "dome-sculpt-object-selection-test": "43f450ddd46a645ead88c0e36aaf843088c23e324e80fa6d78a52b396a5c2fdf",
+      "dome-sculpt-object-isolation-test": "9e350a218213f88d2e6ad4ac14f09009757421dea874af85375b66c31252b13b",
+      "dome-sculpt-cut-authoring-test": "bc83eb70468cf1ee1c1b1f77107e9fe67f2dbcd7325b5f81a2d87216be1841bb",
+      "dome-sculpt-modal-selection-controls-test": "cd09c5c15d47c37bc34b85d21f7dfb205174a240c6b849bb1d9ba3eca938f116"
+    }
+  },
+  "build": {
+    "base_source": "e375b31d",
+    "terminal": true,
+    "started": 1795669870.6427553,
+    "scope": "Only5wholefixtureTUs +link; exactparentqualifiede375core, no productionrecompile/no graphics",
+    "exit": 0,
+    "objects": 5,
+    "links": 5,
+    "input_drift": [],
+    "core_sha256": "2c0e4f40211e17c6ef57c92b54c24db47d38593385e0f6266995b149dbdf911f",
+    "ELFs": {
+      "dome-sculpt-local-surface-integration-test": "f50368bb48230d0b69ed7125a82f0d2a43dfea85687d67f9c8fbfd98f1ca1879",
+      "dome-sculpt-object-selection-test": "af46064ea0b046d493951730d8c9aa4ca759b596a001def8fc7168bfe1ddcf27",
+      "dome-sculpt-object-isolation-test": "cb14e1aedabea46bcd4dd147144d20a9a384eb76fff16c9ababee27a7fbc2d42",
+      "dome-sculpt-cut-authoring-test": "cb8c8757c1112295b768d6071fe193a7d9e5beb4c6428f552c2118247c0074f4",
+      "dome-sculpt-modal-selection-controls-test": "473566f797a5b54691a2032af2ec931849fa5b347c06daf50364fe3fcec4e021"
+    },
+    "seconds": 34.16387367248535
+  },
+  "runtime": {
+    "base_core": "e375b31d",
+    "started": 1795669911.7121198,
+    "terminal": true,
+    "cases": {
+      "authenticated-local-surface": {
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-release-20261126/dome-sculpt-local-surface-integration-test"
+        ],
+        "started": 1795669911.8195815,
+        "timeout_seconds": 120,
+        "RSS_limit_bytes": 4294967296,
+        "virtual_AS_cap": null,
+        "pid": 936092,
+        "start": 84783688,
+        "pgrp": 936092,
+        "root": {
+          "pid": 936092,
+          "start": 84783688,
+          "pgrp": 936092,
+          "session": 936092,
+          "ppid": 936064,
+          "state": "R"
+        },
+        "known_processes": [
+          {
+            "pid": 936092,
+            "start": 84783688,
+            "pgrp": 936092,
+            "session": 936092,
+            "ppid": 936064,
+            "state": "R"
+          }
+        ],
+        "peak_owned_RSS_bytes": 60428288,
+        "peak_observed_virtual_bytes": 608153600,
+        "monitor_samples": 106,
+        "signals": [],
+        "exit": 0,
+        "seconds": 1.1259901523590088,
+        "ELF_sha256": "f50368bb48230d0b69ed7125a82f0d2a43dfea85687d67f9c8fbfd98f1ca1879"
+      },
+      "object-selection": {
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-release-20261126/dome-sculpt-object-selection-test"
+        ],
+        "started": 1795669912.978347,
+        "timeout_seconds": 120,
+        "RSS_limit_bytes": 4294967296,
+        "virtual_AS_cap": null,
+        "pid": 936282,
+        "start": 84783804,
+        "pgrp": 936282,
+        "root": {
+          "pid": 936282,
+          "start": 84783804,
+          "pgrp": 936282,
+          "session": 936282,
+          "ppid": 936064,
+          "state": "R"
+        },
+        "known_processes": [
+          {
+            "pid": 936282,
+            "start": 84783804,
+            "pgrp": 936282,
+            "session": 936282,
+            "ppid": 936064,
+            "state": "R"
+          }
+        ],
+        "peak_owned_RSS_bytes": 18411520,
+        "peak_observed_virtual_bytes": 852365312,
+        "monitor_samples": 8,
+        "signals": [],
+        "exit": 0,
+        "seconds": 0.0795283317565918,
+        "ELF_sha256": "af46064ea0b046d493951730d8c9aa4ca759b596a001def8fc7168bfe1ddcf27"
+      },
+      "object-isolation": {
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-release-20261126/dome-sculpt-object-isolation-test"
+        ],
+        "started": 1795669913.08987,
+        "timeout_seconds": 120,
+        "RSS_limit_bytes": 4294967296,
+        "virtual_AS_cap": null,
+        "pid": 936310,
+        "start": 84783815,
+        "pgrp": 936310,
+        "root": {
+          "pid": 936310,
+          "start": 84783815,
+          "pgrp": 936310,
+          "session": 936310,
+          "ppid": 936064,
+          "state": "R"
+        },
+        "known_processes": [
+          {
+            "pid": 936310,
+            "start": 84783815,
+            "pgrp": 936310,
+            "session": 936310,
+            "ppid": 936064,
+            "state": "R"
+          }
+        ],
+        "peak_owned_RSS_bytes": 18571264,
+        "peak_observed_virtual_bytes": 852234240,
+        "monitor_samples": 5,
+        "signals": [],
+        "exit": 0,
+        "seconds": 0.04503893852233887,
+        "ELF_sha256": "cb14e1aedabea46bcd4dd147144d20a9a384eb76fff16c9ababee27a7fbc2d42"
+      },
+      "cut-authoring": {
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-release-20261126/dome-sculpt-cut-authoring-test"
+        ],
+        "started": 1795669913.165986,
+        "timeout_seconds": 120,
+        "RSS_limit_bytes": 4294967296,
+        "virtual_AS_cap": null,
+        "pid": 936594,
+        "start": 84783822,
+        "pgrp": 936594,
+        "root": {
+          "pid": 936594,
+          "start": 84783822,
+          "pgrp": 936594,
+          "session": 936594,
+          "ppid": 936064,
+          "state": "R"
+        },
+        "known_processes": [
+          {
+            "pid": 936594,
+            "start": 84783822,
+            "pgrp": 936594,
+            "session": 936594,
+            "ppid": 936064,
+            "state": "R"
+          }
+        ],
+        "peak_owned_RSS_bytes": 213336064,
+        "peak_observed_virtual_bytes": 2537025536,
+        "monitor_samples": 137,
+        "signals": [],
+        "exit": 0,
+        "seconds": 1.5268158912658691,
+        "ELF_sha256": "cb8c8757c1112295b768d6071fe193a7d9e5beb4c6428f552c2118247c0074f4"
+      },
+      "modal-selection-controls": {
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-release-20261126/dome-sculpt-modal-selection-controls-test"
+        ],
+        "started": 1795669914.7271314,
+        "timeout_seconds": 120,
+        "RSS_limit_bytes": 4294967296,
+        "virtual_AS_cap": null,
+        "pid": 937193,
+        "start": 84783979,
+        "pgrp": 937193,
+        "root": {
+          "pid": 937193,
+          "start": 84783979,
+          "pgrp": 937193,
+          "session": 937193,
+          "ppid": 936064,
+          "state": "R"
+        },
+        "known_processes": [
+          {
+            "pid": 937193,
+            "start": 84783979,
+            "pgrp": 937193,
+            "session": 937193,
+            "ppid": 936064,
+            "state": "R"
+          }
+        ],
+        "peak_owned_RSS_bytes": 94949376,
+        "peak_observed_virtual_bytes": 603734016,
+        "monitor_samples": 128,
+        "signals": [],
+        "exit": 0,
+        "seconds": 1.370168924331665,
+        "ELF_sha256": "473566f797a5b54691a2032af2ec931849fa5b347c06daf50364fe3fcec4e021"
+      }
+    },
+    "no_DRI_nodes": true,
+    "allocator": "default",
+    "scope": "Focused cold/current fixture corrections only, private/dev CPU; no graphics/devicelease or productpatch",
+    "input_drift": [],
+    "exit": 0,
+    "finished": 1795669916.192028
+  },
+  "authorities": [
+    {
+      "name": "artifacts/production-cold-sculpt-projection-release-20261126/build-plan.json",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/production-cold-sculpt-projection-release-20261126/build-plan.json",
+      "bytes": 26852,
+      "sha256": "cdf2c829f8698d4a04417b4b628208989229e235bf5ba3afdbb8d9d40599cdf5"
+    },
+    {
+      "name": "artifacts/production-cold-sculpt-projection-release-20261126/build-status.json",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/production-cold-sculpt-projection-release-20261126/build-status.json",
+      "bytes": 1453,
+      "sha256": "2a3bf73463843389f896c99fabc2dd6bf6d187df668fbe4c59934a597ac13b2b"
+    },
+    {
+      "name": "artifacts/sculpt-cold-fixtures-release-20261126/0.prospective.d",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-release-20261126/0.prospective.d",
+      "bytes": 21641,
+      "sha256": "8373a25241407fb6354b522d422c010d3259f00bc803ccdc4f9ee2aa325c69bc"
+    },
+    {
+      "name": "artifacts/sculpt-cold-fixtures-release-20261126/1.prospective.d",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-release-20261126/1.prospective.d",
+      "bytes": 20897,
+      "sha256": "a0e4ca0d7bca18cc4c744f3902d3a72ffb6d148fece0a77585b1c5810e33c90c"
+    },
+    {
+      "name": "artifacts/sculpt-cold-fixtures-release-20261126/2.prospective.d",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-release-20261126/2.prospective.d",
+      "bytes": 20566,
+      "sha256": "a767d4b77b6a26b5dcc0291bc261080f11855efefedb7da3c3954142d6a58ea1"
+    },
+    {
+      "name": "artifacts/sculpt-cold-fixtures-release-20261126/3.prospective.d",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-release-20261126/3.prospective.d",
+      "bytes": 21500,
+      "sha256": "142556e227c465531b1abcefbb46f8931c9e6173236f99d0204bf2cde6a03da8"
+    },
+    {
+      "name": "artifacts/sculpt-cold-fixtures-release-20261126/4.prospective.d",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-release-20261126/4.prospective.d",
+      "bytes": 21389,
+      "sha256": "a1eefce863677a40d10ae20a2a506a14541a006dbfa5513aa2d7b711913f78cf"
+    },
+    {
+      "name": "artifacts/sculpt-cold-fixtures-release-20261126/before-input-pins.json",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-release-20261126/before-input-pins.json",
+      "bytes": 58986,
+      "sha256": "0eae61e64f80914c1303fc0ea54d3e2a70d35e2db28dc0b51fcd4a6b360e35a3"
+    },
+    {
+      "name": "artifacts/sculpt-cold-fixtures-release-20261126/build-status.json",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-release-20261126/build-status.json",
+      "bytes": 948,
+      "sha256": "2daade96bff945cdd3bc3eb3683b2ee08017aa5782e63a3336703406c73027e7"
+    },
+    {
+      "name": "artifacts/sculpt-cold-fixtures-release-20261126/build.py",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-release-20261126/build.py",
+      "bytes": 3836,
+      "sha256": "88a3db91de1f61b9d0a5a7c27bf9252e17c8a1396fde1bc76b923c8143bac54f"
+    },
+    {
+      "name": "artifacts/sculpt-cold-fixtures-release-20261126/commands.json",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-release-20261126/commands.json",
+      "bytes": 16161,
+      "sha256": "ceac76fafc4b548c41baf8d197ae7f3fb8ff5a686de2d3abca0b9e76a5859963"
+    },
+    {
+      "name": "artifacts/sculpt-cold-fixtures-release-20261126/compile-0.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-release-20261126/compile-0.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "artifacts/sculpt-cold-fixtures-release-20261126/compile-1.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-release-20261126/compile-1.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "artifacts/sculpt-cold-fixtures-release-20261126/compile-2.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-release-20261126/compile-2.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "artifacts/sculpt-cold-fixtures-release-20261126/compile-3.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-release-20261126/compile-3.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "artifacts/sculpt-cold-fixtures-release-20261126/compile-4.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-release-20261126/compile-4.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "artifacts/sculpt-cold-fixtures-release-20261126/cpu-v1/authenticated-local-surface.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-release-20261126/cpu-v1/authenticated-local-surface.log",
+      "bytes": 7827,
+      "sha256": "2a4c62002d6d648d0cd1c86b2fe36c2593bbf781937e8abde45db1525ef79c56"
+    },
+    {
+      "name": "artifacts/sculpt-cold-fixtures-release-20261126/cpu-v1/cut-authoring.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-release-20261126/cpu-v1/cut-authoring.log",
+      "bytes": 5515,
+      "sha256": "403a4b884a8fced065fd0bc6ed6fb508ba202f59762c7c94afab38d470a00ea8"
+    },
+    {
+      "name": "artifacts/sculpt-cold-fixtures-release-20261126/cpu-v1/journal.txt",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-release-20261126/cpu-v1/journal.txt",
+      "bytes": 606,
+      "sha256": "ff65eeb958122a7ee4400211b6d19341e2fcfff90e6463b8747b1a063000d2c9"
+    },
+    {
+      "name": "artifacts/sculpt-cold-fixtures-release-20261126/cpu-v1/modal-selection-controls.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-release-20261126/cpu-v1/modal-selection-controls.log",
+      "bytes": 3405,
+      "sha256": "4649f1e1dcb1a8219fd0fb579fbe2c8d428ce80f19d5b75b1a1c77acbfb5324e"
+    },
+    {
+      "name": "artifacts/sculpt-cold-fixtures-release-20261126/cpu-v1/object-isolation.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-release-20261126/cpu-v1/object-isolation.log",
+      "bytes": 6049,
+      "sha256": "ad9af0b16b07b3ecb45098a0e6aba81f645889186138f7148e661906cf2b480f"
+    },
+    {
+      "name": "artifacts/sculpt-cold-fixtures-release-20261126/cpu-v1/object-selection.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-release-20261126/cpu-v1/object-selection.log",
+      "bytes": 14608,
+      "sha256": "fb91d907e6182625084eb90f4e151b4512c6481a91a2875d600619effa1371b3"
+    },
+    {
+      "name": "artifacts/sculpt-cold-fixtures-release-20261126/cpu-v1/status.json",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-release-20261126/cpu-v1/status.json",
+      "bytes": 5604,
+      "sha256": "b837eb8cc887a1faf3d412744ef4cd0e638382ddb324a6078d3fca0b10b61ddb"
+    },
+    {
+      "name": "artifacts/sculpt-cold-fixtures-release-20261126/cpu-v1/unit-close.json",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-release-20261126/cpu-v1/unit-close.json",
+      "bytes": 216,
+      "sha256": "414daffb587d8626cf2c14a5252067d615388a28ecfdff27901b4c72e15da41e"
+    },
+    {
+      "name": "artifacts/sculpt-cold-fixtures-release-20261126/cpu-v1/unit-terminal.txt",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-release-20261126/cpu-v1/unit-terminal.txt",
+      "bytes": 7133,
+      "sha256": "dfd61db5ba846a9c2c4ad92ad1e93e1cc6855dc2abb8936ea74cfa7c655802ee"
+    },
+    {
+      "name": "artifacts/sculpt-cold-fixtures-release-20261126/dome-sculpt-cut-authoring-test.link.d",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-release-20261126/dome-sculpt-cut-authoring-test.link.d",
+      "bytes": 9081,
+      "sha256": "d08bf043c45ba8a29f5d9bb5406ddbd2597e0000b7daba2e07d1cfafb9cca487"
+    },
+    {
+      "name": "artifacts/sculpt-cold-fixtures-release-20261126/dome-sculpt-cut-authoring-test.o.d",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-release-20261126/dome-sculpt-cut-authoring-test.o.d",
+      "bytes": 21560,
+      "sha256": "1061347e16bddad3e76a8c33f9ca46089a8c352f8e660fa88b6c8ab26e5c923c"
+    },
+    {
+      "name": "artifacts/sculpt-cold-fixtures-release-20261126/dome-sculpt-local-surface-integration-test.link.d",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-release-20261126/dome-sculpt-local-surface-integration-test.link.d",
+      "bytes": 9117,
+      "sha256": "ac16bcf4f1876a50198c22753f9f1ba64c269392f5bce7fbee15b3dc61644580"
+    },
+    {
+      "name": "artifacts/sculpt-cold-fixtures-release-20261126/dome-sculpt-local-surface-integration-test.o.d",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-release-20261126/dome-sculpt-local-surface-integration-test.o.d",
+      "bytes": 21725,
+      "sha256": "9563546d518dabd580851ec6769ea314d38e6bb92964c32a26bd1230760e86cb"
+    },
+    {
+      "name": "artifacts/sculpt-cold-fixtures-release-20261126/dome-sculpt-modal-selection-controls-test.link.d",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-release-20261126/dome-sculpt-modal-selection-controls-test.link.d",
+      "bytes": 9114,
+      "sha256": "49710f31a6f5d25933b2f14d216248e8302848743fb223c961fea7b2671bb41d"
+    },
+    {
+      "name": "artifacts/sculpt-cold-fixtures-release-20261126/dome-sculpt-modal-selection-controls-test.o.d",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-release-20261126/dome-sculpt-modal-selection-controls-test.o.d",
+      "bytes": 21471,
+      "sha256": "10aaf787ce15303e249ff6525f4e43b098ff435776a527658bdc1ddd5f7291d8"
+    },
+    {
+      "name": "artifacts/sculpt-cold-fixtures-release-20261126/dome-sculpt-object-isolation-test.link.d",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-release-20261126/dome-sculpt-object-isolation-test.link.d",
+      "bytes": 9090,
+      "sha256": "f0de23e15baf9db563ce966e75ca3ad3dddc37e7fb6081051ccb30502316c973"
+    },
+    {
+      "name": "artifacts/sculpt-cold-fixtures-release-20261126/dome-sculpt-object-isolation-test.o.d",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-release-20261126/dome-sculpt-object-isolation-test.o.d",
+      "bytes": 20632,
+      "sha256": "9651e738e6457227866abbe84a602ddb2ea564b71ffaff4a15c575ff7940f04a"
+    },
+    {
+      "name": "artifacts/sculpt-cold-fixtures-release-20261126/dome-sculpt-object-selection-test.link.d",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-release-20261126/dome-sculpt-object-selection-test.link.d",
+      "bytes": 9090,
+      "sha256": "0cb03605eef5de4f60ef07fb8bc40224ba90e3e591d7a7c7e91a93a1ec45b75d"
+    },
+    {
+      "name": "artifacts/sculpt-cold-fixtures-release-20261126/dome-sculpt-object-selection-test.o.d",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-release-20261126/dome-sculpt-object-selection-test.o.d",
+      "bytes": 20963,
+      "sha256": "55543565232928b328208de3107c60e2456c244fa5fc1b44ac099bc483988db5"
+    },
+    {
+      "name": "artifacts/sculpt-cold-fixtures-release-20261126/link-0.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-release-20261126/link-0.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "artifacts/sculpt-cold-fixtures-release-20261126/link-1.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-release-20261126/link-1.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "artifacts/sculpt-cold-fixtures-release-20261126/link-2.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-release-20261126/link-2.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "artifacts/sculpt-cold-fixtures-release-20261126/link-3.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-release-20261126/link-3.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "artifacts/sculpt-cold-fixtures-release-20261126/link-4.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-release-20261126/link-4.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "artifacts/sculpt-cold-fixtures-release-20261126/original-ctest-capture.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-release-20261126/original-ctest-capture.log",
+      "bytes": 303366,
+      "sha256": "25fd72d98b72ab45427869af4c6556ba700ef09294df0f6609307a0e4af914c6"
+    },
+    {
+      "name": "artifacts/sculpt-cold-fixtures-release-20261126/original-negatives.json",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-release-20261126/original-negatives.json",
+      "bytes": 980,
+      "sha256": "5454233f83acc496f012ca09077d81d717160d0c6ec29a81a1fe66d033e09d3e"
+    },
+    {
+      "name": "artifacts/sculpt-cold-fixtures-release-20261126/owned_monitor.py",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-release-20261126/owned_monitor.py",
+      "bytes": 4859,
+      "sha256": "b510ef5655e3214bd38e7b5f56022c37a79879070c3733f2dd059bad74f21269"
+    },
+    {
+      "name": "artifacts/sculpt-cold-fixtures-release-20261126/run.py",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-release-20261126/run.py",
+      "bytes": 1941,
+      "sha256": "d550152b0ec2a28ac3222e13320a9f48f9ac6f88910cbb6a34ec4203658019fc"
+    },
+    {
+      "name": "artifacts/sculpt-cold-fixtures-release-20261126/scan-0.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-release-20261126/scan-0.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "artifacts/sculpt-cold-fixtures-release-20261126/scan-1.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-release-20261126/scan-1.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "artifacts/sculpt-cold-fixtures-release-20261126/scan-2.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-release-20261126/scan-2.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "artifacts/sculpt-cold-fixtures-release-20261126/scan-3.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-release-20261126/scan-3.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "artifacts/sculpt-cold-fixtures-release-20261126/scan-4.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-release-20261126/scan-4.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "artifacts/sculpt-cold-fixtures-release-20261126/seal.py",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-release-20261126/seal.py",
+      "bytes": 2545,
+      "sha256": "8ac4ffbcf0bf20f3b48c7f3ee0243b01f79fce7bfcd615c1f85a04c1e081b88f"
+    },
+    {
+      "name": "artifacts/sculpt-cold-fixtures-source-20261126/tests/cut-authoring.cpp",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-source-20261126/tests/cut-authoring.cpp",
+      "bytes": 25618,
+      "sha256": "0de26406ad8dea8bcedeed00341799d01a59f209dfa432c7051844856f6a18db"
+    },
+    {
+      "name": "artifacts/sculpt-cold-fixtures-source-20261126/tests/local-surface-integration.cpp",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-source-20261126/tests/local-surface-integration.cpp",
+      "bytes": 35095,
+      "sha256": "847e91a337ebd8a43de96ad21821e88c8e22b707452b9f547f1c676910738a4b"
+    },
+    {
+      "name": "artifacts/sculpt-cold-fixtures-source-20261126/tests/modal-selection-controls.cpp",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-source-20261126/tests/modal-selection-controls.cpp",
+      "bytes": 3720,
+      "sha256": "48595dea5dee28ed2227c58de4dc47ab8e4611cbe827dc7e4adfc1d4d38fe0c1"
+    },
+    {
+      "name": "artifacts/sculpt-cold-fixtures-source-20261126/tests/object-isolation.cpp",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-source-20261126/tests/object-isolation.cpp",
+      "bytes": 10840,
+      "sha256": "3d3ea56e880972bc6f99745105baae11ebb4b7944666a61562106c34ec658648"
+    },
+    {
+      "name": "artifacts/sculpt-cold-fixtures-source-20261126/tests/object-selection.cpp",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-cold-fixtures-source-20261126/tests/object-selection.cpp",
+      "bytes": 16496,
+      "sha256": "c6ade4039ba41bd26aabe280d9c41f937d605ee2b8d51b47cf35f805b32b6950"
+    }
+  ],
+  "archive": {
+    "file": "sculpt-cold-fixtures-20261126.tar.xz",
+    "bytes": 93820,
+    "sha256": "61e11a146f0c8095ed51527cdc0159af88dd0593a8ecae2b0db5ab35d6e36836",
+    "members": 56
+  }
+}
