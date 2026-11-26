@@ -1700,6 +1700,28 @@ Release and sanitizer applications. Each route saves identical project bytes
 for a given field state.
 [Canonical Bake source evidence](validation/canonical-donor-current-20261126.json)
 
+### Bake from independent writable paint grids
+
+Native and canonical source meshes remain eligible after UV edits that keep
+their writable paint coordinates. Bake maps each source hit through its
+owning paint corners for colour, material and FLOAT emission. Normal fields
+and original texture roles keep their own coordinates. The worker binds the
+exact immutable material snapshot and the paint correspondence to the source
+resolver. This also admits the tested prepared polygon source with separate
+PBR colour and normal domains.
+
+The 64 native and canonical cases pass 619,644 checks. The eight combined
+colour and normal cases and the LDR and HDR app-ready cases pass 346,313
+checks. Maximum sampled rebake normal error is 0.004871 against the existing
+0.035 bound. The cases include current poses and keys, reflected and sheared
+placement, HDR above 7.9, and exact ordered Save, reopen and Undo/Redo. The
+19-test focused Release suite passes.
+Nested DomeD Wayland, software OpenXR and Intel Arc A770 OpenXR with the
+Release application each pass 30 public checks. All three routes save
+identical project bytes for each tested source family.
+The scoped sanitizer build and its Arc replays are still running.
+[Independent writable source evidence](validation/independent-writable-donor-20261126.json)
+
 ## Source and integration boundary
 
 - Main now admits product1bc13125 and public fixturef1e193c7 after complete
