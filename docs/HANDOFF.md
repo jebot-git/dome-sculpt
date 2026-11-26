@@ -1378,6 +1378,19 @@ the earlier plane-cut source. Physical-device acceptance remains open.
 [GPU retirement evidence](validation/steady-gpu-retirement-20261126.json)
 [Projection and combined application evidence](validation/renderer-projection-combined-20261126.json)
 
+### Current selection and isolation regressions
+
+The selection and isolation fixtures now check the working material-aware
+ray query used by ordinary painted editing. The modal fixture samples an
+actual placed sculpt chunk after Cancel, close, focus loss, tracking loss
+or Confirm, then checks that the still-held trigger cannot change the scene.
+The three previous fixtures reproduce their old assumptions on the frozen
+plane-cut build. The updated cases pass 257 checks per Release and ASan/UBSan
+profile. The same application passes 11 synthetic OpenXR checks each on
+software GL and Intel Arc for direct selection, multiselect, translucent
+reference meshes and the rendered hierarchy.
+[Selection fixture evidence](validation/selection-fixtures-20261126.json)
+
 ## Source and integration boundary
 
 - Main now admits product1bc13125 and public fixturef1e193c7 after complete

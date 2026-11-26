@@ -1,0 +1,174 @@
+{
+  "fixtures": "6f7fa6f9721ff3b87997c2baa5efa0d9e451fa53",
+  "main_merge": "cc4c12afb49ea9a5b4f00a4b0ad13e6ad84887f3",
+  "baseline": {
+    "candidate": "fadacc0076aef8f7b2ed8ec5a9a9cfbbbaa8ca17",
+    "results": [
+      {
+        "test": "object-selection",
+        "exit": 1,
+        "expected_failure": "Ordinary editing allocates no selection BVH",
+        "binary_sha256": "c2eb1527e94dcfae6b3ed876630fc04125476e7e8709e094cfa1cc2b8788c445"
+      },
+      {
+        "test": "object-isolation",
+        "exit": 1,
+        "expected_failure": "Ordinary scenes do not allocate an unused object-picking BVH",
+        "binary_sha256": "5991166ef3f103226edeb33cbd1e8e2bec6750677223c47fd86284cdfad13f72"
+      },
+      {
+        "test": "modal-selection-controls",
+        "exit": 1,
+        "expected_failure": "Scene fixture has no sculpt surface",
+        "binary_sha256": "a7eba3d7278cfa0899ce682a0d6c5bd98202f3eb7085f08f82e148a81690de90"
+      }
+    ]
+  },
+  "profiles": {
+    "release": {
+      "native": {
+        "candidate": "6f7fa6f9721ff3b87997c2baa5efa0d9e451fa53",
+        "donor": "c62279e741f9d60eddff95315a1517c2b46b19e4",
+        "invocation": "de883bed056746a7a8757b0ae96263be",
+        "profile": "release",
+        "core_sha256": "de13c985eb74f6b9d6ef6c33ed775a1d49191485534253a5f909469ddbeb7f62",
+        "results": [
+          {
+            "test": "object-selection",
+            "exit": 0,
+            "binary_sha256": "ab5b8f7c8338c0803900d7db783c750a1b0ad4bcfd4dd2b3261da95b5e0b2434",
+            "last": [
+              "PASS Direct touch ignores transparent closer fragments and selects visible underlying geometry",
+              "PASS A controller slightly inside a one-sided surface can still select it by touch",
+              "PASS Replacement clears stale selection identities and presentation overrides",
+              "Object selection checks 155"
+            ]
+          },
+          {
+            "test": "object-isolation",
+            "exit": 0,
+            "binary_sha256": "dc6c55493dd2b5a40499b2ce5b31d8ea0ee91760914c60f46c1ee79c98d24731",
+            "last": [
+              "PASS Injected transition-publication allocation failure restores exact permission binding, selection and committed scene",
+              "PASS Injected transition-publication allocation failure restores exact permission binding, selection and committed scene",
+              "PASS Allocation-failure fixture reaches real transition publications rather than only admission rejection",
+              "Object isolation checks 62"
+            ]
+          },
+          {
+            "test": "modal-selection-controls",
+            "exit": 0,
+            "binary_sha256": "735f1d962866f3b61ea029a82f8109a9a4e0165cabb50cec6cfda5382b4bf6a4",
+            "last": [
+              "PASS Leaving selection with a held trigger still requires a real physical release",
+              "PASS A fresh released-then-pressed trigger rearms ordinary editing after modal shutdown",
+              "PASS Rearmed editing keeps one exact Undo without hidden leaked strokes",
+              "PASS 40 owned modal selection/held-trigger checks"
+            ]
+          }
+        ]
+      },
+      "synthetic_openxr": {
+        "candidate": "6f7fa6f9721ff3b87997c2baa5efa0d9e451fa53",
+        "profile": "release",
+        "terminal": true,
+        "invocation": "623e95251e754ee0ae58bed29da5a9e2",
+        "phase": "complete",
+        "app_sha256": "68895db7beb00e2485167c19896d171560f6a378f7ff660829c26a86f9ac4991",
+        "helper_sha256": "ab5b8f7c8338c0803900d7db783c750a1b0ad4bcfd4dd2b3261da95b5e0b2434",
+        "runtime_sha256": "a509d343406cb8ca044821b06e3cd90d5a1730d6747abfb27a6fa1e4c5487d65",
+        "exit": 0,
+        "checks": 11,
+        "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+        "report_sha256": "b4fb123317c3d80086203f1624706adc8c355f4385cf9ad99bb203085d127062"
+      }
+    },
+    "asan": {
+      "native": {
+        "candidate": "6f7fa6f9721ff3b87997c2baa5efa0d9e451fa53",
+        "donor": "c62279e741f9d60eddff95315a1517c2b46b19e4",
+        "invocation": "34e4a0e616794d03b155c8acb05e94bc",
+        "profile": "asan",
+        "core_sha256": "dc3172d0f3badd3eac13f91dba51710bd35d6d49c5fbcd00cfad608d8a348b48",
+        "results": [
+          {
+            "test": "object-selection",
+            "exit": 0,
+            "binary_sha256": "3744ffa60f8ab616763b8e8e1654861c84ec94f579d141c505edca9a24b093b0",
+            "last": [
+              "PASS Direct touch ignores transparent closer fragments and selects visible underlying geometry",
+              "PASS A controller slightly inside a one-sided surface can still select it by touch",
+              "PASS Replacement clears stale selection identities and presentation overrides",
+              "Object selection checks 155"
+            ]
+          },
+          {
+            "test": "object-isolation",
+            "exit": 0,
+            "binary_sha256": "0f65a8667b98d552f1cdb4ef5d6ba7135090d9998cf182454c128e0da2fd83e2",
+            "last": [
+              "PASS Injected transition-publication allocation failure restores exact permission binding, selection and committed scene",
+              "PASS Injected transition-publication allocation failure restores exact permission binding, selection and committed scene",
+              "PASS Allocation-failure fixture reaches real transition publications rather than only admission rejection",
+              "Object isolation checks 62"
+            ]
+          },
+          {
+            "test": "modal-selection-controls",
+            "exit": 0,
+            "binary_sha256": "1d4c73b50cf7d316ed8d8681fc1df89364f7263508312114cafffaf2b61d5ed3",
+            "last": [
+              "PASS Leaving selection with a held trigger still requires a real physical release",
+              "PASS A fresh released-then-pressed trigger rearms ordinary editing after modal shutdown",
+              "PASS Rearmed editing keeps one exact Undo without hidden leaked strokes",
+              "PASS 40 owned modal selection/held-trigger checks"
+            ]
+          }
+        ]
+      },
+      "synthetic_openxr": {
+        "candidate": "6f7fa6f9721ff3b87997c2baa5efa0d9e451fa53",
+        "profile": "asan",
+        "terminal": true,
+        "invocation": "1d3dba369b9c4bdf9047f8ee5ae963b7",
+        "phase": "complete",
+        "app_sha256": "09a5e5b2eff3a1b2cfbcfa53a862f96ddf82cd2b2a6ab8383d9cc2e63c636698",
+        "helper_sha256": "3744ffa60f8ab616763b8e8e1654861c84ec94f579d141c505edca9a24b093b0",
+        "runtime_sha256": "30f084267eff52f70cf7600f00399a85c79c1f7ef866b3bb05d35f7ec12618ca",
+        "exit": 0,
+        "checks": 11,
+        "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+        "report_sha256": "b4fb123317c3d80086203f1624706adc8c355f4385cf9ad99bb203085d127062"
+      }
+    }
+  },
+  "archive": {
+    "name": "selection-fixtures-20261126.tar.gz",
+    "sha256": "ed67982d4c781b213bc24018214094d5408812261c2a9ea5943823b9a7e2b98f",
+    "members": {
+      "asan/native/modal-selection-controls/run.log": "4649f1e1dcb1a8219fd0fb579fbe2c8d428ce80f19d5b75b1a1c77acbfb5324e",
+      "asan/native/object-isolation/run.log": "ad9af0b16b07b3ecb45098a0e6aba81f645889186138f7148e661906cf2b480f",
+      "asan/native/object-selection/run.log": "7ea3e5210bf5261a2217429cbe47d1d87b89f92ee05c3d0daf38a56538dc05c5",
+      "asan/native/status.json": "835b55554aa3a30940c682ef49766c73454b5952bc20ce9f3dbd42868edf740a",
+      "asan/openxr/status.json": "1896fb3c0e560ced3a22138cc0d796913effec6378582ba17883fa6af751c086",
+      "asan/openxr/xr.log": "ce5edb2b77b784a0501548b1ff8b1e54d2558262dabb6dbca21e5cdbf38da792",
+      "asan/openxr/xr/report.json": "b4fb123317c3d80086203f1624706adc8c355f4385cf9ad99bb203085d127062",
+      "asan/openxr/xr/runtime.json": "f63d2e429317c2e7c71021768a50493741aff11ae54d4f02ffb1b28bc5752a98",
+      "baseline/modal-selection-controls.log": "c15da313487d96df4d4abdb229fb1674ab676664a6c44e99f5c57188e0312d1a",
+      "baseline/object-isolation.log": "3fa32015a306d8df7e6f10e5cddfdb149491ddab5a13e60cd75d87f1abcdbe72",
+      "baseline/object-selection.log": "be966bc516d289a627a53db751a6a4ba20f2d098e2a0730bfde8ac0f90c494fc",
+      "baseline/status.json": "950b0895448d4401e7bc085e7ac144909da2377dbd0f198c143d5855397c2bdb",
+      "native-runner/record.py": "7483f8f6d0b511faf70331112015cf9671ba449ca4b8b1ed7c42343c688ce46c",
+      "native-runner/run.py": "0f35c21ca0210d6dded2fc8881ccbac31f71074a55e414a81a4a399700923af8",
+      "openxr-runner/run.py": "5f1ae470506c5010c815f4610d89086046e9b3f61e212176cca132c73d02c60d",
+      "release/native/modal-selection-controls/run.log": "4649f1e1dcb1a8219fd0fb579fbe2c8d428ce80f19d5b75b1a1c77acbfb5324e",
+      "release/native/object-isolation/run.log": "ad9af0b16b07b3ecb45098a0e6aba81f645889186138f7148e661906cf2b480f",
+      "release/native/object-selection/run.log": "7ea3e5210bf5261a2217429cbe47d1d87b89f92ee05c3d0daf38a56538dc05c5",
+      "release/native/status.json": "2c7e1c610b5a729aa87f54b494791fcf12bf96cd47bcbe88bcc469ca295a4c5b",
+      "release/openxr/status.json": "cdd22ebb8b978d6e8dfc29e42245f79fce26a7c9da3a315208577da4a2fbef0d",
+      "release/openxr/xr.log": "029a8962668bab507c0c468324dacc8b50784ca3f3fef4e5f463750775a76da0",
+      "release/openxr/xr/report.json": "b4fb123317c3d80086203f1624706adc8c355f4385cf9ad99bb203085d127062",
+      "release/openxr/xr/runtime.json": "e3921c122eade21aa9549dceaa1cd94daeeb3980a7ab5344afbfa7e07eee5fca"
+    }
+  }
+}
