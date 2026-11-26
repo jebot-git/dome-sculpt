@@ -1563,7 +1563,9 @@ int main(int argc, char **argv) try {
     return 0;
   }
   if (argc == 4 && std::string(argv[1]) == "--export-project") {
-    export_glb(Scene::load(argv[2]).surfaces(true), argv[3]);
+    Document document;
+    document.replace(Scene::load(argv[2]));
+    document.export_asset(argv[3], AssetExportFormat::Glb).get();
     return 0;
   }
   if (argc == 3 && std::string(argv[1]) == "--export-demo") {
