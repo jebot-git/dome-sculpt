@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "bake-retained-emission.hpp"
 #include "emission-bake-source.hpp"
+#include "dome/deformation.hpp"
 #include <nlohmann/json.hpp>
 #include <iostream>
 namespace {
