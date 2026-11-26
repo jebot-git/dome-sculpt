@@ -69,6 +69,13 @@ projection metric before float conversion. Advanced retained UV and polygon
 normal domains still need their own adapters. Physical headset qualification
 remains open. [Affine artist Bake evidence](validation/affine-artist-bake-20261126.json)
 
+Strict Bake rays now recover source-edge contacts affected by float staging.
+An exact ray hit has priority. A missed ray can use an actual source edge
+within a radius derived from float spacing and inside its original front/back
+segment. The coincident imported VRM1 fixture now covers all 3,969 texels.
+The tests also preserve genuine lateral misses, front/back cutoffs, and
+partial-bake coverage. [Coincident ray evidence](validation/coincident-bake-ray-20261126.json)
+
 Every route through retained project ownership now counts its longest
 descendant path toward the depth limit, including routes that reuse shared
 source history. Saving a cyclic project preserves the existing file.

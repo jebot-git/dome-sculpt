@@ -1599,13 +1599,35 @@ observe both normal roles. Three native matching outputs are byte-identical
 between Release and ASan/UBSan with leak detection. The exact original skin
 test distinguishes centered double evaluation from shifting pre-rounded world
 positions. The focused replay retains exact source ownership and ordered
-Save, reopen, Undo and Redo. On one fixture, strict ray projection of coincident
-edges misses 87 texels. Matching triangles cover all 3,969. The inset ray
-fixture projects all 3,969 through the public controls.
+Save, reopen, Undo and Redo. On the earlier fixture, strict ray projection of
+coincident edges missed 87 texels, while matching triangles covered all 3,969.
+The inset ray fixture projected all 3,969 through the public controls.
 
-Further work includes robust coincident-edge ray coverage, advanced retained
-UV and polygon normal domains, and physical headset verification.
+Advanced retained UV and polygon normal domains and physical headset
+verification remain open.
 [Affine artist Bake and allocation observer evidence](validation/affine-artist-bake-20261126.json)
+
+### Coincident Bake rays
+
+Product `c9929606` first performs the existing exact ray query. For a miss, it
+checks real source edges against the same finite depth segment and a radius
+derived from float spacing at the target before and after recentering. The
+query keeps source corner weights and shares the ordinary triangle work limit.
+Exact hits, AO rays, backface policy, and partial-miss coverage keep their
+existing behavior.
+
+The original imported VRM1 chart had 87 ray misses at texel centers on
+coincident borders. Every observed miss passed within about 0.11 micrometres
+of a source edge. The revised build projects all 3,969 texels, with both normal
+planes matching the corresponding-triangle route to within two byte levels.
+The tests cover actual deeper-hit precedence, a genuine lateral gap, and
+out-of-range front and back endpoints. Release, ASan/UBSan, nested DomeD
+Wayland and software and Intel Arc synthetic OpenXR exercised the fix.
+
+The fresh all-target Release build on frozen `c9929606` is running in
+`ds-coincident-bake-ray-full-release-20261126.service`. Its all-case run waits
+for the existing `ds-native-grid-combined-release-20261126.service` sweep.
+[Coincident ray evidence](validation/coincident-bake-ray-20261126.json)
 
 ## Source and integration boundary
 
