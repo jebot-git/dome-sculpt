@@ -1,0 +1,1798 @@
+{
+  "scope": "Fresh exact e375 combined source plus verified first-avatar framing: targeted Release App/runtime consumers and five actual CPU-only native workflows. Prior ec578 framing synthetic-XR proof stays separate. No new loader, graphical, physical-HMD, installation or session action. Full goal active/incomplete.",
+  "base": "e375b31da113dfa1826de43354fc4fea4933a977",
+  "source_commit": "3fd61ad43f6d5657f4dd7ab2d60aae3b817dc73e",
+  "build": {
+    "terminal": true,
+    "started": 1795670096.6892905,
+    "exit": 0,
+    "seconds": 703.2219524383545,
+    "drift": [],
+    "actual_complete_TUs": 255,
+    "unknown_dependencies": [],
+    "products": {
+      "dome-sculpt": "abc6fb2a13a1b1ba4409e5418ad46bc1e268a7cdbf7984691a9f0d70ce31616b",
+      "dome-sculpt-creator-framing-test": "18cbd666ff4dd405821e722b79ceee26ea905a132c28e50793fb676ca6625670",
+      "dome-sculpt-creator-workspace-test": "33a8c60db2400dc4826278be2f271378c65a066e914e687ba916ec4b83debab8",
+      "libdome-sculpt-creator-workspace-runtime.so": "9cdb293931ec45380946819f5683a2b69c010416fa2f6fc1d0256d16610621b7",
+      "dome-sculpt-xr-fixture-clock-test": "68cd867f6a45ff407034c3ac0aeb18c6b57086c78cafe1bf717c82bd82697ee3",
+      "libdome-sculpt-creator-initial-runtime.so": "149787fee3099af6a950e8a782c68da1c85ad69fed5bdbbbe7c24508d5d08167",
+      "dome-sculpt-creator-initial-verifier": "2c8a3da22bfba5d9763f8d10c35c5de05bbd1544969c990e423d44fac91d24c0",
+      "dome-sculpt-native-paged-ray-test": "b6c47e7224962a1bce9c486e974933d25919d1eef021e3ef329752ad72e992d2",
+      "dome-sculpt-projection-native-test": "59dd7765a778caed3a67d43c3ae5598dbe7651c26e8fadf57457e59a5397ee4b"
+    }
+  },
+  "review_summary": {
+    "terminal": true,
+    "exit": 0,
+    "base_source": "e375b31da113dfa1826de43354fc4fea4933a977",
+    "source_commit": "3fd61ad43f6d5657f4dd7ab2d60aae3b817dc73e",
+    "actual_unique_whole_TU_owners": 255,
+    "normalized_actual_compiler_commands_match_current_profiles": 255,
+    "all_current_dependencies_match_prospective_manifest": true,
+    "core_actual_archive_payloads_checked": 198,
+    "products": {
+      "dome-sculpt": "abc6fb2a13a1b1ba4409e5418ad46bc1e268a7cdbf7984691a9f0d70ce31616b",
+      "dome-sculpt-creator-framing-test": "18cbd666ff4dd405821e722b79ceee26ea905a132c28e50793fb676ca6625670",
+      "dome-sculpt-creator-workspace-test": "33a8c60db2400dc4826278be2f271378c65a066e914e687ba916ec4b83debab8",
+      "libdome-sculpt-creator-workspace-runtime.so": "9cdb293931ec45380946819f5683a2b69c010416fa2f6fc1d0256d16610621b7",
+      "dome-sculpt-xr-fixture-clock-test": "68cd867f6a45ff407034c3ac0aeb18c6b57086c78cafe1bf717c82bd82697ee3",
+      "libdome-sculpt-creator-initial-runtime.so": "149787fee3099af6a950e8a782c68da1c85ad69fed5bdbbbe7c24508d5d08167",
+      "dome-sculpt-creator-initial-verifier": "2c8a3da22bfba5d9763f8d10c35c5de05bbd1544969c990e423d44fac91d24c0",
+      "dome-sculpt-native-paged-ray-test": "b6c47e7224962a1bce9c486e974933d25919d1eef021e3ef329752ad72e992d2",
+      "dome-sculpt-projection-native-test": "59dd7765a778caed3a67d43c3ae5598dbe7651c26e8fadf57457e59a5397ee4b"
+    },
+    "copied_or_fabricated_MDs": false,
+    "scope": "Fresh exact e375 plus first-framing Release build and static proof only; no new graphics/physical headset acceptance"
+  },
+  "native_checks": {
+    "terminal": true,
+    "plan_sha256": "d28b85b3b08ede6840a2a6e5985e5629cfc69270b67d043965a9b36dc90eebf6",
+    "native_paged_checks": 90,
+    "native_projection_checks": 124,
+    "exit": 0,
+    "actual_checks": 53,
+    "existing_workspace_checks": 44,
+    "initial_verifier_self_checks": 19,
+    "canonical_native_before_after_sha256": "9319f4978b2d0753669b312dfdab1593e16fe1d29495db076859060f9fdf31d6",
+    "input_drift": [],
+    "owned_remaining": []
+  },
+  "native_steps": [
+    {
+      "name": "framing",
+      "command": [
+        "/usr/bin/bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/",
+        "/",
+        "--dev",
+        "/dev",
+        "--proc",
+        "/proc",
+        "--tmpfs",
+        "/tmp",
+        "--bind",
+        "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/native-integration-v1",
+        "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/native-integration-v1",
+        "--chdir",
+        "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/native-integration-v1",
+        "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/dome-sculpt-creator-framing-test",
+        "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/native-integration-v1/output"
+      ],
+      "started": 1795670814.3330142,
+      "timeout_seconds": 900,
+      "RSS_limit_bytes": 4294967296,
+      "virtual_AS_cap": null,
+      "pid": 1054517,
+      "start": 84873939,
+      "pgrp": 1054517,
+      "peak_owned_RSS_bytes": 1235496960,
+      "peak_observed_virtual_bytes": 1776889856,
+      "monitor_samples": 2521,
+      "signals": [],
+      "exit": 0,
+      "seconds": 28.894976377487183
+    },
+    {
+      "name": "workspace",
+      "command": [
+        "/usr/bin/bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/",
+        "/",
+        "--dev",
+        "/dev",
+        "--proc",
+        "/proc",
+        "--tmpfs",
+        "/tmp",
+        "--bind",
+        "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/native-integration-v1",
+        "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/native-integration-v1",
+        "--chdir",
+        "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/native-integration-v1",
+        "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/dome-sculpt-creator-workspace-test",
+        "--workspace",
+        "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/native-integration-v1/workspace-output"
+      ],
+      "started": 1795670843.228624,
+      "timeout_seconds": 900,
+      "RSS_limit_bytes": 4294967296,
+      "virtual_AS_cap": null,
+      "pid": 1058208,
+      "start": 84876829,
+      "pgrp": 1058208,
+      "peak_owned_RSS_bytes": 1618169856,
+      "peak_observed_virtual_bytes": 2463502336,
+      "monitor_samples": 820,
+      "signals": [],
+      "exit": 0,
+      "seconds": 9.44901967048645
+    },
+    {
+      "name": "verifier",
+      "command": [
+        "/usr/bin/bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/",
+        "/",
+        "--dev",
+        "/dev",
+        "--proc",
+        "/proc",
+        "--tmpfs",
+        "/tmp",
+        "--bind",
+        "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/native-integration-v1",
+        "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/native-integration-v1",
+        "--chdir",
+        "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/native-integration-v1",
+        "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/dome-sculpt-creator-initial-verifier",
+        "--self-test",
+        "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/native-integration-v1/verifier-output"
+      ],
+      "started": 1795670852.6784115,
+      "timeout_seconds": 900,
+      "RSS_limit_bytes": 4294967296,
+      "virtual_AS_cap": null,
+      "pid": 1059415,
+      "start": 84877774,
+      "pgrp": 1059415,
+      "peak_owned_RSS_bytes": 1317703680,
+      "peak_observed_virtual_bytes": 1463525376,
+      "monitor_samples": 1365,
+      "signals": [],
+      "exit": 0,
+      "seconds": 15.349077701568604
+    },
+    {
+      "name": "paged",
+      "command": [
+        "/usr/bin/bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/",
+        "/",
+        "--dev",
+        "/dev",
+        "--proc",
+        "/proc",
+        "--tmpfs",
+        "/tmp",
+        "--bind",
+        "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/native-integration-v1",
+        "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/native-integration-v1",
+        "--chdir",
+        "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/native-integration-v1",
+        "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/dome-sculpt-native-paged-ray-test"
+      ],
+      "started": 1795670868.0282156,
+      "timeout_seconds": 600,
+      "RSS_limit_bytes": 4294967296,
+      "virtual_AS_cap": null,
+      "pid": 1061377,
+      "start": 84879309,
+      "pgrp": 1061377,
+      "peak_owned_RSS_bytes": 1448423424,
+      "peak_observed_virtual_bytes": 2039185408,
+      "monitor_samples": 1764,
+      "signals": [],
+      "exit": 0,
+      "seconds": 20.261500358581543
+    },
+    {
+      "name": "projection",
+      "command": [
+        "/usr/bin/bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/",
+        "/",
+        "--dev",
+        "/dev",
+        "--proc",
+        "/proc",
+        "--tmpfs",
+        "/tmp",
+        "--bind",
+        "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/native-integration-v1",
+        "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/native-integration-v1",
+        "--chdir",
+        "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/native-integration-v1",
+        "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/dome-sculpt-projection-native-test"
+      ],
+      "started": 1795670888.2904036,
+      "timeout_seconds": 90,
+      "RSS_limit_bytes": 4294967296,
+      "virtual_AS_cap": null,
+      "pid": 1063954,
+      "start": 84881335,
+      "pgrp": 1063954,
+      "peak_owned_RSS_bytes": 45326336,
+      "peak_observed_virtual_bytes": 851177472,
+      "monitor_samples": 28,
+      "signals": [],
+      "exit": 0,
+      "seconds": 0.31032538414001465
+    }
+  ],
+  "members": {
+    "build/build.py": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/build.py",
+      "bytes": 4678,
+      "sha256": "5e7ef29d934ac50a42bcac1faccf1036ab161fd0f9278b728f30d252f91548c3"
+    },
+    "build/audit-build.py": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/audit-build.py",
+      "bytes": 3036,
+      "sha256": "20d7b265be96bfc7ec48d930c167a1af3624846abb7e82c956586cd8ffdd3bc5"
+    },
+    "build/run-native-integration.py": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/run-native-integration.py",
+      "bytes": 7383,
+      "sha256": "82068e60e3e8ef85f163cbba9c93dbcc85ac27873a1c8cf6b3dba286588aff5d"
+    },
+    "build/audit-and-native.py": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/audit-and-native.py",
+      "bytes": 626,
+      "sha256": "ae5377ae163ab73d451a4bec37f02dfba4245f6d201e78f9e98ed0d9b6972aff"
+    },
+    "build/build-before.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/build-before.json",
+      "bytes": 4497783,
+      "sha256": "fce1146b413e9a68eb9219df0dac1326a1cb33f169d4dbaf896f7fa8ea652486"
+    },
+    "build/build-plan.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/build-plan.json",
+      "bytes": 1032,
+      "sha256": "df22515e7b211b9f59defefefb83602c8437a63e41b8d72b78d0ef2c64c9516e"
+    },
+    "build/build-status.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/build-status.json",
+      "bytes": 1177,
+      "sha256": "26cb895026a07939059cd10964167787bea777bc0caf6c1d13fe4145b656a616"
+    },
+    "build/build.log": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/build.log",
+      "bytes": 810153,
+      "sha256": "4ffbfe161be8738e3e159185e642d5c53fabdf0adcbb20a82be7492be53d0643"
+    },
+    "build/generated-rules-prospective.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/generated-rules-prospective.json",
+      "bytes": 1480,
+      "sha256": "370b2283ed18e481a2265565222982928cbcce29d8258d162f9fd57e266b1261"
+    },
+    "build/actual-generated-owners.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/actual-generated-owners.json",
+      "bytes": 1789,
+      "sha256": "8b6f3e0f04dec30ec5ac704a0ba5ade360a5eef5ecda76940335d1978c9ff9b4"
+    },
+    "build/actual-MD-owners.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/actual-MD-owners.json",
+      "bytes": 5357680,
+      "sha256": "ff0f6a3d8af40b81a4db7a1490455d9f9ef3f86d19ff9efd35414da05cb15c47"
+    },
+    "build/source-review.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/source-review.json",
+      "bytes": 427098,
+      "sha256": "90a6349baf8ebfe573dabd4936dc6cd301b997f25b667300aa797b1bc134d078"
+    },
+    "build/compile_commands.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/compile_commands.json",
+      "bytes": 1324731,
+      "sha256": "c5713758bcccccf773990b11ffa2af24bc50ea2c510ee3a66ec33887e70d0a96"
+    },
+    "build/CMakeCache.txt": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeCache.txt",
+      "bytes": 57034,
+      "sha256": "b7921a5cb9d167f77dd2689ba9506f6e12ec854a82bf6107000cbeff506cd8ea"
+    },
+    "build/build.ninja": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/build.ninja",
+      "bytes": 4241934,
+      "sha256": "ac06b7c2e10e3e8b7833c268bdedca9eb5c8087b85873625e60b9c35b32dfa26"
+    },
+    "build/CMakeFiles/rules.ninja": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/rules.ninja",
+      "bytes": 1556862,
+      "sha256": "84bbd3a73f051de693fed87d29542a00440f2a50b31a1c99315f3e5b85a065d4"
+    },
+    "build/audit-build.py.outer.log": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/audit-build.py.outer.log",
+      "bytes": 1484,
+      "sha256": "33060f9d315a97c453b1b24d7edb3e2ca9ee06186c34d0486df902b5786943b9"
+    },
+    "build/run-native-integration.py.outer.log": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/run-native-integration.py.outer.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "terminal/ds-creator-framing-e375-build-20261126.service.terminal.txt": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/ds-creator-framing-e375-build-20261126.service.terminal.txt",
+      "bytes": 77,
+      "sha256": "9493173433b2e966be4eee1cfe611aae24f189faf169649b3521a09d290f9077"
+    },
+    "terminal/ds-creator-framing-e375-build-20261126.service.journal.txt": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/ds-creator-framing-e375-build-20261126.service.journal.txt",
+      "bytes": 17,
+      "sha256": "19c4e28b2f54ea8f217db4e622b0a5c758efa7b77ce2dc0394b6d159568c0b2e"
+    },
+    "terminal/ds-creator-framing-e375-native-20261126.service.terminal.txt": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/ds-creator-framing-e375-native-20261126.service.terminal.txt",
+      "bytes": 77,
+      "sha256": "9493173433b2e966be4eee1cfe611aae24f189faf169649b3521a09d290f9077"
+    },
+    "terminal/ds-creator-framing-e375-native-20261126.service.journal.txt": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/ds-creator-framing-e375-native-20261126.service.journal.txt",
+      "bytes": 17,
+      "sha256": "19c4e28b2f54ea8f217db4e622b0a5c758efa7b77ce2dc0394b6d159568c0b2e"
+    },
+    "actual-current-MDs/dome-sculpt.dir/appmenu-protocol.c.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt.dir/appmenu-protocol.c.o.d",
+      "bytes": 2414,
+      "sha256": "599b6293d0110756e1647bf07605647c599b7d4d7b45900775272a369d509b5c"
+    },
+    "actual-current-MDs/dome-sculpt-creator-workspace-test.dir/tests/creator-workspace.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-creator-workspace-test.dir/tests/creator-workspace.cpp.o.d",
+      "bytes": 23266,
+      "sha256": "a11ab30600f35cb733e67184af62b128204ce327c7528e8c3dbd0456f247c730"
+    },
+    "actual-current-MDs/dome-sculpt-creator-framing-test.dir/tests/creator-framing.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-creator-framing-test.dir/tests/creator-framing.cpp.o.d",
+      "bytes": 21442,
+      "sha256": "1c52130d0cb34e281ce44f2458ff29080da6d299b0a7f1501fcf8df15a5db72b"
+    },
+    "actual-current-MDs/dome-sculpt-creator-initial-verifier.dir/tests/creator-initial-verifier.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-creator-initial-verifier.dir/tests/creator-initial-verifier.cpp.o.d",
+      "bytes": 16131,
+      "sha256": "1cd1caef3e41247f1b9d433f3d7608e74046aa98128e8f8747404a192a8f51de"
+    },
+    "actual-current-MDs/dome-sculpt-projection-native-test.dir/tests/projection-native.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-projection-native-test.dir/tests/projection-native.cpp.o.d",
+      "bytes": 22489,
+      "sha256": "4900788b2578eff422d1f9d585cb7f20ce5081b7686d4eec35f1fc8b496852cb"
+    },
+    "actual-current-MDs/dome-sculpt-native-paged-ray-test.dir/tests/native-paged-ray.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-native-paged-ray-test.dir/tests/native-paged-ray.cpp.o.d",
+      "bytes": 21141,
+      "sha256": "855de60a2b79fd106b051ff37aab58bf2085ca34fb4110d2b94c80044f95a4a7"
+    },
+    "actual-current-MDs/dome-sculpt-xr-fixture-clock-test.dir/tests/xr-fixture-clock.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-xr-fixture-clock-test.dir/tests/xr-fixture-clock.cpp.o.d",
+      "bytes": 8703,
+      "sha256": "7abc9fdbff785876a49674ba8dfeb7fa3571a887bc24524474c90ba119c022b8"
+    },
+    "actual-current-MDs/dome-sculpt.dir/src/native-display-runtime.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt.dir/src/native-display-runtime.cpp.o.d",
+      "bytes": 2697,
+      "sha256": "00f36fd3b0d8065aba7cf7df7e4e77db05efb54c2a7b15730c8517ce116f409a"
+    },
+    "actual-current-MDs/dome-sculpt.dir/src/vrm-expression-editor.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt.dir/src/vrm-expression-editor.cpp.o.d",
+      "bytes": 27650,
+      "sha256": "8e21eec687733bad4bf95b4032e11e1803fde4bfd483779c5341fcf3f52a31cd"
+    },
+    "actual-current-MDs/dome-sculpt.dir/src/rig-fit-editor.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt.dir/src/rig-fit-editor.cpp.o.d",
+      "bytes": 27829,
+      "sha256": "1efe9c150037a785afaa2a5b4d292d19aeadac7b3edf92a8b0fef7d00f3a860b"
+    },
+    "actual-current-MDs/dome-sculpt.dir/src/projection-editor.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt.dir/src/projection-editor.cpp.o.d",
+      "bytes": 28437,
+      "sha256": "d1bbf89b23c194fb53c53a38b39e652e927fce4bbe48978d10d3a62d378c81c4"
+    },
+    "actual-current-MDs/dome-sculpt.dir/src/spacenav-options.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt.dir/src/spacenav-options.cpp.o.d",
+      "bytes": 21236,
+      "sha256": "db967aff249fc0472d114caefbe866e872355075feb13412ffe567a9dfaacfb3"
+    },
+    "actual-current-MDs/dome-sculpt.dir/src/polygon-editor.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt.dir/src/polygon-editor.cpp.o.d",
+      "bytes": 22243,
+      "sha256": "f23f58ec0c84f585966a4ca593bb6f7f3c4dbc52c56e1a814aa5b92d94de0aa8"
+    },
+    "actual-current-MDs/dome-sculpt.dir/src/import-editor.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt.dir/src/import-editor.cpp.o.d",
+      "bytes": 21096,
+      "sha256": "a63edb568f1b555d640efb793f083d9b4eb109d31ff324688b019435019a743c"
+    },
+    "actual-current-MDs/dome-sculpt.dir/src/procedural-editor.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt.dir/src/procedural-editor.cpp.o.d",
+      "bytes": 23028,
+      "sha256": "9af8901ce2fbfc0524c5dccf9dd8c8ed9d2c0670f5cfc7bb310b125e34f4b5f0"
+    },
+    "actual-current-MDs/dome-sculpt.dir/src/resolution-editor.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt.dir/src/resolution-editor.cpp.o.d",
+      "bytes": 23359,
+      "sha256": "94be3bfcd824afcda0b090a7bb8440919c377f07b08c45005df5c5a3e42d858e"
+    },
+    "actual-current-MDs/dome-sculpt.dir/src/sculpt-editor.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt.dir/src/sculpt-editor.cpp.o.d",
+      "bytes": 21554,
+      "sha256": "9978c6cc4d2dd74f399bf3a1891c0d45874a14d7ac5d7dc90a9d2c57a234bdd9"
+    },
+    "actual-current-MDs/dome-sculpt.dir/src/creator-editor.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt.dir/src/creator-editor.cpp.o.d",
+      "bytes": 27941,
+      "sha256": "f61f6565be4b65eb8286f021a5f6516ee4125cfd436029691e100c9dafc53f6b"
+    },
+    "actual-current-MDs/dome-sculpt.dir/src/app.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt.dir/src/app.cpp.o.d",
+      "bytes": 34013,
+      "sha256": "589635ea7233304e12c12a675f63c6b0f74fa2d7c44b57d096e854607bd2142e"
+    },
+    "actual-current-MDs/dome-sculpt.dir/src/rig-editor.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt.dir/src/rig-editor.cpp.o.d",
+      "bytes": 27927,
+      "sha256": "11e5222c4b6eaef6f0f331d52ab5f0c08fc4314e808a0cff240400d1393e0937"
+    },
+    "actual-current-MDs/dome-sculpt.dir/src/weight-editor.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt.dir/src/weight-editor.cpp.o.d",
+      "bytes": 27929,
+      "sha256": "14cdb98073f838790d805c95d140fd734a0638ecbcbf3722a79e40fa631210bd"
+    },
+    "actual-current-MDs/dome-sculpt.dir/src/shapekey-editor.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt.dir/src/shapekey-editor.cpp.o.d",
+      "bytes": 27725,
+      "sha256": "9d3723f632a5f566775f91a3a8254c8eb7f6ca2aacf16e8a12dea0a37230d4b6"
+    },
+    "actual-current-MDs/dome-sculpt.dir/src/skin-editor.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt.dir/src/skin-editor.cpp.o.d",
+      "bytes": 28711,
+      "sha256": "4f146cdcea4cab4ed8be085d57374e983d2a3a18c5ae81b74c50a1bd60488828"
+    },
+    "actual-current-MDs/dome-sculpt.dir/src/mesh-editor.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt.dir/src/mesh-editor.cpp.o.d",
+      "bytes": 27714,
+      "sha256": "c1432e7ccef227fe5ea611558830c21679e460ebd5253a3fbac85b73e1608b63"
+    },
+    "actual-current-MDs/dome-sculpt.dir/src/bake-editor.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt.dir/src/bake-editor.cpp.o.d",
+      "bytes": 28150,
+      "sha256": "e0b64b34810df53c542ff20cdc74fb3596768a7098e8f5e58fcedd17fb10672c"
+    },
+    "actual-current-MDs/dome-sculpt.dir/src/object-editor.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt.dir/src/object-editor.cpp.o.d",
+      "bytes": 28439,
+      "sha256": "45ab021f0c1e8d03274b6d5dbcbeda1a5c4eeb7a786fd28d4e3c42176ad026d9"
+    },
+    "actual-current-MDs/dome-sculpt.dir/src/paint-editor.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt.dir/src/paint-editor.cpp.o.d",
+      "bytes": 27779,
+      "sha256": "0013f318da6df2681b96b47b0bb11aa6c27112455d9f8e36ebdb980236e63f57"
+    },
+    "actual-current-MDs/dome-sculpt.dir/src/texture-set-editor.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt.dir/src/texture-set-editor.cpp.o.d",
+      "bytes": 27890,
+      "sha256": "c388d52ed515ee360d0aed295c063d124f614ccea0b517b432876ef2fcf026af"
+    },
+    "actual-current-MDs/dome-sculpt.dir/src/ui-conventions.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt.dir/src/ui-conventions.cpp.o.d",
+      "bytes": 20528,
+      "sha256": "a53e2acdd0419ab5d7ffdefda1f1bfa77060ba1e0e9f4d5fcae0213647c28d90"
+    },
+    "actual-current-MDs/dome-sculpt.dir/src/uv-editor.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt.dir/src/uv-editor.cpp.o.d",
+      "bytes": 27819,
+      "sha256": "d7a3b10e9fb58dd636233f5f84f5713a4404700b107f0e7fb27dea3680cc0cd0"
+    },
+    "actual-current-MDs/dome-sculpt.dir/src/export-editor.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt.dir/src/export-editor.cpp.o.d",
+      "bytes": 27673,
+      "sha256": "fe2f739ef7f8127971c01717cc726ddf043d49dd4b1fdb9286bb489efd83bd4c"
+    },
+    "actual-current-MDs/dome-sculpt.dir/src/session-appearance.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt.dir/src/session-appearance.cpp.o.d",
+      "bytes": 23605,
+      "sha256": "132f33ded6fcf062ec847fb8e071726c2d6bce11ccc958d8d0a186eb8a97c330"
+    },
+    "actual-current-MDs/dome-sculpt.dir/third_party/desktop/desktop-menu.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt.dir/third_party/desktop/desktop-menu.cpp.o.d",
+      "bytes": 33291,
+      "sha256": "06da527ba3cca9747c915b506862ac7ad9b69793a737b84356889f3f51627b64"
+    },
+    "actual-current-MDs/dome-sculpt-creator-initial-runtime.dir/tests/creator-workspace-runtime.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-creator-initial-runtime.dir/tests/creator-workspace-runtime.cpp.o.d",
+      "bytes": 14923,
+      "sha256": "3743a37ecbba2666f828431e8728827aece402e73d6619cfa7e5e9982e5c7009"
+    },
+    "actual-current-MDs/dome-sculpt-creator-workspace-runtime.dir/tests/creator-workspace-runtime.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-creator-workspace-runtime.dir/tests/creator-workspace-runtime.cpp.o.d",
+      "bytes": 14925,
+      "sha256": "3beed2de762ee8b8229d139c3612c83f9c9b4018466f220f2246fa2cb9075417"
+    },
+    "actual-current-MDs/dome-sculpt-xr.dir/src/xr.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-xr.dir/src/xr.cpp.o.d",
+      "bytes": 21386,
+      "sha256": "f4cf833f4d9fa4d5bc432e058c0e947bb8feb2743132560d4bb56226a480c89a"
+    },
+    "actual-current-MDs/dome-sculpt-render.dir/src/palette.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-render.dir/src/palette.cpp.o.d",
+      "bytes": 20946,
+      "sha256": "c8f5d85d0e4bb997f52980944998f8c3f705fee907bd2a7b24e743343626420f"
+    },
+    "actual-current-MDs/dome-sculpt-render.dir/src/palette-text.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-render.dir/src/palette-text.cpp.o.d",
+      "bytes": 14953,
+      "sha256": "0c0a8c3b5dc941709d4a0f9599a1cbb238fb960511c9cac6147988825fab0dc7"
+    },
+    "actual-current-MDs/dome-sculpt-render.dir/src/polygon-render.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-render.dir/src/polygon-render.cpp.o.d",
+      "bytes": 13944,
+      "sha256": "1dd325a26c952fa1e980af2a7abcdefafc9aadeb1dd08347bbf5e3e189f0d233"
+    },
+    "actual-current-MDs/dome-sculpt-render.dir/src/render.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-render.dir/src/render.cpp.o.d",
+      "bytes": 28649,
+      "sha256": "0d9a2d9705b6a540dc604b98f90c828f2926936c1bb98193a6c6d5773f8734b3"
+    },
+    "actual-current-MDs/dome-sculpt-emission-codec.dir/src/emission-exr.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-emission-codec.dir/src/emission-exr.cpp.o.d",
+      "bytes": 11412,
+      "sha256": "50d66253d1556c1d81d06f6a8789f1f94b5ac574a82b7b35d3daacb727dd7364"
+    },
+    "actual-current-MDs/dome-sculpt-emission-codec.dir/src/emission-exr-owned.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-emission-codec.dir/src/emission-exr-owned.cpp.o.d",
+      "bytes": 9707,
+      "sha256": "efd30033203198ad1c29830c54601a49fff2a1604f888119ee90743e3a5c8d9a"
+    },
+    "actual-current-MDs/dome-sculpt-baked-emission.dir/src/baked-emission.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-baked-emission.dir/src/baked-emission.cpp.o.d",
+      "bytes": 11257,
+      "sha256": "89e1af83ce6f9fcc70f41c777465ec52bcd15f8212387b17e44b1ee61cd601f9"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/creator-tool.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/creator-tool.cpp.o.d",
+      "bytes": 15481,
+      "sha256": "5bcd5c8af88f2254caa45427167f4f4d6507c65a4e6fcc401fb5d9a2d03cc336"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/document-creator.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/document-creator.cpp.o.d",
+      "bytes": 20326,
+      "sha256": "183349d81ecf535a42083bb52407c232809a72bf6af4ca158bcf914f787d6444"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/creator-framing.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/creator-framing.cpp.o.d",
+      "bytes": 20216,
+      "sha256": "c65c6a8b49afe7ec3cab4a2f13e9cac98ff43d3a8488ccac8e0d079df2faeea9"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/source-rest-graph.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/source-rest-graph.cpp.o.d",
+      "bytes": 16617,
+      "sha256": "b8ff04886676bf9970791e937bc770b13053e36c2ca1ab96548a56625fc26d1e"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/source-rest-plan.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/source-rest-plan.cpp.o.d",
+      "bytes": 17383,
+      "sha256": "9ba1e983fb765cfdbc15d8970f49aadacdd25f9b7e9e2a70d1d3e89920c2d1dd"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/source-rest-scene.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/source-rest-scene.cpp.o.d",
+      "bytes": 16295,
+      "sha256": "d12bc40cf119d6a12c090c5f2e22756fdfd3e0dcbf90cf4785304f7971c87b95"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/rig-rest-scene.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/rig-rest-scene.cpp.o.d",
+      "bytes": 17617,
+      "sha256": "2eafaf3645fde7d58c0b38ddec579890fef7f6858de06654563cb678a375a6ad"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/rig-rest.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/rig-rest.cpp.o.d",
+      "bytes": 16033,
+      "sha256": "e44258face305ad58910104358a6c0eb0f45527c830a40579420c45aabb44e37"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/rig-fit.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/rig-fit.cpp.o.d",
+      "bytes": 14939,
+      "sha256": "fa17b0c20dad833efd4b39c112bf215c037faffe5f1a411041f33c1d01609c09"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/rig-fit-tool.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/rig-fit-tool.cpp.o.d",
+      "bytes": 15162,
+      "sha256": "a7b234b4fa336f5f764a4ee923f9a84c61e429a74887908d2449bcdb2649d65b"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/projection-tool.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/projection-tool.cpp.o.d",
+      "bytes": 14410,
+      "sha256": "8b15e7f883e0ad4cb2ebca265287b07f61fed9cf23c3e43b9135d495bac5b056"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/document-rig-fit.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/document-rig-fit.cpp.o.d",
+      "bytes": 21214,
+      "sha256": "3a0b978f8bf5d62cd5daa3bf15a79d049d9a38b2472294b4544f82f806165246"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/document-projection.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/document-projection.cpp.o.d",
+      "bytes": 20222,
+      "sha256": "f2ce1ec65ea4d2a1a0728da98e7ee60da79afe5aa615a461dc4cc78102c6806e"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/volume-raycast.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/volume-raycast.cpp.o.d",
+      "bytes": 13276,
+      "sha256": "0a24656737924f40c00ac736550a3693436b21678038631ea3bd074f700e8f52"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/sculpt-mask.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/sculpt-mask.cpp.o.d",
+      "bytes": 13165,
+      "sha256": "214b4719dbe7a8753669774aad9237f937b16c2f99a5bc1d79a35a2004fb61fc"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/sculpt-resolution.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/sculpt-resolution.cpp.o.d",
+      "bytes": 15617,
+      "sha256": "d4b95c091039576b69a9e75082347d16d6bc2bc7b36661dd1e82f756692539f9"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/volume.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/volume.cpp.o.d",
+      "bytes": 15753,
+      "sha256": "0770682d34f6f18c1133c6e49ff973cefbdd844d56731a93c8a65049a3d4b666"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/procedural-sculpt.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/procedural-sculpt.cpp.o.d",
+      "bytes": 15165,
+      "sha256": "3d5703cfaf2a84c750da278ea9cafe0d36f13143dea89c37703a208714470f66"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/groups.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/groups.cpp.o.d",
+      "bytes": 15951,
+      "sha256": "a8d26f8f9889ccdcc477186157a97583e843357563d8c4a5c1494b5c999177df"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/creation.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/creation.cpp.o.d",
+      "bytes": 16853,
+      "sha256": "c02919fd2bf3730e40fc9dd7cd80b0a610b13db997711a6c1f697f936a1ac155"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/mesh-authoring.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/mesh-authoring.cpp.o.d",
+      "bytes": 15504,
+      "sha256": "6f4c0bb955f4b8f24ea0b02ebbaeedf1d22180dada9eb1477acb21fbd689333c"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/tangents.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/tangents.cpp.o.d",
+      "bytes": 13391,
+      "sha256": "9a37ec0120a66db54a34f793d123c65a66c2f19fa4713a4fec34fbf3a3e2e3fa"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/bake-authoring.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/bake-authoring.cpp.o.d",
+      "bytes": 22156,
+      "sha256": "c0af1c91c5fd6b1bc3f26ceba9bb3f6d1939875e725685f21cc332ce56bcb455"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/scene.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/scene.cpp.o.d",
+      "bytes": 28058,
+      "sha256": "0cadbf9c49ce4eaf5a3d992b02ed611524abd33d6410d86d46331eaec9fa7a9d"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/bake-recipe.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/bake-recipe.cpp.o.d",
+      "bytes": 16046,
+      "sha256": "5d382a69cdf8f223d558b95111e067d8a0ae149a51f77bc4557534e0fc11a25d"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/document-shapes.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/document-shapes.cpp.o.d",
+      "bytes": 20112,
+      "sha256": "7bef871911349b4582dd0e9649988771e25890bda267bf6cf3132bed887819d3"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/document-baking.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/document-baking.cpp.o.d",
+      "bytes": 22249,
+      "sha256": "1dd0ebe1e4959c78e66519e5a5d2a0ea13d45922803ccd554f2812a9968e73fb"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/creator-archive.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/creator-archive.cpp.o.d",
+      "bytes": 16297,
+      "sha256": "8f049169131abdd20a5cc7deb56bbbbc71fcc42c16b84cff82f2b6efcd336dd6"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/projection.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/projection.cpp.o.d",
+      "bytes": 16135,
+      "sha256": "f4a98a0aec6c465159ef272840a0ad74e834a00dfdc7f736c9274f9727024207"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/source-maps.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/source-maps.cpp.o.d",
+      "bytes": 15048,
+      "sha256": "ebc4afcb5ff4cffbcee2d1ea6a8c5c7cb9750f468ac65677142230f3ae34bdf7"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/color-preparation.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/color-preparation.cpp.o.d",
+      "bytes": 20846,
+      "sha256": "79a391dda144ef0cd908d755b23f43f2dd4a128b64b1a2175f9c68660f682c4a"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/paint.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/paint.cpp.o.d",
+      "bytes": 25702,
+      "sha256": "2e33e68548c981f79418ee01548d6c128134bb72af1a680b0432111470769c6c"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/normal-frames.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/normal-frames.cpp.o.d",
+      "bytes": 14717,
+      "sha256": "67ae27b771117fa6e822c3131b713fe713c1b5b01fcc25b72bf18b8af2433aa0"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/normal-bake-frames.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/normal-bake-frames.cpp.o.d",
+      "bytes": 16730,
+      "sha256": "0e762f0784c8979416404892282f41eeff84601cb9a53cbd24b3f45fbf70901a"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/normal-preparation.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/normal-preparation.cpp.o.d",
+      "bytes": 22003,
+      "sha256": "f2123a578a104cdff33b4fd41d8e539f7152fe7e5737f473944f9a3a0d726a57"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/canonical-normal-conversion.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/canonical-normal-conversion.cpp.o.d",
+      "bytes": 17223,
+      "sha256": "0ce96b5233d6b863569e9b3bc86e7ece640d01d8eb90d850fc8ed28895d86dc4"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/material-bindings.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/material-bindings.cpp.o.d",
+      "bytes": 22799,
+      "sha256": "4fa5251931327b98ec2b20115b035935da1d4c0c87f0d2365b8276bc8b657a61"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/canonical-normal-owner.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/canonical-normal-owner.cpp.o.d",
+      "bytes": 16982,
+      "sha256": "0736b2125c83762132f6a1e797ea6ca1a03e5af43daad12ff6e82d1edd751124"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/normal-uv-reprojection.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/normal-uv-reprojection.cpp.o.d",
+      "bytes": 20399,
+      "sha256": "081de34a7c2086ecaf927978defbf3e68bd15ca8e8f6e46ae4ebff5936ed4dd2"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/shapekey-authoring.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/shapekey-authoring.cpp.o.d",
+      "bytes": 19348,
+      "sha256": "b7a402e3f24c1c1347920e31de6cc590c0b0f6534ef31bd19405425cecc80b94"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/shapekey-normal-preparation.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/shapekey-normal-preparation.cpp.o.d",
+      "bytes": 19050,
+      "sha256": "4b4f79f8d69d793d4eaddcd340822e259e7d35e0e996b36caee4316350911666"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/mesh.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/mesh.cpp.o.d",
+      "bytes": 13367,
+      "sha256": "65b81c89bc94bd19327eaf024b6dbbead2581c70e5f09d11eca287dd878aa649"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/atlas.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/atlas.cpp.o.d",
+      "bytes": 13610,
+      "sha256": "366f0e7840fb59c4793670a15b034d4edefe9de5be698a59c8ef980382ddf710"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/uv.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/uv.cpp.o.d",
+      "bytes": 13689,
+      "sha256": "c52badfb89cfb79dc24f6c0a0fc2f15b8251f80680f690ff8e195dc0d2d873d1"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/source-uv-bake.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/source-uv-bake.cpp.o.d",
+      "bytes": 22195,
+      "sha256": "f1c7dada2ccaaed32e14490655e6fad485ea73ad51bac8c33e39ab8e0fe5bc90"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/source-morph.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/source-morph.cpp.o.d",
+      "bytes": 15155,
+      "sha256": "d9ea00a92b795710151b00fda3e6a44655a08a19626aeee3871eda24bcfd3571"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/vrm.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/vrm.cpp.o.d",
+      "bytes": 22151,
+      "sha256": "54c5347ae5f2dc8efa4cce5c903fcb3daaad3f46f0409de28c6983812d37ed1e"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/input.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/input.cpp.o.d",
+      "bytes": 13829,
+      "sha256": "98fc3d6244d07d975b690cfbe19a1d7e7deba1d1f954d13c30e8201ba0c96cf8"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/export.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/export.cpp.o.d",
+      "bytes": 25585,
+      "sha256": "bb7ace39f515465bda8c3d2a769fd08762383f01150ed0769edb796f28f1e9c2"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/document-interaction.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/document-interaction.cpp.o.d",
+      "bytes": 22257,
+      "sha256": "ac0844e204cb8b147f0400e20dd2a4398453eac7f94b8e29c7e2f4252833fc00"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/document-uv-solve.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/document-uv-solve.cpp.o.d",
+      "bytes": 24419,
+      "sha256": "7e5a17928fe882cb14d18c71164d697ca4e50154a08084504ece5b00f5da0fd6"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/document-recovery.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/document-recovery.cpp.o.d",
+      "bytes": 20001,
+      "sha256": "9b0d8d61d80469bb4451a1bd00384b180dc57a97db8249b1589b8d9692ebbff4"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/document-assets.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/document-assets.cpp.o.d",
+      "bytes": 23282,
+      "sha256": "d47ea14caabb068323b607e82239d97b9b41666b8eb91bf7f2524aa250eb782f"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/document.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/document.cpp.o.d",
+      "bytes": 32856,
+      "sha256": "f2ab22100a514dbcfb57ff943a0121e13193f5b96b8cc7df7c6054a82eb7933c"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/recovery.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/recovery.cpp.o.d",
+      "bytes": 17491,
+      "sha256": "effd37dbbfb52d5a68277eb278eb6540bcd5e2da0ad9df469f4316329a70f8c4"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/rig.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/rig.cpp.o.d",
+      "bytes": 16448,
+      "sha256": "6593376cf18e0a38c6282fa699d232c9b9e5cc16e9eb2e9edad277ae5d74c47d"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/humanoid-creator.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/humanoid-creator.cpp.o.d",
+      "bytes": 15378,
+      "sha256": "0443ceece9f95ce24c1248657221026f406ef16cc67c5abbf198c92e8b4899ba"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/avatar.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/avatar.cpp.o.d",
+      "bytes": 14941,
+      "sha256": "4701838c43adc2e5c312cc646a42de51225382029b41f511ec69257e0b16487e"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/creator-vrm.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/creator-vrm.cpp.o.d",
+      "bytes": 16713,
+      "sha256": "3c91503d99c836cb9f222d4821fead6cbb85e5e881e040772a067728807034f3"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/vroid-groom.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/vroid-groom.cpp.o.d",
+      "bytes": 14594,
+      "sha256": "34300797b5aec2ebed7faa305043d87042ea91b376356755f20e6d84bc53214d"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/vroid-creator.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/vroid-creator.cpp.o.d",
+      "bytes": 17419,
+      "sha256": "574b334f480da431391f6cee22153d7be48de858e2dea2c9ab348eb0a8e09a7c"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/deformation.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/deformation.cpp.o.d",
+      "bytes": 14841,
+      "sha256": "51b613141eb3b0f7354ecdaa5571f2bdb8ecebd69ae083a5f0ec8e15e17db9c2"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/weight-edit.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/weight-edit.cpp.o.d",
+      "bytes": 13490,
+      "sha256": "a05ea36eaa9309ad02bf7064bd0a2ddb920ccd9957d138d4d593c8d7b377407b"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/rig-edit.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/rig-edit.cpp.o.d",
+      "bytes": 21413,
+      "sha256": "1fe35585165874801e3717b876caa9a9ebf208cc532cc8d6ba19c6ffa097aea0"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/weight-authoring.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/weight-authoring.cpp.o.d",
+      "bytes": 16180,
+      "sha256": "73e3f2be93679bf59bd6eba84ca9f93a47e6dca6e655bebbfa65028f6196d845"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/skin-authoring.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/skin-authoring.cpp.o.d",
+      "bytes": 18856,
+      "sha256": "fd5241ab0a7c3900a9ee6beb563030c1e67fa5993efac571f162e2691a713e85"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/document-skin.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/document-skin.cpp.o.d",
+      "bytes": 21559,
+      "sha256": "9b697dfa76e01873e79359d6a3f78421fef684f8630093850a0e66561aee6ac7"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/material-visibility.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/material-visibility.cpp.o.d",
+      "bytes": 25337,
+      "sha256": "a0c3d352fca42c4f7a592d6ab356ca8f3442c951af76d68278165e639ffd0c6a"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/uv-solve.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/uv-solve.cpp.o.d",
+      "bytes": 13599,
+      "sha256": "98d536a983ca7323bce0d68910914e9ce9dc16ba77475dce132c9ba6b61cc35b"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/bone-metadata.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/bone-metadata.cpp.o.d",
+      "bytes": 14589,
+      "sha256": "a3c7453a2219d6b0d221cd199948efd6f6742f0108d20b5f3b45870acc82fb26"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/source-node-extras.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/source-node-extras.cpp.o.d",
+      "bytes": 14607,
+      "sha256": "692deb357815c0704426cb97dbf5c4669f64bb7d92327afbbbf1815c769ffa05"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/source-decoded-images.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/source-decoded-images.cpp.o.d",
+      "bytes": 14074,
+      "sha256": "1fe567699fc1f2d5da7ab36e0eb7879ecdc889553be66091f85375387369abe3"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/import.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/import.cpp.o.d",
+      "bytes": 17089,
+      "sha256": "f6e0f3457d04541e92da036220bbc3010efbb8dd3775b6d58160dcf48c373c7e"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/vrm-import.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/vrm-import.cpp.o.d",
+      "bytes": 17338,
+      "sha256": "f38a6ade2538bea3336e782c5f05368ba56183b5b1710c711caaa024a0b34461"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/import-authoring.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/import-authoring.cpp.o.d",
+      "bytes": 21005,
+      "sha256": "9f285f9131cce62ab41ada78c8a501fea66944f0b961a32c5a5ed4dde91d67b0"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/vrm-source-graph.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/vrm-source-graph.cpp.o.d",
+      "bytes": 18357,
+      "sha256": "27695efd9dec8a737be4c0dd9a89d91a6b5cae342aca13d2b2233ee99ddbcea7"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/vrm-rest-metadata.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/vrm-rest-metadata.cpp.o.d",
+      "bytes": 16832,
+      "sha256": "538f026da5fd9ceaf65011bac291db295f87e81bf6b9e99be4ed085f55750ec7"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/vrm1-metadata.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/vrm1-metadata.cpp.o.d",
+      "bytes": 14697,
+      "sha256": "6a568711f73488f2045c64bbedc6381835de7babff0ddd1a734718f1e81c168b"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/vrm1-authoring.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/vrm1-authoring.cpp.o.d",
+      "bytes": 21632,
+      "sha256": "b373bc4fcf1365e379335439476a97277b6000cd644dcd4d0c102d6ecb8cffbd"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/vrm1-painted-material.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/vrm1-painted-material.cpp.o.d",
+      "bytes": 17426,
+      "sha256": "c9392f01587bb9f026f1cfd4cb43201eb0077d1d0b9c6a036e43944ec3f4816a"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/vrm1-export.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/vrm1-export.cpp.o.d",
+      "bytes": 23908,
+      "sha256": "0410729569f49153abf82e52fad52ff0e84147e7b646a99132f832179c536d82"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/vrm-expression.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/vrm-expression.cpp.o.d",
+      "bytes": 16046,
+      "sha256": "5894e99ad97824c9b8622b28eafa8f0e5d725f68efedd15221467ec044f8d5e0"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/vrm1-expression-layer.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/vrm1-expression-layer.cpp.o.d",
+      "bytes": 21658,
+      "sha256": "e93bb3c6e265c2852c468706bb9312d612b642ca0e645cf1938a5a6a86595d16"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/vrm-expression-scene.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/vrm-expression-scene.cpp.o.d",
+      "bytes": 18574,
+      "sha256": "95c1f8f58a15d466258e27d5ecb9313e80c6d81ade5f6e62e8b1cfc9c9704f3b"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/document-expressions.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/document-expressions.cpp.o.d",
+      "bytes": 20007,
+      "sha256": "dd61f52c87cdc65a589c080910c1f726b3cc2d7573abfa88972523d8184e08be"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/source-rigid-pose.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/source-rigid-pose.cpp.o.d",
+      "bytes": 16173,
+      "sha256": "3905c677cc35c97a21b834fd819ea78b31db7d5c1834705b5e7667735adfde8c"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/import-options.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/import-options.cpp.o.d",
+      "bytes": 13644,
+      "sha256": "095ece331fb1c5f05f46b7907c71e69e4f1c9fc05706adeb0dd1dd5debb7ad3e"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/import-browser.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/import-browser.cpp.o.d",
+      "bytes": 11633,
+      "sha256": "db44b5d83011bcf7b87711f6c4afe938768f75e3a011a25d1037b83d030e6b54"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/import-image.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/import-image.cpp.o.d",
+      "bytes": 14506,
+      "sha256": "14c8e469aa6677f1ba905db1c77a451408bb947166d26f9cfadfee05982a446b"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/import-jpeg.c.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/import-jpeg.c.o.d",
+      "bytes": 2678,
+      "sha256": "15d94076bbfe7b07977f501ed04c80171f678bde5b3f5d26ba9e9a501af45702"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/document-import.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/document-import.cpp.o.d",
+      "bytes": 20099,
+      "sha256": "5d25d6124fd55537f9621a28a1c41a975ac14b249637c621c4304f30358c09ff"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/import-source.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/import-source.cpp.o.d",
+      "bytes": 15700,
+      "sha256": "8ce18ac75b50a632d87dccce831370a66407d354a111ea99a6a5ec7a24b85421"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/mesh-processing.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/mesh-processing.cpp.o.d",
+      "bytes": 13849,
+      "sha256": "383eb80c58d8102192fbbe9bcd4b9873c4b1df642f1bbb6c4f9973e17255ef8c"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/import-native.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/import-native.cpp.o.d",
+      "bytes": 15320,
+      "sha256": "73076ddd28647da55362f0dfa9e9afd08752878a36b9fa7dc34e4a27f2bb9db5"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/remesh.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/remesh.cpp.o.d",
+      "bytes": 13713,
+      "sha256": "eafd894ccb0911b1ab2d8338115ef2a8ae4eb249741c2e985070a6bdc356881f"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/bake.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/bake.cpp.o.d",
+      "bytes": 20381,
+      "sha256": "ce08141796ed28ad23b2a99939404cbbd48ff37f703a01b8311334ad4bd7cffb"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/retopo.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/retopo.cpp.o.d",
+      "bytes": 14694,
+      "sha256": "033f8e26bed64c82082382874a79184358c83d578474899cc441c579f117c9bd"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/paint-sampling.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/paint-sampling.cpp.o.d",
+      "bytes": 13395,
+      "sha256": "9e890d01d2add623d7d503df96b732e43630a8329ab03431858230d33dd873ec"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/mtoon.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/mtoon.cpp.o.d",
+      "bytes": 13800,
+      "sha256": "4342493695d040d4d9baa8777f835d5926c49f5e5ec4d0dd0dd3e2c2f97b2175"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/paint-sampling-archive.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/paint-sampling-archive.cpp.o.d",
+      "bytes": 14404,
+      "sha256": "a73033c515ff1972e888c82844c0873adda8aa4281171e85885b807d1c23aded"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/color-paint-sampling.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/color-paint-sampling.cpp.o.d",
+      "bytes": 19285,
+      "sha256": "1a64f99a0986d72d7d30d8584d5e509d6cc1e355c8f7df6737ab286411bc5c30"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/native-paint-sampling.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/native-paint-sampling.cpp.o.d",
+      "bytes": 20194,
+      "sha256": "9770a3b7cdf116111333c0b8a10828f2e1c5dcea9f14036776f23963f4813916"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/native-paint-frame-source.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/native-paint-frame-source.cpp.o.d",
+      "bytes": 18244,
+      "sha256": "836bed854f702d5f890c369f62ee91b47e8244d921084af72008b58a068635ab"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/native-paint-metadata.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/native-paint-metadata.cpp.o.d",
+      "bytes": 17565,
+      "sha256": "47acd3b2ed11855589b889edfd2c52d737624d6287737b4d2cede5c510cb924f"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/color-uv-reprojection.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/color-uv-reprojection.cpp.o.d",
+      "bytes": 19508,
+      "sha256": "dd38087b8240bddcf2a3536d522ed018bb173a6dbf83ef0066c5bd62446c9655"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/normal-sampling.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/normal-sampling.cpp.o.d",
+      "bytes": 14952,
+      "sha256": "e121c1e27730bf62aacbd0e73777d53cb0b7ad17a5c190af72b484de5c06f62f"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/normal-preview.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/normal-preview.cpp.o.d",
+      "bytes": 19511,
+      "sha256": "925a87367b7e776975b8be6a81f25739c6fd12c890e3dc42ee4a726dddf1a6ec"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/normal-sampling-replay.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/normal-sampling-replay.cpp.o.d",
+      "bytes": 20522,
+      "sha256": "5bc9d6c8f3927b62153050ed71e5bf3c947167a34d4de62cd5690a0f7a1cc866"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/normal-sampling-surface.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/normal-sampling-surface.cpp.o.d",
+      "bytes": 19070,
+      "sha256": "cb22b425c2de4fca4872bcd85ff2718af1e2970a0c47d8fefd11f174e6ea552a"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/polygon-color-uv.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/polygon-color-uv.cpp.o.d",
+      "bytes": 17650,
+      "sha256": "00f943f71e98e3d6b058863f23c4132737073571f19ed9a1cf9d09529b4cfdf4"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/shapekey-attributes.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/shapekey-attributes.cpp.o.d",
+      "bytes": 15395,
+      "sha256": "b0f1287d10d04e588cd834e9b056c8e7651ef2b74d9cf50d73edaf16822eb6cd"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/corner-key-expansion.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/corner-key-expansion.cpp.o.d",
+      "bytes": 13298,
+      "sha256": "07614cecd45346ffa87cf1169579d9912b2f458492e5796fb0ba92b8a8e1dafd"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/frame-position-domain.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/frame-position-domain.cpp.o.d",
+      "bytes": 16180,
+      "sha256": "b2b1b9854300246d111e84cef9854e0d343eb66f184603e1dcb59204d9986294"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/key-frame-archive.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/key-frame-archive.cpp.o.d",
+      "bytes": 15174,
+      "sha256": "758b65785e41d89c81dd8d0ae82936368653bf3099abf69a4c4a4e97e638892c"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/key-derivation-codec.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/key-derivation-codec.cpp.o.d",
+      "bytes": 17667,
+      "sha256": "79909ee644e7664101dd5aea43b49c3db64bc224ebdea50b7d7799d5c41770ba"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/key-archive-preflight.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/key-archive-preflight.cpp.o.d",
+      "bytes": 18603,
+      "sha256": "ac25446e8a77e08957f99c5102595e8438acc779dd7bae1194e6d05a20970ce7"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/normal-key-derivation.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/normal-key-derivation.cpp.o.d",
+      "bytes": 21426,
+      "sha256": "9ef0b7a729bde30f7bf2207aaee51138d768eb36d9153ba482c3bda4960eb719"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/key-mirror-correspondence.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/key-mirror-correspondence.cpp.o.d",
+      "bytes": 13428,
+      "sha256": "fb79e14760878d73baa82358adff31d34031aaf24481e27a69f2ee2ca8d9eaf3"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/backend_cpu.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/backend_cpu.cpp.o.d",
+      "bytes": 8991,
+      "sha256": "3f4ae829694a701d776490e0d3c51f667c8f404a64c611489f5405148b8eaf23"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/key-mirror-relative.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/key-mirror-relative.cpp.o.d",
+      "bytes": 13528,
+      "sha256": "2602daed9114716328da2d12448b81c6a4126c4ecc04d76a7fcbbe28878a5591"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/sparse-resample-cpu.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/sparse-resample-cpu.cpp.o.d",
+      "bytes": 11610,
+      "sha256": "0932ab7a1ade8d3115dc04bab488dd949809a7805d85cc7685a9f820a618cd71"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/document-paint-blur.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/document-paint-blur.cpp.o.d",
+      "bytes": 20114,
+      "sha256": "4f93a0093635921ece7128326d23b0efc2e99b2c46a5fd03bfa7406c4b94ea6c"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/retopo-authoring.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/retopo-authoring.cpp.o.d",
+      "bytes": 15172,
+      "sha256": "56cc6be6b8fbe7bf57824600d92d8fbc4eb7c5d0ee227b2cdcd8e50d7f76ed7a"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/emission-bake-source.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/emission-bake-source.cpp.o.d",
+      "bytes": 22791,
+      "sha256": "48b83a451ecb40f1ee283e41b35bafdc5bddad5e65e121bb1e79a072952eb96d"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/document-sculpt.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/document-sculpt.cpp.o.d",
+      "bytes": 19999,
+      "sha256": "d1eea7ed9f42da0315ce0ef3c53858fbf7927ba394c53cde6d1739caa7cbb04e"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/document-retopo.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/document-retopo.cpp.o.d",
+      "bytes": 19998,
+      "sha256": "e229ef07ee7f1dc62273e5645823b649d1c346551e651f63f50ed27eccc31c9b"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/document-contact.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/document-contact.cpp.o.d",
+      "bytes": 20790,
+      "sha256": "d395508ec735d23e3cb88f9b1716fd30909745b0665ecd78c3419d85b99bb7f7"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/document-transaction.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/document-transaction.cpp.o.d",
+      "bytes": 20007,
+      "sha256": "1a2355a8d7817ea74bededbcf2fbf68df00feda82593a4127db3e368af45052e"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/document-native.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/document-native.cpp.o.d",
+      "bytes": 26064,
+      "sha256": "7a07d9088f331612008c2b13f4f5dcf558c4e42b5d65c2aebf2bfedefea2c7a3"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/texture-sets.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/texture-sets.cpp.o.d",
+      "bytes": 17869,
+      "sha256": "6b1858035ca210bffce241ace34fd1ebfa747d849dca73d6e02f9fe2baa9a04e"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/texture-set-graph.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/texture-set-graph.cpp.o.d",
+      "bytes": 19522,
+      "sha256": "0b3b53fb79517a50389b2678ffcc4c5808ea090f43df8b17b63caef22daf302c"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/texture-set-surface.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/texture-set-surface.cpp.o.d",
+      "bytes": 15420,
+      "sha256": "57dfcf25f076640e63bbe98ef63469902f17c7800815feb954f2dafe2986affb"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/texture-set-range.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/texture-set-range.cpp.o.d",
+      "bytes": 23039,
+      "sha256": "4c10dc28c90ace6f1416920e10f55e27f7bdd0488ff1bb5076ff62f5740705fb"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/texture-set-archive.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/texture-set-archive.cpp.o.d",
+      "bytes": 17312,
+      "sha256": "8955772ba1ebbbaea618196f64e84af7633bff2889bcc30e4c8237fa3a8d6b2b"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/texture-set-packed.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/texture-set-packed.cpp.o.d",
+      "bytes": 17780,
+      "sha256": "fd9dd3468b183ec63f78777c096c0176794d48fb3d4450d148fa4317c0a6de13"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/texture-set-resample.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/texture-set-resample.cpp.o.d",
+      "bytes": 16103,
+      "sha256": "c24b51da59475e3d1a0ac9a2a425599ad68c568f5b9a656a5c379beb585978db"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/texture-set-worker.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/texture-set-worker.cpp.o.d",
+      "bytes": 23146,
+      "sha256": "f02f04facd4ee6769f65c99189f41bc3ec280a77bc6ea90bc9d5a1b7b86fab35"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/texture-set-stroke.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/texture-set-stroke.cpp.o.d",
+      "bytes": 15761,
+      "sha256": "121de55d85ab257e553e997a27987985f62bfc4d676b9c5dee1693aede5df750"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/document-texture-sets.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/document-texture-sets.cpp.o.d",
+      "bytes": 22716,
+      "sha256": "5395ac45a2a322b307960858181ac8439437f8a21187ad0a78c2f328a8353dc1"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/texture-set-export.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/texture-set-export.cpp.o.d",
+      "bytes": 19134,
+      "sha256": "c210d86a2f0d3a2997cfc2bab36471f40bfb884ff4c1ba9eac9d734bf7fe10be"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/texture-set-field-source.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/texture-set-field-source.cpp.o.d",
+      "bytes": 17576,
+      "sha256": "01218ee09201bdf69ef6dec7471c7b8cf3736193362a4185b63c55633ef02f38"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/texture-set-portable-field.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/texture-set-portable-field.cpp.o.d",
+      "bytes": 18710,
+      "sha256": "64d36b0a7d58ceeac217be209b3cfc3db696b9ef3726ce0693c2e8114b65755f"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/texture-set-field-codec.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/texture-set-field-codec.cpp.o.d",
+      "bytes": 19168,
+      "sha256": "72d914d49a9ff09cefac8e59ff36e3cbcf7dc23367fddc8e0eacb2702576ba64"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/cut-authoring.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/cut-authoring.cpp.o.d",
+      "bytes": 15493,
+      "sha256": "357a34d8d3bead020c97ac5ca15e3001950e52978e7d40568538bcb397da52dd"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/document-cut.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/document-cut.cpp.o.d",
+      "bytes": 21328,
+      "sha256": "91d5599fc02b091c94794e1fd2923486a00473a3232bb87a51b55ed44d763652"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/cut-color.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/cut-color.cpp.o.d",
+      "bytes": 18990,
+      "sha256": "05b3f6a06cd04b95af244d4e4c47e8816be76c0e8f61a275a857ea907fa3234f"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/document-worker-errors.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/document-worker-errors.cpp.o.d",
+      "bytes": 20114,
+      "sha256": "fa264311f7c89830b7ae2a37e70d26b81b08986de0e6ddf04ccd8a333b61004e"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/source-sampling-transport.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/source-sampling-transport.cpp.o.d",
+      "bytes": 13426,
+      "sha256": "221991ccf4f98a8e656d43f1ccf4edb22cc9b90755722743a21a0420ce9fba0a"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/object-selection.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/object-selection.cpp.o.d",
+      "bytes": 21338,
+      "sha256": "dde072394a36d386c0be5d19d11727bd03e5e27df25bd2830681cd91681f9085"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/source-placement.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/source-placement.cpp.o.d",
+      "bytes": 15617,
+      "sha256": "1dac38f8735c22075b02c0118c54ebdfb17759673f0d1e85aa035916c79ba410"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/source-placement-archive.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/source-placement-archive.cpp.o.d",
+      "bytes": 16637,
+      "sha256": "f9061d8868780e9ea0134d0d98b405b5e03386b9a07e53091f6903553903267c"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/polygon-authoring.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/polygon-authoring.cpp.o.d",
+      "bytes": 14073,
+      "sha256": "fac3a8e18b05e8e8a5f89997b0cf8006c3828a0cd949eba612e91e1605a00ddb"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/polygon-source.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/polygon-source.cpp.o.d",
+      "bytes": 15715,
+      "sha256": "193c13d123fb4adbd694208deada5675c9e055bd8ea73268494ce42a4bcda36a"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/polygon-color-source.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/polygon-color-source.cpp.o.d",
+      "bytes": 16061,
+      "sha256": "9eb256b1cc15b7ba6c8008057efe6bdbee3788c51831541e9f3f7fc0261549a1"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/polygon-color-archive.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/polygon-color-archive.cpp.o.d",
+      "bytes": 14729,
+      "sha256": "ab48c8c48f9c477e7f275f8d0800c35040d4325ad31578a072b397f2bb8dc476"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/polygon-conversion.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/polygon-conversion.cpp.o.d",
+      "bytes": 18114,
+      "sha256": "36c5794357b2a544289b152aea7fcd59444c930562c6286ffaead5fd3a0bd911"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/polygon-scene.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/polygon-scene.cpp.o.d",
+      "bytes": 23596,
+      "sha256": "6c3c04975f2ccd502837bda651ee4453692f72cd6c6915b26a45dcd59d78aeda"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/document-polygon.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/document-polygon.cpp.o.d",
+      "bytes": 21814,
+      "sha256": "ed8abd8ebd8e6b1266b43fa78fdd98228656aa454899cd2b58266a59d7416752"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/polygon-surface-transfer.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/polygon-surface-transfer.cpp.o.d",
+      "bytes": 15198,
+      "sha256": "20945eb150d9cf11feb23fceb4b5e9594340a2f32e1a45450a434a1904212f8e"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/polygon-surface-codec.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/polygon-surface-codec.cpp.o.d",
+      "bytes": 16996,
+      "sha256": "4c095acca6f7329aba2d8ca1f8bbd389fb9ff7388d76442775dddaedba509469"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/polygon-surface-owner.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/polygon-surface-owner.cpp.o.d",
+      "bytes": 20980,
+      "sha256": "4442300c5b0f246c590322245fc78e9507defcbeb0e8650b8551254e5b8728f4"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/polygon-surface-preview.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/polygon-surface-preview.cpp.o.d",
+      "bytes": 19157,
+      "sha256": "8cc6dd8d09b04fe06b8287ee8967e22e501ddc4a465bdf3bfb44dd273d138a0c"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/polygon-surface-paint.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/polygon-surface-paint.cpp.o.d",
+      "bytes": 17448,
+      "sha256": "ca3ebde5f1acc19969274990a9658144a3eca0d8f34bd1db2276f024638a7280"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/polygon-surface-archive.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/polygon-surface-archive.cpp.o.d",
+      "bytes": 19617,
+      "sha256": "144d65d02e6812f535f1a74fc0dc7617464967d0813cbb6342de8b05a2dc6e07"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/scene-file.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/scene-file.cpp.o.d",
+      "bytes": 16591,
+      "sha256": "68f0b98253177fe63d1e4a7ee4b4660a73102087cd429e43ee0e706647fd3b2c"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/native-scene-append.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/native-scene-append.cpp.o.d",
+      "bytes": 17434,
+      "sha256": "4bd37d530c6fdb72de38225c90f99578d690c8beb6e5d3a21988b844953960de"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/native-authoring.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/native-authoring.cpp.o.d",
+      "bytes": 18579,
+      "sha256": "3835889bf9a93b4aac4eb67ba5d721ff4e802973f74a4a5af605c1870bd8dd2c"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/emission-package.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/emission-package.cpp.o.d",
+      "bytes": 23831,
+      "sha256": "3bbd3f9349c7fa8b35794a28bd60945d4b7ec72f6dfb240ea41814261bcc2a69"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/native-authoring-compiler.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/native-authoring-compiler.cpp.o.d",
+      "bytes": 23960,
+      "sha256": "2c9061c5fb6699fdbc3ab371a7f4ba9970e8d8f4e38a5d483336899db7a2888c"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/local-surface.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/local-surface.cpp.o.d",
+      "bytes": 13678,
+      "sha256": "6500a79b2de7869e7eee07858c2dbe73055259e5b761548fafb68acfa957fe74"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/emission-export.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/emission-export.cpp.o.d",
+      "bytes": 23273,
+      "sha256": "7c44ed010aacaaba2905c25742003cfe1dd498f5ef8331eaf7a563e57b644243"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/sculpt-storage.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/sculpt-storage.cpp.o.d",
+      "bytes": 9311,
+      "sha256": "2f384945805aec62c505f2431133e531d702df9f6433a9cbca811b5b7a9b2596"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/volume-geometry.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/volume-geometry.cpp.o.d",
+      "bytes": 13069,
+      "sha256": "b623ea03b0ce3e7734023ac48e0ea53c555e7fff0255fc1a41edfcca3fa68bc4"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/ray-index.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/ray-index.cpp.o.d",
+      "bytes": 13402,
+      "sha256": "e230b545efc123c5626043e1a7d19feb4b7ce38b611b45776a05b5884b8235fa"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/sculpt-scene-chunks.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/sculpt-scene-chunks.cpp.o.d",
+      "bytes": 16656,
+      "sha256": "da79936f5bec93f0432cf8d71008138cb5fd8987d1a2dc356defb7897dcb2cf9"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/sculpt-placed-chunk.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/sculpt-placed-chunk.cpp.o.d",
+      "bytes": 16208,
+      "sha256": "5cab8c68d5bc28a8c3752b081e298d29ad0c6a03c4693a3a007a5cd39a73dac3"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/sculpt-surface-chunks.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/sculpt-surface-chunks.cpp.o.d",
+      "bytes": 13973,
+      "sha256": "3ef18b9fe2ecc5446969033977e9ec34b3708a705960496c1d3ec15ad98508d7"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/sculpt-placed-chunks.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/sculpt-placed-chunks.cpp.o.d",
+      "bytes": 15753,
+      "sha256": "910d9fc1fb3ffe4cff4942766ece47e78a1e3505500345dd84e2f39a4a5d4c4d"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/sculpt-chunk-masks.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/sculpt-chunk-masks.cpp.o.d",
+      "bytes": 15408,
+      "sha256": "cda3e1ba29e638434f99644ba5453c7fcedfa2840463304229d125246d34d6d4"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/retopo-edges.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/retopo-edges.cpp.o.d",
+      "bytes": 13607,
+      "sha256": "5d84a49c85b5fee786c7931c4998dc8c3156d01fa7a7d7e5d31f66ccaca50596"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/shapekey-sculpt.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/shapekey-sculpt.cpp.o.d",
+      "bytes": 14723,
+      "sha256": "f8dd88f63c9f81360691d5761e39e3934a3ad468f5550755162e14537317afe8"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/paint-composite-cpu.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/paint-composite-cpu.cpp.o.d",
+      "bytes": 4333,
+      "sha256": "4d2f984da2a162a7f396a5d35c679fc1d3ab9dbcea31972118bd66fd59384930"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/paint-composite.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/paint-composite.cpp.o.d",
+      "bytes": 13951,
+      "sha256": "b97c038279ee0a184d248b700ade5a86bb807fd2abf84f993a8dc2f677411ff2"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/current-paint-preview.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/current-paint-preview.cpp.o.d",
+      "bytes": 20681,
+      "sha256": "8e832bc967a27ab5d5bfba0d533525b4e9c9fdb61cc104b0f80b5017dd0f973e"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/baked-normal-field.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/baked-normal-field.cpp.o.d",
+      "bytes": 16989,
+      "sha256": "d4e59ee5eaa6f5754050398c3ea25ae2814f614ba1874a6875ff425694b7d32e"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/baked-emission-domain.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/baked-emission-domain.cpp.o.d",
+      "bytes": 22474,
+      "sha256": "55f3fcfadb90fe68170fddcd25269b7d1d95e87f4d170ed43d60f027dac3cd7e"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/canonical-normal-uv.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/canonical-normal-uv.cpp.o.d",
+      "bytes": 16880,
+      "sha256": "8fbd3150ce8a07905531717b5dd26ecff92312b7d95a43b8e92aec75f6473fa7"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/baked-normal-archive.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/baked-normal-archive.cpp.o.d",
+      "bytes": 17907,
+      "sha256": "49b4ed87126dc16db5e517ca3cf02551304a6a3593d0e27f5850b2903341d5e9"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/canonical-native-pose.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/canonical-native-pose.cpp.o.d",
+      "bytes": 20291,
+      "sha256": "bf78b5cbc27a54bb14a99593d6172e8061033e8239d4db5b3bb9e744d562a998"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/surface-heat-authoring.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/surface-heat-authoring.cpp.o.d",
+      "bytes": 24510,
+      "sha256": "b69d6174d22e48d2e4f2a48e8fa8aee89c678951b7dd066ca656d5a9d414b446"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/canonical-paint-uv.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/canonical-paint-uv.cpp.o.d",
+      "bytes": 20634,
+      "sha256": "090647396810f9295ec363e8efb34527f431c40d89b254cf0932e58831081227"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/anatomical-authoring.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/anatomical-authoring.cpp.o.d",
+      "bytes": 22674,
+      "sha256": "d5c16aab892732f491ae1c178e7b093d5166a1f91c93f164a1b658998319d4d5"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/canonical-paint-native.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/canonical-paint-native.cpp.o.d",
+      "bytes": 18141,
+      "sha256": "6030c3fdd3c182fa44c8378405d796ca0ba41c6c86a385e6e65117ed05a18042"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/canonical-paint-prospect.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/canonical-paint-prospect.cpp.o.d",
+      "bytes": 19879,
+      "sha256": "74d2fb40a1f07fec83e55a841c7b4bbdc4dbd935933fdcda3723452e9d842c76"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/canonical-paint-sampling.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/canonical-paint-sampling.cpp.o.d",
+      "bytes": 20874,
+      "sha256": "c644b54fb4224dd375dfd88961b4d68c066204ff29d8fac6a4632f75a1c0aa07"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/src/canonical-paint-archive.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/src/canonical-paint-archive.cpp.o.d",
+      "bytes": 19391,
+      "sha256": "c93cae31158af241931db2d25b0efce7edb695de227075478eee6013d8e334a5"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/third_party/openbrush/navigation.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/third_party/openbrush/navigation.cpp.o.d",
+      "bytes": 8107,
+      "sha256": "551fc2da48121074d529b32ca225cc7b5e3f0ab4178e822424ba9d6a9b98d13d"
+    },
+    "actual-current-MDs/dome-sculpt-core.dir/third_party/openbrush/controller-profiles.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-core.dir/third_party/openbrush/controller-profiles.cpp.o.d",
+      "bytes": 6643,
+      "sha256": "e1ec98ef317da57d99a749640b6b9c77f4670defe4d0a198ef8359da74e4a352"
+    },
+    "actual-current-MDs/dome-sculpt-spacenav.dir/src/spacenav-unix.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-spacenav.dir/src/spacenav-unix.cpp.o.d",
+      "bytes": 11681,
+      "sha256": "50d0c2612bb7178797818a08fdf55b99cd7e1ed48255f45a2a09fbbdd17a78f6"
+    },
+    "actual-current-MDs/dome-sculpt-spacenav.dir/src/spacenav.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-spacenav.dir/src/spacenav.cpp.o.d",
+      "bytes": 11069,
+      "sha256": "f6592904acb24a8b5caaf67a0d50e4b180d1eece35d24cb58cda97b01d9a20b2"
+    },
+    "actual-current-MDs/mikktspace-robust.dir/third_party/mikktspace/mikktspace.c.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/mikktspace-robust.dir/third_party/mikktspace/mikktspace.c.o.d",
+      "bytes": 2848,
+      "sha256": "0a5190d3341ac4f2753bdd2a9a85cf5dcffd72d10fd51425d8a7773ff4293b94"
+    },
+    "actual-current-MDs/dome-sculpt-polygon.dir/src/polygon-color.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-polygon.dir/src/polygon-color.cpp.o.d",
+      "bytes": 13503,
+      "sha256": "2c76e12e44415496188921d7fc542f244fcf8c9a1a9743948e1c5d42bf7b2ec3"
+    },
+    "actual-current-MDs/dome-sculpt-polygon.dir/src/polygon.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-polygon.dir/src/polygon.cpp.o.d",
+      "bytes": 14475,
+      "sha256": "37df6113f0d695a51c220658b1918720c1b93574b81cd8ffa8f2344004b6e0d4"
+    },
+    "actual-current-MDs/mikktspace.dir/third_party/mikktspace/mikktspace.c.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/mikktspace.dir/third_party/mikktspace/mikktspace.c.o.d",
+      "bytes": 2841,
+      "sha256": "c479af42b42220d96a7de6f230d610eff5b7d63134e9cc5877f92b000e10daba"
+    },
+    "actual-current-MDs/ufbx.dir/third_party/ufbx/ufbx.c.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/ufbx.dir/third_party/ufbx/ufbx.c.o.d",
+      "bytes": 3267,
+      "sha256": "8db1f9ba138e83b23ef78914e68133e14a3b26f5d6aef1eb1ac1132c9594e61b"
+    },
+    "actual-current-MDs/xatlas.dir/third_party/xatlas/xatlas.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/xatlas.dir/third_party/xatlas/xatlas.cpp.o.d",
+      "bytes": 10968,
+      "sha256": "c229164ee8e54cbb81c9f3de94e723c994cfec053b55bdcd39c964dda3d06668"
+    },
+    "actual-current-MDs/dome-sculpt-affine.dir/src/affine.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-affine.dir/src/affine.cpp.o.d",
+      "bytes": 7675,
+      "sha256": "c2dfb6887c307a0813fab2568a886b573250f7453f14c7d8d2cab08d45504f48"
+    },
+    "actual-current-MDs/dome-sculpt-affine.dir/src/affine-interaction.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-affine.dir/src/affine-interaction.cpp.o.d",
+      "bytes": 7838,
+      "sha256": "534ec02c949996064ab1241cce9119aaeda7224abd77e31a28c7494ca1108af1"
+    },
+    "actual-current-MDs/dome-sculpt-affine.dir/src/import-affine.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-affine.dir/src/import-affine.cpp.o.d",
+      "bytes": 13709,
+      "sha256": "536806b037a9ad3a665fe4cff5ec26328c738b3d4337e1199abaa71ff03a634b"
+    },
+    "actual-current-MDs/dome-sculpt-affine.dir/src/affine-factor.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-affine.dir/src/affine-factor.cpp.o.d",
+      "bytes": 13762,
+      "sha256": "152966fa9a34cd557e4b3ef8ec6c151afaea964a264adc43023897ba320153bd"
+    },
+    "actual-current-MDs/dome-sculpt-paint-gpu.dir/src/paint-blur-gpu.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-paint-gpu.dir/src/paint-blur-gpu.cpp.o.d",
+      "bytes": 13254,
+      "sha256": "c534b0624eca5af006f0054f3d59304c37002b0def4e4aba11d2176a50b66e15"
+    },
+    "actual-current-MDs/dome-sculpt-native-graphics.dir/third_party/openbrush/graphics.cpp.o.d": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/CMakeFiles/dome-sculpt-native-graphics.dir/third_party/openbrush/graphics.cpp.o.d",
+      "bytes": 9194,
+      "sha256": "48baa6531fea47b167499cacc0b10eed072dc4c2d66ba8ecea33e19690974543"
+    },
+    "native/plan.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/native-integration-v1/plan.json",
+      "bytes": 994316,
+      "sha256": "d28b85b3b08ede6840a2a6e5985e5629cfc69270b67d043965a9b36dc90eebf6"
+    },
+    "native/framing.log": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/native-integration-v1/framing.log",
+      "bytes": 3982,
+      "sha256": "3f0190867961e7046f58a80d140bbe7d218c93a9930b12b12ad3946bd56ca1e2"
+    },
+    "native/status.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/native-integration-v1/status.json",
+      "bytes": 23878,
+      "sha256": "a0a1cd9f3f60adcc07a0ab9114a8434460922bffacfd1752b30b06a84c27b994"
+    },
+    "native/workspace.log": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/native-integration-v1/workspace.log",
+      "bytes": 3757,
+      "sha256": "2fd797ddf514e212ada3028b868d2c41a9aa19b1ce13204d9000c6b8602baae6"
+    },
+    "native/verifier.log": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/native-integration-v1/verifier.log",
+      "bytes": 1462,
+      "sha256": "907fd259f0703d9a7f9a017fdcc36bf15d8e3ec45ff4ee0f79dbe7d65f5f617a"
+    },
+    "native/paged.log": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/native-integration-v1/paged.log",
+      "bytes": 6908,
+      "sha256": "42a7bbcabe924b798b1d2b5ad09914cb7aca117e08026549fa7ed94732ef941b"
+    },
+    "native/projection.log": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/native-integration-v1/projection.log",
+      "bytes": 7289,
+      "sha256": "dbb4964e917eea290b2e7fd08576c580a637cc57f85f586bcc761588cfea536b"
+    },
+    "source/CMakeLists.txt": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-integration-20261126/CMakeLists.txt",
+      "bytes": 435973,
+      "sha256": "a757a42e94e2aa679b7eafa11b9a258d61fb79b0778a477780c0bacc549c7251"
+    },
+    "source/include/dome/document.hpp": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-integration-20261126/include/dome/document.hpp",
+      "bytes": 46324,
+      "sha256": "57209a1b6c3f1b8634746718486d002667eee6e7e773ba26eec803268d1e6ca5"
+    },
+    "source/include/dome/render.hpp": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-integration-20261126/include/dome/render.hpp",
+      "bytes": 2817,
+      "sha256": "02b17365260b67550e042a24521340be78372ef9535a1f9f31308557284aa214"
+    },
+    "source/include/dome/view-clip.hpp": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-integration-20261126/include/dome/view-clip.hpp",
+      "bytes": 141,
+      "sha256": "9d276b289f56d9310a70b9044c7652e71d49af5014fa50568de0cd20d17d3ba5"
+    },
+    "source/include/dome/xr.hpp": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-integration-20261126/include/dome/xr.hpp",
+      "bytes": 2097,
+      "sha256": "fdfd01db218f8915f159ca1fae8fdbf4d4e4306a1c725ce7c27a0cd07d6a9a4e"
+    },
+    "source/src/creator-framing.cpp": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-integration-20261126/src/creator-framing.cpp",
+      "bytes": 7565,
+      "sha256": "5baa6b867c30f20038ccff16dc951e7697c2940b351fc7d8c01c2f4b5b165806"
+    },
+    "source/src/creator-framing.hpp": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-integration-20261126/src/creator-framing.hpp",
+      "bytes": 435,
+      "sha256": "7961cca7b964b280e17842bf60700307d4baeda7b160ff02506039d7fa54db57"
+    },
+    "source/src/document-creator.cpp": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-integration-20261126/src/document-creator.cpp",
+      "bytes": 13677,
+      "sha256": "c6e7bcb4b4e91e19041d44737e7e3c0f3b926ba22ad790ecacf558b61239eda7"
+    },
+    "source/src/document-transaction.cpp": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-integration-20261126/src/document-transaction.cpp",
+      "bytes": 4697,
+      "sha256": "203f5f35365f1696ddb64dd84bd67250db9ab18436014778cf6884981972f9cf"
+    },
+    "source/src/document-transaction.hpp": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-integration-20261126/src/document-transaction.hpp",
+      "bytes": 5129,
+      "sha256": "d57aacbbcc47545f7ed6e6a9f4407560688a78956af2ed702fe748d86b7b9f20"
+    },
+    "source/src/document.cpp": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-integration-20261126/src/document.cpp",
+      "bytes": 237858,
+      "sha256": "bc2bf53691b74ef6b5f1d5c1d7281ccfe3baff9dcdce62e5c245b9a153c97e4a"
+    },
+    "source/src/xr.cpp": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-integration-20261126/src/xr.cpp",
+      "bytes": 27488,
+      "sha256": "08c1b1409565906135326e1aebec2b96d5197803da7358136484afac7b5da9f1"
+    },
+    "source/tests/creator-framing.cpp": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-integration-20261126/tests/creator-framing.cpp",
+      "bytes": 13026,
+      "sha256": "269153085e04d19c7bd9679161177570002edfd429bf32ce8c1569029e2574ba"
+    },
+    "source/tests/creator-initial-verifier.cpp": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-integration-20261126/tests/creator-initial-verifier.cpp",
+      "bytes": 3682,
+      "sha256": "661bdbf02589b1345cfee03d1d0ff536ff5a549f65e9f6b0b27254421d49d578"
+    },
+    "source/tests/creator-initial-xr.py": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-integration-20261126/tests/creator-initial-xr.py",
+      "bytes": 6495,
+      "sha256": "90dbe39bceaccbf15a0a505532b9e1b618df8cdb7fb6c5f711f34b23c77f5093"
+    },
+    "source/tests/creator-workspace-runtime.cpp": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-integration-20261126/tests/creator-workspace-runtime.cpp",
+      "bytes": 115163,
+      "sha256": "151ce2e08eca8b4e7b9d00860fff52f2f7bc0675957ecde9f0d3f9688c8eb517"
+    }
+  },
+  "external_native_projects": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/native-integration-v1/output/before-fit.dsculpt": {
+      "bytes": 133912275,
+      "sha256": "9319f4978b2d0753669b312dfdab1593e16fe1d29495db076859060f9fdf31d6"
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/native-integration-v1/output/after-fit.dsculpt": {
+      "bytes": 133912275,
+      "sha256": "9319f4978b2d0753669b312dfdab1593e16fe1d29495db076859060f9fdf31d6"
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/native-integration-v1/workspace-output/created.dsculpt": {
+      "bytes": 150829332,
+      "sha256": "3d75fe8f7ea4bfab12072c9d1e3179cff4335cdbd8fb240a5b878bd1008df019"
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/native-integration-v1/workspace-output/before-cancel.dsculpt": {
+      "bytes": 586,
+      "sha256": "c29266210a0f042676b72917b0d1e3207251deb9069b07b407be863883b448c8"
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/native-integration-v1/workspace-output/before-replace.dsculpt": {
+      "bytes": 586,
+      "sha256": "c29266210a0f042676b72917b0d1e3207251deb9069b07b407be863883b448c8"
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/native-integration-v1/verifier-output/accept.dsculpt": {
+      "bytes": 133916440,
+      "sha256": "8cfe9bc771bc97e8aa998746903a0d1751b9bcb5c13d2e29e88251ab3d0c32a4"
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/native-integration-v1/verifier-output/cancel.dsculpt": {
+      "bytes": 375620,
+      "sha256": "af5423e0efde32e2367b4c696f2156d4d3cbdc8471d7b8e05fb9d4a76236049b"
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/native-integration-v1/verifier-output/focus.dsculpt": {
+      "bytes": 375620,
+      "sha256": "af5423e0efde32e2367b4c696f2156d4d3cbdc8471d7b8e05fb9d4a76236049b"
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/native-integration-v1/verifier-output/altered-material.dsculpt": {
+      "bytes": 133916440,
+      "sha256": "56d114c1fe29c68750fbb847ede7977540a8dff4f5f1e777fc9c9ff61b771ece"
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/creator-framing-e375-release-20261126/native-integration-v1/verifier-output/missing-initial.dsculpt": {
+      "bytes": 133540897,
+      "sha256": "40719bdfd98bee39419760e46ed477369138a1e6c5e8c908fd0cc72df266585b"
+    }
+  },
+  "evidence_archive": {
+    "bytes": 1921476,
+    "sha256": "2db1fbb9fd5d08557a2ba039174ea89a7ede3a1d1f05366232b431eb1e8b7770",
+    "member_count": 300
+  },
+  "preserved_seed_clay": "Initial clean seed/Scene validation, clay geometry and placement unchanged; sphere may obscure torso. Existing project reopen does not acquire first-workspace fit."
+}

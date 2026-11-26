@@ -13,10 +13,13 @@ Cancel and focus-loss remain exact. The original clean seed clay sphere is
 retained and still obscures part of the avatar torso. Removing or repositioning
 that clay is a separate product decision and was not done here.
 
-The next assigned integration bases this verified change on exacte375b31d and
-builds targeted native plus App consumers. That new candidate requires its own
-build/native evidence; the prior rendered proofs do not automatically qualify it.
-No installation or physical-headset test is included in this milestone.
+The separate exacte375b31d integration product3fd61ad4 now has a fresh Release
+App/runtime build and passes native330, including paged-ray cancellation and
+projection occlusion. Read [the combined integration proof](CREATOR-FRAMING-E375-20261126.md).
+The prior rendered proofs retain their ec578-based source scope and do not
+qualify this newer App. Original clean seed clay remains retained and partly
+occludes the torso; ordinary reopen remains unchanged. No installation, new
+session action or physical-headset test is included in this integration.
 Read [REQUIREMENTS.md](REQUIREMENTS.md) and the original
 [HANDOFF-466ebd1.md](HANDOFF-466ebd1.md) for the complete scope. This concise file
 replaces the accumulated checkpoint diary; all previous text is preserved,
