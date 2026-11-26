@@ -48,6 +48,13 @@ paint, and additional painted channels remain open. See the
 [opaque receipt](validation/vrm1-unlit-live-paint-20261126.json) and
 [masked receipt](validation/vrm1-unlit-mask-paint-20261126.json).
 
+The HDR provenance and retained-emission worker tests now consume their
+own checked 2048 pre-Bake seed. Both pass in Release and ASan/UBSan.
+The full 2048 bake, independent numerical sweep and history workflow
+remain separately registered. They pass in Release with a full
+sanitizer pass still required.
+[HDR fixture validation](validation/hdr-closure-independent-seed-20261126.json)
+
 ## Qualified integration — 2026-11-17
 
 Main now integrates product `1bc13125` and public fixture `f1e193c7` after

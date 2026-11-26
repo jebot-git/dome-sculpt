@@ -1,0 +1,107 @@
+{
+  "candidate": "9a94277214baa8359931fc2dec15f76e173802f4",
+  "product": "e09f2f4bcb9c35198cbb9a6168ae3403a95263ff",
+  "branch": "work/hdr-closure-independent-seed-20261126",
+  "change": "CTest registration and fixture CLI only",
+  "scope": "Generate the authentic pre-Bake source64/target2048 project independently. Preserve the full 2048 compound workflow under its own case.",
+  "profiles": {
+    "release": {
+      "status": {
+        "profile": "release",
+        "candidate": "9a94277214baa8359931fc2dec15f76e173802f4",
+        "invocation": "99ecc3f2f5bf4933b5966fa2a122f6a9",
+        "terminal": true,
+        "phase": "complete",
+        "seconds": 229.75,
+        "core": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-unlit-mask-paint-validation-20261126/combined-release/libdome-sculpt-core.a",
+        "core_sha256": "bd78d9c365efe67b9b18421e512cebdca6c1cc4309d45d7e0dd92bba92708081",
+        "targets": [
+          "dome-sculpt-source-hdr-provenance-closure-test",
+          "dome-sculpt-source-joint-writable-normal-bake-test",
+          "dome-sculpt-source-retained-emission-worker-test"
+        ],
+        "selected": "^(source-hdr-provenance-closure|source-retained-emission-worker|source-hdr-joint-full-size)$",
+        "exit": 0,
+        "clean": true
+      },
+      "ctest_passes": 5,
+      "fixture_checks": 17,
+      "retained_emission_worker_checks": 22,
+      "provenance_checks": 22,
+      "seed_sha256": "8a0675d42ea3075d38fb698a5e65ddecec0a332556b6e56d393942d5daf99a7e",
+      "hashes": {
+        "release/ctest.log": "51a059596d75930c5a3ee736ae6c3988fc1c995d0598da8214c88117dd0ba427",
+        "release/ctest.xml": "bf96af6b72d81f2c4cc3445bd342a4b2afb9a2737697a24ce0169197b067c70e",
+        "release/status.json": "fee3d0b157baf5d68216cdd27aadf0efa3cdbc023162f948fa5d48681f00d449",
+        "release/source-hdr-provenance-closure.compile.log": "322419f89e73efa33e2431b61df5d61cf85bda83a20d3c811825ba6d13baf218",
+        "release/source-joint-writable-normal-bake.compile.log": "c77f471d55143707947913d956410e986d1a5ac356040e84be8093f2223ea917",
+        "release/source-retained-emission-worker.compile.log": "8f71294df6de605f83f2c3c5646834299795a9648948b7ef79e9793b5022ed69",
+        "release/source-hdr-provenance-closure.link.log": "510f050a880a59e8029e3b2e6ed35af72db0f511bf3b14349ecd6f3b22baee51",
+        "release/source-joint-writable-normal-bake.link.log": "82d04c0c313d47b883d4a4f6f0747cb2da2f810b2cc41b6b291e084e2b935a5d",
+        "release/source-retained-emission-worker.link.log": "58d860ebc81f7b5020be9dc2f3f3f408e8cb9a77fd2611c954b181cbf2c3cd4b"
+      },
+      "leak_detection": false
+    },
+    "asan": {
+      "status": {
+        "profile": "asan",
+        "candidate": "9a94277214baa8359931fc2dec15f76e173802f4",
+        "invocation": "ce6b03b6f626418e9bf9d1277ce4df26",
+        "terminal": true,
+        "phase": "complete",
+        "seconds": 92.0,
+        "core": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-unlit-mask-paint-validation-20261126/asan-verified-final/libdome-sculpt-core.a",
+        "core_sha256": "828024bcdd488c84027dee87bddfe91e59106d8e33e23da398aa0a7812f000ab",
+        "targets": [
+          "dome-sculpt-source-hdr-provenance-closure-test",
+          "dome-sculpt-source-joint-writable-normal-bake-test",
+          "dome-sculpt-source-retained-emission-worker-test"
+        ],
+        "selected": "^(source-hdr-provenance-closure|source-retained-emission-worker)$",
+        "exit": 0,
+        "clean": true
+      },
+      "ctest_passes": 4,
+      "fixture_checks": 17,
+      "retained_emission_worker_checks": 22,
+      "provenance_checks": 22,
+      "seed_sha256": "8a0675d42ea3075d38fb698a5e65ddecec0a332556b6e56d393942d5daf99a7e",
+      "hashes": {
+        "asan/ctest.log": "0b94aff10da6b3fd029107ab90b3002f2e28dfb378d5568f5fe279180da38275",
+        "asan/ctest.xml": "2f9059d94c6aa18bc007b80fd040cc52966a91b5b8842e2594736573c636677b",
+        "asan/status.json": "0849760ae54b1d1810aaa554d9afe0da091916df5d847a2f1a28f2d5e0e42dec",
+        "asan/source-hdr-provenance-closure.compile.log": "d96e7ee17706170cd15a6088489e6ef6c3f40e289a85b2414977513855fa1ceb",
+        "asan/source-joint-writable-normal-bake.compile.log": "93b55c46e83ad28502c57814ad9a5f4a16c39e2327095ff41e27f42586c8b20b",
+        "asan/source-retained-emission-worker.compile.log": "9271e83e9e397d922542bc4bff5e16e2446d74848af8609fea5643a04d80efab",
+        "asan/source-hdr-provenance-closure.link.log": "18541da0fc59524d4759aca2e02b1d0f699f03be541a4369ba3f9058d1f6c64f",
+        "asan/source-joint-writable-normal-bake.link.log": "9750ffa351b28bd990a6af700772d125e49de86304149742ef75a6e417049f79",
+        "asan/source-retained-emission-worker.link.log": "9e62e6470b6c301d2533032e9ecbfe316a8bb1e7eb9626af772f8c69a64b4e41"
+      },
+      "leak_detection": true
+    }
+  },
+  "full_2048": {
+    "full_release_checks": 47409,
+    "full_release_seconds": 197.5,
+    "samples_per_role": 73530600,
+    "normal_max_component": 0.00423080620101,
+    "normal_max_radians": 0.00585570130032,
+    "hdr_max_absolute": 3.17920956849e-06,
+    "deadline_seconds": 900,
+    "strict_status": "The original monolithic run exceeded the 900-second deadline. The full strict workflow is still open."
+  },
+  "historical_outcome": {
+    "source": "ccbbe02093bed6997bdacdf0d36b3a11bc1f177d",
+    "original_log": "artifacts/vrm-consumer-combined-asan-20261126/combined-regression/ctest.log",
+    "observations": [
+      "50/86 Test   #22: source-hdr-provenance-closure-seed ....***Timeout 900.24 sec",
+      "Failed test dependencies: source-hdr-provenance-closure-seed"
+    ]
+  },
+  "seed_comparison": "Independent native decoder finds a single generated fixture group-name difference from earlier and current monolithic seeds. No persistent input was modified. The new Release and sanitizer seeds have the same bytes.",
+  "evidence": {
+    "path": "docs/validation/hdr-closure-independent-seed-20261126.tar.gz",
+    "sha256": "a4657155d1b50536fb985daf511a87718ba55a69235ed376940f176f8a5419c5",
+    "local_artifacts": "artifacts/hdr-closure-independent-seed-validation-20261126"
+  }
+}

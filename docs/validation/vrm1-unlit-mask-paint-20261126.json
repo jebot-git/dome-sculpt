@@ -220,7 +220,7 @@
   ],
   "evidence": {
     "path": "docs/validation/vrm1-unlit-mask-paint-20261126.tar.gz",
-    "sha256": "0f207e5d6024393b3d6da4a090c67d9e07caf96352d580cfeb15eb9854e4ff07",
+    "sha256": "ce2d667eca7dd123cb08bb95777a0c4e2aad694a4cbd9ecbf1ad0e82838ff576",
     "local_artifacts": "artifacts/vrm1-unlit-mask-paint-validation-20261126"
   },
   "official_vrm_schemas": {
@@ -235,7 +235,12 @@
     "invocation": "49daa8a3d0c745babef2cf168ac9427e",
     "candidate": "e09f2f4bcb9c35198cbb9a6168ae3403a95263ff",
     "status_path": "artifacts/vrm1-unlit-mask-paint-validation-20261126/combined-release/status.json",
-    "status_at_record": "Configured successfully with canonical DomeD FLTK. Optimized FLTK/OpenXR build active."
+    "status_at_record": "Finished 275 build actions and actual --version, exit 0.",
+    "elapsed_seconds": 397.86,
+    "app_sha256": "638157de53473059ebccc8d940fa53d90f36a5e006122c18b15e61b2b18dc3ff",
+    "build_log_sha256": "79c2fcc147e7cad0c14920222017dd8a8f4f5e4d87d8e6cce803e73a9bdfaced",
+    "build_exit": 0,
+    "version_exit": 0
   },
   "verification_note": "The earlier archive sampled the sanitizer sweep before exit. The terminal result is now verified from the original process and archived here.",
   "owning_public_xr": {
@@ -243,6 +248,73 @@
     "invocation": "94027c8d724948b28d33880c0a695aea",
     "candidate": "e09f2f4bcb9c35198cbb9a6168ae3403a95263ff",
     "status_path": "artifacts/vrm1-unlit-mask-paint-validation-20261126/public-xr/status.json",
-    "status_at_record": "Waiting for matching optimized build. Synthetic OpenXR with the genuine candidate-produced project fixture."
+    "status_at_record": "Finished all six real OpenXR loader workflows using the synthetic runtime, exit 0.",
+    "checks": 53,
+    "loader_exit": 0,
+    "physical_headset": false,
+    "profiler": "Mesa llvmpipe",
+    "elapsed_seconds": 260.53,
+    "app_sha256": "638157de53473059ebccc8d940fa53d90f36a5e006122c18b15e61b2b18dc3ff",
+    "portable_results": {
+      "accept256": {
+        "xr_runtime_receipt_sha256": "73c467127f4a06dca889c64103628fcb2b3a354afd427c5a91a2b69a79fa2d85",
+        "portable_vrm_sha256": "1dafb4e06a6c8c43e211dc27120c51d86b599194ab817d75f290893642dd4e17",
+        "exact_native_save_sha256": "0d5a6216d7ff23aff2c8c5e6352cc6a6cddea04716b0cfa80febca2f4852c51d",
+        "khronos_errors": 0,
+        "khronos_warnings": 4,
+        "independent_software_renderer": {
+          "checks": 17,
+          "max_rgb8_difference": 1,
+          "max_alpha8_difference": 0
+        }
+      },
+      "accept512": {
+        "xr_runtime_receipt_sha256": "9b57579fd08f8d6e7d14118168c0a8b96f6ef022099da853597f31f7a0f8778c",
+        "portable_vrm_sha256": "39947edec36c74ee863ab1e869297bf41332faa459a19f6ca69727d555c2def8",
+        "exact_native_save_sha256": "0d5a6216d7ff23aff2c8c5e6352cc6a6cddea04716b0cfa80febca2f4852c51d",
+        "khronos_errors": 0,
+        "khronos_warnings": 4,
+        "independent_software_renderer": {
+          "checks": 17,
+          "max_rgb8_difference": 1,
+          "max_alpha8_difference": 0
+        }
+      },
+      "accept1024": {
+        "xr_runtime_receipt_sha256": "e7f9f14044df0818e45c58327cd083a2b48f8a2ba926c55740e3ec8971af28a2",
+        "portable_vrm_sha256": "ee685abb27b011a2cef0c4e98bc6c5a2ed8792217a7c4c0a4a4c88b21cdee2cc",
+        "exact_native_save_sha256": "0d5a6216d7ff23aff2c8c5e6352cc6a6cddea04716b0cfa80febca2f4852c51d",
+        "khronos_errors": 0,
+        "khronos_warnings": 4,
+        "independent_software_renderer": {
+          "checks": 17,
+          "max_rgb8_difference": 1,
+          "max_alpha8_difference": 0
+        }
+      },
+      "retry": {
+        "xr_runtime_receipt_sha256": "b4c529689b654bc102b6f57cc514ab75fbe52b072a10b0b8857bc75aca7348df",
+        "portable_vrm_sha256": "1dafb4e06a6c8c43e211dc27120c51d86b599194ab817d75f290893642dd4e17",
+        "exact_native_save_sha256": "0d5a6216d7ff23aff2c8c5e6352cc6a6cddea04716b0cfa80febca2f4852c51d",
+        "khronos_errors": 0,
+        "khronos_warnings": 4
+      }
+    },
+    "official_vrm_instances_from_exported_files": 20,
+    "official_vrm_errors": 0
+  },
+  "owning_public_wayland": {
+    "unit": "ds-vrm1-mask-public-wayland-20261126.service",
+    "invocation": "d8bb4e8351e248d4b9975ba6fa0da917",
+    "app_sha256": "638157de53473059ebccc8d940fa53d90f36a5e006122c18b15e61b2b18dc3ff",
+    "checks": 14,
+    "exit": 0,
+    "scope": "Actual Intel Arc OpenGL and Vulkan through nested DomeD. Wayland menu/text/window/body smoke; no physical headset or native DRM scanout.",
+    "status_path": "artifacts/creator-public-build-20261126/combined-waylande09f2f4b-v1/status.json",
+    "report_sha256": "6bd20c3c03e3f6bf40afca17657f56c92b17360ea98f700db5c79bdf6b547187",
+    "status_sha256": "d34ebcbf5122ede65dd05caad625a7e45ed8d9b30449cf878f573ce7db7ecda2",
+    "actual_device_reports": {
+      "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/combined-waylande09f2f4b-v1/workflow/actual-device/egl-query-0/device.txt": "e3640b6a0ddca029af23bc4da2f5b287e88a40ded1c879f40e90da9ed9da5db1"
+    }
   }
 }

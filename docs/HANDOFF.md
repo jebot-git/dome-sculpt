@@ -727,12 +727,37 @@ pinned VRM schemas pass, including the masked unlit and MToon inputs and outputs
 Live lit PBR, blended unlit, cutouts that cross painted fragments and
 additional paint channels remain open. The full Release and combined
 sanitizer runs are still using `ccbbe020`. Its sanitizer run reproduced
-the software Mesa teardown leak and an HDR fixture timeout. A fresh
-optimized owning application build has started on exact `e09f2f4b` with the
-canonical DomeD FLTK toolkit. The existing controller-driven editable export
-workflow is queued against that binary and the masked avatar. The validation
-receipt records both services.
+the software Mesa teardown leak and an HDR fixture timeout. The exact
+`e09f2f4b` optimized application completes 275 build actions with the
+canonical DomeD FLTK toolkit. Its real OpenXR loader passes all 53
+controller-driven checks with synthetic input, including editable export
+at 256, 512 and 1024 pixels, Cancel, retry and reopened project Save. An
+independent reader renders each resolution across five expression states
+on llvmpipe with one RGB8 step maximum and exact alpha. All exported files
+in the workflow pass the pinned VRM schemas and Khronos validation with
+zero errors. The same binary passes 14 native Wayland checks through
+nested DomeD on Intel Arc, including menu, modal text and teardown.
+Physical headset and direct scanout acceptance remain open.
 [Mesa teardown evidence](MESA-XR-RTASM-LIFETIME.md)
+
+### Independent HDR provenance fixture
+
+Candidate `9a942772` gives the provenance and retained-emission worker tests
+their own pre-Bake fixture. It uses the same real source construction and
+native destination resize, ordered Save, reopen, Undo/Redo and stale
+authority checks as the full 2048 workflow. The original 2048 Bake,
+numerical sweep and file/history checks remain registered with their
+900-second limit under `source-hdr-joint-full-size`.
+
+The independent CTest suites finish 5/5 in Release and 4/4 in ASan/UBSan.
+The seed passes 17 checks and both dependent tests pass 22 each in both
+profiles. The two new seeds are byte-identical. A read-only comparison
+with the old and new monolithic seeds finds only the generated fixture
+group name differs. The full Release workflow passes 47,409 checks in
+197.50 seconds and retains all 73,530,600 independent samples per role.
+The original monolithic sanitizer timeout remains recorded and its full
+workflow still needs a strict pass.
+[Validation receipt](validation/hdr-closure-independent-seed-20261126.json)
 
 ## Source and integration boundary
 
