@@ -225,6 +225,12 @@ if(BUILD_TESTING)
   add_executable(dome-sculpt-texture-set-bake-recipe-test tests/texture-set-bake-recipe.cpp)
   target_include_directories(dome-sculpt-texture-set-bake-recipe-test PRIVATE src)
   target_link_libraries(dome-sculpt-texture-set-bake-recipe-test PRIVATE dome-sculpt-core)
+  add_executable(dome-sculpt-normal-projection-sharing-test tests/normal-projection-sharing.cpp)
+  target_include_directories(dome-sculpt-normal-projection-sharing-test PRIVATE src)
+  target_link_libraries(dome-sculpt-normal-projection-sharing-test PRIVATE dome-sculpt-core)
+  add_test(NAME normal-projection-sharing COMMAND dome-sculpt-normal-projection-sharing-test
+    ${CMAKE_CURRENT_BINARY_DIR}/normal-projection-sharing)
+  set_tests_properties(normal-projection-sharing PROPERTIES TIMEOUT 900)
   add_test(NAME texture-set-bake-recipe COMMAND dome-sculpt-texture-set-bake-recipe-test
     ${CMAKE_CURRENT_BINARY_DIR}/texture-set-bake-recipe)
   set_tests_properties(texture-set-bake-recipe PROPERTIES TIMEOUT 900)
