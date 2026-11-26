@@ -3,6 +3,7 @@
 #include "vr-controls.cpp"
 #undef main
 #include <nlohmann/json.hpp>
+#include "../src/sculpt-scene-chunks.hpp"
 namespace {
 unsigned checks=0;
 void check(bool ok,const char *why){if(!ok)throw std::runtime_error(why);++checks;std::cout<<"PASS "<<why<<std::endl;}
@@ -20,7 +21,14 @@ int main()try{
   else{held_panel(hand,400,300);if(reason==1)doc.cancel_spatial_menu();else if(reason==2){hand.frame.focused=false;hand.send(0,0,false,.8f);}else{hand.frame.hands[1].tracked.valid=false;hand.send(0,0,false,.8f);}}
   check(doc.frame().state->controls.parameter==VrParameter::None,"Cancel, close, focus loss, tracking loss or Confirm retires the actual control owner");
   hand.frame.focused=true;hand.frame.hands[1].tracked.valid=true;hand.frame.hands[1].tracked.aimValid=false;doc.cancel_spatial_menu();
-  auto surface=doc.frame().surface;if(surface->mesh.positions.empty())throw std::runtime_error("Scene fixture has no sculpt surface");const auto p=surface->mesh.positions.front();
+  auto surface=doc.frame().surface;
+  const auto *object=surface->sculpt_chunks?surface->sculpt_chunks->find(doc.frame().state->active_object):nullptr;
+  std::optional<Vec3> point;
+  if(object)object->geometry->for_each_run([&](const detail::SculptSurfaceRun &run){
+    if(!point&&run.count){const auto vertex=run.chunk->mesh.indices.at(run.first);
+      point=object->placed_position(run.chunk->mesh.positions.at(vertex));}
+  });
+  if(!point)throw std::runtime_error("Scene fixture has no owning sculpt draw corner");const auto p=*point;
   hand.frame.hands[1].tracked.grip.position=ob::transform(doc.frame().state->canvas,{p.x,p.y,p.z});hand.send(0,0,false,.8f);hand.send(0,0,false,.8f);
   check(doc.frame().state->selection_mode&&doc.copy_scene().encode()==before,"A held trigger on return cannot leak an edit while selection mode remains active");
   doc.configure_selection(false);hand.send(0,0,false,.8f);hand.send(0,0,false,.8f);
