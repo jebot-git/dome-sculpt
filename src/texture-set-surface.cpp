@@ -1,5 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "texture-set-surface.hpp"
+#include "texture-set-bake.hpp"
+#include "polygon-color-target.hpp"
+#include "cut-color.hpp"
 #include "texture-set-paint-access.hpp"
 #include "texture-set-field-source.hpp"
 #include "dome/polygon-scene.hpp"
@@ -10,18 +13,38 @@ void stop(const TextureSetLimits&l){if(l.cancelled&&l.cancelled())throw std::run
 void charge(size_t&total,size_t n,size_t unit,const TextureSetLimits&l){if(total>l.maximum_bytes||(unit&&n>(l.maximum_bytes-total)/unit))throw std::length_error("Texture-set surface staging exceeds its byte budget");total+=n*unit;}
 void work(size_t&total,size_t n,const TextureSetLimits&l){if(n>l.maximum_work-total)throw std::length_error("Texture-set surface exceeds its work budget");total+=n;}
 void bounded_product(size_t&total,size_t n,size_t unit,const TextureSetLimits&l){if(unit&&n>(l.maximum_work-total)/unit)throw std::length_error("Texture-set topology replay exceeds its work budget");total+=n*unit;}
-void plain(const PaintedMesh&p,const CreatorAppearance*appearance,const SourceMaterialBindings*binding,const ObjectBakeRecipe*recipe){
- if(appearance||binding||recipe||p.source_maps()||p.color_projection()||p.normal_projection()||p.paint_sampling_domain()||p.source_sampling_prepared()||
-    (p.baked()&&(p.baked()->normal_field||p.baked()->normal_authority)))
-  throw std::invalid_argument("Texture-set complex frames/sampling need their complete corner-attribute surface adapter");
+bool plain(const PaintedMesh *paint, const CreatorAppearance *appearance,
+           const SourceMaterialBindings *binding) noexcept {
+ return paint && !appearance && !binding && !paint->source_maps() &&
+        !paint->color_projection() && !paint->normal_projection() &&
+        !paint->paint_sampling_domain() && !paint->source_sampling_prepared() &&
+        (!paint->baked() || (!paint->baked()->normal_field && !paint->baked()->normal_authority));
 }
 bool bits(float a,float b){return std::bit_cast<uint32_t>(a)==std::bit_cast<uint32_t>(b);}
 bool bits(Vec3 a,Vec3 b){return bits(a.x,b.x)&&bits(a.y,b.y)&&bits(a.z,b.z);}
 }
 bool texture_set_plain_fields(const SculptObject&o)noexcept{
- auto field=[](const PaintedMesh*p,const CreatorAppearance*a,const SourceMaterialBindings*b,const ObjectBakeRecipe*r){return p&&!a&&!b&&!r&&!p->source_maps()&&!p->color_projection()&&!p->normal_projection()&&!p->paint_sampling_domain()&&!p->source_sampling_prepared()&&(!p->baked()||(!p->baked()->normal_field&&!p->baked()->normal_authority));};
- if(!o.mesh_active||!field(o.painted.get(),o.appearance.get(),o.material_bindings.get(),o.bake_recipe.get())||(o.polygon&&o.polygon->colors))return false;
- if(o.texture_sets)for(const auto&s:o.texture_sets->additional())if(!field(s.painted.get(),s.appearance.get(),s.material_bindings.get(),s.bake_recipe.get()))return false;return true;
+ if (!o.mesh_active || !plain(o.painted.get(), o.appearance.get(), o.material_bindings.get()) ||
+     (o.polygon && o.polygon->colors))
+   return false;
+ if (o.texture_sets)
+   for (const auto &field : o.texture_sets->additional())
+     if (!plain(field.painted.get(), field.appearance.get(), field.material_bindings.get()))
+       return false;
+ return true;
+}
+bool bake_target_supported(const SculptObject &object) {
+ if (!object.texture_sets)
+   return corner_bake_target_supported(object);
+ const auto field=active_texture_set(object);
+ return (!object.polygon || !object.polygon->colors) &&
+        !field.source && field.domain && !field.domain->triangles().empty() &&
+        plain(field.painted.get(),field.appearance.get(),field.material_bindings.get());
+}
+
+bool bake_source_supported(const SculptObject &object) {
+ return cut_color_supported(object) &&
+        (!object.texture_sets || texture_set_plain_fields(object));
 }
 std::shared_ptr<const TextureSetSurfacePlan> prepare_texture_set_surface(const SculptObject&o,const TextureSetLimits&limits){
  limits.validate();stop(limits);
@@ -32,7 +55,8 @@ std::shared_ptr<const TextureSetSurfacePlan> prepare_texture_set_surface(const S
  const auto validate_field=[&](const TextureSetView&field){
   if(!field.painted)throw std::invalid_argument("Texture-set surface field has no actual paint owner");
   if(field.source){if(o.deformation)throw std::invalid_argument("Retained texture-set fields require their actual posed before-frame adapter");field.source->authenticate_owner(field.source);field.source->validate_field(field,limits);if(!field.source->source_preview())throw std::invalid_argument("Retained texture-set field has no genuine before-role packet");}
-  else plain(*field.painted,field.appearance.get(),field.material_bindings.get(),field.bake_recipe.get());
+  else if(!plain(field.painted.get(),field.appearance.get(),field.material_bindings.get()))
+    throw std::invalid_argument("Texture-set complex frames need their complete corner-attribute surface adapter");
  };
  validate_field(texture_set_view(o,0));for(const auto&field:o.texture_sets->additional())validate_field(texture_set_view(o,field.id));
  size_t forecast=0;

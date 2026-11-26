@@ -5,12 +5,19 @@ from pathlib import Path
 signal.pthread_sigmask(signal.SIG_SETMASK,[])
 p=argparse.ArgumentParser(description=__doc__)
 for name in ('binary','runtime','helper','out'):p.add_argument(name,type=lambda v:Path(v).resolve())
+p.add_argument('--texture-set',action='store_true',help='Replay Recall and Bake on the selected additional material')
 a=p.parse_args();out=a.out;out.mkdir(parents=True,exist_ok=True);checks=[]
 def check(ok,label):
  checks.append({'passed':bool(ok),'check':label});(out/'report.json').write_text(json.dumps({'checks':checks,'physical_headset':False},indent=2)+'\n');print(('PASS ' if ok else 'FAIL ')+label,flush=True);assert ok,label
 with tempfile.TemporaryDirectory(prefix='dome-cage-xr-') as directory:
  root=Path(directory);manifest=root/'runtime.json';manifest.write_text(json.dumps({'file_format_version':'1.0.0','runtime':{'library_path':str(a.runtime)}}))
- env={**os.environ,'DOME_XR_FIXTURE_RECIPE':'1','XR_RUNTIME_JSON':str(manifest),'LIBGL_ALWAYS_SOFTWARE':'1','LP_NUM_THREADS':'2','HOME':str(root),'XDG_RUNTIME_DIR':str(root),'XDG_CONFIG_HOME':str(root/'config'),'XDG_STATE_HOME':str(root/'state'),'XDG_CACHE_HOME':str(root/'cache'),'XDG_DATA_HOME':str(root/'data')};source=out/'source.dsculpt';subprocess.run([str(a.helper),'--ui-wide-fixture' if os.environ.get('DOME_RECIPE_WIDE')=='1' else '--ui-fixture',str(source)],env=env,check=True);before=source.read_bytes()
+ env={**os.environ,'DOME_XR_FIXTURE_RECIPE':'1','XR_RUNTIME_JSON':str(manifest),'LIBGL_ALWAYS_SOFTWARE':'1','LP_NUM_THREADS':'2','HOME':str(root),'XDG_RUNTIME_DIR':str(root),'XDG_CONFIG_HOME':str(root/'config'),'XDG_STATE_HOME':str(root/'state'),'XDG_CACHE_HOME':str(root/'cache'),'XDG_DATA_HOME':str(root/'data')}
+ source=out/'source.dsculpt';reference=out/'reference.dsculpt'
+ if a.texture_set:
+  subprocess.run([str(a.helper),'--texture-set-xr-fixture',str(source),str(reference)],env=env,check=True)
+ else:
+  subprocess.run([str(a.helper),'--ui-wide-fixture' if os.environ.get('DOME_RECIPE_WIDE')=='1' else '--ui-fixture',str(source)],env=env,check=True)
+ before=source.read_bytes()
  def inspect(path):return json.loads(subprocess.check_output([str(a.helper),'--inspect',str(path)],env=env,text=True))
  original_inspection=inspect(source);original=original_inspection['scene'];(out/'source.json').write_text(json.dumps(original,indent=2)+'\n')
  for mode in ['accept','cancel','focus']:
@@ -34,7 +41,10 @@ with tempfile.TemporaryDirectory(prefix='dome-cage-xr-') as directory:
   check(detail.get('acquires',0)>0 and detail.get('acquires')==detail.get('image_waits')==detail.get('releases') and detail.get('left_eye_nonblank',0)>0 and detail.get('right_eye_nonblank',0)>0,mode+': actual stereo ownership balances and both eyes contain rendered output')
   check(all(detail.get('cage_images',{}).get('58',{}).get(eye,0)>1000 for eye in ['0','1']),mode+': both real GL eyes render the edited Source/Cage controls')
   check(source.read_bytes()==before,mode+': input project bytes remain untouched')
-  if mode=='accept':
+  if a.texture_set:
+   expected=reference.read_bytes() if mode=='accept' else before
+   check(target.read_bytes()==expected,mode+': exact entire native project matches the selected-field Bake reference or the original cancelled project')
+  elif mode=='accept':
    check(after['baked'],mode+': actual ray Recall restores the projection range needed by the off-axis cage before explicit Bake')
    check(after['scene']['objects'][0]['bake_recipe']['settings']==original['objects'][0]['bake_recipe']['settings'],mode+': persisted recipe matches every originally recalled setting after the earlier controller range change')
    scene=after['scene'];check(after['sources']==original_inspection['sources'] and scene['objects'][0]['painted']['layers']==original['objects'][0]['painted']['layers'],mode+': complete hidden source/cage and target editable paint remain exact')

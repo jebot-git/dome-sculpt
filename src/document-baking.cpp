@@ -3,7 +3,8 @@
 #include "dome/document.hpp"
 #include "dome/bake-recipe.hpp"
 #include "dome/polygon-scene.hpp"
-#include "polygon-color-target.hpp"
+#include "texture-set-bake.hpp"
+#include "texture-set-stroke.hpp"
 #include "dome/normal-preparation.hpp"
 namespace dome {
 AssetStatus Document::asset_status() const {
@@ -38,20 +39,21 @@ void Document::cancel_background_work(){
 bool Document::bake_source_eligible_locked(uint64_t id) const {
   const auto at=std::find_if(scene_.objects().begin(),scene_.objects().end(),[id](const auto &o){return o.id==id;});
   return at!=scene_.objects().end()&&id!=scene_.active().id&&!scene_.has_affine_placement(id)&&
-    detail::cut_color_supported(*at)&&(at->mesh_active?at->painted&&!at->painted->mesh().indices.empty():!at->volume->voxels().empty());
+    detail::bake_source_supported(*at)&&(at->mesh_active?at->painted&&!at->painted->mesh().indices.empty():!at->volume->voxels().empty());
 }
 std::vector<uint64_t> Document::bake_sources_locked() const {
   std::vector<uint64_t> ids;
   const auto &target=scene_.active();
-  if(!detail::corner_bake_target_supported(target))return ids;
+  if(!detail::bake_target_supported(target))return ids;
+  const auto recipe=target.texture_sets?active_texture_set(target).bake_recipe:target.bake_recipe;
   for(const auto &o:scene_.objects())if(o.id!=scene_.active().id && !scene_.has_affine_placement(o.id) &&
-      detail::cut_color_supported(o) &&
+      detail::bake_source_supported(o) &&
       (o.mesh_active ? o.painted && !o.painted->mesh().indices.empty() : !o.volume->voxels().empty()))ids.push_back(o.id);
   if(state_.bake_source==unavailable_bake_object||
-      (target.bake_recipe&&target.bake_recipe->source.object==unavailable_bake_object))
+      (recipe&&recipe->source.object==unavailable_bake_object))
     ids.push_back(unavailable_bake_object);
-  if(target.bake_recipe&&std::find(ids.begin(),ids.end(),target.bake_recipe->source.object)==ids.end())
-    ids.push_back(target.bake_recipe->source.object);
+  if(recipe&&std::find(ids.begin(),ids.end(),recipe->source.object)==ids.end())
+    ids.push_back(recipe->source.object);
   return ids;
 }
 std::vector<uint64_t> Document::bake_cages_locked() const {
@@ -66,15 +68,16 @@ std::vector<uint64_t> Document::bake_cages_locked() const {
   if(state_.bake_settings.cage_object &&
       std::find(ids.begin(),ids.end(),state_.bake_settings.cage_object)==ids.end())
     ids.push_back(state_.bake_settings.cage_object);
-  if(scene_.active().bake_recipe&&scene_.active().bake_recipe->cage&&
-      scene_.active().bake_recipe->cage->object==unavailable_bake_object&&
+  const auto &target=scene_.active();
+  const auto recipe=target.texture_sets?active_texture_set(target).bake_recipe:target.bake_recipe;
+  if(recipe&&recipe->cage&&recipe->cage->object==unavailable_bake_object&&
       std::find(ids.begin(),ids.end(),unavailable_bake_object)==ids.end())
     ids.push_back(unavailable_bake_object);
   return ids;
 }
 bool Document::bake_target_ready_locked() const {
   const auto &o=scene_.active();
-  return detail::corner_bake_target_supported(o) && !state_.shape_sculpt && !scene_.has_affine_placement(o.id) && !state_.polygon && !state_.cut && !state_.retopology && !uv_ &&
+  return detail::bake_target_supported(o) && !state_.shape_sculpt && !scene_.has_affine_placement(o.id) && !state_.polygon && !state_.cut && !state_.retopology && !uv_ &&
     !state_.asset_busy && !state_.recovery_busy && !action_active_locked() &&
     object_editable_locked(o.id) && o.mesh_active && o.painted;
 }
@@ -84,6 +87,10 @@ void Document::queue_bake_locked(uint64_t source,ObjectBakeSettings settings,Ass
   auto ids=bake_sources_locked();
   if(!bake_target_ready_locked() || !bake_source_eligible_locked(source) || std::find(ids.begin(),ids.end(),source)==ids.end())
     throw std::logic_error("Choose a prepared, visible, unlocked target and a different nonempty source");
+  const auto &target=scene_.active();
+  if(target.texture_sets && (settings.prepare_colors || settings.prepare_normals))
+    throw std::invalid_argument("Texture-set Bake uses the existing material and normal basis");
+  auto lease=target.texture_sets?detail::capture_texture_set_stroke(scene_,target.id):nullptr;
   auto report=std::make_shared<std::string>();auto work=std::make_shared<AssetWork>();
   queue_scene_operation_locked("Bake surface",[source,settings,report,work](Scene &scene,const auto &cancelled){
     auto result=bake_object(scene,source,settings,cancelled,[work](float p){work->progress.store(p);});
@@ -91,29 +98,41 @@ void Document::queue_bake_locked(uint64_t source,ObjectBakeSettings settings,Ass
     if(result.color_prepared){char quality[96];snprintf(quality,sizeof(quality),"; color error bound %.4f",double(*std::max_element(result.color_error_bound.begin(),result.color_error_bound.end())));*report+=quality;}
     if(result.canonical_captured)*report+="; verified normal frame captured";
     if(result.normal_prepared){char quality[128];snprintf(quality,sizeof(quality),"; portable normal attributes authored (rest quantization %.3f deg)",result.normal_initial_error*57.29577951308232);*report+=quality;}
-  },expected,report,work,{}, {},0,0,{},BakeAdmission{source,settings});
+  },expected,report,work,{}, {},0,0,{},BakeAdmission{source,settings},0,{},std::move(lease));
 }
 void Document::bake_from_object(uint64_t source,ObjectBakeSettings settings,AssetSource expected){
   std::lock_guard lock(model_mutex_);queue_bake_locked(source,settings,expected);
 }
 void Document::queue_clear_bake_locked(AssetSource expected){
-  if(!bake_target_ready_locked() || !scene_.active().painted->baked())throw std::logic_error("Select an editable baked target");
+  const auto &target=scene_.active();
+  if(!bake_target_ready_locked() || !active_texture_set(target).painted->baked())
+    throw std::logic_error("Select an editable baked target");
+  auto lease=target.texture_sets?detail::capture_texture_set_stroke(scene_,target.id):nullptr;
   queue_scene_operation_locked("Clear baked surface",[](Scene &scene,const auto &cancelled){
     if(cancelled())throw std::runtime_error("Clear bake cancelled");
     auto &o=scene.active();
+    if(o.texture_sets) {
+      TextureSetLimits limits;limits.cancelled=cancelled;
+      dome::edit_texture_set(scene,o.id,o.texture_sets->active(),[](PaintedMesh &paint,Material &) {
+        paint.clear_bake();
+        return true;
+      },limits);
+      return;
+    }
     if(o.material_bindings&&o.material_bindings->normal_preparation&&o.material_bindings->normal_preparation->canonical_conversion){
       NormalPreparationOptions options;options.cancelled=cancelled;
       auto result=convert_canonical_normals({o.painted,o.appearance,o.material_bindings,o.deformation,o.material,{}},options);
       o.painted=std::move(result.paint);o.material_bindings=std::move(result.material_bindings);
     }
     scene.active().painted->clear_bake();
-  },expected,{});
+  },expected,{}, {}, {}, {}, 0, 0, {}, {}, 0, {}, std::move(lease));
 }
 void Document::clear_bake(AssetSource expected){
   std::lock_guard lock(model_mutex_);queue_clear_bake_locked(expected);
 }
 bool Document::canonical_conversion_ready_locked() const {
   const auto &o=scene_.active();
+  if(o.texture_sets)return false;
   if(!state_.object_grabbing&&bake_target_ready_locked()&&o.material_bindings&&o.material_bindings->normal_preparation){
     const auto &p=*o.material_bindings->normal_preparation;
     return p.canonical_conversion&&!p.uv_reprojection&&!p.sampling_domain&&!p.key_derivation;

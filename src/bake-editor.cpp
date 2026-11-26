@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "bake-editor.hpp"
+#include "dome/texture-sets.hpp"
 #include "dome/bake-recipe.hpp"
 #include "dome/bake-distance.hpp"
 #include "appearance.h"
@@ -46,11 +47,15 @@ void edit_bake_dialog(Document &doc){
   DomeDialog window(width,height,"Bake surface");
   Fl_Scroll scroll(0,0,width,height-row*2);scroll.type(Fl_Scroll::VERTICAL);
   Fl_Group content(0,0,width-24,row*17);content.resizable(nullptr);
-  const char *description="Bake into the selected target's UVs below editable paint.\nSource geometry, rig and paint stay intact. Bounds use world mm.";
+  const auto &object=draft.scene.object(target);
+  const bool texture_set=bool(object.texture_sets);
+  const std::string description=texture_set
+      ?"Bake beneath editable paint in "+active_texture_set(object).name+". Bounds use world mm."
+      :"Bake into the selected target's UVs below editable paint.\nSource geometry, rig and paint stay intact. Bounds use world mm.";
   fl_font(dx::font,dx::size);
   auto measured=[&](const char*text,int minimum){fl_font(dx::font,dx::size);int w=width-48,h=0;fl_measure(text,w,h,0);return std::max(minimum,h+16);};
-  int header=measured(description,row*2);
-  Fl_Box hint(16,4,width-48,header-4,description);
+  int header=measured(description.c_str(),row*2);
+  Fl_Box hint(16,4,width-48,header-4,description.c_str());
   hint.align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE|FL_ALIGN_WRAP);
   int label=std::min(width/2,dx::size*15),y=header;
   Fl_Choice source(label,y,width-label-40,row-6,"Source");y+=row;
@@ -91,9 +96,12 @@ void edit_bake_dialog(Document &doc){
   color_error.position(label,y);y+=row;
   Fl_Check_Button normals(20,y,width-56,row,"Author portable normal targets");normals.value(settings.prepare_normals);normals.tooltip("Authors portable normal and tangent targets. Pose and morph shading can differ from legacy dynamic shading; original source data is retained.");y+=row;
   normal_error.position(label,y);y+=row;
-  const char *help="Partial projection keeps unprojected areas and reports misses.\nPortable normal authoring creates a new shading model; original data is retained.\nCage: duplicate target, edit vertices; keep topology. 0 samples disables AO.\nDrag or wheel to adjust. Bake is one Undo step.";
-  int help_height=measured(help,row);
-  Fl_Box adjustment(16,y,width-48,help_height,help);y+=help_height;
+  if(texture_set){colors.deactivate();normals.deactivate();color_error.deactivate();normal_error.deactivate();}
+  std::string help="Partial projection keeps unprojected areas and reports misses.\n";
+  if(!texture_set)help+="Portable normal authoring creates a new shading model while retaining the original data.\n";
+  help+="For a cage, duplicate the target and edit its vertices while keeping topology. 0 samples disables AO.\nDrag or wheel to adjust. Bake is one Undo step.";
+  int help_height=measured(help.c_str(),row);
+  Fl_Box adjustment(16,y,width-48,help_height,help.c_str());y+=help_height;
   adjustment.align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE|FL_ALIGN_WRAP);
   Fl_Progress progress(20,y,width-60,row-8);progress.selection_color(FL_SELECTION_COLOR);progress.minimum(0);progress.maximum(100);progress.value(0);y+=row;
   Fl_Box status(16,y,width-48,row*2);status.align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE|FL_ALIGN_WRAP);y+=row*2;
@@ -110,7 +118,7 @@ void edit_bake_dialog(Document &doc){
     const double values[]{v.front_mm,v.back_mm,v.ao_distance_mm,double(v.ao_samples),double(v.padding),v.color_error,v.normal_error*57.29577951308232};
     for(size_t i=0;i<r.fields.size();++i){r.fields[i]->physical(values[i]);r.fields[i]->redraw();}
     r.partial->value(v.allow_partial);r.backfaces->value(v.allow_backfaces);
-    r.colors->value(v.prepare_colors);r.normals->value(v.prepare_normals);r.window->redraw();
+    r.colors->value(r.colors->active()&&v.prepare_colors);r.normals->value(r.normals->active()&&v.prepare_normals);r.window->redraw();
   }catch(const std::exception &e){r.doc->report_error(e.what());}},&run);
   close.callback([](Fl_Widget*w,void*p){auto &r=*static_cast<Run*>(p);if(r.running && r.doc->frame().state->asset_busy)r.doc->cancel_asset_work();else w->window()->hide();},&run);
   bake.callback([](Fl_Widget*,void*p){auto &r=*static_cast<Run*>(p);try{
@@ -132,7 +140,9 @@ void edit_bake_dialog(Document &doc){
     }
     if(s->active_object!=target || s->generation!=expected.generation){window.hide();break;}
     if(run.running){normals.deactivate();colors.deactivate();partial.deactivate();backfaces.deactivate();source.deactivate();cage.deactivate();for(auto f:sliders)f->deactivate();bake.deactivate();if(work.cancellable)close.activate();else close.deactivate();close.copy_label(work.cancelling?"Cancelling...":"Cancel bake");progress.value(std::min(99.f,work.progress*100));}
-    else {normals.activate();colors.activate();partial.activate();backfaces.activate();source.activate();cage.activate();for(auto f:sliders)f->activate();bake.activate();
+    else {partial.activate();backfaces.activate();source.activate();cage.activate();bake.activate();
+      for(size_t i=0;i<(texture_set?5:sliders.size());++i)sliders[i]->activate();
+      if(!texture_set){colors.activate();normals.activate();}
       if(ids.at(size_t(source.value()))==unavailable_bake_object||cage_ids.at(size_t(cage.value()))==unavailable_bake_object)bake.deactivate();
       close.activate();close.copy_label(run.ever_ran?"Close":"Cancel");if(run.ever_ran && s->error.empty() && s->message.find("complete")!=std::string::npos)progress.value(100);}
     std::string title="Bake surface";

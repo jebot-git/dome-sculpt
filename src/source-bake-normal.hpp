@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 #include "dome/bake.hpp"
+#include <span>
 namespace dome::detail {
 // Actual object-space roles after authentic artist-frame/morph/skin transport,
 // rotated into the low target's coordinate system. Never a display normal map.
@@ -13,5 +14,5 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &,CanvasTransfor
  const SourceBakeNormalOptions & = {});
 // Internal dual-role route; the public legacy Bake API stays byte/layout exact.
 BakeResult bake_mesh_source_normals(const Mesh &,const BakeSource &,const BakeOptions &,
- const SourceBakeNormalResolver &);
+ const SourceBakeNormalResolver &, std::span<const uint32_t> target_triangles = {});
 }
