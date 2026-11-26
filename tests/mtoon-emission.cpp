@@ -92,6 +92,9 @@ int main(int argc,char **argv)try {
       if(!close(actual,wanted,3))std::cerr<<"EM legacy="<<legacy<<" opacity="<<opacity<<" coverage="<<coverage<<" pixelcoverage="<<int(pixel.data[12])<<" actual="<<actual[0]<<","<<actual[1]<<","<<actual[2]<<" wanted="<<wanted[0]<<","<<wanted[1]<<","<<wanted[2]<<"\n";
       check(close(actual,wanted,3),"Protected, fractional and full emission preserve differing typed/PBR roles and factors through editable layers");
     }
+    // Finish earlier replaced views in this fixture, then measure the
+    // accepted pack separately from pending retirement costs.
+    glFinish();draw(renderer,fixture.scene);
     auto stats=renderer.texture_stats();draw(renderer,fixture.scene);auto shifted=std::make_shared<MeshSnapshot>(*fixture.scene);shifted->mesh.positions[0].x+=.001f;draw(renderer,shifted);
     check(stats.packed_bytes>0 && stats.pack_builds>0 && renderer.texture_stats().pack_builds==stats.pack_builds &&
           renderer.texture_stats().uploads==stats.uploads && renderer.texture_stats().bytes==stats.bytes,
@@ -143,8 +146,23 @@ int main(int argc,char **argv)try {
   check(GLuint(packed)==buffer && layout && GLuint(binding)==texture,
         "GPU source copies restore caller pixel-pack buffer, pixel layout and texture-buffer bindings");
   glBindBuffer(GL_PIXEL_PACK_BUFFER,0);for(size_t n=0;n<pack_names.size();++n)glPixelStorei(pack_names[n],n==0?4:0);glBindTexture(GL_TEXTURE_BUFFER,0);glDeleteTextures(1,&texture);glDeleteBuffers(1,&buffer);
-  auto stats=renderer.texture_stats();SurfaceTextureLimits budget;budget.max_bytes=stats.bytes-1;SurfaceRenderer limited(budget);
-  check(rejects([&]{draw(limited,state.scene);}) && limited.texture_stats().images==0,"Combined original/mip/packed GPU byte budgets reject oversized candidates without retained partial resources");
+  // Measure the same cold workload without the previous frame's retirements.
+  SurfaceRenderer reference;
+  const auto reference_pixels=draw(reference,state.scene);
+  const auto cost=reference.texture_stats();
+  check(cost.packed_bytes>0&&cost.bytes>cost.packed_bytes,"Cold source preview charges both original images and their GPU pack");
+  SurfaceTextureLimits budget;
+  budget.max_bytes=cost.bytes-1;
+  SurfaceRenderer limited(budget);
+  bool refused_budget=false;
+  try{draw(limited,state.scene);}catch(const std::length_error &){refused_budget=true;}
+  const auto refused_cost=limited.texture_stats();
+  check(refused_budget&&refused_cost.bytes==0&&refused_cost.images==0&&refused_cost.uploads==0,
+        "Combined original and packed GPU byte budgets reject oversized candidates without allocating material stores");
+  budget.max_bytes=cost.bytes;
+  SurfaceRenderer exact_budget(budget);
+  check(draw(exact_budget,state.scene)==reference_pixels&&exact_budget.texture_stats().bytes==cost.bytes,
+        "The exact cold GPU byte budget accepts the same source pack and pixels");
   short_buffer_limit=true;SurfaceRenderer narrow;auto refused=rejects([&]{draw(narrow,state.scene);});short_buffer_limit=false;
   check(refused && narrow.texture_stats().images==0,"Actual texture-buffer texel limits are enforced before packing allocation");
   check(gpu_copy_calls>0 && all_gpu_copies,"Every production texture transfer targets an unmapped GPU pixel-pack buffer rather than host memory");
