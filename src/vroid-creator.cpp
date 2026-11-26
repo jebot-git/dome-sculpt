@@ -445,6 +445,7 @@ CreatorShapeExport::CreatorShapeExport(const HumanoidControls &c,
 }
 Vec3 CreatorShapeExport::point(Vec3 p) const { return impl_->shape(p); }
 const Skeleton &CreatorShapeExport::skeleton() const { return impl_->rest; }
+bool CreatorShapeExport::has_uniform_shape() const { return impl_->shape.neutral_frame(); }
 float CreatorShapeExport::scale() const { return impl_->shape.scale; }
 std::vector<uint32_t> CreatorShapeExport::joint_nodes() const {
   std::vector<uint32_t> result(impl_->rest.bones.size());
