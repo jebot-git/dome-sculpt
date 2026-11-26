@@ -66,9 +66,21 @@ int main(int argc,char**argv)try{
   auto separate=std::make_shared<PaintSourceMaps>();separate->color.image=pair;separate->emission.image=pair;separate->normal.image=pair;separate->metal_rough.image=pair;separate->occlusion.image=pair;
   auto shared=painted(separate);auto scene=snapshot(quad(),opaque,shared->preview(opaque));capture(renderer,scene);auto uploaded=renderer.texture_stats();check(uploaded.images==2,"One original image shares GPU storage by identity with distinct sRGB and linear encodings");
   auto changed=std::make_shared<MeshSnapshot>(*scene);changed->mesh.positions[0].x+=.1f;capture(renderer,changed);check(renderer.texture_stats().uploads==uploaded.uploads,"Geometry-only preview jobs preserve existing GPU images with zero pixel reupload");
-  capture(renderer,snapshot(quad(),opaque,{}));check(renderer.texture_stats().images==0&&renderer.texture_stats().samplers==0&&renderer.texture_stats().bytes==0,"Stale GL image and sampler resources are released when the current snapshot no longer uses them");
+  auto empty_material=snapshot(quad(),opaque,{});
+  capture(renderer,empty_material);
+  check(renderer.texture_stats().bytes>0,"Replaced image stores remain charged at publication until their fence is observed");
+  glFinish();
+  capture(renderer,empty_material);
+  check(renderer.texture_stats().images==0&&renderer.texture_stats().samplers==0&&renderer.texture_stats().bytes==0,
+        "An unchanged snapshot collects completed image and sampler retirements");
   auto missing=std::make_shared<PaintSourceMaps>();missing->normal.image=flat({128,128,255,255});auto defaults=painted(missing);auto tint=white();tint.color={1,0,0,1};check(pixel(capture(renderer,snapshot(quad(),tint,defaults->preview(tint))))==std::array<uint8_t,4>{255,0,0,255},"Missing source slots use material defaults rather than black incomplete textures");
-  auto mip=std::make_shared<PaintSourceMaps>();mip->color.image=pair;mip->color.min_filter=GL_LINEAR_MIPMAP_LINEAR;auto mip_paint=painted(mip);capture(renderer,snapshot(quad(),opaque,mip_paint->preview(opaque)));
+  auto mip=std::make_shared<PaintSourceMaps>();mip->color.image=pair;mip->color.min_filter=GL_LINEAR_MIPMAP_LINEAR;auto mip_paint=painted(mip);
+  auto mip_scene=snapshot(quad(),opaque,mip_paint->preview(opaque));
+  const auto mip_pixels=capture(renderer,mip_scene);
+  check(renderer.texture_stats().images==2&&renderer.texture_stats().bytes==16,
+        "The 12-byte mip chain and retired 4-byte normal share the material budget until retirement");
+  glFinish();
+  check(capture(renderer,mip_scene)==mip_pixels,"Retiring the previous normal leaves the accepted mipmapped image exact");
   check(renderer.texture_stats().images==1&&renderer.texture_stats().bytes==12,"Original mipmapped sampler generates a GPU mip chain with explicitly accounted storage");
   SurfaceTextureLimits tiny;tiny.max_bytes=4;SurfaceRenderer limited(tiny);check(rejects([&]{capture(limited,scene);})&&limited.texture_stats().images==0,"GPU byte budgets fail explicitly before retaining partial oversized resources");
   auto original=std::make_shared<PaintSourceMaps>();original->color.image=flat({255,0,0,255});

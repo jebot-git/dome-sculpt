@@ -69,13 +69,16 @@ weighted=mix(weighted,vec3(0),equal(original,vec3(0)));}
 retained=mix(retained,weighted,isinf(background));}
 return retained;}
 uniform samplerBuffer packedSources;
-uniform ivec4 mt_pack_levels[98],mt_pack_sampler[4];uniform ivec2 mt_pack_info[4];
+uniform ivec4 mt_pack_levels[112],mt_pack_sampler[4];uniform ivec2 mt_pack_info[4];
 vec2 mt_packed_wrap(vec2 q,ivec2 wrap){for(int axis=0;axis<2;++axis){
 if(wrap[axis]==10497)q[axis]=fract(q[axis]);
 else if(wrap[axis]==33648){float cell=floor(q[axis]);q[axis]=fract(q[axis]);if(mod(cell,2.)>=1.)q[axis]=1.-q[axis];}
 else q[axis]=clamp(q[axis],0.,1.);}return q;}
-int mt_packed_coordinate(int q,int n,int wrap){if(wrap==10497)return (q%n+n)%n;
-if(wrap==33648){q=(q%(n*2)+n*2)%(n*2);return q<n?q:n*2-1-q;}return clamp(q,0,n-1);}
+// GLSL leaves signed remainder undefined when an operand is negative.
+// Filter taps can start one texel below zero after normalized wrapping.
+int mt_packed_remainder(int q,int n){return q>=0?q%n:n-1-(-(q+1)%n);}
+int mt_packed_coordinate(int q,int n,int wrap){if(wrap==10497)return mt_packed_remainder(q,n);
+if(wrap==33648){q=mt_packed_remainder(q,n*2);return q<n?q:n*2-1-q;}return clamp(q,0,n-1);}
 vec4 mt_packed_texel(int view,int level,ivec2 q){ivec4 data=mt_pack_levels[view*14+level];
 ivec2 wrap=mt_pack_sampler[view].xy;q=ivec2(mt_packed_coordinate(q.x,data.y,wrap.x),mt_packed_coordinate(q.y,data.z,wrap.y));
 vec4 v=texelFetch(packedSources,data.x+q.y*data.y+q.x);
@@ -105,6 +108,55 @@ vec2 p=clamp(uv,vec2(0),vec2(1))*vec2(size)-.5,f=fract(p);ivec2 base=ivec2(floor
 ivec2 a=clamp(base,ivec2(0),size-1),b=clamp(base+ivec2(1),ivec2(0),size-1);
 return mix(mix(texelFetch(packedSources,data.x+a.y*size.x+a.x),texelFetch(packedSources,data.x+a.y*size.x+b.x),f.x),
 mix(texelFetch(packedSources,data.x+b.y*size.x+a.x),texelFetch(packedSources,data.x+b.y*size.x+b.x),f.x),f.y);}
+uniform int retained_paint_size;
+uniform ivec2 retained_legacy_origin,retained_image_origin,retained_image_size;
+uniform ivec3 retained_image_sampler;
+uniform vec3 retained_image_u,retained_image_v,retained_texture_u,retained_texture_v,retained_image_factor;
+uniform vec2 retained_image_scale,retained_image_offset,retained_image_rotation;
+uniform float retained_source_strength;
+vec4 retained_input(ivec2 q,bool packed_view){
+ if(!packed_view)return texelFetch(tex15,q,0);
+ ivec4 current=mt_pack_levels[98];
+ return texelFetch(packedSources,current.x+q.y*current.y+q.x);
+}
+vec4 retained_layer(vec2 uv,ivec2 origin,bool packed_view){
+ ivec2 size=ivec2(retained_paint_size);
+ vec2 p=clamp(uv,0.,1.)*vec2(size)-.5,f=fract(p);
+ ivec2 base=ivec2(floor(p));
+ ivec2 a=clamp(base,ivec2(0),size-1)+origin,b=clamp(base+1,ivec2(0),size-1)+origin;
+ return mix(mix(retained_input(a,packed_view),retained_input(ivec2(b.x,a.y),packed_view),f.x),
+            mix(retained_input(ivec2(a.x,b.y),packed_view),retained_input(b,packed_view),f.x),f.y);
+}
+vec3 retained_original_texel(ivec2 q,bool packed_view){
+ ivec2 size=retained_image_size,wrap=retained_image_sampler.xy;
+ q=ivec2(mt_packed_coordinate(q.x,size.x,wrap.x),mt_packed_coordinate(q.y,size.y,wrap.y));
+ vec3 encoded=retained_input(q+retained_image_origin,packed_view).rgb;
+ return mix(encoded/12.92,pow((encoded+.055)/1.055,vec3(2.4)),greaterThan(encoded,vec3(.04045)));
+}
+vec3 retained_original(bool packed_view){
+ vec3 current=vec3(clamp(texcoord,0.,1.),1.);
+ vec2 uv=vec2(dot(retained_image_u,current),dot(retained_image_v,current))*retained_image_scale;
+ vec2 rotation=retained_image_rotation;
+ uv=vec2(rotation.x*uv.x-rotation.y*uv.y,rotation.y*uv.x+rotation.x*uv.y)+retained_image_offset;
+ uv=vec2(dot(retained_texture_u,vec3(uv,1.)),dot(retained_texture_v,vec3(uv,1.)));
+ vec2 p=mt_packed_wrap(uv,retained_image_sampler.xy)*vec2(retained_image_size);
+ if(retained_image_sampler.z==9728)return retained_original_texel(ivec2(floor(p)),packed_view);
+ p-=.5;
+ ivec2 a=ivec2(floor(p));vec2 f=fract(p);
+ return mix(mix(retained_original_texel(a,packed_view),retained_original_texel(a+ivec2(1,0),packed_view),f.x),
+            mix(retained_original_texel(a+ivec2(0,1),packed_view),retained_original_texel(a+1,packed_view),f.x),f.y);
+}
+vec3 retained_image_emission(bool packed_view){
+ vec2 uv=retained_emission_uv();
+ vec4 paint=retained_layer(uv,ivec2(0),packed_view);
+ vec3 legacy=retained_layer(uv,retained_legacy_origin,packed_view).rgb;
+ vec3 image=clamp(retained_original(packed_view),0.,1.)*retained_image_factor;
+ return image*(1.-paint.a)+legacy*retained_source_strength+paint.rgb;
+}
+vec3 mt_baked_emission(){
+ if(retained_emission_domain==3)return retained_image_emission(true);
+ return mt_paint_read(7,retained_emission_uv()).rgb;
+}
 // Reconstruct canonical detail in coverage-premultiplied space. Protected
 // texels may contain arbitrary unused normal bytes and must not bleed in.
 vec3 mt_baked_detail(out float coverage){
@@ -158,14 +210,14 @@ vec3 generic=mt_packed_read(2,genericUV).rgb;
 s.emission=coverage==0?mt_effective_emission*original:max(vec3(0),s.emission+(mt_effective_emission*original-mt_native_emission*generic)*(1-coverage));}
 if(mt_overlay==1){float coverage=mt_paint_read(3,paintcoord).a;
 vec3 original=s.emission;
-s.emission=mt_retained_emission(original,1-coverage)+mt_paint_read(1,paintcoord).rgb*mt_emission_strength+mt_paint_read(2,paintcoord).rgb;
+s.emission=(retained_emission_domain!=0?mt_baked_emission()*(1-coverage):mt_retained_emission(original,1-coverage))+mt_paint_read(1,paintcoord).rgb*mt_emission_strength+mt_paint_read(2,paintcoord).rgb;
 }else if(mt_overlay>=2){
 // Native color/normal maps are already resolved. Only emission is evaluated
 // from these separate genuine coefficient fields, in its actual paint domain.
 float coverage=mt_overlay==2?mt_paint_read(6,paintcoord).a:0.;
 vec3 legacy=mt_overlay==2?mt_paint_read(4,paintcoord).rgb:vec3(0);
 vec3 physical=mt_overlay==2?mt_paint_read(5,paintcoord).rgb:vec3(0);
-s.emission=mt_retained_emission(s.emission,1.-coverage)+legacy*mt_emission_strength+physical;
+s.emission=(retained_emission_domain!=0?mt_baked_emission()*(1.-coverage):mt_retained_emission(s.emission,1.-coverage))+legacy*mt_emission_strength+physical;
 }else if(mt_absolute_background==1)s.emission*=mt_background;
 s.emission=dome_preview_positive_finite(s.emission);
 s.rim=mt_read(4,mt_uv(4,texcoord,texcoord1,N,V,mask)).rgb;s.matcap=mt_read(5,mt_uv(5,texcoord,texcoord1,N,V,mask)).rgb;

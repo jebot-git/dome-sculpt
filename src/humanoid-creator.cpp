@@ -24,10 +24,19 @@ void HumanoidControls::validate() const {
     for (float v : color)
       if (!std::isfinite(v) || v < 0 || v > 1)
         fail("Invalid humanoid material color");
+  if(hair_recolor){
+    if(baseline=="makehuman-hm08")fail("Hair recolour requires a genuine CC0 VRoid base");
+    for(float value:*hair_recolor)if(!std::isfinite(value)||value<0||value>1)fail("Invalid absolute hair recolour");
+  }
+}
+std::array<float,3> humanoid_hair_recolor_value(const HumanoidControls &c){
+ if(c.hair_recolor)return *c.hair_recolor;
+ // Both hash-verified bundled HairBack materials share this linear base factor.
+ return {0, .3967553f*c.hair_color[1], .6038274f*c.hair_color[2]};
 }
 nlohmann::json HumanoidControls::encode() const {
   validate();
-  return {{"version", 2},
+  nlohmann::json result={{"version", 2},
           {"baseline", baseline},
           {"height", height},
           {"anime", anime},
@@ -49,10 +58,13 @@ nlohmann::json HumanoidControls::encode() const {
           {"skin_color", skin_color},
           {"iris_color", iris_color},
           {"hair_color", hair_color}};
+  if(hair_recolor){result["version"]=3;result["hair_recolor"]={{"version",1},{"linear_rgb",*hair_recolor}};}
+  return result;
 }
 HumanoidControls HumanoidControls::decode(const nlohmann::json &j) {
   if (!j.is_object() || ((j.at("version") != 1 || j.size() != 21) &&
-                         (j.at("version") != 2 || j.size() != 22)))
+                         (j.at("version") != 2 || j.size() != 22) &&
+                         (j.at("version") != 3 || j.size() != 23)))
     fail("Unsupported humanoid controls record");
   HumanoidControls c;
   c.baseline = j.at("version") == 1 ? "makehuman-hm08"
@@ -78,6 +90,10 @@ HumanoidControls HumanoidControls::decode(const nlohmann::json &j) {
   READ(skin_color);
   READ(iris_color);
   READ(hair_color);
+  if(j.at("version")==3){const auto &value=j.at("hair_recolor");
+    if(!value.is_object()||value.size()!=2||value.at("version")!=1)fail("Unsupported hair recolour record");
+    c.hair_recolor=value.at("linear_rgb").get<std::array<float,3>>();
+  }
 #undef READ
   c.validate();
   return c;

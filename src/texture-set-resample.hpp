@@ -6,5 +6,5 @@ namespace dome::detail {
 // masked and currently uncovered values, on independently preserved planes.
 std::vector<PaintLayer> resample_texture_set_layers(
     const PaintedMesh &, const TextureSetResolutionOptions &,
-    const TextureSetLimits &, TextureSetResolutionReport &);
+    const TextureSetLimits &, TextureSetResolutionReport &, bool native_cells = false);
 } // namespace dome::detail

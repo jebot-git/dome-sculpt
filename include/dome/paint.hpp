@@ -8,7 +8,7 @@
 #include <map>
 #include <memory>
 namespace dome {
-namespace detail {class PaintOverlayPacket;struct PaintOverlayFactory;struct EmissionExportAccess;class BakedNormalField;struct NativeWeightPaintAccess;struct TextureSetPaintAccess;class TextureSetFieldSource;class PolygonSurfaceOwner;class PolygonSurfacePreview;struct PolygonSurfaceStage;struct PolygonSurfacePaintCodec;}
+namespace detail {class PaintOverlayPacket;struct PaintOverlayFactory;struct EmissionExportAccess;class BakedNormalField;class BakedEmissionDomain;struct NativeWeightPaintAccess;struct TextureSetPaintAccess;class TextureSetFieldSource;class PolygonSurfaceOwner;class PolygonSurfacePreview;struct PolygonSurfaceStage;struct PolygonSurfacePaintCodec;}
 struct Material;
 namespace detail {class CurrentGridPaintPreview;}
 class PaintProjection;
@@ -98,6 +98,8 @@ struct BakedTextures {
   // Independent, immutable linear replacement coefficients. When present,
   // maps.emission is empty: RGB8 is not a second emission authority.
   std::shared_ptr<const BakedEmissionField> emission_field;
+  // Explicit source-grid authority, mutually exclusive with emission_field.
+  std::shared_ptr<const detail::BakedEmissionDomain> emission_domain;
   void validate(uint32_t resolution) const;
   size_t storage_bytes() const;
 };

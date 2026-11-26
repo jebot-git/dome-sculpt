@@ -1,0 +1,106 @@
+{
+  "scope": "Test-only materialcontrol fix calibrated partialsoftware6views; original64RetainSource transfer fidelity FAILED, no fullGL/Arc/wholecandidate admission",
+  "source_render": "422e9a59299f8c668ce479e933098ef5a33a0fdb",
+  "source_CPU_diagnosis": "5cb2e1acfa3b5ec18480abf685d3c8f6b38740a4",
+  "production_trees_unchanged": {
+    "src": "e83c2ce7e76e23267bb708c20363e7c1f0829afa",
+    "include": "cc49d0b27817baa5f3b849594585b9cee5784d79",
+    "third_party": "4bbfacd9cd0985e996148fcf4d540705fbb8a250"
+  },
+  "actual_software_exit": 1,
+  "completed_views": 6,
+  "completed_points": 39,
+  "partial_material_control_triplets": 156,
+  "partial_MToon_triplets": 84,
+  "partial_forecast_max_RGB_error": 2,
+  "original_target_points": 136,
+  "original_direction_failures_035": 18,
+  "first_original_direction_error": 0.07921938842435189,
+  "maximum_original_direction_error": 0.21788554280628836,
+  "full_matrix_expected_points": 437,
+  "full_matrix_expected_PNGs": 1816,
+  "failed_matrix_retained_PNGs": 163,
+  "original_probes_unchanged": [
+    [
+      48,
+      48
+    ],
+    [
+      45,
+      47
+    ],
+    [
+      49,
+      45
+    ],
+    [
+      50,
+      50
+    ]
+  ],
+  "acceptance_bounds_unchanged": {
+    "normal": 0.035,
+    "RGB": 3,
+    "negative_gap": 7,
+    "negative_disjoint": true
+  },
+  "input_drift": [],
+  "owned_processes": [],
+  "software_lease_released": true,
+  "CPU_diagnostic_lease_released": true,
+  "Arc_executed": false,
+  "evidence": {
+    "artifacts/advanced-normal-context-witness-build-20261118/software-plan-v3.json": {
+      "sha256": "db93a420d003ba362951744df746fcf5e75a4d9685cfdf66a4712d8790ace161",
+      "bytes": 169127
+    },
+    "artifacts/advanced-normal-context-witness-build-20261118/run-software-v3.py": {
+      "sha256": "0635124b170bfe54361688ad050c4cc9760c1bd50f2833e1bb25577384e62736",
+      "bytes": 9678
+    },
+    "artifacts/advanced-normal-context-witness-build-20261118/software-display-v1-20261118/status.json": {
+      "sha256": "cf00b207a4cd24614253b5fb7b2ed4dcf23473bc064fd1b5dc28841f7ed63b0b",
+      "bytes": 46527
+    },
+    "artifacts/advanced-normal-context-witness-build-20261118/software-display-v1-20261118/advanced-render.log": {
+      "sha256": "c4504f8c5241fb82981929e167d2308353527b3ae2cb39300a21c752ff105db1",
+      "bytes": 41666
+    },
+    "artifacts/advanced-normal-context-witness-build-20261118/partial-material-control-calibration-v1.json": {
+      "sha256": "6fa3fb10f8057d1d37fe4586ff7f26c7cd750f5ac3f93390877f97d8914c4224",
+      "bytes": 46505
+    },
+    "artifacts/advanced-normal-context-witness-build-20261118/display-witnesses-v1.json": {
+      "sha256": "1687b2b6c26220dbf6a18a4fec45fd9962f68a6dfb971abf2eee8b6c201c7bff",
+      "bytes": 472757
+    },
+    "artifacts/advanced-normal-context-witness-build-20261118/compile-status.json": {
+      "sha256": "1ac8a9700c3e431c34b2c05465864ef4e0ecdc8fec3ce247d17458fe11fda40b",
+      "bytes": 167374
+    },
+    "artifacts/advanced-normal-context-witness-build-20261118/link-status-v1.json": {
+      "sha256": "a018bbbcd290ecfe49191ced5d6d6f31a1392b63a54b8ee814bc41e751c497be",
+      "bytes": 40741
+    },
+    "artifacts/advanced-normal-transfer-diagnose-build-20261118/compile-status.json": {
+      "sha256": "ba4b9ce522ff17cd218c0a4ca647d6e49038e6dbe2ebf5a047e655067877b088",
+      "bytes": 167994
+    },
+    "artifacts/advanced-normal-transfer-diagnose-build-20261118/link-status-v1.json": {
+      "sha256": "fef3efa6afa7b7d6d113604cbbacaa57f6fdfb41fc7b53598f2dc1dee3df7dc0",
+      "bytes": 40724
+    },
+    "artifacts/advanced-normal-transfer-diagnose-build-20261118/CPU-forecast-v1-20261118/status.json": {
+      "sha256": "8016f8209f6dce0ce3de1fc68b2a27b8a63a8cf3679c8d2e791284fa5f2ead3a",
+      "bytes": 98497
+    },
+    "artifacts/advanced-normal-transfer-diagnose-build-20261118/CPU-forecast-v1-20261118/forecast.jsonl": {
+      "sha256": "4c53b5c6ad24863ab56e6a2fdd3920bd0a0674dfa1c24a6ef1c9844cd4044039",
+      "bytes": 52566472
+    },
+    "artifacts/advanced-normal-transfer-diagnose-build-20261118/transfer-diagnosis-v1.json": {
+      "sha256": "dffaa492b6e1ad73d4884f4eb0eefe1718f3c48cb60d35dac94baf0ce37c8337",
+      "bytes": 509277
+    }
+  }
+}

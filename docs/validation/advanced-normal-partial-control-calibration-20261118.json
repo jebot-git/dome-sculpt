@@ -1,0 +1,2976 @@
+{
+  "scope": "Partial sixpassedviews only; full matrix FAILED genuine retainedtarget direction .035 before seventhview firstpixel; no fullgraphicsacceptance",
+  "points": 39,
+  "RGB_triplets": 156,
+  "maximum_RGB_error": 2,
+  "MToon_triplets": 84,
+  "maximum_MToon_RGB_error": 2,
+  "rows": [
+    {
+      "label": "mt1-rest-shared-raster-source-pbr",
+      "xy": [
+        58,
+        43
+      ],
+      "control": "correct",
+      "actual": [
+        160,
+        131,
+        103
+      ],
+      "forecast": [
+        161,
+        131,
+        103
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-raster-source-pbr",
+      "xy": [
+        58,
+        43
+      ],
+      "control": "wrong-domain",
+      "actual": [
+        151,
+        122,
+        95
+      ],
+      "forecast": [
+        152,
+        122,
+        94
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-raster-source-pbr",
+      "xy": [
+        58,
+        43
+      ],
+      "control": "omitted",
+      "actual": [
+        151,
+        122,
+        95
+      ],
+      "forecast": [
+        151,
+        122,
+        94
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-raster-source-pbr",
+      "xy": [
+        58,
+        43
+      ],
+      "control": "swapped-role",
+      "actual": [
+        129,
+        102,
+        77
+      ],
+      "forecast": [
+        129,
+        101,
+        76
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-raster-source-pbr",
+      "xy": [
+        49,
+        45
+      ],
+      "control": "correct",
+      "actual": [
+        97,
+        108,
+        55
+      ],
+      "forecast": [
+        97,
+        108,
+        55
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-source-pbr",
+      "xy": [
+        49,
+        45
+      ],
+      "control": "wrong-domain",
+      "actual": [
+        101,
+        113,
+        59
+      ],
+      "forecast": [
+        101,
+        113,
+        59
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-source-pbr",
+      "xy": [
+        49,
+        45
+      ],
+      "control": "omitted",
+      "actual": [
+        96,
+        107,
+        54
+      ],
+      "forecast": [
+        96,
+        107,
+        54
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-source-pbr",
+      "xy": [
+        49,
+        45
+      ],
+      "control": "swapped-role",
+      "actual": [
+        96,
+        107,
+        54
+      ],
+      "forecast": [
+        95,
+        107,
+        54
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-raster-source-pbr",
+      "xy": [
+        45,
+        47
+      ],
+      "control": "correct",
+      "actual": [
+        144,
+        118,
+        86
+      ],
+      "forecast": [
+        144,
+        118,
+        86
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-source-pbr",
+      "xy": [
+        45,
+        47
+      ],
+      "control": "wrong-domain",
+      "actual": [
+        155,
+        129,
+        97
+      ],
+      "forecast": [
+        155,
+        129,
+        97
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-source-pbr",
+      "xy": [
+        45,
+        47
+      ],
+      "control": "omitted",
+      "actual": [
+        140,
+        114,
+        83
+      ],
+      "forecast": [
+        140,
+        114,
+        83
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-source-pbr",
+      "xy": [
+        45,
+        47
+      ],
+      "control": "swapped-role",
+      "actual": [
+        140,
+        114,
+        82
+      ],
+      "forecast": [
+        140,
+        113,
+        82
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-raster-source-pbr",
+      "xy": [
+        48,
+        48
+      ],
+      "control": "correct",
+      "actual": [
+        128,
+        114,
+        74
+      ],
+      "forecast": [
+        128,
+        114,
+        74
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-source-pbr",
+      "xy": [
+        48,
+        48
+      ],
+      "control": "wrong-domain",
+      "actual": [
+        133,
+        119,
+        79
+      ],
+      "forecast": [
+        133,
+        119,
+        79
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-source-pbr",
+      "xy": [
+        48,
+        48
+      ],
+      "control": "omitted",
+      "actual": [
+        125,
+        111,
+        71
+      ],
+      "forecast": [
+        125,
+        111,
+        71
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-source-pbr",
+      "xy": [
+        48,
+        48
+      ],
+      "control": "swapped-role",
+      "actual": [
+        123,
+        109,
+        70
+      ],
+      "forecast": [
+        123,
+        109,
+        70
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-source-pbr",
+      "xy": [
+        50,
+        50
+      ],
+      "control": "correct",
+      "actual": [
+        135,
+        119,
+        80
+      ],
+      "forecast": [
+        135,
+        119,
+        80
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-source-pbr",
+      "xy": [
+        50,
+        50
+      ],
+      "control": "wrong-domain",
+      "actual": [
+        137,
+        121,
+        82
+      ],
+      "forecast": [
+        137,
+        121,
+        82
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-source-pbr",
+      "xy": [
+        50,
+        50
+      ],
+      "control": "omitted",
+      "actual": [
+        130,
+        113,
+        75
+      ],
+      "forecast": [
+        129,
+        113,
+        75
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-raster-source-pbr",
+      "xy": [
+        50,
+        50
+      ],
+      "control": "swapped-role",
+      "actual": [
+        126,
+        110,
+        72
+      ],
+      "forecast": [
+        126,
+        110,
+        72
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-source-pbr",
+      "xy": [
+        58,
+        58
+      ],
+      "control": "correct",
+      "actual": [
+        166,
+        138,
+        110
+      ],
+      "forecast": [
+        167,
+        138,
+        109
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-raster-source-pbr",
+      "xy": [
+        58,
+        58
+      ],
+      "control": "wrong-domain",
+      "actual": [
+        152,
+        122,
+        95
+      ],
+      "forecast": [
+        152,
+        122,
+        95
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-source-pbr",
+      "xy": [
+        58,
+        58
+      ],
+      "control": "omitted",
+      "actual": [
+        152,
+        122,
+        95
+      ],
+      "forecast": [
+        152,
+        122,
+        95
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-source-pbr",
+      "xy": [
+        58,
+        58
+      ],
+      "control": "swapped-role",
+      "actual": [
+        153,
+        124,
+        96
+      ],
+      "forecast": [
+        153,
+        124,
+        96
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-source-mtoon",
+      "xy": [
+        33,
+        37
+      ],
+      "control": "correct",
+      "actual": [
+        215,
+        164,
+        124
+      ],
+      "forecast": [
+        215,
+        164,
+        124
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-source-mtoon",
+      "xy": [
+        33,
+        37
+      ],
+      "control": "wrong-domain",
+      "actual": [
+        201,
+        153,
+        116
+      ],
+      "forecast": [
+        201,
+        153,
+        117
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-raster-source-mtoon",
+      "xy": [
+        33,
+        37
+      ],
+      "control": "omitted",
+      "actual": [
+        201,
+        153,
+        116
+      ],
+      "forecast": [
+        201,
+        153,
+        117
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-raster-source-mtoon",
+      "xy": [
+        33,
+        37
+      ],
+      "control": "swapped-role",
+      "actual": [
+        200,
+        152,
+        116
+      ],
+      "forecast": [
+        200,
+        152,
+        116
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-source-mtoon",
+      "xy": [
+        33,
+        40
+      ],
+      "control": "correct",
+      "actual": [
+        213,
+        162,
+        123
+      ],
+      "forecast": [
+        214,
+        163,
+        123
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-raster-source-mtoon",
+      "xy": [
+        33,
+        40
+      ],
+      "control": "wrong-domain",
+      "actual": [
+        195,
+        149,
+        113
+      ],
+      "forecast": [
+        195,
+        149,
+        114
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-raster-source-mtoon",
+      "xy": [
+        33,
+        40
+      ],
+      "control": "omitted",
+      "actual": [
+        201,
+        153,
+        116
+      ],
+      "forecast": [
+        201,
+        153,
+        117
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-raster-source-mtoon",
+      "xy": [
+        33,
+        40
+      ],
+      "control": "swapped-role",
+      "actual": [
+        198,
+        151,
+        115
+      ],
+      "forecast": [
+        198,
+        151,
+        115
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-source-mtoon",
+      "xy": [
+        49,
+        45
+      ],
+      "control": "correct",
+      "actual": [
+        246,
+        242,
+        239
+      ],
+      "forecast": [
+        247,
+        242,
+        239
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-raster-source-mtoon",
+      "xy": [
+        49,
+        45
+      ],
+      "control": "wrong-domain",
+      "actual": [
+        252,
+        247,
+        244
+      ],
+      "forecast": [
+        252,
+        247,
+        245
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-raster-source-mtoon",
+      "xy": [
+        49,
+        45
+      ],
+      "control": "omitted",
+      "actual": [
+        247,
+        242,
+        239
+      ],
+      "forecast": [
+        247,
+        242,
+        240
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-raster-source-mtoon",
+      "xy": [
+        49,
+        45
+      ],
+      "control": "swapped-role",
+      "actual": [
+        247,
+        242,
+        240
+      ],
+      "forecast": [
+        248,
+        243,
+        240
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-raster-source-mtoon",
+      "xy": [
+        58,
+        45
+      ],
+      "control": "correct",
+      "actual": [
+        188,
+        142,
+        105
+      ],
+      "forecast": [
+        188,
+        141,
+        104
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-raster-source-mtoon",
+      "xy": [
+        58,
+        45
+      ],
+      "control": "wrong-domain",
+      "actual": [
+        199,
+        150,
+        110
+      ],
+      "forecast": [
+        199,
+        149,
+        109
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-raster-source-mtoon",
+      "xy": [
+        58,
+        45
+      ],
+      "control": "omitted",
+      "actual": [
+        199,
+        149,
+        110
+      ],
+      "forecast": [
+        199,
+        149,
+        109
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-raster-source-mtoon",
+      "xy": [
+        58,
+        45
+      ],
+      "control": "swapped-role",
+      "actual": [
+        206,
+        154,
+        114
+      ],
+      "forecast": [
+        206,
+        154,
+        112
+      ],
+      "RGB_error": 2
+    },
+    {
+      "label": "mt1-rest-shared-raster-source-mtoon",
+      "xy": [
+        45,
+        47
+      ],
+      "control": "correct",
+      "actual": [
+        220,
+        192,
+        176
+      ],
+      "forecast": [
+        220,
+        192,
+        176
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-source-mtoon",
+      "xy": [
+        45,
+        47
+      ],
+      "control": "wrong-domain",
+      "actual": [
+        222,
+        195,
+        178
+      ],
+      "forecast": [
+        222,
+        194,
+        178
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-raster-source-mtoon",
+      "xy": [
+        45,
+        47
+      ],
+      "control": "omitted",
+      "actual": [
+        220,
+        193,
+        176
+      ],
+      "forecast": [
+        220,
+        192,
+        176
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-raster-source-mtoon",
+      "xy": [
+        45,
+        47
+      ],
+      "control": "swapped-role",
+      "actual": [
+        222,
+        195,
+        178
+      ],
+      "forecast": [
+        222,
+        194,
+        178
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-raster-source-mtoon",
+      "xy": [
+        48,
+        48
+      ],
+      "control": "correct",
+      "actual": [
+        231,
+        217,
+        209
+      ],
+      "forecast": [
+        232,
+        218,
+        209
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-raster-source-mtoon",
+      "xy": [
+        48,
+        48
+      ],
+      "control": "wrong-domain",
+      "actual": [
+        237,
+        223,
+        214
+      ],
+      "forecast": [
+        237,
+        223,
+        214
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-source-mtoon",
+      "xy": [
+        48,
+        48
+      ],
+      "control": "omitted",
+      "actual": [
+        232,
+        218,
+        209
+      ],
+      "forecast": [
+        233,
+        219,
+        210
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-raster-source-mtoon",
+      "xy": [
+        48,
+        48
+      ],
+      "control": "swapped-role",
+      "actual": [
+        235,
+        221,
+        212
+      ],
+      "forecast": [
+        235,
+        221,
+        212
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-source-mtoon",
+      "xy": [
+        50,
+        50
+      ],
+      "control": "correct",
+      "actual": [
+        227,
+        208,
+        198
+      ],
+      "forecast": [
+        227,
+        208,
+        198
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-source-mtoon",
+      "xy": [
+        50,
+        50
+      ],
+      "control": "wrong-domain",
+      "actual": [
+        236,
+        217,
+        206
+      ],
+      "forecast": [
+        236,
+        217,
+        206
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-source-mtoon",
+      "xy": [
+        50,
+        50
+      ],
+      "control": "omitted",
+      "actual": [
+        229,
+        210,
+        200
+      ],
+      "forecast": [
+        229,
+        210,
+        200
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-source-mtoon",
+      "xy": [
+        50,
+        50
+      ],
+      "control": "swapped-role",
+      "actual": [
+        233,
+        214,
+        203
+      ],
+      "forecast": [
+        233,
+        214,
+        203
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-target-pbr",
+      "xy": [
+        58,
+        43
+      ],
+      "control": "correct",
+      "actual": [
+        160,
+        131,
+        103
+      ],
+      "forecast": [
+        161,
+        131,
+        103
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-raster-target-pbr",
+      "xy": [
+        58,
+        43
+      ],
+      "control": "wrong-domain",
+      "actual": [
+        151,
+        122,
+        95
+      ],
+      "forecast": [
+        152,
+        122,
+        94
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-raster-target-pbr",
+      "xy": [
+        58,
+        43
+      ],
+      "control": "omitted",
+      "actual": [
+        151,
+        122,
+        95
+      ],
+      "forecast": [
+        151,
+        122,
+        94
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-raster-target-pbr",
+      "xy": [
+        58,
+        43
+      ],
+      "control": "swapped-role",
+      "actual": [
+        129,
+        102,
+        77
+      ],
+      "forecast": [
+        129,
+        101,
+        76
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-raster-target-pbr",
+      "xy": [
+        49,
+        45
+      ],
+      "control": "correct",
+      "actual": [
+        97,
+        108,
+        55
+      ],
+      "forecast": [
+        97,
+        108,
+        55
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-target-pbr",
+      "xy": [
+        49,
+        45
+      ],
+      "control": "wrong-domain",
+      "actual": [
+        101,
+        113,
+        59
+      ],
+      "forecast": [
+        101,
+        113,
+        59
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-target-pbr",
+      "xy": [
+        49,
+        45
+      ],
+      "control": "omitted",
+      "actual": [
+        96,
+        107,
+        54
+      ],
+      "forecast": [
+        96,
+        107,
+        54
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-target-pbr",
+      "xy": [
+        49,
+        45
+      ],
+      "control": "swapped-role",
+      "actual": [
+        96,
+        107,
+        54
+      ],
+      "forecast": [
+        95,
+        107,
+        54
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-raster-target-pbr",
+      "xy": [
+        45,
+        47
+      ],
+      "control": "correct",
+      "actual": [
+        144,
+        118,
+        86
+      ],
+      "forecast": [
+        144,
+        118,
+        86
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-target-pbr",
+      "xy": [
+        45,
+        47
+      ],
+      "control": "wrong-domain",
+      "actual": [
+        155,
+        129,
+        97
+      ],
+      "forecast": [
+        155,
+        129,
+        97
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-target-pbr",
+      "xy": [
+        45,
+        47
+      ],
+      "control": "omitted",
+      "actual": [
+        140,
+        114,
+        83
+      ],
+      "forecast": [
+        140,
+        114,
+        83
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-target-pbr",
+      "xy": [
+        45,
+        47
+      ],
+      "control": "swapped-role",
+      "actual": [
+        140,
+        114,
+        82
+      ],
+      "forecast": [
+        140,
+        113,
+        82
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-raster-target-pbr",
+      "xy": [
+        48,
+        48
+      ],
+      "control": "correct",
+      "actual": [
+        128,
+        114,
+        74
+      ],
+      "forecast": [
+        128,
+        114,
+        74
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-target-pbr",
+      "xy": [
+        48,
+        48
+      ],
+      "control": "wrong-domain",
+      "actual": [
+        133,
+        119,
+        79
+      ],
+      "forecast": [
+        133,
+        119,
+        79
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-target-pbr",
+      "xy": [
+        48,
+        48
+      ],
+      "control": "omitted",
+      "actual": [
+        125,
+        111,
+        71
+      ],
+      "forecast": [
+        125,
+        111,
+        71
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-target-pbr",
+      "xy": [
+        48,
+        48
+      ],
+      "control": "swapped-role",
+      "actual": [
+        123,
+        109,
+        70
+      ],
+      "forecast": [
+        123,
+        109,
+        70
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-target-pbr",
+      "xy": [
+        50,
+        50
+      ],
+      "control": "correct",
+      "actual": [
+        135,
+        119,
+        80
+      ],
+      "forecast": [
+        135,
+        119,
+        80
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-target-pbr",
+      "xy": [
+        50,
+        50
+      ],
+      "control": "wrong-domain",
+      "actual": [
+        137,
+        121,
+        82
+      ],
+      "forecast": [
+        137,
+        121,
+        82
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-target-pbr",
+      "xy": [
+        50,
+        50
+      ],
+      "control": "omitted",
+      "actual": [
+        130,
+        113,
+        75
+      ],
+      "forecast": [
+        129,
+        113,
+        75
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-raster-target-pbr",
+      "xy": [
+        50,
+        50
+      ],
+      "control": "swapped-role",
+      "actual": [
+        126,
+        110,
+        72
+      ],
+      "forecast": [
+        126,
+        110,
+        72
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-target-pbr",
+      "xy": [
+        58,
+        58
+      ],
+      "control": "correct",
+      "actual": [
+        166,
+        138,
+        110
+      ],
+      "forecast": [
+        167,
+        138,
+        109
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-raster-target-pbr",
+      "xy": [
+        58,
+        58
+      ],
+      "control": "wrong-domain",
+      "actual": [
+        152,
+        122,
+        95
+      ],
+      "forecast": [
+        152,
+        122,
+        95
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-target-pbr",
+      "xy": [
+        58,
+        58
+      ],
+      "control": "omitted",
+      "actual": [
+        152,
+        122,
+        95
+      ],
+      "forecast": [
+        152,
+        122,
+        95
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-target-pbr",
+      "xy": [
+        58,
+        58
+      ],
+      "control": "swapped-role",
+      "actual": [
+        153,
+        124,
+        96
+      ],
+      "forecast": [
+        153,
+        124,
+        96
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-target-mtoon",
+      "xy": [
+        33,
+        37
+      ],
+      "control": "correct",
+      "actual": [
+        212,
+        157,
+        115
+      ],
+      "forecast": [
+        212,
+        157,
+        115
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-target-mtoon",
+      "xy": [
+        33,
+        37
+      ],
+      "control": "wrong-domain",
+      "actual": [
+        198,
+        147,
+        108
+      ],
+      "forecast": [
+        198,
+        147,
+        108
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-target-mtoon",
+      "xy": [
+        33,
+        37
+      ],
+      "control": "omitted",
+      "actual": [
+        198,
+        147,
+        108
+      ],
+      "forecast": [
+        198,
+        147,
+        108
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-target-mtoon",
+      "xy": [
+        33,
+        37
+      ],
+      "control": "swapped-role",
+      "actual": [
+        197,
+        146,
+        108
+      ],
+      "forecast": [
+        197,
+        146,
+        107
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-raster-target-mtoon",
+      "xy": [
+        33,
+        41
+      ],
+      "control": "correct",
+      "actual": [
+        210,
+        156,
+        114
+      ],
+      "forecast": [
+        210,
+        156,
+        113
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-raster-target-mtoon",
+      "xy": [
+        33,
+        41
+      ],
+      "control": "wrong-domain",
+      "actual": [
+        191,
+        142,
+        104
+      ],
+      "forecast": [
+        191,
+        142,
+        104
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-target-mtoon",
+      "xy": [
+        33,
+        41
+      ],
+      "control": "omitted",
+      "actual": [
+        198,
+        147,
+        108
+      ],
+      "forecast": [
+        198,
+        147,
+        108
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-target-mtoon",
+      "xy": [
+        33,
+        41
+      ],
+      "control": "swapped-role",
+      "actual": [
+        195,
+        145,
+        106
+      ],
+      "forecast": [
+        195,
+        145,
+        106
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-target-mtoon",
+      "xy": [
+        49,
+        45
+      ],
+      "control": "correct",
+      "actual": [
+        110,
+        126,
+        54
+      ],
+      "forecast": [
+        110,
+        126,
+        54
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-target-mtoon",
+      "xy": [
+        49,
+        45
+      ],
+      "control": "wrong-domain",
+      "actual": [
+        112,
+        129,
+        54
+      ],
+      "forecast": [
+        112,
+        129,
+        54
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-target-mtoon",
+      "xy": [
+        49,
+        45
+      ],
+      "control": "omitted",
+      "actual": [
+        110,
+        126,
+        54
+      ],
+      "forecast": [
+        110,
+        126,
+        54
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-target-mtoon",
+      "xy": [
+        49,
+        45
+      ],
+      "control": "swapped-role",
+      "actual": [
+        110,
+        127,
+        54
+      ],
+      "forecast": [
+        110,
+        126,
+        54
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-raster-target-mtoon",
+      "xy": [
+        58,
+        46
+      ],
+      "control": "correct",
+      "actual": [
+        188,
+        141,
+        104
+      ],
+      "forecast": [
+        188,
+        141,
+        104
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-target-mtoon",
+      "xy": [
+        58,
+        46
+      ],
+      "control": "wrong-domain",
+      "actual": [
+        199,
+        149,
+        109
+      ],
+      "forecast": [
+        199,
+        149,
+        109
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-target-mtoon",
+      "xy": [
+        58,
+        46
+      ],
+      "control": "omitted",
+      "actual": [
+        199,
+        149,
+        109
+      ],
+      "forecast": [
+        199,
+        149,
+        109
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-target-mtoon",
+      "xy": [
+        58,
+        46
+      ],
+      "control": "swapped-role",
+      "actual": [
+        206,
+        154,
+        112
+      ],
+      "forecast": [
+        206,
+        154,
+        112
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-target-mtoon",
+      "xy": [
+        45,
+        47
+      ],
+      "control": "correct",
+      "actual": [
+        178,
+        136,
+        93
+      ],
+      "forecast": [
+        178,
+        136,
+        92
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-raster-target-mtoon",
+      "xy": [
+        45,
+        47
+      ],
+      "control": "wrong-domain",
+      "actual": [
+        180,
+        138,
+        94
+      ],
+      "forecast": [
+        180,
+        138,
+        93
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-raster-target-mtoon",
+      "xy": [
+        45,
+        47
+      ],
+      "control": "omitted",
+      "actual": [
+        178,
+        136,
+        93
+      ],
+      "forecast": [
+        179,
+        136,
+        93
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-raster-target-mtoon",
+      "xy": [
+        45,
+        47
+      ],
+      "control": "swapped-role",
+      "actual": [
+        180,
+        138,
+        94
+      ],
+      "forecast": [
+        181,
+        138,
+        93
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-raster-target-mtoon",
+      "xy": [
+        48,
+        48
+      ],
+      "control": "correct",
+      "actual": [
+        152,
+        131,
+        77
+      ],
+      "forecast": [
+        152,
+        131,
+        76
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-raster-target-mtoon",
+      "xy": [
+        48,
+        48
+      ],
+      "control": "wrong-domain",
+      "actual": [
+        155,
+        134,
+        78
+      ],
+      "forecast": [
+        155,
+        134,
+        78
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-target-mtoon",
+      "xy": [
+        48,
+        48
+      ],
+      "control": "omitted",
+      "actual": [
+        152,
+        131,
+        77
+      ],
+      "forecast": [
+        152,
+        131,
+        77
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-target-mtoon",
+      "xy": [
+        48,
+        48
+      ],
+      "control": "swapped-role",
+      "actual": [
+        154,
+        133,
+        77
+      ],
+      "forecast": [
+        154,
+        133,
+        77
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-target-mtoon",
+      "xy": [
+        50,
+        50
+      ],
+      "control": "correct",
+      "actual": [
+        159,
+        134,
+        81
+      ],
+      "forecast": [
+        158,
+        133,
+        81
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-raster-target-mtoon",
+      "xy": [
+        50,
+        50
+      ],
+      "control": "wrong-domain",
+      "actual": [
+        165,
+        139,
+        84
+      ],
+      "forecast": [
+        165,
+        139,
+        83
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-raster-target-mtoon",
+      "xy": [
+        50,
+        50
+      ],
+      "control": "omitted",
+      "actual": [
+        160,
+        135,
+        82
+      ],
+      "forecast": [
+        160,
+        135,
+        82
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-raster-target-mtoon",
+      "xy": [
+        50,
+        50
+      ],
+      "control": "swapped-role",
+      "actual": [
+        163,
+        137,
+        83
+      ],
+      "forecast": [
+        163,
+        137,
+        83
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-retained-source-pbr",
+      "xy": [
+        58,
+        44
+      ],
+      "control": "correct",
+      "actual": [
+        161,
+        132,
+        104
+      ],
+      "forecast": [
+        161,
+        132,
+        104
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-retained-source-pbr",
+      "xy": [
+        58,
+        44
+      ],
+      "control": "wrong-domain",
+      "actual": [
+        149,
+        120,
+        93
+      ],
+      "forecast": [
+        149,
+        120,
+        93
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-retained-source-pbr",
+      "xy": [
+        58,
+        44
+      ],
+      "control": "omitted",
+      "actual": [
+        151,
+        122,
+        95
+      ],
+      "forecast": [
+        151,
+        122,
+        94
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-retained-source-pbr",
+      "xy": [
+        58,
+        44
+      ],
+      "control": "swapped-role",
+      "actual": [
+        129,
+        101,
+        76
+      ],
+      "forecast": [
+        129,
+        101,
+        76
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-retained-source-pbr",
+      "xy": [
+        49,
+        45
+      ],
+      "control": "correct",
+      "actual": [
+        97,
+        108,
+        55
+      ],
+      "forecast": [
+        97,
+        108,
+        55
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-retained-source-pbr",
+      "xy": [
+        49,
+        45
+      ],
+      "control": "wrong-domain",
+      "actual": [
+        95,
+        106,
+        53
+      ],
+      "forecast": [
+        95,
+        106,
+        53
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-retained-source-pbr",
+      "xy": [
+        49,
+        45
+      ],
+      "control": "omitted",
+      "actual": [
+        96,
+        107,
+        54
+      ],
+      "forecast": [
+        96,
+        107,
+        54
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-retained-source-pbr",
+      "xy": [
+        49,
+        45
+      ],
+      "control": "swapped-role",
+      "actual": [
+        96,
+        107,
+        54
+      ],
+      "forecast": [
+        95,
+        107,
+        54
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-retained-source-pbr",
+      "xy": [
+        45,
+        47
+      ],
+      "control": "correct",
+      "actual": [
+        144,
+        118,
+        86
+      ],
+      "forecast": [
+        144,
+        118,
+        86
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-retained-source-pbr",
+      "xy": [
+        45,
+        47
+      ],
+      "control": "wrong-domain",
+      "actual": [
+        141,
+        115,
+        84
+      ],
+      "forecast": [
+        141,
+        115,
+        83
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-retained-source-pbr",
+      "xy": [
+        45,
+        47
+      ],
+      "control": "omitted",
+      "actual": [
+        140,
+        114,
+        83
+      ],
+      "forecast": [
+        140,
+        114,
+        83
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-retained-source-pbr",
+      "xy": [
+        45,
+        47
+      ],
+      "control": "swapped-role",
+      "actual": [
+        140,
+        114,
+        83
+      ],
+      "forecast": [
+        140,
+        114,
+        83
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-retained-source-pbr",
+      "xy": [
+        48,
+        48
+      ],
+      "control": "correct",
+      "actual": [
+        132,
+        118,
+        78
+      ],
+      "forecast": [
+        132,
+        118,
+        78
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-retained-source-pbr",
+      "xy": [
+        48,
+        48
+      ],
+      "control": "wrong-domain",
+      "actual": [
+        125,
+        112,
+        72
+      ],
+      "forecast": [
+        125,
+        111,
+        72
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-retained-source-pbr",
+      "xy": [
+        48,
+        48
+      ],
+      "control": "omitted",
+      "actual": [
+        125,
+        111,
+        71
+      ],
+      "forecast": [
+        125,
+        111,
+        71
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-retained-source-pbr",
+      "xy": [
+        48,
+        48
+      ],
+      "control": "swapped-role",
+      "actual": [
+        118,
+        104,
+        65
+      ],
+      "forecast": [
+        118,
+        104,
+        65
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-retained-source-pbr",
+      "xy": [
+        50,
+        50
+      ],
+      "control": "correct",
+      "actual": [
+        136,
+        120,
+        81
+      ],
+      "forecast": [
+        136,
+        120,
+        81
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-retained-source-pbr",
+      "xy": [
+        50,
+        50
+      ],
+      "control": "wrong-domain",
+      "actual": [
+        130,
+        114,
+        76
+      ],
+      "forecast": [
+        130,
+        114,
+        75
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-retained-source-pbr",
+      "xy": [
+        50,
+        50
+      ],
+      "control": "omitted",
+      "actual": [
+        130,
+        113,
+        75
+      ],
+      "forecast": [
+        129,
+        113,
+        75
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-retained-source-pbr",
+      "xy": [
+        50,
+        50
+      ],
+      "control": "swapped-role",
+      "actual": [
+        125,
+        109,
+        71
+      ],
+      "forecast": [
+        125,
+        109,
+        71
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-retained-source-pbr",
+      "xy": [
+        48,
+        59
+      ],
+      "control": "correct",
+      "actual": [
+        152,
+        124,
+        88
+      ],
+      "forecast": [
+        152,
+        124,
+        87
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-retained-source-pbr",
+      "xy": [
+        48,
+        59
+      ],
+      "control": "wrong-domain",
+      "actual": [
+        135,
+        108,
+        73
+      ],
+      "forecast": [
+        135,
+        108,
+        73
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-retained-source-pbr",
+      "xy": [
+        48,
+        59
+      ],
+      "control": "omitted",
+      "actual": [
+        135,
+        107,
+        73
+      ],
+      "forecast": [
+        135,
+        107,
+        73
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-retained-source-pbr",
+      "xy": [
+        48,
+        59
+      ],
+      "control": "swapped-role",
+      "actual": [
+        133,
+        105,
+        71
+      ],
+      "forecast": [
+        133,
+        105,
+        71
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-retained-source-mtoon",
+      "xy": [
+        33,
+        37
+      ],
+      "control": "correct",
+      "actual": [
+        215,
+        164,
+        124
+      ],
+      "forecast": [
+        215,
+        164,
+        124
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-retained-source-mtoon",
+      "xy": [
+        33,
+        37
+      ],
+      "control": "wrong-domain",
+      "actual": [
+        205,
+        156,
+        119
+      ],
+      "forecast": [
+        205,
+        156,
+        119
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-retained-source-mtoon",
+      "xy": [
+        33,
+        37
+      ],
+      "control": "omitted",
+      "actual": [
+        201,
+        153,
+        116
+      ],
+      "forecast": [
+        201,
+        153,
+        117
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-retained-source-mtoon",
+      "xy": [
+        33,
+        37
+      ],
+      "control": "swapped-role",
+      "actual": [
+        200,
+        152,
+        116
+      ],
+      "forecast": [
+        200,
+        152,
+        116
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-retained-source-mtoon",
+      "xy": [
+        58,
+        41
+      ],
+      "control": "correct",
+      "actual": [
+        188,
+        141,
+        105
+      ],
+      "forecast": [
+        188,
+        141,
+        104
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-retained-source-mtoon",
+      "xy": [
+        58,
+        41
+      ],
+      "control": "wrong-domain",
+      "actual": [
+        209,
+        157,
+        115
+      ],
+      "forecast": [
+        209,
+        156,
+        114
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-retained-source-mtoon",
+      "xy": [
+        58,
+        41
+      ],
+      "control": "omitted",
+      "actual": [
+        199,
+        150,
+        110
+      ],
+      "forecast": [
+        199,
+        149,
+        109
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-retained-source-mtoon",
+      "xy": [
+        58,
+        41
+      ],
+      "control": "swapped-role",
+      "actual": [
+        204,
+        153,
+        113
+      ],
+      "forecast": [
+        204,
+        153,
+        112
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-retained-source-mtoon",
+      "xy": [
+        49,
+        45
+      ],
+      "control": "correct",
+      "actual": [
+        246,
+        242,
+        239
+      ],
+      "forecast": [
+        247,
+        242,
+        239
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-retained-source-mtoon",
+      "xy": [
+        49,
+        45
+      ],
+      "control": "wrong-domain",
+      "actual": [
+        252,
+        247,
+        244
+      ],
+      "forecast": [
+        252,
+        247,
+        244
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-retained-source-mtoon",
+      "xy": [
+        49,
+        45
+      ],
+      "control": "omitted",
+      "actual": [
+        247,
+        242,
+        239
+      ],
+      "forecast": [
+        247,
+        242,
+        240
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-retained-source-mtoon",
+      "xy": [
+        49,
+        45
+      ],
+      "control": "swapped-role",
+      "actual": [
+        247,
+        242,
+        240
+      ],
+      "forecast": [
+        247,
+        242,
+        240
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-retained-source-mtoon",
+      "xy": [
+        58,
+        45
+      ],
+      "control": "correct",
+      "actual": [
+        188,
+        142,
+        105
+      ],
+      "forecast": [
+        188,
+        141,
+        104
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-retained-source-mtoon",
+      "xy": [
+        58,
+        45
+      ],
+      "control": "wrong-domain",
+      "actual": [
+        207,
+        156,
+        114
+      ],
+      "forecast": [
+        207,
+        155,
+        113
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-retained-source-mtoon",
+      "xy": [
+        58,
+        45
+      ],
+      "control": "omitted",
+      "actual": [
+        199,
+        149,
+        110
+      ],
+      "forecast": [
+        199,
+        149,
+        109
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-retained-source-mtoon",
+      "xy": [
+        58,
+        45
+      ],
+      "control": "swapped-role",
+      "actual": [
+        206,
+        154,
+        114
+      ],
+      "forecast": [
+        206,
+        154,
+        112
+      ],
+      "RGB_error": 2
+    },
+    {
+      "label": "mt1-rest-shared-retained-source-mtoon",
+      "xy": [
+        45,
+        47
+      ],
+      "control": "correct",
+      "actual": [
+        220,
+        193,
+        176
+      ],
+      "forecast": [
+        220,
+        192,
+        176
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-retained-source-mtoon",
+      "xy": [
+        45,
+        47
+      ],
+      "control": "wrong-domain",
+      "actual": [
+        221,
+        193,
+        177
+      ],
+      "forecast": [
+        221,
+        193,
+        177
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-retained-source-mtoon",
+      "xy": [
+        45,
+        47
+      ],
+      "control": "omitted",
+      "actual": [
+        220,
+        193,
+        176
+      ],
+      "forecast": [
+        220,
+        192,
+        176
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-retained-source-mtoon",
+      "xy": [
+        45,
+        47
+      ],
+      "control": "swapped-role",
+      "actual": [
+        222,
+        195,
+        178
+      ],
+      "forecast": [
+        222,
+        194,
+        178
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-retained-source-mtoon",
+      "xy": [
+        48,
+        48
+      ],
+      "control": "correct",
+      "actual": [
+        228,
+        214,
+        206
+      ],
+      "forecast": [
+        228,
+        215,
+        206
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-retained-source-mtoon",
+      "xy": [
+        48,
+        48
+      ],
+      "control": "wrong-domain",
+      "actual": [
+        234,
+        220,
+        211
+      ],
+      "forecast": [
+        235,
+        221,
+        212
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-retained-source-mtoon",
+      "xy": [
+        48,
+        48
+      ],
+      "control": "omitted",
+      "actual": [
+        232,
+        218,
+        209
+      ],
+      "forecast": [
+        233,
+        219,
+        210
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-retained-source-mtoon",
+      "xy": [
+        48,
+        48
+      ],
+      "control": "swapped-role",
+      "actual": [
+        238,
+        223,
+        214
+      ],
+      "forecast": [
+        238,
+        224,
+        215
+      ],
+      "RGB_error": 1
+    },
+    {
+      "label": "mt1-rest-shared-retained-source-mtoon",
+      "xy": [
+        50,
+        50
+      ],
+      "control": "correct",
+      "actual": [
+        226,
+        208,
+        197
+      ],
+      "forecast": [
+        226,
+        208,
+        197
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-retained-source-mtoon",
+      "xy": [
+        50,
+        50
+      ],
+      "control": "wrong-domain",
+      "actual": [
+        231,
+        213,
+        202
+      ],
+      "forecast": [
+        231,
+        213,
+        202
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-retained-source-mtoon",
+      "xy": [
+        50,
+        50
+      ],
+      "control": "omitted",
+      "actual": [
+        229,
+        210,
+        200
+      ],
+      "forecast": [
+        229,
+        210,
+        200
+      ],
+      "RGB_error": 0
+    },
+    {
+      "label": "mt1-rest-shared-retained-source-mtoon",
+      "xy": [
+        50,
+        50
+      ],
+      "control": "swapped-role",
+      "actual": [
+        234,
+        215,
+        204
+      ],
+      "forecast": [
+        234,
+        215,
+        204
+      ],
+      "RGB_error": 0
+    }
+  ],
+  "forecast_sha256": "99988d781fe90128c5f54b93c6e9f5588759fe98540d4032cad7ae1bc73d016d",
+  "actual_log_sha256": "c4504f8c5241fb82981929e167d2308353527b3ae2cb39300a21c752ff105db1"
+}

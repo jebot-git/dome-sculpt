@@ -3,8 +3,10 @@
 #include "dome/emission-native.hpp"
 #include "dome/source-maps.hpp"
 #include "gltf-document.hpp"
+namespace dome {class SourceColorPaintSampling;}
 namespace dome::detail {
 class CanonicalPaintSampling;
+class BakedEmissionDomain;
 Scene emission_export_subset(const Scene &,std::span<const uint64_t>);
 struct EmissionExportImage {
  uint64_t object=0;
@@ -23,6 +25,9 @@ struct EmissionExportImage {
  unsigned texcoord=0;
  // Package4 only: actual independently authenticated canonical writable owner.
  std::shared_ptr<const CanonicalPaintSampling> canonical_paint_domain;
+ // Package5: immutable independent source-grid FLOAT witness.
+ std::shared_ptr<const BakedEmissionDomain> retained_emission;
+ std::shared_ptr<const SourceColorPaintSampling> source_paint_domain;
 };
 void attach_native_emission(GltfDocument &,const NativeEmissionExport &,
                             std::span<const uint64_t> exported_objects,

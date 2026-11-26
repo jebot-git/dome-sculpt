@@ -352,8 +352,9 @@ void XrSculpt::setup(bool overlay) {
   }
 }
 void XrSculpt::finishStroke() { document.finish_spatial(); }
-void XrSculpt::input(XrTime time) {
+void XrSculpt::input(XrTime time,std::optional<std::array<SpatialView,2>> views) {
   SpatialFrame frame;
+  frame.views=std::move(views);
   frame.sequence = ++sequence;
   frame.time = double(time) / 1e9;
   frame.focused = state == XR_SESSION_STATE_FOCUSED;
@@ -521,7 +522,34 @@ void XrSculpt::run(unsigned frameLimit) {
       document.rebase_space(changes_.front().old_from_new);
       changes_.erase(changes_.begin());
     }
-    input(frame.predictedDisplayTime);
+    // Use the exact same physical views for input-side initial framing and
+    // stereo rendering. Missing/invalid/skipped views never invent a FoV.
+    std::vector<XrView> views(eyes.size(), {XR_TYPE_VIEW});
+    bool views_valid=false;
+    std::optional<std::array<SpatialView,2>> spatial_views;
+    if(frame.shouldRender){
+      XrViewLocateInfo locate{XR_TYPE_VIEW_LOCATE_INFO};
+      locate.viewConfigurationType = XR_VIEW_CONFIGURATION_TYPE_PRIMARY_STEREO;
+      locate.displayTime = frame.predictedDisplayTime;
+      locate.space = reference;
+      XrViewState viewState{XR_TYPE_VIEW_STATE};
+      uint32_t n;
+      XR(xrLocateViews(session, &locate, &viewState, views.size(), &n,
+                       views.data()));
+      auto flags = XR_VIEW_STATE_POSITION_VALID_BIT |
+                   XR_VIEW_STATE_ORIENTATION_VALID_BIT;
+      views_valid=n==eyes.size()&&(viewState.viewStateFlags&flags)==flags;
+      if(views_valid&&views.size()==2){
+        spatial_views.emplace();
+        for(size_t eye=0;eye<2;++eye){
+          const auto&p=views[eye].pose;const auto&f=views[eye].fov;
+          (*spatial_views)[eye]={{{p.position.x,p.position.y,p.position.z},
+            {p.orientation.x,p.orientation.y,p.orientation.z,p.orientation.w},1},
+            {f.angleLeft,f.angleRight,f.angleDown,f.angleUp}};
+        }
+      }
+    }
+    input(frame.predictedDisplayTime,std::move(spatial_views));
     auto content = document.frame();
     renderer->set_frame_time(render_frame_time());
     std::vector<XrCompositionLayerProjectionView> layers(
@@ -534,18 +562,7 @@ void XrSculpt::run(unsigned frameLimit) {
     layer.views = layers.data();
     bool submit = false;
     if (frame.shouldRender) {
-      XrViewLocateInfo locate{XR_TYPE_VIEW_LOCATE_INFO};
-      locate.viewConfigurationType = XR_VIEW_CONFIGURATION_TYPE_PRIMARY_STEREO;
-      locate.displayTime = frame.predictedDisplayTime;
-      locate.space = reference;
-      XrViewState viewState{XR_TYPE_VIEW_STATE};
-      std::vector<XrView> views(eyes.size(), {XR_TYPE_VIEW});
-      uint32_t n;
-      XR(xrLocateViews(session, &locate, &viewState, views.size(), &n,
-                       views.data()));
-      auto flags = XR_VIEW_STATE_POSITION_VALID_BIT |
-                   XR_VIEW_STATE_ORIENTATION_VALID_BIT;
-      if (n == eyes.size() && (viewState.viewStateFlags & flags) == flags) {
+      if (views_valid) {
         submit = true;
         for (size_t i = 0; i < eyes.size(); ++i) {
           auto &e = eyes[i];

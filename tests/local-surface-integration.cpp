@@ -609,8 +609,11 @@ int main(int argc, char **argv) try {
     check(held->sculpt_chunks&&held->sculpt_chunks->objects().size()==2&&
               held->mesh.indices.empty()&&held->ranges.empty(),
           "Actual generated objects occupy typed chunk owners without a hidden flat packed copy");
-    check(held->sculpt_meshing.full_rebuilds == 2 &&
-              same_preview(*held,d.copy_scene()),
+    const auto initial_meshing=held->sculpt_meshing;
+    // A valid empty-owner ancestry may initialize one object with a local
+    // update. Both visible objects must still be prepared and exact.
+    check(initial_meshing.full_rebuilds+initial_meshing.local_updates==2&&
+              initial_meshing.objects_reused==0&&same_preview(*held,d.copy_scene()),
           "Actual Document worker initially builds both grouped source objects "
           "exactly");
     for (int i = 0; i < 12; ++i) {
@@ -635,7 +638,9 @@ int main(int argc, char **argv) try {
               frame.surface->geometry_identity==held->geometry_identity,
           "Real generated geometry changes its own upload owners without invalidating an unchanged separate packed identity");
     check(chunk_object(*held,first).geometry->report().indices!=0 &&
-              held->sculpt_meshing.full_rebuilds == 2,
+              held->sculpt_meshing.full_rebuilds==initial_meshing.full_rebuilds&&
+              held->sculpt_meshing.local_updates==initial_meshing.local_updates&&
+              held->sculpt_meshing.objects_reused==initial_meshing.objects_reused,
           "Previously acquired immutable Document snapshot remains unchanged");
     check(d.undo(), "Document undo available");
     ready(d);

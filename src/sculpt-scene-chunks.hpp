@@ -73,7 +73,12 @@ public:
 private:
   static SculptScenePreview capture_geometry(const Scene &,SculptSceneChunkContext,
       const Ptr &,SculptSceneChunkLimits,LocalSurfaceCache::Cancel);
-  struct Cache {uint64_t object;SculptSurfaceChunks::Ptr geometry;};
+  struct Cache {
+    uint64_t object;
+    SculptSurfaceChunks::Ptr geometry;
+    // Geometry bytes added after all earlier caches in this capture.
+    size_t added_bytes;
+  };
   SculptSceneChunks()=default;
   SculptSceneChunkContext context_;
   std::vector<SculptObjectChunks> objects_;

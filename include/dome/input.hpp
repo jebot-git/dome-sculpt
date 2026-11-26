@@ -6,7 +6,7 @@
 #include <optional>
 namespace dome {
 // Shared page registry:18 procedural,19/22 polygon,20 holding,21/23 import.
-inline constexpr int spatial_page_count=33; //25 projection;26 preview;27 rig fitting;28 export;29 expressions;30 emission;31 material texture sets;32 paint filters.
+inline constexpr int spatial_page_count=34; //33 parameterized humanoid creation.
 inline constexpr int spatial_max_page=spatial_page_count-1;
 enum class DeviceKind { Controller, SpatialStylus };
 enum class SpatialCommand {
@@ -101,8 +101,12 @@ enum class SpatialCommand {
   ExpressionIncrease, ExpressionReset, ExpressionApply, ExpressionCancel,
   EmissionRelative=16384, EmissionPhysical, EmissionBlack,
   TexturePrevious=32768, TextureNext, TexturePickFaces, TextureClearFaces, TextureCreate, TextureAssign,
-  BlurColorLayer=65536
+  BlurColorLayer=65536,
+  CreatorBegin=131072, CreatorPrevious, CreatorNext, CreatorBaseline,
+  CreatorNeutral, CreatorToon, CreatorAnime, CreatorCopySettings,
+  CreatorApply, CreatorCancel
 };
+inline bool creator_command(SpatialCommand c){return c>=SpatialCommand::CreatorBegin&&c<=SpatialCommand::CreatorCancel;}
 inline bool texture_set_command(SpatialCommand c){return c>=SpatialCommand::TexturePrevious&&c<=SpatialCommand::TextureAssign;}
 inline bool editable_export_command(SpatialCommand c){return c>=SpatialCommand::ExportEditable256&&c<=SpatialCommand::ExportEditable1024;}
 inline bool expression_command(SpatialCommand c){return c>=SpatialCommand::ExpressionBegin&&c<=SpatialCommand::ExpressionCancel;}

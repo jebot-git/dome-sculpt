@@ -137,6 +137,7 @@ public:
   std::vector<ObjectSurface> preview_surface_bundles(const std::function<bool()> &, const SculptMesher & = {}) const;
 
 private:
+  nlohmann::json encode_document(bool include_object_volumes) const;
   static Scene decode_owning(const nlohmann::json &,
       const detail::BakedEmissionReadCapability *);
   friend struct detail::SculptScenePreviewAccess;

@@ -163,6 +163,15 @@ int main(int argc,char **argv)try{
   scene.object(1).volume->fill_mask(.7f);auto scalar=SculptSceneChunks::capture(scene,{7,2,1,true,true},first.chunks);
   const auto *masked=scalar.chunks->find(1);
   pipeline_check(masked->geometry==before_geometry&&masked->placed==before_placed&&masked->masks!=before_masks,"A real mask edit changes scalar ownership without geometry extraction, placed geometry or BVH rebuild");
+  const auto recount=SculptSceneChunks::capture(scene,{7,2,1,true,true});
+  SculptSceneChunkLimits mask_limit;
+  mask_limit.retained_bytes=recount.chunks->retained_bytes();
+  pipeline_check(scalar.chunks->retained_bytes()==mask_limit.retained_bytes&&
+      SculptSceneChunks::capture(scene,{7,2,1,true,true},first.chunks,mask_limit).chunks->retained_bytes()==mask_limit.retained_bytes,
+      "Warm mask capture matches independently built geometry charges at the exact retained quota");
+  --mask_limit.retained_bytes;
+  pipeline_check(fails([&]{SculptSceneChunks::capture(scene,{7,2,1,true,true},first.chunks,mask_limit);}),
+      "Reusing an exact geometry prefix still rejects a one-byte-tight retained quota");
   pipeline_check(scalar.chunks->find(3)->geometry==first.chunks->find(3)->geometry&&scalar.chunks->find(3)->placed==first.chunks->find(3)->placed,"Unrelated object's immutable placed owners remain exact");
   masked->geometry->for_each_chunk([&](const auto &chunk){for(float v:masked->masks->find(chunk)->values)if(v!=.7f)throw std::runtime_error("Real full-mask scalar was not sampled");for(float v:before_masks->find(chunk)->values)if(v!=0)throw std::runtime_error("Previous scalar owner was mutated");});
   pipeline_check(true,"New real protection values coexist with immutable unchanged earlier scalar packets");

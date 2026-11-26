@@ -12,6 +12,7 @@
 #include "vrm-painted.hpp"
 #include "vrm-source-graph.hpp"
 #include "vrm1-export.hpp"
+#include "creator-vrm.hpp"
 #include <bit>
 #include <set>
 namespace dome {
@@ -438,6 +439,12 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &original_input_obje
   if (!original.contains("extensions") ||
       !original.at("extensions").contains("VRM"))
     fail("only original VRM0 is supported by this source-preserving path");
+  std::unique_ptr<detail::CreatorVrmAuthority> creator;
+  if(detail::has_creator_vrm_origin(objects)) {
+    if(original_space)fail("original-node authoring cannot borrow a creator rest certificate");
+    creator=std::make_unique<detail::CreatorVrmAuthority>(objects,*origin,options.cancelled);
+    original["extensions"]["VRM"]=creator->refit(original.at("extensions").at("VRM"),asset,options.cancelled);
+  }
   if (original_space) {
     source_graph = detail::vrm_source_graph(input_objects, original, options.cancelled,options.max_output_bytes);
     group = source_graph->instance;
@@ -527,9 +534,9 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &original_input_obje
     if(o.material_bindings && o.material_bindings->normal_frames)detail::normal_frame_current_authority(*o.material_bindings,o.mesh,o.deformation.get(),options.cancelled);
     if (o.deformation)
       o.deformation->validate(o.mesh);
-    if (!o.appearance || !o.appearance->source_basis_quaternion)
+    if ((!o.appearance || !o.appearance->source_basis_quaternion) && !creator)
       fail("every source part needs coordinate basis provenance");
-    auto q = *o.appearance->source_basis_quaternion;
+    auto q = o.appearance && o.appearance->source_basis_quaternion ? *o.appearance->source_basis_quaternion : basis;
     float norm = q.w * q.w + q.x * q.x + q.y * q.y + q.z * q.z;
     if (!std::isfinite(norm) || std::abs(norm - 1) > 1e-5f ||
         std::abs(std::abs(q.w * basis.w + q.x * basis.x + q.y * basis.y +
@@ -578,6 +585,7 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &original_input_obje
   float fit_scale = 1, farthest = 0;
   Vec3 fit_offset{}, p0{}, q0{};
   bool first_vertex = true, uniform_fit = true;
+  if(!creator) {
   auto source_primitive =
       [&](const CreatorAppearance &a) -> const ImportedPrimitive & {
     const ImportedPrimitive *found = nullptr;
@@ -629,6 +637,7 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &original_input_obje
   if (!uniform_fit)
     fail("nonlinear source rest fitting needs explicit first-person/collider "
          "metadata refitting");
+  }
   auto document = detail::make_gltf(objects, detail::SourceMorphSpace::Original,
                                     true, options.cancelled);
   report.normal_targets_recomputed = document.normal_targets_recomputed;
@@ -695,7 +704,7 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &original_input_obje
         {{"source", original_images[t.image]}, {"sampler", sampler}});
   }
   std::set<std::tuple<int, int, int>> primitives;
-  std::vector<int> avatar_joints;
+  std::vector<int> avatar_joints, generated_meshes;
   Json output_properties = Json::array();
   Json output_materials = Json::array();
   struct MaterialVariant {
@@ -843,12 +852,14 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &original_input_obje
     if (!rigid && !source_graph && std::vector<int>(emitted.joints.begin(), emitted.joints.end()) !=
         avatar_joints)
       fail("avatar parts do not share one actual emitted rig/pose/transform");
-    if (!o.appearance)
-      fail("generated parts need an explicit VRM material/source policy; "
-           "export them separately as glTF");
-    const auto &a = *o.appearance;
-    if (!rigid && (a.source_joint_nodes.size() != emitted.joints.size() ||
-        a.source_joint_nodes.empty() || a.source_joint_nodes.size() > 256))
+    if (!o.appearance && !creator)
+      fail("generated parts need an explicit VRM material/source policy; export them separately as glTF");
+    // Generated parts use the separately verified creator rig map, never a
+    // fabricated CreatorAppearance or source material/mesh index.
+    const auto &joint_nodes=o.appearance?o.appearance->source_joint_nodes:creator->joint_nodes();
+
+    if (!rigid && (joint_nodes.size() != emitted.joints.size() ||
+        joint_nodes.empty() || joint_nodes.size() > 256))
       fail("missing exact source joint map; reopen/recreate source instead of "
            "inferring names");
     if (!rigid) {
@@ -859,20 +870,19 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &original_input_obje
     auto rest_skeleton = s;
     if (source_graph) rest_skeleton.space_matrix.reset();
     auto fitted_world = rest_skeleton.world();
-    for (size_t joint = 0; joint < a.source_joint_nodes.size(); ++joint) {
-      auto source = a.source_joint_nodes[joint];
+    for (size_t joint = 0; joint < joint_nodes.size(); ++joint) {
+      auto source = joint_nodes[joint];
       if (source >= asset.nodes.size() || !unique.insert(source).second)
         fail("invalid source joint identity");
       int parent = s.bones[joint].parent;
       int expected =
-          parent < 0 ? -1 : int(a.source_joint_nodes.at(size_t(parent)));
+          parent < 0 ? -1 : int(joint_nodes.at(size_t(parent)));
       if ((source_graph?source_graph->parents.at(source):asset.nodes[source].parent) != expected)
         fail("source joint ancestry differs from native mapping");
       const auto &source_world = source_graph?source_graph->rest_world.at(source):asset.nodes[source].world;
       Vec3 expected_world =
-          Vec3{source_world[12], source_world[13], source_world[14]} *
-              fit_scale +
-          fit_offset;
+          creator ? inverse.rotate(creator->point({source_world[12],source_world[13],source_world[14]})) :
+          Vec3{source_world[12], source_world[13], source_world[14]} * fit_scale + fit_offset;
       auto &actual_world = fitted_world[joint];
       if (length(Vec3{actual_world[12], actual_world[13], actual_world[14]} -
                  expected_world) > 2e-5f)
@@ -901,6 +911,39 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &original_input_obje
       mapped_node = int(emitted.joints[joint]);
     }
     }
+    if(!o.appearance) {
+      if(!o.material.unlit || o.material.emissive!=std::array<float,3>{})
+        fail("generated creator groom currently requires its explicit unlit, non-emissive material policy");
+      auto material=j["materials"].at(emitted.material);
+      const auto &pbr=material.at("pbrMetallicRoughness");
+      if(!pbr.contains("baseColorTexture"))fail("generated groom is missing its current texture");
+      auto factor=pbr.value("baseColorFactor",std::array<float,4>{1,1,1,1});
+      // Native groom is unlit: explicit MToon0 emission carries the current
+      // colour field exactly; zero lit base/shade prevents double lighting.
+      // PBR retains the same emitted KHR_materials_unlit material and image.
+      const int texture=pbr.at("baseColorTexture").at("index");
+      const std::string name="Dome generated groom "+std::to_string(o.id);
+      Json properties={{"name",name},{"shader","VRM/MToon"},{"renderQueue",2000},
+        {"floatProperties",{{"_OutlineWidthMode",0},{"_ReceiveShadowRate",0},{"_IndirectLightIntensity",0},{"_LightColorAttenuation",1},{"_CullMode",material.value("doubleSided",false)?0:2}}},
+        {"vectorProperties",{{"_Color",{0,0,0,factor[3]}},{"_ShadeColor",{0,0,0,1}},{"_EmissionColor",{factor[0],factor[1],factor[2],1}},{"_MainTex",{0,0,1,1}},{"_ShadeTexture",{0,0,1,1}},{"_EmissionMap",{0,0,1,1}}}},
+        {"textureProperties",{{"_MainTex",texture},{"_ShadeTexture",texture},{"_EmissionMap",texture}}},
+        {"keywordMap",Json::object()},{"tagMap",{{"RenderType","Opaque"}}}};
+      auto toon=MToonMaterial::from_vrm0(properties,j["textures"].size());
+      auto alpha=material.value("alphaMode",std::string("OPAQUE"));
+      toon.parameters.alpha=alpha=="MASK"?MToonAlpha::Mask:alpha=="BLEND"?MToonAlpha::Blend:MToonAlpha::Opaque;
+      toon.parameters.alpha_cutoff=material.value("alphaCutoff",.5f);
+      toon.parameters.depth_write=alpha!="BLEND";toon.parameters.source_blend=alpha=="BLEND"?5:1;toon.parameters.destination_blend=alpha=="BLEND"?10:0;
+      toon.parameters.render_queue=alpha=="BLEND"?3000:alpha=="MASK"?2450:2000;
+      properties=toon.source_json();material["name"]=name;
+      auto id=int(variants.size());variants.push_back({-1,"",name,material_signature(material,properties),{}});
+      output_materials.push_back(std::move(material));output_properties.push_back(std::move(properties));
+      j["meshes"][emitted.mesh]["primitives"][0]["material"]=id;
+      j["meshes"][emitted.mesh]["extras"]["DomeSculptGeneratedPart"]={{"kind","vroid-groom"},{"version",1},
+          {"source_sha256",creator_detail::sha256(*origin->original_bytes)},
+          {"controls",o.groups.back().humanoid->encode()}};
+      generated_meshes.push_back(emitted.mesh);check_budget();continue;
+    }
+    const auto &a=*o.appearance;
     if (a.source_mesh < 0 || size_t(a.source_mesh) >= asset.meshes.size() ||
         a.source_primitive < 0 || a.source_node < 0 ||
         size_t(a.source_node) >= asset.nodes.size() ||
@@ -1113,9 +1156,9 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &original_input_obje
       if (v.contains(axis))
         v[axis] = v.at(axis).get<double>() * fit_scale;
   };
-  if (vrm["firstPerson"].contains("firstPersonBoneOffset"))
+  if (!creator && vrm["firstPerson"].contains("firstPersonBoneOffset"))
     scale_vector(vrm["firstPerson"]["firstPersonBoneOffset"]);
-  if (vrm["secondaryAnimation"].contains("colliderGroups"))
+  if (!creator && vrm["secondaryAnimation"].contains("colliderGroups"))
     for (auto &g : vrm["secondaryAnimation"]["colliderGroups"])
       for (auto &c : g["colliders"]) {
         if (c.contains("offset"))
@@ -1123,11 +1166,12 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &original_input_obje
         if (c.contains("radius"))
           c["radius"] = c.at("radius").get<double>() * fit_scale;
       }
-  if (vrm["secondaryAnimation"].contains("boneGroups"))
+  if (!creator && vrm["secondaryAnimation"].contains("boneGroups"))
     for (auto &g : vrm["secondaryAnimation"]["boneGroups"])
       if (g.contains("hitRadius"))
         g["hitRadius"] = g.at("hitRadius").get<double>() * fit_scale;
 
+  for(auto mesh:generated_meshes)vrm["firstPerson"]["meshAnnotations"].push_back({{"mesh",mesh},{"firstPersonFlag","Auto"}});
   vrm["materialProperties"] = output_properties;
   // VRM0 expressions address material names, while native authoring addresses
   // original material IDs. Expand an original binding to every distinct state
@@ -1202,10 +1246,10 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &original_input_obje
   if (output_size > options.max_output_bytes)
     throw std::length_error("VRM metadata output budget exceeded");
   stop(options);
-  report.diagnostics.push_back(
-      "Source basis restored explicitly; spring/collider offsets and radii "
-      "retain authored values after translation/proportion fitting and need "
-      "physics verification");
+  report.diagnostics.push_back(creator ?
+      "Verified CC0 creator genesis and current rig; first-person points refitted through the actual shape, collider and spring tail spheres conservatively enclosed; dynamic physics remains consumer-dependent" :
+      "Source basis restored explicitly; source-local physics scaled by the proved uniform fit; dynamic physics remains consumer-dependent");
+  if(!generated_meshes.empty())report.diagnostics.push_back("Explicit generated groom provenance; shared certified current rig, new Auto first-person annotation and current unlit colour through PBR/MToon emission; no invented original material or mesh identity");
   report.meshes = objects.size();
   report.joints = avatar_joints.size();
   report.materials=variants.size();report.painted_materials=painted_variants.size();

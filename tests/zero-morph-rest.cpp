@@ -25,7 +25,10 @@ int main(int argc,char **argv)try{
  // Scene30 adds a recipe field to every object record, including a null field
  // on the untouched source. Compare complete sources in the actual capability
  // context rather than treating that archive-shape change as a source edit.
- auto reference=initial;reference.active().bake_recipe=capture_bake_recipe(initial,2,settings);
+ auto reference=initial;
+ auto effective=settings;
+ effective.normal_filter_quality=0;
+ reference.active().bake_recipe=capture_bake_recipe(initial,2,effective);
  check(accepted.at("version")==30&&baked.active().bake_recipe&&
    baked.active().bake_recipe->encode()==reference.active().bake_recipe->encode()&&initial.encode()==original,
    "Zero-weight Bake records the actual source/settings recipe without changing its input Scene");

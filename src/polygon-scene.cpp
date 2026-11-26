@@ -17,6 +17,7 @@
 #include "text-utf8.hpp"
 #include "texture-set-archive.hpp"
 #include "texture-set-source-preflight.hpp"
+#include "texture-set-recipe-wire.hpp"
 #include <map>
 #include <nlohmann/json.hpp>
 #include <set>
@@ -581,7 +582,8 @@ void PolygonSceneArchive::preflight(const nlohmann::json &j,
     if (!object.contains("texture_sets") || object.at("texture_sets").is_null())
       return;
     const auto &sets = object.at("texture_sets");
-    const auto field = [&](const nlohmann::json &paint) {
+    const auto field = [&](const nlohmann::json &wire) {
+      const auto &paint=texture_set_recipe_member(wire);
       if(paint.is_object()&&paint.contains("field_source")){
         if(!texture_geometry||!materials||!polygon_surfaces)throw std::invalid_argument("Source Paint7 requires its actual enclosing material/node/geometry preflight");
         (void)texture_source_seed(paint,*texture_geometry,*materials,*polygon_surfaces);return;
@@ -608,10 +610,12 @@ void PolygonSceneArchive::preflight(const nlohmann::json &j,
       for(const auto*paint:paints){
         field(*paint);
         if(first){
-          const auto*seed=paint->contains("field_source")?texture_source_seed(*paint,*texture_geometry,*materials,*polygon_surfaces):nullptr;
+          const auto&member=texture_set_recipe_member(*paint);
+          const auto*seed=member.contains("field_source")?texture_source_seed(member,*texture_geometry,*materials,*polygon_surfaces):nullptr;
           if(!object.at("appearance").is_null()||(seed?object.at("material_bindings")!=seed->at("binding"):!object.at("material_bindings").is_null()))throw std::invalid_argument("Shared primary source/material owner is unrepresented or foreign");
           const auto&recipe=object.contains("bake_recipe")?object.at("bake_recipe"):nlohmann::json(nullptr);
-          if(seed?recipe!=seed->at("bake_recipe"):!recipe.is_null())throw std::invalid_argument("Shared primary recipe differs from its explicitly referenced source seed");
+          const auto&expected=seed?seed->at("bake_recipe"):(paint->contains("field_recipe")?paint->at("field_recipe"):nlohmann::json(nullptr));
+          if(recipe!=expected)throw std::invalid_argument("Shared primary recipe differs from its explicitly referenced field context");
           first=false;
         }
       }

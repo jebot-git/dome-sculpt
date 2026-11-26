@@ -1,6 +1,11 @@
 #include "paint-overlay-packet.hpp"
 #include "emission-authority.hpp"
 #include "source-bake-normal.hpp"
+#include "source-writable-paint.hpp"
+#include "dome/normal-sampling.hpp"
+#include "baked-normal-field.hpp"
+#include "bake-retained-emission.hpp"
+#include "bake-filtered-emission-quality.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/bake.hpp"
 #include "dome/mesh-processing.hpp"
@@ -95,7 +100,8 @@ Channels material(const BakeMaterial &m, const Mesh &mesh, size_t triangle,
     result.roughness*=orm[1];result.metallic*=orm[2];
     if(raw.occlusion.image)result.ao=1-raw.occlusion_strength*(1-sample_surface_texture(mesh,raw,raw.occlusion,triangle,bary,false)[0]);
     if(m.maps->overlay){
-      const auto contribution=detail::sample_overlay_values(*m.maps->overlay,uv[0],uv[1],pbr);
+      const auto paint_uv=detail::source_overlay_coordinates(*m.maps->overlay,uint32_t(triangle),bary,uv);
+      const auto contribution=detail::sample_overlay_values(*m.maps->overlay,paint_uv[0],paint_uv[1],pbr);
       for(size_t c=0;c<4;++c)result.color[c]=result.color[c]*(1-contribution[3][0])+contribution[0][c];
       result.ao=result.ao*(1-contribution[1][3])+contribution[1][0];
       result.roughness=result.roughness*(1-contribution[3][2])+contribution[1][1];
@@ -104,6 +110,7 @@ Channels material(const BakeMaterial &m, const Mesh &mesh, size_t triangle,
     }
     return result;
   }
+  if(m.maps->overlay)uv=detail::source_overlay_coordinates(*m.maps->overlay,uint32_t(triangle),bary,uv);
   auto color=sample(m.maps->color,uv,m.repeat_uv,true), orm=sample(m.maps->metal_rough,uv,m.repeat_uv,false),
        emission=sample(m.maps->emission,uv,m.repeat_uv,true);
   for (int i=0;i<4;++i) result.color[i]=color[i]*(m.maps_are_composited?1:result.color[i]);
@@ -135,55 +142,51 @@ double edge(std::array<float,2> a,std::array<float,2> b,std::array<float,2> p) {
 bool top_left(std::array<float,2> a,std::array<float,2> b) {
   return b[1]>a[1]||(b[1]==a[1]&&b[0]<a[0]);
 }
-void validate(const Mesh &low,const BakeSource &source,const BakeOptions &o) {
-  if (low.positions.size()>2'000'000||low.indices.size()/3>2'000'000) throw std::length_error("Low bake mesh exceeds surface limits");
-  low.validate(); source.mesh.validate();
-  for (auto n:low.normals) if (length(n)<1e-8f) throw std::invalid_argument("Low bake mesh contains a zero normal");
-  auto validate_tangents=[](const Mesh &mesh,const std::vector<std::array<float,4>> &tangents){
+void validate_source_tangents(const Mesh &mesh,const std::vector<std::array<float,4>> &tangents){
     if(tangents.empty())return;
     if(tangents.size()!=mesh.positions.size())throw std::invalid_argument("Tangent attribute count mismatch");
     for(auto v:tangents)if(!finite(Vec3{v[0],v[1],v[2]})||length(Vec3{v[0],v[1],v[2]})<1e-8f||!std::isfinite(v[3])||std::abs(std::abs(v[3])-1)>1e-5f)throw std::invalid_argument("Invalid tangent attribute");
     for(size_t t=0;t<mesh.indices.size();t+=3)if(tangents[mesh.indices[t]][3]*tangents[mesh.indices[t+1]][3]<0||tangents[mesh.indices[t]][3]*tangents[mesh.indices[t+2]][3]<0)throw std::invalid_argument("Tangent handedness changes inside a triangle");
-  };
-  validate_tangents(low,o.low_tangents);validate_tangents(source.mesh,source.tangents);
+}
+void validate_source_colors(const BakeSource &source){
   if(!source.colors.empty()&&source.colors.size()!=source.mesh.positions.size())throw std::invalid_argument("Source color attribute count mismatch");
   for(auto value:source.colors)for(auto c:value)if(!std::isfinite(c)||c<0||c>1)throw std::invalid_argument("Invalid linear source vertex color");
-  if (low.uv.size()!=low.positions.size()) throw std::invalid_argument("Baking requires low-mesh UV coordinates");
-  for (auto uv:low.uv) if (uv[0]<0||uv[0]>1||uv[1]<0||uv[1]>1) throw std::invalid_argument("Low UVs must fit the unit texture tile");
-  if (o.resolution<8||o.resolution>4096||uint64_t(o.resolution)*o.resolution>o.max_texels||o.max_texels>16'777'216||
-      o.padding>64||o.ao_samples>256||!o.max_rays||o.max_rays>1'000'000'000||!o.max_raster_samples||o.max_raster_samples>1'000'000'000||
-      !std::isfinite(o.front_distance)||!std::isfinite(o.back_distance)||o.front_distance<0||o.back_distance<0||
-      o.front_distance+o.back_distance<=0||o.front_distance+o.back_distance>100||
-      !std::isfinite(o.ray_bias)||o.ray_bias<=0||o.ray_bias>.1f||
-      !std::isfinite(o.ao_distance)||o.ao_distance<0||(o.ao_samples&&o.ao_distance<=o.ray_bias)||o.ao_distance>100)
-    throw std::invalid_argument("Invalid bake bounds or resource budget");
-  if ((!o.writable.empty()&&o.writable.size()!=size_t(o.resolution)*o.resolution)||std::any_of(o.writable.begin(),o.writable.end(),[](auto v){return v>1;})) throw std::invalid_argument("Invalid bake writable mask");
-  if (!o.cage_positions.empty()) {
-    if (o.cage_positions.size()!=low.positions.size()) throw std::invalid_argument("Cage vertex identities differ from low mesh");
-    for (size_t i=0;i<o.cage_positions.size();++i) {
-      auto delta=o.cage_positions[i]-low.positions[i];
-      if (!finite(o.cage_positions[i])||length(delta)>o.front_distance+1e-6f||dot(delta,normalized(low.normals[i]))<-1e-6f)
-        throw std::invalid_argument("Cage exceeds outward projection bounds");
-    }
-  }
+}
+void validate_source_materials(const BakeSource &source,
+    const detail::SourceBakeNormalResolver &source_normals={}){
   if (source.materials.empty()||source.materials.size()>4096||(!source.triangle_materials.empty()&&source.triangle_materials.size()!=source.mesh.indices.size()/3))
     throw std::invalid_argument("Invalid source material assignments");
   for (auto id:source.triangle_materials) if (id>=source.materials.size()) throw std::out_of_range("Unknown source triangle material");
   for (const auto &m:source.materials) {
+    if(source_normals.requires_source_pairing()&&(!m.maps||!source_normals.matches_prepared_source(*m.maps)))
+      throw std::invalid_argument("Prepared source resolver requires its complete paired material packet");
     m.material.validate();
     if(!m.resolved_emission&&(detail::hdr_emission(m.material.emissive)||(m.maps&&m.maps->overlay&&m.maps->overlay->native_geometry())))
       throw std::invalid_argument("Physical emission Bake requires its actual float sampling/output adapter");
     if (!std::isfinite(m.normal_strength)||m.normal_strength<0||m.normal_strength>4) throw std::invalid_argument("Invalid normal-map strength");
     if (m.maps) {
-      if(m.maps->overlay&&((m.maps->source_only&&m.maps->overlay->source_maps()!=m.maps->source_maps)||(!m.maps->source_only&&!m.resolved_emission)))
+      const bool canonical_packet=m.maps->overlay&&bool(m.maps->overlay->normal_source_binding());
+      if(canonical_packet&&(!source_normals||!source_normals.matches_prepared_source(*m.maps)))
+        throw std::invalid_argument("Canonical current source requires its exact normal/material/frame packet");
+      const auto field=m.maps->baked_base&&m.maps->baked_base->normal_field?m.maps->baked_base->normal_field:
+        m.maps->overlay&&m.maps->overlay->baked()?m.maps->overlay->baked()->normal_field:nullptr;
+      if(field){
+        field->validate();
+        if(!source_normals||!source_normals.matches_prepared_source(*m.maps)||m.maps->normal_projection)
+          throw std::invalid_argument("Canonical material source requires its actual field/frame resolver");
+        if(!m.maps->source_only&&(m.maps->normal.rgba!=field->pbr()->rgba||m.maps->mtoon_normal.rgba!=field->mtoon()->rgba))
+          throw std::invalid_argument("Canonical source view differs from its actual resolved normal field");
+      }
+      if(m.maps->overlay&&((m.maps->source_only&&m.maps->overlay->source_maps()!=m.maps->source_maps&&!source_normals.matches_prepared_source(*m.maps))||(!m.maps->source_only&&!m.resolved_emission&&!canonical_packet)))
         throw std::invalid_argument("Bake overlay differs from its immutable source coordinate owner");
       if(m.maps->source_maps)m.maps->source_maps->validate_surface(source.mesh);
       if(m.maps->baked_base&&m.maps->source_only){
         if(!m.maps->overlay||m.maps->overlay->baked()!=m.maps->baked_base)
           throw std::invalid_argument("Raw Bake normal differs from its actual immutable overlay owner");
         const auto &b=*m.maps->baked_base;b.validate(m.maps->overlay->resolution());
-        if(b.normal_interpretation!=BakedNormalInterpretation::CanonicalMikk||b.normal_field||b.normal_authority)
-          throw std::invalid_argument("Raw Bake normal requires its explicit prepared frame adapter");
+        if(b.normal_authority||(!field&&b.normal_interpretation!=BakedNormalInterpretation::CanonicalMikk)||
+            (field&&(b.normal_interpretation!=BakedNormalInterpretation::PreparedAttributes||!source_normals.matches_prepared_source(*m.maps))))
+          throw std::invalid_argument("Raw Bake normal requires its actual prepared field/frame adapter");
       }
       if(m.maps->source_only){
         // Explicit empty role bundles are valid untextured source captures.
@@ -205,6 +208,113 @@ void validate(const Mesh &low,const BakeSource &source,const BakeOptions &o) {
     if (m.normal_map) m.normal_map->validate();
     if ((m.maps||m.normal_map)&&source.mesh.uv.size()!=source.mesh.positions.size()) throw std::invalid_argument("Textured high mesh requires UV coordinates");
   }
+}
+Vec3 generic_source_normal(const BakeSource &source,const std::vector<Tangent> &high_frames,const SurfaceHit &hit){
+  const auto id=source.triangle_materials.empty()?0:source.triangle_materials.at(hit.triangle);
+  const auto &m=source.materials.at(id);
+  const auto high_uv=source.mesh.uv.empty()?std::array<float,2>{}:texcoord(source.mesh,hit.triangle,hit.barycentric);
+  auto high_normal=normalized(hit.normal);
+      if (normal_image(m)&&m.normal_strength>0) {
+        TangentFrame tangent;
+        if (source.tangents.empty())
+          tangent = tangent_frame(source.mesh, high_frames, hit.triangle, hit.barycentric);
+        else {
+          auto supplied = basis(source.mesh,hit.triangle,high_normal,hit.barycentric,source.tangents);
+          tangent = {supplied.tangent, supplied.bitangent, supplied.normal};
+        }
+        auto sampled=sample(*normal_image(m),high_uv,m.repeat_uv,false);
+        auto detail=Vec3{(sampled[0]*2-1)*m.normal_strength,(sampled[1]*2-1)*m.normal_strength,sampled[2]*2-1};
+        detail=length(detail)>1e-8f?normalized(detail):Vec3{0,0,1};
+        high_normal=tangent.to_world(detail);
+      }
+      else if(m.maps && m.maps->source_maps && m.normal_strength>0){
+        const auto &raw=*m.maps->source_maps;
+        if(source.tangents.empty() || !raw.normal.image || raw.normal_scale==0)
+          high_normal=source_texture_normal(source.mesh,raw,hit.triangle,hit.barycentric,m.normal_strength);
+        else {
+          // Explicit imported frames remain authoritative; affine UV applies to
+          // the lookup, while the supplied XYZ/handedness defines its basis.
+          auto supplied=basis(source.mesh,hit.triangle,high_normal,hit.barycentric,source.tangents);
+          auto encoded=sample_surface_texture(source.mesh,raw,raw.normal,hit.triangle,hit.barycentric,false);
+          double scale=double(raw.normal_scale)*m.normal_strength;
+          double x=(encoded[0]*2-1)*scale,y=(encoded[1]*2-1)*scale,z=encoded[2]*2-1;
+          double size=std::hypot(x,y,z);
+          if(size>1e-20)high_normal=TangentFrame{supplied.tangent,supplied.bitangent,supplied.normal}.to_world(
+            {float(x/size),float(y/size),float(z/size)});
+        }
+      }
+      if(m.maps&&m.maps->source_only&&m.maps->overlay&&m.maps->baked_base&&
+         !m.maps->baked_base->maps.normal.rgba.empty()&&m.normal_strength>0){
+        // Filter decoded legacy RGB8 vectors premultiplied by the independent
+        // common coverage, through the same immutable padding owner as all
+        // other paint planes. The original normal keeps its role UV basis;
+        // canonical baked detail keeps current UV0 Mikk corner frames.
+        const auto &packet=*m.maps->overlay;const auto &baked=*m.maps->baked_base;
+        const auto r=packet.resolution();const float x=std::clamp(high_uv[0],0.f,1.f)*r-.5f,
+          y=std::clamp(high_uv[1],0.f,1.f)*r-.5f;
+        const int ix=int(std::floor(x)),iy=int(std::floor(y));const float fx=x-ix,fy=y-iy;
+        Vec3 sum;float coverage=0;
+        for(int dy=0;dy<2;++dy)for(int dx=0;dx<2;++dx){
+          const auto owner=packet.padding()->at(size_t(std::clamp(iy+dy,0,int(r)-1))*r+size_t(std::clamp(ix+dx,0,int(r)-1)));
+          if(owner<0)continue;const size_t at=size_t(owner);
+          const float w=(dx?fx:1-fx)*(dy?fy:1-fy)*(baked.coverage.at(at)/255.f);
+          coverage+=w;const auto *q=baked.maps.normal.rgba.data()+at*4;
+          sum+=Vec3{q[0]/255.f*2-1,q[1]/255.f*2-1,q[2]/255.f*2-1}*w;
+        }
+        if(coverage>0){
+          const auto canonical=tangent_frame(source.mesh,high_frames,hit.triangle,hit.barycentric);
+          const auto baked_world=canonical.to_world(sum/coverage);
+          high_normal=normalized(high_normal*(1-coverage)+baked_world*coverage);
+        }
+      }
+  return high_normal;
+}
+std::vector<Tangent> generic_source_frames(const BakeSource &source,const std::function<bool()> &cancelled){
+  std::vector<Tangent> high_frames;
+  const bool raw_baked_normals=std::any_of(source.materials.begin(),source.materials.end(),[](const auto &m){
+    return m.maps&&m.maps->source_only&&m.maps->overlay&&m.maps->baked_base&&
+        !m.maps->baked_base->maps.normal.rgba.empty()&&m.normal_strength>0;
+  });
+  if ((source.tangents.empty() && std::any_of(source.materials.begin(), source.materials.end(),
+        [](const auto &material) { return normal_image(material) && material.normal_strength > 0; })) || raw_baked_normals) {
+    high_frames = tangent_corners(source.mesh, cancelled);
+    for (size_t t = 0; t < source.mesh.indices.size()/3; ++t) {
+      auto id = source.triangle_materials.empty() ? 0 : source.triangle_materials[t];
+      if (normal_image(source.materials[id]) && source.materials[id].normal_strength > 0)
+        basis(source.mesh, t, normalized(source.mesh.normals[source.mesh.indices[t*3]]), {1,0,0});
+    }
+  }
+  return high_frames;
+}
+void validate(const Mesh &low,const BakeSource &source,const BakeOptions &o,
+    const detail::SourceBakeNormalResolver &source_normals) {
+  if (low.positions.size()>2'000'000||low.indices.size()/3>2'000'000) throw std::length_error("Low bake mesh exceeds surface limits");
+  low.validate(); source.mesh.validate();
+  for (auto n:low.normals) if (length(n)<1e-8f) throw std::invalid_argument("Low bake mesh contains a zero normal");
+  validate_source_tangents(low,o.low_tangents);validate_source_tangents(source.mesh,source.tangents);
+  validate_source_colors(source);
+  if (low.uv.size()!=low.positions.size()) throw std::invalid_argument("Baking requires low-mesh UV coordinates");
+  for (auto uv:low.uv) if (uv[0]<0||uv[0]>1||uv[1]<0||uv[1]>1) throw std::invalid_argument("Low UVs must fit the unit texture tile");
+  if (o.resolution<8||o.resolution>4096||uint64_t(o.resolution)*o.resolution>o.max_texels||o.max_texels>16'777'216||
+      o.padding>64||o.ao_samples>256||!o.max_rays||o.max_rays>1'000'000'000||!o.max_raster_samples||o.max_raster_samples>1'000'000'000||
+      !std::isfinite(o.front_distance)||!std::isfinite(o.back_distance)||o.front_distance<0||o.back_distance<0||
+      o.front_distance+o.back_distance<=0||o.front_distance+o.back_distance>100||
+      !std::isfinite(o.ray_bias)||o.ray_bias<=0||o.ray_bias>.1f||
+      !std::isfinite(o.ao_distance)||o.ao_distance<0||(o.ao_samples&&o.ao_distance<=o.ray_bias)||o.ao_distance>100)
+    throw std::invalid_argument("Invalid bake bounds or resource budget");
+  if ((!o.writable.empty()&&o.writable.size()!=size_t(o.resolution)*o.resolution)||std::any_of(o.writable.begin(),o.writable.end(),[](auto v){return v>1;})) throw std::invalid_argument("Invalid bake writable mask");
+  if (!o.cage_positions.empty()) {
+    if (o.cage_positions.size()!=low.positions.size()) throw std::invalid_argument("Cage vertex identities differ from low mesh");
+    for (size_t i=0;i<o.cage_positions.size();++i) {
+      auto delta=o.cage_positions[i]-low.positions[i];
+      if (!finite(o.cage_positions[i])||length(delta)>o.front_distance+1e-6f||dot(delta,normalized(low.normals[i]))<-1e-6f)
+        throw std::invalid_argument("Cage exceeds outward projection bounds");
+    }
+  }
+  validate_source_materials(source,source_normals);
+  if(o.corresponding_topology&&(o.source_triangles.empty()||!o.cage_positions.empty()||
+     o.source_triangles.size()!=source.mesh.indices.size()/3))
+    throw std::invalid_argument("Corresponding topology requires an explicit complete ordered source map and no cage");
   if (!o.source_triangles.empty() || !o.source_corner_barycentrics.empty()) {
     if (o.source_triangles.size()!=low.indices.size()/3 || o.source_corner_barycentrics.size()!=low.indices.size())
       throw std::invalid_argument("Exact bake provenance count mismatch");
@@ -212,12 +322,22 @@ void validate(const Mesh &low,const BakeSource &source,const BakeOptions &o) {
       cancel(o);
       auto source_triangle=o.source_triangles[t];
       if(source_triangle>=source.mesh.indices.size()/3)throw std::out_of_range("Exact bake provenance source triangle is invalid");
+      if(o.corresponding_topology&&source_triangle!=t)
+        throw std::invalid_argument("Corresponding topology changed the source triangle order");
       for(int k=0;k<3;++k){
         auto b=o.source_corner_barycentrics[t*3+k];float sum=0;
         for(auto value:b){if(!std::isfinite(value)||value<-.00001f||value>1.00001f)throw std::invalid_argument("Invalid exact bake barycentrics");sum+=value;}
         if(std::abs(sum-1)>1e-5f)throw std::invalid_argument("Exact bake barycentrics are not normalized");
         auto expected=interpolate(source.mesh,source_triangle,b,false),actual=low.positions[low.indices[t*3+k]];
-        if(length(expected-actual)>1e-5f+1e-6f*length(actual))throw std::invalid_argument("Exact bake provenance does not match target geometry");
+        const auto delta=expected-actual;
+        const float tolerance=1e-5f+1e-6f*length(actual);
+        if(o.corresponding_topology){
+          std::array<float,3> identity{};identity[k]=1;
+          const float direction=dot(delta,normalized(low.normals[low.indices[t*3+k]]));
+          if(b!=identity || direction>o.front_distance+tolerance || direction<-o.back_distance-tolerance ||
+             length(delta)>std::max(o.front_distance,o.back_distance)+tolerance)
+            throw std::invalid_argument("Corresponding topology source corner exceeds its identity or projection bounds");
+        }else if(length(delta)>tolerance)throw std::invalid_argument("Exact bake provenance does not match target geometry");
       }
     }
   }
@@ -246,26 +366,33 @@ void pad(BakeResult &result,const BakeOptions &o,std::vector<BakedEmissionSample
 }
 } // namespace
 static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const BakeOptions &o,
-    const detail::SourceBakeNormalResolver &source_normals) {
+    const detail::SourceBakeNormalResolver &source_normals,
+    const std::shared_ptr<const detail::BakedEmissionDomain> &retained_emission={}) {
   if(o.progress)o.progress(0);
-  cancel(o); validate(low,source,o);
+  cancel(o); validate(low,source,o,source_normals);
   for(const auto &material:source.materials)if(material.maps&&material.maps->normal_projection){
     const auto &maps=*material.maps;
-    if(!source_normals)
-      throw std::invalid_argument("Prepared material source requires its actual separate normal-frame resolver");
+    if(!source_normals||!source_normals.matches_prepared_source(maps))
+      throw std::invalid_argument("Prepared material source requires its actual paired normal-frame resolver");
     const auto &projection=*maps.normal_projection;
     projection.validate(projection.pbr?projection.pbr->width:0);
     if(maps.source_only){
       if(!maps.overlay||!maps.source_maps||maps.baked_base)
         throw std::invalid_argument("Prepared raw material lost its actual separate channel owners");
       projection.validate(maps.overlay->resolution());
-      if(const auto &baked=maps.overlay->baked();baked&&(baked->normal_interpretation!=BakedNormalInterpretation::PreparedAttributes||baked->normal_field||baked->normal_authority))
+      if(const auto &baked=maps.overlay->baked();baked&&(baked->normal_interpretation!=BakedNormalInterpretation::PreparedAttributes||baked->normal_field||
+          (baked->normal_authority&&(projection.version!=2||!projection.sampling_domain||
+           baked->normal_authority!=projection.sampling_domain->detail))))
         throw std::invalid_argument("Prepared raw material source has a conflicting retained normal event");
     }
   }
   const bool float_emission=std::any_of(source.materials.begin(),source.materials.end(),[](const auto &m){return bool(m.resolved_emission);});
   if(float_emission){
-    const size_t field=BakedEmissionField::required_bytes(o.resolution,{128*1024*1024,o.cancelled});
+    // A certified source-grid domain is already the complete immutable FLOAT
+    // authority. Do not allocate a second target-grid field which bake_object
+    // would immediately discard. Charge the real retained owner instead.
+    const size_t field=retained_emission?retained_emission->storage_bytes():
+      BakedEmissionField::required_bytes(o.resolution,{128*1024*1024,o.cancelled});
     const uint64_t other=uint64_t(o.resolution)*o.resolution*(13+(o.separate_pbr_color?4:0)+(o.encode_target_normal?4:0));
     if(other>128*1024*1024||field>128*1024*1024-other)
       throw std::length_error("FLOAT Bake retained channels exceed unchanged paint budget");
@@ -273,23 +400,10 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
   SurfaceQuery query(source.mesh,o.cancelled); cancel(o);
   auto low_frames = o.low_tangents.empty() ? tangent_corners(low, o.cancelled)
                                          : std::vector<Tangent>{};
-  std::vector<Tangent> high_frames;
-  const bool raw_baked_normals=std::any_of(source.materials.begin(),source.materials.end(),[](const auto &m){
-    return m.maps&&m.maps->source_only&&m.maps->overlay&&m.maps->baked_base&&
-        !m.maps->baked_base->maps.normal.rgba.empty()&&m.normal_strength>0;
-  });
-  if ((source.tangents.empty() && std::any_of(source.materials.begin(), source.materials.end(),
-        [](const auto &material) { return normal_image(material) && material.normal_strength > 0; })) || raw_baked_normals) {
-    high_frames = tangent_corners(source.mesh, o.cancelled);
-    for (size_t t = 0; t < source.mesh.indices.size()/3; ++t) {
-      auto id = source.triangle_materials.empty() ? 0 : source.triangle_materials[t];
-      if (normal_image(source.materials[id]) && source.materials[id].normal_strength > 0)
-        basis(source.mesh, t, normalized(source.mesh.normals[source.mesh.indices[t*3]]), {1,0,0});
-    }
-  }
+  auto high_frames=generic_source_frames(source,o.cancelled);
   size_t pixels=size_t(o.resolution)*o.resolution;
   BakeResult result; result.coverage.resize(pixels);
-  std::vector<BakedEmissionSample> emission;if(float_emission)emission.resize(pixels);
+  std::vector<BakedEmissionSample> emission;if(float_emission&&!retained_emission)emission.resize(pixels);
   if(o.encode_target_normal)result.maps.mtoon_normal={o.resolution,o.resolution,std::vector<uint8_t>(pixels*4)};
   if (!o.writable.empty()) for (size_t i=0;i<pixels;++i) if (!o.writable[i]) result.coverage[i]=4;
   for (auto *image:{&result.maps.color,&result.maps.metal_rough,&result.maps.emission,&result.normal,&result.ambient_occlusion})
@@ -354,69 +468,18 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
       auto high_uv=source.mesh.uv.empty()?std::array<float,2>{}:texcoord(source.mesh,hit->triangle,hit->barycentric);
       auto channels=material(m,source.mesh,hit->triangle,hit->barycentric,high_uv); auto high_normal=normalized(hit->normal);
       if(m.resolved_emission)channels.emission=m.resolved_emission(hit->triangle,hit->barycentric);
-      if(float_emission){emission[at]={{},channels.emission,1};emission[at].validate();}
+      if(float_emission){const BakedEmissionSample value{{},channels.emission,1};value.validate();if(!retained_emission)emission[at]=value;}
       auto pbr_color=m.maps&&m.maps->overlay?material(m,source.mesh,hit->triangle,hit->barycentric,high_uv,true).color:channels.color;
       const bool resolved_source=m.maps&&!m.maps->pbr_color.rgba.empty();
-      if(o.separate_pbr_color&&resolved_source)pbr_color=sample(m.maps->pbr_color,high_uv,false,true);
+      if(o.separate_pbr_color&&resolved_source){
+        const auto pbr_uv=m.maps->overlay?detail::source_overlay_coordinates(*m.maps->overlay,hit->triangle,hit->barycentric,high_uv):high_uv;
+        pbr_color=sample(m.maps->pbr_color,pbr_uv,false,true);
+      }
       if(!source.colors.empty()){
         std::array<float,4> tint{};for(int i=0;i<3;++i)for(int c=0;c<4;++c)tint[c]+=source.colors[source.mesh.indices[hit->triangle*3+i]][c]*hit->barycentric[i];
         for(int c=0;c<4;++c){if(!o.separate_pbr_color)channels.color[c]*=tint[c];else if(!resolved_source)pbr_color[c]*=tint[c];}
       }
-      if(!source_normals){
-      if (normal_image(m)&&m.normal_strength>0) {
-        TangentFrame tangent;
-        if (source.tangents.empty())
-          tangent = tangent_frame(source.mesh, high_frames, hit->triangle, hit->barycentric);
-        else {
-          auto supplied = basis(source.mesh,hit->triangle,high_normal,hit->barycentric,source.tangents);
-          tangent = {supplied.tangent, supplied.bitangent, supplied.normal};
-        }
-        auto sampled=sample(*normal_image(m),high_uv,m.repeat_uv,false);
-        auto detail=Vec3{(sampled[0]*2-1)*m.normal_strength,(sampled[1]*2-1)*m.normal_strength,sampled[2]*2-1};
-        detail=length(detail)>1e-8f?normalized(detail):Vec3{0,0,1};
-        high_normal=tangent.to_world(detail);
-      }
-      else if(m.maps && m.maps->source_maps && m.normal_strength>0){
-        const auto &raw=*m.maps->source_maps;
-        if(source.tangents.empty() || !raw.normal.image || raw.normal_scale==0)
-          high_normal=source_texture_normal(source.mesh,raw,hit->triangle,hit->barycentric,m.normal_strength);
-        else {
-          // Explicit imported frames remain authoritative; affine UV applies to
-          // the lookup, while the supplied XYZ/handedness defines its basis.
-          auto supplied=basis(source.mesh,hit->triangle,high_normal,hit->barycentric,source.tangents);
-          auto encoded=sample_surface_texture(source.mesh,raw,raw.normal,hit->triangle,hit->barycentric,false);
-          double scale=double(raw.normal_scale)*m.normal_strength;
-          double x=(encoded[0]*2-1)*scale,y=(encoded[1]*2-1)*scale,z=encoded[2]*2-1;
-          double size=std::hypot(x,y,z);
-          if(size>1e-20)high_normal=TangentFrame{supplied.tangent,supplied.bitangent,supplied.normal}.to_world(
-            {float(x/size),float(y/size),float(z/size)});
-        }
-      }
-      if(m.maps&&m.maps->source_only&&m.maps->overlay&&m.maps->baked_base&&
-         !m.maps->baked_base->maps.normal.rgba.empty()&&m.normal_strength>0){
-        // Filter decoded legacy RGB8 vectors premultiplied by the independent
-        // common coverage, through the same immutable padding owner as all
-        // other paint planes. The original normal keeps its role UV basis;
-        // canonical baked detail keeps current UV0 Mikk corner frames.
-        const auto &packet=*m.maps->overlay;const auto &baked=*m.maps->baked_base;
-        const auto r=packet.resolution();const float x=std::clamp(high_uv[0],0.f,1.f)*r-.5f,
-          y=std::clamp(high_uv[1],0.f,1.f)*r-.5f;
-        const int ix=int(std::floor(x)),iy=int(std::floor(y));const float fx=x-ix,fy=y-iy;
-        Vec3 sum;float coverage=0;
-        for(int dy=0;dy<2;++dy)for(int dx=0;dx<2;++dx){
-          const auto owner=packet.padding()->at(size_t(std::clamp(iy+dy,0,int(r)-1))*r+size_t(std::clamp(ix+dx,0,int(r)-1)));
-          if(owner<0)continue;const size_t at=size_t(owner);
-          const float w=(dx?fx:1-fx)*(dy?fy:1-fy)*(baked.coverage.at(at)/255.f);
-          coverage+=w;const auto *q=baked.maps.normal.rgba.data()+at*4;
-          sum+=Vec3{q[0]/255.f*2-1,q[1]/255.f*2-1,q[2]/255.f*2-1}*w;
-        }
-        if(coverage>0){
-          const auto canonical=tangent_frame(source.mesh,high_frames,hit->triangle,hit->barycentric);
-          const auto baked_world=canonical.to_world(sum/coverage);
-          high_normal=normalized(high_normal*(1-coverage)+baked_world*coverage);
-        }
-      }
-      }
+      if(!source_normals)high_normal=generic_source_normal(source,high_frames,*hit);
       auto desired=source_normals?source_normals(hit->triangle,hit->barycentric):std::array<Vec3,2>{high_normal,high_normal};
       if(source_normals)for(auto &direction:desired){if(!finite(direction)||length(direction)<1e-10f)throw std::invalid_argument("Source normal resolver returned a singular direction");direction=normalized(direction);}
       high_normal=desired[0];Vec3 mapped;
@@ -457,14 +520,60 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
   if (!result.projected) throw std::runtime_error("No low UV texels projected onto the high source");
   if(o.progress)o.progress(.9f);
   cancel(o); if (o.padding) pad(result,o,emission); cancel(o);
-  if(float_emission)result.emission_field=BakedEmissionField::create(o.resolution,emission,{128*1024*1024,o.cancelled});
+  if(float_emission&&!retained_emission)result.emission_field=BakedEmissionField::create(o.resolution,emission,{128*1024*1024,o.cancelled});
   cancel(o);
   if(o.progress)o.progress(1);
   return result;
+}
+detail::GenericBakeNormalSampler detail::generic_bake_normals(const BakeSource &source,const SourceBakeNormalOptions &options){
+  auto stop=[&]{if(options.cancelled&&options.cancelled())throw std::runtime_error("Generic Bake normal capture cancelled");};stop();
+  if(!options.max_working_bytes||options.max_working_bytes>256*1024*1024)throw std::invalid_argument("Invalid generic normal capture budget");
+  source.mesh.validate();validate_source_tangents(source.mesh,source.tangents);validate_source_colors(source);validate_source_materials(source);
+  for(const auto &material:source.materials)if(material.maps){const auto &maps=*material.maps;
+    if(maps.normal_projection||(maps.baked_base&&(maps.baked_base->normal_field||maps.baked_base->normal_authority||maps.baked_base->normal_interpretation==BakedNormalInterpretation::PreparedAttributes)))
+      throw std::invalid_argument("Prepared source requires its actual paired normal resolver, never a generic capture");
+  }
+  size_t bytes=sizeof(BakeSource)+1024;
+  auto reserve=[&](size_t count,size_t unit){if(unit&&count>(options.max_working_bytes-bytes)/unit)throw std::length_error("Generic normal capture exceeds its immutable snapshot/workspace budget");bytes+=count*unit;};
+  if(bytes>options.max_working_bytes)throw std::length_error("Generic normal capture lacks metadata budget");
+  reserve(source.mesh.positions.size()+source.mesh.normals.size(),sizeof(Vec3));reserve(source.mesh.uv.size(),sizeof(std::array<float,2>));reserve(source.mesh.indices.size(),sizeof(uint32_t));reserve(source.mesh.uv_pins.size()+source.mesh.uv_seams.size(),1);
+  reserve(source.tangents.size()+source.colors.size(),sizeof(std::array<float,4>));reserve(source.triangle_materials.size(),sizeof(uint32_t));reserve(source.materials.size(),sizeof(BakeMaterial));
+  const bool cache=std::any_of(source.materials.begin(),source.materials.end(),[&](const auto &m){return (source.tangents.empty()&&normal_image(m)&&m.normal_strength>0)||(m.maps&&m.maps->source_only&&m.maps->overlay&&m.maps->baked_base&&!m.maps->baked_base->maps.normal.rgba.empty()&&m.normal_strength>0);});
+  if(cache)reserve(source.mesh.indices.size(),sizeof(Tangent)*4); // output and conservative Mikk scratch
+  stop();auto owned=std::make_shared<const BakeSource>(source);auto frames=std::make_shared<const std::vector<Tangent>>(generic_source_frames(*owned,options.cancelled));stop();
+  return GenericBakeNormalSampler([owned,frames](const SurfaceHit &hit){
+    if(hit.triangle>=owned->mesh.indices.size()/3||!finite(hit.normal)||length(hit.normal)<1e-10f)throw std::invalid_argument("Generic normal sample has invalid actual projection hit");
+    double total=0;for(auto value:hit.barycentric){if(!std::isfinite(value)||value<-.00001f||value>1.00001f)throw std::invalid_argument("Generic normal sample has invalid source barycentrics");total+=value;}
+    if(std::abs(total-1)>1e-5)throw std::invalid_argument("Generic normal source barycentrics are not normalized");
+    const auto normal=generic_source_normal(*owned,*frames,hit);return std::array<Vec3,2>{normal,normal};
+  });
 }
 BakeResult bake_mesh(const Mesh &low,const BakeSource &source,const BakeOptions &options){
  return bake_mesh_impl(low,source,options,{});
 }
 BakeResult detail::bake_mesh_source_normals(const Mesh &low,const BakeSource &source,const BakeOptions &options,
  const SourceBakeNormalResolver &normal){return bake_mesh_impl(low,source,options,normal);}
+BakeResult detail::bake_mesh_retained_emission(const Mesh &low,const BakeSource &source,
+ const BakeOptions &options,const SourceBakeNormalResolver &normal,
+ const std::shared_ptr<const BakedEmissionDomain> &domain,const std::shared_ptr<const Mesh> &target){
+ cancel(options);
+ if(!domain||!domain->valid_owner(domain)||!target||source.materials.size()!=1||
+    !source.materials[0].resolved_emission||
+    std::any_of(source.triangle_materials.begin(),source.triangle_materials.end(),[](auto id){return id!=0;}))
+   throw std::invalid_argument("Retained emission worker needs one genuine certified source");
+ domain->validate_current(target,options.resolution);low.validate();source.mesh.validate();
+ if(low.indices.size()!=target->indices.size()||source.mesh.indices.size()!=target->indices.size()||
+    !exact_emission_projection_directions(low,options))
+   throw std::invalid_argument("Retained emission worker changed its exact source corners or ray columns");
+ auto same=[](Vec3 a,Vec3 b){return a.x==b.x&&a.y==b.y&&a.z==b.z;};
+ for(size_t c=0;c<target->indices.size();++c){
+   if(!(c%1024))cancel(options);
+   const auto t=target->indices[c],l=low.indices[c],h=source.mesh.indices[c];
+   if(!same(low.positions.at(l),target->positions.at(t))||
+      !same(source.mesh.positions.at(h),target->positions.at(t))||
+      low.uv.at(l)!=target->uv.at(t))
+     throw std::invalid_argument("Retained emission worker changed certified target geometry or UVs");
+ }
+ return bake_mesh_impl(low,source,options,normal,domain);
+}
 } // namespace dome

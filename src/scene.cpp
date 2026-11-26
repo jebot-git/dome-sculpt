@@ -1,3 +1,4 @@
+#include "baked-emission-domain.hpp"
 #include "texture-set-field-source.hpp"
 #include "texture-set-field-codec.hpp"
 #include "texture-set-source-preflight.hpp"
@@ -59,10 +60,12 @@
 #include "polygon-scene-archive.hpp"
 #include "polygon-scene-budget.hpp"
 #include "source-uv-archive.hpp"
+#include "texture-set-recipe-wire.hpp"
 #include <fstream>
 #include <map>
 #include <nlohmann/json.hpp>
 #include <set>
+#include <streambuf>
 namespace dome {
 namespace {
 void name_valid(const std::string &s) {
@@ -84,6 +87,71 @@ void retopology_acyclic(const std::map<uint64_t,uint64_t> &references) {
       if(!visited.insert(current).second)throw std::invalid_argument("Retopology reference cycle");
       current=found->second;
     }
+  }
+}
+
+class NativeCborBuffer final : public std::streambuf {
+public:
+  std::span<const uint8_t> bytes() const { return bytes_; }
+
+private:
+  void reserve_space(size_t count) {
+    constexpr size_t limit = 256 * 1024 * 1024;
+    if (count > limit - bytes_.size())
+      throw std::length_error("Scene exceeds file size limit");
+    const size_t needed = bytes_.size() + count;
+    if (needed > bytes_.capacity())
+      bytes_.reserve(std::max(needed, std::min(limit, bytes_.capacity() * 2)));
+  }
+
+  std::streamsize xsputn(const char *data, std::streamsize count) override {
+    if (count <= 0)
+      return 0;
+    reserve_space(size_t(count));
+    const auto *bytes = reinterpret_cast<const uint8_t *>(data);
+    bytes_.insert(bytes_.end(), bytes, bytes + count);
+    return count;
+  }
+
+  int_type overflow(int_type value) override {
+    if (traits_type::eq_int_type(value, traits_type::eof()))
+      return traits_type::not_eof(value);
+    reserve_space(1);
+    bytes_.push_back(uint8_t(traits_type::to_char_type(value)));
+    return value;
+  }
+
+  std::vector<uint8_t> bytes_;
+};
+
+void write_cbor_container(std::ostream &output, unsigned type, size_t count) {
+  if (count < 24) {
+    output.put(char(type | count));
+    return;
+  }
+  // These are scene maps and the live object array, capped at 256 objects.
+  if (count > 256)
+    throw std::logic_error("Unexpected native scene container size");
+  if (count < 256) {
+    output.put(char(type | 24));
+    output.put(char(count));
+  } else {
+    output.put(char(type | 25));
+    output.put(char(1));
+    output.put(char(0));
+  }
+}
+
+template <class WriteField>
+void write_native_map(std::ostream &output, const nlohmann::json &map,
+                      std::string_view field, const WriteField &write_field) {
+  write_cbor_container(output, 0xa0, map.size());
+  for (const auto &[key, value] : map.items()) {
+    nlohmann::json::to_cbor(key, output);
+    if (key == field)
+      write_field(value);
+    else
+      nlohmann::json::to_cbor(value, output);
   }
 }
 } // namespace
@@ -201,6 +269,7 @@ Scene Scene::snapshot() const {
   return result;
 }
 void Scene::validate(bool deep_sources) const {
+  for(const auto &o:objects_)if(o.painted&&o.painted->baked()&&o.painted->baked()->emission_domain)o.painted->baked()->emission_domain->validate_current(*o.painted);
   detail::validate_texture_set_graph(*this);
   detail::ColorBoundScope color_bound_scope;
   if (objects_.empty() || objects_.size() > 256)
@@ -563,6 +632,10 @@ void Scene::validate(bool deep_sources) const {
   object(active_);
 }
 nlohmann::json Scene::encode() const {
+  return encode_document(true);
+}
+
+nlohmann::json Scene::encode_document(bool include_object_volumes) const {
   detail::BakedEmissionWriteScope baked_emission_write;
   detail::ColorBoundScope color_bound_scope;
   validate();
@@ -611,7 +684,7 @@ nlohmann::json Scene::encode() const {
     if(feature_version==37&&!canonical_paints)throw std::invalid_argument("Scene37 writer lacks actual canonical paint ownership");
   }
   const auto sourceful=[](const auto&collection){if(!collection)return false;if(collection->primary_source())return true;return std::any_of(collection->additional().begin(),collection->additional().end(),[](const auto&field){return bool(field.source);});};
-  const bool shared_sets=texture_sets&&(std::any_of(objects_.begin(),objects_.end(),[&](const auto&o){return sourceful(o.texture_sets);})||std::any_of(polygons.origins().begin(),polygons.origins().end(),[](const auto&o){return bool(o->texture_sets);}));
+  const bool shared_sets=texture_sets&&(std::any_of(objects_.begin(),objects_.end(),[&](const auto&o){return sourceful(o.texture_sets)||(o.texture_sets&&(o.bake_recipe||std::any_of(o.texture_sets->additional().begin(),o.texture_sets->additional().end(),[](const auto&field){return bool(field.bake_recipe);})));})||std::any_of(polygons.origins().begin(),polygons.origins().end(),[](const auto&o){return bool(o->texture_sets);}));
   std::unique_ptr<detail::TextureSetFieldCodec>field_codec;
   if(shared_sets){texture_archive.shared_records();field_codec=std::make_unique<detail::TextureSetFieldCodec>();texture_archive.field_encoder([&](const TextureSetView&field,uint32_t geometry){return field_codec->encode(field,geometry,source_images,&normal_domains,&writable_domains,[&](auto binding){return source_materials.add(std::move(binding));});},[&]{return field_codec->records();});}
   // Keep old UV-only Scene26 records free of fabricated rig-history fields.
@@ -660,7 +733,7 @@ nlohmann::json Scene::encode() const {
            {"toon", m.toon},
            {"double_sided", m.double_sided},
            {"alpha", int(m.alpha)}, {"alpha_cutoff", m.alpha_cutoff}, {"unlit", m.unlit}}},
-         {"volume", o.volume->encode()},
+         {"volume", include_object_volumes ? o.volume->encode() : nlohmann::json(nullptr)},
          {"mesh_active", o.mesh_active},
          {"painted", o.painted&&!o.texture_sets ? o.painted->encode(&source_images,feature_version>=21?&normal_domains:nullptr,feature_version>=24?&writable_domains:nullptr) : nlohmann::json(nullptr)},
          {"deformation", o.deformation
@@ -704,6 +777,8 @@ nlohmann::json Scene::encode() const {
   j["source_images"] = source_images.encode();
   j["source_models"] = source_models.encode();
   baked_emission_write.publish(*this);
+  if(baked_emission_write.domain_emitted())
+    return {{"format","dome-sculpt"},{"version",43},{"payload",std::move(j)}};
   if(baked_emission_write.source_bake_emitted())
     return {{"format","dome-sculpt"},{"version",42},{"payload",std::move(j)}};
   if(baked_emission_write.emitted())
@@ -712,16 +787,18 @@ nlohmann::json Scene::encode() const {
 }
 Scene Scene::decode(const nlohmann::json &j) {
   detail::NativeReadScope::check();
-  if(j.is_object()&&j.contains("version")&&(j.at("version")==41||j.at("version")==42)){
-    const bool source_bake=j.at("version")==42;
+  if(j.is_object()&&j.contains("version")&&(j.at("version")==41||j.at("version")==42||j.at("version")==43)){
+    const bool domain=j.at("version")==43;
+    const bool source_bake=j.at("version")==42||domain;
     if(j.size()!=3||!j.at("version").is_number_integer()||j.at("format")!="dome-sculpt"||!j.at("payload").is_object()||
        !j.at("payload").at("version").is_number_integer()||
        j.at("payload").at("version").get<int64_t>()<2||
        j.at("payload").at("version").get<int64_t>()>40)
       throw std::invalid_argument("Scene41 requires one genuine prior owning scene, not nested envelopes");
-    detail::BakedEmissionReadCapability capability(source_bake);
+    detail::BakedEmissionReadCapability capability(source_bake,domain);
     auto result=decode_owning(j.at("payload"),&capability);
-    if(source_bake){if(!capability.admitted_source_bake_)throw std::invalid_argument("Scene42 requires genuine decoded source Bake ownership");}
+    if(domain){if(!capability.admitted_domain_)throw std::invalid_argument("Scene43 requires genuine decoded retained emission ownership");}
+    else if(source_bake){if(!capability.admitted_source_bake_)throw std::invalid_argument("Scene42 requires genuine decoded source Bake ownership");}
     else if(!capability.admitted_)throw std::invalid_argument("Scene41 requires genuine decoded FLOAT baked emission ownership");
     return result;
   }
@@ -897,7 +974,7 @@ Scene Scene::decode_owning(const nlohmann::json &j,
       for(const auto*name:{"meshes","topologies"}){const auto&table=geometry.at(name);if(!table.is_array()||table.empty()||table.size()>256)throw std::length_error("Invalid texture-set geometry count");for(const auto&record:table)for(const auto&field:record.items())if(field.value().is_binary())detail::PolygonSceneBudget::add(budget.paint_bytes,field.value().get_binary().size(),256*1024*1024,"Shared geometry/identity exceeds whole Scene storage");}
       if(shared_texture_geometry){
         for(const auto&assignment:geometry.at("assignments")){if(!assignment.is_binary()||assignment.get_binary().size()%4||assignment.get_binary().size()>8'000'000)throw std::invalid_argument("Invalid shared texture assignment buffer");detail::PolygonSceneBudget::add(budget.paint_bytes,assignment.get_binary().size(),256*1024*1024,"Shared assignment budget exceeded");}
-        for(const auto&record:geometry.at("paints")){const auto&paint=record.at("painted");const auto*seed=paint.contains("field_source")?detail::texture_source_seed(paint,geometry,j.at("source_materials"),j.at("polygon_surfaces")):nullptr;if(!paint.is_object()||paint.at("version")!=7||(!seed&&paint.size()!=3))throw std::invalid_argument("Shared texture Paint7 envelope differs");budget.paint(paint.at("payload"),false,unsigned(version),true,seed?std::optional<bool>(paint.at("physical_paint").get<bool>()):std::nullopt);}
+        for(const auto&record:geometry.at("paints")){const auto&paint=detail::texture_set_recipe_member(record.at("painted"));const auto*seed=paint.contains("field_source")?detail::texture_source_seed(paint,geometry,j.at("source_materials"),j.at("polygon_surfaces")):nullptr;if(!paint.is_object()||paint.at("version")!=7||(!seed&&paint.size()!=3))throw std::invalid_argument("Shared texture Paint7 envelope differs");budget.paint(paint.at("payload"),false,unsigned(version),true,seed?std::optional<bool>(paint.at("physical_paint").get<bool>()):std::nullopt);}
         for(const auto&seed:geometry.at("field_sources"))budget.paint(seed.at("original"),true,unsigned(version),true,seed.at("physical_paint").get<bool>());
       }else for(const auto&o:objects)if(!o.at("texture_sets").is_null()){const auto&slots=o.at("texture_sets").at("slots");if(!slots.is_binary()||slots.get_binary().size()%4||slots.get_binary().size()>8'000'000)throw std::invalid_argument("Invalid texture assignment storage");detail::PolygonSceneBudget::add(budget.paint_bytes,slots.get_binary().size(),256*1024*1024,"Texture assignment budget exceeded");}
     }
@@ -1095,7 +1172,7 @@ Scene Scene::decode_owning(const nlohmann::json &j,
       preflight(object.at("painted"));
       if(version==40&&j.at("texture_set_geometry").at("version")==1&&!object.at("texture_sets").is_null())for(const auto*paint:texture_holder_paints(object.at("texture_sets"),j.at("texture_set_geometry")))preflight(paint->at("payload"));
     }
-    if(version==40&&j.at("texture_set_geometry").at("version")==2){const auto&geometry=j.at("texture_set_geometry");for(const auto&p:geometry.at("paints")){const auto&paint=p.at("painted");if(paint.contains("field_source")){(void)detail::texture_source_seed(paint,geometry,j.at("source_materials"),j.at("polygon_surfaces"));preflight_grid(paint.at("payload"),paint.at("physical_paint").get<bool>());}else preflight(paint.at("payload"));}for(const auto&seed:geometry.at("field_sources"))preflight_grid(seed.at("original"),seed.at("physical_paint").get<bool>());}
+    if(version==40&&j.at("texture_set_geometry").at("version")==2){const auto&geometry=j.at("texture_set_geometry");for(const auto&p:geometry.at("paints")){const auto&paint=detail::texture_set_recipe_member(p.at("painted"));if(paint.contains("field_source")){(void)detail::texture_source_seed(paint,geometry,j.at("source_materials"),j.at("polygon_surfaces"));preflight_grid(paint.at("payload"),paint.at("physical_paint").get<bool>());}else preflight(paint.at("payload"));}for(const auto&seed:geometry.at("field_sources"))preflight_grid(seed.at("original"),seed.at("physical_paint").get<bool>());}
   }
   // Aggregate paint/deformation/sculpt preflight precedes all current geometry
   // reconstruction as well as every SurfaceMap allocation.
@@ -1385,10 +1462,26 @@ Scene Scene::decode_owning(const nlohmann::json &j,
   return result;
 }
 void Scene::save(const std::filesystem::path &path) const {
-  auto bytes = nlohmann::json::to_cbor(encode());
-  if (bytes.size() > 256 * 1024 * 1024)
-    throw std::length_error("Scene exceeds file size limit");
-  atomic_write(path, bytes);
+  const auto metadata = encode_document(false);
+  NativeCborBuffer buffer;
+  std::ostream output(&buffer);
+  output.exceptions(std::ios::badbit | std::ios::failbit);
+  auto write_scene = [&](const nlohmann::json &record) {
+    write_native_map(output, record, "objects", [&](const nlohmann::json &objects) {
+      write_cbor_container(output, 0x80, objects.size());
+      // Release each temporary volume DOM before encoding the next object.
+      for (size_t i = 0; i < objects_.size(); ++i) {
+        write_native_map(output, objects.at(i), "volume", [&](const nlohmann::json &) {
+          nlohmann::json::to_cbor(objects_[i].volume->encode(), output);
+        });
+      }
+    });
+  };
+  if (metadata.contains("payload"))
+    write_native_map(output, metadata, "payload", write_scene);
+  else
+    write_scene(metadata);
+  atomic_write(path, buffer.bytes());
 }
 Scene Scene::load(const std::filesystem::path &path) { return load(path, {}); }
 Scene Scene::load(const std::filesystem::path &path, const std::function<bool()> &cancelled) {

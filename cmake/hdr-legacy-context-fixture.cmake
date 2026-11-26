@@ -1,0 +1,18 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+if(NOT DEFINED ARCHIVE OR NOT DEFINED DESTINATION)
+  message(FATAL_ERROR "The authentic historical HDR fixture needs archive and destination")
+endif()
+file(SHA256 "${ARCHIVE}" archive_sha256)
+if(NOT archive_sha256 STREQUAL "29053060b95c33f7016caf8c96fa9fbe49307a10d2fecd273cef3979c4b7f110")
+  message(FATAL_ERROR "Historical HDR context archive differs from its actual old producer")
+endif()
+file(MAKE_DIRECTORY "${DESTINATION}")
+execute_process(COMMAND "${CMAKE_COMMAND}" -E tar xJf "${ARCHIVE}"
+  WORKING_DIRECTORY "${DESTINATION}" RESULT_VARIABLE result)
+if(NOT result EQUAL 0)
+  message(FATAL_ERROR "Could not extract the actual historical HDR context")
+endif()
+file(SHA256 "${DESTINATION}/hdr-legacy/scene43-full-context.dsculpt" native_sha256)
+if(NOT native_sha256 STREQUAL "1e6034833b5b52a366bf7f08eca754201864b07587f73f8f129cdb149bb57067")
+  message(FATAL_ERROR "Historical HDR native bytes differ from their old-producer witness")
+endif()

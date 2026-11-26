@@ -9,6 +9,7 @@ namespace dome::detail {
 // coefficient; it does not resolve it with any newly supplied material factor.
 inline BakedEmissionSample baked_emission_texel(const BakedTextures &baked, size_t at) {
   if (at >= baked.coverage.size()) throw std::out_of_range("Baked emission texel");
+  if(baked.emission_domain)throw std::invalid_argument("Retained HDR field requires its actual continuous source-domain sampler");
   if (baked.emission_field) return baked.emission_field->values()[at];
   BakedEmissionSample result;
   result.coverage = baked.coverage[at]/255.f;

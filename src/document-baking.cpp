@@ -1,3 +1,4 @@
+#include "bake-source-capabilities.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "cut-color.hpp"
 #include "dome/document.hpp"
@@ -24,6 +25,7 @@ void Document::cancel_asset_work_locked(){
   }
 }
 void Document::cancel_background_work_locked(){
+  if(state_.creator)end_humanoid_creator_locked(false);
   if(state_.expressions)end_expression_preview_locked(false);
   cancel_asset_work_locked();
   for(const auto &work:exports_)if(work && work->cancel())
@@ -38,14 +40,14 @@ void Document::cancel_background_work(){
 bool Document::bake_source_eligible_locked(uint64_t id) const {
   const auto at=std::find_if(scene_.objects().begin(),scene_.objects().end(),[id](const auto &o){return o.id==id;});
   return at!=scene_.objects().end()&&id!=scene_.active().id&&!scene_.has_affine_placement(id)&&
-    detail::cut_color_supported(*at)&&(at->mesh_active?at->painted&&!at->painted->mesh().indices.empty():!at->volume->voxels().empty());
+    detail::bake_source_supported(*at)&&(at->mesh_active?at->painted&&!at->painted->mesh().indices.empty():!at->volume->voxels().empty());
 }
 std::vector<uint64_t> Document::bake_sources_locked() const {
   std::vector<uint64_t> ids;
   const auto &target=scene_.active();
   if(!detail::corner_bake_target_supported(target))return ids;
   for(const auto &o:scene_.objects())if(o.id!=scene_.active().id && !scene_.has_affine_placement(o.id) &&
-      detail::cut_color_supported(o) &&
+      detail::bake_source_supported(o) &&
       (o.mesh_active ? o.painted && !o.painted->mesh().indices.empty() : !o.volume->voxels().empty()))ids.push_back(o.id);
   if(state_.bake_source==unavailable_bake_object||
       (target.bake_recipe&&target.bake_recipe->source.object==unavailable_bake_object))
@@ -91,6 +93,7 @@ void Document::queue_bake_locked(uint64_t source,ObjectBakeSettings settings,Ass
     if(result.color_prepared){char quality[96];snprintf(quality,sizeof(quality),"; color error bound %.4f",double(*std::max_element(result.color_error_bound.begin(),result.color_error_bound.end())));*report+=quality;}
     if(result.canonical_captured)*report+="; verified normal frame captured";
     if(result.normal_prepared){char quality[128];snprintf(quality,sizeof(quality),"; portable normal attributes authored (rest quantization %.3f deg)",result.normal_initial_error*57.29577951308232);*report+=quality;}
+    if(scene.active().bake_recipe&&scene.active().bake_recipe->settings.normal_filter_quality==1)*report+="; filtered normal detail checked";
   },expected,report,work,{}, {},0,0,{},BakeAdmission{source,settings});
 }
 void Document::bake_from_object(uint64_t source,ObjectBakeSettings settings,AssetSource expected){

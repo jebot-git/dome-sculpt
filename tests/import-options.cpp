@@ -125,8 +125,10 @@ int main(int argc,char **argv){try{
   doc.import_action(SpatialCommand::ImportCancel);
   auto limit=root/"limit";fs::create_directories(limit);for(int i=0;i<513;++i)write(limit/(std::to_string(i)+".obj"),triangle);
   refuses([&]{scan_import_directory(limit);},"directory result quota refuses instead of silently omitting eligible assets");
-  check(spatial_page_count==31 && spatial_max_page==30 && !spatial_action(spatial_page_count,5) && spatial_action(21,6)==SpatialCommand::ImportApply&&spatial_action(23,0)==SpatialCommand::ImportFormat&&spatial_parameter(23,6)==VrParameter::ImportUnitScale&&
+  check(spatial_page_count==34 && spatial_max_page==33 && !spatial_action(34,5) && spatial_action(21,6)==SpatialCommand::ImportApply&&spatial_action(23,0)==SpatialCommand::ImportFormat&&spatial_parameter(23,6)==VrParameter::ImportUnitScale&&
       spatial_action(0,4)==SpatialCommand::Undo&&spatial_parameter(17,1)==VrParameter::CutOffset&&
-      spatial_action(25,0)==SpatialCommand::ProjectionBrowse&&spatial_action(26,1)==SpatialCommand::PreviewPbr&&spatial_action(27,10)==SpatialCommand::RigFitApply,"Import21/23 preserve root Undo and existing cut controls");
+      spatial_action(25,0)==SpatialCommand::ProjectionBrowse&&spatial_action(26,1)==SpatialCommand::PreviewPbr&&spatial_action(27,10)==SpatialCommand::RigFitApply&&spatial_action(31,0)==SpatialCommand::TexturePrevious&&
+      spatial_action(32,1)==SpatialCommand::BlurColorLayer&&spatial_action(33,11)==SpatialCommand::CreatorApply,
+      "Import pages preserve existing controls alongside texture sets, filters and creator controls");
   std::cout<<checks<<" import options/controller checks passed\n";return 0;
 }catch(const std::exception&e){release_read=true;gate_changed.notify_all();std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}}

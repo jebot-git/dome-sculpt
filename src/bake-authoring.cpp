@@ -1,3 +1,4 @@
+#include "bake-source-capabilities.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/bake-authoring.hpp"
 #include "dome/bake-recipe.hpp"
@@ -16,6 +17,9 @@
 #include "emission-bake-source.hpp"
 #include "source4-baked.hpp"
 #include "source-bake-normal.hpp"
+#include "bake-filtered-normal-quality.hpp"
+#include "bake-filtered-emission-quality.hpp"
+#include "bake-retained-emission.hpp"
 namespace dome {
 ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
                               ObjectBakeSettings settings,
@@ -30,7 +34,6 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   auto target = scene.active();
   auto source = scene.object(source_id);
   if(target.material_bindings&&target.material_bindings->native_paint_sampling)throw std::logic_error("Retained native paint target requires its sampling-aware Bake adapter");
-  if(source.material_bindings&&source.material_bindings->native_paint_sampling)throw std::logic_error("Retained native paint source requires its sampling-aware Bake adapter");
   if(target.material_bindings&&target.material_bindings->normal_preparation&&target.material_bindings->normal_preparation->canonical_conversion){
     NormalPreparationOptions normal_options;normal_options.cancelled=cancelled;normal_options.max_angular_error=settings.normal_error;
     auto layered=convert_canonical_normals({target.painted,target.appearance,target.material_bindings,target.deformation,target.material,{}},normal_options);
@@ -42,18 +45,20 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
     throw std::logic_error("This corner-color target has shading roles that target baking cannot yet preserve");
   // This source route uses the same authenticated ordinary shading domain as
   // plane cutting. Other original/prepared roles still require their adapters.
-  if(current_source&&!detail::cut_color_supported(source))
+  if(current_source&&!detail::bake_source_supported(source))
     throw std::logic_error("This corner-color source has shading roles that source baking cannot yet preserve");
   if (source.id == target.id)
     throw std::invalid_argument("Choose a different source object for baking");
   if (!target.visible || target.locked || !target.mesh_active || !target.painted)
     throw std::logic_error("Show, unlock and prepare the target painting mesh before baking");
-  if(source.mesh_active&&source.painted&&
-      source.painted->baked()&&source.painted->baked()->normal_field)
-    throw std::invalid_argument("Select a source without prepared normal attributes for this bake; source-frame transport is required and both objects are retained");
+  if(source.mesh_active&&source.painted&&source.painted->baked()&&source.painted->baked()->normal_field&&
+      (!source.material_bindings||!source.material_bindings->canonical_attributes))
+    throw std::invalid_argument("Independent normal-field source requires its actual canonical attribute owner");
+  // The source adapter below authenticates the actual field/current frame/UV
+  // owners before sampling. It preserves both stored roles, not raw pixels.
   if(!std::isfinite(settings.color_error)||settings.color_error<0||settings.color_error>1)
     throw std::invalid_argument("Invalid vertex-color preparation tolerance");
-  if(!std::isfinite(settings.normal_error)||settings.normal_error<0||settings.normal_error>.25f)
+  if(!std::isfinite(settings.normal_error)||settings.normal_error<0||settings.normal_error>.25f||settings.normal_filter_quality>1||settings.emission_transport>1)
     throw std::invalid_argument("Invalid normal preparation angular tolerance");
   for (auto mm : {settings.front_mm, settings.back_mm, settings.ao_distance_mm})
     if (!std::isfinite(mm) || mm < 0 || mm > 100'000)
@@ -75,7 +80,7 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   // positions/normals later, never the source field's corner identity or RGBA.
   auto source_maps=detail::raw_bake_source(source,cancelled);
   if(!source_maps&&source.mesh_active)source_maps=source.painted->preview(source.material,cancelled);
-  auto source_colors=source.mesh_active?detail::current_vertex_colors(source.painted->mesh(),current?&*current:nullptr,
+  auto source_colors=source.mesh_active&&!source.painted->color_projection()?detail::current_vertex_colors(source.painted->mesh(),current?&*current:nullptr,
       source.appearance.get(),source.material_bindings.get(),source_maps.get(),cancelled):std::vector<PolygonRgba>{};
   std::shared_ptr<const PolygonColorSurface> target_current;
   if(current_target){
@@ -148,6 +153,10 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   if(progress)options.progress=[&](float value){progress(.1f+.8f*value);};
   const auto canonical_attributes=target.material_bindings?target.material_bindings->canonical_attributes:nullptr;
   const bool prepared_normals=bool(target.painted->normal_projection())||bool(canonical_attributes);
+  // Raw canonical-map baking keeps the explicitly recorded legacy contract.
+  // Version1 is claimed only for a real prepared target whose filtered field
+  // will be checked, including ordinary/sculpt sources without frame bindings.
+  if(!prepared_normals)settings.normal_filter_quality=0;
   const bool canonical_captured=!prepared_normals&&detail::capture_new_bake_frame(target,cancelled);
   std::optional<Mesh> low;
   if(prepared_normals){
@@ -172,12 +181,55 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
     };
   }else low=detail::retained_bake_basis(target,options);
   const auto &low_mesh=low?*low:target.painted->mesh();
+  if(settings.corresponding_topology){
+    const auto &rest=target.painted->mesh();
+    if(settings.cage_object||!source.mesh_active||high.mesh.indices!=rest.indices||
+       high.mesh.positions.size()!=rest.positions.size())
+      throw std::invalid_argument("Corresponding topology requires matching ordered vertices and triangles and no cage");
+    options.corresponding_topology=true;
+    for(size_t c=0;c<rest.indices.size();c+=3){
+      if(!(c%3072))check();
+      options.source_triangles.push_back(uint32_t(c/3));
+    }
+    options.source_corner_barycentrics.resize(rest.indices.size());
+    for(size_t c=0;c<rest.indices.size();++c){if(!(c%1024))check();options.source_corner_barycentrics[c][c%3]=1;}
+  }
   if(settings.cage_object)
     options.cage_positions=detail::object_bake_cage(scene,target.id,settings.cage_object,
         target.painted->mesh(),low_mesh,cancelled);
   const auto retained_uv=target.material_bindings?target.material_bindings->canonical_uv:nullptr;
   if(retained_uv&&progress)options.progress=[&](float value){progress(.1f+.4f*value);};
-  auto result = detail::bake_mesh_source_normals(low_mesh,high,options,source_normals);
+  std::shared_ptr<const detail::BakedEmissionDomain> emission_domain;
+  if(settings.emission_transport&&!options.corresponding_topology&&high.materials[0].resolved_emission&&detail::exact_emission_projection_directions(low_mesh,options)){
+    try{emission_domain=detail::BakedEmissionDomain::capture(scene,source_id,target.painted->mesh_owner(),options.resolution,target_world,cancelled);}
+    catch(const std::invalid_argument&){/* Uncertified correspondence keeps the independently checked raster route. */}
+    if(emission_domain&&emission_domain->version()!=1&&target.painted->paint_sampling_domain())emission_domain.reset();
+  }
+  // A separately retained UV write basis may differ from the current mesh.
+  // Keep its existing raster route; sharing below requires the actual current
+  // grid correspondence, in addition to the source domain's certificate.
+  bool share_emission=bool(emission_domain)&&low_mesh.indices.size()==target.painted->mesh().indices.size();
+  if(share_emission)for(size_t c=0;c<low_mesh.indices.size();++c){
+    if(!(c%1024))check();const auto l=low_mesh.indices[c],t=target.painted->mesh().indices[c];
+    const auto a=low_mesh.positions[l],b=target.painted->mesh().positions[t];
+    if(a.x!=b.x||a.y!=b.y||a.z!=b.z||low_mesh.uv[l]!=target.painted->mesh().uv[t]){share_emission=false;break;}
+  }
+  if(!share_emission)emission_domain.reset();
+  auto result = emission_domain?
+    detail::bake_mesh_retained_emission(low_mesh,high,options,source_normals,emission_domain,target.painted->mesh_owner()):
+    detail::bake_mesh_source_normals(low_mesh,high,options,source_normals);
+  if(settings.emission_transport)detail::verify_filtered_emission_quality(low_mesh,high,options,result,emission_domain);
+  auto verify_filtered=[&](const Mesh &mesh,const BakeOptions &policy,BakeResult &candidate){
+    if(prepared_normals&&settings.normal_filter_quality==1){
+      const auto frames=target.material_bindings->normal_frames;
+      const auto mode=canonical_attributes?PreparedMToonNormalEvaluation::Absent:target.material_bindings->normal_preparation->receipt.mtoon;
+      std::optional<detail::GenericBakeNormalSampler> generic;
+      if(!source_normals)generic.emplace(detail::generic_bake_normals(high,source_normal_options));
+      detail::verify_filtered_normal_quality(mesh,high,policy,source_normals,*frames,mode,
+          target.material_bindings->material.parameters.normal_scale,settings.normal_error,candidate,generic?&*generic:nullptr);
+    }
+  };
+  if(!retained_uv)verify_filtered(low_mesh,options,result);
   std::optional<BakeResult> retained_normal_write;
   if(retained_uv){
     retained_uv->validate_current(target.painted->mesh(),cancelled);
@@ -196,6 +248,7 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
     normal_options.max_rays-=result.rays;normal_options.max_raster_samples-=result.raster_samples;
     if(progress)normal_options.progress=[&](float value){progress(.5f+.4f*value);};
     retained_normal_write=detail::bake_mesh_source_normals(normal_low,high,normal_options,source_normals);
+    verify_filtered(normal_low,normal_options,*retained_normal_write);
   }
   check();
   if(!result.projected)throw std::runtime_error("No target texels project onto the selected source");
@@ -215,7 +268,8 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   if(prepared_normals)textures.normal_interpretation=BakedNormalInterpretation::PreparedAttributes;
   if(separate)textures.color_interpretation=BakedColorInterpretation::ResolvedPbr;
   textures.maps = std::move(result.maps);
-  textures.emission_field=std::move(result.emission_field);
+  textures.emission_domain=std::move(emission_domain);
+  if(!textures.emission_domain)textures.emission_field=std::move(result.emission_field);
   textures.maps.normal = std::move(result.normal);
   textures.coverage.reserve(result.coverage.size());
   for (auto c : result.coverage) textures.coverage.push_back(c==1 || c==2 ? 255 : 0);

@@ -6,6 +6,7 @@
 #include "graphics.h"
 #include <nlohmann/json.hpp>
 #include "sculpt-sustained-device.hpp"
+#include "sculpt-independent-fixture.hpp"
 #include <algorithm>
 #include <bit>
 #include <charconv>
@@ -23,7 +24,7 @@ void write(const std::filesystem::path &p,const json &j){std::ofstream f(p);f<<j
 struct Options {
   std::filesystem::path output;std::string tier="production",device="software";
   size_t objects=4,strokes=300,masks=120,pairs=2000,held_pairs=120,repetitions=3;float voxel=.0125f;
-  int width=768,height=768;bool smoke=false,count_allocations=false,inventory_only=false;
+  int width=768,height=768;bool smoke=false,count_allocations=false,inventory_only=false,independent=false;
 };
 Options options(int argc,char **argv){
   Options o;bool explicit_work=false,explicit_voxel=false,explicit_objects=false;
@@ -40,14 +41,16 @@ Options options(int argc,char **argv){
     else if(k=="--width"){o.width=int(count(value(),2048));explicit_work=true;}
     else if(k=="--height"){o.height=int(count(value(),2048));explicit_work=true;}
     else if(k=="--inventory-only")o.inventory_only=true;
+    else if(k=="--independent")o.independent=true;
     else if(k=="--allocations")o.count_allocations=true;else if(k=="--smoke")o.smoke=true;else throw std::invalid_argument("Unknown benchmark argument: "+k);
   }
-  require(!o.output.empty(),"Usage: sculpt-sustained --output NEW-directory [--tier small|medium|production|dense] [--objects 1|4|16] [--voxel metres] [--device software|arc] [--inventory-only] [--strokes N --masks N --pairs N --held-pairs N --repetitions N --width N --height N] [--smoke] [--allocations]");
+  require(!o.output.empty(),"Usage: sculpt-sustained --output NEW-directory [--tier small|medium|production|dense] [--objects 1|4|16] [--voxel metres] [--device software|arc] [--inventory-only] [--independent] [--strokes N --masks N --pairs N --held-pairs N --repetitions N --width N --height N] [--smoke] [--allocations]");
   require(o.objects==1||o.objects==4||o.objects==16,"Object count must be 1, 4 or 16");
   require(o.device=="software"||o.device=="arc","Device must be software or arc");
   float preset=0;if(o.tier=="small")preset=.025f;else if(o.tier=="medium"||o.tier=="production")preset=.0125f;else if(o.tier=="dense")preset=.00625f;else throw std::invalid_argument("Unknown tier");
   if(!explicit_voxel)o.voxel=preset;
   if(o.smoke){require(!explicit_voxel&&!explicit_work&&!o.inventory_only&&(!explicit_objects||o.objects==4),"Smoke has a fixed workload; explicit density/count/inventory overrides are refused");o.objects=4;o.voxel=.04f;o.strokes=4;o.masks=3;o.pairs=8;o.held_pairs=4;o.repetitions=1;o.width=o.height=128;}
+  require(!o.independent||(!o.smoke&&o.objects==4&&o.tier=="production"&&o.voxel==.0125f),"Independent production fixture requires four .0125m production objects, without smoke substitution");
   return o;
 }
 void ready(Document &d){const auto until=std::chrono::steady_clock::now()+std::chrono::seconds(120);bool accepted=false;do{accepted=d.wait_mesh(std::chrono::milliseconds(100));require(d.frame().state->error.empty(),"Document error: "+d.frame().state->error);}while(!accepted&&std::chrono::steady_clock::now()<until);require(accepted,"Mesh worker publication timed out");auto f=d.frame();require(f.surface->generation==f.state->generation&&f.surface->revision==f.state->revision&&f.surface->view_epoch==f.state->view_epoch,"Worker did not publish the accepted current source");}
@@ -69,6 +72,7 @@ Scene fixture(const Options &o){
     if(i%3==1){s.object(id).material.alpha=Material::AlphaMode::Blend;s.object(id).material.color[3]=.6f;}
     if(i==o.objects-1)s.object(id).affine_edit=std::make_shared<NativeAffineEdit>(AffineTransform(std::array<double,16>{-1,0,0,0,.17,1.1,0,0,.07,.09,.85,0,0,0,0,1}));
   }
+  if(o.independent)sculpt_independent_fixture::author(s);
   s.select(1);return s;
 }
 Scene grouped_regression(){
@@ -243,7 +247,7 @@ int main(int argc,char **argv){
     if(!o.output.parent_path().empty())std::filesystem::create_directories(o.output.parent_path());
     require(std::filesystem::create_directory(o.output),"Evidence output directory already exists; preserve it and choose a new directory");
     output=o.output;RawRows raw(output);sustained::allocations=o.count_allocations;
-    report["options"]={{"tier",o.tier},{"device",o.device},{"inventory_only",o.inventory_only},{"smoke",o.smoke},{"objects",o.objects},{"voxel",o.voxel},{"strokes",o.strokes},{"masks",o.masks},{"pairs",o.pairs},{"held_pairs",o.held_pairs},{"repetitions",o.repetitions},{"width",o.width},{"height",o.height},{"allocation_instrumentation",o.count_allocations}};
+    report["options"]={{"tier",o.tier},{"device",o.device},{"inventory_only",o.inventory_only},{"smoke",o.smoke},{"independent_authored_fields",o.independent},{"objects",o.objects},{"voxel",o.voxel},{"strokes",o.strokes},{"masks",o.masks},{"pairs",o.pairs},{"held_pairs",o.held_pairs},{"repetitions",o.repetitions},{"width",o.width},{"height",o.height},{"allocation_instrumentation",o.count_allocations}};
     const auto allocation_before=Counters::read();bool aligned=true;sustained::measuring=true;
     for(size_t alignment:{size_t(1),size_t(2),size_t(4),size_t(8),size_t(16)}){void *p=::operator new(37,std::align_val_t(alignment));aligned=aligned&&reinterpret_cast<uintptr_t>(p)%alignment==0;::operator delete(p,std::align_val_t(alignment));}
     sustained::measuring=false;const auto allocation_after=Counters::read();require(aligned,"Actual aligned allocation control returned misaligned memory");require(allocation_after.news-allocation_before.news==(o.count_allocations?5u:0u)&&allocation_after.new_bytes-allocation_before.new_bytes==(o.count_allocations?185u:0u),"Actual aligned allocation counters differ from requested operations");report["aligned_cpp_new_controls"]={{"alignments",{1,2,4,8,16}},{"counted_calls",allocation_after.news-allocation_before.news},{"counted_requested_bytes",allocation_after.new_bytes-allocation_before.new_bytes}};

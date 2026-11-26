@@ -3,6 +3,8 @@
 #include "dome/uv.hpp"
 namespace dome {
 const std::array<const char *, 12> &spatial_labels(int page) {
+  static const std::array<const char*,12> creator={"Previous value","Next value","Switch base","Neutral","Toon","Anime","Edit value","Copy settings","Cancel draft","Undo draft","Redo draft","Create new"};
+  if(page==33)return creator;
   static const std::array<const char*,12> filters={"Brush controls","Blur color layer","","","","","Cancel work","Save","Back","Undo","Redo",""};
   if(page==32)return filters;
   static const std::array<const char*,12> emission={"Brush RGB","Brush units","Material radiance","Source factors","Relative / normalize","Physical brush","Brush black","Paint emission","Back","Undo","Redo","Close"};
@@ -45,7 +47,7 @@ const std::array<const char *, 12> &spatial_labels(int page) {
       "Refresh", "Next project", "Previous", "Recover", "Save", "Center",
       "Undo", "Redo", "Back", "Export glTF", "Objects", "Materials"};
   static const std::array<const char *, 12> avatars = {
-      "Female CC0", "Male CC0", "Center part", "Next part", "Previous part", "Rig and shapes",
+      "Female CC0", "Male CC0", "Creator controls", "Next part", "Previous part", "Rig and shapes",
       "Delete group", "Ungroup", "Back", "Undo", "Redo", "Save"};
   static const std::array<const char *, 12> mesh = {
       "Prepare paint", "Voxel remesh", "Polygon edit", "UV editor",
@@ -92,6 +94,7 @@ const std::array<const char *, 12> &spatial_labels(int page) {
                      : root;
 }
 std::optional<VrParameter> spatial_parameter(int page, int sector) {
+  if(page==33&&sector==6)return VrParameter::CreatorValue;
   if(page==31){if(sector==6)return VrParameter::TextureResolution;if(sector==7)return VrParameter::BaseColor;return {};}
   if(page==24&&sector==3)return VrParameter::ShapeMirror;
   if(page==30){if(sector==0)return VrParameter::InkEmission;if(sector==1)return VrParameter::InkEmissionUnits;if(sector==2)return VrParameter::MaterialEmission;if(sector==3)return VrParameter::EmissionSource;return {};}
@@ -169,6 +172,10 @@ std::optional<VrParameter> spatial_parameter(int page, int sector) {
   return {};
 }
 std::optional<SpatialCommand> spatial_action(int page, int index) {
+  if(page==33){
+    static const std::array<SpatialCommand,12> creator={SpatialCommand::CreatorPrevious,SpatialCommand::CreatorNext,SpatialCommand::CreatorBaseline,SpatialCommand::CreatorNeutral,SpatialCommand::CreatorToon,SpatialCommand::CreatorAnime,SpatialCommand::CreatorBegin,SpatialCommand::CreatorCopySettings,SpatialCommand::CreatorCancel,SpatialCommand::Undo,SpatialCommand::Redo,SpatialCommand::CreatorApply};
+    return index<0||index>=12||index==6?std::nullopt:std::optional<SpatialCommand>(creator[index]);
+  }
   if(page==32){if(index==1)return SpatialCommand::BlurColorLayer;if(index==6)return SpatialCommand::CancelWork;if(index==7)return SpatialCommand::Save;if(index==9)return SpatialCommand::Undo;if(index==10)return SpatialCommand::Redo;return {};}
   if(page==31){if(index>=0&&index<6)return SpatialCommand(int(SpatialCommand::TexturePrevious)+index);if(index==9)return SpatialCommand::Undo;if(index==10)return SpatialCommand::Redo;if(index==11)return SpatialCommand::Save;return {};}
   if(page==30){if(index==4)return SpatialCommand::EmissionRelative;if(index==5)return SpatialCommand::EmissionPhysical;if(index==6)return SpatialCommand::EmissionBlack;if(index==7)return SpatialCommand::PaintGlow;if(index==9)return SpatialCommand::Undo;if(index==10)return SpatialCommand::Redo;return {};}
@@ -275,7 +282,7 @@ std::optional<SpatialCommand> spatial_action(int page, int index) {
   if(page==20){static const std::array<SpatialCommand,12> actions={SpatialCommand::ObjectGrabMode,SpatialCommand::HoldObject,SpatialCommand::ReleaseObject,SpatialCommand::GhostOthers,SpatialCommand::Visibility,SpatialCommand::Previous,SpatialCommand::Next,SpatialCommand::Center,SpatialCommand::Center,SpatialCommand::Left,SpatialCommand::Right,SpatialCommand::CancelObjectGrab};return index==8?std::nullopt:std::optional<SpatialCommand>(actions[index]);}
   if (page == 9) {
     static const std::array<SpatialCommand,12> avatars = {
-      SpatialCommand::CreateFemale, SpatialCommand::CreateMale, SpatialCommand::Center,
+      SpatialCommand::CreateFemale, SpatialCommand::CreateMale, SpatialCommand::CreatorBegin,
       SpatialCommand::Next, SpatialCommand::Previous, SpatialCommand::Center,
       SpatialCommand::DeleteGroup, SpatialCommand::Ungroup, SpatialCommand::Undo,
       SpatialCommand::Undo, SpatialCommand::Redo, SpatialCommand::Save};
@@ -507,7 +514,7 @@ void SpatialInput::ray_controls(const SpatialSample &s, bool pressed) {
                parameter_ == VrParameter::InkEmission || parameter_ == VrParameter::MaterialEmission ||
                parameter_ == VrParameter::BaseColor || parameter_ == VrParameter::CutCapColor;
   bool multi = parameter_==VrParameter::BakeSource || parameter_==VrParameter::ShapeMirror || parameter_==VrParameter::BakeColors || parameter_==VrParameter::BakeProjection || parameter_==VrParameter::ProceduralGrid || parameter_==VrParameter::ProceduralCoverage || color || parameter_ == VrParameter::SculptPlanes || parameter_ == VrParameter::CutDirection || parameter_ == VrParameter::RigRotation || parameter_==VrParameter::BakeDistances || parameter_==VrParameter::SkinDistances || parameter_==VrParameter::BakeQuality;
-  int components = (parameter_==VrParameter::BakeSource || parameter_==VrParameter::BakeProjection || parameter_==VrParameter::ProceduralGrid || parameter_==VrParameter::BakeQuality || parameter_==VrParameter::CutDirection)?2:(parameter_==VrParameter::ProceduralCoverage||parameter_==VrParameter::ShapeMirror)?3:parameter_==VrParameter::BakeDistances || parameter_==VrParameter::SkinDistances || parameter_ == VrParameter::RigRotation || (parameter_ == VrParameter::InkEmission || parameter_ == VrParameter::MaterialEmission) ? 3 : parameter_==VrParameter::BakeColors || color || parameter_ == VrParameter::SculptPlanes ? 4 : 1;
+  int components = (parameter_==VrParameter::BakeSource || parameter_==VrParameter::ProceduralGrid || parameter_==VrParameter::BakeQuality || parameter_==VrParameter::CutDirection)?2:(parameter_==VrParameter::ProceduralCoverage||parameter_==VrParameter::ShapeMirror||parameter_==VrParameter::BakeProjection)?3:parameter_==VrParameter::BakeDistances || parameter_==VrParameter::SkinDistances || parameter_ == VrParameter::RigRotation || (parameter_ == VrParameter::InkEmission || parameter_ == VrParameter::MaterialEmission) ? 3 : parameter_==VrParameter::BakeColors || color || parameter_ == VrParameter::SculptPlanes ? 4 : 1;
   if (s.trigger && s.panel_hit) {
     int row = 0;
     float y = .46875f;
@@ -658,7 +665,7 @@ void SpatialInput::update(const SpatialSample &s) {
                  parameter_ == VrParameter::InkEmission || parameter_ == VrParameter::MaterialEmission ||
                  parameter_ == VrParameter::BaseColor || parameter_ == VrParameter::CutCapColor;
     bool multi = parameter_==VrParameter::BakeSource || parameter_==VrParameter::ShapeMirror || parameter_==VrParameter::BakeColors || parameter_==VrParameter::BakeProjection || parameter_==VrParameter::ProceduralGrid || parameter_==VrParameter::ProceduralCoverage || color || parameter_ == VrParameter::SculptPlanes || parameter_ == VrParameter::CutDirection || parameter_ == VrParameter::RigRotation || parameter_==VrParameter::BakeDistances || parameter_==VrParameter::SkinDistances || parameter_==VrParameter::BakeQuality;
-    int components = (parameter_==VrParameter::BakeSource || parameter_==VrParameter::BakeProjection || parameter_==VrParameter::ProceduralGrid || parameter_==VrParameter::BakeQuality || parameter_==VrParameter::CutDirection)?2:(parameter_==VrParameter::ProceduralCoverage||parameter_==VrParameter::ShapeMirror)?3:parameter_==VrParameter::BakeDistances || parameter_==VrParameter::SkinDistances || parameter_ == VrParameter::RigRotation || (parameter_ == VrParameter::InkEmission || parameter_ == VrParameter::MaterialEmission) ? 3 : parameter_==VrParameter::BakeColors || color || parameter_ == VrParameter::SculptPlanes ? 4 : 1;
+    int components = (parameter_==VrParameter::BakeSource || parameter_==VrParameter::ProceduralGrid || parameter_==VrParameter::BakeQuality || parameter_==VrParameter::CutDirection)?2:(parameter_==VrParameter::ProceduralCoverage||parameter_==VrParameter::ShapeMirror||parameter_==VrParameter::BakeProjection)?3:parameter_==VrParameter::BakeDistances || parameter_==VrParameter::SkinDistances || parameter_ == VrParameter::RigRotation || (parameter_ == VrParameter::InkEmission || parameter_ == VrParameter::MaterialEmission) ? 3 : parameter_==VrParameter::BakeColors || color || parameter_ == VrParameter::SculptPlanes ? 4 : 1;
     if (multi) {
       if (std::abs(s.stick_y) < .3f)
         y_latch_ = 0;
@@ -718,6 +725,9 @@ void SpatialInput::update(const SpatialSample &s) {
     } else if(page_==11&&selected_==7){command_=SpatialCommand::RigFitBegin;command_device_=s.id;page_=27;selected_=0;
     } else if (page_ == 11 && selected_ == 10) {
       page_ = 13; selected_ = 0;
+    } else if(page_==9&&selected_==2){
+      if(allowed&&!allowed(SpatialCommand::CreatorBegin)){d.pressed=s.trigger;return;}
+      command_=SpatialCommand::CreatorBegin;command_device_=s.id;page_=33;selected_=0;
     } else if (page_ == 9 && selected_ == 5) {
       page_ = 11;
       selected_ = 0;
@@ -772,7 +782,7 @@ void SpatialInput::update(const SpatialSample &s) {
       component_ = y_latch_ = 0;
       page_ = 5;
       controls_.push_back({VrControlEventType::Begin, parameter_});
-    } else if (page_ != 0 && page_ != 27 && selected_ == 8) {
+    } else if (page_ != 0 && page_ != 27 && page_ != 33 && selected_ == 8) {
       const bool export_back=page_==28||page_==30;
       page_ = page_==32 ? 6 : page_==31 ? 2 : page_==30 ? 6 : page_==29 ? 26 : page_==26 ? 2 : page_==25 ? 3 : page_==24 ? 10 : page_==22 ? 19 : page_==19 ? 10 : page_==23 ? 21 : (page_ == 16 || page_ == 17 || page_==20 || page_==21) ? 10 : (page_ == 18 || page_ == 15) ? 7 : page_ == 14 ? 13 : page_ == 13 ? 11
               : page_ == 12 ? 10
@@ -811,7 +821,7 @@ void SpatialInput::update(const SpatialSample &s) {
       const bool resume_mask = page_ == 15 && command_ && *command_ == SpatialCommand::SculptMaskResume;
       const bool resume_polygon=(page_==19||page_==22)&&command_&&
         (*command_==SpatialCommand::PolygonBegin||*command_==SpatialCommand::PolygonMoveMode||*command_==SpatialCommand::PolygonApply||*command_==SpatialCommand::PolygonCancel);
-      if((page_!=19 && page_!=22 && page_!=12 && page_!=14 && page_!=15 && page_!=16 && page_!=18 && page_!=20 && page_!=21 && page_!=23 && page_!=25 && page_!=27 && page_!=29 && page_!=30) || resume_retopology || resume_mask || resume_polygon){menu_ = false;device_ = 0;}
+      if((page_!=19 && page_!=22 && page_!=12 && page_!=14 && page_!=15 && page_!=16 && page_!=18 && page_!=20 && page_!=21 && page_!=23 && page_!=25 && page_!=27 && page_!=29 && page_!=30 && page_!=33) || resume_retopology || resume_mask || resume_polygon){menu_ = false;device_ = 0;}
       d.armed = false;
     }
     d.pressed = s.trigger;
