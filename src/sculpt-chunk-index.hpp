@@ -40,8 +40,15 @@ template<class K,class V,class Traits> struct PersistentSculptIndex {
     w.tick();
     // Requested node/control-block storage plus a conservative allocation
     // allowance. This is an owning working budget, not an RSS measurement.
-    w.charge(sizeof(Node)+128);
-    return std::make_shared<const Node>(k,v,std::move(a),std::move(b));
+    if constexpr(requires {w.template node_allocator<Node>(sizeof(Node)+128);}) {
+      // The geometry working owner tracks the actual shared allocation's
+      // lifetime. Intermediate AVL paths can die between successive edits.
+      return std::allocate_shared<const Node>(
+          w.template node_allocator<Node>(sizeof(Node)+128),k,v,std::move(a),std::move(b));
+    } else {
+      w.charge(sizeof(Node)+128);
+      return std::make_shared<const Node>(k,v,std::move(a),std::move(b));
+    }
   }
   static Ptr balanced(const K &k,const V &v,Ptr a,Ptr b,auto &w) {
     if(h(a)>h(b)+1) {
