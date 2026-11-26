@@ -126,14 +126,25 @@ std::optional<Image> reproject_normal(const PolygonSurfacePreview &preview,
   const auto &a=original.at(i),&b=original.at(i+1),&c=original.at(i+2);
   const std::array<Uv,3> source{a,b,c};
   const std::array<Uv,3> reference{{{0,0},{1,0},{0,1}}};
-  const auto &layout=UvTriangle(source,size).usable()?source:reference;
+  const bool preserve_layout=UvTriangle(source,size).usable();
+  const auto &layout=preserve_layout?source:reference;
   for(size_t axis=0;axis<2;++axis){
    const auto lo=std::min({layout[0][axis],layout[1][axis],layout[2][axis]});
    const auto hi=std::max({layout[0][axis],layout[1][axis],layout[2][axis]});
    const auto tile=axis==0?face%columns:face/columns;
-   for(size_t k=0;k<3;++k)
-    corners[face*3+k].role[axis]=float((tile*cell+gutter+1+(cell-2*(gutter+1))*
-       ((double(layout[k][axis])-lo)/(double(hi)-lo)))/size);
+   const auto origin=tile*cell+gutter+1;
+   const auto span=cell-2*(gutter+1);
+   const auto first_pixel=std::floor(double(lo)*source_size);
+   const auto last_pixel=std::ceil(double(hi)*source_size);
+   // Keep the source texel centers aligned when the original span fits.
+   // Shifting the filtering lattice changes sharp partial-Bake edges.
+   const bool aligned=preserve_layout&&last_pixel-first_pixel<=span;
+   for(size_t k=0;k<3;++k){
+    const double value=layout[k][axis];
+    const auto offset=aligned?value*source_size-first_pixel:
+                         span*(value-lo)/(double(hi)-lo);
+    corners[face*3+k].role[axis]=float((origin+offset)/size);
+   }
   }
  }
  for(size_t face=0;face<domain.size();++face){
@@ -146,7 +157,10 @@ std::optional<Image> reproject_normal(const PolygonSurfacePreview &preview,
     const auto [b,d]=chart.closest(u,v);
     const size_t i=size_t(y)*size+x;
     if(d>gutter||d>=distance[i])continue;
-    const auto uv=independent?interpolate(source,b):Uv{float(u),float(v)};
+    // Border texels are still part of the consumer's bilinear footprint.
+    // Use the source image beyond the chart while holding the frame at
+    // the nearest valid barycentrics.
+    const auto uv=independent?interpolate(source,chart.barycentric(u,v)):Uv{float(u),float(v)};
     const auto wanted=preview.sample_baked_normal(triangle,b,world,uv);
     const auto basis=normal_bake_basis(frame,b,NormalFragmentBasis::UnitColumns);
     const auto encoded=encode_normal_bake(basis,wanted);
