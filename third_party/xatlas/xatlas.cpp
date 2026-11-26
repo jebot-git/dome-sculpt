@@ -8762,22 +8762,28 @@ private:
 				else
 					break;
 			}
+			const int minExtentX = max(w, cw);
 			for (int y = startPosition.y; y <= h + stepSize; y += stepSize) {
 				if (maxResolution > 0 && y > (int)maxResolution - ch)
 					break;
-				for (int x = (y == startPosition.y ? startPosition.x : 0); x <= w + stepSize; x += stepSize) {
+				const int extentY = max(h, y + ch);
+				const int minExtent = max(minExtentX, extentY);
+				// Even x = 0 cannot improve the score on this or later rows.
+				if (minExtent * minExtent + minExtentX * extentY > best_metric)
+					break;
+				const int firstX = y == startPosition.y ? startPosition.x : 0;
+				for (int x = firstX; x <= w + stepSize; x += stepSize) {
 					if (maxResolution > 0 && x > (int)maxResolution - cw)
 						break;
-					// Early out if metric is not better.
-					const int extentX = max(w, x + cw), extentY = max(h, y + ch);
+					const int extentX = max(w, x + cw);
 					const int area = extentX * extentY;
 					const int extents = max(extentX, extentY);
 					const int metric = extents * extents + area;
+					// Both the score and its distance tie-break can only increase along this row.
 					if (metric > best_metric)
-						continue;
-					// If metric is the same, pick the one closest to the origin.
+						break;
 					if (metric == best_metric && max(x, y) >= max(*best_x, *best_y))
-						continue;
+						break;
 					if (!atlasBitImage->canBlit(r == 1 ? *chartBitImageRotated : *chartBitImage, x, y))
 						continue;
 					best_metric = metric;
