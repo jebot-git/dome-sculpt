@@ -190,7 +190,7 @@ void validate(const Mesh &low,const BakeSource &source,const BakeOptions &o,
         (!m.maps||!source_normals.matches_prepared_source(*m.maps)))
       throw std::invalid_argument("Prepared Bake requires its actual paired normal and material source");
     if (m.maps) {
-      if(m.maps->baked_base&&m.maps->baked_base->normal_field&&!canonical)
+      if(m.maps->baked_base&&m.maps->baked_base->normal_field&&!canonical&&!owns_field)
         throw std::invalid_argument("Canonical source field requires its exact normal and material source");
       if(m.maps->overlay&&!canonical&&((m.maps->source_only&&m.maps->overlay->source_maps()!=m.maps->source_maps)||(!m.maps->source_only&&!m.resolved_emission&&!owns_field)))
         throw std::invalid_argument("Bake overlay differs from its immutable source coordinate owner");
