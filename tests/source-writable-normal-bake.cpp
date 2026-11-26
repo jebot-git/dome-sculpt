@@ -10,6 +10,7 @@
 #include "paint-overlay-packet.hpp"
 #include "native-paint-model.hpp"
 #include "native-paint-frame-source.hpp"
+#include "native-bake-conversion.hpp"
 #include "baked-normal-field.hpp"
 #include "emission-paint-access.hpp"
 #include "dome/shapekey-authoring.hpp"
@@ -497,6 +498,131 @@ void native_key_recipient(bool physical,const std::filesystem::path &out){
           "Reopened keyed Bake donates the correct normal from its retained paint grid");
   std::cout<<"NATIVE_KEY_RECIPIENT "<<name<<" projected="<<report.projected<<" preserved="<<partial.preserved_misses<<'\n';
 }
+
+void legacy_key_conversion(bool physical,const std::filesystem::path &out){
+  auto scene=source(false);
+  auto donor=scene.active().painted->mesh();
+  paint(scene,physical);
+  uv(scene,false,false);
+  for(auto &p:donor.positions){p.z=.02f;if(physical&&p.x<0)p.x=0;}
+  donor.normals.assign(donor.positions.size(),normalized(Vec3{-.33f,.27f,1}));
+  const auto donor_id=scene.add("Historical Bake donor",Volume{});
+  scene.active().mesh_active=true;
+  scene.active().painted=std::make_shared<PaintedMesh>(std::move(donor),64);
+  paint(scene,physical);
+  scene.active().visible=false;
+  scene.active().locked=true;
+  scene.select(1);
+  auto opts=settings();
+  opts.prepare_normals=false;
+  opts.allow_partial=physical;
+  opts.corresponding_topology=!physical;
+  const auto report=bake_object(scene,donor_id,opts);
+  require(report.projected==(physical?2048:4096),"Historical Bake has the requested full or partial coverage");
+  const auto old_bake=scene.active().painted->baked();
+  require(old_bake->normal_interpretation==BakedNormalInterpretation::CanonicalMikk&&
+      bool(old_bake->emission_field)==physical,"Bake predates native key attributes and keeps its original emission authority");
+  require(!detail::native_bake_conversion_supported(scene.active()),"A plain retained Bake already uses its original portable route");
+  key_pose(scene,true,false,"Key authored after the original Bake");
+  require(scene.active().painted->baked()==old_bake&&detail::native_bake_conversion_supported(scene.active()),
+      "Authoring a key retains the raw legacy normals and makes conversion explicit");
+
+  const std::string name=physical?"hdr":"ldr";
+  const auto before=scene.encode();
+  const auto before_path=out/(name+"-before.dsculpt");
+  scene.save(before_path);
+  scene=Scene::load(before_path);
+  auto input=scene.active().painted;
+  auto original=input->baked();
+  require(scene.encode()==before,"Legacy bytes and later key survive cold native reopen");
+  auto unrelated=scene.active();
+  unrelated.material_bindings.reset();
+  require(!detail::native_bake_conversion_supported(unrelated),"Conversion requires the actual paint and frame owners together");
+
+  unsigned calls=0;
+  NormalPreparationOptions rejected;
+  rejected.cancelled=[&]{return ++calls==7;};
+  bool cancelled=false;
+  try{detail::convert_native_baked_normals(scene.active(),rejected);}
+  catch(const std::runtime_error &e){cancelled=std::string_view(e.what()).find("cancelled")!=std::string_view::npos;}
+  require(cancelled&&scene.encode()==before,"Cancellation preserves the original project exactly");
+  rejected.cancelled={};
+  rejected.max_angular_error=0;
+  bool quality=false;
+  try{detail::convert_native_baked_normals(scene.active(),rejected);}
+  catch(const std::invalid_argument &e){quality=std::string_view(e.what()).find("tolerance")!=std::string_view::npos;}
+  require(quality&&scene.encode()==before,"Impossible conversion tolerance leaves the original bytes exact");
+
+  Document doc;
+  doc.replace(scene);
+  const auto standard=out/(name+".glb");
+  const auto rejected_export=out/(name+"-unchanged.glb");
+  {std::ofstream file(rejected_export);file<<"previous export";}
+  require(doc.wait_mesh()&&doc.frame().state->can_convert_bake,"The reopened historical project exposes the shared conversion command");
+  bool blocked=false;
+  try{doc.export_asset(rejected_export).get();}
+  catch(const std::invalid_argument &e){blocked=std::string_view(e.what()).starts_with("Canonical normal export:");}
+  {std::ifstream file(rejected_export);const std::string bytes{std::istreambuf_iterator<char>(file),{}};
+   require(blocked&&bytes=="previous export","Portable export refuses the unchanged legacy shading model and preserves the existing file");}
+
+  const auto historical_frame=doc.frame().surface;
+  const auto ordered=out/(name+"-ordered.dsculpt");
+  doc.convert_baked_normals();
+  doc.save_async(ordered).get();
+  require(doc.wait_asset()&&doc.wait_mesh()&&doc.frame().state->error.empty()&&!doc.frame().state->can_convert_bake,
+      "The shared worker publishes the portable bake and reports success");
+  const auto portable_frame=doc.frame().surface;
+  require(historical_frame->geometry_identity&&portable_frame->geometry_identity&&
+      historical_frame->geometry_identity!=portable_frame->geometry_identity&&
+      historical_frame->mesh.positions.size()!=portable_frame->mesh.positions.size(),
+      "A changed packed frame layout invalidates the immutable GPU geometry identity");
+  auto converted=doc.copy_scene();
+  const auto accepted=converted.encode();
+  const auto &o=converted.active();
+  const auto next=o.painted->baked();
+  const auto direct=detail::convert_native_baked_normals(scene.active(),{});
+  require(direct.maximum_sample_error>0&&direct.maximum_sample_error<=.02&&
+      direct.paint->baked()->maps.normal.rgba==next->maps.normal.rgba,
+      "Detached conversion reports sampled rest error and agrees with the shared worker");
+  std::cout<<"CONVERSION_QUALITY "<<name<<" sampled_degrees="<<direct.maximum_sample_error*57.29577951308232<<'\n';
+  require(next&&next->normal_interpretation==BakedNormalInterpretation::NativeAttributes&&
+      next->maps.normal.rgba!=original->maps.normal.rgba&&next->coverage==original->coverage&&
+      next->maps.color.rgba==original->maps.color.rgba&&next->maps.metal_rough.rgba==original->maps.metal_rough.rgba&&
+      next->maps.emission.rgba==original->maps.emission.rgba&&next->emission_field==original->emission_field&&
+      same_layers(*o.painted,*input),"Conversion changes only the normal bytes and their interpretation");
+  require(o.material_bindings==scene.active().material_bindings&&o.deformation==scene.active().deformation&&
+      o.painted->mesh_owner()==input->mesh_owner()&&o.painted->paint_sampling_attachment()==input->paint_sampling_attachment()&&
+      o.bake_recipe==scene.active().bake_recipe,"Conversion shares the geometry, rig, keys, paint attachment and Bake recipe");
+  require(Scene::load(ordered).encode()==accepted,"Save ordered behind conversion has the accepted native scene");
+  require(doc.undo()&&doc.wait_mesh()&&doc.copy_scene().encode()==before&&
+      doc.redo()&&doc.wait_mesh()&&doc.copy_scene().encode()==accepted,"One Undo/Redo exactly restores legacy and converted projects");
+  doc.export_asset(standard).get();
+  const auto portable=out/(name+"-editable.glb");
+  doc.export_asset(portable,AssetExportFormat::EditableGlb256).get();
+  std::ifstream stream(portable,std::ios::binary);
+  const std::vector<uint8_t> bytes{std::istreambuf_iterator<char>(stream),{}};
+  const auto extracted=extract_native_authoring(bytes);
+  require(extracted&&extracted->encode()==accepted&&doc.copy_scene().encode()==accepted,
+      "Standard and Editable GLB exports succeed and the editable copy retains the complete project");
+
+  auto replay=Scene::load(ordered);
+  key_pose(replay,true,true,"Key added after portable conversion");
+  uv(replay,false,true);
+  replay.save(out/(name+"-edited.dsculpt"));
+  require(replay.active().painted->baked()->maps.normal.rgba==next->maps.normal.rgba,
+      "Later live keys and UV edits retain the converted normal grid");
+  // The seam split duplicates vertices. Ordered correspondence is no longer
+  // valid against the unchanged source, so exercise the ordinary ray path.
+  opts.corresponding_topology=false;
+  auto rest=*replay.active().deformation;
+  rest.pose.clear();
+  rest.morph_weights.clear();
+  replay.set_deformation(replay.active().id,std::move(rest));
+  const auto rebaked=bake_object(replay,donor_id,opts);
+  require(rebaked.projected==report.projected&&replay.active().painted->baked()->normal_interpretation==BakedNormalInterpretation::NativeAttributes,
+      "A converted Bake can be replaced through the normal worker in the same authored model");
+  std::cout<<"LEGACY_KEY_CONVERSION "<<name<<" covered="<<report.projected<<'\n';
+}
 }
 int main(int argc,char **argv) try {
  if(argc==3&&std::string_view(argv[1])=="--sources"){
@@ -525,6 +651,13 @@ int main(int argc,char **argv) try {
    std::filesystem::create_directories(out);
    for(bool physical:{false,true})writable_source::native_key_recipient(physical,out);
    std::cout<<"PASS "<<writable_source::checks<<" keyed writable recipient checks\n";
+   return 0;
+ }
+ if(argc==3&&std::string_view(argv[1])=="--legacy-key-conversion"){
+   const std::filesystem::path out=argv[2];
+   std::filesystem::create_directories(out);
+   for(bool physical:{false,true})writable_source::legacy_key_conversion(physical,out);
+   std::cout<<"PASS "<<writable_source::checks<<" legacy keyed Bake conversion checks\n";
    return 0;
  }
  if(argc!=2)return 2;

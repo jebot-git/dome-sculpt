@@ -6,6 +6,7 @@
 #include "texture-set-bake.hpp"
 #include "texture-set-stroke.hpp"
 #include "dome/normal-preparation.hpp"
+#include "native-bake-conversion.hpp"
 namespace dome {
 AssetStatus Document::asset_status() const {
   auto work=asset_work_.load();
@@ -132,11 +133,13 @@ void Document::clear_bake(AssetSource expected){
 bool Document::canonical_conversion_ready_locked() const {
   const auto &o=scene_.active();
   if(o.texture_sets||scene_.has_affine_placement(o.id))return false;
-  if(!state_.object_grabbing&&bake_target_ready_locked()&&o.material_bindings&&o.material_bindings->normal_preparation){
+  if(state_.object_grabbing||!bake_target_ready_locked())return false;
+  if(detail::native_bake_conversion_supported(o))return true;
+  if(o.material_bindings&&o.material_bindings->normal_preparation){
     const auto &p=*o.material_bindings->normal_preparation;
     return p.canonical_conversion&&!p.uv_reprojection&&!p.sampling_domain&&!p.key_derivation;
   }
-  return !state_.object_grabbing&&bake_target_ready_locked()&&!o.appearance&&!o.material_bindings&&
+  return !o.appearance&&!o.material_bindings&&
     o.painted&&!o.painted->normal_projection()&&!o.painted->paint_sampling_domain()&&!o.painted->source_sampling_prepared()&&
     o.painted->baked()&&!o.painted->baked()->maps.normal.rgba.empty()&&
     o.painted->baked()->normal_interpretation==BakedNormalInterpretation::CanonicalMikk;
@@ -148,10 +151,20 @@ void Document::queue_convert_bake_locked(AssetSource expected){
   queue_scene_operation_locked("Convert to portable normals",[error,report,work](Scene &scene,const auto &cancelled){
     auto &o=scene.active();NormalPreparationOptions options;options.max_angular_error=error;options.cancelled=cancelled;
     work->progress.store(.05f);
-    auto result=convert_canonical_normals({o.painted,o.appearance,o.material_bindings,o.deformation,o.material,{}},options);
-    o.painted=std::move(result.paint);o.material_bindings=std::move(result.material_bindings);
+    if(detail::native_bake_conversion_supported(o)) {
+      auto result=detail::convert_native_baked_normals(o,options);
+      o.painted=std::move(result.paint);
+      char quality[105];
+      snprintf(quality,sizeof(quality),"Portable bake (sampled rest error %.3f deg). Pose and morph shading use the authored frame.",
+          result.maximum_sample_error*57.29577951308232);
+      *report=quality;
+    } else {
+      auto result=convert_canonical_normals({o.painted,o.appearance,o.material_bindings,o.deformation,o.material,{}},options);
+      o.painted=std::move(result.paint);o.material_bindings=std::move(result.material_bindings);
+      *report="Portable normal/tangent targets authored; original source retained. Pose and morph shading follow the new model.";
+    }
     scene.validate();if(cancelled())throw std::runtime_error("Canonical normal conversion cancelled");
-    *report="Portable normal/tangent targets authored; original source retained. Pose and morph shading follow the new model.";work->progress.store(.95f);
+    work->progress.store(.95f);
   },expected,report,work);
 }
 void Document::convert_baked_normals(AssetSource expected){

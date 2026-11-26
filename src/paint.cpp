@@ -28,6 +28,9 @@
 #include "dome/paint-sampling.hpp"
 #include "paint-sampling-access.hpp"
 #include "native-baked-grid.hpp"
+#include "native-bake-conversion.hpp"
+#include "native-paint-bake.hpp"
+#include "native-paint-frame-source.hpp"
 #include "dome/normal-preparation.hpp"
 #include "polygon-paint.hpp"
 #include "polygon-surface-paint.hpp"
@@ -2058,6 +2061,65 @@ std::shared_ptr<PaintedMesh> detail::TextureSetPaintAccess::resample_plain(const
  if(limits.cancelled&&limits.cancelled())throw std::runtime_error("Texture-set resolution cancelled");return result;
 }
 struct SourcePaintSamplingAccess {
+  static detail::NativeBakeConversion convert_native_bake(const SculptObject &object,
+      const NormalPreparationOptions &options) {
+    const auto stop=[&]{if(options.cancelled&&options.cancelled())throw std::runtime_error("Native Bake conversion cancelled");};
+    stop();
+    if(!detail::native_bake_conversion_supported(object))
+      throw std::invalid_argument("Native Bake conversion requires its own historical paint and authored normal frame");
+    if(!std::isfinite(options.max_angular_error)||options.max_angular_error<0||options.max_angular_error>.25||
+        !options.max_working_bytes||options.max_working_bytes>512*1024*1024||
+        !options.max_samples||options.max_samples>64'000'000)
+      throw std::invalid_argument("Invalid native Bake conversion limits");
+    const auto &paint=*object.painted;
+    const auto &binding=*object.material_bindings;
+    const auto &surface=*paint.surface_;
+    const auto &bake=*paint.baked_;
+    if(paint.revision_==UINT64_MAX)throw std::overflow_error("Paint revision exhausted");
+    if(surface.diagnostics.policy!=PaintUvPolicy::Strict||surface.diagnostics.additional_candidates||
+        !surface.diagnostics.unpaintable_uv_faces.empty())
+      throw std::invalid_argument("Native Bake conversion requires the strict retained writable grid");
+    bake.validate(paint.resolution());
+    // The output will share paint layers, the raster and FLOAT emission.
+    // Charge the actual copied byte planes and the per-layer pointer tables.
+    size_t copy_bytes=bake.maps.color.rgba.size()+bake.maps.metal_rough.rgba.size()+
+        bake.maps.emission.rgba.size()+bake.coverage.size();
+    for(const auto &layer:paint.layers_)
+      copy_bytes+=(layer.tiles.size()+layer.pbr_tiles.size()+layer.emission_tiles.size())*sizeof(std::shared_ptr<const void>);
+    if(copy_bytes>=options.max_working_bytes||
+        paint.mesh().indices.size()*256+surface.padding.size()*8>options.max_working_bytes-copy_bytes)
+      throw std::length_error("Native Bake conversion exceeds the paint and raster workspace budget");
+    auto reduced=options;
+    reduced.max_working_bytes-=copy_bytes;
+    binding.native_paint_frames->validate_binding(binding,false,options.cancelled);
+    detail::normal_frame_current_authority(binding,paint.mesh(),object.deformation.get(),options.cancelled);
+    const auto raster=detail::native_paint_bake_mesh(paint.mesh(),*paint.paint_sampling_domain(),options.cancelled);
+    const auto texel=[&](size_t at){
+      const auto &point=surface.texels.at(at);
+      if(!point.covered)throw std::logic_error("Native Bake conversion found an unowned paint texel");
+      return detail::NativeBakeTexel{point.face,{point.bary[0],point.bary[1],1.-point.bary[0]-point.bary[1]}};
+    };
+    auto converted=detail::convert_native_bake_grid(raster,*binding.normal_frames->pbr,bake,surface.padding,texel,reduced);
+    stop();
+    auto output=std::make_shared<BakedTextures>();
+    output->maps.color=bake.maps.color;
+    output->maps.metal_rough=bake.maps.metal_rough;
+    output->maps.emission=bake.maps.emission;
+    output->maps.transparent=bake.maps.transparent;
+    output->maps.normal=std::move(converted.normal);
+    output->coverage=bake.coverage;
+    output->color_interpretation=bake.color_interpretation;
+    output->normal_interpretation=BakedNormalInterpretation::NativeAttributes;
+    output->emission_field=bake.emission_field;
+    output->validate(paint.resolution());
+    auto result=paint.snapshot();
+    result->baked_=std::move(output);
+    result->composite_token_=next_composite_token();
+    ++result->revision_;
+    stop();
+    return {std::move(result),converted.maximum_sample_error};
+  }
+
   static size_t surface_retained_bytes(size_t vertices,size_t corners,uint32_t r){
     (void)surface_working_bytes(vertices,corners,r);
     return sizeof(PaintedMesh::SurfaceMap)+sizeof(PaintedMesh)+sizeof(PaintSamplingAttachment)+
@@ -2155,6 +2217,24 @@ struct SourcePaintSamplingAccess {
     return retain(before,authored,std::move(domain),budget,native_bake);
   }
 };
+bool detail::native_bake_conversion_supported(const SculptObject &o) noexcept {
+  const auto &binding=o.material_bindings;
+  if(!o.mesh_active||!o.painted||o.painted->in_stroke()||o.appearance||o.texture_sets||o.polygon||
+      !binding||!binding->native_paint_sampling||!binding->native_paint_frames||!binding->normal_frames||
+      !binding->normal_frames->pbr||binding->normal_frames->pbr->tangents.empty()||binding->normal_frames->canonical)
+    return false;
+  const auto bake=o.painted->baked();
+  const auto &owner=binding->native_paint_sampling;
+  return bake&&bake->normal_interpretation==BakedNormalInterpretation::CanonicalMikk&&
+      !bake->maps.normal.rgba.empty()&&!bake->normal_authority&&!bake->normal_field&&
+      bake->color_interpretation==BakedColorInterpretation::VertexComponent&&
+      owner->valid_owner(owner)&&owner->matches_current(*o.painted)&&
+      binding->native_paint_frames->valid_owner(binding->native_paint_frames);
+}
+detail::NativeBakeConversion detail::convert_native_baked_normals(const SculptObject &object,
+    const NormalPreparationOptions &options) {
+  return SourcePaintSamplingAccess::convert_native_bake(object,options);
+}
 size_t paint_sampling_surface_retained_bytes(size_t vertices,size_t corners,uint32_t resolution){
   return SourcePaintSamplingAccess::surface_retained_bytes(vertices,corners,resolution);
 }
@@ -3406,10 +3486,16 @@ PaintedMesh::build_composite(const Material &material,const std::function<bool()
     for (size_t at=0;at<size_t(r)*r;++at) {
       int32_t owner=surface_->padding[at];
       if (owner<0) continue;
-      auto values=baked_pixel(*baked_,size_t(owner));
       float a=unit(baked_->coverage[size_t(owner)]);
       maps->baked_coverage.rgba[at*4]=byte(a);
       for(int c=0;c<4;++c)maps->baked_normal.rgba[at*4+c]=baked_->maps.normal.rgba[size_t(owner)*4+c];
+      const auto values=baked_pixel(*baked_,size_t(owner));
+      const Vec3 normal_detail{values[10],values[11],values[12]};
+      if(baked_->normal_interpretation==BakedNormalInterpretation::NativeAttributes){
+        const auto rgb=detail::composite_native_bake_normal(normal_detail,a);
+        std::copy_n(rgb.begin(),3,maps->normal.rgba.begin()+at*4);
+        continue;
+      }
       Vec3 original{0,0,1};
       if(a<1 && !corners.empty()){
         const auto &texel=surface_->texels[size_t(owner)];
@@ -3417,7 +3503,7 @@ PaintedMesh::build_composite(const Material &material,const std::function<bool()
         original=tangent_frame(mesh(),corners,texel.face,bary).to_tangent(
           source_texture_normal(mesh(),source,texel.face,bary));
       }
-      Vec3 n=Vec3{values[10],values[11],values[12]}*a+original*(1-a);
+      Vec3 n=normal_detail*a+original*(1-a);
       if(length(n)<1e-8f)n={0,0,1};else n=normalized(n);
       maps->normal.rgba[at*4]=byte(n.x*.5f+.5f);
       maps->normal.rgba[at*4+1]=byte(n.y*.5f+.5f);

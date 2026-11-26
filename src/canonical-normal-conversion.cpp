@@ -7,6 +7,7 @@
 #include "paint-normal-access.hpp"
 #include "emission-paint-access.hpp"
 #include "emission-authority.hpp"
+#include "native-bake-conversion.hpp"
 namespace dome::detail {
 namespace {
 bool touches(const std::array<std::array<double,2>,3> &t,double left,double bottom,double right,double top){
@@ -145,5 +146,196 @@ CanonicalNormalConversionCandidate convert_native_intrinsic_normals(
   if(bytes>=options.max_working_bytes)throw std::length_error("Intrinsic baked baseline exceeds working budget");
   auto reduced=options;reduced.max_working_bytes-=bytes;
   return convert_native_normal_grid(input,reduced,SourceNormalPreparationAccess::canonical_intrinsic(*input.paint,options.cancelled));
+}
+
+namespace {
+using Pixel = std::array<uint8_t,4>;
+using Point = std::array<double,2>;
+constexpr Pixel neutral_normal{128,128,255,255};
+
+Vec3 decode_normal(const uint8_t *pixel) {
+  return {pixel[0]/255.f*2-1,pixel[1]/255.f*2-1,pixel[2]/255.f*2-1};
+}
+
+struct RestBakeTriangle {
+  std::array<NormalBakeVertex,3> legacy,authored;
+  std::array<Point,3> uv;
+
+  RestBakeTriangle(const Mesh &raster,std::span<const Tangent> old,
+      const NormalFrames &frames,size_t face,double resolution) {
+    for(size_t k=0;k<3;++k) {
+      const auto c=face*3+k,v=size_t(raster.indices[c]);
+      const auto t=old[c],a=frames.tangents[c];
+      legacy[k]=normal_bake_vertex(raster.normals[v],{t[0],t[1],t[2]},t[3],NormalVertexBitangent::RawCross);
+      authored[k]=normal_bake_vertex(frames.normals[c],{a[0],a[1],a[2]},a[3],NormalVertexBitangent::UnitCross);
+      uv[k]={raster.uv[v][0]*resolution-.5,raster.uv[v][1]*resolution-.5};
+    }
+  }
+
+  std::array<double,3> weights(Point p) const {
+    const double dx1=uv[1][0]-uv[0][0],dy1=uv[1][1]-uv[0][1];
+    const double dx2=uv[2][0]-uv[0][0],dy2=uv[2][1]-uv[0][1];
+    const double det=dx1*dy2-dy1*dx2;
+    if(det==0)throw std::invalid_argument("Native Bake conversion requires nondegenerate paint UVs");
+    const double dx=p[0]-uv[0][0],dy=p[1]-uv[0][1];
+    const double w1=(dx*dy2-dy*dx2)/det,w2=(dy*dx1-dx*dy1)/det;
+    return {1-w1-w2,w1,w2};
+  }
+};
+
+struct FilterCellPolygon {
+  std::array<Point,8> points{};
+  size_t count=0;
+
+  void append(Point p) {
+    if(count && points[count-1]==p)return;
+    if(count==points.size())throw std::logic_error("Clipped native Bake cell exceeds its polygon capacity");
+    points[count++]=p;
+  }
+
+  FilterCellPolygon clip(size_t axis,double limit,bool lower) const {
+    FilterCellPolygon result;
+    if(!count)return result;
+    const auto distance=[&](Point p){return lower?p[axis]-limit:limit-p[axis];};
+    auto previous=points[count-1];
+    double a=distance(previous);
+    for(size_t i=0;i<count;++i) {
+      const auto current=points[i];
+      const double b=distance(current);
+      if((a>0 && b<0)||(a<0 && b>0)) {
+        const double t=a/(a-b);
+        Point intersection;
+        intersection[axis]=limit;
+        intersection[1-axis]=previous[1-axis]+t*(current[1-axis]-previous[1-axis]);
+        result.append(intersection);
+      }
+      if(b>=0)result.append(current);
+      previous=current;
+      a=b;
+    }
+    if(result.count>1 && result.points[0]==result.points[result.count-1])--result.count;
+    return result;
+  }
+};
+
+Vec3 apply_normal(const NormalBakeBasis &basis,Vec3 value) {
+  const auto n=basis.t*value.x+basis.b*value.y+basis.n*value.z;
+  return length(n)>1e-20f?normal_bake_math::unit(n):Vec3{0,0,1};
+}
+}
+
+Pixel composite_native_bake_normal(Vec3 detail,float coverage) {
+  const auto blend=detail*coverage+Vec3{0,0,1}*(1-coverage);
+  const auto n=length(blend)<1e-8f?Vec3{0,0,1}:normalized(blend);
+  const auto byte=[](float component){return uint8_t(std::lround(std::clamp(component*.5f+.5f,0.f,1.f)*255));};
+  return {byte(n.x),byte(n.y),byte(n.z),255};
+}
+
+ConvertedNativeBakeGrid convert_native_bake_grid(const Mesh &raster,const NormalFrames &frames,
+    const BakedTextures &bake,std::span<const int32_t> padding,
+    const std::function<NativeBakeTexel(size_t)> &texel,const NormalPreparationOptions &options) {
+  const auto stop=[&]{if(options.cancelled && options.cancelled())throw std::runtime_error("Native Bake conversion cancelled");};
+  stop();
+  const size_t corners=raster.indices.size(),pixels=padding.size();
+  if(frames.tangents.size()!=corners||frames.normals.size()!=corners||bake.coverage.size()!=pixels)
+    throw std::invalid_argument("Native Bake conversion requires its aligned normal corners and paint grid");
+  // Charge the corner raster plus Mikk workspace, the detached output and
+  // the resolved sampling image. The caller accounts for the paint copy.
+  const size_t scratch=corners*256+pixels*8;
+  if(scratch>options.max_working_bytes||pixels>options.max_samples)
+    throw std::length_error("Native Bake conversion exceeds its working budget");
+  const auto resolution=int(bake.maps.normal.width);
+  const auto old_tangents=tangent_corners(raster,options.cancelled);
+  ConvertedNativeBakeGrid result{bake.maps.normal};
+  uint64_t work=pixels;
+  const auto step=[&]{
+    if(++work>options.max_samples)throw std::length_error("Native Bake conversion exceeds its sampling budget");
+    if((work&1023)==0)stop();
+  };
+
+  std::optional<RestBakeTriangle> triangle;
+  size_t current_face=SIZE_MAX,sampled=0;
+  std::vector<Pixel> resolved(pixels,neutral_normal);
+  for(size_t at=0;at<pixels;++at) {
+    if((at&1023)==0)stop();
+    if(padding[at]!=int32_t(at)||!bake.coverage[at])continue;
+    const auto point=texel(at);
+    if(point.face!=current_face) {
+      triangle.emplace(raster,old_tangents,frames,point.face,resolution);
+      current_face=point.face;
+    }
+    const auto *old=&bake.maps.normal.rgba[at*4];
+    const auto desired=normal_bake_evaluate(extrapolate(triangle->legacy,point.bary,false),{old[0],old[1],old[2],old[3]});
+    const auto basis=extrapolate(triangle->authored,point.bary,true);
+    const auto converted=encode_normal_bake(basis,desired);
+    if(!converted||converted->quantized_angle_radians>options.max_angular_error)
+      throw std::invalid_argument("Native Bake conversion exceeds the rest texel conditioning or quantization tolerance");
+    result.maximum_sample_error=std::max(result.maximum_sample_error,converted->quantized_angle_radians);
+    std::copy_n(converted->rgba.begin(),3,result.normal.rgba.begin()+at*4);
+    resolved[at]=composite_native_bake_normal(decode_normal(converted->rgba.data()),bake.coverage[at]/255.f);
+    ++sampled;
+  }
+  if(!sampled)throw std::invalid_argument("Native Bake conversion has no covered normal detail in its paint grid");
+
+  // Repeat the legacy coverage-weighted decode and the proposed portable
+  // bilinear decode at the same REST points, including seams, partial misses
+  // and subpixel triangles. The reported tolerance is sampled, not analytic.
+  for(size_t face=0;face<corners/3;++face) {
+    step();
+    const RestBakeTriangle t(raster,old_tangents,frames,face,resolution);
+    const int left=int(std::floor(std::min({t.uv[0][0],t.uv[1][0],t.uv[2][0]})));
+    const int right=int(std::floor(std::max({t.uv[0][0],t.uv[1][0],t.uv[2][0]})));
+    const int bottom=int(std::floor(std::min({t.uv[0][1],t.uv[1][1],t.uv[2][1]})));
+    const int top=int(std::floor(std::max({t.uv[0][1],t.uv[1][1],t.uv[2][1]})));
+    for(int y=bottom;y<=top;++y)for(int x=left;x<=right;++x) {
+      step();
+      FilterCellPolygon poly;
+      for(auto p:t.uv)poly.append(p);
+      poly=poly.clip(0,x,true).clip(0,x+1,false).clip(1,y,true).clip(1,y+1,false);
+      if(!poly.count)continue;
+      std::array<float,4> alpha{};
+      std::array<Vec3,4> old{},next{};
+      for(int k=0;k<4;++k) {
+        const auto sx=std::clamp(x+(k&1),0,resolution-1),sy=std::clamp(y+(k>>1),0,resolution-1);
+        const auto owner=padding[size_t(sy)*resolution+sx];
+        const auto &rgb=owner<0?neutral_normal:resolved[size_t(owner)];
+        next[k]=decode_normal(rgb.data());
+        if(owner<0)continue;
+        alpha[k]=bake.coverage[size_t(owner)]/255.f;
+        old[k]=decode_normal(&bake.maps.normal.rgba[size_t(owner)*4])*alpha[k];
+      }
+      const auto check_sample=[&](Point p) {
+        step();
+        const auto bary=t.weights(p);
+        const auto new_basis=extrapolate(t.authored,bary,true);
+        const float fx=float(p[0]-x),fy=float(p[1]-y);
+        const std::array<float,4> w{(1-fx)*(1-fy),fx*(1-fy),(1-fx)*fy,fx*fy};
+        float coverage=0;
+        Vec3 old_rgb{},new_rgb{};
+        for(size_t k=0;k<4;++k) {
+          coverage+=w[k]*alpha[k];
+          old_rgb+=old[k]*w[k];
+          new_rgb+=next[k]*w[k];
+        }
+        const auto detail=coverage>1e-8f?apply_normal(extrapolate(t.legacy,bary,false),old_rgb*(1/coverage)):new_basis.n;
+        const auto previous=normal_bake_math::unit(new_basis.n*(1-coverage)+detail*coverage);
+        const auto proposed=apply_normal(new_basis,new_rgb);
+        const double angle=std::atan2(double(length(cross(previous,proposed))),double(dot(previous,proposed)));
+        if(angle>options.max_angular_error)
+          throw std::invalid_argument("Native Bake conversion exceeds the sampled rest tolerance after texture filtering");
+        result.maximum_sample_error=std::max(result.maximum_sample_error,angle);
+      };
+      Point center{};
+      for(size_t k=0;k<poly.count;++k) {
+        const auto a=poly.points[k],b=poly.points[(k+1)%poly.count];
+        check_sample(a);
+        if(poly.count>1)check_sample({(a[0]+b[0])*.5,(a[1]+b[1])*.5});
+        center[0]+=a[0];center[1]+=a[1];
+      }
+      if(poly.count>2)check_sample({center[0]/poly.count,center[1]/poly.count});
+    }
+  }
+  stop();
+  return result;
 }
 } // namespace dome::detail
