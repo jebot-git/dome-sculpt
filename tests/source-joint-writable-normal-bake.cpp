@@ -96,6 +96,7 @@ enum class CheckedTask { Full, Refusal, Seed, Capture };
 void exercise(bool seam,bool live,bool repeat,const std::filesystem::path&out,
               uint32_t checked_resolution=0,CheckedTask task=CheckedTask::Full){
  auto s=prepared(seam);uv(s);if(repeat)uv(s);stroke(s);pose(s,live);const auto source=s.active().id;const auto original=s.encode();const auto raw=detail::raw_bake_source(s.active());const auto resolver=detail::source_bake_normals(s.active(),{});require(raw&&!raw->source_only&&raw->overlay&&raw->normal_projection&&resolver.matches_prepared_source(*raw),"Joint source resolves colour factors separately while authenticating actual normal/material/paint owners");double direct=0,omitted_normal=0,wrong_normal=0;const auto triangles=s.active().painted->mesh().indices.size()/3;for(size_t tri=0;tri<triangles;++tri){const std::array<float,3>bary{.25f,.35f,.4f};const auto wanted=decode(s.active(),tri,bary,0);direct=std::max(direct,error(wanted,resolver(tri,bary)[0]));const auto omitted=decode(s.active(),tri,bary,0,false,true),wrong=decode(s.active(),tri,bary,0,true,false);for(size_t axis=0;axis<3;++axis){omitted_normal=std::max(omitted_normal,std::abs(wanted[axis]-omitted[axis]));wrong_normal=std::max(wrong_normal,std::abs(wanted[axis]-wrong[axis]));}}require(direct<3e-6&&omitted_normal>.05&&wrong_normal>.05,"Independent joint live source normal equation rejects omitted and wrong-normal-domain controls");
+ if(task==CheckedTask::Capture)s.save(out/"original-source.dsculpt");
  const auto evaluated=s.active().deformation->preview(s.active().painted->mesh());const auto&domain=*s.active().painted->paint_sampling_domain();const auto&basis=*domain.basis();Mesh destination_mesh;for(size_t c=0;c<evaluated.indices.size();++c){const auto v=evaluated.indices[c];destination_mesh.positions.push_back(evaluated.positions[v]);destination_mesh.normals.push_back(evaluated.normals[v]);destination_mesh.uv.push_back(basis.uv[basis.indices[domain.source_corners()[c]]]);destination_mesh.indices.push_back(uint32_t(c));}const auto destination=target(s,destination_mesh,false);s.select(destination);
  auto final_settings=settings();
  if(checked_resolution){
@@ -139,9 +140,9 @@ void check_capture(uint32_t resolution,const std::filesystem::path &capture,
                    const std::optional<std::filesystem::path> &worker_output){
  const auto before=Scene::load(capture/"selected-target-resolution.dsculpt");
  const auto baked=Scene::load(capture/"observed-second-bake.dsculpt");
- std::ifstream original_file(capture/"observed-source.json");
- const auto original=nlohmann::json::parse(original_file);
- const auto source=original.at("active").get<uint64_t>();
+ const auto original_scene=Scene::load(capture/"original-source.dsculpt");
+ const auto source=original_scene.active().id;
+ const auto original=original_scene.encode();
  const auto &before_target=before.active();
  const auto &baked_target=baked.active();
  require(before_target.id==baked_target.id && before_target.id!=source &&
