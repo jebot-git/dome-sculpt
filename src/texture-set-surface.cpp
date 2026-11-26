@@ -42,7 +42,7 @@ bool bake_target_supported(const SculptObject &object) {
   return false;
  if(field.source){
   const auto &preview=field.source->source_preview();
-  return !object.deformation&&preview&&preview->model()==PolygonSurfaceNormalModel::PreparedCorePbr;
+  return !object.deformation&&bool(preview);
  }
  return plain(field.painted.get(),field.appearance.get(),field.material_bindings.get());
 }

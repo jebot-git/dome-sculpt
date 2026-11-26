@@ -22,6 +22,14 @@ public:
  std::pair<PolygonGeometryFrame,PolygonGeometryFrame> triangle_frames(size_t,const AffineTransform &)const;
  NormalBakeBasis before_role_basis(size_t,std::array<double,3>,const AffineTransform &)const;
  std::shared_ptr<const PolygonSurfacePreview> with_bake(const PaintedMesh &)const;
+ std::shared_ptr<const PolygonSurfacePreview> with_bake(
+     const PaintedMesh &,std::shared_ptr<const Image>)const;
+ Vec3 sample_native_bake(size_t,std::array<double,3>,const AffineTransform &)const;
+ void validate_world(size_t,const AffineTransform &,double minimum=1e-6,
+     const std::function<bool()> &cancelled={})const;
+ void validate_bake_world(std::span<const uint32_t>,const AffineTransform &,
+     const std::function<bool()> &cancelled={})const;
+ const auto &native_bake()const noexcept{return native_bake_;}
  const auto &baked()const noexcept{return baked_;}
  const auto &binding()const noexcept{return binding_;}
  const auto &field_owner()const noexcept{return owner_;}
@@ -52,6 +60,8 @@ private:
  PolygonSurfacePreview()=default;
  std::weak_ptr<const PolygonSurfacePreview>self_;
  std::shared_ptr<const BakedTextures>baked_;
+ // RGBA8 on the retained paint grid. Zero alpha denotes inherited normals.
+ std::shared_ptr<const Image> native_bake_;
  std::shared_ptr<const SourceMaterialBindings> binding_;
  std::shared_ptr<const PolygonSurfaceOwner> owner_;
  std::shared_ptr<const PaintSamplingAttachment> attachment_;

@@ -1642,7 +1642,9 @@ std::shared_ptr<const TextureMaps> detail::PolygonSurfacePaintCodec::preview(con
   if(paint.baked_&&paint.baked_->normal_field){maps->normal=*paint.baked_->normal_field->pbr();maps->mtoon_normal=*paint.baked_->normal_field->mtoon();}
   maps->overlay=std::move(packet);PolygonSurfaceTransferLimits limits;limits.geometry.cancelled=cancelled;
   if(cached&&!cached->matches(binding,paint.paint_sampling_attachment()))throw std::invalid_argument("Cached polygon preview borrowed another actual source/material attachment");
-  maps->polygon_surface=cached?cached->with_bake(paint):PolygonSurfacePreview::create(paint,binding,limits);maps->polygon_surface->validate_maps(*maps);
+  maps->polygon_surface=cached?cached->with_bake(paint):PolygonSurfacePreview::create(paint,binding,limits);
+  if(const auto &normal=maps->polygon_surface->native_bake())maps->normal=*normal;
+  maps->polygon_surface->validate_maps(*maps);
   paint_compute::checkpoint(cancelled);return maps;
 }
 bool detail::EmissionExportAccess::requires_preview(const PaintedMesh &paint,const Material &material,

@@ -49,9 +49,9 @@ private:
       std::shared_ptr<const PolygonSurfacePreview>,const TextureSetLimits &,const PaintedMesh*raster_template=nullptr);
   void validate_member(const TextureSetView &,const TextureSetLimits &,bool rebake=false)const;
   std::shared_ptr<const TextureSetFieldSource> with_member(
-      const TextureSetView &,const TextureSetLimits &,bool rebake)const;
+      const TextureSetView &,const TextureSetLimits &,bool rebake,std::shared_ptr<const Image>)const;
   std::shared_ptr<const TextureSetFieldSource> with_bake(
-      const TextureSetView &,const TextureSetLimits &)const;
+      const TextureSetView &,const TextureSetLimits &,std::shared_ptr<const Image> = {})const;
   TextureSetFieldSource()=default;
   TextureSetFieldSource(TextureSetFieldSource&&)=default;
   mutable std::weak_ptr<const TextureSetFieldSource>self_;
