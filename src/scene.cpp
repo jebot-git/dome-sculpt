@@ -65,6 +65,7 @@
 #include <map>
 #include <nlohmann/json.hpp>
 #include <set>
+#include <streambuf>
 namespace dome {
 namespace {
 void name_valid(const std::string &s) {
@@ -86,6 +87,71 @@ void retopology_acyclic(const std::map<uint64_t,uint64_t> &references) {
       if(!visited.insert(current).second)throw std::invalid_argument("Retopology reference cycle");
       current=found->second;
     }
+  }
+}
+
+class NativeCborBuffer final : public std::streambuf {
+public:
+  std::span<const uint8_t> bytes() const { return bytes_; }
+
+private:
+  void reserve_space(size_t count) {
+    constexpr size_t limit = 256 * 1024 * 1024;
+    if (count > limit - bytes_.size())
+      throw std::length_error("Scene exceeds file size limit");
+    const size_t needed = bytes_.size() + count;
+    if (needed > bytes_.capacity())
+      bytes_.reserve(std::max(needed, std::min(limit, bytes_.capacity() * 2)));
+  }
+
+  std::streamsize xsputn(const char *data, std::streamsize count) override {
+    if (count <= 0)
+      return 0;
+    reserve_space(size_t(count));
+    const auto *bytes = reinterpret_cast<const uint8_t *>(data);
+    bytes_.insert(bytes_.end(), bytes, bytes + count);
+    return count;
+  }
+
+  int_type overflow(int_type value) override {
+    if (traits_type::eq_int_type(value, traits_type::eof()))
+      return traits_type::not_eof(value);
+    reserve_space(1);
+    bytes_.push_back(uint8_t(traits_type::to_char_type(value)));
+    return value;
+  }
+
+  std::vector<uint8_t> bytes_;
+};
+
+void write_cbor_container(std::ostream &output, unsigned type, size_t count) {
+  if (count < 24) {
+    output.put(char(type | count));
+    return;
+  }
+  // These are scene maps and the live object array, capped at 256 objects.
+  if (count > 256)
+    throw std::logic_error("Unexpected native scene container size");
+  if (count < 256) {
+    output.put(char(type | 24));
+    output.put(char(count));
+  } else {
+    output.put(char(type | 25));
+    output.put(char(1));
+    output.put(char(0));
+  }
+}
+
+template <class WriteField>
+void write_native_map(std::ostream &output, const nlohmann::json &map,
+                      std::string_view field, const WriteField &write_field) {
+  write_cbor_container(output, 0xa0, map.size());
+  for (const auto &[key, value] : map.items()) {
+    nlohmann::json::to_cbor(key, output);
+    if (key == field)
+      write_field(value);
+    else
+      nlohmann::json::to_cbor(value, output);
   }
 }
 } // namespace
@@ -566,6 +632,10 @@ void Scene::validate(bool deep_sources) const {
   object(active_);
 }
 nlohmann::json Scene::encode() const {
+  return encode_document(true);
+}
+
+nlohmann::json Scene::encode_document(bool include_object_volumes) const {
   detail::BakedEmissionWriteScope baked_emission_write;
   detail::ColorBoundScope color_bound_scope;
   validate();
@@ -663,7 +733,7 @@ nlohmann::json Scene::encode() const {
            {"toon", m.toon},
            {"double_sided", m.double_sided},
            {"alpha", int(m.alpha)}, {"alpha_cutoff", m.alpha_cutoff}, {"unlit", m.unlit}}},
-         {"volume", o.volume->encode()},
+         {"volume", include_object_volumes ? o.volume->encode() : nlohmann::json(nullptr)},
          {"mesh_active", o.mesh_active},
          {"painted", o.painted&&!o.texture_sets ? o.painted->encode(&source_images,feature_version>=21?&normal_domains:nullptr,feature_version>=24?&writable_domains:nullptr) : nlohmann::json(nullptr)},
          {"deformation", o.deformation
@@ -1392,10 +1462,26 @@ Scene Scene::decode_owning(const nlohmann::json &j,
   return result;
 }
 void Scene::save(const std::filesystem::path &path) const {
-  auto bytes = nlohmann::json::to_cbor(encode());
-  if (bytes.size() > 256 * 1024 * 1024)
-    throw std::length_error("Scene exceeds file size limit");
-  atomic_write(path, bytes);
+  const auto metadata = encode_document(false);
+  NativeCborBuffer buffer;
+  std::ostream output(&buffer);
+  output.exceptions(std::ios::badbit | std::ios::failbit);
+  auto write_scene = [&](const nlohmann::json &record) {
+    write_native_map(output, record, "objects", [&](const nlohmann::json &objects) {
+      write_cbor_container(output, 0x80, objects.size());
+      // Release each temporary volume DOM before encoding the next object.
+      for (size_t i = 0; i < objects_.size(); ++i) {
+        write_native_map(output, objects.at(i), "volume", [&](const nlohmann::json &) {
+          nlohmann::json::to_cbor(objects_[i].volume->encode(), output);
+        });
+      }
+    });
+  };
+  if (metadata.contains("payload"))
+    write_native_map(output, metadata, "payload", write_scene);
+  else
+    write_scene(metadata);
+  atomic_write(path, buffer.bytes());
 }
 Scene Scene::load(const std::filesystem::path &path) { return load(path, {}); }
 Scene Scene::load(const std::filesystem::path &path, const std::function<bool()> &cancelled) {

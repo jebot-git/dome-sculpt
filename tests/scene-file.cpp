@@ -71,6 +71,17 @@ int main(int argc, char **argv) try {
   const auto project = out/"original.dsculpt";
   scene.save(project);
   const auto original_project = read(project);
+  check(original_project == nlohmann::json::to_cbor(exact),
+        "Native project Save preserves the exact CBOR of the HDR envelope");
+  Scene many;
+  for (const size_t count : {size_t(24), size_t(256)}) {
+    while (many.objects().size() < count)
+      many.add("Sculpt object", Volume{});
+    const auto crowded = out / ("objects-" + std::to_string(count) + ".dsculpt");
+    many.save(crowded);
+    check(read(crowded) == nlohmann::json::to_cbor(many.encode()),
+          "Native project Save preserves exact CBOR across object array size boundaries");
+  }
   auto ordinary = load_scene_file(project);
   check(ordinary.kind == SceneFileKind::Project && ordinary.scene.encode() == exact,
         "Ordinary native project retains exact content and project kind");
