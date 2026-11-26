@@ -35,7 +35,15 @@ size_t PolygonSurfacePaintCodec::preflight_grid(const nlohmann::json&payload,boo
    for(const auto&tile:tiles){stop(l);keys(tile,{"index","data"});}
   }
  }
- if(payload.contains("baked"))keys(payload.at("baked"),{"version","color","orm","emission","normal","coverage","color_interpretation","pbr_color","normal_interpretation","mtoon_normal","normal_authority","normal_field"});
+ if(payload.contains("baked")){
+  const auto &baked=payload.at("baked");
+  if(shared_geometry&&physical&&baked.is_object()&&baked.at("version")==6)
+   keys(baked,{"version","base_version","color","orm","emission","float_emission","normal","coverage",
+               "color_interpretation","pbr_color","normal_interpretation","mtoon_normal","normal_field"});
+  else
+   keys(baked,{"version","color","orm","emission","normal","coverage","color_interpretation",
+               "pbr_color","normal_interpretation","mtoon_normal","normal_authority","normal_field"});
+ }
  // Borrow JSON. Charge every binary/string/container node before any current
  // mesh/layer copy or replay. The limit is conservative, includes metadata,
  // and does not replace aggregate Scene graph/image/payload preflight.

@@ -8,6 +8,7 @@
 #include "emission-control-scale.hpp"
 #include "emission-source-info.hpp"
 #include "dome/document.hpp"
+#include "texture-set-bake.hpp"
 #include "skin-methods.hpp"
 #include "native-paint-sampling.hpp"
 #include "dome/scene-file.hpp"
@@ -699,7 +700,7 @@ void Document::publish_locked(bool force,bool checkpoint) {
   if(std::find(state_.bake_sources.begin(),state_.bake_sources.end(),state_.bake_source)==state_.bake_sources.end())
     state_.bake_source=state_.bake_sources.empty()?0:state_.bake_sources.front();
   state_.can_bake=!state_.object_grabbing && bake_target_ready_locked() && !state_.bake_sources.empty();
-  state_.can_clear_bake=!state_.object_grabbing && selected_field && bake_target_ready_locked() && bool(selected_field->painted->baked());
+  state_.can_clear_bake=!state_.object_grabbing && selected_field && bake_target_ready_locked() && detail::texture_set_bake_present(*selected_field);
   state_.can_blur_color_layer=command_enabled_locked(SpatialCommand::BlurColorLayer);
   state_.can_convert_bake=canonical_conversion_ready_locked();
   auto work=asset_status();state_.can_cancel_asset=state_.asset_busy && work.cancellable;
@@ -3217,7 +3218,7 @@ bool Document::command_enabled_locked(SpatialCommand command) const {
     return false;
   }
   if(command==SpatialCommand::BakeSurface)return !control_before_ && bake_source_eligible_locked(state_.bake_source) && state_.bake_settings.cage_object!=unavailable_bake_object && bake_target_ready_locked();
-  if(command==SpatialCommand::ClearBake)return !control_before_ && bake_target_ready_locked() && bool(active_texture_set(scene_.active()).painted->baked());
+  if(command==SpatialCommand::ClearBake)return !control_before_ && bake_target_ready_locked() && detail::texture_set_bake_present(active_texture_set(scene_.active()));
   if(command==SpatialCommand::BindSkin) return !control_before_ && skin_target_ready_locked() &&
     !skin_sources_locked(state_.skin_options.mode).empty() &&
     !(state_.skin_options.mode==SkinAuthoringMode::SurfaceHeat&&state_.selected_objects.size()>1&&!selected_skin_ready_locked(SkinAuthoringMode::SurfaceHeat));

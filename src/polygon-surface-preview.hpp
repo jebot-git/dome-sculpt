@@ -17,6 +17,12 @@ public:
  void validate_maps(const TextureMaps &) const;
  Vec3 normal_at(size_t,std::array<double,3>,const AffineTransform &,
      const std::function<bool()> &cancelled={})const;
+ // Placed primitive frames use the same inverse transpose and handedness as
+ // the packed viewport stream. The before-role basis is interpolated separately.
+ std::pair<PolygonGeometryFrame,PolygonGeometryFrame> triangle_frames(size_t,const AffineTransform &)const;
+ NormalBakeBasis before_role_basis(size_t,std::array<double,3>,const AffineTransform &)const;
+ std::shared_ptr<const PolygonSurfacePreview> with_bake(const PaintedMesh &)const;
+ const auto &baked()const noexcept{return baked_;}
  const auto &binding()const noexcept{return binding_;}
  const auto &field_owner()const noexcept{return owner_;}
  const auto &attachment()const noexcept{return attachment_;}

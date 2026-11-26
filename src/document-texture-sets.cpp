@@ -24,7 +24,10 @@ void Document::queue_texture_set_locked(TextureSetEdit edit,AssetSource expected
  finish_locked();require_authority_locked(expected);
  if((expected.generation&&expected.generation!=state_.generation)||(expected.revision&&expected.revision!=state_.revision)||(expected.object&&expected.object!=scene_.active().id))throw std::logic_error("The texture-set recipient changed while finishing its earlier gesture");
  const auto object=scene_.active().id;require_object_editable_locked(object);
- if(!detail::texture_set_plain_fields(scene_.active()))throw std::logic_error("Texture sets are not yet available for this prepared material");
+ if(edit.action==TextureSetAction::Select){
+  if(!scene_.active().texture_sets)throw std::logic_error("Choose an object with material sets");
+ }else if(!detail::texture_set_plain_fields(scene_.active()))
+  throw std::logic_error("This texture-set edit requires plain editable materials");
  auto lease=detail::capture_texture_set_recipient(scene_,object);auto changed=std::make_shared<bool>(false);
  const auto source=AssetSource{state_.generation,state_.revision,object,state_.edit_authority};
  const char*label=edit.action==TextureSetAction::Create?"Create texture set":edit.action==TextureSetAction::AssignFaces?"Assign material faces":edit.action==TextureSetAction::Select?"Select texture set":edit.action==TextureSetAction::Rename?"Rename texture set":edit.action==TextureSetAction::Material?"Edit texture-set material":edit.action==TextureSetAction::Resolution?"Resize texture-set paint":"Edit texture-set layer";
@@ -61,10 +64,16 @@ void Document::queue_texture_set_locked(TextureSetEdit edit,AssetSource expected
  },source,{}, {},changed,{},0,0,{},{},0,{},std::move(lease));
 }
 
+bool Document::can_select_texture_sets()const{
+ std::lock_guard lock(model_mutex_);
+ return texture_set_command_enabled_locked(SpatialCommand::TextureNext);
+}
 bool Document::texture_set_command_enabled_locked(SpatialCommand command)const{
- if(!texture_set_command(command)||state_.asset_busy||state_.recovery_busy||control_before_||action_active_locked()||state_.polygon||state_.retopology||state_.cut||uv_||!object_editable_locked(scene_.active().id)||!detail::texture_set_plain_fields(scene_.active()))return false;
- const auto&o=scene_.active();if(o.polygon&&!o.texture_sets)return false;
- if(command==SpatialCommand::TexturePrevious||command==SpatialCommand::TextureNext)return o.texture_sets&&o.texture_sets->additional().size();
+ if(!texture_set_command(command)||state_.asset_busy||state_.recovery_busy||control_before_||action_active_locked()||state_.polygon||state_.retopology||state_.cut||uv_||!object_editable_locked(scene_.active().id))return false;
+ const auto&o=scene_.active();
+ if(command==SpatialCommand::TexturePrevious||command==SpatialCommand::TextureNext)
+  return o.texture_sets&&!o.texture_sets->additional().empty();
+ if((o.polygon&&!o.texture_sets)||!detail::texture_set_plain_fields(o))return false;
  if(command==SpatialCommand::TextureCreate)return !state_.texture_faces.empty()&&(!o.texture_sets||o.texture_sets->additional().size()<63);
  if(command==SpatialCommand::TextureAssign)return o.texture_sets&&!state_.texture_faces.empty();
  if(command==SpatialCommand::TextureClearFaces)return !state_.texture_faces.empty();return true;

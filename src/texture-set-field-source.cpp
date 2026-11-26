@@ -3,6 +3,7 @@
 #include "texture-set-paint-access.hpp"
 #include "polygon-surface-owner.hpp"
 #include "polygon-surface-preview.hpp"
+#include "baked-normal-field.hpp"
 #include "dome/material-bindings.hpp"
 #include <algorithm>
 namespace dome::detail {namespace {
@@ -55,11 +56,11 @@ std::shared_ptr<const TextureSetFieldSource>TextureSetFieldSource::capture_prepa
 }
 bool TextureSetFieldSource::owns_read_paint(const PaintedMesh&value)const noexcept{return &value==original_.get()||&value==readable_.get();}
 void TextureSetFieldSource::authenticate_owner(const std::shared_ptr<const TextureSetFieldSource>&value)const{const auto expected=self_.lock();if(!expected||!owner(expected,value))throw std::invalid_argument("Texture-set field source borrowed another control block");}
-void TextureSetFieldSource::validate_member(const TextureSetView&value,const TextureSetLimits&limits)const{
+void TextureSetFieldSource::validate_member(const TextureSetView&value,const TextureSetLimits&limits,bool rebake)const{
  limits.validate();stop(limits);authenticate_owner(self_.lock());
- if(!value.painted||value.id!=field_.id||!owner(value.domain,field_.domain)||!owner(value.painted->mesh_owner(),field_.domain->topology()->geometry())||!owner(TextureSetPaintAccess::domain(*value.painted),field_.domain)||!owner(value.appearance,field_.appearance)||!owner(value.material_bindings,field_.material_bindings)||!owner(value.bake_recipe,field_.bake_recipe)||!TextureSetPaintAccess::valid_raster(*value.painted)||value.painted->in_stroke())throw std::invalid_argument("Texture-set field changed actual set/geometry/source/material/recipe authority");
+ if(!value.painted||value.id!=field_.id||!owner(value.domain,field_.domain)||!owner(value.painted->mesh_owner(),field_.domain->topology()->geometry())||!owner(TextureSetPaintAccess::domain(*value.painted),field_.domain)||!owner(value.appearance,field_.appearance)||!owner(value.material_bindings,field_.material_bindings)||(!rebake&&!owner(value.bake_recipe,field_.bake_recipe))||!TextureSetPaintAccess::valid_raster(*value.painted)||value.painted->in_stroke())throw std::invalid_argument("Texture-set field changed actual set/geometry/source/material/recipe authority");
  value.material.validate();if(value.source&&!owner(value.source,self_.lock()))throw std::invalid_argument("Texture-set record changed its actual field source descriptor");
- if(!TextureSetPaintAccess::valid_source_member(*value.painted,*original_,field_.domain))throw std::invalid_argument("Texture-set current field changed original geometry/raster/source authority");
+ if(!TextureSetPaintAccess::valid_source_member(*value.painted,*original_,field_.domain,rebake?value.painted.get():field_.painted.get()))throw std::invalid_argument("Texture-set current field changed original geometry/raster/source authority");
 }
 void TextureSetFieldSource::validate_field(const TextureSetView&value,const TextureSetLimits&limits,bool deep)const{
  validate_member(value,limits);if(!TextureSetPaintAccess::same_current(*value.painted,*field_.painted))throw std::invalid_argument("Texture-set field source has stale current pixel/layer values");
@@ -67,12 +68,35 @@ void TextureSetFieldSource::validate_field(const TextureSetView&value,const Text
 }
 std::shared_ptr<const PaintedMesh>TextureSetFieldSource::read_view(const TextureSetView&value,const TextureSetLimits&limits)const{validate_field(value,limits,false);return readable_;}
 std::shared_ptr<const TextureSetFieldSource>TextureSetFieldSource::with_current(const TextureSetView&value,const TextureSetLimits&limits)const{
- validate_member(value,limits);if(working_bytes(value,limits)>limits.maximum_bytes)throw std::length_error("Updated source field exceeds metadata/raster quota");
- auto next=std::shared_ptr<TextureSetFieldSource>(new TextureSetFieldSource);next->field_=value;next->field_.source.reset();next->field_.painted=value.painted->snapshot();next->original_=original_;next->polygon_=polygon_;next->preview_=preview_;next->readable_=TextureSetPaintAccess::field_source_view(*next->field_.painted,*original_,field_.domain,limits);
+ return with_member(value,limits,false);
+}
+std::shared_ptr<const TextureSetFieldSource>TextureSetFieldSource::with_bake(const TextureSetView&value,const TextureSetLimits&limits)const{
+ if(!polygon_||!polygon_->has_normal_field()||!original_->baked()||!value.bake_recipe)
+  throw std::invalid_argument("Retained texture-set Bake requires a prepared normal source and its actual recipe");
+ if(value.painted&&value.painted->baked()!=original_->baked()){
+  const auto initial=original_->baked()->normal_field;
+  const auto baked=value.painted->baked();
+  auto ancestor=baked&&baked->normal_field?baked->normal_field->prior():nullptr;
+  while(ancestor&&!owner(ancestor,initial)){stop(limits);ancestor=ancestor->prior();}
+  if(!ancestor)throw std::invalid_argument("Retained texture-set Bake must extend its own original normal field");
+ }
+ return with_member(value,limits,true);
+}
+std::shared_ptr<const TextureSetFieldSource>TextureSetFieldSource::with_member(const TextureSetView&value,const TextureSetLimits&limits,bool rebake)const{
+ validate_member(value,limits,rebake);if(working_bytes(value,limits)>limits.maximum_bytes)throw std::length_error("Updated source field exceeds metadata/raster quota");
+ auto next=std::shared_ptr<TextureSetFieldSource>(new TextureSetFieldSource);next->field_=value;next->field_.source.reset();next->field_.painted=value.painted->snapshot();next->original_=original_;next->polygon_=polygon_;next->readable_=TextureSetPaintAccess::field_source_view(*next->field_.painted,*original_,field_.domain,limits,next->field_.painted.get());
+ next->preview_=preview_?preview_->with_bake(*next->readable_):nullptr;
  std::shared_ptr<const TextureSetFieldSource>sealed(new const TextureSetFieldSource(std::move(*next)));sealed->self_=sealed;sealed->validate_field(sealed->field_,limits);return sealed;
 }
 std::shared_ptr<const TextureSetFieldSource>TextureSetFieldSource::repartition(const TextureSetView&value,std::shared_ptr<const TextureSetFaceDomain>domain,const TextureSetLimits&limits)const{
- auto source=value;source.painted=read_view(value,limits);source.domain.reset();source.source.reset();return capture_prepared(source,std::move(domain),preview_,limits);
+ auto source=value;source.painted=read_view(value,limits);source.domain.reset();source.source.reset();
+ if(owner(source.painted->baked(),original_->baked()))return capture_prepared(source,std::move(domain),preview_,limits);
+ const auto with_bake=source.painted;
+ auto baseline=with_bake->snapshot();TextureSetPaintAccess::restore_source_bake(*baseline,*original_);
+ source.painted=baseline;
+ auto next=capture_prepared(source,std::move(domain),preview_->with_bake(*baseline),limits);
+ auto current=next->field();current.painted=TextureSetPaintAccess::bind_raster(*with_bake,current.domain,*current.painted,limits);
+ return next->with_bake(current,limits);
 }
 TextureSetFieldSample TextureSetFieldSource::sample(uint32_t triangle,std::array<double,3>b,const TextureSetLimits&limits)const{
  limits.validate();stop(limits);authenticate_owner(self_.lock());if(!field_.domain->contains(triangle))throw std::invalid_argument("A foreign logical triangle cannot sample this material field");double sum=0;for(double x:b){if(!std::isfinite(x)||x<0||x>1)throw std::invalid_argument("Texture-set field barycentrics are outside their actual triangle");sum+=x;}if(std::abs(sum-1)>1e-6)throw std::invalid_argument("Texture-set field barycentrics do not form an actual triangle point");
