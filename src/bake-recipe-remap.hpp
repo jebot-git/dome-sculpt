@@ -2,10 +2,10 @@
 #pragma once
 #include "dome/bake-recipe.hpp"
 #include "dome/polygon-scene.hpp"
-#include "texture-set-field-source.hpp"
 #include <map>
 #include <functional>
 namespace dome::detail {
+class TextureSetFieldSource;
 inline std::shared_ptr<const ObjectBakeRecipe> remap_bake_recipe(
     const std::shared_ptr<const ObjectBakeRecipe> &recipe,
     const std::map<uint64_t,uint64_t> &objects,bool missing_unavailable){
@@ -41,54 +41,12 @@ public:
   }
 
   std::shared_ptr<const TextureSetCollection>
-  collection(const std::shared_ptr<const TextureSetCollection> &original) {
-    if (!original)
-      return {};
-    if (const auto found = collections_.find(original.get()); found != collections_.end())
-      return found->second;
-    std::shared_ptr<TextureSetCollection> changed;
-    const auto primary = field_source(original->primary_source_);
-    if (primary != original->primary_source_) {
-      changed.reset(new TextureSetCollection(*original));
-      changed->primary_source_ = primary;
-    }
-    for (size_t i = 0; i < original->additional_.size(); ++i) {
-      if (cancelled_ && cancelled_())
-        throw std::runtime_error("Texture-set bake recipe remapping cancelled");
-      const auto &field = original->additional_[i];
-      const auto remapped = recipe(field.bake_recipe);
-      if (remapped == field.bake_recipe)
-        continue;
-      if (!changed)
-        changed.reset(new TextureSetCollection(*original));
-      changed->additional_[i].bake_recipe = remapped;
-      changed->additional_[i].source = field_source(field.source);
-    }
-    auto result = changed ? std::shared_ptr<const TextureSetCollection>(std::move(changed)) : original;
-    collections_.emplace(original.get(), result);
-    return result;
-  }
+  collection(const std::shared_ptr<const TextureSetCollection> &original);
 
 private:
+  friend struct TextureSetAccess;
   std::shared_ptr<const TextureSetFieldSource>
-  field_source(const std::shared_ptr<const TextureSetFieldSource> &original) {
-    if (!original)
-      return {};
-    original->authenticate_owner(original);
-    const auto remapped = recipe(original->field_.bake_recipe);
-    if (remapped == original->field_.bake_recipe)
-      return original;
-    if (const auto found = fields_.find(original.get()); found != fields_.end())
-      return found->second;
-
-    // Geometry, raster and the validated read view all keep their owners.
-    auto copy = std::shared_ptr<TextureSetFieldSource>(new TextureSetFieldSource(*original));
-    copy->field_.bake_recipe = remapped;
-    std::shared_ptr<const TextureSetFieldSource> result = std::move(copy);
-    result->self_ = result;
-    fields_.emplace(original.get(), result);
-    return result;
-  }
+  field_source(const std::shared_ptr<const TextureSetFieldSource> &original);
 
   const std::map<uint64_t, uint64_t> &objects_;
   bool missing_unavailable_;

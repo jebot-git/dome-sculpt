@@ -6,7 +6,7 @@ namespace dome {
 using TextureSetId = uint32_t;
 struct PolygonOrigin;
 struct TextureSetView;
-namespace detail { class BakeRecipeRemap; class TextureSetFieldSource; struct TextureSetAccess; struct TextureSetPaintAccess; class TextureSetArchive; }
+namespace detail { class TextureSetFieldSource; struct TextureSetAccess; struct TextureSetPaintAccess; class TextureSetArchive; }
 struct TextureSetInitialField {Material material;uint32_t resolution=512;};
 struct TextureSetLimits {
   size_t maximum_sets_per_object=64,maximum_sets_per_scene=256;
@@ -84,7 +84,6 @@ public:
   void validate(const SculptObject&,bool deep=true,const TextureSetLimits & = {})const;
   void validate(const PolygonOrigin&,bool deep=true,const TextureSetLimits & = {})const;
 private:
-  friend class detail::BakeRecipeRemap;
   friend struct detail::TextureSetAccess;
   friend class detail::TextureSetArchive;
   friend void initialize_texture_sets(Scene&,uint64_t,const Mesh&,std::span<const TextureSetInitialField>,std::span<const TextureSetId>,const TextureSetLimits&);
