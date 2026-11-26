@@ -12,7 +12,7 @@ struct Phase {
  explicit Phase(const char*n):name(n){std::cout<<"PHASE_BEGIN "<<name<<std::endl;}
  ~Phase(){std::cout<<"PHASE_END "<<name<<" seconds="<<std::chrono::duration<double>(std::chrono::steady_clock::now()-start).count()<<" completed="<<(std::uncaught_exceptions()==exceptions)<<std::endl;}
 };
-nlohmann::json original_source(const std::filesystem::path&p){std::ifstream f(p);if(!f)throw std::runtime_error("Missing actual original source JSON");auto j=nlohmann::json::parse(f);require(j.at("version")==43,"Actual original source is Scene43");return j;}
+nlohmann::json original_source(const std::filesystem::path&p){std::ifstream f(p);if(!f)throw std::runtime_error("Missing actual original source JSON");auto j=nlohmann::json::parse(f);require(j.at("version")==30,"Actual captured pre-HDR source is Scene30");return j;}
 void source_preserved(const Scene&s,uint64_t source,const nlohmann::json&original){auto source_only=s;source_only.erase(s.active().id);source_only.select(source);auto context=source_only.encode();context["next_id"]=original.at("next_id");require(context==original,"All actual joint original/source/normal/paint/pose/UV history remains exact");}
 void input(const Scene&s,uint64_t source,uint32_t resolution){require(s.active().id!=source&&s.active().painted->resolution()==resolution&&s.object(source).painted->resolution()==64,"Exact actual selected target and genuine source64 remain independent");}
 void native(const std::filesystem::path&before_path,const std::filesystem::path&original_path,const std::filesystem::path&out){
