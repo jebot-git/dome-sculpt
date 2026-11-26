@@ -103,3 +103,12 @@ Arc timing runs, both patched exports finish in under 35 seconds and
 produce the same native projects and GLBs as their parent. Both variants
 of the six native atlas/worker cases also pass on the main-based port.
 [Timing and runtime evidence](validation/atlas-grid-hdr-history-20261126.json)
+
+Atlas packing checks complete chart words against the corresponding atlas
+bits and clips partial words at both image edges. It keeps the same
+placement order and packed UVs. Two independent profiles each evaluate
+734,580 clipped overlaps against a pixel oracle. The matched headless
+export spends 3.07 seconds in placement search, down from 14.01, and
+retains byte-identical native and GLB files. Main's exact candidate then
+passes the full 153-check software and Arc sanitizer OpenXR replays.
+[Packing evidence](validation/atlas-packing-and-hdr-redo-20261126.json)

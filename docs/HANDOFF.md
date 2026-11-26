@@ -1027,8 +1027,10 @@ GLB and native file bytes while packing placement search drops from
 14.01 to 3.07 seconds. Both profiles pass 734,580 independently evaluated
 overlap cases and six native cases. The software Release replay passes
 153 checks. The Arc run during the whole build stops after 135 checks
-at paint startup. The main port `5c8c8fb1` also passes six native cases in
-each profile and the full software replay, with Arc validation running.
+at paint startup. The main port `5c8c8fb1` passes six native cases in each
+profile and the complete 153-check software Release and Arc ASan/UBSan
+replays with the original Files deadline. Main includes this packing change.
+A matched Arc file-timing run is in progress.
 An experimental sorted-frontier child `4021dc13` keeps four mesh outputs
 exact, including 57,311 comparisons of cost ties and candidate face order.
 A matched headless run drops from 38.38 to 34.60 seconds overall.

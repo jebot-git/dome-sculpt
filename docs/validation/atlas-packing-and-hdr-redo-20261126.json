@@ -781,6 +781,321 @@
       "uv_atlas_wait_frames": 1
     }
   },
+  "wordwise-main-arc-xr": {
+    "candidate": "5c8c8fb1e9b8aa592e458526737e5f0dedf0e80a",
+    "app_source": "5c8c8fb1e9b8aa592e458526737e5f0dedf0e80a",
+    "invocation": "da87b3327d2a49b9a4f8467c21c3d831",
+    "profile": "arc-asan",
+    "terminal": true,
+    "phase": "complete",
+    "elapsed_seconds": 297.92,
+    "app_sha256": "eb0bbed35d7abbfd742220448ec4341b2a7f008d6e67308ff2d10f0a1fd770e2",
+    "runtime_sha256": "124f81ae983246d3bb3c2699241131334425e3aa10a1d4d92b524d37e2f7542c",
+    "runner_sha256": "60869bf047e814c1b3aec9e5281bde4f62b466883ab1c95af5295459e98849cb",
+    "exit": 0,
+    "loader_exit": 0,
+    "checks": 153,
+    "report_complete": true,
+    "error": null,
+    "arc_witnesses": {
+      "baseline": {
+        "pid": 1715007,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "signal-committed": {
+        "pid": 1716024,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "signal-sigint": {
+        "pid": 1716596,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "signal-sigterm": {
+        "pid": 1717167,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "controller": {
+        "pid": 1717960,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "stylus": {
+        "pid": 1718867,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "controller-srgb": {
+        "pid": 1719823,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "sculpt-layers": {
+        "pid": 1720695,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "restart-prefix": {
+        "pid": 1721387,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "restart": {
+        "pid": 1721743,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "scene": {
+        "pid": 1722386,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "voxel-accept": {
+        "pid": 1722975,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "voxel-cancel": {
+        "pid": 1723786,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "voxel-focus": {
+        "pid": 1724320,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "voxel-undo": {
+        "pid": 1724839,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "bake-accept": {
+        "pid": 1725824,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "bake-cancel": {
+        "pid": 1726293,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "bake-focus": {
+        "pid": 1726745,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "bake-undo": {
+        "pid": 1727174,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "skin-transfer": {
+        "pid": 1727702,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "skin-fitted": {
+        "pid": 1728210,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "skin-focus": {
+        "pid": 1728844,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "retopo-committed": {
+        "pid": 1729484,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "retopo-accept": {
+        "pid": 1729944,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "retopo-focus": {
+        "pid": 1730801,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "retopo-unconfirmed": {
+        "pid": 1731712,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "cut-accept": {
+        "pid": 1732643,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "cut-unconfirmed": {
+        "pid": 1733574,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "mask-prefix": {
+        "pid": 1734299,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "mask-accept": {
+        "pid": 1734800,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "mask-cancel": {
+        "pid": 1735696,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "mask-focus": {
+        "pid": 1736511,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "mask-fill": {
+        "pid": 1737283,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "mask-undo": {
+        "pid": 1738100,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "paint-baseline": {
+        "pid": 1738881,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "paint": {
+        "pid": 1743917,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "uv": {
+        "pid": 1749169,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "controls": {
+        "pid": 1754542,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "files": {
+        "pid": 1755184,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "exclusive": {
+        "pid": 1760362,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      }
+    },
+    "voxel": {
+      "exact_native_bytes": true,
+      "voxel_menu_pixels": 10141,
+      "voxel_menu_reopens": 1,
+      "voxel_menu_seen": true,
+      "voxel_open_pixels": 172,
+      "voxel_undo_pixels": 131,
+      "voxel_undo_seen": true,
+      "voxel_undo_wait_frames": 86
+    },
+    "uv": {
+      "uv_atlas_apply_accent": 207,
+      "uv_atlas_ready": true,
+      "uv_atlas_visible_pixels": 4997,
+      "uv_atlas_wait_frames": 27
+    }
+  },
   "candidate-sort-profile": {
     "terminal": true,
     "invocation": "52011213dc464d3d803964e1e87a39e4",
@@ -1047,9 +1362,46 @@
     "parent_core_sha256": "cd3c1ce319ca2c918812076ad46963f692f118120910d8a6c266211f2f875b10",
     "exit": 0
   },
+  "worker-bound-memo-release": {
+    "profile": "release",
+    "resolution": 2048,
+    "candidate": "b458d7bd4af75b0fd00cea64afc127dd9e3cfe69",
+    "terminal": true,
+    "invocation": "6400db6f39594160971467fdf595d25a",
+    "deadline_per_phase_seconds": 900,
+    "owned_RSS_limit_bytes": 4294967296,
+    "phase": "complete",
+    "mode": "color-bound-memo",
+    "seconds": 181.42,
+    "binary_sha256": "90500652ee43efea4f0c4166212bbaac4badfc6516d89c697b8093be8a8d5ebe",
+    "core_sha256": "9c10d9c5ca289e454f5165cda257e4b874caa648a510d477253b8ef32662c4c8",
+    "capture_inputs": {
+      "original-source.dsculpt": "6415086c94bb1d1570e167ee317e3b3bd73e510cd9b35d6c26da0e189cfab0d6",
+      "selected-target-resolution.dsculpt": "a2fb762266ccd6a3de39e44635521265397ad0b82e6411162daa84c90f2ad724",
+      "observed-source.json": "9ed2472ab7e8a7eb89f0b582c399dcfd07215fefab89a923577e7414561fcd17",
+      "observed-second-bake.dsculpt": "9c299cac73198075a602366fc7084e37409e6055f39a90d641f9ddf8add28673"
+    },
+    "exit": 0,
+    "runs": [
+      {
+        "label": "color-bound-memo",
+        "pid": 1753261,
+        "exit": 0,
+        "error": null,
+        "elapsed_seconds": 58.142,
+        "peak_owned_rss": 34893824,
+        "libasan_mapped": false,
+        "libubsan_mapped": false,
+        "checks": [
+          3471
+        ],
+        "log_sha256": "a45d48e0d37591526c0f5d2d067600beee18ac549d6d853232e1156ebcb76b98"
+      }
+    ]
+  },
   "archive": {
     "path": "docs/validation/atlas-packing-and-hdr-redo-20261126.tar.gz",
-    "sha256": "7250b699bbc587c7f39861f288ba343550f69da940839f038c73ea8056d414e3",
-    "members": 33
+    "sha256": "3d49de78d70ea2f843f7f268afcbc5c2b313c4dea25395ec7b812638d57ae031",
+    "members": 35
   }
 }
