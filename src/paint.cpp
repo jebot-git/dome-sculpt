@@ -914,6 +914,41 @@ struct SourcePaintAccess {
     if(!result->valid_source_sampling_attachment())throw std::logic_error("Source parameter edit failed its immutable current owner pairing");
     paint_compute::checkpoint(o.cancelled);return result;
   }
+  static std::shared_ptr<PaintedMesh> original_parameters(
+      const PaintedMesh &current, const std::array<std::array<float,6>,5> &transforms,
+      const SourcePaintOptions &o) {
+    paint_compute::checkpoint(o.cancelled);
+    if(current.in_stroke()||current.source_sampling_prepared()||!current.source_maps_||
+       current.texture_set_domain_||current.sampling_attachment_||current.surface_->paint_domain||
+       current.baked_||current.color_projection_||current.normal_projection_||
+       current.surface_->options.policy!=PaintUvPolicy::SourceAuthored)
+      throw std::invalid_argument("Original texture transforms require an unprepared source raster");
+    const auto &mesh=current.mesh();
+    const auto &old=maps(current);
+    const auto work=limits(o,mesh.positions.size());
+    if(mesh.positions.size()>o.max_vertices||mesh.indices.size()/3>o.max_triangles||
+       coordinate_bytes(old)>o.max_coordinate_bytes||
+       mesh.positions.size()+mesh.indices.size()>work.max_work)
+      throw std::length_error("Original texture transforms exceed their source work budget");
+    const auto retained=working_bytes(footprint(current),{},0);
+    const auto replacement=detail::TextureSetPaintAccess::snapshot_bytes(current)+sizeof(PaintSourceMaps)+
+      old.extra_uv_sets.size()*(sizeof(decltype(old.extra_uv_sets)::value_type)+4*sizeof(void*));
+    if(!o.max_working_bytes||o.max_working_bytes>SourcePaintOptions::maximum_working_bytes||
+       retained>o.max_working_bytes||replacement>o.max_working_bytes-retained)
+      throw std::length_error("Original texture transforms exceed their working budget");
+    auto roles=std::make_shared<PaintSourceMaps>(old);
+    const std::array<PaintSourceTexture*,5> views{&roles->color,&roles->metal_rough,&roles->emission,&roles->normal,&roles->occlusion};
+    for(size_t k=0;k<views.size();++k)views[k]->uv_transform=transforms[k];
+    roles->validate_surface(mesh);
+    if(current.revision_==UINT64_MAX)throw std::overflow_error("Original texture transform revision exhausted");
+    auto result=current.snapshot();
+    result->source_maps_=std::move(roles);
+    result->composite_cache_=std::make_shared<PaintedMesh::CompositeCache>();
+    result->composite_token_=next_composite_token();
+    ++result->revision_;
+    paint_compute::checkpoint(o.cancelled);
+    return result;
+  }
   static std::shared_ptr<PaintedMesh> prepare(std::shared_ptr<const PaintedMesh> before,Mesh target,
                                            std::span<const uint32_t> vertices,const SourcePaintOptions &o,std::shared_ptr<const Coordinates> uv1={}) {
     if(!before)throw std::invalid_argument("Independent source paint has no original owner");
@@ -934,6 +969,10 @@ struct SourcePaintAccess {
 std::shared_ptr<PaintedMesh> detail::rebind_source_paint_transforms(const PaintedMesh &current,
  const std::array<std::array<float,6>,5> &transforms,const SourcePaintOptions &options) {
  return SourcePaintAccess::parameters(current,transforms,options);
+}
+std::shared_ptr<PaintedMesh> detail::rebind_original_paint_transforms(const PaintedMesh &current,
+ const std::array<std::array<float,6>,5> &transforms,const SourcePaintOptions &options) {
+ return SourcePaintAccess::original_parameters(current,transforms,options);
 }
 std::shared_ptr<PaintedMesh> prepare_source_paint(std::shared_ptr<const PaintedMesh> before,Mesh target,
     std::span<const uint32_t> vertices,const SourcePaintOptions &options) {

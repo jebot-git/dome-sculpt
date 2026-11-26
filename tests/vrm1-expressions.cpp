@@ -16,6 +16,184 @@ void end(Document &d){check(d.wait_asset(std::chrono::seconds(120))&&d.wait_mesh
 void ink(Document &d){PaintSettings settings;settings.color={.15f,.85f,.3f,1};settings.front_only=false;d.paint_settings(settings);
  const auto s=d.copy_scene();const auto &o=s.active();auto m=o.deformation?o.deformation->preview(o.painted->mesh()):o.painted->mesh();const auto a=m.indices[0],b=m.indices[1],c=m.indices[2];auto p=m.positions[a]*.3f+m.positions[b]*.3f+m.positions[c]*.4f;auto n=normalized(cross(m.positions[b]-m.positions[a],m.positions[c]-m.positions[a]));const auto w=s.world_matrix(o.id);auto wp=w.point({p.x,p.y,p.z}),wn=w.normal({n.x,n.y,n.z});p={float(wp[0]),float(wp[1]),float(wp[2])};n=normalized(Vec3{float(wn[0]),float(wn[1]),float(wn[2])});NativeStrokeSample q;q.origin=p+n;q.direction=n*-1;q.brush.radius=.15f;q.brush.blend=0;
  check(d.begin_native_stroke()&&d.sample_native_stroke(q),"Real source-owned native paint accepts before expression authoring");d.end_native_stroke();check(d.wait_native_stroke()&&d.wait_mesh(),"Real paint worker completes");}
+
+// The expected arrays are derived from fixture JSON and the VRM absolute
+// target-minus-current rule, independently of the product expression helper.
+void check_texture(const PaintSourceTexture &before,const PaintSourceTexture &after,
+                   float rotation,float weight) {
+  const auto &a=before.uv_transform;
+  const float u=.7f*weight,v=.9f*weight;
+  const std::array<float,6> expected{
+    a[0]*(1-weight)+std::cos(rotation)*u,a[1]*(1-weight)-std::sin(rotation)*v,
+    a[2]*(1-weight)+std::sin(rotation)*u,a[3]*(1-weight)+std::cos(rotation)*v,
+    a[4]*(1-weight)+.2f*weight,a[5]*(1-weight)-.1f*weight};
+  check(before.image&&after.image==before.image&&after.texcoord==before.texcoord&&
+          after.wrap_s==before.wrap_s&&after.wrap_t==before.wrap_t&&
+          after.min_filter==before.min_filter&&after.mag_filter==before.mag_filter,
+        "Expression keeps the texture image, sampler and original UV index");
+  for(size_t k=0;k<6;++k)near(after.uv_transform[k],expected[k],
+    "Expression samples the exact independent original-role affine");
+}
+
+import_fixture::Fixture core_source(bool unlit) {
+  auto fixture=metadata_source();
+  auto &m=fixture.j["materials"][0];
+  m["extensions"].erase("VRMC_materials_mtoon");
+  m["extensions"].erase("KHR_materials_unlit");
+  for(const char *key:{"extensionsUsed","extensionsRequired"}){
+    auto &list=fixture.j[key];
+    for(auto at=list.begin();at!=list.end();)
+      if(*at=="VRMC_materials_mtoon"||*at=="KHR_materials_unlit")at=list.erase(at);else ++at;
+  }
+  m["pbrMetallicRoughness"]["baseColorFactor"]={.6f,.4f,.3f,.72f};
+  m["pbrMetallicRoughness"]["metallicRoughnessTexture"]={{"index",0},{"texCoord",0}};
+  m["emissiveFactor"]={.12f,.26f,.32f};
+  m["emissiveTexture"]={{"index",0},{"texCoord",1}};
+  m["occlusionTexture"]={{"index",0},{"strength",.75f}};
+  m["normalTexture"]={{"index",0},{"texCoord",1},{"scale",.8f},
+      {"extensions",{{"KHR_texture_transform",{{"rotation",-.31f},
+          {"scale",{1.15f,.66f}},{"offset",{.04f,.08f}}}}}}};
+  if(unlit){
+    m["extensions"]["KHR_materials_unlit"]=J::object();
+    fixture.j["extensionsUsed"].push_back("KHR_materials_unlit");
+  }else{
+    m["extensions"]["KHR_materials_emissive_strength"]={{"emissiveStrength",2.5f}};
+    fixture.j["extensionsUsed"].push_back("KHR_materials_emissive_strength");
+  }
+  auto &happy=fixture.j["extensions"]["VRMC_vrm"]["expressions"]["preset"]["happy"];
+  happy["isBinary"]=false;
+  happy["materialColorBinds"].push_back({
+    {"material",0},{"type","emissionColor"},{"targetValue",{.2f,.1f,.3f,13}}});
+  happy["materialColorBinds"].push_back({
+    {"material",0},{"type","shadeColor"},{"targetValue",{.91f,.83f,.72f,17}}});
+  return fixture;
+}
+
+void core_expressions(const std::filesystem::path &out) {
+  constexpr float weight=.25f;
+  for(bool unlit:{false,true})for(bool atlas:{false,true}){
+    auto fixture=core_source(unlit);
+    const auto label=std::string(unlit?"unlit":"pbr")+(atlas?"-atlas":"-original");
+    const auto input=out/(label+".vrm");
+    fixture.save(input);
+    Scene empty;empty.active().visible=false;
+    ImportAuthoringOptions options;options.prepare_texture_atlas=atlas;options.paint_resolution=64;
+    auto imported=prepare_authoring_import(empty,input,options);
+    const auto id=imported.objects.front();
+    imported.scene.select(id);
+    Document doc;doc.replace(imported.scene);end(doc);
+    if(atlas)ink(doc);
+    const auto baseline=doc.copy_scene();
+    const auto encoded=baseline.encode();
+    const auto &start=baseline.object(id);
+    check(start.material.unlit==unlit&&start.material_bindings&&!start.material_bindings->has_mtoon,
+          "The source enters through the genuine plain glTF material importer");
+    Vrm1ExpressionWeights weights;weights.preset["happy"]=weight;
+    const auto posed=bake_vrm1_expression_pose(baseline,id,weights);
+    const auto &actual=posed.object(id);
+    check(baseline.encode()==encoded&&actual.appearance==start.appearance&&
+          actual.material_bindings==start.material_bindings&&actual.material.unlit==unlit,
+          "The expression preserves the immutable model and original frame/material owners");
+    const std::array<float,4> base_target{.4f,.5f,.6f,.7f};
+    const std::array<float,3> emission_target{.2f,.1f,.3f};
+    for(size_t k=0;k<4;++k)near(actual.material.color[k],
+      start.material.color[k]*(1-weight)+weight*base_target[k],"Plain core base factor matches the VRM expression arithmetic");
+    for(size_t k=0;k<3;++k)near(actual.material.emissive[k],unlit?start.material.emissive[k]:
+      start.material.emissive[k]*(1-weight)+weight*emission_target[k]*2.5f,
+      "Only PBR emission follows the expression, in authored strength units");
+    check(actual.material.metallic==start.material.metallic&&actual.material.roughness==start.material.roughness&&
+          actual.material.alpha==start.material.alpha&&actual.material.alpha_cutoff==start.material.alpha_cutoff,
+          "Unused MToon properties leave core shading and opacity controls intact");
+    const auto old_grid=atlas?start.painted->source_sampling_original():start.painted;
+    const auto now_grid=atlas?actual.painted->source_sampling_original():actual.painted;
+    const auto &old=*old_grid->source_maps(),&now=*now_grid->source_maps();
+    check(now.uv1==old.uv1&&now.uv1&&now.normal_scale==old.normal_scale&&now.occlusion_strength==old.occlusion_strength,
+          "Authored original UV1, normal scale and occlusion strength stay intact");
+    check_texture(old.color,now.color,.19f,weight);
+    check_texture(old.normal,now.normal,-.31f,weight);
+    check_texture(old.metal_rough,now.metal_rough,0,weight);
+    check_texture(old.emission,now.emission,0,weight);
+    check_texture(old.occlusion,now.occlusion,0,weight);
+    check(actual.painted->mesh().uv==start.painted->mesh().uv&&actual.painted->source_sampling_prepared()==atlas&&
+          actual.painted->valid_source_sampling_attachment(),"The current paint grid keeps its true coordinate domain");
+    for(size_t layer=0;layer<start.painted->layers().size();++layer){
+      const auto &a=start.painted->layers()[layer],&b=actual.painted->layers()[layer];
+      check(a.id==b.id&&a.tiles==b.tiles&&a.pbr_tiles==b.pbr_tiles&&a.emission_tiles==b.emission_tiles,
+            "Texture expressions keep the actual sparse native paint tiles");
+    }
+    if(!atlas)check(start.painted->mesh_owner()==actual.painted->mesh_owner(),
+                  "Unprepared texture expressions keep the original raster geometry");
+    doc.begin_expression_preview();
+    check(doc.wait_mesh()&&doc.frame().state->expressions&&doc.frame().state->expressions->ready,
+          "The public expression editor opens on a plain material avatar");
+    auto view=doc.frame().state->expressions;
+    size_t entry=0;
+    while(entry<view->entries.size()&&(view->entries[entry].name!="happy"||view->entries[entry].custom))++entry;
+    check(entry<view->entries.size(),"The actual imported preset is available in the expression editor");
+    doc.configure_expression_preview(entry,weight,view->session);
+    check(doc.wait_mesh()&&doc.frame().state->expressions->ready&&doc.frame().state->error.empty()&&
+            doc.copy_scene().encode()==encoded,"Plain PBR expression preview publishes without editing the project");
+    const auto preview=doc.frame().surface;
+    const auto range=std::ranges::find_if(preview->ranges,[&](const auto &item){return item.object==id;});
+    check(range!=preview->ranges.end()&&range->material.color==actual.material.color&&
+          range->material.emissive==actual.material.emissive&&range->textures&&range->textures->source_maps&&
+          range->textures->source_maps->color.uv_transform==now.color.uv_transform,
+          "The immutable preview carries the evaluated original image transform and core factors");
+    doc.end_expression_preview(true,view->session);
+    const auto saved=out/(label+".dsculpt");
+    doc.save_async(saved).get();end(doc);
+    const auto wanted=posed.encode();
+    check(doc.copy_scene().encode()==wanted&&Scene::load(saved).encode()==wanted,
+          "Expression Apply and queued Save reach the same posed native state");
+    check(doc.undo()&&doc.copy_scene().encode()==encoded&&doc.redo()&&doc.copy_scene().encode()==wanted,
+          "A plain material expression is exactly one undoable edit");
+    if(!atlas&&!unlit){
+      NativeAuthoringExport authority;
+      authority.scene=std::make_shared<const Scene>(posed.snapshot());
+      authority.allow_portable_fallback=true;
+      VrmExportOptions export_options;export_options.paint_resolution=64;
+      const auto portable=out/"pbr-original-applied.vrm";
+      export_vrm_authoring(authority,portable,export_options);
+      const auto package=json(portable);
+      const auto slot=package.at("meshes")[0].at("primitives")[0].at("material").get<size_t>();
+      const auto &material=package.at("materials").at(slot);
+      const auto factor=material.at("emissiveFactor").get<std::array<float,3>>();
+      const auto extensions=material.value("extensions",J::object());
+      const auto strength=extensions.value("KHR_materials_emissive_strength",J::object()).value("emissiveStrength",1.f);
+      std::cout<<"Core PBR export emission strength "<<strength<<'\n';
+      for(size_t k=0;k<3;++k)near(factor[k]*strength,actual.material.emissive[k],
+        "The portable core material retains the exact applied effective emission");
+      near(strength,2.5f,"The portable source keeps emission expression targets in the original strength units");
+      check(authority.scene->encode()==wanted,"Portable VRM1 export preserves all applied native project data");
+    }
+  }
+  auto fixture=core_source(false);
+  for(auto &primitive:fixture.j["meshes"][0]["primitives"]){
+    primitive["attributes"].erase("TANGENT");
+    for(auto &target:primitive["targets"])target.erase("TANGENT");
+  }
+  Scene empty;
+  empty.active().visible=false;
+  const auto empty_data=empty.encode();
+  const auto transformed=out/"pbr-generated-transformed-frame.vrm";
+  fixture.save(transformed);
+  const auto import_error=refuses([&]{prepare_authoring_import(empty,transformed,{});});
+  check(import_error.find("Generated normal tangents for transformed sampling")!=std::string::npos&&
+        empty.encode()==empty_data,"A missing tangent with an already transformed normal refuses during import");
+  fixture.j["materials"][0]["normalTexture"].erase("extensions");
+  const auto input=out/"pbr-generated-frame.vrm";
+  fixture.save(input);
+  auto imported=prepare_authoring_import(empty,input,{});
+  const auto before=imported.scene.encode();
+  const auto id=imported.objects.front();
+  const auto &frames=imported.scene.object(id).material_bindings->normal_frames;
+  check(frames&&frames->pbr&&frames->pbr->generated_tangents,
+        "An identity normal sampler imports with its actual generated frame");
+  Vrm1ExpressionWeights weights;weights.preset["happy"]=weight;
+  const auto error=refuses([&]{bake_vrm1_expression_pose(imported.scene,id,weights);});
+  check(error.find("genuine authored source TANGENT")!=std::string::npos&&imported.scene.encode()==before,
+        "Ordinary PBR normal-UV transforms still require a genuine fixed tangent frame");
+}
 }
 int main(int argc,char **argv)try{
  if(argc!=2)return 2;const std::filesystem::path out=argv[1];std::filesystem::create_directories(out);
@@ -66,7 +244,15 @@ int main(int argc,char **argv)try{
  auto twice=prepare_authoring_import(baseline,input,options);const auto independent=bake_vrm1_expression_pose(twice.scene,selected,weights);
  for(auto id:twice.objects){const auto &before=twice.scene.object(id),&after=independent.object(id);check(before.appearance==after.appearance&&before.material_bindings==after.material_bindings&&before.deformation==after.deformation&&before.painted->encode()==after.painted->encode(),"Repeated imported source node/material numbers never join independent native instances");}
  auto with_normal=fixture;with_normal.j["materials"][0]["normalTexture"]={{"index",0}};const auto normal_file=out/"normal.vrm";with_normal.save(normal_file);auto normal_scene=prepare_authoring_import(empty,normal_file,options);const auto normal_before=normal_scene.scene.encode();
- const auto normal_error=refuses([&]{bake_vrm1_expression_pose(normal_scene.scene,normal_scene.objects.front(),weights);});check(normal_error.find("tangent-frame transport")!=std::string::npos&&normal_scene.scene.encode()==normal_before,"Genuine normal-image UV expression keeps explicit frame-transport guard with atomic scene preservation");
+ Vrm1ExpressionWeights normal_weights;normal_weights.preset["happy"]=.25f;
+ const auto normal_id=normal_scene.objects.front();
+ const auto normal_pose=bake_vrm1_expression_pose(normal_scene.scene,normal_id,normal_weights);
+ const auto &normal_original=normal_scene.scene.object(normal_id),&normal_current=normal_pose.object(normal_id);
+ check_texture(normal_original.painted->source_sampling_original()->source_maps()->normal,
+               normal_current.painted->source_sampling_original()->source_maps()->normal,0,.25f);
+ check(normal_scene.scene.encode()==normal_before&&
+       normal_current.material_bindings->normal_frames==normal_original.material_bindings->normal_frames,
+       "Typed MToon normal texture expressions preserve the original fixed frame");
  const auto saved=out/"static.dsculpt";baked.save(saved);check(Scene::load(saved).encode()==baked.encode(),"Native Save/restart retains actual static source transforms and paints");
  const auto repeat=bake_vrm1_expression_pose(baseline,selected,weights);check(repeat.encode()==baked.encode(),"Repeated sampling of immutable baseline has no accumulated expression drift");
  auto removed=baseline.snapshot();auto &part=removed.object(selected);auto deform=std::make_shared<DeformationState>(*part.deformation);deform->morphs.reset();deform->morph_weights.clear();part.deformation=deform;auto binding=std::make_shared<SourceMaterialBindings>(*part.material_bindings);auto frames=std::make_shared<NormalFrameSet>(*binding->normal_frames);frames->current_targets.clear();binding->normal_frames=frames;part.material_bindings=binding;
@@ -81,6 +267,7 @@ int main(int argc,char **argv)try{
  // Actual detached computation completes; gate pauses only before publication.
  std::promise<void> entered,release;auto released=release.get_future().share();doc.undo();end(doc);doc.save_async(out/"cancel.dsculpt").get();const auto old_cancel=bytes(out/"cancel.dsculpt");const auto cancel_undo=doc.frame().state->can_undo,cancel_redo=doc.frame().state->can_redo;doc.edit_scene("Cancel static VRM1 expression",[&](Scene&s,const auto&cancel){std::optional<Scene> computed;try{computed.emplace(bake_vrm1_expression_pose(s,selected,weights,cancel));}catch(...){entered.set_exception(std::current_exception());throw;}entered.set_value();released.wait();s=std::move(*computed);},doc.begin_import());
  auto entry=entered.get_future();check(entry.wait_for(std::chrono::seconds(120))==std::future_status::ready,"Actual expression computation completes before publication cancellation gate");entry.get();auto after=doc.save_async(out/"cancel.dsculpt");doc.cancel_background_work();release.set_value();const auto cancel_error=refuses([&]{after.get();});check(cancel_error=="Scene changed during Cancel static VRM1 expression"&&doc.wait_asset()&&doc.wait_mesh()&&doc.copy_scene().encode()==baseline_json&&bytes(out/"cancel.dsculpt")==old_cancel&&doc.frame().state->can_undo==cancel_undo&&doc.frame().state->can_redo==cancel_redo,"Actual native late Cancel refuses dependent Save and preserves exact Scene/prior file/history");doc.save_async(out/"cancel-retry.dsculpt").get();check(Scene::load(out/"cancel-retry.dsculpt").encode()==baseline_json,"Actual Save retry recovers after cancelled accepted expression endpoint");
- NativeAuthoringExport owner;owner.scene=std::make_shared<const Scene>(baked.snapshot());owner.allow_portable_fallback=true;VrmExportOptions export_options;export_options.paint_resolution=64;const auto error=refuses([&]{export_vrm_authoring(owner,out/"still-dynamic.vrm",export_options);});std::cout<<"STATIC_DYNAMIC_REFUSAL "<<error<<'\n';check(baked.active().material_bindings->material.parameters.alpha==MToonAlpha::Mask&&error=="VRM1 expression layer currently requires opaque outline-free nonanimated MToon1 source"&&!std::filesystem::exists(out/"still-dynamic.vrm")&&owner.scene->encode()==baked.encode(),"Real MASK/MatCap static fixture keeps its unsupported dynamic-layer guard and exact original Scene; opaque layer admission is tested separately");
+ NativeAuthoringExport owner;owner.scene=std::make_shared<const Scene>(baked.snapshot());owner.allow_portable_fallback=true;VrmExportOptions export_options;export_options.paint_resolution=64;const auto error=refuses([&]{export_vrm_authoring(owner,out/"still-dynamic.vrm",export_options);});std::cout<<"STATIC_DYNAMIC_REFUSAL "<<error<<'\n';check(baked.active().material_bindings->material.parameters.alpha==MToonAlpha::Mask&&error=="VRM1 differing UV targets couple moving upper roles to fixed paint"&&!std::filesystem::exists(out/"still-dynamic.vrm")&&owner.scene->encode()==baked.encode(),"Incompatible moving UV targets and fixed paint refuse portable export atomically");
+ core_expressions(out);
  std::cout<<"PASS "<<checks<<" static VRM1 expression checks polls="<<polls<<'\n';return 0;
 }catch(const std::exception &e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

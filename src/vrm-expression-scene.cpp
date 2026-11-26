@@ -37,8 +37,8 @@ J original(const CreatorSourceModel &model,const std::function<bool()> &cancelle
 }
 std::array<float,3> array(Vec3 v){return {v.x,v.y,v.z};}
 Vec3 vector(std::array<float,3> v){return {v[0],v[1],v[2]};}
-template<size_t N>std::array<float,N> color(std::array<float,N> initial,const std::vector<Vrm1ExpressionColor> &binds,uint32_t material,std::string_view type){
- auto result=initial;for(size_t k=0;k<N;++k){double value=initial[k];for(const auto &bind:binds)if(bind.material==material&&bind.type==type)value+=(double(bind.target[k])-initial[k])*bind.weight;
+template<size_t N>std::array<float,N> color(std::array<float,N> initial,const std::vector<Vrm1ExpressionColor> &binds,uint32_t material,std::string_view type,double target_gain=1){
+ auto result=initial;for(size_t k=0;k<N;++k){double value=initial[k];for(const auto &bind:binds)if(bind.material==material&&bind.type==type)value+=(double(bind.target[k])*target_gain-initial[k])*bind.weight;
   if(!std::isfinite(value)||std::abs(value)>std::numeric_limits<float>::max())throw std::invalid_argument("VRM1 expression color is outside finite native representation");result[k]=float(value);}
  return result;
 }
@@ -49,6 +49,50 @@ std::array<float,6> uv(std::array<float,6> initial,float rotation,const std::vec
  return {float(initial[0]*(1-weight)+c*scale[0]),float(initial[1]*(1-weight)-s*scale[1]),
          float(initial[2]*(1-weight)+s*scale[0]),float(initial[3]*(1-weight)+c*scale[1]),
          float(initial[4]*(1-weight)+offset[0]),float(initial[5]*(1-weight)+offset[1])};
+}
+std::shared_ptr<PaintedMesh> core_texture_parameters(
+    const SculptObject &entry,const ImportedMaterial &raw,
+    const std::vector<Vrm1ExpressionUv> &binds,uint32_t material,
+    const std::function<bool()> &cancelled) {
+  const auto &paint=*entry.painted;
+  const auto original=paint.source_sampling_original();
+  const auto maps=original?original->source_maps():paint.source_maps();
+  if(!maps)throw std::invalid_argument("VRM1 expression lost original source role bundle");
+  if(maps->empty())return entry.painted;
+  const std::array<float,5> rotations{raw.color_transform.rotation,raw.metal_rough_transform.rotation,
+    raw.emissive_transform.rotation,raw.normal_transform.rotation,raw.occlusion_transform.rotation};
+  const std::array<const PaintSourceTexture*,5> views{&maps->color,&maps->metal_rough,&maps->emission,&maps->normal,&maps->occlusion};
+  std::array<std::array<float,6>,5> transforms;
+  for(size_t k=0;k<views.size();++k)
+    transforms[k]=views[k]->image?uv(views[k]->uv_transform,rotations[k],binds,material):views[k]->uv_transform;
+  SourcePaintOptions options;options.cancelled=cancelled;
+  return original?detail::rebind_source_paint_transforms(paint,transforms,options):
+      detail::rebind_original_paint_transforms(paint,transforms,options);
+}
+
+void apply_core_material_expression(
+    const SculptObject &entry,SculptObject &current,const ImportedMaterial &raw,
+    const Vrm1ExpressionEvaluation &evaluation,uint32_t material,bool textures,
+    const std::function<bool()> &cancelled) {
+  current.material.color=color(entry.material.color,evaluation.colors,material,"color");
+  if(!entry.material.unlit) {
+    const bool active_emission=std::ranges::any_of(evaluation.colors,[&](const auto &bind){
+      return bind.material==material&&bind.type=="emissionColor"&&bind.weight!=0;
+    });
+    if(active_emission&&entry.material_bindings->physical_emission)
+      throw std::invalid_argument("Static VRM1 emission expression needs its explicit absolute-background adapter");
+    // Native core emission already incorporates KHR_materials_emissive_strength.
+    // Evaluate the target in the same units, while leaving paint independent.
+    current.material.emissive=color(entry.material.emissive,evaluation.colors,material,
+                                    "emissionColor",raw.emissive_strength);
+  }
+  current.material.validate();
+  if(!textures)return;
+  const auto original=entry.painted->source_sampling_original();
+  const auto maps=original?original->source_maps():entry.painted->source_maps();
+  if(!entry.material.unlit&&maps&&maps->normal.image)
+    detail::require_vrm1_fixed_normal_frame(entry,cancelled);
+  current.painted=core_texture_parameters(entry,raw,evaluation.textures,material,cancelled);
 }
 }
 std::vector<Vrm1ExpressionDescription> describe_vrm1_expressions(const Scene &scene,uint64_t object,
@@ -108,10 +152,16 @@ Scene bake_vrm1_expression_pose(const Scene &baseline,uint64_t object,
   const bool textures=std::any_of(evaluated.textures.begin(),evaluated.textures.end(),[&](const auto &b){return b.material==material&&b.weight!=0;});
   if(!colors&&!textures)continue;
   const auto binding=entry.material_bindings;
-  if(!binding||!binding->has_mtoon||binding->material.version()!=MToonVersion::V1)
-   throw std::invalid_argument("Static VRM1 plain-PBR material authoring needs its separate native factor adapter");
+  if(!binding)throw std::invalid_argument("Static VRM1 expressions require their original material owner");
   if(binding->canonical_attributes||binding->canonical_uv||binding->native_paint_sampling||binding->color_preparation||binding->normal_preparation||binding->key_derivation)
    throw std::invalid_argument("Static VRM1 prepared material expressions need an authenticated before-state parameter adapter");
+  const auto &raw=owner->model->asset->materials.at(size_t(a.source_material)+1);
+  if(!binding->has_mtoon){
+   apply_core_material_expression(entry,current,raw,evaluated,material,textures,cancelled);
+   continue;
+  }
+  if(binding->material.version()!=MToonVersion::V1)
+   throw std::invalid_argument("Static VRM1 expression has a different typed material version");
   auto edited=std::make_shared<SourceMaterialBindings>(*binding);auto &parameters=edited->material.parameters;
   // Fold the current inspector correction into the initial source term only.
   // Paint remains independent and Material stays exact, including unit intent.
@@ -135,12 +185,8 @@ Scene bake_vrm1_expression_pose(const Scene &baseline,uint64_t object,
     for(size_t k=0;k<2;++k){texture.scale[k]=float(initial.scale[k]*(1-w)+scale[k]);texture.offset[k]=float(initial.offset[k]*(1-w)+offset[k]);}
    }
    const auto before=entry.painted->source_sampling_original();const auto maps=before->source_maps();if(!maps)throw std::invalid_argument("VRM1 expression lost original source role bundle");
-   const auto &raw=owner->model->asset->materials.at(size_t(a.source_material)+1);
-   const std::array<float,5> rotation{raw.color_transform.rotation,raw.metal_rough_transform.rotation,raw.emissive_transform.rotation,raw.normal_transform.rotation,raw.occlusion_transform.rotation};
-   const std::array<const PaintSourceTexture*,5> views{&maps->color,&maps->metal_rough,&maps->emission,&maps->normal,&maps->occlusion};
    if(maps->normal.image&&!binding->roles[size_t(MToonSlot::Normal)].image)throw std::invalid_argument("Static VRM1 PBR normal-texture expressions require their actual typed frame owner");
-   std::array<std::array<float,6>,5> transforms;for(size_t k=0;k<5;++k)transforms[k]=views[k]->image?uv(views[k]->uv_transform,rotation[k],evaluated.textures,material):views[k]->uv_transform;
-   SourcePaintOptions options;options.cancelled=cancelled;current.painted=detail::rebind_source_paint_transforms(*entry.painted,transforms,options);
+   current.painted=core_texture_parameters(entry,raw,evaluated.textures,material,cancelled);
   }
   edited->validate();current.material_bindings=std::move(edited);
  }
