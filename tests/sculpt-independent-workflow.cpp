@@ -11,6 +11,7 @@
 #include <thread>
 #include <cstdint>
 #include <vector>
+#include <optional>
 using namespace dome;using namespace dome::detail;
 namespace {
 size_t checks=0;
@@ -51,10 +52,14 @@ std::string bytes(const std::filesystem::path &p){std::ifstream f(p,std::ios::bi
 }
 int main(int argc,char **argv)try{
  check(argc==2||argc==3,"Usage: sculpt-independent-workflow output [accepted-native-project]");const std::filesystem::path output=argv[1];check(std::filesystem::create_directory(output),"Preserve previous outputs in their own namespace");
- Scene source=argc==3?Scene::load(argv[2]):sculpt_independent_fixture::scene();const auto original=native_bytes(source);
- Document d;d.replace(source.snapshot());ready(d);geometry(d);check(native_bytes(d.copy_scene())==original,"Cold publication preserves every original authored source bit");
- const auto previous=d.frame().surface;gesture(d,false);check(native_bytes(d.copy_scene())==original,"Cancelled real native stroke preserves exact complete source");
- gesture(d,true);const auto accepted=native_bytes(d.copy_scene());check(accepted!=original,"Accepted native stroke makes real geometry changes");check(d.undo(),"One native gesture has one Undo");ready(d);check(native_bytes(d.copy_scene())==original,"Undo restores all independent objects exactly");check(d.redo(),"Native gesture Redo is available");ready(d);check(native_bytes(d.copy_scene())==accepted,"Redo restores all independent objects exactly");
+ std::optional<Document> document;std::vector<std::uint8_t> accepted;std::shared_ptr<const MeshSnapshot> previous;
+ {Scene source=argc==3?Scene::load(argv[2]):sculpt_independent_fixture::scene();const auto original=native_bytes(source);
+ document.emplace();auto &d=*document;d.replace(source.snapshot());ready(d);geometry(d);check(native_bytes(d.copy_scene())==original,"Cold publication preserves every original authored source bit");
+ previous=d.frame().surface;gesture(d,false);check(native_bytes(d.copy_scene())==original,"Cancelled real native stroke preserves exact complete source");
+ gesture(d,true);accepted=native_bytes(d.copy_scene());check(accepted!=original,"Accepted native stroke makes real geometry changes");check(d.undo(),"One native gesture has one Undo");ready(d);check(native_bytes(d.copy_scene())==original,"Undo restores all independent objects exactly");check(d.redo(),"Native gesture Redo is available");ready(d);check(native_bytes(d.copy_scene())==accepted,"Redo restores all independent objects exactly");}
+ auto &d=*document;
+ // Input construction and its original native-byte oracle have no later use;
+ // the real Document and previously acquired immutable snapshot stay alive.
  {const auto before_mask=d.frame().surface->sculpt_chunks->find(1)->geometry;d.sculpt_mask_invert();ready(d);check(native_bytes(d.copy_scene())!=accepted,"Actual background mask inversion changes protection");check(d.frame().surface->sculpt_chunks->find(1)->geometry==before_mask,"Mask editing preserves exact geometry ownership");check(d.undo(),"Mask inversion Undo is available");ready(d);check(native_bytes(d.copy_scene())==accepted,"Mask Undo restores authored mask and geometry bytes");}
  const auto layer=d.copy_scene().active().volume->active_layer();const auto name=d.frame().state->sculpt_layer_name;d.sculpt_layer_properties(1,layer,name,true,false,.7f);ready(d);check(native_bytes(d.copy_scene())!=accepted,"Layer opacity performs real evaluated geometry work");check(d.undo(),"Layer opacity Undo is available");ready(d);check(native_bytes(d.copy_scene())==accepted,"Layer Undo restores exact complete source");geometry(d);
  std::cerr<<"PHASE native editing complete checks="<<checks<<std::endl;
