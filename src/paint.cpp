@@ -2713,8 +2713,10 @@ void BakedTextures::validate(uint32_t resolution) const {
   if (maps.current_grid_preview || maps.overlay || maps.source_maps || maps.source_only || maps.baked_base || maps.color_projection || maps.pbr_transparent || !maps.emission_coverage.rgba.empty() || maps.emission_coverage.width || maps.emission_coverage.height || !maps.color_coverage.rgba.empty() || maps.color_coverage.width || maps.color_coverage.height || !maps.baked_normal.rgba.empty() || maps.baked_normal.width || maps.baked_normal.height || !maps.baked_coverage.rgba.empty() || maps.baked_coverage.width || maps.baked_coverage.height) throw std::invalid_argument("Attach original maps through from_maps, not a baked payload");
   if(size_t(color_interpretation)>1 || (color_interpretation==BakedColorInterpretation::ResolvedPbr)!=!maps.pbr_color.rgba.empty())
     throw std::invalid_argument("Baked PBR color interpretation is incomplete");
-  if(size_t(normal_interpretation)>1||maps.normal_projection||
-     (normal_interpretation==BakedNormalInterpretation::CanonicalMikk&&!maps.mtoon_normal.rgba.empty())||
+  if(size_t(normal_interpretation)>2||maps.normal_projection||
+     (normal_interpretation!=BakedNormalInterpretation::PreparedAttributes&&!maps.mtoon_normal.rgba.empty())||
+     (normal_interpretation==BakedNormalInterpretation::NativeAttributes&&
+      (maps.normal.rgba.empty()||color_interpretation!=BakedColorInterpretation::VertexComponent))||
      (normal_interpretation==BakedNormalInterpretation::PreparedAttributes&&maps.normal.rgba.empty()!=maps.mtoon_normal.rgba.empty()))
     throw std::invalid_argument("Baked normal interpretation is incomplete");
   if(normal_authority){
@@ -2791,6 +2793,10 @@ void SourcePaintAccess::merge_bake(PaintedMesh &paint,BakedTextures incoming,Bak
       throw std::invalid_argument("Baked field/preparation needs prepared normal interpretation");
   }else if(incoming.normal_interpretation==BakedNormalInterpretation::PreparedAttributes)
     throw std::invalid_argument("Baked normal interpretation must match explicit normal preparation");
+  if(incoming.normal_interpretation==BakedNormalInterpretation::NativeAttributes&&
+     (!paint.paint_sampling_domain()||paint.paint_sampling_domain()->version()!=1||
+      !paint.valid_paint_sampling_attachment()||paint.source_maps_||paint.normal_projection_))
+    throw std::invalid_argument("Authored native Bake requires its retained writable atlas");
   if(paint.normal_projection_&&incoming.normal_field)throw std::invalid_argument("Independent baked field cannot overwrite genuine intrinsic preparation");
   if(paint.baked_&&paint.baked_->normal_field&&(!incoming.normal_field||
       (incoming.normal_field!=paint.baked_->normal_field&&incoming.normal_field->prior()!=paint.baked_->normal_field)))
@@ -3780,7 +3786,10 @@ nlohmann::json PaintedMesh::encode_impl(PaintImageArchive *archive,NormalSamplin
       j["baked"]["version"]=2;j["baked"]["color_interpretation"]="resolved-pbr";
       j["baked"]["pbr_color"]=nlohmann::json::binary(baked_->maps.pbr_color.rgba);
     }
-    if(baked_->normal_interpretation==BakedNormalInterpretation::PreparedAttributes){
+    if(baked_->normal_interpretation==BakedNormalInterpretation::NativeAttributes){
+      j["baked"]["version"]=3;j["baked"]["normal_interpretation"]="native-attributes-v1";
+      j["baked"]["mtoon_normal"]=nlohmann::json::binary({});
+    }else if(baked_->normal_interpretation==BakedNormalInterpretation::PreparedAttributes){
       j["baked"]["version"]=3;j["baked"]["normal_interpretation"]="prepared-attributes-v1";
       j["baked"]["mtoon_normal"]=nlohmann::json::binary(baked_->maps.mtoon_normal.rgba);
     }
@@ -4181,8 +4190,12 @@ std::shared_ptr<PaintedMesh> PaintedMesh::decode_impl(const nlohmann::json &inpu
     }
     if(baked_version==3||retained){
       const auto &kind=v.at("normal_interpretation");
-      if(!kind.is_string()||kind.get_ref<const std::string&>()!=(retained?"retained-field-metadata-v1":"prepared-attributes-v1"))throw std::runtime_error("Unknown baked normal interpretation");
-      baked.normal_interpretation=BakedNormalInterpretation::PreparedAttributes;
+      if(!retained&&kind=="native-attributes-v1")baked.normal_interpretation=BakedNormalInterpretation::NativeAttributes;
+      else {
+        if(!kind.is_string()||kind.get_ref<const std::string&>()!=(retained?"retained-field-metadata-v1":"prepared-attributes-v1"))
+          throw std::runtime_error("Unknown baked normal interpretation");
+        baked.normal_interpretation=BakedNormalInterpretation::PreparedAttributes;
+      }
       auto normal=bytes("mtoon_normal",size_t(r)*r*4,true);if(!normal.empty())baked.maps.mtoon_normal={r,r,std::move(normal)};
     }
     if(layered){

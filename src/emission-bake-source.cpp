@@ -129,7 +129,8 @@ const char *source_normal_domain_error(const SculptObject &object,bool prepared,
      (binding->native_paint_frames&&!binding->native_paint_sampling)||
      bool(binding->normal_preparation)!=bool(object.painted->normal_projection())||
      (!canonical&&!writable&&object.painted->color_projection())||
-     (event&&((!prepared&&!event->maps.normal.rgba.empty())||(field&&!canonical)||
+     (event&&((!prepared&&!event->maps.normal.rgba.empty()&&
+       event->normal_interpretation!=BakedNormalInterpretation::NativeAttributes)||(field&&!canonical)||
       (!prepared&&event->normal_authority))))
     return "Artist source normal capture requires its unchanged original frame and separate current-normal adapter";
   return nullptr;
@@ -314,13 +315,14 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTr
   const auto canonical=binding?binding->canonical_attributes:nullptr;
   const auto event=object.painted?object.painted->baked():nullptr;
   const auto field=event?event->normal_field:nullptr;
+  const bool native_attributes=event&&event->normal_interpretation==BakedNormalInterpretation::NativeAttributes;
   const auto validate_writable=[&] {
     source_paint_pairing(object.painted.get(),binding.get(),object.appearance.get(),true);
     domain->validate_current(object.painted->mesh(),limits);
     if(binding->native_paint_frames)
       binding->native_paint_frames->validate_binding(*binding,true,options.cancelled);
   };
-  const bool native_baked=domain&&binding->native_paint_sampling&&event&&!event->maps.normal.rgba.empty();
+  const bool native_baked=domain&&binding->native_paint_sampling&&event&&!native_attributes&&!event->maps.normal.rgba.empty();
   if(native_baked||(domain&&!binding->normal_frames&&binding->native_paint_sampling)){
     const auto &mesh=object.painted->mesh();
     const uint64_t bake_bytes=native_baked?
@@ -402,7 +404,7 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTr
   const uint64_t corners=mesh.indices.size();
   // Charge both posed role arrays, immutable evaluated corner columns and
   // layout scratch before allocating, including retained morph/frame payload.
-  const uint64_t preview_bytes=(prepared||((canonical||domain)&&object.painted->color_projection()))?
+  const uint64_t preview_bytes=(native_attributes||prepared||((canonical||domain)&&object.painted->color_projection()))?
       uint64_t(object.painted->resolution())*object.painted->resolution()*4*12:0;
   const uint64_t capture_bytes=preview_bytes+set.storage_bytes()+
       corners*(3*sizeof(uint32_t)+2*(sizeof(Vec3)+sizeof(std::array<float,4>)+sizeof(NormalBakeVertex)))+
@@ -448,6 +450,18 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTr
     current_normals->validate(object.painted->resolution());
   }
   auto paired_maps=(canonical||domain)?paired_bake_maps(object,options.cancelled):nullptr;
+  PaintSourceTexture native_normal;
+  if(native_attributes){
+    if(!domain||!binding->native_paint_frames||set.pbr->tangents.empty())
+      throw std::invalid_argument("Authored Bake donor lost its writable atlas or tangent frame");
+    auto composite=object.painted->preview(object.material,options.cancelled);
+    if(composite->normal.rgba.empty())
+      throw std::logic_error("Authored Bake donor lost its resolved normal image");
+    const auto *image=&composite->normal;
+    native_normal.image=std::shared_ptr<const Image>(std::move(composite),image);
+    native_normal.wrap_s=native_normal.wrap_t=33071;
+    native_normal.min_filter=native_normal.mag_filter=9729;
+  }
   Source coordinates;coordinates.mesh=object.painted->mesh_owner();coordinates.maps=object.painted->source_maps();
   coordinates.packet=paired_maps?paired_maps->overlay:PaintOverlayFactory::capture(*object.painted,options.cancelled);
   coordinates.cancelled=options.cancelled;
@@ -476,7 +490,7 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTr
       }
       auto n=ob::rotate(relative.orientation,{N.x,N.y,N.z}),t=ob::rotate(relative.orientation,{T.x,T.y,T.z});
       if(has_tangent[role])out.push_back(normal_bake_vertex({n.x,n.y,n.z},{t.x,t.y,t.z},w,
-          (prepared||field)?NormalVertexBitangent::UnitCross:NormalVertexBitangent::RawCross));
+          (prepared||field||native_attributes)?NormalVertexBitangent::UnitCross:NormalVertexBitangent::RawCross));
       else out.push_back({normalized(Vec3{n.x,n.y,n.z}),{},{},1});
     }
   }
@@ -485,7 +499,7 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTr
   stop();std::shared_ptr<const std::array<std::vector<NormalBakeVertex>,2>> immutable=std::move(vertices);
   const auto packet=coordinates.packet;
   auto sample=[immutable,coordinates=std::move(coordinates),typed,typed_role,has_tangent,prepared,
-      current_normals,retained,field,canonical_uv](uint32_t triangle,std::array<float,3> bary){
+      current_normals,retained,field,canonical_uv,native_normal=std::move(native_normal),domain](uint32_t triangle,std::array<float,3> bary){
     coordinates.stop();const std::array<double,3> weights{bary[0],bary[1],bary[2]};std::array<Vec3,2> result;
     if(field){
       // Both canonical planes are encoded against the same prepared PBR columns.
@@ -512,6 +526,16 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTr
         result[role]=normalized(basis.t*n.x+basis.b*n.y+basis.n*n.z);
       }
       return result;
+    }
+    if(native_normal.image){
+      std::array<NormalBakeVertex,3> corners;
+      for(size_t k=0;k<3;++k)corners[k]=immutable->at(0).at(size_t(triangle)*3+k);
+      const auto basis=normal_bake_basis(corners,weights,NormalFragmentBasis::UnitColumns);
+      const auto uv=bake_paint_coordinates(domain.get(),triangle,bary,{});
+      const auto rgb=sample_source_texture(native_normal,uv[0],uv[1],false);
+      const auto n=mtoon_normal_map({rgb[0],rgb[1],rgb[2]},1);
+      const auto normal=normalized(basis.t*n.x+basis.b*n.y+basis.n*n.z);
+      return std::array{normal,normal};
     }
     for(size_t role=0;role<(typed?2u:1u);++role){
       std::array<NormalBakeVertex,3> corners;for(size_t k=0;k<3;++k)corners[k]=immutable->at(role).at(size_t(triangle)*3+k);

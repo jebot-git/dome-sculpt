@@ -81,7 +81,7 @@ struct TextureMaps {
   std::shared_ptr<const detail::PolygonSurfacePreview> polygon_surface;
 };
 enum class BakedColorInterpretation { VertexComponent, ResolvedPbr };
-enum class BakedNormalInterpretation { CanonicalMikk, PreparedAttributes };
+enum class BakedNormalInterpretation { CanonicalMikk, PreparedAttributes, NativeAttributes };
 struct BakedTextures {
   TextureMaps maps;
   // Linear coverage below editable paint layers: 0 intrinsic material,

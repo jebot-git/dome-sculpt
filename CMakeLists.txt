@@ -200,6 +200,9 @@ if(BUILD_TESTING)
   add_test(NAME native-writable-bake-recipient
     COMMAND dome-sculpt-source-writable-normal-bake-test --native-recipient ${CMAKE_CURRENT_BINARY_DIR}/native-writable-bake-recipient)
   set_tests_properties(native-writable-bake-recipient PROPERTIES TIMEOUT 180)
+  add_test(NAME native-key-writable-bake-recipient
+    COMMAND dome-sculpt-source-writable-normal-bake-test --key-recipient ${CMAKE_CURRENT_BINARY_DIR}/native-key-writable-bake-recipient)
+  set_tests_properties(native-key-writable-bake-recipient PROPERTIES TIMEOUT 180)
   # Additive native producer; public GUI/XR execution is an explicit owning gate.
   add_executable(dome-sculpt-source8-public-fixture tests/source8-public-fixture.cpp)
   target_include_directories(dome-sculpt-source8-public-fixture PRIVATE src)

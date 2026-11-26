@@ -1885,7 +1885,10 @@ void Document::mesh_loop() {
         if(!colors.empty() && snapshot->source_colors.empty())snapshot->source_colors.assign(snapshot->mesh.positions.size(),{1,1,1,1});
         auto retained=o.material_bindings?o.material_bindings->normal_frames:nullptr;
         const bool source8_normal=o.textures&&o.textures->overlay&&o.textures->overlay->source_baked_geometry()&&bool(o.textures->overlay->source_baked_normal());
-        const bool canonical=!polygon_field && o.textures && !o.textures->normal_projection && (!o.textures->normal.rgba.empty()||source8_normal);
+        const bool authored_bake=o.textures&&o.textures->baked_base&&
+            o.textures->baked_base->normal_interpretation==BakedNormalInterpretation::NativeAttributes;
+        const bool canonical=!polygon_field && o.textures && !authored_bake &&
+            !o.textures->normal_projection && (!o.textures->normal.rgba.empty()||source8_normal);
         // Existing bakes without captured canonical authority use the historical
         // posed-mesh Mikk basis. Do not invent a persisted/rest export basis.
         const bool dynamic_canonical=retained && canonical && !retained->canonical;

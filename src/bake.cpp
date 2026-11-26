@@ -287,7 +287,7 @@ void pad(BakeResult &result,const BakeOptions &o,std::vector<BakedEmissionSample
         if(!image->rgba.empty())std::copy_n(image->rgba.data()+size_t(at)*4,4,image->rgba.data()+size_t(target)*4);
       if(!emission.empty())emission[target]=emission[at];
       if(o.separate_pbr_color)std::copy_n(result.maps.pbr_color.rgba.data()+size_t(at)*4,4,result.maps.pbr_color.rgba.data()+size_t(target)*4);
-      if(o.encode_target_normal)std::copy_n(result.maps.mtoon_normal.rgba.data()+size_t(at)*4,4,result.maps.mtoon_normal.rgba.data()+size_t(target)*4);
+      if(!result.maps.mtoon_normal.rgba.empty())std::copy_n(result.maps.mtoon_normal.rgba.data()+size_t(at)*4,4,result.maps.mtoon_normal.rgba.data()+size_t(target)*4);
       result.coverage[target]=2; ++result.padded; queue.push_back({target,distance+1});
     }
   }
@@ -299,7 +299,7 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
     std::span<const detail::RetainedSourceBakeField> source_fields = {},
     detail::SourceBakePlacement source_placement = {},
     std::span<const Tangent> target_metric_corners = {},
-    bool corresponding_topology = false) {
+    bool corresponding_topology = false,bool dual_normal = true) {
   if(o.progress)o.progress(0);
   cancel(o); validate(low,source,o,source_fields,source_normals);
   if(corresponding_topology&&(!o.cage_positions.empty()||!o.source_triangles.empty()||
@@ -336,7 +336,7 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
       std::any_of(source_fields.begin(),source_fields.end(),[](const auto &field){return field.physical_emission;});
   if(float_emission){
     const size_t field=BakedEmissionField::required_bytes(o.resolution,{128*1024*1024,o.cancelled});
-    const uint64_t other=uint64_t(o.resolution)*o.resolution*(13+(o.separate_pbr_color?4:0)+(o.encode_target_normal?4:0));
+    const uint64_t other=uint64_t(o.resolution)*o.resolution*(13+(o.separate_pbr_color?4:0)+(o.encode_target_normal&&dual_normal?4:0));
     if(other>128*1024*1024||field>128*1024*1024-other)
       throw std::length_error("FLOAT Bake retained channels exceed unchanged paint budget");
   }
@@ -378,7 +378,7 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
   size_t pixels=size_t(o.resolution)*o.resolution;
   BakeResult result; result.coverage.resize(pixels);
   std::vector<BakedEmissionSample> emission;if(float_emission)emission.resize(pixels);
-  if(o.encode_target_normal)result.maps.mtoon_normal={o.resolution,o.resolution,std::vector<uint8_t>(pixels*4)};
+  if(o.encode_target_normal&&dual_normal)result.maps.mtoon_normal={o.resolution,o.resolution,std::vector<uint8_t>(pixels*4)};
   if (!o.writable.empty()) for (size_t i=0;i<pixels;++i) if (!o.writable[i]) result.coverage[i]=4;
   for (auto *image:{&result.maps.color,&result.maps.metal_rough,&result.maps.emission,&result.normal,&result.ambient_occlusion})
     if(image!=&result.maps.emission||!float_emission)*image={o.resolution,o.resolution,std::vector<uint8_t>(pixels*4)};
@@ -539,19 +539,20 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
       auto desired=source_normals?source_normals(hit->triangle,hit->barycentric):std::array<Vec3,2>{high_normal,high_normal};
       if(source_normals)for(auto &direction:desired){if(!finite(direction)||length(direction)<1e-10f)throw std::invalid_argument("Source normal resolver returned a singular direction");direction=normalized(direction);}
       high_normal=desired[0];Vec3 mapped;
+      if((!o.encode_target_normal||!dual_normal)&&source_normals&&length(desired[0]-desired[1])>1e-6f)
+        throw std::invalid_argument("Source PBR/MToon normals differ; enable genuine target normal preparation to retain both roles");
       if(o.encode_target_normal){
         const auto pbr=o.encode_target_normal(uint32_t(triangle),bary,desired[0]);
-        const auto toon=source_normals?o.encode_target_normal(uint32_t(triangle),bary,desired[1]):pbr;
-        const std::array<std::array<uint8_t,4>,2> encoded{pbr[0],toon[1]};
-        if(encoded[0][3]!=255||encoded[1][3]!=255)throw std::invalid_argument("Explicit target normal encoder returned malformed normal data alpha");
-        std::copy_n(encoded[0].begin(),4,result.normal.rgba.data()+at*4);
-        std::copy_n(encoded[1].begin(),4,result.maps.mtoon_normal.rgba.data()+at*4);
-        if(o.normal_y_down){result.normal.rgba[at*4+1]=255-result.normal.rgba[at*4+1];result.maps.mtoon_normal.rgba[at*4+1]=255-result.maps.mtoon_normal.rgba[at*4+1];}
-      }else {
-        if(source_normals&&length(desired[0]-desired[1])>1e-6f)
-          throw std::invalid_argument("Source PBR/MToon normals differ; enable genuine target normal preparation to retain both roles");
-        mapped=frame.to_tangent(high_normal);
-      }
+        if(pbr[0][3]!=255)throw std::invalid_argument("Explicit target normal encoder returned malformed normal data alpha");
+        std::copy_n(pbr[0].begin(),4,result.normal.rgba.data()+at*4);
+        if(o.normal_y_down)result.normal.rgba[at*4+1]=255-result.normal.rgba[at*4+1];
+        if(dual_normal){
+          const auto toon=source_normals?o.encode_target_normal(uint32_t(triangle),bary,desired[1]):pbr;
+          if(toon[1][3]!=255)throw std::invalid_argument("Explicit target normal encoder returned malformed normal data alpha");
+          std::copy_n(toon[1].begin(),4,result.maps.mtoon_normal.rgba.data()+at*4);
+          if(o.normal_y_down)result.maps.mtoon_normal.rgba[at*4+1]=255-result.maps.mtoon_normal.rgba[at*4+1];
+        }
+      }else mapped=frame.to_tangent(high_normal);
       if (o.normal_y_down) mapped.y=-mapped.y;
       float ao=channels.ao;
       if(query)
@@ -592,5 +593,12 @@ BakeResult detail::bake_mesh_source_normals(const Mesh &low,const BakeSource &so
  std::span<const Tangent> target_metric_corners,bool corresponding_topology){
  return bake_mesh_impl(low,source,options,normal,target_triangles,source_fields,source_placement,
                        target_metric_corners,corresponding_topology);
+}
+BakeResult detail::bake_mesh_native_attributes(const Mesh &low,const BakeSource &source,const BakeOptions &options,
+ const SourceBakeNormalResolver &normal,std::span<const RetainedSourceBakeField> source_fields,
+ SourceBakePlacement source_placement,std::span<const Tangent> target_metric_corners,bool corresponding_topology){
+ if(!options.encode_target_normal)throw std::invalid_argument("Authored native Bake needs its exact target frame encoder");
+ return bake_mesh_impl(low,source,options,normal,{},source_fields,source_placement,
+                       target_metric_corners,corresponding_topology,false);
 }
 } // namespace dome

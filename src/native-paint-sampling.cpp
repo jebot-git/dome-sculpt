@@ -19,7 +19,8 @@ bool native_grid_state(const PaintedMesh &p) noexcept {
   const auto baked=p.baked();
   return !p.source_maps()&&!p.color_projection()&&!p.normal_projection()&&
       !p.source_sampling_prepared()&&p.surface_diagnostics().policy==PaintUvPolicy::Strict&&
-      (!baked||(baked->normal_interpretation==BakedNormalInterpretation::CanonicalMikk&&
+      (!baked||((baked->normal_interpretation==BakedNormalInterpretation::CanonicalMikk||
+                 baked->normal_interpretation==BakedNormalInterpretation::NativeAttributes)&&
                 baked->color_interpretation==BakedColorInterpretation::VertexComponent&&
                 !baked->normal_authority&&!baked->normal_field));
 }
@@ -93,6 +94,9 @@ void NativePaintSampling::validate(const PaintSamplingLimits &limits) const {
     throw std::invalid_argument("Native retained paint lacks its independently captured owner");
   if(!native_grid_state(*before_)||(!before_material_&&before_->baked()))
     throw std::invalid_argument("Native paint history requires its actual writable grid and Bake policy");
+  if(before_->baked()&&before_->baked()->normal_interpretation==BakedNormalInterpretation::NativeAttributes&&
+      !before_material_->native_paint_frames)
+    throw std::invalid_argument("Native paint history lost its authored Bake frame");
   const auto previous=before_material_?before_material_->native_paint_sampling:nullptr;
   if(bool(previous)!=bool(before_->paint_sampling_domain())||depth_!=(previous?previous->history_depth()+1:1))throw std::invalid_argument("Native paint history lost its exact prior owner");
   if(before_material_){before_material_->validate();if(!previous||!previous->matches_current(*before_))throw std::invalid_argument("Native before-Paint borrowed another material attachment");}

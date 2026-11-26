@@ -42,7 +42,7 @@ bool bake_target_supported(const SculptObject &object) {
    if(binding&&binding->native_paint_sampling){
      const auto &owner=binding->native_paint_sampling;
      return object.mesh_active&&object.painted&&!object.polygon&&!object.appearance&&
-         !binding->normal_frames&&owner->valid_owner(owner)&&owner->matches_current(*object.painted);
+         (!binding->normal_frames||binding->native_paint_frames)&&owner->valid_owner(owner)&&owner->matches_current(*object.painted);
    }
    return corner_bake_target_supported(object);
  }

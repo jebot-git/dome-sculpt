@@ -64,4 +64,7 @@ BakeResult bake_mesh_source_normals(const Mesh &,const BakeSource &,const BakeOp
  std::span<const RetainedSourceBakeField> source_fields = {},
  SourceBakePlacement source_placement = {},
  std::span<const std::array<float,4>> target_metric_corners = {}, bool corresponding_topology = false);
+BakeResult bake_mesh_native_attributes(const Mesh &,const BakeSource &,const BakeOptions &,
+ const SourceBakeNormalResolver &,std::span<const RetainedSourceBakeField>,
+ SourceBakePlacement,std::span<const std::array<float,4>> target_metric_corners,bool corresponding_topology);
 }

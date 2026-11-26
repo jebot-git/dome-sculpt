@@ -427,7 +427,10 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   if(progress)options.progress=[&](float value){progress(.1f+.8f*value);};
   const auto canonical_attributes=target.material_bindings?target.material_bindings->canonical_attributes:nullptr;
   const bool prepared_normals=bool(target.painted->normal_projection())||bool(canonical_attributes);
-  const bool canonical_captured=!(recipient&&recipient->source)&&!prepared_normals&&detail::capture_new_bake_frame(target,cancelled);
+  const bool canonical_captured=!native_writable&&!(recipient&&recipient->source)&&!prepared_normals&&detail::capture_new_bake_frame(target,cancelled);
+  const auto old_bake=target.painted->baked();
+  const bool native_attributes=native_writable&&target.material_bindings->native_paint_frames&&
+      (!old_bake||old_bake->normal_interpretation==BakedNormalInterpretation::NativeAttributes);
   std::optional<Mesh> low;
   const auto retained_recipient=recipient&&recipient->source?recipient->source->source_preview():nullptr;
   if(native_writable){
@@ -435,6 +438,15 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
     limits.cancelled=cancelled;
     native_writable->validate_current(*target.painted,limits);
     low=detail::native_paint_bake_mesh(target.painted->mesh(),*native_writable->domain(),cancelled);
+    if(native_attributes){
+      detail::normal_frame_current_authority(*target.material_bindings,target.painted->mesh(),
+          target.deformation.get(),cancelled);
+      const auto &frame=*target.material_bindings->normal_frames->pbr;
+      if(frame.normals.size()!=low->positions.size()||frame.tangents.size()!=low->positions.size())
+        throw std::invalid_argument("Authored native Bake needs a complete ordered tangent frame");
+      low->normals=frame.normals;
+      options.low_tangents=frame.tangents;
+    }
   }else if(retained_recipient){
     const auto &mesh=target.painted->mesh();
     if(mesh.indices.size()>2'000'000)
@@ -500,7 +512,26 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
     recenter(low->positions);
     recenter(options.cage_positions);
   }
-  if(prepared_normals){
+  if(native_attributes){
+    const auto frame=target.material_bindings->normal_frames->pbr;
+    const auto *placed_low=target_placement?&*low:nullptr;
+    const std::span<const Tangent> placed_tangents=target_metric_corners;
+    options.encode_target_normal=[frame,placed_low,placed_tangents,limit=double(settings.normal_error)](
+          uint32_t triangle,std::array<float,3> bary,Vec3 desired){
+      std::array<detail::NormalBakeVertex,3> corners;
+      for(size_t k=0;k<3;++k){
+        const size_t corner=size_t(triangle)*3+k;
+        const auto t=placed_low?placed_tangents[corner]:frame->tangents[corner];
+        const auto n=placed_low?placed_low->normals[placed_low->indices[corner]]:frame->normals[corner];
+        corners[k]=detail::normal_bake_vertex(n,{t[0],t[1],t[2]},t[3],detail::NormalVertexBitangent::UnitCross);
+      }
+      const auto basis=detail::normal_bake_basis(corners,{bary[0],bary[1],bary[2]},detail::NormalFragmentBasis::UnitColumns);
+      const auto encoded=detail::encode_normal_bake(basis,desired);
+      if(!encoded||encoded->quantized_angle_radians>limit)
+        throw std::invalid_argument("Projected normal exceeds the authored native basis conditioning or quantization limit");
+      return std::array{encoded->rgba,encoded->rgba};
+    };
+  }else if(prepared_normals){
     const auto frames=target.material_bindings->normal_frames;
     const auto placed_low=target_placement?&*low:nullptr;
     const std::span<const Tangent> metric_corners=target_metric_corners;
@@ -546,7 +577,9 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   };
   if(retained_recipient&&!split_recipient)encode_retained(options);
   if((retained_uv||split_recipient)&&progress)options.progress=[&](float value){progress(.1f+.4f*value);};
-  auto result = detail::bake_mesh_source_normals(low_mesh,high,options,source_normals,
+  auto result = native_attributes?detail::bake_mesh_native_attributes(low_mesh,high,options,
+      source_normals,source_fields,source_placement,target_metric_corners,settings.corresponding_topology):
+      detail::bake_mesh_source_normals(low_mesh,high,options,source_normals,
       target_triangles,source_fields,source_placement,target_metric_corners,
       settings.corresponding_topology);
   std::optional<BakeResult> retained_normal_write;
@@ -599,7 +632,8 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
       if(result.coverage[i]==3 && prior->coverage[i])++report.preserved_misses;
     }
   BakedTextures textures;
-  if(prepared_normals||(retained_recipient&&!native_recipient))
+  if(native_attributes)textures.normal_interpretation=BakedNormalInterpretation::NativeAttributes;
+  else if(prepared_normals||(retained_recipient&&!native_recipient))
     textures.normal_interpretation=BakedNormalInterpretation::PreparedAttributes;
   if(separate)textures.color_interpretation=BakedColorInterpretation::ResolvedPbr;
   textures.maps = std::move(result.maps);

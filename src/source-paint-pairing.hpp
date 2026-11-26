@@ -24,6 +24,10 @@ inline void source_paint_pairing(const PaintedMesh *paint,const SourceMaterialBi
   const auto normal=paint?paint->normal_projection():nullptr;
   const auto color_recipe=binding?binding->color_preparation:nullptr;
   const auto normal_recipe=binding?binding->normal_preparation:nullptr;
+  if(paint&&paint->baked()&&paint->baked()->normal_interpretation==BakedNormalInterpretation::NativeAttributes&&
+     (!binding||!binding->native_paint_sampling||!binding->native_paint_frames||!binding->normal_frames||
+      !binding->normal_frames->pbr||binding->normal_frames->pbr->tangents.empty()||appearance))
+    throw std::invalid_argument("Authored native Bake lost its actual writable paint and tangent owners");
   if(binding&&binding->canonical_uv){
     if(!paint||appearance||binding->canonical_uv->origin()!=binding->canonical_attributes)
       throw std::invalid_argument("Retained canonical UV paint lost its original native authority");

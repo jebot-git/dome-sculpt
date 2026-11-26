@@ -41,7 +41,7 @@ void uv(Scene &s,bool canonical,bool seam){
  else{auto next=detail::retain_native_paint_model(s.active(),target,vertices);auto binding=detail::bind_native_paint(next.sampling.owner,s.active().material_bindings);s.active().painted=next.sampling.paint;s.active().deformation=next.deformation;s.active().material_bindings=binding;require(next.sampling.owner->matches_current(*s.active().painted),"Actual native32 current owner");}
  s.validate();
 }
-void key_pose(Scene&s,bool keyed,bool live){if(keyed){ShapeKeyEdit key;key.action=ShapeKeyAction::Create;key.name="Actual writable current key";author_shapekey(s,s.active().id,key);key.action=ShapeKeyAction::Replace;key.target=s.active().deformation->morphs->targets.size()-1;key.positions=s.active().painted->mesh().positions;key.positions[0].z+=.012f;key.positions[2].z-=.009f;author_shapekey(s,s.active().id,key);}if(live){auto d=*s.active().deformation;if(d.morphs)d.morph_weights.assign(d.morphs->targets.size(),.35f);d.pose.resize(2);d.pose[0].scale={1.2f,.8f,.7f};d.pose[1].scale={.8f,1.1f,1.3f};s.set_deformation(s.active().id,d);}s.validate();}
+void key_pose(Scene&s,bool keyed,bool live,const char *name="Actual writable current key"){if(keyed){ShapeKeyEdit key;key.action=ShapeKeyAction::Create;key.name=name;author_shapekey(s,s.active().id,key);key.action=ShapeKeyAction::Replace;key.target=s.active().deformation->morphs->targets.size()-1;key.positions=s.active().painted->mesh().positions;key.positions[0].z+=.012f;key.positions[2].z-=.009f;author_shapekey(s,s.active().id,key);}if(live){auto d=*s.active().deformation;if(d.morphs)d.morph_weights.assign(d.morphs->targets.size(),.35f);d.pose.resize(2);d.pose[0].scale={1.2f,.8f,.7f};d.pose[1].scale={.8f,1.1f,1.3f};s.set_deformation(s.active().id,d);}s.validate();}
 D decode_canonical(const SculptObject &o,size_t tri,std::array<float,3> bary,size_t role,bool wrong_domain=false,bool omit=false){
  const auto &b=*o.material_bindings;const auto &set=*b.normal_frames;const auto &f=*set.pbr;const auto &m=o.painted->mesh();const auto field=o.painted->baked()?o.painted->baked()->normal_field:nullptr;D N{},T{},B{};std::array<double,2> uv{};
  for(size_t k=0;k<3;++k){const size_t c=tri*3+k,v=m.indices[c];D n=vc(f.normals[c]),t{f.tangents[c][0],f.tangents[c][1],f.tangents[c][2]};if(o.deformation){for(size_t slot=0;slot<set.current_targets.size();++slot){const double w=o.deformation->morph_weights.empty()?0:o.deformation->morph_weights[slot];for(const auto &target:f.targets)if(target.id==set.current_targets[slot]){if(!target.normals.empty())n=add(n,mul(vc(target.normals[c]),w));if(!target.tangents.empty())t=add(t,mul(vc(target.tangents[c]),w));}}if(!o.deformation->pose.empty()){D nn{},tt{};const auto a=o.deformation->pose[0].scale,h=o.deformation->pose[1].scale;for(auto weight:o.deformation->skin->vertices[v]){D scale{a.x,a.y,a.z};if(weight.joint==1)scale={a.x*h.x,a.y*h.y,a.z*h.z};for(size_t axis=0;axis<3;++axis){nn[axis]+=n[axis]/scale[axis]*weight.weight;tt[axis]+=t[axis]*scale[axis]*weight.weight;}}n=nn;t=tt;}}
@@ -372,6 +372,131 @@ void native_recipient(bool physical,const std::filesystem::path &out){
   }
   std::cout<<"NATIVE_WRITABLE_RECIPIENT "<<name<<" projected="<<result.projected<<" rays="<<result.rays<<'\n';
 }
+
+void native_key_recipient(bool physical,const std::filesystem::path &out){
+  auto scene=source(false);
+  const auto rest=scene.active().painted->mesh();
+  paint(scene,physical);
+  uv(scene,false,false);
+  key_pose(scene,true,false);
+  const auto control_tangents=tangent_corners(rest);
+  const auto binding=scene.active().material_bindings;
+  const auto frames=binding->normal_frames->pbr;
+  require(binding->native_paint_frames&&frames->tangents!=control_tangents&&
+          !frames->targets.front().tangents.empty(),
+          "A real authored shapekey has an independent tangent basis and nonempty direction targets");
+  auto add_donor=[&](std::string label,Vec3 normal,bool partial){
+    auto mesh=rest;
+    for(auto &p:mesh.positions){
+      if(partial&&p.x<0)p.x=0;
+      p.z=.02f;
+    }
+    mesh.normals.assign(mesh.positions.size(),normal);
+    const auto id=scene.add(std::move(label),Volume{});
+    scene.select(id);
+    scene.active().mesh_active=true;
+    scene.active().painted=std::make_shared<PaintedMesh>(std::move(mesh),64);
+    paint(scene,physical);
+    scene.active().visible=false;
+    scene.active().locked=true;
+    scene.select(1);
+    return id;
+  };
+  const auto direction=normalized(Vec3{-.37f,.28f,1});
+  const auto donor=add_donor("Keyed mesh normal and material donor",direction,false);
+  const auto second=add_donor("Partial keyed mesh donor",normalized(Vec3{.25f,-.3f,1}),true);
+  const auto before_paint=scene.active().painted;
+  const auto model=scene.active().deformation;
+  const auto before=scene.encode();
+  const std::string name=physical?"hdr":"ldr";
+  scene.save(out/(name+"-before.dsculpt"));
+  auto options=settings();
+  options.prepare_normals=false;
+  options.corresponding_topology=true;
+  const auto report=bake_object(scene,donor,options);
+  const auto bake=scene.active().painted->baked();
+  require(report.projected==4096&&report.rays==0&&bake&&
+          bake->normal_interpretation==BakedNormalInterpretation::NativeAttributes&&
+          bake->maps.mtoon_normal.rgba.empty()&&bool(bake->emission_field)==physical&&
+          scene.active().material_bindings==binding&&scene.active().deformation==model&&
+          same_layers(*scene.active().painted,*before_paint),"Native Bake retains the actual authored frame and writable layers");
+  const auto sample=bake->maps.normal.rgba.data()+4*(41*64+29);
+  const auto t=frames->tangents[0];
+  const Vec3 tangent{t[0],t[1],t[2]},normal=frames->normals[0],bitangent=cross(normal,tangent)*t[3];
+  const auto decoded=normalized(tangent*(sample[0]/127.5f-1)+bitangent*(sample[1]/127.5f-1)+normal*(sample[2]/127.5f-1));
+  const auto wrong=control_tangents.front();
+  const Vec3 wrong_tangent{wrong[0],wrong[1],wrong[2]};
+  const auto misread=normalized(wrong_tangent*(sample[0]/127.5f-1)+
+      cross(normal,wrong_tangent)*(wrong[3]*(sample[1]/127.5f-1))+normal*(sample[2]/127.5f-1));
+  require(length(decoded-direction)<.015f&&length(misread-direction)>.25f,
+          "Baked texels decode the donor direction in the authored frame and reject the writable Mikk control");
+
+  const auto accepted=scene.encode();
+  scene.save(out/(name+"-accepted.dsculpt"));
+  require(Scene::load(out/(name+"-accepted.dsculpt")).encode()==accepted,"Keyed writable Bake restarts exactly");
+  Document doc;
+  doc.replace(Scene::load(out/(name+"-before.dsculpt")));
+  require(doc.wait_mesh()&&doc.frame().state->can_bake,"Keyed recipient is eligible in the actual shared Bake controls");
+  doc.bake_from_object(donor,options);
+  doc.save_async(out/(name+"-ordered.dsculpt")).get();
+  require(doc.wait_asset()&&doc.wait_mesh()&&doc.frame().state->error.empty()&&doc.copy_scene().encode()==accepted&&
+          Scene::load(out/(name+"-ordered.dsculpt")).encode()==accepted,"Keyed Bake publishes exact ordered Save");
+  require(doc.undo()&&doc.wait_mesh()&&doc.copy_scene().encode()==before&&
+          doc.redo()&&doc.wait_mesh()&&doc.copy_scene().encode()==accepted,"Keyed Bake owns one Undo and Redo");
+  const auto frame=doc.frame().surface;
+  require(frame&&frame->ranges.size()==1&&frame->ranges[0].source_frame&&!frame->ranges[0].canonical_frame&&
+          frame->source_tangents.at(frame->mesh.indices.front())==t&&
+          frame->paint_coordinates.at(frame->mesh.indices.front())==rest.uv.front(),
+          "Live viewport uses authored tangent columns and independent paint UVs");
+  doc.clear_bake();
+  require(doc.wait_asset()&&doc.wait_mesh()&&doc.frame().state->error.empty()&&
+          !doc.copy_scene().active().painted->baked()&&doc.undo()&&doc.wait_mesh()&&doc.copy_scene().encode()==accepted,
+          "Clear Bake preserves keyed authority and is reversible");
+
+  for(bool editable:{false,true}){
+    const auto glb=out/(name+(editable?"-editable.glb":".glb"));
+    doc.export_asset(glb,editable?AssetExportFormat::EditableGlb256:AssetExportFormat::Glb).get();
+    std::ifstream stream(glb,std::ios::binary);
+    std::vector<uint8_t> bytes{std::istreambuf_iterator<char>(stream),{}};
+    uint32_t count=0;
+    for(unsigned k=0;k<4;++k)count|=uint32_t(bytes.at(12+k))<<(8*k);
+    const auto gltf=nlohmann::json::parse(bytes.begin()+20,bytes.begin()+20+count);
+    const auto &primitive=gltf.at("meshes").at(0).at("primitives").at(0);
+    const auto &material=gltf.at("materials").at(primitive.at("material").get<size_t>());
+    const auto coord=material.at("normalTexture").at("texCoord").get<unsigned>();
+    const auto &key=primitive.at("targets").at(0);
+    require(coord>0&&key.contains("POSITION")&&key.contains("NORMAL")&&key.contains("TANGENT")&&
+            material.at("pbrMetallicRoughness").at("baseColorTexture").at("texCoord")==coord,
+            "Both GLB routes bind normal and paint coordinates and retain every authored key channel");
+    if(editable){
+      const auto extracted=extract_native_authoring(bytes);
+      require(extracted&&extracted->encode()==accepted,"Editable keyed GLB restores the authored bake exactly");
+    }
+  }
+
+  options.corresponding_topology=false;
+  options.allow_partial=true;
+  const auto partial=bake_object(scene,second,options);
+  const auto patched=scene.active().painted->baked();
+  require(partial.projected==2048&&partial.preserved_misses==2048,"Partial rebake preserves all missed keyed texels");
+  for(auto pixel:{size_t(32*64+12),size_t(32*64+50)}){
+    const auto old=bake->maps.normal.rgba.begin()+pixel*4;
+    const bool same=std::equal(old,old+4,patched->maps.normal.rgba.begin()+pixel*4);
+    require(same==(pixel%64<32),"Partial keyed normal Bake only updates the intersecting region");
+  }
+  uv(scene,false,true);
+  key_pose(scene,true,false,"New key after partial Bake and seam edit");
+  require(scene.active().painted->baked()==patched,"Later UV seam split and additional key keep the authored normal image");
+  scene.save(out/(name+"-edited.dsculpt"));
+  auto reopened=Scene::load(out/(name+"-edited.dsculpt"));
+  require(reopened.encode()==scene.encode(),"Nested Bake and edited key histories reopen exactly");
+  const auto &object=reopened.active();
+  const auto resolved=detail::source_bake_normals(object,{});
+  const auto wanted=resolved(0,{.1f,.45f,.45f});
+  require(length(wanted[0]-normalized(Vec3{.25f,-.3f,1}))<.015f&&length(wanted[0]-wanted[1])<1e-7f,
+          "Reopened keyed Bake donates the correct normal from its retained paint grid");
+  std::cout<<"NATIVE_KEY_RECIPIENT "<<name<<" projected="<<report.projected<<" preserved="<<partial.preserved_misses<<'\n';
+}
 }
 int main(int argc,char **argv) try {
  if(argc==3&&std::string_view(argv[1])=="--sources"){
@@ -393,6 +518,13 @@ int main(int argc,char **argv) try {
    std::filesystem::create_directories(out);
    for(bool physical:{false,true})writable_source::native_recipient(physical,out);
    std::cout<<"PASS "<<writable_source::checks<<" native writable recipient checks\n";
+   return 0;
+ }
+ if(argc==3&&std::string_view(argv[1])=="--key-recipient"){
+   const std::filesystem::path out=argv[2];
+   std::filesystem::create_directories(out);
+   for(bool physical:{false,true})writable_source::native_key_recipient(physical,out);
+   std::cout<<"PASS "<<writable_source::checks<<" keyed writable recipient checks\n";
    return 0;
  }
  if(argc!=2)return 2;

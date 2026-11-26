@@ -964,12 +964,15 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
     const bool native_float=TextureState::native_float(original,maps,binding);
     const auto polygon=maps?maps->polygon_surface:nullptr;
     const bool native_polygon_bake=polygon&&polygon->native_bake();
+    const bool native_attributes=maps&&maps->baked_base&&
+        maps->baked_base->normal_interpretation==BakedNormalInterpretation::NativeAttributes;
     glUniform1i(glGetUniformLocation(program_,"polygon_mode"),native_polygon_bake?3:polygon?int(polygon->model()):0);
     Material material = original;if(background){material.color=background->color;material.emissive=background->emission;}
     glUniform1f(glGetUniformLocation(program_,"relative_emission_strength"),background?background->relative_emission_strength:1);
     glDepthFunc(GL_LESS);glBlendEquationSeparate(GL_FUNC_ADD,GL_FUNC_ADD);glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE);
     glUniform1i(glGetUniformLocation(program_,"source_frame"),use_source);glUniform1i(glGetUniformLocation(program_,"canonical_frame"),use_canonical);
-    glUniform1i(glGetUniformLocation(program_,"prepared_pbr_frame"),maps&&(maps->normal_projection||(maps->baked_base&&maps->baked_base->normal_field)));
+    glUniform1i(glGetUniformLocation(program_,"prepared_pbr_frame"),maps&&
+        (native_attributes||maps->normal_projection||(maps->baked_base&&maps->baked_base->normal_field)));
     glUniform1i(glGetUniformLocation(program_,"paint_domain"),paint_domain||(maps&&maps->overlay&&maps->overlay->original_uv0()));
     glUniform1i(glGetUniformLocation(program_,"retained_normal_domain"),bool(polygon&&polygon->model()==detail::PolygonSurfaceNormalModel::PreparedCorePbr)||normal_domain||(maps&&maps->normal_projection&&maps->normal_projection->version==2));
     const auto overlay=maps?maps->overlay:nullptr;
@@ -1009,7 +1012,8 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
       constexpr std::array<int,5> slots{7,8,9,10,13};
       for(size_t n=0;n<slots.size();++n){glActiveTexture(GL_TEXTURE0+slots[n]);glBindTexture(GL_TEXTURE_2D,overlay.planes[n]);glBindSampler(slots[n],0);}}
     glUniform1i(glGetUniformLocation(program_,"map_mode"),maps?(maps->source_only?2:1):0);
-    glUniform1i(glGetUniformLocation(program_,"baked_normal"),maps&&!maps->normal_projection&&!(maps->baked_base&&maps->baked_base->normal_field)&&!maps->normal.rgba.empty());
+    glUniform1i(glGetUniformLocation(program_,"baked_normal"),maps&&!native_attributes&&
+        !maps->normal_projection&&!(maps->baked_base&&maps->baked_base->normal_field)&&!maps->normal.rgba.empty());
     for(int n=0;n<16;++n){auto name="tex"+std::to_string(n);glUniform1i(glGetUniformLocation(program_,name.c_str()),n);}
     glUniform1f(glGetUniformLocation(program_,"normal_scale"),maps&&maps->source_maps&&!maps->normal_projection&&!(maps->baked_base&&maps->baked_base->normal_field)?maps->source_maps->normal_scale:1);
     glUniform1f(glGetUniformLocation(program_,"ao_strength"),maps&&maps->source_maps?maps->source_maps->occlusion_strength:1);
