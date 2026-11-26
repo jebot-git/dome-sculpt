@@ -1137,9 +1137,26 @@ replay and agree byte for byte across the XR profiles. The original
 llvmpipe sanitizer run saved the exact accepted project and reported a
 112-byte leak at teardown, with both allocation addresses in Mesa's
 libgallium mapping. The Arc replay kept leak detection enabled and exited
-cleanly. Baking retained prepared texture-set fields and physical-input
-verification remain open.
+cleanly. Retained prepared targets and physical-input verification remain open.
 [Active-set acceptance and original leak evidence](validation/active-texture-set-bake-20261126.json)
+
+Main merge `72155951` adds static retained texture sets as Bake sources for
+ordinary and selected plain targets. Each hit uses its source field's actual
+original paint coordinates and before/current normal frames, including
+prepared Core PBR normal textures and absolute FLOAT emission. The worker
+shares the authenticated corner streams and preserves the source project.
+The mixed Scene40 preflight now opens the same saved bytes when retained
+source fields and plain Bake recipes coexist. It rejects a plain recipe with
+a forged set reference.
+
+Release and ASan/UBSan each pass all ten focused tests and 569 retained-source
+assertions. The exact app passes 15 native Wayland checks through nested
+DomeD and 19 synthetic OpenXR checks per software Release and Intel Arc
+sanitizer profile. Both XR profiles save identical bytes, including exact
+Cancel and focus-loss results. The full fresh Release build and regression
+for this source are running. Retained writable targets, deformed or
+non-similarity source placement, and physical-device acceptance remain open.
+[Retained-source Bake evidence](validation/retained-texture-set-bake-source-20261126.json)
 
 ## Source and integration boundary
 

@@ -89,11 +89,15 @@ and Recall for plain native texture sets, including per-hit source material
 selection, exact Undo/Redo, ordered Save and full-cage projection. Eight
 focused tests pass per native profile. The final app passes 15 nested DomeD
 Wayland checks and 19 synthetic OpenXR checks each in software Release and
-Arc with ASan/UBSan. Retained prepared-field Bake and physical controls
+Arc with ASan/UBSan. Retained native and prepared Core PBR donor fields now
+bake using their original coordinates, normal frames and FLOAT emission.
+Mixed projects with retained fields and plain recipes reopen exactly.
+Retained writable targets, generalized source placement and physical controls
 remain open. The original software sanitizer leak remains in the evidence.
 [Texture-set recipe evidence](validation/texture-set-bake-recipe-20261126.json)
 [Combined runtime evidence](validation/texture-set-recipe-runtime-20261126.json)
 [Active-set Bake evidence](validation/active-texture-set-bake-20261126.json)
+[Retained-source Bake evidence](validation/retained-texture-set-bake-source-20261126.json)
 
 ## Qualified integration — 2026-11-17
 
