@@ -1,0 +1,181 @@
+{
+  "combined_replay": {
+    "software-release": {
+      "candidate": "5c977be9be8d90f0a6ada3ef34df9d4d27769209",
+      "app_source": "5c977be9be8d90f0a6ada3ef34df9d4d27769209",
+      "invocation": "b75d72cef9614755958e325e3c075b36",
+      "profile": "software-release",
+      "terminal": true,
+      "phase": "complete",
+      "elapsed_seconds": 82.87,
+      "app_sha256": "c54aab6e5b4ff70e2eaf4ed1b938b2e54121f2c5e4264d30045863fb633b1c08",
+      "runtime_sha256": "e00b86390634f4c3e97694a50553e0364db6b3379153fd912a1c3f9d81027026",
+      "runner_sha256": "943e4655951793a8552358db79c1634246fef9ec41f8b2b4e1c8c8ef1b7fa3d3",
+      "exit": 0,
+      "loader_exit": 0,
+      "checks": 153,
+      "report_complete": true,
+      "error": null,
+      "arc_witnesses": {},
+      "voxel": {
+        "exact_native_bytes": true,
+        "voxel_menu_pixels": 9884,
+        "voxel_menu_seen": true,
+        "voxel_open_pixels": 172,
+        "voxel_undo_pixels": 196,
+        "voxel_undo_seen": true
+      },
+      "uv": {
+        "uv_atlas_apply_accent": 207,
+        "uv_atlas_ready": true,
+        "uv_atlas_visible_pixels": 4994,
+        "uv_atlas_wait_frames": 1
+      }
+    },
+    "arc-asan": {
+      "candidate": "5c977be9be8d90f0a6ada3ef34df9d4d27769209",
+      "app_source": "5c977be9be8d90f0a6ada3ef34df9d4d27769209",
+      "invocation": "081fadd651474ec0bbc80cd3b047841c",
+      "profile": "arc-asan",
+      "terminal": true,
+      "phase": "complete",
+      "elapsed_seconds": 245.05,
+      "app_sha256": "60af079b03dc31751d7ca3f1b4aa3615777e18a7450b39b000aabc73a604f1f8",
+      "runtime_sha256": "b6c9a9212553e499914d6abad35afe5937b52b7f6e556a10a72d02e29ecdb0d8",
+      "runner_sha256": "60869bf047e814c1b3aec9e5281bde4f62b466883ab1c95af5295459e98849cb",
+      "exit": 0,
+      "loader_exit": 0,
+      "checks": 153,
+      "report_complete": true,
+      "error": null,
+      "voxel": {
+        "exact_native_bytes": true,
+        "voxel_menu_pixels": 10141,
+        "voxel_menu_reopens": 1,
+        "voxel_menu_seen": true,
+        "voxel_open_pixels": 172,
+        "voxel_undo_pixels": 131,
+        "voxel_undo_seen": true,
+        "voxel_undo_wait_frames": 74
+      },
+      "uv": {
+        "uv_atlas_apply_accent": 207,
+        "uv_atlas_ready": true,
+        "uv_atlas_visible_pixels": 4997,
+        "uv_atlas_wait_frames": 23
+      },
+      "arc_witness_count": 40
+    }
+  },
+  "independent_glb": {
+    "source": "5c977be9be8d90f0a6ada3ef34df9d4d27769209",
+    "terminal": true,
+    "validator": "2.0.0-dev.3.10",
+    "results": [
+      {
+        "profile": "software-release",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/combined-atlas-hdr-preview-validation-20261126/software-release/workflow/projects-1hcnkyn_/state/dome-sculpt/Recovery-819.glb",
+        "sha256": "22200865cba16ae30ca9b64781d4d7203fc9307a55f48b28298d6402866171c6",
+        "bytes": 598708,
+        "issues": {
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 1,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+            }
+          ],
+          "truncated": false
+        },
+        "app": "c54aab6e5b4ff70e2eaf4ed1b938b2e54121f2c5e4264d30045863fb633b1c08"
+      },
+      {
+        "profile": "arc-asan",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/combined-atlas-hdr-preview-validation-20261126/arc-asan/workflow/projects-ybbgepdv/state/dome-sculpt/Recovery-931.glb",
+        "sha256": "22200865cba16ae30ca9b64781d4d7203fc9307a55f48b28298d6402866171c6",
+        "bytes": 598708,
+        "issues": {
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 1,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+            }
+          ],
+          "truncated": false
+        },
+        "app": "60af079b03dc31751d7ca3f1b4aa3615777e18a7450b39b000aabc73a604f1f8"
+      }
+    ],
+    "identical_exports": true,
+    "exit": 0
+  },
+  "main_rendered_controls": {
+    "candidate": "518a1d895419e037cba752ad7c87b752c7835a53",
+    "app_source": "66d31263a3f5877dc0b22c96cffa54f7a41c02ec",
+    "invocation": "5ea281d4fe32460bbc7885822f1c5cca",
+    "profile": "software-release",
+    "terminal": true,
+    "phase": "complete",
+    "elapsed_seconds": 83.5,
+    "app_sha256": "77e9f3be9c54cc49180db8039f572cbeb44250862191adf2a36062acc16b48af",
+    "runtime_sha256": "e00b86390634f4c3e97694a50553e0364db6b3379153fd912a1c3f9d81027026",
+    "runner_sha256": "943e4655951793a8552358db79c1634246fef9ec41f8b2b4e1c8c8ef1b7fa3d3",
+    "exit": 0,
+    "loader_exit": 0,
+    "checks": 153,
+    "report_complete": true,
+    "error": null,
+    "arc_witnesses": {},
+    "voxel": {
+      "exact_native_bytes": true,
+      "voxel_menu_pixels": 9884,
+      "voxel_menu_seen": true,
+      "voxel_open_pixels": 172,
+      "voxel_undo_pixels": 196,
+      "voxel_undo_seen": true
+    },
+    "uv": {
+      "uv_atlas_apply_accent": 207,
+      "uv_atlas_ready": true,
+      "uv_atlas_visible_pixels": 4994,
+      "uv_atlas_wait_frames": 1
+    },
+    "active_color": [
+      0.04000004380941391,
+      0.12000001966953278,
+      0.800000011920929,
+      1.0
+    ],
+    "scene_sha256": "5db8d7615ba86ecd2f47db1b49d91d6400e9d890588acfc40411f5a90fb8b8cf",
+    "objects": 2
+  },
+  "combined_merge_candidate": {
+    "merge": "4f083e6e5801d32c3e0b036ae5d3a92abd441d46",
+    "validated": "5c977be9be8d90f0a6ada3ef34df9d4d27769209",
+    "identical_paths": [
+      "src",
+      "include",
+      "tests",
+      "third_party",
+      "assets",
+      "tools",
+      "CMakeLists.txt"
+    ]
+  },
+  "archive": {
+    "path": "docs/validation/combined-atlas-hdr-openxr-20261126.tar.gz",
+    "sha256": "fbea1894cb4026f2aefcb068a2d953fd408d6f0c2e1cb935e34c32f0a8d03d11",
+    "members": 14
+  }
+}

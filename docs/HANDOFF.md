@@ -977,14 +977,26 @@ The main-based atlas port `66d31263` passes six native cases in both
 profiles. Its software XR replay stops at the existing fixture's material
 menu assertion after 48 checks. The prior main build fails the same
 assertion with the same 48 passes and a byte-identical scene. Main
-includes the atlas port. Its material-menu fixture still needs the
-rendered control replay already qualified on the combined branch.
+includes the atlas port. Its new replay `518a1d89` observes the rendered
+Materials page and RGB sliders, uses separate ray gestures, and checks the
+exact saved RGB values. The same main app binary now passes all 153
+software checks and saves a second object with RGB `0.04, 0.12, 0.80`.
+This changes only the test fixture and the exact skin Restore oracle.
+The main Arc sanitizer replay is running.
 
 Candidate `5c977be9` combines the exact qualified atlas source with the
-matching full HDR preview cache source. Its optimized software and
-Arc ASan/UBSan suites are running with the current DomeD toolkit.
+matching full HDR preview cache source. Its full software Release and
+Arc ASan/UBSan replays both pass 153 checks under the original deadlines.
+Both produce the same GLB byte for byte. Khronos glTF Validator reports
+zero errors and zero warnings on both files. Integration merge
+`4f083e6e` preserves main's history, the later mapped-emission evidence
+and the exact combined sources, assets, tooling and tests. A clean whole
+Release build and the 1,360-case private run are in progress against the
+combined source. Full-size native HDR history and nested DomeD Wayland
+replays remain in progress.
 [Preview and integration evidence](validation/hdr-preview-composite-20261126.json)
 [Cache and Arc rerun evidence](validation/atlas-grid-hdr-history-20261126.json)
+[Combined OpenXR and independent GLB evidence](validation/combined-atlas-hdr-openxr-20261126.json)
 
 ## Source and integration boundary
 
