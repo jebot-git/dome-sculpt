@@ -1,0 +1,958 @@
+{
+  "scope": "Actual Release preflight of independent full2048 native/oracle/Document-history groups on exact original strict inputs; source9ee test-only, product725. Not full strict/App/display admission and not a replacement of original strict900deadlinefailure.",
+  "product_source": "725ea10032981e28c7edb0c1ffdd5689e4a3ad32",
+  "fixture_source": "9ee166d43999f8006514247f3e227c99c8ffda31",
+  "invocation": "b8cdf08b070b4625a85f290f288608ee",
+  "phase_controls": 59725,
+  "controls_note": "Common controls repeated across independent phases; not a count of new unique functional tests or a new original47409 result.",
+  "status": {
+    "terminal": true,
+    "exit": 0,
+    "started": 1795665517.9678855,
+    "steps": [
+      {
+        "name": "native",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-strict-groups-build-v3-20261126/release/dome-sculpt-source-hdr-strict-phases-test",
+          "--native",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-projection-sharing-sanitize-20261126/native-sanitize-current-v1/current2048/selected-target-resolution.dsculpt",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-projection-sharing-sanitize-20261126/native-sanitize-current-v1/current2048/observed-source.json",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-strict-groups-build-v3-20261126/native-release-groups-v1/native"
+        ],
+        "started": 1795665522.2406616,
+        "timeout_seconds": 900,
+        "RSS_limit_bytes": 4294967296,
+        "virtual_AS_cap": null,
+        "signals": [],
+        "peak_owned_RSS_bytes": 1153134592,
+        "known_processes": [
+          {
+            "pid": 3825474,
+            "start": 84344730,
+            "pgrp": 3825474,
+            "state": "R"
+          }
+        ],
+        "pid": 3825474,
+        "root": {
+          "pid": 3825474,
+          "start": 84344730,
+          "pgrp": 3825474,
+          "state": "R"
+        },
+        "cpu_no_graphics_samples": 4241,
+        "actual_ELF": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-strict-groups-build-v3-20261126/release/dome-sculpt-source-hdr-strict-phases-test",
+          "sha256": "8979dc57cc75ba1e930a1ceea6322280c9205a0c5b4e5b688b01d2d431b87188",
+          "live_maps": true,
+          "live_sanitizers": false
+        },
+        "exit": 0,
+        "seconds": 44.98820376396179,
+        "survivors": [],
+        "actual_mapped_providers": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-strict-groups-build-v3-20261126/release/dome-sculpt-source-hdr-strict-phases-test": "8979dc57cc75ba1e930a1ceea6322280c9205a0c5b4e5b688b01d2d431b87188",
+          "/usr/lib64/libstdc++.so.6.0.36": "49811507d8fc0283d8f8023546613774c673f876fe823b1b99d0c8d46039deda",
+          "/usr/lib64/libOpenEXRCore-3_2.so.31.3.2.4": "bc6775af6f33d58d41f20e714d80db4b0fd21209796a6694cb5249739a49a331",
+          "/usr/lib64/libImath-3_1.so.29.11.0": "1e86ce61e14061369bd937b73d53abb69305dff34df4700f99a459f5c024ab45",
+          "/usr/lib64/libOpenEXR-3_2.so.31.3.2.4": "efdbbe75b27b6a50e4a8e028e008fde32befa53280295e21ef6f036350225769",
+          "/usr/lib64/libIex-3_2.so.31.3.2.4": "da965da4711be1158555d457dc6ff17582ec88c1b86d98edc69f09cdcc4f6c7a",
+          "/usr/lib64/liblapacke.so.3.12.0": "4e74d393b6f5f294cbd96b777da8be3ada9995b1da98aaa0c1eb5fea4b294c7c",
+          "/usr/lib64/libgcc_s-16-20261029.so.1": "5a52ae4a6f1b119aa092aa1483c967e19d9ba036b1b0c2133236a8a2ce826ebf",
+          "/usr/lib64/libIlmThread-3_2.so.31.3.2.4": "424321e69eb6257387820baa90e4fccb209c5dcb8c88589a8c5e1ccf4d4c23d6",
+          "/usr/lib64/libOpenEXRUtil-3_2.so.31.3.2.4": "bafa0a2cb708d3ae952987c013d96e992badbb742e1a8e4fac6605c7eae5b5a0",
+          "/usr/lib64/libz.so.1.3.1.zlib-ng": "bbde8faec092a7c67b8bd76bbba4a826e61b05c171b97004ce6b308c5a090351",
+          "/usr/lib64/libjpeg.so.62.4.0": "beb79376b4544260da3c31603784c908b58bdb959cbe1d8c48075dfa7d5bc80c",
+          "/usr/lib64/libpng16.so.16.59.0": "536a1ed876bffe5a7e9204aae387d4da2d4a969bf716bbcf4a03c30a8dea0cde",
+          "/usr/lib64/libEGL.so.1.1.0": "76ffc090b8990696d028e7d1bc82606c564565fb05d2fa9e5f6122b61e9f1b60",
+          "/usr/lib64/libOpenGL.so.0.0.0": "07a014ea0624d5d9711f941fb0401a203c2025b683d34897bd1b261a32a83d69",
+          "/usr/lib64/ld-linux-x86-64.so.2": "4e5d39355699e90fa29313d3100e82af4a23290028c58c364d6a249ef6a78e5e"
+        },
+        "actual_checks": 43280
+      },
+      {
+        "name": "oracle0",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-strict-groups-build-v3-20261126/release/dome-sculpt-source-hdr-strict-phases-test",
+          "--oracle",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-strict-groups-build-v3-20261126/native-release-groups-v1/native/accepted.dsculpt",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-projection-sharing-sanitize-20261126/native-sanitize-current-v1/current2048/observed-source.json",
+          "0",
+          "4",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-strict-groups-build-v3-20261126/native-release-groups-v1/oracle0"
+        ],
+        "started": 1795665567.5335376,
+        "timeout_seconds": 900,
+        "RSS_limit_bytes": 4294967296,
+        "virtual_AS_cap": null,
+        "signals": [],
+        "peak_owned_RSS_bytes": 1192095744,
+        "known_processes": [
+          {
+            "pid": 3831749,
+            "start": 84349259,
+            "pgrp": 3831749,
+            "state": "R"
+          }
+        ],
+        "pid": 3831749,
+        "root": {
+          "pid": 3831749,
+          "start": 84349259,
+          "pgrp": 3831749,
+          "state": "R"
+        },
+        "cpu_no_graphics_samples": 2918,
+        "actual_ELF": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-strict-groups-build-v3-20261126/release/dome-sculpt-source-hdr-strict-phases-test",
+          "sha256": "8979dc57cc75ba1e930a1ceea6322280c9205a0c5b4e5b688b01d2d431b87188",
+          "live_maps": true,
+          "live_sanitizers": false
+        },
+        "exit": 0,
+        "seconds": 31.081438064575195,
+        "survivors": [],
+        "actual_mapped_providers": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-strict-groups-build-v3-20261126/release/dome-sculpt-source-hdr-strict-phases-test": "8979dc57cc75ba1e930a1ceea6322280c9205a0c5b4e5b688b01d2d431b87188",
+          "/usr/lib64/libgfortran.so.5.0.0": "d4b3a93cbd67561c5febd49d7bd035796d3b2b03a8d659d7ddf869321173f186",
+          "/usr/lib64/liblapack.so.3.12.0": "10c786e4517845cac86595b22fd7d40b548bf328cbf7bf14c867b0c31e20661f",
+          "/usr/lib64/libmvec.so.1": "82ddf7efbb88b2eaf5570fa6c0ec41565d9c32a2dbd095200ceead862af0f3dc",
+          "/usr/lib64/libc.so.6": "a5c5ad9d59d3c69eda93aa8f82930ba06cc4e893a113e66c85ad6e96243d53c8",
+          "/usr/lib64/libstdc++.so.6.0.36": "49811507d8fc0283d8f8023546613774c673f876fe823b1b99d0c8d46039deda",
+          "/usr/lib64/libblas.so.3.12.0": "df2686da50030c23198f485115b84df323352325abb18a949515736e8f57b2f4",
+          "/usr/lib64/libOpenEXRCore-3_2.so.31.3.2.4": "bc6775af6f33d58d41f20e714d80db4b0fd21209796a6694cb5249739a49a331",
+          "/usr/lib64/libdeflate.so.0": "fee24c7738e4c31860f65fa43c862f572cdf4cd2ffcc30e5cd8bf1d46346b318",
+          "/usr/lib64/libtmglib.so.3.12.0": "e497c25e923336dc4d95b2822f0845667ab113b985e8e7d16eadaf0379cdac87",
+          "/usr/lib64/libm.so.6": "16a03ce6d24c8a46742206d4a9c1d35bb6577ae2384f153dc6ef4a4b62b5357f",
+          "/usr/lib64/libOpenEXR-3_2.so.31.3.2.4": "efdbbe75b27b6a50e4a8e028e008fde32befa53280295e21ef6f036350225769",
+          "/usr/lib64/libGLdispatch.so.0.0.0": "3c53e14fb731128afe1fa1c88e94944fe9a60cbe170f2e08c1134b709d771ec7",
+          "/usr/lib64/libgcc_s-16-20261029.so.1": "5a52ae4a6f1b119aa092aa1483c967e19d9ba036b1b0c2133236a8a2ce826ebf",
+          "/usr/lib64/libImath-3_1.so.29.11.0": "1e86ce61e14061369bd937b73d53abb69305dff34df4700f99a459f5c024ab45",
+          "/usr/lib64/libIex-3_2.so.31.3.2.4": "da965da4711be1158555d457dc6ff17582ec88c1b86d98edc69f09cdcc4f6c7a",
+          "/usr/lib64/libOpenEXRUtil-3_2.so.31.3.2.4": "bafa0a2cb708d3ae952987c013d96e992badbb742e1a8e4fac6605c7eae5b5a0",
+          "/usr/lib64/libz.so.1.3.1.zlib-ng": "bbde8faec092a7c67b8bd76bbba4a826e61b05c171b97004ce6b308c5a090351",
+          "/usr/lib64/libjpeg.so.62.4.0": "beb79376b4544260da3c31603784c908b58bdb959cbe1d8c48075dfa7d5bc80c",
+          "/usr/lib64/libpng16.so.16.59.0": "536a1ed876bffe5a7e9204aae387d4da2d4a969bf716bbcf4a03c30a8dea0cde",
+          "/usr/lib64/liblapacke.so.3.12.0": "4e74d393b6f5f294cbd96b777da8be3ada9995b1da98aaa0c1eb5fea4b294c7c",
+          "/usr/lib64/libIlmThread-3_2.so.31.3.2.4": "424321e69eb6257387820baa90e4fccb209c5dcb8c88589a8c5e1ccf4d4c23d6",
+          "/usr/lib64/libEGL.so.1.1.0": "76ffc090b8990696d028e7d1bc82606c564565fb05d2fa9e5f6122b61e9f1b60",
+          "/usr/lib64/libOpenGL.so.0.0.0": "07a014ea0624d5d9711f941fb0401a203c2025b683d34897bd1b261a32a83d69",
+          "/usr/lib64/ld-linux-x86-64.so.2": "4e5d39355699e90fa29313d3100e82af4a23290028c58c364d6a249ef6a78e5e"
+        },
+        "actual_checks": 4109
+      },
+      {
+        "name": "oracle1",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-strict-groups-build-v3-20261126/release/dome-sculpt-source-hdr-strict-phases-test",
+          "--oracle",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-strict-groups-build-v3-20261126/native-release-groups-v1/native/accepted.dsculpt",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-projection-sharing-sanitize-20261126/native-sanitize-current-v1/current2048/observed-source.json",
+          "1",
+          "4",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-strict-groups-build-v3-20261126/native-release-groups-v1/oracle1"
+        ],
+        "started": 1795665598.849035,
+        "timeout_seconds": 900,
+        "RSS_limit_bytes": 4294967296,
+        "virtual_AS_cap": null,
+        "signals": [],
+        "peak_owned_RSS_bytes": 1192189952,
+        "known_processes": [
+          {
+            "pid": 3835886,
+            "start": 84352391,
+            "pgrp": 3835886,
+            "state": "R"
+          }
+        ],
+        "pid": 3835886,
+        "root": {
+          "pid": 3835886,
+          "start": 84352391,
+          "pgrp": 3835886,
+          "state": "R"
+        },
+        "cpu_no_graphics_samples": 2908,
+        "actual_ELF": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-strict-groups-build-v3-20261126/release/dome-sculpt-source-hdr-strict-phases-test",
+          "sha256": "8979dc57cc75ba1e930a1ceea6322280c9205a0c5b4e5b688b01d2d431b87188",
+          "live_maps": true,
+          "live_sanitizers": false
+        },
+        "exit": 0,
+        "seconds": 31.05027174949646,
+        "survivors": [],
+        "actual_mapped_providers": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-strict-groups-build-v3-20261126/release/dome-sculpt-source-hdr-strict-phases-test": "8979dc57cc75ba1e930a1ceea6322280c9205a0c5b4e5b688b01d2d431b87188",
+          "/usr/lib64/libgfortran.so.5.0.0": "d4b3a93cbd67561c5febd49d7bd035796d3b2b03a8d659d7ddf869321173f186",
+          "/usr/lib64/libmvec.so.1": "82ddf7efbb88b2eaf5570fa6c0ec41565d9c32a2dbd095200ceead862af0f3dc",
+          "/usr/lib64/liblapack.so.3.12.0": "10c786e4517845cac86595b22fd7d40b548bf328cbf7bf14c867b0c31e20661f",
+          "/usr/lib64/libblas.so.3.12.0": "df2686da50030c23198f485115b84df323352325abb18a949515736e8f57b2f4",
+          "/usr/lib64/libtmglib.so.3.12.0": "e497c25e923336dc4d95b2822f0845667ab113b985e8e7d16eadaf0379cdac87",
+          "/usr/lib64/libc.so.6": "a5c5ad9d59d3c69eda93aa8f82930ba06cc4e893a113e66c85ad6e96243d53c8",
+          "/usr/lib64/libstdc++.so.6.0.36": "49811507d8fc0283d8f8023546613774c673f876fe823b1b99d0c8d46039deda",
+          "/usr/lib64/libm.so.6": "16a03ce6d24c8a46742206d4a9c1d35bb6577ae2384f153dc6ef4a4b62b5357f",
+          "/usr/lib64/libOpenEXRCore-3_2.so.31.3.2.4": "bc6775af6f33d58d41f20e714d80db4b0fd21209796a6694cb5249739a49a331",
+          "/usr/lib64/libGLdispatch.so.0.0.0": "3c53e14fb731128afe1fa1c88e94944fe9a60cbe170f2e08c1134b709d771ec7",
+          "/usr/lib64/libgcc_s-16-20261029.so.1": "5a52ae4a6f1b119aa092aa1483c967e19d9ba036b1b0c2133236a8a2ce826ebf",
+          "/usr/lib64/libImath-3_1.so.29.11.0": "1e86ce61e14061369bd937b73d53abb69305dff34df4700f99a459f5c024ab45",
+          "/usr/lib64/libIex-3_2.so.31.3.2.4": "da965da4711be1158555d457dc6ff17582ec88c1b86d98edc69f09cdcc4f6c7a",
+          "/usr/lib64/libOpenEXRUtil-3_2.so.31.3.2.4": "bafa0a2cb708d3ae952987c013d96e992badbb742e1a8e4fac6605c7eae5b5a0",
+          "/usr/lib64/libOpenEXR-3_2.so.31.3.2.4": "efdbbe75b27b6a50e4a8e028e008fde32befa53280295e21ef6f036350225769",
+          "/usr/lib64/libdeflate.so.0": "fee24c7738e4c31860f65fa43c862f572cdf4cd2ffcc30e5cd8bf1d46346b318",
+          "/usr/lib64/libjpeg.so.62.4.0": "beb79376b4544260da3c31603784c908b58bdb959cbe1d8c48075dfa7d5bc80c",
+          "/usr/lib64/liblapacke.so.3.12.0": "4e74d393b6f5f294cbd96b777da8be3ada9995b1da98aaa0c1eb5fea4b294c7c",
+          "/usr/lib64/libIlmThread-3_2.so.31.3.2.4": "424321e69eb6257387820baa90e4fccb209c5dcb8c88589a8c5e1ccf4d4c23d6",
+          "/usr/lib64/libz.so.1.3.1.zlib-ng": "bbde8faec092a7c67b8bd76bbba4a826e61b05c171b97004ce6b308c5a090351",
+          "/usr/lib64/libpng16.so.16.59.0": "536a1ed876bffe5a7e9204aae387d4da2d4a969bf716bbcf4a03c30a8dea0cde",
+          "/usr/lib64/libEGL.so.1.1.0": "76ffc090b8990696d028e7d1bc82606c564565fb05d2fa9e5f6122b61e9f1b60",
+          "/usr/lib64/libOpenGL.so.0.0.0": "07a014ea0624d5d9711f941fb0401a203c2025b683d34897bd1b261a32a83d69",
+          "/usr/lib64/ld-linux-x86-64.so.2": "4e5d39355699e90fa29313d3100e82af4a23290028c58c364d6a249ef6a78e5e"
+        },
+        "actual_checks": 4109
+      },
+      {
+        "name": "oracle2",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-strict-groups-build-v3-20261126/release/dome-sculpt-source-hdr-strict-phases-test",
+          "--oracle",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-strict-groups-build-v3-20261126/native-release-groups-v1/native/accepted.dsculpt",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-projection-sharing-sanitize-20261126/native-sanitize-current-v1/current2048/observed-source.json",
+          "2",
+          "4",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-strict-groups-build-v3-20261126/native-release-groups-v1/oracle2"
+        ],
+        "started": 1795665630.1120033,
+        "timeout_seconds": 900,
+        "RSS_limit_bytes": 4294967296,
+        "virtual_AS_cap": null,
+        "signals": [],
+        "peak_owned_RSS_bytes": 1192235008,
+        "known_processes": [
+          {
+            "pid": 3843231,
+            "start": 84355517,
+            "pgrp": 3843231,
+            "state": "R"
+          }
+        ],
+        "pid": 3843231,
+        "root": {
+          "pid": 3843231,
+          "start": 84355517,
+          "pgrp": 3843231,
+          "state": "R"
+        },
+        "cpu_no_graphics_samples": 2781,
+        "actual_ELF": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-strict-groups-build-v3-20261126/release/dome-sculpt-source-hdr-strict-phases-test",
+          "sha256": "8979dc57cc75ba1e930a1ceea6322280c9205a0c5b4e5b688b01d2d431b87188",
+          "live_maps": true,
+          "live_sanitizers": false
+        },
+        "exit": 0,
+        "seconds": 29.577032804489136,
+        "survivors": [],
+        "actual_mapped_providers": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-strict-groups-build-v3-20261126/release/dome-sculpt-source-hdr-strict-phases-test": "8979dc57cc75ba1e930a1ceea6322280c9205a0c5b4e5b688b01d2d431b87188",
+          "/usr/lib64/libc.so.6": "a5c5ad9d59d3c69eda93aa8f82930ba06cc4e893a113e66c85ad6e96243d53c8",
+          "/usr/lib64/libstdc++.so.6.0.36": "49811507d8fc0283d8f8023546613774c673f876fe823b1b99d0c8d46039deda",
+          "/usr/lib64/libGLdispatch.so.0.0.0": "3c53e14fb731128afe1fa1c88e94944fe9a60cbe170f2e08c1134b709d771ec7",
+          "/usr/lib64/libOpenEXRCore-3_2.so.31.3.2.4": "bc6775af6f33d58d41f20e714d80db4b0fd21209796a6694cb5249739a49a331",
+          "/usr/lib64/libm.so.6": "16a03ce6d24c8a46742206d4a9c1d35bb6577ae2384f153dc6ef4a4b62b5357f",
+          "/usr/lib64/libgcc_s-16-20261029.so.1": "5a52ae4a6f1b119aa092aa1483c967e19d9ba036b1b0c2133236a8a2ce826ebf",
+          "/usr/lib64/libIex-3_2.so.31.3.2.4": "da965da4711be1158555d457dc6ff17582ec88c1b86d98edc69f09cdcc4f6c7a",
+          "/usr/lib64/libOpenEXR-3_2.so.31.3.2.4": "efdbbe75b27b6a50e4a8e028e008fde32befa53280295e21ef6f036350225769",
+          "/usr/lib64/libImath-3_1.so.29.11.0": "1e86ce61e14061369bd937b73d53abb69305dff34df4700f99a459f5c024ab45",
+          "/usr/lib64/libOpenEXRUtil-3_2.so.31.3.2.4": "bafa0a2cb708d3ae952987c013d96e992badbb742e1a8e4fac6605c7eae5b5a0",
+          "/usr/lib64/libz.so.1.3.1.zlib-ng": "bbde8faec092a7c67b8bd76bbba4a826e61b05c171b97004ce6b308c5a090351",
+          "/usr/lib64/liblapacke.so.3.12.0": "4e74d393b6f5f294cbd96b777da8be3ada9995b1da98aaa0c1eb5fea4b294c7c",
+          "/usr/lib64/libIlmThread-3_2.so.31.3.2.4": "424321e69eb6257387820baa90e4fccb209c5dcb8c88589a8c5e1ccf4d4c23d6",
+          "/usr/lib64/libjpeg.so.62.4.0": "beb79376b4544260da3c31603784c908b58bdb959cbe1d8c48075dfa7d5bc80c",
+          "/usr/lib64/libpng16.so.16.59.0": "536a1ed876bffe5a7e9204aae387d4da2d4a969bf716bbcf4a03c30a8dea0cde",
+          "/usr/lib64/libEGL.so.1.1.0": "76ffc090b8990696d028e7d1bc82606c564565fb05d2fa9e5f6122b61e9f1b60",
+          "/usr/lib64/libOpenGL.so.0.0.0": "07a014ea0624d5d9711f941fb0401a203c2025b683d34897bd1b261a32a83d69",
+          "/usr/lib64/ld-linux-x86-64.so.2": "4e5d39355699e90fa29313d3100e82af4a23290028c58c364d6a249ef6a78e5e"
+        },
+        "actual_checks": 4109
+      },
+      {
+        "name": "oracle3",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-strict-groups-build-v3-20261126/release/dome-sculpt-source-hdr-strict-phases-test",
+          "--oracle",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-strict-groups-build-v3-20261126/native-release-groups-v1/native/accepted.dsculpt",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-projection-sharing-sanitize-20261126/native-sanitize-current-v1/current2048/observed-source.json",
+          "3",
+          "4",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-strict-groups-build-v3-20261126/native-release-groups-v1/oracle3"
+        ],
+        "started": 1795665659.851988,
+        "timeout_seconds": 900,
+        "RSS_limit_bytes": 4294967296,
+        "virtual_AS_cap": null,
+        "signals": [],
+        "peak_owned_RSS_bytes": 1192255488,
+        "known_processes": [
+          {
+            "pid": 3847365,
+            "start": 84358491,
+            "pgrp": 3847365,
+            "state": "R"
+          }
+        ],
+        "pid": 3847365,
+        "root": {
+          "pid": 3847365,
+          "start": 84358491,
+          "pgrp": 3847365,
+          "state": "R"
+        },
+        "cpu_no_graphics_samples": 2689,
+        "actual_ELF": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-strict-groups-build-v3-20261126/release/dome-sculpt-source-hdr-strict-phases-test",
+          "sha256": "8979dc57cc75ba1e930a1ceea6322280c9205a0c5b4e5b688b01d2d431b87188",
+          "live_maps": true,
+          "live_sanitizers": false
+        },
+        "exit": 0,
+        "seconds": 28.579155683517456,
+        "survivors": [],
+        "actual_mapped_providers": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-strict-groups-build-v3-20261126/release/dome-sculpt-source-hdr-strict-phases-test": "8979dc57cc75ba1e930a1ceea6322280c9205a0c5b4e5b688b01d2d431b87188",
+          "/usr/lib64/libgfortran.so.5.0.0": "d4b3a93cbd67561c5febd49d7bd035796d3b2b03a8d659d7ddf869321173f186",
+          "/usr/lib64/libmvec.so.1": "82ddf7efbb88b2eaf5570fa6c0ec41565d9c32a2dbd095200ceead862af0f3dc",
+          "/usr/lib64/liblapack.so.3.12.0": "10c786e4517845cac86595b22fd7d40b548bf328cbf7bf14c867b0c31e20661f",
+          "/usr/lib64/libblas.so.3.12.0": "df2686da50030c23198f485115b84df323352325abb18a949515736e8f57b2f4",
+          "/usr/lib64/libc.so.6": "a5c5ad9d59d3c69eda93aa8f82930ba06cc4e893a113e66c85ad6e96243d53c8",
+          "/usr/lib64/libstdc++.so.6.0.36": "49811507d8fc0283d8f8023546613774c673f876fe823b1b99d0c8d46039deda",
+          "/usr/lib64/libdeflate.so.0": "fee24c7738e4c31860f65fa43c862f572cdf4cd2ffcc30e5cd8bf1d46346b318",
+          "/usr/lib64/libGLdispatch.so.0.0.0": "3c53e14fb731128afe1fa1c88e94944fe9a60cbe170f2e08c1134b709d771ec7",
+          "/usr/lib64/libOpenEXRCore-3_2.so.31.3.2.4": "bc6775af6f33d58d41f20e714d80db4b0fd21209796a6694cb5249739a49a331",
+          "/usr/lib64/libtmglib.so.3.12.0": "e497c25e923336dc4d95b2822f0845667ab113b985e8e7d16eadaf0379cdac87",
+          "/usr/lib64/libm.so.6": "16a03ce6d24c8a46742206d4a9c1d35bb6577ae2384f153dc6ef4a4b62b5357f",
+          "/usr/lib64/libImath-3_1.so.29.11.0": "1e86ce61e14061369bd937b73d53abb69305dff34df4700f99a459f5c024ab45",
+          "/usr/lib64/libOpenEXR-3_2.so.31.3.2.4": "efdbbe75b27b6a50e4a8e028e008fde32befa53280295e21ef6f036350225769",
+          "/usr/lib64/libgcc_s-16-20261029.so.1": "5a52ae4a6f1b119aa092aa1483c967e19d9ba036b1b0c2133236a8a2ce826ebf",
+          "/usr/lib64/libIlmThread-3_2.so.31.3.2.4": "424321e69eb6257387820baa90e4fccb209c5dcb8c88589a8c5e1ccf4d4c23d6",
+          "/usr/lib64/libIex-3_2.so.31.3.2.4": "da965da4711be1158555d457dc6ff17582ec88c1b86d98edc69f09cdcc4f6c7a",
+          "/usr/lib64/liblapacke.so.3.12.0": "4e74d393b6f5f294cbd96b777da8be3ada9995b1da98aaa0c1eb5fea4b294c7c",
+          "/usr/lib64/libOpenEXRUtil-3_2.so.31.3.2.4": "bafa0a2cb708d3ae952987c013d96e992badbb742e1a8e4fac6605c7eae5b5a0",
+          "/usr/lib64/libz.so.1.3.1.zlib-ng": "bbde8faec092a7c67b8bd76bbba4a826e61b05c171b97004ce6b308c5a090351",
+          "/usr/lib64/libjpeg.so.62.4.0": "beb79376b4544260da3c31603784c908b58bdb959cbe1d8c48075dfa7d5bc80c",
+          "/usr/lib64/libpng16.so.16.59.0": "536a1ed876bffe5a7e9204aae387d4da2d4a969bf716bbcf4a03c30a8dea0cde",
+          "/usr/lib64/libEGL.so.1.1.0": "76ffc090b8990696d028e7d1bc82606c564565fb05d2fa9e5f6122b61e9f1b60",
+          "/usr/lib64/libOpenGL.so.0.0.0": "07a014ea0624d5d9711f941fb0401a203c2025b683d34897bd1b261a32a83d69",
+          "/usr/lib64/ld-linux-x86-64.so.2": "4e5d39355699e90fa29313d3100e82af4a23290028c58c364d6a249ef6a78e5e"
+        },
+        "actual_checks": 4109
+      },
+      {
+        "name": "endpoint",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-strict-groups-build-v3-20261126/release/dome-sculpt-source-hdr-strict-phases-test",
+          "--endpoint",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-projection-sharing-sanitize-20261126/native-sanitize-current-v1/current2048/selected-target-resolution.dsculpt",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-strict-groups-build-v3-20261126/native-release-groups-v1/native/accepted.dsculpt",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-projection-sharing-sanitize-20261126/native-sanitize-current-v1/current2048/observed-source.json",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-strict-groups-build-v3-20261126/native-release-groups-v1/endpoint"
+        ],
+        "started": 1795665688.6387568,
+        "timeout_seconds": 900,
+        "RSS_limit_bytes": 4294967296,
+        "virtual_AS_cap": null,
+        "signals": [],
+        "peak_owned_RSS_bytes": 2175569920,
+        "known_processes": [
+          {
+            "pid": 3851018,
+            "start": 84361370,
+            "pgrp": 3851018,
+            "state": "R"
+          }
+        ],
+        "pid": 3851018,
+        "root": {
+          "pid": 3851018,
+          "start": 84361370,
+          "pgrp": 3851018,
+          "state": "R"
+        },
+        "cpu_no_graphics_samples": 9789,
+        "actual_ELF": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-strict-groups-build-v3-20261126/release/dome-sculpt-source-hdr-strict-phases-test",
+          "sha256": "8979dc57cc75ba1e930a1ceea6322280c9205a0c5b4e5b688b01d2d431b87188",
+          "live_maps": true,
+          "live_sanitizers": false
+        },
+        "exit": 0,
+        "seconds": 105.39444875717163,
+        "survivors": [],
+        "actual_mapped_providers": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-strict-groups-build-v3-20261126/release/dome-sculpt-source-hdr-strict-phases-test": "8979dc57cc75ba1e930a1ceea6322280c9205a0c5b4e5b688b01d2d431b87188",
+          "/usr/lib64/libgfortran.so.5.0.0": "d4b3a93cbd67561c5febd49d7bd035796d3b2b03a8d659d7ddf869321173f186",
+          "/usr/lib64/libmvec.so.1": "82ddf7efbb88b2eaf5570fa6c0ec41565d9c32a2dbd095200ceead862af0f3dc",
+          "/usr/lib64/liblapack.so.3.12.0": "10c786e4517845cac86595b22fd7d40b548bf328cbf7bf14c867b0c31e20661f",
+          "/usr/lib64/libblas.so.3.12.0": "df2686da50030c23198f485115b84df323352325abb18a949515736e8f57b2f4",
+          "/usr/lib64/libc.so.6": "a5c5ad9d59d3c69eda93aa8f82930ba06cc4e893a113e66c85ad6e96243d53c8",
+          "/usr/lib64/libstdc++.so.6.0.36": "49811507d8fc0283d8f8023546613774c673f876fe823b1b99d0c8d46039deda",
+          "/usr/lib64/libdeflate.so.0": "fee24c7738e4c31860f65fa43c862f572cdf4cd2ffcc30e5cd8bf1d46346b318",
+          "/usr/lib64/libGLdispatch.so.0.0.0": "3c53e14fb731128afe1fa1c88e94944fe9a60cbe170f2e08c1134b709d771ec7",
+          "/usr/lib64/libOpenEXRCore-3_2.so.31.3.2.4": "bc6775af6f33d58d41f20e714d80db4b0fd21209796a6694cb5249739a49a331",
+          "/usr/lib64/libtmglib.so.3.12.0": "e497c25e923336dc4d95b2822f0845667ab113b985e8e7d16eadaf0379cdac87",
+          "/usr/lib64/libm.so.6": "16a03ce6d24c8a46742206d4a9c1d35bb6577ae2384f153dc6ef4a4b62b5357f",
+          "/usr/lib64/libImath-3_1.so.29.11.0": "1e86ce61e14061369bd937b73d53abb69305dff34df4700f99a459f5c024ab45",
+          "/usr/lib64/libOpenEXR-3_2.so.31.3.2.4": "efdbbe75b27b6a50e4a8e028e008fde32befa53280295e21ef6f036350225769",
+          "/usr/lib64/libgcc_s-16-20261029.so.1": "5a52ae4a6f1b119aa092aa1483c967e19d9ba036b1b0c2133236a8a2ce826ebf",
+          "/usr/lib64/libIex-3_2.so.31.3.2.4": "da965da4711be1158555d457dc6ff17582ec88c1b86d98edc69f09cdcc4f6c7a",
+          "/usr/lib64/liblapacke.so.3.12.0": "4e74d393b6f5f294cbd96b777da8be3ada9995b1da98aaa0c1eb5fea4b294c7c",
+          "/usr/lib64/libIlmThread-3_2.so.31.3.2.4": "424321e69eb6257387820baa90e4fccb209c5dcb8c88589a8c5e1ccf4d4c23d6",
+          "/usr/lib64/libOpenEXRUtil-3_2.so.31.3.2.4": "bafa0a2cb708d3ae952987c013d96e992badbb742e1a8e4fac6605c7eae5b5a0",
+          "/usr/lib64/libz.so.1.3.1.zlib-ng": "bbde8faec092a7c67b8bd76bbba4a826e61b05c171b97004ce6b308c5a090351",
+          "/usr/lib64/libjpeg.so.62.4.0": "beb79376b4544260da3c31603784c908b58bdb959cbe1d8c48075dfa7d5bc80c",
+          "/usr/lib64/libpng16.so.16.59.0": "536a1ed876bffe5a7e9204aae387d4da2d4a969bf716bbcf4a03c30a8dea0cde",
+          "/usr/lib64/libEGL.so.1.1.0": "76ffc090b8990696d028e7d1bc82606c564565fb05d2fa9e5f6122b61e9f1b60",
+          "/usr/lib64/libOpenGL.so.0.0.0": "07a014ea0624d5d9711f941fb0401a203c2025b683d34897bd1b261a32a83d69",
+          "/usr/lib64/ld-linux-x86-64.so.2": "4e5d39355699e90fa29313d3100e82af4a23290028c58c364d6a249ef6a78e5e"
+        },
+        "actual_checks": 9
+      }
+    ],
+    "drift": [],
+    "owned": [],
+    "generated": {
+      "/home/blux/de-xr/dome-sculpt/artifacts/hdr-strict-groups-build-v3-20261126/native-release-groups-v1/native/accepted.dsculpt": {
+        "producer": "native",
+        "sha256": "4721e99dc724cfdb71cc26106c646a532bebf53d12a060ec8bc65184fd54a1e4",
+        "bytes": 122856849
+      },
+      "/home/blux/de-xr/dome-sculpt/artifacts/hdr-strict-groups-build-v3-20261126/native-release-groups-v1/native/observed-source.json": {
+        "producer": "native",
+        "sha256": "50766bb4c91ed7215d59c41f6993e5c98eab5186e5b8b3057baba09765f11c14",
+        "bytes": 2425164
+      },
+      "/home/blux/de-xr/dome-sculpt/artifacts/hdr-strict-groups-build-v3-20261126/native-release-groups-v1/endpoint/ordered.dsculpt": {
+        "producer": "endpoint",
+        "sha256": "4721e99dc724cfdb71cc26106c646a532bebf53d12a060ec8bc65184fd54a1e4",
+        "bytes": 122856849
+      }
+    },
+    "scope": "Bounded native/oracle/history phases of original full2048, original selected target/source inputs and all original cell25offsets/bothroles preserved, actual immutable native hashes before cross-phase use; original strict monolithic900failure retained separately. Product725 fixture9ee, no App/display qualification.",
+    "lease": {
+      "not_acquired": true,
+      "mode": "CPU-only correctness per root authorization; any DRM fd/Mesa driver mapping is refused",
+      "released": 1795665798.7773983
+    },
+    "oracle_complete_coverage": {
+      "partitions": [
+        {
+          "first": 0,
+          "end": 3,
+          "triangles": 12,
+          "samples": 18382650,
+          "HDR_samples": 18382650,
+          "target": 2048,
+          "offsets": 25,
+          "roles": 2
+        },
+        {
+          "first": 3,
+          "end": 6,
+          "triangles": 12,
+          "samples": 18382650,
+          "HDR_samples": 18382650,
+          "target": 2048,
+          "offsets": 25,
+          "roles": 2
+        },
+        {
+          "first": 6,
+          "end": 9,
+          "triangles": 12,
+          "samples": 18382650,
+          "HDR_samples": 18382650,
+          "target": 2048,
+          "offsets": 25,
+          "roles": 2
+        },
+        {
+          "first": 9,
+          "end": 12,
+          "triangles": 12,
+          "samples": 18382650,
+          "HDR_samples": 18382650,
+          "target": 2048,
+          "offsets": 25,
+          "roles": 2
+        }
+      ],
+      "samples_per_role": 73530600,
+      "HDR_samples": 73530600,
+      "expected": {
+        "triangles": 12,
+        "target": 2048,
+        "samples_per_role": 73530600
+      }
+    },
+    "seconds": 280.80950832366943
+  },
+  "archive": {
+    "file": "hdr-bounded-phases-release-20261126.tar.xz",
+    "bytes": 8164468,
+    "sha256": "ba0b73ae8a37db57d151a99ea1631ff5df5dff07f08458068ea9a693b111f34b",
+    "authorities": [
+      {
+        "path": "artifacts/hdr-projection-sharing-sanitize-20261126/native-sanitize-current-v1/current2048/observed-source.json",
+        "sha256": "50766bb4c91ed7215d59c41f6993e5c98eab5186e5b8b3057baba09765f11c14",
+        "bytes": 2425164
+      },
+      {
+        "path": "artifacts/hdr-projection-sharing-sanitize-20261126/native-sanitize-current-v1/current2048/selected-target-resolution.dsculpt",
+        "sha256": "f69fc8bbeb13f3a4e413c980d8e37ab0113a637d78782bc8038542956c62299e",
+        "bytes": 606228
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-20261126/audit.json",
+        "sha256": "876fe0abcbe6b2817ec8862fbed4b41252ec2bbf7ae2ccae5e1874aa32b7320f",
+        "bytes": 88246
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-20261126/audit.py",
+        "sha256": "b7b3bd34b60bf8562cbbbd2604b2ce65fe23e71140874b7dfefe9cf452dacfc6",
+        "bytes": 2573
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-20261126/before-inputs.json",
+        "sha256": "3665597aeaf8f03a7703a3a1103a544a59717d757bbc3eb810f850abf31f0ad0",
+        "bytes": 16264534
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-20261126/build.py",
+        "sha256": "021478576f6e415528332ddd6af95a501ed7cd3097b6d02b8f992b8f3f0a6291",
+        "bytes": 1170
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-20261126/compiler-records/58dbe15a8c3b1d3964cb6b38f255aca8b1b09aff944d2d8b9ef4756350ca24e1.json",
+        "sha256": "4e3c9fe4ccd4aa2f6d79211eefc0fb6e137289442233848b150deaad30732f55",
+        "bytes": 1511
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-20261126/compiler-records/58dbe15a8c3b1d3964cb6b38f255aca8b1b09aff944d2d8b9ef4756350ca24e1.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-20261126/compiler-records/95ae33bc86d0f402c80c39a9a2ad0a29618151ee15360799e2f2e689bef949a2.json",
+        "sha256": "f64a824652dc1d90311987e399c40bb9098bc8cb61b5b1f72b20303ce6a9b5fe",
+        "bytes": 1595
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-20261126/compiler-records/95ae33bc86d0f402c80c39a9a2ad0a29618151ee15360799e2f2e689bef949a2.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-20261126/compiler.py",
+        "sha256": "393e207fee7b4b43b2e4cb0df83251eeb70c2a8b9f7337d1e5e8e413203684de",
+        "bytes": 1217
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-20261126/native-release-groups-v1/journal.txt",
+        "sha256": "45deb6f59fc71d388dfad8e3621279664a19b3afeb94a40010251dbac4fe5607",
+        "bytes": 1488
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-20261126/native-release-groups-v1/native.log",
+        "sha256": "a930352d69c0d5ecda2e8f9b6f8e6b529c5f60890c40801b76bf41da2b5cbe15",
+        "bytes": 191
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-20261126/native-release-groups-v1/native.maps",
+        "sha256": "ed23aba99c3a3f269614a6d12b34eb9862fa99e9a251b8791f4f393f4cb3a18b",
+        "bytes": 6260
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-20261126/native-release-groups-v1/plan.json",
+        "sha256": "fa5ce2f11129e39a84dd1bfa25bb8c097381df527da9175dbfdb7cedfc476fb6",
+        "bytes": 9202212
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-20261126/native-release-groups-v1/status.json",
+        "sha256": "018a6d0fc98570349d2024648fa6f8e3dde9d21ec5314e1d2029b4852c87d651",
+        "bytes": 2306
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-20261126/native-release-groups-v1/terminal-closure.json",
+        "sha256": "7129003215593e674443e6b60387488f8631e4c9163d002959ba6d92c159f395",
+        "bytes": 186
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-20261126/native-release-groups-v1/unit-terminal.txt",
+        "sha256": "86332f2c982214981d7551aeae9528e0860cf43b381cf85e12ed6aeb6a9e05ed",
+        "bytes": 9146
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-20261126/native-runner.py",
+        "sha256": "baa67c553a18245039e976bbe90c462f5ef4d1811016fbc1fd0dff91f9594687",
+        "bytes": 9850
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-20261126/plan.json",
+        "sha256": "5e62dbc50f1a53951b60685dde2657c55148fa3a43513f194496e343731169e8",
+        "bytes": 8160
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-20261126/prepare-native.py",
+        "sha256": "8bada54096002e2c58d6f3dc84ff390caf12bea65513f86d9ddb7f2050b67c22",
+        "bytes": 2988
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-20261126/release/source-hdr-strict-phases.cpp.o.d",
+        "sha256": "d32e75f7205db19e15e0c62bd21d8f8a11db13da9efb03eb8d1b29aac6f1426b",
+        "bytes": 27579
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-20261126/release-link.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-20261126/sanitize/source-hdr-strict-phases.cpp.o.d",
+        "sha256": "09b01276d39f90ae29b6e86ad3591b9078cbf52663be66aa5859e412fec4f537",
+        "bytes": 27580
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-20261126/sanitize-link.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-20261126/status.json",
+        "sha256": "019edd80fe02daf2e72b086025c0c0bde8f17c5b58c5ef7160b9a8bb1d074718",
+        "bytes": 491
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v2-20261126/audit.json",
+        "sha256": "71f4ccdd352c9d4100cb16ea0a1ac68e39d7d13f5be5ba1a30446442158739be",
+        "bytes": 89079
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v2-20261126/audit.py",
+        "sha256": "b7b3bd34b60bf8562cbbbd2604b2ce65fe23e71140874b7dfefe9cf452dacfc6",
+        "bytes": 2573
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v2-20261126/before-inputs.json",
+        "sha256": "1b75b4e347b966304e84d2c26291a8997b76320a60c790d55dcaf2592c1cd0ac",
+        "bytes": 16292032
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v2-20261126/build.py",
+        "sha256": "021478576f6e415528332ddd6af95a501ed7cd3097b6d02b8f992b8f3f0a6291",
+        "bytes": 1170
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v2-20261126/compiler-records/6dfc753773707245236c1c76e2ca56208f0df9bf102431d9c0b5702503d0146c.json",
+        "sha256": "1be5460eaa4a8f91f4ca44cd55a348a16f328cf76e77ddad1129146e52d03510",
+        "bytes": 1541
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v2-20261126/compiler-records/6dfc753773707245236c1c76e2ca56208f0df9bf102431d9c0b5702503d0146c.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v2-20261126/compiler-records/a337f3f525327043193e6162eba98186698a0c388b51aa892f04c3b640769048.json",
+        "sha256": "ffff2e1a38a6b455446f1b29bc77a906a8c7cb2c756205fae05de506213b27d2",
+        "bytes": 1624
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v2-20261126/compiler-records/a337f3f525327043193e6162eba98186698a0c388b51aa892f04c3b640769048.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v2-20261126/compiler.py",
+        "sha256": "a45bf1a1c39784921bbbb12896ed2260b2c906f3ca9ca0287662426a80e7d56c",
+        "bytes": 1220
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v2-20261126/native-release-groups-v1/journal.txt",
+        "sha256": "f55079f553f3daa9df2ae9ebde9649d8e8948726cd46f9fc0106fdeb9b483c76",
+        "bytes": 1495
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v2-20261126/native-release-groups-v1/native.log",
+        "sha256": "09521a3c81f53d074f4a6de32c31ffae8399229cdf700cfc35d0974f3cc7bb98",
+        "bytes": 232
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v2-20261126/native-release-groups-v1/native.maps",
+        "sha256": "4ba7f6d3b47a29edc0e09caffb905a02b17639a82ac24c0df0321a3fcd62025b",
+        "bytes": 6318
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v2-20261126/native-release-groups-v1/plan.json",
+        "sha256": "e5f2e9fc74617e897ef46a5137bdd171a3482deb347be0eb674617832506ed66",
+        "bytes": 9216062
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v2-20261126/native-release-groups-v1/status.json",
+        "sha256": "334d6b6dc00bec264f7df41a2ed3285f5f5a91d05cbd91fd77fc03d09b2f9fb3",
+        "bytes": 2314
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v2-20261126/native-release-groups-v1/terminal-closure.json",
+        "sha256": "bc03ffb01b4886877dfe1f751c513b0ff3c86612f74a0a02c2325cc1f3ebe51b",
+        "bytes": 221
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v2-20261126/native-release-groups-v1/unit-terminal.txt",
+        "sha256": "f8b5f8b154bd119a1fbeb6d324c456c73f4c8b1c8f532851ea7ec5480affd47b",
+        "bytes": 9170
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v2-20261126/native-runner.py",
+        "sha256": "baa67c553a18245039e976bbe90c462f5ef4d1811016fbc1fd0dff91f9594687",
+        "bytes": 9850
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v2-20261126/plan.json",
+        "sha256": "a45f92e59e5367c0f1658337a933a518662b159970c8bfceaa18911c7679db8f",
+        "bytes": 8238
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v2-20261126/prepare-native.py",
+        "sha256": "a944903d2859b27e1a1b5821a37d0fa01ba479da16fba01c075b601267a71b89",
+        "bytes": 2987
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v2-20261126/release/source-hdr-strict-phases.cpp.o.d",
+        "sha256": "5c5f66aa4d0d94123d2510a9d5554986baf0a999a85fa9b3792bea0c63e0445c",
+        "bytes": 27948
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v2-20261126/release-link.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v2-20261126/sanitize/source-hdr-strict-phases.cpp.o.d",
+        "sha256": "275586bfda6647b71338cda173c09809ac444b7ed2defa426698a3d4d6f5c874",
+        "bytes": 27949
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v2-20261126/sanitize-link.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v2-20261126/source-json-binary-diagnostic.json",
+        "sha256": "dfd966c5b9e11f0da258938f559759ce8f866472724cf2b67686b1bd16329d0f",
+        "bytes": 759
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v2-20261126/status.json",
+        "sha256": "8e947effc69830d560128e7f2e05020de6150ac3920b115ebedf6b91bf880760",
+        "bytes": 493
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v3-20261126/audit.json",
+        "sha256": "53715fe983cdd024e2a7a6fe93c9bd58cae57e33ac32a56c3fe36a08df115569",
+        "bytes": 89079
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v3-20261126/audit.py",
+        "sha256": "b7b3bd34b60bf8562cbbbd2604b2ce65fe23e71140874b7dfefe9cf452dacfc6",
+        "bytes": 2573
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v3-20261126/before-inputs.json",
+        "sha256": "cb013ed8b6b2448c2b79a0b78b44b0e7031bcfa49c20c99aefc593847c5a0cbd",
+        "bytes": 16292032
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v3-20261126/build.py",
+        "sha256": "021478576f6e415528332ddd6af95a501ed7cd3097b6d02b8f992b8f3f0a6291",
+        "bytes": 1170
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v3-20261126/compiler-records/0d416c86304182a0d358631fbeeabdd1d01d517b5ce912861710a0f3bab6f244.json",
+        "sha256": "e63f0e4c590c7e58713ad24416297e5177418937b87c6361ac3eec04e4a0cb24",
+        "bytes": 1542
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v3-20261126/compiler-records/0d416c86304182a0d358631fbeeabdd1d01d517b5ce912861710a0f3bab6f244.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v3-20261126/compiler-records/109a99fb56e3b0bcd11e23a966a3732f7542ff4e57302a2d240b5d944b5ac410.json",
+        "sha256": "ebb3312686d121a6da8b322c9617366bcf1b977479b4b4f8d06ea6ded736db17",
+        "bytes": 1624
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v3-20261126/compiler-records/109a99fb56e3b0bcd11e23a966a3732f7542ff4e57302a2d240b5d944b5ac410.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v3-20261126/compiler.py",
+        "sha256": "2c72f62f0404e8881eda3de0c2a469c71660b741f876668f987ed051ed73ab69",
+        "bytes": 1220
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v3-20261126/native-release-groups-v1/endpoint.log",
+        "sha256": "1d9231c861a9c3bc92a5c8f3380bf1bbe8baef387947a8304f4287a0aafb1965",
+        "bytes": 688
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v3-20261126/native-release-groups-v1/endpoint.maps",
+        "sha256": "dd47c033228d91cef88679848b84ad2a8e9f43ce6abc63d6444fe687fb0750bb",
+        "bytes": 11495
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v3-20261126/native-release-groups-v1/journal.txt",
+        "sha256": "b1a2c731e52654a3b1eeff3b68f0c62d00bdfcb0b375827113700f325c7c3caa",
+        "bytes": 2632
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v3-20261126/native-release-groups-v1/native.log",
+        "sha256": "3c5a51d4ab784a5011d70a7fba0211dc4f8bce2c747720207158758441c8c2ba",
+        "bytes": 719
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v3-20261126/native-release-groups-v1/native.maps",
+        "sha256": "c8255314a6dc4f044061ab2ddd69f4414d9f16c88bce5ee7efb6307f1ba40c8e",
+        "bytes": 5957
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v3-20261126/native-release-groups-v1/oracle0.log",
+        "sha256": "279c09f3455ffab2dc4374236571bd6967e9d7ddb151df93e6e84db2468f3067",
+        "bytes": 1146
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v3-20261126/native-release-groups-v1/oracle0.maps",
+        "sha256": "492383b44020a41c466d1d2c9a0975eebd1618e9ef3c7c1741d093b33d6b7001",
+        "bytes": 11397
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v3-20261126/native-release-groups-v1/oracle1.log",
+        "sha256": "278c24bd778f60248da5f33471241e91e72e6c012fa27bfa3e6a514ca8dfec70",
+        "bytes": 1145
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v3-20261126/native-release-groups-v1/oracle1.maps",
+        "sha256": "5e079ac019fafeeb26ea927c2121c44ba6418ff63f7f3247230ec862ea76bfc3",
+        "bytes": 11495
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v3-20261126/native-release-groups-v1/oracle2.log",
+        "sha256": "61bcd1fc9a8484b08d177dc4ec478106f3c41a6acca2e17510583c23f5d21e2d",
+        "bytes": 1105
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v3-20261126/native-release-groups-v1/oracle2.maps",
+        "sha256": "6c80221b236d9f79f3964ea7293d0263e6b88e7ef5017ad60475b782717a33be",
+        "bytes": 7246
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v3-20261126/native-release-groups-v1/oracle3.log",
+        "sha256": "de3fa8677485104275f9bdbb6a8b1ac8e488185d4ae0e469cdb5e928721a71a2",
+        "bytes": 1100
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v3-20261126/native-release-groups-v1/oracle3.maps",
+        "sha256": "59c16ca6d978a352701b19f8c010aa98462ac8e9cded0610072775c7e9bd4324",
+        "bytes": 11446
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v3-20261126/native-release-groups-v1/plan.json",
+        "sha256": "2838586c521233cabe53376c115cbb05dd7d455a769b313f600823c8ab6ec362",
+        "bytes": 9216063
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v3-20261126/native-release-groups-v1/status.json",
+        "sha256": "ff2ad03489c359eead43b63c3f9cc835b1310f12d6eb3ebd669233990cec2a30",
+        "bytes": 28260
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v3-20261126/native-release-groups-v1/terminal-closure.json",
+        "sha256": "a53a0bce41a97578ccd52d7674c0118cabf96eaacde0681e9c1e8c64a31ebce2",
+        "bytes": 597
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v3-20261126/native-release-groups-v1/unit-terminal.txt",
+        "sha256": "d8564719ee7157798646d94de2b1361aa5f52bd08865ccb74dfd46b3b9946c12",
+        "bytes": 7181
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v3-20261126/native-runner.py",
+        "sha256": "baa67c553a18245039e976bbe90c462f5ef4d1811016fbc1fd0dff91f9594687",
+        "bytes": 9850
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v3-20261126/plan.json",
+        "sha256": "12344d76684cf5481bd7cec7195e62178c0f1848cfa0032af37cdc724bb951af",
+        "bytes": 8238
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v3-20261126/prepare-native.py",
+        "sha256": "909d38be0e5793ef85e0d25737b6409d495287e0d1bfa25621ecf0c344369f23",
+        "bytes": 2987
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v3-20261126/release/source-hdr-strict-phases.cpp.o.d",
+        "sha256": "6c8937c476ba8fc49ee0355b10b1720247edeae8f829aadc791420da12ffe537",
+        "bytes": 27948
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v3-20261126/release-link.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v3-20261126/sanitize/source-hdr-strict-phases.cpp.o.d",
+        "sha256": "b90248f20b6dc16169dcf503eaf6469d6dc98d3a15b1069a2de75fe2b6116bbf",
+        "bytes": 27949
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v3-20261126/sanitize-link.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      {
+        "path": "artifacts/hdr-strict-groups-build-v3-20261126/status.json",
+        "sha256": "12349706068cc871d3dcd29e26e9b4a163f1f3e130c28ad09d4aa0114d607377",
+        "bytes": 494
+      },
+      {
+        "path": "artifacts/make-hdr-group-release-proof-20261126.py",
+        "sha256": "b1c1117171110d8f08e1a44900be4fceeb3c4b8c7ec1fc9a8d578e10506f9ae1",
+        "bytes": 3581
+      }
+    ]
+  },
+  "large_outputs_retained_at_actual_paths": [
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-strict-groups-build-v3-20261126/native-release-groups-v1/endpoint/ordered.dsculpt",
+      "sha256": "4721e99dc724cfdb71cc26106c646a532bebf53d12a060ec8bc65184fd54a1e4",
+      "bytes": 122856849
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-strict-groups-build-v3-20261126/native-release-groups-v1/native/accepted.dsculpt",
+      "sha256": "4721e99dc724cfdb71cc26106c646a532bebf53d12a060ec8bc65184fd54a1e4",
+      "bytes": 122856849
+    }
+  ],
+  "original_strict_monolithic_failure": "docs/validation/hdr-source-closure-strict-20261126.json",
+  "strict_group_runtime": "separately active, not qualified by this Release result",
+  "limitations": [
+    "Original successfulR transient unit was garbage-collected before terminal show/stop; real notfound observation, original status, liveELF/maps, invocation and journal retained; no stalePID/service assumption.",
+    "First two cheap Release group preflights fail on fixture-only source-schema and dumped-binary transport assumptions; preserved in original stages. No product guard was weakened.",
+    "Initialv1 runner aggregate typo73730600 was detected before an oracle ran and corrected prospectively to actual original73530600; v1 plan retained.",
+    "Prospective elapsed phase timings identify costs in these runs, not isolated controlled performance comparisons."
+  ],
+  "observed": 1795666001.8051176
+}
