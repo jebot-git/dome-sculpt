@@ -40,6 +40,7 @@ Copyright (c) 2012 Brandon Pelfrey
 #if XATLAS_C_API
 #include "xatlas_c.h"
 #endif
+#include <algorithm>
 #include <atomic>
 #include <condition_variable>
 #include <mutex>
@@ -5018,7 +5019,7 @@ struct CostQueue
 
 	void push(float cost, uint32_t face)
 	{
-		const Pair p = { cost, face };
+		const Pair p = { cost, face, 0 };
 		if (m_pairs.isEmpty() || cost < peekCost())
 			m_pairs.push_back(p);
 		else {
@@ -5032,6 +5033,25 @@ struct CostQueue
 			if (m_pairs.size() > m_maxSize)
 				m_pairs.removeAt(0);
 		}
+	}
+
+	// The unbounded chart frontier is rebuilt in one pass. Keep the old
+	// insertion order even for repeated faces and equal costs.
+	void appendUnsorted(float cost, uint32_t face)
+	{
+		XA_DEBUG_ASSERT(m_maxSize == UINT32_MAX);
+		m_pairs.push_back({ cost, face, m_pairs.size() });
+	}
+
+	void sortAppended()
+	{
+		if (m_pairs.size() < 2)
+			return;
+		std::sort(m_pairs.begin(), m_pairs.end(), [](const Pair &a, const Pair &b) {
+			if (a.cost != b.cost)
+				return a.cost > b.cost;
+			return a.insertion < b.insertion;
+		});
 	}
 
 	uint32_t pop()
@@ -5059,6 +5079,7 @@ private:
 	{
 		float cost;
 		uint32_t face;
+		uint32_t insertion;
 	};
 
 	Array<Pair> m_pairs;
@@ -5907,8 +5928,9 @@ private:
 				continue;
 			const float cost = computeCost(chart, otherFace);
 			if (cost < FLT_MAX)
-				chart->candidates.push(cost, otherFace);
+				chart->candidates.appendUnsorted(cost, otherFace);
 		}
+		chart->candidates.sortAppended();
 		return true;
 	}
 
