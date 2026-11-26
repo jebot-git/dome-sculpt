@@ -1675,6 +1675,31 @@ The all-target build on frozen `afd3d40c` runs in
 queues behind the already-running `c9929606` sweep.
 [UV-edited normal Bake evidence](validation/uv-edited-normal-bake-20261126.json)
 
+### Bake from a converted native normal field
+
+The shared Bake worker now accepts a mesh with a converted native normal
+field, including sources with retained normal UV correspondence and current
+skin or shapekey changes. It samples the two stored normal planes in their
+retained coordinate domain. After Clear Bake it evaluates the live intrinsic
+normal. Paint, material and FLOAT emission keep their own sampling data.
+The worker pairs the normal resolver with its exact material snapshot.
+Bound polygon texture-set fields keep their existing separate resolver.
+
+All 17 focused Release tests and 16 ASan/UBSan tests with leak detection
+pass. The 32-case native matrix and the affine and rejection controls pass
+525,112 checks per profile, with maximum sampled rebake
+normal error 0.004809 against the existing 0.035 bound. The fixture checks
+exact native Save/reopen and Undo/Redo, and transfers painted FLOAT emission
+above 7.5. All 67 native fixture projects match byte for byte between the
+two profiles. The dependent Save regressions hold the real Bake until Save
+has queued, then exercise the original failure. The prepared-source fixture
+passes 20 runs and 40 dependent Save refusals with exact prior bytes.
+Nested DomeD Wayland and synthetic OpenXR on software GL pass 20 public
+checks each. Intel Arc A770 synthetic OpenXR passes 20 checks each with the
+Release and sanitizer applications. Each route saves identical project bytes
+for a given field state.
+[Canonical Bake source evidence](validation/canonical-donor-current-20261126.json)
+
 ## Source and integration boundary
 
 - Main now admits product1bc13125 and public fixturef1e193c7 after complete
