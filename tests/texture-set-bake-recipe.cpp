@@ -3,6 +3,7 @@
 #include "dome/texture-sets.hpp"
 #include "dome/polygon-scene.hpp"
 #include "texture-set-paint-access.hpp"
+#include "polygon-conversion.hpp"
 #include <nlohmann/json.hpp>
 #include <filesystem>
 #include <fstream>
