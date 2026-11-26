@@ -69,7 +69,7 @@ with contextlib.nullcontext(tempfile.mkdtemp(prefix="projects-", dir=output)) as
         gated_menu = name in ("controller", "stylus", "controller-srgb")
         if gated_menu:
             e["DOME_XR_FIXTURE_MENU_GATE"] = "1"
-        frame_limit = [] if gated_menu or name == "voxel-undo" else ["--frames", str(frames)]
+        frame_limit = [] if gated_menu or name in ("scene", "voxel-undo") else ["--frames", str(frames)]
         with (output / (name + ".log")).open("w") as log:
             p = subprocess.run(
                 [
@@ -234,6 +234,9 @@ with contextlib.nullcontext(tempfile.mkdtemp(prefix="projects-", dir=output)) as
         scene.returncode == 0,
         "Headset object and material menu pages complete through native OpenXR actions",
     )
+    material_observation = json.loads((output / "scene.json").read_text())
+    check(material_observation.get("scene_materials_seen") and material_observation.get("scene_sliders_seen"),
+          "The real palette shows Materials and RGB tracks before ray editing")
     info = json.loads(
         subprocess.check_output(
             [str(binary), "--project-info", str(scene_path)], env=env, text=True

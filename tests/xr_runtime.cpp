@@ -137,6 +137,8 @@ std::string voxel_mode() {
 }
 bool voxel_menu_seen = false, voxel_undo_seen = false, voxel_menu_visible = false;
 unsigned voxel_menu_wait = 0, voxel_undo_wait = 0;
+bool scene_menu_visible = false, scene_materials_seen = false, scene_sliders_seen = false;
+unsigned scene_material_wait = 0, scene_slider_wait = 0;
 XrPath path(std::string text) {
   auto found = paths.find(text);
   if (found != paths.end())
@@ -509,6 +511,18 @@ FN(ReleaseSwapchainImage, XrSwapchain p, const XrSwapchainImageReleaseInfo *) {
       if(frame==27)report["editable_avatar_cancel_menu_seen"]=true;
     }
   }
+  auto backing_pixels = [&] {
+    int backing = 0;
+    for (unsigned row = s->height / 3; row < s->height * 2 / 3; ++row)
+      for (unsigned col = s->width / 3; col < s->width * 2 / 3; ++col) {
+        const auto at = (size_t(row) * s->width + col) * 4;
+        const int r = displayed(bytes[at]), g = displayed(bytes[at+1]),
+                  b = displayed(bytes[at+2]);
+        if (r >= 25 && r <= 31 && g >= 35 && g <= 41 && b >= 43 && b <= 49)
+          ++backing;
+      }
+    return backing;
+  };
   if (voxel_mode() == "undo" && s->eye == 0 && (frame == 43 || frame == 45)) {
     // The selected tile uses the palette accent only when the command is
     // enabled. The fixture observes Clay when the root opens, then Undo.
@@ -533,21 +547,45 @@ FN(ReleaseSwapchainImage, XrSwapchain p, const XrSwapchainImageReleaseInfo *) {
     if (!opening) {
       // Publishing the remesh can close a menu that opened while it was
       // pending. Inspect the central backing panel even with Undo disabled.
-      int backing = 0;
-      for (unsigned row = s->height / 3; row < s->height * 2 / 3; ++row)
-        for (unsigned col = s->width / 3; col < s->width * 2 / 3; ++col) {
-          const auto at = (size_t(row) * s->width + col) * 4;
-          const int r = displayed(bytes[at]), g = displayed(bytes[at+1]),
-                    b = displayed(bytes[at+2]);
-          if (r >= 25 && r <= 31 && g >= 35 && g <= 41 && b >= 43 && b <= 49)
-            ++backing;
-        }
+      const int backing = backing_pixels();
       voxel_menu_visible = backing > 1000;
       report["voxel_menu_pixels"] = backing;
     }
     if (accent > 30 && (opening || voxel_menu_visible)) {
       (opening ? voxel_menu_seen : voxel_undo_seen) = true;
       report[opening ? "voxel_menu_seen" : "voxel_undo_seen"] = true;
+    }
+  }
+  if (getenv("DOME_XR_FIXTURE_SCENE") && s->eye == 0 && (frame == 17 || frame == 21)) {
+    // The new object can publish after the next menu click was submitted.
+    // Observe the real Materials highlight, then the three RGB tracks, with
+    // a stationary right grip shared by the retry and the slider rays.
+    const float perspective = .66f * std::tan(.6f);
+    auto sample = [&](int px, int py, int radius, auto pixel) {
+      const float world_x = .015f + .032f + .6f * (px / 640.f - .5f);
+      const float world_y = 1.56f - 1.6f + .6f * (.5f - py / 640.f);
+      const int x = int(std::lround(s->width * .5f * (1 + world_x / perspective)));
+      const int y = int(std::lround(s->height * .5f * (1 + world_y / perspective)));
+      int found = 0;
+      for (int row = std::max(0, y - 2); row <= std::min(int(s->height) - 1, y + 2); ++row)
+        for (int col = std::max(0, x - radius); col <= std::min(int(s->width) - 1, x + radius); ++col) {
+          const auto at = (size_t(row) * s->width + col) * 4;
+          if (pixel(displayed(bytes[at]), displayed(bytes[at+1]), displayed(bytes[at+2]))) ++found;
+        }
+      return found;
+    };
+    if (frame == 17) {
+      scene_menu_visible = backing_pixels() > 1000;
+      scene_materials_seen = scene_menu_visible &&
+          sample(320, 528, 8, [](int r, int g, int b) { return r < 150 && g > 130 && b > 220; }) > 20;
+      report["scene_materials_seen"] = scene_materials_seen;
+    } else {
+      scene_sliders_seen = true;
+      for (int row : {210, 280, 350})
+        scene_sliders_seen &= sample(480, row, 6, [](int r, int g, int b) {
+          return r >= 57 && r <= 64 && g >= 66 && g <= 75 && b >= 81 && b <= 89;
+        }) > 10;
+      report["scene_sliders_seen"] = scene_sliders_seen;
     }
   }
   if((!mask_mode().empty() && s->eye==0 && mask_step==35) || (!resolution_mode().empty() && s->eye==0 && frame==19)) {
@@ -672,7 +710,8 @@ FN(PollEvent, XrInstance, XrEventDataBuffer *out) {
   }
   const bool menu_complete = (!editable_avatar_mode().empty() || menu_gate()) && frame >= 45;
   const bool voxel_complete = voxel_mode() == "undo" && frame >= 50;
-  if ((menu_complete || voxel_complete) && menu_completion_event < 2) {
+  const bool scene_complete = getenv("DOME_XR_FIXTURE_SCENE") && frame >= 45;
+  if ((menu_complete || voxel_complete || scene_complete) && menu_completion_event < 2) {
     auto e = reinterpret_cast<XrEventDataSessionStateChanged *>(out);
     e->type = XR_TYPE_EVENT_DATA_SESSION_STATE_CHANGED;
     e->session = reinterpret_cast<XrSession>(&session_tag);
@@ -771,7 +810,17 @@ FN(WaitFrame, XrSession, const XrFrameWaitInfo *, XrFrameState *p) {
   if(avatar_wait){count("editable_avatar_wait_frames");if(physical_frame>3000){report["editable_avatar_gate_exhausted"]=true;save();return XR_ERROR_RUNTIME_FAILURE;}}
   const bool wait_voxel_menu = voxel_mode() == "undo" && frame == 43 && !voxel_menu_seen;
   const bool wait_voxel_undo = voxel_mode() == "undo" && frame == 45 && !voxel_undo_seen;
-  if (wait_voxel_menu || wait_voxel_undo) {
+  const bool wait_scene_menu = getenv("DOME_XR_FIXTURE_SCENE") && frame == 17 && !scene_materials_seen;
+  const bool wait_scene_sliders = getenv("DOME_XR_FIXTURE_SCENE") && frame == 21 && !scene_sliders_seen;
+  if (wait_scene_menu || wait_scene_sliders) {
+    auto &waited = wait_scene_menu ? scene_material_wait : scene_slider_wait;
+    report[wait_scene_menu ? "scene_material_wait_frames" : "scene_slider_wait_frames"] = ++waited;
+    if (scene_material_wait + scene_slider_wait >= 750) {
+      report["scene_material_gate_exhausted"] = true;
+      save();
+      return XR_ERROR_RUNTIME_FAILURE;
+    }
+  } else if (wait_voxel_menu || wait_voxel_undo) {
     auto &waited = wait_voxel_menu ? voxel_menu_wait : voxel_undo_wait;
     report[wait_voxel_menu ? "voxel_menu_wait_frames" : "voxel_undo_wait_frames"] = ++waited;
     if (voxel_menu_wait + voxel_undo_wait >= 750) {
@@ -826,7 +875,10 @@ FN(WaitFrame, XrSession, const XrFrameWaitInfo *, XrFrameState *p) {
   }
   p->predictedDisplayTime = 1000000000 + physical_frame * 18000000;
   p->predictedDisplayPeriod = 18000000;
-  p->shouldRender = frame % 7 ? XR_TRUE : XR_FALSE;
+  // Sample the slider panel even while its logical step is held. Keep
+  // periodic skipped frames on the actual presentation clock.
+  const bool scene_slider_probe = getenv("DOME_XR_FIXTURE_SCENE") && frame == 21;
+  p->shouldRender = (scene_slider_probe ? physical_frame : frame) % 7 ? XR_TRUE : XR_FALSE;
   count("frames_waited");
   return XR_SUCCESS;
 }
@@ -931,7 +983,8 @@ FN(GetActionStateBoolean, XrSession, const XrActionStateGetInfo *p,
        (getenv("DOME_XR_FIXTURE_UV") && frame == 12) ||
        (getenv("DOME_XR_FIXTURE_LAYERS") && (frame == 12 || frame == 14)) ||
        (getenv("DOME_XR_FIXTURE_SCENE") &&
-        (frame == 12 || frame == 16 || frame == 18 || frame == 20 || frame == 28)) ||
+        (frame == 12 || frame == 16 || frame == 18 || frame == 20 || frame == 28 ||
+         (frame == 17 && !scene_menu_visible && scene_material_wait && scene_material_wait % 12 == 0))) ||
        (getenv("DOME_XR_FIXTURE_FILES") &&
         (frame == 24 || frame == 26 || frame == 28 || frame == 30 || frame == 34)));
   out->changedSinceLastSync = button && ((frame >= 8 && frame <= 11) ||
@@ -1373,6 +1426,9 @@ FN(LocateSpace, XrSpace handle, XrSpace, XrTime, XrSpaceLocation *p) {
     p->pose.position = {(right(s->hand) ? float((frame % 5) * .015f) : -.3f) +
                             (frame >= 38 ? -.2f : 0),
                         1.48f, -.48f};
+  if (getenv("DOME_XR_FIXTURE_SCENE") && s->action && right(s->hand) &&
+      frame >= 16 && frame <= 20)
+    p->pose.position.x = .015f;
   if(corner_uv_mode()=="cancel"&&s->action&&s->action->name=="aim_pose"&&right(s->hand)&&frame==28){
     p->pose.position={.045f+(170.f/640-.5f)*.6f,1.56f+(.5f-609.f/640)*.6f,-.3f};
   }
