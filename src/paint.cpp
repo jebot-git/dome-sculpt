@@ -87,9 +87,22 @@ struct CompositeFactors {
   float metallic,roughness;
   bool operator==(const CompositeFactors &)const=default;
 };
+enum class CompositeUse { Standard, NativeEmission };
+struct NativeEmissionOwner {
+  std::shared_ptr<const Mesh> geometry;
+  std::shared_ptr<const PaintSamplingDomain> domain;
+
+  bool matches(const TextureMaps &maps) const {
+    const auto same_owner = [](const auto &a, const auto &b) {
+      return a == b && !a.owner_before(b) && !b.owner_before(a);
+    };
+    return maps.overlay && same_owner(maps.overlay->native_geometry(), geometry) &&
+           same_owner(maps.overlay->native_domain(), domain);
+  }
+};
 struct CompositeRetention {
   struct Source {size_t references=0,bytes=0;};
-  struct Entry {std::shared_ptr<const TextureMaps> maps;uint64_t token=0;CompositeFactors factors{};size_t derived=0,count=0;std::array<const Image*,8> sources{};const BakedTextures *base=nullptr;};
+  struct Entry {std::shared_ptr<const TextureMaps> maps;uint64_t token=0;CompositeFactors factors{};CompositeUse use=CompositeUse::Standard;size_t derived=0,count=0;std::array<const Image*,8> sources{};const BakedTextures *base=nullptr;};
   std::mutex mutex;
   size_t limit=512*1024*1024,bytes=0;
   uint64_t hits=0,builds=0;
@@ -102,16 +115,23 @@ struct CompositeRetention {
     if(e.base){auto found=bases.find(e.base);if(!--found->second.references){bytes-=found->second.bytes;bases.erase(found);}}
     entries.pop_back();
   }
-  std::shared_ptr<const TextureMaps> find(uint64_t token,const CompositeFactors &factors){
-    std::lock_guard lock(mutex);auto found=std::find_if(entries.begin(),entries.end(),[&](auto &e){return e.token==token&&e.factors==factors;});
+  std::shared_ptr<const TextureMaps> find(uint64_t token, const CompositeFactors &factors,
+                                          const NativeEmissionOwner *native = nullptr) {
+    const auto use = native ? CompositeUse::NativeEmission : CompositeUse::Standard;
+    std::lock_guard lock(mutex);
+    auto found = std::find_if(entries.begin(), entries.end(), [&](const Entry &entry) {
+      return entry.token == token && entry.factors == factors && entry.use == use &&
+             (!native || native->matches(*entry.maps));
+    });
     if(found==entries.end())return {};
     auto result=found->maps;entries.splice(entries.begin(),entries,found);++hits;return result;
   }
-  void retain(const std::shared_ptr<const TextureMaps> &maps,uint64_t token,const CompositeFactors &factors,bool hit){
+  void retain(const std::shared_ptr<const TextureMaps> &maps, uint64_t token,
+              const CompositeFactors &factors, bool hit, CompositeUse use = CompositeUse::Standard) {
     std::lock_guard lock(mutex);if(hit)++hits;else ++builds;
     auto found=std::find_if(entries.begin(),entries.end(),[&](auto &e){return e.maps.get()==maps.get();});
     if(found!=entries.end()){entries.splice(entries.begin(),entries,found);return;}
-    Entry entry;entry.maps=maps;entry.token=token;entry.factors=factors;entry.derived=(maps->overlay?maps->overlay->storage_bytes():0)+maps->color.rgba.size()+maps->metal_rough.rgba.size()+maps->emission.rgba.size()+maps->normal.rgba.size()+maps->mtoon_normal.rgba.size()+maps->color_coverage.rgba.size()+maps->baked_normal.rgba.size()+maps->baked_coverage.rgba.size()+maps->emission_coverage.rgba.size()+maps->pbr_color.rgba.size();
+    Entry entry;entry.maps=maps;entry.token=token;entry.factors=factors;entry.use=use;entry.derived=(maps->overlay?maps->overlay->storage_bytes():0)+maps->color.rgba.size()+maps->metal_rough.rgba.size()+maps->emission.rgba.size()+maps->normal.rgba.size()+maps->mtoon_normal.rgba.size()+maps->color_coverage.rgba.size()+maps->baked_normal.rgba.size()+maps->baked_coverage.rgba.size()+maps->emission_coverage.rgba.size()+maps->pbr_color.rgba.size();
     entry.base=maps->baked_base.get();
     if(maps->source_maps)for(auto slot:{&maps->source_maps->color,&maps->source_maps->metal_rough,&maps->source_maps->emission,&maps->source_maps->normal,&maps->source_maps->occlusion})
       if(slot->image&&std::find(entry.sources.begin(),entry.sources.begin()+entry.count,slot->image.get())==entry.sources.begin()+entry.count)
@@ -1619,16 +1639,30 @@ std::shared_ptr<const TextureMaps> detail::EmissionExportAccess::preview(const P
     const std::function<bool()> &cancelled) {
   paint_compute::checkpoint(cancelled);material.validate();
   const CompositeFactors factors{material.color,material.emissive,material.metallic,material.roughness};
+  const NativeEmissionOwner owner{paint.mesh_owner(), paint.paint_sampling_domain()};
   auto &cache=*paint.composite_cache_;
-  {std::lock_guard lock(cache.mutex);
-    if(cache.native_emission_token==paint.composite_token_&&cache.native_emission_factors==factors)
-      if(auto previous=cache.native_emission_preview.lock()){
-        // A retained/rebound grid may preserve its visible value token while
-        // changing the exact native geometry attachment carried by the packet.
-        auto same=[](const auto &a,const auto &b){return a==b&&!a.owner_before(b)&&!b.owner_before(a);};
-        if(previous->overlay&&same(previous->overlay->native_geometry(),paint.mesh_owner())&&
-           same(previous->overlay->native_domain(),paint.paint_sampling_domain()))return previous;
-      }
+  const auto remember = [&](const std::shared_ptr<const TextureMaps> &maps) {
+    std::lock_guard lock(cache.mutex);
+    cache.native_emission_token = paint.composite_token_;
+    cache.native_emission_factors = factors;
+    cache.native_emission_preview = maps;
+  };
+  std::shared_ptr<const TextureMaps> previous;
+  {
+    std::lock_guard lock(cache.mutex);
+    if (cache.native_emission_token == paint.composite_token_ && cache.native_emission_factors == factors)
+      previous = cache.native_emission_preview.lock();
+  }
+  auto &retention = composite_retention();
+  if (previous && owner.matches(*previous)) {
+    retention.retain(previous, paint.composite_token_, factors, true, CompositeUse::NativeEmission);
+    return previous;
+  }
+  // Editable history can outlive the renderer's last frame. Restore an exact
+  // preview through the shared byte-bounded cache when that frame is gone.
+  if (auto retained = retention.find(paint.composite_token_, factors, &owner)) {
+    remember(retained);
+    return retained;
   }
   // Deep normal replay may legitimately visit a before-Paint that shares this
   // metadata cache. Build without holding its mutex, then publish completed maps.
@@ -1649,9 +1683,8 @@ std::shared_ptr<const TextureMaps> detail::EmissionExportAccess::preview(const P
   // The existing compositor refuses unresolved alternate original coordinates.
   // Do not silently reinterpret those coordinates as the native writable grid.
   paint_compute::checkpoint(cancelled);
-  {std::lock_guard lock(cache.mutex);
-    cache.native_emission_token=paint.composite_token_;cache.native_emission_factors=factors;cache.native_emission_preview=maps;
-  }
+  remember(maps);
+  retention.retain(maps, paint.composite_token_, factors, false, CompositeUse::NativeEmission);
   return maps;
 }
 std::shared_ptr<PaintedMesh> detail::EmissionExportAccess::without_emission(const PaintedMesh &paint) {
