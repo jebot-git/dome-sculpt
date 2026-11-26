@@ -1,0 +1,40 @@
+{
+  "production_source": "05f5d1cc",
+  "corrected_fixture": "2e9f5873",
+  "checks": 176543,
+  "original_native_checks": 88724,
+  "total_selected_checks": 265267,
+  "cases": [
+    {
+      "name": "source-owning-hdr-render",
+      "expected_checks": 4422,
+      "exit": 0,
+      "ELF_sha256": "5a78d67097b951b05d891e13c06634a2bbb5ce0eb053b2dcacf9e609bc30574f",
+      "seconds": 3.238447427749634,
+      "peak_owned_RSS_bytes": 1701052416
+    },
+    {
+      "name": "baked-emission-gpu",
+      "expected_checks": 172040,
+      "exit": 0,
+      "ELF_sha256": "a0963d790414c7e59f5a72b15413abb1f2996b99ba29f67496fe1dbc416dd95b",
+      "seconds": 0.3624386787414551,
+      "peak_owned_RSS_bytes": 935747584
+    },
+    {
+      "name": "mtoon-render",
+      "expected_checks": 81,
+      "exit": 0,
+      "ELF_sha256": "37a08ba2385435ff5e22ba408f93da50d644eb9edf228b92bde89c602d918bd1",
+      "seconds": 55.24968147277832,
+      "peak_owned_RSS_bytes": 2968051712
+    }
+  ],
+  "scope": "All selected cases other than independent full 2048 filtered normal workflow. Strict CPU and llvmpipe graphics. HDR test-only range initialization and outer count parser correction. Original failures preserved.",
+  "archive": {
+    "path": "docs/validation/strict-graphics-tail-20261126.tar.xz",
+    "sha256": "eeb9edaa4c7835e2053859a6b1d292dce958114db3706d5e6e6d00b55113629e",
+    "members": 22,
+    "bytes": 18752
+  }
+}

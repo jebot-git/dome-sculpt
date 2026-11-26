@@ -65,9 +65,17 @@ checks or resource limits; the full-resolution runtime diagnosis is pending.
 The strict native/software cohort passed 88,724 checks across the first 11 cases.
 Its first graphics case stopped with `Frame range is invalid` because the test
 fixture left `SurfaceRange::first` uninitialized. The corrected fixture
-`2e9f5873` rebuilds and links against the same strict core and renderer. The
-three graphics cases remain pending. The original invocation, terminal logs and
-live sanitizer witnesses are retained in the [strict runtime receipt](validation/strict-native-runtime-11-20261126.json).
+`2e9f5873` rebuilds and links against the same strict core and renderer. All
+three graphics cases then pass 176,543 checks, with exact retained HDR
+coefficients and maximum RGB error 1. The HDR test exited successfully while
+the original wrapper missed its aggregate count. Its captured logs support a
+read-only correction. Both subsequent graphics tests passed in the next run.
+Together the 14 selected cases pass 265,267 checks. The
+[native receipt](validation/strict-native-runtime-11-20261126.json) and
+[graphics receipt](validation/strict-graphics-tail-20261126.json) retain
+the original invocations, results, terminal logs and live sanitizer witnesses.
+The original and texel-reuse variants of the independent full-resolution
+advanced-normal workflow are running separately under the original limits.
 The HDR877 isolated 2048 worker passes its 22 checks. The complete 2048 joint
 Bake reaches a further `Baked maps exceed paint storage budget` refusal.
 The isolated integration candidate
