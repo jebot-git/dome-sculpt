@@ -49,6 +49,32 @@ int main(int argc,char**argv)try {
   }catch(const std::exception&e){caught=std::string_view(e.what()).find("cancelled")!=std::string_view::npos;}
   check(caught,"A real cached-bound hit still polls and honors cancellation");}
  empty_context();recipe->validate_current(mesh,nullptr);check(source.encode()==exact,"Exception/cancellation retry leaves every original source and native field exact");empty_context();
+ {
+  detail::WorkerColorBounds worker;
+  auto copy=*recipe;
+  auto image=std::make_shared<Image>(*recipe->projection->vertex_rgba);
+  auto projection=std::make_shared<PaintColorProjection>(*recipe->projection);
+  projection->vertex_rgba=image;
+  copy.projection=projection;
+  const auto &owned=copy.original_paint->mesh();
+  auto publish=[&]{
+   detail::ColorBoundScope job(&worker);
+   copy.validate_current(owned,nullptr);
+  };
+  publish();
+  const auto owners=image.use_count();
+  publish();
+  check(detail::last_color_bound_memo_stats().hits>0 && image.use_count()==owners,
+        "A subsequent worker job reuses the numerical bound without holding another image reference");
+  worker.clear();
+  publish();
+  check(detail::last_color_bound_memo_stats().misses>0 && detail::last_color_bound_memo_stats().hits==0,
+        "A new document generation clears the worker's previous numerical bounds");
+  std::fill(image->rgba.begin(),image->rgba.end(),0);
+  check(refusal(publish,"recorded source-field"),
+        "A working worker cache still refuses mutated same-owner image pixels");
+  empty_context();
+ }
  {auto colors=detail::polygon_target_colors(mesh,*recipe->current_descriptor());detail::ColorBoundScope call;
   check(refusal([&]{detail::color_projection_bound(mesh,colors,*recipe->projection->vertex_rgba,1);},"budget"),"Smaller actual work limits retain ordinary quality-resource refusal");}
  empty_context();
