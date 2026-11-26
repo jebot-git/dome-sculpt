@@ -7,6 +7,9 @@
 #include "dome/source-placement.hpp"
 #include "source-paint-parameters.hpp"
 #include "dome/vrm-authoring.hpp"
+#include "dome/gltf-export.hpp"
+#include "dome/native-authoring.hpp"
+#include "import-skin-fixtures.hpp"
 #include <future>
 #include <condition_variable>
 namespace {
@@ -296,6 +299,106 @@ void core_generated_frames(const std::filesystem::path &out) {
   check(import_error.find("Generated core normal tangents require nonsingular")!=std::string::npos&&
         empty.encode()==empty_data,"A collapsed normal sampler cannot generate a tangent and refuses atomically");
 }
+
+void core_glb_normal_frames(const std::filesystem::path &out) {
+  Scene empty;
+  empty.active().visible=false;
+  for(bool generated:{false,true})for(bool atlas:{false,true}){
+    auto fixture=import_fixture::skinned(false);
+    fixture.j["materials"]=core_source(false).j.at("materials");
+    fixture.j["extensionsUsed"]={"KHR_texture_transform","KHR_materials_emissive_strength"};
+    const int coordinate=generated?2:1;
+    for(auto &primitive:fixture.j["meshes"][0]["primitives"]){
+      if(!generated)continue;
+      primitive["attributes"].erase("TANGENT");
+      const auto extra=primitive["attributes"]["TEXCOORD_1"];
+      primitive["attributes"]["TEXCOORD_2"]=extra;
+      for(auto &target:primitive["targets"])target.erase("TANGENT");
+    }
+    auto &normal=fixture.j["materials"][0]["normalTexture"];
+    normal["texCoord"]=0;
+    auto &transform=normal["extensions"]["KHR_texture_transform"];
+    transform["texCoord"]=coordinate;
+    if(generated)transform["scale"]={-1.15f,.66f};
+    const auto label=std::string(generated?"core-glb-generated":"core-glb-authored")+(atlas?"-atlas":"-original");
+    const auto input=out/(label+".glb");
+    fixture.save(input);
+    ImportAuthoringOptions import;import.prepare_texture_atlas=atlas;import.paint_resolution=64;
+    auto source=prepare_authoring_import(empty,input,import);
+    source.scene.select(source.objects.front());
+    const auto &initial=source.scene.active();
+    const auto &frame=*initial.material_bindings->normal_frames->pbr;
+    const auto initial_bytes=source.scene.encode();
+    check(frame.generated_tangents==generated&&(!generated||frame.generated_uv==uint32_t(coordinate)),
+          "Core GLB import owns its authored or generated original normal frame");
+
+    Document worker;worker.replace(source.scene);
+    const auto output=out/(label+"-portable.glb");
+    worker.export_asset(output,AssetExportFormat::Glb).get();
+    end(worker);
+    check(worker.copy_scene().encode()==initial_bytes,"The public standard GLB file worker leaves its source intact");
+    const auto emitted=bytes(output);
+    cgltf_data *parsed=nullptr;
+    const cgltf_options options{};
+    check(cgltf_parse(&options,emitted.data(),emitted.size(),&parsed)==cgltf_result_success&&parsed&&
+          cgltf_validate(parsed)==cgltf_result_success,"Independent consumer validates the standard GLB");
+    const std::unique_ptr<cgltf_data,decltype(&cgltf_free)> primary(parsed,cgltf_free);
+    const auto json_view=json(output);
+    check(!json_view.contains("extras")||
+          !json_view.at("extras").contains("domeSculptAuthoring"),"Standard GLB carries standalone portable attributes");
+    const auto &sampler=json_view.at("materials").at(0).at("normalTexture");
+    check(sampler.at("texCoord")==coordinate&&sampler.at("scale")==normal.at("scale"),
+          "Standard GLB preserves the actual effective normal UV set and intensity");
+    const auto &st=sampler.at("extensions").at("KHR_texture_transform");
+    const auto &old_st=transform;
+    const auto expected_offset=old_st.at("offset").get<std::array<float,2>>();
+    const auto actual_offset=st.at("offset").get<std::array<float,2>>();
+    for(size_t k=0;k<2;++k)near(actual_offset[k],expected_offset[k],"The normal sampler offset remains authored");
+    const auto scales=st.at("scale").get<std::array<double,2>>();
+    const auto source_scales=old_st.at("scale").get<std::array<double,2>>();
+    const auto angle=st.at("rotation").get<double>(),old_angle=old_st.at("rotation").get<double>();
+    near(float(std::cos(angle)*scales[0]),float(std::cos(old_angle)*source_scales[0]),
+         "Exported normal sampler retains the signed U derivative");
+    near(float(std::sin(angle)*scales[1]),float(std::sin(old_angle)*source_scales[1]),
+         "Exported normal sampler retains the signed V derivative");
+    import.prepare_texture_atlas=false;
+    const auto reimported=prepare_authoring_import(empty,output,import);
+    const auto &from_portable=reimported.scene.object(reimported.objects.front()).material_bindings;
+    check(from_portable&&from_portable->normal_frames&&from_portable->normal_frames->pbr,
+          "Standalone GLB reimport restores a real normal frame owner");
+    const auto &read=*from_portable->normal_frames->pbr;
+    check(!read.generated_tangents&&read.tangents==frame.tangents,"Standalone GLB retains every explicit tangent and sign");
+    check(read.targets.size()==frame.targets.size()&&read.targets[0].tangents.size()==frame.targets[0].tangents.size(),
+          "Standalone GLB retains the complete morph tangent stream");
+    for(size_t k=0;k<read.targets[0].tangents.size();++k)
+      check(length(read.targets[0].tangents[k]-frame.targets[0].tangents[k])==0,"Standalone GLB retains exact morph tangent deltas");
+
+    if(atlas){
+      const auto editable=out/(label+"-editable.glb");
+      worker.export_asset(editable,AssetExportFormat::EditableGlb256).get();
+      end(worker);
+      check(extract_native_authoring(bytes(editable)).value().encode()==initial_bytes,
+            "Editable GLB keeps the exact original native project with the portable normal view");
+      continue;
+    }
+    auto surfaces=source.scene.export_surfaces();
+    auto forged=surfaces;
+    auto textures=std::make_shared<TextureMaps>(*forged.front().textures);
+    auto maps=std::make_shared<PaintSourceMaps>(*textures->source_maps);
+    auto &coords=coordinate==1?maps->uv1:maps->extra_uv_sets.at(uint32_t(coordinate));
+    auto foreign=std::make_shared<std::vector<std::array<float,2>>>(*coords);
+    foreign->front()[0]+=.1f;
+    coords=std::move(foreign);
+    textures->source_maps=std::move(maps);
+    forged.front().textures=std::move(textures);
+    check(refuses([&]{export_glb(forged,output);}).find("coordinates differ from the original source")!=std::string::npos&&
+          bytes(output)==emitted,"A changed normal UV stream refuses atomically");
+    GltfExportOptions cancel;
+    cancel.before_commit=[] {throw std::runtime_error("Test cancelled at portable commit");};
+    check(refuses([&]{export_glb(surfaces,output,cancel);}).find("Test cancelled at portable commit")!=std::string::npos&&
+          bytes(output)==emitted&&source.scene.encode()==initial_bytes,"Portable commit cancellation preserves the existing file and source scene");
+  }
+}
 }
 int main(int argc,char **argv)try{
  if(argc!=2)return 2;const std::filesystem::path out=argv[1];std::filesystem::create_directories(out);
@@ -372,5 +475,6 @@ int main(int argc,char **argv)try{
  NativeAuthoringExport owner;owner.scene=std::make_shared<const Scene>(baked.snapshot());owner.allow_portable_fallback=true;VrmExportOptions export_options;export_options.paint_resolution=64;const auto error=refuses([&]{export_vrm_authoring(owner,out/"still-dynamic.vrm",export_options);});std::cout<<"STATIC_DYNAMIC_REFUSAL "<<error<<'\n';check(baked.active().material_bindings->material.parameters.alpha==MToonAlpha::Mask&&error=="VRM1 differing UV targets couple moving upper roles to fixed paint"&&!std::filesystem::exists(out/"still-dynamic.vrm")&&owner.scene->encode()==baked.encode(),"Incompatible moving UV targets and fixed paint refuse portable export atomically");
  core_expressions(out);
  core_generated_frames(out);
+ core_glb_normal_frames(out);
  std::cout<<"PASS "<<checks<<" static VRM1 expression checks polls="<<polls<<'\n';return 0;
 }catch(const std::exception &e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
