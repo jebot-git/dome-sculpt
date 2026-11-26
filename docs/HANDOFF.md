@@ -774,8 +774,11 @@ native archive preserves the encoded data types and closes that setup
 error. The final Release 512 checkpoint chain and original 47,409-check
 workflow pass. Its parent `55e67401` also passes the full 2048 Release
 checkpoint chain with all 73,530,600 samples per role. The 2048 sanitizer
-capture passes on that parent and its dense oracle and history jobs are
-still running. A full-size run on `0833d18a` is also active.
+capture passes on that parent. Its first strict dense oracle and history
+jobs each reached the 900-second deadline. The ordered native file was
+written before termination. The final `0833d18a` capture also passes with
+43,293 checks. Its unpartitioned dense and history consumers also
+reached the original deadline.
 
 The exact `ccbbe020` ASan/UBSan application passes all 27 affine
 retopology checks on Intel Arc through the real OpenXR loader with
@@ -785,9 +788,38 @@ and pose, focus loss, unconfirmed drafts and clean shutdown.
 The broader Arc replay passes its first 58 checks, including
 initialization and session restart, then the radial voxel-remesh Undo
 case saves the same state as Accept. A separate delayed direct Undo action
-restores the exact baseline. Radial replay remains open. The original
-software failures remain recorded.
+restores the exact baseline. The original software and Arc failures
+remain recorded.
 [Follow-up validation](validation/strict-regression-followups-20261126.json)
+
+### Rendered controller readiness and full-size dense rows
+
+The Arc stereo trace shows the second voxel-Undo click opening the palette
+with Clay selected. Candidate `5a89ea5a` checks the actual root and enabled
+Undo highlight before activation. If remesh publication closes the palette,
+the synthetic controller reopens it after the released images show it gone.
+The focused Arc ASan/UBSan replay and complete software Release replay
+restore the original native project byte for byte. The latter passes 151
+checks.
+
+The broader Arc replay on `5a89ea5a` stops earlier at an independent
+material edit. Candidate `6f4743db` waits for the actual highlighted
+Materials sector and three RGB tracks before the existing ray actions.
+The focused Arc sanitizer replay reaches both acknowledgements and saves
+the exact expected RGB fields. The full software Release replay passes 152
+checks. Its Arc counterpart passes the two controller paths and stops after
+135 checks when the initial `--paint` project reaches the 40-second deadline.
+An isolated replay reaches the same deadline before an EGL log entry, an Arc
+render-node open or a project save. The process continues to consume CPU time.
+The exact startup stage still needs profiling.
+
+Candidate `871513fa` adds four disjoint row ranges to the existing dense
+HDR oracle. The complete 512-pixel Release reference and aggregate agree
+on sample counts and maxima for PBR, MToon and HDR. The full-size sanitizer
+ranges are active on one read-only native capture. The runner requires
+all rows, exact sample totals and the same maxima as the unpartitioned
+2048 Release oracle. The history consumer keeps its own strict gate.
+[Validation receipt](validation/controller-feedback-and-dense-rows-20261126.json)
 
 ## Source and integration boundary
 

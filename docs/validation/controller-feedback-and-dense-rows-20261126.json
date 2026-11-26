@@ -1,0 +1,776 @@
+{
+  "radial_undo": {
+    "candidate": "5a89ea5a9073ce03f4d3c58a0c9a7fd0f9b8c4ad",
+    "branch": "work/xr-voxel-undo-ready-20261126",
+    "scope": "Fixture-only OpenXR action sequence tied to actual palette and Undo visibility. Existing product binary.",
+    "focused_arc": {
+      "exit": 0,
+      "restores_exact_baseline": true,
+      "report_ready": true,
+      "accent": 131,
+      "time_gate_frames": 98,
+      "frames": 148,
+      "exhausted": false
+    },
+    "software_release": {
+      "candidate": "5a89ea5a9073ce03f4d3c58a0c9a7fd0f9b8c4ad",
+      "app_source": "ccbbe02093bed6997bdacdf0d36b3a11bc1f177d",
+      "invocation": "976cc598b4474a3daf77de91aa079388",
+      "profile": "software-release",
+      "terminal": true,
+      "phase": "complete",
+      "elapsed_seconds": 118.01,
+      "app_sha256": "4b6335a00541127e43528b7f2c985cc24213a9fc7ef77d268a471aef9d926a1b",
+      "runtime_sha256": "c68db257f22dafe70932308c414a7dc98cd3258a825abf91527cfa61b1e55d08",
+      "runner_sha256": "2867e2e443b2ac5a07c996cb9635c84bc344d43efe7b01527cd599c0a3376ca4",
+      "exit": 0,
+      "loader_exit": 0,
+      "checks": 151,
+      "report_complete": true,
+      "error": null,
+      "arc_witnesses": {},
+      "voxel": {
+        "exact_native_bytes": true,
+        "voxel_menu_pixels": 9884,
+        "voxel_menu_seen": true,
+        "voxel_open_pixels": 172,
+        "voxel_undo_pixels": 196,
+        "voxel_undo_seen": true
+      }
+    },
+    "broader_arc": {
+      "candidate": "5a89ea5a9073ce03f4d3c58a0c9a7fd0f9b8c4ad",
+      "app_source": "ccbbe02093bed6997bdacdf0d36b3a11bc1f177d",
+      "invocation": "3d484219b7e84b4ab3b69493a7adee50",
+      "profile": "arc-asan",
+      "terminal": true,
+      "phase": "complete",
+      "elapsed_seconds": 62.47,
+      "app_sha256": "ea49c9824090f8478315b9cb331faa84bdb9287a08fa06679c1cf7782b571229",
+      "runtime_sha256": "320570f8bb698b3a880f38e0d98d33060a3cf04dd7c099e4e2c76cd97d75cb5e",
+      "runner_sha256": "673ecb7a6eb7da017f5408eb1b3b0e007e1ef660211173ad14d51991d03ba5a6",
+      "exit": 1,
+      "loader_exit": 1,
+      "checks": 48,
+      "report_complete": false,
+      "error": "AssertionError: Joystick opens and confirms the active object's exact RGB ray edits",
+      "arc_witnesses": {
+        "baseline": {
+          "pid": 1229822,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "signal-committed": {
+          "pid": 1249334,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "signal-sigint": {
+          "pid": 1262618,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "signal-sigterm": {
+          "pid": 1278167,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "controller": {
+          "pid": 1292871,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "stylus": {
+          "pid": 1311465,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "controller-srgb": {
+          "pid": 1329914,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "sculpt-layers": {
+          "pid": 1346964,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "restart-prefix": {
+          "pid": 1365000,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "restart": {
+          "pid": 1376069,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "scene": {
+          "pid": 1397204,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        }
+      },
+      "voxel": {
+        "exact_native_bytes": false
+      }
+    },
+    "restored_scene_sha256": "af5423e0efde32e2367b4c696f2156d4d3cbdc8471d7b8e05fb9d4a76236049b"
+  },
+  "material_ray": {
+    "candidate": "6f4743db63cabf592f0dad32dcda8ef960f3ceb3",
+    "branch": "work/xr-material-ray-ready-20261126",
+    "focused_arc": {
+      "exit": 0,
+      "restores_exact_baseline": true,
+      "report_ready": true,
+      "accent": 1,
+      "time_gate_frames": 0,
+      "frames": 46,
+      "exhausted": false
+    },
+    "saved_color": [
+      0.04000004380941391,
+      0.12000001966953278,
+      0.800000011920929,
+      1.0
+    ],
+    "object_count": 2,
+    "full_arc": {
+      "candidate": "6f4743db63cabf592f0dad32dcda8ef960f3ceb3",
+      "app_source": "ccbbe02093bed6997bdacdf0d36b3a11bc1f177d",
+      "invocation": "5bf50f13a36f4410a3742cea6df01c9f",
+      "profile": "arc-asan",
+      "terminal": true,
+      "phase": "complete",
+      "elapsed_seconds": 234.9,
+      "app_sha256": "ea49c9824090f8478315b9cb331faa84bdb9287a08fa06679c1cf7782b571229",
+      "runtime_sha256": "08b9fd1c1049a1252c3f9bfd610efca28c57d9631d9c0b8cc36a6d83e3024863",
+      "runner_sha256": "a30016faea8144c08af732dd5782a1562387e2f69d83fa9bceb00b0712f81842",
+      "exit": 1,
+      "loader_exit": 1,
+      "checks": 135,
+      "report_complete": false,
+      "error": "TimeoutExpired: Command '['/home/blux/de-xr/dome-sculpt/artifacts/vrm-consumer-combined-asan-20261126/dome-sculpt', '--xr', '--frames', '1', '--save', '/home/blux/de-xr/dome-sculpt/artifacts/xr-material-ray-ready-validation-20261126/arc-asan/workflow/projects-ymrjtbfw/paint-baseline.dsculpt', '--paint']' timed out after 40 seconds",
+      "arc_witnesses": {
+        "baseline": {
+          "pid": 3806850,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "signal-committed": {
+          "pid": 3826283,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "signal-sigint": {
+          "pid": 3837449,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "signal-sigterm": {
+          "pid": 3850297,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "controller": {
+          "pid": 3862579,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "stylus": {
+          "pid": 3878808,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "controller-srgb": {
+          "pid": 3894083,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "sculpt-layers": {
+          "pid": 3909861,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "restart-prefix": {
+          "pid": 3925746,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "restart": {
+          "pid": 3935955,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "scene": {
+          "pid": 3953250,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "voxel-accept": {
+          "pid": 3970994,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "voxel-cancel": {
+          "pid": 3996808,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "voxel-focus": {
+          "pid": 4011869,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "voxel-undo": {
+          "pid": 4028424,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "bake-accept": {
+          "pid": 4059885,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "bake-cancel": {
+          "pid": 4073547,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "bake-focus": {
+          "pid": 4085284,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "bake-undo": {
+          "pid": 4097297,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "skin-transfer": {
+          "pid": 4113024,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "skin-fitted": {
+          "pid": 4127912,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "skin-focus": {
+          "pid": 4143580,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "retopo-committed": {
+          "pid": 4159791,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "retopo-accept": {
+          "pid": 4170838,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "retopo-focus": {
+          "pid": 4191202,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "retopo-unconfirmed": {
+          "pid": 18214,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "cut-accept": {
+          "pid": 39856,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "cut-unconfirmed": {
+          "pid": 60749,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "mask-prefix": {
+          "pid": 78403,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "mask-accept": {
+          "pid": 89838,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "mask-cancel": {
+          "pid": 108173,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "mask-focus": {
+          "pid": 125913,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "mask-fill": {
+          "pid": 143460,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "mask-undo": {
+          "pid": 161527,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        }
+      },
+      "voxel": {
+        "exact_native_bytes": true,
+        "voxel_menu_pixels": 10141,
+        "voxel_menu_reopens": 1,
+        "voxel_menu_seen": true,
+        "voxel_open_pixels": 172,
+        "voxel_undo_pixels": 131,
+        "voxel_undo_seen": true,
+        "voxel_undo_wait_frames": 110
+      }
+    },
+    "full_software": {
+      "candidate": "6f4743db63cabf592f0dad32dcda8ef960f3ceb3",
+      "app_source": "ccbbe02093bed6997bdacdf0d36b3a11bc1f177d",
+      "invocation": "0bc418b5307247e8a0670dd54edbfc31",
+      "profile": "software-release",
+      "terminal": true,
+      "phase": "complete",
+      "elapsed_seconds": 123.62,
+      "app_sha256": "4b6335a00541127e43528b7f2c985cc24213a9fc7ef77d268a471aef9d926a1b",
+      "runtime_sha256": "383dc8395d7cafc1d15494056b63fb791457a2972b589786d968cb1a265d70a3",
+      "runner_sha256": "e0d17c6be61d01a6b5675a4025f989c9fd7f0c4c633fcb825cc5c727eb585f8a",
+      "exit": 0,
+      "loader_exit": 0,
+      "checks": 152,
+      "report_complete": true,
+      "error": null,
+      "arc_witnesses": {},
+      "voxel": {
+        "exact_native_bytes": true,
+        "voxel_menu_pixels": 9884,
+        "voxel_menu_seen": true,
+        "voxel_open_pixels": 172,
+        "voxel_undo_pixels": 196,
+        "voxel_undo_seen": true
+      }
+    }
+  },
+  "paint_startup": {
+    "terminal": true,
+    "invocation": "e592f0b000d4412d8cbf6592c8dde8cc",
+    "timeout_seconds": 40,
+    "phase": "legal loader and native paint startup",
+    "exit": -15,
+    "elapsed": 40.14,
+    "first_graphics_log_seconds": null,
+    "created_save": false,
+    "arc_witnesses": 0
+  },
+  "hdr": {
+    "candidate": "871513fa6cb45d3e2a18b13c888b1bff5bc91502",
+    "branch": "work/hdr-strict-dense-rows-20261126",
+    "release_512": {
+      "profile": "release",
+      "resolution": 512,
+      "candidate": "871513fa6cb45d3e2a18b13c888b1bff5bc91502",
+      "terminal": true,
+      "invocation": "3e0a8b10fb6c43e7aa57d652732f62b1",
+      "deadline_per_phase_seconds": 900,
+      "owned_RSS_limit_bytes": 4294967296,
+      "core_sha256": "bd78d9c365efe67b9b18421e512cebdca6c1cc4309d45d7e0dd92bba92708081",
+      "phase": "complete",
+      "capture_inputs": {
+        "original-source.dsculpt": "6415086c94bb1d1570e167ee317e3b3bd73e510cd9b35d6c26da0e189cfab0d6",
+        "selected-target-resolution.dsculpt": "1491fc951b73c25f24205a96b66a36450e5f578944317a0166a8df24921c9ac2",
+        "observed-source.json": "9ed2472ab7e8a7eb89f0b582c399dcfd07215fefab89a923577e7414561fcd17",
+        "observed-second-bake.dsculpt": "60d1cd75a49e5b8a628b3fbfbab87cce8df34abd5320f7d869a20f8f767fa9f7"
+      },
+      "seconds": 27.07,
+      "partitions": [
+        [
+          0,
+          127
+        ],
+        [
+          127,
+          255
+        ],
+        [
+          255,
+          383
+        ],
+        [
+          383,
+          511
+        ]
+      ],
+      "binary_sha256": "d356aa870f9a3c4bd9d9dc47ed23cb6ae861f048dae2fdd0860b40ae0ae29bce",
+      "exit": 0,
+      "runs": [
+        {
+          "label": "rows-0-127",
+          "pid": 3753576,
+          "exit": 0,
+          "error": null,
+          "elapsed_seconds": 3.009,
+          "peak_owned_rss": 116789248,
+          "libasan_mapped": false,
+          "libubsan_mapped": false,
+          "checks": [
+            4118
+          ],
+          "log_sha256": "e6fe4bf1eb042dd58b492b9c406484e203c148105cdb018f4ed327910d9ddaa0"
+        },
+        {
+          "label": "rows-127-255",
+          "pid": 3753575,
+          "exit": 0,
+          "error": null,
+          "elapsed_seconds": 3.009,
+          "peak_owned_rss": 116838400,
+          "libasan_mapped": false,
+          "libubsan_mapped": false,
+          "checks": [
+            4118
+          ],
+          "log_sha256": "b3e947476e4f5bee16426f3987c58be9a6bccf2b50b63dcdd00a67f253441d3d"
+        },
+        {
+          "label": "rows-255-383",
+          "pid": 3753577,
+          "exit": 0,
+          "error": null,
+          "elapsed_seconds": 4.014,
+          "peak_owned_rss": 116850688,
+          "libasan_mapped": false,
+          "libubsan_mapped": false,
+          "checks": [
+            4118
+          ],
+          "log_sha256": "eebcf0a96e3d2b57f5eda698735bac409b905a7d9bfd750d7ec876fc6fba883c"
+        },
+        {
+          "label": "rows-383-511",
+          "pid": 3753579,
+          "exit": 0,
+          "error": null,
+          "elapsed_seconds": 2.509,
+          "peak_owned_rss": 116686848,
+          "libasan_mapped": false,
+          "libubsan_mapped": false,
+          "checks": [
+            4118
+          ],
+          "log_sha256": "3d0e56e9fcf79a522a9fe5db55bfe7d2c8e15253aebf29c16329a9103d29bb91"
+        }
+      ],
+      "aggregate_normals": [
+        [
+          0,
+          4536900,
+          0.00401572541845,
+          0.00544629434241
+        ],
+        [
+          1,
+          4536900,
+          0.00401572541845,
+          0.00544629434241
+        ]
+      ],
+      "aggregate_hdr": [
+        4536900,
+        3.06424057506e-06
+      ],
+      "reference_sha256": "3be9ce4e9561a8e0432627b64df807ae228819b07dc2b21e77685b02bb503cb4"
+    },
+    "asan_2048_rows": {
+      "profile": "asan",
+      "resolution": 2048,
+      "candidate": "871513fa6cb45d3e2a18b13c888b1bff5bc91502",
+      "terminal": true,
+      "invocation": "238e5eefa4db4737b5a9890fe2d7fd97",
+      "deadline_per_phase_seconds": 900,
+      "owned_RSS_limit_bytes": 4294967296,
+      "core_sha256": "828024bcdd488c84027dee87bddfe91e59106d8e33e23da398aa0a7812f000ab",
+      "phase": "complete",
+      "capture_inputs": {
+        "original-source.dsculpt": "6415086c94bb1d1570e167ee317e3b3bd73e510cd9b35d6c26da0e189cfab0d6",
+        "selected-target-resolution.dsculpt": "a2fb762266ccd6a3de39e44635521265397ad0b82e6411162daa84c90f2ad724",
+        "observed-source.json": "9ed2472ab7e8a7eb89f0b582c399dcfd07215fefab89a923577e7414561fcd17",
+        "observed-second-bake.dsculpt": "9c299cac73198075a602366fc7084e37409e6055f39a90d641f9ddf8add28673"
+      },
+      "seconds": 423.64,
+      "partitions": [
+        [
+          0,
+          511
+        ],
+        [
+          511,
+          1023
+        ],
+        [
+          1023,
+          1535
+        ],
+        [
+          1535,
+          2047
+        ]
+      ],
+      "binary_sha256": "07874b5062401ad8058072a83cc4525e2964cd09f541a930c12c0c71212c0dac",
+      "exit": 0,
+      "runs": [
+        {
+          "label": "rows-0-511",
+          "pid": 3823581,
+          "exit": 0,
+          "error": null,
+          "elapsed_seconds": 359.076,
+          "peak_owned_rss": 2098548736,
+          "libasan_mapped": true,
+          "libubsan_mapped": true,
+          "checks": [
+            4118
+          ],
+          "log_sha256": "c64b85a5e3a42b0a542c5346849d6d4d1ff665ad968f4c64456f3f22d02d3b81"
+        },
+        {
+          "label": "rows-511-1023",
+          "pid": 3823583,
+          "exit": 0,
+          "error": null,
+          "elapsed_seconds": 376.619,
+          "peak_owned_rss": 2098417664,
+          "libasan_mapped": true,
+          "libubsan_mapped": true,
+          "checks": [
+            4118
+          ],
+          "log_sha256": "d264484a94a66d80e4622608fc8fd35f5990579d68895e049921bb203ecaa7e2"
+        },
+        {
+          "label": "rows-1023-1535",
+          "pid": 3823585,
+          "exit": 0,
+          "error": null,
+          "elapsed_seconds": 376.057,
+          "peak_owned_rss": 2098626560,
+          "libasan_mapped": true,
+          "libubsan_mapped": true,
+          "checks": [
+            4118
+          ],
+          "log_sha256": "007151626e24f78c71e6b1a1cd11fff81890a88591659fdbe419084035190185"
+        },
+        {
+          "label": "rows-1535-2047",
+          "pid": 3823584,
+          "exit": 0,
+          "error": null,
+          "elapsed_seconds": 382.069,
+          "peak_owned_rss": 2098278400,
+          "libasan_mapped": true,
+          "libubsan_mapped": true,
+          "checks": [
+            4118
+          ],
+          "log_sha256": "dc15462f6fee1ff947f8aae5417d6c5c1700c6fa13c47933e3487e829359fec3"
+        }
+      ],
+      "aggregate_normals": [
+        [
+          0,
+          73530600,
+          0.00423080620101,
+          0.00585570130032
+        ],
+        [
+          1,
+          73530600,
+          0.00423080620101,
+          0.00585570130032
+        ]
+      ],
+      "aggregate_hdr": [
+        73530600,
+        3.17920956849e-06
+      ],
+      "reference_sha256": "cfbd94df3d7e9f6a4e6143b50b6bda5742bc1883af23e0bcf194feca305df429"
+    },
+    "asan_2048_parent": {
+      "profile": "asan",
+      "resolution": 2048,
+      "candidate": "55e67401d75133c0452637ab1cde2e0f09bfc0c5",
+      "terminal": true,
+      "invocation": "17071475cbba47f2a2146ead2ce6d650",
+      "deadline_per_phase_seconds": 900,
+      "owned_RSS_limit_bytes": 4294967296,
+      "core_sha256": "828024bcdd488c84027dee87bddfe91e59106d8e33e23da398aa0a7812f000ab",
+      "phase": "independent numerical oracle and ordered worker",
+      "seconds": 1391.88,
+      "binary_sha256": "fa5f202bd078e77aec31f007cb3ef5fe1ed477b325d8c0cbf9f735627145f160",
+      "capture": {
+        "label": "capture",
+        "pid": 3875204,
+        "exit": 0,
+        "error": null,
+        "elapsed_seconds": 449.552,
+        "peak_owned_rss": 2019000320,
+        "libasan_mapped": true,
+        "libubsan_mapped": true,
+        "checks": [
+          43292
+        ],
+        "log_sha256": "5658c1ac31a13f0908c9aae00b6b33afc39d9d8a26a1b88f1b3bc24cb4f735c4"
+      },
+      "capture_inputs": {
+        "original-source.dsculpt": "6415086c94bb1d1570e167ee317e3b3bd73e510cd9b35d6c26da0e189cfab0d6",
+        "selected-target-resolution.dsculpt": "a2fb762266ccd6a3de39e44635521265397ad0b82e6411162daa84c90f2ad724",
+        "observed-source.json": "9ed2472ab7e8a7eb89f0b582c399dcfd07215fefab89a923577e7414561fcd17",
+        "observed-second-bake.dsculpt": "9c299cac73198075a602366fc7084e37409e6055f39a90d641f9ddf8add28673"
+      },
+      "exit": 1,
+      "error": "RuntimeError(\"dense failed: {'label': 'dense', 'pid': 3944488, 'exit': -15, 'error': 'Original 900-second phase deadline reached', 'elapsed_seconds': 900.02, 'peak_owned_rss': 2095767552, 'libasan_mapped': True, 'libubsan_mapped': True, 'checks': [], 'log_sha256': 'cbeb7e412fa1eefb0c4787c566ea0bd934f9c3c9b3ceab2b84ba1de397e0995f'}\")"
+    },
+    "asan_2048_final": {
+      "profile": "asan",
+      "resolution": 2048,
+      "candidate": "0833d18ac2e9690e2d7849c8c1a09a4668538bde",
+      "terminal": true,
+      "invocation": "5a91449e8ab444c3a115f9e614c3a732",
+      "deadline_per_phase_seconds": 900,
+      "owned_RSS_limit_bytes": 4294967296,
+      "core_sha256": "828024bcdd488c84027dee87bddfe91e59106d8e33e23da398aa0a7812f000ab",
+      "phase": "independent numerical oracle and ordered worker",
+      "seconds": 1344.12,
+      "binary_sha256": "a234be523efd46d14cee29b2cfc7f8177768564ac757a0e0d98933d0b7f052d8",
+      "capture": {
+        "label": "capture",
+        "pid": 3943665,
+        "exit": 0,
+        "error": null,
+        "elapsed_seconds": 406.513,
+        "peak_owned_rss": 1870045184,
+        "libasan_mapped": true,
+        "libubsan_mapped": true,
+        "checks": [
+          43293
+        ],
+        "log_sha256": "38934ce4fd9c223858894d2ba6340cd31edf41e1f305c9071523ca91260eed5a"
+      },
+      "capture_inputs": {
+        "original-source.dsculpt": "6415086c94bb1d1570e167ee317e3b3bd73e510cd9b35d6c26da0e189cfab0d6",
+        "selected-target-resolution.dsculpt": "a2fb762266ccd6a3de39e44635521265397ad0b82e6411162daa84c90f2ad724",
+        "observed-source.json": "9ed2472ab7e8a7eb89f0b582c399dcfd07215fefab89a923577e7414561fcd17",
+        "observed-second-bake.dsculpt": "9c299cac73198075a602366fc7084e37409e6055f39a90d641f9ddf8add28673"
+      },
+      "exit": 1,
+      "error": "RuntimeError(\"dense failed: {'label': 'dense', 'pid': 123385, 'exit': -15, 'error': 'Original 900-second phase deadline reached', 'elapsed_seconds': 900.039, 'peak_owned_rss': 2095316992, 'libasan_mapped': True, 'libubsan_mapped': True, 'checks': [], 'log_sha256': '067979a519bb5e45598eb6469b4047d185657b61c4c897b27f1020786f8b04ad'}\")"
+    },
+    "ordered_save_survived_parent_timeout_sha256": "9c299cac73198075a602366fc7084e37409e6055f39a90d641f9ddf8add28673",
+    "scope": "Four disjoint row ranges of the existing independent normal and HDR oracle. Same captured source and baked state with no change to offsets or numerical thresholds."
+  },
+  "evidence": {
+    "path": "docs/validation/controller-feedback-and-dense-rows-20261126.tar.gz",
+    "sha256": "a21a992279115ba371752d4664edfa413b8680ad6d8f376602092220002c03ae"
+  }
+}
