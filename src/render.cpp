@@ -842,7 +842,8 @@ if(opacity<=0)discard;float x=clamp(weight_value,0,1)*4;vec3 ramp=x<1?mix(vec3(0
 if(slots[0]==1)base*=texture(tex0,source_uv(0));
 if(slots[1]==1){vec3 orm=texture(tex1,source_uv(1)).rgb;metal*=orm.b;rough*=orm.g;if(map_mode==1)ao=orm.r;}
 if(slots[2]==1)glow*=texture(tex2,source_uv(2)).rgb;
-if(retained_emission_domain!=0)glow=retained_hdr_sample(retained_emission_uv());
+if(retained_emission_domain==3)glow=retained_image_emission(false);
+else if(retained_emission_domain!=0)glow=retained_hdr_sample(retained_emission_uv());
 if(map_mode==2&&slots[4]==1)ao=mix(1.0,texture(tex4,source_uv(4)).r,ao_strength);
 if(overlay_mode==1){vec4 contribution=texture(tex7,paintcoord),orm=texture(tex8,paintcoord),coverage=texture(tex10,paintcoord);
  base=base*(1-coverage.r)+contribution;metal=metal*(1-coverage.g)+orm.b;rough=rough*(1-coverage.b)+orm.g;ao=ao*(1-orm.a)+orm.r;
@@ -967,11 +968,31 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
   };
   bool ghost_pass=false;
   auto bind_retained_emission = [&](const detail::BakedEmissionDomain *domain){
-    const int mode=domain?(domain->mapped()?2:1):0;
+    const int mode=domain?int(domain->version()):0;
     glUniform1i(glGetUniformLocation(program_,"retained_emission_domain"),mode);
-    if(mode==2){
+    if(mode>=2){
       glUniform3fv(glGetUniformLocation(program_,"retained_emission_u"),1,domain->mapping()[0].data());
       glUniform3fv(glGetUniformLocation(program_,"retained_emission_v"),1,domain->mapping()[1].data());
+    }
+    if(mode==3){
+      const auto &role=*domain->image();
+      const auto &texture=role.texture;
+      const auto layout=domain->texture_layout();
+      glUniform3fv(glGetUniformLocation(program_,"retained_image_u"),1,domain->image_mapping()[0].data());
+      glUniform3fv(glGetUniformLocation(program_,"retained_image_v"),1,domain->image_mapping()[1].data());
+      glUniform2fv(glGetUniformLocation(program_,"retained_image_scale"),1,role.scale.data());
+      glUniform2fv(glGetUniformLocation(program_,"retained_image_offset"),1,role.offset.data());
+      glUniform2fv(glGetUniformLocation(program_,"retained_image_rotation"),1,role.rotation.data());
+      const auto &uv=texture.uv_transform;
+      glUniform3f(glGetUniformLocation(program_,"retained_texture_u"),uv[0],uv[1],uv[4]);
+      glUniform3f(glGetUniformLocation(program_,"retained_texture_v"),uv[2],uv[3],uv[5]);
+      glUniform3fv(glGetUniformLocation(program_,"retained_image_factor"),1,role.factor.data());
+      glUniform1f(glGetUniformLocation(program_,"retained_source_strength"),domain->legacy_strength());
+      glUniform1i(glGetUniformLocation(program_,"retained_paint_size"),GLint(domain->field()->resolution()));
+      glUniform2i(glGetUniformLocation(program_,"retained_legacy_origin"),GLint(layout.legacy[0]),GLint(layout.legacy[1]));
+      glUniform2i(glGetUniformLocation(program_,"retained_image_origin"),GLint(layout.image[0]),GLint(layout.image[1]));
+      glUniform2i(glGetUniformLocation(program_,"retained_image_size"),GLint(texture.image->width),GLint(texture.image->height));
+      glUniform3i(glGetUniformLocation(program_,"retained_image_sampler"),texture.wrap_s,texture.wrap_t,texture.mag_filter);
     }
   };
   auto draw_range = [&](const Material &original, size_t first, size_t count,

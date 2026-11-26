@@ -27,9 +27,8 @@ inline void verify_filtered_emission_quality(const Mesh&low,const BakeSource&hig
  const BakeOptions&o,BakeResult&result,const std::shared_ptr<const BakedEmissionDomain>&domain){
  if(domain){
   // The factory proves exact ordered placed geometry and paint coordinates,
-  // non-occluding supporting faces and ONE genuine source contribution grid
-  // with a constant background. Its immutable source-grid coefficients retain
-  // the same continuous function without reconstruction on the target grid.
+  // non-occluding supporting faces and the affine map for each source input.
+  // The original grids retain their continuous functions throughout filtering.
   // Re-querying FLOAT ray barycentrics would add geometric/UV roundoff to this
   // exact correspondence, not measure resampling fidelity. The uncertified
   // raster route below continues to require its independent sampled check.

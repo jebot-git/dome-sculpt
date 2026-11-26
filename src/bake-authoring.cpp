@@ -190,7 +190,7 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   if(settings.emission_transport&&high.materials[0].resolved_emission&&detail::exact_emission_projection_directions(low_mesh,options)){
     try{emission_domain=detail::BakedEmissionDomain::capture(scene,source_id,target.painted->mesh_owner(),options.resolution,target_world,cancelled);}
     catch(const std::invalid_argument&){/* Uncertified correspondence keeps the independently checked raster route. */}
-    if(emission_domain&&emission_domain->mapped()&&target.painted->paint_sampling_domain())emission_domain.reset();
+    if(emission_domain&&emission_domain->version()!=1&&target.painted->paint_sampling_domain())emission_domain.reset();
   }
   // A separately retained UV write basis may differ from the current mesh.
   // Keep its existing raster route; sharing below requires the actual current

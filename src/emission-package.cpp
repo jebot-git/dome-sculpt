@@ -286,9 +286,15 @@ void native_domain(const Json &j,std::span<const uint8_t> binary,const Json &ent
 // Package5 keeps the source knots independent from the current paint grid.
 // The EXR is a witness of the immutable domain, never a replacement for it.
 size_t retained_descriptor(const Json &record){
- const bool mapped=record.is_object()&&record.value("version",0)==2;
- if(!record.is_object()||record.size()!=(mapped?9:8)||record.at("version")!=(mapped?2:1)||record.at("kind")!="retained-emission43"||
-    (mapped&&(!record.contains("coordinates")||!record.at("coordinates").is_array()||record.at("coordinates").size()!=2)))
+ if(!record.is_object()||!record.contains("version")||!record.at("version").is_number_integer())
+  throw std::invalid_argument("Unknown retained emission witness interpretation");
+ const auto &version=record.at("version");
+ auto has_coordinates=[&](const char *key){
+  return record.contains(key)&&record.at(key).is_array()&&record.at(key).size()==2;
+ };
+ if((version!=1&&version!=2&&version!=3)||record.size()!=7+version.get<unsigned>()||
+    record.at("kind")!="retained-emission43"||
+    (version!=1&&!has_coordinates("coordinates"))||(version==3&&!has_coordinates("imageCoordinates")))
   throw std::invalid_argument("Unknown retained emission witness interpretation");
  integer(record.at("sourceObject"),UINT64_MAX,"Invalid retained emission source identity");
  const auto source=integer(record.at("sourceResolution"),4096,"Retained emission source resolution exceeds policy");
@@ -304,7 +310,9 @@ void retained_coordinates(const Json &j,std::span<const uint8_t> binary,const Js
  owner->validate_current(*object.painted);
  if(record.at("sourceObject")!=owner->source_id()||record.at("sourceResolution")!=owner->field()->resolution()||record.at("targetResolution")!=owner->target_resolution())
   throw std::invalid_argument("Retained emission witness changed its source/target grid identity");
- if(record.at("version")!=(owner->mapped()?2:1)||(owner->mapped()&&record.at("coordinates")!=Json(owner->mapping())))
+ if(record.at("version")!=owner->version()||
+    (owner->version()!=1&&record.at("coordinates")!=Json(owner->mapping()))||
+    (owner->image()&&record.at("imageCoordinates")!=Json(owner->image_mapping())))
   throw std::invalid_argument("Retained emission witness changed its certified coordinates");
  if(entry.contains("domain")){
   if(entry.at("domain").at("texCoord")!=coordinate)throw std::invalid_argument("Retained emission borrowed another writable coordinate domain");
@@ -375,8 +383,9 @@ void detail::attach_native_emission(GltfDocument &document,const NativeEmissionE
   auto expected=detail::baked_emission_field(current_object,cancelled,entry.authored_mtoon);
   if(expected.version!=entry.image.version||expected.width!=entry.image.width||expected.height!=entry.image.height||expected.pixels!=entry.image.pixels)throw std::invalid_argument("Retained emission current coefficients changed after preparation");
   auto source=detail::retained_source_emission_field(current_object,cancelled);limits.max_encoded_bytes=std::min(max_bytes,size_t(128*1024*1024)-exr_bytes);const auto source_bytes=encode_emission_exr(source,limits);exr_bytes+=source_bytes.size();auto witness=append(source_bytes);
-  witness["version"]=actual->mapped()?2:1;witness["kind"]="retained-emission43";witness["sourceObject"]=actual->source_id();witness["sourceResolution"]=source.width;witness["targetResolution"]=actual->target_resolution();witness["texCoord"]=entry.texcoord;
-  if(actual->mapped())witness["coordinates"]=actual->mapping();
+  witness["version"]=actual->version();witness["kind"]="retained-emission43";witness["sourceObject"]=actual->source_id();witness["sourceResolution"]=source.width;witness["targetResolution"]=actual->target_resolution();witness["texCoord"]=entry.texcoord;
+  if(actual->version()!=1)witness["coordinates"]=actual->mapping();
+  if(actual->image())witness["imageCoordinates"]=actual->image_mapping();
   record["retainedEmission"]=std::move(witness);retained_coordinates(j,document.binary,record,current_object,cancelled);
  }
  package["images"].push_back(std::move(record));}

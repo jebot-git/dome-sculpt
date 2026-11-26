@@ -2,6 +2,7 @@
 #include "dome/document.hpp"
 #include "dome/emission-native.hpp"
 #include "dome/source-maps.hpp"
+#include "dome/source-paint.hpp"
 #include "emission-bake-source.hpp"
 #include "gltf-document.hpp"
 #include "humanoid-sha256.hpp"
@@ -76,14 +77,29 @@ void check_samples(const Scene &scene,uint64_t source){
 } // namespace
 
 int main(int argc,char **argv)try{
- if(argc!=2)return 2;
+ const bool image=argc==3&&std::string_view(argv[2])=="--image";
+ if(argc!=2&&!image)return 2;
  const std::filesystem::path output=argv[1];
  std::filesystem::create_directories(output);
  Scene scene;
  const auto source=scene.active().id;
  auto &from=scene.active();
  from.mesh_active=true;from.material.emissive={.07f,.12f,.01f};
- from.painted=std::make_shared<PaintedMesh>(quad(),64);
+ if(image){
+  from.visible=false;
+  from.material.emissive={2.1f,1.25f,3.5f};
+  auto maps=std::make_shared<PaintSourceMaps>();
+  maps->emission.image=std::make_shared<const Image>(Image{2,3,{
+   255,0,40,255, 40,230,0,255, 0,70,255,255, 120,0,50,255, 5,100,15,255, 230,0,255,255}});
+  maps->emission.texcoord=1;maps->emission.mag_filter=maps->emission.min_filter=9729;
+  auto raw=quad(),atlas=raw;
+  auto uv1=std::make_shared<std::vector<std::array<float,2>>>(raw.uv);
+  for(auto &uv:*uv1)uv[0]=1-uv[0];
+  maps->uv1=uv1;
+  for(auto &uv:atlas.uv)uv={.125f+.75f*uv[0],.0625f+.875f*uv[1]};
+  const std::array<uint32_t,4> vertices{0,1,2,3};
+  from.painted=prepare_source_paint(capture_source_sampling(raw,maps,64),std::move(atlas),vertices);
+ }else from.painted=std::make_shared<PaintedMesh>(quad(),64);
  stamp(*from.painted,{-.32f,0,0},{4,.06f,.2f});
  stamp(*from.painted,{.21f,.16f,0},{.3f,1.9f,.08f});
  auto target_mesh=quad();
@@ -108,9 +124,13 @@ int main(int argc,char **argv)try{
  check(app.wait_asset()&&app.wait_mesh()&&app.frame().state->error.empty(),"Actual Bake worker and following ordered Save complete");
  const auto baked=app.copy_scene();
  const auto domain=baked.active().painted->baked()->emission_domain;
- const detail::BakedEmissionDomain::Mapping expected{{{-2,.5f,1.125f},{0,2,-.5f}}};
+ using Mapping=detail::BakedEmissionDomain::Mapping;
+ const Mapping expected=image?Mapping{{{-1.5f,.375f,.96875f},{0,1.75f,-.375f}}}:
+                              Mapping{{{-2,.5f,1.125f},{0,2,-.5f}}};
+ const Mapping expected_image{{{2,-.5f,-.125f},{0,2,-.5f}}};
  check(domain&&domain->mapping()==expected&&domain->field()->resolution()==64&&domain->target_resolution()==128,
        "Bake retains the true mirrored source64 grid under the current128 paint grid");
+ if(image)check(domain->image()&&domain->image_mapping()==expected_image,"The original image remains in its own logical UV space");
  check_samples(baked,source);
  const auto exact=baked.encode();
  check(app.undo()&&app.wait_mesh()&&app.copy_scene().encode()==baseline,"Bake is exactly one Undo");
@@ -119,11 +139,12 @@ int main(int argc,char **argv)try{
  check(reopened.encode()==exact,"Native reopen preserves exact independent coordinates and owners");
  check_samples(reopened,source);
  auto record=domain->encode();
- check(record.at("version")==2&&record.at("coordinates")==Json(expected),"Mapped native source carries explicit coordinate version");
+ check(record.at("version")== (image?3:2)&&record.at("coordinates")==Json(expected),"Mapped native source carries explicit coordinate version");
+ if(image)check(record.at("image_coordinates")==Json(expected_image),"Native source retains and authenticates the image coordinates");
  auto malformed=record;
  malformed["coordinates"][0].push_back(17);
  refuses([&]{detail::BakedEmissionDomain::preflight_archive(malformed);},"Invalid retained emission coordinate record");
- record["coordinates"][0][2]=1.f;
+ record[image?"image_coordinates":"coordinates"][0][2]=1.f;
  refuses([&]{detail::BakedEmissionDomain::decode(record,baked.active().painted->mesh_owner(),128);},
          "changed its certified coordinates");
  const auto glb=output/"mapped.glb";
@@ -137,8 +158,9 @@ int main(int argc,char **argv)try{
  bool found=false;
  for(auto &entry:marker.at("images"))if(entry.at("object")==target){
   auto &witness=entry.at("retainedEmission");
-  check(witness.at("version")==2&&witness.at("coordinates")==Json(expected),"GLB witnesses its native mapping separately from target UV0");
-  witness["coordinates"][0][2]=1.f;
+  check(witness.at("version")== (image?3:2)&&witness.at("coordinates")==Json(expected),"GLB witnesses its native mapping separately from target UV0");
+  if(image)check(witness.at("imageCoordinates")==Json(expected_image),"GLB authenticates the independent original image coordinates");
+  witness[image?"imageCoordinates":"coordinates"][0][2]=1.f;
   found=true;
  }
  check(found,"Actual retained target exported");

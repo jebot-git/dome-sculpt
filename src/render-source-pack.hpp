@@ -55,7 +55,10 @@ private:
       }
       shared.emplace(key,view);
       uint32_t width=input.overlay?input.overlay->resolution():input.owner->width,height=input.overlay?input.overlay->resolution():input.owner->height;
-      if(input.overlay&&input.plane==5)width=height=input.overlay->baked()->emission_domain->field()->resolution();
+      if(input.overlay&&input.plane==5){
+        const auto layout=input.overlay->baked()->emission_domain->texture_layout();
+        width=layout.width;height=layout.height;
+      }
       for(size_t level=0;;++level) {
         if(level>=14 || texels>size_t(INT_MAX)-size_t(width)*height)
           throw std::length_error("GPU source pack metadata exceeds index limits");

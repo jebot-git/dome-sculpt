@@ -67,6 +67,7 @@ struct Source {
   std::shared_ptr<const PaintOverlayPacket> packet;
   std::shared_ptr<const PaintSourceMaps> maps;
   PaintSourceTexture role;
+  std::optional<EmissionImageRole> image;
   std::optional<MToonMaterial> toon;
   std::array<float,3> background{};
   float legacy_strength=1;
@@ -88,23 +89,20 @@ struct Source {
     for(size_t k=0;k<3;++k){const auto uv=values->at(mesh->indices[size_t(triangle)*3+k]);for(size_t c=0;c<2;++c)result[c]+=double(uv[c])*bary[k];}
     return {float(result[0]),float(result[1])};
   }
+  std::array<float,2> paint_coordinates(uint32_t tri,std::array<float,3> bary)const{
+    return source_overlay_coordinates(*packet,tri,bary,coordinates(tri,bary,0,false));
+  }
+  std::array<float,2> image_coordinates(uint32_t tri,std::array<float,3> bary)const{
+    // PBR roles name transported carriers. Typed slots keep their logical UV.
+    const int set=toon?mtoon_coordinate(toon->textures[size_t(MToonSlot::Emission)]):role.texcoord;
+    return coordinates(tri,bary,set,bool(toon));
+  }
   std::array<float,3> sample(uint32_t triangle,std::array<float,3> bary)const{
-    stop();auto original=background;
-    if(role.image&&!physical_background){
-      // PBR roles already name transported current carriers. Typed slots keep
-      // their original logical ordinal, including separately retained artist UV1.
-      auto uv=coordinates(triangle,bary,toon?mtoon_coordinate(toon->textures[size_t(MToonSlot::Emission)]):role.texcoord,bool(toon));
-      if(toon)uv=mtoon_uv(*toon,MToonSlot::Emission,uv,0);
-      // coordinates() has authenticated and resolved the actual source set.
-      // The ordinary image sampler accepts only a resolved coordinate pair;
-      // retain its affine/filter/image, without reinterpreting UV1 as UV0.
-      auto resolved=role;resolved.texcoord=0;
-      const auto value=sample_source_texture(resolved,uv[0],uv[1],true);
-      for(size_t k=0;k<3;++k){const double radiance=double(original[k])*value[k];if(radiance>std::numeric_limits<float>::max())throw std::overflow_error("Emission Bake source multiplication overflows FLOAT");original[k]=float(radiance);}
-    }
+    stop();
+    const auto original=image?image->sample(image_coordinates(triangle,bary)):background;
     BakedEmissionSample replacement;
     if(packet){
-      const auto uv=source_overlay_coordinates(*packet,triangle,bary,coordinates(triangle,bary,0,false));
+      const auto uv=paint_coordinates(triangle,bary);
       const auto values=sample_overlay_values(*packet,uv[0],uv[1],false);
       for(size_t k=0;k<3;++k){replacement.legacy[k]=values[2][k];replacement.absolute[k]=values[4][k];}
       replacement.coverage=values[3][3];
@@ -112,6 +110,13 @@ struct Source {
     return replacement.resolve(original,legacy_strength);
   }
 };
+}
+std::array<float,3> EmissionImageRole::sample(std::array<float,2> uv)const{
+ const double x=double(uv[0])*scale[0],y=double(uv[1])*scale[1];
+ const float u=float(rotation[0]*x-rotation[1]*y+offset[0]);
+ const float v=float(rotation[1]*x+rotation[0]*y+offset[1]);
+ const auto rgb=sample_source_texture(texture,u,v,true);
+ return {rgb[0]*factor[0],rgb[1]*factor[1],rgb[2]*factor[2]};
 }
 std::shared_ptr<const PaintOverlayPacket> PaintOverlayFactory::capture_normal_source(
     const SculptObject &object,const std::function<bool()> &cancelled){
@@ -557,8 +562,8 @@ std::shared_ptr<const TextureMaps> source_baked_preview(const SculptObject &obje
   (void)raw_bake_source(object,cancelled);
   return PaintOverlayFactory::capture_source_baked(*object.painted,cancelled);
 }
-std::function<std::array<float,3>(uint32_t,std::array<float,3>)>
-emission_bake_source(const SculptObject &object,const std::function<bool()> &cancelled){
+namespace {
+std::shared_ptr<const Source> capture_emission_source(const SculptObject &object,const std::function<bool()> &cancelled){
   if(cancelled&&cancelled())throw std::runtime_error("Emission Bake cancelled");
   const auto &binding=object.material_bindings;
   std::optional<MToonMaterial> typed;
@@ -605,10 +610,36 @@ emission_bake_source(const SculptObject &object,const std::function<bool()> &can
     }
   }
   if(binding&&binding->physical_emission){source->background=*binding->physical_emission;source->physical_background=true;}
+  if(source->role.image&&!source->physical_background){
+    auto &image=source->image.emplace();
+    image.texture=source->role;
+    // The coordinate owner resolves the ordinal before the ordinary sampler.
+    image.texture.texcoord=0;
+    image.factor=source->background;
+    if(const auto &toon=source->toon){
+      const auto &slot=toon->textures[toon->version()==MToonVersion::V0?0:size_t(MToonSlot::Emission)];
+      image.scale=slot.scale;image.offset=slot.offset;
+      image.rotation={std::cos(slot.rotation),std::sin(slot.rotation)};
+    }
+  }
   source->stop();
-  // Only const ownership escapes; no caller's mutable object/material is read
-  // from the worker after this capture or from a rendering callback.
-  std::shared_ptr<const Source> immutable=std::move(source);
-  return [immutable](uint32_t triangle,std::array<float,3> bary){return immutable->sample(triangle,bary);};
+  return source;
+}
+}
+std::function<std::array<float,3>(uint32_t,std::array<float,3>)>
+emission_bake_source(const SculptObject &object,const std::function<bool()> &cancelled){
+ const auto source=capture_emission_source(object,cancelled);
+ if(!source)return {};
+ return [source](uint32_t triangle,std::array<float,3> bary){return source->sample(triangle,bary);};
+}
+EmissionBakeInputs emission_bake_inputs(const SculptObject &object,const std::function<bool()> &cancelled){
+ const auto source=capture_emission_source(object,cancelled);
+ if(!source||!source->packet)return {};
+ EmissionBakeInputs inputs;
+ inputs.paint=source->packet;inputs.image=source->image;
+ inputs.background=source->background;inputs.legacy_strength=source->legacy_strength;
+ inputs.paint_coordinates=[source](uint32_t tri,std::array<float,3> bary){return source->paint_coordinates(tri,bary);};
+ if(inputs.image)inputs.image_coordinates=[source](uint32_t tri,std::array<float,3> bary){return source->image_coordinates(tri,bary);};
+ return inputs;
 }
 } // namespace dome::detail

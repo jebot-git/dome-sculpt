@@ -45,13 +45,20 @@ void main(){vec2 p=vec2(gl_VertexID==1?3:-1,gl_VertexID==2?3:-1);gl_Position=vec
 uniform usamplerBuffer common_pixels;uniform samplerBuffer physical_pixels;uniform isamplerBuffer tile_offsets,padding;
 uniform sampler2D baked_color,baked_orm,baked_emission,baked_coverage;
 uniform int resolution,layer_count,has_baked,baked_float_offset,has_domain,extract_domain,domain_resolution,domain_float_offset;uniform float layer_opacity[16];
+uniform ivec2 domain_origin;
 layout(location=0)out vec4 colour;layout(location=1)out vec4 orm;layout(location=2)out vec4 legacy;layout(location=3)out vec4 coverage;layout(location=4)out vec4 physical;
 float byte_value(uvec4 p,int i){return float((p[i/4]>>uint((i%4)*8))&255u)/255.0;}
 vec3 decode_rgb(vec3 c){return mix(c/12.92,pow((c+.055)/1.055,vec3(2.4)),greaterThan(c,vec3(.04045)));}
 float ph(int offset,int component){return texelFetch(physical_pixels,offset+component).r;}
 void main(){
  colour=orm=legacy=coverage=physical=vec4(0);ivec2 out_pixel=ivec2(gl_FragCoord.xy);
- if(extract_domain==1){int base=domain_float_offset+(out_pixel.y*domain_resolution+out_pixel.x)*7;colour=vec4(ph(base,3),ph(base,4),ph(base,5),ph(base,6));return;}
+ if(extract_domain!=0){
+  ivec2 point=out_pixel-domain_origin;
+  int base=domain_float_offset+(point.y*domain_resolution+point.x)*7;
+  int lane=extract_domain==1?3:0;
+  colour=vec4(ph(base,lane),ph(base,lane+1),ph(base,lane+2),ph(base,6));
+  return;
+ }
  int at=out_pixel.y*resolution+out_pixel.x;int owner=texelFetch(padding,at).r;if(owner<0)return;
  ivec2 p=ivec2(owner%resolution,owner/resolution);
  if(has_baked==1){float a=texelFetch(baked_coverage,p,0).r;vec4 c=texelFetch(baked_color,p,0);c.rgb=decode_rgb(c.rgb);colour=c*a;coverage=vec4(a);orm=vec4(texelFetch(baked_orm,p,0).rgb*a,a);legacy=vec4(decode_rgb(texelFetch(baked_emission,(baked_float_offset>=0||has_domain==1)?ivec2(0):p,0).rgb)*a,a);physical.a=a;if(baked_float_offset>=0){int base=baked_float_offset+owner*7;for(int k=0;k<3;++k){legacy[k]=ph(base,k);physical[k]=ph(base,3+k);}float emission_coverage=ph(base,6);coverage.a=legacy.a=physical.a=emission_coverage;}}
@@ -87,7 +94,8 @@ void main(){
   size_t mip_pixels=0;for(size_t width=input.resolution();;width=std::max(size_t(1),width/2)){mip_pixels+=width*width;if(width==1)break;}
   const size_t plane_bytes=mip_pixels*16;
   const uint32_t domain_resolution=domain?domain->field()->resolution():0;
-  const size_t domain_bytes=size_t(domain_resolution)*domain_resolution*16;
+  const auto layout=domain?domain->texture_layout():BakedEmissionDomain::TextureLayout{};
+  const size_t domain_bytes=size_t(layout.width)*layout.height*16;
   result.bytes=plane_bytes*5+domain_bytes;
   if(result.bytes>budget)throw std::length_error("GPU overlay byte budget exceeded");
   struct CommonRef{const PaintTile*tile;const PaintColorTile*colour;size_t destination;};
@@ -112,7 +120,7 @@ void main(){
   // A known byte refusal stays entirely in owned CPU code. Query the driver
   // only after that forecast, still before any large pixel-vector allocation.
   GLint max_buffer=0,max_size=0,max_draw=0;glGetIntegerv(GL_MAX_TEXTURE_BUFFER_SIZE,&max_buffer);glGetIntegerv(GL_MAX_TEXTURE_SIZE,&max_size);glGetIntegerv(GL_MAX_DRAW_BUFFERS,&max_draw);
-  if(pixels>size_t(std::max(0,max_buffer))||common_pixels>size_t(std::max(0,max_buffer))||physical_values+field_bytes/4>size_t(std::max(0,max_buffer))||offset_count>size_t(std::max(0,max_buffer))||input.resolution()>uint32_t(std::max(0,max_size))||domain_resolution>uint32_t(std::max(0,max_size))||max_draw<5)throw std::length_error("GPU overlay exceeds device limits");
+  if(pixels>size_t(std::max(0,max_buffer))||common_pixels>size_t(std::max(0,max_buffer))||physical_values+field_bytes/4>size_t(std::max(0,max_buffer))||offset_count>size_t(std::max(0,max_buffer))||input.resolution()>uint32_t(std::max(0,max_size))||std::max(layout.width,layout.height)>uint32_t(std::max(0,max_size))||max_draw<5)throw std::length_error("GPU overlay exceeds device limits");
   std::vector<std::array<uint32_t,4>> common;std::vector<float> physical;std::vector<std::array<int32_t,2>> offsets(offset_count,{-1,-1});common.reserve(common_pixels);physical.reserve(physical_values);
   int32_t common_offset=-1,physical_offset=-1;
   for(size_t i=0;i<common_keys.size();++i){const auto &key=common_keys[i];if(!i||common_key(key)!=common_key(common_keys[i-1])){common_offset=int32_t(common.size());for(size_t px=0;px<1024;++px){std::array<uint8_t,16> bytes{};std::copy(key.tile->pixels[px].data.begin(),key.tile->pixels[px].data.end(),bytes.begin());if(key.colour)std::copy(key.colour->pixels[px].begin(),key.colour->pixels[px].end(),bytes.begin());std::array<uint32_t,4> words{};for(size_t b=0;b<16;++b)words[b/4]|=uint32_t(bytes[b])<<((b%4)*8);common.push_back(words);}}offsets[key.destination][0]=common_offset;}
@@ -146,12 +154,27 @@ void main(){
     // Extract the immutable seven-FLOAT records on the GPU at their ORIGINAL
     // resolution. No resampling into the editable atlas or CPU readback.
     result.retained_store=ledger_->create(Ledger::Kind::Texture,domain_bytes,Ledger::Domain::Material,group_);result.retained_emission=result.retained_store.name();
-    glActiveTexture(GL_TEXTURE0);glBindTexture(GL_TEXTURE_2D,result.retained_emission);glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA32F,GLsizei(domain_resolution),GLsizei(domain_resolution),0,GL_RGBA,GL_FLOAT,nullptr);
+    glActiveTexture(GL_TEXTURE0);glBindTexture(GL_TEXTURE_2D,result.retained_emission);glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA32F,GLsizei(layout.width),GLsizei(layout.height),0,GL_RGBA,GL_FLOAT,nullptr);
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);
     for(size_t n=1;n<5;++n)glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER,attachments[n],GL_TEXTURE_2D,0,0);
     glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER,GL_COLOR_ATTACHMENT0,GL_TEXTURE_2D,result.retained_emission,0);glDrawBuffer(GL_COLOR_ATTACHMENT0);
     if(glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER)!=GL_FRAMEBUFFER_COMPLETE)throw std::runtime_error("Retained HDR framebuffer incomplete");
-    glViewport(0,0,GLsizei(domain_resolution),GLsizei(domain_resolution));glUniform1i(glGetUniformLocation(program_,"extract_domain"),1);glUniform1i(glGetUniformLocation(program_,"domain_resolution"),GLint(domain_resolution));glUniform1i(glGetUniformLocation(program_,"domain_float_offset"),GLint(physical.size()));glDrawArrays(GL_TRIANGLES,0,3);
+    glUniform1i(glGetUniformLocation(program_,"domain_resolution"),GLint(domain_resolution));
+    glUniform1i(glGetUniformLocation(program_,"domain_float_offset"),GLint(physical.size()));
+    auto extract=[&](int lane,std::array<uint32_t,2> origin){
+     glViewport(GLint(origin[0]),GLint(origin[1]),GLsizei(domain_resolution),GLsizei(domain_resolution));
+     glUniform1i(glGetUniformLocation(program_,"extract_domain"),lane);
+     glUniform2i(glGetUniformLocation(program_,"domain_origin"),GLint(origin[0]),GLint(origin[1]));
+     glDrawArrays(GL_TRIANGLES,0,3);
+    };
+    extract(1,{0,0});
+    if(const auto &role=domain->image()){
+     extract(2,layout.legacy);
+     glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER,GL_COLOR_ATTACHMENT0,GL_TEXTURE_2D,0,0);
+     const auto &original=*role->texture.image;
+     glTexSubImage2D(GL_TEXTURE_2D,0,GLint(layout.image[0]),GLint(layout.image[1]),
+                     GLsizei(original.width),GLsizei(original.height),GL_RGBA,GL_UNSIGNED_BYTE,original.rgba.data());
+    }
    }
    if(glGetError()!=GL_NO_ERROR)throw std::runtime_error("GPU sparse overlay compilation failed");
   }catch(...){throw;}
@@ -164,7 +187,9 @@ public:
  static size_t texture_bytes(const std::shared_ptr<const PaintOverlayPacket> &owner){
   if(!owner)throw std::invalid_argument("Missing immutable overlay input");if(owner->empty())return 0;
   size_t pixels=0;for(size_t width=owner->resolution();;width=std::max(size_t(1),width/2)){pixels+=width*width;if(width==1)break;}
-  const auto domain=owner->baked()?owner->baked()->emission_domain:nullptr;const size_t r=domain?domain->field()->resolution():0;return pixels*16*5+r*r*16;
+  const auto domain=owner->baked()?owner->baked()->emission_domain:nullptr;
+  const auto layout=domain?domain->texture_layout():BakedEmissionDomain::TextureLayout{};
+  return pixels*16*5+size_t(layout.width)*layout.height*16;
  }
  static size_t texture_images(const std::shared_ptr<const PaintOverlayPacket> &owner){if(!owner)throw std::invalid_argument("Missing immutable overlay input");return owner->empty()?0:5+size_t(owner->baked()&&owner->baked()->emission_domain);}
 

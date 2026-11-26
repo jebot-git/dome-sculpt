@@ -132,7 +132,7 @@ EmissionInterchangeImage retained_source_emission_field(const SculptObject &obje
  owner->validate_current(*object.painted);
  const auto &source=*owner->field();EmissionInterchangeImage result;result.version=2;
  result.width=result.height=source.resolution();result.pixels.resize(source.values().size());
- for(size_t i=0;i<result.pixels.size();++i){if((i&1023)==0)stop(cancelled);const auto &sample=source.values()[i];const auto radiance=sample.resolve({},1);auto &p=result.pixels[i];
+ for(size_t i=0;i<result.pixels.size();++i){if((i&1023)==0)stop(cancelled);const auto &sample=source.values()[i];const auto radiance=sample.resolve({},owner->legacy_strength());auto &p=result.pixels[i];
   for(size_t k=0;k<3;++k){p[k]=radiance[k];p[3+k]=sample.legacy[k];p[6+k]=sample.absolute[k];}p[9]=sample.coverage;}
  result.validate();return result;
 }
