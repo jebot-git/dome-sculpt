@@ -4006,6 +4006,11 @@ std::shared_ptr<PaintedMesh> PaintedMesh::decode_impl(const nlohmann::json &inpu
   result->layer(result->active_);
   result->allocated_tiles_=0;
   for(const auto &layer:result->layers_)result->allocated_tiles_+=tile_count(layer);
+  // Validate the persisted owner before allocating baked planes or invoking
+  // the public editing path, which diagnoses a different operation.
+  if(!independent&&result->source_maps_&&result->source_maps_->uses_alternate_uv()&&
+     (result->allocated_tiles_||result->allocated_color_tiles_||j.contains("baked")))
+    throw std::invalid_argument("Paint on independent original coordinates requires its actual Paint4 owner");
   if(independent){
     SourcePaintOptions resource_limits;resource_limits.max_working_bytes=SourcePaintOptions::maximum_working_bytes;
     SourcePaintAccess::bind(*result,std::move(original),original_vertices,resource_limits,std::move(authored_uv1));
@@ -4095,9 +4100,6 @@ std::shared_ptr<PaintedMesh> PaintedMesh::decode_impl(const nlohmann::json &inpu
      (!result->source_maps_||result->baked_||result->color_projection_||result->normal_projection_||
       result->allocated_tiles_||result->allocated_color_tiles_))
     throw std::invalid_argument("Initial original-coordinate capture cannot contain writable paint data");
-  if(!independent&&result->source_maps_&&result->source_maps_->uses_alternate_uv()&&
-     (result->allocated_tiles_||result->allocated_color_tiles_||result->baked_))
-    throw std::invalid_argument("Paint on independent original coordinates requires its actual Paint4 owner");
   if(result->storage_bytes()>128*1024*1024)throw std::length_error("Persisted paint exceeds total storage budget");
   if(independent) {
     if(result->storage_bytes()>128*1024*1024)throw std::length_error("Independent source paint exceeds total retained storage budget");
