@@ -234,7 +234,17 @@ void retained_bake_xr_fixture(const std::filesystem::path &input,const std::file
   paint.clear_bake();return true;
  }),"The selected fixture set retains its successful recipe");
  scene.save(input);
+ const auto encoded=scene.encode();
  auto plain=Scene::load(input);
+ check(plain.encode()==encoded,"Prepared donor and plain retained recipe reopen in the same Scene40 archive");
+ auto foreign=encoded;
+ auto &records=foreign.at("texture_set_geometry").at("paints");
+ const auto recipe=std::find_if(records.begin(),records.end(),[](auto &record){
+  return record.at("painted").contains("field_recipe");
+ });
+ check(recipe!=records.end(),"Fixture encodes the actual selected plain recipe member");
+ recipe->at("painted").at("payload").at("set")=0;
+ refuses([&]{Scene::decode(foreign);},"Mixed retained graph rejects a plain recipe borrowing another set");
  const auto original=plain.encode();
  auto shortened=settings;shortened.front_mm=40;
  refuses([&]{bake_object(plain,donor,shortened);},"The shortened approach cannot reach the original prepared field");
@@ -317,6 +327,7 @@ int main(int argc,char **argv)try {
  if(argc==3&&mode=="--retained-bake-source"){
   std::filesystem::create_directories(argv[2]);std::filesystem::current_path(argv[2]);
   retained_bake_source(false,false);retained_bake_source(true,false);retained_bake_source(false,true);
+  retained_bake_xr_fixture("mixed-before.dsculpt","mixed-baked.dsculpt");
   std::cout<<"PASS "<<checks<<" retained source Bake controls\n";
   return 0;
  }
