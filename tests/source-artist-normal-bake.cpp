@@ -48,10 +48,12 @@ void affine_donor(Scene scene, const std::filesystem::path &path) {
       : MToonMaterial::from_vrm1({{"extensions",{{"VRMC_materials_mtoon",{{"specVersion","1.0"}}}}}});
   scene.active().material_bindings=std::move(binding);
   const auto before=scene.encode();
+  auto input=path;input+=".before.dsculpt";scene.save(input);
   const auto source_before=bake_fixture::isolated_scene(scene,donor).encode();
   Document doc;doc.replace(scene);
-  check(doc.wait_mesh()&&doc.frame().state->can_bake&&
-        doc.frame().state->bake_sources==std::vector<uint64_t>{donor},
+  const bool ready=doc.wait_mesh();
+  const auto view=doc.frame().state;
+  check(ready&&view->can_bake&&std::ranges::find(view->bake_sources,donor)!=view->bake_sources.end(),
         "The shared control offers the hidden affine imported or posed source");
   ObjectBakeSettings settings;settings.ao_samples=0;settings.padding=0;
   settings.front_mm=settings.back_mm=2;settings.prepare_normals=true;

@@ -34,6 +34,16 @@ void ready(Document &doc){check(doc.wait_mesh(std::chrono::seconds(90))&&doc.fra
 int main(int argc,char **argv)try{
  const bool full_faults=argc==4&&std::string_view(argv[3])=="--faults";if(argc!=3&&!full_faults)return 2;const auto baseline=Scene::load(argv[1]);const auto original=baseline.encode();const auto id=baseline.active().id;const auto zero=bake_vrm1_expression_pose(baseline,id,{});const auto exact=zero.encode();const auto surface=active_surface(zero);const auto expected=detail::source_skin_world_positions(surface);check(expected&&expected->size()==surface.mesh.positions.size(),"Authenticated original source skin has a complete world position result");
  check(expected->at(0).x==.37999999523162842f&&expected->at(1).x==.62000000476837158f,"Original source corner X survives exact mesh-node inverse cancellation before final float conversion");
+ auto metric=AffineTransform{}.matrix();
+ // The authored root X and first inverse-bind translation are independent
+ // float accessor values. Their exact sum is the projection origin here.
+ const double center=double(.3f)+double(.2f);
+ metric[12]=-center;
+ const AffineTransform output(metric);
+ const auto centered=detail::source_skin_world_positions(surface,{},256u*1024u*1024u,&output);
+ const float independent=float(double(-.1f)*double(1.2f));
+ check(centered&&centered->at(0).x==independent&&float(double(expected->at(0).x)-center)!=independent,
+       "The original skinned position enters the Bake metric before float rounding");
  const auto old=surface.preview_mesh();const auto frame=detail::placement_frame(surface);check(detail::placed_position(frame,old.positions[0]).x!=expected->at(0).x,"Original native float inverse/forward counterexample genuinely differs");
  auto wrong=surface;auto d=std::make_shared<DeformationState>(*wrong.deformation);auto skeleton=*d->skeleton;(*skeleton.space_matrix)[12]=std::nextafter((*skeleton.space_matrix)[12],1.f);d->skeleton=skeleton;wrong.deformation=d;check(!detail::source_skin_world_positions(wrong),"An independently edited native space matrix keeps generic native authority");
  wrong=surface;auto appearance=std::make_shared<CreatorAppearance>(*wrong.appearance);appearance->asset=std::shared_ptr<const ImportedAsset>(appearance->asset.get(),[](const auto*){});wrong.appearance=appearance;check(refuses([&]{detail::source_skin_world_positions(wrong);}),"A borrowed equal-address source owner cannot authenticate original skin evaluation");
