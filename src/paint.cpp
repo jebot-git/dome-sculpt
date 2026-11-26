@@ -29,6 +29,7 @@
 #include "paint-sampling-access.hpp"
 #include "native-writable-grid.hpp"
 #include "native-read-scope.hpp"
+#include "native-grid-composite-work.hpp"
 #include "scene-paint-raster.hpp"
 #include "native-bake-conversion.hpp"
 #include "native-paint-bake.hpp"
@@ -187,6 +188,11 @@ Vec3 high(Vec3 a, Vec3 b) {
   return {std::max(a.x, b.x), std::max(a.y, b.y), std::max(a.z, b.z)};
 }
 using BakedPixel = std::array<float, 13>;
+Vec3 unpack_baked_normal(const Image &image,size_t at) {
+  if(image.rgba.empty())return {0,0,1};
+  const auto *pixel=image.rgba.data()+at*4;
+  return {unit(pixel[0])*2-1,unit(pixel[1])*2-1,unit(pixel[2])*2-1};
+}
 BakedPixel baked_pixel(const BakedTextures &baked, size_t at) {
   auto &m = baked.maps;
   size_t i = at * 4;
@@ -198,9 +204,9 @@ BakedPixel baked_pixel(const BakedTextures &baked, size_t at) {
   for (int c = 0; c < 3; ++c) {
     result[4 + c] = unit(m.metal_rough.rgba[i + c]);
     result[7 + c] = baked.emission_field ? 0 : srgb_to_linear(unit(m.emission.rgba[i + c]));
-    result[10 + c] = m.normal.rgba.empty() ? (c == 2 ? 1 : 0)
-                                           : unit(m.normal.rgba[i + c]) * 2 - 1;
   }
+  const auto normal=unpack_baked_normal(m.normal,at);
+  result[10]=normal.x;result[11]=normal.y;result[12]=normal.z;
   return result;
 }
 void baked_pixel(BakedTextures &baked, size_t at, BakedPixel values, bool write_normal=true) {
@@ -2082,6 +2088,7 @@ std::shared_ptr<PaintedMesh> detail::TextureSetPaintAccess::resample_plain(const
  if(limits.cancelled&&limits.cancelled())throw std::runtime_error("Texture-set resolution cancelled");return result;
 }
 struct SourcePaintSamplingAccess {
+  static size_t composite_work(const PaintedMesh &,size_t,const std::function<bool()> &);
   static const void *scene_raster(const PaintedMesh &paint) noexcept {
     const auto &surface=paint.surface_;
     if(!surface||!surface->paint_domain||surface->paint_domain->version()!=1||
@@ -3369,6 +3376,64 @@ std::shared_ptr<TextureMaps> gpu_plain_composite(uint32_t r,const std::vector<Pa
 }
 std::shared_ptr<TextureMaps>
 PaintedMesh::build_composite(const Material &material) const {return build_composite(material,{});}
+namespace {
+std::vector<uint16_t> composite_tile_layers(const std::vector<PaintLayer> &layers,size_t tiles) {
+  if(layers.size()>16)throw std::invalid_argument("Composite exceeds sixteen ordered paint layers");
+  std::vector<uint16_t> masks(tiles);
+  for(size_t i=0;i<layers.size();++i){
+    const auto &layer=layers[i];
+    if(!layer.visible||!(layer.opacity>0))continue;
+    for(size_t tile=0;tile<tiles;++tile)
+      if(layer.tiles[tile])masks[tile]|=uint16_t(1u<<i);
+  }
+  return masks;
+}
+size_t composite_tile(uint32_t x,uint32_t y,uint32_t columns) noexcept {
+  return size_t(y/PaintTile::size)*columns+x/PaintTile::size;
+}
+}
+size_t SourcePaintSamplingAccess::composite_work(const PaintedMesh &paint,size_t maximum,
+    const std::function<bool()> &cancelled){
+  const auto r=paint.resolution();
+  const auto &surface=*paint.surface_;
+  if(!surface.paint_domain||surface.options.policy!=PaintUvPolicy::Strict||
+     paint.source_maps_||paint.color_projection_||paint.normal_projection_||
+     paint.has_physical_emission()||(paint.baked_&&paint.baked_->normal_field))
+    throw std::invalid_argument("Native composite bound requires the actual plain LDR retained grid");
+  const size_t pixels=size_t(r)*r,tiles=surface.tiles.size();
+  size_t work=0;
+  auto charge=[&](size_t count,size_t unit){
+    if(count>(maximum-work)/unit)
+      throw std::length_error("Native nonemission compilation exceeds cumulative sample budget");
+    work+=count*unit;
+  };
+  // Per channel allow padding, bake RGBA/coverage and output/coverage
+  // transfers. Also charge the preflight padding walk and the two coverage
+  // scans. No source sampler, projection or bilinear taps enter this route.
+  charge(pixels,3*8+1+2);
+  charge(tiles,std::max<size_t>(1,paint.layers_.size()));
+  if(paint.baked_&&!paint.baked_->maps.normal.rgba.empty())charge(pixels,8);
+  const auto masks=composite_tile_layers(paint.layers_,tiles);
+  size_t populated=0;
+  for(auto mask:masks)populated+=std::popcount(mask);
+  // Both colour/emission coverage scans may visit every pixel of each
+  // occupied visible tile, even for a grid with sparse or no Bake coverage.
+  charge(populated,2*PaintTile::size*PaintTile::size);
+  for(size_t at=0;at<pixels;++at){
+    if((at&4095)==0)paint_compute::checkpoint(cancelled);
+    const int32_t owner=surface.padding[at];
+    if(owner<0)continue;
+    const auto mask=masks[composite_tile(uint32_t(owner)%r,uint32_t(owner)/r,surface.columns)];
+    // Three channels, each reading the ordered tile once and applying its
+    // mask/coverage to that channel. Padding can reference one tile repeatedly.
+    charge(size_t(std::popcount(mask)),3*4);
+  }
+  return work;
+}
+size_t detail::native_grid_composite_work(const PaintedMesh &paint,size_t maximum,
+    const std::function<bool()> &cancelled){
+  return SourcePaintSamplingAccess::composite_work(paint,maximum,cancelled);
+}
 std::shared_ptr<TextureMaps>
 PaintedMesh::build_composite(const Material &material,const std::function<bool()> &cancelled) const {
   paint_compute::checkpoint(cancelled);
@@ -3441,6 +3506,7 @@ PaintedMesh::build_composite(const Material &material,const std::function<bool()
   }();
   const detail::SourceTextureGrid occlusion(source.occlusion,maps->metal_rough.width,maps->metal_rough.height,false);
   const detail::SourceTextureGrid projected(projected_vertex_color,maps->color.width,maps->color.height,false);
+  const auto tile_layers=composite_tile_layers(layers_,surface_->tiles.size());
   for(int channel=0;channel<3;++channel){
     auto &image=channel==0?maps->color:channel==1?maps->metal_rough:maps->emission;
     const auto &source_view=channel==0?source.color:channel==1?source.metal_rough:source.emission;
@@ -3488,8 +3554,12 @@ PaintedMesh::build_composite(const Material &material,const std::function<bool()
         }
       }
 
-      for(auto &l:layers_)if(l.visible&&l.opacity>0&&owner>=0){
-        auto &p=pixel(l.id,px,py);float mask=unit(p.data[13])*l.opacity;
+      const auto tile=composite_tile(px,py,surface_->columns);
+      const auto within=size_t(py%PaintTile::size)*PaintTile::size+px%PaintTile::size;
+      for(auto remaining=owner>=0?tile_layers[tile]:uint16_t{};remaining;remaining&=remaining-1){
+        const auto &l=layers_[std::countr_zero(remaining)];
+        const auto &p=l.tiles[tile]->pixels[within];
+        float mask=unit(p.data[13])*l.opacity;
         float weight=mask*unit(p.data[channel==2?12:9]);replacement_coverage=replacement_coverage*(1-weight)+weight;
         auto blend=[&](float base,int data,int coverage,bool srgb){
           const float a = mask * unit(p.data[coverage]);
@@ -3501,7 +3571,8 @@ PaintedMesh::build_composite(const Material &material,const std::function<bool()
         else if(channel==1){value[1]=blend(value[1],5,11,false);value[2]=blend(value[2],4,10,false);}
         else for(int k=0;k<3;++k)value[k]=blend(value[k],6+k,12,true);
         if(channel==0 && color_projection_) {
-          auto painted=pbr_pixel(l.id,px,py);
+          std::array<uint8_t,4> painted{p.data[0],p.data[1],p.data[2],p.data[3]};
+          if(!l.pbr_tiles.empty()&&l.pbr_tiles[tile])painted=l.pbr_tiles[tile]->pixels[within];
           const float a=mask*unit(p.data[9]);
           for(int k=0;k<4;++k) {
             const float sample = k < 3 ? linear_byte[painted[k]] : unit(painted[k]);
@@ -3548,13 +3619,13 @@ PaintedMesh::build_composite(const Material &material,const std::function<bool()
       if(needs_original)corners=tangent_corners(mesh());
     }
     for (size_t at=0;at<size_t(r)*r;++at) {
+      if((at&4095)==0)paint_compute::checkpoint(cancelled);
       int32_t owner=surface_->padding[at];
       if (owner<0) continue;
       float a=unit(baked_->coverage[size_t(owner)]);
       maps->baked_coverage.rgba[at*4]=byte(a);
       for(int c=0;c<4;++c)maps->baked_normal.rgba[at*4+c]=baked_->maps.normal.rgba[size_t(owner)*4+c];
-      const auto values=baked_pixel(*baked_,size_t(owner));
-      const Vec3 normal_detail{values[10],values[11],values[12]};
+      const auto normal_detail=unpack_baked_normal(baked_->maps.normal,size_t(owner));
       if(baked_->normal_interpretation==BakedNormalInterpretation::NativeAttributes){
         const auto rgb=detail::composite_native_bake_normal(normal_detail,a);
         std::copy_n(rgb.begin(),3,maps->normal.rgba.begin()+at*4);

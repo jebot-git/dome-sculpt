@@ -10,6 +10,7 @@
 #include "emission-paint-access.hpp"
 #include "paint-overlay-sample.hpp"
 #include "native-paint-sampling.hpp"
+#include "native-grid-composite-work.hpp"
 #include "native-paint-export-policy.hpp"
 #include "native-paint-frame-export-policy.hpp"
 #include <cstring>
@@ -62,6 +63,7 @@ NativeExtractionCost native_extraction_cost(const Scene &scene,const SourceUvBak
       const size_t n=size_t(w)*h;if(n>policy.max_image_pixels||n>16*1024*1024)throw std::length_error("Native physical composite image exceeds pixel budget before allocation");return n;};
     const PaintSourceMaps empty;const auto &m=maps?*maps:empty;
     const size_t color=pixels({&m.color}),orm=pixels({&m.metal_rough,&m.occlusion}),emission=pixels({&m.emission});
+    const bool native_ldr=o.material_bindings&&o.material_bindings->native_paint_sampling&&!native_physical(o);
     // Colour/emission coverage are conservatively charged at full extent;
     // the compositor may use a singleton when no corresponding coverage exists.
     bytes(color,8);bytes(orm,4);bytes(emission,8);
@@ -73,8 +75,14 @@ NativeExtractionCost native_extraction_cost(const Scene &scene,const SourceUvBak
       bytes(layer.name.capacity()+1,1);
       for(const auto &tile:layer.tiles)if(tile&&std::any_of(tile->pixels.begin(),tile->pixels.end(),[](const auto &q){return q.data[6]||q.data[7]||q.data[8]||q.data[12];}))bytes(1,sizeof(PaintTile));
     }
-    const size_t per_pixel=16+8*p.layers().size();
-    charge(cost.samples,color+orm+emission,per_pixel,policy.max_sample_operations,"Native nonemission compilation exceeds cumulative sample budget");
+    if(native_ldr){
+      bytes(grid/(PaintTile::size*PaintTile::size),sizeof(uint16_t));
+      cost.samples+=native_grid_composite_work(
+          p,policy.max_sample_operations-cost.samples,cancelled);
+    }else{
+      const size_t per_pixel=16+8*p.layers().size();
+      charge(cost.samples,color+orm+emission,per_pixel,policy.max_sample_operations,"Native nonemission compilation exceeds cumulative sample budget");
+    }
     charge(cost.raster,color+orm+emission,1,policy.max_raster_samples,"Native nonemission compilation exceeds cumulative raster budget");
   }
   return cost;

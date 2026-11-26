@@ -843,6 +843,44 @@ void dense_first_key(const std::filesystem::path &out){
   }
   std::cout<<"DENSE_FIRST_KEY "<<std::filesystem::file_size(keyed_file)<<" archive bytes; Restore exact\n";
 }
+
+void dense_editable_export(const std::filesystem::path &out){
+  const auto converted=out/"converted-2048.dsculpt";
+  const auto editable=out/"editable-2048.glb";
+  const auto restored=out/"editable-native-2048.dsculpt";
+  {
+    Document doc;
+    doc.open(converted);
+    require(doc.wait_asset()&&doc.wait_mesh(std::chrono::seconds(45))&&doc.frame().state->error.empty(),
+        "Editable export starts from the actual reopened keyed 2048 project");
+    doc.export_asset(editable,AssetExportFormat::EditableGlb256).get();
+  }
+  const auto bytes_from=[](const auto &path){
+    std::ifstream stream(path,std::ios::binary);
+    require(bool(stream),"Open the exported Editable GLB for an independent check");
+    return std::vector<uint8_t>{std::istreambuf_iterator<char>(stream),{}};
+  };
+  const auto bytes=bytes_from(editable);
+  {
+    const auto recovered=extract_native_authoring(bytes);
+    require(bool(recovered),"Editable GLB carries a complete native project");
+    recovered->save(restored);
+  }
+  require(same_file(converted,restored),"Editable GLB recovers exact normal, paint, shapekey and Restore data");
+
+  NativeAuthoringExport owner;
+  owner.scene=std::make_shared<const Scene>(Scene::load(converted));
+  owner.allow_portable_fallback=true;
+  SourceUvBakeOptions limits;
+  limits.resolution=256;
+  limits.max_sample_operations=32*1024*1024;
+  bool refused=false;
+  try{export_glb_authoring(owner,editable,{},limits);}catch(const std::length_error &error){
+    refused=std::string_view(error.what()).find("cumulative sample budget")!=std::string_view::npos;
+  }
+  require(refused&&bytes_from(editable)==bytes,"A tighter caller sample budget still refuses and preserves the exported file");
+  std::cout<<"DENSE_EDITABLE "<<bytes.size()<<" container bytes; native source exact\n";
+}
 }
 int main(int argc,char **argv) try {
  if(argc==3&&std::string_view(argv[1])=="--sources"){
@@ -892,6 +930,11 @@ int main(int argc,char **argv) try {
    std::filesystem::create_directories(out);
    writable_source::dense_first_key(out);
    std::cout<<"PASS "<<writable_source::checks<<" full-resolution first-key checks\n";
+   return 0;
+ }
+ if(argc==3&&std::string_view(argv[1])=="--dense-editable-export"){
+   writable_source::dense_editable_export(argv[2]);
+   std::cout<<"PASS "<<writable_source::checks<<" full-resolution Editable GLB checks\n";
    return 0;
  }
  if(argc!=2)return 2;
