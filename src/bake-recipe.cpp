@@ -33,6 +33,8 @@ void ObjectBakeRecipe::validate()const{
   reference(source);if(cage)reference(*cage);
   if(settings.cage_object!=(cage?cage->object:0))
     throw std::invalid_argument("Bake recipe lost its explicit cage binding");
+  if(settings.corresponding_topology&&cage)
+    throw std::invalid_argument("Matching source triangles requires a bake without a cage");
   for(float mm:{settings.front_mm,settings.back_mm,settings.ao_distance_mm})
     if(!std::isfinite(mm)||mm<0||mm>100'000)
       throw std::invalid_argument("Invalid bake recipe distance");
@@ -43,20 +45,25 @@ void ObjectBakeRecipe::validate()const{
 }
 nlohmann::json ObjectBakeRecipe::encode()const{
   validate();const auto &s=settings;
-  return {{"version",1},{"source",encode_reference(source)},
+  nlohmann::json out={{"version",s.corresponding_topology?2:1},{"source",encode_reference(source)},
     {"cage",cage?nlohmann::json(encode_reference(*cage)):nlohmann::json(nullptr)},
     {"settings",{{"front_mm",s.front_mm},{"back_mm",s.back_mm},{"ao_distance_mm",s.ao_distance_mm},
       {"ao_samples",s.ao_samples},{"padding",s.padding},{"allow_partial",s.allow_partial},
       {"allow_backfaces",s.allow_backfaces},{"prepare_colors",s.prepare_colors},
       {"color_error",s.color_error},{"prepare_normals",s.prepare_normals},{"normal_error",s.normal_error}}}};
+  if(s.corresponding_topology)out["settings"]["corresponding_topology"]=true;
+  return out;
 }
 std::shared_ptr<const ObjectBakeRecipe> ObjectBakeRecipe::decode(const nlohmann::json &j){
-  if(!j.is_object()||j.size()!=4||!j.at("version").is_number_integer()||j.at("version")!=1)
+  if(!j.is_object()||j.size()!=4||!j.at("version").is_number_integer()||
+      (j.at("version")!=1&&j.at("version")!=2))
     throw std::invalid_argument("Invalid bake recipe record");
+  const bool corresponding=j.at("version")==2;
   auto result=std::make_shared<ObjectBakeRecipe>();result->source=decode_reference(j.at("source"));
   if(!j.at("cage").is_null())result->cage=decode_reference(j.at("cage"));
   const auto &v=j.at("settings");auto &s=result->settings;
-  if(!v.is_object()||v.size()!=11)throw std::invalid_argument("Incomplete bake recipe settings");
+  if(!v.is_object()||v.size()!=(corresponding?12u:11u))
+    throw std::invalid_argument("Incomplete bake recipe settings");
   auto real=[&](const char *key){if(!v.at(key).is_number())throw std::invalid_argument("Invalid bake recipe scalar");return v.at(key).get<float>();};
   auto flag=[&](const char *key){if(!v.at(key).is_boolean())throw std::invalid_argument("Invalid bake recipe flag");return v.at(key).get<bool>();};
   s.front_mm=real("front_mm");s.back_mm=real("back_mm");s.ao_distance_mm=real("ao_distance_mm");
@@ -66,6 +73,9 @@ std::shared_ptr<const ObjectBakeRecipe> ObjectBakeRecipe::decode(const nlohmann:
   s.allow_partial=flag("allow_partial");s.allow_backfaces=flag("allow_backfaces");
   s.prepare_colors=flag("prepare_colors");s.color_error=real("color_error");
   s.prepare_normals=flag("prepare_normals");s.normal_error=real("normal_error");
+  if(corresponding&&!flag("corresponding_topology"))
+    throw std::invalid_argument("Invalid matching topology bake recipe");
+  s.corresponding_topology=corresponding;
   s.cage_object=result->cage?result->cage->object:0;
   result->validate();return result;
 }

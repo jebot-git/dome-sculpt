@@ -31,5 +31,5 @@ BakeResult bake_mesh_source_normals(const Mesh &,const BakeSource &,const BakeOp
  const SourceBakeNormalResolver &, std::span<const uint32_t> target_triangles = {},
  std::span<const RetainedSourceBakeField> source_fields = {},
  SourceBakePlacement source_placement = {},
- std::span<const std::array<float,4>> target_metric_corners = {});
+ std::span<const std::array<float,4>> target_metric_corners = {}, bool corresponding_topology = false);
 }

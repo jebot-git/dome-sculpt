@@ -225,6 +225,22 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
     throw std::invalid_argument("Choose a different source object for baking");
   if (!target.visible || target.locked || !target.mesh_active || !target.painted)
     throw std::logic_error("Show, unlock and prepare the target painting mesh before baking");
+  if(settings.corresponding_topology){
+    if(settings.cage_object)
+      throw std::invalid_argument("Matching source triangles requires a bake without a cage");
+    if(!source.mesh_active||!source.painted)
+      throw std::invalid_argument("Matching source triangles requires an editable source mesh");
+    const auto &source_mesh=source.painted->mesh();
+    const auto &target_mesh=target.painted->mesh();
+    if(source_mesh.positions.size()!=target_mesh.positions.size()||
+       source_mesh.indices.size()!=target_mesh.indices.size())
+      throw std::invalid_argument("Matching source triangles requires the same vertex count and ordered indices");
+    for(size_t corner=0;corner<target_mesh.indices.size();++corner){
+      if((corner&1023)==0)check();
+      if(source_mesh.indices[corner]!=target_mesh.indices[corner])
+        throw std::invalid_argument("Matching source triangles requires the same vertex count and ordered indices");
+    }
+  }
   if(!source.texture_sets&&source.mesh_active&&source.painted&&
       source.painted->baked()&&source.painted->baked()->normal_field)
     throw std::invalid_argument("Select a source without prepared normal attributes for this bake; source-frame transport is required and both objects are retained");
@@ -450,7 +466,9 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   };
   if(retained_recipient&&!split_recipient)encode_retained(options);
   if((retained_uv||split_recipient)&&progress)options.progress=[&](float value){progress(.1f+.4f*value);};
-  auto result = detail::bake_mesh_source_normals(low_mesh,high,options,source_normals,target_triangles,source_fields,source_placement,target_metric_corners);
+  auto result = detail::bake_mesh_source_normals(low_mesh,high,options,source_normals,
+      target_triangles,source_fields,source_placement,target_metric_corners,
+      settings.corresponding_topology);
   std::optional<BakeResult> retained_normal_write;
   if(split_recipient){
     auto normal_options=options;
@@ -463,7 +481,8 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
     Mesh normal_low=low_mesh;
     normal_low.uv=retained_recipient->normal_coordinates();
     retained_normal_write=detail::bake_mesh_source_normals(normal_low,high,normal_options,
-        source_normals,target_triangles,source_fields,source_placement,target_metric_corners);
+        source_normals,target_triangles,source_fields,source_placement,target_metric_corners,
+        settings.corresponding_topology);
     if(!retained_normal_write->projected)
       throw std::runtime_error("No retained normal texels project onto the selected source");
   }
@@ -483,7 +502,9 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
       throw std::length_error("Retained normal rebake lacks aggregate projection/raster budget");
     normal_options.max_rays-=result.rays;normal_options.max_raster_samples-=result.raster_samples;
     if(progress)normal_options.progress=[&](float value){progress(.5f+.4f*value);};
-    retained_normal_write=detail::bake_mesh_source_normals(normal_low,high,normal_options,source_normals,{},source_fields,source_placement,target_metric_corners);
+    retained_normal_write=detail::bake_mesh_source_normals(normal_low,high,normal_options,
+        source_normals,{},source_fields,source_placement,target_metric_corners,
+        settings.corresponding_topology);
   }
   check();
   if(!result.projected)throw std::runtime_error("No target texels project onto the selected source");

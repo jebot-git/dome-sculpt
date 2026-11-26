@@ -230,6 +230,16 @@ void validate(const Mesh &low,const BakeSource &source,const BakeOptions &o,
     }
   }
 }
+bool within_projection_bounds(Vec3 target, Vec3 source, Vec3 normal,
+                              const BakeOptions &options) {
+  const auto delta=source-target;
+  const float tolerance=1e-5f+1e-6f*length(target);
+  const float signed_distance=dot(delta,normal);
+  return signed_distance<=options.front_distance+tolerance&&
+      signed_distance>=-options.back_distance-tolerance&&
+      length(delta)<=std::max(options.front_distance,options.back_distance)+tolerance;
+}
+
 void pad(BakeResult &result,const BakeOptions &o,std::vector<BakedEmissionSample> &emission) {
   auto n=o.resolution; std::deque<std::pair<uint32_t,uint32_t>> queue;
   for (uint32_t i=0;i<result.coverage.size();++i) if (result.coverage[i]==1) queue.push_back({i,0});
@@ -258,9 +268,13 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
     std::span<const uint32_t> target_triangles = {},
     std::span<const detail::RetainedSourceBakeField> source_fields = {},
     detail::SourceBakePlacement source_placement = {},
-    std::span<const Tangent> target_metric_corners = {}) {
+    std::span<const Tangent> target_metric_corners = {},
+    bool corresponding_topology = false) {
   if(o.progress)o.progress(0);
   cancel(o); validate(low,source,o,source_fields);
+  if(corresponding_topology&&(!o.cage_positions.empty()||!o.source_triangles.empty()||
+      low.indices.size()!=source.mesh.indices.size()))
+    throw std::invalid_argument("Matching source triangles requires an intact corner order and no cage");
   if(!source_placement.tangent_corners.empty()&&
       source_placement.tangent_corners.size()!=source.mesh.indices.size())
     throw std::invalid_argument("Placed Bake tangents lost their original logical corners");
@@ -293,7 +307,11 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
     if(other>128*1024*1024||field>128*1024*1024-other)
       throw std::length_error("FLOAT Bake retained channels exceed unchanged paint budget");
   }
-  SurfaceQuery query(source.mesh,o.cancelled); cancel(o);
+  const bool ray_projection=!corresponding_topology&&o.source_triangles.empty();
+  std::optional<SurfaceQuery> query;
+  if(!corresponding_topology||o.ao_samples)
+    query.emplace(source.mesh,o.cancelled);
+  cancel(o);
   const auto generated_low_frames=o.low_tangents.empty()&&target_metric_corners.empty()
       ? tangent_corners(low,o.cancelled) : std::vector<Tangent>{};
   const auto low_frames=target_metric_corners.empty()
@@ -369,15 +387,23 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
         auto supplied = basis(low,triangle,normal,bary,o.low_tangents);
         frame = {supplied.tangent, supplied.bitangent, supplied.normal};
       }
-      Vec3 offset=normal*o.front_distance;
-      if (!o.cage_positions.empty()) {
-        Vec3 cage; for (int i=0;i<3;++i) cage+=o.cage_positions[low.indices[triangle*3+i]]*bary[i]; offset=cage-position;
-      }
-      float front=length(offset); auto direction=front>1e-8f?offset/front:normal;
       std::optional<SurfaceHit> hit;
-      if(o.source_triangles.empty()){
-        if (++result.rays>o.max_rays) throw std::length_error("Bake ray budget exceeded");
-        hit=query.raycast(position+offset,direction*-1,front+o.back_distance);
+      if(corresponding_topology){
+        const auto matched=interpolate(source.mesh,triangle,bary,false);
+        if(within_projection_bounds(position,matched,normal,o))
+          hit=SurfaceHit{uint32_t(triangle),matched,
+                         interpolate(source.mesh,triangle,bary,true),bary,0};
+      }else if(ray_projection){
+        Vec3 offset=normal*o.front_distance;
+        if(!o.cage_positions.empty()){
+          Vec3 cage;
+          for(int i=0;i<3;++i)cage+=o.cage_positions[low.indices[triangle*3+i]]*bary[i];
+          offset=cage-position;
+        }
+        const float front=length(offset);
+        const auto direction=front>1e-8f?offset/front:normal;
+        if(++result.rays>o.max_rays)throw std::length_error("Bake ray budget exceeded");
+        hit=query->raycast(position+offset,direction*-1,front+o.back_distance);
       }else{
         std::array<float,3> mapped{};
         for(int k=0;k<3;++k)for(int c=0;c<3;++c)mapped[c]+=bary[k]*o.source_corner_barycentrics[triangle*3+k][c];
@@ -487,7 +513,9 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
         mapped=frame.to_tangent(high_normal);
       }
       if (o.normal_y_down) mapped.y=-mapped.y;
-      float ao=ambient(query,hit->position,normalized(hit->normal),o,result)*channels.ao;
+      float ao=channels.ao;
+      if(query)
+        ao*=ambient(*query,hit->position,normalized(hit->normal),o,result);
       for (int c=0;c<3;++c) {
         result.maps.color.rgba[at*4+c]=byte(linear_to_srgb(channels.color[c]));
         if(!float_emission)result.maps.emission.rgba[at*4+c]=byte(linear_to_srgb(channels.emission[c]));
@@ -521,7 +549,8 @@ BakeResult bake_mesh(const Mesh &low,const BakeSource &source,const BakeOptions 
 BakeResult detail::bake_mesh_source_normals(const Mesh &low,const BakeSource &source,const BakeOptions &options,
  const SourceBakeNormalResolver &normal,std::span<const uint32_t> target_triangles,
  std::span<const RetainedSourceBakeField> source_fields,SourceBakePlacement source_placement,
- std::span<const Tangent> target_metric_corners){
- return bake_mesh_impl(low,source,options,normal,target_triangles,source_fields,source_placement,target_metric_corners);
+ std::span<const Tangent> target_metric_corners,bool corresponding_topology){
+ return bake_mesh_impl(low,source,options,normal,target_triangles,source_fields,source_placement,
+                       target_metric_corners,corresponding_topology);
 }
 } // namespace dome
