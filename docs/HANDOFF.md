@@ -916,8 +916,13 @@ ASan/UBSan Clear Bake/Undo control also reuses that immutable preview,
 publishing in 8.374 seconds without another build. Retention is
 444,041,876 bytes against the 512 MiB cap. The same diagnostic needs
 13.159 seconds to publish the ordinary cleared preview again on Redo.
-The original full-size Bake, ordered Save, Undo and Redo test is a
-separate run. The cache port based on main, `ead80bb5`, passes the
+The original full-size Bake, ordered Save, Undo and Redo test also passes
+all eight ASan/UBSan checks with the cache candidate. It takes 633.363
+seconds within the 900-second phase limit and peaks at 2,503,692,288
+bytes under 4 GiB. The ordered file matches the observed second Bake
+byte for byte. Redo publishes the baked preview within the existing wait
+and restores the exact native state. The cache port based on main,
+`ead80bb5`, passes the
 optimized application link/version check and five focused bake, UV and
 cache tests with the two CC0 VRoid inputs. Its strict build is in progress.
 
@@ -944,9 +949,19 @@ runs, both app versions save byte-identical native projects and GLBs.
 The parent takes 44.57 and 44.16 seconds and the candidate takes 44.36
 and 43.55 seconds. These observations used an extended diagnostic limit.
 The original workflow budget is still 40 seconds. A separate candidate
-`6cca3fc2` keeps each chart's ordered boundary across growth and merges,
-and uses it to refresh neighboring candidates. Release, sanitizer and
-matched Arc checks are running.
+`6cca3fc2` keeps each chart's ordered boundary across growth and merges
+and uses it to refresh neighboring candidates. Six native tests pass in
+each profile, along with the full 153-check software Release replay.
+A test build compares its retained edge list to a full scan before every
+intersection query. The four curved and perforated meshes produce
+identical chart membership, topology and UV output in both profiles.
+The matched Arc comparison retains byte-identical native Save and GLB
+output. The parent takes 41.52 and 42.12 seconds and the candidate takes
+40.73 and 39.52 seconds. Candidate `0fa8eaba` also visits grid cells
+directly in traversal order. It passes the 574-check grid oracle and six
+native cases in each profile, plus the 153-check software Release replay.
+Its matched Arc comparison is running. The full Arc suite will use the
+faster candidate with the original workflow deadline.
 [Preview and integration evidence](validation/hdr-preview-composite-20261126.json)
 [Cache and Arc rerun evidence](validation/atlas-grid-hdr-history-20261126.json)
 
