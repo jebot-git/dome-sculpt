@@ -9,10 +9,19 @@
 #include <type_traits>
 namespace dome {class SourceColorPaintSampling;struct SourceMaterialBindings;struct DeformationState;}
 namespace dome::detail {
-// A call-local numerical memo, never a material/geometry validity certificate.
-// Every caller still authenticates the current geometry/field and compares the
-// computed result with the current claimed receipt. No owner survives the call.
-struct ColorBoundMemoKey {
+// These parameters key only the numerical projection bound. Every caller
+// still authenticates the current inputs and checks the bound against its receipt.
+struct ColorBoundParameters {
+  const void *recipe=nullptr;
+  uint64_t max_cells=0,claimed_cells=0;
+  std::array<uint32_t,4> error_bits{};
+  std::array<uint32_t,2> dimensions{};
+  std::array<char,64> image_content{},colors_content{};
+  uint32_t source_field=0;
+  bool initial=false;
+  bool operator==(const ColorBoundParameters &)const=default;
+};
+struct ColorBoundMemoKey : ColorBoundParameters {
   std::shared_ptr<const Mesh> mesh,current_mesh;
   std::shared_ptr<const PolygonMesh> topology;
   std::shared_ptr<const PolygonColorField> field;
@@ -22,28 +31,61 @@ struct ColorBoundMemoKey {
   std::shared_ptr<const SourceColorPaintSampling> sampling;
   std::shared_ptr<const SourceMaterialBindings> material;
   std::shared_ptr<const DeformationState> deformation;
-  const void *recipe=nullptr;
-  uint64_t max_cells=0,claimed_cells=0;
-  std::array<uint32_t,4> error_bits{};
-  std::array<uint32_t,2> dimensions{};
-  std::array<char,64> image_content{},colors_content{};
-  uint32_t source_field=0;
-  bool initial=false;
 };
 template<class T>inline bool color_bound_same_owner(const std::shared_ptr<const T>&a,
     const std::shared_ptr<const T>&b) noexcept {
   return a.get()==b.get()&&!a.owner_before(b)&&!b.owner_before(a);
 }
 inline bool same_color_bound_key(const ColorBoundMemoKey&a,const ColorBoundMemoKey&b) noexcept {
-  return a.recipe==b.recipe&&a.max_cells==b.max_cells&&a.claimed_cells==b.claimed_cells&&
-    a.error_bits==b.error_bits&&a.dimensions==b.dimensions&&a.image_content==b.image_content&&
-    a.colors_content==b.colors_content&&a.source_field==b.source_field&&a.initial==b.initial&&
+  return static_cast<const ColorBoundParameters &>(a)==static_cast<const ColorBoundParameters &>(b)&&
     color_bound_same_owner(a.mesh,b.mesh)&&color_bound_same_owner(a.current_mesh,b.current_mesh)&&color_bound_same_owner(a.topology,b.topology)&&
     color_bound_same_owner(a.field,b.field)&&color_bound_same_owner(a.projection,b.projection)&&
     color_bound_same_owner(a.image,b.image)&&color_bound_same_owner(a.source_paint,b.source_paint)&&
     color_bound_same_owner(a.sampling,b.sampling)&&color_bound_same_owner(a.material,b.material)&&
     color_bound_same_owner(a.deformation,b.deformation);
 }
+class WorkerColorBounds {
+  using Owners = std::array<std::shared_ptr<const void>,10>;
+  struct Entry {
+    ColorBoundParameters parameters;
+    std::array<std::weak_ptr<const void>,10> owners;
+    ColorProjectionBound value;
+  };
+  std::array<Entry,64> entries_{};
+  size_t used_=0,next_=0;
+
+  static Owners owners(const ColorBoundMemoKey &key) noexcept {
+    return {key.mesh,key.current_mesh,key.topology,key.field,key.projection,
+            key.image,key.source_paint,key.sampling,key.material,key.deformation};
+  }
+public:
+  void clear() noexcept {
+    for(size_t i=0;i<used_;++i)entries_[i]={};
+    used_=next_=0;
+  }
+  std::optional<ColorProjectionBound> find(const ColorBoundMemoKey &key)const noexcept {
+    const auto current=owners(key);
+    for(size_t i=0;i<used_;++i) {
+      const auto &entry=entries_[i];
+      if(entry.parameters!=static_cast<const ColorBoundParameters &>(key))continue;
+      const bool matches=std::equal(entry.owners.begin(),entry.owners.end(),current.begin(),
+          [](const auto &old,const auto &now){
+            return !old.owner_before(now)&&!now.owner_before(old)&&old.lock().get()==now.get();
+          });
+      if(matches)return entry.value;
+    }
+    return {};
+  }
+  void remember(const ColorBoundMemoKey &key,const ColorProjectionBound &value) noexcept {
+    auto &entry=entries_[next_];
+    entry.parameters=key;
+    const auto current=owners(key);
+    for(size_t i=0;i<current.size();++i)entry.owners[i]=current[i];
+    entry.value=value;
+    used_=std::min(used_+1,entries_.size());
+    next_=(next_+1)%entries_.size();
+  }
+};
 inline std::array<char,64> color_bound_digest(std::span<const uint8_t> bytes) {
   // Content only invalidates a numerical memo when legally mutable metadata is
   // presented again. A digest never supplies missing ownership or authority.
@@ -62,18 +104,24 @@ struct ColorBoundMemoContext {
   std::array<ColorBoundPaintContext,64> paints{};
   size_t depth=0,count=0,paint_count=0;
   ColorBoundMemoStats stats{},last{};
+  WorkerColorBounds *worker=nullptr;
 };
 inline ColorBoundMemoContext &color_bound_context() {
   thread_local ColorBoundMemoContext value;return value;
 }
 class ColorBoundScope {
 public:
-  ColorBoundScope() noexcept {auto &c=color_bound_context();if(!c.depth)c.stats={};++c.depth;}
+  explicit ColorBoundScope(WorkerColorBounds *worker=nullptr) noexcept {
+    auto &c=color_bound_context();
+    if(!c.depth){c.stats={};c.worker=worker;}
+    ++c.depth;
+  }
   ColorBoundScope(const ColorBoundScope&)=delete;
   ColorBoundScope&operator=(const ColorBoundScope&)=delete;
   ~ColorBoundScope() noexcept {
     auto &c=color_bound_context();if(--c.depth)return;
     c.last=c.stats;
+    c.worker=nullptr;
     static_assert(std::is_nothrow_move_assignable_v<ColorBoundMemoContext::Entry>);
     for(size_t n=0;n<c.count;++n)c.entries[n]={};c.count=0;
     for(size_t n=0;n<c.paint_count;++n)c.paints[n]={};c.paint_count=0;
@@ -114,10 +162,16 @@ inline std::optional<ColorProjectionBound> find_color_bound(const ColorBoundMemo
       throw std::length_error("Color projection quality exceeds its work budget");
     ++c.stats.hits;return c.entries[n].value;
   }
+  if(c.worker)if(auto prior=c.worker->find(key)) {
+    if(prior->tested_cells>key.max_cells)
+      throw std::length_error("Color projection quality exceeds its work budget");
+    ++c.stats.hits;return prior;
+  }
   ++c.stats.misses;return {};
 }
 inline void remember_color_bound(ColorBoundMemoKey key,const ColorProjectionBound &value) noexcept {
   auto &c=color_bound_context();if(!c.depth)return;
+  if(c.worker)c.worker->remember(key,value);
   if(c.count==c.entries.size()){++c.stats.full_fallback;return;}
   c.entries[c.count++]={std::move(key),value};
 }
