@@ -1746,9 +1746,38 @@ The focused Release and ASan/UBSan cohorts each pass ten tests, including 77
 recipient checks. Nine native fixture projects match byte for byte. Nested
 DomeD Wayland and synthetic OpenXR on software GL and Intel Arc A770 each pass
 ten checks and write the same accepted bytes. The Arc run uses the sanitizer
-application. The plain native retained writable recipient and physical
-headset qualification remain open.
+application. Physical headset qualification remains open.
 [Canonical writable recipient evidence](validation/canonical-writable-recipient-20261126.json)
+
+### Bake into plain native meshes with retained writable UVs
+
+The shared Bake worker now uses the retained paint atlas and its Mikk tangent
+basis on supported plain native meshes. Colour, material, AO, normals and
+FLOAT emission remain writable across later display-UV changes and reopening.
+The viewport and subsequent Bake jobs read the same retained coordinates.
+Clear and Undo refresh the viewport's corner layout. The FLTK and XR controls
+keep the established basis for this target.
+
+The LDR and HDR matching-triangle fixtures each project 4,096 texels with
+zero rays and match the original-atlas control. Both profiles pass 60 native
+recipient checks, including ordered Save, exact Undo/Redo, Clear, later UV
+seam splitting, rebake-source sampling and standard and editable GLB export.
+All eight native projects and four exported GLBs match byte for byte between
+Release and ASan/UBSan. The focused suite passes 11 tests per profile.
+
+Software GL and Intel Arc A770 each pass 13 framebuffer and independent GLB
+consumer checks. The retained Bake matches the original-atlas framebuffer at
+rest and with mixed skin weights under a nonuniform pose. Standard and editable
+LDR GLB agree within one RGB8 level. The independent Khronos validator reports
+zero errors on all four files and one skinned-node parent warning per file.
+Nested DomeD Wayland and synthetic OpenXR on software and Intel Arc each save
+identical accepted project bytes. Wayland passes 10 checks including explicit
+dialog cancellation. The two synthetic OpenXR routes each pass 11 checks
+including focus-loss cancellation. The original XR test sequence sent a
+second Bake command after closing the settings panel and is preserved.
+Targets with independently authored native shapekey frames and physical
+headset qualification remain open.
+[Native writable recipient evidence](validation/native-writable-recipient-20261126.json)
 
 ## Source and integration boundary
 
