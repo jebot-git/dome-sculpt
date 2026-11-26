@@ -353,10 +353,21 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   }
   const detail::SourceBakePlacement source_placement{placed_corners,
       placement&&placement->orientation()==AffineOrientation::Reversing};
+  AffineVector bake_origin{};
   if(placement||target_placement){
     // Keep original triangle and corner identities even under reflection.
     // The Bake hit keeps its source barycentrics and tests effective winding.
-    const auto source_to_bake=placement?affine_similarity(target_inverse)*placement->world():affine_similarity(relative);
+    auto source_to_bake=placement?affine_similarity(target_inverse)*placement->world():affine_similarity(relative);
+    if(!target_placement){
+      // Keep the float ray workspace near the donor. A large translation can
+      // collapse tiny but distinct isosurface triangles after rounding.
+      auto matrix=source_to_bake.matrix();
+      for(size_t axis=0;axis<3;++axis){
+        bake_origin[axis]=matrix[12+axis];
+        matrix[12+axis]=0;
+      }
+      source_to_bake=AffineTransform(matrix);
+    }
     const auto transform=target_placement?metric_from_world*source_to_bake:source_to_bake;
     for(size_t i=0;i<high.mesh.positions.size();++i){
       if((i&1023)==0)check();
@@ -421,6 +432,18 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   if(target_placement){
     if(!low)low=target.painted->mesh();
     target_metric_corners=place_bake_target(*low,options,*target_placement,metric_from_world);
+  }else if(bake_origin!=AffineVector{}){
+    if(!low)low=target.painted->mesh();
+    const auto recenter=[&](std::span<Vec3> positions){
+      for(size_t i=0;i<positions.size();++i){
+        if((i&1023)==0)check();
+        auto p=detail::affine_vector(positions[i]);
+        for(size_t axis=0;axis<3;++axis)p[axis]-=bake_origin[axis];
+        positions[i]=detail::affine_position(p);
+      }
+    };
+    recenter(low->positions);
+    recenter(options.cage_positions);
   }
   if(prepared_normals){
     const auto frames=target.material_bindings->normal_frames;
