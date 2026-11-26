@@ -906,6 +906,677 @@
       "uv_atlas_wait_frames": 1
     }
   },
+  "direct-grid-timing": {
+    "terminal": true,
+    "invocation": "8d9afb6a81d749bbb4f821af6a7a2b48",
+    "runs": [
+      {
+        "case": "parent-1",
+        "exit": 0,
+        "seconds": 41.117,
+        "arc_device": true,
+        "frames": 45,
+        "native_scene": true,
+        "stereo_export_panel": {
+          "0": 221824,
+          "1": 221608
+        },
+        "native_recovery": 1,
+        "valid_glb": 1,
+        "app_sha256": "bf30f46f18ac471cdad7c8d7d76fbbbc549d88f02e060a3d988e854621ceabd2",
+        "scene_sha256": "ca1248046485e3ede9122479fb12d0201fc12efd7726a67650d9eaac667e764c",
+        "process_cpu_seconds": 42.52,
+        "glb_sha256": [
+          "22200865cba16ae30ca9b64781d4d7203fc9307a55f48b28298d6402866171c6"
+        ],
+        "passed": true
+      },
+      {
+        "case": "candidate-1",
+        "exit": 0,
+        "seconds": 34.88,
+        "arc_device": true,
+        "frames": 45,
+        "native_scene": true,
+        "stereo_export_panel": {
+          "0": 221824,
+          "1": 221608
+        },
+        "native_recovery": 1,
+        "valid_glb": 1,
+        "app_sha256": "f800c671a226f5b32e73647f908dce8e994d783f6816747c9547c8bcf32b1461",
+        "scene_sha256": "ca1248046485e3ede9122479fb12d0201fc12efd7726a67650d9eaac667e764c",
+        "process_cpu_seconds": 36.06,
+        "glb_sha256": [
+          "22200865cba16ae30ca9b64781d4d7203fc9307a55f48b28298d6402866171c6"
+        ],
+        "passed": true
+      },
+      {
+        "case": "candidate-2",
+        "exit": 0,
+        "seconds": 34.077,
+        "arc_device": true,
+        "frames": 45,
+        "native_scene": true,
+        "stereo_export_panel": {
+          "0": 221824,
+          "1": 221608
+        },
+        "native_recovery": 1,
+        "valid_glb": 1,
+        "app_sha256": "f800c671a226f5b32e73647f908dce8e994d783f6816747c9547c8bcf32b1461",
+        "scene_sha256": "ca1248046485e3ede9122479fb12d0201fc12efd7726a67650d9eaac667e764c",
+        "process_cpu_seconds": 35.29,
+        "glb_sha256": [
+          "22200865cba16ae30ca9b64781d4d7203fc9307a55f48b28298d6402866171c6"
+        ],
+        "passed": true
+      },
+      {
+        "case": "parent-2",
+        "exit": 0,
+        "seconds": 36.68,
+        "arc_device": true,
+        "frames": 45,
+        "native_scene": true,
+        "stereo_export_panel": {
+          "0": 221824,
+          "1": 221608
+        },
+        "native_recovery": 1,
+        "valid_glb": 1,
+        "app_sha256": "bf30f46f18ac471cdad7c8d7d76fbbbc549d88f02e060a3d988e854621ceabd2",
+        "scene_sha256": "ca1248046485e3ede9122479fb12d0201fc12efd7726a67650d9eaac667e764c",
+        "process_cpu_seconds": 37.92,
+        "glb_sha256": [
+          "22200865cba16ae30ca9b64781d4d7203fc9307a55f48b28298d6402866171c6"
+        ],
+        "passed": true
+      }
+    ],
+    "phase": "complete",
+    "candidate": "0fa8eabab49f13cf56651e04fc2a824bc7460066",
+    "input_runtime_sha256": "94736612c5262ff56d62ad2553654e7336fcb5395df3b6259c7505aa341e947e",
+    "exit": 0
+  },
+  "direct-grid-arc-xr": {
+    "candidate": "0fa8eabab49f13cf56651e04fc2a824bc7460066",
+    "app_source": "0fa8eabab49f13cf56651e04fc2a824bc7460066",
+    "invocation": "5fe29db131c04966a44c0fee8d24fcca",
+    "profile": "arc-asan",
+    "terminal": true,
+    "phase": "complete",
+    "elapsed_seconds": 251.44,
+    "app_sha256": "f800c671a226f5b32e73647f908dce8e994d783f6816747c9547c8bcf32b1461",
+    "runtime_sha256": "81d136f7dfac55b79f205d7e382c5e49d10d46ea01f39dc0893f6c57d534e366",
+    "runner_sha256": "60869bf047e814c1b3aec9e5281bde4f62b466883ab1c95af5295459e98849cb",
+    "exit": 0,
+    "loader_exit": 0,
+    "checks": 153,
+    "report_complete": true,
+    "error": null,
+    "arc_witnesses": {
+      "baseline": {
+        "pid": 1365349,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "signal-committed": {
+        "pid": 1365854,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "signal-sigint": {
+        "pid": 1366182,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "signal-sigterm": {
+        "pid": 1366572,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "controller": {
+        "pid": 1366952,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "stylus": {
+        "pid": 1367515,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "controller-srgb": {
+        "pid": 1368005,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "sculpt-layers": {
+        "pid": 1368535,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "restart-prefix": {
+        "pid": 1369046,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "restart": {
+        "pid": 1369374,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "scene": {
+        "pid": 1370009,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "voxel-accept": {
+        "pid": 1370596,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "voxel-cancel": {
+        "pid": 1372659,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "voxel-focus": {
+        "pid": 1373215,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "voxel-undo": {
+        "pid": 1374358,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "bake-accept": {
+        "pid": 1375296,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "bake-cancel": {
+        "pid": 1375772,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "bake-focus": {
+        "pid": 1376224,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "bake-undo": {
+        "pid": 1377944,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "skin-transfer": {
+        "pid": 1378520,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "skin-fitted": {
+        "pid": 1379039,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "skin-focus": {
+        "pid": 1379551,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "retopo-committed": {
+        "pid": 1380075,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "retopo-accept": {
+        "pid": 1380442,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "retopo-focus": {
+        "pid": 1381147,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "retopo-unconfirmed": {
+        "pid": 1381870,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "cut-accept": {
+        "pid": 1382649,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "cut-unconfirmed": {
+        "pid": 1383414,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "mask-prefix": {
+        "pid": 1384065,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "mask-accept": {
+        "pid": 1384494,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "mask-cancel": {
+        "pid": 1385160,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "mask-focus": {
+        "pid": 1385834,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "mask-fill": {
+        "pid": 1386563,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "mask-undo": {
+        "pid": 1387619,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "paint-baseline": {
+        "pid": 1388317,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "paint": {
+        "pid": 1392704,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "uv": {
+        "pid": 1396449,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "controls": {
+        "pid": 1400406,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "files": {
+        "pid": 1400899,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      },
+      "exclusive": {
+        "pid": 1406692,
+        "node": "/dev/dri/renderD129",
+        "maps": [
+          "/usr/lib64/libgallium-26.2.7.so"
+        ]
+      }
+    },
+    "voxel": {
+      "exact_native_bytes": true,
+      "voxel_menu_pixels": 10141,
+      "voxel_menu_reopens": 1,
+      "voxel_menu_seen": true,
+      "voxel_open_pixels": 172,
+      "voxel_undo_pixels": 131,
+      "voxel_undo_seen": true,
+      "voxel_undo_wait_frames": 74
+    },
+    "uv": {
+      "uv_atlas_apply_accent": 207,
+      "uv_atlas_ready": true,
+      "uv_atlas_visible_pixels": 4997,
+      "uv_atlas_wait_frames": 22
+    }
+  },
+  "native-atlas-stage-profile": {
+    "terminal": true,
+    "invocation": "a55ee4e3a96d44f29f6bd7b809bd901e",
+    "profiles": {
+      "baseline": {
+        "source": "3cb2fe81e00a0a71bdac5c505ad169eb16d67b6d",
+        "seconds": 36.432,
+        "app_sha256": "5714113a39018dceedc5cf29cf21da5a69b84a979f953943551cc3fb3bebcbfc",
+        "glb_sha256": "22200865cba16ae30ca9b64781d4d7203fc9307a55f48b28298d6402866171c6",
+        "scene_sha256": "ca1248046485e3ede9122479fb12d0201fc12efd7726a67650d9eaac667e764c",
+        "stages": [
+          "Total (real): 0.01 seconds (13.515 ms)",
+          "Copy data: 0.01 seconds (11.168 ms)",
+          "Total (thread): 0.00 seconds (2.22 ms)",
+          "Create colocals: 0.00 seconds (2.201 ms)",
+          "Compute charts total (real): 23.20 seconds (23203.9 ms)",
+          "Compute charts total (thread): 23.20 seconds (23203.7 ms)",
+          "Create face groups: 0.01 seconds (6.388 ms)",
+          "Extract invalid mesh geometry: 0.00 seconds (0.077 ms)",
+          "Chart group compute charts (real): 23.20 seconds (23197.2 ms)",
+          "Chart group compute charts (thread): 23.20 seconds (23197.2 ms)",
+          "Create chart group mesh: 0.01 seconds (12.217 ms)",
+          "Create colocals: 0.00 seconds (1.384 ms)",
+          "Create boundaries: 0.00 seconds (3.632 ms)",
+          "Build atlas: 23.04 seconds (23042 ms)",
+          "Init: 0.01 seconds (8.039 ms)",
+          "Planar charts: 0.00 seconds (3.538 ms)",
+          "Clustered charts: 23.03 seconds (23030.4 ms)",
+          "Place seeds: 7.54 seconds (7542.51 ms)",
+          "Boundary intersection: 2.63 seconds (2630.11 ms)",
+          "Relocate seeds: 0.01 seconds (8.832 ms)",
+          "Reset: 0.00 seconds (1.427 ms)",
+          "Grow: 15.45 seconds (15451.5 ms)",
+          "Boundary intersection: 5.85 seconds (5846.88 ms)",
+          "Merge: 0.03 seconds (25.049 ms)",
+          "Fill holes: 0.00 seconds (0.841 ms)",
+          "Copy chart faces: 0.00 seconds (0.099 ms)",
+          "Create chart mesh and parameterize (real): 0.14 seconds (141.499 ms)",
+          "Create chart mesh and parameterize (thread): 0.90 seconds (901.45 ms)",
+          "Create chart mesh: 0.03 seconds (28.264 ms)",
+          "Parameterize charts: 0.85 seconds (853.396 ms)",
+          "Orthogonal: 0.00 seconds (0.328 ms)",
+          "LSCM: 0.83 seconds (827.088 ms)",
+          "Recompute: 0.02 seconds (19.554 ms)",
+          "Piecewise: 0.02 seconds (18.92 ms)",
+          "Boundary intersection: 0.02 seconds (17.594 ms)",
+          "Evaluate quality: 0.03 seconds (25.754 ms)",
+          "Total: 11.66 seconds (11664.6 ms)",
+          "Add charts (real): 0.00 seconds (3.618 ms)",
+          "Add charts (thread): 0.02 seconds (20.025 ms)",
+          "Restore texcoords: 0.00 seconds (0.042 ms)",
+          "Rasterize: 0.47 seconds (472.531 ms)",
+          "Dilate (padding): 0.12 seconds (122.353 ms)",
+          "Find location: 11.18 seconds (11175.8 ms)",
+          "Blit: 0.01 seconds (6.566 ms)",
+          "Total: 0.00 seconds (1.156 ms)"
+        ]
+      },
+      "candidate": {
+        "source": "0fa8eabab49f13cf56651e04fc2a824bc7460066",
+        "seconds": 34.429,
+        "app_sha256": "f00b748ca118a924ccd5615b301706edbcdba356b52063a20ba3908da475f7fb",
+        "glb_sha256": "22200865cba16ae30ca9b64781d4d7203fc9307a55f48b28298d6402866171c6",
+        "scene_sha256": "ca1248046485e3ede9122479fb12d0201fc12efd7726a67650d9eaac667e764c",
+        "stages": [
+          "Total (real): 0.01 seconds (12.541 ms)",
+          "Copy data: 0.01 seconds (11.104 ms)",
+          "Total (thread): 0.00 seconds (1.322 ms)",
+          "Create colocals: 0.00 seconds (1.313 ms)",
+          "Compute charts total (real): 21.25 seconds (21252.2 ms)",
+          "Compute charts total (thread): 21.25 seconds (21252.1 ms)",
+          "Create face groups: 0.01 seconds (6.299 ms)",
+          "Extract invalid mesh geometry: 0.00 seconds (0.079 ms)",
+          "Chart group compute charts (real): 21.25 seconds (21245.7 ms)",
+          "Chart group compute charts (thread): 21.25 seconds (21245.5 ms)",
+          "Create chart group mesh: 0.02 seconds (18.28 ms)",
+          "Create colocals: 0.00 seconds (1.582 ms)",
+          "Create boundaries: 0.00 seconds (4.331 ms)",
+          "Build atlas: 21.05 seconds (21049.4 ms)",
+          "Init: 0.01 seconds (8.612 ms)",
+          "Planar charts: 0.00 seconds (3.613 ms)",
+          "Clustered charts: 21.04 seconds (21037.2 ms)",
+          "Place seeds: 6.67 seconds (6672.5 ms)",
+          "Boundary intersection: 2.16 seconds (2156.43 ms)",
+          "Relocate seeds: 0.01 seconds (9.905 ms)",
+          "Reset: 0.00 seconds (1.494 ms)",
+          "Grow: 14.33 seconds (14325.1 ms)",
+          "Boundary intersection: 5.12 seconds (5120.1 ms)",
+          "Merge: 0.03 seconds (27.096 ms)",
+          "Fill holes: 0.00 seconds (0.867 ms)",
+          "Copy chart faces: 0.00 seconds (0.105 ms)",
+          "Create chart mesh and parameterize (real): 0.18 seconds (176.604 ms)",
+          "Create chart mesh and parameterize (thread): 1.04 seconds (1044.61 ms)",
+          "Create chart mesh: 0.03 seconds (33.427 ms)",
+          "Parameterize charts: 0.99 seconds (991.803 ms)",
+          "Orthogonal: 0.00 seconds (0.45 ms)",
+          "LSCM: 0.96 seconds (963.295 ms)",
+          "Recompute: 0.02 seconds (19.085 ms)",
+          "Piecewise: 0.02 seconds (18.506 ms)",
+          "Boundary intersection: 0.02 seconds (17.186 ms)",
+          "Evaluate quality: 0.03 seconds (27.871 ms)",
+          "Total: 11.52 seconds (11518.9 ms)",
+          "Add charts (real): 0.00 seconds (4.037 ms)",
+          "Add charts (thread): 0.02 seconds (20.754 ms)",
+          "Restore texcoords: 0.00 seconds (0.033 ms)",
+          "Rasterize: 0.47 seconds (466.229 ms)",
+          "Dilate (padding): 0.12 seconds (121.619 ms)",
+          "Find location: 11.04 seconds (11036.5 ms)",
+          "Blit: 0.01 seconds (6.539 ms)",
+          "Total: 0.00 seconds (1.144 ms)"
+        ]
+      }
+    },
+    "phase": "complete",
+    "exit": 0,
+    "identity": true,
+    "input_sha256": "ca1248046485e3ede9122479fb12d0201fc12efd7726a67650d9eaac667e764c"
+  },
+  "direct-grid-main-port-native-release": {
+    "terminal": true,
+    "profile": "release",
+    "candidate": "66d31263a3f5877dc0b22c96cffa54f7a41c02ec",
+    "invocation": "6d333e76dea24b0aa745598970727386",
+    "results": [
+      {
+        "target": "xatlas-allocation",
+        "exit": 0,
+        "seconds": 0.032,
+        "log_sha256": "7d8b5830488de23399a53e3a34c01dec61fc77823739447dd77940bccf9f441e",
+        "last_line": "PASS 19 persistent thread-state allocation failures unwind all native workers and allow retry"
+      },
+      {
+        "target": "xatlas-shutdown",
+        "exit": 0,
+        "seconds": 0.064,
+        "log_sha256": "7af2ac5c60860d5825b0193513c90ad4ea4446e9793c7a2077c4829e6be39e61",
+        "last_line": "PASS 32 deterministic Atlas shutdown predicate/wait-registration handshakes"
+      },
+      {
+        "target": "atlas-robustness",
+        "exit": 0,
+        "seconds": 5.875,
+        "log_sha256": "1b8d16d0dc9b9ae35b7a7c3eb7bc16bff2340c5b8dc7c0cf5c0f0b20a7b777c8",
+        "last_line": "PASS Increasing requested resolution fits all independent tiny charts under the same strict policy"
+      },
+      {
+        "target": "atlas-cancellation",
+        "exit": 0,
+        "seconds": 0.214,
+        "log_sha256": "a0aae97971e2a76bede2378ad0461220d7f2919d7061ca39dbae42cd7f8e189f",
+        "last_line": "15 cancellable atlas checks passed"
+      },
+      {
+        "target": "atlas-authoring-cancellation",
+        "exit": 0,
+        "seconds": 1.266,
+        "log_sha256": "2b920d662d23bf14f325d37922124e63f7bdb75218a760cfc1f42914dd6f4789",
+        "last_line": "18 authoring atlas cancellation checks passed"
+      },
+      {
+        "target": "voxel-authoring",
+        "exit": 0,
+        "seconds": 0.314,
+        "log_sha256": "80b396a5f991f54e6f182109003be77bdac85fa8dedeba4da1d09fd18d1df0f3",
+        "last_line": "PASS Scalar-source remeshing has exact scene undo"
+      }
+    ],
+    "phase": "complete",
+    "exit": 0
+  },
+  "direct-grid-main-port-native-asan": {
+    "terminal": true,
+    "profile": "asan",
+    "candidate": "66d31263a3f5877dc0b22c96cffa54f7a41c02ec",
+    "invocation": "3c319d1089724ff9bbc9082e3411089f",
+    "results": [
+      {
+        "target": "xatlas-allocation",
+        "exit": 0,
+        "seconds": 0.114,
+        "log_sha256": "7d8b5830488de23399a53e3a34c01dec61fc77823739447dd77940bccf9f441e",
+        "last_line": "PASS 19 persistent thread-state allocation failures unwind all native workers and allow retry"
+      },
+      {
+        "target": "xatlas-shutdown",
+        "exit": 0,
+        "seconds": 0.314,
+        "log_sha256": "7af2ac5c60860d5825b0193513c90ad4ea4446e9793c7a2077c4829e6be39e61",
+        "last_line": "PASS 32 deterministic Atlas shutdown predicate/wait-registration handshakes"
+      },
+      {
+        "target": "atlas-robustness",
+        "exit": 0,
+        "seconds": 55.123,
+        "log_sha256": "1b8d16d0dc9b9ae35b7a7c3eb7bc16bff2340c5b8dc7c0cf5c0f0b20a7b777c8",
+        "last_line": "PASS Increasing requested resolution fits all independent tiny charts under the same strict policy"
+      },
+      {
+        "target": "atlas-cancellation",
+        "exit": 0,
+        "seconds": 1.717,
+        "log_sha256": "a0aae97971e2a76bede2378ad0461220d7f2919d7061ca39dbae42cd7f8e189f",
+        "last_line": "15 cancellable atlas checks passed"
+      },
+      {
+        "target": "atlas-authoring-cancellation",
+        "exit": 0,
+        "seconds": 9.332,
+        "log_sha256": "2b920d662d23bf14f325d37922124e63f7bdb75218a760cfc1f42914dd6f4789",
+        "last_line": "18 authoring atlas cancellation checks passed"
+      },
+      {
+        "target": "voxel-authoring",
+        "exit": 0,
+        "seconds": 3.521,
+        "log_sha256": "80b396a5f991f54e6f182109003be77bdac85fa8dedeba4da1d09fd18d1df0f3",
+        "last_line": "PASS Scalar-source remeshing has exact scene undo"
+      }
+    ],
+    "phase": "complete",
+    "exit": 0
+  },
+  "direct-grid-main-port-software-xr": {
+    "candidate": "66d31263a3f5877dc0b22c96cffa54f7a41c02ec",
+    "app_source": "66d31263a3f5877dc0b22c96cffa54f7a41c02ec",
+    "invocation": "97df7bb5024b4cc5911c655948b1e5c7",
+    "profile": "software-release",
+    "terminal": true,
+    "phase": "complete",
+    "elapsed_seconds": 20.34,
+    "app_sha256": "77e9f3be9c54cc49180db8039f572cbeb44250862191adf2a36062acc16b48af",
+    "runtime_sha256": "15d037ea373efe098acf3584c25b8947579c44b33e2fc8b51c894d0d4e424665",
+    "runner_sha256": "99e30fdace2b236ce34f9cb8ea6e9477f059027a43cceabc8e596b8efc876aa3",
+    "exit": 1,
+    "loader_exit": 1,
+    "checks": 48,
+    "report_complete": false,
+    "error": "AssertionError: Joystick material page updates and persists the active object's blue material",
+    "arc_witnesses": {},
+    "voxel": {
+      "exact_native_bytes": false
+    },
+    "uv": {}
+  },
+  "main-before-grid-software-xr": {
+    "terminal": true,
+    "invocation": "9dc2bdfa6049498c8b28835b095eb6e1",
+    "exit": 1,
+    "source": "ead80bb50485de6f8a2473ea64ee039d53f79ae9",
+    "native_scene_sha256": "6f812500c377653e72009614ea8377044f35821620c55d76336c01ff91eb53e3",
+    "candidate_scene_sha256": "6f812500c377653e72009614ea8377044f35821620c55d76336c01ff91eb53e3",
+    "identical_native_scene": true,
+    "active_color": [
+      0.5799999833106995,
+      0.30000001192092896,
+      0.15000000596046448,
+      1.0
+    ],
+    "checks": 48,
+    "error": "AssertionError: Joystick material page updates and persists the active object's blue material",
+    "matches_candidate_failure": true
+  },
   "hdr-main-port-asan": {
     "terminal": true,
     "source": "ead80bb50485de6f8a2473ea64ee039d53f79ae9",
@@ -924,7 +1595,7 @@
   },
   "archive": {
     "path": "docs/validation/atlas-grid-hdr-history-20261126.tar.gz",
-    "sha256": "121c13ba49cfb17bb8fd4afd63d9543d634d7e8deee27e692208574253949f08",
-    "members": 32
+    "sha256": "390317e29a4990373c07c762872671b4aa72c1b77f6a7214f00f18653ae92760",
+    "members": 50
   }
 }

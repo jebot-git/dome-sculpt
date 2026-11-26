@@ -960,9 +960,22 @@ The matched Arc comparison retains byte-identical native Save and GLB
 output. The parent takes 41.52 and 42.12 seconds and the candidate takes
 40.73 and 39.52 seconds. Candidate `0fa8eaba` also visits grid cells
 directly in traversal order. It passes the 574-check grid oracle and six
-native cases in each profile, plus the 153-check software Release replay.
-Its matched Arc comparison is running. The full Arc suite will use the
-faster candidate with the original workflow deadline.
+native cases in each profile. Two isolated Arc candidate runs complete
+in 34.88 and 34.08 seconds. The matched parent takes 41.12 and 36.68
+seconds. All four Save and GLB pairs are byte-identical. The original
+software Release and Arc ASan/UBSan suites each pass all 153 checks
+with unchanged file deadlines. The Arc suite attests 40 real device
+witnesses, including the Files workflow on renderD129. Headless replay
+of that workflow's recovered project finds 21.04 seconds in chart growth
+and 11.04 seconds in placement search on the candidate. A separate
+packing-bounds patch `2d08e63e` is being evaluated against the same output.
+
+The main-based atlas port `66d31263` passes six native cases in both
+profiles. Its software XR replay stops at the existing fixture's material
+menu assertion after 48 checks. The prior main build fails the same
+assertion with the same 48 passes and a byte-identical scene. Main
+includes the atlas port. Its material-menu fixture still needs the
+rendered control replay already qualified on the combined branch.
 [Preview and integration evidence](validation/hdr-preview-composite-20261126.json)
 [Cache and Arc rerun evidence](validation/atlas-grid-hdr-history-20261126.json)
 

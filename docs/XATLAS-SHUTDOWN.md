@@ -88,3 +88,18 @@ their initial values. The preceding scheduler fails this test. The patch
 passes the focused Release and ASan/UBSan suites. The optimized Arc launch
 saves the same native paint project as the earlier scheduler build.
 [Cancellation evidence](validation/atlas-worker-and-history-20261126.json)
+
+## Chart boundaries and file export
+
+Chart growth retains the accepted boundary in face insertion order.
+New faces remove internal edges and append newly exposed edges. A rejected
+chart candidate leaves the committed boundary intact. The grid visits
+each cell directly, with the original traversal order and intersection
+tests. Candidate costs and their tie order are unchanged.
+
+The combined Release software and Intel Arc ASan/UBSan OpenXR replays
+each pass all 153 checks under the original limits. In separate matched
+Arc timing runs, both patched exports finish in under 35 seconds and
+produce the same native projects and GLBs as their parent. Both variants
+of the six native atlas/worker cases also pass on the main-based port.
+[Timing and runtime evidence](validation/atlas-grid-hdr-history-20261126.json)
