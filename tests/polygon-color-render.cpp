@@ -133,6 +133,7 @@ int main(int argc, char **argv) try {
   Fbo framebuffer;
   framebuffer.bind();
   SurfaceRenderer renderer;
+  SurfaceRenderer plain_renderer;
   polygon_color_consumer::Renderer independent;
   auto dir = std::filesystem::temp_directory_path() /
              ("dome-polygon-color-gl-" + std::to_string(getpid()));
@@ -173,13 +174,16 @@ int main(int argc, char **argv) try {
         surface.deformation = deform;
       }
       auto snapshot = packed(surface);
+      auto plain = std::make_shared<MeshSnapshot>(*snapshot);
+      plain->source_colors.clear();
+      native_draw(plain_renderer, plain);
+      const auto plain_bytes = plain_renderer.buffer_stats().vertex_bytes;
       auto native = native_draw(renderer, snapshot);
       check(reads == 0 && maps == 0,
             "Production current-color draw performs no CPU readback or map");
       auto bytes = renderer.buffer_stats().vertex_bytes;
-      check(bytes == snapshot->mesh.positions.size() * (56 + 16),
-            "Current corner RGBA uses the existing exact16-byte optional GPU "
-            "stream");
+      check(bytes == plain_bytes + snapshot->mesh.positions.size() * 16,
+            "Current corner RGBA adds exactly one 16-byte GPU stream per vertex");
       auto path = dir / (std::to_string(seam) + "-" +
                          std::to_string(int(alpha)) + ".glb");
       export_glb({surface}, path);

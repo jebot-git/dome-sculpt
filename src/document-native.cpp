@@ -13,6 +13,7 @@
 #include "dome/shapekey-sculpt.hpp"
 #include "shapekey-preview.hpp"
 #include "current-colors.hpp"
+#include "sculpt-scene-chunks.hpp"
 #include "texture-set-stroke.hpp"
 #include "texture-set-worker.hpp"
 #include <pthread.h>
@@ -234,11 +235,27 @@ void Document::native_loop(){
         world_projector=PaintProjection::from_shared_image(session->projection->image->pixels,
             session->projection->settings.camera,Mesh{},std::move(options));
         if(!evaluation||!query)throw std::logic_error("Projection requires evaluated native geometry");
-        if(session->projection->settings.image.visibility&&session->projection->settings.occlusion==ProjectionOcclusion::VisibleScene&&
-           std::any_of(session->original_preview->ranges.begin(),session->original_preview->ranges.end(),[&](const auto &range){return range.count&&std::find(session->projection_excluded.begin(),session->projection_excluded.end(),range.object)==session->projection_excluded.end();})){
-          scene_query=session->original_preview->picking;
-          if(!scene_query)scene_query=std::make_shared<MaterialSurfaceQuery>(session->original_preview->mesh,
-              session->original_preview->ranges,cancelled,session->original_preview->source_colors,PaintVertexCoordinates{session->original_preview->paint_coordinates});
+        if(session->projection->settings.image.visibility&&session->projection->settings.occlusion==ProjectionOcclusion::VisibleScene){
+          const auto &scene=*session->original_preview;
+          const auto eligible=[&](uint64_t object){
+            const auto &excluded=session->projection_excluded;
+            return std::find(excluded.begin(),excluded.end(),object)==excluded.end();
+          };
+          const bool packed=std::any_of(scene.ranges.begin(),scene.ranges.end(),
+              [&](const auto &range){return range.count&&eligible(range.object);});
+          const bool sculpt=scene.sculpt_chunks&&std::any_of(
+              scene.sculpt_chunks->objects().begin(),scene.sculpt_chunks->objects().end(),
+              [&](const auto &object){return eligible(object.object);});
+          if(packed||sculpt){
+            scene_query=scene.picking;
+            const PaintVertexCoordinates coordinates{scene.paint_coordinates};
+            if(!scene_query&&scene.sculpt_chunks)
+              scene_query=std::make_shared<MaterialSurfaceQuery>(
+                  scene.mesh,scene.ranges,cancelled,scene.source_colors,coordinates,scene.sculpt_chunks);
+            else if(!scene_query)
+              scene_query=std::make_shared<MaterialSurfaceQuery>(
+                  scene.mesh,scene.ranges,cancelled,scene.source_colors,coordinates);
+          }
         }
       }
       std::optional<Vec3> previous;size_t processed=0;auto shown=std::chrono::steady_clock::now();

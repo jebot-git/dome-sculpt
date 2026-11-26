@@ -10,6 +10,7 @@
 #include "dome/normal-frames.hpp"
 #include "dome/material-visibility.hpp"
 #include "dome/creation.hpp"
+#include "sculpt-scene-chunks.hpp"
 #include <nlohmann/json.hpp>
 namespace preview_fault {
 thread_local bool enabled=false,hit=false;
@@ -40,9 +41,22 @@ struct AssetRelease {std::shared_ptr<AssetGate> gate;~AssetRelease(){gate->relea
 std::atomic<std::shared_ptr<AssetGate>> mesh_gate;
 void open_view(Driver &hand,bool left=false){hand.open();auto state=hand.doc.frame().state;auto &tracked=hand.frame.hands[left?0:1].tracked;tracked.valid=tracked.aimValid=true;tracked.aim={ob::transform(state->panel,{0,(.5f-.06f)*.6f,.25f}),state->panel.orientation,1};if(left){tracked.trigger=0;hand.send();tracked.trigger=.8f;hand.send();tracked.trigger=0;hand.send();}else{hand.send(0,0,false,.8f);hand.send();}check(hand.doc.frame().state->menu_page==26,"Either controller opens the root View header while preserving the joystick owner's shared preview page");}
 }
-extern "C" std::vector<ObjectSurface> surfaces_real(const Scene*,const std::function<bool()>&,const Scene::SculptMesher&) asm("__real__ZNK4dome5Scene16preview_surfacesERKSt8functionIFbvEERKS1_IFNS_4MeshEmRKNS_6VolumeEEE");
-extern "C" std::vector<ObjectSurface> surfaces_wrap(const Scene*,const std::function<bool()>&,const Scene::SculptMesher&) asm("__wrap__ZNK4dome5Scene16preview_surfacesERKSt8functionIFbvEERKS1_IFNS_4MeshEmRKNS_6VolumeEEE");
-extern "C" std::vector<ObjectSurface> surfaces_wrap(const Scene *scene,const std::function<bool()> &cancelled,const Scene::SculptMesher &mesher){auto result=surfaces_real(scene,cancelled,mesher);if(auto gate=mesh_gate.exchange({}))gate->stop();return result;}
+extern "C" detail::SculptScenePreview real_capture(
+    const Scene &,detail::SculptSceneChunkContext,const detail::SculptSceneChunks::Ptr &,
+    detail::SculptSceneChunkLimits,LocalSurfaceCache::Cancel)
+    asm("__real__ZN4dome6detail17SculptSceneChunks7captureERKNS_5SceneENS0_23SculptSceneChunkContextERKSt10shared_ptrIKS1_ENS0_22SculptSceneChunkLimitsESt8functionIFbvEE");
+extern "C" detail::SculptScenePreview wrapped_capture(
+    const Scene &,detail::SculptSceneChunkContext,const detail::SculptSceneChunks::Ptr &,
+    detail::SculptSceneChunkLimits,LocalSurfaceCache::Cancel)
+    asm("__wrap__ZN4dome6detail17SculptSceneChunks7captureERKNS_5SceneENS0_23SculptSceneChunkContextERKSt10shared_ptrIKS1_ENS0_22SculptSceneChunkLimitsESt8functionIFbvEE");
+extern "C" detail::SculptScenePreview wrapped_capture(
+    const Scene &scene,detail::SculptSceneChunkContext context,
+    const detail::SculptSceneChunks::Ptr &previous,detail::SculptSceneChunkLimits limits,
+    LocalSurfaceCache::Cancel cancelled) {
+  auto result=real_capture(scene,context,previous,limits,std::move(cancelled));
+  if(auto gate=mesh_gate.exchange({}))gate->stop();
+  return result;
+}
 int main(int argc,char **argv)try{
  if(argc==3&&std::string_view(argv[1])=="--fixture"){preview_model().save(argv[2]);return 0;}
  if(argc==3&&std::string_view(argv[1])=="--inspect"){std::cout<<Scene::load(argv[2]).encode().dump()<<'\n';return 0;}
@@ -97,8 +111,27 @@ int main(int argc,char **argv)try{
   for(bool pbr:{false,true}){
    Document d;d.replace(scene);ready(d);load(d);if(pbr){d.shading(false);ready(d);}stroke(d);const auto coverage=d.copy_scene().active().painted->pixel(1,19,32).data[9];check((coverage>200)==pbr,"Active projected target query captures the actual authored/PBR alpha role");
   }
-  for(bool cached:{false,true})for(bool pbr:{false,true}){
-   auto occluded=scene;occluded.active().transform.position.z=.5f;auto id=occluded.add("Plain projected target",Volume{});auto &target=occluded.object(id);target.mesh_active=true;target.painted=std::make_shared<PaintedMesh>(quad(),64);occluded.select(id);Document d;d.replace(occluded);ready(d);if(cached){d.configure_object_grab(true,false);ready(d);}load(d);if(pbr){d.shading(false);ready(d);}check(bool(d.frame().surface->picking)==cached,"Actual projection test exercises both immutable picking cache and fallback query construction");stroke(d);const auto coverage=d.copy_scene().active().painted->pixel(1,19,32).data[9];check((coverage>200)==!pbr,"Other-object projected occlusion captures the actual immutable authored/PBR alpha role");
+  for(bool object_grab:{false,true})for(bool pbr:{false,true}){
+   auto occluded=scene;
+   occluded.active().transform.position.z=.5f;
+   const auto occluder=occluded.active().id;
+   const auto id=occluded.add("Plain projected target",Volume{});
+   auto &target=occluded.object(id);
+   target.mesh_active=true;
+   target.painted=std::make_shared<PaintedMesh>(quad(),64);
+   occluded.select(id);
+   Document d;
+   d.replace(occluded);
+   if(object_grab)d.configure_object_grab(true,false);
+   ready(d);
+   load(d);
+   if(pbr){d.shading(false);ready(d);}
+   const auto surface=d.frame().surface;
+   check(surface->picking&&bool(surface->picking->raycast_target({-.3f,0,2},{0,0,-1},2,0,occluder))==pbr,
+         "The published query uses the occluder's authored or PBR alpha role with grab on or off");
+   stroke(d);
+   const auto coverage=d.copy_scene().active().painted->pixel(1,19,32).data[9];
+   check((coverage>200)==!pbr,"Other-object projected occlusion captures the actual immutable authored/PBR alpha role");
   }
   Document placed;placed.replace(scene);ready(placed);load(placed);placed.projection_action(SpatialCommand::ProjectionPlace);const auto before=placed.copy_scene().encode();check(placed.frame().state->projection->placing&&!placed.frame().state->can_preview&&rejects([&]{placed.shading(false);})&&!placed.frame().state->pbr_view,"Physical projector placement owns its gesture and blocks preview changes atomically");placed.projection_action(SpatialCommand::ProjectionPlace);check(!placed.frame().state->projection->placing&&placed.frame().state->can_preview&&placed.copy_scene().encode()==before,"Finishing placement restores material preview availability without source mutation");
  }
