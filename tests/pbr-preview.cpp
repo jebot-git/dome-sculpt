@@ -97,8 +97,27 @@ int main(int argc,char **argv)try{
   for(bool pbr:{false,true}){
    Document d;d.replace(scene);ready(d);load(d);if(pbr){d.shading(false);ready(d);}stroke(d);const auto coverage=d.copy_scene().active().painted->pixel(1,19,32).data[9];check((coverage>200)==pbr,"Active projected target query captures the actual authored/PBR alpha role");
   }
-  for(bool cached:{false,true})for(bool pbr:{false,true}){
-   auto occluded=scene;occluded.active().transform.position.z=.5f;auto id=occluded.add("Plain projected target",Volume{});auto &target=occluded.object(id);target.mesh_active=true;target.painted=std::make_shared<PaintedMesh>(quad(),64);occluded.select(id);Document d;d.replace(occluded);ready(d);if(cached){d.configure_object_grab(true,false);ready(d);}load(d);if(pbr){d.shading(false);ready(d);}check(bool(d.frame().surface->picking)==cached,"Actual projection test exercises both immutable picking cache and fallback query construction");stroke(d);const auto coverage=d.copy_scene().active().painted->pixel(1,19,32).data[9];check((coverage>200)==!pbr,"Other-object projected occlusion captures the actual immutable authored/PBR alpha role");
+  for(bool object_grab:{false,true})for(bool pbr:{false,true}){
+   auto occluded=scene;
+   occluded.active().transform.position.z=.5f;
+   const auto occluder=occluded.active().id;
+   const auto id=occluded.add("Plain projected target",Volume{});
+   auto &target=occluded.object(id);
+   target.mesh_active=true;
+   target.painted=std::make_shared<PaintedMesh>(quad(),64);
+   occluded.select(id);
+   Document d;
+   d.replace(occluded);
+   if(object_grab)d.configure_object_grab(true,false);
+   ready(d);
+   load(d);
+   if(pbr){d.shading(false);ready(d);}
+   const auto surface=d.frame().surface;
+   check(surface->picking&&bool(surface->picking->raycast_target({-.3f,0,2},{0,0,-1},2,0,occluder))==pbr,
+         "The published query uses the occluder's authored or PBR alpha role with grab on or off");
+   stroke(d);
+   const auto coverage=d.copy_scene().active().painted->pixel(1,19,32).data[9];
+   check((coverage>200)==!pbr,"Other-object projected occlusion captures the actual immutable authored/PBR alpha role");
   }
   Document placed;placed.replace(scene);ready(placed);load(placed);placed.projection_action(SpatialCommand::ProjectionPlace);const auto before=placed.copy_scene().encode();check(placed.frame().state->projection->placing&&!placed.frame().state->can_preview&&rejects([&]{placed.shading(false);})&&!placed.frame().state->pbr_view,"Physical projector placement owns its gesture and blocks preview changes atomically");placed.projection_action(SpatialCommand::ProjectionPlace);check(!placed.frame().state->projection->placing&&placed.frame().state->can_preview&&placed.copy_scene().encode()==before,"Finishing placement restores material preview availability without source mutation");
  }
