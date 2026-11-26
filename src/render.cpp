@@ -882,7 +882,8 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
   TextureState::DrawPending next;next.mesh=mesh;next.previous_program=program_;auto&staged_chunks=next.chunks;auto&staged_material=next.material;auto&staged_flat=next.flat;
   auto drawing=mesh;const auto drawing_count=mesh->mesh.indices.size();
   try{
-  if(mesh!=cached_)textures_->ledger->collect();textures_->ledger->mark_used();
+  textures_->ledger->collect();
+  textures_->ledger->mark_used();
   textures_->target.begin(width,height,textures_->output);
   glViewport(0, 0, width, height);
   glDisable(GL_FRAMEBUFFER_SRGB);
