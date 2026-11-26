@@ -97,9 +97,10 @@ targets, broader polygon source domains and physical headset qualification remai
 
 Native Keep paint detail now reuses its proven immutable raster across display
 UV edits. The 2048-square Document workflow preserves sparse layers through UV
-editing, matching-triangle Bake with AO disabled, Save, Undo/Redo and cold
-reopen. Full-resolution default AO and first-key authoring on a fully baked
-target still reach existing resource quotas. [Full-resolution writable atlas evidence](validation/native-writable-raster-2048-20261126.json)
+editing, Bake, Save, Undo/Redo and cold reopen. Both ordinary projection and
+matching triangles now execute all 16 default AO samples at 2048. The first
+shapekey on that fully baked target still reaches the retained scene paint
+quota. [Full-resolution writable atlas evidence](validation/native-writable-raster-2048-20261126.json) · [Default AO evidence](validation/default-ao-bake-2048-20261126.json)
 
 Strict Bake rays now recover source-edge contacts affected by float staging.
 An exact ray hit has priority. A missed ray can use an actual source edge

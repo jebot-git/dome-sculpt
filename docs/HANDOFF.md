@@ -1874,6 +1874,32 @@ fully baked 2048 target hits the Scene paint-map quota. Preserve the complete
 history while addressing those limits. Physical headset verification remains open.
 [Full-resolution writable atlas evidence](validation/native-writable-raster-2048-20261126.json)
 
+### Default ambient occlusion at 2048
+
+The shared Bake worker budgets projection and AO against the actual target
+resolution and pass count. It reuses the deterministic hemisphere sample
+pattern across texels. A second pass that writes the independent normal atlas
+keeps both normal planes and performs only the required projection queries.
+The low-level baker still enforces explicit caller limits and the existing
+absolute cap.
+
+At 2048, ordinary projection traces 71,303,168 rays and matching triangles
+trace 67,108,864. Both use all 16 default AO samples on all 4,194,304 texels.
+The independent wall fixture verifies actual darkening near an occluder and
+unoccluded distant texels. Save, Undo/Redo and cold reopen preserve the complete
+project and recipe. Release and ASan/UBSan pass all 12 focused CTests and save
+byte-identical projects. AO, ORM and normal bytes match the previous kernel
+at seven sample counts from 0 through 256. The independent normal pass fixture
+confirms that both normal planes stay byte-identical when AO is enabled and
+the ray count rises by exactly 16 per projected material texel. Nested DomeD
+Wayland and synthetic OpenXR on software GL and Intel Arc save the same matched
+Bake using the default settings without a previously saved recipe.
+
+First-key authoring on the fully baked 2048 target still
+requires addressing the retained scene paint budget. Physical headset
+verification remains open.
+[Default AO evidence](validation/default-ao-bake-2048-20261126.json)
+
 ## Source and integration boundary
 
 - Main now admits product1bc13125 and public fixturef1e193c7 after complete

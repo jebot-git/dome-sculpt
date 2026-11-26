@@ -1,0 +1,158 @@
+{
+  "archive": {
+    "file": "default-ao-bake-2048-20261126.tar.gz",
+    "members": 50,
+    "sha256": "8e4e6e3e5acc21a2eaf774e1a5c2d469e991bd2507746c4feadb122aa48d3cec"
+  },
+  "byte_parity": {
+    "baked-2048.dsculpt": "307e0efee37d1327b085d74077ffbdde915e7b83f815402c29450fb6aa79d6da",
+    "matched-2048.dsculpt": "a0833f8e90874d59405ab286c5f3947ba38e6667c69cc9cfffc9ae5a0e61a258",
+    "retained-2048.dsculpt": "5b01ec7206e6cac7de6a585a31c6ea37ca82b9bc2f2537eeddd6b6024bcfe3a3"
+  },
+  "frontend": {
+    "arc": {
+      "app_sha256": "d285517056bdf5b043c7d6087a63301dbb59917b2dfd2a01473ff19443bc0596",
+      "checks": 10,
+      "exit": 0,
+      "input_sha256": "5b01ec7206e6cac7de6a585a31c6ea37ca82b9bc2f2537eeddd6b6024bcfe3a3",
+      "inspector_sha256": "ce2f7b065c57bbe34f86d9a1be1b3dae5a8b4c6c7034cc729e4a583644c21fc7",
+      "invocation": "6c4144616c184203b8193a10a029bc46",
+      "log_sha256": "962aaf007dafb533ad3a3b7b70db01a256d0b4fb2ca1713599206678dbbc5552",
+      "mode": "arc",
+      "native_sha256": "a0833f8e90874d59405ab286c5f3947ba38e6667c69cc9cfffc9ae5a0e61a258",
+      "phase": "complete",
+      "report_sha256": "772989f345ad45f88b3f173e43357dff719676ce5e8155fa9cbe4f79803aa283",
+      "run_script_sha256": "156f2292e8ad2b0d3d29a378a77c270128d5bb92a80c94e6d6cf2050d2d9e298",
+      "status_sha256": "5da14185b8f71c92d512764a8dc83d11680bc0f1c9cc05880cb5dd005c8d7a38",
+      "terminal": true,
+      "verifier_sha256": "09bc3a002f6035f072090c2f8bb9edd64d99955d6b354a80bf5f42105b2a707f"
+    },
+    "software": {
+      "app_sha256": "3f6773bf2daaf4a80bf6f90d5467d89c63cc63c047ebe217da49782aba03e399",
+      "checks": 10,
+      "exit": 0,
+      "input_sha256": "5b01ec7206e6cac7de6a585a31c6ea37ca82b9bc2f2537eeddd6b6024bcfe3a3",
+      "inspector_sha256": "e6e346db63a6ed8a992e0911107e6ccddd7ede2953972ac177ac42d59190ebdc",
+      "invocation": "876c5945e85647dd8fa9e63a2b4c4bfc",
+      "log_sha256": "8464922874a71351cb05216d820f5773eceffe9935b23e4e0b9dde8f28d92844",
+      "mode": "software",
+      "native_sha256": "a0833f8e90874d59405ab286c5f3947ba38e6667c69cc9cfffc9ae5a0e61a258",
+      "phase": "complete",
+      "report_sha256": "772989f345ad45f88b3f173e43357dff719676ce5e8155fa9cbe4f79803aa283",
+      "run_script_sha256": "156f2292e8ad2b0d3d29a378a77c270128d5bb92a80c94e6d6cf2050d2d9e298",
+      "status_sha256": "67554f890ab1d74ba4ee137be96d01658d12e5a696fd21b167b8be681a9ba273",
+      "terminal": true,
+      "verifier_sha256": "6a84351ca8245661a6ec9ed340fca42e43c9206aef912a1d6f4d338335f9f054"
+    },
+    "wayland": {
+      "app_sha256": "3f6773bf2daaf4a80bf6f90d5467d89c63cc63c047ebe217da49782aba03e399",
+      "checks": 9,
+      "compositor_sha256": "47920142c8c803dcf5adb63ba643d2e347fbdcd1e15ecd8bce7c1a8dd47c0b7e",
+      "compositor_source": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+      "exit": 0,
+      "input_sha256": "5b01ec7206e6cac7de6a585a31c6ea37ca82b9bc2f2537eeddd6b6024bcfe3a3",
+      "inspector_sha256": "e6e346db63a6ed8a992e0911107e6ccddd7ede2953972ac177ac42d59190ebdc",
+      "invocation": "a140663944f0430c89ba64d93273cf6d",
+      "log_sha256": "f73cfaccc267274800a4217d8a7041b40c09dffc32719392c28e25be1f35b9b3",
+      "mode": "wayland",
+      "native_sha256": "a0833f8e90874d59405ab286c5f3947ba38e6667c69cc9cfffc9ae5a0e61a258",
+      "phase": "complete",
+      "probe_sha256": "5bf11c670f66bbb68960073878933055b09582e5173ec1e3f472b413956c55aa",
+      "report_sha256": "48e68fa9d3ccc16c7712b8da097de6ff1618df9b03a2b23737bfce166589dcc3",
+      "run_script_sha256": "3c32fafcc64ed75b5471d3d10019883c051f30c05f53919557c9b17fe0ceb945",
+      "status_sha256": "6ca8739aaee0038b85da3c927be32ffe73d24ccb66c3f2fd74dcb03a2fdfe50d",
+      "terminal": true,
+      "verifier_sha256": "6a84351ca8245661a6ec9ed340fca42e43c9206aef912a1d6f4d338335f9f054"
+    }
+  },
+  "matching_rays": 67108864,
+  "native": {
+    "asan": {
+      "ao_parity": {
+        "0": "da0ef51f63608bf62199efd73d6f78afadfbe91e5210271bb429dd39730770e0",
+        "1": "da0ef51f63608bf62199efd73d6f78afadfbe91e5210271bb429dd39730770e0",
+        "16": "4b3b2f3a88716b82fe4bc91f4c065d34bcb6c17dfcd80e09da089ec4a7777891",
+        "2": "18defbe695fb44e5459350787ecdc9f0186b9e708eb15f87237ce0c91fd172c7",
+        "256": "afa82be842a16d194359b873f529e65a4bdc5ab37dec85fb46ce64296cf1ff6f",
+        "64": "031ebecd1dec92d5514fb5fa8a4f0d785d0613f9f6ff9c6617a77e7058c397bd",
+        "7": "24c78003aa4f586c3060073e314c29e57f5c63f1b5e785ba1fcf51065f713d3d"
+      },
+      "app_sha256": "d285517056bdf5b043c7d6087a63301dbb59917b2dfd2a01473ff19443bc0596",
+      "checks": 16,
+      "core_sha256": "527fdc999d992bd233a83b937694716f5f98443d96dfe9cb42dbe7f972187928",
+      "ctests": [
+        "bake",
+        "bake-custom-cage",
+        "bake-projection-policy",
+        "canonical-writable-bake-recipient",
+        "legacy-native-key-bake-conversion",
+        "native-key-writable-bake-recipient",
+        "native-writable-bake-2048",
+        "native-writable-bake-recipient",
+        "native-writable-default-ao-2048",
+        "source-artist-normal-bake",
+        "source-prepared-normal-bake",
+        "texture-set-bake-recipe"
+      ],
+      "log_sha256": {
+        "ao-parity-baseline-run.log": "9bacb421cb030fcae6e4da9deb0a4b08cdd83f161d6b42c173225b270ed17a25",
+        "ao-parity-candidate-run.log": "ff0812ec8f08231ca78c1d3cfea5951ff2b3fd60330ee18823889e5eec32fcdc",
+        "ao-parity-exact.json": "3ff72e12758ad5768263f3a349c4d6b41b91fc2700f25d07b66943ede2a1bc5c",
+        "ao-parity-first-baseline-run.log": "c2a15fca4d1c797fc390071f47be8cf3442394c690ab47710e39311bf25b8ad1",
+        "bake-authoring.cpp.log": "efb0ca48750848de22d705dd5fa298af1ab517338ff81be1605e22daa3270f4a",
+        "bake.cpp.log": "399e143df4c001d8cb971ef126d4563c410518ec80d630ba971a05c980e8048d",
+        "build/regressions.xml": "3ef2a4efb109ad4d7d4de0cacf59dec1e30c794e07ea33b2dd4338089b5dc267",
+        "ctest.log": "7b01ec5a9df23eea669b56504b7960a5c2912c3d293eaace16255a7ac35fff36",
+        "secondary-normal-candidate-run.log": "477c41612a670b3eeb91c804c7d25c5b3c081f8dcfa5bcf260fc68036f0e6279",
+        "status.json": "93efa61e4bf9f4ea3a1b4214e2055dae3cebd6fc70c3a63613b8e0880c45d283"
+      },
+      "secondary_pass_primary_ao_rays": 23104
+    },
+    "release": {
+      "ao_parity": {
+        "0": "da0ef51f63608bf62199efd73d6f78afadfbe91e5210271bb429dd39730770e0",
+        "1": "da0ef51f63608bf62199efd73d6f78afadfbe91e5210271bb429dd39730770e0",
+        "16": "4b3b2f3a88716b82fe4bc91f4c065d34bcb6c17dfcd80e09da089ec4a7777891",
+        "2": "18defbe695fb44e5459350787ecdc9f0186b9e708eb15f87237ce0c91fd172c7",
+        "256": "afa82be842a16d194359b873f529e65a4bdc5ab37dec85fb46ce64296cf1ff6f",
+        "64": "031ebecd1dec92d5514fb5fa8a4f0d785d0613f9f6ff9c6617a77e7058c397bd",
+        "7": "24c78003aa4f586c3060073e314c29e57f5c63f1b5e785ba1fcf51065f713d3d"
+      },
+      "app_sha256": "3f6773bf2daaf4a80bf6f90d5467d89c63cc63c047ebe217da49782aba03e399",
+      "checks": 16,
+      "core_sha256": "2e23c6749473fab25a40aa9e6673115d614cac650c3126c9e4c0110b9833a658",
+      "ctests": [
+        "bake",
+        "bake-custom-cage",
+        "bake-projection-policy",
+        "canonical-writable-bake-recipient",
+        "legacy-native-key-bake-conversion",
+        "native-key-writable-bake-recipient",
+        "native-writable-bake-2048",
+        "native-writable-bake-recipient",
+        "native-writable-default-ao-2048",
+        "source-artist-normal-bake",
+        "source-prepared-normal-bake",
+        "texture-set-bake-recipe"
+      ],
+      "log_sha256": {
+        "ao-parity-baseline-run.log": "35d159ea0b2a7688bbafb43e134ab241fe08876052183a4bf1d5e7bdb83037f3",
+        "ao-parity-candidate-run.log": "8dde138e787c0cb802cd3f94b79ff2d0f9b48c9948c656ebccf681b87f818879",
+        "ao-parity-exact.json": "3ff72e12758ad5768263f3a349c4d6b41b91fc2700f25d07b66943ede2a1bc5c",
+        "ao-parity-first-baseline-run.log": "df5d8304de21f0e63743025a38b88d3c1f8f3590767d92f3a80f7debbe499cb9",
+        "bake-authoring.cpp.log": "eb0513f216e01c0c15e40f0fd1ba7e052bd16fde5f1b8c0385d5b77b8ee1cdf6",
+        "bake.cpp.log": "b586a5273a00e202fc1275ab8d4e6ba3b5a429ea9f67e92114d744983b2c6b32",
+        "build/regressions.xml": "8158402b6903118f796493e55617baec96bccfe6ff2ff800744574ae9eb051f7",
+        "ctest.log": "adf22e2a54e9b2ce4d813704474c2acea6e219884e99c81790fcbf54eb620078",
+        "secondary-normal-candidate-run.log": "18b1063ccab01fa844b57a35f074f63c7fb1cb045a2512c37376c48144f867ff",
+        "status.json": "7528c702c520caf94c409f5dca8155430dbbbd48eca37cecf53d3eeb39259bef"
+      },
+      "secondary_pass_primary_ao_rays": 23104
+    }
+  },
+  "ordinary_rays": 71303168,
+  "patch_sha256": "f2954e9a6401a244da86e92b20c34ccbdb98bc9c49d9b50fd3d55a65ac9de044",
+  "product": "14fc52b43b20c1fa0653c5f851a678e619dd9dcf",
+  "scope": "Default sixteen AO samples at 2048 in the normal-offset and matching-triangle native Bake routes, including live nested Wayland and synthetic OpenXR. Both AO and geometry projection are CPU work.",
+  "target_texels": 4194304
+}
