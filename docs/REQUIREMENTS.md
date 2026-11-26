@@ -98,8 +98,11 @@ native and prepared normal targets now use world-metric projection, AO and
 cages while preserving their original tangent authority and local geometry.
 Selected prepared retained targets now bake in their original paint and
 normal domains, preserve inherited fields through ordered Save and reopen,
-and restore those fields with Clear. N-only retained targets, deformed
-retained donors and physical controls remain open. The original software
+and restore those fields with Clear. Native retained targets without a
+normal map now keep a separate channel on the original paint grid,
+including partial replacement, authored smooth normals, FLOAT material
+history and native reopen. Deformed retained donors and physical
+controls remain open. The original software
 sanitizer leak remains in the evidence.
 [Texture-set recipe evidence](validation/texture-set-bake-recipe-20261126.json)
 [Combined runtime evidence](validation/texture-set-recipe-runtime-20261126.json)
@@ -113,6 +116,7 @@ exports match byte for byte across Release and ASan/UBSan. Native HDR
 retained Bake remains writable and reopenable. Per-field portable HDR
 export is still required.
 [Standard GLB and UV archive evidence](validation/retained-target-export-worker-20261126.json)
+[Native retained-target Bake evidence](validation/retained-native-target-bake-20261126.json)
 
 
 ## Qualified integration — 2026-11-17

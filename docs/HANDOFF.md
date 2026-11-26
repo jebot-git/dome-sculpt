@@ -1228,6 +1228,28 @@ its valid paired UV Bake and both retained bake roles pass in Release
 and ASan/UBSan.
 [GLB worker and UV archive evidence](validation/retained-target-export-worker-20261126.json)
 
+Main merge `d88726a5` adds retained Bake for native authored normals
+without an inherited normal map. The selected field owns a normal detail
+image on the original paint grid. Its coverage keeps the inherited
+smooth normal outside projection. Successive partial bakes keep the
+earlier covered pixels. Clear restores the original field and leaves its
+last recipe available. Scene40's source member owns the new normal
+image in the existing archive. Scene41 also carries FLOAT emission.
+Portable LDR GLB exports the supported constant-frame case with the
+actual field image and authenticated tangent basis. Varying normal
+frames and per-field portable HDR still require their own export work.
+
+The twelve focused tests pass in each Release and ASan/UBSan profile,
+with 112 new native normal checks. A separate primary-field test passes
+59 checks per profile, including repeated partial Bake and original-grid
+FLOAT replay. The independent software and Intel Arc renderer matrices
+each check 4,058 baked and 4,058 unchanged field pixels over four
+reflection/winding cases. Maximum RGB8 error is one. Seventeen nested
+DomeD Wayland checks and 19 synthetic OpenXR checks per renderer pass
+with exact native Save, Cancel, Undo and focus-loss endpoints.
+Physical input and deformed retained donors remain open.
+[Native retained-target Bake evidence](validation/retained-native-target-bake-20261126.json)
+
 ## Source and integration boundary
 
 - Main now admits product1bc13125 and public fixturef1e193c7 after complete
