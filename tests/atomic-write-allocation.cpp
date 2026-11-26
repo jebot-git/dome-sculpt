@@ -107,6 +107,17 @@ int main(int argc, char **argv) try {
   try { dome::atomic_write(path, payload, options); }
   catch (const std::bad_alloc &) { callback_failed = true; }
   check(callback_failed && read(path) == prior, "Commit callback allocation failure preserves exact old output");
+  bool producer_failed = false;
+  try {
+    dome::detail::write_atomic_file(path, {}, [&](const auto &append) {
+      append(std::span<const uint8_t>(payload).first(65536));
+      throw std::length_error("Output exceeded the producer's size limit");
+    });
+  } catch (const std::length_error &) {
+    producer_failed = true;
+  }
+  check(producer_failed && read(path) == prior,
+        "Streaming failure after a written chunk preserves exact old output");
   size_t temporaries = 0;
   for (const auto &p : std::filesystem::directory_iterator(directory))
     if (p.path().filename().string().find(".tmp-") != std::string::npos) ++temporaries;

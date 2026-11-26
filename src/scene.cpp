@@ -60,10 +60,13 @@
 #include "polygon-scene-archive.hpp"
 #include "polygon-scene-budget.hpp"
 #include "source-uv-archive.hpp"
+#include <array>
+#include <cstring>
 #include <fstream>
 #include <map>
 #include <nlohmann/json.hpp>
 #include <set>
+#include <streambuf>
 namespace dome {
 namespace {
 void name_valid(const std::string &s) {
@@ -87,6 +90,57 @@ void retopology_acyclic(const std::map<uint64_t,uint64_t> &references) {
     }
   }
 }
+
+template <class Append>
+class SceneCborBuffer final : public std::streambuf {
+public:
+  explicit SceneCborBuffer(const Append &append) : append_(append) { reset(); }
+
+private:
+  void reset() { setp(buffer_.data(), buffer_.data() + buffer_.size()); }
+
+  void write_bytes(const char *data, size_t count) {
+    constexpr size_t limit = 256 * 1024 * 1024;
+    if (count > limit - written_)
+      throw std::length_error("Scene exceeds file size limit");
+    append_(std::span<const uint8_t>(reinterpret_cast<const uint8_t *>(data), count));
+    written_ += count;
+  }
+
+  int sync() override {
+    if (pptr() != pbase())
+      write_bytes(pbase(), size_t(pptr() - pbase()));
+    reset();
+    return 0;
+  }
+
+  int_type overflow(int_type ch) override {
+    sync();
+    if (!traits_type::eq_int_type(ch, traits_type::eof())) {
+      *pptr() = traits_type::to_char_type(ch);
+      pbump(1);
+    }
+    return traits_type::not_eof(ch);
+  }
+
+  std::streamsize xsputn(const char *data, std::streamsize count) override {
+    if (count <= 0)
+      return 0;
+    if (count > epptr() - pptr())
+      sync();
+    if (size_t(count) >= buffer_.size())
+      write_bytes(data, size_t(count));
+    else {
+      std::memcpy(pptr(), data, size_t(count));
+      pbump(int(count));
+    }
+    return count;
+  }
+
+  const Append &append_;
+  size_t written_ = 0;
+  std::array<char, 64 * 1024> buffer_;
+};
 } // namespace
 void Material::validate() const {
   name_valid(name);
@@ -1391,10 +1445,13 @@ Scene Scene::decode_owning(const nlohmann::json &j,
   return result;
 }
 void Scene::save(const std::filesystem::path &path) const {
-  auto bytes = nlohmann::json::to_cbor(encode());
-  if (bytes.size() > 256 * 1024 * 1024)
-    throw std::length_error("Scene exceeds file size limit");
-  atomic_write(path, bytes);
+  detail::write_atomic_file(path, {}, [&](const auto &append) {
+    SceneCborBuffer buffer(append);
+    std::ostream output(&buffer);
+    output.exceptions(std::ios::badbit | std::ios::failbit);
+    nlohmann::json::to_cbor(encode(), output);
+    output.flush();
+  });
 }
 Scene Scene::load(const std::filesystem::path &path) { return load(path, {}); }
 Scene Scene::load(const std::filesystem::path &path, const std::function<bool()> &cancelled) {

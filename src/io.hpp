@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 #include <algorithm>
+#include <cerrno>
+#include <cstdint>
 #include <filesystem>
 #include <fcntl.h>
 #include <functional>
@@ -15,9 +17,10 @@ struct AtomicWriteOptions {
   // A caller can atomically claim this commit boundary against cancellation.
   std::function<void()> before_commit;
 };
-inline void atomic_write(const std::filesystem::path &path,
-                         std::span<const uint8_t> bytes,
-                         const AtomicWriteOptions &options) {
+namespace detail {
+template <class Produce>
+void write_atomic_file(const std::filesystem::path &path,
+                       const AtomicWriteOptions &options, Produce produce) {
   auto check=[&]{if(options.cancelled && options.cancelled())
     throw std::runtime_error("Output cancelled");};
   check();
@@ -37,17 +40,19 @@ inline void atomic_write(const std::filesystem::path &path,
     throw std::runtime_error("Cannot create output file");
   try {
     const std::filesystem::path temporary_path(temporary.data());
-    size_t done = 0;
-    while (done < bytes.size()) {
-      check();
-      auto n = write(fd, bytes.data() + done,
-                     std::min(bytes.size() - done, size_t(1024 * 1024)));
-      if (n < 0 && errno == EINTR)
-        continue;
-      if (n <= 0)
-        throw std::runtime_error("Cannot write output file");
-      done += size_t(n);
-    }
+    const auto append = [&](std::span<const uint8_t> bytes) {
+      while (!bytes.empty()) {
+        check();
+        const auto count = write(fd, bytes.data(),
+                                 std::min(bytes.size(), size_t(1024 * 1024)));
+        if (count < 0 && errno == EINTR)
+          continue;
+        if (count <= 0)
+          throw std::runtime_error("Cannot write output file");
+        bytes = bytes.subspan(size_t(count));
+      }
+    };
+    produce(append);
     check();
     if (fsync(fd))
       throw std::runtime_error("Cannot sync output file");
@@ -74,6 +79,12 @@ inline void atomic_write(const std::filesystem::path &path,
     unlink(temporary.data());
     throw;
   }
+}
+} // namespace detail
+inline void atomic_write(const std::filesystem::path &path,
+                         std::span<const uint8_t> bytes,
+                         const AtomicWriteOptions &options) {
+  detail::write_atomic_file(path, options, [&](const auto &append) { append(bytes); });
 }
 inline void atomic_write(const std::filesystem::path &path,
                          std::span<const uint8_t> bytes) {
