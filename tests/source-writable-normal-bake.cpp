@@ -10,10 +10,13 @@
 #include "paint-overlay-packet.hpp"
 #include "native-paint-model.hpp"
 #include "native-paint-frame-source.hpp"
+#include "normal-key-derivation.hpp"
+#include "scene-paint-raster.hpp"
 #include "native-bake-conversion.hpp"
 #include "baked-normal-field.hpp"
 #include "emission-paint-access.hpp"
 #include "dome/shapekey-authoring.hpp"
+#include "dome/polygon-scene.hpp"
 #include "dome/tangents.hpp"
 #include <fstream>
 using namespace source_artist_fixture;
@@ -535,6 +538,14 @@ void legacy_key_conversion(bool physical,const std::filesystem::path &out){
   auto input=scene.active().painted;
   auto original=input->baked();
   require(scene.encode()==before,"Legacy bytes and later key survive cold native reopen");
+  if(!physical){
+    auto forged=before;
+    auto &bytes=forged.at("objects").at(0).at("painted").at("payload").at("mesh").at("positions").get_binary();
+    bytes[0]^=1;
+    bool refused=false;
+    try{(void)Scene::decode(forged);}catch(const std::invalid_argument &){refused=true;}
+    require(refused&&scene.encode()==before,"A shared raster reference cannot certify a changed REST corner");
+  }
   auto unrelated=scene.active();
   unrelated.material_bindings.reset();
   require(!detail::native_bake_conversion_supported(unrelated),"Conversion requires the actual paint and frame owners together");
@@ -742,6 +753,96 @@ void dense_retained_bake(const std::filesystem::path &out,bool default_ao){
     std::cout<<"DENSE_DEFAULT_AO ray="<<ordinary_rays<<" matching="<<matched.rays<<'\n';
   }
 }
+
+bool same_file(const std::filesystem::path &a,const std::filesystem::path &b){
+  if(std::filesystem::file_size(a)!=std::filesystem::file_size(b))return false;
+  std::ifstream first(a,std::ios::binary),second(b,std::ios::binary);
+  std::array<char,64*1024> left,right;
+  while(first.read(left.data(),left.size())||first.gcount()){
+    second.read(right.data(),first.gcount());
+    if(second.gcount()!=first.gcount()||!std::equal(left.begin(),left.begin()+first.gcount(),right.begin()))return false;
+  }
+  return first.eof()&&bool(second);
+}
+
+void dense_first_key(const std::filesystem::path &out){
+  dense_retained_bake(out,false);
+  const auto first_bake=out/"baked-2048.dsculpt";
+  const auto keyed_file=out/"keyed-2048.dsculpt";
+  const auto converted_file=out/"converted-2048.dsculpt";
+  const auto restored_file=out/"restored-2048.dsculpt";
+  const auto attached=[&](const Scene &scene){
+    const auto &o=scene.active();
+    const auto &b=o.material_bindings;
+    require(b&&b->key_derivation&&b->native_paint_frames&&o.shape_source&&
+        b->key_derivation->before_paint()==b->native_paint_frames->before_paint(),
+        "The key and native frame share their exact archived predecessor");
+    const auto &capture=*b->native_paint_frames->before_paint();
+    require(capture.baked()&&detail::retained_scene_paint_raster(*o.painted)==detail::retained_scene_paint_raster(capture)&&
+        capture.baked()->normal_interpretation==BakedNormalInterpretation::CanonicalMikk&&
+        o.painted->mesh().uv==capture.mesh().uv&&capture.resolution()==2048,
+        "Keyed authoring retains its immutable 2048 atlas and the original bake");
+  };
+  const auto ready=[&](Document &doc){
+    require(doc.wait_asset()&&doc.wait_mesh(std::chrono::seconds(45))&&doc.frame().state->error.empty(),
+        "The full-resolution document worker settles successfully");
+  };
+
+  ShapeKeyEdit edit;
+  edit.name="Full-resolution legacy Bake key";
+  {
+    Document doc;
+    doc.open(first_bake);
+    ready(doc);
+    const auto before=doc.copy_scene();
+    doc.author_shape(edit);
+    doc.save_async(keyed_file).get();
+    ready(doc);
+    attached(doc.copy_scene());
+    require(doc.undo()&&doc.copy_scene().active().painted->baked()==before.active().painted->baked()&&
+        !doc.copy_scene().active().shape_source&&doc.redo(),"First-key Undo and Redo preserve the original full-resolution Bake");
+  }
+  {
+    Document doc;
+    doc.open(keyed_file);
+    ready(doc);
+    const auto reopened=doc.copy_scene();
+    attached(reopened);
+    require(reopened.active().deformation->morphs->targets.front().name==edit.name&&
+        reopened.active().painted->baked()->maps.normal.rgba==reopened.active().shape_source->paint->baked()->maps.normal.rgba,
+        "Cold reopen restores the later key and full original normal plane");
+    edit.action=ShapeKeyAction::Replace;
+    edit.positions=reopened.active().painted->mesh().positions;
+    edit.positions.front().z+=.028f;
+    doc.author_shape(edit);
+    ready(doc);
+    require(doc.copy_scene().active().deformation->morphs->targets.front().delta.front().z==.028f,
+        "The reopened full-resolution key remains editable");
+    doc.convert_baked_normals();
+    doc.save_async(converted_file).get();
+    ready(doc);
+    const auto portable=doc.copy_scene();
+    attached(portable);
+    require(portable.active().painted->baked()->normal_interpretation==BakedNormalInterpretation::NativeAttributes&&
+        portable.active().painted->baked()->coverage==reopened.active().painted->baked()->coverage,
+        "Portable conversion keeps full-resolution coverage and the original Restore data");
+    doc.export_asset(out/"portable-2048.glb",AssetExportFormat::Glb).get();
+    require(std::filesystem::file_size(out/"portable-2048.glb")>1024,
+        "Standard GLB exports the converted full-resolution key");
+  }
+  {
+    Document doc;
+    doc.open(converted_file);
+    ready(doc);
+    attached(doc.copy_scene());
+    edit.action=ShapeKeyAction::Restore;
+    doc.author_shape(edit);
+    doc.save_async(restored_file).get();
+    ready(doc);
+    require(same_file(first_bake,restored_file),"Shape Restore after cold reopen reproduces the complete original Bake file");
+  }
+  std::cout<<"DENSE_FIRST_KEY "<<std::filesystem::file_size(keyed_file)<<" archive bytes; Restore exact\n";
+}
 }
 int main(int argc,char **argv) try {
  if(argc==3&&std::string_view(argv[1])=="--sources"){
@@ -784,6 +885,13 @@ int main(int argc,char **argv) try {
    std::filesystem::create_directories(out);
    writable_source::dense_retained_bake(out,std::string_view(argv[1])=="--dense-default-ao");
    std::cout<<"PASS "<<writable_source::checks<<" full-resolution retained Bake checks\n";
+   return 0;
+ }
+ if(argc==3&&std::string_view(argv[1])=="--dense-first-key"){
+   const std::filesystem::path out=argv[2];
+   std::filesystem::create_directories(out);
+   writable_source::dense_first_key(out);
+   std::cout<<"PASS "<<writable_source::checks<<" full-resolution first-key checks\n";
    return 0;
  }
  if(argc!=2)return 2;

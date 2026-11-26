@@ -28,6 +28,8 @@
 #include "dome/paint-sampling.hpp"
 #include "paint-sampling-access.hpp"
 #include "native-writable-grid.hpp"
+#include "native-read-scope.hpp"
+#include "scene-paint-raster.hpp"
 #include "native-bake-conversion.hpp"
 #include "native-paint-bake.hpp"
 #include "native-paint-frame-source.hpp"
@@ -2080,6 +2082,14 @@ std::shared_ptr<PaintedMesh> detail::TextureSetPaintAccess::resample_plain(const
  if(limits.cancelled&&limits.cancelled())throw std::runtime_error("Texture-set resolution cancelled");return result;
 }
 struct SourcePaintSamplingAccess {
+  static const void *scene_raster(const PaintedMesh &paint) noexcept {
+    const auto &surface=paint.surface_;
+    if(!surface||!surface->paint_domain||surface->paint_domain->version()!=1||
+       surface->options.policy!=PaintUvPolicy::Strict||surface->set_domain||
+       !surface->sampling_raster_proven)return nullptr;
+    return surface->raster_data.get();
+  }
+
   static detail::NativeBakeConversion convert_native_bake(const SculptObject &object,
       const NormalPreparationOptions &options) {
     const auto stop=[&]{if(options.cancelled&&options.cancelled())throw std::runtime_error("Native Bake conversion cancelled");};
@@ -2261,6 +2271,9 @@ struct SourcePaintSamplingAccess {
     return retain(before,authored,std::move(domain),budget,native_grid);
   }
 };
+const void *detail::retained_scene_paint_raster(const PaintedMesh &paint) noexcept {
+  return SourcePaintSamplingAccess::scene_raster(paint);
+}
 bool detail::native_bake_conversion_supported(const SculptObject &o) noexcept {
   const auto &binding=o.material_bindings;
   if(!o.mesh_active||!o.painted||o.painted->in_stroke()||o.appearance||o.texture_sets||o.polygon||
@@ -4154,8 +4167,24 @@ std::shared_ptr<PaintedMesh> PaintedMesh::decode_impl(const nlohmann::json &inpu
     result->surface_=polygon->paint->surface_;result->sampling_attachment_=polygon->paint->sampling_attachment_;
     result->composite_cache_=std::make_shared<CompositeCache>();result->composite_token_=next_composite_token();
   }else {
-    result=std::shared_ptr<PaintedMesh>(new PaintedMesh(std::move(geometry),uint32_t(resolution.get<uint64_t>()),surface_options,std::move(sampling),membership));
-    result->texture_set_domain_=membership;
+    const auto size=resolution.get<uint32_t>();
+    const bool share=sampling&&sampling->version()==1&&surface_options.policy==PaintUvPolicy::Strict&&
+        !membership&&detail::ScenePaintRasterReader::active();
+    const auto cached=share?detail::ScenePaintRasterReader::find(*sampling,size):nullptr;
+    if(cached){
+      PaintSamplingLimits limits;
+      limits.cancelled=[]{detail::NativeReadScope::check();return false;};
+      sampling->validate_current(*geometry,limits);
+      const auto surface=std::static_pointer_cast<const SurfaceMap>(cached);
+      result=std::shared_ptr<PaintedMesh>(new PaintedMesh);
+      result->surface_=std::make_shared<SurfaceMap>(*surface,std::move(geometry),std::move(sampling));
+      result->seal_paint_sampling_attachment();
+      result->composite_cache_=std::make_shared<CompositeCache>();
+      result->composite_token_=next_composite_token();
+    }else{
+      result=std::shared_ptr<PaintedMesh>(new PaintedMesh(std::move(geometry),size,surface_options,std::move(sampling),membership));
+      if(share)detail::ScenePaintRasterReader::retain(*result->paint_sampling_domain(),size,result->surface_);
+    }
   }
   std::optional<PaintImageArchive> local_images;
   const PaintImageArchive *images=archive;

@@ -15,6 +15,7 @@
 #include "dome/color-paint-sampling.hpp"
 #include "paint-sampling-access.hpp"
 #include "paint-archive-shape.hpp"
+#include "scene-paint-raster.hpp"
 #include "source-uv-archive.hpp"
 #include "material-archive-version.hpp"
 #include "material-key-context.hpp"
@@ -740,6 +741,7 @@ SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,
   auto frame_at=[&](const nlohmann::json &ref){return keyed?key_frames->at(uint32_t(index(ref,key_frames->size()))):frames.at(uint32_t(index(ref,frames.sets().size())));};
   // Preflight all implicit SurfaceMap allocations before constructing any.
   size_t texels=0,vertices=0,tile_bytes=0,metadata=0;
+  detail::EncodedPaintRasterBudget paint_rasters;
   std::function<void(const nlohmann::json&)> preflight_paint=[&](const nlohmann::json &record) {
     const auto &paint=detail::paint_archive_payload(record,native_paint||canonical_paint||detail::material_archive_base_version(input)==9||(keyed&&keyed_paint),context);
     if(record.contains("version")&&(record.at("version")==4||record.at("version")==8)){
@@ -752,7 +754,7 @@ SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,
       throw std::runtime_error("Invalid original UV paint resolution");
     auto r=resolution.get<uint64_t>();
     if(r<64 || r>2048 || (r&(r-1)))throw std::runtime_error("Invalid original UV paint resolution");
-    texels+=size_t(r)*r;
+    texels+=paint_rasters.texels(record,paint,uint32_t(r));
     const auto &positions=paint.at("mesh").at("positions");
     if(!positions.is_binary())throw std::runtime_error("Invalid original UV geometry");
     vertices+=positions.get_binary().size()/12;

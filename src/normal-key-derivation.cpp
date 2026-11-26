@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "normal-key-derivation.hpp"
 #include "native-paint-frame-source.hpp"
+#include "native-weight-paint-access.hpp"
 #include "dome/normal-preparation.hpp"
 #include "normal-frame-runtime.hpp"
 #include "normal-projection-identity.hpp"
@@ -244,7 +245,22 @@ ShapeKeyResult author_derived_normal_shapekey(Scene &scene,uint64_t object,const
   auto node=std::shared_ptr<SourceKeyDerivation>(new SourceKeyDerivation);node->owner_=node;
   auto staged=std::make_shared<NormalFrameSet>(*binding->normal_frames);staged->position_domain=domain;
   if(reuse){node->paint_=old->paint_;node->material_=old->material_;node->deformation_=old->deformation_;node->appearance_=old->appearance_;node->targets_=old->targets_;}
-  else {node->paint_=source.painted->snapshot();node->material_=binding;node->deformation_=source.deformation;node->appearance_=source.appearance;node->domain_=domain;staged->targets.clear();const auto map=anchor_map(*node);for(const auto &t:binding->normal_frames->targets){node->targets_.push_back({t.id,t.id});FrameTargetIdentity record=t;auto old_positions=prior_positions(*binding,t.id);record.positions.clear();record.positions.reserve(map.size());for(auto v:map)record.positions.push_back(old_positions.at(v));staged->targets.push_back(std::move(record));}}
+  else {
+    // The native frame capture may already hold this exact immutable paint.
+    // Match the full authoring state before sharing its archive record.
+    const auto native=binding->native_paint_frames;
+    const auto captured=native?native->before_paint():nullptr;
+    node->paint_=captured&&NativeWeightPaintAccess::same_current(*captured,*source.painted)
+        ?captured:source.painted->snapshot();
+    node->material_=binding;node->deformation_=source.deformation;node->appearance_=source.appearance;node->domain_=domain;
+    staged->targets.clear();const auto map=anchor_map(*node);
+    for(const auto &t:binding->normal_frames->targets){
+      node->targets_.push_back({t.id,t.id});FrameTargetIdentity record=t;
+      auto old_positions=prior_positions(*binding,t.id);record.positions.clear();record.positions.reserve(map.size());
+      for(auto v:map)record.positions.push_back(old_positions.at(v));
+      staged->targets.push_back(std::move(record));
+    }
+  }
   node->domain_=domain;node->current_targets_=binding->normal_frames->current_targets;node->next_target_=binding->normal_frames->next_target;
   uint64_t id;if(create){if(node->targets_.size()>=128||node->next_target_==UINT64_MAX)throw std::length_error("Independent key stable identity budget exceeded");id=node->next_target_++;node->current_targets_.push_back(id);node->targets_.push_back({id,(duplicate||(mirror&&!vertex_mirror))?std::optional<uint64_t>{binding->normal_frames->current_targets.at(edit.target)}:mix?std::optional<uint64_t>{0}:std::optional<uint64_t>{}});if(mirror&&!vertex_mirror){node->targets_.back().mirror_tolerance=edit.mirror_tolerance;if(edit.mirror_plane!=0||edit.mirror_frames!=ShapeKeyMirrorFrames::ExactAuthored)node->targets_.back().mirror_conversion=DerivedMirrorConversion{edit.mirror_plane,edit.mirror_frames};}staged->targets.push_back({id,{},{},std::vector<Vec3>(domain->basis()->positions.size())});}else id=node->current_targets_.at(slot);
   auto target=std::find_if(staged->targets.begin(),staged->targets.end(),[&](const auto&t){return t.id==id;});auto endpoint=current.positions;std::vector<Vec3> mirrored_delta;

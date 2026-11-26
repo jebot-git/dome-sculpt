@@ -14,6 +14,7 @@
 #include "baked-emission-codec.hpp"
 #include "emission-bake-source.hpp"
 #include "native-scene-geometry-intern.hpp"
+#include "scene-paint-raster.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/scene.hpp"
 #include "current-paint-preview.hpp"
@@ -231,6 +232,7 @@ void Scene::validate(bool deep_sources) const {
   detail::PolygonSceneArchive polygons;
   NormalSamplingArchive retained_normal_domains;
   std::set<const PaintedMesh *> retained_paint;
+  std::set<std::pair<const PaintSamplingDomain *,const void *>> retained_rasters;
   std::set<const PaintedMesh*> domain_paints,paired_domain_paints;
   std::set<const PaintSamplingDomain*> paint_domains;
   std::set<const Mesh*> paint_bases;size_t paint_domain_bytes=0;
@@ -310,7 +312,10 @@ void Scene::validate(bool deep_sources) const {
         if(domain->detail){source_images.add(domain->detail->pbr);source_images.add(domain->detail->mtoon);}
       }
     }
-    texels+=size_t(paint->resolution())*paint->resolution();paint_bytes+=paint->storage_bytes();
+    const auto raster=detail::retained_scene_paint_raster(*paint);
+    if(!raster||retained_rasters.emplace(paint->paint_sampling_domain().get(),raster).second)
+      texels+=size_t(paint->resolution())*paint->resolution();
+    paint_bytes+=paint->storage_bytes();
     if(auto original=paint->source_sampling_original())texels+=size_t(original->resolution())*original->resolution();
     if(paint_bytes>256*1024*1024)throw std::length_error("Scene paint storage budget exceeded");
     if(texels>16*1024*1024)throw std::length_error("Scene paint-map budget exceeded");
@@ -732,6 +737,7 @@ Scene Scene::decode(const nlohmann::json &j) {
 Scene Scene::decode_owning(const nlohmann::json &j,
     const detail::BakedEmissionReadCapability *baked_emission) {
   detail::NativeReadScope::check();
+  detail::ScenePaintRasterReader decoded_rasters;
   Scene result;
   if(!j.is_object() || (!j.at("format").is_string() || j.at("format").get_ref<const std::string&>()!="dome-sculpt") || !j.at("version").is_number_integer())
     throw std::runtime_error("Unsupported scene format or version type");
@@ -1030,6 +1036,7 @@ Scene Scene::decode_owning(const nlohmann::json &j,
     // Include retained original paint surfaces before any implicit UV raster
     // allocation; a tiny file must not request hundreds of huge SurfaceMaps.
     size_t pixels=0,storage=layered_normal_bytes;
+    detail::EncodedPaintRasterBudget paint_rasters;
     std::function<void(const nlohmann::json&,std::optional<bool>)> preflight_grid;
     const auto preflight=[&](const nlohmann::json&record){preflight_grid(record,{});};
     preflight_grid=[&](const nlohmann::json &record,std::optional<bool> source_physical) {
@@ -1044,7 +1051,7 @@ Scene Scene::decode_owning(const nlohmann::json &j,
         throw std::runtime_error("Invalid retained painting resolution");
       auto r=resolution.get<uint64_t>();
       if(r<64 || r>2048 || (r&(r-1)))throw std::runtime_error("Invalid retained painting resolution");
-      pixels+=size_t(r)*r;
+      pixels+=paint_rasters.texels(record,paint,uint32_t(r));
       const auto &layers=paint.at("layers");
       if(!layers.is_array() || layers.empty() || layers.size()>16)throw std::runtime_error("Invalid retained paint layers");
       for(const auto &layer:layers) {

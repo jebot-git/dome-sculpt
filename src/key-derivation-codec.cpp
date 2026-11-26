@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "key-derivation-codec.hpp"
 #include "key-paint-adoption.hpp"
+#include "native-paint-frame-source.hpp"
+#include "native-weight-paint-access.hpp"
 namespace dome::detail {
 namespace {
 uint64_t number(const nlohmann::json &j,bool positive=false){if(!j.is_number_unsigned()&&(!j.is_number_integer()||j.get<int64_t>()<0))throw std::invalid_argument("Invalid owning key identity");auto n=j.get<uint64_t>();if(positive&&!n)throw std::invalid_argument("Missing owning key target identity");return n;}
@@ -35,12 +37,21 @@ std::shared_ptr<const SourceKeyDerivation> KeyDerivationCodec::decode(const nloh
   }
   if(named&&!has_operation)throw std::invalid_argument("Record2 requires an actual named key operation");if(version==3&&!has_mirror)throw std::invalid_argument("Record3 requires an actual mirrored key operation");if(version==4&&!has_explicit_mirror)throw std::invalid_argument("Record4 requires actual explicit plane or converted artist-frame semantics");
   auto node=std::shared_ptr<SourceKeyDerivation>(new SourceKeyDerivation);node->owner_=node;node->material_=earlier.at(before);if(!node->material_)throw std::invalid_argument("Owning key record has an absent before material");
-  const auto source=paint(uint32_t(paint_id),node->material_);if(!source)throw std::invalid_argument("Owning key record has an absent before Paint");node->paint_=source->snapshot();
+  const auto source=paint(uint32_t(paint_id),node->material_);if(!source)throw std::invalid_argument("Owning key record has an absent before Paint");
+  const auto native=node->material_->native_paint_frames;
+  const bool shared_capture=native&&native->before_paint()==source;
+  node->paint_=shared_capture?source:source->snapshot();
   if(!input.at("deformation").is_null())node->deformation_=std::make_shared<const DeformationState>(DeformationState::decode(input.at("deformation"),node->paint_->mesh()));
   if(!input.at("appearance").is_null())node->appearance_=decode_creator_appearance(input.at("appearance"),models);
   if(node->material_->key_derivation)node->paint_=adopt_key_paint_geometry(*node->paint_,*node->material_,node->appearance_.get(),node->deformation_.get(),cancelled);
   if(const auto domain=frames.references_.at(size_t(frame_id));domain&&frames.input_.at("position_domains").at(*domain).at("version")==2)
     node->paint_=adopt_key_source_geometry(*node->paint_,*node->material_,node->appearance_.get(),node->deformation_.get(),cancelled);
+  if(shared_capture){
+    // Replay the declared geometry proof before retaining the shared archive owner.
+    if(!NativeWeightPaintAccess::same_current(*node->paint_,*source))
+      throw std::invalid_argument("Shared native key capture changed the declared paint owner");
+    node->paint_=source;
+  }
   auto staged=frames;node->frames_=staged.bind(uint32_t(frame_id),node->paint_->mesh_owner(),*node->material_,cancelled);node->domain_=node->frames_->position_domain;node->current_targets_=node->frames_->current_targets;node->next_target_=node->frames_->next_target;
   for(const auto&t:input.at("targets")){
     std::optional<uint64_t> reference;

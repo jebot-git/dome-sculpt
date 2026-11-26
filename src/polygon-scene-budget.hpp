@@ -6,6 +6,7 @@
 #include "source-uv-archive.hpp"
 #include "paint-archive-shape.hpp"
 #include "baked-emission-codec.hpp"
+#include "scene-paint-raster.hpp"
 #include <nlohmann/json.hpp>
 #include <optional>
 namespace dome::detail {
@@ -17,6 +18,7 @@ struct PolygonSceneBudget {
   bool independent_source_paint=false;
   bool owning_physical_emission=false;
   const BakedEmissionReadCapability *baked_emission=nullptr;
+  EncodedPaintRasterBudget paint_rasters;
   size_t samples = 0, pixels = 0, paint_bytes = 0, deformations = 0, remaps = 0,
          retopo_entries = 0, retopo_bytes = 0, retained_vertices = 0;
   static void add(size_t &n, size_t amount, size_t maximum,
@@ -68,7 +70,7 @@ struct PolygonSceneBudget {
     auto n = r.get<uint64_t>();
     if (n < 64 || n > 2048 || (n & (n - 1)))
       throw std::invalid_argument("Invalid polygon paint resolution");
-    add(pixels, size_t(n) * n, 16 * 1024 * 1024,
+    add(pixels, paint_rasters.texels(input,p,uint32_t(n)), 16 * 1024 * 1024,
         "Scene retained paint-map budget exceeded");
     const auto &ls = p.at("layers");
     if (!ls.is_array() || ls.empty() || ls.size() > 16)
