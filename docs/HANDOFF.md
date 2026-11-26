@@ -842,7 +842,8 @@ the unchanged save from one prepared project. The stereo capture shows the
 UV grid without published chart edges at the start of the fixture's edit.
 Fixture `25a29897` waits for visible chart edges and an enabled Apply tile.
 The focused Arc ASan/UBSan replay then changes the saved UVs while
-preserving the source sculpt and paint hashes. Full replay is underway.
+preserving the source sculpt and paint hashes. The full software Release
+replay passes all 153 checks. The full Arc sanitizer replay is underway.
 
 Main `c352cb72` adds cooperative cancellation inside connected chart growth.
 A regression using the actual starter sculpt cancels before its first
