@@ -1,0 +1,261 @@
+{
+  "product": "a2b46ea72c9188c3ec48dcfa216873f078bd6c14",
+  "main_merge": "7b00bb13d94c5e95d9a0186e5057ef95af2330b8",
+  "physical_headset": false,
+  "scope": "Cold sculpt edge representatives and ordered draw runs. Dense preview within original quotas, exact mesh/draw fingerprint, cancellation, masks, multi-object authoring and live immutable snapshot checks.",
+  "native": {
+    "release": {
+      "candidate": "a2b46ea72c9188c3ec48dcfa216873f078bd6c14",
+      "profile": "release",
+      "terminal": true,
+      "fltk": "/opt/fltk-vr/toolkit",
+      "invocation": "92489b3d67b64e5c8abc96dd6bbd58c0",
+      "phase": "complete",
+      "elapsed_seconds": 51.26,
+      "donor": "33bd24609e8fc701283b23aa5057955e908df583",
+      "rebuilt": [
+        "src/sculpt-surface-chunks.cpp"
+      ],
+      "core_sha256": "ce60e1af90f6ff609bbdb5bbddf7cf06f7f513fdba466f29882264b9315174ff",
+      "parent_core_sha256": "ac63fe35626c909abdab8b664ce97c09420dc0d8f3ae597627a0122a87bfc485",
+      "owned_objects": {
+        "sculpt-surface-chunks.cpp.o": "9d751c1500774992a059b35ce7d879f40bd1b74587beca1d3838783c52600cf3"
+      },
+      "binaries": {
+        "dome-sculpt-local-surface-integration-test": "64d3e912b4d6a18157934f79fb6cafa5bbe6b1277c873a8091cba78fa667310a",
+        "dome-sculpt-local-surface-test": "8431aff1ccc855a3ff4dbad00c35d314a4f2b7dd8f0144b19f42552837e84437",
+        "dome-sculpt-mask-controller-test": "1667b0793cb082b7a82118c1aeeea0b1ac6495a7f9b7ccda716e609b919b3a81",
+        "dome-sculpt-mask-document-test": "d3270fe474706ea6f52c49cffa6a74dbdc79cdf9d8991302de454483c90ca990",
+        "dome-sculpt-mask-render-test": "186877d4ea2e1d86bef1fa41bab673a0af5977423f48d0edcdddb60e097ffbf4",
+        "dome-sculpt-mask-symmetry-test": "ff54f1fedffeafc2238d35bfeb241a5ec05e961e46e31002367cb57a73b791f8",
+        "dome-sculpt-mask-transactions-test": "c5f197e8d4c0a48bf9b3c8f740559c34d294a027e3f68ba7e0f686ef1dad4ca2",
+        "dome-sculpt-native-paged-ray-test": "b05bdb988cdef3d276118d474569473d1d3594627cd9d192d50489351ac170ca",
+        "dome-sculpt-native-strokes-test": "f27773cc08ea5694b11a52830c71fa1d46f5efcc15418776eac8e6817ab4c285",
+        "dome-sculpt-paged-ray-test": "79f3afc8348bc18ae85f843cb8e9e4b86068e9cd3ad26376622de1ee58d8421c",
+        "dome-sculpt-scene-test": "655349b26c46c1a10c5a698e3d92ae81d33c44f4fbf30c831ddc8441132922f1",
+        "dome-sculpt-sculpt-chunk-pipeline-test": "20cad576161d6b1520ba15e55cbf840c07b056d19dd4f579ad1bb50fae7ef43a",
+        "dome-sculpt-sculpt-chunk-render-test": "1ea774dead4726c6960f5c5fbb1e79fc3bb7c2307f750a713d0c9a689d681491",
+        "dome-sculpt-sculpt-surface-chunks-test": "d9a00ee2572c1b2ed76ae3bc4493363905dfe6f7dc340eceddfe7b02dcdeb7e5"
+      },
+      "app_sha256": "7f8b701e9894cbfd2f0d7a1d5f5c6fc7633549581c9ce0503a2f8fdb2751f851",
+      "render_sha256": "828a8d35dd8ba95e71f69b89b26d12638f0bbf73639e2b28178c89a5b575847b",
+      "xr_sha256": "aec7fe47cf2ff52bf299a681372f003c0a1e66c01e87b4474fa2500988f6002f",
+      "exit": 0,
+      "failures": [],
+      "tests": 16,
+      "ctest_sha256": "344948c79531be071977de463786d803767895672f98829872580c68722fe316",
+      "junit_sha256": "bcae38af89c2b47d226f621c3c967f3a79f713c1aa0db82f9227383903b0fa04",
+      "passed": [
+        "authenticated-local-surface",
+        "local-surface",
+        "native-live-preview",
+        "native-paged-ray-cancellation",
+        "native-strokes",
+        "paged-ray",
+        "scene-authoring",
+        "sculpt-chunk-pipeline",
+        "sculpt-chunk-render",
+        "sculpt-mask-controller",
+        "sculpt-mask-dispatch",
+        "sculpt-mask-document",
+        "sculpt-mask-render",
+        "sculpt-mask-symmetry",
+        "sculpt-mask-transactions",
+        "sculpt-surface-chunks"
+      ]
+    },
+    "asan": {
+      "candidate": "a2b46ea72c9188c3ec48dcfa216873f078bd6c14",
+      "profile": "asan",
+      "terminal": true,
+      "fltk": "/home/blux/de-xr/dome-sculpt/artifacts/sdk-20261126/toolkit-sanitize",
+      "invocation": "625255a3a471428c8b1e8f0cf88068d1",
+      "phase": "complete",
+      "elapsed_seconds": 225.83,
+      "donor": "33bd24609e8fc701283b23aa5057955e908df583",
+      "rebuilt": [
+        "src/sculpt-surface-chunks.cpp"
+      ],
+      "core_sha256": "b0f139c6439271519c3d94fa2a20c148259a17946819cbb6329c887690e2ab20",
+      "parent_core_sha256": "15582b95545c31eac8c5e54c0daa81b9c46da3e999f3b65d4a85f0ff0a76731e",
+      "owned_objects": {
+        "sculpt-surface-chunks.cpp.o": "e8c564acddb2dbea8c1bb402177f48c44d60435aa6a893a28766d7cdebe6b3a6"
+      },
+      "binaries": {
+        "dome-sculpt-local-surface-integration-test": "ea1ec1e78b48c6f869636f43034a0d9ba86c11e66f39d157c1f2ad2dbd12aa75",
+        "dome-sculpt-local-surface-test": "5bdca4f5bd3c2b61f11e9494772c37c367d92b3cce0cad264c5f57857dcb7167",
+        "dome-sculpt-mask-controller-test": "176d82fffb60ca6f1c4233948640e265290935c1a4dcff23829e97290c6a88d4",
+        "dome-sculpt-mask-document-test": "284fdf1709942725f3247aebf74d04f9a71a220c9b47d8dedbe71b5bd835bb12",
+        "dome-sculpt-mask-render-test": "a17e4a4b6629e0c696fac4b0219937d4b86afd8f2d650ed6d81c5be2af4bec57",
+        "dome-sculpt-mask-symmetry-test": "a81a960f4611aac81efd3f6ccc7655c285971bc3de9bcd143afdddd6e416ce10",
+        "dome-sculpt-mask-transactions-test": "6fece1822ba2b7e6da74a3ff00053a4ce6434493f11cb169dfcac9b52cced6e6",
+        "dome-sculpt-native-paged-ray-test": "0d45c8a516a4cdea5a038c2bce3a567b1cc820d21804f2ba01add96c58274ee8",
+        "dome-sculpt-native-strokes-test": "47b9370ac615417fa0b6ed029bb8ce07f628689526a26b1a6540d0da818a1052",
+        "dome-sculpt-paged-ray-test": "ffec6fa913e91296ac81bb5d4baa4a63cc1f8324753d5e4cb08a6c9d97d2ce55",
+        "dome-sculpt-scene-test": "789f5ac698cd143f740d070138f81608d8320433916d670313277841382b7ba3",
+        "dome-sculpt-sculpt-chunk-pipeline-test": "d3088e0ee5b5a2ffb1a953e10affa5f098f034821af177ca553c3d0d11b3b003",
+        "dome-sculpt-sculpt-chunk-render-test": "e57c1c6fda69416fcb9f78aef90d9e70f16558e99ee8efd04e48fe90bb052451",
+        "dome-sculpt-sculpt-surface-chunks-test": "b6677e0d425a16c4c6c60c033a6157feeaa21a7fea90048258d676a4eebeb9ee"
+      },
+      "app_sha256": "20a0927484653e6da5596e9b885e78760fe831ec7b8fa7fe54375ad166ea45a5",
+      "render_sha256": "9db371e66bcdf7ffcfe0380170efebff9b3448ad6a1cadd88513327829c39202",
+      "xr_sha256": "dfcc553a0b94882d2dec24259ae341e6525f4a316c75fa08553f761f03e1c68e",
+      "exit": 0,
+      "failures": [],
+      "tests": 16,
+      "ctest_sha256": "5b71157ff33a751b840bc4e31bcd1adba773052fdc478dbf243e897ce53c8e9a",
+      "junit_sha256": "77396a2bc7a21a72e2652bd08113dba9fead6c1c0367058cad6cde31033ce4d3",
+      "passed": [
+        "authenticated-local-surface",
+        "local-surface",
+        "native-live-preview",
+        "native-paged-ray-cancellation",
+        "native-strokes",
+        "paged-ray",
+        "scene-authoring",
+        "sculpt-chunk-pipeline",
+        "sculpt-chunk-render",
+        "sculpt-mask-controller",
+        "sculpt-mask-dispatch",
+        "sculpt-mask-document",
+        "sculpt-mask-render",
+        "sculpt-mask-symmetry",
+        "sculpt-mask-transactions",
+        "sculpt-surface-chunks"
+      ]
+    }
+  },
+  "dense_oracle": {
+    "candidate": "a2b46ea72c9188c3ec48dcfa216873f078bd6c14",
+    "results": {
+      "baseline-16000000": {
+        "exit": 1,
+        "data": {},
+        "message": "Sculpt chunk work limit exceeded"
+      },
+      "baseline-36000000": {
+        "exit": 0,
+        "data": {
+          "work_limit": "36000000",
+          "vertices": "306020",
+          "indices": "1728072",
+          "dependency_edges": "288014",
+          "chunks": "3002",
+          "runs": "96008",
+          "digest": "3438701520078628339",
+          "working": "569408200",
+          "retained": "518020960",
+          "elapsed": "1.3909"
+        },
+        "message": "work_limit=36000000 vertices=306020 indices=1728072 dependency_edges=288014 chunks=3002 runs=96008 digest=3438701520078628339 working=569408200 retained=518020960 elapsed=1.3909"
+      },
+      "candidate-12000000": {
+        "exit": 1,
+        "data": {
+          "limit": "12000000"
+        },
+        "message": "Sculpt chunk work limit exceeded during initial chunk and ordered-run indexes (limit=12000000)"
+      },
+      "candidate-16000000": {
+        "exit": 0,
+        "data": {
+          "work_limit": "16000000",
+          "vertices": "306020",
+          "indices": "1728072",
+          "dependency_edges": "288014",
+          "chunks": "3002",
+          "runs": "96008",
+          "digest": "3438701520078628339",
+          "working": "536870912",
+          "retained": "518020960",
+          "elapsed": "1.36458"
+        },
+        "message": "work_limit=16000000 vertices=306020 indices=1728072 dependency_edges=288014 chunks=3002 runs=96008 digest=3438701520078628339 working=536870912 retained=518020960 elapsed=1.36458"
+      }
+    }
+  },
+  "intel_arc": {
+    "candidate": "a2b46ea72c9188c3ec48dcfa216873f078bd6c14",
+    "invocation": "5faaa82633664a61a64eb945b5852432",
+    "exit": 0,
+    "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+    "render_node": "/dev/dri/renderD129",
+    "cases": {
+      "sculpt-chunk-render": {
+        "binary_sha256": "1ea774dead4726c6960f5c5fbb1e79fc3bb7c2307f750a713d0c9a689d681491",
+        "log_sha256": "cc7ab997fc9cfbd33f89b9c1b21b235a11b128f23fa4a1c7b410c9616e0e8f53",
+        "checks": 99
+      },
+      "sculpt-mask-render": {
+        "binary_sha256": "186877d4ea2e1d86bef1fa41bab673a0af5977423f48d0edcdddb60e097ffbf4",
+        "log_sha256": "211e28ee8539985e54bd9dfe0f58bf32bc1ecc3f85e6dd933e98e0ba606943f3",
+        "checks": 38
+      }
+    }
+  },
+  "nested_wayland_bake_smoke": {
+    "candidate": "a2b46ea72c9188c3ec48dcfa216873f078bd6c14",
+    "terminal": true,
+    "invocation": "c372e6a14afb4bf08a1cc2defccb8c63",
+    "phase": "complete",
+    "core_sha256": "ce60e1af90f6ff609bbdb5bbddf7cf06f7f513fdba466f29882264b9315174ff",
+    "fixture_sha256": "8e02ad619c644cc1c5fb0c5674a147852ba968fd2551a706211c0a04a00bb744",
+    "compositor_sha256": "47920142c8c803dcf5adb63ba643d2e347fbdcd1e15ecd8bce7c1a8dd47c0b7e",
+    "compositor_source": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+    "probe_sha256": "5bf11c670f66bbb68960073878933055b09582e5173ec1e3f472b413956c55aa",
+    "app_sha256": "7f8b701e9894cbfd2f0d7a1d5f5c6fc7633549581c9ce0503a2f8fdb2751f851",
+    "exit": 0,
+    "checks": 17,
+    "report_sha256": "2da75bdef9a7abae098796c32119e1c17af4eb26966c1b1bebe3324ceac48a87"
+  },
+  "raw": {
+    "archive": "sculpt-cold-chunks-20261126.tar.gz",
+    "sha256": "c408afc594b060a8e81b6541ab3ee34384cbaddc81827478913565ffba9fc9fc",
+    "members": {
+      "arc/pixels/case-0-chunk.rgba": "67bbaa966bcd263aa4f7d2ea6d6d145a9cc6fd7a6b6430c1eaac398fc73e1c30",
+      "arc/pixels/case-0-reference.rgba": "67bbaa966bcd263aa4f7d2ea6d6d145a9cc6fd7a6b6430c1eaac398fc73e1c30",
+      "arc/pixels/case-1-chunk.rgba": "6b67bb6f79b9ef4ef8b879e64b7c14c177f3db411557bd89b482e422f04b2b29",
+      "arc/pixels/case-1-reference.rgba": "6b67bb6f79b9ef4ef8b879e64b7c14c177f3db411557bd89b482e422f04b2b29",
+      "arc/pixels/case-2-chunk.rgba": "75f8e5f188eacead3720eff2a5681f49634a4bbc9b8276ddfe41010f4999a654",
+      "arc/pixels/case-2-reference.rgba": "75f8e5f188eacead3720eff2a5681f49634a4bbc9b8276ddfe41010f4999a654",
+      "arc/pixels/case-3-chunk.rgba": "ce6f8a3a085a56ba5c3c1e1d60a100f423224239a1d13ec1a2e6460be91cb1f7",
+      "arc/pixels/case-3-reference.rgba": "ce6f8a3a085a56ba5c3c1e1d60a100f423224239a1d13ec1a2e6460be91cb1f7",
+      "arc/pixels/case-4-chunk.rgba": "e49ea0f15ecb70a2dc2936b09bd4c28edcf46696d13d007c2c026de607bef858",
+      "arc/pixels/case-4-reference.rgba": "e49ea0f15ecb70a2dc2936b09bd4c28edcf46696d13d007c2c026de607bef858",
+      "arc/pixels/case-5-chunk.rgba": "13beb691cf6ed0a6694ab701ca3d23a00586128c39f5ae92f7cc8db4027a4146",
+      "arc/pixels/case-5-reference.rgba": "13beb691cf6ed0a6694ab701ca3d23a00586128c39f5ae92f7cc8db4027a4146",
+      "arc/pixels/grouped-local.rgba": "3e35cabba1cd068d5b27658d6563b6856d9e73fac348a46d4754b881a3cdfe01",
+      "arc/pixels/grouped-reference.rgba": "3e35cabba1cd068d5b27658d6563b6856d9e73fac348a46d4754b881a3cdfe01",
+      "arc/run.py": "c5332d33836a7445f45d4b9bc1ad2f692c1d9c4b8cc410d236ad8025b3e4b28b",
+      "arc/sculpt-chunk-render.log": "cc7ab997fc9cfbd33f89b9c1b21b235a11b128f23fa4a1c7b410c9616e0e8f53",
+      "arc/sculpt-mask-render.log": "211e28ee8539985e54bd9dfe0f58bf32bc1ecc3f85e6dd933e98e0ba606943f3",
+      "arc/status.json": "d75acdc89b4a1842e64cbb6aa29601e6b39cb2a217512b538f2eb27c97f9666a",
+      "dense/baseline-16000000.log": "35f7ec9e950255ad1ce01d0cff3ba64ece5bcfeb37968901b7b8b27115859c28",
+      "dense/baseline-36000000.log": "450e613fedcf2162e38c4005befb1c2d3a2a8522677f5885c9db8a1f1da4ab72",
+      "dense/candidate-12000000.log": "4aae19deccff7a83c93debbb15b429f018f7c84cdd329d3b5229f9a4e06e6318",
+      "dense/candidate-16000000.log": "5c765414aed5cd7be860bab760a37563a9c7bf36b041987077b89cd2d06116e4",
+      "dense/run.py": "ec09acdb7fe540746d491364a00a3383461e1b0753236ac72b0b22bbbdb54701",
+      "dense/status.json": "e1ae960c2812478ea68f31941255fd2ce53ba434b4f6e865c7d27444910cb906",
+      "dense/witness.cpp": "6d8fafbeb670d93fafc7d1786ca35e00fbb75014083ecaf537c75ff1cb5b8204",
+      "native/asan/build/chunk-tests.xml": "77396a2bc7a21a72e2652bd08113dba9fead6c1c0367058cad6cde31033ce4d3",
+      "native/asan/configure.log": "1017057942ec2185528397aef63d76cf6861c0ae474ba25982d33b18a692dad2",
+      "native/asan/ctest.log": "5b71157ff33a751b840bc4e31bcd1adba773052fdc478dbf243e897ce53c8e9a",
+      "native/asan/dome-sculpt-link.log": "f913b7394d2620ded035ccfd94c63223a608893ef2d3949c3ff584909e720f5a",
+      "native/asan/sculpt-surface-chunks.cpp.log": "a02f3094d01da21dcccdef393ed0305e639d9c042375a88de3d88dbe3213e58a",
+      "native/asan/status.json": "2b0cef9fba269672cb98a249291f31bb440c3b1f6a6c38f03cf9b61595f9df03",
+      "native/release/build/chunk-tests.xml": "bcae38af89c2b47d226f621c3c967f3a79f713c1aa0db82f9227383903b0fa04",
+      "native/release/configure.log": "b0aff20dabf388fe27b78465d478cd0343b232e65ab8c46802a0dab7787631f7",
+      "native/release/ctest.log": "344948c79531be071977de463786d803767895672f98829872580c68722fe316",
+      "native/release/dome-sculpt-link.log": "217a1cf5e3a67143d119479568f1b116046ab7beb2a199629d3c08836b5202d3",
+      "native/release/sculpt-surface-chunks.cpp.log": "f4766f9e379f326f7c0887e29aec3ea76223a91de99abacf1375d6deeffc50f6",
+      "native/release/status.json": "ef28d059d453f456b7d3f4ba45f739e7c65993a1c84b7f45286f3590b06ede27",
+      "nested-wayland/replay.py": "de31e3aba0faf1806654ffe238f6dd16c420de336500f1c50f5aea660ee346d4",
+      "nested-wayland/run.py": "2abfc4278c607b99bbe3a72ca5612c58f488075718e21ea700b27f817eea864d",
+      "nested-wayland/status.json": "6e8d9efcb7ad3ed562bd76d7d589485ddc6ae17a70fec2861d5d61fb40bda7ae",
+      "nested-wayland/wayland.log": "86b4a369824ec1479b03b1e8f66f919b327804364afb713e7433e017798564cc",
+      "nested-wayland/workflow/report.json": "2da75bdef9a7abae098796c32119e1c17af4eb26966c1b1bebe3324ceac48a87",
+      "validation-source/record.py": "193270e2e55df3effaad0b13a44b9771e225fa3c8c5dbe57762d486ea21b7791",
+      "validation-source/run.py": "12d7c84cdf77a40e34e571e3074eee294b6165ed362e719f86669bf5b52737eb"
+    }
+  }
+}

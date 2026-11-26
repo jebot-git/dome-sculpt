@@ -135,6 +135,16 @@ and 27 failures. Five sculpt and scene failures were reproduced on
 `55a5bc69`. The complete latest-product regression remains open.
 [Regression results and fixtures](validation/retained-smooth-glb-20261126.tar.gz)
 
+The dense native sculpt preview now builds under the original work
+quota with the same geometry, provenance and draw-run digest as the
+larger-budget reference. All five previously reproduced sculpt and
+scene failures pass in both Release and ASan/UBSan. The selected
+16-case matrices also cover mask rendering, exact history, shared
+multi-object state and native paged-ray cancellation. Arc confirms
+the chunk and mask renderers. The current full regression and physical
+input qualification remain open.
+[Cold sculpt evidence](validation/sculpt-cold-chunks-20261126.json)
+
 ## Qualified integration — 2026-11-17
 
 Main now integrates product `1bc13125` and public fixture `f1e193c7` after

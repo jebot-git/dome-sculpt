@@ -1283,6 +1283,29 @@ and the scoped reproductions. A complete combined regression on the
 latest product remains open.
 [Raw validation and regression archive](validation/retained-smooth-glb-20261126.tar.gz)
 
+### Cold sculpt chunk construction
+
+Product `a2b46ea7` collects canonical edge representatives in a single
+cold pass and records each cell's draw-run bounds while assembling its
+final triangles. The 24,001-sample ray corridor builds within the
+unchanged 16-million-step default and publishes its native preview.
+The candidate and the earlier kernel run with a larger diagnostic
+budget produce the same position, normal, index, origin and ordered
+draw-run digest, with 306,020 chunk vertices and 96,008 draw runs.
+The smaller 12-million-step diagnostic budget still refuses.
+
+The existing native paged-ray test passes all 90 cancellation,
+replacement and shutdown checks. The scene, held preview, mask scalar
+and controller fixtures now exercise the actual chunk owners. Sixteen
+selected tests pass in each Release and ASan/UBSan profile. The separate
+Arc A770 render tests cover exact pixel parity, ordered draws, mask
+values and GPU-state recovery. The combined app also passes 17 nested
+DomeD Wayland checks in the Bake and universal-menu smoke workflow.
+The earlier 27-case failure list remains historical. These results
+close the five reproduced sculpt/scene failures for this candidate.
+The full latest regression and physical device acceptance remain open.
+[Cold sculpt build and runtime evidence](validation/sculpt-cold-chunks-20261126.json)
+
 ## Source and integration boundary
 
 - Main now admits product1bc13125 and public fixturef1e193c7 after complete
