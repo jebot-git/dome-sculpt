@@ -24,7 +24,15 @@ int main(int argc,char**argv)try{
  check(restored.encode()==native&&same(restored.active().painted->normal_projection()->pbr,restored.active().painted->normal_projection()->mtoon),"Genuine material/normal-frame native replay preserves both roles and their shared owner");
  scene.save(out/"shared.dsculpt");restored.save(out/"shared-reopened.dsculpt");check(bytes(out/"shared.dsculpt")==bytes(out/"shared-reopened.dsculpt"),"Shared-image native Save/reopen is byte exact");
  auto maps=std::make_shared<PaintSourceMaps>();auto normal=std::make_shared<Image>(neutral());for(size_t i=0;i<pixels;++i)normal->rgba[4*i]=255;maps->normal.image=normal;
- ColorPreparationInput different;different.paint=PaintedMesh::from_maps(quad(),maps,64);const auto changed=prepare_source_normals(different);const auto &roles=*changed.paint->normal_projection();
+ ColorPreparationInput different;different.paint=PaintedMesh::from_maps(quad(),maps,64);
+ // This is an authored native quad with known original N/T, not an imported
+ // normal texture with missing frame provenance. Retain those actual ordered
+ // corner attributes and the original UV/paint owner before preparation.
+ auto frame=std::make_shared<NormalFrames>();frame->origin_vertex_count=4;frame->origin_vertices=different.paint->mesh().indices;frame->normals.assign(6,{0,0,1});frame->tangents.assign(6,{1,0,0,1});
+ auto frames=std::make_shared<NormalFrameSet>();frames->pbr=frame;
+ auto origin=std::make_shared<SourceUvOrigin>();origin->paint=different.paint->snapshot();
+ auto binding=std::make_shared<SourceMaterialBindings>();binding->has_mtoon=false;binding->uv_origin=origin;binding->normal_frames=frames;binding->normal_frame=SourceMaterialNormalFrame::OriginalAttributes;binding->validate();different.material_bindings=binding;
+ const auto changed=prepare_source_normals(different);const auto &roles=*changed.paint->normal_projection();
  check(!same(roles.pbr,roles.mtoon)&&roles.pbr->rgba!=roles.mtoon->rgba,"Genuinely distinct PBR and absent-MToon intrinsic values keep separate image owners");
  check(changed.paint->storage_bytes()==pixels*8,"Distinct role allocations remain fully charged");
  auto historical=std::make_shared<PaintedMesh>(quad(),64);BakeSource source;source.mesh=quad();BakeOptions options;options.resolution=64;options.padding=0;options.ao_samples=0;auto bake=bake_mesh(quad(),source,options);BakedTextures textures;textures.maps=std::move(bake.maps);textures.maps.normal=std::move(bake.normal);for(auto c:bake.coverage)textures.coverage.push_back(c==1||c==2?255:0);historical->install_bake(std::move(textures));
