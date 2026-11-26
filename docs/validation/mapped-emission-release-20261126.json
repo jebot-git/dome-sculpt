@@ -1,0 +1,246 @@
+{
+  "source": "460a30ee9db1aef183198fa575a8d9e990dd425a",
+  "base": "e375b31d",
+  "domeD": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "build": {
+    "type": "Release",
+    "backend": "CPU",
+    "toolkit": "/opt/fltk-vr/toolkit",
+    "bitmap_runtime": "/opt/fltk-vr/bdf-runtime",
+    "first_attempt_exit": 1,
+    "first_attempt_reason": "Missing direct test include for PaintSourceTexture. Corrected before final build.",
+    "final_exit": 0,
+    "selected_targets_up_to_date": true
+  },
+  "native": {
+    "cases": [
+      {
+        "name": "mapped-emission",
+        "status": "run",
+        "seconds": 0.177425
+      }
+    ],
+    "checks": 20,
+    "samples_per_stage": 3969,
+    "stages": [
+      "Bake",
+      "native reopen",
+      "GLB reopen"
+    ],
+    "max_error": 2.38419e-07,
+    "wrong_coordinates_error": 3.24298
+  },
+  "historical": {
+    "exit": 0,
+    "checks": 22,
+    "older_scene_bytes_equal": true,
+    "input": {
+      "path": "artifacts/production-full-regression-release-20261126/hdr-legacy/scene43-full-context.dsculpt",
+      "sha256": "1e6034833b5b52a366bf7f08eca754201864b07587f73f8f129cdb149bb57067",
+      "bytes": 9943248
+    }
+  },
+  "software": {
+    "cases": [
+      {
+        "name": "source-owning-hdr-render",
+        "status": "run",
+        "seconds": 14.4192
+      },
+      {
+        "name": "source-mapped-hdr-render",
+        "status": "run",
+        "seconds": 14.4451
+      }
+    ],
+    "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+    "identity_checks": 4422,
+    "mapped_checks": 4423,
+    "source_float_error": 0,
+    "max_rgb8_error": 1
+  },
+  "arc": {
+    "exit": 0,
+    "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+    "render_node": "/dev/dri/renderD129",
+    "node_device": "226:129",
+    "node_inode": 266,
+    "pci": "0000:03:00.0",
+    "driver": "i915",
+    "mapped_checks": 4423,
+    "source_float_error": 0,
+    "max_rgb8_error": 1
+  },
+  "unchanged_other_role_failures": {
+    "cases": [
+      {
+        "name": "source-role-domain-emission",
+        "status": "fail",
+        "seconds": 0.0154326
+      },
+      {
+        "name": "source-role-missing-uv1",
+        "status": "fail",
+        "seconds": 0.066746
+      }
+    ],
+    "exit": 8,
+    "maximum_reported_probe_error": 0.015625
+  },
+  "khronos": {
+    "validatorVersion": "2.0.0-dev.3.10",
+    "issues": {
+      "numErrors": 0,
+      "numWarnings": 1,
+      "numInfos": 6,
+      "numHints": 0,
+      "messages": [
+        {
+          "code": "MESH_PRIMITIVE_GENERATED_TANGENT_SPACE",
+          "message": "Material requires a tangent space but the mesh primitive does not provide it. Runtime-generated tangent space may be non-portable across implementations.",
+          "severity": 1,
+          "pointer": "/meshes/1/primitives/0/material"
+        },
+        {
+          "code": "UNUSED_OBJECT",
+          "message": "This object may be unused.",
+          "severity": 2,
+          "pointer": "/bufferViews/17"
+        },
+        {
+          "code": "UNUSED_OBJECT",
+          "message": "This object may be unused.",
+          "severity": 2,
+          "pointer": "/bufferViews/18"
+        },
+        {
+          "code": "UNUSED_OBJECT",
+          "message": "This object may be unused.",
+          "severity": 2,
+          "pointer": "/bufferViews/19"
+        },
+        {
+          "code": "UNUSED_OBJECT",
+          "message": "This object may be unused.",
+          "severity": 2,
+          "pointer": "/bufferViews/20"
+        },
+        {
+          "code": "UNUSED_OBJECT",
+          "message": "This object may be unused.",
+          "severity": 2,
+          "pointer": "/textures/2"
+        },
+        {
+          "code": "UNUSED_OBJECT",
+          "message": "This object may be unused.",
+          "severity": 2,
+          "pointer": "/textures/6"
+        }
+      ],
+      "truncated": false
+    }
+  },
+  "artifacts": [
+    {
+      "path": "artifacts/retained-emission-affine-release-20261126/dome-sculpt",
+      "sha256": "c41f73a34f7baed7e0616f0c31b010e5d407726108aa3ae4b87de36f94bd5b6a",
+      "bytes": 17701560
+    },
+    {
+      "path": "artifacts/retained-emission-affine-release-20261126/dome-sculpt-mapped-emission-test",
+      "sha256": "2b0dd2cf5257b8b748571b4bf244a4492ad0fd428402dc3aedcca45c15f77523",
+      "bytes": 16031752
+    },
+    {
+      "path": "artifacts/retained-emission-affine-release-20261126/dome-sculpt-source-owning-hdr-render-test",
+      "sha256": "ce7349b72747698aaf167b9f20ae6a9ea58a908260f8731a71304b6578fd9ab2",
+      "bytes": 11453192
+    },
+    {
+      "path": "artifacts/retained-emission-affine-release-20261126/dome-sculpt-source-hdr-provenance-closure-test",
+      "sha256": "b61d4ade95e8b527819d0457e7413a30a042b599a5a6ca3597eb4d271449758f",
+      "bytes": 10643592
+    },
+    {
+      "path": "artifacts/retained-emission-affine-release-20261126/libdome-sculpt-core.a",
+      "sha256": "f58b306052857ddf33b1261dc92aac8b8a47b81fcee425444cbbc823394f4620",
+      "bytes": 44918800
+    },
+    {
+      "path": "artifacts/retained-emission-affine-release-20261126/libdome-sculpt-render.a",
+      "sha256": "11c8652d8d704c7440929c4c602407928f8c4a33fbd1dd77f8506c209f9fc80d",
+      "bytes": 1421232
+    },
+    {
+      "path": "artifacts/retained-emission-affine-release-20261126/build.log",
+      "sha256": "80947c145b65a41f83402372b8f327c0a49101c544d370bb74c322e9a01dc47f",
+      "bytes": 472286
+    },
+    {
+      "path": "artifacts/retained-emission-affine-release-20261126/build-resume.log",
+      "sha256": "18ac28aec93875588bb5bd1d7d43ad8a8a704a97a018d4cd73f7ef5f088d58e0",
+      "bytes": 74347
+    },
+    {
+      "path": "artifacts/retained-emission-affine-release-20261126/mapped-native.log",
+      "sha256": "2fa93873a57205b6c7b5ba36c8d0f69fe78acc9328ce25adcba7545387d93125",
+      "bytes": 1446
+    },
+    {
+      "path": "artifacts/retained-emission-affine-release-20261126/mapped-native.xml",
+      "sha256": "202db101b36137b1c1116823fd4e33b057779702f83128efc6bc0349dd71e560",
+      "bytes": 614
+    },
+    {
+      "path": "artifacts/retained-emission-affine-release-20261126/graphics-software.log",
+      "sha256": "7fa550dac87ea228ae3c85fb849091cace485a230019dc1611f29b08bf09f20f",
+      "bytes": 2441
+    },
+    {
+      "path": "artifacts/retained-emission-affine-release-20261126/graphics-software.xml",
+      "sha256": "340955a9b01b2a2d7470440f8f70bb8134337be64c39e81b7ade013a75a2c7cb",
+      "bytes": 1193
+    },
+    {
+      "path": "artifacts/retained-emission-affine-release-20261126/graphics-arc.log",
+      "sha256": "58c92e1798911026daf1c259347ae5746a023e12de088151c8e33a411e883454",
+      "bytes": 357
+    },
+    {
+      "path": "artifacts/retained-emission-affine-release-20261126/historical-identity.log",
+      "sha256": "258421e3ae6e0d1c07cbc812415a64efbac2f33df8350e7deb090a22944daee5",
+      "bytes": 404
+    },
+    {
+      "path": "artifacts/retained-emission-affine-release-20261126/legacy-run/legacy-reopened.dsculpt",
+      "sha256": "1e6034833b5b52a366bf7f08eca754201864b07587f73f8f129cdb149bb57067",
+      "bytes": 9943248
+    },
+    {
+      "path": "artifacts/retained-emission-affine-release-20261126/other-hdr-roles.log",
+      "sha256": "9bd9bc195a197f75d5ae658304146bd4a90cc86ec87f0cc5c6c855aa584515b6",
+      "bytes": 3898
+    },
+    {
+      "path": "artifacts/retained-emission-affine-release-20261126/other-hdr-roles.xml",
+      "sha256": "9ce0df2597c7b1f42668f20f35288629fd37adee9a0cd58d33d56df68fe3d0cf",
+      "bytes": 1606
+    },
+    {
+      "path": "artifacts/retained-emission-affine-release-20261126/khronos-mapped.json",
+      "sha256": "6994629ca1920ff79a1a8a3ace5bdf044c0dd9f33428b21210a688dbe64159aa",
+      "bytes": 4903
+    },
+    {
+      "path": "artifacts/retained-emission-affine-release-20261126/mapped-emission/mapped.dsculpt",
+      "sha256": "c98b48929c89cd918363c360c9c687123efb97cf779859ba8d0820b7b0359551",
+      "bytes": 560968
+    },
+    {
+      "path": "artifacts/retained-emission-affine-release-20261126/mapped-emission/mapped.glb",
+      "sha256": "158f9e587d2a0baf69593d73242794be7a856eead8c398a4e15e770faf0cfef8",
+      "bytes": 647720
+    }
+  ]
+}

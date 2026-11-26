@@ -116,9 +116,11 @@ eight native HDR and recipe tests passed in 229.77 seconds, including full
 Whole Release build `c26a8573` includes the corrected projection fixture and
 uses identical product source. It passed all 1,802 actions in 1,818.85
 seconds, including both separately requested sculpt fixtures. Its full
-1,349-test CTest suite is running in a private software-only environment.
-Check `ds-production-full-private-ctest-20261126.service` and
-`artifacts/production-full-regression-release-20261126/full-private-ctest/status.json`.
+1,349-test CTest suite finished in a private software-only environment.
+It reports 1,284 passes, 52 failures and 13 cases that could not run because of
+failed fixture dependencies. The raw JUnit and terminal status are under
+`artifacts/production-full-regression-release-20261126/full-private-ctest/`.
+Later focused fixes retain the original broad results in that directory.
 The exact `9e4f79f6` combined candidate passes all 14 native
 Wayland assertions and clean private teardown on Arc. The original wrapper
 refused a deleted non-executable Mesa
@@ -344,9 +346,28 @@ Combined Release `e375b31d` passes all six focused cases and 524 checks,
 including projection, cut retry, the paged-ray test and the four-object
 sculpt workflow. Its accepted Save and two recovery files match the previous
 native outputs byte for byte. All 22 SDF physical export controls pass in a
-separate rerun against its core. The full strict cold-sculpt workflow has a
-separate run. Read
+separate rerun against its core. The full strict cold-sculpt workflow reached
+164 checks, including the exact retained quota, before exceeding its unchanged
+4 GiB owned RSS limit at 710.886 seconds. The three smaller strict cases pass
+90, 26 and 94 checks. The full run's status and log are under
+`artifacts/sculpt-cold-representatives-strict-20261126/native/`. Read
 [the combined authoring receipt](validation/cold-sculpt-and-combined-authoring-20261126.json).
+
+Release candidate `460a30ee` retains a physical paint field across certified
+affine bake UV layouts. The native test passes Bake, ordered Save, exact Undo
+and Redo, native reopen and editable GLB replay. PBR and MToon pass on software
+and Intel Arc with one RGB8 level of maximum error. A genuine earlier Scene43
+file still reopens and saves byte for byte. The two original-image HDR failures
+still reproduce and require separate image and paint sampling. Read
+[the mapped emission result](MAPPED-EMISSION-20261126.md).
+
+Combined candidate `25632dd3` adds that mapped bake to the separately
+qualified HDR channel reuse, five sculpt regression fixtures and first-open
+creator framing. Its fresh optimized App build and 21 selected native and
+software renderer cases are running in
+`ds-production-mapped-hdr-creator-20261126.service`. The smaller mapped
+candidate has a separate strict sanitizer build. Each result belongs to its
+own source revision.
 
 ## Source and integration boundary
 
