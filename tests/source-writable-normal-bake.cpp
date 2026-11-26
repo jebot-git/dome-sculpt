@@ -881,6 +881,70 @@ void dense_editable_export(const std::filesystem::path &out){
   require(refused&&bytes_from(editable)==bytes,"A tighter caller sample budget still refuses and preserves the exported file");
   std::cout<<"DENSE_EDITABLE "<<bytes.size()<<" container bytes; native source exact\n";
 }
+
+void dense_hdr_first_key(const std::filesystem::path &out){
+  auto scene=Scene::load(out/"retained-2048.dsculpt");
+  const auto donor=std::find_if(scene.objects().begin(),scene.objects().end(),[](const auto &o){
+    return !o.visible&&o.name=="Hidden high source"&&bool(o.painted);
+  });
+  require(donor!=scene.objects().end(),"The actual matching HDR probe donor is available");
+  constexpr std::array<float,3> radiance{8.f,.125f,2.5f};
+  const auto donor_id=donor->id;
+  scene.object(donor_id).material.emissive=radiance;
+  auto options=settings();
+  options.prepare_normals=false;
+  options.corresponding_topology=true;
+  const auto baked_file=out/"baked-2048-hdr.dsculpt";
+  const auto keyed_file=out/"keyed-2048-hdr.dsculpt";
+  const auto restored_file=out/"restored-2048-hdr.dsculpt";
+  const auto verified=[&](const Scene &endpoint){
+    const auto baked=endpoint.active().painted->baked();
+    require(baked&&baked->emission_field&&baked->maps.emission.rgba.empty()&&
+        baked->emission_field->sample_count()==2048u*2048u&&
+        baked->emission_field->storage().dense.empty()&&
+        std::all_of(baked->coverage.begin(),baked->coverage.end(),[](uint8_t v){return v==255;}),
+        "Full-resolution baked paint retains a compact independent FLOAT field");
+    for(const size_t i:{size_t(0),size_t(2048*1024),size_t(2048*2048-1)}){
+      const auto sample=baked->emission_field->texel(i);
+      require(sample.coverage==1&&sample.absolute==radiance&&sample.legacy==std::array<float,3>{},
+          "Physical radiance and full coverage round-trip without quantization");
+    }
+  };
+  {
+    Document doc;
+    doc.replace(std::move(scene));
+    require(doc.wait_mesh(),"The retained HDR input publishes its original mesh");
+    doc.bake_from_object(donor_id,options);
+    doc.save_async(baked_file).get();
+    require(doc.wait_asset()&&doc.wait_mesh()&&doc.frame().state->error.empty(),
+        "Actual HDR Bake and ordered native Save succeed at 2048");
+    verified(doc.copy_scene());
+  }
+  ShapeKeyEdit edit;
+  edit.name="Full-resolution physical Bake key";
+  {
+    Document doc;
+    doc.open(baked_file);
+    require(doc.wait_mesh(),"Cold HDR Bake reopen publishes an editable mesh");
+    verified(doc.copy_scene());
+    doc.author_shape(edit);
+    doc.save_async(keyed_file).get();
+    require(doc.wait_asset()&&doc.wait_mesh()&&doc.frame().state->can_select_shape,
+        "The first shapekey preserves the compact full-resolution Bake");
+    require(doc.undo()&&doc.redo(),"HDR key authoring owns one reversible scene change");
+  }
+  {
+    Document doc;
+    doc.open(keyed_file);
+    require(doc.wait_mesh()&&doc.frame().state->can_select_shape,"Cold HDR key reopen restores editable geometry");
+    verified(doc.copy_scene());
+    edit.action=ShapeKeyAction::Restore;
+    doc.author_shape(edit);
+    doc.save_async(restored_file).get();
+    require(same_file(restored_file,baked_file),"Shape Restore reproduces the complete physical Bake project");
+  }
+  std::cout<<"DENSE_HDR_FIRST_KEY "<<std::filesystem::file_size(keyed_file)<<" archive bytes; Restore exact\n";
+}
 }
 int main(int argc,char **argv) try {
  if(argc==3&&std::string_view(argv[1])=="--sources"){
@@ -935,6 +999,11 @@ int main(int argc,char **argv) try {
  if(argc==3&&std::string_view(argv[1])=="--dense-editable-export"){
    writable_source::dense_editable_export(argv[2]);
    std::cout<<"PASS "<<writable_source::checks<<" full-resolution Editable GLB checks\n";
+   return 0;
+ }
+ if(argc==3&&std::string_view(argv[1])=="--dense-hdr-first-key"){
+   writable_source::dense_hdr_first_key(argv[2]);
+   std::cout<<"PASS "<<writable_source::checks<<" full-resolution physical Bake and shapekey checks\n";
    return 0;
  }
  if(argc!=2)return 2;

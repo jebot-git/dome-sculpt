@@ -19,12 +19,17 @@ std::array<std::vector<float>,5> read(const detail::PaintOverlayCompiler::Resour
 int main()try{
   using namespace dome;
   NativeGraphics graphics;std::cout<<"GL_VENDOR="<<glGetString(GL_VENDOR)<<" GL_RENDERER="<<glGetString(GL_RENDERER)<<'\n';
-  for(bool visible:{false,true}){
+  for(unsigned mode:{0u,1u,2u})for(bool visible:{false,true}){
     auto paint=std::make_shared<PaintedMesh>(quad(),64);
     BakedTextures baked;baked.maps.color=image({33,92,170,192});baked.maps.metal_rough=image({181,72,24,255});baked.coverage.resize(4096);
     std::vector<BakedEmissionSample> values(4096);
-    for(size_t i=0;i<4096;++i){const float a=i%3==0?0x1p-24f:i%3==1?.25f:.9f;baked.coverage[i]=i%3==0?0:i%3==1?128:255;values[i]={{a*.25f,a*.5f,0},{50000*a,.00001f*a,2*a},a};}
-    baked.emission_field=BakedEmissionField::create(64,values);paint->install_bake(std::move(baked));
+    for(size_t i=0;i<4096;++i){const float a=mode==2?(i%3==0?0.f:1.f):i%3==0?0x1p-24f:i%3==1?.25f:.9f;baked.coverage[i]=i%3==0?0:i%3==1?128:255;values[i]={{a*.25f,a*.5f,0},{50000*a,.00001f*a,2*a},a};}
+    baked.emission_field=mode==0?BakedEmissionField::create(64,values):
+        BakedEmissionField::generate(64,[&](size_t i){return values[i];},{100*1024,{}});
+    const auto field=baked.emission_field->storage();
+    check(field.dense.empty()==(mode!=0)&&field.binary_coverage.empty()==(mode!=2),
+          "Actual shader input exercises the intended dense, packed or binary layout");
+    paint->install_bake(std::move(baked));
     PaintSettings ink;ink.channel=PaintChannel::Emission;ink.emission_units=PaintEmissionUnits::Physical;ink.emission={7,.005f,4};ink.front_only=false;
     Brush brush;brush.from=brush.to={};brush.normal={0,0,1};brush.radius=2;brush.strength=.73f;
     paint->add_layer("Physical overlay");paint->begin_stroke();paint->stamp(brush,ink);check(paint->end_stroke(),"genuine editable physical overlay created");paint->layer_properties("Physical overlay",visible,.375f);

@@ -280,7 +280,7 @@ double projection_rounding_radius(const Mesh &low,size_t triangle,
   return 2*std::hypot(spacing[0],spacing[1],spacing[2]);
 }
 
-void pad(BakeResult &result,const BakeOptions &o,std::vector<BakedEmissionSample> &emission) {
+void pad(BakeResult &result,const BakeOptions &o,std::vector<std::array<float,3>> &emission) {
   auto n=o.resolution; std::deque<std::pair<uint32_t,uint32_t>> queue;
   for (uint32_t i=0;i<result.coverage.size();++i) if (result.coverage[i]==1) queue.push_back({i,0});
   uint64_t visited=0;
@@ -344,11 +344,13 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
   }
   const bool float_emission=std::any_of(source.materials.begin(),source.materials.end(),[](const auto &m){return bool(m.resolved_emission);})||
       std::any_of(source_fields.begin(),source_fields.end(),[](const auto &field){return field.physical_emission;});
+  constexpr size_t retained_limit=128*1024*1024;
+  size_t emission_budget=0;
   if(float_emission){
-    const size_t field=BakedEmissionField::required_bytes(o.resolution,{128*1024*1024,o.cancelled});
     const uint64_t other=uint64_t(o.resolution)*o.resolution*(13+(o.separate_pbr_color?4:0)+(o.encode_target_normal&&dual_normal?4:0));
-    if(other>128*1024*1024||field>128*1024*1024-other)
+    if(other>=retained_limit)
       throw std::length_error("FLOAT Bake retained channels exceed unchanged paint budget");
+    emission_budget=retained_limit-size_t(other);
   }
   const bool ray_projection=!corresponding_topology&&o.source_triangles.empty();
   const auto ambient_directions=ambient_pattern(o.ao_samples);
@@ -389,7 +391,7 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
   }
   size_t pixels=size_t(o.resolution)*o.resolution;
   BakeResult result; result.coverage.resize(pixels);
-  std::vector<BakedEmissionSample> emission;if(float_emission)emission.resize(pixels);
+  std::vector<std::array<float,3>> emission;if(float_emission)emission.resize(pixels);
   if(o.encode_target_normal&&dual_normal)result.maps.mtoon_normal={o.resolution,o.resolution,std::vector<uint8_t>(pixels*4)};
   if (!o.writable.empty()) for (size_t i=0;i<pixels;++i) if (!o.writable[i]) result.coverage[i]=4;
   for (auto *image:{&result.maps.color,&result.maps.metal_rough,&result.maps.emission,&result.normal,&result.ambient_occlusion})
@@ -484,7 +486,7 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
       auto channels=material(m,source.mesh,hit->triangle,hit->barycentric,paint_uv); auto high_normal=normalized(hit->normal);
       if(retained&&retained->emission)channels.emission=*retained->emission;
       else if(m.resolved_emission)channels.emission=m.resolved_emission(hit->triangle,hit->barycentric);
-      if(float_emission){emission[at]={{},channels.emission,1};emission[at].validate();}
+      if(float_emission)emission[at]=channels.emission;
       auto pbr_color=m.maps&&m.maps->overlay?material(m,source.mesh,hit->triangle,hit->barycentric,paint_uv,true).color:channels.color;
       const bool resolved_source=m.maps&&!m.maps->pbr_color.rgba.empty();
       if(o.separate_pbr_color&&resolved_source)pbr_color=sample(m.maps->pbr_color,paint_uv,false,true);
@@ -591,7 +593,10 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
   if (!result.projected) throw std::runtime_error("No low UV texels projected onto the high source");
   if(o.progress)o.progress(.9f);
   cancel(o); if (o.padding) pad(result,o,emission); cancel(o);
-  if(float_emission)result.emission_field=BakedEmissionField::create(o.resolution,emission,{128*1024*1024,o.cancelled});
+  if(float_emission)result.emission_field=BakedEmissionField::generate(o.resolution,[&](size_t i){
+    const bool covered=result.coverage[i]==1||result.coverage[i]==2;
+    return BakedEmissionSample{{},emission[i],covered?1.f:0.f};
+  },{emission_budget,o.cancelled});
   cancel(o);
   if(o.progress)o.progress(1);
   return result;

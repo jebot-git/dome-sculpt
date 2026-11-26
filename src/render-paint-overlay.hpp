@@ -40,17 +40,28 @@ private:
   try{v=shader(GL_VERTEX_SHADER,R"GLSL(#version 330 core
 void main(){vec2 p=vec2(gl_VertexID==1?3:-1,gl_VertexID==2?3:-1);gl_Position=vec4(p,0,1);})GLSL");
    f=shader(GL_FRAGMENT_SHADER,R"GLSL(#version 330 core
-uniform usamplerBuffer common_pixels;uniform samplerBuffer physical_pixels;uniform isamplerBuffer tile_offsets,padding;
+uniform usamplerBuffer common_pixels,physical_pixels;uniform isamplerBuffer tile_offsets,padding;
 uniform sampler2D baked_color,baked_orm,baked_emission,baked_coverage;
 uniform int resolution,layer_count,has_baked,baked_float_offset;uniform float layer_opacity[16];
+uniform int baked_float_stride,baked_float_index[7],baked_binary_offset;
+uniform float baked_float_constants[7];
 layout(location=0)out vec4 colour;layout(location=1)out vec4 orm;layout(location=2)out vec4 legacy;layout(location=3)out vec4 coverage;layout(location=4)out vec4 physical;
 float byte_value(uvec4 p,int i){return float((p[i/4]>>uint((i%4)*8))&255u)/255.0;}
 vec3 decode_rgb(vec3 c){return mix(c/12.92,pow((c+.055)/1.055,vec3(2.4)),greaterThan(c,vec3(.04045)));}
-float ph(int offset,int component){return texelFetch(physical_pixels,offset+component).r;}
+float ph(int offset,int component){return uintBitsToFloat(texelFetch(physical_pixels,offset+component).r);}
+float bakedCoefficient(int owner,int component){
+ if(component==6&&baked_binary_offset>=0){
+  uint word=texelFetch(physical_pixels,baked_binary_offset+owner/32).r;
+  return float((word>>uint(owner%32))&1u);
+ }
+ int index=baked_float_index[component];
+ if(index<0)return baked_float_constants[component];
+ return ph(baked_float_offset+owner*baked_float_stride,index);
+}
 void main(){
  colour=orm=legacy=coverage=physical=vec4(0);ivec2 out_pixel=ivec2(gl_FragCoord.xy);int at=out_pixel.y*resolution+out_pixel.x;int owner=texelFetch(padding,at).r;if(owner<0)return;
  ivec2 p=ivec2(owner%resolution,owner/resolution);
- if(has_baked==1){float a=texelFetch(baked_coverage,p,0).r;vec4 c=texelFetch(baked_color,p,0);c.rgb=decode_rgb(c.rgb);colour=c*a;coverage=vec4(a);orm=vec4(texelFetch(baked_orm,p,0).rgb*a,a);legacy=vec4(decode_rgb(texelFetch(baked_emission,baked_float_offset>=0?ivec2(0):p,0).rgb)*a,a);physical.a=a;if(baked_float_offset>=0){int base=baked_float_offset+owner*7;for(int k=0;k<3;++k){legacy[k]=ph(base,k);physical[k]=ph(base,3+k);}float emission_coverage=ph(base,6);coverage.a=legacy.a=physical.a=emission_coverage;}}
+ if(has_baked==1){float a=texelFetch(baked_coverage,p,0).r;vec4 c=texelFetch(baked_color,p,0);c.rgb=decode_rgb(c.rgb);colour=c*a;coverage=vec4(a);orm=vec4(texelFetch(baked_orm,p,0).rgb*a,a);legacy=vec4(decode_rgb(texelFetch(baked_emission,baked_float_offset>=0?ivec2(0):p,0).rgb)*a,a);physical.a=a;if(baked_float_offset>=0){for(int k=0;k<3;++k){legacy[k]=bakedCoefficient(owner,k);physical[k]=bakedCoefficient(owner,3+k);}float emission_coverage=bakedCoefficient(owner,6);coverage.a=legacy.a=physical.a=emission_coverage;}}
  int columns=resolution/32,tile=(p.y/32)*columns+p.x/32,within=(p.y%32)*32+p.x%32;
  for(int layer=0;layer<layer_count;++layer){ivec2 offsets=texelFetch(tile_offsets,layer*columns*columns+tile).rg;if(offsets.x<0)continue;uvec4 q=texelFetch(common_pixels,offsets.x+within);
   float mask=byte_value(q,13)*layer_opacity[layer];vec4 a=vec4(byte_value(q,9),byte_value(q,10),byte_value(q,11),byte_value(q,12))*mask;
@@ -72,6 +83,9 @@ void main(){
   ~Temporary(){if(fbo)glDeleteFramebuffers(1,&fbo);}
  };
  static void image(GLuint name,uint32_t width,uint32_t height,GLenum internal,GLenum format,const void *pixels){glBindTexture(GL_TEXTURE_2D,name);glTexImage2D(GL_TEXTURE_2D,0,GLint(internal),GLsizei(width),GLsizei(height),0,format,GL_UNSIGNED_BYTE,pixels);glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);}
+ static size_t field_upload_bytes(const BakedEmissionField::StorageView &field){
+  return field.dense.size_bytes()+field.varying.size_bytes()+field.binary_coverage.size_bytes();
+ }
  Resource build(std::shared_ptr<const PaintOverlayPacket> packet,bool pbr,size_t budget,size_t working_budget){
   Resource result;result.owner=std::move(packet);result.pbr=pbr;result.resolution=result.owner->resolution();const auto &input=*result.owner;
   if(input.empty())return result;
@@ -93,7 +107,9 @@ void main(){
   std::sort(common_keys.begin(),common_keys.end(),[&](const auto&a,const auto&b){return common_key(a)<common_key(b);});std::sort(physical_keys.begin(),physical_keys.end(),[](const auto&a,const auto&b){return reinterpret_cast<uintptr_t>(a.tile)<reinterpret_cast<uintptr_t>(b.tile);});
   size_t common_count=0,physical_count=0;for(size_t i=0;i<common_keys.size();++i)if(!i||common_key(common_keys[i])!=common_key(common_keys[i-1]))++common_count;for(size_t i=0;i<physical_keys.size();++i)if(!i||physical_keys[i].tile!=physical_keys[i-1].tile)++physical_count;
   const size_t common_pixels=std::max(size_t(1),common_count*1024),physical_values=std::max(size_t(1),physical_count*1024*7),offset_count=std::max(size_t(1),input.layers().size()*grid);
-  const auto field=input.baked()?input.baked()->emission_field:nullptr;const size_t field_bytes=field?field->storage_bytes():0;
+  const auto field=input.baked()?input.baked()->emission_field:nullptr;
+  const auto storage=field?field->storage():BakedEmissionField::StorageView{};
+  const size_t field_bytes=field_upload_bytes(storage);
   const size_t baked_bytes=field?pixels*9+4:(input.baked()?pixels*13:16);
   size_t upload=0;for(auto size:{common_pixels*16,physical_values*4+field_bytes,offset_count*8,pixels*4,baked_bytes})add(upload,size,budget-result.bytes,"GPU overlay byte budget exceeded");
   size_t working=key_bytes;for(auto size:{common_pixels*16,physical_values*4,offset_count*8})add(working,size,working_budget,"GPU overlay sparse packing exceeds CPU working budget");
@@ -113,13 +129,18 @@ void main(){
    buffer(0,GL_RGBA32UI,common.size()*16,common.data());
    if(field){
     static_assert(sizeof(BakedEmissionSample)==7*sizeof(float));
-    // Upload immutable owning FLOAT bytes directly after the existing sparse
-    // tile buffer. No dense host repack, UNORM8 conversion or product readback.
-    buffer(1,GL_R32F,physical.size()*4+field_bytes,nullptr);
+    // The unsigned view carries exact FLOAT words and binary coverage alike.
+    // Upload both layouts directly without expanding constant coefficients.
+    buffer(1,GL_R32UI,physical.size()*4+field_bytes,nullptr);
     glBindBuffer(GL_TEXTURE_BUFFER,temp.buffers[1]);
     glBufferSubData(GL_TEXTURE_BUFFER,0,GLsizeiptr(physical.size()*4),physical.data());
-    glBufferSubData(GL_TEXTURE_BUFFER,GLintptr(physical.size()*4),GLsizeiptr(field_bytes),field->values().data());
-   }else buffer(1,GL_R32F,physical.size()*4,physical.data());
+    auto offset=physical.size()*sizeof(float);
+    auto upload_words=[&](const auto &values){
+      if(!values.empty())glBufferSubData(GL_TEXTURE_BUFFER,GLintptr(offset),GLsizeiptr(values.size_bytes()),values.data());
+      offset+=values.size_bytes();
+    };
+    upload_words(storage.dense);upload_words(storage.varying);upload_words(storage.binary_coverage);
+   }else buffer(1,GL_R32UI,physical.size()*4,physical.data());
    buffer(2,GL_RG32I,offsets.size()*8,offsets.data());buffer(3,GL_R32I,pixels*4,input.padding()->data());
    std::array<uint8_t,4> zero{};for(size_t n=0;n<4;++n){glActiveTexture(GL_TEXTURE4+n);const auto baked=input.baked();const Image *im=nullptr;if(baked&&n<3)im=n==0?(pbr&&baked->color_interpretation==BakedColorInterpretation::ResolvedPbr?&baked->maps.pbr_color:&baked->maps.color):n==1?&baked->maps.metal_rough:&baked->maps.emission;
     const bool active=baked&&!(field&&n==2);
@@ -129,7 +150,17 @@ void main(){
    if(glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER)!=GL_FRAMEBUFFER_COMPLETE)throw std::runtime_error("GPU overlay framebuffer incomplete");
    for(size_t n=0;n<4;++n){glActiveTexture(GL_TEXTURE4+n);glBindTexture(GL_TEXTURE_2D,temp.baked[n]);}
    glViewport(0,0,GLsizei(input.resolution()),GLsizei(input.resolution()));glUseProgram(program_);glBindVertexArray(vao_);
-   const char *names[]{"common_pixels","physical_pixels","tile_offsets","padding","baked_color","baked_orm","baked_emission","baked_coverage"};for(int i=0;i<8;++i)glUniform1i(glGetUniformLocation(program_,names[i]),i);glUniform1i(glGetUniformLocation(program_,"resolution"),GLint(input.resolution()));glUniform1i(glGetUniformLocation(program_,"layer_count"),GLint(input.layers().size()));glUniform1i(glGetUniformLocation(program_,"has_baked"),bool(input.baked()));glUniform1i(glGetUniformLocation(program_,"baked_float_offset"),field?GLint(physical.size()):-1);std::array<float,16> opacity{};for(size_t i=0;i<input.layers().size();++i)opacity[i]=input.layers()[i].opacity;glUniform1fv(glGetUniformLocation(program_,"layer_opacity"),16,opacity.data());glDrawArrays(GL_TRIANGLES,0,3);for(auto plane:result.planes){glBindTexture(GL_TEXTURE_2D,plane);glGenerateMipmap(GL_TEXTURE_2D);}
+   const char *names[]{"common_pixels","physical_pixels","tile_offsets","padding","baked_color","baked_orm","baked_emission","baked_coverage"};for(int i=0;i<8;++i)glUniform1i(glGetUniformLocation(program_,names[i]),i);glUniform1i(glGetUniformLocation(program_,"resolution"),GLint(input.resolution()));glUniform1i(glGetUniformLocation(program_,"layer_count"),GLint(input.layers().size()));glUniform1i(glGetUniformLocation(program_,"has_baked"),bool(input.baked()));glUniform1i(glGetUniformLocation(program_,"baked_float_offset"),field?GLint(physical.size()):-1);
+   std::array<GLint,7> indices{};
+   GLint stride=0;
+   for(size_t k=0;k<indices.size();++k)
+     indices[k]=(!storage.dense.empty()||(storage.varying_mask&(1u<<k)))?stride++:-1;
+   const GLint binary_offset=storage.binary_coverage.empty()?-1:GLint(physical.size()+storage.varying.size());
+   glUniform1i(glGetUniformLocation(program_,"baked_float_stride"),stride);
+   glUniform1i(glGetUniformLocation(program_,"baked_binary_offset"),binary_offset);
+   glUniform1iv(glGetUniformLocation(program_,"baked_float_index[0]"),7,indices.data());
+   glUniform1fv(glGetUniformLocation(program_,"baked_float_constants[0]"),7,storage.constants.data());
+   std::array<float,16> opacity{};for(size_t i=0;i<input.layers().size();++i)opacity[i]=input.layers()[i].opacity;glUniform1fv(glGetUniformLocation(program_,"layer_opacity"),16,opacity.data());glDrawArrays(GL_TRIANGLES,0,3);for(auto plane:result.planes){glBindTexture(GL_TEXTURE_2D,plane);glGenerateMipmap(GL_TEXTURE_2D);}
    if(glGetError()!=GL_NO_ERROR)throw std::runtime_error("GPU sparse overlay compilation failed");
   }catch(...){throw;}
   return result;
@@ -153,7 +184,8 @@ public:
   for(const auto&l:owner->layers())for(size_t t=0;t<l.tiles.size();++t)if(l.tiles[t]){common.emplace_back(l.tiles[t].get(),pbr&&!l.pbr_tiles.empty()?l.pbr_tiles[t].get():nullptr);if(!l.emission_tiles.empty()&&l.emission_tiles[t])physical.push_back(l.emission_tiles[t].get());}
   auto order=[](const auto&a,const auto&b){auto less=std::less<const void*>{};return less(a.first,b.first)||(a.first==b.first&&less(a.second,b.second));};std::sort(common.begin(),common.end(),order);common.erase(std::unique(common.begin(),common.end()),common.end());std::sort(physical.begin(),physical.end(),std::less<const void*>{});physical.erase(std::unique(physical.begin(),physical.end()),physical.end());
   const auto r=owner->resolution();const size_t pixels=size_t(r)*r,offsets=std::max(size_t(1),owner->layers().size()*size_t(r/32)*(r/32));
-  return {texture_bytes(owner)+std::max(size_t(1),common.size()*1024)*16+std::max(size_t(1),physical.size()*1024*7)*4+offsets*8+pixels*4+(owner->baked()&&owner->baked()->emission_field?pixels*9+4+owner->baked()->emission_field->storage_bytes():(owner->baked()?pixels*13:13)),13};
+  const auto field=owner->baked()?owner->baked()->emission_field:nullptr;
+  return {texture_bytes(owner)+std::max(size_t(1),common.size()*1024)*16+std::max(size_t(1),physical.size()*1024*7)*4+offsets*8+pixels*4+(field?pixels*9+4+field_upload_bytes(field->storage()):(owner->baked()?pixels*13:16)),13};
  }
  Demand additional(const std::vector<Input>&inputs,size_t working=256ull*1024*1024)const{Selection seen;Demand total;for(const auto&i:inputs){auto owner=contribution(i.owner);Key key{owner.get(),i.pbr};if(cache_.contains(key)||!seen.insert(key).second)continue;const auto d=demand(owner,i.pbr,working);if(d.bytes>SIZE_MAX-total.bytes||d.images>SIZE_MAX-total.images)throw std::length_error("Overlay store forecast overflow");total.bytes+=d.bytes;total.images+=d.images;}return total;}
  Ledger::Group group()const noexcept{return group_;}

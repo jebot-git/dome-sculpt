@@ -54,8 +54,9 @@ inline size_t baked_float_preflight(const nlohmann::json &b, uint32_t r,
   if(b.at("version")!=6)return 0;
   const auto &bytes=b.at("float_emission").get_binary();
   auto check=[cancelled]{NativeReadScope::check();return cancelled&&cancelled();};
-  if(BakedEmissionField::encoded_resolution(bytes,{128*1024*1024,check})!=r)
+  const auto layout=BakedEmissionField::inspect_encoded(bytes,{128*1024*1024,check});
+  if(layout.resolution!=r)
     throw std::invalid_argument("FLOAT baked emission differs from actual paint grid");
-  return BakedEmissionField::required_bytes(r,{128*1024*1024,check});
+  return layout.retained_bytes;
 }
 } // namespace dome::detail

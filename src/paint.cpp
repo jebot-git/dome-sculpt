@@ -2981,16 +2981,17 @@ void SourcePaintAccess::merge_bake(PaintedMesh &paint,BakedTextures incoming,Bak
     if(merged.emission_field||incoming.emission_field){
       // Independent FLOAT coverage, including values far below one R8 step.
       // Other channels continue their original common-coverage merge below.
-      const size_t bytes=BakedEmissionField::required_bytes(paint.resolution());
-      const size_t replacement=merged.storage_bytes()-merged.maps.emission.rgba.size()-(merged.emission_field?merged.emission_field->storage_bytes():0)+bytes;
-      if(paint.storage_bytes()-paint.baked_->storage_bytes()+replacement>128*1024*1024)
+      constexpr size_t maximum=128*1024*1024;
+      const auto other=paint.storage_bytes()-paint.baked_->storage_bytes()+
+          merged.storage_bytes()-merged.maps.emission.rgba.size()-
+          (merged.emission_field?merged.emission_field->storage_bytes():0);
+      if(other>=maximum)
         throw std::length_error("Merged FLOAT baked emission exceeds paint storage budget");
-      std::vector<BakedEmissionSample> values(incoming.coverage.size());
-      for(size_t i=0;i<values.size();++i){
-        if((i&1023)==0)paint_compute::checkpoint(cancelled);
-        values[i]=BakedEmissionField::over(detail::baked_emission_texel(*paint.baked_,i),detail::baked_emission_texel(incoming,i));
-      }
-      merged.emission_field=BakedEmissionField::create(paint.resolution(),values,{128*1024*1024,cancelled});merged.maps.emission={};
+      merged.emission_field=BakedEmissionField::generate(paint.resolution(),[&](size_t i){
+        return BakedEmissionField::over(detail::baked_emission_texel(*paint.baked_,i),
+                                       detail::baked_emission_texel(incoming,i));
+      },{maximum-other,cancelled});
+      merged.maps.emission={};
     }
     if (merged.maps.normal.rgba.empty() && !incoming.maps.normal.rgba.empty())
       merged.maps.normal = blank_image(paint.resolution(), true);

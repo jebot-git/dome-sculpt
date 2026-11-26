@@ -34,8 +34,27 @@ void exact(const dome::BakedEmissionSample &a, const dome::BakedEmissionSample &
 int main() try {
   using namespace dome;
   static_assert(!std::is_copy_constructible_v<BakedEmissionField>);
-  static_assert(std::is_same_v<decltype(std::declval<const BakedEmissionField>().values()),
-                               std::span<const BakedEmissionSample>>);
+  static_assert(std::is_same_v<decltype(std::declval<const BakedEmissionField>().values()[0]),
+                               BakedEmissionSample>);
+  const auto sparse=[](size_t i){
+    return i%3 ? BakedEmissionSample{{},{float(i)*.125f,0x1p-24f,3},1}
+               : BakedEmissionSample{};
+  };
+  const auto packed=BakedEmissionField::generate(9,sparse,{1024,{}});
+  const auto layout=packed->storage();
+  check(layout.dense.empty()&&layout.binary_coverage.size()==3&&layout.varying_mask==56,
+        "Exact packed field uses constant legacy and binary coverage");
+  const auto packed_bytes=packed->encode();
+  check(packed_bytes.at(8)==2&&BakedEmissionField::inspect_encoded(packed_bytes).retained_bytes==packed->storage_bytes(),
+        "Packed wire reports actual retained bytes");
+  const auto packed_reopen=BakedEmissionField::decode(packed_bytes);
+  check(packed_reopen->encode()==packed_bytes,"Packed field preserves exact native wire bytes");
+  for(size_t i=0;i<81;++i)exact(packed_reopen->texel(i),sparse(i));
+  auto forged_packed=packed_bytes;
+  forged_packed.back()|=128;
+  refuses<std::invalid_argument>([&]{BakedEmissionField::decode(forged_packed);},"Out-of-grid coverage bits refuse");
+  refuses<std::length_error>([&]{BakedEmissionField::generate(9,sparse,{packed->storage_bytes()-1,{}});},
+      "Packed field respects a smaller retained budget");
   const float largest = std::numeric_limits<float>::max();
   const float tiny = 0x1p-24f; // Far below one UNORM8 step; nonzero HDR residual.
   const BakedEmissionSample value{{.125f, .25f, 0}, {100.f, 50000.f, .0625f}, .5f};
