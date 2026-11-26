@@ -27,6 +27,7 @@
 #include "source-uv-archive.hpp"
 #include "dome/paint-sampling.hpp"
 #include "paint-sampling-access.hpp"
+#include "native-baked-grid.hpp"
 #include "dome/normal-preparation.hpp"
 #include "polygon-paint.hpp"
 #include "polygon-surface-paint.hpp"
@@ -2108,7 +2109,7 @@ struct SourcePaintSamplingAccess {
     auto result=paint.snapshot();result->surface_=surface;result->sampling_attachment_=std::move(attachment);stop();return result;
   }
   template<class Geometry> static std::shared_ptr<PaintedMesh> retain(const PaintedMesh &before,Geometry &&authored,
-      std::shared_ptr<const PaintSamplingDomain> domain,const PaintSamplingLimits &limits){
+      std::shared_ptr<const PaintSamplingDomain> domain,const PaintSamplingLimits &limits,bool native_bake=false){
     const Mesh&target=[&]()->const Mesh&{if constexpr(std::is_same_v<std::remove_cvref_t<Geometry>,std::shared_ptr<const Mesh>>){if(!authored)throw std::invalid_argument("Writable paint shared geometry is absent");return *authored;}else return authored;}();
     auto stop=[&]{if(limits.cancelled&&limits.cancelled())throw std::runtime_error("Writable paint-grid attachment cancelled");};stop();
     if(before.in_stroke()||!domain||!before.valid_paint_sampling_attachment())
@@ -2116,7 +2117,7 @@ struct SourcePaintSamplingAccess {
     if(before.source_maps_&&before.source_maps_->uses_uv1())
       throw std::invalid_argument("Retained paint with original UV1 requires its own coordinate-role adapter");
     if(!before.normal_projection_&&((before.source_maps_&&before.source_maps_->normal.image)||
-       (before.baked_&&!before.baked_->maps.normal.rgba.empty())))
+       (!native_bake&&before.baked_&&!before.baked_->maps.normal.rgba.empty())))
       throw std::invalid_argument("Retained paint with raw normal data requires independent prepared-normal authority");
     if(before.revision_==UINT64_MAX)throw std::overflow_error("Paint geometry identity exhausted");
     domain->validate_current(target,limits);
@@ -2145,6 +2146,14 @@ struct SourcePaintSamplingAccess {
     // change must independently invalidate the relevant interpretation.
     ++result->revision_;stop();return result;
   }
+  static std::shared_ptr<PaintedMesh> retain_borrowed(const PaintedMesh &before,const Mesh &authored,
+      std::shared_ptr<const PaintSamplingDomain> domain,const PaintSamplingLimits &limits,bool native_bake=false){
+    const size_t bytes=authored.positions.size()*(2*sizeof(Vec3)+sizeof(std::array<float,2>))+
+        authored.indices.size()*sizeof(uint32_t)+authored.uv_pins.size()+authored.uv_seams.size();
+    if(bytes>=limits.max_working_bytes)throw std::length_error("Borrowed writable geometry exhausts working budget before allocation");
+    auto budget=limits;budget.max_working_bytes-=bytes;budget.max_basis_bytes=std::min(budget.max_basis_bytes,budget.max_working_bytes);
+    return retain(before,authored,std::move(domain),budget,native_bake);
+  }
 };
 size_t paint_sampling_surface_retained_bytes(size_t vertices,size_t corners,uint32_t resolution){
   return SourcePaintSamplingAccess::surface_retained_bytes(vertices,corners,resolution);
@@ -2162,10 +2171,21 @@ std::shared_ptr<PaintedMesh> retain_paint_grid_shared(const PaintedMesh&before,s
 }
 std::shared_ptr<PaintedMesh> retain_paint_grid_borrowed(const PaintedMesh &before,const Mesh &authored,
     std::shared_ptr<const PaintSamplingDomain> domain,const PaintSamplingLimits &limits){
-  const size_t bytes=authored.positions.size()*(2*sizeof(Vec3)+sizeof(std::array<float,2>))+authored.indices.size()*sizeof(uint32_t)+authored.uv_pins.size()+authored.uv_seams.size();
-  if(bytes>=limits.max_working_bytes)throw std::length_error("Borrowed writable geometry exhausts working budget before allocation");
-  auto budget=limits;budget.max_working_bytes-=bytes;budget.max_basis_bytes=std::min(budget.max_basis_bytes,budget.max_working_bytes);
-  return SourcePaintSamplingAccess::retain(before,authored,std::move(domain),budget);
+  return SourcePaintSamplingAccess::retain_borrowed(before,authored,std::move(domain),limits);
+}
+std::shared_ptr<PaintedMesh> detail::retain_native_baked_grid(const PaintedMesh &before,const Mesh &authored,
+    std::shared_ptr<const PaintSamplingDomain> domain,const std::shared_ptr<const NativePaintSampling> &owner,
+    const PaintSamplingLimits &limits){
+  if(!before.baked()||!owner||!owner->valid_owner(owner)||!owner->matches_current(before))
+    throw std::invalid_argument("Retained native Bake needs its exact previous writable owner");
+  return SourcePaintSamplingAccess::retain_borrowed(before,authored,std::move(domain),limits,true);
+}
+std::shared_ptr<PaintedMesh> detail::retain_native_baked_grid(const PaintedMesh &before,Mesh &&authored,
+    std::shared_ptr<const PaintSamplingDomain> domain,const std::shared_ptr<const NativePaintSampling> &owner,
+    const PaintSamplingLimits &limits){
+  if(!before.baked()||!owner||!owner->valid_owner(owner)||!owner->matches_current(before))
+    throw std::invalid_argument("Retained native Bake needs its exact previous writable owner");
+  return SourcePaintSamplingAccess::retain(before,std::move(authored),std::move(domain),limits,true);
 }
 std::shared_ptr<PaintedMesh> adopt_retained_paint_normal(const PaintedMesh &paint,const SourceNormalSampling &proof,
     const PaintSamplingLimits &limits){return SourcePaintSamplingAccess::normal(paint,proof,limits);}

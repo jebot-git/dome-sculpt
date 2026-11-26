@@ -14,6 +14,8 @@
 #include "baked-normal-field.hpp"
 #include "canonical-normal-uv.hpp"
 #include "canonical-paint-sampling.hpp"
+#include "native-paint-sampling.hpp"
+#include "native-paint-bake.hpp"
 #include "emission-bake-source.hpp"
 #include "source4-baked.hpp"
 #include "source-bake-normal.hpp"
@@ -209,7 +211,9 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
     target.appearance=recipient->appearance;
     target.material_bindings=recipient->material_bindings;
   }
-  if(target.material_bindings&&target.material_bindings->native_paint_sampling)throw std::logic_error("Retained native paint target requires its sampling-aware Bake adapter");
+  const auto native_writable=target.material_bindings?target.material_bindings->native_paint_sampling:nullptr;
+  if(native_writable&&(settings.prepare_colors||settings.prepare_normals))
+    throw std::invalid_argument("Native retained paint Bake uses the existing writable tangent basis");
   if(target.material_bindings&&target.material_bindings->normal_preparation&&target.material_bindings->normal_preparation->canonical_conversion){
     NormalPreparationOptions normal_options;normal_options.cancelled=cancelled;normal_options.max_angular_error=settings.normal_error;
     auto layered=convert_canonical_normals({target.painted,target.appearance,target.material_bindings,target.deformation,target.material,{}},normal_options);
@@ -217,7 +221,7 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   }
   const bool current_source=source.polygon&&source.polygon->active&&source.polygon->colors;
   const bool current_target=target.polygon&&target.polygon->active&&target.polygon->colors;
-  if(!target.texture_sets && !detail::corner_bake_target_supported(target))
+  if(!target.texture_sets && !detail::bake_target_supported(target))
     throw std::logic_error("This corner-color target has shading roles that target baking cannot yet preserve");
 
   // This source route uses the same authenticated ordinary shading domain as
@@ -426,7 +430,12 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   const bool canonical_captured=!(recipient&&recipient->source)&&!prepared_normals&&detail::capture_new_bake_frame(target,cancelled);
   std::optional<Mesh> low;
   const auto retained_recipient=recipient&&recipient->source?recipient->source->source_preview():nullptr;
-  if(retained_recipient){
+  if(native_writable){
+    PaintSamplingLimits limits;
+    limits.cancelled=cancelled;
+    native_writable->validate_current(*target.painted,limits);
+    low=detail::native_paint_bake_mesh(target.painted->mesh(),*native_writable->domain(),cancelled);
+  }else if(retained_recipient){
     const auto &mesh=target.painted->mesh();
     if(mesh.indices.size()>2'000'000)
       throw std::length_error("Retained Bake target exceeds the corner workspace");

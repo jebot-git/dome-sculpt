@@ -766,6 +766,9 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
         const auto &attributes=j["meshes"][result.objects[i].mesh]["primitives"][0]["attributes"];
         if(!attributes.contains("TEXCOORD_"+std::to_string(coordinate)))throw std::logic_error("Compiled paint coordinate accessor is missing");
         if(coordinate)for(auto *info:{&pbr["baseColorTexture"],&pbr["metallicRoughnessTexture"],&material["occlusionTexture"],&material["emissiveTexture"]})(*info)["texCoord"]=coordinate;
+        if(coordinate&&object.material_bindings&&object.material_bindings->native_paint_sampling&&
+           !maps.normal.rgba.empty())
+          material["normalTexture"]["texCoord"]=coordinate;
       }
     }
     if(compiled_role&&!maps.normal.rgba.empty()){

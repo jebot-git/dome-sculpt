@@ -1,6 +1,8 @@
 #include "polygon-surface-owner.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "native-paint-model.hpp"
+#include "native-paint-bake.hpp"
+#include "native-baked-grid.hpp"
 #include "native-paint-frame-source.hpp"
 #include "canonical-paint-sampling.hpp"
 
@@ -13,7 +15,14 @@
 namespace dome::detail {namespace {
 void stop(const PaintSamplingLimits &limits){if(limits.cancelled&&limits.cancelled())throw std::runtime_error("Native paint retention cancelled");}
 bool equal(Vec3 a,Vec3 b){return a.x==b.x&&a.y==b.y&&a.z==b.z;}
-bool native_grid_state(const PaintedMesh &p) noexcept {return !p.source_maps()&&!p.color_projection()&&!p.normal_projection()&&!p.baked()&&!p.source_sampling_prepared()&&p.surface_diagnostics().policy==PaintUvPolicy::Strict;}
+bool native_grid_state(const PaintedMesh &p) noexcept {
+  const auto baked=p.baked();
+  return !p.source_maps()&&!p.color_projection()&&!p.normal_projection()&&
+      !p.source_sampling_prepared()&&p.surface_diagnostics().policy==PaintUvPolicy::Strict&&
+      (!baked||(baked->normal_interpretation==BakedNormalInterpretation::CanonicalMikk&&
+                baked->color_interpretation==BakedColorInterpretation::VertexComponent&&
+                !baked->normal_authority&&!baked->normal_field));
+}
 void replay_budget(const PaintedMesh &before,size_t target_vertices,size_t target_indices,size_t pins,size_t seams,const PaintSamplingLimits &limits){
   if(!limits.max_vertices||limits.max_vertices>2'000'000||!limits.max_triangles||limits.max_triangles>2'000'000||
      !limits.max_working_bytes||limits.max_working_bytes>512*1024*1024||!limits.max_work||limits.max_work>256'000'000)
@@ -41,6 +50,30 @@ void same_mesh(const Mesh &a,const Mesh &b,const PaintSamplingLimits &limits){
   for(size_t i=0;i<a.positions.size();++i){if((i&1023)==0)stop(limits);if(!equal(a.positions[i],b.positions[i])||!equal(a.normals[i],b.normals[i]))throw std::invalid_argument("Native retained paint changed REST positions or normals");}
 }
 }
+Mesh native_paint_bake_mesh(const Mesh &evaluated,const PaintSamplingDomain &domain,
+    const std::function<bool()> &cancelled) {
+  const auto &basis=*domain.basis();
+  const auto corners=domain.source_corners();
+  if(domain.version()!=1||corners.size()!=evaluated.indices.size())
+    throw std::invalid_argument("Native Bake requires its exact writable corner domain");
+  if(corners.size()>2'000'000)
+    throw std::length_error("Native writable Bake exceeds its corner workspace");
+  Mesh raster;
+  raster.positions.reserve(corners.size());
+  raster.normals.reserve(corners.size());
+  raster.uv.reserve(corners.size());
+  raster.indices.reserve(corners.size());
+  for(size_t c=0;c<corners.size();++c){
+    if((c&1023)==0&&cancelled&&cancelled())
+      throw std::runtime_error("Native writable Bake corner packing cancelled");
+    const auto v=evaluated.indices[c];
+    raster.positions.push_back(evaluated.positions.at(v));
+    raster.normals.push_back(evaluated.normals.at(v));
+    raster.uv.push_back(basis.uv.at(basis.indices.at(corners[c])));
+    raster.indices.push_back(uint32_t(c));
+  }
+  return raster;
+}
 const std::shared_ptr<const PaintedMesh> &NativePaintSampling::original_paint() const noexcept {
   const auto *node=this;while(node->before_material_&&node->before_material_->native_paint_sampling)node=node->before_material_->native_paint_sampling.get();return node->before_;
 }
@@ -58,7 +91,8 @@ void NativePaintSampling::validate(const PaintSamplingLimits &limits) const {
   stop(limits);native_.validate();
   if(!before_||!layout_||!domain_||!attachment_||before_->in_stroke()||attachment_->domain()!=domain_||!depth_||depth_>32)
     throw std::invalid_argument("Native retained paint lacks its independently captured owner");
-  if(!native_grid_state(*before_))throw std::invalid_argument("Native paint history requires its actual unprepared writable grid");
+  if(!native_grid_state(*before_)||(!before_material_&&before_->baked()))
+    throw std::invalid_argument("Native paint history requires its actual writable grid and Bake policy");
   const auto previous=before_material_?before_material_->native_paint_sampling:nullptr;
   if(bool(previous)!=bool(before_->paint_sampling_domain())||depth_!=(previous?previous->history_depth()+1:1))throw std::invalid_argument("Native paint history lost its exact prior owner");
   if(before_material_){before_material_->validate();if(!previous||!previous->matches_current(*before_))throw std::invalid_argument("Native before-Paint borrowed another material attachment");}
@@ -77,15 +111,15 @@ bool native_paint_retention_supported(const SculptObject &source) noexcept {
   const auto &b=source.material_bindings;const bool paired=b&&b->native_paint_frames;
   if(!source.mesh_active||!source.painted||source.painted->in_stroke()||source.appearance||source.polygon||
      (source.shape_source&&!paired)||(source.deformation&&source.deformation->morphs&&!source.deformation->morphs->targets.empty()&&!paired)||
-     source.painted->source_maps()||source.painted->color_projection()||source.painted->normal_projection()||source.painted->baked()||source.painted->source_sampling_prepared()||source.painted->surface_diagnostics().policy!=PaintUvPolicy::Strict)return false;
-  if(!b)return !source.painted->paint_sampling_domain();
+     !native_grid_state(*source.painted))return false;
+  if(!b)return !source.painted->baked()&&!source.painted->paint_sampling_domain();
   if(b->has_mtoon||b->normal_preparation||b->color_preparation||b->canonical_attributes||b->canonical_uv||!b->native_paint_sampling||!b->native_paint_sampling->valid_owner(b->native_paint_sampling)||b->native_paint_sampling->history_depth()>=32||!b->native_paint_sampling->matches_current(*source.painted))return false;
   if(paired){try{b->native_paint_frames->validate_binding(*b,false);return true;}catch(...){return false;}}
   return b->normal_frame==SourceMaterialNormalFrame::UvDerivative&&!b->normal_frames&&!b->key_derivation;
 }
 bool native_paint_source_restorable(const SculptObject &o) noexcept {
   const auto b=o.material_bindings;const auto p=b?b->native_paint_sampling:nullptr;
-  return o.visible&&!o.locked&&o.mesh_active&&o.painted&&!o.painted->in_stroke()&&!o.appearance&&!o.deformation&&!o.shape_source&&!o.rig_source&&!o.polygon&&!o.retopology&&!o.affine_edit&&!o.bake_recipe&&b&&!b->has_mtoon&&!b->normal_frames&&!b->key_derivation&&!b->normal_preparation&&!b->color_preparation&&p&&p->valid_owner(p)&&p->matches_current(*o.painted);
+  return o.visible&&!o.locked&&o.mesh_active&&o.painted&&!o.painted->in_stroke()&&!o.painted->baked()&&!o.appearance&&!o.deformation&&!o.shape_source&&!o.rig_source&&!o.polygon&&!o.retopology&&!o.affine_edit&&!o.bake_recipe&&b&&!b->has_mtoon&&!b->normal_frames&&!b->key_derivation&&!b->normal_preparation&&!b->color_preparation&&p&&p->valid_owner(p)&&p->matches_current(*o.painted);
 }
 void restore_native_paint(Scene &scene,uint64_t object,const std::function<bool()> &cancelled){
   PaintSamplingLimits limits;limits.cancelled=cancelled;stop(limits);const auto &source=scene.object(object);
@@ -156,8 +190,17 @@ struct NativePaintSamplingAccess {
   // immutable pixel owners remain shared; current metadata cannot edit anchor.
   auto captured=capture(source.painted);
   std::shared_ptr<PaintedMesh> paint;
-  if(owned_target){auto grid_budget=budget;grid_budget.max_working_bytes-=geometry_bytes;grid_budget.max_basis_bytes=std::min(grid_budget.max_basis_bytes,grid_budget.max_working_bytes);paint=retain_paint_grid(*captured,std::move(*owned_target),domain,grid_budget);}
-  else paint=retain_paint_grid_borrowed(*captured,target,domain,budget);
+  const auto baked_owner=captured->baked()?source.material_bindings->native_paint_sampling:nullptr;
+  if(owned_target){
+    auto grid_budget=budget;
+    grid_budget.max_working_bytes-=geometry_bytes;
+    grid_budget.max_basis_bytes=std::min(grid_budget.max_basis_bytes,grid_budget.max_working_bytes);
+    paint=baked_owner?retain_native_baked_grid(*captured,std::move(*owned_target),domain,baked_owner,grid_budget):
+        retain_paint_grid(*captured,std::move(*owned_target),domain,grid_budget);
+  }else{
+    paint=baked_owner?retain_native_baked_grid(*captured,target,domain,baked_owner,budget):
+        retain_paint_grid_borrowed(*captured,target,domain,budget);
+  }
   auto owner=std::shared_ptr<NativePaintSampling>(new NativePaintSampling);owner->before_=std::move(captured);owner->native_=source.material;owner->before_material_=capture_binding(source.material_bindings);owner->depth_=source.material_bindings?source.material_bindings->native_paint_sampling->history_depth()+1:1;owner->layout_=std::move(layout);owner->domain_=std::move(domain);owner->attachment_=paint->paint_sampling_attachment();
   owner->self_=owner;owner->validate_current(*paint,limits);stop(limits);return {std::move(paint),std::move(owner)};
 }

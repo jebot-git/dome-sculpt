@@ -14,6 +14,7 @@
 #include "normal-projection-identity.hpp"
 #include "normal-key-derivation.hpp"
 #include "native-paint-frame-source.hpp"
+#include "native-paint-bake.hpp"
 #include "paint-normal-access.hpp"
 #include "source-paint-pairing.hpp"
 #include <numeric>
@@ -319,17 +320,40 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTr
     if(binding->native_paint_frames)
       binding->native_paint_frames->validate_binding(*binding,true,options.cancelled);
   };
-  if(domain&&!binding->normal_frames&&binding->native_paint_sampling){
+  const bool native_baked=domain&&binding->native_paint_sampling&&event&&!event->maps.normal.rgba.empty();
+  if(native_baked||(domain&&!binding->normal_frames&&binding->native_paint_sampling)){
     const auto &mesh=object.painted->mesh();
-    const uint64_t capture=object.painted->storage_bytes()+writable_bytes+
+    const uint64_t bake_bytes=native_baked?
+        uint64_t(object.painted->resolution())*object.painted->resolution()*36+
+        mesh.indices.size()*(2*sizeof(Vec3)+sizeof(Tangent)+sizeof(std::array<float,2>)+sizeof(uint32_t)):0;
+    const uint64_t capture=object.painted->storage_bytes()+writable_bytes+bake_bytes+
         mesh.positions.size()*(sizeof(Vec3)*3+sizeof(std::array<float,2>))+
         mesh.indices.size()*sizeof(uint32_t);
     const auto work=std::max(capture,normal_replay_bytes(*binding,stop));
     if(!options.max_working_bytes||options.max_working_bytes>512*1024*1024||work>options.max_working_bytes)
       throw std::length_error("Native paint Bake exceeds prospective working budget");
     validate_writable();
-    auto normals=std::make_shared<std::vector<Vec3>>(object.deformation?
-        object.deformation->preview(mesh).normals:mesh.normals);
+    auto posed=object.deformation?std::optional(object.deformation->preview(mesh)):std::nullopt;
+    auto normals=std::make_shared<std::vector<Vec3>>(posed?posed->normals:mesh.normals);
+    std::vector<Tangent> tangents;
+    PaintSourceTexture normal_image;
+    if(native_baked){
+      auto raster=native_paint_bake_mesh(posed?*posed:mesh,*domain,options.cancelled);
+      tangents=tangent_corners(raster,options.cancelled);
+      for(size_t c=0;c<tangents.size();++c){
+        if((c&1023)==0)stop();
+        auto t=options.placement?placed_tangent(*options.placement,tangents[c]):tangents[c];
+        const auto rotated=ob::rotate(relative.orientation,{t[0],t[1],t[2]});
+        tangents[c]={rotated.x,rotated.y,rotated.z,t[3]};
+      }
+      auto composite=object.painted->preview(object.material,options.cancelled);
+      if(composite->normal.rgba.empty())
+        throw std::logic_error("Native writable Bake source lost its composed normal map");
+      const auto *image=&composite->normal;
+      normal_image.image=std::shared_ptr<const Image>(std::move(composite),image);
+      normal_image.wrap_s=normal_image.wrap_t=33071;
+      normal_image.min_filter=normal_image.mag_filter=9729;
+    }
     for(size_t v=0;v<normals->size();++v){
       if((v&1023)==0)stop();
       auto n=(*normals)[v];
@@ -338,11 +362,27 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTr
       (*normals)[v]=normalized(Vec3{rotated.x,rotated.y,rotated.z});
     }
     auto sample=[normals=std::shared_ptr<const std::vector<Vec3>>(std::move(normals)),
+        tangents=std::move(tangents),normal_image=std::move(normal_image),domain,
         geometry=object.painted->mesh_owner(),cancelled=options.cancelled](uint32_t triangle,std::array<float,3> bary){
       if(cancelled&&cancelled())throw std::runtime_error("Native paint Bake sampling cancelled");
-      Vec3 n{};
-      for(size_t k=0;k<3;++k)n+=normals->at(geometry->indices.at(size_t(triangle)*3+k))*bary[k];
-      n=normalized(n);
+      TangentFrame frame;
+      for(size_t k=0;k<3;++k){
+        const auto corner=size_t(triangle)*3+k;
+        const auto n=normals->at(geometry->indices.at(corner));
+        frame.normal+=n*bary[k];
+        if(normal_image.image){
+          const auto t=tangents.at(corner);
+          const Vec3 direction{t[0],t[1],t[2]};
+          frame.tangent+=direction*bary[k];
+          frame.bitangent+=cross(n,direction)*(bary[k]*t[3]);
+        }
+      }
+      auto n=normalized(frame.normal);
+      if(normal_image.image){
+        const auto uv=bake_paint_coordinates(domain.get(),triangle,bary,{});
+        const auto rgb=sample_source_texture(normal_image,uv[0],uv[1],false);
+        n=frame.to_world({rgb[0]*2-1,rgb[1]*2-1,rgb[2]*2-1});
+      }
       return std::array{n,n};
     };
     auto maps=paired_bake_maps(object,options.cancelled);

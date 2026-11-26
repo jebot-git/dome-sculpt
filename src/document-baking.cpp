@@ -89,8 +89,9 @@ void Document::queue_bake_locked(uint64_t source,ObjectBakeSettings settings,Ass
   if(!bake_target_ready_locked() || !bake_source_eligible_locked(source) || std::find(ids.begin(),ids.end(),source)==ids.end())
     throw std::logic_error("Choose a prepared, visible, unlocked target and a different nonempty source");
   const auto &target=scene_.active();
-  if(target.texture_sets && (settings.prepare_colors || settings.prepare_normals))
-    throw std::invalid_argument("Texture-set Bake uses the existing material and normal basis");
+  if((target.texture_sets||(target.material_bindings&&target.material_bindings->native_paint_sampling))&&
+      (settings.prepare_colors||settings.prepare_normals))
+    throw std::invalid_argument("Bake uses the existing material and normal basis for this target");
   auto lease=target.texture_sets?detail::capture_texture_set_stroke(scene_,target.id):nullptr;
   auto report=std::make_shared<std::string>();auto work=std::make_shared<AssetWork>();
   queue_scene_operation_locked("Bake surface",[source,settings,report,work](Scene &scene,const auto &cancelled){

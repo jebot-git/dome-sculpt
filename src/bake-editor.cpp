@@ -2,6 +2,7 @@
 #include "bake-editor.hpp"
 #include "dome/texture-sets.hpp"
 #include "dome/bake-recipe.hpp"
+#include "dome/material-bindings.hpp"
 #include "dome/bake-distance.hpp"
 #include "appearance.h"
 #include "ui-conventions.hpp"
@@ -49,8 +50,11 @@ void edit_bake_dialog(Document &doc){
   Fl_Group content(0,0,width-24,row*17);content.resizable(nullptr);
   const auto &object=draft.scene.object(target);
   const bool texture_set=bool(object.texture_sets);
+  const bool retained_native=object.material_bindings&&object.material_bindings->native_paint_sampling;
+  const bool existing_basis=texture_set||retained_native;
   const std::string description=texture_set
       ?"Bake beneath editable paint in "+active_texture_set(object).name+". Bounds use world mm."
+      :retained_native?"Bake into the retained paint atlas below the editable layers. Bounds use world mm."
       :"Bake into the selected target's UVs below editable paint.\nSource geometry, rig and paint stay intact. Bounds use world mm.";
   fl_font(dx::font,dx::size);
   auto measured=[&](const char*text,int minimum){fl_font(dx::font,dx::size);int w=width-48,h=0;fl_measure(text,w,h,0);return std::max(minimum,h+16);};
@@ -99,9 +103,9 @@ void edit_bake_dialog(Document &doc){
   color_error.position(label,y);y+=row;
   Fl_Check_Button normals(20,y,width-56,row,"Author portable normal targets");normals.value(settings.prepare_normals);normals.tooltip("Authors portable normal and tangent targets. Pose and morph shading can differ from legacy dynamic shading; original source data is retained.");y+=row;
   normal_error.position(label,y);y+=row;
-  if(texture_set){colors.deactivate();normals.deactivate();color_error.deactivate();normal_error.deactivate();}
+  if(existing_basis){colors.deactivate();normals.deactivate();color_error.deactivate();normal_error.deactivate();}
   std::string help="Partial projection keeps unprojected areas and reports misses.\n";
-  if(!texture_set)help+="Portable normal authoring creates a new shading model while retaining the original data.\n";
+  if(!existing_basis)help+="Portable normal authoring creates a new shading model while retaining the original data.\n";
   help+="For a cage, duplicate the target and edit its vertices while keeping topology. 0 samples disables AO.\nDrag or wheel to adjust. Bake is one Undo step.";
   int help_height=measured(help.c_str(),row);
   Fl_Box adjustment(16,y,width-48,help_height,help.c_str());y+=help_height;
@@ -147,8 +151,8 @@ void edit_bake_dialog(Document &doc){
     if(run.running){normals.deactivate();colors.deactivate();partial.deactivate();backfaces.deactivate();corresponding.deactivate();source.deactivate();cage.deactivate();for(auto f:sliders)f->deactivate();bake.deactivate();if(work.cancellable)close.activate();else close.deactivate();close.copy_label(work.cancelling?"Cancelling...":"Cancel bake");progress.value(std::min(99.f,work.progress*100));}
     else {partial.activate();backfaces.activate();corresponding.activate();source.activate();
       if(corresponding.value())cage.deactivate();else cage.activate();bake.activate();
-      for(size_t i=0;i<(texture_set?5:sliders.size());++i)sliders[i]->activate();
-      if(!texture_set){colors.activate();normals.activate();}
+      for(size_t i=0;i<(existing_basis?5:sliders.size());++i)sliders[i]->activate();
+      if(!existing_basis){colors.activate();normals.activate();}
       if(ids.at(size_t(source.value()))==unavailable_bake_object||
          (!corresponding.value()&&cage_ids.at(size_t(cage.value()))==unavailable_bake_object))bake.deactivate();
       close.activate();close.copy_label(run.ever_ran?"Close":"Cancel");if(run.ever_ran && s->error.empty() && s->message.find("complete")!=std::string::npos)progress.value(100);}

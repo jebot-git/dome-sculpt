@@ -11,6 +11,7 @@
 #include "texture-set-bake.hpp"
 #include "skin-methods.hpp"
 #include "native-paint-sampling.hpp"
+#include "native-paint-bake.hpp"
 #include "dome/scene-file.hpp"
 #include "dome/native-authoring.hpp"
 #include "dome/source-uv-bake.hpp"
@@ -692,7 +693,7 @@ void Document::publish_locked(bool force,bool checkpoint) {
     state_.bake_settings_object=active.id;
     state_.bake_recipe=recipe;
   }
-  if(active.texture_sets){
+  if(active.texture_sets||(active.material_bindings&&active.material_bindings->native_paint_sampling)){
     state_.bake_settings.prepare_colors=false;
     state_.bake_settings.prepare_normals=false;
   }
@@ -1730,7 +1731,7 @@ void Document::mesh_loop() {
     std::shared_ptr<const std::vector<std::array<float,2>>> paint_coordinates;
     std::shared_ptr<const detail::NormalFrameLayout> layout;
     size_t bytes=0;
-    bool dynamic_canonical=false;
+    bool corner_tangents=false;
   };
   std::unordered_map<uint64_t,FrameLayoutCache> frame_layouts;
   std::unordered_map<uint64_t,std::shared_ptr<const detail::TextureSetPackedGeometry>> texture_layouts;
@@ -1888,6 +1889,7 @@ void Document::mesh_loop() {
         // Existing bakes without captured canonical authority use the historical
         // posed-mesh Mikk basis. Do not invent a persisted/rest export basis.
         const bool dynamic_canonical=retained && canonical && !retained->canonical;
+        const bool corner_tangents=canonical&&(!retained||dynamic_canonical);
         std::shared_ptr<const detail::NormalFrameLayout> retained_layout;
         std::optional<detail::PosedNormalFrames> retained_pose;
         const size_t source_role=o.material_bindings&&o.material_bindings->has_mtoon&&!job->pbr_view&&(!retained||!geometry_detail::same_owner(retained->pbr,retained->mtoon))?1:0;
@@ -1898,10 +1900,10 @@ void Document::mesh_loop() {
         if(!polygon_field&&(retained||paint_attachment)) {
           frame_objects.insert(o.id);auto mesh_owner=job->scene.object(o.id).painted->mesh_owner();
           auto old=frame_layouts.find(o.id);
-          if(old!=frame_layouts.end() && old->second.mesh.lock()==mesh_owner && old->second.frames.lock()==retained && old->second.paint.lock()==paint_attachment && old->second.dynamic_canonical==dynamic_canonical) {
+          if(old!=frame_layouts.end() && old->second.mesh.lock()==mesh_owner && old->second.frames.lock()==retained && old->second.paint.lock()==paint_attachment && old->second.corner_tangents==corner_tangents) {
             retained_layout=old->second.layout;paint_coordinates=old->second.paint_coordinates;
           } else {
-            if(dynamic_canonical||(!retained&&canonical)) {
+            if(corner_tangents) {
               auto layout=std::make_shared<detail::NormalFrameLayout>();
               layout->vertices=o.mesh.indices;
               layout->corners.resize(o.mesh.indices.size());
@@ -1930,7 +1932,7 @@ void Document::mesh_loop() {
             if(bytes>frame_layout_limit)throw std::length_error("Immutable surface layout exceeds cache budget");
             if(old!=frame_layouts.end()){frame_layout_bytes-=old->second.bytes;frame_layouts.erase(old);}
             reserve_layout(bytes);
-            frame_layouts.emplace(o.id,FrameLayoutCache{mesh_owner,retained,paint_attachment,paint_coordinates,retained_layout,bytes,dynamic_canonical});frame_layout_bytes+=bytes;++frame_layout_builds;
+            frame_layouts.emplace(o.id,FrameLayoutCache{mesh_owner,retained,paint_attachment,paint_coordinates,retained_layout,bytes,corner_tangents});frame_layout_bytes+=bytes;++frame_layout_builds;
           }
         }
         if(polygon_field){
@@ -1948,8 +1950,13 @@ void Document::mesh_loop() {
         }
         const auto source_world_positions=detail::source_skin_world_positions(o,cancelled);
         if (o.deformation) o.mesh = o.preview_mesh();
+        const auto current_tangents=[&]{
+          if(paint_attachment&&o.material_bindings&&o.material_bindings->native_paint_sampling)
+            return tangent_corners(detail::native_paint_bake_mesh(o.mesh,*paint_attachment->domain(),cancelled),cancelled);
+          return tangent_corners(o.mesh,cancelled);
+        };
         if(dynamic_canonical) {
-          retained_pose->tangents[2]=tangent_corners(o.mesh,cancelled);
+          retained_pose->tangents[2]=current_tangents();
           retained_pose->normals[2].reserve(retained_layout->vertices.size());
           for(size_t v=0;v<retained_layout->vertices.size();++v) {
             if((v&1023)==0 && cancelled())throw std::runtime_error("Stale canonical bake preview");
@@ -1970,7 +1977,7 @@ void Document::mesh_loop() {
         bool selected = std::find(weighted.begin(), weighted.end(), o.id) != weighted.end();
         if(retained && canonical && retained_pose->tangents[2].empty())
           throw std::invalid_argument("Baked normal detail requires a complete canonical preview basis");
-        auto frames = canonical && !retained ? tangent_corners(o.mesh, cancelled)
+        auto frames = canonical && !retained ? current_tangents()
                                             : std::vector<Tangent>{};
         std::shared_ptr<std::vector<std::array<float,2>>> packed_uv1;
         std::vector<uint32_t> overlay_vertices;
@@ -2324,7 +2331,10 @@ bool Document::parameter_enabled_locked(VrParameter parameter) const {
     (parameter==VrParameter::SkinSource ? !skin_sources_locked(state_.skin_options.mode).empty()
       : !skin_sources_locked(SkinAuthoringMode::Automatic).empty());
   if(parameter==VrParameter::BakeSource&&canonical_conversion_ready_locked())return true;
-  if(parameter==VrParameter::BakeColors&&scene_.active().texture_sets)return false;
+  if(parameter==VrParameter::BakeColors){
+    const auto &target=scene_.active();
+    if(target.texture_sets||(target.material_bindings&&target.material_bindings->native_paint_sampling))return false;
+  }
   if(parameter==VrParameter::BakeSource || parameter==VrParameter::BakeDistances || parameter==VrParameter::BakeQuality || parameter==VrParameter::BakeProjection || parameter==VrParameter::BakeColors)
     return bake_target_ready_locked() && !bake_sources_locked().empty();
   if (parameter == VrParameter::WeightStrength || parameter == VrParameter::WeightValue)

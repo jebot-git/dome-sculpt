@@ -2,6 +2,7 @@
 #include "source-prepared-normal-oracle.hpp"
 #include "bake-paint-coordinates.hpp"
 #include "dome/bake-recipe.hpp"
+#include "dome/native-authoring.hpp"
 #include "dome/source-uv-bake.hpp"
 #include "emission-bake-source.hpp"
 #include "canonical-paint-sampling.hpp"
@@ -12,6 +13,8 @@
 #include "baked-normal-field.hpp"
 #include "emission-paint-access.hpp"
 #include "dome/shapekey-authoring.hpp"
+#include "dome/tangents.hpp"
+#include <fstream>
 using namespace source_artist_fixture;
 using namespace source_prepared_oracle;
 namespace writable_source {
@@ -252,6 +255,123 @@ void canonical_recipient(bool physical,bool partial,const std::filesystem::path 
   std::cout<<"WRITABLE_RECIPIENT "<<name<<" projected="<<actual.projected<<" missed="<<actual.missed
            <<" preserved="<<actual.preserved_misses<<" rays="<<actual.rays<<'\n';
 }
+
+void native_recipient(bool physical,const std::filesystem::path &out){
+  auto seed=source(false);
+  const auto rest=seed.active().painted->mesh();
+  auto high=rest;
+  for(auto &p:high.positions)p.z=.02f;
+  high.normals.assign(high.positions.size(),normalized(Vec3{-.37f,.28f,1}));
+  const auto donor=seed.add("Native writable atlas projection donor",Volume{});
+  seed.select(donor);
+  seed.active().mesh_active=true;
+  seed.active().painted=std::make_shared<PaintedMesh>(high,64);
+  paint(seed,physical);
+  seed.active().visible=false;
+  seed.active().locked=true;
+  seed.select(1);
+  paint(seed,physical);
+  auto scene=seed;
+  uv(scene,false,false);
+  const auto material=scene.active().material_bindings;
+  const auto before_paint=scene.active().painted;
+  const std::string name=physical?"hdr":"ldr";
+  scene.save(out/(name+"-before.dsculpt"));
+  const auto before=scene.encode();
+  auto options=settings();
+  options.prepare_normals=false;
+  options.corresponding_topology=true;
+  const auto reference=bake_object(seed,donor,options);
+  const auto result=bake_object(scene,donor,options);
+  const auto &expected=*seed.active().painted->baked();
+  const auto baked=scene.active().painted->baked();
+  require(result.projected==reference.projected&&result.projected==4096&&result.rays==0&&
+          baked->coverage==expected.coverage&&baked->maps.normal.rgba==expected.maps.normal.rgba&&
+          baked->maps.color.rgba==expected.maps.color.rgba&&baked->maps.metal_rough.rgba==expected.maps.metal_rough.rgba,
+          "Native writable Bake matches the original atlas material, normal and coverage");
+  require(physical?(baked->emission_field&&expected.emission_field&&
+                    baked->emission_field->encode()==expected.emission_field->encode()):
+                   (!baked->emission_field&&baked->maps.emission.rgba==expected.maps.emission.rgba),
+          "Native writable Bake preserves the emitted radiance representation");
+  require(scene.active().material_bindings==material&&scene.active().painted->mesh_owner()==before_paint->mesh_owner()&&
+          scene.active().painted->paint_sampling_attachment()==before_paint->paint_sampling_attachment()&&
+          same_layers(*scene.active().painted,*before_paint),"Native writable recipient preserves every live owner and layer");
+
+  const auto accepted=scene.encode();
+  scene.save(out/(name+"-accepted.dsculpt"));
+  require(Scene::load(out/(name+"-accepted.dsculpt")).encode()==accepted,"Native writable baked project reopens precisely");
+  Document doc;
+  doc.replace(Scene::load(out/(name+"-before.dsculpt")));
+  require(doc.wait_mesh()&&doc.frame().state->can_bake,"Real worker opens native writable Bake on the retained target");
+  doc.bake_from_object(donor,options);
+  doc.save_async(out/(name+"-ordered.dsculpt")).get();
+  require(doc.wait_asset()&&doc.wait_mesh()&&doc.frame().state->error.empty()&&
+          doc.copy_scene().encode()==accepted&&Scene::load(out/(name+"-ordered.dsculpt")).encode()==accepted,
+          "Native Bake and immediately ordered Save publish exact retained state");
+  require(doc.undo()&&doc.wait_mesh()&&doc.copy_scene().encode()==before&&
+          doc.redo()&&doc.wait_mesh()&&doc.copy_scene().encode()==accepted,
+          "Native writable Bake has exact Undo and Redo");
+
+  const auto original_tangent=tangent_corners(rest);
+  const auto wrong_tangent=tangent_corners(scene.active().painted->mesh());
+  require(original_tangent!=wrong_tangent,"The edited display atlas is a sensitive wrong-frame control");
+  const auto snapshot=doc.frame().surface;
+  require(snapshot&&snapshot->mesh.indices.size()==rest.indices.size()&&
+          snapshot->paint_coordinates.size()==snapshot->mesh.positions.size(),
+          "The live worker publishes its complete writable Bake corner layout");
+  for(size_t c=0;c<rest.indices.size();++c){
+    const auto v=snapshot->mesh.indices[c];
+    require(snapshot->tangents.at(v)==original_tangent[c]&&
+            snapshot->paint_coordinates.at(v)==rest.uv[rest.indices[c]],
+            "Live worker uses the original tangent and paint UV for each corner after Bake");
+  }
+
+  auto rebake=scene;
+  uv(rebake,false,true);
+  require(rebake.active().painted->baked()==baked,"Further UV changes keep the exact baked field");
+  rebake.save(out/(name+"-edited.dsculpt"));
+  auto reopened=Scene::load(out/(name+"-edited.dsculpt"));
+  require(reopened.encode()==rebake.encode(),"Native Bake survives a further UV edit through encode and replay");
+  const auto resolve=detail::source_bake_normals(reopened.active(),{});
+  const auto maps=seed.active().painted->preview(seed.active().material);
+  constexpr std::array<float,3> bary{.28f,.33f,.39f};
+  for(uint32_t tri=0;tri<rest.indices.size()/3;++tri){
+    std::array<double,2> coordinate{};
+    for(size_t k=0;k<3;++k)for(size_t axis=0;axis<2;++axis)
+      coordinate[axis]+=double(rest.uv[rest.indices[size_t(tri)*3+k]][axis])*bary[k];
+    const auto rgb=sample(maps->normal,coordinate);
+    const auto ideal=tangent_frame(rest,original_tangent,tri,bary).to_world(
+        {float(rgb[0]*2-1),float(rgb[1]*2-1),float(rgb[2]*2-1)});
+    require(length(resolve(tri,bary)[0]-ideal)<1e-5f,"Reopened writable Bake donates its retained normal in the correct domain");
+  }
+  doc.clear_bake();
+  require(doc.wait_asset()&&doc.wait_mesh()&&doc.frame().state->error.empty()&&
+          !doc.copy_scene().active().painted->baked()&&doc.undo()&&doc.wait_mesh()&&doc.copy_scene().encode()==accepted,
+          "Native writable Clear Bake and Undo refresh the same corner layout");
+
+  for(bool editable:{false,true}){
+    const auto glb=out/(name+(editable?"-editable.glb":".glb"));
+    doc.export_asset(glb,editable?AssetExportFormat::EditableGlb256:AssetExportFormat::Glb).get();
+    std::ifstream stream(glb,std::ios::binary);
+    std::vector<uint8_t> bytes{std::istreambuf_iterator<char>(stream),{}};
+    uint32_t count=0;
+    for(unsigned k=0;k<4;++k)count|=uint32_t(bytes.at(12+k))<<(8*k);
+    const auto gltf=nlohmann::json::parse(bytes.begin()+20,bytes.begin()+20+count);
+    const auto &primitive=gltf.at("meshes").at(0).at("primitives").at(0);
+    const auto &output_material=gltf.at("materials").at(primitive.at("material").get<size_t>());
+    const auto uv_set=output_material.at("normalTexture").at("texCoord").get<unsigned>();
+    require(uv_set>0&&primitive.at("attributes").contains("TANGENT")&&
+            primitive.at("attributes").contains("TEXCOORD_"+std::to_string(uv_set))&&
+            output_material.at("pbrMetallicRoughness").at("baseColorTexture").at("texCoord")==uv_set,
+            "GLB shares the actual paint basis between baked normals and colour and retains UV0");
+    if(editable){
+      const auto extracted=extract_native_authoring(bytes);
+      require(extracted&&extracted->encode()==accepted,"Editable GLB restores the entire baked paint and owner history");
+    }
+    require(doc.copy_scene().encode()==accepted,"Portable export leaves the working scene exact");
+  }
+  std::cout<<"NATIVE_WRITABLE_RECIPIENT "<<name<<" projected="<<result.projected<<" rays="<<result.rays<<'\n';
+}
 }
 int main(int argc,char **argv) try {
  if(argc==3&&std::string_view(argv[1])=="--sources"){
@@ -266,6 +386,13 @@ int main(int argc,char **argv) try {
    writable_source::canonical_recipient(false,false,out);
    for(bool partial:{false,true})writable_source::canonical_recipient(true,partial,out);
    std::cout<<"PASS "<<writable_source::checks<<" writable recipient checks\n";
+   return 0;
+ }
+ if(argc==3&&std::string_view(argv[1])=="--native-recipient"){
+   const std::filesystem::path out=argv[2];
+   std::filesystem::create_directories(out);
+   for(bool physical:{false,true})writable_source::native_recipient(physical,out);
+   std::cout<<"PASS "<<writable_source::checks<<" native writable recipient checks\n";
    return 0;
  }
  if(argc!=2)return 2;

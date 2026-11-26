@@ -11,10 +11,11 @@ void native_paint_metadata(const std::shared_ptr<const NativePaintSampling>&root
  while(node){
   if(!node->valid_owner(node)||node->history_depth()!=remaining||!node->before_paint()||!node->layout()||!node->domain()||!node->attachment())throw std::invalid_argument("Native paint metadata lost exact owning history");
   node->before_native_material().validate();const auto &paint=*node->before_paint();const auto &layout=*node->layout();const auto &domain=*node->domain();const auto &geometry=node->attachment()->authored_geometry();
-  if(!grid(paint)||!geometry||!own(node->attachment()->domain(),node->domain()))throw std::invalid_argument("Native paint metadata changed its immutable basis/attachment interpretation");
+  const auto &before=node->before_material();auto previous=before?before->native_paint_sampling:nullptr;
+  if(paint.in_stroke()||(!previous&&!grid(paint))||!geometry||!own(node->attachment()->domain(),node->domain()))
+    throw std::invalid_argument("Native paint metadata changed its immutable basis/attachment interpretation");
   const auto n=geometry->positions.size(),c=geometry->indices.size();
   if(!n||n>2'000'000||!c||c>6'000'000||layout.source_vertices.size()!=n||layout.uv.size()!=n||layout.indices.size()!=c||(!layout.pins.empty()&&layout.pins.size()!=n)||(!layout.seams.empty()&&layout.seams.size()!=c)||paint.mesh().indices.size()!=c||domain.source_corners().size()!=c||!domain.basis()||domain.basis()->positions.size()>2'000'000||domain.basis()->indices.size()>6'000'000)throw std::invalid_argument("Native paint metadata dimensions differ from factory-sealed source geometry");
-  const auto &before=node->before_material();auto previous=before?before->native_paint_sampling:nullptr;
   if(bool(previous)!=bool(paint.paint_sampling_domain())||(previous&&(!previous->valid_owner(previous)||!previous->matches_current(paint)||previous->history_depth()+1!=remaining))||(!previous&&remaining!=1))throw std::invalid_argument("Native paint metadata changed its prior current-paint owner");
   if(previous&&!own(previous->domain()->basis(),node->domain()->basis()))throw std::invalid_argument("Native paint metadata changed its actual original basis owner");
   node=std::move(previous);if(!remaining--)throw std::invalid_argument("Native paint metadata history underflow");

@@ -3,6 +3,7 @@
 #include "texture-set-bake.hpp"
 #include "source-bake-normal.hpp"
 #include "polygon-color-target.hpp"
+#include "native-paint-sampling.hpp"
 #include "cut-color.hpp"
 #include "texture-set-paint-access.hpp"
 #include "texture-set-field-source.hpp"
@@ -36,8 +37,15 @@ bool texture_set_plain_fields(const SculptObject&o)noexcept{
  return true;
 }
 bool bake_target_supported(const SculptObject &object) {
- if (!object.texture_sets)
+ if (!object.texture_sets) {
+   const auto binding=object.material_bindings;
+   if(binding&&binding->native_paint_sampling){
+     const auto &owner=binding->native_paint_sampling;
+     return object.mesh_active&&object.painted&&!object.polygon&&!object.appearance&&
+         !binding->normal_frames&&owner->valid_owner(owner)&&owner->matches_current(*object.painted);
+   }
    return corner_bake_target_supported(object);
+ }
  const auto field=active_texture_set(object);
  if((object.polygon&&object.polygon->colors)||!field.domain||field.domain->triangles().empty())
   return false;

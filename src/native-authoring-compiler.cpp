@@ -211,7 +211,8 @@ bool native_paint_compiled_emission(const NativeAuthoringCapture &capture,const 
   const auto &mesh=surface.mesh,&expected=original->mesh;
   if(!same(mesh.positions,expected.positions)||!same(mesh.normals,expected.normals)||!same(mesh.uv,expected.uv)||mesh.indices!=expected.indices||mesh.uv_pins!=expected.uv_pins||mesh.uv_seams!=expected.uv_seams||!same(surface.paint_corner_coordinates,original->paint_corner_coordinates))fail();
   PaintSamplingLimits limits;limits.cancelled=cancelled;owner->validate_current(*object.painted,limits);owner->validate_mesh(mesh,limits);
-  if(!surface.textures||surface.textures->overlay||surface.textures->source_maps||surface.textures->normal_projection||surface.textures->color_projection||surface.textures->baked_base)fail();
+  if(!surface.textures||surface.textures->overlay||surface.textures->source_maps||surface.textures->normal_projection||surface.textures->color_projection||
+     bool(surface.textures->baked_base)!=bool(object.painted->baked()))fail();
   stop();return true;
 }
 std::vector<ObjectSurface> native_authoring_surfaces(const Scene &scene,

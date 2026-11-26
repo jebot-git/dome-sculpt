@@ -351,7 +351,7 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
       ? std::span<const Tangent>(generated_low_frames) : target_metric_corners;
   std::vector<Tangent> generated_high_frames;
   auto high_frames=source_placement.tangent_corners;
-  const bool raw_baked_normals=std::any_of(source.materials.begin(),source.materials.end(),[](const auto &m){
+  const bool raw_baked_normals=!source_normals&&std::any_of(source.materials.begin(),source.materials.end(),[](const auto &m){
     return m.maps&&m.maps->source_only&&m.maps->overlay&&m.maps->baked_base&&
         !m.maps->baked_base->maps.normal.rgba.empty()&&m.normal_strength>0;
   });
