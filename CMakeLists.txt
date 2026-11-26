@@ -5312,6 +5312,8 @@ if(BUILD_TESTING)
   add_test(NAME creator-workspace COMMAND dome-sculpt-creator-workspace-test --workspace ${CMAKE_CURRENT_BINARY_DIR}/creator-workspace)
   add_test(NAME creator-source-grid-resolution COMMAND dome-sculpt-creator-workspace-test --resize-source-grid ${CMAKE_CURRENT_BINARY_DIR}/creator-source-grid-resolution)
   set_tests_properties(creator-source-grid-resolution PROPERTIES TIMEOUT 180)
+  add_test(NAME creator-painted-source-grid-resolution COMMAND dome-sculpt-creator-workspace-test --resize-painted-source-grid ${CMAKE_CURRENT_BINARY_DIR}/creator-painted-source-grid-resolution)
+  set_tests_properties(creator-painted-source-grid-resolution PROPERTIES TIMEOUT 240)
   set_tests_properties(creator-controls-output creator-workspace PROPERTIES TIMEOUT 900)
 endif()
 

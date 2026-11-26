@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "texture-set-resample.hpp"
+#include "bake-target-resolution.hpp"
 #include "dome/source-maps.hpp"
 #include "emission-paint-access.hpp"
 #include "paint-overlay-sample.hpp"
@@ -183,7 +184,8 @@ Sample filtered(const PaintLayer &l, uint32_t from, uint32_t to, uint32_t x,
 void quality(const PaintLayer &before, const PaintLayer &after, uint32_t from,
              uint32_t to, const TextureSetResolutionOptions &options,
              const TextureSetLimits &limits, TextureSetResolutionReport &report,
-             TextureSetResolutionLayerQuality &q) {
+             TextureSetResolutionLayerQuality &q, bool native_cells) {
+  const uint32_t subdivision = native_cells && from > to ? from / to : 1;
   double peak = 1;
   for (const auto &t : before.emission_tiles)
     if (t)
@@ -203,8 +205,16 @@ void quality(const PaintLayer &before, const PaintLayer &after, uint32_t from,
   for (uint32_t y = 0; y < from; ++y) {
     stop(limits);
     for (uint32_t x = 0; x < from; ++x) {
-      const auto a = pixel(before, from, x, y),
-                 b = filtered(after, to, from, x, y, report, limits);
+      const auto a = pixel(before, from, x, y);
+      Sample b;
+      if (subdivision > 1) {
+        // Compare a reduced cell to every authored texel it now represents.
+        // The visible overlay has its separate filtered reconstruction check.
+        work(report, 32, limits);
+        b = pixel(after, to, x / subdivision, y / subdivision);
+      } else {
+        b = filtered(after, to, from, x, y, report, limits);
+      }
       const auto &ad = a.common.data;
       const auto &bd = b.common.data;
       for (size_t g = 0; g < 4; ++g) {
@@ -392,14 +402,79 @@ void material_quality(const PaintedMesh &before, const PaintedMesh &after,
         "material/mask/alpha reconstruction within its quality bounds");
 }
 
+void native_overlay_quality(const PaintedMesh &before, const PaintedMesh &after,
+                            const TextureSetResolutionOptions &options,
+                            const TextureSetLimits &limits,
+                            TextureSetResolutionReport &report) {
+  const auto old = PaintOverlayFactory::capture(before, limits.cancelled);
+  const auto now = PaintOverlayFactory::capture(after, limits.cancelled);
+  // Compare the actual composed fields on their common coarser footprints.
+  // Layer quality separately checks every authored value on the old grid.
+  const auto &coarse = before.resolution() < after.resolution() ? before : after;
+  const auto r = coarse.resolution();
+  double emission_peak = 1, squares = 0;
+  size_t count = 0;
+  for (const auto &layer : old->layers())
+    for (const auto &tile : layer.emission_tiles)
+      if (tile) {
+        stop(limits);
+        work(report, tile->pixels.size(), limits);
+        for (const auto &pixel : tile->pixels)
+          for (float value : pixel.physical)
+            emission_peak = std::max(emission_peak, double(value));
+      }
+  constexpr std::array<size_t, 5> widths{4, 3, 3, 4, 3};
+  constexpr std::array<size_t, 5> offsets{0, 4, 7, 10, 7};
+  for (uint32_t y = 0; y < r; ++y) {
+    stop(limits);
+    work(report, r, limits);
+    for (uint32_t x = 0; x < r; ++x) {
+      if (!TextureSetPaintAccess::grid_covered(coarse, size_t(y) * r + x))
+        continue;
+      auto sample_footprint = [&](const PaintOverlayPacket &packet) {
+        std::array<std::array<double, 4>, 5> values{};
+        footprint(packet.resolution(), r, x, y, [&](uint32_t sx, uint32_t sy, double weight) {
+          work(report, (packet.layers().size() + 1) * 32, limits);
+          const auto sample = sample_overlay_texel_values(packet, int(sx), int(sy), false);
+          for (size_t plane = 0; plane < widths.size(); ++plane)
+            for (size_t c = 0; c < widths[plane]; ++c)
+              values[plane][c] += weight * sample[plane][c];
+        });
+        return values;
+      };
+      const auto original = sample_footprint(*old);
+      const auto restored = sample_footprint(*now);
+      for (size_t plane = 0; plane < widths.size(); ++plane)
+        for (size_t c = 0; c < widths[plane]; ++c) {
+          const auto error = std::abs(restored[plane][c] - original[plane][c]) /
+                             (plane == 4 ? emission_peak : 1.);
+          auto &maximum = report.material_error[offsets[plane] + c];
+          maximum = std::max(maximum, error);
+          squares += error * error;
+          ++count;
+        }
+    }
+  }
+  report.material_rms_error = count ? std::sqrt(squares / count) : 0;
+  if (report.material_rms_error > options.maximum_rms_error ||
+      std::ranges::any_of(report.material_error, [&](double error) {
+        return error > options.maximum_component_error;
+      }))
+    throw std::runtime_error("Native resolution cannot preserve the layered paint overlay within its reconstruction bounds");
+}
 } // namespace
 std::vector<PaintLayer> resample_texture_set_layers(
     const PaintedMesh &before, const TextureSetResolutionOptions &options,
-    const TextureSetLimits &limits, TextureSetResolutionReport &report) {
+    const TextureSetLimits &limits, TextureSetResolutionReport &report,
+    bool native_cells) {
   options.validate();
   limits.validate();
   stop(limits);
   const auto from = before.resolution(), to = options.resolution;
+  // A larger native grid can retain whole authored cells, including masked
+  // values and unassociated colour. The separate overlay check still
+  // certifies the effect of rebuilding the geometry's writable raster.
+  const uint32_t subdivision = native_cells && to > from ? to / from : 1;
   const size_t tiles = size_t(to / 32) * (to / 32);
   // Old field plus new raster constructor/padding, dense worst-case authored
   // output and one writable tile of scratch coexist. No dense per-layer image.
@@ -413,8 +488,9 @@ std::vector<PaintLayer> resample_texture_set_layers(
   charge(bytes, geometry.indices.size(), sizeof(uint32_t), limits);
   charge(bytes, 3, TextureSetPaintAccess::snapshot_bytes(before), limits);
   const size_t largest = size_t(std::max(from, to)) * std::max(from, to);
+  const size_t work_per_cell = native_cells ? 96 : 160;
   if (before.layers().size() && largest > (limits.maximum_work - report.work) /
-                                              before.layers().size() / 160)
+                                              before.layers().size() / work_per_cell)
     throw std::length_error("Texture-set resolution filtering/quality work "
                             "exceeds its prospective bound");
   charge(bytes, 1,
@@ -457,8 +533,15 @@ std::vector<PaintLayer> resample_texture_set_layers(
         bool has_common = false, has_pbr = false, has_emission = false;
         for (uint32_t y = 0; y < 32; ++y)
           for (uint32_t x = 0; x < 32; ++x) {
-            auto s = filtered(layer, from, to, tx * 32 + x, ty * 32 + y, report,
-                              limits);
+            const auto grid_x = tx * 32 + x, grid_y = ty * 32 + y;
+            Sample s;
+            if (subdivision > 1) {
+              work(report, 32, limits);
+              ++report.filtered_samples;
+              s = pixel(layer, from, grid_x / subdivision, grid_y / subdivision);
+            } else {
+              s = filtered(layer, from, to, grid_x, grid_y, report, limits);
+            }
             const auto i = size_t(y) * 32 + x;
             has_common |= s.common_present;
             has_pbr |= s.pbr_present;
@@ -491,7 +574,7 @@ std::vector<PaintLayer> resample_texture_set_layers(
       }
     TextureSetResolutionLayerQuality q;
     q.layer = layer.id;
-    quality(layer, out, from, to, options, limits, report, q);
+    quality(layer, out, from, to, options, limits, report, q, native_cells);
     report.layers.push_back(std::move(q));
     result.push_back(std::move(out));
   }
@@ -499,6 +582,43 @@ std::vector<PaintLayer> resample_texture_set_layers(
   return result;
 }
 } // namespace detail
+TextureSetResolutionReport resample_native_texture_grid(
+    Scene &scene, uint64_t object, const TextureSetResolutionOptions &options,
+    const TextureSetLimits &limits) {
+  options.validate();
+  limits.validate();
+  detail::stop(limits);
+  const auto &before = scene.object(object);
+  if (!detail::writable_bake_resolution_target(before))
+    throw std::invalid_argument("Resolution editing needs an actual writable native grid");
+  TextureSetResolutionReport report;
+  report.original_resolution = before.painted->resolution();
+  report.resolution = options.resolution;
+  if (report.original_resolution == report.resolution)
+    return report;
+  if (detail::unpainted_bake_resolution_target(before)) {
+    report.changed = detail::resize_unpainted_bake_target(scene, object, options.resolution, limits);
+    return report;
+  }
+  if (compute_backend() != "CPU")
+    throw std::logic_error("Native paint resampling is not implemented for the selected accelerator");
+  const auto resized = detail::TextureSetPaintAccess::resample_plain(*before.painted, options, limits, report);
+  if (resized->mesh_owner() != before.painted->mesh_owner() ||
+      resized->source_maps() != before.painted->source_maps() ||
+      !resized->valid_source_sampling_attachment() ||
+      !resized->valid_paint_sampling_attachment())
+    throw std::invalid_argument("Native resolution lost its immutable mesh or image authority");
+  detail::charge(report.peak_bytes, 1, detail::TextureSetPaintAccess::snapshot_bytes(*before.painted), limits);
+  detail::charge(report.peak_bytes, 1, detail::TextureSetPaintAccess::snapshot_bytes(*resized), limits);
+  detail::native_overlay_quality(*before.painted, *resized, options, limits, report);
+  auto next = scene.snapshot();
+  next.object(object).painted = resized;
+  next.validate();
+  detail::stop(limits);
+  scene = std::move(next);
+  report.changed = true;
+  return report;
+}
 TextureSetResolutionReport
 resample_texture_set(Scene &scene, uint64_t object, TextureSetId set,
                      const TextureSetResolutionOptions &options,

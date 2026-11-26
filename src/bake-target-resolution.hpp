@@ -6,19 +6,21 @@
 #include "dome/texture-sets.hpp"
 
 namespace dome::detail {
-// Raw source images and rig frames have their own immutable owners. Only the
-// empty writable grid changes here. Prepared fields need their own adapter.
-inline bool unpainted_bake_resolution_target(const SculptObject &o)noexcept{
+// Raw source images and rig frames have independent immutable owners.
+// Prepared fields need a separate grid adapter.
+inline bool writable_bake_resolution_target(const SculptObject &o)noexcept{
   if(!o.mesh_active||!o.painted||o.texture_sets||o.polygon||o.retopology||
-     !TextureSetPaintAccess::can_resize_unpainted(*o.painted))return false;
+     !TextureSetPaintAccess::can_resize_raw(*o.painted))return false;
   const auto &b=o.material_bindings;
   return !b||(!b->normal_preparation&&!b->color_preparation&&!b->canonical_attributes&&
       !b->native_paint_sampling&&!b->canonical_paint_sampling&&!b->native_paint_frames&&
       !b->polygon_surface_transfer&&!b->sampling_reparameterized);
 }
-// 2048² cells at the unchanged conservative20-work/cell charge need more
-// than the generic64M limit. Only this ordinary empty-target workflow opts in;
-// caller-supplied smaller budgets remain binding and byte limits stay256MiB.
+inline bool unpainted_bake_resolution_target(const SculptObject &o)noexcept{
+  return writable_bake_resolution_target(o)&&TextureSetPaintAccess::can_resize_unpainted(*o.painted);
+}
+// At the conservative 20-work-per-cell charge, a 2048 grid alone exceeds
+// the generic 64M limit. Smaller caller budgets and the 256 MiB cap still apply.
 inline TextureSetLimits bake_target_resolution_limits(){
   TextureSetLimits limits;limits.maximum_work=128'000'000;return limits;
 }
