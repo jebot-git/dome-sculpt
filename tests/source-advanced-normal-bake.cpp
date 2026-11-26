@@ -57,7 +57,7 @@ D decode(const SculptObject&o,size_t tri,std::array<float,3>bary,size_t role,
  auto encoded=sample(*image,uv);const double scale=role==0?1:b.material.parameters.normal_scale;D ts=unit(D{(encoded[0]*2-1)*scale,(encoded[1]*2-1)*scale,encoded[2]*2-1});return unit(add(add(mul(T,ts[0]),mul(B,ts[1])),mul(N,ts[2])));
 }
 
-void affine_source(bool legacy,SourceNormalUvMethod method){
+void affine_source(bool legacy,SourceNormalUvMethod method,const std::filesystem::path &folder){
  auto scene=uv_source(prepared(legacy),method,true);
  auto &source=scene.active();
  const auto id=source.id;
@@ -85,6 +85,9 @@ void affine_source(bool legacy,SourceNormalUvMethod method){
  }
  const auto destination=target(scene,mesh,legacy);
  scene.select(destination);
+ const std::string name=std::string(legacy?"mt0-":"mt1-")+
+     (method==SourceNormalUvMethod::RetainSource?"retained":"raster");
+ scene.save(folder/(name+"-affine-before.dsculpt"));
  ObjectBakeSettings settings;
  settings.prepare_normals=true;
  settings.corresponding_topology=true;
@@ -148,12 +151,18 @@ void run(bool legacy,bool live,bool seam,SourceNormalUvMethod method,const std::
 }
 }
 int main(int argc,char **argv) try {
+ if(argc==3&&std::string_view(argv[1])=="--sources"){
+   auto scene=Scene::load(argv[2]);
+   scene.erase(scene.active().id);
+   std::cout<<scene.encode().dump()<<'\n';
+   return 0;
+ }
  if(argc!=2)return 2;
  std::filesystem::create_directories(argv[1]);
  for(auto method:{SourceNormalUvMethod::Rasterize,SourceNormalUvMethod::RetainSource}){
    advanced_source::negatives(method);
    for(bool legacy:{false,true}){
-     advanced_source::affine_source(legacy,method);
+     advanced_source::affine_source(legacy,method,argv[1]);
      for(bool live:{false,true})for(bool seam:{false,true})
        advanced_source::run(legacy,live,seam,method,argv[1]);
    }

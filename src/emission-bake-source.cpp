@@ -11,6 +11,7 @@
 #include <numeric>
 #include "dome/material-bindings.hpp"
 #include "dome/material-visibility.hpp"
+#include "dome/normal-sampling.hpp"
 #include "dome/humanoid-creator.hpp"
 #include "dome/deformation.hpp"
 #include "dome/source-maps.hpp"
