@@ -10,6 +10,7 @@
 #include "dome/normal-frames.hpp"
 #include "dome/material-visibility.hpp"
 #include "dome/creation.hpp"
+#include "sculpt-scene-chunks.hpp"
 #include <nlohmann/json.hpp>
 namespace preview_fault {
 thread_local bool enabled=false,hit=false;
@@ -40,9 +41,22 @@ struct AssetRelease {std::shared_ptr<AssetGate> gate;~AssetRelease(){gate->relea
 std::atomic<std::shared_ptr<AssetGate>> mesh_gate;
 void open_view(Driver &hand,bool left=false){hand.open();auto state=hand.doc.frame().state;auto &tracked=hand.frame.hands[left?0:1].tracked;tracked.valid=tracked.aimValid=true;tracked.aim={ob::transform(state->panel,{0,(.5f-.06f)*.6f,.25f}),state->panel.orientation,1};if(left){tracked.trigger=0;hand.send();tracked.trigger=.8f;hand.send();tracked.trigger=0;hand.send();}else{hand.send(0,0,false,.8f);hand.send();}check(hand.doc.frame().state->menu_page==26,"Either controller opens the root View header while preserving the joystick owner's shared preview page");}
 }
-extern "C" std::vector<ObjectSurface> surfaces_real(const Scene*,const std::function<bool()>&,const Scene::SculptMesher&) asm("__real__ZNK4dome5Scene16preview_surfacesERKSt8functionIFbvEERKS1_IFNS_4MeshEmRKNS_6VolumeEEE");
-extern "C" std::vector<ObjectSurface> surfaces_wrap(const Scene*,const std::function<bool()>&,const Scene::SculptMesher&) asm("__wrap__ZNK4dome5Scene16preview_surfacesERKSt8functionIFbvEERKS1_IFNS_4MeshEmRKNS_6VolumeEEE");
-extern "C" std::vector<ObjectSurface> surfaces_wrap(const Scene *scene,const std::function<bool()> &cancelled,const Scene::SculptMesher &mesher){auto result=surfaces_real(scene,cancelled,mesher);if(auto gate=mesh_gate.exchange({}))gate->stop();return result;}
+extern "C" detail::SculptScenePreview real_capture(
+    const Scene &,detail::SculptSceneChunkContext,const detail::SculptSceneChunks::Ptr &,
+    detail::SculptSceneChunkLimits,LocalSurfaceCache::Cancel)
+    asm("__real__ZN4dome6detail17SculptSceneChunks7captureERKNS_5SceneENS0_23SculptSceneChunkContextERKSt10shared_ptrIKS1_ENS0_22SculptSceneChunkLimitsESt8functionIFbvEE");
+extern "C" detail::SculptScenePreview wrapped_capture(
+    const Scene &,detail::SculptSceneChunkContext,const detail::SculptSceneChunks::Ptr &,
+    detail::SculptSceneChunkLimits,LocalSurfaceCache::Cancel)
+    asm("__wrap__ZN4dome6detail17SculptSceneChunks7captureERKNS_5SceneENS0_23SculptSceneChunkContextERKSt10shared_ptrIKS1_ENS0_22SculptSceneChunkLimitsESt8functionIFbvEE");
+extern "C" detail::SculptScenePreview wrapped_capture(
+    const Scene &scene,detail::SculptSceneChunkContext context,
+    const detail::SculptSceneChunks::Ptr &previous,detail::SculptSceneChunkLimits limits,
+    LocalSurfaceCache::Cancel cancelled) {
+  auto result=real_capture(scene,context,previous,limits,std::move(cancelled));
+  if(auto gate=mesh_gate.exchange({}))gate->stop();
+  return result;
+}
 int main(int argc,char **argv)try{
  if(argc==3&&std::string_view(argv[1])=="--fixture"){preview_model().save(argv[2]);return 0;}
  if(argc==3&&std::string_view(argv[1])=="--inspect"){std::cout<<Scene::load(argv[2]).encode().dump()<<'\n';return 0;}
