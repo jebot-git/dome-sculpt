@@ -96,13 +96,7 @@ std::shared_ptr<const SourceMaterialBindings> BakeRecipeRemap::binding(
   if (found == polygon_fields_.end()) {
     // The same retained geometry and paint now reference the remapped origin.
     // Share the authenticated trace and attachment, so this remains a metadata edit.
-    auto rebased = std::shared_ptr<PolygonSurfaceOwner>(new PolygonSurfaceOwner);
-    rebased->before_ = before;
-    rebased->attachment_ = field->attachment_;
-    rebased->trace_ = field->trace_;
-    rebased->corners_ = field->corners_;
-    rebased->self_ = rebased;
-    found = polygon_fields_.emplace(field.get(), std::move(rebased)).first;
+    found = polygon_fields_.emplace(field.get(), field->rebase_before(before)).first;
   }
   auto result = std::make_shared<SourceMaterialBindings>(*original);
   result->polygon_surface_transfer = found->second;

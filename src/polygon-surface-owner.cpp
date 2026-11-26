@@ -97,6 +97,18 @@ SourceDomain source_domain(const PolygonOrigin&o,const PolygonSurfaceTransferLim
 void barycentric(std::array<double,3>b){double total=0;for(auto x:b){if(!std::isfinite(x)||x<0||x>1)throw std::invalid_argument("Polygon field sample is outside its declared triangle");total+=x;}if(std::abs(total-1)>1e-6)throw std::invalid_argument("Polygon field sample barycentrics must sum to one");}
 std::array<float,2> interpolate(const std::vector<std::array<float,2>>&uv,size_t t,std::array<double,3>b){std::array<double,2> q{};for(size_t k=0;k<3;++k)for(size_t d=0;d<2;++d)q[d]+=uv.at(t*3+k)[d]*b[k];return {float(q[0]),float(q[1])};}
 }
+std::shared_ptr<const PolygonSurfaceOwner> PolygonSurfaceOwner::rebase_before(
+    std::shared_ptr<const PolygonOrigin> before) const {
+ if(!before||!valid_owner(self_.lock())||!own(before->paint,before_->paint))
+  throw std::invalid_argument("Rebased polygon field requires its exact original Paint owner");
+ auto rebased=std::shared_ptr<PolygonSurfaceOwner>(new PolygonSurfaceOwner);
+ rebased->before_=std::move(before);
+ rebased->attachment_=attachment_;
+ rebased->trace_=trace_;
+ rebased->corners_=corners_;
+ rebased->self_=rebased;
+ return rebased;
+}
 bool PolygonSurfaceOwner::valid_owner(const std::shared_ptr<const PolygonSurfaceOwner>&p)const noexcept{return p.get()==this&&!self_.expired()&&!self_.owner_before(p)&&!p.owner_before(self_);}
 bool polygon_surface_transfer_required(const SculptObject&o){return o.mesh_active&&o.painted&&(o.painted->paint_sampling_domain()||o.painted->has_physical_emission()||(o.painted->baked()&&o.painted->baked()->normal_field)||(o.material_bindings&&o.material_bindings->polygon_surface_transfer));}
 void validate_polygon_surface_model(bool active,const PaintedMesh*paint,

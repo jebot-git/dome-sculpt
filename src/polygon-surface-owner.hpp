@@ -84,8 +84,10 @@ public:
 private:
  friend class BakeRecipeRemap;
  friend class PolygonSurfacePreview;
+ friend class PolygonSurfaceNodeReader;
  PolygonSurfaceOwner()=default;
  PolygonSurfaceOwner(const PolygonSurfaceOwner&)=delete;
+ std::shared_ptr<const PolygonSurfaceOwner> rebase_before(std::shared_ptr<const PolygonOrigin>) const;
  std::weak_ptr<const PolygonSurfaceOwner> self_;
  std::shared_ptr<const PolygonOrigin> before_;
  std::shared_ptr<const PaintSamplingAttachment> attachment_;

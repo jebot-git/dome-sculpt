@@ -142,5 +142,19 @@ void recipe_reference_remap(bool prepared) {
  const auto nested = appended.scene.encode();
  check(Scene::decode(nested).encode() == nested && scene.encode() == before,
        "Both prepared source namespaces and the original native archive reopen exactly");
+ const auto &nodes = nested.at("polygon_surfaces").at("nodes");
+ size_t variant = 0;
+ while (variant < nodes.size() && nodes[variant].at("version") == 1)
+   ++variant;
+ check(variant < nodes.size() && nodes[variant].at("sampling_node").get<size_t>() < variant,
+       "Prepared source namespaces explicitly share an authenticated earlier sampling node");
+ auto forged = nested;
+ forged["polygon_surfaces"]["nodes"][variant]["sampling_node"] = variant;
+ refuses([&]{Scene::decode(forged);},"Shared polygon sampling rejects a self-reference");
+ forged = nested;
+ auto &foreign = forged["polygon_surfaces"]["nodes"][variant]["recipe"]["operations"][0];
+ foreign["delta"][0] = foreign["delta"][0].get<float>() + 0.01f;
+ refuses([&]{Scene::decode(forged);},"Shared polygon sampling rejects a different geometric recipe");
+
 }
 int main(int argc,char**argv)try{if(argc==2&&std::string_view(argv[1])=="--recipe-reference-remap"){for(bool prepared:{false,true})recipe_reference_remap(prepared);std::cout<<"PASS "<<checks<<" prepared texture recipe controls\n";return 0;}if(argc>1){std::filesystem::create_directories(argv[1]);std::filesystem::current_path(argv[1]);}for(bool prepared:{false,true})for(bool reflected:{false,true})audit(prepared,reflected);audit(false,false,true);auto varied=source(false,false,false,true);const auto before=varied.encode();refuses([&]{detail::make_gltf(varied.export_surfaces());},"A varying original role is explicitly refused pending its full interpolation adapter");check(varied.encode()==before,"Varying-role refusal preserves the actual native source");auto hdr=source(false,false,true);refuses([&]{detail::make_gltf(hdr.export_surfaces());},"Actual FLOAT source export retains its precision-qualified per-material guard");std::cout<<"PASS "<<checks<<" actual retained standard source export controls\n";return 0;}catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

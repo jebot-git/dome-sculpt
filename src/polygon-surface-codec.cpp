@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "polygon-surface-codec.hpp"
+#include "dome/material-bindings.hpp"
 #include "dome/paint-sampling.hpp"
 #include "paint-sampling-access.hpp"
 #include <nlohmann/json.hpp>
@@ -21,7 +22,9 @@ nlohmann::json encode_polygon_surface_node(const std::shared_ptr<const PolygonSu
 }
 size_t preflight_polygon_surface_node(const nlohmann::json&record,size_t origins,const PolygonSurfaceTransferLimits&l){
  stop(l);if(!l.maximum_steps||l.maximum_steps>128||!l.maximum_entries||l.maximum_entries>8'000'000||!l.maximum_working_bytes||l.maximum_working_bytes>512*1024*1024||!origins||origins>512)throw std::invalid_argument("Invalid polygon surface node resource/origin context");
- if(!record.is_object()||record.size()!=4||!record.at("version").is_number_integer()||record.at("version")!=1||!record.at("basis").is_string()||(!tag(record.at("basis"),"captured-retained-grid")&&!tag(record.at("basis"),"captured-native-grid")))throw std::invalid_argument("Invalid polygon surface owning node shape/version/basis");
+ if(!record.is_object()||!record.at("version").is_number_integer())throw std::invalid_argument("Invalid polygon surface owning node version");
+ const auto version=integer(record.at("version"),2);
+ if((version==1?record.size()!=4:version!=2||record.size()!=5||!record.contains("sampling_node"))||!record.at("basis").is_string()||(!tag(record.at("basis"),"captured-retained-grid")&&!tag(record.at("basis"),"captured-native-grid")))throw std::invalid_argument("Invalid polygon surface owning node shape/version/basis");
  integer(record.at("before_origin"),origins-1);const auto&recipe=record.at("recipe");
  if(!recipe.is_object()||recipe.size()!=4||!recipe.at("version").is_number_integer()||recipe.at("version")!=1||!tag(recipe.at("model"),"polygon-original-field-current-surface-v1")||(!tag(recipe.at("normal_evaluation"),"core-pbr-unit-columns")&&!tag(recipe.at("normal_evaluation"),"native-normal-only"))||!recipe.at("operations").is_array()||recipe.at("operations").empty()||recipe.at("operations").size()>l.maximum_steps)throw std::invalid_argument("Invalid polygon surface owning edit recipe");
  size_t entries=0,bytes=0;const auto charge=[&](size_t n,size_t unit){if(bytes>l.maximum_working_bytes||n>(l.maximum_working_bytes-bytes)/unit)throw std::length_error("Polygon surface recipe exceeds prospective working quota");bytes+=n*unit;};
@@ -35,9 +38,18 @@ size_t preflight_polygon_surface_node(const nlohmann::json&record,size_t origins
  }
  stop(l);return entries;
 }
+void preflight_polygon_surface_sampling(const nlohmann::json &nodes,size_t node) {
+ const auto &entry=nodes.at(node);
+ if(entry.at("version")==1)return;
+ if(!node)throw std::invalid_argument("Polygon sampling must reference an earlier complete node");
+ const auto &base=nodes.at(integer(entry.at("sampling_node"),node-1));
+ if(base.at("version")!=1||entry.at("basis")!=base.at("basis")||
+    entry.at("recipe")!=base.at("recipe")||entry.at("before_origin")==base.at("before_origin"))
+  throw std::invalid_argument("Shared polygon sampling needs its matching earlier basis and independent before origin");
+}
 PolygonSurfaceStage decode_polygon_surface_node(const nlohmann::json&record,size_t origins,
  const PolygonSurfaceOriginReader&origin,const PolygonSurfaceTransferLimits&l){
- (void)preflight_polygon_surface_node(record,origins,l);if(!origin)throw std::invalid_argument("Polygon surface node has no actual owning origin reader");
+ (void)preflight_polygon_surface_node(record,origins,l);if(!origin||record.at("version")!=1)throw std::invalid_argument("Polygon surface node needs its actual owning resolver and sampling pool");
  auto before=origin(uint32_t(integer(record.at("before_origin"),origins-1)));if(!before||!tag(record.at("basis"),relation(*before)))throw std::invalid_argument("Polygon surface basis witness differs from its actual source ownership");
  // The basis is selected from this authentic source root, not reconstructed by
  // equal-position/UV merging with an unrelated Mesh table. The real factory
@@ -47,7 +59,8 @@ PolygonSurfaceStage decode_polygon_surface_node(const nlohmann::json&record,size
 namespace {
 void preflight_pool(const nlohmann::json&input,size_t origins,const PolygonSurfaceTransferLimits&l){
  stop(l);if(!input.is_object()||input.size()!=2||!input.at("version").is_number_integer()||input.at("version")!=1||!input.at("nodes").is_array()||input.at("nodes").empty()||input.at("nodes").size()>128)throw std::invalid_argument("Invalid bounded polygon surface owning-node pool");
- size_t entries=0;for(const auto&node:input.at("nodes")){const auto n=preflight_polygon_surface_node(node,origins,l);if(n>l.maximum_entries-entries)throw std::length_error("Polygon surface pool exceeds aggregate edit-entry quota");entries+=n;}stop(l);
+ const auto &nodes=input.at("nodes");
+ size_t entries=0;for(size_t id=0;id<nodes.size();++id){const auto n=preflight_polygon_surface_node(nodes[id],origins,l);preflight_polygon_surface_sampling(nodes,id);if(n>l.maximum_entries-entries)throw std::length_error("Polygon surface pool exceeds aggregate edit-entry quota");entries+=n;}stop(l);
 }
 bool same_owner(const auto&a,const auto&b){return a==b&&!a.owner_before(b)&&!b.owner_before(a);}
 size_t replay_reservation(const nlohmann::json&node,const PolygonOrigin&before,const PolygonSurfaceTransferLimits&l){
@@ -80,7 +93,18 @@ uint32_t PolygonSurfaceNodeWriter::add(std::shared_ptr<const PolygonSurfaceOwner
 nlohmann::json PolygonSurfaceNodeWriter::encode(const PolygonSurfaceOriginWriter&origin)const{
  stop(limits_);if(owners_.empty()||!origin)throw std::invalid_argument("Polygon surface writer needs actual owning nodes and origin pool");
  nlohmann::json output={{"version",1},{"nodes",nlohmann::json::array()}};
- for(const auto&owner:owners_)output["nodes"].push_back(encode_polygon_surface_node(owner,origin,limits_));
+ for(size_t id=0;id<owners_.size();++id){
+  const auto &owner=owners_[id];
+  auto node=encode_polygon_surface_node(owner,origin,limits_);
+  for(size_t prior=0;prior<id;++prior){
+   if(!owner->shares_sampling(*owners_[prior]))continue;
+   node["version"]=2;
+   node["sampling_node"]=prior;
+   break;
+  }
+  output["nodes"].push_back(std::move(node));
+  preflight_polygon_surface_sampling(output.at("nodes"),id);
+ }
  stop(limits_);return output;
 }
 PolygonSurfaceNodeReader::PolygonSurfaceNodeReader(const nlohmann::json&input,size_t origins,
@@ -103,6 +127,27 @@ const PolygonSurfaceStage&PolygonSurfaceNodeReader::at(uint32_t id){
  if(stages_[id]){
   auto&stage=*stages_[id];if(geometry&&!same_owner(geometry,stage.paint->mesh_owner()))throw std::invalid_argument("Polygon surface shared geometry changed its actual owning context");if(!same_owner(stage.owner->before(),before)||stage.owner->encode_recipe(limits_)!=node.at("recipe"))throw std::invalid_argument("Polygon surface completed node changed its exact owning context");
   stage.owner->validate_binding(*stage.binding,limits_);stage.owner->validate_current(*stage.paint,limits_);stop(limits_);return stage;
+ }
+ if(node.at("version")==2){
+  const auto &base=at(uint32_t(integer(node.at("sampling_node"),id-1)));
+  const auto &base_origin=base.owner->before();
+  if(!same_owner(before->paint,base_origin->paint)||
+     !same_owner(before->material_bindings,base_origin->material_bindings)||
+     (geometry&&!same_owner(geometry,base.paint->mesh_owner())))
+   throw std::invalid_argument("Shared polygon sampling cannot borrow a foreign source or logical geometry");
+  const size_t bytes=sizeof(PolygonSurfaceOwner)+sizeof(SourceMaterialBindings)+256;
+  if(bytes>limits_.maximum_working_bytes-reserved_)
+   throw std::length_error("Shared polygon sampling metadata exceeds prospective replay quota");
+  auto remaining=limits_;remaining.maximum_working_bytes-=reserved_;
+  auto owner=base.owner->rebase_before(std::move(before));
+  auto binding=std::make_shared<SourceMaterialBindings>(*base.binding);
+  binding->polygon_surface_transfer=owner;
+  owner->validate_binding(*binding,remaining);
+  owner->validate_current(*base.paint,remaining);
+  stop(limits_);
+  stages_[id]=PolygonSurfaceStage{std::move(owner),base.paint,std::move(binding)};
+  reserved_+=bytes;
+  return *stages_[id];
  }
  const auto bytes=replay_reservation(node,*before,limits_);
  if(bytes>limits_.maximum_working_bytes-reserved_)throw std::length_error("Polygon surface retained nodes plus replay exceed aggregate working quota");
