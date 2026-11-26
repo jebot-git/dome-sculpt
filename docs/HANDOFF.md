@@ -1,15 +1,40 @@
-# Dome Sculpt current handoff — 2026-11-18
+# Dome Sculpt current handoff — 2026-11-26
 
-The full production goal is PAUSED at the user's request after this round and
-remains incomplete. See [the current assessment](PROGRESS-ASSESSMENT-20261118.md)
-for qualified results and the main remaining goals. Do not launch prepared
-runtime jobs until an explicit resume. Earlier pause/resume records below retain
-their dated scope.
+The full production goal is ACTIVE after the user's Nov26 resume and remains
+incomplete. The Nov18 [assessment](PROGRESS-ASSESSMENT-20261118.md) preserves
+the prior round's results and remaining goals. Earlier pause/resume records
+below retain their dated scope.
 Read [REQUIREMENTS.md](REQUIREMENTS.md) and the original
 [HANDOFF-466ebd1.md](HANDOFF-466ebd1.md) for the complete scope. This concise file
 replaces the accumulated checkpoint diary; all previous text is preserved,
 byte-for-byte, in [the historical handoff](HANDOFF-HISTORY-20261117.md).
 Update this current summary at milestones rather than prepending more history.
+
+## Nov26 resume: rebuild from committed sources
+
+No Dome Sculpt build jobs were running at resume. The Nov18 temporary SDK,
+source worktrees, executables and prepared runtime plans are absent; their Git
+commits and committed evidence remain. Do not claim old executable reuse or
+rewrite historical manifests to make missing paths appear current.
+
+Canonical DomeD local and remote main remain `acc2b70ae61dedec2a23727f67c60c0303d0f76f`.
+The installed Release toolkit `/opt/fltk-vr/toolkit` passes44 static checks of
+canonical builder/27 patches, archive, generated poll configuration, library
+digests and BDF helper. Receipt: `artifacts/sdk-20261126/installed-release-check.json`.
+This permits fresh configuration; actual new loader/render/UI checks are separate.
+The explicit bitmap prefix remains `/opt/fltk-vr/bdf-runtime`.
+
+Fresh isolated source/build lanes are now running with regular-user limits and
+actual compiler/dependency records: creator public application on production05,
+HDR bounded provenance514, sculpt independent workflows6d3 and root headless
+strict05 core/render/13 fixtures. Inspect actual units before taking any action.
+No source headers or objects are borrowed across these different products.
+Device jobs must take the common nonblocking lease, with no idle reservation.
+Current creator clock regression is freshly built and passes6014 checks; current
+application public workflows, HDR closure/2048, sculpt cold-open/recovery and
+sustained independent authoring remain pending. Root is adding opt-in fixture
+phase timing to diagnose the previous strict deadline without changing data,
+checks, product code or resource limits. Full scope in REQUIREMENTS is unchanged.
 
 ## Source and integration boundary
 
