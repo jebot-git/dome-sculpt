@@ -1,0 +1,1266 @@
+{
+  "source": "7a06dbe5",
+  "scope": "Separate compact allocator on6d component. Actualsharedallocations8Bsmaller; Release167andR/S26+92pass. Fullstrict167 failsunchangedRSS4GiB; noRSSimprovementorcombinedapplicationacceptanceclaimed.",
+  "same_original_bounds": true,
+  "builds": {
+    "Release": {
+      "source": "7a06dbe5",
+      "started": 1795665896.9002,
+      "terminal": true,
+      "scope": "One changed complete surface compiler TU;196 qualified current owners and all4 actual existing consumer TUs after MD/source-byte equality; compact owner account only",
+      "strict": false,
+      "exit": 0,
+      "state": "passed",
+      "fresh_whole_TUs": 1,
+      "fresh_core_owners": 1,
+      "qualified_unchanged_core_owners": 196,
+      "actual_archive_payloads": 197,
+      "input_drift": [],
+      "core_sha256": "4fadf0c2013f4d8fd8d06c5810734c5a5e0bdab3b88ac946177da89c377fc8a0",
+      "products": {
+        "dome-sculpt-sculpt-independent-workflow": "f8e5708049f4c71fd783ff419047f8604d83772f6752fd4de8d42fc128a4c235",
+        "dome-sculpt-sculpt-sustained": "68aeee361e1a7ef99397f5321855dd909f30e6041230746de065aa85375492b0",
+        "dome-sculpt-sculpt-surface-chunks-test": "798d7b816a2f79f96a9cfe02690fe17ad92f8d36d02be0f506ffbd1383b755e2",
+        "dome-sculpt-sculpt-chunk-pipeline-test": "d03bafb4b9c785cc7acd7980e012754d7219554ba1ab637dd80a742c9b47d23f"
+      },
+      "seconds": 27.545698165893555
+    },
+    "ASAN_UBSAN": {
+      "source": "7a06dbe5",
+      "started": 1795665896.9034653,
+      "terminal": true,
+      "scope": "One changed complete surface compiler TU;196 qualified current owners and all4 actual existing consumer TUs after MD/source-byte equality; compact owner account only",
+      "strict": true,
+      "exit": 0,
+      "state": "passed",
+      "fresh_whole_TUs": 1,
+      "fresh_core_owners": 1,
+      "qualified_unchanged_core_owners": 196,
+      "actual_archive_payloads": 197,
+      "input_drift": [],
+      "core_sha256": "b2b5a8be79ea7777c04ed45976c04170c9d6a21ca83051bbca53bac8b74428ba",
+      "products": {
+        "dome-sculpt-sculpt-independent-workflow": "81837be7eba434d493fa0f7a910c8a42e6a08462c0f310a70b363d5620e5ad1d",
+        "dome-sculpt-sculpt-sustained": "e593271eff1078d9286d761cea0544f77c83213a0238f2c9ed451e028842598f",
+        "dome-sculpt-sculpt-surface-chunks-test": "61dd58499273bb90127866ef75bcff177a08da0e39fd4eca42b2c350917e87d9",
+        "dome-sculpt-sculpt-chunk-pipeline-test": "b7cb1ff2140e9ff185d7ababa336bb0e1ec15dc610ced9303eee3b2d83cdc979"
+      },
+      "seconds": 53.20434021949768
+    }
+  },
+  "runtimes": {
+    "Release": {
+      "surface": {
+        "production_source": "7a06dbe5",
+        "fixture_source": "7a06dbe5",
+        "terminal": true,
+        "started": 1795665981.2999415,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/dome-sculpt-sculpt-surface-chunks-test"
+        ],
+        "timeout_seconds": 900,
+        "rss_limit_bytes": 4294967296,
+        "AS_cap": null,
+        "scope": "Existing native chunk-topology or actual Document pipeline regression; no GUI/physical-HMD claim",
+        "driver_sha256": "9c56869f31ebc691fb1cc93b7e8a790ca5816181ce24edb78d588e42acbbbbc6",
+        "cpu_lock": {
+          "acquired": 1795665981.3001425,
+          "device": 40,
+          "inode": 469041,
+          "GPU_lease": false,
+          "ldd_invoked": false,
+          "isolated_CPU_only": true,
+          "released": 1795665982.0509589
+        },
+        "provider_authority": "Previously executed fe94 native167 actual24 closure; verified DT_NEEDED/RPATH subset; no ldd/GL/device lease",
+        "executable_sha256": "798d7b816a2f79f96a9cfe02690fe17ad92f8d36d02be0f506ffbd1383b755e2",
+        "providers": 24,
+        "pid": 3889524,
+        "process_identity": {
+          "pid": 3889524,
+          "ppid": 3889484,
+          "pgrp": 3889524,
+          "start": 84390662,
+          "RSS": 937984,
+          "state": "R"
+        },
+        "actual_executable_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/dome-sculpt-sculpt-surface-chunks-test",
+        "product_exit": 0,
+        "seconds": 0.25313687894959,
+        "peak_owned_RSS_bytes": 20967424,
+        "samples": 3,
+        "mapped_witness": true,
+        "owned_survivors": [],
+        "DRM_FDs_observed": [],
+        "mapped_external_ELFs": [
+          "/usr/lib64/ld-linux-x86-64.so.2",
+          "/usr/lib64/libEGL.so.1.1.0",
+          "/usr/lib64/libGLdispatch.so.0.0.0",
+          "/usr/lib64/libIex-3_2.so.31.3.2.4",
+          "/usr/lib64/libIlmThread-3_2.so.31.3.2.4",
+          "/usr/lib64/libImath-3_1.so.29.11.0",
+          "/usr/lib64/libOpenEXR-3_2.so.31.3.2.4",
+          "/usr/lib64/libOpenEXRCore-3_2.so.31.3.2.4",
+          "/usr/lib64/libOpenEXRUtil-3_2.so.31.3.2.4",
+          "/usr/lib64/libOpenGL.so.0.0.0",
+          "/usr/lib64/libblas.so.3.12.0",
+          "/usr/lib64/libc.so.6",
+          "/usr/lib64/libdeflate.so.0",
+          "/usr/lib64/libgcc_s-16-20261029.so.1",
+          "/usr/lib64/libgfortran.so.5.0.0",
+          "/usr/lib64/libjpeg.so.62.4.0",
+          "/usr/lib64/liblapack.so.3.12.0",
+          "/usr/lib64/liblapacke.so.3.12.0",
+          "/usr/lib64/libm.so.6",
+          "/usr/lib64/libmvec.so.1",
+          "/usr/lib64/libpng16.so.16.59.0",
+          "/usr/lib64/libstdc++.so.6.0.36",
+          "/usr/lib64/libtmglib.so.3.12.0",
+          "/usr/lib64/libz.so.1.3.1.zlib-ng"
+        ],
+        "input_drift": [],
+        "provider_drift": [],
+        "checks": 26,
+        "exit": 0,
+        "state": "passed",
+        "finished": 1795665982.0509577
+      },
+      "pipeline": {
+        "production_source": "7a06dbe5",
+        "fixture_source": "7a06dbe5",
+        "terminal": true,
+        "started": 1795665982.106974,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/dome-sculpt-sculpt-chunk-pipeline-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/pipeline-cpu-v1/workflow"
+        ],
+        "timeout_seconds": 900,
+        "rss_limit_bytes": 4294967296,
+        "AS_cap": null,
+        "scope": "Existing native chunk-topology or actual Document pipeline regression; no GUI/physical-HMD claim",
+        "driver_sha256": "9c56869f31ebc691fb1cc93b7e8a790ca5816181ce24edb78d588e42acbbbbc6",
+        "cpu_lock": {
+          "acquired": 1795665982.107154,
+          "device": 40,
+          "inode": 469041,
+          "GPU_lease": false,
+          "ldd_invoked": false,
+          "isolated_CPU_only": true,
+          "released": 1795665983.36852
+        },
+        "provider_authority": "Previously executed fe94 native167 actual24 closure; verified DT_NEEDED/RPATH subset; no ldd/GL/device lease",
+        "executable_sha256": "d03bafb4b9c785cc7acd7980e012754d7219554ba1ab637dd80a742c9b47d23f",
+        "providers": 24,
+        "pid": 3889635,
+        "process_identity": {
+          "pid": 3889635,
+          "ppid": 3889597,
+          "pgrp": 3889635,
+          "start": 84390742,
+          "RSS": 1728512,
+          "state": "R"
+        },
+        "actual_executable_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/dome-sculpt-sculpt-chunk-pipeline-test",
+        "product_exit": 0,
+        "seconds": 0.7553677300456911,
+        "peak_owned_RSS_bytes": 47693824,
+        "samples": 10,
+        "mapped_witness": true,
+        "owned_survivors": [],
+        "DRM_FDs_observed": [],
+        "mapped_external_ELFs": [
+          "/usr/lib64/ld-linux-x86-64.so.2",
+          "/usr/lib64/libEGL.so.1.1.0",
+          "/usr/lib64/libGLdispatch.so.0.0.0",
+          "/usr/lib64/libIex-3_2.so.31.3.2.4",
+          "/usr/lib64/libIlmThread-3_2.so.31.3.2.4",
+          "/usr/lib64/libImath-3_1.so.29.11.0",
+          "/usr/lib64/libOpenEXR-3_2.so.31.3.2.4",
+          "/usr/lib64/libOpenEXRCore-3_2.so.31.3.2.4",
+          "/usr/lib64/libOpenEXRUtil-3_2.so.31.3.2.4",
+          "/usr/lib64/libOpenGL.so.0.0.0",
+          "/usr/lib64/libblas.so.3.12.0",
+          "/usr/lib64/libc.so.6",
+          "/usr/lib64/libdeflate.so.0",
+          "/usr/lib64/libgcc_s-16-20261029.so.1",
+          "/usr/lib64/libgfortran.so.5.0.0",
+          "/usr/lib64/libjpeg.so.62.4.0",
+          "/usr/lib64/liblapack.so.3.12.0",
+          "/usr/lib64/liblapacke.so.3.12.0",
+          "/usr/lib64/libm.so.6",
+          "/usr/lib64/libmvec.so.1",
+          "/usr/lib64/libpng16.so.16.59.0",
+          "/usr/lib64/libstdc++.so.6.0.36",
+          "/usr/lib64/libtmglib.so.3.12.0",
+          "/usr/lib64/libz.so.1.3.1.zlib-ng"
+        ],
+        "input_drift": [],
+        "provider_drift": [],
+        "checks": 92,
+        "exit": 0,
+        "state": "passed",
+        "finished": 1795665983.3685179
+      },
+      "native": {
+        "production_source": "7a06dbe5",
+        "fixture_source": "7a06dbe5",
+        "terminal": true,
+        "started": 1795666061.7363546,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/dome-sculpt-sculpt-independent-workflow",
+          "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/native-cpu-v1/workflow"
+        ],
+        "timeout_seconds": 900,
+        "rss_limit_bytes": 4294967296,
+        "AS_cap": null,
+        "scope": "Full-size four independent objects: native Document layers, masks, native gestures, history, ordered Save, cold Open, durable recovery and exact independent geometry; no GUI/physical-HMD claim",
+        "allocator_profile": {
+          "MALLOC_ARENA_MAX": "2",
+          "MALLOC_MMAP_THRESHOLD_": "131072"
+        },
+        "driver_sha256": "c56bd2763492026c640ae66d0893fc7858416b6e2801ebe68e3358ce750dd09d",
+        "cpu_lock": {
+          "acquired": 1795666061.736722,
+          "device": 40,
+          "inode": 469041,
+          "GPU_lease": false,
+          "ldd_invoked": false,
+          "isolated_CPU_only": true,
+          "released": 1795666137.80955
+        },
+        "provider_authority": "Previously executed fe94 native167 actual24 closure; exact DT_NEEDED/RPATH matches; no ldd/GL/device lease",
+        "executable_sha256": "f8e5708049f4c71fd783ff419047f8604d83772f6752fd4de8d42fc128a4c235",
+        "providers": 24,
+        "pid": 3899892,
+        "process_identity": {
+          "pid": 3899892,
+          "ppid": 3899850,
+          "pgrp": 3899892,
+          "start": 84398710,
+          "RSS": 741376,
+          "state": "R"
+        },
+        "actual_executable_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/dome-sculpt-sculpt-independent-workflow",
+        "product_exit": 0,
+        "seconds": 75.53756842704024,
+        "peak_owned_RSS_bytes": 2681860096,
+        "samples": 998,
+        "mapped_witness": true,
+        "owned_survivors": [],
+        "DRM_FDs_observed": [],
+        "mapped_external_ELFs": [
+          "/usr/lib64/ld-linux-x86-64.so.2",
+          "/usr/lib64/libEGL.so.1.1.0",
+          "/usr/lib64/libGLdispatch.so.0.0.0",
+          "/usr/lib64/libIex-3_2.so.31.3.2.4",
+          "/usr/lib64/libIlmThread-3_2.so.31.3.2.4",
+          "/usr/lib64/libImath-3_1.so.29.11.0",
+          "/usr/lib64/libOpenEXR-3_2.so.31.3.2.4",
+          "/usr/lib64/libOpenEXRCore-3_2.so.31.3.2.4",
+          "/usr/lib64/libOpenEXRUtil-3_2.so.31.3.2.4",
+          "/usr/lib64/libOpenGL.so.0.0.0",
+          "/usr/lib64/libblas.so.3.12.0",
+          "/usr/lib64/libc.so.6",
+          "/usr/lib64/libdeflate.so.0",
+          "/usr/lib64/libgcc_s-16-20261029.so.1",
+          "/usr/lib64/libgfortran.so.5.0.0",
+          "/usr/lib64/libjpeg.so.62.4.0",
+          "/usr/lib64/liblapack.so.3.12.0",
+          "/usr/lib64/liblapacke.so.3.12.0",
+          "/usr/lib64/libm.so.6",
+          "/usr/lib64/libmvec.so.1",
+          "/usr/lib64/libpng16.so.16.59.0",
+          "/usr/lib64/libstdc++.so.6.0.36",
+          "/usr/lib64/libtmglib.so.3.12.0",
+          "/usr/lib64/libz.so.1.3.1.zlib-ng"
+        ],
+        "input_drift": [],
+        "provider_drift": [],
+        "checks": 167,
+        "exit": 0,
+        "state": "passed",
+        "finished": 1795666137.8095474
+      }
+    },
+    "ASAN_UBSAN": {
+      "surface": {
+        "production_source": "7a06dbe5",
+        "fixture_source": "7a06dbe5",
+        "terminal": true,
+        "started": 1795665983.4227982,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/dome-sculpt-sculpt-surface-chunks-test"
+        ],
+        "timeout_seconds": 900,
+        "rss_limit_bytes": 4294967296,
+        "AS_cap": null,
+        "sanitizers": "ASan+UBSan,leakdetect,halt/abort,no suppressions",
+        "scope": "Existing native chunk-topology or actual Document pipeline regression; no GUI/physical-HMD claim",
+        "driver_sha256": "50dffc0836bc9e3d2cd3dfea312f0a9c060d0ddcfa2c3973ca92e1a7b58a4b20",
+        "cpu_lock": {
+          "acquired": 1795665983.4231205,
+          "device": 40,
+          "inode": 469041,
+          "GPU_lease": false,
+          "ldd_invoked": false,
+          "isolated_CPU_only": true,
+          "released": 1795665993.679362
+        },
+        "provider_authority": "Executed fe94 R24 closure plus actual rootcanonical S libasan/libubsan mapped paths; verified strict DT_NEEDED/RPATH subset; no ldd/GL/device lease",
+        "executable_sha256": "61dd58499273bb90127866ef75bcff177a08da0e39fd4eca42b2c350917e87d9",
+        "providers": 26,
+        "pid": 3890320,
+        "process_identity": {
+          "pid": 3890320,
+          "ppid": 3889762,
+          "pgrp": 3890320,
+          "start": 84391284,
+          "RSS": 1093632,
+          "state": "R"
+        },
+        "actual_executable_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/dome-sculpt-sculpt-surface-chunks-test",
+        "live_ASan_UBSan_witness": true,
+        "product_exit": 0,
+        "seconds": 1.730917330016382,
+        "peak_owned_RSS_bytes": 189108224,
+        "samples": 22,
+        "mapped_witness": true,
+        "owned_survivors": [],
+        "DRM_FDs_observed": [],
+        "mapped_external_ELFs": [
+          "/usr/lib64/ld-linux-x86-64.so.2",
+          "/usr/lib64/libEGL.so.1.1.0",
+          "/usr/lib64/libGLdispatch.so.0.0.0",
+          "/usr/lib64/libIex-3_2.so.31.3.2.4",
+          "/usr/lib64/libIlmThread-3_2.so.31.3.2.4",
+          "/usr/lib64/libImath-3_1.so.29.11.0",
+          "/usr/lib64/libOpenEXR-3_2.so.31.3.2.4",
+          "/usr/lib64/libOpenEXRCore-3_2.so.31.3.2.4",
+          "/usr/lib64/libOpenEXRUtil-3_2.so.31.3.2.4",
+          "/usr/lib64/libOpenGL.so.0.0.0",
+          "/usr/lib64/libasan.so.8.0.0",
+          "/usr/lib64/libblas.so.3.12.0",
+          "/usr/lib64/libc.so.6",
+          "/usr/lib64/libdeflate.so.0",
+          "/usr/lib64/libgcc_s-16-20261029.so.1",
+          "/usr/lib64/libgfortran.so.5.0.0",
+          "/usr/lib64/libjpeg.so.62.4.0",
+          "/usr/lib64/liblapack.so.3.12.0",
+          "/usr/lib64/liblapacke.so.3.12.0",
+          "/usr/lib64/libm.so.6",
+          "/usr/lib64/libmvec.so.1",
+          "/usr/lib64/libpng16.so.16.59.0",
+          "/usr/lib64/libstdc++.so.6.0.36",
+          "/usr/lib64/libtmglib.so.3.12.0",
+          "/usr/lib64/libubsan.so.1.0.0",
+          "/usr/lib64/libz.so.1.3.1.zlib-ng"
+        ],
+        "input_drift": [],
+        "provider_drift": [],
+        "checks": 26,
+        "exit": 0,
+        "state": "passed",
+        "finished": 1795665993.6793602
+      },
+      "pipeline": {
+        "production_source": "7a06dbe5",
+        "fixture_source": "7a06dbe5",
+        "terminal": true,
+        "started": 1795665993.7205365,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/dome-sculpt-sculpt-chunk-pipeline-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/pipeline-cpu-v1/workflow"
+        ],
+        "timeout_seconds": 900,
+        "rss_limit_bytes": 4294967296,
+        "AS_cap": null,
+        "sanitizers": "ASan+UBSan,leakdetect,halt/abort,no suppressions",
+        "scope": "Existing native chunk-topology or actual Document pipeline regression; no GUI/physical-HMD claim",
+        "driver_sha256": "50dffc0836bc9e3d2cd3dfea312f0a9c060d0ddcfa2c3973ca92e1a7b58a4b20",
+        "cpu_lock": {
+          "acquired": 1795665993.7208083,
+          "device": 40,
+          "inode": 469041,
+          "GPU_lease": false,
+          "ldd_invoked": false,
+          "isolated_CPU_only": true,
+          "released": 1795666008.8438084
+        },
+        "provider_authority": "Executed fe94 R24 closure plus actual rootcanonical S libasan/libubsan mapped paths; verified strict DT_NEEDED/RPATH subset; no ldd/GL/device lease",
+        "executable_sha256": "b7cb1ff2140e9ff185d7ababa336bb0e1ec15dc610ced9303eee3b2d83cdc979",
+        "providers": 26,
+        "pid": 3891795,
+        "process_identity": {
+          "pid": 3891795,
+          "ppid": 3891054,
+          "pgrp": 3891795,
+          "start": 84392350,
+          "RSS": 1060864,
+          "state": "R"
+        },
+        "actual_executable_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/dome-sculpt-sculpt-chunk-pipeline-test",
+        "live_ASan_UBSan_witness": true,
+        "product_exit": 0,
+        "seconds": 6.191486195079051,
+        "peak_owned_RSS_bytes": 1699315712,
+        "samples": 82,
+        "mapped_witness": true,
+        "owned_survivors": [],
+        "DRM_FDs_observed": [],
+        "mapped_external_ELFs": [
+          "/usr/lib64/ld-linux-x86-64.so.2",
+          "/usr/lib64/libEGL.so.1.1.0",
+          "/usr/lib64/libGLdispatch.so.0.0.0",
+          "/usr/lib64/libIex-3_2.so.31.3.2.4",
+          "/usr/lib64/libIlmThread-3_2.so.31.3.2.4",
+          "/usr/lib64/libImath-3_1.so.29.11.0",
+          "/usr/lib64/libOpenEXR-3_2.so.31.3.2.4",
+          "/usr/lib64/libOpenEXRCore-3_2.so.31.3.2.4",
+          "/usr/lib64/libOpenEXRUtil-3_2.so.31.3.2.4",
+          "/usr/lib64/libOpenGL.so.0.0.0",
+          "/usr/lib64/libasan.so.8.0.0",
+          "/usr/lib64/libblas.so.3.12.0",
+          "/usr/lib64/libc.so.6",
+          "/usr/lib64/libdeflate.so.0",
+          "/usr/lib64/libgcc_s-16-20261029.so.1",
+          "/usr/lib64/libgfortran.so.5.0.0",
+          "/usr/lib64/libjpeg.so.62.4.0",
+          "/usr/lib64/liblapack.so.3.12.0",
+          "/usr/lib64/liblapacke.so.3.12.0",
+          "/usr/lib64/libm.so.6",
+          "/usr/lib64/libmvec.so.1",
+          "/usr/lib64/libpng16.so.16.59.0",
+          "/usr/lib64/libstdc++.so.6.0.36",
+          "/usr/lib64/libtmglib.so.3.12.0",
+          "/usr/lib64/libubsan.so.1.0.0",
+          "/usr/lib64/libz.so.1.3.1.zlib-ng"
+        ],
+        "input_drift": [],
+        "provider_drift": [],
+        "checks": 92,
+        "exit": 0,
+        "state": "passed",
+        "finished": 1795666008.843805
+      },
+      "native": {
+        "production_source": "7a06dbe5",
+        "fixture_source": "7a06dbe5",
+        "terminal": true,
+        "started": 1795666144.9567888,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/dome-sculpt-sculpt-independent-workflow",
+          "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/native-cpu-v1/workflow"
+        ],
+        "timeout_seconds": 900,
+        "rss_limit_bytes": 4294967296,
+        "AS_cap": null,
+        "sanitizers": "ASan+UBSan,leakdetect,halt/abort,no suppressions",
+        "scope": "Full-size four independent objects: native Document layers, masks, native gestures, history, ordered Save, cold Open, durable recovery and exact independent geometry; no GUI/physical-HMD claim",
+        "allocator_profile": {
+          "MALLOC_ARENA_MAX": "2",
+          "MALLOC_MMAP_THRESHOLD_": "131072"
+        },
+        "driver_sha256": "f93bcba16ca8a1ff92b08a10d57c916645e7a741ed1682d82905d6822b4e1398",
+        "cpu_lock": {
+          "acquired": 1795666144.957035,
+          "device": 40,
+          "inode": 469041,
+          "GPU_lease": false,
+          "ldd_invoked": false,
+          "isolated_CPU_only": true,
+          "released": 1795666996.2709832
+        },
+        "provider_authority": "Executed fe94 R24 closure plus actual rootcanonical S libasan/libubsan mapped paths; exact strict DT_NEEDED/RPATH matches; no ldd/GL/device lease",
+        "executable_sha256": "81837be7eba434d493fa0f7a910c8a42e6a08462c0f310a70b363d5620e5ad1d",
+        "providers": 26,
+        "pid": 3911898,
+        "process_identity": {
+          "pid": 3911898,
+          "ppid": 3911291,
+          "pgrp": 3911898,
+          "start": 84407465,
+          "RSS": 1081344,
+          "state": "R"
+        },
+        "actual_executable_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/dome-sculpt-sculpt-independent-workflow",
+        "live_ASan_UBSan_witness": true,
+        "limit_failure": "RSS",
+        "product_exit": -15,
+        "seconds": 842.2171595729887,
+        "peak_owned_RSS_bytes": 4305338368,
+        "samples": 10896,
+        "mapped_witness": true,
+        "owned_survivors": [],
+        "DRM_FDs_observed": [],
+        "mapped_external_ELFs": [
+          "/usr/lib64/ld-linux-x86-64.so.2",
+          "/usr/lib64/libEGL.so.1.1.0",
+          "/usr/lib64/libGLdispatch.so.0.0.0",
+          "/usr/lib64/libIex-3_2.so.31.3.2.4",
+          "/usr/lib64/libIlmThread-3_2.so.31.3.2.4",
+          "/usr/lib64/libImath-3_1.so.29.11.0",
+          "/usr/lib64/libOpenEXR-3_2.so.31.3.2.4",
+          "/usr/lib64/libOpenEXRCore-3_2.so.31.3.2.4",
+          "/usr/lib64/libOpenEXRUtil-3_2.so.31.3.2.4",
+          "/usr/lib64/libOpenGL.so.0.0.0",
+          "/usr/lib64/libasan.so.8.0.0",
+          "/usr/lib64/libblas.so.3.12.0",
+          "/usr/lib64/libc.so.6",
+          "/usr/lib64/libdeflate.so.0",
+          "/usr/lib64/libgcc_s-16-20261029.so.1",
+          "/usr/lib64/libgfortran.so.5.0.0",
+          "/usr/lib64/libjpeg.so.62.4.0",
+          "/usr/lib64/liblapack.so.3.12.0",
+          "/usr/lib64/liblapacke.so.3.12.0",
+          "/usr/lib64/libm.so.6",
+          "/usr/lib64/libmvec.so.1",
+          "/usr/lib64/libpng16.so.16.59.0",
+          "/usr/lib64/libstdc++.so.6.0.36",
+          "/usr/lib64/libtmglib.so.3.12.0",
+          "/usr/lib64/libubsan.so.1.0.0",
+          "/usr/lib64/libz.so.1.3.1.zlib-ng"
+        ],
+        "input_drift": [],
+        "provider_drift": [],
+        "checks": null,
+        "exit": 1,
+        "state": "failed",
+        "error": "AssertionError()",
+        "finished": 1795666996.2709808
+      }
+    }
+  },
+  "allocation_layout": {
+    "old_source": "8c3b9aea",
+    "compact_source": "7a06dbe5",
+    "scope": "Original whole TU syntax-only GCC layout query versus actual new Release whole-TU compiler class dump, five actual allocate_shared rebound control-block instantiations; no runtime/RSS saving claim yet",
+    "rows": [
+      {
+        "type": "std::_Sp_counted_ptr_inplace<dome::detail::PersistentSculptIndex<dome::Int3, std::shared_ptr<const dome::SurfaceTile>, dome::detail::{anonymous}::KernelIndexTraits>::Node, dome::detail::{anonymous}::Work::NodeAllocator<dome::detail::PersistentSculptIndex<dome::Int3, std::shared_ptr<const dome::SurfaceTile>, dome::detail::{anonymous}::KernelIndexTraits>::Node>, __gnu_cxx::_S_atomic>",
+        "old_allocation_bytes": 160,
+        "compact_allocation_bytes": 152,
+        "saved_bytes": 8
+      },
+      {
+        "type": "std::_Sp_counted_ptr_inplace<dome::detail::PersistentSculptIndex<dome::SurfaceEdge, dome::detail::{anonymous}::EdgeRecord, dome::detail::{anonymous}::KernelIndexTraits>::Node, dome::detail::{anonymous}::Work::NodeAllocator<dome::detail::PersistentSculptIndex<dome::SurfaceEdge, dome::detail::{anonymous}::EdgeRecord, dome::detail::{anonymous}::KernelIndexTraits>::Node>, __gnu_cxx::_S_atomic>",
+        "old_allocation_bytes": 216,
+        "compact_allocation_bytes": 208,
+        "saved_bytes": 8
+      },
+      {
+        "type": "std::_Sp_counted_ptr_inplace<dome::detail::PersistentSculptIndex<dome::detail::{anonymous}::PositionRequest, dome::detail::{anonymous}::EdgeRecord, dome::detail::{anonymous}::KernelIndexTraits>::Node, dome::detail::{anonymous}::Work::NodeAllocator<dome::detail::PersistentSculptIndex<dome::detail::{anonymous}::PositionRequest, dome::detail::{anonymous}::EdgeRecord, dome::detail::{anonymous}::KernelIndexTraits>::Node>, __gnu_cxx::_S_atomic>",
+        "old_allocation_bytes": 248,
+        "compact_allocation_bytes": 240,
+        "saved_bytes": 8
+      },
+      {
+        "type": "std::_Sp_counted_ptr_inplace<dome::detail::PersistentSculptIndex<dome::Int3, dome::detail::SculptSurfaceRun, dome::detail::{anonymous}::KernelIndexTraits>::Node, dome::detail::{anonymous}::Work::NodeAllocator<dome::detail::PersistentSculptIndex<dome::Int3, dome::detail::SculptSurfaceRun, dome::detail::{anonymous}::KernelIndexTraits>::Node>, __gnu_cxx::_S_atomic>",
+        "old_allocation_bytes": 200,
+        "compact_allocation_bytes": 192,
+        "saved_bytes": 8
+      },
+      {
+        "type": "std::_Sp_counted_ptr_inplace<dome::detail::PersistentSculptIndex<dome::Int3, std::shared_ptr<const dome::detail::SculptSurfaceChunk>, dome::detail::{anonymous}::KernelIndexTraits>::Node, dome::detail::{anonymous}::Work::NodeAllocator<dome::detail::PersistentSculptIndex<dome::Int3, std::shared_ptr<const dome::detail::SculptSurfaceChunk>, dome::detail::{anonymous}::KernelIndexTraits>::Node>, __gnu_cxx::_S_atomic>",
+        "old_allocation_bytes": 160,
+        "compact_allocation_bytes": 152,
+        "saved_bytes": 8
+      }
+    ],
+    "layout_authorities": {
+      "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/original-layout.class": "639d44b6df4e9a57b19c1aa11560f9b27bdf23bb59687997e86193036492c5ce",
+      "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/source-layout.class": "cf246bea13fcaa655116a9d0b7463616728be60c88c3ee7af5eb9bd66f51b8a6"
+    },
+    "strict_actual_class_dump": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/source-layout.class",
+      "sha256": "bfab01966d69cf1abb2d521de0b2473bdb4863bbddc80c554a6cf064a39de547",
+      "all_five_layouts_match_actual_Release": true
+    }
+  },
+  "native_projects": [
+    {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/native-cpu-v1/workflow/accepted.dsculpt",
+      "size": 50061799,
+      "sha256": "d32c725a02d3d9291f3208c879f78ecc343c33511de9e10b5c18d93bb95fd694"
+    },
+    {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/native-cpu-v1/workflow/recovery/1e3212b8bbaa7884031a0860bb38cbb2-39fcad4fa47a83fa28a1c29a713d853f.dsculpt",
+      "size": 50061799,
+      "sha256": "d32c725a02d3d9291f3208c879f78ecc343c33511de9e10b5c18d93bb95fd694"
+    },
+    {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/native-cpu-v1/workflow/recovery/07f62a253a8cdf5e423f4769e5cc9426-2c7c5e4de1d762173e76647ddba11992.dsculpt",
+      "size": 50061799,
+      "sha256": "d32c725a02d3d9291f3208c879f78ecc343c33511de9e10b5c18d93bb95fd694"
+    },
+    {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/native-cpu-v1/workflow/accepted.dsculpt",
+      "size": 50061799,
+      "sha256": "d32c725a02d3d9291f3208c879f78ecc343c33511de9e10b5c18d93bb95fd694"
+    },
+    {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/native-cpu-v1/workflow/recovery/7333c8a1d857ad3b309af7ddd3107d8c-0a16745edbefba662cd1bb020e076dac.dsculpt",
+      "size": 50061799,
+      "sha256": "d32c725a02d3d9291f3208c879f78ecc343c33511de9e10b5c18d93bb95fd694"
+    },
+    {
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/native-cpu-v1/workflow/recovery/e4fc751de3ba3abf5477a37fdd9d28f3-ec21c362d1a77783130e747b70b145f7.dsculpt",
+      "size": 50061799,
+      "sha256": "d32c725a02d3d9291f3208c879f78ecc343c33511de9e10b5c18d93bb95fd694"
+    }
+  ],
+  "native_payload_reference": {
+    "proof_commit": "9cc18990",
+    "archive_sha256": "b649ca2be7dd656d1d1bce902594abd08619cdd6414df9c88e9cc98e83226b62",
+    "member": "native-projects/d32c725a02d3d9291f3208c879f78ecc343c33511de9e10b5c18d93bb95fd694.dsculpt"
+  },
+  "authorities": [
+    {
+      "name": "artifacts/sculpt-index-compact-release-20261126/0.prospective.d",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/0.prospective.d",
+      "sha256": "e84517b37adda8ed1b85717983051845ef1a6cf23fe4ef8f69445148a3b57dd8",
+      "size": 13831
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-release-20261126/actual-core-owners.json",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/actual-core-owners.json",
+      "sha256": "ef044a4cb604481bfc36f70f96c6e65778beef8324e8a0ecc19ef69dcc8d3f47",
+      "size": 104739
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-release-20261126/allocation-layout-comparison.json",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/allocation-layout-comparison.json",
+      "sha256": "99cf78ff74f986ab94f72a793801df44c369d46c906b9ddba12a40358a6d73bc",
+      "size": 3588
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-release-20261126/archive.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/archive.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-release-20261126/before-input-pins.json",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/before-input-pins.json",
+      "sha256": "d603f1180a03fce946621770cc686bc7d9609f3384a907075421438dd65106de",
+      "size": 368452
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-release-20261126/build.py",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/build.py",
+      "sha256": "c756dd7bdd55a3c79a8a6bb3ddf633b391120bcd9f6992afadd33849e83ae822",
+      "size": 6667
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-release-20261126/commands.json",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/commands.json",
+      "sha256": "bebffd02620bbadb8813ceb0aca265d2fb01f148caf4a0ce1fcaad6f00bbb3f2",
+      "size": 11739
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-release-20261126/compile-0.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/compile-0.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-release-20261126/dome-sculpt-sculpt-chunk-pipeline-test.dynamic.txt",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/dome-sculpt-sculpt-chunk-pipeline-test.dynamic.txt",
+      "sha256": "117346b81ba6101e1ef05475df78ee4a5809d7191d3108f3ca1fd07e9b10cf7a",
+      "size": 2469
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-release-20261126/dome-sculpt-sculpt-chunk-pipeline-test.link.d",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/dome-sculpt-sculpt-chunk-pipeline-test.link.d",
+      "sha256": "6988526a5f6b45f714f50a4d28a6bfb5c7fcde4b41046433aeb0426d7534c86d",
+      "size": 8943
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-release-20261126/dome-sculpt-sculpt-independent-workflow.dynamic.txt",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/dome-sculpt-sculpt-independent-workflow.dynamic.txt",
+      "sha256": "1378c5715b189b5466372e0b184dbc85742e7cf48b33a5f0a903d680ad701238",
+      "size": 2469
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-release-20261126/dome-sculpt-sculpt-independent-workflow.link.d",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/dome-sculpt-sculpt-independent-workflow.link.d",
+      "sha256": "f58998fb4be050984404d2dae7ca380767389628dd7d5e718e7b8ea8a77d8712",
+      "size": 8876
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-release-20261126/dome-sculpt-sculpt-surface-chunks-test.dynamic.txt",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/dome-sculpt-sculpt-surface-chunks-test.dynamic.txt",
+      "sha256": "62cc15a76fae7dd8b5066de2b8ef297cccd287699257c9a9f46d10ff4ca784b6",
+      "size": 2460
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-release-20261126/dome-sculpt-sculpt-surface-chunks-test.link.d",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/dome-sculpt-sculpt-surface-chunks-test.link.d",
+      "sha256": "663228b4b23c5b59e3bac9be5d0bbe8a1e41c85a5f244fd3d0b64a97ebbd9d23",
+      "size": 8863
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-release-20261126/dome-sculpt-sculpt-sustained.dynamic.txt",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/dome-sculpt-sculpt-sustained.dynamic.txt",
+      "sha256": "545e6a24865ced20d445eea5c302a245dcb2f2237ae2dbf973a7c039181a4475",
+      "size": 3016
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-release-20261126/dome-sculpt-sculpt-sustained.link.d",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/dome-sculpt-sculpt-sustained.link.d",
+      "sha256": "773c948c83df5a7d71899cceb76e0e1b7a374be9ed17943e806a130de2a6721f",
+      "size": 10239
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-release-20261126/link-0.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/link-0.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-release-20261126/link-1.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/link-1.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-release-20261126/link-2.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/link-2.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-release-20261126/link-3.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/link-3.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-release-20261126/native-cpu-v1/actual-maps-latest.txt",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/native-cpu-v1/actual-maps-latest.txt",
+      "sha256": "fc3ef32667ce54bc5c3c5c71e96087a2882f2191a9da10e88a61ba63b78134b3",
+      "size": 12051
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-release-20261126/native-cpu-v1/actual-maps.txt",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/native-cpu-v1/actual-maps.txt",
+      "sha256": "502c6455888be38841a6e0b8a9483a29b674c6e304e7992b544b18bde8e6ffcb",
+      "size": 11365
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-release-20261126/native-cpu-v1/journal.txt",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/native-cpu-v1/journal.txt",
+      "sha256": "0ef13155d454d79431def01a2413715b709478495ff784eb08d47c3423004e53",
+      "size": 674
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-release-20261126/native-cpu-v1/product.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/native-cpu-v1/product.log",
+      "sha256": "3fea6c88b6383a4d9cd57f519a99b4fe98bca303e564517d28bdebd81c6f71a6",
+      "size": 381
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-release-20261126/native-cpu-v1/provider-before-pins.json",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/native-cpu-v1/provider-before-pins.json",
+      "sha256": "16adffe3d21eeb98a68ae034fb99b6290900ae67b283db029dbe914a6f8fabcc",
+      "size": 2518
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-release-20261126/native-cpu-v1/status.json",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/native-cpu-v1/status.json",
+      "sha256": "dded45f755bd115ce98255b3fef931be938e0d1e1d8b175137bcec674d8a1ccb",
+      "size": 2890
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-release-20261126/native-cpu-v1/unit-close.json",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/native-cpu-v1/unit-close.json",
+      "sha256": "e10b14513cc661a222ac3c97884002cedf959dad5ec6e62889d1b1bb5bfb9a2b",
+      "size": 252
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-release-20261126/native-cpu-v1/unit-terminal.txt",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/native-cpu-v1/unit-terminal.txt",
+      "sha256": "4f4587b60a448c9b9cbaac62796bbdae728ade5d1919eb941bd8e465cc09b668",
+      "size": 7181
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-release-20261126/original-layout-command.json",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/original-layout-command.json",
+      "sha256": "192f0f7e23354d79edb8415cc7bcc3af3db9918c7a426f8000e9763ff8c508fa",
+      "size": 1392
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-release-20261126/original-layout-status.json",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/original-layout-status.json",
+      "sha256": "9face5f1845d9fa96b6daa23b061d435b2b49c794ac3079640f2f6fbe86dc93e",
+      "size": 136
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-release-20261126/original-layout.class",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/original-layout.class",
+      "sha256": "639d44b6df4e9a57b19c1aa11560f9b27bdf23bb59687997e86193036492c5ce",
+      "size": 3121286
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-release-20261126/original-layout.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/original-layout.log",
+      "sha256": "501482339714505415fb247410b2984c04d1b755634f34c545de0e1e7761d531",
+      "size": 5918
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-release-20261126/pipeline-cpu-v1/actual-maps-latest.txt",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/pipeline-cpu-v1/actual-maps-latest.txt",
+      "sha256": "a816c42ac2d30e72922670fcbd5d94c7bfb6154b8a501fd513b7c3b441ab5144",
+      "size": 11508
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-release-20261126/pipeline-cpu-v1/actual-maps.txt",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/pipeline-cpu-v1/actual-maps.txt",
+      "sha256": "2f018363a921c738345be14baa32257129569bcc8a907d4c71826032e52170a6",
+      "size": 11508
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-release-20261126/pipeline-cpu-v1/product.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/pipeline-cpu-v1/product.log",
+      "sha256": "351519a7b76bd86afa9043357287596d2ac1aafe1bfcd2c9870e39aa8ba4b15b",
+      "size": 7701
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-release-20261126/pipeline-cpu-v1/provider-before-pins.json",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/pipeline-cpu-v1/provider-before-pins.json",
+      "sha256": "16adffe3d21eeb98a68ae034fb99b6290900ae67b283db029dbe914a6f8fabcc",
+      "size": 2518
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-release-20261126/pipeline-cpu-v1/status.json",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/pipeline-cpu-v1/status.json",
+      "sha256": "8d925b01a721c4bc091b24d2b915eecc6372bb19b2ff82e8c00031708a57c155",
+      "size": 2695
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-release-20261126/qualified-core-owners.json",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/qualified-core-owners.json",
+      "sha256": "478f2073a6777506bd494610f3828ef61f22f21be9fe11bf2b0cae93543e08ef",
+      "size": 101459
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-release-20261126/ranlib.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/ranlib.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-release-20261126/regression-cohort-status.json",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/regression-cohort-status.json",
+      "sha256": "6b9dcd7392d2ef80b44c897111f3f3832b9ac0c214657d6e8bcb2343994a76ad",
+      "size": 716
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-release-20261126/regression-journal.txt",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/regression-journal.txt",
+      "sha256": "15ff9fe3498a8b244e50ef840dc7b0ffea098acb4a214dd19db5df64d5b22ad0",
+      "size": 669
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-release-20261126/regression-unit-close.json",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/regression-unit-close.json",
+      "sha256": "12854c847bd72cf02efbf16608b35a37a1bb80b01d761e2a244596556ede1b19",
+      "size": 243
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-release-20261126/regression-unit-terminal.txt",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/regression-unit-terminal.txt",
+      "sha256": "1782d92f8e63375933ac101650d8a818c842e10217e03f53a26063224792440e",
+      "size": 7169
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-release-20261126/run-native-cpu.py",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/run-native-cpu.py",
+      "sha256": "c56bd2763492026c640ae66d0893fc7858416b6e2801ebe68e3358ce750dd09d",
+      "size": 6344
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-release-20261126/run-regression-cohort.py",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/run-regression-cohort.py",
+      "sha256": "19df57e6dd10d0d000a0e902b7d9b83e4a0971415397265f8eff8b4337ae88e1",
+      "size": 674
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-release-20261126/run-regression-cpu.py",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/run-regression-cpu.py",
+      "sha256": "9c56869f31ebc691fb1cc93b7e8a790ca5816181ce24edb78d588e42acbbbbc6",
+      "size": 6350
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-release-20261126/runtime-before-input-pins.json",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/runtime-before-input-pins.json",
+      "sha256": "6549c27354df67e7f588db0af8c044826e3366e31035e49eda7275e9d40079fe",
+      "size": 369729
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-release-20261126/scan-0.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/scan-0.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-release-20261126/sculpt-surface-chunks.cpp.o.d",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/sculpt-surface-chunks.cpp.o.d",
+      "sha256": "113c4708dde6d044f0bb8293a927b52b32bdfc788671cc490dae05522b791ad5",
+      "size": 13883
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-release-20261126/seal.py",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/seal.py",
+      "sha256": "3dfc59bfcf3cf1a00a5b15e75bb7cba19e5acfb5c7b0bec4a1f84f9531d4d43d",
+      "size": 2823
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-release-20261126/source-layout.class",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/source-layout.class",
+      "sha256": "cf246bea13fcaa655116a9d0b7463616728be60c88c3ee7af5eb9bd66f51b8a6",
+      "size": 3121638
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-release-20261126/status.json",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/status.json",
+      "sha256": "2f915b34e8c69201ffadef87bf36696546cac7ca1dc21371338f0e0a144e4096",
+      "size": 1042
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-release-20261126/surface-cpu-v1/actual-maps-latest.txt",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/surface-cpu-v1/actual-maps-latest.txt",
+      "sha256": "559ab2ecc980d1b81f4d2c0557a1df9b9b06356137a5690b287d2c4abc47a0f2",
+      "size": 11271
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-release-20261126/surface-cpu-v1/actual-maps.txt",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/surface-cpu-v1/actual-maps.txt",
+      "sha256": "559ab2ecc980d1b81f4d2c0557a1df9b9b06356137a5690b287d2c4abc47a0f2",
+      "size": 11271
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-release-20261126/surface-cpu-v1/product.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/surface-cpu-v1/product.log",
+      "sha256": "ebf78e916610192f405486b582e0ca5ab78b363141f709602c669e9a6ba4b101",
+      "size": 1954
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-release-20261126/surface-cpu-v1/provider-before-pins.json",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/surface-cpu-v1/provider-before-pins.json",
+      "sha256": "16adffe3d21eeb98a68ae034fb99b6290900ae67b283db029dbe914a6f8fabcc",
+      "size": 2518
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-release-20261126/surface-cpu-v1/status.json",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-release-20261126/surface-cpu-v1/status.json",
+      "sha256": "9b672c335d6baaec23537b2822ddded8503f45265166f9eea5ce67711397e94a",
+      "size": 2586
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-sanitize-20261126/0.prospective.d",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/0.prospective.d",
+      "sha256": "e84517b37adda8ed1b85717983051845ef1a6cf23fe4ef8f69445148a3b57dd8",
+      "size": 13831
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-sanitize-20261126/actual-core-owners.json",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/actual-core-owners.json",
+      "sha256": "a2eb3b195da45ed3e7b5d70e16d5c475387d19b9aae6cf86089aac516bedad36",
+      "size": 104759
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-sanitize-20261126/archive.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/archive.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-sanitize-20261126/before-input-pins.json",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/before-input-pins.json",
+      "sha256": "d386f00bdbd1b3faac319fb02947c0179723dab93fcc58344bec71a912effa00",
+      "size": 395104
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-sanitize-20261126/build.py",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/build.py",
+      "sha256": "c756dd7bdd55a3c79a8a6bb3ddf633b391120bcd9f6992afadd33849e83ae822",
+      "size": 6667
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-sanitize-20261126/commands.json",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/commands.json",
+      "sha256": "f3e0d127ca6baac5b293c977bae19c38d2b758f22a20fba80e760723c7e83cdf",
+      "size": 12178
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-sanitize-20261126/compile-0.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/compile-0.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-sanitize-20261126/dome-sculpt-sculpt-chunk-pipeline-test.dynamic.txt",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/dome-sculpt-sculpt-chunk-pipeline-test.dynamic.txt",
+      "sha256": "09b85a1b7d6e5faa3236b4f4f44d1f5022a5bc0597c29fa2eee6d661751e0fc6",
+      "size": 2730
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-sanitize-20261126/dome-sculpt-sculpt-chunk-pipeline-test.link.d",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/dome-sculpt-sculpt-chunk-pipeline-test.link.d",
+      "sha256": "02ce6af7d927d44aa3e2e822b4d3fec817066d9e5470c7965fd6aa10b858528e",
+      "size": 9794
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-sanitize-20261126/dome-sculpt-sculpt-independent-workflow.dynamic.txt",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/dome-sculpt-sculpt-independent-workflow.dynamic.txt",
+      "sha256": "0e6b002ab5dbcc74f8a90f623583922f1b645471c604bc1006ef6c945d96b5b7",
+      "size": 2730
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-sanitize-20261126/dome-sculpt-sculpt-independent-workflow.link.d",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/dome-sculpt-sculpt-independent-workflow.link.d",
+      "sha256": "054f68be30b684e322c526a16239cf04a64fa54fbd0f09c41acb011039683194",
+      "size": 9727
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-sanitize-20261126/dome-sculpt-sculpt-surface-chunks-test.dynamic.txt",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/dome-sculpt-sculpt-surface-chunks-test.dynamic.txt",
+      "sha256": "a79acbcf384c12800573d0b1d3b2ba54b54b1df597464a32a21b71ad8ccad72b",
+      "size": 2710
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-sanitize-20261126/dome-sculpt-sculpt-surface-chunks-test.link.d",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/dome-sculpt-sculpt-surface-chunks-test.link.d",
+      "sha256": "2a863817cc217ce368f8c8da5132b67bd880150bcf871cf5d8fbb625e3785e6a",
+      "size": 9714
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-sanitize-20261126/dome-sculpt-sculpt-sustained.dynamic.txt",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/dome-sculpt-sculpt-sustained.dynamic.txt",
+      "sha256": "205ebeaa835d254f7a6536437291203b5aaf38c574a313b5852ae01c41a94557",
+      "size": 3269
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-sanitize-20261126/dome-sculpt-sculpt-sustained.link.d",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/dome-sculpt-sculpt-sustained.link.d",
+      "sha256": "0cd3f4c74b6c952dac50881560e692fc81a684908317640dd53d5e288d7a5c54",
+      "size": 11090
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-sanitize-20261126/link-0.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/link-0.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-sanitize-20261126/link-1.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/link-1.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-sanitize-20261126/link-2.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/link-2.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-sanitize-20261126/link-3.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/link-3.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-sanitize-20261126/native-cpu-v1/actual-maps-latest.txt",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/native-cpu-v1/actual-maps-latest.txt",
+      "sha256": "128fbab5875af2aa8f026540ddf68c0f2f09d69a50e218a063c058071617c040",
+      "size": 25758
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-sanitize-20261126/native-cpu-v1/actual-maps.txt",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/native-cpu-v1/actual-maps.txt",
+      "sha256": "48b8274b736dc2f77aac732731df9229da510b929279dfb1bde61bd4db360c2b",
+      "size": 15909
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-sanitize-20261126/native-cpu-v1/journal.txt",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/native-cpu-v1/journal.txt",
+      "sha256": "a3bb57faeca8f06f6ed62af8740fe517d3b94b1a05af2bdf508cf011901cfa67",
+      "size": 976
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-sanitize-20261126/native-cpu-v1/product.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/native-cpu-v1/product.log",
+      "sha256": "bf27e1618af43a5d5a82b38b438c2cc4c89d92694f471640b279f7291718c740",
+      "size": 187
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-sanitize-20261126/native-cpu-v1/provider-before-pins.json",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/native-cpu-v1/provider-before-pins.json",
+      "sha256": "cd5741c7f785499f2fd8127b26ed013725215187ce098dfd22b6948c7c693bbc",
+      "size": 2721
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-sanitize-20261126/native-cpu-v1/status.json",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/native-cpu-v1/status.json",
+      "sha256": "9586b01cbfc6aee07ddaa2381d5363baaa5845683a23a24ee352cbfb572b5623",
+      "size": 3171
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-sanitize-20261126/native-cpu-v1/unit-close.json",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/native-cpu-v1/unit-close.json",
+      "sha256": "13ead6c485212e27b89a8a26202caf55a8d33d9887304cdcfb3b20487c2cae48",
+      "size": 107
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-sanitize-20261126/native-cpu-v1/unit-terminal.txt",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/native-cpu-v1/unit-terminal.txt",
+      "sha256": "3fa2548b7de395603ff0052142a01ef76928c6279cfc0b8ca7038532cbbd61d8",
+      "size": 8762
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-sanitize-20261126/pipeline-cpu-v1/actual-maps-latest.txt",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/pipeline-cpu-v1/actual-maps-latest.txt",
+      "sha256": "5c85b61a792513ee72e1230f19d1f4bc367f99e26eb2564d34df865c265012f8",
+      "size": 23108
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-sanitize-20261126/pipeline-cpu-v1/actual-maps.txt",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/pipeline-cpu-v1/actual-maps.txt",
+      "sha256": "7baa16999f6584ae3c8c7d72f48b898984c3d758e4d3d4ff2bec7da51ec79709",
+      "size": 15954
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-sanitize-20261126/pipeline-cpu-v1/product.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/pipeline-cpu-v1/product.log",
+      "sha256": "351519a7b76bd86afa9043357287596d2ac1aafe1bfcd2c9870e39aa8ba4b15b",
+      "size": 7701
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-sanitize-20261126/pipeline-cpu-v1/provider-before-pins.json",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/pipeline-cpu-v1/provider-before-pins.json",
+      "sha256": "50c9bd7960a514b0690fada1f3467dacd50c7f28e7c3fe2090647e873333aeee",
+      "size": 2721
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-sanitize-20261126/pipeline-cpu-v1/status.json",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/pipeline-cpu-v1/status.json",
+      "sha256": "8b1c10d205a76ca01088c257afbc0e12431066bfb67ce8f8bb740e6dfcd7fa0f",
+      "size": 2915
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-sanitize-20261126/qualified-core-owners.json",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/qualified-core-owners.json",
+      "sha256": "e6db08bc3f5a1764e20ce7fa43d04b41bdb8d587f5e6aa37512ceebb95bbfe1c",
+      "size": 101477
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-sanitize-20261126/ranlib.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/ranlib.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-sanitize-20261126/run-native-cpu.py",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/run-native-cpu.py",
+      "sha256": "f93bcba16ca8a1ff92b08a10d57c916645e7a741ed1682d82905d6822b4e1398",
+      "size": 7426
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-sanitize-20261126/run-regression-cpu.py",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/run-regression-cpu.py",
+      "sha256": "50dffc0836bc9e3d2cd3dfea312f0a9c060d0ddcfa2c3973ca92e1a7b58a4b20",
+      "size": 7425
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-sanitize-20261126/runtime-before-input-pins.json",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/runtime-before-input-pins.json",
+      "sha256": "caa22f0e35bc4aca2211b701a715465199d5e1adb1ebb9410bb0928c429f096e",
+      "size": 396388
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-sanitize-20261126/scan-0.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/scan-0.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-sanitize-20261126/sculpt-surface-chunks.cpp.o.d",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/sculpt-surface-chunks.cpp.o.d",
+      "sha256": "113c4708dde6d044f0bb8293a927b52b32bdfc788671cc490dae05522b791ad5",
+      "size": 13883
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-sanitize-20261126/source-layout.class",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/source-layout.class",
+      "sha256": "bfab01966d69cf1abb2d521de0b2473bdb4863bbddc80c554a6cf064a39de547",
+      "size": 3121638
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-sanitize-20261126/status.json",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/status.json",
+      "sha256": "9491b0f88a51757eefd0b4d09e883497a66e07d642c0b5b4331b1748d3742686",
+      "size": 1043
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-sanitize-20261126/surface-cpu-v1/actual-maps-latest.txt",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/surface-cpu-v1/actual-maps-latest.txt",
+      "sha256": "1680b3d24fdc4aa69bad33ae6f8ec4e533f08aa744e434eacc323b1c8437385c",
+      "size": 21638
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-sanitize-20261126/surface-cpu-v1/actual-maps.txt",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/surface-cpu-v1/actual-maps.txt",
+      "sha256": "5eb232899271ed7df2ffa9322ba15cf7909bca9db23b6c5615741dae42a34039",
+      "size": 16885
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-sanitize-20261126/surface-cpu-v1/product.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/surface-cpu-v1/product.log",
+      "sha256": "ebf78e916610192f405486b582e0ca5ab78b363141f709602c669e9a6ba4b101",
+      "size": 1954
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-sanitize-20261126/surface-cpu-v1/provider-before-pins.json",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/surface-cpu-v1/provider-before-pins.json",
+      "sha256": "50c9bd7960a514b0690fada1f3467dacd50c7f28e7c3fe2090647e873333aeee",
+      "size": 2721
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-sanitize-20261126/surface-cpu-v1/status.json",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-sanitize-20261126/surface-cpu-v1/status.json",
+      "sha256": "033a0517f8c380e6c3f7e16bd089a0bd3d923c0929a235d4b3bfb41700bd03f8",
+      "size": 2804
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-source-20261126/docs/SCULPT-INDEX-ALLOCATION-LIFETIME.md",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-source-20261126/docs/SCULPT-INDEX-ALLOCATION-LIFETIME.md",
+      "sha256": "f3acefa89bb2d4468ca34bfbe3bef76b3fafa3209eafac7991362179e6e51373",
+      "size": 2761
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-source-20261126/src/sculpt-chunk-index.hpp",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-source-20261126/src/sculpt-chunk-index.hpp",
+      "sha256": "6e9db9ac1779286d23a4c30406185179cb5fa14f6293515cf94c1ab30619ee5d",
+      "size": 6152
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-source-20261126/src/sculpt-surface-chunks.cpp",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-source-20261126/src/sculpt-surface-chunks.cpp",
+      "sha256": "5afebd7a4ce939943b46244d4bf26ad8863f385746bea0c68f2d83d685854699",
+      "size": 46243
+    },
+    {
+      "name": "artifacts/sculpt-index-compact-source-20261126/tests/sculpt-surface-chunks.cpp",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-index-compact-source-20261126/tests/sculpt-surface-chunks.cpp",
+      "sha256": "6899dc27f0e3c46333081e816b6be54e0a17409f2b5e04b758aaf9bcb6cc8d86",
+      "size": 9076
+    }
+  ],
+  "archive": {
+    "name": "sculpt-index-compact-20261126.tar.xz",
+    "bytes": 365492,
+    "sha256": "1ac3f5a7f0c73cc41655dc04e646f33ad85e66919f135d93c832f4d1c54beb0c",
+    "members": 108
+  }
+}
