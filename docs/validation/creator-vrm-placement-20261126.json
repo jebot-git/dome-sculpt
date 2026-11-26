@@ -301,10 +301,73 @@
       "passed": 74,
       "failed": 12,
       "skipped": 0
+    },
+    "result": {
+      "parent": {
+        "passed": 74,
+        "failed": 12,
+        "skipped": 0
+      },
+      "current": {
+        "passed": 76,
+        "failed": 10,
+        "skipped": 0
+      },
+      "recovered": [
+        "bone-length-creator-basis",
+        "source-native-hints"
+      ],
+      "new_failures": [],
+      "remaining_nonpasses": [
+        "document-export",
+        "native-paint-sampling-transitions",
+        "normal-preparation-native",
+        "pbr-preview",
+        "polygon-scene-archive",
+        "polygon-surface-paint-private-codec",
+        "source-color-vrm",
+        "vrm",
+        "vrm-role-consumer",
+        "vrm1-expressions"
+      ],
+      "ctest_exit": 8,
+      "artifacts_sha256": {
+        "artifacts/filtered-normal-authoring-release-20261126/combined-regression/ctest.xml": "2b20231ee6651985f1956d992f6509c27213ec385591b6ef29b54beb0d313ea7",
+        "artifacts/creator-vrm-placement-release-20261126/combined-regression/ctest.xml": "5110a6d442c0b581ffb729aa4e46564ddbbc3ee77338f06819bfe28681ab7b21",
+        "artifacts/creator-vrm-placement-release-20261126/combined-regression/ctest.log": "8dddc1121b670cb5717d5794a7b31ee598fbb56f03415d8d0f9391fd4d453906",
+        "artifacts/creator-vrm-placement-release-20261126/combined-regression/status.json": "38a851eed1a1230983c888d302e1ce315d5c6b1034bbc8ebfc7edbfdb885f768"
+      }
     }
   },
   "limits": [
     "Common affine placement preserves emitted rig, skin, first-person and spring metadata. Dynamic external spring simulation remains unverified.",
     "Nonlinear spring refitting requires positive similarity placement. Divergent parts cannot share the emitted rig."
-  ]
+  ],
+  "groom_worker_fixture": {
+    "fixture_commit": "62e7b6eccaa6fa0c142e3a8c58e834f088406948",
+    "branch": "work/document-groom-export-regression-20261126",
+    "production_commit": "adb805a47638d07a9338775b99bdba26f1edb6e7",
+    "fixture_sha256": "7f85941d572ded95379efc8c320bd04a7987df85961f65445e49b6f547fd64fe",
+    "workflow": "Worker exports the genuine generated groom and preserves the existing VRM and scene if the generated material fails export policy.",
+    "runs": {
+      "release": {
+        "invocation": "946918ffe46d4b7d83c97ffad9d3b2b9",
+        "checks": 30,
+        "exit": 0,
+        "archives_verified": 11,
+        "runtime_log_sha256": "24228ec1077f2e696e246c39790321834c1ab2a991dd47b6398fcb1a1e50c3ad",
+        "receipt": "artifacts/document-groom-export-regression-release-20261126/receipt.json",
+        "receipt_sha256": "a0c27c7c82ea6d5fe181f1e3eb8a0375087f113d942d697824f0e44d9c18de4d"
+      },
+      "strict": {
+        "invocation": "4f3c49ed57c14deeafc5def6965d17e2",
+        "checks": 30,
+        "exit": 0,
+        "archives_verified": 11,
+        "runtime_log_sha256": "24228ec1077f2e696e246c39790321834c1ab2a991dd47b6398fcb1a1e50c3ad",
+        "receipt": "artifacts/document-groom-export-regression-strict-20261126/receipt.json",
+        "receipt_sha256": "bfa2e4709cd5ee1963194e412c22b93e5b646ff3acbdb2e0dabcb3690894bd05"
+      }
+    }
+  }
 }

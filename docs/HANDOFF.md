@@ -479,8 +479,18 @@ Both placement regressions also pass the fresh headless ASan/UBSan build with
 leak detection. All eighteen matching VRM outputs are byte-identical between
 the Release and sanitizer runs.
 
-The code is on `work/creator-vrm-placement-20261126`. The 86-case replay on
-that exact source is tracked by `ds-creator-vrm-placement-regressions-20261126.service`.
+The 86-case Release replay on exact `adb805a4` finished with 76 passes,
+10 failures and zero skips. Both creator placement cases recovered and every
+previous pass held. Logs and the case-by-case comparison are under
+`artifacts/creator-vrm-placement-release-20261126/combined-regression/`.
+
+Test-only follow-up `62e7b6ec` replaces the obsolete generated-part rejection
+in `document-export` with a worker export of all 20 meshes on one skin. The
+independent reader confirms the generated groom's textured unlit material.
+An unsupported emissive groom still fails and leaves the previous VRM and
+native scene byte-exact. The updated fixture passes 30 checks per Release and
+strict run against the unchanged `adb805a4` archives. The original 86-case
+result retains its `document-export` failure.
 See [the validation receipt](validation/creator-vrm-placement-20261126.json).
 
 ## Source and integration boundary
