@@ -3121,8 +3121,12 @@ void Document::control_event_locked(VrControlEvent event) {
 bool Document::command_enabled_locked(SpatialCommand command) const {
   if(creator_command(command)||state_.creator)return creator_command_enabled_locked(command);
   if(command==SpatialCommand::BlurColorLayer){
-    const auto&o=scene_.active();const auto field=o.painted?active_texture_set(o):TextureSetView{};
-    return !state_.asset_busy&&!state_.recovery_busy&&!control_before_&&!action_active_locked()&&!state_.polygon&&!state_.cut&&!state_.retopology&&!state_.expressions&&!state_.object_grabbing&&!uv_&&object_editable_locked(o.id)&&o.mesh_active&&field.painted&&field.painted->gpu_color_blur_eligible();
+    const auto &object=scene_.active();
+    if(!object.mesh_active||!object.painted)return false;
+    return !state_.asset_busy&&!state_.recovery_busy&&!control_before_&&
+        !action_active_locked()&&!state_.polygon&&!state_.cut&&!state_.retopology&&
+        !state_.expressions&&!state_.object_grabbing&&!uv_&&
+        object_editable_locked(object.id)&&active_texture_set(object).painted->gpu_color_blur_eligible();
   }
   if(texture_set_command(command))return texture_set_command_enabled_locked(command);
   if(expression_command(command))return expression_command_enabled_locked(command);

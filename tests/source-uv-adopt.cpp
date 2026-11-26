@@ -78,6 +78,8 @@ int main()try {
     document.paint_command(SpatialCommand::EditSource);auto volume_mode=document.copy_scene().encode();
     check(source_is_dormant(document.copy_scene().active()) && volume_mode["version"]==8,
           "Native source-mode command keeps complete immutable material and deformation data dormant");
+    check(!document.frame().state->can_blur_color_layer,
+          "Dormant paint leaves color blur unavailable in sculpt mode");
     check(document.undo() && document.copy_scene().encode()==before_mode,
           "One global Undo restores the exact original mesh, source roles, paint and deformation together");
     check(document.redo() && document.copy_scene().encode()==volume_mode,
