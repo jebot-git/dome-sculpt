@@ -119,18 +119,28 @@ float radical_inverse(uint32_t n) {
   n=((n&0x33333333u)<<2)|((n&0xccccccccu)>>2); n=((n&0x0f0f0f0fu)<<4)|((n&0xf0f0f0f0u)>>4);
   n=((n&0x00ff00ffu)<<8)|((n&0xff00ff00u)>>8); return float(double(n)/4294967296.0);
 }
-float ambient(const SurfaceQuery &query, Vec3 position, Vec3 normal, const BakeOptions &o, BakeResult &result) {
-  if (!o.ao_samples) return 1;
-  auto tangent=normalized(cross(std::abs(normal.x)<.8f?Vec3{1,0,0}:Vec3{0,1,0},normal));
-  auto bitangent=cross(normal,tangent); uint32_t blocked=0;
-  for (uint32_t i=0;i<o.ao_samples;++i) {
-    if (!(i%16)) cancel(o);
-    float u=(i+.5f)/o.ao_samples, angle=radical_inverse(i)*2*Pi;
-    auto direction=tangent*(std::sqrt(u)*std::cos(angle))+bitangent*(std::sqrt(u)*std::sin(angle))+normal*std::sqrt(1-u);
-    if (++result.rays>o.max_rays) throw std::length_error("Bake ray budget exceeded");
-    blocked+=query.raycast(position+normal*o.ray_bias,direction,o.ao_distance).has_value();
+std::array<Vec3,256> ambient_pattern(uint32_t count) {
+  std::array<Vec3,256> directions{};
+  for(uint32_t i=0;i<count;++i){
+    const float u=(i+.5f)/count,angle=radical_inverse(i)*2*Pi;
+    const float radius=std::sqrt(u);
+    directions[i]={radius*std::cos(angle),radius*std::sin(angle),std::sqrt(1-u)};
   }
-  return 1-float(blocked)/o.ao_samples;
+  return directions;
+}
+float ambient(const SurfaceQuery &query, Vec3 position, Vec3 normal,
+    std::span<const Vec3> pattern,const BakeOptions &o,BakeResult &result) {
+  auto tangent=normalized(cross(std::abs(normal.x)<.8f?Vec3{1,0,0}:Vec3{0,1,0},normal));
+  const auto bitangent=cross(normal,tangent),origin=position+normal*o.ray_bias;
+  uint32_t blocked=0;
+  for(size_t i=0;i<pattern.size();++i){
+    if (!(i%16)) cancel(o);
+    const auto sample=pattern[i];
+    const auto direction=tangent*sample.x+bitangent*sample.y+normal*sample.z;
+    if (++result.rays>o.max_rays) throw std::length_error("Bake ray budget exceeded");
+    blocked+=query.raycast(origin,direction,o.ao_distance).has_value();
+  }
+  return 1-float(blocked)/pattern.size();
 }
 double edge(std::array<float,2> a,std::array<float,2> b,std::array<float,2> p) {
   return (double(b[0])-a[0])*(double(p[1])-a[1])-(double(b[1])-a[1])*(double(p[0])-a[0]);
@@ -156,7 +166,7 @@ void validate(const Mesh &low,const BakeSource &source,const BakeOptions &o,
   if (low.uv.size()!=low.positions.size()) throw std::invalid_argument("Baking requires low-mesh UV coordinates");
   for (auto uv:low.uv) if (uv[0]<0||uv[0]>1||uv[1]<0||uv[1]>1) throw std::invalid_argument("Low UVs must fit the unit texture tile");
   if (o.resolution<8||o.resolution>4096||uint64_t(o.resolution)*o.resolution>o.max_texels||o.max_texels>16'777'216||
-      o.padding>64||o.ao_samples>256||!o.max_rays||o.max_rays>1'000'000'000||!o.max_raster_samples||o.max_raster_samples>1'000'000'000||
+      o.padding>64||o.ao_samples>256||!o.max_rays||o.max_rays>detail::bake_ray_limit||!o.max_raster_samples||o.max_raster_samples>1'000'000'000||
       !std::isfinite(o.front_distance)||!std::isfinite(o.back_distance)||o.front_distance<0||o.back_distance<0||
       o.front_distance+o.back_distance<=0||o.front_distance+o.back_distance>100||
       !std::isfinite(o.ray_bias)||o.ray_bias<=0||o.ray_bias>.1f||
@@ -341,6 +351,8 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
       throw std::length_error("FLOAT Bake retained channels exceed unchanged paint budget");
   }
   const bool ray_projection=!corresponding_topology&&o.source_triangles.empty();
+  const auto ambient_directions=ambient_pattern(o.ao_samples);
+  const auto ambient_samples=std::span(ambient_directions).first(o.ao_samples);
   std::optional<SurfaceQuery> query;
   if(!corresponding_topology||o.ao_samples)
     query.emplace(source.mesh,o.cancelled);
@@ -555,8 +567,8 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
       }else mapped=frame.to_tangent(high_normal);
       if (o.normal_y_down) mapped.y=-mapped.y;
       float ao=channels.ao;
-      if(query)
-        ao*=ambient(*query,hit->position,normalized(hit->normal),o,result);
+      if(!ambient_samples.empty())
+        ao*=ambient(*query,hit->position,normalized(hit->normal),ambient_samples,o,result);
       for (int c=0;c<3;++c) {
         result.maps.color.rgba[at*4+c]=byte(linear_to_srgb(channels.color[c]));
         if(!float_emission)result.maps.emission.rgba[at*4+c]=byte(linear_to_srgb(channels.emission[c]));

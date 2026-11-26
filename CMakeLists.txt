@@ -209,6 +209,9 @@ if(BUILD_TESTING)
   add_test(NAME native-writable-bake-2048
     COMMAND dome-sculpt-source-writable-normal-bake-test --dense-retained ${CMAKE_CURRENT_BINARY_DIR}/native-writable-bake-2048)
   set_tests_properties(native-writable-bake-2048 PROPERTIES TIMEOUT 480)
+  add_test(NAME native-writable-default-ao-2048
+    COMMAND dome-sculpt-source-writable-normal-bake-test --dense-default-ao ${CMAKE_CURRENT_BINARY_DIR}/native-writable-default-ao-2048)
+  set_tests_properties(native-writable-default-ao-2048 PROPERTIES TIMEOUT 480)
   # Additive native producer; public GUI/XR execution is an explicit owning gate.
   add_executable(dome-sculpt-source8-public-fixture tests/source8-public-fixture.cpp)
   target_include_directories(dome-sculpt-source8-public-fixture PRIVATE src)

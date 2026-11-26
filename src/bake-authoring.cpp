@@ -7,6 +7,7 @@
 #include "cut-color.hpp"
 #include "bake-canonical-frame.hpp"
 #include "bake-cage.hpp"
+#include "bake-ray-query.hpp"
 #include "polygon-color-preparation.hpp"
 #include "dome/source-placement.hpp"
 #include "dome/normal-preparation.hpp"
@@ -560,6 +561,16 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
       retained_recipient->model()==detail::PolygonSurfaceNormalModel::NativeNOnly;
   const bool split_recipient=retained_recipient&&!native_recipient&&
       low_mesh.uv!=retained_recipient->normal_coordinates();
+  // A pass visits each writable texel at most once. Mapped triangles need
+  // no projection ray. The extra normal-coordinate pass does not write AO.
+  const bool separate_normal_pass=retained_uv||split_recipient;
+  const uint64_t projection_rays=!settings.corresponding_topology;
+  const uint64_t rays_per_texel=uint64_t(options.ao_samples)+projection_rays+
+      (separate_normal_pass?projection_rays:0);
+  // Keep a nonzero valid allowance if a matching normal-only second pass
+  // follows a primary pass that uses the complete projected AO budget.
+  const uint64_t sufficient_rays=uint64_t(options.resolution)*options.resolution*rays_per_texel+1;
+  options.max_rays=std::max(options.max_rays,std::min(sufficient_rays,detail::bake_ray_limit));
   const auto target_triangles=recipient?recipient->domain->triangles():std::span<const uint32_t>{};
   const auto encode_retained=[&](BakeOptions &options){
     const auto world=target_placement?target_placement->world():AffineTransform{};
@@ -576,7 +587,7 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
     };
   };
   if(retained_recipient&&!split_recipient)encode_retained(options);
-  if((retained_uv||split_recipient)&&progress)options.progress=[&](float value){progress(.1f+.4f*value);};
+  if(separate_normal_pass&&progress)options.progress=[&](float value){progress(.1f+.4f*value);};
   auto result = native_attributes?detail::bake_mesh_native_attributes(low_mesh,high,options,
       source_normals,source_fields,source_placement,target_metric_corners,settings.corresponding_topology):
       detail::bake_mesh_source_normals(low_mesh,high,options,source_normals,
@@ -585,6 +596,7 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   std::optional<BakeResult> retained_normal_write;
   if(split_recipient){
     auto normal_options=options;
+    normal_options.ao_samples=0;
     if(result.rays>=options.max_rays||result.raster_samples>=options.max_raster_samples)
       throw std::length_error("Retained texture-set normal bake lacks aggregate projection/raster budget");
     normal_options.max_rays-=result.rays;
@@ -609,6 +621,7 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
     for(size_t c=0;c<normal_low.uv.size();++c){if((c&1023)==0)check();
       normal_low.uv[c]=retained_uv->coordinates().at(target.painted->mesh().indices[c]);}
     auto normal_options=options;
+    normal_options.ao_samples=0;
     if(result.rays>=options.max_rays||result.raster_samples>=options.max_raster_samples)
       throw std::length_error("Retained normal rebake lacks aggregate projection/raster budget");
     normal_options.max_rays-=result.rays;normal_options.max_raster_samples-=result.raster_samples;

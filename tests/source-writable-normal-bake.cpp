@@ -624,7 +624,7 @@ void legacy_key_conversion(bool physical,const std::filesystem::path &out){
   std::cout<<"LEGACY_KEY_CONVERSION "<<name<<" covered="<<report.projected<<'\n';
 }
 
-void dense_retained_bake(const std::filesystem::path &out){
+void dense_retained_bake(const std::filesystem::path &out,bool default_ao){
   constexpr uint32_t resolution=2048;
   auto scene=source(false);
   auto donor_mesh=scene.active().painted->mesh();
@@ -646,11 +646,28 @@ void dense_retained_bake(const std::filesystem::path &out){
   scene.active().painted=initial;
   for(auto &p:donor_mesh.positions)p.z=.02f;
   donor_mesh.normals.assign(donor_mesh.positions.size(),normalized(Vec3{-.33f,.27f,1}));
-  const auto donor=scene.add("Hidden high source",Volume{});
-  scene.active().mesh_active=true;
-  scene.active().visible=false;
-  scene.active().locked=true;
-  scene.active().painted=std::make_shared<PaintedMesh>(std::move(donor_mesh),64);
+  const auto add_donor=[&](std::string name,Mesh mesh){
+    const auto id=scene.add(std::move(name),Volume{});
+    scene.active().mesh_active=true;
+    scene.active().visible=false;
+    scene.active().locked=true;
+    scene.active().painted=std::make_shared<PaintedMesh>(std::move(mesh),64);
+    return id;
+  };
+  const auto matching_donor=add_donor("Hidden high source",donor_mesh);
+  auto donor=matching_donor;
+  if(default_ao){
+    for(auto &q:donor_mesh.uv)q[0]*=.5f;
+    // The wall is visible to hemisphere rays. Even-resolution texel centers
+    // lie to either side of x=0, so normal-offset rays still hit the floor.
+    const std::vector<Vec3> wall{{0,-.2f,.02f},{0,.2f,.02f},{0,.2f,.22f},{0,-.2f,.22f}};
+    donor_mesh.positions.insert(donor_mesh.positions.end(),wall.begin(),wall.end());
+    donor_mesh.normals.insert(donor_mesh.normals.end(),4,Vec3{1,0,0});
+    const std::vector<std::array<float,2>> chart{{.6f,.2f},{.9f,.2f},{.9f,.8f},{.6f,.8f}};
+    donor_mesh.uv.insert(donor_mesh.uv.end(),chart.begin(),chart.end());
+    donor_mesh.indices.insert(donor_mesh.indices.end(),{4,5,6,4,6,7});
+    donor=add_donor("Hidden source with AO wall",std::move(donor_mesh));
+  }
   scene.select(1);
 
   const auto apply_uv=[](Document &doc,float scale,float turn){
@@ -677,9 +694,9 @@ void dense_retained_bake(const std::filesystem::path &out){
       "Retained atlas preserves the whole 2048 grid, paint values and texture layers through a display UV edit");
   require(Scene::load(uv_file).encode()==before.encode(),"Full-resolution retained UV state survives cold native reopen");
 
-  auto opts=settings();
+  auto opts=default_ao?ObjectBakeSettings{}:settings();
   opts.prepare_normals=false;
-  opts.corresponding_topology=true;
+  opts.corresponding_topology=!default_ao;
   doc.bake_from_object(donor,opts);
   const auto baked_file=out/"baked-2048.dsculpt";
   doc.save_async(baked_file).get();
@@ -701,6 +718,29 @@ void dense_retained_bake(const std::filesystem::path &out){
   }
   require(doc.frame().state->can_undo,"The full-resolution Bake retains normal document history");
   std::cout<<"DENSE_RETAINED_BAKE resolution="<<resolution<<" projected="<<baked->coverage.size()<<'\n';
+  if(default_ao){
+    const auto pixels=uint64_t(resolution)*resolution;
+    uint64_t ordinary_rays=0;
+    {
+      auto ordinary=before;
+      const auto report=bake_object(ordinary,donor,opts);
+      ordinary_rays=report.rays;
+      require(report.projected==pixels&&report.rays==pixels*17&&
+          ordinary.active().painted->baked()->maps.metal_rough.rgba==baked->maps.metal_rough.rgba,
+          "Ordinary Bake traces one projection ray and all sixteen AO rays at every full-resolution texel");
+    }
+    const auto &orm=baked->maps.metal_rough.rgba;
+    require(orm[4*(1024*resolution+1000)]<240&&orm[4*(1024*resolution+1950)]==255&&
+        accepted.active().bake_recipe->settings.ao_samples==16,
+        "The default AO bake shades a texel near the wall and preserves a distant unoccluded texel");
+    auto matching=before;
+    opts.corresponding_topology=true;
+    const auto matched=bake_object(matching,matching_donor,opts);
+    require(matched.projected==pixels&&matched.rays==pixels*16,
+        "Matching Bake traces all sixteen AO rays for every full-resolution texel");
+    matching.save(out/"matched-2048.dsculpt");
+    std::cout<<"DENSE_DEFAULT_AO ray="<<ordinary_rays<<" matching="<<matched.rays<<'\n';
+  }
 }
 }
 int main(int argc,char **argv) try {
@@ -739,10 +779,10 @@ int main(int argc,char **argv) try {
    std::cout<<"PASS "<<writable_source::checks<<" legacy keyed Bake conversion checks\n";
    return 0;
  }
- if(argc==3&&std::string_view(argv[1])=="--dense-retained"){
+ if(argc==3&&(std::string_view(argv[1])=="--dense-retained"||std::string_view(argv[1])=="--dense-default-ao")){
    const std::filesystem::path out=argv[2];
    std::filesystem::create_directories(out);
-   writable_source::dense_retained_bake(out);
+   writable_source::dense_retained_bake(out,std::string_view(argv[1])=="--dense-default-ao");
    std::cout<<"PASS "<<writable_source::checks<<" full-resolution retained Bake checks\n";
    return 0;
  }
