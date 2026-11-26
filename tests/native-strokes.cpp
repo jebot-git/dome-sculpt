@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
 #include "dome/import.hpp"
+#include "sculpt-scene-chunks.hpp"
 #include <nlohmann/json.hpp>
 #include <condition_variable>
 #include <future>
@@ -36,13 +37,25 @@ int main(int argc,char **argv){try{
   Document live;live.replace(sphere());ready(live);auto original=ordered(live.copy_volume());auto baseline=live.frame().surface;auto revision=live.frame().state->revision;
   struct ReleasePreview{~ReleasePreview(){release();}} guard;
   auto await_preview=[&](size_t after){auto end=std::chrono::steady_clock::now()+std::chrono::seconds(8);while(live.frame().state->native_samples<=after&&std::chrono::steady_clock::now()<end)std::this_thread::yield();check(live.frame().state->native_samples>after,"Native processed prefix published");check(live.wait_mesh(),"Immutable native preview becomes ready");return live.frame().surface;};
-  auto hash=[](const Mesh &mesh){uint64_t h=1469598103934665603ULL;for(auto p:mesh.positions)for(float x:{p.x,p.y,p.z}){h^=std::bit_cast<uint32_t>(x);h*=1099511628211ULL;}return h;};
+  auto hash=[id=live.frame().state->active_object](const MeshSnapshot &snapshot){
+   check(bool(snapshot.sculpt_chunks),"Snapshot carries immutable sculpt chunks");
+   const auto *draw=snapshot.sculpt_chunks->find(id);
+   check(draw&&draw->placed&&draw->geometry->report().indices,"Snapshot owns actual placed brush geometry");
+   uint64_t result=1469598103934665603ULL;
+   const auto word=[&](uint32_t value){result^=value;result*=1099511628211ULL;};
+   draw->geometry->for_each_chunk([&](const detail::SculptSurfaceChunks::Chunk &chunk){
+    for(const auto &stream:{&chunk->mesh.positions,&chunk->mesh.normals})
+     for(auto p:*stream)for(float x:{p.x,p.y,p.z})word(std::bit_cast<uint32_t>(x));
+    for(uint32_t index:chunk->mesh.indices)word(index);
+   });
+   return result;
+  };
   auto release_after_throttle=[] {std::unique_lock lock(gate);changed.wait_for(lock,std::chrono::milliseconds(35),[]{return released;});released=true;changed.notify_all();};
-  arm();check(live.begin_native_stroke()&&live.sample_native_stroke(sample(-.05f)),"Live preview gesture starts");await();release_after_throttle();auto first=await_preview(0);auto first_hash=hash(first->mesh);auto samples=live.frame().state->native_samples;
-  check(first->native_gesture==live.frame().state->native_gesture&&first->native_samples>=samples&&first_hash!=hash(baseline->mesh),"Worker publishes actual changed geometry with immutable session/sample identity");
+  arm();check(live.begin_native_stroke()&&live.sample_native_stroke(sample(-.05f)),"Live preview gesture starts");await();release_after_throttle();auto first=await_preview(0);auto first_hash=hash(*first);auto samples=live.frame().state->native_samples;
+  check(first->native_gesture==live.frame().state->native_gesture&&first->native_samples>=samples&&first_hash!=hash(*baseline),"Worker publishes actual changed geometry with immutable session/sample identity");
   check(ordered(live.copy_volume())==original&&live.frame().state->revision==revision,"Visible native preview does not mutate authoritative scene/revision");
   arm();live.sample_native_stroke(sample(.08f));await();release_after_throttle();auto second=await_preview(samples);
-  check(hash(first->mesh)==first_hash&&second!=first,"Later samples retain every byte of an earlier held preview");
+  check(hash(*first)==first_hash&&second!=first,"Later samples retain every byte of an earlier held preview");
   live.end_native_stroke(false);check(live.wait_native_stroke(),"Live preview cancellation drains");check(live.frame().surface==baseline&&ordered(live.copy_volume())==original&&!live.frame().state->can_undo,"Cancel restores exact original render snapshot/scene/history after visible previews");return 0;
  }
  struct Release{~Release(){release();}} guard;

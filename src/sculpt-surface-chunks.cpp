@@ -5,6 +5,7 @@
 #include <bit>
 #include <exception>
 #include <limits>
+#include <map>
 #include <queue>
 #include <set>
 #include <string>
@@ -56,7 +57,8 @@ struct Work {
   // charges deliberately remain conservative through the complete operation.
   struct Scratch {
     Work &work;size_t bytes;
-    Scratch(Work &w,size_t n,size_t width=1):work(w),bytes(0){work.charge(n,width);bytes=n*width;}
+    Scratch(Work &w,size_t n,size_t width=1):work(w),bytes(0){add(n,width);}
+    void add(size_t n,size_t width) {work.charge(n,width);bytes+=n*width;}
     Scratch(const Scratch &)=delete;
     Scratch &operator=(const Scratch &)=delete;
     ~Scratch(){if(work.bytes<bytes)std::terminate();work.bytes-=bytes;}
@@ -68,14 +70,17 @@ struct Work {
         !e.evaluated_cells||!e.bytes||!e.vertices||e.vertices>UINT32_MAX||!e.indices||!e.regions)
       throw std::invalid_argument("Invalid sculpt chunk operation limits");
   }
+  [[noreturn]] void work_limit() const {
+    throw std::length_error(std::string("Sculpt chunk work limit exceeded during ")+phase+
+                            " (limit="+std::to_string(limits.steps)+")");
+  }
   void tick() {
-    if (steps >= limits.steps) throw std::length_error("Sculpt chunk work limit exceeded");
+    if (steps >= limits.steps) work_limit();
     ++steps;
     if ((steps & 63) == 0) stop();
   }
   void advance(size_t n) {
-    if(steps>limits.steps||n>limits.steps-steps)
-      throw std::length_error("Sculpt chunk work limit exceeded");
+    if(steps>limits.steps||n>limits.steps-steps)work_limit();
     steps+=n;stop();
   }
   void stop() const {
@@ -302,7 +307,13 @@ bool same_chunk(const SculptSurfaceChunk &a,const SculptSurfaceChunk &b,Work &w)
   }
   return true;
 }
-Chunk assemble(const SurfaceTile &tile,const Edges &edges,const Positions &positions,Work &w) {
+struct CellRun {
+  Int3 cell;
+  size_t first,count;
+  SculptChunkBounds bounds;
+};
+Chunk assemble(const SurfaceTile &tile,const Edges &edges,const Positions &positions,
+               std::vector<CellRun> &runs,Work &w) {
   size_t maximum=0;
   for(const auto &cell:tile.cells) {
     w.tick();
@@ -323,6 +334,8 @@ Chunk assemble(const SurfaceTile &tile,const Edges &edges,const Positions &posit
   out->mesh.indices.reserve(maximum);out->triangles.reserve(maximum/3);
   std::map<Position,uint32_t> vertices;
   for(const auto &cell:tile.cells) {
+    const auto first=out->mesh.indices.size();
+    SculptChunkBounds bounds;
     for(size_t triangle=0;triangle<cell.indices.size()/3;++triangle) {
       w.tick();std::array<const EdgeRecord *,3> records;
       for(size_t c=0;c<3;++c) {
@@ -347,9 +360,12 @@ Chunk assemble(const SurfaceTile &tile,const Edges &edges,const Positions &posit
           out->bounds.include(record->vertex.position);
         }
         out->mesh.indices.push_back(i->second);
+        bounds.include(record->vertex.position);
       }
       out->triangles.push_back({cell.coordinate,uint32_t(triangle)});
     }
+    if(first!=out->mesh.indices.size())
+      runs.push_back({cell.coordinate,first,out->mesh.indices.size()-first,bounds});
   }
   out->bytes=sizeof(SculptSurfaceChunk)+128+
       out->mesh.positions.capacity()*sizeof(Vec3)+out->mesh.normals.capacity()*sizeof(Vec3)+
@@ -394,14 +410,8 @@ struct SculptSurfaceChunks::State {
         collect_tile(*before->cache,tile);collect_tile(*out->cache,tile);
         scratch_insert(dirty_chunks,tile,limits.dependency_chunks,w);
       }
-    } else {
-      out->cache->tiles.visit([&](Int3 tile,const Tile &){
-        collect_tile(*out->cache,tile);
-        scratch_insert(dirty_chunks,tile,limits.extraction.tiles,w);
-      },w);
     }
     out->report.extracted_tiles=out->cache->stats().tiles_built;
-    out->report.dependency_edges=dirty_edges.size();
     {
       Work::Phase phase(w,"representative indexes");
       if(before) {
@@ -419,21 +429,40 @@ struct SculptSurfaceChunks::State {
             out->edges.put(edge,*next,w);out->positions.put(key(*next),*next,w);
           }
         }
+        out->report.dependency_edges=dirty_edges.size();
       }else {
-        // These bounded arrays are real cold-build scratch, charged in full
-        // before reservation. Every representative is selected by the same
-        // exact first_request rule; only construction of its indexes differs.
-        using E=std::pair<SurfaceEdge,EdgeRecord>;
-        using P=std::pair<PositionRequest,EdgeRecord>;
-        Work::Scratch arrays(w,dirty_edges.size(),sizeof(E)+sizeof(P));
-        std::vector<E> edges;std::vector<P> positions;
-        edges.reserve(dirty_edges.size());positions.reserve(dirty_edges.size());
-        for(auto edge:dirty_edges) {
-          w.tick();if(auto next=first_request(*out->cache,edge,w)) {
-            if(!finite(next->vertex.position)||!finite(next->vertex.normal))
-              throw std::invalid_argument("Nonfinite sculpt representative");
-            edges.emplace_back(edge,*next);positions.emplace_back(key(*next),*next);
+        // Every request is already available on a cold build. Pick the same
+        // minimum cell/ordinal as first_request without rescanning neighboring
+        // cells once per distinct edge. Local edits keep the sparse query.
+        Work::Scratch edge_nodes(w,0);
+        std::map<SurfaceEdge,EdgeRecord> edges;
+        out->cache->tiles.visit([&](Int3 tile,const Tile &packet){
+          scratch_insert(dirty_chunks,tile,limits.extraction.tiles,w);
+          for(const auto &cell:packet->cells)for(size_t i=0;i<cell.vertices.size();++i) {
+            w.tick();
+            const auto &vertex=cell.vertices[i];
+            const Request request{cell.coordinate,uint32_t(i)};
+            auto entry=edges.lower_bound(vertex.edge);
+            if(entry==edges.end()||vertex.edge<entry->first) {
+              if(edges.size()>=limits.dependency_edges)
+                throw std::length_error("Sculpt chunk dependency limit exceeded");
+              edge_nodes.add(1,sizeof(decltype(edges)::value_type)+128);
+              edges.emplace_hint(entry,vertex.edge,EdgeRecord{request,vertex});
+            }else if(request<entry->second.request) {
+              entry->second={request,vertex};
+            }
           }
+        },w);
+        out->report.dependency_edges=edges.size();
+        using P=std::pair<PositionRequest,EdgeRecord>;
+        Work::Scratch position_array(w,edges.size(),sizeof(P));
+        std::vector<P> positions;
+        positions.reserve(edges.size());
+        for(const auto &[edge,record]:edges) {
+          w.tick();
+          if(!finite(record.vertex.position)||!finite(record.vertex.normal))
+            throw std::invalid_argument("Nonfinite sculpt representative");
+          positions.emplace_back(key(record),record);
         }
         out->edges.assign_sorted(edges.begin(),edges.end(),w);
         std::sort(positions.begin(),positions.end(),[&](const auto &a,const auto &b){w.tick();return a.first<b.first;});
@@ -489,18 +518,14 @@ struct SculptSurfaceChunks::State {
         do {w.tick();++t;}while(t<chunk->triangles.size()&&chunk->triangles[t].cell==cell);
       }
     };
-    auto add_runs=[&](const Chunk &chunk){
-      for(size_t t=0;t<chunk->triangles.size();) {
-        w.tick();const auto first=t;const auto cell=chunk->triangles[t].cell;
-        do {w.tick();++t;}while(t<chunk->triangles.size()&&chunk->triangles[t].cell==cell);
-        SculptSurfaceRun run{chunk,3*first,3*(t-first),{}};
-        for(size_t c=run.first;c<run.first+run.count;++c) {
-          w.tick();run.bounds.include(chunk->mesh.positions.at(chunk->mesh.indices.at(c)));
-        }
-        if(before)out->runs.put(cell,run,w);
+    auto add_runs=[&](const Chunk &chunk,const std::vector<CellRun> &runs){
+      for(const auto &record:runs) {
+        w.tick();
+        const SculptSurfaceRun run{chunk,record.first,record.count,record.bounds};
+        if(before)out->runs.put(record.cell,run,w);
         else {
           if(initial_runs.size()>=run_capacity)throw std::length_error("Sculpt initial run scratch capacity exceeded");
-          initial_runs.emplace_back(cell,std::move(run));
+          initial_runs.emplace_back(record.cell,run);
         }
       }
     };
@@ -519,7 +544,12 @@ struct SculptSurfaceChunks::State {
           if(before&&old_chunk)out->changes.push_back({tile,{}});
           continue;
         }
-        auto chunk=assemble(**i,out->edges,out->positions,w);
+        // Capture ordered cell runs while their final corners are already
+        // assembled. The metadata owns no pointer until the chunk is complete.
+        Work::Scratch run_scratch(w,(*i)->cells.size(),sizeof(CellRun));
+        std::vector<CellRun> runs;
+        runs.reserve((*i)->cells.size());
+        auto chunk=assemble(**i,out->edges,out->positions,runs,w);
         if(chunk->mesh.indices.empty()) {
           erase_runs(old_chunk);
           if(before&&old_chunk)out->changes.push_back({tile,{}});
@@ -530,7 +560,7 @@ struct SculptSurfaceChunks::State {
         // unchanged, so GPU clients do not upload merely because Volume COW
         // ownership changed.
         if(old_chunk&&same_chunk(*old_chunk,*chunk,w))chunk=old_chunk;
-        if(chunk!=old_chunk){erase_runs(old_chunk);add_runs(chunk);}
+        if(chunk!=old_chunk){erase_runs(old_chunk);add_runs(chunk,runs);}
         if(chunk->mesh.positions.size()>limits.extraction.vertices-out->report.vertices||
             chunk->mesh.indices.size()>limits.extraction.indices-out->report.indices)
           throw std::length_error("Sculpt manifest geometry limit exceeded");

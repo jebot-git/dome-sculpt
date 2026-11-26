@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
+#include "sculpt-chunk-masks.hpp"
 #include <nlohmann/json.hpp>
 #include <atomic>
 #include <condition_variable>
@@ -49,6 +50,9 @@ int main(int argc,char **argv) {
   d.sculpt_settings(settings,lease(d));
   require(d.frame().state->revision==clean->revision && !d.frame().state->dirty && !d.frame().state->can_undo,"identical controls are exact no-op");
   const auto original=d.copy_volume().voxels();const auto baseline_extractions=extractions.load();
+  auto baseline=d.frame().surface->sculpt_chunks;
+  const auto object_id=clean->active_object;
+  require(baseline&&baseline->find(object_id),"Initial preview owns actual sculpt chunks");
   settings.symmetry_axes=5;settings.symmetry_origin={.01f,-.02f,.03f};settings.mask_edit=true;
   const auto stale=lease(d);d.sculpt_settings(settings,stale);mesh(d);
   require(extractions==baseline_extractions&&reused(d),"controls retain cached COW source geometry without tile extraction/assembly");
@@ -65,13 +69,26 @@ int main(int argc,char **argv) {
   require(d.begin_desktop(),"mask stroke restart");d.stamp_desktop(b);d.end_desktop();mesh(d);
   require(!d.copy_volume().mask_values().empty() && d.copy_volume().voxels()==original,"mask stroke changes protection only");
   require(extractions==baseline_extractions&&reused(d),"mask stroke does not extract tiles or assemble source geometry again");
-  auto snapshot=d.frame().surface;require(snapshot->sculpt_masks.size()==snapshot->mesh.positions.size(),"immutable overlay matches packed vertices");
+  const auto snapshot=d.frame().surface;
+  const auto *sculpt=snapshot->sculpt_chunks->find(object_id);
+  require(sculpt&&sculpt->mask&&sculpt->masks&&sculpt->geometry==baseline->find(object_id)->geometry,
+          "Mask stroke publishes scalar owners while keeping the original geometry owner");
+  size_t vertices=0;
   bool protected_vertex=false;
-  auto volume=d.copy_volume();for(size_t i=0;i<snapshot->mesh.positions.size();++i) {
-    float expected=volume.mask_sample(snapshot->mesh.positions[i]);
-    require(std::abs(snapshot->sculpt_masks[i]-expected)<1e-6f,"overlay samples local persisted protection");protected_vertex|=expected>0;
-  }
-  require(protected_vertex,"visible surface protection feedback");
+  const auto volume=d.copy_volume();
+  sculpt->geometry->for_each_chunk([&](const auto &chunk){
+    const auto mask=sculpt->masks->find(chunk);
+    require(mask&&mask->geometry==chunk&&mask->mask==sculpt->mask&&
+            mask->values.size()==chunk->mesh.positions.size(),
+            "Immutable overlay matches the actual vertices of its owning chunk");
+    for(size_t i=0;i<mask->values.size();++i){
+      const float expected=volume.mask_sample(chunk->mesh.positions[i]);
+      require(std::abs(mask->values[i]-expected)<1e-6f,"Overlay samples local persisted protection");
+      protected_vertex|=expected>0;
+      ++vertices;
+    }
+  });
+  require(vertices&&protected_vertex,"Visible surface protection feedback");
   auto before_fill=d.copy_volume();d.sculpt_mask_fill(1,lease(d));require(d.wait_asset(),"background Fill completes");mesh(d);
   require(d.copy_volume().mask_default()==1 && d.copy_volume().mask_values().empty(),"global Fill protection persists without empty-space enumeration");
   require(d.undo(),"Fill undo");mesh(d);require(d.copy_volume().mask_values()==before_fill.mask_values() && d.copy_volume().mask_default()==0,"Fill is one exact undo");
@@ -81,7 +98,10 @@ int main(int argc,char **argv) {
   settings=d.frame().state->sculpt_settings;settings.mask_edit=false;settings.symmetry_axes=0;d.sculpt_settings(settings);mesh(d);
   auto protected_scene=d.copy_volume();require(d.begin_desktop(),"protected geometry stroke starts");b.tool=Tool::Carve;d.stamp_desktop(b);d.end_desktop();mesh(d);
   require(d.copy_volume().voxels()==protected_scene.voxels(),"all-protected geometry remains exact");
-  settings.mask_visible=false;d.sculpt_settings(settings);mesh(d);require(d.frame().surface->sculpt_masks.empty(),"hidden protection emits no overlay attributes");
+  settings.mask_visible=false;d.sculpt_settings(settings);mesh(d);
+  const auto *hidden=d.frame().surface->sculpt_chunks->find(object_id);
+  require(hidden&&!hidden->mask&&!hidden->masks&&d.frame().surface->sculpt_masks.empty(),
+          "Hidden protection removes scalar draw data from chunk and packed paths");
   auto object=d.frame().state->active_object;auto info=d.frame().state->objects.front();
   d.sculpt_layer_properties(object,d.copy_volume().active_layer(),"Protected layer",true,true,1);mesh(d);
   settings.mask_edit=true;d.sculpt_settings(settings);mesh(d);require(d.begin_desktop(),"mask editing remains available on locked geometry layer");d.cancel_desktop();

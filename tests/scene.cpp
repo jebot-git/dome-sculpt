@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
+#include "sculpt-scene-chunks.hpp"
 #include <iostream>
 #include <nlohmann/json.hpp>
 #include <unistd.h>
@@ -24,8 +25,16 @@ int main() try {
   auto first = doc.copy_scene();
   auto original = first.active().volume->voxels();
   auto id = doc.add_object();
-  require(doc.wait_mesh() && doc.frame().surface->ranges.size() == 2,
-          "Two independent objects are meshed into the shared preview");
+  const auto original_id = first.active().id;
+  require(doc.wait_mesh(), "The two-object preview publishes");
+  auto surface = doc.frame().surface;
+  require(bool(surface->sculpt_chunks), "The actual snapshot owns sculpt geometry");
+  const auto *original_draw = surface->sculpt_chunks->find(original_id);
+  const auto *added_draw = surface->sculpt_chunks->find(id);
+  require(surface->sculpt_chunks->objects().size() == 2 && original_draw && added_draw &&
+              original_draw->geometry->report().indices && added_draw->geometry->report().indices &&
+              original_draw->placed && added_draw->placed,
+          "Two independent objects have placed geometry in the shared preview");
   auto scene = doc.copy_scene();
   auto &o = scene.active();
   auto t = o.transform;
@@ -53,10 +62,13 @@ int main() try {
               loaded.active().transform.scale == .75f,
           "Material values and object transforms survive a native save/reopen");
   doc.object_properties(id, "Metal piece", false, true, t, blue);
-  require(!doc.begin_desktop() && doc.wait_mesh() &&
-              doc.frame().surface->ranges.size() == 1,
-          "Hidden and locked objects cannot be sculpted and hidden surfaces "
-          "leave the preview");
+  require(!doc.begin_desktop() && doc.wait_mesh(),
+          "Hidden and locked objects cannot acquire the brush");
+  const auto visible = doc.frame().surface->sculpt_chunks;
+  require(visible && visible->objects().size() == 1 &&
+              visible->find(original_id) && !visible->find(id) &&
+              surface->sculpt_chunks->find(id) == added_draw,
+          "A hidden surface leaves the current preview and stays in the held frame");
   require(doc.undo() && doc.frame().state->objects.back().visible,
           "Scene undo restores object visibility and locking");
   require(!doc.frame().state->dirty, "Undoing metadata changes back to the "
