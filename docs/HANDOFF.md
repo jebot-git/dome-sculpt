@@ -409,9 +409,19 @@ forged source-corner remap leaves the existing export unchanged. Khronos
 glTF validation reports zero errors on six exports, with the VRM0 naming
 warning and 19 skinned-node hierarchy warnings per file. The focused logs
 are under `artifacts/gpu-retirement-progress-release-20261126/`.
-The same 86-case cohort is running on this frozen candidate in
-`ds-gpu-creator-regressions-20261126.service`. Product changes are on
-`work/gpu-retirement-progress-20261126`; main runtime admission is unchanged.
+The same candidate passes all 828 software renderer recovery controls and
+27 VRM export controls under ASan/UBSan with leak detection. The strict
+build recompiled both changed production translation units, checked each
+reused archive member and freshly linked both tests. The build and runtime
+receipts are under `artifacts/gpu-creator-strict-20261126/`.
+The same 86-case cohort on the frozen candidate completed with 71 passes,
+15 failures and zero skips. Fourteen former failures now pass and all
+57 earlier passes hold. The remaining failures involve VRM source metadata
+and expressions, creator rest/placement export, normal-bake quality, paint
+archive guards and one projection case. The exact case comparison is under
+`artifacts/gpu-retirement-progress-release-20261126/combined-regression/`.
+Product changes are on `work/gpu-retirement-progress-20261126`; main runtime
+admission is unchanged.
 
 ## Source and integration boundary
 
