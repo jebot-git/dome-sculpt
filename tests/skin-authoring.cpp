@@ -2,6 +2,7 @@
 #include "dome/skin-authoring.hpp"
 #include "dome/document.hpp"
 #include "dome/creation.hpp"
+#include "dome/rig-rest.hpp"
 #include <fstream>
 #include <numbers>
 #include <nlohmann/json.hpp>
@@ -72,6 +73,18 @@ int main(int argc,char **argv) try {
   if(argc==3 && std::string_view(argv[1])=="--inspect") {
     auto scene=Scene::load(argv[2]);const auto &d=scene.active().deformation;
     std::cout<<nlohmann::json{{"skinned",bool(d&&d->skin)}, {"scene",scene.encode()}}.dump();return 0;
+  }
+  if(argc==4 && std::string_view(argv[1])=="--verify-ui-bind-restore") {
+    const auto before=Scene::load(argv[2]);
+    auto after=Scene::load(argv[3]);
+    const auto target=before.active().id;
+    const auto original=before.encode();
+    if(!after.object(target).rig_source || !same_bind_remainder(after,target,before.active(),original))
+      throw std::runtime_error("Native bind changed data outside the target deformation and Restore capsule");
+    restore_rig_source(after,target,false);
+    if(after.encode()!=original)
+      throw std::runtime_error("The persisted Restore capsule does not reproduce the exact original Scene");
+    return 0;
   }
   auto scene=fixture();scene.object(1).transform={{1,2,3},{0,.70710678f,0,.70710678f},2};
   scene.object(2).transform={{-.5f,1,2},{0,0,.38268343f,.92387953f},.5f};
