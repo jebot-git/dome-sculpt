@@ -20,6 +20,13 @@ and rig ownership, preserves all layers and supports exact Undo/Redo and
 ordered Save. Prepared and baked fields, accelerated resampling, and full
 application qualification remain open. See [the receipt](validation/source-authored-painted-grid-20261126.json).
 
+Static VRM1 expression preview and Apply now cover original core PBR and
+unlit materials, including independently writable paint and ordered native
+Save. Unpainted PBR export preserves authored tangent frames and original
+emission expression units. Generated tangent transport and live painted
+Core PBR expression export remain open. See
+[the validation receipt](validation/vrm1-core-pbr-expressions-20261126.json).
+
 ## Qualified integration — 2026-11-17
 
 Main now integrates product `1bc13125` and public fixture `f1e193c7` after

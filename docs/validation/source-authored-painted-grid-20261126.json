@@ -153,7 +153,40 @@
     "selected_cases": 86,
     "unit": "ds-source-painted-resize-regressions-20261126.service",
     "invocation": "77aae1c6a44a46f4988f88fdf0f3bfcf",
-    "status": "artifacts/source-authored-painted-grid-release-20261126/combined-regression/status.json"
+    "status": "artifacts/source-authored-painted-grid-release-20261126/combined-regression/status.json",
+    "result": {
+      "parent": {
+        "passed": 76,
+        "failed": 10,
+        "skipped": 0
+      },
+      "current": {
+        "passed": 77,
+        "failed": 9,
+        "skipped": 0
+      },
+      "recovered": [
+        "document-export"
+      ],
+      "new_failures": [],
+      "remaining_nonpasses": [
+        "native-paint-sampling-transitions",
+        "normal-preparation-native",
+        "pbr-preview",
+        "polygon-scene-archive",
+        "polygon-surface-paint-private-codec",
+        "source-color-vrm",
+        "vrm",
+        "vrm-role-consumer",
+        "vrm1-expressions"
+      ],
+      "artifacts_sha256": {
+        "artifacts/creator-vrm-placement-release-20261126/combined-regression/ctest.xml": "5110a6d442c0b581ffb729aa4e46564ddbbc3ee77338f06819bfe28681ab7b21",
+        "artifacts/source-authored-painted-grid-release-20261126/combined-regression/ctest.xml": "72054a83cd2402276a9f5f780477ca953f5cc9b7d198f54c3854392d52e8264a",
+        "artifacts/source-authored-painted-grid-release-20261126/combined-regression/ctest.log": "5e2185d2cbb08f9d8589cc24eebc78729eff0c255605494d0e803f02647d01fb",
+        "artifacts/source-authored-painted-grid-release-20261126/combined-regression/status.json": "d36823edf6bf6403dfc32c7b24462df14c75672c4bbdcc14b7c288e7870183c9"
+      }
+    }
   },
   "limits": [
     "Single writable native grids with retained original source images. Prepared, retained-domain, multi-material and baked fields still use their own adapter requirements.",

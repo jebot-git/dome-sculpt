@@ -518,8 +518,38 @@ errors in the reduction probe are 0.000588238 and 0.147059 under the existing
 controller controls. The five selected Release tests and the same five
 headless ASan/UBSan tests with leak detection all pass. Four saved native
 projects are byte-identical between those profiles. Controller tests use
-synthetic input. The 86-case combined Release replay is running on exact
-`07d70f24`. See [the validation receipt](validation/source-authored-painted-grid-20261126.json).
+synthetic input. The 86-case combined Release replay on exact `07d70f24`
+finished with 77 passes, nine failures and zero skips. The updated groom
+worker fixture now passes in the combined build and every previous pass
+held. See [the validation receipt](validation/source-authored-painted-grid-20261126.json).
+
+### Static VRM1 expressions on core materials
+
+Candidate `217b4ad2` evaluates base colour and texture transforms for plain
+PBR and unlit VRM1 source materials. Lit PBR emission evaluates in the
+original emissive-strength units. Each texture keeps its source image,
+sampler, UV set and rotation. Native Preview and Apply retain both original
+rasters and independently writable atlas paint, with one undo step and
+ordered Save. Transformed PBR normals require a genuine fixed source tangent
+frame. Existing MToon frame and paint guards still apply.
+
+The six focused Release tests pass, including the existing software OpenGL
+preview and a 326-check static expression suite. A separate Mesa llvmpipe
+test renders the plain PBR and unlit original-source cases through Preview,
+Cancel, Apply and native reopen. The portable PBR reimport reproduces exactly
+the applied native pixels. An independent reader checks
+144 exact corner tuples and 201 texture and factor values in the unpainted
+portable PBR export. The export passes five pinned VRM1 extension checks and
+Khronos glTF validation with four skinned-node placement warnings.
+The fresh instrumented headless build passes five ASan/UBSan tests with leak
+detection, and all four native projects and the exported VRM match Release
+byte for byte. An earlier launch dropped the sanitizer flags and is recorded
+as a repeated Release run.
+The combined Release replay finishes with 78 passes, eight failures and zero
+skips across the same 86 tests. The expression test recovers and all previous
+passes hold. Generated tangent transport, live painted Core PBR expression
+export and external HDR adapter composition remain open.
+See [the validation receipt](validation/vrm1-core-pbr-expressions-20261126.json).
 
 ## Source and integration boundary
 

@@ -1,0 +1,256 @@
+{
+  "source": "217b4ad28d152f786a146bb492a197fae859abec",
+  "parent": "07d70f24866b0c169c8c78c9fd0645d8722fb4b4",
+  "branch": "work/vrm1-core-pbr-expressions-20261126",
+  "tested_diff_sha256": "3c7ae453cee85aba6d0c9bb01f072ef1bb505e25f5361fa42da8818e09a31428",
+  "toolkit": {
+    "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+    "fltk_release": "/opt/fltk-vr/toolkit",
+    "bitmap": "/opt/fltk-vr/bdf-runtime"
+  },
+  "scope": [
+    "Static base colour and independent UV sampling on core PBR and KHR unlit materials",
+    "Static effective emission on lit core PBR with the original KHR emissive strength",
+    "Native Preview, Apply, ordered Save, reopen and exact Undo/Redo for original and prepared raster owners",
+    "Unpainted source-authorized portable VRM1 PBR output with fixed authored normals and tangents",
+    "Retained typed MToon normal support and refusal of unsupported generated normal transport"
+  ],
+  "release": {
+    "service": "ds-vrm1-pbr-expressions-release-frame-controls-20261126.service",
+    "invocation": "219b87314dbe4ac4b3421937a9493159",
+    "state": "inactive",
+    "directory": "artifacts/vrm1-core-pbr-expressions-release-20261126",
+    "exit": 0,
+    "cases": {
+      "vrm1-source-export": "pass",
+      "vrm1-background-fixture": "pass",
+      "vrm1-expression-preview-render": "pass",
+      "vrm1-expression-preview": "pass",
+      "vrm1-expression-parameters-faults": "pass",
+      "vrm1-expressions": "pass"
+    },
+    "artifacts": {
+      "artifacts/vrm1-core-pbr-expressions-release-20261126/source-at-test": "4dd36abb956264ddda63b0518b10bf1c1c8a4b2210fb8fc4ab93fa2fa3772a8d",
+      "artifacts/vrm1-core-pbr-expressions-release-20261126/ctest.log": "2788e5d8857ae575684e965de7528ad33074aee89283374ae531e6a0bbc0a653",
+      "artifacts/vrm1-core-pbr-expressions-release-20261126/ctest.xml": "895d561314901b5e2791a74ac8f89e455b672c6f16a8cfa58fdf16a3b8311fff",
+      "artifacts/vrm1-core-pbr-expressions-release-20261126/ctest-exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    "version": "Dome Sculpt 0.1.0 / CPU / Blender 5.4 Alpha trackball basis",
+    "static_expression_checks": 326,
+    "typed_preview_renderer": "Mesa llvmpipe"
+  },
+  "supplemental_core_render": {
+    "renderer": "windowless EGL, Mesa llvmpipe",
+    "runtime": [
+      "Native XR graphics: windowless EGL 1.5",
+      "DEVICE llvmpipe (LLVM 22.1.8, 256 bits)",
+      "pbr-original initial_coverage=1862 preview_coverage=1697 preview_max_difference=255 portable_reimport_max_difference=0",
+      "unlit-original initial_coverage=1862 preview_coverage=1697 preview_max_difference=255 portable_reimport_max_difference=-1"
+    ],
+    "scope": "Actual Document raw core PBR and unlit preview, cancel, apply, native reopen and PBR portable reimport",
+    "artifacts": {
+      "artifacts/vrm1-core-pbr-expression-interoperability-20261126/core-preview-render.cpp": "545a93a2b8ff15b238aa2ff173e10aa842e6f6c852c50355a26b6ec43f6f2d95",
+      "artifacts/vrm1-core-pbr-expression-interoperability-20261126/core-preview-render": "8e1feba3fc4133953200fc9c80cc9ff8a5b91277ae8101e596abe48a32dba543",
+      "artifacts/vrm1-core-pbr-expression-interoperability-20261126/core-preview-render.log": "2e5e15d930f976d936fe75629dcbfe8616b237513eefca5e07536a68b0fddd36",
+      "artifacts/vrm1-core-pbr-expression-interoperability-20261126/core-preview-render-owners.sha256": "3b5eae6e150a1a5a3e6e3438f0cdeab8ec077ef123ff3528dd582b3efaa44dea"
+    }
+  },
+  "asan_ubsan_leaks": {
+    "service": "ds-vrm1-core-pbr-asan-20261126.service",
+    "invocation": "93a62cd9092e4376bda35f5e4ebafe9f",
+    "state": "inactive",
+    "directory": "artifacts/vrm1-core-pbr-expressions-asan-20261126",
+    "exit": 0,
+    "cases": {
+      "vrm1-source-export": "pass",
+      "vrm1-background-fixture": "pass",
+      "vrm1-expression-preview": "pass",
+      "vrm1-expression-parameters-faults": "pass",
+      "vrm1-expressions": "pass"
+    },
+    "artifacts": {
+      "artifacts/vrm1-core-pbr-expressions-asan-20261126/source-at-test": "386f8843c10cdbb8fad50b2062047865fe875cd5ceea7e376b2875730d1dd04d",
+      "artifacts/vrm1-core-pbr-expressions-asan-20261126/ctest.log": "ca1d8d0e3a67a1f6f19676c05e30ac32329dfe4ca8fdd57c2aad9a752af15129",
+      "artifacts/vrm1-core-pbr-expressions-asan-20261126/ctest.xml": "0bc00f6a7a95cd7a0ee052022e3e80bdbcac0e6c88ea1d20e4a6a6d59fb4a351",
+      "artifacts/vrm1-core-pbr-expressions-asan-20261126/ctest-exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    "elf_witnesses": {
+      "artifacts/vrm1-core-pbr-expressions-asan-20261126/dome-sculpt-vrm1-background-fixture-test.elf-dynamic": "c3847b826e970fb46b28283e72ed21ebcd2ec9900ff253419ff168031b6d507a",
+      "artifacts/vrm1-core-pbr-expressions-asan-20261126/dome-sculpt-vrm1-expression-parameters-faults-test.elf-dynamic": "9f4745a6370aca5ea6fd57291689d665a50b2b46f1c178499d94dd3b54b0186d",
+      "artifacts/vrm1-core-pbr-expressions-asan-20261126/dome-sculpt-vrm1-expression-preview-test.elf-dynamic": "0a4ff135a4278f4f4b01fcb361fc6d224b00692a304ba9fee2f530f4395eed86",
+      "artifacts/vrm1-core-pbr-expressions-asan-20261126/dome-sculpt-vrm1-expressions-test.elf-dynamic": "688470cacd6d858e0cb2a8f9cdf8adaddb08cc870ed142f61c6f2aaca6e45fa5",
+      "artifacts/vrm1-core-pbr-expressions-asan-20261126/dome-sculpt-vrm1-source-export-test.elf-dynamic": "90e5fac14a1b0e3a482aeb927c2599cabf94d22ddb925354bd40267e2e0d4e02"
+    },
+    "exact_release_outputs": {
+      "artifacts/vrm1-core-pbr-expressions-asan-20261126/vrm1-expressions/pbr-original.dsculpt": "c2a8922da060c7f2687647a7e1b23d40f5f04e65ec6871923ecddab6a576e19b",
+      "artifacts/vrm1-core-pbr-expressions-asan-20261126/vrm1-expressions/pbr-atlas.dsculpt": "51e224e6521142614e1dfe17906606a15d15e7f509ca425973385a19264f26bd",
+      "artifacts/vrm1-core-pbr-expressions-asan-20261126/vrm1-expressions/unlit-original.dsculpt": "1d9466c9cecad180958cb0fafaab01a3fd06bb80fed8f8e50a97fb007cad5c2d",
+      "artifacts/vrm1-core-pbr-expressions-asan-20261126/vrm1-expressions/unlit-atlas.dsculpt": "df6d40390ba4c2f36d9eb01931c344e883573390b1781478657261eda74c6310",
+      "artifacts/vrm1-core-pbr-expressions-asan-20261126/vrm1-expressions/pbr-original-applied.vrm": "adcc6ece798e1c1e2da28a20e4496afef929ad90db9d53d31fac709b5b26c06b"
+    }
+  },
+  "excluded_profile": {
+    "path": "artifacts/vrm1-core-pbr-expressions-strict-20261126",
+    "reason": "Systemd expanded an inline shell array and omitted the sanitizer options at configure time",
+    "identified_by": "No libasan/libubsan in the linked executable and empty CMAKE_CXX_FLAGS",
+    "runtime": "Five duplicate optimized Release checks. Treat as Release only.",
+    "artifacts": {
+      "artifacts/vrm1-core-pbr-expressions-strict-20261126/CMakeCache.txt": "32dc61666f673e63332d89f76d40f1cdc0adca71c251d288125b48bf0195e2b9",
+      "artifacts/vrm1-core-pbr-expressions-strict-20261126/ctest.xml": "2527c1bfd05e64f11460d0b0f0c77cbb8c89d984f84f19c58d12f9daf5a680b6",
+      "artifacts/vrm1-core-pbr-expressions-strict-20261126/generated-import-guard/ctest.xml": "95439001d9af8251a0caa0ae47620079593fe50c28d5e2556f198d9be8c18117"
+    }
+  },
+  "independent_portable_validation": {
+    "vrm_spec_revision": "94e82dd346fa6cf0337c4421728640e5252dd38e",
+    "gltf_common_schema_revision": "3cd6f59b277ed7f6540dbabdacc7841a5fdc0ded",
+    "vrm_extension_schema_results": [
+      {
+        "file": "pbr-atlas.vrm",
+        "checks": 5,
+        "errors": 0
+      },
+      {
+        "file": "pbr-original-applied.vrm",
+        "checks": 5,
+        "errors": 0
+      },
+      {
+        "file": "pbr-original.vrm",
+        "checks": 5,
+        "errors": 0
+      },
+      {
+        "file": "source.vrm",
+        "checks": 6,
+        "errors": 0
+      },
+      {
+        "file": "unlit-atlas.vrm",
+        "checks": 5,
+        "errors": 0
+      },
+      {
+        "file": "unlit-original.vrm",
+        "checks": 5,
+        "errors": 0
+      }
+    ],
+    "resolver_negative_controls": 2,
+    "khronos_validator_version": "2.0.0-dev.3.10",
+    "export_errors": 0,
+    "export_warnings": [
+      "NODE_SKINNED_MESH_NON_ROOT",
+      "NODE_SKINNED_MESH_LOCAL_TRANSFORMS",
+      "NODE_SKINNED_MESH_NON_ROOT",
+      "NODE_SKINNED_MESH_LOCAL_TRANSFORMS"
+    ],
+    "source_fixture_khronos_errors": [
+      {
+        "file": "pbr-atlas.vrm",
+        "errors": [
+          "/nodes/8/children",
+          "/nodes/11/children",
+          "/nodes/14/children",
+          "/nodes/17/children"
+        ]
+      },
+      {
+        "file": "pbr-original.vrm",
+        "errors": [
+          "/nodes/8/children",
+          "/nodes/11/children",
+          "/nodes/14/children",
+          "/nodes/17/children"
+        ]
+      },
+      {
+        "file": "source.vrm",
+        "errors": [
+          "/nodes/8/children",
+          "/nodes/11/children",
+          "/nodes/14/children",
+          "/nodes/17/children"
+        ]
+      },
+      {
+        "file": "unlit-atlas.vrm",
+        "errors": [
+          "/nodes/8/children",
+          "/nodes/11/children",
+          "/nodes/14/children",
+          "/nodes/17/children"
+        ]
+      },
+      {
+        "file": "unlit-original.vrm",
+        "errors": [
+          "/nodes/8/children",
+          "/nodes/11/children",
+          "/nodes/14/children",
+          "/nodes/17/children"
+        ]
+      }
+    ],
+    "binary_oracle": {
+      "package_sha256": "adcc6ece798e1c1e2da28a20e4496afef929ad90db9d53d31fac709b5b26c06b",
+      "primitive_count": 3,
+      "exact_corner_tuples": 144,
+      "numeric_comparisons": 201,
+      "maximum_error": 2.9802322387695312e-08
+    },
+    "artifacts": {
+      "artifacts/vrm1-core-pbr-expression-interoperability-20261126/official-vrm1.json": "486b65187e63df6aa07d0eea23bf6934d2c8605f382be1b8467f277a750f52f8",
+      "artifacts/vrm1-core-pbr-expression-interoperability-20261126/portable-khronos.json": "a092738f1614da43ef0943347330fca595e37216e990d6e092b78de57de8d0e3",
+      "artifacts/vrm1-core-pbr-expression-interoperability-20261126/khronos.json": "e0a591f9d03b3194148839d6cde2a220ca5d118c93dd44bc65fffb4f7daeac17",
+      "artifacts/vrm1-core-pbr-expression-interoperability-20261126/portable-oracle.json": "07a3554f93272cb97f899348766027e3b5cf4c2c310ccf42f9bbe90b73c851b5",
+      "artifacts/vrm1-core-pbr-expression-interoperability-20261126/verify-portable.py": "366ac08cb0597774848328045c9a088d59f7d12e2d7bfcdff9aa63364785e223",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/schema-blobs.txt": "840bb82b28610f2d3105dff344ead2f9e5d2e0af7fcdf1a72f374a0667fe9b2d",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/gltf-schema-blobs.txt": "7687892a9fb3fb776aefe35e23ac8c6b87bba61196332e315dc25891330cc86c"
+    }
+  },
+  "combined_release_replay": {
+    "service": "ds-vrm1-core-pbr-regressions-20261126.service",
+    "invocation": "0bd8dbf6523d4f6ebb251ccb82a60dd9",
+    "count": 86,
+    "state": "failed",
+    "status_path": "artifacts/vrm1-core-pbr-expressions-release-20261126/combined-regression/status.json",
+    "result": {
+      "parent": {
+        "passed": 77,
+        "failed": 9,
+        "skipped": 0
+      },
+      "current": {
+        "passed": 78,
+        "failed": 8,
+        "skipped": 0
+      },
+      "recovered": [
+        "vrm1-expressions"
+      ],
+      "new_failures": [],
+      "remaining_nonpasses": [
+        "native-paint-sampling-transitions",
+        "normal-preparation-native",
+        "pbr-preview",
+        "polygon-scene-archive",
+        "polygon-surface-paint-private-codec",
+        "source-color-vrm",
+        "vrm",
+        "vrm-role-consumer"
+      ],
+      "ctest_exit": 8,
+      "artifacts": {
+        "artifacts/source-authored-painted-grid-release-20261126/combined-regression/ctest.xml": "72054a83cd2402276a9f5f780477ca953f5cc9b7d198f54c3854392d52e8264a",
+        "artifacts/vrm1-core-pbr-expressions-release-20261126/combined-regression/status.json": "a4ec3ce0e9abc9aeea49e44077dee196cb6e5748fc2f1ee23376435f0ffc3965",
+        "artifacts/vrm1-core-pbr-expressions-release-20261126/combined-regression/ctest.xml": "bc75018e48aa8bacea0764682c95098cee64119cd85dacc9b4ece62cbd3bc415",
+        "artifacts/vrm1-core-pbr-expressions-release-20261126/combined-regression/ctest.log": "b2ea42d05476e7ccdbb7a8539297638d1c0a5c8cfae3a8af357cd0d60b4c37f9",
+        "artifacts/vrm1-core-pbr-expressions-release-20261126/combined-regression/comparison.json": "950232b2a76fa8001f16eaa90c183049ac5cf485155f157231131e41afd01f13"
+      }
+    }
+  },
+  "remaining": [
+    "Generated or changed normal frames and external HDR adapter composition",
+    "Portable dynamic core PBR over authored paint, actual Arc/headset expression rendering, broader production scope"
+  ]
+}
