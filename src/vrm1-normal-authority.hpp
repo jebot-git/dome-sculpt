@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 #include "normal-frame-runtime.hpp"
+#include "source-normal-sampler-frame.hpp"
 namespace dome::detail {
-// UV expression parameters leave an explicit imported TANGENT in its original
-// attribute space. A generated frame needs a separate derivative adapter.
-inline const NormalFrameSet &require_vrm1_fixed_normal_frame(const SculptObject &object,
- const std::function<bool()> &cancelled={}) {
+// Texture expressions edit the material. Retain each primitive's initial
+// vertex frame, including Core PBR frames generated from the original sampler.
+inline const ImportedPrimitive &vrm1_normal_source(const SculptObject &object,
+ const std::function<bool()> &cancelled) {
  auto fail=[](const char *reason){throw std::invalid_argument(std::string("VRM1 normal-texture authored frame: ")+reason);};
  if(!object.painted||!object.appearance||!object.material_bindings)fail("owning source is absent");
  const auto &binding=*object.material_bindings;
@@ -20,21 +21,73 @@ inline const NormalFrameSet &require_vrm1_fixed_normal_frame(const SculptObject 
   fail("retained original primitive identity differs");
  const ImportedPrimitive *primitive=nullptr;
  for(const auto &candidate:appearance.asset->primitives)if(candidate.source_mesh==appearance.source_mesh&&candidate.source_primitive==appearance.source_primitive){if(primitive)fail("source primitive is ambiguous");primitive=&candidate;}
- if(!primitive||primitive->tangents.size()!=primitive->mesh.positions.size()||primitive->tangents.empty())fail("genuine authored source TANGENT is required");
+ if(!primitive)fail("original source primitive is absent");
  normal_frame_current_authority(binding,object.painted->mesh(),object.deformation.get(),cancelled);
  const auto &pbr=binding.normal_frames->pbr;
- if(!pbr||pbr->generated_tangents||pbr->transport!=NormalFrameTransport::FixedAttributes||pbr->tangents.empty())
-  fail("core PBR requires fixed authored N/T");
- return *binding.normal_frames;
+ if(!pbr||pbr->transport!=NormalFrameTransport::FixedAttributes||pbr->tangents.empty())
+  fail("core PBR requires fixed source N/T");
+ return *primitive;
+}
+
+inline const ImportedPrimitive &require_vrm1_core_normal_frame(const SculptObject &object,
+ const std::function<bool()> &cancelled) {
+ const auto &primitive=vrm1_normal_source(object,cancelled);
+ const auto &binding=*object.material_bindings;
+ const auto &frame=*binding.normal_frames->pbr;
+ const auto &raw=object.appearance->asset->materials.at(primitive.material);
+ if(binding.has_mtoon||raw.normal_texture<0||
+    frame.generated_tangents!=source_needs_generated_tangents(primitive))
+  throw std::invalid_argument("VRM1 core normal frame needs its original sampler and attribute provenance");
+ if(frame.generated_tangents){
+  const auto &maps=binding.uv_origin->paint->source_maps();
+  const auto set=imported_texture_coordinate(raw.normal_texcoord,raw.normal_transform);
+  if(frame.generated_uv!=uint32_t(set)||!maps||!maps->normal.image||maps->normal.texcoord!=set||
+     maps->normal.uv_transform!=imported_texture_matrix(raw.normal_transform))
+   throw std::invalid_argument("VRM1 generated normal frame lost its initial normal sampler");
+ }
+ return primitive;
+}
+
+// The sealed exporter certifies derived directions against the actual
+// original primitive. Preview uses the immutable imported attribute owner.
+inline void verify_vrm1_generated_normal_frame(const SculptObject &object,
+ const ImportedPrimitive &primitive,const std::function<bool()> &cancelled) {
+ const auto &set=*object.material_bindings->normal_frames;
+ const auto &frame=*set.pbr;
+ if(!frame.generated_tangents)return;
+ const auto &material=object.appearance->asset->materials.at(primitive.material);
+ const auto expected=core_source_normal_sampler_frame(primitive,material,cancelled);
+ auto fail=[] {throw std::invalid_argument("VRM1 generated normal frame differs from source replay");};
+ auto compare=[&](const auto &before,const auto &after,auto equal) {
+  if(before.size()!=after.size())fail();
+  for(size_t i=0;i<before.size();++i){
+   if((i&1023)==0&&cancelled&&cancelled())throw std::runtime_error("VRM1 generated frame verification cancelled");
+   if(!equal(before[i],after[i]))fail();
+  }
+ };
+ const auto vector_equal=[](Vec3 a,Vec3 b){return a.x==b.x&&a.y==b.y&&a.z==b.z;};
+ compare(frame.source_vertices,expected.origin_vertices,std::equal_to{});
+ compare(frame.tangents,expected.base,std::equal_to{});
+ compare(frame.normals,expected.normals,vector_equal);
+ if(set.targets.size()!=expected.targets.size())fail();
+ for(size_t i=0;i<set.targets.size();++i){
+  const auto &identity=set.targets[i];
+  if(identity.source_target!=i||!identity.positions.empty())fail();
+  compare(frame.targets[i].tangents,expected.targets[i],vector_equal);
+  compare(frame.targets[i].normals,expected.normal_targets[i],vector_equal);
+ }
 }
 inline void require_vrm1_authored_normal_frame(const SculptObject &object,
  const std::function<bool()> &cancelled={}) {
- const auto &frames=require_vrm1_fixed_normal_frame(object,cancelled);
+ const auto &primitive=vrm1_normal_source(object,cancelled);
  const auto &binding=*object.material_bindings;
+ const auto &frames=*binding.normal_frames;
  auto fail=[](const char *reason){throw std::invalid_argument(std::string("VRM1 normal-texture authored frame: ")+reason);};
  if(!binding.has_mtoon||binding.material.version()!=MToonVersion::V1||
     !object.painted->source_sampling_prepared())fail("actual typed MToon1 and independent writable owner are required");
  const auto &pbr=frames.pbr,&toon=frames.mtoon;
+ if(source_needs_generated_tangents(primitive)||pbr->generated_tangents)
+  fail("genuine authored source TANGENT is required");
  if(!toon||toon->generated_tangents||toon->transport!=NormalFrameTransport::FixedAttributes||
     pbr->tangents!=toon->tangents||pbr->normals.size()!=toon->normals.size()||pbr->targets.size()!=toon->targets.size())
   fail("PBR and MToon require compatible fixed authored N/T");

@@ -22,7 +22,8 @@ inline NormalFrameExport normal_frame_export_vrm1(const Vrm1AuthoringCompilation
   if(maps->normal.image!=binding->roles[size_t(MToonSlot::Normal)].image)
    throw std::invalid_argument("VRM1 normal export lost its shared Core PBR/MToon original image");
  }else{
-  require_vrm1_fixed_normal_frame(source,cancelled);
+  const auto &primitive=require_vrm1_core_normal_frame(source,cancelled);
+  verify_vrm1_generated_normal_frame(source,primitive,cancelled);
   const auto original=source.painted->source_sampling_original();
   const auto expected=original?original->source_maps():source.painted->source_maps();
   // The sealed compiler reconstructs atlas coordinates from their original

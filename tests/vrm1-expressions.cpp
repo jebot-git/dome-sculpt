@@ -167,32 +167,134 @@ void core_expressions(const std::filesystem::path &out) {
       check(authority.scene->encode()==wanted,"Portable VRM1 export preserves all applied native project data");
     }
   }
+}
+
+void core_generated_frames(const std::filesystem::path &out) {
   auto fixture=core_source(false);
   for(auto &primitive:fixture.j["meshes"][0]["primitives"]){
     primitive["attributes"].erase("TANGENT");
     for(auto &target:primitive["targets"])target.erase("TANGENT");
   }
+  for(auto &node:fixture.j["nodes"])
+    if(node.contains("children")&&node["children"].empty())node.erase("children");
   Scene empty;
   empty.active().visible=false;
   const auto empty_data=empty.encode();
-  const auto transformed=out/"pbr-generated-transformed-frame.vrm";
-  fixture.save(transformed);
-  const auto import_error=refuses([&]{prepare_authoring_import(empty,transformed,{});});
-  check(import_error.find("Generated normal tangents for transformed sampling")!=std::string::npos&&
-        empty.encode()==empty_data,"A missing tangent with an already transformed normal refuses during import");
-  fixture.j["materials"][0]["normalTexture"].erase("extensions");
-  const auto input=out/"pbr-generated-frame.vrm";
-  fixture.save(input);
-  auto imported=prepare_authoring_import(empty,input,{});
-  const auto before=imported.scene.encode();
-  const auto id=imported.objects.front();
-  const auto &frames=imported.scene.object(id).material_bindings->normal_frames;
-  check(frames&&frames->pbr&&frames->pbr->generated_tangents,
-        "An identity normal sampler imports with its actual generated frame");
-  Vrm1ExpressionWeights weights;weights.preset["happy"]=weight;
-  const auto error=refuses([&]{bake_vrm1_expression_pose(imported.scene,id,weights);});
-  check(error.find("genuine authored source TANGENT")!=std::string::npos&&imported.scene.encode()==before,
-        "Ordinary PBR normal-UV transforms still require a genuine fixed tangent frame");
+  auto &transform=fixture.j["materials"][0]["normalTexture"]["extensions"]["KHR_texture_transform"];
+  transform["texCoord"]=1;
+  fixture.j["materials"][0]["normalTexture"]["texCoord"]=0;
+  constexpr float weight=.25f;
+  for(bool mirror:{false,true})for(bool atlas:{false,true}){
+    const float sx=mirror?-1.15f:1.15f,sy=.66f,rotation=-.31f;
+    transform["scale"]={sx,sy};
+    const auto label=std::string(mirror?"generated-mirror":"generated-rotate")+(atlas?"-atlas":"-original");
+    const auto input=out/(label+".vrm");
+    fixture.save(input);
+    ImportAuthoringOptions options;options.prepare_texture_atlas=atlas;options.paint_resolution=64;
+    auto imported=prepare_authoring_import(empty,input,options);
+    const auto id=imported.objects.front();
+    imported.scene.select(id);
+    if(atlas){
+      auto &object=imported.scene.object(id);
+      auto paint=object.painted->snapshot();
+      PaintSettings settings;settings.color={.15f,.85f,.3f,1};settings.front_only=false;
+      Brush brush;brush.from=brush.to={0,0,0};brush.radius=1;brush.strength=1;
+      paint->begin_stroke();
+      paint->stamp(brush,settings);
+      check(paint->end_stroke(),"A real native atlas stroke authors sparse paint before expression Apply");
+      object.painted=std::move(paint);
+    }
+    const auto &baseline=imported.scene;
+    const auto before=baseline.encode();
+    const auto &initial=baseline.object(id);
+    const auto &frame=*initial.material_bindings->normal_frames->pbr;
+    check(frame.generated_tangents&&frame.generated_uv==1&&
+          initial.appearance->asset->primitives.front().tangents.empty(),
+          "Normal generation uses the actual KHR TEXCOORD override and no authored tangent payload");
+    // The fixture has an axis-aligned square in object space with equally
+    // spaced U and V. The first column of inverse(R*diag(sx,sy)) gives dP/du.
+    const auto expected=normalized(Vec3{std::cos(rotation)/sx,-std::sin(rotation)/sy,0});
+    for(const auto &t:frame.tangents){
+      near(t[0],expected.x,"Generated tangent U follows the inverse sampler derivative");
+      near(t[1],expected.y,"Generated tangent V uses rotation and anisotropic scale");
+      near(t[2],0,"The analytic frame stays tangent to the source square");
+      near(t[3],mirror?-1.f:1.f,"Reflection changes generated frame handedness");
+    }
+    check(frame.targets.size()==1&&!frame.targets.front().tangents.empty(),
+          "The actual original shape key owns generated tangent deltas");
+    Vrm1ExpressionWeights weights;weights.preset["happy"]=weight;
+    const auto posed=bake_vrm1_expression_pose(baseline,id,weights);
+    const auto &changed=posed.object(id);
+    check(baseline.encode()==before&&changed.material_bindings==initial.material_bindings,
+          "Texture expressions retain the fixed generated frame and leave the original scene intact");
+    const auto orig=atlas?initial.painted->source_sampling_original():initial.painted;
+    const auto now=atlas?changed.painted->source_sampling_original():changed.painted;
+    check_texture(orig->source_maps()->normal,now->source_maps()->normal,rotation,weight);
+    if(atlas){
+      const auto &paint=initial.painted->layers().front();
+      check(std::ranges::any_of(paint.tiles,[](const auto &tile){return bool(tile);})&&
+            paint.tiles==changed.painted->layers().front().tiles,
+            "Generated tangent expressions keep real atlas paint tiles");
+    }
+    const auto saved=out/(label+".dsculpt");
+    posed.save(saved);
+    const auto reopened=Scene::load(saved);
+    check(reopened.encode()==posed.encode(),"Generated tangent frames and current samplers survive native reopen");
+    if(atlas)continue;
+    const auto portable=out/(label+"-applied.vrm");
+    NativeAuthoringExport owner;
+    owner.scene=std::make_shared<const Scene>(reopened);
+    owner.allow_portable_fallback=true;
+    VrmExportOptions export_options;export_options.paint_resolution=64;
+    export_vrm_authoring(owner,portable,export_options);
+    const auto portable_data=bytes(portable);
+    cgltf_options consumer_options{};
+    cgltf_data *parsed=nullptr;
+    check(cgltf_parse(&consumer_options,portable_data.data(),portable_data.size(),&parsed)==cgltf_result_success&&
+          parsed&&parsed->bin,"The independent glTF consumer reads the portable package");
+    const std::unique_ptr<cgltf_data,decltype(&cgltf_free)> primary(parsed,cgltf_free);
+    import_fixture::Fixture standalone;
+    standalone.j=json(portable);
+    check(standalone.j.at("extras").erase("domeSculptAuthoring")==1,
+          "Standalone interop fixture bypasses the embedded native project");
+    const auto *bin=static_cast<const uint8_t *>(primary->bin);
+    standalone.bin.assign(bin,bin+primary->bin_size);
+    const auto consumer=out/(label+"-portable-only.vrm");
+    standalone.save(consumer);
+    auto imported_again=prepare_authoring_import(empty,consumer,options);
+    const auto &emitted_binding=imported_again.scene.object(imported_again.objects.front()).material_bindings;
+    check(emitted_binding&&emitted_binding->normal_frames&&emitted_binding->normal_frames->pbr,
+          "Portable-only import owns actual source normal attributes");
+    const auto &emitted=*emitted_binding->normal_frames->pbr;
+    check(!emitted.generated_tangents&&emitted.tangents==frame.tangents,
+          "Portable export emits the exact generated frame as explicit glTF tangents");
+    check(emitted.targets.size()==1&&emitted.targets[0].tangents.size()==frame.targets[0].tangents.size(),
+          "Portable output retains the generated shape key tangent stream");
+    for(size_t i=0;i<emitted.targets[0].tangents.size();++i)
+      check(length(emitted.targets[0].tangents[i]-frame.targets[0].tangents[i])==0,
+            "Portable shape key tangent deltas are exact after native reimport");
+
+    auto forged=reopened.snapshot();
+    auto binding=std::make_shared<SourceMaterialBindings>(*forged.object(id).material_bindings);
+    auto frames=std::make_shared<NormalFrameSet>(*binding->normal_frames);
+    auto foreign=std::make_shared<NormalFrames>(*frames->pbr);
+    for(auto &t:foreign->tangents){t[0]=0;t[1]=1;}
+    frames->pbr=foreign;binding->normal_frames=frames;
+    forged.object(id).material_bindings=binding;
+    const auto native_bytes=forged.encode();
+    const auto old_output=bytes(portable);
+    owner.scene=std::make_shared<const Scene>(std::move(forged));
+    const auto error=refuses([&]{export_vrm_authoring(owner,portable,export_options);});
+    check(error.find("generated normal frame differs from source replay")!=std::string::npos&&
+          bytes(portable)==old_output&&owner.scene->encode()==native_bytes,
+          "A forged generated frame refuses export and preserves the native scene and existing file");
+  }
+  transform["scale"]={0,1};
+  const auto singular=out/"generated-singular.vrm";
+  fixture.save(singular);
+  const auto import_error=refuses([&]{prepare_authoring_import(empty,singular,{});});
+  check(import_error.find("Generated core normal tangents require nonsingular")!=std::string::npos&&
+        empty.encode()==empty_data,"A collapsed normal sampler cannot generate a tangent and refuses atomically");
 }
 }
 int main(int argc,char **argv)try{
@@ -269,5 +371,6 @@ int main(int argc,char **argv)try{
  auto entry=entered.get_future();check(entry.wait_for(std::chrono::seconds(120))==std::future_status::ready,"Actual expression computation completes before publication cancellation gate");entry.get();auto after=doc.save_async(out/"cancel.dsculpt");doc.cancel_background_work();release.set_value();const auto cancel_error=refuses([&]{after.get();});check(cancel_error=="Scene changed during Cancel static VRM1 expression"&&doc.wait_asset()&&doc.wait_mesh()&&doc.copy_scene().encode()==baseline_json&&bytes(out/"cancel.dsculpt")==old_cancel&&doc.frame().state->can_undo==cancel_undo&&doc.frame().state->can_redo==cancel_redo,"Actual native late Cancel refuses dependent Save and preserves exact Scene/prior file/history");doc.save_async(out/"cancel-retry.dsculpt").get();check(Scene::load(out/"cancel-retry.dsculpt").encode()==baseline_json,"Actual Save retry recovers after cancelled accepted expression endpoint");
  NativeAuthoringExport owner;owner.scene=std::make_shared<const Scene>(baked.snapshot());owner.allow_portable_fallback=true;VrmExportOptions export_options;export_options.paint_resolution=64;const auto error=refuses([&]{export_vrm_authoring(owner,out/"still-dynamic.vrm",export_options);});std::cout<<"STATIC_DYNAMIC_REFUSAL "<<error<<'\n';check(baked.active().material_bindings->material.parameters.alpha==MToonAlpha::Mask&&error=="VRM1 differing UV targets couple moving upper roles to fixed paint"&&!std::filesystem::exists(out/"still-dynamic.vrm")&&owner.scene->encode()==baked.encode(),"Incompatible moving UV targets and fixed paint refuse portable export atomically");
  core_expressions(out);
+ core_generated_frames(out);
  std::cout<<"PASS "<<checks<<" static VRM1 expression checks polls="<<polls<<'\n';return 0;
 }catch(const std::exception &e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

@@ -91,7 +91,7 @@ void apply_core_material_expression(
   const auto original=entry.painted->source_sampling_original();
   const auto maps=original?original->source_maps():entry.painted->source_maps();
   if(!entry.material.unlit&&maps&&maps->normal.image)
-    detail::require_vrm1_fixed_normal_frame(entry,cancelled);
+    detail::require_vrm1_core_normal_frame(entry,cancelled);
   current.painted=core_texture_parameters(entry,raw,evaluation.textures,material,cancelled);
 }
 }
