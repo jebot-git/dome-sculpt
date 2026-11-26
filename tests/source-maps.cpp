@@ -3,6 +3,8 @@
 #include "dome/source-maps.hpp"
 #include "dome/scene.hpp"
 #include "dome/projection.hpp"
+#include "../src/source-texture-grid.hpp"
+#include <bit>
 #include <iostream>
 #include <fstream>
 #include <nlohmann/json.hpp>
@@ -14,8 +16,86 @@ bool near(float a,float b,float e=.006f){return std::abs(a-b)<e;}
 std::shared_ptr<const Image> flat(std::array<uint8_t,4> rgba,uint32_t w=1,uint32_t h=1){auto i=std::make_shared<Image>();i->width=w;i->height=h;for(size_t n=0;n<size_t(w)*h;++n)i->rgba.insert(i->rgba.end(),rgba.begin(),rgba.end());return i;}
 Mesh quad(){Mesh m;m.positions={{-1,-1,0},{1,-1,0},{1,1,0},{-1,1,0}};m.normals.assign(4,{0,0,1});m.uv={{{0,0}},{{1,0}},{{1,1}},{{0,1}}};m.indices={0,1,2,0,2,3};return m;}
 uint8_t pixel(const Image&i,uint32_t x,uint32_t y,int c){return i.rgba[(size_t(y)*i.width+x)*4+c];}
+
+std::array<float,4> reference_sample(const PaintSourceTexture &sampler,
+                                    float u,float v,bool srgb) {
+  auto wrap=[](double t,int mode) {
+    if(mode==33071)return float(std::clamp(t,0.,1.));
+    if(mode==33648) {
+      t=std::fmod(t,2.);
+      if(t<0)t+=2.;
+      return float(t<=1?t:2-t);
+    }
+    return float(t-std::floor(t));
+  };
+  auto address=[](int at,int extent,int mode) {
+    if(mode==33071)return std::clamp(at,0,extent-1);
+    const int period=mode==33648?extent*2:extent;
+    at%=period;
+    if(at<0)at+=period;
+    return at<extent?at:period-1-at;
+  };
+  const auto &affine=sampler.uv_transform;
+  const auto &im=*sampler.image;
+  const float x=wrap(double(affine[0])*u+double(affine[1])*v+affine[4],sampler.wrap_s)*im.width-.5f;
+  const float y=wrap(double(affine[2])*u+double(affine[3])*v+affine[5],sampler.wrap_t)*im.height-.5f;
+  int bx=int(std::floor(x)),by=int(std::floor(y));
+  const float fx=x-bx,fy=y-by;
+  const bool nearest=sampler.mag_filter==9728;
+  if(nearest){bx=int(std::floor(x+.5f));by=int(std::floor(y+.5f));}
+  std::array<float,4> result{};
+  for(int k=0;k<(nearest?1:4);++k) {
+    const int sx=address(bx+(k&1),int(im.width),sampler.wrap_s);
+    const int sy=address(by+(k>>1),int(im.height),sampler.wrap_t);
+    const float weight=nearest?1.f:((k&1)?fx:1-fx)*((k>>1)?fy:1-fy);
+    for(int c=0;c<4;++c) {
+      const float encoded=float(pixel(im,sx,sy,c))/255.f;
+      const float decoded=srgb&&c<3
+          ?(encoded<=.04045f?encoded/12.92f:std::pow((encoded+.055f)/1.055f,2.4f))
+          :encoded;
+      result[c]+=weight*decoded;
+    }
+  }
+  return result;
+}
+
+void sampling_grid() {
+  auto image=std::make_shared<Image>(Image{17,29,std::vector<uint8_t>(17*29*4)});
+  for(size_t i=0;i<image->rgba.size();++i)image->rgba[i]=uint8_t(i*109+i/11);
+  PaintSourceTexture source;
+  source.image=image;
+  constexpr std::array affines{
+    std::array{1.f,0.f,0.f,1.f,0.f,0.f},
+    std::array{-2.3f,0.f,0.f,3.5f,.45f,-1.125f},
+    std::array{0.f,0.f,0.f,0.f,-1.f,2.f},
+    std::array{.6f,1.25f,-.3f,.8f,-.6f,.45f}};
+  constexpr uint32_t width=37,height=23;
+  size_t total=0;
+  const auto bits=[](auto sample){return std::bit_cast<std::array<uint32_t,4>>(sample);};
+  for(int s:{10497,33648,33071})for(int t:{10497,33648,33071})
+    for(int filter:{0,9728,9729})for(bool linear_light:{false,true})
+      for(const auto &transform:affines) {
+        source.wrap_s=s;source.wrap_t=t;source.mag_filter=filter;
+        source.uv_transform=transform;
+        detail::SourceTextureGrid grid(source,width,height,linear_light);
+        for(uint32_t y=0;y<height;++y)for(uint32_t x=0;x<width;++x) {
+          const float u=(float(x)+.5f)/width,v=(float(y)+.5f)/height;
+          const auto expected=bits(reference_sample(source,u,v,linear_light));
+          if(bits(grid.sample(x,y))!=expected||
+             bits(sample_source_texture(source,u,v,linear_light))!=expected)
+            throw std::runtime_error("Prepared or scalar sampler changed original float taps");
+          ++total;
+        }
+      }
+  check(total==183816,"Prepared and scalar source samplers retain exact float taps with wrapped, reflected and coupled source transforms");
+  check(rejects([&]{detail::SourceTextureGrid grid(source,0,height,true);}),
+        "Prepared sampling refuses an invalid output extent");
+  detail::SourceTextureGrid grid(source,width,height,true);
+  check(rejects([&]{grid.sample(width,0);}),"Prepared sampling refuses a coordinate beyond its recorded output grid");
+}
 }
 int main(int argc,char **argv)try{
+  sampling_grid();
   auto image=std::make_shared<Image>();image->width=128;image->height=64;
   for(uint32_t y=0;y<64;++y)for(uint32_t x=0;x<128;++x){image->rgba.push_back(uint8_t(x*2));image->rgba.push_back(uint8_t(y*4));image->rgba.push_back(195);image->rgba.push_back(x%3?128:0);}
   auto maps=std::make_shared<PaintSourceMaps>();maps->color.image=image;maps->color.wrap_s=maps->color.wrap_t=33071;

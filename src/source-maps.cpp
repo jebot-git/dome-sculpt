@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/source-maps.hpp"
 #include "dome/paint.hpp"
+#include "source-texture-grid.hpp"
 #include "source-uv-archive.hpp"
 #include <nlohmann/json.hpp>
 #include <set>
@@ -20,11 +21,91 @@ float wrap(double v,int mode) {
   return float(v-std::floor(v));
 }
 int address(int p,int n,int mode){
+  if(unsigned(p)<unsigned(n))return p;
   if(mode==33071)return std::clamp(p,0,n-1);
   if(mode==33648){int period=2*n;p%=period;if(p<0)p+=period;return p<n?p:period-1-p;}
   p%=n;return p<0?p+n:p;
 }
+
+detail::SourceTextureAxis source_axis(double value, int extent, int mode, bool nearest) {
+  const float at = wrap(value, mode) * float(extent) - .5f;
+  if(nearest) {
+    const int texel=address(int(std::floor(at+.5f)),extent,mode);
+    return {texel,texel,0.f};
+  }
+  const int first=int(std::floor(at));
+  return {address(first,extent,mode),address(first+1,extent,mode),at-first};
 }
+
+std::array<float,4> sample_taps(const Image &image, detail::SourceTextureAxis x,
+                                detail::SourceTextureAxis y, bool nearest, bool srgb) {
+  struct ByteColors {
+    std::array<float,256> unit{}, linear{};
+    ByteColors() {
+      for(size_t byte=0; byte<unit.size(); ++byte) {
+        unit[byte]=float(byte)/255.f;
+        linear[byte]=srgb_to_linear(unit[byte]);
+      }
+    }
+  };
+  static const ByteColors bytes;
+  const auto &rgb=srgb?bytes.linear:bytes.unit;
+  const auto *pixels=image.rgba.data();
+  if(nearest) {
+    const size_t at=(size_t(y.first)*image.width+x.first)*4;
+    return {rgb[pixels[at]],rgb[pixels[at+1]],rgb[pixels[at+2]],bytes.unit[pixels[at+3]]};
+  }
+  std::array<float,4> result{};
+  for(int k=0;k<4;++k) {
+    const bool right=k&1, bottom=k&2;
+    const size_t at=(size_t(bottom?y.second:y.first)*image.width+(right?x.second:x.first))*4;
+    const float weight=(right?x.fraction:1-x.fraction)*(bottom?y.fraction:1-y.fraction);
+    for(int c=0;c<3;++c)result[c]+=weight*rgb[pixels[at+c]];
+    result[3]+=weight*bytes.unit[pixels[at+3]];
+  }
+  return result;
+}
+
+std::array<float,4> sample_validated(const PaintSourceTexture &source, float u, float v, bool srgb) {
+  const auto &m=source.uv_transform;
+  const auto &image=*source.image;
+  const bool nearest=source.mag_filter==9728;
+  const auto x=source_axis(double(m[0])*u+double(m[1])*v+m[4],int(image.width),source.wrap_s,nearest);
+  const auto y=source_axis(double(m[2])*u+double(m[3])*v+m[5],int(image.height),source.wrap_t,nearest);
+  return sample_taps(image,x,y,nearest,srgb);
+}
+
+float texel_center(uint32_t at,uint32_t extent) {
+  return (float(at)+.5f)/extent;
+}
+}
+
+detail::SourceTextureGrid::SourceTextureGrid(const PaintSourceTexture &source,
+    uint32_t width,uint32_t height,bool srgb)
+    :source_(source),width_(width),height_(height),srgb_(srgb) {
+  if(!width||!height||width>8192||height>8192)
+    throw std::invalid_argument("Invalid destination texture sampling dimensions");
+  source_.validate();
+  const auto &m=source_.uv_transform;
+  if(!source_.image||m[1]!=0.f||m[2]!=0.f)return;
+  const bool nearest=source_.mag_filter==9728;
+  columns_.reserve(width);
+  rows_.reserve(height);
+  for(uint32_t x=0;x<width;++x)
+    columns_.push_back(source_axis(double(m[0])*texel_center(x,width)+m[4],
+        int(source_.image->width),source_.wrap_s,nearest));
+  for(uint32_t y=0;y<height;++y)
+    rows_.push_back(source_axis(double(m[3])*texel_center(y,height)+m[5],
+        int(source_.image->height),source_.wrap_t,nearest));
+}
+
+std::array<float,4> detail::SourceTextureGrid::sample(uint32_t x,uint32_t y) const {
+  if(x>=width_||y>=height_)throw std::out_of_range("Source sampling grid coordinate is outside the image");
+  if(!source_.image)return {1,1,1,1};
+  if(columns_.empty())return sample_validated(source_,texel_center(x,width_),texel_center(y,height_),srgb_);
+  return sample_taps(*source_.image,columns_[x],rows_[y],source_.mag_filter==9728,srgb_);
+}
+
 void PaintSourceTexture::validate(unsigned coordinate_count) const {
   if(coordinate_count<1||coordinate_count>8)throw std::invalid_argument("Invalid original texture coordinate authority");
   if(!image)return;
@@ -180,15 +261,7 @@ std::array<float,4> sample_source_texture(const PaintSourceTexture&t,float u,flo
   if(!t.image)return {1,1,1,1};
   t.validate();
   if(!std::isfinite(u)||!std::isfinite(v))throw std::invalid_argument("Invalid original texture sample coordinate");
-  auto &m=t.uv_transform;double tu=double(m[0])*u+double(m[1])*v+m[4],tv=double(m[2])*u+double(m[3])*v+m[5];
-  auto &im=*t.image;float x=wrap(tu,t.wrap_s)*im.width-.5f,y=wrap(tv,t.wrap_t)*im.height-.5f;
-  bool nearest=t.mag_filter==9728;int bx=int(std::floor(x)),by=int(std::floor(y));float fx=x-bx,fy=y-by;
-  if(nearest){bx=int(std::floor(x+.5f));by=int(std::floor(y+.5f));fx=fy=0;}
-  std::array<float,4> result{};
-  for(int k=0;k<(nearest?1:4);++k){int sx=address(bx+(k&1),int(im.width),t.wrap_s),sy=address(by+(k>>1),int(im.height),t.wrap_t);
-    float weight=nearest?1:((k&1)?fx:1-fx)*((k>>1)?fy:1-fy);size_t at=(size_t(sy)*im.width+sx)*4;
-    for(int c=0;c<4;++c){float value=im.rgba[at+c]/255.f;if(srgb&&c<3)value=srgb_to_linear(value);result[c]+=weight*value;}
-  }return result;
+  return sample_validated(t,u,v,srgb);
 }
 std::span<const std::array<float,2>> source_texture_coordinates(const Mesh &mesh,const PaintSourceMaps &maps,int coordinate){
   if(coordinate==0){if(mesh.uv.size()!=mesh.positions.size())throw std::invalid_argument("Source UV0 vertex domain is unavailable");return mesh.uv;}

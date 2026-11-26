@@ -34,6 +34,7 @@
 #include "polygon-surface-archive.hpp"
 #include "paint-composite-backend.hpp"
 #include "dome/source-maps.hpp"
+#include "source-texture-grid.hpp"
 #include "dome/normal-sampling.hpp"
 #include "dome/scene.hpp"
 #include "dome/tangents.hpp"
@@ -3171,8 +3172,12 @@ PaintedMesh::build_composite(const Material &material,const std::function<bool()
       table[value] = srgb_to_linear(unit(uint8_t(value)));
     return table;
   }();
+  const detail::SourceTextureGrid occlusion(source.occlusion,maps->metal_rough.width,maps->metal_rough.height,false);
+  const detail::SourceTextureGrid projected(projected_vertex_color,maps->color.width,maps->color.height,false);
   for(int channel=0;channel<3;++channel){
     auto &image=channel==0?maps->color:channel==1?maps->metal_rough:maps->emission;
+    const auto &source_view=channel==0?source.color:channel==1?source.metal_rough:source.emission;
+    const detail::SourceTextureGrid source_grid(source_view,image.width,image.height,channel!=1);
     const Image *baked_image = nullptr;
     if (baked_)
       baked_image = channel == 0 ? &baked_->maps.color :
@@ -3181,16 +3186,16 @@ PaintedMesh::build_composite(const Material &material,const std::function<bool()
     for(uint32_t y=0;y<image.height;++y)for(uint32_t x=0;x<image.width;++x){
       if((x&255)==0)paint_compute::checkpoint(cancelled);
       float u=(float(x)+.5f)/image.width,v=(float(y)+.5f)/image.height;
-      auto sampled=sample_source_texture(channel==0?source.color:channel==1?source.metal_rough:source.emission,u,v,channel!=1);
+      const auto sampled=source_grid.sample(x,y);
       std::array<float,4> value{};
       if(channel==0)for(int k=0;k<4;++k)value[k]=material.color[k]*sampled[k];
       else if(channel==1){
-        float ao=source.occlusion.image?sample_source_texture(source.occlusion,u,v,false)[0]:1;
+        const float ao=occlusion.sample(x,y)[0];
         value={1-source.occlusion_strength*(1-ao),material.roughness*sampled[1],material.metallic*sampled[2],1};
       }else{for(int k=0;k<3;++k)value[k]=material.emissive[k]*sampled[k];value[3]=1;}
       auto pbr_value=value;
       if(channel==0 && color_projection_) {
-        const auto vertex=sample_source_texture(projected_vertex_color,u,v,false);
+        const auto vertex=projected.sample(x,y);
         for(int k=0;k<4;++k)pbr_value[k]*=vertex[k];
       }
       uint32_t tx=std::min(r-1,uint32_t(u*r)),ty=std::min(r-1,uint32_t(v*r));
