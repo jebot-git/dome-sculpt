@@ -4,6 +4,8 @@
 #include "source-writable-paint.hpp"
 #include "dome/normal-sampling.hpp"
 #include "baked-normal-field.hpp"
+#include "bake-retained-emission.hpp"
+#include "bake-filtered-emission-quality.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/bake.hpp"
 #include "dome/mesh-processing.hpp"
@@ -351,7 +353,8 @@ void pad(BakeResult &result,const BakeOptions &o,std::vector<BakedEmissionSample
 }
 } // namespace
 static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const BakeOptions &o,
-    const detail::SourceBakeNormalResolver &source_normals) {
+    const detail::SourceBakeNormalResolver &source_normals,
+    const std::shared_ptr<const detail::BakedEmissionDomain> &retained_emission={}) {
   if(o.progress)o.progress(0);
   cancel(o); validate(low,source,o,source_normals);
   for(const auto &material:source.materials)if(material.maps&&material.maps->normal_projection){
@@ -372,7 +375,11 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
   }
   const bool float_emission=std::any_of(source.materials.begin(),source.materials.end(),[](const auto &m){return bool(m.resolved_emission);});
   if(float_emission){
-    const size_t field=BakedEmissionField::required_bytes(o.resolution,{128*1024*1024,o.cancelled});
+    // A certified source-grid domain is already the complete immutable FLOAT
+    // authority. Do not allocate a second target-grid field which bake_object
+    // would immediately discard. Charge the real retained owner instead.
+    const size_t field=retained_emission?retained_emission->storage_bytes():
+      BakedEmissionField::required_bytes(o.resolution,{128*1024*1024,o.cancelled});
     const uint64_t other=uint64_t(o.resolution)*o.resolution*(13+(o.separate_pbr_color?4:0)+(o.encode_target_normal?4:0));
     if(other>128*1024*1024||field>128*1024*1024-other)
       throw std::length_error("FLOAT Bake retained channels exceed unchanged paint budget");
@@ -383,7 +390,7 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
   auto high_frames=generic_source_frames(source,o.cancelled);
   size_t pixels=size_t(o.resolution)*o.resolution;
   BakeResult result; result.coverage.resize(pixels);
-  std::vector<BakedEmissionSample> emission;if(float_emission)emission.resize(pixels);
+  std::vector<BakedEmissionSample> emission;if(float_emission&&!retained_emission)emission.resize(pixels);
   if(o.encode_target_normal)result.maps.mtoon_normal={o.resolution,o.resolution,std::vector<uint8_t>(pixels*4)};
   if (!o.writable.empty()) for (size_t i=0;i<pixels;++i) if (!o.writable[i]) result.coverage[i]=4;
   for (auto *image:{&result.maps.color,&result.maps.metal_rough,&result.maps.emission,&result.normal,&result.ambient_occlusion})
@@ -448,7 +455,7 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
       auto high_uv=source.mesh.uv.empty()?std::array<float,2>{}:texcoord(source.mesh,hit->triangle,hit->barycentric);
       auto channels=material(m,source.mesh,hit->triangle,hit->barycentric,high_uv); auto high_normal=normalized(hit->normal);
       if(m.resolved_emission)channels.emission=m.resolved_emission(hit->triangle,hit->barycentric);
-      if(float_emission){emission[at]={{},channels.emission,1};emission[at].validate();}
+      if(float_emission){const BakedEmissionSample value{{},channels.emission,1};value.validate();if(!retained_emission)emission[at]=value;}
       auto pbr_color=m.maps&&m.maps->overlay?material(m,source.mesh,hit->triangle,hit->barycentric,high_uv,true).color:channels.color;
       const bool resolved_source=m.maps&&!m.maps->pbr_color.rgba.empty();
       if(o.separate_pbr_color&&resolved_source){
@@ -500,7 +507,7 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
   if (!result.projected) throw std::runtime_error("No low UV texels projected onto the high source");
   if(o.progress)o.progress(.9f);
   cancel(o); if (o.padding) pad(result,o,emission); cancel(o);
-  if(float_emission)result.emission_field=BakedEmissionField::create(o.resolution,emission,{128*1024*1024,o.cancelled});
+  if(float_emission&&!retained_emission)result.emission_field=BakedEmissionField::create(o.resolution,emission,{128*1024*1024,o.cancelled});
   cancel(o);
   if(o.progress)o.progress(1);
   return result;
@@ -533,4 +540,27 @@ BakeResult bake_mesh(const Mesh &low,const BakeSource &source,const BakeOptions 
 }
 BakeResult detail::bake_mesh_source_normals(const Mesh &low,const BakeSource &source,const BakeOptions &options,
  const SourceBakeNormalResolver &normal){return bake_mesh_impl(low,source,options,normal);}
+BakeResult detail::bake_mesh_retained_emission(const Mesh &low,const BakeSource &source,
+ const BakeOptions &options,const SourceBakeNormalResolver &normal,
+ const std::shared_ptr<const BakedEmissionDomain> &domain,const std::shared_ptr<const Mesh> &target){
+ cancel(options);
+ if(!domain||!domain->valid_owner(domain)||!target||source.materials.size()!=1||
+    !source.materials[0].resolved_emission||
+    std::any_of(source.triangle_materials.begin(),source.triangle_materials.end(),[](auto id){return id!=0;}))
+   throw std::invalid_argument("Retained emission worker needs one genuine certified source");
+ domain->validate_current(target,options.resolution);low.validate();source.mesh.validate();
+ if(low.indices.size()!=target->indices.size()||source.mesh.indices.size()!=target->indices.size()||
+    !exact_emission_projection_directions(low,options))
+   throw std::invalid_argument("Retained emission worker changed its exact source corners or ray columns");
+ auto same=[](Vec3 a,Vec3 b){return a.x==b.x&&a.y==b.y&&a.z==b.z;};
+ for(size_t c=0;c<target->indices.size();++c){
+   if(!(c%1024))cancel(options);
+   const auto t=target->indices[c],l=low.indices[c],h=source.mesh.indices[c];
+   if(!same(low.positions.at(l),target->positions.at(t))||
+      !same(source.mesh.positions.at(h),target->positions.at(t))||
+      low.uv.at(l)!=target->uv.at(t))
+     throw std::invalid_argument("Retained emission worker changed certified target geometry or UVs");
+ }
+ return bake_mesh_impl(low,source,options,normal,domain);
+}
 } // namespace dome

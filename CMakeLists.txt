@@ -219,6 +219,12 @@ if(BUILD_TESTING)
   add_executable(dome-sculpt-source-hdr-provenance-closure-test tests/source-hdr-provenance-closure.cpp)
   target_include_directories(dome-sculpt-source-hdr-provenance-closure-test PRIVATE src)
   target_link_libraries(dome-sculpt-source-hdr-provenance-closure-test PRIVATE dome-sculpt-core)
+  add_executable(dome-sculpt-source-retained-emission-worker-test tests/source-retained-emission-worker.cpp)
+  target_include_directories(dome-sculpt-source-retained-emission-worker-test PRIVATE src)
+  target_link_libraries(dome-sculpt-source-retained-emission-worker-test PRIVATE dome-sculpt-core)
+  add_test(NAME source-retained-emission-worker COMMAND dome-sculpt-source-retained-emission-worker-test
+    ${CMAKE_CURRENT_BINARY_DIR}/source-hdr-provenance-closure-seed/selected-target-resolution.dsculpt)
+  set_tests_properties(source-retained-emission-worker PROPERTIES FIXTURES_REQUIRED hdr-closure-seed TIMEOUT 900)
   add_test(NAME source-hdr-provenance-closure-seed COMMAND dome-sculpt-source-joint-writable-normal-bake-test
     --checked-case 000 2048 ${CMAKE_CURRENT_BINARY_DIR}/source-hdr-provenance-closure-seed)
   set_tests_properties(source-hdr-provenance-closure-seed PROPERTIES FIXTURES_SETUP hdr-closure-seed TIMEOUT 900)
