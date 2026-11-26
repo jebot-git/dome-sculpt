@@ -294,8 +294,8 @@ private:
                        const Evaluation *, const std::function<bool()> &);
   struct SurfaceMap;
   struct CompositeCache;
-  std::shared_ptr<const TextureMaps> build_composite(const Material &) const;
-  std::shared_ptr<const TextureMaps> build_composite(const Material &, const std::function<bool()> &) const;
+  std::shared_ptr<TextureMaps> build_composite(const Material &) const;
+  std::shared_ptr<TextureMaps> build_composite(const Material &, const std::function<bool()> &) const;
   std::shared_ptr<CompositeCache> composite_cache_;
   uint64_t composite_token_ = 0, before_composite_token_ = 0;
   std::shared_ptr<const SurfaceMap> surface_;
