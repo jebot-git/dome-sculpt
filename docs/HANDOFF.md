@@ -1009,6 +1009,17 @@ The exact combined application
 passes all 14 native Wayland checks through the nested canonical DomeD
 compositor on Intel Arc, with no input drift or owned survivors.
 
+The whole Release run exposed a synthetic UV readiness error in
+`native-key-uv-openxr`. Three exact isolated replays reproduced the
+unchanged Save. The observer counted 97 light pixels and missed selected
+edges drawn in the DomeD accent. Fixture `f7877989` counts both colors
+while requiring the enabled Apply indicator and completed controller
+sequence. The corrected observer sees 212 chart pixels and passes all 26
+checks on the frozen combined app and the current active-set app, including
+a changed chart on Apply and exact native bytes after Cancel or focus loss.
+The original full-suite result and the focused replay remain separate.
+[Native XR UV observer evidence](validation/native-key-uv-rendered-atlas-20261126.json)
+
 The combined ASan/UBSan history run accepts the original Bake, writes the
 exact ordered Save and restores the exact native state through Undo/Redo.
 Redo's preview misses the original ten-second wait. A separate sampled

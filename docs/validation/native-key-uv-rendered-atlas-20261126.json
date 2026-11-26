@@ -1,0 +1,120 @@
+{
+  "scope": "Synthetic OpenXR test observer correction. Product and input unchanged within each replay.",
+  "original": {
+    "candidate": "5c977be9be8d90f0a6ada3ef34df9d4d27769209",
+    "unit": "ds-combined-native-key-uv-replay-20261126.service",
+    "invocation": "bc419bec498840c1b57781b99f795c87",
+    "terminal": true,
+    "inputs": {
+      "/usr/bin/python3.14": "44580a031f15af0c03db8f84299b1da4f9740df4467e30cf30bc2143084cf500",
+      "/home/blux/de-xr/dome-sculpt/artifacts/combined-atlas-hdr-preview-source-20261126/tests/native-key-uv-xr.py": "58bb394c721e40e1b91b9acce29a40b16f313833cc1b296bcc5e5294eaea44c2",
+      "/home/blux/de-xr/dome-sculpt/artifacts/combined-atlas-hdr-preview-full-20261126/build/dome-sculpt": "ee0cc1d9a35d94535afce250c6dfe7dd576b1b4472a4ee4d46fd77d1e2bec205",
+      "/home/blux/de-xr/dome-sculpt/artifacts/combined-atlas-hdr-preview-full-20261126/build/libdome-sculpt-test-runtime.so": "e00b86390634f4c3e97694a50553e0364db6b3379153fd912a1c3f9d81027026",
+      "/home/blux/de-xr/dome-sculpt/artifacts/combined-atlas-hdr-preview-full-20261126/build/dome-sculpt-native-authoring-inspect": "36eb9b61278b4556fc78baf4c2d75b3be5abe544a65c0b299996ab61e8d18d27",
+      "/home/blux/de-xr/dome-sculpt/artifacts/combined-atlas-hdr-preview-full-20261126/build/native-key-uv/before.dsculpt": "f2e1b7edffa10f557165b5e4451a659b20a958f3234ad355889ca816f1845485"
+    },
+    "runs": [
+      {
+        "trial": 1,
+        "code": 1,
+        "checks": 7,
+        "failures": [
+          "accept: actual accepted chart changes rather than saving a no-op"
+        ],
+        "accepted_exact_original": true,
+        "uv": {
+          "uv_atlas_apply_accent": 207,
+          "uv_atlas_ready": false,
+          "uv_atlas_visible_pixels": 97,
+          "uv_atlas_wait_frames": 29
+        }
+      },
+      {
+        "trial": 2,
+        "code": 1,
+        "checks": 7,
+        "failures": [
+          "accept: actual accepted chart changes rather than saving a no-op"
+        ],
+        "accepted_exact_original": true,
+        "uv": {
+          "uv_atlas_apply_accent": 207,
+          "uv_atlas_ready": false,
+          "uv_atlas_visible_pixels": 97,
+          "uv_atlas_wait_frames": 29
+        }
+      },
+      {
+        "trial": 3,
+        "code": 1,
+        "checks": 7,
+        "failures": [
+          "accept: actual accepted chart changes rather than saving a no-op"
+        ],
+        "accepted_exact_original": true,
+        "uv": {
+          "uv_atlas_apply_accent": 207,
+          "uv_atlas_ready": false,
+          "uv_atlas_visible_pixels": 97,
+          "uv_atlas_wait_frames": 29
+        }
+      }
+    ],
+    "exit": 1
+  },
+  "corrected": {
+    "fixture_commit": "f787798998889b4083bbed012f49ea063041701b",
+    "invocation": "7b85ceb0c62145cfbff0e75b1eaf7ae1",
+    "terminal": true,
+    "runs": {
+      "broad-candidate": {
+        "app_source": "5c977be9be8d90f0a6ada3ef34df9d4d27769209",
+        "app_sha256": "ee0cc1d9a35d94535afce250c6dfe7dd576b1b4472a4ee4d46fd77d1e2bec205",
+        "checks": 26,
+        "rendered_accept_pixels": 212,
+        "report_sha256": "49e3ed1ff42960ae0d5d08fad610c94dd70fe65029fca3835a59a1ab65563ef3"
+      },
+      "active-set-main": {
+        "app_source": "5ef38b520d9fdfa4e0e2049ce1aad75cfcf28cc1",
+        "app_sha256": "33f4673b17aa9c065072f9ff0cd14e29ada1822a9eb5a0386ecee9ee842b2504",
+        "checks": 26,
+        "rendered_accept_pixels": 212,
+        "report_sha256": "49e3ed1ff42960ae0d5d08fad610c94dd70fe65029fca3835a59a1ab65563ef3"
+      }
+    },
+    "phase": "complete",
+    "runtime_sha256": "a509d343406cb8ca044821b06e3cd90d5a1730d6747abfb27a6fa1e4c5487d65",
+    "exit": 0
+  },
+  "archive": {
+    "file": "native-key-uv-rendered-atlas-20261126.tar.gz",
+    "sha256": "343386b5e5aa63b94cc4311205157ec354ddcca4642a19fd17389a3a3d7bbd67",
+    "members": {
+      "corrected/active-set-main/accept/graphics.json": "3a40ad597d7df103cc3d332c382cc0799bdd3e446f1d5c7d325affcf65d292a6",
+      "corrected/active-set-main/cancel/graphics.json": "5f7149fce3a303055b18d597381bca05fa702414ca0574dc867678481691077c",
+      "corrected/active-set-main/focus/graphics.json": "dfd078f5c6b58a4cead0b32aaeebafe2df1bea2d559a03506f6a35dfdbe02458",
+      "corrected/active-set-main/process.log": "4f9e66df1822c50a6d8e46663cde829423f6f5eaec579cb23c0c568c5af41b97",
+      "corrected/active-set-main/report.json": "49e3ed1ff42960ae0d5d08fad610c94dd70fe65029fca3835a59a1ab65563ef3",
+      "corrected/active-set-main/status.json": "91c3e837864a80bb510cdef0b54de12922e99311f34072abff7d9e90a67eee71",
+      "corrected/broad-candidate/accept/graphics.json": "3a40ad597d7df103cc3d332c382cc0799bdd3e446f1d5c7d325affcf65d292a6",
+      "corrected/broad-candidate/cancel/graphics.json": "5f7149fce3a303055b18d597381bca05fa702414ca0574dc867678481691077c",
+      "corrected/broad-candidate/focus/graphics.json": "dfd078f5c6b58a4cead0b32aaeebafe2df1bea2d559a03506f6a35dfdbe02458",
+      "corrected/broad-candidate/process.log": "1b3db8f4f87b1ac5b07b1e0a73143b59eb54fc5c2fe6566b6d737bb3afd35117",
+      "corrected/broad-candidate/report.json": "49e3ed1ff42960ae0d5d08fad610c94dd70fe65029fca3835a59a1ab65563ef3",
+      "corrected/broad-candidate/status.json": "b6dbd7c68ed73175b02c0b8fca9583020e723f751ae00ff39eb0444b99fe5eb1",
+      "corrected/run.py": "13a9ac147d02de6323a5aceef394d2362b5ca2fbe5cbb23e1166d77e4b8b904a",
+      "corrected/status.json": "dd65470d4cec5ce2f30ea1ebe23c64d668bcda890e2c836fafed8e73d1150524",
+      "original/1/accept/graphics.json": "75bee06efddface8497544fc310b5e79eb197d3ef03229eace5df6594b27d69f",
+      "original/1/process.log": "ad4373c2ac5632ded29203d733243eaecfb52999a5f2fe58732b645e3be4226b",
+      "original/1/report.json": "1b00dee04cb7d438eda6e0e2cc968952a06c231f4ee876579534dd127f5bf4d2",
+      "original/2/accept/graphics.json": "75bee06efddface8497544fc310b5e79eb197d3ef03229eace5df6594b27d69f",
+      "original/2/process.log": "ad4373c2ac5632ded29203d733243eaecfb52999a5f2fe58732b645e3be4226b",
+      "original/2/report.json": "1b00dee04cb7d438eda6e0e2cc968952a06c231f4ee876579534dd127f5bf4d2",
+      "original/3/accept/graphics.json": "75bee06efddface8497544fc310b5e79eb197d3ef03229eace5df6594b27d69f",
+      "original/3/process.log": "ad4373c2ac5632ded29203d733243eaecfb52999a5f2fe58732b645e3be4226b",
+      "original/3/report.json": "1b00dee04cb7d438eda6e0e2cc968952a06c231f4ee876579534dd127f5bf4d2",
+      "original/run.py": "8083fac3718027b2ac2fbfaa8b24cf77a73ab2c1e766e51617a0b261a706b389",
+      "original/status.json": "07451b7687bbc1247dfc4fe347b804322d4787f1b5460e4aa8ff0c1cb375b12f"
+    }
+  }
+}
