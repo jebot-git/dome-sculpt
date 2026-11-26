@@ -1489,6 +1489,46 @@ The fresh combined Release build uses frozen `d9ea0716` in
 `artifacts/native-grid-combined-release-20261126/status.json`.
 [Current resize evidence](validation/native-authored-grid-20261126.json)
 
+### Matching topology Bake
+
+The FLTK Bake dialog and XR Projection Policy panel expose an explicit
+matching-triangles mode. A source and target must share ordered vertices
+and triangle indices. The bake interpolates the corresponding source point
+for each covered target texel and tests signed front/back and total
+displacement in the existing projection metric. Partial mode keeps previous
+bake samples where the new source misses. The existing backface and AO
+paths apply and the sampled material still follows the true source triangle.
+The worker uses the existing normal, color, material and FLOAT emission
+resolvers. The FLTK dialog disables the cage in matching mode. Explicitly
+choosing a cage in XR returns to ray projection.
+
+Matching recipes use recipe v2 and the ordinary ray recipes retain their
+v1 encoding. Native fixtures cover the whole target of a displaced source
+that the ray mode partially misses, a measured normal gradient, FLOAT
+radiance, AO ray counts, preserved misses, wrong index order, cage conflict,
+detached cancellation, exact Save and history. Both original CC0 VRoid
+FaceSkin probes use real displaced detail with prepared normals and a
+common scaled group. Their 256-pixel grids record 50,680 and 49,931
+projected samples and zero projection rays. Both projects match byte for
+byte between Release and ASan/UBSan with leak detection. The eight focused
+native suites pass in each profile. Nested DomeD Wayland covers keyboard
+selection, Cancel, Bake, Recall, Save, Undo and Redo. Both
+synthetic OpenXR profiles exercise the rendered policy and use the same
+native worker. All three frontend runs save the same bytes. Physical
+headset verification, the complete current regressions and broader
+integration work remain open.
+[Matching Bake evidence](validation/matching-bake-20261126.json)
+
+The older plane-cut Release job on `fadacc00` has completed with 1,318
+passes, 18 failures and zero skips. Its evidence retains the original
+test outputs and candidate identity. On the current matching Bake
+product, emission controls, editable XR export and native MToon HDR
+pass the unchanged tests. The polygon archive diagnostic and the previous
+prepared-normal and VRM1 expression guard fixtures still fail their
+assertions. The separate combined Release build on frozen `d9ea0716`
+remains active.
+[Full plane-cut Release results](validation/full-release-fadacc00-20261126.json)
+
 ## Source and integration boundary
 
 - Main now admits product1bc13125 and public fixturef1e193c7 after complete

@@ -1,0 +1,763 @@
+{
+  "production": "fc4abd9ae14c9737a6c1039ec6d661708cc23558",
+  "qualified_fixture": "70b7e6b861b3ca16b416a793d199ed87709f1a08",
+  "source_parent": "e16a84d7",
+  "scoped_native": {
+    "release": {
+      "candidate": "70b7e6b861b3ca16b416a793d199ed87709f1a08",
+      "profile": "release",
+      "terminal": true,
+      "fltk": "/opt/fltk-vr/toolkit",
+      "invocation": "712a2cd0230b46f18aaa259b5ed579d0",
+      "phase": "complete",
+      "elapsed_seconds": 17.56,
+      "exact_product": "fc4abd9ae14c9737a6c1039ec6d661708cc23558",
+      "rebuilt": 63,
+      "dependency_receipt": {
+        "CMakeFiles/dome-sculpt-core.dir/src/document-rig-fit.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/document-projection.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/scene.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/groups.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/bake-authoring.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/src/source-bake-normal.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/bake-recipe.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/document-baking.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/document-shapes.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/input.cpp.o": [],
+        "CMakeFiles/dome-sculpt-core.dir/src/document.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/document-interaction.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/document-uv-solve.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/document-recovery.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/document-assets.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/material-visibility.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/document-skin.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/document-expressions.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/document-import.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/bake.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/src/source-bake-normal.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/emission-bake-source.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/src/source-bake-normal.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/document-paint-blur.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/document-retopo.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/document-sculpt.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/document-native.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/document-contact.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/document-transaction.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/texture-sets.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/texture-set-archive.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/texture-set-range.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/texture-set-worker.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/document-texture-sets.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/texture-set-field-codec.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/document-cut.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/document-worker-errors.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/object-selection.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/polygon-scene.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/document-polygon.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/polygon-surface-archive.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/native-scene-append.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/current-paint-preview.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/anatomical-authoring.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/surface-heat-authoring.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/canonical-paint-prospect.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-render.dir/src/render.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-render.dir/src/palette.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-xr.dir/src/xr.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt.dir/src/vrm-expression-editor.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt.dir/src/rig-fit-editor.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt.dir/src/projection-editor.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt.dir/src/app.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt.dir/src/creator-editor.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt.dir/src/rig-editor.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt.dir/src/shapekey-editor.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt.dir/src/weight-editor.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt.dir/src/skin-editor.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt.dir/src/mesh-editor.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt.dir/src/bake-editor.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt.dir/src/object-editor.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt.dir/src/texture-set-editor.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt.dir/src/paint-editor.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt.dir/src/uv-editor.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt.dir/src/session-appearance.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt.dir/src/export-editor.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ]
+      },
+      "owned_objects": {
+        "CMakeFiles/dome-sculpt-core.dir/src/document-rig-fit.cpp.o": "cc3cd5b58ac2e3cf530c33ea0075bfe7b4b60811c438ec70544aca3d52b62b74",
+        "CMakeFiles/dome-sculpt-core.dir/src/document-projection.cpp.o": "f4e4b6c4df21145fe583545919e6c1dc802cfac05f5267ce2fa77abdc9117f7d",
+        "CMakeFiles/dome-sculpt-core.dir/src/scene.cpp.o": "73a9d5003afa7f9f13bf3bc96e4da6c8db786edf37c00e922b3b25d0ad8e27c1",
+        "CMakeFiles/dome-sculpt-core.dir/src/groups.cpp.o": "8410b0000053aba16a0b785164b55a278a4c7a176930d300dad14422a50b813c",
+        "CMakeFiles/dome-sculpt-core.dir/src/bake-authoring.cpp.o": "f03eee2cdf4d769cf4d8021e3a307a3d7b98e41e770899606921729334fdd77e",
+        "CMakeFiles/dome-sculpt-core.dir/src/bake-recipe.cpp.o": "55215eaa25e33c4c9a9c1171fe39bd5c1337486fe9dab2a77f96d26aa253e896",
+        "CMakeFiles/dome-sculpt-core.dir/src/document-baking.cpp.o": "c51a049ea3a436a9976087411f89334042bab5dddd3bc979b1075f5211d31fab",
+        "CMakeFiles/dome-sculpt-core.dir/src/document-shapes.cpp.o": "59aaab986ff8c8a3def747887a5b66e4a8135c842684f137bfd2c5ae855ada8b",
+        "CMakeFiles/dome-sculpt-core.dir/src/input.cpp.o": "efff2584523d35748d190b77b4068d31d3929247fa0bdbc21420b71decdd6586",
+        "CMakeFiles/dome-sculpt-core.dir/src/document.cpp.o": "032326b0c4511fbb62252244e550327d52cfeef801fb5e747333ca00b9c69e35",
+        "CMakeFiles/dome-sculpt-core.dir/src/document-interaction.cpp.o": "654b964da023c51ceab48b7637100797e5d2ebdb925e8d7e227b3461acf0a73e",
+        "CMakeFiles/dome-sculpt-core.dir/src/document-uv-solve.cpp.o": "8680deae3369c7ed29f0aa08fce08912066d3a0a5d9651771ef8563c6ad4d1a3",
+        "CMakeFiles/dome-sculpt-core.dir/src/document-recovery.cpp.o": "d27c9cbda14e01b7ac25cafc62cb2c8e661145f7b303bee39888b0d2482820b0",
+        "CMakeFiles/dome-sculpt-core.dir/src/document-assets.cpp.o": "d5ccc23962622df355542e95b3d658a59ed919772cfa4664b9ba951ba2df5e1b",
+        "CMakeFiles/dome-sculpt-core.dir/src/material-visibility.cpp.o": "318e0f3291a8c75808025350366c946fe86e888012db7974c526268cfd06f7d7",
+        "CMakeFiles/dome-sculpt-core.dir/src/document-skin.cpp.o": "4fb67b3e9f625e8a07d7c9b2a3f0e38580803cd9a8d43e895f9d7d53f2dc936d",
+        "CMakeFiles/dome-sculpt-core.dir/src/document-expressions.cpp.o": "9c434f8566b9e0354ef1e736d1f26c826308b4964f185251d1a44cb715cb3f22",
+        "CMakeFiles/dome-sculpt-core.dir/src/document-import.cpp.o": "3e5460426d24c4aad5c791d41d943ff534f48e57efd5a829f51de12879291efa",
+        "CMakeFiles/dome-sculpt-core.dir/src/bake.cpp.o": "a46af35b060ed0e2aabd560dd40346a81dc87403b44d86d2a054fd6b77b35376",
+        "CMakeFiles/dome-sculpt-core.dir/src/emission-bake-source.cpp.o": "12360f00138369d82f5e27fb495d85ed1921f013282143321440264ddbf9c883",
+        "CMakeFiles/dome-sculpt-core.dir/src/document-paint-blur.cpp.o": "f0b97c1295598f7dc9c92765708231a1d6be95aee0c379cd8b4cae6d2cf3494a",
+        "CMakeFiles/dome-sculpt-core.dir/src/document-retopo.cpp.o": "b013896d53e3655697c18acab524cb7b82217e0e968a6370351238fd637bc8b0",
+        "CMakeFiles/dome-sculpt-core.dir/src/document-sculpt.cpp.o": "7b6a701f50029450dd8f02e2f9bb87ca13ea78ac68c5cdf7cb8f14e97672fff9",
+        "CMakeFiles/dome-sculpt-core.dir/src/document-native.cpp.o": "1ff2aec5ca91e3286e895fa5fbe4d87626cc3f83a719179cef10432547d1caf7",
+        "CMakeFiles/dome-sculpt-core.dir/src/document-contact.cpp.o": "0aebe57ed19d3eb3990c37d7c3c23a54ea25b844712506f80b0f79ce160bb4be",
+        "CMakeFiles/dome-sculpt-core.dir/src/document-transaction.cpp.o": "13b50be47d5afb6b48d6901827566962eaf686c9fa1ed2ccb63df057a263467f",
+        "CMakeFiles/dome-sculpt-core.dir/src/texture-sets.cpp.o": "7807356a5bfd0cb3b2291076437ff12e440ae716cf6ecf792985ae903f6300ec",
+        "CMakeFiles/dome-sculpt-core.dir/src/texture-set-archive.cpp.o": "791d4a6e1a02f09659a90fb225122674f1742cf1add2f84312ed901284baac7b",
+        "CMakeFiles/dome-sculpt-core.dir/src/texture-set-range.cpp.o": "07f3bb5b6ad897558e194b29616fbdc73c0fc224ca53278aeccf157f0a4fe6df",
+        "CMakeFiles/dome-sculpt-core.dir/src/texture-set-worker.cpp.o": "80ade2d892872c0fd28b400fdef112f55568fa564ea4adeeb0297b48c9ca01be",
+        "CMakeFiles/dome-sculpt-core.dir/src/document-texture-sets.cpp.o": "5d0e510c0217f4b3f3d26e9ba61164a0c3b291a08bd0c38bfc48415b9aa03105",
+        "CMakeFiles/dome-sculpt-core.dir/src/texture-set-field-codec.cpp.o": "dd19152e344a2fbc2e7f4de5fcdbfae24704b4ff877f0062a8de31d10995f036",
+        "CMakeFiles/dome-sculpt-core.dir/src/document-cut.cpp.o": "cdfc00f5dd564d8c1e5c146633c81f78c2331541be91cf3b014d56e8e61ea825",
+        "CMakeFiles/dome-sculpt-core.dir/src/document-worker-errors.cpp.o": "625b451821a499281649470a2dab0da78ae703b9d40e643b9c76a74b1508e5c1",
+        "CMakeFiles/dome-sculpt-core.dir/src/object-selection.cpp.o": "b1287bfb7675eb987daf4a44f5369bfff0b5b8beac072cd97bd997cff95e9152",
+        "CMakeFiles/dome-sculpt-core.dir/src/polygon-scene.cpp.o": "c41728618b709052a4742bfcad16ac83f3abb1fd669bb49ebc00b25d545257ba",
+        "CMakeFiles/dome-sculpt-core.dir/src/document-polygon.cpp.o": "e409955b0ed252bb12c5bfef874a8f6ac421c60e069f36ee23103052a7d51a9d",
+        "CMakeFiles/dome-sculpt-core.dir/src/polygon-surface-archive.cpp.o": "5e519a520a3bb9e24dc35dc98239904eef79cef9f77158ce4bc5948a72325d92",
+        "CMakeFiles/dome-sculpt-core.dir/src/native-scene-append.cpp.o": "b261fc042fc88a0056e7839e63a5f8891b5a2ab6db4554b299d51e3f7cc88068",
+        "CMakeFiles/dome-sculpt-core.dir/src/current-paint-preview.cpp.o": "5e656c1a89dbbf6911c956415cbb156837b5ea71aa7a6b832c5572fe7648e92f",
+        "CMakeFiles/dome-sculpt-core.dir/src/anatomical-authoring.cpp.o": "c09f98ee3bc094c09135f8dedff8af845d48822987a007cda8832160aa3a4577",
+        "CMakeFiles/dome-sculpt-core.dir/src/surface-heat-authoring.cpp.o": "300ebfd57a1982b08443ab2d69b07b8f981c9a625603888a921aaeede99a3b29",
+        "CMakeFiles/dome-sculpt-core.dir/src/canonical-paint-prospect.cpp.o": "9992eb2ae677bc03ebd980e66166d6ee773a20d0bc03ab4f8ef37e8db5f3e658",
+        "CMakeFiles/dome-sculpt-render.dir/src/render.cpp.o": "89eaa140e298e53e50fe268b5567aa24f5005a876c04aec79f10efe954e287e1",
+        "CMakeFiles/dome-sculpt-render.dir/src/palette.cpp.o": "f868015d7dbc4d23c6390341124a5a337b33dbc4310d00b90ec4682430528b17",
+        "CMakeFiles/dome-sculpt-xr.dir/src/xr.cpp.o": "79fd16b619aa1d825ccab47e3dadbf41c435bebd01fc86c3d5aedf3daa762223",
+        "CMakeFiles/dome-sculpt.dir/src/vrm-expression-editor.cpp.o": "28b50ff17eeee77547e1bf523ecaec070a398c0f6df4f701acdce32501cae16f",
+        "CMakeFiles/dome-sculpt.dir/src/rig-fit-editor.cpp.o": "fd3e1ff21b543b6dc811031395c8fbfd7eb596ab2217406cbbf77b4f19bd4ee4",
+        "CMakeFiles/dome-sculpt.dir/src/projection-editor.cpp.o": "b2b7fed2e2399b58a848930ec69ac39aa4dfff3a6b72be1caddbb13ade030820",
+        "CMakeFiles/dome-sculpt.dir/src/app.cpp.o": "633ae5019c929a261cda65846f2e65ed44ba6e1ab169c7ff120e7359ae00d79f",
+        "CMakeFiles/dome-sculpt.dir/src/creator-editor.cpp.o": "3d9398d9b2f5568c7aa7d2f3f2f7e70e5668e802f2940b4f3446b4fd57c8858f",
+        "CMakeFiles/dome-sculpt.dir/src/rig-editor.cpp.o": "2c995e418a068132380d8619a944e0fbbfac067d9a374c1ebc664bdb6188e723",
+        "CMakeFiles/dome-sculpt.dir/src/shapekey-editor.cpp.o": "99bce5b073e98bb38ee9c8464e2e21bb4510e529504e9218b712407fa7429dcb",
+        "CMakeFiles/dome-sculpt.dir/src/weight-editor.cpp.o": "7e1541e7b69e689147cec834e2f2d7c3857fecc646593e82f6ae79d3b9b6c6eb",
+        "CMakeFiles/dome-sculpt.dir/src/skin-editor.cpp.o": "765f9f5dc95d332bf6bb1b73b0d80378e5906a9b3b1cace877769f6fa2df219e",
+        "CMakeFiles/dome-sculpt.dir/src/mesh-editor.cpp.o": "829207e6cfe054a2e4a31ec785b67dd134555fe8f95e74abf5942c30024113e7",
+        "CMakeFiles/dome-sculpt.dir/src/bake-editor.cpp.o": "55cd9ade9a0c058d6d01072c9c7b8278906fc48f0e61b50ec5db36cf3e2dc105",
+        "CMakeFiles/dome-sculpt.dir/src/object-editor.cpp.o": "716dbbc6e98d5d16182d7f2234fe2348489baf3a86a93232e2b97a955d1e2c79",
+        "CMakeFiles/dome-sculpt.dir/src/texture-set-editor.cpp.o": "5aa7176eb7377872021a0891ec593070c7f0104c5100085c863b61ad822b6b71",
+        "CMakeFiles/dome-sculpt.dir/src/paint-editor.cpp.o": "ed3e76ebf35460cc79af7c1d5a13384af1efbeaac5701290c045c8572c76bf08",
+        "CMakeFiles/dome-sculpt.dir/src/uv-editor.cpp.o": "d5a6f8f80b96c4e7559ce6bb1451016b502dcfd1d670276b7e15c86c0b255c50",
+        "CMakeFiles/dome-sculpt.dir/src/session-appearance.cpp.o": "6965bfea96948df5f89e48562215047719e11abcffa8b553c52c353ffa8a92e1",
+        "CMakeFiles/dome-sculpt.dir/src/export-editor.cpp.o": "20d8b94ea2653be60558474ef634c3a47c474b57f703ab2f07cd601d0f698055"
+      },
+      "binaries": {
+        "dome-sculpt-bake-controls-test": "ad0ee2b2f3cedefb5894fa6ec6bdea5050ddee809f94e8918d3c0f5e35785cb0",
+        "dome-sculpt-bake-recipes-test": "befed72449831069ac9973113eacf729321f94b4b05c060c56dbd0abe91ecf32",
+        "dome-sculpt-bake-test": "0d3d2b6412c2a0c4398ca8e419b44d3db30c9f88820df8c83b5063471a3c7094",
+        "dome-sculpt-bake-workflow-test": "198d555639d24b60019e326bb5202c18cdd7fb122df43004e1e5c4c3fcb47b76",
+        "dome-sculpt-baked-textures-test": "cdfc176cd729b7cd8a5615fd9dc811d31ef855f7f989865a5e00182d75f4dd1e",
+        "dome-sculpt-texture-set-bake-recipe-test": "9ad384399efa142db8d09fe8bdde6f28ba69872ec9d7e537f87d3df0fafc656c",
+        "dome-sculpt-bake-projection-policy-test": "bc087168d8ee100a4efbcb423aa3f2e9236994931a19af60dd323f4a0e59abba"
+      },
+      "core_sha256": "a72cd4f4ce9fbb578b4a5e5ce8b8276dd93d773cb7e5f53414863dac764a7a9b",
+      "render_sha256": "3ed9bc450ba6c135a17f9336d8462159007c3400a56f85926dd773d72791c53c",
+      "xr_sha256": "1b47a1f80ff7bdcf45ae29300b350a02176ed5f6ae61d98c976c92e6f9d15d4f",
+      "app_sha256": "eefd82933e84a075eebe607e9eba62b9393176074b7a0c83c1304a1f13d9c8eb",
+      "runtime_sha256": "a509d343406cb8ca044821b06e3cd90d5a1730d6747abfb27a6fa1e4c5487d65",
+      "exit": 0,
+      "failures": [],
+      "tests": 8,
+      "ctest_sha256": "105226e499149de278bbb7f1ecdcc23535ce901a8ec1ff6af76fc66abd5e3f5b",
+      "junit_sha256": "34b492c9adf124faebd70ffb749d764960f501b1e628ac0561200e5aa82d93a4"
+    },
+    "asan": {
+      "candidate": "70b7e6b861b3ca16b416a793d199ed87709f1a08",
+      "profile": "asan",
+      "terminal": true,
+      "fltk": "/home/blux/de-xr/dome-sculpt/artifacts/sdk-20261126/toolkit-sanitize",
+      "invocation": "a0588813a60742f59b0a7f5e20747921",
+      "phase": "complete",
+      "elapsed_seconds": 180.79,
+      "exact_product": "fc4abd9ae14c9737a6c1039ec6d661708cc23558",
+      "rebuilt": 63,
+      "dependency_receipt": {
+        "CMakeFiles/dome-sculpt-core.dir/src/document-rig-fit.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/document-projection.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/scene.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/groups.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/bake-authoring.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp",
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/src/source-bake-normal.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/bake-recipe.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/document-baking.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/document-shapes.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/input.cpp.o": [],
+        "CMakeFiles/dome-sculpt-core.dir/src/document.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/document-interaction.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/document-uv-solve.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/document-recovery.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/document-assets.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/material-visibility.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/document-skin.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/document-expressions.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/document-import.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/bake.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/src/source-bake-normal.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/emission-bake-source.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/src/source-bake-normal.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/document-paint-blur.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/document-retopo.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/document-sculpt.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/document-native.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/document-contact.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/document-transaction.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/texture-sets.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/texture-set-archive.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/texture-set-range.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/texture-set-worker.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/document-texture-sets.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/texture-set-field-codec.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/document-cut.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/document-worker-errors.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/object-selection.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/polygon-scene.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/document-polygon.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/polygon-surface-archive.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/native-scene-append.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/current-paint-preview.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/anatomical-authoring.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/surface-heat-authoring.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-core.dir/src/canonical-paint-prospect.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-render.dir/src/render.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-render.dir/src/palette.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt-xr.dir/src/xr.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt.dir/src/vrm-expression-editor.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt.dir/src/rig-fit-editor.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt.dir/src/projection-editor.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt.dir/src/app.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt.dir/src/creator-editor.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt.dir/src/rig-editor.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt.dir/src/shapekey-editor.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt.dir/src/weight-editor.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt.dir/src/skin-editor.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt.dir/src/mesh-editor.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt.dir/src/bake-editor.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt.dir/src/object-editor.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt.dir/src/texture-set-editor.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt.dir/src/paint-editor.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt.dir/src/uv-editor.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt.dir/src/session-appearance.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ],
+        "CMakeFiles/dome-sculpt.dir/src/export-editor.cpp.o": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126/include/dome/bake-settings.hpp"
+        ]
+      },
+      "owned_objects": {
+        "CMakeFiles/dome-sculpt-core.dir/src/document-rig-fit.cpp.o": "22a5beafbf1b1c284834688a43a53453b72ef55c77d63ff18a4cd2cfb0c7baed",
+        "CMakeFiles/dome-sculpt-core.dir/src/document-projection.cpp.o": "844d3ccef734a1f67509f331801ea3a6cfe1ca4d8e23cdc6d3dd31e4e7537b90",
+        "CMakeFiles/dome-sculpt-core.dir/src/scene.cpp.o": "d0bf019a451f7f0e0da9d740270f32e5e4b3d81573e6e5c6e59d673f8a29e207",
+        "CMakeFiles/dome-sculpt-core.dir/src/groups.cpp.o": "9964dea9a9bc542d1cc055ade6d7cd71b54c0058bacaf5b0b9f27f593d5ad89d",
+        "CMakeFiles/dome-sculpt-core.dir/src/bake-authoring.cpp.o": "fbfa2cf30cbc4b518c9438895e7ef642eda8a72860ae12e9426c94fb97548488",
+        "CMakeFiles/dome-sculpt-core.dir/src/bake-recipe.cpp.o": "8ebfc60685b74dd8b5f30cafa8ccd0a4e6942a04b7d0e633002fc563805325e2",
+        "CMakeFiles/dome-sculpt-core.dir/src/document-baking.cpp.o": "2bd7f04769f7740d1fa943f3fe7ae31a13540d40ba167bbc09db0c2c0c384844",
+        "CMakeFiles/dome-sculpt-core.dir/src/document-shapes.cpp.o": "b289c394d742d3cf6cb48c8a06483cd1ade0c012884f12d1aeffd57c2a889483",
+        "CMakeFiles/dome-sculpt-core.dir/src/input.cpp.o": "502ede6ab0e473032fbdd6177a6ea6f12d03a5c2a86755222fb90185b8fbc366",
+        "CMakeFiles/dome-sculpt-core.dir/src/document.cpp.o": "b8fdef8cd73f13690c329c337b0283d7906ebecf9e99e7399d9c8b9488c75a94",
+        "CMakeFiles/dome-sculpt-core.dir/src/document-interaction.cpp.o": "1fbbc659da842462e2b40a7c75a61f88c9e59c37b269d2b70c2eafa05873bc53",
+        "CMakeFiles/dome-sculpt-core.dir/src/document-uv-solve.cpp.o": "59d68ecb499a653ccc62b3fbb27a5709e108cfe041ca2575e5bdc0e87c2dcd18",
+        "CMakeFiles/dome-sculpt-core.dir/src/document-recovery.cpp.o": "b1996bbdc56c60b9e3bee607a3dc090addd5b2ccad26c1e6a3c6d5bd7501174a",
+        "CMakeFiles/dome-sculpt-core.dir/src/document-assets.cpp.o": "545771bed53e4eb20f59bb3c856c3fd3860cbbd18c3620f903b0bba552a76a94",
+        "CMakeFiles/dome-sculpt-core.dir/src/material-visibility.cpp.o": "9cad7cf5dc78d9a763f57a0d5e54c79961a1fcc75386217445a9dfb991382c58",
+        "CMakeFiles/dome-sculpt-core.dir/src/document-skin.cpp.o": "430463795030145912a01bac02de2e4e476066a83529df6d4886f17b069cc2d4",
+        "CMakeFiles/dome-sculpt-core.dir/src/document-expressions.cpp.o": "7693f3a86b1286b15b8a16578bb375bce8bb15cf61d48af67de115fe8c4e7e75",
+        "CMakeFiles/dome-sculpt-core.dir/src/document-import.cpp.o": "ecc158f44090c00c3d49b7e77fe6199bd061b8bcf19901de3026a479f102ed7b",
+        "CMakeFiles/dome-sculpt-core.dir/src/bake.cpp.o": "63cd82e50db6004b5088639acc6d2c1f335870e66a584969d939a15657bf763a",
+        "CMakeFiles/dome-sculpt-core.dir/src/emission-bake-source.cpp.o": "94a3fcdbb86969dfa48710a9aa0dc36e63a8b21c66e431ad309721193aaf3574",
+        "CMakeFiles/dome-sculpt-core.dir/src/document-paint-blur.cpp.o": "d5cdf63aaab6e94f3004ee91638f6312425a2968256ef38a2c5b13fe53c1f57d",
+        "CMakeFiles/dome-sculpt-core.dir/src/document-retopo.cpp.o": "748001adb3b69ec4b03ab16bb229d37bd52a4ea1358363103ad81392712e29a2",
+        "CMakeFiles/dome-sculpt-core.dir/src/document-sculpt.cpp.o": "b97bcc3448cd03b65862a5e4c83893e715ee6db9dfc4385897ce903bde36c856",
+        "CMakeFiles/dome-sculpt-core.dir/src/document-native.cpp.o": "69cb40f2787f2b50c95e2a1dc8677b08e71715756f76bdc613c76073e2e71355",
+        "CMakeFiles/dome-sculpt-core.dir/src/document-contact.cpp.o": "d6e894179e3ded02afd998e7e31c476a6ab769498811f792d51f080ce59209c9",
+        "CMakeFiles/dome-sculpt-core.dir/src/document-transaction.cpp.o": "48436aff10e1ee06815eafd2280a0b8f8bab85775b5d6efc81d7d02328e5f474",
+        "CMakeFiles/dome-sculpt-core.dir/src/texture-sets.cpp.o": "2d9faffde0ff4fdd8fba57960c7c10f7765650ccac387fcf8c4e4669d8350780",
+        "CMakeFiles/dome-sculpt-core.dir/src/texture-set-archive.cpp.o": "a268005a5064a44f1e5eb95cd97e1f3cab49dde620454ec783da1e69cfc4b860",
+        "CMakeFiles/dome-sculpt-core.dir/src/texture-set-range.cpp.o": "e18bbdd13eb1343d6720416f0529b39234bf7ed4359f4627ffe3be88ee898832",
+        "CMakeFiles/dome-sculpt-core.dir/src/texture-set-worker.cpp.o": "f6d58ff7ce398af922fc24d03d333eb20f60ff31249cfe76e3f4f3a9af5da8b1",
+        "CMakeFiles/dome-sculpt-core.dir/src/document-texture-sets.cpp.o": "4a1052c88da3ef5f3577baa3743b8701bf93a943cc589ac593f5613cdc6f1a62",
+        "CMakeFiles/dome-sculpt-core.dir/src/texture-set-field-codec.cpp.o": "1215ee64e89f3d6fb90a4a63a38d500817ae45a0c19cf01463885e75d137d411",
+        "CMakeFiles/dome-sculpt-core.dir/src/document-cut.cpp.o": "d166b2a4a28f2d1bfe5f585da23747bfec77c96c55c765ded781732b9c8cfb3a",
+        "CMakeFiles/dome-sculpt-core.dir/src/document-worker-errors.cpp.o": "560dfed1b7c6f9149daf3ff4ee2784038876f5643a2ef521811269690b57c971",
+        "CMakeFiles/dome-sculpt-core.dir/src/object-selection.cpp.o": "4ede99d7e34ef92a2ca9e07e6d6e6f0bb20cf457124f0a3a97528d9a2cd7aa9b",
+        "CMakeFiles/dome-sculpt-core.dir/src/polygon-scene.cpp.o": "a579ea20207c818b8681547c086c2a896061449f3eb06a35a04f6e8a3eb44ce4",
+        "CMakeFiles/dome-sculpt-core.dir/src/document-polygon.cpp.o": "ed20283a822edf22a18b9e7791db6811335661808c0f15104d1ec2c2033d52e2",
+        "CMakeFiles/dome-sculpt-core.dir/src/polygon-surface-archive.cpp.o": "8b6d6637cb09d4cd7fb8a1bd347ef37dc94329d2b654aa96344010824e9ba75f",
+        "CMakeFiles/dome-sculpt-core.dir/src/native-scene-append.cpp.o": "d5f252ee5839034226552401db6b2c5531826b03dc2e1ce0b8253396aa215ceb",
+        "CMakeFiles/dome-sculpt-core.dir/src/current-paint-preview.cpp.o": "73ffe4dd75f46be88662919817d2c24e1f382e2db3851a17d2f929facd79508a",
+        "CMakeFiles/dome-sculpt-core.dir/src/anatomical-authoring.cpp.o": "15b02927042d33957f40e54e6243c21666e280f5f7290416a491d1ebf73b1d4e",
+        "CMakeFiles/dome-sculpt-core.dir/src/surface-heat-authoring.cpp.o": "3aafed7745dd537f7a41cbcdbde0c37b3c675f834c2db2e37e7f88795ad5867f",
+        "CMakeFiles/dome-sculpt-core.dir/src/canonical-paint-prospect.cpp.o": "559df2b7c2f01aa2f607dc84259474e23cca5f369ee9f81c17df2b3bc596559e",
+        "CMakeFiles/dome-sculpt-render.dir/src/render.cpp.o": "a61b4a5926e000aab255fc28dc47fe9612807a153a4de369aabec145f4eab84b",
+        "CMakeFiles/dome-sculpt-render.dir/src/palette.cpp.o": "27fb49c647d637adc721c4458e9ed24cd4d49780a6c3948eb7dbcd153d8f17aa",
+        "CMakeFiles/dome-sculpt-xr.dir/src/xr.cpp.o": "6a9b44fcdf0ffcd58c3a17695551b1aa592f13fe111b1cbaebba1aa1948835ba",
+        "CMakeFiles/dome-sculpt.dir/src/vrm-expression-editor.cpp.o": "51af25055c66f5c89bd2b9aaa22bb6e6317ed9feffff1a3f31499d12ee2c28d7",
+        "CMakeFiles/dome-sculpt.dir/src/rig-fit-editor.cpp.o": "c97afadbade03a8be437a95ca8ecfea9622b9499c18cb4a07c45cf5a0d5ca8f7",
+        "CMakeFiles/dome-sculpt.dir/src/projection-editor.cpp.o": "285a6a5dca0a2664b0919f7c99e7860f29c23285169ccc8f73ebec0da5fe821e",
+        "CMakeFiles/dome-sculpt.dir/src/app.cpp.o": "36eb8ae84948b4de045bae8a6683120ae67cabde6d8b23f38a7a81e36d837ad5",
+        "CMakeFiles/dome-sculpt.dir/src/creator-editor.cpp.o": "9630d15ed7191dc6c23455b07dfd61ef52eb7e24222fc712ddc4152c3bab04e0",
+        "CMakeFiles/dome-sculpt.dir/src/rig-editor.cpp.o": "0b2713ae47337480f0fe1e5365791d83c700d092b68be0dae0534daee99ef5fb",
+        "CMakeFiles/dome-sculpt.dir/src/shapekey-editor.cpp.o": "d2d4cee6cf1e3a0924d43b58b58b8862a73de73f30928f612d3719cda3047be7",
+        "CMakeFiles/dome-sculpt.dir/src/weight-editor.cpp.o": "55d8e1e2d06a70e212593740f0751987cdd2c6eecc8019835ed86af20b7fd608",
+        "CMakeFiles/dome-sculpt.dir/src/skin-editor.cpp.o": "a636d32f07e0d25bf8332ef74c7131ddbf31a86f2974f3f29d39574b54f468ac",
+        "CMakeFiles/dome-sculpt.dir/src/mesh-editor.cpp.o": "c76acdd7979c45b139f0abf4ed76b92e1f3c368e5a1c86ce2c9e9a3514e5aa3c",
+        "CMakeFiles/dome-sculpt.dir/src/bake-editor.cpp.o": "13185492ea3542527de9161d003ec2bee6ea876611ede473cb400a61ba57d4ae",
+        "CMakeFiles/dome-sculpt.dir/src/object-editor.cpp.o": "15a3ef4787f8f32b5570d37a256d575152ebef023d91cab7a46409f8e0b90bde",
+        "CMakeFiles/dome-sculpt.dir/src/texture-set-editor.cpp.o": "a731952954c5d6efea5edc6457eeb117267e7db1340b5475618b6314ac19613a",
+        "CMakeFiles/dome-sculpt.dir/src/paint-editor.cpp.o": "df74654915b97b71f0f530685071a5ac019f41d991dd2969adc6872b331670be",
+        "CMakeFiles/dome-sculpt.dir/src/uv-editor.cpp.o": "56f6ae788f59a05c7ade11110d257bb70d77921a79f08209454758369199b5e1",
+        "CMakeFiles/dome-sculpt.dir/src/session-appearance.cpp.o": "bd0c8d28fec4418242dd56ad990c600c314e9c5e0ef4a24275f9dceb20809be1",
+        "CMakeFiles/dome-sculpt.dir/src/export-editor.cpp.o": "0e59956ce6e8a07c68489ef6dc98c9389fb86bcc8aa99f7fbe985e2f120f9fb0"
+      },
+      "binaries": {
+        "dome-sculpt-bake-controls-test": "cb9c403e337280c643b621c0650fdac8e9c88a6e1bdde1bd14f17dc15e81684f",
+        "dome-sculpt-bake-recipes-test": "b468cba9abd1bcd38221c8654dc6ef316f022c28e078b75d2adeea4513c1f770",
+        "dome-sculpt-bake-test": "4777134c3a84dc88a330bfaaeaa42a6afd34bc3d0514e2a460f259eb99c30ae4",
+        "dome-sculpt-bake-workflow-test": "526e35f60487c547ccb0156bd23bacc3369ae7a75440b154bdabe6369162fca2",
+        "dome-sculpt-baked-textures-test": "6b0610badd11a74302fa0551e429554613b92cb3702c31aed76a6954cb595c78",
+        "dome-sculpt-texture-set-bake-recipe-test": "f6a9395a9de857f99a5b7f0ffa76c637af94d0c873f1794010bd12d97bfc8491",
+        "dome-sculpt-bake-projection-policy-test": "8c9af56f957a1772e9616b80afe996560fbde43b094dc571a8df094d5cd1fdba"
+      },
+      "core_sha256": "2e1dae56a73ac895a0aae65ed996e32282b7ffc464ce40cf32e19b096ac3f970",
+      "render_sha256": "eb7dcb88ae55137e3068e522958259e8344329cd0d7e7dfd7e5d007c9283ce68",
+      "xr_sha256": "85d12e5fc953c235dbec794083cc0488ba453b7a5522ffb66ce69495259a0eca",
+      "app_sha256": "a6bfd8c87ffb3860c9a0360403e478c06ad29e768fffcc8ef41230c0239e86e1",
+      "runtime_sha256": "4f2bbe31ec88414cf8142d24037188bf32c03740e616d3a964024b448254cb4b",
+      "exit": 0,
+      "failures": [],
+      "tests": 8,
+      "ctest_sha256": "4954d46dcc024a2ccf706bfcab80eeab1715d63bfc312fc3d132bdfe500e6497",
+      "junit_sha256": "e6c8926081c4a8421e3c5f4ce5e15216621dfdaffc2008067807467c4c81a2e1"
+    }
+  },
+  "nested_wayland": {
+    "candidate": "70b7e6b861b3ca16b416a793d199ed87709f1a08",
+    "terminal": true,
+    "invocation": "36231a6dec9a4c7db6f45f3db08a4664",
+    "phase": "complete",
+    "core_sha256": "a72cd4f4ce9fbb578b4a5e5ce8b8276dd93d773cb7e5f53414863dac764a7a9b",
+    "fixture_helper_sha256": "bc087168d8ee100a4efbcb423aa3f2e9236994931a19af60dd323f4a0e59abba",
+    "compositor_sha256": "47920142c8c803dcf5adb63ba643d2e347fbdcd1e15ecd8bce7c1a8dd47c0b7e",
+    "compositor_source": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+    "probe_sha256": "5bf11c670f66bbb68960073878933055b09582e5173ec1e3f472b413956c55aa",
+    "app_sha256": "eefd82933e84a075eebe607e9eba62b9393176074b7a0c83c1304a1f13d9c8eb",
+    "exit": 0,
+    "checks": 12,
+    "report_sha256": "c250cd00edd93268800e41dcdc3d609a86fb694d8fe2f8ecd2af0825a0a7da58",
+    "output_sha256": "076af7088d3f4d57ce36127e006035af0a617c32d9c48d161b49b2bfebc61443"
+  },
+  "synthetic_openxr": {
+    "software": {
+      "candidate": "70b7e6b861b3ca16b416a793d199ed87709f1a08",
+      "profile": "software",
+      "terminal": true,
+      "invocation": "b56620b667cb48fb9e2b121d39aa6aa5",
+      "phase": "complete",
+      "app_sha256": "eefd82933e84a075eebe607e9eba62b9393176074b7a0c83c1304a1f13d9c8eb",
+      "runtime_sha256": "a509d343406cb8ca044821b06e3cd90d5a1730d6747abfb27a6fa1e4c5487d65",
+      "script_sha256": "d0423bd86bcdd4d63d80c7df59a06537e2bc3655d57cfcf86eec045fc9fee071",
+      "exit": 0,
+      "checks": 20,
+      "report_sha256": "5d4fce8613ab15f59b797e104484b0178a7d91102b5a53bd3740dbe6efc44dd4",
+      "topology_sha256": "076af7088d3f4d57ce36127e006035af0a617c32d9c48d161b49b2bfebc61443"
+    },
+    "arc": {
+      "candidate": "70b7e6b861b3ca16b416a793d199ed87709f1a08",
+      "profile": "arc",
+      "terminal": true,
+      "invocation": "44215f4c98134caba5f4c4873901c6d6",
+      "phase": "complete",
+      "app_sha256": "eefd82933e84a075eebe607e9eba62b9393176074b7a0c83c1304a1f13d9c8eb",
+      "runtime_sha256": "a509d343406cb8ca044821b06e3cd90d5a1730d6747abfb27a6fa1e4c5487d65",
+      "script_sha256": "d0423bd86bcdd4d63d80c7df59a06537e2bc3655d57cfcf86eec045fc9fee071",
+      "exit": 0,
+      "checks": 20,
+      "report_sha256": "5d4fce8613ab15f59b797e104484b0178a7d91102b5a53bd3740dbe6efc44dd4",
+      "topology_sha256": "076af7088d3f4d57ce36127e006035af0a617c32d9c48d161b49b2bfebc61443"
+    }
+  },
+  "both_cc0_avatar_probes": {
+    "release": {
+      "phase": "complete",
+      "terminal": true,
+      "candidate": "70b7e6b861b3ca16b416a793d199ed87709f1a08",
+      "profile": "release",
+      "invocation": "97f01fe964e941c38195b0a10c006e7a",
+      "core_sha256": "a72cd4f4ce9fbb578b4a5e5ce8b8276dd93d773cb7e5f53414863dac764a7a9b",
+      "exit": 0,
+      "project_sha256": {
+        "vroid-beta-female.dsculpt": "dde2240261850b7e003719f9ffe2ec5ec0946a8b478a0ff85a5bf36f64c871de",
+        "vroid-beta-male.dsculpt": "88a4ace349efb23f5d5d5a7a4d7e5973d6c437d3b47353fbd448a841394354d3"
+      },
+      "log_sha256": "b7cecd32ff97e395e7e5ba9ad9356b0e4bc127783f365bdaa49c70d4710df35f",
+      "samples": {
+        "vroid-beta-female": {
+          "projected": 50680,
+          "missed": 4
+        },
+        "vroid-beta-male": {
+          "projected": 49931,
+          "missed": 7
+        }
+      }
+    },
+    "asan": {
+      "phase": "complete",
+      "terminal": true,
+      "candidate": "70b7e6b861b3ca16b416a793d199ed87709f1a08",
+      "profile": "asan",
+      "invocation": "3865b5261d0e4cc5bf87bb8b060224e2",
+      "core_sha256": "2e1dae56a73ac895a0aae65ed996e32282b7ffc464ce40cf32e19b096ac3f970",
+      "exit": 0,
+      "project_sha256": {
+        "vroid-beta-female.dsculpt": "dde2240261850b7e003719f9ffe2ec5ec0946a8b478a0ff85a5bf36f64c871de",
+        "vroid-beta-male.dsculpt": "88a4ace349efb23f5d5d5a7a4d7e5973d6c437d3b47353fbd448a841394354d3"
+      },
+      "log_sha256": "0fab30bf4593ae2a65f20029f70996a99de342ea652de5bf033eb029bcee2def",
+      "samples": {
+        "vroid-beta-female": {
+          "projected": 50680,
+          "missed": 4
+        },
+        "vroid-beta-male": {
+          "projected": 49931,
+          "missed": 7
+        }
+      }
+    }
+  },
+  "avatar_outputs_byte_identical_across_release_and_asan": true,
+  "earlier_failures_current_replay": {
+    "passed": [
+      "emission-controls",
+      "xr-editable-export",
+      "native-mtoon-physical"
+    ],
+    "failed": [
+      "normal-preparation-native",
+      "polygon-scene-archive",
+      "vrm1-expressions"
+    ],
+    "scope": "Six unchanged registered tests against the exact new product",
+    "status": {
+      "candidate": "70b7e6b861b3ca16b416a793d199ed87709f1a08",
+      "profile": "release",
+      "terminal": true,
+      "fltk": "/opt/fltk-vr/toolkit",
+      "invocation": "7e9312246a4241b19bbe59815e8b2d0c",
+      "phase": "complete",
+      "elapsed_seconds": 62.74,
+      "binaries": {
+        "dome-sculpt-emission-controls-test": "3adb3fde1a0c9c7b454ea07e89a8dcfdfc16a13829ed88443c7f17b1f9333cfb",
+        "dome-sculpt-native-mtoon-physical-test": "2ffc33aee0724466e2a5bb3f77decec7a30e96862550a271bc4518ebad74e241",
+        "dome-sculpt-normal-preparation-test": "2095200b9c0237471ed3072ba075d238c1c3e6795e731b5ea37082cb83150f1f",
+        "dome-sculpt-polygon-scene-test": "e21eb858ba34d0146b31b9ba05c3ea3dcf18f45c06c3e9c7f7ee6e000f9c28e9",
+        "dome-sculpt-vrm1-expressions-test": "39954e2405843a4073556f60e299604b1296bab8ca8221811caf5bd90ca7a9b2",
+        "dome-sculpt-xr-editable-export-test": "5cfad4482f627c5548db8e260b3c1ffb66c2330ed454a8269e08b5139e8ba452"
+      },
+      "tested_donor": "fc4abd9ae14c9737a6c1039ec6d661708cc23558",
+      "exit": 8,
+      "failures": [
+        "normal-preparation-native",
+        "polygon-scene-archive",
+        "vrm1-expressions"
+      ],
+      "tests": 6,
+      "ctest_sha256": "b841aacbd202ea5b6f1bf0f00af8c09d8b0188bddce01dc1f624b9c980ffc4ad",
+      "junit_sha256": "4bdcf6350f74889373f5fbfa96cdf0ac42a8dbea1e0a70ae1b25ee8d0d4ab6ee"
+    }
+  },
+  "limits": [
+    "Matching source and target require equal rest vertex counts and exactly ordered triangle indices.",
+    "Layer, saved recipe, bounds, backface, partial-miss preservation and independent AO use the current native worker.",
+    "Actual headset/device acceptance and full current combined qualification remain open."
+  ],
+  "initial_attempts": [
+    "The first build wrapper tried to resolve generated source paths relative to the tracked worktree. The corrected wrapper handles generated entries.",
+    "The first projection fixture read top-level layer data from a physical Paint3 envelope. The corrected fixture uses genuine public layer state and verifies original editable tile owners over the unchanged product."
+  ],
+  "archive": {
+    "file": "matching-bake-20261126.tar.gz",
+    "sha256": "dade08bc8b222a4b1747292121dce46f423a24469d83668a64816525251db538",
+    "members": {
+      "avatar/asan/probe.log": "0fab30bf4593ae2a65f20029f70996a99de342ea652de5bf033eb029bcee2def",
+      "avatar/asan/status.json": "988bb92bbaffd3b6c70a94fb6127791f92405248930fb4ffe4655e47b28677a9",
+      "avatar/avatar-probe.cpp": "cf1acf4d1b79b68ad64c864122995791ac2fb296cf81fb7810616b1600a168e8",
+      "avatar/release/probe.log": "b7cecd32ff97e395e7e5ba9ad9356b0e4bc127783f365bdaa49c70d4710df35f",
+      "avatar/release/status.json": "85c9c1a1e2a7bc2dd48fad94ba5151692b23bedd761330e9f6c252010bccac11",
+      "combined/current-status.json": "5e79b0585a4c02a9276c152e74d26a26159a0a57f1e1dbfcabb9d32a840a6a4d",
+      "initial/asan/ctest-layer-assertion.log": "f263c3a510dcd846cacc5d4c2fb75af7e165cf4e1e7f9d7ebf69152b7793b03f",
+      "initial/asan/generated-entry-status.json": "2073a9e62ae0cd040f148ed852628f0a091a93a0206d7abe18708afa2fc124d0",
+      "initial/release/ctest-layer-assertion.log": "e6de75619ffbcb67d9be8479032e8e97e75fbde67c48ab8dd6561355faa468e1",
+      "initial/release/generated-entry-status.json": "8fc87e3ed716610f1d22884414fbbed1a6087e040991337a5b225b86a03a28a1",
+      "native/asan/bake-topology-tests.xml": "e6c8926081c4a8421e3c5f4ce5e15216621dfdaffc2008067807467c4c81a2e1",
+      "native/asan/ctest.log": "4954d46dcc024a2ccf706bfcab80eeab1715d63bfc312fc3d132bdfe500e6497",
+      "native/asan/status.json": "aee6f1693a936a71d5ae1fd82d88ebb606b0ce3cdf8ee3005c424c6a33676b41",
+      "native/product-build.py": "8f987d5cdc7bdd329949c7b9562f8bb6851c3d4d6d11f6f5d91cb6abca6f51e0",
+      "native/release/bake-topology-tests.xml": "34b492c9adf124faebd70ffb749d764960f501b1e628ac0561200e5aa82d93a4",
+      "native/release/ctest.log": "105226e499149de278bbb7f1ecdcc23535ce901a8ec1ff6af76fc66abd5e3f5b",
+      "native/release/status.json": "b01ad70d02c667f77daba07b949a93ec851f436a0f769c83936928aeae514bf5",
+      "native/run.py": "0ad3195c45b012121359f50effe0a9d6cd777a16271e19eaeb581ae7b45a440d",
+      "openxr/arc/report.json": "5d4fce8613ab15f59b797e104484b0178a7d91102b5a53bd3740dbe6efc44dd4",
+      "openxr/arc/status.json": "ff7d531a1ce8666961cddb189d344aa10aa9776a09ae5aed7a9cb6882f522c29",
+      "openxr/arc/topology.json": "db9dc3b80d55050854678f24d821cf19ed399b306966bed52d5ed7026bbb1b85",
+      "openxr/arc/xr.log": "7e2981f32934dad853ef62939f88ac721069c5ae9f2869733b9e035013aa7d85",
+      "openxr/software/report.json": "5d4fce8613ab15f59b797e104484b0178a7d91102b5a53bd3740dbe6efc44dd4",
+      "openxr/software/status.json": "fa5e57a63f6a898de1275df8374da8ba15d1b59a34651aadf279f7b57463e7e5",
+      "openxr/software/topology.json": "46ac9936405bb24ea4d102c765a611a0e0cbb3c6344a0ee694aaf8f0a6147da7",
+      "openxr/software/xr.log": "0c4211a09e16c256f7d5743d2a3a1bdcd9f2602e78f57eaefa2bf5aa68fe17da",
+      "regression-triage/ctest.log": "b841aacbd202ea5b6f1bf0f00af8c09d8b0188bddce01dc1f624b9c980ffc4ad",
+      "regression-triage/current-regression-triage.xml": "4bdcf6350f74889373f5fbfa96cdf0ac42a8dbea1e0a70ae1b25ee8d0d4ab6ee",
+      "regression-triage/status.json": "d13ab1bb53a21744ef53e0165dc60348574ef22aa4d70acb124c4ac080b289e1",
+      "wayland/replay.py": "f8072100650491a8866356b8ec9799c895dca977ec9e0abc6184808bd512d11f",
+      "wayland/runtime-maps.txt": "7528db546c4d1bbc5a532e47630ac34303b6f3496d4e23bd6d8e79bc239ae73c",
+      "wayland/status.json": "a12d51c2a4fd59cc52cf4c6e043f497de0f823b1b11fab2b5ced3d014323ad14",
+      "wayland/wayland.log": "9d4cf8c6b4bab1550e367c41b811dc6ac18023174cee79c1f398413857806630",
+      "wayland/workflow-report.json": "c250cd00edd93268800e41dcdc3d609a86fb694d8fe2f8ecd2af0825a0a7da58"
+    }
+  }
+}

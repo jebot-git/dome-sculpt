@@ -1,0 +1,67 @@
+{
+  "profile": "Full private software Release from the exact earlier plane-cut closure",
+  "result": {
+    "candidate": "fadacc0076aef8f7b2ed8ec5a9a9cfbbbaa8ca17",
+    "terminal": true,
+    "invocation": "65c3a58f33b1405e9ed2d0fd35052bdc",
+    "toolkit": "/opt/fltk-vr/toolkit",
+    "phase": "complete",
+    "configure": [
+      "cmake",
+      "-S",
+      "/home/blux/de-xr/dome-sculpt/artifacts/cut-owning-material-source-20261126",
+      "-B",
+      "/home/blux/de-xr/dome-sculpt/artifacts/current-full-release-20261126/build",
+      "-G",
+      "Ninja",
+      "-DCMAKE_BUILD_TYPE=Release",
+      "-DDOME_COMPUTE_BACKEND=CPU",
+      "-DFLTK_DIR=/opt/fltk-vr/toolkit/share/fltk"
+    ],
+    "elapsed_seconds": 5853.501,
+    "cache_sha256": "16a20687cb0db558e719635727c63f8fb282bc9b6ffb7c8a35223d358e101b98",
+    "app_sha256": "b2252b2eb6658031e92bb7d7802920e7791393685d358a10b27e8828e2f727e0",
+    "registered": 1336,
+    "exit": 8,
+    "totals": {
+      "pass": 1318,
+      "fail": 18,
+      "skip": 0
+    },
+    "failed": [
+      "anatomical-female-worker",
+      "anatomical-male-worker",
+      "emission-controls",
+      "import-options-controller",
+      "modal-selection-controls",
+      "mtoon-emission",
+      "native-mtoon-physical",
+      "normal-preparation-native",
+      "object-isolation",
+      "object-selection",
+      "pbr-preview",
+      "polygon-color-render",
+      "polygon-scene-archive",
+      "retopology-affine-openxr",
+      "source-gpu",
+      "vrm1-expressions",
+      "xr-editable-export",
+      "xr-native-paint32-export"
+    ],
+    "skipped": [],
+    "junit_sha256": "eb318364bff9e2b663614ac660f4d0d47f430ec51c7beace957a53297ba5077e"
+  },
+  "newer_followup": "The combined current authored paint resolution Release service uses d9ea0716; qualify its complete current test set independently.",
+  "archive": {
+    "file": "full-release-fadacc00-20261126.tar.gz",
+    "sha256": "e6a45e0bd0a6c4656147f157ddf37c1a4491ed051d095162a92fb4992546053a",
+    "members": {
+      "configure.log": "50f251d93478eae3f62864918ebeccf1a4d9db555b048a6270b60677326585db",
+      "build.log": "a903d55358375824c89516955e9895f4e0a00518c5ba886e07da2c5af9faab42",
+      "registered.json": "44d21d6c916b6aa01f8a46c8701ee3a5f497561d3360524935ae4166f75dc3ce",
+      "ctest.log": "7f95637ede6b221ed42bf805cde8deb789cf3b952842309899c6e88b30428537",
+      "full.xml": "eb318364bff9e2b663614ac660f4d0d47f430ec51c7beace957a53297ba5077e",
+      "status.json": "297c6ace8ec2d95ad9602723737c04f3796b11deedba720acf660f1719e26fec"
+    }
+  }
+}

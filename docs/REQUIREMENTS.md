@@ -43,6 +43,15 @@ raw linked-source HDR authoring, accelerated painted resampling, physical XR
 and the new full Release sweep remain open.
 [Current receipt](validation/native-authored-grid-20261126.json)
 
+The shared Bake workflow now supports matching ordered source triangles
+within the configured projection bounds. It transfers normal, color,
+material and FLOAT emission detail in the existing worker. AO retains its
+surface query. The native recipe records the selected mode and restores it
+through Recall. Both CC0 VRoid faces receive about 50,000 source samples
+with zero projection rays and byte-identical Release and sanitizer
+projects. DomeD Wayland and synthetic OpenXR on software GL and Intel Arc
+save identical results. [Matching Bake evidence](validation/matching-bake-20261126.json)
+
 Static VRM1 expression preview and Apply now cover original core PBR and
 unlit materials, including independently writable paint and ordered native
 Save. Unpainted PBR export preserves authored tangent frames and original
@@ -140,10 +149,12 @@ OpenXR evidence. Cross-renderer reflection, per-field HDR, deformed
 sources and physical headset verification remain open.
 [Portable retained-normal evidence](validation/retained-smooth-glb-20261126.json)
 
-The earlier `5ff0da2b` full Release sweep finished with 1,307 passes
-and 27 failures. Five sculpt and scene failures were reproduced on
-`55a5bc69`. The complete latest-product regression remains open.
-[Regression results and fixtures](validation/retained-smooth-glb-20261126.tar.gz)
+The frozen plane-cut Release sweep on `fadacc00` finished with 1,318
+passes, 18 failures and zero skips. The combined authored paint resolution
+Release build on `d9ea0716` is running separately. The earlier `5ff0da2b`
+sweep finished with 1,307 passes and 27 failures.
+[Plane-cut regression](validation/full-release-fadacc00-20261126.json)
+[Earlier regression results](validation/retained-smooth-glb-20261126.tar.gz)
 
 The dense native sculpt preview now builds under the original work
 quota with the same geometry, provenance and draw-run digest as the
