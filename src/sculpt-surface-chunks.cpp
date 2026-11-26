@@ -343,25 +343,59 @@ Volume::GeometryChange checked_field_difference(const SurfaceGeometry &before,
 template<class Index>
 size_t shared_directory_bytes(const Index &current,
                              std::span<const Index *const> others,Work &w) {
-  const auto visit=[&](auto &&self,const typename Index::Ptr &node)->size_t {
-    if(!node)return 0;
+  using Ptr=typename Index::Ptr;
+  using SearchRoot=const Ptr *;
+  using Key=std::remove_cvref_t<decltype(current.root->key)>;
+  static_assert(sizeof(SearchRoot)==sizeof(const void *));
+  if(!current.root||others.empty())return 0;
+  const size_t levels=current.root->height;
+  if(levels>sculpt_shared_index_max_levels)
+    throw std::length_error("Shared sculpt directory exceeds the search depth bound");
+  const size_t width=others.size();
+  Work::Scratch reserve(w,width*levels,sizeof(SearchRoot));
+  std::vector<SearchRoot> roots(width*levels);
+  for(size_t i=0;i<width;++i)roots[i]=&others[i]->root;
+  const auto visit=[&](auto &&self,const Ptr &node,const Key *lower,const Key *upper,size_t level)->size_t {
     w.tick();
-    for(const auto *other:others) {
-      w.tick();const auto found=other->node_owner(node->key);
-      if(found&&same_owner(node,*found)) {
+    auto candidates=std::span(roots).subspan(level*width,width);
+    const size_t payload=value_bytes(node->value);
+    size_t shared=0;
+    for(auto &search:candidates) {
+      w.tick();
+      // The current subtree can only contain keys in (lower, upper). Trim
+      // each foreign search root before passing it down to both children.
+      // The trimmed root still contains every possible match in that range.
+      while(*search) {
+        const auto &key=(*search)->key;
+        if(lower&&!(*lower<key))search=&(*search)->right;
+        else if(upper&&!(key<*upper))search=&(*search)->left;
+        else break;
+      }
+      auto found=search;
+      while(*found) {
+        const auto &key=(*found)->key;
+        if(node->key<key)found=&(*found)->left;
+        else if(key<node->key)found=&(*found)->right;
+        else break;
+      }
+      if(!*found)continue;
+      if(same_owner(node,*found)) {
         if(node->count>SIZE_MAX/(sizeof(typename Index::Node)+128))
           throw std::length_error("Shared sculpt subtree byte overflow");
         return sum(node->count*(sizeof(typename Index::Node)+128),node->payload_bytes);
       }
+      if(payload&&shared_payload(node->value,(*found)->value))shared=payload;
     }
-    size_t shared=0;
-    if(value_bytes(node->value))for(const auto *other:others) {
-      w.tick();const auto found=other->find(node->key);
-      if(found&&shared_payload(node->value,*found)){shared=value_bytes(node->value);break;}
-    }
-    return sum(shared,sum(self(self,node->left),self(self,node->right)));
+    const auto descend=[&](const Ptr &child,const Key *lo,const Key *hi) {
+      if(!child)return size_t{0};
+      auto next=std::span(roots).subspan((level+1)*width,width);
+      std::copy(candidates.begin(),candidates.end(),next.begin());
+      return self(self,child,lo,hi,level+1);
+    };
+    const auto left=descend(node->left,lower,&node->key);
+    return sum(shared,sum(left,descend(node->right,&node->key,upper)));
   };
-  return visit(visit,current.root);
+  return visit(visit,current.root,nullptr,nullptr,0);
 }
 
 const SurfaceCell *cell_at(const TilePackets &cache,Int3 p) {

@@ -87,11 +87,12 @@ SculptScenePreview SculptSceneChunks::capture_geometry(const Scene &scene,Sculpt
     if(group.name.size()+128>SIZE_MAX-group_scratch)throw std::length_error("Sculpt group scratch overflow");
     group_scratch+=group.name.size()+128;
   }
-  constexpr size_t owner_scratch=sizeof(SculptSurfaceChunks::Ptr)+2*sizeof(const void *);
+  constexpr size_t owner_scratch=sizeof(SculptSurfaceChunks::Ptr)+
+      (2+sculpt_shared_index_max_levels)*sizeof(const void *);
   if(scene.objects().size()>(SIZE_MAX-group_scratch)/owner_scratch)
     throw std::length_error("Sculpt retained owner scratch overflow");
-  // Retained geometry handles plus the two bounded pointer arrays used by
-  // actual directory-ownership accounting coexist during a nested operation.
+  // Retained geometry handles, owner arrays and the bounded per-level search
+  // roots coexist during directory-ownership accounting.
   group_scratch+=scene.objects().size()*owner_scratch;
   if(metadata>limits.working_bytes||metadata>limits.retained_bytes)
     throw std::length_error("Sculpt scene metadata limit exceeded");

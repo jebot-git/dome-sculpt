@@ -1,9 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 #include "dome/local-surface.hpp"
+#include <limits>
 #include <optional>
 
 namespace dome::detail {
+// An AVL tree with a size_t node count cannot reach this height.
+inline constexpr size_t sculpt_shared_index_max_levels=2*std::numeric_limits<size_t>::digits;
 // Private preview geometry authority. This is deliberately not a Paint domain,
 // SourceMaterialBindings field, serialized asset, or packed triangle number.
 // Its factory retains the actual immutable extraction owner. Consumers must
