@@ -6,7 +6,9 @@
 #include <bit>
 #include <exception>
 #include <limits>
+#include <map>
 #include <queue>
+#include <ranges>
 #include <set>
 #include <string>
 #include <type_traits>
@@ -121,9 +123,10 @@ struct Work {
   // Lexical scratch remains charged until the actual local storage dies.
   struct Scratch {
     Work &work;size_t bytes;
-    Scratch(Work &w,size_t n,size_t width=1):work(w),bytes(0){work.charge(n,width);bytes=n*width;}
+    Scratch(Work &w,size_t n=0,size_t width=1):work(w),bytes(0){add(n,width);}
     Scratch(const Scratch &)=delete;
     Scratch &operator=(const Scratch &)=delete;
+    void add(size_t n,size_t width){work.charge(n,width);bytes+=n*width;}
     ~Scratch(){if(work.bytes<bytes)std::terminate();work.bytes-=bytes;}
   };
   void validate() const {
@@ -133,14 +136,18 @@ struct Work {
         !e.evaluated_cells||!e.bytes||!e.vertices||e.vertices>UINT32_MAX||!e.indices||!e.regions)
       throw std::invalid_argument("Invalid sculpt chunk operation limits");
   }
+  [[noreturn]] void work_limit() const {
+    throw std::length_error(std::string("Sculpt chunk work limit exceeded during ")+phase+
+        " (steps="+std::to_string(steps)+", limit="+std::to_string(limits.steps)+")");
+  }
   void tick() {
-    if (steps >= limits.steps) throw std::length_error("Sculpt chunk work limit exceeded");
+    if (steps >= limits.steps) work_limit();
     ++steps;
     if ((steps & 63) == 0) stop();
   }
   void advance(size_t n) {
     if(steps>limits.steps||n>limits.steps-steps)
-      throw std::length_error("Sculpt chunk work limit exceeded");
+      work_limit();
     steps+=n;stop();
   }
   void stop() {
@@ -185,7 +192,63 @@ using Positions=Directory<PositionRequest,EdgeRecord>;
 using Chunks=Directory<Int3,Chunk>;
 using Runs=Directory<Int3,SculptSurfaceRun>;
 using Tiles=Directory<Int3,Tile>;
+using RunEntry=std::pair<Int3,SculptSurfaceRun>;
 template<class T> void scratch_insert(std::set<T> &,const T &,size_t,Work &);
+
+void order_tile_runs(std::span<const RunEntry> runs,std::span<size_t> order,Work &w) {
+  constexpr int width=LocalSurfaceCache::tile_width;
+  for(size_t slab_begin=0;slab_begin<runs.size();) {
+    // Tile coordinates advance in (x, y, z) order. Reserve one interval
+    // per cell x across the entire tile slab, including all its y columns.
+    const int tile_x=LocalSurfaceCache::tile_coordinate(runs[slab_begin].first).x;
+    const auto local_x=[&](Int3 cell) {
+      return size_t(int64_t(cell.x)-int64_t(tile_x)*width);
+    };
+    std::array<size_t,width> x_offsets{};
+    size_t slab_end=slab_begin;
+    for(;slab_end<runs.size();++slab_end) {
+      w.tick();
+      const auto cell=runs[slab_end].first;
+      if(LocalSurfaceCache::tile_coordinate(cell).x!=tile_x)break;
+      ++x_offsets[local_x(cell)];
+    }
+    size_t at=slab_begin;
+    for(auto &count:x_offsets) {
+      const auto next=at+count;
+      count=at;
+      at=next;
+    }
+    for(size_t column_begin=slab_begin;column_begin<slab_end;) {
+      const int tile_y=LocalSurfaceCache::tile_coordinate(runs[column_begin].first).y;
+      const auto row=[&](Int3 cell) {
+        const auto y=size_t(int64_t(cell.y)-int64_t(tile_y)*width);
+        return local_x(cell)*width+y;
+      };
+      std::array<size_t,width*width> rows{};
+      size_t column_end=column_begin;
+      for(;column_end<slab_end;++column_end) {
+        w.tick();
+        const auto cell=runs[column_end].first;
+        if(LocalSurfaceCache::tile_coordinate(cell).y!=tile_y)break;
+        ++rows[row(cell)];
+      }
+      for(size_t x=0;x<width;++x)
+        for(size_t y=0;y<width;++y){
+          auto &count=rows[x*width+y];
+          const auto next=x_offsets[x]+count;
+          count=x_offsets[x];
+          x_offsets[x]=next;
+        }
+      // Each row was visited in z tile/cell order, so a stable fill is enough.
+      for(size_t i=column_begin;i<column_end;++i) {
+        w.tick();
+        order[rows[row(runs[i].first)]++]=i;
+      }
+      column_begin=column_end;
+    }
+    slab_begin=slab_end;
+  }
+}
 
 // Geometry-only persistent extraction owner. It never copies the complete
 // legacy std::map on a local update. The initial/replacement factory may use
@@ -579,11 +642,6 @@ struct SculptSurfaceChunks::State {
         collect_tile(*before->cache,tile);collect_tile(*out->cache,tile);
         scratch_insert(dirty_chunks,tile,limits.dependency_chunks,w);
       }
-    } else {
-      out->cache->tiles.visit([&](Int3 tile,const Tile &){
-        collect_tile(*out->cache,tile);
-        scratch_insert(dirty_chunks,tile,limits.extraction.tiles,w);
-      },w);
     }
     out->report.extracted_tiles=out->cache->stats().tiles_built;
     out->report.dependency_edges=dirty_edges.size();
@@ -605,20 +663,41 @@ struct SculptSurfaceChunks::State {
           }
         }
       }else {
-        // These bounded arrays are real cold-build scratch, charged in full
-        // before reservation. Every representative is selected by the same
-        // exact first_request rule; only construction of its indexes differs.
-        using E=std::pair<SurfaceEdge,EdgeRecord>;
+        // All requests are already available in the cold tile directory.
+        // Keep the first cell/ordinal for each edge while visiting the packets
+        // once. The local path still has to query all incident cells because
+        // an unchanged tile can own the first request.
+        Work::Scratch representatives(w);
+        std::map<SurfaceEdge,EdgeRecord> edges;
+        out->cache->tiles.visit([&](Int3 tile,const Tile &packet){
+          scratch_insert(dirty_chunks,tile,limits.extraction.tiles,w);
+          for(const auto &cell:packet->cells)
+            for(size_t ordinal=0;ordinal<cell.vertices.size();++ordinal) {
+              w.tick();
+              const auto &vertex=cell.vertices[ordinal];
+              const EdgeRecord request{{cell.coordinate,uint32_t(ordinal)},vertex};
+              auto found=edges.lower_bound(vertex.edge);
+              if(found!=edges.end()&&found->first==vertex.edge) {
+                if(request.request<found->second.request)found->second=request;
+                continue;
+              }
+              if(edges.size()>=limits.dependency_edges)
+                throw std::length_error("Sculpt chunk dependency limit exceeded");
+              representatives.add(1,sizeof(std::pair<const SurfaceEdge,EdgeRecord>)+128);
+              edges.emplace_hint(found,vertex.edge,request);
+            }
+        },w);
+        out->report.dependency_edges=edges.size();
         using P=std::pair<PositionRequest,EdgeRecord>;
-        Work::Scratch arrays(w,dirty_edges.size(),sizeof(E)+sizeof(P));
-        std::vector<E> edges;std::vector<P> positions;
-        edges.reserve(dirty_edges.size());positions.reserve(dirty_edges.size());
-        for(auto edge:dirty_edges) {
-          w.tick();if(auto next=first_request(*out->cache,edge,w)) {
-            if(!finite(next->vertex.position)||!finite(next->vertex.normal))
-              throw std::invalid_argument("Nonfinite sculpt representative");
-            edges.emplace_back(edge,*next);positions.emplace_back(key(*next),*next);
-          }
+        Work::Scratch array(w,edges.size(),sizeof(P));
+        std::vector<P> positions;
+        positions.reserve(edges.size());
+        for(const auto &[edge,request]:edges) {
+          (void)edge;
+          w.tick();
+          if(!finite(request.vertex.position)||!finite(request.vertex.normal))
+            throw std::invalid_argument("Nonfinite sculpt representative");
+          positions.emplace_back(key(request),request);
         }
         out->edges.assign_sorted(edges.begin(),edges.end(),w);
         std::sort(positions.begin(),positions.end(),[&](const auto &a,const auto &b){w.tick();return a.first<b.first;});
@@ -651,7 +730,6 @@ struct SculptSurfaceChunks::State {
     }
     Work::Phase assembly_phase(w,"chunk assembly and ordered runs");
     using C=std::pair<Int3,Chunk>;
-    using R=std::pair<Int3,SculptSurfaceRun>;
     std::optional<Work::Scratch> chunk_array,run_array;
     size_t run_capacity=0;
     if(!before){
@@ -661,11 +739,11 @@ struct SculptSurfaceChunks::State {
         run_capacity+=tile->cells.size();
       },w);
       chunk_array.emplace(w,dirty_chunks.size(),sizeof(C));
-      run_array.emplace(w,run_capacity,sizeof(R));
+      run_array.emplace(w,run_capacity,sizeof(RunEntry));
     }
     // Constructed after their reservations, so vectors and all element owners
     // die before the lexical scratch leases release on success or exception.
-    std::vector<C> initial_chunks;std::vector<R> initial_runs;
+    std::vector<C> initial_chunks;std::vector<RunEntry> initial_runs;
     if(!before){initial_chunks.reserve(dirty_chunks.size());initial_runs.reserve(run_capacity);}
     auto erase_runs=[&](const Chunk &chunk){
       if(!chunk)return;
@@ -727,8 +805,11 @@ struct SculptSurfaceChunks::State {
       if(!before){
         Work::Phase phase(w,"initial chunk and ordered-run indexes");
         out->chunks.assign_sorted(initial_chunks.begin(),initial_chunks.end(),w);
-        std::sort(initial_runs.begin(),initial_runs.end(),[&](const auto &a,const auto &b){w.tick();return a.first<b.first;});
-        out->runs.assign_sorted(initial_runs.begin(),initial_runs.end(),w);
+        Work::Scratch order_storage(w,initial_runs.size(),sizeof(size_t));
+        std::vector<size_t> order(initial_runs.size());
+        order_tile_runs(initial_runs,order,w);
+        const auto sorted=order | std::views::transform([&](size_t i)->const RunEntry &{return initial_runs[i];});
+        out->runs.assign_sorted(sorted.begin(),sorted.end(),w);
       }
     } catch(const ExactRepair &) {
       // No approximation, local orientation guess, or permanent guard lift.
