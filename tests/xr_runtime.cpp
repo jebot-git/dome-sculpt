@@ -139,6 +139,8 @@ bool voxel_menu_seen = false, voxel_undo_seen = false, voxel_menu_visible = fals
 unsigned voxel_menu_wait = 0, voxel_undo_wait = 0;
 bool scene_menu_visible = false, scene_materials_seen = false, scene_sliders_seen = false;
 unsigned scene_material_wait = 0, scene_slider_wait = 0;
+bool uv_atlas_ready = false;
+unsigned uv_atlas_wait = 0;
 XrPath path(std::string text) {
   auto found = paths.find(text);
   if (found != paths.end())
@@ -588,6 +590,39 @@ FN(ReleaseSwapchainImage, XrSwapchain p, const XrSwapchainImageReleaseInfo *) {
       report["scene_sliders_seen"] = scene_sliders_seen;
     }
   }
+  if (getenv("DOME_XR_FIXTURE_UV") && s->eye == 0 && frame == 13) {
+    // Wait for the chart worker to publish actual edges and enable Apply.
+    // A visible empty grid still ignores the following editor input.
+    const float perspective = .66f * std::tan(.6f);
+    const auto x = [&](int px) {
+      const float world = .045f + .032f + .6f * (px / 640.f - .5f);
+      return int(std::lround(s->width * .5f * (1 + world / perspective)));
+    };
+    const auto y = [&](int py) {
+      const float world = 1.56f - 1.6f + .6f * (.5f - py / 640.f);
+      return int(std::lround(s->height * .5f * (1 + world / perspective)));
+    };
+    const auto pixels = [&](int left, int top, int right, int bottom, auto match) {
+      int count = 0;
+      for (int row = std::max(0, y(bottom)); row <= std::min(int(s->height) - 1, y(top)); ++row)
+        for (int col = std::max(0, x(left)); col <= std::min(int(s->width) - 1, x(right)); ++col) {
+          const auto at = (size_t(row) * s->width + col) * 4;
+          if (match(displayed(bytes[at]), displayed(bytes[at + 1]), displayed(bytes[at + 2])))
+            ++count;
+        }
+      return count;
+    };
+    const int chart = pixels(148, 148, 490, 490, [](int r, int g, int b) {
+      return r > 155 && g > 155 && b > 155;
+    });
+    const int apply = pixels(418, 594, 520, 607, [](int r, int g, int b) {
+      return r < 150 && g > 130 && b > 220;
+    });
+    report["uv_atlas_visible_pixels"] = chart;
+    report["uv_atlas_apply_accent"] = apply;
+    uv_atlas_ready = chart > 100 && apply > 20;
+    report["uv_atlas_ready"] = uv_atlas_ready;
+  }
   if((!mask_mode().empty() && s->eye==0 && mask_step==35) || (!resolution_mode().empty() && s->eye==0 && frame==19)) {
     if(auto path=getenv("DOME_XR_FIXTURE_REPORT")) {
       std::ofstream capture(std::string(path)+(!resolution_mode().empty()?".resolution-"+std::to_string(frame):".mask-"+std::to_string(mask_step))+".ppm",std::ios::binary);
@@ -711,7 +746,8 @@ FN(PollEvent, XrInstance, XrEventDataBuffer *out) {
   const bool menu_complete = (!editable_avatar_mode().empty() || menu_gate()) && frame >= 45;
   const bool voxel_complete = voxel_mode() == "undo" && frame >= 50;
   const bool scene_complete = getenv("DOME_XR_FIXTURE_SCENE") && frame >= 45;
-  if ((menu_complete || voxel_complete || scene_complete) && menu_completion_event < 2) {
+  const bool uv_complete = getenv("DOME_XR_FIXTURE_UV") && frame >= 45;
+  if ((menu_complete || voxel_complete || scene_complete || uv_complete) && menu_completion_event < 2) {
     auto e = reinterpret_cast<XrEventDataSessionStateChanged *>(out);
     e->type = XR_TYPE_EVENT_DATA_SESSION_STATE_CHANGED;
     e->session = reinterpret_cast<XrSession>(&session_tag);
@@ -812,7 +848,14 @@ FN(WaitFrame, XrSession, const XrFrameWaitInfo *, XrFrameState *p) {
   const bool wait_voxel_undo = voxel_mode() == "undo" && frame == 45 && !voxel_undo_seen;
   const bool wait_scene_menu = getenv("DOME_XR_FIXTURE_SCENE") && frame == 17 && !scene_materials_seen;
   const bool wait_scene_sliders = getenv("DOME_XR_FIXTURE_SCENE") && frame == 21 && !scene_sliders_seen;
-  if (wait_scene_menu || wait_scene_sliders) {
+  if (getenv("DOME_XR_FIXTURE_UV") && frame == 13 && !uv_atlas_ready) {
+    report["uv_atlas_wait_frames"] = ++uv_atlas_wait;
+    if (uv_atlas_wait >= 750) {
+      report["uv_atlas_gate_exhausted"] = true;
+      save();
+      return XR_ERROR_RUNTIME_FAILURE;
+    }
+  } else if (wait_scene_menu || wait_scene_sliders) {
     auto &waited = wait_scene_menu ? scene_material_wait : scene_slider_wait;
     report[wait_scene_menu ? "scene_material_wait_frames" : "scene_slider_wait_frames"] = ++waited;
     if (scene_material_wait + scene_slider_wait >= 750) {

@@ -540,8 +540,11 @@ with contextlib.nullcontext(tempfile.mkdtemp(prefix="projects-", dir=output)) as
         info["paint_blue_texels"] > 20,
         "Nested joystick brush palette selects blue ink for the tracked paint stroke",
     )
-    uv_result, uv_path = run("uv",45,extra=["--paint"],mode={"DOME_XR_FIXTURE_UV":"1"})
+    uv_result, uv_path = run("uv",900,extra=["--paint"],mode={"DOME_XR_FIXTURE_UV":"1"})
     check(uv_result.returncode==0,"Native OpenXR UV panel supports joystick entry and ray-operated edit/Apply controls")
+    uv_report = json.loads((output / "uv.json").read_text())
+    check(uv_report.get("uv_atlas_ready") is True,
+          "Native OpenXR observes rendered atlas edges and enabled Apply before UV edits")
     uv_info=json.loads(subprocess.check_output([str(binary),"--project-info",str(uv_path)],env=env,text=True))
     (output / "uv-comparison.json").write_text(json.dumps({"uv_info":uv_info,"basepaint":basepaint,"project_directory":directory},indent=2)+"\n")
     check(uv_info["uv_hash"]!=basepaint["uv_hash"],"XR UV coordinates change and persist after Apply")
