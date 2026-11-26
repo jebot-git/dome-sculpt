@@ -1928,12 +1928,41 @@ test resources. Read the exact run state under
 `artifacts/first-key-2048-full-release-20261126/status.json`.
 
 Standard GLB passes Khronos validation with zero errors and a skinned-node
-parent warning. The default Editable GLB worker still reaches its cumulative
-sample budget at this resolution. A diagnostic run with an explicit larger
-sample budget extracts a byte-identical native project from the resulting GLB.
-Default Editable export, joint full-resolution physical-emission key workflows
-and physical headset verification remain open.
+parent warning. The first-key checkpoint's default Editable GLB worker reached
+its cumulative sample budget at this resolution. Its diagnostic run with a
+larger explicit limit recovered a byte-identical native project.
 [First shapekey evidence](validation/native-writable-first-key-2048-20261126.json)
+
+### Editable GLB from the retained 2048 atlas
+
+CPU composition now visits occupied visible tiles in original layer order.
+The plain LDR retained export preflight charges the actual padded texel
+references, coverage scans, and normal-plane pass under the existing limits.
+The normal pass reads the baked directions directly. A tighter caller budget
+still refuses before publishing a replacement file.
+
+The default worker export of the converted 2048-square Bake and shapekey
+matches the previous raised-budget diagnostic GLB byte for byte. Its native
+payload reopens to the exact 214,324,184-byte project. The portable core view
+uses the four retained 2048-square maps, including when the general export
+dialog shows its default 512 setting. Khronos reports zero errors and one
+skinned-node parent warning.
+
+Release and ASan/UBSan each pass 13 focused tests and eight additional tests
+covering source paint, UVs, texture sets and repeated package export. A
+14-layer scene with overlapping sparse colour, roughness, metal and emission
+layers produces the same Editable GLB as the previous compositor with a
+higher diagnostic limit. The Wayland export and the synthetic OpenXR
+controller export use the same bytes. The first software OpenXR test stub
+omitted the active flag on the joystick click. Its corrected input replay
+uses the same application binary.
+
+A follow-up probe used a genuine physical-emission donor with full
+2048-square coverage. Bake rejects the prospective 164 MiB of dense FLOAT
+planes and other retained channels at the existing 128 MiB per-paint limit.
+The probe reaches that refusal before the first key or portable HDR export.
+Physical headset verification remains open.
+[Editable GLB and physical Bake probe evidence](validation/native-editable-glb-2048-20261126.json)
 
 ## Source and integration boundary
 

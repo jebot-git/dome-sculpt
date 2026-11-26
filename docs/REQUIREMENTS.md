@@ -102,10 +102,11 @@ matching triangles execute all 16 default AO samples at 2048. The first
 shapekey on a fully baked native LDR target can now save and reopen with the
 exact original Bake available for Undo and Shape Restore. The reopened key
 remains editable and supports portable normal conversion and Standard GLB.
-Default Editable GLB still reaches its compilation sample budget at this
-resolution. Full-resolution key authoring with physical emission and physical
-headset verification remain open.
-[Full-resolution writable atlas evidence](validation/native-writable-raster-2048-20261126.json) · [Default AO evidence](validation/default-ao-bake-2048-20261126.json) · [First shapekey evidence](validation/native-writable-first-key-2048-20261126.json)
+Default Editable GLB also exports this project under the existing sample
+budget. It recovers the exact native scene, including the original Bake and
+Shape Restore data. Full-resolution Bake and key authoring with physical
+emission and physical headset verification remain open.
+[Full-resolution writable atlas evidence](validation/native-writable-raster-2048-20261126.json) · [Default AO evidence](validation/default-ao-bake-2048-20261126.json) · [First shapekey evidence](validation/native-writable-first-key-2048-20261126.json) · [Editable GLB evidence](validation/native-editable-glb-2048-20261126.json)
 
 Strict Bake rays now recover source-edge contacts affected by float staging.
 An exact ray hit has priority. A missed ray can use an actual source edge

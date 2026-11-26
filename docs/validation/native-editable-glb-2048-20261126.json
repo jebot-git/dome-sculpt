@@ -1,0 +1,117 @@
+{
+  "archive": {
+    "file": "native-editable-glb-2048-20261126.tar.gz",
+    "members": 69,
+    "sha256": "9b51d6ae48af241dab8a44baca1ef8783ec306a3130031f1047983dfad976ecf"
+  },
+  "artifact": {
+    "bytes": 331120,
+    "embedded_scene_bytes": 214324184,
+    "khronos_errors": 0,
+    "khronos_warnings": 1,
+    "png_dimensions": [
+      [
+        2048,
+        2048
+      ],
+      [
+        2048,
+        2048
+      ],
+      [
+        2048,
+        2048
+      ],
+      [
+        2048,
+        2048
+      ]
+    ],
+    "recovered_scene_sha256": "075776f1e2656d1f31d29c312c191120d62389bbe0af61d3956f84f6c868363a",
+    "sha256": "2a2d509fb87ebeb01459846eb16138d96500b05debbef7846e470861db5790cb"
+  },
+  "frontend": {
+    "arc": {
+      "app_sha256": "33c74843934794b086a18392b94d773ee3bca75de6eb071ffa62b5d3dd57f21c",
+      "checks": 10,
+      "exit": 0,
+      "input_sha256": "075776f1e2656d1f31d29c312c191120d62389bbe0af61d3956f84f6c868363a",
+      "inspector_sha256": "8f0d0e0068ab619bf68ee5cd25645abdf3446c8dedebb63529f7bf9d1a4cebfc",
+      "invocation": "ad8b24e9fbd14c95aad2803f2ab91471",
+      "mode": "arc",
+      "native_sha256": "2a2d509fb87ebeb01459846eb16138d96500b05debbef7846e470861db5790cb",
+      "phase": "complete",
+      "report_sha256": "9debf980f51f32b99b3339ba7b1242d5edc559c47121856ec385e947214741b8",
+      "run_script_sha256": "2689b66c44ab6aa2f4aa4c4b9ed0b79b260702b05ba0ed5d715ef875dc46151e",
+      "runtime_sha256": "d95d6c86927bcc539288749181e1642d2b5484e44e1ab768e62f3c5c60b8ad82",
+      "terminal": true,
+      "verifier_sha256": "5a24b56b885b08fcfb868325e2646b3ea49e0213ee939b8574e5fe542182d349"
+    },
+    "software": {
+      "app_sha256": "4bc1b5922644aa29c0d51db701c2d78c11af0e5aa7ae5f5ee6a6cd735366cfb4",
+      "checks": 10,
+      "exit": 0,
+      "input_sha256": "075776f1e2656d1f31d29c312c191120d62389bbe0af61d3956f84f6c868363a",
+      "inspector_sha256": "c9ed91264a4e92e7e0fe779f3ea28c9425c44959beac86af5a42d723ae387a11",
+      "invocation": "9ceb6f287bd54cb3a04e7bc694055623",
+      "mode": "software",
+      "native_sha256": "2a2d509fb87ebeb01459846eb16138d96500b05debbef7846e470861db5790cb",
+      "phase": "complete",
+      "report_sha256": "9debf980f51f32b99b3339ba7b1242d5edc559c47121856ec385e947214741b8",
+      "run_script_sha256": "2689b66c44ab6aa2f4aa4c4b9ed0b79b260702b05ba0ed5d715ef875dc46151e",
+      "runtime_sha256": "c6e7b477be71c5818a5e688de9ea0632e78edf35e253c1adc88b6701e31b2b18",
+      "terminal": true,
+      "verifier_sha256": "8dc1a0592a78c196c82f7a2d6e22488e15a2c95b8c816a787bcba94d23434ae6"
+    },
+    "wayland": {
+      "app_sha256": "4bc1b5922644aa29c0d51db701c2d78c11af0e5aa7ae5f5ee6a6cd735366cfb4",
+      "checks": 9,
+      "compositor_sha256": "47920142c8c803dcf5adb63ba643d2e347fbdcd1e15ecd8bce7c1a8dd47c0b7e",
+      "compositor_source": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+      "exit": 0,
+      "input_sha256": "075776f1e2656d1f31d29c312c191120d62389bbe0af61d3956f84f6c868363a",
+      "inspector_sha256": "c9ed91264a4e92e7e0fe779f3ea28c9425c44959beac86af5a42d723ae387a11",
+      "invocation": "a02f0951176647b99415a0b671b2bae3",
+      "mode": "wayland",
+      "native_sha256": "2a2d509fb87ebeb01459846eb16138d96500b05debbef7846e470861db5790cb",
+      "phase": "complete",
+      "probe_sha256": "5bf11c670f66bbb68960073878933055b09582e5173ec1e3f472b413956c55aa",
+      "report_sha256": "a0389ad0919d87921f37991e15039f6554451b2c3df3fb2c0f9e5b5edbf3a7ea",
+      "run_script_sha256": "d5bac9b96280e257c528b45cdca4b6fee58f396e752232862b724fa5c0b7c12b",
+      "terminal": true,
+      "verifier_sha256": "8dc1a0592a78c196c82f7a2d6e22488e15a2c95b8c816a787bcba94d23434ae6"
+    }
+  },
+  "multilayer_parity": {
+    "exit": 0,
+    "glb_bytes": 713656,
+    "glb_sha256": "5b8e40d58bcb8a9b209b969bdefeb9a1df1586ed718316ea6c3c96e6b852aeac",
+    "input_sha256": "075776f1e2656d1f31d29c312c191120d62389bbe0af61d3956f84f6c868363a",
+    "layers": 14
+  },
+  "pending_physical_bake": {
+    "combined_minimum_bytes": 171966464,
+    "per_paint_byte_cap": 134217728,
+    "refusal": "Probe refusal: FLOAT Bake retained channels exceed unchanged paint budget",
+    "resolution": 2048
+  },
+  "product": "7b22726e9c0c9cdb529626f197b4a93d2519ff2b",
+  "profiles": {
+    "asan": {
+      "application_sha256": "33c74843934794b086a18392b94d773ee3bca75de6eb071ffa62b5d3dd57f21c",
+      "core_sha256": "20a724e115284871d2bd413dab2fbe00501cc7f06a73c647fb3aa9f605e9d386",
+      "ctest_log_sha256": "b97bc6504a932588c888ab5c15b28e7682d8ffae656d08bb2a057eb7850772d6",
+      "ctests": 13,
+      "expanded_ctests": 8
+    },
+    "release": {
+      "application_sha256": "4bc1b5922644aa29c0d51db701c2d78c11af0e5aa7ae5f5ee6a6cd735366cfb4",
+      "core_sha256": "40bf74c52bd46ecd7dc9fe71768da0c8aa425ca064762b3452a480dd8d95ced4",
+      "ctest_log_sha256": "4e411c8489d013cc8c11f11368e6ea4a78c29647d9da388efd9ddc2c84b05897",
+      "ctests": 13,
+      "expanded_ctests": 8
+    }
+  },
+  "scope": "Native LDR Editable GLB of a fully baked 2048 square retained atlas with an edited shapekey and original Restore. Existing sample limits and published output bytes are preserved.",
+  "source_patch_sha256": "4a24f961171803b552a55a19e2a08ea299d32b5b41840daff8d68f13d7de9bce"
+}
