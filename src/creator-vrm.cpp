@@ -17,6 +17,40 @@ bool same_mesh(const Mesh &a,const Mesh &b) {
   for(size_t i=0;i<a.normals.size();++i)if(length(a.normals[i]-b.normals[i])>2e-6f)return false;
   return true;
 }
+bool same_position(Vec3 a,Vec3 b) {
+  return a.x==b.x && a.y==b.y && a.z==b.z;
+}
+bool preserves_source_corners(const ObjectSurface &object,const SourceUvOrigin &origin,
+                              const std::function<bool()> &cancel) {
+  const auto &current=object.mesh;
+  const auto &original=origin.paint->mesh();
+  const auto &current_source=object.appearance->source_vertices;
+  const auto &original_source=origin.appearance->source_vertices;
+  if(!object.material_bindings->sampling_reparameterized ||
+     current.indices.size()!=original.indices.size() ||
+     current.positions.size()!=current_source.size() ||
+     current.normals.size()!=current.positions.size() ||
+     current.positions.size()>current.indices.size())
+    return false;
+
+  // A UV edit can split a vertex at an island boundary. Each current corner
+  // must still address the same rest position, normal and original accessor.
+  std::vector<uint32_t> remap(current.positions.size(),UINT32_MAX);
+  for(size_t corner=0;corner<current.indices.size();++corner) {
+    if((corner%4096)==0 && cancel && cancel())
+      throw std::runtime_error("Creator VRM authority cancelled");
+    const auto vertex=current.indices[corner],source=original.indices[corner];
+    if(vertex>=remap.size()) return false;
+    auto &previous=remap[vertex];
+    if(previous==source) continue;
+    if(previous!=UINT32_MAX || current_source[vertex]!=original_source[source] ||
+       !same_position(current.positions[vertex],original.positions[source]) ||
+       !same_position(current.normals[vertex],original.normals[source]))
+      return false;
+    previous=source;
+  }
+  return std::none_of(remap.begin(),remap.end(),[](auto vertex){return vertex==UINT32_MAX;});
+}
 Vec3 vector(const nlohmann::json &j){return {j.value("x",0.f),j.value("y",0.f),j.value("z",0.f)};}
 nlohmann::json vector(Vec3 v){return {{"x",v.x},{"y",v.y},{"z",v.z}};}
 Vec3 unity(Vec3 p){return {p.x,p.y,-p.z};}
@@ -63,11 +97,14 @@ CreatorVrmAuthority::CreatorVrmAuthority(const std::vector<ObjectSurface> &objec
     if(o.appearance) {
       if(origin.creator_kind!="vroid-shape"||!origin.appearance||
          o.appearance->source_joint_nodes!=nodes_||origin.appearance->source_joint_nodes!=nodes_||
-         o.appearance->source_vertices!=expected.appearance->source_vertices ||
+         origin.appearance->source_vertices!=expected.appearance->source_vertices ||
          !o.appearance->source_basis_quaternion ||
          o.appearance->source_basis_quaternion->w!=0 || o.appearance->source_basis_quaternion->x!=0 ||
          std::abs(o.appearance->source_basis_quaternion->y)!=1 || o.appearance->source_basis_quaternion->z!=0)
         fail("creator source accessor or joint identity differs");
+      if(o.appearance->source_vertices!=origin.appearance->source_vertices &&
+         !preserves_source_corners(o,origin,cancel))
+        fail("creator UV remap changes the original source corners");
     } else if(origin.appearance||origin.material||o.material_bindings->has_mtoon)
       fail("generated groom cannot impersonate an imported material or appearance");
   }
