@@ -3616,12 +3616,16 @@ public:
 			m_edges.reserve(reserveEdgeCount);
 		m_positions = positions;
 		m_indices = indices;
-		m_cellDataOffsets.clear();
+		// Chart growth rebuilds this grid for each trial chart. Clear the cells
+		// that held edges and reuse the initialized background cells.
+		for (uint32_t i = 0; i < m_occupiedCells.size(); ++i)
+			m_cellDataOffsets[m_occupiedCells[i]] = UINT32_MAX;
+		m_occupiedCells.clear();
 	}
 
 	void append(uint32_t edge)
 	{
-		XA_DEBUG_ASSERT(m_cellDataOffsets.isEmpty());
+		XA_DEBUG_ASSERT(m_occupiedCells.isEmpty());
 		m_edges.push_back(edge);
 	}
 
@@ -3629,7 +3633,7 @@ public:
 	{
 		const uint32_t edgeCount = m_edges.size();
 		bool bruteForce = edgeCount <= 20;
-		if (!bruteForce && m_cellDataOffsets.isEmpty())
+		if (!bruteForce && m_occupiedCells.isEmpty())
 			bruteForce = !createGrid();
 		if (bruteForce) {
 			for (uint32_t j = 0; j < edgeCount; j++) {
@@ -3656,7 +3660,7 @@ public:
 	bool intersect(float epsilon, ConstArrayView<uint32_t> edges = ConstArrayView<uint32_t>(), ConstArrayView<uint32_t> ignoreEdges = ConstArrayView<uint32_t>())
 	{
 		bool bruteForce = m_edges.size() <= 20;
-		if (!bruteForce && m_cellDataOffsets.isEmpty())
+		if (!bruteForce && m_occupiedCells.isEmpty())
 			bruteForce = !createGrid();
 		const uint32_t *edges1, *edges2 = nullptr;
 		uint32_t edges1Count, edges2Count = 0;
@@ -3769,9 +3773,13 @@ private:
 		if (m_gridWidth <= 1 || m_gridHeight <= 1)
 			return false;
 		// Insert edges into cells.
-		m_cellDataOffsets.resize(m_gridWidth * m_gridHeight);
-		for (uint32_t i = 0; i < m_cellDataOffsets.size(); i++)
-			m_cellDataOffsets[i] = UINT32_MAX;
+		const uint32_t cellCount = m_gridWidth * m_gridHeight;
+		const uint32_t initialized = m_cellDataOffsets.size();
+		if (cellCount > initialized) {
+			m_cellDataOffsets.resize(cellCount);
+			for (uint32_t i = initialized; i < cellCount; ++i)
+				m_cellDataOffsets[i] = UINT32_MAX;
+		}
 		m_cellData.clear();
 		m_cellData.reserve(edgeCount * 2);
 		for (uint32_t i = 0; i < edgeCount; i++) {
@@ -3780,22 +3788,27 @@ private:
 			XA_DEBUG_ASSERT(!m_traversedCellOffsets.isEmpty());
 			for (uint32_t j = 0; j < m_traversedCellOffsets.size(); j++) {
 				const uint32_t cell = m_traversedCellOffsets[j];
-				uint32_t offset = m_cellDataOffsets[cell];
-				if (offset == UINT32_MAX)
-					m_cellDataOffsets[cell] = m_cellData.size();
-				else {
-					for (;;) {
-						uint32_t &nextOffset = m_cellData[offset + 1];
-						if (nextOffset == UINT32_MAX) {
-							nextOffset = m_cellData.size();
-							break;
-						}
-						offset = nextOffset;
-					}
+				// During insertion the cell points to the tail of a circular
+				// list, so appending keeps the original edge order in O(1).
+				const uint32_t offset = m_cellData.size();
+				uint32_t first = offset;
+				uint32_t &tail = m_cellDataOffsets[cell];
+				if (tail == UINT32_MAX) {
+					m_occupiedCells.push_back(cell);
+				} else {
+					first = m_cellData[tail + 1];
+					m_cellData[tail + 1] = offset;
 				}
 				m_cellData.push_back(edge);
-				m_cellData.push_back(UINT32_MAX);
+				m_cellData.push_back(first);
+				tail = offset;
 			}
+		}
+		for (uint32_t i = 0; i < m_occupiedCells.size(); ++i) {
+			uint32_t &head = m_cellDataOffsets[m_occupiedCells[i]];
+			const uint32_t tail = head;
+			head = m_cellData[tail + 1];
+			m_cellData[tail + 1] = UINT32_MAX;
 		}
 		return true;
 	}
@@ -3907,6 +3920,7 @@ private:
 	Vector2 m_gridOrigin;
 	uint32_t m_gridWidth, m_gridHeight; // in cells
 	Array<uint32_t> m_cellDataOffsets;
+	Array<uint32_t> m_occupiedCells;
 	Array<uint32_t> m_cellData;
 	Array<uint32_t> m_potentialEdges;
 	Array<uint32_t> m_traversedCellOffsets;
