@@ -244,8 +244,9 @@ with contextlib.nullcontext(tempfile.mkdtemp(prefix="projects-", dir=output)) as
         "Joystick object page creates and persists a second independent sculpt",
     )
     check(
-        info["active_color"][2] > 0.7 and info["active_color"][0] < 0.1,
-        "Joystick material page updates and persists the active object's blue material",
+        all(abs(actual - expected) < 1e-4 for actual, expected in
+            zip(info["active_color"][:3], (.04, .12, .8), strict=True)),
+        "Joystick opens and confirms the active object's exact RGB ray edits",
     )
     for mode in ("accept", "cancel", "focus", "undo"):
         result, path = run("voxel-" + mode, 50 if mode == "undo" else 45,
@@ -313,11 +314,11 @@ with contextlib.nullcontext(tempfile.mkdtemp(prefix="projects-", dir=output)) as
         else:
             check(after["skinned"],"Actual OpenXR joystick and ray controls publish persistent "+mode+" skin weights")
             target=0 if mode=="fitted" else 1
-            original_target=dict(before["scene"]["objects"][target]);new_target=dict(after["scene"]["objects"][target])
-            old_deformation=original_target.pop("deformation",None);deformation=new_target.pop("deformation")
-            check(original_target==new_target,"OpenXR skin authoring retains exact target geometry, paint and source properties")
-            other=1-target
-            check(before["scene"]["objects"][other]==after["scene"]["objects"][other],"OpenXR skin authoring leaves the complete reference/other object untouched")
+            old_deformation=before["scene"]["objects"][target].get("deformation")
+            deformation=after["scene"]["objects"][target]["deformation"]
+            retained=subprocess.run([str(skin_helper),"--verify-ui-bind-restore",str(skin_fixture),str(path)],env=env)
+            check(retained.returncode==0,
+                  "OpenXR skin authoring retains the entire Scene outside the target bind and its exact Restore capsule")
             if mode=="transfer":
                 source=before["scene"]["objects"][0]["deformation"]
                 check([dict(row) for row in deformation["skin"]["vertices"]]==[dict(row) for row in source["skin"]["vertices"]],"OpenXR method selector transfers independently known reference weights exactly")
@@ -343,14 +344,14 @@ with contextlib.nullcontext(tempfile.mkdtemp(prefix="projects-", dir=output)) as
                 volume["sculpt_mask"]["values"].sort()
         return scene
     retopo_original = inspect_scene(retopo_fixture)
-    prefix, prefix_path = run("retopo-committed", 14,
+    prefix, prefix_path = run("retopo-committed", 22,
                               extra=["--open", str(retopo_fixture)],
                               mode={"DOME_XR_FIXTURE_RETOPO": "committed"})
     check(prefix.returncode == 0, "Actual OpenXR joystick commits a scene edit before opening retopology")
     retopo_committed = inspect_scene(prefix_path)
     source = retopo_committed["objects"][0]
-    check(source["material"]["color"][2] > .7 and
-          source["material"]["color"][0] < .1 and
+    check(all(abs(actual - expected) < 1e-4 for actual, expected in
+              zip(source["material"]["color"][:3], (.04, .12, .8), strict=True)) and
           source["volume"] == retopo_original["objects"][0]["volume"] and
           source["painted"] == retopo_original["objects"][0]["painted"],
           "Committed OpenXR prefix changes the material while retaining the original sculpt and prepared source")

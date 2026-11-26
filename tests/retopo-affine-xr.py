@@ -47,10 +47,10 @@ def run(mode,frames):
     check(rc==0,'Actual loader retopology '+mode+' exits cleanly without suppression')
     check(path.is_file(),'Actual '+mode+' writes its requested native output')
     return scene(path),json.loads(report.read_text())
-committed,_=run('committed',14)
+committed,_=run('committed',22)
 source=committed['objects'][0]
-check(source['material']['color'][2]>.7 and source['material']['color'][0]<.1,
-      'Real controller commits its material change before the retopo draft')
+check(all(abs(actual-expected)<1e-4 for actual,expected in zip(source['material']['color'][:3],(.04,.12,.8),strict=True)),
+      'Real controller commits all three material channels before the retopo draft')
 expected=dict(before['objects'][0]);actual=dict(source);expected.pop('material');actual.pop('material')
 check(expected==actual,'Committed controller prefix retains every affine, posed, painted and sculpt source channel')
 for mode in ('accept','focus','unconfirmed'):
