@@ -2,6 +2,7 @@
 #include "dome/document.hpp"
 #include "dome/source-placement.hpp"
 #include "dome/source-maps.hpp"
+#include "dome/material-visibility.hpp"
 #include <nlohmann/json.hpp>
 #include <png.h>
 #include <fstream>
@@ -50,5 +51,34 @@ int main(int argc,char **argv)try{
  {Document d;d.replace(source(false));ready(d);auto before=d.copy_scene().encode();std::ofstream(root/"bad.png")<<"not a png";d.load_projection_image(root/"bad.png");check(d.wait_projection_image()&&!d.frame().state->projection->error.empty(),"Malformed PNG reports worker error without stuck loading");check(d.copy_scene().encode()==before&&!d.frame().state->can_undo,"Detached decode failure changes no Scene/history");load(d,image,{});check(d.copy_scene().encode()==before,"Image retry succeeds without Scene mutation");d.browse_projection_images(root);check(d.wait_projection_image()&&d.frame().state->projection->entries.size()>=2,"Bounded worker browser exposes PNG images");}
  {Document d;d.replace(source(true));ready(d);load(d,image,{});d.configure_shape_sculpt(true);ready(d);const auto before=d.copy_scene().encode();check(d.begin_native_stroke(),"Remembered image tool does not block explicit shapekey sculpt mode");d.end_native_stroke(false);check(d.wait_native_stroke()&&d.copy_scene().encode()==before,"Cancelling shapekey mode preserves all source and image state");}
  {Document d;d.replace(source(false));ready(d);load(d,image,{});d.use_source();ready(d);const auto before=d.copy_scene().encode();check(d.begin_native_stroke(),"Remembered paint projection does not block switching to source-volume sculpting");d.end_native_stroke(false);check(d.wait_native_stroke()&&d.copy_scene().encode()==before,"Source sculpt cancellation retains dormant painted mesh exactly");}
+ for(int policy=0;policy<5;++policy){
+  auto scene=source(false);
+  Volume occluder(.025f);
+  Brush brush;brush.radius=.28f;
+  occluder.begin_stroke();occluder.stamp(brush);
+  check(occluder.end_stroke(),"Projection occlusion fixture creates actual volume geometry");
+  const auto other=scene.add("Sculpt occluder",std::move(occluder));
+  auto &object=scene.object(other);object.transform.position.z=.5f;
+  if(policy==1)object.visible=false;
+  if(policy==2){object.material.alpha=Material::AlphaMode::Blend;object.material.color[3]=0;}
+  scene.select(1);
+  Document d;d.replace(scene);ready(d);
+  if(policy==0){
+    const auto frame=d.frame();
+    const auto hit=frame.surface->picking->raycast_target({0,0,2},{0,0,-1},2,0,other);
+    check(hit&&hit->object==other&&!hit->packed()&&hit->surface.distance<1.6f,
+          "The accepted viewport has a non-packed sculpt hit in front of the paint target");
+  }
+  load(d,image,{});
+  if(policy==3){auto settings=d.projection_settings();settings.occlusion=ProjectionOcclusion::TargetOnly;d.configure_projection(settings);}
+  if(policy==4){
+    d.configure_object_grab(true,true);
+    const uint64_t selected=1;d.select_objects(std::span<const uint64_t>(&selected,1));ready(d);
+    check(d.frame().state->objects[1].ghost,"The sculpt occluder is deliberately an editor ghost");
+  }
+  stroke(d,{});
+  const bool painted=d.copy_scene().active().painted->pixel(1,32,32).data[9]>200;
+  check(painted==(policy!=0),"Projection respects visible sculpt geometry, alpha, target-only mode and editor ghosts");
+ }
  std::cout<<checks<<" native projection workflow checks passed\n";return 0;
 }catch(const std::exception &e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
