@@ -35,7 +35,9 @@ inline void author(Scene &scene) {
     v.layer_properties(layer,name,true,false,.65f);
     v.fill_mask(.1f+float(i)*.05f);
     auto settings=v.sculpt_settings();settings.mask_edit=true;v.sculpt_settings(settings);
-    b.from=b.to={0,0,.6f};b.normal={0,0,1};b.radius=.09f;
+    // Mask setup must satisfy the same public brush contract as real input.
+    // Do not carry the wider geometry brush's blend beyond this mask radius.
+    b.from=b.to={0,0,.6f};b.normal={0,0,1};b.radius=.09f;b.blend=0;
     v.begin_stroke();v.stamp(b);
     require(v.end_stroke(),"Independent mask must retain real sparse protection");
     settings.mask_edit=false;v.sculpt_settings(settings);

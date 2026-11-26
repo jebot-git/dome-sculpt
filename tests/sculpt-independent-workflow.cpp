@@ -8,11 +8,21 @@
 #include <fstream>
 #include <iostream>
 #include <set>
+#include <thread>
 using namespace dome;using namespace dome::detail;
 namespace {
 size_t checks=0;
 void check(bool value,const char *why){if(!value)throw std::runtime_error(why);++checks;}
 void ready(Document &d){check(d.wait_asset(std::chrono::seconds(120)),"Actual file/asset worker finishes");check(d.wait_mesh(std::chrono::seconds(120)),"Actual mesh worker publishes");check(d.frame().state->error.empty(),"Actual publication has no asynchronous error");}
+void recovery_ready(Document &d){
+ const auto until=std::chrono::steady_clock::now()+std::chrono::seconds(120);
+ while(d.frame().state->recovery_busy&&std::chrono::steady_clock::now()<until)
+  std::this_thread::sleep_for(std::chrono::milliseconds(1));
+ const auto state=d.frame().state;
+ check(!state->recovery_busy,"Actual recovery catalogue worker finishes");
+ check(state->recovery_error.empty(),"Recovery discovery has no asynchronous error");
+ check(state->error.empty(),"Catalogue publication has no document error");
+}
 bool bits(Vec3 a,Vec3 b){return std::bit_cast<uint32_t>(a.x)==std::bit_cast<uint32_t>(b.x)&&std::bit_cast<uint32_t>(a.y)==std::bit_cast<uint32_t>(b.y)&&std::bit_cast<uint32_t>(a.z)==std::bit_cast<uint32_t>(b.z);}
 void geometry(Document &d){
  const auto scene=d.copy_scene();const auto frame=d.frame();check(scene.objects().size()==4&&frame.surface->sculpt_chunks&&frame.surface->sculpt_chunks->objects().size()==4,"Four real independent sculpt objects publish through Document");
@@ -45,7 +55,7 @@ int main(int argc,char **argv)try{
  RecoverySource recovery_source{new_recovery_id(),1,native};const auto root=output/"recovery";
  {RecoveryService service(root);check(service.set_source(recovery_source),"Recovery source is accepted");check(service.enqueue({recovery_source,1,1,d.copy_scene()})==RecoveryEnqueue::Accepted,"Actual detached four-object scene enters recovery worker");check(service.flush(std::chrono::seconds(120))&&service.status().error.empty(),"Durable recovery checkpoint commits");service.shutdown();}
  {const auto found=RecoveryService::discover(root);check(found.errors.empty()&&found.candidates.size()==1,"Fresh recovery discovery finds exactly the checked checkpoint");check(RecoveryService::load(found.candidates[0]).encode()==accepted,"Recovery file retains original authored bits");}
- {Document recovered;recovered.enable_recovery(root);recovered.refresh_recovery();ready(recovered);check(!recovered.frame().state->recovery_candidates.empty(),"Actual Document discovers recovery on its file worker");recovered.restore_recovery(0);ready(recovered);check(recovered.copy_scene().encode()==accepted,"Actual Document recovery restores exact four-object source");geometry(recovered);}
+ {Document recovered;recovered.enable_recovery(root);recovered.refresh_recovery();recovery_ready(recovered);check(!recovered.frame().state->recovery_candidates.empty(),"Actual Document discovers recovery on its file worker");recovered.restore_recovery(0);ready(recovered);check(recovered.copy_scene().encode()==accepted,"Actual Document recovery restores exact four-object source");geometry(recovered);}
  check(bytes(native)==saved_bytes,"Recovery never overwrites the user's accepted project");
  {auto scene=d.copy_scene();auto cold=SculptSceneChunks::capture(scene,{987,1,1,true,true});const auto exact=cold.chunks->retained_bytes();SculptSceneChunkLimits limits;limits.retained_bytes=exact;auto kept=SculptSceneChunks::capture(scene,{988,1,1,true,true},{},limits);check(kept.chunks->retained_bytes()==exact,"Cold independent capture fits its exact unchanged retained footprint");--limits.retained_bytes;bool refused=false;try{SculptSceneChunks::capture(scene,{989,1,1,true,true},{},limits);}catch(const std::length_error&){refused=true;}check(refused&&d.copy_scene().encode()==accepted,"One-byte-too-small retained quota refuses without source mutation");size_t polls=0;bool cancelled=false;try{SculptSceneChunks::capture(scene,{990,1,1,true,true},{},{},[&]{return++polls>=32;});}catch(const std::runtime_error&){cancelled=true;}check(cancelled&&d.copy_scene().encode()==accepted,"Cold correspondence cancellation preserves complete source");}
  check(previous->sculpt_chunks->objects().size()==4&&previous->sculpt_chunks->find(1)->geometry->report().indices>0,"Previously acquired immutable scene remains valid through editing, Save and recovery");
