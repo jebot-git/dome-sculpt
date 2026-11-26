@@ -1,0 +1,339 @@
+{
+  "source": "c5fbb0bd5251deaf7baf97f0c0b17252817c914e",
+  "baseline": "f9c20398",
+  "build_invocation": "0038c2b203534917946c7c88ce66105c",
+  "native_invocation": "95e962616b11496dbd89010f9e966068",
+  "scope": "Actual private Release reload/source-mode and sculpt-undo allocation fault regression. Software color blur verifies the selected current-layer workflow and backend refusal; graphics/hardware support is separate.",
+  "build": {
+    "terminal": true,
+    "exit": 0,
+    "compile": [
+      {
+        "name": "document.cpp",
+        "exit": 0
+      },
+      {
+        "name": "document-transactions.cpp",
+        "exit": 0
+      },
+      {
+        "name": "source-uv-adopt.cpp",
+        "exit": 0
+      },
+      {
+        "name": "gpu-color-blur-native.cpp",
+        "exit": 0
+      }
+    ],
+    "linked_archive": {
+      "members": 197,
+      "sha256": "087df92e24305266967724bd506c37d01bf73c51a8cf327d7d80f5b6c512dc4d",
+      "replacements": [
+        "document.cpp.o"
+      ]
+    },
+    "links": [
+      {
+        "name": "dome-sculpt-document-transactions-test",
+        "exit": 0
+      },
+      {
+        "name": "dome-sculpt-source-uv-adopt-test",
+        "exit": 0
+      },
+      {
+        "name": "dome-sculpt-gpu-color-blur-native-test",
+        "exit": 0
+      },
+      {
+        "name": "dome-sculpt",
+        "exit": 0
+      }
+    ]
+  },
+  "native": {
+    "terminal": true,
+    "cases": {
+      "dome-sculpt-document-transactions-test": {
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/dormant-paint-command-release-20261126/dome-sculpt-document-transactions-test",
+          "sculpt-undo"
+        ],
+        "started": 1795668030.8751428,
+        "timeout_seconds": 900,
+        "RSS_limit_bytes": 4294967296,
+        "virtual_AS_cap": null,
+        "pid": 4,
+        "start": 84595593,
+        "pgrp": 4,
+        "root": {
+          "pid": 4,
+          "start": 84595593,
+          "pgrp": 4,
+          "session": 4,
+          "ppid": 2,
+          "state": "R"
+        },
+        "known_processes": [
+          {
+            "pid": 4,
+            "start": 84595593,
+            "pgrp": 4,
+            "session": 4,
+            "ppid": 2,
+            "state": "R"
+          }
+        ],
+        "peak_owned_RSS_bytes": 22294528,
+        "peak_observed_virtual_bytes": 582377472,
+        "monitor_samples": 54,
+        "signals": [],
+        "exit": 0,
+        "seconds": 0.5795238018035889,
+        "sha256": "7fe2e4557a3ee8e3897deb8172287c453dd1f4571a9289ac88a7a3077b4e2043",
+        "check_passed": true,
+        "passed_cases": [
+          "PASS sculpt-undo: every one of 73 real endpoint allocation boundaries; exact scene/history/cache/lease rollback and retry"
+        ]
+      },
+      "dome-sculpt-source-uv-adopt-test": {
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/dormant-paint-command-release-20261126/dome-sculpt-source-uv-adopt-test"
+        ],
+        "started": 1795668031.4722264,
+        "timeout_seconds": 900,
+        "RSS_limit_bytes": 4294967296,
+        "virtual_AS_cap": null,
+        "pid": 597,
+        "start": 84595653,
+        "pgrp": 597,
+        "root": {
+          "pid": 597,
+          "start": 84595653,
+          "pgrp": 597,
+          "session": 597,
+          "ppid": 2,
+          "state": "R"
+        },
+        "known_processes": [
+          {
+            "pid": 597,
+            "start": 84595653,
+            "pgrp": 597,
+            "session": 597,
+            "ppid": 2,
+            "state": "R"
+          }
+        ],
+        "peak_owned_RSS_bytes": 26136576,
+        "peak_observed_virtual_bytes": 520937472,
+        "monitor_samples": 10,
+        "signals": [],
+        "exit": 0,
+        "seconds": 0.09867739677429199,
+        "sha256": "95c741f5b3b08d9256d7aad863e5765d46091f8b093a13fb903369e4a98518ab",
+        "check_passed": true,
+        "passed_cases": [
+          "PASS Native adoption shares immutable generated source images and the separate baked payload",
+          "PASS Native adoption preserves every layer identity, next ID and active selection with caller-owned history",
+          "PASS Generic PBR adoption retains the complete first immutable original rather than dropping its maps or layers",
+          "PASS The first new layer after adoption uses the preserved monotonic source identity",
+          "PASS Later native painting cannot mutate adopted result tiles or the retained first source",
+          "PASS Repeated baking propagates the exact first-source owner and original image identities",
+          "PASS Scene v8 deduplicates shared material holders, original-source records and paint payloads",
+          "PASS Native restart retains exact derived paint and first-source provenance with shared holder identity",
+          "PASS Immutable preview surfaces carry the same explicit material holder without reparsing raw metadata",
+          "PASS Native atomic save and disk reopen retain v8 provenance and editable state",
+          "PASS Native source-mode command keeps complete immutable material and deformation data dormant",
+          "PASS Dormant paint leaves color blur unavailable in sculpt mode",
+          "PASS One global Undo restores the exact original mesh, source roles, paint and deformation together",
+          "PASS One global Redo restores the exact dormant source mode without dropping provenance",
+          "PASS Scene export preflight catches a visible dormant source even when an empty volume would omit its surface entirely",
+          "PASS Explicitly hidden dormant objects are excluded from export preflight",
+          "PASS Generated volume previews explicitly mark retained source as dormant and never sample unrelated UV or deformation data",
+          "PASS Source-to-volume export refuses dormant source before publishing a flattened file",
+          "PASS Native save and reopen retain dormant original mesh, layers and material provenance exactly",
+          "PASS Restoring the original painting mesh reactivates exact retained source identity without reconstruction",
+          "PASS Generic painted source maps and editable paint also remain explicit dormant export data without a creator or resolved holder",
+          "PASS Adoption rejects changed layer metadata",
+          "PASS Adoption rejects incomplete sparse tile tables",
+          "PASS Adoption rejects invented active layer identity",
+          "PASS Adoption cannot silently discard a retained baked base",
+          "PASS Adoption revalidates exact source corner identities",
+          "PASS Cancellation before adoption publishes no partially constructed surface or source changes",
+          "PASS Native decoding cannot relabel derivative role normals as canonical Mikk data",
+          "PASS Native decoding rejects missing immutable original-source identities",
+          "PASS Aggregate original raster quotas are checked before any oversized SurfaceMap is allocated",
+          "PASS First-source ownership is a detached COW paint snapshot even if the caller later edits its original class"
+        ]
+      },
+      "dome-sculpt-gpu-color-blur-native-test": {
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/dormant-paint-command-release-20261126/dome-sculpt-gpu-color-blur-native-test",
+          "software",
+          "/home/blux/de-xr/dome-sculpt/artifacts/dormant-paint-command-release-20261126/native/blur"
+        ],
+        "started": 1795668031.587279,
+        "timeout_seconds": 900,
+        "RSS_limit_bytes": 4294967296,
+        "virtual_AS_cap": null,
+        "pid": 606,
+        "start": 84595665,
+        "pgrp": 606,
+        "root": {
+          "pid": 606,
+          "start": 84595665,
+          "pgrp": 606,
+          "session": 606,
+          "ppid": 2,
+          "state": "R"
+        },
+        "known_processes": [
+          {
+            "pid": 606,
+            "start": 84595665,
+            "pgrp": 606,
+            "session": 606,
+            "ppid": 2,
+            "state": "R"
+          }
+        ],
+        "peak_owned_RSS_bytes": 152805376,
+        "peak_observed_virtual_bytes": 886018048,
+        "monitor_samples": 136,
+        "signals": [],
+        "exit": 0,
+        "seconds": 1.4564638137817383,
+        "sha256": "698b541d88246c4919879b804218308ce5c9c184eeec0fffe6f401b1e4b950dc",
+        "check_passed": true,
+        "passed_cases": [
+          "PASS 139378 actual native GPU color blur controls"
+        ]
+      }
+    },
+    "app": {
+      "sha256": "9b3f45d972f67cbb2e021111de216abd27fa76bb22b5960e50c7c0eca8ccc86e",
+      "version": "Dome Sculpt 0.1.0 / CPU / Blender 5.4 Alpha trackball basis"
+    },
+    "exit": 0
+  },
+  "authorities": {
+    "prepare.py": {
+      "bytes": 3063,
+      "sha256": "a392d3e15b24b863c0bc34748d8ffadeea08133fb850930e4e1f31260f1d4606"
+    },
+    "build.py": {
+      "bytes": 2514,
+      "sha256": "2d43afbd31839fb3da338e16e20e96e744af4ea9f419e012aa10bf6dcc1c7eeb"
+    },
+    "run-native.py": {
+      "bytes": 1975,
+      "sha256": "a5b0290af329485215d936f28f19d5455a07e9a63439da0c7180eef068d6c4fe"
+    },
+    "owned_monitor.py": {
+      "bytes": 4859,
+      "sha256": "b510ef5655e3214bd38e7b5f56022c37a79879070c3733f2dd059bad74f21269"
+    },
+    "build-plan.json": {
+      "bytes": 16282,
+      "sha256": "b6fe1287cf6525dcf48c1df96efa09691aaf731d5fc6526b7010b91caee37a02"
+    },
+    "build-status.json": {
+      "bytes": 828,
+      "sha256": "af6e6ed45c6599f59fda140b71ab5a8ec86727813c04e3902776b65e40592c1f"
+    },
+    "native/status.json": {
+      "bytes": 6948,
+      "sha256": "3d14fe9e1e456302859f1f348740dd7dc53ad7d0acf9036c9a0bce807a97fc1d"
+    },
+    "seal.py": {
+      "bytes": 3266,
+      "sha256": "fd39503cb38a2d682c0c2dc635efdbd66e59ac53ed9c065158fc099fd9303041"
+    },
+    "document-transactions.cpp.o.d": {
+      "bytes": 21311,
+      "sha256": "969d1e8256299b0d8fd24feaee76270e8e65a1cd2cb272070b781a4eb88a0df0"
+    },
+    "document.cpp.o.d": {
+      "bytes": 32250,
+      "sha256": "507a153acd3c0384f8d684460220acea4ae2bf478b3a6d59c651751f2d27d478"
+    },
+    "dome-sculpt-document-transactions-test.link.d": {
+      "bytes": 7398,
+      "sha256": "1c4f7ff64df2dc909a292c2216ded2b8963468acbd178d2f936a70343caf5040"
+    },
+    "dome-sculpt-gpu-color-blur-native-test.link.d": {
+      "bytes": 7398,
+      "sha256": "aebcc7cf3a5d5acadeee71533c4e1a8bbda0cbbd6299e9ec139d5d8e29bd5485"
+    },
+    "dome-sculpt-source-uv-adopt-test.link.d": {
+      "bytes": 7380,
+      "sha256": "c7c5cd88bbe5f26e5289e117523dc1363bcb8a4e31cc9b2edb4ef27cad3afb0b"
+    },
+    "dome-sculpt.link.d": {
+      "bytes": 13947,
+      "sha256": "dd192a06f2f53f55b3b2faa52307ec7e21c1b0c305bd328d1b742ceb3beb7ecd"
+    },
+    "gpu-color-blur-native.cpp.o.d": {
+      "bytes": 22322,
+      "sha256": "c5be97a0a36aa5058e6a05560937aeebe44e2cc9fd391e270d767c8b325d05cf"
+    },
+    "source-uv-adopt.cpp.o.d": {
+      "bytes": 21515,
+      "sha256": "de1685f565dd644b218135cad61441bf427b39902525ce134056fdba14363d18"
+    },
+    "broad-original-dormant-tests.log": {
+      "bytes": 1248,
+      "sha256": "cd0b5549f6b2bf58f507662cf9f8c5f02787058e34adcc4b43f3662d8c530853"
+    },
+    "document-transactions.cpp.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "document.cpp.log": {
+      "bytes": 18558,
+      "sha256": "21edd002f92ce9719c10f7ab36dec28a631a9be00d106554de7355e12edfc447"
+    },
+    "dome-sculpt-document-transactions-test.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "dome-sculpt-gpu-color-blur-native-test.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "dome-sculpt-source-uv-adopt-test.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "dome-sculpt.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "gpu-color-blur-native.cpp.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "source-uv-adopt.cpp.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "native/dome-sculpt-document-transactions-test.log": {
+      "bytes": 169,
+      "sha256": "38f022759480a6a19c23e7d94edeec33867ef1adf419f2b19bb1ca9edfa1adb4"
+    },
+    "native/dome-sculpt-gpu-color-blur-native-test.log": {
+      "bytes": 792,
+      "sha256": "b1b7ea99b484d1bb18b53882bb9f887755e136d1f1c0a809310cde2df35d93c2"
+    },
+    "native/dome-sculpt-source-uv-adopt-test.log": {
+      "bytes": 2773,
+      "sha256": "75fbffb94fdb39fc73503af4d1f444c18c337d10cc8bed225041ee28e0f82bf2"
+    }
+  },
+  "archive": {
+    "file": "dormant-paint-command-release-20261126.tar.xz",
+    "sha256": "aff31cb440d8f9c0dc46b11832c0aa1f2883b4f86e06462e6d6957f8642a63fd",
+    "bytes": 17636
+  }
+}

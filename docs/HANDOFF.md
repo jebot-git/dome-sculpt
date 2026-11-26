@@ -283,6 +283,16 @@ frontend and renderer compiled and the app version check passed. Read
 The benchmark measures native CPU snapshot capture. Separate runs qualify
 sanitizers, graphics and device behavior.
 
+The broad regression found that command availability could throw when a
+sculpt volume retained a dormant painting mesh. Candidate `c5fbb0bd` checks
+the active mode before resolving the paint field for color blur. The
+original source-mode adoption regression and all 73 sculpt Undo allocation
+boundaries pass on the matching Release build. The software color-blur
+controls also pass, including the active-paint and backend-refusal cases.
+Read [the dormant-paint receipt](validation/dormant-paint-command-release-20261126.json).
+The broad matrix and the remaining native workflow failures are still under
+review.
+
 ## Source and integration boundary
 
 - Main now admits product1bc13125 and public fixturef1e193c7 after complete
