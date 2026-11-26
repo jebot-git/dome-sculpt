@@ -24,8 +24,7 @@ Mesh material_quads(float height) {
   return mesh;
 }
 
-void texture_set_bake(const std::filesystem::path &output) {
-  std::filesystem::create_directories(output);
+Scene texture_set_bake_scene(float source_height,float cage_height) {
   Scene scene;
   const auto target=scene.active().id;
   const auto source=scene.add("Two source materials",Volume{});
@@ -33,7 +32,7 @@ void texture_set_bake(const std::filesystem::path &output) {
   auto &cage_object=scene.object(cage);
   cage_object.mesh_active=true;
   cage_object.visible=false;
-  auto cage_mesh=material_quads(.030f);
+  auto cage_mesh=material_quads(cage_height);
   for(size_t vertex=0;vertex<cage_mesh.uv.size();++vertex)
     cage_mesh.uv[vertex][0]=cage_mesh.uv[vertex][0]*.5f+(vertex<4?0.f:.5f);
   cage_object.painted=std::make_shared<PaintedMesh>(std::move(cage_mesh),64);
@@ -45,24 +44,38 @@ void texture_set_bake(const std::filesystem::path &output) {
   initialize_texture_sets(scene,target,material_quads(0),fields,membership);
   fields[0].material.color={.9f,.02f,.03f,1};
   fields[1].material.color={.02f,.8f,.03f,1};
-  initialize_texture_sets(scene,source,material_quads(.012f),fields,membership);
+  initialize_texture_sets(scene,source,material_quads(source_height),fields,membership);
   scene.object(source).visible=false;
   scene.select(target);
   select_texture_set(scene,target,1);
-  edit_texture_set(scene,target,1,[](PaintedMesh &paint,Material &) {
+  require_cage(edit_texture_set(scene,target,1,[](PaintedMesh &paint,Material &) {
     paint.add_layer("Editable brush layer");
     Brush brush;brush.from=brush.to={3,0,0};brush.normal={0,0,1};brush.radius=.3f;brush.strength=1;
     PaintSettings ink;ink.channel=PaintChannel::Color;ink.color={.03f,.04f,.9f,1};
     paint.begin_stroke();paint.stamp(brush,ink);
     return paint.end_stroke();
-  });
+  }),"The selected field carries a real editable brush stroke");
+  return scene;
+}
+
+ObjectBakeSettings texture_set_probe_settings(uint64_t cage) {
+  ObjectBakeSettings settings;
+  settings.front_mm=80;settings.padding=0;settings.ao_samples=4;settings.cage_object=cage;
+  return settings;
+}
+
+void texture_set_bake(const std::filesystem::path &output) {
+  std::filesystem::create_directories(output);
+  auto scene=texture_set_bake_scene(.012f,.030f);
+  const auto source=scene.objects()[1].id;
+  const auto cage=scene.objects()[2].id;
+  const auto target=scene.active().id;
   const auto original=scene.encode();
   const auto original_left=scene.active().painted;
   const auto original_right=dome::active_texture_set(scene.active()).painted;
   const auto source_collection=scene.object(source).texture_sets;
   const auto cage_paint=scene.object(cage).painted;
-  ObjectBakeSettings right_settings;
-  right_settings.front_mm=80;right_settings.padding=0;right_settings.ao_samples=4;right_settings.cage_object=cage;
+  const auto right_settings=texture_set_probe_settings(cage);
 
   auto cancelled=scene.snapshot();
   bool armed=false;
@@ -147,6 +160,29 @@ void texture_set_bake(const std::filesystem::path &output) {
 int main(int argc,char **argv)try{
   if(argc==3&&std::string_view(argv[1])=="--texture-set-bake"){
     texture_set_bake(argv[2]);return 0;
+  }
+  if(argc==4&&std::string_view(argv[1])=="--texture-set-xr-fixture"){
+    auto scene=texture_set_bake_scene(.060f,.070f);
+    const auto source=scene.objects()[1].id;
+    const auto cage=scene.objects()[2].id;
+    const auto settings=texture_set_probe_settings(cage);
+    bake_object(scene,source,settings);
+    require_cage(edit_texture_set(scene,scene.active().id,1,[](PaintedMesh &paint,Material &) {
+      paint.clear_bake();
+      return true;
+    }),"The XR seed retains its recipe after Clear");
+    scene.save(argv[2]);
+    auto reference=Scene::load(argv[2]);
+    auto changed=settings;changed.front_mm=40;
+    const auto original=reference.encode();
+    require_cage(rejected_cage([&]{bake_object(reference,source,changed);})&&reference.encode()==original,
+      "The altered controller range cannot reach the authored cage");
+    bake_object(reference,source,settings);
+    require_cage(dome::active_texture_set(reference.active()).painted->baked()&&
+      !reference.active().painted->baked()&&!reference.active().bake_recipe,
+      "The reference Bake affects only the selected additional field");
+    reference.save(argv[3]);
+    return 0;
   }
   if(argc==3&&(std::string_view(argv[1])=="--ui-fixture"||std::string_view(argv[1])=="--ui-wide-fixture")){
     auto scene=cage_scene(128);auto settings=cage_settings();if(std::string_view(argv[1])=="--ui-wide-fixture"){settings.front_mm=100000;settings.back_mm=0;settings.ao_distance_mm=.00001f;}bake_object(scene,2,settings);scene.active().painted->clear_bake();scene.save(argv[2]);return 0;
