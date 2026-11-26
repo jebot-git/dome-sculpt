@@ -3255,8 +3255,21 @@ PaintedMesh::build_composite(const Material &material,const std::function<bool()
     maps->baked_coverage=blank_image(r);for(size_t at=3;at<maps->baked_coverage.rgba.size();at+=4)maps->baked_coverage.rgba[at]=255;
   }
 
+  // These values are decoded directly from byte images and sparse layer
+  // tiles. Original samplers still interpolate in their existing domain.
+  static const auto linear_byte = [] {
+    std::array<float, 256> table{};
+    for (size_t value = 0; value < table.size(); ++value)
+      table[value] = srgb_to_linear(unit(uint8_t(value)));
+    return table;
+  }();
   for(int channel=0;channel<3;++channel){
     auto &image=channel==0?maps->color:channel==1?maps->metal_rough:maps->emission;
+    const Image *baked_image = nullptr;
+    if (baked_)
+      baked_image = channel == 0 ? &baked_->maps.color :
+                    channel == 1 ? &baked_->maps.metal_rough :
+                    baked_->emission_field ? nullptr : &baked_->maps.emission;
     for(uint32_t y=0;y<image.height;++y)for(uint32_t x=0;x<image.width;++x){
       if((x&255)==0)paint_compute::checkpoint(cancelled);
       float u=(float(x)+.5f)/image.width,v=(float(y)+.5f)/image.height;
@@ -3277,18 +3290,20 @@ PaintedMesh::build_composite(const Material &material,const std::function<bool()
       uint32_t px=owner>=0?uint32_t(owner)%r:tx,py=owner>=0?uint32_t(owner)/r:ty;
       float replacement_coverage=0;
       if (baked_ && owner >= 0) {
-        auto values = baked_pixel(*baked_, size_t(owner));
-        float a = unit(baked_->coverage[size_t(owner)]);
-        replacement_coverage=a;
-        if (channel == 0) for (int k=0;k<4;++k) value[k] = value[k]*(1-a)+values[k]*a;
-        else if (channel == 1) for (int k=0;k<3;++k) value[k] = value[k]*(1-a)+values[4+k]*a;
-        else for (int k=0;k<3;++k) value[k] = value[k]*(1-a)+values[7+k]*a;
+        const auto texel = size_t(owner) * 4;
+        const float a = unit(baked_->coverage[size_t(owner)]);
+        replacement_coverage = a;
+        for (int k = 0; k < (channel == 0 ? 4 : 3); ++k) {
+          const uint8_t sample = baked_image ? baked_image->rgba[texel + k] : 0;
+          const float decoded = channel == 1 || k == 3 ? unit(sample) : linear_byte[sample];
+          value[k] = value[k] * (1 - a) + decoded * a;
+        }
         if(channel==0 && color_projection_) {
           if(baked_->color_interpretation!=BakedColorInterpretation::ResolvedPbr)throw std::logic_error("Prepared surface contains unresolved baked colors");
           for(int k=0;k<4;++k) {
-            float baked=unit(baked_->maps.pbr_color.rgba[size_t(owner)*4+k]);
-            if(k<3)baked=srgb_to_linear(baked);
-            pbr_value[k]=pbr_value[k]*(1-a)+baked*a;
+            const auto sample = baked_->maps.pbr_color.rgba[texel + k];
+            const float decoded = k < 3 ? linear_byte[sample] : unit(sample);
+            pbr_value[k] = pbr_value[k] * (1 - a) + decoded * a;
           }
         }
       }
@@ -3297,8 +3312,9 @@ PaintedMesh::build_composite(const Material &material,const std::function<bool()
         auto &p=pixel(l.id,px,py);float mask=unit(p.data[13])*l.opacity;
         float weight=mask*unit(p.data[channel==2?12:9]);replacement_coverage=replacement_coverage*(1-weight)+weight;
         auto blend=[&](float base,int data,int coverage,bool srgb){
-          float a=mask*unit(p.data[coverage]),paint=unit(p.data[data]);
-          if(srgb)paint=srgb_to_linear(paint);
+          const float a = mask * unit(p.data[coverage]);
+          const auto sample = p.data[data];
+          const float paint = srgb ? linear_byte[sample] : unit(sample);
           return base*(1-a)+paint*a;
         };
         if(channel==0)for(int k=0;k<4;++k)value[k]=blend(value[k],k,9,k<3);
@@ -3308,7 +3324,7 @@ PaintedMesh::build_composite(const Material &material,const std::function<bool()
           auto painted=pbr_pixel(l.id,px,py);
           const float a=mask*unit(p.data[9]);
           for(int k=0;k<4;++k) {
-            float sample=unit(painted[k]);if(k<3)sample=srgb_to_linear(sample);
+            const float sample = k < 3 ? linear_byte[painted[k]] : unit(painted[k]);
             pbr_value[k]=pbr_value[k]*(1-a)+sample*a;
           }
         }
