@@ -1,0 +1,221 @@
+{
+  "archive": {
+    "file": "legacy-key-bake-conversion-20261126.tar.gz",
+    "members": 60,
+    "sha256": "8ef93aba3063e83c7990dafa61a0dfc3672da8f47e82e7e53bbb26a62acc1725"
+  },
+  "dense": {
+    "dense-raised/run.log": {
+      "log_sha256": "d36a8afb4e8b770d1260c9244e5157ec701b6b3229fc1f9e7611c69d809bd2be",
+      "outcome": "FAIL Scene paint-map budget exceeded"
+    },
+    "dense-without-donor/run.log": {
+      "log_sha256": "48fa3b115a8faf172f4e168c249659a4df0556ef6156ddf7c066943c1f8108b1",
+      "outcome": "FAIL Scene paint storage budget exceeded"
+    },
+    "dense/2048.log": {
+      "log_sha256": "c4c9d6c3f0bc2fa6f088e96cc0768d83de11709cea78fff13024b0ee94b5fd98",
+      "outcome": "FAIL Native retained fixed work exceeds budget before allocation"
+    },
+    "dense/run.log": {
+      "log_sha256": "553b5241c0df7f8c62ceda968f37c7391f6ab8e703bba36dc0fbdc5dfe8fb9d2",
+      "outcome": "PASS dense 1024 projected=1048576 bake_sec=0.43993 authored_and_converted_sec=1.70175 max_sampled_degrees=3.5202e-06"
+    }
+  },
+  "format": {
+    "hdr-editable.glb": {
+      "errors": 0,
+      "warnings": [
+        "NODE_SKINNED_MESH_NON_ROOT"
+      ]
+    },
+    "hdr.glb": {
+      "errors": 0,
+      "warnings": [
+        "NODE_SKINNED_MESH_NON_ROOT"
+      ]
+    },
+    "ldr-editable.glb": {
+      "errors": 0,
+      "warnings": [
+        "NODE_SKINNED_MESH_NON_ROOT"
+      ]
+    },
+    "ldr.glb": {
+      "errors": 0,
+      "warnings": [
+        "NODE_SKINNED_MESH_NON_ROOT"
+      ]
+    }
+  },
+  "format_log_sha256": "d0702e53274b3511bf9eba4ef2c8b1895ade0d66d61d1dc953d1c18b9d6e296d",
+  "frontends": {
+    "arc": {
+      "app_sha256": "c9b0fe5392df1586732a1eee73b1bbc0b9355e74c01c98c97028cd55f2abad27",
+      "checks": 11,
+      "exit": 0,
+      "input_sha256": "88bcb25f15a9e200a29594bec35fddf3d7e0449e524f0e9f9adf624381c9f3e5",
+      "inspector_sha256": "2d4185be9630bbdb0d02f47c67f5ca905782d49c6da59dbe345358bdad3a0ec9",
+      "invocation": "9985331af6c44d379f38214e0eb95440",
+      "log_sha256": "494543073c0010d6d993fedfbbff76ab1fe79c9e89f450180d3242fc01e30211",
+      "mode": "arc",
+      "native_sha256": "857abf8f6f742d7b80836dc691ee04708a65407563318ca71fb57bef77098b45",
+      "phase": "complete",
+      "report_sha256": "7ec603459be9dac04bacef0f2412bf33f0718ff40b572fbe517126118fee1590",
+      "run_script_sha256": "96f7234d628e11cad2c80bd2c8f84f198c75219cc4626cd740c8b5e1d6a382c5",
+      "status_sha256": "8e9cb8bd1f8a70806f16a64cf41eccf77e562b7a277d30cf1eca02314216f725",
+      "terminal": true,
+      "verifier_sha256": "793d4a8aee70a440bac2305b0681fcde6761a16b6742571270f53e4bf1b9f579"
+    },
+    "software": {
+      "app_sha256": "97282b1c1b635862f6bb58d976cf93069812d8376256c1d55b1e15950954915b",
+      "checks": 11,
+      "exit": 0,
+      "input_sha256": "88bcb25f15a9e200a29594bec35fddf3d7e0449e524f0e9f9adf624381c9f3e5",
+      "inspector_sha256": "5c83e2f8247e7e177a5b4f223cd6876565a20e758c4c4299d4466e2545ebe8bd",
+      "invocation": "b99d7c0dbf4d411b81de66f648a142c1",
+      "log_sha256": "53646cd6233b6ad79f590e64603ab0f212bb0beca8aa4f1ec4a5ea57de53b7d7",
+      "mode": "software",
+      "native_sha256": "857abf8f6f742d7b80836dc691ee04708a65407563318ca71fb57bef77098b45",
+      "phase": "complete",
+      "report_sha256": "7ec603459be9dac04bacef0f2412bf33f0718ff40b572fbe517126118fee1590",
+      "run_script_sha256": "96f7234d628e11cad2c80bd2c8f84f198c75219cc4626cd740c8b5e1d6a382c5",
+      "status_sha256": "5409435addd86517e378b2fca2db3b8bd56d21c5e95043ac52ecc9460c5779ba",
+      "terminal": true,
+      "verifier_sha256": "fb843be5dec638b607e816a161beae6f70be1e2f71e522bebb5edb326e345f34"
+    },
+    "wayland": {
+      "app_sha256": "97282b1c1b635862f6bb58d976cf93069812d8376256c1d55b1e15950954915b",
+      "checks": 8,
+      "compositor_sha256": "47920142c8c803dcf5adb63ba643d2e347fbdcd1e15ecd8bce7c1a8dd47c0b7e",
+      "compositor_source": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+      "exit": 0,
+      "input_sha256": "88bcb25f15a9e200a29594bec35fddf3d7e0449e524f0e9f9adf624381c9f3e5",
+      "inspector_sha256": "5c83e2f8247e7e177a5b4f223cd6876565a20e758c4c4299d4466e2545ebe8bd",
+      "invocation": "ddf0f42562f14a27ad9487bf07243874",
+      "log_sha256": "741dc104e5c0abeefe64f89a3afff1bf4f32c34e9f9851799cec48b92258775b",
+      "mode": "wayland",
+      "native_sha256": "857abf8f6f742d7b80836dc691ee04708a65407563318ca71fb57bef77098b45",
+      "phase": "complete",
+      "probe_sha256": "5bf11c670f66bbb68960073878933055b09582e5173ec1e3f472b413956c55aa",
+      "report_sha256": "777d387a2be4b4cbc9bdb0f7505a2a56b1d9ed456beb742214f43e0c7814caf2",
+      "run_script_sha256": "b3f8aeb020a9e3a6d5c369b4d745cafb5751915e3c90b12f6e327ee83a964bd3",
+      "status_sha256": "3e5b4ff7c76b5e9c290e96c653dad4e2016bc0be8b0d5c0649e04992b2644d68",
+      "terminal": true,
+      "verifier_sha256": "fb843be5dec638b607e816a161beae6f70be1e2f71e522bebb5edb326e345f34"
+    }
+  },
+  "graphics": {
+    "arc": {
+      "checks": 43,
+      "independent_max_rgb8_delta": {
+        "hdr-edited:editable0": 1,
+        "hdr-edited:editable1": 1,
+        "hdr-rest:editable0": 1,
+        "hdr-rest:editable1": 1,
+        "ldr-edited:editable0": 1,
+        "ldr-edited:editable1": 1,
+        "ldr-rest:editable0": 1,
+        "ldr-rest:editable1": 1
+      },
+      "log_sha256": "2919fb27e580cdc74ba85794502095c82ee95e055b07d765954bd558bbcd0372",
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "rest_max_rgb8_delta": {
+        "hdr": 1,
+        "ldr": 0
+      }
+    },
+    "llvmpipe": {
+      "checks": 43,
+      "independent_max_rgb8_delta": {
+        "hdr-edited:editable0": 1,
+        "hdr-edited:editable1": 1,
+        "hdr-rest:editable0": 1,
+        "hdr-rest:editable1": 1,
+        "ldr-edited:editable0": 1,
+        "ldr-edited:editable1": 1,
+        "ldr-rest:editable0": 1,
+        "ldr-rest:editable1": 1
+      },
+      "log_sha256": "2ca15022ccd869586bf3e69e038d6aebee024913588bd8e73f737edd18680980",
+      "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+      "rest_max_rgb8_delta": {
+        "hdr": 1,
+        "ldr": 0
+      }
+    }
+  },
+  "native": {
+    "asan": {
+      "app_sha256": "c9b0fe5392df1586732a1eee73b1bbc0b9355e74c01c98c97028cd55f2abad27",
+      "checks": 50,
+      "core_sha256": "d1a134450754f6b4719040daacf63503778d8885de12ed58a683ba1c7ef2eea6",
+      "ctest_sha256": "a0b14e36fa00b02bac45249f5a2f9585bb31c01ccbadf894e99f666530f29a8c",
+      "renderer_sha256": "efbb648c1096e266f60d6b1c12fa8b20289a3f12b08d4b2172ae40bbd306595c",
+      "rest_sample_error_degrees": {
+        "hdr": 0.31776,
+        "ldr": 3.5202e-06
+      },
+      "status_sha256": "90f3cd33437d8b53f0088de5d7fbcb2ad40bcaccb13f40c1368a6e657c5e0fa1",
+      "synthetic_runtime_sha256": "162042f7bffbc32d4bfadf909d7fcaa3ee8d1859f6d366828ac78da52798d4a3",
+      "tests": [
+        "bake",
+        "bake-custom-cage",
+        "bake-projection-policy",
+        "canonical-writable-bake-recipient",
+        "legacy-native-key-bake-conversion",
+        "native-key-writable-bake-recipient",
+        "native-writable-bake-recipient",
+        "source-artist-normal-bake",
+        "source-prepared-normal-bake",
+        "texture-set-bake-recipe"
+      ]
+    },
+    "release": {
+      "app_sha256": "97282b1c1b635862f6bb58d976cf93069812d8376256c1d55b1e15950954915b",
+      "checks": 50,
+      "core_sha256": "8a32c524e6aecd8daa335c6ed888ef4a77ebabe7e3b91189cd15c6c1c3620d38",
+      "ctest_sha256": "d6ceaa366371e60de9df16ab52e216848162bc198e9ccfecb9f29a6367143cbe",
+      "renderer_sha256": "f95424b2c8ef87a91133833803e6593b1703a98383310f7e18b0de63410e752e",
+      "rest_sample_error_degrees": {
+        "hdr": 0.31776,
+        "ldr": 3.5202e-06
+      },
+      "status_sha256": "744b068ae890892a1ef466006dce0cc492228b023049bbd99fff3789151ed725",
+      "synthetic_runtime_sha256": "6fecf8566635527b1846957308cc83402da2a796ee0fbf3d8d27a7503cefc5c8",
+      "tests": [
+        "bake",
+        "bake-custom-cage",
+        "bake-projection-policy",
+        "canonical-writable-bake-recipient",
+        "legacy-native-key-bake-conversion",
+        "native-key-writable-bake-recipient",
+        "native-writable-bake-recipient",
+        "source-artist-normal-bake",
+        "source-prepared-normal-bake",
+        "texture-set-bake-recipe"
+      ]
+    }
+  },
+  "native_and_glb_byte_parity": {
+    "hdr-before.dsculpt": "88bcb25f15a9e200a29594bec35fddf3d7e0449e524f0e9f9adf624381c9f3e5",
+    "hdr-editable.glb": "a7a979bb35951958c7178284d37f198e02ed9b148ace1f98c18d0b36e425540d",
+    "hdr-edited.dsculpt": "083c1dd2f26ff18f901595f7fed244b439cf518c84f4fff3a528d9b4dfe00d46",
+    "hdr-ordered.dsculpt": "857abf8f6f742d7b80836dc691ee04708a65407563318ca71fb57bef77098b45",
+    "hdr.glb": "476347ea6d3e3acd7899a25f1819d5230a4b235814516521002a21c8c67ae787",
+    "ldr-before.dsculpt": "03d12cd6f57e4620cd2f0fec3dd429e53bda0253fa7889f89474988c38f83327",
+    "ldr-editable.glb": "0f579707fee44397580353fb5d7ad157059dcd3731eb360c61556654546d2b75",
+    "ldr-edited.dsculpt": "49e8a17154a45b4ac6afef24999c82e883d9cda0ebe6a8bed6c3c2abe8cbf53a",
+    "ldr-ordered.dsculpt": "866fe38c6ef4282aac2d996288175117902d92351bf95ab3a30c1fa4dbd8a34f",
+    "ldr.glb": "5a02707191609757fd7b40b9416f9fcdc086ce8eddb04c96857c483d3f2767e8"
+  },
+  "patch_sha256": "a6ca98519873f548b3772cedb1f323524fbb024727dec576cf63f322e58333f2",
+  "previous_attempts": {
+    "-v2/release/ctest.log": "ae858d008e5c2fd2147f145e6619156fa6f75b6f241d51b178185d255da8ae21",
+    "-v3/wayland-focus-recipient/run.log": "62f28046e66acee26755775723310de7b979ed8b8b98b70fba01ed500b4017b2",
+    "-v3/wayland-focus-recipient/workflow/client.log": "31e37dfa03c78ea51289873b61b75a9e8d40e33d7305810f31c33a3fe36d7c43",
+    "/release/ctest.log": "b3857e9ce5899951d6cd7a05c9752fc5818a204ed11ea369e1e039431eef5be2"
+  },
+  "product": "9a76137623be52adbf5434611dfc5ad2977c0e06",
+  "scope": "Explicit rest-space conversion of a historical Mikk bake after native shapekey authoring on a retained writable paint atlas. Physical headset and affine targets remain open."
+}

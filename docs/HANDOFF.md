@@ -1804,10 +1804,46 @@ file for the four native fixture exports. Nested DomeD Wayland passes 10
 checks. Software and Intel Arc synthetic OpenXR each pass 11, including focus
 cancellation. All three save the same accepted bytes.
 
-An existing legacy Mikk bake retains its current interpretation when a key is
-added later. Portable conversion of that mixed history and physical headset
-qualification remain open.
 [Authored native recipient evidence](validation/native-key-writable-bake-20261126.json)
+
+### Convert a Bake that predates the first shapekey
+
+Use **Mesh → Convert to portable normals** in the universal menu or **Portable
+normals** in the XR Bake source panel. The worker uses the original writable
+paint coordinates and the sealed shapekey frame. It re-encodes the raw normals
+and checks both decoders at rest across covered texels and filtered cells,
+including chart borders and partial coverage. The command reports the maximum
+sampled rest error. Posed and morphed shading follows the authored frame.
+
+Color, AO/material, both emission representations, coverage and sparse layers
+retain their values. The command retains the original rig, geometry, UV, key
+and Bake recipe owners. Ordered Save stores the converted project. Undo restores
+the original Bake bytes, and Redo restores the converted project. Failed quality
+checks and cancellation preserve the existing project. Standard and Editable
+GLB can export the converted project with position, normal and tangent targets.
+The new frame also updates live GPU geometry identity when the packed layout
+changes. The first Wayland replay exposed this stale identity during live
+conversion. The corrected replay renders and saves successfully across
+Convert, Undo and Redo in the same application process.
+
+Release and ASan/UBSan each pass ten CTests and 50 focused checks. The partial
+FLOAT-emission case measures 0.318 degrees of sampled rest error. The six native
+projects and four GLBs match byte for byte between build profiles. Software GL
+and Intel Arc A770 pass 43 graphical checks each. The converted rest view and
+independent GLB views agree with their controls within one RGB8 level, including
+a live edited pose and later UV seam edit. The four Khronos reports each show
+zero errors and one skinned-node parent warning. Nested DomeD Wayland passes
+eight checks. Synthetic OpenXR on software GL and strict Intel Arc each pass
+11, including focus-loss admission. The three frontends save identical bytes.
+
+An independent 1024-square fixture converts all 1,048,576 texels. At 2048 the
+ordinary UV worker's fixed-work quota rejects the predecessor. The following
+probe raises only that existing API limit and reaches the scene paint-map quota.
+With the hidden donor removed after the successful 4,194,304-texel Bake,
+the scene paint-storage quota still stops the workflow before conversion.
+Full-resolution retained authoring, affine-placed conversion targets and physical
+headset verification remain open.
+[Legacy Bake conversion evidence](validation/legacy-key-bake-conversion-20261126.json)
 
 ## Source and integration boundary
 

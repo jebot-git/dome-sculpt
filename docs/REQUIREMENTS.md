@@ -81,8 +81,11 @@ Plain native recipients now bake, retain their writable atlas through UV
 edits, and export its normal map with the original paint tangents. Native
 targets with authored shapekey frames can bake, rebake and export the same
 normal field alongside their position, normal and tangent morph channels.
-Portable conversion of a legacy Mikk bake after key creation, broader polygon
-source domains and physical headset qualification remain open.
+For retained native paint grids, the explicit portable-normal command now
+converts a legacy Mikk bake after later shapekey authoring. It checks rest-space
+shading through texture filtering and preserves bake coverage, paint layers,
+the original key frame source and editable history. Conversion of affine-placed
+targets, broader polygon source domains and physical headset qualification remain open.
 [Affine artist Bake evidence](validation/affine-artist-bake-20261126.json)
 [Prepared source UV evidence](validation/uv-edited-normal-bake-20261126.json)
 [Converted native source evidence](validation/canonical-donor-current-20261126.json)
@@ -90,6 +93,7 @@ source domains and physical headset qualification remain open.
 [Canonical writable recipient evidence](validation/canonical-writable-recipient-20261126.json)
 [Plain native writable recipient evidence](validation/native-writable-recipient-20261126.json)
 [Authored native writable recipient evidence](validation/native-key-writable-bake-20261126.json)
+[Legacy Bake conversion evidence](validation/legacy-key-bake-conversion-20261126.json)
 
 Strict Bake rays now recover source-edge contacts affected by float staging.
 An exact ray hit has priority. A missed ray can use an actual source edge
