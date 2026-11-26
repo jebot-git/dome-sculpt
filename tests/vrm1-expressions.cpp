@@ -65,7 +65,19 @@ int main(int argc,char **argv)try{
  check(current.painted->mesh().uv==initial.painted->mesh().uv&&current.painted->source_sampling_vertices().size()==initial.painted->source_sampling_vertices().size()&&current.material_bindings->uv_origin==initial.material_bindings->uv_origin,"Writable coordinates, source remap and first source capsule stay exact");
  auto twice=prepare_authoring_import(baseline,input,options);const auto independent=bake_vrm1_expression_pose(twice.scene,selected,weights);
  for(auto id:twice.objects){const auto &before=twice.scene.object(id),&after=independent.object(id);check(before.appearance==after.appearance&&before.material_bindings==after.material_bindings&&before.deformation==after.deformation&&before.painted->encode()==after.painted->encode(),"Repeated imported source node/material numbers never join independent native instances");}
- auto with_normal=fixture;with_normal.j["materials"][0]["normalTexture"]={{"index",0}};const auto normal_file=out/"normal.vrm";with_normal.save(normal_file);auto normal_scene=prepare_authoring_import(empty,normal_file,options);const auto normal_before=normal_scene.scene.encode();
+ auto with_normal=fixture;
+ with_normal.j["materials"][0]["normalTexture"]={{"index",0}};
+ auto generated=with_normal;
+ auto &primitive=generated.j["meshes"][0]["primitives"][0];
+ primitive["attributes"].erase("TANGENT");
+ for(auto &target:primitive["targets"])target.erase("TANGENT");
+ const auto normal_file=out/"normal-generated.vrm";
+ generated.save(normal_file);
+ const auto normal_scene=prepare_authoring_import(empty,normal_file,options);
+ const auto normal_before=normal_scene.scene.encode();
+ const auto generated_frames=normal_scene.scene.object(normal_scene.objects.front()).material_bindings->normal_frames;
+ check(generated_frames&&generated_frames->pbr->generated_tangents,
+       "The counterexample uses genuine generated tangents and a live normal texture");
  const auto normal_error=refuses([&]{bake_vrm1_expression_pose(normal_scene.scene,normal_scene.objects.front(),weights);});
  check(normal_error.find("genuine authored source TANGENT is required")!=std::string::npos&&normal_scene.scene.encode()==normal_before,
        "Generated tangent authority still cannot authorize a typed normal-texture UV expression");
@@ -74,8 +86,6 @@ int main(int argc,char **argv)try{
  with_normal.j["materials"][0]["normalTexture"]={{"index",0},{"scale",.65f},
    {"extensions",{{"KHR_texture_transform",{{"offset",{.08f,-.07f}},
      {"scale",{.8f,1.2f}},{"rotation",rotation}}}}}};
- auto tangent=with_normal.values({1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,1},4,"VEC4");
- with_normal.j["meshes"][0]["primitives"][0]["attributes"]["TANGENT"]=tangent;
  const auto auth_file=out/"normal-authored.vrm";
  with_normal.save(auth_file);
  const auto authored=prepare_authoring_import(empty,auth_file,options);
