@@ -1437,6 +1437,29 @@ remain in the evidence. Stack samples locate the expensive work in
 CPU source-image sampling inside the native paint composite.
 [Completed sanitizer and format evidence](validation/creator-vrm0-strict-closure-20261126.json)
 
+### Source texture sampling during paint preview
+
+The CPU paint composite validates each source view once and precomputes
+wrapped taps per output row and column for axis-aligned UV transforms.
+Coupled transforms evaluate the same sampler at each output texel. Both
+paths use exact byte-to-float decoding and the original accumulation
+order. The scalar sampler keeps its original source and coordinate
+validation. An independent reference checks 183,816 samples per profile
+across sRGB and linear data, all wrap combinations, source filtering,
+and diagonal, reflected, constant and coupled UV transforms.
+
+The cold canonical avatar worker takes 3.68–3.93 seconds in optimized
+Release on software GL, compared with 8.91–11.34 seconds on the prior
+core. Two sanitizer captures on Intel Arc take 22.32 and 25.80 seconds,
+both within the original 30-second deadline. The prior captures take
+20.70 and 35.64 seconds. All captures reproduce the independent rendered image and
+canonical VRM output. Each native profile passes ten selected source,
+paint, material, cache and renderer cases. The seven normal-frame VRM
+outputs match the prior files byte for byte. Nested DomeD Wayland passes
+ten selected-avatar checks and emits the prior exact VRM. The synthetic
+OpenXR startup and exact Save pass on software GL and Intel Arc.
+[Source sampling validation](validation/paint-source-grid-20261126.json)
+
 ## Source and integration boundary
 
 - Main now admits product1bc13125 and public fixturef1e193c7 after complete

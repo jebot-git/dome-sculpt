@@ -1,0 +1,321 @@
+{
+  "candidate": "59f6c278f94c0f31f45b092673e22ea57cebea47",
+  "production_parent": "90c10c285038fdfdf5e415ca8efbc7c494debb34",
+  "main_merge": "36e4d8236a2210fd5cba95c19a63d25f941348c0",
+  "profiles": {
+    "release": {
+      "matrix": {
+        "candidate": "59f6c278f94c0f31f45b092673e22ea57cebea47",
+        "profile": "release",
+        "terminal": true,
+        "fltk": "/opt/fltk-vr/toolkit",
+        "invocation": "a562d881025c454aa560e3460b5f3e4b",
+        "phase": "complete",
+        "elapsed_seconds": 214.64,
+        "donor": "90c10c285038fdfdf5e415ca8efbc7c494debb34",
+        "rebuilt": [
+          "src/paint.cpp",
+          "src/source-maps.cpp"
+        ],
+        "core_sha256": "69642b3889e0ddf14cc93b02308c430b11e48bcc2100185b3cf82f7d470f1617",
+        "parent_core_sha256": "5781719886efc98616c340601464519dfd8624b3fe222c1172fc93b5e8b22a6e",
+        "owned_objects": {
+          "paint.cpp.o": "910075e42b3c1346554c3bd50d5fa08fec10633c4bb37c9ffdca5b584ad5a0fb",
+          "source-maps.cpp.o": "310722ad1e7eaedde1c52b641fc1392ab3632209201fa585c15f9ad66c298c9c"
+        },
+        "binaries": {
+          "dome-sculpt-baked-textures-test": "d4b9ea23986db1a4b2b548e6c983bb0fa77a174a24849e5c44e7e67f36e66dd3",
+          "dome-sculpt-composite-cache-test": "a7e7147709fa43ac895f507329db7cc6190b3b9b7196a7d2d20824d651649634",
+          "dome-sculpt-mtoon-emission-test": "2bfcad0617fce42f37f520c1f8063019fba0c8550294a0cdd993e01503a6e94b",
+          "dome-sculpt-normal-frame-vrm-consumer-test": "e9404a97db91f0a83653377cf4358e02e542ea489afb179715213968a6068668",
+          "dome-sculpt-polygon-color-render-test": "8f34782098b8e031b718df317328daa937b55a0de0200a915934da443ca847f6",
+          "dome-sculpt-source-extra-uv-test": "4a39b54669b343e8731394e9d6c850b888b74b2109c26e907d94bc2fdb970c10",
+          "dome-sculpt-source-gpu-test": "3c634d6adf317b08d5432dd99b9206d1dc30f4a2b6b1bc80730aacdc0bb9e033",
+          "dome-sculpt-source-maps-test": "220fd33227d6e98a44ea3b070068d17610425780645aac73c7d1dcbb1ae17944",
+          "dome-sculpt-source-uv-bake-test": "b7dbcd3e8d2891840f499a98565cde3a4e3b6c6df357a64c7f4ac39280a7e6a1",
+          "dome-sculpt-source-uv1-test": "43ad645d3ae2aeebe10a2b5b862a37013c90f2119a1364ef0c1537272a6e1e0e"
+        },
+        "app_sha256": "0647e241c9f8a0a6bd320b9dfec075864770216457184c0fc8df12e9eb03d6bb",
+        "render_sha256": "f5b35f3b6091f14015f937b45f4c64f7a2a7df0fdf0f27fab059a607f164eb98",
+        "xr_sha256": "aec7fe47cf2ff52bf299a681372f003c0a1e66c01e87b4474fa2500988f6002f",
+        "exit": 0,
+        "failures": [],
+        "tests": 10,
+        "ctest_sha256": "b24c4cd385395aae7ac4d2e5a35154bf1548c840b9434e9dba4198d1451b0a1e",
+        "junit_sha256": "dfd380042228f1fcfa9dac1d91e6c6bf9b339f2beec3aaea5dccce07176922e2"
+      },
+      "reference_files": {
+        "frame-vrm-consumer-0-0.vrm": "f9c0b604ac02e0b5b0f74780fdc6e888e7719195a73331c5f3e6241bd436f57f",
+        "frame-vrm-consumer-0-35.vrm": "76b3456644f447eda1cc2a8aa4b5256e0eadb832f7f3aac4eab1dee6fa8cf250",
+        "frame-vrm-consumer-0-100.vrm": "89484b239e1e6c274cf59ac9c6fd74d9c8dced122d77b0a180a52bc22003b43e",
+        "frame-vrm-consumer-1-0.vrm": "1bb32f9c9e8c0b721e501aafd0e5d80f9b9cd8c6e9bd181cf169b66ec2d88fb1",
+        "frame-vrm-consumer-1-35.vrm": "c7fae20da5d6da6470bbb722532b88bbbade08713925193510532d1db338e774",
+        "frame-vrm-consumer-1-100.vrm": "5100e749ebd77216c44b83edb9ec44f06048d3489f831b57c20fe32b81784297",
+        "frame-vrm-consumer-canonical.vrm": "c93dcb6f02e739d44a22073474681b1604459ec4d137082ab6a40ad08a942f62"
+      },
+      "worker": {
+        "candidate": "59f6c278f94c0f31f45b092673e22ea57cebea47",
+        "parent": "90c10c285038fdfdf5e415ca8efbc7c494debb34",
+        "profile": "release",
+        "terminal": true,
+        "invocation": "679f6f29075249798af436eee1efcfa3",
+        "phase": "complete",
+        "fixture_sha256": "f207c9c88b53251eaa6c7bdd95958973c0458c474c773e131a7b7203b93f1840",
+        "expected_vrm_sha256": "c93dcb6f02e739d44a22073474681b1604459ec4d137082ab6a40ad08a942f62",
+        "results": [
+          {
+            "core": "parent",
+            "worker_ms": 11343.9,
+            "deadline": true,
+            "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+            "image_error": 0,
+            "file_sha256": "c93dcb6f02e739d44a22073474681b1604459ec4d137082ab6a40ad08a942f62"
+          },
+          {
+            "core": "candidate",
+            "worker_ms": 3934.94,
+            "deadline": true,
+            "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+            "image_error": 0,
+            "file_sha256": "c93dcb6f02e739d44a22073474681b1604459ec4d137082ab6a40ad08a942f62"
+          },
+          {
+            "core": "candidate",
+            "worker_ms": 3682.56,
+            "deadline": true,
+            "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+            "image_error": 0,
+            "file_sha256": "c93dcb6f02e739d44a22073474681b1604459ec4d137082ab6a40ad08a942f62"
+          },
+          {
+            "core": "parent",
+            "worker_ms": 8908.46,
+            "deadline": true,
+            "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+            "image_error": 0,
+            "file_sha256": "c93dcb6f02e739d44a22073474681b1604459ec4d137082ab6a40ad08a942f62"
+          }
+        ],
+        "exit": 0
+      },
+      "median_ms": {
+        "parent": 10126.18,
+        "candidate": 3808.75
+      }
+    },
+    "asan": {
+      "matrix": {
+        "candidate": "59f6c278f94c0f31f45b092673e22ea57cebea47",
+        "profile": "asan",
+        "terminal": true,
+        "fltk": "/home/blux/de-xr/dome-sculpt/artifacts/sdk-20261126/toolkit-sanitize",
+        "invocation": "885b6e2ab328463885ccbd10c23499d5",
+        "phase": "complete",
+        "elapsed_seconds": 551.63,
+        "donor": "90c10c285038fdfdf5e415ca8efbc7c494debb34",
+        "rebuilt": [
+          "src/paint.cpp",
+          "src/source-maps.cpp"
+        ],
+        "core_sha256": "6348a50ea8adc0cad509b3165405f24ca894bd1ea92a03a10cf0f6d4709e0675",
+        "parent_core_sha256": "1d59087998ff588ef498342ac2d027ca5b1461e10ffd1bc82b8d9edab62a80cc",
+        "owned_objects": {
+          "paint.cpp.o": "9e77e4e232f721cb4d58a95059cb823da35994fc2bfafd4755728e48abe57ae7",
+          "source-maps.cpp.o": "230825bd801f2906da3d2c6e389835584974319395486c901345150d6d9caaef"
+        },
+        "binaries": {
+          "dome-sculpt-baked-textures-test": "40543e2246938324f5f9dbfd2e9a980fe4653aba0a0ed08a52421b3c9597b193",
+          "dome-sculpt-composite-cache-test": "726382152273f65df276256932e0f98574648b0c44f00b5a6e43579220d76a65",
+          "dome-sculpt-mtoon-emission-test": "2cd85d261730eefee57541a34c64f7b6bd7f0a6309e2315f221aace56ce7d495",
+          "dome-sculpt-normal-frame-vrm-consumer-test": "aaaf8140fae5ed7a139d4755c93d6c36cff10a2ed13b22739b3845b0f8143482",
+          "dome-sculpt-polygon-color-render-test": "f3b511cba28c3ba3b70fa3e1102e5fded519b869500138846a930d9a397fc6cc",
+          "dome-sculpt-source-extra-uv-test": "2c27a92ab4ebec86710f94e2dfacf4cdb4039a97ca8852600ccd1e9ef76561fd",
+          "dome-sculpt-source-gpu-test": "c9c00ce7d7700bba85346ec4e1ad421a8b58e8f5449fdaf5491a845cdcc02deb",
+          "dome-sculpt-source-maps-test": "3cf1a7b0dd1393afca7e3f2eb55cf40e0ce38cb9c6c27c3cc27f7b0a8800495b",
+          "dome-sculpt-source-uv-bake-test": "93a5c4d44e309673d997932d119631a971c4b93f9e06948982f998856ba47a57",
+          "dome-sculpt-source-uv1-test": "d3fd5e1247df4ecf70f016b1d76f3f961a022ec7ab3c27e71b2c4fda5e95770c"
+        },
+        "app_sha256": "b3b927e560b3c4ed9bb7c2b5a500975d34d0470f1aff69956ab46ced364057a5",
+        "render_sha256": "0a5aff19c3b7870febfa7905b08eddab1effd9b6992ec4f6d2dbc41c1deb42a6",
+        "xr_sha256": "dfcc553a0b94882d2dec24259ae341e6525f4a316c75fa08553f761f03e1c68e",
+        "exit": 0,
+        "failures": [],
+        "tests": 10,
+        "ctest_sha256": "8a05eb18fa32b534725911399078eb79f13cae4b7a8673f3e3e32d67cdefa452",
+        "junit_sha256": "2cc9f08ebc5cffe3591bcc6a3f2f099345b36205a4db11f541ff29c0e111921a"
+      },
+      "reference_files": {
+        "frame-vrm-consumer-0-0.vrm": "f9c0b604ac02e0b5b0f74780fdc6e888e7719195a73331c5f3e6241bd436f57f",
+        "frame-vrm-consumer-0-35.vrm": "76b3456644f447eda1cc2a8aa4b5256e0eadb832f7f3aac4eab1dee6fa8cf250",
+        "frame-vrm-consumer-0-100.vrm": "89484b239e1e6c274cf59ac9c6fd74d9c8dced122d77b0a180a52bc22003b43e",
+        "frame-vrm-consumer-1-0.vrm": "1bb32f9c9e8c0b721e501aafd0e5d80f9b9cd8c6e9bd181cf169b66ec2d88fb1",
+        "frame-vrm-consumer-1-35.vrm": "c7fae20da5d6da6470bbb722532b88bbbade08713925193510532d1db338e774",
+        "frame-vrm-consumer-1-100.vrm": "5100e749ebd77216c44b83edb9ec44f06048d3489f831b57c20fe32b81784297",
+        "frame-vrm-consumer-canonical.vrm": "c93dcb6f02e739d44a22073474681b1604459ec4d137082ab6a40ad08a942f62"
+      },
+      "worker": {
+        "candidate": "59f6c278f94c0f31f45b092673e22ea57cebea47",
+        "parent": "90c10c285038fdfdf5e415ca8efbc7c494debb34",
+        "profile": "asan",
+        "terminal": true,
+        "invocation": "3b8bea38789b40cfaaa00b9c3b122db0",
+        "phase": "complete",
+        "fixture_sha256": "f207c9c88b53251eaa6c7bdd95958973c0458c474c773e131a7b7203b93f1840",
+        "expected_vrm_sha256": "c93dcb6f02e739d44a22073474681b1604459ec4d137082ab6a40ad08a942f62",
+        "results": [
+          {
+            "core": "parent",
+            "worker_ms": 35643.1,
+            "deadline": false,
+            "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+            "image_error": 0,
+            "file_sha256": "c93dcb6f02e739d44a22073474681b1604459ec4d137082ab6a40ad08a942f62"
+          },
+          {
+            "core": "candidate",
+            "worker_ms": 25797.1,
+            "deadline": true,
+            "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+            "image_error": 0,
+            "file_sha256": "c93dcb6f02e739d44a22073474681b1604459ec4d137082ab6a40ad08a942f62"
+          },
+          {
+            "core": "candidate",
+            "worker_ms": 22316.6,
+            "deadline": true,
+            "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+            "image_error": 0,
+            "file_sha256": "c93dcb6f02e739d44a22073474681b1604459ec4d137082ab6a40ad08a942f62"
+          },
+          {
+            "core": "parent",
+            "worker_ms": 20704.9,
+            "deadline": true,
+            "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+            "image_error": 0,
+            "file_sha256": "c93dcb6f02e739d44a22073474681b1604459ec4d137082ab6a40ad08a942f62"
+          }
+        ],
+        "exit": 0
+      },
+      "median_ms": {
+        "parent": 28174.0,
+        "candidate": 24056.85
+      }
+    }
+  },
+  "wayland": {
+    "candidate": "59f6c278f94c0f31f45b092673e22ea57cebea47",
+    "terminal": true,
+    "invocation": "4808e794d9b54986850d1cbbfc9964fb",
+    "phase": "complete",
+    "core_sha256": "69642b3889e0ddf14cc93b02308c430b11e48bcc2100185b3cf82f7d470f1617",
+    "fixture_sha256": "8ed1761e7c3fc393763d2c0a9ffd3c5ac388679ef91e76b6962d9e03d51c5f63",
+    "compositor_sha256": "47920142c8c803dcf5adb63ba643d2e347fbdcd1e15ecd8bce7c1a8dd47c0b7e",
+    "compositor_source": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+    "probe_sha256": "5bf11c670f66bbb68960073878933055b09582e5173ec1e3f472b413956c55aa",
+    "app_sha256": "0647e241c9f8a0a6bd320b9dfec075864770216457184c0fc8df12e9eb03d6bb",
+    "exit": 0,
+    "checks": 10,
+    "report_sha256": "35c6e0eaf75eb1aa1210b6d60c1eea67c995619f4b7e9dcd6b7e4e0d72f4f545",
+    "output_sha256": "ee0dd8c6fed6577ba9cf2f644c460d69f01e6d8060ae980c5d5157c4dbfcafdf"
+  },
+  "synthetic_openxr": {
+    "software": {
+      "candidate": "59f6c278f94c0f31f45b092673e22ea57cebea47",
+      "profile": "software",
+      "terminal": true,
+      "invocation": "ae8b8d4b0a714b9d8033433c26c64acc",
+      "phase": "complete",
+      "app_sha256": "0647e241c9f8a0a6bd320b9dfec075864770216457184c0fc8df12e9eb03d6bb",
+      "immutable_project_sha256": "8ed1761e7c3fc393763d2c0a9ffd3c5ac388679ef91e76b6962d9e03d51c5f63",
+      "runtime_sha256": "a509d343406cb8ca044821b06e3cd90d5a1730d6747abfb27a6fa1e4c5487d65",
+      "exit": 0,
+      "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+      "nonblank": {
+        "left": 6,
+        "right": 6
+      },
+      "releases": 12,
+      "report_sha256": "f2cd26792db594f41a9089240e9ce8d3d8b96fbbceb1b794f939b77b47f1dd27"
+    },
+    "arc": {
+      "candidate": "59f6c278f94c0f31f45b092673e22ea57cebea47",
+      "profile": "arc",
+      "terminal": true,
+      "invocation": "8eff6d3e0cff45fc8f54956afbd8c5d7",
+      "phase": "complete",
+      "app_sha256": "0647e241c9f8a0a6bd320b9dfec075864770216457184c0fc8df12e9eb03d6bb",
+      "immutable_project_sha256": "8ed1761e7c3fc393763d2c0a9ffd3c5ac388679ef91e76b6962d9e03d51c5f63",
+      "runtime_sha256": "a509d343406cb8ca044821b06e3cd90d5a1730d6747abfb27a6fa1e4c5487d65",
+      "exit": 0,
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "nonblank": {
+        "left": 6,
+        "right": 6
+      },
+      "releases": 12,
+      "report_sha256": "c48165c542c59b6e323c93e72f08137a8c8470018deadff2861f4e345cde65b6"
+    }
+  },
+  "numeric_grid_checks_per_profile": 183816,
+  "archive": {
+    "file": "paint-source-grid-20261126.tar.gz",
+    "sha256": "9fa1056648e7eccacdf254b52eab3d00e85ba52bc1544340533e6277005f3ff9",
+    "members": {
+      "arc/openxr/runtime.json": "c48165c542c59b6e323c93e72f08137a8c8470018deadff2861f4e345cde65b6",
+      "arc/openxr/status.json": "7f01675786b7a034157fbe9fc4e73f7bc5c61ad6674f9f0f1f1615f4393d7fcb",
+      "arc/openxr/xr.log": "e80ef4241e35a2e554e9ce1a92179e1a907107f46ead1f7efd2aa936bc580170",
+      "asan/benchmark/candidate-link.log": "7fcb92e36881e545ccaea69cc87e209ace6798d795259e7a10b7d2a6f440cc7a",
+      "asan/benchmark/candidate/sample-1.log": "fad3edbefe1242cba49efc6349bb7c96fe5f0cfa05fee6d282bf7602b34d0298",
+      "asan/benchmark/candidate/sample-2.log": "a634b58b864273ea572c735a9d49e4f6aa24a0171314681f1c911c3717686664",
+      "asan/benchmark/compile.log": "10ee1135fe96c68c727fd8cd22a70f42b704ba4219db501354a88de77ef8fdcd",
+      "asan/benchmark/parent-link.log": "f6de239411cbeff21475ee7f9ee392796893ed9d671f479464cfb5d87392b99a",
+      "asan/benchmark/parent/sample-0.log": "f0c72d5eb8c89cdadc2b737eb9f2de427be70ed282c00f2063a22e7a5678f859",
+      "asan/benchmark/parent/sample-3.log": "f61ae3f538cb30b436fc35fe15ee727a402fdb733c465d3a64f218bca69f8f5c",
+      "asan/benchmark/status.json": "97a4e244ab15b8479ca13b9b89b3f83156d71117f72bf1369366856a77ad7294",
+      "asan/benchmark/timed-normal-frame.cpp": "f207c9c88b53251eaa6c7bdd95958973c0458c474c773e131a7b7203b93f1840",
+      "asan/native/build/paint-grid-tests.xml": "2cc9f08ebc5cffe3591bcc6a3f2f099345b36205a4db11f541ff29c0e111921a",
+      "asan/native/configure.log": "08164d27558df8c6e278566781fe150f6815bd87d1c0cadeb1eaa17c48f821b5",
+      "asan/native/core-index.log": "bed53875b3ed6c44ee2cea53693212ec6ea6ac4e5778c374d9e2813b5b6294ac",
+      "asan/native/ctest.log": "8a05eb18fa32b534725911399078eb79f13cae4b7a8673f3e3e32d67cdefa452",
+      "asan/native/dome-sculpt-link.log": "b16c46eea897fd3802dabee18115bfd993251defd254a28b680426ecb1068d7e",
+      "asan/native/paint.cpp.log": "765eeab341752e580d87ba1b24923495f63d158e7cd61681608eed75e3a89050",
+      "asan/native/source-maps.cpp.log": "1957553aec0ea69a073526397b67790df0eb6937fea6f6ec6324d24eafd9c9d9",
+      "asan/native/status.json": "16fa5bd746a6d719429e0cdb28299f07a4f08af0c74fec507ddad48bcfbd9210",
+      "benchmark-runner/run.py": "7886edd87d38d1ab63afee98b4329d4e3da46179478e7b7035744d1a9c4e2cfc",
+      "first-wayland-focus/status.json": "4966c8b62a789909c3524afc5e7b0ada59d2741458e33913c9d6ce66dd7cc3ba",
+      "first-wayland-focus/wayland.log": "b7f76f91e549835441bcff90b0b870cb9e0311510d7a2e408385fd82a3ad698a",
+      "first-wayland-focus/workflow/report.json": "89d2ed3c8b756525c471cb5fe4a79037e44be3c1cfbc758e39c2a9b41e0453d5",
+      "native-runner/record.py": "a73aa17f924be5602fcca68e6e5e001fdff82723a5b1ac3369005ef8671d00de",
+      "native-runner/run.py": "923ebe9005c9a2a638638d48cdbbe9664139d78b7950566b270a1f8da7e708f4",
+      "release/benchmark/candidate-link.log": "d4f1bc37a29e7a5b412bcd434ac9e91e065cb3c6b54e707f272ac1a0f241d7ca",
+      "release/benchmark/candidate/sample-1.log": "c292a44d81342de6d5bdc03b1206e72ec4696434ad49e695f2b11b07699cd22b",
+      "release/benchmark/candidate/sample-2.log": "85fd606ace563c76b8f90a29c45d034dedc4499be96652b15eb8ff396ba06feb",
+      "release/benchmark/compile.log": "8b53f3eb1d9e0e0fd23fafd8beaa0285ebaa04a2aff384753d812f640b3f1daf",
+      "release/benchmark/parent-link.log": "1f071abc1c9e8f2d7bd74f26df3ddba1bee8e7c6b7ba83945d0f5f03452e0eb4",
+      "release/benchmark/parent/sample-0.log": "00974e951d44007d0ee0316d26997799428be6ef145124d98d19018a4f51f6af",
+      "release/benchmark/parent/sample-3.log": "bed7893cf7a6650b132c6820be1d27e72c1e32d98fd9f1703f000aa9eabae7e4",
+      "release/benchmark/status.json": "552d01eef4ee216957fd07b552b44b3287c58642723285e2fcd0808c337ed540",
+      "release/benchmark/timed-normal-frame.cpp": "f207c9c88b53251eaa6c7bdd95958973c0458c474c773e131a7b7203b93f1840",
+      "release/native/build/paint-grid-tests.xml": "dfd380042228f1fcfa9dac1d91e6c6bf9b339f2beec3aaea5dccce07176922e2",
+      "release/native/configure.log": "1cccc08e0d80eda19af198ab27a2b5438a54d6cb2b8900721a48df79ead3196d",
+      "release/native/core-index.log": "5f8b591576dc58e3102d20dbe96d846d4eb4ebe6e1b5fdc20b0cf1f7849ce1d3",
+      "release/native/ctest.log": "b24c4cd385395aae7ac4d2e5a35154bf1548c840b9434e9dba4198d1451b0a1e",
+      "release/native/dome-sculpt-link.log": "4950c1f94451e4603d355b7cbdee5e73de6c4449a5b58ad06dd431293412a228",
+      "release/native/paint.cpp.log": "bc2af43893a5494c21847b240c6e182e488745e021d6f15ce83a8dedec18c0ce",
+      "release/native/source-maps.cpp.log": "d0f65e3f678ed73bfe6bc27bb66276b06077b732954713757a6bea40d0c5b773",
+      "release/native/status.json": "18ec33a2a7134cfcf4d3f184e249efd459dbbe5e76806688884f64bc41dfc6d3",
+      "software/openxr/runtime.json": "f2cd26792db594f41a9089240e9ce8d3d8b96fbbceb1b794f939b77b47f1dd27",
+      "software/openxr/status.json": "bd0252cd0633ea611c731346548a0f4eb0aee9bb24de63db6c0f66cce80d98d3",
+      "software/openxr/xr.log": "536a844b9defd509ad6b09a6f1189ffd8216f5d7cbbd492ff7cd7d2bec242d76",
+      "wayland/replay.py": "dc293b487ed751876c40efee948ff0d198df29b8a356448d432e84b4c76eff0b",
+      "wayland/run.py": "f6fba2e1ee9cec4d885e5a0e2b9e1d4faba5cc64e4f8cd45672a7fa12f0c251e",
+      "wayland/status.json": "72ab6f17ca8b3f6ba91c4b6130c8bcbc0aef3d9c949a4e1089d4cdaedb053044",
+      "wayland/wayland.log": "ae8adc89ff9cdf1e51158e6a4c0880f80095d3f361a31a7de930ad3938897081",
+      "wayland/workflow/focus-trace.json": "3e7cc888a80899173f1729346876321bd8fcc7dd351f3503af757f60b85d2408",
+      "wayland/workflow/report.json": "35c6e0eaf75eb1aa1210b6d60c1eea67c995619f4b7e9dcd6b7e4e0d72f4f545",
+      "xr-runner/run.py": "debef453f9c91f088e8602e5fda06ebed5e608e40f70d377da4c5347c083ec13"
+    }
+  }
+}

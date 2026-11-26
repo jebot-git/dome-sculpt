@@ -184,6 +184,13 @@ Intel Arc. The existing physical selection acceptance applies to the
 previous headset-tested build.
 [Selection fixture evidence](validation/selection-fixtures-20261126.json)
 
+The native paint composite now reuses validated source texture taps
+and exact byte decoding. Independent sampling, Release and sanitizer
+regressions, unchanged VRM bytes, native Wayland export and synthetic
+OpenXR startup qualify this optimization. The sampled Arc sanitizer
+avatar previews complete within the original readiness deadline.
+[Source sampling validation](validation/paint-source-grid-20261126.json)
+
 ## Qualified integration — 2026-11-17
 
 Main now integrates product `1bc13125` and public fixture `f1e193c7` after
