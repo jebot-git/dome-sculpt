@@ -8,11 +8,14 @@ is no longer simultaneously owned working memory.
 
 `Work::NodeAllocator` is private to this compiler and supplied exclusively to
 synchronous `std::allocate_shared` calls in `PersistentSculptIndex::node`.
-Its `allocate` operation runs while the enclosing `Work` is alive. No allocator
-is published as a general allocation interface or reused to allocate after the
-factory returns. The allocator stored in the shared control block can outlive
-`Work`; its former `Work*` is then an opaque pointer value. Deallocation never
-dereferences that pointer. It credits only a weak numeric release account,
+Its `allocate` operation runs synchronously on the enclosing `Work` owner
+thread. No allocator is published as a general parallel allocation interface.
+The allocator stored in each shared control block holds a weak numeric account
+and a reservation size. A single live-owner pointer belongs to the account;
+`Work` clears it during destruction. Allocation locks the account and rejects
+an expired or retired owner before charging. This also avoids a redundant
+owner pointer in every node allocation. Deallocation never reads that owner
+pointer. It credits only the weak numeric release account,
 after the underlying allocation has actually been freed. Expiration of that
 account makes later destruction of a published owner a no-op for accounting.
 

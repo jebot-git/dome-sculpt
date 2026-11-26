@@ -57,8 +57,14 @@ struct Work {
   // Only actual allocation retirement may credit a persistent index charge.
   // Published nodes can outlive this Work: their allocator holds a weak
   // numeric account, never a deleter which dereferences the former Work.
-  struct NodeReleases { std::atomic<size_t> bytes{0}; };
-  std::shared_ptr<NodeReleases> node_releases;
+  struct NodeReleases {
+    std::atomic<size_t> bytes{0};
+    std::atomic<Work *> owner{nullptr};
+  };
+  std::shared_ptr<NodeReleases> node_releases{};
+  Work(const SculptChunkLimits &l,SculptSurfaceChunks::Cancel c)
+      :limits(l),cancel(std::move(c)){}
+  ~Work(){if(node_releases)node_releases->owner.store(nullptr,std::memory_order_release);}
   void settle_node_releases() {
     if(!node_releases)return;
     const auto released=node_releases->bytes.exchange(0,std::memory_order_relaxed);
@@ -67,12 +73,11 @@ struct Work {
   }
   template<class T> struct NodeAllocator {
     using value_type=T;
-    Work *work;
     std::weak_ptr<NodeReleases> releases;
     size_t charge_bytes;
-    NodeAllocator(Work &w,size_t n):work(&w),releases(w.node_releases),charge_bytes(n){}
+    NodeAllocator(Work &w,size_t n):releases(w.node_releases),charge_bytes(n){}
     template<class U> NodeAllocator(const NodeAllocator<U> &other) noexcept
-        :work(other.work),releases(other.releases),charge_bytes(other.charge_bytes){}
+        :releases(other.releases),charge_bytes(other.charge_bytes){}
     void retired() noexcept {
       if(auto account=releases.lock()) {
         const auto before=account->bytes.fetch_add(charge_bytes,std::memory_order_relaxed);
@@ -85,7 +90,12 @@ struct Work {
       // and the shared numeric account. Refuse an unsupported implementation.
       if(charge_bytes<64||n>(charge_bytes-64)/sizeof(T))
         throw std::length_error("Sculpt index shared allocation exceeds its allowance");
-      work->charge(charge_bytes);
+      // Only synchronous allocate_shared may allocate. A copied allocator
+      // which survives its factory has no charge owner and must refuse reuse.
+      const auto account=releases.lock();
+      auto *owner=account?account->owner.load(std::memory_order_acquire):nullptr;
+      if(!owner)throw std::logic_error("Expired sculpt index allocation owner");
+      owner->charge(charge_bytes);
       try { return std::allocator<T>{}.allocate(n); }
       catch(...) {retired();throw;}
     }
@@ -96,7 +106,7 @@ struct Work {
       retired();
     }
     template<class U> bool operator==(const NodeAllocator<U> &other) const noexcept {
-      return work==other.work&&charge_bytes==other.charge_bytes&&
+      return charge_bytes==other.charge_bytes&&
           !releases.owner_before(other.releases)&&!other.releases.owner_before(releases);
     }
   };
@@ -104,6 +114,7 @@ struct Work {
     if(!node_releases) {
       charge(sizeof(NodeReleases)+128);
       node_releases=std::make_shared<NodeReleases>();
+      node_releases->owner.store(this,std::memory_order_release);
     }
     return NodeAllocator<T>(*this,n);
   }
