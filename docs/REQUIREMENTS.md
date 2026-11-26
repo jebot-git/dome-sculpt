@@ -74,12 +74,16 @@ Clearing the field leaves the live intrinsic normal available as a donor.
 Native and canonical sources with an independent writable UV grid can now
 donate their material, normal and FLOAT emission detail. Prepared polygon
 sources can also donate resolved PBR colour and normal detail from their
-separate UV domains. Independent writable recipients, broader polygon source
-domains and physical headset qualification remain open.
+separate UV domains. Canonical targets with independent writable coordinates
+now bake into their retained paint grid and keep both normals in their own
+field. Partial HDR Bake preserves missed texels and exact editable history.
+Plain native retained writable recipients, broader polygon source domains
+and physical headset qualification remain open.
 [Affine artist Bake evidence](validation/affine-artist-bake-20261126.json)
 [Prepared source UV evidence](validation/uv-edited-normal-bake-20261126.json)
 [Converted native source evidence](validation/canonical-donor-current-20261126.json)
 [Independent writable source evidence](validation/independent-writable-donor-20261126.json)
+[Canonical writable recipient evidence](validation/canonical-writable-recipient-20261126.json)
 
 Strict Bake rays now recover source-edge contacts affected by float staging.
 An exact ray hit has priority. A missed ray can use an actual source edge

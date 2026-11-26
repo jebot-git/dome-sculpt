@@ -1726,6 +1726,30 @@ Intel Arc with the sanitizer application also passes 30 public checks and
 saves the same accepted project bytes.
 [Independent writable source evidence](validation/independent-writable-donor-20261126.json)
 
+### Bake into canonical meshes with retained writable UVs
+
+The shared Bake worker uses the target's retained writable UVs for colour,
+material, AO and FLOAT emission. It projects PBR and MToon normals in their
+separate normal field. The normal pass preserves the FLOAT emission
+representation through validation. Before the fix, a low-dynamic-range Bake
+used the display coordinates and a FLOAT emission donor could fail with
+`Invalid texture image`.
+
+Three cases distinguish the display, paint and normal coordinates, including a
+seam split and a partial HDR projection. The complete material and normal
+maps match the independent writable-atlas control. Matching-triangle cases
+project 2,304 texels with zero rays. Partial HDR projects 1,152 texels and
+preserves all 1,152 missed texels. Existing layers and sampling owners stay
+attached. Dependent Save, reopen, Clear Bake and exact Undo/Redo pass.
+
+The focused Release and ASan/UBSan cohorts each pass ten tests, including 77
+recipient checks. Nine native fixture projects match byte for byte. Nested
+DomeD Wayland and synthetic OpenXR on software GL and Intel Arc A770 each pass
+ten checks and write the same accepted bytes. The Arc run uses the sanitizer
+application. The plain native retained writable recipient and physical
+headset qualification remain open.
+[Canonical writable recipient evidence](validation/canonical-writable-recipient-20261126.json)
+
 ## Source and integration boundary
 
 - Main now admits product1bc13125 and public fixturef1e193c7 after complete
