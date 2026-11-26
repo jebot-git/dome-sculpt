@@ -5,6 +5,7 @@
 #include <map>
 #include <functional>
 namespace dome::detail {
+class CanonicalPaintSampling;
 class PolygonSurfaceOwner;
 class PolygonSurfacePreview;
 class TextureSetFieldSource;
@@ -67,6 +68,7 @@ private:
   std::map<const TextureSetFieldSource *, std::shared_ptr<const TextureSetFieldSource>> fields_;
   std::map<const SourceMaterialBindings *, std::shared_ptr<const SourceMaterialBindings>> bindings_;
   std::map<const PolygonSurfaceOwner *, std::shared_ptr<const PolygonSurfaceOwner>> polygon_fields_;
+  std::map<const CanonicalPaintSampling *, std::shared_ptr<const CanonicalPaintSampling>> canonical_fields_;
   std::map<const PolygonSurfacePreview *, std::shared_ptr<const PolygonSurfacePreview>> previews_;
 };
 

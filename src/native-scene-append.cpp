@@ -1,4 +1,8 @@
 #include "bake-recipe-remap.hpp"
+#include "canonical-paint-sampling.hpp"
+#include "polygon-surface-owner.hpp"
+#include "dome/material-bindings.hpp"
+#include "dome/texture-sets.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/native-scene-append.hpp"
 #include "dome/polygon-scene.hpp"
@@ -63,17 +67,30 @@ struct Append {
   void collect(const std::shared_ptr<const PolygonAuthority> &p){
     stop();if(p&&seen_authorities.insert(p.get()).second)collect(p->origin);
   }
+  void collect_fields(const std::shared_ptr<const SourceMaterialBindings> &binding,
+                      const std::shared_ptr<const TextureSetCollection> &sets){
+    const auto visit=[&](const std::shared_ptr<const SourceMaterialBindings> &material){
+      stop();
+      if(!material)return;
+      if(material->polygon_surface_transfer)collect(material->polygon_surface_transfer->before());
+      if(material->canonical_paint_sampling)collect(material->canonical_paint_sampling->before());
+    };
+    visit(binding);
+    if(sets)for(const auto &field:sets->additional())visit(field.material_bindings);
+  }
   void collect(const std::shared_ptr<const PolygonOrigin> &p){
     stop();if(!p||!seen_origins.insert(p.get()).second)return;
     if(p->placement)for(const auto &g:p->placement->groups)collect_group(g);
     if(p->retopology)retopo_sources.insert(p->retopology->source);
     collect(p->polygon);collect(p->shape_source);collect(p->rig_source);
+    collect_fields(p->material_bindings,p->texture_sets);
   }
   void collect(const Scene &s){
     for(const auto &g:s.groups()){stop();collect_group(g);}
     for(const auto &o:s.objects()){
       stop();if(o.retopology)retopo_sources.insert(o.retopology->source);
       collect(o.polygon);collect(o.shape_source);collect(o.rig_source);
+      collect_fields(o.material_bindings,o.texture_sets);
     }
   }
   uint64_t instance(const SourceNodePlacement &p){

@@ -26,17 +26,24 @@ public:
  const auto &before() const noexcept{return before_;}
  const auto &normal_uv() const noexcept{return normal_uv_;}
  const auto &attachment() const noexcept{return attachment_;}
- const auto &current_sources() const noexcept{return current_sources_;}
+ const auto &current_sources() const noexcept{return *current_sources_;}
+ bool shares_sampling(const CanonicalPaintSampling &other) const noexcept {
+   return attachment_ == other.attachment_ && normal_uv_ == other.normal_uv_ &&
+          current_sources_ == other.current_sources_;
+ }
 private:
  CanonicalPaintSampling()=default;
  CanonicalPaintSampling(const CanonicalPaintSampling&)=delete;
  CanonicalPaintSampling &operator=(const CanonicalPaintSampling&)=delete;
  friend class CanonicalPaintSamplingCodec;
+ friend class BakeRecipeRemap;
+ friend class CanonicalPaintArchive;
+ std::shared_ptr<const CanonicalPaintSampling> rebase_before(std::shared_ptr<const PolygonOrigin>) const;
  std::weak_ptr<const CanonicalPaintSampling> self_;
  std::shared_ptr<const PolygonOrigin> before_;
  std::shared_ptr<const CanonicalNormalUv> normal_uv_;
  std::shared_ptr<const PaintSamplingAttachment> attachment_;
- std::vector<uint32_t> current_sources_;
+ std::shared_ptr<const std::vector<uint32_t>> current_sources_;
 };
 // Only an actual owning decoder can provide these independently decoded pools.
 // Replay mints a new private lease; a structural domain alone is insufficient.

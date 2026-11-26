@@ -12,6 +12,20 @@ namespace dome::detail {
 namespace {
 void stop(const PaintSamplingLimits &limits){if(limits.cancelled&&limits.cancelled())throw std::runtime_error("Canonical paint sampling cancelled");}
 }
+std::shared_ptr<const CanonicalPaintSampling> CanonicalPaintSampling::rebase_before(
+    std::shared_ptr<const PolygonOrigin> before) const {
+ if(!before||!valid_owner(self_.lock())||!before->paint||
+    before->paint!=before_->paint||before->paint.owner_before(before_->paint)||
+    before_->paint.owner_before(before->paint))
+  throw std::invalid_argument("Rebased canonical paint requires its exact original Paint owner");
+ auto rebased=std::shared_ptr<CanonicalPaintSampling>(new CanonicalPaintSampling);
+ rebased->before_=std::move(before);
+ rebased->normal_uv_=normal_uv_;
+ rebased->attachment_=attachment_;
+ rebased->current_sources_=current_sources_;
+ rebased->self_=rebased;
+ return rebased;
+}
 bool CanonicalPaintSampling::valid_owner(const std::shared_ptr<const CanonicalPaintSampling> &p) const noexcept{
  return p.get()==this&&!self_.expired()&&!self_.owner_before(p)&&!p.owner_before(self_);
 }
@@ -43,11 +57,11 @@ void CanonicalPaintSampling::validate(const PaintSamplingLimits &limits,bool dee
    throw std::invalid_argument("Canonical paint before-state borrowed another independent normal field");
  }else source_paint_pairing(before_->paint.get(),before_->material_bindings.get(),before_->appearance.get(),deep);
  const auto &current=*attachment_->authored_geometry();normal_uv_->validate_current(current,limits.cancelled);
- if(current_sources_.size()!=current.positions.size())throw std::invalid_argument("Canonical paint source dimensions differ");
+ if(current_sources_->size()!=current.positions.size())throw std::invalid_argument("Canonical paint source dimensions differ");
  const auto &old=before_->paint->mesh();
  if(old.indices.size()!=current.indices.size())throw std::invalid_argument("Canonical paint triangle identity differs");
  for(size_t c=0;c<current.indices.size();++c){if((c&1023)==0)stop(limits);
-  if(current_sources_.at(current.indices[c])!=old.indices[c])throw std::invalid_argument("Canonical paint ordered source corners differ");}
+  if(current_sources_->at(current.indices[c])!=old.indices[c])throw std::invalid_argument("Canonical paint ordered source corners differ");}
  attachment_->domain()->validate_current(current,limits);
  stop(limits);
 }
@@ -124,7 +138,7 @@ CanonicalPaintTransition CanonicalPaintSampling::create(const Scene &scene,uint6
  auto owner=std::shared_ptr<CanonicalPaintSampling>(new CanonicalPaintSampling);
  owner->before_=std::move(before);owner->normal_uv_=std::move(geometry.normal_uv);
  owner->attachment_=geometry.paint->paint_sampling_attachment();
- owner->current_sources_=std::move(geometry.current_sources);owner->self_=owner;
+ owner->current_sources_=std::make_shared<const std::vector<uint32_t>>(std::move(geometry.current_sources));owner->self_=owner;
  owner->validate_current(*geometry.paint,limits);stop(limits);
  auto binding=std::make_shared<SourceMaterialBindings>(*source.material_bindings);
  binding->canonical_uv=owner->normal_uv_;binding->canonical_paint_sampling=owner;binding->sampling_reparameterized=true;
@@ -160,7 +174,7 @@ std::shared_ptr<const CanonicalPaintSampling> CanonicalPaintSamplingCodec::repla
  auto paint=retain_paint_grid_borrowed(*before->paint,*uv->mesh(),domain,limits);
  auto owner=std::shared_ptr<CanonicalPaintSampling>(new CanonicalPaintSampling);
  owner->before_=std::move(before);owner->normal_uv_=std::move(uv);owner->attachment_=paint->paint_sampling_attachment();
- owner->current_sources_=std::move(actual.current_sources);owner->self_=owner;
+ owner->current_sources_=std::make_shared<const std::vector<uint32_t>>(std::move(actual.current_sources));owner->self_=owner;
  owner->validate_current(*paint,limits);stop(limits);return owner;
 }
 }

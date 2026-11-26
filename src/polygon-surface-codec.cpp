@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "polygon-surface-codec.hpp"
 #include "dome/material-bindings.hpp"
+#include "canonical-paint-sampling.hpp"
 #include "dome/paint-sampling.hpp"
 #include "paint-sampling-access.hpp"
 #include <nlohmann/json.hpp>
@@ -131,8 +132,15 @@ const PolygonSurfaceStage&PolygonSurfaceNodeReader::at(uint32_t id){
  if(node.at("version")==2){
   const auto &base=at(uint32_t(integer(node.at("sampling_node"),id-1)));
   const auto &base_origin=base.owner->before();
+  const auto &binding=before->material_bindings;
+  const auto &base_binding=base_origin->material_bindings;
+  const bool shared_canonical=binding&&base_binding&&
+      binding->canonical_paint_sampling&&base_binding->canonical_paint_sampling&&
+      binding->canonical_paint_sampling->shares_sampling(*base_binding->canonical_paint_sampling)&&
+      same_owner(binding->canonical_attributes,base_binding->canonical_attributes)&&
+      same_owner(binding->normal_frames,base_binding->normal_frames);
   if(!same_owner(before->paint,base_origin->paint)||
-     !same_owner(before->material_bindings,base_origin->material_bindings)||
+     (!same_owner(binding,base_binding)&&!shared_canonical)||
      (geometry&&!same_owner(geometry,base.paint->mesh_owner())))
    throw std::invalid_argument("Shared polygon sampling cannot borrow a foreign source or logical geometry");
   const size_t bytes=sizeof(PolygonSurfaceOwner)+sizeof(SourceMaterialBindings)+256;
@@ -140,12 +148,12 @@ const PolygonSurfaceStage&PolygonSurfaceNodeReader::at(uint32_t id){
    throw std::length_error("Shared polygon sampling metadata exceeds prospective replay quota");
   auto remaining=limits_;remaining.maximum_working_bytes-=reserved_;
   auto owner=base.owner->rebase_before(std::move(before));
-  auto binding=std::make_shared<SourceMaterialBindings>(*base.binding);
-  binding->polygon_surface_transfer=owner;
-  owner->validate_binding(*binding,remaining);
+  auto rebased_binding=std::make_shared<SourceMaterialBindings>(*base.binding);
+  rebased_binding->polygon_surface_transfer=owner;
+  owner->validate_binding(*rebased_binding,remaining);
   owner->validate_current(*base.paint,remaining);
   stop(limits_);
-  stages_[id]=PolygonSurfaceStage{std::move(owner),base.paint,std::move(binding)};
+  stages_[id]=PolygonSurfaceStage{std::move(owner),base.paint,std::move(rebased_binding)};
   reserved_+=bytes;
   return *stages_[id];
  }
