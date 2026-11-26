@@ -96,6 +96,20 @@ int main(int argc,char**argv)try{
   check(rejects([&]{ hdr->composite(physical_material); }) &&
             rejects([&]{ hdr->preview(physical_material, []{ return true; }); }),
         "Retained HDR previews keep physical and standard keys separate and still honor cancellation");
+  const auto hdr_bytes = paint_composite_cache_stats().retained_bytes;
+  set_paint_composite_cache_budget(hdr_bytes);
+  restored.reset();
+  PaintedMesh pressure(quad(), 64);
+  auto pressure_frame = pressure.composite(material);
+  check(!prior_frame.expired() && !pressure_frame->color.rgba.empty() &&
+            paint_composite_cache_stats().retained_bytes <= hdr_bytes,
+        "One ordinary frame preserves the previous HDR preview within the same retention limit");
+  PaintedMesh additional(quad(), 64);
+  additional.composite(material);
+  check(prior_frame.expired(), "Further ordinary cache pressure can evict the prior HDR preview");
+  set_paint_composite_cache_budget(256*mib);
+  restored = hdr->preview(physical_material);
+  prior_frame = restored;
   auto updated_geometry = quad();
   updated_geometry.uv_pins.assign(4, 1);
   auto rebound = hdr->reparameterize(updated_geometry);
