@@ -5,6 +5,7 @@
 #include "polygon-surface-preview.hpp"
 #include "dome/bake-recipe.hpp"
 #include "dome/material-bindings.hpp"
+#include "texture-set-recipe-wire.hpp"
 namespace dome::detail {namespace {
 void stop(const TextureSetLimits&l){if(l.cancelled&&l.cancelled())throw std::runtime_error("Texture-set field codec cancelled");}
 template<class T>bool owner(const std::shared_ptr<const T>&a,const std::shared_ptr<const T>&b){return a==b&&!a.owner_before(b)&&!b.owner_before(a);}
@@ -36,9 +37,10 @@ nlohmann::json TextureSetFieldCodec::encode(const TextureSetView&view,uint32_t g
       view.painted->source_sampling_prepared()||view.painted->source_maps()||view.painted->color_projection()||
       view.painted->normal_projection()||(view.painted->baked()&&view.painted->baked()->normal_field)))
     throw std::invalid_argument("Texture-set recipe field needs its actual source/material adapter");
-  auto result=TextureSetPaintAccess::encode(*view.painted,&images,normal,sampling);
-  if(view.bake_recipe){result["field_kind"]="bake_recipe";result["field_recipe"]=view.bake_recipe->encode();}
-  return result;
+  auto member=TextureSetPaintAccess::encode(*view.painted,&images,normal,sampling);
+  if(!view.bake_recipe)return member;
+  nlohmann::json result={{"version",7},{"set",view.id},{"field_kind","bake_recipe"},{"field_recipe",view.bake_recipe->encode()}};
+  result["payload"]=std::move(member);return result;
  }
  view.source->authenticate_owner(view.source);view.source->validate_field(view,limits_);if(!materials||!view.material_bindings||!view.source->polygon_owner())throw std::invalid_argument("Source Paint7 requires its actual material/node writer");
  const auto binding=materials(view.material_bindings),node=PolygonSurfaceArchive::writer().add(view.material_bindings);size_t id=0;
@@ -54,11 +56,9 @@ nlohmann::json TextureSetFieldCodec::encode(const TextureSetView&view,uint32_t g
 }
 DecodedTextureSetField TextureSetFieldCodec::decode(const nlohmann::json&j,const std::shared_ptr<const TextureSetFaceDomain>&domain,uint32_t geometry,const Material&current,const PaintImageArchive&images,const NormalSamplingArchive*normal,const PaintSamplingArchive*sampling,const MaterialReader&materials,bool polygon,const PaintedMesh*raster,const SourcePaintDecodeContext&context){
  if(j.is_object()&&(j.contains("field_kind")||j.contains("field_recipe"))){
-  stop(limits_);if(j.size()!=5||j.contains("field_source")||!j.at("version").is_number_integer()||j.at("version")!=7||
-      !j.contains("field_kind")||j.at("field_kind")!="bake_recipe"||!j.contains("field_recipe")||!j.at("field_recipe").is_object())
-    throw std::invalid_argument("Incomplete texture-set recipe field envelope");
-  auto recipe=ObjectBakeRecipe::decode(j.at("field_recipe"));auto payload=j;payload.erase("field_kind");payload.erase("field_recipe");
-  auto paint=TextureSetPaintAccess::decode(payload,&images,polygon,normal,sampling,context,domain,raster);
+  stop(limits_);const auto &member=texture_set_recipe_member(j);
+  auto recipe=ObjectBakeRecipe::decode(j.at("field_recipe"));
+  auto paint=TextureSetPaintAccess::decode(member,&images,polygon,normal,sampling,context,domain,raster);
   if(paint->paint_sampling_domain()||paint->source_sampling_prepared()||paint->source_maps()||paint->color_projection()||
       paint->normal_projection()||(paint->baked()&&paint->baked()->normal_field))
     throw std::invalid_argument("Texture-set recipe field cannot grant source/material capability");
