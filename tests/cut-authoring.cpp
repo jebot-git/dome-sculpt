@@ -1,9 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
 #include "dome/source-maps.hpp"
+#include "dome/source-placement.hpp"
 #include "dome/import.hpp"
+#include "dome/emission-native.hpp"
+#include "sculpt-chunk-masks.hpp"
 #include <nlohmann/json.hpp>
 #include <iostream>
+#include <fstream>
 #include <unistd.h>
 using namespace dome;
 namespace {
@@ -29,7 +33,7 @@ Scene fixture(){
 }
 BakeSource high(const Scene &scene){BakeSource source;auto o=scene.active();source.mesh=o.painted->mesh();
   source.materials[0].material=o.material;source.materials[0].maps=o.painted->preview(o.material);return source;}
-Mesh combined(const Scene &scene){Mesh mesh;for(auto &s:scene.surfaces()){
+Mesh combined(const Scene &scene,bool preview=false){Mesh mesh;for(auto &s:preview?scene.preview_surfaces():scene.surfaces()){
   auto transform=s.world_transform();auto offset=uint32_t(mesh.positions.size());
   for(auto p:s.mesh.positions){auto v=ob::transform(transform,{p.x,p.y,p.z});mesh.positions.push_back({v.x,v.y,v.z});}
   for(auto n:s.mesh.normals){auto v=ob::rotate(transform.orientation,{n.x,n.y,n.z});mesh.normals.push_back({v.x,v.y,v.z});}
@@ -216,14 +220,23 @@ int main(int argc,char **argv)try{
     Document protected_cut;protected_cut.replace(protected_source.snapshot());protected_cut.begin_cut();
     check(protected_cut.wait_cut()&&protected_cut.wait_mesh()&&protected_cut.frame().state->error.empty(),
           "A Volume3 protected symmetric source prepares a clipped preview with a cap");
-    auto surface=protected_cut.frame().surface;bool source_mask=false,cap_mask=false,attributes=true;
-    for(const auto &range:surface->ranges)for(size_t k=range.first;k<range.first+range.count;++k){
-      auto value=surface->sculpt_masks.at(surface->mesh.indices[k]);
-      if(range.object==1){source_mask=true;attributes&=value==.75f;}
-      else if(range.object==UINT64_MAX){cap_mask=true;attributes&=value==-1;}
-    }
-    check(source_mask&&cap_mask&&attributes&&surface->sculpt_masks.size()==surface->mesh.positions.size(),
-          "Original protection feedback stays exact while ephemeral cap vertices use ordinary unmasked material");
+    const auto surface=protected_cut.frame().surface;
+    check(bool(surface->sculpt_chunks),"Protected cut keeps the actual source chunk owner");
+    const auto *view=surface->sculpt_chunks->find(1);
+    check(view&&view->mask&&view->masks,"Protected source has the real scalar render packets");
+    size_t tested_vertices=0;
+    view->geometry->for_each_chunk([&](const auto &chunk){
+      const auto masks=view->masks->find(chunk);
+      if(!masks||masks->geometry!=chunk||masks->mask!=view->mask||
+         masks->values.size()!=chunk->mesh.positions.size()||
+         !std::all_of(masks->values.begin(),masks->values.end(),[](float v){return v==.75f;}))
+        throw std::runtime_error("Protected cut lost current per-chunk mask values");
+      tested_vertices+=masks->values.size();
+    });
+    const auto cap=std::find_if(surface->ranges.begin(),surface->ranges.end(),
+                                [](const auto &range){return range.object==UINT64_MAX;});
+    check(tested_vertices&&cap!=surface->ranges.end()&&cap->count&&surface->sculpt_masks.empty(),
+          "Protected source renders exact scalar packets and the packed cap is unmasked");
     check(!protected_cut.frame().state->can_configure_sculpt&&!protected_cut.begin_desktop()&&
           rejects([&]{protected_cut.sculpt_settings(mask_settings);})&&rejects([&]{protected_cut.sculpt_mask_fill(0);})&&
           rejects([&]{protected_cut.sculpt_mask_invert();}),
@@ -255,6 +268,112 @@ int main(int argc,char **argv)try{
     Document no_bake_source;no_bake_source.replace(std::move(bake_scene));
     check(no_bake_source.frame().state->bake_sources.empty()&&!no_bake_source.frame().state->can_bake,
           "A protected empty volume is not advertised as a usable geometry/paint bake source");
+  }
+  for(bool affine:{false,true}){
+    Scene partition;
+    auto &object=partition.active();
+    object.painted=std::make_shared<PaintedMesh>(cube(),128);
+    object.mesh_active=true;
+    object.material.alpha=Material::AlphaMode::Opaque;
+    object.material.color={1,0,0,1};
+    object.material.roughness=.2f;
+    if(affine)object.affine_edit=std::make_shared<const NativeAffineEdit>(
+        AffineTransform(std::array<double,16>{-1.1,0,0,0,.2,1,0,0,.14,.04,.8,0,.11,-.06,.01,1}));
+    const auto id=object.id;
+    const std::array<uint64_t,2> faces{3,4};
+    const auto slot=create_texture_set(partition,id,faces,"Front panel",128);
+    const float x=affine?-.1f:.1f,y=.075f;
+    check(edit_texture_set(partition,id,slot,[&](PaintedMesh &paint,Material &m){
+      m.color={0,0,1,1};m.roughness=.8f;m.emissive={2.f,.15f,.1f};
+      PaintSettings settings;
+      settings.channel=PaintChannel::Emission;settings.emission_units=PaintEmissionUnits::Physical;
+      settings.emission={5.f,.3f,.2f};
+      Brush brush;
+      brush.from=brush.to={x,y,.2f};brush.normal={0,0,1};
+      brush.radius=.065f;brush.strength=1.f;brush.blend=0;
+      paint.begin_stroke();paint.stamp(brush,settings);return paint.end_stroke();
+    }),"Fixture commits FLOAT brush detail on an independent current texture field");
+    const auto input=partition.encode();
+    auto incompatible=partition.snapshot();
+    edit_texture_set(incompatible,id,slot,[](PaintedMesh &,Material &m){m.unlit=true;return true;});
+    Document refused;
+    refused.replace(incompatible);
+    const auto exact=refused.copy_scene().encode();
+    check(!refused.frame().state->can_cut&&rejects([&]{refused.begin_cut();})&&
+          refused.copy_scene().encode()==exact,
+          "Mixed lighting policies refuse before opening a shared-shell cut");
+
+    Document multiple;
+    multiple.replace(partition);
+    multiple.begin_cut();
+    check(multiple.wait_cut()&&multiple.frame().state->error.empty()&&
+          multiple.frame().state->cut->preview->result->cap_triangles>=6,
+          "Native cut preview uses all faces across both material ranges");
+    multiple.end_cut(true);
+    check(multiple.wait_asset()&&multiple.wait_mesh()&&!multiple.frame().state->cut&&
+          multiple.frame().state->error.empty(),"Native worker transfers both cut fields");
+    const auto result=multiple.copy_scene();
+    const auto &baked=result.active().painted->baked();
+    check(baked&&baked->emission_field,"Accepted shell has an actual FLOAT emission field");
+    check(inspect_mesh(combined(result,true)).closed_manifold()&&result.objects().size()==3&&
+          !result.object(id).visible&&result.object(id).texture_sets->additional().size()==1&&
+          result.world_matrix(id).matrix()==partition.world_matrix(id).matrix(),
+          "Published shell and cap close the full mesh and retain the hidden source and its placement");
+    size_t red_count=0,blue_count=0,detail_count=0;
+    for(size_t i=0;i<baked->coverage.size();++i){
+      if(!baked->coverage[i])continue;
+      const auto &rgba=baked->maps.color.rgba;
+      const float radiant=baked->emission_field->values()[i].absolute[0];
+      const uint8_t roughness=baked->maps.metal_rough.rgba[i*4+1];
+      if(rgba[i*4]>250&&rgba[i*4+2]<4){
+        if(radiant>1e-5f||std::abs(int(roughness)-51)>1)
+          throw std::runtime_error("The red cut field borrowed blue roughness or emission");
+        ++red_count;
+      }else if(rgba[i*4]<4&&rgba[i*4+2]>250){
+        if(radiant<2.f-1e-5f||radiant>5.f+1e-5f||std::abs(int(roughness)-204)>1)
+          throw std::runtime_error("The blue cut field lost its own roughness or physical emission");
+        ++blue_count;
+        detail_count+=radiant>4.f;
+      }
+    }
+    check(red_count>100&&blue_count>100&&detail_count>10,
+          "Covered texels preserve distinct field color, roughness and FLOAT radiance");
+    const auto source_placement=partition.world_matrix(id);
+    const auto shell_placement=result.world_matrix(result.active().id);
+    auto shell=result.active().painted->mesh();
+    const auto vector=[](const auto &p){return Vec3{float(p[0]),float(p[1]),float(p[2])};};
+    for(auto &p:shell.positions)p=vector(shell_placement.point({p.x,p.y,p.z}));
+    const auto normal=normalized(vector(source_placement.normal({0,0,1})));
+    const SurfaceQuery query(shell);
+    const auto sample=[&](float local_y){
+      const auto point=vector(source_placement.point({x,local_y,.2}));
+      const auto hit=query.raycast(point+normal*.03f,normal*-1.f,.06f);
+      if(!hit)throw std::runtime_error("Expected kept physical brush fragment is absent");
+      std::array<float,2> uv{};
+      for(size_t i=0;i<3;++i){
+        const auto coordinate=shell.uv.at(shell.indices.at(size_t(hit->triangle)*3+i));
+        for(size_t axis=0;axis<2;++axis)uv[axis]+=coordinate[axis]*hit->barycentric[i];
+      }
+      return baked->emission_field->sample(uv[0],uv[1]).absolute[0];
+    };
+    check(sample(y)>4.5f&&std::abs(sample(-.09f)-2.f)<.03f,
+          "Spatial samples keep the FLOAT brush at its actual location and retain off-brush emission");
+    const auto accepted=result.encode();
+    const auto file=std::filesystem::temp_directory_path()/
+        ("dome-cut-multifield-"+std::to_string(getpid())+".glb");
+    multiple.export_asset(file).get();
+    ImportLimits limits;limits.mode=ImportMode::PreserveGltf;
+    const auto portable=import_mesh(file,limits);
+    check(portable.primitives.size()==2,"Cut exports the visible shell and cap with the source hidden");
+    std::ifstream input_glb(file,std::ios::binary);
+    const std::vector<uint8_t> bytes((std::istreambuf_iterator<char>(input_glb)),{});
+    const auto native=extract_native_emission(bytes);
+    check(native&&native->encode()==accepted,
+          "GLB retains the exact FLOAT cut and its hidden editable source in the native payload");
+    std::filesystem::remove(file);
+    check(Scene::decode(accepted).encode()==accepted&&multiple.undo()&&multiple.copy_scene().encode()==input&&
+          multiple.redo()&&multiple.copy_scene().encode()==accepted,
+          "Multi-field cut and FLOAT output survive exact Scene reopen and Undo/Redo");
   }
   std::cout<<checks<<" checks passed\n";
 }catch(const std::exception &e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

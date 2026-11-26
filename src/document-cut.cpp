@@ -1,9 +1,15 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
 #include "dome/polygon-scene.hpp"
+#include "current-paint-preview.hpp"
 #include "cut-color.hpp"
 #include "document-authority.hpp"
+#include "emission-bake-source.hpp"
+#include "emission-paint-access.hpp"
 #include "sculpt-scene-chunks.hpp"
+#include "texture-set-range.hpp"
+#include "texture-set-paint-access.hpp"
+#include <set>
 namespace dome {
 namespace {
 bool same(const CutSettings &a,const CutSettings &b){
@@ -14,12 +20,14 @@ bool same(const CutSettings &a,const CutSettings &b){
          a.cap_material.double_sided==b.cap_material.double_sided&&a.cap_material.alpha==b.cap_material.alpha&&
          a.cap_material.alpha_cutoff==b.cap_material.alpha_cutoff&&a.cap_material.unlit==b.cap_material.unlit;
 }
-std::shared_ptr<const BakeSource> source_mesh(const MeshSnapshot &base,uint64_t object,const std::function<bool()> &cancelled){
+std::shared_ptr<const BakeSource> source_mesh(const MeshSnapshot &base,const SculptObject &original,const std::function<bool()> &cancelled){
+  const auto object=original.id;
   if(base.sculpt_chunks)if(const auto *view=base.sculpt_chunks->find(object)) {
     const auto count=view->geometry->report().indices;
     if(!count)throw std::logic_error("The cut source has no displayed surface");
     if(count>2'000'000)throw std::length_error("The cut source range exceeds its bounded surface");
     auto source=std::make_shared<BakeSource>();source->materials[0].material=view->material;
+    source->materials[0].resolved_emission=detail::emission_bake_source(original,cancelled);
     auto &mesh=source->mesh;
     mesh.positions.reserve(count);mesh.normals.reserve(count);mesh.uv.reserve(count);mesh.indices.reserve(count);
     if(!base.source_colors.empty())source->colors.reserve(count);
@@ -41,19 +49,104 @@ std::shared_ptr<const BakeSource> source_mesh(const MeshSnapshot &base,uint64_t 
     },cancelled);
     mesh.validate();return source;
   }
-  auto range=std::find_if(base.ranges.begin(),base.ranges.end(),[&](auto &r){return r.object==object;});
-  if(range==base.ranges.end()||!range->count)throw std::logic_error("The cut source has no displayed surface");
-  if(range->first>base.mesh.indices.size()||range->count>base.mesh.indices.size()-range->first||range->count>2'000'000)
-    throw std::length_error("The cut source range exceeds its bounded surface");
+  std::vector<const SurfaceRange *> ranges;
+  size_t corners=0;
+  for(const auto &range:base.ranges){
+    if(range.object!=object||!range.count)continue;
+    if(range.first>base.mesh.indices.size()||range.count>base.mesh.indices.size()-range.first||
+       range.count%3||range.count>2'000'000-corners)
+      throw std::length_error("The cut source range exceeds its bounded surface");
+    corners+=range.count;
+    ranges.push_back(&range);
+  }
+  if(ranges.empty())throw std::logic_error("The cut source has no displayed surface");
+  if(!original.texture_sets&&ranges.size()!=1)
+    throw std::invalid_argument("The cut source has unauthenticated material ranges");
+  if(original.texture_sets&&corners!=original.painted->mesh().indices.size())
+    throw std::invalid_argument("The cut source omitted part of its texture-set partition");
   if(!base.source_colors.empty()&&base.source_colors.size()!=base.mesh.positions.size())
     throw std::invalid_argument("The displayed cut color stream is incomplete");
-  auto source=std::make_shared<BakeSource>();source->materials[0].material=range->material;source->materials[0].maps=range->textures;
-  for(size_t k=range->first;k<range->first+range->count;++k){
-    if((k&255)==0&&cancelled&&cancelled())throw std::runtime_error("Plane cutting cancelled");
-    auto vertex=base.mesh.indices.at(k);auto &mesh=source->mesh;
-    mesh.indices.push_back(uint32_t(mesh.positions.size()));mesh.positions.push_back(base.mesh.positions.at(vertex));
-    mesh.normals.push_back(base.mesh.normals.at(vertex));if(!base.mesh.uv.empty())mesh.uv.push_back(base.mesh.uv.at(vertex));
-    if(!base.source_colors.empty())source->colors.push_back(base.source_colors.at(vertex));
+
+  auto source=std::make_shared<BakeSource>();
+  source->materials.clear();
+  source->materials.reserve(ranges.size());
+  auto &mesh=source->mesh;
+  mesh.positions.reserve(corners);mesh.normals.reserve(corners);mesh.indices.reserve(corners);
+  if(!base.mesh.uv.empty())mesh.uv.reserve(corners);
+  if(!base.source_colors.empty())source->colors.reserve(corners);
+  if(ranges.size()>1)source->triangle_materials.reserve(corners/3);
+  std::set<TextureSetId> seen;
+  const bool colored=original.polygon&&original.polygon->active&&original.polygon->colors;
+  size_t remaining=TextureSetLimits{}.maximum_bytes;
+  for(const auto *range:ranges){
+    if(cancelled&&cancelled())throw std::runtime_error("Plane cutting cancelled");
+    BakeMaterial material{range->material,range->textures};
+    const auto &proof=range->texture_set_proof;
+    if(bool(proof)!=bool(original.texture_sets)||(proof&&!seen.insert(range->texture_set).second))
+      throw std::invalid_argument("The cut source lacks its complete material partition");
+    std::optional<TextureSetView> field;
+    if(original.mesh_active)field=texture_set_view(original,range->texture_set);
+    if(proof){
+      proof->authenticate_stream(base.mesh,*range);
+      const auto &displayed=proof->field();
+      if(field->domain!=displayed.domain||field->domain.owner_before(displayed.domain)||
+         displayed.domain.owner_before(field->domain)||
+         !detail::TextureSetPaintAccess::same_current(*field->painted,*displayed.painted))
+        throw std::invalid_argument("The displayed cut material differs from the actual texture set");
+      // Multiple composed fields coexist until the detached Bake finishes.
+      // Include their current paint working domains and four RGBA images.
+      const auto resolution=field->painted->resolution();
+      const auto bytes=detail::TextureSetPaintAccess::working_bytes(*field->painted,resolution)+
+          size_t(resolution)*resolution*16;
+      if(bytes>remaining)throw std::length_error("The cut texture sets exceed their material staging budget");
+      remaining-=bytes;
+    }
+    const bool render_only=material.maps&&material.maps->current_grid_preview;
+    if(render_only){
+      const auto &packet=*material.maps->current_grid_preview;
+      packet.authenticate_range(base.mesh,*range,true);
+      if(!field)throw std::invalid_argument("The cut paint preview lacks its current field");
+      const auto geometry=field->painted->mesh_owner();
+      if(packet.geometry()!=geometry||packet.geometry().owner_before(geometry)||
+         geometry.owner_before(packet.geometry())||!packet.matches_material(field->material))
+        throw std::invalid_argument("The painted cut source changed while its preview was being prepared");
+    }
+    if(field&&!colored){
+      auto actual=original;
+      actual.painted=field->painted->snapshot();actual.material=field->material;
+      actual.material_bindings=field->material_bindings;actual.appearance=field->appearance;
+      if(auto emission=detail::emission_bake_source(actual,cancelled)){
+        material.maps=detail::EmissionExportAccess::preview(*field->painted,field->material,cancelled);
+        const bool reversed=range->paint_winding_reversed;
+        const auto first=uint32_t(mesh.indices.size()/3),count=uint32_t(range->count/3);
+        material.resolved_emission=[emission=std::move(emission),proof,reversed,first,count]
+            (uint32_t triangle,std::array<float,3> bary){
+          if(triangle<first||triangle-first>=count)
+            throw std::invalid_argument("The cut Bake hit missed its emission source range");
+          const auto local=triangle-first;
+          if(reversed)std::swap(bary[1],bary[2]);
+          return emission(proof?proof->logical_corner(size_t(local)*3,false)/3:local,bary);
+        };
+      }
+    }
+    if(render_only&&!material.resolved_emission)material.maps=field->painted->composite(field->material,cancelled);
+    if(range->material.alpha==Material::AlphaMode::Automatic&&!source->materials.empty()&&
+       bool(material.maps&&material.maps->transparent)!=
+           bool(source->materials.front().maps&&source->materials.front().maps->transparent))
+      throw std::invalid_argument("Cut texture sets require a shared transparency mode");
+    const auto material_index=uint32_t(source->materials.size());
+    source->materials.push_back(std::move(material));
+    if(ranges.size()>1)
+      source->triangle_materials.insert(source->triangle_materials.end(),range->count/3,material_index);
+    for(size_t k=range->first;k<range->first+range->count;++k){
+      if((k&255)==0&&cancelled&&cancelled())throw std::runtime_error("Plane cutting cancelled");
+      const auto vertex=base.mesh.indices.at(k);
+      mesh.indices.push_back(uint32_t(mesh.positions.size()));
+      mesh.positions.push_back(base.mesh.positions.at(vertex));
+      mesh.normals.push_back(base.mesh.normals.at(vertex));
+      if(!base.mesh.uv.empty())mesh.uv.push_back(base.mesh.uv.at(vertex));
+      if(!base.source_colors.empty())source->colors.push_back(base.source_colors.at(vertex));
+    }
   }
   source->mesh.validate();return source;
 }
@@ -243,8 +336,11 @@ void Document::cut_loop(){
       if(stopping_)return;
       if(base&&session!=cut_session_.load()){lock.unlock();base.reset();source.reset();session=0;continue;}
       job=std::move(*cut_job_);cut_job_.reset();}
-    auto cancelled=[&]{auto state=published_.load();return stopping_.load()||cut_session_.load()!=job.session||
-      state->generation!=job.expected.generation||state->revision!=job.expected.revision||state->active_object!=job.expected.object;};
+    auto cancelled=[this,session=job.session,expected=job.expected]{
+      const auto state=published_.load();
+      return stopping_.load()||cut_session_.load()!=session||state->generation!=expected.generation||
+          state->revision!=expected.revision||state->active_object!=expected.object;
+    };
     try{
       if(cancelled())continue;
       if(!base||session!=job.session){
@@ -253,7 +349,11 @@ void Document::cut_loop(){
           if(cancelled())continue;
           base=mesh_.load();}
         if(base->generation!=job.expected.generation||base->revision!=job.expected.revision)throw std::runtime_error("Cut source mesh failed to prepare");
-        source=source_mesh(*base,job.expected.object,cancelled);session=job.session;auto [center,radius]=cut_bounds(source->mesh);
+        std::shared_ptr<const Scene> source_scene;
+        {std::lock_guard lock(model_mutex_);if(cancelled())continue;source_scene=native_source_scene_;}
+        if(!source_scene)throw std::runtime_error("Cut source scene failed to prepare");
+        source=source_mesh(*base,source_scene->object(job.expected.object),cancelled);
+        session=job.session;auto [center,radius]=cut_bounds(source->mesh);
         std::lock_guard lock(model_mutex_);if(cancelled()||!state_.cut)continue;
         cut_base_=base;cut_bake_source_=source;auto view=std::make_shared<CutView>(*state_.cut);
         view->center=center;view->radius=radius;view->ready=true;view->offset_limit_mm=std::min(100'000.f,std::max(1.f,radius*1000));state_.cut=view;publish_locked();

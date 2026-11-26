@@ -5,6 +5,7 @@
 #include "current-colors.hpp"
 #include "dome/source-maps.hpp"
 #include "polygon-conversion.hpp"
+#include "texture-set-surface.hpp"
 #include <atomic>
 #include <map>
 #include <set>
@@ -407,6 +408,19 @@ struct PolygonCutAccess {
 };
 namespace detail {
 bool cut_color_supported(const SculptObject &object) noexcept {
+  if(object.texture_sets){
+    if(!texture_set_plain_fields(object))return false;
+    const auto filled=[](const auto &domain){return domain&&!domain->triangles().empty();};
+    const Material *baseline=filled(object.texture_sets->primary_domain())?&object.material:nullptr;
+    for(const auto &field:object.texture_sets->additional()){
+      if(!filled(field.domain))continue;
+      const auto &m=field.material;
+      if(!baseline){baseline=&m;continue;}
+      if(m.toon!=baseline->toon||m.unlit!=baseline->unlit||m.double_sided!=baseline->double_sided||
+         m.alpha!=baseline->alpha||(m.alpha==Material::AlphaMode::Mask&&m.alpha_cutoff!=baseline->alpha_cutoff))
+        return false;
+    }
+  }
   if(object.material_bindings&&object.material_bindings->native_paint_sampling)return false;
   if (!object.polygon || !object.polygon->active || !object.polygon->colors)
     return true;
@@ -436,8 +450,7 @@ bool cut_color_supported(const SculptObject &object) noexcept {
 void require_cut_color_supported(const SculptObject &object) {
   if (!cut_color_supported(object))
     throw std::logic_error(
-        "This colored mesh has source shading that plane cuts cannot yet "
-        "preserve; the original is unchanged");
+        "Plane cutting cannot preserve the current source shading or material policies");
 }
 CutPublishReport publish_colored_cut(
     Scene &scene, const CutPreview &preview, const BakeSource &display,

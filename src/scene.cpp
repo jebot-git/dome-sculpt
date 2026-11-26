@@ -1423,7 +1423,11 @@ std::vector<ObjectSurface> Scene::preview_surface_bundles(const std::function<bo
 }
 std::vector<ObjectSurface> Scene::surfaces_impl(bool atlas, bool preview, const std::function<bool()> &cancelled, const SculptMesher &mesher,bool texture_bundles,
     const std::function<bool(const SculptObject &)> *capture_sculpt,bool render_only) const {
-  bool has_sets=false;for(const auto &o:objects_)if(o.texture_sets){has_sets=true;if(!texture_bundles)throw std::logic_error("Texture-set surfaces require their owning subset render/export adapter");}
+  const bool has_sets=std::any_of(objects_.begin(),objects_.end(),[](const auto &object){
+    return object.visible&&bool(object.texture_sets);
+  });
+  if(has_sets&&!texture_bundles)
+    throw std::logic_error("Texture-set surfaces require their owning subset render/export adapter");
   if(has_sets)detail::validate_texture_set_graph(*this);
   std::vector<ObjectSurface> result;
   for (auto &o : objects_)
