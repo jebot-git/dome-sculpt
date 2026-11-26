@@ -10,13 +10,19 @@
 #include "canonical-normal-owner.hpp"
 #include "canonical-normal-uv.hpp"
 #include "native-paint-frame-source.hpp"
+#include <array>
+#include <map>
 #include <set>
 namespace dome::detail {
 namespace {
 struct Ledger {
  const TextureSetLimits&limits;TextureSetGraphStats stats;
  using Key=std::pair<unsigned,const void*>;
- std::set<Key>active,done;
+ static constexpr size_t maximum_depth=64;
+ std::set<Key>active;
+ std::map<Key,size_t>done; // Longest validated descendant path from this owner.
+ std::array<size_t,maximum_depth>depths{};
+ size_t levels=0;
  std::set<const TextureSetFaceDomain*>domains;
  std::set<const TextureSetFaceDomain*>associated_domains,paint_domains;
  std::set<const TextureSetTopology*>topologies;
@@ -25,8 +31,25 @@ struct Ledger {
  explicit Ledger(const TextureSetLimits&l):limits(l){l.validate();}
  void stop(){if(limits.cancelled&&limits.cancelled())throw std::runtime_error("Texture-set graph validation cancelled");}
  template<class F>void node(unsigned kind,const void*p,size_t depth,F&&body){
-  if(!p)return;stop();const Key key{kind,p};if(depth>64||active.contains(key))throw std::invalid_argument("Cyclic or overdeep retained texture-set owner graph");if(done.contains(key))return;
-  if(active.size()+done.size()>=8192)throw std::length_error("Retained texture-set metadata graph exceeds bounds");active.insert(key);body();active.erase(key);done.insert(key);
+  if(!p)return;
+  stop();
+  const Key key{kind,p};
+  if(active.contains(key))throw std::invalid_argument("Retained source ownership cycle");
+  if(depth>maximum_depth)throw std::length_error("Retained source ownership depth exceeds bounds");
+  if(const auto visited=done.find(key);visited!=done.end()){
+   if(visited->second>maximum_depth-depth)
+    throw std::length_error("Retained source ownership depth exceeds bounds");
+   if(levels)depths[levels-1]=std::max(depths[levels-1],depth+visited->second);
+   return;
+  }
+  if(active.size()+done.size()>=8192)throw std::length_error("Retained texture-set metadata graph exceeds bounds");
+  active.insert(key);
+  depths.at(levels++)=depth;
+  body();
+  const auto deepest=depths[--levels];
+  active.erase(key);
+  done.emplace(key,deepest-depth);
+  if(levels)depths[levels-1]=std::max(depths[levels-1],deepest);
  }
  void charge(size_t&counter,size_t n,size_t unit){if(unit&&n>(limits.maximum_bytes-counter)/unit)throw std::length_error("Texture-set retained owner bytes exceed bounds");counter+=n*unit;}
  void domain(const std::shared_ptr<const TextureSetFaceDomain>&d){

@@ -66,7 +66,44 @@ int main(int argc,char **argv)try{
  auto twice=prepare_authoring_import(baseline,input,options);const auto independent=bake_vrm1_expression_pose(twice.scene,selected,weights);
  for(auto id:twice.objects){const auto &before=twice.scene.object(id),&after=independent.object(id);check(before.appearance==after.appearance&&before.material_bindings==after.material_bindings&&before.deformation==after.deformation&&before.painted->encode()==after.painted->encode(),"Repeated imported source node/material numbers never join independent native instances");}
  auto with_normal=fixture;with_normal.j["materials"][0]["normalTexture"]={{"index",0}};const auto normal_file=out/"normal.vrm";with_normal.save(normal_file);auto normal_scene=prepare_authoring_import(empty,normal_file,options);const auto normal_before=normal_scene.scene.encode();
- const auto normal_error=refuses([&]{bake_vrm1_expression_pose(normal_scene.scene,normal_scene.objects.front(),weights);});check(normal_error.find("tangent-frame transport")!=std::string::npos&&normal_scene.scene.encode()==normal_before,"Genuine normal-image UV expression keeps explicit frame-transport guard with atomic scene preservation");
+ const auto normal_error=refuses([&]{bake_vrm1_expression_pose(normal_scene.scene,normal_scene.objects.front(),weights);});
+ check(normal_error.find("genuine authored source TANGENT is required")!=std::string::npos&&normal_scene.scene.encode()==normal_before,
+       "Generated tangent authority still cannot authorize a typed normal-texture UV expression");
+
+ constexpr float rotation=.37f;
+ with_normal.j["materials"][0]["normalTexture"]={{"index",0},{"scale",.65f},
+   {"extensions",{{"KHR_texture_transform",{{"offset",{.08f,-.07f}},
+     {"scale",{.8f,1.2f}},{"rotation",rotation}}}}}};
+ auto tangent=with_normal.values({1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,1},4,"VEC4");
+ with_normal.j["meshes"][0]["primitives"][0]["attributes"]["TANGENT"]=tangent;
+ const auto auth_file=out/"normal-authored.vrm";
+ with_normal.save(auth_file);
+ const auto authored=prepare_authoring_import(empty,auth_file,options);
+ const auto unposed=authored.scene.encode();
+ const auto id=authored.objects.front();
+ const auto changed_normal=bake_vrm1_expression_pose(authored.scene,id,weights);
+ const auto &authored_part=authored.scene.object(id),&changed_part=changed_normal.object(id);
+ const auto &authored_binding=*authored_part.material_bindings,&changed_binding=*changed_part.material_bindings;
+ const auto &changed_view=changed_part.painted->source_sampling_original()->source_maps()->normal;
+ const auto &authored_view=authored_part.painted->source_sampling_original()->source_maps()->normal;
+ check(changed_view.image&&changed_view.image==authored_view.image&&
+       authored_binding.normal_frames&&!authored_binding.normal_frames->pbr->generated_tangents&&
+       changed_binding.normal_frames==authored_binding.normal_frames&&changed_part.appearance==authored_part.appearance,
+       "Normal UV expression retains the actual authored tangent frame and texture image");
+ const float sx=.8f*.55f+.7f*.25f+.2f, sy=1.2f*.55f+.9f*.25f+.2f;
+ const std::array<float,6> expected_normal{std::cos(rotation)*sx,std::sin(rotation)*sx,
+     -std::sin(rotation)*sy,std::cos(rotation)*sy,.08f*.55f+.2f*.25f,-.07f*.55f-.1f*.25f};
+ for(size_t k=0;k<expected_normal.size();++k)
+   near(changed_view.uv_transform[k],expected_normal[k],"Core authored normal sampler follows independent expression arithmetic");
+ const auto &authored_normal=authored_binding.material.textures[size_t(MToonSlot::Normal)];
+ const auto &changed_normal_slot=changed_binding.material.textures[size_t(MToonSlot::Normal)];
+ near(changed_normal_slot.scale[0],sx,"MToon authored normal U scale follows the expression");
+ near(changed_normal_slot.scale[1],sy,"MToon authored normal V scale follows the expression");
+ near(changed_normal_slot.rotation,authored_normal.rotation,"The MToon normal role retains its authored rotation");
+ const auto normal_project=out/"normal-authored.dsculpt";
+ changed_normal.save(normal_project);
+ check(authored.scene.encode()==unposed&&Scene::load(normal_project).encode()==changed_normal.encode(),
+       "Authored normal parameter changes survive a project restart and leave the input Scene exact");
  const auto saved=out/"static.dsculpt";baked.save(saved);check(Scene::load(saved).encode()==baked.encode(),"Native Save/restart retains actual static source transforms and paints");
  const auto repeat=bake_vrm1_expression_pose(baseline,selected,weights);check(repeat.encode()==baked.encode(),"Repeated sampling of immutable baseline has no accumulated expression drift");
  auto removed=baseline.snapshot();auto &part=removed.object(selected);auto deform=std::make_shared<DeformationState>(*part.deformation);deform->morphs.reset();deform->morph_weights.clear();part.deformation=deform;auto binding=std::make_shared<SourceMaterialBindings>(*part.material_bindings);auto frames=std::make_shared<NormalFrameSet>(*binding->normal_frames);frames->current_targets.clear();binding->normal_frames=frames;part.material_bindings=binding;

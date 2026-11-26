@@ -6,6 +6,7 @@
 #include "dome/material-bindings.hpp"
 #include "dome/retopo-authoring.hpp"
 #include "import-skin-fixtures.hpp"
+#include "../src/texture-set-graph.hpp"
 #include <fstream>
 #include <iostream>
 #include <nlohmann/json.hpp>
@@ -169,12 +170,28 @@ int main() try {
   auto cyclic = authority();
   auto loop = origin(plain.active());
   cyclic->origin = loop;
-  loop->polygon = cyclic;
   Scene invalid;
-  install(invalid, cyclic);
-  refuses([&] { invalid.encode(); },
-          "Caller-created source cycle refuses atomically", "cycle");
-  loop->polygon.reset();
+  {
+    loop->polygon = cyclic;
+    struct BreakCycle {
+      PolygonOrigin &origin;
+      ~BreakCycle() { origin.polygon.reset(); }
+    } release{*loop};
+    install(invalid, cyclic);
+    refuses([&] { invalid.encode(); },
+            "Caller-created source cycle refuses atomically", "ownership cycle");
+    const auto prior=path/"prior-project.dsculpt";
+    plain.save(prior);
+    auto contents=[&] {
+      std::ifstream file(prior,std::ios::binary);
+      return std::string(std::istreambuf_iterator<char>(file),{});
+    };
+    const auto saved=contents();
+    refuses([&] { invalid.save(prior); },
+            "A source cycle refuses Save before opening the existing project", "ownership cycle");
+    check(!saved.empty()&&contents()==saved&&Scene::load(prior).encode()==legacy,
+          "A refused cyclic project leaves the previous file byte-identical and readable");
+  }
   auto deep = authority();
   deep->active = false;
   for (int i = 0; i < 33; ++i) {
@@ -189,6 +206,30 @@ int main() try {
   install(invalid, deep);
   refuses([&] { invalid.encode(); }, "Bounded retained source depth enforced",
           "depth");
+  // Use one shared polygon history from two objects. Visiting the short
+  // route first must not hide the total depth reached by the second route.
+  const auto extend = [&](std::shared_ptr<PolygonAuthority> current, int count) {
+    for(int i=0;i<count;++i){
+      auto before=origin(plain.active());
+      before->polygon=std::move(current);
+      current=authority();
+      current->active=false;
+      current->origin=std::move(before);
+    }
+    return current;
+  };
+  const auto shared=extend(authority(),16);
+  Scene shared_history;
+  install(shared_history,shared);
+  const auto second=shared_history.add("Second ownership route",Volume{});
+  shared_history.select(second);
+  install(shared_history,extend(shared,14));
+  detail::validate_texture_set_graph(shared_history);
+  check(true,"Shared acyclic history within the depth limit validates");
+  install(shared_history,extend(shared,16));
+  refuses([&]{detail::validate_texture_set_graph(shared_history);},
+          "Deep ownership route is checked after a shorter route memoizes its shared history",
+          "ownership depth");
   auto badrest = a->topology.triangulate().mesh;
   badrest.positions[0].x += .01f;
   invalid = Scene{};

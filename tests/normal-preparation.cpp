@@ -66,10 +66,42 @@ int main(int argc,char **argv)try {
   settings.prepare_normals=false;restarted.bake_from_object(2,settings);check(restarted.wait_asset()&&restarted.frame().state->error.empty()&&restarted.wait_mesh(),"Repeat native bake reuses the explicit intrinsic and target-frame interpretation");
   check(restarted.copy_scene().active().material_bindings->normal_preparation==repeat_recipe&&restarted.copy_scene().active().material_bindings->normal_preparation->receipt.encode()==captured->receipt.encode(),"Repeat bake preserves the first conversion receipt rather than relabeling its normal authority");
   auto cleared=restarted.copy_scene();cleared.active().painted=cleared.active().painted->snapshot();cleared.active().painted->clear_bake();cleared.validate();check(cleared.active().painted->normal_projection()&&!cleared.active().painted->baked(),"Clear bake preserves the explicitly prepared intrinsic model and original-state provenance");
-  auto prepared_source=restarted.copy_scene();auto &readonly=prepared_source.object(2);const auto &prepared_target=prepared_source.active();
-  readonly.painted=prepared_target.painted;readonly.material_bindings=prepared_target.material_bindings;readonly.deformation=prepared_target.deformation;readonly.appearance=prepared_target.appearance;
+  auto prepared_source=restarted.copy_scene();
+  auto &readonly=prepared_source.object(2);
+  auto &prepared_target=prepared_source.active();
+  readonly.painted=prepared_target.painted;
+  readonly.material_bindings=prepared_target.material_bindings;
+  readonly.deformation=prepared_target.deformation;
+  readonly.appearance=prepared_target.appearance;
+  prepared_target.painted=cleared.active().painted;
   const auto source_before=prepared_source.encode();
-  check(refuses([&]{bake_object(prepared_source,2,settings);})&&prepared_source.encode()==source_before,"Prepared source normals are explicitly guarded until their exact source frame adapter exists; no posed-atlas Mikk substitution is allowed");
+  const auto prior=readonly.painted;
+  const auto prior_frame=readonly.material_bindings;
+  auto donor_settings=settings;
+  donor_settings.corresponding_topology=true;
+  donor_settings.ao_samples=0;
+  const auto projected=bake_object(prepared_source,2,donor_settings);
+  const auto repeated=prepared_source.active().painted;
+  check(projected.projected>0&&!projected.rays&&repeated->baked()&&
+        prepared_source.object(2).painted==prior&&prepared_source.object(2).material_bindings==prior_frame,
+        "The real prepared normal donor supplies its detail through the matching Bake worker");
+  const auto &expected=prior->baked()->maps.normal;
+  const auto &actual=repeated->baked()->maps.normal;
+  unsigned compared=0,maximum_error=0,non_neutral=0;
+  for(size_t i=0;i<expected.rgba.size();i+=4) {
+    if(!expected.rgba[i+3]||!actual.rgba[i+3])continue;
+    ++compared;
+    non_neutral+=std::abs(int(expected.rgba[i])-128)>6||std::abs(int(expected.rgba[i+1])-128)>6;
+    for(int k=0;k<3;++k)
+      maximum_error=std::max(maximum_error,unsigned(std::abs(int(expected.rgba[i+k])-actual.rgba[i+k])));
+  }
+  check(compared>3000&&non_neutral>500&&maximum_error<=2,
+        "Matching prepared-normal Bake recovers the non-neutral authored texels within two RGB8 levels");
+  auto restored=prepared_source.snapshot();
+  restored.active().painted=cleared.active().painted;
+  restored.active().bake_recipe=cleared.active().bake_recipe;
+  check(restored.encode()==source_before,
+        "A second Bake changes only the target bake and recipe while preserving all source authority");
   const auto before_uv=restarted.copy_scene().encode();restarted.begin_uv();check(restarted.wait_uv()&&restarted.frame().state->uv&&restarted.frame().state->uv->valid,"Prepared normal target enters the real native UV workspace without changing its source interpretation");
   restarted.edit_uv(UvAction::Scale,.9f);check(restarted.wait_uv()&&restarted.frame().state->uv->valid,"A real changed UV draft validates its geometry before source-aware adoption");
   const auto draft_uv=restarted.frame().state->uv->mesh->uv;
