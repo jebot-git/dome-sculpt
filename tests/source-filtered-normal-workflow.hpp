@@ -5,12 +5,26 @@
 #include <fstream>
 #include <type_traits>
 #include <cerrno>
+#include <chrono>
+#include <cstdlib>
 #include <spawn.h>
 #include <sys/wait.h>
 extern char **environ;
 namespace filtered_workflow {
 unsigned checks=0;
-void require(bool yes,const char *why){if(!yes)throw std::runtime_error(why);++checks;std::cout<<"PASS "<<why<<'\n';}
+void require(bool yes,const char *why){
+ if(!yes)throw std::runtime_error(why);
+ ++checks;std::cout<<"PASS "<<why<<'\n';
+ // Opt-in observation only: retain every operation, guard and dataset while
+ // locating expensive phases in the full-resolution sanitizer workflow.
+ if(std::getenv("DOME_TEST_FILTERED_TIMING")){
+  using Clock=std::chrono::steady_clock;
+  static const auto start=Clock::now();
+  std::cerr<<"FILTERED_TIMING seconds="
+           <<std::chrono::duration<double>(Clock::now()-start).count()
+           <<" check="<<checks<<" phase="<<why<<'\n';
+ }
+}
 std::vector<uint8_t> bytes(const std::filesystem::path &path){std::ifstream f(path,std::ios::binary);return {std::istreambuf_iterator<char>(f),std::istreambuf_iterator<char>()};}
 bool byte_equal_files(const std::filesystem::path &a,const std::filesystem::path &b){
  std::ifstream left(a,std::ios::binary),right(b,std::ios::binary);if(!left||!right)return false;
