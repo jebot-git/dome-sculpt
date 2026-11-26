@@ -1350,6 +1350,34 @@ in Release and ASan/UBSan. The frozen full Release run started before
 these fixture changes and still uses the earlier test sources.
 [Controller fixture evidence](validation/controller-page-fixtures-20261126.json)
 
+### GPU store retirement and sculpt projection
+
+The shared OpenGL store ledger retains the oldest pending completion point
+alongside the latest submission. The renderer observes retirement on steady
+views and through continuing edits. Stores remain charged until their fence
+completes. Retiring an alias can release backing storage at the same proven
+epoch, while an independently used backing store keeps its later epoch. The
+baseline fails the same real-buffer regression. The new ledger passes 106
+software and 108 authenticated Intel Arc checks. The renderer recovery suite
+passes 828 software and 831 Arc checks with actual GL faults, bounds and retry
+controls. The production path uses zero-timeout fence queries.
+
+Visible Scene projection now uses sculpt chunks alongside packed meshes for
+occlusion. Opaque sculpt geometry blocks the image. Hidden and ghosted
+objects, fully transparent surfaces and Target Only mode let it reach the
+target. The PBR regression checks authored and PBR alpha roles through the
+published scene query and gates the actual worker to check publication races.
+The native probe reproduces projection through an opaque sculpt volume on
+the earlier core and passes all 124 assertions with the fix.
+
+The component matrices pass 12 renderer and seven projection tests per
+Release and ASan/UBSan profile. The combined product passes eight targeted
+tests per profile, 31 synthetic OpenXR checks per software and Intel Arc
+profile, and 17 nested DomeD Wayland checks. The full Release sweep uses
+the earlier plane-cut source. Physical-device acceptance remains open.
+[GPU retirement evidence](validation/steady-gpu-retirement-20261126.json)
+[Projection and combined application evidence](validation/renderer-projection-combined-20261126.json)
+
 ## Source and integration boundary
 
 - Main now admits product1bc13125 and public fixturef1e193c7 after complete

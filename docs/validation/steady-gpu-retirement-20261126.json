@@ -1,0 +1,267 @@
+{
+  "candidate": "a4ef26ffad36da8814ae1bf863feaa7b02693cd9",
+  "main_merge": "bb508b882408ed2171237a8df4fad476549ed6cd",
+  "source_commits": [
+    "a4ef26ffad36da8814ae1bf863feaa7b02693cd9",
+    "7c3fd2802540f85690e38e528148e3b73157b6b7"
+  ],
+  "baseline": {
+    "expected_failure": "New pending submissions preserve a completed older fence and reclaim its actual store",
+    "exit": 1,
+    "parent": "fadacc0076aef8f7b2ed8ec5a9a9cfbbbaa8ca17",
+    "header_sha256": "27faacdfcf1ef9cbe2d8513545ddbd1e51ee199fb5d6566a2216e65d650e9dad",
+    "fixture_sha256": "eefb6edcfa07fcda7a3d0e416c4a9a40c2e38c701b9430092c2ce18f85bd4231"
+  },
+  "matrix": {
+    "release": {
+      "native": {
+        "candidate": "a4ef26ffad36da8814ae1bf863feaa7b02693cd9",
+        "profile": "release",
+        "terminal": true,
+        "fltk": "/opt/fltk-vr/toolkit",
+        "invocation": "9741d9ff21d64324863b49d6fef16cc3",
+        "phase": "complete",
+        "elapsed_seconds": 224.19,
+        "donor": "fadacc0076aef8f7b2ed8ec5a9a9cfbbbaa8ca17",
+        "rebuilt": [
+          "CMakeFiles/dome-sculpt-render.dir/src/render.cpp.o"
+        ],
+        "core_sha256": "b4dcb9065cd49bd5502feed553dfbedc870e9e63e4f7e16f866c2edde6721e70",
+        "parent_render_sha256": "828a8d35dd8ba95e71f69b89b26d12638f0bbf73639e2b28178c89a5b575847b",
+        "owned_objects": {
+          "render.cpp.o": "89eaa140e298e53e50fe268b5567aa24f5005a876c04aec79f10efe954e287e1"
+        },
+        "binaries": {
+          "dome-sculpt-current-paint-preview-gpu-test": "8a1f23f1d2cc445268318aeb62a31010dfbff04a655b4b8df45940fca89580ae",
+          "dome-sculpt-cut-color-render-test": "4dab668de5f2deef18bc47019876a273d4e7fff0e87d3e4f734eab4d27294213",
+          "dome-sculpt-mask-render-test": "d254db82e0797566e177fb42f8ed6840b532913f0b2b80b7c32b5de6ac879af3",
+          "dome-sculpt-mtoon-emission-test": "46d87f83187536925ec62ddc05f51019df43f631cf42e21a508a3000a8259a6d",
+          "dome-sculpt-native-mtoon-physical-test": "f0d4b13c349b815b68f5c739e7774bfdb2b25ada87dd8153190aab26c3109d0f",
+          "dome-sculpt-native-retained-physical-test": "8ce26a01d9057a672d797f750b639c2ff1f0d80ee40f042f820465d88e8edce3",
+          "dome-sculpt-paint-overlay-gpu-test": "4837d1d5a1184a37808335116cc047704c5d51dc2f94b701c1f1c505f42b6149",
+          "dome-sculpt-polygon-color-render-test": "2544948e720da41f713c8cb32e78b5c44f1d34f4871753b3b0e8901a856af199",
+          "dome-sculpt-render-store-ledger-test": "749d132166bccc0bced5000d60366fa4c0a394317274bded86b652c59daa5db3",
+          "dome-sculpt-renderer-recovery-test": "951886a4137889390e82cce21003721a6739058ccc00541fbc60bf7919c17a75",
+          "dome-sculpt-sculpt-chunk-render-test": "30bce53bc9eb5f471b0f747af16284583f9776db6ce1adf65d34bc68d245574f",
+          "dome-sculpt-source-gpu-test": "2369adcdf2fbb2c199056f7222073c756ad6e632ed47d7a8fe113e53a25fafa1"
+        },
+        "app_sha256": "09a8c450da22f532d99c4b447249efd665fab032a20c5f51f6a30f56e13776a0",
+        "render_sha256": "f5b35f3b6091f14015f937b45f4c64f7a2a7df0fdf0f27fab059a607f164eb98",
+        "xr_sha256": "aec7fe47cf2ff52bf299a681372f003c0a1e66c01e87b4474fa2500988f6002f",
+        "exit": 0,
+        "failures": [],
+        "tests": 12,
+        "ctest_sha256": "040c09def1b1ccbd369052a4bd845c017fd91f01e036b5bef62dc2f46a01ce7b",
+        "junit_sha256": "1a620ee81d394273ded7a42258b05d96f9632c243825da838b978e241923e7ca"
+      },
+      "synthetic_openxr": {
+        "candidate": "a4ef26ffad36da8814ae1bf863feaa7b02693cd9",
+        "profile": "release",
+        "terminal": true,
+        "invocation": "27a62c6ed08e42349b6065114602ca0b",
+        "phase": "complete",
+        "cut_fixture_sha256": {
+          "dome-sculpt-cut-color-test": "f0e4f07565c442d5d904e30b554a61e14cdf2f4991223b69e7e8ae5afd1575ea",
+          "dome-sculpt-cut-authoring-test": "a2d031db26675f7cef3ce0b18b2f347057c72c208a451e241c2d758dc6f3d1b8"
+        },
+        "app_sha256": "09a8c450da22f532d99c4b447249efd665fab032a20c5f51f6a30f56e13776a0",
+        "runtime_sha256": "a509d343406cb8ca044821b06e3cd90d5a1730d6747abfb27a6fa1e4c5487d65",
+        "runner_sha256": "ee93078e0bdc118be3d19267b6bca14520fc29c2cc48e553b287cf892c309b96",
+        "core_sha256": "b4dcb9065cd49bd5502feed553dfbedc870e9e63e4f7e16f866c2edde6721e70",
+        "exit": 0,
+        "checks": 21,
+        "report_sha256": "4c8f4e6012236c90641e227a180882b43ac6e41ef04aa03453804781840baa81"
+      }
+    },
+    "asan": {
+      "native": {
+        "candidate": "a4ef26ffad36da8814ae1bf863feaa7b02693cd9",
+        "profile": "asan",
+        "terminal": true,
+        "fltk": "/home/blux/de-xr/dome-sculpt/artifacts/sdk-20261126/toolkit-sanitize",
+        "invocation": "22850747138243628d6ae178b0c29685",
+        "phase": "complete",
+        "elapsed_seconds": 380.06,
+        "donor": "fadacc0076aef8f7b2ed8ec5a9a9cfbbbaa8ca17",
+        "rebuilt": [
+          "CMakeFiles/dome-sculpt-render.dir/src/render.cpp.o"
+        ],
+        "core_sha256": "f362e3286af01e1851051e7ce2cb8a85a09dd05df69625f19fba1d4601352637",
+        "parent_render_sha256": "9db371e66bcdf7ffcfe0380170efebff9b3448ad6a1cadd88513327829c39202",
+        "owned_objects": {
+          "render.cpp.o": "f7dd73db7cabee7b600164dc3cb73aed62865cb34175c231c5e6c515a477c201"
+        },
+        "binaries": {
+          "dome-sculpt-current-paint-preview-gpu-test": "a71a742350651ad768cb0c70136d90a146a703e02d4ccabd02b82b677366994b",
+          "dome-sculpt-cut-color-render-test": "db4b4705220075a6135922ca069de4bd56f7b670a6bffd936f680989a3fcdf4d",
+          "dome-sculpt-mask-render-test": "c9b52b5f4051df3d6e9aea498ac9ec241c96b7b50cad1c45b1854c6e08a4498e",
+          "dome-sculpt-mtoon-emission-test": "d6c3b25d791186f18057de07a86e3d6c6c61fc91db711694a972374b2dc931ec",
+          "dome-sculpt-native-mtoon-physical-test": "d6741837a6134f772cf8efe4e1628a17dfb4752727699b28d209abfbe3e36fc9",
+          "dome-sculpt-native-retained-physical-test": "962d2dc2793aba1952efcd7d7ee95406e9800531805fc4834d44ff29a584d4cb",
+          "dome-sculpt-paint-overlay-gpu-test": "f7e436131bf0fb07d6af7b64e7378227f2b5dfb3e539cb1a68931306ff93857d",
+          "dome-sculpt-polygon-color-render-test": "96cccaf2ff2cb706aac2b1952c72375bcebc8dfda90f4216b60a3cb73d303b28",
+          "dome-sculpt-render-store-ledger-test": "720a81e5841ccbfe218a9e735a8c6d447745f3d66f38172d5a1fba80b5768e4e",
+          "dome-sculpt-renderer-recovery-test": "dbdb94b5a9d9086c88de61b153b3c4f2eecc043605c15e869952da343ab02960",
+          "dome-sculpt-sculpt-chunk-render-test": "f29d9529cb1ea6c9ed61c85c6c3a174a382ccda596993d27b32aeb027db2e4ec",
+          "dome-sculpt-source-gpu-test": "6cfdc131dfefa15a0e2b7c65209e7645f8299315f87a5c0ad50b7ee4774ff9ef"
+        },
+        "app_sha256": "fb4b998785a7947578b04eec1259b993cba46366ea338d105aef52f6899534a5",
+        "render_sha256": "0a5aff19c3b7870febfa7905b08eddab1effd9b6992ec4f6d2dbc41c1deb42a6",
+        "xr_sha256": "dfcc553a0b94882d2dec24259ae341e6525f4a316c75fa08553f761f03e1c68e",
+        "exit": 0,
+        "failures": [],
+        "tests": 12,
+        "ctest_sha256": "0ad23748c57389a2551970092a9a52929526f963596a9a52a636c025d2b162ff",
+        "junit_sha256": "fef7c513ad03e551abf1edebac41fd61fc2a3ee5598ab0eff43d973d523c9ec6"
+      },
+      "synthetic_openxr": {
+        "candidate": "a4ef26ffad36da8814ae1bf863feaa7b02693cd9",
+        "profile": "asan",
+        "terminal": true,
+        "invocation": "722394e36e644362ba01d24c16c88438",
+        "phase": "complete",
+        "app_sha256": "fb4b998785a7947578b04eec1259b993cba46366ea338d105aef52f6899534a5",
+        "runtime_sha256": "30f084267eff52f70cf7600f00399a85c79c1f7ef866b3bb05d35f7ec12618ca",
+        "runner_sha256": "8f573bf6f3172ae8285b3bee684d36505ff1a22484e54f444874e7f87c0d2256",
+        "core_sha256": "f362e3286af01e1851051e7ce2cb8a85a09dd05df69625f19fba1d4601352637",
+        "hardware": {
+          "render-store-ledger": {
+            "exit": 0,
+            "log_sha256": "4a54c31b1ec5d3b12e5246c8a9146d7dfd340d63dbde816e8de092b4d9b571e3",
+            "checks": 1
+          },
+          "renderer-recovery": {
+            "exit": 0,
+            "log_sha256": "1252edffed6b8dd3d8d487b3b8bb542eedb6b440b1cf589539d1d6f9727807c5",
+            "checks": 832
+          },
+          "source-gpu": {
+            "exit": 0,
+            "log_sha256": "45989af21c2990b01ae7591049b94c9e60677fa773f042332868cd8d3091b1ce",
+            "checks": 45
+          },
+          "mtoon-emission": {
+            "exit": 0,
+            "log_sha256": "cb3de18fa9a1ca68ba2b5581de352e7031555061719901da6e1e763dfa8c2c6d",
+            "checks": 45
+          },
+          "native-mtoon-physical": {
+            "exit": 0,
+            "log_sha256": "e914148c83988d1028c5d37e141fbcec8d66d3091d98d9ca9ec60a7a89d4631c",
+            "checks": 708
+          },
+          "native-retained-physical": {
+            "exit": 0,
+            "log_sha256": "4ec40864bd8f5794f8e54b58c5c878996f02587a75a794cd18d7c1c84be90d9b",
+            "checks": 80
+          },
+          "polygon-color-render": {
+            "exit": 0,
+            "log_sha256": "fa9f61bb266a96d3aafecb503444f205780445195065ca6a5579e87e238cecc5",
+            "checks": 558
+          },
+          "paint-overlay-gpu": {
+            "exit": 0,
+            "log_sha256": "afe81d745d46fc6014956fc5e810c2e3a499a6d0bb5d6a0229811c89ddc6a784",
+            "checks": 42
+          },
+          "current-paint-preview-gpu": {
+            "exit": 0,
+            "log_sha256": "ed8a0d6d604efd4b3cd0f0a82385a3f73917c950040e6818cf59ac5428bf7809",
+            "checks": 1
+          },
+          "sculpt-chunk-render": {
+            "exit": 0,
+            "log_sha256": "2789ca6d88027e0f9a7653750fe03cbe363050a83866b6ab02e7c1965422a8bf",
+            "checks": 99
+          },
+          "sculpt-mask-render": {
+            "exit": 0,
+            "log_sha256": "546559ad269d82bb43782f91258f788ddef1eea9e5fa3d7cf974700b43619475",
+            "checks": 38
+          }
+        },
+        "hardware_failures": [],
+        "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+        "render_log_sha256": "e4572cfb95c4223d8764493ed3eb4875e277ad6bd6ba0a11368afa7339e5ad64",
+        "exit": 0,
+        "checks": 21,
+        "report_sha256": "4c8f4e6012236c90641e227a180882b43ac6e41ef04aa03453804781840baa81"
+      }
+    }
+  },
+  "wayland": {
+    "candidate": "a4ef26ffad36da8814ae1bf863feaa7b02693cd9",
+    "terminal": true,
+    "invocation": "74c56b1b70504004998d2312f3988eea",
+    "phase": "complete",
+    "core_sha256": "b4dcb9065cd49bd5502feed553dfbedc870e9e63e4f7e16f866c2edde6721e70",
+    "fixture_sha256": "8e02ad619c644cc1c5fb0c5674a147852ba968fd2551a706211c0a04a00bb744",
+    "compositor_sha256": "47920142c8c803dcf5adb63ba643d2e347fbdcd1e15ecd8bce7c1a8dd47c0b7e",
+    "compositor_source": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+    "probe_sha256": "5bf11c670f66bbb68960073878933055b09582e5173ec1e3f472b413956c55aa",
+    "app_sha256": "09a8c450da22f532d99c4b447249efd665fab032a20c5f51f6a30f56e13776a0",
+    "exit": 0,
+    "checks": 17,
+    "report_sha256": "2da75bdef9a7abae098796c32119e1c17af4eb26966c1b1bebe3324ceac48a87"
+  },
+  "archive": {
+    "name": "steady-gpu-retirement-20261126.tar.gz",
+    "sha256": "54b417f416124f176d6ad8eca9bf8630ad93d4f3f68a6a07693e61dcc36555ee",
+    "members": {
+      "asan/arc/current-paint-preview-gpu.log": "ed8a0d6d604efd4b3cd0f0a82385a3f73917c950040e6818cf59ac5428bf7809",
+      "asan/arc/mtoon-emission.log": "cb3de18fa9a1ca68ba2b5581de352e7031555061719901da6e1e763dfa8c2c6d",
+      "asan/arc/native-mtoon-physical.log": "e914148c83988d1028c5d37e141fbcec8d66d3091d98d9ca9ec60a7a89d4631c",
+      "asan/arc/native-retained-physical.log": "4ec40864bd8f5794f8e54b58c5c878996f02587a75a794cd18d7c1c84be90d9b",
+      "asan/arc/paint-overlay-gpu.log": "afe81d745d46fc6014956fc5e810c2e3a499a6d0bb5d6a0229811c89ddc6a784",
+      "asan/arc/polygon-color-render.log": "fa9f61bb266a96d3aafecb503444f205780445195065ca6a5579e87e238cecc5",
+      "asan/arc/render-store-ledger.log": "4a54c31b1ec5d3b12e5246c8a9146d7dfd340d63dbde816e8de092b4d9b571e3",
+      "asan/arc/render.log": "e4572cfb95c4223d8764493ed3eb4875e277ad6bd6ba0a11368afa7339e5ad64",
+      "asan/arc/renderer-recovery.log": "1252edffed6b8dd3d8d487b3b8bb542eedb6b440b1cf589539d1d6f9727807c5",
+      "asan/arc/runner.py": "8f573bf6f3172ae8285b3bee684d36505ff1a22484e54f444874e7f87c0d2256",
+      "asan/arc/sculpt-chunk-render.log": "2789ca6d88027e0f9a7653750fe03cbe363050a83866b6ab02e7c1965422a8bf",
+      "asan/arc/sculpt-mask-render.log": "546559ad269d82bb43782f91258f788ddef1eea9e5fa3d7cf974700b43619475",
+      "asan/arc/source-gpu.log": "45989af21c2990b01ae7591049b94c9e60677fa773f042332868cd8d3091b1ce",
+      "asan/native/build/renderer-tests.xml": "fef7c513ad03e551abf1edebac41fd61fc2a3ee5598ab0eff43d973d523c9ec6",
+      "asan/native/configure.log": "dcd500a78dd3c4796475cf74f33114e2bdaab9c6d268b4b554074765228ed464",
+      "asan/native/ctest.log": "0ad23748c57389a2551970092a9a52929526f963596a9a52a636c025d2b162ff",
+      "asan/native/cut-fixtures.json": "6a5b653ae5f34433549f2cb31d746351deacbf79d4711a15fa7082e176b92a49",
+      "asan/native/dome-sculpt-link.log": "78e1568e3b0d3926673ffc36ededb5e0c7a401fae9c659b3b86c2648fe8b9716",
+      "asan/native/render-index.log": "5a818a4561216cd2a5f2739323bdd4c310863b1e6e4d353925fd782c18951076",
+      "asan/native/render.cpp.log": "e596cb90e7d635e03480ae174ed9116fe81c309b3e742c6ef2e5e9bac36b0e0e",
+      "asan/native/status.json": "cd69ccc863bdb4b2ea621c20399c8697665e1ef7d7772787c9df57b070bea255",
+      "asan/synthetic-openxr/status.json": "26594217cf072b968c5facf57d4f6499582404eb174f733f230ee3ce5e017e86",
+      "asan/synthetic-openxr/xr.log": "3bbeabaf9a35de109e3fc2457e231c26f0ad1c0f14169d233589996b2f4153d8",
+      "asan/synthetic-openxr/xr/report.json": "4c8f4e6012236c90641e227a180882b43ac6e41ef04aa03453804781840baa81",
+      "baseline/build.log": "24287b78e263772c426c2c8f3735febc6a9d191d9d404b62c69900e89c41adb9",
+      "baseline/control.log": "10d7655fe28cc7bfcb8cce85424fed5dd00b41afee4bcc5f069876ff6131aaea",
+      "baseline/run.py": "0c5e7e4a71c896cba802164f0c07a4841f5c00e0b81f40836a9eb26616781aac",
+      "baseline/status.json": "965c286b53acbf247a02c3a45df9c0ed625732ade60b1edf191dcd83c0a933c4",
+      "failed-runner-v1-asan/status.json": "9cd1634965954cb11b0a2fb69ae784eeca7965c34d9cad551c1d0b903486ea5c",
+      "failed-runner-v1-release/status.json": "a56f3c04658d96a6f5836abea8a3624722ba8f21118efe611680b97b22a2460c",
+      "failed-software-replay-v2/status.json": "a53be0a6f1435e74601771b1f56692418850909b6b70cddd171b05f098416996",
+      "failed-software-replay-v2/xr.log": "c382e40cb1273cc78f5dc5bd826ca25fa475ebfa55b9e17a03f8b513411efc37",
+      "failed-wayland-wait-v2/status.json": "114588ef71f9b38c4ab673c47151a21ad2cdf524b1e924765491b4be3b61d4f1",
+      "release/native/build/renderer-tests.xml": "1a620ee81d394273ded7a42258b05d96f9632c243825da838b978e241923e7ca",
+      "release/native/configure.log": "17e57d59e2517fe40716c70c716ba69422b563106ea8cf098117d226cf9386f0",
+      "release/native/ctest.log": "040c09def1b1ccbd369052a4bd845c017fd91f01e036b5bef62dc2f46a01ce7b",
+      "release/native/cut-fixtures.json": "88091690dd59edf8e5e5365c41b88ddf141b7759305770782b9f147caf2a9d8c",
+      "release/native/dome-sculpt-link.log": "ed77ab7648ac0a0423a7d96ddb0a1b9c9ffa75c686e3957d0d9442e93846659b",
+      "release/native/render-index.log": "79f089cd8be04f1d8a7ce3d113d7ae3c5d3442bfc7be499316482d16b6fad2cc",
+      "release/native/render.cpp.log": "b2e878dbe06dd6b29cd9728e956f9341ffd573cfd292292d0999c44a02c678aa",
+      "release/native/status.json": "9d6e83074d872ab1b065feaa224f34707767fca2deb9cef05fc5089c9f9a70e0",
+      "release/synthetic-openxr/status.json": "96fdc625deb03401e8f52e835d3c1bd2b9fe985c6f608baa9110628505823dc4",
+      "release/synthetic-openxr/xr.log": "603959ebcdf2a14bb7d6e4b7051eacc3c95f4e91f06720bc790b4e4fa4d084c6",
+      "release/synthetic-openxr/xr/report.json": "4c8f4e6012236c90641e227a180882b43ac6e41ef04aa03453804781840baa81",
+      "replay-runner-v3/run.py": "1ad309774a37f39850c1170730acf127d0b63e431730de7da892de36299ee867",
+      "replay-runner/run.py": "ff837462206018c759665f972f25b66e549feb873b09a03d0197126a7552ff8d",
+      "runner/record.py": "7315bdad6c7b4296941b3601d3f0c98d1923a737617a4630194fa9d55d5587d4",
+      "runner/run.py": "80f6a9480384014663e74b6f0ffda6daacdbf4d3887cc86e4eef809dc072609f",
+      "wayland/replay.py": "de31e3aba0faf1806654ffe238f6dd16c420de336500f1c50f5aea660ee346d4",
+      "wayland/run.py": "bdbc53f1a50e1e119714b23a7fef57d77d4b7727c821cc907a2cf375c983fb38",
+      "wayland/status.json": "3e86951bd08576b04091c355fca6c17a9a118e5ffede45dfc729459c587702ee",
+      "wayland/wayland.log": "cbb4afb0cbbb2dcbd7612f9cbb68cedf2bbc37db27c6b9b4cfb049ae6055fee4",
+      "wayland/workflow/report.json": "2da75bdef9a7abae098796c32119e1c17af4eb26966c1b1bebe3324ceac48a87"
+    }
+  }
+}

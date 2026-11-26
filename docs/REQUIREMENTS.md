@@ -162,6 +162,17 @@ pass in Release and ASan/UBSan. The ongoing full Release run uses the
 earlier fixtures.
 [Controller fixture evidence](validation/controller-page-fixtures-20261126.json)
 
+Main now retires completed OpenGL stores under steady and changing views,
+with scoped sanitizer, Intel Arc and GL failure recovery evidence. Visible
+Scene projection includes sculpt chunks and respects object visibility,
+editor ghosts, material alpha and Target Only mode. The combined application
+passes eight selected tests per Release and ASan/UBSan profile, 31 synthetic
+OpenXR checks per software and Intel Arc profile, and 17 nested DomeD
+Wayland checks. Full integrated regression and physical qualification remain
+open.
+[GPU retirement evidence](validation/steady-gpu-retirement-20261126.json)
+[Projection and combined application evidence](validation/renderer-projection-combined-20261126.json)
+
 ## Qualified integration — 2026-11-17
 
 Main now integrates product `1bc13125` and public fixture `f1e193c7` after
