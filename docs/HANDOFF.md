@@ -62,12 +62,15 @@ CPU-only workflow checks can run concurrently in memory-bounded units. Record
 comparative timings in their own controlled runs. Root's opt-in timing fixture91a90a67
 compiles/links against the exact strict05 core without changing product, data,
 checks or resource limits; the full-resolution runtime diagnosis is pending.
-Root strict14 native/software unit ds-current-native-strict14-20261126.service,
-Invocation4699538f903b4a6bb3b954be5c0e8975, is live at this checkpoint. Inspect
-artifacts/current-normal-sanitize-20261126/native-selected-v1/status.json and
-the actual unit before acting. Its sampler55/canonical14068/writable9694/joint47409
-cases pass; this snapshot is not a complete strict14 result. HDR877's ready
-five-case cohort follows its natural release. The isolated integration candidate
+The strict native/software cohort passed 88,724 checks across the first 11 cases.
+Its first graphics case stopped with `Frame range is invalid` because the test
+fixture left `SurfaceRange::first` uninitialized. The corrected fixture
+`2e9f5873` rebuilds and links against the same strict core and renderer. The
+three graphics cases remain pending. The original invocation, terminal logs and
+live sanitizer witnesses are retained in the [strict runtime receipt](validation/strict-native-runtime-11-20261126.json).
+The HDR877 isolated 2048 worker passes its 22 checks. The complete 2048 joint
+Bake reaches a further `Baked maps exceed paint storage budget` refusal.
+The isolated integration candidate
 `5604ad54` combines current05, HDR877, sculpt6d/fe94 and corrected creator
 fixtures550. The [fresh Release build](COMBINED-RELEASE-BUILD-20261126.md) for
 the application and 13 selected fixtures passed all 290 actions in

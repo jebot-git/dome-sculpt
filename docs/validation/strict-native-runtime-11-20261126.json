@@ -1,0 +1,160 @@
+{
+  "source": "05f5d1ccfa4bb5b97d25e4a425a2fd9497b0d8c9",
+  "passed_checks": 88724,
+  "passed_cases": [
+    {
+      "name": "source-maps-regression",
+      "expected_checks": 55,
+      "seconds": 0.18784379959106445,
+      "ELF_sha256": "417df4f9653c34c530a9d4cb41ec5be27e3f6ed0268f3ecc52aa294bfd63c034",
+      "peak_owned_RSS_bytes": 563249152,
+      "sanitizer_witness": {
+        "pid": 2844089,
+        "start": 83692847,
+        "live_ASan_UBSan": true
+      }
+    },
+    {
+      "name": "source-canonical-normal-bake",
+      "expected_checks": 14068,
+      "seconds": 74.76925826072693,
+      "ELF_sha256": "677d67c3e213aeb8eef81c4ad5c9cdb0f1d6cb17f89ecab60cdff04ab9b0ef25",
+      "peak_owned_RSS_bytes": 1470767104,
+      "sanitizer_witness": {
+        "pid": 2844231,
+        "start": 83692946,
+        "live_ASan_UBSan": true
+      }
+    },
+    {
+      "name": "source-writable-normal-bake",
+      "expected_checks": 9694,
+      "seconds": 18.020567178726196,
+      "ELF_sha256": "f04535a930eb88727d2845141031efcdd739e0d4da1465c4b743ce44d223619e",
+      "peak_owned_RSS_bytes": 1461051392,
+      "sanitizer_witness": {
+        "pid": 2853846,
+        "start": 83700522,
+        "live_ASan_UBSan": true
+      }
+    },
+    {
+      "name": "source-joint-writable-normal-bake",
+      "expected_checks": 47409,
+      "seconds": 154.2778458595276,
+      "ELF_sha256": "3ed9c2dca3ddb24a5b6e852348f66502cd6b93cbecb7e9868960c1edfbdcea93",
+      "peak_owned_RSS_bytes": 2234327040,
+      "sanitizer_witness": {
+        "pid": 2856319,
+        "start": 83702438,
+        "live_ASan_UBSan": true
+      }
+    },
+    {
+      "name": "source-owning-hdr-domain",
+      "expected_checks": 24,
+      "seconds": 243.10173296928406,
+      "ELF_sha256": "1b200a86dcbbd8b604560733d91938529960a058a174a936bcb3c36092f86ade",
+      "peak_owned_RSS_bytes": 2640846848,
+      "sanitizer_witness": {
+        "pid": 2876881,
+        "start": 83717975,
+        "live_ASan_UBSan": true
+      }
+    },
+    {
+      "name": "source-owning-hdr-export",
+      "expected_checks": 16400,
+      "seconds": 181.73933267593384,
+      "ELF_sha256": "d2fd00876820b893f8eedf7344e51ec4cca0afd4910dd271bcab8c536b0c011b",
+      "peak_owned_RSS_bytes": 2454159360,
+      "sanitizer_witness": {
+        "pid": 2908297,
+        "start": 83742397,
+        "live_ASan_UBSan": true
+      }
+    },
+    {
+      "name": "source-prepared-normal-bake-legacy",
+      "expected_checks": 91,
+      "seconds": 2.5085740089416504,
+      "ELF_sha256": "d905f6511a1a58ab2e120805265f8a19d3a1e764f3afbf032dd351098ac38891",
+      "peak_owned_RSS_bytes": 1551745024,
+      "sanitizer_witness": {
+        "pid": 2931703,
+        "start": 83760670,
+        "live_ASan_UBSan": true
+      }
+    },
+    {
+      "name": "source-artist-normal-bake-legacy",
+      "expected_checks": 139,
+      "seconds": 1.2149693965911865,
+      "ELF_sha256": "a337905aff64f5331986a7c0cac470447a6e87a4ec2c7e8d80f3a9ccc21fa4ea",
+      "peak_owned_RSS_bytes": 1215070208,
+      "sanitizer_witness": {
+        "pid": 2932181,
+        "start": 83761020,
+        "live_ASan_UBSan": true
+      }
+    },
+    {
+      "name": "creator-workspace",
+      "expected_checks": 44,
+      "seconds": 37.12692141532898,
+      "ELF_sha256": "1ae2c5f94e2f2b5ce5a9e47f89ed74fbff86cc1f66290b5835b5f55dceb25f0a",
+      "peak_owned_RSS_bytes": 3020406784,
+      "sanitizer_witness": {
+        "pid": 2932527,
+        "start": 83761234,
+        "live_ASan_UBSan": true
+      }
+    },
+    {
+      "name": "creator-controls-output",
+      "expected_checks": 352,
+      "seconds": 355.6995551586151,
+      "ELF_sha256": "1ae2c5f94e2f2b5ce5a9e47f89ed74fbff86cc1f66290b5835b5f55dceb25f0a",
+      "peak_owned_RSS_bytes": 2607382528,
+      "sanitizer_witness": {
+        "pid": 2937320,
+        "start": 83765032,
+        "live_ASan_UBSan": true
+      }
+    },
+    {
+      "name": "creator-shaped-vrm",
+      "expected_checks": 448,
+      "seconds": 507.65772581100464,
+      "ELF_sha256": "1eb9c32b38fa520d5dd2e8cb9f7f3b9dd4f0bf8d9c449c6c199a9ed9e7830e9a",
+      "peak_owned_RSS_bytes": 2798886912,
+      "sanitizer_witness": {
+        "pid": 2983695,
+        "start": 83800700,
+        "live_ASan_UBSan": true
+      }
+    }
+  ],
+  "first_failure": {
+    "name": "source-owning-hdr-render",
+    "exit": 1,
+    "seconds": 12.942023992538452,
+    "ELF_sha256": "a92eb5644a50f721724db7627ba48c1f79c4a75095ca423c6ae30972466866dc",
+    "peak_owned_RSS_bytes": 3048415232
+  },
+  "first_failure_reason": "Frame range is invalid: HDR fixture left SurfaceRange::first uninitialized. Subsequent graphics cases unrun.",
+  "fixture_fix_source": "2e9f5873",
+  "invocation": "4699538f903b4a6bb3b954be5c0e8975",
+  "lease": {
+    "acquired": 1795659003.2063017,
+    "device": 40,
+    "inode": 99618,
+    "released": 1795660603.5253277
+  },
+  "archive": {
+    "path": "docs/validation/strict-native-runtime-11-20261126.tar.xz",
+    "sha256": "723af92b60dcf813c9fc8734d56ef078aeffa4da3042ad138fcac7dca2863443",
+    "files": 42,
+    "bytes": 37340
+  }
+}
