@@ -245,8 +245,9 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
     }
   }
   if(!source.texture_sets&&source.mesh_active&&source.painted&&
-      source.painted->baked()&&source.painted->baked()->normal_field)
-    throw std::invalid_argument("Select a source without prepared normal attributes for this bake; source-frame transport is required and both objects are retained");
+      source.painted->baked()&&source.painted->baked()->normal_field&&
+      (!source.material_bindings||!source.material_bindings->canonical_attributes))
+    throw std::invalid_argument("Independent normal-field source requires its native canonical attributes");
   if(!std::isfinite(settings.color_error)||settings.color_error<0||settings.color_error>1)
     throw std::invalid_argument("Invalid vertex-color preparation tolerance");
   if(!std::isfinite(settings.normal_error)||settings.normal_error<0||settings.normal_error>.25f)
@@ -327,6 +328,8 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
     high.mesh = source.deformation ? source.deformation->preview(source.painted->mesh())
                                    : source.painted->mesh();
     high.materials[0].maps = std::move(source_maps);
+    if(source_normals.canonical_maps())
+      high.materials[0].maps_are_composited=!source_normals.canonical_maps()->source_only;
     if(!source_prepared)high.colors=std::move(source_colors);
   } else
     high.mesh = surface_mesh(*source.volume, cancelled);

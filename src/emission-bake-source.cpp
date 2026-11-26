@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "emission-bake-source.hpp"
 #include "affine-surface.hpp"
+#include "baked-normal-field.hpp"
+#include "canonical-normal-uv.hpp"
+#include "emission-authority.hpp"
+#include "emission-paint-access.hpp"
 #include "paint-overlay-sample.hpp"
 #include "source-bake-normal.hpp"
 #include "normal-frame-runtime.hpp"
@@ -8,6 +12,7 @@
 #include "normal-projection-identity.hpp"
 #include "normal-key-derivation.hpp"
 #include "paint-normal-access.hpp"
+#include "source-paint-pairing.hpp"
 #include <numeric>
 #include "dome/material-bindings.hpp"
 #include "dome/material-visibility.hpp"
@@ -99,6 +104,13 @@ struct Source {
 };
 const char *source_normal_domain_error(const SculptObject &object,bool prepared) noexcept {
   const auto &binding=object.material_bindings;
+  const auto canonical=binding->canonical_attributes;
+  const auto event=object.painted?object.painted->baked():nullptr;
+  const auto field=event?event->normal_field:nullptr;
+  if(canonical&&(binding->has_mtoon||object.appearance||binding->normal_preparation||
+      !canonical->valid_owner(canonical)||(field&&field->origin()!=canonical)||
+      (binding->canonical_uv&&binding->canonical_uv->origin()!=canonical)))
+    return "Canonical source normal capture requires its actual native conversion and current field";
   if(prepared){
     const auto &normal=*binding->normal_preparation;
     if(normal.canonical_conversion||object.painted->paint_sampling_domain()||
@@ -108,9 +120,13 @@ const char *source_normal_domain_error(const SculptObject &object,bool prepared)
       return "Prepared source UV reparameterization lost its owning normal/material recipe";
   }
   if(!object.mesh_active||!object.painted||!object.painted->valid_source_sampling_attachment()||
-     binding->canonical_attributes||binding->canonical_uv||binding->canonical_paint_sampling||binding->native_paint_sampling||binding->native_paint_frames||
-     bool(binding->normal_preparation)!=bool(object.painted->normal_projection())||object.painted->color_projection()||
-     (object.painted->baked()&&((!prepared&&!object.painted->baked()->maps.normal.rgba.empty())||object.painted->baked()->normal_field||(!prepared&&object.painted->baked()->normal_authority))))
+     (binding->canonical_uv&&!canonical)||binding->canonical_paint_sampling||
+     binding->native_paint_sampling||binding->native_paint_frames||
+     (canonical&&object.painted->paint_sampling_domain())||
+     bool(binding->normal_preparation)!=bool(object.painted->normal_projection())||
+     (!canonical&&object.painted->color_projection())||
+     (event&&((!prepared&&!event->maps.normal.rgba.empty())||(field&&!canonical)||
+      (!prepared&&event->normal_authority))))
     return "Artist source normal capture requires its unchanged original frame and separate current-normal adapter";
   return nullptr;
 }
@@ -140,7 +156,15 @@ uint64_t normal_replay_bytes(const SourceMaterialBindings &binding,const std::fu
     active[depth]=node;
     size_t height=1;
     const auto descend=[&](const auto &parent){height=std::max(height,1+self(self,parent.get(),depth+1));};
+    const auto check_conversion=[&](const auto &conversion){
+      if(!conversion->valid_owner(conversion))
+        throw std::invalid_argument("Source normal replay lost its canonical conversion owner");
+      bytes=std::max<uint64_t>(bytes,conversion->maximum_working_bytes());
+      descend(conversion->before_material());
+    };
+    if(node->canonical_attributes)check_conversion(node->canonical_attributes);
     if(const auto &normal=node->normal_preparation){
+      if(normal->canonical_conversion)check_conversion(normal->canonical_conversion);
       if(const auto &uv=normal->uv_reprojection){
         bytes=std::max(bytes,uv->receipt.max_working_bytes);
         descend(uv->before_material);
@@ -162,9 +186,38 @@ uint64_t normal_replay_bytes(const SourceMaterialBindings &binding,const std::fu
   visit(visit,&binding,0);
   return bytes;
 }
+
+std::shared_ptr<const TextureMaps> canonical_source_maps(const SculptObject &object,
+    const std::function<bool()> &cancelled) {
+  const auto &paint=*object.painted;
+  std::shared_ptr<TextureMaps> maps;
+  if(paint.color_projection()){
+    const bool physical=paint.has_physical_emission()||hdr_emission(object.material.emissive)||
+        bool(object.material_bindings->physical_emission);
+    const auto composite=physical?EmissionExportAccess::other_channels(paint,object.material,cancelled):
+        paint.preview(object.material,cancelled);
+    maps=std::make_shared<TextureMaps>(*composite);
+  }else{
+    maps=std::make_shared<TextureMaps>();
+    maps->source_only=true;
+    maps->source_maps=paint.source_maps();
+    if(!maps->source_maps)maps->source_maps=std::make_shared<const PaintSourceMaps>();
+  }
+  maps->overlay=PaintOverlayFactory::capture_canonical_bake(paint,cancelled);
+  maps->baked_base=paint.baked();
+  return maps;
+}
+}
+
+std::shared_ptr<const PaintOverlayPacket> PaintOverlayFactory::capture_canonical_bake(
+    const PaintedMesh &paint,const std::function<bool()> &cancelled) {
+  auto packet=std::const_pointer_cast<PaintOverlayPacket>(capture(paint,cancelled));
+  packet->canonical_normal_bake_=true;
+  return packet;
 }
 
 bool SourceBakeNormalResolver::matches_prepared_source(const TextureMaps &maps) const noexcept {
+  if(canonical_maps_)return canonical_maps_.get()==&maps;
   const auto same=[](const auto &a,const auto &b){
     return a==b&&!a.owner_before(b)&&!b.owner_before(a);
   };
@@ -195,25 +248,50 @@ bool affine_source_normal_supported(const SculptObject &object) noexcept {
 SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTransform relative,
     const SourceBakeNormalOptions &options){
   const auto &binding=object.material_bindings;
-  if(!binding||!binding->normal_frames)return {};
+  const auto canonical=binding?binding->canonical_attributes:nullptr;
+  const auto event=object.painted?object.painted->baked():nullptr;
+  const auto field=event?event->normal_field:nullptr;
+  if(!binding||!binding->normal_frames){
+    if(canonical||field)throw std::invalid_argument("Canonical normal source lost its current frame owner");
+    return {};
+  }
   auto stop=[&]{if(options.cancelled&&options.cancelled())throw std::runtime_error("Source normal capture cancelled");};stop();
   const bool prepared=object.painted&&object.painted->normal_projection()&&binding->normal_preparation;
   if(const auto error=source_normal_domain_error(object,prepared))throw std::invalid_argument(error);
   const auto preparation=prepared?binding->normal_preparation:nullptr;
   const auto retained=prepared?object.painted->normal_projection()->sampling_domain:nullptr;
+  const auto canonical_uv=canonical?binding->canonical_uv:nullptr;
   const auto &mesh=object.painted->mesh();const auto &set=*binding->normal_frames;
   const uint64_t corners=mesh.indices.size();
   // Charge both posed role arrays, immutable evaluated corner columns and
   // layout scratch before allocating, including retained morph/frame payload.
-  const uint64_t preview_bytes=prepared?uint64_t(object.painted->resolution())*object.painted->resolution()*4*12:0;
+  const uint64_t preview_bytes=(prepared||(canonical&&object.painted->color_projection()))?
+      uint64_t(object.painted->resolution())*object.painted->resolution()*4*12:0;
   const uint64_t capture_bytes=preview_bytes+set.storage_bytes()+
       corners*(3*sizeof(uint32_t)+2*(sizeof(Vec3)+sizeof(std::array<float,4>)+sizeof(NormalBakeVertex)))+
-      (retained?retained->storage_bytes():0);
-  const uint64_t work=std::max(capture_bytes,prepared?normal_replay_bytes(*binding,stop):0);
+      (retained?retained->storage_bytes():0)+(canonical_uv?canonical_uv->storage_bytes():0)+
+      (field?field->retained_bytes():0);
+  const uint64_t work=std::max(capture_bytes,(prepared||canonical)?normal_replay_bytes(*binding,stop):0);
   if(!options.max_working_bytes||options.max_working_bytes>512*1024*1024||work>options.max_working_bytes)
     throw std::length_error("Artist source normal capture exceeds prospective working budget");
   normal_frame_current_authority(*binding,mesh,object.deformation.get(),options.cancelled);
   if(!set.pbr||(binding->has_mtoon&&!set.mtoon))throw std::invalid_argument("Artist source lost its explicitly declared PBR/MToon frame roles");
+  if(canonical){
+    if(set.pbr->tangents.empty())throw std::invalid_argument("Canonical normal frames require their actual tangents");
+    source_paint_pairing(object.painted.get(),binding.get(),nullptr,true);
+    if(canonical_uv)canonical_uv->validate_current(mesh,options.cancelled);
+    else{
+      const auto &original=canonical->before_paint()->mesh();
+      if(original.indices.size()!=mesh.indices.size())
+        throw std::invalid_argument("Canonical source lost its ordered normal coordinates");
+      for(size_t c=0;c<mesh.indices.size();++c){
+        if((c&1023)==0)stop();
+        if(mesh.uv.at(mesh.indices[c])!=original.uv.at(original.indices[c]))
+          throw std::invalid_argument("Canonical source needs the owning normal UV correspondence");
+      }
+    }
+    if(field)field->validate();
+  }
   std::shared_ptr<const PaintNormalProjection> current_normals;
   if(prepared){
     if(preparation->uv_reprojection)preparation->uv_reprojection->validate(true,options.cancelled);
@@ -231,7 +309,10 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTr
     current_normals=SourceNormalPreparationAccess::resolved(*object.painted,options.cancelled);
     current_normals->validate(object.painted->resolution());
   }
-  Source coordinates;coordinates.mesh=object.painted->mesh_owner();coordinates.maps=object.painted->source_maps();coordinates.packet=PaintOverlayFactory::capture(*object.painted,options.cancelled);coordinates.cancelled=options.cancelled;
+  auto canonical_maps=canonical?canonical_source_maps(object,options.cancelled):nullptr;
+  Source coordinates;coordinates.mesh=object.painted->mesh_owner();coordinates.maps=object.painted->source_maps();
+  coordinates.packet=canonical_maps?canonical_maps->overlay:PaintOverlayFactory::capture(*object.painted,options.cancelled);
+  coordinates.cancelled=options.cancelled;
   if(!coordinates.maps)coordinates.maps=std::make_shared<const PaintSourceMaps>();
   coordinates.maps->validate_surface(mesh);
   const auto typed=binding->has_mtoon?std::optional<MToonMaterial>(binding->material):std::optional<MToonMaterial>{};
@@ -256,7 +337,8 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTr
         }
       }
       auto n=ob::rotate(relative.orientation,{N.x,N.y,N.z}),t=ob::rotate(relative.orientation,{T.x,T.y,T.z});
-      if(has_tangent[role])out.push_back(normal_bake_vertex({n.x,n.y,n.z},{t.x,t.y,t.z},w,prepared?NormalVertexBitangent::UnitCross:NormalVertexBitangent::RawCross));
+      if(has_tangent[role])out.push_back(normal_bake_vertex({n.x,n.y,n.z},{t.x,t.y,t.z},w,
+          (prepared||field)?NormalVertexBitangent::UnitCross:NormalVertexBitangent::RawCross));
       else out.push_back({normalized(Vec3{n.x,n.y,n.z}),{},{},1});
     }
   }
@@ -264,8 +346,35 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTr
   for(size_t role=0;role<(typed?2u:1u);++role)for(size_t c=0;c<corners;c+=3){if((c&1023)==0)stop();if(vertices->at(role)[c].w!=vertices->at(role)[c+1].w||vertices->at(role)[c].w!=vertices->at(role)[c+2].w)throw std::invalid_argument("Artist source tangent handedness changes inside a triangle");}
   stop();std::shared_ptr<const std::array<std::vector<NormalBakeVertex>,2>> immutable=std::move(vertices);
   const auto packet=coordinates.packet;
-  auto sample=[immutable,coordinates=std::move(coordinates),typed,typed_role,has_tangent,prepared,current_normals,retained](uint32_t triangle,std::array<float,3> bary){
+  auto sample=[immutable,coordinates=std::move(coordinates),typed,typed_role,has_tangent,prepared,
+      current_normals,retained,field,canonical_uv](uint32_t triangle,std::array<float,3> bary){
     coordinates.stop();const std::array<double,3> weights{bary[0],bary[1],bary[2]};std::array<Vec3,2> result;
+    if(field){
+      // Both canonical planes are encoded against the same prepared PBR columns.
+      std::array<NormalBakeVertex,3> corners;
+      for(size_t k=0;k<3;++k)corners[k]=immutable->at(0).at(size_t(triangle)*3+k);
+      const auto basis=normal_bake_basis(corners,weights,NormalFragmentBasis::UnitColumns);
+      auto uv=coordinates.coordinates(triangle,bary,0,false);
+      if(canonical_uv){
+        std::array<double,2> original{};
+        for(size_t k=0;k<3;++k){
+          const auto vertex=canonical_uv->mesh()->indices[size_t(triangle)*3+k];
+          const auto q=canonical_uv->coordinates()[vertex];
+          for(size_t c=0;c<2;++c)original[c]+=double(q[c])*bary[k];
+        }
+        uv={float(original[0]),float(original[1])};
+      }
+      PaintSourceTexture view;
+      view.wrap_s=view.wrap_t=33071;
+      view.min_filter=view.mag_filter=9729;
+      for(size_t role=0;role<2;++role){
+        view.image=role?field->mtoon():field->pbr();
+        const auto value=sample_source_texture(view,uv[0],uv[1],false);
+        const auto n=mtoon_normal_map({value[0],value[1],value[2]},1);
+        result[role]=normalized(basis.t*n.x+basis.b*n.y+basis.n*n.z);
+      }
+      return result;
+    }
     for(size_t role=0;role<(typed?2u:1u);++role){
       std::array<NormalBakeVertex,3> corners;for(size_t k=0;k<3;++k)corners[k]=immutable->at(role).at(size_t(triangle)*3+k);
       if(!has_tangent[role]){Vec3 N;for(size_t k=0;k<3;++k)N+=corners[k].n*bary[k];result[role]=normalized(N);continue;}
@@ -298,7 +407,8 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTr
     if(!typed)result[1]=result[0];
     return result;
   };
-  return SourceBakeNormalResolver(std::move(sample),prepared?object.painted->normal_projection():nullptr,packet);
+  return SourceBakeNormalResolver(std::move(sample),prepared?object.painted->normal_projection():nullptr,
+      packet,std::move(canonical_maps));
 }
 std::shared_ptr<const TextureMaps> raw_bake_source(const SculptObject &object,
     const std::function<bool()> &cancelled,const SourceBakeNormalResolver *captured_normals){
@@ -307,6 +417,11 @@ std::shared_ptr<const TextureMaps> raw_bake_source(const SculptObject &object,
   const auto typed=binding&&binding->has_mtoon?std::optional<MToonMaterial>(binding->material):
       (object.appearance?retained_mtoon(object.appearance.get()):std::optional<MToonMaterial>{});
   require_original_emission_uv1(object,typed);
+  if((binding&&binding->canonical_attributes)||
+      (object.painted&&object.painted->baked()&&object.painted->baked()->normal_field)){
+    if(captured_normals)return captured_normals->canonical_maps();
+    return source_bake_normals(object,{},SourceBakeNormalOptions{256*1024*1024,cancelled}).canonical_maps();
+  }
   const auto has_frames=[&]{
     return captured_normals?bool(*captured_normals):
         bool(source_bake_normals(object,{},SourceBakeNormalOptions{256*1024*1024,cancelled}));

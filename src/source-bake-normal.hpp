@@ -20,14 +20,18 @@ public:
    return sample_(triangle,bary);
  }
  bool matches_prepared_source(const TextureMaps &) const noexcept;
+ bool requires_source_pairing() const noexcept {return bool(projection_)||bool(canonical_maps_);}
+ const auto &canonical_maps() const noexcept {return canonical_maps_;}
 private:
  using Sample=std::function<std::array<Vec3,2>(uint32_t,std::array<float,3>)>;
  SourceBakeNormalResolver(Sample sample,std::shared_ptr<const PaintNormalProjection> projection,
-     std::shared_ptr<const PaintOverlayPacket> packet)
-   :sample_(std::move(sample)),projection_(std::move(projection)),packet_(std::move(packet)){}
+     std::shared_ptr<const PaintOverlayPacket> packet,std::shared_ptr<const TextureMaps> canonical_maps={})
+   :sample_(std::move(sample)),projection_(std::move(projection)),packet_(std::move(packet)),
+    canonical_maps_(std::move(canonical_maps)){}
  Sample sample_;
  std::shared_ptr<const PaintNormalProjection> projection_;
  std::shared_ptr<const PaintOverlayPacket> packet_;
+ std::shared_ptr<const TextureMaps> canonical_maps_;
  friend SourceBakeNormalResolver source_bake_normals(
      const SculptObject &,CanvasTransform,const SourceBakeNormalOptions &);
 };

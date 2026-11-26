@@ -138,7 +138,8 @@ bool top_left(std::array<float,2> a,std::array<float,2> b) {
   return b[1]>a[1]||(b[1]==a[1]&&b[0]<a[0]);
 }
 void validate(const Mesh &low,const BakeSource &source,const BakeOptions &o,
-              std::span<const detail::RetainedSourceBakeField> retained) {
+    std::span<const detail::RetainedSourceBakeField> retained,
+    const detail::SourceBakeNormalResolver &source_normals) {
   if (low.positions.size()>2'000'000||low.indices.size()/3>2'000'000) throw std::length_error("Low bake mesh exceeds surface limits");
   low.validate(); source.mesh.validate();
   for (auto n:low.normals) if (length(n)<1e-8f) throw std::invalid_argument("Low bake mesh contains a zero normal");
@@ -184,15 +185,21 @@ void validate(const Mesh &low,const BakeSource &source,const BakeOptions &o,
     if(owns_field!=bool(m.maps&&m.maps->polygon_surface))
       throw std::invalid_argument("Retained polygon Bake maps require their actual source-field resolver");
     if (!std::isfinite(m.normal_strength)||m.normal_strength<0||m.normal_strength>4) throw std::invalid_argument("Invalid normal-map strength");
+    const bool canonical=m.maps&&m.maps->overlay&&m.maps->overlay->requires_canonical_bake_frames();
+    if((source_normals.requires_source_pairing()||canonical)&&
+        (!m.maps||!source_normals.matches_prepared_source(*m.maps)))
+      throw std::invalid_argument("Prepared Bake requires its actual paired normal and material source");
     if (m.maps) {
-      if(m.maps->overlay&&((m.maps->source_only&&m.maps->overlay->source_maps()!=m.maps->source_maps)||(!m.maps->source_only&&!m.resolved_emission&&!owns_field)))
+      if(m.maps->baked_base&&m.maps->baked_base->normal_field&&!canonical)
+        throw std::invalid_argument("Canonical source field requires its exact normal and material source");
+      if(m.maps->overlay&&!canonical&&((m.maps->source_only&&m.maps->overlay->source_maps()!=m.maps->source_maps)||(!m.maps->source_only&&!m.resolved_emission&&!owns_field)))
         throw std::invalid_argument("Bake overlay differs from its immutable source coordinate owner");
       if(m.maps->source_maps)m.maps->source_maps->validate_surface(source.mesh);
       if(m.maps->baked_base&&m.maps->source_only){
         if(!m.maps->overlay||m.maps->overlay->baked()!=m.maps->baked_base)
           throw std::invalid_argument("Raw Bake normal differs from its actual immutable overlay owner");
         const auto &b=*m.maps->baked_base;b.validate(m.maps->overlay->resolution());
-        if(b.normal_interpretation!=BakedNormalInterpretation::CanonicalMikk||b.normal_field||b.normal_authority)
+        if(!canonical&&(b.normal_interpretation!=BakedNormalInterpretation::CanonicalMikk||b.normal_field||b.normal_authority))
           throw std::invalid_argument("Raw Bake normal requires its explicit prepared frame adapter");
       }
       if(m.maps->source_only){
@@ -293,7 +300,7 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
     std::span<const Tangent> target_metric_corners = {},
     bool corresponding_topology = false) {
   if(o.progress)o.progress(0);
-  cancel(o); validate(low,source,o,source_fields);
+  cancel(o); validate(low,source,o,source_fields,source_normals);
   if(corresponding_topology&&(!o.cage_positions.empty()||!o.source_triangles.empty()||
       low.indices.size()!=source.mesh.indices.size()))
     throw std::invalid_argument("Matching source triangles requires an intact corner order and no cage");
@@ -353,7 +360,7 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
     return !retained_field(index)&&normal_image(material)&&material.normal_strength>0;
   };
   bool needs_high_frames=raw_baked_normals;
-  if(source.tangents.empty())
+  if(!source_normals&&source.tangents.empty())
     for(size_t field=0;field<source.materials.size();++field)
       needs_high_frames|=needs_map(field);
   if (needs_high_frames) {

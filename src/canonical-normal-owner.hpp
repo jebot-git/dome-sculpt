@@ -19,6 +19,7 @@ public:
   const auto &before_deformation() const noexcept{return deformation_;}
   const auto &frames() const noexcept{return frames_;}
   const auto &projection() const noexcept{return projection_;}
+  size_t maximum_working_bytes() const noexcept{return max_bytes_;}
   NormalPreparationReceipt receipt() const;
   nlohmann::json encode() const;
   void validate(bool deep=true) const;

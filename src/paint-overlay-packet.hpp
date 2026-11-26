@@ -13,7 +13,7 @@ struct PaintOverlayLayer {
 // current PaintedMesh/Scene back-edge, serialized seal or dense CPU float image.
 class PaintOverlayPacket {
  friend struct PaintOverlayFactory;
- uint32_t resolution_=0;bool empty_=true;size_t storage_bytes_=0;
+ uint32_t resolution_=0;bool empty_=true;bool canonical_normal_bake_=false;size_t storage_bytes_=0;
  std::vector<PaintOverlayLayer> layers_;
  std::shared_ptr<const std::vector<int32_t>> padding_;
  std::shared_ptr<const BakedTextures> baked_;
@@ -32,6 +32,7 @@ class PaintOverlayPacket {
  std::shared_ptr<const Image> source_baked_normal_,source_baked_coverage_;
  PaintOverlayPacket()=default;
 public:
+ bool requires_canonical_bake_frames() const noexcept {return canonical_normal_bake_;}
  const std::shared_ptr<const Image>&source_baked_normal()const noexcept{return contribution_owner_?contribution_owner_->source_baked_normal():source_baked_normal_;}
  const std::shared_ptr<const Image>&source_baked_coverage()const noexcept{return contribution_owner_?contribution_owner_->source_baked_coverage():source_baked_coverage_;}
  const std::shared_ptr<const Mesh>&source_baked_geometry()const noexcept{return contribution_owner_?contribution_owner_->source_baked_geometry():source_baked_geometry_;}
@@ -75,6 +76,8 @@ inline bool overlay_uses_float_emission(const PaintOverlayPacket &packet) noexce
   return false;
 }
 struct PaintOverlayFactory {
+ static std::shared_ptr<const PaintOverlayPacket> capture_canonical_bake(
+     const PaintedMesh &,const std::function<bool()> &cancelled={});
  static std::shared_ptr<const TextureMaps> capture_source_baked(const PaintedMesh &,const std::function<bool()> &cancelled={});
  static std::shared_ptr<const TextureMaps> capture_current_grid(const PaintedMesh &,
      const Material &,const std::function<bool()> &cancelled={});
