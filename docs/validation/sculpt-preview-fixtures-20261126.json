@@ -1,0 +1,538 @@
+{
+  "fixture_commit": "b060ef56",
+  "base_core": "f9c20398",
+  "core_sha256": "a047845528052bdd2417a2946c70a90f5ef9e8ee179e2dc54d5aa5533cbc3c23",
+  "scope": "Four stale preview fixtures corrected to actual owningchunkgeometry/scalar/capture seam;5focused ReleaseCPU casespass; noproductionpatch/no graphics/devicelease/no sanitizer or wholeumbrella claim.",
+  "original_failure_capture": {
+    "scope": "Append-only umbrella log snapshot; original source/executables unmodified",
+    "source": "c26a8573f467afef4966069ca3e58cde674b1f68",
+    "original_log": "/home/blux/de-xr/dome-sculpt/artifacts/production-full-regression-release-20261126/full-private-ctest/ctest.log",
+    "captured_bytes": 173682,
+    "captured_sha256": "e3274f4e5dc7611acf28d5ba498b2d2b2acc305d428159a9e03b333ea7b1ce3a",
+    "ELFs": {
+      "dome-sculpt-scene-test": "1916da6493490516158ea3b7074bb40fe4ba6ae20b08af7969bc14e2c122d4ba",
+      "dome-sculpt-native-strokes-test": "ebfcb6c9482b974c85bf780d4c6b7d53b30b470fe88df324fd2174ae9a1b6f0c",
+      "dome-sculpt-mask-document-test": "223f731c0822e65d65bdc4167519e88fc35368fee7a7df314c11408977cac80c",
+      "dome-sculpt-mask-controller-test": "61f2307e09cac17b34f125c70695ff37b033f558ec7499b70678c35ffbb1d1e9"
+    }
+  },
+  "build": {
+    "base_source": "f9c20398",
+    "terminal": true,
+    "started": 1795668147.1748888,
+    "scope": "Only4wholefixtureTUs +link; exactparentqualifiedf9core, no productionrecompile/no graphics",
+    "exit": 0,
+    "objects": 4,
+    "links": 4,
+    "input_drift": [],
+    "core_sha256": "a047845528052bdd2417a2946c70a90f5ef9e8ee179e2dc54d5aa5533cbc3c23",
+    "ELFs": {
+      "dome-sculpt-scene-test": "5231463d3a8fc61fa8ca6c03549a9763d42fa8b9c1fa03fd1b0d76db55d5e750",
+      "dome-sculpt-native-strokes-test": "60e7f7290c952532f8798ff9cc7bb13320e6448a60afd29cc70a01da2aa01b55",
+      "dome-sculpt-mask-document-test": "ff6f0e4a944ba4d9585ae273ef60ff3b404c90ffb740b7569ad579a79b0541af",
+      "dome-sculpt-mask-controller-test": "9abd0118bf0b6ed1ee97358e235788dc79353cbc75765232dd1739e46f2449cb"
+    },
+    "seconds": 33.16663146018982
+  },
+  "runtime": {
+    "base_core": "f9c20398",
+    "started": 1795668213.3266873,
+    "terminal": true,
+    "cases": {
+      "scene-authoring": {
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-broad-failures-release-20261126/dome-sculpt-scene-test"
+        ],
+        "started": 1795668213.4474084,
+        "timeout_seconds": 180,
+        "RSS_limit_bytes": 4294967296,
+        "virtual_AS_cap": null,
+        "pid": 3473447,
+        "start": 84613851,
+        "pgrp": 3473447,
+        "root": {
+          "pid": 3473447,
+          "start": 84613851,
+          "pgrp": 3473447,
+          "session": 3473447,
+          "ppid": 3472918,
+          "state": "R"
+        },
+        "known_processes": [
+          {
+            "pid": 3473447,
+            "start": 84613851,
+            "pgrp": 3473447,
+            "session": 3473447,
+            "ppid": 3472918,
+            "state": "R"
+          }
+        ],
+        "peak_owned_RSS_bytes": 74211328,
+        "peak_observed_virtual_bytes": 316379136,
+        "monitor_samples": 59,
+        "signals": [],
+        "exit": 0,
+        "seconds": 0.6358039379119873,
+        "ELF_sha256": "5231463d3a8fc61fa8ca6c03549a9763d42fa8b9c1fa03fd1b0d76db55d5e750"
+      },
+      "native-live-preview": {
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-broad-failures-release-20261126/dome-sculpt-native-strokes-test",
+          "--preview-test"
+        ],
+        "started": 1795668214.1250365,
+        "timeout_seconds": 180,
+        "RSS_limit_bytes": 4294967296,
+        "virtual_AS_cap": null,
+        "pid": 3475395,
+        "start": 84613918,
+        "pgrp": 3475395,
+        "root": {
+          "pid": 3475395,
+          "start": 84613918,
+          "pgrp": 3475395,
+          "session": 3475395,
+          "ppid": 3472918,
+          "state": "R"
+        },
+        "known_processes": [
+          {
+            "pid": 3475395,
+            "start": 84613918,
+            "pgrp": 3475395,
+            "session": 3475395,
+            "ppid": 3472918,
+            "state": "R"
+          }
+        ],
+        "peak_owned_RSS_bytes": 22220800,
+        "peak_observed_virtual_bytes": 314519552,
+        "monitor_samples": 22,
+        "signals": [],
+        "exit": 0,
+        "seconds": 0.23068571090698242,
+        "ELF_sha256": "60e7f7290c952532f8798ff9cc7bb13320e6448a60afd29cc70a01da2aa01b55"
+      },
+      "native-strokes": {
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-broad-failures-release-20261126/dome-sculpt-native-strokes-test"
+        ],
+        "started": 1795668214.395396,
+        "timeout_seconds": 180,
+        "RSS_limit_bytes": 4294967296,
+        "virtual_AS_cap": null,
+        "pid": 3476194,
+        "start": 84613945,
+        "pgrp": 3476194,
+        "root": {
+          "pid": 3476194,
+          "start": 84613945,
+          "pgrp": 3476194,
+          "session": 3476194,
+          "ppid": 3472918,
+          "state": "R"
+        },
+        "known_processes": [
+          {
+            "pid": 3476194,
+            "start": 84613945,
+            "pgrp": 3476194,
+            "session": 3476194,
+            "ppid": 3472918,
+            "state": "R"
+          }
+        ],
+        "peak_owned_RSS_bytes": 46125056,
+        "peak_observed_virtual_bytes": 2071384064,
+        "monitor_samples": 47,
+        "signals": [],
+        "exit": 0,
+        "seconds": 0.5397288799285889,
+        "ELF_sha256": "60e7f7290c952532f8798ff9cc7bb13320e6448a60afd29cc70a01da2aa01b55"
+      },
+      "sculpt-mask-document": {
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-broad-failures-release-20261126/dome-sculpt-mask-document-test"
+        ],
+        "started": 1795668214.9704456,
+        "timeout_seconds": 180,
+        "RSS_limit_bytes": 4294967296,
+        "virtual_AS_cap": null,
+        "pid": 3477713,
+        "start": 84614003,
+        "pgrp": 3477713,
+        "root": {
+          "pid": 3477713,
+          "start": 84614003,
+          "pgrp": 3477713,
+          "session": 3477713,
+          "ppid": 3472918,
+          "state": "R"
+        },
+        "known_processes": [
+          {
+            "pid": 3477713,
+            "start": 84614003,
+            "pgrp": 3477713,
+            "session": 3477713,
+            "ppid": 3472918,
+            "state": "R"
+          }
+        ],
+        "peak_owned_RSS_bytes": 87519232,
+        "peak_observed_virtual_bytes": 783941632,
+        "monitor_samples": 17,
+        "signals": [],
+        "exit": 0,
+        "seconds": 0.1789252758026123,
+        "ELF_sha256": "ff6f0e4a944ba4d9585ae273ef60ff3b404c90ffb740b7569ad579a79b0541af"
+      },
+      "sculpt-mask-controller": {
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-broad-failures-release-20261126/dome-sculpt-mask-controller-test"
+        ],
+        "started": 1795668215.186893,
+        "timeout_seconds": 180,
+        "RSS_limit_bytes": 4294967296,
+        "virtual_AS_cap": null,
+        "pid": 3478408,
+        "start": 84614025,
+        "pgrp": 3478408,
+        "root": {
+          "pid": 3478408,
+          "start": 84614025,
+          "pgrp": 3478408,
+          "session": 3478408,
+          "ppid": 3472918,
+          "state": "R"
+        },
+        "known_processes": [
+          {
+            "pid": 3478408,
+            "start": 84614025,
+            "pgrp": 3478408,
+            "session": 3478408,
+            "ppid": 3472918,
+            "state": "R"
+          }
+        ],
+        "peak_owned_RSS_bytes": 30400512,
+        "peak_observed_virtual_bytes": 315899904,
+        "monitor_samples": 19,
+        "signals": [],
+        "exit": 0,
+        "seconds": 0.2000560760498047,
+        "ELF_sha256": "9abd0118bf0b6ed1ee97358e235788dc79353cbc75765232dd1739e46f2449cb"
+      }
+    },
+    "no_DRI_nodes": true,
+    "allocator": "default",
+    "scope": "Focused native fixtures only, private/dev CPU; no graphics/devicelease or productpatch",
+    "input_drift": [],
+    "exit": 0,
+    "finished": 1795668215.520081
+  },
+  "authorities": [
+    {
+      "name": "artifacts/sculpt-broad-failures-release-20261126/0.prospective.d",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-broad-failures-release-20261126/0.prospective.d",
+      "bytes": 21333,
+      "sha256": "21cac960311b79d148e8c1452f0bae5180901e434aca0535338da2507dc9b28a"
+    },
+    {
+      "name": "artifacts/sculpt-broad-failures-release-20261126/1.prospective.d",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-broad-failures-release-20261126/1.prospective.d",
+      "bytes": 21342,
+      "sha256": "b525fa8298d9d28c047aabe8234f6b6747c16d3a70e997f8b4d71edf430c086e"
+    },
+    {
+      "name": "artifacts/sculpt-broad-failures-release-20261126/2.prospective.d",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-broad-failures-release-20261126/2.prospective.d",
+      "bytes": 21459,
+      "sha256": "5c1d6cf049c1800fd9083064d3455addef490d0f6f8ffccc070156ae9e0ed280"
+    },
+    {
+      "name": "artifacts/sculpt-broad-failures-release-20261126/3.prospective.d",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-broad-failures-release-20261126/3.prospective.d",
+      "bytes": 20206,
+      "sha256": "2b6e617b244b1508f4d8a41851efe544b09a5ab5ecf90b305737092dcc0e1fa8"
+    },
+    {
+      "name": "artifacts/sculpt-broad-failures-release-20261126/before-input-pins.json",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-broad-failures-release-20261126/before-input-pins.json",
+      "bytes": 57067,
+      "sha256": "d23d0a518f5a031efdd6c46a39dbd562bea68aba36a890ab3c45175f47f3d3e6"
+    },
+    {
+      "name": "artifacts/sculpt-broad-failures-release-20261126/build-status.json",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-broad-failures-release-20261126/build-status.json",
+      "bytes": 806,
+      "sha256": "10a02cd24833148e59c5ba35d2d19fa21dc434c8f1a7c6c6ad80c8c4e4c3c1a2"
+    },
+    {
+      "name": "artifacts/sculpt-broad-failures-release-20261126/build.py",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-broad-failures-release-20261126/build.py",
+      "bytes": 3762,
+      "sha256": "a6530eb68d53bfbdc1747c56310a63a9220254cc2ccda96fdfc0b7c36c5a7a2a"
+    },
+    {
+      "name": "artifacts/sculpt-broad-failures-release-20261126/commands.json",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-broad-failures-release-20261126/commands.json",
+      "bytes": 12843,
+      "sha256": "551c2eed6a9a7e5dab18c7cf3686b9aa53d7952c61557a9114d4fe84ea435514"
+    },
+    {
+      "name": "artifacts/sculpt-broad-failures-release-20261126/compile-0.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-broad-failures-release-20261126/compile-0.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "artifacts/sculpt-broad-failures-release-20261126/compile-1.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-broad-failures-release-20261126/compile-1.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "artifacts/sculpt-broad-failures-release-20261126/compile-2.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-broad-failures-release-20261126/compile-2.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "artifacts/sculpt-broad-failures-release-20261126/compile-3.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-broad-failures-release-20261126/compile-3.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "artifacts/sculpt-broad-failures-release-20261126/cpu-v1/journal.txt",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-broad-failures-release-20261126/cpu-v1/journal.txt",
+      "bytes": 610,
+      "sha256": "c45898c643bb5787bc8a87cdd8de2b8dcef93afaff16338190cd038c3b03e96b"
+    },
+    {
+      "name": "artifacts/sculpt-broad-failures-release-20261126/cpu-v1/native-live-preview.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-broad-failures-release-20261126/cpu-v1/native-live-preview.log",
+      "bytes": 583,
+      "sha256": "f8e7a41ef07a08a05083b8d9390f068c5fe226ad739b1b571c8f3dc6e176b7c5"
+    },
+    {
+      "name": "artifacts/sculpt-broad-failures-release-20261126/cpu-v1/native-strokes.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-broad-failures-release-20261126/cpu-v1/native-strokes.log",
+      "bytes": 2957,
+      "sha256": "3e051386381520afff36f8b7a3a408e7118129e416010d8f197903d804edf3a7"
+    },
+    {
+      "name": "artifacts/sculpt-broad-failures-release-20261126/cpu-v1/scene-authoring.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-broad-failures-release-20261126/cpu-v1/scene-authoring.log",
+      "bytes": 1589,
+      "sha256": "881c8c0f3d7d0f077b7c9b385b230fe10a4ee0bfb65a719305cec44aed43e6a1"
+    },
+    {
+      "name": "artifacts/sculpt-broad-failures-release-20261126/cpu-v1/sculpt-mask-controller.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-broad-failures-release-20261126/cpu-v1/sculpt-mask-controller.log",
+      "bytes": 105,
+      "sha256": "af0f5b22705248d7c6b1c6c0c2108beab5e2a1340f78bad6c1bd23332da10a4f"
+    },
+    {
+      "name": "artifacts/sculpt-broad-failures-release-20261126/cpu-v1/sculpt-mask-document.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-broad-failures-release-20261126/cpu-v1/sculpt-mask-document.log",
+      "bytes": 136,
+      "sha256": "28e956460bac281b81168879d8a8e80497d2b7be41dff8cfbfda0bcff22f1bda"
+    },
+    {
+      "name": "artifacts/sculpt-broad-failures-release-20261126/cpu-v1/status.json",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-broad-failures-release-20261126/cpu-v1/status.json",
+      "bytes": 5630,
+      "sha256": "5831bd38b9d13694b61ffb6e8a9f8317f8199fd8dc1f64b3bd08ef7d8624d278"
+    },
+    {
+      "name": "artifacts/sculpt-broad-failures-release-20261126/cpu-v1/unit-close.json",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-broad-failures-release-20261126/cpu-v1/unit-close.json",
+      "bytes": 219,
+      "sha256": "4247ea9601d9bc1fd674fc1e9d677b62e416ac72bc39b48b787009339c08d597"
+    },
+    {
+      "name": "artifacts/sculpt-broad-failures-release-20261126/cpu-v1/unit-terminal.txt",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-broad-failures-release-20261126/cpu-v1/unit-terminal.txt",
+      "bytes": 7137,
+      "sha256": "398c6b725d7d3bec6d4ebbba32986e025a80a1d09e0cf216e5657ba16e368208"
+    },
+    {
+      "name": "artifacts/sculpt-broad-failures-release-20261126/dome-sculpt-mask-controller-test.link.d",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-broad-failures-release-20261126/dome-sculpt-mask-controller-test.link.d",
+      "bytes": 9078,
+      "sha256": "f30d565db606d6670de873a8553fcc0806c75d71ab563c39d3799009df59aafe"
+    },
+    {
+      "name": "artifacts/sculpt-broad-failures-release-20261126/dome-sculpt-mask-controller-test.o.d",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-broad-failures-release-20261126/dome-sculpt-mask-controller-test.o.d",
+      "bytes": 20272,
+      "sha256": "ce5253c99e7fbc3be9f4221cc08db2ffe8616811b372733e04bb4e77407b3cb5"
+    },
+    {
+      "name": "artifacts/sculpt-broad-failures-release-20261126/dome-sculpt-mask-document-test.link.d",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-broad-failures-release-20261126/dome-sculpt-mask-document-test.link.d",
+      "bytes": 9072,
+      "sha256": "a1e78344c269b1e012303b43fae6a9b46bdc19a1a90dcc25d598470d1101259d"
+    },
+    {
+      "name": "artifacts/sculpt-broad-failures-release-20261126/dome-sculpt-mask-document-test.o.d",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-broad-failures-release-20261126/dome-sculpt-mask-document-test.o.d",
+      "bytes": 21521,
+      "sha256": "0c82331fd4d4b9d3247e76c4393c9fcee51f7064274de0c62648ed58b4043fd8"
+    },
+    {
+      "name": "artifacts/sculpt-broad-failures-release-20261126/dome-sculpt-native-strokes-test.link.d",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-broad-failures-release-20261126/dome-sculpt-native-strokes-test.link.d",
+      "bytes": 9075,
+      "sha256": "fa1325aded9323c4542cb9c76cd985d343bc113af53ffc5a8e3cabaa88a84c9e"
+    },
+    {
+      "name": "artifacts/sculpt-broad-failures-release-20261126/dome-sculpt-native-strokes-test.o.d",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-broad-failures-release-20261126/dome-sculpt-native-strokes-test.o.d",
+      "bytes": 21404,
+      "sha256": "f8866b6fc263983f277a6573bdcbfd3330e6f1a50d8d03bc78b1466b62637678"
+    },
+    {
+      "name": "artifacts/sculpt-broad-failures-release-20261126/dome-sculpt-scene-test.link.d",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-broad-failures-release-20261126/dome-sculpt-scene-test.link.d",
+      "bytes": 9048,
+      "sha256": "05568923aa3aa1f8690e1d9db65a400052e0edfb273243b9962cf6208b095bd1"
+    },
+    {
+      "name": "artifacts/sculpt-broad-failures-release-20261126/dome-sculpt-scene-test.o.d",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-broad-failures-release-20261126/dome-sculpt-scene-test.o.d",
+      "bytes": 21377,
+      "sha256": "9e99cda2b1de025d6cdf2e65448ded0796a2dfd4af4196588f629a31b6b3fce6"
+    },
+    {
+      "name": "artifacts/sculpt-broad-failures-release-20261126/link-0.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-broad-failures-release-20261126/link-0.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "artifacts/sculpt-broad-failures-release-20261126/link-1.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-broad-failures-release-20261126/link-1.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "artifacts/sculpt-broad-failures-release-20261126/link-2.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-broad-failures-release-20261126/link-2.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "artifacts/sculpt-broad-failures-release-20261126/link-3.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-broad-failures-release-20261126/link-3.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "artifacts/sculpt-broad-failures-release-20261126/original-ctest-capture.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-broad-failures-release-20261126/original-ctest-capture.log",
+      "bytes": 173682,
+      "sha256": "e3274f4e5dc7611acf28d5ba498b2d2b2acc305d428159a9e03b333ea7b1ce3a"
+    },
+    {
+      "name": "artifacts/sculpt-broad-failures-release-20261126/original-failures.json",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-broad-failures-release-20261126/original-failures.json",
+      "bytes": 832,
+      "sha256": "6f92c1b44e644b879c16951a594a94352bba99fe171f7292f06947acc579434b"
+    },
+    {
+      "name": "artifacts/sculpt-broad-failures-release-20261126/owned_monitor.py",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-broad-failures-release-20261126/owned_monitor.py",
+      "bytes": 4859,
+      "sha256": "b510ef5655e3214bd38e7b5f56022c37a79879070c3733f2dd059bad74f21269"
+    },
+    {
+      "name": "artifacts/sculpt-broad-failures-release-20261126/run.py",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-broad-failures-release-20261126/run.py",
+      "bytes": 1901,
+      "sha256": "6e05341e43f366b20984ddbc3f338766b81d91beda231bc7c327d94c741a8a57"
+    },
+    {
+      "name": "artifacts/sculpt-broad-failures-release-20261126/scan-0.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-broad-failures-release-20261126/scan-0.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "artifacts/sculpt-broad-failures-release-20261126/scan-1.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-broad-failures-release-20261126/scan-1.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "artifacts/sculpt-broad-failures-release-20261126/scan-2.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-broad-failures-release-20261126/scan-2.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "artifacts/sculpt-broad-failures-release-20261126/scan-3.log",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-broad-failures-release-20261126/scan-3.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "artifacts/sculpt-broad-failures-release-20261126/seal.py",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-broad-failures-release-20261126/seal.py",
+      "bytes": 2446,
+      "sha256": "34fcb9e8d54d062bf75201dea1263f3d56f96d8a5c07ae8040484f5f5cf1d492"
+    },
+    {
+      "name": "artifacts/sculpt-broad-failures-source-20261126/CMakeLists.txt",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-broad-failures-source-20261126/CMakeLists.txt",
+      "bytes": 434791,
+      "sha256": "587e32fd8f3445a313b72d3946fd573d1946962967601c0c1083908c0f04b70c"
+    },
+    {
+      "name": "artifacts/sculpt-broad-failures-source-20261126/tests/native-strokes.cpp",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-broad-failures-source-20261126/tests/native-strokes.cpp",
+      "bytes": 17191,
+      "sha256": "0b59f745d7436c86da92131e7b8a356ed21ee1f042664ffeb8964e019172c124"
+    },
+    {
+      "name": "artifacts/sculpt-broad-failures-source-20261126/tests/scene.cpp",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-broad-failures-source-20261126/tests/scene.cpp",
+      "bytes": 6809,
+      "sha256": "4505646e32668ef8e75c2733d1b1fca8be1006a20b9d2784a2608e8fe9005414"
+    },
+    {
+      "name": "artifacts/sculpt-broad-failures-source-20261126/tests/sculpt-controller.cpp",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-broad-failures-source-20261126/tests/sculpt-controller.cpp",
+      "bytes": 8450,
+      "sha256": "f97720078f90d4710971c1f8fd629a2dc779d508d3de9fd8c8747e4b7600eb38"
+    },
+    {
+      "name": "artifacts/sculpt-broad-failures-source-20261126/tests/sculpt-document.cpp",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-broad-failures-source-20261126/tests/sculpt-document.cpp",
+      "bytes": 12184,
+      "sha256": "e891be1f7a6082618299470f4a54be28bcdbe86167875ed86cd9d9cfc8b1fece"
+    },
+    {
+      "name": "artifacts/sculpt-sharing-range-search-release-20261126/build-plan.json",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-sharing-range-search-release-20261126/build-plan.json",
+      "bytes": 27951,
+      "sha256": "45c767fb2c7e865971ce89ce3798bba85339f713b10e3152b96e3f7b018479da"
+    },
+    {
+      "name": "artifacts/sculpt-sharing-range-search-release-20261126/build-status.json",
+      "actual_path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-sharing-range-search-release-20261126/build-status.json",
+      "bytes": 1631,
+      "sha256": "4ca94763fd2ad151adfec6faa67781654be22d910a61b42363ec2201e3141aa8"
+    }
+  ],
+  "archive": {
+    "file": "sculpt-preview-fixtures-20261126.tar.xz",
+    "bytes": 108912,
+    "sha256": "91b39d40b43293a28de3f125d57622bc95462a40da6e25db00d2371318d05327",
+    "members": 50
+  }
+}
