@@ -522,7 +522,8 @@ void bake_retained_recipient(TextureSetId id,bool physical){
         "The normal export worker writes an actual GLB for the baked retained field");
   const std::unique_ptr<cgltf_data,decltype(&cgltf_free)> owner(data,cgltf_free);
   check(cgltf_load_buffers(&options,data,path.c_str())==cgltf_result_success&&
-        cgltf_validate(data)==cgltf_result_success&&data->meshes_count==1&&data->meshes[0].primitives_count==2,
+        cgltf_validate(data)==cgltf_result_success&&data->meshes_count==2&&
+        data->meshes[0].primitives_count==2&&data->meshes[1].primitives_count==1,
         "Independent cgltf validates the worker's two material primitives");
   check(document.copy_scene().encode()==saved,"Portable export preserves the native Bake state");
  }
