@@ -1,0 +1,158 @@
+{
+  "source": "5604ad5494fcd8ac9f6390e8a8d7fb643d1cf6b4",
+  "compiler_owners": 259,
+  "core_owners": 197,
+  "archives": [
+    {
+      "archive": "/home/blux/de-xr/dome-sculpt/artifacts/production-combined-release-20261126/libdome-sculpt-affine.a",
+      "sha256": "b69bd796a6733bc94f954b60293c3a599d44206a16761cfc4437966df8b741ee",
+      "members": 4
+    },
+    {
+      "archive": "/home/blux/de-xr/dome-sculpt/artifacts/production-combined-release-20261126/libdome-sculpt-baked-emission.a",
+      "sha256": "e25935646ddce79932aa2d419bc00119841700007213526e1b48baaa0ec58415",
+      "members": 1
+    },
+    {
+      "archive": "/home/blux/de-xr/dome-sculpt/artifacts/production-combined-release-20261126/libdome-sculpt-core.a",
+      "sha256": "db8607b4ca2f4e704d8456cb19140f035aa391feffa116c3fd3f8c48d649249b",
+      "members": 197
+    },
+    {
+      "archive": "/home/blux/de-xr/dome-sculpt/artifacts/production-combined-release-20261126/libdome-sculpt-emission-codec.a",
+      "sha256": "18d411b9eca51ae2cd9ad6f20f56262134f8173f52a72d1c80e4b19e20b8c5b3",
+      "members": 2
+    },
+    {
+      "archive": "/home/blux/de-xr/dome-sculpt/artifacts/production-combined-release-20261126/libdome-sculpt-native-graphics.a",
+      "sha256": "c8ecf996ed2e580a83b4e33e382e61e6263a2a152632b2ef708bdb854fb0727e",
+      "members": 1
+    },
+    {
+      "archive": "/home/blux/de-xr/dome-sculpt/artifacts/production-combined-release-20261126/libdome-sculpt-paint-gpu.a",
+      "sha256": "a2ec7667ee92ead55e90ed28ce223465f32bda549bc5236383c848d315550794",
+      "members": 1
+    },
+    {
+      "archive": "/home/blux/de-xr/dome-sculpt/artifacts/production-combined-release-20261126/libdome-sculpt-polygon.a",
+      "sha256": "933cf3972582d6c2dafcfc72d77c58123a2dcc0384ec43cba66f7a0cf4c8b177",
+      "members": 2
+    },
+    {
+      "archive": "/home/blux/de-xr/dome-sculpt/artifacts/production-combined-release-20261126/libdome-sculpt-render.a",
+      "sha256": "a39bded59927e84d85e196bc0636d4ae91b60c3f0e69c19e7f0f524c88693b12",
+      "members": 4
+    },
+    {
+      "archive": "/home/blux/de-xr/dome-sculpt/artifacts/production-combined-release-20261126/libdome-sculpt-spacenav.a",
+      "sha256": "f5cf33675618ecac6d38300b75940f7dc87bff7974b392ac622a6ce696a4bd6a",
+      "members": 2
+    },
+    {
+      "archive": "/home/blux/de-xr/dome-sculpt/artifacts/production-combined-release-20261126/libdome-sculpt-xr.a",
+      "sha256": "4f7f75ac6172005025d4ef784472166477ae554e24a4a024818ec8d1c9984edc",
+      "members": 1
+    },
+    {
+      "archive": "/home/blux/de-xr/dome-sculpt/artifacts/production-combined-release-20261126/libmikktspace-robust.a",
+      "sha256": "05a4813ac36000e857f1df99971a396a7a15b451a55bc5929d400741ef094d50",
+      "members": 1
+    },
+    {
+      "archive": "/home/blux/de-xr/dome-sculpt/artifacts/production-combined-release-20261126/libmikktspace.a",
+      "sha256": "c85c57ff0a7ec3872da726ffbfe377552f89cbf1c83b44cef1ee242e8de964ec",
+      "members": 1
+    },
+    {
+      "archive": "/home/blux/de-xr/dome-sculpt/artifacts/production-combined-release-20261126/libufbx.a",
+      "sha256": "87dab6ec81ba86bb514c3b4a99afe25095546e41fc820bfa63f3a5fa7a9cc1d3",
+      "members": 1
+    },
+    {
+      "archive": "/home/blux/de-xr/dome-sculpt/artifacts/production-combined-release-20261126/libxatlas.a",
+      "sha256": "4a6673c5c2c4ae7e0f947afe73d5a22933b34ce209b621737eb87077c305efef",
+      "members": 1
+    }
+  ],
+  "outputs": [
+    {
+      "target": "dome-sculpt",
+      "executable": "/home/blux/de-xr/dome-sculpt/artifacts/production-combined-release-20261126/dome-sculpt",
+      "sha256": "002685db461076056e4cfcceb8817201e45afd1fefb079d11578bbf58b2aa9c5"
+    },
+    {
+      "target": "dome-sculpt-creator-workspace-runtime",
+      "executable": "/home/blux/de-xr/dome-sculpt/artifacts/production-combined-release-20261126/libdome-sculpt-creator-workspace-runtime.so",
+      "sha256": "2cb3885e673babc4160fca528269ef30cb6ab644549693939c4d76618ed36ece"
+    },
+    {
+      "target": "dome-sculpt-creator-workspace-test",
+      "executable": "/home/blux/de-xr/dome-sculpt/artifacts/production-combined-release-20261126/dome-sculpt-creator-workspace-test",
+      "sha256": "d0175d49dcbdc92d8f7227602fbf51ed580b97aebc0ce280267faf83105247b9"
+    },
+    {
+      "target": "dome-sculpt-creator-vrm-test",
+      "executable": "/home/blux/de-xr/dome-sculpt/artifacts/production-combined-release-20261126/dome-sculpt-creator-vrm-test",
+      "sha256": "1ed5087e2d00ccf44e1478d7dbfbf9a73d466ba9da81383ba33b1c148232084c"
+    },
+    {
+      "target": "dome-sculpt-xr-fixture-clock-test",
+      "executable": "/home/blux/de-xr/dome-sculpt/artifacts/production-combined-release-20261126/dome-sculpt-xr-fixture-clock-test",
+      "sha256": "68cd867f6a45ff407034c3ac0aeb18c6b57086c78cafe1bf717c82bd82697ee3"
+    },
+    {
+      "target": "dome-sculpt-sculpt-independent-workflow",
+      "executable": "/home/blux/de-xr/dome-sculpt/artifacts/production-combined-release-20261126/dome-sculpt-sculpt-independent-workflow",
+      "sha256": "b8b0b8925798077c3d89883f937f5e6a6f3d321686fdaf9590bb6afa388cbb10"
+    },
+    {
+      "target": "dome-sculpt-sculpt-sustained",
+      "executable": "/home/blux/de-xr/dome-sculpt/artifacts/production-combined-release-20261126/dome-sculpt-sculpt-sustained",
+      "sha256": "a57bc1d899bd228ca4cee463c4c7841b0e9cc2b7dfbb359bf5b02eedc9be6ea5"
+    },
+    {
+      "target": "dome-sculpt-source-advanced-normal-bake-test",
+      "executable": "/home/blux/de-xr/dome-sculpt/artifacts/production-combined-release-20261126/dome-sculpt-source-advanced-normal-bake-test",
+      "sha256": "0fcc105c6d7f049a0b99a325b37341b722fb675dcf7e7ddd1982303d9c68f804"
+    },
+    {
+      "target": "dome-sculpt-source-joint-writable-normal-bake-test",
+      "executable": "/home/blux/de-xr/dome-sculpt/artifacts/production-combined-release-20261126/dome-sculpt-source-joint-writable-normal-bake-test",
+      "sha256": "f0873e8b407b53f398d632cb994554d50e8e1d39b0cfc8ddc8bc2b16ddf5e856"
+    },
+    {
+      "target": "dome-sculpt-source-owning-hdr-domain-test",
+      "executable": "/home/blux/de-xr/dome-sculpt/artifacts/production-combined-release-20261126/dome-sculpt-source-owning-hdr-domain-test",
+      "sha256": "c7f91d13ce433de0f53a1c9210dc8916f45520a97c57ca04d521320c87c861f5"
+    },
+    {
+      "target": "dome-sculpt-source-owning-hdr-render-test",
+      "executable": "/home/blux/de-xr/dome-sculpt/artifacts/production-combined-release-20261126/dome-sculpt-source-owning-hdr-render-test",
+      "sha256": "6781fcadfd4da37080c5ec1d94d78c9e331d4dbe1c6a85ec7be9c195e897a3d2"
+    },
+    {
+      "target": "dome-sculpt-source-owning-hdr-export-test",
+      "executable": "/home/blux/de-xr/dome-sculpt/artifacts/production-combined-release-20261126/dome-sculpt-source-owning-hdr-export-test",
+      "sha256": "3980ca7fcc22b72d75cb6cbeda90fbfd0a6ecbc97036b47e5b0f216f2c8ccf58"
+    },
+    {
+      "target": "dome-sculpt-source-hdr-provenance-closure-test",
+      "executable": "/home/blux/de-xr/dome-sculpt/artifacts/production-combined-release-20261126/dome-sculpt-source-hdr-provenance-closure-test",
+      "sha256": "97f5b16990103c3047e296f5cedb10f43bf21cbf1cf47cd32d5f288d4ce83e69"
+    },
+    {
+      "target": "dome-sculpt-source-retained-emission-worker-test",
+      "executable": "/home/blux/de-xr/dome-sculpt/artifacts/production-combined-release-20261126/dome-sculpt-source-retained-emission-worker-test",
+      "sha256": "65fbbf35ddb7deaff38f1819301e5126314046d257cbdc2ac6f2e2a1e47c4fe5"
+    }
+  ],
+  "seconds": 277.55589962005615,
+  "observed_dependency_count": 1679,
+  "scope": "Fresh Release application and 13 selected executables using the canonical installed Release FLTK. Static build evidence, including complete compiler invocations, actual dependency files and verified archive members. System dependency hashes captured after the build.",
+  "archive": {
+    "path": "docs/validation/combined-release-build-20261126.tar.xz",
+    "sha256": "69d2e26338af3bbe7dba74c7e4ebf77cfb7cd6f01cd2eeda2c975dbda98a1b69",
+    "bytes": 350180,
+    "members": 282
+  }
+}

@@ -67,10 +67,11 @@ the actual unit before acting. Its sampler55/canonical14068/writable9694/joint47
 cases pass; this snapshot is not a complete strict14 result. HDR877's ready
 five-case cohort follows its natural release. The isolated integration candidate
 `5604ad54` combines current05, HDR877, sculpt6d/fe94 and corrected creator
-fixtures550. A fresh Release build for the application and selected fixtures
-is running in `artifacts/production-combined-release-20261126`, unit
+fixtures550. The [fresh Release build](COMBINED-RELEASE-BUILD-20261126.md) for
+the application and 13 selected fixtures passed all 290 actions in
+`artifacts/production-combined-release-20261126`. The terminal unit was
 `ds-production-combined-release-20261126.service`, invocation
-`593996bfc65d47d0a641ffcb5e4769ef`. Its source remains frozen for the run.
+`593996bfc65d47d0a641ffcb5e4769ef`. Runtime qualification is pending.
 The branch is `work/production-resume-integration-20261126`.
 Full scope in REQUIREMENTS is unchanged.
 
