@@ -52,6 +52,15 @@ the generated triangles. Each further Apply creates another retained version;
 it does not transfer the previous target's paint or rig onto changed topology.
 Use the existing explicit bake/authoring workflows where transfer is required.
 
+To transfer surface detail, select the new patch, open **Bake surface**, and
+choose the original source marked **[hidden]**. Native painted meshes and sculpt
+volumes remain eligible under reflected, sheared, and nonuniform placement.
+Bake projects the evaluated source into the patch's atlas using world distances.
+It writes color, material, normals, and emission below editable paint layers.
+The original object, paint, sculpt layers, rig, and morphs remain in the project.
+Imported and prepared materials that carry their own normal or sampling domains
+require the corresponding source adapter.
+
 Scene version 8 stores each patch's source object ID and independent versioned
 RetopoMesh payload alongside the derived painted mesh. Vertex/edge/face IDs,
 allocation cursor, wires, unfinished vertices, pins and seams survive save/open.

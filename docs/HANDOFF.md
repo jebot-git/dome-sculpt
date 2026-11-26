@@ -1554,6 +1554,33 @@ five byte-identical output files across the two profiles. Intel Arc passes
 the independent renderer agrees within one RGB8 level.
 [Retained archive and normal evidence](validation/retained-depth-authoring-20261126.json)
 
+### Native affine Bake donors
+
+Product `6f11e65e` uses the ordinary Bake chooser for hidden affine native mesh
+and sculpt donors. The reflected, posed retopology fixture transfers sparse
+color and physical FLOAT emission onto the applied patch at 2 mm projection
+bounds, with exact source retention, ordered Save, reopen and Undo/Redo.
+Native tangent-map transfer preserves source winding and reflected handedness.
+The translated sculpt at 2 m projected all 4,096 texels after recentering the
+projection workspace before float conversion. The unrecentered fixture and
+independent mesh probe preserve the earlier degenerate-triangle failure.
+
+The exact build passes eight native CTests in both Release and ASan/UBSan with
+leak detection. Release also passes the registered affine OpenXR retopology
+test with 27 checks after allowing the full controller material edit to finish.
+The production app passes ten nested DomeD Wayland checks and ten synthetic
+OpenXR Bake checks each in software Release and Intel Arc ASan/UBSan. Native
+Release and sanitizer patch outputs match byte for byte. The two XR outputs
+also match each other. Their controller settings differ from the desktop test.
+Original and prepared affine material domains and physical headset use remain
+open. [Native affine Bake evidence](validation/affine-native-bake-20261126.json)
+
+The older `d9ea0716` combined suite remains live. Its first observed failure
+is the allocation partition `canonical-paint37-key-replace-fault-part-86`.
+The native child completed all 345 prefixes and exited successfully. The outer
+ELF observer captured unexpected Python mappings in the child's process during
+startup. The wrapper result still fails and needs an executable-identity check.
+
 ## Source and integration boundary
 
 - Main now admits product1bc13125 and public fixturef1e193c7 after complete
