@@ -94,14 +94,16 @@ bake using their original coordinates, normal frames and FLOAT emission.
 Mixed projects with retained fields and plain recipes reopen exactly.
 Plain and retained donors now support reflected, sheared and nonuniform
 placement, with preserved material corners and effective winding. Affine
-and retained writable targets, deformed retained donors and physical
-controls remain open. The original software sanitizer leak remains in
-the evidence.
+native and prepared normal targets now use world-metric projection, AO and
+cages while preserving their original tangent authority and local geometry.
+Retained writable targets, deformed retained donors and physical controls
+remain open. The original software sanitizer leak remains in the evidence.
 [Texture-set recipe evidence](validation/texture-set-bake-recipe-20261126.json)
 [Combined runtime evidence](validation/texture-set-recipe-runtime-20261126.json)
 [Active-set Bake evidence](validation/active-texture-set-bake-20261126.json)
 [Retained-source Bake evidence](validation/retained-texture-set-bake-source-20261126.json)
 [Affine-source Bake evidence](validation/affine-texture-set-bake-source-20261126.json)
+[Affine-target Bake evidence](validation/affine-target-bake-20261126.json)
 
 ## Qualified integration — 2026-11-17
 

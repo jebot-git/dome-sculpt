@@ -1153,8 +1153,8 @@ Release and ASan/UBSan each pass all ten focused tests and 569 retained-source
 assertions. The exact app passes 15 native Wayland checks through nested
 DomeD and 19 synthetic OpenXR checks per software Release and Intel Arc
 sanitizer profile. Both XR profiles save identical bytes, including exact
-Cancel and focus-loss results. The full fresh Release build and regression
-for this checkpoint are running.
+Cancel and focus-loss results. The fresh Release build for this checkpoint
+finished all 1,766 build steps. Its 1,334-test regression is running.
 [Retained-source Bake evidence](validation/retained-texture-set-bake-source-20261126.json)
 
 Main merge `7ae33ac1` adds affine placement for plain and retained
@@ -1169,9 +1169,25 @@ All ten focused tests pass in both Release and ASan/UBSan, with 1,100
 retained and affine assertions in each. The exact build passes 15 nested
 DomeD Wayland checks and 19 synthetic OpenXR checks per software Release
 and Intel Arc sanitizer profile. Both XR profiles produce identical
-native projects. Affine and retained writable targets, deformed
-retained donors and physical-device acceptance remain open.
+native projects.
 [Affine-source Bake evidence](validation/affine-texture-set-bake-source-20261126.json)
+
+Main merge `1afdbf95` adds world-metric Bake for affine native targets,
+including prepared normal targets and selected plain texture sets. Rays, AO
+and independently placed cages use physical distances. Normal encoding uses
+the target's original corner tangents placed in the rendered frame, including
+reflected handedness. Projected maps preserve local geometry and placement
+and publish through the existing selected-field, history and Save paths.
+
+Ten focused tests pass per Release and ASan/UBSan profile, with 1,146
+source and target assertions each. The exact build passes 15 nested
+DomeD Wayland checks and 19 synthetic OpenXR checks per software Release
+and Intel Arc sanitizer profile. The two XR replays produce byte-identical
+native projects. In the independent translation probe, moving all three
+objects by several million metres preserves the raster bytes for 780
+projected texels and 3,900 projection and AO rays. Retained writable
+targets, deformed retained donors and physical-device acceptance remain open.
+[Affine-target Bake evidence](validation/affine-target-bake-20261126.json)
 
 ## Source and integration boundary
 
