@@ -1,0 +1,895 @@
+{
+  "scope": "Current05 matched ASan/UBSan/leak public XR cancel and focus routing, native fidelity and ordinary reopen. Synthetic-input Arc execution; no physical HMD or newer combined-source acceptance.",
+  "production": "05f5d1ccfa4bb5b97d25e4a425a2fd9497b0d8c9",
+  "fixture_source": "5509958f",
+  "strict_App_sha256": "1c2560673f4f388eb9c56efeccf1c2bffb59e17633ef4f9ac57a7de0ede151ba",
+  "static_build_proof": "9dd08f32",
+  "prior_strict_accept_desktop_proof": "46b1b3eb",
+  "strict_options": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+    "cohort_seconds": 240,
+    "RSS_bytes": 4294967296,
+    "virtual_AS_cap": null
+  },
+  "actual_cases": {
+    "cancel": {
+      "actual_checks": 19,
+      "whole_wrapper_exit": 0,
+      "actual_seconds": 159.9281039237976,
+      "peak_owned_RSS_bytes": 3190120448,
+      "explicit_App_roots": {
+        "3338495": {
+          "pid": 3338495,
+          "start": 84061032,
+          "pgrp": 3338350,
+          "session": 3338350,
+          "ppid": 3338350,
+          "state": "R"
+        },
+        "3350454": {
+          "pid": 3350454,
+          "start": 84068533,
+          "pgrp": 3338350,
+          "session": 3338350,
+          "ppid": 3338350,
+          "state": "R"
+        }
+      },
+      "same_executable_descendants": {
+        "3345155": {
+          "pid": 3345155,
+          "start": 84065337,
+          "pgrp": 3338350,
+          "session": 3338350,
+          "ppid": 3338495,
+          "state": "R"
+        },
+        "3356854": {
+          "pid": 3356854,
+          "start": 84072713,
+          "pgrp": 3338350,
+          "session": 3338350,
+          "ppid": 3350454,
+          "state": "R"
+        }
+      },
+      "ELF_certificates": 360,
+      "lease": {
+        "acquired": 1795662683.902918,
+        "device": 40,
+        "inode": 99618,
+        "before_any_ldd_or_product": true,
+        "released": 1795662852.8402305
+      },
+      "input_drift": [],
+      "owned_remaining": []
+    },
+    "focus": {
+      "actual_checks": 20,
+      "whole_wrapper_exit": 0,
+      "actual_seconds": 212.3267502784729,
+      "peak_owned_RSS_bytes": 3232280576,
+      "explicit_App_roots": {
+        "3388213": {
+          "pid": 3388213,
+          "start": 84093827,
+          "pgrp": 3387994,
+          "session": 3387994,
+          "ppid": 3387994,
+          "state": "R"
+        },
+        "3407276": {
+          "pid": 3407276,
+          "start": 84106559,
+          "pgrp": 3387994,
+          "session": 3387994,
+          "ppid": 3387994,
+          "state": "R"
+        }
+      },
+      "same_executable_descendants": {
+        "3399770": {
+          "pid": 3399770,
+          "start": 84101855,
+          "pgrp": 3387994,
+          "session": 3387994,
+          "ppid": 3388213,
+          "state": "R"
+        },
+        "3413389": {
+          "pid": 3413389,
+          "start": 84111068,
+          "pgrp": 3387994,
+          "session": 3387994,
+          "ppid": 3407276,
+          "state": "R"
+        }
+      },
+      "ELF_certificates": 360,
+      "lease": {
+        "acquired": 1795663011.2232997,
+        "device": 40,
+        "inode": 99618,
+        "before_any_ldd_or_product": true,
+        "released": 1795663232.0625033
+      },
+      "input_drift": [],
+      "owned_remaining": []
+    }
+  },
+  "archive": {
+    "bytes": 653196,
+    "sha256": "42c5766abad94cb8279c6bad5c0b5efafa1051d8596e8ef6c5bb1b6ddad7c59c",
+    "members": {
+      "cancel/plan.json": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/plan.json",
+        "bytes": 1172734,
+        "sha256": "2eb9b254d944499885303259b2b54956154f565b350bf1d77d9443f43778ada0"
+      },
+      "cancel/status.json": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/status.json",
+        "bytes": 261673,
+        "sha256": "bf83b5d73f0c090a5e1b8d09bdf2999671eddbcd20d91a424d929a2df50b876b"
+      },
+      "cancel/dome-sculpt.ldd": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/dome-sculpt.ldd",
+        "bytes": 5280,
+        "sha256": "8f55d8507ca0285c8afdabe21d05ac47b6ddec90d31b4074ecd6e23e5498d74c"
+      },
+      "cancel/dome-sculpt-creator-workspace-test.ldd": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/dome-sculpt-creator-workspace-test.ldd",
+        "bytes": 1780,
+        "sha256": "3800be36ac68470e1d642b3107df33aca9d52bb056fc5f5144c4a74704ea8757"
+      },
+      "cancel/libdome-sculpt-creator-workspace-runtime.so.ldd": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/libdome-sculpt-creator-workspace-runtime.so.ldd",
+        "bytes": 2072,
+        "sha256": "60259f45087568ce28d3f5a0cadfefb6b7615d6bf909bf341ef57c83e9e9e8a0"
+      },
+      "cancel/device-auth-sanitize.so.ldd": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/device-auth-sanitize.so.ldd",
+        "bytes": 590,
+        "sha256": "c0ccefd5051151995bfe87538e9f397c65f700f88d2c502b99fd7f1b0640f7b3"
+      },
+      "cancel/process.log": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/process.log",
+        "bytes": 1526,
+        "sha256": "4a39eba6c3c2cc17623eb7f9212e6840afee67ed63781ff26cae83e42b476992"
+      },
+      "cancel/unit-terminal.txt": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/unit-terminal.txt",
+        "bytes": 7165,
+        "sha256": "fbf1e1d3570ee0ac6423905717a3eae14f510cb39a56f27a6f5e5be5f283cf5b"
+      },
+      "cancel/unit-journal.txt": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/unit-journal.txt",
+        "bytes": 429,
+        "sha256": "e692f2a734e86867e3ae76bf6eb80f1d9f682ef850a32c35a5b787433f02489b"
+      },
+      "cancel/independent-free.json": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/independent-free.json",
+        "bytes": 87,
+        "sha256": "22e2fd4a55307f23e1ce83cdb7c641450e1afc7f1ed68e813a82e1664b05a347"
+      },
+      "cancel/workflow/report.json": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/report.json",
+        "bytes": 3609,
+        "sha256": "86c6b5beed3ffc878144137c94a56834d894c9c27ba50296f8b1289b83a408e2"
+      },
+      "cancel/actual-device/3338495/context-maps.txt": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/actual-device/3338495/context-maps.txt",
+        "bytes": 61987,
+        "sha256": "6292fd2c4598512a74d4d90f9c754ef7f69dfe20a54457316137f561971a47c7"
+      },
+      "cancel/actual-device/3338495/device.txt": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/actual-device/3338495/device.txt",
+        "bytes": 284,
+        "sha256": "0daade43101e28f1070290e06cb1fc47bea6540d6fba4390676ddc792591c33e"
+      },
+      "cancel/actual-device/3350454/context-maps.txt": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/actual-device/3350454/context-maps.txt",
+        "bytes": 61546,
+        "sha256": "4ccacf55bfb4ba4cc8922bd7b3093c3902cc720316497fa68a9bbbe376d2a51b"
+      },
+      "cancel/actual-device/3350454/device.txt": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/actual-device/3350454/device.txt",
+        "bytes": 284,
+        "sha256": "e0253367d36c3397a149f4ce40e888e2a28bdb6edceaa800c542302286f30c15"
+      },
+      "cancel/workflow/author/loader.json": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/author/loader.json",
+        "bytes": 186,
+        "sha256": "7eab27664b627e1ef1d08bc7115cdb97b0327dbc89b59bfe473c1de81df70be4"
+      },
+      "cancel/workflow/author/invocation.json": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/author/invocation.json",
+        "bytes": 481,
+        "sha256": "9815895d882b93db0aab929efcbd8287e862031e1e561cbfaec0d8b625b3b6f2"
+      },
+      "cancel/workflow/author/app.log": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/author/app.log",
+        "bytes": 830,
+        "sha256": "222bc4c6ec6b072d9456d8e1b6f3414c9554232e1f5d022103af158fabdca39f"
+      },
+      "cancel/workflow/author/runtime.json.maps": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/author/runtime.json.maps",
+        "bytes": 65578,
+        "sha256": "8f453a07e489354c9f3aeaf97f05f3bf0f92b9f0d6d07f2db1085429187710d0"
+      },
+      "cancel/workflow/author/runtime.json.creator-26-0.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/author/runtime.json.creator-26-0.ppm",
+        "bytes": 307215,
+        "sha256": "f27c71f10fe0a80403c824ff00053171c1c5efa3bbb9690056c99e95243e4f98"
+      },
+      "cancel/workflow/author/runtime.json.creator-26-1.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/author/runtime.json.creator-26-1.ppm",
+        "bytes": 307215,
+        "sha256": "a7111ccee3d2ac2389f6b51cc9b1735bc04192ec179206d8c2d22714b961628c"
+      },
+      "cancel/workflow/author/runtime.json.creator-29-0.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/author/runtime.json.creator-29-0.ppm",
+        "bytes": 307215,
+        "sha256": "5ce90e22e403a046aeb414f0c7cc5882eb350210f672517523c626d7e89d049b"
+      },
+      "cancel/workflow/author/runtime.json.creator-29-1.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/author/runtime.json.creator-29-1.ppm",
+        "bytes": 307215,
+        "sha256": "8696ad3bb0fd674fab31333cc7a3fc251e26800c45cbe20c1ca9c1a045511528"
+      },
+      "cancel/workflow/author/runtime.json.creator-37-0.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/author/runtime.json.creator-37-0.ppm",
+        "bytes": 307215,
+        "sha256": "5ce90e22e403a046aeb414f0c7cc5882eb350210f672517523c626d7e89d049b"
+      },
+      "cancel/workflow/author/runtime.json.creator-37-1.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/author/runtime.json.creator-37-1.ppm",
+        "bytes": 307215,
+        "sha256": "8696ad3bb0fd674fab31333cc7a3fc251e26800c45cbe20c1ca9c1a045511528"
+      },
+      "cancel/workflow/author/runtime.json.creator-61-0.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/author/runtime.json.creator-61-0.ppm",
+        "bytes": 307215,
+        "sha256": "ccfbfde97a9726789ad42692232695fae4e84c5c27f46e55c8637cd271e14cd4"
+      },
+      "cancel/workflow/author/runtime.json.creator-61-1.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/author/runtime.json.creator-61-1.ppm",
+        "bytes": 307215,
+        "sha256": "9b9e03c77fe615250e7562fb6aff2d8469a5ae506090dc2455d5f3c2dacdc742"
+      },
+      "cancel/workflow/author/runtime.json.creator-67-0.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/author/runtime.json.creator-67-0.ppm",
+        "bytes": 307215,
+        "sha256": "cc67bb797e2ef5cbc4870d74edd3696f308f094fefa48191364c43b015b6a0fb"
+      },
+      "cancel/workflow/author/runtime.json.creator-67-1.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/author/runtime.json.creator-67-1.ppm",
+        "bytes": 307215,
+        "sha256": "ed488a3b1f9f6d3952cdd600aa5f49fc230d35adfe50076842173caf7a364309"
+      },
+      "cancel/workflow/author/runtime.json.creator-73-0.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/author/runtime.json.creator-73-0.ppm",
+        "bytes": 307215,
+        "sha256": "6f3c349b5e3ac832bbdb5349884aab23d41dcaa73f1e675ccb9b8984f78e149a"
+      },
+      "cancel/workflow/author/runtime.json.creator-73-1.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/author/runtime.json.creator-73-1.ppm",
+        "bytes": 307215,
+        "sha256": "af93f29f7dcc79259be4d8f3317eb22cbe908e352c095271d8b1d65993f7baab"
+      },
+      "cancel/workflow/author/runtime.json.creator-79-0.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/author/runtime.json.creator-79-0.ppm",
+        "bytes": 307215,
+        "sha256": "214c42809e13e3a4d47cce3008cb53acc20d0980e935206164af328076c68fe1"
+      },
+      "cancel/workflow/author/runtime.json.creator-79-1.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/author/runtime.json.creator-79-1.ppm",
+        "bytes": 307215,
+        "sha256": "193a725779ff783c57e778d4bcc7e828ce36a4df6bc4e10a4e4aa9185853b663"
+      },
+      "cancel/workflow/author/runtime.json.creator-85-0.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/author/runtime.json.creator-85-0.ppm",
+        "bytes": 307215,
+        "sha256": "01b99fc10711c938e8b69e7f4854c591f891d3ee153cf72229ab2cc1b442cece"
+      },
+      "cancel/workflow/author/runtime.json.creator-85-1.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/author/runtime.json.creator-85-1.ppm",
+        "bytes": 307215,
+        "sha256": "1111d47bbefa5887108cfa0d878c11b323cf1ed4f98fb68adc8cffabce84d240"
+      },
+      "cancel/workflow/author/runtime.json.creator-89-0.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/author/runtime.json.creator-89-0.ppm",
+        "bytes": 307215,
+        "sha256": "9d7138dc3b3df0f8d4767c92e301c7b37e5f9e0f912da01d76f62e10bbec0599"
+      },
+      "cancel/workflow/author/runtime.json.creator-89-1.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/author/runtime.json.creator-89-1.ppm",
+        "bytes": 307215,
+        "sha256": "5055e0ac42fd871699ab5fe515f3131404b4cb7344beeb4c2b5a778dd4152932"
+      },
+      "cancel/workflow/author/runtime.json.creator-93-0.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/author/runtime.json.creator-93-0.ppm",
+        "bytes": 307215,
+        "sha256": "dfec5541bcba0a796cde9d02019b183e069a2f1d157849119e865496fa5946ee"
+      },
+      "cancel/workflow/author/runtime.json.creator-93-1.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/author/runtime.json.creator-93-1.ppm",
+        "bytes": 307215,
+        "sha256": "5c72da8d9103d94712332cd80825c680b0c5eaf67d9a521178058817f76ff77e"
+      },
+      "cancel/workflow/author/runtime.json.creator-97-0.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/author/runtime.json.creator-97-0.ppm",
+        "bytes": 307215,
+        "sha256": "959844cf7256d332a12a4f3ff78d8965a08c3a5389a9d5da52e8681c152a48b9"
+      },
+      "cancel/workflow/author/runtime.json.creator-97-1.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/author/runtime.json.creator-97-1.ppm",
+        "bytes": 307215,
+        "sha256": "22ec73b3f847b7fdd0f294a0f926ae9de04bf02add2fe27671bd20e40688aaa6"
+      },
+      "cancel/workflow/author/runtime.json.creator-115-0.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/author/runtime.json.creator-115-0.ppm",
+        "bytes": 307215,
+        "sha256": "99b19e888c10fba7e4d79defabb88aba0131302e65c9334e9b1a7aa3cbc67c3d"
+      },
+      "cancel/workflow/author/runtime.json.creator-115-1.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/author/runtime.json.creator-115-1.ppm",
+        "bytes": 307215,
+        "sha256": "7c4960e393ac1ed3e771fccb4a2b514adef9ded842c211a1d60a0f189a948ec6"
+      },
+      "cancel/workflow/author/runtime.json.creator-120-0.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/author/runtime.json.creator-120-0.ppm",
+        "bytes": 307215,
+        "sha256": "26fb692e3ca7fb2c264b20a4e33e119becc452cbf0ca0e57d9bb07091187db9c"
+      },
+      "cancel/workflow/author/runtime.json.creator-120-1.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/author/runtime.json.creator-120-1.ppm",
+        "bytes": 307215,
+        "sha256": "a83cec126de8c796cc8dab9e4d6f5bec0f619c75e4be02ea484fc643bfd73b92"
+      },
+      "cancel/workflow/author/runtime.json.creator-124-0.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/author/runtime.json.creator-124-0.ppm",
+        "bytes": 307215,
+        "sha256": "37cfffea56b88b69d672cb8b8c06bf4895b2076f298ee5eca083b2c49b63a371"
+      },
+      "cancel/workflow/author/runtime.json.creator-124-1.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/author/runtime.json.creator-124-1.ppm",
+        "bytes": 307215,
+        "sha256": "cda674887d9fc289195b4a40b74bcdd2a75cb48c28fe3fb071367ab1da4cdb60"
+      },
+      "cancel/workflow/author/runtime.json.creator-130-0.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/author/runtime.json.creator-130-0.ppm",
+        "bytes": 307215,
+        "sha256": "c561a6c701b57ca61692214547278722fcf6cb8070aec6773ebee1421de352af"
+      },
+      "cancel/workflow/author/runtime.json.creator-130-1.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/author/runtime.json.creator-130-1.ppm",
+        "bytes": 307215,
+        "sha256": "38343ffd2fb1d6c5b99e917cff0e1611ba9c739f620149a22310ea6a613052db"
+      },
+      "cancel/workflow/author/runtime.json.creator-137-0.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/author/runtime.json.creator-137-0.ppm",
+        "bytes": 307215,
+        "sha256": "e3402b4c6d2d3081ae1c0a64f9d7fdd7bbcf523243e7f97123af7eb7b856c979"
+      },
+      "cancel/workflow/author/runtime.json.creator-137-1.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/author/runtime.json.creator-137-1.ppm",
+        "bytes": 307215,
+        "sha256": "6ee9d512c6c8cbbfaba7ec304ef7c9b6133c635b8813bd809e7ad50232b73efb"
+      },
+      "cancel/workflow/author/runtime.json.creator-275-0.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/author/runtime.json.creator-275-0.ppm",
+        "bytes": 307215,
+        "sha256": "d4d7a25eda216bcdcadcc7296d8ad6dc224101a2b73c758e746163a3ce0489af"
+      },
+      "cancel/workflow/author/runtime.json.creator-275-1.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/author/runtime.json.creator-275-1.ppm",
+        "bytes": 307215,
+        "sha256": "ad665fdffae711cfe7a805d9d40492960edeb8d85cd150d74f1e1e19b05d3f4f"
+      },
+      "cancel/workflow/author/runtime.json.creator-279-0.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/author/runtime.json.creator-279-0.ppm",
+        "bytes": 307215,
+        "sha256": "821c0cd21e163085e675281c3d93d0729bc05b03715f09a97a6b69ea76a7173d"
+      },
+      "cancel/workflow/author/runtime.json.creator-279-1.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/author/runtime.json.creator-279-1.ppm",
+        "bytes": 307215,
+        "sha256": "51a6647f28e53083139808901a500c03b74d80ecce631b82cf596709602f3f63"
+      },
+      "cancel/workflow/author/runtime.json.creator-283-0.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/author/runtime.json.creator-283-0.ppm",
+        "bytes": 307215,
+        "sha256": "5daf4eafcdb9ccfe6f7f09bd491d4d1b6a68e94547a111129929891fbfebd440"
+      },
+      "cancel/workflow/author/runtime.json.creator-283-1.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/author/runtime.json.creator-283-1.ppm",
+        "bytes": 307215,
+        "sha256": "5834e901f6a3b2f828511eaa409e98f2d6d8849ca456c3be420a032fe23c3a7b"
+      },
+      "cancel/workflow/author/runtime.json.creator-290-0.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/author/runtime.json.creator-290-0.ppm",
+        "bytes": 307215,
+        "sha256": "b821aabd233b3f9d1ba49b68a38fd627803665e4350d6003ab9d0bd1f08f2d2d"
+      },
+      "cancel/workflow/author/runtime.json.creator-290-1.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/author/runtime.json.creator-290-1.ppm",
+        "bytes": 307215,
+        "sha256": "5a315c343ae8308dfb9305d09e7b9e06aa509ae45fefbf2da32eceab064819a3"
+      },
+      "cancel/workflow/author/runtime.json": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/author/runtime.json",
+        "bytes": 58263,
+        "sha256": "d21dd1dfa7b3fbd189a6491aba27f3b3b2ca5297682057f3d70efd7430ec2658"
+      },
+      "cancel/workflow/author/endpoint.log": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/author/endpoint.log",
+        "bytes": 161,
+        "sha256": "0bacdad3fe65840e436db650230d09d873de1196792a620bc4a79f1348043dc1"
+      },
+      "cancel/workflow/reopen/loader.json": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/reopen/loader.json",
+        "bytes": 186,
+        "sha256": "7eab27664b627e1ef1d08bc7115cdb97b0327dbc89b59bfe473c1de81df70be4"
+      },
+      "cancel/workflow/reopen/invocation.json": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/reopen/invocation.json",
+        "bytes": 485,
+        "sha256": "ee0289f270a4bb0aa3b068271f608714904056160b13889b4fe2da6e188c31bb"
+      },
+      "cancel/workflow/reopen/app.log": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/reopen/app.log",
+        "bytes": 820,
+        "sha256": "6ee597f90a978401d06c188e6cdc9ce23ff4baaa3239a0d4129502e1508b2289"
+      },
+      "cancel/workflow/reopen/runtime.json.creator-2-0.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/reopen/runtime.json.creator-2-0.ppm",
+        "bytes": 307215,
+        "sha256": "f27c71f10fe0a80403c824ff00053171c1c5efa3bbb9690056c99e95243e4f98"
+      },
+      "cancel/workflow/reopen/runtime.json.creator-2-1.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/reopen/runtime.json.creator-2-1.ppm",
+        "bytes": 307215,
+        "sha256": "a7111ccee3d2ac2389f6b51cc9b1735bc04192ec179206d8c2d22714b961628c"
+      },
+      "cancel/workflow/reopen/runtime.json.creator-4-0.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/reopen/runtime.json.creator-4-0.ppm",
+        "bytes": 307215,
+        "sha256": "f27c71f10fe0a80403c824ff00053171c1c5efa3bbb9690056c99e95243e4f98"
+      },
+      "cancel/workflow/reopen/runtime.json.creator-4-1.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/reopen/runtime.json.creator-4-1.ppm",
+        "bytes": 307215,
+        "sha256": "a7111ccee3d2ac2389f6b51cc9b1735bc04192ec179206d8c2d22714b961628c"
+      },
+      "cancel/workflow/reopen/runtime.json": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/reopen/runtime.json",
+        "bytes": 8078,
+        "sha256": "137b9d615135fce8bf49fab1a180e8cf7378964d2e878a6c588f060b7d1e32a4"
+      },
+      "cancel/workflow/reopen/endpoint.log": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/reopen/endpoint.log",
+        "bytes": 161,
+        "sha256": "0bacdad3fe65840e436db650230d09d873de1196792a620bc4a79f1348043dc1"
+      },
+      "focus/plan.json": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/plan.json",
+        "bytes": 1172728,
+        "sha256": "24616fa3637f5dc7de8eb2ff58310c3c0b7321c1b7975dfc85221650c3719401"
+      },
+      "focus/status.json": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/status.json",
+        "bytes": 262768,
+        "sha256": "1ec922f6d5d4122604afd243d8469259c889eebbf9f6995aeaffb12827c5aa88"
+      },
+      "focus/dome-sculpt.ldd": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/dome-sculpt.ldd",
+        "bytes": 5280,
+        "sha256": "b9afe993c56e07d6866405580f6273682da7917d0211f8110fd6be0a827d01b6"
+      },
+      "focus/dome-sculpt-creator-workspace-test.ldd": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/dome-sculpt-creator-workspace-test.ldd",
+        "bytes": 1780,
+        "sha256": "eb2ac74ec3cc1a9a8c7a552ee72a0ec9eddd416068cc4ae1d893ec4a17db18a4"
+      },
+      "focus/libdome-sculpt-creator-workspace-runtime.so.ldd": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/libdome-sculpt-creator-workspace-runtime.so.ldd",
+        "bytes": 2072,
+        "sha256": "6ffdc2b49b12b86fc48759928d62793402782cc9455238b11b44b87bc7e6c281"
+      },
+      "focus/device-auth-sanitize.so.ldd": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/device-auth-sanitize.so.ldd",
+        "bytes": 590,
+        "sha256": "114c3d06b4dc663daaee90e78eed00e477a660ecb4be3779cb6eb3691226b5cc"
+      },
+      "focus/process.log": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/process.log",
+        "bytes": 1600,
+        "sha256": "a9922e345a5ba9d0169e46a3a4f1d9a1909a0e8920a7d40b3a4a65176ce12826"
+      },
+      "focus/unit-terminal.txt": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/unit-terminal.txt",
+        "bytes": 7161,
+        "sha256": "82b3009bfc09037154eaa8039154c0ec5cc69067c7de6af56bf35e47263ea915"
+      },
+      "focus/unit-journal.txt": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/unit-journal.txt",
+        "bytes": 429,
+        "sha256": "a7f98760407c6ab246191119e489cf9cc65b49bf723fd942b0289c2f4c654443"
+      },
+      "focus/independent-free.json": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/independent-free.json",
+        "bytes": 67,
+        "sha256": "2f3f7f0d97405306174b71d9feeaef626461c90b42fadb0a00ab348331356c7c"
+      },
+      "focus/workflow/report.json": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/report.json",
+        "bytes": 3730,
+        "sha256": "75606b00085f60959a5ab4cf1f1adbe3c92ef50f96b7146721127b54cafa0c5f"
+      },
+      "focus/actual-device/3388213/context-maps.txt": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/actual-device/3388213/context-maps.txt",
+        "bytes": 61790,
+        "sha256": "2f1e7356b718812c3ebed80f2f37be17983cf92dc43e98799c4557c3e30bf1ea"
+      },
+      "focus/actual-device/3388213/device.txt": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/actual-device/3388213/device.txt",
+        "bytes": 284,
+        "sha256": "82c4ecd4589f8b2780630564e9bb143781a05ccc5874425fecf8ab0fc2a07db6"
+      },
+      "focus/actual-device/3407276/context-maps.txt": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/actual-device/3407276/context-maps.txt",
+        "bytes": 61790,
+        "sha256": "17b546f1dbd7cab8b2e48852f319b9949be83337e76d62d57d103e8f6d11df18"
+      },
+      "focus/actual-device/3407276/device.txt": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/actual-device/3407276/device.txt",
+        "bytes": 284,
+        "sha256": "eab25c0d7f1e256261d4fef9954a36062827fd5c70f7f96059fd68f0072ead76"
+      },
+      "focus/workflow/author/loader.json": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/author/loader.json",
+        "bytes": 186,
+        "sha256": "7eab27664b627e1ef1d08bc7115cdb97b0327dbc89b59bfe473c1de81df70be4"
+      },
+      "focus/workflow/author/invocation.json": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/author/invocation.json",
+        "bytes": 479,
+        "sha256": "1266dc8a6d279ad11785f4e5aefd37322b7cb823e2468d9993f86252a6d3f258"
+      },
+      "focus/workflow/author/app.log": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/author/app.log",
+        "bytes": 829,
+        "sha256": "2066a78a9994e67dae4d915573b8e055a67067bf24d1668545bd34498948dfab"
+      },
+      "focus/workflow/author/runtime.json.maps": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/author/runtime.json.maps",
+        "bytes": 66361,
+        "sha256": "d100f760de1313e61b0f33b51f6b5ada7a50e06854fae0e11c5edad269a44ffb"
+      },
+      "focus/workflow/author/runtime.json.creator-26-0.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/author/runtime.json.creator-26-0.ppm",
+        "bytes": 307215,
+        "sha256": "f27c71f10fe0a80403c824ff00053171c1c5efa3bbb9690056c99e95243e4f98"
+      },
+      "focus/workflow/author/runtime.json.creator-26-1.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/author/runtime.json.creator-26-1.ppm",
+        "bytes": 307215,
+        "sha256": "a7111ccee3d2ac2389f6b51cc9b1735bc04192ec179206d8c2d22714b961628c"
+      },
+      "focus/workflow/author/runtime.json.creator-29-0.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/author/runtime.json.creator-29-0.ppm",
+        "bytes": 307215,
+        "sha256": "5ce90e22e403a046aeb414f0c7cc5882eb350210f672517523c626d7e89d049b"
+      },
+      "focus/workflow/author/runtime.json.creator-29-1.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/author/runtime.json.creator-29-1.ppm",
+        "bytes": 307215,
+        "sha256": "8696ad3bb0fd674fab31333cc7a3fc251e26800c45cbe20c1ca9c1a045511528"
+      },
+      "focus/workflow/author/runtime.json.creator-37-0.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/author/runtime.json.creator-37-0.ppm",
+        "bytes": 307215,
+        "sha256": "5ce90e22e403a046aeb414f0c7cc5882eb350210f672517523c626d7e89d049b"
+      },
+      "focus/workflow/author/runtime.json.creator-37-1.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/author/runtime.json.creator-37-1.ppm",
+        "bytes": 307215,
+        "sha256": "8696ad3bb0fd674fab31333cc7a3fc251e26800c45cbe20c1ca9c1a045511528"
+      },
+      "focus/workflow/author/runtime.json.creator-61-0.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/author/runtime.json.creator-61-0.ppm",
+        "bytes": 307215,
+        "sha256": "ccfbfde97a9726789ad42692232695fae4e84c5c27f46e55c8637cd271e14cd4"
+      },
+      "focus/workflow/author/runtime.json.creator-61-1.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/author/runtime.json.creator-61-1.ppm",
+        "bytes": 307215,
+        "sha256": "9b9e03c77fe615250e7562fb6aff2d8469a5ae506090dc2455d5f3c2dacdc742"
+      },
+      "focus/workflow/author/runtime.json.creator-67-0.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/author/runtime.json.creator-67-0.ppm",
+        "bytes": 307215,
+        "sha256": "cc67bb797e2ef5cbc4870d74edd3696f308f094fefa48191364c43b015b6a0fb"
+      },
+      "focus/workflow/author/runtime.json.creator-67-1.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/author/runtime.json.creator-67-1.ppm",
+        "bytes": 307215,
+        "sha256": "ed488a3b1f9f6d3952cdd600aa5f49fc230d35adfe50076842173caf7a364309"
+      },
+      "focus/workflow/author/runtime.json.creator-73-0.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/author/runtime.json.creator-73-0.ppm",
+        "bytes": 307215,
+        "sha256": "6f3c349b5e3ac832bbdb5349884aab23d41dcaa73f1e675ccb9b8984f78e149a"
+      },
+      "focus/workflow/author/runtime.json.creator-73-1.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/author/runtime.json.creator-73-1.ppm",
+        "bytes": 307215,
+        "sha256": "af93f29f7dcc79259be4d8f3317eb22cbe908e352c095271d8b1d65993f7baab"
+      },
+      "focus/workflow/author/runtime.json.creator-79-0.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/author/runtime.json.creator-79-0.ppm",
+        "bytes": 307215,
+        "sha256": "214c42809e13e3a4d47cce3008cb53acc20d0980e935206164af328076c68fe1"
+      },
+      "focus/workflow/author/runtime.json.creator-79-1.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/author/runtime.json.creator-79-1.ppm",
+        "bytes": 307215,
+        "sha256": "193a725779ff783c57e778d4bcc7e828ce36a4df6bc4e10a4e4aa9185853b663"
+      },
+      "focus/workflow/author/runtime.json.creator-85-0.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/author/runtime.json.creator-85-0.ppm",
+        "bytes": 307215,
+        "sha256": "01b99fc10711c938e8b69e7f4854c591f891d3ee153cf72229ab2cc1b442cece"
+      },
+      "focus/workflow/author/runtime.json.creator-85-1.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/author/runtime.json.creator-85-1.ppm",
+        "bytes": 307215,
+        "sha256": "1111d47bbefa5887108cfa0d878c11b323cf1ed4f98fb68adc8cffabce84d240"
+      },
+      "focus/workflow/author/runtime.json.creator-89-0.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/author/runtime.json.creator-89-0.ppm",
+        "bytes": 307215,
+        "sha256": "9d7138dc3b3df0f8d4767c92e301c7b37e5f9e0f912da01d76f62e10bbec0599"
+      },
+      "focus/workflow/author/runtime.json.creator-89-1.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/author/runtime.json.creator-89-1.ppm",
+        "bytes": 307215,
+        "sha256": "5055e0ac42fd871699ab5fe515f3131404b4cb7344beeb4c2b5a778dd4152932"
+      },
+      "focus/workflow/author/runtime.json.creator-93-0.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/author/runtime.json.creator-93-0.ppm",
+        "bytes": 307215,
+        "sha256": "dfec5541bcba0a796cde9d02019b183e069a2f1d157849119e865496fa5946ee"
+      },
+      "focus/workflow/author/runtime.json.creator-93-1.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/author/runtime.json.creator-93-1.ppm",
+        "bytes": 307215,
+        "sha256": "5c72da8d9103d94712332cd80825c680b0c5eaf67d9a521178058817f76ff77e"
+      },
+      "focus/workflow/author/runtime.json.creator-97-0.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/author/runtime.json.creator-97-0.ppm",
+        "bytes": 307215,
+        "sha256": "959844cf7256d332a12a4f3ff78d8965a08c3a5389a9d5da52e8681c152a48b9"
+      },
+      "focus/workflow/author/runtime.json.creator-97-1.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/author/runtime.json.creator-97-1.ppm",
+        "bytes": 307215,
+        "sha256": "22ec73b3f847b7fdd0f294a0f926ae9de04bf02add2fe27671bd20e40688aaa6"
+      },
+      "focus/workflow/author/runtime.json.creator-115-0.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/author/runtime.json.creator-115-0.ppm",
+        "bytes": 307215,
+        "sha256": "99b19e888c10fba7e4d79defabb88aba0131302e65c9334e9b1a7aa3cbc67c3d"
+      },
+      "focus/workflow/author/runtime.json.creator-115-1.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/author/runtime.json.creator-115-1.ppm",
+        "bytes": 307215,
+        "sha256": "7c4960e393ac1ed3e771fccb4a2b514adef9ded842c211a1d60a0f189a948ec6"
+      },
+      "focus/workflow/author/runtime.json.creator-120-0.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/author/runtime.json.creator-120-0.ppm",
+        "bytes": 307215,
+        "sha256": "26fb692e3ca7fb2c264b20a4e33e119becc452cbf0ca0e57d9bb07091187db9c"
+      },
+      "focus/workflow/author/runtime.json.creator-120-1.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/author/runtime.json.creator-120-1.ppm",
+        "bytes": 307215,
+        "sha256": "a83cec126de8c796cc8dab9e4d6f5bec0f619c75e4be02ea484fc643bfd73b92"
+      },
+      "focus/workflow/author/runtime.json.creator-124-0.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/author/runtime.json.creator-124-0.ppm",
+        "bytes": 307215,
+        "sha256": "37cfffea56b88b69d672cb8b8c06bf4895b2076f298ee5eca083b2c49b63a371"
+      },
+      "focus/workflow/author/runtime.json.creator-124-1.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/author/runtime.json.creator-124-1.ppm",
+        "bytes": 307215,
+        "sha256": "cda674887d9fc289195b4a40b74bcdd2a75cb48c28fe3fb071367ab1da4cdb60"
+      },
+      "focus/workflow/author/runtime.json.creator-130-0.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/author/runtime.json.creator-130-0.ppm",
+        "bytes": 307215,
+        "sha256": "b821aabd233b3f9d1ba49b68a38fd627803665e4350d6003ab9d0bd1f08f2d2d"
+      },
+      "focus/workflow/author/runtime.json.creator-130-1.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/author/runtime.json.creator-130-1.ppm",
+        "bytes": 307215,
+        "sha256": "5a315c343ae8308dfb9305d09e7b9e06aa509ae45fefbf2da32eceab064819a3"
+      },
+      "focus/workflow/author/runtime.json.creator-137-0.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/author/runtime.json.creator-137-0.ppm",
+        "bytes": 307215,
+        "sha256": "b821aabd233b3f9d1ba49b68a38fd627803665e4350d6003ab9d0bd1f08f2d2d"
+      },
+      "focus/workflow/author/runtime.json.creator-137-1.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/author/runtime.json.creator-137-1.ppm",
+        "bytes": 307215,
+        "sha256": "5a315c343ae8308dfb9305d09e7b9e06aa509ae45fefbf2da32eceab064819a3"
+      },
+      "focus/workflow/author/runtime.json.creator-275-0.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/author/runtime.json.creator-275-0.ppm",
+        "bytes": 307215,
+        "sha256": "b821aabd233b3f9d1ba49b68a38fd627803665e4350d6003ab9d0bd1f08f2d2d"
+      },
+      "focus/workflow/author/runtime.json.creator-275-1.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/author/runtime.json.creator-275-1.ppm",
+        "bytes": 307215,
+        "sha256": "5a315c343ae8308dfb9305d09e7b9e06aa509ae45fefbf2da32eceab064819a3"
+      },
+      "focus/workflow/author/runtime.json.creator-279-0.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/author/runtime.json.creator-279-0.ppm",
+        "bytes": 307215,
+        "sha256": "b821aabd233b3f9d1ba49b68a38fd627803665e4350d6003ab9d0bd1f08f2d2d"
+      },
+      "focus/workflow/author/runtime.json.creator-279-1.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/author/runtime.json.creator-279-1.ppm",
+        "bytes": 307215,
+        "sha256": "5a315c343ae8308dfb9305d09e7b9e06aa509ae45fefbf2da32eceab064819a3"
+      },
+      "focus/workflow/author/runtime.json.creator-283-0.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/author/runtime.json.creator-283-0.ppm",
+        "bytes": 307215,
+        "sha256": "b821aabd233b3f9d1ba49b68a38fd627803665e4350d6003ab9d0bd1f08f2d2d"
+      },
+      "focus/workflow/author/runtime.json.creator-283-1.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/author/runtime.json.creator-283-1.ppm",
+        "bytes": 307215,
+        "sha256": "5a315c343ae8308dfb9305d09e7b9e06aa509ae45fefbf2da32eceab064819a3"
+      },
+      "focus/workflow/author/runtime.json.creator-290-0.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/author/runtime.json.creator-290-0.ppm",
+        "bytes": 307215,
+        "sha256": "b821aabd233b3f9d1ba49b68a38fd627803665e4350d6003ab9d0bd1f08f2d2d"
+      },
+      "focus/workflow/author/runtime.json.creator-290-1.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/author/runtime.json.creator-290-1.ppm",
+        "bytes": 307215,
+        "sha256": "5a315c343ae8308dfb9305d09e7b9e06aa509ae45fefbf2da32eceab064819a3"
+      },
+      "focus/workflow/author/runtime.json": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/author/runtime.json",
+        "bytes": 56247,
+        "sha256": "f5991c245de98e5b7b3fcba27f6ba6169126651a4e2ed11b0c9c840be6f98c49"
+      },
+      "focus/workflow/author/endpoint.log": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/author/endpoint.log",
+        "bytes": 161,
+        "sha256": "0bacdad3fe65840e436db650230d09d873de1196792a620bc4a79f1348043dc1"
+      },
+      "focus/workflow/reopen/loader.json": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/reopen/loader.json",
+        "bytes": 186,
+        "sha256": "7eab27664b627e1ef1d08bc7115cdb97b0327dbc89b59bfe473c1de81df70be4"
+      },
+      "focus/workflow/reopen/invocation.json": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/reopen/invocation.json",
+        "bytes": 482,
+        "sha256": "179cd275c5b064787c91616adadf4f1923cc77775e8f74eefc4e5d1fd1cce92b"
+      },
+      "focus/workflow/reopen/app.log": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/reopen/app.log",
+        "bytes": 820,
+        "sha256": "6ee597f90a978401d06c188e6cdc9ce23ff4baaa3239a0d4129502e1508b2289"
+      },
+      "focus/workflow/reopen/runtime.json.creator-2-0.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/reopen/runtime.json.creator-2-0.ppm",
+        "bytes": 307215,
+        "sha256": "f27c71f10fe0a80403c824ff00053171c1c5efa3bbb9690056c99e95243e4f98"
+      },
+      "focus/workflow/reopen/runtime.json.creator-2-1.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/reopen/runtime.json.creator-2-1.ppm",
+        "bytes": 307215,
+        "sha256": "a7111ccee3d2ac2389f6b51cc9b1735bc04192ec179206d8c2d22714b961628c"
+      },
+      "focus/workflow/reopen/runtime.json.creator-4-0.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/reopen/runtime.json.creator-4-0.ppm",
+        "bytes": 307215,
+        "sha256": "f27c71f10fe0a80403c824ff00053171c1c5efa3bbb9690056c99e95243e4f98"
+      },
+      "focus/workflow/reopen/runtime.json.creator-4-1.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/reopen/runtime.json.creator-4-1.ppm",
+        "bytes": 307215,
+        "sha256": "a7111ccee3d2ac2389f6b51cc9b1735bc04192ec179206d8c2d22714b961628c"
+      },
+      "focus/workflow/reopen/runtime.json": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/reopen/runtime.json",
+        "bytes": 8074,
+        "sha256": "48b30c32f150cbb96831f24e12fa1bbe2d5b42651eab81e734152dc6ced55608"
+      },
+      "focus/workflow/reopen/endpoint.log": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/reopen/endpoint.log",
+        "bytes": 161,
+        "sha256": "0bacdad3fe65840e436db650230d09d873de1196792a620bc4a79f1348043dc1"
+      },
+      "support/seal-strict-routing.py": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/seal-strict-routing.py",
+        "bytes": 3969,
+        "sha256": "c3220f737e14ef10e3e02d71daa7251cb4d84708d1df1a4491a3f98825cf8848"
+      },
+      "support/run-public-sanitize-v2.py": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/run-public-sanitize-v2.py",
+        "bytes": 9386,
+        "sha256": "171741322097d57b9dcecf6381348ca53661e0ab8decce46260815924d2c86d7"
+      },
+      "support/provider-witness-v3.py": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/provider-witness-v3.py",
+        "bytes": 7097,
+        "sha256": "942e7b3fd8a780502cc44f0f8b5c4c68c78276ae2a67ae0a0df8c3ee94a2f049"
+      },
+      "support/owned-monitor.py": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/owned-monitor.py",
+        "bytes": 4859,
+        "sha256": "b510ef5655e3214bd38e7b5f56022c37a79879070c3733f2dd059bad74f21269"
+      },
+      "support/Xvfb": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/private-bin-v3/Xvfb",
+        "bytes": 316,
+        "sha256": "2d4222db83ea4fdc74f6c5216856c65a78500504dc365c9bd3b64bd11a5c28fb"
+      },
+      "support/sanitize-review.json": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/sanitize-review.json",
+        "bytes": 102390,
+        "sha256": "5b07217b2fc0c31fbe5551b7411bc2aeb04cdd1eb1174c7826fe1dd010e372fe"
+      },
+      "support/device-auth-sanitize-build.json": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/device-auth-sanitize-build.json",
+        "bytes": 1416,
+        "sha256": "5d47450612943bfbf10ea244f7cb9154825c06608869404b64682db15c98652b"
+      },
+      "fixture/creator-workspace-xr.py": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-creator-public-resume-20261126/tests/creator-workspace-xr.py",
+        "bytes": 6487,
+        "sha256": "a24374e9ee984e00de94e8256e14c4acc4119dd783c27f7f40d822d332eb6219"
+      },
+      "fixture/creator-workspace.cpp": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-creator-public-resume-20261126/tests/creator-workspace.cpp",
+        "bytes": 24590,
+        "sha256": "e8fb61ff7ca6f128d943cc7123b72ec909e89211820e312aa10d3f29484d6760"
+      },
+      "fixture/creator-workspace-runtime.cpp": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-creator-public-resume-20261126/tests/creator-workspace-runtime.cpp",
+        "bytes": 113987,
+        "sha256": "99b441dab8b7261c5f695d6454591f0c0b78aa7fb0659301a272916684f6edbf"
+      }
+    }
+  },
+  "external_native_projects": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/author/final.dsculpt": {
+      "bytes": 133738656,
+      "sha256": "7e29a66885d7607e67e89418db75b4f29775907385a294439c9310c9ca458430"
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-cancel-v1/workflow/reopen/final.dsculpt": {
+      "bytes": 133738656,
+      "sha256": "7e29a66885d7607e67e89418db75b4f29775907385a294439c9310c9ca458430"
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/author/final.dsculpt": {
+      "bytes": 133738656,
+      "sha256": "7e29a66885d7607e67e89418db75b4f29775907385a294439c9310c9ca458430"
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/strict-public-focus-v1/workflow/reopen/final.dsculpt": {
+      "bytes": 133738656,
+      "sha256": "7e29a66885d7607e67e89418db75b4f29775907385a294439c9310c9ca458430"
+    }
+  }
+}

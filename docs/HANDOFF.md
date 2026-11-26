@@ -37,24 +37,29 @@ read [the toolkit record](CURRENT-TOOLKIT-20261126.md).
 Creator's fresh clock regression passes6014 checks. The current05 application's
 actual Arc XR accept/cancel/focus workflows and ordinary fresh-App reopen now
 pass58 checks. The [creator XR receipt](CREATOR-CURRENT-PUBLIC-XR-20261126.md)
-records the six application processes and the matched sanitizer build. Desktop's
-first private-Xvfb wrapper fails on read-only temporary
-socket storage before App functionality; its isolated wrapper correction and
-runtime remain pending. The prior-authored stress fixture
+records the six application processes and the matched sanitizer build. The strict
+accept and desktop workflows passed 19 and 14 checks respectively. The accept
+wrapper miscounted exit-time descendants after the actual checks passed. Both
+strict cancel and focus-loss/regain passed their complete wrappers, with 19 and
+20 checks. Read [public creator validation](CREATOR-CURRENT-PUBLIC-STRICT-20261126.md)
+and [cancellation and focus validation](CREATOR-CURRENT-PUBLIC-STRICT-ROUTING-20261126.md).
+The prior-authored stress fixture
 moves the head joint5m, so its cropped screenshot does not establish ordinary
 default-base presentation quality.
 
-Genuine2048 HDR now reaches a further128MiB paint-channel allocation refusal
-after the provenance fix. A new isolated87729adb worker avoids the discarded
-112MiB field using a certified actual retained source domain; build/audit passes,
-end-to-end qualification remains pending. Sculpt's new workflow first exposes
+The HDR2048 path first reached a 128 MiB paint-channel allocation refusal
+after the provenance fix. The isolated worker avoids the discarded 112 MiB
+field with a certified retained source domain. The later combined qualification
+is recorded below. Sculpt's new workflow first exposed
 an invalid mask-brush fixture, then an inappropriate initial mesh wait after
 file-only recovery catalogue refresh. Correct those fixtures without weakening
 product guards. The corrected full-size native sculpt workflow now passes167
 Release checks in49.304s, including cold reopening and durable recovery, with
 peak owned RSS3847172096 below4GiB. Root independently rehashes all518 archived
 and current authorities; read [the scoped proof](SCULPT-INDEPENDENT-NATIVE-20261126.md).
-Strict runtime and original sustained independent Arc acceptance remain pending.
+The production-size strict sculpt run exceeded 4 GiB after completing recovery
+and fitting the exact cold-capture quota. Original sustained independent Arc
+qualification and the new fixture lifetime comparison remain open.
 
 Inspect live units before taking action. Graphics, display and loader validation
 jobs take the common nonblocking lease, with no idle reservation. Confirmed
@@ -90,12 +95,22 @@ Bake reached a further `Baked maps exceed paint storage budget` refusal.
 Component `725ea100` shares identical immutable intrinsic normal images and
 retains recipes in the texture-set archive. Its Release cohort passes 111,306
 checks, including the full 2048 and 512 inputs, export and historical replay.
+Read [HDR source closure](HDR-SOURCE-CLOSURE-RELEASE-20261126.md) for the
+component, source-projection fixture and independent exporter evidence.
 The new combined candidate `9e4f79f6` builds all 294 selected actions with
 261 complete translation units, 14 verified archives and 16 outputs. The
-native eight-test HDR and recipe gate is running under
-`ds-production-hdr-combined-native-20261126.service`, invocation
-`1e3a3ccded554518884279e9d643d9b8`. The independent projection test fixture
-still needs its corrected source frame before runtime.
+eight native HDR and recipe tests passed in 229.77 seconds, including full
+2048, export and historical replay. Read the
+[combined native and loader receipt](validation/combined-native-and-open-20261126.json).
+Whole Release build `c26a8573` includes the corrected projection fixture and
+uses identical product source. The current build plan covers all default
+targets and both independent sculpt fixtures. Check
+`ds-production-full-regression-release-20261126.service` and
+`artifacts/production-full-regression-release-20261126/build-status.json`
+for its actual result. The combined candidate's nested Wayland App completed
+all 14 assertions. The wrapper later refused a deleted non-executable Mesa
+shared mapping belonging to the compositor. Whole-wrapper acceptance remains
+open.
 The isolated integration candidate
 `5604ad54` combines current05, HDR877, sculpt6d/fe94 and corrected creator
 fixtures550. The [fresh Release build](COMBINED-RELEASE-BUILD-20261126.md) for
@@ -107,8 +122,9 @@ the application and 13 selected fixtures passed all 290 actions in
 allocator environment under its original 4 GiB limit. The build record links
 the first memory refusal and the runtime observer correction. The combined
 renderer passes 4,422 retained HDR checks each on software and Intel Arc with
-the corrected fixture. Public Wayland and XR, and full HDR 2048 Bake, are
-pending. The branch is
+the corrected fixture. This exact App also passed all
+[14 nested DomeD native Wayland checks](COMBINED5604-NATIVE-WAYLAND-20261126.md)
+on Intel Arc. The branch is
 `work/production-resume-integration-20261126`.
 The [streamed native Save experiment](validation/stream-native-save-experiment-20261126.json)
 preserves atomic replacement, recovery and the exact 50,061,799-byte project.
@@ -116,6 +132,20 @@ The default-allocator sculpt workflow still exceeds 4 GiB. The matched
 allocator run passes all 167 checks. The save-only probe measures similar
 memory peaks for the original and streamed writers on this project, so the
 change remains on its experimental branch.
+
+Bounded native Open `9368689d` reads CBOR in 64 KiB chunks directly from
+the project file and checks cancellation and the existing size cap on refill.
+Editable GLB package loading retains random access. File and recovery tests
+pass 20 and 21 checks against the combined Release core and an independently
+linked strict component with equivalent loader bytes. The first build plan
+used a colliding output basename. The successful build uses distinct core and
+test output directories. Earlier count observers reported failures after
+successful test exits. The corrected strict driver verifies every check.
+Isolated Open lowers peak RSS from 1,268,932 to 1,220,144 KiB on the sculpt
+project and from 1,041,932 to 921,436 KiB on the HDR project. Normal Save
+reproduces both input files byte for byte. The same combined full-size sculpt
+workflow still exceeds 4 GiB with the default allocator. The Open change is
+on `work/stream-native-open-20261126`. Main runtime admission is unchanged.
 Full scope in REQUIREMENTS is unchanged.
 
 ## Source and integration boundary
