@@ -882,7 +882,7 @@ void dense_editable_export(const std::filesystem::path &out){
   std::cout<<"DENSE_EDITABLE "<<bytes.size()<<" container bytes; native source exact\n";
 }
 
-void dense_hdr_first_key(const std::filesystem::path &out){
+void dense_hdr_first_key(const std::filesystem::path &out,bool varied){
   auto scene=Scene::load(out/"retained-2048.dsculpt");
   const auto donor=std::find_if(scene.objects().begin(),scene.objects().end(),[](const auto &o){
     return !o.visible&&o.name=="Hidden high source"&&bool(o.painted);
@@ -890,13 +890,26 @@ void dense_hdr_first_key(const std::filesystem::path &out){
   require(donor!=scene.objects().end(),"The actual matching HDR probe donor is available");
   constexpr std::array<float,3> radiance{8.f,.125f,2.5f};
   const auto donor_id=donor->id;
-  scene.object(donor_id).material.emissive=radiance;
+  auto &source=scene.object(donor_id);
+  source.material.emissive=radiance;
+  if(varied){
+    auto paint=source.painted->snapshot();
+    paint->add_layer("Spatially varying physical donor");
+    PaintSettings ink;ink.channel=PaintChannel::Emission;ink.emission_units=PaintEmissionUnits::Physical;
+    ink.emission={15,.6f,4};ink.front_only=false;
+    Brush brush;brush.from={-.2f,.14f,.02f};brush.to={.21f,-.14f,.02f};brush.normal={0,0,1};
+    brush.radius=.21f;brush.strength=.73f;
+    paint->begin_stroke();paint->stamp(brush,ink);
+    require(paint->end_stroke()&&paint->has_physical_emission(),"The hidden donor carries painted physical radiance");
+    source.painted=std::move(paint);
+  }
   auto options=settings();
   options.prepare_normals=false;
   options.corresponding_topology=true;
-  const auto baked_file=out/"baked-2048-hdr.dsculpt";
-  const auto keyed_file=out/"keyed-2048-hdr.dsculpt";
-  const auto restored_file=out/"restored-2048-hdr.dsculpt";
+  const std::string suffix=varied?"-2048-varied-hdr.dsculpt":"-2048-hdr.dsculpt";
+  const auto baked_file=out/("baked"+suffix);
+  const auto keyed_file=out/("keyed"+suffix);
+  const auto restored_file=out/("restored"+suffix);
   const auto verified=[&](const Scene &endpoint){
     const auto baked=endpoint.active().painted->baked();
     require(baked&&baked->emission_field&&baked->maps.emission.rgba.empty()&&
@@ -906,8 +919,13 @@ void dense_hdr_first_key(const std::filesystem::path &out){
         "Full-resolution baked paint retains a compact independent FLOAT field");
     for(const size_t i:{size_t(0),size_t(2048*1024),size_t(2048*2048-1)}){
       const auto sample=baked->emission_field->texel(i);
-      require(sample.coverage==1&&sample.absolute==radiance&&sample.legacy==std::array<float,3>{},
+      require(sample.coverage==1&&(varied||sample.absolute==radiance)&&sample.legacy==std::array<float,3>{},
           "Physical radiance and full coverage round-trip without quantization");
+    }
+    if(varied){
+      const auto &field=*baked->emission_field;
+      require(field.storage().varying_mask==56&&field.texel(1024u*2048+1024u).absolute!=radiance,
+          "The full Bake keeps three independently varying FLOAT channels");
     }
   };
   {
@@ -937,13 +955,34 @@ void dense_hdr_first_key(const std::filesystem::path &out){
     Document doc;
     doc.open(keyed_file);
     require(doc.wait_mesh()&&doc.frame().state->can_select_shape,"Cold HDR key reopen restores editable geometry");
-    verified(doc.copy_scene());
+    {
+      const auto reopened=doc.copy_scene();
+      verified(reopened);
+      const auto &o=reopened.active();
+      require(o.shape_source&&o.material_bindings&&o.material_bindings->native_paint_frames&&
+          o.shape_source->paint->baked()==o.painted->baked()&&
+          o.material_bindings->native_paint_frames->before_paint()->baked()==o.painted->baked(),
+          "The current shape and both predecessors share exactly one decoded Bake owner");
+      if(varied){
+        auto archive=reopened.encode();
+        require(archive.at("version")==44&&archive.at("shared_bakes").size()==1&&
+            std::filesystem::file_size(keyed_file)<128*1024*1024,
+            "The full shared field is stored once in the native archive");
+        auto &domain=archive.at("shared_bakes").at(0).at("domain");
+        domain=domain.get<uint32_t>()+1;
+        bool rejected=false;
+        try{(void)Scene::decode(archive);}catch(const std::invalid_argument &e){
+          rejected=std::string_view(e.what()).find("another native paint domain")!=std::string_view::npos;
+        }
+        require(rejected,"A foreign paint domain cannot borrow that shared Bake");
+      }
+    }
     edit.action=ShapeKeyAction::Restore;
     doc.author_shape(edit);
     doc.save_async(restored_file).get();
     require(same_file(restored_file,baked_file),"Shape Restore reproduces the complete physical Bake project");
   }
-  std::cout<<"DENSE_HDR_FIRST_KEY "<<std::filesystem::file_size(keyed_file)<<" archive bytes; Restore exact\n";
+  std::cout<<"DENSE_HDR_FIRST_KEY varied="<<varied<<' '<<std::filesystem::file_size(keyed_file)<<" archive bytes; Restore exact\n";
 }
 }
 int main(int argc,char **argv) try {
@@ -1001,8 +1040,8 @@ int main(int argc,char **argv) try {
    std::cout<<"PASS "<<writable_source::checks<<" full-resolution Editable GLB checks\n";
    return 0;
  }
- if(argc==3&&std::string_view(argv[1])=="--dense-hdr-first-key"){
-   writable_source::dense_hdr_first_key(argv[2]);
+ if(argc==3&&(std::string_view(argv[1])=="--dense-hdr-first-key"||std::string_view(argv[1])=="--dense-varied-hdr-first-key")){
+   writable_source::dense_hdr_first_key(argv[2],std::string_view(argv[1])=="--dense-varied-hdr-first-key");
    std::cout<<"PASS "<<writable_source::checks<<" full-resolution physical Bake and shapekey checks\n";
    return 0;
  }

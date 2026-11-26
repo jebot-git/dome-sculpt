@@ -31,6 +31,7 @@
 #include "native-read-scope.hpp"
 #include "native-grid-composite-work.hpp"
 #include "scene-paint-raster.hpp"
+#include "scene-bake-archive.hpp"
 #include "native-bake-conversion.hpp"
 #include "native-paint-bake.hpp"
 #include "native-paint-frame-source.hpp"
@@ -3998,41 +3999,45 @@ nlohmann::json PaintedMesh::encode_impl(PaintImageArchive *archive,NormalSamplin
     }
   }
   if (baked_) {
-    j["baked"] = {{"version", 1},
-                    {"color", nlohmann::json::binary(baked_->maps.color.rgba)},
-                    {"orm", nlohmann::json::binary(baked_->maps.metal_rough.rgba)},
-                    {"emission", nlohmann::json::binary(baked_->maps.emission.rgba)},
-                    {"normal", nlohmann::json::binary(baked_->maps.normal.rgba)},
-                    {"coverage", nlohmann::json::binary(baked_->coverage)}};
-    if(baked_->color_interpretation==BakedColorInterpretation::ResolvedPbr) {
-      j["baked"]["version"]=2;j["baked"]["color_interpretation"]="resolved-pbr";
-      j["baked"]["pbr_color"]=nlohmann::json::binary(baked_->maps.pbr_color.rgba);
-    }
-    if(baked_->normal_interpretation==BakedNormalInterpretation::NativeAttributes){
-      j["baked"]["version"]=3;j["baked"]["normal_interpretation"]="native-attributes-v1";
-      j["baked"]["mtoon_normal"]=nlohmann::json::binary({});
-    }else if(baked_->normal_interpretation==BakedNormalInterpretation::PreparedAttributes){
-      j["baked"]["version"]=3;j["baked"]["normal_interpretation"]="prepared-attributes-v1";
-      j["baked"]["mtoon_normal"]=nlohmann::json::binary(baked_->maps.mtoon_normal.rgba);
-    }
-    if(baked_->normal_authority){
-      if(!domains||!normal_projection_||normal_projection_->version!=2)
-        throw std::invalid_argument("Retained normal bake requires its own sampling model");
-      j["baked"]["version"]=4;
-      j["baked"]["normal_interpretation"]="retained-field-metadata-v1";
-      j["baked"]["normal_authority"]=domains->add_detail(baked_->normal_authority);
-    }
-    if(baked_->normal_field){
-      if(!archive)throw std::invalid_argument("Independent baked normal persistence needs the actual Scene33 image archive");
-      j["baked"]["version"]=5;j["baked"]["normal_interpretation"]="independent-baked-field-v1";
-      j["baked"]["normal_field"]=detail::BakedNormalArchive::writer().add_field(baked_->normal_field);
-    }
-    if(baked_->emission_field){
-      j["baked"]["base_version"]=j["baked"]["version"];
-      j["baked"]["version"]=6;
-      j["baked"]["float_emission"]=nlohmann::json::binary(baked_->emission_field->encode());
-      detail::BakedEmissionWriteScope::field_emitted(archive);
-    }
+    const auto encode_bake=[&]{
+      nlohmann::json field= {{"version", 1},
+                      {"color", nlohmann::json::binary(baked_->maps.color.rgba)},
+                      {"orm", nlohmann::json::binary(baked_->maps.metal_rough.rgba)},
+                      {"emission", nlohmann::json::binary(baked_->maps.emission.rgba)},
+                      {"normal", nlohmann::json::binary(baked_->maps.normal.rgba)},
+                      {"coverage", nlohmann::json::binary(baked_->coverage)}};
+      if(baked_->color_interpretation==BakedColorInterpretation::ResolvedPbr) {
+        field["version"]=2;field["color_interpretation"]="resolved-pbr";
+        field["pbr_color"]=nlohmann::json::binary(baked_->maps.pbr_color.rgba);
+      }
+      if(baked_->normal_interpretation==BakedNormalInterpretation::NativeAttributes){
+        field["version"]=3;field["normal_interpretation"]="native-attributes-v1";
+        field["mtoon_normal"]=nlohmann::json::binary({});
+      }else if(baked_->normal_interpretation==BakedNormalInterpretation::PreparedAttributes){
+        field["version"]=3;field["normal_interpretation"]="prepared-attributes-v1";
+        field["mtoon_normal"]=nlohmann::json::binary(baked_->maps.mtoon_normal.rgba);
+      }
+      if(baked_->normal_authority){
+        if(!domains||!normal_projection_||normal_projection_->version!=2)
+          throw std::invalid_argument("Retained normal bake requires its own sampling model");
+        field["version"]=4;
+        field["normal_interpretation"]="retained-field-metadata-v1";
+        field["normal_authority"]=domains->add_detail(baked_->normal_authority);
+      }
+      if(baked_->normal_field){
+        if(!archive)throw std::invalid_argument("Independent baked normal persistence needs the actual Scene33 image archive");
+        field["version"]=5;field["normal_interpretation"]="independent-baked-field-v1";
+        field["normal_field"]=detail::BakedNormalArchive::writer().add_field(baked_->normal_field);
+      }
+      if(baked_->emission_field){
+        field["base_version"]=field["version"];
+        field["version"]=6;
+        field["float_emission"]=nlohmann::json::binary(baked_->emission_field->encode());
+        detail::BakedEmissionWriteScope::field_emitted(archive);
+      }
+      return field;
+    };
+    j["baked"]=detail::SharedBakeWriter::encode(*this,archive,[&]{return paint_domains->add(sampling);},encode_bake);
   }
   if(source_sampling_prepared()) {
     if(sampling||color_projection_||normal_projection_||surface_->diagnostics.policy!=PaintUvPolicy::Strict||!valid_source_sampling_attachment())
@@ -4384,84 +4389,97 @@ std::shared_ptr<PaintedMesh> PaintedMesh::decode_impl(const nlohmann::json &inpu
      (result->allocated_tiles_||result->allocated_color_tiles_||result->baked_||j.contains("baked")))
     throw std::invalid_argument("Paint on independent original coordinates requires its actual Paint4 owner");
   if (j.contains("baked")) {
-    const auto &v = j.at("baked");
-    if(v.contains("normal_authority")&&!domains)
-      throw std::invalid_argument("Retained normal bake requires a complete owning sampling archive context");
-    const auto baked_version=detail::baked_legacy_version(v,context.baked_emission);
-    const bool floating=v.at("version")==6;
-    const bool retained=baked_version==4;
-    const bool layered=baked_version==5;
-    if(layered){
-      (void)detail::BakedNormalArchive::reader();
-      if(!v.contains("normal_field")||v.at("normal_interpretation")!="independent-baked-field-v1"||result->normal_projection_)
-        throw std::invalid_argument("Independent baked field has contradictory intrinsic/normal ownership");
-    }else if(v.contains("normal_field"))throw std::invalid_argument("Independent baked reference requires payload5/Scene33");
-    if(retained&&(!domains||!v.contains("normal_authority")||!result->normal_projection_||result->normal_projection_->version!=2))
-      throw std::invalid_argument("Retained normal metadata requires complete paired field context");
-    if(!retained&&v.contains("normal_authority"))
-      throw std::invalid_argument("Normal event identity requires baked metadata4");
-    if(baked_version==1 && (v.contains("color_interpretation") || v.contains("pbr_color")))throw std::runtime_error("Resolved baked colors require baked payload2");
-    uint32_t r = result->resolution();
-    auto bytes = [&](const char *key, size_t count, bool optional = false) {
-      const auto &value = v.at(key);
-      if (!value.is_binary() ||
-          (value.get_binary().size() != count && !(optional && value.get_binary().empty())))
-        throw std::runtime_error("Invalid persisted baked image or coverage buffer");
-      return std::vector<uint8_t>(value.get_binary().begin(), value.get_binary().end());
-    };
-    BakedTextures baked;
-    if(floating){
-      detail::baked_float_preflight(v,r,context.baked_emission);
-      baked.emission_field=BakedEmissionField::decode(v.at("float_emission").get_binary(),
-        {128*1024*1024,[]{detail::NativeReadScope::check();return false;}});
-    }
-    baked.maps.color = {r, r, bytes("color", size_t(r)*r*4)};
-    baked.maps.metal_rough = {r, r, bytes("orm", size_t(r)*r*4)};
-    if(!floating)baked.maps.emission = {r, r, bytes("emission", size_t(r)*r*4)};
-    auto normal = bytes("normal", size_t(r)*r*4, true);
-    if (!normal.empty()) baked.maps.normal = {r, r, std::move(normal)};
-    baked.coverage = bytes("coverage", size_t(r)*r);
-    if(baked_version!=3&&!retained&&!layered&&(v.contains("normal_interpretation")||v.contains("mtoon_normal")))throw std::runtime_error("Prepared normals require baked payload3");
-    if(baked_version==2||((baked_version==3||retained||layered)&&(v.contains("color_interpretation")||v.contains("pbr_color")))) {
-      if(v.at("color_interpretation")!="resolved-pbr")throw std::runtime_error("Unknown baked color interpretation");
-      baked.color_interpretation=BakedColorInterpretation::ResolvedPbr;baked.maps.pbr_color={r,r,bytes("pbr_color",size_t(r)*r*4)};
-    }
-    if(baked_version==3||retained){
-      const auto &kind=v.at("normal_interpretation");
-      if(!retained&&kind=="native-attributes-v1")baked.normal_interpretation=BakedNormalInterpretation::NativeAttributes;
-      else {
-        if(!kind.is_string()||kind.get_ref<const std::string&>()!=(retained?"retained-field-metadata-v1":"prepared-attributes-v1"))
-          throw std::runtime_error("Unknown baked normal interpretation");
-        baked.normal_interpretation=BakedNormalInterpretation::PreparedAttributes;
+    const auto shared=detail::shared_bake_for(record,j,result->resolution(),context.baked_emission);
+    const auto &v=shared?*shared->record:j.at("baked");
+    if(shared&&(!archive||independent||membership||polygon||result->baked_||
+        !result->paint_sampling_domain()||result->paint_sampling_domain()->version()!=1||
+        !result->valid_paint_sampling_attachment()))
+      throw std::invalid_argument("Shared baked field needs its authenticated native raster");
+    if(shared&&shared->owner){
+      result->baked_=shared->owner;
+      result->composite_token_=next_composite_token();
+      ++result->revision_;
+    }else{
+      if(v.contains("normal_authority")&&!domains)
+        throw std::invalid_argument("Retained normal bake requires a complete owning sampling archive context");
+      const auto baked_version=detail::baked_legacy_version(v,context.baked_emission);
+      const bool floating=v.at("version")==6;
+      const bool retained=baked_version==4;
+      const bool layered=baked_version==5;
+      if(layered){
+        (void)detail::BakedNormalArchive::reader();
+        if(!v.contains("normal_field")||v.at("normal_interpretation")!="independent-baked-field-v1"||result->normal_projection_)
+          throw std::invalid_argument("Independent baked field has contradictory intrinsic/normal ownership");
+      }else if(v.contains("normal_field"))throw std::invalid_argument("Independent baked reference requires payload5/Scene33");
+      if(retained&&(!domains||!v.contains("normal_authority")||!result->normal_projection_||result->normal_projection_->version!=2))
+        throw std::invalid_argument("Retained normal metadata requires complete paired field context");
+      if(!retained&&v.contains("normal_authority"))
+        throw std::invalid_argument("Normal event identity requires baked metadata4");
+      if(baked_version==1 && (v.contains("color_interpretation") || v.contains("pbr_color")))throw std::runtime_error("Resolved baked colors require baked payload2");
+      uint32_t r = result->resolution();
+      auto bytes = [&](const char *key, size_t count, bool optional = false) {
+        const auto &value = v.at(key);
+        if (!value.is_binary() ||
+            (value.get_binary().size() != count && !(optional && value.get_binary().empty())))
+          throw std::runtime_error("Invalid persisted baked image or coverage buffer");
+        return std::vector<uint8_t>(value.get_binary().begin(), value.get_binary().end());
+      };
+      BakedTextures baked;
+      if(floating){
+        detail::baked_float_preflight(v,r,context.baked_emission);
+        baked.emission_field=BakedEmissionField::decode(v.at("float_emission").get_binary(),
+          {128*1024*1024,[]{detail::NativeReadScope::check();return false;}});
       }
-      auto normal=bytes("mtoon_normal",size_t(r)*r*4,true);if(!normal.empty())baked.maps.mtoon_normal={r,r,std::move(normal)};
+      baked.maps.color = {r, r, bytes("color", size_t(r)*r*4)};
+      baked.maps.metal_rough = {r, r, bytes("orm", size_t(r)*r*4)};
+      if(!floating)baked.maps.emission = {r, r, bytes("emission", size_t(r)*r*4)};
+      auto normal = bytes("normal", size_t(r)*r*4, true);
+      if (!normal.empty()) baked.maps.normal = {r, r, std::move(normal)};
+      baked.coverage = bytes("coverage", size_t(r)*r);
+      if(baked_version!=3&&!retained&&!layered&&(v.contains("normal_interpretation")||v.contains("mtoon_normal")))throw std::runtime_error("Prepared normals require baked payload3");
+      if(baked_version==2||((baked_version==3||retained||layered)&&(v.contains("color_interpretation")||v.contains("pbr_color")))) {
+        if(v.at("color_interpretation")!="resolved-pbr")throw std::runtime_error("Unknown baked color interpretation");
+        baked.color_interpretation=BakedColorInterpretation::ResolvedPbr;baked.maps.pbr_color={r,r,bytes("pbr_color",size_t(r)*r*4)};
+      }
+      if(baked_version==3||retained){
+        const auto &kind=v.at("normal_interpretation");
+        if(!retained&&kind=="native-attributes-v1")baked.normal_interpretation=BakedNormalInterpretation::NativeAttributes;
+        else {
+          if(!kind.is_string()||kind.get_ref<const std::string&>()!=(retained?"retained-field-metadata-v1":"prepared-attributes-v1"))
+            throw std::runtime_error("Unknown baked normal interpretation");
+          baked.normal_interpretation=BakedNormalInterpretation::PreparedAttributes;
+        }
+        auto normal=bytes("mtoon_normal",size_t(r)*r*4,true);if(!normal.empty())baked.maps.mtoon_normal={r,r,std::move(normal)};
+      }
+      if(layered){
+        const auto &reference=v.at("normal_field");
+        if((!reference.is_number_unsigned()&&(!reference.is_number_integer()||reference.get<int64_t>()<0))||reference.get<uint64_t>()>UINT32_MAX)throw std::invalid_argument("Invalid independent baked normal reference");
+        baked.normal_interpretation=BakedNormalInterpretation::PreparedAttributes;
+        baked.normal_field=detail::BakedNormalArchive::reader().field_at(reference.get<uint32_t>());
+      }
+      if(retained){
+        const auto &reference=v.at("normal_authority");
+        if((!reference.is_number_unsigned()&&(!reference.is_number_integer()||reference.get<int64_t>()<0))||
+           reference.get<uint64_t>()>UINT32_MAX)
+          throw std::invalid_argument("Invalid retained normal event reference");
+        baked.normal_authority=domains->detail_at(reference.get<uint32_t>());
+        baked.validate(r);
+        if(bool(result->color_projection_)!=(baked.color_interpretation==BakedColorInterpretation::ResolvedPbr))
+          throw std::invalid_argument("Retained baked color interpretation differs");
+        // Only structural reconstruction here. Source replay/pairing happens in
+        // the owning model before publication; ordinary install_bake cannot
+        // manufacture or smuggle a retained event identity.
+        result->baked_=std::make_shared<const BakedTextures>(std::move(baked));
+        result->composite_token_=next_composite_token();++result->revision_;
+      }else if(independent&&input.at("version")==8){
+        SourcePaintOptions resource_limits;resource_limits.max_working_bytes=SourcePaintOptions::maximum_working_bytes;
+        result=SourcePaintAccess::install(*result,std::move(baked),resource_limits);
+        context.baked_emission->note_source_bake();
+      }else result->install_bake(std::move(baked));
+      if(floating)context.baked_emission->note_validated_field();
+      if(shared)shared->owner=result->baked_;
     }
-    if(layered){
-      const auto &reference=v.at("normal_field");
-      if((!reference.is_number_unsigned()&&(!reference.is_number_integer()||reference.get<int64_t>()<0))||reference.get<uint64_t>()>UINT32_MAX)throw std::invalid_argument("Invalid independent baked normal reference");
-      baked.normal_interpretation=BakedNormalInterpretation::PreparedAttributes;
-      baked.normal_field=detail::BakedNormalArchive::reader().field_at(reference.get<uint32_t>());
-    }
-    if(retained){
-      const auto &reference=v.at("normal_authority");
-      if((!reference.is_number_unsigned()&&(!reference.is_number_integer()||reference.get<int64_t>()<0))||
-         reference.get<uint64_t>()>UINT32_MAX)
-        throw std::invalid_argument("Invalid retained normal event reference");
-      baked.normal_authority=domains->detail_at(reference.get<uint32_t>());
-      baked.validate(r);
-      if(bool(result->color_projection_)!=(baked.color_interpretation==BakedColorInterpretation::ResolvedPbr))
-        throw std::invalid_argument("Retained baked color interpretation differs");
-      // Only structural reconstruction here. Source replay/pairing happens in
-      // the owning model before publication; ordinary install_bake cannot
-      // manufacture or smuggle a retained event identity.
-      result->baked_=std::make_shared<const BakedTextures>(std::move(baked));
-      result->composite_token_=next_composite_token();++result->revision_;
-    }else if(independent&&input.at("version")==8){
-      SourcePaintOptions resource_limits;resource_limits.max_working_bytes=SourcePaintOptions::maximum_working_bytes;
-      result=SourcePaintAccess::install(*result,std::move(baked),resource_limits);
-      context.baked_emission->note_source_bake();
-    }else result->install_bake(std::move(baked));
-    if(floating)context.baked_emission->note_validated_field();
+    if(shared)shared->users.insert(&j);
   }
   if(physical&&!result->has_physical_emission())throw std::invalid_argument("Paint3 requires genuine physical emission ownership");
   result->allocated_tiles_ = 0;

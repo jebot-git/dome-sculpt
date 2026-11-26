@@ -7,6 +7,7 @@
 
 namespace dome { class Scene; class PaintImageArchive; }
 namespace dome::detail {
+class SharedBakeReader;
 // An explicit short-lived native reader capability, not a global/TLS switch.
 // Only the actual Scene41 envelope creates it. Copies of existing decode
 // contexts borrow it within the synchronous owning decode, never in snapshots.
@@ -14,12 +15,14 @@ class BakedEmissionReadCapability final {
   friend class dome::Scene;
   explicit BakedEmissionReadCapability(bool source_bake=false):source_bake_(source_bake) {}
   bool source_bake_=false;
+  const SharedBakeReader *shared_bakes_=nullptr;
   mutable size_t admitted_source_bake_=0;
   mutable size_t admitted_ = 0;
 public:
   BakedEmissionReadCapability(const BakedEmissionReadCapability &) = delete;
   void note_validated_field() const { ++admitted_; }
   bool source_bake_allowed() const noexcept { return source_bake_; }
+  const SharedBakeReader *shared_bakes() const noexcept { return shared_bakes_; }
   void note_source_bake() const { if(!source_bake_)throw std::invalid_argument("Source Bake needs Scene42 ownership");++admitted_source_bake_; }
 };
 inline unsigned baked_legacy_version(const nlohmann::json &b,

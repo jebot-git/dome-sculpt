@@ -15,6 +15,7 @@
 #include "emission-bake-source.hpp"
 #include "native-scene-geometry-intern.hpp"
 #include "scene-paint-raster.hpp"
+#include "scene-bake-archive.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/scene.hpp"
 #include "current-paint-preview.hpp"
@@ -233,6 +234,7 @@ void Scene::validate(bool deep_sources) const {
   NormalSamplingArchive retained_normal_domains;
   std::set<const PaintedMesh *> retained_paint;
   std::set<std::pair<const PaintSamplingDomain *,const void *>> retained_rasters;
+  std::set<detail::SharedBakeIdentity> retained_bakes;
   std::set<const PaintedMesh*> domain_paints,paired_domain_paints;
   std::set<const PaintSamplingDomain*> paint_domains;
   std::set<const Mesh*> paint_bases;size_t paint_domain_bytes=0;
@@ -315,7 +317,13 @@ void Scene::validate(bool deep_sources) const {
     const auto raster=detail::retained_scene_paint_raster(*paint);
     if(!raster||retained_rasters.emplace(paint->paint_sampling_domain().get(),raster).second)
       texels+=size_t(paint->resolution())*paint->resolution();
-    paint_bytes+=paint->storage_bytes();
+    auto storage=paint->storage_bytes();
+    if(detail::shareable_bake(*paint)){
+      const auto identity=detail::shared_bake_identity(*paint);
+      detail::SharedBakeWriter::note(*this,identity);
+      if(!retained_bakes.insert(identity).second)storage-=paint->baked()->storage_bytes();
+    }
+    paint_bytes+=storage;
     if(auto original=paint->source_sampling_original())texels+=size_t(original->resolution())*original->resolution();
     if(paint_bytes>256*1024*1024)throw std::length_error("Scene paint storage budget exceeded");
     if(texels>16*1024*1024)throw std::length_error("Scene paint-map budget exceeded");
@@ -571,6 +579,7 @@ void Scene::validate(bool deep_sources) const {
 }
 nlohmann::json Scene::encode() const {
   detail::BakedEmissionWriteScope baked_emission_write;
+  detail::SharedBakeWriter shared_bakes(*this);
   detail::ColorBoundScope color_bound_scope;
   validate();
   bool baked = std::any_of(objects_.begin(), objects_.end(), [](const auto &o) { return o.painted && o.painted->baked(); });
@@ -594,6 +603,7 @@ nlohmann::json Scene::encode() const {
                       {"objects", nlohmann::json::array()}};
   PaintImageArchive source_images;
   baked_emission_write.begin(source_images);
+  shared_bakes.begin(source_images);
   detail::BakedNormalArchive layered_normals(source_images);
   CreatorAssetArchive source_models;
   SourceMaterialArchive source_materials;
@@ -711,6 +721,10 @@ nlohmann::json Scene::encode() const {
   j["source_images"] = source_images.encode();
   j["source_models"] = source_models.encode();
   baked_emission_write.publish(*this);
+  if(!shared_bakes.empty())
+    return {{"format","dome-sculpt"},{"version",detail::shared_bake_scene_version},
+      {"source_bake",baked_emission_write.source_bake_emitted()},
+      {"shared_bakes",shared_bakes.take()},{"payload",std::move(j)}};
   if(baked_emission_write.source_bake_emitted())
     return {{"format","dome-sculpt"},{"version",42},{"payload",std::move(j)}};
   if(baked_emission_write.emitted())
@@ -719,15 +733,25 @@ nlohmann::json Scene::encode() const {
 }
 Scene Scene::decode(const nlohmann::json &j) {
   detail::NativeReadScope::check();
-  if(j.is_object()&&j.contains("version")&&(j.at("version")==41||j.at("version")==42)){
-    const bool source_bake=j.at("version")==42;
-    if(j.size()!=3||!j.at("version").is_number_integer()||j.at("format")!="dome-sculpt"||!j.at("payload").is_object()||
+  if(j.is_object()&&j.contains("version")&&
+      (j.at("version")==41||j.at("version")==42||j.at("version")==detail::shared_bake_scene_version)){
+    const bool shared=j.at("version")==detail::shared_bake_scene_version;
+    if(j.size()!=(shared?5u:3u)||!j.at("version").is_number_integer()||j.at("format")!="dome-sculpt"||!j.at("payload").is_object()||
        !j.at("payload").at("version").is_number_integer()||
        j.at("payload").at("version").get<int64_t>()<2||
        j.at("payload").at("version").get<int64_t>()>40)
       throw std::invalid_argument("Scene41 requires one genuine prior owning scene, not nested envelopes");
+    if(shared&&!j.at("source_bake").is_boolean())
+      throw std::invalid_argument("Shared Bake Scene requires its exact source capability flag");
+    const bool source_bake=j.at("version")==42||(shared&&j.at("source_bake").get<bool>());
     detail::BakedEmissionReadCapability capability(source_bake);
+    std::optional<detail::SharedBakeReader> shared_bakes;
+    if(shared){
+      shared_bakes.emplace(j.at("shared_bakes"),capability);
+      capability.shared_bakes_=&*shared_bakes;
+    }
     auto result=decode_owning(j.at("payload"),&capability);
+    if(shared)shared_bakes->require_complete();
     if(source_bake){if(!capability.admitted_source_bake_)throw std::invalid_argument("Scene42 requires genuine decoded source Bake ownership");}
     else if(!capability.admitted_)throw std::invalid_argument("Scene41 requires genuine decoded FLOAT baked emission ownership");
     return result;
@@ -738,6 +762,8 @@ Scene Scene::decode_owning(const nlohmann::json &j,
     const detail::BakedEmissionReadCapability *baked_emission) {
   detail::NativeReadScope::check();
   detail::ScenePaintRasterReader decoded_rasters;
+  const auto shared_bakes=baked_emission?baked_emission->shared_bakes():nullptr;
+  const size_t shared_bake_bytes=shared_bakes?shared_bakes->bytes():0;
   Scene result;
   if(!j.is_object() || (!j.at("format").is_string() || j.at("format").get_ref<const std::string&>()!="dome-sculpt") || !j.at("version").is_number_integer())
     throw std::runtime_error("Unsupported scene format or version type");
@@ -897,6 +923,8 @@ Scene Scene::decode_owning(const nlohmann::json &j,
     detail::PolygonSceneBudget budget;budget.owning_paint_domain=paint_context;
     budget.baked_emission=baked_emission;
     budget.paint_bytes=layered_normal_bytes;
+    detail::PolygonSceneBudget::add(budget.paint_bytes,shared_bake_bytes,detail::scene_paint_byte_limit,
+        "Shared Bakes exceed whole Scene storage");
     if(layered_context)for(const auto &c:j.at("baked_normal_fields").at("origins"))budget.deformation(c.at("deformation"),unsigned(version));
     budget.independent_source_paint=source_paint_context.independent_source;budget.owning_physical_emission=version>=27;
     const bool shared_texture_geometry=version==40&&j.at("texture_set_geometry").at("version")==2;
@@ -1035,7 +1063,7 @@ Scene Scene::decode_owning(const nlohmann::json &j,
   if(j.at("version")>=7) {
     // Include retained original paint surfaces before any implicit UV raster
     // allocation; a tiny file must not request hundreds of huge SurfaceMaps.
-    size_t pixels=0,storage=layered_normal_bytes;
+    size_t pixels=0,storage=layered_normal_bytes+shared_bake_bytes;
     detail::EncodedPaintRasterBudget paint_rasters;
     std::function<void(const nlohmann::json&,std::optional<bool>)> preflight_grid;
     const auto preflight=[&](const nlohmann::json&record){preflight_grid(record,{});};
@@ -1068,16 +1096,17 @@ Scene Scene::decode_owning(const nlohmann::json &j,
           storage+=tiles.size()*sizeof(PaintEmissionTile);
         }
       }
-      if(paint.contains("baked"))for(const auto *key:{"color","orm","emission","normal","coverage"}) {
+      const bool shared=detail::shared_bake_for(record,paint,uint32_t(r),baked_emission)!=nullptr;
+      if(paint.contains("baked")&&!shared)for(const auto *key:{"color","orm","emission","normal","coverage"}) {
         const auto &bytes=paint.at("baked").at(key);
         if(!bytes.is_binary())throw std::runtime_error("Invalid retained baked buffer");
         storage+=bytes.get_binary().size();
       }
-      if(paint.contains("baked"))storage+=detail::baked_float_preflight(paint.at("baked"),uint32_t(r),baked_emission,[]{detail::NativeReadScope::check();return false;});
+      if(paint.contains("baked")&&!shared)storage+=detail::baked_float_preflight(paint.at("baked"),uint32_t(r),baked_emission,[]{detail::NativeReadScope::check();return false;});
       if(paint.contains("color_projection") && version<10)throw std::runtime_error("Prepared color projection requires scene10");
       if(paint.contains("normal_projection")&&paint.at("normal_projection").at("version")==2&&version<21)throw std::invalid_argument("Retained normal field requires Scene21");
       if(paint.contains("normal_projection")&&version<15)throw std::invalid_argument("Prepared normal projection requires Scene15");
-      if(paint.contains("baked")&&paint.at("baked").at("version")!=1){
+      if(paint.contains("baked")&&!shared&&paint.at("baked").at("version")!=1){
         const auto &baked=paint.at("baked");const auto bv=detail::baked_legacy_version(baked,baked_emission);
         if(bv==2||((bv==3||bv==5)&&(baked.contains("pbr_color")||baked.contains("color_interpretation")))){
           if(version<10||!baked.at("pbr_color").is_binary())throw std::runtime_error("Resolved baked PBR requires scene10");

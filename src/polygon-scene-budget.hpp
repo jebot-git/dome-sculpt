@@ -7,6 +7,7 @@
 #include "paint-archive-shape.hpp"
 #include "baked-emission-codec.hpp"
 #include "scene-paint-raster.hpp"
+#include "scene-bake-archive.hpp"
 #include <nlohmann/json.hpp>
 #include <optional>
 namespace dome::detail {
@@ -107,6 +108,7 @@ struct PolygonSceneBudget {
         add(paint_bytes, item.value().get_binary().size(), 256 * 1024 * 1024,
             "Scene retained mesh storage exceeded");
     }
+    if(shared_bake_for(input,p,uint32_t(n),baked_emission))return;
     if (p.contains("baked"))
       for (const auto *key :
            {"color", "orm", "emission", "normal", "coverage"}) {

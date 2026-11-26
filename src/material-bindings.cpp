@@ -16,6 +16,7 @@
 #include "paint-sampling-access.hpp"
 #include "paint-archive-shape.hpp"
 #include "scene-paint-raster.hpp"
+#include "scene-bake-archive.hpp"
 #include "source-uv-archive.hpp"
 #include "material-archive-version.hpp"
 #include "material-key-context.hpp"
@@ -690,14 +691,14 @@ SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,
     if(input.contains("normal_preparations"))throw std::invalid_argument("Normal preparations require material archive4");
     for(const auto &b:input.at("bindings"))if(b.contains("normal_preparation"))throw std::invalid_argument("Normal preparation references require material archive4");
     for(const auto &record:input.at("paints"))detail::visit_paint_archive_payloads(record,(native_paint||detail::material_archive_base_version(input)==9),context,[&](const nlohmann::json &p){
-      if(p.contains("normal_projection")||(p.contains("baked")&&detail::baked_legacy_version(p.at("baked"),context.baked_emission)==3))throw std::invalid_argument("Prepared normal paint requires material archive4");
+      if(p.contains("normal_projection")||(p.contains("baked")&&detail::baked_legacy_version(detail::shared_bake_payload(p.at("baked"),context.baked_emission),context.baked_emission)==3))throw std::invalid_argument("Prepared normal paint requires material archive4");
     });
   }
   if(!prepared) {
     if(input.contains("color_preparations"))throw std::runtime_error("Color preparations require material archive3");
     for(const auto &b:input.at("bindings"))if(b.contains("color_preparation"))throw std::runtime_error("Color preparation references require material archive3");
     for(const auto &record:input.at("paints"))detail::visit_paint_archive_payloads(record,(native_paint||detail::material_archive_base_version(input)==9),context,[&](const nlohmann::json &p) {
-      if(p.contains("color_projection") || (p.contains("baked") && detail::baked_legacy_version(p.at("baked"),context.baked_emission)!=1&&!(layered&&detail::baked_legacy_version(p.at("baked"),context.baked_emission)==5)))throw std::runtime_error("Prepared paint requires material archive3");
+      if(p.contains("color_projection") || (p.contains("baked") && detail::baked_legacy_version(detail::shared_bake_payload(p.at("baked"),context.baked_emission),context.baked_emission)!=1&&!(layered&&detail::baked_legacy_version(detail::shared_bake_payload(p.at("baked"),context.baked_emission),context.baked_emission)==5)))throw std::runtime_error("Prepared paint requires material archive3");
       for(const auto &l:p.at("layers"))if(!native_paint&&l.contains("pbr_color_tiles"))throw std::runtime_error("Prepared paint layers require material archive3");
     });
   }
@@ -774,18 +775,20 @@ SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,
         tile_bytes+=tiles.size()*sizeof(PaintEmissionTile);
       }
     }
-    if(paint.contains("baked"))for(const auto *key:{"color","orm","emission","normal","coverage"}) {
-      const auto &bytes=paint.at("baked").at(key);
-      if(!bytes.is_binary())throw std::runtime_error("Invalid original UV baked buffer");
-      tile_bytes+=bytes.get_binary().size();
-    }
-    if(paint.contains("baked") && paint.at("baked").contains("pbr_color")) {
-      const auto &bytes=paint.at("baked").at("pbr_color");
-      if(!bytes.is_binary())throw std::runtime_error("Invalid original baked PBR buffer");
-      tile_bytes+=bytes.get_binary().size();
-    }
-    if(paint.contains("baked")&&paint.at("baked").contains("mtoon_normal")){
-      const auto &bytes=paint.at("baked").at("mtoon_normal");if(!bytes.is_binary())throw std::invalid_argument("Invalid original baked MToon normal buffer");tile_bytes+=bytes.get_binary().size();
+    if(!detail::shared_bake_for(record,paint,uint32_t(r),context.baked_emission)){
+      if(paint.contains("baked"))for(const auto *key:{"color","orm","emission","normal","coverage"}) {
+        const auto &bytes=paint.at("baked").at(key);
+        if(!bytes.is_binary())throw std::runtime_error("Invalid original UV baked buffer");
+        tile_bytes+=bytes.get_binary().size();
+      }
+      if(paint.contains("baked") && paint.at("baked").contains("pbr_color")) {
+        const auto &bytes=paint.at("baked").at("pbr_color");
+        if(!bytes.is_binary())throw std::runtime_error("Invalid original baked PBR buffer");
+        tile_bytes+=bytes.get_binary().size();
+      }
+      if(paint.contains("baked")&&paint.at("baked").contains("mtoon_normal")){
+        const auto &bytes=paint.at("baked").at("mtoon_normal");if(!bytes.is_binary())throw std::invalid_argument("Invalid original baked MToon normal buffer");tile_bytes+=bytes.get_binary().size();
+      }
     }
     if(texels>16*1024*1024 || vertices>8'000'000 || tile_bytes>256*1024*1024)
       throw std::length_error("Original UV source archive exceeds scene budgets");
