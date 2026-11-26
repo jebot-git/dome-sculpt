@@ -15,6 +15,9 @@ nlohmann::json encode_polygon_surface_node(
 // is borrowed; all edit IDs are charged before any replay/candidate copy.
 size_t preflight_polygon_surface_node(const nlohmann::json &,size_t origin_count,
  const PolygonSurfaceTransferLimits & = {});
+// Version 2 nodes can reference an earlier version 1 node's exact sampling.
+void preflight_polygon_surface_sampling(const nlohmann::json &nodes,size_t node);
+
 PolygonSurfaceStage decode_polygon_surface_node(
  const nlohmann::json &,size_t origin_count,const PolygonSurfaceOriginReader &,
  const PolygonSurfaceTransferLimits & = {});

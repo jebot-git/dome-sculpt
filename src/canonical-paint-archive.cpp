@@ -12,6 +12,22 @@ size_t ref(const nlohmann::json &v,size_t count){
 }
 uint32_t word(const nlohmann::json::binary_t &bytes,size_t at){return uint32_t(bytes[at])|uint32_t(bytes[at+1])<<8|uint32_t(bytes[at+2])<<16|uint32_t(bytes[at+3])<<24;}
 template<class T>bool own(const std::shared_ptr<const T>&a,const std::shared_ptr<const T>&b){return a==b&&!a.owner_before(b)&&!b.owner_before(a);}
+size_t sampling_node(const nlohmann::json &nodes,size_t id) {
+ const auto &entry=nodes.at(id);
+ if(!entry.is_object()||!entry.at("version").is_number_integer()||!entry.at("vertices").is_binary())
+  throw std::invalid_argument("Invalid canonical paint owning correspondence record");
+ if(entry.at("version")==1&&entry.size()==5)return id;
+ if(entry.at("version")!=2||entry.size()!=6||!id)
+  throw std::invalid_argument("Invalid shared canonical paint sampling record");
+ const auto prior=ref(entry.at("sampling_node"),id);
+ const auto &base=nodes.at(prior);
+ if(base.at("version")!=1||entry.at("before_origin")==base.at("before_origin")||
+    entry.at("normal_uv")!=base.at("normal_uv")||entry.at("domain")!=base.at("domain")||
+    entry.at("vertices")!=base.at("vertices"))
+  throw std::invalid_argument("Shared canonical paint sampling differs from its earlier basis");
+ return prior;
+}
+
 }
 CanonicalPaintArchive::CanonicalPaintArchive(PolygonSceneArchive &p,BakedNormalArchive &n,PaintSamplingArchive &d)
  :previous_(current_),write_origins_(&p),normals_(n),write_domains_(&d),domains_(d){current_=this;}
@@ -34,12 +50,20 @@ uint32_t CanonicalPaintArchive::add(std::shared_ptr<const CanonicalPaintSampling
 nlohmann::json CanonicalPaintArchive::encode() const{
  if(!write_origins_||!write_domains_)throw std::logic_error("Cannot encode a canonical paint reader");
  nlohmann::json out={{"version",1},{"nodes",nlohmann::json::array()}};
- for(const auto &p:nodes_){
+ for(size_t id=0;id<nodes_.size();++id){
+  const auto &p=nodes_[id];
   std::vector<uint8_t> bytes;bytes.reserve(p->current_sources().size()*4);
   for(auto v:p->current_sources())for(unsigned k=0;k<4;++k)bytes.push_back(uint8_t(v>>(k*8)));
-  out["nodes"].push_back({{"version",1},{"before_origin",write_origins_->add_origin(p->before())},
+  nlohmann::json record={{"version",1},{"before_origin",write_origins_->add_origin(p->before())},
    {"normal_uv",normals_.add_uv(p->normal_uv())},{"domain",write_domains_->add(p->attachment()->domain())},
-   {"vertices",nlohmann::json::binary(std::move(bytes))}});
+   {"vertices",nlohmann::json::binary(std::move(bytes))}};
+  for(size_t prior=0;prior<id;++prior)if(p->shares_sampling(*nodes_[prior])){
+   record["version"]=2;
+   record["sampling_node"]=prior;
+   break;
+  }
+  out["nodes"].push_back(std::move(record));
+  (void)sampling_node(out.at("nodes"),id);
  }
  return out;
 }
@@ -55,6 +79,16 @@ std::shared_ptr<const CanonicalPaintSampling> CanonicalPaintArchive::at(uint32_t
   if(!own(nodes_[id]->before(),before)||!own(nodes_[id]->normal_uv(),uv)||!own(nodes_[id]->attachment()->domain(),domain))
    throw std::invalid_argument("Canonical paint completed node changed its exact owning context");
   nodes_[id]->validate();used_[id]=1;return nodes_[id];
+ }
+ const auto prior=sampling_node(input_->at("nodes"),id);
+ if(prior!=id){
+  const auto base=at(uint32_t(prior));
+  if(!own(before->paint,base->before()->paint)||!own(uv,base->normal_uv())||
+     !own(domain,base->attachment()->domain()))
+   throw std::invalid_argument("Shared canonical paint sampling cannot borrow an unrelated source");
+  auto owner=base->rebase_before(std::move(before));
+  owner->validate();
+  nodes_[id]=std::move(owner);used_[id]=1;return nodes_[id];
  }
  const auto &bytes=j.at("vertices").get_binary();if(bytes.empty()||bytes.size()>8'000'000||bytes.size()%4)throw std::length_error("Canonical paint current map exceeds its bounded dimensions");std::vector<uint32_t> vertices;vertices.reserve(bytes.size()/4);
  for(size_t at=0;at<bytes.size();at+=4)vertices.push_back(word(bytes,at));
@@ -76,10 +110,16 @@ size_t CanonicalPaintArchive::preflight(const nlohmann::json &j,const nlohmann::
     !j.at("nodes").is_array()||j.at("nodes").empty()||j.at("nodes").size()>128||normals.at("version")!=2)
   throw std::invalid_argument("Scene37 requires actual bounded canonical paint and normal UV pools");
  size_t bytes=0,peak_scratch=0;constexpr size_t limit=256*1024*1024;
- for(const auto &p:j.at("nodes")){
-  if(!p.is_object()||p.size()!=5||!p.at("version").is_number_integer()||p.at("version")!=1||!p.at("vertices").is_binary())
-   throw std::invalid_argument("Invalid canonical paint owning correspondence record");
+ const auto &nodes=j.at("nodes");
+ for(size_t id=0;id<nodes.size();++id){
+  const auto &p=nodes[id];
+  const auto prior=sampling_node(nodes,id);
   const auto &origin=polygons.at("origins").at(ref(p.at("before_origin"),polygons.at("origins").size()));
+  if(prior!=id){
+   const auto &base=polygons.at("origins").at(ref(nodes[prior].at("before_origin"),polygons.at("origins").size()));
+   if(origin.at("painted")!=base.at("painted"))
+    throw std::invalid_argument("Shared canonical paint sampling names a different original Paint owner");
+  }
   const auto &before=materials.at("bindings").at(ref(origin.at("material_bindings"),materials.at("bindings").size()));
   const auto &uv=normals.at("uv").at(ref(p.at("normal_uv"),normals.at("uv").size()));
   ref(p.at("domain"),domains.at("domains").size());

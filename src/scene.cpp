@@ -59,6 +59,7 @@
 #include "polygon-scene-archive.hpp"
 #include "polygon-scene-budget.hpp"
 #include "source-uv-archive.hpp"
+#include "texture-set-recipe-wire.hpp"
 #include <fstream>
 #include <map>
 #include <nlohmann/json.hpp>
@@ -611,7 +612,7 @@ nlohmann::json Scene::encode() const {
     if(feature_version==37&&!canonical_paints)throw std::invalid_argument("Scene37 writer lacks actual canonical paint ownership");
   }
   const auto sourceful=[](const auto&collection){if(!collection)return false;if(collection->primary_source())return true;return std::any_of(collection->additional().begin(),collection->additional().end(),[](const auto&field){return bool(field.source);});};
-  const bool shared_sets=texture_sets&&(std::any_of(objects_.begin(),objects_.end(),[&](const auto&o){return sourceful(o.texture_sets);})||std::any_of(polygons.origins().begin(),polygons.origins().end(),[](const auto&o){return bool(o->texture_sets);}));
+  const bool shared_sets=texture_sets&&(std::any_of(objects_.begin(),objects_.end(),[&](const auto&o){return sourceful(o.texture_sets)||(o.texture_sets&&(o.bake_recipe||std::any_of(o.texture_sets->additional().begin(),o.texture_sets->additional().end(),[](const auto&field){return bool(field.bake_recipe);})));})||std::any_of(polygons.origins().begin(),polygons.origins().end(),[](const auto&o){return bool(o->texture_sets);}));
   std::unique_ptr<detail::TextureSetFieldCodec>field_codec;
   if(shared_sets){texture_archive.shared_records();field_codec=std::make_unique<detail::TextureSetFieldCodec>();texture_archive.field_encoder([&](const TextureSetView&field,uint32_t geometry){return field_codec->encode(field,geometry,source_images,&normal_domains,&writable_domains,[&](auto binding){return source_materials.add(std::move(binding));});},[&]{return field_codec->records();});}
   // Keep old UV-only Scene26 records free of fabricated rig-history fields.
@@ -897,7 +898,7 @@ Scene Scene::decode_owning(const nlohmann::json &j,
       for(const auto*name:{"meshes","topologies"}){const auto&table=geometry.at(name);if(!table.is_array()||table.empty()||table.size()>256)throw std::length_error("Invalid texture-set geometry count");for(const auto&record:table)for(const auto&field:record.items())if(field.value().is_binary())detail::PolygonSceneBudget::add(budget.paint_bytes,field.value().get_binary().size(),256*1024*1024,"Shared geometry/identity exceeds whole Scene storage");}
       if(shared_texture_geometry){
         for(const auto&assignment:geometry.at("assignments")){if(!assignment.is_binary()||assignment.get_binary().size()%4||assignment.get_binary().size()>8'000'000)throw std::invalid_argument("Invalid shared texture assignment buffer");detail::PolygonSceneBudget::add(budget.paint_bytes,assignment.get_binary().size(),256*1024*1024,"Shared assignment budget exceeded");}
-        for(const auto&record:geometry.at("paints")){const auto&paint=record.at("painted");const auto*seed=paint.contains("field_source")?detail::texture_source_seed(paint,geometry,j.at("source_materials"),j.at("polygon_surfaces")):nullptr;if(!paint.is_object()||paint.at("version")!=7||(!seed&&paint.size()!=3))throw std::invalid_argument("Shared texture Paint7 envelope differs");budget.paint(paint.at("payload"),false,unsigned(version),true,seed?std::optional<bool>(paint.at("physical_paint").get<bool>()):std::nullopt);}
+        for(const auto&record:geometry.at("paints")){const auto&paint=detail::texture_set_recipe_member(record.at("painted"));const auto*seed=paint.contains("field_source")?detail::texture_source_seed(paint,geometry,j.at("source_materials"),j.at("polygon_surfaces")):nullptr;if(!paint.is_object()||paint.at("version")!=7||(!seed&&paint.size()!=3))throw std::invalid_argument("Shared texture Paint7 envelope differs");budget.paint(paint.at("payload"),false,unsigned(version),true,seed?std::optional<bool>(paint.at("physical_paint").get<bool>()):std::nullopt);}
         for(const auto&seed:geometry.at("field_sources"))budget.paint(seed.at("original"),true,unsigned(version),true,seed.at("physical_paint").get<bool>());
       }else for(const auto&o:objects)if(!o.at("texture_sets").is_null()){const auto&slots=o.at("texture_sets").at("slots");if(!slots.is_binary()||slots.get_binary().size()%4||slots.get_binary().size()>8'000'000)throw std::invalid_argument("Invalid texture assignment storage");detail::PolygonSceneBudget::add(budget.paint_bytes,slots.get_binary().size(),256*1024*1024,"Texture assignment budget exceeded");}
     }
@@ -1095,7 +1096,7 @@ Scene Scene::decode_owning(const nlohmann::json &j,
       preflight(object.at("painted"));
       if(version==40&&j.at("texture_set_geometry").at("version")==1&&!object.at("texture_sets").is_null())for(const auto*paint:texture_holder_paints(object.at("texture_sets"),j.at("texture_set_geometry")))preflight(paint->at("payload"));
     }
-    if(version==40&&j.at("texture_set_geometry").at("version")==2){const auto&geometry=j.at("texture_set_geometry");for(const auto&p:geometry.at("paints")){const auto&paint=p.at("painted");if(paint.contains("field_source")){(void)detail::texture_source_seed(paint,geometry,j.at("source_materials"),j.at("polygon_surfaces"));preflight_grid(paint.at("payload"),paint.at("physical_paint").get<bool>());}else preflight(paint.at("payload"));}for(const auto&seed:geometry.at("field_sources"))preflight_grid(seed.at("original"),seed.at("physical_paint").get<bool>());}
+    if(version==40&&j.at("texture_set_geometry").at("version")==2){const auto&geometry=j.at("texture_set_geometry");for(const auto&p:geometry.at("paints")){const auto&paint=detail::texture_set_recipe_member(p.at("painted"));if(paint.contains("field_source")){(void)detail::texture_source_seed(paint,geometry,j.at("source_materials"),j.at("polygon_surfaces"));preflight_grid(paint.at("payload"),paint.at("physical_paint").get<bool>());}else preflight(paint.at("payload"));}for(const auto&seed:geometry.at("field_sources"))preflight_grid(seed.at("original"),seed.at("physical_paint").get<bool>());}
   }
   // Aggregate paint/deformation/sculpt preflight precedes all current geometry
   // reconstruction as well as every SurfaceMap allocation.

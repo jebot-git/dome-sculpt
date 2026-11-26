@@ -20,15 +20,15 @@ public:
  const auto &binding()const noexcept{return binding_;}
  const auto &field_owner()const noexcept{return owner_;}
  const auto &attachment()const noexcept{return attachment_;}
- const auto &normals()const noexcept{return normals_;}
+ const auto &normals()const noexcept{return streams_->normals;}
  // Empty for genuine N-only input. No artist tangent or W is synthesized.
- const auto &tangents()const noexcept{return tangents_;}
- const auto &paint_coordinates()const noexcept{return paint_;}
- const auto &normal_coordinates()const noexcept{return normal_;}
+ const auto &tangents()const noexcept{return streams_->tangents;}
+ const auto &paint_coordinates()const noexcept{return streams_->paint;}
+ const auto &normal_coordinates()const noexcept{return streams_->normal;}
  PolygonSurfaceNormalModel model()const noexcept{return model_;}
  // Four RGBA texels/triangle: before N+geometric-W, before T, current N+W,
  // current T. These are GEOMETRIC frames, not extra artist attributes/UVs.
- const auto &geometric_frames()const noexcept{return frames_;}
+ const auto &geometric_frames()const noexcept{return streams_->frames;}
  std::vector<std::array<std::array<float,4>,4>> placed_frames(const AffineTransform &,
      const std::function<bool()> &cancelled={})const;
  // Certifies complete BEFORE role-basis interpolation, not sampled points.
@@ -38,7 +38,11 @@ public:
  // may conservatively refuse triangles needing a finer interval proof.
  void validate_world(const AffineTransform &,double minimum=1e-6,
      const std::function<bool()> &cancelled={})const;
+ bool shares_streams(const PolygonSurfacePreview &other) const noexcept {
+   return streams_ == other.streams_ && attachment_ == other.attachment_;
+ }
 private:
+ friend class BakeRecipeRemap;
  PolygonSurfacePreview()=default;
  std::weak_ptr<const PolygonSurfacePreview>self_;
  std::shared_ptr<const BakedTextures>baked_;
@@ -49,9 +53,12 @@ private:
  std::shared_ptr<const SourceUvOrigin> origin_;
  std::optional<std::array<float,3>> physical_;
  PolygonSurfaceNormalModel model_=PolygonSurfaceNormalModel::NativeNOnly;
- std::vector<Vec3>normals_;
- std::vector<std::array<float,4>>tangents_;
- std::vector<std::array<float,2>>paint_,normal_;
- std::vector<std::array<std::array<float,4>,4>>frames_;
+ struct Streams {
+   std::vector<Vec3> normals;
+   std::vector<std::array<float,4>> tangents;
+   std::vector<std::array<float,2>> paint, normal;
+   std::vector<std::array<std::array<float,4>,4>> frames;
+ };
+ std::shared_ptr<const Streams> streams_;
 };
 } // namespace dome::detail

@@ -2,6 +2,7 @@
 #include "polygon-surface-preview.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/texture-sets.hpp"
+#include "bake-recipe-remap.hpp"
 #include "dome/polygon-scene.hpp"
 #include "texture-set-paint-access.hpp"
 #include "texture-set-graph.hpp"
@@ -72,6 +73,49 @@ void TextureSetCollection::validate_owner(const TextureSetView&primary,bool acti
 }
 namespace detail {
 struct TextureSetAccess {
+ static std::shared_ptr<const TextureSetFieldSource> rebind_recipe(
+     const TextureSetFieldSource &original, const std::shared_ptr<const ObjectBakeRecipe> &recipe,
+     const std::shared_ptr<const SourceMaterialBindings> &binding, BakeRecipeRemap &remap) {
+  // Geometry, raster and validated read view keep their immutable owners.
+  auto copy = std::shared_ptr<TextureSetFieldSource>(new TextureSetFieldSource);
+  copy->field_ = original.field_;
+  copy->field_.bake_recipe = recipe;
+  copy->field_.material_bindings = binding;
+  copy->original_ = original.original_;
+  copy->readable_ = original.readable_;
+  copy->polygon_ = binding ? binding->polygon_surface_transfer : nullptr;
+  copy->preview_ = remap.preview(original.preview_, binding);
+  std::shared_ptr<const TextureSetFieldSource> result = std::move(copy);
+  result->self_ = result;
+  return result;
+ }
+ static std::shared_ptr<const TextureSetCollection> remap_recipes(
+     const std::shared_ptr<const TextureSetCollection> &original, BakeRecipeRemap &remap,
+     const BakeRecipeRemap::OriginRemap &origin) {
+  std::shared_ptr<TextureSetCollection> changed;
+  const auto primary = remap.field_source(original->primary_source_, origin);
+  if (primary != original->primary_source_) {
+   changed.reset(new TextureSetCollection(*original));
+   changed->primary_source_ = primary;
+  }
+  for (size_t i = 0; i < original->additional_.size(); ++i) {
+   if (remap.cancelled_ && remap.cancelled_())
+    throw std::runtime_error("Texture-set bake recipe remapping cancelled");
+   const auto &field = original->additional_[i];
+   const auto recipe = remap.recipe(field.bake_recipe);
+   const auto binding = remap.binding(field.material_bindings, origin);
+   if (recipe == field.bake_recipe && binding == field.material_bindings)
+    continue;
+   if (!changed)
+    changed.reset(new TextureSetCollection(*original));
+   changed->additional_[i].bake_recipe = recipe;
+   changed->additional_[i].material_bindings = binding;
+   changed->additional_[i].source = remap.field_source(field.source, origin);
+  }
+  if (changed)
+   return changed;
+  return original;
+ }
  static std::shared_ptr<TextureSetCollection>initial(const Mesh&mesh,std::span<const TextureSetId>assignments){
   auto t=std::shared_ptr<TextureSetTopology>(new TextureSetTopology);t->geometry_=std::make_shared<const Mesh>(mesh);
   t->faces_.reserve(assignments.size());t->corners_.reserve(mesh.indices.size());
@@ -134,6 +178,33 @@ struct TextureSetAccess {
 
  }
 };
+std::shared_ptr<const TextureSetCollection> BakeRecipeRemap::collection(
+    const std::shared_ptr<const TextureSetCollection> &original, const OriginRemap &origin) {
+ if (!original)
+  return {};
+ if (const auto found = collections_.find(original.get()); found != collections_.end())
+  return found->second;
+ auto result = TextureSetAccess::remap_recipes(original, *this, origin);
+ collections_.emplace(original.get(), result);
+ return result;
+}
+
+std::shared_ptr<const TextureSetFieldSource> BakeRecipeRemap::field_source(
+    const std::shared_ptr<const TextureSetFieldSource> &original, const OriginRemap &origin) {
+ if (!original)
+  return {};
+ original->authenticate_owner(original);
+ const auto remapped = recipe(original->field().bake_recipe);
+ const auto material = binding(original->field().material_bindings, origin);
+ if (remapped == original->field().bake_recipe && material == original->field().material_bindings)
+  return original;
+ if (const auto found = fields_.find(original.get()); found != fields_.end())
+  return found->second;
+ auto result = TextureSetAccess::rebind_recipe(*original, remapped, material, *this);
+ fields_.emplace(original.get(), result);
+ return result;
+}
+
 std::vector<std::shared_ptr<const TextureSetFieldSource>>prepare_texture_set_field_sources(const SculptObject&o,std::span<const TextureSetId>assignments,const TextureSetLimits&l){l.validate();stop(l);return TextureSetAccess::field_sources(o,assignments,l);}
 } // namespace detail
 void initialize_texture_sets(Scene&scene,uint64_t object,const Mesh&mesh,

@@ -1,4 +1,8 @@
 #include "bake-recipe-remap.hpp"
+#include "canonical-paint-sampling.hpp"
+#include "polygon-surface-owner.hpp"
+#include "dome/material-bindings.hpp"
+#include "dome/texture-sets.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/native-scene-append.hpp"
 #include "dome/polygon-scene.hpp"
@@ -42,6 +46,7 @@ struct Append {
   std::set<const PolygonOrigin *> seen_origins;
   std::set<const PolygonAuthority *> seen_authorities;
   std::map<uint64_t,uint64_t> objects,groups;
+  detail::BakeRecipeRemap bake_recipes{objects,true,cancelled};
   std::set<uint64_t> retopo_sources;
   struct ModelLess {
     bool operator()(const std::shared_ptr<const CreatorSourceModel> &a,
@@ -62,17 +67,30 @@ struct Append {
   void collect(const std::shared_ptr<const PolygonAuthority> &p){
     stop();if(p&&seen_authorities.insert(p.get()).second)collect(p->origin);
   }
+  void collect_fields(const std::shared_ptr<const SourceMaterialBindings> &binding,
+                      const std::shared_ptr<const TextureSetCollection> &sets){
+    const auto visit=[&](const std::shared_ptr<const SourceMaterialBindings> &material){
+      stop();
+      if(!material)return;
+      if(material->polygon_surface_transfer)collect(material->polygon_surface_transfer->before());
+      if(material->canonical_paint_sampling)collect(material->canonical_paint_sampling->before());
+    };
+    visit(binding);
+    if(sets)for(const auto &field:sets->additional())visit(field.material_bindings);
+  }
   void collect(const std::shared_ptr<const PolygonOrigin> &p){
     stop();if(!p||!seen_origins.insert(p.get()).second)return;
     if(p->placement)for(const auto &g:p->placement->groups)collect_group(g);
     if(p->retopology)retopo_sources.insert(p->retopology->source);
     collect(p->polygon);collect(p->shape_source);collect(p->rig_source);
+    collect_fields(p->material_bindings,p->texture_sets);
   }
   void collect(const Scene &s){
     for(const auto &g:s.groups()){stop();collect_group(g);}
     for(const auto &o:s.objects()){
       stop();if(o.retopology)retopo_sources.insert(o.retopology->source);
       collect(o.polygon);collect(o.shape_source);collect(o.rig_source);
+      collect_fields(o.material_bindings,o.texture_sets);
     }
   }
   uint64_t instance(const SourceNodePlacement &p){
@@ -148,7 +166,10 @@ struct Append {
     auto n=std::make_shared<PolygonOrigin>(*p);
     n->placement=capsule(p->placement);n->polygon=authority(p->polygon);
     n->shape_source=origin(p->shape_source);n->rig_source=origin(p->rig_source);
-    n->retopology=patch(p->retopology);n->bake_recipe=detail::remap_bake_recipe(p->bake_recipe,objects,true);
+    n->retopology=patch(p->retopology);n->bake_recipe=bake_recipes.recipe(p->bake_recipe);
+    const detail::BakeRecipeRemap::OriginRemap retained=[this](const auto &before){return origin(before);};
+    n->material_bindings=bake_recipes.binding(p->material_bindings,retained);
+    n->texture_sets=bake_recipes.collection(p->texture_sets,retained);
     origins.emplace(p.get(),n);return n;
   }
 };
@@ -209,11 +230,14 @@ NativeSceneAppend append_native_scene(const Scene &destination,const Scene &pack
   for(const auto &g:source.groups())if(g.source_placement)a.witness(source.group_path(g.id),{});
   for(const auto *origin:a.seen_origins)if(origin->placement)a.witness(origin->placement->groups,origin->appearance);
   for(const auto &g:source.groups())out.scene.group(a.groups.at(g.id)).source_placement=a.node(g.source_placement);
+  const detail::BakeRecipeRemap::OriginRemap retained=[&a](const auto &before){return a.origin(before);};
   for(const auto &o:source.objects()){
     a.stop();auto copy=o;copy.id=a.objects.at(o.id);copy.group=o.group?a.groups.at(o.group):0;
     copy.polygon=a.authority(o.polygon);copy.shape_source=a.origin(o.shape_source);
     copy.rig_source=a.origin(o.rig_source);copy.retopology=a.patch(o.retopology);
-    copy.bake_recipe=detail::remap_bake_recipe(o.bake_recipe,a.objects,true);
+    copy.bake_recipe=a.bake_recipes.recipe(o.bake_recipe);
+    copy.material_bindings=a.bake_recipes.binding(o.material_bindings,retained);
+    copy.texture_sets=a.bake_recipes.collection(o.texture_sets,retained);
     out.scene.object(copy.id)=std::move(copy);
   }
   out.scene.select(a.objects.at(source.active().id));a.stop();out.scene.validate();a.stop();require_saveable(out.scene,cancelled);a.stop();return out;

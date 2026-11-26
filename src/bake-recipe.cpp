@@ -1,5 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/bake-recipe.hpp"
+#include "bake-recipe-remap.hpp"
+#include "canonical-paint-sampling.hpp"
+#include "polygon-surface-preview.hpp"
 #include "dome/scene.hpp"
 #include "text-utf8.hpp"
 #include <nlohmann/json.hpp>
@@ -74,3 +77,61 @@ std::shared_ptr<const ObjectBakeRecipe> capture_bake_recipe(const Scene &scene,
   result->settings=settings;result->validate();return result;
 }
 } // namespace dome
+
+namespace dome::detail {
+std::shared_ptr<const SourceMaterialBindings> BakeRecipeRemap::binding(
+    const std::shared_ptr<const SourceMaterialBindings> &original, const OriginRemap &origin) {
+  if (!original || (!original->polygon_surface_transfer && !original->canonical_paint_sampling))
+    return original;
+  if (const auto found = bindings_.find(original.get()); found != bindings_.end())
+    return found->second;
+
+  auto polygon = original->polygon_surface_transfer;
+  if (polygon) {
+    const auto before = origin(polygon->before());
+    if (before != polygon->before()) {
+      auto found = polygon_fields_.find(polygon.get());
+      if (found == polygon_fields_.end())
+        found = polygon_fields_.emplace(polygon.get(), polygon->rebase_before(before)).first;
+      polygon = found->second;
+    }
+  }
+  auto canonical = original->canonical_paint_sampling;
+  if (canonical) {
+    const auto before = origin(canonical->before());
+    if (before != canonical->before()) {
+      auto found = canonical_fields_.find(canonical.get());
+      if (found == canonical_fields_.end())
+        found = canonical_fields_.emplace(canonical.get(), canonical->rebase_before(before)).first;
+      canonical = found->second;
+    }
+  }
+  if (polygon == original->polygon_surface_transfer && canonical == original->canonical_paint_sampling)
+    return original;
+
+  // Geometry and paint retain their authenticated owners while the before
+  // references move into the destination object's namespace.
+  auto result = std::make_shared<SourceMaterialBindings>(*original);
+  result->polygon_surface_transfer = std::move(polygon);
+  result->canonical_paint_sampling = std::move(canonical);
+  bindings_.emplace(original.get(), result);
+  return result;
+}
+
+std::shared_ptr<const PolygonSurfacePreview> BakeRecipeRemap::preview(
+    const std::shared_ptr<const PolygonSurfacePreview> &original,
+    const std::shared_ptr<const SourceMaterialBindings> &binding) {
+  if (!original || original->binding_ == binding)
+    return original;
+  if (const auto found = previews_.find(original.get()); found != previews_.end())
+    return found->second;
+  auto rebased = std::shared_ptr<PolygonSurfacePreview>(new PolygonSurfacePreview(*original));
+  rebased->binding_ = binding;
+  rebased->owner_ = binding->polygon_surface_transfer;
+  rebased->self_ = rebased;
+  if (!rebased->matches(binding, original->attachment_))
+    throw std::invalid_argument("Bake recipe remapping changed the polygon preview field");
+  previews_.emplace(original.get(), rebased);
+  return rebased;
+}
+} // namespace dome::detail

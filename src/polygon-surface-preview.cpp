@@ -24,21 +24,22 @@ std::shared_ptr<const PolygonSurfacePreview> PolygonSurfacePreview::create(const
  if(source.positions.size()>l.maximum_working_bytes/per_source_vertex)throw std::length_error("Polygon preview exceeds prospective source-preview quota");
  const size_t source_bytes=source.positions.size()*per_source_vertex;
  if(corners>(l.maximum_working_bytes-source_bytes)/per_corner)throw std::length_error("Polygon preview exceeds prospective packed input quota");
- const auto mapping=owner->trace_.triangle_permutation(l);const auto old_mesh=owner->trace_.original()->triangulate(l.geometry).mesh;
+ const auto mapping=owner->trace().triangle_permutation(l);const auto old_mesh=owner->trace().original()->triangulate(l.geometry).mesh;
  auto result=std::shared_ptr<PolygonSurfacePreview>(new PolygonSurfacePreview);result->binding_=std::move(binding);result->owner_=owner;result->attachment_=paint.paint_sampling_attachment();result->reference_=result->binding_->native_reference;result->physical_=result->binding_->physical_emission;result->origin_=result->binding_->uv_origin;
+ auto streams=std::make_shared<Streams>();
  PosedNormalFrames raw;Mesh native;
  if(owner->has_normal_field()){
-  result->model_=PolygonSurfaceNormalModel::PreparedCorePbr;NormalFrameLayout layout;layout.vertices=source.indices;layout.corners.resize(source.indices.size());layout.indices.resize(source.indices.size());for(size_t c=0;c<source.indices.size();++c)layout.corners[c]=layout.indices[c]=uint32_t(c);raw=normal_frame_preview(*before.material_bindings->normal_frames,layout,before.deformation.get(),l.geometry.cancelled,1);if(raw.tangents[0].size()!=source.indices.size())throw std::invalid_argument("Polygon preview cannot synthesize missing before artist tangents");result->tangents_.reserve(corners);result->normal_.reserve(corners);
+  result->model_=PolygonSurfaceNormalModel::PreparedCorePbr;NormalFrameLayout layout;layout.vertices=source.indices;layout.corners.resize(source.indices.size());layout.indices.resize(source.indices.size());for(size_t c=0;c<source.indices.size();++c)layout.corners[c]=layout.indices[c]=uint32_t(c);raw=normal_frame_preview(*before.material_bindings->normal_frames,layout,before.deformation.get(),l.geometry.cancelled,1);if(raw.tangents[0].size()!=source.indices.size())throw std::invalid_argument("Polygon preview cannot synthesize missing before artist tangents");streams->tangents.reserve(corners);streams->normal.reserve(corners);
  }else native=before.deformation?before.deformation->preview(source):source;
- result->normals_.reserve(corners);result->paint_.reserve(corners);result->frames_.reserve(corners/3);
+ streams->normals.reserve(corners);streams->paint.reserve(corners);streams->frames.reserve(corners/3);
  for(size_t t=0;t<corners/3;++t){
   stop(l.geometry.cancelled);const auto &map=mapping.at(t);std::array<Vec3,3>p{},q{};std::array<std::array<float,2>,3>uv{},current_uv{};
   const std::array<std::array<float,2>,3>chart{{{0,0},{1,0},{0,1}}};
-  for(size_t k=0;k<3;++k){p[k]=old_mesh.positions.at(old_mesh.indices.at(map.source_triangle*3+k));uv[k]=owner->has_normal_field()?owner->normal_corners_.at(map.source_triangle*3+k):chart[k];}
-  for(size_t c=0;c<3;++c){size_t k=0;while(k<3&&map.source_barycentrics[c][k]!=1)++k;if(k==3)throw std::invalid_argument("Polygon preview needs its genuine barycentric refinement adapter");const size_t before_corner=map.source_triangle*3+k;const auto original=owner->native_corners_.at(before_corner);q[c]=mesh.positions.at(mesh.indices.at(t*3+c));current_uv[c]=uv[k];result->paint_.push_back(owner->paint_corners_.at(before_corner));if(owner->has_normal_field()){result->normal_.push_back(uv[k]);result->normals_.push_back(raw.normals[0].at(original));result->tangents_.push_back(raw.tangents[0].at(original));}else result->normals_.push_back(native.normals.at(native.indices.at(original)));}
-  const auto old=polygon_geometry_frame(p,uv,AffineTransform{}),current=polygon_geometry_frame(q,current_uv,AffineTransform{});result->frames_.push_back({std::array<float,4>{old.basis.n.x,old.basis.n.y,old.basis.n.z,old.handedness},std::array<float,4>{old.basis.t.x,old.basis.t.y,old.basis.t.z,0},std::array<float,4>{current.basis.n.x,current.basis.n.y,current.basis.n.z,current.handedness},std::array<float,4>{current.basis.t.x,current.basis.t.y,current.basis.t.z,0}});
+  for(size_t k=0;k<3;++k){p[k]=old_mesh.positions.at(old_mesh.indices.at(map.source_triangle*3+k));uv[k]=owner->has_normal_field()?owner->corners_->normal.at(map.source_triangle*3+k):chart[k];}
+  for(size_t c=0;c<3;++c){size_t k=0;while(k<3&&map.source_barycentrics[c][k]!=1)++k;if(k==3)throw std::invalid_argument("Polygon preview needs its genuine barycentric refinement adapter");const size_t before_corner=map.source_triangle*3+k;const auto original=owner->corners_->native.at(before_corner);q[c]=mesh.positions.at(mesh.indices.at(t*3+c));current_uv[c]=uv[k];streams->paint.push_back(owner->corners_->paint.at(before_corner));if(owner->has_normal_field()){streams->normal.push_back(uv[k]);streams->normals.push_back(raw.normals[0].at(original));streams->tangents.push_back(raw.tangents[0].at(original));}else streams->normals.push_back(native.normals.at(native.indices.at(original)));}
+  const auto old=polygon_geometry_frame(p,uv,AffineTransform{}),current=polygon_geometry_frame(q,current_uv,AffineTransform{});streams->frames.push_back({std::array<float,4>{old.basis.n.x,old.basis.n.y,old.basis.n.z,old.handedness},std::array<float,4>{old.basis.t.x,old.basis.t.y,old.basis.t.z,0},std::array<float,4>{current.basis.n.x,current.basis.n.y,current.basis.n.z,current.handedness},std::array<float,4>{current.basis.t.x,current.basis.t.y,current.basis.t.z,0}});
  }
- result->baked_=paint.baked();result->self_=result;stop(l.geometry.cancelled);return result;
+ result->streams_=std::move(streams);result->baked_=paint.baked();result->self_=result;stop(l.geometry.cancelled);return result;
 }
 bool PolygonSurfacePreview::matches(const std::shared_ptr<const SourceMaterialBindings>&binding,
  const std::shared_ptr<const PaintSamplingAttachment>&attachment)const noexcept{
@@ -67,9 +68,9 @@ Vec3 PolygonSurfacePreview::normal_at(size_t triangle,std::array<double,3>b,cons
 void PolygonSurfacePreview::validate_world(const AffineTransform&world,double minimum,const std::function<bool()>&cancel)const{
  if(!std::isfinite(minimum)||minimum<=0||minimum>1)throw std::invalid_argument("Invalid complete polygon field conditioning bound");
  stop(cancel);(void)world.inverse();const float hand=world.orientation()==AffineOrientation::Reversing?-1.f:1.f;
- for(size_t t=0;t<normals_.size()/3;++t){
+ for(size_t t=0;t<streams_->normals.size()/3;++t){
   stop(cancel);std::array<NormalBakeVertex,3>v{};
-  for(size_t k=0;k<3;++k){const auto c=t*3+k;const auto n=transform_normal(world,normals_[c]);if(model_==PolygonSurfaceNormalModel::NativeNOnly)v[k].n=n;else{const auto raw=tangents_.at(c);v[k]=normal_bake_vertex(n,transform_tangent(world,raw),raw[3]*hand,NormalVertexBitangent::UnitCross);}}
+  for(size_t k=0;k<3;++k){const auto c=t*3+k;const auto n=transform_normal(world,streams_->normals[c]);if(model_==PolygonSurfaceNormalModel::NativeNOnly)v[k].n=n;else{const auto raw=streams_->tangents.at(c);v[k]=normal_bake_vertex(n,transform_tangent(world,raw),raw[3]*hand,NormalVertexBitangent::UnitCross);}}
   if(model_==PolygonSurfaceNormalModel::NativeNOnly){for(size_t i=0;i<3;++i)for(size_t j=i+1;j<3;++j)if(dot(v[i].n,v[j].n)<=minimum)throw std::invalid_argument("Polygon N-only interpolation needs a finer whole-triangle nonzero proof");continue;}
   if(v[0].w!=v[1].w||v[0].w!=v[2].w)throw std::invalid_argument("Polygon before artist W changes inside its triangle");
   // det(T(b),B(b),N(b)) is a homogeneous cubic in barycentrics. Its10
@@ -84,8 +85,8 @@ void PolygonSurfacePreview::validate_world(const AffineTransform&world,double mi
  stop(cancel);
 }
 std::vector<std::array<std::array<float,4>,4>>PolygonSurfacePreview::placed_frames(const AffineTransform&world,const std::function<bool()>&cancel)const{
- validate_world(world,1e-6,cancel);if(frames_.size()>128*1024*1024/sizeof(frames_[0]))throw std::length_error("Polygon primitive frames exceed their bounded upload workspace");
- auto result=frames_;const float hand=world.orientation()==AffineOrientation::Reversing?-1.f:1.f;
+ validate_world(world,1e-6,cancel);if(streams_->frames.size()>128*1024*1024/sizeof(streams_->frames[0]))throw std::length_error("Polygon primitive frames exceed their bounded upload workspace");
+ auto result=streams_->frames;const float hand=world.orientation()==AffineOrientation::Reversing?-1.f:1.f;
  for(auto&frame:result){stop(cancel);for(size_t first:{size_t(0),size_t(2)}){
   const auto raw_n=frame[first],raw_t=frame[first+1];const auto n=transform_normal(world,{raw_n[0],raw_n[1],raw_n[2]});
   auto t=normal_bake_math::vec(world.direction({raw_t[0],raw_t[1],raw_t[2]}));t=normal_bake_math::unit(t-n*dot(n,t));
