@@ -251,8 +251,13 @@ if(BUILD_TESTING)
     ${CMAKE_CURRENT_BINARY_DIR}/source-hdr-provenance-closure-seed/selected-target-resolution.dsculpt)
   set_tests_properties(source-retained-emission-worker PROPERTIES FIXTURES_REQUIRED hdr-closure-seed TIMEOUT 900)
   add_test(NAME source-hdr-provenance-closure-seed COMMAND dome-sculpt-source-joint-writable-normal-bake-test
-    --checked-case 000 2048 ${CMAKE_CURRENT_BINARY_DIR}/source-hdr-provenance-closure-seed)
+    --checked-seed 000 2048 ${CMAKE_CURRENT_BINARY_DIR}/source-hdr-provenance-closure-seed)
   set_tests_properties(source-hdr-provenance-closure-seed PROPERTIES FIXTURES_SETUP hdr-closure-seed TIMEOUT 900)
+  # The provenance consumers read only the pre-Bake project. Keep the full
+  # 2048 Bake, numerical oracle and history checks independently registered.
+  add_test(NAME source-hdr-joint-full-size COMMAND dome-sculpt-source-joint-writable-normal-bake-test
+    --checked-case 000 2048 ${CMAKE_CURRENT_BINARY_DIR}/source-hdr-joint-full-size)
+  set_tests_properties(source-hdr-joint-full-size PROPERTIES TIMEOUT 900)
   # A same-current-build seed cannot prove replay of old full-before-context
   # Scene43. This small archive contains actual bytes from the unchanged05
   # producer, with both archive and extracted native checksums verified.

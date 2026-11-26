@@ -44,9 +44,30 @@ D decode(const SculptObject&o,size_t tri,std::array<float,3>bary,size_t role,boo
 D physical(const PaintedMesh &paint,std::array<double,2> uv){const int r=int(paint.resolution());const double x=uv[0]*r-.5,y=uv[1]*r-.5;require(std::isfinite(x)&&std::isfinite(y),"Finite independent physical coordinates");const int ix=int(std::floor(x)),iy=int(std::floor(y));D result{};for(int dy=0;dy<2;++dy)for(int dx=0;dx<2;++dx){const auto px=std::clamp(ix+dx,0,r-1),py=std::clamp(iy+dy,0,r-1);D texel{};for(const auto &layer:paint.layers())if(layer.visible&&layer.opacity){const auto emission=paint.emission_pixel(layer.id,px,py);const double coverage=double(emission.coverage)*paint.pixel(layer.id,px,py).data[13]/255.*layer.opacity;for(size_t axis=0;axis<3;++axis)texel[axis]=texel[axis]*(1-coverage)+emission.physical[axis]*coverage;}const double weight=(dx?x-ix:1-(x-ix))*(dy?y-iy:1-(y-iy));result=add(result,mul(texel,weight));}finite_sample(result);return result;}
 
 std::array<double,2> paint_uv(const SculptObject&o,size_t triangle,std::array<float,3>bary){const auto&d=*o.painted->paint_sampling_domain();const auto&m=*d.basis();std::array<double,2>q{};for(size_t k=0;k<3;++k){const auto uv=m.uv.at(m.indices.at(d.source_corners()[triangle*3+k]));for(size_t axis=0;axis<2;++axis)q[axis]+=double(uv[axis])*bary[k];}return q;}
-void exercise(bool seam,bool live,bool repeat,const std::filesystem::path&out,uint32_t checked_resolution=0,bool expect_refusal=false){
+enum class CheckedTask { Full, Refusal, Seed };
+
+void exercise(bool seam,bool live,bool repeat,const std::filesystem::path&out,
+              uint32_t checked_resolution=0,CheckedTask task=CheckedTask::Full){
  auto s=prepared(seam);uv(s);if(repeat)uv(s);stroke(s);pose(s,live);const auto source=s.active().id;const auto original=s.encode();const auto raw=detail::raw_bake_source(s.active());const auto resolver=detail::source_bake_normals(s.active(),{});require(raw&&!raw->source_only&&raw->overlay&&raw->normal_projection&&resolver.matches_prepared_source(*raw),"Joint source resolves colour factors separately while authenticating actual normal/material/paint owners");double direct=0,omitted_normal=0,wrong_normal=0;const auto triangles=s.active().painted->mesh().indices.size()/3;for(size_t tri=0;tri<triangles;++tri){const std::array<float,3>bary{.25f,.35f,.4f};const auto wanted=decode(s.active(),tri,bary,0);direct=std::max(direct,error(wanted,resolver(tri,bary)[0]));const auto omitted=decode(s.active(),tri,bary,0,false,true),wrong=decode(s.active(),tri,bary,0,true,false);for(size_t axis=0;axis<3;++axis){omitted_normal=std::max(omitted_normal,std::abs(wanted[axis]-omitted[axis]));wrong_normal=std::max(wrong_normal,std::abs(wanted[axis]-wrong[axis]));}}require(direct<3e-6&&omitted_normal>.05&&wrong_normal>.05,"Independent joint live source normal equation rejects omitted and wrong-normal-domain controls");
- const auto evaluated=s.active().deformation->preview(s.active().painted->mesh());const auto&domain=*s.active().painted->paint_sampling_domain();const auto&basis=*domain.basis();Mesh destination_mesh;for(size_t c=0;c<evaluated.indices.size();++c){const auto v=evaluated.indices[c];destination_mesh.positions.push_back(evaluated.positions[v]);destination_mesh.normals.push_back(evaluated.normals[v]);destination_mesh.uv.push_back(basis.uv[basis.indices[domain.source_corners()[c]]]);destination_mesh.indices.push_back(uint32_t(c));}const auto destination=target(s,destination_mesh,false);s.select(destination);auto final_settings=settings();if(checked_resolution){owning_filtered::select_resolution(s,source,checked_resolution,out,require);final_settings.normal_filter_quality=1;final_settings.emission_transport=1;}if(expect_refusal){owning_filtered::refusal(s,source,final_settings,out,require);std::cout<<"CHECKED_SOURCE_REFUSAL resolution="<<checked_resolution<<std::endl;return;}const auto before=s.encode();const auto native=s.snapshot();require(bake_object(s,source,final_settings).projected>500,"Actual combined Source8 SOURCE second Bake projects");
+ const auto evaluated=s.active().deformation->preview(s.active().painted->mesh());const auto&domain=*s.active().painted->paint_sampling_domain();const auto&basis=*domain.basis();Mesh destination_mesh;for(size_t c=0;c<evaluated.indices.size();++c){const auto v=evaluated.indices[c];destination_mesh.positions.push_back(evaluated.positions[v]);destination_mesh.normals.push_back(evaluated.normals[v]);destination_mesh.uv.push_back(basis.uv[basis.indices[domain.source_corners()[c]]]);destination_mesh.indices.push_back(uint32_t(c));}const auto destination=target(s,destination_mesh,false);s.select(destination);
+ auto final_settings=settings();
+ if(checked_resolution){
+  owning_filtered::select_resolution(s,source,checked_resolution,out,require);
+  final_settings.normal_filter_quality=1;
+  final_settings.emission_transport=1;
+ }
+ if(task==CheckedTask::Seed){
+  std::cout<<"CHECKED_SOURCE_SEED resolution="<<checked_resolution<<std::endl;
+  return;
+ }
+ if(task==CheckedTask::Refusal){
+  owning_filtered::refusal(s,source,final_settings,out,require);
+  std::cout<<"CHECKED_SOURCE_REFUSAL resolution="<<checked_resolution<<std::endl;
+  return;
+ }
+ const auto before=s.encode();
+ const auto native=s.snapshot();
+ require(bake_object(s,source,final_settings).projected>500,"Actual combined Source8 SOURCE second Bake projects");
  const auto target_maps=s.active().painted->preview(s.active().material);const auto material=detail::EmissionExportAccess::other_channels(*s.object(source).painted,s.object(source).material,{});const auto&low=s.active().painted->mesh();double normal_error=0,material_error=0,emission_error=0,peak=0,wrong_material=0,omitted_pbr=0;size_t interior=0;
  for(size_t y=0;y<64;++y)for(size_t x=0;x<64;++x){const std::array<double,2>q{(x+.5)/64.,(y+.5)/64.};for(size_t tri=0;tri<triangles;++tri){const auto a=low.uv[low.indices[tri*3]],b=low.uv[low.indices[tri*3+1]],c=low.uv[low.indices[tri*3+2]];const double den=(b[1]-c[1])*(a[0]-c[0])+(c[0]-b[0])*(a[1]-c[1]);require(std::isfinite(den)&&std::abs(den)>1e-20,"Independent finite joint target UV determinant");const double u=((b[1]-c[1])*(q[0]-c[0])+(c[0]-b[0])*(q[1]-c[1]))/den,v=((c[1]-a[1])*(q[0]-c[0])+(a[0]-c[0])*(q[1]-c[1]))/den;if(std::min({u,v,1-u-v})<.08)continue;const std::array<float,3>bary{float(u),float(v),float(1-u-v)};const auto wanted=decode(s.object(source),tri,bary,0);for(size_t role=0;role<2;++role){const auto actual=direction(s.active(),tri,bary,role,target_maps.get());finite_sample(actual);for(size_t axis=0;axis<3;++axis)normal_error=std::max(normal_error,std::abs(wanted[axis]-actual[axis]));}const auto root=paint_uv(s.object(source),tri,bary);const auto wanted_color=sample(material->pbr_color,root,true),actual_color=sample(s.active().painted->baked()->maps.pbr_color,q,true);const auto legacy=sample(material->color,root,true),actual_legacy=sample(s.active().painted->baked()->maps.color,q,true);std::array<double,2> current_uv{};for(size_t k=0;k<3;++k)for(size_t axis=0;axis<2;++axis)current_uv[axis]+=double(s.object(source).painted->mesh().uv[s.object(source).painted->mesh().indices[tri*3+k]][axis])*bary[k];const auto wrong=sample(material->pbr_color,current_uv,true);for(size_t axis=0;axis<3;++axis){material_error=std::max({material_error,std::abs(wanted_color[axis]-actual_color[axis]),std::abs(legacy[axis]-actual_legacy[axis])});wrong_material=std::max(wrong_material,std::abs(wanted_color[axis]-wrong[axis]));omitted_pbr=std::max(omitted_pbr,std::abs(wanted_color[axis]-legacy[axis]));}const auto emission=physical(*s.object(source).painted,root);const auto&baked=*s.active().painted->baked();require(bool(baked.emission_field)!=bool(baked.emission_domain),"Joint second Bake owns exactly one actual independent FLOAT output");const auto value=(baked.emission_domain?baked.emission_domain->field():baked.emission_field)->sample(float(q[0]),float(q[1])).resolve({},1);for(size_t axis=0;axis<3;++axis){emission_error=std::max(emission_error,std::abs(emission[axis]-value[axis]));peak=std::max(peak,emission[axis]);}++interior;break;}}
  std::cout<<"JOINT_OBSERVATION seam="<<seam<<" live="<<live<<" repeat="<<repeat<<" direct="<<direct<<" normal="<<normal_error<<" material="<<material_error<<" wrongMaterial="<<wrong_material<<" omittedPbr="<<omitted_pbr<<" omittedNormal="<<omitted_normal<<" wrongNormal="<<wrong_normal<<" emission="<<emission_error<<" peak="<<peak<<" interior="<<interior<<std::endl;
@@ -93,6 +114,38 @@ void negatives(){
 }
 }
 #ifndef DOME_JOINT_SOURCE_EMBEDDED
-int main(int argc,char**argv)try{if(argc==5&&(std::string_view(argv[1])=="--checked-case"||std::string_view(argv[1])=="--checked-refusal")){const auto axes=owning_filtered::bits(argv[2],3);const auto selected=owning_filtered::resolution(argv[3]);const std::filesystem::path out=argv[4];std::filesystem::create_directories(out);joint_source::exercise(axes[0],axes[1],axes[2],out,selected,std::string_view(argv[1])=="--checked-refusal");std::cout<<"PASS "<<joint_source::checks<<" checked joint-writable SOURCE controls"<<std::endl;return 0;}if(argc==3&&std::string_view(argv[1])=="--legacy-controls"){argv[1]=argv[2];argc=2;}if(argc!=2)return 2;const std::filesystem::path out=argv[1];std::filesystem::create_directories(out);for(bool seam:{false,true})for(bool live:{false,true})for(bool repeat:{false,true})joint_source::exercise(seam,live,repeat,out);joint_source::negatives();std::cout<<"PASS "<<joint_source::checks<<" joint source checks\n";return 0;}catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
+int main(int argc,char**argv)try{
+  if(argc==5){
+    const std::string_view command=argv[1];
+    auto task=joint_source::CheckedTask::Full;
+    if(command=="--checked-seed")task=joint_source::CheckedTask::Seed;
+    else if(command=="--checked-refusal")task=joint_source::CheckedTask::Refusal;
+    else if(command!="--checked-case")return 2;
+    const auto axes=owning_filtered::bits(argv[2],3);
+    const auto selected=owning_filtered::resolution(argv[3]);
+    if(task==joint_source::CheckedTask::Seed && selected==64)
+      throw std::invalid_argument("Checked seed requires an explicit target resize");
+    const std::filesystem::path out=argv[4];
+    std::filesystem::create_directories(out);
+    joint_source::exercise(axes[0],axes[1],axes[2],out,selected,task);
+    std::cout<<"PASS "<<joint_source::checks<<" checked joint-writable SOURCE controls"<<std::endl;
+    return 0;
+  }
+  if(argc==3&&std::string_view(argv[1])=="--legacy-controls"){
+    argv[1]=argv[2];
+    argc=2;
+  }
+  if(argc!=2)return 2;
+  const std::filesystem::path out=argv[1];
+  std::filesystem::create_directories(out);
+  for(bool seam:{false,true})for(bool live:{false,true})for(bool repeat:{false,true})
+    joint_source::exercise(seam,live,repeat,out);
+  joint_source::negatives();
+  std::cout<<"PASS "<<joint_source::checks<<" joint source checks\n";
+  return 0;
+}catch(const std::exception&e){
+  std::cerr<<"FAIL "<<e.what()<<'\n';
+  return 1;
+}
 
 #endif
