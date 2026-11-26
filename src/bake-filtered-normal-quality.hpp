@@ -24,6 +24,8 @@ inline void verify_filtered_normal_quality(const Mesh &low,const BakeSource &hig
       result.normal.width!=r||result.normal.height!=r||result.maps.mtoon_normal.width!=r||
       result.maps.mtoon_normal.height!=r||result.coverage.size()!=size_t(r)*r)
     throw std::invalid_argument("Filtered normal quality dimensions differ from their selected target grid");
+  result.normal.validate();
+  result.maps.mtoon_normal.validate();
   std::optional<SurfaceQuery> query;
   if(options.source_triangles.empty())query.emplace(high.mesh,options.cancelled);
   auto charge=[&]{
@@ -34,12 +36,22 @@ inline void verify_filtered_normal_quality(const Mesh &low,const BakeSource &hig
   };
   auto edge=[](const std::array<float,2>&a,const std::array<float,2>&b,const std::array<double,2>&q){
     return (double(b[0])-a[0])*(q[1]-a[1])-(double(b[1])-a[1])*(q[0]-a[0]);};
-  auto filtered=[&](const Image &im,int x,int y,double u,double v){
+  // The nine reconstruction probes share the same four texels. Decode each
+  // corner once, keeping the accumulation order at every probe identical.
+  auto cell_texels=[r](const Image &image,int x,int y){
+    std::array<D,4> texels{};
+    for(int dy=0;dy<2;++dy)for(int dx=0;dx<2;++dx){
+      const size_t at=(size_t(y+dy)*r+size_t(x+dx))*4;
+      for(size_t c=0;c<3;++c)
+        texels[dy*2+dx][c]=double(image.rgba[at+c])/255*2-1;
+    }
+    return texels;
+  };
+  auto filtered=[&](const std::array<D,4> &texels,double u,double v){
     D q{};
     for(int dy=0;dy<2;++dy)for(int dx=0;dx<2;++dx){
       const double w=(dx?u:1-u)*(dy?v:1-v);
-      const size_t at=(size_t(y+dy)*r+size_t(x+dx))*4;
-      for(size_t c=0;c<3;++c)q[c]+=(double(im.rgba.at(at+c))/255*2-1)*w;
+      for(size_t c=0;c<3;++c)q[c]+=texels[dy*2+dx][c]*w;
     }
     if(options.normal_y_down)q[1]=-q[1];
     return q;
@@ -69,6 +81,8 @@ inline void verify_filtered_normal_quality(const Mesh &low,const BakeSource &hig
         interior&=*std::min_element(bary.begin(),bary.end())>1e-6&&result.coverage.at(size_t(y+dy)*r+size_t(x+dx))==1;
       }
       if(!interior)continue;
+      const std::array cell{cell_texels(result.normal,x,y),
+                            cell_texels(result.maps.mtoon_normal,x,y)};
       for(double oy:offsets)for(double ox:offsets){
         charge();const auto weights=barycentric(x+.5+ox,y+.5+oy);
         const std::array<float,3> bary{float(weights[0]),float(weights[1]),float(weights[2])};
@@ -100,7 +114,7 @@ inline void verify_filtered_normal_quality(const Mesh &low,const BakeSource &hig
         const auto pb=normal_bake_basis(pv,weights,NormalFragmentBasis::UnitColumns);
         const auto tb=mode==PreparedMToonNormalEvaluation::Absent?pb:normal_bake_basis(tv,weights,mode==PreparedMToonNormalEvaluation::LegacyRawInterpolated?NormalFragmentBasis::RawColumns:NormalFragmentBasis::UnitCross);
         for(size_t role=0;role<2;++role){
-          auto q=filtered(role?result.maps.mtoon_normal:result.normal,x,y,ox,oy);
+          auto q=filtered(cell[role],ox,oy);
           if(role&&mode!=PreparedMToonNormalEvaluation::Absent){q[0]*=toon_scale;q[1]*=toon_scale;}
           const auto actual=normal_bake_math::unit(normal_bake_math::apply(role?tb:pb,q));
           const auto wanted=normal_bake_math::unit(normal_bake_math::vec(desired[role]));
