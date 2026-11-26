@@ -366,7 +366,8 @@ qualified HDR channel reuse, five sculpt regression fixtures and first-open
 creator framing. Its fresh optimized App build and 21 selected native and
 software renderer cases are running in
 `ds-production-mapped-hdr-creator-20261126.service`. The smaller mapped
-candidate has a separate strict sanitizer build. Each result belongs to its
+candidate passes all three selected strict sanitizer cases and reproduces the
+three original identity-case GLBs byte for byte. Each result belongs to its
 own source revision.
 
 ## Source and integration boundary
