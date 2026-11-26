@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "source-artist-normal-fixture.hpp"
+#include "source-artist-normal-oracle.hpp"
+#include "affine-surface.hpp"
 #include "emission-bake-source.hpp"
 #include "dome/normal-preparation.hpp"
 #include "dome/normal-sampling.hpp"
@@ -22,12 +24,16 @@ D sample(const Image &im,std::array<double,2> uv,bool srgb=false){
  for(int dy=0;dy<2;++dy)for(int dx=0;dx<2;++dx){const auto px=std::clamp(ix+dx,0,int(im.width)-1),py=std::clamp(iy+dy,0,int(im.height)-1);const double w=(dx?x-ix:1-(x-ix))*(dy?y-iy:1-(y-iy));for(size_t c=0;c<3;++c){double value=im.rgba[(size_t(py)*im.width+px)*4+c]/255.;if(srgb)value=value<=.04045?value/12.92:std::pow((value+.055)/1.055,2.4);out[c]+=w*value;}}
  finite_sample(out);return out;
 }
-D direction(const SculptObject &o,size_t triangle,std::array<float,3> bary,size_t role){
+D direction(const SculptObject &o,size_t triangle,std::array<float,3> bary,size_t role,
+    const AffineTransform &world={}){
  const auto &binding=*o.material_bindings;const auto &frames=role==0?*binding.normal_frames->pbr:*binding.normal_frames->mtoon;
  D n{},t{},b{};std::array<double,2> uv{};const auto &mesh=o.painted->mesh();
- for(size_t k=0;k<3;++k){const auto c=triangle*3+k;const auto v=mesh.indices[c];const auto nt=unit(vc(frames.normals[c]));const auto tt=frames.tangents[c];const auto tangent=unit(D{tt[0],tt[1],tt[2]});n=add(n,mul(nt,bary[k]));t=add(t,mul(tangent,bary[k]));b=add(b,mul(unit(crossd(nt,tangent)),bary[k]*tt[3]));for(size_t q=0;q<2;++q)uv[q]+=mesh.uv[v][q]*bary[k];}
+ const auto &m=world.matrix();
+ const double determinant=m[0]*(m[5]*m[10]-m[9]*m[6])-m[4]*(m[1]*m[10]-m[9]*m[2])+m[8]*(m[1]*m[6]-m[5]*m[2]);
+ const double orientation=determinant<0?-1:1;
+ for(size_t k=0;k<3;++k){const auto c=triangle*3+k;const auto v=mesh.indices[c];const auto nt=unit(vc(source_artist_oracle::normal(m,frames.normals[c])));const auto tt=frames.tangents[c];const auto tangent=unit(vc(source_artist_oracle::direction(m,{tt[0],tt[1],tt[2]})));n=add(n,mul(nt,bary[k]));t=add(t,mul(tangent,bary[k]));b=add(b,mul(unit(crossd(nt,tangent)),bary[k]*tt[3]*orientation));for(size_t q=0;q<2;++q)uv[q]+=mesh.uv[v][q]*bary[k];}
  const bool legacy=binding.material.version()==MToonVersion::V0;
- if(role==0){n=unit(n);t=unit(t);b=unit(b);}else if(!legacy){n=unit(n);t=unit(t);b=mul(unit(crossd(n,t)),frames.tangents[triangle*3][3]);}
+ if(role==0){n=unit(n);t=unit(t);b=unit(b);}else if(!legacy){n=unit(n);t=unit(t);b=mul(unit(crossd(n,t)),frames.tangents[triangle*3][3]*orientation);}
  const auto maps=o.painted->preview(o.material);const auto encoded=sample(role==0?maps->normal:maps->mtoon_normal,uv);const double scale=role==0?1:binding.material.parameters.normal_scale;
  D ts{(encoded[0]*2-1)*scale,(encoded[1]*2-1)*scale,encoded[2]*2-1};
  return unit(add(add(mul(t,ts[0]),mul(b,ts[1])),mul(n,ts[2])));
@@ -38,6 +44,35 @@ std::shared_ptr<const SourceMaterialBindings> blank_typed(bool legacy){
 }
 uint64_t target(Scene &scene,const Mesh &mesh,bool legacy){
  const auto id=scene.add("Independent prepared destination",Volume{});auto &o=scene.object(id);o.mesh_active=true;o.painted=std::make_shared<PaintedMesh>(mesh,64);o.material_bindings=blank_typed(legacy);return id;
+}
+void affine_prepared_source(Scene scene,uint64_t donor,bool legacy,ObjectBakeSettings settings){
+ auto &source=scene.object(donor);
+ const std::array<double,16> m{-1.4,.2,0,0, .22,.81,0,0, 0,0,1.3,0, .8,-.4,.2,1};
+ source.affine_edit=std::make_shared<const NativeAffineEdit>(AffineTransform(m));
+ source.visible=false;
+ const auto frame=detail::placement_frame(scene,donor);
+ detail::SourceBakeNormalOptions capture;capture.placement=&frame;
+ const auto resolver=detail::source_bake_normals(source,{},capture);
+ double maximum=0;
+ auto low=source.painted->mesh();
+ for(uint32_t tri=0;tri<low.indices.size()/3;++tri){
+  const std::array<float,3> bary{.2f,.3f,.5f};
+  const auto got=resolver(tri,bary);
+  for(size_t role=0;role<2;++role)maximum=std::max(maximum,error(direction(source,tri,bary,role,frame.world()),got[role]));
+ }
+ check(maximum<3e-6,"The independent prepared-image decoder agrees under reflection and shear in both normal roles");
+ const auto paint=source.painted;
+ const auto binding=source.material_bindings;
+ for(auto &p:low.positions){const auto q=frame.world().point({p.x,p.y,p.z});p={float(q[0]),float(q[1]),float(q[2])};}
+ low.normals.assign(low.positions.size(),{0,0,1});
+ target(scene,low,legacy);
+ settings.front_mm=settings.back_mm=2;
+ settings.corresponding_topology=true;
+ const auto report=bake_object(scene,donor,settings);
+ const auto baked=scene.active().painted->baked();
+ check(report.projected>500&&baked&&baked->maps.normal.rgba!=baked->maps.mtoon_normal.rgba&&
+       scene.object(donor).painted==paint&&scene.object(donor).material_bindings==binding,
+       "The matching worker rebakes distinct affine prepared normal roles and retains their source owners");
 }
 
 void emission_guards(const Scene &baseline,uint64_t source,const ObjectBakeSettings &options,const std::filesystem::path &folder){
@@ -113,6 +148,7 @@ void run_case(bool legacy,bool posed,const std::filesystem::path &folder){
  bool cancelled=true;for(size_t point=1;point<=polls;++point){size_t at=0;limited.cancelled=[&]{return ++at>=point;};cancelled&=refuses([&]{detail::source_bake_normals(f.scene.object(first),{},limited);})&&f.scene.encode()==before;}
  check(cancelled&&polls>1,"Every prepared-source capture cancellation boundary preserves source, recipe and history");
  const auto second=target(f.scene,mesh,legacy);f.scene.select(second);const auto original=f.scene.encode();const auto native_before=f.scene.snapshot();
+ if(posed)affine_prepared_source(native_before,first,legacy,options);
  if(!legacy&&posed){emission_guards(native_before,first,options,folder);advanced_recipe_guards(native_before,first,options);}
  const auto report=bake_object(f.scene,first,options);check(report.projected&&f.scene.object(second).painted->baked(),"A real prepared Bake result is reusable as the source of a second Bake");
  check(f.scene.object(first).painted==prepared&&f.scene.object(first).material_bindings==binding,"Second Bake retains the exact immutable prepared source owners");

@@ -3,13 +3,16 @@
 #include "dome/bake.hpp"
 #include <span>
 namespace dome::detail {
+class AffineInteractionFrame;
 // Actual object-space roles after authentic artist-frame/morph/skin transport,
-// rotated into the low target's coordinate system. Never a display normal map.
+// placed into the low target's coordinate system. Never a display normal map.
 using SourceBakeNormalResolver=std::function<std::array<Vec3,2>(uint32_t,std::array<float,3>)>;
 struct SourceBakeNormalOptions {
  size_t max_working_bytes=256*1024*1024;
  std::function<bool()> cancelled;
+ const AffineInteractionFrame *placement=nullptr;
 };
+bool affine_source_normal_supported(const SculptObject &) noexcept;
 SourceBakeNormalResolver source_bake_normals(const SculptObject &,CanvasTransform,
  const SourceBakeNormalOptions & = {});
 struct RetainedSourceBakeHit {

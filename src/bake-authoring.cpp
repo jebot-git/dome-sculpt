@@ -24,6 +24,7 @@
 #include "emission-authority.hpp"
 #include "emission-paint-access.hpp"
 #include "affine-surface.hpp"
+#include "source-skin-world.hpp"
 namespace dome {
 namespace {
 // Reuse the sealed before/current streams once the hit belongs to its field.
@@ -337,10 +338,11 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
     high.materials[0].resolved_emission=detail::emission_bake_source(source,cancelled);
   }
   detail::SourceBakeNormalOptions source_normal_options;source_normal_options.cancelled=cancelled;
+  source_normal_options.placement=placement?&*placement:nullptr;
   const auto source_normals=source.texture_sets?detail::SourceBakeNormalResolver{}:
       detail::source_bake_normals(source,relative,source_normal_options);
   std::vector<Tangent> placed_corners;
-  if(placement&&std::any_of(high.materials.begin(),high.materials.end(),[](const auto &field){
+  if(placement&&!source_normals&&std::any_of(high.materials.begin(),high.materials.end(),[](const auto &field){
        return field.maps&&!field.maps->polygon_surface&&!field.maps->normal.rgba.empty();
       })){
     placed_corners=tangent_corners(high.mesh,cancelled);
@@ -369,9 +371,25 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
       source_to_bake=AffineTransform(matrix);
     }
     const auto transform=target_placement?metric_from_world*source_to_bake:source_to_bake;
+    std::optional<std::vector<Vec3>> source_positions;
+    if(placement&&source.mesh_active&&source.appearance&&source.deformation&&source.deformation->skin){
+      // The retained mesh node and original joint graph can have different
+      // spaces. Use the same authenticated evaluation as the viewport, and
+      // center the result before converting the skin positions to float.
+      ObjectSurface surface;
+      surface.id=source.id;surface.transform=source.transform;surface.mesh=source.painted->mesh();
+      surface.deformation=source.deformation;surface.groups=scene.group_path(source.group);
+      surface.appearance=source.appearance;surface.affine_edit=source.affine_edit;surface.rig_source=source.rig_source;
+      auto matrix=affine_similarity(target_inverse).matrix();
+      for(size_t axis=0;axis<3;++axis)matrix[12+axis]-=bake_origin[axis];
+      const auto output_from_world=target_placement?metric_from_world:AffineTransform(matrix);
+      source_positions=detail::source_skin_world_positions(surface,cancelled,256u*1024u*1024u,&output_from_world);
+      if(source_positions)high.mesh.positions=std::move(*source_positions);
+    }
     for(size_t i=0;i<high.mesh.positions.size();++i){
       if((i&1023)==0)check();
-      high.mesh.positions[i]=detail::affine_position(transform.point(detail::affine_vector(high.mesh.positions[i])));
+      if(!source_positions)
+        high.mesh.positions[i]=detail::affine_position(transform.point(detail::affine_vector(high.mesh.positions[i])));
       const auto n=placement?detail::placed_normal(*placement,high.mesh.normals[i]):high.mesh.normals[i];
       const auto rotated=ob::rotate(relative.orientation,{n.x,n.y,n.z});
       high.mesh.normals[i]={rotated.x,rotated.y,rotated.z};

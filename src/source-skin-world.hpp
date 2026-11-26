@@ -10,7 +10,8 @@ namespace dome::detail {
 // never infer it from a matrix value or a matching joint name alone.
 inline std::optional<std::vector<Vec3>> source_skin_world_positions(
     const ObjectSurface &surface,const std::function<bool()> &cancelled={},
-    size_t maximum_bytes=256u*1024u*1024u) {
+    size_t maximum_bytes=256u*1024u*1024u,
+    const AffineTransform *output_from_world=nullptr) {
   const auto &d=surface.deformation;const auto &appearance=surface.appearance;
   if(!d||!d->skin||!d->skeleton||!appearance||!appearance->asset||
       appearance->source_node<0||!d->skeleton->space_matrix||!d->skeleton->inverse_bind_override)return {};
@@ -50,7 +51,9 @@ inline std::optional<std::vector<Vec3>> source_skin_world_positions(
     local=std::move(graph.parts.at(0).pose_local);
   }
   AffineTransform original_world;for(auto source:ancestry)original_world=original_world*AffineTransform(asset.nodes[source].local);
-  const auto model_to_world=placement_frame(surface).world()*original_world.inverse();
+  const auto placement=placement_frame(surface).world();
+  const auto object_to_output=output_from_world?*output_from_world*placement:placement;
+  const auto model_to_output=object_to_output*original_world.inverse();
   std::vector<AffineTransform> world(local.size());std::vector<uint8_t> done(local.size());
   auto visit=[&](auto &&self,size_t bone,size_t depth)->void{
     stop();if(done[bone]==2)return;if(done[bone]||depth>256)throw std::invalid_argument("Source skin world joint hierarchy is cyclic or excessive");done[bone]=1;
@@ -60,12 +63,12 @@ inline std::optional<std::vector<Vec3>> source_skin_world_positions(
   // capture_source_rest_graph authenticated this exact immutable explicit IBM
   // owner/count and finite affine values. Reuse it within this operation.
   const auto &binds=*skeleton.inverse_bind_override;std::vector<AffineTransform> matrices;matrices.reserve(local.size());
-  for(size_t bone=0;bone<local.size();++bone){visit(visit,bone,1);matrices.push_back(model_to_world*world[bone]*AffineTransform(binds[bone]));}
+  for(size_t bone=0;bone<local.size();++bone){visit(visit,bone,1);matrices.push_back(model_to_output*world[bone]*AffineTransform(binds[bone]));}
   auto morphed=surface.mesh;if(d->morphs&&!d->morph_weights.empty())morphed=d->morphs->evaluate(surface.mesh,d->morph_weights);
   std::vector<Vec3> positions;positions.reserve(morphed.positions.size());
   for(size_t vertex=0;vertex<morphed.positions.size();++vertex){if((vertex&1023)==0)stop();AffineVector position{};
     bool influenced=false;for(const auto &influence:d->skin->vertices[vertex]){if(!influence.weight)continue;influenced=true;const auto p=matrices.at(influence.joint).point(affine_vector(morphed.positions[vertex]));for(size_t axis=0;axis<3;++axis)position[axis]+=p[axis]*influence.weight;}
-    if(!influenced)position=placement_frame(surface).world().point({0,0,0}); // Preserve existing native zero-influence policy.
+    if(!influenced)position=object_to_output.point({0,0,0}); // Preserve existing native zero-influence policy.
     positions.push_back(affine_position(position));
   }
   stop();return positions;

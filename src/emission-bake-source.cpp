@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "emission-bake-source.hpp"
+#include "affine-surface.hpp"
 #include "paint-overlay-sample.hpp"
 #include "source-bake-normal.hpp"
 #include "normal-frame-runtime.hpp"
@@ -94,6 +95,23 @@ struct Source {
     return replacement.resolve(original,legacy_strength);
   }
 };
+const char *source_normal_domain_error(const SculptObject &object,bool prepared) noexcept {
+  const auto &binding=object.material_bindings;
+  if(prepared&&(object.painted->normal_projection()->version!=1||binding->normal_preparation->uv_reprojection||
+      binding->normal_preparation->sampling_domain||binding->sampling_reparameterized))
+    return "Prepared source UV edits require their own normal/material coordinate authority adapter";
+  if(!object.mesh_active||!object.painted||!object.painted->valid_source_sampling_attachment()||
+     binding->canonical_attributes||binding->canonical_uv||binding->canonical_paint_sampling||binding->native_paint_sampling||binding->native_paint_frames||
+     bool(binding->normal_preparation)!=bool(object.painted->normal_projection())||object.painted->color_projection()||
+     (object.painted->baked()&&((!prepared&&!object.painted->baked()->maps.normal.rgba.empty())||object.painted->baked()->normal_field||(!prepared&&object.painted->baked()->normal_authority))))
+    return "Artist source normal capture requires its unchanged original frame and separate current-normal adapter";
+  return nullptr;
+}
+}
+bool affine_source_normal_supported(const SculptObject &object) noexcept {
+  const auto &binding=object.material_bindings;
+  if(!binding||!binding->normal_frames||!object.painted)return false;
+  return !source_normal_domain_error(object,object.painted->normal_projection()&&binding->normal_preparation);
 }
 SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTransform relative,
     const SourceBakeNormalOptions &options){
@@ -101,14 +119,7 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTr
   if(!binding||!binding->normal_frames)return {};
   auto stop=[&]{if(options.cancelled&&options.cancelled())throw std::runtime_error("Source normal capture cancelled");};stop();
   const bool prepared=object.painted&&object.painted->normal_projection()&&binding->normal_preparation;
-  if(prepared&&(object.painted->normal_projection()->version!=1||binding->normal_preparation->uv_reprojection||
-      binding->normal_preparation->sampling_domain||binding->sampling_reparameterized))
-    throw std::invalid_argument("Prepared source UV edits require their own normal/material coordinate authority adapter");
-  if(!object.mesh_active||!object.painted||!object.painted->valid_source_sampling_attachment()||
-     binding->canonical_attributes||binding->canonical_uv||binding->canonical_paint_sampling||binding->native_paint_sampling||binding->native_paint_frames||
-     bool(binding->normal_preparation)!=bool(object.painted->normal_projection())||object.painted->color_projection()||
-     (object.painted->baked()&&((!prepared&&!object.painted->baked()->maps.normal.rgba.empty())||object.painted->baked()->normal_field||(!prepared&&object.painted->baked()->normal_authority))))
-    throw std::invalid_argument("Artist source normal capture requires its unchanged original frame and separate current-normal adapter");
+  if(const auto error=source_normal_domain_error(object,prepared))throw std::invalid_argument(error);
   const auto &mesh=object.painted->mesh();const auto &set=*binding->normal_frames;
   const uint64_t corners=mesh.indices.size();
   // Charge both posed role arrays, immutable evaluated corner columns and
@@ -146,6 +157,13 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTr
     auto &out=vertices->at(role);out.reserve(size_t(corners));
     for(size_t c=0;c<corners;++c){if((c&1023)==0)stop();auto N=posed.normals[role].at(c);Vec3 T{1,0,0};float w=1;
       if(!posed.tangents[role].empty()){const auto t=posed.tangents[role][c];T={t[0],t[1],t[2]};w=t[3];}
+      if(options.placement){
+        N=placed_normal(*options.placement,N);
+        if(has_tangent[role]){
+          const auto t=placed_tangent(*options.placement,{T.x,T.y,T.z,w});
+          T={t[0],t[1],t[2]};w=t[3];
+        }
+      }
       auto n=ob::rotate(relative.orientation,{N.x,N.y,N.z}),t=ob::rotate(relative.orientation,{T.x,T.y,T.z});
       if(has_tangent[role])out.push_back(normal_bake_vertex({n.x,n.y,n.z},{t.x,t.y,t.z},w,prepared?NormalVertexBitangent::UnitCross:NormalVertexBitangent::RawCross));
       else out.push_back({normalized(Vec3{n.x,n.y,n.z}),{},{},1});

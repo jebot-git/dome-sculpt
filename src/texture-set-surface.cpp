@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "texture-set-surface.hpp"
 #include "texture-set-bake.hpp"
+#include "source-bake-normal.hpp"
 #include "polygon-color-target.hpp"
 #include "cut-color.hpp"
 #include "texture-set-paint-access.hpp"
@@ -51,10 +52,10 @@ bool bake_source_supported(const SculptObject &object, bool affine) {
  if(!object.texture_sets){
   if(!cut_color_supported(object))return false;
   if(!affine)return true;
-  // Native geometry and paint use the evaluated mesh and its Mikk corners.
-  // Original and prepared fields with their own frames need a separate adapter.
+  // Color-decorated polygon topology has an independent corner adapter.
   if(object.polygon&&object.polygon->active&&object.polygon->colors)return false;
-  if(object.mesh_active)return plain(object.painted.get(),object.appearance.get(),object.material_bindings.get());
+  if(object.mesh_active)return affine_source_normal_supported(object)||
+    plain(object.painted.get(),object.appearance.get(),object.material_bindings.get());
   return !object.appearance&&!object.material_bindings;
  }
  if(!object.mesh_active||!object.painted||(object.polygon&&object.polygon->colors))return false;
