@@ -423,6 +423,33 @@ archive guards and one projection case. The exact case comparison is under
 Product changes are on `work/gpu-retirement-progress-20261126`; main runtime
 admission is unchanged.
 
+Candidate `d39ebf8d` extends texture resolution authoring to untouched
+source-authored meshes. The actual XR controller changes one FaceSkin
+grid from 256 to 1024 on both CC0 VRoid bases. The mesh, image, rig and
+material owners stay identical, and ordered Save/reopen and one-step
+Undo/Redo preserve complete Scene data. Painted grids still require a
+paint-transfer adapter. The 2048 FaceSkin resize exceeds the existing
+raster-work budget in the measured case.
+
+The same candidate adds matching ordered source triangles to desktop
+Bake and the XR Projection Policy panel. It transfers a displaced mesh
+through corresponding corners within the world-space bounds. A changed
+triangle order or excessive displacement refuses atomically. The new mode
+uses recipe version 2. Older ray and cage recipes retain their encoding.
+The original ray policy still refuses the male FaceSkin case at the
+unchanged .02 radian bound. Matching triangles passes that bound at 256 px,
+and both avatars pass independently rendered VRM0 and core-PBR GLB across
+three poses and three morph weights. Software and authenticated Intel Arc
+each pass 72 VRM0 and 92 GLB checks. The real-loader synthetic OpenXR
+projection suite passes all 16 checks, including save and reload of the
+actual selected policy and its baked output. The focused Release suite
+passes 9 tests. The independent physical-emission transfer sample also
+passes. Logs are under `artifacts/filtered-normal-authoring-release-20261126/`.
+The 86-case replay and the fresh strict build run on the frozen candidate
+in `ds-filtered-normal-authoring-regressions-20261126.service` and
+`ds-filtered-normal-authoring-strict-20261126.service` respectively.
+The candidate branch is `work/filtered-normal-authoring-20261126`.
+
 ## Source and integration boundary
 
 - Main now admits product1bc13125 and public fixturef1e193c7 after complete
