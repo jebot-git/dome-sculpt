@@ -632,7 +632,8 @@ uint32_t TextureSetArchive::add_paint(const TextureSetView &f,
             prior->source_preview()->shares_streams(*f.source->source_preview()) &&
             same(prior->field().painted, f.source->field().painted) &&
             same(prior->field().domain, f.source->field().domain) &&
-            same(prior->field().appearance, f.source->field().appearance) &&
+            ((!prior->field().appearance && !f.source->field().appearance) ||
+             same(prior->field().appearance, f.source->field().appearance)) &&
             (!same(prior->field().bake_recipe, f.source->field().bake_recipe) ||
              !same(prior->field().material_bindings, f.source->field().material_bindings)))
           continue;
