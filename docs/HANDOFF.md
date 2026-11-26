@@ -262,6 +262,19 @@ expected SHA-256. Read
 The selected sanitizer checks require their own result, as do the matching
 Wayland and OpenXR routes.
 
+Candidate `f9c20398` narrows the immutable search roots during retained-byte
+accounting for changed sculpt geometry. Every subtree credit still requires a
+shared owner. Temporary search roots are charged against the existing working
+limit. On the same four-object project, 32 changing captures per build reduced
+the median from 375.93 ms to 315.97 ms and p95 from 428.53 ms to 355.34 ms.
+Retained bytes matched at every revision. All four profile outputs had an
+identical project hash. The 94 pipeline checks and the full 167-check native
+workflow passed, with exact Save and recovery bytes. The matching optimized
+frontend and renderer compiled and the app version check passed. Read
+[the changing-capture receipt](validation/sculpt-sharing-range-search-20261126.json).
+The benchmark measures native CPU snapshot capture. Separate runs qualify
+sanitizers, graphics and device behavior.
+
 ## Source and integration boundary
 
 - Main now admits product1bc13125 and public fixturef1e193c7 after complete
