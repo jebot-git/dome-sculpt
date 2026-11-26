@@ -1288,6 +1288,102 @@
     },
     "source_sha256": "407de09213bd4177ce8b40c38fa586ef7e9a014a7ecc67383926c6511c79dbc8"
   },
+  "wordwise-files-arc": {
+    "terminal": true,
+    "invocation": "cb85adf1de4d45519a1d3f789fc0f9ab",
+    "runs": [
+      {
+        "case": "before-1",
+        "exit": 0,
+        "seconds": 44.562,
+        "arc_device": true,
+        "frames": 45,
+        "native_scene": true,
+        "stereo_export_panel": {
+          "0": 221824,
+          "1": 221608
+        },
+        "native_recovery": 1,
+        "valid_glb": 1,
+        "app_sha256": "28221c95cc8f8c2b572a8f424c2735434157d4b6fe58922904dc8a693ffff54b",
+        "scene_sha256": "ca1248046485e3ede9122479fb12d0201fc12efd7726a67650d9eaac667e764c",
+        "process_cpu_seconds": 47.01,
+        "glb_sha256": [
+          "22200865cba16ae30ca9b64781d4d7203fc9307a55f48b28298d6402866171c6"
+        ],
+        "passed": true
+      },
+      {
+        "case": "wordwise-1",
+        "exit": 0,
+        "seconds": 33.109,
+        "arc_device": true,
+        "frames": 45,
+        "native_scene": true,
+        "stereo_export_panel": {
+          "0": 221824,
+          "1": 221608
+        },
+        "native_recovery": 1,
+        "valid_glb": 1,
+        "app_sha256": "eb0bbed35d7abbfd742220448ec4341b2a7f008d6e67308ff2d10f0a1fd770e2",
+        "scene_sha256": "ca1248046485e3ede9122479fb12d0201fc12efd7726a67650d9eaac667e764c",
+        "process_cpu_seconds": 35.38,
+        "glb_sha256": [
+          "22200865cba16ae30ca9b64781d4d7203fc9307a55f48b28298d6402866171c6"
+        ],
+        "passed": true
+      },
+      {
+        "case": "wordwise-2",
+        "exit": 0,
+        "seconds": 32.312,
+        "arc_device": true,
+        "frames": 45,
+        "native_scene": true,
+        "stereo_export_panel": {
+          "0": 221824,
+          "1": 221608
+        },
+        "native_recovery": 1,
+        "valid_glb": 1,
+        "app_sha256": "eb0bbed35d7abbfd742220448ec4341b2a7f008d6e67308ff2d10f0a1fd770e2",
+        "scene_sha256": "ca1248046485e3ede9122479fb12d0201fc12efd7726a67650d9eaac667e764c",
+        "process_cpu_seconds": 34.38,
+        "glb_sha256": [
+          "22200865cba16ae30ca9b64781d4d7203fc9307a55f48b28298d6402866171c6"
+        ],
+        "passed": true
+      },
+      {
+        "case": "before-2",
+        "exit": 0,
+        "seconds": 43.555,
+        "arc_device": true,
+        "frames": 45,
+        "native_scene": true,
+        "stereo_export_panel": {
+          "0": 221824,
+          "1": 221608
+        },
+        "native_recovery": 1,
+        "valid_glb": 1,
+        "app_sha256": "28221c95cc8f8c2b572a8f424c2735434157d4b6fe58922904dc8a693ffff54b",
+        "scene_sha256": "ca1248046485e3ede9122479fb12d0201fc12efd7726a67650d9eaac667e764c",
+        "process_cpu_seconds": 45.37,
+        "glb_sha256": [
+          "22200865cba16ae30ca9b64781d4d7203fc9307a55f48b28298d6402866171c6"
+        ],
+        "passed": true
+      }
+    ],
+    "phase": "complete",
+    "candidate": "5c8c8fb1e9b8aa592e458526737e5f0dedf0e80a",
+    "input_runtime_sha256": "043aaf07f78bf6f69d92cd900ad7f18a11d85a0410ff0a4e1e24e3e7d9a4faba",
+    "exit": 0,
+    "identical_glb": true,
+    "identical_native": true
+  },
   "worker-bound-memo-build-release": {
     "profile": "release",
     "invocation": "634d1a9e637c460b9f027f0c77fbf2ab",
@@ -1362,6 +1458,80 @@
     "parent_core_sha256": "cd3c1ce319ca2c918812076ad46963f692f118120910d8a6c266211f2f875b10",
     "exit": 0
   },
+  "worker-bound-memo-build-asan": {
+    "profile": "asan",
+    "invocation": "4faf81d6e63e457889d0217d15d2731a",
+    "terminal": true,
+    "linked": {
+      "dome-sculpt": "fa8663aea7fd6701985eff00c6917b255d044fc219a30dc2f3a2dd2f85bbfcf4",
+      "color-bound-memo": "cbc9901dba5aae235beb5dbeac2df9070f9d33f7328150260ef17479ef1f8a12",
+      "composite-cache": "66df6e4acd285221e09599a8a304dc38306eff6f38f7feb43b685236b7be70b8",
+      "ordered-history": "1fe267445cbd949dc8dbb982315a77b118cd963802661a52fea2e0e1dc9e1513",
+      "clear-bake-history": "804879551acc308dabfdf70b25b5c077857f7d1c8a03797a2aaf2b7c04aa4968"
+    },
+    "objects": {
+      "src/bake.cpp": "b30af35d0c0d9f16fa81e7e05e7dafed492940d5c9146ead4ec8ef3275589739",
+      "src/canonical-native-pose.cpp": "2be9835e0c9fe1c0cf0210757ff58f2a8047183db6bd431597793ec0d88b6db4",
+      "src/canonical-paint-sampling.cpp": "551cc0108421b2999ebd92b2f2122c3a6b6279b9fe85abb63f562edb263dcee7",
+      "src/canonical-paint-uv.cpp": "db3dc1e2b412bda667e52481e0e891b8cc2e0037d00b2dd0a6fc18d4bc1fe984",
+      "src/color-paint-sampling.cpp": "1483ee29482a47beb748816055cd850b5030334575047ceae88a1a025a833767",
+      "src/color-preparation.cpp": "c225b6d9290ce6030dd5dd5fa26cc7bbc62b09f3786d866ac8faa7433b72ebae",
+      "src/color-uv-reprojection.cpp": "6f5128ba434355f8e78e94288655bc48bb0b474aa39b24887bc25db05f555f6d",
+      "src/document.cpp": "692acf882b1a8599027c32c1a4c0d57248ce1194be8c08eaa5067a6176c29dba",
+      "src/emission-bake-source.cpp": "316ca5ee24586847477049b260840ca400b661bd78e821bf603519ba8bf9e022",
+      "src/emission-export.cpp": "87693c9757da4bd11fa8671bd1fefd9c0e8bae45b86f408f4756aadd39b0d480",
+      "src/emission-package.cpp": "d544392ca86032cab788f34517355bd24115d6f86cc1ef7c10d06c66d3dcfad0",
+      "src/material-bindings.cpp": "90491525ad60d999c10a368da8e479aa2a198a185eaac33d60829505fd9e8eb2",
+      "src/native-authoring-compiler.cpp": "321297565d5a1d15f80428dbe65d6a9242e87423e1e3c5cc3d14a86f85a6d074",
+      "src/native-authoring.cpp": "fea60253824ceb9aff85302230d3820964358f8c154df4b7bd0343ca5ccbf42e",
+      "src/normal-key-derivation.cpp": "8c8f9c2b8dced6eaa3f60a023e6827fed5227cfee97602e61e76274561f298ea",
+      "src/normal-preparation.cpp": "faeaa4cf49a3a98cf9709f14c1e2d6899277cd419ca8349fa91349d1eeaa9d76",
+      "src/normal-sampling-replay.cpp": "f3d34f638c7d569370872a10c74eeedf701bc1d93b0bc48e42396c37e8250338",
+      "src/normal-sampling-surface.cpp": "ea91b0cbb54032608c4c7af3fb73b297ee7f60554dac09e8d8c9528b522f56f5",
+      "src/normal-uv-reprojection.cpp": "da8d8dfa61b7b7f34411b2e8f0724f7e516400e8614f7ca20d4cd135a397dc8f",
+      "src/paint.cpp": "d27f4ab4d058450eb5cfb698214d007da258d0d39a6ff0091d49e29cd16dbb44",
+      "src/polygon-scene.cpp": "2e658ce72432ae52d084a2960ea5436e4078a38938e726a8eabdfd65eff9c29b",
+      "src/polygon-surface-owner.cpp": "ae16fc51268561cfec0e3018cdf704a27c54f7309f263e0639e28419b048379e",
+      "src/scene.cpp": "c36b8ce3b36fa9bcf6049486d72dd768e5cdb70cefe1c3256440d5a0f2b2ca33",
+      "src/source-uv-bake.cpp": "4551e0f365beaf987f4eea883412f4b6cc93f621ff7b67eebbae44f3852be7b2",
+      "src/vrm1-authoring.cpp": "007647365ca942470d633d6d7daebc965ef3b0fa72e39bc2e019b5c2b564329d",
+      "src/vrm1-expression-layer.cpp": "afb35b2fd2ded885af742b79bf546d35dcfd59ddc765cb7e8d5c545444899e9f"
+    },
+    "candidate": "b458d7bd4af75b0fd00cea64afc127dd9e3cfe69",
+    "core_dependencies": [
+      "src/bake.cpp",
+      "src/canonical-native-pose.cpp",
+      "src/canonical-paint-sampling.cpp",
+      "src/canonical-paint-uv.cpp",
+      "src/color-paint-sampling.cpp",
+      "src/color-preparation.cpp",
+      "src/color-uv-reprojection.cpp",
+      "src/document.cpp",
+      "src/emission-bake-source.cpp",
+      "src/emission-export.cpp",
+      "src/emission-package.cpp",
+      "src/material-bindings.cpp",
+      "src/native-authoring-compiler.cpp",
+      "src/native-authoring.cpp",
+      "src/normal-key-derivation.cpp",
+      "src/normal-preparation.cpp",
+      "src/normal-sampling-replay.cpp",
+      "src/normal-sampling-surface.cpp",
+      "src/normal-uv-reprojection.cpp",
+      "src/paint.cpp",
+      "src/polygon-scene.cpp",
+      "src/polygon-surface-owner.cpp",
+      "src/scene.cpp",
+      "src/source-uv-bake.cpp",
+      "src/vrm1-authoring.cpp",
+      "src/vrm1-expression-layer.cpp"
+    ],
+    "phase": "complete",
+    "core_sha256": "96db380db16483f760bbbb229ef0943aea58416d3e37a8fc3247e8040eb47b80",
+    "atlas_sha256": "f18fc42037ebab1be85a73e96c2da4c5ec70059ff8e5c91c85f29e359ae6a1e5",
+    "parent_core_sha256": "8480459ba1bf454aa0bc9bd58a216ebb53bf04255dc53ab8d42d95bda18ab339",
+    "exit": 0
+  },
   "worker-bound-memo-release": {
     "profile": "release",
     "resolution": 2048,
@@ -1399,9 +1569,47 @@
       }
     ]
   },
+  "worker-bound-memo-history-release": {
+    "profile": "release",
+    "resolution": 2048,
+    "candidate": "b458d7bd4af75b0fd00cea64afc127dd9e3cfe69",
+    "terminal": true,
+    "invocation": "6400db6f39594160971467fdf595d25a",
+    "deadline_per_phase_seconds": 900,
+    "owned_RSS_limit_bytes": 4294967296,
+    "phase": "complete",
+    "mode": "ordered-history",
+    "seconds": 64.95,
+    "binary_sha256": "424bf57c78d0e4054aa42879622c868cc7f1ca1437b85af0ced61916bfa08e08",
+    "core_sha256": "9c10d9c5ca289e454f5165cda257e4b874caa648a510d477253b8ef32662c4c8",
+    "capture_inputs": {
+      "original-source.dsculpt": "6415086c94bb1d1570e167ee317e3b3bd73e510cd9b35d6c26da0e189cfab0d6",
+      "selected-target-resolution.dsculpt": "a2fb762266ccd6a3de39e44635521265397ad0b82e6411162daa84c90f2ad724",
+      "observed-source.json": "9ed2472ab7e8a7eb89f0b582c399dcfd07215fefab89a923577e7414561fcd17",
+      "observed-second-bake.dsculpt": "9c299cac73198075a602366fc7084e37409e6055f39a90d641f9ddf8add28673"
+    },
+    "ordered_save_sha256": "9c299cac73198075a602366fc7084e37409e6055f39a90d641f9ddf8add28673",
+    "exit": 0,
+    "runs": [
+      {
+        "label": "ordered-history",
+        "pid": 1762163,
+        "exit": 0,
+        "error": null,
+        "elapsed_seconds": 64.637,
+        "peak_owned_rss": 1728528384,
+        "libasan_mapped": false,
+        "libubsan_mapped": false,
+        "checks": [
+          8
+        ],
+        "log_sha256": "87130f9d7738b87858a2a6e8de3a4f7a4b6db212be4fd2091e9c5cc9a0e403b3"
+      }
+    ]
+  },
   "archive": {
     "path": "docs/validation/atlas-packing-and-hdr-redo-20261126.tar.gz",
-    "sha256": "3d49de78d70ea2f843f7f268afcbc5c2b313c4dea25395ec7b812638d57ae031",
-    "members": 35
+    "sha256": "fe331cab8e348fcce206c749231e21f47cf8b99130f20e988b50a6202a133251",
+    "members": 38
   }
 }

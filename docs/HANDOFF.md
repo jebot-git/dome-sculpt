@@ -1018,8 +1018,10 @@ mesh-worker stacks show the prepared-color numerical validation under
 `MaterialSurfaceQuery`. Candidate `b458d7bd` reuses numerical bounds across
 jobs through exact weak owners and the existing image and field content
 checks. It keeps all receipt and cancellation checks, and clears the cache
-on a new document generation. Release and sanitizer builds and history
-replays are in progress.
+on a new document generation. Both profiles rebuild all 26 affected core
+translation units and link the app and test targets. Release passes 3,471
+memo checks and all eight 2048-pixel history checks. The ordered Save bytes
+match the independent Bake capture. Sanitizer runtime tests are in progress.
 
 The wordwise atlas candidate `19f125ae` checks clipped overlap without
 splitting aligned chart words. A matched native export keeps the same
@@ -1030,7 +1032,11 @@ overlap cases and six native cases. The software Release replay passes
 at paint startup. The main port `5c8c8fb1` passes six native cases in each
 profile and the complete 153-check software Release and Arc ASan/UBSan
 replays with the original Files deadline. Main includes this packing change.
-A matched Arc file-timing run is in progress.
+In four matched Arc Files runs, the previous build takes 44.56 and 43.56
+seconds and the new build takes 33.11 and 32.31 seconds. All four produce
+byte-identical GLBs and native projects. Integration merge `5ae10f18`
+preserves current main with identical combined sources, build inputs and
+tests to `19f125ae`.
 An experimental sorted-frontier child `4021dc13` keeps four mesh outputs
 exact, including 57,311 comparisons of cost ties and candidate face order.
 A matched headless run drops from 38.38 to 34.60 seconds overall.
