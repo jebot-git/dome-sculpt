@@ -1607,9 +1607,48 @@
       }
     ]
   },
+  "worker-bound-memo-sampled-asan": {
+    "profile": "asan",
+    "resolution": 2048,
+    "candidate": "b458d7bd4af75b0fd00cea64afc127dd9e3cfe69",
+    "terminal": true,
+    "invocation": "cf964eabe79e4195931c2e04b20e0fbb",
+    "deadline_per_phase_seconds": 900,
+    "owned_RSS_limit_bytes": 4294967296,
+    "phase": "complete",
+    "mode": "clear-bake-history",
+    "seconds": 454.51,
+    "binary_sha256": "804879551acc308dabfdf70b25b5c077857f7d1c8a03797a2aaf2b7c04aa4968",
+    "core_sha256": "96db380db16483f760bbbb229ef0943aea58416d3e37a8fc3247e8040eb47b80",
+    "capture_inputs": {
+      "original-source.dsculpt": "6415086c94bb1d1570e167ee317e3b3bd73e510cd9b35d6c26da0e189cfab0d6",
+      "selected-target-resolution.dsculpt": "a2fb762266ccd6a3de39e44635521265397ad0b82e6411162daa84c90f2ad724",
+      "observed-source.json": "9ed2472ab7e8a7eb89f0b582c399dcfd07215fefab89a923577e7414561fcd17",
+      "observed-second-bake.dsculpt": "9c299cac73198075a602366fc7084e37409e6055f39a90d641f9ddf8add28673"
+    },
+    "restored_seconds": 9.48498,
+    "same_maps": true,
+    "exit": 0,
+    "runs": [
+      {
+        "label": "clear-bake-history",
+        "pid": 1776028,
+        "exit": 0,
+        "error": null,
+        "elapsed_seconds": 195.938,
+        "peak_owned_rss": 1729839104,
+        "libasan_mapped": true,
+        "libubsan_mapped": true,
+        "checks": [
+          1
+        ],
+        "log_sha256": "8cc09ea331583d88eec674b9a8b5bacc2306732fb4bc7934f2772cf4ddac6470"
+      }
+    ]
+  },
   "archive": {
     "path": "docs/validation/atlas-packing-and-hdr-redo-20261126.tar.gz",
-    "sha256": "fe331cab8e348fcce206c749231e21f47cf8b99130f20e988b50a6202a133251",
-    "members": 38
+    "sha256": "a89bbf1c35779bc6cf80c83a686f50246a5f74fcb3bd168ee055df601efa1692",
+    "members": 41
   }
 }

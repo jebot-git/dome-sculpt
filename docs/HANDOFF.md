@@ -1021,7 +1021,20 @@ checks. It keeps all receipt and cancellation checks, and clears the cache
 on a new document generation. Both profiles rebuild all 26 affected core
 translation units and link the app and test targets. Release passes 3,471
 memo checks and all eight 2048-pixel history checks. The ordered Save bytes
-match the independent Bake capture. Sanitizer runtime tests are in progress.
+match the independent Bake capture. The focused ASan/UBSan Clear Bake/Undo
+probe now restores the same texture-map owner in 9.485 seconds with the original
+ten-second wait and no additional composite build. It also completes ordinary
+Redo. This probe and the original history replay use the same captured project.
+The full sanitizer history test retains its independent Bake, ordered Save and
+Redo preview assertions, and still needs a terminal result.
+
+Main port `fa288931` and combined candidate `3e4f1756` apply this same worker
+change. The combined candidate has identical application, build, test, asset
+and third-party inputs to `b458d7bd`. Fresh optimized and sanitizer app builds,
+eight native cases per profile, and the matched software/Arc OpenXR replays
+qualify the main port separately. Their runners and receipts are under
+`artifacts/worker-color-bound-memo-main-validation-20261126`. The port remains
+on its qualification branch pending those results.
 
 The wordwise atlas candidate `19f125ae` checks clipped overlap without
 splitting aligned chart words. A matched native export keeps the same
