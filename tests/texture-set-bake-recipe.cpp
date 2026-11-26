@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/bake-recipe.hpp"
+#include "dome/native-scene-append.hpp"
 #include "dome/texture-sets.hpp"
 #include "dome/polygon-scene.hpp"
 #include "texture-set-paint-access.hpp"
@@ -39,5 +40,45 @@ int main(int argc,char **argv)try{
  corrupt([](auto&j){j.erase("field_recipe");});corrupt([](auto&j){j["field_kind"]="foreign";});corrupt([](auto&j){j["field_recipe"]=nullptr;});corrupt([](auto&j){j["field_source"]=0;});corrupt([](auto&j){j["set"]=999;});corrupt([](auto&j){j["field_recipe"]["source"]["object"]=uint64_t(999999);});corrupt([](auto&j){j["field_recipe"]["settings"].erase("normal_error");});
  auto bad=nested;for(auto &o:bad["objects"])if(o["id"]==actor)o["bake_recipe"]=capture_bake_recipe(scene,a,settings)->encode();refuses([&]{Scene::decode(bad);});
  check(scene.encode()==nested,"All invalid wire controls leave the original native scene unchanged");
+ auto erased = scene.snapshot();
+ erased.erase(a);
+ const auto &after_erase = erased.object(actor);
+ const auto &erased_field = after_erase.texture_sets->at(1);
+ check(erased_field.bake_recipe->source.object == unavailable_bake_object &&
+       erased_field.bake_recipe->source.original_object == a,
+       "Deleting the source marks the set context unavailable and retains its original identity");
+ check(after_erase.texture_sets == after_erase.shape_source->texture_sets &&
+       after_erase.texture_sets->at(1).painted == scene.object(actor).texture_sets->at(1).painted,
+       "Deleting a source preserves shared collection history and exact field paint");
+ const auto erased_wire = erased.encode();
+ check(Scene::decode(erased_wire).encode() == erased_wire,
+       "A project with a deleted additional-field source reopens exactly");
+ erased.erase(c);
+ check(erased.object(actor).bake_recipe->source.object == unavailable_bake_object &&
+       erased.object(actor).shape_source->bake_recipe->settings.cage_object == unavailable_bake_object,
+       "Deleting the cage preserves its explicit retained binding as unavailable");
+
+ const auto appended = append_native_scene(scene, scene);
+ const auto append_id = [&](uint64_t id) {
+   for (size_t i = 0; i < scene.objects().size(); ++i)
+     if (scene.objects()[i].id == id)
+       return appended.objects.at(i);
+   throw std::logic_error("Missing appended object witness");
+ };
+ const auto &appended_target = appended.scene.object(append_id(actor));
+ check(appended_target.texture_sets->at(1).bake_recipe->source.object == append_id(a) &&
+       appended_target.texture_sets->at(1).bake_recipe->source.original_object == a &&
+       appended_target.bake_recipe->source.object == append_id(c) &&
+       appended_target.shape_source->bake_recipe->source.object == append_id(b) &&
+       appended_target.shape_source->bake_recipe->settings.cage_object == append_id(c),
+       "Append rebases current and historical sources and the cage into the new object namespace");
+ check(appended_target.texture_sets == appended_target.shape_source->texture_sets &&
+       appended_target.texture_sets->topology() == scene.object(actor).texture_sets->topology() &&
+       appended.scene.object(actor).texture_sets->at(1).bake_recipe->source.object == a,
+       "Append preserves topology and sharing in both namespaces");
+ const auto appended_wire = appended.scene.encode();
+ check(Scene::decode(appended_wire).encode() == appended_wire && scene.encode() == nested,
+       "Same-scene append and its untouched source both reopen exactly");
+
  std::cout<<"PASS "<<checks<<" texture-set recipe controls\n";return 0;
 }catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

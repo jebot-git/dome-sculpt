@@ -4,6 +4,7 @@
 #include "dome/polygon-scene.hpp"
 #include "dome/source-paint.hpp"
 #include "texture-set-paint-access.hpp"
+#include "texture-set-field-source.hpp"
 #include "texture-set-recipe-wire.hpp"
 #include <algorithm>
 #include <bit>
@@ -618,9 +619,23 @@ uint32_t TextureSetArchive::add_paint(const TextureSetView &f,
   for (size_t i = 0; i < paints_.size(); ++i) {
     step();
     if (same(paints_[i].owner, f.painted)) {
-      if (!same(paints_[i].source, f.source) && (paints_[i].source || f.source))
+      const auto &prior = paints_[i].source;
+      if (!same(prior, f.source) && (prior || f.source)) {
+        // Rebasing a recipe gives the same immutable source a new reference
+        // namespace. Keep a separate recipe record on the same paint raster.
+        if (prior && f.source &&
+            same(prior->original_paint(), f.source->original_paint()) &&
+            same(prior->polygon_owner(), f.source->polygon_owner()) &&
+            same(prior->source_preview(), f.source->source_preview()) &&
+            same(prior->field().painted, f.source->field().painted) &&
+            same(prior->field().domain, f.source->field().domain) &&
+            same(prior->field().material_bindings, f.source->field().material_bindings) &&
+            same(prior->field().appearance, f.source->field().appearance) &&
+            !same(prior->field().bake_recipe, f.source->field().bake_recipe))
+          continue;
         throw std::invalid_argument(
             "One paint owner has contradictory source authorities");
+      }
       if (!f.source) {
         const auto before = paints_[i].payload.contains("field_recipe")
                                 ? paints_[i].payload.at("field_recipe")

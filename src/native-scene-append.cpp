@@ -42,6 +42,7 @@ struct Append {
   std::set<const PolygonOrigin *> seen_origins;
   std::set<const PolygonAuthority *> seen_authorities;
   std::map<uint64_t,uint64_t> objects,groups;
+  detail::BakeRecipeRemap bake_recipes{objects,true,cancelled};
   std::set<uint64_t> retopo_sources;
   struct ModelLess {
     bool operator()(const std::shared_ptr<const CreatorSourceModel> &a,
@@ -148,7 +149,8 @@ struct Append {
     auto n=std::make_shared<PolygonOrigin>(*p);
     n->placement=capsule(p->placement);n->polygon=authority(p->polygon);
     n->shape_source=origin(p->shape_source);n->rig_source=origin(p->rig_source);
-    n->retopology=patch(p->retopology);n->bake_recipe=detail::remap_bake_recipe(p->bake_recipe,objects,true);
+    n->retopology=patch(p->retopology);n->bake_recipe=bake_recipes.recipe(p->bake_recipe);
+    n->texture_sets=bake_recipes.collection(p->texture_sets);
     origins.emplace(p.get(),n);return n;
   }
 };
@@ -213,7 +215,8 @@ NativeSceneAppend append_native_scene(const Scene &destination,const Scene &pack
     a.stop();auto copy=o;copy.id=a.objects.at(o.id);copy.group=o.group?a.groups.at(o.group):0;
     copy.polygon=a.authority(o.polygon);copy.shape_source=a.origin(o.shape_source);
     copy.rig_source=a.origin(o.rig_source);copy.retopology=a.patch(o.retopology);
-    copy.bake_recipe=detail::remap_bake_recipe(o.bake_recipe,a.objects,true);
+    copy.bake_recipe=a.bake_recipes.recipe(o.bake_recipe);
+    copy.texture_sets=a.bake_recipes.collection(o.texture_sets);
     out.scene.object(copy.id)=std::move(copy);
   }
   out.scene.select(a.objects.at(source.active().id));a.stop();out.scene.validate();a.stop();require_saveable(out.scene,cancelled);a.stop();return out;
