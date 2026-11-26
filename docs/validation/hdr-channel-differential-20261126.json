@@ -1,0 +1,443 @@
+{
+  "scope": "Algorithm-only paired whole-TU Release/strict differential on actual full2048 numerical input and original receipt; unchanged725 support archives. Owning new product core/App qualification is a separate stage, not implied by these checks.",
+  "tested_algorithm_fixture_source": "1b954003a516313b44888d211256f9664fe18de8",
+  "clean_standalone_commit": "eccddcd4",
+  "source_identity": [
+    {
+      "path": "src/color-projection-quality.hpp",
+      "tested_source_sha256": "b289039841174fdd7317e069bae491086691b340a0e85b97bbbf59b40408158f",
+      "clean_commit_source_sha256": "b289039841174fdd7317e069bae491086691b340a0e85b97bbbf59b40408158f"
+    },
+    {
+      "path": "tests/color-projection-channel-reuse.cpp",
+      "tested_source_sha256": "16a4d4c39ad9d4aaaa64875d6cc1691aaa7d96cea3b0212c8d3311b29f67f1a7",
+      "clean_commit_source_sha256": "16a4d4c39ad9d4aaaa64875d6cc1691aaa7d96cea3b0212c8d3311b29f67f1a7"
+    },
+    {
+      "path": "tests/color-projection-reference-725.hpp",
+      "tested_source_sha256": "1a3884e658245ad438535eacd0370463699e3adf32f598cec88e24f85da86780",
+      "clean_commit_source_sha256": "1a3884e658245ad438535eacd0370463699e3adf32f598cec88e24f85da86780"
+    }
+  ],
+  "support_archive_source": "725ea10032981e28c7edb0c1ffdd5689e4a3ad32",
+  "actual_controls_each": 576,
+  "profiles": {
+    "release": {
+      "status": {
+        "terminal": true,
+        "exit": 0,
+        "started": 1795666895.5319493,
+        "steps": [
+          {
+            "name": "differential",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/hdr-channel-reuse-differential-20261126/release/dome-sculpt-color-projection-channel-reuse-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/hdr-projection-sharing-sanitize-20261126/native-sanitize-current-v1/current2048/observed-second-bake.dsculpt"
+            ],
+            "started": 1795666900.8249505,
+            "timeout_seconds": 900,
+            "RSS_limit_bytes": 1610612736,
+            "virtual_AS_cap": null,
+            "signals": [],
+            "peak_owned_RSS_bytes": 376049664,
+            "known_processes": [
+              {
+                "pid": 4008005,
+                "start": 84482588,
+                "pgrp": 4008005,
+                "state": "R"
+              }
+            ],
+            "pid": 4008005,
+            "root": {
+              "pid": 4008005,
+              "start": 84482588,
+              "pgrp": 4008005,
+              "state": "R"
+            },
+            "cpu_no_graphics_samples": 814,
+            "actual_ELF": {
+              "path": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-channel-reuse-differential-20261126/release/dome-sculpt-color-projection-channel-reuse-test",
+              "sha256": "4f0c3d775ce4145d78359fd269d9a98c08101c7f41fcf6fd378a12c7ec1f44cb",
+              "live_maps": true,
+              "live_sanitizers": false
+            },
+            "exit": 0,
+            "seconds": 8.779516696929932,
+            "survivors": [],
+            "actual_mapped_providers": {
+              "/home/blux/de-xr/dome-sculpt/artifacts/hdr-channel-reuse-differential-20261126/release/dome-sculpt-color-projection-channel-reuse-test": "4f0c3d775ce4145d78359fd269d9a98c08101c7f41fcf6fd378a12c7ec1f44cb",
+              "/usr/lib64/libstdc++.so.6.0.36": "49811507d8fc0283d8f8023546613774c673f876fe823b1b99d0c8d46039deda",
+              "/usr/lib64/libOpenEXRCore-3_2.so.31.3.2.4": "bc6775af6f33d58d41f20e714d80db4b0fd21209796a6694cb5249739a49a331",
+              "/usr/lib64/libm.so.6": "16a03ce6d24c8a46742206d4a9c1d35bb6577ae2384f153dc6ef4a4b62b5357f",
+              "/usr/lib64/libOpenEXR-3_2.so.31.3.2.4": "efdbbe75b27b6a50e4a8e028e008fde32befa53280295e21ef6f036350225769",
+              "/usr/lib64/libgcc_s-16-20261029.so.1": "5a52ae4a6f1b119aa092aa1483c967e19d9ba036b1b0c2133236a8a2ce826ebf",
+              "/usr/lib64/libImath-3_1.so.29.11.0": "1e86ce61e14061369bd937b73d53abb69305dff34df4700f99a459f5c024ab45",
+              "/usr/lib64/libIlmThread-3_2.so.31.3.2.4": "424321e69eb6257387820baa90e4fccb209c5dcb8c88589a8c5e1ccf4d4c23d6",
+              "/usr/lib64/liblapacke.so.3.12.0": "4e74d393b6f5f294cbd96b777da8be3ada9995b1da98aaa0c1eb5fea4b294c7c",
+              "/usr/lib64/libIex-3_2.so.31.3.2.4": "da965da4711be1158555d457dc6ff17582ec88c1b86d98edc69f09cdcc4f6c7a",
+              "/usr/lib64/libOpenEXRUtil-3_2.so.31.3.2.4": "bafa0a2cb708d3ae952987c013d96e992badbb742e1a8e4fac6605c7eae5b5a0",
+              "/usr/lib64/libz.so.1.3.1.zlib-ng": "bbde8faec092a7c67b8bd76bbba4a826e61b05c171b97004ce6b308c5a090351",
+              "/usr/lib64/libjpeg.so.62.4.0": "beb79376b4544260da3c31603784c908b58bdb959cbe1d8c48075dfa7d5bc80c",
+              "/usr/lib64/libpng16.so.16.59.0": "536a1ed876bffe5a7e9204aae387d4da2d4a969bf716bbcf4a03c30a8dea0cde",
+              "/usr/lib64/libEGL.so.1.1.0": "76ffc090b8990696d028e7d1bc82606c564565fb05d2fa9e5f6122b61e9f1b60",
+              "/usr/lib64/libOpenGL.so.0.0.0": "07a014ea0624d5d9711f941fb0401a203c2025b683d34897bd1b261a32a83d69",
+              "/usr/lib64/ld-linux-x86-64.so.2": "4e5d39355699e90fa29313d3100e82af4a23290028c58c364d6a249ef6a78e5e"
+            }
+          }
+        ],
+        "drift": [],
+        "owned": [],
+        "generated": {},
+        "scope": "New inline percellRGBA equivalence algorithm differential vs exact frozen725 function, real2048 native mesh/Identity field/projection and originalreceipt; randomized and single-channel-different neighboring fields, mutations/cancel/budgets. Standalone math and primitive validation only; owning productcore still725 oldimplementation, not integrated newproduct or App qualification. Independent small CPU unit may run while old-source strictgroups unchanged.",
+        "lease": {
+          "not_acquired": true,
+          "mode": "CPU-only correctness per root authorization; any DRM fd/Mesa driver mapping is refused",
+          "released": 1795666915.3332312
+        },
+        "seconds": 19.801276922225952
+      },
+      "terminal_closure": {
+        "exit": 0,
+        "actual_controls": 576,
+        "owned": [],
+        "drift": [],
+        "CPU_only": true,
+        "no_graphics_lease": true,
+        "service_already_collected": true,
+        "terminal_properties_captured_before_stop": false,
+        "invocation": "374a3f4c02104b33a5eb829c506e3945",
+        "actual_ELF": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-channel-reuse-differential-20261126/release/dome-sculpt-color-projection-channel-reuse-test",
+          "sha256": "4f0c3d775ce4145d78359fd269d9a98c08101c7f41fcf6fd378a12c7ec1f44cb",
+          "live_maps": true,
+          "live_sanitizers": false
+        },
+        "peak_owned_RSS_bytes": 376049664,
+        "seconds": 8.779516696929932,
+        "observed": 1795667308.1045122
+      }
+    },
+    "sanitize": {
+      "status": {
+        "terminal": true,
+        "exit": 0,
+        "started": 1795667039.743108,
+        "steps": [
+          {
+            "name": "differential",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/hdr-channel-reuse-differential-20261126/sanitize/dome-sculpt-color-projection-channel-reuse-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/hdr-projection-sharing-sanitize-20261126/native-sanitize-current-v1/current2048/observed-second-bake.dsculpt"
+            ],
+            "started": 1795667046.1253712,
+            "timeout_seconds": 900,
+            "RSS_limit_bytes": 1610612736,
+            "virtual_AS_cap": null,
+            "signals": [],
+            "peak_owned_RSS_bytes": 1128923136,
+            "known_processes": [
+              {
+                "pid": 4028029,
+                "start": 84497118,
+                "pgrp": 4028029,
+                "state": "R"
+              },
+              {
+                "pid": 4053955,
+                "start": 84512925,
+                "pgrp": 4028029,
+                "state": "R"
+              },
+              {
+                "pid": 4053956,
+                "start": 84512927,
+                "pgrp": 4028029,
+                "state": "R"
+              }
+            ],
+            "pid": 4028029,
+            "root": {
+              "pid": 4028029,
+              "start": 84497118,
+              "pgrp": 4028029,
+              "state": "R"
+            },
+            "cpu_no_graphics_samples": 14547,
+            "actual_ELF": {
+              "path": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-channel-reuse-differential-20261126/sanitize/dome-sculpt-color-projection-channel-reuse-test",
+              "sha256": "6f2ee0429d793fce6c20cdafa479e8ab9652b46241b75381c1217352ade4bac6",
+              "live_maps": true,
+              "live_sanitizers": true
+            },
+            "exit": 0,
+            "seconds": 158.43447184562683,
+            "survivors": [],
+            "actual_mapped_providers": {
+              "/home/blux/de-xr/dome-sculpt/artifacts/hdr-channel-reuse-differential-20261126/sanitize/dome-sculpt-color-projection-channel-reuse-test": "6f2ee0429d793fce6c20cdafa479e8ab9652b46241b75381c1217352ade4bac6",
+              "/usr/lib64/libgfortran.so.5.0.0": "d4b3a93cbd67561c5febd49d7bd035796d3b2b03a8d659d7ddf869321173f186",
+              "/usr/lib64/liblapack.so.3.12.0": "10c786e4517845cac86595b22fd7d40b548bf328cbf7bf14c867b0c31e20661f",
+              "/usr/lib64/libc.so.6": "a5c5ad9d59d3c69eda93aa8f82930ba06cc4e893a113e66c85ad6e96243d53c8",
+              "/usr/lib64/libubsan.so.1.0.0": "d4322305e0b1492398b7c5dabf56e1cdfe67548211b0149769c14f234cf3bb9d",
+              "/usr/lib64/libmvec.so.1": "82ddf7efbb88b2eaf5570fa6c0ec41565d9c32a2dbd095200ceead862af0f3dc",
+              "/usr/lib64/libstdc++.so.6.0.36": "49811507d8fc0283d8f8023546613774c673f876fe823b1b99d0c8d46039deda",
+              "/usr/lib64/libblas.so.3.12.0": "df2686da50030c23198f485115b84df323352325abb18a949515736e8f57b2f4",
+              "/usr/lib64/libtmglib.so.3.12.0": "e497c25e923336dc4d95b2822f0845667ab113b985e8e7d16eadaf0379cdac87",
+              "/usr/lib64/libOpenEXRCore-3_2.so.31.3.2.4": "bc6775af6f33d58d41f20e714d80db4b0fd21209796a6694cb5249739a49a331",
+              "/usr/lib64/libGLdispatch.so.0.0.0": "3c53e14fb731128afe1fa1c88e94944fe9a60cbe170f2e08c1134b709d771ec7",
+              "/usr/lib64/libm.so.6": "16a03ce6d24c8a46742206d4a9c1d35bb6577ae2384f153dc6ef4a4b62b5357f",
+              "/usr/lib64/libOpenEXR-3_2.so.31.3.2.4": "efdbbe75b27b6a50e4a8e028e008fde32befa53280295e21ef6f036350225769",
+              "/usr/lib64/libgcc_s-16-20261029.so.1": "5a52ae4a6f1b119aa092aa1483c967e19d9ba036b1b0c2133236a8a2ce826ebf",
+              "/usr/lib64/libIex-3_2.so.31.3.2.4": "da965da4711be1158555d457dc6ff17582ec88c1b86d98edc69f09cdcc4f6c7a",
+              "/usr/lib64/liblapacke.so.3.12.0": "4e74d393b6f5f294cbd96b777da8be3ada9995b1da98aaa0c1eb5fea4b294c7c",
+              "/usr/lib64/libdeflate.so.0": "fee24c7738e4c31860f65fa43c862f572cdf4cd2ffcc30e5cd8bf1d46346b318",
+              "/usr/lib64/libImath-3_1.so.29.11.0": "1e86ce61e14061369bd937b73d53abb69305dff34df4700f99a459f5c024ab45",
+              "/usr/lib64/libOpenEXRUtil-3_2.so.31.3.2.4": "bafa0a2cb708d3ae952987c013d96e992badbb742e1a8e4fac6605c7eae5b5a0",
+              "/usr/lib64/libz.so.1.3.1.zlib-ng": "bbde8faec092a7c67b8bd76bbba4a826e61b05c171b97004ce6b308c5a090351",
+              "/usr/lib64/libjpeg.so.62.4.0": "beb79376b4544260da3c31603784c908b58bdb959cbe1d8c48075dfa7d5bc80c",
+              "/usr/lib64/libpng16.so.16.59.0": "536a1ed876bffe5a7e9204aae387d4da2d4a969bf716bbcf4a03c30a8dea0cde",
+              "/usr/lib64/libasan.so.8.0.0": "0e9878f315009d4a3b3f1d8c44467de841f9ff2ca404f996937bf89d1d966c37",
+              "/usr/lib64/libIlmThread-3_2.so.31.3.2.4": "424321e69eb6257387820baa90e4fccb209c5dcb8c88589a8c5e1ccf4d4c23d6",
+              "/usr/lib64/libEGL.so.1.1.0": "76ffc090b8990696d028e7d1bc82606c564565fb05d2fa9e5f6122b61e9f1b60",
+              "/usr/lib64/libOpenGL.so.0.0.0": "07a014ea0624d5d9711f941fb0401a203c2025b683d34897bd1b261a32a83d69",
+              "/usr/lib64/ld-linux-x86-64.so.2": "4e5d39355699e90fa29313d3100e82af4a23290028c58c364d6a249ef6a78e5e"
+            },
+            "actual_checks": 576
+          }
+        ],
+        "drift": [],
+        "owned": [],
+        "generated": {},
+        "scope": "New inline percellRGBA equivalence algorithm differential vs exact frozen725 function, real2048 native mesh/Identity field/projection and originalreceipt; randomized and single-channel-different neighboring fields, mutations/cancel/budgets. Standalone math and primitive validation only; owning productcore still725 oldimplementation, not integrated newproduct or App qualification. Matched strict with576 actual Release controls, liveASANUBSAN/leaks, original900s and1.5GiB math-case RSS cap; independent small CPU unit may run while old-source strictgroups unchanged.",
+        "lease": {
+          "not_acquired": true,
+          "mode": "CPU-only correctness per root authorization; any DRM fd/Mesa driver mapping is refused",
+          "released": 1795667212.8114913
+        },
+        "seconds": 173.06837606430054
+      },
+      "terminal_closure": {
+        "exit": 0,
+        "actual_controls": 576,
+        "owned": [],
+        "drift": [],
+        "CPU_only": true,
+        "no_graphics_lease": true,
+        "service_already_collected": false,
+        "terminal_properties_captured_before_stop": true,
+        "invocation": "2f870a49d9424edea18c6149a5fe1062",
+        "actual_ELF": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-channel-reuse-differential-20261126/sanitize/dome-sculpt-color-projection-channel-reuse-test",
+          "sha256": "6f2ee0429d793fce6c20cdafa479e8ab9652b46241b75381c1217352ade4bac6",
+          "live_maps": true,
+          "live_sanitizers": true
+        },
+        "peak_owned_RSS_bytes": 1128923136,
+        "seconds": 158.43447184562683,
+        "observed": 1795667308.2847216
+      }
+    }
+  },
+  "reference_identity": {
+    "exact_original_source": "725ea100:src/color-projection-quality.hpp",
+    "namespace_only_rename_verified": true,
+    "original_SHA256": "a36da31e54cf229e1caffd70e7e10fdb8e1f0b2825d127449012fd14a8dc82d0"
+  },
+  "actual_native_input": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-projection-sharing-sanitize-20261126/native-sanitize-current-v1/current2048/observed-second-bake.dsculpt",
+    "bytes": 122856849,
+    "sha256": "4721e99dc724cfdb71cc26106c646a532bebf53d12a060ec8bc65184fd54a1e4"
+  },
+  "invariants": [
+    "all5934012 tested cells and2975612 intersecting cells unchanged",
+    "all5808 cancellation callback positions unchanged",
+    "all4 channel maxima bit-identical to frozen original725",
+    "all original native receipt CBOR bytes unchanged",
+    "neighboring G-only field takes general path and invalidates original tight claim",
+    "finite random/pair fields, in-cell callback mutation/cancel, exact and one-cell-tight budgets, ill-conditioned/degenerate/outside/nonfinite cases"
+  ],
+  "timing_scope": "Elapsed same-process paired orders in these bounded runs; not isolated hardware benchmark. No newcore performance claim until owning runtime.",
+  "archive": {
+    "file": "hdr-channel-differential-20261126.tar.xz",
+    "sha256": "6d6e91d654239b0f88891c6f0823353f6018d557a6a2ded100026c8759cb5903",
+    "bytes": 4101768,
+    "authorities": [
+      {
+        "path": "artifacts/hdr-channel-reuse-differential-20261126/audit.json",
+        "sha256": "40b5530eefd0e0afbccd0100d032c2afb80905582273dc36231bb2652151a91d",
+        "bytes": 62477
+      },
+      {
+        "path": "artifacts/hdr-channel-reuse-differential-20261126/audit.py",
+        "sha256": "b7b3bd34b60bf8562cbbbd2604b2ce65fe23e71140874b7dfefe9cf452dacfc6",
+        "bytes": 2573
+      },
+      {
+        "path": "artifacts/hdr-channel-reuse-differential-20261126/before-inputs.json",
+        "sha256": "7d229ac0aec415c733d18657b17395620928d261bab3eda9d4de06fcfca66881",
+        "bytes": 18012980
+      },
+      {
+        "path": "artifacts/hdr-channel-reuse-differential-20261126/build.py",
+        "sha256": "021478576f6e415528332ddd6af95a501ed7cd3097b6d02b8f992b8f3f0a6291",
+        "bytes": 1170
+      },
+      {
+        "path": "artifacts/hdr-channel-reuse-differential-20261126/compiler-records/5fd70768eabae674306f8fe3d7a8aba28c2ab30d1aafc167eab0707651560ed9.json",
+        "sha256": "31df8df5ca8862660676d07cf5c795f494690edf2a5cbfaed67c46d4b74452f0",
+        "bytes": 1576
+      },
+      {
+        "path": "artifacts/hdr-channel-reuse-differential-20261126/compiler-records/5fd70768eabae674306f8fe3d7a8aba28c2ab30d1aafc167eab0707651560ed9.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      {
+        "path": "artifacts/hdr-channel-reuse-differential-20261126/compiler-records/ad5fdb71f45ddec3a0487958a2322c32c8b654e761d813a3dc921981363dcb7c.json",
+        "sha256": "aee8e2a7324d55c7c3ba6aac04fcceff8f1754207bd28b67c15a296d3d60d63d",
+        "bytes": 1660
+      },
+      {
+        "path": "artifacts/hdr-channel-reuse-differential-20261126/compiler-records/ad5fdb71f45ddec3a0487958a2322c32c8b654e761d813a3dc921981363dcb7c.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      {
+        "path": "artifacts/hdr-channel-reuse-differential-20261126/compiler.py",
+        "sha256": "2e7a13f4e28c7277e6362c67a85e3bb0ab3621725ad7f1b1d444209ad9034e35",
+        "bytes": 1224
+      },
+      {
+        "path": "artifacts/hdr-channel-reuse-differential-20261126/native-release-v1/differential.log",
+        "sha256": "bcf3dc186b30e51a4ee0bce6e920fcd2288cdbab2473284cdd1fd7dc4e019d94",
+        "bytes": 8048
+      },
+      {
+        "path": "artifacts/hdr-channel-reuse-differential-20261126/native-release-v1/differential.maps",
+        "sha256": "cbc137d446ae9c865f4c40811fb1f30ed27a60941899f4b7d32ebd0227c9a346",
+        "bytes": 6575
+      },
+      {
+        "path": "artifacts/hdr-channel-reuse-differential-20261126/native-release-v1/journal.txt",
+        "sha256": "0780359965e2ac45d1548a081697c4ebf687a98ea41305ad4237ea6ad63cce56",
+        "bytes": 1331
+      },
+      {
+        "path": "artifacts/hdr-channel-reuse-differential-20261126/native-release-v1/plan.json",
+        "sha256": "0536b833d77f7a05005ac0180f629cf373b736e3f6f43c21d075fab07bf4e775",
+        "bytes": 10156275
+      },
+      {
+        "path": "artifacts/hdr-channel-reuse-differential-20261126/native-release-v1/status.json",
+        "sha256": "81f0b999d42da2b45f61d0c70530d218c52936f43008c3ac8561acb94b98514b",
+        "bytes": 4197
+      },
+      {
+        "path": "artifacts/hdr-channel-reuse-differential-20261126/native-release-v1/terminal-closure.json",
+        "sha256": "e77160ff7f73553dc861c0084d1ff0c8f9571757691079e60789a46d03395261",
+        "bytes": 673
+      },
+      {
+        "path": "artifacts/hdr-channel-reuse-differential-20261126/native-release-v1/unit-terminal.txt",
+        "sha256": "8a0400776a9911c3354be5105c6e87ab0788006c9ae80c9ddd3c807b7fd6d0c4",
+        "bytes": 7205
+      },
+      {
+        "path": "artifacts/hdr-channel-reuse-differential-20261126/native-runner.py",
+        "sha256": "97215d917a104522b19e26e4bde510565768e194c3e7812238eb07fd3347266c",
+        "bytes": 8208
+      },
+      {
+        "path": "artifacts/hdr-channel-reuse-differential-20261126/native-sanitize-v1/differential.log",
+        "sha256": "28e52f7df9318001319182803269e06ccd77a9c4c982c632734df24ed8a642c0",
+        "bytes": 7943
+      },
+      {
+        "path": "artifacts/hdr-channel-reuse-differential-20261126/native-sanitize-v1/differential.maps",
+        "sha256": "04552e042f60a7bc6316420f605fd1d0b4479cb5b82913e986b0ae64b7d7a3f5",
+        "bytes": 15981
+      },
+      {
+        "path": "artifacts/hdr-channel-reuse-differential-20261126/native-sanitize-v1/journal.txt",
+        "sha256": "a8e9f6518d19caf5d5ff8aea55fbe1351f111919918ceb6259c77fd432cf1165",
+        "bytes": 1263
+      },
+      {
+        "path": "artifacts/hdr-channel-reuse-differential-20261126/native-sanitize-v1/plan.json",
+        "sha256": "0df0cb4103f0bf7c44a6ba926bbc6bac40bc65ee48e3094e1586095acfb8a6c7",
+        "bytes": 10157382
+      },
+      {
+        "path": "artifacts/hdr-channel-reuse-differential-20261126/native-sanitize-v1/status.json",
+        "sha256": "1110008db48c013e0c86edef4f2d453a5bb33a59ce0210d08638fa4e32878630",
+        "bytes": 5669
+      },
+      {
+        "path": "artifacts/hdr-channel-reuse-differential-20261126/native-sanitize-v1/terminal-closure.json",
+        "sha256": "a3af7b33d411095db6182803337253e49fb03aed586676bf62f676b466f199a5",
+        "bytes": 675
+      },
+      {
+        "path": "artifacts/hdr-channel-reuse-differential-20261126/native-sanitize-v1/unit-terminal.txt",
+        "sha256": "c4a848b2feef5416024ced373ad9c6581c0eb53e93b70d785284651d2ae8f3cc",
+        "bytes": 9087
+      },
+      {
+        "path": "artifacts/hdr-channel-reuse-differential-20261126/plan.json",
+        "sha256": "1a0ddd8aeb846cbc86be46cde736e27b7018d03e3110e81f5d6fb78157eaa73b",
+        "bytes": 8448
+      },
+      {
+        "path": "artifacts/hdr-channel-reuse-differential-20261126/reference-identity.json",
+        "sha256": "c8e798daf9412bbc4027f31574ccc1309753ecce7aa59b4495afd601752f0cf2",
+        "bytes": 206
+      },
+      {
+        "path": "artifacts/hdr-channel-reuse-differential-20261126/release/color-projection-channel-reuse.cpp.o.d",
+        "sha256": "8e7dbe6c2122a0e0928308ef0fe4feb9088f9ba3efb877a9da94fd39405df320",
+        "bytes": 15589
+      },
+      {
+        "path": "artifacts/hdr-channel-reuse-differential-20261126/release-link.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      {
+        "path": "artifacts/hdr-channel-reuse-differential-20261126/sanitize/color-projection-channel-reuse.cpp.o.d",
+        "sha256": "d220cabda1eca4594eb958536719f9d04ecbe918f41ab12a1cba7abac6009f36",
+        "bytes": 15590
+      },
+      {
+        "path": "artifacts/hdr-channel-reuse-differential-20261126/sanitize-link.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      {
+        "path": "artifacts/hdr-channel-reuse-differential-20261126/status.json",
+        "sha256": "7f465952c90637b77730175c2910a84681e1a38fb8679073275b1881b7e35f23",
+        "bytes": 493
+      },
+      {
+        "path": "artifacts/make-hdr-channel-differential-proof-20261126.py",
+        "sha256": "eaff79b83626f84768687289adeb211c6f8dcb442c630f3a70bdf7f4f3c38489",
+        "bytes": 3588
+      },
+      {
+        "path": "artifacts/source-hdr-channel-reuse-20261126/src/color-projection-quality.hpp",
+        "sha256": "b289039841174fdd7317e069bae491086691b340a0e85b97bbbf59b40408158f",
+        "bytes": 7879
+      },
+      {
+        "path": "artifacts/source-hdr-channel-reuse-20261126/tests/color-projection-channel-reuse.cpp",
+        "sha256": "16a4d4c39ad9d4aaaa64875d6cc1691aaa7d96cea3b0212c8d3311b29f67f1a7",
+        "bytes": 10925
+      },
+      {
+        "path": "artifacts/source-hdr-channel-reuse-20261126/tests/color-projection-reference-725.hpp",
+        "sha256": "1a3884e658245ad438535eacd0370463699e3adf32f598cec88e24f85da86780",
+        "bytes": 6774
+      }
+    ]
+  },
+  "observed": 1795668540.8259482
+}
