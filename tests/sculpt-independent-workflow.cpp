@@ -9,10 +9,17 @@
 #include <iostream>
 #include <set>
 #include <thread>
+#include <cstdint>
+#include <vector>
 using namespace dome;using namespace dome::detail;
 namespace {
 size_t checks=0;
 void check(bool value,const char *why){if(!value)throw std::runtime_error(why);++checks;}
+std::vector<std::uint8_t> native_bytes(const Scene &scene){
+ // Retain the complete native encoding, including every field and float bit,
+ // instead of keeping several expanded JSON trees alive beside real workers.
+ return nlohmann::json::to_cbor(scene.encode());
+}
 void ready(Document &d){check(d.wait_asset(std::chrono::seconds(120)),"Actual file/asset worker finishes");check(d.wait_mesh(std::chrono::seconds(120)),"Actual mesh worker publishes");check(d.frame().state->error.empty(),"Actual publication has no asynchronous error");}
 void recovery_ready(Document &d){
  const auto until=std::chrono::steady_clock::now()+std::chrono::seconds(120);
