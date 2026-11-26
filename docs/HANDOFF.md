@@ -1964,6 +1964,44 @@ The probe reaches that refusal before the first key or portable HDR export.
 Physical headset verification remains open.
 [Editable GLB and physical Bake probe evidence](validation/native-editable-glb-2048-20261126.json)
 
+### Lossless FLOAT Bake at 2048
+
+The physical Bake worker now stages resolved RGB and reuses the projection
+coverage states. When the original dense FLOAT layout exceeds its paint
+allowance, the field stores bit-identical shader coefficients using shared
+component constants, varying FLOAT values and exact binary coverage words.
+Version 1 remains the wire format for fields that fit the dense path.
+Decode validates the channel layout, values and retained size under the
+existing Scene41/42 authority. OpenGL uploads the packed words and reads
+the constants in the shader without expanding the field on the host.
+
+The exact full-resolution matching Bake fixture keeps the radiance,
+coverage, editable paint and coordinates through ordered Save, first key,
+Undo/Redo, a cold reopen and byte-identical Shape Restore. The original
+Bake uses 54,525,984 retained bytes and the keyed project uses 163,992,646
+archive bytes. The independent varying-field oracle checks every sample in
+two 2048-square grids. It retains 50,331,680 bytes with constant coverage
+and 50,855,968 with binary partial coverage.
+
+The full application and selected fixtures build cleanly in Release and
+ASan/UBSan, with all 13 focused CTests passing in each profile. Both produce
+identical native HDR files. Nested DomeD Wayland and synthetic OpenXR on software GL and Intel Arc pass
+10 checks each. The Arc workflow passes in Release and ASan/UBSan. The
+first Release Arc observer loaded the sanitizer SDK and stopped during
+startup. The corrected observer loads the Release SDK. Actual OpenGL
+contribution checks compare dense, packed and binary-coverage fields against
+an independent oracle on software GL and Arc in both build profiles.
+
+A separate spatially varying physical donor produces a 104,857,632-byte
+Bake. The subsequent first-key command reaches the aggregate Scene paint
+limit because the archive still charges the Bake in several paint owners.
+The constant-radiance key converts its normals, then Standard HDR GLB
+reaches its aggregate extraction limit when staging ten floats per texel.
+Both limits reproduce against the exact Release build. Continue with shared
+immutable Bake storage and a bounded portable HDR export path. Physical
+headset verification remains open.
+[Physical FLOAT Bake evidence](validation/native-hdr-compact-bake-2048-20261126.json)
+
 ## Source and integration boundary
 
 - Main now admits product1bc13125 and public fixturef1e193c7 after complete

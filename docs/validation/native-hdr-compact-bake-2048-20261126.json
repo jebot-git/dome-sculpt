@@ -1,0 +1,134 @@
+{
+  "archive": {
+    "file": "native-hdr-compact-bake-2048-20261126.tar.gz",
+    "members": 77,
+    "sha256": "a4a5523f143d860325d49554cdab57ec39223b91b8413ef651f2df5d6d401ad8"
+  },
+  "byte_parity": {
+    "baked-2048-hdr.dsculpt": "a7ac2e4c7354a3f336092a4e320084ee95fcf48050749b71c2c66b40420223db",
+    "editable-2048.glb": "2a2d509fb87ebeb01459846eb16138d96500b05debbef7846e470861db5790cb",
+    "keyed-2048-hdr.dsculpt": "d2cba236c2384fa92f3a25dc8cd68f70df35ac3b180b40ac6456fd8388706dd2",
+    "restored-2048-hdr.dsculpt": "a7ac2e4c7354a3f336092a4e320084ee95fcf48050749b71c2c66b40420223db"
+  },
+  "frontend": {
+    "arc": {
+      "app_sha256": "d0fa28ca325ca077b18591798871d0b9a331c59d4e5fa08418843e8456e27ec4",
+      "checks": 10,
+      "exit": 0,
+      "input_sha256": "a7ac2e4c7354a3f336092a4e320084ee95fcf48050749b71c2c66b40420223db",
+      "inspector_sha256": "3c22b79b4d2f85710bd1892603491ddc71d0f975b75e5d3f47be5bd96197f845",
+      "invocation": "40860d5d7f94472f95133b046a4a209a",
+      "mode": "arc",
+      "native_sha256": "764452baec7f21c85510e4238f6f637764fa2206a007c13bad8c64bf9c0bbffb",
+      "phase": "complete",
+      "report_sha256": "ef7b3e3faf43042d5a40c312b102aa53b04afe13cabc4c64fdfb6b2836d81e8e",
+      "run_script_sha256": "b9a7c58d28458c27e96a5fecb72fb0d81b764db59167d44bac3a63ada8f77b94",
+      "runtime_sha256": "c1cbe195d234bc893faf8bd4e4dbf3831b686ec625f17b4e61d0d8f8acbf4265",
+      "terminal": true,
+      "verifier_sha256": "c8fcffa921bc45b7812edbfa13d8f5a3eda4bdd68b03fe0cf00d9da3ad0abff6"
+    },
+    "arc-release": {
+      "app_sha256": "a217762aa8778a870603e3c7f64f95e604f48ea1d0739d2aa955af42bf6cd8ef",
+      "checks": 10,
+      "exit": 0,
+      "input_sha256": "a7ac2e4c7354a3f336092a4e320084ee95fcf48050749b71c2c66b40420223db",
+      "inspector_sha256": "3729f69c345dbab492aae65f867ccf55b85c23cd3900f8b703cb0d413115f793",
+      "invocation": "5f6944aec1404b07a0415b5dee52a9d1",
+      "mode": "arc-release",
+      "native_sha256": "764452baec7f21c85510e4238f6f637764fa2206a007c13bad8c64bf9c0bbffb",
+      "phase": "complete",
+      "report_sha256": "ef7b3e3faf43042d5a40c312b102aa53b04afe13cabc4c64fdfb6b2836d81e8e",
+      "run_script_sha256": "b9a7c58d28458c27e96a5fecb72fb0d81b764db59167d44bac3a63ada8f77b94",
+      "runtime_sha256": "e20bb9e934ddf93dc184231f99ce67ed9f3dd8f7efc7baff9e9b89c03fc1d8b4",
+      "terminal": true,
+      "verifier_sha256": "d66dba8c143ec9996283846734dcafd5b792d47f1b82d422982b1bab75169ff6"
+    },
+    "software": {
+      "app_sha256": "a217762aa8778a870603e3c7f64f95e604f48ea1d0739d2aa955af42bf6cd8ef",
+      "checks": 10,
+      "exit": 0,
+      "input_sha256": "a7ac2e4c7354a3f336092a4e320084ee95fcf48050749b71c2c66b40420223db",
+      "inspector_sha256": "3729f69c345dbab492aae65f867ccf55b85c23cd3900f8b703cb0d413115f793",
+      "invocation": "abe458d22ee24c72b935419975a14c79",
+      "mode": "software",
+      "native_sha256": "764452baec7f21c85510e4238f6f637764fa2206a007c13bad8c64bf9c0bbffb",
+      "phase": "complete",
+      "report_sha256": "ef7b3e3faf43042d5a40c312b102aa53b04afe13cabc4c64fdfb6b2836d81e8e",
+      "run_script_sha256": "b9a7c58d28458c27e96a5fecb72fb0d81b764db59167d44bac3a63ada8f77b94",
+      "runtime_sha256": "e20bb9e934ddf93dc184231f99ce67ed9f3dd8f7efc7baff9e9b89c03fc1d8b4",
+      "terminal": true,
+      "verifier_sha256": "d66dba8c143ec9996283846734dcafd5b792d47f1b82d422982b1bab75169ff6"
+    },
+    "wayland": {
+      "app_sha256": "a217762aa8778a870603e3c7f64f95e604f48ea1d0739d2aa955af42bf6cd8ef",
+      "checks": 10,
+      "compositor_sha256": "47920142c8c803dcf5adb63ba643d2e347fbdcd1e15ecd8bce7c1a8dd47c0b7e",
+      "compositor_source": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+      "exit": 0,
+      "input_sha256": "a7ac2e4c7354a3f336092a4e320084ee95fcf48050749b71c2c66b40420223db",
+      "inspector_sha256": "3729f69c345dbab492aae65f867ccf55b85c23cd3900f8b703cb0d413115f793",
+      "invocation": "bde21ed6dfa84d6da85842bb8c27aa3d",
+      "mode": "wayland",
+      "native_sha256": "d2cba236c2384fa92f3a25dc8cd68f70df35ac3b180b40ac6456fd8388706dd2",
+      "phase": "complete",
+      "probe_sha256": "5bf11c670f66bbb68960073878933055b09582e5173ec1e3f472b413956c55aa",
+      "report_sha256": "96baa9f49568767cb8c1b2e4ce46247f7bc2b6ef3f8dbf9c4fcde5da005f7abd",
+      "run_script_sha256": "0cd03ab3ae7d43f3896917bbb2ca9423f711694dbc7c380f7a1ea4f2d29f772a",
+      "terminal": true,
+      "verifier_sha256": "d66dba8c143ec9996283846734dcafd5b792d47f1b82d422982b1bab75169ff6"
+    }
+  },
+  "open": {
+    "standard_glb": "Constant-radiance key converts normals; Standard HDR export reaches its aggregate 128 MiB staging limit.",
+    "varied_hdr_key": "Actual varying full-grid Bake reaches 104857632 bytes, then first key reaches Scene paint storage budget."
+  },
+  "product": "07390f67cfc0b91fccec5dc32a1caf90a5873ed3",
+  "profiles": {
+    "asan": {
+      "app_sha256": "d0fa28ca325ca077b18591798871d0b9a331c59d4e5fa08418843e8456e27ec4",
+      "arc": {
+        "exe_sha256": "e8423ab22f00f74876eac07276643ebc4d6d0d8f7b1e2e4c00488b36164327ad",
+        "exit": 0,
+        "gpu_checks": 516126,
+        "gpu_device": "/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0",
+        "renderer": "Intel Arc A770"
+      },
+      "ctests": 13,
+      "dense_hdr_checks": 20,
+      "logs_sha256": {
+        "actual-arc.json": "51d80c9ef3049b3b90def50128f82bad712896e9414453988da6f9c653a5f990",
+        "actual-arc.log": "e759322cc2bef601136dd432f53d24f6db48263729dced3ef70191eed032e3af",
+        "build.log": "ac6d014512ad677ab49f9a4c7a993909d445dc6527d7f19291ac29f110da9f44",
+        "build/regressions.xml": "ea99697a3cfe899c39d342dbf8f4c362ef258dfac413cd4dac1f67d16ff24a4e",
+        "configure.log": "9b189cc018cc8a0462448221dcc5a74541c76f4357df088983378c5571f890f7",
+        "ctest.log": "123d7c769dadffd5e940da828bca96661a883cd65853157fd0fc1e669f32b7b7",
+        "status.json": "4a6183f6406b41e0db14825f847f9f3a46b36f74c479dd3689f1f661cabc9560"
+      },
+      "software_gl_checks": 516126
+    },
+    "release": {
+      "app_sha256": "a217762aa8778a870603e3c7f64f95e604f48ea1d0739d2aa955af42bf6cd8ef",
+      "arc": {
+        "exe_sha256": "e481bb0b17eaf9b9a4c0b3b175f2127de7b0908d1a4b7f5b78487c88d694ec73",
+        "exit": 0,
+        "gpu_checks": 516126,
+        "gpu_device": "/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0",
+        "renderer": "Intel Arc A770"
+      },
+      "ctests": 13,
+      "dense_hdr_checks": 20,
+      "logs_sha256": {
+        "actual-arc.json": "023ab6035f3faae5df0467754811b16e6165ea8750f18137ce6343e1d8ae7a8b",
+        "actual-arc.log": "d7a3a0e2cece72e4e43c0155af6a75592a13cebd9fcfb50d0148ede390b07676",
+        "build.log": "8e026772373d6edb114a6ccab2c0140fab2fc49a4fd6ed40a37f27dbc249dbf2",
+        "build/regressions.xml": "cefac741d56fedae4108f247e49188db5a01706766f934accf0d054bed4f0218",
+        "configure.log": "46db73906a74ab33f9c68d6b4e5fbf937f37d6d38f9de86d2690b6cde451fd26",
+        "ctest.log": "829f3bedb374c4c1c0b5e738fae4a4941b9c9a98df2677c529a9202321db0117",
+        "status.json": "ccf82bde4a222661707b964fd10c3da521ba0ea45292a783f388a6b1f9126b5f"
+      },
+      "software_gl_checks": 516126
+    }
+  },
+  "scope": "Packed lossless FLOAT channels and optional binary coverage for a full-resolution 2048 Bake. A full constant-radiance native Bake survives first shapekey, ordered Save, reopen, Undo/Redo, and exact Shape Restore. Varying HDR Bake, exact coefficient storage, and GPU contribution checks are separately scoped.",
+  "source_patch_sha256": "670ded32159bf9863054e7e1c0594d257b5f33d23a749c265d8228fc1619a89a"
+}

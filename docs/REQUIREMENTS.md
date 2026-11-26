@@ -104,9 +104,13 @@ exact original Bake available for Undo and Shape Restore. The reopened key
 remains editable and supports portable normal conversion and Standard GLB.
 Default Editable GLB also exports this project under the existing sample
 budget. It recovers the exact native scene, including the original Bake and
-Shape Restore data. Full-resolution Bake and key authoring with physical
-emission and physical headset verification remain open.
-[Full-resolution writable atlas evidence](validation/native-writable-raster-2048-20261126.json) · [Default AO evidence](validation/default-ao-bake-2048-20261126.json) · [First shapekey evidence](validation/native-writable-first-key-2048-20261126.json) · [Editable GLB evidence](validation/native-editable-glb-2048-20261126.json)
+Shape Restore data. Native 2048-square Bake now stores physical emission
+losslessly using shared constants, varying FLOAT channels and exact binary
+coverage where applicable. The constant-radiance native fixture supports
+first-key authoring and exact Shape Restore after reopen. A spatially varying
+Bake still reaches the aggregate scene quota at first key, and portable HDR
+export and physical headset verification remain open.
+[Full-resolution writable atlas evidence](validation/native-writable-raster-2048-20261126.json) · [Default AO evidence](validation/default-ao-bake-2048-20261126.json) · [First shapekey evidence](validation/native-writable-first-key-2048-20261126.json) · [Editable GLB evidence](validation/native-editable-glb-2048-20261126.json) · [Physical FLOAT Bake evidence](validation/native-hdr-compact-bake-2048-20261126.json)
 
 Strict Bake rays now recover source-edge contacts affected by float staging.
 An exact ray hit has priority. A missed ray can use an actual source edge
