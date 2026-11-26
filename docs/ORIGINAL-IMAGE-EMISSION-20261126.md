@@ -45,4 +45,10 @@ initial logs, causal pixel observations and revised renderer are pinned in
 The certificate covers static images and exact affine layouts on the
 supported coincident source and target geometry. General correspondences
 remain open. Candidate `08936bd8` builds against the canonical DomeD FLTK and
-bitmap runtime. The broader software regression run is still in progress.
+bitmap runtime. A fresh optimized build of the broader software regression
+cohort passed. CTest finished with 57 passes, 29 failures and zero skips in
+231.98 seconds. All 29 failures belong to the earlier suite's 65 failed or
+dependency-skipped tests. The current run clears 36 of those 65, and all
+21 additional selected cases pass. Raw CTest and JUnit results are under
+`artifacts/production-original-hdr-regressions-release-20261126/`. The complete
+1,349-case suite remains to be run on this source.

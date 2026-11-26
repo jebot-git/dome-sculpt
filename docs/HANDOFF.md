@@ -376,10 +376,16 @@ missing-role refusals, native replay and ordered history. The separate image
 and paint GLB passes the focused export and forged-map checks. Both renderers
 pass linear, nearest and rotated MToon cases in software and on Intel Arc.
 The strict native and corrected software renderer cases pass with leak detection.
-The wider 86-case run for this exact source includes all 65 earlier failures
-or dependency skips and is live in
-`ds-production-original-hdr-regressions-20261126.service`. Read
-[the original image result](ORIGINAL-IMAGE-EMISSION-20261126.md).
+The optimized build for the wider 86-case run on exact `08936bd8` passed.
+The private software CTest run finished with 57 passes, 29 failures and
+zero skips. It re-ran all 65 failures or dependency skips from the earlier
+1,349-case run and cleared 36 of them. The other 21 selected cases all pass.
+The full 1,349-case suite has yet to run on this newer source. Open areas
+include joystick navigation, anatomical binding, source-native VRM export,
+paint/archive ownership and GPU resource lifetime. The older joystick
+fixture still drives the previous material page layout. Raw CTest and JUnit
+results are under `artifacts/production-original-hdr-regressions-release-20261126/`.
+Read [the original image result](ORIGINAL-IMAGE-EMISSION-20261126.md).
 
 ## Source and integration boundary
 
