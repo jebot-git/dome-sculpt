@@ -65,6 +65,38 @@ Vec3 PolygonSurfacePreview::normal_at(size_t triangle,std::array<double,3>b,cons
  // the CPU evaluator; no GPU readback or edited-UV tangent inference exists.
  PolygonSurfaceTransferLimits l;l.geometry.cancelled=cancel;return owner_->has_normal_field()?owner_->pbr_normal(triangle,b,world,l):owner_->native_normal(triangle,b,world,l);
 }
+Vec3 PolygonSurfacePreview::local_normal_at(size_t triangle,std::array<double,3> bary,
+    std::optional<std::array<float,2>> normal_uv)const {
+ const auto &frame=streams_->frames.at(triangle);
+ const auto geometry=[&](size_t offset) {
+  const auto &n=frame[offset],&t=frame[offset+1];
+  const Vec3 normal{n[0],n[1],n[2]},tangent{t[0],t[1],t[2]};
+  return PolygonGeometryFrame{{tangent,cross(normal,tangent)*n[3],normal},n[3]};
+ };
+ const auto before=geometry(0),current=geometry(2);
+ const auto first=triangle*3;
+ if(model_==PolygonSurfaceNormalModel::NativeNOnly) {
+  Vec3 normal;
+  for(size_t k=0;k<3;++k)
+   normal+=normal_bake_math::unit(streams_->normals.at(first+k))*float(bary[k]);
+  return transport_polygon_direction(normal,before,current);
+ }
+ if(!normal_uv)throw std::invalid_argument("Retained Bake source lost its normal coordinates");
+ std::array<NormalBakeVertex,3> vertices;
+ for(size_t k=0;k<3;++k) {
+  const auto &t=streams_->tangents.at(first+k);
+  vertices[k]=normal_bake_vertex(streams_->normals.at(first+k),{t[0],t[1],t[2]},t[3],
+      NormalVertexBitangent::UnitCross);
+ }
+ const auto basis=normal_bake_basis(vertices,bary,NormalFragmentBasis::UnitColumns);
+ PaintSourceTexture texture;
+ texture.image=owner_->before()->paint->baked()->normal_field->pbr();
+ texture.wrap_s=texture.wrap_t=33071;texture.min_filter=texture.mag_filter=9729;
+ const auto value=sample_source_texture(texture,(*normal_uv)[0],(*normal_uv)[1],false);
+ Vec3 decoded{value[0]*2-1,value[1]*2-1,value[2]*2-1};
+ if(length(decoded)<=1e-20f)decoded={0,0,1};
+ return transport_polygon_normal({basis,vertices.front().w,1},decoded,before,current);
+}
 void PolygonSurfacePreview::validate_world(const AffineTransform&world,double minimum,const std::function<bool()>&cancel)const{
  if(!std::isfinite(minimum)||minimum<=0||minimum>1)throw std::invalid_argument("Invalid complete polygon field conditioning bound");
  stop(cancel);(void)world.inverse();const float hand=world.orientation()==AffineOrientation::Reversing?-1.f:1.f;

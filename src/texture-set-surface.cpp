@@ -43,8 +43,15 @@ bool bake_target_supported(const SculptObject &object) {
 }
 
 bool bake_source_supported(const SculptObject &object) {
- return cut_color_supported(object) &&
-        (!object.texture_sets || texture_set_plain_fields(object));
+ if(!object.texture_sets)return cut_color_supported(object);
+ if(!object.mesh_active||!object.painted||(object.polygon&&object.polygon->colors))return false;
+ const auto eligible=[&](const auto &field){
+  if(field.source)return !object.deformation&&field.source->source_preview()&&
+      field.material_bindings&&!field.material_bindings->has_mtoon;
+  return plain(field.painted.get(),field.appearance.get(),field.material_bindings.get());
+ };
+ return eligible(texture_set_view(object,0))&&
+    std::all_of(object.texture_sets->additional().begin(),object.texture_sets->additional().end(),eligible);
 }
 std::shared_ptr<const TextureSetSurfacePlan> prepare_texture_set_surface(const SculptObject&o,const TextureSetLimits&limits){
  limits.validate();stop(limits);

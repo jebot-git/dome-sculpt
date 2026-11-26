@@ -17,6 +17,10 @@ public:
  void validate_maps(const TextureMaps &) const;
  Vec3 normal_at(size_t,std::array<double,3>,const AffineTransform &,
      const std::function<bool()> &cancelled={})const;
+ // Evaluate the already authenticated corner streams in object space.
+ // The caller checks membership and applies the source-to-target similarity.
+ Vec3 local_normal_at(size_t,std::array<double,3>,
+     std::optional<std::array<float,2>> normal_uv)const;
  const auto &binding()const noexcept{return binding_;}
  const auto &field_owner()const noexcept{return owner_;}
  const auto &attachment()const noexcept{return attachment_;}

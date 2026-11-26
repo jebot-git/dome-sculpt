@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
+#include "dome/bake-authoring.hpp"
 #include "dome/bake-recipe.hpp"
 #include "dome/native-scene-append.hpp"
 #include "dome/normal-preparation.hpp"
@@ -7,6 +8,7 @@
 #include "dome/projection.hpp"
 #include "dome/source-maps.hpp"
 #include "dome/source-placement.hpp"
+#include "dome/tangents.hpp"
 #include "texture-set-export.hpp"
 #include "texture-set-field-source.hpp"
 #include "polygon-surface-preview.hpp"
@@ -15,6 +17,8 @@
 #include "cgltf.h"
 #include "native-paint-sampling.hpp"
 #include "polygon-surface-owner.hpp"
+#include "polygon-surface-paint.hpp"
+#include "paint-overlay-sample.hpp"
 #include <bit>
 #include <fstream>
 #include <iostream>
@@ -102,6 +106,103 @@ void audit(bool prepared,bool reflected,bool varying=false){
  const std::string file=varying?"native-smooth.glb":std::string(prepared?"prepared":"native")+(reflected?"-reflected.glb":"-sheared.glb");export_glb(surfaces,file);cgltf_options options{};cgltf_data*data=nullptr;check(cgltf_parse_file(&options,file.c_str(),&data)==cgltf_result_success,"Independent cgltf parses the actual durable GLB");struct Free{cgltf_data*p;~Free(){cgltf_free(p);}}free{data};check(cgltf_load_buffers(&options,data,file.c_str())==cgltf_result_success&&cgltf_validate(data)==cgltf_result_success,"Independent standard glTF consumer validates actual buffers, materials and attributes");check(data->meshes_count==1&&data->meshes[0].primitives_count==2,"Independent consumer sees one geometry with both material primitives");
  check(scene.encode()==exact,"Portable source compilation leaves all original normal/paint/recipe/native history exact");
 }
+void retained_bake_source(bool prepared,bool physical) {
+ auto scene=source(prepared,false,physical);
+ const auto source_id=scene.active().id;
+ scene.active().affine_edit.reset();
+ for(TextureSetId field:{0u,1u}) {
+  check(edit_texture_set(scene,source_id,field,[field](PaintedMesh &paint,Material &){
+   paint.add_layer("Current field paint");
+   PaintSettings ink;ink.front_only=false;ink.color=field?std::array<float,4>{.8f,.05f,.05f,1}:std::array<float,4>{.01f,.1f,.85f,1};
+   Brush brush;brush.from=brush.to={0,0,0};brush.normal={0,0,1};brush.radius=2;brush.strength=1;
+   paint.begin_stroke();paint.stamp(brush,ink);return paint.end_stroke();
+  }),"Current retained fields each contain real distinct editable paint");
+ }
+ auto low=scene.active().painted->mesh();
+ low.normals.assign(low.positions.size(),{0,0,1});
+ const auto target_id=scene.add("Plain Bake recipient",Volume{});
+ auto &target=scene.active();
+ target.mesh_active=true;
+ for(auto &p:low.positions)p.z+=.015f;
+ target.painted=std::make_shared<PaintedMesh>(low,64);
+ scene.object(source_id).visible=false;
+ scene.object(source_id).locked=true;
+ const auto original=scene.encode();
+ ObjectBakeSettings settings;
+ settings.allow_backfaces=true;settings.padding=0;settings.ao_samples=0;
+ Document doc;doc.replace(scene);ready(doc);
+ check(doc.frame().state->can_bake,"Document lists the authenticated retained multi-material source");
+ doc.bake_from_object(source_id,settings);
+ const auto out=std::filesystem::path("retained-bake-source.dsculpt");
+ doc.save_async(out).get();ready(doc);
+ const auto result=doc.copy_scene();
+ const auto baked=result.object(target_id).painted->baked();
+ check(baked&&result.active().bake_recipe->source.object==source_id&&
+       Scene::load(out).encode()==result.encode(),"Actual Bake and ordered Save reopen exactly");
+ check(bool(baked->emission_field)==physical,"Only actual physical source uses the independent FLOAT output");
+ auto before_source=scene.snapshot(),after_source=result.snapshot();
+ before_source.erase(target_id);after_source.erase(target_id);
+ check(before_source.encode()==after_source.encode(),"Baking preserves the complete retained source archive");
+ const auto tangents=tangent_corners(low);
+ const auto &source_object=result.object(source_id);
+ const auto sample_at=[](const Image&image,std::array<float,2> uv,bool srgb){
+  PaintSourceTexture texture;texture.image=std::shared_ptr<const Image>(&image,[](const Image *){});
+  texture.wrap_s=texture.wrap_t=33071;texture.min_filter=texture.mag_filter=9729;
+  return sample_source_texture(texture,uv[0],uv[1],srgb);
+ };
+ size_t authorized_pixels=0,distinct_coordinates=0,physical_pixels=0;
+ std::array<size_t,2> field_pixels{};
+ for(TextureSetId set:{0u,1u}) {
+  const auto member=texture_set_view(source_object,set);
+  const auto read=member.source->read_view(member);
+  const auto maps=detail::PolygonSurfacePaintCodec::preview(*read,member.material_bindings,member.material);
+  for(const auto triangle:member.domain->triangles()){
+   const auto start=size_t(triangle)*3;
+   const auto a=low.uv.at(low.indices[start]),b=low.uv.at(low.indices[start+1]),c=low.uv.at(low.indices[start+2]);
+   const double determinant=(b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0]);
+   for(unsigned y=6;y<64;y+=7)for(unsigned x=6;x<64;x+=7){
+    const float u=(x+.5f)/64,v=(y+.5f)/64;
+    const double s=((u-a[0])*(c[1]-a[1])-(v-a[1])*(c[0]-a[0]))/determinant;
+    const double t=((b[0]-a[0])*(v-a[1])-(b[1]-a[1])*(u-a[0]))/determinant;
+    const std::array<double,3> weights{1-s-t,s,t};
+    if(*std::min_element(weights.begin(),weights.end())<.08)continue;
+    const size_t pixel=y*64+x;
+    check(baked->coverage[pixel]==255,"Each independent interior raster point is projected");
+    const auto source_sample=member.source->sample(triangle,weights);
+    const auto expected_color=sample_at(maps->color,source_sample.paint_uv,true);
+    const auto wrong_color=sample_at(maps->color,{u,v},true);
+    for(size_t k=0;k<3;++k)
+     check(std::abs(int(baked->maps.color.rgba[pixel*4+k])-int(std::lround(linear_to_srgb(expected_color[k])*255)))<=1,
+           "Baked material color follows the independent original paint coordinates");
+    if(std::abs(expected_color[0]-wrong_color[0])>.02f||std::abs(expected_color[2]-wrong_color[2])>.02f)
+     ++distinct_coordinates;
+    const auto expected_normal=member.source->normal(triangle,weights,AffineTransform{},true);
+    const auto got=tangent_frame(low,tangents,triangle,{float(weights[0]),float(weights[1]),float(weights[2])}).to_world(
+        {baked->maps.normal.rgba[pixel*4]/255.f*2-1,baked->maps.normal.rgba[pixel*4+1]/255.f*2-1,baked->maps.normal.rgba[pixel*4+2]/255.f*2-1});
+    check(length(normalized(got)-expected_normal)<.015f,"Projected normal retains the original role in the current physical corner frame");
+    if(physical) {
+     const auto value=detail::sample_overlay_values(*maps->overlay,source_sample.paint_uv[0],source_sample.paint_uv[1],false);
+     const auto expected=BakedEmissionSample{{value[2][0],value[2][1],value[2][2]},
+         {value[4][0],value[4][1],value[4][2]},value[3][3]}.resolve(member.material.emissive,1);
+     const auto got=baked->emission_field->values()[pixel].resolve({},1);
+     for(size_t k=0;k<3;++k)check(std::abs(got[k]-expected[k])<2e-5f,"Baked FLOAT emission matches continuous original-grid sampling");
+     physical_pixels+=got[0]>1;
+    }
+    ++authorized_pixels;
+    ++field_pixels[set];
+   }
+  }
+ }
+ check(authorized_pixels>=8&&field_pixels[0]&&field_pixels[1],"Oracle covers both source material ranges");
+ if(!physical)check(distinct_coordinates>0,"Original paint and edited UV0 produce demonstrably different colors");
+ if(physical)check(physical_pixels>0,"Fixture verifies genuine above-one radiance");
+ check(doc.undo()&&doc.copy_scene().encode()==original&&doc.redo()&&doc.copy_scene().encode()==result.encode(),
+       "Retained donor Bake is exactly one Undo and Redo");
+ auto cancelled=scene.snapshot();bool stop=false;
+ refuses([&]{bake_object(cancelled,source_id,settings,[&]{return stop;},[&](float f){stop|=f>.12f;});},
+       "Detached retained-field projection can be cancelled");
+ check(stop&&cancelled.encode()==original,"Retained donor cancellation leaves the complete Scene unchanged");
+}
 }
 void recipe_reference_remap(bool prepared) {
  auto scene = source(prepared,false,false,false,true);
@@ -157,4 +258,4 @@ void recipe_reference_remap(bool prepared) {
  refuses([&]{Scene::decode(forged);},"Shared polygon sampling rejects a different geometric recipe");
 
 }
-int main(int argc,char**argv)try{if(argc==2&&std::string_view(argv[1])=="--recipe-reference-remap"){for(bool prepared:{false,true})recipe_reference_remap(prepared);std::cout<<"PASS "<<checks<<" prepared texture recipe controls\n";return 0;}if(argc>1){std::filesystem::create_directories(argv[1]);std::filesystem::current_path(argv[1]);}for(bool prepared:{false,true})for(bool reflected:{false,true})audit(prepared,reflected);audit(false,false,true);auto varied=source(false,false,false,true);const auto before=varied.encode();refuses([&]{detail::make_gltf(varied.export_surfaces());},"A varying original role is explicitly refused pending its full interpolation adapter");check(varied.encode()==before,"Varying-role refusal preserves the actual native source");auto hdr=source(false,false,true);refuses([&]{detail::make_gltf(hdr.export_surfaces());},"Actual FLOAT source export retains its precision-qualified per-material guard");std::cout<<"PASS "<<checks<<" actual retained standard source export controls\n";return 0;}catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
+int main(int argc,char**argv)try{if(argc==2&&std::string_view(argv[1])=="--recipe-reference-remap"){for(bool prepared:{false,true})recipe_reference_remap(prepared);std::cout<<"PASS "<<checks<<" prepared texture recipe controls\n";return 0;}if(argc==3&&std::string_view(argv[1])=="--retained-bake-source"){std::filesystem::create_directories(argv[2]);std::filesystem::current_path(argv[2]);retained_bake_source(false,false);retained_bake_source(true,false);retained_bake_source(false,true);std::cout<<"PASS "<<checks<<" retained source Bake controls\n";return 0;}if(argc>1){std::filesystem::create_directories(argv[1]);std::filesystem::current_path(argv[1]);}for(bool prepared:{false,true})for(bool reflected:{false,true})audit(prepared,reflected);audit(false,false,true);auto varied=source(false,false,false,true);const auto before=varied.encode();refuses([&]{detail::make_gltf(varied.export_surfaces());},"A varying original role is explicitly refused pending its full interpolation adapter");check(varied.encode()==before,"Varying-role refusal preserves the actual native source");auto hdr=source(false,false,true);refuses([&]{detail::make_gltf(hdr.export_surfaces());},"Actual FLOAT source export retains its precision-qualified per-material guard");std::cout<<"PASS "<<checks<<" actual retained standard source export controls\n";return 0;}catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
