@@ -251,6 +251,17 @@ pass. The App version check also passes. Read
 [the warm-capture validation](validation/sculpt-scene-prefix-accounting-20261126.json).
 Full scope in REQUIREMENTS is unchanged.
 
+Candidate `0cdd1511` combines the warm-capture change with compact sculpt
+index allocation. The Release build replaces one complete core translation
+unit and links the app and four matching fixtures. Its app version check and
+all 287 selected native checks pass with the default allocator. The complete
+167-check sculpt workflow peaks at 3,414,052,864 owned RSS bytes within the
+original 4 GiB cap. The saved project and both recovery files have the exact
+expected SHA-256. Read
+[the combined Release receipt](validation/production-compact-sculpt-release-20261126.json).
+The selected sanitizer checks require their own result, as do the matching
+Wayland and OpenXR routes.
+
 ## Source and integration boundary
 
 - Main now admits product1bc13125 and public fixturef1e193c7 after complete
@@ -651,9 +662,9 @@ runtime /opt/fltk-vr/bdf-runtime. Updated unrelated /usr font-library copies are
 outside the actual selected72-provider closure; do not rewrite old expectations
 or rebuild solely because an unused historical/global manifest differs.
 
-The [current progress assessment](PROGRESS-ASSESSMENT-20261118.md) describes
-remaining production work. The latest user instruction requests a pause after
-this round. Preserve all incomplete requirements for the next explicit resume.
+The [Nov18 progress assessment](PROGRESS-ASSESSMENT-20261118.md) describes
+the earlier pause and the remaining production work at that checkpoint. This
+Nov26 handoff reflects resumed work.
 Complete production sculpt/local meshing/recovery, painting/texture sets/baking,
 remesh/retopology/UV workflows, humanoid/rig/weight authoring, glTF/VRM coverage,
 physical XR/input and accelerator execution remain required. Controller trays
