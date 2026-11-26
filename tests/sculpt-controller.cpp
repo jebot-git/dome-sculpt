@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
+#include "../src/sculpt-scene-chunks.hpp"
 #include "sculpt-ui-values.hpp"
 #include <iostream>
 using namespace dome;
@@ -31,13 +32,16 @@ struct ReleaseMesh {
 };
 std::atomic<std::shared_ptr<MeshGate>> mesh_gate;
 }
-extern "C" std::vector<ObjectSurface> surfaces_real(const Scene*, const std::function<bool()>&, const Scene::SculptMesher&)
-    asm("__real__ZNK4dome5Scene16preview_surfacesERKSt8functionIFbvEERKS1_IFNS_4MeshEmRKNS_6VolumeEEE");
-extern "C" std::vector<ObjectSurface> surfaces_wrap(const Scene*, const std::function<bool()>&, const Scene::SculptMesher&)
-    asm("__wrap__ZNK4dome5Scene16preview_surfacesERKSt8functionIFbvEERKS1_IFNS_4MeshEmRKNS_6VolumeEEE");
-extern "C" std::vector<ObjectSurface> surfaces_wrap(const Scene *scene, const std::function<bool()> &cancelled, const Scene::SculptMesher &mesher) {
-  auto result = surfaces_real(scene, cancelled, mesher);
-  if (auto gate = mesh_gate.exchange({})) gate->stop();
+extern "C" dome::detail::SculptScenePreview capture_real(const Scene &,dome::detail::SculptSceneChunkContext,
+    const dome::detail::SculptSceneChunks::Ptr &,dome::detail::SculptSceneChunkLimits,LocalSurfaceCache::Cancel)
+    asm("__real__ZN4dome6detail17SculptSceneChunks7captureERKNS_5SceneENS0_23SculptSceneChunkContextERKSt10shared_ptrIKS1_ENS0_22SculptSceneChunkLimitsESt8functionIFbvEE");
+extern "C" dome::detail::SculptScenePreview capture_wrap(const Scene &,dome::detail::SculptSceneChunkContext,
+    const dome::detail::SculptSceneChunks::Ptr &,dome::detail::SculptSceneChunkLimits,LocalSurfaceCache::Cancel)
+    asm("__wrap__ZN4dome6detail17SculptSceneChunks7captureERKNS_5SceneENS0_23SculptSceneChunkContextERKSt10shared_ptrIKS1_ENS0_22SculptSceneChunkLimitsESt8functionIFbvEE");
+extern "C" dome::detail::SculptScenePreview capture_wrap(const Scene &scene,dome::detail::SculptSceneChunkContext context,
+    const dome::detail::SculptSceneChunks::Ptr &before,dome::detail::SculptSceneChunkLimits limits,LocalSurfaceCache::Cancel cancelled) {
+  auto result=capture_real(scene,context,before,limits,std::move(cancelled));
+  if (auto gate=mesh_gate.exchange({})) gate->stop();
   return result;
 }
 struct Driver {
