@@ -2,6 +2,7 @@
 #include "sculpt-surface-chunks.hpp"
 #include "sculpt-surface-tile.hpp"
 #include "sculpt-chunk-index.hpp"
+#include <atomic>
 #include <bit>
 #include <exception>
 #include <limits>
@@ -53,8 +54,60 @@ struct Work {
     Phase(Work &w,const char *next):work(w),previous(w.phase){w.phase=next;}
     ~Phase(){work.phase=previous;}
   };
-  // Only lexical transient storage may be released. Persistent packet/index
-  // charges deliberately remain conservative through the complete operation.
+  // Only actual allocation retirement may credit a persistent index charge.
+  // Published nodes can outlive this Work: their allocator holds a weak
+  // numeric account, never a deleter which dereferences the former Work.
+  struct NodeReleases { std::atomic<size_t> bytes{0}; };
+  std::shared_ptr<NodeReleases> node_releases;
+  void settle_node_releases() {
+    if(!node_releases)return;
+    const auto released=node_releases->bytes.exchange(0,std::memory_order_relaxed);
+    if(released>bytes)std::terminate();
+    bytes-=released;
+  }
+  template<class T> struct NodeAllocator {
+    using value_type=T;
+    Work *work;
+    std::weak_ptr<NodeReleases> releases;
+    size_t charge_bytes;
+    NodeAllocator(Work &w,size_t n):work(&w),releases(w.node_releases),charge_bytes(n){}
+    template<class U> NodeAllocator(const NodeAllocator<U> &other) noexcept
+        :work(other.work),releases(other.releases),charge_bytes(other.charge_bytes){}
+    void retired() noexcept {
+      if(auto account=releases.lock()) {
+        const auto before=account->bytes.fetch_add(charge_bytes,std::memory_order_relaxed);
+        if(before>SIZE_MAX-charge_bytes)std::terminate();
+      }
+    }
+    T *allocate(size_t n) {
+      // allocate_shared must fit its real control block and allocator inside
+      // the unchanged node+128 allowance, retaining 64 bytes for heap overhead
+      // and the shared numeric account. Refuse an unsupported implementation.
+      if(charge_bytes<64||n>(charge_bytes-64)/sizeof(T))
+        throw std::length_error("Sculpt index shared allocation exceeds its allowance");
+      work->charge(charge_bytes);
+      try { return std::allocator<T>{}.allocate(n); }
+      catch(...) {retired();throw;}
+    }
+    void deallocate(T *p,size_t n) noexcept {
+      // Releasing a node's last strong pointer can destroy its descendants;
+      // credit only after the complete actual shared allocation is freed.
+      std::allocator<T>{}.deallocate(p,n);
+      retired();
+    }
+    template<class U> bool operator==(const NodeAllocator<U> &other) const noexcept {
+      return work==other.work&&charge_bytes==other.charge_bytes&&
+          !releases.owner_before(other.releases)&&!other.releases.owner_before(releases);
+    }
+  };
+  template<class T> NodeAllocator<T> node_allocator(size_t n) {
+    if(!node_releases) {
+      charge(sizeof(NodeReleases)+128);
+      node_releases=std::make_shared<NodeReleases>();
+    }
+    return NodeAllocator<T>(*this,n);
+  }
+  // Lexical scratch remains charged until the actual local storage dies.
   struct Scratch {
     Work &work;size_t bytes;
     Scratch(Work &w,size_t n,size_t width=1):work(w),bytes(0){work.charge(n,width);bytes=n*width;}
@@ -79,10 +132,12 @@ struct Work {
       throw std::length_error("Sculpt chunk work limit exceeded");
     steps+=n;stop();
   }
-  void stop() const {
+  void stop() {
+    settle_node_releases();
     if (cancel && cancel()) throw std::runtime_error("Sculpt chunk operation cancelled");
   }
   void charge(size_t n, size_t width = 1) {
+    settle_node_releases();
     if (bytes > limits.working_bytes ||
         (width && n > (limits.working_bytes-bytes)/width))
       throw std::length_error(std::string("Sculpt chunk working byte limit exceeded during ")+phase+
