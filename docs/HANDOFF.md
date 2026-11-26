@@ -1154,9 +1154,24 @@ assertions. The exact app passes 15 native Wayland checks through nested
 DomeD and 19 synthetic OpenXR checks per software Release and Intel Arc
 sanitizer profile. Both XR profiles save identical bytes, including exact
 Cancel and focus-loss results. The full fresh Release build and regression
-for this source are running. Retained writable targets, deformed or
-non-similarity source placement, and physical-device acceptance remain open.
+for this checkpoint are running.
 [Retained-source Bake evidence](validation/retained-texture-set-bake-source-20261126.json)
+
+Main merge `7ae33ac1` adds affine placement for plain and retained
+texture-set donors. Bake uses the viewport's placed normals and tangent
+handedness for shear, reflection and nonuniform scale. Reflection changes
+the front-face test while source triangle and corner identities stay
+stable. The native tests include a rotated and scaled recipient, original
+paint coordinates, prepared PBR normals, FLOAT emission and front-only
+projection from a reflected plain donor.
+
+All ten focused tests pass in both Release and ASan/UBSan, with 1,100
+retained and affine assertions in each. The exact build passes 15 nested
+DomeD Wayland checks and 19 synthetic OpenXR checks per software Release
+and Intel Arc sanitizer profile. Both XR profiles produce identical
+native projects. Affine and retained writable targets, deformed
+retained donors and physical-device acceptance remain open.
+[Affine-source Bake evidence](validation/affine-texture-set-bake-source-20261126.json)
 
 ## Source and integration boundary
 

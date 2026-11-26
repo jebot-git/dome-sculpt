@@ -1,0 +1,198 @@
+{
+  "product": "133e9360a2ab425d067b548f2dbec1d794006a1d",
+  "main_merge": "7ae33ac1b8489f9b756374099de517270ba935e7",
+  "scope": "Reflected and sheared plain/retained texture-set donor placement, native Mikk and prepared polygon normal roles, original paint and FLOAT emission, front-facing projection, mixed Scene40 Save and history, selected plain recipient. Exact nested DomeD and real loader with synthetic tracking.",
+  "profiles": {
+    "native-release": {
+      "candidate": "133e9360a2ab425d067b548f2dbec1d794006a1d",
+      "profile": "release",
+      "terminal": true,
+      "invocation": "d3732ef554f242ac93ca72b29f5cb4fa",
+      "fltk": "/opt/fltk-vr/toolkit",
+      "phase": "complete",
+      "elapsed_seconds": 82.4,
+      "donor": "5ff0da2bf169ebb6a999139bcdd1103d1ea3c91d",
+      "rebuilt": [
+        "src/bake-authoring.cpp",
+        "src/bake.cpp",
+        "src/document-baking.cpp",
+        "src/emission-bake-source.cpp"
+      ],
+      "core_sha256": "3c2b7dd5955e1629191f8e3e9e2fc98089beb0d0f809e7b93f454de1aa02c511",
+      "parent_core_sha256": "84b6035b37bebdda90c403673022ee5b3c8de700d3b8b705c14c0f2a2941fb64",
+      "objects": {
+        "bake-authoring.cpp.o": "2562a447775668999894f846283f3c260feb912fdc2a87339d20084d9ae7aa55",
+        "bake.cpp.o": "aea1c5a25f009bf49e9cd02db6dea61d46fd2d49c3b0a936fda1f5763f826b08",
+        "document-baking.cpp.o": "5b31c170893ce61ff37c9d5aaebc1e96ac0428a66274310ea35fe6ccf9be77a8",
+        "emission-bake-source.cpp.o": "12360f00138369d82f5e27fb495d85ed1921f013282143321440264ddbf9c883"
+      },
+      "atlas_sha256": "230e1bf7593976ee61f3c0edfb31acf3d142ede218c495aa3a02da2c8207622a",
+      "app_sha256": "60466254778279d20f31f64e18d9c76b855e90cfabbc66af4bed7b397a5c0634",
+      "binaries": {
+        "dome-sculpt-texture-set-native": "5359fe5b636e90e2a68c7b41425bdcd04833b2971d0e2c00b97045a43c8aca02",
+        "dome-sculpt-texture-set-source-export": "e300d5a9bf21b0105b8831d270ca44ff1d43dc22c7162b8997468b3e8eca12f3",
+        "texture-set-bake-recipe": "dcb10d8d276a13a22002b7d7e45aa188e74542c33b2a603d628fb415e3f43a12",
+        "bake-recipes": "9b717f683918e100a2a257e093d9cd620b2b7c1776c361fed3bd43f93f5b625e",
+        "bake-custom-cage": "a5c32ab1e98e55b17d90185459e4d4839883983fb00d614df09e7c74f33bc819",
+        "bake-workflow": "6ddea3b003feca3c7ecdb85c8ea1046f486a14bb57c07881e4c96eae7b85cba8",
+        "bake-controls": "4e2a90aae2bcd5e81001b3367f4277a899a10e06484ab8f387353f9b23641298"
+      },
+      "exit": 0,
+      "ctest_sha256": "d8e662396ff1434b17f294c8aaf39625560aa9d5b134fd45cd1e7086f4f6734f",
+      "tests": 10,
+      "retained_and_affine_assertions": 1100
+    },
+    "native-sanitize": {
+      "candidate": "133e9360a2ab425d067b548f2dbec1d794006a1d",
+      "profile": "asan",
+      "terminal": true,
+      "invocation": "6964f2d375c24d22989715626503ce5a",
+      "fltk": "/home/blux/de-xr/dome-sculpt/artifacts/sdk-20261126/toolkit-sanitize",
+      "phase": "complete",
+      "elapsed_seconds": 256.82,
+      "donor": "5ff0da2bf169ebb6a999139bcdd1103d1ea3c91d",
+      "rebuilt": [
+        "src/bake-authoring.cpp",
+        "src/bake.cpp",
+        "src/document-baking.cpp",
+        "src/emission-bake-source.cpp"
+      ],
+      "core_sha256": "c7194908c67bf91752ce2334a5612f72c798d7cd50663bce2bff64b1abc46e4b",
+      "parent_core_sha256": "1e0a31a8e7e75ae1c0cc10656339b13858c05e70c4784cb758f6d557bec903ea",
+      "objects": {
+        "bake-authoring.cpp.o": "292d60bc527c1a38a081d552e2ecb45504fa1a3337b60afa0501116bae8bc6fc",
+        "bake.cpp.o": "7358f4607b465285fbccbd99274a549d276c895a549734ef37886f2e695baa83",
+        "document-baking.cpp.o": "05f3d8a40efbe07565f9e56af031976ef2fca1b6e2d78676362302fa8e1c4f63",
+        "emission-bake-source.cpp.o": "0eb1e224e68f3329476e06f0079ea55cebc0683e10cebaf1cd3cb770808e720a"
+      },
+      "atlas_sha256": "2956c3f61d86b97853efacc7e798de11787ac931743ca658f4846da09e138a26",
+      "app_sha256": "e2fb960ac21e97f639d5d41daea6dd4e6dd59d7928b8842d90522542c2d5bd54",
+      "binaries": {
+        "dome-sculpt-texture-set-native": "0af87e097828db147192e6ee377bd1c816e3e682e6f86bb3648fa91d1646dea3",
+        "dome-sculpt-texture-set-source-export": "0737cecb9a98ed5f4af2ca7e0b6f2fe1d14233583b7f410581ef5f551c04ed91",
+        "texture-set-bake-recipe": "ed0df52ff857388d39f6b7f07df510dfcdd556fc33b94d85469dafdb336ff94b",
+        "bake-recipes": "ff9d793fc69652b46da2e25864a4c76cca2b64efaaf8d0c6c6ace7ba9f89846d",
+        "bake-custom-cage": "b318f86271e153e1aa5a035749b82be171f8e82e7a9e6e8610676a9b185f3be2",
+        "bake-workflow": "a9b65f83f04b47faf0c0a0b99e14bf27ef5f4dabe212f26d7854bdcedf88e927",
+        "bake-controls": "df4d668b08ceb225e286616d64f7c29c18088b4e9c0bbcdd93397606ffe65d12"
+      },
+      "exit": 0,
+      "ctest_sha256": "26b07158976ffeedad9caff642806a1dad63be5d45313183aa9eca6442fb94f9",
+      "tests": 10,
+      "retained_and_affine_assertions": 1100
+    },
+    "software-openxr": {
+      "candidate": "133e9360a2ab425d067b548f2dbec1d794006a1d",
+      "profile": "release",
+      "invocation": "db823bd150f3439db6290426f5f073f8",
+      "terminal": true,
+      "phase": "complete",
+      "product": "133e9360a2ab425d067b548f2dbec1d794006a1d",
+      "app_sha256": "60466254778279d20f31f64e18d9c76b855e90cfabbc66af4bed7b397a5c0634",
+      "core_sha256": "3c2b7dd5955e1629191f8e3e9e2fc98089beb0d0f809e7b93f454de1aa02c511",
+      "runtime_sha256": "a509d343406cb8ca044821b06e3cd90d5a1730d6747abfb27a6fa1e4c5487d65",
+      "fixture_sha256": "e300d5a9bf21b0105b8831d270ca44ff1d43dc22c7162b8997468b3e8eca12f3",
+      "runner_sha256": "89df5c3fc7fd994d47356c5d12020975db64333f1634718853c069ccec397aea",
+      "exit": 0,
+      "checks": 19,
+      "report_sha256": "528845174a2be985afa5ed69f32fdfc7bb9b7e6cf022d1df99eb0ef9bd1c9c78",
+      "native_endpoint_sha256": {
+        "source": "998d191d05e8cb0b93489513565b0ebdbde788d5545a4b795ab121c0d62a0935",
+        "reference": "99ed7024432c36852ecd16f0251a1a1268a440e8be6d8a289b6f3936e80e661c",
+        "accept": "99ed7024432c36852ecd16f0251a1a1268a440e8be6d8a289b6f3936e80e661c",
+        "cancel": "998d191d05e8cb0b93489513565b0ebdbde788d5545a4b795ab121c0d62a0935",
+        "focus": "998d191d05e8cb0b93489513565b0ebdbde788d5545a4b795ab121c0d62a0935"
+      }
+    },
+    "arc-openxr-sanitize": {
+      "candidate": "133e9360a2ab425d067b548f2dbec1d794006a1d",
+      "profile": "asan",
+      "invocation": "9418d22efc724e588b1125a1f0d5c886",
+      "terminal": true,
+      "phase": "complete",
+      "product": "133e9360a2ab425d067b548f2dbec1d794006a1d",
+      "app_sha256": "e2fb960ac21e97f639d5d41daea6dd4e6dd59d7928b8842d90522542c2d5bd54",
+      "core_sha256": "c7194908c67bf91752ce2334a5612f72c798d7cd50663bce2bff64b1abc46e4b",
+      "runtime_sha256": "30f084267eff52f70cf7600f00399a85c79c1f7ef866b3bb05d35f7ec12618ca",
+      "fixture_sha256": "0737cecb9a98ed5f4af2ca7e0b6f2fe1d14233583b7f410581ef5f551c04ed91",
+      "runner_sha256": "d38c59f192e568bb980596ce151eef5f29122c3be70ab85ded1486219d9718b4",
+      "witnesses": {
+        "accept": {
+          "pid": 3526754,
+          "node": "/dev/dri/renderD129"
+        },
+        "cancel": {
+          "pid": 3528761,
+          "node": "/dev/dri/renderD129"
+        },
+        "focus": {
+          "pid": 3530603,
+          "node": "/dev/dri/renderD129"
+        }
+      },
+      "exit": 0,
+      "checks": 19,
+      "report_sha256": "9bccafa7fa21dca8dd6a4d63f955e9eb5c04880ff48fb475c7d6725e1e57072b",
+      "native_endpoint_sha256": {
+        "source": "998d191d05e8cb0b93489513565b0ebdbde788d5545a4b795ab121c0d62a0935",
+        "reference": "99ed7024432c36852ecd16f0251a1a1268a440e8be6d8a289b6f3936e80e661c",
+        "accept": "99ed7024432c36852ecd16f0251a1a1268a440e8be6d8a289b6f3936e80e661c",
+        "cancel": "998d191d05e8cb0b93489513565b0ebdbde788d5545a4b795ab121c0d62a0935",
+        "focus": "998d191d05e8cb0b93489513565b0ebdbde788d5545a4b795ab121c0d62a0935"
+      }
+    },
+    "domed-wayland": {
+      "candidate": "133e9360a2ab425d067b548f2dbec1d794006a1d",
+      "terminal": true,
+      "invocation": "4e96d51d95b64fb2a2695ec3555071df",
+      "phase": "complete",
+      "core_sha256": "3c2b7dd5955e1629191f8e3e9e2fc98089beb0d0f809e7b93f454de1aa02c511",
+      "fixture_sha256": "e300d5a9bf21b0105b8831d270ca44ff1d43dc22c7162b8997468b3e8eca12f3",
+      "compositor_sha256": "47920142c8c803dcf5adb63ba643d2e347fbdcd1e15ecd8bce7c1a8dd47c0b7e",
+      "compositor_source": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+      "probe_sha256": "5bf11c670f66bbb68960073878933055b09582e5173ec1e3f472b413956c55aa",
+      "app_sha256": "60466254778279d20f31f64e18d9c76b855e90cfabbc66af4bed7b397a5c0634",
+      "exit": 0,
+      "checks": 15,
+      "report_sha256": "37607002c48a02c531ca0e1b708edfc2187db1aa7d205f3f9bbf8556fb507410"
+    }
+  },
+  "archive": {
+    "file": "affine-texture-set-bake-source-20261126.tar.gz",
+    "sha256": "e42c08bfbaf479eab05211c62838a29a343e2fb32d11f96a5125236e13082e0d",
+    "members": {
+      "arc-openxr-sanitize/arc-xr.py": "d38c59f192e568bb980596ce151eef5f29122c3be70ab85ded1486219d9718b4",
+      "arc-openxr-sanitize/status.json": "399b794027a0fb8cd55230de118094f84f27ed01289b90d9a898448e6eb93711",
+      "arc-openxr-sanitize/workflow/accept.json": "29167133735b7ebe2c10535446f219c23299a5c262c36cb4b5fb85d77d2e1248",
+      "arc-openxr-sanitize/workflow/cancel.json": "3ca6c76bd07aae04be4965c623c8b19bfff0b43bde0b51bab22ac47dc00e0be0",
+      "arc-openxr-sanitize/workflow/focus.json": "3f4a1e1992c88adf38e8b3407bacbf9c9a4886d4af4c302d25e1d27da71699f1",
+      "arc-openxr-sanitize/workflow/report.json": "9bccafa7fa21dca8dd6a4d63f955e9eb5c04880ff48fb475c7d6725e1e57072b",
+      "arc-openxr-sanitize/xr.log": "44f6a34f3e5622908f95d72cf9eaabeaabb16427d485691851f205c1175e6075",
+      "domed-wayland/status.json": "13b11e0546aed3466dcd9dc0a467aec2600a9876e5243199d1518f61e2b09695",
+      "domed-wayland/wayland.log": "a2136b56b60caf14e3f4ac60fbff661f475e191b1becbb700d7b4b3804e96edf",
+      "domed-wayland/workflow/compositor.log": "14bdbf6d8060280befacaaab3215887fb88f6205dfbdade8007fa261f8cb8d7a",
+      "domed-wayland/workflow/report.json": "37607002c48a02c531ca0e1b708edfc2187db1aa7d205f3f9bbf8556fb507410",
+      "domed-wayland/workflow/runtime-maps.txt": "2a67ebfa531033949faba9f00699c4a897d5b3c56f07821391abf238b230f816",
+      "native-release/ctest.log": "d8e662396ff1434b17f294c8aaf39625560aa9d5b134fd45cd1e7086f4f6734f",
+      "native-release/status.json": "6c03154c3580248ce3a6d86599d0fe7ede8ab1378813ba7634aeea28aeaf3b94",
+      "native-sanitize/ctest.log": "26b07158976ffeedad9caff642806a1dad63be5d45313183aa9eca6442fb94f9",
+      "native-sanitize/status.json": "3abe9af1ff355d059d4dc9f83f54b9ed7b6c76467822485f7866829634ab9e05",
+      "runner/arc-openxr-sanitize.py": "3e1dd6d032237df168501e4e3a25d2be83c363b62e530ec70431c410bbfca43d",
+      "runner/domed-wayland.py": "c82a6d48af339a9b78eb29c55facffede39085d0efabe3d4acbf3fc50518a871",
+      "runner/native-release.py": "60104d669f8eb984c3e73d66fb5343fbea33e064aff536ff8c67c08de0e5a455",
+      "runner/native-sanitize.py": "60104d669f8eb984c3e73d66fb5343fbea33e064aff536ff8c67c08de0e5a455",
+      "runner/software-openxr.py": "3e1dd6d032237df168501e4e3a25d2be83c363b62e530ec70431c410bbfca43d",
+      "software-openxr/status.json": "a3ccbbd04f03cde54a9771ebad11f4c9712b141948333ff761b06674def82669",
+      "software-openxr/workflow/accept.dsculpt": "99ed7024432c36852ecd16f0251a1a1268a440e8be6d8a289b6f3936e80e661c",
+      "software-openxr/workflow/accept.json": "8e5c10d6bdb140db7a1d64240af7da6a2ab2f66cc44c49aa966e29e5a1947732",
+      "software-openxr/workflow/cancel.dsculpt": "998d191d05e8cb0b93489513565b0ebdbde788d5545a4b795ab121c0d62a0935",
+      "software-openxr/workflow/cancel.json": "01ca306331f0188bfa95f26c7a0e403eee7c17a06c95f1c11d44e4bb3e5efea2",
+      "software-openxr/workflow/focus.dsculpt": "998d191d05e8cb0b93489513565b0ebdbde788d5545a4b795ab121c0d62a0935",
+      "software-openxr/workflow/focus.json": "411d873d7a1276ffe249b337f4d334cdcdb3dd4eadcb21967d9b5922d599bbcb",
+      "software-openxr/workflow/reference.dsculpt": "99ed7024432c36852ecd16f0251a1a1268a440e8be6d8a289b6f3936e80e661c",
+      "software-openxr/workflow/report.json": "528845174a2be985afa5ed69f32fdfc7bb9b7e6cf022d1df99eb0ef9bd1c9c78",
+      "software-openxr/workflow/source.dsculpt": "998d191d05e8cb0b93489513565b0ebdbde788d5545a4b795ab121c0d62a0935",
+      "software-openxr/xr.log": "0470648fda23c69858d9c28d59432b3a6315dc9bd4ffc06272757e70ad583b40"
+    }
+  }
+}
