@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
 #include "sculpt-ui-values.hpp"
+#include "sculpt-scene-chunks.hpp"
 #include <iostream>
 using namespace dome;
 namespace {
@@ -31,15 +32,22 @@ struct ReleaseMesh {
 };
 std::atomic<std::shared_ptr<MeshGate>> mesh_gate;
 }
-extern "C" std::vector<ObjectSurface> surfaces_real(const Scene*, const std::function<bool()>&, const Scene::SculptMesher&)
-    asm("__real__ZNK4dome5Scene16preview_surfacesERKSt8functionIFbvEERKS1_IFNS_4MeshEmRKNS_6VolumeEEE");
-extern "C" std::vector<ObjectSurface> surfaces_wrap(const Scene*, const std::function<bool()>&, const Scene::SculptMesher&)
-    asm("__wrap__ZNK4dome5Scene16preview_surfacesERKSt8functionIFbvEERKS1_IFNS_4MeshEmRKNS_6VolumeEEE");
-extern "C" std::vector<ObjectSurface> surfaces_wrap(const Scene *scene, const std::function<bool()> &cancelled, const Scene::SculptMesher &mesher) {
-  auto result = surfaces_real(scene, cancelled, mesher);
-  if (auto gate = mesh_gate.exchange({})) gate->stop();
+using namespace dome::detail;
+#define CAPTURE_SYMBOL "_ZN4dome6detail17SculptSceneChunks7captureERKNS_5SceneENS0_23SculptSceneChunkContextERKSt10shared_ptrIKS1_ENS0_22SculptSceneChunkLimitsESt8functionIFbvEE"
+extern "C" SculptScenePreview real_capture(const Scene &,SculptSceneChunkContext,
+    const SculptSceneChunks::Ptr &,SculptSceneChunkLimits,LocalSurfaceCache::Cancel)
+    asm("__real_" CAPTURE_SYMBOL);
+extern "C" SculptScenePreview wrap_capture(const Scene &,SculptSceneChunkContext,
+    const SculptSceneChunks::Ptr &,SculptSceneChunkLimits,LocalSurfaceCache::Cancel)
+    asm("__wrap_" CAPTURE_SYMBOL);
+extern "C" SculptScenePreview wrap_capture(const Scene &scene,SculptSceneChunkContext context,
+    const SculptSceneChunks::Ptr &before,SculptSceneChunkLimits limits,LocalSurfaceCache::Cancel cancelled) {
+  auto result=real_capture(scene,context,before,limits,std::move(cancelled));
+  if(!result.chunks->objects().empty())
+    if(auto gate=mesh_gate.exchange({}))gate->stop();
   return result;
 }
+#undef CAPTURE_SYMBOL
 struct Driver {
   Document &doc;
   SpatialFrame frame;
