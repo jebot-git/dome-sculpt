@@ -48,7 +48,9 @@ int main(int argc,char **argv)try{
  uint64_t root=deep.groups().front().id;rows=object_hierarchy(deep,ids,std::span<const uint64_t>(&root,1));check(rows.size()==1&&rows.front().selected,"Collapsed deep hierarchy retains full descendant selection");}
  Document d;d.replace(fixture());check(d.wait_mesh(),"Complete initial immutable scene prepared");
  auto original=d.copy_scene();auto a=original.objects()[0].id,b=original.objects()[1].id,c=original.objects()[2].id,hidden=original.objects()[3].id;
- check(!d.frame().state->selection_mode&&!d.frame().surface->picking,"Ordinary editing allocates no selection BVH");
+ const auto ordinary_hit=d.raycast({-.16f,0,1},{0,0,-1});
+ check(!d.frame().state->selection_mode&&d.frame().surface->picking&&ordinary_hit&&std::abs(ordinary_hit->z)<1e-6f,
+       "Ordinary painted editing owns working material-aware ray picking without enabling selection");
  d.configure_selection(true);check(d.wait_mesh()&&d.frame().surface->picking,"First-page selection toggle prepares worker BVH");auto geometry=d.frame().surface;
  allocation_budget=0;auto empty_touch=geometry->picking->nearby({99,99,99},.04f);allocation_budget=-1;
  check(!empty_touch,"Empty-space proximity selection completes without any heap allocation or exception");
