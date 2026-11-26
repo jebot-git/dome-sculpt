@@ -8,6 +8,7 @@
 #include "emission-paint-access.hpp"
 #include "source-owning-filtered-workflow.hpp"
 #include "baked-emission-domain.hpp"
+#include <optional>
 namespace joint_source {
 size_t checks=0;
 void require(bool ok,const char *why){if(!ok)throw std::runtime_error(why);++checks;}
@@ -44,7 +45,53 @@ D decode(const SculptObject&o,size_t tri,std::array<float,3>bary,size_t role,boo
 D physical(const PaintedMesh &paint,std::array<double,2> uv){const int r=int(paint.resolution());const double x=uv[0]*r-.5,y=uv[1]*r-.5;require(std::isfinite(x)&&std::isfinite(y),"Finite independent physical coordinates");const int ix=int(std::floor(x)),iy=int(std::floor(y));D result{};for(int dy=0;dy<2;++dy)for(int dx=0;dx<2;++dx){const auto px=std::clamp(ix+dx,0,r-1),py=std::clamp(iy+dy,0,r-1);D texel{};for(const auto &layer:paint.layers())if(layer.visible&&layer.opacity){const auto emission=paint.emission_pixel(layer.id,px,py);const double coverage=double(emission.coverage)*paint.pixel(layer.id,px,py).data[13]/255.*layer.opacity;for(size_t axis=0;axis<3;++axis)texel[axis]=texel[axis]*(1-coverage)+emission.physical[axis]*coverage;}const double weight=(dx?x-ix:1-(x-ix))*(dy?y-iy:1-(y-iy));result=add(result,mul(texel,weight));}finite_sample(result);return result;}
 
 std::array<double,2> paint_uv(const SculptObject&o,size_t triangle,std::array<float,3>bary){const auto&d=*o.painted->paint_sampling_domain();const auto&m=*d.basis();std::array<double,2>q{};for(size_t k=0;k<3;++k){const auto uv=m.uv.at(m.indices.at(d.source_corners()[triangle*3+k]));for(size_t axis=0;axis<2;++axis)q[axis]+=double(uv[axis])*bary[k];}return q;}
-enum class CheckedTask { Full, Refusal, Seed };
+// Shared by the monolithic regression and the instrumented consumers of its
+// captured inputs. The arithmetic and sample grid live in one place.
+void check_dense(const Scene &s,uint64_t source,uint32_t checked_resolution){
+ const auto&baked=*s.active().painted->baked();require(baked.emission_domain&&!baked.emission_field&&baked.emission_domain->field()->resolution()==64&&baked.emission_domain->target_resolution()==checked_resolution,"Checked HDR owns the genuine unchanged source64 field independently from selected target grid");
+  // Independent immutable double texels, read once for THIS accepted phase.
+  // They come from original layer/pixel data, never the production field,
+  // projection resolver or transfer result. No cache survives a mutation.
+  const auto&source_paint=*s.object(source).painted;const int source_r=source_paint.resolution();std::vector<D>radiance(size_t(source_r)*source_r);
+  for(int y=0;y<source_r;++y)for(int x=0;x<source_r;++x)radiance[size_t(y)*source_r+x]=physical(source_paint,{(x+.5)/source_r,(y+.5)/source_r});
+  auto expected_hdr=[&](std::array<double,2>q){const double x=q[0]*source_r-.5,y=q[1]*source_r-.5;const int ix=int(std::floor(x)),iy=int(std::floor(y));D value{};for(int dy=0;dy<2;++dy)for(int dx=0;dx<2;++dx){const auto&pixel=radiance[size_t(std::clamp(iy+dy,0,source_r-1))*source_r+std::clamp(ix+dx,0,source_r-1)];value=add(value,mul(pixel,(dx?x-ix:1-(x-ix))*(dy?y-iy:1-(y-iy))));}return value;};
+  double hdr_maximum=0;uint64_t hdr_samples=0;std::array<double,2>hdr_worst{};
+  owning_filtered::offcentre(s,source,[&](const SculptObject &object,size_t tri,std::array<float,3>bary,size_t role){
+   if(role==0){const auto root=paint_uv(object,tri,bary);std::array<double,2>q{};const auto&mesh=s.active().painted->mesh();for(size_t k=0;k<3;++k)for(size_t axis=0;axis<2;++axis)q[axis]+=double(mesh.uv[mesh.indices[tri*3+k]][axis])*bary[k];const auto wanted=expected_hdr(root);const auto actual=baked.emission_domain->field()->sample(float(q[0]),float(q[1])).resolve({},1);for(size_t axis=0;axis<3;++axis){if(!std::isfinite(actual[axis]))throw std::runtime_error("Independent dense HDR consumer encountered nonfinite output");const double error=std::abs(wanted[axis]-actual[axis]);if(error>hdr_maximum){hdr_maximum=error;hdr_worst=q;}}++hdr_samples;}
+   return decode(object,tri,bary,role);},[](const SculptObject &object,size_t tri,std::array<float,3>bary,size_t role,const TextureMaps *maps){return direction(object,tri,bary,role,maps);},require);
+  std::cout<<std::setprecision(12)<<"CHECKED_HDR_EXTREMUM samples="<<hdr_samples<<" absolute="<<hdr_maximum<<" uv="<<hdr_worst[0]<<','<<hdr_worst[1]<<std::endl;
+  require(hdr_samples>300&&hdr_maximum<2e-4,"Every independent current-grid offcentre HDR sample retains the unchanged2e-4 bound");
+}
+
+void check_history(const Scene &baked,const Scene &before,uint64_t source,
+    const ObjectBakeSettings &settings,const std::filesystem::path &out,const std::string &name){
+ const auto original=before.encode();
+ const auto accepted=baked.encode();
+ const auto path=out/(name+".dsculpt");
+ baked.save(path);
+ require(Scene::load(path).encode()==accepted,"Combined SOURCE Save/reopen full owning graph exact");
+ Document doc;
+ doc.replace(before.snapshot());
+ require(doc.wait_mesh(),"Joint SOURCE worker baseline publishes");
+ doc.bake_from_object(source,settings);
+ doc.save_async(out/(name+"-ordered.dsculpt")).get();
+ require(doc.wait_asset()&&doc.wait_mesh()&&doc.frame().state->error.empty()&&doc.copy_scene().encode()==accepted,
+         "Joint actual worker and immediately ordered Save match native endpoint");
+ require(doc.undo()&&doc.wait_mesh()&&doc.copy_scene().encode()==original&&
+         doc.redo()&&doc.wait_mesh()&&doc.copy_scene().encode()==accepted,
+         "Joint SOURCE Bake owns one exact UndoRedo boundary");
+}
+
+void check_source_context(const Scene &s,uint64_t source,const nlohmann::json &original){
+ auto source_only=s;
+ source_only.erase(s.active().id);
+ source_only.select(source);
+ auto context=source_only.encode();
+ context["next_id"]=original.at("next_id");
+ require(context==original,"All actual joint original/source/normal/paint/pose/UV history remains exact");
+}
+
+enum class CheckedTask { Full, Refusal, Seed, Capture };
 
 void exercise(bool seam,bool live,bool repeat,const std::filesystem::path&out,
               uint32_t checked_resolution=0,CheckedTask task=CheckedTask::Full){
@@ -65,7 +112,6 @@ void exercise(bool seam,bool live,bool repeat,const std::filesystem::path&out,
   std::cout<<"CHECKED_SOURCE_REFUSAL resolution="<<checked_resolution<<std::endl;
   return;
  }
- const auto before=s.encode();
  const auto native=s.snapshot();
  require(bake_object(s,source,final_settings).projected>500,"Actual combined Source8 SOURCE second Bake projects");
  const auto target_maps=s.active().painted->preview(s.active().material);const auto material=detail::EmissionExportAccess::other_channels(*s.object(source).painted,s.object(source).material,{});const auto&low=s.active().painted->mesh();double normal_error=0,material_error=0,emission_error=0,peak=0,wrong_material=0,omitted_pbr=0;size_t interior=0;
@@ -73,23 +119,54 @@ void exercise(bool seam,bool live,bool repeat,const std::filesystem::path&out,
  std::cout<<"JOINT_OBSERVATION seam="<<seam<<" live="<<live<<" repeat="<<repeat<<" direct="<<direct<<" normal="<<normal_error<<" material="<<material_error<<" wrongMaterial="<<wrong_material<<" omittedPbr="<<omitted_pbr<<" omittedNormal="<<omitted_normal<<" wrongNormal="<<wrong_normal<<" emission="<<emission_error<<" peak="<<peak<<" interior="<<interior<<std::endl;
  const auto source_world=s.world_transform(source),target_world=s.world_transform(destination);std::cout<<"JOINT_WORLD source="<<source_world.position.x<<','<<source_world.position.y<<','<<source_world.position.z<<" rotation="<<source_world.orientation.w<<','<<source_world.orientation.x<<','<<source_world.orientation.y<<','<<source_world.orientation.z<<" scale="<<source_world.scale<<" target="<<target_world.position.x<<','<<target_world.position.y<<','<<target_world.position.z<<" rotation="<<target_world.orientation.w<<','<<target_world.orientation.x<<','<<target_world.orientation.y<<','<<target_world.orientation.z<<" scale="<<target_world.scale<<std::endl;
  std::ofstream(out/"observed-source.json")<<original.dump(2);s.save(out/"observed-second-bake.dsculpt");
- require(interior>500&&normal_error<.035&&material_error<.025&&wrong_material>.05&&omitted_pbr>.05&&emission_error<2e-4&&peak>1,"Independent joint normal, current corner colour and HDR retain unchanged exact numerical bounds");if(checked_resolution){
-  const auto&baked=*s.active().painted->baked();require(baked.emission_domain&&!baked.emission_field&&baked.emission_domain->field()->resolution()==64&&baked.emission_domain->target_resolution()==checked_resolution,"Checked HDR owns the genuine unchanged source64 field independently from selected target grid");
-  // Independent immutable double texels, read once for THIS accepted phase.
-  // They come from original layer/pixel data, never the production field,
-  // projection resolver or transfer result. No cache survives a mutation.
-  const auto&source_paint=*s.object(source).painted;const int source_r=source_paint.resolution();std::vector<D>radiance(size_t(source_r)*source_r);
-  for(int y=0;y<source_r;++y)for(int x=0;x<source_r;++x)radiance[size_t(y)*source_r+x]=physical(source_paint,{(x+.5)/source_r,(y+.5)/source_r});
-  auto expected_hdr=[&](std::array<double,2>q){const double x=q[0]*source_r-.5,y=q[1]*source_r-.5;const int ix=int(std::floor(x)),iy=int(std::floor(y));D value{};for(int dy=0;dy<2;++dy)for(int dx=0;dx<2;++dx){const auto&pixel=radiance[size_t(std::clamp(iy+dy,0,source_r-1))*source_r+std::clamp(ix+dx,0,source_r-1)];value=add(value,mul(pixel,(dx?x-ix:1-(x-ix))*(dy?y-iy:1-(y-iy))));}return value;};
-  double hdr_maximum=0;uint64_t hdr_samples=0;std::array<double,2>hdr_worst{};
-  owning_filtered::offcentre(s,source,[&](const SculptObject &object,size_t tri,std::array<float,3>bary,size_t role){
-   if(role==0){const auto root=paint_uv(object,tri,bary);std::array<double,2>q{};const auto&mesh=s.active().painted->mesh();for(size_t k=0;k<3;++k)for(size_t axis=0;axis<2;++axis)q[axis]+=double(mesh.uv[mesh.indices[tri*3+k]][axis])*bary[k];const auto wanted=expected_hdr(root);const auto actual=baked.emission_domain->field()->sample(float(q[0]),float(q[1])).resolve({},1);for(size_t axis=0;axis<3;++axis){if(!std::isfinite(actual[axis]))throw std::runtime_error("Independent dense HDR consumer encountered nonfinite output");const double error=std::abs(wanted[axis]-actual[axis]);if(error>hdr_maximum){hdr_maximum=error;hdr_worst=q;}}++hdr_samples;}
-   return decode(object,tri,bary,role);},[](const SculptObject &object,size_t tri,std::array<float,3>bary,size_t role,const TextureMaps *maps){return direction(object,tri,bary,role,maps);},require);
-  std::cout<<std::setprecision(12)<<"CHECKED_HDR_EXTREMUM samples="<<hdr_samples<<" absolute="<<hdr_maximum<<" uv="<<hdr_worst[0]<<','<<hdr_worst[1]<<std::endl;
-  require(hdr_samples>300&&hdr_maximum<2e-4,"Every independent current-grid offcentre HDR sample retains the unchanged2e-4 bound");
+ require(interior>500&&normal_error<.035&&material_error<.025&&wrong_material>.05&&omitted_pbr>.05&&emission_error<2e-4&&peak>1,"Independent joint normal, current corner colour and HDR retain unchanged exact numerical bounds");
+ if(task==CheckedTask::Capture){
+  check_source_context(s,source,original);
+  std::cout<<"CHECKED_SOURCE_CAPTURE resolution="<<checked_resolution<<std::endl;
+  return;
  }
- const auto name=std::to_string(seam)+std::to_string(live)+std::to_string(repeat);const auto accepted=s.encode();s.save(out/(name+".dsculpt"));require(Scene::load(out/(name+".dsculpt")).encode()==accepted,"Combined SOURCE Save/reopen full owning graph exact");Document doc;doc.replace(native);require(doc.wait_mesh(),"Joint SOURCE worker baseline publishes");doc.bake_from_object(source,final_settings);doc.save_async(out/(name+"-ordered.dsculpt")).get();require(doc.wait_asset()&&doc.wait_mesh()&&doc.frame().state->error.empty()&&doc.copy_scene().encode()==accepted,"Joint actual worker and immediately ordered Save match native endpoint");require(doc.undo()&&doc.wait_mesh()&&doc.copy_scene().encode()==before&&doc.redo()&&doc.wait_mesh()&&doc.copy_scene().encode()==accepted,"Joint SOURCE Bake owns one exact UndoRedo boundary");auto source_only=s;source_only.erase(destination);source_only.select(source);auto context=source_only.encode();context["next_id"]=original["next_id"];require(context==original,"All actual joint original/source/normal/paint/pose/UV history remains exact");std::cout<<(checked_resolution?"CHECKED_JOINT_SOURCE ":"JOINT_SOURCE ")<<name<<" direct="<<direct<<" normal="<<normal_error<<" material="<<material_error<<" wrongMaterial="<<wrong_material<<" omittedPbr="<<omitted_pbr<<" omittedNormal="<<omitted_normal<<" wrongNormal="<<wrong_normal<<" emission="<<emission_error<<" peak="<<peak<<" interior="<<interior<<'\n';
+ if(checked_resolution){
+   check_dense(s,source,checked_resolution);
+ }
+ const auto name=std::to_string(seam)+std::to_string(live)+std::to_string(repeat);
+ check_history(s,native,source,final_settings,out,name);
+ check_source_context(s,source,original);
+ std::cout<<(checked_resolution?"CHECKED_JOINT_SOURCE ":"JOINT_SOURCE ")<<name<<" direct="<<direct<<" normal="<<normal_error<<" material="<<material_error<<" wrongMaterial="<<wrong_material<<" omittedPbr="<<omitted_pbr<<" omittedNormal="<<omitted_normal<<" wrongNormal="<<wrong_normal<<" emission="<<emission_error<<" peak="<<peak<<" interior="<<interior<<'\n';
 }
+// Both consumers reopen the exact files from one real Bake. The runner pins
+// their bytes and grants read-only access to the capture directory.
+void check_capture(uint32_t resolution,const std::filesystem::path &capture,
+                   const std::optional<std::filesystem::path> &worker_output){
+ const auto before=Scene::load(capture/"selected-target-resolution.dsculpt");
+ const auto baked=Scene::load(capture/"observed-second-bake.dsculpt");
+ std::ifstream original_file(capture/"observed-source.json");
+ const auto original=nlohmann::json::parse(original_file);
+ const auto source=original.at("active").get<uint64_t>();
+ const auto &before_target=before.active();
+ const auto &baked_target=baked.active();
+ require(before_target.id==baked_target.id && before_target.id!=source &&
+         before_target.painted && baked_target.painted &&
+         before_target.painted->resolution()==resolution &&
+         baked_target.painted->resolution()==resolution &&
+         !before_target.painted->baked() && baked_target.painted->baked(),
+         "Capture retains the same selected unbaked and baked target");
+ require(before.object(source).painted && before.object(source).painted->resolution()==64 &&
+         before.object(source).painted->has_physical_emission(),
+         "Capture retains the genuine independent 64-pixel physical source");
+ check_source_context(before,source,original);
+ check_source_context(baked,source,original);
+ const auto settings=baked_target.bake_recipe;
+ require(settings && settings->source.object==source && settings->settings.normal_filter_quality==1 &&
+         settings->settings.emission_transport==1,
+         "Capture retains the checked native bake recipe and exact source ID");
+ if(worker_output){
+  std::filesystem::create_directories(*worker_output);
+  check_history(baked,before,source,settings->settings,*worker_output,"000");
+ }else{
+  check_dense(baked,source,resolution);
+ }
+}
+
 void negatives(){
  auto s=prepared(false);uv(s);const auto baseline=s.encode();
  auto binding=std::make_shared<SourceMaterialBindings>(*s.active().material_bindings);
@@ -115,16 +192,30 @@ void negatives(){
 }
 #ifndef DOME_JOINT_SOURCE_EMBEDDED
 int main(int argc,char**argv)try{
+  if(argc>=2){
+    const std::string_view command=argv[1];
+    const bool worker=command=="--checked-worker";
+    if(command=="--checked-dense"||worker){
+      if(argc!=(worker?5:4))return 2;
+      const auto resolution=owning_filtered::resolution(argv[2]);
+      const auto output=worker?std::optional<std::filesystem::path>(argv[4]):std::nullopt;
+      joint_source::check_capture(resolution,argv[3],output);
+      std::cout<<"PASS "<<joint_source::checks<<" checked joint-writable SOURCE "
+               <<(worker?"history":"dense oracle")<<" controls"<<std::endl;
+      return 0;
+    }
+  }
   if(argc==5){
     const std::string_view command=argv[1];
     auto task=joint_source::CheckedTask::Full;
     if(command=="--checked-seed")task=joint_source::CheckedTask::Seed;
+    else if(command=="--checked-capture")task=joint_source::CheckedTask::Capture;
     else if(command=="--checked-refusal")task=joint_source::CheckedTask::Refusal;
     else if(command!="--checked-case")return 2;
     const auto axes=owning_filtered::bits(argv[2],3);
     const auto selected=owning_filtered::resolution(argv[3]);
-    if(task==joint_source::CheckedTask::Seed && selected==64)
-      throw std::invalid_argument("Checked seed requires an explicit target resize");
+    if((task==joint_source::CheckedTask::Seed||task==joint_source::CheckedTask::Capture)&&selected==64)
+      throw std::invalid_argument("Checked input requires an explicit target resize");
     const std::filesystem::path out=argv[4];
     std::filesystem::create_directories(out);
     joint_source::exercise(axes[0],axes[1],axes[2],out,selected,task);
