@@ -69,7 +69,7 @@ with contextlib.nullcontext(tempfile.mkdtemp(prefix="projects-", dir=output)) as
         gated_menu = name in ("controller", "stylus", "controller-srgb")
         if gated_menu:
             e["DOME_XR_FIXTURE_MENU_GATE"] = "1"
-        frame_limit = [] if gated_menu else ["--frames", str(frames)]
+        frame_limit = [] if gated_menu or name == "voxel-undo" else ["--frames", str(frames)]
         with (output / (name + ".log")).open("w") as log:
             p = subprocess.run(
                 [
@@ -255,6 +255,10 @@ with contextlib.nullcontext(tempfile.mkdtemp(prefix="projects-", dir=output)) as
               "Native OpenXR voxel " + mode + " finishes with a saved scene")
         info = json.loads(subprocess.check_output(
             [str(binary), "--project-info", str(path)], env=env, text=True))
+        if mode == "undo":
+            observation = json.loads((output / "voxel-undo.json").read_text())
+            check(observation.get("voxel_menu_seen") and observation.get("voxel_undo_seen"),
+                  "The real palette shows the root and enabled Undo before activation")
         if mode == "focus":
             report = json.loads((output / "voxel-focus.json").read_text())
             check(report.get("focus_losses") == 1 and
