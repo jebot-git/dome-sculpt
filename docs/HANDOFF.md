@@ -2074,6 +2074,26 @@ exact refusals are identified in the receipt. Physical headset checks and
 the full integrated regression remain open.
 [Editable HDR GLB validation](validation/native-hdr-editable-2048-20261127.json)
 
+### Editable HDR per texture-set material
+
+The Editable worker now authenticates the native texture-set plan and
+compiles physical emission for each emitted PBR primitive. The finite
+PNG and emissive strength use the existing writable-grid coordinates
+and measured texel error. The native package preserves all exact
+materials, membership, FLOAT layers, geometry and history.
+
+Release and ASan/UBSan write identical files for the original retained
+fixture and the distinct-radiance plain and retained fixtures. The
+retained test reads the actual emitted corner accessors and PNG channels.
+The plain case keeps one mesh, shared skin and morph data. Nested DomeD
+Wayland and synthetic OpenXR on software GL and Intel Arc match the
+native export byte for byte. Khronos reports zero errors for all three
+files and one skinned-node warning on the plain fixture.
+Exact Standard GLB per-field FLOAT packaging, typed texture-set
+materials, alternate emission coordinates, physical headset checks
+and the full integrated regression remain open.
+[Texture-set Editable HDR validation](validation/native-texture-set-hdr-editable-20261127.json)
+
 ## Source and integration boundary
 
 - Main now admits product1bc13125 and public fixturef1e193c7 after complete
