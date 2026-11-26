@@ -967,8 +967,11 @@ software Release and Arc ASan/UBSan suites each pass all 153 checks
 with unchanged file deadlines. The Arc suite attests 40 real device
 witnesses, including the Files workflow on renderD129. Headless replay
 of that workflow's recovered project finds 21.04 seconds in chart growth
-and 11.04 seconds in placement search on the candidate. A separate
-packing-bounds patch `2d08e63e` is being evaluated against the same output.
+and 11.04 seconds in placement search on the candidate. Experimental
+packing-bounds patch `2d08e63e` preserves the exact output in both
+profiles, including block-aligned packing. Its matched headless probe
+changes placement search from 10.45 to 10.33 seconds, so it stays on
+its own branch.
 
 The main-based atlas port `66d31263` passes six native cases in both
 profiles. Its software XR replay stops at the existing fixture's material
@@ -976,6 +979,10 @@ menu assertion after 48 checks. The prior main build fails the same
 assertion with the same 48 passes and a byte-identical scene. Main
 includes the atlas port. Its material-menu fixture still needs the
 rendered control replay already qualified on the combined branch.
+
+Candidate `5c977be9` combines the exact qualified atlas source with the
+matching full HDR preview cache source. Its optimized software and
+Arc ASan/UBSan suites are running with the current DomeD toolkit.
 [Preview and integration evidence](validation/hdr-preview-composite-20261126.json)
 [Cache and Arc rerun evidence](validation/atlas-grid-hdr-history-20261126.json)
 

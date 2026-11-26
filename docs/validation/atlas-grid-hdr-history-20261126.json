@@ -1433,6 +1433,182 @@
     "identity": true,
     "input_sha256": "ca1248046485e3ede9122479fb12d0201fc12efd7726a67650d9eaac667e764c"
   },
+  "atlas-packing-bounds-profile": {
+    "terminal": true,
+    "invocation": "29ff0f2a36f640aab5d97990d48a7de9",
+    "profiles": {
+      "baseline": {
+        "source": "0fa8eabab49f13cf56651e04fc2a824bc7460066",
+        "seconds": 32.176,
+        "app_sha256": "3bbb44406691a34a6dbb09bfcf9e7bf21e3474bcf976711ad003afc0c48e235a",
+        "glb_sha256": "22200865cba16ae30ca9b64781d4d7203fc9307a55f48b28298d6402866171c6",
+        "scene_sha256": "ca1248046485e3ede9122479fb12d0201fc12efd7726a67650d9eaac667e764c",
+        "stages": [
+          "Total (real): 0.02 seconds (24.154 ms)",
+          "Copy data: 0.02 seconds (21.596 ms)",
+          "Total (thread): 0.00 seconds (2.423 ms)",
+          "Create colocals: 0.00 seconds (2.396 ms)",
+          "Compute charts total (real): 19.70 seconds (19700.5 ms)",
+          "Compute charts total (thread): 19.70 seconds (19700.3 ms)",
+          "Create face groups: 0.01 seconds (12.595 ms)",
+          "Extract invalid mesh geometry: 0.00 seconds (0.108 ms)",
+          "Chart group compute charts (real): 19.69 seconds (19687.5 ms)",
+          "Chart group compute charts (thread): 19.69 seconds (19687.4 ms)",
+          "Create chart group mesh: 0.02 seconds (18.113 ms)",
+          "Create colocals: 0.00 seconds (1.283 ms)",
+          "Create boundaries: 0.00 seconds (3.821 ms)",
+          "Build atlas: 19.53 seconds (19531.1 ms)",
+          "Init: 0.01 seconds (8.535 ms)",
+          "Planar charts: 0.00 seconds (4.132 ms)",
+          "Clustered charts: 19.52 seconds (19518.5 ms)",
+          "Place seeds: 6.38 seconds (6378.31 ms)",
+          "Boundary intersection: 2.06 seconds (2063.04 ms)",
+          "Relocate seeds: 0.01 seconds (9.19 ms)",
+          "Reset: 0.00 seconds (1.345 ms)",
+          "Grow: 13.10 seconds (13103.9 ms)",
+          "Boundary intersection: 4.67 seconds (4673.9 ms)",
+          "Merge: 0.02 seconds (24.68 ms)",
+          "Fill holes: 0.00 seconds (0.785 ms)",
+          "Copy chart faces: 0.00 seconds (0.108 ms)",
+          "Create chart mesh and parameterize (real): 0.14 seconds (136.432 ms)",
+          "Create chart mesh and parameterize (thread): 0.82 seconds (821.792 ms)",
+          "Create chart mesh: 0.03 seconds (29.782 ms)",
+          "Parameterize charts: 0.76 seconds (760.509 ms)",
+          "Orthogonal: 0.00 seconds (0.322 ms)",
+          "LSCM: 0.73 seconds (733.431 ms)",
+          "Recompute: 0.03 seconds (31.235 ms)",
+          "Piecewise: 0.03 seconds (30.214 ms)",
+          "Boundary intersection: 0.03 seconds (27.482 ms)",
+          "Evaluate quality: 0.03 seconds (26.53 ms)",
+          "Total: 10.90 seconds (10896.2 ms)",
+          "Add charts (real): 0.00 seconds (2.198 ms)",
+          "Add charts (thread): 0.01 seconds (14.74 ms)",
+          "Restore texcoords: 0.00 seconds (0.039 ms)",
+          "Rasterize: 0.43 seconds (429.115 ms)",
+          "Dilate (padding): 0.11 seconds (113.849 ms)",
+          "Find location: 10.45 seconds (10452.5 ms)",
+          "Blit: 0.01 seconds (6.193 ms)",
+          "Total: 0.00 seconds (1.059 ms)"
+        ]
+      },
+      "candidate": {
+        "source": "2d08e63eb58ed85f2390e99d4757719f6d9d3163",
+        "seconds": 31.025,
+        "app_sha256": "51392b6608f9f80e0ab663686bf9ed12238196abae76c3404686f2cfe4818afd",
+        "glb_sha256": "22200865cba16ae30ca9b64781d4d7203fc9307a55f48b28298d6402866171c6",
+        "scene_sha256": "ca1248046485e3ede9122479fb12d0201fc12efd7726a67650d9eaac667e764c",
+        "stages": [
+          "Total (real): 0.01 seconds (10.924 ms)",
+          "Copy data: 0.01 seconds (9.752 ms)",
+          "Total (thread): 0.00 seconds (1.083 ms)",
+          "Create colocals: 0.00 seconds (1.075 ms)",
+          "Compute charts total (real): 18.76 seconds (18763.8 ms)",
+          "Compute charts total (thread): 18.76 seconds (18763.6 ms)",
+          "Create face groups: 0.01 seconds (5.95 ms)",
+          "Extract invalid mesh geometry: 0.00 seconds (0.065 ms)",
+          "Chart group compute charts (real): 18.76 seconds (18757.6 ms)",
+          "Chart group compute charts (thread): 18.76 seconds (18757.6 ms)",
+          "Create chart group mesh: 0.01 seconds (10.812 ms)",
+          "Create colocals: 0.00 seconds (1.047 ms)",
+          "Create boundaries: 0.00 seconds (3.427 ms)",
+          "Build atlas: 18.63 seconds (18625.8 ms)",
+          "Init: 0.01 seconds (7.146 ms)",
+          "Planar charts: 0.00 seconds (3.049 ms)",
+          "Clustered charts: 18.62 seconds (18615.6 ms)",
+          "Place seeds: 6.01 seconds (6009.89 ms)",
+          "Boundary intersection: 1.94 seconds (1942.88 ms)",
+          "Relocate seeds: 0.01 seconds (8.684 ms)",
+          "Reset: 0.00 seconds (1.391 ms)",
+          "Grow: 12.57 seconds (12570.3 ms)",
+          "Boundary intersection: 4.48 seconds (4475.15 ms)",
+          "Merge: 0.02 seconds (24.342 ms)",
+          "Fill holes: 0.00 seconds (0.796 ms)",
+          "Copy chart faces: 0.00 seconds (0.104 ms)",
+          "Create chart mesh and parameterize (real): 0.12 seconds (119.426 ms)",
+          "Create chart mesh and parameterize (thread): 0.82 seconds (818.687 ms)",
+          "Create chart mesh: 0.03 seconds (30.263 ms)",
+          "Parameterize charts: 0.77 seconds (771.452 ms)",
+          "Orthogonal: 0.00 seconds (0.32 ms)",
+          "LSCM: 0.75 seconds (745.079 ms)",
+          "Recompute: 0.02 seconds (16.554 ms)",
+          "Piecewise: 0.02 seconds (16.046 ms)",
+          "Boundary intersection: 0.01 seconds (14.832 ms)",
+          "Evaluate quality: 0.03 seconds (25.864 ms)",
+          "Total: 10.77 seconds (10769.9 ms)",
+          "Add charts (real): 0.00 seconds (2.997 ms)",
+          "Add charts (thread): 0.02 seconds (15.369 ms)",
+          "Restore texcoords: 0.00 seconds (0.043 ms)",
+          "Rasterize: 0.43 seconds (429.9 ms)",
+          "Dilate (padding): 0.11 seconds (113.449 ms)",
+          "Find location: 10.33 seconds (10325.2 ms)",
+          "Blit: 0.01 seconds (6.205 ms)",
+          "Total: 0.00 seconds (1.011 ms)"
+        ]
+      }
+    },
+    "phase": "complete",
+    "exit": 0,
+    "identity": true,
+    "input_sha256": "ca1248046485e3ede9122479fb12d0201fc12efd7726a67650d9eaac667e764c"
+  },
+  "atlas-packing-bounds-oracle-release": {
+    "profile": "release",
+    "invocation": "6ea96bbff9734a23a8a8cde465ba1bfb",
+    "terminal": true,
+    "roles": {
+      "baseline": {
+        "commit": "0fa8eabab49f13cf56651e04fc2a824bc7460066",
+        "source_sha256": "39e5bdba3c9eb1186afa5253d79672c05f3c0553d8d122a46b90dec1c3d4ab6e",
+        "test_source_sha256": "39e5bdba3c9eb1186afa5253d79672c05f3c0553d8d122a46b90dec1c3d4ab6e",
+        "output_sha256": "029d026f372b98fb68c96fdd78f2b633cd47ea5d4263c34ea13c098cf14eb4d4"
+      },
+      "candidate": {
+        "commit": "2d08e63eb58ed85f2390e99d4757719f6d9d3163",
+        "source_sha256": "f8c2db9ca09ff6128dd92142aa9030530eb367e2dc0473446782488c9585a8a4",
+        "test_source_sha256": "823bf962d27ba9cca1b941272c6fe8679470922c5ea13c30b85cde090b57e1eb",
+        "output_sha256": "029d026f372b98fb68c96fdd78f2b633cd47ea5d4263c34ea13c098cf14eb4d4"
+      }
+    },
+    "phase": "complete",
+    "exit": 0,
+    "cases": [
+      "rippled 218 235 1 1 4368 783",
+      "perforated 252 220 1 1 4734 884",
+      "torus 312 352 1 13 6600 1376",
+      "torus 249 371 1 10 1122 277"
+    ],
+    "identical_output": true,
+    "full_rescan_oracle": true
+  },
+  "atlas-packing-bounds-oracle-asan": {
+    "profile": "asan",
+    "invocation": "a9d788f223c548ff98249c9dd0cdd60e",
+    "terminal": true,
+    "roles": {
+      "baseline": {
+        "commit": "0fa8eabab49f13cf56651e04fc2a824bc7460066",
+        "source_sha256": "39e5bdba3c9eb1186afa5253d79672c05f3c0553d8d122a46b90dec1c3d4ab6e",
+        "test_source_sha256": "39e5bdba3c9eb1186afa5253d79672c05f3c0553d8d122a46b90dec1c3d4ab6e",
+        "output_sha256": "029d026f372b98fb68c96fdd78f2b633cd47ea5d4263c34ea13c098cf14eb4d4"
+      },
+      "candidate": {
+        "commit": "2d08e63eb58ed85f2390e99d4757719f6d9d3163",
+        "source_sha256": "f8c2db9ca09ff6128dd92142aa9030530eb367e2dc0473446782488c9585a8a4",
+        "test_source_sha256": "823bf962d27ba9cca1b941272c6fe8679470922c5ea13c30b85cde090b57e1eb",
+        "output_sha256": "029d026f372b98fb68c96fdd78f2b633cd47ea5d4263c34ea13c098cf14eb4d4"
+      }
+    },
+    "phase": "complete",
+    "exit": 0,
+    "cases": [
+      "rippled 218 235 1 1 4368 783",
+      "perforated 252 220 1 1 4734 884",
+      "torus 312 352 1 13 6600 1376",
+      "torus 249 371 1 10 1122 277"
+    ],
+    "identical_output": true,
+    "full_rescan_oracle": true
+  },
   "direct-grid-main-port-native-release": {
     "terminal": true,
     "profile": "release",
@@ -1595,7 +1771,7 @@
   },
   "archive": {
     "path": "docs/validation/atlas-grid-hdr-history-20261126.tar.gz",
-    "sha256": "390317e29a4990373c07c762872671b4aa72c1b77f6a7214f00f18653ae92760",
-    "members": 50
+    "sha256": "4a63281d643499658284d755887ac53589f091e1e40db13451bf8bb79b3050a4",
+    "members": 56
   }
 }
