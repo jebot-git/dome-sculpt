@@ -63,7 +63,8 @@ void affine_source(bool legacy,SourceNormalUvMethod method,const std::filesystem
  const auto id=source.id;
  const auto paint=source.painted;
  const auto binding=source.material_bindings;
- const AffineTransform placement({-1.4,.2,0,0, .22,.81,0,0, 0,0,1.3,0, .8,-.4,.2,1});
+ const std::array<double,16> matrix{-1.4,.2,0,0, .22,.81,0,0, 0,0,1.3,0, .8,-.4,.2,1};
+ const AffineTransform placement(matrix);
  source.affine_edit=std::make_shared<const NativeAffineEdit>(placement);
  source.visible=false;
  const auto frame=detail::placement_frame(scene,id);
