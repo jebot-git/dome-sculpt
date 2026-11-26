@@ -5,6 +5,8 @@
 #include "gltf-document.hpp"
 namespace dome::detail {
 class CanonicalPaintSampling;
+constexpr size_t emission_dense_bytes = 128u * 1024 * 1024;
+constexpr size_t emission_stream_pixels = 16u * 1024 * 1024;
 Scene emission_export_subset(const Scene &,std::span<const uint64_t>);
 struct EmissionExportImage {
  uint64_t object=0;
@@ -27,5 +29,5 @@ struct EmissionExportImage {
 void attach_native_emission(GltfDocument &,const NativeEmissionExport &,
                             std::span<const uint64_t> exported_objects,
                             std::span<const EmissionExportImage>,size_t max_bytes,
-                            const std::function<bool()> &cancelled={});
+                            const std::function<bool()> &cancelled={}, bool streaming=false);
 }

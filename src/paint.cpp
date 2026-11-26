@@ -1769,6 +1769,26 @@ std::shared_ptr<const TextureMaps> detail::EmissionExportAccess::preview(const P
   retention.retain(maps, paint.composite_token_, factors, false, CompositeUse::NativeEmission);
   return maps;
 }
+std::span<const int32_t> detail::EmissionExportAccess::writable_padding(const PaintedMesh &paint) {
+  if(!paint.surface_||paint.editing_||!paint.valid_source_sampling_attachment()||
+     !paint.valid_paint_sampling_attachment())
+    throw std::invalid_argument("HDR raster needs its actual finished paint and sampling owners");
+  const auto &surface=*paint.surface_;
+  const size_t resolution=surface.resolution;
+  if(resolution<64||resolution>2048||(resolution&(resolution-1))||
+     surface.padding.size()!=resolution*resolution||paint.layers_.size()>16)
+    throw std::invalid_argument("Invalid editable HDR export raster");
+  if(paint.source_sampling_prepared()&&paint.baked_&&
+     (paint.baked_->normal_interpretation!=BakedNormalInterpretation::CanonicalMikk||
+      paint.baked_->normal_authority||paint.baked_->normal_field))
+    throw std::invalid_argument("Prepared HDR raster needs its exact native normal-domain adapter");
+  for(const auto &layer:paint.layers_)
+    if(!std::isfinite(layer.opacity)||layer.opacity<0||layer.opacity>1||
+       layer.tiles.size()!=surface.tiles.size()||
+       (!layer.emission_tiles.empty()&&layer.emission_tiles.size()!=surface.tiles.size()))
+      throw std::invalid_argument("Invalid editable HDR raster layer");
+  return surface.padding;
+}
 std::shared_ptr<PaintedMesh> detail::EmissionExportAccess::without_emission(const PaintedMesh &paint) {
   // An altered temporary may never publish maps under the original's visual
   // content identity, including actual physical zero/hidden contributions.

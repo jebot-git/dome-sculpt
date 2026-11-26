@@ -25,6 +25,11 @@ inline double resolved_fallback_radiance(uint8_t encoded,float factor,float stre
     throw std::overflow_error("Resolved fallback radiance exceeds FLOAT scale");
   return value;
 }
+inline float legacy_fallback_radiance(uint8_t encoded,float factor,float strength,bool ignored){
+  const float x=float(encoded)/255;
+  const float linear=x<=.04045f?x/12.92f:std::pow((x+.055f)/1.055f,2.4f);
+  return ignored?0.f:linear*factor*strength;
+}
 struct ResolvedFallbackMetrics {
   double maximum_absolute_error=0,maximum_relative_error=0;
   size_t erased_nonzero_samples=0;

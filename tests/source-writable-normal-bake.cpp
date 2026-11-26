@@ -3,6 +3,7 @@
 #include "bake-paint-coordinates.hpp"
 #include "dome/bake-recipe.hpp"
 #include "dome/native-authoring.hpp"
+#include "dome/emission-native.hpp"
 #include "dome/source-uv-bake.hpp"
 #include "emission-bake-source.hpp"
 #include "canonical-paint-sampling.hpp"
@@ -882,6 +883,60 @@ void dense_editable_export(const std::filesystem::path &out){
   std::cout<<"DENSE_EDITABLE "<<bytes.size()<<" container bytes; native source exact\n";
 }
 
+void dense_hdr_portable(const std::filesystem::path &out){
+  const auto input=out/"keyed-2048-varied-hdr.dsculpt";
+  const auto converted=out/"portable-varied-hdr-native.dsculpt";
+  const auto restored_path=out/"portable-varied-hdr-restored.dsculpt";
+  const auto output=out/"portable-varied-hdr-2048.glb";
+  const auto ready=[&](Document &doc){
+    require(doc.wait_asset()&&doc.wait_mesh(std::chrono::seconds(90))&&doc.frame().state->error.empty(),
+        "The native HDR operation publishes its ordered result");
+  };
+  {
+    Document doc;
+    doc.open(input);
+    ready(doc);
+    const auto state=doc.copy_scene();
+    const auto field=state.active().painted->baked()->emission_field;
+    ShapeKeyEdit edit;
+    edit.action=ShapeKeyAction::Replace;
+    edit.positions=state.active().painted->mesh().positions;
+    edit.positions.front().z+=.028f;
+    doc.author_shape(edit);
+    ready(doc);
+    doc.convert_baked_normals();
+    doc.save_async(converted).get();
+    ready(doc);
+    require(doc.copy_scene().active().painted->baked()->emission_field==field,
+        "Portable normal conversion leaves the actual physical field in place");
+    doc.export_asset(output,AssetExportFormat::Glb).get();
+  }
+  std::ifstream stream(output,std::ios::binary);
+  require(bool(stream),"Standard GLB worker publishes the complete HDR file");
+  const std::vector<uint8_t> bytes{std::istreambuf_iterator<char>(stream),{}};
+  NativeEmissionReadLimits limits;
+  limits.image.max_working_bytes=96u*1024*1024;
+  {
+    const auto restored=extract_native_emission(bytes,limits);
+    require(bool(restored),"Standard GLB restores the native authoring payload under a scanline budget");
+    const auto &object=restored->active();
+    require(object.painted->baked()->emission_field->sample_count()==2048u*2048u&&
+            object.painted->baked()->emission_field->storage().varying_mask==56&&
+            object.painted->baked()->normal_interpretation==BakedNormalInterpretation::NativeAttributes&&
+            object.deformation->morphs->targets.front().delta.front().z==.028f,
+        "Reopened Standard GLB preserves full-resolution FLOAT, converted normal frame and edited key");
+    restored->save(restored_path);
+  }
+  require(same_file(converted,restored_path),
+      "Streamed Standard GLB reopens into the exact complete native project");
+  limits.max_exr_bytes=1024;
+  bool refused=false;
+  try{(void)extract_native_emission(bytes,limits);}
+  catch(const std::length_error &e){refused=std::string_view(e.what()).find("EXR bytes exceed aggregate limit")!=std::string_view::npos;}
+  require(refused,"Streamed EXR keeps the aggregate encoded resource limit");
+  std::cout<<"DENSE_HDR_PORTABLE "<<bytes.size()<<" container bytes; native source exact\n";
+}
+
 void dense_hdr_first_key(const std::filesystem::path &out,bool varied){
   auto scene=Scene::load(out/"retained-2048.dsculpt");
   const auto donor=std::find_if(scene.objects().begin(),scene.objects().end(),[](const auto &o){
@@ -1038,6 +1093,11 @@ int main(int argc,char **argv) try {
  if(argc==3&&std::string_view(argv[1])=="--dense-editable-export"){
    writable_source::dense_editable_export(argv[2]);
    std::cout<<"PASS "<<writable_source::checks<<" full-resolution Editable GLB checks\n";
+   return 0;
+ }
+ if(argc==3&&std::string_view(argv[1])=="--dense-hdr-portable"){
+   writable_source::dense_hdr_portable(argv[2]);
+   std::cout<<"PASS "<<writable_source::checks<<" full-resolution portable HDR checks\n";
    return 0;
  }
  if(argc==3&&(std::string_view(argv[1])=="--dense-hdr-first-key"||std::string_view(argv[1])=="--dense-varied-hdr-first-key")){

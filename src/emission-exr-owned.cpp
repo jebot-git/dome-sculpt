@@ -58,18 +58,165 @@ FieldHeader header(Context &c){
  auto text=[&](const char *name,std::string_view expected){int32_t length=0;const char *value=nullptr;s.check(exr_attr_get_string(c.value,0,name,&length,&value));if(!value||length<0||std::string_view(value,size_t(length))!=expected)throw std::invalid_argument("Unknown HDR emission EXR interpretation");};text("domeSculptEmissionUnits",version==1?"linear-cd/m2;legacy-relative-premult;physical-absolute-premult;coverage-linear":"linear-cd/m2;legacy-relative-premult;resolved-absolute-premult;coverage-linear");text("domeSculptEmissionCoordinates","row0=v0");const auto w=uint32_t(box.max.x)+1,h=uint32_t(box.max.y)+1;measure(w,h,s.limits);const exr_attr_chlist_t *list=nullptr;s.check(exr_get_channels(c.value,0,&list));if(!list||list->num_channels!=10)throw std::invalid_argument("HDR EXR must contain ten named FLOAT channels");unsigned seen=0;for(int i=0;i<10;++i){const auto &entry=list->entries[i];if(entry.pixel_type!=EXR_PIXEL_FLOAT||entry.x_sampling!=1||entry.y_sampling!=1)throw std::invalid_argument("Invalid HDR EXR channel interpretation");const auto n=channel(entry.name.str);if(seen&(1u<<n))throw std::invalid_argument("Repeated HDR FLOAT channel");seen|=1u<<n;}return {w,h,uint32_t(version)};
 }
 void chunk(const exr_chunk_info_t &c,uint32_t w,uint32_t h,int y){if(c.start_x!=0||c.start_y!=y||c.width!=int(w)||c.height<=0||uint32_t(c.height)>h-uint32_t(y))throw std::invalid_argument("Invalid HDR scanline chunk extent");}
+constexpr uint32_t zip_chunk_rows = 16;
+size_t scanline_bytes(uint32_t width, uint32_t height) {
+    return size_t(width) * std::min(height, zip_chunk_rows) * sizeof(EmissionExrPixel);
 }
-std::vector<uint8_t> encode_emission_exr_owned(const EmissionInterchangeImage &image,const EmissionInterchangeLimits &l,EmissionExrMemory provider){
- image.validate(l);const auto raw=measure(image.width,image.height,l),forecast=raw+raw/50+1024*1024;if(raw>l.max_working_bytes-std::min(l.max_working_bytes,forecast))throw std::length_error("HDR EXR encode forecast exceeds working/output budgets");State s(l,provider);s.output.reserve(std::min(forecast,l.max_encoded_bytes));s.reduce(l.max_working_bytes-raw-s.output.capacity());Scope scope(s);Context c(s);c.open(true);int part=-1;s.check(exr_add_part(c.value,nullptr,EXR_STORAGE_SCANLINE,&part));s.check(exr_initialize_required_attr_simple(c.value,part,int(image.width),int(image.height),EXR_COMPRESSION_ZIP));for(auto name:channels)s.check(exr_result_t(exr_add_channel(c.value,part,name,EXR_PIXEL_FLOAT,EXR_PERCEPTUALLY_LOGARITHMIC,1,1)));
- s.check(exr_attr_set_int(c.value,part,"domeSculptEmissionVersion",int32_t(image.version)));s.check(exr_attr_set_string(c.value,part,"domeSculptEmissionUnits",image.version==1?"linear-cd/m2;legacy-relative-premult;physical-absolute-premult;coverage-linear":"linear-cd/m2;legacy-relative-premult;resolved-absolute-premult;coverage-linear"));s.check(exr_attr_set_string(c.value,part,"domeSculptEmissionCoordinates","row0=v0"));s.check(exr_write_header(c.value));
- {Encoding pipe(c.value);bool first=true;for(int y=0;y<int(image.height);){exr_chunk_info_t info{};s.check(exr_write_scanline_chunk_info(c.value,part,y,&info));chunk(info,image.width,image.height,y);s.check(first?exr_encoding_initialize(c.value,part,&info,&pipe.value):exr_encoding_update(c.value,part,&info,&pipe.value));for(int n=0;n<pipe.value.channel_count;++n){auto &entry=pipe.value.channels[n];const auto k=channel(entry.channel_name);entry.user_bytes_per_element=4;entry.user_data_type=EXR_PIXEL_FLOAT;entry.user_pixel_stride=40;entry.user_line_stride=int(image.width*40);entry.encode_from_ptr=reinterpret_cast<const uint8_t*>(&image.pixels[size_t(y)*image.width][k]);}if(first)s.check(exr_encoding_choose_default_routines(c.value,part,&pipe.value));s.check(exr_encoding_run(c.value,part,&pipe.value));first=false;y+=info.height;}}
- c.close();s.check();return std::move(s.output);
+
+std::span<EmissionExrPixel> scanlines(std::vector<EmissionExrPixel> &buffer,
+                                      const exr_chunk_info_t &info) {
+    const auto count = size_t(info.width) * info.height;
+    if (count > buffer.size()) throw std::invalid_argument("HDR ZIP chunk exceeds scanline storage");
+    return std::span(buffer).first(count);
 }
-EmissionExrDescription emission_exr_owned_description(std::span<const uint8_t> bytes,const EmissionInterchangeLimits &l,EmissionExrMemory provider){limits(l);if(bytes.empty()||bytes.size()>l.max_encoded_bytes||bytes.size()>l.max_working_bytes)throw std::length_error("HDR EXR capture exceeds encoded byte budget");State s(l,provider);s.input=bytes;s.reduce(std::min(l.max_working_bytes-bytes.size(),size_t(1024*1024)));Scope scope(s);Context c(s);c.open(false);const auto [w,h,version]=header(c);const auto raw=measure(w,h,l);if(raw>l.max_working_bytes-bytes.size())throw std::length_error("HDR EXR decode forecast exceeds working budget");c.close();return {raw,version,w,h};}
+
+std::vector<uint8_t> encode_rows(uint32_t width, uint32_t height, uint32_t version,
+    size_t resident_bytes, const auto &get_pixels, const EmissionInterchangeLimits &l,
+    EmissionExrMemory provider) {
+    const auto raw = measure(width, height, l);
+    const auto forecast = raw + raw / 50 + 1024 * 1024;
+    const auto capacity = std::min(forecast, l.max_encoded_bytes);
+    if (resident_bytes > l.max_working_bytes || capacity > l.max_working_bytes - resident_bytes)
+        throw std::length_error("HDR EXR encode forecast exceeds working/output budgets");
+    State s(l, provider);
+    s.output.reserve(capacity);
+    s.reduce(l.max_working_bytes - resident_bytes - s.output.capacity());
+    Scope scope(s);
+    Context context(s);
+    context.open(true);
+    int part = -1;
+    s.check(exr_add_part(context.value, nullptr, EXR_STORAGE_SCANLINE, &part));
+    s.check(exr_initialize_required_attr_simple(context.value, part, int(width), int(height),
+                                               EXR_COMPRESSION_ZIP));
+    for (auto name : channels)
+        s.check(exr_result_t(exr_add_channel(context.value, part, name, EXR_PIXEL_FLOAT,
+                                           EXR_PERCEPTUALLY_LOGARITHMIC, 1, 1)));
+    s.check(exr_attr_set_int(context.value, part, "domeSculptEmissionVersion", int32_t(version)));
+    s.check(exr_attr_set_string(context.value, part, "domeSculptEmissionUnits",
+        version == 1 ? "linear-cd/m2;legacy-relative-premult;physical-absolute-premult;coverage-linear"
+                     : "linear-cd/m2;legacy-relative-premult;resolved-absolute-premult;coverage-linear"));
+    s.check(exr_attr_set_string(context.value, part, "domeSculptEmissionCoordinates", "row0=v0"));
+    s.check(exr_write_header(context.value));
+    {
+        Encoding pipe(context.value);
+        for (int y = 0; y < int(height);) {
+            exr_chunk_info_t info{};
+            s.check(exr_write_scanline_chunk_info(context.value, part, y, &info));
+            chunk(info, width, height, y);
+            const auto *pixels = get_pixels(info);
+            s.check(y == 0 ? exr_encoding_initialize(context.value, part, &info, &pipe.value)
+                           : exr_encoding_update(context.value, part, &info, &pipe.value));
+            for (int n = 0; n < pipe.value.channel_count; ++n) {
+                auto &entry = pipe.value.channels[n];
+                const auto k = channel(entry.channel_name);
+                entry.user_bytes_per_element = 4;
+                entry.user_data_type = EXR_PIXEL_FLOAT;
+                entry.user_pixel_stride = sizeof(EmissionExrPixel);
+                entry.user_line_stride = int(width * sizeof(EmissionExrPixel));
+                entry.encode_from_ptr = reinterpret_cast<const uint8_t *>(&pixels[0][k]);
+            }
+            if (y == 0) s.check(exr_encoding_choose_default_routines(context.value, part, &pipe.value));
+            s.check(exr_encoding_run(context.value, part, &pipe.value));
+            y += info.height;
+        }
+    }
+    context.close();
+    return std::move(s.output);
+}
+
+void decode_rows(Context &context, uint32_t width, uint32_t height,
+                 const auto &get_pixels, const auto &consume_pixels) {
+    auto &s = context.state;
+    Decoding pipe(context.value);
+    for (int y = 0; y < int(height);) {
+        exr_chunk_info_t info{};
+        s.check(exr_read_scanline_chunk_info(context.value, 0, y, &info));
+        chunk(info, width, height, y);
+        auto pixels = get_pixels(info);
+        s.check(y == 0 ? exr_decoding_initialize(context.value, 0, &info, &pipe.value)
+                       : exr_decoding_update(context.value, 0, &info, &pipe.value));
+        for (int n = 0; n < pipe.value.channel_count; ++n) {
+            auto &entry = pipe.value.channels[n];
+            const auto k = channel(entry.channel_name);
+            entry.user_bytes_per_element = 4;
+            entry.user_data_type = EXR_PIXEL_FLOAT;
+            entry.user_pixel_stride = sizeof(EmissionExrPixel);
+            entry.user_line_stride = int(width * sizeof(EmissionExrPixel));
+            entry.decode_to_ptr = reinterpret_cast<uint8_t *>(&pixels[0][k]);
+        }
+        if (y == 0) s.check(exr_decoding_choose_default_routines(context.value, 0, &pipe.value));
+        s.check(exr_decoding_run(context.value, 0, &pipe.value));
+        consume_pixels(uint32_t(y), pixels);
+        y += info.height;
+    }
+}
+
+}
+std::vector<uint8_t> encode_emission_exr_owned(const EmissionInterchangeImage &image,
+    const EmissionInterchangeLimits &l, EmissionExrMemory provider) {
+    image.validate(l);
+    const auto raw = measure(image.width, image.height, l);
+    const auto forecast = raw + raw / 50 + 1024 * 1024;
+    if (raw > l.max_working_bytes - std::min(l.max_working_bytes, forecast))
+        throw std::length_error("HDR EXR encode forecast exceeds working/output budgets");
+    return encode_rows(image.width, image.height, image.version, raw,
+        [&](const auto &info) { return image.pixels.data() + size_t(info.start_y) * image.width; },
+        l, provider);
+}
+
+std::vector<uint8_t> encode_emission_exr_rows(uint32_t width, uint32_t height,
+    uint32_t version, const EmissionExrSource &source, const EmissionInterchangeLimits &l,
+    EmissionExrMemory provider) {
+    measure(width, height, l);
+    if (!source || (version != 1 && version != 2))
+        throw std::invalid_argument("Invalid HDR EXR scanline source");
+    const auto scratch = scanline_bytes(width, height);
+    if (scratch > l.max_working_bytes)
+        throw std::length_error("HDR EXR scanlines exceed working budget");
+    std::vector<EmissionExrPixel> buffer(scratch / sizeof(EmissionExrPixel));
+    return encode_rows(width, height, version, scratch, [&](const auto &info) {
+        auto rows = scanlines(buffer, info);
+        source(uint32_t(info.start_y), rows);
+        validate_emission_exr_pixels(rows, version, l);
+        return rows.data();
+    }, l, provider);
+}
+
+EmissionExrDescription emission_exr_owned_description(std::span<const uint8_t> bytes,const EmissionInterchangeLimits &l,EmissionExrMemory provider,bool streaming){limits(l);if(bytes.empty()||bytes.size()>l.max_encoded_bytes||bytes.size()>l.max_working_bytes)throw std::length_error("HDR EXR capture exceeds encoded byte budget");State s(l,provider);s.input=bytes;s.reduce(std::min(l.max_working_bytes-bytes.size(),size_t(1024*1024)));Scope scope(s);Context c(s);c.open(false);const auto [w,h,version]=header(c);const auto raw=measure(w,h,l);if((streaming?scanline_bytes(w,h):raw)>l.max_working_bytes-bytes.size())throw std::length_error("HDR EXR decode forecast exceeds working budget");c.close();return {raw,version,w,h};}
 size_t emission_exr_owned_decoded_bytes(std::span<const uint8_t> bytes,const EmissionInterchangeLimits &l,EmissionExrMemory provider){return emission_exr_owned_description(bytes,l,provider).decoded_bytes;}
 EmissionInterchangeImage decode_emission_exr_owned(std::span<const uint8_t> bytes,const EmissionInterchangeLimits &l,EmissionExrMemory provider){
  limits(l);if(bytes.empty()||bytes.size()>l.max_encoded_bytes||bytes.size()>l.max_working_bytes)throw std::length_error("HDR EXR capture exceeds encoded byte budget");State s(l,provider);s.input=bytes;s.reduce(std::min(l.max_working_bytes-bytes.size(),size_t(1024*1024)));Scope scope(s);Context c(s);c.open(false);const auto [w,h,version]=header(c);const auto raw=measure(w,h,l);if(raw>l.max_working_bytes-bytes.size())throw std::length_error("HDR EXR decode forecast exceeds working budget");s.reduce(l.max_working_bytes-bytes.size()-raw);EmissionInterchangeImage image;image.version=version;image.width=w;image.height=h;image.pixels.resize(size_t(w)*h);
- {Decoding pipe(c.value);bool first=true;for(int y=0;y<int(h);){exr_chunk_info_t info{};s.check(exr_read_scanline_chunk_info(c.value,0,y,&info));chunk(info,w,h,y);s.check(first?exr_decoding_initialize(c.value,0,&info,&pipe.value):exr_decoding_update(c.value,0,&info,&pipe.value));for(int n=0;n<pipe.value.channel_count;++n){auto &entry=pipe.value.channels[n];const auto k=channel(entry.channel_name);entry.user_bytes_per_element=4;entry.user_data_type=EXR_PIXEL_FLOAT;entry.user_pixel_stride=40;entry.user_line_stride=int(w*40);entry.decode_to_ptr=reinterpret_cast<uint8_t*>(&image.pixels[size_t(y)*w][k]);}if(first)s.check(exr_decoding_choose_default_routines(c.value,0,&pipe.value));s.check(exr_decoding_run(c.value,0,&pipe.value));first=false;y+=info.height;}}
+
+ decode_rows(c,w,h,[&](const auto &info) {
+     return std::span(image.pixels).subspan(size_t(info.start_y)*w, size_t(info.height)*w);
+ }, [](uint32_t, std::span<const EmissionExrPixel>) {});
  c.close();image.validate(l);return image;
+}
+
+EmissionExrDescription read_emission_exr_rows(std::span<const uint8_t> bytes,
+    const EmissionExrSink &sink, const EmissionInterchangeLimits &l, EmissionExrMemory provider) {
+    limits(l);
+    if (!sink) throw std::invalid_argument("Missing HDR EXR scanline sink");
+    if (bytes.empty() || bytes.size() > l.max_encoded_bytes || bytes.size() > l.max_working_bytes)
+        throw std::length_error("HDR EXR capture exceeds encoded byte budget");
+    State s(l, provider);
+    s.input = bytes;
+    s.reduce(std::min(l.max_working_bytes - bytes.size(), size_t(1024 * 1024)));
+    Scope scope(s);
+    Context context(s);
+    context.open(false);
+    const auto [width, height, version] = header(context);
+    const auto scratch = scanline_bytes(width, height);
+    if (scratch > l.max_working_bytes - bytes.size())
+        throw std::length_error("HDR EXR scanlines exceed working budget");
+    s.reduce(l.max_working_bytes - bytes.size() - scratch);
+    std::vector<EmissionExrPixel> buffer(scratch / sizeof(EmissionExrPixel));
+    decode_rows(context, width, height, [&](const auto &info) { return scanlines(buffer, info); },
+        [&](uint32_t y, std::span<const EmissionExrPixel> rows) {
+            validate_emission_exr_pixels(rows, version, l);
+            sink(y, rows);
+        });
+    context.close();
+    return {measure(width, height, l), version, width, height};
 }
 }

@@ -40,6 +40,57 @@ int main()try {
  // development proof also compares complete bytes against that old archive.
  check(bytes.size()==18014&&legacy_hash(bytes)==16333072579688455284ull,"Legacy encoder byte fingerprint remains exact");check(detail::decode_emission_exr_owned(bytes).pixels==initial,"Owned decoder restores exact ten-plane FLOAT32 fields");
  struct Golden{uint32_t w,h;size_t size;uint64_t hash;};for(auto g:{Golden{1,1,775,700591849390724062ull},{7,16,1957,18035003280282636195ull},{19,17,4423,15456539845958369503ull},{129,67,36004,11183535747692206137ull}}){auto v=image(g.w,g.h);auto b=detail::encode_emission_exr_owned(v);check(b.size()==g.size&&legacy_hash(b)==g.hash,"Legacy byte fingerprints exact across chunk/tiny extents");check(detail::decode_emission_exr_owned(b).pixels==v.pixels,"Multiple chunk extent exact decode");}
+ const auto tiled = [&](uint32_t y, std::span<detail::EmissionExrPixel> rows) {
+     std::copy_n(initial.begin() + size_t(y) * f.width, rows.size(), rows.begin());
+ };
+ check(detail::encode_emission_exr_rows(f.width, f.height, f.version, tiled, {}) == bytes,
+       "Streamed writer emits the original ten-channel ZIP bytes");
+ const auto consume = [&](uint32_t y, std::span<const detail::EmissionExrPixel> rows) {
+     if (!std::equal(rows.begin(), rows.end(), initial.begin() + size_t(y) * f.width))
+         throw std::runtime_error("Scanline decoder changed FLOAT coefficients");
+ };
+ const auto desc = detail::read_emission_exr_rows(bytes, consume, {});
+ check(desc.width == f.width && desc.height == f.height && desc.version == f.version,
+       "Streamed reader reports original dimensions and interpretation");
+ const auto sample = [](size_t i) {
+     const auto x = float(i % 2048) / 2048.f;
+     const auto y = float(i / 2048) / 2048.f;
+     const float a = (i & 31) ? 1.f : 0.f;
+     return detail::EmissionExrPixel{1.5f + 300.f*x*a, 2.f + 50.f*y*a, 3.f*a,
+         0.f, 0.f, .25f*a, 300.f*x*a, 50.f*y*a, 2.75f*a, a};
+ };
+ EmissionInterchangeLimits stream_limits;
+ stream_limits.max_encoded_bytes = 64u*1024*1024;
+ stream_limits.max_working_bytes = 96u*1024*1024;
+ const auto full = detail::encode_emission_exr_rows(2048, 2048, 2,
+     [&](uint32_t y, std::span<detail::EmissionExrPixel> rows) {
+         for (size_t i = 0; i < rows.size(); ++i) rows[i] = sample(size_t(y)*2048+i);
+     }, stream_limits);
+ size_t decoded = 0;
+ const auto full_desc = detail::read_emission_exr_rows(full,
+     [&](uint32_t y, std::span<const detail::EmissionExrPixel> rows) {
+         if (decoded != size_t(y)*2048 || rows.size() > 16u*2048)
+             throw std::runtime_error("Streamed scanlines exceed their work window");
+         for (const auto &pixel : rows)
+             if (pixel != sample(decoded++)) throw std::runtime_error("Full-size ZIP sample differs");
+     }, stream_limits);
+ check(decoded == 2048u*2048 && full_desc.decoded_bytes == decoded*40,
+       "All ten FLOAT planes stream through a budget below their decoded size");
+ refuses([&]{detail::decode_emission_exr_owned(full, stream_limits);},
+         "Dense decode retains its original working limit");
+ raw_sweep([&](auto p) {
+     check(detail::encode_emission_exr_rows(f.width,f.height,f.version,tiled,{},p)==bytes,
+           "Stream writer allocation retry preserves bytes");
+ }, "stream encode");
+ raw_sweep([&](auto p) {
+     detail::read_emission_exr_rows(bytes,consume,{},p);
+ }, "stream decode");
+ cancellations([&](auto l) {
+     detail::encode_emission_exr_rows(f.width,f.height,f.version,tiled,l);
+ }, "stream encode");
+ cancellations([&](auto l) {
+     detail::read_emission_exr_rows(bytes,consume,l);
+ }, "stream decode");
  raw_sweep([&](auto p){auto b=detail::encode_emission_exr_owned(f,{},p);check(b==bytes,"Raw-provider writer bytes exact");},"encode");
  raw_sweep([&](auto p){auto out=detail::decode_emission_exr_owned(bytes,{},p);check(out.pixels==initial,"Raw-provider reader floats exact");},"decode");
  raw_sweep([&](auto p){check(detail::emission_exr_owned_decoded_bytes(bytes,{},p)==initial.size()*40,"Raw-provider header reports exact storage");},"header");
