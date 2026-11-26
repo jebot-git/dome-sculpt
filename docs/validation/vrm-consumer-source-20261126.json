@@ -1,0 +1,209 @@
+{
+  "candidate": "ccbbe02093bed6997bdacdf0d36b3a11bc1f177d",
+  "parent": "9a2958a853f3d7ed277375d4ba8b2e976b4f6747",
+  "branch": "work/vrm-consumer-source-20261126",
+  "scope": "Three regression targets and their shared test fixture. Fresh test translation units link against the existing exact runtime libraries.",
+  "fixture_changes": [
+    "Author VRM0 file inputs before normal import. Production import constructs the original node graph, materials and role ownership.",
+    "Retain an explicit negative test of modified embedded creator bytes and verify exact rejection.",
+    "Compare material expression remapping and rendered VRM0 results, including complete geometry, posed morph frames, source colors, UV rebake, aliasing and protected animation."
+  ],
+  "focused_vrm": {
+    "release": {
+      "checks": 167,
+      "log": {
+        "path": "artifacts/vrm-consumer-diagnostic-20261126/vrm-authentic-output/log",
+        "sha256": "02e40a57a96e288304213ecab9884865cf8cbf5b31aae80e92e2d1d53b585fae"
+      },
+      "exit": 0,
+      "avatars": [
+        "female",
+        "male"
+      ]
+    },
+    "asan": {
+      "checks": 167,
+      "log": {
+        "path": "artifacts/vrm-consumer-diagnostic-20261126/vrm-asan-authentic-output/log",
+        "sha256": "02e40a57a96e288304213ecab9884865cf8cbf5b31aae80e92e2d1d53b585fae"
+      },
+      "exit": 0,
+      "avatars": [
+        "female",
+        "male"
+      ]
+    }
+  },
+  "graphics": {
+    "release": {
+      "tests": {
+        "role": {
+          "exit": 0,
+          "seconds": 11.606,
+          "checks": 20,
+          "gpu": "GPU llvmpipe (LLVM 22.1.8, 256 bits)",
+          "device_witnesses": [],
+          "log": {
+            "path": "artifacts/vrm-consumer-diagnostic-20261126/role-release-final/run.log",
+            "sha256": "087e3b1eb1a36bf644e5878765aae1a6f6d7b625bfdf73b19ce3c3120f905445"
+          },
+          "maximum_rgb8_difference": 1,
+          "rendered_comparisons": 10
+        },
+        "color": {
+          "exit": 0,
+          "seconds": 54.027,
+          "checks": 41,
+          "gpu": "GPU llvmpipe (LLVM 22.1.8, 256 bits)",
+          "device_witnesses": [],
+          "log": {
+            "path": "artifacts/vrm-consumer-diagnostic-20261126/color-release-final/run.log",
+            "sha256": "d3ebdb5c2463519621e3537a0e87b6e3b4566232ed3b1c70d578c7cba60e1755"
+          },
+          "maximum_rgb8_difference": 1,
+          "rendered_comparisons": 13
+        }
+      },
+      "runner_result": {
+        "path": "artifacts/vrm-consumer-diagnostic-20261126/release-graphics-status.json",
+        "sha256": "46a05b7300a5b9dfeb17dc1a13012d50ad5fbfe1a00c04d2571d6be488da2158"
+      }
+    },
+    "arc": {
+      "tests": {
+        "role": {
+          "exit": 0,
+          "seconds": 13.845,
+          "checks": 20,
+          "gpu": "GPU Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+          "device_witnesses": [
+            [
+              3069210,
+              3
+            ],
+            [
+              3069210,
+              4
+            ],
+            [
+              3069210,
+              5
+            ],
+            [
+              3069210,
+              6
+            ]
+          ],
+          "log": {
+            "path": "artifacts/vrm-consumer-diagnostic-20261126/role-arc-final/run.log",
+            "sha256": "f066311e7af4676b8881697c746452a7101b88f7b2922e88371e71ad95b6af5f"
+          },
+          "maximum_rgb8_difference": 1,
+          "rendered_comparisons": 10
+        },
+        "color": {
+          "exit": 0,
+          "seconds": 37.491,
+          "checks": 41,
+          "gpu": "GPU Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+          "device_witnesses": [
+            [
+              3071619,
+              3
+            ],
+            [
+              3071619,
+              4
+            ],
+            [
+              3071619,
+              5
+            ],
+            [
+              3071619,
+              6
+            ]
+          ],
+          "log": {
+            "path": "artifacts/vrm-consumer-diagnostic-20261126/color-arc-final/run.log",
+            "sha256": "8831d6f1caeaef5db5ae1941bdbfe1f782c5927ad620364c4cc2109bd35946a5"
+          },
+          "maximum_rgb8_difference": 1,
+          "rendered_comparisons": 13
+        }
+      },
+      "runner_result": {
+        "path": "artifacts/vrm-consumer-diagnostic-20261126/arc-graphics-status.json",
+        "sha256": "a38692b9208df05d1e66efaf79e1888db2f92d6abb26956488ea19e1c2b5b6ce"
+      }
+    },
+    "asan": {
+      "tests": {
+        "role": {
+          "exit": 0,
+          "seconds": 49.425,
+          "checks": 20,
+          "gpu": "GPU llvmpipe (LLVM 22.1.8, 256 bits)",
+          "device_witnesses": [],
+          "log": {
+            "path": "artifacts/vrm-consumer-diagnostic-20261126/role-asan-final/run.log",
+            "sha256": "087e3b1eb1a36bf644e5878765aae1a6f6d7b625bfdf73b19ce3c3120f905445"
+          },
+          "maximum_rgb8_difference": 1,
+          "rendered_comparisons": 10
+        },
+        "color": {
+          "exit": 0,
+          "seconds": 115.854,
+          "checks": 41,
+          "gpu": "GPU llvmpipe (LLVM 22.1.8, 256 bits)",
+          "device_witnesses": [],
+          "log": {
+            "path": "artifacts/vrm-consumer-diagnostic-20261126/color-asan-final/run.log",
+            "sha256": "d3ebdb5c2463519621e3537a0e87b6e3b4566232ed3b1c70d578c7cba60e1755"
+          },
+          "maximum_rgb8_difference": 1,
+          "rendered_comparisons": 13
+        }
+      },
+      "runner_result": {
+        "path": "artifacts/vrm-consumer-diagnostic-20261126/asan-graphics-status.json",
+        "sha256": "bf80ee35f3885d762669b66ab23546e57cf4819016c54a66b3d877d1919f709d"
+      }
+    }
+  },
+  "hardware": {
+    "pci": "0000:03:00.0",
+    "render_node": "/dev/dri/renderD129"
+  },
+  "libraries": {
+    "release_core": {
+      "path": "artifacts/authoring-regression-integration-combined-20261126/libdome-sculpt-core.a",
+      "sha256": "b8af98c7d320e727444a18d9f836b54c5562d0516078cfe44ac8dee4d33592d0"
+    },
+    "release_renderer": {
+      "path": "artifacts/authoring-regression-integration-combined-20261126/libdome-sculpt-render.a",
+      "sha256": "b76b7344c3f2e5aeb1a06c64254a9b14d1786d155e012803d93d1ee6ea9ace35"
+    },
+    "asan_core": {
+      "path": "artifacts/authoring-regression-integration-current-asan-20261126/libdome-sculpt-core.a",
+      "sha256": "90e4a04c0c6e6d94d1da7c602d56673bc4981e2c577e5b05ba94c40086e726af"
+    },
+    "asan_renderer": {
+      "path": "artifacts/core-gltf-normal-export-asan-20261126/libdome-sculpt-render.a",
+      "sha256": "29ac70350873a10b56465e363aec40e36a0314ca792b124dcab907a41d0984fb"
+    }
+  },
+  "asan_options": "detect_leaks=1:halt_on_error=1",
+  "ubsan_options": "halt_on_error=1:print_stacktrace=1",
+  "combined_replay": {
+    "service": "ds-vrm-consumer-combined-v2-20261126.service",
+    "invocation": "ecca157699b24d96a052e95260d59de3",
+    "cases": 86,
+    "status_path": "artifacts/vrm-consumer-combined-20261126/combined-regression/status.json",
+    "terminal": false,
+    "phase_at_record": "Release build",
+    "previous_invocation": "91c1e6034f75469998d175fe73abf8f0",
+    "previous_failure": "Runner output parent did not exist. Created the isolated build directory and used a new invocation before any source build or CTest."
+  }
+}

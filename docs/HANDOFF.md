@@ -632,6 +632,27 @@ fixtures still report a creator-source SHA256 mismatch after modifying their
 embedded source bytes.
 See [the validation receipt](validation/authoring-regression-integration-20261126.json).
 
+### VRM0 fixtures through normal import
+
+Candidate `ccbbe020` authors the modified VRM0 inputs before import, so Dome
+Sculpt constructs the original node graph, materials and deformation owners
+through the normal import path. The broad suite exercises both verified CC0
+VRoid bases. It retains an explicit negative test for altered embedded
+creator bytes, checks exact material-expression forks, and verifies that an
+unrepresentable painted colour expression leaves the old export byte-exact.
+
+The two independent graphics consumers run using real imported skin and
+morph data, with per-corner RGBA and UV checks, original and rebaked UVs,
+texture role aliases, animated material factors and an opaque canonical atlas
+fixture. All 61 assertions pass on software and Intel Arc A770, with a
+maximum difference of one RGB8 step in both profiles under the original
+four-step tolerance. Arc execution was witnessed on `/dev/dri/renderD129`.
+The broad suite passes 167 checks under Release and ASan/UBSan. Both software
+graphics consumers also pass under ASan/UBSan, with leak detection enabled
+throughout that profile. The candidate changes test code. A fresh optimized FLTK build and the same
+86-case replay are running on the exact pushed source. See
+[the focused and combined-replay receipt](validation/vrm-consumer-source-20261126.json).
+
 ## Source and integration boundary
 
 - Main now admits product1bc13125 and public fixturef1e193c7 after complete
