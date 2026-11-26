@@ -2,6 +2,9 @@
 #include "creator-vrm.hpp"
 #include "dome/material-bindings.hpp"
 #include "dome/affine.hpp"
+#include <algorithm>
+#include <cmath>
+#include <limits>
 #include <set>
 namespace dome::detail {
 namespace {
@@ -55,6 +58,43 @@ Vec3 vector(const nlohmann::json &j){return {j.value("x",0.f),j.value("y",0.f),j
 nlohmann::json vector(Vec3 v){return {{"x",v.x},{"y",v.y},{"z",v.z}};}
 Vec3 unity(Vec3 p){return {p.x,p.y,-p.z};}
 Vec3 position(const ImportedAsset &asset,size_t n){auto &m=asset.nodes.at(n).world;return {m[12],m[13],m[14]};}
+bool positive_similarity(const AffineTransform &placement) {
+  if (placement.orientation() != AffineOrientation::Preserving)
+    return false;
+  auto x = placement.direction({1, 0, 0});
+  auto y = placement.direction({0, 1, 0});
+  auto z = placement.direction({0, 0, 1});
+  const auto norm = [](const AffineVector &axis) {
+    return std::hypot(axis[0], axis[1], axis[2]);
+  };
+  const double scale = std::max({norm(x), norm(y), norm(z)});
+  if (!std::isfinite(scale) || scale == 0)
+    return false;
+  for (auto *axis : {&x, &y, &z})
+    for (auto &component : *axis)
+      component /= scale;
+  const auto dot = [](const AffineVector &a, const AffineVector &b) {
+    return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+  };
+  constexpr double tolerance = 128 * std::numeric_limits<double>::epsilon();
+  return std::abs(dot(x, x) - 1) <= tolerance &&
+         std::abs(dot(y, y) - 1) <= tolerance &&
+         std::abs(dot(z, z) - 1) <= tolerance &&
+         std::abs(dot(x, y)) <= tolerance &&
+         std::abs(dot(x, z)) <= tolerance &&
+         std::abs(dot(y, z)) <= tolerance;
+}
+bool has_spring_geometry(const nlohmann::json &spring) {
+  if (spring.contains("boneGroups") &&
+      std::ranges::any_of(spring.at("boneGroups"), [](const auto &group) {
+        return !group.at("bones").empty();
+      }))
+    return true;
+  return spring.contains("colliderGroups") &&
+         std::ranges::any_of(spring.at("colliderGroups"), [](const auto &group) {
+           return !group.at("colliders").empty();
+         });
+}
 }
 bool has_creator_vrm_origin(const std::vector<ObjectSurface> &objects) {
   for(const auto &o:objects)if(o.material_bindings&&o.material_bindings->uv_origin&&
@@ -66,13 +106,16 @@ CreatorVrmAuthority::CreatorVrmAuthority(const std::vector<ObjectSurface> &objec
     :shape_(recipe(objects),appearance.original_bytes,cancel),nodes_(shape_.joint_nodes()) {
   const auto encoded=recipe(objects).encode();auto reference=shape_.reference(cancel);
   if(objects.size()!=reference.parts.size())fail("complete creator parts including generated groom are required");
+  const auto placement = objects.front().world_matrix();
+  nonlinear_physics_placement_ =
+      !shape_.has_uniform_shape() && !positive_similarity(placement);
   std::set<size_t> used;
   for(const auto &o:objects) {
     if(cancel&&cancel())throw std::runtime_error("Creator VRM authority cancelled");
     if(o.groups.empty()||o.groups.back().id!=objects.front().groups.back().id||!o.groups.back().humanoid||o.groups.back().humanoid->encode()!=encoded)
       fail("creator group or saved recipe differs");
-    if(o.affine_edit||std::any_of(o.groups.begin(),o.groups.end(),[](const auto &g){return bool(g.affine_edit);}))
-      fail("creator physics refitting requires a similarity placement, not an arbitrary affine edit");
+    if(o.world_matrix().matrix()!=placement.matrix())
+      fail("creator parts require one shared placement for the avatar rig");
     // No arbitrary bind-space edits can borrow a creator genesis certificate.
     if(!o.deformation||!o.deformation->skeleton||o.deformation->skeleton->encode()!=shape_.skeleton().encode())
       fail("current rest rig differs from the actual creator recipe");
@@ -111,6 +154,13 @@ CreatorVrmAuthority::CreatorVrmAuthority(const std::vector<ObjectSurface> &objec
 }
 nlohmann::json CreatorVrmAuthority::refit(const nlohmann::json &source,
     const ImportedAsset &asset,const std::function<bool()> &cancel) const {
+  // The shared placement is emitted around the rig and mesh. Bone-local
+  // offsets stay in the certified creator frame. Nonlinear spring refitting
+  // certifies spherical bounds in that frame and needs a positive similarity
+  // to carry the bounds through to the consumer's spring solver.
+  if (nonlinear_physics_placement_ &&
+      has_spring_geometry(source.at("secondaryAnimation")))
+    fail("nonlinear creator spring refitting requires positive similarity placement");
   auto result=source;
   std::map<uint32_t,Vec3> current;
   // Native source basis is the creator's proper Y half-turn. Export restores

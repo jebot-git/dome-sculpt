@@ -7,6 +7,7 @@ namespace dome::detail {
 class CreatorVrmAuthority {
   creator_detail::CreatorShapeExport shape_;
   std::vector<uint32_t> nodes_;
+  bool nonlinear_physics_placement_ = false;
 public:
   CreatorVrmAuthority(const std::vector<ObjectSurface> &, const CreatorAppearance &,
       const std::function<bool()> &);

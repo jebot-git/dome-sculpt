@@ -15,6 +15,7 @@ public:
   CreatedHumanoid reference(const std::function<bool()> &cancelled = {}) const;
   const Skeleton &skeleton() const;
   std::vector<uint32_t> joint_nodes() const;
+  bool has_uniform_shape() const;
   float scale() const;
   float sphere_radius(Vec3 original_center, float original_radius,
       const std::function<bool()> &cancelled = {}) const;
