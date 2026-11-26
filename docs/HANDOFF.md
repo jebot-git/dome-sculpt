@@ -843,7 +843,9 @@ UV grid without published chart edges at the start of the fixture's edit.
 Fixture `25a29897` waits for visible chart edges and an enabled Apply tile.
 The focused Arc ASan/UBSan replay then changes the saved UVs while
 preserving the source sculpt and paint hashes. The full software Release
-replay passes all 153 checks. The full Arc sanitizer replay is underway.
+and Arc ASan/UBSan replays both pass all 153 checks. The Arc UV fixture
+observes the enabled panel after 23 rendered-wait steps. Forty application
+processes witness the Arc render node during the full replay.
 
 Main `c352cb72` adds cooperative cancellation inside connected chart growth.
 A regression using the actual starter sculpt cancels before its first
@@ -860,8 +862,13 @@ captured native Bake. At 2048 pixels the independent strict Save/reopen
 phase passes with the same byte identity. The isolated strict worker writes
 the identical ordered Save and verifies the accepted and undone native
 states. The combined Redo/preview/equality endpoint fails within the time
-budget. A diagnostic replay checks Redo, preview and held native state
-individually within the original limits.
+budget. Diagnostic `d257ea07` confirms Redo returns success and restores
+the exact native state. The mesh publication exceeds the existing
+10-second wait and the document reports an empty error during the wait.
+A separate native 2048-pixel Open and Clear Bake/Undo/Redo control shows
+that the restored baked preview can publish in 15.55 seconds under
+ASan/UBSan. Its extended observation measures latency independently of
+the original, unchanged history gate.
 
 The broad combined Release run found two VRM1 fault suites expecting the
 pre-refactor diagnostic for a foreign retained primitive. Candidate
@@ -871,6 +878,39 @@ Release run finishes with 1,358 passes and those two failures. Both fixed
 suites pass their full Release and ASan/UBSan reruns, with 2,664 Normal and
 2,736 Shift checks in each profile.
 [Validation receipt](validation/atlas-worker-and-history-20261126.json)
+
+### Baked preview work and combined build
+
+Main's channel decoder `88f95028` reads only the selected baked plane and
+uses the same sRGB conversion for byte samples. It keeps the original
+sampler interpolation for source textures. The combined counterpart
+`ff06dfb8` reproduces all ten 2048-pixel preview planes byte for byte
+in Release and ASan/UBSan. The Release preview uses 0.983 seconds of CPU
+versus 1.239 on its parent. The sanitizer pair uses 6.749 and 6.613 seconds
+respectively. The existing strict history wait is being exercised on this
+build. The main Release application links with the canonical DomeD toolkit
+and passes five native bake, source UV and cache cases. The first combined
+source UV test used a read-only scratch directory. The same binaries with
+a writable scratch directory and both VRoid inputs pass in both profiles.
+A separate candidate `8a4d7d35` extends the existing size-bounded
+composite cache to authenticated HDR previews so editable history can
+reuse them when the renderer releases its previous frame. Native Release
+and ASan/UBSan cases pass for eviction, exact geometry ownership, explicit
+physical emission keys and cancellation. The full-size worker is running.
+The first full-size Clear Bake/Undo diagnostic with the cache still takes
+15.49 seconds to restore the baked preview. A separate ownership probe
+measures the cache charges and eviction across the same history.
+
+Combined candidate `3cb2fe81` keeps the `ccbbe020` source baseline and adds
+both atlas patches, the rendered XR readiness fixtures, and the two VRM1
+diagnostic oracles. Six native cases pass in both profiles. Its full
+software Release replay passes 153 checks. The matching full Arc replay
+passes 146 checks including UV, then reaches the file workflow's 40-second
+deadline after all 45 frames. The isolated replay reaches the same deadline.
+Stacks show the ordered final Save waiting for the export worker's active
+xatlas chart growth. The `b3b583b8` scheduler candidate
+passes that full Arc replay through its existing background file checks.
+[Preview and integration evidence](validation/hdr-preview-composite-20261126.json)
 
 ## Source and integration boundary
 

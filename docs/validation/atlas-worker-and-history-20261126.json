@@ -572,12 +572,33 @@
       "app_source": "b3b583b8d297a58c2a22fd43d0020525b2896b7b",
       "invocation": "410c1e9d6fd6471e8652ea05429ec47b",
       "profile": "arc-asan",
-      "terminal": false,
-      "phase": "run full native OpenXR workflow",
-      "elapsed_seconds": 11.67,
+      "terminal": true,
+      "phase": "complete",
+      "elapsed_seconds": 263.46,
       "app_sha256": "929a006e59362f11480e550fd0a07e662e6332bec3f35219075389f09ca711aa",
       "runtime_sha256": "5d7be0867bad69d0e7d19c8ef73637f2de4ff20c485469b55c60593e7cb800bc",
-      "runner_sha256": "60869bf047e814c1b3aec9e5281bde4f62b466883ab1c95af5295459e98849cb"
+      "runner_sha256": "60869bf047e814c1b3aec9e5281bde4f62b466883ab1c95af5295459e98849cb",
+      "exit": 0,
+      "loader_exit": 0,
+      "checks": 153,
+      "report_complete": true,
+      "error": null,
+      "voxel": {
+        "exact_native_bytes": true,
+        "voxel_menu_pixels": 10141,
+        "voxel_menu_reopens": 1,
+        "voxel_menu_seen": true,
+        "voxel_open_pixels": 172,
+        "voxel_undo_pixels": 131,
+        "voxel_undo_seen": true,
+        "voxel_undo_wait_frames": 74
+      },
+      "uv": {
+        "uv_atlas_apply_accent": 207,
+        "uv_atlas_ready": true,
+        "uv_atlas_visible_pixels": 4997,
+        "uv_atlas_wait_frames": 23
+      }
     },
     "software-release": {
       "candidate": "25a29897b4256881b6a07125d29995c11f441f00",
@@ -891,6 +912,6 @@
   },
   "archive": {
     "path": "docs/validation/atlas-worker-and-history-20261126.tar.gz",
-    "sha256": "7a588de0bff5fa21f59c87087fedd476588df8cf0e3b19deefbe48fa0ebf4d60"
+    "sha256": "58e5d0761f74cb1970cdb894f42dac6609253cae013d34b432c0d114303adb36"
   }
 }
