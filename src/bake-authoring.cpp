@@ -192,8 +192,10 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   auto source = scene.object(source_id);
   if(target.texture_sets && !detail::bake_target_supported(target))
     throw std::logic_error("The selected target field needs its source-retaining Bake adapter");
-  if(source.texture_sets && !detail::bake_source_supported(source))
-    throw std::logic_error("The source texture collection needs its retained material Bake adapter");
+  const bool source_affine=scene.has_affine_placement(source_id);
+  if((source.texture_sets||source_affine) && !detail::bake_source_supported(source,source_affine))
+    throw std::logic_error(source.texture_sets ? "The source texture collection needs its retained material Bake adapter" :
+        "This affine Bake source needs its original material and normal frame adapter");
   std::optional<TextureSetView> recipient;
   if(target.texture_sets){
     if(settings.prepare_colors || settings.prepare_normals)
@@ -324,7 +326,7 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
     for(size_t i=12;i<15;++i)matrix[i]=-world[i];
     metric_from_world=AffineTransform(matrix);
   }
-  const auto placement=source.texture_sets&&scene.has_affine_placement(source.id)
+  const auto placement=source_affine
     ? std::optional(detail::placement_frame(scene,source.id)) : std::nullopt;
   const auto relative=placement?target_inverse:
       ob::compose(target_inverse,scene.world_transform(source.id));

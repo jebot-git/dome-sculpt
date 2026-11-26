@@ -38,16 +38,17 @@ void Document::cancel_background_work(){
 }
 bool Document::bake_source_eligible_locked(uint64_t id) const {
   const auto at=std::find_if(scene_.objects().begin(),scene_.objects().end(),[id](const auto &o){return o.id==id;});
-  return at!=scene_.objects().end()&&id!=scene_.active().id&&(at->texture_sets||!scene_.has_affine_placement(id))&&
-    detail::bake_source_supported(*at)&&(at->mesh_active?at->painted&&!at->painted->mesh().indices.empty():!at->volume->voxels().empty());
+  return at!=scene_.objects().end()&&id!=scene_.active().id&&
+    detail::bake_source_supported(*at,scene_.has_affine_placement(id))&&
+    (at->mesh_active?at->painted&&!at->painted->mesh().indices.empty():!at->volume->voxels().empty());
 }
 std::vector<uint64_t> Document::bake_sources_locked() const {
   std::vector<uint64_t> ids;
   const auto &target=scene_.active();
   if(!detail::bake_target_supported(target))return ids;
   const auto recipe=target.texture_sets?active_texture_set(target).bake_recipe:target.bake_recipe;
-  for(const auto &o:scene_.objects())if(o.id!=scene_.active().id && (o.texture_sets||!scene_.has_affine_placement(o.id)) &&
-      detail::bake_source_supported(o) &&
+  for(const auto &o:scene_.objects())if(o.id!=target.id &&
+      detail::bake_source_supported(o,scene_.has_affine_placement(o.id)) &&
       (o.mesh_active ? o.painted && !o.painted->mesh().indices.empty() : !o.volume->voxels().empty()))ids.push_back(o.id);
   if(state_.bake_source==unavailable_bake_object||
       (recipe&&recipe->source.object==unavailable_bake_object))

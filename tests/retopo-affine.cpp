@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
 #include "dome/source-placement.hpp"
+#include <algorithm>
 #include <nlohmann/json.hpp>
 #include <filesystem>
 #include <iostream>
@@ -57,10 +58,15 @@ Scene source(const Matrix &m, bool posed) {
   mesh.normals.assign(4,normalized(Vec3{-.2f,-.1f,1}));
   mesh.uv={{{0,0}},{{1,0}},{{1,1}},{{0,1}}};mesh.indices={0,1,2,0,2,3};
   Scene s;auto &o=s.active();o.name="Retopo source — původní";o.mesh_active=true;
+  o.material.color={.42f,.05f,.05f,1};
   o.painted=std::make_shared<PaintedMesh>(mesh,64);
   o.painted->begin_stroke();Brush b;b.radius=.18f;b.from=b.to={0,0,0};b.normal=mesh.normals.front();
   PaintSettings paint;paint.color={.12f,.6f,.3f,.8f};o.painted->stamp(b,paint);
   check(o.painted->end_stroke(),"Fixture has genuine sparse paint");
+  o.painted->begin_stroke();paint.channel=PaintChannel::Emission;
+  paint.emission_units=PaintEmissionUnits::Physical;paint.emission={4,.125f,.05f};
+  o.painted->stamp(b,paint);
+  check(o.painted->end_stroke(),"Fixture has a physical emission stroke");
   DeformationState d(mesh);d.skeleton=Skeleton{{{"root",-1,{},.2f}}};
   d.skin=SkinWeights{};d.skin->vertices.assign(4,{{0,1}});
   d.morphs=MorphSet(mesh);auto target=mesh.positions;
@@ -78,6 +84,37 @@ void ready(Document &d) {
 void place(Document &d, Vec3 p) {
   check(d.begin_desktop(),"Actual desktop gesture owns retopo placement");
   Brush b;b.radius=.01f;b.from=b.to=p;d.stamp_desktop(b);d.end_desktop();ready(d);
+}
+void bake_patch(Document &doc, uint64_t source, const std::filesystem::path &path) {
+  const auto before=doc.copy_scene().encode();
+  const auto sources=doc.frame().state->bake_sources;
+  check(std::find(sources.begin(),sources.end(),source)!=sources.end(),
+        "The Bake chooser includes the original hidden affine mesh");
+  ObjectBakeSettings settings;settings.front_mm=2;settings.back_mm=2;
+  settings.ao_samples=0;settings.padding=0;
+  doc.bake_from_object(source,settings);
+  doc.save_async(path).get();
+  check(doc.wait_asset(),"Bake and ordered Save finish");
+  if(!doc.frame().state->error.empty())throw std::runtime_error(doc.frame().state->error);
+  const auto baked_scene=doc.copy_scene().encode();
+  const auto reloaded=Scene::load(path);
+  const auto baked=reloaded.active().painted->baked();
+  check(baked&&baked->emission_field&&baked->maps.emission.rgba.empty(),
+        "The patch keeps physical emission as FLOAT beside its baked color and normals");
+  size_t green=0,red=0,hdr=0;
+  for(size_t texel=0;texel<baked->coverage.size();++texel){
+    if(baked->coverage[texel]!=255)continue;
+    const auto *rgba=baked->maps.color.rgba.data()+texel*4;
+    green+=rgba[1]>rgba[0]+16;
+    red+=rgba[0]>rgba[1]+16;
+    hdr+=baked->emission_field->values()[texel].absolute[0]>2;
+  }
+  check(green>1000&&red>1000&&hdr>1000,
+        "World-metric projection reaches both sparse painted detail and the unpainted base");
+  check(baked_scene.at("objects").at(0)==before.at("objects").at(0)&&reloaded.encode()==baked_scene,
+        "Bake and reopen preserve the hidden donor, source pose and all paint layers exactly");
+  check(doc.undo()&&doc.copy_scene().encode()==before&&doc.redo()&&doc.copy_scene().encode()==baked_scene,
+        "Undo and Redo affect only the accepted patch Bake");
 }
 void topology_transform() {
   RetopoMesh t;std::array<TopologyID,4> v;
@@ -145,6 +182,7 @@ int main(int argc,char **argv)try {
     for(auto &[id,p]:accepted.active().retopology->topology.vertices()){(void)id;check(w.view().source->closest(p.position).distance<2e-6f,"Published topology lies on independently checked evaluated source");}
     check(d.undo()&&d.copy_scene().encode()==original,"One global Undo removes the entire accepted patch");check(d.redo()&&d.copy_scene().encode()==exact,"Global Redo restores complete accepted source and patch");
     d.begin_retopology();ready(d);check(d.frame().state->retopology->topology->encode()==topology,"Reopen uses retained source rather than atlas triangles");d.end_retopology(false);check(d.copy_scene().encode()==exact,"Reopened Cancel is exact");
+    if(mode==3&&posed)bake_patch(d,source_id,out/"reflected-posed-baked.dsculpt");
     d.begin_retopology();ready(d);place(d,world[0]);d.replace(s.snapshot());check(d.wait_retopology()&&!d.frame().state->retopology&&d.copy_scene().encode()==original,"Document replacement rejects any stale affine workspace publication");
   }
   std::cout<<"PASS "<<checks<<" affine manual-retopo checks\n";return 0;

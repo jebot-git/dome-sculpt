@@ -5,7 +5,7 @@
 
 namespace dome::detail {
 bool bake_target_supported(const SculptObject &);
-bool bake_source_supported(const SculptObject &);
+bool bake_source_supported(const SculptObject &, bool affine);
 bool texture_set_bake_present(const TextureSetView &) noexcept;
 void clear_texture_set_bake(Scene &,const TextureSetLimits &);
 

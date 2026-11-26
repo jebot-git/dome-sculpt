@@ -47,8 +47,16 @@ bool bake_target_supported(const SculptObject &object) {
  return plain(field.painted.get(),field.appearance.get(),field.material_bindings.get());
 }
 
-bool bake_source_supported(const SculptObject &object) {
- if(!object.texture_sets)return cut_color_supported(object);
+bool bake_source_supported(const SculptObject &object, bool affine) {
+ if(!object.texture_sets){
+  if(!cut_color_supported(object))return false;
+  if(!affine)return true;
+  // Native geometry and paint use the evaluated mesh and its Mikk corners.
+  // Original and prepared fields with their own frames need a separate adapter.
+  if(object.polygon&&object.polygon->active&&object.polygon->colors)return false;
+  if(object.mesh_active)return plain(object.painted.get(),object.appearance.get(),object.material_bindings.get());
+  return !object.appearance&&!object.material_bindings;
+ }
  if(!object.mesh_active||!object.painted||(object.polygon&&object.polygon->colors))return false;
  const auto eligible=[&](const auto &field){
   if(field.source)return !object.deformation&&field.source->source_preview()&&

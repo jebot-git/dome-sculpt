@@ -47,7 +47,9 @@ def run(mode,frames):
     check(rc==0,'Actual loader retopology '+mode+' exits cleanly without suppression')
     check(path.is_file(),'Actual '+mode+' writes its requested native output')
     return scene(path),json.loads(report.read_text())
-committed,_=run('committed',14)
+# Allow the three component edits, their trigger releases, and Apply to finish
+# before saving the committed comparison scene.
+committed,_=run('committed',22)
 source=committed['objects'][0]
 check(source['material']['color'][2]>.7 and source['material']['color'][0]<.1,
       'Real controller commits its material change before the retopo draft')

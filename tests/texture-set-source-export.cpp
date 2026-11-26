@@ -302,7 +302,7 @@ void retained_bake_source(bool prepared,bool physical,bool affine=false,bool ref
  check(stop&&cancelled.encode()==original,"Retained donor cancellation leaves the complete Scene unchanged");
 }
 
-void affine_plain_bake_source(){
+void affine_plain_bake_source(bool texture_sets){
  Mesh mesh;
  mesh.positions={{-.5f,-.5f,0},{.5f,-.5f,0},{.5f,.5f,0},{-.5f,.5f,0}};
  mesh.normals.assign(4,{0,0,1});
@@ -314,10 +314,14 @@ void affine_plain_bake_source(){
  fields[0].resolution=fields[1].resolution=64;
  fields[0].material.name="First plain material";fields[1].material.name="Second plain material";
  const std::array<TextureSetId,2> membership{0,1};
- initialize_texture_sets(scene,donor,mesh,fields,membership);
+ if(texture_sets)initialize_texture_sets(scene,donor,mesh,fields,membership);
+ else{
+  scene.active().mesh_active=true;
+  scene.active().painted=std::make_shared<PaintedMesh>(mesh,64);
+ }
  const std::array<uint8_t,4> encoded{176,89,236,255};
  for(TextureSetId id:{0u,1u}) {
-  edit_texture_set(scene,donor,id,[id,encoded](PaintedMesh &paint,Material &){
+  const auto install=[id,encoded](PaintedMesh &paint,Material &){
    BakedTextures detail;
    detail.maps.color=solid(id?std::array<uint8_t,4>{10,180,20,255}:std::array<uint8_t,4>{180,10,20,255});
    detail.maps.metal_rough=solid({255,128,0,255});
@@ -326,7 +330,12 @@ void affine_plain_bake_source(){
    detail.coverage.assign(64*64,255);
    paint.install_bake(std::move(detail));
    return true;
-  });
+  };
+  if(texture_sets)edit_texture_set(scene,donor,id,install);
+  else{
+   install(*scene.active().painted,scene.active().material);
+   break;
+  }
  }
  auto transform=AffineTransform{}.matrix();
  transform[0]=-1.2;transform[1]=.3;transform[2]=.07;
@@ -343,7 +352,7 @@ void affine_plain_bake_source(){
  scene.active().painted=std::make_shared<PaintedMesh>(mesh,64);
  const auto before=scene.encode();
  Document doc;doc.replace(scene);ready(doc);
- check(doc.frame().state->can_bake,"The reflected plain texture-set donor is available");
+ check(doc.frame().state->can_bake,"The reflected plain donor is available");
  ObjectBakeSettings settings;settings.padding=0;settings.ao_samples=0;
  doc.bake_from_object(donor,settings);ready(doc);
  const auto result=doc.copy_scene();
@@ -356,7 +365,8 @@ void affine_plain_bake_source(){
  const auto target_corners=tangent_corners(mesh);
  for(size_t triangle=0;triangle<2;++triangle) {
   const size_t x=triangle?16:48,y=triangle?48:16,at=(y*64+x)*4;
-  check(bake->maps.color.rgba[at+triangle]>bake->maps.color.rgba[at+1-triangle],
+  const auto channel=texture_sets?triangle:0;
+  check(bake->maps.color.rgba[at+channel]>bake->maps.color.rgba[at+1-channel],
         "Reflected placement keeps the actual per-triangle material");
   const auto mapped=tangent_frame(mesh,target_corners,triangle,{.25f,.5f,.25f}).to_world({
       bake->maps.normal.rgba[at]/255.f*2-1,bake->maps.normal.rgba[at+1]/255.f*2-1,
@@ -836,7 +846,7 @@ int main(int argc,char **argv)try {
   retained_bake_source(false,false);retained_bake_source(true,false);retained_bake_source(false,true);
   retained_bake_source(true,false,true);retained_bake_source(true,false,true,true);
   retained_bake_source(false,true,true,true);
-  affine_plain_bake_source();
+  affine_plain_bake_source(false);affine_plain_bake_source(true);
   affine_bake_target(false,false,false);affine_bake_target(true,false,true);
   affine_bake_target(false,true,true);
   retained_bake_xr_fixture("mixed-before.dsculpt","mixed-baked.dsculpt");
