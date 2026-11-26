@@ -2520,7 +2520,7 @@ void Document::finish_control_locked(bool accept) {
     if(accept){
       if(c.parameter==VrParameter::BakeDistances){state_.bake_settings.front_mm=c.value[0];state_.bake_settings.back_mm=c.value[1];state_.bake_settings.ao_distance_mm=c.value[2];}
       else if(c.parameter==VrParameter::BakeColors){state_.bake_settings.prepare_colors=c.value[0]>=.5f;state_.bake_settings.color_error=c.value[1];state_.bake_settings.prepare_normals=c.value[2]>=.5f;state_.bake_settings.normal_error=c.value[3]*.25f;}
-      else if(c.parameter==VrParameter::BakeProjection){state_.bake_settings.allow_partial=c.value[0]>=.5f;state_.bake_settings.allow_backfaces=c.value[1]>=.5f;}
+      else if(c.parameter==VrParameter::BakeProjection){state_.bake_settings.allow_partial=c.value[0]>=.5f;state_.bake_settings.allow_backfaces=c.value[1]>=.5f;state_.bake_settings.corresponding_topology=c.value[2]>=.5f;}
       else {state_.bake_settings.ao_samples=uint32_t(std::lround(c.value[0]*256));state_.bake_settings.padding=uint32_t(std::lround(c.value[1]*64));}
     }
     control_before_.reset();control_changed_=false;state_.controls={};return;
@@ -2747,8 +2747,8 @@ void Document::control_event_locked(VrControlEvent event) {
       c.title="Color / normal preparation and maximum errors";c.components=4;
       c.value={state_.bake_settings.prepare_colors?1.f:0.f,state_.bake_settings.color_error,state_.bake_settings.prepare_normals?1.f:0.f,state_.bake_settings.normal_error*4};break;
     case VrParameter::BakeProjection:
-      c.title="Projection: partial / backfaces";c.components=2;
-      c.value={state_.bake_settings.allow_partial?1.f:0.f,state_.bake_settings.allow_backfaces?1.f:0.f,0,0};break;
+      c.title="Projection policy";c.components=3;
+      c.value={state_.bake_settings.allow_partial?1.f:0.f,state_.bake_settings.allow_backfaces?1.f:0.f,state_.bake_settings.corresponding_topology?1.f:0.f,0};break;
     case VrParameter::BakeQuality:
       c.title="AO samples / seam padding";c.components=2;
       c.value={state_.bake_settings.ao_samples/256.f,state_.bake_settings.padding/64.f,0,0};break;

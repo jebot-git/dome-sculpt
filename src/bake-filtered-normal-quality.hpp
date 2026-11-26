@@ -107,7 +107,11 @@ inline void verify_filtered_normal_quality(const Mesh &low,const BakeSource &hig
           const auto difference=normal_bake_math::cross(actual,wanted);
           const double angle=std::atan2(std::sqrt(normal_bake_math::dot(difference,difference)),std::clamp(normal_bake_math::dot(actual,wanted),-1.,1.));
           if(!std::isfinite(angle)||angle>maximum_angle)
-            throw std::invalid_argument("Baked normal detail exceeds the selected error between texture samples at "+std::to_string(r)+" px; choose a larger target paint resolution and Bake again");
+            throw std::invalid_argument("Baked normal detail exceeds the selected error between texture samples at "+std::to_string(r)+
+                " px; choose a larger target paint resolution or adjust the projection. Target triangle "+
+                std::to_string(triangle)+", source triangle "+std::to_string(hit->triangle)+
+                (role?" (MToon): ":" (PBR): ")+std::to_string(angle*57.29577951308232)+
+                " degrees, limit "+std::to_string(maximum_angle*57.29577951308232)+" degrees");
         }
         ++tested;
       }

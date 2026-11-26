@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
+#include "dome/baked-emission.hpp"
 #include <nlohmann/json.hpp>
 #include <iostream>
 #include <unistd.h>
@@ -19,6 +20,11 @@ int main(int argc,char**argv)try {
  Fixture f;ObjectBakeSettings options;options.front_mm=options.back_mm=100;options.ao_samples=0;options.padding=0;
  auto first=bake_object(f.scene,f.full,options);check(first.projected==4096&&!first.missed,"Default strict native bake projects the complete source");
  if(argc==3&&std::string(argv[1])=="--ui-fixture"){f.scene.erase(f.full);f.scene.erase(f.miss);f.scene.erase(f.back);f.scene.object(f.half).painted=std::make_shared<PaintedMesh>(quad(-.2f,0,.02f),64);f.scene.select(f.target);f.scene.save(argv[2]);return 0;}
+ if(argc==3&&std::string(argv[1])=="--ui-topology-fixture"){
+  f.scene.erase(f.full);f.scene.erase(f.miss);f.scene.erase(f.back);
+  f.scene.object(f.half).painted=std::make_shared<PaintedMesh>(quad(-.2f,.2f,.02f),64);
+  f.scene.select(f.target);f.scene.save(argv[2]);return 0;
+ }
 
  auto before=f.scene.encode();auto original=f.scene.active().painted->baked();auto layers=f.scene.active().painted->encode()["layers"];
  check(refuses([&]{bake_object(f.scene,f.half,options);})&&f.scene.encode()==before,"Strict projection still refuses partial hits without changing any target or source");
@@ -30,12 +36,22 @@ int main(int argc,char**argv)try {
  auto endpoint=f.scene.encode();check(refuses([&]{bake_object(f.scene,f.miss,options);})&&f.scene.encode()==endpoint,"A completely missed source refuses explicitly instead of installing an empty or fake-success bake");
  options.allow_partial=false;check(refuses([&]{bake_object(f.scene,f.back,options);})&&f.scene.encode()==endpoint,"Backfaces remain refused by default");
  options.allow_backfaces=true;auto reversed=bake_object(f.scene,f.back,options);check(reversed.projected==4096&&!reversed.missed,"Explicit backface option projects the requested reversed surface");
+ Fixture physical;
+ auto matching=options;
+ matching.allow_backfaces=false;
+ matching.corresponding_topology=true;
+ physical.scene.object(physical.full).material.emissive={8,.5f,0};
+ const auto copied=bake_object(physical.scene,physical.full,matching);
+ const auto float_field=physical.scene.active().painted->baked()->emission_field;
+ check(float_field&&copied.projected==4096&&copied.rays==0&&
+       float_field->sample(.37f,.62f).resolve({},1)==std::array<float,3>{8,.5f,0},
+       "Corresponding source corners retain physical emission through the checked filtered route");
  Fixture native;options={};options.front_mm=options.back_mm=100;options.ao_samples=0;options.padding=0;bake_object(native.scene,native.full,options);Document d;d.replace(native.scene);ready(d);auto baseline=d.copy_scene().encode();
  d.bake_from_object(native.half,options);ready(d);check(!d.frame().state->error.empty()&&!d.frame().state->can_undo&&d.copy_scene().encode()==baseline,"Document strict refusal preserves history and complete source/target authority");
  options.allow_partial=true;d.bake_from_object(native.half,options);ready(d);check(d.frame().state->error.empty()&&d.frame().state->message.find("2048 missed")!=std::string::npos,"Partial Document bake publishes normal status with visible miss counts");auto after=d.copy_scene().encode();
  check(d.undo()&&d.copy_scene().encode()==baseline&&!d.frame().state->can_undo&&d.redo()&&d.copy_scene().encode()==after,"Accepted partial bake is exactly one native Undo/Redo transaction");ready(d);
- Document xr;xr.replace(native.scene);ready(xr);auto untouched_scene=xr.copy_scene().encode();Driver hand(xr);hand.open();check(xr.frame().state->controls.parameter==VrParameter::BakeProjection&&xr.frame().state->controls.components==2,"Controller baking page exposes independent partial and backface policy rows");
- hand.point(520,240);hand.point(520,320);hand.confirm(false);check(!xr.frame().state->bake_settings.allow_partial&&!xr.frame().state->bake_settings.allow_backfaces&&xr.copy_scene().encode()==untouched_scene,"XR Cancel discards both projection choices without changing the document");
+ Document xr;xr.replace(native.scene);ready(xr);auto untouched_scene=xr.copy_scene().encode();Driver hand(xr);hand.open();check(xr.frame().state->controls.parameter==VrParameter::BakeProjection&&xr.frame().state->controls.components==3,"Controller baking page exposes independent partial, backface and source projection policy rows");
+ hand.point(520,240);hand.point(520,320);hand.point(520,400);hand.confirm(false);check(!xr.frame().state->bake_settings.allow_partial&&!xr.frame().state->bake_settings.allow_backfaces&&!xr.frame().state->bake_settings.corresponding_topology&&xr.copy_scene().encode()==untouched_scene,"XR Cancel discards all three projection choices without changing the document");
  hand.sector(11);hand.point(520,240);hand.point(520,320);hand.confirm(true);check(xr.frame().state->bake_settings.allow_partial&&xr.frame().state->bake_settings.allow_backfaces&&!xr.frame().state->dirty&&!xr.frame().state->can_undo,"XR confirmation changes only explicit bake configuration");
  hand.sector(11);hand.point(100,240);hand.f.focused=false;hand.send();check(xr.frame().state->controls.parameter==VrParameter::None&&xr.frame().state->bake_settings.allow_partial&&xr.copy_scene().encode()==untouched_scene,"OpenXR-style focus loss discards unconfirmed policy while retaining prior choices and source");
  std::cout<<checks<<" native bake projection policy checks passed\n";return 0;

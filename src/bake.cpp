@@ -312,6 +312,9 @@ void validate(const Mesh &low,const BakeSource &source,const BakeOptions &o,
     }
   }
   validate_source_materials(source,source_normals);
+  if(o.corresponding_topology&&(o.source_triangles.empty()||!o.cage_positions.empty()||
+     o.source_triangles.size()!=source.mesh.indices.size()/3))
+    throw std::invalid_argument("Corresponding topology requires an explicit complete ordered source map and no cage");
   if (!o.source_triangles.empty() || !o.source_corner_barycentrics.empty()) {
     if (o.source_triangles.size()!=low.indices.size()/3 || o.source_corner_barycentrics.size()!=low.indices.size())
       throw std::invalid_argument("Exact bake provenance count mismatch");
@@ -319,12 +322,22 @@ void validate(const Mesh &low,const BakeSource &source,const BakeOptions &o,
       cancel(o);
       auto source_triangle=o.source_triangles[t];
       if(source_triangle>=source.mesh.indices.size()/3)throw std::out_of_range("Exact bake provenance source triangle is invalid");
+      if(o.corresponding_topology&&source_triangle!=t)
+        throw std::invalid_argument("Corresponding topology changed the source triangle order");
       for(int k=0;k<3;++k){
         auto b=o.source_corner_barycentrics[t*3+k];float sum=0;
         for(auto value:b){if(!std::isfinite(value)||value<-.00001f||value>1.00001f)throw std::invalid_argument("Invalid exact bake barycentrics");sum+=value;}
         if(std::abs(sum-1)>1e-5f)throw std::invalid_argument("Exact bake barycentrics are not normalized");
         auto expected=interpolate(source.mesh,source_triangle,b,false),actual=low.positions[low.indices[t*3+k]];
-        if(length(expected-actual)>1e-5f+1e-6f*length(actual))throw std::invalid_argument("Exact bake provenance does not match target geometry");
+        const auto delta=expected-actual;
+        const float tolerance=1e-5f+1e-6f*length(actual);
+        if(o.corresponding_topology){
+          std::array<float,3> identity{};identity[k]=1;
+          const float direction=dot(delta,normalized(low.normals[low.indices[t*3+k]]));
+          if(b!=identity || direction>o.front_distance+tolerance || direction<-o.back_distance-tolerance ||
+             length(delta)>std::max(o.front_distance,o.back_distance)+tolerance)
+            throw std::invalid_argument("Corresponding topology source corner exceeds its identity or projection bounds");
+        }else if(length(delta)>tolerance)throw std::invalid_argument("Exact bake provenance does not match target geometry");
       }
     }
   }

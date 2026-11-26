@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
 #include "dome/bake-distance.hpp"
+#include "dome/bake-recipe.hpp"
 #include <nlohmann/json.hpp>
 #include <iostream>
 #include <chrono>
@@ -48,8 +49,38 @@ int main(int argc,char**argv)try{
   check(std::abs(doc.frame().state->bake_settings.front_mm-20)<.01f,"Joystick confirmation retains the chosen world-millimetre bounds");
   driver.sector(2);check(doc.frame().state->controls.components==2,"AO sampling and seam padding expose independent controller rows");driver.value(0);driver.value(.125f,1);driver.confirm();
   check(doc.frame().state->bake_settings.ao_samples==0 && doc.frame().state->bake_settings.padding==8 && !doc.frame().state->dirty,"Quality confirmation selects integer AO samples and padding without dirtying the scene");
+  driver.sector(11);
+  check(doc.frame().state->controls.parameter==VrParameter::BakeProjection&&doc.frame().state->controls.components==3,
+        "XR projection policy exposes a separate corresponding topology setting");
+  driver.value(1,2);driver.confirm();
+  check(doc.frame().state->bake_settings.corresponding_topology&&doc.copy_scene().encode()==before,
+        "Confirming corresponding topology stages the setting without altering the meshes or history");
   driver.sector(3);check(doc.wait_asset() && doc.frame().state->error.empty(),"Controller Bake runs the guarded native worker");
+  const auto recipe=doc.copy_scene().active().bake_recipe;
+  check(recipe&&recipe->settings.corresponding_topology&&Scene::decode(doc.copy_scene().encode()).active().bake_recipe->settings.corresponding_topology,
+        "The actual XR bake persists the selected topology policy through the native recipe");
   auto baked=doc.copy_scene().encode();check(doc.copy_scene().active().painted->baked() && bake_readonly_sources(doc.copy_scene())==readonly_sources && doc.frame().state->can_clear_bake,"Accepted baking retains both complete hidden sources and enables Clear");
+  auto mismatched=scene;
+  const auto src=mismatched.objects()[1].id;
+  auto mesh=mismatched.object(src).painted->mesh();
+  std::rotate(mesh.indices.begin(),mesh.indices.begin()+3,mesh.indices.end());
+  mismatched.object(src).painted=std::make_shared<PaintedMesh>(mesh,64);
+  const auto mismatched_before=mismatched.encode();
+  bool refused=false;
+  try{bake_object(mismatched,src,recipe->settings);}catch(const std::invalid_argument &e){
+    refused=std::string_view(e.what()).find("matching ordered vertices and triangles")!=std::string_view::npos;
+  }
+  check(refused&&mismatched.encode()==mismatched_before,
+        "The same triangle count with different order refuses without replacing the target or source");
+  auto distant=scene;
+  distant.object(src).transform.position.z=1;
+  const auto distant_before=distant.encode();
+  refused=false;
+  try{bake_object(distant,src,recipe->settings);}catch(const std::invalid_argument &e){
+    refused=std::string_view(e.what()).find("projection bounds")!=std::string_view::npos;
+  }
+  check(refused&&distant.encode()==distant_before,
+        "Matching triangles outside the world-space bounds refuse before changing the scene");
   check(doc.undo() && doc.copy_scene().encode()==before && doc.redo() && doc.copy_scene().encode()==baked,"Baking is one exact global Undo/Redo transaction");
   doc.clear_bake();check(doc.wait_asset() && !doc.copy_scene().active().painted->baked() && doc.undo() && doc.copy_scene().encode()==baked,"Explicit Clear removes only the baked base and is exactly undoable");
   auto confirmed_front=doc.frame().state->bake_settings.front_mm;

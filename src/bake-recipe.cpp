@@ -30,6 +30,8 @@ void ObjectBakeRecipe::validate()const{
   reference(source);if(cage)reference(*cage);
   if(settings.cage_object!=(cage?cage->object:0))
     throw std::invalid_argument("Bake recipe lost its explicit cage binding");
+  if(settings.corresponding_topology&&cage)
+    throw std::invalid_argument("A corresponding topology bake does not use a cage");
   for(float mm:{settings.front_mm,settings.back_mm,settings.ao_distance_mm})
     if(!std::isfinite(mm)||mm<0||mm>100'000)
       throw std::invalid_argument("Invalid bake recipe distance");
@@ -40,7 +42,7 @@ void ObjectBakeRecipe::validate()const{
 }
 nlohmann::json ObjectBakeRecipe::encode()const{
   validate();const auto &s=settings;
-  nlohmann::json out={{"version",1},{"source",encode_reference(source)},
+  nlohmann::json out={{"version",s.corresponding_topology?2:1},{"source",encode_reference(source)},
     {"cage",cage?nlohmann::json(encode_reference(*cage)):nlohmann::json(nullptr)},
     {"settings",{{"front_mm",s.front_mm},{"back_mm",s.back_mm},{"ao_distance_mm",s.ao_distance_mm},
       {"ao_samples",s.ao_samples},{"padding",s.padding},{"allow_partial",s.allow_partial},
@@ -49,15 +51,17 @@ nlohmann::json ObjectBakeRecipe::encode()const{
   // Omit policy0 so genuine legacy recipes reencode byte-equivalent JSON.
   if(s.normal_filter_quality)out["settings"]["normal_filter_quality"]=s.normal_filter_quality;
   if(s.emission_transport)out["settings"]["emission_transport"]=s.emission_transport;
+  if(s.corresponding_topology)out["settings"]["corresponding_topology"]=true;
   return out;
 }
 std::shared_ptr<const ObjectBakeRecipe> ObjectBakeRecipe::decode(const nlohmann::json &j){
-  if(!j.is_object()||j.size()!=4||!j.at("version").is_number_integer()||j.at("version")!=1)
+  if(!j.is_object()||j.size()!=4||!j.at("version").is_number_integer()||
+      (j.at("version")!=1&&j.at("version")!=2))
     throw std::invalid_argument("Invalid bake recipe record");
   auto result=std::make_shared<ObjectBakeRecipe>();result->source=decode_reference(j.at("source"));
   if(!j.at("cage").is_null())result->cage=decode_reference(j.at("cage"));
   const auto &v=j.at("settings");auto &s=result->settings;
-  if(!v.is_object()||v.size()!=11+size_t(v.contains("normal_filter_quality"))+size_t(v.contains("emission_transport")))throw std::invalid_argument("Incomplete bake recipe settings");
+  if(!v.is_object()||v.size()!=11+size_t(v.contains("normal_filter_quality"))+size_t(v.contains("emission_transport"))+size_t(v.contains("corresponding_topology")))throw std::invalid_argument("Incomplete bake recipe settings");
   auto real=[&](const char *key){if(!v.at(key).is_number())throw std::invalid_argument("Invalid bake recipe scalar");return v.at(key).get<float>();};
   auto flag=[&](const char *key){if(!v.at(key).is_boolean())throw std::invalid_argument("Invalid bake recipe flag");return v.at(key).get<bool>();};
   s.front_mm=real("front_mm");s.back_mm=real("back_mm");s.ao_distance_mm=real("ao_distance_mm");
@@ -69,6 +73,10 @@ std::shared_ptr<const ObjectBakeRecipe> ObjectBakeRecipe::decode(const nlohmann:
   s.prepare_normals=flag("prepare_normals");s.normal_error=real("normal_error");
   s.emission_transport=0;
   if(v.contains("emission_transport")){const auto policy=number(v.at("emission_transport"));if(policy!=1)throw std::invalid_argument("Unsupported saved emission transport policy");s.emission_transport=uint32_t(policy);}
+  if(v.contains("corresponding_topology")){
+    if(j.at("version")!=2||!flag("corresponding_topology"))throw std::invalid_argument("Invalid saved topology projection policy");
+    s.corresponding_topology=true;
+  }else if(j.at("version")==2)throw std::invalid_argument("Missing saved topology projection policy");
   s.normal_filter_quality=0;
   if(v.contains("normal_filter_quality")){
     const auto policy=number(v.at("normal_filter_quality"));

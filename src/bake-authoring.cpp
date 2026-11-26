@@ -181,13 +181,26 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
     };
   }else low=detail::retained_bake_basis(target,options);
   const auto &low_mesh=low?*low:target.painted->mesh();
+  if(settings.corresponding_topology){
+    const auto &rest=target.painted->mesh();
+    if(settings.cage_object||!source.mesh_active||high.mesh.indices!=rest.indices||
+       high.mesh.positions.size()!=rest.positions.size())
+      throw std::invalid_argument("Corresponding topology requires matching ordered vertices and triangles and no cage");
+    options.corresponding_topology=true;
+    for(size_t c=0;c<rest.indices.size();c+=3){
+      if(!(c%3072))check();
+      options.source_triangles.push_back(uint32_t(c/3));
+    }
+    options.source_corner_barycentrics.resize(rest.indices.size());
+    for(size_t c=0;c<rest.indices.size();++c){if(!(c%1024))check();options.source_corner_barycentrics[c][c%3]=1;}
+  }
   if(settings.cage_object)
     options.cage_positions=detail::object_bake_cage(scene,target.id,settings.cage_object,
         target.painted->mesh(),low_mesh,cancelled);
   const auto retained_uv=target.material_bindings?target.material_bindings->canonical_uv:nullptr;
   if(retained_uv&&progress)options.progress=[&](float value){progress(.1f+.4f*value);};
   std::shared_ptr<const detail::BakedEmissionDomain> emission_domain;
-  if(settings.emission_transport&&high.materials[0].resolved_emission&&detail::exact_emission_projection_directions(low_mesh,options)){
+  if(settings.emission_transport&&!options.corresponding_topology&&high.materials[0].resolved_emission&&detail::exact_emission_projection_directions(low_mesh,options)){
     try{emission_domain=detail::BakedEmissionDomain::capture(scene,source_id,target.painted->mesh_owner(),options.resolution,target_world,cancelled);}
     catch(const std::invalid_argument&){/* Uncertified correspondence keeps the independently checked raster route. */}
     if(emission_domain&&emission_domain->version()!=1&&target.painted->paint_sampling_domain())emission_domain.reset();

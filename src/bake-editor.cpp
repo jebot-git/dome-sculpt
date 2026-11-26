@@ -87,6 +87,8 @@ void edit_bake_dialog(Document &doc){
   for(size_t i=0;i<7;++i){auto &v=*sliders[i];v.type(FL_HOR_NICE_SLIDER);v.align(FL_ALIGN_LEFT);v.textfont(dx::font);v.textsize(dx::size);v.value_width(std::max(60,dx::size*6));v.logarithmic=i<3;v.fractional=i>=5;v.bounds(0,i<3||i>=5?1:i==3?256:64);v.step(i<3||i>=5?.001:1);v.physical(initial[i]);}
   Fl_Check_Button partial(20,y,width-56,row,"Allow partial projection");partial.value(settings.allow_partial);y+=row;
   Fl_Check_Button backfaces(20,y,width-56,row,"Allow backface projection");backfaces.value(settings.allow_backfaces);y+=row;
+  Fl_Check_Button correspondence(20,y,width-56,row,"Match ordered source triangles");correspondence.value(settings.corresponding_topology);y+=row;
+  correspondence.tooltip("Use corresponding triangles on two versions of the same mesh. Source displacement must fit the projection bounds.");
   Fl_Check_Button colors(20,y,width-56,row,"Prepare source colors");colors.value(settings.prepare_colors);y+=row;
   color_error.position(label,y);y+=row;
   Fl_Check_Button normals(20,y,width-56,row,"Author portable normal targets");normals.value(settings.prepare_normals);normals.tooltip("Authors portable normal and tangent targets. Pose and morph shading can differ from legacy dynamic shading; original source data is retained.");y+=row;
@@ -99,7 +101,7 @@ void edit_bake_dialog(Document &doc){
   Fl_Box status(16,y,width-48,row*2);status.align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE|FL_ALIGN_WRAP);y+=row*2;
   content.size(width-24,y);content.end();scroll.end();
   Fl_Button close(24,height-row*2+8,width/2-36,row,"Cancel"),bake(width/2+12,height-row*2+8,width/2-36,row,"Bake");
-  struct Run {Document *doc;Fl_Window *window;Fl_Choice *source,*cage;std::array<BakeSlider*,7> fields;std::vector<uint64_t>*ids,*cage_ids;AssetSource *expected;Fl_Check_Button *partial,*backfaces,*colors,*normals;std::shared_ptr<const ObjectBakeRecipe> recipe;bool running=false,ever_ran=false;} run{&doc,&window,&source,&cage,sliders,&ids,&cage_ids,&expected,&partial,&backfaces,&colors,&normals,state->bake_recipe};
+  struct Run {Document *doc;Fl_Window *window;Fl_Choice *source,*cage;std::array<BakeSlider*,7> fields;std::vector<uint64_t>*ids,*cage_ids;AssetSource *expected;Fl_Check_Button *partial,*backfaces,*correspondence,*colors,*normals;std::shared_ptr<const ObjectBakeRecipe> recipe;bool running=false,ever_ran=false;} run{&doc,&window,&source,&cage,sliders,&ids,&cage_ids,&expected,&partial,&backfaces,&correspondence,&colors,&normals,state->bake_recipe};
   recall.callback([](Fl_Widget*,void *p){auto &r=*static_cast<Run*>(p);try{
     if(!r.recipe)throw std::logic_error("No successful bake has been saved for this target");
     r.recipe->validate();const auto &v=r.recipe->settings;
@@ -110,6 +112,7 @@ void edit_bake_dialog(Document &doc){
     const double values[]{v.front_mm,v.back_mm,v.ao_distance_mm,double(v.ao_samples),double(v.padding),v.color_error,v.normal_error*57.29577951308232};
     for(size_t i=0;i<r.fields.size();++i){r.fields[i]->physical(values[i]);r.fields[i]->redraw();}
     r.partial->value(v.allow_partial);r.backfaces->value(v.allow_backfaces);
+    r.correspondence->value(v.corresponding_topology);
     r.colors->value(v.prepare_colors);r.normals->value(v.prepare_normals);r.window->redraw();
   }catch(const std::exception &e){r.doc->report_error(e.what());}},&run);
   close.callback([](Fl_Widget*w,void*p){auto &r=*static_cast<Run*>(p);if(r.running && r.doc->frame().state->asset_busy)r.doc->cancel_asset_work();else w->window()->hide();},&run);
@@ -118,6 +121,7 @@ void edit_bake_dialog(Document &doc){
     s.prepare_colors=r.colors->value();s.color_error=float(r.fields[5]->value());
     s.prepare_normals=r.normals->value();s.normal_error=float(r.fields[6]->physical()/57.29577951308232);
     s.allow_partial=r.partial->value();s.allow_backfaces=r.backfaces->value();
+    s.corresponding_topology=r.correspondence->value();
     s.cage_object=r.cage_ids->at(size_t(r.cage->value()));
     r.doc->bake_from_object(r.ids->at(size_t(r.source->value())),s,*r.expected);r.running=r.ever_ran=true;
   }catch(const std::exception&e){r.doc->report_error(e.what());}},&run);
@@ -131,8 +135,8 @@ void edit_bake_dialog(Document &doc){
       if(s->active_object==target && s->generation==expected.generation)expected=doc.draft_scene().source;
     }
     if(s->active_object!=target || s->generation!=expected.generation){window.hide();break;}
-    if(run.running){normals.deactivate();colors.deactivate();partial.deactivate();backfaces.deactivate();source.deactivate();cage.deactivate();for(auto f:sliders)f->deactivate();bake.deactivate();if(work.cancellable)close.activate();else close.deactivate();close.copy_label(work.cancelling?"Cancelling...":"Cancel bake");progress.value(std::min(99.f,work.progress*100));}
-    else {normals.activate();colors.activate();partial.activate();backfaces.activate();source.activate();cage.activate();for(auto f:sliders)f->activate();bake.activate();
+    if(run.running){normals.deactivate();colors.deactivate();partial.deactivate();backfaces.deactivate();correspondence.deactivate();source.deactivate();cage.deactivate();for(auto f:sliders)f->deactivate();bake.deactivate();if(work.cancellable)close.activate();else close.deactivate();close.copy_label(work.cancelling?"Cancelling...":"Cancel bake");progress.value(std::min(99.f,work.progress*100));}
+    else {normals.activate();colors.activate();partial.activate();backfaces.activate();correspondence.activate();source.activate();cage.activate();for(auto f:sliders)f->activate();bake.activate();
       if(ids.at(size_t(source.value()))==unavailable_bake_object||cage_ids.at(size_t(cage.value()))==unavailable_bake_object)bake.deactivate();
       close.activate();close.copy_label(run.ever_ran?"Close":"Cancel");if(run.ever_ran && s->error.empty() && s->message.find("complete")!=std::string::npos)progress.value(100);}
     std::string title="Bake surface";

@@ -20,11 +20,14 @@ with tempfile.TemporaryDirectory(prefix='dome-bake-policy-xr-') as directory:
             for layer in v.get('sculpt_layers',[]):layer['delta'].sort()
             if 'sculpt_mask' in v:v['sculpt_mask']['values'].sort()
         return scene
-    original=inspect(fixture)
-    for mode in ('accept','cancel','focus'):
+    topology_fixture=root/'matching-source.dsculpt'
+    subprocess.run([str(helper),'--ui-topology-fixture',str(topology_fixture)],check=True,env=env)
+    for mode in ('accept','cancel','focus','topology'):
+        source=topology_fixture if mode=='topology' else fixture
+        original=inspect(source)
         target=output/(mode+'.dsculpt');report=output/(mode+'.json')
         with (output/(mode+'.log')).open('w') as log:
-            result=subprocess.run([str(binary),'--xr','--open',str(fixture),'--frames','44','--save',str(target)],env={**env,'DOME_XR_FIXTURE_REPORT':str(report),'DOME_XR_FIXTURE_BAKE_POLICY':mode},stdout=log,stderr=subprocess.STDOUT,timeout=90)
+            result=subprocess.run([str(binary),'--xr','--open',str(source),'--frames','44','--save',str(target)],env={**env,'DOME_XR_FIXTURE_REPORT':str(report),'DOME_XR_FIXTURE_BAKE_POLICY':mode},stdout=log,stderr=subprocess.STDOUT,timeout=90)
         check(result.returncode==0,'Real-loader projection policy '+mode+' closes normally and saves native state')
         after=inspect(target);r=json.loads(report.read_text())
         check(r.get('acquires')==r.get('image_waits')==r.get('releases') and r.get('left_eye_nonblank',0)>0 and r.get('right_eye_nonblank',0)>0 and r.get('palette_images',0)>0 and r.get('tracking_losses',0)==0,'Projection policy '+mode+' renders both real GL eyes with balanced image ownership')
@@ -36,6 +39,14 @@ with tempfile.TemporaryDirectory(prefix='dome-bake-policy-xr-') as directory:
             check(recipe['source']['object']==after['objects'][1]['id'] and recipe['settings']['allow_partial'],'Actual controller explicitly selects the live source rather than rebinding its unavailable historical recipe')
             check(right and left,'Actual joystick policy confirmation and Bake update hits while preserving every missed channel')
             check(after['objects'][1:]==original['objects'][1:] and after['objects'][0]['painted']['layers']==original['objects'][0]['painted']['layers'],'Real-loader partial bake retains exact sources and editable layers')
+        elif mode=='topology':
+            part=after['objects'][0]
+            recipe=part['bake_recipe']
+            colors=part['painted']['baked']['color']['bytes']
+            check(recipe['version']==2 and recipe['settings']['corresponding_topology'] and recipe['source']['object']==after['objects'][1]['id'],
+                  'The ordered save records the real controller-selected topology recipe and live source')
+            check(all(colors[i:i+4]==[0,0,255,255] for i in range(0,len(colors),4)) and after['objects'][1:]==original['objects'][1:] and part['painted']['layers']==original['objects'][0]['painted']['layers'],
+                  'Matching topology paints all source corners and preserves original source and target layers')
         else:check(after==original,'Projection policy '+mode+' preserves complete original scene exactly')
         if mode=='focus':check(r.get('focus_losses')==1 and r.get('focus_regains')==1,'Actual OpenXR focus loss cancels staged projection policy settings')
 print(str(len(checks))+' actual-loader projection policy checks passed',flush=True)

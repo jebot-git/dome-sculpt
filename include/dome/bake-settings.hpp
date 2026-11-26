@@ -22,5 +22,8 @@ struct ObjectBakeSettings {
   // certified source emission knots or check actual continuous FLOAT fidelity.
   // Missing persisted settings decode to0, independently of normal quality.
   uint32_t emission_transport=1;
+  // Sample matching ordered triangles on two versions of the same mesh.
+  // The source may be displaced within the configured world-space bounds.
+  bool corresponding_topology=false;
 };
 } // namespace dome

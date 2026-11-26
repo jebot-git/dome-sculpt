@@ -24,7 +24,18 @@ void domain_avatar_glb(const std::filesystem::path &prefix,const char *baseline,
  for(size_t v=0;v<high.normals.size();++v)high.normals[v]=length(high.normals[v])>1e-12f?normalized(high.normals[v]):artist[v];
  const auto high_id=original.add("Readonly high FaceSkin",Volume{});auto &source=original.object(high_id);source.mesh_active=true;source.visible=false;source.locked=true;source.group=group;source.transform=original.object(object).transform;source.painted=std::make_shared<PaintedMesh>(std::move(high),256);
  ObjectBakeSettings settings;settings.front_mm=settings.back_mm=30;settings.ao_samples=0;settings.allow_partial=true;settings.padding=4;original.select(object);
- const auto report=bake_object(original,high_id,settings);(void)report;
+ const bool male=std::string_view(baseline)=="vroid-beta-male";
+ if(male){
+   const auto before=original.encode();
+   bool refused=false;
+   try{(void)bake_object(original,high_id,settings);}catch(const std::invalid_argument &error){
+     refused=std::string_view(error.what()).find("Baked normal detail exceeds the selected error")!=std::string_view::npos;
+   }
+   check(refused&&original.encode()==before,"The original ray policy refuses the male surface without altering paint or source ownership");
+   settings.corresponding_topology=true;
+ }
+ const auto report=bake_object(original,high_id,settings);
+ check(report.projected>0&&bool(report.rays)!=male,"Strict normal reconstruction uses the selected source query");
  check(original.active().painted->baked()&&!original.active().painted->baked()->maps.normal.rgba.empty(),"Actual FaceSkin carries genuine native baked normal detail before retained-domain Scale");
  const auto exact=original.encode();const auto old_frames=original.active().material_bindings->normal_frames;
  SourceUvBakeInput input;input.paint=original.active().painted;input.current_material=original.active().material_bindings;input.current_deformation=original.active().deformation;input.appearance=original.active().appearance;input.target=input.paint->mesh();input.source_vertices.resize(input.target.positions.size());std::iota(input.source_vertices.begin(),input.source_vertices.end(),0);
