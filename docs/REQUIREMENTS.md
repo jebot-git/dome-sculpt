@@ -39,10 +39,14 @@ The tested standalone outputs reimport with exact base and morph tangents.
 See [the validation receipt](validation/core-gltf-normal-export-20261126.json).
 
 Portable live colour and UV expressions now export over fixed native colour
-paint on original opaque unlit VRM1 materials, with exact editable Save/reopen
-and independent software and Arc coverage. Live lit PBR, nonopaque unlit and
-additional painted channels remain open. See
-[the validation receipt](validation/vrm1-unlit-live-paint-20261126.json).
+paint on original opaque unlit VRM1 materials and on masked unlit materials
+whose paint stays inside fragments retained throughout the expression range.
+Both candidates have exact editable Save/reopen and independent software
+and Arc coverage. The masked candidate also preserves authored signed UV
+scales in live bindings. Live lit PBR, blended unlit, cutouts that intersect
+paint, and additional painted channels remain open. See the
+[opaque receipt](validation/vrm1-unlit-live-paint-20261126.json) and
+[masked receipt](validation/vrm1-unlit-mask-paint-20261126.json).
 
 ## Qualified integration — 2026-11-17
 

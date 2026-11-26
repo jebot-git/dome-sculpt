@@ -693,9 +693,41 @@ Freezing the source UV or using source vertex alpha for paint yields differences
 of 157 and 41 RGB8 steps. Khronos validation reports zero errors on the source
 and exported VRM. Read [the validation receipt](validation/vrm1-unlit-live-paint-20261126.json).
 
-The live lit PBR, nonopaque unlit and other painted channels still need their
-portable compositing paths. The frozen combined build remains under its own
-Release and sanitizer qualification. Those runs precede this product change.
+### Portable live expressions on masked unlit paint
+
+Candidate `e09f2f4b` extends the same native worker to original unlit
+alpha-cutout materials when the source and native composite both retain
+every fragment where fixed colour paint contributes. The original cutoff,
+vertex alpha and expression bindings stay on the lower draw. The upper
+draw uses paint coverage. A conservative proof evaluates the original
+sampler and vertex alpha over the editable footprint and the full
+expression weight range. The local proof requires an explicit nearest
+or linear filter. It refuses with the previous export and native bytes
+intact when a moved cutout reaches the paint, vertex alpha can put the
+paint below the cutoff, or the portable viewer can choose an unspecified
+minification filter. Live core materials keep the authored rotation
+and signed scales because equivalent rest transforms can animate
+differently. [glTF alpha and sampler specification](https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html)
+
+Release and ASan/UBSan each pass 641 native expression checks and 45
+MToon worker checks. A startup preflight fix restores the failed MToon
+control and preserves cancellation through large binding tables. Both
+profiles now pass the whole 2,180-check MToon sweep, including 827 persistent
+allocation denial prefixes and 1,337 cancellation boundaries. The source,
+exported VRM and editable project are byte-identical across profiles.
+Independent OpenGL checks on llvmpipe and Intel Arc A770 cover five
+expression states, including a rotated, repeating original sampler with
+a negative scale and real cutouts. The largest RGB8 difference is one
+and alpha matches exactly. Bad UV, vertex alpha and rotation-basis
+controls change the visible result. Khronos validation reports zero
+errors and reports five warnings on input and four on output.
+[Validation receipt](validation/vrm1-unlit-mask-paint-20261126.json)
+
+Live lit PBR, blended unlit, cutouts that cross painted fragments and
+additional paint channels remain open. The full Release and combined
+sanitizer runs are still using `ccbbe020`. Its sanitizer run reproduced
+the software Mesa teardown leak and an HDR fixture timeout.
+[Mesa teardown evidence](MESA-XR-RTASM-LIFETIME.md)
 
 ## Source and integration boundary
 

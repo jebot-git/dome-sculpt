@@ -1,0 +1,225 @@
+{
+  "candidate": "e09f2f4bcb9c35198cbb9a6168ae3403a95263ff",
+  "branch": "work/vrm1-unlit-mask-paint-20261126",
+  "parent": "b2bfba2d180af890fef5c517f6353b9844e206cc",
+  "scope": "Portable live VRM1 core-unlit colour paint on original masked materials when the lower source and native composite remain inside the alpha cutoff wherever paint contributes. Core texture transform export preserves authored rotation and signed scale in live VRM materials.",
+  "profiles": {
+    "release": {
+      "profile_path": "artifacts/vrm1-unlit-mask-paint-validation-20261126/release-final",
+      "vrm1_expression_checks": 641,
+      "mtoon_worker_checks": 45,
+      "mtoon_fault_checks": 2180,
+      "allocation_denial_prefixes": 827,
+      "cancellation_boundaries": 1337,
+      "mtoon_other_controls": 16,
+      "leak_detection": false,
+      "archive_members_verified": 198,
+      "fresh_production_objects": 3,
+      "logs": {
+        "run.log": "7f82a11be729b21bf3e73a682bf47845177d5439b942265a42e1964730472756",
+        "mtoon-mask.log": "98ac0378aae99f5a0362f7c94cb4cf14e40514a96e6a73ff5791ac8b93e3a014",
+        "mtoon-faults.log": "ba1a6604ae123159855b6bbd24897a42f0ef50e0d85bf2dd1974626fecc33ba0",
+        "mtoon-control.log": "9178630670eaf688c0826d4736322e8721a969c686129fb898abe8cb0dfa44d7"
+      }
+    },
+    "asan_ubsan": {
+      "profile_path": "artifacts/vrm1-unlit-mask-paint-validation-20261126/asan-verified-final",
+      "vrm1_expression_checks": 641,
+      "mtoon_worker_checks": 45,
+      "mtoon_fault_checks": 2180,
+      "allocation_denial_prefixes": 827,
+      "cancellation_boundaries": 1337,
+      "mtoon_other_controls": 16,
+      "leak_detection": true,
+      "archive_members_verified": 198,
+      "fresh_production_objects": 3,
+      "logs": {
+        "run.log": "7f82a11be729b21bf3e73a682bf47845177d5439b942265a42e1964730472756",
+        "mtoon-mask.log": "98ac0378aae99f5a0362f7c94cb4cf14e40514a96e6a73ff5791ac8b93e3a014",
+        "mtoon-faults.log": "0f88104c048b427854978d8d35c18e99a2e885566065327d6d6a2df737e95271",
+        "mtoon-control.log": "9178630670eaf688c0826d4736322e8721a969c686129fb898abe8cb0dfa44d7"
+      }
+    }
+  },
+  "portable": {
+    "unlit-mask-input.vrm": {
+      "sha256": "f888c5aeab4dc8dcae2258c7a419f438142f458a6b048a70a830b410418a4056",
+      "size": 40656,
+      "identical_across_profiles": true
+    },
+    "unlit-mask-output.vrm": {
+      "sha256": "1dafb4e06a6c8c43e211dc27120c51d86b599194ab817d75f290893642dd4e17",
+      "size": 324032,
+      "identical_across_profiles": true
+    },
+    "unlit-mask-preserved.dsculpt": {
+      "sha256": "452786bb3aebd1cb20c47e088a64b3264caec4e5d6ade157ae2659636e035fc6",
+      "size": 270775,
+      "identical_across_profiles": true
+    }
+  },
+  "independent_opengl": {
+    "software": {
+      "exit": 0,
+      "seconds": 1.602,
+      "checks": 17,
+      "gpu": "GPU llvmpipe (LLVM 22.1.8, 256 bits)",
+      "device_witnesses": [],
+      "states": [
+        {
+          "happy": 0.0,
+          "alternate": 0.0,
+          "covered_pixels": 116,
+          "rgb8_max": 1,
+          "alpha8_max": 0
+        },
+        {
+          "happy": 0.35,
+          "alternate": 0.0,
+          "covered_pixels": 120,
+          "rgb8_max": 1,
+          "alpha8_max": 0
+        },
+        {
+          "happy": 1.0,
+          "alternate": 0.0,
+          "covered_pixels": 123,
+          "rgb8_max": 1,
+          "alpha8_max": 0
+        },
+        {
+          "happy": 0.0,
+          "alternate": 1.0,
+          "covered_pixels": 105,
+          "rgb8_max": 1,
+          "alpha8_max": 0
+        },
+        {
+          "happy": 0.28,
+          "alternate": 0.62,
+          "covered_pixels": 112,
+          "rgb8_max": 1,
+          "alpha8_max": 0
+        }
+      ],
+      "cutout_pixels": [
+        28,
+        24,
+        21,
+        39,
+        32
+      ],
+      "negative_controls": {
+        "frozen_uv_rgb8": 255,
+        "attenuated_paint_rgb8": 17,
+        "equivalent_rest_matrix_wrong_live_basis_rgb8": 255
+      }
+    },
+    "arc": {
+      "exit": 0,
+      "seconds": 0.803,
+      "checks": 17,
+      "gpu": "GPU Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "device_witnesses": [
+        [
+          3680637,
+          3
+        ],
+        [
+          3680637,
+          4
+        ],
+        [
+          3680637,
+          5
+        ],
+        [
+          3680637,
+          6
+        ]
+      ],
+      "states": [
+        {
+          "happy": 0.0,
+          "alternate": 0.0,
+          "covered_pixels": 116,
+          "rgb8_max": 1,
+          "alpha8_max": 0
+        },
+        {
+          "happy": 0.35,
+          "alternate": 0.0,
+          "covered_pixels": 120,
+          "rgb8_max": 1,
+          "alpha8_max": 0
+        },
+        {
+          "happy": 1.0,
+          "alternate": 0.0,
+          "covered_pixels": 123,
+          "rgb8_max": 1,
+          "alpha8_max": 0
+        },
+        {
+          "happy": 0.0,
+          "alternate": 1.0,
+          "covered_pixels": 105,
+          "rgb8_max": 1,
+          "alpha8_max": 0
+        },
+        {
+          "happy": 0.28,
+          "alternate": 0.62,
+          "covered_pixels": 112,
+          "rgb8_max": 1,
+          "alpha8_max": 0
+        }
+      ],
+      "cutout_pixels": [
+        28,
+        24,
+        21,
+        39,
+        32
+      ],
+      "negative_controls": {
+        "frozen_uv_rgb8": 255,
+        "attenuated_paint_rgb8": 17,
+        "equivalent_rest_matrix_wrong_live_basis_rgb8": 255
+      },
+      "device": "/dev/dri/renderD129"
+    }
+  },
+  "khronos": {
+    "version": "2.0.0-dev.3.10",
+    "input_errors": 0,
+    "input_warnings": 5,
+    "output_errors": 0,
+    "output_warnings": 4
+  },
+  "atomic_refusals": [
+    "moving cutout reaches actual paint support",
+    "low vertex alpha reaches actual paint support",
+    "omitted portable minification filter prevents a local support proof"
+  ],
+  "startup_preflight": "Original control failure retained. Startup output limits and small bad binding tables reject before cancellable per-role work. The preflight scans large tables with a bounded cancellation checkpoint, then slower sampling stays cancellable.",
+  "combined": {
+    "source": "ccbbe02093bed6997bdacdf0d36b3a11bc1f177d",
+    "release_registered": 1360,
+    "sanitizer_registered": 86,
+    "predates_this_product_change": true,
+    "release_status": "Running",
+    "sanitizer_status": "Running with Mesa 112-byte software XR teardown leak, HDR fixture seed timeout and blocked dependent case"
+  },
+  "open": [
+    "Core lit PBR and blended unlit live paint",
+    "Cutouts that intersect actual paint support",
+    "Other painted channels and wider material/frame combinations",
+    "Whole owning application integration and physical headset acceptance"
+  ],
+  "evidence": {
+    "path": "docs/validation/vrm1-unlit-mask-paint-20261126.tar.gz",
+    "sha256": "7c79266633243b811635a764b913ac77c0cfec5cbfbfa5bd5b10d333d79ca1a1",
+    "local_artifacts": "artifacts/vrm1-unlit-mask-paint-validation-20261126"
+  }
+}
