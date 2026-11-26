@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "atlas-detail.hpp"
+#include "dome/mesh-authoring.hpp"
 #include "xatlas.h"
 #include "import-authoring-fixtures.hpp"
 #include <atomic>
@@ -146,6 +147,25 @@ int main() try {
               : "Actual mid-pack cancellation unwinds without changing the "
                 "input mesh or authoring flags");
   }
+  Volume field(.03f);
+  field.begin_stroke();
+  Brush brush;
+  brush.radius = .4f;
+  brush.blend = 0;
+  field.stamp(brush);
+  field.end_stroke();
+  auto sculpt = surface_mesh(field);
+  condition_sculpt_normals(sculpt);
+  const auto source_sculpt = sculpt;
+  std::atomic_uint unchanged_chart_progress{0};
+  const bool stopped_during_clustering = cancelled(sculpt, [&] {
+    return category == int(xatlas::ProgressCategory::ComputeCharts) &&
+           percentage == 0 && ++unchanged_chart_progress == 2;
+  });
+  check(stopped_during_clustering && unchanged_chart_progress == 2 &&
+            same(sculpt, source_sculpt),
+        "Connected sculpt chart growth observes cancellation before a chart "
+        "group finishes and preserves the exact input");
   auto late = original;
   std::atomic_bool complete{false};
   check(cancelled(late,

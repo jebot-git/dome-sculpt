@@ -3080,6 +3080,13 @@ struct Progress
 		update();
 	}
 
+	bool pollCancellation()
+	{
+		if (!cancel && m_func && !m_func(m_category, m_percent.load(), m_userData))
+			cancel = true;
+		return cancel;
+	}
+
 	std::atomic<bool> cancel;
 
 private:
@@ -5378,8 +5385,9 @@ struct ClusteredCharts
 	ConstArrayView<uint32_t> chartFaces(uint32_t chartIndex) const { return m_charts[chartIndex]->faces; }
 	const Basis &chartBasis(uint32_t chartIndex) const { return m_charts[chartIndex]->basis; }
 
-	void compute()
+	void compute(Progress &progress)
 	{
+		Cancellation cancellation{progress};
 		const uint32_t faceCount = m_data.mesh->faceCount();
 		m_facesLeft = 0;
 		for (uint32_t i = 0; i < faceCount; i++) {
@@ -5398,7 +5406,9 @@ struct ClusteredCharts
 		if (m_facesLeft == 0)
 			return;
 		// Create initial charts greedely.
-		placeSeeds(m_data.options.maxCost * 0.5f);
+		placeSeeds(m_data.options.maxCost * 0.5f, cancellation);
+		if (progress.cancel)
+			return;
 		if (m_data.options.maxIterations == 0) {
 			XA_DEBUG_ASSERT(m_facesLeft == 0);
 			return;
@@ -5408,9 +5418,13 @@ struct ClusteredCharts
 		// Restart process growing charts in parallel.
 		uint32_t iteration = 0;
 		for (;;) {
-			growCharts(m_data.options.maxCost);
+			growCharts(m_data.options.maxCost, cancellation);
+			if (progress.cancel)
+				return;
 			// When charts cannot grow more: fill holes, merge charts, relocate seeds and start new iteration.
-			fillHoles(m_data.options.maxCost * 0.5f);
+			fillHoles(m_data.options.maxCost * 0.5f, cancellation);
+			if (progress.cancel)
+				return;
 #if XA_MERGE_CHARTS
 			mergeCharts();
 #endif
@@ -5425,6 +5439,19 @@ struct ClusteredCharts
 	}
 
 private:
+	struct Cancellation
+	{
+		Progress &progress;
+		uint32_t work = 0;
+
+		bool stop()
+		{
+			// A single connected group can run for a long time without reporting
+			// any new percent. Poll periodically without advancing its progress.
+			return progress.cancel || ((++work & 31u) == 0 && progress.pollCancellation());
+		}
+	};
+
 	struct Chart
 	{
 		Chart() : faces(MemTag::SegmentAtlasChartFaces) {}
@@ -5441,7 +5468,7 @@ private:
 		uint32_t seed;
 	};
 
-	void placeSeeds(float threshold)
+	void placeSeeds(float threshold, Cancellation &cancellation)
 	{
 		XA_PROFILE_START(clusteredChartsPlaceSeeds)
 		m_placingSeeds = true;
@@ -5451,18 +5478,18 @@ private:
 		// @@ How can we give preference to faces far from sharp features as in the LSCM paper?
 		//   - those points can be found using a simple flood filling algorithm.
 		//   - how do we weight the probabilities?
-		while (m_facesLeft > 0)
-			createChart(threshold);
+		while (m_facesLeft > 0 && !cancellation.stop())
+			createChart(threshold, cancellation);
 		m_placingSeeds = false;
 		XA_PROFILE_END(clusteredChartsPlaceSeeds)
 	}
 
 	// Returns true if any of the charts can grow more.
-	void growCharts(float threshold)
+	void growCharts(float threshold, Cancellation &cancellation)
 	{
 		XA_PROFILE_START(clusteredChartsGrow)
 		for (;;) {
-			if (m_facesLeft == 0)
+			if (m_facesLeft == 0 || cancellation.stop())
 				break;
 			// Get the single best candidate out of the chart best candidates.
 			uint32_t bestFace = UINT32_MAX, bestChart = UINT32_MAX;
@@ -5551,11 +5578,11 @@ private:
 		return anySeedChanged;
 	}
 
-	void fillHoles(float threshold)
+	void fillHoles(float threshold, Cancellation &cancellation)
 	{
 		XA_PROFILE_START(clusteredChartsFillHoles)
-		while (m_facesLeft > 0)
-			createChart(threshold);
+		while (m_facesLeft > 0 && !cancellation.stop())
+			createChart(threshold, cancellation);
 		XA_PROFILE_END(clusteredChartsFillHoles)
 	}
 
@@ -5668,7 +5695,7 @@ private:
 #endif
 
 private:
-	void createChart(float threshold)
+	void createChart(float threshold, Cancellation &cancellation)
 	{
 		Chart *chart = XA_NEW(MemTag::Default, Chart);
 		chart->id = (int)m_charts.size();
@@ -5688,7 +5715,7 @@ private:
 		addFaceToChart(chart, chart->seed);
 		// Grow the chart as much as possible within the given threshold.
 		for (;;) {
-			if (chart->candidates.count() == 0 || chart->candidates.peekCost() > threshold)
+			if (chart->candidates.count() == 0 || chart->candidates.peekCost() > threshold || cancellation.stop())
 				break;
 			const uint32_t f = chart->candidates.pop();
 			if (m_data.isFaceInChart.get(f))
@@ -6216,7 +6243,7 @@ struct Atlas
 		XA_PROFILE_END(buildAtlasInit)
 	}
 
-	void compute()
+	void compute(Progress &progress)
 	{
 		if (m_data.options.useInputMeshUvs) {
 			XA_PROFILE_START(originalUvCharts)
@@ -6227,7 +6254,7 @@ struct Atlas
 		m_planarCharts.compute();
 		XA_PROFILE_END(planarCharts)
 		XA_PROFILE_START(clusteredCharts)
-		m_clusteredCharts.compute();
+		m_clusteredCharts.compute(progress);
 		XA_PROFILE_END(clusteredCharts)
 	}
 
@@ -7588,15 +7615,17 @@ public:
 #else
 		XA_PROFILE_START(buildAtlas)
 		atlas.reset(mesh, options);
-		atlas.compute();
+		atlas.compute(*progress);
 		XA_PROFILE_END(buildAtlas)
 		// Update progress.
-		progress->increment(faceCount());
+		if (!progress->cancel)
+			progress->increment(faceCount());
 #if XA_DEBUG_EXPORT_OBJ_CHARTS
 		char filename[256];
 		XA_SPRINTF(filename, sizeof(filename), "debug_mesh_%03u_chartgroup_%03u_charts.obj", m_sourceMesh->id(), m_id);
-		FILE *file;
-		XA_FOPEN(file, filename, "w");
+		FILE *file = nullptr;
+		if (!progress->cancel)
+			XA_FOPEN(file, filename, "w");
 		if (file) {
 			mesh->writeObjVertices(file);
 			for (uint32_t i = 0; i < atlas.chartCount(); i++) {
@@ -7614,9 +7643,9 @@ public:
 		const uint32_t faceCount = mesh->faceCount();
 		mesh->~Mesh();
 		XA_FREE(mesh);
-		XA_PROFILE_START(copyChartFaces)
 		if (progress->cancel)
 			return;
+		XA_PROFILE_START(copyChartFaces)
 		// Copy faces from segment::Atlas to m_chartFaces array with <chart 0 face count> <face 0> <face n> <chart 1 face count> etc. encoding.
 		// segment::Atlas faces refer to the chart group mesh. Map them to the input mesh instead.
 		const uint32_t chartCount = atlas.chartCount();
