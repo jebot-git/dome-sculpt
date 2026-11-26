@@ -3,6 +3,7 @@
 #include "texture-set-paint-access.hpp"
 #include "polygon-surface-owner.hpp"
 #include "polygon-surface-preview.hpp"
+#include "baked-normal-field.hpp"
 #include "dome/material-bindings.hpp"
 #include <algorithm>
 namespace dome::detail {namespace {
@@ -70,8 +71,15 @@ std::shared_ptr<const TextureSetFieldSource>TextureSetFieldSource::with_current(
  return with_member(value,limits,false);
 }
 std::shared_ptr<const TextureSetFieldSource>TextureSetFieldSource::with_bake(const TextureSetView&value,const TextureSetLimits&limits)const{
- if(!polygon_||!polygon_->has_normal_field()||!value.bake_recipe)
+ if(!polygon_||!polygon_->has_normal_field()||!original_->baked()||!value.bake_recipe)
   throw std::invalid_argument("Retained texture-set Bake requires a prepared normal source and its actual recipe");
+ if(value.painted&&value.painted->baked()!=original_->baked()){
+  const auto initial=original_->baked()->normal_field;
+  const auto baked=value.painted->baked();
+  auto ancestor=baked&&baked->normal_field?baked->normal_field->prior():nullptr;
+  while(ancestor&&!owner(ancestor,initial)){stop(limits);ancestor=ancestor->prior();}
+  if(!ancestor)throw std::invalid_argument("Retained texture-set Bake must extend its own original normal field");
+ }
  return with_member(value,limits,true);
 }
 std::shared_ptr<const TextureSetFieldSource>TextureSetFieldSource::with_member(const TextureSetView&value,const TextureSetLimits&limits,bool rebake)const{

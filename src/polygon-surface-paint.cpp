@@ -38,7 +38,7 @@ size_t PolygonSurfacePaintCodec::preflight_grid(const nlohmann::json&payload,boo
  if(payload.contains("baked")){
   const auto &baked=payload.at("baked");
   if(shared_geometry&&physical&&baked.is_object()&&baked.at("version")==6)
-   keys(baked,{"version","base_version","color","orm","float_emission","normal","coverage",
+   keys(baked,{"version","base_version","color","orm","emission","float_emission","normal","coverage",
                "color_interpretation","pbr_color","normal_interpretation","mtoon_normal","normal_field"});
   else
    keys(baked,{"version","color","orm","emission","normal","coverage","color_interpretation",

@@ -8,6 +8,7 @@
 #include "dome/projection.hpp"
 #include "dome/source-maps.hpp"
 #include "dome/source-placement.hpp"
+#include "dome/source-uv-bake.hpp"
 #include "dome/tangents.hpp"
 #include "texture-set-export.hpp"
 #include "texture-set-field-source.hpp"
@@ -56,7 +57,7 @@ void move(Document&d){
  const auto topology=d.frame().state->polygon->topology;const auto mesh=topology->triangulate().mesh;const auto a=mesh.positions.at(mesh.indices.at(0)),b=mesh.positions.at(mesh.indices.at(1)),c=mesh.positions.at(mesh.indices.at(2));const auto p=a*.2f+b*.3f+c*.5f,n=normalized(cross(b-a,c-a));
  d.polygon_pointer(p+n,n*-1,PolygonAction::BeginDrag);polygon(d);check(d.frame().state->polygon->moving,"Actual selected face ray begins a native Move gesture");const Vec3 delta{.006f,.003f,0};d.polygon_pointer(p+n+delta,n*-1,PolygonAction::Drag);polygon(d);d.polygon_pointer(p+n+delta,n*-1,PolygonAction::EndDrag);polygon(d);
 }
-Scene source(bool prepared,bool reflected,bool floating=false,bool varying=false,bool recipes=false){
+Scene source(bool prepared,bool reflected,bool floating=false,bool varying=false,bool recipes=false,bool split_grids=false){
  Mesh m;m.positions={{-.8f,-.6f,0},{.8f,-.6f,0},{.8f,.6f,0},{-.8f,.6f,0}};m.normals.assign(4,{0,0,1});if(varying)m.normals[1]=normalized(Vec3{.2f,.1f,1});m.uv={{{.1f,.1f}},{{.9f,.1f}},{{.9f,.9f}},{{.1f,.9f}}};m.indices={0,1,2,0,2,3};
  Scene s;auto&o=s.active();o.mesh_active=true;o.material.double_sided=true;o.material.color={.4f,.3f,.2f,1};o.painted=std::make_shared<PaintedMesh>(m,64);
  if(prepared){BakedTextures bake;bake.maps.color=solid({90,100,110,255});bake.maps.metal_rough=solid({255,160,0,255});bake.maps.emission=solid({0,0,0,255});bake.maps.normal=solid({128,128,255,255});bake.coverage.assign(64*64,255);for(size_t y=0;y<64;++y)for(size_t x=0;x<64;++x){const auto at=(y*64+x)*4;bake.maps.normal.rgba[at]=uint8_t(96+x/4);bake.maps.normal.rgba[at+1]=uint8_t(112+y/3);bake.maps.normal.rgba[at+2]=240;}o.painted->install_bake(std::move(bake));auto converted=convert_canonical_normals({o.painted,{},{},{},o.material,{}});o.painted=std::move(converted.paint);o.material_bindings=std::move(converted.material_bindings);}
@@ -65,6 +66,14 @@ Scene source(bool prepared,bool reflected,bool floating=false,bool varying=false
  // KeepPaint UV transition. Empty ordinary Paint correctly uses the legacy
  // polygon route and is not an original-field ownership receipt.
  if(!prepared&&!floating){PaintSettings ink;ink.front_only=false;ink.channel=PaintChannel::Color;ink.color={.2f,.7f,.4f,1};Brush b;b.from=b.to={0,0,0};b.normal={0,0,1};b.radius=.7f;b.strength=.8f;b.blend=.2f;o.painted->begin_stroke();o.painted->stamp(b,ink);check(o.painted->end_stroke()&&o.painted->has_paint_data()&&!o.painted->has_physical_emission(),"Actual N-only source owns nonempty byte paint without manufactured FLOAT history");}
+ if(split_grids){
+  SourceUvBakeInput input;
+  input.paint=o.painted;input.current_material=o.material_bindings;input.target=m;
+  input.source_vertices={0,1,2,3};
+  for(auto &uv:input.target.uv){uv[0]=.1f+.66f*uv[0];uv[1]=.15f+.72f*uv[1];}
+  auto result=adopt_source_uv_bake(bake_source_uv(input));
+  o.painted=std::move(result.paint);o.material_bindings=std::move(result.material_bindings);
+ }
  if (recipes) {
    const auto target = s.active().id;
    const auto recipe_source = s.add("Texture Bake source", Volume{});
@@ -434,7 +443,7 @@ void retained_bake_xr_fixture(const std::filesystem::path &input,const std::file
 }
 }
 void bake_retained_recipient(TextureSetId id,bool physical){
- auto scene=source(true,physical);
+ auto scene=source(true,physical,false,false,false,physical);
  const auto target=scene.active().id;
  if(!physical)scene.active().affine_edit.reset();
  select_texture_set(scene,target,id);
@@ -443,8 +452,8 @@ void bake_retained_recipient(TextureSetId id,bool physical){
  const auto world=scene.world_matrix(target);
  const auto prior=old.painted->baked()->normal_field;
  const auto &preview=*old.source->source_preview();
- check(preview.paint_coordinates()!=preview.normal_coordinates(),
-       "Prepared target has independently edited paint and normal coordinates");
+ check((preview.paint_coordinates()!=preview.normal_coordinates())==physical,
+       "Fixture distinguishes matching and independently resampled paint and normal coordinates");
  const auto covered=old.domain->triangles().front();
  const auto old_normal=old.source->normal(covered,{.2,.3,.5},world,true);
  Mesh high=scene.active().painted->mesh();
@@ -458,8 +467,8 @@ void bake_retained_recipient(TextureSetId id,bool physical){
  object.painted=std::make_shared<PaintedMesh>(high,64);
  object.material.color={.82f,.11f,.27f,1};
  if(physical)object.material.emissive={3.f,.1f,.2f};
- // Affine donors use the ordinary texture-set placement path. Keep one real
- // primary domain by first creating a secondary field and transferring it back.
+ // Affine donors use the ordinary texture-set placement path. Give both
+ // donor fields the same material so the target's role sampling is isolated.
  if(placement){
   const uint64_t face=1;
   create_texture_set(scene,donor,std::array<uint64_t,1>{face},"Donor face",64);
@@ -471,12 +480,17 @@ void bake_retained_recipient(TextureSetId id,bool physical){
  const auto baseline=scene.encode();
  ObjectBakeSettings settings;settings.allow_backfaces=true;settings.padding=0;settings.ao_samples=2;
  Document document;document.replace(scene);ready(document);
+ check(document.can_select_texture_sets(),"Actual retained set selection is available");
+ document.texture_set_action(SpatialCommand::TextureNext);ready(document);
+ check(document.frame().state->active_texture_set==(id==0?1:0),"The actual next-set command selects the other retained field");
+ document.texture_set_action(SpatialCommand::TexturePrevious);ready(document);
+ check(document.copy_scene().encode()==baseline,"The previous-set command restores the active field");
  check(document.frame().state->can_bake&&!document.frame().state->can_clear_bake,
        "Actual prepared retained target admits Bake and protects its inherited detail");
  auto stopped=scene.snapshot();
  bool cancelled=false;
  refuses([&]{bake_object(stopped,donor,settings,[&]{return cancelled;},[&](float x){cancelled=x>.6f;});},
-         "Cancellation interrupts the second, independent role projection");
+         "Cancellation interrupts the retained field projection before publication");
  check(stopped.encode()==baseline,"An interrupted normal projection preserves both role grids");
  document.bake_from_object(donor,settings);
  const auto file=std::filesystem::path("retained-target.dsculpt");
