@@ -95,6 +95,12 @@ targets, broader polygon source domains and physical headset qualification remai
 [Authored native writable recipient evidence](validation/native-key-writable-bake-20261126.json)
 [Legacy Bake conversion evidence](validation/legacy-key-bake-conversion-20261126.json)
 
+Native Keep paint detail now reuses its proven immutable raster across display
+UV edits. The 2048-square Document workflow preserves sparse layers through UV
+editing, matching-triangle Bake with AO disabled, Save, Undo/Redo and cold
+reopen. Full-resolution default AO and first-key authoring on a fully baked
+target still reach existing resource quotas. [Full-resolution writable atlas evidence](validation/native-writable-raster-2048-20261126.json)
+
 Strict Bake rays now recover source-edge contacts affected by float staging.
 An exact ray hit has priority. A missed ray can use an actual source edge
 within a radius derived from float spacing and inside its original front/back

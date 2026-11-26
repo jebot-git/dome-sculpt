@@ -1,0 +1,143 @@
+{
+  "allocation_probe": {
+    "after-1024": {
+      "largest_bytes": 16384,
+      "log_sha256": "de4295e60ff11f70e5e7e77339d5fcaab890f4f98893ccc22ad451e27cbfbda8",
+      "message": "RASTER_ALLOCATION resolution=1024 largest_bytes=16384"
+    },
+    "after-2048": {
+      "largest_bytes": 65536,
+      "log_sha256": "d6e304e8070a23ddb37d430eee7798640446b1f1401061c24217528be0c80d80",
+      "message": "RASTER_ALLOCATION resolution=2048 largest_bytes=65536"
+    },
+    "before-1024": {
+      "largest_bytes": 41943040,
+      "log_sha256": "02e99c799bdb76e4735d43039106492e4fe45dc6273ab3c957868e94b7b9f291",
+      "message": "RASTER_ALLOCATION resolution=1024 largest_bytes=41943040"
+    },
+    "before-2048": {
+      "largest_bytes": null,
+      "log_sha256": "8aed4339f64bdaefcb16483726e11635dcc856da42da3a1d34cb42d3fb1f4696",
+      "message": "FAIL Native retained fixed work exceeds budget before allocation"
+    }
+  },
+  "archive": {
+    "file": "native-writable-raster-2048-20261126.tar.gz",
+    "members": 61,
+    "sha256": "29ac9da21eda0a55f8668edd43e189a9629fac783df5a1d7bf937c0066006b0f"
+  },
+  "frontend_seed_sha256": "3417ce4110f69dad197ff8c0a12d0ffc04c6643694b58f5ac39ff3cc817c90a4",
+  "frontends": {
+    "arc": {
+      "app_sha256": "09989699f65d970a7f1210b05b63680321b1d4353ede71c69a45d4ab217f10c9",
+      "checks": 10,
+      "exit": 0,
+      "input_sha256": "3417ce4110f69dad197ff8c0a12d0ffc04c6643694b58f5ac39ff3cc817c90a4",
+      "inspector_sha256": "90e51447c8391958108ba0cff1dce70868dc6cec1dc38cfe02d894d6d7e105a3",
+      "invocation": "5f003e16386a47309e60ee2f09f157d2",
+      "log_sha256": "69a10e5cfad62455b214300da4f25b77d5b1e4e6e9270c3a8cca1ce87e27625e",
+      "mode": "arc",
+      "native_sha256": "f672bafac4f0ea5c2296c7b5c9916322039616f41ec41156127d8efdeb25853d",
+      "phase": "complete",
+      "report_sha256": "772989f345ad45f88b3f173e43357dff719676ce5e8155fa9cbe4f79803aa283",
+      "run_script_sha256": "156f2292e8ad2b0d3d29a378a77c270128d5bb92a80c94e6d6cf2050d2d9e298",
+      "status_sha256": "ff05d8b8e10bb141d63c4b7385d29b7035eb605e986e70ae971bbafda5dc9410",
+      "terminal": true,
+      "verifier_sha256": "2d4ed71fe153de1e1797e3a0bf6522af6b7bec0ad03466a1f99d92cc82dd3e20"
+    },
+    "software": {
+      "app_sha256": "0bdacfeb984e032188f5bfb608e55d684ba4a51d86eecd191d0563387b4585c3",
+      "checks": 10,
+      "exit": 0,
+      "input_sha256": "3417ce4110f69dad197ff8c0a12d0ffc04c6643694b58f5ac39ff3cc817c90a4",
+      "inspector_sha256": "61ef436a171251b8c1f4efb57a493249d70837025a190e8ca64c81e915912bf4",
+      "invocation": "7f379e32eb2b4de0b6007dcd4d48554d",
+      "log_sha256": "ba1e0c952726a34491b254427b996b09c1ec2df9ffe2df2afa44f2b092e9a0f3",
+      "mode": "software",
+      "native_sha256": "f672bafac4f0ea5c2296c7b5c9916322039616f41ec41156127d8efdeb25853d",
+      "phase": "complete",
+      "report_sha256": "772989f345ad45f88b3f173e43357dff719676ce5e8155fa9cbe4f79803aa283",
+      "run_script_sha256": "156f2292e8ad2b0d3d29a378a77c270128d5bb92a80c94e6d6cf2050d2d9e298",
+      "status_sha256": "ae4402aa91bda5557482418355bacddaae8e49abba680100351c0c1643d361f7",
+      "terminal": true,
+      "verifier_sha256": "cbda426e279db0bf1d0f3ebb995d397bd77fc24e5b2ec30c2baf2c04bf1c35fa"
+    },
+    "wayland": {
+      "app_sha256": "0bdacfeb984e032188f5bfb608e55d684ba4a51d86eecd191d0563387b4585c3",
+      "checks": 9,
+      "compositor_sha256": "47920142c8c803dcf5adb63ba643d2e347fbdcd1e15ecd8bce7c1a8dd47c0b7e",
+      "compositor_source": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+      "exit": 0,
+      "input_sha256": "3417ce4110f69dad197ff8c0a12d0ffc04c6643694b58f5ac39ff3cc817c90a4",
+      "inspector_sha256": "61ef436a171251b8c1f4efb57a493249d70837025a190e8ca64c81e915912bf4",
+      "invocation": "fdbae49bfb7f4d0f85bcde2d2d195be0",
+      "log_sha256": "29eac27d22ebb9fdd74de7c0d2f36f90219033f90be0d0f54ae2587d3bc67485",
+      "mode": "wayland",
+      "native_sha256": "f672bafac4f0ea5c2296c7b5c9916322039616f41ec41156127d8efdeb25853d",
+      "phase": "complete",
+      "probe_sha256": "5bf11c670f66bbb68960073878933055b09582e5173ec1e3f472b413956c55aa",
+      "report_sha256": "48e68fa9d3ccc16c7712b8da097de6ff1618df9b03a2b23737bfce166589dcc3",
+      "run_script_sha256": "3c32fafcc64ed75b5471d3d10019883c051f30c05f53919557c9b17fe0ceb945",
+      "status_sha256": "37707c8bb5d09ee82713943c7db1b1a5f807f72f7fe50124d73d5cac6cc6a288",
+      "terminal": true,
+      "verifier_sha256": "cbda426e279db0bf1d0f3ebb995d397bd77fc24e5b2ec30c2baf2c04bf1c35fa"
+    }
+  },
+  "native": {
+    "asan": {
+      "app_sha256": "09989699f65d970a7f1210b05b63680321b1d4353ede71c69a45d4ab217f10c9",
+      "core_sha256": "17a6ab946a8314d72ff4990560b13c4ef101f99bbaf8fc4ff046cd0ecb30c31a",
+      "corrected_transition_log_sha256": "5e6a9429cf81d3786366fa88eba753f477d54ebd6352dcf2d8e7f27c0c4010b0",
+      "ctests": [
+        "bake",
+        "bake-custom-cage",
+        "bake-projection-policy",
+        "canonical-writable-bake-recipient",
+        "legacy-native-key-bake-conversion",
+        "native-key-writable-bake-recipient",
+        "native-writable-bake-2048",
+        "native-writable-bake-recipient",
+        "source-artist-normal-bake",
+        "source-prepared-normal-bake",
+        "texture-set-bake-recipe"
+      ],
+      "dense_checks": 13,
+      "extended_original_log_sha256": "0dc00ac71209470d8d28daec928ccddfcdbcf5a3d2e05b9b84b0b4b75f200fdb",
+      "primary_log_sha256": "bceb2abeef76f031acd7c5934f73a0a6aec82f201a92f823242140cf7a1b7878"
+    },
+    "release": {
+      "app_sha256": "0bdacfeb984e032188f5bfb608e55d684ba4a51d86eecd191d0563387b4585c3",
+      "core_sha256": "e8e8ffc1c9996557e78ac0225e2af1512fe0c35dbc673973d4d56486f50d935c",
+      "corrected_transition_log_sha256": "9c4a96e65033f4d540c77c3338fa872e596d31eb5334a8611f3c8adc4bbd3dd0",
+      "ctests": [
+        "bake",
+        "bake-custom-cage",
+        "bake-projection-policy",
+        "canonical-writable-bake-recipient",
+        "legacy-native-key-bake-conversion",
+        "native-key-writable-bake-recipient",
+        "native-writable-bake-2048",
+        "native-writable-bake-recipient",
+        "source-artist-normal-bake",
+        "source-prepared-normal-bake",
+        "texture-set-bake-recipe"
+      ],
+      "dense_checks": 13,
+      "extended_original_log_sha256": "e6fe72f08aff93e1cc7df2af2bd02648b8dba01208318481ca28c14b0e910956",
+      "primary_log_sha256": "e723ace11ecb9c10f7077dcdbadf255916313529540b6271aaa0a8b3770f13c3"
+    }
+  },
+  "patch_sha256": "92985e8510c4f7f35c7f334a04f9aef9660df8ebc11824a18c77cf5a967955d1",
+  "product": "689fb06173626f81c2d6240d5fc2204b9def9d7e",
+  "remaining": {
+    "default_ao": "Full-resolution Bake with 16 AO samples exceeds the existing 64,000,000-ray limit.",
+    "evidence_sha256": "50a2661546425db0c65219ef157050c08f02ec05447d6ebc3f155a1e5f2431f4",
+    "first_key_after_full_bake": "Scene paint-map budget exceeded before key publication."
+  },
+  "saved_projects": {
+    "baked-2048.dsculpt": "f672bafac4f0ea5c2296c7b5c9916322039616f41ec41156127d8efdeb25853d",
+    "retained-2048.dsculpt": "a262d60e0c64b26953f06bec509970ee68ea5f805ba28f7f5ee551b5c8f419c3"
+  },
+  "scope": "Native retained writable atlas through 2048-square UV editing and matched Bake with AO disabled, Save, hot Undo and Redo, cold reopen, and copy-free atlas attachment.",
+  "transition_fixture": "b073eb2f7f2d2cff2ecab710382f7cfbf67fdd9b"
+}

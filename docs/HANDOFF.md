@@ -1845,6 +1845,35 @@ Full-resolution retained authoring, affine-placed conversion targets and physica
 headset verification remain open.
 [Legacy Bake conversion evidence](validation/legacy-key-bake-conversion-20261126.json)
 
+### Keep a full-resolution writable atlas through UV editing and Bake
+
+Native Keep paint detail now shares the immutable raster when its ordered
+source corners still match. The display mesh and its sampling attachment retain
+their own owners. The original raster supplies the texel positions, barycentric
+coordinates, padding and paint-picking bounds. Native source replay uses the same
+proof under the existing limits. The largest allocation in the 1024 fixture
+fell from 40 MiB to 16 KiB. At 2048 the previous build refused the UV edit and
+the current build's largest allocation is 64 KiB for the 2048 fixture.
+
+The actual Document workflow preserves sparse paint through a 2048 UV transform,
+projects all 4,194,304 texels with matching source triangles and AO disabled,
+and preserves the new display UVs and bake recipe through ordered Save, Undo,
+Redo and cold reopen. Release and ASan/UBSan each pass 11 focused CTests and 13
+full-resolution checks. Five further regressions cover paint sampling,
+allocation faults, rig/key UV edits and Source8 rendering. The outdated
+transition fixture assumed both native Bake directions would refuse. Its
+corrected replay passes 12 checks, including refusal of a fabricated authored
+normal interpretation without the genuine frame.
+
+Nested DomeD Wayland passes nine checks. Software and Intel Arc synthetic
+OpenXR each pass ten, including focus cancellation. The accepted files match
+the native workflow byte for byte. The successful frontend inputs retain a
+genuine ray-Bake recipe with AO disabled. Separate probes confirm that the
+default 16 AO samples can hit the ray quota at 2048 and the first key on a
+fully baked 2048 target hits the Scene paint-map quota. Preserve the complete
+history while addressing those limits. Physical headset verification remains open.
+[Full-resolution writable atlas evidence](validation/native-writable-raster-2048-20261126.json)
+
 ## Source and integration boundary
 
 - Main now admits product1bc13125 and public fixturef1e193c7 after complete
