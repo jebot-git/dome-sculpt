@@ -45,7 +45,7 @@ inline PaintOverlayValues sample_overlay_values(const PaintOverlayPacket &packet
  const float x=std::clamp(u,0.f,1.f)*r-.5f,y=std::clamp(v,0.f,1.f)*r-.5f;const int ix=int(std::floor(x)),iy=int(std::floor(y));const float fx=x-ix,fy=y-iy;
  const auto a=pixel(ix,iy),b=pixel(ix+1,iy),c=pixel(ix,iy+1),d=pixel(ix+1,iy+1);PaintOverlayValues out;
  for(size_t plane=0;plane<5;++plane)for(size_t k=0;k<4;++k)out[plane][k]=std::lerp(std::lerp(a[plane][k],b[plane][k],fx),std::lerp(c[plane][k],d[plane][k],fx),fy);
- if(const auto &baked=packet.baked();baked&&baked->emission_domain){const auto below=baked->emission_domain->field()->sample(u,v);const float residual=1-out[3][3];for(size_t k=0;k<3;++k){out[2][k]+=below.legacy[k]*residual;out[4][k]+=below.absolute[k]*residual;}out[3][3]+=below.coverage*residual;out[2][3]=out[4][3]=out[3][3];}
+ if(const auto &baked=packet.baked();baked&&baked->emission_domain){const auto below=baked->emission_domain->sample(u,v);const float residual=1-out[3][3];for(size_t k=0;k<3;++k){out[2][k]+=below.legacy[k]*residual;out[4][k]+=below.absolute[k]*residual;}out[3][3]+=below.coverage*residual;out[2][3]=out[4][3]=out[3][3];}
  return out;
 }
 } // namespace dome::detail

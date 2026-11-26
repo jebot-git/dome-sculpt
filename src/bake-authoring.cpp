@@ -190,6 +190,7 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   if(settings.emission_transport&&high.materials[0].resolved_emission&&detail::exact_emission_projection_directions(low_mesh,options)){
     try{emission_domain=detail::BakedEmissionDomain::capture(scene,source_id,target.painted->mesh_owner(),options.resolution,target_world,cancelled);}
     catch(const std::invalid_argument&){/* Uncertified correspondence keeps the independently checked raster route. */}
+    if(emission_domain&&emission_domain->mapped()&&target.painted->paint_sampling_domain())emission_domain.reset();
   }
   // A separately retained UV write basis may differ from the current mesh.
   // Keep its existing raster route; sharing below requires the actual current
@@ -200,7 +201,8 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
     const auto a=low_mesh.positions[l],b=target.painted->mesh().positions[t];
     if(a.x!=b.x||a.y!=b.y||a.z!=b.z||low_mesh.uv[l]!=target.painted->mesh().uv[t]){share_emission=false;break;}
   }
-  auto result = share_emission?
+  if(!share_emission)emission_domain.reset();
+  auto result = emission_domain?
     detail::bake_mesh_retained_emission(low_mesh,high,options,source_normals,emission_domain,target.painted->mesh_owner()):
     detail::bake_mesh_source_normals(low_mesh,high,options,source_normals);
   if(settings.emission_transport)detail::verify_filtered_emission_quality(low_mesh,high,options,result,emission_domain);

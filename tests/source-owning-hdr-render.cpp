@@ -9,6 +9,7 @@
 #include "graphics.h"
 #include <iostream>
 #include <cmath>
+#include <string_view>
 #include <nlohmann/json.hpp>
 using namespace dome;
 namespace {
@@ -57,14 +58,27 @@ std::shared_ptr<MeshSnapshot> snapshot(const PaintedMesh &paint,Material materia
 std::vector<uint8_t> draw(SurfaceRenderer&r,Target&t,const std::shared_ptr<MeshSnapshot>&s){glBindFramebuffer(GL_FRAMEBUFFER,t.f);r.draw(s,{},identity,{0,0,2},96,96,true);std::vector<uint8_t>pixels(96*96*4);glReadPixels(0,0,96,96,GL_RGBA,GL_UNSIGNED_BYTE,pixels.data());check(glGetError()==GL_NO_ERROR,"Actual material renderer completed without GL errors");return pixels;}
 }
 int main(int argc,char**argv)try{
- NativeGraphics graphics;const std::string device=reinterpret_cast<const char*>(glGetString(GL_RENDERER));std::cout<<"GL_RENDERER="<<device<<std::endl;check(argc<2||std::string(argv[1])!="--hardware"||(device.find("llvmpipe")==std::string::npos&&device.find("softpipe")==std::string::npos),"Requested device executes real GPU path");
+ bool hardware=false,mapped=false;
+ for(int i=1;i<argc;++i){
+  const std::string_view flag=argv[i];
+  if(flag=="--hardware")hardware=true;
+  else if(flag=="--mapped")mapped=true;
+  else throw std::invalid_argument("Unknown retained HDR render fixture argument");
+ }
+ NativeGraphics graphics;const std::string device=reinterpret_cast<const char*>(glGetString(GL_RENDERER));std::cout<<"GL_RENDERER="<<device<<std::endl;check(!hardware||(device.find("llvmpipe")==std::string::npos&&device.find("softpipe")==std::string::npos),"Requested device executes real GPU path");
  Scene scene;auto &source_object=scene.active();const auto source=source_object.id;source_object.mesh_active=true;source_object.material.color={0,0,0,1};source_object.material.emissive={.02f,.04f,.08f};source_object.material.roughness=.75f;source_object.painted=std::make_shared<PaintedMesh>(quad(),64);stamp(*source_object.painted,{-.25f,0,0},.37f,{2,.1f,.03f});source_object.painted->add_layer("Original source detail");stamp(*source_object.painted,{.24f,.13f,0},.23f,{.05f,.8f,.3f});source_object.painted->layer_properties("Original source detail",true,.6f);const auto original_source=source_object.painted;const auto background=source_object.material.emissive;
- const auto target=scene.add("Actual higher-resolution target",Volume{});auto &target_object=scene.object(target);target_object.mesh_active=true;target_object.painted=std::make_shared<PaintedMesh>(quad(),512);target_object.material=scene.object(source).material;scene.select(target);ObjectBakeSettings settings;settings.padding=0;settings.ao_samples=0;settings.front_mm=settings.back_mm=2;const auto report=bake_object(scene,source,settings);check(report.projected>0,"Actual Bake produces retained source authority");auto paint=scene.active().painted;const auto domain=paint->baked()->emission_domain;check(domain&&domain->field()->resolution()==64&&paint->resolution()==512,"Original64 HDR knots are independent from current512 paint");
+ auto target_mesh=quad();
+ if(mapped)for(auto &uv:target_mesh.uv)uv={.625f-.5f*uv[0]+.125f*uv[1],.25f+.5f*uv[1]};
+ const auto target=scene.add("Actual higher-resolution target",Volume{});auto &target_object=scene.object(target);target_object.mesh_active=true;target_object.painted=std::make_shared<PaintedMesh>(std::move(target_mesh),512);target_object.material=scene.object(source).material;scene.select(target);ObjectBakeSettings settings;settings.padding=0;settings.ao_samples=0;settings.front_mm=settings.back_mm=2;const auto report=bake_object(scene,source,settings);check(report.projected>0,"Actual Bake produces retained source authority");auto paint=scene.active().painted;const auto domain=paint->baked()->emission_domain;check(domain&&domain->field()->resolution()==64&&paint->resolution()==512,"Original64 HDR knots are independent from current512 paint");
+ if(mapped){check(domain->mapped(),"Mapped rendering exercises the independent target atlas");std::cout<<"HDR_MAPPED mirrored and sheared UV0\n";}
  const auto packet=detail::PaintOverlayFactory::capture_native_emission(*paint);detail::PaintOverlayCompiler compiler;compiler.prepare({{packet,true}});const auto&resource=compiler.at(packet,true);check(resource.retained_emission&&resource.bytes==detail::PaintOverlayCompiler::texture_bytes(packet)&&compiler.image_count()>=6,"Retained original-size texture is owned and budgeted");GLuint fbo=0;glGenFramebuffers(1,&fbo);glBindFramebuffer(GL_READ_FRAMEBUFFER,fbo);glFramebufferTexture2D(GL_READ_FRAMEBUFFER,GL_COLOR_ATTACHMENT0,GL_TEXTURE_2D,resource.retained_emission,0);glReadBuffer(GL_COLOR_ATTACHMENT0);std::vector<float>raw(64*64*4);glReadPixels(0,0,64,64,GL_RGBA,GL_FLOAT,raw.data());double coefficient_error=0;for(size_t i=0;i<4096;++i){const auto&e=domain->field()->values()[i];for(size_t k=0;k<3;++k)coefficient_error=std::max(coefficient_error,std::abs(double(raw[i*4+k])-e.absolute[k]));check(raw[i*4+3]==1,"Retained immutable full-coverage coefficient survives GPU extraction");}check(coefficient_error==0,"GPU extracts original FLOAT coefficients exactly without resampling");glBindFramebuffer(GL_READ_FRAMEBUFFER,0);glDeleteFramebuffers(1,&fbo);
  MToonSourcePacks packs;MToonSourcePacks::Inputs inputs{};inputs[7]=MToonSourcePacks::Input::retained(resource);packs.prepare({inputs},0,0,{});check(packs.at(inputs).levels[98][1]==64&&packs.at(inputs).levels[98][2]==64,"MToon eighth view retains original64 size in existing sampler unit");
  Material material=scene.active().material;material.emissive={17,8,3};Target output;SurfaceRenderer renderer,reference;renderer.set_frame_time(0);reference.set_frame_time(0);int maximum=0;
  for(bool edited:{false,true}){if(edited){paint=paint->snapshot();paint->add_layer("Current512 physical paint");stamp(*paint,{0,-.1f,0},.29f,{.1f,.9f,.02f});paint->layer_properties("Current512 physical paint",true,.45f);}
-  for(bool toon:{false,true}){const auto actual=draw(renderer,output,snapshot(*paint,material,toon,true));int phase_error=0;for(int y:{29,37,48,59,67})for(int x:{29,37,48,59,67}){const double u=(x+.5-12)/72.,v=(y+.5-12)/72.;const auto below=sample(*original_source,u,v,background),above=sample(*paint,u,v,{});auto expected_material=material;for(int k=0;k<3;++k)expected_material.emissive[k]=float(below.rgb[k]*(1-above.coverage)+above.rgb[k]);const auto expected=draw(reference,output,snapshot(*paint,expected_material,toon,false));for(int k=0;k<3;++k)phase_error=std::max(phase_error,std::abs(int(actual[(y*96+x)*4+k])-int(expected[(y*96+x)*4+k])));}
+  for(bool toon:{false,true}){const auto actual=draw(renderer,output,snapshot(*paint,material,toon,true));int phase_error=0;for(int y:{29,37,48,59,67})for(int x:{29,37,48,59,67}){const double u=(x+.5-12)/72.,v=(y+.5-12)/72.;
+   const auto below=sample(*original_source,u,v,background);
+   const auto above=sample(*paint,mapped?.625-.5*u+.125*v:u,mapped?.25+.5*v:v,{});
+   auto expected_material=material;for(int k=0;k<3;++k)expected_material.emissive[k]=float(below.rgb[k]*(1-above.coverage)+above.rgb[k]);const auto expected=draw(reference,output,snapshot(*paint,expected_material,toon,false));for(int k=0;k<3;++k)phase_error=std::max(phase_error,std::abs(int(actual[(y*96+x)*4+k])-int(expected[(y*96+x)*4+k])));}
    std::cout<<"HDR_MATERIAL edited="<<edited<<" mtoon="<<toon<<" rgb_error="<<phase_error<<std::endl;maximum=std::max(maximum,phase_error);check(phase_error<=2,"Independent original64/current512 layer equation matches actual PBR/MToon material pixels");
   }
  }

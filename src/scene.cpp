@@ -269,7 +269,7 @@ Scene Scene::snapshot() const {
   return result;
 }
 void Scene::validate(bool deep_sources) const {
-  for(const auto &o:objects_)if(o.painted&&o.painted->baked()&&o.painted->baked()->emission_domain)o.painted->baked()->emission_domain->validate_current(o.painted->mesh_owner(),o.painted->resolution());
+  for(const auto &o:objects_)if(o.painted&&o.painted->baked()&&o.painted->baked()->emission_domain)o.painted->baked()->emission_domain->validate_current(*o.painted);
   detail::validate_texture_set_graph(*this);
   detail::ColorBoundScope color_bound_scope;
   if (objects_.empty() || objects_.size() > 256)

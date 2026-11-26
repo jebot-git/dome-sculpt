@@ -39,7 +39,7 @@ EmissionInterchangeImage field(const SculptObject &object,const std::function<bo
   if(slot.index>=0){if(binding)typed_emission=binding->roles[size_t(MToonSlot::Emission)];else {const auto &appearance=*object.appearance;const auto &texture=appearance.asset->textures.at(size_t(slot.index));if(texture.image<0||!appearance.decoded_images||size_t(texture.image)>=appearance.decoded_images->size())throw std::invalid_argument("Typed HDR emission has no owned original image");typed_emission.image=appearance.decoded_images->at(size_t(texture.image));typed_emission.wrap_s=texture.wrap_s;typed_emission.wrap_t=texture.wrap_t;typed_emission.min_filter=texture.min_filter;typed_emission.mag_filter=texture.mag_filter;}if(!typed_emission.image)throw std::invalid_argument("Typed HDR emission role has no image owner");}
  }if(paint.paint_sampling_domain()&&!native_domain)throw std::invalid_argument("Retained HDR paint export requires its exact current/source UV correspondence adapter");if(maps&&maps->emission.image&&(maps->emission.texcoord!=0))throw std::invalid_argument("HDR emission source requires its exact alternate-coordinate export raster");
  const auto retained=packet->baked()?packet->baked()->emission_domain:nullptr;
- if(retained)retained->validate_current(paint.mesh_owner(),paint.resolution());
+ if(retained)retained->validate_current(paint);
  const bool baked_float=packet->baked()&&(packet->baked()->emission_field||retained);
  EmissionInterchangeImage out;out.version=baked_float?2:1;out.width=out.height=r;out.pixels.resize(count);EmissionRgb original=toon?typed_background:object.material.emissive;if(binding&&binding->physical_emission)original=*binding->physical_emission;
  for(size_t index=0;index<count;++index){if((index&1023)==0)stop(cancelled);auto p=packet->padding()->at(index);const auto source=p<0?index:size_t(p);const auto x=uint32_t(source%r),y=uint32_t(source/r);EmissionOverlay overlay;BakedEmissionSample resolved_base;
@@ -49,7 +49,7 @@ EmissionInterchangeImage field(const SculptObject &object,const std::function<bo
    const auto overlay_values=sample_overlay_texel_values(*packet,int(index%r),int(index/r),false);
    BakedEmissionSample above;above.coverage=overlay_values[3][3];
    for(size_t k=0;k<3;++k){above.legacy[k]=overlay_values[2][k];above.absolute[k]=overlay_values[4][k];}
-   const auto background=retained->field()->sample((float(index%r)+.5f)/r,(float(index/r)+.5f)/r).resolve({},1);
+   const auto background=retained->sample((float(index%r)+.5f)/r,(float(index/r)+.5f)/r).resolve({},1);
    const auto resolved=above.resolve(background,legacy_strength);auto &destination=out.pixels[index];
    for(size_t k=0;k<3;++k){destination[k]=resolved[k];destination[3+k]=above.legacy[k];destination[6+k]=above.absolute[k];}
    destination[9]=above.coverage;continue;
@@ -129,7 +129,7 @@ EmissionInterchangeImage retained_source_emission_field(const SculptObject &obje
   throw std::invalid_argument("Retained emission witness needs its actual owning source domain");
  const auto owner=object.painted->baked()->emission_domain;
  if(!owner->valid_owner(owner))throw std::invalid_argument("Foreign retained emission source owner");
- owner->validate_current(object.painted->mesh_owner(),object.painted->resolution());
+ owner->validate_current(*object.painted);
  const auto &source=*owner->field();EmissionInterchangeImage result;result.version=2;
  result.width=result.height=source.resolution();result.pixels.resize(source.values().size());
  for(size_t i=0;i<result.pixels.size();++i){if((i&1023)==0)stop(cancelled);const auto &sample=source.values()[i];const auto radiance=sample.resolve({},1);auto &p=result.pixels[i];

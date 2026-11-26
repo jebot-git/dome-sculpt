@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
+#include "baked-emission-domain.hpp"
 #include "dome/baked-emission.hpp"
 #include "native-read-scope.hpp"
 #include "baked-emission-write-scope.hpp"
@@ -54,7 +55,7 @@ inline size_t baked_float_preflight(const nlohmann::json &b, uint32_t r,
                                      const BakedEmissionReadCapability *capability,
                                      const std::function<bool()> &cancelled={}) {
   (void)baked_legacy_version(b,capability);
-  if(b.at("version")==7){const auto &d=b.at("emission_domain");const auto n=d.at("resolution").get<uint32_t>();if(n<64||n>2048||(n&(n-1)))throw std::invalid_argument("Invalid retained emission grid");const auto bytes=nlohmann::json::to_cbor(d).size();if(bytes>32*1024*1024)throw std::length_error("Retained emission source exceeds archive budget");return bytes+BakedEmissionField::required_bytes(n,{128*1024*1024,cancelled});}
+  if(b.at("version")==7)return BakedEmissionDomain::preflight_archive(b.at("emission_domain"),cancelled);
   if(b.at("version")!=6)return 0;
   const auto &bytes=b.at("float_emission").get_binary();
   auto check=[cancelled]{NativeReadScope::check();return cancelled&&cancelled();};

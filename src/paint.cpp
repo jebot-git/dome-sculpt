@@ -2671,8 +2671,8 @@ void SourcePaintAccess::merge_bake(PaintedMesh &paint,BakedTextures incoming,Bak
   if (paint.editing_) throw std::logic_error("Finish the paint stroke before baking");
   if(size_t(normal_write)>1)throw std::invalid_argument("Invalid normal bake write intent");
   incoming.validate(paint.resolution());
-  if(incoming.emission_domain)incoming.emission_domain->validate_current(paint.mesh_owner(),paint.resolution());
-  if(paint.baked_&&paint.baked_->emission_domain)paint.baked_->emission_domain->validate_current(paint.mesh_owner(),paint.resolution());
+  if(incoming.emission_domain)incoming.emission_domain->validate_current(paint);
+  if(paint.baked_&&paint.baked_->emission_domain)paint.baked_->emission_domain->validate_current(paint);
   if(incoming.normal_authority)
     throw std::invalid_argument("Retained normal identity requires a source-owning field transition");
   if(bool(paint.color_projection_)!=(incoming.color_interpretation==BakedColorInterpretation::ResolvedPbr))
@@ -3672,7 +3672,7 @@ nlohmann::json PaintedMesh::encode_impl(PaintImageArchive *archive,NormalSamplin
       j["baked"]["normal_field"]=detail::BakedNormalArchive::writer().add_field(baked_->normal_field);
     }
     if(baked_->emission_domain){
-      baked_->emission_domain->validate_current(mesh_owner(),resolution());
+      baked_->emission_domain->validate_current(*this);
       j["baked"]["base_version"]=j["baked"]["version"];j["baked"]["version"]=7;
       j["baked"]["emission_domain"]=baked_->emission_domain->encode();
       detail::BakedEmissionWriteScope::domain_emitted(archive);
@@ -4045,7 +4045,10 @@ std::shared_ptr<PaintedMesh> PaintedMesh::decode_impl(const nlohmann::json &inpu
     BakedTextures baked;
     if(floating){
       detail::baked_float_preflight(v,r,context.baked_emission);
-      if(domain_emission){baked.emission_domain=detail::BakedEmissionDomain::decode(v.at("emission_domain"),result->mesh_owner(),r);context.baked_emission->note_validated_domain();}
+      if(domain_emission){
+        baked.emission_domain=detail::BakedEmissionDomain::decode(v.at("emission_domain"),result->mesh_owner(),r);
+        baked.emission_domain->validate_current(*result);context.baked_emission->note_validated_domain();
+      }
       else baked.emission_field=BakedEmissionField::decode(v.at("float_emission").get_binary(),
         {128*1024*1024,[]{detail::NativeReadScope::check();return false;}});
     }

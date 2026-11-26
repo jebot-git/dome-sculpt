@@ -782,6 +782,12 @@ SurfaceRenderer::SurfaceRenderer(SurfaceTextureLimits limits):chunks_(std::make_
   auto vertex=mtoon_renderer_vertex(true);
   std::string fragment="#version 330 core\n"+mtoon_renderer_common()+R"GLSL(
 in vec3 world,n,canonical_t,canonical_b,cut_position,canonical_n,source_n,source_t,source_b;in vec4 source_color,normal_coordinates,source_uv23,source_uv45,source_uv67;in float source_w;in vec2 texcoord,texcoord1,paintcoord;in float weight_value,mask_value;uniform int weight_pass;uniform float ghost_opacity;uniform vec3 selection_color;uniform float selection_amount;uniform int clip_enabled;uniform vec4 clip_plane;out vec4 color;uniform vec3 camera;uniform int toon,unlit,alpha_mode;uniform float alpha_cutoff;uniform vec4 base_color;uniform float metallic,roughness;uniform vec3 emission;uniform int source_uv1_is_uv0;uniform int overlay_mode,retained_emission_domain;uniform float relative_emission_strength;uniform int map_mode,slots[5],source_coordinates[5],baked_normal;uniform vec3 uv_x[5],uv_y[5];uniform float normal_scale,ao_strength;uniform int source_baked_frame,original_normal_present;uniform vec3 original_normal_x,original_normal_y;uniform int original_normal_coordinate;
+uniform vec3 retained_emission_u,retained_emission_v;
+vec2 retained_emission_uv(){
+  if(retained_emission_domain==1)return paintcoord;
+  vec3 uv=vec3(clamp(texcoord,0.,1.),1.);
+  return vec2(dot(retained_emission_u,uv),dot(retained_emission_v,uv));
+}
 )GLSL"+mtoon_renderer_fragment()+R"GLSL(
 const float PI=3.141592653589793;
 vec3 shade(vec3 N,vec3 V,vec3 L,vec3 power,vec3 base,float roughness,float metallic){
@@ -836,7 +842,7 @@ if(opacity<=0)discard;float x=clamp(weight_value,0,1)*4;vec3 ramp=x<1?mix(vec3(0
 if(slots[0]==1)base*=texture(tex0,source_uv(0));
 if(slots[1]==1){vec3 orm=texture(tex1,source_uv(1)).rgb;metal*=orm.b;rough*=orm.g;if(map_mode==1)ao=orm.r;}
 if(slots[2]==1)glow*=texture(tex2,source_uv(2)).rgb;
-if(retained_emission_domain==1)glow=retained_hdr_sample(paintcoord);
+if(retained_emission_domain!=0)glow=retained_hdr_sample(retained_emission_uv());
 if(map_mode==2&&slots[4]==1)ao=mix(1.0,texture(tex4,source_uv(4)).r,ao_strength);
 if(overlay_mode==1){vec4 contribution=texture(tex7,paintcoord),orm=texture(tex8,paintcoord),coverage=texture(tex10,paintcoord);
  base=base*(1-coverage.r)+contribution;metal=metal*(1-coverage.g)+orm.b;rough=rough*(1-coverage.b)+orm.g;ao=ao*(1-orm.a)+orm.r;
@@ -960,6 +966,14 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
     return alpha.value_or(m.color[3]) < 1 || (maps && (maps->color_projection?maps->pbr_transparent:maps->transparent)) || textures_->vertex_alpha.contains(key);
   };
   bool ghost_pass=false;
+  auto bind_retained_emission = [&](const detail::BakedEmissionDomain *domain){
+    const int mode=domain?(domain->mapped()?2:1):0;
+    glUniform1i(glGetUniformLocation(program_,"retained_emission_domain"),mode);
+    if(mode==2){
+      glUniform3fv(glGetUniformLocation(program_,"retained_emission_u"),1,domain->mapping()[0].data());
+      glUniform3fv(glGetUniformLocation(program_,"retained_emission_v"),1,domain->mapping()[1].data());
+    }
+  };
   auto draw_range = [&](const Material &original, size_t first, size_t count,
                         uint64_t id, const TextureMaps *maps,bool use_source=false,bool use_canonical=false,bool force_pbr=false,bool paint_domain=false,bool normal_domain=false,const SourceMaterialBindings *binding=nullptr,const detail::Vrm1SourceBackground *background=nullptr,uint32_t texture_set=0,bool submit=true) {
     const TextureState::MaterialKey key{id,texture_set};
@@ -1001,8 +1015,8 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
     const bool visible_overlay=maps&&maps->overlay&&!maps->overlay->empty()&&(!maps->overlay->native_geometry()||native_float);
     const bool current_float=maps&&maps->current_grid_preview&&maps->current_grid_preview->physical_emission();
     glUniform1i(glGetUniformLocation(program_,"overlay_mode"),current_float?2:visible_overlay?(maps->overlay->native_geometry()?2:1):0);
-    const bool retained_domain=visible_overlay&&maps->overlay->baked()&&maps->overlay->baked()->emission_domain;
-    glUniform1i(glGetUniformLocation(program_,"retained_emission_domain"),retained_domain);
+    const auto retained_domain=visible_overlay&&maps->overlay->baked()?maps->overlay->baked()->emission_domain.get():nullptr;
+    bind_retained_emission(retained_domain);
     if(retained_domain){const auto &overlay=textures_->paint_overlays.at(maps->overlay,true);glActiveTexture(GL_TEXTURE15);glBindTexture(GL_TEXTURE_2D,overlay.retained_emission);glBindSampler(15,0);}
     if(current_float){const auto&binding=textures_->bindings.at(key);for(int n:{9,10,13}){glActiveTexture(GL_TEXTURE0+n);glBindTexture(GL_TEXTURE_2D,binding[n].image);glBindSampler(n,binding[n].sampler);}}
     if(visible_overlay){const auto &overlay=textures_->paint_overlays.at(maps->overlay,true);
@@ -1104,7 +1118,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
     glUniform1iv(glGetUniformLocation(program_,"mt_present[0]"),16,present.data());glUniform1iv(glGetUniformLocation(program_,"mt_coord[0]"),16,coordinates.data());glUniform1iv(glGetUniformLocation(program_,"mt_derived[0]"),16,derived.data());glUniform1iv(glGetUniformLocation(program_,"mt_channel[0]"),16,channels.data());
     glUniform2fv(glGetUniformLocation(program_,"mt_offset[0]"),16,offsets.data());glUniform2fv(glGetUniformLocation(program_,"mt_scale[0]"),16,scales.data());glUniform1fv(glGetUniformLocation(program_,"mt_rotation[0]"),16,rotations.data());glUniform3fv(glGetUniformLocation(program_,"mt_pbr_x[0]"),2,pbrx.data());glUniform3fv(glGetUniformLocation(program_,"mt_pbr_y[0]"),2,pbry.data());
     glUniform3fv(glGetUniformLocation(program_,"mt_effective_emission"),1,effective_emission.data());
-    glUniform1i(glGetUniformLocation(program_,"mt_retained_domain"),t.overlay&&t.overlay->baked()&&t.overlay->baked()->emission_domain);
+    bind_retained_emission(t.overlay&&t.overlay->baked()?t.overlay->baked()->emission_domain.get():nullptr);
     glUniform1i(glGetUniformLocation(program_,"mt_overlay"),t.native_emission?(t.overlay?2:3):int(bool(t.overlay)));
     glUniform1f(glGetUniformLocation(program_,"mt_emission_strength"),emission_strength);
     glUniform1i(glGetUniformLocation(program_,"mt_absolute_background"),background!=textures_->physical_backgrounds.end());

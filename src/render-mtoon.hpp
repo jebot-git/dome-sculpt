@@ -53,7 +53,7 @@ vec3 viewNormal=vec3(dot(N,right),dot(N,mt_camera_up),-dot(N,mt_camera_forward))
 inline std::string mtoon_renderer_fragment(){return R"GLSL(
 uniform vec4 mt_effective_color,mt_native_color;uniform vec3 mt_effective_emission,mt_native_emission;
 uniform int mt_shade_alias,mt_baked_normal;
-uniform int mt_overlay,mt_absolute_background,mt_retained_domain;uniform float mt_emission_strength;uniform vec3 mt_background;
+uniform int mt_overlay,mt_absolute_background;uniform float mt_emission_strength;uniform vec3 mt_background;
 vec3 mt_retained_emission(vec3 original,float residual){
 vec3 factor=mt_absolute_background==1?mt_background:mt_effective_emission;
 vec3 background=mt_absolute_background==1?factor:factor*mt_emission_strength;
@@ -158,14 +158,14 @@ vec3 generic=mt_packed_read(2,genericUV).rgb;
 s.emission=coverage==0?mt_effective_emission*original:max(vec3(0),s.emission+(mt_effective_emission*original-mt_native_emission*generic)*(1-coverage));}
 if(mt_overlay==1){float coverage=mt_paint_read(3,paintcoord).a;
 vec3 original=s.emission;
-s.emission=(mt_retained_domain==1?mt_paint_read(7,paintcoord).rgb*(1-coverage):mt_retained_emission(original,1-coverage))+mt_paint_read(1,paintcoord).rgb*mt_emission_strength+mt_paint_read(2,paintcoord).rgb;
+s.emission=(retained_emission_domain!=0?mt_paint_read(7,retained_emission_uv()).rgb*(1-coverage):mt_retained_emission(original,1-coverage))+mt_paint_read(1,paintcoord).rgb*mt_emission_strength+mt_paint_read(2,paintcoord).rgb;
 }else if(mt_overlay>=2){
 // Native color/normal maps are already resolved. Only emission is evaluated
 // from these separate genuine coefficient fields, in its actual paint domain.
 float coverage=mt_overlay==2?mt_paint_read(6,paintcoord).a:0.;
 vec3 legacy=mt_overlay==2?mt_paint_read(4,paintcoord).rgb:vec3(0);
 vec3 physical=mt_overlay==2?mt_paint_read(5,paintcoord).rgb:vec3(0);
-s.emission=(mt_retained_domain==1?mt_paint_read(7,paintcoord).rgb*(1.-coverage):mt_retained_emission(s.emission,1.-coverage))+legacy*mt_emission_strength+physical;
+s.emission=(retained_emission_domain!=0?mt_paint_read(7,retained_emission_uv()).rgb*(1.-coverage):mt_retained_emission(s.emission,1.-coverage))+legacy*mt_emission_strength+physical;
 }else if(mt_absolute_background==1)s.emission*=mt_background;
 s.emission=dome_preview_positive_finite(s.emission);
 s.rim=mt_read(4,mt_uv(4,texcoord,texcoord1,N,V,mask)).rgb;s.matcap=mt_read(5,mt_uv(5,texcoord,texcoord1,N,V,mask)).rgb;

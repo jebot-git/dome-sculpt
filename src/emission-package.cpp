@@ -286,7 +286,9 @@ void native_domain(const Json &j,std::span<const uint8_t> binary,const Json &ent
 // Package5 keeps the source knots independent from the current paint grid.
 // The EXR is a witness of the immutable domain, never a replacement for it.
 size_t retained_descriptor(const Json &record){
- if(!record.is_object()||record.size()!=8||record.at("version")!=1||record.at("kind")!="retained-emission43")
+ const bool mapped=record.is_object()&&record.value("version",0)==2;
+ if(!record.is_object()||record.size()!=(mapped?9:8)||record.at("version")!=(mapped?2:1)||record.at("kind")!="retained-emission43"||
+    (mapped&&(!record.contains("coordinates")||!record.at("coordinates").is_array()||record.at("coordinates").size()!=2)))
   throw std::invalid_argument("Unknown retained emission witness interpretation");
  integer(record.at("sourceObject"),UINT64_MAX,"Invalid retained emission source identity");
  const auto source=integer(record.at("sourceResolution"),4096,"Retained emission source resolution exceeds policy");
@@ -299,9 +301,11 @@ void retained_coordinates(const Json &j,std::span<const uint8_t> binary,const Js
  const auto &record=entry.at("retainedEmission");const auto coordinate=retained_descriptor(record);
  const auto owner=object.painted&&object.painted->baked()?object.painted->baked()->emission_domain:nullptr;
  if(!object.mesh_active||!owner||!owner->valid_owner(owner))throw std::invalid_argument("Retained emission witness lost its actual source owner");
- owner->validate_current(object.painted->mesh_owner(),object.painted->resolution());
+ owner->validate_current(*object.painted);
  if(record.at("sourceObject")!=owner->source_id()||record.at("sourceResolution")!=owner->field()->resolution()||record.at("targetResolution")!=owner->target_resolution())
   throw std::invalid_argument("Retained emission witness changed its source/target grid identity");
+ if(record.at("version")!=(owner->mapped()?2:1)||(owner->mapped()&&record.at("coordinates")!=Json(owner->mapping())))
+  throw std::invalid_argument("Retained emission witness changed its certified coordinates");
  if(entry.contains("domain")){
   if(entry.at("domain").at("texCoord")!=coordinate)throw std::invalid_argument("Retained emission borrowed another writable coordinate domain");
   return; // native_domain independently validates every refined emitted corner.
@@ -371,7 +375,8 @@ void detail::attach_native_emission(GltfDocument &document,const NativeEmissionE
   auto expected=detail::baked_emission_field(current_object,cancelled,entry.authored_mtoon);
   if(expected.version!=entry.image.version||expected.width!=entry.image.width||expected.height!=entry.image.height||expected.pixels!=entry.image.pixels)throw std::invalid_argument("Retained emission current coefficients changed after preparation");
   auto source=detail::retained_source_emission_field(current_object,cancelled);limits.max_encoded_bytes=std::min(max_bytes,size_t(128*1024*1024)-exr_bytes);const auto source_bytes=encode_emission_exr(source,limits);exr_bytes+=source_bytes.size();auto witness=append(source_bytes);
-  witness["version"]=1;witness["kind"]="retained-emission43";witness["sourceObject"]=actual->source_id();witness["sourceResolution"]=source.width;witness["targetResolution"]=actual->target_resolution();witness["texCoord"]=entry.texcoord;
+  witness["version"]=actual->mapped()?2:1;witness["kind"]="retained-emission43";witness["sourceObject"]=actual->source_id();witness["sourceResolution"]=source.width;witness["targetResolution"]=actual->target_resolution();witness["texCoord"]=entry.texcoord;
+  if(actual->mapped())witness["coordinates"]=actual->mapping();
   record["retainedEmission"]=std::move(witness);retained_coordinates(j,document.binary,record,current_object,cancelled);
  }
  package["images"].push_back(std::move(record));}
