@@ -84,7 +84,16 @@ void check_worker_history(const Scene &before,uint64_t source,const ObjectBakeSe
  if(trace)std::cout<<"CHECKED_SOURCE_HISTORY accepted-state-exact"<<std::endl;
  const bool undone=doc.undo()&&doc.wait_mesh()&&doc.copy_scene().encode()==original;
  if(trace&&undone)std::cout<<"CHECKED_SOURCE_HISTORY undone-state-exact"<<std::endl;
- require(undone&&doc.redo()&&doc.wait_mesh()&&doc.copy_scene().encode()==accepted,
+ const bool redone=undone&&doc.redo();
+ const bool preview_ready=redone&&doc.wait_mesh();
+ if(trace){
+  const auto frame=doc.frame();
+  std::cout<<"CHECKED_SOURCE_REDO invoked="<<redone<<" preview_ready="<<preview_ready
+           <<" revision="<<frame.state->revision<<" error="<<frame.state->error<<std::endl;
+ }
+ const bool redo_exact=(preview_ready||(trace&&redone))&&doc.copy_scene().encode()==accepted;
+ if(trace)std::cout<<"CHECKED_SOURCE_REDO native_exact="<<redo_exact<<std::endl;
+ require(undone&&redone&&preview_ready&&redo_exact,
          "Joint SOURCE Bake owns one exact UndoRedo boundary");
  if(trace)std::cout<<"CHECKED_SOURCE_HISTORY redone-state-exact"<<std::endl;
 }
