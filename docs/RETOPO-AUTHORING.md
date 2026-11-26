@@ -58,8 +58,10 @@ volumes remain eligible under reflected, sheared, and nonuniform placement.
 Bake projects the evaluated source into the patch's atlas using world distances.
 It writes color, material, normals, and emission below editable paint layers.
 The original object, paint, sculpt layers, rig, and morphs remain in the project.
-Imported and prepared materials that carry their own normal or sampling domains
-require the corresponding source adapter.
+Imported source frames and initial prepared normal planes can carry distinct
+PBR and MToon directions. Select **Author portable normal targets** to keep
+both directions on the patch. **Match source triangles** requires the same
+ordered geometry and is available for corresponding meshes.
 
 Scene version 8 stores each patch's source object ID and independent versioned
 RetopoMesh payload alongside the derived painted mesh. Vertex/edge/face IDs,

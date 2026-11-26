@@ -1578,8 +1578,34 @@ open. [Native affine Bake evidence](validation/affine-native-bake-20261126.json)
 The older `d9ea0716` combined suite remains live. Its first observed failure
 is the allocation partition `canonical-paint37-key-replace-fault-part-86`.
 The native child completed all 345 prefixes and exited successfully. The outer
-ELF observer captured unexpected Python mappings in the child's process during
-startup. The wrapper result still fails and needs an executable-identity check.
+ELF observer captured Python mappings during child startup. The shared observer
+now checks executable identity before and after sampling. A gated child verifies
+the Python-to-native transition. With the original allocation binary and
+fixture, partition 86 passes on a fresh plan with the exact original native
+result. The original wrapper failure remains in the older suite log.
+
+### Affine authored normal sources
+
+Product `71f60afa` applies the same normal and tangent placement as the
+viewport to each evaluated source corner. It keeps separate original UV roles,
+inverse-transpose normals, linear tangents and reflected handedness. Initial
+prepared normal planes use the existing source decoder in that placed basis.
+Imported source skin positions reuse the authenticated original joint graph and
+enter the centered Bake metric before float conversion.
+
+Fixture `d087d27d` verifies a real imported authored VRM1, independently posed
+VRM0 and VRM1, and initial prepared normal donors. The independent samplers
+observe both normal roles. Three native matching outputs are byte-identical
+between Release and ASan/UBSan with leak detection. The exact original skin
+test distinguishes centered double evaluation from shifting pre-rounded world
+positions. The focused replay retains exact source ownership and ordered
+Save, reopen, Undo and Redo. On one fixture, strict ray projection of coincident
+edges misses 87 texels. Matching triangles cover all 3,969. The inset ray
+fixture projects all 3,969 through the public controls.
+
+Further work includes robust coincident-edge ray coverage, advanced retained
+UV and polygon normal domains, and physical headset verification.
+[Affine artist Bake and allocation observer evidence](validation/affine-artist-bake-20261126.json)
 
 ## Source and integration boundary
 

@@ -57,9 +57,17 @@ hidden source. A reflected, posed retopology donor transfers sparse color and
 FLOAT emission to the patch and retains its exact source scene. Native baked
 normals keep their original Mikk tangents and reflected handedness. The worker
 centers the shared projection space before narrowing transformed coordinates,
-so a translated sculpt's tiny triangles remain distinct. Original-material
-sampling and normal adapters for additional affine source types are still
-required. [Affine native Bake evidence](validation/affine-native-bake-20261126.json)
+so a translated sculpt's tiny triangles remain distinct.
+[Affine native Bake evidence](validation/affine-native-bake-20261126.json)
+
+Affine Bake also uses the original authored normal and tangent corners of
+imported VRM1 and tested VRM0 sources. It evaluates each material's normal
+role at the original coordinates, transports the posed corner columns, and
+retains reflected handedness. The same worker can rebake the initial prepared
+normal planes. Authenticated imported skins evaluate directly into the
+projection metric before float conversion. Advanced retained UV and polygon
+normal domains still need their own adapters. Physical headset qualification
+remains open. [Affine artist Bake evidence](validation/affine-artist-bake-20261126.json)
 
 Every route through retained project ownership now counts its longest
 descendant path toward the depth limit, including routes that reuse shared
