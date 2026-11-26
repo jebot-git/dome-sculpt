@@ -1,0 +1,151 @@
+{
+  "archive": {
+    "file": "native-writable-first-key-2048-20261126.tar.gz",
+    "members": 75,
+    "sha256": "949e66fdc652127bdea24def0079f46437637537a8fe66d8237148d30f6a478b"
+  },
+  "byte_parity": {
+    "baked-2048.dsculpt": "f672bafac4f0ea5c2296c7b5c9916322039616f41ec41156127d8efdeb25853d",
+    "converted-2048.dsculpt": "075776f1e2656d1f31d29c312c191120d62389bbe0af61d3956f84f6c868363a",
+    "keyed-2048.dsculpt": "55c4f3bf63a0c5cd97da5156fc2d1d807ca97f0e34f79b1986b6a16312f0bd97",
+    "portable-2048.glb": "593c183db2983c1f55b2c68a4d5012c6dc234e16a70a0ea9e8481fd06d52dea0",
+    "restored-2048.dsculpt": "f672bafac4f0ea5c2296c7b5c9916322039616f41ec41156127d8efdeb25853d",
+    "retained-2048.dsculpt": "a262d60e0c64b26953f06bec509970ee68ea5f805ba28f7f5ee551b5c8f419c3"
+  },
+  "frontend": {
+    "arc": {
+      "app_sha256": "463fc038abf28098752632fce30de1fe729fa5c5aa4a69babad64bfb2fb671c1",
+      "checks": 10,
+      "exit": 0,
+      "input_sha256": "f672bafac4f0ea5c2296c7b5c9916322039616f41ec41156127d8efdeb25853d",
+      "inspector_sha256": "3c22b79b4d2f85710bd1892603491ddc71d0f975b75e5d3f47be5bd96197f845",
+      "invocation": "bb942bc2e5b643c4ad80f43caebacbf0",
+      "log_sha256": "026a41dc687bcf1ed194433317378f580d629bdf2d52a026f56f52f4f3cd848c",
+      "mode": "arc",
+      "native_sha256": "359c8a7fd297a9d771dfc0c2aa96f1cf548dac7117369e9bed8035be8d75d50a",
+      "phase": "complete",
+      "report_sha256": "ef7b3e3faf43042d5a40c312b102aa53b04afe13cabc4c64fdfb6b2836d81e8e",
+      "run_script_sha256": "b9a7c58d28458c27e96a5fecb72fb0d81b764db59167d44bac3a63ada8f77b94",
+      "status_sha256": "a53d3cd01b97f239079f02ce209263fe1b947b81790bb9885a4846f6eab1acb4",
+      "synthetic_runtime_sha256": "1b229b9a886d39da990e7bd995bd2b8021397ce0768d4a5ca70ed6146b6af693",
+      "terminal": true,
+      "verifier_sha256": "8a5bce81f696934008adcb01ccd7abe3cdb0d208d97766710436f255cd427e01"
+    },
+    "software": {
+      "app_sha256": "e3b54252d23dbae4ecda6ad4a22af4709b9c6c5bb7112d3b820ca5e80de6d67c",
+      "checks": 10,
+      "exit": 0,
+      "input_sha256": "f672bafac4f0ea5c2296c7b5c9916322039616f41ec41156127d8efdeb25853d",
+      "inspector_sha256": "3729f69c345dbab492aae65f867ccf55b85c23cd3900f8b703cb0d413115f793",
+      "invocation": "7974d345e3fc41a1bda50849658a6699",
+      "log_sha256": "30140f888be38ff113d2fe43a5799afa6d04f298619614c06eea977495369db8",
+      "mode": "software",
+      "native_sha256": "359c8a7fd297a9d771dfc0c2aa96f1cf548dac7117369e9bed8035be8d75d50a",
+      "phase": "complete",
+      "report_sha256": "ef7b3e3faf43042d5a40c312b102aa53b04afe13cabc4c64fdfb6b2836d81e8e",
+      "run_script_sha256": "b9a7c58d28458c27e96a5fecb72fb0d81b764db59167d44bac3a63ada8f77b94",
+      "status_sha256": "e5fe61d3bc33e708b11d1169b7b2d72bcba9a6970fc5b185c0a2d87ded54df89",
+      "synthetic_runtime_sha256": "e20bb9e934ddf93dc184231f99ce67ed9f3dd8f7efc7baff9e9b89c03fc1d8b4",
+      "terminal": true,
+      "verifier_sha256": "0b3a545d1636cccc37b3de0b72e46d4b628d1e610192fa136581e0158e07cfcc"
+    },
+    "wayland": {
+      "app_sha256": "e3b54252d23dbae4ecda6ad4a22af4709b9c6c5bb7112d3b820ca5e80de6d67c",
+      "checks": 10,
+      "compositor_sha256": "47920142c8c803dcf5adb63ba643d2e347fbdcd1e15ecd8bce7c1a8dd47c0b7e",
+      "compositor_source": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+      "exit": 0,
+      "input_sha256": "f672bafac4f0ea5c2296c7b5c9916322039616f41ec41156127d8efdeb25853d",
+      "inspector_sha256": "3729f69c345dbab492aae65f867ccf55b85c23cd3900f8b703cb0d413115f793",
+      "invocation": "b295d877a8ae48a7a2277b503e2e984a",
+      "log_sha256": "1acc776e31cedbb30025313cc3614c1878b3d17b9a0df94b70e7de77b5bb1539",
+      "mode": "wayland",
+      "native_sha256": "55c4f3bf63a0c5cd97da5156fc2d1d807ca97f0e34f79b1986b6a16312f0bd97",
+      "phase": "complete",
+      "probe_sha256": "5bf11c670f66bbb68960073878933055b09582e5173ec1e3f472b413956c55aa",
+      "report_sha256": "96baa9f49568767cb8c1b2e4ce46247f7bc2b6ef3f8dbf9c4fcde5da005f7abd",
+      "run_script_sha256": "f0c6ea2dcc5773ddd27712e84ea002cbc3e82ee12e35d17c1b1cd05d0ef0eadb",
+      "status_sha256": "e7e2bbc4ccc76acd1457c4f6a3b3a4d7d4d095b313cd2a9ea9612609327f9959",
+      "terminal": true,
+      "verifier_sha256": "0b3a545d1636cccc37b3de0b72e46d4b628d1e610192fa136581e0158e07cfcc"
+    }
+  },
+  "native": {
+    "asan": {
+      "app_sha256": "463fc038abf28098752632fce30de1fe729fa5c5aa4a69babad64bfb2fb671c1",
+      "core_sha256": "62dbd384818ecb3334e1abe40a981de88e176b8236cb19f81918cda9c25af6e2",
+      "ctests": [
+        "bake",
+        "bake-custom-cage",
+        "bake-projection-policy",
+        "canonical-writable-bake-recipient",
+        "legacy-native-key-bake-conversion",
+        "native-key-writable-bake-recipient",
+        "native-writable-bake-2048",
+        "native-writable-bake-recipient",
+        "native-writable-first-key-2048",
+        "source-artist-normal-bake",
+        "source-prepared-normal-bake",
+        "texture-set-bake-recipe"
+      ],
+      "expanded_ctests": 8,
+      "log_sha256": {
+        "app-link.log": "961d4f0c393969629b7d97ad1982be8d119f814231d1fe4de84ddcf6ba916122",
+        "build/regressions.xml": "44572f2b3f6badacc911ccc3eb8fda15a1cfb8b2638036fb4dba70ddefb36cc5",
+        "ctest.log": "8c5eafe3c3a8177aecc8cf1bfcb86f23d2e90fc70d57e73d08f6d43bbb89fd3e",
+        "key-derivation-codec.cpp.log": "6f6fb63f15dd7437a9184790fbf1f7b6d96fc65595571010a3a54e8536464d2d",
+        "material-bindings.cpp.log": "64c65ea7b5908d6d55963088e00e8aa26b61457ca4a4c9744e28bcd0b13a863a",
+        "normal-key-derivation.cpp.log": "e7d6e0d6d4f65393a579dd78e42ebf78eec6307e7db5acd2c5a1c882e5bce5ce",
+        "paint.cpp.log": "ca2cafc6df2061e560ae5acb3508d5b82ef64a3716b80616ce42f365316d31b3",
+        "scene.cpp.log": "609ee141505a9f3db8bbc74fd8019768322861446e408caae11b34721d0a4878",
+        "source-writable-normal-bake.cpp.log": "a252db5b0bdcd09f60f7501d79e4898bc05b57e4dfa47cb2c85f02ff1f269ecd",
+        "status.json": "dcd875a76b7039809dc14eccf3457f2be7f5d998a463eddbd1c41a7a2ea676f3"
+      }
+    },
+    "release": {
+      "app_sha256": "e3b54252d23dbae4ecda6ad4a22af4709b9c6c5bb7112d3b820ca5e80de6d67c",
+      "core_sha256": "c0ea6676df025589068523141ff5336ee172a7c30208461ad31790e7008c74e0",
+      "ctests": [
+        "bake",
+        "bake-custom-cage",
+        "bake-projection-policy",
+        "canonical-writable-bake-recipient",
+        "legacy-native-key-bake-conversion",
+        "native-key-writable-bake-recipient",
+        "native-writable-bake-2048",
+        "native-writable-bake-recipient",
+        "native-writable-first-key-2048",
+        "source-artist-normal-bake",
+        "source-prepared-normal-bake",
+        "texture-set-bake-recipe"
+      ],
+      "expanded_ctests": 8,
+      "log_sha256": {
+        "app-link.log": "09800b9d7d1fdf9ff6ff8a0a89f70b56d2f195305e3c983f2a9bc73601e49778",
+        "build/regressions.xml": "e74efa0af370c843d835a5e6e0c07d9cca62bf9f6a52bcc014a5ae5ea91f55d8",
+        "ctest.log": "44322cb726957ad2153954082242baed7cd771143317226fb611ab54d3539182",
+        "key-derivation-codec.cpp.log": "eb25bd4315053a8e072f4b1a605c9152d0214fe13e9bf6dc27156a5d7a73d4c1",
+        "material-bindings.cpp.log": "fe742bb327ce34d2551173db2642bd60885a42c5eff1b55359123199de34bcfb",
+        "normal-key-derivation.cpp.log": "e6438c50420c9c962c7a4ce9895bc2ef239151426b05907f83d8d0c0d4493d58",
+        "paint.cpp.log": "45004bee80f55ad08aea49743f68f5168b4f9557d3d62910f90c4d15f0de28e9",
+        "scene.cpp.log": "5344098cf02725d80818920bb2c32bb9424fd7705d1510e0643c473d8bfe1398",
+        "source-writable-normal-bake.cpp.log": "6bc39b82e4a55b7f8e5f39d879095b64bc9c33d333cd2408108ac8b07ed42524",
+        "status.json": "7b0126fbe074de0e9aafcef3f8c864f01400116aca376a04d038ba57c8e3abc2"
+      }
+    }
+  },
+  "patch_sha256": "0cfd894aeca3b6142c2c442ec8d03b320007a1031cecd66309d4dfb6e666ac14",
+  "product": "ed491ddf685ebd5e637decafe8c88d6b7290ec87",
+  "scope": "Native writable LDR atlas at 2048 with a retained Bake and later first shapekey. Exact ordered Save, cold reopen, Undo/Redo, displacement, portable conversion, Standard GLB and Shape Restore. Expanded tests cover sampling, UV, texture sets and faults.",
+  "separate_checks": {
+    "editable_default_refusal": "Native nonemission compilation exceeds cumulative sample budget",
+    "editable_diagnostic_container_sha256": "2a2d509fb87ebeb01459846eb16138d96500b05debbef7846e470861db5790cb",
+    "editable_diagnostic_sample_operations_limit": 536870912,
+    "editable_diagnostic_scene_sha256": "075776f1e2656d1f31d29c312c191120d62389bbe0af61d3956f84f6c868363a",
+    "standard_default_ao_key_sha256": "a3ff343864b1d1d9574b6f8702ecf4fb33d00fe5a1de74bd109724ac8cd4b4ba"
+  },
+  "standard_format": {
+    "errors": 0,
+    "warnings": 1
+  }
+}

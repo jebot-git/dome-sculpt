@@ -1895,10 +1895,45 @@ the ray count rises by exactly 16 per projected material texel. Nested DomeD
 Wayland and synthetic OpenXR on software GL and Intel Arc save the same matched
 Bake using the default settings without a previously saved recipe.
 
-First-key authoring on the fully baked 2048 target still
-requires addressing the retained scene paint budget. Physical headset
-verification remains open.
 [Default AO evidence](validation/default-ao-bake-2048-20261126.json)
+
+### First shapekey after a full-resolution native Bake
+
+The native material frame and key derivation now share the exact finished
+paint record when their geometry, Bake, layers and revisions match. Native
+reopen replays the declared key geometry before preserving that identity.
+Strict linked paint also shares immutable raster samples within one Scene
+read. Each current geometry, material attachment and paint payload still
+has its own validation. An altered REST corner is rejected even when it
+points to the same raster. The native archive schema and its byte and
+texel limits are unchanged.
+
+The 2048-square LDR worker fixture creates and saves the first key over the
+full Bake, reopens the saved project, edits the key, converts its normals
+and exports Standard GLB. A fresh reopen followed by Shape Restore reproduces
+the entire original project file. The saved first-key archive is 214,323,981
+bytes. Release and ASan/UBSan each pass 12 focused tests and eight additional
+tests covering UV, texture sets, raster replay and fault recovery. Both profiles
+produce byte-identical projects and the same Standard GLB. A separate Release
+probe creates and saves a first key on the previous fixture with all 16 default
+AO samples. Nested DomeD Wayland and synthetic OpenXR on software GL and
+Intel Arc each pass 10 checks, including cancellation. The first Arc observer
+looked for the Release comparison fixture in the sanitizer output directory.
+The corrected observer passes with the same application and runtime.
+
+A fresh full Release build of `ed491ddf` is running under
+`ds-first-key-2048-full-release-20261126.service` with the current DomeD SDK.
+The resulting full private CTest run is gated on the preceding run releasing
+test resources. Read the exact run state under
+`artifacts/first-key-2048-full-release-20261126/status.json`.
+
+Standard GLB passes Khronos validation with zero errors and a skinned-node
+parent warning. The default Editable GLB worker still reaches its cumulative
+sample budget at this resolution. A diagnostic run with an explicit larger
+sample budget extracts a byte-identical native project from the resulting GLB.
+Default Editable export, joint full-resolution physical-emission key workflows
+and physical headset verification remain open.
+[First shapekey evidence](validation/native-writable-first-key-2048-20261126.json)
 
 ## Source and integration boundary
 
