@@ -1,0 +1,431 @@
+{
+  "merge": "06d1c5feb758401e57f3375931b8818cd7564ee9",
+  "candidate": "6b5d338ec348767c8494a8fa6387c40af11ce284",
+  "scope": "Scene40 recipe persistence, namespace remap, retained native paint and canonical PBR sampling. Physical headset and active-set authoring are outside this validation.",
+  "profiles": {
+    "release": {
+      "profile": "release",
+      "candidate": "6b5d338ec348767c8494a8fa6387c40af11ce284",
+      "product_source": "b89b1f8c2a3d3346f6b0127c830395df193ecbf3",
+      "terminal": true,
+      "invocation": "78aff64f4586469ca986f4cf3ac27995",
+      "phase": "complete",
+      "app_sha256": "302f929a3793f99e46bfe1f0e28a7bce4844c3972dd7b4286fd8911dbc2edb95",
+      "core_sha256": "5767b821a7d88b844ff9f1b7c6ea03c3736a20e8e9b30cd7766ce202232dff96",
+      "original_ctest_sha256": "4ebf29e18d24bd71c19d0a9b047af3afc55b6e58494410a22e86b637d1ba3201",
+      "fixture_sha256": "4ff5d7e8087adba70598380af49ca9c22bca7c6f6031caaeecf4340e0a6b6d92",
+      "exit": 0,
+      "ctest_sha256": "020b216bd8ea9d73bedb20a1c2d19c863d4126f1a624dfc769ebae5c96c87686",
+      "tests_passed": 10
+    },
+    "software-release": {
+      "candidate": "6b5d338ec348767c8494a8fa6387c40af11ce284",
+      "app_source": "6b5d338ec348767c8494a8fa6387c40af11ce284",
+      "invocation": "309d5eea694a404ebd74888415bc41e3",
+      "profile": "software-release",
+      "terminal": true,
+      "phase": "complete",
+      "elapsed_seconds": 387.98,
+      "companion_hashes": {
+        "dome-sculpt-bake-controls-test": "13aed9583bd26484b56d70f16fef6750a8b30726ce06fab5c51d22f83bb6850b",
+        "dome-sculpt-corner-color-uv23-gui-fixture": "e5e2875955d2c175b50b2486082f0bc7fb89a70cc4efe556544791e03cad209a",
+        "dome-sculpt-skin-authoring-test": "1181bad3dcb73d14ad9d1a16113e43b1a17a0667e9b9ea60dc91263bbb33437b",
+        "dome-sculpt-retopo-authoring-test": "02de9a92244651e38d7b7f460987c6144e6c6c75f029e026e2cdc318391ef85c",
+        "dome-sculpt-cut-authoring-test": "a2b740e579e79fdf95048f733bcb2e11795826b304ecdac6e9a20e6c71ad9b0f",
+        "dome-sculpt-mask-document-test": "4ec94e884e9b994e2983fa16ee9e3c64b49c2bb023395cae9acc618d1cf863fd"
+      },
+      "app_sha256": "302f929a3793f99e46bfe1f0e28a7bce4844c3972dd7b4286fd8911dbc2edb95",
+      "runtime_sha256": "e00b86390634f4c3e97694a50553e0364db6b3379153fd912a1c3f9d81027026",
+      "runner_sha256": "943e4655951793a8552358db79c1634246fef9ec41f8b2b4e1c8c8ef1b7fa3d3",
+      "exit": 0,
+      "loader_exit": 0,
+      "checks": 153,
+      "report_complete": true,
+      "error": null,
+      "arc_witnesses": {},
+      "voxel": {
+        "exact_native_bytes": true,
+        "voxel_menu_pixels": 9884,
+        "voxel_menu_seen": true,
+        "voxel_open_pixels": 172,
+        "voxel_undo_pixels": 196,
+        "voxel_undo_seen": true
+      },
+      "uv": {
+        "uv_atlas_apply_accent": 207,
+        "uv_atlas_ready": true,
+        "uv_atlas_visible_pixels": 4994,
+        "uv_atlas_wait_frames": 1
+      }
+    },
+    "asan": {
+      "profile": "asan",
+      "candidate": "6b5d338ec348767c8494a8fa6387c40af11ce284",
+      "product_source": "b89b1f8c2a3d3346f6b0127c830395df193ecbf3",
+      "terminal": true,
+      "invocation": "3526c7db72224ddab5e5bb19ed31fc26",
+      "phase": "complete",
+      "app_sha256": "51d3b0f725033af2d584945f56d96d1e37d72155384878a5ca50f979417a0982",
+      "core_sha256": "625025e6b7d01a913e85c13a0a518c85a7cc24357ee3dc0adfee7002177d164a",
+      "original_ctest_sha256": "804260c440d179019a864f8742b95104cde7b2427bdd8c592ab6b7fea3f3aa6a",
+      "fixture_sha256": "56125fbf061237b10ff7f6d386f1ce4f928ed2c8b4dc8f4c3ee267f01f8f4e33",
+      "exit": 0,
+      "ctest_sha256": "9cdce15a01208485a6fc6b53d8bcc46f65b03b3aa2a8e6e0ab6a671f5bc3edea",
+      "tests_passed": 10
+    },
+    "arc-asan": {
+      "candidate": "6b5d338ec348767c8494a8fa6387c40af11ce284",
+      "app_source": "6b5d338ec348767c8494a8fa6387c40af11ce284",
+      "invocation": "55774614c32641cf8453843b7caacd21",
+      "profile": "arc-asan",
+      "terminal": true,
+      "phase": "complete",
+      "elapsed_seconds": 899.74,
+      "companion_hashes": {
+        "dome-sculpt-bake-controls-test": "1126624ff9939472ffddb223805cb151a8cd0f0f14afac9fe0864751b02b80fc",
+        "dome-sculpt-corner-color-uv23-gui-fixture": "d5b7629d8369c5150cd5c3784012420d2d0dfe820211acac6e02d6093d96f329",
+        "dome-sculpt-skin-authoring-test": "b89c7b53f06fc05744a35c22c1b97778fec738c1c9498c1d93c630f922477ac7",
+        "dome-sculpt-retopo-authoring-test": "104353fae33a380364b87175ce4601fa68a3a4cf788fcfdbec33679c5df5fa1c",
+        "dome-sculpt-cut-authoring-test": "0c0174882eab244731c6d7c7f5b2f4e8fe8f403332aedd6b79d5531ee043e323",
+        "dome-sculpt-mask-document-test": "745c797761ac4ba8a1d979ba47cbce6cd06c3516a31ed8ce9845eeb818b80a04"
+      },
+      "app_sha256": "51d3b0f725033af2d584945f56d96d1e37d72155384878a5ca50f979417a0982",
+      "runtime_sha256": "3203579dbe7d26f550dc3197bec266148f0e38bf9cfe467804ae6c369f5faa98",
+      "runner_sha256": "60869bf047e814c1b3aec9e5281bde4f62b466883ab1c95af5295459e98849cb",
+      "exit": 0,
+      "loader_exit": 0,
+      "checks": 153,
+      "report_complete": true,
+      "error": null,
+      "arc_witnesses": {
+        "baseline": {
+          "pid": 2819632,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "signal-committed": {
+          "pid": 2836018,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "signal-sigint": {
+          "pid": 2845301,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "signal-sigterm": {
+          "pid": 2857192,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "controller": {
+          "pid": 2869474,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "stylus": {
+          "pid": 2884368,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "controller-srgb": {
+          "pid": 2899813,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "sculpt-layers": {
+          "pid": 2914832,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "restart-prefix": {
+          "pid": 2928389,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "restart": {
+          "pid": 2937674,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "scene": {
+          "pid": 2955862,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "voxel-accept": {
+          "pid": 2973883,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "voxel-cancel": {
+          "pid": 2997140,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "voxel-focus": {
+          "pid": 3011388,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "voxel-undo": {
+          "pid": 3025921,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "bake-accept": {
+          "pid": 3040335,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "bake-cancel": {
+          "pid": 3040855,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "bake-focus": {
+          "pid": 3041328,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "bake-undo": {
+          "pid": 3041773,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "skin-transfer": {
+          "pid": 3042337,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "skin-fitted": {
+          "pid": 3043120,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "skin-focus": {
+          "pid": 3044107,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "retopo-committed": {
+          "pid": 3045286,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "retopo-accept": {
+          "pid": 3046194,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "retopo-focus": {
+          "pid": 3047256,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "retopo-unconfirmed": {
+          "pid": 3048633,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "cut-accept": {
+          "pid": 3049845,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "cut-unconfirmed": {
+          "pid": 3050895,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "mask-prefix": {
+          "pid": 3051923,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "mask-accept": {
+          "pid": 3052530,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "mask-cancel": {
+          "pid": 3053201,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "mask-focus": {
+          "pid": 3053884,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "mask-fill": {
+          "pid": 3054770,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "mask-undo": {
+          "pid": 3055551,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "paint-baseline": {
+          "pid": 3056242,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "paint": {
+          "pid": 3061428,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "uv": {
+          "pid": 3066672,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "controls": {
+          "pid": 3072004,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "files": {
+          "pid": 3072604,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "no-overlay": {
+          "pid": 3079840,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        },
+        "exclusive": {
+          "pid": 3080050,
+          "node": "/dev/dri/renderD129",
+          "maps": [
+            "/usr/lib64/libgallium-26.2.7.so"
+          ]
+        }
+      },
+      "voxel": {
+        "exact_native_bytes": true,
+        "voxel_menu_pixels": 10141,
+        "voxel_menu_reopens": 1,
+        "voxel_menu_seen": true,
+        "voxel_open_pixels": 172,
+        "voxel_undo_pixels": 131,
+        "voxel_undo_seen": true,
+        "voxel_undo_wait_frames": 74
+      },
+      "uv": {
+        "uv_atlas_apply_accent": 207,
+        "uv_atlas_ready": true,
+        "uv_atlas_visible_pixels": 4997,
+        "uv_atlas_wait_frames": 24
+      }
+    }
+  },
+  "archive": {
+    "file": "texture-set-recipe-runtime-20261126.tar.gz",
+    "sha256": "e5ef66608e4ee89d11ef5bfe70c3caa52fe0545ccebab80b6c5ddb0ba2508d77",
+    "members": {
+      "arc-asan/run.log": "4d5930c193c9b7d749ffe8ddd084097f6283c4bea4163f85747194a010027ded",
+      "arc-asan/status.json": "68383a6cee9b2d70c00de4148cf59f82e069b17f203fb25f607783abc302d31a",
+      "arc-asan/workflow/files.json": "b69d83bc6f4b5cf5bf42f02c9f4f8a2f4797dc7a954ffab8d97fdd3653db4bd4",
+      "arc-asan/workflow/report.json": "e44a6cc23817abf15bb3cae664bf8f096b3f0d9c00b91fc069715030b09c5d49",
+      "arc-asan/workflow/voxel-undo.json": "0410d8a2d86fa3a7c65fead91fe1a32e86747276105600bd3f3903eb5fd01efd",
+      "asan/ctest.log": "9cdce15a01208485a6fc6b53d8bcc46f65b03b3aa2a8e6e0ab6a671f5bc3edea",
+      "asan/pre-fixture-correction-ctest.log": "804260c440d179019a864f8742b95104cde7b2427bdd8c592ab6b7fea3f3aa6a",
+      "asan/status.json": "43b4058ea5402344bd059113465c952bf75b7b01f3003dcd5219f590a3789129",
+      "release/ctest.log": "020b216bd8ea9d73bedb20a1c2d19c863d4126f1a624dfc769ebae5c96c87686",
+      "release/pre-fixture-correction-ctest.log": "4ebf29e18d24bd71c19d0a9b047af3afc55b6e58494410a22e86b637d1ba3201",
+      "release/status.json": "69346d5e4a7bf2c910b9720559184e0c7fd171330638cd4f4b4889cbc75dcec5",
+      "run-xr.py": "c7fb2414705f3d20e4aae4cc4d39970c7a4c7064f25724fe044a824de1ce52b8",
+      "run.py": "76a3de860d429359e0cb08a8e9c6cdf8925057dbaedbd9a03604aa8c1ddf2296",
+      "software-release/run.log": "a834ee80b5dd1594279375684b39b220d85c3bd532cc525a609b72e7d26da76e",
+      "software-release/status.json": "c9cb78968b6de7f6c86d22962c926687adb4ba822785e3b5ef3a62d0939eb95f",
+      "software-release/workflow/files.json": "84c9e7e472c140633a14a74741a5ccfbee4768c613f911d7c4e21c7a478ed115",
+      "software-release/workflow/report.json": "4021b8db3b3666fcee8d68ea0afcb24eb023ac3033b86a8e5bc4fa3f7adb66c8",
+      "software-release/workflow/voxel-undo.json": "6dfd90e27072b8abe150ceaf835dc8f4126d2a7bdcde77629ec599ce28a50fa2"
+    }
+  }
+}

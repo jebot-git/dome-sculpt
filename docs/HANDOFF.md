@@ -1101,11 +1101,15 @@ The unchanged Paint6 fixture expected older exception wording. Its
 failure reproduces on main. Test-only `a3d59082` checks the exact missing
 physical-context refusal and passes all 16,407 controls against both
 existing Release cores and the canonical candidate's sanitizer core. The original failures and corrected results are
-preserved. Combined application `b89b1f8c` adds the admitted HDR fix.
-Its test-only companion `6b5d338e` uses the corrected Paint6 fixture.
-Native and OpenXR qualification continue before runtime admission.
-Active-set Bake/Clear/Recall remains required.
+preserved. Combined application `b89b1f8c` pairs the recipe transport with
+the admitted HDR fix. Its test-only companion `6b5d338e` passes all ten
+native cases in optimized Release and ASan/UBSan. The matching applications
+each pass all 153 synthetic OpenXR checks, with exact voxel Undo bytes.
+The sanitizer XR process uses Intel Arc at `/dev/dri/renderD129`.
+Main integrates the qualified source as `06d1c5fe`.
+Active-set Bake/Clear/Recall and physical device verification remain open.
 [Texture-set recipe and reference evidence](validation/texture-set-bake-recipe-20261126.json)
+[Combined runtime evidence](validation/texture-set-recipe-runtime-20261126.json)
 
 ## Source and integration boundary
 

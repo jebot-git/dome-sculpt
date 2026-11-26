@@ -77,9 +77,12 @@ remapping candidate handles deletion and append for the tested plain
 fields. Both initial candidates pass five native suites in Release and
 ASan/UBSan. The prepared polygon and canonical UV continuation passes
 75 checks per Release and ASan/UBSan profile for native and PBR reference remapping while
-preserving exact source sampling and archive replay. The combined app
-qualification and active-set Bake/Clear/Recall remain open.
+preserving exact source sampling and archive replay. Main now integrates
+recipe persistence and reference remapping after ten native tests per
+profile and 153 synthetic OpenXR checks each in software Release and on
+Intel Arc with ASan/UBSan. Active-set Bake/Clear/Recall remains open.
 [Texture-set recipe evidence](validation/texture-set-bake-recipe-20261126.json)
+[Combined runtime evidence](validation/texture-set-recipe-runtime-20261126.json)
 
 ## Qualified integration — 2026-11-17
 
