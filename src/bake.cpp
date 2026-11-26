@@ -257,12 +257,16 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
     const detail::SourceBakeNormalResolver &source_normals,
     std::span<const uint32_t> target_triangles = {},
     std::span<const detail::RetainedSourceBakeField> source_fields = {},
-    detail::SourceBakePlacement source_placement = {}) {
+    detail::SourceBakePlacement source_placement = {},
+    std::span<const Tangent> target_metric_corners = {}) {
   if(o.progress)o.progress(0);
   cancel(o); validate(low,source,o,source_fields);
   if(!source_placement.tangent_corners.empty()&&
       source_placement.tangent_corners.size()!=source.mesh.indices.size())
     throw std::invalid_argument("Placed Bake tangents lost their original logical corners");
+  if(!target_metric_corners.empty()&&
+      (!o.low_tangents.empty()||target_metric_corners.size()!=low.indices.size()))
+    throw std::invalid_argument("Placed target tangent corners differ from the actual Bake basis");
   if(!target_triangles.empty() &&
      (target_triangles.back()>=low.indices.size()/3 ||
       std::adjacent_find(target_triangles.begin(),target_triangles.end(),std::greater_equal<>{})!=target_triangles.end()))
@@ -290,8 +294,10 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
       throw std::length_error("FLOAT Bake retained channels exceed unchanged paint budget");
   }
   SurfaceQuery query(source.mesh,o.cancelled); cancel(o);
-  auto low_frames = o.low_tangents.empty() ? tangent_corners(low, o.cancelled)
-                                         : std::vector<Tangent>{};
+  const auto generated_low_frames=o.low_tangents.empty()&&target_metric_corners.empty()
+      ? tangent_corners(low,o.cancelled) : std::vector<Tangent>{};
+  const auto low_frames=target_metric_corners.empty()
+      ? std::span<const Tangent>(generated_low_frames) : target_metric_corners;
   std::vector<Tangent> generated_high_frames;
   auto high_frames=source_placement.tangent_corners;
   const bool raw_baked_normals=std::any_of(source.materials.begin(),source.materials.end(),[](const auto &m){
@@ -514,7 +520,8 @@ BakeResult bake_mesh(const Mesh &low,const BakeSource &source,const BakeOptions 
 }
 BakeResult detail::bake_mesh_source_normals(const Mesh &low,const BakeSource &source,const BakeOptions &options,
  const SourceBakeNormalResolver &normal,std::span<const uint32_t> target_triangles,
- std::span<const RetainedSourceBakeField> source_fields,SourceBakePlacement source_placement){
- return bake_mesh_impl(low,source,options,normal,target_triangles,source_fields,source_placement);
+ std::span<const RetainedSourceBakeField> source_fields,SourceBakePlacement source_placement,
+ std::span<const Tangent> target_metric_corners){
+ return bake_mesh_impl(low,source,options,normal,target_triangles,source_fields,source_placement,target_metric_corners);
 }
 } // namespace dome

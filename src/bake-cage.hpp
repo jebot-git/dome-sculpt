@@ -9,7 +9,7 @@ namespace dome::detail {
 // ordered target vertex IDs, transported through the existing low-basis corners.
 inline std::vector<Vec3> object_bake_cage(const Scene &scene,uint64_t target_id,
     uint64_t cage_id,const Mesh &target,const Mesh &low,
-    const std::function<bool()> &cancelled) {
+    const std::function<bool()> &cancelled,const AffineTransform *metric_from_world=nullptr) {
   auto stop=[&]{if(cancelled&&cancelled())throw std::runtime_error("Bake cage cancelled");};
   stop();
   if(cage_id==target_id)throw std::invalid_argument("Choose a different editable mesh for the bake cage");
@@ -29,7 +29,8 @@ inline std::vector<Vec3> object_bake_cage(const Scene &scene,uint64_t target_id,
   const bool ordered=rest.positions.size()==target.positions.size()&&rest.indices==target.indices;
   std::vector<uint32_t> polygon_identity;
   if(!ordered)polygon_identity=polygon_bake_cage_vertices(scene.object(target_id),object,target,visible,cancelled);
-  const auto relative=scene.world_matrix(target_id).inverse()*scene.world_matrix(cage_id);
+  const auto relative=(metric_from_world?*metric_from_world:scene.world_matrix(target_id).inverse())*
+      scene.world_matrix(cage_id);
   std::vector<uint32_t> identity(low.positions.size(),UINT32_MAX);
   for(size_t c=0;c<target.indices.size();++c){
     if((c&1023)==0)stop();

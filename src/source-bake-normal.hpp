@@ -30,5 +30,6 @@ struct SourceBakePlacement {
 BakeResult bake_mesh_source_normals(const Mesh &,const BakeSource &,const BakeOptions &,
  const SourceBakeNormalResolver &, std::span<const uint32_t> target_triangles = {},
  std::span<const RetainedSourceBakeField> source_fields = {},
- SourceBakePlacement source_placement = {});
+ SourceBakePlacement source_placement = {},
+ std::span<const std::array<float,4>> target_metric_corners = {});
 }

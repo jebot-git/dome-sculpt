@@ -77,7 +77,7 @@ std::vector<uint64_t> Document::bake_cages_locked() const {
 }
 bool Document::bake_target_ready_locked() const {
   const auto &o=scene_.active();
-  return detail::bake_target_supported(o) && !state_.shape_sculpt && !scene_.has_affine_placement(o.id) && !state_.polygon && !state_.cut && !state_.retopology && !uv_ &&
+  return detail::bake_target_supported(o) && !state_.shape_sculpt && !state_.polygon && !state_.cut && !state_.retopology && !uv_ &&
     !state_.asset_busy && !state_.recovery_busy && !action_active_locked() &&
     object_editable_locked(o.id) && o.mesh_active && o.painted;
 }
@@ -132,7 +132,7 @@ void Document::clear_bake(AssetSource expected){
 }
 bool Document::canonical_conversion_ready_locked() const {
   const auto &o=scene_.active();
-  if(o.texture_sets)return false;
+  if(o.texture_sets||scene_.has_affine_placement(o.id))return false;
   if(!state_.object_grabbing&&bake_target_ready_locked()&&o.material_bindings&&o.material_bindings->normal_preparation){
     const auto &p=*o.material_bindings->normal_preparation;
     return p.canonical_conversion&&!p.uv_reprojection&&!p.sampling_domain&&!p.key_derivation;

@@ -283,25 +283,118 @@ void affine_plain_bake_source(){
  check(doc.undo()&&doc.copy_scene().encode()==before,"The reflected donor and recipient Undo exactly");
 }
 
+void affine_bake_target(bool texture_set,bool prepared,bool reflected){
+ Mesh mesh;
+ mesh.positions={{-.5f,-.5f,0},{.5f,-.5f,0},{.5f,.5f,0},{-.5f,.5f,0}};
+ mesh.normals.assign(4,{0,0,1});
+ mesh.uv={{.10f,.10f},{.90f,.10f},{.90f,.90f},{.10f,.90f}};
+ mesh.indices={0,1,2,0,2,3};
+ auto matrix=AffineTransform{}.matrix();
+ matrix[0]=reflected?-1.6:1.6;matrix[1]=.25;matrix[2]=.1;
+ matrix[4]=.4;matrix[5]=.72;matrix[6]=-.2;
+ matrix[8]=.3;matrix[9]=.24;matrix[10]=2.4;
+ matrix[12]=.2;matrix[13]=-.3;matrix[14]=.12;
+ const AffineTransform world(matrix);
+ const auto tangent=unit(world.direction({1,0,0})),normal=unit(world.normal({0,0,1}));
+ const auto bitangent=cross(normal,tangent)*(reflected?-1.f:1.f);
+ const auto expected=normalized(tangent*.28f+bitangent*.18f+normal*.94f);
+
+ Scene scene;
+ const auto target=scene.active().id;
+ if(texture_set){
+  std::array<TextureSetInitialField,2> fields;
+  fields[0].resolution=fields[1].resolution=64;
+  fields[0].material.name="Other target layer";fields[1].material.name="Affine recipient";
+  initialize_texture_sets(scene,target,mesh,fields,std::array<TextureSetId,2>{0,1});
+  select_texture_set(scene,target,1);
+ }else{
+  scene.active().mesh_active=true;scene.active().painted=std::make_shared<PaintedMesh>(mesh,64);
+ }
+ scene.active().affine_edit=std::make_shared<const NativeAffineEdit>(world);
+
+ const auto donor=scene.add("Physical distance donor",Volume{});
+ auto high=mesh;
+ for(auto &p:high.positions){
+  const auto q=world.point({p.x,p.y,p.z});
+  p=Vec3{float(q[0]),float(q[1]),float(q[2])}+normal*.027f;
+ }
+ high.normals.assign(4,expected);
+ if(reflected)for(size_t c=0;c<high.indices.size();c+=3)
+  std::swap(high.indices[c+1],high.indices[c+2]);
+ scene.active().mesh_active=true;scene.active().visible=false;
+ scene.active().material.color={.02f,.65f,.08f,1};
+ scene.active().painted=std::make_shared<PaintedMesh>(high,64);
+
+ const auto cage=scene.add("Independent matching cage",Volume{});
+ auto cage_mesh=mesh;
+ const auto offset=world.inverse().direction({normal.x*.031,normal.y*.031,normal.z*.031});
+ for(auto &p:cage_mesh.positions)p+=Vec3{float(offset[0]),float(offset[1]),float(offset[2])};
+ auto cage_matrix=matrix;
+ cage_matrix[12]+=.02;
+ const auto correction=world.inverse().direction({-.02,0,0});
+ for(auto &p:cage_mesh.positions)p+=Vec3{float(correction[0]),float(correction[1]),float(correction[2])};
+ scene.active().mesh_active=true;scene.active().visible=false;
+ scene.active().painted=std::make_shared<PaintedMesh>(std::move(cage_mesh),64);
+ scene.active().affine_edit=std::make_shared<const NativeAffineEdit>(AffineTransform(cage_matrix));
+ scene.select(target);
+ const auto original=scene.encode();
+
+ ObjectBakeSettings settings;
+ settings.front_mm=34;settings.back_mm=0;settings.padding=0;settings.ao_samples=4;
+ settings.cage_object=cage;settings.prepare_normals=prepared;
+ auto short_ray=settings;short_ray.cage_object=0;short_ray.front_mm=25;
+ auto detached=scene.snapshot();
+ refuses([&]{bake_object(detached,donor,short_ray);},"A 25 mm world-bounded ray cannot reach the 27 mm donor");
+ auto short_cage=settings;short_cage.front_mm=29;
+ refuses([&]{bake_object(detached,donor,short_cage);},"The 31 mm world cage cannot fit inside a 29 mm bound");
+ check(detached.encode()==original,"Out-of-bounds rays and cage preserve the complete affine project");
+ Document doc;doc.replace(scene);ready(doc);
+ check(doc.frame().state->can_bake,"The affine recipient is available through Document Bake");
+ doc.bake_from_object(donor,settings);
+ const auto saved=std::filesystem::path("affine-target.dsculpt");
+ doc.save_async(saved).get();ready(doc);
+ const auto result=doc.copy_scene();
+ const auto field=active_texture_set(result.active());
+ const auto baked=field.painted->baked();
+ check(baked&&field.bake_recipe&&field.bake_recipe->settings.cage_object==cage&&
+       Scene::load(saved).encode()==result.encode(),"Affine Bake, exact cage recipe and ordered Save reopen");
+ const auto same_position=[](Vec3 a,Vec3 b){return a.x==b.x&&a.y==b.y&&a.z==b.z;};
+ check(result.world_matrix(target).matrix()==world.matrix()&&
+       std::ranges::equal(result.active().painted->mesh().positions,mesh.positions,same_position),
+       "Bake preserves the target's local vertices and affine placement");
+ if(texture_set)check(!result.active().painted->baked(),"Other target field remains untouched");
+ const Image &normal_image=baked->normal_field?*baked->normal_field->pbr():baked->maps.normal;
+ for(const auto pixel:{size_t(37*64+19),size_t(43*64+22),size_t(34*64+26)}){
+  const auto at=pixel*4;
+  check(baked->coverage[pixel]==255&&baked->maps.color.rgba[at+1]>160,
+        "The independently placed donor projects onto the affine target");
+  const auto direction=normalized(tangent*(normal_image.rgba[at]/255.f*2-1)+
+      bitangent*(normal_image.rgba[at+1]/255.f*2-1)+normal*(normal_image.rgba[at+2]/255.f*2-1));
+  check(length(direction-expected)<.015f,"Baked texture decodes to the world normal in the rendered target frame");
+ }
+ check(doc.undo()&&doc.copy_scene().encode()==original&&doc.redo()&&doc.copy_scene().encode()==result.encode(),
+       "Affine target Bake Undo and Redo preserve the exact project");
+}
+
 void retained_bake_xr_fixture(const std::filesystem::path &input,const std::filesystem::path &reference) {
  auto scene=source(true,true);
  const auto donor=scene.active().id;
  auto &source_object=scene.active();
  source_object.visible=false;source_object.locked=true;
  const auto source_world=scene.world_matrix(donor);
+ const auto placement=source_object.affine_edit;
  auto mesh=source_object.painted->mesh();
  mesh.normals.assign(mesh.positions.size(),{0,0,1});
- for(auto &p:mesh.positions) {
-  const auto q=source_world.point({p.x,p.y,p.z});
-  p={float(q[0]),float(q[1]),float(q[2])};
- }
  auto cage_mesh=mesh;
- for(auto &p:mesh.positions)p.z-=.06f;
- for(auto &p:cage_mesh.positions)p.z+=.01f;
+ const auto down=source_world.inverse().direction({0,0,-.06});
+ const auto up=source_world.inverse().direction({0,0,.01});
+ for(auto &p:mesh.positions)p+=Vec3{float(down[0]),float(down[1]),float(down[2])};
+ for(auto &p:cage_mesh.positions)p+=Vec3{float(up[0]),float(up[1]),float(up[2])};
  const auto target=scene.add("Texture-set Bake recipient",Volume{});
  const auto cage=scene.add("Full matched cage",Volume{});
  scene.active().mesh_active=true;scene.active().visible=false;
  scene.active().painted=std::make_shared<PaintedMesh>(std::move(cage_mesh),64);
+ scene.active().affine_edit=placement;
  std::array<TextureSetInitialField,2> recipients;
  recipients[0].resolution=recipients[1].resolution=64;
  recipients[0].material.name="Left set";recipients[1].material.name="Right set";
@@ -309,6 +402,7 @@ void retained_bake_xr_fixture(const std::filesystem::path &input,const std::file
  for(auto triangle:scene.object(donor).texture_sets->at(1).domain->triangles())
   membership[triangle]=1;
  initialize_texture_sets(scene,target,mesh,recipients,membership);
+ scene.object(target).affine_edit=placement;
  scene.select(target);select_texture_set(scene,target,1);
  ObjectBakeSettings settings;
  settings.front_mm=80;settings.padding=0;settings.ao_samples=4;settings.cage_object=cage;
@@ -414,6 +508,8 @@ int main(int argc,char **argv)try {
   retained_bake_source(true,false,true);retained_bake_source(true,false,true,true);
   retained_bake_source(false,true,true,true);
   affine_plain_bake_source();
+  affine_bake_target(false,false,false);affine_bake_target(true,false,true);
+  affine_bake_target(false,true,true);
   retained_bake_xr_fixture("mixed-before.dsculpt","mixed-baked.dsculpt");
   std::cout<<"PASS "<<checks<<" retained source Bake controls\n";
   return 0;
