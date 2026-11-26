@@ -141,6 +141,40 @@ std::vector<detail::RetainedSourceBakeField> capture_texture_set_bake_source(
              field.material_bindings,field.bake_recipe,field.domain,field.source});
   return fields;
 }
+
+std::vector<Tangent> place_bake_target(Mesh &mesh,BakeOptions &options,
+    const detail::AffineInteractionFrame &placement,const AffineTransform &metric_from_world) {
+  if(mesh.positions.size()>2'000'000||mesh.indices.size()/3>2'000'000)
+    throw std::length_error("Low bake mesh exceeds surface limits");
+  const auto stop=[&](size_t i) {
+    if((i&1023)==0&&options.cancelled&&options.cancelled())
+      throw std::runtime_error("Bake target placement cancelled");
+  };
+  // The viewport places native tangents and inverse-transpose normals
+  // independently. Generate the corner tangents before moving any positions.
+  std::vector<Tangent> corners;
+  if(options.low_tangents.empty())corners=tangent_corners(mesh,options.cancelled);
+  else {
+    corners.reserve(mesh.indices.size());
+    for(size_t c=0;c<mesh.indices.size();++c){
+      stop(c);
+      corners.push_back(options.low_tangents.at(mesh.indices[c]));
+    }
+    options.low_tangents.clear();
+  }
+  for(size_t c=0;c<corners.size();++c){
+    stop(c);
+    corners[c]=detail::placed_tangent(placement,corners[c]);
+  }
+  const auto metric_from_target=metric_from_world*placement.world();
+  for(size_t v=0;v<mesh.positions.size();++v){
+    stop(v);
+    const auto p=metric_from_target.point(detail::affine_vector(mesh.positions[v]));
+    mesh.positions[v]=detail::affine_position(p);
+    mesh.normals[v]=detail::placed_normal(placement,mesh.normals[v]);
+  }
+  return corners;
+}
 } // namespace
 ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
                               ObjectBakeSettings settings,
@@ -261,8 +295,17 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
     if(!source_prepared)high.colors=std::move(source_colors);
   } else
     high.mesh = surface_mesh(*source.volume, cancelled);
-  const auto target_world = scene.world_transform(target.id);
+  const auto target_placement=scene.has_affine_placement(target.id)
+    ? std::optional(detail::placement_frame(scene,target.id)) : std::nullopt;
+  const auto target_world=target_placement?CanvasTransform{}:scene.world_transform(target.id);
   const auto target_inverse=ob::inverse(target_world);
+  AffineTransform metric_from_world;
+  if(target_placement){
+    auto matrix=metric_from_world.matrix();
+    const auto &world=target_placement->world().matrix();
+    for(size_t i=12;i<15;++i)matrix[i]=-world[i];
+    metric_from_world=AffineTransform(matrix);
+  }
   const auto placement=source.texture_sets&&scene.has_affine_placement(source.id)
     ? std::optional(detail::placement_frame(scene,source.id)) : std::nullopt;
   const auto relative=placement?target_inverse:
@@ -290,14 +333,15 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   }
   const detail::SourceBakePlacement source_placement{placed_corners,
       placement&&placement->orientation()==AffineOrientation::Reversing};
-  if(placement){
+  if(placement||target_placement){
     // Keep original triangle and corner identities even under reflection.
     // The Bake hit keeps its source barycentrics and tests effective winding.
-    const auto transform=affine_similarity(target_inverse)*placement->world();
+    const auto source_to_bake=placement?affine_similarity(target_inverse)*placement->world():affine_similarity(relative);
+    const auto transform=target_placement?metric_from_world*source_to_bake:source_to_bake;
     for(size_t i=0;i<high.mesh.positions.size();++i){
       if((i&1023)==0)check();
       high.mesh.positions[i]=detail::affine_position(transform.point(detail::affine_vector(high.mesh.positions[i])));
-      const auto n=detail::placed_normal(*placement,high.mesh.normals[i]);
+      const auto n=placement?detail::placed_normal(*placement,high.mesh.normals[i]):high.mesh.normals[i];
       const auto rotated=ob::rotate(relative.orientation,{n.x,n.y,n.z});
       high.mesh.normals[i]={rotated.x,rotated.y,rotated.z};
     }
@@ -331,13 +375,29 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
     const auto &frame=*target.material_bindings->normal_frames->pbr;const auto &mesh=target.painted->mesh();
     low.emplace();low->indices.resize(mesh.indices.size());
     for(size_t c=0;c<mesh.indices.size();++c){if((c&1023)==0)check();const auto v=mesh.indices[c];low->indices[c]=uint32_t(c);low->positions.push_back(mesh.positions[v]);low->normals.push_back(frame.normals[c]);low->uv.push_back(mesh.uv[v]);options.low_tangents.push_back(frame.tangents[c]);}
+  }else low=detail::retained_bake_basis(target,options);
+  if(settings.cage_object)
+    options.cage_positions=detail::object_bake_cage(scene,target.id,settings.cage_object,
+        target.painted->mesh(),low?*low:target.painted->mesh(),cancelled,
+        target_placement?&metric_from_world:nullptr);
+  std::vector<Tangent> target_metric_corners;
+  if(target_placement){
+    if(!low)low=target.painted->mesh();
+    target_metric_corners=place_bake_target(*low,options,*target_placement,metric_from_world);
+  }
+  if(prepared_normals){
     const auto frames=target.material_bindings->normal_frames;
+    const auto placed_low=target_placement?&*low:nullptr;
+    const std::span<const Tangent> metric_corners=target_metric_corners;
     const auto mode=canonical_attributes?PreparedMToonNormalEvaluation::Absent:target.material_bindings->normal_preparation->receipt.mtoon;
-    options.encode_target_normal=[frames,mode,limit=double(settings.normal_error)](uint32_t triangle,std::array<float,3> bary,Vec3 desired){
+    options.encode_target_normal=[frames,placed_low,metric_corners,mode,limit=double(settings.normal_error)](uint32_t triangle,std::array<float,3> bary,Vec3 desired){
       std::array<detail::NormalBakeVertex,3> pbr,toon;const auto &f=*frames->pbr;
-      for(size_t k=0;k<3;++k){const size_t c=size_t(triangle)*3+k;const auto t=f.tangents[c];const Vec3 T{t[0],t[1],t[2]};
-        pbr[k]=detail::normal_bake_vertex(f.normals[c],T,t[3],detail::NormalVertexBitangent::UnitCross);
-        toon[k]=detail::normal_bake_vertex(f.normals[c],T,t[3],detail::NormalVertexBitangent::RawCross);
+      for(size_t k=0;k<3;++k){const size_t c=size_t(triangle)*3+k;
+        const auto t=placed_low?metric_corners[c]:f.tangents[c];
+        const auto n=placed_low?placed_low->normals[placed_low->indices[c]]:f.normals[c];
+        const Vec3 T{t[0],t[1],t[2]};
+        pbr[k]=detail::normal_bake_vertex(n,T,t[3],detail::NormalVertexBitangent::UnitCross);
+        toon[k]=detail::normal_bake_vertex(n,T,t[3],detail::NormalVertexBitangent::RawCross);
       }
       const std::array<double,3> weights{bary[0],bary[1],bary[2]};
       const auto a=detail::normal_bake_basis(pbr,weights,detail::NormalFragmentBasis::UnitColumns);
@@ -347,15 +407,12 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
         throw std::invalid_argument("Projected normal exceeds the explicit target basis conditioning/quantization contract");
       return std::array<std::array<uint8_t,4>,2>{x->rgba,y->rgba};
     };
-  }else low=detail::retained_bake_basis(target,options);
+  }
   const auto &low_mesh=low?*low:target.painted->mesh();
-  if(settings.cage_object)
-    options.cage_positions=detail::object_bake_cage(scene,target.id,settings.cage_object,
-        target.painted->mesh(),low_mesh,cancelled);
   const auto retained_uv=target.material_bindings?target.material_bindings->canonical_uv:nullptr;
   if(retained_uv&&progress)options.progress=[&](float value){progress(.1f+.4f*value);};
   const auto target_triangles=recipient?recipient->domain->triangles():std::span<const uint32_t>{};
-  auto result = detail::bake_mesh_source_normals(low_mesh,high,options,source_normals,target_triangles,source_fields,source_placement);
+  auto result = detail::bake_mesh_source_normals(low_mesh,high,options,source_normals,target_triangles,source_fields,source_placement,target_metric_corners);
   std::optional<BakeResult> retained_normal_write;
   if(retained_uv){
     retained_uv->validate_current(target.painted->mesh(),cancelled);
@@ -373,7 +430,7 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
       throw std::length_error("Retained normal rebake lacks aggregate projection/raster budget");
     normal_options.max_rays-=result.rays;normal_options.max_raster_samples-=result.raster_samples;
     if(progress)normal_options.progress=[&](float value){progress(.5f+.4f*value);};
-    retained_normal_write=detail::bake_mesh_source_normals(normal_low,high,normal_options,source_normals,{},source_fields,source_placement);
+    retained_normal_write=detail::bake_mesh_source_normals(normal_low,high,normal_options,source_normals,{},source_fields,source_placement,target_metric_corners);
   }
   check();
   if(!result.projected)throw std::runtime_error("No target texels project onto the selected source");
