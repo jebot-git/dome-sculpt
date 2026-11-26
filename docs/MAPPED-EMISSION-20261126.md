@@ -28,11 +28,16 @@ fallback evaluated on the target grid.
   older Scene43 file opens and saves byte for byte. Khronos glTF Validator
   reports zero errors on the new editable GLB and one warning about generated
   tangent space.
+- The original identity export passes all 16,400 checks. Its direct,
+  second-cycle and worker GLBs each match the earlier broad-regression
+  build's file byte for byte.
+- A fresh 233-action ASan/UBSan build passes all three selected cases with
+  leak detection enabled. The native case repeats 20 controls and the two
+  software renderer cases repeat 4,422 and 4,423 checks.
 
 The two tests for HDR emission from independently sampled original PBR and
 MToon images still reproduce their 0.015625 source-fidelity error. Their source
 roles require separate continuous image and paint evaluation. The mapped
 candidate covers certified affine layouts and a constant emission background.
 The scoped optimized App builds with the canonical DomeD FLTK and bitmap
-runtime. The strict native and software renderer build is in progress.
-See [the Release receipt](validation/mapped-emission-release-20261126.json).
+runtime. See [the validation receipt](validation/mapped-emission-release-20261126.json).
