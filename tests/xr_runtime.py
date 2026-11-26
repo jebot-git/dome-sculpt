@@ -69,7 +69,7 @@ with contextlib.nullcontext(tempfile.mkdtemp(prefix="projects-", dir=output)) as
         gated_menu = name in ("controller", "stylus", "controller-srgb")
         if gated_menu:
             e["DOME_XR_FIXTURE_MENU_GATE"] = "1"
-        frame_limit = [] if gated_menu else ["--frames", str(frames)]
+        frame_limit = [] if gated_menu or name in ("scene", "voxel-undo") else ["--frames", str(frames)]
         with (output / (name + ".log")).open("w") as log:
             p = subprocess.run(
                 [
@@ -234,6 +234,9 @@ with contextlib.nullcontext(tempfile.mkdtemp(prefix="projects-", dir=output)) as
         scene.returncode == 0,
         "Headset object and material menu pages complete through native OpenXR actions",
     )
+    material_observation = json.loads((output / "scene.json").read_text())
+    check(material_observation.get("scene_materials_seen") and material_observation.get("scene_sliders_seen"),
+          "The real palette shows Materials and RGB tracks before ray editing")
     info = json.loads(
         subprocess.check_output(
             [str(binary), "--project-info", str(scene_path)], env=env, text=True
@@ -255,6 +258,10 @@ with contextlib.nullcontext(tempfile.mkdtemp(prefix="projects-", dir=output)) as
               "Native OpenXR voxel " + mode + " finishes with a saved scene")
         info = json.loads(subprocess.check_output(
             [str(binary), "--project-info", str(path)], env=env, text=True))
+        if mode == "undo":
+            observation = json.loads((output / "voxel-undo.json").read_text())
+            check(observation.get("voxel_menu_seen") and observation.get("voxel_undo_seen"),
+                  "The real palette shows the root and enabled Undo before activation")
         if mode == "focus":
             report = json.loads((output / "voxel-focus.json").read_text())
             check(report.get("focus_losses") == 1 and
@@ -533,8 +540,11 @@ with contextlib.nullcontext(tempfile.mkdtemp(prefix="projects-", dir=output)) as
         info["paint_blue_texels"] > 20,
         "Nested joystick brush palette selects blue ink for the tracked paint stroke",
     )
-    uv_result, uv_path = run("uv",45,extra=["--paint"],mode={"DOME_XR_FIXTURE_UV":"1"})
+    uv_result, uv_path = run("uv",900,extra=["--paint"],mode={"DOME_XR_FIXTURE_UV":"1"})
     check(uv_result.returncode==0,"Native OpenXR UV panel supports joystick entry and ray-operated edit/Apply controls")
+    uv_report = json.loads((output / "uv.json").read_text())
+    check(uv_report.get("uv_atlas_ready") is True,
+          "Native OpenXR observes rendered atlas edges and enabled Apply before UV edits")
     uv_info=json.loads(subprocess.check_output([str(binary),"--project-info",str(uv_path)],env=env,text=True))
     (output / "uv-comparison.json").write_text(json.dumps({"uv_info":uv_info,"basepaint":basepaint,"project_directory":directory},indent=2)+"\n")
     check(uv_info["uv_hash"]!=basepaint["uv_hash"],"XR UV coordinates change and persist after Apply")

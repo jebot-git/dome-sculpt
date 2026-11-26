@@ -135,6 +135,12 @@ std::string voxel_mode() {
   auto mode = getenv("DOME_XR_FIXTURE_VOXEL");
   return mode ? mode : "";
 }
+bool voxel_menu_seen = false, voxel_undo_seen = false, voxel_menu_visible = false;
+unsigned voxel_menu_wait = 0, voxel_undo_wait = 0;
+bool scene_menu_visible = false, scene_materials_seen = false, scene_sliders_seen = false;
+unsigned scene_material_wait = 0, scene_slider_wait = 0;
+bool uv_atlas_ready = false;
+unsigned uv_atlas_wait = 0;
 XrPath path(std::string text) {
   auto found = paths.find(text);
   if (found != paths.end())
@@ -507,6 +513,116 @@ FN(ReleaseSwapchainImage, XrSwapchain p, const XrSwapchainImageReleaseInfo *) {
       if(frame==27)report["editable_avatar_cancel_menu_seen"]=true;
     }
   }
+  auto backing_pixels = [&] {
+    int backing = 0;
+    for (unsigned row = s->height / 3; row < s->height * 2 / 3; ++row)
+      for (unsigned col = s->width / 3; col < s->width * 2 / 3; ++col) {
+        const auto at = (size_t(row) * s->width + col) * 4;
+        const int r = displayed(bytes[at]), g = displayed(bytes[at+1]),
+                  b = displayed(bytes[at+2]);
+        if (r >= 25 && r <= 31 && g >= 35 && g <= 41 && b >= 43 && b <= 49)
+          ++backing;
+      }
+    return backing;
+  };
+  if (voxel_mode() == "undo" && s->eye == 0 && (frame == 43 || frame == 45)) {
+    // The selected tile uses the palette accent only when the command is
+    // enabled. The fixture observes Clay when the root opens, then Undo.
+    // The sample covers the right grip positions used to open the panel.
+    const bool opening = frame == 43;
+    constexpr float pi = 3.14159265358979323846f;
+    const float angle = opening ? 0.f : 4.f * pi / 6.f;
+    const float cell_x = .0375f + .6f / 640.f * 220.f * std::cos(angle) + .032f;
+    const float cell_y = 1.56f + .6f / 640.f * (220.f * std::sin(angle) + 12.f) - 1.6f;
+    const float perspective = .66f * std::tan(.6f);
+    const int x = int(std::lround(s->width * .5f * (1 + cell_x / perspective)));
+    const int y = int(std::lround(s->height * .5f * (1 + cell_y / perspective)));
+    int accent = 0;
+    for (int row = std::max(0, y - 5); row <= std::min(int(s->height) - 1, y + 5); ++row)
+      for (int col = std::max(0, x - 12); col <= std::min(int(s->width) - 1, x + 12); ++col) {
+        const auto at = (size_t(row) * s->width + col) * 4;
+        if (displayed(bytes[at]) < 150 && displayed(bytes[at+1]) > 130 &&
+            displayed(bytes[at+2]) > 220) ++accent;
+      }
+    const char *pixels = opening ? "voxel_open_pixels" : "voxel_undo_pixels";
+    report[pixels] = std::max(report.value(pixels, 0), accent);
+    if (!opening) {
+      // Publishing the remesh can close a menu that opened while it was
+      // pending. Inspect the central backing panel even with Undo disabled.
+      const int backing = backing_pixels();
+      voxel_menu_visible = backing > 1000;
+      report["voxel_menu_pixels"] = backing;
+    }
+    if (accent > 30 && (opening || voxel_menu_visible)) {
+      (opening ? voxel_menu_seen : voxel_undo_seen) = true;
+      report[opening ? "voxel_menu_seen" : "voxel_undo_seen"] = true;
+    }
+  }
+  if (getenv("DOME_XR_FIXTURE_SCENE") && s->eye == 0 && (frame == 17 || frame == 21)) {
+    // The new object can publish after the next menu click was submitted.
+    // Observe the real Materials highlight, then the three RGB tracks, with
+    // a stationary right grip shared by the retry and the slider rays.
+    const float perspective = .66f * std::tan(.6f);
+    auto sample = [&](int px, int py, int radius, auto pixel) {
+      const float world_x = .015f + .032f + .6f * (px / 640.f - .5f);
+      const float world_y = 1.56f - 1.6f + .6f * (.5f - py / 640.f);
+      const int x = int(std::lround(s->width * .5f * (1 + world_x / perspective)));
+      const int y = int(std::lround(s->height * .5f * (1 + world_y / perspective)));
+      int found = 0;
+      for (int row = std::max(0, y - 2); row <= std::min(int(s->height) - 1, y + 2); ++row)
+        for (int col = std::max(0, x - radius); col <= std::min(int(s->width) - 1, x + radius); ++col) {
+          const auto at = (size_t(row) * s->width + col) * 4;
+          if (pixel(displayed(bytes[at]), displayed(bytes[at+1]), displayed(bytes[at+2]))) ++found;
+        }
+      return found;
+    };
+    if (frame == 17) {
+      scene_menu_visible = backing_pixels() > 1000;
+      scene_materials_seen = scene_menu_visible &&
+          sample(320, 528, 8, [](int r, int g, int b) { return r < 150 && g > 130 && b > 220; }) > 20;
+      report["scene_materials_seen"] = scene_materials_seen;
+    } else {
+      scene_sliders_seen = true;
+      for (int row : {210, 280, 350})
+        scene_sliders_seen &= sample(480, row, 6, [](int r, int g, int b) {
+          return r >= 57 && r <= 64 && g >= 66 && g <= 75 && b >= 81 && b <= 89;
+        }) > 10;
+      report["scene_sliders_seen"] = scene_sliders_seen;
+    }
+  }
+  if (getenv("DOME_XR_FIXTURE_UV") && s->eye == 0 && frame == 13) {
+    // Wait for the chart worker to publish actual edges and enable Apply.
+    // A visible empty grid still ignores the following editor input.
+    const float perspective = .66f * std::tan(.6f);
+    const auto x = [&](int px) {
+      const float world = .045f + .032f + .6f * (px / 640.f - .5f);
+      return int(std::lround(s->width * .5f * (1 + world / perspective)));
+    };
+    const auto y = [&](int py) {
+      const float world = 1.56f - 1.6f + .6f * (.5f - py / 640.f);
+      return int(std::lround(s->height * .5f * (1 + world / perspective)));
+    };
+    const auto pixels = [&](int left, int top, int right, int bottom, auto match) {
+      int count = 0;
+      for (int row = std::max(0, y(bottom)); row <= std::min(int(s->height) - 1, y(top)); ++row)
+        for (int col = std::max(0, x(left)); col <= std::min(int(s->width) - 1, x(right)); ++col) {
+          const auto at = (size_t(row) * s->width + col) * 4;
+          if (match(displayed(bytes[at]), displayed(bytes[at + 1]), displayed(bytes[at + 2])))
+            ++count;
+        }
+      return count;
+    };
+    const int chart = pixels(148, 148, 490, 490, [](int r, int g, int b) {
+      return r > 155 && g > 155 && b > 155;
+    });
+    const int apply = pixels(418, 594, 520, 607, [](int r, int g, int b) {
+      return r < 150 && g > 130 && b > 220;
+    });
+    report["uv_atlas_visible_pixels"] = chart;
+    report["uv_atlas_apply_accent"] = apply;
+    uv_atlas_ready = chart > 100 && apply > 20;
+    report["uv_atlas_ready"] = uv_atlas_ready;
+  }
   if((!mask_mode().empty() && s->eye==0 && mask_step==35) || (!resolution_mode().empty() && s->eye==0 && frame==19)) {
     if(auto path=getenv("DOME_XR_FIXTURE_REPORT")) {
       std::ofstream capture(std::string(path)+(!resolution_mode().empty()?".resolution-"+std::to_string(frame):".mask-"+std::to_string(mask_step))+".ppm",std::ios::binary);
@@ -627,7 +743,11 @@ FN(PollEvent, XrInstance, XrEventDataBuffer *out) {
     e->session = reinterpret_cast<XrSession>(&session_tag);
     return XR_SUCCESS;
   }
-  if ((!editable_avatar_mode().empty() || menu_gate()) && frame >= 45 && menu_completion_event < 2) {
+  const bool menu_complete = (!editable_avatar_mode().empty() || menu_gate()) && frame >= 45;
+  const bool voxel_complete = voxel_mode() == "undo" && frame >= 50;
+  const bool scene_complete = getenv("DOME_XR_FIXTURE_SCENE") && frame >= 45;
+  const bool uv_complete = getenv("DOME_XR_FIXTURE_UV") && frame >= 45;
+  if ((menu_complete || voxel_complete || scene_complete || uv_complete) && menu_completion_event < 2) {
     auto e = reinterpret_cast<XrEventDataSessionStateChanged *>(out);
     e->type = XR_TYPE_EVENT_DATA_SESSION_STATE_CHANGED;
     e->session = reinterpret_cast<XrSession>(&session_tag);
@@ -724,8 +844,38 @@ FN(WaitFrame, XrSession, const XrFrameWaitInfo *, XrFrameState *p) {
      (editable_avatar_mode()=="cancel"&&((frame==23&&!report.value("editable_avatar_cancel_root_seen",false))||
       (frame==27&&!report.value("editable_avatar_cancel_menu_seen",false)))));
   if(avatar_wait){count("editable_avatar_wait_frames");if(physical_frame>3000){report["editable_avatar_gate_exhausted"]=true;save();return XR_ERROR_RUNTIME_FAILURE;}}
-  if (!avatar_wait && !(menu_gate() && frame == 9 && report.value("palette_images", 0) == 0)) ++frame;
-  else if(!avatar_wait) count("menu_gate_wait_frames");
+  const bool wait_voxel_menu = voxel_mode() == "undo" && frame == 43 && !voxel_menu_seen;
+  const bool wait_voxel_undo = voxel_mode() == "undo" && frame == 45 && !voxel_undo_seen;
+  const bool wait_scene_menu = getenv("DOME_XR_FIXTURE_SCENE") && frame == 17 && !scene_materials_seen;
+  const bool wait_scene_sliders = getenv("DOME_XR_FIXTURE_SCENE") && frame == 21 && !scene_sliders_seen;
+  if (getenv("DOME_XR_FIXTURE_UV") && frame == 13 && !uv_atlas_ready) {
+    report["uv_atlas_wait_frames"] = ++uv_atlas_wait;
+    if (uv_atlas_wait >= 750) {
+      report["uv_atlas_gate_exhausted"] = true;
+      save();
+      return XR_ERROR_RUNTIME_FAILURE;
+    }
+  } else if (wait_scene_menu || wait_scene_sliders) {
+    auto &waited = wait_scene_menu ? scene_material_wait : scene_slider_wait;
+    report[wait_scene_menu ? "scene_material_wait_frames" : "scene_slider_wait_frames"] = ++waited;
+    if (scene_material_wait + scene_slider_wait >= 750) {
+      report["scene_material_gate_exhausted"] = true;
+      save();
+      return XR_ERROR_RUNTIME_FAILURE;
+    }
+  } else if (wait_voxel_menu || wait_voxel_undo) {
+    auto &waited = wait_voxel_menu ? voxel_menu_wait : voxel_undo_wait;
+    report[wait_voxel_menu ? "voxel_menu_wait_frames" : "voxel_undo_wait_frames"] = ++waited;
+    if (voxel_menu_wait + voxel_undo_wait >= 750) {
+      report["voxel_undo_gate_exhausted"] = true;
+      save();
+      return XR_ERROR_RUNTIME_FAILURE;
+    }
+  } else if (!avatar_wait && !(menu_gate() && frame == 9 && report.value("palette_images", 0) == 0)) {
+    ++frame;
+  } else if (!avatar_wait) {
+    count("menu_gate_wait_frames");
+  }
   if(!editable_avatar_mode().empty()){
     report["editable_avatar_script_step"]=frame;
     if(physical_frame==10)if(const auto *path=getenv("DOME_XR_FIXTURE_REPORT")){std::ifstream maps("/proc/self/maps");std::ofstream capture(std::string(path)+".maps");capture<<maps.rdbuf();}
@@ -768,7 +918,10 @@ FN(WaitFrame, XrSession, const XrFrameWaitInfo *, XrFrameState *p) {
   }
   p->predictedDisplayTime = 1000000000 + physical_frame * 18000000;
   p->predictedDisplayPeriod = 18000000;
-  p->shouldRender = frame % 7 ? XR_TRUE : XR_FALSE;
+  // Sample the slider panel even while its logical step is held. Keep
+  // periodic skipped frames on the actual presentation clock.
+  const bool scene_slider_probe = getenv("DOME_XR_FIXTURE_SCENE") && frame == 21;
+  p->shouldRender = (scene_slider_probe ? physical_frame : frame) % 7 ? XR_TRUE : XR_FALSE;
   count("frames_waited");
   return XR_SUCCESS;
 }
@@ -873,16 +1026,24 @@ FN(GetActionStateBoolean, XrSession, const XrActionStateGetInfo *p,
        (getenv("DOME_XR_FIXTURE_UV") && frame == 12) ||
        (getenv("DOME_XR_FIXTURE_LAYERS") && (frame == 12 || frame == 14)) ||
        (getenv("DOME_XR_FIXTURE_SCENE") &&
-        (frame == 12 || frame == 16 || frame == 18 || frame == 20 || frame == 28)) ||
+        (frame == 12 || frame == 16 || frame == 18 || frame == 20 || frame == 28 ||
+         (frame == 17 && !scene_menu_visible && scene_material_wait && scene_material_wait % 12 == 0))) ||
        (getenv("DOME_XR_FIXTURE_FILES") &&
         (frame == 24 || frame == 26 || frame == 28 || frame == 30 || frame == 34)));
   out->changedSinceLastSync = button && ((frame >= 8 && frame <= 11) ||
       (getenv("DOME_XR_FIXTURE_FILES") && frame >= 24 && frame <= 35));
   if (auto mode = voxel_mode(); !mode.empty()) {
+    // A publication can invalidate a press or close an open palette.
+    // Retry only after real frames show the palette is absent.
+    const bool retry_open = frame == 43 && !voxel_menu_seen && voxel_menu_wait &&
+                            voxel_menu_wait % 12 == 0;
+    const bool reopen = frame == 45 && !voxel_menu_visible && voxel_undo_wait &&
+                        voxel_undo_wait % 12 == 0;
+    if (button && mode == "undo" && reopen) count("voxel_menu_reopens");
     out->currentState = button &&
         (frame == 8 || frame == 10 || frame == 12 || frame == 14 ||
          ((mode == "accept" || mode == "undo") && frame == 18) ||
-         (mode == "undo" && (frame == 42 || frame == 44)));
+         (mode == "undo" && (frame == 42 || retry_open || reopen || frame == 46)));
     out->changedSinceLastSync = button;
   }
   if(auto mode=bake_mode();!mode.empty()){
@@ -1134,7 +1295,7 @@ FN(GetActionStateVector2f, XrSession, const XrActionStateGetInfo *p,
     if (frame == 9 || frame == 10) out->currentState = {-.5f, -.8660254f};
     if (frame == 11 || frame == 12) out->currentState = {0, -1};
     if (frame == 13 || frame == 14) out->currentState = {.8660254f, .5f};
-    if (mode == "undo" && (frame == 43 || frame == 44))
+    if (mode == "undo" && frame >= 44 && frame <= 46)
       out->currentState = {-.5f, .8660254f};
   }
   if(auto mode=bake_mode();!mode.empty() && right(p->subactionPath) && a->name=="right_stick"){
@@ -1308,6 +1469,9 @@ FN(LocateSpace, XrSpace handle, XrSpace, XrTime, XrSpaceLocation *p) {
     p->pose.position = {(right(s->hand) ? float((frame % 5) * .015f) : -.3f) +
                             (frame >= 38 ? -.2f : 0),
                         1.48f, -.48f};
+  if (getenv("DOME_XR_FIXTURE_SCENE") && s->action && right(s->hand) &&
+      frame >= 16 && frame <= 20)
+    p->pose.position.x = .015f;
   if(corner_uv_mode()=="cancel"&&s->action&&s->action->name=="aim_pose"&&right(s->hand)&&frame==28){
     p->pose.position={.045f+(170.f/640-.5f)*.6f,1.56f+(.5f-609.f/640)*.6f,-.3f};
   }
