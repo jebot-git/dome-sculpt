@@ -911,8 +911,15 @@ entry survive one intervening ordinary cache insertion under pressure.
 Additional pressure can evict it, and the foreground always receives its
 composited frame. In the 2048-pixel Release Clear Bake/Undo control, the
 same immutable preview survives and restores in 0.666 seconds. The
-shared-owner build alone recomposes it in 1.601 seconds. Retention stays
-within 512 MiB. Full-size sanitizer qualification is in progress.
+shared-owner build alone recomposes it in 1.601 seconds. The full-size
+ASan/UBSan Clear Bake/Undo control also reuses that immutable preview,
+publishing in 8.374 seconds without another build. Retention is
+444,041,876 bytes against the 512 MiB cap. The same diagnostic needs
+13.159 seconds to publish the ordinary cleared preview again on Redo.
+The original full-size Bake, ordered Save, Undo and Redo test is a
+separate run. The cache port based on main, `ead80bb5`, passes the
+optimized application link/version check and five focused bake, UV and
+cache tests with the two CC0 VRoid inputs. Its strict build is in progress.
 
 Combined candidate `3cb2fe81` keeps the `ccbbe020` source baseline and adds
 both atlas patches, the rendered XR readiness fixtures, and the two VRM1
@@ -926,9 +933,22 @@ passes that full Arc replay through its existing background file checks.
 An isolated pair with an extended observation limit terminates after
 40.70 and 39.30 seconds respectively on the scheduler and combined
 builds. Their native Save and glTF export finish, and the exported GLBs
-match byte for byte. The original 40-second failures remain recorded. A
-full Arc rerun uses the same candidate and the original per-process limit.
+match byte for byte. The full Arc rerun under the original limit again
+passes 146 checks and times out in the same file workflow.
+
+The sparse boundary grid candidates `24bd45a5` and `b949cfef` retain
+cell order while resetting occupied cells only. Release and ASan/UBSan
+analytic tests each check 574 intersections over 160 grids. Six native
+cases pass per profile on the combined candidate. In four matched Arc
+runs, both app versions save byte-identical native projects and GLBs.
+The parent takes 44.57 and 44.16 seconds and the candidate takes 44.36
+and 43.55 seconds. These observations used an extended diagnostic limit.
+The original workflow budget is still 40 seconds. A separate candidate
+`6cca3fc2` keeps each chart's ordered boundary across growth and merges,
+and uses it to refresh neighboring candidates. Release, sanitizer and
+matched Arc checks are running.
 [Preview and integration evidence](validation/hdr-preview-composite-20261126.json)
+[Cache and Arc rerun evidence](validation/atlas-grid-hdr-history-20261126.json)
 
 ## Source and integration boundary
 

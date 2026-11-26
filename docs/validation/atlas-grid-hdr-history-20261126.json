@@ -1,0 +1,420 @@
+{
+  "combined-arc": {
+    "candidate": "3cb2fe81e00a0a71bdac5c505ad169eb16d67b6d",
+    "app_source": "3cb2fe81e00a0a71bdac5c505ad169eb16d67b6d",
+    "invocation": "9a03fe212f634f029ce30542376a3e88",
+    "profile": "arc-asan",
+    "terminal": true,
+    "phase": "complete",
+    "elapsed_seconds": 279.95,
+    "app_sha256": "bf30f46f18ac471cdad7c8d7d76fbbbc549d88f02e060a3d988e854621ceabd2",
+    "runtime_sha256": "94736612c5262ff56d62ad2553654e7336fcb5395df3b6259c7505aa341e947e",
+    "runner_sha256": "60869bf047e814c1b3aec9e5281bde4f62b466883ab1c95af5295459e98849cb",
+    "exit": 1,
+    "loader_exit": 1,
+    "checks": 146,
+    "report_complete": false,
+    "error": "TimeoutExpired: Command '['/home/blux/de-xr/dome-sculpt/artifacts/combined-atlas-xr-candidate-validation-20261126/asan/dome-sculpt', '--xr', '--frames', '45', '--save', '/home/blux/de-xr/dome-sculpt/artifacts/combined-atlas-xr-candidate-validation-20261126/arc-asan/workflow/projects-6i5mojkl/files.dsculpt']' timed out after 40 seconds",
+    "voxel": {
+      "exact_native_bytes": true,
+      "voxel_menu_pixels": 10141,
+      "voxel_menu_reopens": 1,
+      "voxel_menu_seen": true,
+      "voxel_open_pixels": 172,
+      "voxel_undo_pixels": 131,
+      "voxel_undo_seen": true,
+      "voxel_undo_wait_frames": 74
+    },
+    "uv": {
+      "uv_atlas_apply_accent": 207,
+      "uv_atlas_ready": true,
+      "uv_atlas_visible_pixels": 4997,
+      "uv_atlas_wait_frames": 27
+    },
+    "arc_witness_count": 39
+  },
+  "combined-arc-rerun": {
+    "candidate": "3cb2fe81e00a0a71bdac5c505ad169eb16d67b6d",
+    "app_source": "3cb2fe81e00a0a71bdac5c505ad169eb16d67b6d",
+    "invocation": "0e9ba8a8afc849b8abb8ff14b8c52e10",
+    "profile": "arc-asan",
+    "terminal": true,
+    "phase": "complete",
+    "elapsed_seconds": 275.06,
+    "app_sha256": "bf30f46f18ac471cdad7c8d7d76fbbbc549d88f02e060a3d988e854621ceabd2",
+    "runtime_sha256": "94736612c5262ff56d62ad2553654e7336fcb5395df3b6259c7505aa341e947e",
+    "runner_sha256": "60869bf047e814c1b3aec9e5281bde4f62b466883ab1c95af5295459e98849cb",
+    "exit": 1,
+    "loader_exit": 1,
+    "checks": 146,
+    "report_complete": false,
+    "error": "TimeoutExpired: Command '['/home/blux/de-xr/dome-sculpt/artifacts/combined-atlas-xr-candidate-validation-20261126/asan/dome-sculpt', '--xr', '--frames', '45', '--save', '/home/blux/de-xr/dome-sculpt/artifacts/combined-atlas-xr-candidate-validation-20261126/arc-asan-rerun/workflow/projects-rfoenfjo/files.dsculpt']' timed out after 40 seconds",
+    "voxel": {
+      "exact_native_bytes": true,
+      "voxel_menu_pixels": 10141,
+      "voxel_menu_reopens": 1,
+      "voxel_menu_seen": true,
+      "voxel_open_pixels": 172,
+      "voxel_undo_pixels": 131,
+      "voxel_undo_seen": true,
+      "voxel_undo_wait_frames": 86
+    },
+    "uv": {
+      "uv_atlas_apply_accent": 207,
+      "uv_atlas_ready": true,
+      "uv_atlas_visible_pixels": 4997,
+      "uv_atlas_wait_frames": 25
+    },
+    "arc_witness_count": 39
+  },
+  "sparse-timing": {
+    "terminal": true,
+    "invocation": "f5cee4f3970e4a7abda37f6a58f4231f",
+    "runs": [
+      {
+        "case": "parent-1",
+        "exit": 0,
+        "seconds": 44.57,
+        "arc_device": true,
+        "frames": 45,
+        "native_scene": true,
+        "stereo_export_panel": {
+          "0": 221824,
+          "1": 221608
+        },
+        "native_recovery": 1,
+        "valid_glb": 1,
+        "app_sha256": "bf30f46f18ac471cdad7c8d7d76fbbbc549d88f02e060a3d988e854621ceabd2",
+        "scene_sha256": "ca1248046485e3ede9122479fb12d0201fc12efd7726a67650d9eaac667e764c",
+        "process_cpu_seconds": 46.42,
+        "glb_sha256": [
+          "22200865cba16ae30ca9b64781d4d7203fc9307a55f48b28298d6402866171c6"
+        ],
+        "passed": true
+      },
+      {
+        "case": "candidate-1",
+        "exit": 0,
+        "seconds": 44.355,
+        "arc_device": true,
+        "frames": 45,
+        "native_scene": true,
+        "stereo_export_panel": {
+          "0": 221824,
+          "1": 221608
+        },
+        "native_recovery": 1,
+        "valid_glb": 1,
+        "app_sha256": "bd5bb6cf58724d2c1eb9f39ef753cb0b10dec1790cdf5eaafdb4cd92230dcc74",
+        "scene_sha256": "ca1248046485e3ede9122479fb12d0201fc12efd7726a67650d9eaac667e764c",
+        "process_cpu_seconds": 46.38,
+        "glb_sha256": [
+          "22200865cba16ae30ca9b64781d4d7203fc9307a55f48b28298d6402866171c6"
+        ],
+        "passed": true
+      },
+      {
+        "case": "candidate-2",
+        "exit": 0,
+        "seconds": 43.549,
+        "arc_device": true,
+        "frames": 45,
+        "native_scene": true,
+        "stereo_export_panel": {
+          "0": 221824,
+          "1": 221608
+        },
+        "native_recovery": 1,
+        "valid_glb": 1,
+        "app_sha256": "bd5bb6cf58724d2c1eb9f39ef753cb0b10dec1790cdf5eaafdb4cd92230dcc74",
+        "scene_sha256": "ca1248046485e3ede9122479fb12d0201fc12efd7726a67650d9eaac667e764c",
+        "process_cpu_seconds": 45.27,
+        "glb_sha256": [
+          "22200865cba16ae30ca9b64781d4d7203fc9307a55f48b28298d6402866171c6"
+        ],
+        "passed": true
+      },
+      {
+        "case": "parent-2",
+        "exit": 0,
+        "seconds": 44.155,
+        "arc_device": true,
+        "frames": 45,
+        "native_scene": true,
+        "stereo_export_panel": {
+          "0": 221824,
+          "1": 221608
+        },
+        "native_recovery": 1,
+        "valid_glb": 1,
+        "app_sha256": "bf30f46f18ac471cdad7c8d7d76fbbbc549d88f02e060a3d988e854621ceabd2",
+        "scene_sha256": "ca1248046485e3ede9122479fb12d0201fc12efd7726a67650d9eaac667e764c",
+        "process_cpu_seconds": 45.67,
+        "glb_sha256": [
+          "22200865cba16ae30ca9b64781d4d7203fc9307a55f48b28298d6402866171c6"
+        ],
+        "passed": true
+      }
+    ],
+    "phase": "complete",
+    "candidate": "b949cfefc7fa71ddbaf2ebc816601d49c87c104a",
+    "input_runtime_sha256": "94736612c5262ff56d62ad2553654e7336fcb5395df3b6259c7505aa341e947e",
+    "exit": 0
+  },
+  "grid-release": {
+    "terminal": true,
+    "exit": 0,
+    "invocation": "9b5508d5d89c47b9b769f5df03d60bfc",
+    "results": {
+      "reference": {
+        "source_sha256": "6c4e9c925cab2fc343bf11376903212b25b037f994a52a7fd877758b95515b33",
+        "result": "PASS 574 analytic intersections across 160 reused, resized, indexed and fallback boundary grids"
+      },
+      "sparse": {
+        "source_sha256": "329cd0450dd120fdad0c802228b3ffd9f9bf0a0d0666b219c3f1b13f6a2b50d9",
+        "result": "PASS 574 analytic intersections across 160 reused, resized, indexed and fallback boundary grids"
+      }
+    }
+  },
+  "sparse-native-release": {
+    "terminal": true,
+    "profile": "release",
+    "candidate": "b949cfefc7fa71ddbaf2ebc816601d49c87c104a",
+    "invocation": "689730fdcddc478586390d36e22eefd5",
+    "results": [
+      {
+        "target": "xatlas-allocation",
+        "exit": 0,
+        "seconds": 0.032,
+        "log_sha256": "7d8b5830488de23399a53e3a34c01dec61fc77823739447dd77940bccf9f441e",
+        "last_line": "PASS 19 persistent thread-state allocation failures unwind all native workers and allow retry"
+      },
+      {
+        "target": "xatlas-shutdown",
+        "exit": 0,
+        "seconds": 0.064,
+        "log_sha256": "7af2ac5c60860d5825b0193513c90ad4ea4446e9793c7a2077c4829e6be39e61",
+        "last_line": "PASS 32 deterministic Atlas shutdown predicate/wait-registration handshakes"
+      },
+      {
+        "target": "atlas-robustness",
+        "exit": 0,
+        "seconds": 7.629,
+        "log_sha256": "1b8d16d0dc9b9ae35b7a7c3eb7bc16bff2340c5b8dc7c0cf5c0f0b20a7b777c8",
+        "last_line": "PASS Increasing requested resolution fits all independent tiny charts under the same strict policy"
+      },
+      {
+        "target": "atlas-cancellation",
+        "exit": 0,
+        "seconds": 0.214,
+        "log_sha256": "a0aae97971e2a76bede2378ad0461220d7f2919d7061ca39dbae42cd7f8e189f",
+        "last_line": "15 cancellable atlas checks passed"
+      },
+      {
+        "target": "atlas-authoring-cancellation",
+        "exit": 0,
+        "seconds": 1.617,
+        "log_sha256": "2b920d662d23bf14f325d37922124e63f7bdb75218a760cfc1f42914dd6f4789",
+        "last_line": "18 authoring atlas cancellation checks passed"
+      },
+      {
+        "target": "voxel-authoring",
+        "exit": 0,
+        "seconds": 0.365,
+        "log_sha256": "80b396a5f991f54e6f182109003be77bdac85fa8dedeba4da1d09fd18d1df0f3",
+        "last_line": "PASS Scalar-source remeshing has exact scene undo"
+      }
+    ],
+    "phase": "complete",
+    "exit": 0
+  },
+  "grid-asan": {
+    "terminal": true,
+    "exit": 0,
+    "invocation": "d33d87e8490f493cae8617456b48b848",
+    "results": {
+      "reference": {
+        "source_sha256": "6c4e9c925cab2fc343bf11376903212b25b037f994a52a7fd877758b95515b33",
+        "result": "PASS 574 analytic intersections across 160 reused, resized, indexed and fallback boundary grids"
+      },
+      "sparse": {
+        "source_sha256": "329cd0450dd120fdad0c802228b3ffd9f9bf0a0d0666b219c3f1b13f6a2b50d9",
+        "result": "PASS 574 analytic intersections across 160 reused, resized, indexed and fallback boundary grids"
+      }
+    }
+  },
+  "sparse-native-asan": {
+    "terminal": true,
+    "profile": "asan",
+    "candidate": "b949cfefc7fa71ddbaf2ebc816601d49c87c104a",
+    "invocation": "f9844c3108a044b4a9493f7dfb53021f",
+    "results": [
+      {
+        "target": "xatlas-allocation",
+        "exit": 0,
+        "seconds": 0.064,
+        "log_sha256": "7d8b5830488de23399a53e3a34c01dec61fc77823739447dd77940bccf9f441e",
+        "last_line": "PASS 19 persistent thread-state allocation failures unwind all native workers and allow retry"
+      },
+      {
+        "target": "xatlas-shutdown",
+        "exit": 0,
+        "seconds": 0.315,
+        "log_sha256": "7af2ac5c60860d5825b0193513c90ad4ea4446e9793c7a2077c4829e6be39e61",
+        "last_line": "PASS 32 deterministic Atlas shutdown predicate/wait-registration handshakes"
+      },
+      {
+        "target": "atlas-robustness",
+        "exit": 0,
+        "seconds": 55.922,
+        "log_sha256": "1b8d16d0dc9b9ae35b7a7c3eb7bc16bff2340c5b8dc7c0cf5c0f0b20a7b777c8",
+        "last_line": "PASS Increasing requested resolution fits all independent tiny charts under the same strict policy"
+      },
+      {
+        "target": "atlas-cancellation",
+        "exit": 0,
+        "seconds": 1.617,
+        "log_sha256": "a0aae97971e2a76bede2378ad0461220d7f2919d7061ca39dbae42cd7f8e189f",
+        "last_line": "15 cancellable atlas checks passed"
+      },
+      {
+        "target": "atlas-authoring-cancellation",
+        "exit": 0,
+        "seconds": 9.333,
+        "log_sha256": "2b920d662d23bf14f325d37922124e63f7bdb75218a760cfc1f42914dd6f4789",
+        "last_line": "18 authoring atlas cancellation checks passed"
+      },
+      {
+        "target": "voxel-authoring",
+        "exit": 0,
+        "seconds": 3.621,
+        "log_sha256": "80b396a5f991f54e6f182109003be77bdac85fa8dedeba4da1d09fd18d1df0f3",
+        "last_line": "PASS Scalar-source remeshing has exact scene undo"
+      }
+    ],
+    "phase": "complete",
+    "exit": 0
+  },
+  "hdr-clear-undo-release-2048": {
+    "profile": "release",
+    "resolution": 2048,
+    "candidate": "f9830df417d2ad2ab65905866b816468ab6d00ef",
+    "terminal": true,
+    "invocation": "b5903e84dcfd42ca9798ce5ada64f043",
+    "deadline_per_phase_seconds": 900,
+    "owned_RSS_limit_bytes": 4294967296,
+    "core_sha256": "bd78d9c365efe67b9b18421e512cebdca6c1cc4309d45d7e0dd92bba92708081",
+    "phase": "complete",
+    "seconds": 19.36,
+    "paint_object_sha256": "871d79bc0a53ac199b6f8b058f86a30152c10a6946be0f12aa297072bb23046d",
+    "source_sha256": "9c299cac73198075a602366fc7084e37409e6055f39a90d641f9ddf8add28673",
+    "exit": 0,
+    "runs": [
+      {
+        "label": "preview",
+        "pid": 1149178,
+        "exit": 0,
+        "error": null,
+        "elapsed_seconds": 17.031,
+        "peak_owned_rss": 1191034880,
+        "libasan_mapped": false,
+        "libubsan_mapped": false,
+        "checks": [
+          1
+        ],
+        "log_sha256": "200bc504ddb6745275dc56c9967f0da56dc5c141782bcb2e0df25a2c4121bfc9"
+      }
+    ],
+    "restored_preview_seconds": 0.665657,
+    "restored_retention_bytes": 444041876,
+    "same_immutable_preview": true
+  },
+  "hdr-clear-undo-asan-2048": {
+    "profile": "asan",
+    "resolution": 2048,
+    "candidate": "f9830df417d2ad2ab65905866b816468ab6d00ef",
+    "terminal": true,
+    "invocation": "d8c30d225751413685505885ecd3a356",
+    "deadline_per_phase_seconds": 900,
+    "owned_RSS_limit_bytes": 4294967296,
+    "core_sha256": "828024bcdd488c84027dee87bddfe91e59106d8e33e23da398aa0a7812f000ab",
+    "phase": "complete",
+    "seconds": 182.32,
+    "paint_object_sha256": "d7bff1be911c1acd707797105fc22d9cc205753d202f9dc52ecd6b23089b93eb",
+    "source_sha256": "9c299cac73198075a602366fc7084e37409e6055f39a90d641f9ddf8add28673",
+    "exit": 0,
+    "runs": [
+      {
+        "label": "preview",
+        "pid": 1152801,
+        "exit": 0,
+        "error": null,
+        "elapsed_seconds": 176.307,
+        "peak_owned_rss": 1737281536,
+        "libasan_mapped": true,
+        "libubsan_mapped": true,
+        "checks": [
+          1
+        ],
+        "log_sha256": "a481ce0023a6832e4c856ecc0fb50e5eb7c161d4b66b216bd3379f01c2683b40"
+      }
+    ],
+    "restored_preview_seconds": 8.37366,
+    "restored_retention_bytes": 444041876,
+    "same_immutable_preview": true
+  },
+  "hdr-main-port-release": {
+    "terminal": true,
+    "invocation": "c6a89a5f9bf3441d860e33fa11abecac",
+    "candidate": "ead80bb50485de6f8a2473ea64ee039d53f79ae9",
+    "results": {
+      "app": {
+        "executable_sha256": "1c8ccd3fb831e69bda272ac89d68f1ee33183e2c0e4412b26e2be2064b2489d6",
+        "log_sha256": "4b2680e6b8047f42eca5a279e9cc76b1dcd6e6c424e909d56233655c50a3d797",
+        "assertions": 0,
+        "last_line": "Dome Sculpt 0.1.0 / CPU / Blender 5.4 Alpha trackball basis"
+      },
+      "baked-textures": {
+        "executable_sha256": "492a8050a655bc2553c29ab38a889cf788c1e2e9472e07cb8124158f9efe36de",
+        "log_sha256": "9534dd921bb588a649b4d944378c0064102017c1a41973874a199da20fc29c76",
+        "assertions": 38,
+        "last_line": "PASS Ordered native saving retains baked channels and editable rig/paint state"
+      },
+      "bake-workflow": {
+        "executable_sha256": "f0195bda87725205189db467aaaaf9642a9bc34485ed96595ae75936d91d6838",
+        "log_sha256": "abd92a2911185624eaece6f0c86b044fb620a6a26ee80a2308720b716a8daae2",
+        "assertions": 11,
+        "last_line": "PASS The baked workflow publishes render-ready immutable tangent corners off the UI thread"
+      },
+      "source-maps": {
+        "executable_sha256": "90ba23668eb21337fa9848f42bdfc9c557fcc7beb4e8a4d1e814f519c0021e0f",
+        "log_sha256": "f1323e2a52b00c6585a553be63b8c9e90c287fff4f14dc21a5c2aeb689ae05b6",
+        "assertions": 43,
+        "last_line": "Native original source-map tests complete"
+      },
+      "composite-cache": {
+        "executable_sha256": "6f17ff82cd004c4c5fa227cf5142c2c10493078126a569110914f1e7c59f6592",
+        "log_sha256": "851c0d6123db5dacdba724a4c0c6c0c74898ccdb1048d88ed9bf56a8ecdf58d6",
+        "assertions": 52,
+        "last_line": "Native composite cache tests complete"
+      },
+      "source-uv": {
+        "executable_sha256": "fd96b823a1e7e448377051ecd408985aec66f34850a57bd2195ead265dc32435",
+        "log_sha256": "454219067f7d4d02269a416ae3fc3c8555bcbfdcd6166082c7dc0f0dc4a2b2d4",
+        "assertions": 68,
+        "last_line": "Native source-authored UV tests complete"
+      }
+    },
+    "phase": "complete",
+    "main_support": "6a63f6fef24ef7c3e144fe38c652c414ffb1652a",
+    "atlas_sha256": "f5d851324f0feb10326fa3cb112f736b5e5e5c46573dfaf6f86aef3b48298b5d",
+    "core_sha256": "2760adf57af0a0b0a370c1c42e81c424f701ca49fc72fb533b69c2f538f56acf",
+    "paint_sha256": "47d3f9d4380440dfe778a597e04ada80073122b14d334178b1dcdf3d8c609dd6",
+    "exit": 0
+  },
+  "archive": {
+    "path": "docs/validation/atlas-grid-hdr-history-20261126.tar.gz",
+    "sha256": "6b5ab078ccc03a066ab3ddf61e2ee4e27ced2d9467491b1a13b6e4979d117430",
+    "members": 14
+  }
+}
