@@ -22,6 +22,8 @@ import sys
 import time
 import uuid
 
+import native_process_maps
+
 FORMAT = 1
 TIMEOUT = 3500
 COMMON = ("format", "baseline", "baseline_counts", "stable_baseline",
@@ -87,7 +89,8 @@ def lock(path, exclusive=False):
 
 
 def protected_inputs(binary, fixture, source, extra, env):
-    files = {binary.resolve(), fixture.resolve(), Path(__file__).resolve()}
+    files = {binary.resolve(), fixture.resolve(), Path(__file__).resolve(),
+             Path(native_process_maps.__file__).resolve()}
     tracked = subprocess.check_output(["git", "-C", str(source), "ls-files", "-z"])
     files.update(source / os.fsdecode(p) for p in tracked.split(b"\0") if p)
     files.update(Path(p).resolve() for p in extra)
@@ -114,26 +117,6 @@ def check_inputs(plan):
             "Frozen input manifest digest is invalid")
 
 
-def elf_mappings(pid):
-    result = set()
-    try:
-        lines = Path(f"/proc/{pid}/maps").read_text().splitlines()
-    except FileNotFoundError:
-        return result
-    for line in lines:
-        fields = line.split(None, 5)
-        if len(fields) < 6 or not fields[5].startswith("/"):
-            continue
-        path = Path(fields[5])
-        try:
-            with path.open("rb") as f:
-                if f.read(4) == b"\x7fELF":
-                    result.add(str(path.resolve()))
-        except FileNotFoundError:
-            continue
-    return result
-
-
 def run_native(plan, run, case, arguments):
     """Own, time-limit and reap the actual native process, including on SIGTERM."""
     output = run / case
@@ -157,7 +140,7 @@ def run_native(plan, run, case, arguments):
             write(run / (case + ".process.json"),
                   {"pid": child.pid, "wrapper_pid": os.getpid(), "command": command})
             while child.poll() is None:
-                observed.update(elf_mappings(child.pid))
+                observed.update(native_process_maps.elf_mappings(child.pid, plan["binary"]))
                 if time.monotonic() - before > TIMEOUT:
                     timed_out = True
                     os.killpg(child.pid, signal.SIGKILL)
