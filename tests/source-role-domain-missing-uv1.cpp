@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "bake-save-gate.hpp"
 #include "dome/scene.hpp"
 #include "dome/source-paint.hpp"
 #include "dome/source-maps.hpp"
@@ -35,7 +36,7 @@ size_t missing(bool hdr,const std::filesystem::path&out){auto f=fixture(hdr,true
  const bool emitter=refuses([&]{const auto callback=detail::emission_bake_source(source);if(callback){const auto value=callback(0,{.2f,.3f,.5f});std::cout<<"SILENT_CALLBACK hdr="<<hdr<<" value="<<value[0]<<','<<value[1]<<','<<value[2]<<std::endl;}else std::cout<<"SILENT_CALLBACK hdr=0 legacy_empty=1"<<std::endl;});const bool raw=refuses([&]{detail::raw_bake_source(source);});auto trial=f.scene.snapshot();const bool bake=refuses([&]{const auto report=bake_object(trial,f.source,settings());std::cout<<"SILENT_BAKE hdr="<<hdr<<" projected="<<report.projected<<std::endl;});check(!bake||trial.encode()==before,"Missing logical UV1 refusal changed source/target state");check(f.scene.encode()==before,"Original role captures changed authority");
  auto cancelled=f.scene.snapshot();check(refuses([&]{bake_object(cancelled,f.source,settings(),[]{return true;});})&&cancelled.encode()==before,"Missing role cancellation changed source/target state");check(refuses([&]{detail::emission_bake_source(source,[]{return true;});})&&f.scene.encode()==before,"Cancelled missing role emitter changed authority");
  const auto path=out/(hdr?"hdr-prior.dsculpt":"ldr-prior.dsculpt");const std::string prior="Prior native path bytes must remain exact\n";{std::ofstream file(path,std::ios::binary);file<<prior;}
- Document doc;doc.replace(f.scene.snapshot());check(doc.wait_mesh(),"Missing role fixture failed unrelated geometry publication");const auto initial=doc.frame().state;bool saved=true;try{doc.bake_from_object(f.source,settings());auto save=doc.save_async(path);save.get();}catch(const std::exception&e){saved=false;std::cout<<"DEPENDENT_SAVE_REFUSAL hdr="<<hdr<<" "<<e.what()<<std::endl;}
+ Document doc;doc.replace(f.scene.snapshot());check(doc.wait_mesh(),"Missing role fixture failed unrelated geometry publication");const auto initial=doc.frame().state;bool saved=true;auto save=bake_save_gate::queue(doc,f.source,settings(),path);try{save.get();}catch(const std::exception&e){saved=false;std::cout<<"DEPENDENT_SAVE_REFUSAL hdr="<<hdr<<" "<<e.what()<<std::endl;}
  check(doc.wait_asset(std::chrono::seconds(120))&&doc.wait_mesh(),"Missing role worker did not reach an owning terminal boundary");const auto state=doc.frame().state;const bool atomic=!saved&&doc.copy_scene().encode()==before&&!state->can_undo&&!state->can_redo&&state->project_path==initial->project_path&&bytes(path)==prior;std::cout<<"MISSING_ROLE hdr="<<hdr<<" emitter_refuses="<<emitter<<" raw_refuses="<<raw<<" Bake_refuses="<<bake<<" dependentSave_refuses="<<!saved<<" exact_data_path_history="<<atomic<<" error="<<state->error<<std::endl;return size_t(!emitter)+size_t(!raw)+size_t(!bake)+size_t(!atomic);
 }
 }

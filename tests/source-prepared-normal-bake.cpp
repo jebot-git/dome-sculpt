@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "bake-save-gate.hpp"
 #include "source-prepared-normal-oracle.hpp"
 #include "affine-surface.hpp"
 #include "emission-bake-source.hpp"
@@ -78,7 +79,7 @@ void emission_guards(const Scene &baseline,uint64_t source,const ObjectBakeSetti
   check(refuses([&]{bake_object(scene,source,options);})&&scene.encode()==before,"Actual prepared-source Bake refuses missing logical emission UV1 without source/target mutation");
   const auto path=folder/(hdr?"prepared-hdr-prior.dsculpt":"prepared-ldr-prior.dsculpt");const std::string previous="Keep exact prior save bytes\n";{std::ofstream f(path,std::ios::binary);f<<previous;}
   Document doc;doc.replace(scene.snapshot());check(doc.wait_mesh(),"Prepared missing-UV1 Scene publishes before Bake");const auto initial=doc.frame().state;bool saved=true;
-  try{doc.bake_from_object(source,options);auto result=doc.save_async(path);result.get();}catch(const std::exception&){saved=false;}
+  auto result=bake_save_gate::queue(doc,source,options,path);try{result.get();}catch(const std::exception&){saved=false;}
   std::ifstream file(path,std::ios::binary);const std::string bytes{std::istreambuf_iterator<char>(file),{}};
   check(doc.wait_asset(std::chrono::seconds(120))&&doc.wait_mesh()&&!saved&&bytes==previous&&doc.copy_scene().encode()==before&&!doc.frame().state->can_undo&&!doc.frame().state->can_redo&&doc.frame().state->project_path==initial->project_path,"Prepared missing-UV1 worker and dependent Save preserve exact data, prior bytes, path and history in both LDR and HDR");
  }

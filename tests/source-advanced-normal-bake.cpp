@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "bake-save-gate.hpp"
 #include "source-prepared-normal-oracle.hpp"
 #include "affine-surface.hpp"
 #include "dome/source-uv-bake.hpp"
@@ -134,7 +135,7 @@ void ancestor_guards(const std::filesystem::path &folder){
  const auto id=source.id;auto mesh=source.deformation?source.deformation->preview(source.painted->mesh()):source.painted->mesh();chain.select(target(chain,mesh,false));const auto baseline=chain.encode();ObjectBakeSettings bake;bake.prepare_normals=true;bake.normal_error=.03f;bake.ao_samples=0;bake.padding=0;bake.front_mm=bake.back_mm=500;
  require(refuses([&]{bake_object(chain,id,bake);})&&chain.encode()==baseline,"Native Bake's declared 256MiB source cap refuses larger historical replay atomically");
  const auto path=folder/"ancestor-budget-prior.dsculpt";const std::string previous="Keep exact earlier native save bytes\n";{std::ofstream f(path,std::ios::binary);f<<previous;}
- Document document;document.replace(chain.snapshot());require(document.wait_mesh(),"Historical quota native Scene reaches initial worker state");bool rejected=false;try{document.bake_from_object(id,bake);document.save_async(path).get();}catch(const std::exception&){rejected=true;}
+ Document document;document.replace(chain.snapshot());require(document.wait_mesh(),"Historical quota native Scene reaches initial worker state");bool rejected=false;auto pending=bake_save_gate::queue(document,id,bake,path);try{pending.get();}catch(const std::exception&){rejected=true;}
  std::ifstream file(path,std::ios::binary);const std::string actual{std::istreambuf_iterator<char>(file),{}};require(rejected&&document.wait_asset()&&document.wait_mesh()&&actual==previous&&document.copy_scene().encode()==baseline&&!document.frame().state->can_undo&&!document.frame().state->can_redo,"Historical replay quota failure preserves ordered Save bytes, full native state and history");
 }
 void run(bool legacy,bool live,bool seam,SourceNormalUvMethod method,const std::filesystem::path&folder,bool repeated=false){
