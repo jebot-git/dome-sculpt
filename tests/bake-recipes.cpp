@@ -7,7 +7,144 @@
 #include <fstream>
 #include "polygon-conversion.hpp"
 #include "dome/shapekey-authoring.hpp"
+#include "dome/texture-sets.hpp"
+#include "texture-set-paint-access.hpp"
+
+namespace {
+Mesh material_quads(float height) {
+  Mesh mesh;
+  for(float x : {0.f,3.f}) {
+    const auto first=uint32_t(mesh.positions.size());
+    mesh.positions.insert(mesh.positions.end(),{{x-.5f,-.5f,height},{x+.5f,-.5f,height},
+        {x+.5f,.5f,height},{x-.5f,.5f,height}});
+    mesh.normals.insert(mesh.normals.end(),4,{0,0,1});
+    mesh.uv.insert(mesh.uv.end(),{{.125f,.125f},{.875f,.125f},{.875f,.875f},{.125f,.875f}});
+    mesh.indices.insert(mesh.indices.end(),{first,first+1,first+2,first,first+2,first+3});
+  }
+  return mesh;
+}
+
+void texture_set_bake(const std::filesystem::path &output) {
+  std::filesystem::create_directories(output);
+  Scene scene;
+  const auto target=scene.active().id;
+  const auto source=scene.add("Two source materials",Volume{});
+  const auto cage=scene.add("Full matched cage",Volume{});
+  auto &cage_object=scene.object(cage);
+  cage_object.mesh_active=true;
+  cage_object.visible=false;
+  cage_object.painted=std::make_shared<PaintedMesh>(material_quads(.030f),64);
+  std::array<TextureSetInitialField,2> fields;
+  fields[0].resolution=fields[1].resolution=64;
+  fields[0].material.name="Left set";
+  fields[1].material.name="Right set";
+  const std::array<TextureSetId,4> membership{0,0,1,1};
+  initialize_texture_sets(scene,target,material_quads(0),fields,membership);
+  fields[0].material.color={.9f,.02f,.03f,1};
+  fields[1].material.color={.02f,.8f,.03f,1};
+  initialize_texture_sets(scene,source,material_quads(.012f),fields,membership);
+  scene.object(source).visible=false;
+  scene.select(target);
+  select_texture_set(scene,target,1);
+  edit_texture_set(scene,target,1,[](PaintedMesh &paint,Material &) {
+    paint.add_layer("Editable brush layer");
+    Brush brush;brush.from=brush.to={3,0,0};brush.normal={0,0,1};brush.radius=.3f;brush.strength=1;
+    PaintSettings ink;ink.channel=PaintChannel::Color;ink.color={.03f,.04f,.9f,1};
+    paint.begin_stroke();paint.stamp(brush,ink);
+    return paint.end_stroke();
+  });
+  const auto original=scene.encode();
+  const auto original_left=scene.active().painted;
+  const auto original_right=dome::active_texture_set(scene.active()).painted;
+  const auto source_collection=scene.object(source).texture_sets;
+  const auto cage_paint=scene.object(cage).painted;
+  ObjectBakeSettings right_settings;
+  right_settings.front_mm=80;right_settings.padding=0;right_settings.ao_samples=4;right_settings.cage_object=cage;
+
+  auto cancelled=scene.snapshot();
+  bool armed=false;
+  require_cage(rejected_cage([&]{bake_object(cancelled,source,right_settings,[&]{return armed;},
+      [&](float p){armed|=p>.12f;});})&&armed&&cancelled.encode()==original,
+      "Cancellation during active-set projection preserves the complete Scene");
+
+  Document doc;
+  doc.replace(scene);
+  ready_cage(doc);
+  require_cage(doc.frame().state->can_bake&&doc.frame().state->active_texture_set==1,
+      "The shared editor enables Bake for the selected right field");
+  doc.bake_from_object(source,right_settings);
+  doc.save_async(output/"right-ordered.dsculpt").get();
+  ready_cage(doc);
+  const auto right_scene=doc.copy_scene();
+  const auto right_wire=right_scene.encode();
+  const auto right=active_texture_set(right_scene.active());
+  require_cage(doc.frame().state->error.empty()&&right.painted->baked()&&doc.frame().state->can_clear_bake&&
+      Scene::load(output/"right-ordered.dsculpt").encode()==right_wire,
+      "Active-set Bake and ordered Save publish the exact complete Scene");
+  const auto &right_bake=*right.painted->baked();
+  const auto pixel=(32*64+32)*4;
+  require_cage(right_bake.coverage[32*64+32]&&right_bake.maps.color.rgba[pixel+1]>right_bake.maps.color.rgba[pixel]&&
+      !right_bake.maps.normal.rgba.empty()&&!right_bake.maps.metal_rough.rgba.empty(),
+      "Overlapping UVs bake only the right recipient using its green source material and native normal and AO channels");
+  require_cage(detail::TextureSetPaintAccess::same_current(*right_scene.active().painted,*original_left)&&
+      right.painted->layers().back().tiles==original_right->layers().back().tiles&&
+      right_scene.object(source).texture_sets==source_collection&&
+      right_scene.object(cage).painted->mesh_owner()==cage_paint->mesh_owner(),
+      "Bake leaves the other raster, editable paint, source collection and cage geometry intact");
+  require_cage(right.bake_recipe&&right.bake_recipe->source.object==source&&right.bake_recipe->settings.cage_object==cage&&
+      !right_scene.active().bake_recipe&&doc.frame().state->bake_recipe==right.bake_recipe,
+      "The completed recipe belongs to the right field and is available to the shared editor");
+  require_cage(doc.undo()&&doc.copy_scene().encode()==original&&doc.redo()&&doc.copy_scene().encode()==right_wire,
+      "Active-set Bake is exactly one Undo and Redo transition");
+  ready_cage(doc);
+
+  TextureSetEdit selection;selection.set=0;
+  doc.edit_texture_set(selection);ready_cage(doc);
+  require_cage(!doc.frame().state->bake_recipe&&!doc.frame().state->can_clear_bake&&
+      doc.frame().state->bake_settings.cage_object==0,
+      "Selecting the unbaked primary field presents independent settings and Clear state");
+  ObjectBakeSettings left_settings;left_settings.front_mm=55;left_settings.ao_samples=0;left_settings.padding=0;
+  doc.bake_from_object(source,left_settings);ready_cage(doc);
+  const auto both=doc.copy_scene();
+  const auto both_wire=both.encode();
+  const auto &left_bake=*both.active().painted->baked();
+  require_cage(left_bake.maps.color.rgba[pixel]>left_bake.maps.color.rgba[pixel+1]&&
+      both.active().texture_sets->at(1).painted->baked()==right.painted->baked(),
+      "Primary Bake samples the red source and leaves the right bake owner alone");
+
+  doc.clear_bake();ready_cage(doc);
+  const auto cleared=doc.copy_scene();
+  const auto cleared_wire=cleared.encode();
+  require_cage(!cleared.active().painted->baked()&&cleared.active().bake_recipe==both.active().bake_recipe&&
+      cleared.active().texture_sets->at(1).painted->baked()==right.painted->baked()&&
+      !doc.frame().state->can_clear_bake,
+      "Clear affects the primary bake alone and keeps its recallable recipe and editable layers");
+  require_cage(doc.undo()&&doc.copy_scene().encode()==both_wire&&doc.redo()&&doc.copy_scene().encode()==cleared_wire,
+      "Clearing the active bake has exact Undo and Redo");
+  ready_cage(doc);
+
+  selection.set=1;doc.edit_texture_set(selection);ready_cage(doc);
+  const auto recalled_scene=doc.copy_scene().encode();
+  require_cage(doc.frame().state->bake_recipe&&doc.frame().state->bake_settings.front_mm==80&&
+      doc.frame().state->bake_settings.cage_object==cage,
+      "Returning to the right field restores its own saved projection settings");
+  Driver hand(doc);hand.open();hand.sector(1);hand.value(.2f,0);hand.confirm();
+  const float modified=doc.frame().state->bake_settings.front_mm;
+  hand.sector(0);hand.ray(.5f,432.f/640);
+  require_cage(modified!=80&&doc.frame().state->controls.bake_preset&&
+      doc.frame().state->controls.bake_preset->settings.cage_object==cage,
+      "Controller Recall stages the selected material's complete saved recipe");
+  hand.confirm();
+  require_cage(doc.frame().state->bake_settings.front_mm==80&&doc.copy_scene().encode()==recalled_scene,
+      "Controller confirmation recalls the active recipe without modifying scene or rebaking");
+  std::cout<<"PASS "<<cage_checks<<" texture-set Bake, Clear and Recall controls\n";
+}
+} // namespace
+
 int main(int argc,char **argv)try{
+  if(argc==3&&std::string_view(argv[1])=="--texture-set-bake"){
+    texture_set_bake(argv[2]);return 0;
+  }
   if(argc==3&&(std::string_view(argv[1])=="--ui-fixture"||std::string_view(argv[1])=="--ui-wide-fixture")){
     auto scene=cage_scene(128);auto settings=cage_settings();if(std::string_view(argv[1])=="--ui-wide-fixture"){settings.front_mm=100000;settings.back_mm=0;settings.ao_distance_mm=.00001f;}bake_object(scene,2,settings);scene.active().painted->clear_bake();scene.save(argv[2]);return 0;
   }

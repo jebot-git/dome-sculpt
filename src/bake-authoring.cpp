@@ -16,7 +16,35 @@
 #include "emission-bake-source.hpp"
 #include "source4-baked.hpp"
 #include "source-bake-normal.hpp"
+#include "texture-set-bake.hpp"
 namespace dome {
+namespace {
+void capture_texture_set_bake_source(BakeSource &high, SculptObject source,
+                                     const std::function<bool()> &cancelled) {
+  const auto primary=texture_set_view(source,0);
+  const auto collection=std::move(source.texture_sets);
+  high.materials.clear();
+  high.materials.reserve(collection->additional().size()+1);
+  high.triangle_materials.resize(high.mesh.indices.size()/3);
+  const auto capture=[&](const TextureSetView &field) {
+    if (cancelled && cancelled())
+      throw std::runtime_error("Texture-set Bake source capture cancelled");
+    const auto index=uint32_t(high.materials.size());
+    for (const auto triangle : field.domain->triangles())
+      high.triangle_materials[triangle]=index;
+    source.painted=field.painted->snapshot();
+    source.material=field.material;
+    auto &material=high.materials.emplace_back();
+    material.material=field.material;
+    material.maps=field.painted->preview(field.material,cancelled);
+    material.resolved_emission=detail::emission_bake_source(source,cancelled);
+  };
+  capture(primary);
+  for (const auto &field : collection->additional())
+    capture({field.id,field.name,field.painted,field.material,field.appearance,
+             field.material_bindings,field.bake_recipe,field.domain,field.source});
+}
+} // namespace
 ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
                               ObjectBakeSettings settings,
                               const std::function<bool()> &cancelled,
@@ -29,6 +57,21 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   scene.validate();
   auto target = scene.active();
   auto source = scene.object(source_id);
+  if(target.texture_sets && !detail::bake_target_supported(target))
+    throw std::logic_error("The selected target field needs its source-retaining Bake adapter");
+  if(source.texture_sets && !detail::bake_source_supported(source))
+    throw std::logic_error("The source texture collection needs its retained material Bake adapter");
+  std::optional<TextureSetView> recipient;
+  if(target.texture_sets){
+    if(settings.prepare_colors || settings.prepare_normals)
+      throw std::invalid_argument("Prepare source colors or portable normal targets before splitting this mesh into texture sets");
+    recipient=active_texture_set(target);
+    target.painted=recipient->painted->snapshot();
+    recipient->painted=target.painted;
+    target.material=recipient->material;
+    target.appearance=recipient->appearance;
+    target.material_bindings=recipient->material_bindings;
+  }
   if(target.material_bindings&&target.material_bindings->native_paint_sampling)throw std::logic_error("Retained native paint target requires its sampling-aware Bake adapter");
   if(source.material_bindings&&source.material_bindings->native_paint_sampling)throw std::logic_error("Retained native paint source requires its sampling-aware Bake adapter");
   if(target.material_bindings&&target.material_bindings->normal_preparation&&target.material_bindings->normal_preparation->canonical_conversion){
@@ -38,8 +81,9 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   }
   const bool current_source=source.polygon&&source.polygon->active&&source.polygon->colors;
   const bool current_target=target.polygon&&target.polygon->active&&target.polygon->colors;
-  if(!detail::corner_bake_target_supported(target))
+  if(!target.texture_sets && !detail::corner_bake_target_supported(target))
     throw std::logic_error("This corner-color target has shading roles that target baking cannot yet preserve");
+
   // This source route uses the same authenticated ordinary shading domain as
   // plane cutting. Other original/prepared roles still require their adapters.
   if(current_source&&!detail::cut_color_supported(source))
@@ -73,9 +117,9 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   }
   // Authenticate ordered REST geometry before evaluation. Skin/morph changes
   // positions/normals later, never the source field's corner identity or RGBA.
-  auto source_maps=detail::raw_bake_source(source,cancelled);
-  if(!source_maps&&source.mesh_active)source_maps=source.painted->preview(source.material,cancelled);
-  auto source_colors=source.mesh_active?detail::current_vertex_colors(source.painted->mesh(),current?&*current:nullptr,
+  auto source_maps=source.texture_sets?std::shared_ptr<const TextureMaps>{}:detail::raw_bake_source(source,cancelled);
+  if(!source_maps&&source.mesh_active&&!source.texture_sets)source_maps=source.painted->preview(source.material,cancelled);
+  auto source_colors=source.mesh_active&&!source.texture_sets?detail::current_vertex_colors(source.painted->mesh(),current?&*current:nullptr,
       source.appearance.get(),source.material_bindings.get(),source_maps.get(),cancelled):std::vector<PolygonRgba>{};
   std::shared_ptr<const PolygonColorSurface> target_current;
   if(current_target){
@@ -120,12 +164,16 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
     if(!source_prepared)high.colors=std::move(source_colors);
   } else
     high.mesh = surface_mesh(*source.volume, cancelled);
-  high.materials[0].material = source.material;
-  high.materials[0].resolved_emission=detail::emission_bake_source(source,cancelled);
+  if(source.texture_sets)capture_texture_set_bake_source(high,source,cancelled);
+  else{
+    high.materials[0].material=source.material;
+    high.materials[0].resolved_emission=detail::emission_bake_source(source,cancelled);
+  }
   auto target_world = scene.world_transform(target.id);
   auto relative = ob::compose(ob::inverse(target_world), scene.world_transform(source.id));
   detail::SourceBakeNormalOptions source_normal_options;source_normal_options.cancelled=cancelled;
-  const auto source_normals=detail::source_bake_normals(source,relative,source_normal_options);
+  const auto source_normals=source.texture_sets?detail::SourceBakeNormalResolver{}:
+      detail::source_bake_normals(source,relative,source_normal_options);
   for (auto &p : high.mesh.positions) {
     auto world = ob::transform(relative, {p.x,p.y,p.z});
     p = {world.x,world.y,world.z};
@@ -177,7 +225,8 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
         target.painted->mesh(),low_mesh,cancelled);
   const auto retained_uv=target.material_bindings?target.material_bindings->canonical_uv:nullptr;
   if(retained_uv&&progress)options.progress=[&](float value){progress(.1f+.4f*value);};
-  auto result = detail::bake_mesh_source_normals(low_mesh,high,options,source_normals);
+  const auto target_triangles=recipient?recipient->domain->triangles():std::span<const uint32_t>{};
+  auto result = detail::bake_mesh_source_normals(low_mesh,high,options,source_normals,target_triangles);
   std::optional<BakeResult> retained_normal_write;
   if(retained_uv){
     retained_uv->validate_current(target.painted->mesh(),cancelled);
@@ -239,10 +288,15 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
     painting=detail::install_source_bake(*painting,std::move(textures),source_options);
   }else painting->install_bake(std::move(textures));
   auto next = scene;
-  next.active().painted = std::move(painting);
-  next.active().material_bindings=target.material_bindings;
-  next.active().polygon=target.polygon;
-  next.active().bake_recipe=capture_bake_recipe(scene,source_id,settings);
+  auto recipe=capture_bake_recipe(scene,source_id,settings);
+  if(recipient)
+    detail::stage_texture_set_bake(next.active(),target.texture_sets,*recipient,std::move(painting),std::move(recipe));
+  else{
+    next.active().painted=std::move(painting);
+    next.active().material_bindings=target.material_bindings;
+    next.active().polygon=target.polygon;
+    next.active().bake_recipe=std::move(recipe);
+  }
   next.validate();
   check();
   // A user progress callback can throw or request cancellation. No fallible

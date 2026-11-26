@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "bake-editor.hpp"
+#include "dome/texture-sets.hpp"
 #include "dome/bake-recipe.hpp"
 #include "dome/bake-distance.hpp"
 #include "appearance.h"
@@ -46,11 +47,15 @@ void edit_bake_dialog(Document &doc){
   DomeDialog window(width,height,"Bake surface");
   Fl_Scroll scroll(0,0,width,height-row*2);scroll.type(Fl_Scroll::VERTICAL);
   Fl_Group content(0,0,width-24,row*17);content.resizable(nullptr);
-  const char *description="Bake into the selected target's UVs below editable paint.\nSource geometry, rig and paint stay intact. Bounds use world mm.";
+  const auto &object=draft.scene.object(target);
+  const bool texture_set=bool(object.texture_sets);
+  const std::string description=texture_set
+      ?"Bake beneath editable paint in "+active_texture_set(object).name+". Bounds use world mm."
+      :"Bake into the selected target's UVs below editable paint.\nSource geometry, rig and paint stay intact. Bounds use world mm.";
   fl_font(dx::font,dx::size);
   auto measured=[&](const char*text,int minimum){fl_font(dx::font,dx::size);int w=width-48,h=0;fl_measure(text,w,h,0);return std::max(minimum,h+16);};
-  int header=measured(description,row*2);
-  Fl_Box hint(16,4,width-48,header-4,description);
+  int header=measured(description.c_str(),row*2);
+  Fl_Box hint(16,4,width-48,header-4,description.c_str());
   hint.align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE|FL_ALIGN_WRAP);
   int label=std::min(width/2,dx::size*15),y=header;
   Fl_Choice source(label,y,width-label-40,row-6,"Source");y+=row;
@@ -91,6 +96,8 @@ void edit_bake_dialog(Document &doc){
   color_error.position(label,y);y+=row;
   Fl_Check_Button normals(20,y,width-56,row,"Author portable normal targets");normals.value(settings.prepare_normals);normals.tooltip("Authors portable normal and tangent targets. Pose and morph shading can differ from legacy dynamic shading; original source data is retained.");y+=row;
   normal_error.position(label,y);y+=row;
+  if(texture_set){colors.deactivate();normals.deactivate();color_error.deactivate();normal_error.deactivate();}
+
   const char *help="Partial projection keeps unprojected areas and reports misses.\nPortable normal authoring creates a new shading model; original data is retained.\nCage: duplicate target, edit vertices; keep topology. 0 samples disables AO.\nDrag or wheel to adjust. Bake is one Undo step.";
   int help_height=measured(help,row);
   Fl_Box adjustment(16,y,width-48,help_height,help);y+=help_height;

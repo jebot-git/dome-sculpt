@@ -3966,6 +3966,9 @@ if(BUILD_TESTING)
   target_link_libraries(dome-sculpt-bake-recipes-test PRIVATE dome-sculpt-core)
   add_test(NAME bake-recipes COMMAND dome-sculpt-bake-recipes-test ${CMAKE_CURRENT_BINARY_DIR}/bake-recipes)
   set_tests_properties(bake-recipes PROPERTIES TIMEOUT 600)
+  add_test(NAME texture-set-active-bake COMMAND dome-sculpt-bake-recipes-test --texture-set-bake
+    ${CMAKE_CURRENT_BINARY_DIR}/texture-set-active-bake)
+  set_tests_properties(texture-set-active-bake PROPERTIES TIMEOUT 300)
 endif()
 
 if(BUILD_TESTING)

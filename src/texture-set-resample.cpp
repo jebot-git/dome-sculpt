@@ -513,7 +513,7 @@ resample_texture_set(Scene &scene, uint64_t object, TextureSetId set,
   object_before.texture_sets->validate(object_before, true, limits);
   const auto field = texture_set_view(object_before, set);
   if (field.source || field.material_bindings || field.appearance ||
-      field.bake_recipe || field.painted->paint_sampling_domain() ||
+      field.painted->paint_sampling_domain() ||
       field.painted->source_maps() ||
       field.painted->source_sampling_prepared() ||
       field.painted->color_projection() || field.painted->normal_projection() ||

@@ -2,6 +2,7 @@
 #include "polygon-surface-preview.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/texture-sets.hpp"
+#include "texture-set-bake.hpp"
 #include "bake-recipe-remap.hpp"
 #include "dome/polygon-scene.hpp"
 #include "texture-set-paint-access.hpp"
@@ -73,6 +74,32 @@ void TextureSetCollection::validate_owner(const TextureSetView&primary,bool acti
 }
 namespace detail {
 struct TextureSetAccess {
+ static void stage_bake(SculptObject &target,
+       const std::shared_ptr<const TextureSetCollection> &membership,
+       const TextureSetView &recipient, std::shared_ptr<PaintedMesh> paint,
+       std::shared_ptr<const ObjectBakeRecipe> recipe) {
+  if (!same_owner(target.texture_sets,membership) || target.texture_sets->active()!=recipient.id)
+   throw std::invalid_argument("The active texture set changed during Bake");
+  const auto current=texture_set_view(target,recipient.id);
+  if (current.source || !same_owner(current.domain,recipient.domain) ||
+      !TextureSetPaintAccess::same_current(*current.painted,*recipient.painted) ||
+      !paint || paint->in_stroke() || !recipe ||
+      !same_owner(TextureSetPaintAccess::domain(*paint),current.domain) ||
+      !same_owner(TextureSetPaintAccess::raster_owner(*paint),
+                  TextureSetPaintAccess::raster_owner(*current.painted)))
+   throw std::invalid_argument("Bake lost the active texture field's paint, raster or face membership");
+  if (recipient.id==0) {
+   target.painted=std::move(paint);
+   target.bake_recipe=std::move(recipe);
+   return;
+  }
+  auto collection=std::shared_ptr<TextureSetCollection>(new TextureSetCollection(*membership));
+  auto field=std::find_if(collection->additional_.begin(),collection->additional_.end(),
+                         [&](const auto &entry){return entry.id==recipient.id;});
+  field->painted=std::move(paint);
+  field->bake_recipe=std::move(recipe);
+  target.texture_sets=std::move(collection);
+ }
  static std::shared_ptr<const TextureSetFieldSource> rebind_recipe(
      const TextureSetFieldSource &original, const std::shared_ptr<const ObjectBakeRecipe> &recipe,
      const std::shared_ptr<const SourceMaterialBindings> &binding, BakeRecipeRemap &remap) {
@@ -178,6 +205,12 @@ struct TextureSetAccess {
 
  }
 };
+void stage_texture_set_bake(SculptObject &target,
+    const std::shared_ptr<const TextureSetCollection> &membership,
+    const TextureSetView &recipient, std::shared_ptr<PaintedMesh> paint,
+    std::shared_ptr<const ObjectBakeRecipe> recipe) {
+ TextureSetAccess::stage_bake(target,membership,recipient,std::move(paint),std::move(recipe));
+}
 std::shared_ptr<const TextureSetCollection> BakeRecipeRemap::collection(
     const std::shared_ptr<const TextureSetCollection> &original, const OriginRemap &origin) {
  if (!original)

@@ -675,16 +675,29 @@ void Document::publish_locked(bool force,bool checkpoint) {
   state_.can_retopologize = !state_.polygon && !state_.cut && !state_.retopology && !uv_ && !state_.asset_busy && !state_.recovery_busy &&
       !control_before_ && !action_active_locked() && object_editable_locked(active.id) &&
       scene_.objects().size() < 256 && (active.mesh_active || !active.volume->voxels().empty());
-  if(state_.bake_settings_object!=active.id||state_.bake_recipe!=active.bake_recipe){
-    if(active.bake_recipe){state_.bake_source=active.bake_recipe->source.object;state_.bake_settings=active.bake_recipe->settings;}
-    state_.bake_settings_object=active.id;state_.bake_recipe=active.bake_recipe;
+  const auto bake_field=active_texture_set(active);
+  if(state_.bake_settings_object!=active.id||state_.active_texture_set!=bake_field.id||
+      state_.bake_recipe!=bake_field.bake_recipe){
+    if(bake_field.bake_recipe){
+      state_.bake_source=bake_field.bake_recipe->source.object;
+      state_.bake_settings=bake_field.bake_recipe->settings;
+    }else if(active.texture_sets){
+      state_.bake_source=0;
+      state_.bake_settings={};
+    }
+    state_.bake_settings_object=active.id;
+    state_.bake_recipe=bake_field.bake_recipe;
+  }
+  if(active.texture_sets){
+    state_.bake_settings.prepare_colors=false;
+    state_.bake_settings.prepare_normals=false;
   }
   state_.bake_sources = bake_sources_locked();
   state_.bake_cages = bake_cages_locked();
   if(std::find(state_.bake_sources.begin(),state_.bake_sources.end(),state_.bake_source)==state_.bake_sources.end())
     state_.bake_source=state_.bake_sources.empty()?0:state_.bake_sources.front();
   state_.can_bake=!state_.object_grabbing && bake_target_ready_locked() && !state_.bake_sources.empty();
-  state_.can_clear_bake=!state_.object_grabbing && bake_target_ready_locked() && bool(active.painted->baked());
+  state_.can_clear_bake=!state_.object_grabbing && bake_target_ready_locked() && bool(bake_field.painted->baked());
   state_.can_blur_color_layer=command_enabled_locked(SpatialCommand::BlurColorLayer);
   state_.can_convert_bake=canonical_conversion_ready_locked();
   auto work=asset_status();state_.can_cancel_asset=state_.asset_busy && work.cancellable;
@@ -2308,6 +2321,7 @@ bool Document::parameter_enabled_locked(VrParameter parameter) const {
     (parameter==VrParameter::SkinSource ? !skin_sources_locked(state_.skin_options.mode).empty()
       : !skin_sources_locked(SkinAuthoringMode::Automatic).empty());
   if(parameter==VrParameter::BakeSource&&canonical_conversion_ready_locked())return true;
+  if(parameter==VrParameter::BakeColors&&scene_.active().texture_sets)return false;
   if(parameter==VrParameter::BakeSource || parameter==VrParameter::BakeDistances || parameter==VrParameter::BakeQuality || parameter==VrParameter::BakeProjection || parameter==VrParameter::BakeColors)
     return bake_target_ready_locked() && !bake_sources_locked().empty();
   if (parameter == VrParameter::WeightStrength || parameter == VrParameter::WeightValue)
@@ -2709,7 +2723,9 @@ void Document::control_event_locked(VrControlEvent event) {
       c.minimum = 1; c.maximum = 200; c.logarithmic = true; c.value[0] = retopo_snap_mm_; break;
     case VrParameter::BakeSource: {
       auto ids=bake_sources_locked(),cages=bake_cages_locked();
-      c.title="Bake source / editable cage (hidden meshes allowed)";c.components=2;
+      c.title=o.texture_sets?"Bake source / cage - "+text::utf8_prefix(active_texture_set(o).name,32):
+          "Bake source / editable cage (hidden meshes allowed)";
+      c.components=2;
       auto found=std::find(ids.begin(),ids.end(),state_.bake_source);
       c.value[0]=ids.size()<2||found==ids.end()?0:float(found-ids.begin())/float(ids.size()-1);
       auto cage=std::find(cages.begin(),cages.end(),state_.bake_settings.cage_object);
@@ -2871,7 +2887,7 @@ void Document::control_event_locked(VrControlEvent event) {
   }
   if(event.type==VrControlEventType::RecallBakeRecipe){
     if(c.parameter!=VrParameter::BakeSource)return;
-    const auto recipe=scene_.active().bake_recipe;
+    const auto recipe=active_texture_set(scene_.active()).bake_recipe;
     if(!recipe){state_.message="No successful bake has been saved for this target";return;}
     require_authority_locked(control_source_);
     if(control_source_.generation!=state_.generation||control_source_.revision!=state_.revision||control_source_.object!=scene_.active().id)
@@ -3199,7 +3215,7 @@ bool Document::command_enabled_locked(SpatialCommand command) const {
     return false;
   }
   if(command==SpatialCommand::BakeSurface)return !control_before_ && bake_source_eligible_locked(state_.bake_source) && state_.bake_settings.cage_object!=unavailable_bake_object && bake_target_ready_locked();
-  if(command==SpatialCommand::ClearBake)return !control_before_ && bake_target_ready_locked() && bool(scene_.active().painted->baked());
+  if(command==SpatialCommand::ClearBake)return !control_before_ && bake_target_ready_locked() && bool(active_texture_set(scene_.active()).painted->baked());
   if(command==SpatialCommand::BindSkin) return !control_before_ && skin_target_ready_locked() &&
     !skin_sources_locked(state_.skin_options.mode).empty() &&
     !(state_.skin_options.mode==SkinAuthoringMode::SurfaceHeat&&state_.selected_objects.size()>1&&!selected_skin_ready_locked(SkinAuthoringMode::SurfaceHeat));

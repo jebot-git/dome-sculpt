@@ -246,9 +246,14 @@ void pad(BakeResult &result,const BakeOptions &o,std::vector<BakedEmissionSample
 }
 } // namespace
 static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const BakeOptions &o,
-    const detail::SourceBakeNormalResolver &source_normals) {
+    const detail::SourceBakeNormalResolver &source_normals,
+    std::span<const uint32_t> target_triangles = {}) {
   if(o.progress)o.progress(0);
   cancel(o); validate(low,source,o);
+  if(!target_triangles.empty() &&
+     (target_triangles.back()>=low.indices.size()/3 ||
+      std::adjacent_find(target_triangles.begin(),target_triangles.end(),std::greater_equal<>{})!=target_triangles.end()))
+    throw std::invalid_argument("Bake target faces must be ordered, unique triangles in the actual mesh");
   for(const auto &material:source.materials)if(material.maps&&material.maps->normal_projection){
     const auto &maps=*material.maps;
     if(!source_normals)
@@ -296,8 +301,10 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
     if(image!=&result.maps.emission||!float_emission)*image={o.resolution,o.resolution,std::vector<uint8_t>(pixels*4)};
   if(o.separate_pbr_color)result.maps.pbr_color={o.resolution,o.resolution,std::vector<uint8_t>(pixels*4)};
   std::vector<uint32_t> owner(pixels,UINT32_MAX);
-  for (size_t triangle=0;triangle<low.indices.size()/3;++triangle) {
-    if(o.progress && triangle%64==0)o.progress(.05f+.85f*float(triangle)/float(low.indices.size()/3));
+  const size_t triangle_count=target_triangles.empty()?low.indices.size()/3:target_triangles.size();
+  for (size_t face=0;face<triangle_count;++face) {
+    const size_t triangle=target_triangles.empty()?face:target_triangles[face];
+    if(o.progress && face%64==0)o.progress(.05f+.85f*float(face)/float(triangle_count));
     cancel(o); std::array<std::array<float,2>,3> uv;
     for (int i=0;i<3;++i) uv[i]=low.uv[low.indices[triangle*3+i]];
     double area=edge(uv[0],uv[1],uv[2]),uvscale=std::hypot(double(uv[1][0])-uv[0][0],double(uv[1][1])-uv[0][1])*std::hypot(double(uv[2][0])-uv[0][0],double(uv[2][1])-uv[0][1]);
@@ -466,5 +473,7 @@ BakeResult bake_mesh(const Mesh &low,const BakeSource &source,const BakeOptions 
  return bake_mesh_impl(low,source,options,{});
 }
 BakeResult detail::bake_mesh_source_normals(const Mesh &low,const BakeSource &source,const BakeOptions &options,
- const SourceBakeNormalResolver &normal){return bake_mesh_impl(low,source,options,normal);}
+ const SourceBakeNormalResolver &normal,std::span<const uint32_t> target_triangles){
+ return bake_mesh_impl(low,source,options,normal,target_triangles);
+}
 } // namespace dome
