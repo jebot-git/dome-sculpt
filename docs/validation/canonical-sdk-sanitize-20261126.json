@@ -1,0 +1,39 @@
+{
+  "source": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "Fresh whole-owned instrumented canonical FLTK SDK compile/install and static checks; no application/runtime qualification; CMakeTmp/Scratch feature probes classified separately, original observer failure preserved",
+  "actual_owned_compiles": 484,
+  "FL_public_headers": 165,
+  "FL_header_differences": [],
+  "configure_probe_failures": 2,
+  "build_seconds": 116.13430190086365,
+  "profile": {
+    "schema": 1,
+    "use_poll": true,
+    "source_patch_sha256": "34091d15335d695f3bb328f3ccdcb4f68110f47a75271c563ba909c3682815b2",
+    "archive_sha256": "eede1fb2b8e9c2e581e77082e15252145855c79aad30070ee3b24aabe2f926f1",
+    "builder_sha256": "85cc04718523dbebfe0ac6c4384fa341641dabdb5022fff98998e18d2e783011",
+    "private_config_sha256": "83516cc7e522d5b5262da4daf585e8cbcbe3655c306a65898198052644a1d1dc",
+    "toolkit_libraries": {
+      "lib/libfltk.so": "26da9d6a87eec2a1b39caebc0eba13d670efd819b7229a5395c347ef72a34f0c",
+      "lib/libfltk.so.1.4": "26da9d6a87eec2a1b39caebc0eba13d670efd819b7229a5395c347ef72a34f0c",
+      "lib/libfltk.so.1.4.5": "26da9d6a87eec2a1b39caebc0eba13d670efd819b7229a5395c347ef72a34f0c",
+      "lib/libfltk_cairo.so": "8e3c3f0fd23ee29c449d09f4447ce32334d075e4141a28b46727690b87503a59",
+      "lib/libfltk_cairo.so.1.4": "8e3c3f0fd23ee29c449d09f4447ce32334d075e4141a28b46727690b87503a59",
+      "lib/libfltk_cairo.so.1.4.5": "8e3c3f0fd23ee29c449d09f4447ce32334d075e4141a28b46727690b87503a59",
+      "lib/libfltk_gl.so": "d548e489c594c950414017ca229f97adf09a80e0655496a76e05c9f1eae79b2b",
+      "lib/libfltk_gl.so.1.4": "d548e489c594c950414017ca229f97adf09a80e0655496a76e05c9f1eae79b2b",
+      "lib/libfltk_gl.so.1.4.5": "d548e489c594c950414017ca229f97adf09a80e0655496a76e05c9f1eae79b2b",
+      "lib/libfltk_images.so": "47ca159090a3be5d4a04cd9421251e9f00b720aa8d942dd0e7ae6f851d8d7d8a",
+      "lib/libfltk_images.so.1.4": "47ca159090a3be5d4a04cd9421251e9f00b720aa8d942dd0e7ae6f851d8d7d8a",
+      "lib/libfltk_images.so.1.4.5": "47ca159090a3be5d4a04cd9421251e9f00b720aa8d942dd0e7ae6f851d8d7d8a"
+    }
+  },
+  "archive": {
+    "path": "docs/validation/canonical-sdk-sanitize-20261126.tar.xz",
+    "sha256": "0f3a0ae9ee8733e7c24636fe3f947a08b7cc43eddbdc72e6e04cca83953eecbb",
+    "bytes": 226580,
+    "members": 1581
+  },
+  "errors": [],
+  "terminal_unit_observation": "Auto-unloaded by observation: LoadState=not-found/MainPID0; stop exit5. Real builder terminal0 and journal retained, no repeated build or inferred root cgroup cleanup."
+}

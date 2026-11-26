@@ -23,3 +23,26 @@ Fresh native-only component and sanitizer builds may use the supported
 `DOME_BUILD_UI=OFF` and `DOME_BUILD_XR=OFF` configuration; this does not qualify
 their desktop or XR frontends. Their actual source, compiler, dependency and
 runtime evidence must remain distinct from missing historical artifacts.
+
+## Rebuilt sanitizer SDK
+
+The canonical builder now also completes a fresh whole-owned ASan/UBSan FLTK
+build at `artifacts/sdk-20261126/toolkit-sanitize` in116.134 seconds. All484
+actual toolkit/support compiler owners use O1/g1, ASan+UBSan and frame pointers;
+their real commands, objects and retained raw compiler depfiles are checked.
+All165 FLTK public headers match the installed Release prefix. The installed
+profile binds27 patches, poll configuration and new shared-library digests;
+static ELF inspection confirms the core links both sanitizers.
+
+Two ordinary negative platform-header configure probes remain recorded. An
+initial audit also misclassified two successful CMakeTmp feature probes as
+toolkit owners; its failed observation is preserved, and the final audit
+separates configure probes from the484 real build owners. No source or
+instrumentation guard changed. The completed transient unit had already
+auto-unloaded when inspected; builder exit0 and the real journal are retained.
+
+The [receipt](validation/canonical-sdk-sanitize-20261126.json) and compressed
+raw evidence cover compilation and static artifact verification. Desktop/XR
+application runtime, actual mapped SDKs and leak/device behavior remain separate
+gates. This prefix is a regular-user local installation; no system files or
+active sessions changed.

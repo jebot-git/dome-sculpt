@@ -1,0 +1,381 @@
+{
+  "source": "05f5d1ccfa4bb5b97d25e4a425a2fd9497b0d8c9",
+  "scope": "Fresh headless strict core/support/render and13 fixtures; no App, FLTK or XR",
+  "initial_owning_build_seconds": 988.8176970481873,
+  "initial_fresh_compiler_owners": 229,
+  "additional_sampler_fixture_owners": 1,
+  "unique_current_owners": 230,
+  "core_owners": 197,
+  "actual_dependency_paths": 1224,
+  "archives": [
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/current-normal-sanitize-20261126/libdome-sculpt-affine.a",
+      "sha256": "b9951d5fca7c9cfec4f5ef79cd665c40ce9e9beaf96375e04408233484ab3572",
+      "members": [
+        "affine.cpp.o",
+        "import-affine.cpp.o",
+        "affine-interaction.cpp.o",
+        "affine-factor.cpp.o"
+      ]
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/current-normal-sanitize-20261126/libdome-sculpt-baked-emission.a",
+      "sha256": "62b67069d7d1ca8490e163cb0e9078725c726bcb9978f02e5ca0067d8fd5b912",
+      "members": [
+        "baked-emission.cpp.o"
+      ]
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/current-normal-sanitize-20261126/libdome-sculpt-core.a",
+      "sha256": "15d16a037569b61e833bb99f790eea8f141b2d229ad2b717851361622099f43d",
+      "members": [
+        "creator-tool.cpp.o",
+        "document-creator.cpp.o",
+        "source-rest-graph.cpp.o",
+        "source-rest-plan.cpp.o",
+        "source-rest-scene.cpp.o",
+        "rig-rest-scene.cpp.o",
+        "rig-rest.cpp.o",
+        "rig-fit.cpp.o",
+        "rig-fit-tool.cpp.o",
+        "document-rig-fit.cpp.o",
+        "projection-tool.cpp.o",
+        "document-projection.cpp.o",
+        "volume.cpp.o",
+        "volume-raycast.cpp.o",
+        "sculpt-mask.cpp.o",
+        "sculpt-resolution.cpp.o",
+        "procedural-sculpt.cpp.o",
+        "scene.cpp.o",
+        "groups.cpp.o",
+        "creation.cpp.o",
+        "mesh-authoring.cpp.o",
+        "tangents.cpp.o",
+        "bake-authoring.cpp.o",
+        "bake-recipe.cpp.o",
+        "document-baking.cpp.o",
+        "document-shapes.cpp.o",
+        "creator-archive.cpp.o",
+        "paint.cpp.o",
+        "projection.cpp.o",
+        "source-maps.cpp.o",
+        "color-preparation.cpp.o",
+        "material-bindings.cpp.o",
+        "normal-frames.cpp.o",
+        "normal-bake-frames.cpp.o",
+        "normal-preparation.cpp.o",
+        "canonical-normal-conversion.cpp.o",
+        "canonical-normal-owner.cpp.o",
+        "normal-uv-reprojection.cpp.o",
+        "shapekey-authoring.cpp.o",
+        "shapekey-normal-preparation.cpp.o",
+        "source-uv-bake.cpp.o",
+        "mesh.cpp.o",
+        "atlas.cpp.o",
+        "uv.cpp.o",
+        "export.cpp.o",
+        "source-morph.cpp.o",
+        "vrm.cpp.o",
+        "input.cpp.o",
+        "document.cpp.o",
+        "document-interaction.cpp.o",
+        "document-uv-solve.cpp.o",
+        "document-recovery.cpp.o",
+        "document-assets.cpp.o",
+        "recovery.cpp.o",
+        "rig.cpp.o",
+        "avatar.cpp.o",
+        "humanoid-creator.cpp.o",
+        "vroid-creator.cpp.o",
+        "creator-vrm.cpp.o",
+        "vroid-groom.cpp.o",
+        "deformation.cpp.o",
+        "rig-edit.cpp.o",
+        "weight-edit.cpp.o",
+        "weight-authoring.cpp.o",
+        "material-visibility.cpp.o",
+        "skin-authoring.cpp.o",
+        "document-skin.cpp.o",
+        "uv-solve.cpp.o",
+        "import.cpp.o",
+        "bone-metadata.cpp.o",
+        "source-node-extras.cpp.o",
+        "source-decoded-images.cpp.o",
+        "import-authoring.cpp.o",
+        "vrm-import.cpp.o",
+        "vrm-source-graph.cpp.o",
+        "vrm-rest-metadata.cpp.o",
+        "vrm1-metadata.cpp.o",
+        "vrm1-export.cpp.o",
+        "vrm1-authoring.cpp.o",
+        "vrm1-painted-material.cpp.o",
+        "vrm1-expression-layer.cpp.o",
+        "vrm-expression.cpp.o",
+        "vrm-expression-scene.cpp.o",
+        "document-expressions.cpp.o",
+        "source-rigid-pose.cpp.o",
+        "import-options.cpp.o",
+        "import-browser.cpp.o",
+        "document-import.cpp.o",
+        "import-image.cpp.o",
+        "import-jpeg.c.o",
+        "import-source.cpp.o",
+        "import-native.cpp.o",
+        "mesh-processing.cpp.o",
+        "retopo.cpp.o",
+        "remesh.cpp.o",
+        "bake.cpp.o",
+        "mtoon.cpp.o",
+        "navigation.cpp.o",
+        "controller-profiles.cpp.o",
+        "paint-sampling.cpp.o",
+        "paint-sampling-archive.cpp.o",
+        "color-paint-sampling.cpp.o",
+        "native-paint-sampling.cpp.o",
+        "native-paint-frame-source.cpp.o",
+        "native-paint-metadata.cpp.o",
+        "color-uv-reprojection.cpp.o",
+        "normal-sampling.cpp.o",
+        "normal-sampling-replay.cpp.o",
+        "normal-preview.cpp.o",
+        "normal-sampling-surface.cpp.o",
+        "polygon-color-uv.cpp.o",
+        "shapekey-attributes.cpp.o",
+        "corner-key-expansion.cpp.o",
+        "frame-position-domain.cpp.o",
+        "key-frame-archive.cpp.o",
+        "key-derivation-codec.cpp.o",
+        "normal-key-derivation.cpp.o",
+        "key-archive-preflight.cpp.o",
+        "key-mirror-correspondence.cpp.o",
+        "key-mirror-relative.cpp.o",
+        "backend_cpu.cpp.o",
+        "sparse-resample-cpu.cpp.o",
+        "emission-bake-source.cpp.o",
+        "document-paint-blur.cpp.o",
+        "retopo-authoring.cpp.o",
+        "document-retopo.cpp.o",
+        "document-sculpt.cpp.o",
+        "document-native.cpp.o",
+        "document-contact.cpp.o",
+        "document-transaction.cpp.o",
+        "texture-sets.cpp.o",
+        "texture-set-graph.cpp.o",
+        "texture-set-archive.cpp.o",
+        "texture-set-surface.cpp.o",
+        "texture-set-range.cpp.o",
+        "texture-set-packed.cpp.o",
+        "texture-set-resample.cpp.o",
+        "texture-set-worker.cpp.o",
+        "texture-set-stroke.cpp.o",
+        "document-texture-sets.cpp.o",
+        "texture-set-export.cpp.o",
+        "texture-set-field-source.cpp.o",
+        "texture-set-field-codec.cpp.o",
+        "texture-set-portable-field.cpp.o",
+        "cut-authoring.cpp.o",
+        "cut-color.cpp.o",
+        "document-cut.cpp.o",
+        "document-worker-errors.cpp.o",
+        "object-selection.cpp.o",
+        "source-sampling-transport.cpp.o",
+        "source-placement.cpp.o",
+        "source-placement-archive.cpp.o",
+        "polygon-authoring.cpp.o",
+        "polygon-source.cpp.o",
+        "polygon-color-source.cpp.o",
+        "polygon-color-archive.cpp.o",
+        "polygon-scene.cpp.o",
+        "polygon-conversion.cpp.o",
+        "document-polygon.cpp.o",
+        "polygon-surface-transfer.cpp.o",
+        "polygon-surface-owner.cpp.o",
+        "polygon-surface-codec.cpp.o",
+        "polygon-surface-preview.cpp.o",
+        "polygon-surface-paint.cpp.o",
+        "polygon-surface-archive.cpp.o",
+        "scene-file.cpp.o",
+        "native-scene-append.cpp.o",
+        "emission-package.cpp.o",
+        "native-authoring.cpp.o",
+        "native-authoring-compiler.cpp.o",
+        "emission-export.cpp.o",
+        "local-surface.cpp.o",
+        "volume-geometry.cpp.o",
+        "sculpt-storage.cpp.o",
+        "ray-index.cpp.o",
+        "sculpt-surface-chunks.cpp.o",
+        "sculpt-scene-chunks.cpp.o",
+        "sculpt-placed-chunk.cpp.o",
+        "sculpt-placed-chunks.cpp.o",
+        "sculpt-chunk-masks.cpp.o",
+        "shapekey-sculpt.cpp.o",
+        "retopo-edges.cpp.o",
+        "paint-composite.cpp.o",
+        "paint-composite-cpu.cpp.o",
+        "current-paint-preview.cpp.o",
+        "baked-emission-domain.cpp.o",
+        "baked-normal-field.cpp.o",
+        "baked-normal-archive.cpp.o",
+        "canonical-normal-uv.cpp.o",
+        "canonical-native-pose.cpp.o",
+        "anatomical-authoring.cpp.o",
+        "surface-heat-authoring.cpp.o",
+        "canonical-paint-uv.cpp.o",
+        "canonical-paint-native.cpp.o",
+        "canonical-paint-prospect.cpp.o",
+        "canonical-paint-sampling.cpp.o",
+        "canonical-paint-archive.cpp.o"
+      ]
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/current-normal-sanitize-20261126/libdome-sculpt-emission-codec.a",
+      "sha256": "2247e820fe0eacd2ce24ed1b8237152107e3fb140635003e61e7bd6d8e04052b",
+      "members": [
+        "emission-exr.cpp.o",
+        "emission-exr-owned.cpp.o"
+      ]
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/current-normal-sanitize-20261126/libdome-sculpt-native-graphics.a",
+      "sha256": "f0d148f64ecd4ce08bc44d83beb168f4eab663e12e684b1a904871511dd7bbcc",
+      "members": [
+        "graphics.cpp.o"
+      ]
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/current-normal-sanitize-20261126/libdome-sculpt-paint-gpu.a",
+      "sha256": "17c5705b63429ad26389b988492964a19b4604ee286bd72941b15cede03ec4a3",
+      "members": [
+        "paint-blur-gpu.cpp.o"
+      ]
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/current-normal-sanitize-20261126/libdome-sculpt-polygon.a",
+      "sha256": "c79bdd08b5ea064ba15f213d886d27a2ffe2508c0d59f6e6515fd0e745baea3b",
+      "members": [
+        "polygon.cpp.o",
+        "polygon-color.cpp.o"
+      ]
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/current-normal-sanitize-20261126/libdome-sculpt-render.a",
+      "sha256": "e8f1ebfca61682db54a0733d4323a1423dbf68c3a69ddfb7d4aa591523c913e0",
+      "members": [
+        "render.cpp.o",
+        "palette.cpp.o",
+        "palette-text.cpp.o",
+        "polygon-render.cpp.o"
+      ]
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/current-normal-sanitize-20261126/libmikktspace-robust.a",
+      "sha256": "144b96d6aa52623eb384fb8d3e6f85ffbcf63e83fcc5e39271e7dead21bf1754",
+      "members": [
+        "mikktspace.c.o"
+      ]
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/current-normal-sanitize-20261126/libmikktspace.a",
+      "sha256": "60cc094edcc3a3eb92df66ef259d67b3ab0d8e17533fdc212e523935f21380d6",
+      "members": [
+        "mikktspace.c.o"
+      ]
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/current-normal-sanitize-20261126/libufbx.a",
+      "sha256": "baccad75b7414d673d97908396e9651f7facf63ba2118358b02dc22defbfac3b",
+      "members": [
+        "ufbx.c.o"
+      ]
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/current-normal-sanitize-20261126/libxatlas.a",
+      "sha256": "6231a9dd95f6b677bb12b8c7b2b4d19e0332dae6dbdfb85020a1670e44fb1f35",
+      "members": [
+        "xatlas.cpp.o"
+      ]
+    }
+  ],
+  "links": [
+    {
+      "target": "dome-sculpt-source-advanced-normal-bake-test",
+      "sha256": "45ac2a5f38776a19088935b512b7e39b4807ea36144039ac1b60f920b0a497b2",
+      "commands_sha256": "edf01aed98a0c7f2dd27641f43e58098d03065af84a332691089d694945db8e2"
+    },
+    {
+      "target": "dome-sculpt-source-canonical-normal-bake-test",
+      "sha256": "677d67c3e213aeb8eef81c4ad5c9cdb0f1d6cb17f89ecab60cdff04ab9b0ef25",
+      "commands_sha256": "c0f0fcd4f62c9a77882c03f02da8ed81fe186469b09d71aa2cba65c71e2053b4"
+    },
+    {
+      "target": "dome-sculpt-source-writable-normal-bake-test",
+      "sha256": "f04535a930eb88727d2845141031efcdd739e0d4da1465c4b743ce44d223619e",
+      "commands_sha256": "67b5c0d0255d7ea706d761c4ace6b589fc768b12f75f7ad0c3c0264f96774730"
+    },
+    {
+      "target": "dome-sculpt-source-joint-writable-normal-bake-test",
+      "sha256": "3ed9c2dca3ddb24a5b6e852348f66502cd6b93cbecb7e9868960c1edfbdcea93",
+      "commands_sha256": "605592220019e862cbb2c80e8ee09570a9f0e53eeee9f24336d1b33f01caaa8b"
+    },
+    {
+      "target": "dome-sculpt-source-owning-hdr-domain-test",
+      "sha256": "1b200a86dcbbd8b604560733d91938529960a058a174a936bcb3c36092f86ade",
+      "commands_sha256": "fbfef236ee0b1e4421186b7cd08af8819e41174ceebfba46c4585e8ade2a26ce"
+    },
+    {
+      "target": "dome-sculpt-source-owning-hdr-export-test",
+      "sha256": "d2fd00876820b893f8eedf7344e51ec4cca0afd4910dd271bcab8c536b0c011b",
+      "commands_sha256": "22d99f5f8e3d8ebab51b60bc1ae3e821c8ad49bf533b364219ada7872404f52c"
+    },
+    {
+      "target": "dome-sculpt-source-prepared-normal-bake-test",
+      "sha256": "d905f6511a1a58ab2e120805265f8a19d3a1e764f3afbf032dd351098ac38891",
+      "commands_sha256": "48d0ce8f6ea0eb2b84731eb1117d710db569e131e46783f5e48d4cdbc1d10277"
+    },
+    {
+      "target": "dome-sculpt-source-artist-normal-bake-test",
+      "sha256": "a337905aff64f5331986a7c0cac470447a6e87a4ec2c7e8d80f3a9ccc21fa4ea",
+      "commands_sha256": "8d908ace5f95e22c226d936079d4821be1c3356a88f3ff43e550fe5580b55a58"
+    },
+    {
+      "target": "dome-sculpt-source-owning-hdr-render-test",
+      "sha256": "a92eb5644a50f721724db7627ba48c1f79c4a75095ca423c6ae30972466866dc",
+      "commands_sha256": "62890c119101639f7e969f938898d25899c4c9728a72b0729542a2e7aeae0e85"
+    },
+    {
+      "target": "dome-sculpt-creator-workspace-test",
+      "sha256": "1ae2c5f94e2f2b5ce5a9e47f89ed74fbff86cc1f66290b5835b5f55dceb25f0a",
+      "commands_sha256": "b1f55970ec998bfc2f093f48cbeef9078b60d7620e5fb67f52f78db3f7acf8fb"
+    },
+    {
+      "target": "dome-sculpt-creator-vrm-test",
+      "sha256": "1eb9c32b38fa520d5dd2e8cb9f7f3b9dd4f0bf8d9c449c6c199a9ed9e7830e9a",
+      "commands_sha256": "dd0c5b307ab1be46e208cc368d77d2d181838b8e1bf4d0fc9adca439ba62fe87"
+    },
+    {
+      "target": "dome-sculpt-baked-emission-gpu-test",
+      "sha256": "a0963d790414c7e59f5a72b15413abb1f2996b99ba29f67496fe1dbc416dd95b",
+      "commands_sha256": "0c32945d862ebb6fed0c0b94da8ccd81a4ccdda997121b2a38cdc3a9c7d4dbc8"
+    },
+    {
+      "target": "dome-sculpt-mtoon-render-test",
+      "sha256": "37a08ba2385435ff5e22ba408f93da50d644eb9edf228b92bde89c602d918bd1",
+      "commands_sha256": "a342b7e598eaf76f903770279f03d4f3b8462e2c1b4c80211a5964e8c38e65b4"
+    }
+  ],
+  "sampler_followup": {
+    "ELF_sha256": "417df4f9653c34c530a9d4cb41ec5be27e3f6ed0268f3ecc52aa294bfd63c034",
+    "unchanged_parent_archives": 12
+  },
+  "effective_optimization": "O1 for every actual owned compiler command; ASan+UBSan/framepointer",
+  "supplemental_tool_observation_limit": "cc1/cc1plus/collect2 observations during build are not claimed before already completed compiles",
+  "runtime": "Pending; this is native-only compilation/static qualification, no App/UI/XR claim",
+  "archive": {
+    "path": "docs/validation/resumed-strict-native-build-20261126.tar.xz",
+    "sha256": "f458b285fb9150aea963a08e741e0765f42d3c4b23cbd23c38b321a4a6ab92ef",
+    "bytes": 1685796,
+    "members": 735
+  },
+  "errors": []
+}

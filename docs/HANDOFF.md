@@ -24,17 +24,35 @@ digests and BDF helper. Receipt: `artifacts/sdk-20261126/installed-release-check
 This permits fresh configuration; actual new loader/render/UI checks are separate.
 The explicit bitmap prefix remains `/opt/fltk-vr/bdf-runtime`.
 
-Fresh isolated source/build lanes are now running with regular-user limits and
-actual compiler/dependency records: creator public application on production05,
-HDR bounded provenance514, sculpt independent workflows6d3 and root headless
-strict05 core/render/13 fixtures. Inspect actual units before taking any action.
-No source headers or objects are borrowed across these different products.
-Device jobs must take the common nonblocking lease, with no idle reservation.
-Current creator clock regression is freshly built and passes6014 checks; current
-application public workflows, HDR closure/2048, sculpt cold-open/recovery and
-sustained independent authoring remain pending. Root is adding opt-in fixture
-phase timing to diagnose the previous strict deadline without changing data,
-checks, product code or resource limits. Full scope in REQUIREMENTS is unchanged.
+Fresh builds now pass for creator's current05 application, HDR provenance514,
+sculpt independent6d3 and root's headless strict05 core/render/13 fixtures. The
+strict parent audit verifies229 real whole compiler owners/197 core owners,
+1224 dependency paths and actual archive payloads/13 sanitizer-linked consumers.
+An additional sampler fixture TU/link is independently audited against unchanged
+parent archives. No runtime acceptance follows from these builds. A supplemental
+compiler-tool observation is not claimed prospectively for completed compiles.
+The canonical full sanitizer FLTK SDK is also freshly rebuilt and checked;
+read [the toolkit record](CURRENT-TOOLKIT-20261126.md).
+
+Creator's fresh clock regression passes6014 checks. The current05 application's
+actual Arc XR accept plus ordinary fresh-App reopen now pass19 checks; cancel,
+focus and desktop remain separate gates. The prior-authored stress fixture
+moves the head joint5m, so its cropped screenshot does not establish ordinary
+default-base presentation quality.
+
+Genuine2048 HDR now reaches a further128MiB paint-channel allocation refusal
+after the provenance fix. A new isolated87729adb worker avoids the discarded
+112MiB field using a certified actual retained source domain; build/audit passes,
+end-to-end qualification remains pending. Sculpt's new workflow first exposes
+an invalid mask-brush fixture, then an inappropriate initial mesh wait after
+file-only recovery catalogue refresh. Correct those fixtures without weakening
+product guards; full cold-open/recovery and sustained acceptance remain pending.
+
+Inspect live units before taking action. All product/loader jobs take the common
+nonblocking lease, with no idle reservation. Root's opt-in timing fixture91a90a67
+compiles/links against the exact strict05 core without changing product, data,
+checks or resource limits; the full-resolution runtime diagnosis is pending.
+Full scope in REQUIREMENTS is unchanged.
 
 ## Source and integration boundary
 

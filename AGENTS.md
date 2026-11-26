@@ -37,9 +37,9 @@ Build (prepare the current canonical DomeD toolkit as in [docs/TOOLKIT.md](docs/
 
 ```sh
 export PKG_CONFIG_PATH="/opt/fltk-vr/bdf-runtime/lib/pkgconfig:/usr/lib64/pkgconfig"
-export LD_LIBRARY_PATH="$PWD/artifacts/sdk-20261111/toolkit-release/lib:/opt/fltk-vr/bdf-runtime/lib:/usr/lib64"
+export LD_LIBRARY_PATH="/opt/fltk-vr/toolkit/lib:/opt/fltk-vr/bdf-runtime/lib:/usr/lib64"
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release \
-  -DDOME_COMPUTE_BACKEND=CPU -DFLTK_DIR="$PWD/artifacts/sdk-20261111/toolkit-release/share/fltk" \
+  -DDOME_COMPUTE_BACKEND=CPU -DFLTK_DIR="/opt/fltk-vr/toolkit/share/fltk" \
   '-U*DOME_BITMAP_RUNTIME*' '-U*NATIVEGL*' '-U*RENDERFONTS*'
 cmake --build build --parallel 2
 ctest --test-dir build --output-on-failure

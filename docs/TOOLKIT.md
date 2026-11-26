@@ -1,5 +1,15 @@
 # Current canonical toolkit requirement
 
+Nov26 resume: the temporary Nov11 SDK directories are absent. Use the verified
+installed Release prefix `/opt/fltk-vr/toolkit` and explicit bitmap runtime
+`/opt/fltk-vr/bdf-runtime` for fresh Release builds. Read
+[the current check](CURRENT-TOOLKIT-20261126.md) for its exact static scope.
+Actual loader/UI validation is separate. A Release toolkit must not be used as
+a substitute for a whole-owned sanitizer desktop toolkit. The supported
+native-only sanitizer configuration does not discover or qualify FLTK.
+
+The following Nov17/earlier prefix descriptions retain their historical scope.
+
 The current workspace prefixes are
 `artifacts/sdk-20261111/toolkit-release` and
 `artifacts/sdk-20261111/toolkit-sanitize`, with the bitmap runtime at
