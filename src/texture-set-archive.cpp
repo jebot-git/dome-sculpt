@@ -1003,14 +1003,16 @@ TextureSetArchive::referenced_paints(const Json &holder, const Json &geometry) {
   if (!c.at("additional").is_array() || c.at("additional").empty() ||
       c.at("additional").size() > 63)
     throw std::length_error("Shared texture-set member count exceeded");
-  std::vector<const Json *> result{&texture_set_recipe_member(primary.at("painted"))};
+  (void)texture_set_recipe_member(primary.at("painted"));
+  std::vector<const Json *> result{&primary.at("painted")};
   for (const auto &field : c.at("additional")) {
     const auto &p = paints.at(index(field.at("painted"), paints.size()));
     const auto &r = rasters.at(index(p.at("raster"), rasters.size()));
     if (index(r.at("domain"), domains.size()) !=
         index(field.at("domain"), domains.size()))
       throw std::invalid_argument("Shared additional field has foreign domain");
-    result.push_back(&texture_set_recipe_member(p.at("painted")));
+    (void)texture_set_recipe_member(p.at("painted"));
+    result.push_back(&p.at("painted"));
   }
   return result;
 }
