@@ -218,15 +218,15 @@ int main() try {
     }
     return current;
   };
-  const auto shared=extend(authority(),16);
+  const auto shared_chain=extend(authority(),16);
   Scene shared_history;
-  install(shared_history,shared);
+  install(shared_history,shared_chain);
   const auto second=shared_history.add("Second ownership route",Volume{});
   shared_history.select(second);
-  install(shared_history,extend(shared,14));
+  install(shared_history,extend(shared_chain,14));
   detail::validate_texture_set_graph(shared_history);
   check(true,"Shared acyclic history within the depth limit validates");
-  install(shared_history,extend(shared,16));
+  install(shared_history,extend(shared_chain,16));
   refuses([&]{detail::validate_texture_set_graph(shared_history);},
           "Deep ownership route is checked after a shorter route memoizes its shared history",
           "ownership depth");
