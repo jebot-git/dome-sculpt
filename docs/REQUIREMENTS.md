@@ -145,6 +145,16 @@ the chunk and mask renderers. The current full regression and physical
 input qualification remain open.
 [Cold sculpt evidence](validation/sculpt-cold-chunks-20261126.json)
 
+Native plane cuts resolve the editable paint field and retry from
+the same draft after an ordered cancellation. Plain texture-set cuts
+use the full material partition and preserve independent color,
+roughness and FLOAT radiance, including reflected and sheared
+sources. Exact native Scene and GLB payloads keep the hidden source.
+The selected Release, ASan/UBSan, Intel Arc and synthetic OpenXR
+checks pass. Incompatible material policies, retained source domains
+and physical device acceptance remain open.
+[Plane cut material and cancellation evidence](validation/cut-owning-materials-20261126.json)
+
 ## Qualified integration — 2026-11-17
 
 Main now integrates product `1bc13125` and public fixture `f1e193c7` after

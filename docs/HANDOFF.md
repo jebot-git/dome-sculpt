@@ -1306,6 +1306,36 @@ close the five reproduced sculpt/scene failures for this candidate.
 The full latest regression and physical device acceptance remain open.
 [Cold sculpt build and runtime evidence](validation/sculpt-cold-chunks-20261126.json)
 
+### Plane cut material and cancellation recovery
+
+Product `fadacc00` resolves the actual editable paint field on the Cut
+worker. Desktop and controller Cancel both acknowledge an ordered
+asset request, preserve the exact draft and source, and allow the same
+preview to be applied again. The protected sculpt fixture now reads
+the actual chunk mask packets and confirms that the cap stays
+unmasked.
+
+Plain texture-set cuts use the complete authenticated face partition.
+The shell Bake keeps each field's color, roughness and FLOAT radiance,
+including spatial brush detail on a reflected and sheared source.
+The new static affine outputs have world-oriented geometry and a group
+pivot at the original object origin. The hidden source retains its exact
+affine placement and editable fields. Standard GLB carries the visible
+shell and cap, and its native payload restores the complete Scene
+including hidden fields and FLOAT emission. Both native Undo/Redo
+and cold reopen reproduce the original payloads.
+
+Twelve registered tests pass in each Release and ASan/UBSan profile.
+The test matrix covers the native Cut, exact cancel/retry, colored
+source admission, ordered/held publication and rendered regressions.
+Twenty-one synthetic OpenXR checks pass in each software Release and
+Intel Arc ASan/UBSan profile. The relinked application passes the
+separate 17-check nested DomeD Wayland Bake and universal-menu smoke
+test. Texture sets with incompatible material policies and retained
+source domains still need their own Cut representation. A clean
+latest full regression and physical device acceptance remain open.
+[Plane cut and FLOAT validation](validation/cut-owning-materials-20261126.json)
+
 ## Source and integration boundary
 
 - Main now admits product1bc13125 and public fixturef1e193c7 after complete
