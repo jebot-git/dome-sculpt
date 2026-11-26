@@ -113,11 +113,14 @@ Save, Undo/Redo and exact Shape Restore after cold reopen. A subsequent key
 edit and normal conversion retain the exact FLOAT field on the varying
 fixture. Standard HDR GLB now exports this actual 2048-square project using
 bounded FLOAT scanlines and restores its native authoring state byte for byte.
-The default Editable HDR GLB reaches a separate non-emission sample limit.
-Per-field HDR for texture sets and physical headset verification remain open.
+Editable HDR GLB also exports the actual varying 2048-square project at all
+three portable texture presets. It restores the exact native HDR Bake,
+edited shape, retained paint coordinates and Restore state. Per-field HDR
+for texture sets and physical headset verification remain open.
 [Full-resolution writable atlas evidence](validation/native-writable-raster-2048-20261126.json) · [Default AO evidence](validation/default-ao-bake-2048-20261126.json) · [First shapekey evidence](validation/native-writable-first-key-2048-20261126.json) · [Editable GLB evidence](validation/native-editable-glb-2048-20261126.json) · [Physical FLOAT Bake evidence](validation/native-hdr-compact-bake-2048-20261126.json)
 [Shared full-resolution HDR Bake evidence](validation/native-shared-hdr-bake-20261127.json)
 [Standard HDR GLB evidence](validation/native-hdr-standard-streaming-20261127.json)
+[Editable HDR GLB evidence](validation/native-hdr-editable-2048-20261127.json)
 
 Strict Bake rays now recover source-edge contacts affected by float staging.
 An exact ray hit has priority. A missed ray can use an actual source edge

@@ -2041,11 +2041,38 @@ The focused native fixture reopens
 the exact project under a 96 MiB image working budget and checks the
 encoded EXR quota. The Khronos validator reports zero errors and one
 warning about the skinned mesh's position in the node hierarchy.
-The default Editable GLB still reaches the cumulative non-emission
-sample limit. Texture-set HDR export, physical headset checks and full
-integrated regression remain open. A separate full Release run builds the
+The Editable GLB reached a separate non-emission sample limit in that build.
+A separate full Release run builds the
 exact product and waits for the earlier sweep before running the full suite.
 [Bounded Standard HDR GLB validation](validation/native-hdr-standard-streaming-20261127.json)
+
+### Editable GLB for varying full-resolution HDR Bake
+
+Editable export budgets the actual occupied tiles in the non-emission
+composite, including the transient byte Bake copy. Its HDR fallback samples
+the existing padding, baked data and visible sparse layers directly. Each
+tap evaluates only the original emission RGB contributions and coverage
+before filtering. The colour, normal and ORM paths retain their own existing
+compilers.
+
+The 256, 512 and 1024 portable texture presets preserve the exact native
+project from the edited, varying 2048-square Bake. Release and ASan/UBSan
+write identical packages. The focused native test compares the emission
+sampler against the existing five-plane sampler at padded, interior and
+filtered samples. It also verifies that a tighter cumulative budget leaves an
+existing output intact. The LDR fixture remains byte-identical to its
+previous result.
+
+The default 512 package matches the nested DomeD Wayland and synthetic
+OpenXR exports on software GL and Intel Arc. All three presets pass the
+Khronos validator with zero errors and one skinned-node warning each.
+The visible retained texture-set follow-up has two actual FLOAT-painted
+material members. Its Standard worker stops at surface extraction because it
+needs the owning subset adapter. Its Editable worker reaches that adapter
+and stops at the per-material precision check. The release fixture and
+exact refusals are identified in the receipt. Physical headset checks and
+the full integrated regression remain open.
+[Editable HDR GLB validation](validation/native-hdr-editable-2048-20261127.json)
 
 ## Source and integration boundary
 

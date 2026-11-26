@@ -1,0 +1,138 @@
+{
+  "archive": {
+    "file": "native-hdr-editable-2048-20261127.tar.gz",
+    "members": 66,
+    "sha256": "31469123709c055678a1415c87cff691e2c1fcfa4923102164ce271eacc3d3d2"
+  },
+  "frontends": {
+    "arc": {
+      "app_sha256": "10fbbc67bdf112a9824507fc513f73425b15404210a9c65eec8a54f0682633aa",
+      "checks": 10,
+      "exit": 0,
+      "input_sha256": "ffa7df8ffffecc80f9f468e53cef4fbea3f79f4529293a9ce69255c42a9431a9",
+      "invocation": "7086b2a767294e87b97a4114180a6c3a",
+      "mode": "arc",
+      "native_sha256": "400daae12a09238e5b2d6b3e96ba49998e10a2fca1237e3f618ced1c1e50f205",
+      "phase": "complete",
+      "report_sha256": "9debf980f51f32b99b3339ba7b1242d5edc559c47121856ec385e947214741b8",
+      "run_script_sha256": "b7d37add6d80f86bcfe008cfd16edfa25a3593f938092d215eba8098b8968062",
+      "runtime_sha256": "d95d6c86927bcc539288749181e1642d2b5484e44e1ab768e62f3c5c60b8ad82",
+      "terminal": true
+    },
+    "software": {
+      "app_sha256": "ee2a079f9e7c87c35c2d70b1229f5f4317f1fbbf58ea5fc8eed4669f3c9f5deb",
+      "checks": 10,
+      "exit": 0,
+      "input_sha256": "ffa7df8ffffecc80f9f468e53cef4fbea3f79f4529293a9ce69255c42a9431a9",
+      "invocation": "4a2678a779aa4060bceda88ec8f32a9c",
+      "mode": "software",
+      "native_sha256": "400daae12a09238e5b2d6b3e96ba49998e10a2fca1237e3f618ced1c1e50f205",
+      "phase": "complete",
+      "report_sha256": "9debf980f51f32b99b3339ba7b1242d5edc559c47121856ec385e947214741b8",
+      "run_script_sha256": "b7d37add6d80f86bcfe008cfd16edfa25a3593f938092d215eba8098b8968062",
+      "runtime_sha256": "c6e7b477be71c5818a5e688de9ea0632e78edf35e253c1adc88b6701e31b2b18",
+      "terminal": true
+    },
+    "wayland": {
+      "app_sha256": "ee2a079f9e7c87c35c2d70b1229f5f4317f1fbbf58ea5fc8eed4669f3c9f5deb",
+      "checks": 9,
+      "compositor_sha256": "47920142c8c803dcf5adb63ba643d2e347fbdcd1e15ecd8bce7c1a8dd47c0b7e",
+      "compositor_source": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+      "exit": 0,
+      "input_sha256": "ffa7df8ffffecc80f9f468e53cef4fbea3f79f4529293a9ce69255c42a9431a9",
+      "invocation": "ba868e9a074f496a9a039356f0dccebc",
+      "mode": "wayland",
+      "native_sha256": "400daae12a09238e5b2d6b3e96ba49998e10a2fca1237e3f618ced1c1e50f205",
+      "phase": "complete",
+      "probe_sha256": "5bf11c670f66bbb68960073878933055b09582e5173ec1e3f472b413956c55aa",
+      "report_sha256": "a0389ad0919d87921f37991e15039f6554451b2c3df3fb2c0f9e5b5edbf3a7ea",
+      "run_script_sha256": "d5bac9b96280e257c528b45cdca4b6fee58f396e752232862b724fa5c0b7c12b",
+      "terminal": true
+    }
+  },
+  "open": "Per-material HDR for texture sets, full integrated regression and physical headset verification remain open.",
+  "presets": {
+    "256": {
+      "bytes": 33310720,
+      "khronos": {
+        "errors": 0,
+        "report_sha256": "2dbe0e111f43e8ea00aefe234a677e19d13dcacf0648d52c9b73e40a88b97a7a",
+        "warnings": [
+          "NODE_SKINNED_MESH_NON_ROOT"
+        ]
+      },
+      "sha256": "e212405658f5eefda6cf7aa91d45cc93a9198ed48842b9c9860984ed642987d7"
+    },
+    "512": {
+      "bytes": 33338516,
+      "khronos": {
+        "errors": 0,
+        "report_sha256": "9f83e357159b45553a26eab077623668db4a739b5281ba9dbe2534456922e793",
+        "warnings": [
+          "NODE_SKINNED_MESH_NON_ROOT"
+        ]
+      },
+      "sha256": "400daae12a09238e5b2d6b3e96ba49998e10a2fca1237e3f618ced1c1e50f205"
+    },
+    "1024": {
+      "bytes": 33417080,
+      "khronos": {
+        "errors": 0,
+        "report_sha256": "d1f1bc8ea47ed05a5f1a1e60c02b2387217031a1692b87f27772b3334b372b46",
+        "warnings": [
+          "NODE_SKINNED_MESH_NON_ROOT"
+        ]
+      },
+      "sha256": "566b879cd47465f57fe99609b2d78cb0674b36b0207ad809a40085bba3e3a24f"
+    }
+  },
+  "product": "6d20663567733f208149d76580dcdcd8bfd7d579",
+  "profiles": {
+    "asan-v2": {
+      "app_sha256": "10fbbc67bdf112a9824507fc513f73425b15404210a9c65eec8a54f0682633aa",
+      "invocation": "6b7495c61f5944ffb9bfa217e384dd60",
+      "logs_sha256": {
+        "archive.log": "afb216d28e3d3650ae759ef84938f1a9ab659deca4f798e47f15593c12a612c1",
+        "checks/dense-editable-hdr.log": "193e79e0af4f460b3434783d2ce78072a4aaa3d3f30867c7243bafabdd492950",
+        "checks/dense-editable-ldr.log": "cc9d0decac1126b8045eae3d72514ac8153350f5dff82a5808bd07d3c442b860",
+        "checks/dome-sculpt-native-authoring-real-test.log": "02f1d5d308287a43a2b187372bed48a2f95e172d1aa7139431ac85752dc5d9a5",
+        "checks/dome-sculpt-native-authoring-test.log": "6547ac55054aa75b9aeb7af646db9ad063570a5113a23eab4b4db59cea58b8f0",
+        "checks/dome-sculpt-native-paint32-emission-mixed-test.log": "88910aecacde3bcdfdc60acec1c644e9acc2ba3491af5e79aef1b6cbe653123c",
+        "checks/presets.log": "51376c6454b4b627249819d4206044cd2e4a177675dad5030b821784470beca8",
+        "checks/status.json": "ac66c643cde3baeb5151c0ae2fabb1c3a2787b6bac0f38622e6febe612c8fc7b",
+        "dome-sculpt-link.log": "5ec2903da8df54e5169c4f7ee95f8218bb04cbd502062899a9e942009146f40a",
+        "editable-link.log": "6e29206b411289501a5d0051e55fe6875f1262a562cc19366df7d7b0afa913d8",
+        "editable.log": "0852af7c267e7a665ac7eb010f0ba3caf12a3063f35bf6a2bec2cedac7d0318c",
+        "native-authoring-compiler.cpp.log": "a8a3887cb12e8ab8d336d6e204fa97b5f451c895ab8a4fae6a26ac0a37125638",
+        "status.json": "7fa7cd07c19419d76800c25ea4c7697a388c589c95bc2ad7d53c6659e52980e3"
+      },
+      "native_sha256": "ffa7df8ffffecc80f9f468e53cef4fbea3f79f4529293a9ce69255c42a9431a9"
+    },
+    "release-v2": {
+      "app_sha256": "ee2a079f9e7c87c35c2d70b1229f5f4317f1fbbf58ea5fc8eed4669f3c9f5deb",
+      "invocation": "76221cf0157e4696a4631d2523a71a94",
+      "logs_sha256": {
+        "archive.log": "1649579aadda2173e76f4c038fa0e441ef7c6194b12020eb16d094704df44482",
+        "checks/dense-editable-hdr.log": "480e392c9bd7e84f29089bf6fe0fcba1ded86f51ffdbfbdb44f584743ab01ff4",
+        "checks/dense-editable-ldr.log": "cf1c8fd1ccbeb8b34e691063bc3de88c290bbe62a607ae28c1317e2c3628daf6",
+        "checks/dome-sculpt-native-authoring-real-test.log": "0eda296308e582781b4200c6979f683c12f566d79222693c52badc4c64b71a6e",
+        "checks/dome-sculpt-native-authoring-test.log": "6c792544811d602bb23b1caf0459e944a33f3a188f7e89d5d160bf5037a865b0",
+        "checks/dome-sculpt-native-paint32-emission-mixed-test.log": "84293aabbbc1ed822caa159658ad42cab29d7cfef87554514858dcd40037a241",
+        "checks/presets.log": "3ccd9a82e7945a795c43c7a21db0fe03ebdb2de738adad125e01f6f12b845973",
+        "checks/status.json": "e64ff86ef257d96a9e4140c5eabece228f8ed2427883ceffee645ca5d3c36402",
+        "dome-sculpt-link.log": "6577699e141b36e8edc69003722b127deb562c5fd5687331176571733cc2c67f",
+        "editable-link.log": "7c792da70a2a0ff8dfe95441887ecd325e168f49f16ade9ed67c6c3c54db4d9f",
+        "editable.log": "9a374c81b2fb865621a825d28ac67b19a0ca508ff419845048998dbed3558a21",
+        "native-authoring-compiler.cpp.log": "a66ee6bf016556ba7408af92b447df9c4b49872206f78cf98f45ffdcfa3171e7",
+        "status.json": "34714fb2b95ff63e1f0bfa504994e940c015bdf393901292451801aa0ac4526f"
+      },
+      "native_sha256": "ffa7df8ffffecc80f9f468e53cef4fbea3f79f4529293a9ce69255c42a9431a9"
+    }
+  },
+  "scope": "Editable GLB at all three portable texture presets from a varying 2048-square HDR Bake with an edited key and converted normal frame. Exact retained native composite, paint, and restore data; finite portable material view.",
+  "source_patch_sha256": "ea1e5700093ea91d3cde4152b3d72a3440d32e27ed6a2c95bc8e0ebdfea46910",
+  "texture_set_followup": {
+    "fixture_sha256": "90b11c3a756504d5b8b630b106454dd5a62894e93ef6d4f069d7177f05b1b915",
+    "log_sha256": "e51090d57f9ece5887e107392eda704b03cfb4f94d7d2ce2c6c9c6f76781319a"
+  }
+}
