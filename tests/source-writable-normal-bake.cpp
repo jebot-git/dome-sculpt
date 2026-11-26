@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "source-prepared-normal-oracle.hpp"
 #include "bake-paint-coordinates.hpp"
+#include "dome/bake-recipe.hpp"
 #include "dome/source-uv-bake.hpp"
 #include "emission-bake-source.hpp"
 #include "canonical-paint-sampling.hpp"
@@ -125,12 +126,146 @@ void affine_source(bool canonical,const std::filesystem::path &out){
          scene.object(id).painted==paint_owner&&scene.object(id).material_bindings==binding,
          "Affine matching Bake preserves the original writable donor and its normal and FLOAT roles");
 }
+
+void rasterize_canonical_paint(Scene &scene){
+  const auto &object=scene.active();
+  SourceUvBakeInput input;
+  input.paint=object.painted;
+  input.current_material=object.material_bindings;
+  input.current_deformation=object.deformation;
+  input.target=object.painted->mesh();
+  input.source_vertices.resize(input.target.positions.size());
+  std::iota(input.source_vertices.begin(),input.source_vertices.end(),0);
+  for(auto &q:input.target.uv)
+    q={.125f+.75f*q[0],.125f+.75f*q[1]};
+  auto adopted=adopt_source_uv_bake(bake_source_uv(input));
+  scene.active().painted=std::move(adopted.paint);
+  scene.active().material_bindings=std::move(adopted.material_bindings);
+  scene.active().deformation=std::move(adopted.deformation);
+  scene.active().appearance=std::move(adopted.appearance);
+  scene.validate();
+}
+
+bool same_layers(const PaintedMesh &a,const PaintedMesh &b){
+  if(a.active_layer()!=b.active_layer()||a.layers().size()!=b.layers().size())return false;
+  for(size_t i=0;i<a.layers().size();++i){
+    const auto &x=a.layers()[i],&y=b.layers()[i];
+    if(x.id!=y.id||x.name!=y.name||x.visible!=y.visible||x.opacity!=y.opacity||
+       x.tiles!=y.tiles||x.pbr_tiles!=y.pbr_tiles||x.emission_tiles!=y.emission_tiles)return false;
+  }
+  return true;
+}
+
+void canonical_recipient(bool physical,bool partial,const std::filesystem::path &out){
+  auto seed=source(true);
+  rasterize_canonical_paint(seed);
+  auto high=seed.active().painted->mesh();
+  high.uv={{{0,0}},{{1,0}},{{1,1}},{{0,1}}};
+  for(auto &p:high.positions){
+    if(partial&&p.x<0)p.x=0;
+    p.z=.02f;
+  }
+  high.normals.assign(high.positions.size(),normalized(Vec3{-.17f,.28f,1}));
+  const auto donor=seed.add("Colour and FLOAT projection donor",Volume{});
+  seed.select(donor);
+  seed.active().mesh_active=true;
+  seed.active().painted=std::make_shared<PaintedMesh>(high,64);
+  paint(seed,physical);
+  seed.active().visible=false;
+  seed.active().locked=true;
+  seed.select(1);
+  paint(seed,true);
+  const auto prior=seed.active().painted->baked();
+  require(bool(prior&&prior->normal_field),"Recipient starts with an independent prior normal field");
+
+  auto edited=seed;
+  uv(edited,true,partial);
+  const auto &object=edited.active();
+  const auto binding=object.material_bindings;
+  const auto before_paint=object.painted;
+  const auto &mesh=before_paint->mesh();
+  const auto &domain=*before_paint->paint_sampling_domain();
+  require(domain.source_corners().size()==mesh.indices.size(),"Recipient has a complete writable corner correspondence");
+  for(size_t corner=0;corner<mesh.indices.size();++corner){
+    const auto writable=domain.basis()->uv[domain.basis()->indices[domain.source_corners()[corner]]];
+    require(writable==seed.active().painted->mesh().uv[seed.active().painted->mesh().indices[corner]]&&
+            writable!=mesh.uv[mesh.indices[corner]]&&
+            writable!=binding->canonical_uv->coordinates()[mesh.indices[corner]],
+            "Recipient has separate display, writable paint and retained normal coordinates");
+  }
+  const std::string name=partial?"partial-hdr":physical?"matching-hdr":"matching";
+  const auto before=edited.encode();
+  edited.save(out/(name+"-before.dsculpt"));
+  auto options=settings();
+  options.allow_partial=partial;
+  options.corresponding_topology=!partial;
+  auto control=seed;
+  const auto expected=bake_object(control,donor,options);
+  const auto actual=bake_object(edited,donor,options);
+  const auto &want=*control.active().painted->baked();
+  const auto &got=*edited.active().painted->baked();
+  require(actual.projected==expected.projected&&actual.projected>900&&
+          actual.missed==expected.missed&&actual.preserved_misses==expected.preserved_misses&&
+          (partial?actual.preserved_misses>900:actual.rays==0&&actual.missed==0),
+          "Bake takes coverage from the writable atlas and preserves uncovered prior samples");
+  require(got.coverage==want.coverage&&got.maps.color.rgba==want.maps.color.rgba&&
+          got.maps.metal_rough.rgba==want.maps.metal_rough.rgba,
+          "Retained writable material bytes match the same surface baked before the display UV edit");
+  require(physical?(want.emission_field&&got.emission_field&&
+                   got.emission_field->encode()==want.emission_field->encode()&&
+                   std::any_of(got.emission_field->values().begin(),got.emission_field->values().end(),
+                               [](const auto &e){return e.absolute[0]>2;})):
+                   (!want.emission_field&&!got.emission_field&&got.maps.emission.rgba==want.maps.emission.rgba),
+          "Retained writable FLOAT emission matches the independent atlas control");
+  require(got.normal_field&&want.normal_field&&got.normal_field->prior()==prior->normal_field&&
+          got.normal_field->pbr()->rgba==want.normal_field->pbr()->rgba&&
+          got.normal_field->mtoon()->rgba==want.normal_field->mtoon()->rgba,
+          "Both normal roles stay on their independent normal atlas");
+  require(edited.active().material_bindings==binding&&edited.active().painted->mesh_owner()==before_paint->mesh_owner()&&
+          edited.active().painted->paint_sampling_attachment()==before_paint->paint_sampling_attachment()&&
+          same_layers(*before_paint,*edited.active().painted)&&
+          edited.active().bake_recipe&&edited.active().bake_recipe->source.object==donor&&
+          edited.active().bake_recipe->settings.corresponding_topology==!partial,
+          "Bake preserves editable layers, geometry and sampling owners and records its recipe");
+
+  const auto accepted=edited.encode();
+  edited.save(out/(name+"-accepted.dsculpt"));
+  require(Scene::load(out/(name+"-accepted.dsculpt")).encode()==accepted,"Writable recipient round trips exactly");
+  Document doc;
+  doc.replace(Scene::load(out/(name+"-before.dsculpt")));
+  require(doc.wait_mesh(),"Writable recipient builds the actual worker baseline");
+  doc.bake_from_object(donor,options);
+  doc.save_async(out/(name+"-ordered.dsculpt")).get();
+  require(doc.wait_asset()&&doc.wait_mesh()&&doc.frame().state->error.empty()&&
+          doc.copy_scene().encode()==accepted&&Scene::load(out/(name+"-ordered.dsculpt")).encode()==accepted,
+          "Actual Bake worker and dependent Save publish the same accepted recipient");
+  require(doc.undo()&&doc.wait_mesh()&&doc.copy_scene().encode()==before&&
+          doc.redo()&&doc.wait_mesh()&&doc.copy_scene().encode()==accepted,
+          "Writable recipient Bake owns one exact Undo and Redo");
+  doc.clear_bake();
+  require(doc.wait_asset()&&doc.wait_mesh()&&doc.frame().state->error.empty(),"Clear Bake is available on the rebaked recipient");
+  const auto cleared=doc.copy_scene();
+  require(!cleared.active().painted->baked()&&cleared.active().painted->paint_sampling_attachment()&&
+          cleared.active().bake_recipe->source.object==donor&&
+          doc.undo()&&doc.wait_mesh()&&doc.copy_scene().encode()==accepted,
+          "Clear Bake preserves the writable authority and recipe and can be undone exactly");
+  std::cout<<"WRITABLE_RECIPIENT "<<name<<" projected="<<actual.projected<<" missed="<<actual.missed
+           <<" preserved="<<actual.preserved_misses<<" rays="<<actual.rays<<'\n';
+}
 }
 int main(int argc,char **argv) try {
  if(argc==3&&std::string_view(argv[1])=="--sources"){
    auto scene=Scene::load(argv[2]);
    scene.erase(scene.active().id);
    std::cout<<scene.encode().dump()<<'\n';
+   return 0;
+ }
+ if(argc==3&&std::string_view(argv[1])=="--recipient"){
+   const std::filesystem::path out=argv[2];
+   std::filesystem::create_directories(out);
+   writable_source::canonical_recipient(false,false,out);
+   for(bool partial:{false,true})writable_source::canonical_recipient(true,partial,out);
+   std::cout<<"PASS "<<writable_source::checks<<" writable recipient checks\n";
    return 0;
  }
  if(argc!=2)return 2;

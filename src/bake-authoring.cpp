@@ -13,6 +13,7 @@
 #include "normal-bake-encoding.hpp"
 #include "baked-normal-field.hpp"
 #include "canonical-normal-uv.hpp"
+#include "canonical-paint-sampling.hpp"
 #include "emission-bake-source.hpp"
 #include "source4-baked.hpp"
 #include "source-bake-normal.hpp"
@@ -442,9 +443,32 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
     }
     low->uv=retained_recipient->paint_coordinates();
   }else if(prepared_normals){
-    const auto &frame=*target.material_bindings->normal_frames->pbr;const auto &mesh=target.painted->mesh();
-    low.emplace();low->indices.resize(mesh.indices.size());
-    for(size_t c=0;c<mesh.indices.size();++c){if((c&1023)==0)check();const auto v=mesh.indices[c];low->indices[c]=uint32_t(c);low->positions.push_back(mesh.positions[v]);low->normals.push_back(frame.normals[c]);low->uv.push_back(mesh.uv[v]);options.low_tangents.push_back(frame.tangents[c]);}
+    const auto &frame=*target.material_bindings->normal_frames->pbr;
+    const auto &mesh=target.painted->mesh();
+    low.emplace();
+    if(const auto &writable=target.material_bindings->canonical_paint_sampling){
+      PaintSamplingLimits limits;
+      limits.cancelled=cancelled;
+      writable->validate_current(*target.painted,limits);
+      low->uv=writable->attachment()->domain()->corner_coordinates(mesh,limits);
+    }else{
+      low->uv.reserve(mesh.indices.size());
+      for(auto vertex:mesh.indices){
+        if((low->uv.size()&1023)==0)check();
+        low->uv.push_back(mesh.uv[vertex]);
+      }
+    }
+    low->positions.reserve(mesh.indices.size());
+    low->normals.reserve(mesh.indices.size());
+    low->indices.reserve(mesh.indices.size());
+    options.low_tangents.reserve(mesh.indices.size());
+    for(size_t c=0;c<mesh.indices.size();++c){
+      if((c&1023)==0)check();
+      low->indices.push_back(uint32_t(c));
+      low->positions.push_back(mesh.positions[mesh.indices[c]]);
+      low->normals.push_back(frame.normals[c]);
+      options.low_tangents.push_back(frame.tangents[c]);
+    }
   }else low=detail::retained_bake_basis(target,options);
   if(settings.cage_object)
     options.cage_positions=detail::object_bake_cage(scene,target.id,settings.cage_object,
@@ -537,10 +561,8 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
     retained_uv->validate_current(target.painted->mesh(),cancelled);
     if(!low||!canonical_attributes||low->positions.size()!=target.painted->mesh().indices.size())
       throw std::invalid_argument("Retained normal rebake lost its exact split corner basis");
-    // Material channels belong to the current editable atlas. The independent
-    // normal field still belongs to its original root coordinates. Project
-    // that role in the original domain instead of replacing it with current-UV
-    // texels. These are CPU geometry queries, never framebuffer readbacks.
+    // The first pass uses the editable paint atlas. Project the independent
+    // normal field through its own root coordinates.
     Mesh normal_low=*low;
     for(size_t c=0;c<normal_low.uv.size();++c){if((c&1023)==0)check();
       normal_low.uv[c]=retained_uv->coordinates().at(target.painted->mesh().indices[c]);}
@@ -585,6 +607,7 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
       BakedTextures normal_write;normal_write.normal_interpretation=BakedNormalInterpretation::PreparedAttributes;
       normal_write.color_interpretation=textures.color_interpretation;
       normal_write.maps=std::move(retained_normal_write->maps);normal_write.maps.normal=std::move(retained_normal_write->normal);
+      normal_write.emission_field=std::move(retained_normal_write->emission_field);
       normal_write.coverage.reserve(retained_normal_write->coverage.size());
       for(auto c:retained_normal_write->coverage)normal_write.coverage.push_back(c==1||c==2?255:0);
       textures.normal_field=before->replace(normal_write,field_options);
