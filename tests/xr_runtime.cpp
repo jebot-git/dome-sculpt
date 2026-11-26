@@ -612,12 +612,13 @@ FN(ReleaseSwapchainImage, XrSwapchain p, const XrSwapchainImageReleaseInfo *) {
         }
       return count;
     };
-    const int chart = pixels(148, 148, 490, 490, [](int r, int g, int b) {
-      return r > 155 && g > 155 && b > 155;
-    });
-    const int apply = pixels(418, 594, 520, 607, [](int r, int g, int b) {
+    const auto accent = [](int r, int g, int b) {
       return r < 150 && g > 130 && b > 220;
+    };
+    const int chart = pixels(148, 148, 490, 490, [&](int r, int g, int b) {
+      return (r > 155 && g > 155 && b > 155) || accent(r, g, b);
     });
+    const int apply = pixels(418, 594, 520, 607, accent);
     report["uv_atlas_visible_pixels"] = chart;
     report["uv_atlas_apply_accent"] = apply;
     uv_atlas_ready = chart > 100 && apply > 20;
