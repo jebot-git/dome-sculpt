@@ -93,18 +93,18 @@ source/current HDR ownership and intentionally corrupted-source refusals.
 
 All Nov 26 builds are reconstructed from actual committed sources. Missing Nov 18
 binaries are not reused or relabeled. The current Release stage has 12 fresh whole
-translation units plus 207 qualified unchanged owners,219 unique owners and 197
+translation units plus 207 qualified unchanged owners, 219 unique owners and 197
 actual core archive payloads, with 7 freshly linked consumers. Original reused
 object, command and MD paths retain their true source context. The additional
 corrected projection fixture is a complete TU/link against those same archives.
 
-The strict 725 build/audit passes:9 fresh plus 224 unchanged whole-TU owners,
-233 unique owners,197 core archive payloads and 17 sanitizer-linked consumers.
-Every actual compile command hasO1/g 1, ASan/UBSan and frame pointers. Only the
+The strict 725 build/audit passes: 9 fresh plus 224 unchanged whole-TU owners,
+233 unique owners, 197 core archive payloads and 17 sanitizer-linked consumers.
+Every actual compile command has O1/g1, ASan/UBSan and frame pointers. Only the
 corrected strict 11 has finished native qualification at this milestone; the
 complete strict 725 cohort is a separate live run and remains pending.
 
-Two evidence limitations remain explicit. Auxiliary cc 1/cc 1plus/collect 2 tools
+Two evidence limitations remain explicit. Auxiliary cc1/cc1plus/collect2 tools
 were observed after the initial fresh Release build began, so their early-owner
 observation is not claimed prospective. One original failed recipe-fixture MD
 was overwritten by its corrected successful TU before archival; original failed
