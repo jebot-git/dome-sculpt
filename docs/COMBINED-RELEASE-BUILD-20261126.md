@@ -38,3 +38,16 @@ HDR 2048 and the per-texture-set Bake recipe workflow are under separate
 validation before the next combined build.
 
 [Native workflow receipt and evidence](validation/combined-native-workflows-20261126.json)
+
+The combined production renderer also passes 4,422 HDR checks on each of
+llvmpipe and Intel Arc A770 when linked with the corrected range fixture.
+This rebuild replaces one fixture translation unit and uses the existing
+combined Release renderer and core. The fixture verifies exact original
+coefficient readback and a maximum one-byte RGB error across four PBR and
+MToon phases. Each run records 105 reads on its current EGL context. The Arc
+process held `renderD129` at PCI `0000:03:00.0` under `i915`, while the
+software process used no DRM descriptor. The first wrapper rejected the Arc
+display label because of `Arc(tm)` capitalization. The review confirms the
+original successful process result, numerical outputs and actual device.
+
+[Combined HDR renderer receipt](validation/combined-hdr-render-20261126.json)

@@ -1,0 +1,39 @@
+{
+  "source": "c1aea4cb",
+  "executable": "4d5ee152661238053280ae029caadd50f24f2e4e0dffae2f6926e371dc472a26",
+  "observer": "a7b76a49bc5b81926f26ac1d6ba9ca30683456ac397ed30d217aad4bbc905163",
+  "cases": [
+    {
+      "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+      "mode": "software",
+      "maximum_rgb_error": 1,
+      "checks": 4422,
+      "context_reads": 105,
+      "drm_fds": [],
+      "exit": 0,
+      "seconds": 1.0600783824920654,
+      "log_sha256": "7ecd9d33865ac55322d1342559ffc6025ee6465ca581a83624414721f5780c04"
+    },
+    {
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "mode": "arc",
+      "maximum_rgb_error": 1,
+      "checks": 4422,
+      "context_reads": 105,
+      "drm_fds": [
+        "/dev/dri/renderD129"
+      ],
+      "exit": 0,
+      "seconds": 11.743121147155762,
+      "log_sha256": "2ababb711638cb5f897746faadf87087728e1f14d065db7832555e51fa2ea71b"
+    }
+  ],
+  "arc_device": "/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0",
+  "observer_correction": "Case-insensitive match of Mesa renderer display label. Original wrapper did case-sensitive Arc(TM); driver reports Arc(tm). Device FD, PCI and numerical checks pass unchanged.",
+  "archive": {
+    "path": "docs/validation/combined-hdr-render-20261126.tar.xz",
+    "sha256": "f562e91d1697ba44dfd17d393a54cb0ffaa772079ac1a3ffef2f30829736ae89",
+    "bytes": 16304,
+    "members": 15
+  }
+}
