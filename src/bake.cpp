@@ -256,9 +256,13 @@ void pad(BakeResult &result,const BakeOptions &o,std::vector<BakedEmissionSample
 static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const BakeOptions &o,
     const detail::SourceBakeNormalResolver &source_normals,
     std::span<const uint32_t> target_triangles = {},
-    std::span<const detail::RetainedSourceBakeField> source_fields = {}) {
+    std::span<const detail::RetainedSourceBakeField> source_fields = {},
+    detail::SourceBakePlacement source_placement = {}) {
   if(o.progress)o.progress(0);
   cancel(o); validate(low,source,o,source_fields);
+  if(!source_placement.tangent_corners.empty()&&
+      source_placement.tangent_corners.size()!=source.mesh.indices.size())
+    throw std::invalid_argument("Placed Bake tangents lost their original logical corners");
   if(!target_triangles.empty() &&
      (target_triangles.back()>=low.indices.size()/3 ||
       std::adjacent_find(target_triangles.begin(),target_triangles.end(),std::greater_equal<>{})!=target_triangles.end()))
@@ -288,7 +292,8 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
   SurfaceQuery query(source.mesh,o.cancelled); cancel(o);
   auto low_frames = o.low_tangents.empty() ? tangent_corners(low, o.cancelled)
                                          : std::vector<Tangent>{};
-  std::vector<Tangent> high_frames;
+  std::vector<Tangent> generated_high_frames;
+  auto high_frames=source_placement.tangent_corners;
   const bool raw_baked_normals=std::any_of(source.materials.begin(),source.materials.end(),[](const auto &m){
     return m.maps&&m.maps->source_only&&m.maps->overlay&&m.maps->baked_base&&
         !m.maps->baked_base->maps.normal.rgba.empty()&&m.normal_strength>0;
@@ -303,7 +308,10 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
     for(size_t field=0;field<source.materials.size();++field)
       needs_high_frames|=needs_map(field);
   if (needs_high_frames) {
-    high_frames = tangent_corners(source.mesh, o.cancelled);
+    if(high_frames.empty()){
+      generated_high_frames=tangent_corners(source.mesh,o.cancelled);
+      high_frames=generated_high_frames;
+    }
     for (size_t t = 0; t < source.mesh.indices.size()/3; ++t) {
       auto id = source.triangle_materials.empty() ? 0 : source.triangle_materials[t];
       if (needs_map(id))
@@ -372,7 +380,15 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
                        interpolate(source.mesh,source_triangle,mapped,true),mapped,0};
       }
       bool backface=false;
-      if (hit) {auto a=source.mesh.positions[source.mesh.indices[hit->triangle*3]],b=source.mesh.positions[source.mesh.indices[hit->triangle*3+1]],c=source.mesh.positions[source.mesh.indices[hit->triangle*3+2]];backface=dot(cross(b-a,c-a),normal)<=0;}
+      if(hit){
+        const auto first=size_t(hit->triangle)*3;
+        const auto a=source.mesh.positions[source.mesh.indices[first]],
+            b=source.mesh.positions[source.mesh.indices[first+1]],
+            c=source.mesh.positions[source.mesh.indices[first+2]];
+        auto facing=dot(cross(b-a,c-a),normal);
+        if(source_placement.reverse_winding)facing=-facing;
+        backface=facing<=0;
+      }
       if (!hit||(!o.allow_backfaces&&backface)) { result.coverage[at]=3; ++result.missed; continue; }
       auto material_id=source.triangle_materials.empty()?0:source.triangle_materials[hit->triangle];
       const auto &m=source.materials[material_id];
@@ -498,7 +514,7 @@ BakeResult bake_mesh(const Mesh &low,const BakeSource &source,const BakeOptions 
 }
 BakeResult detail::bake_mesh_source_normals(const Mesh &low,const BakeSource &source,const BakeOptions &options,
  const SourceBakeNormalResolver &normal,std::span<const uint32_t> target_triangles,
- std::span<const RetainedSourceBakeField> source_fields){
- return bake_mesh_impl(low,source,options,normal,target_triangles,source_fields);
+ std::span<const RetainedSourceBakeField> source_fields,SourceBakePlacement source_placement){
+ return bake_mesh_impl(low,source,options,normal,target_triangles,source_fields,source_placement);
 }
 } // namespace dome

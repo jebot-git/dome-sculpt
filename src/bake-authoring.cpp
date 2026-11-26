@@ -23,32 +23,50 @@
 #include "paint-overlay-sample.hpp"
 #include "emission-authority.hpp"
 #include "emission-paint-access.hpp"
+#include "affine-surface.hpp"
 namespace dome {
 namespace {
 // Reuse the sealed before/current streams once the hit belongs to its field.
 // Replaying the complete polygon graph per texel would dominate projection.
 Vec3 retained_source_normal(const detail::PolygonSurfacePreview &preview, size_t triangle,
-    std::array<double,3> bary, std::optional<std::array<float,2>> normal_uv) {
+    std::array<double,3> bary, std::optional<std::array<float,2>> normal_uv,
+    const std::optional<detail::AffineInteractionFrame> &placement) {
  const auto &normals=preview.normals();
  const auto &frame=preview.geometric_frames().at(triangle);
+ const auto normal_direction=[&](Vec3 n) {
+  return placement?detail::placed_normal(*placement,n):detail::normal_bake_math::unit(n);
+ };
  const auto geometry=[&](size_t offset) {
   const auto &n=frame[offset],&t=frame[offset+1];
-  const Vec3 normal{n[0],n[1],n[2]},tangent{t[0],t[1],t[2]};
-  return detail::PolygonGeometryFrame{{tangent,cross(normal,tangent)*n[3],normal},n[3]};
+  Vec3 normal{n[0],n[1],n[2]},tangent{t[0],t[1],t[2]};
+  float hand=n[3];
+  if(placement){
+   normal=normal_direction(normal);
+   const auto placed=detail::placed_tangent(*placement,{t[0],t[1],t[2],hand});
+   const Vec3 raw{placed[0],placed[1],placed[2]};
+   tangent=detail::normal_bake_math::unit(raw-normal*dot(raw,normal));
+   hand=placed[3];
+  }
+  return detail::PolygonGeometryFrame{{tangent,cross(normal,tangent)*hand,normal},hand};
  };
  const auto before=geometry(0),current=geometry(2);
  const auto first=triangle*3;
  if(preview.model()==detail::PolygonSurfaceNormalModel::NativeNOnly) {
   Vec3 normal;
   for(size_t k=0;k<3;++k)
-   normal+=detail::normal_bake_math::unit(normals.at(first+k))*float(bary[k]);
+   normal+=normal_direction(normals.at(first+k))*float(bary[k]);
   return detail::transport_polygon_direction(normal,before,current);
  }
  if(!normal_uv)throw std::invalid_argument("Retained Bake source lost its normal coordinates");
  std::array<detail::NormalBakeVertex,3> vertices;
  for(size_t k=0;k<3;++k) {
-  const auto &t=preview.tangents().at(first+k);
-  vertices[k]=detail::normal_bake_vertex(normals.at(first+k),{t[0],t[1],t[2]},t[3],
+  auto t=preview.tangents().at(first+k);
+  auto n=normals.at(first+k);
+  if(placement){
+   n=normal_direction(n);
+   t=detail::placed_tangent(*placement,t);
+  }
+  vertices[k]=detail::normal_bake_vertex(n,{t[0],t[1],t[2]},t[3],
       detail::NormalVertexBitangent::UnitCross);
  }
  const auto basis=detail::normal_bake_basis(vertices,bary,detail::NormalFragmentBasis::UnitColumns);
@@ -62,7 +80,8 @@ Vec3 retained_source_normal(const detail::PolygonSurfacePreview &preview, size_t
 }
 
 std::vector<detail::RetainedSourceBakeField> capture_texture_set_bake_source(
-    BakeSource &high, SculptObject source, CanvasTransform relative,
+    BakeSource &high, SculptObject source, CanvasTransform normal_to_target,
+    const std::optional<detail::AffineInteractionFrame> &placement,
     const std::function<bool()> &cancelled) {
   const auto primary=texture_set_view(source,0);
   const auto collection=std::move(source.texture_sets);
@@ -101,12 +120,12 @@ std::vector<detail::RetainedSourceBakeField> capture_texture_set_bake_source(
     resolved.physical_emission=detail::overlay_uses_float_emission(*packet)||
         detail::hdr_emission(field.material.emissive)||detail::physical_emission(*field.material_bindings);
     const auto background=field.material_bindings->physical_emission.value_or(field.material.emissive);
-    resolved.sample=[owner=field.source,preview,limits,relative,background,
+    resolved.sample=[owner=field.source,preview,limits,normal_to_target,placement,background,
         emission=resolved.physical_emission?packet:nullptr](uint32_t triangle,std::array<float,3> weights) {
       const std::array<double,3> bary{weights[0],weights[1],weights[2]};
       const auto point=owner->sample(triangle,bary,limits);
-      const auto local=retained_source_normal(*preview,triangle,bary,point.normal_uv);
-      const auto normal=ob::rotate(relative.orientation,{local.x,local.y,local.z});
+      const auto local=retained_source_normal(*preview,triangle,bary,point.normal_uv,placement);
+      const auto normal=ob::rotate(normal_to_target.orientation,{local.x,local.y,local.z});
       detail::RetainedSourceBakeHit result{point.paint_uv,{normal.x,normal.y,normal.z},{}};
       if(emission) {
         const auto values=detail::sample_overlay_values(*emission,point.paint_uv[0],point.paint_uv[1],false);
@@ -243,9 +262,13 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   } else
     high.mesh = surface_mesh(*source.volume, cancelled);
   const auto target_world = scene.world_transform(target.id);
-  const auto relative = ob::compose(ob::inverse(target_world), scene.world_transform(source.id));
+  const auto target_inverse=ob::inverse(target_world);
+  const auto placement=source.texture_sets&&scene.has_affine_placement(source.id)
+    ? std::optional(detail::placement_frame(scene,source.id)) : std::nullopt;
+  const auto relative=placement?target_inverse:
+      ob::compose(target_inverse,scene.world_transform(source.id));
   std::vector<detail::RetainedSourceBakeField> source_fields;
-  if(source.texture_sets)source_fields=capture_texture_set_bake_source(high,source,relative,cancelled);
+  if(source.texture_sets)source_fields=capture_texture_set_bake_source(high,source,relative,placement,cancelled);
   else{
     high.materials[0].material=source.material;
     high.materials[0].resolved_emission=detail::emission_bake_source(source,cancelled);
@@ -253,13 +276,40 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   detail::SourceBakeNormalOptions source_normal_options;source_normal_options.cancelled=cancelled;
   const auto source_normals=source.texture_sets?detail::SourceBakeNormalResolver{}:
       detail::source_bake_normals(source,relative,source_normal_options);
-  for (auto &p : high.mesh.positions) {
-    auto world = ob::transform(relative, {p.x,p.y,p.z});
-    p = {world.x,world.y,world.z};
+  std::vector<Tangent> placed_corners;
+  if(placement&&std::any_of(high.materials.begin(),high.materials.end(),[](const auto &field){
+       return field.maps&&!field.maps->polygon_surface&&!field.maps->normal.rgba.empty();
+      })){
+    placed_corners=tangent_corners(high.mesh,cancelled);
+    for(size_t i=0;i<placed_corners.size();++i){
+      if((i&1023)==0)check();
+      auto t=detail::placed_tangent(*placement,placed_corners[i]);
+      const auto rotated=ob::rotate(relative.orientation,{t[0],t[1],t[2]});
+      placed_corners[i]={rotated.x,rotated.y,rotated.z,t[3]};
+    }
   }
-  for (auto &n : high.mesh.normals) {
-    auto world = ob::rotate(relative.orientation, {n.x,n.y,n.z});
-    n = {world.x,world.y,world.z};
+  const detail::SourceBakePlacement source_placement{placed_corners,
+      placement&&placement->orientation()==AffineOrientation::Reversing};
+  if(placement){
+    // Keep original triangle and corner identities even under reflection.
+    // The Bake hit keeps its source barycentrics and tests effective winding.
+    const auto transform=affine_similarity(target_inverse)*placement->world();
+    for(size_t i=0;i<high.mesh.positions.size();++i){
+      if((i&1023)==0)check();
+      high.mesh.positions[i]=detail::affine_position(transform.point(detail::affine_vector(high.mesh.positions[i])));
+      const auto n=detail::placed_normal(*placement,high.mesh.normals[i]);
+      const auto rotated=ob::rotate(relative.orientation,{n.x,n.y,n.z});
+      high.mesh.normals[i]={rotated.x,rotated.y,rotated.z};
+    }
+  }else{
+    for (auto &p : high.mesh.positions) {
+      auto world = ob::transform(relative, {p.x,p.y,p.z});
+      p = {world.x,world.y,world.z};
+    }
+    for (auto &n : high.mesh.normals) {
+      auto world = ob::rotate(relative.orientation, {n.x,n.y,n.z});
+      n = {world.x,world.y,world.z};
+    }
   }
   BakeOptions options;
   options.resolution = target.painted->resolution();
@@ -305,7 +355,7 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   const auto retained_uv=target.material_bindings?target.material_bindings->canonical_uv:nullptr;
   if(retained_uv&&progress)options.progress=[&](float value){progress(.1f+.4f*value);};
   const auto target_triangles=recipient?recipient->domain->triangles():std::span<const uint32_t>{};
-  auto result = detail::bake_mesh_source_normals(low_mesh,high,options,source_normals,target_triangles,source_fields);
+  auto result = detail::bake_mesh_source_normals(low_mesh,high,options,source_normals,target_triangles,source_fields,source_placement);
   std::optional<BakeResult> retained_normal_write;
   if(retained_uv){
     retained_uv->validate_current(target.painted->mesh(),cancelled);
@@ -323,7 +373,7 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
       throw std::length_error("Retained normal rebake lacks aggregate projection/raster budget");
     normal_options.max_rays-=result.rays;normal_options.max_raster_samples-=result.raster_samples;
     if(progress)normal_options.progress=[&](float value){progress(.5f+.4f*value);};
-    retained_normal_write=detail::bake_mesh_source_normals(normal_low,high,normal_options,source_normals,{},source_fields);
+    retained_normal_write=detail::bake_mesh_source_normals(normal_low,high,normal_options,source_normals,{},source_fields,source_placement);
   }
   check();
   if(!result.projected)throw std::runtime_error("No target texels project onto the selected source");

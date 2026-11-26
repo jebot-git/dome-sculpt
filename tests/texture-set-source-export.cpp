@@ -106,10 +106,16 @@ void audit(bool prepared,bool reflected,bool varying=false){
  const std::string file=varying?"native-smooth.glb":std::string(prepared?"prepared":"native")+(reflected?"-reflected.glb":"-sheared.glb");export_glb(surfaces,file);cgltf_options options{};cgltf_data*data=nullptr;check(cgltf_parse_file(&options,file.c_str(),&data)==cgltf_result_success,"Independent cgltf parses the actual durable GLB");struct Free{cgltf_data*p;~Free(){cgltf_free(p);}}free{data};check(cgltf_load_buffers(&options,data,file.c_str())==cgltf_result_success&&cgltf_validate(data)==cgltf_result_success,"Independent standard glTF consumer validates actual buffers, materials and attributes");check(data->meshes_count==1&&data->meshes[0].primitives_count==2,"Independent consumer sees one geometry with both material primitives");
  check(scene.encode()==exact,"Portable source compilation leaves all original normal/paint/recipe/native history exact");
 }
-void retained_bake_source(bool prepared,bool physical) {
- auto scene=source(prepared,false,physical);
+void retained_bake_source(bool prepared,bool physical,bool affine=false,bool reflected=false) {
+ auto scene=source(prepared,reflected,physical);
  const auto source_id=scene.active().id;
- scene.active().affine_edit.reset();
+ if(!affine)scene.active().affine_edit.reset();
+ else {
+  auto matrix=scene.active().affine_edit->matrix().matrix();
+  matrix[2]=.07;matrix[6]=-.04;matrix[12]=.04;
+  scene.active().affine_edit=std::make_shared<const NativeAffineEdit>(AffineTransform(matrix));
+ }
+ const auto source_world=scene.world_matrix(source_id);
  for(TextureSetId field:{0u,1u}) {
   check(edit_texture_set(scene,source_id,field,[field](PaintedMesh &paint,Material &){
    paint.add_layer("Current field paint");
@@ -120,10 +126,17 @@ void retained_bake_source(bool prepared,bool physical) {
  }
  auto low=scene.active().painted->mesh();
  low.normals.assign(low.positions.size(),{0,0,1});
- const auto target_id=scene.add("Plain Bake recipient",Volume{});
+ CanvasTransform recipient_world;
+ if(affine)recipient_world={{-.12f,.06f,.02f},{0,0,.2588190451f,.9659258263f},.75f};
+ const auto recipient_inverse=ob::inverse(recipient_world);
+ const auto target_from_source=affine_similarity(recipient_inverse)*source_world;
+ const auto target_id=scene.add("Plain Bake recipient",Volume{},recipient_world);
  auto &target=scene.active();
  target.mesh_active=true;
- for(auto &p:low.positions)p.z+=.015f;
+ for(auto &p:low.positions) {
+  const auto q=target_from_source.point({p.x,p.y,p.z});
+  p={float(q[0]),float(q[1]),float(q[2]+.015/recipient_world.scale)};
+ }
  target.painted=std::make_shared<PaintedMesh>(low,64);
  scene.object(source_id).visible=false;
  scene.object(source_id).locked=true;
@@ -176,7 +189,9 @@ void retained_bake_source(bool prepared,bool physical) {
            "Baked material color follows the independent original paint coordinates");
     if(std::abs(expected_color[0]-wrong_color[0])>.02f||std::abs(expected_color[2]-wrong_color[2])>.02f)
      ++distinct_coordinates;
-    const auto expected_normal=member.source->normal(triangle,weights,AffineTransform{},true);
+    const auto expected_world=member.source->normal(triangle,weights,source_world,true);
+    const auto expected=ob::rotate(recipient_inverse.orientation,{expected_world.x,expected_world.y,expected_world.z});
+    const Vec3 expected_normal{expected.x,expected.y,expected.z};
     const auto got=tangent_frame(low,tangents,triangle,{float(weights[0]),float(weights[1]),float(weights[2])}).to_world(
         {baked->maps.normal.rgba[pixel*4]/255.f*2-1,baked->maps.normal.rgba[pixel*4+1]/255.f*2-1,baked->maps.normal.rgba[pixel*4+2]/255.f*2-1});
     check(length(normalized(got)-expected_normal)<.015f,"Projected normal retains the original role in the current physical corner frame");
@@ -204,13 +219,82 @@ void retained_bake_source(bool prepared,bool physical) {
  check(stop&&cancelled.encode()==original,"Retained donor cancellation leaves the complete Scene unchanged");
 }
 
+void affine_plain_bake_source(){
+ Mesh mesh;
+ mesh.positions={{-.5f,-.5f,0},{.5f,-.5f,0},{.5f,.5f,0},{-.5f,.5f,0}};
+ mesh.normals.assign(4,{0,0,1});
+ mesh.uv={{0,0},{1,0},{1,1},{0,1}};
+ mesh.indices={0,1,2,0,2,3};
+ Scene scene;
+ const auto donor=scene.active().id;
+ std::array<TextureSetInitialField,2> fields;
+ fields[0].resolution=fields[1].resolution=64;
+ fields[0].material.name="First plain material";fields[1].material.name="Second plain material";
+ const std::array<TextureSetId,2> membership{0,1};
+ initialize_texture_sets(scene,donor,mesh,fields,membership);
+ const std::array<uint8_t,4> encoded{176,89,236,255};
+ for(TextureSetId id:{0u,1u}) {
+  edit_texture_set(scene,donor,id,[id,encoded](PaintedMesh &paint,Material &){
+   BakedTextures detail;
+   detail.maps.color=solid(id?std::array<uint8_t,4>{10,180,20,255}:std::array<uint8_t,4>{180,10,20,255});
+   detail.maps.metal_rough=solid({255,128,0,255});
+   detail.maps.emission=solid({0,0,0,255});
+   detail.maps.normal=solid(encoded);
+   detail.coverage.assign(64*64,255);
+   paint.install_bake(std::move(detail));
+   return true;
+  });
+ }
+ auto transform=AffineTransform{}.matrix();
+ transform[0]=-1.2;transform[1]=.3;transform[2]=.07;
+ transform[4]=.35;transform[5]=.8;transform[6]=-.04;transform[9]=.2;transform[10]=1.1;
+ const AffineTransform world(transform);
+ scene.active().affine_edit=std::make_shared<const NativeAffineEdit>(world);
+ scene.active().visible=false;
+ const auto recipient=scene.add("Front-only recipient",Volume{});
+ for(auto &p:mesh.positions) {
+  const auto q=world.point({p.x,p.y,p.z});
+  p={float(q[0]),float(q[1]),float(q[2]+.01)};
+ }
+ scene.active().mesh_active=true;
+ scene.active().painted=std::make_shared<PaintedMesh>(mesh,64);
+ const auto before=scene.encode();
+ Document doc;doc.replace(scene);ready(doc);
+ check(doc.frame().state->can_bake,"The reflected plain texture-set donor is available");
+ ObjectBakeSettings settings;settings.padding=0;settings.ao_samples=0;
+ doc.bake_from_object(donor,settings);ready(doc);
+ const auto result=doc.copy_scene();
+ const auto bake=result.object(recipient).painted->baked();
+ check(bake&&std::count(bake->coverage.begin(),bake->coverage.end(),255)==64*64,
+       "Front-only Bake accounts for reflected winding without reordering source material corners");
+ const auto t=unit(world.direction({1,0,0})),n=unit(world.normal({0,0,1}));
+ const auto b=cross(n,t)*-1.f;
+ const auto expected=normalized(t*(encoded[0]/255.f*2-1)+b*(encoded[1]/255.f*2-1)+n*(encoded[2]/255.f*2-1));
+ const auto target_corners=tangent_corners(mesh);
+ for(size_t triangle=0;triangle<2;++triangle) {
+  const size_t x=triangle?16:48,y=triangle?48:16,at=(y*64+x)*4;
+  check(bake->maps.color.rgba[at+triangle]>bake->maps.color.rgba[at+1-triangle],
+        "Reflected placement keeps the actual per-triangle material");
+  const auto mapped=tangent_frame(mesh,target_corners,triangle,{.25f,.5f,.25f}).to_world({
+      bake->maps.normal.rgba[at]/255.f*2-1,bake->maps.normal.rgba[at+1]/255.f*2-1,
+      bake->maps.normal.rgba[at+2]/255.f*2-1});
+  check(length(mapped-expected)<.015f,"Plain baked detail uses transformed original Mikk tangent and handedness");
+ }
+ check(doc.undo()&&doc.copy_scene().encode()==before,"The reflected donor and recipient Undo exactly");
+}
+
 void retained_bake_xr_fixture(const std::filesystem::path &input,const std::filesystem::path &reference) {
- auto scene=source(true,false);
+ auto scene=source(true,true);
  const auto donor=scene.active().id;
  auto &source_object=scene.active();
- source_object.affine_edit.reset();source_object.visible=false;source_object.locked=true;
+ source_object.visible=false;source_object.locked=true;
+ const auto source_world=scene.world_matrix(donor);
  auto mesh=source_object.painted->mesh();
  mesh.normals.assign(mesh.positions.size(),{0,0,1});
+ for(auto &p:mesh.positions) {
+  const auto q=source_world.point({p.x,p.y,p.z});
+  p={float(q[0]),float(q[1]),float(q[2])};
+ }
  auto cage_mesh=mesh;
  for(auto &p:mesh.positions)p.z-=.06f;
  for(auto &p:cage_mesh.positions)p.z+=.01f;
@@ -327,6 +411,9 @@ int main(int argc,char **argv)try {
  if(argc==3&&mode=="--retained-bake-source"){
   std::filesystem::create_directories(argv[2]);std::filesystem::current_path(argv[2]);
   retained_bake_source(false,false);retained_bake_source(true,false);retained_bake_source(false,true);
+  retained_bake_source(true,false,true);retained_bake_source(true,false,true,true);
+  retained_bake_source(false,true,true,true);
+  affine_plain_bake_source();
   retained_bake_xr_fixture("mixed-before.dsculpt","mixed-baked.dsculpt");
   std::cout<<"PASS "<<checks<<" retained source Bake controls\n";
   return 0;
