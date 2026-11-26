@@ -163,9 +163,15 @@ int main(int argc,char**argv)try{
    controls.hair_recolor=humanoid_hair_recolor_value(controls);controls.hair_recolor->at(0)=persisted.hair_recolor->at(0);
    check(controls.encode()==persisted.encode(),"Actual source, preset and all other body/face/hair/tint settings exactly match selected native draft actions");
    CanvasTransform transform{};transform.position.y=-controls.height*.5f;
-   append_humanoid(expected,controls,group.name+(std::string_view(argv[4])=="accept-desktop"?" copy":" variation"),transform);old_avatar_retained(source,actual);
+   append_humanoid(expected,controls,group.name+(std::string_view(argv[4])=="accept-desktop"?" copy":" variation"),transform);
+   // These are independent file loads: process-local shared_ptr identities
+   // cannot cross serialization. The complete encoded Scene equality below
+   // includes every old geometry/paint/source/rest/skin/morph/group byte.
+   // In-process workspace tests retain old_avatar_retained() owner checks.
   }
-  check(actual.encode()==expected.encode(),"Actual loader creator endpoint equals independently generated native control result and exact prior authored source");
+  const auto actual_bytes=nlohmann::json::to_cbor(actual.encode());
+  const auto expected_bytes=nlohmann::json::to_cbor(expected.encode());
+  check(actual_bytes==expected_bytes,"Actual loader creator endpoint preserves complete canonical native bytes of the independent control result and every prior authored source");
   std::cout<<"CREATOR CHECKS "<<checks<<'\n';return 0;
  }
  const auto root=argc>2?std::filesystem::path(argv[2]):std::filesystem::temp_directory_path()/("creator-workspace-"+std::to_string(getpid()));std::filesystem::create_directories(root);
