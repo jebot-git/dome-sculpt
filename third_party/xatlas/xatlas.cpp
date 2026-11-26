@@ -3776,10 +3776,7 @@ private:
 		m_cellData.reserve(edgeCount * 2);
 		for (uint32_t i = 0; i < edgeCount; i++) {
 			const uint32_t edge = m_edges[i];
-			traverse(edgePosition0(edge), edgePosition1(edge));
-			XA_DEBUG_ASSERT(!m_traversedCellOffsets.isEmpty());
-			for (uint32_t j = 0; j < m_traversedCellOffsets.size(); j++) {
-				const uint32_t cell = m_traversedCellOffsets[j];
+			traverse(edgePosition0(edge), edgePosition1(edge), [&](uint32_t cell) {
 				uint32_t offset = m_cellDataOffsets[cell];
 				if (offset == UINT32_MAX)
 					m_cellDataOffsets[cell] = m_cellData.size();
@@ -3795,7 +3792,7 @@ private:
 				}
 				m_cellData.push_back(edge);
 				m_cellData.push_back(UINT32_MAX);
-			}
+			});
 		}
 		return true;
 	}
@@ -3803,30 +3800,33 @@ private:
 	void computePotentialEdges(Vector2 p1, Vector2 p2)
 	{
 		m_potentialEdges.clear();
-		traverse(p1, p2);
-		for (uint32_t j = 0; j < m_traversedCellOffsets.size(); j++) {
-			const uint32_t cell = m_traversedCellOffsets[j];
+		traverse(p1, p2, [&](uint32_t cell) {
 			uint32_t offset = m_cellDataOffsets[cell];
 			while (offset != UINT32_MAX) {
 				const uint32_t edge2 = m_cellData[offset];
 				m_potentialEdges.push_back(edge2);
 				offset = m_cellData[offset + 1];
 			}
-		}
+		});
 		if (m_potentialEdges.isEmpty())
 			return;
 		insertionSort(m_potentialEdges.data(), m_potentialEdges.size());
 	}
 
 	// "A Fast Voxel Traversal Algorithm for Ray Tracing"
-	void traverse(Vector2 p1, Vector2 p2)
+	template<typename Visitor>
+	void traverse(Vector2 p1, Vector2 p2, Visitor visit)
 	{
+		const uint32_t firstCell[2] = { cellX(p1.x), cellY(p1.y) };
+		const uint32_t lastCell[2] = { cellX(p2.x), cellY(p2.y) };
+		visit(firstCell[0] + firstCell[1] * m_gridWidth);
+		if (firstCell[0] == lastCell[0] && firstCell[1] == lastCell[1])
+			return;
+
 		const Vector2 dir = p2 - p1;
 		const Vector2 normal = normalizeSafe(dir, Vector2(0.0f));
 		const int stepX = dir.x >= 0 ? 1 : -1;
 		const int stepY = dir.y >= 0 ? 1 : -1;
-		const uint32_t firstCell[2] = { cellX(p1.x), cellY(p1.y) };
-		const uint32_t lastCell[2] = { cellX(p2.x), cellY(p2.y) };
 		float distToNextCellX;
 		if (stepX == 1)
 			distToNextCellX = (firstCell[0] + 1) * m_cellSize - (p1.x - m_gridOrigin.x);
@@ -3850,8 +3850,6 @@ private:
 		}
 		else
 			tMaxY = tDeltaY = FLT_MAX;
-		m_traversedCellOffsets.clear();
-		m_traversedCellOffsets.push_back(firstCell[0] + firstCell[1] * m_gridWidth);
 		uint32_t currentCell[2] = { firstCell[0], firstCell[1] };
 		while (!(currentCell[0] == lastCell[0] && currentCell[1] == lastCell[1])) {
 			if (tMaxX < tMaxY) {
@@ -3871,7 +3869,7 @@ private:
 				break;
 			if (stepY == 1 && currentCell[1] > lastCell[1])
 				break;
-			m_traversedCellOffsets.push_back(currentCell[0] + currentCell[1] * m_gridWidth);
+			visit(currentCell[0] + currentCell[1] * m_gridWidth);
 		}
 	}
 
@@ -3909,7 +3907,6 @@ private:
 	Array<uint32_t> m_cellDataOffsets;
 	Array<uint32_t> m_cellData;
 	Array<uint32_t> m_potentialEdges;
-	Array<uint32_t> m_traversedCellOffsets;
 };
 
 struct UvMeshChart
@@ -5463,6 +5460,7 @@ private:
 		Vector3 centroidSum = Vector3(0.0f); // Sum of chart face centroids.
 		Vector3 centroid = Vector3(0.0f); // Average centroid of chart faces.
 		Array<uint32_t> faces;
+		Array<uint32_t> boundaryEdges;
 		Array<uint32_t> failedPlanarRegions;
 		CostQueue candidates;
 		uint32_t seed;
@@ -5557,6 +5555,7 @@ private:
 			chart->centroidSum = Vector3(0.0f);
 			chart->centroid = Vector3(0.0f);
 			chart->faces.clear();
+			chart->boundaryEdges.clear();
 			chart->candidates.clear();
 			chart->failedPlanarRegions.clear();
 			addFaceToChart(chart, chart->seed);
@@ -5734,6 +5733,26 @@ private:
 		return oppositeEdge == UINT32_MAX || m_faceCharts[oppositeFace] != chart->id;
 	}
 
+	void collectChartBoundary(const Chart *chart, uint32_t oldFaceCount)
+	{
+		// Adding faces can only remove edges from the old boundary. Keep
+		// face insertion order for intersection checks and candidate ties.
+		m_pendingBoundary.clear();
+		for (uint32_t i = 0; i < chart->boundaryEdges.size(); i++) {
+			const uint32_t edge = chart->boundaryEdges[i];
+			if (isChartBoundaryEdge(chart, edge))
+				m_pendingBoundary.push_back(edge);
+		}
+		for (uint32_t i = oldFaceCount; i < chart->faces.size(); i++) {
+			const uint32_t face = chart->faces[i];
+			for (uint32_t j = 0; j < 3; j++) {
+				const uint32_t edge = face * 3 + j;
+				if (isChartBoundaryEdge(chart, edge))
+					m_pendingBoundary.push_back(edge);
+			}
+		}
+	}
+
 	bool computeChartBasis(Chart *chart, Basis *basis)
 	{
 		const uint32_t faceCount = chart->faces.size();
@@ -5769,7 +5788,7 @@ private:
 	}
 
 	// m_faceCharts for the chart faces must be set to the chart ID. Needed to compute boundary edges.
-	bool isChartParameterizationValid(const Chart *chart)
+	bool isChartParameterizationValid(const Chart *chart, uint32_t oldFaceCount)
 	{
 		const uint32_t faceCount = chart->faces.size();
 		// Check for flipped faces in the parameterization. OK if all are flipped.
@@ -5783,15 +5802,10 @@ private:
 		// Check for boundary intersection in the parameterization.
 		XA_PROFILE_START(clusteredChartsPlaceSeedsBoundaryIntersection)
 		XA_PROFILE_START(clusteredChartsGrowBoundaryIntersection)
+		collectChartBoundary(chart, oldFaceCount);
 		m_boundaryGrid.reset(m_texcoords);
-		for (uint32_t i = 0; i < faceCount; i++) {
-			const uint32_t f = chart->faces[i];
-			for (uint32_t j = 0; j < 3; j++) {
-				const uint32_t edge = f * 3 + j;
-				if (isChartBoundaryEdge(chart, edge))
-					m_boundaryGrid.append(edge);
-			}
-		}
+		for (uint32_t i = 0; i < m_pendingBoundary.size(); i++)
+			m_boundaryGrid.append(m_pendingBoundary[i]);
 		const bool intersection = m_boundaryGrid.intersect(m_data.mesh->epsilon());
 #if XA_PROFILE
 		if (m_placingSeeds)
@@ -5840,7 +5854,7 @@ private:
 			parameterizeChart(chart);
 			for (uint32_t i = oldFaceCount; i < faceCount; i++)
 				m_faceCharts[chart->faces[i]] = chart->id;
-			if (!isChartParameterizationValid(chart)) {
+			if (!isChartParameterizationValid(chart, oldFaceCount)) {
 				for (uint32_t i = oldFaceCount; i < faceCount; i++)
 					m_faceCharts[chart->faces[i]] = -1;
 				chart->faces.resize(oldFaceCount);
@@ -5859,25 +5873,24 @@ private:
 			chart->centroidSum += m_data.mesh->computeFaceCenter(f);
 		}
 		chart->centroid = chart->centroidSum / float(chart->faces.size());
+		if (firstFace)
+			collectChartBoundary(chart, 0);
+		chart->boundaryEdges.clear();
+		chart->boundaryEdges.push_back(m_pendingBoundary);
 		// Refresh candidates.
 		chart->candidates.clear();
-		for (uint32_t i = 0; i < faceCount; i++) {
-			// Traverse neighboring faces, add the ones that do not belong to any chart yet.
-			const uint32_t f = chart->faces[i];
-			for (uint32_t j = 0; j < 3; j++) {
-				const uint32_t edge = f * 3 + j;
-				const uint32_t oedge = m_data.mesh->oppositeEdge(edge);
-				if (oedge == UINT32_MAX)
-					continue; // Boundary edge.
-				const uint32_t oface = meshEdgeFace(oedge);
-				if (m_data.isFaceInChart.get(oface))
-					continue; // Face belongs to another chart.
-				if (chart->failedPlanarRegions.contains(m_planarCharts.regionIdFromFace(oface)))
-					continue; // Failed to add this faces planar region to the chart before.
-				const float cost = computeCost(chart, oface);
-				if (cost < FLT_MAX)
-					chart->candidates.push(cost, oface);
-			}
+		for (uint32_t i = 0; i < chart->boundaryEdges.size(); i++) {
+			const uint32_t oppositeEdge = m_data.mesh->oppositeEdge(chart->boundaryEdges[i]);
+			if (oppositeEdge == UINT32_MAX)
+				continue;
+			const uint32_t otherFace = meshEdgeFace(oppositeEdge);
+			if (m_data.isFaceInChart.get(otherFace))
+				continue;
+			if (chart->failedPlanarRegions.contains(m_planarCharts.regionIdFromFace(otherFace)))
+				continue;
+			const float cost = computeCost(chart, otherFace);
+			if (cost < FLT_MAX)
+				chart->candidates.push(cost, otherFace);
 		}
 		return true;
 	}
@@ -6144,13 +6157,15 @@ private:
 			basis.normal = -basis.normal;
 		// Compute orthogonal parameterization and check that it is valid.
 		parameterizeChart(owner);
-		if (!isChartParameterizationValid(owner)) {
+		if (!isChartParameterizationValid(owner, oldOwnerFaceCount)) {
 			owner->faces.resize(oldOwnerFaceCount);
 			for (uint32_t i = 0; i < chartFaceCount; i++)
 				m_faceCharts[chart->faces[i]] = chart->id;
 			return false;
 		}
 		// Merge chart.
+		owner->boundaryEdges.clear();
+		owner->boundaryEdges.push_back(m_pendingBoundary);
 		owner->basis = basis;
 		owner->failedPlanarRegions.push_back(chart->failedPlanarRegions);
 		// Update adjacencies?
@@ -6173,6 +6188,7 @@ private:
 	CostQueue m_bestTriangles;
 	Array<Vector3> m_tempPoints;
 	UniformGrid2 m_boundaryGrid;
+	Array<uint32_t> m_pendingBoundary;
 #if XA_MERGE_CHARTS
 	// mergeCharts
 	Array<float> m_sharedBoundaryLengths;
