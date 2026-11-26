@@ -5,8 +5,9 @@ namespace dome {struct TextureSetResolutionOptions;struct TextureSetResolutionRe
 namespace dome::detail {
 struct PolygonSurfaceStage;
 struct TextureSetPaintAccess {
-  // Explicit ordinary unpainted grid resize, preserving real geometry/layer
-  // identities. No membership, original image or prepared/source field adapter.
+  // Raw, unpainted grids can change resolution without replacing their
+  // immutable geometry, original images, or layer identities.
+  static bool can_resize_unpainted(const PaintedMesh&)noexcept;
   static std::shared_ptr<PaintedMesh> resize_unpainted(const PaintedMesh&,uint32_t,const TextureSetLimits&);
   static std::shared_ptr<PaintedMesh> resample_plain(const PaintedMesh&,const TextureSetResolutionOptions&,const TextureSetLimits&,TextureSetResolutionReport&);
   static const std::shared_ptr<const TextureSetFaceDomain>& domain(const PaintedMesh&)noexcept;

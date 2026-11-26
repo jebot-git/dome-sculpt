@@ -5310,6 +5310,8 @@ if(BUILD_TESTING)
   target_link_options(dome-sculpt-creator-workspace-test PRIVATE -Wl,--wrap=fsync)
   add_test(NAME creator-controls-output COMMAND dome-sculpt-creator-workspace-test --controls ${CMAKE_CURRENT_BINARY_DIR}/creator-controls-output)
   add_test(NAME creator-workspace COMMAND dome-sculpt-creator-workspace-test --workspace ${CMAKE_CURRENT_BINARY_DIR}/creator-workspace)
+  add_test(NAME creator-source-grid-resolution COMMAND dome-sculpt-creator-workspace-test --resize-source-grid ${CMAKE_CURRENT_BINARY_DIR}/creator-source-grid-resolution)
+  set_tests_properties(creator-source-grid-resolution PROPERTIES TIMEOUT 180)
   set_tests_properties(creator-controls-output creator-workspace PROPERTIES TIMEOUT 900)
 endif()
 

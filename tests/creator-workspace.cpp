@@ -9,6 +9,7 @@
 #include "dome/material-bindings.hpp"
 #include "dome/material-visibility.hpp"
 #include "document-authority.hpp"
+#include "bake-target-resolution.hpp"
 #include "import-controller-driver.hpp"
 #include "cgltf.h"
 #include <nlohmann/json.hpp>
@@ -106,6 +107,69 @@ void controls(const std::filesystem::path&root){
  std::ofstream(root/"creator-control-effects.json")<<evidence.dump(2)<<'\n';
 }
 void ready(Document&d){if(!d.wait_asset(std::chrono::seconds(180))||!d.wait_mesh(std::chrono::seconds(180)))throw std::runtime_error("Creator worker/surface timed out");if(!d.frame().state->error.empty())throw std::runtime_error(d.frame().state->error);}
+void resize_source_grid(const std::filesystem::path &root){
+ for(const char *baseline:{"vroid-beta-female","vroid-beta-male"}){
+  Scene scene;
+  const auto group=append_humanoid(scene,humanoid_baseline_defaults(baseline),"Resize original face",{},256);
+  const auto face=std::find_if(scene.objects().begin(),scene.objects().end(),[&](const auto &part){
+    return part.group==group && part.name.find("Face_00_SKIN")!=std::string::npos;
+  });
+  check(face!=scene.objects().end()&&face->appearance&&face->painted->source_maps(),
+        "Resize fixture has a genuine source-authored VRoid face and its original images");
+  const auto id=face->id;
+  scene.select(id);
+  const auto before=scene.encode();
+  auto denied=scene;
+  auto small=detail::bake_target_resolution_limits();
+  small.maximum_bytes=1;
+  check(refuses([&]{detail::resize_unpainted_bake_target(denied,id,1024,small);})&&denied.encode()==before,
+        "Insufficient prospective raster memory refuses without changing the complete source scene");
+
+  Document doc;
+  doc.replace(scene);
+  ready(doc);
+  check(doc.frame().state->can_resize_bake_target,"An empty source-authored paint grid enables the native resolution control");
+  ImportDriver hand(doc);
+  hand.open();
+  hand.sector(9);
+  hand.sector(1);
+  hand.sector(6);
+  check(doc.frame().state->controls.parameter==VrParameter::TextureResolution,
+        "The XR Materials and Texture Sets pages open the original mesh resolution control");
+  hand.ray(.8f);
+  hand.panel_button(true);
+  const auto file=root/(std::string(baseline)+"-face1024.dsculpt");
+  doc.save_async(file).get();
+  ready(doc);
+  const auto after=doc.copy_scene();
+  const auto &current=after.object(id);
+  check(current.painted->resolution()==1024&&current.painted->mesh_owner()==face->painted->mesh_owner()&&
+        current.painted->source_maps()==face->painted->source_maps()&&current.appearance==face->appearance&&
+        current.deformation==face->deformation&&current.material_bindings==face->material_bindings,
+        "The controller changes only the selected native raster while retaining the mesh, images, rig and material");
+  auto original_grid=after;
+  original_grid.object(id).painted=face->painted;
+  check(original_grid.encode()==before&&Scene::load(file).encode()==after.encode(),
+        "The queued Save persists the changed grid and every unrelated source value exactly");
+  check(doc.undo()&&doc.copy_scene().encode()==before&&doc.redo()&&doc.copy_scene().encode()==after.encode(),
+        "Source-authored resolution change admits one exact Undo and Redo");
+
+  auto painted=scene;
+  auto &paint=painted.object(id).painted;
+  paint=paint->snapshot();
+  Brush brush;
+  brush.from=brush.to=paint->mesh().positions.front();
+  brush.radius=2;
+  PaintSettings ink;
+  ink.front_only=false;
+  paint->begin_stroke();
+  paint->stamp(brush,ink);
+  check(paint->end_stroke(),"The protected-grid fixture contains actual artist paint");
+  const auto painted_bytes=painted.encode();
+  check(refuses([&]{detail::resize_unpainted_bake_target(painted,id,1024);})&&painted.encode()==painted_bytes,
+        "The empty-grid route refuses a painted source without discarding artist data");
+ }
+}
 std::atomic_bool gate{false};std::mutex gate_mutex;std::condition_variable changed;bool entered=false,released=false;
 void arm(){std::lock_guard lock(gate_mutex);entered=released=false;gate=true;}
 void await_gate(){std::unique_lock lock(gate_mutex);if(!changed.wait_for(lock,std::chrono::seconds(30),[]{return entered;}))throw std::runtime_error("Creator Save barrier timed out");}
@@ -177,6 +241,7 @@ int main(int argc,char**argv)try{
  const auto root=argc>2?std::filesystem::path(argv[2]):std::filesystem::temp_directory_path()/("creator-workspace-"+std::to_string(getpid()));std::filesystem::create_directories(root);
  if(argc>1&&std::string_view(argv[1])=="--controls")controls(root);
  else if(argc>1&&std::string_view(argv[1])=="--fixture"){authored().save(root/"creator-input.dsculpt");}
+ else if(argc>1&&std::string_view(argv[1])=="--resize-source-grid")resize_source_grid(root);
  else workspace(root);
  std::cout<<"CREATOR CHECKS "<<checks<<'\n';return 0;
 }catch(const std::exception&e){release();std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
