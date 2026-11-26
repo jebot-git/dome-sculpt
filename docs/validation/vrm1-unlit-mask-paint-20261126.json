@@ -26,9 +26,9 @@
       "profile_path": "artifacts/vrm1-unlit-mask-paint-validation-20261126/asan-verified-final",
       "vrm1_expression_checks": 641,
       "mtoon_worker_checks": 45,
-      "mtoon_fault_checks": 2180,
-      "allocation_denial_prefixes": 827,
-      "cancellation_boundaries": 1337,
+      "mtoon_fault_checks": null,
+      "allocation_denial_prefixes": null,
+      "cancellation_boundaries": null,
       "mtoon_other_controls": 16,
       "leak_detection": true,
       "archive_members_verified": 198,
@@ -38,7 +38,8 @@
         "mtoon-mask.log": "98ac0378aae99f5a0362f7c94cb4cf14e40514a96e6a73ff5791ac8b93e3a014",
         "mtoon-faults.log": "0f88104c048b427854978d8d35c18e99a2e885566065327d6d6a2df737e95271",
         "mtoon-control.log": "9178630670eaf688c0826d4736322e8721a969c686129fb898abe8cb0dfa44d7"
-      }
+      },
+      "status": "Native, MToon worker and preflight controls passed. Full MToon sweep still running."
     }
   },
   "portable": {
@@ -219,7 +220,22 @@
   ],
   "evidence": {
     "path": "docs/validation/vrm1-unlit-mask-paint-20261126.tar.gz",
-    "sha256": "7c79266633243b811635a764b913ac77c0cfec5cbfbfa5bd5b10d333d79ca1a1",
+    "sha256": "fab63f3e9c0fa02e9127f9755d20ba249f1c0555db934b660cf4fc9559101c28",
     "local_artifacts": "artifacts/vrm1-unlit-mask-paint-validation-20261126"
-  }
+  },
+  "official_vrm_schemas": {
+    "instances": 25,
+    "errors": 0,
+    "resolver_negative_controls": 2,
+    "spec_revision": "94e82dd346fa6cf0337c4421728640e5252dd38e",
+    "common_gltf_schema_revision": "3cd6f59b277ed7f6540dbabdacc7841a5fdc0ded"
+  },
+  "owning_release": {
+    "unit": "ds-vrm1-mask-combined-release-20261126.service",
+    "invocation": "49daa8a3d0c745babef2cf168ac9427e",
+    "candidate": "e09f2f4bcb9c35198cbb9a6168ae3403a95263ff",
+    "status_path": "artifacts/vrm1-unlit-mask-paint-validation-20261126/combined-release/status.json",
+    "status_at_record": "Configured successfully with canonical DomeD FLTK. Optimized FLTK/OpenXR build active."
+  },
+  "verification_note": "Original main evidence archive recorded the sanitizer fault run before it exited. The corrected receipt keeps that run pending and records the matching Release exit."
 }
