@@ -2089,10 +2089,30 @@ The plain case keeps one mesh, shared skin and morph data. Nested DomeD
 Wayland and synthetic OpenXR on software GL and Intel Arc match the
 native export byte for byte. Khronos reports zero errors for all three
 files and one skinned-node warning on the plain fixture.
-Exact Standard GLB per-field FLOAT packaging, typed texture-set
-materials, alternate emission coordinates, physical headset checks
-and the full integrated regression remain open.
+The following checkpoint adds exact Standard GLB per-field FLOAT packaging.
 [Texture-set Editable HDR validation](validation/native-texture-set-hdr-editable-20261127.json)
+
+### Standard GLB with exact HDR per texture-set material
+
+Package6 maps separate ten-channel FLOAT OpenEXR resources to the actual
+texture-set primitives. The shared PBR compiler supplies each portable
+PNG, emissive strength and measured texel error. Native reopen checks the
+primitive membership, paint coordinates, FLOAT coefficients and portable
+fallback against the preserved native Scene. The tests reject stale
+material plans and rehashed files with wrong coordinates, swapped FLOAT
+resources or omitted visible materials.
+
+Release, ASan/UBSan, nested DomeD Wayland and synthetic OpenXR on software
+GL and Intel Arc write identical files for the visible two-field fixture
+at 64-square per field.
+Native tests also cover distinct plain and retained HDR fields, and a
+texture-set mesh beside standalone HDR. Khronos reports zero errors for
+all four files and one skinned-node warning on each of the two skinned
+fixtures. The corresponding Editable output remains byte-identical.
+Typed MToon sets, alternate source emission coordinates, texture-set HDR
+VRM, production-resolution multi-field budgeting, physical headset checks
+and full integrated regression remain open.
+[Texture-set Standard HDR validation](validation/native-texture-set-hdr-standard-20261127.json)
 
 ## Source and integration boundary
 

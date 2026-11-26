@@ -1,0 +1,117 @@
+{
+  "archive": {
+    "file": "native-texture-set-hdr-standard-20261127.tar.gz",
+    "members": 65,
+    "sha256": "e291db166f9d4270255ebc1a3d415771c91a7832c005119fd62d03925d69c8c0"
+  },
+  "frontends": {
+    "arc": {
+      "app_sha256": "4f52d26dc6dc2e3aac8e4d4e251ec6de85c114bc9edf496febb82699e57f06d3",
+      "checks": 10,
+      "exit": 0,
+      "input_sha256": "90b11c3a756504d5b8b630b106454dd5a62894e93ef6d4f069d7177f05b1b915",
+      "invocation": "b9105be826354442992f2ffbdda55b7b",
+      "mode": "arc",
+      "native_sha256": "0d6330394e1627d84968e3f506252eac4c3faebdabcc926a8a342a4d327ccf53",
+      "phase": "complete",
+      "report_sha256": "3b46ec4f34c68717e31664655377cf419e30e4fe031ad98496288af1fd2535f7",
+      "run_script_sha256": "8acd1aa09712493478daf95679a97dca44d0f9370a38425907934263a129b8ce",
+      "runtime_sha256": "40fa5b55ac329cf6dd77a3bdf5a5eac6f5f840d4ef43efd77678c588538fd8e9",
+      "terminal": true
+    },
+    "software": {
+      "app_sha256": "e72b5e989e682e7133f7a8f114200bc8ab5245527acbfde324f14f63b2dd1919",
+      "checks": 10,
+      "exit": 0,
+      "input_sha256": "90b11c3a756504d5b8b630b106454dd5a62894e93ef6d4f069d7177f05b1b915",
+      "invocation": "16d98a8f28e342ae894a984beff2f350",
+      "mode": "software",
+      "native_sha256": "0d6330394e1627d84968e3f506252eac4c3faebdabcc926a8a342a4d327ccf53",
+      "phase": "complete",
+      "report_sha256": "3b46ec4f34c68717e31664655377cf419e30e4fe031ad98496288af1fd2535f7",
+      "run_script_sha256": "8acd1aa09712493478daf95679a97dca44d0f9370a38425907934263a129b8ce",
+      "runtime_sha256": "bbb5897e8616b8fafdbd9d22a4bba4f06290e278b37782134867d4b4477c1fac",
+      "terminal": true
+    },
+    "wayland": {
+      "app_sha256": "e72b5e989e682e7133f7a8f114200bc8ab5245527acbfde324f14f63b2dd1919",
+      "checks": 7,
+      "compositor_sha256": "47920142c8c803dcf5adb63ba643d2e347fbdcd1e15ecd8bce7c1a8dd47c0b7e",
+      "compositor_source": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+      "exit": 0,
+      "input_sha256": "90b11c3a756504d5b8b630b106454dd5a62894e93ef6d4f069d7177f05b1b915",
+      "invocation": "08db7e0ed62a4bef94aa943049a223dd",
+      "mode": "wayland",
+      "native_sha256": "0d6330394e1627d84968e3f506252eac4c3faebdabcc926a8a342a4d327ccf53",
+      "phase": "complete",
+      "probe_sha256": "5bf11c670f66bbb68960073878933055b09582e5173ec1e3f472b413956c55aa",
+      "report_sha256": "1479f58dde45a6650ec4a86a27bfa78dbff2a7235cf3bac585efc465832f849d",
+      "run_script_sha256": "c25dc6ada0d181cee466312b60871fc9c1ceffb6a0f8420c3143ec668f2644c6",
+      "terminal": true
+    }
+  },
+  "khronos": {
+    "checks/plain/mixed-standard-hdr.glb": {
+      "errors": 0,
+      "report_sha256": "ec38ec5b7b1321225a99cd857255e41dcf2714a4ef052b0ee9b687a140f1180d",
+      "warnings": 1
+    },
+    "checks/plain/standard-texture-set-hdr.glb": {
+      "errors": 0,
+      "report_sha256": "c5f8d6940289ab8ad1539998d4a67ed9ac6bd4807d6c09399d66cb1486d29199",
+      "warnings": 1
+    },
+    "checks/retained/standard-retained-hdr.glb": {
+      "errors": 0,
+      "report_sha256": "ca40b1f48c1d26f15a7f69df16bb33ac9747fa770f411f129888011f8c380ec0",
+      "warnings": 0
+    },
+    "probe/standard.glb": {
+      "errors": 0,
+      "report_sha256": "e8a3ee2d73b1ea8d3b3d1d9100fe986c905932b036b5f1aae386f765d93b2eeb",
+      "warnings": 0
+    }
+  },
+  "open": "Typed MToon texture sets, alternate source emission coordinates, texture-set VRM export, full integrated regression, and physical headset verification remain open.",
+  "product": "51cae87ea246e47615e480f58676be15c9bdad33",
+  "profiles": {
+    "asan-final": {
+      "app_sha256": "4f52d26dc6dc2e3aac8e4d4e251ec6de85c114bc9edf496febb82699e57f06d3",
+      "checks": {
+        "dense_exr_budget": 4,
+        "legacy_hdr": 32,
+        "native_authoring": 28,
+        "plain": 90,
+        "retained_editable": 44,
+        "retained_legacy": 6074,
+        "retained_standard": 50
+      },
+      "files_sha256": {
+        "checks/plain/mixed-standard-hdr.glb": "43e151452c8832bc79e79a1a4fa1e7e20ca22743621eff84c63818c4b419c3cd",
+        "checks/plain/standard-texture-set-hdr.glb": "e2510bfbc601ddb659e3cb07eb4ba88a5270d8de3da27767efe30d933eaea4fd",
+        "checks/retained/standard-retained-hdr.glb": "6a2a4551a3e93a1532a3796466e5295a9334e8ba35817fed9ec6e8f29b261f8a",
+        "probe/standard.glb": "0d6330394e1627d84968e3f506252eac4c3faebdabcc926a8a342a4d327ccf53"
+      }
+    },
+    "release-final": {
+      "app_sha256": "e72b5e989e682e7133f7a8f114200bc8ab5245527acbfde324f14f63b2dd1919",
+      "checks": {
+        "dense_exr_budget": 4,
+        "legacy_hdr": 32,
+        "native_authoring": 28,
+        "plain": 90,
+        "retained_editable": 44,
+        "retained_legacy": 6074,
+        "retained_standard": 50
+      },
+      "files_sha256": {
+        "checks/plain/mixed-standard-hdr.glb": "43e151452c8832bc79e79a1a4fa1e7e20ca22743621eff84c63818c4b419c3cd",
+        "checks/plain/standard-texture-set-hdr.glb": "e2510bfbc601ddb659e3cb07eb4ba88a5270d8de3da27767efe30d933eaea4fd",
+        "checks/retained/standard-retained-hdr.glb": "6a2a4551a3e93a1532a3796466e5295a9334e8ba35817fed9ec6e8f29b261f8a",
+        "probe/standard.glb": "0d6330394e1627d84968e3f506252eac4c3faebdabcc926a8a342a4d327ccf53"
+      }
+    }
+  },
+  "scope": "Standard HDR package6 with exact per-material OpenEXR fields for plain and retained PBR texture sets. Actual membership and paint coordinates, mixed standalone HDR, exact native reopen, and rehashed record refusal.",
+  "source_patch_sha256": "03fd7e722cf299e4da0837f552f99c3bf86cbba70fbbebaa5c955e62bff4989e"
+}

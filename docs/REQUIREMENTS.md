@@ -115,16 +115,18 @@ fixture. Standard HDR GLB now exports this actual 2048-square project using
 bounded FLOAT scanlines and restores its native authoring state byte for byte.
 Editable HDR GLB also exports the actual varying 2048-square project at all
 three portable texture presets. It restores the exact native HDR Bake,
-edited shape, retained paint coordinates and Restore state. Editable GLB
-also exports independent HDR materials for plain and retained PBR texture
-sets, preserving native membership and FLOAT layers. Standard per-field
-HDR packaging, typed texture-set materials and physical headset
-verification remain open.
+edited shape, retained paint coordinates and Restore state. Both GLB
+workers export independent HDR materials for plain and retained PBR
+texture sets, preserving native membership and FLOAT layers. Standard GLB
+also embeds a separate exact FLOAT OpenEXR resource for each material.
+Typed texture-set materials, alternate source emission coordinates,
+texture-set HDR VRM and physical headset verification remain open.
 [Full-resolution writable atlas evidence](validation/native-writable-raster-2048-20261126.json) · [Default AO evidence](validation/default-ao-bake-2048-20261126.json) · [First shapekey evidence](validation/native-writable-first-key-2048-20261126.json) · [Editable GLB evidence](validation/native-editable-glb-2048-20261126.json) · [Physical FLOAT Bake evidence](validation/native-hdr-compact-bake-2048-20261126.json)
 [Shared full-resolution HDR Bake evidence](validation/native-shared-hdr-bake-20261127.json)
 [Standard HDR GLB evidence](validation/native-hdr-standard-streaming-20261127.json)
 [Editable HDR GLB evidence](validation/native-hdr-editable-2048-20261127.json)
 [Texture-set Editable HDR evidence](validation/native-texture-set-hdr-editable-20261127.json)
+[Texture-set Standard HDR evidence](validation/native-texture-set-hdr-standard-20261127.json)
 
 Strict Bake rays now recover source-edge contacts affected by float staging.
 An exact ray hit has priority. A missed ray can use an actual source edge
@@ -219,9 +221,9 @@ sanitizer leak remains in the evidence.
 [Affine-target Bake evidence](validation/affine-target-bake-20261126.json)
 [Prepared retained-target Bake evidence](validation/retained-target-bake-20261126.json)
 Non-HDR retained projects now use the standard GLB worker. Headless
-exports match byte for byte across Release and ASan/UBSan. Native HDR
-retained Bake remains writable and reopenable. Per-field portable HDR
-export is still required.
+exports match byte for byte across Release and ASan/UBSan. Both GLB
+workers now export the qualified plain and retained PBR HDR fields.
+Typed texture-set materials and alternate emission coordinates remain open.
 [Standard GLB and UV archive evidence](validation/retained-target-export-worker-20261126.json)
 [Native retained-target Bake evidence](validation/retained-native-target-bake-20261126.json)
 
