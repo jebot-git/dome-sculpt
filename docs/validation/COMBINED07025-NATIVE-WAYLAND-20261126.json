@@ -1,0 +1,364 @@
+{
+  "scope": "Exact save-qualified07025 Release App native Wayland14 through actual rebuilt canonical DomeD, complete wrapper0 and clean private-worker teardown. Distinct from9e4. Nested diagnostic presentation copy, no physicalHMD/nativeDRM-scanout/full-production acceptance.",
+  "production": "07025cd3995626bd32a9d0a848a2564965583ada",
+  "App_sha256": "ad24e8d91fc977e070e151c844422cb50755c4731d5f829d3431a9e23f98b32d",
+  "compositor_source": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "compositor_sha256": "47920142c8c803dcf5adb63ba643d2e347fbdcd1e15ecd8bce7c1a8dd47c0b7e",
+  "actual_checks": 14,
+  "wrapper_exit": 0,
+  "actual_seconds": 43.69003701210022,
+  "peak_owned_RSS_bytes": 678948864,
+  "actual_App_ELF_certificates": 96,
+  "actual_compositor_ELF_certificates": 95,
+  "input_drift": [],
+  "owned_remaining": [],
+  "signals": [],
+  "lease": {
+    "acquired": 1795664353.9051738,
+    "device": 40,
+    "inode": 99618,
+    "before_any_ldd_or_product": true,
+    "released": 1795664405.7404432
+  },
+  "independent_free": {
+    "time": 1795664455.3585744,
+    "device": 40,
+    "inode": 99618
+  },
+  "unit": "ds-combined07025-native-wayland-v1-20261126.service",
+  "InvocationID": "89faa4e62bee42ba8fb9a31425bac9a8",
+  "canonical_compositor_build_proof": "625507bc",
+  "scenario_cleanup_fix_proof": "862c1c7c",
+  "bounds": {
+    "seconds": 360,
+    "RSS_bytes": 6442450944,
+    "virtual_AS_cap": null
+  },
+  "archive": {
+    "bytes": 578244,
+    "sha256": "ed723370885c12c537164a3e2a9402f27b5e67b6181e5e10023905fe7afe1946",
+    "members": {
+      "actual/plan.json": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/combined-wayland07025-v1/plan.json",
+        "bytes": 1684252,
+        "sha256": "b44a8c424e2fdb0b0973b559247e6d72a9402c1da3e94436ebfc90eac38428c7"
+      },
+      "actual/status.json": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/combined-wayland07025-v1/status.json",
+        "bytes": 159451,
+        "sha256": "00c4b2d40f7b18340efdba5048a66734f87a336cdf9613a557ad1c3f8bcfac6b"
+      },
+      "actual/dome-sculpt.ldd": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/combined-wayland07025-v1/dome-sculpt.ldd",
+        "bytes": 5010,
+        "sha256": "7b05459ead9f71bbf61745f1b74ed962ce046090b15d32c28ac52f46c3e1c088"
+      },
+      "actual/dome-compositor.ldd": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/combined-wayland07025-v1/dome-compositor.ldd",
+        "bytes": 4074,
+        "sha256": "5737e7b4c852ec4ea8714ba11a468ca08475a4688845df5de6c509d71dc9fbbc"
+      },
+      "actual/device-auth-native-wayland.so.ldd": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/combined-wayland07025-v1/device-auth-native-wayland.so.ldd",
+        "bytes": 464,
+        "sha256": "89bdfd903902f1e2d5ad0026647fe693fd121ea1f41f012c2fcfa2bb87921faf"
+      },
+      "actual/process.log": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/combined-wayland07025-v1/process.log",
+        "bytes": 1546,
+        "sha256": "f9adb655d877eebc6720a4402a9641145a82980af9ef2d98e48b24a4243beb69"
+      },
+      "actual/unit-terminal.txt": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/combined-wayland07025-v1/unit-terminal.txt",
+        "bytes": 7165,
+        "sha256": "ece5042b164245f7adc1607e6a455d8e453e18a7cbf0811609b4bc414a20f3f3"
+      },
+      "actual/unit-journal.txt": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/combined-wayland07025-v1/unit-journal.txt",
+        "bytes": 430,
+        "sha256": "1f991554d40bd609d6947f4c319cc85225c766cbb46019b2cd9c54be4418a8b9"
+      },
+      "actual/independent-free.json": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/combined-wayland07025-v1/independent-free.json",
+        "bytes": 67,
+        "sha256": "db2a600c5fa35ad767b535bcbd666aa11e903c259f32062fb7a913fde3294074"
+      },
+      "actual/workflow/xvfb.log": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/combined-wayland07025-v1/workflow/xvfb.log",
+        "bytes": 940,
+        "sha256": "1cdd39c2382a47339473881b0dc0dd011a9f7acd304d5f8200c0e46552dcb0e8"
+      },
+      "actual/workflow/compositor.log": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/combined-wayland07025-v1/workflow/compositor.log",
+        "bytes": 1938,
+        "sha256": "eb72a6b7124d0b9475d79335cd706767a2fac3423c696f1a875802fc96e25c2a"
+      },
+      "actual/workflow/report.json": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/combined-wayland07025-v1/workflow/report.json",
+        "bytes": 2053,
+        "sha256": "6bd20c3c03e3f6bf40afca17657f56c92b17360ea98f700db5c79bdf6b547187"
+      },
+      "actual/workflow/client.log": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/combined-wayland07025-v1/workflow/client.log",
+        "bytes": 559,
+        "sha256": "b05b4e78b95e20966567b15cce3f040b48a4bb931abb41b14ea32dd74372e85f"
+      },
+      "actual/workflow/runtime-maps.json": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/combined-wayland07025-v1/workflow/runtime-maps.json",
+        "bytes": 4921,
+        "sha256": "c55cda1318e775088f10609a3b6c945f875bb70b43bfb4f81683051e58ddeb7a"
+      },
+      "actual/workflow/native-clay-viewport.png": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/combined-wayland07025-v1/workflow/native-clay-viewport.png",
+        "bytes": 17954,
+        "sha256": "8fffdf30aed38bc800d6d0553c9bf6df4ad62598b3cdfd243272430362d289a5"
+      },
+      "actual/workflow/dialog.json": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/combined-wayland07025-v1/workflow/dialog.json",
+        "bytes": 17148,
+        "sha256": "bc2ffad0c94309ef6ca091fb4049f87b4b0d028a04c3428e4c4e6e7f31fb3349"
+      },
+      "actual/workflow/universal-menu.png": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/combined-wayland07025-v1/workflow/universal-menu.png",
+        "bytes": 72462,
+        "sha256": "01664dd4227d944808e48d4a695afa5b72169aec3ee95774f9ef1ae1a3f65831"
+      },
+      "actual/workflow/scene.json": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/combined-wayland07025-v1/workflow/scene.json",
+        "bytes": 16222,
+        "sha256": "91a4558cfb23a22d83925f76a40ee2776551f8872751cac633896a3760ba9474"
+      },
+      "actual/workflow/render.ppm": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/combined-wayland07025-v1/workflow/render.ppm",
+        "bytes": 3072016,
+        "sha256": "0d840831dfe65faaabaea04b0eb3a4ba4bc2e3ba98fed1ea6d999e06f7f8a648"
+      },
+      "actual/workflow/actual-device/egl-query-0/context-maps.txt": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/combined-wayland07025-v1/workflow/actual-device/egl-query-0/context-maps.txt",
+        "bytes": 60768,
+        "sha256": "f7fe6b86704c13a2625218a0eff10fcccbe7cf47e6514c51e570199fb30763f4"
+      },
+      "actual/workflow/actual-device/egl-query-0/device.txt": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/combined-wayland07025-v1/workflow/actual-device/egl-query-0/device.txt",
+        "bytes": 300,
+        "sha256": "d9e3c4f6bb13913d028a1e6f89cfe9892394ff1c9579436307079ed5a9da15a0"
+      },
+      "support/run-combined-wayland07025-v1.py": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/run-combined-wayland07025-v1.py",
+        "bytes": 9151,
+        "sha256": "17eebfcb158a25768f3db4ee715b7faf304c07ab7238a074fb9556a704a3102c"
+      },
+      "support/provider-witness-v4.py": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/provider-witness-v4.py",
+        "bytes": 7114,
+        "sha256": "916b622596825983fcc0290ad4aff222e0608db9c46066a807d23a4fed09622c"
+      },
+      "support/owned-monitor.py": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/owned-monitor.py",
+        "bytes": 4859,
+        "sha256": "b510ef5655e3214bd38e7b5f56022c37a79879070c3733f2dd059bad74f21269"
+      },
+      "support/private-bin-v3/Xvfb": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/private-bin-v3/Xvfb",
+        "bytes": 316,
+        "sha256": "2d4222db83ea4fdc74f6c5216856c65a78500504dc365c9bd3b64bd11a5c28fb"
+      },
+      "support/dome-menu-native-gpu-v2.py": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/wayland-reference/dome-menu-native-gpu-v2.py",
+        "bytes": 27715,
+        "sha256": "b83166247e3829cfc77dde63a68074662b23f1178e7586fdde935cf7a316f04f"
+      },
+      "support/dome-menu-native-gpu-v3.py": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/wayland-reference/dome-menu-native-gpu-v3.py",
+        "bytes": 26714,
+        "sha256": "4c08140fbc3b414991cf49988a592d5f6f7b275ff40c47a57b08fc9ef14487cc"
+      },
+      "support/cleanup-order-v3-preparation.json": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/wayland-reference/cleanup-order-v3-preparation.json",
+        "bytes": 641,
+        "sha256": "7b92952a3d1d06d798ce5e45e39f0176aefafa3c64fdc9c73220fc0106d61b50"
+      },
+      "support/compositor-build-status.json": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/wayland-reference/compositor-build-status.json",
+        "bytes": 907,
+        "sha256": "b39ca8df3736869244534299c602ca3967f04ecb15195edb14f52fbeb8a774bc"
+      },
+      "support/current-compositor-artifact.json": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/wayland-reference/current-compositor-artifact.json",
+        "bytes": 885,
+        "sha256": "0ac378995ba8b5415972e8463511afdb8816e540fc9f0a3885f830f9d7f5c926"
+      },
+      "support/observer-build.json": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/wayland-reference/observer-build.json",
+        "bytes": 1472,
+        "sha256": "fbeb06fc043f77addf76cfde57a96d27439f62bc131224c44446b283583fc5f6"
+      },
+      "App-build/app-build-status.json": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/serialize-sculpt-objects-release-20261126/app-build-status.json",
+        "bytes": 291,
+        "sha256": "3ce368d9472482ce0b4489cee119b09aac556f53a8295809c9230d95be624fee"
+      },
+      "App-build/app-build.log": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/serialize-sculpt-objects-release-20261126/app-build.log",
+        "bytes": 45383,
+        "sha256": "6d3b247938b0fa0621dd2cb78dd9247ae2abd7a939e83cd94df1eaa1b9285e17"
+      },
+      "App-build/build-status.json": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/serialize-sculpt-objects-release-20261126/build-status.json",
+        "bytes": 687,
+        "sha256": "f682f585595bb7eaa19c6f923b1e192cbc282478442cab7f1073433d7e0df232"
+      },
+      "App-build/CMakeCache.txt": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/serialize-sculpt-objects-release-20261126/CMakeCache.txt",
+        "bytes": 57048,
+        "sha256": "133075583aedbb872aec5befb3ea29f8e1f4f47fd7a5cfa0a9a79fc4d3a31cca"
+      },
+      "App-build/build-plan.json": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/serialize-sculpt-objects-release-20261126/build-plan.json",
+        "bytes": 589,
+        "sha256": "089a5be8ec3ebc3fea668240b738783de19ca27dc6ab8b509c49d1e4f6091df1"
+      },
+      "App-build/actual-MDs/appmenu-protocol.c.o.d": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/serialize-sculpt-objects-release-20261126/CMakeFiles/dome-sculpt.dir/appmenu-protocol.c.o.d",
+        "bytes": 2418,
+        "sha256": "1bd744865f2860ae028eac37d0bae89111e213e45865a80d99af91b44d3be987"
+      },
+      "App-build/actual-MDs/link.d": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/serialize-sculpt-objects-release-20261126/CMakeFiles/dome-sculpt.dir/link.d",
+        "bytes": 13095,
+        "sha256": "f709f3000d014c124577a9151d29486d185d85514290ace31c9a8db3c6b1e5ca"
+      },
+      "App-build/actual-MDs/src/native-display-runtime.cpp.o.d": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/serialize-sculpt-objects-release-20261126/CMakeFiles/dome-sculpt.dir/src/native-display-runtime.cpp.o.d",
+        "bytes": 2695,
+        "sha256": "90835ca92d365ce6801e9a55f73ae0b9e8b02ba2aaf3f2d93c7ad2a1361a0330"
+      },
+      "App-build/actual-MDs/src/vrm-expression-editor.cpp.o.d": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/serialize-sculpt-objects-release-20261126/CMakeFiles/dome-sculpt.dir/src/vrm-expression-editor.cpp.o.d",
+        "bytes": 27586,
+        "sha256": "76065da4e79063d0a1d7d63f7873a432f232d1de94a56d6792fcc361999f01e3"
+      },
+      "App-build/actual-MDs/src/projection-editor.cpp.o.d": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/serialize-sculpt-objects-release-20261126/CMakeFiles/dome-sculpt.dir/src/projection-editor.cpp.o.d",
+        "bytes": 28373,
+        "sha256": "4ca8b98cf0c5bdf07875c91948fe2993f710880d94a17aecf71e00e8b5c96736"
+      },
+      "App-build/actual-MDs/src/rig-fit-editor.cpp.o.d": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/serialize-sculpt-objects-release-20261126/CMakeFiles/dome-sculpt.dir/src/rig-fit-editor.cpp.o.d",
+        "bytes": 27765,
+        "sha256": "c69b08acd2d86f213b71e14d18521d0e6325fe0f2e101cf94fef61311738d9ec"
+      },
+      "App-build/actual-MDs/src/spacenav-options.cpp.o.d": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/serialize-sculpt-objects-release-20261126/CMakeFiles/dome-sculpt.dir/src/spacenav-options.cpp.o.d",
+        "bytes": 21226,
+        "sha256": "b66b9dcb642bd0523c26c858d5b7796c154423727592c2e12102f5235cf55640"
+      },
+      "App-build/actual-MDs/src/polygon-editor.cpp.o.d": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/serialize-sculpt-objects-release-20261126/CMakeFiles/dome-sculpt.dir/src/polygon-editor.cpp.o.d",
+        "bytes": 22224,
+        "sha256": "a9dbe549103ffda764512b882d40c3a2212892ae69a4b259d55c76ee8d8e56fe"
+      },
+      "App-build/actual-MDs/src/import-editor.cpp.o.d": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/serialize-sculpt-objects-release-20261126/CMakeFiles/dome-sculpt.dir/src/import-editor.cpp.o.d",
+        "bytes": 21087,
+        "sha256": "973f5ec9c3f10e9005f65f9deb18f3f836c806861406ff3d3fb2181541e9eac8"
+      },
+      "App-build/actual-MDs/src/procedural-editor.cpp.o.d": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/serialize-sculpt-objects-release-20261126/CMakeFiles/dome-sculpt.dir/src/procedural-editor.cpp.o.d",
+        "bytes": 23000,
+        "sha256": "7bbb1963c6bc2cec999cde1040c3e0caff7f3efd3fed5bf686d299d5a30e21c2"
+      },
+      "App-build/actual-MDs/src/resolution-editor.cpp.o.d": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/serialize-sculpt-objects-release-20261126/CMakeFiles/dome-sculpt.dir/src/resolution-editor.cpp.o.d",
+        "bytes": 23330,
+        "sha256": "cba5d458ed821159ed5562bfc0637c3250839f17f83301c8d9cfcf01511c730e"
+      },
+      "App-build/actual-MDs/src/sculpt-editor.cpp.o.d": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/serialize-sculpt-objects-release-20261126/CMakeFiles/dome-sculpt.dir/src/sculpt-editor.cpp.o.d",
+        "bytes": 21541,
+        "sha256": "1a0c9cd9d938ef281d02f6e481dd816b254d96b07555f3a51a6d7ce97ec3f709"
+      },
+      "App-build/actual-MDs/src/creator-editor.cpp.o.d": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/serialize-sculpt-objects-release-20261126/CMakeFiles/dome-sculpt.dir/src/creator-editor.cpp.o.d",
+        "bytes": 27876,
+        "sha256": "34eb92359ae2bffebd5104dd3eed6a85625b38ff7525b92544c2fa4f703160a0"
+      },
+      "App-build/actual-MDs/src/rig-editor.cpp.o.d": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/serialize-sculpt-objects-release-20261126/CMakeFiles/dome-sculpt.dir/src/rig-editor.cpp.o.d",
+        "bytes": 27862,
+        "sha256": "0e336e91e7d0359dbd61d0158cdfb54f85fe9fc4f6b98757658a126c616cd903"
+      },
+      "App-build/actual-MDs/src/shapekey-editor.cpp.o.d": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/serialize-sculpt-objects-release-20261126/CMakeFiles/dome-sculpt.dir/src/shapekey-editor.cpp.o.d",
+        "bytes": 27661,
+        "sha256": "540704f07d5f6885ff1e93e931d90cff0f100d738acffaa3e43546d0281d01a3"
+      },
+      "App-build/actual-MDs/src/weight-editor.cpp.o.d": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/serialize-sculpt-objects-release-20261126/CMakeFiles/dome-sculpt.dir/src/weight-editor.cpp.o.d",
+        "bytes": 27865,
+        "sha256": "cc496abc2f8eef018f5480c43cd922d116d331be46951b41311d8ca8d68a993d"
+      },
+      "App-build/actual-MDs/src/app.cpp.o.d": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/serialize-sculpt-objects-release-20261126/CMakeFiles/dome-sculpt.dir/src/app.cpp.o.d",
+        "bytes": 33793,
+        "sha256": "bfe4572bff5d8682ad90ba67eea558fe7a66550a3c4bb4854a3f23dc3a1c2a8e"
+      },
+      "App-build/actual-MDs/src/skin-editor.cpp.o.d": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/serialize-sculpt-objects-release-20261126/CMakeFiles/dome-sculpt.dir/src/skin-editor.cpp.o.d",
+        "bytes": 28640,
+        "sha256": "9d60bb6f152d9311dd0c214e1b5ee657bb1a98f6b2a7f175084fdfafa162e3ef"
+      },
+      "App-build/actual-MDs/src/mesh-editor.cpp.o.d": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/serialize-sculpt-objects-release-20261126/CMakeFiles/dome-sculpt.dir/src/mesh-editor.cpp.o.d",
+        "bytes": 27650,
+        "sha256": "266562fd5e2e5335fad1ae32451c4e57a3a5eafc7766791962aa96253b9bd2d6"
+      },
+      "App-build/actual-MDs/src/bake-editor.cpp.o.d": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/serialize-sculpt-objects-release-20261126/CMakeFiles/dome-sculpt.dir/src/bake-editor.cpp.o.d",
+        "bytes": 28084,
+        "sha256": "41514d60f013f209908ede137def50a533862260dcfbcf87503c2e25c322531f"
+      },
+      "App-build/actual-MDs/src/texture-set-editor.cpp.o.d": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/serialize-sculpt-objects-release-20261126/CMakeFiles/dome-sculpt.dir/src/texture-set-editor.cpp.o.d",
+        "bytes": 27826,
+        "sha256": "3f0a5a9fa63e0dc98a2fc17243fbd91ff5ffa22712a94b687c5367c7c7a3e479"
+      },
+      "App-build/actual-MDs/src/object-editor.cpp.o.d": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/serialize-sculpt-objects-release-20261126/CMakeFiles/dome-sculpt.dir/src/object-editor.cpp.o.d",
+        "bytes": 28370,
+        "sha256": "5e69083dca21dc69c3d00e618e3d859f6406c97de13927d22d96208b2e614081"
+      },
+      "App-build/actual-MDs/src/paint-editor.cpp.o.d": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/serialize-sculpt-objects-release-20261126/CMakeFiles/dome-sculpt.dir/src/paint-editor.cpp.o.d",
+        "bytes": 27715,
+        "sha256": "5f9bba3892c67b95af5ad94494b8d56dc5c5696f345529fb165acfc5fb048040"
+      },
+      "App-build/actual-MDs/src/ui-conventions.cpp.o.d": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/serialize-sculpt-objects-release-20261126/CMakeFiles/dome-sculpt.dir/src/ui-conventions.cpp.o.d",
+        "bytes": 20523,
+        "sha256": "3116e59e44d9732fa3ddae5cf6ef8d0cb4b902e61ff598f30dc6da606280328a"
+      },
+      "App-build/actual-MDs/src/uv-editor.cpp.o.d": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/serialize-sculpt-objects-release-20261126/CMakeFiles/dome-sculpt.dir/src/uv-editor.cpp.o.d",
+        "bytes": 27755,
+        "sha256": "55e57f51e336465dfdabec1154dca50e15fa6dd2c650079d7f5fbbe84762728e"
+      },
+      "App-build/actual-MDs/src/export-editor.cpp.o.d": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/serialize-sculpt-objects-release-20261126/CMakeFiles/dome-sculpt.dir/src/export-editor.cpp.o.d",
+        "bytes": 27609,
+        "sha256": "cd06867cd6210327fecc0282d6206bb02a0f15c9574585c921a7fcf6900f8930"
+      },
+      "App-build/actual-MDs/src/session-appearance.cpp.o.d": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/serialize-sculpt-objects-release-20261126/CMakeFiles/dome-sculpt.dir/src/session-appearance.cpp.o.d",
+        "bytes": 23543,
+        "sha256": "5e1720800386704e1df50d1037f47c07d3c99a3cba02b621284ed2a558358e69"
+      },
+      "App-build/actual-MDs/third_party/desktop/desktop-menu.cpp.o.d": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/serialize-sculpt-objects-release-20261126/CMakeFiles/dome-sculpt.dir/third_party/desktop/desktop-menu.cpp.o.d",
+        "bytes": 33290,
+        "sha256": "e8ca3ef724fa7e696a2d7c9fd58f4c8d0e34328a7d720a4a5d0023d6d48ce42f"
+      }
+    }
+  },
+  "remaining": "Exact07025 public XR accept/cancel/focus with genuine current05 fidelity/ordinary reopen is separate next stage. Framing remediation and full production goals remain outstanding."
+}
