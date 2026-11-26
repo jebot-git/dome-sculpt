@@ -880,6 +880,7 @@ void Document::replace_locked(Scene next,bool clean,std::filesystem::path adopte
   Transaction transaction(*this);
   if(next_content_==UINT64_MAX)throw std::overflow_error("Document history identity exhausted");
   scene_=std::move(next);
+  initial_creator_={}; // Opening/replacing even identical bytes is an existing workspace.
   state_.selection_mode=state_.selection_focus=state_.hierarchy_open=state_.hierarchy_anchored=false;
   state_.selected_objects.clear();state_.collapsed_groups.clear();state_.selection_hover={};
   state_.selection_pressed={true,true};state_.selection_release={true,true};
@@ -904,7 +905,11 @@ void Document::seed() {
   b.blend = 0;
   next.stamp(b);
   next.end_stroke();
-  replace(std::move(next));
+  Scene scene;scene.active().volume=std::make_shared<Volume>(std::move(next));
+  scene.validate(); // Preserve the original replace(Scene) admission before locking.
+  std::lock_guard lock(model_mutex_);
+  replace_locked(std::move(scene),true);
+  initial_creator_={state_.generation,content_};
 }
 bool Document::begin_desktop() {
   std::lock_guard lock(model_mutex_);
@@ -1393,6 +1398,7 @@ void Document::rebase_space(std::optional<CanvasTransform> old_from_new) {
   rebase_space_locked(old_from_new,admission);publish_locked();admission.commit();
 }
 void Document::rebase_space_locked(std::optional<CanvasTransform> old_from_new,RetopoInputScope &admission) {
+  if(initial_creator_.seen_focused)cancel_initial_creator_fit_locked();
   if (!desktop_) {
     if(state_.creator)end_humanoid_creator_locked(false);
     if(state_.expressions)end_expression_preview_locked(false);
@@ -1404,6 +1410,7 @@ void Document::rebase_space_locked(std::optional<CanvasTransform> old_from_new,R
   navigation_.reset();object_navigation_.reset();
   state_.hands = detail::history_only_hands(state_.hands);
   ++state_.input_epoch;
+  if(!initial_creator_.seen_focused&&initial_creator_.target_group)initial_creator_.target_input_epoch=state_.input_epoch;
   if(admission.active())admission.retire_inputs();
   else {
     std::lock_guard queue_lock(input_mutex_);
@@ -1427,6 +1434,7 @@ void Document::finish_spatial() {
   if (!wait_input())
     throw std::runtime_error("Spatial edit worker did not finish");
   std::lock_guard lock(model_mutex_);
+  if(initial_creator_.seen_focused)cancel_initial_creator_fit_locked();
   RetopoInputScope admission(*this,bool(state_.retopology)||(input_.menu_open()&&input_.menu_page()==16));
   if (!desktop_) {
     if(state_.creator)end_humanoid_creator_locked(false);
@@ -1452,6 +1460,9 @@ void Document::process_locked(const SpatialFrame &incoming) {
     if(f.hands[i].tracked.trigger<=.02f)state_.selection_release[i]=false;
     else f.hands[i].tracked.trigger=0;
   }
+  const bool focused_presentation=f.focused&&f.head_valid&&ob::finite(f.head)&&std::isfinite(f.time)&&f.time>=0;
+  if(focused_presentation&&f.views)initial_creator_.seen_focused=true;
+  if(!focused_presentation&&initial_creator_.seen_focused)cancel_initial_creator_fit_locked();
   if(state_.creator&&(!f.focused||!f.head_valid||!ob::finite(f.head)||!std::isfinite(f.time)||f.time<0)){state_.hands=detail::history_only_hands(state_.hands);end_humanoid_creator_locked(false);return;}
   if(process_rig_fit_spatial_locked(f)){return;}
   if(process_projection_spatial_locked(f)){return;}
@@ -1516,6 +1527,7 @@ void Document::process_locked(const SpatialFrame &incoming) {
       state_.canvas = *transform;
     }
     if (navigation_.grabbing()) {
+      initial_creator_.navigated=true;cancel_initial_creator_fit_locked();
       input_.cancel();
       state_.hands = f.hands;
       publish_locked();
@@ -1660,7 +1672,7 @@ void Document::process_locked(const SpatialFrame &incoming) {
   // fallible publication must not report failure after accepting its file job.
   // Independent history buttons in this same frame still need normal handling.
   if(!import_published || undo_requested || redo_requested)
-    publish_locked();
+    if(!fit_initial_creator_locked(f))publish_locked();
 
 }
 void Document::cancel_spatial_menu() {
@@ -3943,6 +3955,15 @@ void Document::file_loop() {
           state_.error.clear();state_.message=job->operation_label+" complete";
           if(job->operation_report&&!job->operation_report->empty())state_.message+=" | "+*job->operation_report;
           publish_locked(changed,false);transaction.commit();asset_work_.store({});
+          // Presentation only: the ordered operation authenticates the accepted
+          // new group. The input worker waits for this exact published mesh.
+          if(initial_creator_.pending==job->work&&job->work){
+            initial_creator_.pending.reset();
+            if(!initial_creator_.navigated&&initial_creator_.generation==job->generation&&initial_creator_.content==job->content){
+              initial_creator_.target_generation=state_.generation;initial_creator_.target_revision=state_.revision;
+              initial_creator_.target_content=content_;initial_creator_.target_group=scene_.active().group;initial_creator_.target_input_epoch=state_.input_epoch;
+            }
+          }
           if(accepted_result) {
             accepted_result->revision=state_.revision;accepted_result->content=content_;
             job->work->completed=std::move(accepted_result);

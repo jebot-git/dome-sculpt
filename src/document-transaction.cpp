@@ -6,7 +6,7 @@ Document::Transaction::Transaction(Document &d):d_(d),before_(d.scene_),state_(d
     control_before_(d.control_before_),bound_(d.bound_volume_),source_(d.native_source_scene_),
     path_(d.path_),recovery_source_(d.recovery_source_),volume_(d.last_volume_),paint_(d.last_paint_),
     content_(d.content_),next_(d.next_content_),saved_(d.saved_content_),recovery_(d.recovery_content_),rig_(d.rig_object_),
-    desktop_(d.desktop_),anchored_(d.anchored_),control_changed_(d.control_changed_),uv_accept_(d.uv_accept_pending_),uv_solving_(d.uv_solving_),control_source_(d.control_source_),import_settings_(d.import_settings_),import_view_(d.import_view_),import_source_(d.import_source_),import_request_(d.import_request_.load()),projection_load_(d.projection_load_),projection_request_(d.projection_request_.load()),work_(d.asset_work_.load()),native_(d.native_stroke_),held_affine_(d.held_affine_),held_start_(d.held_start_transform_),held_preview_(d.held_preview_transform_),object_navigation_(d.object_navigation_) {
+    desktop_(d.desktop_),anchored_(d.anchored_),control_changed_(d.control_changed_),uv_accept_(d.uv_accept_pending_),uv_solving_(d.uv_solving_),control_source_(d.control_source_),import_settings_(d.import_settings_),import_view_(d.import_view_),import_source_(d.import_source_),import_request_(d.import_request_.load()),projection_load_(d.projection_load_),projection_request_(d.projection_request_.load()),work_(d.asset_work_.load()),native_(d.native_stroke_),held_affine_(d.held_affine_),held_start_(d.held_start_transform_),held_preview_(d.held_preview_transform_),object_navigation_(d.object_navigation_),initial_creator_(d.initial_creator_) {
     if(d.transaction_)throw std::logic_error("Nested document transaction");
     d.transaction_=this;
   }
@@ -60,6 +60,6 @@ Document::Transaction::~Transaction() noexcept {
     d_.path_=std::move(path_);d_.recovery_source_=std::move(recovery_source_);
     d_.last_volume_=volume_;d_.last_paint_=paint_;d_.content_=content_;d_.next_content_=next_;
     d_.saved_content_=saved_;d_.recovery_content_=recovery_;d_.rig_object_=rig_;
-    d_.desktop_=desktop_;d_.anchored_=anchored_;d_.transaction_=nullptr;
+    d_.desktop_=desktop_;d_.anchored_=anchored_;d_.initial_creator_=std::move(initial_creator_);d_.transaction_=nullptr;
   }
 }
