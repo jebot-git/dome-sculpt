@@ -363,12 +363,23 @@ still reproduce and require separate image and paint sampling. Read
 
 Combined candidate `25632dd3` adds that mapped bake to the separately
 qualified HDR channel reuse, five sculpt regression fixtures and first-open
-creator framing. Its fresh optimized App build and 21 selected native and
-software renderer cases are running in
-`ds-production-mapped-hdr-creator-20261126.service`. The smaller mapped
-candidate passes all three selected strict sanitizer cases and reproduces the
-three original identity-case GLBs byte for byte. Each result belongs to its
-own source revision.
+creator framing. Its fresh optimized App build and all 21 selected native
+and software cases pass. A separate default-allocator run passes all 167
+full sculpt checks in 83.91 seconds at 3,820,740,608 bytes peak owned RSS,
+within the original 4 GiB limit. The smaller mapped candidate passes all
+three selected strict sanitizer cases and reproduces the three original
+identity-case GLBs byte for byte.
+
+Candidate `08936bd8` retains original PBR and MToon emission images separately
+from source paint. Both original-image regression cases now pass, including
+missing-role refusals, native replay and ordered history. The separate image
+and paint GLB passes the focused export and forged-map checks. Both renderers
+pass linear, nearest and rotated MToon cases in software and on Intel Arc.
+The strict native and corrected software renderer cases pass with leak detection.
+The wider 86-case run for this exact source includes all 65 earlier failures
+or dependency skips and is live in
+`ds-production-original-hdr-regressions-20261126.service`. Read
+[the original image result](ORIGINAL-IMAGE-EMISSION-20261126.md).
 
 ## Source and integration boundary
 

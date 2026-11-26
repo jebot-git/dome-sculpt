@@ -1,0 +1,562 @@
+{
+  "combined_previous": {
+    "source": "25632dd3",
+    "cases": [
+      {
+        "name": "source-joint-writable-normal-bake",
+        "classname": "source-joint-writable-normal-bake",
+        "time": "11.8861",
+        "status": "run"
+      },
+      {
+        "name": "mapped-emission",
+        "classname": "mapped-emission",
+        "time": "0.0997062",
+        "status": "run"
+      },
+      {
+        "name": "color-projection-channel-reuse",
+        "classname": "color-projection-channel-reuse",
+        "time": "0.0408717",
+        "status": "run"
+      },
+      {
+        "name": "texture-set-bake-recipe",
+        "classname": "texture-set-bake-recipe",
+        "time": "0.0188268",
+        "status": "run"
+      },
+      {
+        "name": "source-hdr-provenance-closure-seed",
+        "classname": "source-hdr-provenance-closure-seed",
+        "time": "157.146",
+        "status": "run"
+      },
+      {
+        "name": "source-hdr-legacy-context-setup",
+        "classname": "source-hdr-legacy-context-setup",
+        "time": "0.0518363",
+        "status": "run"
+      },
+      {
+        "name": "source-hdr-provenance-closure",
+        "classname": "source-hdr-provenance-closure",
+        "time": "1.84194",
+        "status": "run"
+      },
+      {
+        "name": "source-owning-hdr-export",
+        "classname": "source-owning-hdr-export",
+        "time": "11.1089",
+        "status": "run"
+      },
+      {
+        "name": "cut-authoring",
+        "classname": "cut-authoring",
+        "time": "1.35681",
+        "status": "run"
+      },
+      {
+        "name": "source-owning-hdr-render",
+        "classname": "source-owning-hdr-render",
+        "time": "9.41271",
+        "status": "run"
+      },
+      {
+        "name": "source-mapped-hdr-render",
+        "classname": "source-mapped-hdr-render",
+        "time": "0.718567",
+        "status": "run"
+      },
+      {
+        "name": "cut-cancellation-boundaries",
+        "classname": "cut-cancellation-boundaries",
+        "time": "0.317557",
+        "status": "run"
+      },
+      {
+        "name": "authenticated-local-surface",
+        "classname": "authenticated-local-surface",
+        "time": "1.01941",
+        "status": "run"
+      },
+      {
+        "name": "native-paged-ray-cancellation",
+        "classname": "native-paged-ray-cancellation",
+        "time": "16.496",
+        "status": "run"
+      },
+      {
+        "name": "object-selection",
+        "classname": "object-selection",
+        "time": "0.054748",
+        "status": "run"
+      },
+      {
+        "name": "object-isolation",
+        "classname": "object-isolation",
+        "time": "0.0359578",
+        "status": "run"
+      },
+      {
+        "name": "projection-native",
+        "classname": "projection-native",
+        "time": "0.235848",
+        "status": "run"
+      },
+      {
+        "name": "modal-selection-controls",
+        "classname": "modal-selection-controls",
+        "time": "1.13816",
+        "status": "run"
+      },
+      {
+        "name": "creator-initial-verifier",
+        "classname": "creator-initial-verifier",
+        "time": "13.6527",
+        "status": "run"
+      },
+      {
+        "name": "creator-initial-framing",
+        "classname": "creator-initial-framing",
+        "time": "20.4646",
+        "status": "run"
+      },
+      {
+        "name": "creator-workspace",
+        "classname": "creator-workspace",
+        "time": "7.87862",
+        "status": "run"
+      }
+    ],
+    "exit": 0,
+    "ctest_log": {
+      "path": "artifacts/production-mapped-hdr-creator-release-20261126/native-and-software.log",
+      "sha256": "e5e03733630fe0b941700181d8a163faefbd827fa2e8c0c8b3d63dc75880ea04",
+      "bytes": 92172
+    },
+    "ctest_xml": {
+      "path": "artifacts/production-mapped-hdr-creator-release-20261126/native-and-software.xml",
+      "sha256": "0a2ecc60f206f10df208173b8f0cf2060bcc976126eab588c7512356315a0b9e",
+      "bytes": 21734
+    },
+    "sculpt": {
+      "seconds": 83.91267418861389,
+      "exit": 0,
+      "signals": [],
+      "peak_owned_RSS_bytes": 3820740608,
+      "check_passed": true
+    },
+    "sculpt_check_count": 167,
+    "sculpt_log": {
+      "path": "artifacts/production-mapped-hdr-creator-release-20261126/full-sculpt/sculpt.log",
+      "sha256": "3fea6c88b6383a4d9cd57f519a99b4fe98bca303e564517d28bdebd81c6f71a6",
+      "bytes": 381
+    },
+    "sculpt_status": {
+      "path": "artifacts/production-mapped-hdr-creator-release-20261126/full-sculpt/status.json",
+      "sha256": "b69f9058938ed349e2df68c7b2f034cca02e3ec95467487b631686bd9336428d",
+      "bytes": 901
+    },
+    "native_roundtrip_files": [
+      {
+        "path": "artifacts/production-mapped-hdr-creator-release-20261126/full-sculpt/projects/accepted.dsculpt",
+        "sha256": "d32c725a02d3d9291f3208c879f78ecc343c33511de9e10b5c18d93bb95fd694",
+        "bytes": 50061799
+      },
+      {
+        "path": "artifacts/production-mapped-hdr-creator-release-20261126/full-sculpt/projects/recovery/0fdde97a5c35b8d60aad9aaec92048eb-7e8e6b40c6c51e23c6b7e66a4c3c5955.dsculpt",
+        "sha256": "d32c725a02d3d9291f3208c879f78ecc343c33511de9e10b5c18d93bb95fd694",
+        "bytes": 50061799
+      },
+      {
+        "path": "artifacts/production-mapped-hdr-creator-release-20261126/full-sculpt/projects/recovery/4ba3626b977d156d71aa78fc539ddbfa-523e7e6a00cd85aa5e9595693800c42f.dsculpt",
+        "sha256": "d32c725a02d3d9291f3208c879f78ecc343c33511de9e10b5c18d93bb95fd694",
+        "bytes": 50061799
+      }
+    ],
+    "e375_native_files": [
+      {
+        "path": "artifacts/production-cold-sculpt-projection-release-20261126/native/sculpt/accepted.dsculpt",
+        "sha256": "d32c725a02d3d9291f3208c879f78ecc343c33511de9e10b5c18d93bb95fd694",
+        "bytes": 50061799
+      },
+      {
+        "path": "artifacts/production-cold-sculpt-projection-release-20261126/native/sculpt/recovery/56e24a86f1959959149acec8d0d4a8c7-eed6a0b13bbd327ea62de0a5094e16b5.dsculpt",
+        "sha256": "d32c725a02d3d9291f3208c879f78ecc343c33511de9e10b5c18d93bb95fd694",
+        "bytes": 50061799
+      },
+      {
+        "path": "artifacts/production-cold-sculpt-projection-release-20261126/native/sculpt/recovery/66742d2cc8a581eb6cb7cddf481ab89e-9fe0cf2001b13e2f5a4d429d4c011465.dsculpt",
+        "sha256": "d32c725a02d3d9291f3208c879f78ecc343c33511de9e10b5c18d93bb95fd694",
+        "bytes": 50061799
+      }
+    ]
+  },
+  "owning_render": {
+    "source": "08936bd89c0d15cf865b96af74c2a4184b4c4508",
+    "base": "7376276268086d9b75fba3ff946caca43a7ca40a",
+    "mode": "release",
+    "core_sha256": "e1a5a19b2645cce5d98d925c3f0bb9e20442df8f1f6a974c66c541ecb593731d",
+    "base_render_sha256": "ce2ef9137e96134ddcfe1ee6d2ef2f94b33bffcf0121d85dcb6e55fa69851f76",
+    "render_sha256": "269764cb465948cee52db4b47287db85458174cb6f20e2568eeeee06d1c7ba44",
+    "render_members": [
+      "render.cpp.o",
+      "palette.cpp.o",
+      "palette-text.cpp.o",
+      "polygon-render.cpp.o"
+    ],
+    "new_owner": "src/render.cpp",
+    "object_sha256": "025383db78ce379c071f9cfd63b504ed705b4ce943ef7e0d461b9743de66303a",
+    "targets": {
+      "dome-sculpt-source-owning-hdr-render-test": "ee9fbf35a91a103ac91e3894f77ed0ae146d5cea09fe9b46ccd3a80ef35c0e94",
+      "dome-sculpt": "9f2f7e23f43e24bd4f1168fafe3217c71879e8efd616000d0da2dbdce0948b1e"
+    },
+    "exit": 0
+  },
+  "native": {
+    "base": "73762762",
+    "cases": [
+      {
+        "name": "mapped-emission",
+        "classname": "mapped-emission",
+        "time": "0.107006",
+        "status": "run"
+      },
+      {
+        "name": "independent-emission-image",
+        "classname": "independent-emission-image",
+        "time": "0.150193",
+        "status": "run"
+      },
+      {
+        "name": "source-role-domain-emission",
+        "classname": "source-role-domain-emission",
+        "time": "0.0399088",
+        "status": "run"
+      },
+      {
+        "name": "source-role-missing-uv1",
+        "classname": "source-role-missing-uv1",
+        "time": "0.141213",
+        "status": "run"
+      }
+    ],
+    "checks": {
+      "mapped-emission": 20,
+      "independent-emission-image": 23,
+      "source-role-domain-emission": 21,
+      "source-role-missing-uv1": 62
+    },
+    "small_image_probe_count_each": 3969,
+    "small_image_maximum_error": 2.38419e-07,
+    "analytical_raw_role_probe_count": 2048,
+    "analytical_raw_role_maximum_error": 1.19209e-07,
+    "old_uv1_worker_checks": 180375,
+    "historical_scene43_checks": 22
+  },
+  "software": {
+    "exit": 0,
+    "device": "llvmpipe",
+    "cases": [
+      {
+        "source_texture_error": 0.0,
+        "maximum_rgb_error": 1,
+        "checks": 4422
+      },
+      {
+        "source_texture_error": 0.0,
+        "maximum_rgb_error": 1,
+        "checks": 4423
+      },
+      {
+        "source_texture_error": 0.0,
+        "maximum_rgb_error": 1,
+        "checks": 4425
+      },
+      {
+        "source_texture_error": 0.0,
+        "maximum_rgb_error": 1,
+        "checks": 4425
+      },
+      {
+        "source_texture_error": 0.0,
+        "maximum_rgb_error": 1,
+        "checks": 4425
+      }
+    ]
+  },
+  "arc": {
+    "exit": 0,
+    "device": "Intel Arc A770",
+    "render_node": "/dev/dri/renderD129",
+    "pci": "0000:03:00.0",
+    "driver": "i915",
+    "cases": [
+      {
+        "source_texture_error": 0.0,
+        "maximum_rgb_error": 1,
+        "checks": 4425
+      },
+      {
+        "source_texture_error": 0.0,
+        "maximum_rgb_error": 1,
+        "checks": 4425
+      },
+      {
+        "source_texture_error": 0.0,
+        "maximum_rgb_error": 1,
+        "checks": 4425
+      }
+    ]
+  },
+  "historical_package": {
+    "checks": 16400,
+    "outputs": [
+      {
+        "path": "artifacts/retained-emission-image-release-20261126/identity-export/retained-source-current.glb",
+        "sha256": "71cb35054a4d97e1917657d31d2fce658e033576f92b4ac9f1b12f17e520c051",
+        "bytes": 10575548
+      },
+      {
+        "path": "artifacts/retained-emission-image-release-20261126/identity-export/second.glb",
+        "sha256": "71cb35054a4d97e1917657d31d2fce658e033576f92b4ac9f1b12f17e520c051",
+        "bytes": 10575548
+      },
+      {
+        "path": "artifacts/retained-emission-image-release-20261126/identity-export/worker.glb",
+        "sha256": "71cb35054a4d97e1917657d31d2fce658e033576f92b4ac9f1b12f17e520c051",
+        "bytes": 10575548
+      }
+    ],
+    "earlier_regression_export": {
+      "path": "artifacts/production-full-regression-release-20261126/source-owning-hdr-export/worker.glb",
+      "sha256": "71cb35054a4d97e1917657d31d2fce658e033576f92b4ac9f1b12f17e520c051",
+      "bytes": 10575548
+    }
+  },
+  "first_attempts": {
+    "fixture_transform": "Invalid duplicate role transform rejected by SourceMaterialBindings::validate",
+    "signed_edge": "Corrected typed fixture reached renderer; max RGB error 54 while independent CPU source samples agreed. Negative GLSL remainder addressed in 08936bd8.",
+    "negative_files": [
+      {
+        "path": "artifacts/retained-emission-image-release-20261126/native-and-software-first.log",
+        "sha256": "83ca1637416e065b69f7218a0cf7a1436a3282cb931a06c853a9d8d401db71ec",
+        "bytes": 10380
+      },
+      {
+        "path": "artifacts/retained-emission-image-release-20261126/native-and-software.log",
+        "sha256": "dc2989160927725f131f4788b0277d43f3f8938694500acfcc79f1e50f7a43bf",
+        "bytes": 10689
+      },
+      {
+        "path": "artifacts/retained-emission-image-release-20261126/graphics-arc.log",
+        "sha256": "ce35ae8635dba84f4b49b21537da34ebde123afa9810c71ff27ac79ea40cc2b7",
+        "bytes": 1086
+      },
+      {
+        "path": "artifacts/retained-emission-image-release-20261126/typed-diag/result.log",
+        "sha256": "05cfe80ff2a18b69f6aaa858532f856196c760f2bbc9c3d5d481b24ff871127e",
+        "bytes": 13737
+      },
+      {
+        "path": "artifacts/retained-emission-image-release-20261126/typed-diag/rgb.log",
+        "sha256": "bdecd90a3fd6fd5db9ee592f312a42fadf424155597c29912609494aa09fd949",
+        "bytes": 2231
+      }
+    ]
+  },
+  "khronos": {
+    "validatorVersion": "2.0.0-dev.3.10",
+    "issues": {
+      "numErrors": 0,
+      "numWarnings": 1,
+      "numInfos": 4,
+      "numHints": 0,
+      "messages": [
+        {
+          "code": "MESH_PRIMITIVE_GENERATED_TANGENT_SPACE",
+          "message": "Material requires a tangent space but the mesh primitive does not provide it. Runtime-generated tangent space may be non-portable across implementations.",
+          "severity": 1,
+          "pointer": "/meshes/0/primitives/0/material"
+        },
+        {
+          "code": "UNUSED_OBJECT",
+          "message": "This object may be unused.",
+          "severity": 2,
+          "pointer": "/bufferViews/9"
+        },
+        {
+          "code": "UNUSED_OBJECT",
+          "message": "This object may be unused.",
+          "severity": 2,
+          "pointer": "/bufferViews/10"
+        },
+        {
+          "code": "UNUSED_OBJECT",
+          "message": "This object may be unused.",
+          "severity": 2,
+          "pointer": "/bufferViews/11"
+        },
+        {
+          "code": "UNUSED_OBJECT",
+          "message": "This object may be unused.",
+          "severity": 2,
+          "pointer": "/textures/3"
+        }
+      ],
+      "truncated": false
+    }
+  },
+  "artifacts": [
+    {
+      "path": "artifacts/retained-emission-image-release-20261126/build.log",
+      "sha256": "dbcb6b5fae785fe7fd86b224d95142d9033fe888dae4a483c71dfefd849b7181",
+      "bytes": 470709
+    },
+    {
+      "path": "artifacts/retained-emission-image-release-20261126/build-final.log",
+      "sha256": "43b5e3771e5ca4232db8c52e19d4e0f2d8f672477eb3823d6496ff85d02ef2ba",
+      "bytes": 7692
+    },
+    {
+      "path": "artifacts/retained-emission-image-release-20261126/baked-emission-uv1-worker/pbr-quarter/accepted.dsculpt",
+      "sha256": "7c4feeaf647337910c791353ab4aaeb7d133592fb8b846b5e27a12dc8d2a191d",
+      "bytes": 775417
+    },
+    {
+      "path": "artifacts/retained-emission-image-release-20261126/uv1-worker.log",
+      "sha256": "8c933ff0e119815acd7799b71ec4c2873f0c27d252a3a97ec0ef02d9cb4540c8",
+      "bytes": 1693
+    },
+    {
+      "path": "artifacts/retained-emission-image-release-20261126/uv1-worker.xml",
+      "sha256": "556564fb36703521c7ec902a83ee19ddce4bc331a317dfd7d5545b8b1d60a421",
+      "bytes": 786
+    },
+    {
+      "path": "artifacts/retained-emission-image-release-20261126/native-and-software.xml",
+      "sha256": "61456034acd368ae423d3f1dbdd80838be2e7291bdfad0f96072e67df6a5f64b",
+      "bytes": 5555
+    },
+    {
+      "path": "artifacts/retained-emission-image-release-20261126/historical-identity.log",
+      "sha256": "258421e3ae6e0d1c07cbc812415a64efbac2f33df8350e7deb090a22944daee5",
+      "bytes": 404
+    },
+    {
+      "path": "artifacts/retained-emission-image-release-20261126/identity-export.log",
+      "sha256": "17d4fac9d42415bb3077087184e557f3d8827222e0b79eeb01a9f805d2f93675",
+      "bytes": 425
+    },
+    {
+      "path": "artifacts/retained-emission-image-release-20261126/independent-emission-image/mapped.dsculpt",
+      "sha256": "602f53c75a836a34f8c4cabb15b9f21c6586ebef3363e18bde9e63790e1190a1",
+      "bytes": 562787
+    },
+    {
+      "path": "artifacts/retained-emission-image-release-20261126/independent-emission-image/mapped.glb",
+      "sha256": "c516991306b13a10b3c3d4d792365f619abba52e3ed92eb67c09b7c42ffeb12a",
+      "bytes": 714808
+    },
+    {
+      "path": "artifacts/retained-emission-image-release-20261126/khronos-image.json",
+      "sha256": "90b2225bffdc917db952a6473b568cfdc7e0bec88a26f03e539d0e5f89f29975",
+      "bytes": 3384
+    },
+    {
+      "path": "artifacts/retained-emission-image-wrap-release-20261126/render.cpp.o.d",
+      "sha256": "5bc1f1af9ca6ba63d3935c4f3529e45ecadf040a3b27cba37900789eff4f4e49",
+      "bytes": 29178
+    },
+    {
+      "path": "artifacts/retained-emission-image-wrap-release-20261126/build-status.json",
+      "sha256": "2703fad42386fc3ea4f127b04b25bf1bb6d9c696300dec009db13fbc3f6a0785",
+      "bytes": 875
+    },
+    {
+      "path": "artifacts/retained-emission-image-wrap-release-20261126/graphics-software.log",
+      "sha256": "c31959b56db1019e49b499496fc91f30806b90597e0246d7eb0a1589741f8fc2",
+      "bytes": 1809
+    },
+    {
+      "path": "artifacts/retained-emission-image-wrap-release-20261126/graphics-arc.log",
+      "sha256": "a41d14d7876b05069d33513086e45b2493993010274d510e3c8588ab64a4b8b1",
+      "bytes": 1176
+    }
+  ],
+  "broader_retest": {
+    "source": "08936bd8",
+    "earlier_failures_or_dependency_skips": 65,
+    "tests_selected_with_neighbors": 86,
+    "invocation": "c30fd3b8af6f42dc9b46868b42cc8c59"
+  },
+  "strict": {
+    "base_build": {
+      "actions": 240,
+      "exit": 0,
+      "source": "73762762",
+      "invocation": "367d718f70d14e6abd98385cba8eed55"
+    },
+    "original_ctest": {
+      "expected_renderer_failure": [
+        "source-hdr-image-mtoon-render"
+      ],
+      "remaining_cases": 9,
+      "exit": 8,
+      "log": {
+        "path": "artifacts/retained-emission-image-strict-20261126/native-and-software.log",
+        "sha256": "74f8c92a5a2b7ebdb5ba58d383879d30d73a40637e9ab9801ccb757e44ce331d",
+        "bytes": 11736
+      },
+      "receipt": {
+        "path": "artifacts/retained-emission-image-strict-20261126/native-and-software.xml",
+        "sha256": "eb7b931c42c60db573ef261f33429b6f5912c7fc335b4b715d61e11e5fd59ace",
+        "bytes": 6137
+      }
+    },
+    "corrected_unit": {
+      "invocation": "938e013a3d85424cabfc5f818cdf5260",
+      "exit": 0,
+      "counts": [
+        4422,
+        4423,
+        4425,
+        4425,
+        4425
+      ],
+      "owning_build": {
+        "source": "08936bd89c0d15cf865b96af74c2a4184b4c4508",
+        "base": "7376276268086d9b75fba3ff946caca43a7ca40a",
+        "mode": "strict",
+        "core_sha256": "55aabf5b61e6598c33632e0ca8f8eb3dfcf4642f93015fef552cebca73ba0f08",
+        "base_render_sha256": "b06d36fe3a64b5d62ed2559340370a2f000a60fc6bdc22b3d1dbd26b885c3bb3",
+        "render_sha256": "a2976313e3bcac79e2a38482ceb78644b77c718f4aa2332256652cc6a30d53b3",
+        "render_members": [
+          "render.cpp.o",
+          "palette.cpp.o",
+          "palette-text.cpp.o",
+          "polygon-render.cpp.o"
+        ],
+        "new_owner": "src/render.cpp",
+        "object_sha256": "e7a030fdddc0543c2c2386f06b8a5dd4db9dce100914737431556d3d3be5075f",
+        "targets": {
+          "dome-sculpt-source-owning-hdr-render-test": "c6ed669a9985fd109b0f71217d3032f67d6dfac23f294b67756292df9bd0a76d"
+        },
+        "exit": 0
+      },
+      "renderer_log": {
+        "path": "artifacts/retained-emission-image-wrap-strict-20261126/graphics-software.log",
+        "sha256": "c31959b56db1019e49b499496fc91f30806b90597e0246d7eb0a1589741f8fc2",
+        "bytes": 1809
+      },
+      "asan": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+      "ubsan": "halt_on_error=1:print_stacktrace=1"
+    },
+    "initial_wrapper": {
+      "invocation": "ec697b1a16d240ca8577453e7206b344",
+      "exit": 127,
+      "reason": "Runner service PATH lacked rg for the final Ninja dry-run confirmation. No corrected test had run."
+    }
+  }
+}
