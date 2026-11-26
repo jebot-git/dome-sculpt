@@ -1,0 +1,124 @@
+{
+  "scope": "Original Release all-target private software run against the frozen combined build. The corrected UV test is a separate replay on the same executable.",
+  "original": {
+    "candidate": "5c977be9be8d90f0a6ada3ef34df9d4d27769209",
+    "terminal": true,
+    "invocation": "14abbae944c848e6a28a860e19314602",
+    "fltk": "/opt/fltk-vr/toolkit",
+    "bitmap": "/opt/fltk-vr/bdf-runtime",
+    "phase": "Full private Release CTest finished",
+    "elapsed_seconds": 6559.343,
+    "cache_sha256": "d7a8a099b260d9f158c7249f9b0a05ab36e9eb05401e589fea8c510da7643897",
+    "focused_arc": {
+      "exit": 0,
+      "checks": 153
+    },
+    "build_exit": 0,
+    "registered": 1360,
+    "app_sha256": "ee0cc1d9a35d94535afce250c6dfe7dd576b1b4472a4ee4d46fd77d1e2bec205",
+    "command": [
+      "bwrap",
+      "--die-with-parent",
+      "--unshare-all",
+      "--ro-bind",
+      "/",
+      "/",
+      "--bind",
+      "/home/blux/de-xr/dome-sculpt/artifacts/combined-atlas-hdr-preview-full-20261126",
+      "/home/blux/de-xr/dome-sculpt/artifacts/combined-atlas-hdr-preview-full-20261126",
+      "--proc",
+      "/proc",
+      "--dev",
+      "/dev",
+      "--tmpfs",
+      "/tmp",
+      "--tmpfs",
+      "/run/user",
+      "--clearenv",
+      "--setenv",
+      "PATH",
+      "/usr/bin:/bin",
+      "--setenv",
+      "HOME",
+      "/home/blux/de-xr/dome-sculpt/artifacts/combined-atlas-hdr-preview-full-20261126/private/home",
+      "--setenv",
+      "XDG_CACHE_HOME",
+      "/home/blux/de-xr/dome-sculpt/artifacts/combined-atlas-hdr-preview-full-20261126/private/cache",
+      "--setenv",
+      "XDG_CONFIG_HOME",
+      "/home/blux/de-xr/dome-sculpt/artifacts/combined-atlas-hdr-preview-full-20261126/private/config",
+      "--setenv",
+      "XDG_DATA_HOME",
+      "/home/blux/de-xr/dome-sculpt/artifacts/combined-atlas-hdr-preview-full-20261126/private/data",
+      "--setenv",
+      "XDG_RUNTIME_DIR",
+      "/home/blux/de-xr/dome-sculpt/artifacts/combined-atlas-hdr-preview-full-20261126/private/runtime",
+      "--setenv",
+      "XDG_STATE_HOME",
+      "/home/blux/de-xr/dome-sculpt/artifacts/combined-atlas-hdr-preview-full-20261126/private/state",
+      "--setenv",
+      "LD_LIBRARY_PATH",
+      "/opt/fltk-vr/toolkit/lib:/opt/fltk-vr/bdf-runtime/lib:/usr/lib64",
+      "--setenv",
+      "LIBGL_ALWAYS_SOFTWARE",
+      "1",
+      "--setenv",
+      "LP_NUM_THREADS",
+      "2",
+      "--setenv",
+      "OPENBLAS_NUM_THREADS",
+      "2",
+      "--setenv",
+      "OMP_NUM_THREADS",
+      "2",
+      "ctest",
+      "--test-dir",
+      "/home/blux/de-xr/dome-sculpt/artifacts/combined-atlas-hdr-preview-full-20261126/build",
+      "-j4",
+      "--output-on-failure",
+      "--output-junit",
+      "/home/blux/de-xr/dome-sculpt/artifacts/combined-atlas-hdr-preview-full-20261126/full.xml"
+    ],
+    "exit": 8,
+    "totals": {
+      "passed": 1359,
+      "failed": 1,
+      "skipped": 0
+    }
+  },
+  "comparison": {
+    "fixed": [
+      "vrm1-normal-faults",
+      "vrm1-shift-faults"
+    ],
+    "regressed": [
+      "native-key-uv-openxr"
+    ],
+    "failed": [
+      "native-key-uv-openxr"
+    ],
+    "skipped": []
+  },
+  "corrected_uv": {
+    "receipt": "native-key-uv-rendered-atlas-20261126.json",
+    "sha256": "d76cdfbe1640aa5f586f4e7075325cc30c4f9a798b77e5247839e0a75f7b9781",
+    "result": {
+      "app_source": "5c977be9be8d90f0a6ada3ef34df9d4d27769209",
+      "app_sha256": "ee0cc1d9a35d94535afce250c6dfe7dd576b1b4472a4ee4d46fd77d1e2bec205",
+      "checks": 26,
+      "rendered_accept_pixels": 212,
+      "report_sha256": "49e3ed1ff42960ae0d5d08fad610c94dd70fe65029fca3835a59a1ab65563ef3"
+    }
+  },
+  "archive": {
+    "file": "combined-atlas-hdr-full-release-20261126.tar.gz",
+    "sha256": "96bc33ad7cfe9e2f9220c6b48fd221f715e8f5cbdde1bac9b77319cf748fa026",
+    "members": {
+      "comparison.json": "9bc22fd51093f664948609e5a710d61e5387647379d2692288f6a92384af9242",
+      "ctest.log": "23b197427c88ea5da74f18fbb1d7794ced54c46b36e9d3d2e0f7696ece525998",
+      "full.xml": "90db9aa98ec2f108db98d6b13b1f5dd9b62acbc20b0140119b4a6559b6131a70",
+      "run.py": "0628c3fefda178cc183859b485615ea1b5ba6fa35516cb5fc203ad339f00427d",
+      "status.json": "3ed0857908ea0101e7bb987f2f3454428f410fdd810a4ea2a67d3b6d874b9abd"
+    }
+  }
+}

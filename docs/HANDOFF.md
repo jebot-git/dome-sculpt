@@ -1001,9 +1001,11 @@ Save and re-export, the 20,320 triangles retain their positions, winding,
 UVs, 60,960 corner normals and materials. The round-trip GLB also passes
 Khronos validation with zero errors and warnings. Integration merge
 `4f083e6e` preserves main's history, the later mapped-emission evidence
-and the exact combined sources, assets, tooling and tests. A clean whole
-Release build and the 1,360-case private run are in progress against the
-combined source. The full-size native HDR history passes eight Release
+and the exact combined sources, assets, tooling and tests. The clean whole
+Release build completed. The private suite recorded 1,359 passes, one
+failure and zero skips across all 1,360 cases. Both previously failing
+VRM1 allocation-fault cases passed. The one UV observer failure and its
+corrected focused replay are recorded below. The full-size native HDR history passes eight Release
 checks, with the ordered save matching the independent Bake capture.
 The exact combined application
 passes all 14 native Wayland checks through the nested canonical DomeD
@@ -1019,6 +1021,7 @@ checks on the frozen combined app and the current active-set app, including
 a changed chart on Apply and exact native bytes after Cancel or focus loss.
 The original full-suite result and the focused replay remain separate.
 [Native XR UV observer evidence](validation/native-key-uv-rendered-atlas-20261126.json)
+[Full Release regression evidence](validation/combined-atlas-hdr-full-release-20261126.json)
 
 The combined ASan/UBSan history run accepts the original Bake, writes the
 exact ordered Save and restores the exact native state through Undo/Redo.
