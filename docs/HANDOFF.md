@@ -1529,6 +1529,31 @@ assertions. The separate combined Release build on frozen `d9ea0716`
 remains active.
 [Full plane-cut Release results](validation/full-release-fadacc00-20261126.json)
 
+### Retained archive depth and normal authoring regressions
+
+The retained ownership walker memoizes each validated owner's longest
+descendant path. Revisiting the owner under a deeper route charges that
+remaining depth against the existing limit. An independent probe uses two
+objects with shared polygon history. The earlier core accepts the graph
+after visiting the shorter route. The revised core reports the depth refusal.
+The archive tests also exercise an in-budget shared graph, an actual cycle
+and byte-identical preservation of an existing project after refused Save.
+
+The prepared-normal regression now uses a genuinely prepared donor with
+a clear target. Matching topology Bake reproduces the non-neutral normal
+field within two RGB8 levels, retains exact source and frame owners, and
+continues through the real UV editor. The VRM1 regression explicitly removes
+base and morph tangents for the generated-frame refusal, and uses a separate
+real authored-tangent asset for the rotated normal UV check. It samples
+independent core and MToon transform coefficients and tests exact native
+archive replay. Static Apply retains fixed editable paint. The mixed moving
+upper-role expression remains guarded during dynamic export. All seven
+selected suites pass in Release and ASan/UBSan with leak detection, with
+five byte-identical output files across the two profiles. Intel Arc passes
+39 normal consumer assertions. Across nine pose and morph combinations
+the independent renderer agrees within one RGB8 level.
+[Retained archive and normal evidence](validation/retained-depth-authoring-20261126.json)
+
 ## Source and integration boundary
 
 - Main now admits product1bc13125 and public fixturef1e193c7 after complete

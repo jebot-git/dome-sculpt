@@ -52,6 +52,13 @@ with zero projection rays and byte-identical Release and sanitizer
 projects. DomeD Wayland and synthetic OpenXR on software GL and Intel Arc
 save identical results. [Matching Bake evidence](validation/matching-bake-20261126.json)
 
+Every route through retained project ownership now counts its longest
+descendant path toward the depth limit, including routes that reuse shared
+source history. Saving a cyclic project preserves the existing file.
+Updated regressions verify rebaking a prepared normal donor and independent
+rotated normal UV arithmetic on real authored VRM1 tangents.
+[Archive and normal authoring evidence](validation/retained-depth-authoring-20261126.json)
+
 Static VRM1 expression preview and Apply now cover original core PBR and
 unlit materials, including independently writable paint and ordered native
 Save. Unpainted PBR export preserves authored tangent frames and original

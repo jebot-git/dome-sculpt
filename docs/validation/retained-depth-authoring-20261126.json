@@ -1,0 +1,140 @@
+{
+  "product": "c9a4b462",
+  "fixture": "b62e42ba1786c02badb0785ed2106473e2eb19b9",
+  "native": {
+    "release": {
+      "candidate": "b62e42ba1786c02badb0785ed2106473e2eb19b9",
+      "profile": "release",
+      "terminal": true,
+      "fltk": "/opt/fltk-vr/toolkit",
+      "invocation": "9d851705853a4810aad3d3b03147e50b",
+      "phase": "complete",
+      "elapsed_seconds": 21.08,
+      "donor": "70b7e6b861b3ca16b416a793d199ed87709f1a08",
+      "exact_product": "b0057eef72621175bdce8d54f79ca49033eb297f",
+      "core_sha256": "223bddc4cd5bd833dc6a87673e4fbcafc5fde9fd96e540bde12e479e2d8dca6d",
+      "app_sha256": "ed6e7d710664e7f02a1c7926328d28223589e2cf63fc1ec6ac437ed7adfa0fc3",
+      "render_sha256": "3ed9bc450ba6c135a17f9336d8462159007c3400a56f85926dd773d72791c53c",
+      "xr_sha256": "1b47a1f80ff7bdcf45ae29300b350a02176ed5f6ae61d98c976c92e6f9d15d4f",
+      "binaries": {
+        "dome-sculpt-normal-preparation-render-test": "6f74a23ee6142ce12a2aefc41f7e548a617ecb4aad3724176cfaee1a391e39c4",
+        "dome-sculpt-normal-preparation-test": "2bd2b19f4427e854feab0ea305a2fd2bc7d08452c7b1039527f4737638287f54",
+        "dome-sculpt-polygon-scene-faults-test": "6138b96c800caff21760831b5dc974fa6e0d14f0ab4cf5752ee3a35dc6469487",
+        "dome-sculpt-polygon-scene-test": "f151ecf0ffb8881bbece05b2d71b2451f92d5ae0d20f260b7a1f701d1151407e",
+        "dome-sculpt-source-prepared-normal-bake-test": "720e9997350507a4972e2b1b543907ac6e6a944cd6548fc28b101bf7da73cdf1",
+        "dome-sculpt-texture-set-bake-recipe-test": "bad11903515bfbc3bee0ad5c0ba6b327b34c049044571d1d6f3793ce5bf8bbf4",
+        "dome-sculpt-vrm1-expressions-test": "5d2dabad6bfcd3111dcc4bfff808c4898eb5ea26b68d2c7c39a53759cf6b71a1"
+      },
+      "exit": 0,
+      "failures": [],
+      "tests": 7,
+      "ctest_sha256": "cf796d441bc9be74cdba372444cf36a130481d546edc3d0d4abe8e6ef3f6cbcd",
+      "junit_sha256": "50e68b7a65eeb7bc9cc3c54e1521246843f204dc44afc666043203e6913f24ca"
+    },
+    "asan": {
+      "candidate": "b62e42ba1786c02badb0785ed2106473e2eb19b9",
+      "profile": "asan",
+      "terminal": true,
+      "fltk": "/home/blux/de-xr/dome-sculpt/artifacts/sdk-20261126/toolkit-sanitize",
+      "invocation": "a4f04d1a7174421ca1b99a7633765f86",
+      "phase": "complete",
+      "elapsed_seconds": 42.68,
+      "donor": "70b7e6b861b3ca16b416a793d199ed87709f1a08",
+      "exact_product": "b0057eef72621175bdce8d54f79ca49033eb297f",
+      "core_sha256": "e336d0e39791037317be5805461cd050daa7f0a5080b79adb2c6a63f3efb4e63",
+      "app_sha256": "73818bc22a97b83dfbc4535595b3d9f07b4a477427599d3f1b3ea0314006ba7c",
+      "render_sha256": "eb7dcb88ae55137e3068e522958259e8344329cd0d7e7dfd7e5d007c9283ce68",
+      "xr_sha256": "85d12e5fc953c235dbec794083cc0488ba453b7a5522ffb66ce69495259a0eca",
+      "binaries": {
+        "dome-sculpt-normal-preparation-render-test": "1b7b778fe1c47fa0ef342d4484359e61b21ae0d3773448cec0174068dcdf8f22",
+        "dome-sculpt-normal-preparation-test": "ef15c546eb94a4c43d77619a0db44e5c1e95388102784b5cdb7584fedb18da57",
+        "dome-sculpt-polygon-scene-faults-test": "eb48b24530c663ed1527610e72d93b6eeeef82de00272114e9f1a4ac1dde4eff",
+        "dome-sculpt-polygon-scene-test": "56061c4f7ac6328f956dcb053f0ef6a27be1015ccf0c7c84ead856fb7e1b8ad0",
+        "dome-sculpt-source-prepared-normal-bake-test": "60accb51e3e51b6dd64c8af3da4a09576080af7705053a008490564e7357ba12",
+        "dome-sculpt-texture-set-bake-recipe-test": "5687632d1de64b09e8dda3deedac2cb9e63a4c05d1b8d331c67c7edab25a43d6",
+        "dome-sculpt-vrm1-expressions-test": "3f5f822aac686be66b7668a17ee3a55cff5557ac1592e46f95ad43ec0770a78f"
+      },
+      "exit": 0,
+      "failures": [],
+      "tests": 7,
+      "ctest_sha256": "d3026fa9df6148216e33b554c610482c05fdaee58351cb9b125328d7ed308b54",
+      "junit_sha256": "dc656ab3f80754b6f5ada0c5146b32b6a603f4a7cf67e27a4855ac21bf83919c"
+    }
+  },
+  "arc_prepared_normal_consumer": {
+    "terminal": true,
+    "invocation": "dcaacd388d404e4ba363e68157e5dbda",
+    "phase": "complete",
+    "candidate": "b62e42ba1786c02badb0785ed2106473e2eb19b9",
+    "application_sha256": "6f74a23ee6142ce12a2aefc41f7e548a617ecb4aad3724176cfaee1a391e39c4",
+    "exit": 0,
+    "checks": 39,
+    "log_sha256": "f7f72e6f53155650fa853bff3ab5cc52be09c16be85bd98acd904f221868e451"
+  },
+  "prior_release_product": "fc4abd9a",
+  "independent_depth_probe": {
+    "baseline": "ACCEPTED",
+    "candidate": "REFUSED Retained source ownership depth exceeds bounds"
+  },
+  "byte_identical_release_sanitizer_files": {
+    "prepared-normal/native.dsculpt": "6cc829876bb237485f7eb03d2923524a099cc527cfc98d89fe9461af14a8373a",
+    "prepared-normal/native.glb": "53891d9c3873e079b4d51c62171c61ec5b10853ece6a2b666d75579f06c67235",
+    "vrm1-expressions/normal-authored.dsculpt": "840cffeba9816444247a4c02f5a1fc0cd921af7a14707fd84d490f5ac9eef3f2",
+    "vrm1-expressions/static.dsculpt": "350940ee1e9ad09face9d1ff34573e07110e232f7e6ce5590e8ddb98cf2ac6c7",
+    "vrm1-expressions/ordered.dsculpt": "350940ee1e9ad09face9d1ff34573e07110e232f7e6ce5590e8ddb98cf2ac6c7"
+  },
+  "combined_at_recording": {
+    "candidate": "d9ea0716855609a2f8121fc4ffa9e652446b771e",
+    "terminal": false,
+    "invocation": "6fd979d1947746539488b79f2c40847a",
+    "toolkit": "/opt/fltk-vr/toolkit",
+    "phase": "run all registered private software CTests",
+    "configure": [
+      "cmake",
+      "-S",
+      "/home/blux/de-xr/dome-sculpt/artifacts/native-grid-combined-source-20261126",
+      "-B",
+      "/home/blux/de-xr/dome-sculpt/artifacts/native-grid-combined-release-20261126/build",
+      "-G",
+      "Ninja",
+      "-DCMAKE_BUILD_TYPE=Release",
+      "-DDOME_COMPUTE_BACKEND=CPU",
+      "-DFLTK_DIR=/opt/fltk-vr/toolkit/share/fltk"
+    ],
+    "elapsed_seconds": 1619.04,
+    "cache_sha256": "9e20ca8d178a4ac14a6fa7c0a43dc62051b444b895598ae02a9bc9bcd78b21be",
+    "app_sha256": "8b021ccdf9861df936cf2e6e8d25638c391805a1b1a43368bc30e09dfb3f7fed",
+    "registered": 1339
+  },
+  "scope": [
+    "A two-root shared polygon history exceeds the existing longest-path quota even after memoization.",
+    "Caller archive cycle/depth errors remain distinct and a rejected native Save preserves prior bytes.",
+    "Native prepared-normal rebake verifies significant non-neutral detail within two RGB8 levels plus exact complete source retention and actual UV workflow.",
+    "Generated VRM1 tangents retain the refusal. Authored base and morph tangent holders retain their real core/MToon transform coefficients through static Apply and native reopen.",
+    "Mixed dynamic expression UV targets coupled to fixed paint remain guarded. Physical XR and complete current product regressions remain open."
+  ],
+  "archive": {
+    "file": "retained-depth-authoring-20261126.tar.gz",
+    "sha256": "5267b1c05c602f87d3d1f2e9cdc75b60937c4dba85d6c881e3a01270acfd707b",
+    "members": {
+      "arc/render.log": "f7f72e6f53155650fa853bff3ab5cc52be09c16be85bd98acd904f221868e451",
+      "arc/status.json": "3a938d16975d3c2540b4abf3a429a751bd1c1e1f13189c92ce3ab094fa441e5d",
+      "asan/authoring-regressions.xml": "dc656ab3f80754b6f5ada0c5146b32b6a603f4a7cf67e27a4855ac21bf83919c",
+      "asan/ctest.log": "d3026fa9df6148216e33b554c610482c05fdaee58351cb9b125328d7ed308b54",
+      "asan/status.json": "7fa82102976acc2ab5d21fb6a70009592bdc0338b41d0dd304d6af577e0637c8",
+      "combined/status.json": "05dbe36c949aae522867b72ee0665eac76964d105062a4568ba8ec610a984dbc",
+      "depth/observations.json": "8044b561c6d7406bd67a4502602bd97f4549a140873a48ded3ee53d0bff12d29",
+      "depth/probe.cpp": "73453e3f74251482910ea8c310c9933ae5618ec5ff34dbbc2889c6712df42cd1",
+      "frames/authored.log": "483e9a67d8abc689f9583577cf8805338d5a2902af631caa9eba50464a64a244",
+      "frames/generated.log": "3df94868fa3053fdf19693507064f9256acc7df76edc4fd46179871d2fb9eb76",
+      "frames/probe.cpp": "deae099cf2e5fdbf299d6abf90084e99bed7e4fdafe87545d433a9a4441324d7",
+      "orchestration/arc.py": "704b2d9910792a0785ad335ce73203aea7ae8f4a7a679c9d62cf182c99b7ef49",
+      "orchestration/native.py": "52bc09aef2b490e1ae3f91276ed324b085ebd1b32839c4ee64d0031597181e33",
+      "prior/asan/historical-guard-regression.log": "66495b65f03b6b7d8d01915afb38e826e21dceddb0ac6be13109ac9eabefeadd",
+      "prior/release/historical-guard-regression.log": "5d916f3573b010a5641bbed6f547b24902469d203a569c76993cba20afc75a49",
+      "release/authoring-regressions.xml": "50e68b7a65eeb7bc9cc3c54e1521246843f204dc44afc666043203e6913f24ca",
+      "release/ctest.log": "cf796d441bc9be74cdba372444cf36a130481d546edc3d0d4abe8e6ef3f6cbcd",
+      "release/status.json": "d3ffe0ad33ea81084a1f862e8d5798b8e081e7e67e65dcf12dbd6306b265c481"
+    }
+  }
+}
