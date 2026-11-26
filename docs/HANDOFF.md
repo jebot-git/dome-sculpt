@@ -263,8 +263,12 @@ all 287 selected native checks pass with the default allocator. The complete
 original 4 GiB cap. The saved project and both recovery files have the exact
 expected SHA-256. Read
 [the combined Release receipt](validation/production-compact-sculpt-release-20261126.json).
-The selected sanitizer checks require their own result, as do the matching
-Wayland and OpenXR routes.
+The same App passes the 14-check native Wayland scenario and all 58 synthetic
+OpenXR creator checks on Arc. Seven matched ASan/UBSan native cases pass.
+The full strict sculpt case wrote the expected project and two recovery files,
+then reached the original 900-second deadline during the cold-capture quota
+checks. Peak owned RSS was 4,078,325,760 bytes. Read
+[the combined graphics and strict receipt](validation/production-compact-sculpt-ui-strict-20261126.json).
 
 Candidate `f9c20398` narrows the immutable search roots during retained-byte
 accounting for changed sculpt geometry. Every subtree credit still requires a

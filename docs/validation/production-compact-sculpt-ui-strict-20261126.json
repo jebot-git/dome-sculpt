@@ -1,0 +1,866 @@
+{
+  "purpose": "Exact compact combined Release on private canonical DomeD Wayland and synthetic XR on Arc, plus its matching isolated ASan/UBSan native outcomes.",
+  "app_source": "0cdd15114b8604a9deb91da02e4817f881f67da3",
+  "app_sha256": "85337e652c24e4c2853b7b266ebc4a31986fe12ec4fb6e7f8fee85de9ce5835e",
+  "actual_ui_checks": {
+    "combined-wayland0cdd1511-v1": {
+      "checks": 14,
+      "seconds": 40.70672059059143,
+      "peak_owned_RSS_bytes": 650104832,
+      "native_projects": {}
+    },
+    "public0cdd1511-accept-v1": {
+      "checks": 19,
+      "seconds": 76.61999464035034,
+      "peak_owned_RSS_bytes": 2219339776,
+      "native_projects": {
+        "workflow/author/final.dsculpt": {
+          "bytes": 267280292,
+          "sha256": "5a8c129091e029a03776e6c6102ff908078802bd0a3ddb53c874174afc723ba3"
+        },
+        "workflow/reopen/final.dsculpt": {
+          "bytes": 267280292,
+          "sha256": "5a8c129091e029a03776e6c6102ff908078802bd0a3ddb53c874174afc723ba3"
+        }
+      }
+    },
+    "public0cdd1511-cancel-v1": {
+      "checks": 19,
+      "seconds": 67.06390905380249,
+      "peak_owned_RSS_bytes": 1207558144,
+      "native_projects": {
+        "workflow/author/final.dsculpt": {
+          "bytes": 133738656,
+          "sha256": "7e29a66885d7607e67e89418db75b4f29775907385a294439c9310c9ca458430"
+        },
+        "workflow/reopen/final.dsculpt": {
+          "bytes": 133738656,
+          "sha256": "7e29a66885d7607e67e89418db75b4f29775907385a294439c9310c9ca458430"
+        }
+      }
+    },
+    "public0cdd1511-focus-v1": {
+      "checks": 20,
+      "seconds": 61.557820558547974,
+      "peak_owned_RSS_bytes": 1210249216,
+      "native_projects": {
+        "workflow/author/final.dsculpt": {
+          "bytes": 133738656,
+          "sha256": "7e29a66885d7607e67e89418db75b4f29775907385a294439c9310c9ca458430"
+        },
+        "workflow/reopen/final.dsculpt": {
+          "bytes": 133738656,
+          "sha256": "7e29a66885d7607e67e89418db75b4f29775907385a294439c9310c9ca458430"
+        }
+      }
+    }
+  },
+  "strict_build": {
+    "terminal": true,
+    "exit": 0,
+    "compile": [
+      {
+        "name": "src-document-cut.cpp",
+        "exit": 0
+      },
+      {
+        "name": "src-document.cpp",
+        "exit": 0
+      },
+      {
+        "name": "src-material-visibility.cpp",
+        "exit": 0
+      },
+      {
+        "name": "src-paint.cpp",
+        "exit": 0
+      },
+      {
+        "name": "src-sculpt-chunk-masks.cpp",
+        "exit": 0
+      },
+      {
+        "name": "src-sculpt-placed-chunk.cpp",
+        "exit": 0
+      },
+      {
+        "name": "src-sculpt-placed-chunks.cpp",
+        "exit": 0
+      },
+      {
+        "name": "src-sculpt-scene-chunks.cpp",
+        "exit": 0
+      },
+      {
+        "name": "src-sculpt-surface-chunks.cpp",
+        "exit": 0
+      },
+      {
+        "name": "tests-baked-emission-workflow.cpp",
+        "exit": 0
+      },
+      {
+        "name": "tests-corner-color-uv23-domain.cpp",
+        "exit": 0
+      },
+      {
+        "name": "tests-sculpt-chunk-pipeline.cpp",
+        "exit": 0
+      },
+      {
+        "name": "tests-sculpt-independent-workflow.cpp",
+        "exit": 0
+      }
+    ],
+    "linked_archive": {
+      "members": 197,
+      "sha256": "c498146253b4ed9cb11e17f85cb72b3cbc5cd05bdf3f747ce5b75c97a532f217",
+      "replacements": [
+        "document-cut.cpp.o",
+        "document.cpp.o",
+        "material-visibility.cpp.o",
+        "paint.cpp.o",
+        "sculpt-chunk-masks.cpp.o",
+        "sculpt-placed-chunk.cpp.o",
+        "sculpt-placed-chunks.cpp.o",
+        "sculpt-scene-chunks.cpp.o",
+        "sculpt-surface-chunks.cpp.o"
+      ]
+    },
+    "links": [
+      {
+        "name": "dome-sculpt-sculpt-surface-chunks-test",
+        "exit": 0
+      },
+      {
+        "name": "dome-sculpt-sculpt-chunk-pipeline-test",
+        "exit": 0
+      },
+      {
+        "name": "dome-sculpt-sculpt-independent-workflow",
+        "exit": 0
+      },
+      {
+        "name": "dome-sculpt-scene-file-test",
+        "exit": 0
+      },
+      {
+        "name": "dome-sculpt-document-recovery-test",
+        "exit": 0
+      },
+      {
+        "name": "dome-sculpt-atomic-write-allocation-test",
+        "exit": 0
+      },
+      {
+        "name": "dome-sculpt-corner-color-uv23-domain-test",
+        "exit": 0
+      },
+      {
+        "name": "dome-sculpt-baked-emission-workflow-test",
+        "exit": 0
+      }
+    ]
+  },
+  "strict_native": {
+    "terminal": true,
+    "source": "0cdd15114b8604a9deb91da02e4817f881f67da3",
+    "profile": "strict",
+    "cases": {
+      "scene-file-test": {
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/production-compact-sculpt-builds-20261126/strict/dome-sculpt-scene-file-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/production-compact-sculpt-builds-20261126/strict/native/scene-file"
+        ],
+        "started": 1795666938.907057,
+        "timeout_seconds": 900,
+        "RSS_limit_bytes": 4294967296,
+        "virtual_AS_cap": null,
+        "pid": 4,
+        "start": 84486397,
+        "pgrp": 4,
+        "root": {
+          "pid": 4,
+          "start": 84486397,
+          "pgrp": 4,
+          "session": 4,
+          "ppid": 2,
+          "state": "R"
+        },
+        "known_processes": [
+          {
+            "pid": 4,
+            "start": 84486397,
+            "pgrp": 4,
+            "session": 4,
+            "ppid": 2,
+            "state": "R"
+          },
+          {
+            "pid": 29,
+            "start": 84486523,
+            "pgrp": 4,
+            "session": 4,
+            "ppid": 4,
+            "state": "R"
+          },
+          {
+            "pid": 30,
+            "start": 84486524,
+            "pgrp": 4,
+            "session": 4,
+            "ppid": 4,
+            "state": "R"
+          }
+        ],
+        "peak_owned_RSS_bytes": 1078517760,
+        "peak_observed_virtual_bytes": 21991242514432,
+        "monitor_samples": 131,
+        "signals": [],
+        "exit": 0,
+        "seconds": 1.3881151676177979,
+        "sha256": "36b0ce8082d11881bbf44a0e0dff42b55fcc4ff1be795e88e88382076dcd3511",
+        "check_passed": true
+      },
+      "document-recovery-test": {
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/production-compact-sculpt-builds-20261126/strict/dome-sculpt-document-recovery-test"
+        ],
+        "started": 1795666940.6382914,
+        "timeout_seconds": 900,
+        "RSS_limit_bytes": 4294967296,
+        "virtual_AS_cap": null,
+        "pid": 32,
+        "start": 84486570,
+        "pgrp": 32,
+        "root": {
+          "pid": 32,
+          "start": 84486570,
+          "pgrp": 32,
+          "session": 32,
+          "ppid": 2,
+          "state": "R"
+        },
+        "known_processes": [
+          {
+            "pid": 32,
+            "start": 84486570,
+            "pgrp": 32,
+            "session": 32,
+            "ppid": 2,
+            "state": "R"
+          },
+          {
+            "pid": 51,
+            "start": 84486773,
+            "pgrp": 32,
+            "session": 32,
+            "ppid": 32,
+            "state": "R"
+          },
+          {
+            "pid": 52,
+            "start": 84486774,
+            "pgrp": 32,
+            "session": 32,
+            "ppid": 32,
+            "state": "R"
+          }
+        ],
+        "peak_owned_RSS_bytes": 1182662656,
+        "peak_observed_virtual_bytes": 21991125078016,
+        "monitor_samples": 210,
+        "signals": [],
+        "exit": 0,
+        "seconds": 2.2207999229431152,
+        "sha256": "952e65c39d07628add9b327c1feaec028ff7076b56b60def041b619b5c18fc86",
+        "check_passed": true
+      },
+      "atomic-write-allocation-test": {
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/production-compact-sculpt-builds-20261126/strict/dome-sculpt-atomic-write-allocation-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/production-compact-sculpt-builds-20261126/strict/native/atomic-write-allocation"
+        ],
+        "started": 1795666943.2006474,
+        "timeout_seconds": 900,
+        "RSS_limit_bytes": 4294967296,
+        "virtual_AS_cap": null,
+        "pid": 54,
+        "start": 84486826,
+        "pgrp": 54,
+        "root": {
+          "pid": 54,
+          "start": 84486826,
+          "pgrp": 54,
+          "session": 54,
+          "ppid": 2,
+          "state": "R"
+        },
+        "known_processes": [
+          {
+            "pid": 54,
+            "start": 84486826,
+            "pgrp": 54,
+            "session": 54,
+            "ppid": 2,
+            "state": "R"
+          }
+        ],
+        "peak_owned_RSS_bytes": 17526784,
+        "peak_observed_virtual_bytes": 21990302334976,
+        "monitor_samples": 11,
+        "signals": [],
+        "exit": 0,
+        "seconds": 0.1061253547668457,
+        "sha256": "aba51a5dee6fd2739a9c50a753585b4087af45199e38da8e97abb814f8ece3f4",
+        "check_passed": true
+      },
+      "corner-color-uv23-domain-test": {
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/production-compact-sculpt-builds-20261126/strict/dome-sculpt-corner-color-uv23-domain-test"
+        ],
+        "started": 1795666943.3166845,
+        "timeout_seconds": 900,
+        "RSS_limit_bytes": 4294967296,
+        "virtual_AS_cap": null,
+        "pid": 58,
+        "start": 84486837,
+        "pgrp": 58,
+        "root": {
+          "pid": 58,
+          "start": 84486837,
+          "pgrp": 58,
+          "session": 58,
+          "ppid": 2,
+          "state": "R"
+        },
+        "known_processes": [
+          {
+            "pid": 58,
+            "start": 84486837,
+            "pgrp": 58,
+            "session": 58,
+            "ppid": 2,
+            "state": "R"
+          },
+          {
+            "pid": 67,
+            "start": 84486988,
+            "pgrp": 58,
+            "session": 58,
+            "ppid": 58,
+            "state": "R"
+          },
+          {
+            "pid": 68,
+            "start": 84486989,
+            "pgrp": 58,
+            "session": 58,
+            "ppid": 58,
+            "state": "R"
+          }
+        ],
+        "peak_owned_RSS_bytes": 929013760,
+        "peak_observed_virtual_bytes": 21990891954176,
+        "monitor_samples": 159,
+        "signals": [],
+        "exit": 0,
+        "seconds": 1.6719515323638916,
+        "sha256": "ce58dfffc098d70db0b9fc766b6f7a7df59401928fa658e5c299bbc7f862b68d",
+        "check_passed": true
+      },
+      "baked-emission-workflow-test": {
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/production-compact-sculpt-builds-20261126/strict/dome-sculpt-baked-emission-workflow-test",
+          "--source-worker-controls",
+          "/home/blux/de-xr/dome-sculpt/artifacts/production-compact-sculpt-builds-20261126/strict/native/uv1"
+        ],
+        "started": 1795666945.3762844,
+        "timeout_seconds": 900,
+        "RSS_limit_bytes": 4294967296,
+        "virtual_AS_cap": null,
+        "pid": 70,
+        "start": 84487043,
+        "pgrp": 70,
+        "root": {
+          "pid": 70,
+          "start": 84487043,
+          "pgrp": 70,
+          "session": 70,
+          "ppid": 2,
+          "state": "R"
+        },
+        "known_processes": [
+          {
+            "pid": 70,
+            "start": 84487043,
+            "pgrp": 70,
+            "session": 70,
+            "ppid": 2,
+            "state": "R"
+          },
+          {
+            "pid": 175,
+            "start": 84487524,
+            "pgrp": 70,
+            "session": 70,
+            "ppid": 70,
+            "state": "R"
+          },
+          {
+            "pid": 176,
+            "start": 84487525,
+            "pgrp": 70,
+            "session": 70,
+            "ppid": 70,
+            "state": "R"
+          }
+        ],
+        "peak_owned_RSS_bytes": 1546567680,
+        "peak_observed_virtual_bytes": 21991171338240,
+        "monitor_samples": 469,
+        "signals": [],
+        "exit": 0,
+        "seconds": 4.989259719848633,
+        "sha256": "500145b659c1cf857746a9cd41971783b98254f8baf0be119a7608cb85b7d647",
+        "check_passed": true
+      },
+      "sculpt-surface-chunks-test": {
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/production-compact-sculpt-builds-20261126/strict/dome-sculpt-sculpt-surface-chunks-test"
+        ],
+        "started": 1795666950.720535,
+        "timeout_seconds": 900,
+        "RSS_limit_bytes": 4294967296,
+        "virtual_AS_cap": null,
+        "pid": 178,
+        "start": 84487578,
+        "pgrp": 178,
+        "root": {
+          "pid": 178,
+          "start": 84487578,
+          "pgrp": 178,
+          "session": 178,
+          "ppid": 2,
+          "state": "R"
+        },
+        "known_processes": [
+          {
+            "pid": 178,
+            "start": 84487578,
+            "pgrp": 178,
+            "session": 178,
+            "ppid": 2,
+            "state": "R"
+          },
+          {
+            "pid": 179,
+            "start": 84487784,
+            "pgrp": 178,
+            "session": 178,
+            "ppid": 178,
+            "state": "R"
+          },
+          {
+            "pid": 180,
+            "start": 84487785,
+            "pgrp": 178,
+            "session": 178,
+            "ppid": 178,
+            "state": "S"
+          }
+        ],
+        "peak_owned_RSS_bytes": 380092416,
+        "peak_observed_virtual_bytes": 21990350970880,
+        "monitor_samples": 207,
+        "signals": [],
+        "exit": 0,
+        "seconds": 2.1640329360961914,
+        "sha256": "00beb6b286baefc339a32b22cca8d67449b2763d08b7743fc1ba57bf5e909fe6",
+        "check_passed": true
+      },
+      "sculpt-chunk-pipeline-test": {
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/production-compact-sculpt-builds-20261126/strict/dome-sculpt-sculpt-chunk-pipeline-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/production-compact-sculpt-builds-20261126/strict/native/pipeline"
+        ],
+        "started": 1795666952.9085615,
+        "timeout_seconds": 900,
+        "RSS_limit_bytes": 4294967296,
+        "virtual_AS_cap": null,
+        "pid": 182,
+        "start": 84487797,
+        "pgrp": 182,
+        "root": {
+          "pid": 182,
+          "start": 84487797,
+          "pgrp": 182,
+          "session": 182,
+          "ppid": 2,
+          "state": "R"
+        },
+        "known_processes": [
+          {
+            "pid": 182,
+            "start": 84487797,
+            "pgrp": 182,
+            "session": 182,
+            "ppid": 2,
+            "state": "R"
+          },
+          {
+            "pid": 191,
+            "start": 84488643,
+            "pgrp": 182,
+            "session": 182,
+            "ppid": 182,
+            "state": "R"
+          },
+          {
+            "pid": 192,
+            "start": 84488644,
+            "pgrp": 182,
+            "session": 182,
+            "ppid": 182,
+            "state": "R"
+          }
+        ],
+        "peak_owned_RSS_bytes": 1714503680,
+        "peak_observed_virtual_bytes": 21990940295168,
+        "monitor_samples": 834,
+        "signals": [],
+        "exit": 0,
+        "seconds": 8.737653970718384,
+        "sha256": "7bcaf79577fd0a2ee18cbd98557da72d257438506363785f156fc8420e036e8d",
+        "check_passed": true
+      },
+      "sculpt-independent-workflow": {
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/production-compact-sculpt-builds-20261126/strict/dome-sculpt-sculpt-independent-workflow",
+          "/home/blux/de-xr/dome-sculpt/artifacts/production-compact-sculpt-builds-20261126/strict/native/sculpt"
+        ],
+        "started": 1795666962.0065207,
+        "timeout_seconds": 900,
+        "RSS_limit_bytes": 4294967296,
+        "virtual_AS_cap": null,
+        "pid": 194,
+        "start": 84488706,
+        "pgrp": 194,
+        "root": {
+          "pid": 194,
+          "start": 84488706,
+          "pgrp": 194,
+          "session": 194,
+          "ppid": 2,
+          "state": "R"
+        },
+        "known_processes": [
+          {
+            "pid": 194,
+            "start": 84488706,
+            "pgrp": 194,
+            "session": 194,
+            "ppid": 2,
+            "state": "R"
+          }
+        ],
+        "peak_owned_RSS_bytes": 4078325760,
+        "peak_observed_virtual_bytes": 21991973679104,
+        "monitor_samples": 82489,
+        "signals": [
+          {
+            "pgid": 194,
+            "witness": {
+              "pid": 194,
+              "start": 84488706,
+              "pgrp": 194,
+              "session": 194,
+              "ppid": 2,
+              "state": "R"
+            },
+            "signal": "SIGTERM",
+            "reason": "Owned command exceeded declared deadline",
+            "epoch": 1795667862.0135896
+          }
+        ],
+        "error": "BudgetExceeded('Owned command exceeded declared deadline')",
+        "exit": -15,
+        "seconds": 900.3831436634064,
+        "sha256": "9e3e333afb4c250280b1b5dc94441d4a567e2864c9b11197a64ef436e486370b",
+        "check_passed": false
+      }
+    },
+    "exit": 1
+  },
+  "authorities": {
+    "creator-public-build-20261126/combined-wayland0cdd1511-v1/plan.json": {
+      "size": 1688931,
+      "sha256": "d5dec67076fe33541b04587624427ef9a5b5145c4ab96a33f59b0c9dbba7399f"
+    },
+    "creator-public-build-20261126/combined-wayland0cdd1511-v1/status.json": {
+      "size": 158710,
+      "sha256": "d1bc54a03b4cd9a68c7adf16153c1abbd4cf1d792df93675e92f3c68ad480fd5"
+    },
+    "creator-public-build-20261126/combined-wayland0cdd1511-v1/process.log": {
+      "size": 1541,
+      "sha256": "ea96701b5ef8e547c9d7b395d24929f0c7ae67a9137190646e1d907a51f0316b"
+    },
+    "creator-public-build-20261126/combined-wayland0cdd1511-v1/workflow/report.json": {
+      "size": 2053,
+      "sha256": "6bd20c3c03e3f6bf40afca17657f56c92b17360ea98f700db5c79bdf6b547187"
+    },
+    "creator-public-build-20261126/combined-wayland0cdd1511-v1/device-auth-native-wayland.so.ldd": {
+      "size": 464,
+      "sha256": "1522e18b54445aa669f8cc3f75d789d7f0711240d0649c07549b3afeaa8bebc7"
+    },
+    "creator-public-build-20261126/combined-wayland0cdd1511-v1/dome-compositor.ldd": {
+      "size": 4074,
+      "sha256": "681d245c112633b8951022de53acdbb3b320d26eb11636058f42bed82edd8c04"
+    },
+    "creator-public-build-20261126/combined-wayland0cdd1511-v1/dome-sculpt.ldd": {
+      "size": 5010,
+      "sha256": "27ade13c415e8044aa1bf1d4670318f3062101f5c51b98faec1e59903b4433e2"
+    },
+    "creator-public-build-20261126/combined-wayland0cdd1511-v1/workflow/actual-device/egl-query-0/device.txt": {
+      "size": 302,
+      "sha256": "11e74d6bb18a646291cd8cff2398989a060c33b836060009ec58a005e17a1c9e"
+    },
+    "creator-public-build-20261126/combined-wayland0cdd1511-v1/workflow/actual-device/egl-query-0/context-maps.txt": {
+      "size": 60622,
+      "sha256": "7a6e33cec8a0975c60794624c0b10ffb6b4b21d070187c7ddd2156e6868fc3b6"
+    },
+    "creator-public-build-20261126/public0cdd1511-accept-v1/plan.json": {
+      "size": 2157851,
+      "sha256": "e01578b1c268476f4aecc7b4b98f9eb43f22803a3726f293960e142d4c5487d0"
+    },
+    "creator-public-build-20261126/public0cdd1511-accept-v1/status.json": {
+      "size": 142434,
+      "sha256": "57c65abcac1d0cbbe04d6a496be8767f30869ae497cac7f38386c23c76d4ebbb"
+    },
+    "creator-public-build-20261126/public0cdd1511-accept-v1/process.log": {
+      "size": 1526,
+      "sha256": "4a39eba6c3c2cc17623eb7f9212e6840afee67ed63781ff26cae83e42b476992"
+    },
+    "creator-public-build-20261126/public0cdd1511-accept-v1/workflow/report.json": {
+      "size": 3618,
+      "sha256": "e3776c9f266525838a7b0329893a9a482a83695edf492da678efbd60a3f3174f"
+    },
+    "creator-public-build-20261126/public0cdd1511-accept-v1/device-auth.so.ldd": {
+      "size": 464,
+      "sha256": "ed7a57ba5e63f97791171eb9420c0ad477d8fe1ad6d7deeabb70da9639eb98f3"
+    },
+    "creator-public-build-20261126/public0cdd1511-accept-v1/dome-sculpt-creator-workspace-test.ldd": {
+      "size": 1654,
+      "sha256": "49e01d72efe1867a062d148cdc5e158127d0cc214c8421a5114f8f6ea1c30ed5"
+    },
+    "creator-public-build-20261126/public0cdd1511-accept-v1/dome-sculpt.ldd": {
+      "size": 5010,
+      "sha256": "fc33f8dd2de80c47684040471049482fbb29c2225dd85004b15748829773bafb"
+    },
+    "creator-public-build-20261126/public0cdd1511-accept-v1/libdome-sculpt-creator-workspace-runtime.so.ldd": {
+      "size": 1946,
+      "sha256": "55f4560350c96795b0ab6e24fb6076935c1660b9dca33f183e6bd55bc00abcdb"
+    },
+    "creator-public-build-20261126/public0cdd1511-accept-v1/actual-device/331600/device.txt": {
+      "size": 276,
+      "sha256": "37b2b22ec9afb9a6de5644920f96bd3eafa5b37a134731aad125311fbf429a33"
+    },
+    "creator-public-build-20261126/public0cdd1511-accept-v1/actual-device/331600/context-maps.txt": {
+      "size": 45312,
+      "sha256": "279136c17635d675640578c5c9859030677bd9692d78c083485d46a7080f0280"
+    },
+    "creator-public-build-20261126/public0cdd1511-accept-v1/actual-device/467509/device.txt": {
+      "size": 276,
+      "sha256": "454cd3a2a77732a30a1721376079d28f6551178ef7b7f2cec1b90069382f9e7d"
+    },
+    "creator-public-build-20261126/public0cdd1511-accept-v1/actual-device/467509/context-maps.txt": {
+      "size": 45949,
+      "sha256": "3aeaa43697c98f1ede864863efa6cd8d16fb1abe1eea77bf3c2f5b6827ff6a2b"
+    },
+    "creator-public-build-20261126/public0cdd1511-cancel-v1/plan.json": {
+      "size": 2157851,
+      "sha256": "8cbeae44e9919ad48da000b910ee0d9695794cfbc22599718a9b32ff1ca39c2a"
+    },
+    "creator-public-build-20261126/public0cdd1511-cancel-v1/status.json": {
+      "size": 142439,
+      "sha256": "ed28a0893aa3b65335339182480cd4a63e59031a993a3c90612059aeda8da52e"
+    },
+    "creator-public-build-20261126/public0cdd1511-cancel-v1/process.log": {
+      "size": 1526,
+      "sha256": "4a39eba6c3c2cc17623eb7f9212e6840afee67ed63781ff26cae83e42b476992"
+    },
+    "creator-public-build-20261126/public0cdd1511-cancel-v1/workflow/report.json": {
+      "size": 3618,
+      "sha256": "e3776c9f266525838a7b0329893a9a482a83695edf492da678efbd60a3f3174f"
+    },
+    "creator-public-build-20261126/public0cdd1511-cancel-v1/device-auth.so.ldd": {
+      "size": 464,
+      "sha256": "b7fe46349e55f92b653aa6f5883ddc0994304545181805adf8bc84059539eea5"
+    },
+    "creator-public-build-20261126/public0cdd1511-cancel-v1/dome-sculpt-creator-workspace-test.ldd": {
+      "size": 1654,
+      "sha256": "1ad70558b8836e037793fa70c4d81ee38db3a83c908cfc6e141788c7ef9d5ce8"
+    },
+    "creator-public-build-20261126/public0cdd1511-cancel-v1/dome-sculpt.ldd": {
+      "size": 5010,
+      "sha256": "c2bf4ce76bb508a66bef42eb8ae39d6b9d35ddb6815ca3a2cf584903340c61a8"
+    },
+    "creator-public-build-20261126/public0cdd1511-cancel-v1/libdome-sculpt-creator-workspace-runtime.so.ldd": {
+      "size": 1946,
+      "sha256": "7de316238783d65ec1fa4d9efcb5c29197aa4e9fa441ad3309f47a4c8f8df94e"
+    },
+    "creator-public-build-20261126/public0cdd1511-cancel-v1/actual-device/633303/device.txt": {
+      "size": 274,
+      "sha256": "6bc09720e26ab4739457623b158b4153e92d8fcc0ee65a71db3adf5dab88c5ad"
+    },
+    "creator-public-build-20261126/public0cdd1511-cancel-v1/actual-device/633303/context-maps.txt": {
+      "size": 45459,
+      "sha256": "8cd4a7a4a3f8ec77473723df732f862110812d765e4c5a985c484dad23b26a6d"
+    },
+    "creator-public-build-20261126/public0cdd1511-cancel-v1/actual-device/780485/device.txt": {
+      "size": 274,
+      "sha256": "848fbb5ea633c53781fd9106615f6e041b3d49783ec1622a5c9413fafda43218"
+    },
+    "creator-public-build-20261126/public0cdd1511-cancel-v1/actual-device/780485/context-maps.txt": {
+      "size": 45361,
+      "sha256": "30f75853d5aee144dcccc4b462947f8a4b9653d3ab32d54503d0b76c48cf695e"
+    },
+    "creator-public-build-20261126/public0cdd1511-focus-v1/plan.json": {
+      "size": 2157845,
+      "sha256": "b44358b42c17482308c63f64a914051a21c17281afb3c6ee556802d12214fd07"
+    },
+    "creator-public-build-20261126/public0cdd1511-focus-v1/status.json": {
+      "size": 142992,
+      "sha256": "483b5258362ecf1f7388fc22b60cee038aa6909ab6f5505c39d626806480da26"
+    },
+    "creator-public-build-20261126/public0cdd1511-focus-v1/process.log": {
+      "size": 1600,
+      "sha256": "a9922e345a5ba9d0169e46a3a4f1d9a1909a0e8920a7d40b3a4a65176ce12826"
+    },
+    "creator-public-build-20261126/public0cdd1511-focus-v1/workflow/report.json": {
+      "size": 3739,
+      "sha256": "73acd358b2e2c8da862eb5928207e9e2f8822f475c0a161865b0b1efb2831d73"
+    },
+    "creator-public-build-20261126/public0cdd1511-focus-v1/device-auth.so.ldd": {
+      "size": 464,
+      "sha256": "77cacdf407c5d4b1cb93948a9fcbc86c2887d3d2233f815099c74e7a5620a907"
+    },
+    "creator-public-build-20261126/public0cdd1511-focus-v1/dome-sculpt-creator-workspace-test.ldd": {
+      "size": 1654,
+      "sha256": "d715314638c438da8884993f793657bbff40ae0aaaef66521ff5ffd8a57ec25d"
+    },
+    "creator-public-build-20261126/public0cdd1511-focus-v1/dome-sculpt.ldd": {
+      "size": 5010,
+      "sha256": "2d40205d743e76959c18d4ba491c6a0776e83937c4a04bc4d6581b28b609bde3"
+    },
+    "creator-public-build-20261126/public0cdd1511-focus-v1/libdome-sculpt-creator-workspace-runtime.so.ldd": {
+      "size": 1946,
+      "sha256": "84086d5065343cc697a19b45a76469b1151fd787e99cf1ce908fb2665304fd94"
+    },
+    "creator-public-build-20261126/public0cdd1511-focus-v1/actual-device/966787/device.txt": {
+      "size": 276,
+      "sha256": "6e1336a046b29c2b2152ca89c9a5d7dcf29723f2aebec9c965a2799af9d86a32"
+    },
+    "creator-public-build-20261126/public0cdd1511-focus-v1/actual-device/966787/context-maps.txt": {
+      "size": 45262,
+      "sha256": "6c482b3f67925caf2330dd94fa94a1e3b220370e77058e903dac2e410e92645b"
+    },
+    "creator-public-build-20261126/public0cdd1511-focus-v1/actual-device/1103600/device.txt": {
+      "size": 274,
+      "sha256": "9b69743d4bd9495fe108e78e680c424b8843f67851c69f5ba2e5b866c593df31"
+    },
+    "creator-public-build-20261126/public0cdd1511-focus-v1/actual-device/1103600/context-maps.txt": {
+      "size": 45262,
+      "sha256": "a1c7eb5181bc285edaa3c19ade541a66b8df3dcacad186f584e47a07b2e28057"
+    },
+    "creator-public-build-20261126/run-combined-wayland0cdd1511-v1.py": {
+      "size": 9106,
+      "sha256": "b67c3036cca9351c7985c90869d73df34b997001f6ba27896eaedb501bbc0bfe"
+    },
+    "creator-public-build-20261126/run-public0cdd1511-v1.py": {
+      "size": 9466,
+      "sha256": "9169ccbbe9454ceb1e1ac7c352e03c7ac72fc94f1e1459ffdce996bcd445f9d8"
+    },
+    "creator-public-build-20261126/run-public0cdd1511-round.py": {
+      "size": 1239,
+      "sha256": "bbc91ea158354d6fe37a4bc03ed6e3495adc14c55a8a7bf3a4ac5a8dce176636"
+    },
+    "creator-public-build-20261126/public0cdd1511-round-v1/status.json": {
+      "size": 830,
+      "sha256": "d6d2fefbe0a477efed1e8ad275fb904b6d07f73cad223388ef34d2c5de601c61"
+    },
+    "production-compact-sculpt-builds-20261126/strict/build-plan.json": {
+      "size": 38184,
+      "sha256": "3f9bfd5fd519e92679d71b048932bbe1c3ea6d18eaf9e6ed0f1fc6574f46ae1e"
+    },
+    "production-compact-sculpt-builds-20261126/strict/build-status.json": {
+      "size": 2145,
+      "sha256": "0f63f5d24a3c0b67afd125bce63047c966a59806bd8ea3fc71647d62f1ccf528"
+    },
+    "production-compact-sculpt-builds-20261126/strict/run-native.py": {
+      "size": 3083,
+      "sha256": "2314fcbbf327792008c618d5a1675b60a6038a91db6d57e6c458dbc7c72e29bd"
+    },
+    "production-compact-sculpt-builds-20261126/strict/native/status.json": {
+      "size": 11682,
+      "sha256": "f8f8e54299d81438f6d36e908e2439be1ad9fa315bc0f8a2f56e0633c1ae76d5"
+    },
+    "production-compact-sculpt-builds-20261126/strict/native/atomic-write-allocation-test.log": {
+      "size": 1536,
+      "sha256": "0e3863f158f06dc45c5e5b10a64ffd86abab056eab621cd2256e12869eccb0da"
+    },
+    "production-compact-sculpt-builds-20261126/strict/native/baked-emission-workflow-test.log": {
+      "size": 417,
+      "sha256": "09a0d354e4170f50e79cce44a87ff94521d29c0fa16503929a9497605f121f38"
+    },
+    "production-compact-sculpt-builds-20261126/strict/native/corner-color-uv23-domain-test.log": {
+      "size": 141,
+      "sha256": "849d187442cf28337f287738b14870de9f451acb772026f3ab1428de692d7279"
+    },
+    "production-compact-sculpt-builds-20261126/strict/native/document-recovery-test.log": {
+      "size": 1162,
+      "sha256": "133749a13b164d17364edc916b9ac7d697f643da0e55ba93767fa5f43959f596"
+    },
+    "production-compact-sculpt-builds-20261126/strict/native/scene-file-test.log": {
+      "size": 2686,
+      "sha256": "0e7fe3a507abddb3db566806058b5525cb58cf89dee94063473155672de85bbe"
+    },
+    "production-compact-sculpt-builds-20261126/strict/native/sculpt-chunk-pipeline-test.log": {
+      "size": 7881,
+      "sha256": "3fb72ac3bb1c62d71d3013be86e1a0f57b4ad6816a6461750b95a499439bbd9f"
+    },
+    "production-compact-sculpt-builds-20261126/strict/native/sculpt-independent-workflow.log": {
+      "size": 142,
+      "sha256": "fd9eed87699526dd19051ed1c60a79b8a0a75745f52abdcf3dd7901e4e0d1a0f"
+    },
+    "production-compact-sculpt-builds-20261126/strict/native/sculpt-surface-chunks-test.log": {
+      "size": 1954,
+      "sha256": "ebf78e916610192f405486b582e0ca5ab78b363141f709602c669e9a6ba4b101"
+    },
+    "production-compact-sculpt-builds-20261126/run-build-and-native.py": {
+      "size": 913,
+      "sha256": "6d9db547bff50abc1dee10f3770287094e563da20f283d9e488e15d93027b913"
+    },
+    "production-compact-sculpt-builds-20261126/prepare.py": {
+      "size": 5295,
+      "sha256": "3028a27eb096b827d95dfa343bb787f3831d9a803819f8dac2121259359db4f4"
+    },
+    "production-compact-sculpt-builds-20261126/seal-ui-strict.py": {
+      "size": 4722,
+      "sha256": "6e08e87e93256d2116bb6386963dc016ff8ecfa2316f0f2c0152dff522fce4da"
+    },
+    "production-compact-sculpt-builds-20261126/ds-production-compact-sculpt-graphics-20261126.journal.txt": {
+      "size": 597,
+      "sha256": "4d3d541941d68e84abc5ec328475a600e1bd89e2185c021da22a4f6d94944745"
+    },
+    "production-compact-sculpt-builds-20261126/ds-production-compact-sculpt-strict-20261126.journal.txt": {
+      "size": 702,
+      "sha256": "5e0262be22cef26407c2bcbcc5118c7469a5158f6c120b3d6fa04185d6cb1246"
+    }
+  },
+  "archive": {
+    "file": "production-compact-sculpt-ui-strict-20261126.tar.xz",
+    "size": 482512,
+    "sha256": "91fb16e402b65dd7d46de3d947f28452193fe1a91be71fed74d6130b6a579425"
+  }
+}
