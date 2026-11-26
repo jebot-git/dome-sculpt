@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
 #include "dome/polygon-scene.hpp"
+#include "current-paint-preview.hpp"
 #include "cut-color.hpp"
 #include "document-authority.hpp"
 #include "sculpt-scene-chunks.hpp"
+#include "texture-set-range.hpp"
 namespace dome {
 namespace {
 bool same(const CutSettings &a,const CutSettings &b){
@@ -14,7 +16,8 @@ bool same(const CutSettings &a,const CutSettings &b){
          a.cap_material.double_sided==b.cap_material.double_sided&&a.cap_material.alpha==b.cap_material.alpha&&
          a.cap_material.alpha_cutoff==b.cap_material.alpha_cutoff&&a.cap_material.unlit==b.cap_material.unlit;
 }
-std::shared_ptr<const BakeSource> source_mesh(const MeshSnapshot &base,uint64_t object,const std::function<bool()> &cancelled){
+std::shared_ptr<const BakeSource> source_mesh(const MeshSnapshot &base,const SculptObject &original,const std::function<bool()> &cancelled){
+  const auto object=original.id;
   if(base.sculpt_chunks)if(const auto *view=base.sculpt_chunks->find(object)) {
     const auto count=view->geometry->report().indices;
     if(!count)throw std::logic_error("The cut source has no displayed surface");
@@ -48,6 +51,18 @@ std::shared_ptr<const BakeSource> source_mesh(const MeshSnapshot &base,uint64_t 
   if(!base.source_colors.empty()&&base.source_colors.size()!=base.mesh.positions.size())
     throw std::invalid_argument("The displayed cut color stream is incomplete");
   auto source=std::make_shared<BakeSource>();source->materials[0].material=range->material;source->materials[0].maps=range->textures;
+  if(range->textures&&range->textures->current_grid_preview){
+    const auto &packet=*range->textures->current_grid_preview;
+    packet.authenticate_range(base.mesh,*range,false);
+    const auto field=texture_set_view(original,range->texture_set_proof?range->texture_set_proof->field().id:0);
+    const auto geometry=field.painted->mesh_owner();
+    if(packet.geometry()!=geometry||packet.geometry().owner_before(geometry)||
+       geometry.owner_before(packet.geometry())||!packet.matches_material(field.material))
+      throw std::invalid_argument("The painted cut source changed while its preview was being prepared");
+    // The render packet carries sparse paint and metadata. The mapped Bake
+    // consumes the actual source field's material images on this worker.
+    source->materials[0].maps=field.painted->composite(field.material,cancelled);
+  }
   for(size_t k=range->first;k<range->first+range->count;++k){
     if((k&255)==0&&cancelled&&cancelled())throw std::runtime_error("Plane cutting cancelled");
     auto vertex=base.mesh.indices.at(k);auto &mesh=source->mesh;
@@ -253,7 +268,11 @@ void Document::cut_loop(){
           if(cancelled())continue;
           base=mesh_.load();}
         if(base->generation!=job.expected.generation||base->revision!=job.expected.revision)throw std::runtime_error("Cut source mesh failed to prepare");
-        source=source_mesh(*base,job.expected.object,cancelled);session=job.session;auto [center,radius]=cut_bounds(source->mesh);
+        std::shared_ptr<const Scene> source_scene;
+        {std::lock_guard lock(model_mutex_);if(cancelled())continue;source_scene=native_source_scene_;}
+        if(!source_scene)throw std::runtime_error("Cut source scene failed to prepare");
+        source=source_mesh(*base,source_scene->object(job.expected.object),cancelled);
+        session=job.session;auto [center,radius]=cut_bounds(source->mesh);
         std::lock_guard lock(model_mutex_);if(cancelled()||!state_.cut)continue;
         cut_base_=base;cut_bake_source_=source;auto view=std::make_shared<CutView>(*state_.cut);
         view->center=center;view->radius=radius;view->ready=true;view->offset_limit_mm=std::min(100'000.f,std::max(1.f,radius*1000));state_.cut=view;publish_locked();
