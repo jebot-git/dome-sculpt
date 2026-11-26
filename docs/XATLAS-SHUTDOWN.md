@@ -58,3 +58,21 @@ fresh xatlas/fixture ASan/UBSan/leak repetitions in 3.03 seconds. These probes
 intercept C++ thread-state `operator new`, not xatlas's C allocation callbacks or
 OS-wide resource failures. Full cut allocation/publication qualification remains
 a separate requirement; the dependency probes alone do not establish it.
+
+## Task-group completion
+
+Samples from an Intel Arc paint startup found the asset worker and an xatlas
+worker in `sched_yield` while another worker generated charts. The scheduler
+now counts each task before releasing the queue lock. After draining its
+queue, a caller sleeps on the group's atomic task count. The final worker
+wakes it. The chart and packing computations are unchanged.
+
+In two matched ASan/UBSan pairs, median process CPU time before EGL fell
+from 106.47 to 37.46 seconds. Time to EGL was 36.88 and 38.89 seconds on
+the parent and 34.89 and 37.89 seconds with the patch. In one optimized
+Release pair, process CPU fell from 11.64 to 4.47 seconds and time to EGL
+from 4.69 to 4.45 seconds. All six runs witnessed the Arc render node and
+saved the same native project byte for byte. Release on the main source and
+both profiles on the combined source passed the six focused scheduler,
+atlas, authoring-cancellation and voxel cases.
+[Build and runtime evidence](validation/atlas-worker-and-history-20261126.json)

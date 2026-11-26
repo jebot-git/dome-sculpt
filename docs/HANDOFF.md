@@ -823,6 +823,33 @@ owned RSS is 2,098,626,560 bytes. The 2048-pixel ordered Save, reopen and
 Undo/Redo history consumer still needs a complete strict pass.
 [Validation receipt](validation/controller-feedback-and-dense-rows-20261126.json)
 
+### Atlas worker scheduling and strict history replay
+
+Native stack samples identify the pre-EGL delay in the worker's xatlas
+chart-generation phase. Two waiting threads also repeatedly yield while
+the chart worker runs. Main `732780d3` sleeps those waiters until the last
+task completes and publishes a queued task's count under its queue lock.
+The patch preserves the atlas calculations. Matched Arc startup saves are
+byte-identical across both profiles. Median pre-EGL CPU falls 64.8% across
+two sanitizer pairs. The single Release pair uses 61.6% less pre-EGL CPU.
+Time to EGL improves by 1–2 seconds in the sanitizer pairs and 0.24 seconds
+in Release. Six focused cases pass on main Release and on combined Release
+and ASan/UBSan. The combined software XR replay passes all 152 checks.
+
+The HDR replay `78e94585` keeps the original monolithic workflow and
+separates the native Save/reopen proof from the real Document worker replay.
+Bake, immediately ordered Save, Undo and Redo stay in a single worker
+session. At 512 pixels both phases pass in Release and both files match the
+captured native Bake. At 2048 pixels the independent strict Save/reopen
+phase passes with the same byte identity. The ordered worker phase is active.
+
+The broad combined Release run found two VRM1 fault suites expecting the
+pre-refactor diagnostic for a foreign retained primitive. Candidate
+`3130bc2b` updates that expectation to the shared guard and retains each
+negative and the full original-state equality check. The full Release
+reruns pass 2,664 Normal and 2,736 Shift checks. Strict reruns are active.
+[Validation receipt](validation/atlas-worker-and-history-20261126.json)
+
 ## Source and integration boundary
 
 - Main now admits product1bc13125 and public fixturef1e193c7 after complete

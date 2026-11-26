@@ -1,0 +1,556 @@
+{
+  "main_product": "732780d309f330071682c83ec323db80865c03a9",
+  "combined_product": "b3b583b8d297a58c2a22fd43d0020525b2896b7b",
+  "independent_xr_fixture": "6f4743db63cabf592f0dad32dcda8ef960f3ceb3",
+  "sampled_parent_stacks": {
+    "terminal": true,
+    "invocation": "f2d6227da0bf4683adaa288a56d4d84a",
+    "timeout_seconds": 40,
+    "phase": "Profile native paint startup before OpenXR",
+    "exit": 0,
+    "elapsed": 34.31,
+    "first_graphics_log_seconds": 33.05,
+    "created_save": true,
+    "arc_witnesses": 3
+  },
+  "arc_startup_measurements": {
+    "asan": {
+      "parent": {
+        "first_EGL_seconds": [
+          36.88,
+          38.89
+        ],
+        "pre_EGL_CPU_seconds": [
+          103.55,
+          109.39
+        ]
+      },
+      "candidate": {
+        "first_EGL_seconds": [
+          34.89,
+          37.89
+        ],
+        "pre_EGL_CPU_seconds": [
+          35.8,
+          39.12
+        ]
+      },
+      "observed_CPU_reduction_percent": 64.8
+    },
+    "release": {
+      "parent": {
+        "first_EGL_seconds": [
+          4.69
+        ],
+        "pre_EGL_CPU_seconds": [
+          11.64
+        ]
+      },
+      "candidate": {
+        "first_EGL_seconds": [
+          4.45
+        ],
+        "pre_EGL_CPU_seconds": [
+          4.47
+        ]
+      },
+      "observed_CPU_reduction_percent": 61.6
+    }
+  },
+  "same_native_project_sha256": "41467f4370f61fddb45ce1626b04c9c3edc554c2a455ec41ec5aa11288b24537",
+  "main_release": {
+    "terminal": true,
+    "profile": "release",
+    "candidate": "732780d309f330071682c83ec323db80865c03a9",
+    "invocation": "3844a5271bf94009a4665978dc9b1aa7",
+    "results": [
+      {
+        "target": "xatlas-allocation",
+        "exit": 0,
+        "seconds": 0.032,
+        "log_sha256": "7d8b5830488de23399a53e3a34c01dec61fc77823739447dd77940bccf9f441e",
+        "last_line": "PASS 19 persistent thread-state allocation failures unwind all native workers and allow retry"
+      },
+      {
+        "target": "xatlas-shutdown",
+        "exit": 0,
+        "seconds": 0.064,
+        "log_sha256": "7af2ac5c60860d5825b0193513c90ad4ea4446e9793c7a2077c4829e6be39e61",
+        "last_line": "PASS 32 deterministic Atlas shutdown predicate/wait-registration handshakes"
+      },
+      {
+        "target": "atlas-robustness",
+        "exit": 0,
+        "seconds": 8.833,
+        "log_sha256": "1b8d16d0dc9b9ae35b7a7c3eb7bc16bff2340c5b8dc7c0cf5c0f0b20a7b777c8",
+        "last_line": "PASS Increasing requested resolution fits all independent tiny charts under the same strict policy"
+      },
+      {
+        "target": "atlas-cancellation",
+        "exit": 0,
+        "seconds": 0.265,
+        "log_sha256": "28ff31b1e889b2baab7d32697f78671046a8124d4b88eb299fb5193638e5a68f",
+        "last_line": "14 cancellable atlas checks passed"
+      },
+      {
+        "target": "atlas-authoring-cancellation",
+        "exit": 0,
+        "seconds": 1.718,
+        "log_sha256": "2b920d662d23bf14f325d37922124e63f7bdb75218a760cfc1f42914dd6f4789",
+        "last_line": "18 authoring atlas cancellation checks passed"
+      },
+      {
+        "target": "voxel-authoring",
+        "exit": 0,
+        "seconds": 0.465,
+        "log_sha256": "80b396a5f991f54e6f182109003be77bdac85fa8dedeba4da1d09fd18d1df0f3",
+        "last_line": "PASS Scalar-source remeshing has exact scene undo"
+      }
+    ],
+    "phase": "complete",
+    "exit": 0
+  },
+  "combined_native": {
+    "release": {
+      "terminal": true,
+      "profile": "release",
+      "candidate": "b3b583b8d297a58c2a22fd43d0020525b2896b7b",
+      "invocation": "b371017534ab44cb8ef614a4436b3cc6",
+      "results": [
+        {
+          "target": "xatlas-allocation",
+          "exit": 0,
+          "seconds": 0.032,
+          "log_sha256": "7d8b5830488de23399a53e3a34c01dec61fc77823739447dd77940bccf9f441e",
+          "last_line": "PASS 19 persistent thread-state allocation failures unwind all native workers and allow retry"
+        },
+        {
+          "target": "xatlas-shutdown",
+          "exit": 0,
+          "seconds": 0.064,
+          "log_sha256": "7af2ac5c60860d5825b0193513c90ad4ea4446e9793c7a2077c4829e6be39e61",
+          "last_line": "PASS 32 deterministic Atlas shutdown predicate/wait-registration handshakes"
+        },
+        {
+          "target": "atlas-robustness",
+          "exit": 0,
+          "seconds": 7.832,
+          "log_sha256": "1b8d16d0dc9b9ae35b7a7c3eb7bc16bff2340c5b8dc7c0cf5c0f0b20a7b777c8",
+          "last_line": "PASS Increasing requested resolution fits all independent tiny charts under the same strict policy"
+        },
+        {
+          "target": "atlas-cancellation",
+          "exit": 0,
+          "seconds": 0.214,
+          "log_sha256": "28ff31b1e889b2baab7d32697f78671046a8124d4b88eb299fb5193638e5a68f",
+          "last_line": "14 cancellable atlas checks passed"
+        },
+        {
+          "target": "atlas-authoring-cancellation",
+          "exit": 0,
+          "seconds": 1.617,
+          "log_sha256": "2b920d662d23bf14f325d37922124e63f7bdb75218a760cfc1f42914dd6f4789",
+          "last_line": "18 authoring atlas cancellation checks passed"
+        },
+        {
+          "target": "voxel-authoring",
+          "exit": 0,
+          "seconds": 0.365,
+          "log_sha256": "80b396a5f991f54e6f182109003be77bdac85fa8dedeba4da1d09fd18d1df0f3",
+          "last_line": "PASS Scalar-source remeshing has exact scene undo"
+        }
+      ],
+      "phase": "complete",
+      "exit": 0
+    },
+    "asan": {
+      "terminal": true,
+      "profile": "asan",
+      "candidate": "b3b583b8d297a58c2a22fd43d0020525b2896b7b",
+      "invocation": "74deaf10cf344d07a8e63cc7847288a0",
+      "results": [
+        {
+          "target": "xatlas-allocation",
+          "exit": 0,
+          "seconds": 0.114,
+          "log_sha256": "7d8b5830488de23399a53e3a34c01dec61fc77823739447dd77940bccf9f441e",
+          "last_line": "PASS 19 persistent thread-state allocation failures unwind all native workers and allow retry"
+        },
+        {
+          "target": "xatlas-shutdown",
+          "exit": 0,
+          "seconds": 0.415,
+          "log_sha256": "7af2ac5c60860d5825b0193513c90ad4ea4446e9793c7a2077c4829e6be39e61",
+          "last_line": "PASS 32 deterministic Atlas shutdown predicate/wait-registration handshakes"
+        },
+        {
+          "target": "atlas-robustness",
+          "exit": 0,
+          "seconds": 72.267,
+          "log_sha256": "1b8d16d0dc9b9ae35b7a7c3eb7bc16bff2340c5b8dc7c0cf5c0f0b20a7b777c8",
+          "last_line": "PASS Increasing requested resolution fits all independent tiny charts under the same strict policy"
+        },
+        {
+          "target": "atlas-cancellation",
+          "exit": 0,
+          "seconds": 2.018,
+          "log_sha256": "28ff31b1e889b2baab7d32697f78671046a8124d4b88eb299fb5193638e5a68f",
+          "last_line": "14 cancellable atlas checks passed"
+        },
+        {
+          "target": "atlas-authoring-cancellation",
+          "exit": 0,
+          "seconds": 12.044,
+          "log_sha256": "2b920d662d23bf14f325d37922124e63f7bdb75218a760cfc1f42914dd6f4789",
+          "last_line": "18 authoring atlas cancellation checks passed"
+        },
+        {
+          "target": "voxel-authoring",
+          "exit": 0,
+          "seconds": 4.528,
+          "log_sha256": "80b396a5f991f54e6f182109003be77bdac85fa8dedeba4da1d09fd18d1df0f3",
+          "last_line": "PASS Scalar-source remeshing has exact scene undo"
+        }
+      ],
+      "phase": "complete",
+      "exit": 0
+    }
+  },
+  "combined_xr": {
+    "suite-arc-asan": {
+      "candidate": "6f4743db63cabf592f0dad32dcda8ef960f3ceb3",
+      "app_source": "b3b583b8d297a58c2a22fd43d0020525b2896b7b",
+      "invocation": "97ba282387bc456cb03f899688d8ca35",
+      "profile": "arc-asan",
+      "terminal": true,
+      "exit": 1,
+      "error": "BlockingIOError(11, 'Resource temporarily unavailable')",
+      "elapsed_seconds": 0.51
+    },
+    "suite-software-release": {
+      "candidate": "6f4743db63cabf592f0dad32dcda8ef960f3ceb3",
+      "app_source": "b3b583b8d297a58c2a22fd43d0020525b2896b7b",
+      "invocation": "045e8ac9b8a34d5c968d31bbc2bc2a34",
+      "profile": "software-release",
+      "terminal": true,
+      "phase": "complete",
+      "app_sha256": "7c748606c6e0d211fc8b22f7fde7fb371a747056eb178333fd2ed2e37a581a50",
+      "runtime_sha256": "383dc8395d7cafc1d15494056b63fb791457a2972b589786d968cb1a265d70a3",
+      "runner_sha256": "e0d17c6be61d01a6b5675a4025f989c9fd7f0c4c633fcb825cc5c727eb585f8a",
+      "elapsed_seconds": 27.71,
+      "exit": 1,
+      "loader_exit": 1,
+      "checks": 61,
+      "report_complete": false,
+      "error": "FileNotFoundError: [Errno 2] No such file or directory: '/home/blux/de-xr/dome-sculpt/artifacts/xatlas-idle-group-wait-validation-20261126/release/dome-sculpt-bake-controls-test'",
+      "voxel": {
+        "exact_native_bytes": true,
+        "voxel_menu_pixels": 9884,
+        "voxel_menu_seen": true,
+        "voxel_open_pixels": 172,
+        "voxel_undo_pixels": 196,
+        "voxel_undo_seen": true
+      },
+      "arc_witness_count": 0
+    },
+    "suite-arc-asan-with-helpers": {
+      "candidate": "6f4743db63cabf592f0dad32dcda8ef960f3ceb3",
+      "app_source": "b3b583b8d297a58c2a22fd43d0020525b2896b7b",
+      "invocation": "88f64acb354040c0b7db70de16f11e77",
+      "profile": "arc-asan",
+      "terminal": false,
+      "phase": "run full native OpenXR workflow",
+      "app_sha256": "929a006e59362f11480e550fd0a07e662e6332bec3f35219075389f09ca711aa",
+      "runtime_sha256": "08b9fd1c1049a1252c3f9bfd610efca28c57d9631d9c0b8cc36a6d83e3024863",
+      "runner_sha256": "a30016faea8144c08af732dd5782a1562387e2f69d83fa9bceb00b0712f81842",
+      "elapsed_seconds": 2.92
+    },
+    "suite-software-release-with-helpers": {
+      "candidate": "6f4743db63cabf592f0dad32dcda8ef960f3ceb3",
+      "app_source": "b3b583b8d297a58c2a22fd43d0020525b2896b7b",
+      "invocation": "722bd44497c742fa91291f7d7683ada1",
+      "profile": "software-release",
+      "terminal": true,
+      "phase": "complete",
+      "app_sha256": "7c748606c6e0d211fc8b22f7fde7fb371a747056eb178333fd2ed2e37a581a50",
+      "runtime_sha256": "383dc8395d7cafc1d15494056b63fb791457a2972b589786d968cb1a265d70a3",
+      "runner_sha256": "e0d17c6be61d01a6b5675a4025f989c9fd7f0c4c633fcb825cc5c727eb585f8a",
+      "elapsed_seconds": 99.23,
+      "exit": 0,
+      "loader_exit": 0,
+      "checks": 152,
+      "report_complete": true,
+      "error": null,
+      "voxel": {
+        "exact_native_bytes": true,
+        "voxel_menu_pixels": 9884,
+        "voxel_menu_seen": true,
+        "voxel_open_pixels": 172,
+        "voxel_undo_pixels": 196,
+        "voxel_undo_seen": true
+      },
+      "arc_witness_count": 0
+    }
+  },
+  "hdr": {
+    "release-512": {
+      "profile": "release",
+      "resolution": 512,
+      "candidate": "78e94585aecbd57f26ccd82919e403a46b6ecac4",
+      "terminal": true,
+      "invocation": "6e614b98ea044e88a95de80d89785792",
+      "deadline_per_phase_seconds": 900,
+      "owned_RSS_limit_bytes": 4294967296,
+      "core_sha256": "bd78d9c365efe67b9b18421e512cebdca6c1cc4309d45d7e0dd92bba92708081",
+      "phase": "complete",
+      "capture_inputs": {
+        "original-source.dsculpt": "6415086c94bb1d1570e167ee317e3b3bd73e510cd9b35d6c26da0e189cfab0d6",
+        "selected-target-resolution.dsculpt": "1491fc951b73c25f24205a96b66a36450e5f578944317a0166a8df24921c9ac2",
+        "observed-source.json": "9ed2472ab7e8a7eb89f0b582c399dcfd07215fefab89a923577e7414561fcd17",
+        "observed-second-bake.dsculpt": "60d1cd75a49e5b8a628b3fbfbab87cce8df34abd5320f7d869a20f8f767fa9f7"
+      },
+      "seconds": 27.41,
+      "binary_sha256": "7b790374cccfa0212e5b4ac71546d92df1c091aaaa3564308a1e4a06389c51eb",
+      "runs": [
+        {
+          "label": "reopen",
+          "pid": 674874,
+          "exit": 0,
+          "error": null,
+          "elapsed_seconds": 3.007,
+          "peak_owned_rss": 162299904,
+          "libasan_mapped": false,
+          "libubsan_mapped": false,
+          "checks": [
+            6
+          ],
+          "log_sha256": "0e6520bde65db043e3117f3aeca42022a859e98f3c03b8298db0b6c41a682fe5"
+        },
+        {
+          "label": "ordered-history",
+          "pid": 675317,
+          "exit": 0,
+          "error": null,
+          "elapsed_seconds": 5.013,
+          "peak_owned_rss": 185552896,
+          "libasan_mapped": false,
+          "libubsan_mapped": false,
+          "checks": [
+            8
+          ],
+          "log_sha256": "ade0bf63753857d84c3082a99c95dd948984c692e944cfac3dff86494a207499"
+        }
+      ],
+      "outputs": {
+        "000.dsculpt": "60d1cd75a49e5b8a628b3fbfbab87cce8df34abd5320f7d869a20f8f767fa9f7",
+        "000-ordered.dsculpt": "60d1cd75a49e5b8a628b3fbfbab87cce8df34abd5320f7d869a20f8f767fa9f7"
+      },
+      "exit": 0
+    },
+    "asan-2048": {
+      "profile": "asan",
+      "resolution": 2048,
+      "candidate": "78e94585aecbd57f26ccd82919e403a46b6ecac4",
+      "terminal": false,
+      "invocation": "49be8468fe9c4ac899f3d14ea3014fcc",
+      "deadline_per_phase_seconds": 900,
+      "owned_RSS_limit_bytes": 4294967296,
+      "core_sha256": "828024bcdd488c84027dee87bddfe91e59106d8e33e23da398aa0a7812f000ab",
+      "phase": "ordered-history",
+      "capture_inputs": {
+        "original-source.dsculpt": "6415086c94bb1d1570e167ee317e3b3bd73e510cd9b35d6c26da0e189cfab0d6",
+        "selected-target-resolution.dsculpt": "a2fb762266ccd6a3de39e44635521265397ad0b82e6411162daa84c90f2ad724",
+        "observed-source.json": "9ed2472ab7e8a7eb89f0b582c399dcfd07215fefab89a923577e7414561fcd17",
+        "observed-second-bake.dsculpt": "9c299cac73198075a602366fc7084e37409e6055f39a90d641f9ddf8add28673"
+      },
+      "seconds": 401.16,
+      "binary_sha256": "9ff47758d14c2ee38dbd6fe29009bf801e777dec43413ad48b81243e44b74522",
+      "runs": [
+        {
+          "label": "reopen",
+          "pid": 677224,
+          "exit": 0,
+          "error": null,
+          "elapsed_seconds": 366.929,
+          "peak_owned_rss": 2846806016,
+          "libasan_mapped": true,
+          "libubsan_mapped": true,
+          "checks": [
+            6
+          ],
+          "log_sha256": "ffe211fbaa4dfd0937479e437c823d1db4dfc1a935d9fd3530c5c44eb5360f8a"
+        }
+      ],
+      "outputs": {
+        "000.dsculpt": "9c299cac73198075a602366fc7084e37409e6055f39a90d641f9ddf8add28673"
+      }
+    }
+  },
+  "vrm_faults": {
+    "release": {
+      "profile": "release",
+      "candidate": "3130bc2b0586cbd8315194b79267e7ae085eb1b5",
+      "parent": "ccbbe02093bed6997bdacdf0d36b3a11bc1f177d",
+      "invocation": "c5abcab274e04fdf85dc0d61a06c71e9",
+      "terminal": true,
+      "linked": {
+        "dome-sculpt-vrm1-normal-faults-test": "8c4dcecdb98f447497968e65fd0b0c7b647818c40e4ff406d3f6acdb4a0f0cf4",
+        "dome-sculpt-vrm1-shift-faults-test": "62a5127ac3d4873fb7248974755a3c0bfbd60629c64717f433a00286ab50bfb1"
+      },
+      "phase": "complete",
+      "outcomes": {
+        "normal-controls": {
+          "exit": 0,
+          "project_sha256": "ef0a83baae140eb653282e29fe579a2cdbac3b8a24a7cce46bd205caf9ec2331",
+          "report": "PASS 16 actual Normal controls/retry checks (prefixes not requested)"
+        },
+        "normal-full": {
+          "exit": 0,
+          "project_sha256": "ef0a83baae140eb653282e29fe579a2cdbac3b8a24a7cce46bd205caf9ec2331",
+          "report": "PASS 2664 actual Normal allocation/cancel/target/float-budget/retry checks"
+        },
+        "shift-controls": {
+          "exit": 0,
+          "project_sha256": "65dcb6e88d57c027cb5dc69dc45f27dafe161c86a753e15223ff7eeb1e6db61b",
+          "report": "PASS 16 actual Normal controls/retry checks (prefixes not requested)"
+        },
+        "shift-full": {
+          "exit": 0,
+          "project_sha256": "65dcb6e88d57c027cb5dc69dc45f27dafe161c86a753e15223ff7eeb1e6db61b",
+          "report": "PASS 2736 actual Shift allocation/cancel/target/float-budget/retry checks"
+        }
+      },
+      "exit": 0
+    },
+    "asan": {
+      "profile": "asan",
+      "candidate": "3130bc2b0586cbd8315194b79267e7ae085eb1b5",
+      "parent": "ccbbe02093bed6997bdacdf0d36b3a11bc1f177d",
+      "invocation": "f08d989c26ef402abbbd3724a9ed9565",
+      "terminal": false,
+      "linked": {
+        "dome-sculpt-vrm1-normal-faults-test": "9957fd8989b1e0968f79e272a671794fca48fa5a0f24f657e612004ef0f3853b"
+      },
+      "phase": "compile dome-sculpt-vrm1-shift-faults-test",
+      "outcomes": {
+        "normal-controls": {
+          "exit": 0,
+          "project_sha256": "ef0a83baae140eb653282e29fe579a2cdbac3b8a24a7cce46bd205caf9ec2331",
+          "report": "PASS 16 actual Normal controls/retry checks (prefixes not requested)"
+        },
+        "normal-full": {
+          "exit": 0,
+          "project_sha256": "ef0a83baae140eb653282e29fe579a2cdbac3b8a24a7cce46bd205caf9ec2331",
+          "report": "PASS 2664 actual Normal allocation/cancel/target/float-budget/retry checks"
+        }
+      }
+    }
+  },
+  "full_combined_release": {
+    "status": {
+      "candidate": "ccbbe02093bed6997bdacdf0d36b3a11bc1f177d",
+      "phase": "Run all registered CTests in private software profile",
+      "terminal": false,
+      "invocation": "24af6aa6636246d69fbb40bb192389ef",
+      "seconds": 1505.05,
+      "focused_ctest_exit": 8,
+      "public_acceptance_exit": 0,
+      "app_sha256": "4b6335a00541127e43528b7f2c985cc24213a9fc7ef77d268a471aef9d926a1b",
+      "build_exit": 0,
+      "registered": 1360,
+      "command": [
+        "bwrap",
+        "--die-with-parent",
+        "--unshare-all",
+        "--ro-bind",
+        "/",
+        "/",
+        "--bind",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm-consumer-combined-20261126",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm-consumer-combined-20261126",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--tmpfs",
+        "/run/user",
+        "--clearenv",
+        "--setenv",
+        "PATH",
+        "/usr/bin:/bin",
+        "--setenv",
+        "HOME",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm-consumer-combined-20261126/full-private-ctest/private/home",
+        "--setenv",
+        "XDG_CACHE_HOME",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm-consumer-combined-20261126/full-private-ctest/private/cache",
+        "--setenv",
+        "XDG_CONFIG_HOME",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm-consumer-combined-20261126/full-private-ctest/private/config",
+        "--setenv",
+        "XDG_DATA_HOME",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm-consumer-combined-20261126/full-private-ctest/private/data",
+        "--setenv",
+        "XDG_RUNTIME_DIR",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm-consumer-combined-20261126/full-private-ctest/private/runtime",
+        "--setenv",
+        "XDG_STATE_HOME",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm-consumer-combined-20261126/full-private-ctest/private/state",
+        "--setenv",
+        "LD_LIBRARY_PATH",
+        "/opt/fltk-vr/toolkit/lib:/opt/fltk-vr/bdf-runtime/lib:/usr/lib64",
+        "--setenv",
+        "LIBGL_ALWAYS_SOFTWARE",
+        "1",
+        "--setenv",
+        "LP_NUM_THREADS",
+        "2",
+        "--setenv",
+        "OPENBLAS_NUM_THREADS",
+        "2",
+        "--setenv",
+        "OMP_NUM_THREADS",
+        "2",
+        "ctest",
+        "--test-dir",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm-consumer-combined-20261126",
+        "-j4",
+        "--output-on-failure",
+        "--output-junit",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm-consumer-combined-20261126/full-private-ctest/full.xml"
+      ],
+      "environment": {
+        "PATH": "/usr/bin:/bin",
+        "HOME": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-consumer-combined-20261126/full-private-ctest/private/home",
+        "XDG_CACHE_HOME": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-consumer-combined-20261126/full-private-ctest/private/cache",
+        "XDG_CONFIG_HOME": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-consumer-combined-20261126/full-private-ctest/private/config",
+        "XDG_DATA_HOME": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-consumer-combined-20261126/full-private-ctest/private/data",
+        "XDG_RUNTIME_DIR": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-consumer-combined-20261126/full-private-ctest/private/runtime",
+        "XDG_STATE_HOME": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-consumer-combined-20261126/full-private-ctest/private/state",
+        "LD_LIBRARY_PATH": "/opt/fltk-vr/toolkit/lib:/opt/fltk-vr/bdf-runtime/lib:/usr/lib64",
+        "LIBGL_ALWAYS_SOFTWARE": "1",
+        "LP_NUM_THREADS": "2",
+        "OPENBLAS_NUM_THREADS": "2",
+        "OMP_NUM_THREADS": "2"
+      }
+    },
+    "completed": 1359,
+    "passed": 1357,
+    "other": [
+      [
+        "vrm1-shift-faults",
+        "***Failed"
+      ],
+      [
+        "vrm1-normal-faults",
+        "***Failed"
+      ]
+    ]
+  },
+  "archive": {
+    "path": "docs/validation/atlas-worker-and-history-20261126.tar.gz",
+    "sha256": "96a901613101dd77e4423e6ca2295fa49c78b24b2e963de9a090832fb7c74f4c"
+  }
+}
