@@ -921,10 +921,11 @@ all eight ASan/UBSan checks with the cache candidate. It takes 633.363
 seconds within the 900-second phase limit and peaks at 2,503,692,288
 bytes under 4 GiB. The ordered file matches the observed second Bake
 byte for byte. Redo publishes the baked preview within the existing wait
-and restores the exact native state. The cache port based on main,
-`ead80bb5`, passes the
-optimized application link/version check and five focused bake, UV and
-cache tests with the two CC0 VRoid inputs. Its strict build is in progress.
+and restores the exact native state. The main-based port `ead80bb5`
+passes the optimized link/version check and five focused bake, UV and
+cache tests with the two CC0 VRoid inputs. Its fresh ASan/UBSan application
+build, version check and the same five native CTests also pass. Main
+includes this cache port.
 
 Combined candidate `3cb2fe81` keeps the `ccbbe020` source baseline and adds
 both atlas patches, the rendered XR readiness fixtures, and the two VRM1
