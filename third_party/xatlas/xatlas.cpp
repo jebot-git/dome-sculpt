@@ -3776,10 +3776,7 @@ private:
 		m_cellData.reserve(edgeCount * 2);
 		for (uint32_t i = 0; i < edgeCount; i++) {
 			const uint32_t edge = m_edges[i];
-			traverse(edgePosition0(edge), edgePosition1(edge));
-			XA_DEBUG_ASSERT(!m_traversedCellOffsets.isEmpty());
-			for (uint32_t j = 0; j < m_traversedCellOffsets.size(); j++) {
-				const uint32_t cell = m_traversedCellOffsets[j];
+			traverse(edgePosition0(edge), edgePosition1(edge), [&](uint32_t cell) {
 				uint32_t offset = m_cellDataOffsets[cell];
 				if (offset == UINT32_MAX)
 					m_cellDataOffsets[cell] = m_cellData.size();
@@ -3795,7 +3792,7 @@ private:
 				}
 				m_cellData.push_back(edge);
 				m_cellData.push_back(UINT32_MAX);
-			}
+			});
 		}
 		return true;
 	}
@@ -3803,30 +3800,33 @@ private:
 	void computePotentialEdges(Vector2 p1, Vector2 p2)
 	{
 		m_potentialEdges.clear();
-		traverse(p1, p2);
-		for (uint32_t j = 0; j < m_traversedCellOffsets.size(); j++) {
-			const uint32_t cell = m_traversedCellOffsets[j];
+		traverse(p1, p2, [&](uint32_t cell) {
 			uint32_t offset = m_cellDataOffsets[cell];
 			while (offset != UINT32_MAX) {
 				const uint32_t edge2 = m_cellData[offset];
 				m_potentialEdges.push_back(edge2);
 				offset = m_cellData[offset + 1];
 			}
-		}
+		});
 		if (m_potentialEdges.isEmpty())
 			return;
 		insertionSort(m_potentialEdges.data(), m_potentialEdges.size());
 	}
 
 	// "A Fast Voxel Traversal Algorithm for Ray Tracing"
-	void traverse(Vector2 p1, Vector2 p2)
+	template<typename Visitor>
+	void traverse(Vector2 p1, Vector2 p2, Visitor visit)
 	{
+		const uint32_t firstCell[2] = { cellX(p1.x), cellY(p1.y) };
+		const uint32_t lastCell[2] = { cellX(p2.x), cellY(p2.y) };
+		visit(firstCell[0] + firstCell[1] * m_gridWidth);
+		if (firstCell[0] == lastCell[0] && firstCell[1] == lastCell[1])
+			return;
+
 		const Vector2 dir = p2 - p1;
 		const Vector2 normal = normalizeSafe(dir, Vector2(0.0f));
 		const int stepX = dir.x >= 0 ? 1 : -1;
 		const int stepY = dir.y >= 0 ? 1 : -1;
-		const uint32_t firstCell[2] = { cellX(p1.x), cellY(p1.y) };
-		const uint32_t lastCell[2] = { cellX(p2.x), cellY(p2.y) };
 		float distToNextCellX;
 		if (stepX == 1)
 			distToNextCellX = (firstCell[0] + 1) * m_cellSize - (p1.x - m_gridOrigin.x);
@@ -3850,8 +3850,6 @@ private:
 		}
 		else
 			tMaxY = tDeltaY = FLT_MAX;
-		m_traversedCellOffsets.clear();
-		m_traversedCellOffsets.push_back(firstCell[0] + firstCell[1] * m_gridWidth);
 		uint32_t currentCell[2] = { firstCell[0], firstCell[1] };
 		while (!(currentCell[0] == lastCell[0] && currentCell[1] == lastCell[1])) {
 			if (tMaxX < tMaxY) {
@@ -3871,7 +3869,7 @@ private:
 				break;
 			if (stepY == 1 && currentCell[1] > lastCell[1])
 				break;
-			m_traversedCellOffsets.push_back(currentCell[0] + currentCell[1] * m_gridWidth);
+			visit(currentCell[0] + currentCell[1] * m_gridWidth);
 		}
 	}
 
@@ -3909,7 +3907,6 @@ private:
 	Array<uint32_t> m_cellDataOffsets;
 	Array<uint32_t> m_cellData;
 	Array<uint32_t> m_potentialEdges;
-	Array<uint32_t> m_traversedCellOffsets;
 };
 
 struct UvMeshChart
