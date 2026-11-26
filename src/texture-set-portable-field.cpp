@@ -22,8 +22,11 @@ PortableTextureSetField portable_texture_set_field(const TextureSetView&field,co
  if(field.painted->has_physical_emission()||hdr_emission(field.material.emissive)||field.material_bindings->physical_emission||hdr_emission(field.material_bindings->native_reference.emission))throw std::invalid_argument("Retained texture-set FLOAT/HDR export needs its precision-qualified per-material emission compiler");
  const size_t count=field.domain->triangles().size()*3,full=p->geometric_frames().size();
  if(count>limits.maximum_corners||full>limits.maximum_bytes/64||count>(limits.maximum_bytes-full*64)/sizeof(PortableTextureSetCorner)||full>limits.maximum_work/96)throw std::length_error("Portable retained field exceeds prospective frame/attribute budget");
- p->validate_world(world,1e-6,limits.cancelled);const auto frames=p->placed_frames(world,limits.cancelled);const auto inverse=world.inverse();const float hand=world.orientation()==AffineOrientation::Reversing?-1.f:1.f;
- PortableTextureSetField out;out.corners.reserve(count);out.normal_role=p->model()==PolygonSurfaceNormalModel::PreparedCorePbr;const bool conformal=exact_similarity(world);
+ const bool native=bool(p->native_bake());
+ if(native)p->validate_bake_world(field.domain->triangles(),world,limits.cancelled);
+ else p->validate_world(world,1e-6,limits.cancelled);
+ const auto frames=p->placed_frames(world,limits.cancelled);const auto inverse=world.inverse();const float hand=world.orientation()==AffineOrientation::Reversing?-1.f:1.f;
+ PortableTextureSetField out;out.corners.reserve(count);out.normal_role=native||p->model()==PolygonSurfaceNormalModel::PreparedCorePbr;const bool conformal=exact_similarity(world);
  for(auto triangle:field.domain->triangles()){
   stop(limits);const auto first=size_t(triangle)*3;const auto rawN=p->normals().at(first);
   for(size_t k=1;k<3;++k)if(!same(rawN,p->normals().at(first+k))&&(out.normal_role||!conformal))throw std::invalid_argument("Varying retained before normals require a certified whole-triangle standard-export basis adapter");
@@ -31,15 +34,24 @@ PortableTextureSetField portable_texture_set_field(const TextureSetView&field,co
   const auto N=unit(world.normal({rawN.x,rawN.y,rawN.z}));const auto desiredN=normalized(transport(before,current,N));const auto localN=unit(inverse.normal({desiredN.x,desiredN.y,desiredN.z}));
   auto localT=perpendicular(localN);
   if(out.normal_role){
-   const auto rawT=p->tangents().at(first);for(size_t k=1;k<3;++k)if(rawT!=p->tangents().at(first+k))throw std::invalid_argument("Varying retained artist tangent/W requires its whole-triangle standard-export basis adapter");
-   const auto T=unit(world.direction({rawT[0],rawT[1],rawT[2]}));if(std::abs(dot(N,T))>2e-7f)throw std::invalid_argument("Oblique retained before N/T cannot be silently orthogonalized for glTF");
-   const auto B=normalized(cross(N,T))*(rawT[3]*hand);const auto desiredT=normalized(transport(before,current,T)),desiredB=normalized(transport(before,current,B));
+   Vec3 T,B;
+   if(native){
+    const auto baked=p->before_role_basis(triangle,{1,0,0},world);
+    T=baked.t;B=baked.b;
+   }else{
+    const auto rawT=p->tangents().at(first);
+    for(size_t k=1;k<3;++k)if(rawT!=p->tangents().at(first+k))throw std::invalid_argument("Varying retained artist tangent/W requires its whole-triangle standard-export basis adapter");
+    T=unit(world.direction({rawT[0],rawT[1],rawT[2]}));
+    B=normalized(cross(N,T))*(rawT[3]*hand);
+   }
+   if(std::abs(dot(N,T))>2e-7f)throw std::invalid_argument("Oblique retained before N/T cannot be silently orthogonalized for glTF");
+   const auto desiredT=normalized(transport(before,current,T)),desiredB=normalized(transport(before,current,B));
    const auto t=unit(inverse.direction({desiredT.x,desiredT.y,desiredT.z}));const float w=(dot(cross(desiredN,desiredT),desiredB)<0?-1.f:1.f)*hand;localT={t.x,t.y,t.z,w};
    if(std::abs(dot(localN,t))>2e-6f)throw std::invalid_argument("Portable retained local N/T lost orthogonality under the actual world transform");
    const auto actualN=unit(world.normal({localN.x,localN.y,localN.z})),actualT=unit(world.direction({t.x,t.y,t.z}));const auto actualB=normalized(cross(actualN,actualT))*(w*hand);
    if(length(actualN-desiredN)>5e-6f||length(actualT-desiredT)>5e-6f||length(actualB-desiredB)>5e-6f)throw std::invalid_argument("Portable retained frame exceeds floating-point transport conditioning bounds");
   }else if(length(unit(world.normal({localN.x,localN.y,localN.z}))-desiredN)>5e-6f)throw std::invalid_argument("Portable retained N exceeds floating-point transport bounds");
-  for(size_t k=0;k<3;++k){const auto paint=p->paint_coordinates().at(first+k);const auto role=out.normal_role?p->normal_coordinates().at(first+k):paint;
+  for(size_t k=0;k<3;++k){const auto paint=p->paint_coordinates().at(first+k);const auto role=out.normal_role&&!native?p->normal_coordinates().at(first+k):paint;
    auto n=localN;auto t=localT;
    if(!out.normal_role&&!same(rawN,p->normals().at(first+k))){const auto raw=p->normals().at(first+k);const auto original=unit(world.normal({raw.x,raw.y,raw.z})),desired=normalized(transport(before,current,original));n=unit(inverse.normal({desired.x,desired.y,desired.z}));t=perpendicular(n);if(length(unit(world.normal({n.x,n.y,n.z}))-desired)>5e-6f)throw std::invalid_argument("Portable smooth retained N exceeds floating-point transport bounds");}
    out.corners.push_back({n,t,paint,role});}

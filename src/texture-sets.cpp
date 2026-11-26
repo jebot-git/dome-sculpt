@@ -77,7 +77,8 @@ struct TextureSetAccess {
  static void stage_bake(SculptObject &target,
        const std::shared_ptr<const TextureSetCollection> &membership,
        const TextureSetView &recipient, std::shared_ptr<PaintedMesh> paint,
-       std::shared_ptr<const ObjectBakeRecipe> recipe,const TextureSetLimits &limits) {
+       std::shared_ptr<const ObjectBakeRecipe> recipe,const TextureSetLimits &limits,
+       std::shared_ptr<const Image> native_normal) {
   stop(limits);
   if (!same_owner(target.texture_sets,membership) || target.texture_sets->active()!=recipient.id)
    throw std::invalid_argument("The active texture set changed during Bake");
@@ -92,8 +93,9 @@ struct TextureSetAccess {
   std::shared_ptr<const TextureSetFieldSource> source;
   if(current.source){
    auto next=current;next.painted=paint;next.bake_recipe=recipe;
-   source=current.source->with_bake(next,limits);
-  }
+   source=current.source->with_bake(next,limits,std::move(native_normal));
+  }else if(native_normal)
+   throw std::invalid_argument("A plain texture set cannot borrow retained normal detail");
   std::shared_ptr<TextureSetCollection> collection;
   if(recipient.id||source)
    collection=std::shared_ptr<TextureSetCollection>(new TextureSetCollection(*membership));
@@ -218,8 +220,9 @@ struct TextureSetAccess {
 void stage_texture_set_bake(SculptObject &target,
     const std::shared_ptr<const TextureSetCollection> &membership,
     const TextureSetView &recipient, std::shared_ptr<PaintedMesh> paint,
-    std::shared_ptr<const ObjectBakeRecipe> recipe,const TextureSetLimits &limits) {
- TextureSetAccess::stage_bake(target,membership,recipient,std::move(paint),std::move(recipe),limits);
+    std::shared_ptr<const ObjectBakeRecipe> recipe,const TextureSetLimits &limits,
+    std::shared_ptr<const Image> native_normal) {
+ TextureSetAccess::stage_bake(target,membership,recipient,std::move(paint),std::move(recipe),limits,std::move(native_normal));
 }
 bool texture_set_bake_present(const TextureSetView &field) noexcept {
  return field.painted&&field.painted->baked()&&(!field.source||field.painted->baked()!=field.source->original_paint()->baked());

@@ -16,7 +16,11 @@ inline void validate_polygon_range(const Mesh&mesh,const SurfaceRange&r,
  const bool declared=r.material_bindings&&bool(r.material_bindings->polygon_surface_transfer);
  if(bool(packet)!=declared)throw std::invalid_argument("Polygon range omitted or fabricated its actual current field packet");if(!packet)return;
  if(!packet->matches(r.material_bindings,r.paint_sampling_attachment))throw std::invalid_argument("Polygon range lost its exact field/binding/paint attachment");packet->validate_maps(*r.textures);
- const auto world=polygon_range_world(r);const AffineInteractionFrame frame(world);packet->validate_world(world,1e-6,cancelled);
+ const auto world=polygon_range_world(r);const AffineInteractionFrame frame(world);
+ if(packet->native_bake()){
+  if(!r.texture_set_proof)throw std::invalid_argument("Native polygon Bake requires its retained texture-set range");
+  packet->validate_bake_world(r.texture_set_proof->field().domain->triangles(),world,cancelled);
+ }else packet->validate_world(world,1e-6,cancelled);
  const auto&source=*packet->attachment()->authored_geometry();
  if(r.texture_set_proof)r.texture_set_proof->authenticate(r);
  if(r.first>mesh.indices.size()||(r.texture_set_proof?r.count!=r.texture_set_proof->draw().count:r.count!=source.indices.size())||r.count>mesh.indices.size()-r.first||paint.size()!=(vertex_coordinates?mesh.positions.size():mesh.indices.size()))throw std::invalid_argument("Polygon range current corner dimensions differ from its owning field");

@@ -11,6 +11,7 @@
 #include "dome/source-uv-bake.hpp"
 #include "dome/tangents.hpp"
 #include "texture-set-export.hpp"
+#include "texture-set-bake.hpp"
 #include "texture-set-field-source.hpp"
 #include "polygon-surface-preview.hpp"
 #include "baked-normal-field.hpp"
@@ -547,6 +548,98 @@ void bake_retained_recipient(TextureSetId id,bool physical){
  check(Scene::decode(cleared.encode()).encode()==cleared.encode()&&
        document.undo()&&document.copy_scene().encode()==saved,"Clear survives cold replay and exact Undo");
 }
+void bake_retained_native(bool reflected,bool smooth){
+ auto scene=source(false,reflected,false,smooth);
+ const auto target=scene.active().id;
+ if(!reflected)scene.active().affine_edit.reset();
+ select_texture_set(scene,target,1);
+ const auto old=active_texture_set(scene.active());
+ const auto neighbor=texture_set_view(scene.active(),0);
+ const auto world=scene.world_matrix(target);
+ const auto &preview=*old.source->source_preview();
+ const auto triangle=old.domain->triangles().front();
+ const std::array<double,3> covered{.68,.18,.14};
+ const std::array<double,3> uncovered{.18,.53,.29};
+ const auto before=old.source->normal(triangle,uncovered,world,true);
+ check(preview.model()==detail::PolygonSurfaceNormalModel::NativeNOnly&&
+       preview.tangents().empty()&&!preview.native_bake(),
+       "Native target starts with actual authored normals and no tangent field");
+ const auto &mesh=old.painted->mesh();
+ Mesh donor_mesh;
+ const auto role=preview.normals().at(size_t(triangle)*3);
+ const auto tilted=normalized(role+Vec3{.19f,-.28f,0});
+ std::array<Vec3,3> positions;
+ for(size_t k=0;k<3;++k)positions[k]=mesh.positions.at(mesh.indices.at(size_t(triangle)*3+k));
+ donor_mesh.positions={positions[0],positions[0]*.44f+positions[1]*.56f,
+                       positions[0]*.44f+positions[2]*.56f};
+ for(auto &point:donor_mesh.positions)point.z+=.014f;
+ donor_mesh.normals.assign(3,tilted);
+ donor_mesh.indices={0,1,2};
+ donor_mesh.uv={{.1f,.1f},{.9f,.1f},{.1f,.9f}};
+ const auto placement=scene.active().affine_edit;
+ const auto donor=scene.add("Partly covering native Bake donor",Volume{});
+ auto &high=scene.active();
+ high.mesh_active=true;
+ high.painted=std::make_shared<PaintedMesh>(donor_mesh,64);
+ high.affine_edit=placement;
+ high.material.color={.21f,.73f,.46f,1};
+ if(reflected)create_texture_set(scene,donor,std::array<uint64_t,1>{1},"Donor",64);
+ scene.active().visible=false;
+ scene.active().locked=true;
+ scene.select(target);
+ const auto baseline=scene.encode();
+ ObjectBakeSettings settings;settings.allow_backfaces=true;settings.allow_partial=true;settings.padding=0;
+ settings.ao_samples=2;
+ Document document;document.replace(scene);ready(document);
+ check(document.frame().state->can_bake&&!document.frame().state->can_clear_bake,
+       "Native retained target admits the actual Bake command");
+ document.bake_from_object(donor,settings);
+ const auto path=std::filesystem::path("native-target.dsculpt");
+ document.save_async(path).get();ready(document);
+ const auto accepted=document.copy_scene();
+ const auto saved=accepted.encode();
+ const auto current=active_texture_set(accepted.active());
+ const auto next=current.source->source_preview()->native_bake();
+ check(next&&next->width==64&&current.painted->baked()&&current.painted->baked()->maps.normal.rgba.empty(),
+       "The bake stores detail separately from the original normal and material owners");
+ const auto expected=unit(world.normal({tilted.x,tilted.y,tilted.z}));
+ const auto at_hit=current.source->normal(triangle,covered,world,true);
+ const auto at_miss=current.source->normal(triangle,uncovered,world,true);
+ check(length(at_hit-expected)<.02f,"Retained baked direction matches the authored donor under the placed frame");
+ check(length(at_miss-before)<3e-6f,"No projected texel restores the exact smooth inherited normal");
+ check(Scene::load(path).encode()==saved&&saved!=baseline,"Native normal Bake reopens through its real Paint7 envelope");
+ check(texture_set_view(accepted.active(),0).source==neighbor.source,
+       "An unrelated retained member preserves its exact original owner");
+ auto malformed=saved;
+ auto &paints=malformed.at("texture_set_geometry").at("paints");
+ auto slot=std::find_if(paints.begin(),paints.end(),[](const auto &p){
+   return p.at("painted").contains("normal_detail");
+ });
+ check(slot!=paints.end()&&slot->at("painted").at("field_bake")==2,"The native envelope names its actual normal image");
+ slot->at("painted")["normal_detail"]=UINT32_MAX;
+ refuses([&]{Scene::decode(malformed);},"An absent normal image cannot be borrowed by a native bake");
+ if(!smooth){
+  const std::filesystem::path glb="native-normal-bake.glb";
+  document.export_asset(glb,AssetExportFormat::Glb).get();
+  cgltf_options options{};
+  cgltf_data *data=nullptr;
+  check(cgltf_parse_file(&options,glb.c_str(),&data)==cgltf_result_success,
+        "The portable GLB worker exports the native normal bake");
+  const std::unique_ptr<cgltf_data,decltype(&cgltf_free)> guard(data,cgltf_free);
+  check(cgltf_load_buffers(&options,data,glb.c_str())==cgltf_result_success&&
+        cgltf_validate(data)==cgltf_result_success&&data->meshes_count==1&&
+        data->meshes[0].primitives_count==2,"Independent glTF validates both material primitives");
+ }
+ check(document.undo()&&document.copy_scene().encode()==baseline&&
+       document.redo()&&document.copy_scene().encode()==saved,"Native retained texture Bake has exact history");
+ document.clear_bake();ready(document);
+ const auto cleared=document.copy_scene();
+ const auto field=active_texture_set(cleared.active());
+ check(!field.source->source_preview()->native_bake()&&field.painted->baked()==old.painted->baked()&&
+       field.bake_recipe->source.object==donor,"Clear restores original Paint and normal state while keeping Recall");
+ check(Scene::decode(cleared.encode()).encode()==cleared.encode()&&
+       document.undo()&&document.copy_scene().encode()==saved,"Clear survives cold replay and exact Undo");
+}
 void recipe_reference_remap(bool prepared) {
  auto scene = source(prepared,false,false,false,true);
  const auto before = scene.encode();
@@ -614,6 +707,13 @@ int main(int argc,char **argv)try {
  }
  if(argc==4&&mode=="--texture-set-xr-fixture"){
   retained_bake_xr_fixture(argv[2],argv[3]);
+  return 0;
+ }
+ if(argc==3&&mode=="--retained-native-target"){
+  std::filesystem::create_directories(argv[2]);std::filesystem::current_path(argv[2]);
+  bake_retained_native(false,false);
+  bake_retained_native(true,true);
+  std::cout<<"PASS "<<checks<<" native-normal retained target checks\n";
   return 0;
  }
  if(argc==3&&mode=="--retained-bake-target"){

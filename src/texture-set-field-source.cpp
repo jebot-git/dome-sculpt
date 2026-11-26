@@ -68,24 +68,52 @@ void TextureSetFieldSource::validate_field(const TextureSetView&value,const Text
 }
 std::shared_ptr<const PaintedMesh>TextureSetFieldSource::read_view(const TextureSetView&value,const TextureSetLimits&limits)const{validate_field(value,limits,false);return readable_;}
 std::shared_ptr<const TextureSetFieldSource>TextureSetFieldSource::with_current(const TextureSetView&value,const TextureSetLimits&limits)const{
- return with_member(value,limits,false);
+ return with_member(value,limits,false,preview_?preview_->native_bake():nullptr);
 }
-std::shared_ptr<const TextureSetFieldSource>TextureSetFieldSource::with_bake(const TextureSetView&value,const TextureSetLimits&limits)const{
- if(!polygon_||!polygon_->has_normal_field()||!original_->baked()||!value.bake_recipe)
-  throw std::invalid_argument("Retained texture-set Bake requires a prepared normal source and its actual recipe");
- if(value.painted&&value.painted->baked()!=original_->baked()){
-  const auto initial=original_->baked()->normal_field;
-  const auto baked=value.painted->baked();
-  auto ancestor=baked&&baked->normal_field?baked->normal_field->prior():nullptr;
-  while(ancestor&&!owner(ancestor,initial)){stop(limits);ancestor=ancestor->prior();}
-  if(!ancestor)throw std::invalid_argument("Retained texture-set Bake must extend its own original normal field");
+std::shared_ptr<const TextureSetFieldSource>TextureSetFieldSource::with_bake(
+    const TextureSetView&value,const TextureSetLimits&limits,std::shared_ptr<const Image> native)const{
+ if(!polygon_||!value.painted||!value.bake_recipe)
+  throw std::invalid_argument("Retained texture-set Bake requires its actual field and recipe");
+ const auto baked=value.painted->baked();
+ const bool changed=!owner(baked,original_->baked());
+ if(polygon_->has_normal_field()){
+  if(native||!original_->baked())
+   throw std::invalid_argument("Prepared normal detail keeps its independent original role");
+  if(changed){
+   const auto initial=original_->baked()->normal_field;
+   auto ancestor=baked&&baked->normal_field?baked->normal_field->prior():nullptr;
+   while(ancestor&&!owner(ancestor,initial)){stop(limits);ancestor=ancestor->prior();}
+   if(!ancestor)throw std::invalid_argument("Retained texture-set Bake must extend its own original normal field");
+  }
+ }else if(changed!=bool(native)){
+  throw std::invalid_argument("Native normal and material Bake need the same retained field");
  }
- return with_member(value,limits,true);
+ if(native){
+  if(!baked||native->width!=value.painted->resolution()||native->height!=native->width)
+   throw std::invalid_argument("Native normal bake has different dimensions from its retained grid");
+  if(native->rgba.size()>limits.maximum_bytes)
+   throw std::length_error("Native normal bake exceeds its grid budget");
+  native->validate();
+  bool covered=false;
+  for(size_t i=0;i<native->rgba.size();i+=4){
+   if((i&4095)==0)stop(limits);
+   const auto *pixel=native->rgba.data()+i;
+   if(pixel[3]==255){
+    if(baked->coverage.at(i/4)!=255)
+     throw std::invalid_argument("Native normal bake is outside its covered material grid");
+    covered=true;
+   }else if(pixel[3]!=0||pixel[0]!=128||pixel[1]!=128||pixel[2]!=255)
+    throw std::invalid_argument("Native normal bake has nonneutral or fractional uncovered data");
+  }
+  if(!covered)throw std::invalid_argument("Native normal bake has no authored coverage");
+ }
+ return with_member(value,limits,true,std::move(native));
 }
-std::shared_ptr<const TextureSetFieldSource>TextureSetFieldSource::with_member(const TextureSetView&value,const TextureSetLimits&limits,bool rebake)const{
+std::shared_ptr<const TextureSetFieldSource>TextureSetFieldSource::with_member(
+    const TextureSetView&value,const TextureSetLimits&limits,bool rebake,std::shared_ptr<const Image> native)const{
  validate_member(value,limits,rebake);if(working_bytes(value,limits)>limits.maximum_bytes)throw std::length_error("Updated source field exceeds metadata/raster quota");
  auto next=std::shared_ptr<TextureSetFieldSource>(new TextureSetFieldSource);next->field_=value;next->field_.source.reset();next->field_.painted=value.painted->snapshot();next->original_=original_;next->polygon_=polygon_;next->readable_=TextureSetPaintAccess::field_source_view(*next->field_.painted,*original_,field_.domain,limits,next->field_.painted.get());
- next->preview_=preview_?preview_->with_bake(*next->readable_):nullptr;
+ next->preview_=preview_?preview_->with_bake(*next->readable_,std::move(native)):nullptr;
  std::shared_ptr<const TextureSetFieldSource>sealed(new const TextureSetFieldSource(std::move(*next)));sealed->self_=sealed;sealed->validate_field(sealed->field_,limits);return sealed;
 }
 std::shared_ptr<const TextureSetFieldSource>TextureSetFieldSource::repartition(const TextureSetView&value,std::shared_ptr<const TextureSetFaceDomain>domain,const TextureSetLimits&limits)const{
@@ -94,9 +122,9 @@ std::shared_ptr<const TextureSetFieldSource>TextureSetFieldSource::repartition(c
  const auto with_bake=source.painted;
  auto baseline=with_bake->snapshot();TextureSetPaintAccess::restore_source_bake(*baseline,*original_);
  source.painted=baseline;
- auto next=capture_prepared(source,std::move(domain),preview_->with_bake(*baseline),limits);
+ auto next=capture_prepared(source,std::move(domain),preview_->with_bake(*baseline,{}),limits);
  auto current=next->field();current.painted=TextureSetPaintAccess::bind_raster(*with_bake,current.domain,*current.painted,limits);
- return next->with_bake(current,limits);
+ return next->with_bake(current,limits,preview_->native_bake());
 }
 TextureSetFieldSample TextureSetFieldSource::sample(uint32_t triangle,std::array<double,3>b,const TextureSetLimits&limits)const{
  limits.validate();stop(limits);authenticate_owner(self_.lock());if(!field_.domain->contains(triangle))throw std::invalid_argument("A foreign logical triangle cannot sample this material field");double sum=0;for(double x:b){if(!std::isfinite(x)||x<0||x>1)throw std::invalid_argument("Texture-set field barycentrics are outside their actual triangle");sum+=x;}if(std::abs(sum-1)>1e-6)throw std::invalid_argument("Texture-set field barycentrics do not form an actual triangle point");

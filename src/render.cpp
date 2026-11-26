@@ -622,6 +622,10 @@ struct SurfaceRenderer::TextureState {
         if(!maps->normal.rgba.empty()){
           if(!prepared_normal&&mesh.tangents.size()!=mesh.mesh.positions.size())throw std::invalid_argument("Normal-mapped snapshots require worker-generated tangent corners");
           auto image=std::shared_ptr<const Image>(maps,&maps->normal);
+          if(maps->polygon_surface&&maps->polygon_surface->native_bake()){
+            image=maps->polygon_surface->native_bake();
+            view.min_filter=view.mag_filter=GL_LINEAR;
+          }
           if(prepared_normal&&maps->normal_projection&&maps->normal_projection->version==2){const auto &p=*maps->normal_projection;
             image=maps->baked_base&&!maps->baked_base->maps.normal.rgba.empty()?p.sampling_domain->resolved_pbr:p.pbr;
             view.min_filter=view.mag_filter=GL_LINEAR;}
@@ -957,7 +961,9 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
                         uint64_t id, const TextureMaps *maps,bool use_source=false,bool use_canonical=false,bool force_pbr=false,bool paint_domain=false,bool normal_domain=false,const SourceMaterialBindings *binding=nullptr,const detail::Vrm1SourceBackground *background=nullptr,uint32_t texture_set=0,bool submit=true) {
     const TextureState::MaterialKey key{id,texture_set};
     const bool native_float=TextureState::native_float(original,maps,binding);
-    const auto polygon=maps?maps->polygon_surface:nullptr;glUniform1i(glGetUniformLocation(program_,"polygon_mode"),polygon?int(polygon->model()):0);
+    const auto polygon=maps?maps->polygon_surface:nullptr;
+    const bool native_polygon_bake=polygon&&polygon->native_bake();
+    glUniform1i(glGetUniformLocation(program_,"polygon_mode"),native_polygon_bake?3:polygon?int(polygon->model()):0);
     Material material = original;if(background){material.color=background->color;material.emissive=background->emission;}
     glUniform1f(glGetUniformLocation(program_,"relative_emission_strength"),background?background->relative_emission_strength:1);
     glDepthFunc(GL_LESS);glBlendEquationSeparate(GL_FUNC_ADD,GL_FUNC_ADD);glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE);
@@ -980,6 +986,9 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
       glActiveTexture(GL_TEXTURE0+n);glBindTexture(GL_TEXTURE_2D,slot.image);glBindSampler(n,slot.sampler);present[n]=slot.image!=0;coordinates[n]=slot.coordinate;
       ux[n*3]=slot.uv[0];ux[n*3+1]=slot.uv[1];ux[n*3+2]=slot.uv[4];uy[n*3]=slot.uv[2];uy[n*3+1]=slot.uv[3];uy[n*3+2]=slot.uv[5];
     }
+    // Native retained detail is sampled in polygon_transport using its own
+    // original paint coordinates and the before geometry frame.
+    if(native_polygon_bake)present[3]=0;
     glUniform1iv(glGetUniformLocation(program_,"slots[0]"),5,present.data());
     glUniform1iv(glGetUniformLocation(program_,"source_coordinates[0]"),5,coordinates.data());
     glUniform3fv(glGetUniformLocation(program_,"uv_x[0]"),5,ux.data());glUniform3fv(glGetUniformLocation(program_,"uv_y[0]"),5,uy.data());
@@ -1156,7 +1165,12 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
         glUniformMatrix3fv(glGetUniformLocation(program_,"normal_model"),1,GL_FALSE,normal.data());
         reversing=delta.orientation()==AffineOrientation::Reversing;
       }
-      if(range&&range->textures&&range->textures->polygon_surface)range->textures->polygon_surface->validate_world(AffineTransform(local_model)*detail::polygon_range_world(*range));
+      if(range&&range->textures&&range->textures->polygon_surface){
+        const auto &polygon=range->textures->polygon_surface;
+        const auto world=AffineTransform(local_model)*detail::polygon_range_world(*range);
+        if(polygon->native_bake())polygon->validate_bake_world(range->texture_set_proof->field().domain->triangles(),world);
+        else polygon->validate_world(world);
+      }
       glUniform1i(glGetUniformLocation(program_,"affine_motion"),affine_preview);
       glUniform1f(glGetUniformLocation(program_,"model_hand"),reversing?-1.f:1.f);
       glFrontFace(reversing?GL_CW:GL_CCW);

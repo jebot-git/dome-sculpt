@@ -51,6 +51,8 @@ Vec3 retained_source_normal(const detail::PolygonSurfacePreview &preview, size_t
  };
  const auto before=geometry(0),current=geometry(2);
  const auto first=triangle*3;
+ if(preview.native_bake())return preview.sample_native_bake(triangle,bary,
+      placement?placement->world():AffineTransform{});
  if(preview.model()==detail::PolygonSurfaceNormalModel::NativeNOnly) {
   Vec3 normal;
   for(size_t k=0;k<3;++k)
@@ -427,11 +429,14 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   }
   const auto &low_mesh=low?*low:target.painted->mesh();
   const auto retained_uv=target.material_bindings?target.material_bindings->canonical_uv:nullptr;
-  const bool split_recipient=retained_recipient&&low_mesh.uv!=retained_recipient->normal_coordinates();
+  const bool native_recipient=retained_recipient&&
+      retained_recipient->model()==detail::PolygonSurfaceNormalModel::NativeNOnly;
+  const bool split_recipient=retained_recipient&&!native_recipient&&
+      low_mesh.uv!=retained_recipient->normal_coordinates();
   const auto target_triangles=recipient?recipient->domain->triangles():std::span<const uint32_t>{};
   const auto encode_retained=[&](BakeOptions &options){
     const auto world=target_placement?target_placement->world():AffineTransform{};
-    retained_recipient->validate_world(world,1e-6,cancelled);
+    retained_recipient->validate_bake_world(target_triangles,world,cancelled);
     options.encode_target_normal=[preview=retained_recipient,world,limit=double(settings.normal_error)](
         uint32_t triangle,std::array<float,3> bary,Vec3 desired){
       const auto [before,current]=preview->triangle_frames(triangle,world);
@@ -495,7 +500,8 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
       if(result.coverage[i]==3 && prior->coverage[i])++report.preserved_misses;
     }
   BakedTextures textures;
-  if(prepared_normals||retained_recipient)textures.normal_interpretation=BakedNormalInterpretation::PreparedAttributes;
+  if(prepared_normals||(retained_recipient&&!native_recipient))
+    textures.normal_interpretation=BakedNormalInterpretation::PreparedAttributes;
   if(separate)textures.color_interpretation=BakedColorInterpretation::ResolvedPbr;
   textures.maps = std::move(result.maps);
   textures.emission_field=std::move(result.emission_field);
@@ -517,7 +523,22 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
     }else textures.normal_field=before->replace(textures,field_options);
     textures.maps.normal={};textures.maps.mtoon_normal={};
   }
-  if(retained_recipient){
+  std::shared_ptr<const Image> native_normal;
+  if(native_recipient){
+    auto normal=std::make_shared<Image>(std::move(textures.maps.normal));
+    const auto &old=retained_recipient->native_bake();
+    constexpr std::array<uint8_t,4> neutral{128,128,255,0};
+    for(size_t i=0;i<textures.coverage.size();++i){
+      if((i&1023)==0)check();
+      if(!textures.coverage[i]){
+        const auto *pixel=old?old->rgba.data()+i*4:neutral.data();
+        std::copy_n(pixel,4,normal->rgba.data()+i*4);
+      }
+    }
+    native_normal=std::move(normal);
+    textures.maps.normal={};
+    textures.maps.mtoon_normal={};
+  }else if(retained_recipient){
     const auto &prior=target.painted->baked()->normal_field;
     detail::BakedNormalFieldOptions field_options;field_options.cancelled=cancelled;
     if(retained_normal_write){
@@ -540,7 +561,7 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   auto recipe=capture_bake_recipe(scene,source_id,settings);
   if(recipient){
     TextureSetLimits limits;limits.cancelled=cancelled;
-    detail::stage_texture_set_bake(next.active(),target.texture_sets,*recipient,std::move(painting),std::move(recipe),limits);
+    detail::stage_texture_set_bake(next.active(),target.texture_sets,*recipient,std::move(painting),std::move(recipe),limits,std::move(native_normal));
   }else{
     next.active().painted=std::move(painting);
     next.active().material_bindings=target.material_bindings;

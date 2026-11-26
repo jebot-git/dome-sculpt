@@ -5060,6 +5060,9 @@ if(BUILD_TESTING)
   add_test(NAME texture-set-retained-bake-target COMMAND dome-sculpt-texture-set-source-export-test
     --retained-bake-target ${CMAKE_CURRENT_BINARY_DIR}/texture-set-retained-bake-target)
   set_tests_properties(texture-set-retained-bake-target PROPERTIES TIMEOUT 300)
+  add_test(NAME texture-set-retained-native-target COMMAND dome-sculpt-texture-set-source-export-test
+    --retained-native-target ${CMAKE_CURRENT_BINARY_DIR}/texture-set-retained-native-target)
+  set_tests_properties(texture-set-retained-native-target PROPERTIES TIMEOUT 300)
 
   if(TARGET dome-sculpt AND TARGET dome-sculpt-test-runtime)
     add_test(NAME texture-set-retained-source-openxr COMMAND ${Python3_EXECUTABLE}

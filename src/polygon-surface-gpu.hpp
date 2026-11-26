@@ -77,6 +77,19 @@ uniform int polygon_mode;
 uniform mat4 model;uniform mat3 normal_model;uniform int affine_motion;uniform float model_hand;
 mat3 polygon_basis(int first){vec4 a=texelFetch(packedSources,gl_PrimitiveID*4+first);vec3 t=texelFetch(packedSources,gl_PrimitiveID*4+first+1).xyz;
 mat3 normal_transform=affine_motion==1?normal_model:mat3(model);vec3 N=unit(normal_transform*a.xyz);vec3 T=mat3(model)*t;T=unit(T-N*dot(N,T));return mat3(T,unit(cross(N,T))*a.w*model_hand,N);}
-vec3 polygon_transport(vec3 before){if(polygon_mode==0)return before;mat3 a=polygon_basis(0),b=polygon_basis(2);return unit(b*transpose(a)*before);}
+vec3 polygon_transport(vec3 before){
+ if(polygon_mode==0)return before;
+ mat3 a=polygon_basis(0),b=polygon_basis(2);
+ if(polygon_mode==3){
+  vec4 stored=texture(tex3,paintcoord);
+  vec3 detail=2.0*stored.xyz-1.0;
+  if(stored.a>0.0&&dot(detail,detail)>1e-16){
+   vec3 N=unit(before),T=unit(a[0]-N*dot(N,a[0]));
+   float hand=dot(cross(a[2],a[0]),a[1])<0.0?-1.0:1.0;
+   before=unit(T*detail.x+cross(N,T)*hand*detail.y+N*detail.z);
+  }
+ }
+ return unit(b*transpose(a)*before);
+}
 )GLSL";}
 } // namespace dome::detail

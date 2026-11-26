@@ -8,19 +8,30 @@ inline size_t texture_wire_ref(const nlohmann::json&v,size_t count){
  if((!v.is_number_unsigned()&&(!v.is_number_integer()||v.get<int64_t>()<0))||v.get<uint64_t>()>=count)throw std::invalid_argument("Retained texture field reference exceeds its actual table");return size_t(v.get<uint64_t>());
 }
 // Legacy current grids inherit their entire bake from the retained seed.
-inline bool texture_source_has_bake(const nlohmann::json&paint){
- const bool rebake=paint.contains("field_bake");
+inline unsigned texture_source_bake(const nlohmann::json&paint){
  const auto &payload=paint.at("payload");
- if(!payload.is_object()||paint.size()!=5+size_t(rebake)||payload.contains("baked")!=rebake)
-  throw std::invalid_argument("Source Paint7 current grid has an invalid Bake envelope");
- if(rebake){
-  const auto &bake=payload.at("baked");
-  if(!paint.at("field_bake").is_number_integer()||paint.at("field_bake")!=1||
-     !bake.is_object()||!bake.at("version").is_number_integer()||
-     (bake.at("version")!=5&&(bake.at("version")!=6||!bake.at("base_version").is_number_integer()||bake.at("base_version")!=5)))
-   throw std::invalid_argument("Source Paint7 rebake needs an independent prepared normal field");
+ const bool present=paint.contains("field_bake");
+ unsigned kind=0;
+ if(present){
+  const auto &value=paint.at("field_bake");
+  if(!value.is_number_integer()||(value!=1&&value!=2))
+   throw std::invalid_argument("Unknown Source Paint7 Bake kind");
+  kind=value.get<unsigned>();
  }
- return rebake;
+ const bool native=kind==2;
+ if(!payload.is_object()||paint.size()!=5+size_t(present)+size_t(native)||
+    payload.contains("baked")!=present||paint.contains("normal_detail")!=native)
+  throw std::invalid_argument("Source Paint7 current grid has an invalid Bake envelope");
+ if(present){
+  const auto &bake=payload.at("baked");
+  if(!bake.is_object()||!bake.at("version").is_number_integer())
+   throw std::invalid_argument("Source Paint7 has an invalid baked payload");
+  const unsigned base=native?1:5;
+  if(bake.at("version")!=base&&(bake.at("version")!=6||
+     !bake.at("base_version").is_number_integer()||bake.at("base_version")!=base))
+   throw std::invalid_argument("Source Paint7 baked payload differs from its normal authority");
+ }
+ return kind;
 }
 // Borrow actual shared-table records. This checks source/node/material pairing,
 // never mints a field, domain, geometry owner or replay permission.
@@ -29,7 +40,7 @@ inline const nlohmann::json*texture_source_seed(const nlohmann::json&paint,
  if(!paint.is_object()||!paint.contains("field_source"))return nullptr;
  if(!geometry.is_object()||geometry.at("version")!=2||!polygon_surface_material_archive(materials)||!pool.is_object()||pool.at("version")!=1||!pool.at("nodes").is_array()||pool.at("nodes").empty()||pool.at("nodes").size()>128)throw std::invalid_argument("Source Paint7 requires its actual geometry2/material21/polygon node pools");
  const auto&sources=geometry.at("field_sources");if(!sources.is_array()||sources.empty()||sources.size()>512||!paint.at("version").is_number_integer()||paint.at("version")!=7||!paint.at("physical_paint").is_boolean())throw std::invalid_argument("Incomplete actual source Paint7 envelope");
- (void)texture_source_has_bake(paint);
+ (void)texture_source_bake(paint);
  const auto&seed=sources.at(texture_wire_ref(paint.at("field_source"),sources.size()));
  if(!seed.is_object()||seed.size()!=10||seed.at("version")!=1||seed.at("kind")!="polygon"||!seed.at("physical_paint").is_boolean()||!seed.at("name").is_string()||seed.at("name").get_ref<const std::string&>().size()>256||!seed.at("material").is_object()||seed.at("material").size()!=10||(!seed.at("bake_recipe").is_null()&&!seed.at("bake_recipe").is_object()))throw std::invalid_argument("Incomplete retained source seed");
  (void)texture_wire_ref(seed.at("geometry"),geometry.at("meshes").size());const auto node=texture_wire_ref(seed.at("node"),pool.at("nodes").size());const auto binding=texture_wire_ref(seed.at("binding"),materials.at("bindings").size());

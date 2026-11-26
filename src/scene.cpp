@@ -1,4 +1,5 @@
 #include "texture-set-field-source.hpp"
+#include "polygon-surface-preview.hpp"
 #include "texture-set-field-codec.hpp"
 #include "texture-set-source-preflight.hpp"
 #include "texture-set-surface.hpp"
@@ -321,7 +322,7 @@ void Scene::validate(bool deep_sources) const {
       const std::shared_ptr<const PolygonAuthority>&polygon,
       const std::shared_ptr<const detail::TextureSetFieldSource>&field_source={}){
     std::shared_ptr<const PaintedMesh>source_view;
-    if(field_source){auto field=field_source->field();field.painted=paint;field.material_bindings=binding;field.appearance=appearance;source_view=field_source->read_view(field);retain_paint(field_source->original_paint(),true);pair_domain(field_source->original_paint(),binding,appearance.get());}
+    if(field_source){auto field=field_source->field();field.painted=paint;field.material_bindings=binding;field.appearance=appearance;source_view=field_source->read_view(field);retain_paint(field_source->original_paint(),true);pair_domain(field_source->original_paint(),binding,appearance.get());if(const auto &preview=field_source->source_preview();preview&&preview->native_bake())source_images.add(preview->native_bake());}
     const auto projection=paint?paint->color_projection():nullptr;
     const auto preparation=binding?binding->color_preparation:nullptr;
     detail::polygon_color_owner(polygon.get(),preparation.get(),deep_sources);

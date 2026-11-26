@@ -58,7 +58,11 @@ nlohmann::json TextureSetFieldCodec::encode(const TextureSetView&view,uint32_t g
  if(!rebake)payload.erase("baked");
  nlohmann::json field={{"version",7},{"set",view.id},{"field_source",id},
                        {"physical_paint",view.painted->has_physical_emission()},{"payload",std::move(payload)}};
- if(rebake)field["field_bake"]=1;
+ if(rebake){
+  const auto &native=view.source->source_preview()->native_bake();
+  field["field_bake"]=native?2:1;
+  if(native)field["normal_detail"]=images.add(native);
+ }
  return field;
 }
 DecodedTextureSetField TextureSetFieldCodec::decode(const nlohmann::json&j,const std::shared_ptr<const TextureSetFaceDomain>&domain,uint32_t geometry,const Material&current,const PaintImageArchive&images,const NormalSamplingArchive*normal,const PaintSamplingArchive*sampling,const MaterialReader&materials,bool polygon,const PaintedMesh*raster,const SourcePaintDecodeContext&context){
@@ -73,7 +77,8 @@ DecodedTextureSetField TextureSetFieldCodec::decode(const nlohmann::json&j,const
  }
  stop(limits_);if(!j.is_object()||!j.contains("field_source"))return {TextureSetPaintAccess::decode(j,&images,polygon,normal,sampling,context,domain,raster),{},{},{},{}};
  preflight();if(!domain||!materials||!j.is_object()||!j.at("version").is_number_integer()||j.at("version")!=7||number(j.at("set"),UINT32_MAX)!=domain->set()||!j.at("physical_paint").is_boolean()||!j.at("payload").is_object()||j.at("payload").contains("mesh")||j.at("payload").contains("version"))throw std::invalid_argument("Source Paint7 lacks its actual member/current-grid envelope");domain->authenticate_owner(domain);
- const bool rebake=texture_source_has_bake(j);
+ const auto bake=texture_source_bake(j);
+ const auto native=bake==2?images.at(uint32_t(number(j.at("normal_detail"),UINT32_MAX))):nullptr;
  PolygonSurfaceTransferLimits wire_policy;wire_policy.maximum_working_bytes=limits_.maximum_bytes;wire_policy.geometry.cancelled=limits_.cancelled;(void)PolygonSurfacePaintCodec::preflight_grid(j.at("payload"),j.at("physical_paint").get<bool>(),true,wire_policy);
  const auto id=reference(j.at("field_source"),read_.size());const auto&record=input_->at(id);if(reference(record.at("geometry"),geometry_count_)!=geometry||!owner(domain->topology()->geometry(),geometry_(geometry)))throw std::invalid_argument("Source Paint7 names another actual geometry owner");
  const auto node=uint32_t(reference(record.at("node"),node_count_));const auto binding=materials(uint32_t(number(record.at("binding"),255)));const auto&stage=PolygonSurfaceArchive::reader().stage_at(node);
@@ -86,7 +91,7 @@ DecodedTextureSetField TextureSetFieldCodec::decode(const nlohmann::json&j,const
  }
  auto&seed=*read_[id];if(!owner(seed.seed.material_bindings,binding)||seed.node!=node||seed.geometry!=geometry)throw std::invalid_argument("Source field seed changed its actual owning reader prefix");
  const auto proto=TextureSetFieldSource::capture_prepared(seed.seed,domain,seed.preview,limits_,raster);const auto physical=j.at("physical_paint").get<bool>();if(physical&&!context.physical_emission)throw std::invalid_argument("Current source FLOAT planes require their actual enclosing Scene context");auto paint=TextureSetPaintAccess::decode_source_grid(j.at("payload"),&images,polygon,normal,sampling,SourcePaintDecodeContext{false,physical,context.baked_emission},stage,*proto->field().painted,domain,proto);
- if(paint->has_physical_emission()!=physical)throw std::invalid_argument("Source member physical interpretation differs from its actual current planes");auto view=proto->field();view.painted=paint;view.material=current;auto source=rebake?proto->with_bake(view,limits_):proto->with_current(view,limits_);used_[id]=1;return {std::move(paint),std::move(source),binding,{},seed.seed.bake_recipe};
+ if(paint->has_physical_emission()!=physical)throw std::invalid_argument("Source member physical interpretation differs from its actual current planes");auto view=proto->field();view.painted=paint;view.material=current;auto source=bake?proto->with_bake(view,limits_,native):proto->with_current(view,limits_);used_[id]=1;return {std::move(paint),std::move(source),binding,{},seed.seed.bake_recipe};
 }
 nlohmann::json TextureSetFieldCodec::records()const{if(input_)return *input_;auto out=nlohmann::json::array();for(const auto&r:written_)out.push_back(r.record);return out;}
 std::shared_ptr<const Mesh>TextureSetFieldCodec::geometry_for_node(uint32_t node)const{

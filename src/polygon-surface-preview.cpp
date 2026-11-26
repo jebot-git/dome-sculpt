@@ -54,16 +54,23 @@ bool PolygonSurfacePreview::matches_binding(const SourceMaterialBindings&binding
 void PolygonSurfacePreview::validate_maps(const TextureMaps&maps)const{
  if(!own(maps.polygon_surface,self_.lock())||!matches(binding_,attachment_)||maps.source_only||maps.source_maps||maps.color_projection||maps.normal_projection||!own(maps.baked_base,baked_))throw std::invalid_argument("Polygon surface maps lost their actual separate current field owner");
  if(!maps.overlay||!attachment_->matches(maps.overlay->native_geometry(),maps.overlay->native_domain()))throw std::invalid_argument("Polygon surface float/paint packet lost its actual current attachment");
+ const auto equal=[](const Image&a,const Image&b){return a.width==b.width&&a.height==b.height&&a.rgba==b.rgba;};
  if(owner_->has_normal_field()){
   const auto&field=*baked_->normal_field;
-  const auto equal=[](const Image&a,const Image&b){return a.width==b.width&&a.height==b.height&&a.rgba==b.rgba;};
-  if(!equal(maps.normal,*field.pbr())||!equal(maps.mtoon_normal,*field.mtoon()))throw std::invalid_argument("Polygon surface changed its independently owned before normal role");
- }else if(maps.normal.width||maps.normal.height||!maps.normal.rgba.empty()||maps.mtoon_normal.width||maps.mtoon_normal.height||!maps.mtoon_normal.rgba.empty())throw std::invalid_argument("Polygon N-only preview cannot invent a normal texture");
+  if(!equal(maps.normal,*field.pbr())||!equal(maps.mtoon_normal,*field.mtoon()))
+   throw std::invalid_argument("Polygon surface changed its independently owned before normal role");
+ }else if(native_bake_){
+  if(!equal(maps.normal,*native_bake_)||!maps.mtoon_normal.rgba.empty())
+   throw std::invalid_argument("Polygon surface changed its own native normal bake");
+ }else if(maps.normal.width||maps.normal.height||!maps.normal.rgba.empty()||
+          maps.mtoon_normal.width||maps.mtoon_normal.height||!maps.mtoon_normal.rgba.empty())
+  throw std::invalid_argument("Polygon N-only preview cannot invent a normal texture");
 }
 Vec3 PolygonSurfacePreview::normal_at(size_t triangle,std::array<double,3>b,const AffineTransform&world,const std::function<bool()>&cancel)const{
  stop(cancel);if(!matches(binding_,attachment_))throw std::invalid_argument("Polygon CPU field query lost its actual current binding");
  PolygonSurfaceTransferLimits limits;limits.geometry.cancelled=cancel;
- if(model_==PolygonSurfaceNormalModel::NativeNOnly)return owner_->native_normal(triangle,b,world,limits);
+ if(model_==PolygonSurfaceNormalModel::NativeNOnly)
+  return native_bake_?sample_native_bake(triangle,b,world):owner_->native_normal(triangle,b,world,limits);
  if(own(baked_->normal_field,owner_->before()->paint->baked()->normal_field))
   return owner_->pbr_normal(triangle,b,world,limits);
  const auto [before,current]=triangle_frames(triangle,world);
@@ -83,12 +90,42 @@ Vec3 PolygonSurfacePreview::normal_at(size_t triangle,std::array<double,3>b,cons
  const auto basis=before_role_basis(triangle,b,world);
  return transport_polygon_direction(basis.t*decoded.x+basis.b*decoded.y+basis.n*decoded.z,before,current);
 }
+Vec3 PolygonSurfacePreview::sample_native_bake(
+    size_t triangle,std::array<double,3> b,const AffineTransform &world)const{
+ if(!native_bake_)throw std::invalid_argument("Polygon has no authored native normal bake");
+ std::array<double,2> uv{};
+ for(size_t k=0;k<3;++k){
+  const auto at=streams_->paint.at(triangle*3+k);
+  for(size_t axis=0;axis<2;++axis)uv[axis]+=at[axis]*b[k];
+ }
+ PaintSourceTexture texture;
+ texture.image=native_bake_;
+ texture.wrap_s=texture.wrap_t=33071;
+ texture.min_filter=texture.mag_filter=9729;
+ const auto e=sample_source_texture(texture,float(uv[0]),float(uv[1]),false);
+ const auto [before,current]=triangle_frames(triangle,world);
+ const auto basis=before_role_basis(triangle,b,world);
+ Vec3 normal=basis.n;
+ if(e[3]>0){
+  const Vec3 components{e[0]*2-1,e[1]*2-1,e[2]*2-1};
+  if(length(components)>1e-8f)
+   normal=basis.t*components.x+basis.b*components.y+basis.n*components.z;
+ }
+ return transport_polygon_direction(normal,before,current);
+}
 std::shared_ptr<const PolygonSurfacePreview> PolygonSurfacePreview::with_bake(const PaintedMesh &paint)const{
+ return with_bake(paint,native_bake_);
+}
+std::shared_ptr<const PolygonSurfacePreview> PolygonSurfacePreview::with_bake(
+    const PaintedMesh &paint,std::shared_ptr<const Image> native_bake)const{
  if(!matches(binding_,paint.paint_sampling_attachment()))
   throw std::invalid_argument("Polygon preview Bake lost its actual sampling attachment");
- if(own(baked_,paint.baked()))return self_.lock();
+ if(native_bake&&(model_!=PolygonSurfaceNormalModel::NativeNOnly||!paint.baked()))
+  throw std::invalid_argument("Native normal bake requires its original polygon model and material bake");
+ if(own(baked_,paint.baked())&&own(native_bake_,native_bake))return self_.lock();
  auto result=std::shared_ptr<PolygonSurfacePreview>(new PolygonSurfacePreview(*this));
  result->baked_=paint.baked();
+ result->native_bake_=std::move(native_bake);
  result->self_=result;
  return result;
 }
@@ -108,6 +145,15 @@ std::pair<PolygonGeometryFrame,PolygonGeometryFrame> PolygonSurfacePreview::tria
 }
 NormalBakeBasis PolygonSurfacePreview::before_role_basis(
     size_t triangle,std::array<double,3> weights,const AffineTransform &world)const{
+ if(model_==PolygonSurfaceNormalModel::NativeNOnly){
+  Vec3 n{};
+  for(size_t k=0;k<3;++k)n+=transform_normal(world,streams_->normals.at(triangle*3+k))*float(weights[k]);
+  n=normal_bake_math::unit(n);
+  const auto [before,current]=triangle_frames(triangle,world);
+  const auto axis=before.basis.t;
+  const auto t=normal_bake_math::unit(axis-n*dot(axis,n));
+  return {t,cross(n,t)*before.handedness,n};
+ }
  const float hand=world.orientation()==AffineOrientation::Reversing?-1.f:1.f;
  std::array<NormalBakeVertex,3> vertices;
  for(size_t k=0;k<3;++k){
@@ -117,6 +163,25 @@ NormalBakeBasis PolygonSurfacePreview::before_role_basis(
   vertices[k]=normal_bake_vertex(n,transform_tangent(world,t),t[3]*hand,NormalVertexBitangent::UnitCross);
  }
  return normal_bake_basis(vertices,weights,NormalFragmentBasis::UnitColumns);
+}
+void PolygonSurfacePreview::validate_world(size_t triangle,const AffineTransform &world,double minimum,
+    const std::function<bool()> &cancel)const{
+ stop(cancel);
+ const auto [before,current]=triangle_frames(triangle,world);
+ const auto axis=before.basis.n;
+ const auto first=transform_normal(world,streams_->normals.at(triangle*3));
+ const float sign=dot(first,axis)<0?-1.f:1.f;
+ for(size_t k=0;k<3;++k){
+  const auto n=transform_normal(world,streams_->normals.at(triangle*3+k));
+  if(sign*dot(n,axis)<=minimum)
+   throw std::invalid_argument("Native normal bake needs a conditioned original tangent across the triangle");
+ }
+}
+void PolygonSurfacePreview::validate_bake_world(std::span<const uint32_t> triangles,
+    const AffineTransform &world,const std::function<bool()> &cancel)const{
+ validate_world(world,1e-6,cancel);
+ if(model_==PolygonSurfaceNormalModel::NativeNOnly)
+  for(const auto triangle:triangles)validate_world(triangle,world,1e-6,cancel);
 }
 void PolygonSurfacePreview::validate_world(const AffineTransform&world,double minimum,const std::function<bool()>&cancel)const{
  if(!std::isfinite(minimum)||minimum<=0||minimum>1)throw std::invalid_argument("Invalid complete polygon field conditioning bound");
