@@ -5,6 +5,7 @@
 #include "dome/source-paint.hpp"
 #include "texture-set-paint-access.hpp"
 #include "texture-set-field-source.hpp"
+#include "polygon-surface-preview.hpp"
 #include "texture-set-recipe-wire.hpp"
 #include <algorithm>
 #include <bit>
@@ -621,17 +622,19 @@ uint32_t TextureSetArchive::add_paint(const TextureSetView &f,
     if (same(paints_[i].owner, f.painted)) {
       const auto &prior = paints_[i].source;
       if (!same(prior, f.source) && (prior || f.source)) {
-        // Rebasing a recipe gives the same immutable source a new reference
-        // namespace. Keep a separate recipe record on the same paint raster.
+        // Namespace-only variants can have different recipe and polygon
+        // owners while sharing their authenticated sampling and paint raster.
         if (prior && f.source &&
             same(prior->original_paint(), f.source->original_paint()) &&
-            same(prior->polygon_owner(), f.source->polygon_owner()) &&
-            same(prior->source_preview(), f.source->source_preview()) &&
+            prior->polygon_owner() && f.source->polygon_owner() &&
+            prior->polygon_owner()->shares_sampling(*f.source->polygon_owner()) &&
+            prior->source_preview() && f.source->source_preview() &&
+            prior->source_preview()->shares_streams(*f.source->source_preview()) &&
             same(prior->field().painted, f.source->field().painted) &&
             same(prior->field().domain, f.source->field().domain) &&
-            same(prior->field().material_bindings, f.source->field().material_bindings) &&
             same(prior->field().appearance, f.source->field().appearance) &&
-            !same(prior->field().bake_recipe, f.source->field().bake_recipe))
+            (!same(prior->field().bake_recipe, f.source->field().bake_recipe) ||
+             !same(prior->field().material_bindings, f.source->field().material_bindings)))
           continue;
         throw std::invalid_argument(
             "One paint owner has contradictory source authorities");

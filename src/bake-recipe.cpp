@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/bake-recipe.hpp"
+#include "bake-recipe-remap.hpp"
+#include "polygon-surface-preview.hpp"
 #include "dome/scene.hpp"
 #include "text-utf8.hpp"
 #include <nlohmann/json.hpp>
@@ -74,3 +76,54 @@ std::shared_ptr<const ObjectBakeRecipe> capture_bake_recipe(const Scene &scene,
   result->settings=settings;result->validate();return result;
 }
 } // namespace dome
+
+namespace dome::detail {
+std::shared_ptr<const SourceMaterialBindings> BakeRecipeRemap::binding(
+    const std::shared_ptr<const SourceMaterialBindings> &original, const OriginRemap &origin) {
+  if (!original || !original->polygon_surface_transfer)
+    return original;
+  if (const auto found = bindings_.find(original.get()); found != bindings_.end())
+    return found->second;
+
+  const auto &field = original->polygon_surface_transfer;
+  if (!field->valid_owner(field))
+    throw std::invalid_argument("Bake recipe remapping requires the original polygon field owner");
+  const auto before = origin(field->before_);
+  if (before == field->before_)
+    return original;
+
+  auto found = polygon_fields_.find(field.get());
+  if (found == polygon_fields_.end()) {
+    // The same retained geometry and paint now reference the remapped origin.
+    // Share the authenticated trace and attachment, so this remains a metadata edit.
+    auto rebased = std::shared_ptr<PolygonSurfaceOwner>(new PolygonSurfaceOwner);
+    rebased->before_ = before;
+    rebased->attachment_ = field->attachment_;
+    rebased->trace_ = field->trace_;
+    rebased->corners_ = field->corners_;
+    rebased->self_ = rebased;
+    found = polygon_fields_.emplace(field.get(), std::move(rebased)).first;
+  }
+  auto result = std::make_shared<SourceMaterialBindings>(*original);
+  result->polygon_surface_transfer = found->second;
+  bindings_.emplace(original.get(), result);
+  return result;
+}
+
+std::shared_ptr<const PolygonSurfacePreview> BakeRecipeRemap::preview(
+    const std::shared_ptr<const PolygonSurfacePreview> &original,
+    const std::shared_ptr<const SourceMaterialBindings> &binding) {
+  if (!original || original->binding_ == binding)
+    return original;
+  if (const auto found = previews_.find(original.get()); found != previews_.end())
+    return found->second;
+  auto rebased = std::shared_ptr<PolygonSurfacePreview>(new PolygonSurfacePreview(*original));
+  rebased->binding_ = binding;
+  rebased->owner_ = binding->polygon_surface_transfer;
+  rebased->self_ = rebased;
+  if (!rebased->matches(binding, original->attachment_))
+    throw std::invalid_argument("Bake recipe remapping changed the polygon preview field");
+  previews_.emplace(original.get(), rebased);
+  return rebased;
+}
+} // namespace dome::detail

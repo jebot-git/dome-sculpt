@@ -43,8 +43,13 @@ public:
  bool valid_owner(const std::shared_ptr<const PolygonSurfaceOwner> &) const noexcept;
  void validate(const PolygonSurfaceTransferLimits & = {}) const;
  const auto &before() const noexcept{return before_;}
- const auto &trace() const noexcept{return trace_;}
+ const auto &trace() const noexcept{return *trace_;}
  const auto &current_attachment() const noexcept{return attachment_;}
+ bool shares_sampling(const PolygonSurfaceOwner &other) const noexcept {
+   return trace_ == other.trace_ && corners_ == other.corners_ &&
+          attachment_ == other.attachment_;
+ }
+
  // These two streams are intentionally independent. The first addresses the
  // exact sparse editable Paint/F32 grid; the second addresses the old resolved
  // canonical normal field. Neither is the new triangulation's atlas.
@@ -77,16 +82,20 @@ public:
  std::shared_ptr<const PaintSamplingDomain> paint_domain(std::shared_ptr<const Mesh>,
      const PolygonSurfaceTransferLimits &) const;
 private:
+ friend class BakeRecipeRemap;
  friend class PolygonSurfacePreview;
  PolygonSurfaceOwner()=default;
  PolygonSurfaceOwner(const PolygonSurfaceOwner&)=delete;
  std::weak_ptr<const PolygonSurfaceOwner> self_;
  std::shared_ptr<const PolygonOrigin> before_;
  std::shared_ptr<const PaintSamplingAttachment> attachment_;
- PolygonSurfaceTrace trace_;
- // Original derivative corner -> original native corner, never raw vertex IDs.
- std::vector<uint32_t> native_corners_;
- std::vector<std::array<float,2>> paint_corners_,normal_corners_;
+ std::shared_ptr<const PolygonSurfaceTrace> trace_;
+ struct Corners {
+   // Original derivative corner to original native corner.
+   std::vector<uint32_t> native;
+   std::vector<std::array<float,2>> paint, normal;
+ };
+ std::shared_ptr<const Corners> corners_;
  std::array<double,3> source_barycentrics(size_t,std::array<double,3>,
      const std::vector<PolygonSurfaceTriangle> &) const;
 };

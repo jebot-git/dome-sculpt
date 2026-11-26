@@ -150,7 +150,9 @@ struct Append {
     n->placement=capsule(p->placement);n->polygon=authority(p->polygon);
     n->shape_source=origin(p->shape_source);n->rig_source=origin(p->rig_source);
     n->retopology=patch(p->retopology);n->bake_recipe=bake_recipes.recipe(p->bake_recipe);
-    n->texture_sets=bake_recipes.collection(p->texture_sets);
+    const detail::BakeRecipeRemap::OriginRemap retained=[this](const auto &before){return origin(before);};
+    n->material_bindings=bake_recipes.binding(p->material_bindings,retained);
+    n->texture_sets=bake_recipes.collection(p->texture_sets,retained);
     origins.emplace(p.get(),n);return n;
   }
 };
@@ -211,12 +213,14 @@ NativeSceneAppend append_native_scene(const Scene &destination,const Scene &pack
   for(const auto &g:source.groups())if(g.source_placement)a.witness(source.group_path(g.id),{});
   for(const auto *origin:a.seen_origins)if(origin->placement)a.witness(origin->placement->groups,origin->appearance);
   for(const auto &g:source.groups())out.scene.group(a.groups.at(g.id)).source_placement=a.node(g.source_placement);
+  const detail::BakeRecipeRemap::OriginRemap retained=[&a](const auto &before){return a.origin(before);};
   for(const auto &o:source.objects()){
     a.stop();auto copy=o;copy.id=a.objects.at(o.id);copy.group=o.group?a.groups.at(o.group):0;
     copy.polygon=a.authority(o.polygon);copy.shape_source=a.origin(o.shape_source);
     copy.rig_source=a.origin(o.rig_source);copy.retopology=a.patch(o.retopology);
     copy.bake_recipe=a.bake_recipes.recipe(o.bake_recipe);
-    copy.texture_sets=a.bake_recipes.collection(o.texture_sets);
+    copy.material_bindings=a.bake_recipes.binding(o.material_bindings,retained);
+    copy.texture_sets=a.bake_recipes.collection(o.texture_sets,retained);
     out.scene.object(copy.id)=std::move(copy);
   }
   out.scene.select(a.objects.at(source.active().id));a.stop();out.scene.validate();a.stop();require_saveable(out.scene,cancelled);a.stop();return out;

@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
+#include "dome/bake-recipe.hpp"
+#include "dome/native-scene-append.hpp"
 #include "dome/normal-preparation.hpp"
 #include "dome/gltf-export.hpp"
 #include "dome/projection.hpp"
@@ -50,7 +52,7 @@ void move(Document&d){
  const auto topology=d.frame().state->polygon->topology;const auto mesh=topology->triangulate().mesh;const auto a=mesh.positions.at(mesh.indices.at(0)),b=mesh.positions.at(mesh.indices.at(1)),c=mesh.positions.at(mesh.indices.at(2));const auto p=a*.2f+b*.3f+c*.5f,n=normalized(cross(b-a,c-a));
  d.polygon_pointer(p+n,n*-1,PolygonAction::BeginDrag);polygon(d);check(d.frame().state->polygon->moving,"Actual selected face ray begins a native Move gesture");const Vec3 delta{.006f,.003f,0};d.polygon_pointer(p+n+delta,n*-1,PolygonAction::Drag);polygon(d);d.polygon_pointer(p+n+delta,n*-1,PolygonAction::EndDrag);polygon(d);
 }
-Scene source(bool prepared,bool reflected,bool floating=false,bool varying=false){
+Scene source(bool prepared,bool reflected,bool floating=false,bool varying=false,bool recipes=false){
  Mesh m;m.positions={{-.8f,-.6f,0},{.8f,-.6f,0},{.8f,.6f,0},{-.8f,.6f,0}};m.normals.assign(4,{0,0,1});if(varying)m.normals[1]=normalized(Vec3{.2f,.1f,1});m.uv={{{.1f,.1f}},{{.9f,.1f}},{{.9f,.9f}},{{.1f,.9f}}};m.indices={0,1,2,0,2,3};
  Scene s;auto&o=s.active();o.mesh_active=true;o.material.double_sided=true;o.material.color={.4f,.3f,.2f,1};o.painted=std::make_shared<PaintedMesh>(m,64);
  if(prepared){BakedTextures bake;bake.maps.color=solid({90,100,110,255});bake.maps.metal_rough=solid({255,160,0,255});bake.maps.emission=solid({0,0,0,255});bake.maps.normal=solid({128,128,255,255});bake.coverage.assign(64*64,255);for(size_t y=0;y<64;++y)for(size_t x=0;x<64;++x){const auto at=(y*64+x)*4;bake.maps.normal.rgba[at]=uint8_t(96+x/4);bake.maps.normal.rgba[at+1]=uint8_t(112+y/3);bake.maps.normal.rgba[at+2]=240;}o.painted->install_bake(std::move(bake));auto converted=convert_canonical_normals({o.painted,{},{},{},o.material,{}});o.painted=std::move(converted.paint);o.material_bindings=std::move(converted.material_bindings);}
@@ -59,6 +61,15 @@ Scene source(bool prepared,bool reflected,bool floating=false,bool varying=false
  // KeepPaint UV transition. Empty ordinary Paint correctly uses the legacy
  // polygon route and is not an original-field ownership receipt.
  if(!prepared&&!floating){PaintSettings ink;ink.front_only=false;ink.channel=PaintChannel::Color;ink.color={.2f,.7f,.4f,1};Brush b;b.from=b.to={0,0,0};b.normal={0,0,1};b.radius=.7f;b.strength=.8f;b.blend=.2f;o.painted->begin_stroke();o.painted->stamp(b,ink);check(o.painted->end_stroke()&&o.painted->has_paint_data()&&!o.painted->has_physical_emission(),"Actual N-only source owns nonempty byte paint without manufactured FLOAT history");}
+ if (recipes) {
+   const auto target = s.active().id;
+   const auto recipe_source = s.add("Texture Bake source", Volume{});
+   auto &bake_source = s.object(recipe_source);
+   bake_source.mesh_active = true;
+   bake_source.painted = std::make_shared<PaintedMesh>(m,64);
+   s.select(target);
+   s.object(target).bake_recipe = capture_bake_recipe(s, recipe_source, {});
+ }
  Document d;d.replace(s);ready(d);
  if(!floating){d.begin_uv();check(d.wait_uv(),"Actual original normal/paint UV workspace opens");if(!prepared){check(d.frame().state->uv->paint_sampling_available,"Actual native KeepPaint action is available");if(!d.frame().state->uv->retain_paint_sampling)d.edit_uv(UvAction::RetainPaint);}d.edit_uv(UvAction::Pick,.5f,.5f);d.edit_uv(UvAction::Scale,.8f);check(d.wait_uv(),"Actual writable UV changes independently of retained original coordinates");d.end_uv(true);ready(d);}
  if(!prepared&&!floating){const auto retained=d.copy_scene();const auto &native=retained.active();check(native.material_bindings&&native.material_bindings->native_paint_sampling&&native.material_bindings->native_paint_sampling->valid_owner(native.material_bindings->native_paint_sampling)&&native.material_bindings->native_paint_sampling->matches_current(*native.painted),"Actual native UV worker publishes its complete paint source/attachment owner");check(native.painted->mesh().uv!=m.uv&&!native.painted->has_physical_emission(),"N-only original paint UV differs from current geometry without FLOAT");native_owner_controls(retained);}
@@ -92,4 +103,44 @@ void audit(bool prepared,bool reflected,bool varying=false){
  check(scene.encode()==exact,"Portable source compilation leaves all original normal/paint/recipe/native history exact");
 }
 }
-int main(int argc,char**argv)try{if(argc>1){std::filesystem::create_directories(argv[1]);std::filesystem::current_path(argv[1]);}for(bool prepared:{false,true})for(bool reflected:{false,true})audit(prepared,reflected);audit(false,false,true);auto varied=source(false,false,false,true);const auto before=varied.encode();refuses([&]{detail::make_gltf(varied.export_surfaces());},"A varying original role is explicitly refused pending its full interpolation adapter");check(varied.encode()==before,"Varying-role refusal preserves the actual native source");auto hdr=source(false,false,true);refuses([&]{detail::make_gltf(hdr.export_surfaces());},"Actual FLOAT source export retains its precision-qualified per-material guard");std::cout<<"PASS "<<checks<<" actual retained standard source export controls\n";return 0;}catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
+void recipe_reference_remap(bool prepared) {
+ auto scene = source(prepared,false,false,false,true);
+ const auto before = scene.encode();
+ const auto target = scene.active().id;
+ const auto source_id = scene.active().bake_recipe->source.object;
+ const auto original = active_texture_set(scene.active());
+ check(original.source && original.bake_recipe && original.bake_recipe->source.object == source_id,
+       "The real prepared texture field retains its original recipe");
+ auto erased = scene.snapshot();
+ erased.erase(source_id);
+ const auto &erased_object = erased.object(target);
+ const auto erased_field = active_texture_set(erased_object);
+ check(erased_field.bake_recipe->source.object == unavailable_bake_object &&
+       erased_field.bake_recipe->source.original_object == source_id &&
+       erased_field.source->read_view(erased_field) == original.source->read_view(original),
+       "Prepared-field deletion preserves the exact read view and original source identity");
+ check(erased_object.polygon->origin == erased_field.source->polygon_owner()->before() &&
+       erased_field.source->source_preview()->matches(erased_field.material_bindings,
+           original.source->read_view(original)->paint_sampling_attachment()) &&
+       erased_field.source->source_preview()->shares_streams(*original.source->source_preview()),
+       "Prepared-field deletion preserves one authenticated origin, attachment and preview streams");
+ const auto erased_wire = erased.encode();
+ check(Scene::decode(erased_wire).encode() == erased_wire,
+       "The prepared native project reopens with its deleted source marker");
+
+ auto appended = append_native_scene(scene,scene);
+ const auto &appended_object = appended.scene.active();
+ const auto appended_field = active_texture_set(appended_object);
+ check(appended_field.bake_recipe->source.object != source_id &&
+       appended_field.bake_recipe->source.original_object == source_id &&
+       appended.scene.object(appended_field.bake_recipe->source.object).name == scene.object(source_id).name,
+       "Same-scene append namespaces the prepared field recipe");
+ check(appended_field.source->read_view(appended_field) == original.source->read_view(original) &&
+       appended_object.polygon->origin == appended_field.source->polygon_owner()->before() &&
+       appended_field.source->source_preview()->shares_streams(*original.source->source_preview()),
+       "Same-scene append preserves shared raster and authenticated preview data");
+ const auto nested = appended.scene.encode();
+ check(Scene::decode(nested).encode() == nested && scene.encode() == before,
+       "Both prepared source namespaces and the original native archive reopen exactly");
+}
+int main(int argc,char**argv)try{if(argc==2&&std::string_view(argv[1])=="--recipe-reference-remap"){for(bool prepared:{false,true})recipe_reference_remap(prepared);std::cout<<"PASS "<<checks<<" prepared texture recipe controls\n";return 0;}if(argc>1){std::filesystem::create_directories(argv[1]);std::filesystem::current_path(argv[1]);}for(bool prepared:{false,true})for(bool reflected:{false,true})audit(prepared,reflected);audit(false,false,true);auto varied=source(false,false,false,true);const auto before=varied.encode();refuses([&]{detail::make_gltf(varied.export_surfaces());},"A varying original role is explicitly refused pending its full interpolation adapter");check(varied.encode()==before,"Varying-role refusal preserves the actual native source");auto hdr=source(false,false,true);refuses([&]{detail::make_gltf(hdr.export_surfaces());},"Actual FLOAT source export retains its precision-qualified per-material guard");std::cout<<"PASS "<<checks<<" actual retained standard source export controls\n";return 0;}catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
