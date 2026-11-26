@@ -35,8 +35,10 @@ The canonical full sanitizer FLTK SDK is also freshly rebuilt and checked;
 read [the toolkit record](CURRENT-TOOLKIT-20261126.md).
 
 Creator's fresh clock regression passes6014 checks. The current05 application's
-actual Arc XR accept plus ordinary fresh-App reopen now pass19 checks; cancel,
-focus and desktop remain separate gates. The prior-authored stress fixture
+actual Arc XR accept/cancel/focus workflows and ordinary fresh-App reopen now
+pass58 checks. Desktop's first private-Xvfb wrapper fails on read-only temporary
+socket storage before App functionality; its isolated wrapper correction and
+runtime remain pending. The prior-authored stress fixture
 moves the head joint5m, so its cropped screenshot does not establish ordinary
 default-base presentation quality.
 
@@ -46,12 +48,24 @@ after the provenance fix. A new isolated87729adb worker avoids the discarded
 end-to-end qualification remains pending. Sculpt's new workflow first exposes
 an invalid mask-brush fixture, then an inappropriate initial mesh wait after
 file-only recovery catalogue refresh. Correct those fixtures without weakening
-product guards; full cold-open/recovery and sustained acceptance remain pending.
+product guards. The corrected full-size native sculpt workflow now passes167
+Release checks in49.304s, including cold reopening and durable recovery, with
+peak owned RSS3847172096 below4GiB. Root independently rehashes all518 archived
+and current authorities; read [the scoped proof](SCULPT-INDEPENDENT-NATIVE-20261126.md).
+Strict runtime and original sustained independent Arc acceptance remain pending.
 
 Inspect live units before taking action. All product/loader jobs take the common
 nonblocking lease, with no idle reservation. Root's opt-in timing fixture91a90a67
 compiles/links against the exact strict05 core without changing product, data,
 checks or resource limits; the full-resolution runtime diagnosis is pending.
+Root strict14 native/software unit ds-current-native-strict14-20261126.service,
+Invocation4699538f903b4a6bb3b954be5c0e8975, is live at this checkpoint. Inspect
+artifacts/current-normal-sanitize-20261126/native-selected-v1/status.json and
+the actual unit before acting. Its sampler55/canonical14068/writable9694/joint47409
+cases pass; this snapshot is not a complete strict14 result. HDR877's ready
+five-case cohort follows its natural release. Latest isolated integration draft
+5604ad54 composes05, HDR877, sculpt6d/fe94 and corrected creator fixtures550;
+it is pushed on work/production-resume-integration-20261126, not admitted to main.
 Full scope in REQUIREMENTS is unchanged.
 
 ## Source and integration boundary
