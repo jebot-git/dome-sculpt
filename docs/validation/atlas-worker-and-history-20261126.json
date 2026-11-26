@@ -110,6 +110,189 @@
     "phase": "complete",
     "exit": 0
   },
+  "connected_chart_cancellation": {
+    "product": "c352cb7227e0c74f311ec36d8799d3009120c165",
+    "main_native": {
+      "terminal": true,
+      "profile": "release",
+      "candidate": "c352cb7227e0c74f311ec36d8799d3009120c165",
+      "invocation": "0d08506597ef4ce184cc6701e41351d5",
+      "results": [
+        {
+          "target": "xatlas-allocation",
+          "exit": 0,
+          "seconds": 0.032,
+          "log_sha256": "7d8b5830488de23399a53e3a34c01dec61fc77823739447dd77940bccf9f441e",
+          "last_line": "PASS 19 persistent thread-state allocation failures unwind all native workers and allow retry"
+        },
+        {
+          "target": "xatlas-shutdown",
+          "exit": 0,
+          "seconds": 0.064,
+          "log_sha256": "7af2ac5c60860d5825b0193513c90ad4ea4446e9793c7a2077c4829e6be39e61",
+          "last_line": "PASS 32 deterministic Atlas shutdown predicate/wait-registration handshakes"
+        },
+        {
+          "target": "atlas-robustness",
+          "exit": 0,
+          "seconds": 6.827,
+          "log_sha256": "1b8d16d0dc9b9ae35b7a7c3eb7bc16bff2340c5b8dc7c0cf5c0f0b20a7b777c8",
+          "last_line": "PASS Increasing requested resolution fits all independent tiny charts under the same strict policy"
+        },
+        {
+          "target": "atlas-cancellation",
+          "exit": 0,
+          "seconds": 0.214,
+          "log_sha256": "a0aae97971e2a76bede2378ad0461220d7f2919d7061ca39dbae42cd7f8e189f",
+          "last_line": "15 cancellable atlas checks passed"
+        },
+        {
+          "target": "atlas-authoring-cancellation",
+          "exit": 0,
+          "seconds": 1.367,
+          "log_sha256": "2b920d662d23bf14f325d37922124e63f7bdb75218a760cfc1f42914dd6f4789",
+          "last_line": "18 authoring atlas cancellation checks passed"
+        },
+        {
+          "target": "voxel-authoring",
+          "exit": 0,
+          "seconds": 0.315,
+          "log_sha256": "80b396a5f991f54e6f182109003be77bdac85fa8dedeba4da1d09fd18d1df0f3",
+          "last_line": "PASS Scalar-source remeshing has exact scene undo"
+        }
+      ],
+      "phase": "complete",
+      "exit": 0
+    },
+    "combined_native": {
+      "release": {
+        "terminal": true,
+        "profile": "release",
+        "candidate": "c352cb7227e0c74f311ec36d8799d3009120c165",
+        "invocation": "79049ed3875642e78b6e70f71d9bd49f",
+        "results": [
+          {
+            "target": "xatlas-allocation",
+            "exit": 0,
+            "seconds": 0.032,
+            "log_sha256": "7d8b5830488de23399a53e3a34c01dec61fc77823739447dd77940bccf9f441e",
+            "last_line": "PASS 19 persistent thread-state allocation failures unwind all native workers and allow retry"
+          },
+          {
+            "target": "xatlas-shutdown",
+            "exit": 0,
+            "seconds": 0.064,
+            "log_sha256": "7af2ac5c60860d5825b0193513c90ad4ea4446e9793c7a2077c4829e6be39e61",
+            "last_line": "PASS 32 deterministic Atlas shutdown predicate/wait-registration handshakes"
+          },
+          {
+            "target": "atlas-robustness",
+            "exit": 0,
+            "seconds": 7.329,
+            "log_sha256": "1b8d16d0dc9b9ae35b7a7c3eb7bc16bff2340c5b8dc7c0cf5c0f0b20a7b777c8",
+            "last_line": "PASS Increasing requested resolution fits all independent tiny charts under the same strict policy"
+          },
+          {
+            "target": "atlas-cancellation",
+            "exit": 0,
+            "seconds": 0.214,
+            "log_sha256": "a0aae97971e2a76bede2378ad0461220d7f2919d7061ca39dbae42cd7f8e189f",
+            "last_line": "15 cancellable atlas checks passed"
+          },
+          {
+            "target": "atlas-authoring-cancellation",
+            "exit": 0,
+            "seconds": 1.567,
+            "log_sha256": "2b920d662d23bf14f325d37922124e63f7bdb75218a760cfc1f42914dd6f4789",
+            "last_line": "18 authoring atlas cancellation checks passed"
+          },
+          {
+            "target": "voxel-authoring",
+            "exit": 0,
+            "seconds": 0.315,
+            "log_sha256": "80b396a5f991f54e6f182109003be77bdac85fa8dedeba4da1d09fd18d1df0f3",
+            "last_line": "PASS Scalar-source remeshing has exact scene undo"
+          }
+        ],
+        "phase": "complete",
+        "exit": 0
+      },
+      "asan": {
+        "terminal": true,
+        "profile": "asan",
+        "candidate": "c352cb7227e0c74f311ec36d8799d3009120c165",
+        "invocation": "bd981aeb0b6b4335b3af2ee61be43b29",
+        "results": [
+          {
+            "target": "xatlas-allocation",
+            "exit": 0,
+            "seconds": 0.114,
+            "log_sha256": "7d8b5830488de23399a53e3a34c01dec61fc77823739447dd77940bccf9f441e",
+            "last_line": "PASS 19 persistent thread-state allocation failures unwind all native workers and allow retry"
+          },
+          {
+            "target": "xatlas-shutdown",
+            "exit": 0,
+            "seconds": 0.365,
+            "log_sha256": "7af2ac5c60860d5825b0193513c90ad4ea4446e9793c7a2077c4829e6be39e61",
+            "last_line": "PASS 32 deterministic Atlas shutdown predicate/wait-registration handshakes"
+          },
+          {
+            "target": "atlas-robustness",
+            "exit": 0,
+            "seconds": 61.235,
+            "log_sha256": "1b8d16d0dc9b9ae35b7a7c3eb7bc16bff2340c5b8dc7c0cf5c0f0b20a7b777c8",
+            "last_line": "PASS Increasing requested resolution fits all independent tiny charts under the same strict policy"
+          },
+          {
+            "target": "atlas-cancellation",
+            "exit": 0,
+            "seconds": 1.667,
+            "log_sha256": "a0aae97971e2a76bede2378ad0461220d7f2919d7061ca39dbae42cd7f8e189f",
+            "last_line": "15 cancellable atlas checks passed"
+          },
+          {
+            "target": "atlas-authoring-cancellation",
+            "exit": 0,
+            "seconds": 8.982,
+            "log_sha256": "2b920d662d23bf14f325d37922124e63f7bdb75218a760cfc1f42914dd6f4789",
+            "last_line": "18 authoring atlas cancellation checks passed"
+          },
+          {
+            "target": "voxel-authoring",
+            "exit": 0,
+            "seconds": 3.27,
+            "log_sha256": "80b396a5f991f54e6f182109003be77bdac85fa8dedeba4da1d09fd18d1df0f3",
+            "last_line": "PASS Scalar-source remeshing has exact scene undo"
+          }
+        ],
+        "phase": "complete",
+        "exit": 0
+      }
+    },
+    "baseline_negative": {
+      "exit": 1,
+      "elapsed_seconds": 3.221,
+      "last_line": "FAIL Connected sculpt chart growth observes cancellation before a chart group finishes and preserves the exact input"
+    },
+    "main_arc_startup": {
+      "terminal": true,
+      "invocation": "30d5f2d6aa6e4918ba158b8559edcc65",
+      "timeout_seconds": 40,
+      "implementation": "candidate",
+      "profile": "release",
+      "application_sha256": "a932c8f1b2ecd150a8eed1a7814acc68a9574dfd5dc81dd9798fc5d55149599a",
+      "phase": "Timed paint startup using real loader and Intel Arc",
+      "exit": 0,
+      "elapsed": 3.62,
+      "cpu_ticks_before_graphics": 339,
+      "ticks_per_second": 100,
+      "save_sha256": "41467f4370f61fddb45ce1626b04c9c3edc554c2a455ec41ec5aa11288b24537",
+      "first_graphics_log_seconds": 3.38,
+      "created_save": true,
+      "arc_witnesses": 3
+    }
+  },
   "combined_native": {
     "release": {
       "terminal": true,
@@ -258,12 +441,28 @@
       "app_source": "b3b583b8d297a58c2a22fd43d0020525b2896b7b",
       "invocation": "88f64acb354040c0b7db70de16f11e77",
       "profile": "arc-asan",
-      "terminal": false,
-      "phase": "run full native OpenXR workflow",
+      "terminal": true,
+      "phase": "complete",
       "app_sha256": "929a006e59362f11480e550fd0a07e662e6332bec3f35219075389f09ca711aa",
       "runtime_sha256": "08b9fd1c1049a1252c3f9bfd610efca28c57d9631d9c0b8cc36a6d83e3024863",
       "runner_sha256": "a30016faea8144c08af732dd5782a1562387e2f69d83fa9bceb00b0712f81842",
-      "elapsed_seconds": 2.92
+      "elapsed_seconds": 239.68,
+      "exit": 1,
+      "loader_exit": 1,
+      "checks": 140,
+      "report_complete": false,
+      "error": "AssertionError: XR UV coordinates change and persist after Apply",
+      "voxel": {
+        "exact_native_bytes": true,
+        "voxel_menu_pixels": 10141,
+        "voxel_menu_reopens": 1,
+        "voxel_menu_seen": true,
+        "voxel_open_pixels": 172,
+        "voxel_undo_pixels": 131,
+        "voxel_undo_seen": true,
+        "voxel_undo_wait_frames": 86
+      },
+      "arc_witness_count": 37
     },
     "suite-software-release-with-helpers": {
       "candidate": "6f4743db63cabf592f0dad32dcda8ef960f3ceb3",
@@ -290,6 +489,107 @@
         "voxel_undo_seen": true
       },
       "arc_witness_count": 0
+    }
+  },
+  "uv_trace": {
+    "terminal": true,
+    "invocation": "c3a33828549f4e3fb76dc19169b4ff18",
+    "cases": [
+      {
+        "label": "parent-1",
+        "exit": 0,
+        "app_sha256": "ea49c9824090f8478315b9cb331faa84bdb9287a08fa06679c1cf7782b571229",
+        "save_sha256": "41467f4370f61fddb45ce1626b04c9c3edc554c2a455ec41ec5aa11288b24537",
+        "frames": 15
+      },
+      {
+        "label": "parent-2",
+        "exit": 0,
+        "app_sha256": "ea49c9824090f8478315b9cb331faa84bdb9287a08fa06679c1cf7782b571229",
+        "save_sha256": "41467f4370f61fddb45ce1626b04c9c3edc554c2a455ec41ec5aa11288b24537",
+        "frames": 15
+      },
+      {
+        "label": "parent-3",
+        "exit": 0,
+        "app_sha256": "ea49c9824090f8478315b9cb331faa84bdb9287a08fa06679c1cf7782b571229",
+        "save_sha256": "41467f4370f61fddb45ce1626b04c9c3edc554c2a455ec41ec5aa11288b24537",
+        "frames": 15
+      },
+      {
+        "label": "candidate-1",
+        "exit": 0,
+        "app_sha256": "929a006e59362f11480e550fd0a07e662e6332bec3f35219075389f09ca711aa",
+        "save_sha256": "41467f4370f61fddb45ce1626b04c9c3edc554c2a455ec41ec5aa11288b24537",
+        "frames": 15
+      },
+      {
+        "label": "candidate-2",
+        "exit": 0,
+        "app_sha256": "929a006e59362f11480e550fd0a07e662e6332bec3f35219075389f09ca711aa",
+        "save_sha256": "41467f4370f61fddb45ce1626b04c9c3edc554c2a455ec41ec5aa11288b24537",
+        "frames": 15
+      },
+      {
+        "label": "candidate-3",
+        "exit": 0,
+        "app_sha256": "929a006e59362f11480e550fd0a07e662e6332bec3f35219075389f09ca711aa",
+        "save_sha256": "41467f4370f61fddb45ce1626b04c9c3edc554c2a455ec41ec5aa11288b24537",
+        "frames": 15
+      }
+    ],
+    "phase": "complete",
+    "source_sha256": "41467f4370f61fddb45ce1626b04c9c3edc554c2a455ec41ec5aa11288b24537",
+    "exit": 0
+  },
+  "uv_ready_focused": {
+    "terminal": true,
+    "invocation": "371e669a0c594b2aae5bff16515c5fcd",
+    "cases": [
+      {
+        "label": "candidate-1",
+        "exit": 0,
+        "app_sha256": "929a006e59362f11480e550fd0a07e662e6332bec3f35219075389f09ca711aa",
+        "save_sha256": "db4f373cdb7c78c86cc8c247f939ccbab1cc91fc8bacc64601c5476de3f9b52d",
+        "evidence": {
+          "ready": true,
+          "waits": 24,
+          "edge_pixels": 4997,
+          "apply_accent": 207,
+          "uv_change": true,
+          "paint_exact": true,
+          "field_exact": true
+        }
+      }
+    ],
+    "phase": "complete",
+    "source_sha256": "41467f4370f61fddb45ce1626b04c9c3edc554c2a455ec41ec5aa11288b24537",
+    "exit": 0
+  },
+  "uv_ready_full": {
+    "arc-asan": {
+      "candidate": "25a29897b4256881b6a07125d29995c11f441f00",
+      "app_source": "b3b583b8d297a58c2a22fd43d0020525b2896b7b",
+      "invocation": "410c1e9d6fd6471e8652ea05429ec47b",
+      "profile": "arc-asan",
+      "terminal": false,
+      "phase": "run full native OpenXR workflow",
+      "elapsed_seconds": 11.67,
+      "app_sha256": "929a006e59362f11480e550fd0a07e662e6332bec3f35219075389f09ca711aa",
+      "runtime_sha256": "5d7be0867bad69d0e7d19c8ef73637f2de4ff20c485469b55c60593e7cb800bc",
+      "runner_sha256": "60869bf047e814c1b3aec9e5281bde4f62b466883ab1c95af5295459e98849cb"
+    },
+    "software-release": {
+      "candidate": "25a29897b4256881b6a07125d29995c11f441f00",
+      "app_source": "b3b583b8d297a58c2a22fd43d0020525b2896b7b",
+      "invocation": "eb3d9641e3484767bbf28f734d3ef506",
+      "profile": "software-release",
+      "terminal": false,
+      "phase": "run full native OpenXR workflow",
+      "elapsed_seconds": 5.99,
+      "app_sha256": "7c748606c6e0d211fc8b22f7fde7fb371a747056eb178333fd2ed2e37a581a50",
+      "runtime_sha256": "e00b86390634f4c3e97694a50553e0364db6b3379153fd912a1c3f9d81027026",
+      "runner_sha256": "943e4655951793a8552358db79c1634246fef9ec41f8b2b4e1c8c8ef1b7fa3d3"
     }
   },
   "hdr": {
@@ -351,7 +651,7 @@
       "profile": "asan",
       "resolution": 2048,
       "candidate": "78e94585aecbd57f26ccd82919e403a46b6ecac4",
-      "terminal": false,
+      "terminal": true,
       "invocation": "49be8468fe9c4ac899f3d14ea3014fcc",
       "deadline_per_phase_seconds": 900,
       "owned_RSS_limit_bytes": 4294967296,
@@ -363,7 +663,7 @@
         "observed-source.json": "9ed2472ab7e8a7eb89f0b582c399dcfd07215fefab89a923577e7414561fcd17",
         "observed-second-bake.dsculpt": "9c299cac73198075a602366fc7084e37409e6055f39a90d641f9ddf8add28673"
       },
-      "seconds": 401.16,
+      "seconds": 958.72,
       "binary_sha256": "9ff47758d14c2ee38dbd6fe29009bf801e777dec43413ad48b81243e44b74522",
       "runs": [
         {
@@ -383,7 +683,9 @@
       ],
       "outputs": {
         "000.dsculpt": "9c299cac73198075a602366fc7084e37409e6055f39a90d641f9ddf8add28673"
-      }
+      },
+      "exit": 1,
+      "error": "RuntimeError(\"ordered-history failed: {'label': 'ordered-history', 'pid': 770142, 'exit': 1, 'error': None, 'elapsed_seconds': 557.569, 'peak_owned_rss': 2653810688, 'libasan_mapped': True, 'libubsan_mapped': True, 'checks': [], 'log_sha256': '308db53c1d74c0a74412fe6f0b651b953f58887cf35dd9b670f81d0a0aa5ce0e'}\")"
     }
   },
   "vrm_faults": {
@@ -427,11 +729,12 @@
       "candidate": "3130bc2b0586cbd8315194b79267e7ae085eb1b5",
       "parent": "ccbbe02093bed6997bdacdf0d36b3a11bc1f177d",
       "invocation": "f08d989c26ef402abbbd3724a9ed9565",
-      "terminal": false,
+      "terminal": true,
       "linked": {
-        "dome-sculpt-vrm1-normal-faults-test": "9957fd8989b1e0968f79e272a671794fca48fa5a0f24f657e612004ef0f3853b"
+        "dome-sculpt-vrm1-normal-faults-test": "9957fd8989b1e0968f79e272a671794fca48fa5a0f24f657e612004ef0f3853b",
+        "dome-sculpt-vrm1-shift-faults-test": "bd1c07059ee0d29291e71c2338f1c36f3e07d2c3e8c13654faf4bdaad3ef40b0"
       },
-      "phase": "compile dome-sculpt-vrm1-shift-faults-test",
+      "phase": "complete",
       "outcomes": {
         "normal-controls": {
           "exit": 0,
@@ -442,17 +745,28 @@
           "exit": 0,
           "project_sha256": "ef0a83baae140eb653282e29fe579a2cdbac3b8a24a7cce46bd205caf9ec2331",
           "report": "PASS 2664 actual Normal allocation/cancel/target/float-budget/retry checks"
+        },
+        "shift-controls": {
+          "exit": 0,
+          "project_sha256": "65dcb6e88d57c027cb5dc69dc45f27dafe161c86a753e15223ff7eeb1e6db61b",
+          "report": "PASS 16 actual Normal controls/retry checks (prefixes not requested)"
+        },
+        "shift-full": {
+          "exit": 0,
+          "project_sha256": "65dcb6e88d57c027cb5dc69dc45f27dafe161c86a753e15223ff7eeb1e6db61b",
+          "report": "PASS 2736 actual Shift allocation/cancel/target/float-budget/retry checks"
         }
-      }
+      },
+      "exit": 0
     }
   },
   "full_combined_release": {
     "status": {
       "candidate": "ccbbe02093bed6997bdacdf0d36b3a11bc1f177d",
-      "phase": "Run all registered CTests in private software profile",
-      "terminal": false,
+      "phase": "Full private Release CTest finished",
+      "terminal": true,
       "invocation": "24af6aa6636246d69fbb40bb192389ef",
-      "seconds": 1505.05,
+      "seconds": 6672.97,
       "focused_ctest_exit": 8,
       "public_acceptance_exit": 0,
       "app_sha256": "4b6335a00541127e43528b7f2c985cc24213a9fc7ef77d268a471aef9d926a1b",
@@ -534,10 +848,17 @@
         "LP_NUM_THREADS": "2",
         "OPENBLAS_NUM_THREADS": "2",
         "OMP_NUM_THREADS": "2"
+      },
+      "exit": 8,
+      "source_clean": true,
+      "totals": {
+        "passed": 1358,
+        "failed": 2,
+        "skipped": 0
       }
     },
-    "completed": 1359,
-    "passed": 1357,
+    "completed": 1360,
+    "passed": 1358,
     "other": [
       [
         "vrm1-shift-faults",
@@ -551,6 +872,6 @@
   },
   "archive": {
     "path": "docs/validation/atlas-worker-and-history-20261126.tar.gz",
-    "sha256": "96a901613101dd77e4423e6ca2295fa49c78b24b2e963de9a090832fb7c74f4c"
+    "sha256": "a9545b7de975c60f3fadb76bed7e8fe50845bb2bc01d2ecbe4b9289f2f4e0d1f"
   }
 }

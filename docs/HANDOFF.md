@@ -835,19 +835,40 @@ two sanitizer pairs. The single Release pair uses 61.6% less pre-EGL CPU.
 Time to EGL improves by 1–2 seconds in the sanitizer pairs and 0.24 seconds
 in Release. Six focused cases pass on main Release and on combined Release
 and ASan/UBSan. The combined software XR replay passes all 152 checks.
+The combined Arc replay passes 140 checks, including paint startup and
+the persistent stroke, then the UV edit saves the unchanged project.
+Three focused traces on the parent and three on the patched build reproduce
+the unchanged save from one prepared project. The stereo capture shows the
+UV grid without published chart edges at the start of the fixture's edit.
+Fixture `25a29897` waits for visible chart edges and an enabled Apply tile.
+The focused Arc ASan/UBSan replay then changes the saved UVs while
+preserving the source sculpt and paint hashes. Full replay is underway.
+
+Main `c352cb72` adds cooperative cancellation inside connected chart growth.
+A regression using the actual starter sculpt cancels before its first
+chart group completes and verifies exact input geometry and authoring data.
+The same test fails against the previous dependency. All six focused cases
+pass on main Release and on the combined Release and ASan/UBSan builds.
+The main Release Arc startup still saves the same native paint project.
 
 The HDR replay `78e94585` keeps the original monolithic workflow and
 separates the native Save/reopen proof from the real Document worker replay.
 Bake, immediately ordered Save, Undo and Redo stay in a single worker
 session. At 512 pixels both phases pass in Release and both files match the
 captured native Bake. At 2048 pixels the independent strict Save/reopen
-phase passes with the same byte identity. The ordered worker phase is active.
+phase passes with the same byte identity. The isolated strict worker writes
+the identical ordered Save and verifies the accepted and undone native
+states. The combined Redo/preview/equality endpoint fails within the time
+budget. A diagnostic replay checks Redo, preview and held native state
+individually within the original limits.
 
 The broad combined Release run found two VRM1 fault suites expecting the
 pre-refactor diagnostic for a foreign retained primitive. Candidate
 `3130bc2b` updates that expectation to the shared guard and retains each
-negative and the full original-state equality check. The full Release
-reruns pass 2,664 Normal and 2,736 Shift checks. Strict reruns are active.
+negative and the full original-state equality check. The original 1,360-case
+Release run finishes with 1,358 passes and those two failures. Both fixed
+suites pass their full Release and ASan/UBSan reruns, with 2,664 Normal and
+2,736 Shift checks in each profile.
 [Validation receipt](validation/atlas-worker-and-history-20261126.json)
 
 ## Source and integration boundary

@@ -76,3 +76,15 @@ saved the same native project byte for byte. Release on the main source and
 both profiles on the combined source passed the six focused scheduler,
 atlas, authoring-cancellation and voxel cases.
 [Build and runtime evidence](validation/atlas-worker-and-history-20261126.json)
+
+## Cancellation during connected charts
+
+Chart growth now polls the same cancellation callback periodically even
+while the reported percentage is unchanged. Cancelling abandons the partial
+chart group before its geometry reaches the output packer. The regression
+uses the real starter sculpt and requests cancellation during the first
+connected group. It checks that the input mesh, UVs, pins and seams match
+their initial values. The preceding scheduler fails this test. The patch
+passes the focused Release and ASan/UBSan suites. The optimized Arc launch
+saves the same native paint project as the earlier scheduler build.
+[Cancellation evidence](validation/atlas-worker-and-history-20261126.json)
