@@ -203,6 +203,47 @@ void retained_bake_source(bool prepared,bool physical) {
        "Detached retained-field projection can be cancelled");
  check(stop&&cancelled.encode()==original,"Retained donor cancellation leaves the complete Scene unchanged");
 }
+
+void retained_bake_xr_fixture(const std::filesystem::path &input,const std::filesystem::path &reference) {
+ auto scene=source(true,false);
+ const auto donor=scene.active().id;
+ auto &source_object=scene.active();
+ source_object.affine_edit.reset();source_object.visible=false;source_object.locked=true;
+ auto mesh=source_object.painted->mesh();
+ mesh.normals.assign(mesh.positions.size(),{0,0,1});
+ auto cage_mesh=mesh;
+ for(auto &p:mesh.positions)p.z-=.06f;
+ for(auto &p:cage_mesh.positions)p.z+=.01f;
+ const auto target=scene.add("Texture-set Bake recipient",Volume{});
+ const auto cage=scene.add("Full matched cage",Volume{});
+ scene.active().mesh_active=true;scene.active().visible=false;
+ scene.active().painted=std::make_shared<PaintedMesh>(std::move(cage_mesh),64);
+ std::array<TextureSetInitialField,2> recipients;
+ recipients[0].resolution=recipients[1].resolution=64;
+ recipients[0].material.name="Left set";recipients[1].material.name="Right set";
+ std::vector<TextureSetId> membership(mesh.indices.size()/3,0);
+ for(auto triangle:scene.object(donor).texture_sets->at(1).domain->triangles())
+  membership[triangle]=1;
+ initialize_texture_sets(scene,target,mesh,recipients,membership);
+ scene.select(target);select_texture_set(scene,target,1);
+ ObjectBakeSettings settings;
+ settings.front_mm=80;settings.padding=0;settings.ao_samples=4;settings.cage_object=cage;
+ settings.allow_backfaces=true;
+ bake_object(scene,donor,settings);
+ check(edit_texture_set(scene,target,1,[](PaintedMesh &paint,Material &){
+  paint.clear_bake();return true;
+ }),"The selected fixture set retains its successful recipe");
+ scene.save(input);
+ auto plain=Scene::load(input);
+ const auto original=plain.encode();
+ auto shortened=settings;shortened.front_mm=40;
+ refuses([&]{bake_object(plain,donor,shortened);},"The shortened approach cannot reach the original prepared field");
+ check(plain.encode()==original,"Failed probe leaves both fields unchanged");
+ bake_object(plain,donor,settings);
+ check(active_texture_set(plain.active()).painted->baked()&&!plain.active().painted->baked(),
+       "The donor's original prepared role enters only the selected target field");
+ plain.save(reference);
+}
 }
 void recipe_reference_remap(bool prepared) {
  auto scene = source(prepared,false,false,false,true);
@@ -258,4 +299,35 @@ void recipe_reference_remap(bool prepared) {
  refuses([&]{Scene::decode(forged);},"Shared polygon sampling rejects a different geometric recipe");
 
 }
-int main(int argc,char**argv)try{if(argc==2&&std::string_view(argv[1])=="--recipe-reference-remap"){for(bool prepared:{false,true})recipe_reference_remap(prepared);std::cout<<"PASS "<<checks<<" prepared texture recipe controls\n";return 0;}if(argc==3&&std::string_view(argv[1])=="--retained-bake-source"){std::filesystem::create_directories(argv[2]);std::filesystem::current_path(argv[2]);retained_bake_source(false,false);retained_bake_source(true,false);retained_bake_source(false,true);std::cout<<"PASS "<<checks<<" retained source Bake controls\n";return 0;}if(argc>1){std::filesystem::create_directories(argv[1]);std::filesystem::current_path(argv[1]);}for(bool prepared:{false,true})for(bool reflected:{false,true})audit(prepared,reflected);audit(false,false,true);auto varied=source(false,false,false,true);const auto before=varied.encode();refuses([&]{detail::make_gltf(varied.export_surfaces());},"A varying original role is explicitly refused pending its full interpolation adapter");check(varied.encode()==before,"Varying-role refusal preserves the actual native source");auto hdr=source(false,false,true);refuses([&]{detail::make_gltf(hdr.export_surfaces());},"Actual FLOAT source export retains its precision-qualified per-material guard");std::cout<<"PASS "<<checks<<" actual retained standard source export controls\n";return 0;}catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
+int main(int argc,char **argv)try {
+ const std::string_view mode=argc>1?argv[1]:"";
+ if(argc==2&&mode=="--recipe-reference-remap") {
+  for(bool prepared:{false,true})recipe_reference_remap(prepared);
+  std::cout<<"PASS "<<checks<<" prepared texture recipe controls\n";
+  return 0;
+ }
+ if(argc==3&&mode=="--inspect"){
+  std::cout<<nlohmann::json{{"scene",Scene::load(argv[2]).encode()}}.dump()<<'\n';
+  return 0;
+ }
+ if(argc==4&&mode=="--texture-set-xr-fixture"){
+  retained_bake_xr_fixture(argv[2],argv[3]);
+  return 0;
+ }
+ if(argc==3&&mode=="--retained-bake-source"){
+  std::filesystem::create_directories(argv[2]);std::filesystem::current_path(argv[2]);
+  retained_bake_source(false,false);retained_bake_source(true,false);retained_bake_source(false,true);
+  std::cout<<"PASS "<<checks<<" retained source Bake controls\n";
+  return 0;
+ }
+ if(argc>1){std::filesystem::create_directories(argv[1]);std::filesystem::current_path(argv[1]);}
+ for(bool prepared:{false,true})for(bool reflected:{false,true})audit(prepared,reflected);
+ audit(false,false,true);
+ auto varied=source(false,false,false,true);const auto before=varied.encode();
+ refuses([&]{detail::make_gltf(varied.export_surfaces());},"A varying original role is explicitly refused pending its full interpolation adapter");
+ check(varied.encode()==before,"Varying-role refusal preserves the actual native source");
+ auto hdr=source(false,false,true);
+ refuses([&]{detail::make_gltf(hdr.export_surfaces());},"Actual FLOAT source export retains its precision-qualified per-material guard");
+ std::cout<<"PASS "<<checks<<" actual retained standard source export controls\n";
+ return 0;
+}catch(const std::exception &e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
