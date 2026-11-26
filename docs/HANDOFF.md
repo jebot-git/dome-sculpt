@@ -726,8 +726,10 @@ pinned VRM schemas pass, including the masked unlit and MToon inputs and outputs
 
 Live lit PBR, blended unlit, cutouts that cross painted fragments and
 additional paint channels remain open. The full Release and combined
-sanitizer runs are still using `ccbbe020`. Its sanitizer run reproduced
-the software Mesa teardown leak and an HDR fixture timeout. The exact
+sanitizer runs use `ccbbe020`. Its sanitizer run finished with 82 of 86
+cases passing. Standalone XR and affine retopology report the same
+112-byte software Mesa teardown leak. The original full-size HDR seed
+timed out and its provenance dependent was skipped. The exact
 `e09f2f4b` optimized application completes 275 build actions with the
 canonical DomeD FLTK toolkit. Its real OpenXR loader passes all 53
 controller-driven checks with synthetic input, including editable export
@@ -758,6 +760,34 @@ group name differs. The full Release workflow passes 47,409 checks in
 The original monolithic sanitizer timeout remains recorded and its full
 workflow still needs a strict pass.
 [Validation receipt](validation/hdr-closure-independent-seed-20261126.json)
+
+### Strict HDR checkpoint and Arc regression follow-ups
+
+Candidate `0833d18a` keeps the original monolithic HDR command and adds
+independently bounded capture, numerical and history commands. The capture
+writes the original native source and pre-Bake and baked native states.
+The consumers reopen those files read-only, use the same numerical and
+Undo/Redo checks, and verify the ordinary and ordered saves against the
+captured Bake byte for byte. The first prototype's printable JSON
+comparison failed on native source ownership. Reloading the original
+native archive preserves the encoded data types and closes that setup
+error. The final Release 512 checkpoint chain and original 47,409-check
+workflow pass. Its parent `55e67401` also passes the full 2048 Release
+checkpoint chain with all 73,530,600 samples per role. The 2048 sanitizer
+capture passes on that parent and its dense oracle and history jobs are
+still running. A full-size run on `0833d18a` is also active.
+
+The exact `ccbbe020` ASan/UBSan application passes all 27 affine
+retopology checks on Intel Arc through the real OpenXR loader with
+synthetic input and leak detection. All four app processes were observed
+on `/dev/dri/renderD129`. This covers projected points, preserved paint
+and pose, focus loss, unconfirmed drafts and clean shutdown.
+The broader Arc replay passes its first 58 checks, including
+initialization and session restart, then the radial voxel-remesh Undo
+case saves the same state as Accept. A separate delayed direct Undo action
+restores the exact baseline. Radial replay remains open. The original
+software failures remain recorded.
+[Follow-up validation](validation/strict-regression-followups-20261126.json)
 
 ## Source and integration boundary
 
