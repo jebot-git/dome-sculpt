@@ -1391,6 +1391,42 @@ software GL and Intel Arc for direct selection, multiselect, translucent
 reference meshes and the rendered hierarchy.
 [Selection fixture evidence](validation/selection-fixtures-20261126.json)
 
+### Creator VRM0 export on current main
+
+The selected-avatar worker now reconstructs the certified creator shape
+from its embedded licensed source and saved controls. Shaped CC0 VRoid
+avatars export their complete skin, current pose and morph weights with
+refitted first-person and spring metadata. The generated unlit groom
+uses its own genesis and material identity and shares the avatar skin.
+Supported UV seams preserve the original rest corner and accessor
+identity while exporting the edited UVs. A common affine placement is
+emitted through the hierarchy for uniform creator shapes and for shaped
+avatars without spring geometry.
+
+The earlier core refuses the same shaped groom fixture. All 11 Release
+cases pass, including 460 independent shaped-avatar checks across both
+CC0 bases. Nine matching ASan/UBSan cases pass at this checkpoint. The
+shaped-avatar and native source-hint cases are still running in the
+full sanitizer matrix. The optimized Intel Arc consumer passes 27 checks.
+The combined and isolated Arc sanitizer runs stop at the canonical
+preview readiness check. The software sanitizer consumer passes that check.
+
+Native Wayland export and chooser cancellation pass ten checks on DomeD
+`acc2b70a`. The exact app also reopens and saves the authoring project
+byte for byte in synthetic OpenXR startup on software GL and Intel Arc.
+All 32 emitted files pass the pinned VRM0 schema and Khronos glTF validation
+with zero errors. Khronos reports 647 extension-name and skinned-node
+hierarchy warnings. The 13 completed placement and normal-frame files
+match across Release and ASan/UBSan, and the seven Arc consumer files match.
+
+The path requires verified creator provenance, compatible material
+roles and one shared rig placement. Older generated grooms without a
+genesis record, arbitrary creator rest edits, nonlinear spring refitting
+under general affine placement and external dynamic spring simulation
+remain open. The separate full Release regression still uses the
+earlier plane-cut snapshot.
+[Creator VRM0 evidence](validation/creator-vrm0-current-20261126.json)
+
 ## Source and integration boundary
 
 - Main now admits product1bc13125 and public fixturef1e193c7 after complete

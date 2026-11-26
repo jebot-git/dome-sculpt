@@ -19,12 +19,15 @@ remain open. Main's rendered material controls replay independently passes
 [Combined OpenXR evidence](validation/combined-atlas-hdr-openxr-20261126.json)
 [Full Release regression evidence](validation/combined-atlas-hdr-full-release-20261126.json)
 
-The current creator VRM0 candidate supports shared affine placement for
-uniform creator shapes and avatars without spring geometry. The validation
-checks complete emitted skin geometry, first-person and spring metadata,
-native reimport, and atomic refusal of divergent part placement or unsupported
-nonlinear spring refitting. Dynamic spring simulation and admission of the
-combined candidate remain open. See [the receipt](validation/creator-vrm-placement-20261126.json).
+Main supports VRM0 export of shaped CC0 VRoid avatars, generated unlit
+grooms, certified UV seam edits and refitted first-person and spring
+metadata. Uniform shapes and avatars without spring geometry support a
+common affine placement. Release, ASan/UBSan, Intel Arc, native Wayland
+and independent format checks cover this path. Full rest-edit export,
+affine nonlinear spring refitting, dynamic runtime spring validation
+and physical headset acceptance remain open.
+[Current creator VRM0 evidence](validation/creator-vrm0-current-20261126.json)
+[Earlier shared-placement candidate](validation/creator-vrm-placement-20261126.json)
 
 The painted-grid candidate preserves authored cells exactly when enlarging
 original writable grids and checks reconstruction error when reducing them.
