@@ -1402,24 +1402,41 @@ public:
 
 	bool canBlit(const BitImage &image, uint32_t offsetX, uint32_t offsetY) const
 	{
-		for (uint32_t y = 0; y < image.m_height; y++) {
-			const uint32_t thisY = y + offsetY;
-			if (thisY >= m_height)
-				continue;
-			uint32_t x = 0;
-			for (;;) {
-				const uint32_t thisX = x + offsetX;
-				if (thisX >= m_width)
-					break;
-				const uint32_t thisBlockShift = thisX % 64;
-				const uint64_t thisBlock = m_data[(thisX >> 6) + thisY * m_rowStride] >> thisBlockShift;
-				const uint32_t blockShift = x % 64;
-				const uint64_t block = image.m_data[(x >> 6) + y * image.m_rowStride] >> blockShift;
-				if ((thisBlock & block) != 0)
+		if (offsetX >= m_width || offsetY >= m_height || !image.m_width)
+			return true;
+		const uint32_t rows = min(image.m_height, m_height - offsetY);
+		const uint32_t columns = min(image.m_width, m_width - offsetX);
+		const uint32_t fullWords = columns / 64;
+		const uint32_t tailBits = columns % 64;
+		const uint64_t tailMask = (UINT64_C(1) << tailBits) - 1;
+		const uint32_t shift = offsetX % 64;
+		const uint32_t firstWord = offsetX / 64;
+		for (uint32_t y = 0; y < rows; y++) {
+			const uint64_t *atlas = m_data.data() + size_t(y + offsetY) * m_rowStride + firstWord;
+			const uint64_t *chart = image.m_data.data() + size_t(y) * image.m_rowStride;
+			if (shift == 0) {
+				for (uint32_t x = 0; x < fullWords; x++) {
+					if (atlas[x] & chart[x])
+						return false;
+				}
+			} else {
+				uint64_t lower = atlas[0] >> shift;
+				for (uint32_t x = 0; x < fullWords; x++) {
+					// A full unaligned word fits in the overlap, so the next
+					// atlas word is on the same row and can be read directly.
+					const uint64_t next = atlas[x + 1];
+					const uint64_t aligned = lower | (next << (64 - shift));
+					if (aligned & chart[x])
+						return false;
+					lower = next >> shift;
+				}
+			}
+			if (tailBits != 0) {
+				uint64_t tail = atlas[fullWords] >> shift;
+				if (tailBits > 64 - shift)
+					tail |= atlas[fullWords + 1] << (64 - shift);
+				if (tail & chart[fullWords] & tailMask)
 					return false;
-				x += 64 - max(thisBlockShift, blockShift);
-				if (x >= image.m_width)
-					break;
 			}
 		}
 		return true;
