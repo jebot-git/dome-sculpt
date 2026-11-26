@@ -313,6 +313,7 @@ public:
   void edit_texture_set(TextureSetEdit,AssetSource expected = {});
   void texture_set_action(SpatialCommand);
   bool can_select_texture_sets() const;
+  bool can_resize_native_paint() const;
   bool texture_face_pointer(Vec3 origin,Vec3 direction,bool additive=false,double material_time=0);
   bool begin_native_stroke();
   void configure_shape_sculpt(bool enabled);

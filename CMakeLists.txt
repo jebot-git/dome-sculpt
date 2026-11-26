@@ -5097,6 +5097,15 @@ if(BUILD_TESTING)
   target_link_libraries(dome-sculpt-texture-set-resolution-test PRIVATE dome-sculpt-core)
   add_test(NAME dome-sculpt-texture-set-resolution COMMAND dome-sculpt-texture-set-resolution-test ${CMAKE_CURRENT_BINARY_DIR}/texture-set-resolution-output)
   set_tests_properties(dome-sculpt-texture-set-resolution PROPERTIES TIMEOUT 300)
+
+  add_executable(dome-sculpt-native-paint-resolution-test tests/native-paint-resolution.cpp)
+  target_include_directories(dome-sculpt-native-paint-resolution-test PRIVATE src)
+  target_link_libraries(dome-sculpt-native-paint-resolution-test PRIVATE dome-sculpt-core)
+  add_test(NAME native-empty-paint-resolution COMMAND dome-sculpt-native-paint-resolution-test empty
+    ${CMAKE_CURRENT_BINARY_DIR}/native-empty-paint-resolution)
+  add_test(NAME native-authored-paint-resolution COMMAND dome-sculpt-native-paint-resolution-test painted
+    ${CMAKE_CURRENT_BINARY_DIR}/native-authored-paint-resolution)
+  set_tests_properties(native-empty-paint-resolution native-authored-paint-resolution PROPERTIES TIMEOUT 420)
 endif()
 
 include(tests/texture-set-resolution-workflows.cmake)

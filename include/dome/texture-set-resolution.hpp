@@ -33,4 +33,8 @@ TextureSetResolutionReport
 resample_texture_set(Scene &, uint64_t, TextureSetId,
                      const TextureSetResolutionOptions &,
                      const TextureSetLimits & = {});
+// One writable material without a texture-set collection. Immutable source
+// images, sampling coordinates and material bindings keep their owners.
+TextureSetResolutionReport resample_native_texture_grid(
+    Scene &,uint64_t,const TextureSetResolutionOptions &,const TextureSetLimits & = {});
 } // namespace dome

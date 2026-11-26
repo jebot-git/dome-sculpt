@@ -2,7 +2,7 @@
 #include "dome/document.hpp"
 #include "texture-set-stroke.hpp"
 #include "texture-set-controls.hpp"
-#include "dome/texture-set-resolution.hpp"
+#include "texture-set-resample.hpp"
 #include "texture-set-surface.hpp"
 #include "document-authority.hpp"
 #include "texture-set-range.hpp"
@@ -24,17 +24,26 @@ void Document::queue_texture_set_locked(TextureSetEdit edit,AssetSource expected
  finish_locked();require_authority_locked(expected);
  if((expected.generation&&expected.generation!=state_.generation)||(expected.revision&&expected.revision!=state_.revision)||(expected.object&&expected.object!=scene_.active().id))throw std::logic_error("The texture-set recipient changed while finishing its earlier gesture");
  const auto object=scene_.active().id;require_object_editable_locked(object);
+ const bool native_resize=edit.action==TextureSetAction::Resolution&&edit.set==0&&
+   detail::can_resize_native_texture_grid(scene_.active());
  if(edit.action==TextureSetAction::Select){
   if(!scene_.active().texture_sets)throw std::logic_error("Choose an object with material sets");
- }else if(!detail::texture_set_plain_fields(scene_.active()))
+ }else if(!native_resize&&!detail::texture_set_plain_fields(scene_.active()))
   throw std::logic_error("This texture-set edit requires plain editable materials");
- auto lease=detail::capture_texture_set_recipient(scene_,object);auto changed=std::make_shared<bool>(false);
+ auto lease=native_resize?nullptr:detail::capture_texture_set_recipient(scene_,object);
+ auto changed=std::make_shared<bool>(false);
  const auto source=AssetSource{state_.generation,state_.revision,object,state_.edit_authority};
- const char*label=edit.action==TextureSetAction::Create?"Create texture set":edit.action==TextureSetAction::AssignFaces?"Assign material faces":edit.action==TextureSetAction::Select?"Select texture set":edit.action==TextureSetAction::Rename?"Rename texture set":edit.action==TextureSetAction::Material?"Edit texture-set material":edit.action==TextureSetAction::Resolution?"Resize texture-set paint":"Edit texture-set layer";
- queue_scene_operation_locked(label,[object,edit=std::move(edit),changed](Scene&scene,const auto&cancelled){
-  TextureSetLimits limits;limits.cancelled=cancelled;
+ const char*label=edit.action==TextureSetAction::Create?"Create texture set":edit.action==TextureSetAction::AssignFaces?"Assign material faces":edit.action==TextureSetAction::Select?"Select texture set":edit.action==TextureSetAction::Rename?"Rename texture set":edit.action==TextureSetAction::Material?"Edit texture-set material":edit.action==TextureSetAction::Resolution?"Resize paint":"Edit texture-set layer";
+ queue_scene_operation_locked(label,[object,edit=std::move(edit),changed,native_resize](Scene&scene,const auto&cancelled){
+  auto limits=native_resize?detail::native_texture_grid_limits():TextureSetLimits{};
+  limits.cancelled=cancelled;
   switch(edit.action){
-  case TextureSetAction::Resolution:{TextureSetResolutionOptions options;options.resolution=edit.resolution;*changed=resample_texture_set(scene,object,edit.set,options,limits).changed;break;}
+  case TextureSetAction::Resolution:{
+   TextureSetResolutionOptions options;options.resolution=edit.resolution;
+   const auto report=native_resize?resample_native_texture_grid(scene,object,options,limits):
+     resample_texture_set(scene,object,edit.set,options,limits);
+   *changed=report.changed;break;
+  }
   case TextureSetAction::Create:dome::create_texture_set(scene,object,edit.faces,edit.name,edit.resolution,limits);*changed=true;break;
   case TextureSetAction::AssignFaces:*changed=assign_texture_set_faces(scene,object,edit.set,edit.faces,limits);break;
   case TextureSetAction::Select:if(cancelled())throw std::runtime_error("Texture-set selection cancelled");*changed=select_texture_set(scene,object,edit.set);break;
@@ -64,6 +73,11 @@ void Document::queue_texture_set_locked(TextureSetEdit edit,AssetSource expected
  },source,{}, {},changed,{},0,0,{},{},0,{},std::move(lease));
 }
 
+bool Document::can_resize_native_paint()const{
+ std::lock_guard lock(model_mutex_);
+ return !scene_.active().texture_sets&&!control_before_&&
+   parameter_enabled_locked(VrParameter::TextureResolution);
+}
 bool Document::can_select_texture_sets()const{
  std::lock_guard lock(model_mutex_);
  return texture_set_command_enabled_locked(SpatialCommand::TextureNext);

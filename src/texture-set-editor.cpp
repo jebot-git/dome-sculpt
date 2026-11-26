@@ -11,13 +11,56 @@
 #include <FL/Fl_Value_Input.H>
 #include <FL/fl_ask.H>
 namespace dome {
+namespace {
+void choose_paint_resolution(Fl_Choice &choice,uint32_t current) {
+ choice.add("64|128|256|512|1024|2048");
+ int grid=0;
+ while(grid<5&&(64u<<grid)<current)++grid;
+ choice.value(grid);
+}
+
+void resize_native_paint(Document &doc,const AssetSource &source,uint32_t current) {
+ int x,y,w,h;
+ Fl::screen_work_area(x,y,w,h);
+ const int row=std::max(28,dx::size+12);
+ const int width=std::min(std::max(400,dx::size*29),w-40);
+ DomeDialog window(width,row*4,"Paint resolution");
+ const int label=width/2;
+ Fl_Choice resolution(label,row,width-label-16,row-4,"Grid size (pixels)");
+ choose_paint_resolution(resolution,current);
+ Fl_Button cancel(label-150,row*3,140,row-4,"Cancel");
+ Fl_Button apply(label+10,row*3,140,row-4,"Apply");
+ bool accepted=false;
+ cancel.callback([](Fl_Widget *widget,void *){widget->window()->hide();});
+ apply.callback([](Fl_Widget *widget,void *data){
+  *static_cast<bool *>(data)=true;
+  widget->window()->hide();
+ },&accepted);
+ window.end();
+ window.set_modal();
+ dx::style(&window);
+ window.show();
+ cancel.take_focus();
+ while(window.shown())Fl::wait();
+ if(accepted){
+  TextureSetEdit edit;
+  edit.action=TextureSetAction::Resolution;
+  edit.resolution=64u<<resolution.value();
+  doc.edit_texture_set(std::move(edit),source);
+ }
+}
+}
 void edit_texture_sets(Document&doc){
  const auto state=doc.frame().state;
+ const AssetSource source{state->generation,state->revision,state->active_object,state->edit_authority};
  const bool selection_only=!state->can_edit_texture_sets;
+ if(selection_only&&state->texture_sets.size()==1&&doc.can_resize_native_paint()){
+  resize_native_paint(doc,source,state->texture_sets.front().resolution);
+  return;
+ }
  if(selection_only&&!doc.can_select_texture_sets()){
   fl_alert("Choose an editable painting mesh and finish pending work first.");return;
  }
- const AssetSource source{state->generation,state->revision,state->active_object,state->edit_authority};
  int sx,sy,sw,sh;Fl::screen_work_area(sx,sy,sw,sh);
  const int row=std::max(28,dx::size+12),width=std::min(std::max(560,dx::size*36),sw-40),height=std::min(row*(selection_only?5:20),sh-60),label=width*2/5;
  DomeDialog window(width,height,"Material texture sets");Fl_Scroll scroll(0,0,width,height-row*2);Fl_Group content(0,0,width-24,row*19);content.resizable(nullptr);int y=row;
@@ -27,7 +70,7 @@ void edit_texture_sets(Document&doc){
  member.copy(items.data());member.value(selected);y+=row;
  Fl_Group operations(0,y,width-24,row*17);operations.resizable(nullptr);
  Fl_Choice action(label,y,width-label-40,row-4,"Apply action");action.add("Select set|New set from picked faces|Assign picked faces to set|Rename set|Edit active set material|Resize active set");action.value(0);y+=row;
- Fl_Choice resolution(label,y,width-label-40,row-4,"Paint resolution");resolution.add("64|128|256|512|1024|2048");int grid=0;while(grid<5&&(64u<<grid)<state->texture_sets[size_t(selected)].resolution)++grid;resolution.value(grid);y+=row;
+ Fl_Choice resolution(label,y,width-label-40,row-4,"Paint resolution");choose_paint_resolution(resolution,state->texture_sets[size_t(selected)].resolution);y+=row;
  Fl_Output faces(label,y,width-label-40,row-4,"Picked faces");const auto count=std::to_string(state->texture_faces.size());faces.value(count.c_str());y+=row;
  Fl_Input name(label,y,width-label-40,row-4,"New / replacement name");name.value(state->texture_sets[size_t(selected)].name.c_str());y+=row;
  const auto material=state->texture_material;

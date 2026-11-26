@@ -12,11 +12,14 @@ inline bool same_texture_material(const Material&a,const Material&b)noexcept{
 inline bool texture_set_control(VrParameter p)noexcept{
  return p==VrParameter::TextureResolution||p==VrParameter::Metallic||p==VrParameter::Roughness||p==VrParameter::Opacity||p==VrParameter::BaseColor||p==VrParameter::MaterialEmission||p==VrParameter::LayerOpacity||p==VrParameter::LayerOrder;
 }
+inline bool uses_texture_set_control(const SculptObject &object,VrParameter parameter) noexcept {
+ return parameter==VrParameter::TextureResolution || (object.texture_sets&&texture_set_control(parameter));
+}
 // Values are staged in the existing common controls; the immutable recipient is
 // unchanged until the common accepted worker transaction validates and applies.
 // No raster replay or geometry copy occurs on a slider/second-eye publication.
 inline TextureSetEdit texture_set_control_request(const SculptObject&o,const VrControlState&c){
- if(!o.texture_sets||!texture_set_control(c.parameter))throw std::invalid_argument("No selected texture field for these controls");
+ if(!uses_texture_set_control(o,c.parameter))throw std::invalid_argument("No selected texture field for these controls");
  const auto field=active_texture_set(o);TextureSetEdit edit;edit.set=field.id;edit.material=field.material;edit.action=TextureSetAction::Material;
  switch(c.parameter){
  case VrParameter::TextureResolution:edit.action=TextureSetAction::Resolution;edit.resolution=64u<<std::clamp(int(std::lround(c.value[0])),0,5);break;

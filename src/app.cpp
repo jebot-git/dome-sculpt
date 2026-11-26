@@ -929,7 +929,8 @@ struct App {
     enable("&Sculpt/Smaller brush",
            !modal && !s->asset_busy && s->radius > .005f);
     enable("&Sculpt/Larger brush", !modal && !s->asset_busy && s->radius < 2);
-    enable("&Paint/Texture sets...",!modal&&(s->can_edit_texture_sets||canvas.document.can_select_texture_sets()));
+    enable("&Paint/Texture sets...",!modal&&(s->can_edit_texture_sets||
+      canvas.document.can_resize_native_paint()||canvas.document.can_select_texture_sets()));
     enable("&Paint/Pick material faces",!modal&&s->can_edit_texture_sets);
     enable("&Paint/Clear material face selection",!modal&&!s->asset_busy&&!s->texture_faces.empty());
     checked("&Paint/Pick material faces",s->texture_face_select);

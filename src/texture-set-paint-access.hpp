@@ -5,6 +5,10 @@ namespace dome {struct TextureSetResolutionOptions;struct TextureSetResolutionRe
 namespace dome::detail {
 struct PolygonSurfaceStage;
 struct TextureSetPaintAccess {
+  static bool can_resize_raw(const PaintedMesh&) noexcept;
+  static bool can_resize_unpainted(const PaintedMesh&) noexcept;
+  static bool grid_covered(const PaintedMesh&,size_t) noexcept;
+  static std::shared_ptr<PaintedMesh> resize_unpainted(const PaintedMesh&,uint32_t,const TextureSetLimits&);
   static std::shared_ptr<PaintedMesh> resample_plain(const PaintedMesh&,const TextureSetResolutionOptions&,const TextureSetLimits&,TextureSetResolutionReport&);
   static const std::shared_ptr<const TextureSetFaceDomain>& domain(const PaintedMesh&)noexcept;
   static std::shared_ptr<const void> raster_owner(const PaintedMesh&)noexcept;
