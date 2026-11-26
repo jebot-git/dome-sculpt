@@ -175,7 +175,40 @@
     "status_path": "artifacts/vrm1-generated-tangent-release-20261126/combined-regression/status.json",
     "candidate": "fc528acadc024ebc4cc54491e54b07dd1ca8e467",
     "selected": 86,
-    "terminal": false
+    "terminal": true,
+    "ctest_exit": 8,
+    "result": {
+      "baseline": "217b4ad28d152f786a146bb492a197fae859abec",
+      "candidate": "fc528acadc024ebc4cc54491e54b07dd1ca8e467",
+      "previous": {
+        "passed": 78,
+        "failed": 8,
+        "skipped": 0
+      },
+      "current": {
+        "passed": 78,
+        "failed": 8,
+        "skipped": 0
+      },
+      "recovered": [],
+      "new_failures": [],
+      "remaining_nonpasses": [
+        "native-paint-sampling-transitions",
+        "normal-preparation-native",
+        "pbr-preview",
+        "polygon-scene-archive",
+        "polygon-surface-paint-private-codec",
+        "source-color-vrm",
+        "vrm",
+        "vrm-role-consumer"
+      ]
+    },
+    "artifacts": {
+      "artifacts/vrm1-generated-tangent-release-20261126/combined-regression/comparison.json": "026aa6a8892357a79c81688f5ef49287d702e66ddce60672e6ea759ae2e753cb",
+      "artifacts/vrm1-generated-tangent-release-20261126/combined-regression/status.json": "915c5ed53d155a84d0ab44edae892bfe7fdf9eaafd66ea275111aa8db89ea40c",
+      "artifacts/vrm1-generated-tangent-release-20261126/combined-regression/ctest.xml": "827a80e6b709ac38cbdb1430006e187c3a5ad04199ee7bdfa5268e68ae71b98c",
+      "artifacts/vrm1-generated-tangent-release-20261126/combined-regression/ctest.log": "8ac17627785ec3303d1e6d9b0eed1b29be63f2dcfb11c2ee840db0bac2aad60c"
+    }
   },
   "harness_corrections": [
     "Initial package reimport exercised the embedded project. The new fixture removes its project marker in a copied file and checks the ordinary source importer.",

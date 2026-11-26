@@ -1,0 +1,238 @@
+{
+  "source": "fed5cd807b7917a9c96fecb76e4dda9aa5213437",
+  "cli_source": "2cbc1f1a55a0642cb99118f9a90a303035357c2d",
+  "parent": "fc528acadc024ebc4cc54491e54b07dd1ca8e467",
+  "branch": "work/core-gltf-normal-export-20261126",
+  "tested_diff_sha256": "eeb1882b6d6382bbfa1a43289eaad2833fe6b0c6490afad9eb3e8c2b2a2134e6",
+  "cli_diff_sha256": "556250beaf88398429c562309433f348b63f581ffed5edb6830ac1135f34cd86",
+  "toolkit": {
+    "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+    "fltk_release": "/opt/fltk-vr/toolkit",
+    "bitmap": "/opt/fltk-vr/bdf-runtime"
+  },
+  "release": {
+    "unit": "ds-core-gltf-normal-export-release-20261126.service",
+    "invocation": "6726385c0ce6418d8f989ae7f756b847",
+    "passed": 9,
+    "exit": 0,
+    "cases": [
+      "gltf-interoperability",
+      "normal-frame-export",
+      "source-extra-uv",
+      "vrm1-source-export",
+      "vrm1-background-fixture",
+      "vrm1-expression-preview-render",
+      "vrm1-expression-preview",
+      "vrm1-expression-parameters-faults",
+      "vrm1-expressions"
+    ],
+    "artifacts": {
+      "artifacts/core-gltf-normal-export-release-20261126/configure.log": "391553e9c4ea748044cc68b950e3e8eeb883fd635b47ad3b96538ebc39119c74",
+      "artifacts/core-gltf-normal-export-release-20261126/source-at-test": "cf1dd289b5e4a4c1efe4a6427c4f6eef594c67345a13210847bcc0f235ad376d",
+      "artifacts/core-gltf-normal-export-release-20261126/build.log": "fa98fa01834a0409f568f013b20ebd323228018c7de2d875609e967444840870",
+      "artifacts/core-gltf-normal-export-release-20261126/ctest.log": "a2c89cb00c2430bfcf9a985538d855c9cfbeb9f9044cc563a5e1ff46e572d3f0",
+      "artifacts/core-gltf-normal-export-release-20261126/ctest.xml": "d50fb5c527effac361eb6d6dfc59c0090023942244189c7171afc608fdd12514"
+    }
+  },
+  "asan_ubsan_leaks": {
+    "unit": "ds-core-gltf-normal-export-asan-20261126.service",
+    "invocation": "d19f747889d241fa83ab75a0dfd6e388",
+    "passed": 8,
+    "exit": 0,
+    "cases": [
+      "gltf-interoperability",
+      "normal-frame-export",
+      "source-extra-uv",
+      "vrm1-source-export",
+      "vrm1-background-fixture",
+      "vrm1-expression-preview",
+      "vrm1-expression-parameters-faults",
+      "vrm1-expressions"
+    ],
+    "artifacts": {
+      "artifacts/core-gltf-normal-export-asan-20261126/configure.log": "ad2601d545f1936448a3228d041f644f254225efd9b0076a2285088b97556e08",
+      "artifacts/core-gltf-normal-export-asan-20261126/source-at-test": "cf1dd289b5e4a4c1efe4a6427c4f6eef594c67345a13210847bcc0f235ad376d",
+      "artifacts/core-gltf-normal-export-asan-20261126/build.log": "e4fbf8730137b913a40ea8b0651463d1a0a993db66b174129cf029450dea4f0b",
+      "artifacts/core-gltf-normal-export-asan-20261126/ctest.log": "4abd1a8fe6616d71f70d7bdc5f2fe7c357d55bd182fcfba2c874227803772503",
+      "artifacts/core-gltf-normal-export-asan-20261126/ctest.xml": "4acc213e56e9753a8e46ad06b98b6e12bbbb39e42baf23bdf6c45f8cdfd647fe"
+    },
+    "elf_witnesses": {
+      "artifacts/core-gltf-normal-export-asan-20261126/dome-sculpt-gltf-test.elf-dynamic": "a07cf2d42d29ad7b039c5ce82d4421976324e2abee59a45b1a55d6a1c4d43170",
+      "artifacts/core-gltf-normal-export-asan-20261126/dome-sculpt-normal-frame-export-test.elf-dynamic": "ecc5532bbc03ae109738d5bfa0c29b61092aba0e1c7ffc8bccb5c0ff146c658e",
+      "artifacts/core-gltf-normal-export-asan-20261126/dome-sculpt-source-extra-uv-test.elf-dynamic": "6cde8a516ec8d86d7cec947423cbdcfe7dd770f35bef63f65e840a721d1bbfa5",
+      "artifacts/core-gltf-normal-export-asan-20261126/dome-sculpt-vrm1-background-fixture-test.elf-dynamic": "78ee071609e599fb8731ebe36238c11529c7434540341d3c290872872542597d",
+      "artifacts/core-gltf-normal-export-asan-20261126/dome-sculpt-vrm1-expression-parameters-faults-test.elf-dynamic": "93399bc37ef88deabe196979d1225d37c749b025149cd94a2cd6e547135c6fa6",
+      "artifacts/core-gltf-normal-export-asan-20261126/dome-sculpt-vrm1-expression-preview-test.elf-dynamic": "829a7cc44cbe60a095938771c7fab02476cf8aadae674c7e3aaeb3cecaa0e9d0",
+      "artifacts/core-gltf-normal-export-asan-20261126/dome-sculpt-vrm1-expressions-test.elf-dynamic": "1b1181972f0d435ac68004deba5cabb312cd8f5654022a3aba90f2c3732e4930",
+      "artifacts/core-gltf-normal-export-asan-20261126/dome-sculpt-vrm1-source-export-test.elf-dynamic": "900a32fade6c95801f087a4a99ad12c762c7c199a0465c35b5b53f036a36bf45"
+    },
+    "identical_core_gltf_files": {
+      "artifacts/core-gltf-normal-export-release-20261126/vrm1-expressions/core-glb-authored-atlas-editable.glb": "5c28112181d0238df3323d684ee5569e198112a3bcdf1c7baf3fa41448572b3a",
+      "artifacts/core-gltf-normal-export-release-20261126/vrm1-expressions/core-glb-authored-atlas-portable.glb": "3ec83061969a97ddea2ce4a5d19e7725aa8dbd7a9932346c4ed139eb774cf8b3",
+      "artifacts/core-gltf-normal-export-release-20261126/vrm1-expressions/core-glb-authored-atlas.glb": "ddb815b8044149b964b7c8298bf8e44b673511f3b4f737b27ee9bffa788f0e4c",
+      "artifacts/core-gltf-normal-export-release-20261126/vrm1-expressions/core-glb-authored-original-portable.glb": "1f93fea120318e53a9b4795594ff19330aad632ca4fa3cd7a10b69d345d634cc",
+      "artifacts/core-gltf-normal-export-release-20261126/vrm1-expressions/core-glb-authored-original.glb": "ddb815b8044149b964b7c8298bf8e44b673511f3b4f737b27ee9bffa788f0e4c",
+      "artifacts/core-gltf-normal-export-release-20261126/vrm1-expressions/core-glb-generated-atlas-editable.glb": "f30124b3b2d982d47a1e3535584cd72593cc66adfec06d2bde66befe97791a55",
+      "artifacts/core-gltf-normal-export-release-20261126/vrm1-expressions/core-glb-generated-atlas-portable.glb": "d6770e655359b4cf693b911381fcf5df3020363f6043dcb5f147e6165379eb0e",
+      "artifacts/core-gltf-normal-export-release-20261126/vrm1-expressions/core-glb-generated-atlas.glb": "f3a2e439b521ac54c8fd14c3a0e1009bdcf282be093c04d947279ebef01246d6",
+      "artifacts/core-gltf-normal-export-release-20261126/vrm1-expressions/core-glb-generated-original-portable.glb": "86650f583514d206560a20b1676139dc3545f5fc5216fe2b0ef69a17d045ee2e",
+      "artifacts/core-gltf-normal-export-release-20261126/vrm1-expressions/core-glb-generated-original.glb": "f3a2e439b521ac54c8fd14c3a0e1009bdcf282be093c04d947279ebef01246d6"
+    }
+  },
+  "static_expression_and_core_glb_checks_per_profile": 576,
+  "standalone_renderer": {
+    "comparison": "Four source geometries across two eye positions each",
+    "llvmpipe_maxima": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "authenticated_arc": {
+      "exit": 0,
+      "pci": "0000:03:00.0",
+      "render_nodes": [
+        "/dev/dri/renderD129"
+      ],
+      "maxima": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "artifacts": {
+      "artifacts/core-gltf-normal-export-render.cpp": "4589339f206a0048a023d23b102902f136d69d86b4549659a4791db3802f22c6",
+      "artifacts/core-gltf-normal-export-verification-20261126/render": "f043b1fade1bafb4e40c4aabde9ab6a9c6def919eef86a88cca76b7d3a61e696",
+      "artifacts/core-gltf-normal-export-verification-20261126/render-build.log": "955e9848e7b9036bafbb78c3d9ed667078a80ad2c9aaa488c7d9905bf63fbe15",
+      "artifacts/core-gltf-normal-export-verification-20261126/render.log": "fa9f3c66f3d79fbcd1eaaae903de2f33b1726da37e2665784309d938290e10c3",
+      "artifacts/core-gltf-normal-export-verification-20261126/render-arc.log": "169037c8a5a1c9657e9d952be4ddf6e9ad02a2cd937664aa8abdbd3f5c5a7d0c",
+      "artifacts/core-gltf-normal-export-verification-20261126/render-arc.json": "e9ec4a6dbaaee5964e44c72464816c9a031cac5d07cd6316930f3780338fbca1"
+    }
+  },
+  "painted_editable_probe": {
+    "scope": "Real committed atlas paint on both authored and generated normal fixtures, exact native project extraction",
+    "khronos": [
+      {
+        "file": "painted-authored.glb",
+        "errors": 0,
+        "warnings": 2
+      },
+      {
+        "file": "painted-generated.glb",
+        "errors": 0,
+        "warnings": 2
+      }
+    ],
+    "artifacts": {
+      "artifacts/core-gltf-painted-probe-20261126.cpp": "073999889b47ccb2b6d23bdcddc1f6c60a2b6f44e8898404442ae6c881681c81",
+      "artifacts/core-gltf-normal-export-verification-20261126/painted-probe": "fb6036126dfb4ec4e78971eab183ffc6c91567e3246e54089f54060cc83e7ef2",
+      "artifacts/core-gltf-normal-export-verification-20261126/painted-authored.glb": "ec14dc1fd30fbdf1c64518648fccc27297659658e755cd0fd76c658e2f6bfa12",
+      "artifacts/core-gltf-normal-export-verification-20261126/painted-generated.glb": "8ad0c7371890941ec1a569ac097b4810ce75ac4e90c25b30247dd02c2832c7bb",
+      "artifacts/core-gltf-normal-export-verification-20261126/painted-authored.log": "85ef26c7fe4fa9570f2bc220cc69cea5f8214083b6b76c692fa6c53513d5915b",
+      "artifacts/core-gltf-normal-export-verification-20261126/painted-generated.log": "4625f2f492262635d5314fe438e39d09332c9655f9cbf03f0b5be247467c4bea"
+    }
+  },
+  "independent_khronos": {
+    "inputs_and_outputs": [
+      {
+        "file": "core-glb-authored-atlas-editable.glb",
+        "errors": 0,
+        "warnings": 2
+      },
+      {
+        "file": "core-glb-authored-atlas-portable.glb",
+        "errors": 0,
+        "warnings": 2
+      },
+      {
+        "file": "core-glb-authored-atlas.glb",
+        "errors": 0,
+        "warnings": 4
+      },
+      {
+        "file": "core-glb-authored-original-portable.glb",
+        "errors": 0,
+        "warnings": 2
+      },
+      {
+        "file": "core-glb-authored-original.glb",
+        "errors": 0,
+        "warnings": 4
+      },
+      {
+        "file": "core-glb-generated-atlas-editable.glb",
+        "errors": 0,
+        "warnings": 2
+      },
+      {
+        "file": "core-glb-generated-atlas-portable.glb",
+        "errors": 0,
+        "warnings": 2
+      },
+      {
+        "file": "core-glb-generated-atlas.glb",
+        "errors": 0,
+        "warnings": 5
+      },
+      {
+        "file": "core-glb-generated-original-portable.glb",
+        "errors": 0,
+        "warnings": 2
+      },
+      {
+        "file": "core-glb-generated-original.glb",
+        "errors": 0,
+        "warnings": 5
+      }
+    ],
+    "cli_outputs": [
+      {
+        "file": "cli-transformed-normal.glb",
+        "errors": 0,
+        "warnings": 2
+      },
+      {
+        "file": "cli-sculpt-demo.glb",
+        "errors": 0,
+        "warnings": 0
+      }
+    ],
+    "artifacts": {
+      "artifacts/core-gltf-normal-export-verification-20261126/khronos.json": "53b5559271ebca9bc3dc479fa55c06b05da4412119694eea0f2461a5f4ac411e",
+      "artifacts/core-gltf-normal-export-verification-20261126/khronos-cli.json": "a2197038237b14e61cd95f1c404f1d1c2fd1b0fbf72af003b2b3ffcd7b4b3946"
+    }
+  },
+  "cli": {
+    "old_error": "UV1 source compositing requires explicit source-coordinate preparation",
+    "new_route": "Same Document GLB export worker as desktop and XR",
+    "artefacts": {
+      "artifacts/core-gltf-normal-export-verification-20261126/cli-build.log": "8213608cb9eb4c9152f94f97bc58c130e7aa2e452123119010ede55c9d2ecb3b",
+      "artifacts/core-gltf-normal-export-verification-20261126/cli-source-at-test": "3a5d431a0a01f9107205a668398fa25f3ba205ded3bc06905310fde12a9c0624",
+      "artifacts/core-gltf-normal-export-verification-20261126/cli-core-before.sha256": "c2294d248c0b8efb306bd7f4514807f3277bcc80d5b4f6691c3f4eacca663ef5",
+      "artifacts/core-gltf-normal-export-verification-20261126/legacy-cli.log": "8287f90b0c5d7c9b706809832f5402fb54181b1c1fa8c96a824f6870e0855ccc",
+      "artifacts/core-gltf-normal-export-verification-20261126/cli-transformed-normal.glb": "e11c6b66450569dd00229febbcb1d935a85820b8f823fdfba14089c56ce6866b",
+      "artifacts/core-gltf-normal-export-verification-20261126/cli-sculpt-demo.glb": "568a1e83a54782824f0c09a4a43aeb2f5c6c1181c9ebbe48b21708f4564ad63b"
+    }
+  },
+  "open_scope": [
+    "Mixed typed MToon source frames, additional normal adapters and live painted VRM1 expressions",
+    "Whole-suite and physical headset qualifications"
+  ],
+  "combined_replay": {
+    "candidate": "2cbc1f1a55a0642cb99118f9a90a303035357c2d",
+    "unit": "ds-core-gltf-normal-export-regressions-20261126.service",
+    "invocation": "1add37a5486e44769e0a521bcf4a9f7d",
+    "path": "artifacts/core-gltf-normal-export-release-20261126/combined-regression/status.json",
+    "cases": 86,
+    "terminal": false
+  }
+}

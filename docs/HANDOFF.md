@@ -574,10 +574,38 @@ matches exactly on llvmpipe and within one RGB8 level on Intel Arc A770.
 That comparison also covers the earlier authored-tangent PBR fixture.
 Independent schema and Khronos validation find zero errors in the checked
 source and output files. Mixed MToon frame generation, portable live
-expressions over paint, and the general transformed-normal GLB export route
+expressions over paint, and other transformed-normal GLB material adapters
 still require separate qualification.
-The selected 86-case combined Release replay is running on the pushed commit.
+The selected 86-case combined Release replay finished with 78 passes, eight
+previous failures and zero skips. Every previous pass held.
 See [the validation receipt](validation/vrm1-generated-tangent-20261126.json).
+
+### Transformed core normal maps in GLB export
+
+The standard GLB and Editable GLB file workers now export transformed core
+normal maps when they can replay the actual source frame and verify the
+original image, sampler, rest geometry, and emitted UV corners. The output
+uses explicit base and morph tangents. Both authored and generated frames
+work on original geometry and unpainted prepared atlases. Existing source
+VRM1 frame replay shares the same verifier.
+
+Tests exercise a skinned core glTF source, authored UV1, generated mirrored
+UV2 and native atlas preparation. Standalone output reimports with exact base
+and morph tangent streams. The editable output retains the native scene.
+Altered source UVs and cancellation at commit preserve the existing GLB.
+The headless software and Arc comparisons match the standalone reimport
+exactly against native PBR pixels across both eye positions and all four input
+cases. A separate editable export probe retains genuine authored atlas paint
+for both authored and generated frames. Khronos reports zero errors across
+the checked source and output files.
+
+Core candidate `fed5cd80` passes nine Release and eight ASan/UBSan tests
+with leak detection. Follow-up `2cbc1f1a` routes the headless
+`--export-project` command through the standard file worker. The fresh
+FLTK application exports the previously failing UV1 project and the sculpt
+demo, and both files validate. The selected 86-case replay is running on
+`2cbc1f1a`.
+See [the validation receipt](validation/core-gltf-normal-export-20261126.json).
 
 ## Source and integration boundary
 

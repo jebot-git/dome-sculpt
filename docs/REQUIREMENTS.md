@@ -33,6 +33,11 @@ frame across editable paint and native reopen. Unpainted portable VRM1 output
 replays and emits explicit base and morph tangents. See
 [the validation receipt](validation/vrm1-generated-tangent-20261126.json).
 
+Standard and Editable GLB export now preserve authored or generated normal
+frames under transformed original core samplers, including UV1 and UV2.
+The tested standalone outputs reimport with exact base and morph tangents.
+See [the validation receipt](validation/core-gltf-normal-export-20261126.json).
+
 ## Qualified integration — 2026-11-17
 
 Main now integrates product `1bc13125` and public fixture `f1e193c7` after
