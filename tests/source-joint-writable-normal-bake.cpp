@@ -64,23 +64,37 @@ void check_dense(const Scene &s,uint64_t source,uint32_t checked_resolution,
   require(hdr_samples>300&&hdr_maximum<2e-4,"Every independent current-grid offcentre HDR sample retains the unchanged2e-4 bound");
 }
 
-void check_history(const Scene &baked,const Scene &before,uint64_t source,
-    const ObjectBakeSettings &settings,const std::filesystem::path &out,
-    const std::string &name,const nlohmann::json &original){
- const auto accepted=baked.encode();
- const auto path=out/(name+".dsculpt");
+void check_reopen(const Scene &baked,const std::filesystem::path &path,
+                  const nlohmann::json &accepted){
  baked.save(path);
  require(Scene::load(path).encode()==accepted,"Combined SOURCE Save/reopen full owning graph exact");
+}
+
+void check_worker_history(const Scene &before,uint64_t source,const ObjectBakeSettings &settings,
+    const std::filesystem::path &ordered_save,const nlohmann::json &original,
+    const nlohmann::json &accepted,bool trace=false){
  Document doc;
  doc.replace(before.snapshot());
  require(doc.wait_mesh(),"Joint SOURCE worker baseline publishes");
  doc.bake_from_object(source,settings);
- doc.save_async(out/(name+"-ordered.dsculpt")).get();
+ doc.save_async(ordered_save).get();
+ if(trace)std::cout<<"CHECKED_SOURCE_HISTORY ordered-save-written"<<std::endl;
  require(doc.wait_asset()&&doc.wait_mesh()&&doc.frame().state->error.empty()&&doc.copy_scene().encode()==accepted,
          "Joint actual worker and immediately ordered Save match native endpoint");
- require(doc.undo()&&doc.wait_mesh()&&doc.copy_scene().encode()==original&&
-         doc.redo()&&doc.wait_mesh()&&doc.copy_scene().encode()==accepted,
+ if(trace)std::cout<<"CHECKED_SOURCE_HISTORY accepted-state-exact"<<std::endl;
+ const bool undone=doc.undo()&&doc.wait_mesh()&&doc.copy_scene().encode()==original;
+ if(trace&&undone)std::cout<<"CHECKED_SOURCE_HISTORY undone-state-exact"<<std::endl;
+ require(undone&&doc.redo()&&doc.wait_mesh()&&doc.copy_scene().encode()==accepted,
          "Joint SOURCE Bake owns one exact UndoRedo boundary");
+ if(trace)std::cout<<"CHECKED_SOURCE_HISTORY redone-state-exact"<<std::endl;
+}
+
+void check_history(const Scene &baked,const Scene &before,uint64_t source,
+    const ObjectBakeSettings &settings,const std::filesystem::path &out,
+    const std::string &name,const nlohmann::json &original){
+ const auto accepted=baked.encode();
+ check_reopen(baked,out/(name+".dsculpt"),accepted);
+ check_worker_history(before,source,settings,out/(name+"-ordered.dsculpt"),original,accepted);
 }
 
 void check_source_context(const Scene &s,uint64_t source,const nlohmann::json &original){
@@ -137,11 +151,14 @@ void exercise(bool seam,bool live,bool repeat,const std::filesystem::path&out,
  check_source_context(s,source,original);
  std::cout<<(checked_resolution?"CHECKED_JOINT_SOURCE ":"JOINT_SOURCE ")<<name<<" direct="<<direct<<" normal="<<normal_error<<" material="<<material_error<<" wrongMaterial="<<wrong_material<<" omittedPbr="<<omitted_pbr<<" omittedNormal="<<omitted_normal<<" wrongNormal="<<wrong_normal<<" emission="<<emission_error<<" peak="<<peak<<" interior="<<interior<<'\n';
 }
-// Both consumers reopen the exact files from one real Bake. The runner pins
+enum class CaptureHistory { Complete, Reopen, OrderedWorker };
+
+// All consumers reopen the exact files from one real Bake. The runner pins
 // their bytes and grants read-only access to the capture directory.
 void check_capture(uint32_t resolution,const std::filesystem::path &capture,
                    const std::optional<std::filesystem::path> &worker_output,
-                   std::optional<owning_filtered::DenseRows> rows = std::nullopt){
+                   std::optional<owning_filtered::DenseRows> rows = std::nullopt,
+                   CaptureHistory history = CaptureHistory::Complete){
  const auto before=Scene::load(capture/"selected-target-resolution.dsculpt");
  const auto baked=Scene::load(capture/"observed-second-bake.dsculpt");
  const auto original_scene=Scene::load(capture/"original-source.dsculpt");
@@ -166,7 +183,18 @@ void check_capture(uint32_t resolution,const std::filesystem::path &capture,
          "Capture retains the checked native bake recipe and exact source ID");
  if(worker_output){
   std::filesystem::create_directories(*worker_output);
-  check_history(baked,before,source,settings->settings,*worker_output,"000",before.encode());
+  switch(history){
+  case CaptureHistory::Complete:
+   check_history(baked,before,source,settings->settings,*worker_output,"000",before.encode());
+   break;
+  case CaptureHistory::Reopen:
+   check_reopen(baked,*worker_output/"000.dsculpt",baked.encode());
+   break;
+  case CaptureHistory::OrderedWorker:
+   check_worker_history(before,source,settings->settings,*worker_output/"000-ordered.dsculpt",
+                        before.encode(),baked.encode(),true);
+   break;
+  }
  }else{
   check_dense(baked,source,resolution,rows);
  }
@@ -199,7 +227,8 @@ void negatives(){
 int main(int argc,char**argv)try{
   if(argc>=2){
     const std::string_view command=argv[1];
-    const bool worker=command=="--checked-worker";
+    const bool worker=command=="--checked-worker"||command=="--checked-reopen"||
+                      command=="--checked-ordered-history";
     if(command=="--checked-dense-rows"){
       if(argc!=6)return 2;
       const auto resolution=owning_filtered::resolution(argv[2]);
@@ -220,7 +249,10 @@ int main(int argc,char**argv)try{
       if(argc!=(worker?5:4))return 2;
       const auto resolution=owning_filtered::resolution(argv[2]);
       const auto output=worker?std::optional<std::filesystem::path>(argv[4]):std::nullopt;
-      joint_source::check_capture(resolution,argv[3],output);
+      auto history=joint_source::CaptureHistory::Complete;
+      if(command=="--checked-reopen")history=joint_source::CaptureHistory::Reopen;
+      else if(command=="--checked-ordered-history")history=joint_source::CaptureHistory::OrderedWorker;
+      joint_source::check_capture(resolution,argv[3],output,std::nullopt,history);
       std::cout<<"PASS "<<joint_source::checks<<" checked joint-writable SOURCE "
                <<(worker?"history":"dense oracle")<<" controls"<<std::endl;
       return 0;
