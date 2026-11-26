@@ -1,0 +1,395 @@
+{
+  "product": "33bd24609e8fc701283b23aa5057955e908df583",
+  "main_merge": "a1f887a439cad497209982feffd6a1f1c52295cf",
+  "scope": "Static LDR retained normal texture sets. Standard and Editable GLB, per-corner frame transport, bounded reprojection and alternate atlas sampling.",
+  "physical_headset": false,
+  "profiles": {
+    "release": {
+      "native": {
+        "candidate": "33bd24609e8fc701283b23aa5057955e908df583",
+        "profile": "release",
+        "terminal": true,
+        "invocation": "32ddf6dd1d4d462a8de12307ad73e079",
+        "fltk": "/opt/fltk-vr/toolkit",
+        "phase": "complete",
+        "elapsed_seconds": 40.5,
+        "donor": "55a5bc69be9db6641c5df2227b5f87108869564b",
+        "rebuilt": [
+          "src/texture-set-portable-field.cpp"
+        ],
+        "frontend": [],
+        "render_owners": [],
+        "core_sha256": "ac63fe35626c909abdab8b664ce97c09420dc0d8f3ae597627a0122a87bfc485",
+        "parent_core_sha256": "6f1f0d8a8998a09a1cea9a5da50d7b10c27db7deeb32fe6ea0fd406625024cc1",
+        "objects": {
+          "texture-set-portable-field.cpp.o": "1ac7a578a7c2f5b83c42c024eb9a94da8605a51f73a168a251aeb6a8aa1dbed7"
+        },
+        "atlas_sha256": "230e1bf7593976ee61f3c0edfb31acf3d142ede218c495aa3a02da2c8207622a",
+        "render_sha256": "828a8d35dd8ba95e71f69b89b26d12638f0bbf73639e2b28178c89a5b575847b",
+        "render_rebuilt": [],
+        "xr_sha256": "aec7fe47cf2ff52bf299a681372f003c0a1e66c01e87b4474fa2500988f6002f",
+        "xr_rebuilt": [],
+        "app_sha256": "da986a0ee8231e9263786c17db3434e9b6b77e04b671a14a590e605dfd058391",
+        "binaries": {
+          "dome-sculpt-texture-set-native": "f38e3aedffd39abb6c4d7323b42a50bab6443a8e3d031d72e1f721e827533932",
+          "dome-sculpt-texture-set-source-export": "85108f535601323df96ec1f84aa02540ad39ced7648c1ec286e9966dc5df4b60",
+          "texture-set-bake-recipe": "a79ab046dc9e4d48359f1c5d3956fdc11054adec18a36dcfa29d5b58313848a6",
+          "bake-recipes": "91463d0d6097fe53080342b019289af9133fc1a6d1143f30625c3e3e0fdc00ec",
+          "bake-custom-cage": "f522a1a497d19890dfd1958a28fe5cc9b6729fbf924ce32c133508a16c8d7419",
+          "bake-workflow": "0d46e2aa5add44fbdd4bec551a5b6f653df755d64658c7d25d3eaa5d64880dd0",
+          "bake-controls": "4c55e8a51baba1a83b4bffa916c87fd987c59557a97883c87d5065584f8dd4af"
+        },
+        "exit": 0,
+        "tests": 12,
+        "ctest_sha256": "2f818f46e8fe6f235050a4a707bccaa631e014922e85eea1cfea4952824167bd",
+        "directional_samples": 6500,
+        "maximum_angle": 0.00555929,
+        "portable_glb_sha256": "41693559b709923af7cc42260170bf623fefb12fcedd35490c8a8758073f9ba8",
+        "editable_glb_sha256": "bf7dde60e00ffa27a767c465a1354bebefecdeb56fb412b46cf1b48f4704ec8c"
+      },
+      "graphics": {
+        "candidate": "33bd24609e8fc701283b23aa5057955e908df583",
+        "invocation": "02522a367bb745fc95ab14a85a09dabd",
+        "terminal": true,
+        "phase": "complete",
+        "core_sha256": "ac63fe35626c909abdab8b664ce97c09420dc0d8f3ae597627a0122a87bfc485",
+        "render_sha256": "828a8d35dd8ba95e71f69b89b26d12638f0bbf73639e2b28178c89a5b575847b",
+        "fixture": "7e57afda1f1e095af252178044a5f22afe30a081d9d4c06b7141ef957e71c77f",
+        "exit": 0,
+        "renderer": "GL_RENDERER llvmpipe (LLVM 22.1.8, 256 bits)",
+        "report": [
+          {
+            "eye": 0.0,
+            "max": 1,
+            "mean": 0.09749201090866502,
+            "overlap": 19923,
+            "p99": 1,
+            "unequal_silhouette": 0
+          },
+          {
+            "eye": 0.00800000037997961,
+            "max": 1,
+            "mean": 0.09686809877534631,
+            "overlap": 19924,
+            "p99": 1,
+            "unequal_silhouette": 0
+          }
+        ]
+      }
+    },
+    "asan": {
+      "native": {
+        "candidate": "33bd24609e8fc701283b23aa5057955e908df583",
+        "profile": "asan",
+        "terminal": true,
+        "invocation": "6366a20773ca4c76af4bd18a111d4070",
+        "fltk": "/home/blux/de-xr/dome-sculpt/artifacts/sdk-20261126/toolkit-sanitize",
+        "phase": "complete",
+        "elapsed_seconds": 206.66,
+        "donor": "55a5bc69be9db6641c5df2227b5f87108869564b",
+        "rebuilt": [
+          "src/texture-set-portable-field.cpp"
+        ],
+        "frontend": [],
+        "render_owners": [],
+        "core_sha256": "15582b95545c31eac8c5e54c0daa81b9c46da3e999f3b65d4a85f0ff0a76731e",
+        "parent_core_sha256": "ddd36db2668dc4be851c34d980242e604bf819f71144a3988504d4a60ab9fba7",
+        "objects": {
+          "texture-set-portable-field.cpp.o": "eb4fd2aecfde05750413e2a020c902d862fcbd938755e29b0463c2ffb1a37bec"
+        },
+        "atlas_sha256": "2956c3f61d86b97853efacc7e798de11787ac931743ca658f4846da09e138a26",
+        "render_sha256": "9db371e66bcdf7ffcfe0380170efebff9b3448ad6a1cadd88513327829c39202",
+        "render_rebuilt": [],
+        "xr_sha256": "dfcc553a0b94882d2dec24259ae341e6525f4a316c75fa08553f761f03e1c68e",
+        "xr_rebuilt": [],
+        "app_sha256": "d699505355fa0d040629da43c587e53a266cbe3e4a1835ed6939ea9691b53e75",
+        "binaries": {
+          "dome-sculpt-texture-set-native": "06e5d4391de63da46a3fc4da5197be1043eb77f8968b9afe8db0029afe585ed5",
+          "dome-sculpt-texture-set-source-export": "0254445bcd6087ebe391210a7a5d265976c4c246d723508b88e186bcb0c82449",
+          "texture-set-bake-recipe": "aeb2c5636dfb433970d30746a5effcda8bd77548d2b00669303b28c8dc1c959a",
+          "bake-recipes": "f792f8d11a2aa18a0ba888726116e42b6b1945b72d9679ea1f6a8ba31d4bcff4",
+          "bake-custom-cage": "97f9ef53fd9ace9b193bfe46dbd9c996efcae97c6f049aba818ddab3fe050881",
+          "bake-workflow": "5750e1e16d9b9f7247ab3fd0a4c1e18e42f5ac420e964d2f37bc375d8fcb9e30",
+          "bake-controls": "0ce851c44ddfabce95671dbe28bcdf1218ad796d3f89fad7dde741c285e0f5bd"
+        },
+        "exit": 0,
+        "tests": 12,
+        "ctest_sha256": "4a1bc734d1d29c3bf9ca6965f31f02952b09250d46b4457b9f8d934eb0fadc63",
+        "directional_samples": 6500,
+        "maximum_angle": 0.00555929,
+        "portable_glb_sha256": "41693559b709923af7cc42260170bf623fefb12fcedd35490c8a8758073f9ba8",
+        "editable_glb_sha256": "bf7dde60e00ffa27a767c465a1354bebefecdeb56fb412b46cf1b48f4704ec8c"
+      },
+      "graphics": {
+        "candidate": "33bd24609e8fc701283b23aa5057955e908df583",
+        "invocation": "0bfc03aabbdb4a58a8b353a257d58442",
+        "terminal": true,
+        "phase": "complete",
+        "core_sha256": "15582b95545c31eac8c5e54c0daa81b9c46da3e999f3b65d4a85f0ff0a76731e",
+        "render_sha256": "9db371e66bcdf7ffcfe0380170efebff9b3448ad6a1cadd88513327829c39202",
+        "fixture": "09d1ad7d55d5a04b941ca50b6a192e3e4971a7a87281d947413ab973010480e3",
+        "exit": 0,
+        "renderer": "GL_RENDERER Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+        "report": [
+          {
+            "eye": 0.0,
+            "max": 1,
+            "mean": 0.09371078652813332,
+            "overlap": 19923,
+            "p99": 1,
+            "unequal_silhouette": 0
+          },
+          {
+            "eye": 0.00800000037997961,
+            "max": 1,
+            "mean": 0.09300341296928327,
+            "overlap": 19924,
+            "p99": 1,
+            "unequal_silhouette": 0
+          }
+        ]
+      }
+    }
+  },
+  "khronos": {
+    "validator": "2.0.0-dev.3.10",
+    "reports": [
+      {
+        "profile": "release",
+        "file": "native-normal-smooth-bake.glb",
+        "sha256": "41693559b709923af7cc42260170bf623fefb12fcedd35490c8a8758073f9ba8",
+        "errors": 0,
+        "warnings": 0,
+        "infos": 3
+      },
+      {
+        "profile": "release",
+        "file": "native-normal-smooth-editable.glb",
+        "sha256": "bf7dde60e00ffa27a767c465a1354bebefecdeb56fb412b46cf1b48f4704ec8c",
+        "errors": 0,
+        "warnings": 0,
+        "infos": 4
+      },
+      {
+        "profile": "asan",
+        "file": "native-normal-smooth-bake.glb",
+        "sha256": "41693559b709923af7cc42260170bf623fefb12fcedd35490c8a8758073f9ba8",
+        "errors": 0,
+        "warnings": 0,
+        "infos": 3
+      },
+      {
+        "profile": "asan",
+        "file": "native-normal-smooth-editable.glb",
+        "sha256": "bf7dde60e00ffa27a767c465a1354bebefecdeb56fb412b46cf1b48f4704ec8c",
+        "errors": 0,
+        "warnings": 0,
+        "infos": 4
+      }
+    ]
+  },
+  "synthetic_openxr": {
+    "candidate": "33bd24609e8fc701283b23aa5057955e908df583",
+    "profile": "release",
+    "invocation": "b58ddeae8a684cb3bc431dc08a633b5b",
+    "terminal": true,
+    "phase": "complete",
+    "product": "33bd24609e8fc701283b23aa5057955e908df583",
+    "app_sha256": "da986a0ee8231e9263786c17db3434e9b6b77e04b671a14a590e605dfd058391",
+    "core_sha256": "ac63fe35626c909abdab8b664ce97c09420dc0d8f3ae597627a0122a87bfc485",
+    "fixture_source_sha256": "3b608ac365646f5ecead129195b701ae1c40efa93b0daf1f4a331fe00867b752",
+    "runtime_sha256": "a509d343406cb8ca044821b06e3cd90d5a1730d6747abfb27a6fa1e4c5487d65",
+    "fixture_sha256": "8e02ad619c644cc1c5fb0c5674a147852ba968fd2551a706211c0a04a00bb744",
+    "runner_sha256": "89df5c3fc7fd994d47356c5d12020975db64333f1634718853c069ccec397aea",
+    "exit": 0,
+    "checks": 19,
+    "report_sha256": "528845174a2be985afa5ed69f32fdfc7bb9b7e6cf022d1df99eb0ef9bd1c9c78"
+  },
+  "nested_wayland": {
+    "candidate": "33bd24609e8fc701283b23aa5057955e908df583",
+    "terminal": true,
+    "invocation": "68ce395a810140d29771d07589b660cd",
+    "phase": "complete",
+    "core_sha256": "ac63fe35626c909abdab8b664ce97c09420dc0d8f3ae597627a0122a87bfc485",
+    "fixture_sha256": "8e02ad619c644cc1c5fb0c5674a147852ba968fd2551a706211c0a04a00bb744",
+    "compositor_sha256": "47920142c8c803dcf5adb63ba643d2e347fbdcd1e15ecd8bce7c1a8dd47c0b7e",
+    "compositor_source": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+    "probe_sha256": "5bf11c670f66bbb68960073878933055b09582e5173ec1e3f472b413956c55aa",
+    "app_sha256": "da986a0ee8231e9263786c17db3434e9b6b77e04b671a14a590e605dfd058391",
+    "exit": 0,
+    "checks": 17,
+    "report_sha256": "2da75bdef9a7abae098796c32119e1c17af4eb26966c1b1bebe3324ceac48a87"
+  },
+  "earlier_full_release": {
+    "candidate": "5ff0da2bf169ebb6a999139bcdd1103d1ea3c91d",
+    "terminal": true,
+    "invocation": "6fcdf9b0235e4437b8a471266e05c1f1",
+    "toolkit": "/opt/fltk-vr/toolkit",
+    "phase": "complete",
+    "configure": [
+      "cmake",
+      "-S",
+      "/home/blux/de-xr/dome-sculpt/artifacts/retained-texture-set-bake-coexistence-source-20261126",
+      "-B",
+      "/home/blux/de-xr/dome-sculpt/artifacts/retained-texture-set-full-release-20261126/build",
+      "-G",
+      "Ninja",
+      "-DCMAKE_BUILD_TYPE=Release",
+      "-DDOME_COMPUTE_BACKEND=CPU",
+      "-DFLTK_DIR=/opt/fltk-vr/toolkit/share/fltk"
+    ],
+    "elapsed_seconds": 5064.571,
+    "cache_sha256": "2caf3302d1a407dddc1e635c2b3af7fd1f9ca357113b1a5c5edc4b7a71a8193f",
+    "app_sha256": "fe1d92b2e969cf63edfe6e8a4450fea604cdf064144a39521864a0374bb0223b",
+    "registered": 1334,
+    "exit": 8,
+    "totals": {
+      "pass": 1307,
+      "fail": 27,
+      "skip": 0
+    },
+    "failed": [
+      "anatomical-female-worker",
+      "anatomical-male-worker",
+      "corner-color-uv23-domain",
+      "cut-authoring",
+      "cut-cancellation-boundaries",
+      "emission-controls",
+      "import-options-controller",
+      "modal-selection-controls",
+      "mtoon-emission",
+      "native-live-preview",
+      "native-mtoon-physical",
+      "native-paged-ray-cancellation",
+      "normal-preparation-native",
+      "object-isolation",
+      "object-selection",
+      "pbr-preview",
+      "polygon-color-render",
+      "polygon-scene-archive",
+      "retopology-affine-openxr",
+      "scene-authoring",
+      "sculpt-mask-controller",
+      "sculpt-mask-document",
+      "source-gpu",
+      "source24-26-integration",
+      "vrm1-expressions",
+      "xr-editable-export",
+      "xr-native-paint32-export"
+    ],
+    "skipped": [],
+    "junit_sha256": "e21fc99f3e75225320b23fa7337f2e66ea2383b1620e6539d04ab44ee08d6543"
+  },
+  "reproduced_on_previous_export_candidate": {
+    "candidate": "55a5bc69be9db6641c5df2227b5f87108869564b",
+    "results": [
+      {
+        "test": "native-paged-ray-cancellation",
+        "exit": 1,
+        "last_lines": [
+          "Native paged render baseline did not become ready: Sculpt chunk work limit exceeded"
+        ]
+      },
+      {
+        "test": "scene-authoring",
+        "exit": 1,
+        "last_lines": [
+          "FAIL Two independent objects are meshed into the shared preview"
+        ]
+      },
+      {
+        "test": "sculpt-mask-document",
+        "exit": 1,
+        "last_lines": [
+          "visible surface protection feedback"
+        ]
+      },
+      {
+        "test": "sculpt-mask-controller",
+        "exit": 1,
+        "last_lines": [
+          "First display mesh did not enter its barrier"
+        ]
+      },
+      {
+        "test": "native-live-preview",
+        "exit": 1,
+        "last_lines": [
+          "PASS Live preview gesture starts",
+          "PASS Native processed prefix published",
+          "PASS Immutable native preview becomes ready",
+          "Worker publishes actual changed geometry with immutable session/sample identity"
+        ]
+      }
+    ]
+  },
+  "raw": {
+    "archive": "retained-smooth-glb-20261126.tar.gz",
+    "sha256": "83223cb29be96e1bc2ae37d19e751b01dbbdea93dd751b774195da23ce6f083a",
+    "members": {
+      "alternate-atlas/run.log": "24d32346fd984d000527575d5d3e0488683765ce42a7119a3d23b2dbd1a585e9",
+      "alternate-atlas/run.py": "d021f92b17f5f5b03f425fa0680662001c0f9c00daec9f6b178a24859ab14c83",
+      "alternate-atlas/witness.cpp": "28e7f2b435793b336b4a80032708c5f70f6a89210c01b40f1ea1321884988aa9",
+      "earlier-release/ctest.log": "702c327338ae89e6621158ad3a617914ece838fc7304b6228e3e6e145de6cade",
+      "earlier-release/full.xml": "e21fc99f3e75225320b23fa7337f2e66ea2383b1620e6539d04ab44ee08d6543",
+      "earlier-release/run.py": "ab34365b88c88f1f9c48a4562802cd5709164cffdcf2042f62c15f4b521876a2",
+      "earlier-release/status.json": "7210b4c93a876f7cfbaa423364793cd7e4f38b6338e596e96815d55aad70d4f5",
+      "fixture/native-normal-smooth-bake.glb": "41693559b709923af7cc42260170bf623fefb12fcedd35490c8a8758073f9ba8",
+      "fixture/native-normal-smooth-editable.glb": "bf7dde60e00ffa27a767c465a1354bebefecdeb56fb412b46cf1b48f4704ec8c",
+      "fixture/native-target-smooth-portable.dsculpt": "6d9dc144df03db5eb634790955b8509156dbe08f5747c799142ab3a0af0d3468",
+      "graphics/asan/output/0.000000-native.png": "8ec315b57722c3e74273fd76647e8a814a49a7b6160450d21825a0c0cba332dd",
+      "graphics/asan/output/0.000000-portable.png": "6a7d8af349d44a81ad7b2ffce883b2ee5a6c5e32fddc4cef17c1cbd046fa4214",
+      "graphics/asan/output/0.008000-native.png": "dcfe64bf0fca3af074446401a079b7ae9c8d685fb8a37e5f0bf930106675d6bc",
+      "graphics/asan/output/0.008000-portable.png": "f384aeb3bb2bf77475d955af17dcc73f96421aa72a3a654ec550dffc6301d4ab",
+      "graphics/asan/output/oracle.json": "27fc41c2efa59930e992eb99a3e4dc19b75adbd33c6bea0f7c8703e3e2d6adbb",
+      "graphics/asan/render.log": "2556ea2ebed0a38fae8e128072b6b08f9169ef6f47fa724160c1ed4d89936b8d",
+      "graphics/asan/startup-attempt.json": "93d93ba405acf3fdb7d1b92ccf74fab744e4d403ea4f81e60b271d5f1ddb09e3",
+      "graphics/asan/status.json": "f98e3b78b14b7f440031d981977fbab5998b201b4b874e41680f11ab492af5c3",
+      "graphics/release/output/0.000000-native.png": "71f8b20edb0155573ca97aa9d3d85cd4199903e09a6a7495dcd1f9eb483c4b79",
+      "graphics/release/output/0.000000-portable.png": "3a9ba17d053fc5b344afb33df97266647efb4bf577e9eca4dea0ab10b291c3bd",
+      "graphics/release/output/0.008000-native.png": "7d437e4dfc0c60a2a419c7c4390de42b75a5547d0ae801be7b38463173c49a46",
+      "graphics/release/output/0.008000-portable.png": "0f17fa239335a461d7b2e3f68ced3a75048e6b51a1b5367fae32862702087ee4",
+      "graphics/release/output/oracle.json": "164aaf77ffb3b6339ecb6ea5cb5c4e8f81edaecd3c5fd5654b39402c796c5cae",
+      "graphics/release/render.log": "e2d1914373caae7f260d440e81a17df5aec489b23be5ebc0094f2794310eb5fc",
+      "graphics/release/startup-attempt.json": "2b7ae2f391200f5e8a3bd1bc5406092c9918da973d5d7cb7e1f2af59784f1f2f",
+      "graphics/release/status.json": "4f495f1e8929a053bd726d454b1b71d34d939248e1305aacaed5cea9c226e3dd",
+      "native/asan/ctest.log": "4a1bc734d1d29c3bf9ca6965f31f02952b09250d46b4457b9f8d934eb0fadc63",
+      "native/asan/dome-sculpt-link.log": "164f453872b9db7001f45e2ff69264e840650349b4e7bbeebcfcbefc9a3df666",
+      "native/asan/public-0.log": "946f6766a4cf038bb7b2260598375d8d54ecef79a033145c14b7ce431142c459",
+      "native/asan/public-1.log": "ac673326c2b1af15f8ae37fc2ca1c216d0bba9559fde6bd9a6c800f0f3cc7231",
+      "native/asan/status.json": "883a84099e8e047ac1608d8bdd438d39b4f67a03fc0e7b183e99e1a36b47a71a",
+      "native/release/ctest.log": "2f818f46e8fe6f235050a4a707bccaa631e014922e85eea1cfea4952824167bd",
+      "native/release/dome-sculpt-link.log": "56bd42f015335d22940dc8a4f500941444b51ee6c19b72786ba117a3b59a379a",
+      "native/release/public-0.log": "00b4acc9f6a1b9c71a3e84875dd154acae9bcb7a1936481331552fc839047b17",
+      "native/release/public-1.log": "282c47495c03b9f8af129268a82c9ffe9ee58800c2e28c059ef9fc4ec2470f7b",
+      "native/release/status.json": "aa38db04700428e73cf1bd0a09f321ba33194a12fc3124078895a02ecf0df64e",
+      "openxr/status.json": "27dd8e67c6c8c174fd78914926fe8ed0c6c706b0540eaa02bdd124ee6a7d74c3",
+      "openxr/workflow/report.json": "528845174a2be985afa5ed69f32fdfc7bb9b7e6cf022d1df99eb0ef9bd1c9c78",
+      "openxr/xr.log": "23c59ced20f76068bb4f1889268dfb8dda9788fc51cb4656c4ec4618c36a204e",
+      "reproduced-regressions/native-live-preview/run.log": "261305f3ad944bc313ba697c6dcc2af65fc64d16da0ce34c47cc46048813f5f6",
+      "reproduced-regressions/native-paged-ray-cancellation/run.log": "2853f92d5d6f8c42d98091a8bc880c4c7cfc258bba8af2b28da2afad9481c0a5",
+      "reproduced-regressions/run.py": "4d77b45274ffbdfc75a20b9996034db80b4abe744dff43243eb565d99c2a5b1e",
+      "reproduced-regressions/scene-authoring/run.log": "1c8f2d356ab6fca2303a34052b74ab53a9eccd43b6780bc57eaea69bd92947dd",
+      "reproduced-regressions/sculpt-mask-controller/run.log": "22711bacac6a9bd880a944428c02ca64b3d4e38fc273e9c4379880d15c970266",
+      "reproduced-regressions/sculpt-mask-document/run.log": "c758fd4f3fd31ca14839d0c9bc5b3e4d4a6b09d7ff1da2a95fa838ea262a0300",
+      "reproduced-regressions/status.json": "4690ca1c7beef9368689dbe43bf8bd0ef702dfecf9239ca6ddcef8ace59b269e",
+      "validation-sources/graphics/run.py": "e4911aeaf62de79d53d5fc537dde071f5a40b609a16bc34fa7c255b313b0918d",
+      "validation-sources/graphics/witness.cpp": "0d15c44e3bb9c20edd8544990805be21f6f094a21fea98ec6cb75dc3e4658833",
+      "validation-sources/native/record.py": "3e6a34f2b51715fcb5be82a27d2c5edd4644e07ec26be04f2d3e4b7153d81ded",
+      "validation-sources/native/run.py": "7d8e27eef08b4f61a7e494ac2c5209850538cb1a632a23c3df2172505e316679",
+      "validation-sources/openxr/fixture.cpp": "3b608ac365646f5ecead129195b701ae1c40efa93b0daf1f4a331fe00867b752",
+      "validation-sources/openxr/run.py": "b77e3548850c23a0037d3a5a1c48b6cbee876af702cbcf80b54748df95967e27",
+      "validation-sources/wayland/replay.py": "de31e3aba0faf1806654ffe238f6dd16c420de336500f1c50f5aea660ee346d4",
+      "validation-sources/wayland/run.py": "a0ef5688f7605dd0731b0679f9c3cbdf3186adbb1d44a801ab1e3686cbc12ca0",
+      "validator/asan-native-normal-smooth-bake.glb.json": "a2ee6e893cb2f4dfa22814d0720209d643525c4c4a400e6f5c8a7271703e0939",
+      "validator/asan-native-normal-smooth-editable.glb.json": "2e94991d399997300e1419a5bf9d644b0d678e06b0f441eb6f9db0d272d996ea",
+      "validator/release-native-normal-smooth-bake.glb.json": "d51f6f5ba17a9a65d84172f27dc8134896b5981302fbae70141462cd5046300f",
+      "validator/release-native-normal-smooth-editable.glb.json": "0a695e8a41d261bf456393d687fa7936165882a321ab06f2bdabb33a86184bbf",
+      "validator/summary.json": "872ca0573d9a029c2b2f04df279564009c53a7fee807f58f6d47509c8b7fce4d",
+      "validator/validate.cjs": "94ce7a65743dc0a281bf25cf8ac653444172ec98533f9b066accac64b3a37f37",
+      "wayland/status.json": "312e41d2872a3db4d35b49042ee6efe2521c79720251f6f5171ef34851a98a90",
+      "wayland/wayland.log": "417b248742a207d9ba66c2bca96f70d01e6304e1b8e9ee1a17a68271a1dde110",
+      "wayland/workflow/report.json": "2da75bdef9a7abae098796c32119e1c17af4eb26966c1b1bebe3324ceac48a87"
+    }
+  }
+}

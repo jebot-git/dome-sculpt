@@ -1235,9 +1235,8 @@ smooth normal outside projection. Successive partial bakes keep the
 earlier covered pixels. Clear restores the original field and leaves its
 last recipe available. Scene40's source member owns the new normal
 image in the existing archive. Scene41 also carries FLOAT emission.
-Portable LDR GLB exports the supported constant-frame case with the
-actual field image and authenticated tangent basis. Varying normal
-frames and per-field portable HDR still require their own export work.
+That milestone exported constant-frame LDR GLB with the actual
+field image and authenticated tangent basis.
 
 The twelve focused tests pass in each Release and ASan/UBSan profile,
 with 112 new native normal checks. A separate primary-field test passes
@@ -1249,6 +1248,40 @@ DomeD Wayland checks and 19 synthetic OpenXR checks per renderer pass
 with exact native Save, Cancel, Undo and focus-loss endpoints.
 Physical input and deformed retained donors remain open.
 [Native retained-target Bake evidence](validation/retained-native-target-bake-20261126.json)
+
+### Portable retained normal bakes
+
+Product `33bd2460` exports static LDR native normal bakes with varying
+authored normals to Standard and Editable GLB. The exporter transports
+the original corner normals and selects a normal texture with a matching
+explicit tangent frame. Prepared Core PBR fields preserve their original
+image bytes when the three emitted tangent columns agree. The fallback
+can allocate separate per-triangle normal coordinates and preserves
+source texel alignment where the chart fits. Editable UV0, paint
+coordinates, geometry and the native Scene retain their original data.
+
+Twelve focused tests pass in each Release and ASan/UBSan profile.
+Each profile checks 6,500 directions with a maximum sampled error of
+0.00556 radians. A separate alternate-atlas fixture checks 5,151
+directions. Standard and Editable GLB bytes agree across profiles and
+pass Khronos validation with zero errors and warnings. Dome reimport
+preserves the full silhouette and differs by at most one RGB8 level in
+two views on software GL and Intel Arc. The exact Release application
+passes 17 nested DomeD Wayland and 19 synthetic OpenXR checks.
+
+A varying field with opposing baked directions is rejected before
+writing a destination file. Cross-renderer reflected tangent handling,
+per-field portable HDR, deformed source fields and full physical input
+qualification remain open.
+[Portable retained-normal evidence](validation/retained-smooth-glb-20261126.json)
+
+The historical `5ff0da2b` full Release run finished with 1,307 passes
+and 27 failures. Five sculpt/scene failures reproduced on export
+candidate `55a5bc69`, including the dense paged sculpt baseline
+exceeding its work limit. The archive preserves the full failure list
+and the scoped reproductions. A complete combined regression on the
+latest product remains open.
+[Raw validation and regression archive](validation/retained-smooth-glb-20261126.tar.gz)
 
 ## Source and integration boundary
 

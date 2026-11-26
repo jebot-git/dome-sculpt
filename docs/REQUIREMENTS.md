@@ -119,6 +119,22 @@ export is still required.
 [Native retained-target Bake evidence](validation/retained-native-target-bake-20261126.json)
 
 
+Static LDR retained normal bakes now export varying authored normals
+to Standard and Editable GLB. Matching prepared tangent columns keep
+the exact source normal image. Reprojected native fields preserve
+editable UV0 and separate paint coordinates. Both GLB variants pass the
+Khronos validator and Dome reimport matches the native silhouette and
+shading within one RGB8 level on software GL and Intel Arc. The exact
+product has focused Release, ASan/UBSan, nested Wayland and synthetic
+OpenXR evidence. Cross-renderer reflection, per-field HDR, deformed
+sources and physical headset verification remain open.
+[Portable retained-normal evidence](validation/retained-smooth-glb-20261126.json)
+
+The earlier `5ff0da2b` full Release sweep finished with 1,307 passes
+and 27 failures. Five sculpt and scene failures were reproduced on
+`55a5bc69`. The complete latest-product regression remains open.
+[Regression results and fixtures](validation/retained-smooth-glb-20261126.tar.gz)
+
 ## Qualified integration — 2026-11-17
 
 Main now integrates product `1bc13125` and public fixture `f1e193c7` after
