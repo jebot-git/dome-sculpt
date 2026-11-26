@@ -167,7 +167,24 @@ void finish_emission_export(GltfDocument &document,EmissionExportPrepared &prepa
 }
 namespace dome {
 std::vector<ObjectSurface> emission_export_surfaces(const Scene &scene,const std::function<bool()> &cancelled){
- auto detached=scene.snapshot();for(const auto &original:scene.objects()){if(cancelled&&cancelled())throw std::runtime_error("HDR export surface extraction cancelled");auto &object=detached.object(original.id);if(!detail::hdr_emission(original.material.emissive)&&!(original.painted&&original.painted->has_physical_emission())&&!(original.material_bindings&&detail::physical_emission(*original.material_bindings)))continue;if(object.painted&&object.painted->has_physical_emission())object.painted=detail::EmissionExportAccess::without_emission(*object.painted);object.material.emissive={};if(object.material_bindings){auto binding=std::make_shared<SourceMaterialBindings>(*object.material_bindings);binding->physical_emission.reset();if(!binding->native_paint_sampling&&!binding->canonical_paint_sampling)binding->native_reference.emission={};object.material_bindings=std::move(binding);}}
+ auto detached=scene.snapshot();
+ for(const auto &original:scene.objects()){
+  if(cancelled&&cancelled())throw std::runtime_error("HDR export surface extraction cancelled");
+  if(!original.visible)continue;
+  if(!detail::hdr_emission(original.material.emissive)&&
+     !(original.painted&&original.painted->has_physical_emission())&&
+     !(original.material_bindings&&detail::physical_emission(*original.material_bindings)))continue;
+  auto &object=detached.object(original.id);
+  if(object.painted&&object.painted->has_physical_emission())
+   object.painted=detail::EmissionExportAccess::without_emission(*object.painted);
+  object.material.emissive={};
+  if(object.material_bindings){
+   auto binding=std::make_shared<SourceMaterialBindings>(*object.material_bindings);
+   binding->physical_emission.reset();
+   if(!binding->native_paint_sampling&&!binding->canonical_paint_sampling)binding->native_reference.emission={};
+   object.material_bindings=std::move(binding);
+  }
+ }
  auto surfaces=detached.preview_surfaces(cancelled);for(auto &surface:surfaces){const auto &original=scene.object(surface.id);surface.material=original.material;surface.material_bindings=original.material_bindings;if(original.painted&&(original.painted->has_physical_emission()||detail::hdr_emission(original.material.emissive)||(original.material_bindings&&detail::physical_emission(*original.material_bindings)))){auto maps=std::make_shared<TextureMaps>(*surface.textures);maps->overlay=detail::PaintOverlayFactory::capture(*original.painted,cancelled);surface.textures=std::move(maps);}}return surfaces;
 }
 }

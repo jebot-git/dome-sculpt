@@ -2,6 +2,7 @@
 #include "dome/cut-authoring.hpp"
 #include "dome/polygon-scene.hpp"
 #include "cut-color.hpp"
+#include "affine-surface.hpp"
 namespace dome {
 namespace {
 void stop(const std::function<bool()> &cancelled) {
@@ -77,6 +78,7 @@ CutPublishReport publish_cut(Scene &scene,const CutPreview &preview,const BakeSo
   if(!preview.changed)return {};
   if(resolution<64||resolution>2048||(resolution&(resolution-1)))throw std::invalid_argument("Invalid cut texture resolution");
   auto original=scene.active();
+  detail::require_cut_color_supported(original);
   if(original.locked||!original.visible)throw std::logic_error("Show and unlock the cut source");
   if(scene.objects().size()>254||scene.groups().size()>=128)throw std::length_error("No room for cut shell/cap objects and group");
   std::vector<uint32_t> triangles;std::vector<std::array<float,3>> barycentrics;
@@ -89,8 +91,16 @@ CutPublishReport publish_cut(Scene &scene,const CutPreview &preview,const BakeSo
   options.cancelled=cancelled;if(progress)options.progress=[&](float p){progress(.15f+p*.65f);};
   auto baked=bake_mesh(shell,source,options);stop(cancelled);
   BakedTextures textures;textures.maps=std::move(baked.maps);textures.maps.normal=std::move(baked.normal);
+  textures.emission_field=std::move(baked.emission_field);
   for(auto coverage:baked.coverage)textures.coverage.push_back(coverage==1||coverage==2?255:0);
-  auto world=scene.world_transform(original.id);localize(shell,world);
+  CanvasTransform world;
+  if(scene.has_affine_placement(original.id)){
+    // The cut and its baked tangent frame already live in world coordinates.
+    // Center the new static outputs at the authored origin using translation.
+    const auto pivot=detail::affine_position(scene.world_matrix(original.id).point({0,0,0}));
+    world.position={pivot.x,pivot.y,pivot.z};
+  }else world=scene.world_transform(original.id);
+  localize(shell,world);
   auto shell_paint=std::make_shared<PaintedMesh>(std::move(shell),resolution);
   shell_paint->install_bake(std::move(textures));
   std::shared_ptr<PaintedMesh> cap_paint;
@@ -101,7 +111,7 @@ CutPublishReport publish_cut(Scene &scene,const CutPreview &preview,const BakeSo
   auto group=next.add_group(std::move(name),world);
   CutPublishReport report;report.changed=true;report.projected=baked.projected;
   report.shell=next.add("Cut shell",Volume{});auto &side=next.object(report.shell);
-  side.group=group;side.material=original.material;side.mesh_active=true;side.painted=std::move(shell_paint);
+  side.group=group;side.material=original.texture_sets?source.materials.front().material:original.material;side.mesh_active=true;side.painted=std::move(shell_paint);
   if(cap_paint){report.cap=next.add("Cut cap",Volume{});auto &end=next.object(report.cap);
     end.group=group;end.material=preview.settings.cap_material;end.mesh_active=true;end.painted=std::move(cap_paint);}
   next.object(original.id).visible=false;next.select(report.shell);next.validate();stop(cancelled);
