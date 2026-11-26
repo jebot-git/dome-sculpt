@@ -898,8 +898,21 @@ reuse them when the renderer releases its previous frame. Native Release
 and ASan/UBSan cases pass for eviction, exact geometry ownership, explicit
 physical emission keys and cancellation. The full-size worker is running.
 The first full-size Clear Bake/Undo diagnostic with the cache still takes
-15.49 seconds to restore the baked preview. A separate ownership probe
-measures the cache charges and eviction across the same history.
+15.49 seconds to restore the baked preview. The Release ownership probe
+shows the 2048-pixel entry rebuilt after Undo. Its overlay already owns
+275,696,172 bytes and the composed map separately owns a 104,857,600-byte
+baked base. Candidate `feef71a8` completes the legacy preview in fresh
+maps and attaches the exact immutable bake already owned by the HDR
+packet. Its matched runs measure plane fidelity and history reuse under
+the existing 512 MiB retention limit. Release reproduces all ten preview
+planes byte for byte. The restored HDR frame and ordinary cleared frame
+still require more than the cap together. Candidate `f9830df4` lets an HDR
+entry survive one intervening ordinary cache insertion under pressure.
+Additional pressure can evict it, and the foreground always receives its
+composited frame. In the 2048-pixel Release Clear Bake/Undo control, the
+same immutable preview survives and restores in 0.666 seconds. The
+shared-owner build alone recomposes it in 1.601 seconds. Retention stays
+within 512 MiB. Full-size sanitizer qualification is in progress.
 
 Combined candidate `3cb2fe81` keeps the `ccbbe020` source baseline and adds
 both atlas patches, the rendered XR readiness fixtures, and the two VRM1
@@ -910,6 +923,11 @@ deadline after all 45 frames. The isolated replay reaches the same deadline.
 Stacks show the ordered final Save waiting for the export worker's active
 xatlas chart growth. The `b3b583b8` scheduler candidate
 passes that full Arc replay through its existing background file checks.
+An isolated pair with an extended observation limit terminates after
+40.70 and 39.30 seconds respectively on the scheduler and combined
+builds. Their native Save and glTF export finish, and the exported GLBs
+match byte for byte. The original 40-second failures remain recorded. A
+full Arc rerun uses the same candidate and the original per-process limit.
 [Preview and integration evidence](validation/hdr-preview-composite-20261126.json)
 
 ## Source and integration boundary
