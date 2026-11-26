@@ -1,0 +1,902 @@
+{
+  "purpose": "Integrated ec Release App Wayland and synthetic XR, separately scoped alternate-coordinate decode and UV1 transport tests, and the prior strict sculpt refusal.",
+  "app_source": "ec578e561c99ec681e9db57f657c0823526b0151",
+  "app_sha256": "ac190d53e2de588ac4365b63fc03093c8deab5810e01c7e806b3d9e3112ee363",
+  "actual_ui_checks": {
+    "combined-waylandec578e-v1": {
+      "checks": 14,
+      "seconds": 41.7328724861145,
+      "peak_owned_RSS_bytes": 677859328,
+      "native_projects": {}
+    },
+    "publicec578e-accept-v1": {
+      "checks": 19,
+      "seconds": 62.113126277923584,
+      "peak_owned_RSS_bytes": 2207125504,
+      "native_projects": {
+        "workflow/author/final.dsculpt": {
+          "bytes": 267280292,
+          "sha256": "5a8c129091e029a03776e6c6102ff908078802bd0a3ddb53c874174afc723ba3"
+        },
+        "workflow/reopen/final.dsculpt": {
+          "bytes": 267280292,
+          "sha256": "5a8c129091e029a03776e6c6102ff908078802bd0a3ddb53c874174afc723ba3"
+        }
+      }
+    },
+    "publicec578e-cancel-v1": {
+      "checks": 19,
+      "seconds": 52.86017918586731,
+      "peak_owned_RSS_bytes": 1207681024,
+      "native_projects": {
+        "workflow/author/final.dsculpt": {
+          "bytes": 133738656,
+          "sha256": "7e29a66885d7607e67e89418db75b4f29775907385a294439c9310c9ca458430"
+        },
+        "workflow/reopen/final.dsculpt": {
+          "bytes": 133738656,
+          "sha256": "7e29a66885d7607e67e89418db75b4f29775907385a294439c9310c9ca458430"
+        }
+      }
+    },
+    "publicec578e-focus-v1": {
+      "checks": 20,
+      "seconds": 54.59131050109863,
+      "peak_owned_RSS_bytes": 1210200064,
+      "native_projects": {
+        "workflow/author/final.dsculpt": {
+          "bytes": 133738656,
+          "sha256": "7e29a66885d7607e67e89418db75b4f29775907385a294439c9310c9ca458430"
+        },
+        "workflow/reopen/final.dsculpt": {
+          "bytes": 133738656,
+          "sha256": "7e29a66885d7607e67e89418db75b4f29775907385a294439c9310c9ca458430"
+        }
+      }
+    }
+  },
+  "source_regression_source": "5735ab7f",
+  "source_regression_native": {
+    "diff_sha256": "5bfb66c78e67f7fb53cb3a5cec49d6abed25918201f426ea7805e47a6589f742",
+    "terminal": true,
+    "archive_sha256": "d915d5c48f62f1e07d3d3a92d9825c298fa98f3436afbd989d20ddd1dde3902b",
+    "fixture_sha256": "ad485d3f588e2f2d26df88e81e68afa1b5cd2eab5f2168a1675d86a1b24d86c5",
+    "cases": {
+      "corner-color-uv23-domain": {
+        "exit": 0,
+        "seconds": 0.11413637804798782,
+        "executable_sha256": "7c84149839f816010e782d52930070af4549a8bf96c183c64bebeaa6be2aed70",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/broad-source-regression-release-20261126/dome-sculpt-corner-color-uv23-domain-test"
+        ]
+      },
+      "baked-emission-uv1-worker": {
+        "exit": 0,
+        "seconds": 0.5649666939862072,
+        "executable_sha256": "7bff9c1234befd1d12eea55d3fa643a05c09be01a038e7389bb35cdea376bbee",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/broad-source-regression-release-20261126/dome-sculpt-baked-emission-workflow-test",
+          "--source-worker-controls",
+          "/home/blux/de-xr/dome-sculpt/artifacts/broad-source-regression-release-20261126/runtime/uv1"
+        ]
+      },
+      "baked-emission-raw-worker": {
+        "exit": 0,
+        "seconds": 0.21503216098062694,
+        "executable_sha256": "7bff9c1234befd1d12eea55d3fa643a05c09be01a038e7389bb35cdea376bbee",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/broad-source-regression-release-20261126/dome-sculpt-baked-emission-workflow-test",
+          "--raw-source-worker-controls",
+          "/home/blux/de-xr/dome-sculpt/artifacts/broad-source-regression-release-20261126/runtime/raw"
+        ]
+      },
+      "baked-emission-workflow": {
+        "exit": 0,
+        "seconds": 0.16444158810190856,
+        "executable_sha256": "7bff9c1234befd1d12eea55d3fa643a05c09be01a038e7389bb35cdea376bbee",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/broad-source-regression-release-20261126/dome-sculpt-baked-emission-workflow-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/broad-source-regression-release-20261126/runtime/workflow"
+        ]
+      },
+      "scene-file": {
+        "exit": 0,
+        "seconds": 0.1642401081044227,
+        "executable_sha256": "176c5e86ba3a37c8ea47a5b18a6d4b27093d327c1fe414838fdeb6a475dc8da5",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/broad-source-regression-release-20261126/dome-sculpt-scene-file-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/broad-source-regression-release-20261126/runtime/scene-file"
+        ]
+      },
+      "source-owning-hdr-domain": {
+        "exit": 0,
+        "seconds": 26.97857594699599,
+        "executable_sha256": "00687e31b405686039e7812804f519dd24ad5fe320bcc094f4cc75e9c106e723",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/broad-source-regression-release-20261126/dome-sculpt-source-owning-hdr-domain-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/serialize-sculpt-objects-release-20261126/source-joint-writable-normal-bake-checked/000.dsculpt",
+          "/home/blux/de-xr/dome-sculpt/artifacts/broad-source-regression-release-20261126/runtime/hdr-domain"
+        ]
+      }
+    },
+    "exit": 0
+  },
+  "strict_07025_original": {
+    "source": "07025cd3995626bd32a9d0a848a2564965583ada",
+    "terminal": true,
+    "build": {
+      "command": [
+        "/usr/bin/ninja",
+        "-d",
+        "keepdepfile",
+        "-d",
+        "keeprsp",
+        "-v",
+        "-j4",
+        "dome-sculpt-scene-file-test",
+        "dome-sculpt-document-recovery-test",
+        "dome-sculpt-atomic-write-allocation-test",
+        "dome-sculpt-sculpt-independent-workflow"
+      ],
+      "exit": 0,
+      "seconds": 604.0901013619732
+    },
+    "sanitizer_options": {
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+      "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+    },
+    "native": {
+      "exit": 0,
+      "junit": {
+        "name": "Linux-c++",
+        "tests": "3",
+        "failures": "0",
+        "disabled": "0",
+        "skipped": "0",
+        "hostname": "nobara-pc",
+        "time": "2",
+        "timestamp": "2026-11-26T04:47:26"
+      }
+    },
+    "sculpt_default": {
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/serialize-sculpt-objects-strict-20261126/dome-sculpt-sculpt-independent-workflow",
+        "/home/blux/de-xr/dome-sculpt/artifacts/serialize-sculpt-objects-strict-20261126/sculpt-default"
+      ],
+      "started": 1795664848.7498975,
+      "timeout_seconds": 900,
+      "RSS_limit_bytes": 4294967296,
+      "virtual_AS_cap": null,
+      "pid": 3646829,
+      "start": 84277381,
+      "pgrp": 3646829,
+      "root": {
+        "pid": 3646829,
+        "start": 84277381,
+        "pgrp": 3646829,
+        "session": 3646829,
+        "ppid": 3561294,
+        "state": "R"
+      },
+      "known_processes": [
+        {
+          "pid": 3646829,
+          "start": 84277381,
+          "pgrp": 3646829,
+          "session": 3646829,
+          "ppid": 3561294,
+          "state": "R"
+        }
+      ],
+      "peak_owned_RSS_bytes": 4297564160,
+      "peak_observed_virtual_bytes": 21992138772480,
+      "monitor_samples": 63249,
+      "signals": [
+        {
+          "pgid": 3646829,
+          "witness": {
+            "pid": 3646829,
+            "start": 84277381,
+            "pgrp": 3646829,
+            "session": 3646829,
+            "ppid": 3561294,
+            "state": "R"
+          },
+          "signal": "SIGTERM",
+          "reason": "Owned aggregate RSS exceeded declared budget",
+          "epoch": 1795665529.465106
+        }
+      ],
+      "error": "BudgetExceeded('Owned aggregate RSS exceeded declared budget')",
+      "exit": -15,
+      "seconds": 681.0396037101746,
+      "ELF_sha256": "015ed4b85bd90e7dadd0ed61a2a87404e9c1ada19b2b88cb91e895de5b59cf42",
+      "reported_expected": false
+    },
+    "exit": 1
+  },
+  "strict_ec_integrated": {
+    "source": "ec578e561c99ec681e9db57f657c0823526b0151",
+    "terminal": true,
+    "cases": {
+      "scene-file-test": {
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/production-sculpt-index-integration-strict-20261126/dome-sculpt-scene-file-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/production-sculpt-index-integration-strict-20261126/native-default/scene-file"
+        ],
+        "started": 1795665723.5216284,
+        "timeout_seconds": 900,
+        "RSS_limit_bytes": 4294967296,
+        "virtual_AS_cap": null,
+        "pid": 4,
+        "start": 84364858,
+        "pgrp": 4,
+        "root": {
+          "pid": 4,
+          "start": 84364858,
+          "pgrp": 4,
+          "session": 4,
+          "ppid": 2,
+          "state": "D"
+        },
+        "known_processes": [
+          {
+            "pid": 4,
+            "start": 84364858,
+            "pgrp": 4,
+            "session": 4,
+            "ppid": 2,
+            "state": "D"
+          },
+          {
+            "pid": 29,
+            "start": 84364952,
+            "pgrp": 4,
+            "session": 4,
+            "ppid": 4,
+            "state": "R"
+          },
+          {
+            "pid": 30,
+            "start": 84364953,
+            "pgrp": 4,
+            "session": 4,
+            "ppid": 4,
+            "state": "R"
+          }
+        ],
+        "peak_owned_RSS_bytes": 1077977088,
+        "peak_observed_virtual_bytes": 21991242469376,
+        "monitor_samples": 100,
+        "signals": [],
+        "exit": 0,
+        "seconds": 1.0608742237091064,
+        "sha256": "5513cd7c7b66d05e6c95ab334080a9d71cbeb8ea0cd6caa2fa13d7863c3cbf35",
+        "check_passed": true
+      },
+      "document-recovery-test": {
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/production-sculpt-index-integration-strict-20261126/dome-sculpt-document-recovery-test"
+        ],
+        "started": 1795665724.9076436,
+        "timeout_seconds": 900,
+        "RSS_limit_bytes": 4294967296,
+        "virtual_AS_cap": null,
+        "pid": 32,
+        "start": 84364997,
+        "pgrp": 32,
+        "root": {
+          "pid": 32,
+          "start": 84364997,
+          "pgrp": 32,
+          "session": 32,
+          "ppid": 2,
+          "state": "R"
+        },
+        "known_processes": [
+          {
+            "pid": 32,
+            "start": 84364997,
+            "pgrp": 32,
+            "session": 32,
+            "ppid": 2,
+            "state": "R"
+          },
+          {
+            "pid": 52,
+            "start": 84365120,
+            "pgrp": 32,
+            "session": 32,
+            "ppid": 32,
+            "state": "R"
+          }
+        ],
+        "peak_owned_RSS_bytes": 1074077696,
+        "peak_observed_virtual_bytes": 21991111987200,
+        "monitor_samples": 131,
+        "signals": [],
+        "exit": 0,
+        "seconds": 1.3849265575408936,
+        "sha256": "158617092311ffe9bdacd94299eabfc87a6e37946ad895347565da5ab8ec4cb6",
+        "check_passed": true
+      },
+      "atomic-write-allocation-test": {
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/production-sculpt-index-integration-strict-20261126/dome-sculpt-atomic-write-allocation-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/production-sculpt-index-integration-strict-20261126/native-default/atomic-write-allocation"
+        ],
+        "started": 1795665726.6088014,
+        "timeout_seconds": 900,
+        "RSS_limit_bytes": 4294967296,
+        "virtual_AS_cap": null,
+        "pid": 54,
+        "start": 84365167,
+        "pgrp": 54,
+        "root": {
+          "pid": 54,
+          "start": 84365167,
+          "pgrp": 54,
+          "session": 54,
+          "ppid": 2,
+          "state": "R"
+        },
+        "known_processes": [
+          {
+            "pid": 54,
+            "start": 84365167,
+            "pgrp": 54,
+            "session": 54,
+            "ppid": 2,
+            "state": "R"
+          }
+        ],
+        "peak_owned_RSS_bytes": 17383424,
+        "peak_observed_virtual_bytes": 21990302330880,
+        "monitor_samples": 8,
+        "signals": [],
+        "exit": 0,
+        "seconds": 0.07508969306945801,
+        "sha256": "aba51a5dee6fd2739a9c50a753585b4087af45199e38da8e97abb814f8ece3f4",
+        "check_passed": true
+      },
+      "sculpt-surface-chunks-test": {
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/production-sculpt-index-integration-strict-20261126/dome-sculpt-sculpt-surface-chunks-test"
+        ],
+        "started": 1795665726.6895945,
+        "timeout_seconds": 900,
+        "RSS_limit_bytes": 4294967296,
+        "virtual_AS_cap": null,
+        "pid": 58,
+        "start": 84365175,
+        "pgrp": 58,
+        "root": {
+          "pid": 58,
+          "start": 84365175,
+          "pgrp": 58,
+          "session": 58,
+          "ppid": 2,
+          "state": "R"
+        },
+        "known_processes": [
+          {
+            "pid": 58,
+            "start": 84365175,
+            "pgrp": 58,
+            "session": 58,
+            "ppid": 2,
+            "state": "R"
+          },
+          {
+            "pid": 59,
+            "start": 84365311,
+            "pgrp": 58,
+            "session": 58,
+            "ppid": 58,
+            "state": "R"
+          },
+          {
+            "pid": 60,
+            "start": 84365311,
+            "pgrp": 58,
+            "session": 58,
+            "ppid": 58,
+            "state": "R"
+          }
+        ],
+        "peak_owned_RSS_bytes": 378757120,
+        "peak_observed_virtual_bytes": 21990350946304,
+        "monitor_samples": 136,
+        "signals": [],
+        "exit": 0,
+        "seconds": 1.4165935516357422,
+        "sha256": "7eae41643de09ce78583f323673c5cff0a65bc9fe20c443e312861ddc61b7583",
+        "check_passed": true
+      },
+      "sculpt-chunk-pipeline-test": {
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/production-sculpt-index-integration-strict-20261126/dome-sculpt-sculpt-chunk-pipeline-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/production-sculpt-index-integration-strict-20261126/native-default/pipeline"
+        ],
+        "started": 1795665728.1255565,
+        "timeout_seconds": 900,
+        "RSS_limit_bytes": 4294967296,
+        "virtual_AS_cap": null,
+        "pid": 62,
+        "start": 84365318,
+        "pgrp": 62,
+        "root": {
+          "pid": 62,
+          "start": 84365318,
+          "pgrp": 62,
+          "session": 62,
+          "ppid": 2,
+          "state": "R"
+        },
+        "known_processes": [
+          {
+            "pid": 62,
+            "start": 84365318,
+            "pgrp": 62,
+            "session": 62,
+            "ppid": 2,
+            "state": "R"
+          },
+          {
+            "pid": 71,
+            "start": 84365844,
+            "pgrp": 62,
+            "session": 62,
+            "ppid": 62,
+            "state": "R"
+          },
+          {
+            "pid": 72,
+            "start": 84365846,
+            "pgrp": 62,
+            "session": 62,
+            "ppid": 62,
+            "state": "R"
+          }
+        ],
+        "peak_owned_RSS_bytes": 1704394752,
+        "peak_observed_virtual_bytes": 21990931365888,
+        "monitor_samples": 521,
+        "signals": [],
+        "exit": 0,
+        "seconds": 5.474757671356201,
+        "sha256": "3cdaa66e3822ee52dee9f4a114f4a8e8c653c24cfefb80ef73ddc496cb5860cf",
+        "check_passed": true
+      },
+      "sculpt-independent-workflow": {
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/production-sculpt-index-integration-strict-20261126/dome-sculpt-sculpt-independent-workflow",
+          "/home/blux/de-xr/dome-sculpt/artifacts/production-sculpt-index-integration-strict-20261126/native-default/sculpt"
+        ],
+        "started": 1795665733.9217722,
+        "timeout_seconds": 900,
+        "RSS_limit_bytes": 4294967296,
+        "virtual_AS_cap": null,
+        "pid": 74,
+        "start": 84365898,
+        "pgrp": 74,
+        "root": {
+          "pid": 74,
+          "start": 84365898,
+          "pgrp": 74,
+          "session": 74,
+          "ppid": 2,
+          "state": "R"
+        },
+        "known_processes": [
+          {
+            "pid": 74,
+            "start": 84365898,
+            "pgrp": 74,
+            "session": 74,
+            "ppid": 2,
+            "state": "R"
+          }
+        ],
+        "peak_owned_RSS_bytes": 4295278592,
+        "peak_observed_virtual_bytes": 21992249167872,
+        "monitor_samples": 73316,
+        "signals": [
+          {
+            "pgid": 74,
+            "witness": {
+              "pid": 74,
+              "start": 84365898,
+              "pgrp": 74,
+              "session": 74,
+              "ppid": 2,
+              "state": "R"
+            },
+            "signal": "SIGTERM",
+            "reason": "Owned aggregate RSS exceeded declared budget",
+            "epoch": 1795666524.516215
+          }
+        ],
+        "error": "BudgetExceeded('Owned aggregate RSS exceeded declared budget')",
+        "exit": -15,
+        "seconds": 791.0087821483612,
+        "sha256": "1bc472396564865ad18b442e2c73a22932e6a554b955ff9a4ff9b9c70627da67",
+        "check_passed": false
+      }
+    },
+    "no_dri_nodes": true,
+    "allocator": "default",
+    "sanitizer": {
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+      "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+    },
+    "exit": 1
+  },
+  "authorities": {
+    "creator-public-build-20261126/combined-waylandec578e-v1/plan.json": {
+      "size": 1734815,
+      "sha256": "79c648e029e6299dc05b48297b16d75a8a956f5e694a2f643361a24207dc1517"
+    },
+    "creator-public-build-20261126/combined-waylandec578e-v1/status.json": {
+      "size": 155932,
+      "sha256": "cc6f013a91f0385af34467afbafeccc8596ea458ff79362ae4bd7d51f7b0134d"
+    },
+    "creator-public-build-20261126/combined-waylandec578e-v1/process.log": {
+      "size": 1546,
+      "sha256": "3a1ec66bff758a402bb6dac78f126688d8f7bf545a36f2879654d264d07383b7"
+    },
+    "creator-public-build-20261126/combined-waylandec578e-v1/workflow/report.json": {
+      "size": 2053,
+      "sha256": "6bd20c3c03e3f6bf40afca17657f56c92b17360ea98f700db5c79bdf6b547187"
+    },
+    "creator-public-build-20261126/combined-waylandec578e-v1/device-auth-native-wayland.so.ldd": {
+      "size": 464,
+      "sha256": "5a0d89338f2c1c300028ff88d94b0a7b3883899926bffec4c14240148191f652"
+    },
+    "creator-public-build-20261126/combined-waylandec578e-v1/dome-compositor.ldd": {
+      "size": 4074,
+      "sha256": "1cad4249694f50872870e640caecb02b43795f4bfee96073c07ddbc3d7bd3187"
+    },
+    "creator-public-build-20261126/combined-waylandec578e-v1/dome-sculpt.ldd": {
+      "size": 5010,
+      "sha256": "1a4a84f9ef7dd6a9b95ce2fef160df8526c7253f7f80de8c8f14b68aa765c661"
+    },
+    "creator-public-build-20261126/combined-waylandec578e-v1/workflow/actual-device/egl-query-0/device.txt": {
+      "size": 302,
+      "sha256": "2836111d2534f754bda3afb1ddb7bb0af3c9a870756cd38edd8505bcc3568352"
+    },
+    "creator-public-build-20261126/combined-waylandec578e-v1/workflow/actual-device/egl-query-0/context-maps.txt": {
+      "size": 60886,
+      "sha256": "54b77f2afcf32634c88a0563f63c158388d7247ed97a0888302b2532846e7f43"
+    },
+    "creator-public-build-20261126/publicec578e-accept-v1/plan.json": {
+      "size": 2203730,
+      "sha256": "41f36ebfe4807ffc12b885afbcc882c13b0000e59f1ccf9b805bba5ebcf1801a"
+    },
+    "creator-public-build-20261126/publicec578e-accept-v1/status.json": {
+      "size": 142933,
+      "sha256": "31e73b55f2fd0b1ac40b4046ccf578932fc758b58e4cc45db9d259a594d9ee79"
+    },
+    "creator-public-build-20261126/publicec578e-accept-v1/process.log": {
+      "size": 1526,
+      "sha256": "4a39eba6c3c2cc17623eb7f9212e6840afee67ed63781ff26cae83e42b476992"
+    },
+    "creator-public-build-20261126/publicec578e-accept-v1/workflow/report.json": {
+      "size": 3621,
+      "sha256": "56aaee722bd2345dba9214c6cb364beac01c5191ba748d8fb8cfd50effa4e45d"
+    },
+    "creator-public-build-20261126/publicec578e-accept-v1/device-auth.so.ldd": {
+      "size": 464,
+      "sha256": "aadccb3a89e20dffaf2b46253c0f9eebd8244d2d42db4ef404d15117b12d9289"
+    },
+    "creator-public-build-20261126/publicec578e-accept-v1/dome-sculpt-creator-workspace-test.ldd": {
+      "size": 1654,
+      "sha256": "ea4e71ed0467be024eb02a1082aacaca2d5d6469d69851adf9426ac2939b8023"
+    },
+    "creator-public-build-20261126/publicec578e-accept-v1/dome-sculpt.ldd": {
+      "size": 5010,
+      "sha256": "cc28590f5f9a2ee1063f8205e4434fe158974b2f117360369fb73cbb456c6978"
+    },
+    "creator-public-build-20261126/publicec578e-accept-v1/libdome-sculpt-creator-workspace-runtime.so.ldd": {
+      "size": 1946,
+      "sha256": "3d6d2eafae1ece21868d3747f3415a2f6ac5b153ce55b3048f5cdcb24d27b06c"
+    },
+    "creator-public-build-20261126/publicec578e-accept-v1/actual-device/3891266/device.txt": {
+      "size": 274,
+      "sha256": "55ef0995eea1e7c02a62f2f65f8fb31fb5077e7e5e5525219c9d6f2688a44999"
+    },
+    "creator-public-build-20261126/publicec578e-accept-v1/actual-device/3891266/context-maps.txt": {
+      "size": 45273,
+      "sha256": "4c4b711f615fd421bc617c4447e2f4b89928c3176fb13b6ced3dc5ec489b20a9"
+    },
+    "creator-public-build-20261126/publicec578e-accept-v1/actual-device/3895956/device.txt": {
+      "size": 276,
+      "sha256": "014488374dc03e0d6b8decd49870f2b065b94671709e1285713c77aaee383ac9"
+    },
+    "creator-public-build-20261126/publicec578e-accept-v1/actual-device/3895956/context-maps.txt": {
+      "size": 46106,
+      "sha256": "5bbc64ba56f6e3c6912e1978dd4a4db667660dc8d5b051a17eedf94929ad4f59"
+    },
+    "creator-public-build-20261126/publicec578e-cancel-v1/plan.json": {
+      "size": 2203730,
+      "sha256": "4c925041e66882bf16cf0cfae7f3ef2aae33859e664b5e3d992259689cbc6b8e"
+    },
+    "creator-public-build-20261126/publicec578e-cancel-v1/status.json": {
+      "size": 142929,
+      "sha256": "1477fd73138075f27270de9207b5fec0890fc56a94a04c6967212cf8bae092cc"
+    },
+    "creator-public-build-20261126/publicec578e-cancel-v1/process.log": {
+      "size": 1526,
+      "sha256": "4a39eba6c3c2cc17623eb7f9212e6840afee67ed63781ff26cae83e42b476992"
+    },
+    "creator-public-build-20261126/publicec578e-cancel-v1/workflow/report.json": {
+      "size": 3621,
+      "sha256": "56aaee722bd2345dba9214c6cb364beac01c5191ba748d8fb8cfd50effa4e45d"
+    },
+    "creator-public-build-20261126/publicec578e-cancel-v1/device-auth.so.ldd": {
+      "size": 464,
+      "sha256": "bac1195d7f5d714d506df66312921135fa46bad1c8c3b14435201b7ac1a6baeb"
+    },
+    "creator-public-build-20261126/publicec578e-cancel-v1/dome-sculpt-creator-workspace-test.ldd": {
+      "size": 1654,
+      "sha256": "84727ea8b720ab82a949f6d5f4f60e289ca69a3ad24dc064bcafdb6c267de1af"
+    },
+    "creator-public-build-20261126/publicec578e-cancel-v1/dome-sculpt.ldd": {
+      "size": 5010,
+      "sha256": "9e9f7b5dbd93e8bff80739a64578e13d11dee84228cbd48ba43e63a6002bcc0d"
+    },
+    "creator-public-build-20261126/publicec578e-cancel-v1/libdome-sculpt-creator-workspace-runtime.so.ldd": {
+      "size": 1946,
+      "sha256": "5f3b98ba9b3619af8080647fffbc25c9c99ed40766c7f50ddfcefbab1335d2fb"
+    },
+    "creator-public-build-20261126/publicec578e-cancel-v1/actual-device/3901457/device.txt": {
+      "size": 274,
+      "sha256": "9e60d13260071fda80133ca7730752e50a2eedf9e6a1bf4fe41b8e5b3a9a33fe"
+    },
+    "creator-public-build-20261126/publicec578e-cancel-v1/actual-device/3901457/context-maps.txt": {
+      "size": 45126,
+      "sha256": "dcf9ea71550db186f4e0ba529b3754044e98b81f87773a892c43b22c540aabf5"
+    },
+    "creator-public-build-20261126/publicec578e-cancel-v1/actual-device/3905332/device.txt": {
+      "size": 276,
+      "sha256": "30b537496ad795eb6e173e42a3a748b66dc21bddbd62e6ef077f4bf9918cc588"
+    },
+    "creator-public-build-20261126/publicec578e-cancel-v1/actual-device/3905332/context-maps.txt": {
+      "size": 45273,
+      "sha256": "69768ca4a84c9e8cf0280781ca60a0bdb48d32503deef8b3b347b72e65971710"
+    },
+    "creator-public-build-20261126/publicec578e-focus-v1/plan.json": {
+      "size": 2203724,
+      "sha256": "fe3df5cc9e7027032f64b8bf3a1e564085b6fcbaf26c73e211bf60d6a966c6f9"
+    },
+    "creator-public-build-20261126/publicec578e-focus-v1/status.json": {
+      "size": 142924,
+      "sha256": "3e38aca3c131a19a698079e5f49a38c2da8df73c9719cd48757bc574f3d3bc18"
+    },
+    "creator-public-build-20261126/publicec578e-focus-v1/process.log": {
+      "size": 1600,
+      "sha256": "a9922e345a5ba9d0169e46a3a4f1d9a1909a0e8920a7d40b3a4a65176ce12826"
+    },
+    "creator-public-build-20261126/publicec578e-focus-v1/workflow/report.json": {
+      "size": 3742,
+      "sha256": "4a521df8b878f8afef1c31c6a052a4c1585cee1949a2af9ed07ee65a26022d7a"
+    },
+    "creator-public-build-20261126/publicec578e-focus-v1/device-auth.so.ldd": {
+      "size": 464,
+      "sha256": "fc6f67a39efb64e64f090937de0c86c332b2ab160c2e5c4d25949db2b3d3b44b"
+    },
+    "creator-public-build-20261126/publicec578e-focus-v1/dome-sculpt-creator-workspace-test.ldd": {
+      "size": 1654,
+      "sha256": "8d0871edb5558cd5864e6b3686853ee59e02f68c73195f36bfdee3e5b173dad2"
+    },
+    "creator-public-build-20261126/publicec578e-focus-v1/dome-sculpt.ldd": {
+      "size": 5010,
+      "sha256": "38ff47c28317aa8b34e690fa1aff2635520c03a36056a660b06ebe776b0b52dc"
+    },
+    "creator-public-build-20261126/publicec578e-focus-v1/libdome-sculpt-creator-workspace-runtime.so.ldd": {
+      "size": 1946,
+      "sha256": "2590655d0f265e1de94d96e492d32601c40fb532eaadb2e54ebdc79b861be632"
+    },
+    "creator-public-build-20261126/publicec578e-focus-v1/actual-device/3911071/device.txt": {
+      "size": 276,
+      "sha256": "c5f11aa7da2cb4126c268df53cef5c7cba8a55c73185ed9a9e800220d2c44bbe"
+    },
+    "creator-public-build-20261126/publicec578e-focus-v1/actual-device/3911071/context-maps.txt": {
+      "size": 45272,
+      "sha256": "43d0424b3ddecbbbc1f0d5dc90f116d08180cdf00a8f59c0e220d2752f140cb8"
+    },
+    "creator-public-build-20261126/publicec578e-focus-v1/actual-device/3914926/device.txt": {
+      "size": 274,
+      "sha256": "59f68b28227a4d25abe7f0b564ab0385df12fb498f5fb4ba4b96250fe47dc988"
+    },
+    "creator-public-build-20261126/publicec578e-focus-v1/actual-device/3914926/context-maps.txt": {
+      "size": 45223,
+      "sha256": "cb1b28af1ecdd1a44d60e85c2e05b710ad3414ac03384efc6781bccb1966fe0e"
+    },
+    "creator-public-build-20261126/run-combined-waylandec578e-v1.py": {
+      "size": 9117,
+      "sha256": "a074b3f2a8a78992ff5f86c9983ab59a1f2d3561b9ae65ebd37bf0cba864ad75"
+    },
+    "creator-public-build-20261126/run-publicec578e-v1.py": {
+      "size": 9474,
+      "sha256": "d371de9abd8d0dc6bf932c9b05c395bade3ab33e0becd11456b5708114afe432"
+    },
+    "creator-public-build-20261126/run-publicec578e-round.py": {
+      "size": 1233,
+      "sha256": "ffac27284ef9da440c60987b0bc50aca18a37e26025416668a7da9c43eed65ba"
+    },
+    "creator-public-build-20261126/publicec578e-round-v1/status.json": {
+      "size": 824,
+      "sha256": "ddf6feb307340ed2629f8986d720a401528542cad7925b233e23f4fac04fe18d"
+    },
+    "serialize-sculpt-objects-strict-20261126/status.json": {
+      "size": 2479,
+      "sha256": "fafd120f0f812e8e9bdb31a6327ee82b988f6bf7be526a3bfc2ca2c023d0192c"
+    },
+    "serialize-sculpt-objects-strict-20261126/native.xml": {
+      "size": 4007,
+      "sha256": "346117c8cb54bb1a7f654d57ca535f4b5727bddf0c17c0099a7993569be001f9"
+    },
+    "serialize-sculpt-objects-strict-20261126/sculpt-default.log": {
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "production-sculpt-index-integration-strict-20261126/prepare.py": {
+      "size": 3775,
+      "sha256": "16d99ea800a980a421cec2bb000c58fdebacbd58796079ce3a0467078aa68903"
+    },
+    "production-sculpt-index-integration-strict-20261126/build-plan.json": {
+      "size": 23614,
+      "sha256": "1fdd5fc9b88e0e296d5365976e426fa6488ab048957f48bb1d21913bdf48b32c"
+    },
+    "production-sculpt-index-integration-strict-20261126/build-status.json": {
+      "size": 1518,
+      "sha256": "404cbeba71f9ac804a44c1f5eaf32f1f8f3b946f480c01653bb2eb5bb14abb88"
+    },
+    "production-sculpt-index-integration-strict-20261126/run-native.py": {
+      "size": 2619,
+      "sha256": "4aef3d6c5b3afab8965d9db16dc57a8486e01966ed2f3f0eb74774d794c48299"
+    },
+    "production-sculpt-index-integration-strict-20261126/native-default/status.json": {
+      "size": 8788,
+      "sha256": "ae4c2da801b1aa4afafb7230fb98ad88b17fcbf2150cbd78f69921d84aef6a72"
+    },
+    "production-sculpt-index-integration-strict-20261126/native-default/atomic-write-allocation-test.log": {
+      "size": 1536,
+      "sha256": "0e3863f158f06dc45c5e5b10a64ffd86abab056eab621cd2256e12869eccb0da"
+    },
+    "production-sculpt-index-integration-strict-20261126/native-default/document-recovery-test.log": {
+      "size": 1162,
+      "sha256": "133749a13b164d17364edc916b9ac7d697f643da0e55ba93767fa5f43959f596"
+    },
+    "production-sculpt-index-integration-strict-20261126/native-default/scene-file-test.log": {
+      "size": 2686,
+      "sha256": "0e7fe3a507abddb3db566806058b5525cb58cf89dee94063473155672de85bbe"
+    },
+    "production-sculpt-index-integration-strict-20261126/native-default/sculpt-chunk-pipeline-test.log": {
+      "size": 7701,
+      "sha256": "351519a7b76bd86afa9043357287596d2ac1aafe1bfcd2c9870e39aa8ba4b15b"
+    },
+    "production-sculpt-index-integration-strict-20261126/native-default/sculpt-independent-workflow.log": {
+      "size": 187,
+      "sha256": "bf27e1618af43a5d5a82b38b438c2cc4c89d92694f471640b279f7291718c740"
+    },
+    "production-sculpt-index-integration-strict-20261126/native-default/sculpt-surface-chunks-test.log": {
+      "size": 1954,
+      "sha256": "ebf78e916610192f405486b582e0ca5ab78b363141f709602c669e9a6ba4b101"
+    },
+    "broad-source-regression-release-20261126/build-plan.json": {
+      "size": 13173,
+      "sha256": "9621aaf7fc8fa5cb3b3ea4345f7cb56d419c7b59512f267834dc3f6947de5750"
+    },
+    "broad-source-regression-release-20261126/build-status.json": {
+      "size": 955,
+      "sha256": "cce5a61f7b27e8eff032c6cd1bcfc80db19d2595763e0ecec150e23b40105232"
+    },
+    "broad-source-regression-release-20261126/original-source-failures.log": {
+      "size": 673,
+      "sha256": "2851e4ad33aff7e76c7a3742b25ef84f1f3abc684376ef367e23cdac22dfdc24"
+    },
+    "broad-source-regression-release-20261126/runtime/status.json": {
+      "size": 3136,
+      "sha256": "79c635bfe826d8504bf09713ae17b0f6799388ac1f84b5f13b86d08a76c9fd7e"
+    },
+    "broad-source-regression-release-20261126/prepare.py": {
+      "size": 2954,
+      "sha256": "a04a97db1f55ac3b73803cdad26c7e0220a23fe44a4b041accd3ce62fece7a6c"
+    },
+    "broad-source-regression-release-20261126/run-native.py": {
+      "size": 2343,
+      "sha256": "1ae1e55fe7f029fa4244753e329237e601700dddfb2eefbe716764a9ad64afa5"
+    },
+    "broad-source-regression-release-20261126/runtime/baked-emission-raw-worker.log": {
+      "size": 260,
+      "sha256": "8140630da001d09e6e1357711721664c2943508a7c97f27ed2f6ca2db19c7b3a"
+    },
+    "broad-source-regression-release-20261126/runtime/baked-emission-uv1-worker.log": {
+      "size": 417,
+      "sha256": "09a0d354e4170f50e79cce44a87ff94521d29c0fa16503929a9497605f121f38"
+    },
+    "broad-source-regression-release-20261126/runtime/baked-emission-workflow.log": {
+      "size": 40,
+      "sha256": "536147bd07f4599ce084da08c68ff6a90df3f2f2bffc3968db5dbe39fc3606c3"
+    },
+    "broad-source-regression-release-20261126/runtime/corner-color-uv23-domain.log": {
+      "size": 141,
+      "sha256": "849d187442cf28337f287738b14870de9f451acb772026f3ab1428de692d7279"
+    },
+    "broad-source-regression-release-20261126/runtime/scene-file.log": {
+      "size": 2686,
+      "sha256": "0e7fe3a507abddb3db566806058b5525cb58cf89dee94063473155672de85bbe"
+    },
+    "broad-source-regression-release-20261126/runtime/source-owning-hdr-domain.log": {
+      "size": 630,
+      "sha256": "10011ba1983c1a14c6d86a41c86093fc3f5ee7cb06a00ec4f07e3411f8a74f05"
+    },
+    "broad-source-regression-release-20261126/dome-sculpt-baked-emission-workflow-test.link.d": {
+      "size": 7426,
+      "sha256": "e4d7f0fa6b1580b623a9a2ec4a114e3b66f3b65f8b0582ad10e2b9583d31d924"
+    },
+    "broad-source-regression-release-20261126/dome-sculpt-corner-color-uv23-domain-test.link.d": {
+      "size": 7429,
+      "sha256": "9c1e01c7513a5178be9d59ea417d57ab316582b20f81e66d73358bda3826633b"
+    },
+    "broad-source-regression-release-20261126/dome-sculpt-scene-file-test.link.d": {
+      "size": 7387,
+      "sha256": "03b1ff75e14835e78e6616336df8e5a82542f13e0f351cdb9ce4647357a210d1"
+    },
+    "broad-source-regression-release-20261126/dome-sculpt-source-owning-hdr-domain-test.link.d": {
+      "size": 7429,
+      "sha256": "58ab642572bc14027948e3b604dcb190cd442805f95c414f919b0bf2298d46f5"
+    },
+    "broad-source-regression-release-20261126/src/paint.cpp.o.d": {
+      "size": 25544,
+      "sha256": "469974c5685526899ca18c90ec936c69123efe1e7ef101cb772fcd158a72e07f"
+    },
+    "broad-source-regression-release-20261126/tests/baked-emission-workflow.cpp.o.d": {
+      "size": 23331,
+      "sha256": "1f5fd9688e12b7b199d0274b119f2a0a7e9bd0d5aa47d63d7410f4ae6ad8fd7b"
+    },
+    "broad-source-regression-release-20261126/tests/corner-color-uv23-domain.cpp.o.d": {
+      "size": 23698,
+      "sha256": "7080179280ce860d652f7df1f5cd26603880b12d203cb0587798f86f837a71cf"
+    },
+    "broad-source-regression-release-20261126/tests/scene-file.cpp.o.d": {
+      "size": 21807,
+      "sha256": "7d6740383d93a21ec73b4dca115fc40fb7d4bd635df45229d64918c1242c05dc"
+    },
+    "broad-source-regression-release-20261126/tests/source-owning-hdr-domain.cpp.o.d": {
+      "size": 28317,
+      "sha256": "ecd5023ea1e7986663551a43a185917e808cc3ea5afe79d7e3a728111f620f8d"
+    },
+    "broad-source-regression-release-20261126/ds-combinedec578e-native-wayland-v1-20261126.journal.txt": {
+      "size": 419,
+      "sha256": "7e7fe7370d7e057a445a077bcdca8418880e1f3e7467cb4db1d9588b37a4d7b1"
+    },
+    "broad-source-regression-release-20261126/ds-combinedec578e-public-xr-20261126.journal.txt": {
+      "size": 573,
+      "sha256": "4250863e007de50144d679ef3c8877a0ee736718ab8bd52dec5990bdc6e384d1"
+    },
+    "broad-source-regression-release-20261126/ds-serialize-sculpt-objects-strict-20261126.journal.txt": {
+      "size": 2676,
+      "sha256": "25b2b4b527e53b1dedf4c99f24df26f2d2bb169437297bc9138123673cd6d8e4"
+    },
+    "broad-source-regression-release-20261126/ds-broad-source-regression-native-20261126.journal.txt": {
+      "size": 1185,
+      "sha256": "44a76f4f3fab8b6ac0d1da97365c72ec8d55a2aee1374be09bcbc7eed0098622"
+    },
+    "broad-source-regression-release-20261126/ds-broad-source-regression-build-20261126.journal.txt": {
+      "size": 393,
+      "sha256": "da9cc659465992846b68e3e937dfe4e0ab2aaa88ffe2f748313361c1c40908ee"
+    },
+    "broad-source-regression-release-20261126/ds-production-sculpt-index-integration-strict-native-20261126.journal.txt": {
+      "size": 1300,
+      "sha256": "2a45a6f079c78a9a6b128c21e37006789c28d61b7905d6d72f865bc65b30f4a7"
+    }
+  },
+  "archive": {
+    "file": "production-index-ui-and-source-regressions-20261126.tar.xz",
+    "size": 488160,
+    "sha256": "f4c58fac0fcb86e3741b2cd18e9c5226f2c577ec1b0c87832517952ccaad34d7"
+  }
+}

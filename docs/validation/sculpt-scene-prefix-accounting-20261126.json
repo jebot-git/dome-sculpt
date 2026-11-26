@@ -1,0 +1,977 @@
+{
+  "source": "50f7abfa23919ffd18761a6d044d2f8918844a2d",
+  "scope": "Alternate four-profile actual private CPU warm mask captures, all 16 revisions per executable per run, seven core changes and matched frontend/span layout links, exact-quota pipeline and full sculpt Save/Open/Recovery.",
+  "build": {
+    "terminal": true,
+    "exit": 0,
+    "compile": [
+      {
+        "name": "document-cut.cpp",
+        "exit": 0
+      },
+      {
+        "name": "document.cpp",
+        "exit": 0
+      },
+      {
+        "name": "material-visibility.cpp",
+        "exit": 0
+      },
+      {
+        "name": "sculpt-chunk-masks.cpp",
+        "exit": 0
+      },
+      {
+        "name": "sculpt-placed-chunk.cpp",
+        "exit": 0
+      },
+      {
+        "name": "sculpt-placed-chunks.cpp",
+        "exit": 0
+      },
+      {
+        "name": "sculpt-scene-chunks.cpp",
+        "exit": 0
+      },
+      {
+        "name": "sculpt-chunk-pipeline.cpp",
+        "exit": 0
+      },
+      {
+        "name": "sculpt-independent-workflow.cpp",
+        "exit": 0
+      },
+      {
+        "name": "capture-profile-before",
+        "exit": 0
+      },
+      {
+        "name": "capture-profile-after",
+        "exit": 0
+      }
+    ],
+    "linked_archive": {
+      "members": 197,
+      "sha256": "b5b4614c6c9d866df3176a21e1de31269ccef98a70d3d66859dbbd3ed2d73af7",
+      "replacements": [
+        "document-cut.cpp.o",
+        "document.cpp.o",
+        "material-visibility.cpp.o",
+        "sculpt-chunk-masks.cpp.o",
+        "sculpt-placed-chunk.cpp.o",
+        "sculpt-placed-chunks.cpp.o",
+        "sculpt-scene-chunks.cpp.o"
+      ]
+    },
+    "links": [
+      {
+        "name": "dome-sculpt-sculpt-chunk-pipeline-test",
+        "exit": 0
+      },
+      {
+        "name": "dome-sculpt-sculpt-independent-workflow",
+        "exit": 0
+      },
+      {
+        "name": "capture-profile-before",
+        "exit": 0
+      },
+      {
+        "name": "capture-profile-after",
+        "exit": 0
+      }
+    ]
+  },
+  "application_build": {
+    "terminal": true,
+    "source_diff_sha256": "8ab32e2c689cbfd04f4a84f5004a2efffc41ce5c432e68e08ff1c1c159aa3497",
+    "compile": [
+      {
+        "name": "render.cpp",
+        "argv": [
+          "/usr/bin/c++",
+          "-MD",
+          "-MF",
+          "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-scene-prefix-accounting-release-20261126/app-build/render.cpp.o.d",
+          "-MT",
+          "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-scene-prefix-accounting-release-20261126/app-build/render.cpp.o",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-scene-prefix-accounting-source-20261126/include",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-scene-prefix-accounting-source-20261126/third_party/openbrush",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-scene-prefix-accounting-source-20261126/third_party/nlohmann",
+          "-isystem",
+          "/opt/fltk-vr/bdf-runtime/include/harfbuzz",
+          "-isystem",
+          "/usr/include/glib-2.0",
+          "-isystem",
+          "/usr/lib64/glib-2.0/include",
+          "-isystem",
+          "/usr/include/sysprof-6",
+          "-isystem",
+          "/opt/fltk-vr/bdf-runtime/include/freetype2",
+          "-isystem",
+          "/usr/include/libpng16",
+          "-isystem",
+          "/usr/include/libxml2",
+          "-O3",
+          "-DNDEBUG",
+          "-std=gnu++20",
+          "-pthread",
+          "-DWITH_GZFILEOP",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-scene-prefix-accounting-release-20261126/app-build/render.cpp.o",
+          "-c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-scene-prefix-accounting-source-20261126/src/render.cpp"
+        ]
+      },
+      {
+        "name": "app.cpp",
+        "argv": [
+          "/usr/bin/c++",
+          "-MD",
+          "-MF",
+          "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-scene-prefix-accounting-release-20261126/app-build/app.cpp.o.d",
+          "-MT",
+          "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-scene-prefix-accounting-release-20261126/app-build/app.cpp.o",
+          "-DDOME_HAS_XR=1",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-scene-prefix-accounting-source-20261126/third_party/desktop",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/serialize-sculpt-objects-release-20261126",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-scene-prefix-accounting-source-20261126/include",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-scene-prefix-accounting-source-20261126/third_party/openbrush",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-scene-prefix-accounting-source-20261126/third_party/nlohmann",
+          "-isystem",
+          "/opt/fltk-vr/bdf-runtime/include/harfbuzz",
+          "-isystem",
+          "/usr/include/glib-2.0",
+          "-isystem",
+          "/usr/lib64/glib-2.0/include",
+          "-isystem",
+          "/usr/include/sysprof-6",
+          "-isystem",
+          "/opt/fltk-vr/bdf-runtime/include/freetype2",
+          "-isystem",
+          "/usr/include/libpng16",
+          "-isystem",
+          "/usr/include/libxml2",
+          "-isystem",
+          "/opt/fltk-vr/toolkit/include",
+          "-isystem",
+          "/opt/fltk-vr/bdf-runtime/include/cairo",
+          "-isystem",
+          "/usr/include/pixman-1",
+          "-isystem",
+          "/usr/include/libmount",
+          "-isystem",
+          "/usr/include/blkid",
+          "-O3",
+          "-DNDEBUG",
+          "-std=gnu++20",
+          "-pthread",
+          "-DWITH_GZFILEOP",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-scene-prefix-accounting-release-20261126/app-build/app.cpp.o",
+          "-c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-scene-prefix-accounting-source-20261126/src/app.cpp"
+        ]
+      },
+      {
+        "name": "sculpt-sustained.cpp",
+        "argv": [
+          "/usr/bin/c++",
+          "-MD",
+          "-MF",
+          "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-scene-prefix-accounting-release-20261126/app-build/sculpt-sustained.cpp.o.d",
+          "-MT",
+          "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-scene-prefix-accounting-release-20261126/app-build/sculpt-sustained.cpp.o",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-scene-prefix-accounting-source-20261126/src",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-scene-prefix-accounting-source-20261126/third_party/desktop",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-scene-prefix-accounting-source-20261126/include",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-scene-prefix-accounting-source-20261126/third_party/openbrush",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-scene-prefix-accounting-source-20261126/third_party/nlohmann",
+          "-isystem",
+          "/opt/fltk-vr/bdf-runtime/include/harfbuzz",
+          "-isystem",
+          "/usr/include/glib-2.0",
+          "-isystem",
+          "/usr/lib64/glib-2.0/include",
+          "-isystem",
+          "/usr/include/sysprof-6",
+          "-isystem",
+          "/opt/fltk-vr/bdf-runtime/include/freetype2",
+          "-isystem",
+          "/usr/include/libpng16",
+          "-isystem",
+          "/usr/include/libxml2",
+          "-O3",
+          "-DNDEBUG",
+          "-std=gnu++20",
+          "-pthread",
+          "-DWITH_GZFILEOP",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-scene-prefix-accounting-release-20261126/app-build/sculpt-sustained.cpp.o",
+          "-c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-scene-prefix-accounting-source-20261126/tests/sculpt-sustained.cpp"
+        ]
+      }
+    ],
+    "links": [
+      {
+        "name": "dome-sculpt",
+        "argv": [
+          "/usr/bin/c++",
+          "-O3",
+          "-DNDEBUG",
+          "-Wl,--dependency-file=/home/blux/de-xr/dome-sculpt/artifacts/sculpt-scene-prefix-accounting-release-20261126/app-build/dome-sculpt.link.d",
+          "CMakeFiles/dome-sculpt.dir/src/native-display-runtime.cpp.o",
+          "CMakeFiles/dome-sculpt.dir/src/vrm-expression-editor.cpp.o",
+          "CMakeFiles/dome-sculpt.dir/src/rig-fit-editor.cpp.o",
+          "CMakeFiles/dome-sculpt.dir/src/projection-editor.cpp.o",
+          "CMakeFiles/dome-sculpt.dir/src/spacenav-options.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-scene-prefix-accounting-release-20261126/app-build/app.cpp.o",
+          "CMakeFiles/dome-sculpt.dir/src/polygon-editor.cpp.o",
+          "CMakeFiles/dome-sculpt.dir/src/import-editor.cpp.o",
+          "CMakeFiles/dome-sculpt.dir/src/procedural-editor.cpp.o",
+          "CMakeFiles/dome-sculpt.dir/src/resolution-editor.cpp.o",
+          "CMakeFiles/dome-sculpt.dir/src/sculpt-editor.cpp.o",
+          "CMakeFiles/dome-sculpt.dir/src/creator-editor.cpp.o",
+          "CMakeFiles/dome-sculpt.dir/src/rig-editor.cpp.o",
+          "CMakeFiles/dome-sculpt.dir/src/shapekey-editor.cpp.o",
+          "CMakeFiles/dome-sculpt.dir/src/weight-editor.cpp.o",
+          "CMakeFiles/dome-sculpt.dir/src/skin-editor.cpp.o",
+          "CMakeFiles/dome-sculpt.dir/src/mesh-editor.cpp.o",
+          "CMakeFiles/dome-sculpt.dir/src/bake-editor.cpp.o",
+          "CMakeFiles/dome-sculpt.dir/src/object-editor.cpp.o",
+          "CMakeFiles/dome-sculpt.dir/src/texture-set-editor.cpp.o",
+          "CMakeFiles/dome-sculpt.dir/src/paint-editor.cpp.o",
+          "CMakeFiles/dome-sculpt.dir/src/uv-editor.cpp.o",
+          "CMakeFiles/dome-sculpt.dir/src/ui-conventions.cpp.o",
+          "CMakeFiles/dome-sculpt.dir/src/session-appearance.cpp.o",
+          "CMakeFiles/dome-sculpt.dir/src/export-editor.cpp.o",
+          "CMakeFiles/dome-sculpt.dir/third_party/desktop/desktop-menu.cpp.o",
+          "CMakeFiles/dome-sculpt.dir/appmenu-protocol.c.o",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-scene-prefix-accounting-release-20261126/dome-sculpt",
+          "-L/opt/fltk-vr/toolkit/lib",
+          "-L/opt/fltk-vr/bdf-runtime/lib",
+          "-Wl,-rpath,/opt/fltk-vr/toolkit/lib:/opt/fltk-vr/bdf-runtime/lib:",
+          "libdome-sculpt-spacenav.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-scene-prefix-accounting-release-20261126/libdome-sculpt-core.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-scene-prefix-accounting-release-20261126/libdome-sculpt-render.a",
+          "/opt/fltk-vr/toolkit/lib/libfltk_images.so.1.4.5",
+          "/opt/fltk-vr/toolkit/lib/libfltk_gl.so.1.4.5",
+          "/usr/lib64/libGLU.so",
+          "libdome-sculpt-xr.a",
+          "/usr/lib64/libjpeg.so",
+          "/usr/lib64/libpng.so",
+          "/opt/fltk-vr/toolkit/lib/libfltk.so.1.4.5",
+          "-lcairo",
+          "-L/usr/lib64",
+          "-lX11",
+          "-lGLU",
+          "-lGL",
+          "/usr/lib64/libdl.a",
+          "/usr/lib64/libSM.so",
+          "/usr/lib64/libICE.so",
+          "/usr/lib64/libXext.so",
+          "/usr/lib64/libXinerama.so",
+          "/usr/lib64/libXfixes.so",
+          "/usr/lib64/libXcursor.so",
+          "/usr/lib64/libXrender.so",
+          "/usr/lib64/libXft.so",
+          "/usr/lib64/libwayland-egl.so",
+          "/usr/lib64/libwayland-cursor.so",
+          "/usr/lib64/libxkbcommon.so",
+          "/usr/lib64/libGLX.so",
+          "/usr/lib64/libOpenGL.so",
+          "/usr/lib64/libz.so",
+          "/opt/fltk-vr/bdf-runtime/lib/libcairo.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-scene-prefix-accounting-release-20261126/libdome-sculpt-render.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-scene-prefix-accounting-release-20261126/libdome-sculpt-core.a",
+          "libdome-sculpt-paint-gpu.a",
+          "libdome-sculpt-affine.a",
+          "/usr/lib64/liblapacke.so",
+          "libdome-sculpt-polygon.a",
+          "libxatlas.a",
+          "libmikktspace.a",
+          "libmikktspace-robust.a",
+          "libufbx.a",
+          "/usr/lib64/libpng.so",
+          "/usr/lib64/libjpeg.so",
+          "/usr/lib64/libz.so",
+          "libdome-sculpt-emission-codec.a",
+          "libdome-sculpt-baked-emission.a",
+          "/usr/lib64/libOpenEXR-3_2.so",
+          "/usr/lib64/libOpenEXRUtil-3_2.so",
+          "/usr/lib64/libOpenEXRCore-3_2.so",
+          "/usr/lib64/libIex-3_2.so",
+          "/usr/lib64/libIlmThread-3_2.so",
+          "/usr/lib64/libImath-3_1.so",
+          "libdome-sculpt-native-graphics.a",
+          "/usr/lib64/libOpenGL.so",
+          "/usr/lib64/libEGL.so",
+          "/opt/fltk-vr/bdf-runtime/lib/libharfbuzz.so",
+          "/usr/lib64/libGL.so",
+          "/usr/lib64/libfontconfig.so",
+          "/opt/fltk-vr/bdf-runtime/lib/libfreetype.so",
+          "/usr/lib64/libicui18n.so",
+          "/usr/lib64/libicuuc.so",
+          "/usr/lib64/libopenxr_loader.so",
+          "/usr/lib64/libgio-2.0.so",
+          "/usr/lib64/libgobject-2.0.so",
+          "/usr/lib64/libglib-2.0.so",
+          "/usr/lib64/libX11.so",
+          "/usr/lib64/libwayland-client.so",
+          "-lm",
+          "-lgcc_s_asneeded",
+          "-lgcc_s_asneeded"
+        ]
+      },
+      {
+        "name": "dome-sculpt-sculpt-sustained",
+        "argv": [
+          "/usr/bin/c++",
+          "-O3",
+          "-DNDEBUG",
+          "-Wl,--wrap=glBufferData",
+          "-Wl,--wrap=glBufferSubData",
+          "-Wl,--wrap=_ZN4dome6detail17SculptSceneChunks7captureERKNS_5SceneENS0_23SculptSceneChunkContextERKSt10shared_ptrIKS1_ENS0_22SculptSceneChunkLimitsESt8functionIFbvEE",
+          "-Wl,--wrap=_ZN4dome6detail19SculptSurfaceChunks5buildERKNS_6VolumeENS0_17SculptChunkLimitsESt8functionIFbvEE",
+          "-Wl,--wrap=_ZNK4dome6detail19SculptSurfaceChunks6updateERKNS_6VolumeENS0_17SculptChunkLimitsESt8functionIFbvEE",
+          "-Wl,--wrap=_ZN4dome6detail18SculptPlacedChunks7captureERKSt10shared_ptrIKNS0_17SculptSceneChunksEEmRKS2_IKS1_EbNS0_24SculptPlacedChunksLimitsESt8functionIFbvEE",
+          "-Wl,--wrap=_ZN4dome6detail16SculptChunkMasks7captureESt10shared_ptrIKNS0_19SculptSurfaceChunksEES2_IKNS0_18SculptMaskSnapshotEERKS2_IKS1_EmmSt8functionIFbvEE",
+          "-Wl,--wrap=_ZNK4dome12SurfaceQuery14nearest_resultENS_4Vec3ERKNS_15AffineTransformERKNS_19SurfaceQueryOptionsE",
+          "-Wl,--wrap=_ZNK4dome12SurfaceQuery14raycast_resultENS_4Vec3ES1_fRKNS_15AffineTransformERKNS_19SurfaceQueryOptionsE",
+          "-Wl,--dependency-file=/home/blux/de-xr/dome-sculpt/artifacts/sculpt-scene-prefix-accounting-release-20261126/app-build/dome-sculpt-sculpt-sustained.link.d",
+          "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-scene-prefix-accounting-release-20261126/app-build/sculpt-sustained.cpp.o",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-scene-prefix-accounting-release-20261126/dome-sculpt-sculpt-sustained",
+          "-Wl,-rpath,/opt/fltk-vr/bdf-runtime/lib",
+          "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-scene-prefix-accounting-release-20261126/libdome-sculpt-render.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-scene-prefix-accounting-release-20261126/libdome-sculpt-core.a",
+          "libdome-sculpt-paint-gpu.a",
+          "libdome-sculpt-affine.a",
+          "/usr/lib64/liblapacke.so",
+          "libdome-sculpt-polygon.a",
+          "libxatlas.a",
+          "libmikktspace.a",
+          "libmikktspace-robust.a",
+          "libufbx.a",
+          "/usr/lib64/libpng.so",
+          "/usr/lib64/libjpeg.so",
+          "/usr/lib64/libz.so",
+          "libdome-sculpt-emission-codec.a",
+          "libdome-sculpt-baked-emission.a",
+          "/usr/lib64/libOpenEXR-3_2.so",
+          "/usr/lib64/libOpenEXRUtil-3_2.so",
+          "/usr/lib64/libOpenEXRCore-3_2.so",
+          "/usr/lib64/libIex-3_2.so",
+          "/usr/lib64/libIlmThread-3_2.so",
+          "/usr/lib64/libImath-3_1.so",
+          "libdome-sculpt-native-graphics.a",
+          "/usr/lib64/libOpenGL.so",
+          "/opt/fltk-vr/bdf-runtime/lib/libharfbuzz.so",
+          "/usr/lib64/libEGL.so",
+          "/usr/lib64/libGL.so",
+          "/usr/lib64/libfontconfig.so",
+          "/opt/fltk-vr/bdf-runtime/lib/libfreetype.so",
+          "/usr/lib64/libicui18n.so",
+          "/usr/lib64/libicuuc.so",
+          "-lgcc_s_asneeded",
+          "-lgcc_s_asneeded"
+        ]
+      }
+    ],
+    "baseline_render_sha256": "bdde0e39fc9012b76bc5361b556e62c563e91e001700636006c2a53ca59ea4c2",
+    "core_sha256": "b5b4614c6c9d866df3176a21e1de31269ccef98a70d3d66859dbbd3ed2d73af7",
+    "objects": {
+      "src/render.cpp": "1214ee50c848d81d007c0fc202c2aa16af7e11d305e62fad86ab25b9a54349a7",
+      "src/app.cpp": "e12c6dffd89e745901b51c68c1eb94d66f1d638e2eebd9d4355edba47e4c9832",
+      "tests/sculpt-sustained.cpp": "669a73db2048c72837931cc5c56e678475695527d71ed1cc5d1b373ca813dd0e"
+    },
+    "executables": {
+      "dome-sculpt": "b5b49676e005fc5437dbfcb409c8ab19537cc6ba277b081003598341a197ad29",
+      "dome-sculpt-sculpt-sustained": "f63fa5b726393cf2071490c96140cbc81876b71acf30a2084b6274cea925eca9"
+    },
+    "render_sha256": "5556fb73e7845fa50f5aff424bf08ae09925599ae95ab538f77b41f0063d1d17",
+    "render_archive_members": 4,
+    "exit": 0
+  },
+  "native": {
+    "terminal": true,
+    "input_sha256": "d32c725a02d3d9291f3208c879f78ecc343c33511de9e10b5c18d93bb95fd694",
+    "diff_sha256": "8ab32e2c689cbfd04f4a84f5004a2efffc41ce5c432e68e08ff1c1c159aa3497",
+    "cases": {
+      "pipeline": {
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-scene-prefix-accounting-release-20261126/dome-sculpt-sculpt-chunk-pipeline-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-scene-prefix-accounting-release-20261126/native/pipeline"
+        ],
+        "started": 1795666354.7524483,
+        "timeout_seconds": 900,
+        "RSS_limit_bytes": 4294967296,
+        "virtual_AS_cap": null,
+        "pid": 7,
+        "start": 84427981,
+        "pgrp": 7,
+        "root": {
+          "pid": 7,
+          "start": 84427981,
+          "pgrp": 7,
+          "session": 7,
+          "ppid": 2,
+          "state": "R"
+        },
+        "known_processes": [
+          {
+            "pid": 7,
+            "start": 84427981,
+            "pgrp": 7,
+            "session": 7,
+            "ppid": 2,
+            "state": "R"
+          }
+        ],
+        "peak_owned_RSS_bytes": 56700928,
+        "peak_observed_virtual_bytes": 334278656,
+        "monitor_samples": 91,
+        "signals": [],
+        "exit": 0,
+        "seconds": 0.9520516395568848,
+        "check_passed": true,
+        "executable_sha256": "6fdef04febd37eec174d2cdb0c1bbb2107b34ce9006540b491e9ef1a90c102ea"
+      },
+      "sculpt": {
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-scene-prefix-accounting-release-20261126/dome-sculpt-sculpt-independent-workflow",
+          "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-scene-prefix-accounting-release-20261126/native/sculpt"
+        ],
+        "started": 1795666355.7187521,
+        "timeout_seconds": 900,
+        "RSS_limit_bytes": 4294967296,
+        "virtual_AS_cap": null,
+        "pid": 16,
+        "start": 84428078,
+        "pgrp": 16,
+        "root": {
+          "pid": 16,
+          "start": 84428078,
+          "pgrp": 16,
+          "session": 16,
+          "ppid": 2,
+          "state": "R"
+        },
+        "known_processes": [
+          {
+            "pid": 16,
+            "start": 84428078,
+            "pgrp": 16,
+            "session": 16,
+            "ppid": 2,
+            "state": "R"
+          }
+        ],
+        "peak_owned_RSS_bytes": 3559337984,
+        "peak_observed_virtual_bytes": 4437975040,
+        "monitor_samples": 7700,
+        "signals": [],
+        "exit": 0,
+        "seconds": 82.38256168365479,
+        "check_passed": true,
+        "executable_sha256": "64b413536f7a673a1c183f9c5ab5e3220770a3f2dfeb8cc799094492e64625bb"
+      }
+    },
+    "profile": {
+      "0-before": {
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-scene-prefix-accounting-release-20261126/capture-profile-before",
+          "/home/blux/de-xr/dome-sculpt/artifacts/production-sculpt-index-integration-release-20261126/native-default/sculpt/accepted.dsculpt"
+        ],
+        "started": 1795666321.010692,
+        "timeout_seconds": 400,
+        "RSS_limit_bytes": 4294967296,
+        "virtual_AS_cap": null,
+        "pid": 3,
+        "start": 84424607,
+        "pgrp": 3,
+        "root": {
+          "pid": 3,
+          "start": 84424607,
+          "pgrp": 3,
+          "session": 3,
+          "ppid": 2,
+          "state": "R"
+        },
+        "known_processes": [
+          {
+            "pid": 3,
+            "start": 84424607,
+            "pgrp": 3,
+            "session": 3,
+            "ppid": 2,
+            "state": "R"
+          }
+        ],
+        "peak_owned_RSS_bytes": 1250500608,
+        "peak_observed_virtual_bytes": 1340284928,
+        "monitor_samples": 932,
+        "signals": [],
+        "exit": 0,
+        "seconds": 9.74911904335022,
+        "exe_sha256": "d249d992c8430f08865761c0abe9f9d767cd29ac83338b0a40c86cfa1c085112",
+        "samples_ms": [
+          217.558,
+          197.27,
+          161.75,
+          158.863,
+          167.985,
+          221.817,
+          203.658,
+          185.66,
+          164.421,
+          170.956,
+          174.946,
+          166.465,
+          170.441,
+          165.669,
+          167.144,
+          166.555
+        ],
+        "retained_bytes": [
+          375633105,
+          375633105,
+          375633105,
+          375633105,
+          375633105,
+          375633105,
+          375633105,
+          375633105,
+          375633105,
+          375633105,
+          375633105,
+          375633105,
+          375633105,
+          375633105,
+          375633105,
+          375633105
+        ],
+        "median_ms": 169.21300000000002
+      },
+      "1-after": {
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-scene-prefix-accounting-release-20261126/capture-profile-after",
+          "/home/blux/de-xr/dome-sculpt/artifacts/production-sculpt-index-integration-release-20261126/native-default/sculpt/accepted.dsculpt"
+        ],
+        "started": 1795666330.7692406,
+        "timeout_seconds": 400,
+        "RSS_limit_bytes": 4294967296,
+        "virtual_AS_cap": null,
+        "pid": 4,
+        "start": 84425583,
+        "pgrp": 4,
+        "root": {
+          "pid": 4,
+          "start": 84425583,
+          "pgrp": 4,
+          "session": 4,
+          "ppid": 2,
+          "state": "R"
+        },
+        "known_processes": [
+          {
+            "pid": 4,
+            "start": 84425583,
+            "pgrp": 4,
+            "session": 4,
+            "ppid": 2,
+            "state": "R"
+          }
+        ],
+        "peak_owned_RSS_bytes": 1250615296,
+        "peak_observed_virtual_bytes": 1340284928,
+        "monitor_samples": 687,
+        "signals": [],
+        "exit": 0,
+        "seconds": 7.193607330322266,
+        "exe_sha256": "3a3a5e4dff58f32319dc2305c6d83b30bd581d4068cc1ce6fbe9092104627527",
+        "samples_ms": [
+          1.38332,
+          1.52591,
+          1.46063,
+          1.3178,
+          1.31793,
+          1.32318,
+          1.27883,
+          1.21539,
+          1.20975,
+          1.21955,
+          1.23096,
+          1.21372,
+          1.21272,
+          1.24156,
+          1.20512,
+          1.18028
+        ],
+        "retained_bytes": [
+          375633137,
+          375633137,
+          375633137,
+          375633137,
+          375633137,
+          375633137,
+          375633137,
+          375633137,
+          375633137,
+          375633137,
+          375633137,
+          375633137,
+          375633137,
+          375633137,
+          375633137,
+          375633137
+        ],
+        "median_ms": 1.2362600000000001
+      },
+      "2-after": {
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-scene-prefix-accounting-release-20261126/capture-profile-after",
+          "/home/blux/de-xr/dome-sculpt/artifacts/production-sculpt-index-integration-release-20261126/native-default/sculpt/accepted.dsculpt"
+        ],
+        "started": 1795666337.973278,
+        "timeout_seconds": 400,
+        "RSS_limit_bytes": 4294967296,
+        "virtual_AS_cap": null,
+        "pid": 5,
+        "start": 84426303,
+        "pgrp": 5,
+        "root": {
+          "pid": 5,
+          "start": 84426303,
+          "pgrp": 5,
+          "session": 5,
+          "ppid": 2,
+          "state": "R"
+        },
+        "known_processes": [
+          {
+            "pid": 5,
+            "start": 84426303,
+            "pgrp": 5,
+            "session": 5,
+            "ppid": 2,
+            "state": "R"
+          }
+        ],
+        "peak_owned_RSS_bytes": 1250631680,
+        "peak_observed_virtual_bytes": 1340284928,
+        "monitor_samples": 665,
+        "signals": [],
+        "exit": 0,
+        "seconds": 6.949821710586548,
+        "exe_sha256": "3a3a5e4dff58f32319dc2305c6d83b30bd581d4068cc1ce6fbe9092104627527",
+        "samples_ms": [
+          1.43582,
+          1.41339,
+          1.96077,
+          1.4826,
+          1.45232,
+          1.35482,
+          1.44386,
+          1.51072,
+          1.65586,
+          1.45304,
+          1.33701,
+          1.28611,
+          1.28185,
+          1.32029,
+          1.48953,
+          1.45194
+        ],
+        "retained_bytes": [
+          375633137,
+          375633137,
+          375633137,
+          375633137,
+          375633137,
+          375633137,
+          375633137,
+          375633137,
+          375633137,
+          375633137,
+          375633137,
+          375633137,
+          375633137,
+          375633137,
+          375633137,
+          375633137
+        ],
+        "median_ms": 1.4479
+      },
+      "3-before": {
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-scene-prefix-accounting-release-20261126/capture-profile-before",
+          "/home/blux/de-xr/dome-sculpt/artifacts/production-sculpt-index-integration-release-20261126/native-default/sculpt/accepted.dsculpt"
+        ],
+        "started": 1795666344.9327385,
+        "timeout_seconds": 400,
+        "RSS_limit_bytes": 4294967296,
+        "virtual_AS_cap": null,
+        "pid": 6,
+        "start": 84426999,
+        "pgrp": 6,
+        "root": {
+          "pid": 6,
+          "start": 84426999,
+          "pgrp": 6,
+          "session": 6,
+          "ppid": 2,
+          "state": "R"
+        },
+        "known_processes": [
+          {
+            "pid": 6,
+            "start": 84426999,
+            "pgrp": 6,
+            "session": 6,
+            "ppid": 2,
+            "state": "R"
+          }
+        ],
+        "peak_owned_RSS_bytes": 1250541568,
+        "peak_observed_virtual_bytes": 1340284928,
+        "monitor_samples": 937,
+        "signals": [],
+        "exit": 0,
+        "seconds": 9.810123682022095,
+        "exe_sha256": "d249d992c8430f08865761c0abe9f9d767cd29ac83338b0a40c86cfa1c085112",
+        "samples_ms": [
+          209.025,
+          181.88,
+          166.553,
+          158.864,
+          161.357,
+          177.527,
+          167.953,
+          167.522,
+          168.627,
+          168.318,
+          173.77,
+          170.7,
+          186.896,
+          194.61,
+          182.246,
+          174.476
+        ],
+        "retained_bytes": [
+          375633105,
+          375633105,
+          375633105,
+          375633105,
+          375633105,
+          375633105,
+          375633105,
+          375633105,
+          375633105,
+          375633105,
+          375633105,
+          375633105,
+          375633105,
+          375633105,
+          375633105,
+          375633105
+        ],
+        "median_ms": 172.235
+      }
+    },
+    "before_summary": {
+      "samples": 32,
+      "p50_ms": 170.57049999999998,
+      "p95_ms": 217.558
+    },
+    "after_summary": {
+      "samples": 32,
+      "p50_ms": 1.330095,
+      "p95_ms": 1.65586
+    },
+    "exit": 0
+  },
+  "exact_projects": {
+    "native/sculpt/accepted.dsculpt": {
+      "bytes": 50061799,
+      "sha256": "d32c725a02d3d9291f3208c879f78ecc343c33511de9e10b5c18d93bb95fd694"
+    },
+    "native/sculpt/recovery/ede9030f1ee1ca213fd20767e78b6795-b258be72c0b1bef8183875770dd841a4.dsculpt": {
+      "bytes": 50061799,
+      "sha256": "d32c725a02d3d9291f3208c879f78ecc343c33511de9e10b5c18d93bb95fd694"
+    },
+    "native/sculpt/recovery/265abfcbbe2c7404ed2a0da9d2740847-402e85eb9071607ca63ac9d1e52653fb.dsculpt": {
+      "bytes": 50061799,
+      "sha256": "d32c725a02d3d9291f3208c879f78ecc343c33511de9e10b5c18d93bb95fd694"
+    }
+  },
+  "authorities": {
+    "build.py": {
+      "bytes": 2514,
+      "sha256": "2d43afbd31839fb3da338e16e20e96e744af4ea9f419e012aa10bf6dcc1c7eeb"
+    },
+    "prepare.py": {
+      "bytes": 3504,
+      "sha256": "bf4cff5a83d41a5c1bc938327e65085d0f2f1a9b5d9902545adcdc84d07c0c3c"
+    },
+    "capture-profile.cpp": {
+      "bytes": 1506,
+      "sha256": "16d8c3656a33b1e24b9239ec3b22f56917554afeebc327d2eeac290a7ffd5e33"
+    },
+    "build-app.py": {
+      "bytes": 4259,
+      "sha256": "6feffe593683e40b2a8ee07f4b99c9caefe60b3c65c1a17725f63a072360e51d"
+    },
+    "run-native.py": {
+      "bytes": 3360,
+      "sha256": "e0d582143b55e878d4ead7e817b8c504b2bd5b91b714ce28d70a58591e7ebe9f"
+    },
+    "owned_monitor.py": {
+      "bytes": 4859,
+      "sha256": "b510ef5655e3214bd38e7b5f56022c37a79879070c3733f2dd059bad74f21269"
+    },
+    "build-plan.json": {
+      "bytes": 26300,
+      "sha256": "726603fcf8b09ad56909d9e8cf8f4419e7f77a81efd74b30d40aa129f11d6be9"
+    },
+    "build-status.json": {
+      "bytes": 1522,
+      "sha256": "1a823d7df957cfb12a4f157737fbf16110187e29bf06ebf2a8db8575c70e1244"
+    },
+    "app-build/status.json": {
+      "bytes": 14483,
+      "sha256": "883a899a4d0938912a1a179616f20561fb2f98103099db0a13a84758c5137735"
+    },
+    "native/status.json": {
+      "bytes": 9965,
+      "sha256": "06f8cad5a2428da53b9d16dffecfb73664cc2eb3216371718420957de597f3d3"
+    },
+    "version.log": {
+      "bytes": 60,
+      "sha256": "9455a20a636a6599ace60120261649d3b29dc51fe2c774305994879190e7336b"
+    },
+    "capture-profile-after.link.d": {
+      "bytes": 7418,
+      "sha256": "548d8e54bae8f8989833454d9344b5dbe075b37b24d347b3afaa509047e8931f"
+    },
+    "capture-profile-after.o.d": {
+      "bytes": 15668,
+      "sha256": "1fad13ccfb5a5319e13d9caea235ef0c9ad313db7477842fb4a217e997d7cd2e"
+    },
+    "capture-profile-before.link.d": {
+      "bytes": 7407,
+      "sha256": "74bf9551d286d15d246e1a3e17728e0d36fc7a94f1a551a814e59653909ef3d4"
+    },
+    "capture-profile-before.o.d": {
+      "bytes": 15501,
+      "sha256": "e326df8b5ef054769d12bb7237569d4385abf8e5df842b66202fc831006faabd"
+    },
+    "document-cut.cpp.o.d": {
+      "bytes": 21039,
+      "sha256": "a9c8a86e61886d9e0f5ac01224247de28706422384f84cbbf6997d7bfc579e75"
+    },
+    "document.cpp.o.d": {
+      "bytes": 33717,
+      "sha256": "4c177865f767002ea7416c04d50cf80b116e89796926372a31e5c0b1818fa367"
+    },
+    "dome-sculpt-sculpt-chunk-pipeline-test.link.d": {
+      "bytes": 7443,
+      "sha256": "e487ba29a370fcfcec8af802d77f905cbc02d1c1283ba3d7cfed92e6e15b1a60"
+    },
+    "dome-sculpt-sculpt-independent-workflow.link.d": {
+      "bytes": 7456,
+      "sha256": "09c200bd7a371e1894a3f21ac88c8c5c5039d0f69c938bd54cc3fde8d92756b0"
+    },
+    "material-visibility.cpp.o.d": {
+      "bytes": 25883,
+      "sha256": "32a06d8c3b6595c7493fcc5bd657616d504fa2518251bac37d3aee611dcfb9ca"
+    },
+    "sculpt-chunk-masks.cpp.o.d": {
+      "bytes": 15594,
+      "sha256": "1cf09941d69c74f1bd9deb0fbab5a60eb4d1452e3f2f520ad5f1098a3923eb5c"
+    },
+    "sculpt-chunk-pipeline.cpp.o.d": {
+      "bytes": 23048,
+      "sha256": "ebd07da2361ffcf7f0935357f539174a11aa6dc44bb4ba334890f2c0cf0478f6"
+    },
+    "sculpt-independent-workflow.cpp.o.d": {
+      "bytes": 22537,
+      "sha256": "a06e236be2b05ca6a6903ebee53abd5dfdcc3b8205948b45cb61a4caac93d902"
+    },
+    "sculpt-placed-chunk.cpp.o.d": {
+      "bytes": 16429,
+      "sha256": "dc5739986ec02a98406d2bb1a32f3ca9fbb5bdf38531b23e0f39067454b3e8c0"
+    },
+    "sculpt-placed-chunks.cpp.o.d": {
+      "bytes": 15954,
+      "sha256": "dac5e42f50d530c390cc94b52df243c6a44c62b22e5576cfabf78f6a3dc92445"
+    },
+    "sculpt-scene-chunks.cpp.o.d": {
+      "bytes": 16897,
+      "sha256": "be89c1337f4dcd441fbfca6d68659dd4ec3510dc79bdda9068516b109a61c0e8"
+    },
+    "app-build/app.cpp.o.d": {
+      "bytes": 34513,
+      "sha256": "8eb452721c49c5b9d52eca5711365bffdb3d67ba633708eea2a49af8d1986b51"
+    },
+    "app-build/dome-sculpt-sculpt-sustained.link.d": {
+      "bytes": 8879,
+      "sha256": "d51288340d8a6fc6a604e8aa13026bcf0400a7e57b42f7a2a297909b7ba792cb"
+    },
+    "app-build/dome-sculpt.link.d": {
+      "bytes": 14010,
+      "sha256": "fe9eeed011433df9885e95c92aec56472716975b902b5f0ba97719750d9f35e6"
+    },
+    "app-build/render.cpp.o.d": {
+      "bytes": 29202,
+      "sha256": "d065b0fc5cd39375008588cb286c79c1f2ffb22c4d3cbff993edb2c6eba06815"
+    },
+    "app-build/sculpt-sustained.cpp.o.d": {
+      "bytes": 24584,
+      "sha256": "18e8df1337d986240cba162e2834b845d07f9033d5eb8f3553715cd8d97482b7"
+    },
+    "native/mask-0-before.log": {
+      "bytes": 532,
+      "sha256": "8b0ad55663742d31ca007f78709af100a79d22058a8b6c6a993841fea4c59521"
+    },
+    "native/mask-1-after.log": {
+      "bytes": 534,
+      "sha256": "c69f3087067f1ac51b78948a2bd607b9a02e60e227213ee7c5c9d7c67f867b35"
+    },
+    "native/mask-2-after.log": {
+      "bytes": 534,
+      "sha256": "dab2ae85b572a2d89d246be3ab5511de01eba45115632a052c1165a4b6c171e6"
+    },
+    "native/mask-3-before.log": {
+      "bytes": 530,
+      "sha256": "ca2110326232e4df9631c2c71549222772f1542649ec4515095fa6b949dcf84f"
+    },
+    "native/pipeline.log": {
+      "bytes": 7881,
+      "sha256": "3fb72ac3bb1c62d71d3013be86e1a0f57b4ad6816a6461750b95a499439bbd9f"
+    },
+    "native/sculpt.log": {
+      "bytes": 381,
+      "sha256": "3fea6c88b6383a4d9cd57f519a99b4fe98bca303e564517d28bdebd81c6f71a6"
+    },
+    "ds-sculpt-scene-prefix-accounting-native-20261126.journal.txt": {
+      "bytes": 7935,
+      "sha256": "e87ab89ad0cfcbc35f8c9f09903da35294e28a036e230b60e6c3d76997efa177"
+    },
+    "ds-sculpt-scene-prefix-accounting-build-20261126.journal.txt": {
+      "bytes": 414,
+      "sha256": "c1d91d9c5ec52eb88baddb6a583b43d25d08779e4437c49d3d9a69baf88a0290"
+    },
+    "ds-sculpt-scene-prefix-accounting-app-20261126.journal.txt": {
+      "bytes": 640,
+      "sha256": "63e155cf368455f40e3fa8a126d93d778a122f3d14f72628ec72ed5bad916549"
+    }
+  },
+  "archive": {
+    "file": "sculpt-scene-prefix-accounting-20261126.tar.xz",
+    "bytes": 22424,
+    "sha256": "52625c4e94df589dbc7bcd16ba16e1db4374005b99987dbfd4aa42307b8979b2"
+  }
+}

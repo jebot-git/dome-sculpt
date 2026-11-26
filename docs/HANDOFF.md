@@ -212,9 +212,43 @@ changed index header. The integrated Release native cohort passes all 285
 checks with the default allocator. The full sculpt case peaks at 3,554,258,944
 owned RSS bytes and produces the same native Save and two recovery files.
 Read [the integrated native receipt](validation/production-sculpt-index-integration-20261126.json).
-The separate component Arc run passed the history and stale-generation checks
-at the earlier failure boundary in its first repetition. Final sustained and
-integrated graphics qualification remain open.
+The component's [original sustained Arc workflow](SCULPT-INDEPENDENT-ARC-20261126.md)
+now passes all three repetitions, 900 strokes, 360 masks, 6,000 stereo pairs
+and 360 held pairs in 812.33 seconds. It completes three history and
+stale-generation sequences and 42 independent checkpoints under the original
+5 GiB cap. The `ec578e56` integrated App separately passes 14 native Wayland
+checks and 58 public creator synthetic OpenXR checks on Arc. Its own sustained
+run remains separate from the component proof. The earlier `07025cd3` full
+sanitizer sculpt case exceeded 4 GiB after writing the Save and two recovery
+files. The exact integrated build passes five short sanitizer regressions.
+Its full sculpt case reached the successful exact-quota check at 164, then
+stopped at 4,295,278,592 owned RSS bytes in 791.01 seconds under the same
+4 GiB guard.
+Read [the integrated UI and source-regression receipt](validation/production-index-ui-and-source-regressions-20261126.json).
+
+Source candidate `5735ab7f` moves persisted alternate-coordinate paint
+validation ahead of baked-plane allocation. The unowned UV1 substitution
+refuses at the decoder's ownership check, and the legitimate current-corner
+UV Bake still succeeds. The original UV1 emission regression now exercises
+its legacy raster policy explicitly, preserving the individual texel,
+source, history and export checks. It separately verifies that default
+continuous transport refuses the nearest-sampled discontinuity without
+changing the Document. That source still needs multi-domain continuous
+emission transport for an exact default Bake. The six current Release
+regressions and original broad-suite failures are in the UI and source
+receipt above.
+
+Candidate `50f7abfa` reuses retained geometry charges only for an identical
+immutable owner prefix in the same generation. Current limits, scalar owners
+and placement owners still have their own checks. On the exact four-object
+native project, the median warm mask capture fell from 170.57 ms to 1.33 ms
+and the p95 fell from 217.56 ms to 1.66 ms across 32 samples per build.
+The probes alternated build order and used the default allocator. The
+candidate passes 94 pipeline checks, including exact-quota and one-byte-short
+captures, and all 167 native sculpt checks with byte-identical Save and
+recovery. The matching frontend, renderer and sustained fixture builds
+pass. The App version check also passes. Read
+[the warm-capture validation](validation/sculpt-scene-prefix-accounting-20261126.json).
 Full scope in REQUIREMENTS is unchanged.
 
 ## Source and integration boundary
