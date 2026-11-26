@@ -1427,6 +1427,16 @@ remain open. The separate full Release regression still uses the
 earlier plane-cut snapshot.
 [Creator VRM0 evidence](validation/creator-vrm0-current-20261126.json)
 
+The frozen ASan/UBSan run subsequently passed all 11 cases, including
+both cases still running at the Release checkpoint. All 31 emitted files
+match Release byte for byte. The release viewer's seven Intel Arc
+consumer files also match. The same sanitizer binary passed the
+isolated five-check canonical workflow on Intel Arc and software GL
+with the original readiness deadline. Two earlier Arc readiness failures
+remain in the evidence. Stack samples locate the expensive work in
+CPU source-image sampling inside the native paint composite.
+[Completed sanitizer and format evidence](validation/creator-vrm0-strict-closure-20261126.json)
+
 ## Source and integration boundary
 
 - Main now admits product1bc13125 and public fixturef1e193c7 after complete

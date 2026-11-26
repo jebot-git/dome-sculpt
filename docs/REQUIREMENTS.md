@@ -27,6 +27,7 @@ and independent format checks cover this path. Full rest-edit export,
 affine nonlinear spring refitting, dynamic runtime spring validation
 and physical headset acceptance remain open.
 [Current creator VRM0 evidence](validation/creator-vrm0-current-20261126.json)
+[Completed creator sanitizer and format evidence](validation/creator-vrm0-strict-closure-20261126.json)
 [Earlier shared-placement candidate](validation/creator-vrm-placement-20261126.json)
 
 The painted-grid candidate preserves authored cells exactly when enlarging
