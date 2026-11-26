@@ -22,7 +22,7 @@ int main(int argc,char **argv)try{
  check(old.at("version")==40&&old.at("texture_set_geometry").at("version")==1,"Existing ordinary Scene40 keeps its exact legacy wire form");check(Scene::decode(old).encode()==old,"Existing plain Scene40 replay remains exact");
  auto scene=plain();const auto actor=scene.active().id;const auto a=scene.add("Actual source A",Volume{}),b=scene.add("Actual source B",Volume{}),c=scene.add("Actual cage/source C",Volume{});scene.select(actor);
  for(auto id:{a,b,c}){scene.object(id).mesh_active=true;scene.object(id).painted=std::make_shared<PaintedMesh>(quad(),64);}
- ObjectBakeSettings settings;settings.normal_filter_quality=0;settings.emission_transport=0;scene.object(actor).bake_recipe=capture_bake_recipe(scene,a,settings);
+ ObjectBakeSettings settings;scene.object(actor).bake_recipe=capture_bake_recipe(scene,a,settings);
  check(create_texture_set(scene,actor,std::array<uint64_t,1>{2},"Source-A material",64)==1,"Real creation captures the actual original source-A recipe");
  settings.cage_object=c;scene.object(actor).bake_recipe=capture_bake_recipe(scene,b,settings);
  const auto before=scene.encode();check(before.at("version")==40&&before.at("texture_set_geometry").at("version")==2,"Recipe-owning fields use the actual shared Scene40 codec");
