@@ -10,16 +10,65 @@
 #include <condition_variable>
 #include <iostream>
 #include <unistd.h>
+#include <utility>
 using namespace dome;
 namespace {
-unsigned checks=0;std::atomic_uint calls=0;std::atomic_bool fail=false,gate=false;
-std::mutex mutex;std::condition_variable changed;bool entered=false,released=false;
+unsigned checks=0;
+std::atomic_uint calls=0;
+std::atomic_bool fail=false;
+
+class ReadbackGate {
+public:
+ using Ticket = uint64_t;
+
+ Ticket arm() {
+  std::lock_guard lock(mutex_);
+  if (pending_)
+   throw std::logic_error("Previous readback gate has not entered");
+  pending_ = ++latest_;
+  return pending_;
+ }
+ void wait_for_entry(Ticket ticket) {
+  std::unique_lock lock(mutex_);
+  if (!changed_.wait_for(lock, std::chrono::seconds(30),
+                         [&] { return entered_ >= ticket; }))
+   throw std::runtime_error("Actual aggregate quality boundary did not enter");
+ }
+ void release(Ticket ticket) {
+  std::lock_guard lock(mutex_);
+  released_ = std::max(released_, ticket);
+  changed_.notify_all();
+ }
+ void release_all() {
+  std::lock_guard lock(mutex_);
+  released_ = latest_;
+  changed_.notify_all();
+ }
+ void pause() {
+  std::unique_lock lock(mutex_);
+  const auto ticket = std::exchange(pending_, 0);
+  if (!ticket)
+   return;
+  entered_ = ticket;
+  changed_.notify_all();
+  // A stale worker can still be waking when the next operation is armed.
+  // The release for the old ticket stays valid across that handoff.
+  if (!changed_.wait_for(lock, std::chrono::seconds(30),
+                         [&] { return released_ >= ticket; }))
+   throw std::runtime_error("Quality gate timed out");
+ }
+private:
+ std::mutex mutex_;
+ std::condition_variable changed_;
+ Ticket latest_=0, pending_=0, entered_=0, released_=0;
+};
+ReadbackGate readback;
+struct ReleaseReadback {
+ ~ReleaseReadback() { readback.release_all(); }
+};
+
 void check(bool b,const char*m){++checks;if(!b)throw std::runtime_error(m);std::cout<<"PASS "<<m<<'\n';}
 template<class F>bool refuses(F f){try{f();return false;}catch(const std::exception&e){std::cout<<"REFUSAL "<<e.what()<<'\n';return true;}}
-void arm(){std::lock_guard l(mutex);entered=released=false;gate=true;}
-void await(){std::unique_lock l(mutex);if(!changed.wait_for(l,std::chrono::seconds(30),[]{return entered;}))throw std::runtime_error("Actual aggregate GPU quality boundary did not enter");}
-void release(){std::lock_guard l(mutex);released=true;changed.notify_all();}
-struct Release{~Release(){release();}};
 nlohmann::json ordered(const Volume &v){auto j=v.encode();std::sort(j["samples"].begin(),j["samples"].end());for(auto &l:j["sculpt_layers"])std::sort(l["delta"].begin(),l["delta"].end());if(j.contains("sculpt_mask"))std::sort(j["sculpt_mask"]["values"].begin(),j["sculpt_mask"]["values"].end());return j;}
 Volume fixture(int size=33){
  Volume v(.02f);auto id=v.add_layer("Hidden independent 日本語");v.layer_properties(id,"Hidden independent 日本語",false,true,.37f);v.fill_mask(.37f);
@@ -46,9 +95,13 @@ void ready(Document&d){if(!d.wait_mesh())throw std::runtime_error("Current immut
 extern "C" uint64_t quality_real(SparseFieldSampler*,std::span<const sparse_resample::ErrorQuery>,const std::function<bool()>&) asm("__real__ZN4dome18SparseFieldSampler13maximum_errorESt4spanIKNS_15sparse_resample10ErrorQueryELm18446744073709551615EERKSt8functionIFbvEE");
 extern "C" uint64_t quality_wrap(SparseFieldSampler*s,std::span<const sparse_resample::ErrorQuery>q,const std::function<bool()>&cancelled) asm("__wrap__ZN4dome18SparseFieldSampler13maximum_errorESt4spanIKNS_15sparse_resample10ErrorQueryELm18446744073709551615EERKSt8functionIFbvEE");
 extern "C" uint64_t quality_wrap(SparseFieldSampler*s,std::span<const sparse_resample::ErrorQuery>q,const std::function<bool()>&cancelled){
- ++calls;auto value=quality_real(s,q,cancelled);
- if(gate.exchange(false)){std::unique_lock l(mutex);entered=true;changed.notify_all();if(!changed.wait_for(l,std::chrono::seconds(30),[]{return released;}))throw std::runtime_error("Quality gate timed out");}
- if(fail.load())throw std::runtime_error("Injected post-aggregate quality failure");return value;
+ ++calls;
+ const bool inject_failure = fail.load();
+ const auto value = quality_real(s, q, cancelled);
+ readback.pause();
+ if (inject_failure)
+  throw std::runtime_error("Injected post-aggregate quality failure");
+ return value;
 }
 int main(int argc,char**argv)try{
  auto source=fixture();const auto before=ordered(source);auto owner=source.geometry_owner();auto o=options();
@@ -82,14 +135,67 @@ int main(int argc,char**argv)try{
  fail=true;o=options();check(refuses([&]{resample_sculpt(source,o);})&&ordered(source)==before,"Real aggregate post-readback failure preserves full detached source and never retries on CPU");fail=false;
  auto path=std::filesystem::temp_directory_path()/("dome-quality-"+std::to_string(getpid())+".dsculpt");
  Document d;d.replace(scene(source));ready(d);const auto original=d.copy_scene().encode();const auto paint_owner=d.copy_scene().active().painted;const auto other_owner=d.copy_scene().object(2).volume->geometry_owner();
- Release cleanup;arm();d.change_sculpt_resolution(o);await();check(d.frame().state->asset_busy&&d.frame().state->can_save_after_asset,"Accepted resolution endpoint permits ordered Save during real quality work");auto saved=d.save_async(path);release();saved.get();check(d.wait_asset(),"Accepted aggregate operation and dependent Save drain");ready(d);
+ ReleaseReadback cleanup;
+ const auto accepted = readback.arm();
+ d.change_sculpt_resolution(o);
+ readback.wait_for_entry(accepted);
+ check(d.frame().state->asset_busy&&d.frame().state->can_save_after_asset,"Accepted resolution endpoint permits ordered Save during real quality work");
+ auto saved = d.save_async(path);
+ readback.release(accepted);
+ saved.get();
+ check(d.wait_asset(),"Accepted aggregate operation and dependent Save drain");
+ ready(d);
  auto after=ordered(d.copy_volume());check(d.copy_scene().active().painted->mesh_owner()==paint_owner->mesh_owner()&&d.copy_scene().active().painted->source_maps()==paint_owner->source_maps()&&d.copy_scene().active().painted->encode()==paint_owner->encode()&&d.copy_scene().object(2).volume->geometry_owner()==other_owner,"Actual worker retains nested dormant paint geometry/image owners, exact paint/layers and independent other geometry");check(after==ordered(target)&&ordered(*Scene::load(path).active().volume)==after,"Queued Save captures exact accepted quality result and survives native restart");check(d.undo()&&d.copy_scene().encode()==original&&!d.frame().state->can_undo,"One Undo restores complete original scene and no extra history");check(d.redo()&&ordered(d.copy_volume())==after,"Redo restores exact detached quality result");
- d.undo();ready(d);arm();d.change_sculpt_resolution(o);await();d.cancel_asset_work();release();check(d.wait_asset()&&d.copy_scene().encode()==original&&!d.frame().state->can_undo,"Cancellation after actual aggregate readback publishes no scene/history");
- arm();d.change_sculpt_resolution(o);await();d.replace(Volume(.09f));release();check(d.wait_asset()&&d.copy_volume().voxel_size()==.09f&&!d.frame().state->can_undo,"Stale generation after actual aggregate cannot overwrite newer document");
- d.replace(scene(source));ready(d);fail=true;arm();d.change_sculpt_resolution(o);await();auto failed_save=d.save_async(path);release();check(refuses([&]{failed_save.get();})&&d.wait_asset()&&!d.frame().state->error.empty()&&d.copy_scene().encode()==original&&!d.frame().state->can_undo&&ordered(*Scene::load(path).active().volume)==after,"Post-readback worker failure rejects dependent Save, preserving prior file/scene/paint/source/history");fail=false;
+ d.undo();
+ ready(d);
+ const auto cancelled = readback.arm();
+ d.change_sculpt_resolution(o);
+ readback.wait_for_entry(cancelled);
+ d.cancel_asset_work();
+ readback.release(cancelled);
+ check(d.wait_asset()&&d.copy_scene().encode()==original&&!d.frame().state->can_undo,"Cancellation after actual aggregate readback publishes no scene/history");
+
+ const auto stale = readback.arm();
+ d.change_sculpt_resolution(o);
+ readback.wait_for_entry(stale);
+ d.replace(Volume(.09f));
+ check(d.wait_asset()&&d.copy_volume().voxel_size()==.09f&&!d.frame().state->can_undo,"Replacement publishes without waiting on stale detached readback");
+
+ // Accept the next operation while the old readback remains held. Only the
+ // old ticket opens first, so the next operation must reach its own gate.
+ d.replace(scene(source));
+ ready(d);
+ fail = true;
+ const auto rejected = readback.arm();
+ d.change_sculpt_resolution(o);
+ readback.release(stale);
+ readback.wait_for_entry(rejected);
+ check(d.frame().state->asset_busy&&d.frame().state->error.empty()&&
+       d.copy_scene().encode()==original&&!d.frame().state->can_undo,
+       "Stale readback cannot overwrite the newer accepted operation or document");
+ auto failed_save = d.save_async(path);
+ readback.release(rejected);
+ check(refuses([&]{failed_save.get();})&&d.wait_asset()&&
+       d.frame().state->error=="Injected post-aggregate quality failure"&&
+       d.copy_scene().encode()==original&&!d.frame().state->can_undo&&
+       ordered(*Scene::load(path).active().volume)==after,
+       "Post-readback worker failure rejects dependent Save, preserving prior file/scene/paint/source/history");
+ fail=false;
  d.change_sculpt_resolution(o);check(d.wait_asset()&&ordered(d.copy_volume())==after,"Same-source retry succeeds after injected detached quality failure");
- auto closing=std::make_unique<Document>();closing->replace(scene(source));ready(*closing);arm();closing->change_sculpt_resolution(o);await();auto final_save=closing->save_async(path);
- {std::jthread teardown([&]{closing.reset();});release();final_save.get();}
+
+ auto closing=std::make_unique<Document>();
+ ReleaseReadback release_closing;
+ closing->replace(scene(source));
+ ready(*closing);
+ const auto final = readback.arm();
+ closing->change_sculpt_resolution(o);
+ readback.wait_for_entry(final);
+ auto final_save=closing->save_async(path);
+ {
+  std::jthread teardown([&]{closing.reset();});
+  readback.release(final);
+  final_save.get();
+ }
  check(ordered(*Scene::load(path).active().volume)==after,"Final shutdown drains accepted aggregate result and dependent Save without a stale-source snapshot");std::filesystem::remove(path);
  std::cout<<"PASS "<<checks<<" actual Volume/worker aggregate checks on "<<compute_backend()<<'\n';return 0;
-}catch(const std::exception&e){release();std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
+}catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
