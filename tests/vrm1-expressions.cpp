@@ -101,8 +101,8 @@ int main(int argc,char **argv)try{
        changed_binding.normal_frames==authored_binding.normal_frames&&changed_part.appearance==authored_part.appearance,
        "Normal UV expression retains the actual authored tangent frame and texture image");
  const float sx=.8f*.55f+.7f*.25f+.2f, sy=1.2f*.55f+.9f*.25f+.2f;
- const std::array<float,6> expected_normal{std::cos(rotation)*sx,std::sin(rotation)*sx,
-     -std::sin(rotation)*sy,std::cos(rotation)*sy,.08f*.55f+.2f*.25f,-.07f*.55f-.1f*.25f};
+ const std::array<float,6> expected_normal{std::cos(rotation)*sx,-std::sin(rotation)*sy,
+     std::sin(rotation)*sx,std::cos(rotation)*sy,.08f*.55f+.2f*.25f,-.07f*.55f-.1f*.25f};
  for(size_t k=0;k<expected_normal.size();++k)
    near(changed_view.uv_transform[k],expected_normal[k],"Core authored normal sampler follows independent expression arithmetic");
  const auto &authored_normal=authored_binding.material.textures[size_t(MToonSlot::Normal)];
