@@ -333,6 +333,21 @@ matching Release App passes 10 software OpenXR loader checks covering the
 original projection accept and focus-loss scenarios. Read
 [the projection receipt](validation/dormant-main-and-sculpt-projection-20261126.json).
 
+Candidate `7b009c92` builds the cold sculpt indexes directly from extracted
+tile requests, keeping the same first edge representative and global cell
+order. The former dense paged-ray case reached 16,000,000 work steps before
+the render baseline was ready. The original case now passes all 90 native
+cancel, replacement and shutdown checks with the same limit in Release and
+ASan/UBSan. The strict surface and pipeline cases also pass.
+
+Combined Release `e375b31d` passes all six focused cases and 524 checks,
+including projection, cut retry, the paged-ray test and the four-object
+sculpt workflow. Its accepted Save and two recovery files match the previous
+native outputs byte for byte. All 22 SDF physical export controls pass in a
+separate rerun against its core. The full strict cold-sculpt workflow has a
+separate run. Read
+[the combined authoring receipt](validation/cold-sculpt-and-combined-authoring-20261126.json).
+
 ## Source and integration boundary
 
 - Main now admits product1bc13125 and public fixturef1e193c7 after complete
