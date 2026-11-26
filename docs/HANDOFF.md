@@ -1629,6 +1629,22 @@ The fresh all-target Release build on frozen `c9929606` is running in
 for the existing `ds-native-grid-combined-release-20261126.service` sweep.
 [Coincident ray evidence](validation/coincident-bake-ray-20261126.json)
 
+### VRM0 export regressions on main
+
+Commit `a5a54e91` creates modified VRM0 fixtures before import, so the normal
+importer assigns their material, rig and source identities. The tests preserve
+the bundled creator hash check and its refusal when embedded bytes change.
+The selected-avatar worker exports a painted derivative while ordered Save
+retains the exact editable scene. A missing derived normal frame still refuses
+export and preserves an existing file.
+
+The two CC0 bases pass 179 Release checks. Independent vertex-color and MToon
+consumers pass 63 checks each on software GL and Intel Arc A770, with at most
+one RGB8 level of difference. All 15 consumer VRM files are byte-identical
+across those profiles. These three Release tests pass against the current
+product archives. The sanitizer replay and integrated all-case sweep continue.
+[VRM0 export evidence](validation/vrm-derived-source-20261126.json)
+
 ## Source and integration boundary
 
 - Main now admits product1bc13125 and public fixturef1e193c7 after complete

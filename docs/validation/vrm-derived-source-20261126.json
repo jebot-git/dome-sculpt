@@ -1,0 +1,116 @@
+{
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "fixture": "a5a54e91ef4f9b843f3303472b4d7a7f8c34a699",
+  "product": "c99296063b937f9d4d323e9ab995552980165416",
+  "scope": "Standalone native Release and isolated EGL consumer regressions using source-identical product archives. Independent consumers include the actual OpenGL drivers specified for each run. No physical OpenXR or all-case result.",
+  "profiles": {
+    "software": {
+      "identity": {
+        "source": "a5a54e91ef4f9b843f3303472b4d7a7f8c34a699",
+        "mode": "software",
+        "product_base": "c99296063b937f9d4d323e9ab995552980165416",
+        "archives": {
+          "libdome-sculpt-core.a": "bccbefb77bb8700a9954558480bf8e3fce2d7bfcd5802cabf9e2b395b7c6356a",
+          "libdome-sculpt-render.a": "3ed9bc450ba6c135a17f9336d8462159007c3400a56f85926dd773d72791c53c",
+          "libdome-sculpt-xr.a": "1b47a1f80ff7bdcf45ae29300b350a02176ed5f6ae61d98c976c92e6f9d15d4f"
+        }
+      },
+      "cases": {
+        "vrm": {
+          "exit": 0,
+          "executable_sha256": "c9be8942b60c2fc8a28f0edbcbc5d1399926b48966086749af5efbceb197e74f",
+          "log_sha256": "56daf70c2c5009f8627c4272e4f46f4fd82a1d00fc18a6c7e0200b0eb82e673b",
+          "checks": 179
+        },
+        "source-color-vrm": {
+          "exit": 0,
+          "executable_sha256": "3edc0a01a16ef6940d32f6b8f76fed2c0cf1aac6db1198c83e8eef355916dfce",
+          "log_sha256": "1172126e4165aed3b9488dedf397a93e0d6ed825b80e788f3f30f6fa1ec71566",
+          "checks": 42,
+          "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+          "maximum_comparison_rgb8": 1
+        },
+        "vrm-role-consumer": {
+          "exit": 0,
+          "executable_sha256": "7398254382c4f1ec31e16e11467e257c17f084a1cda5c76eb7af95264e7d7afa",
+          "log_sha256": "1877dae87a005dad7e8d8e49da2cc5c20a30f028366e653d3c3dcded7bcda9ee",
+          "checks": 21,
+          "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+          "maximum_comparison_rgb8": 1
+        }
+      }
+    },
+    "arc": {
+      "identity": {
+        "source": "a5a54e91ef4f9b843f3303472b4d7a7f8c34a699",
+        "mode": "arc",
+        "product_base": "c99296063b937f9d4d323e9ab995552980165416",
+        "archives": {
+          "libdome-sculpt-core.a": "bccbefb77bb8700a9954558480bf8e3fce2d7bfcd5802cabf9e2b395b7c6356a",
+          "libdome-sculpt-render.a": "3ed9bc450ba6c135a17f9336d8462159007c3400a56f85926dd773d72791c53c",
+          "libdome-sculpt-xr.a": "1b47a1f80ff7bdcf45ae29300b350a02176ed5f6ae61d98c976c92e6f9d15d4f"
+        }
+      },
+      "cases": {
+        "source-color-vrm": {
+          "exit": 0,
+          "executable_sha256": "3edc0a01a16ef6940d32f6b8f76fed2c0cf1aac6db1198c83e8eef355916dfce",
+          "log_sha256": "b5940c25b584e52420c8d1303e85bf16cffbb7c5d04fd1cf1b55ca823af2d04a",
+          "checks": 42,
+          "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+          "maximum_comparison_rgb8": 1
+        },
+        "vrm-role-consumer": {
+          "exit": 0,
+          "executable_sha256": "7398254382c4f1ec31e16e11467e257c17f084a1cda5c76eb7af95264e7d7afa",
+          "log_sha256": "43237f45474b13b6fda45807067f9736659739bf68f07bb29d2337c3e925a893",
+          "checks": 21,
+          "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+          "maximum_comparison_rgb8": 1
+        }
+      }
+    }
+  },
+  "identical_consumer_vrms": {
+    "source-color-vrm-0-0.vrm": "212b425bc18e41ea2877b870bddeb62fc720cdd778a2d7a652956e4b219e623c",
+    "source-color-vrm-0-100.vrm": "725cb178702f9b79afb6bfd7d27660043cb96cbe67017c2cee92bc8003b38a68",
+    "source-color-vrm-0-35.vrm": "d55554ed9a5b91b30e489b717b80442ec8eb5ded23f04350f267171f6dd6150a",
+    "source-color-vrm-1-0.vrm": "6f0c1dc952704e17f6f0a10722f2d977aaaf107055716dd198ff260b9f518e80",
+    "source-color-vrm-1-100.vrm": "c1ebff117b666572bb111148312e9c18f4ebe01858c749ac5458b00076b6a0b3",
+    "source-color-vrm-1-35.vrm": "0f63b8b78fb75f8e5e82d58393eb2d7ccee03a7cb065c1f00f110a0aabd4f97b",
+    "source-color-vrm-canonical.vrm": "ec8027c13c3ad5b43df7d7cd51d5287a789f1984ce9e7347259114d601ae1831",
+    "source-color-vrm-colored-source.vrm": "feec1698dcf196793bea03915afe085a17d21fcedd0351651431d81b860b197a",
+    "vrm-role-consumer-alias-source.vrm": "cbe4c0193d9a6fdad9f437f66f0859c260af35a10b2e30a57b629312652a7b10",
+    "vrm-role-consumer-animated-source.vrm": "917bec1bb7a825a7cd11f3d84d37f4ee6bff4277534a4b8dd11630c6aaeb4bd7",
+    "vrm-role-consumer-animated.vrm": "dc3ccb83a1a04cb143a9e99f46392456e7692e355a71fa81d0cfe12b8bda6fac",
+    "vrm-role-consumer-raw.vrm": "93b78b573de79eac5563202a6996350e1d2612738e37915c4a528cf3e6127d43",
+    "vrm-role-consumer-resolved-0.vrm": "8eff38efc7a837e8a7fadad3ac2b2904623f79d1c66c6e46e53077331ddc9c15",
+    "vrm-role-consumer-resolved-100.vrm": "081f269d65569c57fb64f190f300c976776bff518ff0b6ba31b702ad505d9400",
+    "vrm-role-consumer-resolved-35.vrm": "0c126e1376d8e42ed0519e06ab7c6299b2609d0b6f6546d2328eb408a5882542"
+  },
+  "archive": {
+    "name": "vrm-derived-source-20261126.tar.gz",
+    "sha256": "a817bd4bff508de802ca7cd8e6a6fc62fef6bbf31b26d28d56e598762ea8b979",
+    "members": {
+      "arc/identity.json": "7bcdb470b95ce272712ad3e81bac1f317169d7305e82862b999166517998ee1c",
+      "arc/source-color-vrm-compile.log": "f3ebfe82ad7f2b75c1a757fbdf6950e9901d9b06e9e2b1e42944491ac4dcf4bf",
+      "arc/source-color-vrm-link.log": "a4f2057f3f8b511f17ea22fd500c8fd773db7d6dcc6e1862b347bfb132405908",
+      "arc/source-color-vrm.log": "b5940c25b584e52420c8d1303e85bf16cffbb7c5d04fd1cf1b55ca823af2d04a",
+      "arc/status.json": "24dc2afd135ffb2cecb5f93af90cbad79f5ec30677e8089e8cab76e3a168331d",
+      "arc/vrm-role-consumer-compile.log": "2d728df59107e8f62e2a57e416d20cee78f8c31651c4a2a29b122600a1b9e383",
+      "arc/vrm-role-consumer-link.log": "edd889f64a6d705cf0f608e26c135248505c099e29b517757592ec296bd2e5ef",
+      "arc/vrm-role-consumer.log": "43237f45474b13b6fda45807067f9736659739bf68f07bb29d2337c3e925a893",
+      "software/identity.json": "89f65159aa08e17b161620171de08a3c5f37660b764a4998462e2710b03e104b",
+      "software/source-color-vrm-compile.log": "70b499d2575cd872c13b92db74ad16729e5d99df4346cf3585185b93411a3d25",
+      "software/source-color-vrm-link.log": "67ad269ed93091b7c0681eda9b9e5395a175d547c6b53a6bd6bdb21566025a5b",
+      "software/source-color-vrm.log": "1172126e4165aed3b9488dedf397a93e0d6ed825b80e788f3f30f6fa1ec71566",
+      "software/status.json": "30058cda569bba3d6f01607111d9b30569d582e47b6160087db4ec60f3c9f214",
+      "software/vrm-compile.log": "c78dc4547ac50f11f4585a504ab7dc84fc5e8a714ff84fa8eecdccac1f622d39",
+      "software/vrm-link.log": "0aba8f6ef6ce16efd926cfceceab3535970a7ce119e1bac504f510dd030d3168",
+      "software/vrm-role-consumer-compile.log": "4f3548df0b9233fd9b2711fe633add0ef635acd65aab6d91efcd3489e8d60690",
+      "software/vrm-role-consumer-link.log": "6bd1d871cf36a50f87a9b9606b300bdcc70df830d27d8cef3fe14c75c9848d0a",
+      "software/vrm-role-consumer.log": "1877dae87a005dad7e8d8e49da2cc5c20a30f028366e653d3c3dcded7bcda9ee",
+      "software/vrm.log": "56daf70c2c5009f8627c4272e4f46f4fd82a1d00fc18a6c7e0200b0eb82e673b"
+    }
+  }
+}
