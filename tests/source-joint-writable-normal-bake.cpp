@@ -74,5 +74,70 @@ void negatives(){
  try{detail::source_bake_normals(larger.active(),{},limits);}catch(const std::length_error&e){prospective=std::string_view(e.what()).find("prospective working budget")!=std::string_view::npos;}
  std::cout<<"JOINT_QUOTA authority="<<authority<<" caller="<<limits.max_working_bytes<<" polls="<<polls<<std::endl;require(prospective&&polls<16&&larger.encode()==exact,"One byte below the actual joint replay allowance refuses before deep replay and preserves every source byte");
 }
+
+void public_fixture(const std::filesystem::path &out){
+ auto scene=prepared(false);
+ uv(scene);
+ auto &source=scene.active();
+ const auto id=source.id;
+ const auto paint=source.painted;
+ const auto binding=source.material_bindings;
+ source.visible=false;
+ source.name="Prepared writable colour and normals";
+ const auto &domain=*paint->paint_sampling_domain();
+ const auto &basis=*domain.basis();
+ Mesh mesh;
+ for(size_t corner=0;corner<paint->mesh().indices.size();++corner){
+   const auto vertex=paint->mesh().indices[corner];
+   mesh.positions.push_back(paint->mesh().positions[vertex]);
+   mesh.normals.push_back(paint->mesh().normals[vertex]);
+   mesh.uv.push_back(basis.uv[basis.indices[domain.source_corners()[corner]]]);
+   mesh.indices.push_back(uint32_t(corner));
+ }
+ scene.select(target(scene,mesh,false));
+ auto &recipient=scene.active();
+ ColorPreparationOptions color;
+ color.resolve_identity=true;
+ auto prepared_color=prepare_source_colors({recipient.painted,{},recipient.material_bindings,
+      {},recipient.material,{}},color);
+ recipient.painted=std::move(prepared_color.paint);
+ recipient.material_bindings=std::move(prepared_color.material_bindings);
+ scene.validate();
+ require(bool(recipient.painted->color_projection()),"Public Bake target owns prepared PBR colour");
+
+ auto options=settings();
+ options.prepare_colors=false;
+ auto ldr=scene.snapshot();
+ require(bake_object(ldr,id,options).projected>500&&ldr.active().painted->baked()&&
+         !ldr.active().painted->baked()->emission_field&&
+         !ldr.active().painted->baked()->maps.pbr_color.rgba.empty(),
+         "Joint LDR Bake transfers resolved PBR colour without requiring physical emission");
+
+ const auto recipient_id=recipient.id;
+ scene.select(id);
+ stroke(scene);
+ scene.select(recipient_id);
+ scene.save(out/"joint-before.dsculpt");
+ const auto painted=scene.object(id).painted;
+ require(bake_object(scene,id,options).projected>500&&scene.active().painted->baked()&&
+         scene.active().painted->baked()->emission_field&&
+         !scene.active().painted->baked()->maps.pbr_color.rgba.empty()&&
+         scene.object(id).painted==painted&&scene.object(id).material_bindings==binding,
+         "The public workflow preserves the combined source and transfers both PBR colour and FLOAT emission");
 }
-int main(int argc,char**argv)try{if(argc!=2)return 2;const std::filesystem::path out=argv[1];std::filesystem::create_directories(out);for(bool seam:{false,true})for(bool live:{false,true})for(bool repeat:{false,true})joint_source::exercise(seam,live,repeat,out);joint_source::negatives();std::cout<<"PASS "<<joint_source::checks<<" joint source checks\n";return 0;}catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
+}
+
+int main(int argc,char **argv) try{
+ if(argc!=2)return 2;
+ const std::filesystem::path out=argv[1];
+ std::filesystem::create_directories(out);
+ joint_source::public_fixture(out);
+ for(bool seam:{false,true})for(bool live:{false,true})for(bool repeat:{false,true})
+   joint_source::exercise(seam,live,repeat,out);
+ joint_source::negatives();
+ std::cout<<"PASS "<<joint_source::checks<<" joint source checks\n";
+ return 0;
+}catch(const std::exception &error){
+ std::cerr<<"FAIL "<<error.what()<<'\n';
+ return 1;
+}
