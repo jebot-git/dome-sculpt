@@ -134,6 +134,10 @@ struct CompositeRetention {
     if(found!=entries.end()){entries.splice(entries.begin(),entries,found);return;}
     Entry entry;entry.maps=maps;entry.token=token;entry.factors=factors;entry.use=use;entry.derived=(maps->overlay?maps->overlay->storage_bytes():0)+maps->color.rgba.size()+maps->metal_rough.rgba.size()+maps->emission.rgba.size()+maps->normal.rgba.size()+maps->mtoon_normal.rgba.size()+maps->color_coverage.rgba.size()+maps->baked_normal.rgba.size()+maps->baked_coverage.rgba.size()+maps->emission_coverage.rgba.size()+maps->pbr_color.rgba.size();
     entry.base=maps->baked_base.get();
+    // The native packet's storage already accounts for its exact baked base.
+    if (use == CompositeUse::NativeEmission && maps->overlay &&
+        maps->overlay->baked().get() == entry.base)
+      entry.base = nullptr;
     if(maps->source_maps)for(auto slot:{&maps->source_maps->color,&maps->source_maps->metal_rough,&maps->source_maps->emission,&maps->source_maps->normal,&maps->source_maps->occlusion})
       if(slot->image&&std::find(entry.sources.begin(),entry.sources.begin()+entry.count,slot->image.get())==entry.sources.begin()+entry.count)
         entry.sources[entry.count++]=slot->image.get();
@@ -1742,7 +1746,18 @@ std::shared_ptr<const TextureMaps> detail::EmissionExportAccess::preview(const P
     detached=paint.snapshot();detached->composite_cache_=std::move(fresh);detached->composite_token_=token;
     for(auto &layer:detached->layers_)layer.emission_tiles.clear();
   }else{detached=without_emission(paint);safe.emissive={};}
-  auto maps=std::make_shared<TextureMaps>(*detached->composite(safe,cancelled));
+  // Complete the fresh maps before publishing. A short-lived sanitized paint
+  // snapshot has no caller that can reuse a separate cached composite.
+  const bool source_capture = detached->surface_->source_capture_only;
+  const auto &domain = detached->surface_->paint_domain;
+  if (domain && domain->version() == 3)
+    throw std::invalid_argument("Polygon surface preview/export requires its actual current field adapter");
+  auto maps = source_capture ? std::make_shared<TextureMaps>(*detached->composite(safe, cancelled))
+                             : detached->build_composite(safe, cancelled);
+  // The images contain the safe legacy channels. The attached bake remains
+  // the original immutable owner already retained by the HDR packet.
+  if (!source_capture && maps->baked_base)
+    maps->baked_base = packet->baked();
   maps->overlay=std::move(packet);
   // The existing compositor refuses unresolved alternate original coordinates.
   // Do not silently reinterpret those coordinates as the native writable grid.
@@ -3195,7 +3210,7 @@ bool gpu_plain_composite_eligible(uint32_t r,const std::vector<PaintLayer> &laye
  }
  return contributing&&uint64_t(r)*r*contributing<=128*1024*1024;
 }
-std::shared_ptr<const TextureMaps> gpu_plain_composite(uint32_t r,const std::vector<PaintLayer> &layers,
+std::shared_ptr<TextureMaps> gpu_plain_composite(uint32_t r,const std::vector<PaintLayer> &layers,
     const std::vector<int32_t> &padding,const Material &material,const std::function<bool()> &cancelled){
  using namespace paint_compute;checkpoint(cancelled);Input in;auto &p=in.parameters;
  p.resolution=r;p.tiles=((r+31)/32)*((r+31)/32);std::copy(material.color.begin(),material.color.end(),p.color);std::copy(material.emissive.begin(),material.emissive.end(),p.emission);p.metallic=material.metallic;p.roughness=material.roughness;
@@ -3224,9 +3239,9 @@ std::shared_ptr<const TextureMaps> gpu_plain_composite(uint32_t r,const std::vec
  checkpoint(cancelled);return maps;
 }
 }
-std::shared_ptr<const TextureMaps>
+std::shared_ptr<TextureMaps>
 PaintedMesh::build_composite(const Material &material) const {return build_composite(material,{});}
-std::shared_ptr<const TextureMaps>
+std::shared_ptr<TextureMaps>
 PaintedMesh::build_composite(const Material &material,const std::function<bool()> &cancelled) const {
   paint_compute::checkpoint(cancelled);
   if(has_physical_emission()||std::any_of(material.emissive.begin(),material.emissive.end(),[](float v){return v>1;}))throw std::logic_error("Physical emission requires its linear composite adapter");
