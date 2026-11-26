@@ -5,6 +5,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/bake.hpp"
 #include "dome/mesh-processing.hpp"
+#include "dome/normal-sampling.hpp"
 #include "dome/tangents.hpp"
 #include "dome/source-maps.hpp"
 #include "paint-overlay-sample.hpp"
@@ -308,15 +309,18 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
     throw std::invalid_argument("Bake target faces must be ordered, unique triangles in the actual mesh");
   for(const auto &material:source.materials)if(material.maps&&material.maps->normal_projection){
     const auto &maps=*material.maps;
-    if(!source_normals)
-      throw std::invalid_argument("Prepared material source requires its actual separate normal-frame resolver");
+    if(!source_normals.matches_prepared_source(maps))
+      throw std::invalid_argument("Prepared material source requires its actual paired normal-frame resolver");
     const auto &projection=*maps.normal_projection;
     projection.validate(projection.pbr?projection.pbr->width:0);
     if(maps.source_only){
       if(!maps.overlay||!maps.source_maps||maps.baked_base)
         throw std::invalid_argument("Prepared raw material lost its actual separate channel owners");
       projection.validate(maps.overlay->resolution());
-      if(const auto &baked=maps.overlay->baked();baked&&(baked->normal_interpretation!=BakedNormalInterpretation::PreparedAttributes||baked->normal_field||baked->normal_authority))
+      if(const auto &baked=maps.overlay->baked();baked&&
+         (baked->normal_interpretation!=BakedNormalInterpretation::PreparedAttributes||
+          baked->normal_field||(baked->normal_authority&&
+          (!projection.sampling_domain||baked->normal_authority!=projection.sampling_domain->detail))))
         throw std::invalid_argument("Prepared raw material source has a conflicting retained normal event");
     }
   }

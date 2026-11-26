@@ -267,9 +267,23 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
     current.emplace();current->topology=std::shared_ptr<const PolygonMesh>(source.polygon,&source.polygon->topology);
     current->field=source.polygon->colors;
   }
+  const auto target_placement=scene.has_affine_placement(target.id)
+    ? std::optional(detail::placement_frame(scene,target.id)) : std::nullopt;
+  const auto target_world=target_placement?CanvasTransform{}:scene.world_transform(target.id);
+  const auto target_inverse=ob::inverse(target_world);
+  const auto placement=source_affine
+    ? std::optional(detail::placement_frame(scene,source.id)) : std::nullopt;
+  const auto relative=placement?target_inverse:
+      ob::compose(target_inverse,scene.world_transform(source.id));
+  detail::SourceBakeNormalOptions source_normal_options;
+  source_normal_options.cancelled=cancelled;
+  source_normal_options.placement=placement?&*placement:nullptr;
+  const auto source_normals=source.texture_sets?detail::SourceBakeNormalResolver{}:
+      detail::source_bake_normals(source,relative,source_normal_options);
   // Authenticate ordered REST geometry before evaluation. Skin/morph changes
   // positions/normals later, never the source field's corner identity or RGBA.
-  auto source_maps=source.texture_sets?std::shared_ptr<const TextureMaps>{}:detail::raw_bake_source(source,cancelled);
+  auto source_maps=source.texture_sets?std::shared_ptr<const TextureMaps>{}:
+      detail::raw_bake_source(source,cancelled,&source_normals);
   if(!source_maps&&source.mesh_active&&!source.texture_sets)source_maps=source.painted->preview(source.material,cancelled);
   auto source_colors=source.mesh_active&&!source.texture_sets?detail::current_vertex_colors(source.painted->mesh(),current?&*current:nullptr,
       source.appearance.get(),source.material_bindings.get(),source_maps.get(),cancelled):std::vector<PolygonRgba>{};
@@ -316,10 +330,6 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
     if(!source_prepared)high.colors=std::move(source_colors);
   } else
     high.mesh = surface_mesh(*source.volume, cancelled);
-  const auto target_placement=scene.has_affine_placement(target.id)
-    ? std::optional(detail::placement_frame(scene,target.id)) : std::nullopt;
-  const auto target_world=target_placement?CanvasTransform{}:scene.world_transform(target.id);
-  const auto target_inverse=ob::inverse(target_world);
   AffineTransform metric_from_world;
   if(target_placement){
     auto matrix=metric_from_world.matrix();
@@ -327,20 +337,12 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
     for(size_t i=12;i<15;++i)matrix[i]=-world[i];
     metric_from_world=AffineTransform(matrix);
   }
-  const auto placement=source_affine
-    ? std::optional(detail::placement_frame(scene,source.id)) : std::nullopt;
-  const auto relative=placement?target_inverse:
-      ob::compose(target_inverse,scene.world_transform(source.id));
   std::vector<detail::RetainedSourceBakeField> source_fields;
   if(source.texture_sets)source_fields=capture_texture_set_bake_source(high,source,relative,placement,cancelled);
   else{
     high.materials[0].material=source.material;
     high.materials[0].resolved_emission=detail::emission_bake_source(source,cancelled);
   }
-  detail::SourceBakeNormalOptions source_normal_options;source_normal_options.cancelled=cancelled;
-  source_normal_options.placement=placement?&*placement:nullptr;
-  const auto source_normals=source.texture_sets?detail::SourceBakeNormalResolver{}:
-      detail::source_bake_normals(source,relative,source_normal_options);
   std::vector<Tangent> placed_corners;
   if(placement&&!source_normals&&std::any_of(high.materials.begin(),high.materials.end(),[](const auto &field){
        return field.maps&&!field.maps->polygon_surface&&!field.maps->normal.rgba.empty();

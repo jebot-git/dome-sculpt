@@ -4,13 +4,32 @@
 #include <span>
 namespace dome::detail {
 class AffineInteractionFrame;
-// Actual object-space roles after authentic artist-frame/morph/skin transport,
-// placed into the low target's coordinate system. Never a display normal map.
-using SourceBakeNormalResolver=std::function<std::array<Vec3,2>(uint32_t,std::array<float,3>)>;
+class PaintOverlayPacket;
 struct SourceBakeNormalOptions {
  size_t max_working_bytes=256*1024*1024;
  std::function<bool()> cancelled;
  const AffineInteractionFrame *placement=nullptr;
+};
+// Actual artist-frame roles after morph, skin and placement evaluation.
+// Only the capture function can pair a resolver with prepared material data.
+class SourceBakeNormalResolver {
+public:
+ SourceBakeNormalResolver()=default;
+ explicit operator bool() const noexcept { return bool(sample_); }
+ std::array<Vec3,2> operator()(uint32_t triangle,std::array<float,3> bary) const {
+   return sample_(triangle,bary);
+ }
+ bool matches_prepared_source(const TextureMaps &) const noexcept;
+private:
+ using Sample=std::function<std::array<Vec3,2>(uint32_t,std::array<float,3>)>;
+ SourceBakeNormalResolver(Sample sample,std::shared_ptr<const PaintNormalProjection> projection,
+     std::shared_ptr<const PaintOverlayPacket> packet)
+   :sample_(std::move(sample)),projection_(std::move(projection)),packet_(std::move(packet)){}
+ Sample sample_;
+ std::shared_ptr<const PaintNormalProjection> projection_;
+ std::shared_ptr<const PaintOverlayPacket> packet_;
+ friend SourceBakeNormalResolver source_bake_normals(
+     const SculptObject &,CanvasTransform,const SourceBakeNormalOptions &);
 };
 bool affine_source_normal_supported(const SculptObject &) noexcept;
 SourceBakeNormalResolver source_bake_normals(const SculptObject &,CanvasTransform,
