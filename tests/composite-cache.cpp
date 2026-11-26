@@ -82,6 +82,45 @@ int main(int argc,char**argv)try{
         "Baked payloads cannot smuggle derived emission coverage or bypass its separate cache accounting");
   baked_paint->clear_bake();check(baked_paint->preview(material)->source_only&&baked_a->baked_base&&baked_a->baked_normal.rgba[1]==204,"Clearing a bake restores raw eligibility while renderer-held canonical snapshots remain immutable");
   set_paint_composite_cache_budget(0);check(paint_composite_cache_stats().retained_maps==0&&paint_composite_cache_stats().retained_bytes==0,"Zero retention releases complete aliased baked accounting even while readers own old snapshots");set_paint_composite_cache_budget(256*mib);
+  auto hdr = PaintedMesh::from_maps(quad(), shared, 64);
+  auto physical_material = material;
+  physical_material.emissive = {8, .03f, 2.5f};
+  auto hdr_preview = hdr->preview(physical_material);
+  std::weak_ptr<const TextureMaps> prior_frame = hdr_preview;
+  const auto original_color = hdr_preview->color.rgba;
+  hdr_preview.reset();
+  auto restored = hdr->snapshot()->preview(physical_material);
+  check(prior_frame.lock() == restored && restored->overlay &&
+            paint_composite_cache_stats().retained_bytes <= 256*mib,
+        "HDR history restores the same immutable preview after the renderer releases it");
+  check(rejects([&]{ hdr->composite(physical_material); }) &&
+            rejects([&]{ hdr->preview(physical_material, []{ return true; }); }),
+        "Retained HDR previews keep physical and standard keys separate and still honor cancellation");
+  const auto hdr_bytes = paint_composite_cache_stats().retained_bytes;
+  set_paint_composite_cache_budget(hdr_bytes);
+  restored.reset();
+  PaintedMesh pressure(quad(), 64);
+  auto pressure_frame = pressure.composite(material);
+  check(!prior_frame.expired() && !pressure_frame->color.rgba.empty() &&
+            paint_composite_cache_stats().retained_bytes <= hdr_bytes,
+        "One ordinary frame preserves the previous HDR preview within the same retention limit");
+  PaintedMesh additional(quad(), 64);
+  additional.composite(material);
+  check(prior_frame.expired(), "Further ordinary cache pressure can evict the prior HDR preview");
+  set_paint_composite_cache_budget(256*mib);
+  restored = hdr->preview(physical_material);
+  prior_frame = restored;
+  auto updated_geometry = quad();
+  updated_geometry.uv_pins.assign(4, 1);
+  auto rebound = hdr->reparameterize(updated_geometry);
+  check(rebound->preview(physical_material) != restored && hdr->preview(physical_material) == restored,
+        "HDR preview lookup requires the exact geometry owner even across pixel-preserving UV pin changes");
+  set_paint_composite_cache_budget(0);
+  restored.reset();
+  check(prior_frame.expired() && hdr->preview(physical_material)->color.rgba == original_color &&
+            paint_composite_cache_stats().retained_bytes == 0,
+        "Eviction frees the prior HDR preview and rebuilding restores the exact pixels");
+  set_paint_composite_cache_budget(256*mib);
   struct Profile {std::vector<std::shared_ptr<PaintedMesh>> paint;std::vector<Material> material;};std::vector<Profile> profiles;
   for(int arg=1;arg<argc;++arg){auto path=std::filesystem::path(argv[arg]);auto id=path.filename().string().find("female")!=std::string::npos?"vroid-beta-female":"vroid-beta-male";auto creator=create_humanoid(humanoid_baseline_defaults(id),{},path.parent_path().parent_path());Profile profile;
     for(auto &part:creator.parts){PaintSurfaceOptions options;options.policy=PaintUvPolicy::SourceAuthored;profile.paint.push_back(PaintedMesh::from_maps(part.mesh,part.source_maps,256,options));auto m=white();m.color=part.color;m.roughness=part.roughness;profile.material.push_back(m);}profiles.push_back(std::move(profile));
