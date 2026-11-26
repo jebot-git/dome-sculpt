@@ -135,7 +135,8 @@ double edge(std::array<float,2> a,std::array<float,2> b,std::array<float,2> p) {
 bool top_left(std::array<float,2> a,std::array<float,2> b) {
   return b[1]>a[1]||(b[1]==a[1]&&b[0]<a[0]);
 }
-void validate(const Mesh &low,const BakeSource &source,const BakeOptions &o) {
+void validate(const Mesh &low,const BakeSource &source,const BakeOptions &o,
+              std::span<const detail::RetainedSourceBakeField> retained) {
   if (low.positions.size()>2'000'000||low.indices.size()/3>2'000'000) throw std::length_error("Low bake mesh exceeds surface limits");
   low.validate(); source.mesh.validate();
   for (auto n:low.normals) if (length(n)<1e-8f) throw std::invalid_argument("Low bake mesh contains a zero normal");
@@ -168,14 +169,21 @@ void validate(const Mesh &low,const BakeSource &source,const BakeOptions &o) {
   }
   if (source.materials.empty()||source.materials.size()>4096||(!source.triangle_materials.empty()&&source.triangle_materials.size()!=source.mesh.indices.size()/3))
     throw std::invalid_argument("Invalid source material assignments");
+  if(!retained.empty()&&retained.size()!=source.materials.size())
+    throw std::invalid_argument("Retained Bake field count differs from the actual materials");
   for (auto id:source.triangle_materials) if (id>=source.materials.size()) throw std::out_of_range("Unknown source triangle material");
-  for (const auto &m:source.materials) {
+  for (size_t field=0;field<source.materials.size();++field) {
+    const auto &m=source.materials[field];
+    const bool owns_field=!retained.empty()&&bool(retained[field].sample);
     m.material.validate();
-    if(!m.resolved_emission&&(detail::hdr_emission(m.material.emissive)||(m.maps&&m.maps->overlay&&m.maps->overlay->native_geometry())))
+    if(!m.resolved_emission&&(!owns_field||!retained[field].physical_emission)&&
+       (detail::hdr_emission(m.material.emissive)||(!owns_field&&m.maps&&m.maps->overlay&&m.maps->overlay->native_geometry())))
       throw std::invalid_argument("Physical emission Bake requires its actual float sampling/output adapter");
+    if(owns_field!=bool(m.maps&&m.maps->polygon_surface))
+      throw std::invalid_argument("Retained polygon Bake maps require their actual source-field resolver");
     if (!std::isfinite(m.normal_strength)||m.normal_strength<0||m.normal_strength>4) throw std::invalid_argument("Invalid normal-map strength");
     if (m.maps) {
-      if(m.maps->overlay&&((m.maps->source_only&&m.maps->overlay->source_maps()!=m.maps->source_maps)||(!m.maps->source_only&&!m.resolved_emission)))
+      if(m.maps->overlay&&((m.maps->source_only&&m.maps->overlay->source_maps()!=m.maps->source_maps)||(!m.maps->source_only&&!m.resolved_emission&&!owns_field)))
         throw std::invalid_argument("Bake overlay differs from its immutable source coordinate owner");
       if(m.maps->source_maps)m.maps->source_maps->validate_surface(source.mesh);
       if(m.maps->baked_base&&m.maps->source_only){
@@ -247,9 +255,10 @@ void pad(BakeResult &result,const BakeOptions &o,std::vector<BakedEmissionSample
 } // namespace
 static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const BakeOptions &o,
     const detail::SourceBakeNormalResolver &source_normals,
-    std::span<const uint32_t> target_triangles = {}) {
+    std::span<const uint32_t> target_triangles = {},
+    std::span<const detail::RetainedSourceBakeField> source_fields = {}) {
   if(o.progress)o.progress(0);
-  cancel(o); validate(low,source,o);
+  cancel(o); validate(low,source,o,source_fields);
   if(!target_triangles.empty() &&
      (target_triangles.back()>=low.indices.size()/3 ||
       std::adjacent_find(target_triangles.begin(),target_triangles.end(),std::greater_equal<>{})!=target_triangles.end()))
@@ -268,7 +277,8 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
         throw std::invalid_argument("Prepared raw material source has a conflicting retained normal event");
     }
   }
-  const bool float_emission=std::any_of(source.materials.begin(),source.materials.end(),[](const auto &m){return bool(m.resolved_emission);});
+  const bool float_emission=std::any_of(source.materials.begin(),source.materials.end(),[](const auto &m){return bool(m.resolved_emission);})||
+      std::any_of(source_fields.begin(),source_fields.end(),[](const auto &field){return field.physical_emission;});
   if(float_emission){
     const size_t field=BakedEmissionField::required_bytes(o.resolution,{128*1024*1024,o.cancelled});
     const uint64_t other=uint64_t(o.resolution)*o.resolution*(13+(o.separate_pbr_color?4:0)+(o.encode_target_normal?4:0));
@@ -283,12 +293,20 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
     return m.maps&&m.maps->source_only&&m.maps->overlay&&m.maps->baked_base&&
         !m.maps->baked_base->maps.normal.rgba.empty()&&m.normal_strength>0;
   });
-  if ((source.tangents.empty() && std::any_of(source.materials.begin(), source.materials.end(),
-        [](const auto &material) { return normal_image(material) && material.normal_strength > 0; })) || raw_baked_normals) {
+  const auto retained_field=[&](size_t index){return !source_fields.empty()&&bool(source_fields[index].sample);};
+  const auto needs_map=[&](size_t index){
+    const auto &material=source.materials[index];
+    return !retained_field(index)&&normal_image(material)&&material.normal_strength>0;
+  };
+  bool needs_high_frames=raw_baked_normals;
+  if(source.tangents.empty())
+    for(size_t field=0;field<source.materials.size();++field)
+      needs_high_frames|=needs_map(field);
+  if (needs_high_frames) {
     high_frames = tangent_corners(source.mesh, o.cancelled);
     for (size_t t = 0; t < source.mesh.indices.size()/3; ++t) {
       auto id = source.triangle_materials.empty() ? 0 : source.triangle_materials[t];
-      if (normal_image(source.materials[id]) && source.materials[id].normal_strength > 0)
+      if (needs_map(id))
         basis(source.mesh, t, normalized(source.mesh.normals[source.mesh.indices[t*3]]), {1,0,0});
     }
   }
@@ -358,9 +376,14 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
       if (!hit||(!o.allow_backfaces&&backface)) { result.coverage[at]=3; ++result.missed; continue; }
       auto material_id=source.triangle_materials.empty()?0:source.triangle_materials[hit->triangle];
       const auto &m=source.materials[material_id];
+      std::optional<detail::RetainedSourceBakeHit> retained;
+      if(retained_field(material_id))
+        retained=source_fields[material_id].sample(hit->triangle,hit->barycentric);
       auto high_uv=source.mesh.uv.empty()?std::array<float,2>{}:texcoord(source.mesh,hit->triangle,hit->barycentric);
+      if(retained)high_uv=retained->paint_uv;
       auto channels=material(m,source.mesh,hit->triangle,hit->barycentric,high_uv); auto high_normal=normalized(hit->normal);
-      if(m.resolved_emission)channels.emission=m.resolved_emission(hit->triangle,hit->barycentric);
+      if(retained&&retained->emission)channels.emission=*retained->emission;
+      else if(m.resolved_emission)channels.emission=m.resolved_emission(hit->triangle,hit->barycentric);
       if(float_emission){emission[at]={{},channels.emission,1};emission[at].validate();}
       auto pbr_color=m.maps&&m.maps->overlay?material(m,source.mesh,hit->triangle,hit->barycentric,high_uv,true).color:channels.color;
       const bool resolved_source=m.maps&&!m.maps->pbr_color.rgba.empty();
@@ -369,7 +392,8 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
         std::array<float,4> tint{};for(int i=0;i<3;++i)for(int c=0;c<4;++c)tint[c]+=source.colors[source.mesh.indices[hit->triangle*3+i]][c]*hit->barycentric[i];
         for(int c=0;c<4;++c){if(!o.separate_pbr_color)channels.color[c]*=tint[c];else if(!resolved_source)pbr_color[c]*=tint[c];}
       }
-      if(!source_normals){
+      if(retained)high_normal=retained->normal;
+      else if(!source_normals){
       if (normal_image(m)&&m.normal_strength>0) {
         TangentFrame tangent;
         if (source.tangents.empty())
@@ -473,7 +497,8 @@ BakeResult bake_mesh(const Mesh &low,const BakeSource &source,const BakeOptions 
  return bake_mesh_impl(low,source,options,{});
 }
 BakeResult detail::bake_mesh_source_normals(const Mesh &low,const BakeSource &source,const BakeOptions &options,
- const SourceBakeNormalResolver &normal,std::span<const uint32_t> target_triangles){
- return bake_mesh_impl(low,source,options,normal,target_triangles);
+ const SourceBakeNormalResolver &normal,std::span<const uint32_t> target_triangles,
+ std::span<const RetainedSourceBakeField> source_fields){
+ return bake_mesh_impl(low,source,options,normal,target_triangles,source_fields);
 }
 } // namespace dome

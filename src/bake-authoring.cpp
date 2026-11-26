@@ -17,32 +17,110 @@
 #include "source4-baked.hpp"
 #include "source-bake-normal.hpp"
 #include "texture-set-bake.hpp"
+#include "texture-set-field-source.hpp"
+#include "polygon-surface-paint.hpp"
+#include "polygon-surface-preview.hpp"
+#include "paint-overlay-sample.hpp"
+#include "emission-authority.hpp"
+#include "emission-paint-access.hpp"
 namespace dome {
 namespace {
-void capture_texture_set_bake_source(BakeSource &high, SculptObject source,
-                                     const std::function<bool()> &cancelled) {
+// Reuse the sealed before/current streams once the hit belongs to its field.
+// Replaying the complete polygon graph per texel would dominate projection.
+Vec3 retained_source_normal(const detail::PolygonSurfacePreview &preview, size_t triangle,
+    std::array<double,3> bary, std::optional<std::array<float,2>> normal_uv) {
+ const auto &normals=preview.normals();
+ const auto &frame=preview.geometric_frames().at(triangle);
+ const auto geometry=[&](size_t offset) {
+  const auto &n=frame[offset],&t=frame[offset+1];
+  const Vec3 normal{n[0],n[1],n[2]},tangent{t[0],t[1],t[2]};
+  return detail::PolygonGeometryFrame{{tangent,cross(normal,tangent)*n[3],normal},n[3]};
+ };
+ const auto before=geometry(0),current=geometry(2);
+ const auto first=triangle*3;
+ if(preview.model()==detail::PolygonSurfaceNormalModel::NativeNOnly) {
+  Vec3 normal;
+  for(size_t k=0;k<3;++k)
+   normal+=detail::normal_bake_math::unit(normals.at(first+k))*float(bary[k]);
+  return detail::transport_polygon_direction(normal,before,current);
+ }
+ if(!normal_uv)throw std::invalid_argument("Retained Bake source lost its normal coordinates");
+ std::array<detail::NormalBakeVertex,3> vertices;
+ for(size_t k=0;k<3;++k) {
+  const auto &t=preview.tangents().at(first+k);
+  vertices[k]=detail::normal_bake_vertex(normals.at(first+k),{t[0],t[1],t[2]},t[3],
+      detail::NormalVertexBitangent::UnitCross);
+ }
+ const auto basis=detail::normal_bake_basis(vertices,bary,detail::NormalFragmentBasis::UnitColumns);
+ PaintSourceTexture texture;
+ texture.image=preview.field_owner()->before()->paint->baked()->normal_field->pbr();
+ texture.wrap_s=texture.wrap_t=33071;texture.min_filter=texture.mag_filter=9729;
+ const auto value=sample_source_texture(texture,(*normal_uv)[0],(*normal_uv)[1],false);
+ Vec3 decoded{value[0]*2-1,value[1]*2-1,value[2]*2-1};
+ if(std::max({std::abs(decoded.x),std::abs(decoded.y),std::abs(decoded.z)})<=1e-20f)decoded={0,0,1};
+ return detail::transport_polygon_normal({basis,vertices.front().w,1},decoded,before,current);
+}
+
+std::vector<detail::RetainedSourceBakeField> capture_texture_set_bake_source(
+    BakeSource &high, SculptObject source, CanvasTransform relative,
+    const std::function<bool()> &cancelled) {
   const auto primary=texture_set_view(source,0);
   const auto collection=std::move(source.texture_sets);
   high.materials.clear();
   high.materials.reserve(collection->additional().size()+1);
   high.triangle_materials.resize(high.mesh.indices.size()/3);
+  std::vector<detail::RetainedSourceBakeField> fields;
+  fields.reserve(collection->additional().size()+1);
+  TextureSetLimits limits;limits.cancelled=cancelled;
   const auto capture=[&](const TextureSetView &field) {
     if (cancelled && cancelled())
       throw std::runtime_error("Texture-set Bake source capture cancelled");
+    if(field.domain->triangles().empty())return;
     const auto index=uint32_t(high.materials.size());
     for (const auto triangle : field.domain->triangles())
       high.triangle_materials[triangle]=index;
-    source.painted=field.painted->snapshot();
-    source.material=field.material;
     auto &material=high.materials.emplace_back();
     material.material=field.material;
-    material.maps=field.painted->preview(field.material,cancelled);
-    material.resolved_emission=detail::emission_bake_source(source,cancelled);
+    auto &resolved=fields.emplace_back();
+    if(!field.source) {
+      source.painted=field.painted->snapshot();
+      source.material=field.material;
+      source.material_bindings=field.material_bindings;
+      source.appearance=field.appearance;
+      material.resolved_emission=detail::emission_bake_source(source,cancelled);
+      material.maps=material.resolved_emission
+        ? detail::EmissionExportAccess::preview(*field.painted,field.material,cancelled)
+        : field.painted->preview(field.material,cancelled);
+      return;
+    }
+    const auto paint=detail::texture_set_source_read_view(field,limits);
+    const auto preview=field.source->source_preview();
+    material.maps=detail::PolygonSurfacePaintCodec::preview(*paint,field.material_bindings,
+        field.material,cancelled,preview);
+    const auto packet=material.maps->overlay;
+    resolved.physical_emission=detail::overlay_uses_float_emission(*packet)||
+        detail::hdr_emission(field.material.emissive)||detail::physical_emission(*field.material_bindings);
+    const auto background=field.material_bindings->physical_emission.value_or(field.material.emissive);
+    resolved.sample=[owner=field.source,preview,limits,relative,background,
+        emission=resolved.physical_emission?packet:nullptr](uint32_t triangle,std::array<float,3> weights) {
+      const std::array<double,3> bary{weights[0],weights[1],weights[2]};
+      const auto point=owner->sample(triangle,bary,limits);
+      const auto local=retained_source_normal(*preview,triangle,bary,point.normal_uv);
+      const auto normal=ob::rotate(relative.orientation,{local.x,local.y,local.z});
+      detail::RetainedSourceBakeHit result{point.paint_uv,{normal.x,normal.y,normal.z},{}};
+      if(emission) {
+        const auto values=detail::sample_overlay_values(*emission,point.paint_uv[0],point.paint_uv[1],false);
+        result.emission=BakedEmissionSample{{values[2][0],values[2][1],values[2][2]},
+            {values[4][0],values[4][1],values[4][2]},values[3][3]}.resolve(background,1);
+      }
+      return result;
+    };
   };
   capture(primary);
   for (const auto &field : collection->additional())
     capture({field.id,field.name,field.painted,field.material,field.appearance,
              field.material_bindings,field.bake_recipe,field.domain,field.source});
+  return fields;
 }
 } // namespace
 ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
@@ -92,7 +170,7 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
     throw std::invalid_argument("Choose a different source object for baking");
   if (!target.visible || target.locked || !target.mesh_active || !target.painted)
     throw std::logic_error("Show, unlock and prepare the target painting mesh before baking");
-  if(source.mesh_active&&source.painted&&
+  if(!source.texture_sets&&source.mesh_active&&source.painted&&
       source.painted->baked()&&source.painted->baked()->normal_field)
     throw std::invalid_argument("Select a source without prepared normal attributes for this bake; source-frame transport is required and both objects are retained");
   if(!std::isfinite(settings.color_error)||settings.color_error<0||settings.color_error>1)
@@ -132,7 +210,7 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
       target.appearance.get(),target.material_bindings.get(),target_maps.get(),cancelled)
       :detail::source_vertex_colors(target.appearance.get(),target.painted->mesh().positions.size(),cancelled);
   auto nonidentity=[](const auto &colors){return std::any_of(colors.begin(),colors.end(),[](auto c){return c!=std::array<float,4>{1,1,1,1};});};
-  const bool source_prepared=source.mesh_active&&source.painted->color_projection();
+  const bool source_prepared=source.mesh_active&&!source.texture_sets&&source.painted->color_projection();
   const bool target_prepared=bool(target.painted->color_projection());
   const bool separate=target_prepared||settings.prepare_colors;
   if(!separate&&(source_prepared||nonidentity(source_colors)||nonidentity(target_colors)))
@@ -164,13 +242,14 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
     if(!source_prepared)high.colors=std::move(source_colors);
   } else
     high.mesh = surface_mesh(*source.volume, cancelled);
-  if(source.texture_sets)capture_texture_set_bake_source(high,source,cancelled);
+  const auto target_world = scene.world_transform(target.id);
+  const auto relative = ob::compose(ob::inverse(target_world), scene.world_transform(source.id));
+  std::vector<detail::RetainedSourceBakeField> source_fields;
+  if(source.texture_sets)source_fields=capture_texture_set_bake_source(high,source,relative,cancelled);
   else{
     high.materials[0].material=source.material;
     high.materials[0].resolved_emission=detail::emission_bake_source(source,cancelled);
   }
-  auto target_world = scene.world_transform(target.id);
-  auto relative = ob::compose(ob::inverse(target_world), scene.world_transform(source.id));
   detail::SourceBakeNormalOptions source_normal_options;source_normal_options.cancelled=cancelled;
   const auto source_normals=source.texture_sets?detail::SourceBakeNormalResolver{}:
       detail::source_bake_normals(source,relative,source_normal_options);
@@ -226,7 +305,7 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   const auto retained_uv=target.material_bindings?target.material_bindings->canonical_uv:nullptr;
   if(retained_uv&&progress)options.progress=[&](float value){progress(.1f+.4f*value);};
   const auto target_triangles=recipient?recipient->domain->triangles():std::span<const uint32_t>{};
-  auto result = detail::bake_mesh_source_normals(low_mesh,high,options,source_normals,target_triangles);
+  auto result = detail::bake_mesh_source_normals(low_mesh,high,options,source_normals,target_triangles,source_fields);
   std::optional<BakeResult> retained_normal_write;
   if(retained_uv){
     retained_uv->validate_current(target.painted->mesh(),cancelled);
@@ -244,7 +323,7 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
       throw std::length_error("Retained normal rebake lacks aggregate projection/raster budget");
     normal_options.max_rays-=result.rays;normal_options.max_raster_samples-=result.raster_samples;
     if(progress)normal_options.progress=[&](float value){progress(.5f+.4f*value);};
-    retained_normal_write=detail::bake_mesh_source_normals(normal_low,high,normal_options,source_normals);
+    retained_normal_write=detail::bake_mesh_source_normals(normal_low,high,normal_options,source_normals,{},source_fields);
   }
   check();
   if(!result.projected)throw std::runtime_error("No target texels project onto the selected source");

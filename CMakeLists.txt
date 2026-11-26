@@ -5054,6 +5054,17 @@ if(BUILD_TESTING)
   set_tests_properties(dome-sculpt-texture-set-source-export PROPERTIES TIMEOUT 300)
   add_test(NAME texture-set-prepared-recipe-references COMMAND dome-sculpt-texture-set-source-export-test --recipe-reference-remap)
   set_tests_properties(texture-set-prepared-recipe-references PROPERTIES TIMEOUT 300)
+  add_test(NAME texture-set-retained-bake-source COMMAND dome-sculpt-texture-set-source-export-test
+    --retained-bake-source ${CMAKE_CURRENT_BINARY_DIR}/texture-set-retained-bake-source)
+  set_tests_properties(texture-set-retained-bake-source PROPERTIES TIMEOUT 300)
+  if(TARGET dome-sculpt AND TARGET dome-sculpt-test-runtime)
+    add_test(NAME texture-set-retained-source-openxr COMMAND ${Python3_EXECUTABLE}
+      ${CMAKE_CURRENT_SOURCE_DIR}/tests/bake-recipes-xr.py
+      $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime>
+      $<TARGET_FILE:dome-sculpt-texture-set-source-export-test>
+      ${CMAKE_CURRENT_BINARY_DIR}/texture-set-retained-source-openxr --texture-set)
+    set_tests_properties(texture-set-retained-source-openxr PROPERTIES TIMEOUT 600)
+  endif()
   add_executable(dome-sculpt-texture-set-history-test tests/texture-set-history.cpp)
   target_include_directories(dome-sculpt-texture-set-history-test PRIVATE src)
   target_link_libraries(dome-sculpt-texture-set-history-test PRIVATE dome-sculpt-core)
