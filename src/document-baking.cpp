@@ -112,7 +112,7 @@ void Document::queue_clear_bake_locked(AssetSource expected){
     auto &o=scene.active();
     if(o.texture_sets) {
       TextureSetLimits limits;limits.cancelled=cancelled;
-      edit_texture_set(scene,o.id,o.texture_sets->active(),[](PaintedMesh &paint,Material &) {
+      dome::edit_texture_set(scene,o.id,o.texture_sets->active(),[](PaintedMesh &paint,Material &) {
         paint.clear_bake();
         return true;
       },limits);
