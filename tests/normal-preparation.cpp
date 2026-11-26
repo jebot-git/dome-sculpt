@@ -2,9 +2,11 @@
 #include "bake-recipe-capabilities.hpp"
 #include "dome/document.hpp"
 #include "dome/normal-preparation.hpp"
+#include "dome/source-maps.hpp"
 #include "dome/source-uv-bake.hpp"
 #include "cgltf.h"
 #include "normal-preparation-fixtures.hpp"
+#include "import-authoring-fixtures.hpp"
 #include "../src/normal-preparation-cache.hpp"
 #include <iostream>
 #include <cstring>
@@ -15,6 +17,88 @@ void check(bool value,const char *message){if(!value)throw std::runtime_error(me
 bool refuses(auto function){try{function();return false;}catch(const std::exception&){return true;}}
 using normal_preparation_fixture::model;
 const cgltf_accessor *attribute(const cgltf_attribute *a,size_t count,cgltf_attribute_type type){for(size_t n=0;n<count;++n)if(a[n].type==type)return a[n].data;return nullptr;}
+
+void prepared_source_bake(const std::filesystem::path &prefix) {
+  Scene scene;
+  const auto destination=scene.active().id;
+  auto mesh=normal_preparation_fixture::quad();
+  for(auto &p:mesh.positions)p={p.x*.2f-.1f,p.y*.2f-.1f,0};
+  mesh.normals.assign(mesh.positions.size(),{0,0,1});
+  scene.active().mesh_active=true;
+  scene.active().painted=std::make_shared<PaintedMesh>(mesh,64);
+  constexpr std::array<uint8_t,4> normal{211,149,231,255};
+  import_fixture::Fixture fixture;
+  fixture.j["nodes"]={{{"name","Prepared tangent-space source"},{"mesh",0}}};
+  fixture.j["meshes"][0].erase("weights");
+  fixture.j["meshes"][0]["primitives"][0].erase("targets");
+  fixture.j["meshes"][0].erase("extras");
+  fixture.j["meshes"][0]["primitives"][0]["attributes"].erase("COLOR_0");
+  fixture.j["materials"][0]={{"normalTexture",{{"index",0}}}};
+  fixture.j.erase("extensionsUsed");
+  auto &image_view=fixture.j["bufferViews"].at(fixture.j["images"][0]["bufferView"].get<size_t>());
+  fixture.bin.resize(image_view.at("byteOffset").get<size_t>());
+  const auto png=Image{1,1,{normal.begin(),normal.end()}}.png();
+  fixture.bin.insert(fixture.bin.end(),png.begin(),png.end());
+  image_view["byteLength"]=png.size();
+  const auto input=prefix.string()+"-prepared-source.glb";
+  fixture.save(input);
+  ImportAuthoringOptions import;
+  import.paint_resolution=64;
+  auto loaded=prepare_authoring_import(scene,input,import);
+  const auto source=loaded.objects.front();
+  scene=std::move(loaded.scene);
+  auto &object=scene.object(source);
+  object.visible=false;
+  object.locked=true;
+  object.transform.position.z=.02f;
+  auto converted=prepare_source_normals({object.painted,object.appearance,object.material_bindings,
+                                        object.deformation,object.material});
+  object.painted=converted.paint;
+  object.material_bindings=converted.material_bindings;
+  scene.select(destination);
+  const auto baseline=scene.snapshot();
+  const auto before=baseline.encode();
+  ObjectBakeSettings options;
+  options.prepare_normals=true;
+  options.ao_samples=0;
+  options.padding=0;
+  const auto report=bake_object(scene,source,options);
+  const auto baked=scene.active().painted->baked();
+  check(report.projected>3900&&baked&&baked->normal_interpretation==BakedNormalInterpretation::PreparedAttributes,
+        "A genuinely prepared normal source projects into a second prepared target");
+  const auto &image=baked->maps.normal;
+  check(image.width==64&&image.height==64,"Second Bake publishes its complete PBR normal image");
+  // Authored glTF tangent +X with handedness -1 gives a -Y bitangent.
+  // The ordinary target has +X/+Y, so the source Y channel changes sign.
+  const auto wanted=normalized(Vec3{2.f*normal[0]/255-1,1-2.f*normal[1]/255,2.f*normal[2]/255-1});
+  check(length(wanted-Vec3{0,0,1})>.4f,"Independent normal witness distinguishes source detail from a flat fallback");
+  float maximum=0;
+  for(size_t y=8;y<56;++y)for(size_t x=8;x<56;++x){
+    const auto offset=(y*image.width+x)*4;
+    const auto actual=normalized(Vec3{2.f*image.rgba[offset]/255-1,2.f*image.rgba[offset+1]/255-1,
+                                      2.f*image.rgba[offset+2]/255-1});
+    maximum=std::max(maximum,length(actual-wanted));
+  }
+  std::cout<<"Prepared source second Bake maximum normal difference "<<maximum<<'\n';
+  check(maximum<.02f,"Independent texel decoding agrees with the source frame through two Bake steps");
+  auto isolated=scene.snapshot();
+  isolated.object(destination)=baseline.object(destination);
+  check(isolated.encode()==before,"Second Bake preserves every immutable source owner");
+
+  Document worker;
+  worker.replace(baseline);
+  check(worker.wait_mesh(),"Prepared normal source worker publishes its initial mesh");
+  worker.bake_from_object(source,options);
+  const auto path=prefix.string()+"-prepared-source.dsculpt";
+  worker.save_async(path).get();
+  const auto final=scene.encode();
+  check(worker.wait_asset()&&worker.wait_mesh()&&worker.frame().state->error.empty()&&
+        worker.copy_scene().encode()==final&&Scene::load(path).encode()==final,
+        "Public second Bake and immediate ordered Save match the detached source-frame result");
+  check(worker.undo()&&worker.wait_mesh()&&worker.copy_scene().encode()==before&&
+        worker.redo()&&worker.wait_mesh()&&worker.copy_scene().encode()==final,
+        "Second Bake contributes one exact Undo and Redo entry");
+}
 }
 int main(int argc,char **argv)try {
   if(argc==3&&std::string(argv[1])=="--ui-fixture"){
@@ -68,8 +152,15 @@ int main(int argc,char **argv)try {
   auto cleared=restarted.copy_scene();cleared.active().painted=cleared.active().painted->snapshot();cleared.active().painted->clear_bake();cleared.validate();check(cleared.active().painted->normal_projection()&&!cleared.active().painted->baked(),"Clear bake preserves the explicitly prepared intrinsic model and original-state provenance");
   auto prepared_source=restarted.copy_scene();auto &readonly=prepared_source.object(2);const auto &prepared_target=prepared_source.active();
   readonly.painted=prepared_target.painted;readonly.material_bindings=prepared_target.material_bindings;readonly.deformation=prepared_target.deformation;readonly.appearance=prepared_target.appearance;
-  const auto source_before=prepared_source.encode();
-  check(refuses([&]{bake_object(prepared_source,2,settings);})&&prepared_source.encode()==source_before,"Prepared source normals are explicitly guarded until their exact source frame adapter exists; no posed-atlas Mikk substitution is allowed");
+  readonly.transform.position.z=.04f;
+  const auto source_before=prepared_source.snapshot();
+  const auto second=bake_object(prepared_source,2,settings);
+  check(second.projected>3500&&prepared_source.active().painted->baked(),
+        "The existing curved prepared result is usable as a source in another Bake");
+  auto isolated=prepared_source.snapshot();
+  isolated.active()=source_before.active();
+  check(isolated.encode()==source_before.encode(),"Reusing curved prepared normals leaves the source and its recipe intact");
+  prepared_source_bake(prefix);
   const auto before_uv=restarted.copy_scene().encode();restarted.begin_uv();check(restarted.wait_uv()&&restarted.frame().state->uv&&restarted.frame().state->uv->valid,"Prepared normal target enters the real native UV workspace without changing its source interpretation");
   restarted.edit_uv(UvAction::Scale,.9f);check(restarted.wait_uv()&&restarted.frame().state->uv->valid,"A real changed UV draft validates its geometry before source-aware adoption");
   const auto draft_uv=restarted.frame().state->uv->mesh->uv;

@@ -25,7 +25,12 @@ struct Ledger {
  explicit Ledger(const TextureSetLimits&l):limits(l){l.validate();}
  void stop(){if(limits.cancelled&&limits.cancelled())throw std::runtime_error("Texture-set graph validation cancelled");}
  template<class F>void node(unsigned kind,const void*p,size_t depth,F&&body){
-  if(!p)return;stop();const Key key{kind,p};if(depth>64||active.contains(key))throw std::invalid_argument("Cyclic or overdeep retained texture-set owner graph");if(done.contains(key))return;
+  if (!p) return;
+  stop();
+  const Key key{kind,p};
+  if (active.contains(key)) throw std::invalid_argument("Retained texture-set owner graph contains a cycle");
+  if (depth>64) throw std::invalid_argument("Retained texture-set owner graph exceeds its depth limit");
+  if (done.contains(key)) return;
   if(active.size()+done.size()>=8192)throw std::length_error("Retained texture-set metadata graph exceeds bounds");active.insert(key);body();active.erase(key);done.insert(key);
  }
  void charge(size_t&counter,size_t n,size_t unit){if(unit&&n>(limits.maximum_bytes-counter)/unit)throw std::length_error("Texture-set retained owner bytes exceed bounds");counter+=n*unit;}
