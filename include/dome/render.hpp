@@ -2,6 +2,7 @@
 #pragma once
 #define GL_GLEXT_PROTOTYPES
 #include "document.hpp"
+#include "view-clip.hpp"
 #include <GL/gl.h>
 #include <GL/glext.h>
 #include <unordered_map>
@@ -12,7 +13,7 @@ Mat4 model_matrix(CanvasTransform);
 Mat4 view_matrix(ob::Vec3, ob::Quat);
 Mat4 multiply(const Mat4 &, const Mat4 &);
 Mat4 projection(float left, float right, float down, float up,
-                float near = .01f, float far = 100.f);
+                float near = view_near_clip, float far = view_far_clip);
 struct SurfaceTextureLimits {
   size_t max_bytes=1024ull*1024*1024,max_images=1024,max_samplers=128;
 };

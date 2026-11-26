@@ -34,13 +34,17 @@ void Document::create_humanoid_avatar_locked(HumanoidControls controls,std::stri
  const size_t count=(controls.hair_length||controls.hair_volume||controls.fringe)?20:19;
  if(keep&&(scene_.objects().size()>256-count||scene_.groups().size()>=128))
   throw std::logic_error("The scene has no room for another complete avatar");
+ const bool initial=initial_creator_.generation==state_.generation&&initial_creator_.content==content_&&
+   !initial_creator_.navigated&&undo_.empty()&&redo_.empty();
+ auto work=initial?std::make_shared<AssetWork>():std::shared_ptr<AssetWork>{};
  queue_scene_operation_locked("Create humanoid",[controls=std::move(controls),name=std::move(name),keep](Scene&scene,const auto&cancelled){
   if(!keep)scene=Scene{};
   const auto empty=scene.active().id;
   CanvasTransform transform{};transform.position.y=-controls.height*.5f;
   append_humanoid(scene,controls,name,transform,256,cancelled);
   if(!keep)scene.erase(empty);
- },expected,{});
+ },expected,{},work);
+ if(initial)initial_creator_.pending=std::move(work);
 }
 void Document::begin_humanoid_creator(){std::lock_guard lock(model_mutex_);begin_humanoid_creator_locked();}
 void Document::begin_humanoid_creator_locked(){
@@ -93,6 +97,7 @@ void Document::end_humanoid_creator_locked(bool apply,uint64_t session,AssetSour
  }
  Transaction transaction(*this);
  if(state_.controls.parameter==VrParameter::CreatorValue){control_before_.reset();control_changed_=false;state_.controls={};}
+ cancel_initial_creator_fit_locked(); // Cancel never triggers a delayed prior fit.
  state_.creator.reset();++state_.input_epoch;input_.cancel();transaction.rebind();navigation_.reset();
  contact_rearmed_=shape_rearmed_={};state_.selection_release={true,true};state_.error.clear();
  state_.message="Creator cancelled; original scene unchanged";publish_locked(false,false);transaction.commit(false);

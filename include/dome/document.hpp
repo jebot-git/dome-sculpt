@@ -43,12 +43,18 @@ struct SpatialHand {
   float x = 0, y = 0;
   DeviceKind kind = DeviceKind::Controller;
 };
+struct SpatialView {
+  CanvasTransform pose;
+  // OpenXR order: left, right, down, up; radians in the physical eye frame.
+  std::array<float,4> fov{};
+};
 struct SpatialFrame {
   uint64_t sequence = 0;
   double time = 0;
   bool focused = false, head_valid = false;
   CanvasTransform head;
   std::array<SpatialHand, 2> hands{};
+  std::optional<std::array<SpatialView,2>> views;
 };
 struct ObjectInfo {
   uint64_t id;
@@ -496,6 +502,17 @@ private:
   void require_authority_locked(AssetSource) const;
   EditorState state_;
   uint64_t creator_serial_=0;
+  struct InitialCreatorWorkspace {
+    InitialCreatorWorkspace()=default;
+    InitialCreatorWorkspace(uint64_t generation,uint64_t content):generation(generation),content(content){}
+    uint64_t generation=0,content=0;
+    bool navigated=false,seen_focused=false;
+    std::shared_ptr<AssetWork> pending;
+    uint64_t target_generation=0,target_revision=0,target_content=0,target_group=0,target_input_epoch=0;
+  } initial_creator_{1,1};
+  bool fit_initial_creator_locked(const SpatialFrame &);
+  void cancel_initial_creator_fit_locked() noexcept;
+
   bool desktop_ = false, anchored_ = false;
   uint64_t last_volume_ = 0, last_paint_ = 0, content_ = 1, saved_content_ = 1,
            next_content_ = 2;

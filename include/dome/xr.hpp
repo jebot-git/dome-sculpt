@@ -49,7 +49,7 @@ class XrSculpt {
   XrEnvironmentBlendMode blend = XR_ENVIRONMENT_BLEND_MODE_OPAQUE;
   void setup(bool overlay);
   void events();
-  void input(XrTime);
+  void input(XrTime, std::optional<std::array<SpatialView,2>>);
   void finishStroke();
   void cleanup();
 

@@ -79,6 +79,17 @@ blur_visual_reference::Match visual_match(const std::string&name,int eye,int wid
 
 // Creator fixture uses real public actions; generic shouldRender/tracking/rebase events remain unchanged.
 std::string creator_mode(){const auto*p=getenv("DOME_XR_FIXTURE_CREATOR");return p?p:"";}
+#ifdef DOME_CREATOR_INITIAL_CAPTURE
+std::array<XrView,2> creator_initial_views{};
+unsigned creator_initial_view_frame=0;
+#endif
+bool creator_initial_capture_frame(){
+#ifdef DOME_CREATOR_INITIAL_CAPTURE
+ return frame==2||frame==4||frame==318||frame==600||frame==900||frame==1100||frame==1200;
+#else
+ return false;
+#endif
+}
 int creator_sector(){
  if(creator_mode()=="focus"&&frame>124)return -1;
  for(unsigned click:{128,134,141,148,155,162,169,176,183,190,197,204,211,218,225,232,239,246,253,260,267})if(frame>=click-2&&frame<=click)return 1;
@@ -573,7 +584,7 @@ FN(ReleaseSwapchainImage, XrSwapchain p, const XrSwapchainImageReleaseInfo *) {
       for(int y=int(s->height)-1;y>=0;--y)for(unsigned x=0;x<s->width;++x)for(int c=0;c<3;++c)capture.put(char(displayed(bytes[(size_t(y)*s->width+x)*4+c])));
     }
   }
-  if(!creator_mode().empty()&&((creator_mode()=="reopen"&&(frame==2||frame==4))||frame==26||frame==29||frame==37||frame==61||frame==67||frame==73||frame==79||frame==85||frame==89||frame==93||frame==97||frame==115||frame==120||frame==124||frame==130||frame==137||frame==275||frame==279||frame==283||frame==290)){
+  if(!creator_mode().empty()&&(creator_initial_capture_frame()||(creator_mode()=="reopen"&&(frame==2||frame==4))||frame==26||frame==29||frame==37||frame==61||frame==67||frame==73||frame==79||frame==85||frame==89||frame==93||frame==97||frame==115||frame==120||frame==124||frame==130||frame==137||frame==275||frame==279||frame==283||frame==290)){
     if(const auto*path=getenv("DOME_XR_FIXTURE_REPORT")){
       const auto key=std::to_string(frame)+"-"+std::to_string(s->eye);const auto target=std::string(path)+".creator-"+key+".ppm";
       std::ofstream image(target,std::ios::binary);image<<"P6\n"<<s->width<<' '<<s->height<<"\n255\n";for(int y=int(s->height)-1;y>=0;--y)for(unsigned x=0;x<s->width;++x)for(int c=0;c<3;++c)image.put(char(displayed(bytes[(size_t(y)*s->width+x)*4+c])));
@@ -1035,6 +1046,11 @@ FN(EndFrame, XrSession, const XrFrameEndInfo *p) {
       return XR_ERROR_LAYER_INVALID;
     for (int eye = 0; eye < 2; ++eye) {
       auto &v = layer->views[eye];
+#ifdef DOME_CREATOR_INITIAL_CAPTURE
+      if(creator_initial_view_frame!=frame||std::memcmp(&v.pose,&creator_initial_views[eye].pose,sizeof(v.pose))||
+          std::memcmp(&v.fov,&creator_initial_views[eye].fov,sizeof(v.fov)))return XR_ERROR_POSE_INVALID;
+      count("initial_physical_view_matches");
+#endif
       auto *swap = reinterpret_cast<Swap *>(v.subImage.swapchain);
       auto known = std::find_if(chains.begin(), chains.end(),
                                 [swap](const auto &chain) { return chain.get() == swap; });
@@ -1070,6 +1086,13 @@ FN(LocateViews, XrSession, const XrViewLocateInfo *, XrViewState *state,
     p[i].pose = {{0, 0, 0, 1},
                  {(i ? .032f : -.032f) + (field_mode().empty() && frame >= 38 && (cage_mode().empty()&&(mirror_mode().empty()&&expression_mode().empty())&&import_atlas_mode().empty()&&projection_mode().empty()&&rig_fit_mode().empty()) && (polygon_mode().empty()&&corner_uv_mode().empty()) && !selection_fixture() ? -.2f : 0), 1.6f, 0}};
     p[i].fov = {-.6f, .6f, .6f, -.6f};
+#ifdef DOME_CREATOR_INITIAL_CAPTURE
+    creator_initial_views[i]=p[i];creator_initial_view_frame=frame;
+    if(!creator_mode().empty())report["creator_actual_views"].push_back({{"frame",frame},{"eye",i},
+      {"position",{p[i].pose.position.x,p[i].pose.position.y,p[i].pose.position.z}},
+      {"orientation",{p[i].pose.orientation.x,p[i].pose.orientation.y,p[i].pose.orientation.z,p[i].pose.orientation.w}},
+      {"fov",{p[i].fov.angleLeft,p[i].fov.angleRight,p[i].fov.angleDown,p[i].fov.angleUp}}});
+#endif
   }
   return XR_SUCCESS;
 }
