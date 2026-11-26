@@ -2017,10 +2017,35 @@ Release and ASan/UBSan pass 14 focused CTests, reject the foreign-domain
 control, and write identical native projects. Nested DomeD Wayland and
 synthetic OpenXR on software GL and Intel Arc pass 10 frontend checks each.
 A separate ordered edit, normal conversion and cold reopen on the varying
-fixture preserve the exact FLOAT field. The Standard HDR GLB staging limit,
-full integrated regression for this product, and physical headset checks
-remain open.
+fixture preserve the exact FLOAT field. The following checkpoint closes the
+Standard HDR GLB staging limit for this fixture. Full integrated regression
+and physical headset checks remain open.
 [Shared HDR Bake validation](validation/native-shared-hdr-bake-20261127.json)
+
+### Bounded Standard HDR GLB at 2048
+
+Native HDR package5 reads the owning immutable paint raster in place and
+encodes ten exact FLOAT32 OpenEXR channels in ZIP scanline blocks. The
+writer evaluates the same texels for the portable PNG and measured
+emissive strength. The native reader checks actual FLOAT samples, the
+portable fallback metrics and the emitted paint coordinates where needed.
+Existing package versions keep their original aggregate dense preflight.
+Package5 bounds sample work, scanline scratch, encoded EXR and complete
+container storage independently.
+
+The varying 2048-square Bake with an edited shapekey and converted normal
+frame writes a 51,266,256-byte Standard GLB. Release, ASan/UBSan, nested
+DomeD Wayland and synthetic OpenXR on software GL and Intel Arc produce
+identical bytes. The controller checks include focus-loss cancellation.
+The focused native fixture reopens
+the exact project under a 96 MiB image working budget and checks the
+encoded EXR quota. The Khronos validator reports zero errors and one
+warning about the skinned mesh's position in the node hierarchy.
+The default Editable GLB still reaches the cumulative non-emission
+sample limit. Texture-set HDR export, physical headset checks and full
+integrated regression remain open. A separate full Release run builds the
+exact product and waits for the earlier sweep before running the full suite.
+[Bounded Standard HDR GLB validation](validation/native-hdr-standard-streaming-20261127.json)
 
 ## Source and integration boundary
 

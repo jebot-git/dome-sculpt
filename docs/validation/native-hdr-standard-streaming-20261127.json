@@ -1,0 +1,110 @@
+{
+  "archive": {
+    "file": "native-hdr-standard-streaming-20261127.tar.gz",
+    "members": 66,
+    "sha256": "8c6d74556c7e8781e9887d9f5db4df41b8b14b5ffbda44d3b000ff0d7cca9067"
+  },
+  "frontends": {
+    "arc": {
+      "app_sha256": "3f6c853b4ec76c6737f43ab3f8c885655bfc73a1bf73f8904259c5d6335d8e1f",
+      "checks": 10,
+      "exit": 0,
+      "input_sha256": "ffa7df8ffffecc80f9f468e53cef4fbea3f79f4529293a9ce69255c42a9431a9",
+      "invocation": "cee7ea0f89c9494cbaa8060793e972ce",
+      "mode": "arc",
+      "native_sha256": "a02a7d0d51fb2425d542994f5434848f65b36f0d1cf42f0ab25c4b48734f420d",
+      "phase": "complete",
+      "report_sha256": "3b46ec4f34c68717e31664655377cf419e30e4fe031ad98496288af1fd2535f7",
+      "run_script_sha256": "8acd1aa09712493478daf95679a97dca44d0f9370a38425907934263a129b8ce",
+      "runtime_sha256": "40fa5b55ac329cf6dd77a3bdf5a5eac6f5f840d4ef43efd77678c588538fd8e9",
+      "terminal": true
+    },
+    "software": {
+      "app_sha256": "c3cc29254f8bbdcd7c883f1653ca2bb9b92e847667dffd3dbfdf65b90a48cdbc",
+      "checks": 10,
+      "exit": 0,
+      "input_sha256": "ffa7df8ffffecc80f9f468e53cef4fbea3f79f4529293a9ce69255c42a9431a9",
+      "invocation": "9b028fbfcafc4567b8d9e87f2eab8ec6",
+      "mode": "software",
+      "native_sha256": "a02a7d0d51fb2425d542994f5434848f65b36f0d1cf42f0ab25c4b48734f420d",
+      "phase": "complete",
+      "report_sha256": "3b46ec4f34c68717e31664655377cf419e30e4fe031ad98496288af1fd2535f7",
+      "run_script_sha256": "8acd1aa09712493478daf95679a97dca44d0f9370a38425907934263a129b8ce",
+      "runtime_sha256": "bbb5897e8616b8fafdbd9d22a4bba4f06290e278b37782134867d4b4477c1fac",
+      "terminal": true
+    },
+    "wayland": {
+      "app_sha256": "c3cc29254f8bbdcd7c883f1653ca2bb9b92e847667dffd3dbfdf65b90a48cdbc",
+      "checks": 7,
+      "compositor_sha256": "47920142c8c803dcf5adb63ba643d2e347fbdcd1e15ecd8bce7c1a8dd47c0b7e",
+      "compositor_source": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+      "exit": 0,
+      "input_sha256": "ffa7df8ffffecc80f9f468e53cef4fbea3f79f4529293a9ce69255c42a9431a9",
+      "invocation": "f6805a577f8347d08deaf3da75040669",
+      "mode": "wayland",
+      "native_sha256": "a02a7d0d51fb2425d542994f5434848f65b36f0d1cf42f0ab25c4b48734f420d",
+      "phase": "complete",
+      "probe_sha256": "5bf11c670f66bbb68960073878933055b09582e5173ec1e3f472b413956c55aa",
+      "report_sha256": "1479f58dde45a6650ec4a86a27bfa78dbff2a7235cf3bac585efc465832f849d",
+      "run_script_sha256": "c25dc6ada0d181cee466312b60871fc9c1ceffb6a0f8420c3143ec668f2644c6",
+      "terminal": true
+    }
+  },
+  "khronos": {
+    "errors": 0,
+    "report_sha256": "bc8c9b55040d1169fd69a29507a7dea4b67a28822be0cbba9ab74dde0952b419",
+    "warnings": [
+      "NODE_SKINNED_MESH_NON_ROOT"
+    ]
+  },
+  "open": "Editable GLB 512 still reaches its cumulative nonemission sample budget. Full regression and physical headset verification remain open.",
+  "product": "c67c1f401c89d6e99c40fd9097e4517c75fdf8fb",
+  "profiles": {
+    "asan": {
+      "app_sha256": "3f6c853b4ec76c6737f43ab3f8c885655bfc73a1bf73f8904259c5d6335d8e1f",
+      "focused_fixtures": 6,
+      "glb_sha256": "a02a7d0d51fb2425d542994f5434848f65b36f0d1cf42f0ab25c4b48734f420d",
+      "invocation": "536d663f84b8481381a4545666b6f37f",
+      "logs_sha256": {
+        "dome-sculpt-baked-emission-exr-test.log": "8427e3f3976723b59cd1b6fd9e869c4320dcc15d4d4397e187922652b5f6ed9b",
+        "dome-sculpt-baked-emission-workflow-test.log": "868188e915bf596051fff335f1e04730c3bf58aa8283f6276491fa11811c7682",
+        "dome-sculpt-core-archive.log": "dc46a5085d696792a44315f71300c6f5ddbd3a4dee4881ccd2c44150c599767c",
+        "dome-sculpt-emission-codec-archive.log": "c9c08cb7d2c75fd79fa6412fd33943e243760173df3fa998cf82944913a5318a",
+        "dome-sculpt-emission-export-test.log": "7863d61d43280262db8d272f7affefeaf3d117494dd8caab156a025faf8563ef",
+        "dome-sculpt-emission-exr-owned-test.log": "be80d0cf0949331d816e0c307727d8910dbdbac16e4e3e751020d998e6954d54",
+        "dome-sculpt-emission-package-budget-test.log": "576e1b04b8e0df4bdc7fcc47abc464be39832d9c68065dd1116152a095f67dc4",
+        "dome-sculpt-link.log": "fecf8a523dce88ab41ab7e38357b3ebfdc659babb000c41ca345b8cf2268b607",
+        "full-resolution-fixture/compile.log": "e303b9680c95a45685f5e81018df7cedae1a203c12aeccb9477b3af23ec25b33",
+        "full-resolution-fixture/link.log": "830389870bd803b2a6bd65a6078a23f5cc5a827fe63192ea6ee54196adadaca9",
+        "full-resolution-fixture/run.log": "23c73795bdbc75f926ee668141a6d56fc5be0dfc858c2af04932b13cdce379e2",
+        "standard-varied-compile.log": "ef5396d158d5653ff4580a93e98bfb1bac264a2b34c9a110e9065eea35e8a9a2",
+        "standard-varied.log": "aaec0d041a770cf2a7780a31fd9fb208fd22c2c6adccf0764d846633c0f26cdb",
+        "status.json": "bed11cb8aba484198f807adae46af70788abb7504274da9e92ee4254cfcf2f9f"
+      }
+    },
+    "release": {
+      "app_sha256": "c3cc29254f8bbdcd7c883f1653ca2bb9b92e847667dffd3dbfdf65b90a48cdbc",
+      "focused_fixtures": 6,
+      "glb_sha256": "a02a7d0d51fb2425d542994f5434848f65b36f0d1cf42f0ab25c4b48734f420d",
+      "invocation": "3d95f8757a08405cacba37d7c7ca63e9",
+      "logs_sha256": {
+        "dome-sculpt-baked-emission-exr-test.log": "ebc11e0e2c8f399ad1bbc075f3bcb6abd7cd4876de119f7139153c8daf96c9d6",
+        "dome-sculpt-baked-emission-workflow-test.log": "6d33c6cbcb0982a26161e0991592dfbfdac0ba539bf7ea0e2332a9a49e7c6c52",
+        "dome-sculpt-core-archive.log": "47f9528034ac6803c8250c853d79a3e01ac9135d315746c59dbd71fd0c0fecc3",
+        "dome-sculpt-emission-codec-archive.log": "35ec82afd148113d27572e61e14bbe6b37764dffce7ccc274f6069fbef63b880",
+        "dome-sculpt-emission-export-test.log": "9f686ae2033746e029ecc13d7a84cacd7cf0c5586d7c03786dcc1b28ad326330",
+        "dome-sculpt-emission-exr-owned-test.log": "f3983104d6987f6a39962472470cc02eac98adf17be70a1fefc0f6fdd5617325",
+        "dome-sculpt-emission-package-budget-test.log": "7a55e25935f46224cfc2e9e0023edc9eb85094d52312165e9b142bef2b4b7c2e",
+        "dome-sculpt-link.log": "423f25b1e58c2e6e288af2cb4f3e4c93a90b5a36e2a53860601b3509e1932cee",
+        "full-resolution-fixture/compile.log": "3f8629bff08da59b8a4079a6c61f50a8227619b994b440b94dd6667303dc5951",
+        "full-resolution-fixture/link.log": "e5ba1e1d00e1f980fff34c810550decb978aa5e5bed068d4764af2deab917827",
+        "full-resolution-fixture/run.log": "3d68d10d4b23376e31b94374321706c45d7f9e02b20a285b228fb51f953eb278",
+        "standard-varied-compile.log": "e3db689edaa662c39a4636cba176c3bdc7d77052e8d41bbc2999837442ca287e",
+        "standard-varied.log": "ffe35fc1437ab41f97657ce0326fb99eb35a93359f1e3991dbfbca738140d7a8",
+        "status.json": "03daeda6b15f5b1c98b36f03a106dc86f6ddb32f5c3a7b560c607b0852216e56"
+      }
+    }
+  },
+  "scope": "Native 2048-square spatially varying HDR Bake with an edited key and portable normal frame. Bounded FLOAT scanline Standard GLB export and native reopen, with the legacy EXR and container budgets retained.",
+  "source_patch_sha256": "85c31489384f94bb1fd1982893d9910e554be89cacfd68db7a674d77238775ec"
+}
