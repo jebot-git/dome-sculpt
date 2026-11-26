@@ -14,6 +14,7 @@ using Ledger=dome::detail::ContextStoreLedger;
 using Kind=Ledger::Kind;using Domain=Ledger::Domain;
 namespace {
 size_t checks=0,names=0,fences=0,waits=0;bool pending=false;int fence_fault=0,query_fault=0,delete_fault=0;
+GLsync last_fence=nullptr,withheld_fence=nullptr;
 thread_local bool fail_alloc=false;thread_local size_t alloc_point=0,alloc_seen=0;
 void allocation(){if(fail_alloc&&++alloc_seen>=alloc_point)throw std::bad_alloc();}
 void check(bool p,const char*why){++checks;if(!p)throw std::runtime_error(why);}
@@ -36,13 +37,27 @@ void*operator new(size_t n,std::align_val_t a,const std::nothrow_t&)noexcept{try
 extern "C" {
 void __real_glGenBuffers(GLsizei,GLuint*);void __wrap_glGenBuffers(GLsizei n,GLuint*p){names+=size_t(n);__real_glGenBuffers(n,p);}
 void __real_glDeleteBuffers(GLsizei,const GLuint*);void __wrap_glDeleteBuffers(GLsizei n,const GLuint*p){if(delete_fault){--delete_fault;__real_glDeleteBuffers(-1,p);}else __real_glDeleteBuffers(n,p);}
-GLsync __real_glFenceSync(GLenum,GLbitfield);GLsync __wrap_glFenceSync(GLenum a,GLbitfield b){++fences;if(fence_fault){--fence_fault;return __real_glFenceSync(a,1);}return __real_glFenceSync(a,b);}
-GLenum __real_glClientWaitSync(GLsync,GLbitfield,GLuint64);GLenum __wrap_glClientWaitSync(GLsync a,GLbitfield b,GLuint64 c){++waits;if(c)std::abort();if(query_fault){--query_fault;return __real_glClientWaitSync(a,2,0);}if(pending)return GL_TIMEOUT_EXPIRED;return __real_glClientWaitSync(a,b,c);}
+GLsync __real_glFenceSync(GLenum,GLbitfield);GLsync __wrap_glFenceSync(GLenum a,GLbitfield b){++fences;if(fence_fault){--fence_fault;return __real_glFenceSync(a,1);}return last_fence=__real_glFenceSync(a,b);}
+GLenum __real_glClientWaitSync(GLsync,GLbitfield,GLuint64);GLenum __wrap_glClientWaitSync(GLsync a,GLbitfield b,GLuint64 c){++waits;if(c)std::abort();if(query_fault){--query_fault;return __real_glClientWaitSync(a,2,0);}if(pending||a==withheld_fence)return GL_TIMEOUT_EXPIRED;return __real_glClientWaitSync(a,b,c);}
 }
 int main(int argc,char**argv)try{
  Graphics graphics;if(argc>1&&std::string_view(argv[1])=="--hardware")hardware();else check(std::string(reinterpret_cast<const char*>(glGetString(GL_RENDERER))).find("llvmpipe")!=std::string::npos,"Software control uses actual llvmpipe");
  Ledger::Limits limits;limits.material_bytes=512;limits.material_images=4;limits.material_samplers=2;limits.geometry_bytes=512;
  auto ledger=std::make_shared<Ledger>(limits);const auto a=ledger->create_group(),b=ledger->create_group();
+ {
+  std::array<GLuint,3> ids{};
+  for(auto &id:ids){
+   auto store=buffer(ledger,a,64);id=store.name();
+   ledger->seal(true);
+  }
+  // The old fence is genuinely complete. Hold back only the latest result so
+  // the test can prove earlier storage is released during ongoing submission.
+  withheld_fence=last_fence;glFinish();
+  check(!ledger->collect()&&!glIsBuffer(ids[0])&&glIsBuffer(ids[1])&&glIsBuffer(ids[2])&&
+        ledger->usage(a).bytes==128,"New pending submissions preserve a completed older fence and reclaim its actual store");
+  withheld_fence=nullptr;drain(ledger);
+  check(!glIsBuffer(ids[1])&&!glIsBuffer(ids[2]),"Remaining stores are released after their covering fence completes");
+ }
  {
   const auto before=fences;ledger->mark_used();ledger->seal(true);ledger->seal_noexcept(true);
   check(fences==before&&ledger->collect(),"Empty ledger creates no fence for either forced publication or rollback");
@@ -61,9 +76,31 @@ int main(int argc,char**argv)try{
   auto p=buffer(ledger,a,128);const auto id=p.name();std::array<Ledger::Store,1>parents{p};auto view=ledger->create(Kind::Texture,0,Domain::Material,b,parents);glBindTexture(GL_TEXTURE_BUFFER,view.name());glTexBuffer(GL_TEXTURE_BUFFER,GL_R32F,p.name());check(glGetError()==GL_NO_ERROR,"Actual zero-byte TBO view owns genuine buffer dependency");
   p.reset();parents[0].reset();check(ledger->usage(Domain::Material).images==1&&ledger->usage(Domain::Material).bytes==128,"TBO name and underlying requested bytes are independently charged");
   check(ledger->collect()&&glIsBuffer(id),"A genuine TBO alias alone keeps its actual buffer lease charged");
-  view.reset();drain(ledger);check(!glIsBuffer(id),"Completed TBO retirement releases both real view and backing store");
+  view.reset();ledger->seal(true);const auto sealed=fences;
+  auto unrelated=buffer(ledger,a,96);glFinish();
+  check(ledger->collect()&&fences==sealed&&!glIsBuffer(id)&&glIsBuffer(unrelated.name())&&ledger->usage(a).bytes==96,
+        "Completed TBO and backing storage retire using their proven epoch during newer unrelated GL work");
+  unrelated.reset();drain(ledger);
  }
  drain(ledger);
+ {
+  auto parent=buffer(ledger,a,64);const auto id=parent.name();
+  auto view=ledger->create(Kind::Texture,0,Domain::Material,b,std::span(&parent,1));
+  const auto view_id=view.name();
+  glBindTexture(GL_TEXTURE_BUFFER,view_id);
+  glTexBuffer(GL_TEXTURE_BUFFER,GL_R32F,id);
+  check(glGetError()==GL_NO_ERROR,"Actual TBO view accepts a separately retained buffer");
+  view.reset();ledger->seal(true);
+  ledger->mark_used();
+  glBindBuffer(GL_COPY_WRITE_BUFFER,id);
+  const uint32_t pixel=0x40302010;
+  glBufferSubData(GL_COPY_WRITE_BUFFER,0,sizeof(pixel),&pixel);
+  check(glGetError()==GL_NO_ERROR,"The backing buffer receives a later independent upload");
+  parent.reset();ledger->seal(true);withheld_fence=last_fence;glFinish();
+  check(!ledger->collect()&&!glIsTexture(view_id)&&glIsBuffer(id)&&ledger->usage(a).bytes==64,
+        "Older alias retirement preserves the backing buffer's later independent use");
+  withheld_fence=nullptr;drain(ledger);
+ }
  {
   auto p=buffer(ledger,a,128,Domain::Geometry);const auto id=p.name();auto vao=ledger->create(Kind::VertexArray,0,Domain::Geometry,b,std::span(&p,1));glBindVertexArray(vao.name());glBindBuffer(GL_ARRAY_BUFFER,p.name());glVertexAttribPointer(0,1,GL_FLOAT,GL_FALSE,4,nullptr);glEnableVertexAttribArray(0);check(glGetError()==GL_NO_ERROR,"Actual VAO retains typed geometry dependency");p.reset();check(ledger->usage(Domain::Geometry).bytes==128,"Geometry lease stays charged while actual VAO retains its buffer");vao.reset();drain(ledger);check(!glIsBuffer(id)&&ledger->usage(Domain::Geometry).bytes==0,"Completed alias retirement safely releases both real VAO and buffer");
  }

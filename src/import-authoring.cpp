@@ -14,7 +14,7 @@
 #include "dome/projection.hpp"
 #include "dome/source-placement.hpp"
 #include "import-skin.hpp"
-#include "source-tangent-frames.hpp"
+#include "source-normal-sampler-frame.hpp"
 #include "text-utf8.hpp"
 #include "vrm-import.hpp"
 #include "bone-metadata.hpp"
@@ -271,7 +271,8 @@ maps(const ImportedAsset &asset, const ImportedMaterial &m,
 }
 std::shared_ptr<const NormalFrameSet>
 frames(const ImportedPrimitive &p, const ImportedMaterial &m,
-       const Mesh &current, const std::function<bool()> &cancelled) {
+       const Mesh &current, const std::function<bool()> &cancelled,
+       bool core_normal_sampler = false) {
   auto set = std::make_shared<NormalFrameSet>();
   auto f = std::make_shared<NormalFrames>();
   f->origin_vertex_count = uint32_t(current.positions.size());
@@ -286,7 +287,7 @@ frames(const ImportedPrimitive &p, const ImportedMaterial &m,
   if (tangent) {
     const auto coordinate = detail::imported_texture_coordinate(
         m.normal_texcoord, m.normal_transform);
-    if (p.tangents.empty() && m.normal_texture >= 0 &&
+    if (!core_normal_sampler && p.tangents.empty() && m.normal_texture >= 0 &&
         detail::imported_texture_matrix(m.normal_transform) !=
             std::array<float, 6>{1, 0, 0, 1, 0, 0})
       throw std::invalid_argument("Generated normal tangents for transformed "
@@ -295,7 +296,9 @@ frames(const ImportedPrimitive &p, const ImportedMaterial &m,
                      : coordinate == 1
                          ? p.uv1
                          : p.extra_uv_sets.at(uint32_t(coordinate));
-    auto original = detail::source_tangent_frames(p, uv, cancelled);
+    auto original = core_normal_sampler && m.normal_texture >= 0
+                        ? detail::core_source_normal_sampler_frame(p, m, cancelled)
+                        : detail::source_tangent_frames(p, uv, cancelled);
     f->normals = std::move(original.normals);
     f->tangents = std::move(original.base);
     f->generated_tangents = original.generated;
@@ -653,8 +656,6 @@ ImportedAuthoring prepare_authoring_import(const Scene &input,
       auto binding = std::make_shared<SourceMaterialBindings>();
       binding->has_mtoon = false;
       binding->normal_frame = SourceMaterialNormalFrame::OriginalAttributes;
-      binding->normal_frames =
-          frames(p, m, object.painted->mesh(), options.limits.cancelled);
       std::optional<MToonMaterial> imported_mtoon;
       if(vrm.version!=detail::VrmImportVersion::None&&vrm.materials.at(p.material))imported_mtoon=*vrm.materials[p.material];
       else if(p.material){
@@ -662,6 +663,8 @@ ImportedAuthoring prepare_authoring_import(const Scene &input,
         if(raw.contains("extensions")&&raw.at("extensions").contains("VRMC_materials_mtoon"))
           imported_mtoon=MToonMaterial::from_vrm1(raw,asset->textures.size());
       }
+      binding->normal_frames = frames(p, m, object.painted->mesh(),
+                                     options.limits.cancelled, !imported_mtoon);
       if (imported_mtoon) {
         binding->has_mtoon = true;
         binding->material = *imported_mtoon;

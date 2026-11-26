@@ -8,6 +8,7 @@
 #include <array>
 #include <algorithm>
 #include <cstdint>
+#include <iterator>
 #include <limits>
 #include <list>
 #include <memory>
@@ -66,7 +67,11 @@ private:
  };
  Limits limits_;std::array<Usage,2> usage_{};std::vector<Usage> groups_{1};std::list<Node> nodes_;
  size_t metadata_=4096+512;bool terminal_=false,dirty_=false,epoch_exhausted_=false;
- uint64_t used_=0,sealed_=0,completed_=0;GLsync fence_=nullptr;
+ struct Fence {GLsync name=nullptr;uint64_t epoch=0;};
+ uint64_t used_=0,completed_=0;
+ // Keep the oldest completion point while frames submit newer work. The
+ // second slot can coalesce all later submissions without starving older debt.
+ Fence oldest_,latest_;
  enum class Error {None,CreateFence,QueryFence,DeleteStore};Error error_=Error::None;GLenum gl_error_=GL_NO_ERROR;
  static size_t index(Domain d)noexcept{return d==Domain::Material?0:1;}
  static size_t images(Kind k)noexcept{return k==Kind::Texture;}
@@ -81,9 +86,11 @@ private:
   if(!n.name)return;
   switch(n.kind){case Kind::Buffer:glDeleteBuffers(1,&n.name);break;case Kind::Texture:glDeleteTextures(1,&n.name);break;case Kind::Sampler:glDeleteSamplers(1,&n.name);break;case Kind::VertexArray:glDeleteVertexArrays(1,&n.name);break;}
  }
- void drop(Node*n)noexcept{
+ void drop(Node*n,uint64_t epoch)noexcept{
+  n->epoch=std::max(n->epoch,epoch);
   if(--n->refs||terminal_)return;
-  n->retired=true;n->epoch=used_;retire(usage_[index(n->domain)],*n);retire(groups_[n->group],*n);
+  n->retired=true;
+  retire(usage_[index(n->domain)],*n);retire(groups_[n->group],*n);
  }
  bool retired()const noexcept{return usage_[0].retired_stores||usage_[1].retired_stores;}
  void try_seal(bool force)noexcept{
@@ -93,8 +100,12 @@ private:
   GLsync next=nullptr;try{next=glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE,0);}catch(...){record(Error::CreateFence);return;}
   if(!next){record(Error::CreateFence);return;}
   try{glFlush();}catch(...){glDeleteSync(next);record(Error::CreateFence);return;}
-  if(fence_)glDeleteSync(fence_);
-  fence_=next;sealed_=used_;dirty_=false;
+  if(!oldest_.name)oldest_={next,used_};
+  else{
+   if(latest_.name)glDeleteSync(latest_.name);
+   latest_={next,used_};
+  }
+  dirty_=false;
  }
 public:
  ContextStoreLedger():ContextStoreLedger(Limits{}){}
@@ -140,13 +151,27 @@ public:
  bool collect(){
   active();report();if(!retired())return true;
   // Only debt with no completed/presealed coverage needs a newer fence.
-  bool uncovered=false;for(const auto&n:nodes_)if(n.retired&&n.epoch>completed_&&(!fence_||n.epoch>sealed_)){uncovered=true;break;}
+  const auto sealed=latest_.name?latest_.epoch:oldest_.epoch;
+  bool uncovered=false;for(const auto&n:nodes_)if(n.retired&&n.epoch>completed_&&n.epoch>sealed){uncovered=true;break;}
   if(uncovered){try_seal(false);report();}
-  if(fence_){const auto status=glClientWaitSync(fence_,0,0);if(status==GL_WAIT_FAILED){record(Error::QueryFence);report();}if(status==GL_ALREADY_SIGNALED||status==GL_CONDITION_SATISFIED){completed_=sealed_;glDeleteSync(fence_);fence_=nullptr;}}
-  for(auto it=nodes_.begin();it!=nodes_.end();){
-   auto&n=*it;if(!n.retired||n.epoch>completed_){++it;continue;}
+  while(oldest_.name){
+   const auto status=glClientWaitSync(oldest_.name,0,0);
+   if(status==GL_WAIT_FAILED){record(Error::QueryFence);report();}
+   if(status!=GL_ALREADY_SIGNALED&&status!=GL_CONDITION_SATISFIED)break;
+   completed_=oldest_.epoch;
+   glDeleteSync(oldest_.name);
+   oldest_=std::exchange(latest_,{});
+  }
+  // A view can only depend on stores created before it. Retire in reverse
+  // order so newly unreferenced backing stores can use the same proven epoch.
+  auto next=nodes_.end();
+  while(next!=nodes_.begin()){
+   auto it=std::prev(next);
+   auto&n=*it;if(!n.retired||n.epoch>completed_){next=it;continue;}
    delete_name(n);const auto error=glGetError();if(error!=GL_NO_ERROR){if(error_==Error::None){error_=Error::DeleteStore;gl_error_=error;}report();}
-   n.name=0;for(auto*p:n.dependencies)drop(p);remove(usage_[index(n.domain)],n);remove(groups_[n.group],n);metadata_-=n.metadata;it=nodes_.erase(it);
+   n.name=0;for(auto*p:n.dependencies)drop(p,n.epoch);
+   remove(usage_[index(n.domain)],n);remove(groups_[n.group],n);
+   metadata_-=n.metadata;next=nodes_.erase(it);
   }
   return !retired();
  }
@@ -155,14 +180,14 @@ public:
  void clear(bool releaseGL)noexcept{
   if(terminal_)return;
   terminal_=true;
-  if(releaseGL){for(auto kind:{Kind::VertexArray,Kind::Texture,Kind::Sampler,Kind::Buffer})for(auto&n:nodes_)if(n.kind==kind)delete_name(n);if(fence_)glDeleteSync(fence_);}
+  if(releaseGL){for(auto kind:{Kind::VertexArray,Kind::Texture,Kind::Sampler,Kind::Buffer})for(auto&n:nodes_)if(n.kind==kind)delete_name(n);if(oldest_.name)glDeleteSync(oldest_.name);if(latest_.name)glDeleteSync(latest_.name);}
   for(auto&n:nodes_)n.name=0;
-  fence_=nullptr;usage_={};for(auto&u:groups_)u={};dirty_=false;
+  oldest_=latest_={};usage_={};for(auto&u:groups_)u={};dirty_=false;
  }
  void abandon()noexcept{clear(false);}
 };
 inline ContextStoreLedger::Store::Store(const Store&o):ledger_(o.ledger_),node_(o.node_){if(node_)++node_->refs;}
-inline void ContextStoreLedger::Store::reset()noexcept{if(node_){ledger_->drop(node_);node_=nullptr;}ledger_.reset();}
+inline void ContextStoreLedger::Store::reset()noexcept{if(node_){ledger_->drop(node_,ledger_->used_);node_=nullptr;}ledger_.reset();}
 inline GLuint ContextStoreLedger::Store::name()const noexcept{return node_?node_->name:0;}
 inline size_t ContextStoreLedger::Store::bytes()const noexcept{return node_?node_->bytes:0;}
 inline ContextStoreLedger::Kind ContextStoreLedger::Store::kind()const noexcept{return node_?node_->kind:Kind::Buffer;}

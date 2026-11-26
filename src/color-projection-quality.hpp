@@ -97,17 +97,38 @@ inline ColorProjectionBound color_projection_bound(
       // so an interior stationary point cannot be a strict maximum/minimum.
       // On each clipped polygon edge it is quadratic; include its analytic
       // stationary point as well as both endpoints.
-      for(size_t component=0;component<4;++component)for(size_t edge=0;edge<polygon.count;++edge) {
-        const auto a=polygon.points[edge],b=polygon.points[(edge+1)%polygon.count];
-        const Point midpoint{(a[0]+b[0])*.5,(a[1]+b[1])*.5};
-        const double f0=difference(a,component),f1=difference(b,component),fm=difference(midpoint,component);
-        auto &bound=result.maximum_error[component];bound=std::max({bound,std::abs(f0),std::abs(f1)});
-        const double quadratic=2*(f0+f1-2*fm),linear=f1-f0-quadratic;
-        if(quadratic!=0) {
-          const double t=-linear/(2*quadratic);
-          if(t>0 && t<1)bound=std::max(bound,std::abs(difference({a[0]+t*(b[0]-a[0]),a[1]+t*(b[1]-a[1])},component)));
+      // Reuse only a polynomial whose actual operands are identical in THIS
+      // cell. No owner/content certificate survives a cancellation callback.
+      // Every tested/intersecting cell and every representative edge decision
+      // remains the original calculation, including nonuniform neighbor cells.
+      std::array<size_t,4> representative{0,1,2,3};
+      for(size_t component=1;component<4;++component)for(size_t prior=0;prior<component;++prior){
+        bool equal=true;
+        for(auto id:ids)equal&=colors[id][component]==colors[id][prior];
+        for(int k=0;equal&&k<4;++k){
+          const auto sx=std::clamp(x+(k&1),0,width-1),sy=std::clamp(y+(k>>1),0,height-1);
+          const size_t at=(size_t(sy)*width+sx)*4;
+          equal=projection.rgba[at+component]==projection.rgba[at+prior];
+        }
+        if(equal){representative[component]=representative[prior];break;}
+      }
+      std::array<double,4> cell_bound{};
+      for(size_t component=0;component<4;++component){
+        if(representative[component]!=component){cell_bound[component]=cell_bound[representative[component]];continue;}
+        for(size_t edge=0;edge<polygon.count;++edge) {
+          const auto a=polygon.points[edge],b=polygon.points[(edge+1)%polygon.count];
+          const Point midpoint{(a[0]+b[0])*.5,(a[1]+b[1])*.5};
+          const double f0=difference(a,component),f1=difference(b,component),fm=difference(midpoint,component);
+          auto &bound=cell_bound[component];bound=std::max({bound,std::abs(f0),std::abs(f1)});
+          const double quadratic=2*(f0+f1-2*fm),linear=f1-f0-quadratic;
+          if(quadratic!=0) {
+            const double t=-linear/(2*quadratic);
+            if(t>0 && t<1)bound=std::max(bound,std::abs(difference({a[0]+t*(b[0]-a[0]),a[1]+t*(b[1]-a[1])},component)));
+          }
         }
       }
+      for(size_t component=0;component<4;++component)
+        result.maximum_error[component]=std::max(result.maximum_error[component],cell_bound[component]);
     }
   }
   // Conservative floating arithmetic allowance; both fields are unit-valued.

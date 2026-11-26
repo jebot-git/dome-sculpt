@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
+#include "baked-emission-domain.hpp"
 #include "dome/baked-emission.hpp"
 #include "native-read-scope.hpp"
 #include "baked-emission-write-scope.hpp"
@@ -12,12 +13,15 @@ namespace dome::detail {
 // contexts borrow it within the synchronous owning decode, never in snapshots.
 class BakedEmissionReadCapability final {
   friend class dome::Scene;
-  explicit BakedEmissionReadCapability(bool source_bake=false):source_bake_(source_bake) {}
+  explicit BakedEmissionReadCapability(bool source_bake=false,bool domain=false):source_bake_(source_bake),domain_(domain) {}
+  bool domain_=false;mutable size_t admitted_domain_=0;
   bool source_bake_=false;
   mutable size_t admitted_source_bake_=0;
   mutable size_t admitted_ = 0;
 public:
   BakedEmissionReadCapability(const BakedEmissionReadCapability &) = delete;
+  bool domain_allowed()const noexcept{return domain_;}
+  void note_validated_domain()const{if(!domain_)throw std::invalid_argument("Retained emission needs Scene43 ownership");++admitted_domain_;}
   void note_validated_field() const { ++admitted_; }
   bool source_bake_allowed() const noexcept { return source_bake_; }
   void note_source_bake() const { if(!source_bake_)throw std::invalid_argument("Source Bake needs Scene42 ownership");++admitted_source_bake_; }
@@ -27,19 +31,19 @@ inline unsigned baked_legacy_version(const nlohmann::json &b,
   if(!b.is_object()||!b.at("version").is_number_integer())
     throw std::invalid_argument("Invalid baked payload version");
   const auto v=b.at("version").get<int64_t>();
-  if(v!=6){
-    if(v<1||v>5||b.contains("base_version")||b.contains("float_emission"))
+  if(v!=6&&v!=7){
+    if(v<1||v>5||b.contains("base_version")||b.contains("float_emission")||b.contains("emission_domain"))
       throw std::invalid_argument("Unexpected FLOAT baked emission capability");
     return unsigned(v);
   }
-  if(!capability||!b.at("base_version").is_number_integer()||
+  if(!capability||(v==7&&!capability->domain_allowed())||!b.at("base_version").is_number_integer()||
      b.at("base_version").get<int64_t>()<1||b.at("base_version").get<int64_t>()>5||
-     !b.at("float_emission").is_binary()||!b.at("emission").is_binary()||
+     (v==6?(!b.contains("float_emission")||!b.at("float_emission").is_binary()||b.contains("emission_domain")):(b.contains("float_emission")||!b.contains("emission_domain")||!b.at("emission_domain").is_object()))||!b.at("emission").is_binary()||
      !b.at("emission").get_binary().empty())
     throw std::invalid_argument("Baked6 needs genuine Scene41 ownership and no RGB8 emission authority");
   for(const auto &entry:b.items()){
     const auto &key=entry.key();
-    if(key!="version"&&key!="base_version"&&key!="float_emission"&&
+    if(key!="version"&&key!="base_version"&&key!="float_emission"&&key!="emission_domain"&&
        key!="color"&&key!="orm"&&key!="emission"&&key!="normal"&&key!="coverage"&&
        key!="color_interpretation"&&key!="pbr_color"&&key!="normal_interpretation"&&
        key!="mtoon_normal"&&key!="normal_authority"&&key!="normal_field")
@@ -51,6 +55,7 @@ inline size_t baked_float_preflight(const nlohmann::json &b, uint32_t r,
                                      const BakedEmissionReadCapability *capability,
                                      const std::function<bool()> &cancelled={}) {
   (void)baked_legacy_version(b,capability);
+  if(b.at("version")==7)return BakedEmissionDomain::preflight_archive(b.at("emission_domain"),cancelled);
   if(b.at("version")!=6)return 0;
   const auto &bytes=b.at("float_emission").get_binary();
   auto check=[cancelled]{NativeReadScope::check();return cancelled&&cancelled();};

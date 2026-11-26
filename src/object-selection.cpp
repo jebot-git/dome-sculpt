@@ -49,7 +49,7 @@ std::vector<ObjectHierarchyRow> object_hierarchy(const Scene &scene,std::span<co
   append(append,0,0);return rows;
 }
 bool Document::selection_ready_locked() const {
-  return !state_.asset_busy&&!state_.recovery_busy&&!state_.object_grabbing&&!desktop_&&!native_stroke_&&!action_active_locked()&&!state_.polygon&&!state_.cut&&!state_.retopology&&!uv_&&!control_before_&&!import_view_;
+  return !state_.creator&&!state_.asset_busy&&!state_.recovery_busy&&!state_.object_grabbing&&!desktop_&&!native_stroke_&&!action_active_locked()&&!state_.polygon&&!state_.cut&&!state_.retopology&&!uv_&&!control_before_&&!import_view_;
 }
 void Document::selection_hierarchy_locked(){
   std::erase_if(state_.selected_objects,[&](uint64_t id){return std::none_of(scene_.objects().begin(),scene_.objects().end(),[&](const auto&o){return o.id==id;});});

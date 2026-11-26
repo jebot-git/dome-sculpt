@@ -124,12 +124,23 @@ unsigned polygon_stage(){
 std::vector<uint8_t> polygon_motion_before;
 unsigned mask_step=0;bool mask_work_ready=false, mask_work_completed=false, mask_released=false;
 unsigned retopo_step = 0;
+// Give the Base Color panel a released sample between each RGB slider edit.
+unsigned retopo_stage(){return retopo_step<=12?retopo_step:retopo_step<=20?13:retopo_step-8;}
+int color_slider_channel(unsigned step,unsigned first){
+  return step>=first&&step<=first+4&&(step-first)%2==0?int((step-first)/2):-1;
+}
 bool retopo_source_ready = false, retopo_apply_ready = false;
 
 std::string voxel_mode() {
   auto mode = getenv("DOME_XR_FIXTURE_VOXEL");
   return mode ? mode : "";
 }
+bool voxel_menu_seen = false, voxel_undo_seen = false, voxel_menu_visible = false;
+unsigned voxel_menu_wait = 0, voxel_undo_wait = 0;
+bool scene_menu_visible = false, scene_materials_seen = false, scene_sliders_seen = false;
+unsigned scene_material_wait = 0, scene_slider_wait = 0;
+bool uv_atlas_ready = false;
+unsigned uv_atlas_wait = 0;
 XrPath path(std::string text) {
   auto found = paths.find(text);
   if (found != paths.end())
@@ -502,6 +513,116 @@ FN(ReleaseSwapchainImage, XrSwapchain p, const XrSwapchainImageReleaseInfo *) {
       if(frame==27)report["editable_avatar_cancel_menu_seen"]=true;
     }
   }
+  auto backing_pixels = [&] {
+    int backing = 0;
+    for (unsigned row = s->height / 3; row < s->height * 2 / 3; ++row)
+      for (unsigned col = s->width / 3; col < s->width * 2 / 3; ++col) {
+        const auto at = (size_t(row) * s->width + col) * 4;
+        const int r = displayed(bytes[at]), g = displayed(bytes[at+1]),
+                  b = displayed(bytes[at+2]);
+        if (r >= 25 && r <= 31 && g >= 35 && g <= 41 && b >= 43 && b <= 49)
+          ++backing;
+      }
+    return backing;
+  };
+  if (voxel_mode() == "undo" && s->eye == 0 && (frame == 43 || frame == 45)) {
+    // The selected tile uses the palette accent only when the command is
+    // enabled. The fixture observes Clay when the root opens, then Undo.
+    // The sample covers the right grip positions used to open the panel.
+    const bool opening = frame == 43;
+    constexpr float pi = 3.14159265358979323846f;
+    const float angle = opening ? 0.f : 4.f * pi / 6.f;
+    const float cell_x = .0375f + .6f / 640.f * 220.f * std::cos(angle) + .032f;
+    const float cell_y = 1.56f + .6f / 640.f * (220.f * std::sin(angle) + 12.f) - 1.6f;
+    const float perspective = .66f * std::tan(.6f);
+    const int x = int(std::lround(s->width * .5f * (1 + cell_x / perspective)));
+    const int y = int(std::lround(s->height * .5f * (1 + cell_y / perspective)));
+    int accent = 0;
+    for (int row = std::max(0, y - 5); row <= std::min(int(s->height) - 1, y + 5); ++row)
+      for (int col = std::max(0, x - 12); col <= std::min(int(s->width) - 1, x + 12); ++col) {
+        const auto at = (size_t(row) * s->width + col) * 4;
+        if (displayed(bytes[at]) < 150 && displayed(bytes[at+1]) > 130 &&
+            displayed(bytes[at+2]) > 220) ++accent;
+      }
+    const char *pixels = opening ? "voxel_open_pixels" : "voxel_undo_pixels";
+    report[pixels] = std::max(report.value(pixels, 0), accent);
+    if (!opening) {
+      // Publishing the remesh can close a menu that opened while it was
+      // pending. Inspect the central backing panel even with Undo disabled.
+      const int backing = backing_pixels();
+      voxel_menu_visible = backing > 1000;
+      report["voxel_menu_pixels"] = backing;
+    }
+    if (accent > 30 && (opening || voxel_menu_visible)) {
+      (opening ? voxel_menu_seen : voxel_undo_seen) = true;
+      report[opening ? "voxel_menu_seen" : "voxel_undo_seen"] = true;
+    }
+  }
+  if (getenv("DOME_XR_FIXTURE_SCENE") && s->eye == 0 && (frame == 17 || frame == 21)) {
+    // The new object can publish after the next menu click was submitted.
+    // Observe the real Materials highlight, then the three RGB tracks, with
+    // a stationary right grip shared by the retry and the slider rays.
+    const float perspective = .66f * std::tan(.6f);
+    auto sample = [&](int px, int py, int radius, auto pixel) {
+      const float world_x = .015f + .032f + .6f * (px / 640.f - .5f);
+      const float world_y = 1.56f - 1.6f + .6f * (.5f - py / 640.f);
+      const int x = int(std::lround(s->width * .5f * (1 + world_x / perspective)));
+      const int y = int(std::lround(s->height * .5f * (1 + world_y / perspective)));
+      int found = 0;
+      for (int row = std::max(0, y - 2); row <= std::min(int(s->height) - 1, y + 2); ++row)
+        for (int col = std::max(0, x - radius); col <= std::min(int(s->width) - 1, x + radius); ++col) {
+          const auto at = (size_t(row) * s->width + col) * 4;
+          if (pixel(displayed(bytes[at]), displayed(bytes[at+1]), displayed(bytes[at+2]))) ++found;
+        }
+      return found;
+    };
+    if (frame == 17) {
+      scene_menu_visible = backing_pixels() > 1000;
+      scene_materials_seen = scene_menu_visible &&
+          sample(320, 528, 8, [](int r, int g, int b) { return r < 150 && g > 130 && b > 220; }) > 20;
+      report["scene_materials_seen"] = scene_materials_seen;
+    } else {
+      scene_sliders_seen = true;
+      for (int row : {210, 280, 350})
+        scene_sliders_seen &= sample(480, row, 6, [](int r, int g, int b) {
+          return r >= 57 && r <= 64 && g >= 66 && g <= 75 && b >= 81 && b <= 89;
+        }) > 10;
+      report["scene_sliders_seen"] = scene_sliders_seen;
+    }
+  }
+  if (getenv("DOME_XR_FIXTURE_UV") && s->eye == 0 && frame == 13) {
+    // Wait for the chart worker to publish actual edges and enable Apply.
+    // A visible empty grid still ignores the following editor input.
+    const float perspective = .66f * std::tan(.6f);
+    const auto x = [&](int px) {
+      const float world = .045f + .032f + .6f * (px / 640.f - .5f);
+      return int(std::lround(s->width * .5f * (1 + world / perspective)));
+    };
+    const auto y = [&](int py) {
+      const float world = 1.56f - 1.6f + .6f * (.5f - py / 640.f);
+      return int(std::lround(s->height * .5f * (1 + world / perspective)));
+    };
+    const auto pixels = [&](int left, int top, int right, int bottom, auto match) {
+      int count = 0;
+      for (int row = std::max(0, y(bottom)); row <= std::min(int(s->height) - 1, y(top)); ++row)
+        for (int col = std::max(0, x(left)); col <= std::min(int(s->width) - 1, x(right)); ++col) {
+          const auto at = (size_t(row) * s->width + col) * 4;
+          if (match(displayed(bytes[at]), displayed(bytes[at + 1]), displayed(bytes[at + 2])))
+            ++count;
+        }
+      return count;
+    };
+    const int chart = pixels(148, 148, 490, 490, [](int r, int g, int b) {
+      return r > 155 && g > 155 && b > 155;
+    });
+    const int apply = pixels(418, 594, 520, 607, [](int r, int g, int b) {
+      return r < 150 && g > 130 && b > 220;
+    });
+    report["uv_atlas_visible_pixels"] = chart;
+    report["uv_atlas_apply_accent"] = apply;
+    uv_atlas_ready = chart > 100 && apply > 20;
+    report["uv_atlas_ready"] = uv_atlas_ready;
+  }
   if((!mask_mode().empty() && s->eye==0 && mask_step==35) || (!resolution_mode().empty() && s->eye==0 && frame==19)) {
     if(auto path=getenv("DOME_XR_FIXTURE_REPORT")) {
       std::ofstream capture(std::string(path)+(!resolution_mode().empty()?".resolution-"+std::to_string(frame):".mask-"+std::to_string(mask_step))+".ppm",std::ios::binary);
@@ -556,8 +677,8 @@ FN(ReleaseSwapchainImage, XrSwapchain p, const XrSwapchainImageReleaseInfo *) {
   }
   const bool cut_wait=!cut_mode().empty() && (cut_stage()==20 || (cut_mode()=="accept" && cut_stage()==30));
   const bool mask_gate=!mask_mode().empty() && (mask_step==68 || mask_step==79);
-  if (cut_wait || mask_gate || (!retopo_mode().empty() && (retopo_step == 27 || retopo_step == 60))) {
-    const bool initial=cut_wait?cut_stage()==20:retopo_step==27;
+  if (cut_wait || mask_gate || (!retopo_mode().empty() && (retopo_stage() == 27 || retopo_stage() == 60))) {
+    const bool initial=cut_wait?cut_stage()==20:retopo_stage()==27;
     const int sector = cut_wait?7:mask_gate || initial?0:10;
     float angle = sector * 6.28318530718f / 12;
     float world_x = (cut_wait?.045f:0.f) + .6f * 220.f / 640 * std::cos(angle);
@@ -574,15 +695,15 @@ FN(ReleaseSwapchainImage, XrSwapchain p, const XrSwapchainImageReleaseInfo *) {
         transparent+=bytes[at+3]<5;
         if (displayed(bytes[at]) < 150 && displayed(bytes[at+1]) > 130 && displayed(bytes[at+2]) > 220) ++accent;
       }
-    const char *pixels_key = cut_wait?(initial?"cut_preview_accent_pixels":"cut_apply_accent_pixels"):mask_gate ? "mask_work_accent_pixels" : retopo_step == 27 ? "retopo_source_accent_pixels" : "retopo_apply_accent_pixels";
+    const char *pixels_key = cut_wait?(initial?"cut_preview_accent_pixels":"cut_apply_accent_pixels"):mask_gate ? "mask_work_accent_pixels" : retopo_stage() == 27 ? "retopo_source_accent_pixels" : "retopo_apply_accent_pixels";
     report[pixels_key] = std::max(report.value(pixels_key,0),accent);
     if(mask_gate && mask_step==68 && inspected && transparent*2>inspected) {
       mask_work_completed=true;report["mask_work_completed"]=true;
     }
     if ((!mask_gate || mask_step==79) && inspected && accent * 2 > inspected) {
-      bool first = cut_wait?(initial?!cut_preview_ready:!cut_apply_ready):mask_gate ? !mask_work_ready : retopo_step == 27 ? !retopo_source_ready : !retopo_apply_ready;
+      bool first = cut_wait?(initial?!cut_preview_ready:!cut_apply_ready):mask_gate ? !mask_work_ready : retopo_stage() == 27 ? !retopo_source_ready : !retopo_apply_ready;
       if (first) if (auto path = getenv("DOME_XR_FIXTURE_REPORT")) {
-        std::ofstream capture(std::string(path) + (cut_wait?(initial?".cut-preview-ready.ppm":".cut-apply-ready.ppm"):mask_gate ? ".work-ready.ppm" : retopo_step == 27 ? ".source-ready.ppm" : ".apply-ready.ppm"), std::ios::binary);
+        std::ofstream capture(std::string(path) + (cut_wait?(initial?".cut-preview-ready.ppm":".cut-apply-ready.ppm"):mask_gate ? ".work-ready.ppm" : retopo_stage() == 27 ? ".source-ready.ppm" : ".apply-ready.ppm"), std::ios::binary);
         capture << "P6\n" << s->width << ' ' << s->height << "\n255\n";
         for (int y = int(s->height)-1; y >= 0; --y) for (unsigned x = 0; x < s->width; ++x)
           for (int channel = 0; channel < 3; ++channel)
@@ -592,7 +713,7 @@ FN(ReleaseSwapchainImage, XrSwapchain p, const XrSwapchainImageReleaseInfo *) {
         if(initial){cut_preview_ready=true;report["cut_preview_ready"]=true;}
         else{cut_apply_ready=true;report["cut_apply_ready"]=true;}
       }else if (mask_gate) { mask_work_ready=true;report["mask_work_ready"]=true; }
-      else if (retopo_step == 27) { retopo_source_ready = true; report["retopo_source_ready"] = true; }
+      else if (retopo_stage() == 27) { retopo_source_ready = true; report["retopo_source_ready"] = true; }
       else { retopo_apply_ready = true; report["retopo_apply_ready"] = true; }
     }
   }
@@ -622,7 +743,11 @@ FN(PollEvent, XrInstance, XrEventDataBuffer *out) {
     e->session = reinterpret_cast<XrSession>(&session_tag);
     return XR_SUCCESS;
   }
-  if ((!editable_avatar_mode().empty() || menu_gate()) && frame >= 45 && menu_completion_event < 2) {
+  const bool menu_complete = (!editable_avatar_mode().empty() || menu_gate()) && frame >= 45;
+  const bool voxel_complete = voxel_mode() == "undo" && frame >= 50;
+  const bool scene_complete = getenv("DOME_XR_FIXTURE_SCENE") && frame >= 45;
+  const bool uv_complete = getenv("DOME_XR_FIXTURE_UV") && frame >= 45;
+  if ((menu_complete || voxel_complete || scene_complete || uv_complete) && menu_completion_event < 2) {
     auto e = reinterpret_cast<XrEventDataSessionStateChanged *>(out);
     e->type = XR_TYPE_EVENT_DATA_SESSION_STATE_CHANGED;
     e->session = reinterpret_cast<XrSession>(&session_tag);
@@ -649,7 +774,7 @@ FN(PollEvent, XrInstance, XrEventDataBuffer *out) {
     return XR_SUCCESS;
   }
   auto retopo = retopo_mode();
-  unsigned focus_frame = !polygon_mode().empty()?polygon_stage():!cut_mode().empty()?cut_step:!mask_mode().empty() ? mask_step : retopo.empty() ? frame : retopo_step;
+  unsigned focus_frame = !polygon_mode().empty()?polygon_stage():!cut_mode().empty()?cut_step:!mask_mode().empty() ? mask_step : retopo.empty() ? frame : retopo_stage();
   unsigned focus_at = retopo_history()?7:!cut_mode().empty()?90:!mask_mode().empty() ? (mask_mode()=="focus"?40:90) : retopo.empty() ? 30 : retopo == "focus" ? 40 : 90;
   if(!bake_policy_mode().empty())focus_at=bake_policy_mode()=="focus"?(bake_projection_mode()?28:20):90;
   if(!procedural_mode().empty())focus_at=procedural_mode()=="focus"?20:90;
@@ -719,8 +844,38 @@ FN(WaitFrame, XrSession, const XrFrameWaitInfo *, XrFrameState *p) {
      (editable_avatar_mode()=="cancel"&&((frame==23&&!report.value("editable_avatar_cancel_root_seen",false))||
       (frame==27&&!report.value("editable_avatar_cancel_menu_seen",false)))));
   if(avatar_wait){count("editable_avatar_wait_frames");if(physical_frame>3000){report["editable_avatar_gate_exhausted"]=true;save();return XR_ERROR_RUNTIME_FAILURE;}}
-  if (!avatar_wait && !(menu_gate() && frame == 9 && report.value("palette_images", 0) == 0)) ++frame;
-  else if(!avatar_wait) count("menu_gate_wait_frames");
+  const bool wait_voxel_menu = voxel_mode() == "undo" && frame == 43 && !voxel_menu_seen;
+  const bool wait_voxel_undo = voxel_mode() == "undo" && frame == 45 && !voxel_undo_seen;
+  const bool wait_scene_menu = getenv("DOME_XR_FIXTURE_SCENE") && frame == 17 && !scene_materials_seen;
+  const bool wait_scene_sliders = getenv("DOME_XR_FIXTURE_SCENE") && frame == 21 && !scene_sliders_seen;
+  if (getenv("DOME_XR_FIXTURE_UV") && frame == 13 && !uv_atlas_ready) {
+    report["uv_atlas_wait_frames"] = ++uv_atlas_wait;
+    if (uv_atlas_wait >= 750) {
+      report["uv_atlas_gate_exhausted"] = true;
+      save();
+      return XR_ERROR_RUNTIME_FAILURE;
+    }
+  } else if (wait_scene_menu || wait_scene_sliders) {
+    auto &waited = wait_scene_menu ? scene_material_wait : scene_slider_wait;
+    report[wait_scene_menu ? "scene_material_wait_frames" : "scene_slider_wait_frames"] = ++waited;
+    if (scene_material_wait + scene_slider_wait >= 750) {
+      report["scene_material_gate_exhausted"] = true;
+      save();
+      return XR_ERROR_RUNTIME_FAILURE;
+    }
+  } else if (wait_voxel_menu || wait_voxel_undo) {
+    auto &waited = wait_voxel_menu ? voxel_menu_wait : voxel_undo_wait;
+    report[wait_voxel_menu ? "voxel_menu_wait_frames" : "voxel_undo_wait_frames"] = ++waited;
+    if (voxel_menu_wait + voxel_undo_wait >= 750) {
+      report["voxel_undo_gate_exhausted"] = true;
+      save();
+      return XR_ERROR_RUNTIME_FAILURE;
+    }
+  } else if (!avatar_wait && !(menu_gate() && frame == 9 && report.value("palette_images", 0) == 0)) {
+    ++frame;
+  } else if (!avatar_wait) {
+    count("menu_gate_wait_frames");
+  }
   if(!editable_avatar_mode().empty()){
     report["editable_avatar_script_step"]=frame;
     if(physical_frame==10)if(const auto *path=getenv("DOME_XR_FIXTURE_REPORT")){std::ifstream maps("/proc/self/maps");std::ofstream capture(std::string(path)+".maps");capture<<maps.rdbuf();}
@@ -735,10 +890,10 @@ FN(WaitFrame, XrSession, const XrFrameWaitInfo *, XrFrameState *p) {
     }
   }
   if (auto mode=retopo_mode(); !mode.empty()) {
-    bool waiting = !retopo_history()&&((retopo_step == 27 && !retopo_source_ready) ||
-                   (mode!="unconfirmed" && retopo_step == 60 && !retopo_apply_ready));
+    bool waiting = !retopo_history()&&((retopo_stage() == 27 && !retopo_source_ready) ||
+                   (mode!="unconfirmed" && retopo_stage() == 60 && !retopo_apply_ready));
     if (!waiting) ++retopo_step;
-    report["retopo_script_step"] = retopo_step;
+    report["retopo_script_step"] = retopo_stage();
   }
   if(auto mode=cut_mode();!mode.empty()){
     bool waiting=(cut_stage()==20&&!cut_preview_ready)||(mode=="accept"&&cut_stage()==30&&!cut_apply_ready);
@@ -763,7 +918,10 @@ FN(WaitFrame, XrSession, const XrFrameWaitInfo *, XrFrameState *p) {
   }
   p->predictedDisplayTime = 1000000000 + physical_frame * 18000000;
   p->predictedDisplayPeriod = 18000000;
-  p->shouldRender = frame % 7 ? XR_TRUE : XR_FALSE;
+  // Sample the slider panel even while its logical step is held. Keep
+  // periodic skipped frames on the actual presentation clock.
+  const bool scene_slider_probe = getenv("DOME_XR_FIXTURE_SCENE") && frame == 21;
+  p->shouldRender = (scene_slider_probe ? physical_frame : frame) % 7 ? XR_TRUE : XR_FALSE;
   count("frames_waited");
   return XR_SUCCESS;
 }
@@ -868,16 +1026,24 @@ FN(GetActionStateBoolean, XrSession, const XrActionStateGetInfo *p,
        (getenv("DOME_XR_FIXTURE_UV") && frame == 12) ||
        (getenv("DOME_XR_FIXTURE_LAYERS") && (frame == 12 || frame == 14)) ||
        (getenv("DOME_XR_FIXTURE_SCENE") &&
-        (frame == 12 || frame == 16 || frame == 18 || frame == 20)) ||
+        (frame == 12 || frame == 16 || frame == 18 || frame == 20 || frame == 28 ||
+         (frame == 17 && !scene_menu_visible && scene_material_wait && scene_material_wait % 12 == 0))) ||
        (getenv("DOME_XR_FIXTURE_FILES") &&
         (frame == 24 || frame == 26 || frame == 28 || frame == 30 || frame == 34)));
   out->changedSinceLastSync = button && ((frame >= 8 && frame <= 11) ||
       (getenv("DOME_XR_FIXTURE_FILES") && frame >= 24 && frame <= 35));
   if (auto mode = voxel_mode(); !mode.empty()) {
+    // A publication can invalidate a press or close an open palette.
+    // Retry only after real frames show the palette is absent.
+    const bool retry_open = frame == 43 && !voxel_menu_seen && voxel_menu_wait &&
+                            voxel_menu_wait % 12 == 0;
+    const bool reopen = frame == 45 && !voxel_menu_visible && voxel_undo_wait &&
+                        voxel_undo_wait % 12 == 0;
+    if (button && mode == "undo" && reopen) count("voxel_menu_reopens");
     out->currentState = button &&
         (frame == 8 || frame == 10 || frame == 12 || frame == 14 ||
          ((mode == "accept" || mode == "undo") && frame == 18) ||
-         (mode == "undo" && (frame == 42 || frame == 44)));
+         (mode == "undo" && (frame == 42 || retry_open || reopen || frame == 46)));
     out->changedSinceLastSync = button;
   }
   if(auto mode=bake_mode();!mode.empty()){
@@ -890,8 +1056,8 @@ FN(GetActionStateBoolean, XrSession, const XrActionStateGetInfo *p,
     out->changedSinceLastSync=button;
   }
   if (auto mode = retopo_mode(); !mode.empty()) {
-    auto step = retopo_step;
-    bool common = step==8 || step==10 || step==12 || step==16 || step==18 || step==20 ||
+    auto step = retopo_stage();
+    bool common = step==8 || step==10 || step==12 || retopo_step==20 || step==16 || step==18 || step==20 ||
                   step==22 || step==24 || step==26 || step==28;
     bool apply = (mode=="accept" || mode=="focus") && (step==56 || step==58 || step==62);
     out->currentState = button && (common || apply);
@@ -954,6 +1120,7 @@ FN(GetActionStateFloat, XrSession, const XrActionStateGetInfo *p,
     bool stroke =
         (frame >= 2 && frame <= 5) ||
         (!getenv("DOME_XR_FIXTURE_SCENE") && frame >= 13 && frame <= 18);
+    if(getenv("DOME_XR_FIXTURE_SCENE"))stroke=stroke||color_slider_channel(frame,22)>=0;
     if(pbr_preview_fixture())stroke=frame==12||frame==26;
     if (getenv("DOME_XR_FIXTURE_PAINT"))
       // Frame22 deliberately drops controller tracking in the generic runtime.
@@ -976,9 +1143,10 @@ FN(GetActionStateFloat, XrSession, const XrActionStateGetInfo *p,
     if(auto mode=bake_mode();!mode.empty())stroke=frame==18||(mode=="cancel"&&frame==20);
     if(!skin_mode().empty())stroke=frame==22;
     if (auto mode = retopo_mode(); !mode.empty()) {
-      auto step = retopo_step;
-      stroke = mode!="committed" && (step==32 || (mode=="focus" ? (step>=36 && step<=41) || step==48 || step==52
-                                                                             : step==36 || step==40));
+      auto step = retopo_stage();
+      stroke = color_slider_channel(retopo_step,14)>=0 ||
+               (mode!="committed" && (step==32 || (mode=="focus" ? (step>=36 && step<=41) || step==48 || step==52
+                                                                                 : step==36 || step==40)));
     }
     if(!cut_mode().empty())stroke=cut_stage()==24;
     if(auto mode=mask_mode();!mode.empty()) {
@@ -998,7 +1166,7 @@ FN(GetActionStateFloat, XrSession, const XrActionStateGetInfo *p,
         a->name == (ink() && frame >= 13 ? "tip_force" : "paint_pressure");
     if (stroke && correct) {
       out->currentState = .9f;
-      if (!retopo_mode().empty()) count("retopo_pressure_samples");
+      if (!retopo_mode().empty()&&retopo_stage()>13) count("retopo_pressure_samples");
       if(!polygon_mode().empty())count("polygon_pressure_samples");
       if (!cut_mode().empty()) count("cut_slider_samples");
       if (!mask_mode().empty()) count("mask_pressure_samples");
@@ -1073,7 +1241,7 @@ FN(GetActionStateVector2f, XrSession, const XrActionStateGetInfo *p,
     if (frame == 17 || frame == 18)
       out->currentState = {0, -1};
     if (frame == 19 || frame == 20)
-      out->currentState = {.8660254f, .5f};
+      out->currentState = {1, 0};
   }
   if (getenv("DOME_XR_FIXTURE_PAINT") && right(p->subactionPath) &&
       a->name == "right_stick") {
@@ -1127,7 +1295,7 @@ FN(GetActionStateVector2f, XrSession, const XrActionStateGetInfo *p,
     if (frame == 9 || frame == 10) out->currentState = {-.5f, -.8660254f};
     if (frame == 11 || frame == 12) out->currentState = {0, -1};
     if (frame == 13 || frame == 14) out->currentState = {.8660254f, .5f};
-    if (mode == "undo" && (frame == 43 || frame == 44))
+    if (mode == "undo" && frame >= 44 && frame <= 46)
       out->currentState = {-.5f, .8660254f};
   }
   if(auto mode=bake_mode();!mode.empty() && right(p->subactionPath) && a->name=="right_stick"){
@@ -1149,11 +1317,11 @@ FN(GetActionStateVector2f, XrSession, const XrActionStateGetInfo *p,
     if(frame==25 || frame==26)out->currentState={-.8660254f,-.5f};
   }
   if (!retopo_mode().empty() && right(p->subactionPath) && a->name=="right_stick") {
-    auto step=retopo_step;
+    auto step=retopo_stage();
     out->currentState={0,0};
     if(step==9 || step==10 || step==19 || step==20) out->currentState={0,-1};
-    if(step==11 || step==12) out->currentState={.8660254f,.5f};
-    if(step==17 || step==18) out->currentState={-.5f,-.8660254f};
+    if(step==11 || step==12) out->currentState={1,0};
+    if(step==15 || step==16 || step==17 || step==18) out->currentState={-.5f,-.8660254f};
     if(step==21 || step==22) out->currentState={.8660254f,-.5f};
     if(step==23 || step==24 || step==27 || step==28) out->currentState={1,0};
     if(step==57 || step==58) out->currentState={.5f,.8660254f};
@@ -1289,7 +1457,7 @@ FN(LocateSpace, XrSpace handle, XrSpace, XrTime, XrSpaceLocation *p) {
     else p->pose.position={frame>=25?.16f:-.16f,1.48f,-.83f};
     return XR_SUCCESS;
   }
-  if (frame == 22 && editable_avatar_mode().empty() && !pbr_preview_fixture() && !getenv("DOME_XR_FIXTURE_NORMAL_DOMAIN") && affine_contact_mode().empty() && (polygon_mode().empty()&&corner_uv_mode().empty()) && bake_policy_mode().empty() && procedural_mode().empty() && resolution_mode().empty() && s->action && voxel_mode() != "focus" && bake_mode().empty() && skin_mode().empty() && retopo_mode().empty() && mask_mode().empty() && cut_mode().empty()) {
+  if (frame == (getenv("DOME_XR_FIXTURE_SCENE")?29:22) && editable_avatar_mode().empty() && !pbr_preview_fixture() && !getenv("DOME_XR_FIXTURE_NORMAL_DOMAIN") && affine_contact_mode().empty() && (polygon_mode().empty()&&corner_uv_mode().empty()) && bake_policy_mode().empty() && procedural_mode().empty() && resolution_mode().empty() && s->action && voxel_mode() != "focus" && bake_mode().empty() && skin_mode().empty() && retopo_mode().empty() && mask_mode().empty() && cut_mode().empty()) {
     p->locationFlags = 0;
     count("tracking_losses");
   }
@@ -1301,6 +1469,9 @@ FN(LocateSpace, XrSpace handle, XrSpace, XrTime, XrSpaceLocation *p) {
     p->pose.position = {(right(s->hand) ? float((frame % 5) * .015f) : -.3f) +
                             (frame >= 38 ? -.2f : 0),
                         1.48f, -.48f};
+  if (getenv("DOME_XR_FIXTURE_SCENE") && s->action && right(s->hand) &&
+      frame >= 16 && frame <= 20)
+    p->pose.position.x = .015f;
   if(corner_uv_mode()=="cancel"&&s->action&&s->action->name=="aim_pose"&&right(s->hand)&&frame==28){
     p->pose.position={.045f+(170.f/640-.5f)*.6f,1.56f+(.5f-609.f/640)*.6f,-.3f};
   }
@@ -1347,7 +1518,7 @@ FN(LocateSpace, XrSpace handle, XrSpace, XrTime, XrSpaceLocation *p) {
     p->pose.position={.045f+(x/640-.5f)*.6f,1.56f+(.5f-y/640)*.6f,-.3f};
   }
   if(auto mode=skin_mode();!mode.empty() && s->action && s->action->name=="aim_pose" && right(s->hand) && frame==22) {
-    float t=mode=="fitted"?0.f:1.f;
+    const float t=mode=="fitted"?0.f:1.f/3;
     p->pose.position={.045f+((100+420*t)/640-.5f)*.6f,1.56f+(.5f-300.f/640)*.6f,-.3f};
   }
   if(!cut_mode().empty()&&s->action&&s->action->name=="aim_pose"&&right(s->hand)&&cut_stage()==24){
@@ -1355,12 +1526,23 @@ FN(LocateSpace, XrSpace handle, XrSpace, XrTime, XrSpaceLocation *p) {
   }
   if (auto mode=retopo_mode(); !mode.empty() && s->action && right(s->hand)) {
     float x=0,y=0;
-    auto step=retopo_step;
+    auto step=retopo_stage();
     if(step==32) { x=-.2f; y=-.2f; }
     else if(mode=="focus" && step>=36 && step<=41) { x=.35f; y=.25f; }
     else if(step==36 || step==48) { x=.2f; y=-.2f; }
     else if(step==40 || step==52) { x=0; y=.2f; }
     p->pose.position={x,1.48f+y,-.83f};
+  }
+  if(s->action&&s->action->name=="aim_pose"&&right(s->hand)){
+    const bool scene=getenv("DOME_XR_FIXTURE_SCENE");
+    const int channel=scene?color_slider_channel(frame,22):
+      retopo_mode().empty()||retopo_history()? -1:color_slider_channel(retopo_step,14);
+    if(channel>=0){
+      constexpr float rgb[]={.04f,.12f,.8f};
+      const float x=100+420*rgb[channel],y=210+70*channel;
+      const float anchor=scene?.015f:0.f;
+      p->pose.position={anchor+(x/640-.5f)*.6f,1.56f+(.5f-y/640)*.6f,-.3f};
+    }
   }
   if(auto mode=mask_mode();!mode.empty() && s->action && right(s->hand)) {
     auto step=mask_step;p->pose.position={0,1.48f,-.48f};
@@ -1378,7 +1560,7 @@ FN(LocateSpace, XrSpace handle, XrSpace, XrTime, XrSpaceLocation *p) {
   if(auto mode=bake_policy_mode();!mode.empty() && s->action && right(s->hand)) {
     p->pose.position={0,1.48f,-.48f};const auto step=bake_policy_stage();
     if(s->action->name=="aim_pose" && (step==18 || step==20)) {
-      float x=520,y=bake_normal_mode()?350:bake_color_mode()?210:240;if(bake_projection_mode()&&frame<=20){x=100;y=210;if(frame==20){x=470;y=609;}}else if(step==20){x=mode=="cancel"?170:470;y=609;}
+      float x=520,y=mode=="topology"?400:bake_normal_mode()?350:bake_color_mode()?210:240;if(bake_projection_mode()&&frame<=20){x=100;y=210;if(frame==20){x=470;y=609;}}else if(step==20){x=mode=="cancel"?170:470;y=609;}
       p->pose.position={(x/640-.5f)*.6f,1.56f+(.5f-y/640)*.6f,-.3f};
     }
   }

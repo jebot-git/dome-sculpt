@@ -2,6 +2,7 @@
 #pragma once
 #include "dome/texture-sets.hpp"
 #include "dome/vr-controls.hpp"
+#include "bake-target-resolution.hpp"
 #include <bit>
 namespace dome::detail {
 inline bool same_texture_material(const Material&a,const Material&b)noexcept{
@@ -16,7 +17,7 @@ inline bool texture_set_control(VrParameter p)noexcept{
 // unchanged until the common accepted worker transaction validates and applies.
 // No raster replay or geometry copy occurs on a slider/second-eye publication.
 inline TextureSetEdit texture_set_control_request(const SculptObject&o,const VrControlState&c){
- if(!o.texture_sets||!texture_set_control(c.parameter))throw std::invalid_argument("No selected texture field for these controls");
+ if(!texture_set_control(c.parameter)||(!o.texture_sets&&!(c.parameter==VrParameter::TextureResolution&&writable_bake_resolution_target(o))))throw std::invalid_argument("No selected texture field for these controls");
  const auto field=active_texture_set(o);TextureSetEdit edit;edit.set=field.id;edit.material=field.material;edit.action=TextureSetAction::Material;
  switch(c.parameter){
  case VrParameter::TextureResolution:edit.action=TextureSetAction::Resolution;edit.resolution=64u<<std::clamp(int(std::lround(c.value[0])),0,5);break;

@@ -1,9 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 #include "dome/local-surface.hpp"
+#include <limits>
 #include <optional>
 
 namespace dome::detail {
+// An AVL tree with a size_t node count cannot reach this height.
+inline constexpr size_t sculpt_shared_index_max_levels=2*std::numeric_limits<size_t>::digits;
 // Private preview geometry authority. This is deliberately not a Paint domain,
 // SourceMaterialBindings field, serialized asset, or packed triangle number.
 // Its factory retains the actual immutable extraction owner. Consumers must
@@ -66,6 +69,10 @@ public:
   Ptr update(const Volume &,SculptChunkLimits,Cancel = {}) const;
   Representation representation() const;
   const SculptChunkReport &report() const;
+  // Conservative storage added beyond genuinely owned immutable directories.
+  // Only actual shared node/payload owners receive credit; source storage and
+  // per-manifest metadata remain separately reserved. Bounded and cancellable.
+  size_t additional_retained_bytes(std::span<const Ptr>,Cancel = {}) const;
   const LocalSurfaceCache::Owner &source_owner() const;
   const SculptChunkBounds &bounds() const;
   bool owns(const Chunk &) const;

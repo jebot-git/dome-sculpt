@@ -7,6 +7,7 @@
 #include "dome/material-bindings.hpp"
 #include "dome/document.hpp"
 #include "emission-bake-source.hpp"
+#include "baked-emission-domain.hpp"
 #include <nlohmann/json.hpp>
 #include <iostream>
 using namespace dome;
@@ -60,9 +61,14 @@ int main(int argc,char**argv)try{
  ObjectBakeSettings options;options.front_mm=options.back_mm=2;options.padding=0;options.ao_samples=0;
  const auto baseline=scene.snapshot();const auto baseline_data=scene.encode();size_t bake_polls=0;
  auto report=bake_object(scene,source,options,[&]{++bake_polls;return false;});
- const auto&field=*scene.active().painted->baked()->emission_field;float worker_error=0;size_t checked=0;
+ const auto domain=scene.active().painted->baked()->emission_domain;
+ check(domain&&domain->image()&&domain->version()==3,"Bake must retain the genuine original image separately from editable paint");
+ float worker_error=0;size_t checked=0;
  for(size_t y=16;y<48;++y)for(size_t x=16;x<48;++x){const float u=(x+.5f)/64,blue=u*2-.5f;
-  const auto got=field.values()[y*64+x].resolve({},1);worker_error=std::max(worker_error,error(got,{2*(1-blue),0,4*blue}));++checked;}
+  const auto got=domain->sample(u,(y+.5f)/64).resolve({},1);worker_error=std::max(worker_error,error(got,{2*(1-blue),0,4*blue}));++checked;}
+ for(size_t y=16;y<48;++y)for(size_t x=16;x<48;++x){const float u=(x+.273f)/64,blue=u*2-.5f;
+  const auto got=domain->sample(u,(y+.619f)/64).resolve({},1);worker_error=std::max(worker_error,error(got,{2*(1-blue),0,4*blue}));++checked;}
+ check(domain->mapping()!=domain->image_mapping(),"Actual PBR source paint and original image use different coordinates");
  std::cout<<"EMISSION_DOMAIN actualBake projected="<<report.projected<<" independently_checked="<<checked<<" maximum_error="<<worker_error<<std::endl;
  for(size_t boundary:std::array<size_t,4>{1,2,bake_polls/2,bake_polls}){auto trial=baseline.snapshot();size_t polls=0;
   check(refuses([&]{bake_object(trial,source,options,[&]{return ++polls>=boundary;});})&&trial.encode()==baseline_data,"Early/middle/final actual Bake cancellation published partial source/target state");}

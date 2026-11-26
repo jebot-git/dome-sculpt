@@ -118,6 +118,22 @@ int main() try {
   check(same(source->materialize(),expected),"Retained old chunk/source owners remain exact after COW edit");
   check(fails([&]{next->update(field,[]{return true;});}),"Actual no-op update still honors cancellation");
   check(same(next->materialize(),surface_mesh(field)),"Cancellation leaves current owning surface usable");
+  // Repeat the same real local edit with its measured owning peak, retaining
+  // both original and first-result owners. A freed path is creditable; live
+  // baseline storage and the instantaneous allocation peak are not.
+  auto local_limit=SculptChunkLimits{};
+  local_limit.working_bytes=next->report().working_bytes;
+  auto bounded=source->update(field,local_limit);
+  check(same(bounded->materialize(),surface_mesh(field)),
+        "Exact measured local working budget preserves the independent result");
+  --local_limit.working_bytes;
+  check(fails([&]{source->update(field,local_limit);}),
+        "One byte below the real local allocation peak refuses publication");
+  size_t cancel_polls=0;
+  check(fails([&]{source->update(field,[&]{return ++cancel_polls>30;});})&&cancel_polls>30,
+        "Cancellation during a real local update retires partial path allocations");
+  check(same(source->materialize(),expected)&&same(next->materialize(),surface_mesh(field)),
+        "Failed bounded and cancelled candidates preserve both immutable owners");
   for(auto offset:{Int3{},Int3{-9,0,7}}) {
     auto zero=two_shells(.04f,offset,true);auto owned=SculptSurfaceChunks::build(zero);
     auto mesh=owned->materialize();

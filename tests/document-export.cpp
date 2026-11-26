@@ -3,6 +3,7 @@
 #include "cgltf.h"
 #include "dome/document.hpp"
 #include "dome/creation.hpp"
+#include <algorithm>
 #include <iostream>
 #include <fstream>
 #include <nlohmann/json.hpp>
@@ -97,12 +98,52 @@ int main(int argc, char **argv) try {
   check(std::filesystem::exists(dir / "avatar.vrm") && avatar.frame().state->error.empty(),
         "Actual joystick rig-menu command exports selected avatar next to the native project");
   check(parse(dir / "avatar.vrm")->meshes_count == 19, "Headset export has independently valid selected-group contents");
-  auto original = bytes(dir / "selected.vrm");
   auto controls = humanoid_baseline_defaults("vroid-beta-female"); controls.hair_length = .3f;
-  Scene groomed; append_humanoid(groomed, controls, "Generated groom", {}, 64); avatar.replace(std::move(groomed));
-  auto unsupported = avatar.export_asset(dir / "selected.vrm", AssetExportFormat::Avatar);
-  check(rejects([&] { finish(std::move(unsupported)); }) && bytes(dir / "selected.vrm") == original,
-        "Unsupported generated-part VRM path reports failure and preserves existing valid output exactly");
+  Scene groomed;
+  const auto group = append_humanoid(groomed, controls, "Generated groom", {}, 64);
+  const auto generated = std::ranges::find_if(groomed.objects(), [&](const auto &item) {
+    return item.group == group && !item.appearance;
+  });
+  check(generated != groomed.objects().end(), "Fixture contains the native generated groom part");
+  const auto groom = generated->id;
+  const auto name = generated->name;
+  avatar.replace(std::move(groomed));
+  const auto groom_scene = avatar.copy_scene().encode();
+  const auto path = dir / "groomed.vrm";
+  finish(avatar.export_asset(path, AssetExportFormat::Avatar));
+  auto output = parse(path);
+  check(output->meshes_count == 20 && output->skins_count == 1,
+        "Worker exports nineteen source parts and one generated part on a shared rig");
+  size_t exported_groom = 0;
+  for (size_t i = 0; i < output->nodes_count; ++i) {
+    const auto &node = output->nodes[i];
+    if (!node.mesh || !node.mesh->name || node.mesh->name != name)
+      continue;
+    const auto *material = node.mesh->primitives[0].material;
+    check(node.skin == &output->skins[0] && material && material->unlit &&
+              material->pbr_metallic_roughness.base_color_texture.texture,
+          "Exported groom retains the shared skin and its textured unlit material");
+    ++exported_groom;
+  }
+  check(exported_groom == 1 && avatar.copy_scene().encode() == groom_scene,
+        "Worker emits exactly one generated groom and preserves the complete native scene");
+  const auto original = bytes(path);
+  const auto edited_scene = avatar.copy_scene();
+  const auto &part = edited_scene.object(groom);
+  auto material = part.material;
+  material.emissive = {.125f, 0, 0};
+  avatar.object_properties(groom, part.name, part.visible, part.locked, part.transform, material);
+  const auto edited = avatar.copy_scene().encode();
+  auto unsupported = avatar.export_asset(path, AssetExportFormat::Avatar);
+  std::string error;
+  try {
+    finish(std::move(unsupported));
+  } catch (const std::invalid_argument &failure) {
+    error = failure.what();
+  }
+  check(error.find("unlit, non-emissive material policy") != std::string::npos &&
+            bytes(path) == original && avatar.copy_scene().encode() == edited,
+        "Worker refuses an unsupported groom material and preserves the existing output and scene");
   std::filesystem::remove_all(dir);
   return 0;
 } catch (const std::exception &e) { std::cerr << "FAIL " << e.what() << '\n'; return 1; }

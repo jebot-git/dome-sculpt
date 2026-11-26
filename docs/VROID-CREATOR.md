@@ -94,8 +94,8 @@ length, volume or fringe controls append an original fitted swept-lock groom;
 the source hairstyle and all authored geometry remain unchanged. This is an
 editable parameterized extension, not a complete VRoid hair-guide editor. Complete VRM springs, look-at/first-person behaviors, constraints,
 material expressions and exact MToon shader/export parity remain integration
-work. The MH fallback remains useful for its authored anatomy, but is not
-presented as the newly requested CC0 VRoid baseline.
+work. Historical MakeHuman recipes remain readable, but no MakeHuman generation
+fallback is present.
 
 `tests/vroid-creator.cpp` checks exact asset identity, original geometry/UV/normal
 mapping, untouched neutral material factors, texture cache/sampler references,
@@ -193,3 +193,9 @@ first-ray and0 bidirectional vertices. A0.24rad posed example still has5 shoulde
 penetrations around0.7–2.4mm; the0.18rad native pose fixture stays clear. This
 explicitly bounds the current head-rigid fit and motivates future pose-aware
 collision/spring handling rather than a claim of collision-free animation.
+
+## Shared creator workspace and explicit hair recolour
+
+See [the 2026-11-18 creator workspace checkpoint](CREATOR-WORKSPACE-20261118.md)
+for the native/controller slice, versioned optional recolour, exact validation
+roles and the still-required nonlinear metadata/generated-groom VRM work.

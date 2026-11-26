@@ -71,7 +71,7 @@ static VrmExportReport export_vrm1_impl(const std::vector<ObjectSurface> &object
                 "node extension has no typed reference remapper");
   struct ExpressionLayerIdentity {int source,lower,upper;bool forward_uv,shade_alias;std::array<float,3> shade_divisor;};
   std::vector<ExpressionLayerIdentity> expression_layers;
-  std::set<int> uv_expression_materials, color_expression_materials;
+  std::set<int> uv_expression_materials, color_expression_materials, emission_expression_materials;
   const auto &vrm = original.at("extensions").at("VRMC_vrm");
   if (vrm.contains("expressions"))
     for (const char *table : {"preset", "custom"})
@@ -81,8 +81,11 @@ static VrmExportReport export_vrm1_impl(const std::vector<ObjectSurface> &object
             for (const auto &bind : expression.at("textureTransformBinds"))
               uv_expression_materials.insert(bind.at("material").get<int>());
           if (expression.contains("materialColorBinds"))
-            for (const auto &bind : expression.at("materialColorBinds"))
+            for (const auto &bind : expression.at("materialColorBinds")) {
               color_expression_materials.insert(bind.at("material").get<int>());
+              if(bind.at("type")=="emissionColor")
+                emission_expression_materials.insert(bind.at("material").get<int>());
+            }
         }
   for (const auto &object : objects) {
     stop(options);
@@ -521,8 +524,28 @@ static VrmExportReport export_vrm1_impl(const std::vector<ObjectSurface> &object
         if (generated.contains(slot))
           value[slot] = generated.at(slot);
       }
-      if (value.contains("extensions"))
-        value["extensions"].erase("KHR_materials_emissive_strength");
+      if(value.contains("extensions")){
+        auto &extensions=value["extensions"];
+        constexpr const char *strength_name="KHR_materials_emissive_strength";
+        if(extensions.contains(strength_name)&&!physical&&!object.material.unlit&&
+           emission_expression_materials.contains(a.source_material)){
+          // Core import stores effective emission. Recover the source's
+          // normalized factor so remapped live expression targets keep their
+          // original intensity units.
+          const auto strength=extensions.at(strength_name).value("emissiveStrength",1.f);
+          require(std::isfinite(strength)&&strength>=0,"original emission strength is invalid");
+          auto factor=value.value("emissiveFactor",std::array<double,3>{});
+          for(auto &channel:factor){
+            require(strength>0||channel==0,"zero original emission strength cannot carry the edited background");
+            if(strength>0)channel/=strength;
+            require(std::isfinite(channel)&&channel>=0&&channel<=1,
+                    "edited core emission exceeds its original expression strength");
+          }
+          value["emissiveFactor"]=factor;
+        }else{
+          extensions.erase(strength_name);
+        }
+      }
     }
     j["materials"][emitted.material] = std::move(value);
     identities.materials[size_t(a.source_material)].push_back(emitted.material);

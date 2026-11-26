@@ -113,9 +113,41 @@ int main(int argc,char **argv)try{
     auto raw=Scene::load(source/"original-7.dsculpt");Document document;document.replace(raw);settled_layers(document);
     document.convert_baked_normals();settled_layers(document);auto scene=document.copy_scene();const auto mesh=scene.active().painted->mesh();
     scene.add("Prepared source guard target",Volume{});scene.active().mesh_active=true;scene.active().painted=std::make_shared<PaintedMesh>(mesh,64);
-    const auto exact=scene.encode();ObjectBakeSettings options;options.ao_samples=0;options.allow_partial=true;options.front_mm=options.back_mm=1000;
-    bool refused=false;try{bake_object(scene,1,options);}catch(const std::exception &e){refused=std::string_view(e.what()).find("source-frame transport")!=std::string_view::npos;}
-    check(refused&&scene.encode()==exact,"Independent prepared source cannot bypass genuine source-frame transport or mutate either object");
+    const auto exact=scene.encode();
+    const auto target=scene.active();
+    const auto binding=scene.object(1).material_bindings;
+    const auto source_bake=scene.object(1).painted->baked();
+    check(binding&&source_bake&&source_bake->normal_field&&
+          source_bake->normal_field->origin()==binding->canonical_attributes,
+          "Prepared source carries the actual independent normal field and origin");
+    ObjectBakeSettings options;
+    options.ao_samples=0;
+    options.allow_partial=true;
+    options.front_mm=options.back_mm=1000;
+
+    auto missing_owner=scene.snapshot();
+    missing_owner.object(1).material_bindings.reset();
+    bool refused=false;
+    try {
+      bake_object(missing_owner,1,options);
+    } catch (const std::invalid_argument &e) {
+      refused=std::string_view(e.what()).find("actual separate attribute origin")!=std::string_view::npos;
+    }
+    missing_owner.object(1).material_bindings=binding;
+    check(refused&&missing_owner.encode()==exact,
+          "Independent normal Bake refuses a field without its owner and preserves both objects");
+
+    const auto report=bake_object(scene,1,options);
+    const auto baked=scene.active().painted->baked();
+    check(report.projected>0&&baked&&!baked->maps.normal.rgba.empty()&&
+          scene.active().painted->mesh_owner()==target.painted->mesh_owner(),
+          "Authentic independent source projects normals while retaining the target geometry");
+    const auto saved=out/"independent-source-bake.dsculpt";
+    scene.save(saved);
+    check(Scene::load(saved).encode()==scene.encode(),
+          "Independent source Bake and its provenance survive an exact native round trip");
+    scene.object(target.id)=target;
+    check(scene.encode()==exact,"Independent source Bake changes only the active target");
   }
   return 0;
 }catch(const std::exception &e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

@@ -248,6 +248,7 @@ struct Canvas : Fl_Gl_Window {
         document.cancel_spatial_menu();
         return 1;
       }
+      if(event==FL_KEYDOWN&&Fl::event_key()==FL_Escape&&document.frame().state->creator){document.end_humanoid_creator(false);invalidate();return 1;}
       if(event==FL_KEYDOWN&&Fl::event_key()==FL_Escape&&document.frame().state->polygon){
         if(polygon_drag){polygon_at(Fl::event_x(),Fl::event_y(),PolygonAction::CancelDrag);polygon_drag=false;suppress_drag=true;}
         else document.end_polygon(false);invalidate();return 1;
@@ -929,7 +930,7 @@ struct App {
     enable("&Sculpt/Smaller brush",
            !modal && !s->asset_busy && s->radius > .005f);
     enable("&Sculpt/Larger brush", !modal && !s->asset_busy && s->radius < 2);
-    enable("&Paint/Texture sets...",!modal&&s->can_edit_texture_sets);
+    enable("&Paint/Texture sets...",!modal&&(s->can_edit_texture_sets||s->can_resize_bake_target));
     enable("&Paint/Pick material faces",!modal&&s->can_edit_texture_sets);
     enable("&Paint/Clear material face selection",!modal&&!s->asset_busy&&!s->texture_faces.empty());
     checked("&Paint/Pick material faces",s->texture_face_select);
@@ -1041,6 +1042,11 @@ struct App {
     enable("&Mesh/Plane cut/Apply cut",cutting&&!cut->busy&&cut->preview&&cut->preview_request==cut->request&&cut->preview->changed);
     checked("&Mesh/Plane cut/Cap cut",!cut||cut->settings.cap);
     checked("&Mesh/Plane cut/Flip kept side",cut&&cut->settings.flipped);
+    if(s->creator){
+      const std::array<int,6> native_inputs{menu.find_index("&Edit/Cu&t"),menu.find_index("&Edit/&Copy"),menu.find_index("&Edit/&Paste"),menu.find_index("&Edit/Select &All"),menu.find_index("&Edit/&Undo"),menu.find_index("&Edit/&Redo")};
+      for(int i=0;i<menu.size();++i)if(menu.menu()[i].label()&&!(modes[i]&FL_SUBMENU)&&std::find(native_inputs.begin(),native_inputs.end(),i)==native_inputs.end())modes[i]|=FL_MENU_INACTIVE;
+      enable("&File/Cancel background work",!modal);enable("&File/Close &Window",true);
+    }
     if(expressions){
       const std::array<int,6> native_inputs{menu.find_index("&Edit/Cu&t"),menu.find_index("&Edit/&Copy"),menu.find_index("&Edit/&Paste"),menu.find_index("&Edit/Select &All"),menu.find_index("&Edit/&Undo"),menu.find_index("&Edit/&Redo")};
       // Preserve the canonical input/focus-derived modes above, including
@@ -1221,6 +1227,7 @@ struct App {
       }
       return;
     }
+    if(label=="Close Window"&&canvas.document.frame().state->creator){canvas.document.end_humanoid_creator(false);canvas.invalidate();return;}
     if(label=="Close Window"&&canvas.document.frame().state->polygon){canvas.document.end_polygon(false);canvas.invalidate();return;}
     if (canvas.sculpting) {
       canvas.document.end_desktop();
@@ -1556,7 +1563,9 @@ int main(int argc, char **argv) try {
     return 0;
   }
   if (argc == 4 && std::string(argv[1]) == "--export-project") {
-    export_glb(Scene::load(argv[2]).surfaces(true), argv[3]);
+    Document document;
+    document.replace(Scene::load(argv[2]));
+    document.export_asset(argv[3], AssetExportFormat::Glb).get();
     return 0;
   }
   if (argc == 3 && std::string(argv[1]) == "--export-demo") {
@@ -1622,6 +1631,7 @@ int main(int argc, char **argv) try {
         document.end_retopology(false);
       if (auto view = document.frame().state->cut; view && !view->committing)
         document.end_cut(false);
+      if(document.frame().state->creator)document.end_humanoid_creator(false);
       if(auto view=document.frame().state->polygon;view&&!view->committing)document.end_polygon(false);
       document.save(save);
     }

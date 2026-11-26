@@ -1,0 +1,63 @@
+{
+  "state": "source-and-plan-only-NOT-compiled-or-run",
+  "product_source": "90fad800bc5aac3dc2421595532f4d2ef8429797",
+  "native_fixture_parent": "aa8db16a3ebc8e664b5a1f7c4138e435e30dcbc0",
+  "files": {
+    "tests/source-advanced-normal-bake.cpp": "9862669a19b16fa18f74a87986251da941bd981de527fd6a41e672b913692099",
+    "tests/source8-public-runtime.cpp": "05a71a8d6635e85c6bcdcc1bf6255d03cc8a7c8c72897cb061ce8681f937d64c",
+    "tests/source-advanced-normal-fixture.hpp": "5a443883a29e4aa9854d5df72779a2a3adae2466d9d9b06590c7efd247a64a94",
+    "tests/source-advanced-normal-public.hpp": "fc39660278111c71de80f8055fd28e8a4b273f658eaf5b0f31018cce00131e77",
+    "tests/source-advanced-normal-uv-public.hpp": "901cc098d4665eadbf97ee9114d284fef3bc87a3794634a4da8dadaf9738ab74",
+    "tests/source-advanced-public-menu.py": "d42964108bf0e0faaef8ecff0d2befe8bed7d757f505307325b078ed3f656103",
+    "tests/source-advanced-public-xr.py": "d7b86417f81e4804bac3601e8e5ca8229281589686df0a967b8503d23f23fe44",
+    "tests/source-advanced-uv-menu.py": "1355afc89bbc6c4c6deb24c84ab4a2fad33be06a33c10ee4dbc7b2b542c8f86f",
+    "tests/source-advanced-uv-xr.py": "49ba1a80620f1ea75dc78eaca8475604594f02b3f475e60682a817ebee90d0a6"
+  },
+  "fresh_complete_TUs": [
+    "tests/source-advanced-normal-bake.cpp",
+    "tests/source8-public-runtime.cpp"
+  ],
+  "new_targets": 0,
+  "CMake_or_production_changes": false,
+  "qualified_core_provider": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/artist-advanced-normal-compile-20261117/links-chain-v1/libdome-sculpt-core.a",
+    "sha256": "2e274228f72ee078c87e57b12fe158aa37d8e19ddd7091a1c1e7532b31bfffc5",
+    "scope": "Existing Release advanced product three-core-owner archive; retain actual member/dependency qualification, not a fresh whole-source build claim."
+  },
+  "immutable_UI_archive_provider": {
+    "owning_outputs": "/home/blux/de-xr/dome-sculpt/artifacts/native90-release-planning-20261115/release-090f00-20261117-audit/execution-native90-v1/owned-outputs.json",
+    "sha256": "8aed81c958762b2d559fe1e5d1541986f7e60297793d985ebc972ce86cb4d627",
+    "source": "090f009ede2c0623ca616fe892223b4f68f1c2c4",
+    "scope": "Explicit existing whole090f app/UI owners and ordered support archives; no object/ABI or literal-D rewriting. Fresh application link/current-loader admission required before any advanced public UI."
+  },
+  "sequence": [
+    "Root source review and coordinated bounded fresh compile of both full changed TUs, current14tools/source/header/actual-MD proof",
+    "Fresh native producer link to qualified advanced core and exact ordered immutable whole090f support archives; fresh guarded test-runtime shared link",
+    "Under common lease: actual new-product loader/version closure, original advanced17 plus prepared91/artist139 as appropriate",
+    "Produce8 advanced source-use capsules, both default routes,64positive endpoint phases and16 actual wrong-Original rejections; per-role .035 and >.05 negative controls",
+    "Generate two bounded22-label font references via existing unchanged font helper; no 42-label request",
+    "Produce8 UV-authoring capsules; route-specific native public-command endpoints and actual wrong-method counterfactuals; independent before/after both-role .035",
+    "Fresh application component link from qualified advanced core+immutable whole090f UI providers and explicit source-footprint/loader review, or a newly frozen owning build instead",
+    "Root separately authorizes actual source-use desktop/XR and separate UV-creation desktop/XR cases; stop first failure, preserve old runs",
+    "Strict component/whole-source/new scene/graphics/physical acceptance remain separately required before product admission"
+  ],
+  "limits_preserved": {
+    "source_use_seconds": 240,
+    "source_use_XR_total_frames": 6000,
+    "UV_creation_seconds": 240,
+    "normal_component_error": 0.035,
+    "same_interior_negative_gap": 0.05,
+    "font_request_limit": 32,
+    "per_family_font_requests": 22,
+    "no_heavy_builds_or_products_performed": true
+  },
+  "source_use_scope": "Genuine native first Bake and SourceUV create advanced sources; actual public second Bake/Save/history/reopen; no public SourceUV-action claim from that scenario alone.",
+  "UV_authoring_scope": "Separate actual public UV editor Keep-normal/defaultRaster/toolbarTurn/Apply/Save/UndoRedo/reopen desktop; guarded real controller Keep-detail/Turn90/Apply and fresh ordinary XR reopen, with full native endpoints and both-eye captures. XR UV-authoring history beyond the separate source-use history scope is not claimed.",
+  "static_checks": {
+    "Python_AST_four": true,
+    "old_native17_negative_run_default_main_bodies_byte_identical": true,
+    "production_and_CMake_unchanged": true,
+    "CXX_compile": false,
+    "products_GL_SAN": false
+  }
+}

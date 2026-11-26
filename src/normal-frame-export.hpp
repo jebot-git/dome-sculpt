@@ -152,7 +152,10 @@ inline NormalFrameExport normal_frame_export_impl(const ObjectSurface &input,Sou
   const bool legacy=space==SourceMorphSpace::Original;const auto selected=legacy?set.mtoon:set.pbr;auto tangent_source=selected;
   if(!selected)throw std::invalid_argument("Selected export material has no retained normal frame");
   const bool pbr_normal=prepared||(input.textures && input.textures->source_maps && input.textures->source_maps->normal.image && input.textures->source_maps->normal_scale!=0);
-  if(!prepared && pbr_normal && input.textures->source_maps->normal.uv_transform!=std::array<float,6>{1,0,0,1,0,0} && !(normal_proof&&normal_proof->matches(input)))throw std::invalid_argument("Normal texture transform needs a proven PBR consumer frame convention before export");
+  if(!prepared && pbr_normal && input.textures->source_maps->normal.uv_transform!=std::array<float,6>{1,0,0,1,0,0} && !(normal_proof&&normal_proof->matches(input))) {
+    if(legacy||!retain_pbr_sampling)throw std::invalid_argument("Normal texture transform needs a proven PBR consumer frame convention before export");
+    require_core_normal_export(input, cancelled);
+  }
   const bool mtoon_normal=binding.has_mtoon && binding.material.parameters.normal_enabled && binding.material.parameters.normal_scale!=0 && binding.material.textures[size_t(MToonSlot::Normal)].index>=0;
   if(legacy && (!binding.has_mtoon || binding.material.version()!=MToonVersion::V0))throw std::invalid_argument("Original frame VRM0 export requires an explicit legacy MToon0 material");
   if((legacy?mtoon_normal:pbr_normal) && selected->tangents.empty())throw std::invalid_argument("Normal mapped export has no retained authoritative tangents");
