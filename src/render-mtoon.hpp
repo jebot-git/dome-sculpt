@@ -74,8 +74,11 @@ vec2 mt_packed_wrap(vec2 q,ivec2 wrap){for(int axis=0;axis<2;++axis){
 if(wrap[axis]==10497)q[axis]=fract(q[axis]);
 else if(wrap[axis]==33648){float cell=floor(q[axis]);q[axis]=fract(q[axis]);if(mod(cell,2.)>=1.)q[axis]=1.-q[axis];}
 else q[axis]=clamp(q[axis],0.,1.);}return q;}
-int mt_packed_coordinate(int q,int n,int wrap){if(wrap==10497)return (q%n+n)%n;
-if(wrap==33648){q=(q%(n*2)+n*2)%(n*2);return q<n?q:n*2-1-q;}return clamp(q,0,n-1);}
+// GLSL leaves signed remainder undefined when an operand is negative.
+// Filter taps can start one texel below zero after normalized wrapping.
+int mt_packed_remainder(int q,int n){return q>=0?q%n:n-1-(-(q+1)%n);}
+int mt_packed_coordinate(int q,int n,int wrap){if(wrap==10497)return mt_packed_remainder(q,n);
+if(wrap==33648){q=mt_packed_remainder(q,n*2);return q<n?q:n*2-1-q;}return clamp(q,0,n-1);}
 vec4 mt_packed_texel(int view,int level,ivec2 q){ivec4 data=mt_pack_levels[view*14+level];
 ivec2 wrap=mt_pack_sampler[view].xy;q=ivec2(mt_packed_coordinate(q.x,data.y,wrap.x),mt_packed_coordinate(q.y,data.z,wrap.y));
 vec4 v=texelFetch(packedSources,data.x+q.y*data.y+q.x);
