@@ -82,6 +82,17 @@ template<class K,class V,class Traits> struct PersistentSculptIndex {
     while(p) { if(k<p->key)p=p->left.get();else if(p->key<k)p=p->right.get();else return &p->value; }
     return nullptr;
   }
+  // The actual immutable node owner, rather than value equality, is the
+  // authority for sharing a complete subtree's retained storage.
+  const Ptr *node_owner(const K &k) const {
+    const Ptr *p=&root;
+    while(*p) {
+      if(k<(*p)->key)p=&(*p)->left;
+      else if((*p)->key<k)p=&(*p)->right;
+      else return p;
+    }
+    return nullptr;
+  }
   void put(const K &k,const V &v,auto &w) { root=put(root,k,v,w); }
   void erase(const K &k,auto &w) { root=remove(root,k,w); }
   // Cold construction is not a sequence of persistent edits. Building a new

@@ -5129,6 +5129,7 @@ endif()
 
 include(tests/texture-set-resolution-workflows.cmake)
 include(tests/sculpt-sustained.cmake)
+include(tests/sculpt-independent.cmake)
 include(tests/texture-set-source-render.cmake)
 
 include(tests/sculpt-placed-workspace.cmake)

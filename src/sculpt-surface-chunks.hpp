@@ -66,6 +66,10 @@ public:
   Ptr update(const Volume &,SculptChunkLimits,Cancel = {}) const;
   Representation representation() const;
   const SculptChunkReport &report() const;
+  // Conservative storage added beyond genuinely owned immutable directories.
+  // Only actual shared node/payload owners receive credit; source storage and
+  // per-manifest metadata remain separately reserved. Bounded and cancellable.
+  size_t additional_retained_bytes(std::span<const Ptr>,Cancel = {}) const;
   const LocalSurfaceCache::Owner &source_owner() const;
   const SculptChunkBounds &bounds() const;
   bool owns(const Chunk &) const;
