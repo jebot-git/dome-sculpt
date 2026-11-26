@@ -2381,6 +2381,10 @@ std::shared_ptr<const PaintNormalProjection> SourceNormalPreparationAccess::reso
       pair.first->rgba[a+2]=byte(value.z*.5f+.5f);pair.first->rgba[a+3]=255;
     }
   }
+  // Both roles remain explicit. Equal completed immutable planes can own one
+  // actual image allocation; this is storage sharing, never a value-based
+  // discount for two separately allocated buffers.
+  if(pbr->width==toon->width&&pbr->height==toon->height&&pbr->rgba==toon->rgba)toon=pbr;
   auto result=std::make_shared<PaintNormalProjection>();result->pbr=std::move(pbr);result->mtoon=std::move(toon);
   result->validate(r);stop();return result;
 }
@@ -2510,7 +2514,9 @@ PaintNormalPreparationResult SourceNormalPreparationAccess::prepare(const Painte
     if(binding&&binding->has_mtoon&&binding->material.parameters.normal_enabled){normal=binding->roles[size_t(MToonSlot::Normal)];scale=binding->material.parameters.normal_scale;}
     encode(*toon,at,normal,scale,uv);++receipt.sampled_texels;
   }
-  receipt.validate();projection->pbr=std::move(pbr);projection->mtoon=std::move(toon);projection->validate(r);
+  receipt.validate();check();
+  if(pbr->width==toon->width&&pbr->height==toon->height&&pbr->rgba==toon->rgba)toon=pbr;
+  projection->pbr=std::move(pbr);projection->mtoon=std::move(toon);projection->validate(r);
   auto output=source.snapshot();output->surface_=std::move(atlas);output->normal_projection_=std::move(projection);
   if(output->baked_){auto baked=std::make_shared<BakedTextures>(*output->baked_);baked->normal_interpretation=BakedNormalInterpretation::PreparedAttributes;output->baked_=std::move(baked);}
   if(output->storage_bytes()>128*1024*1024)throw std::length_error("Prepared normal planes exceed paint storage budget");
@@ -2584,6 +2590,7 @@ PaintNormalUvProjectionResult SourceNormalPreparationAccess::reproject(const Pai
   }
   result.raster_samples=raster_work;
   if(!result.sampled_texels||result.observed_sample_error>options.max_angular_error)throw std::invalid_argument("Prepared normal UV quantization/source constraints exceed the declared sample quality bound");
+  stop();if(pbr->width==toon->width&&pbr->height==toon->height&&pbr->rgba==toon->rgba)toon=pbr;
   auto projection=std::make_shared<PaintNormalProjection>();projection->pbr=std::move(pbr);projection->mtoon=std::move(toon);projection->validate(r);result.projection=std::move(projection);stop();return result;
 }
 void BakedTextures::validate(uint32_t resolution) const {
@@ -2629,7 +2636,11 @@ size_t PaintedMesh::storage_bytes() const {
   size_t result = (baked_ ? baked_->storage_bytes() : 0)+(color_projection_?color_projection_->vertex_rgba->rgba.size():0);
   if(source_maps_&&source_maps_->uv1)result+=source_maps_->uv1->size()*sizeof(std::array<float,2>);
   if(source_maps_)for(const auto &[set,uv]:source_maps_->extra_uv_sets)result+=uv->size()*sizeof(std::array<float,2>);
-  if(normal_projection_)result+=normal_projection_->pbr->rgba.size()+normal_projection_->mtoon->rgba.size();
+  if(normal_projection_){
+    const auto &pbr=normal_projection_->pbr,&toon=normal_projection_->mtoon;
+    result+=pbr->rgba.size();
+    if(pbr!=toon||pbr.owner_before(toon)||toon.owner_before(pbr))result+=toon->rgba.size();
+  }
   for (const auto &layer : layers_)
     for (const auto &tile : layer.tiles)
       if (tile) result += sizeof(PaintTile);
