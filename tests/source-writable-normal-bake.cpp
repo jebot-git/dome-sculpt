@@ -623,6 +623,85 @@ void legacy_key_conversion(bool physical,const std::filesystem::path &out){
       "A converted Bake can be replaced through the normal worker in the same authored model");
   std::cout<<"LEGACY_KEY_CONVERSION "<<name<<" covered="<<report.projected<<'\n';
 }
+
+void dense_retained_bake(const std::filesystem::path &out){
+  constexpr uint32_t resolution=2048;
+  auto scene=source(false);
+  auto donor_mesh=scene.active().painted->mesh();
+  auto initial=std::make_shared<PaintedMesh>(donor_mesh,resolution);
+  initial->add_layer("Sparse full-resolution paint");
+  const auto layer=initial->active_layer();
+  PaintSettings ink;
+  ink.color={.12f,.7f,.28f,1};
+  Brush brush;
+  brush.from=brush.to={-.215f,.171f,0};
+  brush.normal={0,0,1};
+  brush.radius=.015f;
+  brush.strength=1;
+  initial->begin_stroke();
+  initial->stamp(brush,ink);
+  require(initial->end_stroke(),"An actual sparse stroke marks the full-resolution atlas");
+  const auto marked=initial->pixel(layer,584,1374);
+  require(marked.data[9]>0,"The original full-resolution paint texel has color coverage");
+  scene.active().painted=initial;
+  for(auto &p:donor_mesh.positions)p.z=.02f;
+  donor_mesh.normals.assign(donor_mesh.positions.size(),normalized(Vec3{-.33f,.27f,1}));
+  const auto donor=scene.add("Hidden high source",Volume{});
+  scene.active().mesh_active=true;
+  scene.active().visible=false;
+  scene.active().locked=true;
+  scene.active().painted=std::make_shared<PaintedMesh>(std::move(donor_mesh),64);
+  scene.select(1);
+
+  const auto apply_uv=[](Document &doc,float scale,float turn){
+    doc.begin_uv();
+    require(doc.wait_uv()&&doc.frame().state->uv->paint_sampling_available,"Keep paint detail is available at 2048");
+    if(!doc.frame().state->uv->retain_paint_sampling)doc.edit_uv(UvAction::RetainPaint);
+    doc.edit_uv(UvAction::Pick,.5f,.5f);
+    doc.edit_uv(UvAction::Scale,scale);
+    doc.edit_uv(UvAction::Rotate,turn);
+    require(doc.wait_uv()&&doc.frame().state->uv->valid,"Full-resolution UV draft remains valid");
+    doc.end_uv(true);
+  };
+  Document doc;
+  doc.replace(scene);
+  require(doc.wait_mesh(),"Dense starter project renders through the Document worker");
+  apply_uv(doc,.65f,.38f);
+  const auto uv_file=out/"retained-2048.dsculpt";
+  doc.save_async(uv_file).get();
+  require(doc.wait_mesh()&&doc.frame().state->error.empty(),"Ordered UV Save publishes the accepted layout and unchanged atlas");
+  const auto before=doc.copy_scene();
+  const auto grid=before.active().painted;
+  require(grid->resolution()==resolution&&grid->mesh().uv!=initial->mesh().uv&&grid->pixel(layer,584,1374)==marked&&
+      same_layers(*initial,*grid)&&grid->surface_diagnostics().covered_texels==size_t(resolution)*resolution,
+      "Retained atlas preserves the whole 2048 grid, paint values and texture layers through a display UV edit");
+  require(Scene::load(uv_file).encode()==before.encode(),"Full-resolution retained UV state survives cold native reopen");
+
+  auto opts=settings();
+  opts.prepare_normals=false;
+  opts.corresponding_topology=true;
+  doc.bake_from_object(donor,opts);
+  const auto baked_file=out/"baked-2048.dsculpt";
+  doc.save_async(baked_file).get();
+  require(doc.wait_asset()&&doc.wait_mesh()&&doc.frame().state->error.empty(),"The shared worker bakes into the full-resolution retained atlas");
+  const auto accepted=doc.copy_scene();
+  const auto baked=accepted.active().painted->baked();
+  require(baked&&baked->coverage.size()==size_t(resolution)*resolution&&
+      std::all_of(baked->coverage.begin(),baked->coverage.end(),[](uint8_t n){return n==255;})&&
+      accepted.active().painted->pixel(layer,584,1374)==marked,"All 4,194,304 projected texels and sparse paint survive Bake");
+  require(doc.undo()&&doc.wait_mesh()&&!doc.copy_scene().active().painted->baked()&&
+      doc.redo()&&doc.wait_mesh()&&doc.copy_scene().active().painted->baked()==baked,"Bake Undo and Redo restore the exact committed bake owner");
+  {
+    const auto cold=Scene::load(baked_file);
+    const auto &loaded=cold.active().painted;
+    require(loaded->baked()&&loaded->baked()->maps.normal.rgba==baked->maps.normal.rgba&&
+        loaded->baked()->coverage==baked->coverage&&loaded->pixel(layer,584,1374)==marked&&
+        loaded->mesh().uv==grid->mesh().uv&&cold.active().bake_recipe->source.object==donor,
+        "Cold reopen preserves the 2048 Bake, separate display UVs, sparse layer and hidden donor recipe");
+  }
+  require(doc.frame().state->can_undo,"The full-resolution Bake retains normal document history");
+  std::cout<<"DENSE_RETAINED_BAKE resolution="<<resolution<<" projected="<<baked->coverage.size()<<'\n';
+}
 }
 int main(int argc,char **argv) try {
  if(argc==3&&std::string_view(argv[1])=="--sources"){
@@ -658,6 +737,13 @@ int main(int argc,char **argv) try {
    std::filesystem::create_directories(out);
    for(bool physical:{false,true})writable_source::legacy_key_conversion(physical,out);
    std::cout<<"PASS "<<writable_source::checks<<" legacy keyed Bake conversion checks\n";
+   return 0;
+ }
+ if(argc==3&&std::string_view(argv[1])=="--dense-retained"){
+   const std::filesystem::path out=argv[2];
+   std::filesystem::create_directories(out);
+   writable_source::dense_retained_bake(out);
+   std::cout<<"PASS "<<writable_source::checks<<" full-resolution retained Bake checks\n";
    return 0;
  }
  if(argc!=2)return 2;

@@ -27,7 +27,7 @@
 #include "source-uv-archive.hpp"
 #include "dome/paint-sampling.hpp"
 #include "paint-sampling-access.hpp"
-#include "native-baked-grid.hpp"
+#include "native-writable-grid.hpp"
 #include "native-bake-conversion.hpp"
 #include "native-paint-bake.hpp"
 #include "native-paint-frame-source.hpp"
@@ -339,13 +339,22 @@ struct PaintedMesh::SurfaceMap {
   };
   struct Extra { Texel texel; uint32_t next = UINT32_MAX; };
   struct Head { uint32_t first = UINT32_MAX, count = 0; };
+  using Links = std::unordered_map<uint32_t,Head>;
   PaintSurfaceOptions options;
   PaintSurfaceDiagnostics diagnostics;
-  std::unordered_map<uint32_t,Head> linked;
-  std::vector<Extra> extra;
-  std::vector<Texel> texels;
-  std::vector<Bounds> tiles;
-  std::vector<int32_t> padding;
+  struct Raster {
+    Links linked;
+    std::vector<Extra> extra;
+    std::vector<Texel> texels;
+    std::vector<Bounds> tiles;
+    std::vector<int32_t> padding;
+  };
+  std::shared_ptr<const Raster> raster_data;
+  const Links &linked;
+  const std::vector<Extra> &extra;
+  const std::vector<Texel> &texels;
+  const std::vector<Bounds> &tiles;
+  const std::vector<int32_t> &padding;
   static const Mesh &checked_geometry(const std::shared_ptr<const Mesh> &geometry) {
     if(!geometry)throw std::invalid_argument("Missing immutable paint geometry");
     return *geometry;
@@ -354,11 +363,15 @@ struct PaintedMesh::SurfaceMap {
   // replacing the immutable vertex/index owner. A reference member must be
   // bound to that new owner at construction, never assigned through const.
   SurfaceMap(const SurfaceMap &before,std::shared_ptr<const Mesh> current)
+      :SurfaceMap(before,std::move(current),before.paint_domain) {}
+  SurfaceMap(const SurfaceMap &before,std::shared_ptr<const Mesh> current,
+      std::shared_ptr<const PaintSamplingDomain> domain)
       :geometry(std::move(current)),mesh(checked_geometry(geometry)),
-       original_sampling(before.original_sampling),paint_domain(before.paint_domain),set_domain(before.set_domain),
-       sampling_raster_proven(before.sampling_raster_proven),source_capture_only(before.source_capture_only),
+       original_sampling(before.original_sampling),paint_domain(std::move(domain)),set_domain(before.set_domain),
+       sampling_raster_proven(bool(paint_domain)),source_capture_only(before.source_capture_only),
        resolution(before.resolution),columns(before.columns),options(before.options),diagnostics(before.diagnostics),
-       linked(before.linked),extra(before.extra),texels(before.texels),tiles(before.tiles),padding(before.padding) {}
+       raster_data(before.raster_data),linked(raster_data->linked),extra(raster_data->extra),texels(raster_data->texels),
+       tiles(raster_data->tiles),padding(raster_data->padding) {}
   SurfaceMap(Mesh input, uint32_t r, PaintSurfaceOptions opts = {},
              std::shared_ptr<const PaintSamplingDomain> domain = {},
              PaintSamplingLimits domain_limits = {})
@@ -367,7 +380,13 @@ struct PaintedMesh::SurfaceMap {
              std::shared_ptr<const PaintSamplingDomain> domain = {},
              PaintSamplingLimits domain_limits = {},std::shared_ptr<const TextureSetFaceDomain> membership = {})
       : geometry(std::move(input)),mesh(checked_geometry(geometry)),paint_domain(std::move(domain)),set_domain(std::move(membership)), resolution(r), columns(r / 32),options(std::move(opts)),
-        tiles(size_t(columns) * columns) {
+        raster_data(std::make_shared<Raster>()),linked(raster_data->linked),extra(raster_data->extra),texels(raster_data->texels),
+        tiles(raster_data->tiles),padding(raster_data->padding) {
+    // A fresh raster is writable solely during construction. Published
+    // SurfaceMaps may share its immutable sample and padding arrays.
+    auto data=std::const_pointer_cast<Raster>(raster_data);
+    auto &[linked,extra,texels,tiles,padding]=*data;
+    tiles.resize(size_t(columns)*columns);
     if((options.policy!=PaintUvPolicy::Strict&&options.policy!=PaintUvPolicy::SourceAuthored&&options.policy!=PaintUvPolicy::PolygonAuthored)||
        !options.max_raster_samples||options.max_raster_samples>512*1024*1024||
        options.max_additional_candidates>8*1024*1024||!options.max_candidate_checks||options.max_candidate_checks>512*1024*1024||
@@ -670,7 +689,7 @@ struct SourcePaintAccess {
     const auto &s=*p.surface_;
     return sizeof(PaintedMesh::SurfaceMap)+s.texels.size()*sizeof(PaintedMesh::SurfaceMap::Texel)+
       s.extra.size()*sizeof(PaintedMesh::SurfaceMap::Extra)+s.tiles.size()*sizeof(PaintedMesh::SurfaceMap::Bounds)+
-      s.padding.size()*sizeof(int32_t)+s.linked.size()*(sizeof(decltype(s.linked)::value_type)+4*sizeof(void*))+
+      s.padding.size()*sizeof(int32_t)+s.linked.size()*(sizeof(PaintedMesh::SurfaceMap::Links::value_type)+4*sizeof(void*))+
       s.linked.bucket_count()*sizeof(void*)+s.diagnostics.unpaintable_uv_faces.size()*sizeof(uint32_t)+
       sizeof(PaintedMesh::SurfaceMap::OriginalSampling)+p.source_sampling_vertices().size()*sizeof(uint32_t);
   }
@@ -1772,7 +1791,7 @@ detail::NativeWeightPaintAccess::Surface detail::NativeWeightPaintAccess::surfac
   add(surface.texels.capacity(),sizeof(PaintedMesh::SurfaceMap::Texel));
   add(surface.extra.capacity(),sizeof(PaintedMesh::SurfaceMap::Extra));
   add(surface.tiles.capacity(),sizeof(PaintedMesh::SurfaceMap::Bounds));add(surface.padding.capacity(),sizeof(int32_t));
-  add(surface.linked.size(),sizeof(decltype(surface.linked)::value_type)+3*sizeof(void*)+32);
+  add(surface.linked.size(),sizeof(PaintedMesh::SurfaceMap::Links::value_type)+3*sizeof(void*)+32);
   add(surface.linked.bucket_count(),sizeof(void*));add(surface.diagnostics.unpaintable_uv_faces.capacity(),sizeof(uint32_t));
   return {paint.surface_,bytes};
 }
@@ -2171,7 +2190,7 @@ struct SourcePaintSamplingAccess {
     auto result=paint.snapshot();result->surface_=surface;result->sampling_attachment_=std::move(attachment);stop();return result;
   }
   template<class Geometry> static std::shared_ptr<PaintedMesh> retain(const PaintedMesh &before,Geometry &&authored,
-      std::shared_ptr<const PaintSamplingDomain> domain,const PaintSamplingLimits &limits,bool native_bake=false){
+      std::shared_ptr<const PaintSamplingDomain> domain,const PaintSamplingLimits &limits,bool native_grid=false){
     const Mesh&target=[&]()->const Mesh&{if constexpr(std::is_same_v<std::remove_cvref_t<Geometry>,std::shared_ptr<const Mesh>>){if(!authored)throw std::invalid_argument("Writable paint shared geometry is absent");return *authored;}else return authored;}();
     auto stop=[&]{if(limits.cancelled&&limits.cancelled())throw std::runtime_error("Writable paint-grid attachment cancelled");};stop();
     if(before.in_stroke()||!domain||!before.valid_paint_sampling_attachment())
@@ -2179,7 +2198,7 @@ struct SourcePaintSamplingAccess {
     if(before.source_maps_&&before.source_maps_->uses_uv1())
       throw std::invalid_argument("Retained paint with original UV1 requires its own coordinate-role adapter");
     if(!before.normal_projection_&&((before.source_maps_&&before.source_maps_->normal.image)||
-       (!native_bake&&before.baked_&&!before.baked_->maps.normal.rgba.empty())))
+       (!native_grid&&before.baked_&&!before.baked_->maps.normal.rgba.empty())))
       throw std::invalid_argument("Retained paint with raw normal data requires independent prepared-normal authority");
     if(before.revision_==UINT64_MAX)throw std::overflow_error("Paint geometry identity exhausted");
     domain->validate_current(target,limits);
@@ -2191,6 +2210,31 @@ struct SourcePaintSamplingAccess {
       auto vectors=[](const auto &a,const auto &b){return a.size()==b.size()&&(!a.size()||std::memcmp(a.data(),b.data(),a.size()*sizeof(a[0]))==0);};
       if(!vectors(basis.positions,source.positions)||!vectors(basis.normals,source.normals)||basis.indices!=source.indices||basis.uv!=source.uv||basis.uv_pins!=source.uv_pins||basis.uv_seams!=source.uv_seams)
         throw std::invalid_argument("Writable paint basis is not the exact detached original authoring mesh");
+    }
+    if(native_grid){
+      const auto &original=*before.surface_;
+      if(domain->version()!=1||original.diagnostics.policy!=PaintUvPolicy::Strict||original.set_domain||original.source_capture_only)
+        throw std::invalid_argument("Native UV retention requires its strict complete writable raster");
+      // The domain check certifies REST positions and normals. Verify the
+      // old atlas corner order as well, because texel records address faces
+      // by ordered ID. Display UV edits and seam splits can then keep the
+      // existing immutable sampling, padding, and picking bounds.
+      const auto &prior=before.paint_sampling_domain();
+      const auto corners=domain->source_corners();
+      for(size_t c=0;c<corners.size();++c){
+        if((c&1023)==0)stop();
+        if(corners[c]!=(prior?prior->source_corners()[c]:uint32_t(c)))
+          throw std::invalid_argument("Native UV retention changed the ordered writable atlas corners");
+      }
+      std::shared_ptr<const Mesh> geometry;
+      if constexpr(std::is_same_v<std::remove_cvref_t<Geometry>,std::shared_ptr<const Mesh>>)
+        geometry=std::forward<Geometry>(authored);
+      else geometry=std::make_shared<const Mesh>(std::forward<Geometry>(authored));
+      auto result=before.snapshot();
+      result->surface_=std::make_shared<PaintedMesh::SurfaceMap>(original,std::move(geometry),std::move(domain));
+      result->seal_paint_sampling_attachment();
+      ++result->revision_;
+      stop();return result;
     }
     const size_t pixels=size_t(before.resolution())*before.resolution();
     const size_t raster_bytes=target.indices.size()*(2*sizeof(Vec3)+sizeof(std::array<float,2>)+sizeof(uint32_t));
@@ -2209,12 +2253,12 @@ struct SourcePaintSamplingAccess {
     ++result->revision_;stop();return result;
   }
   static std::shared_ptr<PaintedMesh> retain_borrowed(const PaintedMesh &before,const Mesh &authored,
-      std::shared_ptr<const PaintSamplingDomain> domain,const PaintSamplingLimits &limits,bool native_bake=false){
+      std::shared_ptr<const PaintSamplingDomain> domain,const PaintSamplingLimits &limits,bool native_grid=false){
     const size_t bytes=authored.positions.size()*(2*sizeof(Vec3)+sizeof(std::array<float,2>))+
         authored.indices.size()*sizeof(uint32_t)+authored.uv_pins.size()+authored.uv_seams.size();
     if(bytes>=limits.max_working_bytes)throw std::length_error("Borrowed writable geometry exhausts working budget before allocation");
     auto budget=limits;budget.max_working_bytes-=bytes;budget.max_basis_bytes=std::min(budget.max_basis_bytes,budget.max_working_bytes);
-    return retain(before,authored,std::move(domain),budget,native_bake);
+    return retain(before,authored,std::move(domain),budget,native_grid);
   }
 };
 bool detail::native_bake_conversion_supported(const SculptObject &o) noexcept {
@@ -2253,18 +2297,25 @@ std::shared_ptr<PaintedMesh> retain_paint_grid_borrowed(const PaintedMesh &befor
     std::shared_ptr<const PaintSamplingDomain> domain,const PaintSamplingLimits &limits){
   return SourcePaintSamplingAccess::retain_borrowed(before,authored,std::move(domain),limits);
 }
-std::shared_ptr<PaintedMesh> detail::retain_native_baked_grid(const PaintedMesh &before,const Mesh &authored,
+static void check_native_writable_grid(const PaintedMesh &before,
+    const std::shared_ptr<const detail::NativePaintSampling> &owner) {
+  if(owner){
+    if(!owner->valid_owner(owner)||!owner->matches_current(before))
+      throw std::invalid_argument("Native UV retention needs its exact previous writable owner");
+  }else if(before.baked()||before.paint_sampling_domain()){
+    throw std::invalid_argument("Native UV retention lost its existing writable owner");
+  }
+}
+std::shared_ptr<PaintedMesh> detail::retain_native_writable_grid(const PaintedMesh &before,const Mesh &authored,
     std::shared_ptr<const PaintSamplingDomain> domain,const std::shared_ptr<const NativePaintSampling> &owner,
     const PaintSamplingLimits &limits){
-  if(!before.baked()||!owner||!owner->valid_owner(owner)||!owner->matches_current(before))
-    throw std::invalid_argument("Retained native Bake needs its exact previous writable owner");
+  check_native_writable_grid(before,owner);
   return SourcePaintSamplingAccess::retain_borrowed(before,authored,std::move(domain),limits,true);
 }
-std::shared_ptr<PaintedMesh> detail::retain_native_baked_grid(const PaintedMesh &before,Mesh &&authored,
+std::shared_ptr<PaintedMesh> detail::retain_native_writable_grid(const PaintedMesh &before,Mesh &&authored,
     std::shared_ptr<const PaintSamplingDomain> domain,const std::shared_ptr<const NativePaintSampling> &owner,
     const PaintSamplingLimits &limits){
-  if(!before.baked()||!owner||!owner->valid_owner(owner)||!owner->matches_current(before))
-    throw std::invalid_argument("Retained native Bake needs its exact previous writable owner");
+  check_native_writable_grid(before,owner);
   return SourcePaintSamplingAccess::retain(before,std::move(authored),std::move(domain),limits,true);
 }
 std::shared_ptr<PaintedMesh> adopt_retained_paint_normal(const PaintedMesh &paint,const SourceNormalSampling &proof,

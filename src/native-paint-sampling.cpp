@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "native-paint-model.hpp"
 #include "native-paint-bake.hpp"
-#include "native-baked-grid.hpp"
+#include "native-writable-grid.hpp"
 #include "native-paint-frame-source.hpp"
 #include "canonical-paint-sampling.hpp"
 
@@ -162,16 +162,9 @@ struct NativePaintSamplingAccess {
     throw std::length_error("Native retained layout exceeds geometry budget");
   const size_t basis_bytes=before.positions.size()*(2*sizeof(Vec3)+sizeof(std::array<float,2>))+before.indices.size()*2*sizeof(uint32_t)+before.uv_pins.size()+before.uv_seams.size();
   if(basis_bytes>limits.max_basis_bytes)throw std::length_error("Native retained basis exceeds budget before allocation");
-  const uint64_t pixels=uint64_t(source.painted->resolution())*source.painted->resolution();
-  uint64_t work=pixels*16+uint64_t(before.positions.size())*8+uint64_t(target.positions.size())*8+uint64_t(before.indices.size())*16;
-  if(work>limits.max_work)throw std::length_error("Native retained fixed work exceeds budget before allocation");
-  for(size_t c=0;c<before.indices.size();c+=3){
-    if((c&1023)==0)stop(limits);
-    const auto a=before.uv.at(before.indices[c]),b=before.uv.at(before.indices[c+1]),d=before.uv.at(before.indices[c+2]);
-    const int r=int(source.painted->resolution());
-    auto extent=[&](size_t axis){const int low=std::max(0,int(std::floor(std::min({a[axis],b[axis],d[axis]})*r))),high=std::min(r-1,int(std::ceil(std::max({a[axis],b[axis],d[axis]})*r)));return high<low?uint64_t(0):uint64_t(high-low+1);};
-    const auto samples=extent(0)*extent(1);if(samples>limits.max_work-work)throw std::length_error("Native retained raster work exceeds budget before allocation");work+=samples;
-  }
+  // Native display UV edits borrow a certified immutable raster, so their
+  // prospective CPU work is proportional to the geometry and corner streams.
+  replay_budget(*source.painted,target,limits);
   size_t metadata=sizeof(NativePaintSampling)+2*sizeof(PaintedMesh)+sizeof(SourceNormalUvLayout)+4096,scratch=0;
   if(metadata>limits.max_working_bytes)throw std::length_error("Native retained owner exceeds working budget before allocation");
   auto charge=[&](size_t n,size_t unit){if(n>limits.max_working_bytes/unit||n*unit>limits.max_working_bytes-metadata)throw std::length_error("Native retained metadata exceeds working budget before allocation");metadata+=n*unit;};
@@ -194,16 +187,14 @@ struct NativePaintSamplingAccess {
   // immutable pixel owners remain shared; current metadata cannot edit anchor.
   auto captured=capture(source.painted);
   std::shared_ptr<PaintedMesh> paint;
-  const auto baked_owner=captured->baked()?source.material_bindings->native_paint_sampling:nullptr;
+  const auto prior_owner=source.material_bindings?source.material_bindings->native_paint_sampling:nullptr;
   if(owned_target){
     auto grid_budget=budget;
     grid_budget.max_working_bytes-=geometry_bytes;
     grid_budget.max_basis_bytes=std::min(grid_budget.max_basis_bytes,grid_budget.max_working_bytes);
-    paint=baked_owner?retain_native_baked_grid(*captured,std::move(*owned_target),domain,baked_owner,grid_budget):
-        retain_paint_grid(*captured,std::move(*owned_target),domain,grid_budget);
+    paint=retain_native_writable_grid(*captured,std::move(*owned_target),domain,prior_owner,grid_budget);
   }else{
-    paint=baked_owner?retain_native_baked_grid(*captured,target,domain,baked_owner,budget):
-        retain_paint_grid_borrowed(*captured,target,domain,budget);
+    paint=retain_native_writable_grid(*captured,target,domain,prior_owner,budget);
   }
   auto owner=std::shared_ptr<NativePaintSampling>(new NativePaintSampling);owner->before_=std::move(captured);owner->native_=source.material;owner->before_material_=capture_binding(source.material_bindings);owner->depth_=source.material_bindings?source.material_bindings->native_paint_sampling->history_depth()+1:1;owner->layout_=std::move(layout);owner->domain_=std::move(domain);owner->attachment_=paint->paint_sampling_attachment();
   owner->self_=owner;owner->validate_current(*paint,limits);stop(limits);return {std::move(paint),std::move(owner)};
