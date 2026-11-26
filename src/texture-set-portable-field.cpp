@@ -236,7 +236,6 @@ PortableTextureSetField portable_texture_set_field(const TextureSetView &field,
  const auto inverse=world.inverse();
  const float hand=world.orientation()==AffineOrientation::Reversing?-1.f:1.f;
  const auto &source_normals=preview->normals();
- const auto &source_tangents=preview->tangents();
  PortableTextureSetField out;
  out.corners.reserve(count);
  out.normal_role=native||preview->model()==PolygonSurfaceNormalModel::PreparedCorePbr;
@@ -264,8 +263,10 @@ PortableTextureSetField portable_texture_set_field(const TextureSetView &field,
     local_t=normal_bake_math::unit(raw-local_n*dot(raw,local_n));
     const auto t=direction(world,local_t);
     const auto b=normalized(cross(desired_n,t))*(sign*hand);
-    reproject|=length(n-source_normals[first])>0||
-       (!native&&source_tangents.at(index)!=source_tangents.at(first))||
+    // Prepared maps and the portable model both interpolate the three
+    // columns. Native Bake instead constructs T and B from the smooth
+    // fragment normal, so matching its endpoints alone is insufficient.
+    reproject|=(native&&length(n-source_normals[first])>0.f)||
        length(t-desired_t)>5e-6f||length(b-desired_b)>5e-6f;
    }
    const auto paint=preview->paint_coordinates().at(index);
