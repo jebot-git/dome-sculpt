@@ -31,6 +31,7 @@ class Document::Transaction {
   std::shared_ptr<const HeldAffine> held_affine_;
   CanvasTransform held_start_,held_preview_;
   CanvasNavigation object_navigation_;
+  InitialCreatorWorkspace initial_creator_;
   bool native_end_=false;
   std::deque<History> *undo_source_=nullptr,*undo_destination_=nullptr;
   std::optional<UvWorkspace> removed_uv_;
