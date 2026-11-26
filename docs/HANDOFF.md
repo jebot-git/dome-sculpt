@@ -56,8 +56,10 @@ peak owned RSS3847172096 below4GiB. Root independently rehashes all518 archived
 and current authorities; read [the scoped proof](SCULPT-INDEPENDENT-NATIVE-20261126.md).
 Strict runtime and original sustained independent Arc acceptance remain pending.
 
-Inspect live units before taking action. All product/loader jobs take the common
-nonblocking lease, with no idle reservation. Root's opt-in timing fixture91a90a67
+Inspect live units before taking action. Graphics, display and loader validation
+jobs take the common nonblocking lease, with no idle reservation. Confirmed
+CPU-only workflow checks can run concurrently in memory-bounded units. Record
+comparative timings in their own controlled runs. Root's opt-in timing fixture91a90a67
 compiles/links against the exact strict05 core without changing product, data,
 checks or resource limits; the full-resolution runtime diagnosis is pending.
 Root strict14 native/software unit ds-current-native-strict14-20261126.service,
@@ -71,8 +73,12 @@ fixtures550. The [fresh Release build](COMBINED-RELEASE-BUILD-20261126.md) for
 the application and 13 selected fixtures passed all 290 actions in
 `artifacts/production-combined-release-20261126`. The terminal unit was
 `ds-production-combined-release-20261126.service`, invocation
-`593996bfc65d47d0a641ffcb5e4769ef`. Runtime qualification is pending.
-The branch is `work/production-resume-integration-20261126`.
+`593996bfc65d47d0a641ffcb5e4769ef`. The combined application version check and
+659 native sculpt and creator checks pass. Sculpt passes with the matched
+allocator environment under its original 4 GiB limit. The build record links
+the first memory refusal and the runtime observer correction. Public Wayland
+and XR, and combined HDR runtime qualification, are pending. The branch is
+`work/production-resume-integration-20261126`.
 Full scope in REQUIREMENTS is unchanged.
 
 ## Source and integration boundary

@@ -1,0 +1,87 @@
+{
+  "source": "5604ad54",
+  "observer_correction": "Read-only review recognizes labelled aggregate counters, which original runner did not parse. Original status and logs retained. Initial default allocator sculpt case remains an actual resource-bound refusal.",
+  "results": [
+    {
+      "folder": "native-workflows",
+      "target": "dome-sculpt-sculpt-independent-workflow",
+      "exit": -15,
+      "checks": 0,
+      "expected": 167,
+      "passed": false,
+      "rss": 4298567680,
+      "seconds": 23.078543424606323,
+      "ELF": "b8b0b8925798077c3d89883f937f5e6a6f3d321686fdaf9590bb6afa388cbb10",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_status_sha256": "f7569d4b5b1eaa022aa51bc163fcc3ca3ff89b584996eb8b1502ac657af010a0",
+      "original_wrapper_exit": 1,
+      "original_error": "BudgetExceeded('Owned aggregate RSS exceeded declared budget')",
+      "owned_survivors": []
+    },
+    {
+      "folder": "native-workflows",
+      "target": "dome-sculpt-creator-workspace-test",
+      "exit": 0,
+      "checks": 44,
+      "expected": 44,
+      "passed": true,
+      "rss": 1745149952,
+      "seconds": 6.959897041320801,
+      "ELF": "d0175d49dcbdc92d8f7227602fbf51ed580b97aebc0ce280267faf83105247b9",
+      "log_sha256": "2fd797ddf514e212ada3028b868d2c41a9aa19b1ce13204d9000c6b8602baae6",
+      "original_status_sha256": "f7569d4b5b1eaa022aa51bc163fcc3ca3ff89b584996eb8b1502ac657af010a0",
+      "original_wrapper_exit": 1,
+      "original_error": null,
+      "owned_survivors": []
+    },
+    {
+      "folder": "native-workflows",
+      "target": "dome-sculpt-creator-vrm-test",
+      "exit": 0,
+      "checks": 448,
+      "expected": 448,
+      "passed": true,
+      "rss": 2025713664,
+      "seconds": 133.00967693328857,
+      "ELF": "1ed5087e2d00ccf44e1478d7dbfbf9a73d466ba9da81383ba33b1c148232084c",
+      "log_sha256": "92ad5949a46db4c0270fee60486c338e4cf61a192f4b679c5041a71098c850a4",
+      "original_status_sha256": "f7569d4b5b1eaa022aa51bc163fcc3ca3ff89b584996eb8b1502ac657af010a0",
+      "original_wrapper_exit": 1,
+      "original_error": null,
+      "owned_survivors": []
+    },
+    {
+      "folder": "native-sculpt-matched",
+      "target": "dome-sculpt-sculpt-independent-workflow",
+      "exit": 0,
+      "checks": 167,
+      "expected": 167,
+      "passed": true,
+      "rss": 3555766272,
+      "seconds": 55.86144685745239,
+      "ELF": "b8b0b8925798077c3d89883f937f5e6a6f3d321686fdaf9590bb6afa388cbb10",
+      "log_sha256": "4ef31ce8ac1c27b69fc7ad936d64d331f247976abff9589692a01d35f43f0377",
+      "original_status_sha256": "791e0f64fcfa7ee6f8b5bd49bae4ea92c0d479b28b0baa708cc2f5e0a7d633d0",
+      "original_wrapper_exit": 1,
+      "original_error": null,
+      "owned_survivors": []
+    }
+  ],
+  "archive": {
+    "path": "docs/validation/combined-native-workflows-20261126.tar.xz",
+    "sha256": "9ea7142c6b32fc1dd30a9ce1a9c704ad3412afcd6be6d6dcff7165257233d095",
+    "members": 18,
+    "bytes": 7928
+  },
+  "version": {
+    "source": "5604ad5494fcd8ac9f6390e8a8d7fb643d1cf6b4",
+    "command": [
+      "/home/blux/de-xr/dome-sculpt/artifacts/production-combined-release-20261126/dome-sculpt",
+      "--version"
+    ],
+    "sha256": "002685db461076056e4cfcceb8817201e45afd1fefb079d11578bbf58b2aa9c5",
+    "exit": 0,
+    "stdout": "Dome Sculpt 0.1.0 / CPU / Blender 5.4 Alpha trackball basis\n",
+    "stderr": ""
+  }
+}
