@@ -1087,12 +1087,24 @@ and retained recipe sources and cages to the new object namespace. Both
 profiles pass all five suites again, including 27 recipe checks across the
 two paths and exact current and retained Scene replay.
 
-A separate real prepared-polygon probe still refuses the source-backed
-reference remap because the editable polygon origin and the authenticated
-source owner no longer match. The refusal is preserved in the evidence.
-These candidate branches remain separate from main runtime admission.
-Active-set Bake/Clear/Recall and prepared-source lifecycle coverage remain
-required.
+The original prepared-polygon probe exposed an origin ownership mismatch.
+Native prepared paint then passed deletion, append and byte-exact reopen
+on `ef96e7c2`, while the prepared PBR path found a second retained recipe
+in canonical UV history. Candidate `c0c1265c` rebases both kinds of
+material owner and shares their authenticated sampling and preview data.
+Archives explicitly identify shared sampling with earlier-node references,
+checking the actual geometry and original Paint owners. Release and
+ASan/UBSan each pass 75 prepared recipe controls across native paint and PBR, including
+deleted-source persistence, append and forged archive refusals.
+
+The unchanged Paint6 fixture expected older exception wording. Its
+failure reproduces on main. Test-only `a3d59082` checks the exact missing
+physical-context refusal and passes all 16,407 controls against both
+existing Release cores and the canonical candidate's sanitizer core. The original failures and corrected results are
+preserved. Combined application `b89b1f8c` adds the admitted HDR fix.
+Its test-only companion `6b5d338e` uses the corrected Paint6 fixture.
+Native and OpenXR qualification continue before runtime admission.
+Active-set Bake/Clear/Recall remains required.
 [Texture-set recipe and reference evidence](validation/texture-set-bake-recipe-20261126.json)
 
 ## Source and integration boundary

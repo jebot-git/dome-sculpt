@@ -74,9 +74,11 @@ software Release and Intel Arc sanitizer profile.
 The Scene40 texture-set candidate preserves distinct per-field Bake
 recipes, including retained history and shared raster storage. The native
 remapping candidate handles deletion and append for the tested plain
-fields. A real prepared-polygon field still needs coherent origin and
-source-owner remapping. Both candidates pass five native suites in
-Release and ASan/UBSan. Active-set Bake/Clear/Recall remains open.
+fields. Both initial candidates pass five native suites in Release and
+ASan/UBSan. The prepared polygon and canonical UV continuation passes
+75 checks per Release and ASan/UBSan profile for native and PBR reference remapping while
+preserving exact source sampling and archive replay. The combined app
+qualification and active-set Bake/Clear/Recall remain open.
 [Texture-set recipe evidence](validation/texture-set-bake-recipe-20261126.json)
 
 ## Qualified integration — 2026-11-17
