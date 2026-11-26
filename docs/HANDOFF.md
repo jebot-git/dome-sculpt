@@ -1031,15 +1031,14 @@ Save matches the independent Bake capture byte for byte, including exact
 Undo/Redo. The sanitizer run stays within the original 900-second and 4 GiB
 limits.
 
-Main port `fa288931` and combined candidate `3e4f1756` apply this same worker
-change. The combined candidate has identical application, build, test, asset
-and third-party inputs to `b458d7bd`. Fresh optimized and sanitizer app builds,
-eight native cases per profile, and the matched software/Arc OpenXR replays
-qualify the main port separately. Their runners and receipts are under
-`artifacts/worker-color-bound-memo-main-validation-20261126`. The main port passes all eight optimized native cases and all 153
-software OpenXR checks. The separate sanitizer cache run passes 3,471
-controls, including 3,438 allocation-denial cases. Main-port sanitizer and
-Arc qualification remain in progress.
+Main merge `dd69136a` integrates the exact tested port `fa288931`.
+Clean optimized and sanitizer application builds both pass all eight
+native cases. The same applications pass all 153 checks in software
+Release and on Intel Arc with ASan/UBSan through the real OpenXR loader
+and a synthetic runtime. The Arc Files workflow attests renderD129.
+The separate cache sanitizer run passes 3,471 controls, including 3,438
+allocation-denial cases. Combined candidate `3e4f1756` has identical
+application, build, test, asset and third-party inputs to `b458d7bd`.
 
 The wordwise atlas candidate `19f125ae` checks clipped overlap without
 splitting aligned chart words. A matched native export keeps the same
