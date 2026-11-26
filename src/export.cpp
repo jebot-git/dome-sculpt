@@ -18,6 +18,7 @@
 #include "vrm1-normal-export.hpp"
 #include "prepared-color-state.hpp"
 #include "current-colors.hpp"
+#include "source-texture-transform.hpp"
 #include "texture-set-export.hpp"
 #include "bone-metadata.hpp"
 #include "humanoid-placement.hpp"
@@ -705,17 +706,10 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
     if(slot.texcoord) info["texCoord"]=slot.texcoord;
     const auto &m=slot.uv_transform;
     if(m!=std::array<float,6>{1,0,0,1,0,0}) {
-      // KHR_texture_transform represents rotation*scale, never arbitrary shear.
-      double sx=std::hypot(double(m[0]),double(m[2]));
-      double rotation=sx>1e-15?std::atan2(double(m[2]),double(m[0])):
-                                      std::atan2(-double(m[1]),double(m[3]));
-      double sy=-std::sin(rotation)*m[1]+std::cos(rotation)*m[3];
-      double scale=std::max({1.,sx,std::abs(sy)});
-      if(std::abs(-std::sin(rotation)*sy-m[1])>1e-6*scale ||
-         std::abs(std::cos(rotation)*sy-m[3])>1e-6*scale)
-        throw std::invalid_argument("Source texture shear cannot be represented by KHR_texture_transform");
-      info["extensions"]["KHR_texture_transform"]={{"offset",{m[4],m[5]}},
-        {"rotation",rotation},{"scale",{sx,sy}}};
+      const auto transform = detail::decompose_source_texture(m);
+      info["extensions"]["KHR_texture_transform"] = {
+          {"offset", transform.offset}, {"rotation", transform.rotation},
+          {"scale", transform.scale}};
       use_extension("KHR_texture_transform");
     }
     return info;

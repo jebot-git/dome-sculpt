@@ -9,6 +9,7 @@
 #include "vrm1-authoring.hpp"
 #include "vrm1-normal-export.hpp"
 #include "native-authoring-attach.hpp"
+#include "source-texture-transform.hpp"
 #include <set>
 #include <bit>
 namespace dome::detail {
@@ -71,6 +72,7 @@ static VrmExportReport export_vrm1_impl(const std::vector<ObjectSurface> &object
                 "node extension has no typed reference remapper");
   struct ExpressionLayerIdentity {int source,lower,upper;bool forward_uv,shade_alias,unlit;std::array<float,3> shade_divisor;};
   std::vector<ExpressionLayerIdentity> expression_layers;
+ bool core_expression_transform=false;
   std::set<int> uv_expression_materials, color_expression_materials, emission_expression_materials;
   const auto &vrm = original.at("extensions").at("VRMC_vrm");
   if (vrm.contains("expressions"))
@@ -524,6 +526,25 @@ static VrmExportReport export_vrm1_impl(const std::vector<ObjectSurface> &object
         if (generated.contains(slot))
           value[slot] = generated.at(slot);
       }
+      if(uv_expression_materials.contains(a.source_material)&&object.textures&&object.textures->source_maps){
+        const auto &maps=*object.textures->source_maps;
+        const auto &raw=asset.materials.at(size_t(a.material));
+        auto preserve=[&](J &fields,const char *key,const PaintSourceTexture &role,float rotation){
+          if(!role.image || (rotation==0&&role.uv_transform==std::array<float,6>{1,0,0,1,0,0}))
+            return;
+          // The generic exporter is free to flip a scale and rotate by pi.
+          // VRM animated absolute scale targets require the authored basis.
+          const auto frame=decompose_source_texture(role.uv_transform,rotation);
+          fields.at(key)["extensions"]["KHR_texture_transform"]={
+            {"rotation",frame.rotation},{"scale",frame.scale},{"offset",frame.offset}};
+          core_expression_transform=true;
+        };
+        preserve(value["pbrMetallicRoughness"],"baseColorTexture",maps.color,raw.color_transform.rotation);
+        preserve(value["pbrMetallicRoughness"],"metallicRoughnessTexture",maps.metal_rough,raw.metal_rough_transform.rotation);
+        preserve(value,"normalTexture",maps.normal,raw.normal_transform.rotation);
+        preserve(value,"emissiveTexture",maps.emission,raw.emissive_transform.rotation);
+        preserve(value,"occlusionTexture",maps.occlusion,raw.occlusion_transform.rotation);
+      }
       if(value.contains("extensions")){
         auto &extensions=value["extensions"];
         constexpr const char *strength_name="KHR_materials_emissive_strength";
@@ -570,9 +591,11 @@ static VrmExportReport export_vrm1_impl(const std::vector<ObjectSurface> &object
       auto upper=j["materials"][emitted.material];
       auto &extensions=upper.at("extensions");
       J *toon=layer->unlit?nullptr:&extensions.at("VRMC_materials_mtoon");
-      if(layer->unlit)
-        require(extensions.contains("KHR_materials_unlit") && upper.value("alphaMode", "OPAQUE")=="OPAQUE",
-                "independent unlit paint lost its original opaque material");
+      if(layer->unlit){
+        const auto alpha=upper.value("alphaMode", "OPAQUE");
+        require(extensions.contains("KHR_materials_unlit") && (alpha=="OPAQUE"||alpha=="MASK"),
+                "independent unlit paint lost its opaque or masked source material");
+      }
       unsigned channel=0;std::set<unsigned> used;
       auto coordinate=[&](const J &info){unsigned c=info.value("texCoord",0u);if(info.contains("extensions")&&info.at("extensions").contains("KHR_texture_transform"))c=info.at("extensions").at("KHR_texture_transform").value("texCoord",c);used.insert(c);};
       // Every lower role, including the PBR fallback, retains its coordinates.
@@ -619,8 +642,8 @@ static VrmExportReport export_vrm1_impl(const std::vector<ObjectSurface> &object
       auto &attributes=primitive["attributes"];
       attributes["TEXCOORD_"+std::to_string(channel)]=uv_accessor;
       if(layer->unlit && attributes.contains("COLOR_0")){
-        // The opaque lower material ignores vertex alpha. The upper must keep
-        // the same interpolated RGB while its alpha is exactly paint coverage.
+        // The lower material is opaque wherever this upper layer contributes.
+        // Keep the interpolated vertex RGB and use only paint coverage for alpha.
         // Read only RGB from the existing dedicated float4 vertex-colour stream.
         auto rgb=j["accessors"].at(attributes.at("COLOR_0").get<size_t>());
         require(rgb.at("componentType")==5126 && rgb.at("type")=="VEC4" &&
@@ -718,7 +741,7 @@ static VrmExportReport export_vrm1_impl(const std::vector<ObjectSurface> &object
   for (const auto &extension : original.value("extensionsUsed", J::array()))
     use(extension);
   use("VRMC_vrm");
-  if(!expression_layers.empty())use("KHR_texture_transform");
+  if(!expression_layers.empty()||core_expression_transform)use("KHR_texture_transform");
   if (original.contains("extensionsRequired"))
     j["extensionsRequired"] = original.at("extensionsRequired");
   if (original.contains("extras"))

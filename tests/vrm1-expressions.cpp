@@ -17,8 +17,8 @@ namespace {
 void near(float a,float b,const char *why){check(std::abs(a-b)<3e-6f,why);}
 template<class F>std::string refuses(F f){try{f();}catch(const std::exception &e){return e.what();}return {};}
 void end(Document &d){check(d.wait_asset(std::chrono::seconds(120))&&d.wait_mesh(std::chrono::seconds(120))&&d.frame().state->error.empty(),"Actual static expression worker completes without source/error loss");}
-void ink(Document &d){PaintSettings settings;settings.color={.15f,.85f,.3f,1};settings.front_only=false;d.paint_settings(settings);
- const auto s=d.copy_scene();const auto &o=s.active();auto m=o.deformation?o.deformation->preview(o.painted->mesh()):o.painted->mesh();const auto a=m.indices[0],b=m.indices[1],c=m.indices[2];auto p=m.positions[a]*.3f+m.positions[b]*.3f+m.positions[c]*.4f;auto n=normalized(cross(m.positions[b]-m.positions[a],m.positions[c]-m.positions[a]));const auto w=s.world_matrix(o.id);auto wp=w.point({p.x,p.y,p.z}),wn=w.normal({n.x,n.y,n.z});p={float(wp[0]),float(wp[1]),float(wp[2])};n=normalized(Vec3{float(wn[0]),float(wn[1]),float(wn[2])});NativeStrokeSample q;q.origin=p+n;q.direction=n*-1;q.brush.radius=.15f;q.brush.blend=0;
+void ink(Document &d,float radius=.15f){PaintSettings settings;settings.color={.15f,.85f,.3f,1};settings.front_only=false;d.paint_settings(settings);
+ const auto s=d.copy_scene();const auto &o=s.active();auto m=o.deformation?o.deformation->preview(o.painted->mesh()):o.painted->mesh();const auto a=m.indices[0],b=m.indices[1],c=m.indices[2];auto p=m.positions[a]*.3f+m.positions[b]*.3f+m.positions[c]*.4f;auto n=normalized(cross(m.positions[b]-m.positions[a],m.positions[c]-m.positions[a]));const auto w=s.world_matrix(o.id);auto wp=w.point({p.x,p.y,p.z}),wn=w.normal({n.x,n.y,n.z});p={float(wp[0]),float(wp[1]),float(wp[2])};n=normalized(Vec3{float(wn[0]),float(wn[1]),float(wn[2])});NativeStrokeSample q;q.origin=p+n;q.direction=n*-1;q.brush.radius=radius;q.brush.blend=0;
  check(d.begin_native_stroke()&&d.sample_native_stroke(q),"Real source-owned native paint accepts before expression authoring");d.end_native_stroke();check(d.wait_native_stroke()&&d.wait_mesh(),"Real paint worker completes");}
 
 // The expected arrays are derived from fixture JSON and the VRM absolute
@@ -294,6 +294,117 @@ void core_unlit_live_paint(const std::filesystem::path &out) {
   check(failure=="VRM1 unlit expression colour exceeds the unit composition gamut"&&
         refusal.wait_asset()&&refusal.copy_scene().encode()==original&&bytes(output)==previous,
         "An out-of-gamut live expression retains the old portable file and exact native source");
+}
+
+void core_unlit_live_mask(const std::filesystem::path &out) {
+  auto fixture=core_source(true);
+  auto &material=fixture.j["materials"][0];
+  material["alphaMode"]="MASK";
+  material["alphaCutoff"]=.38f;
+  material.erase("normalTexture");
+  auto &transform=material["pbrMetallicRoughness"]["baseColorTexture"]
+                          ["extensions"]["KHR_texture_transform"];
+  transform["scale"]={-.7f,.7f};
+  transform["offset"]={1.42f,.1f};
+  transform["rotation"]=.17f;
+  fixture.j["samplers"][0]={{"wrapS",10497},{"wrapT",33071},
+                           {"magFilter",9729},{"minFilter",9729}};
+  const auto uv=fixture.values({.22f,.25f,.24f,.25f,.2f,.72f,.87f,.64f},2,"VEC2");
+  const auto color=fixture.values({.7f,.6f,.6f,.8f, .8f,.9f,.55f,.85f,
+                                   .9f,.7f,.8f,.75f, .6f,.5f,.9f,.5f},4,"VEC4");
+  for(auto &mesh:fixture.j.at("meshes"))for(auto &part:mesh.at("primitives")){
+    part["attributes"]["TEXCOORD_1"]=uv;
+    part["attributes"]["COLOR_0"]=color;
+  }
+  for(auto &node:fixture.j.at("nodes"))
+    if(node.contains("children")&&node.at("children").empty())node.erase("children");
+  Image alpha{16,16,std::vector<uint8_t>(16*16*4)};
+  for(size_t y=0;y<16;++y)for(size_t x=0;x<16;++x){
+    const auto i=(16*y+x)*4;
+    alpha.rgba[i]=uint8_t(32+13*x);
+    alpha.rgba[i+1]=uint8_t(224-10*y);
+    alpha.rgba[i+2]=uint8_t(24+13*y);
+    alpha.rgba[i+3]=x<8?255:0;
+  }
+  const auto png=alpha.png();
+  while(fixture.bin.size()%4)fixture.bin.push_back(0);
+  auto &views=fixture.j.at("bufferViews");
+  fixture.j["images"][0]["bufferView"]=views.size();
+  views.push_back({{"buffer",0},{"byteOffset",fixture.bin.size()},{"byteLength",png.size()}});
+  fixture.bin.insert(fixture.bin.end(),png.begin(),png.end());
+
+  auto &expressions=fixture.j["extensions"]["VRMC_vrm"]["expressions"];
+  auto &happy=expressions["preset"]["happy"];
+  happy["materialColorBinds"][0]["targetValue"][3]=.66f;
+  happy["textureTransformBinds"][0]["scale"]={-.6f,.74f};
+  happy["textureTransformBinds"][0]["offset"]={1.4f,.12f};
+  expressions["custom"]["alternate"]={
+      {"isBinary",false},
+      {"materialColorBinds",{{{"material",0},{"type","color"},{"targetValue",{.7f,.2f,.5f,.9f}}}}},
+      {"textureTransformBinds",{{{"material",0},{"scale",{-.68f,.6f}},{"offset",{1.33f,.08f}}}}}};
+
+  Scene empty;empty.active().visible=false;
+  ImportAuthoringOptions import_options;
+  import_options.prepare_texture_atlas=true;
+  import_options.paint_resolution=64;
+  const auto output=out/"unlit-mask-output.vrm";
+  for(unsigned variant=0;variant<4;++variant){
+    auto input=fixture;
+    if(variant==1)
+      input.j["extensions"]["VRMC_vrm"]["expressions"]["custom"]["alternate"]
+          ["textureTransformBinds"][0]["offset"][0]=1.91f;
+    if(variant==2){
+      const auto low_alpha=input.values({.7f,.6f,.6f,.2f, .8f,.9f,.55f,.85f,
+                                         .9f,.7f,.8f,.75f, .6f,.5f,.9f,.5f},4,"VEC4");
+      for(auto &mesh:input.j.at("meshes"))for(auto &part:mesh.at("primitives"))part["attributes"]["COLOR_0"]=low_alpha;
+    }
+    if(variant==3)input.j["samplers"][0].erase("minFilter");
+    const std::array suffix{"input","moving-input","vertex-input","auto-filter-input"};
+    const auto path=out/(std::string("unlit-mask-")+suffix[variant]+".vrm");
+    input.save(path);
+    auto imported=prepare_authoring_import(empty,path,import_options);
+    imported.scene.select(imported.objects.front());
+    Document doc;
+    doc.replace(std::move(imported.scene));
+    end(doc);
+    ink(doc,.025f);
+    const auto authored=doc.copy_scene();
+    const auto exact=authored.encode();
+    if(variant==0){
+      doc.export_asset(output,AssetExportFormat::EditableAvatar256).get();
+      doc.save_async(out/"unlit-mask-preserved.dsculpt").get();
+      end(doc);
+      auto expected=authored.snapshot();
+      expected.erase(empty.active().id);
+      check(Scene::load(output).encode()==expected.encode()&&doc.copy_scene().encode()==exact,
+            "Masked unlit live export and ordered Save retain exact editable paint and source");
+      const auto result=json(output);
+      const auto &defs=result.at("extensions").at("VRMC_vrm").at("expressions");
+      const auto index=defs.at("preset").at("happy").at("morphTargetBinds")[0].at("node").get<size_t>();
+      const auto mesh=result.at("nodes").at(index).at("mesh").get<size_t>();
+      const auto &primitives=result.at("meshes").at(mesh).at("primitives");
+      check(primitives.size()==2,"A real wrapped moving cutout admits paint confined to retained fragment support");
+      const auto &materials=result.at("materials");
+      const auto &lower=materials.at(primitives[0].at("material").get<size_t>());
+      const auto &upper=materials.at(primitives[1].at("material").get<size_t>());
+      check(lower.at("alphaMode")=="MASK"&&lower.at("alphaCutoff").get<float>()==.38f&&upper.at("alphaMode")=="BLEND",
+            "The original mask and cutoff survive on the source draw while paint uses blend coverage");
+      const auto &sampler=lower.at("pbrMetallicRoughness").at("baseColorTexture")
+                               .at("extensions").at("KHR_texture_transform");
+      near(sampler.at("rotation"),.17f,"Live signed scale targets keep their authored rotation");
+      near(sampler.at("scale")[0],-.7f,"Live mirrored source scale is retained without changing its sign");
+    }else{
+      const auto prior=bytes(output);
+      const auto failure=refuses([&]{doc.export_asset(output,AssetExportFormat::EditableAvatar256).get();});
+      const std::string_view message=variant==3?
+          "VRM1 masked source can change fragment membership: source sampler/domain support adapter required":
+          "VRM1 masked source can change fragment membership within actual paint support";
+      check(failure==message&&doc.wait_asset()&&doc.copy_scene().encode()==exact&&bytes(output)==prior,
+            variant==1?"A moving texture cutout over painted fragments refuses atomically":
+            variant==2?"Low vertex alpha over painted fragments refuses atomically":
+                       "Local cutout proof refuses an unspecified portable minification filter atomically");
+    }
+  }
 }
 
 void core_generated_frames(const std::filesystem::path &out) {
@@ -599,6 +710,7 @@ int main(int argc,char **argv)try{
  NativeAuthoringExport owner;owner.scene=std::make_shared<const Scene>(baked.snapshot());owner.allow_portable_fallback=true;VrmExportOptions export_options;export_options.paint_resolution=64;const auto error=refuses([&]{export_vrm_authoring(owner,out/"still-dynamic.vrm",export_options);});std::cout<<"STATIC_DYNAMIC_REFUSAL "<<error<<'\n';check(baked.active().material_bindings->material.parameters.alpha==MToonAlpha::Mask&&error=="VRM1 differing UV targets couple moving upper roles to fixed paint"&&!std::filesystem::exists(out/"still-dynamic.vrm")&&owner.scene->encode()==baked.encode(),"Incompatible moving UV targets and fixed paint refuse portable export atomically");
  core_expressions(out);
  core_unlit_live_paint(out);
+ core_unlit_live_mask(out);
  core_generated_frames(out);
  core_glb_normal_frames(out);
  std::cout<<"PASS "<<checks<<" static VRM1 expression checks polls="<<polls<<'\n';return 0;
