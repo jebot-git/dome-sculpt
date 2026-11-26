@@ -1026,7 +1026,10 @@ probe now restores the same texture-map owner in 9.485 seconds with the original
 ten-second wait and no additional composite build. It also completes ordinary
 Redo. This probe and the original history replay use the same captured project.
 The full sanitizer history test retains its independent Bake, ordered Save and
-Redo preview assertions, and still needs a terminal result.
+Redo preview assertions and now passes all eight checks. The ordered native
+Save matches the independent Bake capture byte for byte, including exact
+Undo/Redo. The sanitizer run stays within the original 900-second and 4 GiB
+limits.
 
 Main port `fa288931` and combined candidate `3e4f1756` apply this same worker
 change. The combined candidate has identical application, build, test, asset
@@ -1035,8 +1038,8 @@ eight native cases per profile, and the matched software/Arc OpenXR replays
 qualify the main port separately. Their runners and receipts are under
 `artifacts/worker-color-bound-memo-main-validation-20261126`. The main port passes all eight optimized native cases and all 153
 software OpenXR checks. The separate sanitizer cache run passes 3,471
-controls, including 3,438 allocation-denial cases. Full 2048-pixel ordered
-history and main-port sanitizer and Arc qualification remain open.
+controls, including 3,438 allocation-denial cases. Main-port sanitizer and
+Arc qualification remain in progress.
 
 The wordwise atlas candidate `19f125ae` checks clipped overlap without
 splitting aligned chart words. A matched native export keeps the same

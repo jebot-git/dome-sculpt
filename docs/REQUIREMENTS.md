@@ -64,7 +64,9 @@ remain separately registered. They pass in Release with a full
 sanitizer pass still required. Reusing the prepared-colour numerical bound
 across immutable mesh jobs brings the focused Clear Bake/Undo sanitizer
 preview below the original ten-second limit. The full ordered-history
-sanitizer run and the main port's focused native and OpenXR runs remain open.
+sanitizer replay now passes its eight checks with the same saved bytes,
+exact Undo/Redo and the original preview deadline. The separate main port's
+sanitizer and Arc runs remain open.
 [HDR fixture validation](validation/hdr-closure-independent-seed-20261126.json)
 [HDR preview evidence](validation/atlas-packing-and-hdr-redo-20261126.json)
 
