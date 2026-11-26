@@ -184,6 +184,19 @@ void uv1_worker_controls(const std::filesystem::path &directory,bool raw_only=fa
       }check(found&&visible.copy_scene().encode()==shown.encode(),"visible Source8 packing keeps full native hidden/editable/field ownership exact");
     }
     ObjectBakeSettings options;options.front_mm=10;options.back_mm=2;options.padding=2;options.ao_samples=0;
+    if(!raw_only&&!typed&&coverage==.25f){
+      Document continuous;continuous.replace(f.scene);
+      continuous.bake_from_object(f.source,options);
+      check(continuous.wait_asset(std::chrono::seconds(120))&&
+            continuous.frame().state->error.find("Physical emission cannot retain source fidelity")!=std::string::npos,
+            "Continuous FLOAT Bake refuses a UV1 nearest discontinuity on the filtered target grid");
+      check(continuous.copy_scene().encode()==before,
+            "Continuous emission refusal preserves the exact source, target and hidden sibling");
+    }
+    // This older Source8 workflow validates the actual samples at texel
+    // centers. Select its recorded raster policy explicitly. The continuous
+    // policy above must never silently adopt this approximation.
+    options.emission_transport=0;
     auto late=f.scene.snapshot();bool stop=false,rejected=false;
     try{bake_object(late,f.source,options,[&]{return stop;},[&](float p){if(p>=.8f)stop=true;});}catch(const std::exception&){rejected=true;}
     check(rejected&&stop&&late.encode()==before,"late raw/Source8 worker cancellation keeps all actual source/target field owners exact");
