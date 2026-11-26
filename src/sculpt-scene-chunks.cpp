@@ -11,7 +11,8 @@ namespace {
 void stop(const LocalSurfaceCache::Cancel &cancel) {
   if(cancel&&cancel())throw std::runtime_error("Sculpt scene chunk operation cancelled");
 }
-bool owner_same(const Volume::GeometryOwner &a,const Volume::GeometryOwner &b) {
+template<class T>
+bool owner_same(const std::shared_ptr<const T> &a,const std::shared_ptr<const T> &b) {
   return a.get()==b.get()&&!a.owner_before(b)&&!b.owner_before(a);
 }
 bool scalar_same(float a,float b) {return std::bit_cast<uint32_t>(a)==std::bit_cast<uint32_t>(b);}
@@ -106,6 +107,7 @@ SculptScenePreview SculptSceneChunks::capture_geometry(const Scene &scene,Sculpt
   legacy_repairs.reserve(scene.objects().size());
   std::vector<SculptSurfaceChunks::Ptr> retained_geometry;
   retained_geometry.reserve(scene.objects().size());
+  bool same_prefix=before&&before->context_.generation==context.generation;
   auto capture_volume=[&](const SculptObject &o) {
     stop(cancel);
     // Polygon39 and all painted current/source/normal domains retain their
@@ -114,6 +116,18 @@ SculptScenePreview SculptSceneChunks::capture_geometry(const Scene &scene,Sculpt
     if(o.mesh_active||(o.polygon&&o.polygon->active))return false;
     o.material.validate();
     const auto remaining=limits.retained_bytes-out->bytes_;
+    const auto index=out->caches_.size();
+    const auto *previous=same_prefix&&index<before->caches_.size()&&
+        before->caches_[index].object==o.id ? &before->caches_[index] : nullptr;
+    // The incremental charge depends on the exact ordered set of geometry
+    // owners. Mask-only and placement-only edits retain that entire prefix.
+    // Limits are checked anew on every capture.
+    const auto additional=[&](const SculptSurfaceChunks::Ptr &candidate) {
+      if(previous&&owner_same(candidate,previous->geometry))
+        return previous->added_bytes;
+      return candidate->additional_retained_bytes(retained_geometry,cancel);
+    };
+    size_t added=0;
     // Duplicated Volumes share their immutable COW geometry, even when their
     // object IDs, placement, material or masks differ. Share only the complete
     // authenticated local geometry owner; placed/query/scalar owners below
@@ -172,7 +186,7 @@ SculptScenePreview SculptSceneChunks::capture_geometry(const Scene &scene,Sculpt
     bool in_prior=false;
     if(old&&before)for(const auto &entry:before->caches_)if(entry.geometry==old) {in_prior=true;break;}
     const size_t prior_scope=in_prior?old_geometry:0;
-    const size_t shared_current=old?old_geometry-old->additional_retained_bytes(retained_geometry,cancel):0;
+    const size_t shared_current=old?old_geometry-additional(old):0;
     if(prior_scope>prior||shared_current>out->bytes_)
       throw std::logic_error("Sculpt geometry seed lacks its actual Scene reservation");
     const auto prior_other=prior-prior_scope;
@@ -188,12 +202,13 @@ SculptScenePreview SculptSceneChunks::capture_geometry(const Scene &scene,Sculpt
     // A reused owner's original limits never override this caller's reduced
     // aggregate cap. Only proven actual node/payload owners receive credit;
     // per-state metadata and source storage retain conservative reservations.
-    const size_t added=geometry->additional_retained_bytes(retained_geometry,cancel);
+    added=additional(geometry);
     if(added>remaining)
       throw std::length_error("Sculpt scene retained geometry limit exceeded");
     out->bytes_+=added;
     }
-    out->caches_.push_back({o.id,geometry});
+    same_prefix=previous&&owner_same(geometry,previous->geometry);
+    out->caches_.push_back({o.id,geometry,added});
     retained_geometry.push_back(geometry);
     if(geometry->representation()!=SculptSurfaceChunks::Representation::Chunks) {
       legacy_repairs.push_back({o.id,geometry});return false;
