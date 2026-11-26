@@ -1,7 +1,22 @@
-# Dome Sculpt current handoff — 2026-11-18
+# Dome Sculpt current handoff — 2026-11-26
 
-The full production goal is INCOMPLETE. The current round is closing for the
-user-requested pause; no further implementation or test runs are to start.
+The full production goal is ACTIVE and INCOMPLETE following the user’s resume.
+Current integration work remains on isolated milestone branches; the historical
+2026-11-18 admission and job records below retain their original source scopes.
+
+The separate first-creator framing product8a575abb passes native116 and actual
+synthetic-XR first/reopen23 plus unchanged authored58. Read
+[the scoped qualification](CREATOR-FIRST-FRAMING-20261126.md) before reusing its
+proof. It changes only the one-shot session canvas translation of a pristine
+first accepted avatar. Native/save bytes, physical poses, existing/opened scenes,
+Cancel and focus-loss remain exact. The original clean seed clay sphere is
+retained and still obscures part of the avatar torso. Removing or repositioning
+that clay is a separate product decision and was not done here.
+
+The next assigned integration bases this verified change on exacte375b31d and
+builds targeted native plus App consumers. That new candidate requires its own
+build/native evidence; the prior rendered proofs do not automatically qualify it.
+No installation or physical-headset test is included in this milestone.
 Read [REQUIREMENTS.md](REQUIREMENTS.md) and the original
 [HANDOFF-466ebd1.md](HANDOFF-466ebd1.md) for the complete scope. This concise file
 replaces the accumulated checkpoint diary; all previous text is preserved,
