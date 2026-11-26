@@ -1,0 +1,328 @@
+{
+  "scope": "Release single-volume Save component with native file, recovery, direct HDR export and default allocator workflow. Isolated Save uses the same input bytes, loader, and glibc trim/VmHWM reset before each operation.",
+  "source": "07025cd3995626bd32a9d0a848a2564965583ada",
+  "baseline_source": "9368689df6ad7b8b026bcaf6dd7005de0423965d",
+  "build": {
+    "source": "07025cd3995626bd32a9d0a848a2564965583ada",
+    "source_tree": "/home/blux/de-xr/dome-sculpt/artifacts/serialize-sculpt-objects-source-20261126",
+    "command": [
+      "/usr/bin/ninja",
+      "-d",
+      "keepdepfile",
+      "-d",
+      "keeprsp",
+      "-v",
+      "-j4",
+      "dome-sculpt-scene-file-test",
+      "dome-sculpt-document-recovery-test",
+      "dome-sculpt-atomic-write-allocation-test",
+      "dome-sculpt-source-owning-hdr-export-test",
+      "dome-sculpt-sculpt-independent-workflow"
+    ],
+    "cwd": "/home/blux/de-xr/dome-sculpt/artifacts/serialize-sculpt-objects-release-20261126",
+    "terminal": true,
+    "started": 1795663621.1525683,
+    "exit": 0,
+    "seconds": 353.24562311172485
+  },
+  "units": {
+    "build": "ds-serialize-sculpt-objects-release-20261126",
+    "validation": "ds-serialize-sculpt-objects-validate-20261126",
+    "comparison_baseline": "ds-serialize-sculpt-objects-save-peak-baseline-20261126"
+  },
+  "actual_validation": {
+    "source": "07025cd3995626bd32a9d0a848a2564965583ada",
+    "build_unit": "ds-serialize-sculpt-objects-release-20261126.service",
+    "build_pending": false,
+    "terminal": true,
+    "native_exit": 0,
+    "save_peak_exit": 0,
+    "workflows": {
+      "owning-hdr-export": {
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/serialize-sculpt-objects-release-20261126/dome-sculpt-source-owning-hdr-export-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/production-hdr-combined-release-20261126/source-joint-writable-normal-bake-checked/000.dsculpt",
+          "/home/blux/de-xr/dome-sculpt/artifacts/serialize-sculpt-objects-release-20261126/validation/hdr-export"
+        ],
+        "started": 1795664009.9929285,
+        "timeout_seconds": 900,
+        "RSS_limit_bytes": 4294967296,
+        "virtual_AS_cap": null,
+        "pid": 3529297,
+        "start": 84193505,
+        "pgrp": 3529297,
+        "root": {
+          "pid": 3529297,
+          "start": 84193505,
+          "pgrp": 3529297,
+          "session": 3529297,
+          "ppid": 3490431,
+          "state": "R"
+        },
+        "known_processes": [
+          {
+            "pid": 3529297,
+            "start": 84193505,
+            "pgrp": 3529297,
+            "session": 3529297,
+            "ppid": 3490431,
+            "state": "R"
+          }
+        ],
+        "peak_owned_RSS_bytes": 463839232,
+        "peak_observed_virtual_bytes": 1152581632,
+        "monitor_samples": 2181,
+        "signals": [],
+        "exit": 0,
+        "seconds": 24.152811288833618,
+        "elf_sha256": "2c72b244778bf7200949350a3abf6dbc3047c58fa1eed2f50c5f255f4d83df4d",
+        "reported_expected": true
+      },
+      "sculpt-default": {
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/serialize-sculpt-objects-release-20261126/dome-sculpt-sculpt-independent-workflow",
+          "/home/blux/de-xr/dome-sculpt/artifacts/serialize-sculpt-objects-release-20261126/validation/sculpt"
+        ],
+        "started": 1795664034.1643085,
+        "timeout_seconds": 900,
+        "RSS_limit_bytes": 4294967296,
+        "virtual_AS_cap": null,
+        "pid": 3532603,
+        "start": 84195922,
+        "pgrp": 3532603,
+        "root": {
+          "pid": 3532603,
+          "start": 84195922,
+          "pgrp": 3532603,
+          "session": 3532603,
+          "ppid": 3490431,
+          "state": "R"
+        },
+        "known_processes": [
+          {
+            "pid": 3532603,
+            "start": 84195922,
+            "pgrp": 3532603,
+            "session": 3532603,
+            "ppid": 3490431,
+            "state": "R"
+          }
+        ],
+        "peak_owned_RSS_bytes": 3553742848,
+        "peak_observed_virtual_bytes": 4270968832,
+        "monitor_samples": 8447,
+        "signals": [],
+        "exit": 0,
+        "seconds": 94.40962505340576,
+        "elf_sha256": "0af29eec5647e0b35ff8d4913ce42f0089e78667510555d5a984d747d4758bcc",
+        "reported_expected": true
+      }
+    },
+    "exit": 0
+  },
+  "isolated_save_comparison": {
+    "sculpt": {
+      "peak_reduction_kib": 438904,
+      "baseline_peak_kib": 786304,
+      "candidate_peak_kib": 347400
+    },
+    "hdr2048": {
+      "peak_reduction_kib": 37412,
+      "baseline_peak_kib": 1071712,
+      "candidate_peak_kib": 1034300
+    }
+  },
+  "isolated_save_reads": [
+    {
+      "profile": "baseline",
+      "exe_sha256": "2f3e14e53d10abd7b82b089e7697a4bcd11c420ab05611e2b204ad16682291c0",
+      "archive_sha256": "4c3d0625fc6ad2cabcca51e7c60429251921de784e6328180b6c4a7bbbbfafc6",
+      "cases": [
+        {
+          "project": "sculpt",
+          "bytes": 50061799,
+          "input_output_sha256": "d32c725a02d3d9291f3208c879f78ecc343c33511de9e10b5c18d93bb95fd694",
+          "SAVE_START_KIB": 48260,
+          "SAVE_PEAK_KIB": 786304
+        },
+        {
+          "project": "hdr2048",
+          "bytes": 122856849,
+          "input_output_sha256": "3af44a4ae5c3f6563da4e7f18e2d2aeb88a25e2ba5bddc108afdd67daa3b8d3a",
+          "SAVE_START_KIB": 794028,
+          "SAVE_PEAK_KIB": 1071712
+        }
+      ],
+      "scope": "Same probe and native Open implementation. Trim free glibc arenas and reset kernel VmHWM once, before real Scene::save. Native output must match the project bytes."
+    },
+    {
+      "profile": "variant",
+      "exe_sha256": "452df07e3de562dfad9ab82fb800b68edfc6500ba1f60b209505205aefdf01ab",
+      "archive_sha256": "afdf79d2eb081409928b31ef76010191423376f3d44855ee02127b9c2a5b7782",
+      "cases": [
+        {
+          "project": "sculpt",
+          "bytes": 50061799,
+          "input_output_sha256": "d32c725a02d3d9291f3208c879f78ecc343c33511de9e10b5c18d93bb95fd694",
+          "SAVE_START_KIB": 48588,
+          "SAVE_PEAK_KIB": 347400
+        },
+        {
+          "project": "hdr2048",
+          "bytes": 122856849,
+          "input_output_sha256": "3af44a4ae5c3f6563da4e7f18e2d2aeb88a25e2ba5bddc108afdd67daa3b8d3a",
+          "SAVE_START_KIB": 794072,
+          "SAVE_PEAK_KIB": 1034300
+        }
+      ],
+      "scope": "Same probe and native Open implementation. Trim free glibc arenas and reset kernel VmHWM once, before real Scene::save. Native output must match the project bytes."
+    }
+  ],
+  "authorities": {
+    "build-plan.json": {
+      "bytes": 589,
+      "sha256": "089a5be8ec3ebc3fea668240b738783de19ca27dc6ab8b509c49d1e4f6091df1"
+    },
+    "build-status.json": {
+      "bytes": 687,
+      "sha256": "f682f585595bb7eaa19c6f923b1e192cbc282478442cab7f1073433d7e0df232"
+    },
+    "build.log": {
+      "bytes": 754949,
+      "sha256": "3f91b5e6bf07f320ed1d8049afb76415fd9cc7d664340abdeb1b339b9ee5d705"
+    },
+    "configure.log": {
+      "bytes": 2436,
+      "sha256": "ccdc25b0a215b2aeaed8f2f13a7f22afd3cec871991cb56464a1b40ddf89ce85"
+    },
+    "CMakeCache.txt": {
+      "bytes": 57048,
+      "sha256": "133075583aedbb872aec5befb3ea29f8e1f4f47fd7a5cfa0a9a79fc4d3a31cca"
+    },
+    "compile_commands.json": {
+      "bytes": 1321517,
+      "sha256": "02726d52740b5abc6529c1452029fcfa3d83fdaa03b2d0f39d721a359e7fd545"
+    },
+    "save-peak.cpp": {
+      "bytes": 992,
+      "sha256": "97d5b9d9950eafe0259e3e499475d0fd68c43561c40bae4e41dbe6092aa9f005"
+    },
+    "save-peak.py": {
+      "bytes": 3206,
+      "sha256": "eb44ea2bba390c7e3ea7cb1a44420a4eb6f6c3eda904fa13a6589a24bff783bd"
+    },
+    "validate.py": {
+      "bytes": 3465,
+      "sha256": "49fccc90436580490a1938be7b9add72d719cb52a03175a40209301b32b15f46"
+    },
+    "owned_monitor.py": {
+      "bytes": 4859,
+      "sha256": "b510ef5655e3214bd38e7b5f56022c37a79879070c3733f2dd059bad74f21269"
+    },
+    "seal.py": {
+      "bytes": 4221,
+      "sha256": "aabf79f181cf8eb13ac8768435d3bc4b94ced6404b5eb34530e5d5cdf974dcf9"
+    },
+    "Testing/Temporary/LastTest.log": {
+      "bytes": 7691,
+      "sha256": "0d57ee1ee53e5015000c76fb9533b9e9a1c6e8a392638d7e0983407a6593bbdb"
+    },
+    "validation/native.xml": {
+      "bytes": 4009,
+      "sha256": "a369f99862d6b05a5981d063955b1bd46fbfa5128c3bbfb852f141d8cfc4f6c0"
+    },
+    "validation/native.log": {
+      "bytes": 486,
+      "sha256": "287d94b0b1df2dd7a7df3c3650dda8cfcea0e25a39c2fe60a97f5773995be1f7"
+    },
+    "validation/save-peak.log": {
+      "bytes": 748,
+      "sha256": "3f50869e70534da6b06d5b1e6501a4e19163a4c28190132f9621b3ea997fe01b"
+    },
+    "validation/status.json": {
+      "bytes": 2834,
+      "sha256": "f1bfd7abe66cbc99bfbda24f5f1b4933257c15f8ae945a47f2c1debfbf9cccec"
+    },
+    "validation/owning-hdr-export.log": {
+      "bytes": 425,
+      "sha256": "17d4fac9d42415bb3077087184e557f3d8827222e0b79eeb01a9f805d2f93675"
+    },
+    "validation/sculpt-default.log": {
+      "bytes": 141,
+      "sha256": "4ef31ce8ac1c27b69fc7ad936d64d331f247976abff9589692a01d35f43f0377"
+    },
+    "CMakeFiles/dome-sculpt-core.dir/src/scene.cpp.o.d": {
+      "bytes": 27935,
+      "sha256": "90bae855d2351da7af17dabed83e414b65c5b3c439110fc25efe46a6c0878ed7"
+    },
+    "CMakeFiles/dome-sculpt-scene-file-test.dir/tests/scene-file.cpp.o.d": {
+      "bytes": 21837,
+      "sha256": "b228e26754088179bf0a8929be79f9dacb7a3b4bee4336085acccd88a3949c4f"
+    },
+    "profile-baseline/plan.json": {
+      "bytes": 2158,
+      "sha256": "2905829cf7e9c527dba88926c8b262efce3bdca970574763227b909d21ba77e1"
+    },
+    "profile-baseline/result.json": {
+      "bytes": 845,
+      "sha256": "7f036f766e6ae877370ef57b0dc702bc556054545e759b1dfb87f350b5e2d747"
+    },
+    "profile-baseline/sculpt.log": {
+      "bytes": 42,
+      "sha256": "4a5137b1e1c4a6871c2cac8d86b1618e3cc6bff2b5b17ccfd54663a6343cf6b4"
+    },
+    "profile-baseline/hdr2048.log": {
+      "bytes": 44,
+      "sha256": "6cc3ac35cd227a70b4b98917fe5841c93b82c9da7664f0e8c64298b1532b9bed"
+    },
+    "profile-baseline/save-peak.o.d": {
+      "bytes": 14872,
+      "sha256": "b2c5db9c8f929019fb659ebc1d806647a758329d9d5f3267b65ab13036fcd639"
+    },
+    "profile-baseline/save-peak.link.d": {
+      "bytes": 7391,
+      "sha256": "ef520d1db09f53d5245f396965fedf5e2230f4094a06412ddb4bb07a3dc2ee36"
+    },
+    "profile-variant/plan.json": {
+      "bytes": 2178,
+      "sha256": "6cfa6f8100c6bad8f7d25ba531de003b7f35a3c3f120ae5936e989cf5a52329a"
+    },
+    "profile-variant/result.json": {
+      "bytes": 844,
+      "sha256": "4d27f12225e1d080877f408d8c9f90c90e0c2230cd4fe133e4f6df0f889d8842"
+    },
+    "profile-variant/sculpt.log": {
+      "bytes": 42,
+      "sha256": "3063b8501ea64fe9af31ab993e0c09fa938dbb319ed36106a20c19e25c24adb9"
+    },
+    "profile-variant/hdr2048.log": {
+      "bytes": 44,
+      "sha256": "9fb7fd0453e46ed2c3b4f6245e875bb3eafc2d566c150683d06934a8d11259c9"
+    },
+    "profile-variant/save-peak.o.d": {
+      "bytes": 14991,
+      "sha256": "b987e58d92231183eba41040457fd2a76e54bc9526568d8fa712ce8ce3526180"
+    },
+    "profile-variant/save-peak.link.d": {
+      "bytes": 7400,
+      "sha256": "c095c6e8e8e3872f8b652a1caffe40c7c1aa3001c0e67467119c74e6bf31293f"
+    },
+    "build.journal.txt": {
+      "bytes": 788,
+      "sha256": "7e4006f70871e43717be742e2eb5bf3f737bde8f5f0ff15a064acdd9b0e1a535"
+    },
+    "validation.journal.txt": {
+      "bytes": 410,
+      "sha256": "97faca1569f7342656139412c7ca2e3998da969f346322ab3010024e89b83b84"
+    },
+    "comparison_baseline.journal.txt": {
+      "bytes": 1223,
+      "sha256": "d6ff7292d2ef41151b70100a11972f6564fabc42e3286a78877b2316ac71e14e"
+    }
+  },
+  "archive": {
+    "name": "native-save-one-volume-20261126.tar.xz",
+    "bytes": 90176,
+    "sha256": "7c158222bbe911e44c33c02e7148182460a88ce989df00b108ac7c4435349b7f"
+  }
+}

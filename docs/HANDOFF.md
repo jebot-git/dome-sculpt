@@ -111,12 +111,14 @@ uses identical product source. The current build plan covers all default
 targets and both independent sculpt fixtures. Check
 `ds-production-full-regression-release-20261126.service` and
 `artifacts/production-full-regression-release-20261126/build-status.json`
-for its actual result. The combined candidate's nested Wayland App completed
-all 14 assertions. The wrapper later refused a deleted non-executable Mesa
+for its actual result. The exact combined candidate now passes all 14 native
+Wayland assertions and clean private teardown on Arc. The original wrapper
+refused a deleted non-executable Mesa
 shared mapping belonging to the compositor because private cleanup removed
-its cache before stopping the compositor. The corrected private scenario
-keeps the observer and all checks and awaits its runtime slot. Read
-[the functional Wayland and cleanup report](COMBINED9E4-NATIVE-WAYLAND-FUNCTIONAL-20261126.md).
+its cache before stopping the compositor. The corrected private scenario kept
+the observer and all checks. Read
+[the clean Wayland report](COMBINED9E4-NATIVE-WAYLAND-CLEAN-20261126.md)
+and [the original cleanup failure](COMBINED9E4-NATIVE-WAYLAND-FUNCTIONAL-20261126.md).
 The isolated integration candidate
 `5604ad54` combines current05, HDR877, sculpt6d/fe94 and corrected creator
 fixtures550. The [fresh Release build](COMBINED-RELEASE-BUILD-20261126.md) for
@@ -155,11 +157,24 @@ on `work/stream-native-open-20261126`. Main runtime admission is unchanged.
 
 Save candidate `07025cd3` releases each live object's volume JSON tree after
 writing its CBOR fields. It retains the existing file format and atomic writer.
-The comparison uses the same bounded loader and actual projects. The baseline
-isolated sculpt Save reaches 786,304 KiB. The candidate build and dependent
-validation are running. Review `ds-serialize-sculpt-objects-release-20261126.service`
-and `ds-serialize-sculpt-objects-validate-20261126.service` before retrying.
+Isolated sculpt Save peak RSS fell from 786,304 to 347,400 KiB. The 2048 HDR
+project fell from 1,071,712 to 1,034,300 KiB. Both saves match every source byte.
+The fresh Release build passed all 234 actions. The candidate passes 23 scene
+file, 21 recovery, 22 atomic allocation and 16,400 HDR export checks. On the
+default allocator the original four-object sculpt suite now passes all 167
+checks in 94.41 seconds at 3,553,742,848 bytes peak owned RSS, within the original
+4 GiB limit. The earlier default-allocator failure with bounded Open alone
+remains in the original receipt. Read
+[the one-volume Save validation](validation/native-save-one-volume-20261126.json).
+The full-App build and matched sanitizer verification are separate.
 The source is pushed on `work/serialize-sculpt-objects-20261126`.
+
+The original independent Arc sculpt run reached 300 strokes, 120 masks and
+2,000 stereo pairs in its first repetition, including 13 independent exact
+checkpoints. It then failed while charging new representative index paths
+against its internal working quota. The first repetition did not finish all
+post-edit checks. The original cap stays in force while live persistent index
+and scratch ownership are investigated.
 Full scope in REQUIREMENTS is unchanged.
 
 ## Source and integration boundary
