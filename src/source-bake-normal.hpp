@@ -21,8 +21,14 @@ struct RetainedSourceBakeField {
  std::function<RetainedSourceBakeHit(uint32_t,std::array<float,3>)> sample;
  bool physical_emission=false;
 };
+struct SourceBakePlacement {
+ // Transformed native Mikk corners, in original logical triangle order.
+ std::span<const std::array<float,4>> tangent_corners;
+ bool reverse_winding=false;
+};
 // Internal dual-role route; the public legacy Bake API stays byte/layout exact.
 BakeResult bake_mesh_source_normals(const Mesh &,const BakeSource &,const BakeOptions &,
  const SourceBakeNormalResolver &, std::span<const uint32_t> target_triangles = {},
- std::span<const RetainedSourceBakeField> source_fields = {});
+ std::span<const RetainedSourceBakeField> source_fields = {},
+ SourceBakePlacement source_placement = {});
 }
