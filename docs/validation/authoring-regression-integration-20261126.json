@@ -1,0 +1,117 @@
+{
+  "candidate": "9a2958a853f3d7ed277375d4ba8b2e976b4f6747",
+  "parent": "2cbc1f1a55a0642cb99118f9a90a303035357c2d",
+  "branch": "work/authoring-regression-integration-20261126",
+  "tested_diff_sha256": "d286db07eae7ae49809e8caab178b3e30e3c039add8a33ac0e99b837a1a81d24",
+  "toolkit": {
+    "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+    "fltk": "/opt/fltk-vr/toolkit",
+    "bitmap": "/opt/fltk-vr/bdf-runtime"
+  },
+  "focused_build": "Each profile verifies 198 core archive members. The graph validator and five tests were rebuilt and linked; the remaining core members match the corresponding parent byte for byte. The PBR test uses the candidate linker wrapper.",
+  "release": {
+    "unit": "ds-authoring-regression-integration-current-release-20261126.service",
+    "invocation": "9fc26c1f43404296b74b67371066d99b",
+    "passed": 5,
+    "results": {
+      "polygon-scene": 0,
+      "native-paint-sampling-transitions": 0,
+      "normal-preparation": 0,
+      "polygon-surface-paint": 0,
+      "pbr-preview": 0
+    },
+    "case_logs": {
+      "artifacts/authoring-regression-integration-current-release-20261126/polygon-scene.log": "b1f85c3141831544c40b5abd92364316de8cb4e2726959786ced22d8268a12bf",
+      "artifacts/authoring-regression-integration-current-release-20261126/native-paint-sampling-transitions.log": "4407ed37d2ab1562580b98731ba0a7445e8a02159e78353769c5bf6c340cd165",
+      "artifacts/authoring-regression-integration-current-release-20261126/normal-preparation.log": "f86b07607a61ec9ee7a53a430ca039bd279fdd0068fb390d75956b054e8fb9b1",
+      "artifacts/authoring-regression-integration-current-release-20261126/polygon-surface-paint.log": "327bac005a1ae121f660e1e6beeb0b434b50605c1328aec102e12b1bb8cf84d7",
+      "artifacts/authoring-regression-integration-current-release-20261126/pbr-preview.log": "aa45f8edb3bae14de7e057df5205cb3d64bc23009c04e607d1b5c61f0b16fe43"
+    },
+    "source-and-results": {
+      "artifacts/authoring-regression-integration-current-release-20261126/source-at-test": "f8ef0546ac7c798e8a9622a3b80c2d77840863eeab4f97ca6bea683a85a93419",
+      "artifacts/authoring-regression-integration-current-release-20261126/results.json": "3d20d8b285a3e8840dc0bfbe9aaf7bd6339abac07e35cd632efe4a59509cb824",
+      "artifacts/authoring-regression-integration-current-release-20261126/libdome-sculpt-core.a": "e2b27fb33d73d9cf8b16bca8d11bd4bd7109a075e0ff236ab1d1e4bfa9e61426"
+    }
+  },
+  "asan_ubsan_leaks": {
+    "unit": "ds-authoring-regression-integration-current-asan-20261126.service",
+    "invocation": "431dc5dd84314afc9a2c62a5c80cb52a",
+    "passed": 5,
+    "results": {
+      "polygon-scene": 0,
+      "native-paint-sampling-transitions": 0,
+      "normal-preparation": 0,
+      "polygon-surface-paint": 0,
+      "pbr-preview": 0
+    },
+    "case_logs": {
+      "artifacts/authoring-regression-integration-current-asan-20261126/polygon-scene.log": "b1f85c3141831544c40b5abd92364316de8cb4e2726959786ced22d8268a12bf",
+      "artifacts/authoring-regression-integration-current-asan-20261126/native-paint-sampling-transitions.log": "4407ed37d2ab1562580b98731ba0a7445e8a02159e78353769c5bf6c340cd165",
+      "artifacts/authoring-regression-integration-current-asan-20261126/normal-preparation.log": "f86b07607a61ec9ee7a53a430ca039bd279fdd0068fb390d75956b054e8fb9b1",
+      "artifacts/authoring-regression-integration-current-asan-20261126/polygon-surface-paint.log": "327bac005a1ae121f660e1e6beeb0b434b50605c1328aec102e12b1bb8cf84d7",
+      "artifacts/authoring-regression-integration-current-asan-20261126/pbr-preview.log": "aa45f8edb3bae14de7e057df5205cb3d64bc23009c04e607d1b5c61f0b16fe43"
+    },
+    "source-and-results": {
+      "artifacts/authoring-regression-integration-current-asan-20261126/source-at-test": "f8ef0546ac7c798e8a9622a3b80c2d77840863eeab4f97ca6bea683a85a93419",
+      "artifacts/authoring-regression-integration-current-asan-20261126/results.json": "3d20d8b285a3e8840dc0bfbe9aaf7bd6339abac07e35cd632efe4a59509cb824",
+      "artifacts/authoring-regression-integration-current-asan-20261126/libdome-sculpt-core.a": "90e4a04c0c6e6d94d1da7c602d56673bc4981e2c577e5b05ba94c40086e726af"
+    },
+    "elf_witnesses": {
+      "artifacts/authoring-regression-integration-current-asan-20261126/dome-sculpt-native-paint-sampling-transitions-test.elf-dynamic": "99deb78184af5d61f238976ee20350ba17b3ba78be90fc62b322184be225cd1b",
+      "artifacts/authoring-regression-integration-current-asan-20261126/dome-sculpt-normal-preparation-test.elf-dynamic": "3829dde294cf9c4db402c66ec375e59c77468501148389f2ccc716737a522d28",
+      "artifacts/authoring-regression-integration-current-asan-20261126/dome-sculpt-pbr-preview-test.elf-dynamic": "01c4f09277b6be0ef92f7cb321e94ea265b1781d5744b0d53dcba26157391483",
+      "artifacts/authoring-regression-integration-current-asan-20261126/dome-sculpt-polygon-scene-test.elf-dynamic": "74c637d1c34491a110f278c5de5b4aca5be35ed267051a07bd6b6606bb324c9a",
+      "artifacts/authoring-regression-integration-current-asan-20261126/dome-sculpt-polygon-surface-paint-test.elf-dynamic": "f11cf498d3a9c9804436e78524d5f0f1c72b5bac4e2c5f1b3a172d58058f24d9"
+    }
+  },
+  "identical_native_and_portable_outputs": {
+    "artifacts/authoring-regression-integration-current-release-20261126/normal-preparation/native-prepared-source.dsculpt": "618448cebe809a7a7c71122f7f5e6a2ffabd61e737630d096616fa28825756a0",
+    "artifacts/authoring-regression-integration-current-release-20261126/normal-preparation/native.glb": "53891d9c3873e079b4d51c62171c61ec5b10853ece6a2b666d75579f06c67235",
+    "artifacts/authoring-regression-integration-current-release-20261126/pbr-preview/native.glb": "0dc13fb80b759c1b4bc34cf996d868454e20ee184f73695b70c1efc80999dbc9"
+  },
+  "arc": {
+    "exit": 0,
+    "pci": "0000:03:00.0",
+    "device_fds": [
+      "/dev/dri/renderD129"
+    ],
+    "renderer": "GPU Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+    "pbr_preview_checks": 134,
+    "allocation_failure_boundaries": 51,
+    "artifacts": {
+      "artifacts/authoring-regression-integration-current-release-20261126/arc/status.json": "6127c161c9b8c59204327eaca11cbaaec3753b2e52982cbcf1f36cb6f7c32f47",
+      "artifacts/authoring-regression-integration-current-release-20261126/arc/pbr.log": "0ce41857a386117fa5f64fdbf8dbdd52b4a4b899f9275feb16b7beff2a6aac95",
+      "artifacts/authoring-regression-integration-current-release-20261126/arc/native.glb": "0dc13fb80b759c1b4bc34cf996d868454e20ee184f73695b70c1efc80999dbc9"
+    }
+  },
+  "checks": {
+    "native_paint_sampling_transitions": 18,
+    "normal_preparation_native": 47,
+    "pbr_preview": 134,
+    "polygon_scene_archive": 33,
+    "polygon_surface_paint_private_codec": 16407
+  },
+  "bake_numeric": {
+    "retained_paint_maximum_rgb8_error": 0,
+    "prepared_normal_comparisons": 2304,
+    "prepared_normal_maximum_normalized_vector_distance": 0.005282,
+    "prepared_normal_bound": 0.02
+  },
+  "combined_replay": {
+    "unit": "ds-authoring-regression-integration-combined-20261126.service",
+    "invocation": "861a3363d9af4e2892764eeb1175e7d5",
+    "cases": 86,
+    "path": "artifacts/authoring-regression-integration-combined-20261126/combined-regression/status.json",
+    "terminal": false
+  },
+  "preserved_failures_and_recovery": [
+    "Old fixtures expected source Bake to reject supported retained domains. The revised tests compare genuine source data and pre-publication atomicity.",
+    "An early flat fixture lacked original tangent authority and correctly refused. The accepted fixture imports an actual glTF texture and explicit handedness.",
+    "An early projection fixture barrier still intercepted an unused mesher overload. The accepted one gates the current SculptSceneChunks worker."
+  ],
+  "open_scope": [
+    "Fresh combined application qualification",
+    "Remaining VRM consumer cases",
+    "Full production authoring and physical XR/device acceptance"
+  ]
+}

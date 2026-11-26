@@ -603,9 +603,31 @@ Core candidate `fed5cd80` passes nine Release and eight ASan/UBSan tests
 with leak detection. Follow-up `2cbc1f1a` routes the headless
 `--export-project` command through the standard file worker. The fresh
 FLTK application exports the previously failing UV1 project and the sculpt
-demo, and both files validate. The selected 86-case replay is running on
-`2cbc1f1a`.
+demo, and both files validate. The 86-case replay on `2cbc1f1a` finished with
+78 passes, eight previous failures and zero skips.
 See [the validation receipt](validation/core-gltf-normal-export-20261126.json).
+
+### Bake, projection and archive regression integration
+
+Candidate `9a2958a8` updates five regressions against the current authoring
+paths. The retained-paint Bake matches a Bake from the restored original
+pixel for pixel, with a spatially asymmetric colour witness and atomic late
+cancellation. A second Bake from imported prepared normals checks 2,304
+interior texels against the known source tangent basis. Its maximum direction
+difference is 0.005282 against the 0.02 test bound. The actual Document worker,
+immediate Save, reopen and Undo/Redo agree with the detached result.
+
+The PBR projection fixture checks the current immutable query with and
+without object grab, plus independent reconstruction from the captured
+streams. Its delayed-publication gate now intercepts the current mesh
+worker. All 134 checks pass on software and Intel Arc A770, including the
+51 allocation-failure boundaries. Polygon archive checks distinguish an
+owner cycle from excessive graph depth and retain the enclosing FLOAT
+payload guard. Five focused Release and five ASan/UBSan suites pass with
+leak detection. These tests use verified staged archives with a newly
+compiled graph validator. A fresh FLTK application build and the larger
+86-case replay are running on the exact pushed candidate.
+See [the validation receipt](validation/authoring-regression-integration-20261126.json).
 
 ## Source and integration boundary
 

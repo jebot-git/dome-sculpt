@@ -233,6 +233,37 @@
     "invocation": "1add37a5486e44769e0a521bcf4a9f7d",
     "path": "artifacts/core-gltf-normal-export-release-20261126/combined-regression/status.json",
     "cases": 86,
-    "terminal": false
+    "terminal": true,
+    "ctest_exit": 8,
+    "result": {
+      "previous": {
+        "passed": 78,
+        "failed": 8,
+        "skipped": 0
+      },
+      "current": {
+        "passed": 78,
+        "failed": 8,
+        "skipped": 0
+      },
+      "recovered": [],
+      "new_failures": [],
+      "remaining_nonpasses": [
+        "native-paint-sampling-transitions",
+        "normal-preparation-native",
+        "pbr-preview",
+        "polygon-scene-archive",
+        "polygon-surface-paint-private-codec",
+        "source-color-vrm",
+        "vrm",
+        "vrm-role-consumer"
+      ]
+    },
+    "artifacts": {
+      "artifacts/core-gltf-normal-export-release-20261126/combined-regression/comparison.json": "1ad640c3519a36d78cb4eb56fb584b17976c2a9bde0c62f5238d4be9d758d908",
+      "artifacts/core-gltf-normal-export-release-20261126/combined-regression/status.json": "7b9ae314fbdac479f693f07291df50cb9243e0144169331cf6c5911dd357b97b",
+      "artifacts/core-gltf-normal-export-release-20261126/combined-regression/ctest.xml": "46cedb03196923453a3e623e4aecc549cba8a818111936a927d68bad9c3b0fa0",
+      "artifacts/core-gltf-normal-export-release-20261126/combined-regression/ctest.log": "1335c8b43deba4a1d97bb8d0b79bf8a2e97e1bcb900d9bc0509f4a0a4e1f06ca"
+    }
   }
 }
