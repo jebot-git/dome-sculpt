@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/mesh-processing.hpp"
+#include "bake-ray-query.hpp"
 #include "affine-query-metric.hpp"
 #include "packed-material-query.hpp"
 #include <bit>
@@ -7,6 +8,7 @@
 #include <map>
 #include <numeric>
 #include <set>
+#include <tuple>
 namespace dome {
 namespace {
 void cancel(const std::function<bool()> &fn) {
@@ -101,17 +103,17 @@ struct Bounds {
            z = std::max({double(lo.z) - p.z, 0., double(p.z) - hi.z});
     return x * x + y * y + z * z;
   }
-  bool ray(Vec3 p, Vec3 d) const {
-    double lo_t = 0, hi_t = INFINITY;
+  bool ray(Vec3 p, Vec3 d,double radius=0,double maximum=INFINITY) const {
+    double lo_t = 0, hi_t = maximum;
     float ps[] = {p.x, p.y, p.z}, ds[] = {d.x, d.y, d.z},
           ls[] = {lo.x, lo.y, lo.z}, hs[] = {hi.x, hi.y, hi.z};
     for (int k = 0; k < 3; k++) {
       if (std::abs(ds[k]) < 1e-20) {
-        if (ps[k] < ls[k] || ps[k] > hs[k])
+        if (ps[k] < double(ls[k])-radius || ps[k] > double(hs[k])+radius)
           return false;
         continue;
       }
-      double a = (double(ls[k]) - ps[k]) / ds[k], b = (double(hs[k]) - ps[k]) / ds[k];
+      double a = (double(ls[k])-radius-ps[k])/ds[k], b = (double(hs[k])+radius-ps[k])/ds[k];
       if (a > b)
         std::swap(a, b);
       lo_t = std::max(lo_t, a);
@@ -166,6 +168,51 @@ PrecisePoint precise_cross(const PrecisePoint &a, const PrecisePoint &b) {
   return {a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2],
           a[0]*b[1]-a[1]*b[0]};
 }
+struct BoundaryRay {
+  Vec3 origin,direction;
+  PrecisePoint axis;
+  double inverse_length2,maximum,radius;
+  BoundaryRay(Vec3 p,Vec3 d,double distance,double tolerance)
+      : origin(p),direction(d),axis{d.x,d.y,d.z},
+        inverse_length2(1/precise_dot(axis,axis)),maximum(distance),radius(tolerance) {}
+
+  struct Point {
+    Vec3 position;
+    double separation2=INFINITY,distance=INFINITY;
+    double weight=0;
+  };
+  Point nearest_edge(Vec3 a,Vec3 b) const {
+    const auto start=difference(a,origin),edge=difference(b,a);
+    const double start_depth=precise_dot(start,axis)*inverse_length2;
+    const double depth_step=precise_dot(edge,axis)*inverse_length2;
+    double lo=0,hi=1;
+    if(depth_step!=0){
+      double first=-start_depth/depth_step,last=(maximum-start_depth)/depth_step;
+      if(first>last)std::swap(first,last);
+      lo=std::max(lo,first);hi=std::min(hi,last);
+      if(lo>hi)return {};
+    }else if(start_depth<0||start_depth>maximum)return {};
+
+    PrecisePoint across,across_step;
+    for(size_t k=0;k<3;++k){
+      across[k]=start[k]-start_depth*axis[k];
+      across_step[k]=edge[k]-depth_step*axis[k];
+    }
+    const double square=precise_dot(across_step,across_step);
+    const double w=square>0?std::clamp(-precise_dot(across,across_step)/square,lo,hi):
+                           depth_step<0?hi:lo;
+    const double depth=start_depth+w*depth_step;
+    if(depth<0||depth>maximum)return {};
+    for(size_t k=0;k<3;++k)across[k]+=w*across_step[k];
+    return {{float(double(a.x)+w*edge[0]),float(double(a.y)+w*edge[1]),float(double(a.z)+w*edge[2])},
+            precise_dot(across,across),depth,w};
+  }
+};
+struct BoundaryHit {
+  BoundaryRay::Point point;
+  uint32_t triangle=UINT32_MAX;
+  std::array<float,3> bary{};
+};
 struct ClosestPoint {
   Vec3 position;
   std::array<float,3> bary;
@@ -356,6 +403,33 @@ struct Bvh {
       bary = coordinates;
     }
   }
+  void ray_boundary(const BoundaryRay &ray,int n,BoundaryHit &best,
+                     const SurfaceQueryOptions &options,size_t &visited) const {
+    cancel(options.cancelled);
+    const auto &node=nodes[n];
+    if(!node.box.ray(ray.origin,ray.direction,ray.radius,ray.maximum))return;
+    if(node.left>=0){
+      ray_boundary(ray,node.left,best,options,visited);
+      ray_boundary(ray,node.right,best,options,visited);
+      return;
+    }
+    for(size_t i=node.start;i<node.start+node.count;++i){
+      if(++visited>options.max_triangle_tests)throw std::length_error("Surface ray triangle budget exceeded");
+      const auto t=order[i];
+      if(options.triangle_filter&&!options.triangle_filter(t))continue;
+      for(size_t a=0;a<3;++a){
+        const auto b=(a+1)%3;
+        const auto candidate=ray.nearest_edge(point(t,a),point(t,b));
+        if(candidate.separation2>ray.radius*ray.radius)continue;
+        if(std::tie(candidate.separation2,candidate.distance,t)>=
+           std::tie(best.point.separation2,best.point.distance,best.triangle))continue;
+        std::array<float,3> bary{};
+        bary[a]=float(1-candidate.weight);bary[b]=float(candidate.weight);
+        if(options.ray_filter&&!options.ray_filter(t,bary))continue;
+        best={candidate,t,bary};
+      }
+    }
+  }
   void intersections(Vec3 p, Vec3 d, int n, std::vector<double> &hits,
                      bool &edge) const {
     auto &node = nodes[n];
@@ -534,6 +608,10 @@ std::optional<SurfaceHit> SurfaceQuery::raycast(Vec3 origin,Vec3 direction,float
 }
 std::optional<SurfaceQueryResult> SurfaceQuery::raycast_result(Vec3 origin, Vec3 direction,
                                                 float maximum, const SurfaceQueryOptions &options) const {
+  return raycast_result(origin,direction,maximum,options,0);
+}
+std::optional<SurfaceQueryResult> SurfaceQuery::raycast_result(Vec3 origin,Vec3 direction,float maximum,
+    const SurfaceQueryOptions &options,double rounding_radius) const {
   cancel(options.cancelled);
   if (!options.max_triangle_tests) throw std::invalid_argument("Empty surface ray budget");
   if (!impl_ || !finite(origin) || !finite(direction) ||
@@ -549,9 +627,19 @@ std::optional<SurfaceQueryResult> SurfaceQuery::raycast_result(Vec3 origin, Vec3
   std::array<float, 3> bary{};
   size_t visited = 0;
   impl_->tree.ray_hit(origin, direction, SurfaceRay(origin,direction), 0, best, triangle, bary, options, visited);
-  if (triangle == UINT32_MAX)
-    return {};
-  return SurfaceQueryResult{impl_->hit(triangle,origin+direction*float(best),bary,float(best)),best*best};
+  if(triangle!=UINT32_MAX)
+    return SurfaceQueryResult{impl_->hit(triangle,origin+direction*float(best),bary,float(best)),best*best};
+  if(rounding_radius<=0)return {};
+  BoundaryHit boundary;
+  impl_->tree.ray_boundary(BoundaryRay(origin,direction,maximum,rounding_radius),0,boundary,options,visited);
+  if(boundary.triangle==UINT32_MAX)return {};
+  const double distance=boundary.point.distance;
+  return SurfaceQueryResult{impl_->hit(boundary.triangle,boundary.point.position,boundary.bary,float(distance)),distance*distance};
+}
+std::optional<SurfaceHit> detail::BakeRayQuery::cast(const SurfaceQuery &surface,Vec3 origin,Vec3 direction,
+    float maximum,double rounding_radius,const SurfaceQueryOptions &options) {
+  const auto result=surface.raycast_result(origin,direction,maximum,options,rounding_radius);
+  return result?std::optional<SurfaceHit>(result->surface):std::nullopt;
 }
 std::optional<SurfaceQueryResult> SurfaceQuery::nearest_result(Vec3 point,const AffineTransform &world,
     const SurfaceQueryOptions &options) const {

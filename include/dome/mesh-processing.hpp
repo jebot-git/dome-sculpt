@@ -6,7 +6,7 @@
 #include <limits>
 #include <stdexcept>
 namespace dome {
-namespace detail {class SculptPlacedChunk;}
+namespace detail {class SculptPlacedChunk;struct BakeRayQuery;}
 struct TopologyReport {
   size_t vertices = 0, triangles = 0, geometric_vertices = 0,
          unused_vertices = 0;
@@ -58,12 +58,15 @@ struct SurfaceQueryResult {SurfaceHit surface;double squared_distance=0;};
 // Distances are metres and ray direction is normalized internally.
 class SurfaceQuery {
   friend class detail::SculptPlacedChunk;
+  friend struct detail::BakeRayQuery;
   struct Impl;
   std::unique_ptr<Impl> impl_;
   struct ImmutableGeometry {};
   SurfaceQuery(ImmutableGeometry,std::shared_ptr<const Mesh>,
                const std::function<bool()> &);
   static size_t immutable_working_bytes(const Mesh &);
+  std::optional<SurfaceQueryResult> raycast_result(Vec3,Vec3,float,
+      const SurfaceQueryOptions &,double rounding_radius) const;
 
 public:
   explicit SurfaceQuery(const Mesh &,

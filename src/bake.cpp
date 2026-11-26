@@ -1,6 +1,7 @@
 #include "paint-overlay-packet.hpp"
 #include "emission-authority.hpp"
 #include "source-bake-normal.hpp"
+#include "bake-ray-query.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/bake.hpp"
 #include "dome/mesh-processing.hpp"
@@ -240,6 +241,26 @@ bool within_projection_bounds(Vec3 target, Vec3 source, Vec3 normal,
       length(delta)<=std::max(options.front_distance,options.back_distance)+tolerance;
 }
 
+double projection_rounding_radius(const Mesh &low,size_t triangle,
+                                  const std::array<double,3> &origin) {
+  std::array<double,3> extent{};
+  for(size_t corner=0;corner<3;++corner){
+    const auto p=low.positions[low.indices[triangle*3+corner]];
+    const std::array<double,3> point{p.x,p.y,p.z};
+    for(size_t axis=0;axis<3;++axis)
+      extent[axis]=std::max({extent[axis],std::abs(point[axis]),std::abs(point[axis]+origin[axis])});
+  }
+  std::array<double,3> spacing;
+  for(size_t axis=0;axis<3;++axis){
+    const auto magnitude=float(extent[axis]);
+    if(!std::isfinite(magnitude))return 0;
+    spacing[axis]=double(std::nextafter(magnitude,std::numeric_limits<float>::max()))-magnitude;
+  }
+  // The recipient and donor enter the projection frame independently. Use
+  // two float spacings per axis to cover staging and the weighted ray origin.
+  return 2*std::hypot(spacing[0],spacing[1],spacing[2]);
+}
+
 void pad(BakeResult &result,const BakeOptions &o,std::vector<BakedEmissionSample> &emission) {
   auto n=o.resolution; std::deque<std::pair<uint32_t,uint32_t>> queue;
   for (uint32_t i=0;i<result.coverage.size();++i) if (result.coverage[i]==1) queue.push_back({i,0});
@@ -352,8 +373,12 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
   if(o.separate_pbr_color)result.maps.pbr_color={o.resolution,o.resolution,std::vector<uint8_t>(pixels*4)};
   std::vector<uint32_t> owner(pixels,UINT32_MAX);
   const size_t triangle_count=target_triangles.empty()?low.indices.size()/3:target_triangles.size();
+  SurfaceQueryOptions ray_options;
+  ray_options.cancelled=o.cancelled;
   for (size_t face=0;face<triangle_count;++face) {
     const size_t triangle=target_triangles.empty()?face:target_triangles[face];
+    const double rounding_radius=ray_projection?
+        projection_rounding_radius(low,triangle,source_placement.target_rounding_origin):0;
     if(o.progress && face%64==0)o.progress(.05f+.85f*float(face)/float(triangle_count));
     cancel(o); std::array<std::array<float,2>,3> uv;
     for (int i=0;i<3;++i) uv[i]=low.uv[low.indices[triangle*3+i]];
@@ -403,7 +428,8 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
         const float front=length(offset);
         const auto direction=front>1e-8f?offset/front:normal;
         if(++result.rays>o.max_rays)throw std::length_error("Bake ray budget exceeded");
-        hit=query->raycast(position+offset,direction*-1,front+o.back_distance);
+        hit=detail::BakeRayQuery::cast(*query,position+offset,direction*-1,front+o.back_distance,
+                                       rounding_radius,ray_options);
       }else{
         std::array<float,3> mapped{};
         for(int k=0;k<3;++k)for(int c=0;c<3;++c)mapped[c]+=bary[k]*o.source_corner_barycentrics[triangle*3+k][c];

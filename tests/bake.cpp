@@ -36,8 +36,42 @@ std::array<uint8_t,4> pixel(const Image &image,int x,int y) {
   auto p=image.rgba.data()+(size_t(y)*image.width+x)*4;return {p[0],p[1],p[2],p[3]};
 }
 bool near(int a,int b,int tolerance=1) {return std::abs(a-b)<=tolerance;}
+void edge_projection() {
+  const auto target=quad(-1,1,0,1.f/64,63.f/64,1.f/64,63.f/64);
+  BakeOptions settings;settings.resolution=32;settings.ao_samples=0;settings.padding=0;
+  settings.front_distance=settings.back_distance=.25f;
+  BakeSource source;source.mesh=quad(-1,std::nextafter(1.f,0.f),.125f);
+  source.materials.front().material.color={1,0,0,1};
+  const auto rounded=bake_mesh(target,source,settings);
+  check(rounded.projected==31*31&&rounded.missed==0&&rounded.rays==31*31&&
+        pixel(rounded.maps.color,31,16)[0]==255,
+        "A one-float-step boundary projects to the actual donor edge without adding a ray");
+
+  auto layered=source;
+  append(layered.mesh,quad(-1,1,-.125f));
+  layered.materials.emplace_back().material.color={0,1,0,1};
+  layered.triangle_materials={0,0,1,1};
+  const auto exact=bake_mesh(target,layered,settings);
+  check(pixel(exact.maps.color,16,16)[0]==255&&pixel(exact.maps.color,31,16)[1]==255,
+        "An actual deeper ray hit has precedence over a nearby foreground edge");
+
+  source.mesh=quad(-1,1-.00001f,.125f);
+  check(rejects([&]{bake_mesh(target,source,settings);}),
+        "Strict projection refuses a real lateral gap beyond float precision");
+  settings.fail_on_miss=false;
+  const auto gap=bake_mesh(target,source,settings);
+  check(gap.projected==30*31&&gap.missed==31&&gap.coverage[16*32+31]==3,
+        "Partial projection leaves the true missed edge uncovered");
+  settings.fail_on_miss=true;
+  for(float z:{std::nextafter(.25f,1.f),std::nextafter(-.25f,-1.f)}) {
+    source.mesh=quad(-1,std::nextafter(1.f,0.f),z);
+    check(rejects([&]{bake_mesh(target,source,settings);}),
+          "Rounding recovery never extends a front or back projection depth");
+  }
+}
 } // namespace
 int main()try {
+  edge_projection();
   auto low=quad();BakeSource source;source.mesh=quad();
   BakeOptions options;options.resolution=32;options.padding=0;options.ao_samples=0;
   auto result=bake_mesh(low,source,options);

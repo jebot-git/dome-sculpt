@@ -70,6 +70,20 @@ void affine_donor(Scene scene, const std::filesystem::path &path) {
   check(bake_fixture::isolated_scene(after,donor).encode()==source_before&&Scene::load(path).encode()==encoded&&
         doc.undo()&&doc.copy_scene().encode()==before&&doc.redo()&&doc.copy_scene().encode()==encoded,
         "Affine Bake preserves the exact immutable source, ordered reopen, Undo and Redo");
+  settings.corresponding_topology=false;
+  auto ray_scene=scene.snapshot();
+  const auto projected=bake_object(ray_scene,donor,settings);
+  const auto ray_bake=ray_scene.active().painted->baked();
+  check(projected.projected>1000&&projected.missed==0&&projected.rays==projected.projected&&
+        ray_bake->coverage==baked->coverage,
+        "Strict rays cover the complete coincident affine atlas at its original depth bounds");
+  const auto agrees=[](const Image &actual,const Image &expected){
+    return std::ranges::equal(actual.rgba,expected.rgba,[](uint8_t a,uint8_t b){return std::abs(int(a)-b)<=2;});
+  };
+  check(agrees(ray_bake->maps.normal,baked->maps.normal)&&
+        agrees(ray_bake->maps.mtoon_normal,baked->maps.mtoon_normal)&&
+        bake_fixture::isolated_scene(ray_scene,donor).encode()==source_before,
+        "Both normal planes agree with matching geometry within two byte levels and retain the source");
 }
 }
 int main(int argc,char **argv)try {

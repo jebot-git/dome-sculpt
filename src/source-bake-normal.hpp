@@ -28,6 +28,8 @@ struct SourceBakePlacement {
  // Transformed native Mikk corners, in original logical triangle order.
  std::span<const std::array<float,4>> tangent_corners;
  bool reverse_winding=false;
+ // Coordinate origin subtracted after the target was stored as floats.
+ std::array<double,3> target_rounding_origin{};
 };
 // Internal dual-role route; the public legacy Bake API stays byte/layout exact.
 BakeResult bake_mesh_source_normals(const Mesh &,const BakeSource &,const BakeOptions &,

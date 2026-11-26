@@ -353,8 +353,6 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
       placed_corners[i]={rotated.x,rotated.y,rotated.z,t[3]};
     }
   }
-  const detail::SourceBakePlacement source_placement{placed_corners,
-      placement&&placement->orientation()==AffineOrientation::Reversing};
   AffineVector bake_origin{};
   if(placement||target_placement){
     // Keep original triangle and corner identities even under reflection.
@@ -404,6 +402,8 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
       n = {world.x,world.y,world.z};
     }
   }
+  const detail::SourceBakePlacement source_placement{placed_corners,
+      placement&&placement->orientation()==AffineOrientation::Reversing,bake_origin};
   BakeOptions options;
   options.resolution = target.painted->resolution();
   options.front_distance = float(double(settings.front_mm) * .001 / double(target_world.scale));
