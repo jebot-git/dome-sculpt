@@ -5048,6 +5048,13 @@ if(BUILD_TESTING)
   target_link_libraries(dome-sculpt-texture-set-history-test PRIVATE dome-sculpt-core)
   add_test(NAME dome-sculpt-texture-set-history COMMAND dome-sculpt-texture-set-history-test)
   set_tests_properties(dome-sculpt-texture-set-history PROPERTIES TIMEOUT 300)
+
+  add_executable(dome-sculpt-texture-set-bake-recipe-test tests/texture-set-bake-recipe.cpp)
+  target_include_directories(dome-sculpt-texture-set-bake-recipe-test PRIVATE src)
+  target_link_libraries(dome-sculpt-texture-set-bake-recipe-test PRIVATE dome-sculpt-core)
+  add_test(NAME texture-set-bake-recipe COMMAND dome-sculpt-texture-set-bake-recipe-test
+    ${CMAKE_CURRENT_BINARY_DIR}/texture-set-bake-recipe)
+  set_tests_properties(texture-set-bake-recipe PROPERTIES TIMEOUT 900)
 endif()
 
 if(BUILD_TESTING)
