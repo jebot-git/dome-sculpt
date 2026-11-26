@@ -14,5 +14,6 @@ std::shared_ptr<const TextureMaps> source_baked_preview(const SculptObject &,
 // Empty means the unchanged legacy Bake path is sufficient. No RGB8 composite
 // is accepted as physical radiance authority.
 std::function<std::array<float,3>(uint32_t,std::array<float,3>)>
-emission_bake_source(const SculptObject &,const std::function<bool()> &cancelled={});
+emission_bake_source(const SculptObject &,const std::function<bool()> &cancelled={},
+    const SourceBakeNormalResolver *captured_normals=nullptr);
 }

@@ -20,22 +20,26 @@ public:
    return sample_(triangle,bary);
  }
  bool matches_prepared_source(const TextureMaps &) const noexcept;
- bool requires_source_pairing() const noexcept {return bool(projection_)||bool(canonical_maps_);}
- const auto &canonical_maps() const noexcept {return canonical_maps_;}
+ bool requires_source_pairing() const noexcept {return bool(projection_)||bool(paired_maps_);}
+ const auto &paired_maps() const noexcept {return paired_maps_;}
+ const auto &paint_domain() const noexcept {return paint_domain_;}
 private:
  using Sample=std::function<std::array<Vec3,2>(uint32_t,std::array<float,3>)>;
  SourceBakeNormalResolver(Sample sample,std::shared_ptr<const PaintNormalProjection> projection,
-     std::shared_ptr<const PaintOverlayPacket> packet,std::shared_ptr<const TextureMaps> canonical_maps={})
+     std::shared_ptr<const PaintOverlayPacket> packet,std::shared_ptr<const TextureMaps> paired_maps={},
+     std::shared_ptr<const PaintSamplingDomain> paint_domain={})
    :sample_(std::move(sample)),projection_(std::move(projection)),packet_(std::move(packet)),
-    canonical_maps_(std::move(canonical_maps)){}
+    paired_maps_(std::move(paired_maps)),paint_domain_(std::move(paint_domain)){}
  Sample sample_;
  std::shared_ptr<const PaintNormalProjection> projection_;
  std::shared_ptr<const PaintOverlayPacket> packet_;
- std::shared_ptr<const TextureMaps> canonical_maps_;
+ std::shared_ptr<const TextureMaps> paired_maps_;
+ std::shared_ptr<const PaintSamplingDomain> paint_domain_;
  friend SourceBakeNormalResolver source_bake_normals(
      const SculptObject &,CanvasTransform,const SourceBakeNormalOptions &);
 };
 bool affine_source_normal_supported(const SculptObject &) noexcept;
+bool writable_bake_source_supported(const SculptObject &) noexcept;
 SourceBakeNormalResolver source_bake_normals(const SculptObject &,CanvasTransform,
  const SourceBakeNormalOptions & = {});
 struct RetainedSourceBakeHit {

@@ -50,6 +50,7 @@ bool bake_target_supported(const SculptObject &object) {
 
 bool bake_source_supported(const SculptObject &object, bool affine) {
  if(!object.texture_sets){
+  if(writable_bake_source_supported(object))return true;
   if(!cut_color_supported(object))return false;
   if(!affine)return true;
   // Color-decorated polygon topology has an independent corner adapter.

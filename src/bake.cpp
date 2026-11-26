@@ -2,6 +2,7 @@
 #include "emission-authority.hpp"
 #include "source-bake-normal.hpp"
 #include "bake-ray-query.hpp"
+#include "bake-paint-coordinates.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/bake.hpp"
 #include "dome/mesh-processing.hpp"
@@ -185,21 +186,21 @@ void validate(const Mesh &low,const BakeSource &source,const BakeOptions &o,
     if(owns_field!=bool(m.maps&&m.maps->polygon_surface))
       throw std::invalid_argument("Retained polygon Bake maps require their actual source-field resolver");
     if (!std::isfinite(m.normal_strength)||m.normal_strength<0||m.normal_strength>4) throw std::invalid_argument("Invalid normal-map strength");
-    const bool canonical=m.maps&&m.maps->overlay&&m.maps->overlay->requires_canonical_bake_frames();
-    if((source_normals.requires_source_pairing()||canonical)&&
+    const bool paired=m.maps&&m.maps->overlay&&m.maps->overlay->requires_bake_source_frames();
+    if((source_normals.requires_source_pairing()||paired)&&
         (!m.maps||!source_normals.matches_prepared_source(*m.maps)))
       throw std::invalid_argument("Prepared Bake requires its actual paired normal and material source");
     if (m.maps) {
-      if(m.maps->baked_base&&m.maps->baked_base->normal_field&&!canonical&&!owns_field)
+      if(m.maps->baked_base&&m.maps->baked_base->normal_field&&!paired&&!owns_field)
         throw std::invalid_argument("Canonical source field requires its exact normal and material source");
-      if(m.maps->overlay&&!canonical&&((m.maps->source_only&&m.maps->overlay->source_maps()!=m.maps->source_maps)||(!m.maps->source_only&&!m.resolved_emission&&!owns_field)))
+      if(m.maps->overlay&&!paired&&((m.maps->source_only&&m.maps->overlay->source_maps()!=m.maps->source_maps)||(!m.maps->source_only&&!m.resolved_emission&&!owns_field)))
         throw std::invalid_argument("Bake overlay differs from its immutable source coordinate owner");
       if(m.maps->source_maps)m.maps->source_maps->validate_surface(source.mesh);
       if(m.maps->baked_base&&m.maps->source_only){
         if(!m.maps->overlay||m.maps->overlay->baked()!=m.maps->baked_base)
           throw std::invalid_argument("Raw Bake normal differs from its actual immutable overlay owner");
         const auto &b=*m.maps->baked_base;b.validate(m.maps->overlay->resolution());
-        if(!canonical&&(b.normal_interpretation!=BakedNormalInterpretation::CanonicalMikk||b.normal_field||b.normal_authority))
+        if(!paired&&(b.normal_interpretation!=BakedNormalInterpretation::CanonicalMikk||b.normal_field||b.normal_authority))
           throw std::invalid_argument("Raw Bake normal requires its explicit prepared frame adapter");
       }
       if(m.maps->source_only){
@@ -321,7 +322,7 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
     const auto &projection=*maps.normal_projection;
     projection.validate(projection.pbr?projection.pbr->width:0);
     if(maps.source_only){
-      if(!maps.overlay||!maps.source_maps||maps.baked_base)
+      if(!maps.overlay||!maps.source_maps||(maps.baked_base&&!maps.overlay->requires_bake_source_frames()))
         throw std::invalid_argument("Prepared raw material lost its actual separate channel owners");
       projection.validate(maps.overlay->resolution());
       if(const auto &baked=maps.overlay->baked();baked&&
@@ -466,13 +467,15 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
         retained=source_fields[material_id].sample(hit->triangle,hit->barycentric);
       auto high_uv=source.mesh.uv.empty()?std::array<float,2>{}:texcoord(source.mesh,hit->triangle,hit->barycentric);
       if(retained)high_uv=retained->paint_uv;
-      auto channels=material(m,source.mesh,hit->triangle,hit->barycentric,high_uv); auto high_normal=normalized(hit->normal);
+      const auto paint_uv=detail::bake_paint_coordinates(source_normals.paint_domain().get(),
+          hit->triangle,hit->barycentric,high_uv);
+      auto channels=material(m,source.mesh,hit->triangle,hit->barycentric,paint_uv); auto high_normal=normalized(hit->normal);
       if(retained&&retained->emission)channels.emission=*retained->emission;
       else if(m.resolved_emission)channels.emission=m.resolved_emission(hit->triangle,hit->barycentric);
       if(float_emission){emission[at]={{},channels.emission,1};emission[at].validate();}
-      auto pbr_color=m.maps&&m.maps->overlay?material(m,source.mesh,hit->triangle,hit->barycentric,high_uv,true).color:channels.color;
+      auto pbr_color=m.maps&&m.maps->overlay?material(m,source.mesh,hit->triangle,hit->barycentric,paint_uv,true).color:channels.color;
       const bool resolved_source=m.maps&&!m.maps->pbr_color.rgba.empty();
-      if(o.separate_pbr_color&&resolved_source)pbr_color=sample(m.maps->pbr_color,high_uv,false,true);
+      if(o.separate_pbr_color&&resolved_source)pbr_color=sample(m.maps->pbr_color,paint_uv,false,true);
       if(!source.colors.empty()){
         std::array<float,4> tint{};for(int i=0;i<3;++i)for(int c=0;c<4;++c)tint[c]+=source.colors[source.mesh.indices[hit->triangle*3+i]][c]*hit->barycentric[i];
         for(int c=0;c<4;++c){if(!o.separate_pbr_color)channels.color[c]*=tint[c];else if(!resolved_source)pbr_color[c]*=tint[c];}

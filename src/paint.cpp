@@ -1096,13 +1096,33 @@ detail::PaintOverlayFactory::source_coordinates(const PaintedMesh &paint){
   return {proof.original_uv0,proof.original_uv1};
 }
 std::shared_ptr<const detail::PaintOverlayPacket> detail::PaintOverlayFactory::capture(const PaintedMesh &paint,const std::function<bool()> &cancelled){
+  return capture_impl(paint,cancelled,false,nullptr);
+}
+std::shared_ptr<const detail::PaintOverlayPacket> detail::PaintOverlayFactory::capture_paired_bake(
+    const PaintedMesh &paint,const std::shared_ptr<const PaintNormalProjection> &projection,
+    const std::function<bool()> &cancelled) {
+  if(projection!=paint.normal_projection()||
+     projection.owner_before(paint.normal_projection())||paint.normal_projection().owner_before(projection))
+    throw std::invalid_argument("Bake overlay lost the current prepared normal owner");
+  return capture_impl(paint,cancelled,true,projection.get());
+}
+std::shared_ptr<const detail::PaintOverlayPacket> detail::PaintOverlayFactory::capture_impl(
+    const PaintedMesh &paint,const std::function<bool()> &cancelled,bool paired_bake,
+    const PaintNormalProjection *projection) {
   paint_compute::checkpoint(cancelled);
   if(!paint.valid_source_sampling_attachment())throw std::invalid_argument("Overlay capture lost its actual source coordinate/baked owner");
   auto packet=std::shared_ptr<PaintOverlayPacket>(new PaintOverlayPacket);
+  packet->paired_bake_source_=paired_bake;
   if(paint.source_sampling_prepared()&&paint.baked_){
-    if(paint.baked_->normal_interpretation!=BakedNormalInterpretation::CanonicalMikk||paint.baked_->normal_authority||paint.baked_->normal_field)
+    const auto &baked=*paint.baked_;
+    if(projection){
+      if(baked.normal_interpretation!=BakedNormalInterpretation::PreparedAttributes||
+         baked.normal_field||(baked.normal_authority&&
+         (!projection->sampling_domain||baked.normal_authority!=projection->sampling_domain->detail)))
+        throw std::invalid_argument("Bake overlay lost the prepared normal detail event");
+    }else if(baked.normal_interpretation!=BakedNormalInterpretation::CanonicalMikk||baked.normal_authority||baked.normal_field)
       throw std::invalid_argument("Source8 overlay needs its explicit normal-field adapter");
-    packet->source_baked_geometry_=paint.mesh_owner();
+    else packet->source_baked_geometry_=paint.mesh_owner();
   }
   packet->resolution_=paint.resolution();
   packet->padding_=std::shared_ptr<const std::vector<int32_t>>(paint.surface_,&paint.surface_->padding);

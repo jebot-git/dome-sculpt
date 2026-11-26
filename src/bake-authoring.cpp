@@ -209,7 +209,6 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
     target.material_bindings=recipient->material_bindings;
   }
   if(target.material_bindings&&target.material_bindings->native_paint_sampling)throw std::logic_error("Retained native paint target requires its sampling-aware Bake adapter");
-  if(source.material_bindings&&source.material_bindings->native_paint_sampling)throw std::logic_error("Retained native paint source requires its sampling-aware Bake adapter");
   if(target.material_bindings&&target.material_bindings->normal_preparation&&target.material_bindings->normal_preparation->canonical_conversion){
     NormalPreparationOptions normal_options;normal_options.cancelled=cancelled;normal_options.max_angular_error=settings.normal_error;
     auto layered=convert_canonical_normals({target.painted,target.appearance,target.material_bindings,target.deformation,target.material,{}},normal_options);
@@ -222,7 +221,7 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
 
   // This source route uses the same authenticated ordinary shading domain as
   // plane cutting. Other original/prepared roles still require their adapters.
-  if(current_source&&!detail::cut_color_supported(source))
+  if(current_source&&!detail::cut_color_supported(source)&&!detail::writable_bake_source_supported(source))
     throw std::logic_error("This corner-color source has shading roles that source baking cannot yet preserve");
   if (source.id == target.id)
     throw std::invalid_argument("Choose a different source object for baking");
@@ -328,8 +327,8 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
     high.mesh = source.deformation ? source.deformation->preview(source.painted->mesh())
                                    : source.painted->mesh();
     high.materials[0].maps = std::move(source_maps);
-    if(source_normals.canonical_maps())
-      high.materials[0].maps_are_composited=!source_normals.canonical_maps()->source_only;
+    if(source_normals.paired_maps())
+      high.materials[0].maps_are_composited=!source_normals.paired_maps()->source_only;
     if(!source_prepared)high.colors=std::move(source_colors);
   } else
     high.mesh = surface_mesh(*source.volume, cancelled);
@@ -344,7 +343,7 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   if(source.texture_sets)source_fields=capture_texture_set_bake_source(high,source,relative,placement,cancelled);
   else{
     high.materials[0].material=source.material;
-    high.materials[0].resolved_emission=detail::emission_bake_source(source,cancelled);
+    high.materials[0].resolved_emission=detail::emission_bake_source(source,cancelled,&source_normals);
   }
   std::vector<Tangent> placed_corners;
   if(placement&&!source_normals&&std::any_of(high.materials.begin(),high.materials.end(),[](const auto &field){
