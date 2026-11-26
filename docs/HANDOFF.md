@@ -1775,9 +1775,39 @@ identical accepted project bytes. Wayland passes 10 checks including explicit
 dialog cancellation. The two synthetic OpenXR routes each pass 11 checks
 including focus-loss cancellation. The original XR test sequence sent a
 second Bake command after closing the settings panel and is preserved.
-Targets with independently authored native shapekey frames and physical
-headset qualification remain open.
+Physical headset qualification remains open.
 [Native writable recipient evidence](validation/native-writable-recipient-20261126.json)
+
+### Bake into native meshes with authored shapekey frames
+
+The shared Bake worker now keeps normals in the native shapekey's authored
+frame while using the retained paint atlas for all baked channels. The
+viewport, Bake donor resolver and GLB exporter use the same frame and atlas.
+The native record identifies the authored normal interpretation and checks its
+owning paint and frame on reopen. Standard and Editable GLB keep the existing
+position, normal and tangent morph channels.
+
+Nine focused tests pass in both Release and ASan/UBSan. The 49-check native
+fixture projects 4,096 texels in both the LDR and HDR matching-triangle cases.
+Both partial rebakes preserve all 2,048 misses. Ordered Save, Clear Bake,
+exact Undo/Redo, a later UV seam split, an additional key and rebake-source
+sampling pass. All eight native files and four GLBs match byte for byte
+between the two native profiles.
+
+Software GL and Intel Arc A770 each pass 45 graphical checks. An independent
+GLB consumer agrees within one RGB8 level before and after UV edits with active
+keys and mixed skin weights. The wrong tangent control differs by 11 levels.
+The first graphics fixture used a displacement too small to test the visible
+key change. The final replay uses a larger edit through the native authoring
+command. Khronos reports zero errors and one skinned-node parent warning per
+file for the four native fixture exports. Nested DomeD Wayland passes 10
+checks. Software and Intel Arc synthetic OpenXR each pass 11, including focus
+cancellation. All three save the same accepted bytes.
+
+An existing legacy Mikk bake retains its current interpretation when a key is
+added later. Portable conversion of that mixed history and physical headset
+qualification remain open.
+[Authored native recipient evidence](validation/native-key-writable-bake-20261126.json)
 
 ## Source and integration boundary
 
