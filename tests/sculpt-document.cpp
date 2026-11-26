@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
+#include "../src/sculpt-chunk-masks.hpp"
 #include <nlohmann/json.hpp>
 #include <atomic>
 #include <condition_variable>
@@ -65,13 +66,23 @@ int main(int argc,char **argv) {
   require(d.begin_desktop(),"mask stroke restart");d.stamp_desktop(b);d.end_desktop();mesh(d);
   require(!d.copy_volume().mask_values().empty() && d.copy_volume().voxels()==original,"mask stroke changes protection only");
   require(extractions==baseline_extractions&&reused(d),"mask stroke does not extract tiles or assemble source geometry again");
-  auto snapshot=d.frame().surface;require(snapshot->sculpt_masks.size()==snapshot->mesh.positions.size(),"immutable overlay matches packed vertices");
-  bool protected_vertex=false;
-  auto volume=d.copy_volume();for(size_t i=0;i<snapshot->mesh.positions.size();++i) {
-    float expected=volume.mask_sample(snapshot->mesh.positions[i]);
-    require(std::abs(snapshot->sculpt_masks[i]-expected)<1e-6f,"overlay samples local persisted protection");protected_vertex|=expected>0;
-  }
-  require(protected_vertex,"visible surface protection feedback");
+  auto snapshot=d.frame().surface;
+  require(snapshot->sculpt_chunks&&snapshot->sculpt_chunks->context().mask_view,
+          "immutable mask view owns actual sculpt chunks");
+  const auto *active=snapshot->sculpt_chunks->find(d.frame().state->active_object);
+  require(active&&active->masks,"visible sculpt owns an immutable scalar directory");
+  bool protected_vertex=false;size_t checked_vertices=0;
+  auto volume=d.copy_volume();active->geometry->for_each_chunk([&](const auto &chunk){
+    const auto values=active->masks->find(chunk);
+    require(values->geometry==chunk&&values->values.size()==chunk->mesh.positions.size(),
+            "immutable scalar values match their exact geometry packet");
+    for(size_t i=0;i<chunk->mesh.positions.size();++i) {
+      float expected=volume.mask_sample(chunk->mesh.positions[i]);
+      require(std::abs(values->values[i]-expected)<1e-6f,"overlay samples local persisted protection");
+      protected_vertex|=expected>0;++checked_vertices;
+    }
+  });
+  require(checked_vertices>0&&protected_vertex,"visible surface protection feedback");
   auto before_fill=d.copy_volume();d.sculpt_mask_fill(1,lease(d));require(d.wait_asset(),"background Fill completes");mesh(d);
   require(d.copy_volume().mask_default()==1 && d.copy_volume().mask_values().empty(),"global Fill protection persists without empty-space enumeration");
   require(d.undo(),"Fill undo");mesh(d);require(d.copy_volume().mask_values()==before_fill.mask_values() && d.copy_volume().mask_default()==0,"Fill is one exact undo");
@@ -81,7 +92,12 @@ int main(int argc,char **argv) {
   settings=d.frame().state->sculpt_settings;settings.mask_edit=false;settings.symmetry_axes=0;d.sculpt_settings(settings);mesh(d);
   auto protected_scene=d.copy_volume();require(d.begin_desktop(),"protected geometry stroke starts");b.tool=Tool::Carve;d.stamp_desktop(b);d.end_desktop();mesh(d);
   require(d.copy_volume().voxels()==protected_scene.voxels(),"all-protected geometry remains exact");
-  settings.mask_visible=false;d.sculpt_settings(settings);mesh(d);require(d.frame().surface->sculpt_masks.empty(),"hidden protection emits no overlay attributes");
+  settings.mask_visible=false;d.sculpt_settings(settings);mesh(d);
+  const auto hidden=d.frame().surface->sculpt_chunks;
+  require(hidden&&!hidden->context().mask_view&&hidden->find(d.frame().state->active_object)&&
+              !hidden->find(d.frame().state->active_object)->mask&&
+              !hidden->find(d.frame().state->active_object)->masks,
+          "hidden protection emits no scalar owner or overlay attributes");
   auto object=d.frame().state->active_object;auto info=d.frame().state->objects.front();
   d.sculpt_layer_properties(object,d.copy_volume().active_layer(),"Protected layer",true,true,1);mesh(d);
   settings.mask_edit=true;d.sculpt_settings(settings);mesh(d);require(d.begin_desktop(),"mask editing remains available on locked geometry layer");d.cancel_desktop();

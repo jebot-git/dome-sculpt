@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
+#include "../src/sculpt-scene-chunks.hpp"
 #include <iostream>
 #include <nlohmann/json.hpp>
 #include <unistd.h>
@@ -24,8 +25,11 @@ int main() try {
   auto first = doc.copy_scene();
   auto original = first.active().volume->voxels();
   auto id = doc.add_object();
-  require(doc.wait_mesh() && doc.frame().surface->ranges.size() == 2,
-          "Two independent objects are meshed into the shared preview");
+  require(doc.wait_mesh(), "Current independent object preview publishes");
+  const auto pair=doc.frame().surface->sculpt_chunks;
+  require(pair&&pair->objects().size()==2&&pair->find(first.active().id)&&pair->find(id)&&
+              pair->find(first.active().id)->geometry->report().indices&&pair->find(id)->geometry->report().indices,
+          "Two independent objects own genuine visible chunk geometry");
   auto scene = doc.copy_scene();
   auto &o = scene.active();
   auto t = o.transform;
@@ -54,7 +58,10 @@ int main() try {
           "Material values and object transforms survive a native save/reopen");
   doc.object_properties(id, "Metal piece", false, true, t, blue);
   require(!doc.begin_desktop() && doc.wait_mesh() &&
-              doc.frame().surface->ranges.size() == 1,
+              doc.frame().surface->sculpt_chunks&&
+              doc.frame().surface->sculpt_chunks->objects().size()==1&&
+              doc.frame().surface->sculpt_chunks->find(first.active().id)&&
+              !doc.frame().surface->sculpt_chunks->find(id),
           "Hidden and locked objects cannot be sculpted and hidden surfaces "
           "leave the preview");
   require(doc.undo() && doc.frame().state->objects.back().visible,
