@@ -9,6 +9,8 @@
 #include "canonical-paint-sampling.hpp"
 #include "affine-surface.hpp"
 #include "paint-overlay-packet.hpp"
+#include "paint-overlay-sample.hpp"
+#include "paint-emission-sample.hpp"
 #include "native-paint-model.hpp"
 #include "native-paint-frame-source.hpp"
 #include "normal-key-derivation.hpp"
@@ -19,6 +21,7 @@
 #include "dome/shapekey-authoring.hpp"
 #include "dome/polygon-scene.hpp"
 #include "dome/tangents.hpp"
+#include <bit>
 #include <fstream>
 using namespace source_artist_fixture;
 using namespace source_prepared_oracle;
@@ -937,6 +940,57 @@ void dense_hdr_portable(const std::filesystem::path &out){
   std::cout<<"DENSE_HDR_PORTABLE "<<bytes.size()<<" container bytes; native source exact\n";
 }
 
+void dense_hdr_editable(const std::filesystem::path &out){
+  const auto input=out/"portable-varied-hdr-native.dsculpt";
+  const auto file=out/"editable-varied-hdr-512.glb";
+  const auto restored_file=out/"editable-varied-hdr-native.dsculpt";
+  {
+    Document doc;
+    doc.open(input);
+    require(doc.wait_asset()&&doc.wait_mesh(std::chrono::seconds(90))&&doc.frame().state->error.empty(),
+        "Default Editable GLB starts from the actual full-resolution edited HDR Bake");
+    doc.export_asset(file,AssetExportFormat::EditableGlb512).get();
+  }
+  const auto read_file=[](const auto &path){
+    std::ifstream stream(path,std::ios::binary);
+    return std::vector<uint8_t>{std::istreambuf_iterator<char>(stream),{}};
+  };
+  const auto bytes=read_file(file);
+  require(bytes.size()>1024,"Editable HDR worker publishes the complete native and portable views");
+  {
+    const auto restored=extract_native_authoring(bytes);
+    require(bool(restored),"Editable HDR GLB recovers the native project");
+    const auto &paint=*restored->active().painted;
+    const auto packet=detail::PaintOverlayFactory::capture(paint);
+    const detail::PaintEmissionSampler direct(paint);
+    const auto bits=[](float value){return std::bit_cast<uint32_t>(value);};
+    for(int y=-1;y<=65;++y)for(int x=-1;x<=65;++x){
+      const float u=(float(x)+.14f)/64,v=(float(y)+.51f)/64;
+      const auto original=detail::sample_overlay_values(*packet,u,v,true);
+      const auto emission=direct.sample(u,v);
+      require(bits(original[3][3])==bits(emission.coverage),
+          "Emission-only filter keeps previous coverage bits");
+      for(size_t k=0;k<3;++k)require(bits(original[2][k])==bits(emission.legacy[k])&&
+          bits(original[4][k])==bits(emission.absolute[k]),"Emission-only filter keeps previous FLOAT bits");
+    }
+    restored->save(restored_file);
+  }
+  require(same_file(input,restored_file),"Editable HDR preserves exact Bake, retained UV, edited key, and Restore data");
+  NativeAuthoringExport owner;
+  owner.scene=std::make_shared<const Scene>(Scene::load(input));
+  owner.allow_portable_fallback=true;
+  SourceUvBakeOptions limits;
+  limits.resolution=512;
+  limits.max_sample_operations=32u*1024*1024;
+  bool refused=false;
+  try{export_glb_authoring(owner,file,{},limits);}
+  catch(const std::length_error &error){
+    refused=std::string_view(error.what()).find("cumulative sample budget")!=std::string_view::npos;
+  }
+  require(refused&&read_file(file)==bytes,"A tighter sample quota preserves the existing Editable HDR output");
+  std::cout<<"DENSE_EDITABLE_HDR "<<bytes.size()<<" container bytes; native source exact\n";
+}
+
 void dense_hdr_first_key(const std::filesystem::path &out,bool varied){
   auto scene=Scene::load(out/"retained-2048.dsculpt");
   const auto donor=std::find_if(scene.objects().begin(),scene.objects().end(),[](const auto &o){
@@ -1093,6 +1147,11 @@ int main(int argc,char **argv) try {
  if(argc==3&&std::string_view(argv[1])=="--dense-editable-export"){
    writable_source::dense_editable_export(argv[2]);
    std::cout<<"PASS "<<writable_source::checks<<" full-resolution Editable GLB checks\n";
+   return 0;
+ }
+ if(argc==3&&std::string_view(argv[1])=="--dense-hdr-editable"){
+   writable_source::dense_hdr_editable(argv[2]);
+   std::cout<<"PASS "<<writable_source::checks<<" full-resolution Editable HDR checks\n";
    return 0;
  }
  if(argc==3&&std::string_view(argv[1])=="--dense-hdr-portable"){

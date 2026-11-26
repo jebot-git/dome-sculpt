@@ -2109,7 +2109,7 @@ std::shared_ptr<PaintedMesh> detail::TextureSetPaintAccess::resample_plain(const
  if(limits.cancelled&&limits.cancelled())throw std::runtime_error("Texture-set resolution cancelled");return result;
 }
 struct SourcePaintSamplingAccess {
-  static size_t composite_work(const PaintedMesh &,size_t,const std::function<bool()> &);
+  static size_t composite_work(const PaintedMesh &,detail::NativeGridComposite,size_t,const std::function<bool()> &);
   static const void *scene_raster(const PaintedMesh &paint) noexcept {
     const auto &surface=paint.surface_;
     if(!surface||!surface->paint_domain||surface->paint_domain->version()!=1||
@@ -3414,14 +3414,14 @@ size_t composite_tile(uint32_t x,uint32_t y,uint32_t columns) noexcept {
   return size_t(y/PaintTile::size)*columns+x/PaintTile::size;
 }
 }
-size_t SourcePaintSamplingAccess::composite_work(const PaintedMesh &paint,size_t maximum,
+size_t SourcePaintSamplingAccess::composite_work(const PaintedMesh &paint,detail::NativeGridComposite channels,size_t maximum,
     const std::function<bool()> &cancelled){
   const auto r=paint.resolution();
   const auto &surface=*paint.surface_;
   if(!surface.paint_domain||surface.options.policy!=PaintUvPolicy::Strict||
      paint.source_maps_||paint.color_projection_||paint.normal_projection_||
-     paint.has_physical_emission()||(paint.baked_&&paint.baked_->normal_field))
-    throw std::invalid_argument("Native composite bound requires the actual plain LDR retained grid");
+     (channels==detail::NativeGridComposite::Full&&paint.has_physical_emission())||(paint.baked_&&paint.baked_->normal_field))
+    throw std::invalid_argument("Native composite bound requires the actual plain retained grid");
   const size_t pixels=size_t(r)*r,tiles=surface.tiles.size();
   size_t work=0;
   auto charge=[&](size_t count,size_t unit){
@@ -3435,6 +3435,16 @@ size_t SourcePaintSamplingAccess::composite_work(const PaintedMesh &paint,size_t
   charge(pixels,3*8+1+2);
   charge(tiles,std::max<size_t>(1,paint.layers_.size()));
   if(paint.baked_&&!paint.baked_->maps.normal.rgba.empty())charge(pixels,8);
+  if(channels==detail::NativeGridComposite::WithoutEmission){
+    // The temporary emission-free composite walks the same common tiles and
+    // can copy any occupied tile while clearing its legacy emission bytes.
+    for(const auto &layer:paint.layers_){
+      paint_compute::checkpoint(cancelled);
+      for(const auto &tile:layer.tiles)
+        if(tile)charge(PaintTile::size*PaintTile::size,2);
+    }
+    charge(tiles,std::max<size_t>(1,paint.layers_.size()));
+  }
   const auto masks=composite_tile_layers(paint.layers_,tiles);
   size_t populated=0;
   for(auto mask:masks)populated+=std::popcount(mask);
@@ -3452,9 +3462,9 @@ size_t SourcePaintSamplingAccess::composite_work(const PaintedMesh &paint,size_t
   }
   return work;
 }
-size_t detail::native_grid_composite_work(const PaintedMesh &paint,size_t maximum,
+size_t detail::native_grid_composite_work(const PaintedMesh &paint,NativeGridComposite channels,size_t maximum,
     const std::function<bool()> &cancelled){
-  return SourcePaintSamplingAccess::composite_work(paint,maximum,cancelled);
+  return SourcePaintSamplingAccess::composite_work(paint,channels,maximum,cancelled);
 }
 std::shared_ptr<TextureMaps>
 PaintedMesh::build_composite(const Material &material,const std::function<bool()> &cancelled) const {

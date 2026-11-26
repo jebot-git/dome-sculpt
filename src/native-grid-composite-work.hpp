@@ -9,7 +9,8 @@ class PaintedMesh;
 namespace detail {
 // Includes occupied sparse tiles after padding with the CPU compositor's
 // layer order. The caller budgets images and geometry separately.
-size_t native_grid_composite_work(const PaintedMesh &,size_t maximum,
+enum class NativeGridComposite { Full, WithoutEmission };
+size_t native_grid_composite_work(const PaintedMesh &,NativeGridComposite,size_t maximum,
     const std::function<bool()> &cancelled);
 }
 }

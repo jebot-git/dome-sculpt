@@ -8,7 +8,7 @@
 #include "gltf-document.hpp"
 #include "raw-source-emission.hpp"
 #include "emission-paint-access.hpp"
-#include "paint-overlay-sample.hpp"
+#include "paint-emission-sample.hpp"
 #include "native-paint-sampling.hpp"
 #include "native-grid-composite-work.hpp"
 #include "native-paint-export-policy.hpp"
@@ -63,7 +63,11 @@ NativeExtractionCost native_extraction_cost(const Scene &scene,const SourceUvBak
       const size_t n=size_t(w)*h;if(n>policy.max_image_pixels||n>16*1024*1024)throw std::length_error("Native physical composite image exceeds pixel budget before allocation");return n;};
     const PaintSourceMaps empty;const auto &m=maps?*maps:empty;
     const size_t color=pixels({&m.color}),orm=pixels({&m.metal_rough,&m.occlusion}),emission=pixels({&m.emission});
-    const bool native_ldr=o.material_bindings&&o.material_bindings->native_paint_sampling&&!native_physical(o);
+    const bool physical=native_physical(o);
+    const bool native_grid=o.material_bindings&&o.material_bindings->native_paint_sampling&&
+        (!physical||(!maps&&!p.color_projection()&&!p.normal_projection()&&
+                    (!p.baked()||!p.baked()->normal_field)&&
+                    p.surface_diagnostics().policy==PaintUvPolicy::Strict));
     // Colour/emission coverage are conservatively charged at full extent;
     // the compositor may use a singleton when no corresponding coverage exists.
     bytes(color,8);bytes(orm,4);bytes(emission,8);
@@ -75,10 +79,17 @@ NativeExtractionCost native_extraction_cost(const Scene &scene,const SourceUvBak
       bytes(layer.name.capacity()+1,1);
       for(const auto &tile:layer.tiles)if(tile&&std::any_of(tile->pixels.begin(),tile->pixels.end(),[](const auto &q){return q.data[6]||q.data[7]||q.data[8]||q.data[12];}))bytes(1,sizeof(PaintTile));
     }
-    if(native_ldr){
+    if(physical&&p.baked()&&p.baked()->emission_field){
+      // without_emission owns a new byte Bake. The original FLOAT field remains
+      // in the validated Scene and is never copied into this temporary.
+      bytes(p.baked()->storage_bytes()-p.baked()->emission_field->storage_bytes(),1);
+      bytes(grid,4);
+    }
+    if(native_grid){
       bytes(grid/(PaintTile::size*PaintTile::size),sizeof(uint16_t));
       cost.samples+=native_grid_composite_work(
-          p,policy.max_sample_operations-cost.samples,cancelled);
+          p,physical?NativeGridComposite::WithoutEmission:NativeGridComposite::Full,
+          policy.max_sample_operations-cost.samples,cancelled);
     }else{
       const size_t per_pixel=16+8*p.layers().size();
       charge(cost.samples,color+orm+emission,per_pixel,policy.max_sample_operations,"Native nonemission compilation exceeds cumulative sample budget");
@@ -143,21 +154,19 @@ NativePhysicalField native_physical_field(const SculptObject &o,
   if(!policy.resolution&&maps&&maps->emission.image){const auto largest=std::max(maps->emission.image->width,maps->emission.image->height);
     while(r<largest){if(r>2048)throw std::length_error("Native physical source image requires an explicit bounded finite resolution");r*=2;}}
   const size_t pixels=size_t(r)*r;
-  // Four composed texels, five independent RGBA planes, then six output
-  // radiance/quantization channels. Reserve both passes before dense storage.
-  constexpr size_t work_per_pixel=86;
+  // The finite emission image evaluates four taps of the three emissive
+  // roles and encodes RGB once. The color/ORM compositors run separately.
+  const PaintEmissionSampler sampler(paint,cancelled);
+  const auto work_per_pixel=sampler.work_per_sample();
   if(pixels>policy.max_image_pixels||pixels>policy.max_output_bytes/4||
-     pixels>policy.max_sample_operations/work_per_pixel||pixels>policy.max_raster_samples)
+     sampler.index_work()>policy.max_sample_operations||
+     pixels>(policy.max_sample_operations-sampler.index_work())/work_per_pixel||
+     pixels>policy.max_raster_samples)
     throw std::length_error("Native physical field exceeds cumulative sample/image budget");
-  size_t scratch=pixels*(sizeof(std::array<float,3>)+4);
-  auto charge=[&](size_t n,size_t unit){if(scratch>policy.max_working_bytes||n>(policy.max_working_bytes-scratch)/unit)
-    throw std::length_error("Native physical field exceeds working budget before allocation");scratch+=n*unit;};
-  // Packet capture retains the already bounded immutable grid; its pointer
-  // vectors and owner sets are also bounded before capture allocates them.
-  charge(paint.storage_bytes(),1);
-  for(const auto &layer:paint.layers())charge(layer.tiles.size()+layer.pbr_tiles.size()+layer.emission_tiles.size(),sizeof(void*)*8);
-  auto packet=PaintOverlayFactory::capture(paint,cancelled);
-  charge(packet->storage_bytes(),1);
+  // Only derived RGB radiance and RGBA fallback are staged. Existing sparse
+  // layers, Bake and padding stay borrowed from the authenticated Scene.
+  if(pixels>policy.max_working_bytes/(sizeof(std::array<float,3>)+4))
+    throw std::length_error("Native physical field exceeds working budget before allocation");
   // A constant background plus independently linear paint coefficients is a
   // bilinear field in the retained grid. Integer upsampling must preserve its
   // original texel-centre breakpoints instead of introducing a second blur.
@@ -173,11 +182,11 @@ NativePhysicalField native_physical_field(const SculptObject &o,
   for(size_t at=0;at<pixels;++at){if((at&1023)==0)stop();
     const float u=(float(at%r)+.5f)/r-out.emission.texture_offset[0],
                 v=(float(at/r)+.5f)/r-out.emission.texture_offset[1];
-    const auto overlay=sample_overlay_values(*packet,u,v,true);
+    const auto overlay=sampler.sample(u,v);
     std::array<float,4> source{1,1,1,1};
     if(maps&&maps->emission.image&&!(o.material_bindings&&o.material_bindings->physical_emission))
       source=sample_source_texture(maps->emission,u,v,true);
-    for(size_t k=0;k<3;++k){const double value=double(background[k])*source[k]*(1-overlay[3][3])+overlay[2][k]+overlay[4][k];
+    for(size_t k=0;k<3;++k){const double value=double(background[k])*source[k]*(1-overlay.coverage)+overlay.legacy[k]+overlay.absolute[k];
       if(!std::isfinite(value)||value<0||value>30000)throw std::invalid_argument("Native physical radiance is outside its finite range");
       radiance[at][k]=float(value);peak[k]=std::max(peak[k],float(value));}
   }
@@ -194,7 +203,7 @@ NativePhysicalField native_physical_field(const SculptObject &o,
         if(restored==0)++entry.erased_nonzero_samples;if(entry.unlit)++entry.unlit_ignored_samples;}}
     entry.image.rgba[at*4+3]=255;
   }
-  out.images=pixels*4;out.memory=out.images;out.samples=pixels*work_per_pixel;out.raster=pixels;
+  out.images=pixels*4;out.memory=out.images;out.samples=pixels*work_per_pixel+sampler.index_work();out.raster=pixels;
   stop();return out;
 }
 }
