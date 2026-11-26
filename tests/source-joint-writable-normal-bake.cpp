@@ -64,8 +64,8 @@ void check_dense(const Scene &s,uint64_t source,uint32_t checked_resolution){
 }
 
 void check_history(const Scene &baked,const Scene &before,uint64_t source,
-    const ObjectBakeSettings &settings,const std::filesystem::path &out,const std::string &name){
- const auto original=before.encode();
+    const ObjectBakeSettings &settings,const std::filesystem::path &out,
+    const std::string &name,const nlohmann::json &original){
  const auto accepted=baked.encode();
  const auto path=out/(name+".dsculpt");
  baked.save(path);
@@ -113,6 +113,7 @@ void exercise(bool seam,bool live,bool repeat,const std::filesystem::path&out,
   std::cout<<"CHECKED_SOURCE_REFUSAL resolution="<<checked_resolution<<std::endl;
   return;
  }
+ const auto before=s.encode();
  const auto native=s.snapshot();
  require(bake_object(s,source,final_settings).projected>500,"Actual combined Source8 SOURCE second Bake projects");
  const auto target_maps=s.active().painted->preview(s.active().material);const auto material=detail::EmissionExportAccess::other_channels(*s.object(source).painted,s.object(source).material,{});const auto&low=s.active().painted->mesh();double normal_error=0,material_error=0,emission_error=0,peak=0,wrong_material=0,omitted_pbr=0;size_t interior=0;
@@ -122,6 +123,7 @@ void exercise(bool seam,bool live,bool repeat,const std::filesystem::path&out,
  std::ofstream(out/"observed-source.json")<<original.dump(2);s.save(out/"observed-second-bake.dsculpt");
  require(interior>500&&normal_error<.035&&material_error<.025&&wrong_material>.05&&omitted_pbr>.05&&emission_error<2e-4&&peak>1,"Independent joint normal, current corner colour and HDR retain unchanged exact numerical bounds");
  if(task==CheckedTask::Capture){
+  require(native.encode()==before,"Detached Bake preserves the complete pre-Bake scene");
   check_source_context(s,source,original);
   std::cout<<"CHECKED_SOURCE_CAPTURE resolution="<<checked_resolution<<std::endl;
   return;
@@ -130,7 +132,7 @@ void exercise(bool seam,bool live,bool repeat,const std::filesystem::path&out,
    check_dense(s,source,checked_resolution);
  }
  const auto name=std::to_string(seam)+std::to_string(live)+std::to_string(repeat);
- check_history(s,native,source,final_settings,out,name);
+ check_history(s,native,source,final_settings,out,name,before);
  check_source_context(s,source,original);
  std::cout<<(checked_resolution?"CHECKED_JOINT_SOURCE ":"JOINT_SOURCE ")<<name<<" direct="<<direct<<" normal="<<normal_error<<" material="<<material_error<<" wrongMaterial="<<wrong_material<<" omittedPbr="<<omitted_pbr<<" omittedNormal="<<omitted_normal<<" wrongNormal="<<wrong_normal<<" emission="<<emission_error<<" peak="<<peak<<" interior="<<interior<<'\n';
 }
@@ -162,7 +164,7 @@ void check_capture(uint32_t resolution,const std::filesystem::path &capture,
          "Capture retains the checked native bake recipe and exact source ID");
  if(worker_output){
   std::filesystem::create_directories(*worker_output);
-  check_history(baked,before,source,settings->settings,*worker_output,"000");
+  check_history(baked,before,source,settings->settings,*worker_output,"000",before.encode());
  }else{
   check_dense(baked,source,resolution);
  }
