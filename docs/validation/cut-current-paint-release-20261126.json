@@ -1,0 +1,498 @@
+{
+  "source": "2aff79f779cb5750d608f9cd9623b7673b90d1ba",
+  "baseline": "c5fbb0bd",
+  "build_invocation": "92fe175aa3974bbea26ae0730bd72000",
+  "native_invocation": "285e6d47a57e4b57abc13352fa514f41",
+  "scope": "Actual private Release plain current-grid plane cut and desktop/controller cancel and retry, colored cut admission faults and held/source authoring controls.",
+  "build": {
+    "terminal": true,
+    "exit": 0,
+    "compile": [
+      {
+        "name": "document-cut.cpp",
+        "exit": 0
+      },
+      {
+        "name": "cut-boundaries.cpp",
+        "exit": 0
+      },
+      {
+        "name": "cut-color-admission.cpp",
+        "exit": 0
+      },
+      {
+        "name": "cut-color-document.cpp",
+        "exit": 0
+      }
+    ],
+    "linked_archive": {
+      "members": 197,
+      "sha256": "e44d930d92c5bdca1d070c5ec8ba1d49389988c4ecc20ac9f21456648a9114a5",
+      "replacements": [
+        "document-cut.cpp.o"
+      ]
+    },
+    "links": [
+      {
+        "name": "dome-sculpt-cut-boundaries-test",
+        "exit": 0
+      },
+      {
+        "name": "dome-sculpt-cut-color-admission-test",
+        "exit": 0
+      },
+      {
+        "name": "dome-sculpt-cut-color-document-test",
+        "exit": 0
+      },
+      {
+        "name": "dome-sculpt",
+        "exit": 0
+      }
+    ]
+  },
+  "native": {
+    "terminal": true,
+    "cases": {
+      "dome-sculpt-cut-boundaries-test": {
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-current-paint-release-20261126/dome-sculpt-cut-boundaries-test"
+        ],
+        "started": 1795668461.3723285,
+        "timeout_seconds": 900,
+        "RSS_limit_bytes": 4294967296,
+        "virtual_AS_cap": null,
+        "pid": 4,
+        "start": 84638643,
+        "pgrp": 4,
+        "root": {
+          "pid": 4,
+          "start": 84638643,
+          "pgrp": 4,
+          "session": 4,
+          "ppid": 2,
+          "state": "R"
+        },
+        "known_processes": [
+          {
+            "pid": 4,
+            "start": 84638643,
+            "pgrp": 4,
+            "session": 4,
+            "ppid": 2,
+            "state": "R"
+          }
+        ],
+        "peak_owned_RSS_bytes": 55889920,
+        "peak_observed_virtual_bytes": 1145012224,
+        "monitor_samples": 42,
+        "signals": [],
+        "exit": 0,
+        "seconds": 0.45233154296875,
+        "sha256": "c6bb3ed10da595991303210d4003e59c1d8e645d108a93b289db86a2e4d41658",
+        "check_passed": true,
+        "passed_cases": [
+          "PASS Cut preview prepares while an earlier ordered save is paused",
+          "PASS Accepted cut owns a cancellable asset lease behind the earlier save",
+          "PASS Cancel requests the asset owner's cancellation and retains its draft until acknowledgement",
+          "PASS Cancelled cut releases the ordered asset and final-save waiters",
+          "PASS Cancelled publication retains the exact source scene and original editable preview without partial outputs",
+          "PASS The preceding save retains its own original scene snapshot",
+          "PASS The same preview can be explicitly retried after cancellation without restarting the workspace",
+          "PASS Retried cut publishes shell and cap as exactly one global Undo transaction",
+          "PASS Cut preview prepares while an earlier ordered save is paused",
+          "PASS Accepted cut owns a cancellable asset lease behind the earlier save",
+          "PASS Controller sample drains through the native input worker",
+          "PASS Controller sample drains through the native input worker",
+          "PASS Controller sample drains through the native input worker",
+          "PASS Accepted cut keeps its own XR Cancel command available without navigating to another page",
+          "PASS Controller sample drains through the native input worker",
+          "PASS Controller sample drains through the native input worker",
+          "PASS Controller sample drains through the native input worker",
+          "PASS Cancel requests the asset owner's cancellation and retains its draft until acknowledgement",
+          "PASS Cancelled cut releases the ordered asset and final-save waiters",
+          "PASS Cancelled publication retains the exact source scene and original editable preview without partial outputs",
+          "PASS The preceding save retains its own original scene snapshot",
+          "PASS The same preview can be explicitly retried after cancellation without restarting the workspace",
+          "PASS Retried cut publishes shell and cap as exactly one global Undo transaction"
+        ]
+      },
+      "dome-sculpt-cut-color-admission-test": {
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-current-paint-release-20261126/dome-sculpt-cut-color-admission-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-current-paint-release-20261126/native/color-admission"
+        ],
+        "started": 1795668461.8413255,
+        "timeout_seconds": 900,
+        "RSS_limit_bytes": 4294967296,
+        "virtual_AS_cap": null,
+        "pid": 116,
+        "start": 84638690,
+        "pgrp": 116,
+        "root": {
+          "pid": 116,
+          "start": 84638690,
+          "pgrp": 116,
+          "session": 116,
+          "ppid": 2,
+          "state": "R"
+        },
+        "known_processes": [
+          {
+            "pid": 116,
+            "start": 84638690,
+            "pgrp": 116,
+            "session": 116,
+            "ppid": 2,
+            "state": "R"
+          }
+        ],
+        "peak_owned_RSS_bytes": 1013710848,
+        "peak_observed_virtual_bytes": 1851994112,
+        "monitor_samples": 7375,
+        "signals": [],
+        "exit": 0,
+        "seconds": 81.75098729133606,
+        "sha256": "4412fe2fb873b80e6857d14b67d5d46f2505c3391eae0f0b670041b14ccdc836",
+        "check_passed": true,
+        "passed_cases": [
+          "PASS actual direct Apply admission failures 1..174 of 174 preserve exact ready draft, authority, input, no phantom Save and successful one-Undo retry"
+        ]
+      },
+      "dome-sculpt-cut-color-document-test": {
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-current-paint-release-20261126/dome-sculpt-cut-color-document-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/cut-current-paint-release-20261126/native/color-document"
+        ],
+        "started": 1795668543.6096327,
+        "timeout_seconds": 900,
+        "RSS_limit_bytes": 4294967296,
+        "virtual_AS_cap": null,
+        "pid": 8167,
+        "start": 84646867,
+        "pgrp": 8167,
+        "root": {
+          "pid": 8167,
+          "start": 84646867,
+          "pgrp": 8167,
+          "session": 8167,
+          "ppid": 2,
+          "state": "R"
+        },
+        "known_processes": [
+          {
+            "pid": 8167,
+            "start": 84646867,
+            "pgrp": 8167,
+            "session": 8167,
+            "ppid": 2,
+            "state": "R"
+          }
+        ],
+        "peak_owned_RSS_bytes": 239521792,
+        "peak_observed_virtual_bytes": 1234591744,
+        "monitor_samples": 457,
+        "signals": [],
+        "exit": 0,
+        "seconds": 5.0984227657318115,
+        "sha256": "43f7d3f6ceb70d2743ff5c2834f3a05d64f71eada307d183606df0308e54cb5f",
+        "check_passed": true,
+        "passed_cases": [
+          "PASS Real native readiness enables the supported current-field plane cut",
+          "PASS Native current-color source/preview prepares on real workers",
+          "PASS Native current-color source/preview prepares on real workers",
+          "PASS Immutable clipping previews retain RGBA and never change source authority",
+          "PASS Cancel restores exact source and leaves no history",
+          "PASS Native current-color source/preview prepares on real workers",
+          "PASS Native current-color source/preview prepares on real workers",
+          "PASS Immediate ordered Save drains accepted colored-cut work",
+          "PASS Native accepted cut creates current-field shell and independent cap",
+          "PASS Native worker retains exact shared field basis and complete original shape capsule",
+          "PASS Accepted shell is selected/editable while the unselected cap remains a read-only ghost",
+          "PASS Explicit selection transfers edit authority to the new cap without changing stored visibility",
+          "PASS Disk restart equals the actual accepted scene rather than its pre-Apply snapshot",
+          "PASS Exactly one global Undo restores all original field, pose, paint, placement and visibility",
+          "PASS Redo restores exact accepted color/cap/source authority",
+          "PASS Actual Restore source command recovers retained editable paint and original UVs",
+          "PASS Real native readiness enables the supported current-field plane cut",
+          "PASS Native current-color source/preview prepares on real workers",
+          "PASS Native current-color source/preview prepares on real workers",
+          "PASS Immutable clipping previews retain RGBA and never change source authority",
+          "PASS Cancel restores exact source and leaves no history",
+          "PASS Native current-color source/preview prepares on real workers",
+          "PASS Native current-color source/preview prepares on real workers",
+          "PASS Immediate ordered Save drains accepted colored-cut work",
+          "PASS Native accepted cut creates current-field shell and independent cap",
+          "PASS Native worker retains exact shared field basis and complete original shape capsule",
+          "PASS Accepted shell is selected/editable while the unselected cap remains a read-only ghost",
+          "PASS Explicit selection transfers edit authority to the new cap without changing stored visibility",
+          "PASS Disk restart equals the actual accepted scene rather than its pre-Apply snapshot",
+          "PASS Exactly one global Undo restores all original field, pose, paint, placement and visibility",
+          "PASS Redo restores exact accepted color/cap/source authority",
+          "PASS Actual Restore source command recovers retained editable paint and original UVs",
+          "PASS Real native readiness enables the supported current-field plane cut",
+          "PASS Native current-color source/preview prepares on real workers",
+          "PASS Native current-color source/preview prepares on real workers",
+          "PASS Immutable clipping previews retain RGBA and never change source authority",
+          "PASS Cancel restores exact source and leaves no history",
+          "PASS Native current-color source/preview prepares on real workers",
+          "PASS Native current-color source/preview prepares on real workers",
+          "PASS Immediate ordered Save drains accepted colored-cut work",
+          "PASS Native accepted cut creates current-field shell and independent cap",
+          "PASS Native worker retains exact shared field basis and complete original shape capsule",
+          "PASS Accepted shell is selected/editable while the unselected cap remains a read-only ghost",
+          "PASS Explicit selection transfers edit authority to the new cap without changing stored visibility",
+          "PASS Disk restart equals the actual accepted scene rather than its pre-Apply snapshot",
+          "PASS Exactly one global Undo restores all original field, pose, paint, placement and visibility",
+          "PASS Redo restores exact accepted color/cap/source authority",
+          "PASS Actual Restore source command recovers retained editable paint and original UVs",
+          "PASS Real native readiness enables the supported current-field plane cut",
+          "PASS Native current-color source/preview prepares on real workers",
+          "PASS Native current-color source/preview prepares on real workers",
+          "PASS Immutable clipping previews retain RGBA and never change source authority",
+          "PASS Cancel restores exact source and leaves no history",
+          "PASS Native current-color source/preview prepares on real workers",
+          "PASS Native current-color source/preview prepares on real workers",
+          "PASS Immediate ordered Save drains accepted colored-cut work",
+          "PASS Native accepted cut creates current-field shell and independent cap",
+          "PASS Native worker retains exact shared field basis and complete original shape capsule",
+          "PASS Accepted shell is selected/editable while the unselected cap remains a read-only ghost",
+          "PASS Explicit selection transfers edit authority to the new cap without changing stored visibility",
+          "PASS Disk restart equals the actual accepted scene rather than its pre-Apply snapshot",
+          "PASS Exactly one global Undo restores all original field, pose, paint, placement and visibility",
+          "PASS Redo restores exact accepted color/cap/source authority",
+          "PASS Actual Restore source command recovers retained editable paint and original UVs",
+          "PASS Native current-color source/preview prepares on real workers",
+          "PASS Accepted colored cut owns its guarded cancellable worker lease behind an earlier Save",
+          "PASS Native/controller Cancel targets the accepted cut lease",
+          "PASS Cancellation drains the accepted worker",
+          "PASS Cancellation retains the exact editable draft, original RGBA and source graph",
+          "PASS Retry, spatial shutdown and ordered Save commit one exact source-retaining transaction",
+          "PASS Native current-color source/preview prepares on real workers",
+          "PASS Accepted colored cut owns its guarded cancellable worker lease behind an earlier Save",
+          "PASS Controller opens real page17 with accepted-work Cancel enabled",
+          "PASS Native/controller Cancel targets the accepted cut lease",
+          "PASS Cancellation drains the accepted worker",
+          "PASS Cancellation retains the exact editable draft, original RGBA and source graph",
+          "PASS Retry, spatial shutdown and ordered Save commit one exact source-retaining transaction",
+          "PASS Native current-color source/preview prepares on real workers",
+          "PASS Joystick-only page17 Apply survives shutdown and preserves exact one-Undo original",
+          "PASS Native current-color source/preview prepares on real workers",
+          "PASS Native current-color source/preview prepares on real workers",
+          "PASS Exact no-op colored cut closes without output IDs or history",
+          "PASS A newer document generation rejects stale source/preview publication",
+          "PASS Native current-color source/preview prepares on real workers",
+          "PASS Undo after accepted publication restores original while its captured Save is writing",
+          "PASS Pending Save writes its exact accepted cut endpoint without marking a later Undo clean",
+          "PASS Native current-color source/preview prepares on real workers",
+          "PASS Cancelled or newer-generation cut fails dependent Save without writing any stale scene or changing original authority",
+          "PASS Native current-color source/preview prepares on real workers",
+          "PASS Cancelled or newer-generation cut fails dependent Save without writing any stale scene or changing original authority",
+          "PASS Native current-color source/preview prepares on real workers",
+          "PASS Destruction observes the actual pending-cut predicate wait and drains accepted cut plus ordered Save before stopping workers",
+          "PASS Saved pose prepares before selected-key mode test",
+          "PASS Selected-key editing disables cut readiness instead of advertising a saved-weight fallback",
+          "PASS Direct Cut API refuses selected-key mode without modifying source, pose, history or mode",
+          "PASS Finishing key mode restores cut readiness and exact saved pose",
+          "PASS Explicit authoritative weight one is a supported actual cut pose",
+          "PASS Native current-color source/preview prepares on real workers",
+          "PASS Cut uses explicit saved weight one and retains its exact source in one undoable transaction",
+          "PASS Held isolated source advertises the real supported cut path",
+          "PASS Generic isolated edit_scene still refuses structural additions without a typed cut permit",
+          "PASS Native current-color source/preview prepares on real workers",
+          "PASS Native current-color source/preview prepares on real workers",
+          "PASS Cancelling held cut preserves exact source, IDs, hold and history",
+          "PASS Native current-color source/preview prepares on real workers",
+          "PASS Native current-color source/preview prepares on real workers",
+          "PASS Held structural cut and immediate Save publish through accepted worker ordering",
+          "PASS Validated shell becomes the sole held, selected editable output",
+          "PASS Authenticated caps and all existing neighbors remain read-only ghosts, with exact restartable scene",
+          "PASS One Undo restores exact source IDs, placement, capsules and corresponding held endpoint",
+          "PASS Redo restores exact cut and transfers only the matching held endpoint",
+          "PASS Explicit unhold remains unheld through cut history rather than reviving an old permission",
+          "PASS Held isolated source advertises the real supported cut path",
+          "PASS Generic isolated edit_scene still refuses structural additions without a typed cut permit",
+          "PASS Native current-color source/preview prepares on real workers",
+          "PASS Native current-color source/preview prepares on real workers",
+          "PASS Cancelling held cut preserves exact source, IDs, hold and history",
+          "PASS Native current-color source/preview prepares on real workers",
+          "PASS Native current-color source/preview prepares on real workers",
+          "PASS Held structural cut and immediate Save publish through accepted worker ordering",
+          "PASS Validated shell becomes the sole held, selected editable output",
+          "PASS Authenticated caps and all existing neighbors remain read-only ghosts, with exact restartable scene",
+          "PASS One Undo restores exact source IDs, placement, capsules and corresponding held endpoint",
+          "PASS Redo restores exact cut and transfers only the matching held endpoint",
+          "PASS Explicit unhold remains unheld through cut history rather than reviving an old permission",
+          "PASS Held isolated source advertises the real supported cut path",
+          "PASS Generic isolated edit_scene still refuses structural additions without a typed cut permit",
+          "PASS Native current-color source/preview prepares on real workers",
+          "PASS Native current-color source/preview prepares on real workers",
+          "PASS Cancelling held cut preserves exact source, IDs, hold and history",
+          "PASS Native current-color source/preview prepares on real workers",
+          "PASS Native current-color source/preview prepares on real workers",
+          "PASS Held controller workspace exposes enabled guarded Apply",
+          "PASS Held structural cut and immediate Save publish through accepted worker ordering",
+          "PASS Validated shell becomes the sole held, selected editable output",
+          "PASS Authenticated caps and all existing neighbors remain read-only ghosts, with exact restartable scene",
+          "PASS One Undo restores exact source IDs, placement, capsules and corresponding held endpoint",
+          "PASS Redo restores exact cut and transfers only the matching held endpoint",
+          "PASS Explicit unhold remains unheld through cut history rather than reviving an old permission",
+          "PASS Held isolated source advertises the real supported cut path",
+          "PASS Generic isolated edit_scene still refuses structural additions without a typed cut permit",
+          "PASS Native current-color source/preview prepares on real workers",
+          "PASS Native current-color source/preview prepares on real workers",
+          "PASS Cancelling held cut preserves exact source, IDs, hold and history",
+          "PASS Native current-color source/preview prepares on real workers",
+          "PASS Native current-color source/preview prepares on real workers",
+          "PASS Held controller workspace exposes enabled guarded Apply",
+          "PASS Held structural cut and immediate Save publish through accepted worker ordering",
+          "PASS Validated shell becomes the sole held, selected editable output",
+          "PASS Authenticated caps and all existing neighbors remain read-only ghosts, with exact restartable scene",
+          "PASS One Undo restores exact source IDs, placement, capsules and corresponding held endpoint",
+          "PASS Redo restores exact cut and transfers only the matching held endpoint",
+          "PASS Explicit unhold remains unheld through cut history rather than reviving an old permission",
+          "PASS Native current-color source/preview prepares on real workers",
+          "PASS Accepted held-cut cancellation or explicit-unhold race preserves original scene/history and fails dependent Save",
+          "PASS Native current-color source/preview prepares on real workers",
+          "PASS Accepted held-cut cancellation or explicit-unhold race preserves original scene/history and fails dependent Save"
+        ]
+      }
+    },
+    "app": {
+      "sha256": "abb0667b7644f4dafdbb5f62b3968a349df0c378e017af34f521b483a4d82ff8",
+      "version": "Dome Sculpt 0.1.0 / CPU / Blender 5.4 Alpha trackball basis"
+    },
+    "exit": 0
+  },
+  "authorities": {
+    "prepare.py": {
+      "bytes": 3131,
+      "sha256": "cf70975630784da7e31e849fbd475f82e63c8818c055c4a2d51924d4e88fb694"
+    },
+    "build.py": {
+      "bytes": 2514,
+      "sha256": "2d43afbd31839fb3da338e16e20e96e744af4ea9f419e012aa10bf6dcc1c7eeb"
+    },
+    "run-native.py": {
+      "bytes": 2058,
+      "sha256": "65ba3a893238c2df2b629a10ebf6101e19cd3a77d66a5fb0aa19f636473cc8d7"
+    },
+    "owned_monitor.py": {
+      "bytes": 4859,
+      "sha256": "b510ef5655e3214bd38e7b5f56022c37a79879070c3733f2dd059bad74f21269"
+    },
+    "build-plan.json": {
+      "bytes": 15372,
+      "sha256": "82d28e69207416e2ff5ce48d128d6972cd75d5d645327f0a82a689241b2d7156"
+    },
+    "build-status.json": {
+      "bytes": 824,
+      "sha256": "7feb56f8b63394235c462c05647b93063a85291d4526424638948aa33611856a"
+    },
+    "native/status.json": {
+      "bytes": 19775,
+      "sha256": "5ab8bdca23069996c20e2792838f966fca7cae9d9671c09938b9295b8c60d11e"
+    },
+    "seal.py": {
+      "bytes": 3637,
+      "sha256": "dfce1236b3b3b765425fa4053dc16d04b78c4f20bedaef1f6624974db3475da8"
+    },
+    "diagnostic-commands.json": {
+      "bytes": 2112,
+      "sha256": "b711c47c7ef3608cd1133798fb4929af92d4e2ebf3ee6f35fff14d8536c7bf58"
+    },
+    "diagnostic-cut-boundaries.cpp": {
+      "bytes": 4683,
+      "sha256": "098c4651ad24a037ea744eaf45a484e69876986b3a7f9366d7a7f86212d8e8f4"
+    },
+    "cut-boundaries.cpp.o.d": {
+      "bytes": 20722,
+      "sha256": "f1a8c8bb5d5d9603270e73fca073550e0d2652a1a2b98c808acfc103556f8f5d"
+    },
+    "cut-color-admission.cpp.o.d": {
+      "bytes": 23112,
+      "sha256": "21bfd8bd78e4ed3a0d00e497c6c2a269cfffd2ba9fb8961fd9b32e1533a6401e"
+    },
+    "cut-color-document.cpp.o.d": {
+      "bytes": 23110,
+      "sha256": "f20cf24d9c90aa3736e7ff68f716225481a7b14c69ec8749f7704b5d789dc871"
+    },
+    "document-cut.cpp.o.d": {
+      "bytes": 20790,
+      "sha256": "b61559067492c53701d4019d46335c68a955f241cd82a1a469e8b1f2ab419249"
+    },
+    "dome-sculpt-cut-boundaries-test.link.d": {
+      "bytes": 7357,
+      "sha256": "c752b835b178cf27cc6a660fee55d07cfa72739ea10af967db03a202cd71391b"
+    },
+    "dome-sculpt-cut-color-admission-test.link.d": {
+      "bytes": 7372,
+      "sha256": "c6e14bef0985843358ceaf991729df01a5eeec82cedc80328e010960003ee002"
+    },
+    "dome-sculpt-cut-color-document-test.link.d": {
+      "bytes": 7369,
+      "sha256": "7250499ba53e06c603a35559edcae8c994dc6811748711556b4d9604671049e6"
+    },
+    "dome-sculpt.link.d": {
+      "bytes": 13927,
+      "sha256": "b8144798110c84ad57fc24eed2c1ca6bd4fb73897d5a0f494065c1603c3fd0fe"
+    },
+    "broad-original-cut-test.log": {
+      "bytes": 675,
+      "sha256": "28dc255eafd314f4730b87bac68a800ece31d0a7287fd00b15c8ca5b47508e5c"
+    },
+    "cut-boundaries.cpp.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cut-color-admission.cpp.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cut-color-document.cpp.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "diagnostic-result.log": {
+      "bytes": 659,
+      "sha256": "ae7e3fc8efc4394cacf5429fd2edab2a9d26b649a5359def4937f7726b1cfbb4"
+    },
+    "document-cut.cpp.log": {
+      "bytes": 942,
+      "sha256": "998ead20d05159516a8afa01c2d8aec92552f4bd1602d1994dbf454b84dea1c9"
+    },
+    "dome-sculpt-cut-boundaries-test.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "dome-sculpt-cut-color-admission-test.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "dome-sculpt-cut-color-document-test.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "dome-sculpt.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "native/dome-sculpt-cut-boundaries-test.log": {
+      "bytes": 1787,
+      "sha256": "2740fd11e787b56ee8bbcf75ce4f71c1fc9572614737e54cf2f31f2500ab32fc"
+    },
+    "native/dome-sculpt-cut-color-admission-test.log": {
+      "bytes": 658,
+      "sha256": "66ea21dbd14586736eb22243a8a42cb61b709181b969633a91fa219b7f4f171c"
+    },
+    "native/dome-sculpt-cut-color-document-test.log": {
+      "bytes": 12189,
+      "sha256": "224f8450aa6e6f3d113ffc219d312f753d3178c5f8484d619ed8245ba13186c6"
+    }
+  },
+  "archive": {
+    "file": "cut-current-paint-release-20261126.tar.xz",
+    "sha256": "9604e22fdd825197616969ddc855c10df9737c8ccdce9aa5a932b44526c847aa",
+    "bytes": 17264
+  }
+}

@@ -280,8 +280,10 @@ identical project hash. The 94 pipeline checks and the full 167-check native
 workflow passed, with exact Save and recovery bytes. The matching optimized
 frontend and renderer compiled and the app version check passed. Read
 [the changing-capture receipt](validation/sculpt-sharing-range-search-20261126.json).
-The benchmark measures native CPU snapshot capture. Separate runs qualify
-sanitizers, graphics and device behavior.
+The benchmark measures native CPU snapshot capture. Seven focused ASan/UBSan
+cases pass on this source. The full case reaches the original 900-second
+deadline during cold-capture quota checks at 4,075,298,816 bytes of owned RSS.
+The separate sustained Arc run is underway.
 
 The broad regression found that command availability could throw when a
 sculpt volume retained a dormant painting mesh. Candidate `c5fbb0bd` checks
@@ -289,9 +291,27 @@ the active mode before resolving the paint field for color blur. The
 original source-mode adoption regression and all 73 sculpt Undo allocation
 boundaries pass on the matching Release build. The software color-blur
 controls also pass, including the active-paint and backend-refusal cases.
-Read [the dormant-paint receipt](validation/dormant-paint-command-release-20261126.json).
-The broad matrix and the remaining native workflow failures are still under
-review.
+The same three cases pass on the matched ASan/UBSan core. Main carries the
+scoped fix as `6a63f6fe`. Read
+[the Release receipt](validation/dormant-paint-command-release-20261126.json)
+and [the sanitizer receipt](validation/dormant-paint-command-strict-20261126.json).
+
+Candidate `2aff79f7` resolves a render-only current-grid paint field from its
+owning scene on the plane-cut worker. It restores mapped baking of the plain
+painted source. All 23 original desktop/controller cancel-and-retry checks
+pass. The colored cut cohorts pass all 174 Apply admission fault boundaries
+and 157 native/controller checks. Read
+[the plane-cut receipt](validation/cut-current-paint-release-20261126.json).
+The same 23 cancel-and-retry checks pass under ASan/UBSan. Read
+[the range and cut strict receipt](validation/sculpt-range-and-cut-strict-20261126.json).
+
+Four older sculpt fixtures now check the actual immutable chunk geometry,
+scalar owners and current publication boundary. The corrected fixtures and
+regular native strokes pass against the exact `f9c20398` core. Read
+[the sculpt fixture assessment](SCULPT-PREVIEW-FIXTURES-20261126.md).
+Combined candidate `c90c9fed` includes the dormant-paint and cut fixes and the
+four fixture changes. Its rerun uses the verified `2aff79f7` product core.
+The broad matrix and remaining failures are still under review.
 
 ## Source and integration boundary
 

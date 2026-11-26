@@ -1,0 +1,689 @@
+{
+  "scope": "Matched strict runs for the changed-sculpt search candidate and the plain current-grid desktop/controller cut retry.",
+  "sources": {
+    "range": "f9c20398",
+    "cut": "2aff79f7"
+  },
+  "invocations": {
+    "range": "99f62e678a4e4be0b25303a3ed87757d",
+    "cut": "631167c070eb44028964409522885b42"
+  },
+  "runs": {
+    "range-strict": {
+      "build": {
+        "terminal": true,
+        "exit": 0,
+        "compile": [
+          {
+            "name": "src-document-cut.cpp",
+            "exit": 0
+          },
+          {
+            "name": "src-document.cpp",
+            "exit": 0
+          },
+          {
+            "name": "src-material-visibility.cpp",
+            "exit": 0
+          },
+          {
+            "name": "src-sculpt-chunk-masks.cpp",
+            "exit": 0
+          },
+          {
+            "name": "src-sculpt-placed-chunk.cpp",
+            "exit": 0
+          },
+          {
+            "name": "src-sculpt-placed-chunks.cpp",
+            "exit": 0
+          },
+          {
+            "name": "src-sculpt-scene-chunks.cpp",
+            "exit": 0
+          },
+          {
+            "name": "src-sculpt-surface-chunks.cpp",
+            "exit": 0
+          },
+          {
+            "name": "tests-sculpt-chunk-pipeline.cpp",
+            "exit": 0
+          },
+          {
+            "name": "tests-sculpt-independent-workflow.cpp",
+            "exit": 0
+          },
+          {
+            "name": "tests-sculpt-surface-chunks.cpp",
+            "exit": 0
+          }
+        ],
+        "linked_archive": {
+          "members": 197,
+          "sha256": "842f092f80ee1a1826eb528f1d807edd897201d4b1aece9356d8ad9d6a5f7029",
+          "replacements": [
+            "document-cut.cpp.o",
+            "document.cpp.o",
+            "material-visibility.cpp.o",
+            "sculpt-chunk-masks.cpp.o",
+            "sculpt-placed-chunk.cpp.o",
+            "sculpt-placed-chunks.cpp.o",
+            "sculpt-scene-chunks.cpp.o",
+            "sculpt-surface-chunks.cpp.o"
+          ]
+        },
+        "links": [
+          {
+            "name": "dome-sculpt-sculpt-surface-chunks-test",
+            "exit": 0
+          },
+          {
+            "name": "dome-sculpt-sculpt-chunk-pipeline-test",
+            "exit": 0
+          },
+          {
+            "name": "dome-sculpt-sculpt-independent-workflow",
+            "exit": 0
+          },
+          {
+            "name": "dome-sculpt-scene-file-test",
+            "exit": 0
+          },
+          {
+            "name": "dome-sculpt-document-recovery-test",
+            "exit": 0
+          },
+          {
+            "name": "dome-sculpt-atomic-write-allocation-test",
+            "exit": 0
+          },
+          {
+            "name": "dome-sculpt-corner-color-uv23-domain-test",
+            "exit": 0
+          },
+          {
+            "name": "dome-sculpt-baked-emission-workflow-test",
+            "exit": 0
+          }
+        ]
+      },
+      "native": {
+        "terminal": true,
+        "source": "f9c20398b2a917ac85d22eac5f3d0d534312c5c2",
+        "profile": "strict",
+        "cases": {
+          "scene-file-test": {
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-sharing-range-search-strict-20261126/strict/dome-sculpt-scene-file-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-sharing-range-search-strict-20261126/strict/native/scene-file"
+            ],
+            "started": 1795667648.5285842,
+            "timeout_seconds": 900,
+            "RSS_limit_bytes": 4294967296,
+            "virtual_AS_cap": null,
+            "pid": 4,
+            "start": 84557359,
+            "pgrp": 4,
+            "root": {
+              "pid": 4,
+              "start": 84557359,
+              "pgrp": 4,
+              "session": 4,
+              "ppid": 2,
+              "state": "R"
+            },
+            "known_processes": [
+              {
+                "pid": 4,
+                "start": 84557359,
+                "pgrp": 4,
+                "session": 4,
+                "ppid": 2,
+                "state": "R"
+              },
+              {
+                "pid": 29,
+                "start": 84557489,
+                "pgrp": 4,
+                "session": 4,
+                "ppid": 4,
+                "state": "R"
+              },
+              {
+                "pid": 30,
+                "start": 84557490,
+                "pgrp": 4,
+                "session": 4,
+                "ppid": 4,
+                "state": "R"
+              }
+            ],
+            "peak_owned_RSS_bytes": 1079394304,
+            "peak_observed_virtual_bytes": 21991242756096,
+            "monitor_samples": 136,
+            "signals": [],
+            "exit": 0,
+            "seconds": 1.4859631061553955,
+            "sha256": "02ab327612ac363b1b536abf3d8d556e27346a615822358edd2ceed6f292abae",
+            "check_passed": true
+          },
+          "document-recovery-test": {
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-sharing-range-search-strict-20261126/strict/dome-sculpt-document-recovery-test"
+            ],
+            "started": 1795667650.4235206,
+            "timeout_seconds": 900,
+            "RSS_limit_bytes": 4294967296,
+            "virtual_AS_cap": null,
+            "pid": 32,
+            "start": 84557548,
+            "pgrp": 32,
+            "root": {
+              "pid": 32,
+              "start": 84557548,
+              "pgrp": 32,
+              "session": 32,
+              "ppid": 2,
+              "state": "R"
+            },
+            "known_processes": [
+              {
+                "pid": 32,
+                "start": 84557548,
+                "pgrp": 32,
+                "session": 32,
+                "ppid": 2,
+                "state": "R"
+              },
+              {
+                "pid": 51,
+                "start": 84557731,
+                "pgrp": 32,
+                "session": 32,
+                "ppid": 32,
+                "state": "R"
+              },
+              {
+                "pid": 52,
+                "start": 84557732,
+                "pgrp": 32,
+                "session": 32,
+                "ppid": 32,
+                "state": "R"
+              }
+            ],
+            "peak_owned_RSS_bytes": 1131683840,
+            "peak_observed_virtual_bytes": 21991116349440,
+            "monitor_samples": 184,
+            "signals": [],
+            "exit": 0,
+            "seconds": 2.0359792709350586,
+            "sha256": "a2af01f9ae0ad59387baaf1ea23aa05e686dd85e0b9d845968864e4477233def",
+            "check_passed": true
+          },
+          "atomic-write-allocation-test": {
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-sharing-range-search-strict-20261126/strict/dome-sculpt-atomic-write-allocation-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-sharing-range-search-strict-20261126/strict/native/atomic-write-allocation"
+            ],
+            "started": 1795667652.8490584,
+            "timeout_seconds": 900,
+            "RSS_limit_bytes": 4294967296,
+            "virtual_AS_cap": null,
+            "pid": 54,
+            "start": 84557791,
+            "pgrp": 54,
+            "root": {
+              "pid": 54,
+              "start": 84557791,
+              "pgrp": 54,
+              "session": 54,
+              "ppid": 2,
+              "state": "R"
+            },
+            "known_processes": [
+              {
+                "pid": 54,
+                "start": 84557791,
+                "pgrp": 54,
+                "session": 54,
+                "ppid": 2,
+                "state": "R"
+              },
+              {
+                "pid": 56,
+                "start": 84557799,
+                "pgrp": 54,
+                "session": 54,
+                "ppid": 54,
+                "state": "R"
+              }
+            ],
+            "peak_owned_RSS_bytes": 35676160,
+            "peak_observed_virtual_bytes": 21990304468992,
+            "monitor_samples": 10,
+            "signals": [],
+            "exit": 0,
+            "seconds": 0.10010075569152832,
+            "sha256": "aba51a5dee6fd2739a9c50a753585b4087af45199e38da8e97abb814f8ece3f4",
+            "check_passed": true
+          },
+          "corner-color-uv23-domain-test": {
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-sharing-range-search-strict-20261126/strict/dome-sculpt-corner-color-uv23-domain-test"
+            ],
+            "started": 1795667652.9588163,
+            "timeout_seconds": 900,
+            "RSS_limit_bytes": 4294967296,
+            "virtual_AS_cap": null,
+            "pid": 58,
+            "start": 84557802,
+            "pgrp": 58,
+            "root": {
+              "pid": 58,
+              "start": 84557802,
+              "pgrp": 58,
+              "session": 58,
+              "ppid": 2,
+              "state": "R"
+            },
+            "known_processes": [
+              {
+                "pid": 58,
+                "start": 84557802,
+                "pgrp": 58,
+                "session": 58,
+                "ppid": 2,
+                "state": "R"
+              },
+              {
+                "pid": 67,
+                "start": 84557920,
+                "pgrp": 58,
+                "session": 58,
+                "ppid": 58,
+                "state": "R"
+              },
+              {
+                "pid": 68,
+                "start": 84557921,
+                "pgrp": 58,
+                "session": 58,
+                "ppid": 58,
+                "state": "R"
+              }
+            ],
+            "peak_owned_RSS_bytes": 926638080,
+            "peak_observed_virtual_bytes": 21990892113920,
+            "monitor_samples": 122,
+            "signals": [],
+            "exit": 0,
+            "seconds": 1.3131446838378906,
+            "sha256": "3f901cc4bd05bbf44ee2fca8af0e4f7e1dbd0636641758458dbf6a086d59b935",
+            "check_passed": true
+          },
+          "baked-emission-workflow-test": {
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-sharing-range-search-strict-20261126/strict/dome-sculpt-baked-emission-workflow-test",
+              "--source-worker-controls",
+              "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-sharing-range-search-strict-20261126/strict/native/uv1"
+            ],
+            "started": 1795667654.6507466,
+            "timeout_seconds": 900,
+            "RSS_limit_bytes": 4294967296,
+            "virtual_AS_cap": null,
+            "pid": 70,
+            "start": 84557971,
+            "pgrp": 70,
+            "root": {
+              "pid": 70,
+              "start": 84557971,
+              "pgrp": 70,
+              "session": 70,
+              "ppid": 2,
+              "state": "R"
+            },
+            "known_processes": [
+              {
+                "pid": 70,
+                "start": 84557971,
+                "pgrp": 70,
+                "session": 70,
+                "ppid": 2,
+                "state": "R"
+              },
+              {
+                "pid": 175,
+                "start": 84558383,
+                "pgrp": 70,
+                "session": 70,
+                "ppid": 70,
+                "state": "R"
+              },
+              {
+                "pid": 176,
+                "start": 84558384,
+                "pgrp": 70,
+                "session": 70,
+                "ppid": 70,
+                "state": "R"
+              }
+            ],
+            "peak_owned_RSS_bytes": 1546616832,
+            "peak_observed_virtual_bytes": 21991171506176,
+            "monitor_samples": 397,
+            "signals": [],
+            "exit": 0,
+            "seconds": 4.291357517242432,
+            "sha256": "4ec882d45d9f7ea227d8cb46b854cdf85830cfab25598bf41ff6174d1d96a5a5",
+            "check_passed": true
+          },
+          "sculpt-surface-chunks-test": {
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-sharing-range-search-strict-20261126/strict/dome-sculpt-sculpt-surface-chunks-test"
+            ],
+            "started": 1795667659.3013017,
+            "timeout_seconds": 900,
+            "RSS_limit_bytes": 4294967296,
+            "virtual_AS_cap": null,
+            "pid": 178,
+            "start": 84558436,
+            "pgrp": 178,
+            "root": {
+              "pid": 178,
+              "start": 84558436,
+              "pgrp": 178,
+              "session": 178,
+              "ppid": 2,
+              "state": "R"
+            },
+            "known_processes": [
+              {
+                "pid": 178,
+                "start": 84558436,
+                "pgrp": 178,
+                "session": 178,
+                "ppid": 2,
+                "state": "R"
+              },
+              {
+                "pid": 179,
+                "start": 84558615,
+                "pgrp": 178,
+                "session": 178,
+                "ppid": 178,
+                "state": "R"
+              },
+              {
+                "pid": 180,
+                "start": 84558616,
+                "pgrp": 178,
+                "session": 178,
+                "ppid": 178,
+                "state": "R"
+              }
+            ],
+            "peak_owned_RSS_bytes": 380411904,
+            "peak_observed_virtual_bytes": 21990351147008,
+            "monitor_samples": 178,
+            "signals": [],
+            "exit": 0,
+            "seconds": 1.8758544921875,
+            "sha256": "7a458bebe1b8c6d42e82672d33d20fcefe6355628081dbc6ef731433e6720336",
+            "check_passed": true
+          },
+          "sculpt-chunk-pipeline-test": {
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-sharing-range-search-strict-20261126/strict/dome-sculpt-sculpt-chunk-pipeline-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-sharing-range-search-strict-20261126/strict/native/pipeline"
+            ],
+            "started": 1795667661.2011962,
+            "timeout_seconds": 900,
+            "RSS_limit_bytes": 4294967296,
+            "virtual_AS_cap": null,
+            "pid": 182,
+            "start": 84558626,
+            "pgrp": 182,
+            "root": {
+              "pid": 182,
+              "start": 84558626,
+              "pgrp": 182,
+              "session": 182,
+              "ppid": 2,
+              "state": "R"
+            },
+            "known_processes": [
+              {
+                "pid": 182,
+                "start": 84558626,
+                "pgrp": 182,
+                "session": 182,
+                "ppid": 2,
+                "state": "R"
+              },
+              {
+                "pid": 191,
+                "start": 84559353,
+                "pgrp": 182,
+                "session": 182,
+                "ppid": 182,
+                "state": "R"
+              },
+              {
+                "pid": 192,
+                "start": 84559357,
+                "pgrp": 182,
+                "session": 182,
+                "ppid": 182,
+                "state": "R"
+              }
+            ],
+            "peak_owned_RSS_bytes": 1715027968,
+            "peak_observed_virtual_bytes": 21990940475392,
+            "monitor_samples": 718,
+            "signals": [],
+            "exit": 0,
+            "seconds": 7.668710708618164,
+            "sha256": "c7297049a17f4fdd3b0de478a5a9cd7b7fd96129c2fa5a05d83fec1d60cc4c58",
+            "check_passed": true
+          },
+          "sculpt-independent-workflow": {
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-sharing-range-search-strict-20261126/strict/dome-sculpt-sculpt-independent-workflow",
+              "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-sharing-range-search-strict-20261126/strict/native/sculpt"
+            ],
+            "started": 1795667669.2484581,
+            "timeout_seconds": 900,
+            "RSS_limit_bytes": 4294967296,
+            "virtual_AS_cap": null,
+            "pid": 194,
+            "start": 84559431,
+            "pgrp": 194,
+            "root": {
+              "pid": 194,
+              "start": 84559431,
+              "pgrp": 194,
+              "session": 194,
+              "ppid": 2,
+              "state": "R"
+            },
+            "known_processes": [
+              {
+                "pid": 194,
+                "start": 84559431,
+                "pgrp": 194,
+                "session": 194,
+                "ppid": 2,
+                "state": "R"
+              }
+            ],
+            "peak_owned_RSS_bytes": 4075298816,
+            "peak_observed_virtual_bytes": 21991973838848,
+            "monitor_samples": 81809,
+            "signals": [
+              {
+                "pgid": 194,
+                "witness": {
+                  "pid": 194,
+                  "start": 84559431,
+                  "pgrp": 194,
+                  "session": 194,
+                  "ppid": 2,
+                  "state": "R"
+                },
+                "signal": "SIGTERM",
+                "reason": "Owned command exceeded declared deadline",
+                "epoch": 1795668569.2566721
+              }
+            ],
+            "error": "BudgetExceeded('Owned command exceeded declared deadline')",
+            "exit": -15,
+            "seconds": 900.3734540939331,
+            "sha256": "cb9340a8502c040a419c4d4d22e683131021fb6831892e66b32330f2a3e876e0",
+            "check_passed": false
+          }
+        },
+        "exit": 1
+      }
+    },
+    "cut-strict": {
+      "build": {
+        "terminal": true,
+        "exit": 0,
+        "compile": [
+          {
+            "name": "document-cut.cpp",
+            "exit": 0
+          },
+          {
+            "name": "cut-boundaries.cpp",
+            "exit": 0
+          }
+        ],
+        "linked_archive": {
+          "members": 197,
+          "sha256": "7e038ee55420de898c31dc3155741bc54aab9eb2a4a9057dcfb83f0b47888a07",
+          "replacements": [
+            "document-cut.cpp.o"
+          ]
+        },
+        "links": [
+          {
+            "name": "dome-sculpt-cut-boundaries-test",
+            "exit": 0
+          }
+        ]
+      },
+      "native": {
+        "terminal": true,
+        "cases": {
+          "dome-sculpt-cut-boundaries-test": {
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/cut-current-paint-strict-20261126/dome-sculpt-cut-boundaries-test"
+            ],
+            "started": 1795668565.0578604,
+            "timeout_seconds": 900,
+            "RSS_limit_bytes": 4294967296,
+            "virtual_AS_cap": null,
+            "pid": 4,
+            "start": 84649012,
+            "pgrp": 4,
+            "root": {
+              "pid": 4,
+              "start": 84649012,
+              "pgrp": 4,
+              "session": 4,
+              "ppid": 2,
+              "state": "R"
+            },
+            "known_processes": [
+              {
+                "pid": 4,
+                "start": 84649012,
+                "pgrp": 4,
+                "session": 4,
+                "ppid": 2,
+                "state": "R"
+              },
+              {
+                "pid": 116,
+                "start": 84649359,
+                "pgrp": 4,
+                "session": 4,
+                "ppid": 4,
+                "state": "R"
+              },
+              {
+                "pid": 117,
+                "start": 84649361,
+                "pgrp": 4,
+                "session": 4,
+                "ppid": 4,
+                "state": "R"
+              }
+            ],
+            "peak_owned_RSS_bytes": 1100578816,
+            "peak_observed_virtual_bytes": 21991343968256,
+            "monitor_samples": 327,
+            "signals": [],
+            "exit": 0,
+            "seconds": 3.6481215953826904,
+            "sha256": "f6521c8201217e2e09e6e9bfccbade2d409474469367523d58cf7559bbe753e6",
+            "check_passed": true,
+            "passed_cases": [
+              "PASS Cut preview prepares while an earlier ordered save is paused",
+              "PASS Accepted cut owns a cancellable asset lease behind the earlier save",
+              "PASS Cancel requests the asset owner's cancellation and retains its draft until acknowledgement",
+              "PASS Cancelled cut releases the ordered asset and final-save waiters",
+              "PASS Cancelled publication retains the exact source scene and original editable preview without partial outputs",
+              "PASS The preceding save retains its own original scene snapshot",
+              "PASS The same preview can be explicitly retried after cancellation without restarting the workspace",
+              "PASS Retried cut publishes shell and cap as exactly one global Undo transaction",
+              "PASS Cut preview prepares while an earlier ordered save is paused",
+              "PASS Accepted cut owns a cancellable asset lease behind the earlier save",
+              "PASS Controller sample drains through the native input worker",
+              "PASS Controller sample drains through the native input worker",
+              "PASS Controller sample drains through the native input worker",
+              "PASS Accepted cut keeps its own XR Cancel command available without navigating to another page",
+              "PASS Controller sample drains through the native input worker",
+              "PASS Controller sample drains through the native input worker",
+              "PASS Controller sample drains through the native input worker",
+              "PASS Cancel requests the asset owner's cancellation and retains its draft until acknowledgement",
+              "PASS Cancelled cut releases the ordered asset and final-save waiters",
+              "PASS Cancelled publication retains the exact source scene and original editable preview without partial outputs",
+              "PASS The preceding save retains its own original scene snapshot",
+              "PASS The same preview can be explicitly retried after cancellation without restarting the workspace",
+              "PASS Retried cut publishes shell and cap as exactly one global Undo transaction"
+            ]
+          }
+        },
+        "exit": 0
+      }
+    }
+  },
+  "authorities": {
+    "range-strict/build-plan.json": "891bc1ef25d3ae07ba81827b20aaec8a08664d15bb459daf0970f879283ff6d1",
+    "range-strict/build-status.json": "67dd842675cebe7b000f49b61d236ff7ef0ef2226e347d70605bd8ec822e3c1c",
+    "range-strict/run-native.py": "2314fcbbf327792008c618d5a1675b60a6038a91db6d57e6c458dbc7c72e29bd",
+    "range-strict/native/status.json": "bff036fa3d5383f1041ac1245f088e5e7ba76d1ca54f7a55152ea5b2c2bad92b",
+    "range-strict/native/atomic-write-allocation-test.log": "0e3863f158f06dc45c5e5b10a64ffd86abab056eab621cd2256e12869eccb0da",
+    "range-strict/native/baked-emission-workflow-test.log": "09a0d354e4170f50e79cce44a87ff94521d29c0fa16503929a9497605f121f38",
+    "range-strict/native/corner-color-uv23-domain-test.log": "849d187442cf28337f287738b14870de9f451acb772026f3ab1428de692d7279",
+    "range-strict/native/document-recovery-test.log": "133749a13b164d17364edc916b9ac7d697f643da0e55ba93767fa5f43959f596",
+    "range-strict/native/scene-file-test.log": "0e7fe3a507abddb3db566806058b5525cb58cf89dee94063473155672de85bbe",
+    "range-strict/native/sculpt-chunk-pipeline-test.log": "3fb72ac3bb1c62d71d3013be86e1a0f57b4ad6816a6461750b95a499439bbd9f",
+    "range-strict/native/sculpt-independent-workflow.log": "fd9eed87699526dd19051ed1c60a79b8a0a75745f52abdcf3dd7901e4e0d1a0f",
+    "range-strict/native/sculpt-surface-chunks-test.log": "ebf78e916610192f405486b582e0ca5ab78b363141f709602c669e9a6ba4b101",
+    "cut-strict/build-plan.json": "01775f33cf38dad6f626c0c869a0983d725cb495f04af781ac41700892b637ff",
+    "cut-strict/build-status.json": "c3d3a39eb486926add14bbe9bf20b6817ea96525bb6fdfe04d19066925627b72",
+    "cut-strict/run-native.py": "6b15954848f6c7d47271442f6a36c1ade5b5612944145f03e5ba0ed4a7511f28",
+    "cut-strict/native/status.json": "fdb0c0ea9bbb87056359015cee1cf2e163e75243f1b9801a1a7e699f98113679",
+    "cut-strict/native/dome-sculpt-cut-boundaries-test.log": "2740fd11e787b56ee8bbcf75ce4f71c1fc9572614737e54cf2f31f2500ab32fc"
+  },
+  "archive": {
+    "file": "sculpt-range-and-cut-strict-20261126.tar.xz",
+    "bytes": 9804,
+    "sha256": "a5b8ac37ce47349308696266a9ef006e99eb6d96b9da2009644a15af67352661"
+  }
+}
