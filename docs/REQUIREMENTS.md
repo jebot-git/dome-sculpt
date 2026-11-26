@@ -68,6 +68,14 @@ sanitizer run and the main port's focused native and OpenXR runs remain open.
 [HDR fixture validation](validation/hdr-closure-independent-seed-20261126.json)
 [HDR preview evidence](validation/atlas-packing-and-hdr-redo-20261126.json)
 
+The Scene40 texture-set candidate preserves distinct per-field Bake
+recipes, including retained history and shared raster storage. The native
+remapping candidate handles deletion and append for the tested plain
+fields. A real prepared-polygon field still needs coherent origin and
+source-owner remapping. Both candidates pass five native suites in
+Release and ASan/UBSan. Active-set Bake/Clear/Recall remains open.
+[Texture-set recipe evidence](validation/texture-set-bake-recipe-20261126.json)
+
 ## Qualified integration — 2026-11-17
 
 Main now integrates product `1bc13125` and public fixture `f1e193c7` after

@@ -1569,6 +1569,43 @@
       }
     ]
   },
+  "worker-bound-memo-asan": {
+    "profile": "asan",
+    "resolution": 2048,
+    "candidate": "b458d7bd4af75b0fd00cea64afc127dd9e3cfe69",
+    "terminal": true,
+    "invocation": "9eb272457d2846adaa1dc62a0cabf99c",
+    "deadline_per_phase_seconds": 900,
+    "owned_RSS_limit_bytes": 4294967296,
+    "phase": "complete",
+    "mode": "color-bound-memo",
+    "seconds": 1039.06,
+    "binary_sha256": "cbc9901dba5aae235beb5dbeac2df9070f9d33f7328150260ef17479ef1f8a12",
+    "core_sha256": "96db380db16483f760bbbb229ef0943aea58416d3e37a8fc3247e8040eb47b80",
+    "capture_inputs": {
+      "original-source.dsculpt": "6415086c94bb1d1570e167ee317e3b3bd73e510cd9b35d6c26da0e189cfab0d6",
+      "selected-target-resolution.dsculpt": "a2fb762266ccd6a3de39e44635521265397ad0b82e6411162daa84c90f2ad724",
+      "observed-source.json": "9ed2472ab7e8a7eb89f0b582c399dcfd07215fefab89a923577e7414561fcd17",
+      "observed-second-bake.dsculpt": "9c299cac73198075a602366fc7084e37409e6055f39a90d641f9ddf8add28673"
+    },
+    "exit": 0,
+    "runs": [
+      {
+        "label": "color-bound-memo",
+        "pid": 1776049,
+        "exit": 0,
+        "error": null,
+        "elapsed_seconds": 780.426,
+        "peak_owned_rss": 1868468224,
+        "libasan_mapped": true,
+        "libubsan_mapped": true,
+        "checks": [
+          3471
+        ],
+        "log_sha256": "ba06917b95fddae74b4553ac7e566aeb87d8f41667abc84c33d2a93bfe1b55b6"
+      }
+    ]
+  },
   "worker-bound-memo-history-release": {
     "profile": "release",
     "resolution": 2048,
@@ -1646,9 +1683,73 @@
       }
     ]
   },
+  "worker-bound-memo-main-release": {
+    "profile": "release",
+    "candidate": "fa28893123dce8c8342badbebb1285f4a1c7320c",
+    "base": "61e506633981cf5d881c732a11670b090c33b736",
+    "sdk": "/opt/fltk-vr/toolkit",
+    "invocation": "dee05eebed084280a072ac50f6000ba5",
+    "terminal": true,
+    "phase": "complete",
+    "seconds": 570.22,
+    "tests": [
+      "color-bound-memo",
+      "composite-cache",
+      "baked-textures",
+      "bake-workflow",
+      "source-maps",
+      "source-uv",
+      "material-visibility",
+      "baked-emission-native"
+    ],
+    "app_sha256": "bc1ee86488493bf72ac255943d25df6098b4832fe884f6d8e00ddde34e867eef",
+    "core_sha256": "fcb4f3fceecc9751ca6b7a9d7787cb54dd870b82701de0fb26e6661c4e27195a",
+    "exit": 0,
+    "ctest_sha256": "c04753b7409c08589587a69dccf4f6227a71c9e751234e71175d54c93bae6421"
+  },
+  "worker-bound-memo-main-software-openxr": {
+    "candidate": "fa28893123dce8c8342badbebb1285f4a1c7320c",
+    "app_source": "fa28893123dce8c8342badbebb1285f4a1c7320c",
+    "invocation": "1b1fea4a2e524365ae75319622c057d0",
+    "profile": "software-release",
+    "terminal": true,
+    "phase": "complete",
+    "elapsed_seconds": 618.53,
+    "companion_hashes": {
+      "dome-sculpt-bake-controls-test": "d85c0ade8636870b02790e4c89db97ba8820919cba043a23e07ef3fe2e17e653",
+      "dome-sculpt-corner-color-uv23-gui-fixture": "b0e0c30ac3f5105d570b59f25fd301b1767f53d7a390c468bc745811a3e6ff1b",
+      "dome-sculpt-skin-authoring-test": "007faf170f2b8b40fd14185f7688b3fb9520a42cda33ed70b593b19968b53304",
+      "dome-sculpt-retopo-authoring-test": "92fbda52f31a3c044960b998fa669fd97a25e5d322fa636b18e4ca9a149bf845",
+      "dome-sculpt-cut-authoring-test": "4bd75145add2849c41a95267936cef3ed455866ec3db3dfeaa8abfbc5f0aa346",
+      "dome-sculpt-mask-document-test": "6954bdfdfeae3143781c9a8ed32ab29938b9765314d33825fee10b57ff9be789"
+    },
+    "app_sha256": "bc1ee86488493bf72ac255943d25df6098b4832fe884f6d8e00ddde34e867eef",
+    "runtime_sha256": "e00b86390634f4c3e97694a50553e0364db6b3379153fd912a1c3f9d81027026",
+    "runner_sha256": "943e4655951793a8552358db79c1634246fef9ec41f8b2b4e1c8c8ef1b7fa3d3",
+    "exit": 0,
+    "loader_exit": 0,
+    "checks": 153,
+    "report_complete": true,
+    "error": null,
+    "arc_witnesses": {},
+    "voxel": {
+      "exact_native_bytes": true,
+      "voxel_menu_pixels": 9884,
+      "voxel_menu_seen": true,
+      "voxel_open_pixels": 172,
+      "voxel_undo_pixels": 196,
+      "voxel_undo_seen": true
+    },
+    "uv": {
+      "uv_atlas_apply_accent": 207,
+      "uv_atlas_ready": true,
+      "uv_atlas_visible_pixels": 4994,
+      "uv_atlas_wait_frames": 2
+    }
+  },
   "archive": {
     "path": "docs/validation/atlas-packing-and-hdr-redo-20261126.tar.gz",
-    "sha256": "a89bbf1c35779bc6cf80c83a686f50246a5f74fcb3bd168ee055df601efa1692",
-    "members": 41
+    "sha256": "e57195fd171e21e34698ef290c68c0f19111e35fe26cc1376c64068df69db1d0",
+    "members": 49
   }
 }

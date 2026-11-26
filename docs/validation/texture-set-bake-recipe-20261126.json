@@ -1,0 +1,167 @@
+{
+  "sdk_source": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "recipe_persistence": {
+    "release": {
+      "status": {
+        "candidate": "fe16a68418a81152949d02a2f4504c1b8e10cac2",
+        "profile": "release",
+        "terminal": true,
+        "invocation": "d52604b420eb41b2beba430f4ac87e53",
+        "fltk": "/opt/fltk-vr/toolkit",
+        "phase": "complete",
+        "elapsed_seconds": 407.38,
+        "binaries": {
+          "texture-set-bake-recipe": "7f00f5ce69f935ca6b882929efdd221428c369e77a53e32d0cca207dd96abe24",
+          "dome-sculpt-texture-set-native": "00536c5902e92d603103572ba2d093e251abcc8fc5cea1c01869a825f02f3549",
+          "dome-sculpt-texture-set-history": "bc127a29c269f3af146d95935813771a7cfd38c5ff8da11a403219270c0d60a6",
+          "dome-sculpt-texture-set-source-export": "869067b81a333d6bd146616312f783e5e35bb3434bb9109e249054491a4fd13f",
+          "dome-sculpt-texture-set-resolution": "3354f2ec4d93d48c815c3d15ab5dd32b6765f5015f7f6685a0be27f9e064551d"
+        },
+        "exit": 0,
+        "ctest_sha256": "94b565211da54df0a4d356bfdd86619a9b0fcd4faf68f977708c431f6f0358d4"
+      },
+      "native_sha256": "aa85770f0554e1ec8763163c4dfac4458921b92e7ed3733bdbcce426eda72d46",
+      "checks": 3072
+    },
+    "asan": {
+      "status": {
+        "candidate": "fe16a68418a81152949d02a2f4504c1b8e10cac2",
+        "profile": "asan",
+        "terminal": true,
+        "invocation": "f4dfd7b5104d4f07b4b30c2531c33baa",
+        "fltk": "/home/blux/de-xr/dome-sculpt/artifacts/sdk-20261126/toolkit-sanitize",
+        "phase": "complete",
+        "elapsed_seconds": 176.65,
+        "donor": "ead80bb50485de6f8a2473ea64ee039d53f79ae9",
+        "rebuilt": [
+          "src/polygon-scene.cpp",
+          "src/scene.cpp",
+          "src/texture-set-archive.cpp",
+          "src/texture-set-field-codec.cpp"
+        ],
+        "core_sha256": "f70859a7f2098762b622ff52574c297c3e28792e067c1c3d3a4503ac1f558bf1",
+        "parent_core_sha256": "7fa3e626d84fbf57666cccc0999f4faff71537d0fe97eb075457935bb9622b6a",
+        "objects": {
+          "polygon-scene.cpp.o": "9dc6d260dd5be2c8a05a642f541fa68383c1c77658b78a4387c098e8515009a6",
+          "scene.cpp.o": "79fa766245012a8628ad011f22e5cfd02cdea970a76cf0cb9d21afe06d3421c4",
+          "texture-set-archive.cpp.o": "b31bdcedcb9fbc3b5a431dce5a3fc0d318a25f2229635f32eb449d5e0aefc36b",
+          "texture-set-field-codec.cpp.o": "9418d2bdfa6616f64fc28b71bb4174aef1efddc052882fcf7e718565bb3da09e"
+        },
+        "atlas_sha256": "c69b82e6c6bc86b01addd844811220cbc54b19bcbc5edb7eee4ec05a5141f08e",
+        "binaries": {
+          "texture-set-bake-recipe": "4449fbfe6fb311fde46ff950cfd18ccc2ff83b1377527941f7bc6b3dc30076a2",
+          "dome-sculpt-texture-set-native": "f9253a3090ddbc2284c91128f568b204ee96eeee31957f4ee000cfe2f34f44b4",
+          "dome-sculpt-texture-set-history": "ea0cf131586aedf279b4117421b1ddba5c591ec7914f3b8afba95f773ebd9c0e",
+          "dome-sculpt-texture-set-source-export": "d3d29d80ba239e904d28fac43938d4af1d96234f6556e10caf58d1b1b1d7e293",
+          "dome-sculpt-texture-set-resolution": "cbb19b9c191cca28e517c3faa3e6ca787c46b2676f47a0df84ab1cb3b3e12ed3"
+        },
+        "exit": 0,
+        "ctest_sha256": "25181e6285683e829856d7e924bfbf3541e919f01a3c353a6ead936927c827d2"
+      },
+      "native_sha256": "aa85770f0554e1ec8763163c4dfac4458921b92e7ed3733bdbcce426eda72d46",
+      "checks": 3072
+    }
+  },
+  "before_reference_remap": {
+    "source": "fe16a68418a81152949d02a2f4504c1b8e10cac2",
+    "source_delete": "save refused",
+    "native_append": "append refused independently"
+  },
+  "reference_remap": {
+    "release": {
+      "status": {
+        "candidate": "273344dc316e97fe600b557388310b7ebef88cf5",
+        "profile": "release",
+        "terminal": true,
+        "invocation": "7455189a3e97441783d941b75c27ceb3",
+        "fltk": "/opt/fltk-vr/toolkit",
+        "phase": "complete",
+        "elapsed_seconds": 78.68,
+        "donor": "fe16a68418a81152949d02a2f4504c1b8e10cac2",
+        "rebuilt": [
+          "src/groups.cpp",
+          "src/native-scene-append.cpp",
+          "src/scene.cpp",
+          "src/texture-set-archive.cpp",
+          "src/texture-sets.cpp"
+        ],
+        "core_sha256": "cfd05fda634a827acc205722a9110ecc2f22075d0defac24c999f87fb33794c3",
+        "parent_core_sha256": "9af9a58596690e8390ed282da411d843984269ba898e522537a9839565428f74",
+        "objects": {
+          "groups.cpp.o": "d88e3376a27bb04c51013be73efc596fc3eccf9b10b3791d2488bfdd65a2cd19",
+          "native-scene-append.cpp.o": "ce3f068cf4386788c0b8cd8a3c1b1dc413ed93fcd8666ead72117ed13372130c",
+          "scene.cpp.o": "634a0aba97db188b5c0e0b78999bb20c788b4f4b6b6b5c6b7df93418b34e3aaa",
+          "texture-set-archive.cpp.o": "6b79b19fdf333a3b2586d91b1dc25fc93b1d9ccb3475e8675d1e5f7044c4ea67",
+          "texture-sets.cpp.o": "20468361d9d356683b819f88ff95e8b1a6d74811be0dcf31409b6272fdb5d99c"
+        },
+        "atlas_sha256": "19803996402d62a22046ef9bb9dcff5498b1ba5b6c7af68290f3a2771848c528",
+        "binaries": {
+          "texture-set-bake-recipe": "c1f28546229a8bd2663c098772b906ee822edeaafce35f757fa6634e1f22d77f",
+          "dome-sculpt-texture-set-native": "ea5574558eb035e3e4d8255988d37507774774d7452bf0998ce1ce2c732b5793",
+          "dome-sculpt-texture-set-history": "44cd776693af99025aeac173415d820332452c7f99bb5c7ef2b478f723184337",
+          "dome-sculpt-texture-set-source-export": "8c5ac9855c8b1beb6bd69afa42e6f0481fed26299469355ba281bd2af0f962e3",
+          "dome-sculpt-texture-set-resolution": "3834ace75119fdfb39566afa098a181d61b5a048b4655cc030349a844faf191a"
+        },
+        "exit": 0,
+        "ctest_sha256": "75553d7ffb39e9ff1b5415726709c1a1358862be0f415469824d45772b617c27"
+      },
+      "native_sha256": "aa85770f0554e1ec8763163c4dfac4458921b92e7ed3733bdbcce426eda72d46",
+      "checks": 3079
+    },
+    "asan": {
+      "status": {
+        "candidate": "273344dc316e97fe600b557388310b7ebef88cf5",
+        "profile": "asan",
+        "terminal": true,
+        "invocation": "fd9aac016e414d5b8d727fe3f6d7996e",
+        "fltk": "/home/blux/de-xr/dome-sculpt/artifacts/sdk-20261126/toolkit-sanitize",
+        "phase": "complete",
+        "elapsed_seconds": 126.64,
+        "donor": "fe16a68418a81152949d02a2f4504c1b8e10cac2",
+        "rebuilt": [
+          "src/groups.cpp",
+          "src/native-scene-append.cpp",
+          "src/scene.cpp",
+          "src/texture-set-archive.cpp",
+          "src/texture-sets.cpp"
+        ],
+        "core_sha256": "89041f35110278ed991a2634c165425764a3faa37c0c448551e25e71e1bb34eb",
+        "parent_core_sha256": "f70859a7f2098762b622ff52574c297c3e28792e067c1c3d3a4503ac1f558bf1",
+        "objects": {
+          "groups.cpp.o": "26c9475b5238bba1db7fef7c2d8df62b6b2d272bcf7640aaf717d80d67787fb0",
+          "native-scene-append.cpp.o": "bc76749f49c17c0c40128a074b5e2cfc62af7d64847ce3e0201d2204e250b41d",
+          "scene.cpp.o": "fc11d7e27dfe89a599f790f7ff1ff40b253b5c751621ab6f253a47682ab66d55",
+          "texture-set-archive.cpp.o": "7d8288a4637f8ed712734135bbee70c5610c364e830fea5f8b6964bc73a41b4f",
+          "texture-sets.cpp.o": "0ff6aad4d5ea8825e83d3dba3b183a685af5b613bdab731f2697c5a6c343f3cc"
+        },
+        "atlas_sha256": "c69b82e6c6bc86b01addd844811220cbc54b19bcbc5edb7eee4ec05a5141f08e",
+        "binaries": {
+          "texture-set-bake-recipe": "6e788717fedba26ef8a030819e0304109e6a61e14b732181475bce31bd1d3fbb",
+          "dome-sculpt-texture-set-native": "fbd8b2d09c971252148aeb97baaf1313dfb9b2d80287c9e4e94482fc344562f9",
+          "dome-sculpt-texture-set-history": "69d00d2366e4eeb9c79da3b313fdc72d2914041d2b22ee68c817c9e446548fec",
+          "dome-sculpt-texture-set-source-export": "9f5f4b111f719f36bc4b3d96d4d6e84473411b75e657e7dda04b0ebd3597c394",
+          "dome-sculpt-texture-set-resolution": "9412c429a4af5e0aa1b233818338dc5840d24bc0f9ce73e4cb8cad11a098551f"
+        },
+        "exit": 0,
+        "ctest_sha256": "e68001fa441fdbc900e061bf240a4ffcf5fd8a2e77939bcefe4e03e3b6676786"
+      },
+      "native_sha256": "aa85770f0554e1ec8763163c4dfac4458921b92e7ed3733bdbcce426eda72d46",
+      "checks": 3079
+    }
+  },
+  "source_backed_reference_probe": {
+    "candidate": "273344dc316e97fe600b557388310b7ebef88cf5",
+    "terminal": true,
+    "invocation": "7b4bccae6c5d4a899f6e5bea6c50e615",
+    "phase": "run source-backed append and deletion",
+    "core_sha256": "89041f35110278ed991a2634c165425764a3faa37c0c448551e25e71e1bb34eb",
+    "exit": 1,
+    "error": "CalledProcessError(1, ['bwrap', '--die-with-parent', '--unshare-all', '--ro-bind', '/', '/', '--dev', '/dev', '--proc', '/proc', '--tmpfs', '/tmp', '--tmpfs', '/run/user', '--clearenv', '--setenv', 'HOME', '/tmp', '--setenv', 'PATH', '/usr/bin:/bin', '--setenv', 'ASAN_OPTIONS', 'detect_leaks=1:halt_on_error=1', '--setenv', 'UBSAN_OPTIONS', 'halt_on_error=1:print_stacktrace=1', PosixPath('/home/blux/de-xr/dome-sculpt/artifacts/texture-set-recipe-remap-validation-20261126/source-probe-asan/source-probe')])",
+    "failure_stage": "Save encoding after deleting a genuine prepared-polygon Bake source"
+  },
+  "archive": {
+    "path": "docs/validation/texture-set-bake-recipe-20261126.tar.gz",
+    "sha256": "6dcac6ea75b57883d1aa1b23c343600fa357d4e05aaf08c1c8dd7ef74c7cdc11",
+    "members": 23
+  }
+}

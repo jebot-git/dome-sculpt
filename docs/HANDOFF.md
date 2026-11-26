@@ -1033,8 +1033,10 @@ change. The combined candidate has identical application, build, test, asset
 and third-party inputs to `b458d7bd`. Fresh optimized and sanitizer app builds,
 eight native cases per profile, and the matched software/Arc OpenXR replays
 qualify the main port separately. Their runners and receipts are under
-`artifacts/worker-color-bound-memo-main-validation-20261126`. The port remains
-on its qualification branch pending those results.
+`artifacts/worker-color-bound-memo-main-validation-20261126`. The main port passes all eight optimized native cases and all 153
+software OpenXR checks. The separate sanitizer cache run passes 3,471
+controls, including 3,438 allocation-denial cases. Full 2048-pixel ordered
+history and main-port sanitizer and Arc qualification remain open.
 
 The wordwise atlas candidate `19f125ae` checks clipped overlap without
 splitting aligned chart words. A matched native export keeps the same
@@ -1066,6 +1068,30 @@ warnings. A truncated project leaves an existing GLB byte-identical.
 [Preview and integration evidence](validation/hdr-preview-composite-20261126.json)
 [Cache and Arc rerun evidence](validation/atlas-grid-hdr-history-20261126.json)
 [Combined OpenXR and independent GLB evidence](validation/combined-atlas-hdr-openxr-20261126.json)
+
+## Texture-set bake recipes
+
+Candidate `fe16a684` persists individual Scene40 texture-field Bake recipes
+while retaining shared raster storage. Plain Scene40 projects still encode
+through the same legacy records. A saved project with three distinct
+current, retained and additional-field source/cage contexts reopens and
+saves byte for byte. Five suites pass in Release and ASan/UBSan, including
+20 focused recipe checks and exact output parity between profiles.
+
+Deleting a recipe source and appending the same project exposed an
+additional-field reference bug. Candidate `273344dc` keeps original IDs
+and marks deleted live references unavailable. Native append remaps current
+and retained recipe sources and cages to the new object namespace. Both
+profiles pass all five suites again, including 27 recipe checks across the
+two paths and exact current and retained Scene replay.
+
+A separate real prepared-polygon probe still refuses the source-backed
+reference remap because the editable polygon origin and the authenticated
+source owner no longer match. The refusal is preserved in the evidence.
+These candidate branches remain separate from main runtime admission.
+Active-set Bake/Clear/Recall and prepared-source lifecycle coverage remain
+required.
+[Texture-set recipe and reference evidence](validation/texture-set-bake-recipe-20261126.json)
 
 ## Source and integration boundary
 
