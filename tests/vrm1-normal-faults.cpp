@@ -31,8 +31,21 @@ int main(int argc,char**argv)try{
  auto object_refuses=[&](const SculptObject &edited,std::string_view reason){bool caught=false;try{(void)detail::compile_vrm1_expression_layer(original,edited,*packet,256,limits,{});}catch(const std::invalid_argument&e){caught=std::string_view(e.what()).find(reason)!=std::string_view::npos;}if(!caught||scene.encode()!=exact)throw std::runtime_error("Rim model adapter did not refuse precisely with unchanged native owner");++passed;};
  auto edited=object;auto model=std::make_shared<SourceMaterialBindings>(*object.material_bindings);edited.material_bindings=model;model->material.parameters.rim_power=0;object_refuses(edited,"tiny exponent");model->material.parameters.rim_power=object.material_bindings->material.parameters.rim_power;model->material.parameters.alpha=MToonAlpha::Mask;model->material.parameters.render_queue=2450;edited.material.alpha=Material::AlphaMode::Mask;object_refuses(edited,"masked normal");
  // Independent ownership negatives do not mint any private source seal.
- auto frame_refuses=[&](const SculptObject &candidate,std::string_view reason){bool caught=false;try{detail::require_vrm1_authored_normal_frame(candidate);}catch(const std::invalid_argument&e){caught=std::string_view(e.what()).find(reason)!=std::string_view::npos;}if(!caught||scene.encode()!=exact)throw std::runtime_error("Normal frame owner negative failed with unchanged original scene");++passed;};
- auto foreign=object;auto appearance=std::make_shared<CreatorAppearance>(*object.appearance);appearance->asset=std::make_shared<ImportedAsset>(*object.appearance->asset);foreign.appearance=appearance;frame_refuses(foreign,"primitive identity differs");
+ auto frame_refuses = [&](const SculptObject &candidate, std::string_view reason) {
+  std::string diagnostic;
+  try {
+   detail::require_vrm1_authored_normal_frame(candidate);
+  } catch (const std::invalid_argument &error) {
+   diagnostic = error.what();
+  }
+  if (scene.encode() != exact)
+   throw std::runtime_error("Normal frame refusal changed the original scene");
+  if (diagnostic.find(reason) == std::string::npos)
+   throw std::runtime_error("Normal frame refusal expected '" + std::string(reason) +
+                            "', received '" + diagnostic + "'");
+  ++passed;
+ };
+ auto foreign=object;auto appearance=std::make_shared<CreatorAppearance>(*object.appearance);appearance->asset=std::make_shared<ImportedAsset>(*object.appearance->asset);foreign.appearance=appearance;frame_refuses(foreign,"Normal frame lost its retained original primitive identity");
  foreign=object;auto material=std::make_shared<SourceMaterialBindings>(*object.material_bindings);foreign.material_bindings=material;material->roles[size_t(MToonSlot::Normal)].min_filter=9728;frame_refuses(foreign,"sampler/image authority differs");
  auto set=std::make_shared<NormalFrameSet>(*object.material_bindings->normal_frames);auto frame=std::make_shared<NormalFrames>(*set->mtoon);set->mtoon=frame;material=std::make_shared<SourceMaterialBindings>(*object.material_bindings);material->normal_frames=set;foreign=object;foreign.material_bindings=material;frame->generated_tangents=true;frame->generated_uv=1;frame_refuses(foreign,"compatible fixed authored");
  frame->generated_tangents=false;frame->generated_uv.reset();frame->tangents.front()[0]+=.125f;frame_refuses(foreign,"compatible fixed authored");
