@@ -234,11 +234,19 @@ if(BUILD_TESTING)
   add_test(NAME source-hdr-provenance-closure-seed COMMAND dome-sculpt-source-joint-writable-normal-bake-test
     --checked-case 000 2048 ${CMAKE_CURRENT_BINARY_DIR}/source-hdr-provenance-closure-seed)
   set_tests_properties(source-hdr-provenance-closure-seed PROPERTIES FIXTURES_SETUP hdr-closure-seed TIMEOUT 900)
+  # A same-current-build seed cannot prove replay of old full-before-context
+  # Scene43. This small archive contains actual bytes from the unchanged05
+  # producer, with both archive and extracted native checksums verified.
+  add_test(NAME source-hdr-legacy-context-setup COMMAND ${CMAKE_COMMAND}
+    -DARCHIVE=${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/hdr/scene43-full-context-05.tar.xz
+    -DDESTINATION=${CMAKE_CURRENT_BINARY_DIR}
+    -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/hdr-legacy-context-fixture.cmake)
+  set_tests_properties(source-hdr-legacy-context-setup PROPERTIES FIXTURES_SETUP legacy-hdr-context TIMEOUT 60)
   add_test(NAME source-hdr-provenance-closure COMMAND dome-sculpt-source-hdr-provenance-closure-test
     ${CMAKE_CURRENT_BINARY_DIR}/source-hdr-provenance-closure-seed/selected-target-resolution.dsculpt
-    ${CMAKE_CURRENT_BINARY_DIR}/source-joint-writable-normal-bake-checked/000.dsculpt
+    ${CMAKE_CURRENT_BINARY_DIR}/hdr-legacy/scene43-full-context.dsculpt
     ${CMAKE_CURRENT_BINARY_DIR}/source-hdr-provenance-closure)
-  set_tests_properties(source-hdr-provenance-closure PROPERTIES FIXTURES_REQUIRED "hdr-closure-seed;owning-hdr-seed" TIMEOUT 900)
+  set_tests_properties(source-hdr-provenance-closure PROPERTIES FIXTURES_REQUIRED "hdr-closure-seed;legacy-hdr-context" TIMEOUT 900)
   add_executable(dome-sculpt-source-owning-hdr-export-test tests/source-owning-hdr-export.cpp)
   target_include_directories(dome-sculpt-source-owning-hdr-export-test PRIVATE src)
   target_link_libraries(dome-sculpt-source-owning-hdr-export-test PRIVATE dome-sculpt-core)
