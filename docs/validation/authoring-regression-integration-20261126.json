@@ -102,7 +102,20 @@
     "invocation": "861a3363d9af4e2892764eeb1175e7d5",
     "cases": 86,
     "path": "artifacts/authoring-regression-integration-combined-20261126/combined-regression/status.json",
-    "terminal": false
+    "terminal": true,
+    "build_exit": 0,
+    "ctest_exit": 8,
+    "clean_final": true,
+    "passed": 83,
+    "failed": [
+      "vrm",
+      "source-color-vrm",
+      "vrm-role-consumer"
+    ],
+    "skipped": 0,
+    "status_sha256": "5084c3e094df0a526f10736982b7bce65c43c80f0ecb05b204885cfe1f4b26a7",
+    "ctest_xml_sha256": "214783c73ab344a9ce8f31dc2e8425ef6186d6c7e58895e841c861887705dccd",
+    "comparison": "Same 86 cases as 2cbc1f1a. All five previously focused regressions now pass in the fresh combined Release replay. The three other failures still report embedded creator source SHA256 identity mismatch."
   },
   "preserved_failures_and_recovery": [
     "Old fixtures expected source Bake to reject supported retained domains. The revised tests compare genuine source data and pre-publication atomicity.",
@@ -110,7 +123,7 @@
     "An early projection fixture barrier still intercepted an unused mesher overload. The accepted one gates the current SculptSceneChunks worker."
   ],
   "open_scope": [
-    "Fresh combined application qualification",
+    "Combined application qualification with the three VRM fixtures corrected",
     "Remaining VRM consumer cases",
     "Full production authoring and physical XR/device acceptance"
   ]

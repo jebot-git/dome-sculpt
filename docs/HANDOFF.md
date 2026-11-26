@@ -625,8 +625,11 @@ worker. All 134 checks pass on software and Intel Arc A770, including the
 owner cycle from excessive graph depth and retain the enclosing FLOAT
 payload guard. Five focused Release and five ASan/UBSan suites pass with
 leak detection. These tests use verified staged archives with a newly
-compiled graph validator. A fresh FLTK application build and the larger
-86-case replay are running on the exact pushed candidate.
+compiled graph validator. The fresh FLTK Release build completed. The same
+86-case replay passed 83 with no skips, improving on 78 on `2cbc1f1a`.
+All five focused fixes passed in the combined run. The three remaining VRM
+fixtures still report a creator-source SHA256 mismatch after modifying their
+embedded source bytes.
 See [the validation receipt](validation/authoring-regression-integration-20261126.json).
 
 ## Source and integration boundary
