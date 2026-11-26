@@ -427,9 +427,10 @@ Candidate `d39ebf8d` extends texture resolution authoring to untouched
 source-authored meshes. The actual XR controller changes one FaceSkin
 grid from 256 to 1024 on both CC0 VRoid bases. The mesh, image, rig and
 material owners stay identical, and ordered Save/reopen and one-step
-Undo/Redo preserve complete Scene data. Painted grids still require a
-paint-transfer adapter. The 2048 FaceSkin resize exceeds the existing
-raster-work budget in the measured case.
+Undo/Redo preserve complete Scene data. Painted grids on this revision require
+a paint-transfer adapter. The early 2048 FaceSkin probe explicitly used the
+generic 64M work budget. Both bases reach 2048 under the editor's existing
+128M budget, as verified by the later native grid probe.
 
 The same candidate adds matching ordered source triangles to desktop
 Bake and the XR Projection Policy panel. It transfers a displaced mesh
@@ -492,6 +493,33 @@ native scene byte-exact. The updated fixture passes 30 checks per Release and
 strict run against the unchanged `adb805a4` archives. The original 86-case
 result retains its `document-export` failure.
 See [the validation receipt](validation/creator-vrm-placement-20261126.json).
+
+### Resizing painted original grids
+
+Candidate `07d70f24` enables the shared FLTK and XR resolution controls to
+queue a detached operation
+for painted single-mesh writable grids, including original VRoid FaceSkin
+paint. Enlargement preserves every authored texel in the corresponding
+destination cells. Reduction filters colour, opacity, masks, and emission
+and checks every original authored cell against its result. The composed
+paint overlays are compared over the same coarser texel footprints in
+both directions. Rebuilding the writable raster retains the original
+geometry, source images, material and rig owners. Prepared and baked fields
+retain their separate adapter requirements. Painted resampling currently
+requires the CPU backend and refuses explicitly on other build choices.
+
+Both CC0 avatars pass exact 128→256→128 recovery of authored cells, including
+hidden emission and fractional masks. The 128→256 controller operation adds
+one undo step and survives ordered Save and fresh reopen. Separate Release
+probes pass both default 256→512 workspaces and reduce the saved 256 grids
+produced by the committed fixture. The maximum composed overlay component
+errors in the reduction probe are 0.000588238 and 0.147059 under the existing
+0.30 bound. Both empty FaceSkin grids also reach 2048 through the same
+controller controls. The five selected Release tests and the same five
+headless ASan/UBSan tests with leak detection all pass. Four saved native
+projects are byte-identical between those profiles. Controller tests use
+synthetic input. The 86-case combined Release replay is running on exact
+`07d70f24`. See [the validation receipt](validation/source-authored-painted-grid-20261126.json).
 
 ## Source and integration boundary
 

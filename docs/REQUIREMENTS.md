@@ -13,6 +13,13 @@ native reimport, and atomic refusal of divergent part placement or unsupported
 nonlinear spring refitting. Dynamic spring simulation and admission of the
 combined candidate remain open. See [the receipt](validation/creator-vrm-placement-20261126.json).
 
+The painted-grid candidate preserves authored cells exactly when enlarging
+original writable grids and checks reconstruction error when reducing them.
+It retains source image, mesh
+and rig ownership, preserves all layers and supports exact Undo/Redo and
+ordered Save. Prepared and baked fields, accelerated resampling, and full
+application qualification remain open. See [the receipt](validation/source-authored-painted-grid-20261126.json).
+
 ## Qualified integration — 2026-11-17
 
 Main now integrates product `1bc13125` and public fixture `f1e193c7` after

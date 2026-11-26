@@ -1,0 +1,163 @@
+{
+  "source": "07d70f24866b0c169c8c78c9fd0645d8722fb4b4",
+  "parent": "62e7b6eccaa6fa0c142e3a8c58e834f088406948",
+  "tested_diff_sha256": "11c6b7d62fdacc044e6c80f86e680dd3558e0edb142abf647047e612de763f36",
+  "branch": "work/source-authored-painted-grid-20261126",
+  "toolkit": {
+    "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+    "fltk": "/opt/fltk-vr/toolkit",
+    "bitmap": "/opt/fltk-vr/bdf-runtime"
+  },
+  "release": {
+    "invocation": "21db05f416084a65a502f5f4076d580e",
+    "selected_cases": {
+      "bake-controls": {
+        "status": "run",
+        "seconds": 0.0282003
+      },
+      "document-export": {
+        "status": "run",
+        "seconds": 15.7631
+      },
+      "dome-sculpt-texture-set-resolution": {
+        "status": "run",
+        "seconds": 0.847573
+      },
+      "creator-source-grid-resolution": {
+        "status": "run",
+        "seconds": 6.82296
+      },
+      "creator-painted-source-grid-resolution": {
+        "status": "run",
+        "seconds": 7.13493
+      }
+    },
+    "artifacts": [
+      {
+        "path": "artifacts/source-authored-painted-grid-release-20261126/configure.log",
+        "sha256": "e192bbcc644265fd54c6c2622d06c9883db59ab60a09ea65e0b19ff10be852f3"
+      },
+      {
+        "path": "artifacts/source-authored-painted-grid-release-20261126/build.log",
+        "sha256": "84f37e10c75060a3c6735369045fd038d03c4b04e8377b8ebee9febba5c559fe"
+      },
+      {
+        "path": "artifacts/source-authored-painted-grid-release-20261126/build-tests.log",
+        "sha256": "1d2fef6a66c2993a10ac41e237f473b82812c3c6c96449473fcfbeb7d4a9cff0"
+      },
+      {
+        "path": "artifacts/source-authored-painted-grid-release-20261126/source-at-test",
+        "sha256": "890cc782c17d3a06de5b17833bc3af203a6579f0fdec9cb469536de25a6a0e4b"
+      },
+      {
+        "path": "artifacts/source-authored-painted-grid-release-20261126/ctest.log",
+        "sha256": "1cf31d121e2eff771c6cc417922b2ab6607a33f9b6ea5fb1adc61a17979b36e5"
+      },
+      {
+        "path": "artifacts/source-authored-painted-grid-release-20261126/ctest.xml",
+        "sha256": "3b89480103a2f73526cf762d977d695f4c0246e5b8f7b3a690f6c72640a61e5f"
+      }
+    ]
+  },
+  "strict_headless_asan_ubsan_leaks": {
+    "invocation": "6e78f20c84f64ffe963e66adca5e4979",
+    "selected_cases": {
+      "bake-controls": {
+        "status": "run",
+        "seconds": 0.293521
+      },
+      "document-export": {
+        "status": "run",
+        "seconds": 46.1543
+      },
+      "dome-sculpt-texture-set-resolution": {
+        "status": "run",
+        "seconds": 4.71576
+      },
+      "creator-source-grid-resolution": {
+        "status": "run",
+        "seconds": 50.6795
+      },
+      "creator-painted-source-grid-resolution": {
+        "status": "run",
+        "seconds": 49.7905
+      }
+    },
+    "artifacts": [
+      {
+        "path": "artifacts/source-authored-painted-grid-strict-20261126/configure.log",
+        "sha256": "1df2627dbeab74f7a2cad43ffb11f99969f9258ce51b060bb336dcb2ef75d051"
+      },
+      {
+        "path": "artifacts/source-authored-painted-grid-strict-20261126/build.log",
+        "sha256": "236845582dd7e34a4850b00f0c8b23ad44337ec49e7b683ed4ffb0f960f5708e"
+      },
+      {
+        "path": "artifacts/source-authored-painted-grid-strict-20261126/build-tests.log",
+        "sha256": "c4b7a5b001f47f0886fe44dfa8ef2036d16d8996dbc3c4fdcf579d9fe1d83f9a"
+      },
+      {
+        "path": "artifacts/source-authored-painted-grid-strict-20261126/source-at-test",
+        "sha256": "890cc782c17d3a06de5b17833bc3af203a6579f0fdec9cb469536de25a6a0e4b"
+      },
+      {
+        "path": "artifacts/source-authored-painted-grid-strict-20261126/ctest.log",
+        "sha256": "c84f7b6cf4ed0a577b7f2742741dc094932c88be21fb8498c237f1a1b5d97f2a"
+      },
+      {
+        "path": "artifacts/source-authored-painted-grid-strict-20261126/ctest.xml",
+        "sha256": "238927de3c34e8a83ac23b4976a122bf9e3f7e8e66ae34e3620d5a586c079974"
+      }
+    ]
+  },
+  "byte_identical_release_and_sanitizer_projects": {
+    "creator-source-grid-resolution/vroid-beta-female-face2048.dsculpt": "f58919497db4cef4b28152d7dee9abbb6a3fc9150b3542372ce85ecf8b8067eb",
+    "creator-source-grid-resolution/vroid-beta-male-face2048.dsculpt": "3330d9ce52878879a81310359f6f0297deee422ffd256bdd63d56bc9aa63b2d5",
+    "creator-painted-source-grid-resolution/vroid-beta-female-painted256.dsculpt": "9cae1e3a15945012053a46d3321760a9587ec7bf70e0931de4175fb6977bfdd8",
+    "creator-painted-source-grid-resolution/vroid-beta-male-painted256.dsculpt": "0eeb2dcf618b8ce5bc9eb4b52d90023bbb8d2b56fa7550d8322457e7c2339a07"
+  },
+  "probes": {
+    "empty_face_grids_with_normal_and_smaller_budgets": {
+      "path": "artifacts/source-authored-resize-probe-20261126/result.log",
+      "sha256": "458ccfc00872c1d8ef0789c0b838dbd59c6f64bc58c6acdc09494f1dbbc70d46"
+    },
+    "default_256_to_512_synthetic_controller": {
+      "path": "artifacts/source-authored-painted-grid-256-probe-20261126/final.log",
+      "sha256": "1b386be4f180c7db507b80b6eae939910540988044d093eea8764da1e0b657e4"
+    },
+    "native_reduction_256_to_128": {
+      "path": "artifacts/source-authored-painted-grid-reduction-probe-20261126/final.log",
+      "sha256": "31158a07ba832eb661a6a3b48f2d49a047343da59c3f6ccaead467ae3bf6e9ee"
+    },
+    "native_reduction_maximum_coarse_overlay_error": [
+      0.000588238,
+      0.147059
+    ],
+    "native_reduction_cell_comparisons_per_avatar": 32768
+  },
+  "preserved_earlier_attempts": [
+    {
+      "path": "artifacts/source-authored-painted-grid-release-20261126/bilinear-first/ctest.log",
+      "sha256": "60206d422f95d236e11a4ea6af0403493e4feecd8df372c8e3373b35bb729755"
+    },
+    {
+      "path": "artifacts/source-authored-painted-grid-release-20261126/roundtrip-footprints-first/ctest.log",
+      "sha256": "eece3e68b17e2f53259abb4f55ede20212019a7fbb51ea963f85a8640dc74a3a"
+    },
+    {
+      "path": "artifacts/source-authored-painted-grid-strict-20261126/roundtrip-footprints-first/ctest.log",
+      "sha256": "718f5b050e5d0735891ca6b7b274eb2bc035990e04adcfe2607f46fea9ef5990"
+    }
+  ],
+  "combined_regressions": {
+    "selected_cases": 86,
+    "unit": "ds-source-painted-resize-regressions-20261126.service",
+    "invocation": "77aae1c6a44a46f4988f88fdf0f3bfcf",
+    "status": "artifacts/source-authored-painted-grid-release-20261126/combined-regression/status.json"
+  },
+  "limits": [
+    "Single writable native grids with retained original source images. Prepared, retained-domain, multi-material and baked fields still use their own adapter requirements.",
+    "Painted grid resampling currently uses the CPU backend. Selected accelerators receive an explicit unsupported error.",
+    "Controller inputs were synthetic. The visible overlay reconstruction measures common coarser grid footprints."
+  ]
+}
