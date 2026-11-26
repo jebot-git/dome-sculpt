@@ -47,7 +47,8 @@ D physical(const PaintedMesh &paint,std::array<double,2> uv){const int r=int(pai
 std::array<double,2> paint_uv(const SculptObject&o,size_t triangle,std::array<float,3>bary){const auto&d=*o.painted->paint_sampling_domain();const auto&m=*d.basis();std::array<double,2>q{};for(size_t k=0;k<3;++k){const auto uv=m.uv.at(m.indices.at(d.source_corners()[triangle*3+k]));for(size_t axis=0;axis<2;++axis)q[axis]+=double(uv[axis])*bary[k];}return q;}
 // Shared by the monolithic regression and the instrumented consumers of its
 // captured inputs. The arithmetic and sample grid live in one place.
-void check_dense(const Scene &s,uint64_t source,uint32_t checked_resolution){
+void check_dense(const Scene &s,uint64_t source,uint32_t checked_resolution,
+                 std::optional<owning_filtered::DenseRows> rows = std::nullopt){
  const auto&baked=*s.active().painted->baked();require(baked.emission_domain&&!baked.emission_field&&baked.emission_domain->field()->resolution()==64&&baked.emission_domain->target_resolution()==checked_resolution,"Checked HDR owns the genuine unchanged source64 field independently from selected target grid");
   // Independent immutable double texels, read once for THIS accepted phase.
   // They come from original layer/pixel data, never the production field,
@@ -58,7 +59,7 @@ void check_dense(const Scene &s,uint64_t source,uint32_t checked_resolution){
   double hdr_maximum=0;uint64_t hdr_samples=0;std::array<double,2>hdr_worst{};
   owning_filtered::offcentre(s,source,[&](const SculptObject &object,size_t tri,std::array<float,3>bary,size_t role){
    if(role==0){const auto root=paint_uv(object,tri,bary);std::array<double,2>q{};const auto&mesh=s.active().painted->mesh();for(size_t k=0;k<3;++k)for(size_t axis=0;axis<2;++axis)q[axis]+=double(mesh.uv[mesh.indices[tri*3+k]][axis])*bary[k];const auto wanted=expected_hdr(root);const auto actual=baked.emission_domain->field()->sample(float(q[0]),float(q[1])).resolve({},1);for(size_t axis=0;axis<3;++axis){if(!std::isfinite(actual[axis]))throw std::runtime_error("Independent dense HDR consumer encountered nonfinite output");const double error=std::abs(wanted[axis]-actual[axis]);if(error>hdr_maximum){hdr_maximum=error;hdr_worst=q;}}++hdr_samples;}
-   return decode(object,tri,bary,role);},[](const SculptObject &object,size_t tri,std::array<float,3>bary,size_t role,const TextureMaps *maps){return direction(object,tri,bary,role,maps);},require);
+   return decode(object,tri,bary,role);},[](const SculptObject &object,size_t tri,std::array<float,3>bary,size_t role,const TextureMaps *maps){return direction(object,tri,bary,role,maps);},require,rows);
   std::cout<<std::setprecision(12)<<"CHECKED_HDR_EXTREMUM samples="<<hdr_samples<<" absolute="<<hdr_maximum<<" uv="<<hdr_worst[0]<<','<<hdr_worst[1]<<std::endl;
   require(hdr_samples>300&&hdr_maximum<2e-4,"Every independent current-grid offcentre HDR sample retains the unchanged2e-4 bound");
 }
@@ -139,7 +140,8 @@ void exercise(bool seam,bool live,bool repeat,const std::filesystem::path&out,
 // Both consumers reopen the exact files from one real Bake. The runner pins
 // their bytes and grants read-only access to the capture directory.
 void check_capture(uint32_t resolution,const std::filesystem::path &capture,
-                   const std::optional<std::filesystem::path> &worker_output){
+                   const std::optional<std::filesystem::path> &worker_output,
+                   std::optional<owning_filtered::DenseRows> rows = std::nullopt){
  const auto before=Scene::load(capture/"selected-target-resolution.dsculpt");
  const auto baked=Scene::load(capture/"observed-second-bake.dsculpt");
  const auto original_scene=Scene::load(capture/"original-source.dsculpt");
@@ -166,7 +168,7 @@ void check_capture(uint32_t resolution,const std::filesystem::path &capture,
   std::filesystem::create_directories(*worker_output);
   check_history(baked,before,source,settings->settings,*worker_output,"000",before.encode());
  }else{
-  check_dense(baked,source,resolution);
+  check_dense(baked,source,resolution,rows);
  }
 }
 
@@ -198,6 +200,22 @@ int main(int argc,char**argv)try{
   if(argc>=2){
     const std::string_view command=argv[1];
     const bool worker=command=="--checked-worker";
+    if(command=="--checked-dense-rows"){
+      if(argc!=6)return 2;
+      const auto resolution=owning_filtered::resolution(argv[2]);
+      auto row=[&](int index){
+        size_t characters=0;
+        const unsigned long number=std::stoul(argv[index],&characters);
+        if(characters!=std::string_view(argv[index]).size()||number>=resolution)
+          throw std::invalid_argument("Dense reconstruction row is outside the cell grid");
+        return unsigned(number);
+      };
+      const owning_filtered::DenseRows rows{row(4),row(5)};
+      joint_source::check_capture(resolution,argv[3],std::nullopt,rows);
+      std::cout<<"CHECKED_SOURCE_DENSE_ROWS first="<<rows.first<<" end="<<rows.end<<'\n';
+      std::cout<<"PASS "<<joint_source::checks<<" checked joint-writable SOURCE dense oracle controls"<<std::endl;
+      return 0;
+    }
     if(command=="--checked-dense"||worker){
       if(argc!=(worker?5:4))return 2;
       const auto resolution=owning_filtered::resolution(argv[2]);

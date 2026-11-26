@@ -4,6 +4,7 @@
 #include "dome/bake-recipe.hpp"
 #include <fstream>
 #include <iomanip>
+#include <optional>
 
 namespace owning_filtered {
 inline uint32_t resolution(std::string_view text) {
@@ -65,9 +66,15 @@ void refusal(const Scene &input,uint64_t source,const ObjectBakeSettings &settin
   require(after->can_undo==state->can_undo&&after->can_redo==state->can_redo&&after->project_path==state->project_path&&
       after->error.find("larger target paint resolution")!=std::string::npos,"Checked refusal preserves history/path and reports explicit resolution remedy");
 }
+struct DenseRows {
+  unsigned first, end;
+};
 template<class Expected,class Actual,class Require>
-void offcentre(const Scene &scene,uint64_t source,Expected expected,Actual actual,Require require) {
+void offcentre(const Scene &scene,uint64_t source,Expected expected,Actual actual,Require require,
+               std::optional<DenseRows> rows = std::nullopt) {
   const auto &target=scene.active();const auto &mesh=target.painted->mesh();const auto r=target.painted->resolution();
+  if(rows && (rows->first>=rows->end || rows->end>=r))
+    throw std::invalid_argument("Dense reconstruction row window exceeds the target cell grid");
   require(target.bake_recipe&&target.bake_recipe->settings.normal_filter_quality==1&&
       target.bake_recipe->encode()["settings"]["normal_filter_quality"]==1,"Actual accepted SOURCE recipe persists checked1");
   const auto maps=target.painted->preview(target.material);
@@ -85,7 +92,9 @@ void offcentre(const Scene &scene,uint64_t source,Expected expected,Actual actua
       v=((c[1]-a[1])*(x-c[0])+(a[0]-c[0])*(y-c[1]))/det;return std::array<double,3>{u,v,1-u-v};};
     const int left=std::max(0,int(std::floor(std::min({a[0],b[0],c[0]})*r-.5))),right=std::min(int(r)-2,int(std::ceil(std::max({a[0],b[0],c[0]})*r-.5))),
       bottom=std::max(0,int(std::floor(std::min({a[1],b[1],c[1]})*r-.5))),top=std::min(int(r)-2,int(std::ceil(std::max({a[1],b[1],c[1]})*r-.5)));
-    for(int y=bottom;y<=top;++y)for(int x=left;x<=right;++x){
+    const int first=rows?std::max(bottom,int(rows->first)):bottom;
+    const int last=rows?std::min(top,int(rows->end)-1):top;
+    for(int y=first;y<=last;++y)for(int x=left;x<=right;++x){
       bool inside=true;for(int dy=0;dy<2;++dy)for(int dx=0;dx<2;++dx){const auto q=barycentric((x+.5+dx)/r,(y+.5+dy)/r);inside&=*std::min_element(q.begin(),q.end())>1e-6;}
       if(!inside)continue;
       for(double oy:offsets)for(double ox:offsets){const auto q=barycentric((x+.5+ox)/r,(y+.5+oy)/r);
