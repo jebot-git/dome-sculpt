@@ -1189,6 +1189,29 @@ projected texels and 3,900 projection and AO rays. Retained writable
 targets, deformed retained donors and physical-device acceptance remain open.
 [Affine-target Bake evidence](validation/affine-target-bake-20261126.json)
 
+Main merge `df636b4d` adds Bake, Clear and Recall for selected retained
+Core PBR targets. The worker rasterizes material projection in the
+retained paint grid and uses a separate pass when the original normal
+coordinates differ. It encodes projected normals in the inverse of the
+actual placed before-to-current frame and keeps the original normal
+field in the new field's ancestry. Clear restores the inherited bake
+while keeping the last recipe. Set selection uses the existing FLTK
+dialog and XR set commands. Scene40 preserves both the authored member
+and its original record, and the existing Scene41 envelope carries
+retained FLOAT baked emission.
+
+Eleven focused native tests pass in Release and ASan/UBSan, with 76
+retained-target checks in each profile. Seventeen nested DomeD Wayland
+checks cover selection, Bake, Clear, Undo and ordered Save. Nineteen
+software and nineteen Intel Arc ASan/UBSan synthetic OpenXR checks
+cover Recall, accepted Bake, cancellation and focus loss. The two XR
+profiles produce byte-identical native endpoints. An independent
+15-point reflected world-normal comparison measures a maximum vector
+error of 0.000935. Portable LDR PBR output uses the exact normal image from
+each field. The broader production gate still includes N-only retained
+recipients, deformed retained sources and physical input.
+[Prepared retained-target Bake evidence](validation/retained-target-bake-20261126.json)
+
 ## Source and integration boundary
 
 - Main now admits product1bc13125 and public fixturef1e193c7 after complete
