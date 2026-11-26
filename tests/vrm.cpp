@@ -2,9 +2,11 @@
 #include "dome/vrm.hpp"
 #include "cgltf.h"
 #include "dome/creation.hpp"
+#include "dome/document.hpp"
 #include "dome/import.hpp"
 #include "dome/source-maps.hpp"
 #include "dome/material-bindings.hpp"
+#include "vrm-derivative-fixture.hpp"
 #include <fstream>
 #include <iostream>
 #include <numeric>
@@ -173,39 +175,30 @@ Image texture_png(const nlohmann::json &json,const std::vector<uint8_t> &bytes,i
   bool ok=png_image_finish_read(&decoded,nullptr,result.rgba.data(),0,nullptr);png_image_free(&decoded);
   if(!ok)throw std::runtime_error("Independent PNG decoder cannot read painted VRM pixels");return result;
 }
-std::vector<ObjectSurface> source_metadata(std::vector<ObjectSurface> objects,
-    const std::function<void(nlohmann::json&)> &edit) {
-  auto original=objects.front().appearance->original_bytes;
-  auto json=nlohmann::json::parse(original->begin()+20,original->begin()+20+word(*original,12));edit(json);
-  auto encoded=json.dump();while(encoded.size()%4)encoded.push_back(' ');
-  auto bytes=std::make_shared<std::vector<uint8_t>>();
-  auto append=[&](uint32_t value){for(int i=0;i<4;++i)bytes->push_back(uint8_t(value>>(i*8)));};
-  auto tail=20+word(*original,12);
-  append(0x46546c67);append(2);append(uint32_t(20+encoded.size()+original->size()-tail));
-  append(uint32_t(encoded.size()));append(0x4e4f534a);
-  bytes->insert(bytes->end(),encoded.begin(),encoded.end());bytes->insert(bytes->end(),original->begin()+tail,original->end());
-  auto vrm=std::make_shared<const std::string>(json.at("extensions").at("VRM").dump());
-  for(auto &object:objects) {
-    auto appearance=std::make_shared<CreatorAppearance>(*object.appearance);
-    appearance->original_bytes=bytes;appearance->vrm_json=vrm;object.appearance=std::move(appearance);
+Scene source_metadata(const CreatorAppearance &original,
+    const std::filesystem::path &input,const std::function<void(nlohmann::json&)> &edit,
+    const CreatorAppearance *painted_part=nullptr) {
+  vrm_derivative_fixture::Source source(*original.original_bytes);
+  edit(source.json);
+  auto imported=source.import(input);
+  if(painted_part){
+    const auto part=std::find_if(imported.objects.begin(),imported.objects.end(),[&](uint64_t id){
+      const auto &a=*imported.scene.object(id).appearance;
+      return a.source_node==painted_part->source_node&&a.source_mesh==painted_part->source_mesh&&
+             a.source_primitive==painted_part->source_primitive;
+    });
+    if(part==imported.objects.end())throw std::runtime_error("Missing authored paint target in derived VRM0 input");
+    auto &paint=*imported.scene.object(*part).painted;
+    PaintSettings ink;ink.color={0,1,0,1};ink.front_only=false;
+    Brush brush;brush.radius=5;brush.from=brush.to=paint.mesh().positions.front();
+    paint.begin_stroke();for(int sample=0;sample<16;++sample)paint.stamp(brush,ink);
+    check(paint.end_stroke(),"The derived imported VRM0 has a genuine editable material fork");
   }
-  return objects;
-}
-std::shared_ptr<SourceMaterialBindings> material_binding(const ObjectSurface &object) {
-  const auto &a=*object.appearance;auto result=std::make_shared<SourceMaterialBindings>();
-  auto vrm=nlohmann::json::parse(*a.vrm_json);
-  result->material=MToonMaterial::from_vrm0(vrm.at("materialProperties").at(size_t(a.source_material)),a.asset->textures.size());
-  for(size_t role=0;role<result->roles.size();++role)if(result->material.textures[role].index>=0) {
-    const auto &source=a.asset->textures.at(size_t(result->material.textures[role].index));auto &view=result->roles[role];
-    view.image=a.decoded_images->at(size_t(source.image));view.wrap_s=source.wrap_s;view.wrap_t=source.wrap_t;
-    view.min_filter=source.min_filter;view.mag_filter=source.mag_filter;
-  }
-  const auto &native=a.asset->materials.at(size_t(a.material));
-  result->native_reference.color=native.color;result->native_reference.emission=native.emissive;
-  result->native_reference.alpha=native.alpha==ImportedMaterial::AlphaMode::Opaque?int(Material::AlphaMode::Opaque):
-      native.alpha==ImportedMaterial::AlphaMode::Mask?int(Material::AlphaMode::Mask):int(Material::AlphaMode::Blend);
-  result->native_reference.alpha_cutoff=native.alpha_cutoff;result->native_reference.double_sided=native.double_sided;
-  return result;
+  imported.scene.select(imported.objects.front());
+  const auto scene=imported.scene.encode();
+  auto reopened=Scene::decode(scene);
+  check(reopened.encode()==scene,"Imported derivative native restart preserves source and authored paint");
+  return reopened;
 }
 } // namespace
 int main(int argc, char **argv) try {
@@ -515,16 +508,18 @@ int main(int argc, char **argv) try {
           "Independent glTF validation accepts all reconstructed paint images and fork references");
     auto shared_source=objects[shared_part].appearance->source_material;
     auto shared_name=original["materialProperties"][shared_source]["name"];
-    auto expressions=source_metadata(painted_objects,[&](auto &json) {
+    const auto &source_appearance=*objects[shared_part].appearance;
+    auto expression_scene=source_metadata(source_appearance,directory/"source-material-fork.vrm",[&](auto &json) {
       json["extensions"]["VRM"]["blendShapeMaster"]["blendShapeGroups"].push_back({
         {"name","Material fork fixture"},{"presetName","unknown"},{"binds",nlohmann::json::array()},
         {"materialValues",{{{"materialName",shared_name},{"propertyName","_RimColor"},{"targetValue",{.3,.4,.2,1}}}}}});
-    });
+    },&source_appearance);
+    const auto expressions=expression_scene.preview_surfaces();
     auto expression_path=directory/"painted-expression.vrm";export_vrm(expressions,expression_path,painted_options);
     auto [expression_json,expression_bytes]=container(expression_path);
     auto expression_binds=expression_json["extensions"]["VRM"]["blendShapeMaster"]["blendShapeGroups"].back()["materialValues"];
     std::set<std::string> expected_names,actual_names;
-    for(size_t i=0;i<objects.size();++i)if(objects[i].appearance->source_material==shared_source) {
+    for(size_t i=0;i<expressions.size();++i)if(expressions[i].appearance->source_material==shared_source) {
       auto id=expression_json["meshes"][i]["primitives"][0]["material"].template get<size_t>();
       expected_names.insert(expression_json["materials"][id]["name"]);
     }
@@ -535,14 +530,46 @@ int main(int argc, char **argv) try {
     }
     check(expected_names.size()>1 && expected_names==actual_names && expression_binds.size()==actual_names.size(),
           "Original material-value expressions expand exactly once to every distinct painted/raw state fork");
-    auto impossible=source_metadata(painted_objects,[&](auto &json) {
+    {
+      Document doc;doc.replace(expression_scene);
+      check(doc.wait_mesh(std::chrono::seconds(30))&&doc.frame().state->can_export_avatar,
+            "The active external VRM0 instance enables selected-avatar worker export");
+      const auto worker=directory/"painted-expression-worker.vrm";
+      const auto project=directory/"painted-expression-worker.dsculpt";
+      auto export_task=doc.export_asset(worker,AssetExportFormat::Avatar);
+      auto save_task=doc.save_async(project);
+      export_task.get();save_task.get();
+      const auto [worker_json,worker_bytes]=container(worker);
+      check(worker_json["extensions"]["VRM"]["blendShapeMaster"]["blendShapeGroups"].back()["materialValues"]==expression_binds&&
+            Scene::load(project).encode()==expression_scene.encode()&&doc.copy_scene().encode()==expression_scene.encode(),
+            "Selected-avatar export and ordered native Save preserve the material forks and original derivative scene");
+    }
+    auto forged=objects;
+    for(auto &part:forged){
+      auto appearance=std::make_shared<CreatorAppearance>(*part.appearance);
+      appearance->original_bytes=expressions.front().appearance->original_bytes;
+      part.appearance=std::move(appearance);
+    }
+    bool refused=false;
+    try{export_vrm(forged,expression_path,painted_options);}
+    catch(const std::runtime_error &error){
+      refused=std::string_view(error.what()).find("embedded creator source SHA256 identity mismatch")!=std::string_view::npos;
+    }
+    check(refused&&read(expression_path)==expression_bytes,
+          "A licensed creator recipe rejects substituted external bytes and preserves the existing VRM");
+    auto impossible=source_metadata(source_appearance,directory/"source-color-expression.vrm",[&](auto &json) {
       json["extensions"]["VRM"]["blendShapeMaster"]["blendShapeGroups"].push_back({
         {"name","Changed factor fixture"},{"presetName","unknown"},{"binds",nlohmann::json::array()},
         {"materialValues",{{{"materialName",shared_name},{"propertyName","_Color"},{"targetValue",{.3,.4,.2,1}}}}}});
-    });
-    check(rejects([&]{export_vrm(impossible,expression_path,painted_options);}) && read(expression_path)==expression_bytes,
+    },&source_appearance).preview_surfaces();
+    bool unrepresentable=false;
+    try{export_vrm(impossible,expression_path,painted_options);}
+    catch(const std::invalid_argument &error){
+      unrepresentable=std::string_view(error.what()).find("compilation changes expression property _Color")!=std::string_view::npos;
+    }
+    check(unrepresentable&&read(expression_path)==expression_bytes,
           "Unrepresentable flattened-factor expression fails atomically instead of silently changing its effect");
-    auto identity_names=source_metadata(objects,[&](auto &json) {
+    auto identity_names=source_metadata(source_appearance,directory/"source-identity-names.vrm",[&](auto &json) {
       auto &vrm=json["extensions"]["VRM"];vrm["materialProperties"][0]["name"]="";
       vrm["materialProperties"][1]["name"]="Source material 0";
       // Empty names are still exact original expression identities. Generated
@@ -551,14 +578,15 @@ int main(int argc, char **argv) try {
         {"name","Exact empty-name identity"},{"presetName","unknown"},{"binds",nlohmann::json::array()},
         {"materialValues",{{{"materialName",""},{"propertyName","_RimColor"},{"targetValue",{.1,.2,.3,1}}},
                            {{"materialName","Source material 0"},{"propertyName","_RimColor"},{"targetValue",{.4,.5,.6,1}}}}}});
-    });
+    }).preview_surfaces();
     auto name_path=directory/"identity-names.vrm";export_vrm(identity_names,name_path);
     auto [name_json,name_bytes]=container(name_path);
     auto name_binds=name_json["extensions"]["VRM"]["blendShapeMaster"]["blendShapeGroups"].back()["materialValues"];
     check(name_binds.size()==2 && name_binds[0]["materialName"]!=name_binds[1]["materialName"] &&
           name_binds[1]["materialName"]=="Source material 0" && name_binds[0]["targetValue"]==nlohmann::json::array({.1,.2,.3,1}),
           "Empty original material names and colliding generated labels preserve separate exact expression identities");
-    auto explicit_objects=objects;auto resolved=material_binding(explicit_objects[shared_part]);
+    auto explicit_objects=objects;
+    auto resolved=std::make_shared<SourceMaterialBindings>(*objects[shared_part].material_bindings);
     auto orange=std::make_shared<Image>(Image{2,2,std::vector<uint8_t>(16)});
     for(size_t at=0;at<orange->rgba.size();at+=4){orange->rgba[at]=255;orange->rgba[at+1]=96;orange->rgba[at+2]=0;orange->rgba[at+3]=255;}
     resolved->roles[0].image=orange;
@@ -571,11 +599,23 @@ int main(int argc, char **argv) try {
     auto explicit_pixels=texture_png(explicit_json,explicit_bytes,explicit_texture);
     check(explicit_pixels.width==2 && explicit_pixels.height==2 && explicit_pixels.rgba==orange->rgba,
           "Explicit resolved role images export independently of historical source texture indices");
-    auto unsupported_uv=objects;auto derivative=material_binding(unsupported_uv[shared_part]);
-    auto origin=std::make_shared<SourceUvOrigin>();origin->paint=reopened.object(objects[shared_part].id).painted;
-    origin->appearance=objects[shared_part].appearance;origin->material=derivative->material;origin->roles=derivative->roles;
-    derivative->uv_origin=origin;derivative->sampling_reparameterized=true;unsupported_uv[shared_part].material_bindings=derivative;
-    check(rejects([&]{export_vrm(unsupported_uv,explicit_path);}) && read(explicit_path)==explicit_bytes,
+    auto unsupported_uv=objects;
+    auto derivative=std::make_shared<SourceMaterialBindings>(*objects[shared_part].material_bindings);
+    derivative->normal_frames.reset();
+    derivative->normal_frame=SourceMaterialNormalFrame::UvDerivative;
+    derivative->sampling_reparameterized=true;
+    derivative->material.parameters.normal_enabled=true;
+    derivative->material.parameters.normal_scale=1;
+    const auto normal_role=size_t(MToonSlot::Normal);
+    derivative->material.textures[normal_role].index=0;
+    derivative->roles[normal_role].image=std::make_shared<const Image>(Image{1,1,{128,160,240,255}});
+    unsupported_uv[shared_part].material_bindings=derivative;
+    bool missing_frames=false;
+    try{export_vrm(unsupported_uv,explicit_path);}
+    catch(const std::invalid_argument &error){
+      missing_frames=std::string_view(error.what()).find("derived UV normal roles require retained original frame/tangent transport")!=std::string_view::npos;
+    }
+    check(missing_frames&&read(explicit_path)==explicit_bytes,
           "Derived normal frames cannot silently replace original tangent and morph transport under deformation");
     size_t tinted_part = SIZE_MAX;
     for (size_t i = 0; i < raw_objects.size(); ++i)
