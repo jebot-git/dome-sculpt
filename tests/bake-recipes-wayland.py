@@ -10,6 +10,7 @@ from PIL import Image,ImageChops
 signal.pthread_sigmask(signal.SIG_SETMASK,[])
 if os.environ.get('DOME_PROJECTION_WL_BUS')!='1':os.execvpe('dbus-run-session',['dbus-run-session','--',sys.executable,*sys.argv],{**os.environ,'DOME_PROJECTION_WL_BUS':'1'})
 root=Path(__file__).resolve().parents[1];build=Path(os.environ.get('DOME_SCULPT_TEST_BUILD',root/'build'));compositor=Path(os.environ['DOME_COMPOSITOR']);out=Path(os.environ['DOME_CAGE_WL_OUT']);out.mkdir(parents=True,exist_ok=True);checks=[];processes=[]
+texture_set=os.environ.get('DOME_CAGE_TEXTURE_SET')=='1'
 def check(ok,label):
  checks.append({'passed':bool(ok),'check':label});(out/'report.json').write_text(json.dumps({'checks':checks,'complete':False},indent=2)+'\n');print(('PASS ' if ok else 'FAIL ')+label,flush=True);assert ok,label
 async def wait(fn,seconds=60):
@@ -36,7 +37,10 @@ async def main():
   def scene():return json.load(urllib.request.urlopen(base+'/api/state',timeout=2))['scene']
   def action(data):urllib.request.urlopen(urllib.request.Request(base+'/api/action',data=json.dumps(data).encode(),headers={'Content-Type':'application/json'}),timeout=2).close()
   await wait(lambda:scene()['source']=='wayland');wayland=re.search(r'Dome Wayland socket: (\S+)',(out/'compositor.log').read_text())[1]
-  helper=Path(os.environ['DOME_CAGE_HELPER']);project=Path(home,'cage.dsculpt');subprocess.run([str(helper),'--ui-fixture',str(project)],env=env,check=True)
+  helper=Path(os.environ['DOME_CAGE_HELPER']);project=Path(home,'cage.dsculpt');reference=Path(home,'reference.dsculpt')
+  fixture=['--texture-set-xr-fixture',str(project),str(reference)] if texture_set else ['--ui-fixture',str(project)]
+  subprocess.run([str(helper),*fixture],env=env,check=True)
+  original_bytes=project.read_bytes()
   def inspect():return json.loads(subprocess.check_output([str(helper),'--inspect',str(project)],env=env))
   original=inspect()['scene'];report=Path(home,'widgets.json');client=start([os.environ['DOME_CAGE_APP'],str(project)],'client',{**env,'WAYLAND_DISPLAY':wayland,'FLTK_BACKEND':'wayland','LD_PRELOAD':os.environ['DOME_CAGE_PROBE'],'LD_LIBRARY_PATH':os.environ.get('DOME_CAGE_CLIENT_LD_LIBRARY_PATH',env.get('LD_LIBRARY_PATH','')),'DOME_CAGE_WIDGET_REPORT':str(report)},cwd=home)
   def named(title):return next((w for w in scene()['windows'] if title in w['title']),None)
@@ -80,6 +84,10 @@ async def main():
      found=walk(w)
      if found:return found
   await command('Bake surface...');dialog=await wait(lambda:named('Bake surface'));action({'op':'focus','id':dialog['id']});choice=await wait(lambda:widget('Cage mesh'));check(choice['choice']==2,'Native Wayland project restores the saved custom-cage recipe')
+  if texture_set:
+   check(widget('Bake beneath editable paint in Right set. Bounds use world mm.') is not None,'FLTK dialog identifies the active texture field')
+   policies=['Prepare source colors','Color error (0..1)','Author portable normal targets','Rest error (deg)']
+   check(all(widget(label) is not None and not widget(label)['active'] for label in policies),'Texture-set Bake keeps whole-mesh preparation inputs inactive')
   for _ in range(20):
    if widget('Cage mesh') and widget('Cage mesh')['focused']:break
    await key('Tab');await asyncio.sleep(.08)
@@ -88,10 +96,26 @@ async def main():
   check('automatic' in choice['selected'],'Actual compositor keyboard changes the custom cage to automatic in the local draft')
   await key('Tab');await wait(lambda:widget('Use last bake')['focused']);await key('space')
   await wait(lambda:widget('Cage mesh')['choice']==2)
-  check('envelope' in widget('Cage mesh')['selected'] and abs(widget('Front (mm)')['value']-math.log1p(100/.01)/math.log1p(100000/.01))<1e-6,'Actual native Wayland Recall restores the custom Unicode cage and saved projection range')
+  expected_title='Full matched cage' if texture_set else 'envelope'
+  expected_front=80 if texture_set else 100
+  check(expected_title in widget('Cage mesh')['selected'] and abs(widget('Front (mm)')['value']-math.log1p(expected_front/.01)/math.log1p(100000/.01))<1e-6,'Actual native Wayland Recall restores the custom cage and saved projection range')
   await chord('Control_L','w');await wait(lambda:named('Bake surface') is None);await command('Save');check(inspect()['scene']==original,'Native Ctrl+W cancels staged cage choice and ordered Save preserves the complete scene')
   await command('Bake surface...');dialog=await wait(lambda:named('Bake surface'));action({'op':'focus','id':dialog['id']});choice=await wait(lambda:widget('Cage mesh'));check(choice['choice']==2,'Reopened Wayland options retain saved recipe after cancelling the recalled draft')
-  await chord('Control_L','w');await wait(lambda:named('Bake surface') is None);await command('Close Window');await wait(lambda:client.poll() is not None);check(client.returncode==0,'Native Wayland client closes through normal worker and graphics/font release')
+  if texture_set:
+   for _ in range(24):
+    if widget('Bake') and widget('Bake')['focused']:break
+    await key('Tab')
+   check(widget('Bake')['focused'],'DomeD keyboard navigation reaches the active-set Bake button')
+   await key('space');await wait(lambda:named('Bake surface - complete'))
+   await chord('Control_L','w');await wait(lambda:named('Bake surface') is None);await command('Save')
+   check(project.read_bytes()==reference.read_bytes(),'FLTK active-set Bake and ordered Save match the entire expected native project')
+   await command('Clear baked surface');await command('Save')
+   check(project.read_bytes()==original_bytes,'Universal Clear and ordered Save restore the original paint and preserve the selected recipe')
+   await command('Undo');await command('Save')
+   check(project.read_bytes()==reference.read_bytes(),'Universal Undo restores the exact active-set bake')
+  else:
+   await chord('Control_L','w');await wait(lambda:named('Bake surface') is None)
+  await command('Close Window');await wait(lambda:client.poll() is not None);check(client.returncode==0,'Native Wayland client closes through normal worker and graphics/font release')
   (out/'final-scene.json').write_text(json.dumps(scene(),indent=2));d.close();bus.disconnect()
 try:asyncio.run(main())
 finally:
