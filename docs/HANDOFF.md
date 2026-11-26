@@ -45,7 +45,11 @@ strict cancel and focus-loss/regain passed their complete wrappers, with 19 and
 and [cancellation and focus validation](CREATOR-CURRENT-PUBLIC-STRICT-ROUTING-20261126.md).
 The prior-authored stress fixture
 moves the head joint5m, so its cropped screenshot does not establish ordinary
-default-base presentation quality.
+default-base presentation quality. A separate ordinary creation used the real
+initial XR canvas placement and found that 80.85% of evaluated vertices fit
+the synthetic vertical view. Check framing in a rendered ordinary workflow
+before changing default placement. Read
+[the geometry observation](DEFAULT-CREATOR-FRAMING-GEOMETRY-20261126.md).
 
 The HDR2048 path first reached a 128 MiB paint-channel allocation refusal
 after the provenance fix. The isolated worker avoids the discarded 112 MiB
@@ -109,8 +113,10 @@ targets and both independent sculpt fixtures. Check
 `artifacts/production-full-regression-release-20261126/build-status.json`
 for its actual result. The combined candidate's nested Wayland App completed
 all 14 assertions. The wrapper later refused a deleted non-executable Mesa
-shared mapping belonging to the compositor. Whole-wrapper acceptance remains
-open.
+shared mapping belonging to the compositor because private cleanup removed
+its cache before stopping the compositor. The corrected private scenario
+keeps the observer and all checks and awaits its runtime slot. Read
+[the functional Wayland and cleanup report](COMBINED9E4-NATIVE-WAYLAND-FUNCTIONAL-20261126.md).
 The isolated integration candidate
 `5604ad54` combines current05, HDR877, sculpt6d/fe94 and corrected creator
 fixtures550. The [fresh Release build](COMBINED-RELEASE-BUILD-20261126.md) for
@@ -146,6 +152,14 @@ project and from 1,041,932 to 921,436 KiB on the HDR project. Normal Save
 reproduces both input files byte for byte. The same combined full-size sculpt
 workflow still exceeds 4 GiB with the default allocator. The Open change is
 on `work/stream-native-open-20261126`. Main runtime admission is unchanged.
+
+Save candidate `07025cd3` releases each live object's volume JSON tree after
+writing its CBOR fields. It retains the existing file format and atomic writer.
+The comparison uses the same bounded loader and actual projects. The baseline
+isolated sculpt Save reaches 786,304 KiB. The candidate build and dependent
+validation are running. Review `ds-serialize-sculpt-objects-release-20261126.service`
+and `ds-serialize-sculpt-objects-validate-20261126.service` before retrying.
+The source is pushed on `work/serialize-sculpt-objects-20261126`.
 Full scope in REQUIREMENTS is unchanged.
 
 ## Source and integration boundary

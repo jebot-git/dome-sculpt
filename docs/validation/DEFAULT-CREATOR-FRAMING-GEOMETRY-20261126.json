@@ -1,0 +1,304 @@
+{
+  "scope": "Current05 production Document ordinary default creation and initial anchor geometry only. Private CPU-only no-DRM sandbox, no display/loader probes or rendered/physical-HMD acceptance.",
+  "production": "05f5d1ccfa4bb5b97d25e4a425a2fd9497b0d8c9",
+  "owning_source": "5509958f",
+  "standalone_probe_ELF_sha256": "ff136814bdecd8765f08794389b503762f4605d9eec16e130cb3bf8f9f5c4c4a",
+  "actual_wrapper_exit": 0,
+  "actual_steps": [
+    {
+      "exit": 0,
+      "seconds": 1.3425896167755127,
+      "peak_owned_RSS_bytes": 570699776,
+      "signals": []
+    },
+    {
+      "exit": 0,
+      "seconds": 2.0678811073303223,
+      "peak_owned_RSS_bytes": 640040960,
+      "signals": []
+    }
+  ],
+  "actual_CPU_only_native_processes": [
+    {
+      "identity": {
+        "pid": 3469291,
+        "start": 84152594,
+        "pgrp": 3469288,
+        "session": 3469288,
+        "ppid": 3469289,
+        "state": "S"
+      },
+      "exe": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/default-probe",
+      "command": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/default-probe --native-default /home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/ordinary-default-framing-v2/default.dsculpt /home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/ordinary-default-framing-v2/default.json ",
+      "private_dev_has_no_dri": true,
+      "DRM_FDs": []
+    },
+    {
+      "identity": {
+        "pid": 3469622,
+        "start": 84152728,
+        "pgrp": 3469615,
+        "session": 3469615,
+        "ppid": 3469616,
+        "state": "R"
+      },
+      "exe": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/default-probe",
+      "command": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/default-probe --inspect /home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/public-fixture-v1/fixture/creator-input.dsculpt /home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/ordinary-default-framing-v2/preservation-stress.json ",
+      "private_dev_has_no_dri": true,
+      "DRM_FDs": []
+    }
+  ],
+  "actual_default_result": {
+    "canvas_orientation": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "canvas_position": [
+      0.0,
+      1.4800000190734863,
+      -0.8500000238418579
+    ],
+    "canvas_scale": 1.0,
+    "groups": [
+      {
+        "creator_controls": {
+          "anime": 0.0,
+          "arm_length": 0.0,
+          "baseline": "vroid-beta-female",
+          "build": 0.0,
+          "eye_size": 0.0,
+          "eye_spacing": 0.0,
+          "fringe": 0.0,
+          "hair_color": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "hair_length": 0.0,
+          "hair_volume": 0.0,
+          "head_height": 0.0,
+          "head_width": 0.0,
+          "height": 1.597817301750183,
+          "iris_color": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "jaw_width": 0.0,
+          "leg_length": 0.0,
+          "mouth_width": 0.0,
+          "nose_size": 0.0,
+          "shoulder_width": 0.0,
+          "skin_color": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "version": 2,
+          "waist_width": 0.0
+        },
+        "group": 1,
+        "group_position": [
+          0.0,
+          -0.7989086508750916,
+          0.0
+        ],
+        "model_world_max": [
+          0.6917431950569153,
+          0.7989087700843811,
+          0.13823647797107697
+        ],
+        "model_world_min": [
+          -0.6922544836997986,
+          -0.7989086508750916,
+          -0.15041635930538177
+        ],
+        "name": "Default avatar",
+        "vertices": 9851,
+        "vertices_behind_eye": 0,
+        "vertices_inside_vertical_frustum": 7965
+      }
+    ],
+    "head": [
+      0,
+      1.6,
+      0
+    ],
+    "scope": "Geometry/frustum observation with real default Document anchoring; not visual or physical-HMD acceptance"
+  },
+  "input_drift": [],
+  "owned_remaining": [],
+  "interpretation": "Ordinary creation centers the 1.5978m baseline, but only7965/9851 evaluated vertices fit the synthetic head vertical frustum at the real initial0.85m canvas anchor. Independent of preserved stress input; further rendered assessment needed before deciding product framing behavior. No camera or product edits.",
+  "preserved_initial_failure": "v1 read the /proc/exe path of a process that had already exited; original outer1/signals retained. v2 uses readlink raising ENOENT and preserves original geometry, controls, bounds and helper ELF.",
+  "archive": {
+    "bytes": 100256,
+    "sha256": "22012ff50ba41b0a776929d05bb0b1a1e0c190db5d21150490259711f0bcc4eb",
+    "members": {
+      "v1/plan.json": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/ordinary-default-framing-v1/plan.json",
+        "bytes": 60062,
+        "sha256": "3d69ecd0e131d216ec155d70091a86667bc9917ee614dc1da303d246c7c8c62e"
+      },
+      "v1/status.json": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/ordinary-default-framing-v1/status.json",
+        "bytes": 11156,
+        "sha256": "1855a40b9ef717021f41d94d2bfb22f0c6647420927ddd0d039e841876911f7a"
+      },
+      "v1/process-0.log": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/ordinary-default-framing-v1/process-0.log",
+        "bytes": 1693,
+        "sha256": "48bd98cb536b64e933d7edb0305081ffe1c4dbe200d6e0303f2d15279297f953"
+      },
+      "v1/default.json": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/ordinary-default-framing-v1/default.json",
+        "bytes": 1693,
+        "sha256": "48bd98cb536b64e933d7edb0305081ffe1c4dbe200d6e0303f2d15279297f953"
+      },
+      "v1/process-1.log": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/ordinary-default-framing-v1/process-1.log",
+        "bytes": 1750,
+        "sha256": "bf682e9335b77c1ff291d765c9e2228a6cc51e68aa060e6eb8951b54150951dd"
+      },
+      "v1/preservation-stress.json": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/ordinary-default-framing-v1/preservation-stress.json",
+        "bytes": 1750,
+        "sha256": "bf682e9335b77c1ff291d765c9e2228a6cc51e68aa060e6eb8951b54150951dd"
+      },
+      "v1/unit-terminal.txt": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/ordinary-default-framing-v1/unit-terminal.txt",
+        "bytes": 8849,
+        "sha256": "ec0bd32c6d514115a35bda1b69868a22affba33750e24fc8cf3b21354f760262"
+      },
+      "v1/unit-journal.txt": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/ordinary-default-framing-v1/unit-journal.txt",
+        "bytes": 693,
+        "sha256": "e7d3916a433a9d1e375ff0e508c7973f1feec8a58df11d43d3a0c294a70d8423"
+      },
+      "v2/plan.json": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/ordinary-default-framing-v2/plan.json",
+        "bytes": 60065,
+        "sha256": "e3c3426642bf783f706527791e0171df17c4cc1f1c2e4ac3d2acfa9c98b4da12"
+      },
+      "v2/status.json": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/ordinary-default-framing-v2/status.json",
+        "bytes": 10205,
+        "sha256": "5782100e7c1436ed757e5751dfddb2cd63e96bd4fbf4b2629e7a66b00dfd12fc"
+      },
+      "v2/process-0.log": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/ordinary-default-framing-v2/process-0.log",
+        "bytes": 1693,
+        "sha256": "48bd98cb536b64e933d7edb0305081ffe1c4dbe200d6e0303f2d15279297f953"
+      },
+      "v2/default.json": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/ordinary-default-framing-v2/default.json",
+        "bytes": 1693,
+        "sha256": "48bd98cb536b64e933d7edb0305081ffe1c4dbe200d6e0303f2d15279297f953"
+      },
+      "v2/process-1.log": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/ordinary-default-framing-v2/process-1.log",
+        "bytes": 1750,
+        "sha256": "bf682e9335b77c1ff291d765c9e2228a6cc51e68aa060e6eb8951b54150951dd"
+      },
+      "v2/preservation-stress.json": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/ordinary-default-framing-v2/preservation-stress.json",
+        "bytes": 1750,
+        "sha256": "bf682e9335b77c1ff291d765c9e2228a6cc51e68aa060e6eb8951b54150951dd"
+      },
+      "v2/unit-terminal.txt": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/ordinary-default-framing-v2/unit-terminal.txt",
+        "bytes": 7161,
+        "sha256": "646209c707f6400d94c1c83cae4d50b8bec0e65e6fa55ac1bd0144b3c83c9fef"
+      },
+      "v2/unit-journal.txt": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/ordinary-default-framing-v2/unit-journal.txt",
+        "bytes": 413,
+        "sha256": "898b352581cc978c3ae53ddf5d38693c3eceac5a9de2c471afcaf96f2a84b8a1"
+      },
+      "support/default-creator-probe.cpp": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/default-creator-probe.cpp",
+        "bytes": 3637,
+        "sha256": "3dd78d50ddefe71dbe56d4202422c953012a13a15409aa888df785c3fa8830c7"
+      },
+      "support/default-probe-before.json": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/default-probe-before.json",
+        "bytes": 54132,
+        "sha256": "0ae27df9f0a3def2e8d62dc639ef9746a0389c5a789110f1b43f29ec600e0015"
+      },
+      "support/default-probe-build.json": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/default-probe-build.json",
+        "bytes": 2408,
+        "sha256": "1f078cc152551fc30b8b39ab4d51af2ffb45fba69c74a62a4d3e79ef58391b10"
+      },
+      "support/default-probe-compile.log": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/default-probe-compile.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "support/default-probe-link.log": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/default-probe-link.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "support/default-probe-prospective.d": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/default-probe-prospective.d",
+        "bytes": 20860,
+        "sha256": "387b7efc1eeb634b29e6871dc139879cea1a5a0e49cff09c5f3f619243b621d4"
+      },
+      "support/default-probe.o.d": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/default-probe.o.d",
+        "bytes": 20921,
+        "sha256": "0e24e7622880cd563cadc0d5d03983d9d51d8becfbfa6664f72dcf2e5661a7d2"
+      },
+      "support/default-probe.link.d": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/default-probe.link.d",
+        "bytes": 7166,
+        "sha256": "032a350f347297c53039468ca84602db7db8c1345528485ffe8c423f8cc4f50b"
+      },
+      "support/run-default-framing.py": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/run-default-framing.py",
+        "bytes": 5274,
+        "sha256": "adc2c0adc299314f920d2b275ce0b88194935b9d2565be2925386d665b4d0af4"
+      },
+      "support/run-default-framing-v2.py": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/run-default-framing-v2.py",
+        "bytes": 5270,
+        "sha256": "8b3972eb4a3420ccc6b611567dcb00be82dabf06403679fcd67256c8f2a4d8a6"
+      },
+      "support/owned-monitor.py": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/owned-monitor.py",
+        "bytes": 4859,
+        "sha256": "b510ef5655e3214bd38e7b5f56022c37a79879070c3733f2dd059bad74f21269"
+      },
+      "production-source/document-creator.cpp": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-creator-public-resume-20261126/src/document-creator.cpp",
+        "bytes": 13288,
+        "sha256": "54ba865b646ae0cd2a8b9a4534e2a697d7a0541ac04611bc19cfd2048034e5da"
+      },
+      "production-source/document.cpp": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-creator-public-resume-20261126/src/document.cpp",
+        "bytes": 236122,
+        "sha256": "379509a3d62415addfb0965c88ba5e33b99f7c5e9af8d0177430036fd401c346"
+      },
+      "production-source/scene.cpp": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-creator-public-resume-20261126/src/scene.cpp",
+        "bytes": 121008,
+        "sha256": "7d5eb4847ed0e1f8cd58c16d1304f4c104d636d1d98af2b6c7656282ba0d43b7"
+      }
+    }
+  },
+  "external_native_projects": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/ordinary-default-framing-v1/default.dsculpt": {
+      "bytes": 133536852,
+      "sha256": "b4ea42fe12d61eb63da5f5fa581c1057eb4a55e746320b8f565b74ed65104af0"
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/creator-public-build-20261126/ordinary-default-framing-v2/default.dsculpt": {
+      "bytes": 133536852,
+      "sha256": "b4ea42fe12d61eb63da5f5fa581c1057eb4a55e746320b8f565b74ed65104af0"
+    }
+  }
+}
