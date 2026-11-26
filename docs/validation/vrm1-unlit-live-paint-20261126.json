@@ -1,0 +1,112 @@
+{
+  "candidate": "b2bfba2d180af890fef5c517f6353b9844e206cc",
+  "parent": "1ab9d535fda56eef2c2e577191de8c4b47335b06",
+  "branch": "work/vrm1-unlit-live-paint-20261126",
+  "scope": "Colour-only native Source Atlas paint on original opaque unlit VRM1 materials. Colour and texture expression binds remain on the lower original draw, including singular and differing UV targets. The paint draw retains source RGB and takes alpha only from paint coverage.",
+  "profiles": {
+    "release": {
+      "expression_and_export_checks": 620,
+      "mtoon_checks": 44,
+      "expression_log": {
+        "path": "artifacts/vrm1-unlit-live-paint-validation-20261126/release-final/run.log",
+        "sha256": "096a60b39d214062da09b7953d1c40861360cd01df822878912a724daa98fdfd"
+      },
+      "mtoon_log": {
+        "path": "artifacts/vrm1-unlit-live-paint-validation-20261126/release-final/mtoon.log",
+        "sha256": "0d407d3b5006f7acc579de01a7b9e5838fde101c801af543d8ec78f1700c51b9"
+      },
+      "core": {
+        "path": "artifacts/vrm1-unlit-live-paint-validation-20261126/release-final/libdome-sculpt-core.a",
+        "sha256": "1be490522972d84a1ee584b6ba32ea82a2ddd456ba51e8db6f2b23073ecc4886"
+      }
+    },
+    "asan": {
+      "expression_and_export_checks": 620,
+      "mtoon_checks": 44,
+      "expression_log": {
+        "path": "artifacts/vrm1-unlit-live-paint-validation-20261126/asan-final/run.log",
+        "sha256": "096a60b39d214062da09b7953d1c40861360cd01df822878912a724daa98fdfd"
+      },
+      "mtoon_log": {
+        "path": "artifacts/vrm1-unlit-live-paint-validation-20261126/asan-final/mtoon.log",
+        "sha256": "0d407d3b5006f7acc579de01a7b9e5838fde101c801af543d8ec78f1700c51b9"
+      },
+      "core": {
+        "path": "artifacts/vrm1-unlit-live-paint-validation-20261126/asan-final/libdome-sculpt-core.a",
+        "sha256": "24f541eff8d39acf3c8ad5475a9b86669876785ef5df48080f5c4a4704e156cd"
+      }
+    }
+  },
+  "external_gl_checks": {
+    "llvmpipe": {
+      "cases": 5,
+      "maximum_rgb8_difference": 1,
+      "maximum_alpha8_difference": 0,
+      "covered_pixels_per_case": 144,
+      "negative_frozen_uv_delta": 157,
+      "negative_wrong_alpha_delta": 41,
+      "log": {
+        "path": "artifacts/vrm1-unlit-live-paint-validation-20261126/render-software.log",
+        "sha256": "944cb7283fdac2eab454e4c3108d44678ab5d6714c7d1410c249b1967e708aa8"
+      }
+    },
+    "intel_arc": {
+      "cases": 5,
+      "maximum_rgb8_difference": 1,
+      "maximum_alpha8_difference": 0,
+      "covered_pixels_per_case": 144,
+      "negative_frozen_uv_delta": 157,
+      "negative_wrong_alpha_delta": 41,
+      "log": {
+        "path": "artifacts/vrm1-unlit-live-paint-validation-20261126/unlit-render-arc-final/run.log",
+        "sha256": "4b08d2c78aa05aa8eee9becf0c30dbc6aea7e88a18bb68671909c0d0b484d744"
+      },
+      "render_node": "/dev/dri/renderD129",
+      "runner": {
+        "path": "artifacts/vrm1-unlit-live-paint-validation-20261126/arc-graphics-status.json",
+        "sha256": "3b21407f37b9cc55e377d65428d7fce279605d021d3e0b1fb92cacf11598ba73"
+      }
+    }
+  },
+  "glTF_validation": {
+    "unlit-live-input.vrm": {
+      "errors": 0,
+      "warnings": 5,
+      "report": {
+        "path": "artifacts/vrm1-unlit-live-paint-validation-20261126/release-final/unlit-live-input.vrm.khronos.json",
+        "sha256": "94b9e4f9cbea5a3e52f0caf2dedfc3358294db71db79f5b5f8a28cfce05ad9a5"
+      }
+    },
+    "unlit-live-output.vrm": {
+      "errors": 0,
+      "warnings": 4,
+      "report": {
+        "path": "artifacts/vrm1-unlit-live-paint-validation-20261126/release-final/unlit-live-output.vrm.khronos.json",
+        "sha256": "c0cd79adfab57e8cc8a0a19a82e367503281e9ebbe634018387214af11b6f981"
+      }
+    }
+  },
+  "evidence_archive": {
+    "path": "docs/validation/vrm1-unlit-live-paint-20261126.tar.xz",
+    "sha256": "fd503af6b3bf2ac09d61c41b082dde0bffc83fb7341081f40fb5ef342ee2a2c4"
+  },
+  "paired_outputs": {
+    "unlit-live-input.vrm": {
+      "path": "artifacts/vrm1-unlit-live-paint-validation-20261126/release-final/output/unlit-live-input.vrm",
+      "sha256": "18d73e7862ff8810e1bb692ffebae23ee248191e2ecdbfb1c365e5318b23894f"
+    },
+    "unlit-live-output.vrm": {
+      "path": "artifacts/vrm1-unlit-live-paint-validation-20261126/release-final/output/unlit-live-output.vrm",
+      "sha256": "d12f52baec181fa4ba2e34af9a1f9414f365ec77d0cf036b3012a177a14aa5d6"
+    },
+    "unlit-live-preserved.dsculpt": {
+      "path": "artifacts/vrm1-unlit-live-paint-validation-20261126/release-final/output/unlit-live-preserved.dsculpt",
+      "sha256": "398771b66c5f90a90230694c9ffb7159784525242b448cc3a9b3f60161fa66ff"
+    }
+  },
+  "open_scope": [
+    "Live lit PBR and nonopaque unlit paint composition",
+    "Non-colour expression paint and wider source/frame combinations",
+    "Full candidate integration and physical XR acceptance"
+  ]
+}

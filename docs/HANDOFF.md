@@ -672,6 +672,31 @@ Release build with all 1,360 registered CTests and the separately built 86-case
 sanitizer candidate are active on `ccbbe020`, with the fixture correction
 qualified separately. Read [the combined receipt](validation/vrm-consumer-combined-public-20261126.json).
 
+### Portable live expressions on opaque unlit paint
+
+Candidate `b2bfba2d` exports genuine source-atlas colour paint on an opaque
+VRM1 unlit material. The lower primitive retains all original colour and
+texture expression bindings and sampler transforms. A derived unlit blend
+primitive carries the fixed paint. It reads the same vertex RGB but uses its
+paint coverage for alpha. The native package retains the complete editable
+source and paint. The worker refuses a live expression whose RGB range would
+clip before the two draws are combined, preserving the previous export.
+[glTF unlit specification](https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_materials_unlit/README.md) · [VRM expression specification](https://github.com/vrm-c/vrm-specification/blob/master/specification/VRMC_vrm-1.0/expressions.md).
+
+The focused suite passes 620 native checks and the existing MToon expression
+worker passes 44 checks in both Release and ASan/UBSan with leak detection.
+The source, exported VRM and saved native project match across profiles.
+Independent glTF parsing and rendered comparison cover five expression states,
+including a singular UV target and simultaneous expressions. On llvmpipe and
+Intel Arc A770, the largest difference is one RGB8 step and alpha is exact.
+Freezing the source UV or using source vertex alpha for paint yields differences
+of 157 and 41 RGB8 steps. Khronos validation reports zero errors on the source
+and exported VRM. Read [the validation receipt](validation/vrm1-unlit-live-paint-20261126.json).
+
+The live lit PBR, nonopaque unlit and other painted channels still need their
+portable compositing paths. The frozen combined build remains under its own
+Release and sanitizer qualification. Those runs precede this product change.
+
 ## Source and integration boundary
 
 - Main now admits product1bc13125 and public fixturef1e193c7 after complete
