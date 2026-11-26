@@ -1,4 +1,12 @@
-## Current integration — 2026-11-17
+## Current validation — 2026-11-26
+
+The [current handoff](HANDOFF.md) records the exact combined Release, Arc,
+Wayland and synthetic OpenXR checkpoints, focused sanitizer results and
+remaining regression work. The dormant-paint fix on main has a fresh
+Release build and three focused native results. The full production goal
+remains active.
+
+## Qualified integration — 2026-11-17
 
 Main now integrates product `1bc13125` and public fixture `f1e193c7` after
 Release90 and strict sanitizer90 runtime qualification, public desktop64 and

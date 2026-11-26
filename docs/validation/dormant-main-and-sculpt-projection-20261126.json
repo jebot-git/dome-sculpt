@@ -1,0 +1,417 @@
+{
+  "scope": "Exact main Release build and three native tests for the dormant-paint fix. Separate component tests for sculpt occlusion in the projection worker in Release and ASan/UBSan, plus software OpenXR projection accept/focus regressions.",
+  "main": {
+    "terminal": true,
+    "steps": [
+      {
+        "name": "configure",
+        "exit": 0
+      },
+      {
+        "name": "build",
+        "exit": 0
+      },
+      {
+        "name": "version",
+        "exit": 0
+      },
+      {
+        "name": "native",
+        "exit": 0
+      }
+    ],
+    "source": "6a63f6fef24ef7c3e144fe38c652c414ffb1652a",
+    "executables": {
+      "dome-sculpt": "fddbf339c8e3288f96b298d787e94d6b40feb9db8dff7b84bc53bd13b726dc8c",
+      "dome-sculpt-document-transactions-test": "4ee54fd291c7829efa979e29178cd0cbabfd24b8c1e9d98d547832fc0a0a7470",
+      "dome-sculpt-source-uv-adopt-test": "50c93e118ce439ebe9331f0d359b1c36aa65dcf96255f0690aff33d3bc9b68e4",
+      "dome-sculpt-gpu-color-blur-native-test": "fb814936b74efaaced87f40e0f181d11a16c9f71e8bbaf46caf1d5b3b9da74e0"
+    },
+    "exit": 0
+  },
+  "main_build_invocation": "c8601f5c6de04eaeb6448c8700e22825",
+  "projection_source": "f5136b36af6da93042cc0cfe9c19e4c1d361e3f9",
+  "projection_release": {
+    "terminal": true,
+    "exit": 0,
+    "compile": [
+      {
+        "name": "document-native.cpp",
+        "exit": 0
+      },
+      {
+        "name": "projection-native.cpp",
+        "exit": 0
+      }
+    ],
+    "linked_archive": {
+      "members": 197,
+      "sha256": "a75a4b50acf5790a381fbc905d796f801eefa0024d5bccf53284f38d77428afb",
+      "replacements": [
+        "document-native.cpp.o"
+      ]
+    },
+    "links": [
+      {
+        "name": "dome-sculpt-projection-native-test",
+        "exit": 0
+      },
+      {
+        "name": "dome-sculpt",
+        "exit": 0
+      }
+    ]
+  },
+  "projection_strict": {
+    "terminal": true,
+    "cases": {
+      "dome-sculpt-projection-native-test": {
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/projection-occluding-sculpt-strict-20261126/dome-sculpt-projection-native-test"
+        ],
+        "started": 1795669357.9376411,
+        "timeout_seconds": 900,
+        "RSS_limit_bytes": 4294967296,
+        "virtual_AS_cap": null,
+        "pid": 4,
+        "start": 84728300,
+        "pgrp": 4,
+        "root": {
+          "pid": 4,
+          "start": 84728300,
+          "pgrp": 4,
+          "session": 4,
+          "ppid": 2,
+          "state": "R"
+        },
+        "known_processes": [
+          {
+            "pid": 4,
+            "start": 84728300,
+            "pgrp": 4,
+            "session": 4,
+            "ppid": 2,
+            "state": "R"
+          },
+          {
+            "pid": 149,
+            "start": 84728662,
+            "pgrp": 4,
+            "session": 4,
+            "ppid": 4,
+            "state": "R"
+          },
+          {
+            "pid": 150,
+            "start": 84728663,
+            "pgrp": 4,
+            "session": 4,
+            "ppid": 4,
+            "state": "R"
+          }
+        ],
+        "peak_owned_RSS_bytes": 1151827968,
+        "peak_observed_virtual_bytes": 21990923722752,
+        "monitor_samples": 351,
+        "signals": [],
+        "exit": 0,
+        "seconds": 3.805988073348999,
+        "sha256": "e1ac40e08840bb8607a8f7ce8e5512e3c65f84bde41f32048809a2b538f732a2",
+        "check_passed": true,
+        "passed_cases": [
+          "PASS Detached PNG load completes",
+          "PASS Immutable image publication enables projection without owning Scene result",
+          "PASS Projection native ray stroke admitted",
+          "PASS Projection stroke worker drains",
+          "PASS Actual image replaces contrasting brush color at evaluated UV center",
+          "PASS Paint retains exact REST mesh, skin/morph and full reflected-sheared placement owners",
+          "PASS World-metric brush limits projection footprint",
+          "PASS One accepted projection gesture is one exact global Undo/Redo",
+          "PASS Projection native ray stroke admitted",
+          "PASS Projection stroke worker drains",
+          "PASS Cancelled projection keeps authoritative scene exact",
+          "PASS Ordered save projection starts",
+          "PASS Save accepts and waits for projection endpoint",
+          "PASS Immediate ordered Save/restart retains exact projected pixels and source archives",
+          "PASS Detached PNG load completes",
+          "PASS Immutable image publication enables projection without owning Scene result",
+          "PASS Projection native ray stroke admitted",
+          "PASS Projection stroke worker drains",
+          "PASS Actual image replaces contrasting brush color at evaluated UV center",
+          "PASS Paint retains exact REST mesh, skin/morph and full reflected-sheared placement owners",
+          "PASS World-metric brush limits projection footprint",
+          "PASS One accepted projection gesture is one exact global Undo/Redo",
+          "PASS Projection native ray stroke admitted",
+          "PASS Projection stroke worker drains",
+          "PASS Cancelled projection keeps authoritative scene exact",
+          "PASS Ordered save projection starts",
+          "PASS Save accepts and waits for projection endpoint",
+          "PASS Immediate ordered Save/restart retains exact projected pixels and source archives",
+          "PASS Detached PNG load completes",
+          "PASS Immutable image publication enables projection without owning Scene result",
+          "PASS Projection native ray stroke admitted",
+          "PASS Projection stroke worker drains",
+          "PASS Actual image replaces contrasting brush color at evaluated UV center",
+          "PASS Paint retains exact REST mesh, skin/morph and full reflected-sheared placement owners",
+          "PASS World-metric brush limits projection footprint",
+          "PASS One accepted projection gesture is one exact global Undo/Redo",
+          "PASS Projection native ray stroke admitted",
+          "PASS Projection stroke worker drains",
+          "PASS Cancelled projection keeps authoritative scene exact",
+          "PASS Ordered save projection starts",
+          "PASS Save accepts and waits for projection endpoint",
+          "PASS Immediate ordered Save/restart retains exact projected pixels and source archives",
+          "PASS Detached PNG load completes",
+          "PASS Immutable image publication enables projection without owning Scene result",
+          "PASS Projection native ray stroke admitted",
+          "PASS Projection stroke worker drains",
+          "PASS Visible-scene policy honors opaque/hidden/material-transparent/target-only/editor-ghost distinctions",
+          "PASS Detached PNG load completes",
+          "PASS Immutable image publication enables projection without owning Scene result",
+          "PASS Projection native ray stroke admitted",
+          "PASS Projection stroke worker drains",
+          "PASS Visible-scene policy honors opaque/hidden/material-transparent/target-only/editor-ghost distinctions",
+          "PASS Detached PNG load completes",
+          "PASS Immutable image publication enables projection without owning Scene result",
+          "PASS Projection native ray stroke admitted",
+          "PASS Projection stroke worker drains",
+          "PASS Visible-scene policy honors opaque/hidden/material-transparent/target-only/editor-ghost distinctions",
+          "PASS Detached PNG load completes",
+          "PASS Immutable image publication enables projection without owning Scene result",
+          "PASS Projection native ray stroke admitted",
+          "PASS Projection stroke worker drains",
+          "PASS Visible-scene policy honors opaque/hidden/material-transparent/target-only/editor-ghost distinctions",
+          "PASS Detached PNG load completes",
+          "PASS Immutable image publication enables projection without owning Scene result",
+          "PASS Occluder is deliberately an editor ghost",
+          "PASS Projection native ray stroke admitted",
+          "PASS Projection stroke worker drains",
+          "PASS Visible-scene policy honors opaque/hidden/material-transparent/target-only/editor-ghost distinctions",
+          "PASS Detached PNG load completes",
+          "PASS Immutable image publication enables projection without owning Scene result",
+          "PASS Projection native ray stroke admitted",
+          "PASS Projection stroke worker drains",
+          "PASS Visible-scene policy honors opaque/hidden/material-transparent/target-only/editor-ghost distinctions",
+          "PASS Detached PNG load completes",
+          "PASS Immutable image publication enables projection without owning Scene result",
+          "PASS Projection native ray stroke admitted",
+          "PASS Projection stroke worker drains",
+          "PASS Visible-scene policy honors opaque/hidden/material-transparent/target-only/editor-ghost distinctions",
+          "PASS Malformed PNG reports worker error without stuck loading",
+          "PASS Detached decode failure changes no Scene/history",
+          "PASS Detached PNG load completes",
+          "PASS Immutable image publication enables projection without owning Scene result",
+          "PASS Image retry succeeds without Scene mutation",
+          "PASS Bounded worker browser exposes PNG images",
+          "PASS Detached PNG load completes",
+          "PASS Immutable image publication enables projection without owning Scene result",
+          "PASS Remembered image tool does not block explicit shapekey sculpt mode",
+          "PASS Cancelling shapekey mode preserves all source and image state",
+          "PASS Detached PNG load completes",
+          "PASS Immutable image publication enables projection without owning Scene result",
+          "PASS Remembered paint projection does not block switching to source-volume sculpting",
+          "PASS Source sculpt cancellation retains dormant painted mesh exactly",
+          "PASS Projection occlusion fixture creates actual volume geometry",
+          "PASS The accepted viewport has a non-packed sculpt hit in front of the paint target",
+          "PASS Detached PNG load completes",
+          "PASS Immutable image publication enables projection without owning Scene result",
+          "PASS Projection native ray stroke admitted",
+          "PASS Projection stroke worker drains",
+          "PASS Projection respects visible sculpt geometry, alpha, target-only mode and editor ghosts",
+          "PASS Projection occlusion fixture creates actual volume geometry",
+          "PASS Detached PNG load completes",
+          "PASS Immutable image publication enables projection without owning Scene result",
+          "PASS Projection native ray stroke admitted",
+          "PASS Projection stroke worker drains",
+          "PASS Projection respects visible sculpt geometry, alpha, target-only mode and editor ghosts",
+          "PASS Projection occlusion fixture creates actual volume geometry",
+          "PASS Detached PNG load completes",
+          "PASS Immutable image publication enables projection without owning Scene result",
+          "PASS Projection native ray stroke admitted",
+          "PASS Projection stroke worker drains",
+          "PASS Projection respects visible sculpt geometry, alpha, target-only mode and editor ghosts",
+          "PASS Projection occlusion fixture creates actual volume geometry",
+          "PASS Detached PNG load completes",
+          "PASS Immutable image publication enables projection without owning Scene result",
+          "PASS Projection native ray stroke admitted",
+          "PASS Projection stroke worker drains",
+          "PASS Projection respects visible sculpt geometry, alpha, target-only mode and editor ghosts",
+          "PASS Projection occlusion fixture creates actual volume geometry",
+          "PASS Detached PNG load completes",
+          "PASS Immutable image publication enables projection without owning Scene result",
+          "PASS The sculpt occluder is deliberately an editor ghost",
+          "PASS Projection native ray stroke admitted",
+          "PASS Projection stroke worker drains",
+          "PASS Projection respects visible sculpt geometry, alpha, target-only mode and editor ghosts"
+        ]
+      }
+    },
+    "exit": 0
+  },
+  "projection_xr": {
+    "checks": [
+      {
+        "passed": true,
+        "check": "Actual projection accept loader session closes and saves normally"
+      },
+      {
+        "passed": true,
+        "check": "Projection accept captures actual requested software GL renderer"
+      },
+      {
+        "passed": true,
+        "check": "Projection accept balances actual nonblank stereo swapchains without tracking loss"
+      },
+      {
+        "passed": true,
+        "check": "Real joystick navigates image browser, loads PNG and paints its color through native worker"
+      },
+      {
+        "passed": true,
+        "check": "Actual XR projection retains exact REST/source/material/placement fields"
+      },
+      {
+        "passed": true,
+        "check": "Actual projection focus loader session closes and saves normally"
+      },
+      {
+        "passed": true,
+        "check": "Projection focus captures actual requested software GL renderer"
+      },
+      {
+        "passed": true,
+        "check": "Projection focus balances actual nonblank stereo swapchains without tracking loss"
+      },
+      {
+        "passed": true,
+        "check": "Actual runtime focus loss cancels the complete unaccepted projected gesture"
+      },
+      {
+        "passed": true,
+        "check": "Projection cancellation crosses real loader focus-loss/regain events"
+      }
+    ],
+    "physical_headset": false
+  },
+  "projection_app_sha256": "37ac5ba0e82fc8797ce22657559e95313c106ae6cab76fe21ebee7bfd7bfea68",
+  "projection_xr_invocation": "dabda634bdb84ac7836fc336f00476c5",
+  "authorities": {
+    "dormant-main-release-20261126/run.py": {
+      "sha256": "db613ff70b79ae7a34149610aafbb65e57bcd99f67339cf8cf80d38a8606acb6",
+      "bytes": 2414
+    },
+    "dormant-main-release-20261126/status.json": {
+      "sha256": "43306593fae5f7caee72a03f071951d4843ad50d20e03897c2614f3a2916be63",
+      "bytes": 770
+    },
+    "dormant-main-release-20261126/configure.log": {
+      "sha256": "78c61294724a53130559ca7dc158721b10b6ff43e54585f0ac7afd1d81d3a218",
+      "bytes": 2424
+    },
+    "dormant-main-release-20261126/build.log": {
+      "sha256": "55bd937e6126697f6b04867bafbb230f47c56c4af3d1e1aef4157e7726df9860",
+      "bytes": 421945
+    },
+    "dormant-main-release-20261126/native.log": {
+      "sha256": "aba9e970d232ce49efa753bdba42c1f1264aed3f5795c53c7e5fc369fefabeda",
+      "bytes": 492
+    },
+    "dormant-main-release-20261126/version.log": {
+      "sha256": "9455a20a636a6599ace60120261649d3b29dc51fe2c774305994879190e7336b",
+      "bytes": 60
+    },
+    "projection-occluding-sculpt-baseline-20261126/build.py": {
+      "sha256": "61f8f4fc4aa09e27c60fde8f24cb9440a358d9e49525a146ca286ed56bd726f8",
+      "bytes": 1380
+    },
+    "projection-occluding-sculpt-baseline-20261126/commands.json": {
+      "sha256": "1c9625a66f8be2120733879633cf1713121ba4f6e446f6ed466e41b10ad2a57b",
+      "bytes": 2239
+    },
+    "projection-occluding-sculpt-baseline-20261126/product.log": {
+      "sha256": "7a346d834dbe57d8cde630a4e2acb029c3bffcb8ae08723adfbb89b50a173f09",
+      "bytes": 5787
+    },
+    "projection-occluding-sculpt-baseline-20261126/exit": {
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "bytes": 2
+    },
+    "projection-occluding-sculpt-release-20261126/prepare.py": {
+      "sha256": "6a2054cd35e788a7f8d23ed2d8c23407c9e39273c0d8a21332bbfafe593b2b4a",
+      "bytes": 2989
+    },
+    "projection-occluding-sculpt-release-20261126/build-plan.json": {
+      "sha256": "bb6d626b7d447ec6ad17e45d23178885ae0ae4d0ceac90d891b6ea63fdc77e7d",
+      "bytes": 10394
+    },
+    "projection-occluding-sculpt-release-20261126/build-status.json": {
+      "sha256": "cecd69c02af8c76fb62272022f73b23e137bb7809f782ba99bd5b11fce5a1aa9",
+      "bytes": 532
+    },
+    "projection-occluding-sculpt-release-20261126/product.log": {
+      "sha256": "dbb4964e917eea290b2e7fd08576c580a637cc57f85f586bcc761588cfea536b",
+      "bytes": 7289
+    },
+    "projection-occluding-sculpt-release-20261126/exit": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    "projection-occluding-sculpt-release-20261126/xr/report.json": {
+      "sha256": "2049bbb91d276893d2702aa2685cdf29f34956fffcfb8aeaab95d74f760092b9",
+      "bytes": 1305
+    },
+    "projection-occluding-sculpt-release-20261126/xr/accept.json": {
+      "sha256": "653078345523dbe16edaf8dba266ae43df0cf9878b388da2a3c0d2cdaf57f120",
+      "bytes": 6416
+    },
+    "projection-occluding-sculpt-release-20261126/xr/focus.json": {
+      "sha256": "b5e98e82da4b4f48e642efc73c1e78fafb08a2678e2e5c38bad69e8ed0e8730d",
+      "bytes": 6459
+    },
+    "projection-occluding-sculpt-release-20261126/xr/accept.log": {
+      "sha256": "bf462b8ee56d4ce061f33a511d850f06d8731495807ca0881fcc24fd7a8f8a4f",
+      "bytes": 275
+    },
+    "projection-occluding-sculpt-release-20261126/xr/focus.log": {
+      "sha256": "e00e75bd95112c5042c290c5085ba8b76e0b9bc7f48b65d29c9f5a774506fd68",
+      "bytes": 275
+    },
+    "projection-occluding-sculpt-strict-20261126/prepare.py": {
+      "sha256": "9795208e13943b403c3a1a6ec8a664e8a2741b76149c171c25778992c758086d",
+      "bytes": 2411
+    },
+    "projection-occluding-sculpt-strict-20261126/build-plan.json": {
+      "sha256": "6ed77729bdfce482712affb56ebb15f8378e4d5ffb3872b5634e9f959e135dd8",
+      "bytes": 5344
+    },
+    "projection-occluding-sculpt-strict-20261126/build-status.json": {
+      "sha256": "f67ffc9056ccc38c9a96c079e61ee034bdfb470ac3b001e8234d19e742a7582f",
+      "bytes": 474
+    },
+    "projection-occluding-sculpt-strict-20261126/native/status.json": {
+      "sha256": "6c60d3d9c38e81ca4378cc251af8ce1842c85d4882831b9d1258867090784812",
+      "bytes": 10069
+    },
+    "projection-occluding-sculpt-strict-20261126/native/dome-sculpt-projection-native-test.log": {
+      "sha256": "dbb4964e917eea290b2e7fd08576c580a637cc57f85f586bcc761588cfea536b",
+      "bytes": 7289
+    },
+    "nov26-authoring-verification/ds-dormant-main-release-20261126.journal": {
+      "sha256": "4bc0c4cdf126e25e40832319aa626dc73fbd08f081caf2baff3b5c8cd0f6aa12",
+      "bytes": 368
+    },
+    "nov26-authoring-verification/ds-projection-occluding-sculpt-xr-20261126.journal": {
+      "sha256": "1093e687acb5f04b6d285cbbbd16131834c808910e418f5138bdfdf70cbfd410",
+      "bytes": 2524
+    },
+    "nov26-authoring-verification/seal.py": {
+      "sha256": "4dfe5f0e6a4b5eeadbbd9434bb08bcc23a855c3cfd6ff767ebde21ebf90ae85d",
+      "bytes": 4414
+    }
+  },
+  "archive": {
+    "file": "dormant-main-and-sculpt-projection-20261126.tar.xz",
+    "sha256": "38db8eb9fa03119b1507a9f6fa35ff5b195ef8140fd32ddb093bf67c2591f512",
+    "bytes": 41812
+  }
+}

@@ -301,6 +301,10 @@ The same three cases pass on the matched ASan/UBSan core. Main carries the
 scoped fix as `6a63f6fe`. Read
 [the Release receipt](validation/dormant-paint-command-release-20261126.json)
 and [the sanitizer receipt](validation/dormant-paint-command-strict-20261126.json).
+The exact main source also completes a fresh 266-action Release build using
+the canonical FLTK and BDF prefixes. The application version check and all
+three focused native tests pass. Read
+[the exact main and projection receipt](validation/dormant-main-and-sculpt-projection-20261126.json).
 
 Candidate `2aff79f7` resolves a render-only current-grid paint field from its
 owning scene on the plane-cut worker. It restores mapped baking of the plain
@@ -319,6 +323,15 @@ Combined candidate `c90c9fed` includes the dormant-paint and cut fixes and the
 four fixture changes. All five focused cases also pass against its verified
 `2aff79f7` product core.
 The broad matrix and remaining failures are still under review.
+
+Candidate `f5136b36` restores visible-scene image projection blocking by
+sculpt volumes in the same immutable material query used for packed meshes.
+The original failure is reproduced by an authenticated chunk hit in front
+of a painted target. All 124 native checks pass in Release and ASan/UBSan,
+including sculpt alpha, visibility, ghosting and target-only projection. The
+matching Release App passes 10 software OpenXR loader checks covering the
+original projection accept and focus-loss scenarios. Read
+[the projection receipt](validation/dormant-main-and-sculpt-projection-20261126.json).
 
 ## Source and integration boundary
 
