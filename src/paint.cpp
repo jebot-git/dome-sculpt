@@ -102,7 +102,7 @@ struct NativeEmissionOwner {
 };
 struct CompositeRetention {
   struct Source {size_t references=0,bytes=0;};
-  struct Entry {std::shared_ptr<const TextureMaps> maps;uint64_t token=0;CompositeFactors factors{};CompositeUse use=CompositeUse::Standard;size_t derived=0,count=0;std::array<const Image*,8> sources{};const BakedTextures *base=nullptr;};
+  struct Entry {std::shared_ptr<const TextureMaps> maps;uint64_t token=0;CompositeFactors factors{};CompositeUse use=CompositeUse::Standard;size_t derived=0,count=0;std::array<const Image*,8> sources{};const BakedTextures *base=nullptr;bool deferred_standard=false;};
   std::mutex mutex;
   size_t limit=512*1024*1024,bytes=0;
   uint64_t hits=0,builds=0;
@@ -124,13 +124,15 @@ struct CompositeRetention {
              (!native || native->matches(*entry.maps));
     });
     if(found==entries.end())return {};
-    auto result=found->maps;entries.splice(entries.begin(),entries,found);++hits;return result;
+    auto result=found->maps;
+    found->deferred_standard = false;
+    entries.splice(entries.begin(),entries,found);++hits;return result;
   }
   void retain(const std::shared_ptr<const TextureMaps> &maps, uint64_t token,
               const CompositeFactors &factors, bool hit, CompositeUse use = CompositeUse::Standard) {
     std::lock_guard lock(mutex);if(hit)++hits;else ++builds;
     auto found=std::find_if(entries.begin(),entries.end(),[&](auto &e){return e.maps.get()==maps.get();});
-    if(found!=entries.end()){entries.splice(entries.begin(),entries,found);return;}
+    if(found!=entries.end()){found->deferred_standard=false;entries.splice(entries.begin(),entries,found);return;}
     Entry entry;entry.maps=maps;entry.token=token;entry.factors=factors;entry.use=use;entry.derived=(maps->overlay?maps->overlay->storage_bytes():0)+maps->color.rgba.size()+maps->metal_rough.rgba.size()+maps->emission.rgba.size()+maps->normal.rgba.size()+maps->mtoon_normal.rgba.size()+maps->color_coverage.rgba.size()+maps->baked_normal.rgba.size()+maps->baked_coverage.rgba.size()+maps->emission_coverage.rgba.size()+maps->pbr_color.rgba.size();
     entry.base=maps->baked_base.get();
     // The native packet's storage already accounts for its exact baked base.
@@ -147,7 +149,17 @@ struct CompositeRetention {
     size_t isolated=entry.derived+(entry.base?entry.base->storage_bytes():0);for(size_t i=0;i<entry.count;++i)isolated+=entry.sources[i]->rgba.size();
     if(isolated>limit)return;
     auto increment=[&]{size_t n=entry.derived;if(entry.base&&!bases.contains(entry.base))n+=entry.base->storage_bytes();for(size_t i=0;i<entry.count;++i)if(!sources.contains(entry.sources[i]))n+=entry.sources[i]->rgba.size();return n;};
-    while(!entries.empty()&&(entries.size()>=128||increment()>limit||bytes>limit-increment()))evict();
+    while (!entries.empty() && (entries.size() >= 128 || increment() > limit || bytes > limit - increment())) {
+      auto &oldest = entries.back();
+      if (use == CompositeUse::Standard && oldest.use == CompositeUse::NativeEmission &&
+          !oldest.deferred_standard) {
+        // Give the expensive HDR preview one chance to serve adjacent history.
+        // The caller still gets its ordinary frame. A later miss can evict HDR.
+        oldest.deferred_standard = true;
+        return;
+      }
+      evict();
+    }
     size_t additional=increment();if(additional>limit||bytes>limit-additional)return;
     // Retention is best effort. A cache-node allocation failure must not turn a
     // successfully composited immutable frame into a document edit failure.
