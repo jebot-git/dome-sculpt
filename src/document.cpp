@@ -16,6 +16,7 @@
 #include "dome/normal-sampling.hpp"
 #include "normal-preparation-state.hpp"
 #include "cut-color.hpp"
+#include "color-bound-memo.hpp"
 #include "affine-surface.hpp"
 #include "source-skin-world.hpp"
 #include "shapekey-preview.hpp"
@@ -1728,6 +1729,10 @@ void Document::input_loop() {
   }
 }
 void Document::mesh_loop() {
+  // Verified numerical bounds can follow immutable owners through history.
+  // Weak references let discarded geometry and images retire normally.
+  detail::WorkerColorBounds color_bounds;
+  uint64_t color_bounds_generation=0;
   detail::SculptSceneChunks::Ptr sculpt_cache;
   struct FrameLayoutCache {
     std::weak_ptr<const Mesh> mesh;
@@ -1771,6 +1776,11 @@ void Document::mesh_loop() {
     };
     std::shared_ptr<VrmExpressionView> expression_result;
     try {
+      if(color_bounds_generation!=job->generation){
+        color_bounds.clear();
+        color_bounds_generation=job->generation;
+      }
+      detail::ColorBoundScope color_bound_scope(&color_bounds);
       if(job->expressions){
         expression_result=std::make_shared<VrmExpressionView>(*job->expressions);
         if(expression_result->entries.empty()){
