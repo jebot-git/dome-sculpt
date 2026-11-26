@@ -815,10 +815,12 @@ The exact startup stage still needs profiling.
 
 Candidate `871513fa` adds four disjoint row ranges to the existing dense
 HDR oracle. The complete 512-pixel Release reference and aggregate agree
-on sample counts and maxima for PBR, MToon and HDR. The full-size sanitizer
-ranges are active on one read-only native capture. The runner requires
-all rows, exact sample totals and the same maxima as the unpartitioned
-2048 Release oracle. The history consumer keeps its own strict gate.
+on sample counts and maxima for PBR, MToon and HDR. All four 2048-pixel
+ASan/UBSan ranges pass on one read-only native capture. They match the
+unpartitioned Release reference's 73,530,600 samples per role and error
+maxima. The slowest range takes 382.069 seconds and the largest sampled
+owned RSS is 2,098,626,560 bytes. The 2048-pixel ordered Save, reopen and
+Undo/Redo history consumer still needs a complete strict pass.
 [Validation receipt](validation/controller-feedback-and-dense-rows-20261126.json)
 
 ## Source and integration boundary
