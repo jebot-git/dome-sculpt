@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "bake-fixture-identity.hpp"
 #include "dome/document.hpp"
 #include "dome/source-placement.hpp"
 #include <algorithm>
@@ -86,7 +87,8 @@ void place(Document &d, Vec3 p) {
   Brush b;b.radius=.01f;b.from=b.to=p;d.stamp_desktop(b);d.end_desktop();ready(d);
 }
 void bake_patch(Document &doc, uint64_t source, const std::filesystem::path &path) {
-  const auto before=doc.copy_scene().encode();
+  const auto original=doc.copy_scene();
+  const auto before=original.encode();
   const auto sources=doc.frame().state->bake_sources;
   check(std::find(sources.begin(),sources.end(),source)!=sources.end(),
         "The Bake chooser includes the original hidden affine mesh");
@@ -96,7 +98,8 @@ void bake_patch(Document &doc, uint64_t source, const std::filesystem::path &pat
   doc.save_async(path).get();
   check(doc.wait_asset(),"Bake and ordered Save finish");
   if(!doc.frame().state->error.empty())throw std::runtime_error(doc.frame().state->error);
-  const auto baked_scene=doc.copy_scene().encode();
+  const auto accepted=doc.copy_scene();
+  const auto baked_scene=accepted.encode();
   const auto reloaded=Scene::load(path);
   const auto baked=reloaded.active().painted->baked();
   check(baked&&baked->emission_field&&baked->maps.emission.rgba.empty(),
@@ -111,7 +114,8 @@ void bake_patch(Document &doc, uint64_t source, const std::filesystem::path &pat
   }
   check(green>1000&&red>1000&&hdr>1000,
         "World-metric projection reaches both sparse painted detail and the unpainted base");
-  check(baked_scene.at("objects").at(0)==before.at("objects").at(0)&&reloaded.encode()==baked_scene,
+  check(bake_fixture::isolated_scene(accepted,source).encode()==
+        bake_fixture::isolated_scene(original,source).encode()&&reloaded.encode()==baked_scene,
         "Bake and reopen preserve the hidden donor, source pose and all paint layers exactly");
   check(doc.undo()&&doc.copy_scene().encode()==before&&doc.redo()&&doc.copy_scene().encode()==baked_scene,
         "Undo and Redo affect only the accepted patch Bake");

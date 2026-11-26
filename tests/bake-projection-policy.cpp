@@ -2,6 +2,8 @@
 #include "dome/document.hpp"
 #include "dome/bake-recipe.hpp"
 #include "dome/baked-emission.hpp"
+#include "dome/source-placement.hpp"
+#include <algorithm>
 #include <nlohmann/json.hpp>
 #include <iostream>
 #include <unistd.h>
@@ -128,6 +130,43 @@ void matching_source_bake() {
         "Partial matching preserves the previous bake wherever a source sample exceeds its bounds");
 }
 
+void affine_volume_source() {
+  Scene scene;
+  const auto target=scene.active().id;
+  Volume volume(.01f);
+  Brush brush;brush.radius=.2f;
+  volume.begin_stroke();volume.stamp(brush);
+  check(volume.end_stroke(),"The affine donor contains an actual sculpt volume");
+  const auto donor=scene.add("Hidden affine sculpt",std::move(volume));
+  auto &source=scene.object(donor);
+  source.visible=false;
+  source.material.color={.9f,.15f,.05f,1};
+  const std::array<double,16> placement{
+      -1.3,0,0,0, .25,.8,0,0, 0,0,1.2,0, 2,1,.4,1};
+  source.affine_edit=std::make_shared<const NativeAffineEdit>(AffineTransform(placement));
+  scene.select(target);
+  auto patch=quad(-.035f,.035f,.65f);
+  for(auto &vertex:patch.positions){vertex.x+=2;vertex.y=1+vertex.y*.175f;}
+  scene.active().mesh_active=true;
+  scene.active().painted=std::make_shared<PaintedMesh>(std::move(patch),64);
+  ObjectBakeSettings settings;settings.front_mm=2;settings.back_mm=50;
+  settings.ao_samples=0;settings.padding=0;
+  Document doc;doc.replace(scene);ready(doc);
+  check(doc.frame().state->bake_sources==std::vector<uint64_t>{donor},
+        "The native chooser offers the translated reflected sculpt as a hidden donor");
+  const auto before=doc.copy_scene().encode();
+  doc.bake_from_object(donor,settings);ready(doc);
+  if(!doc.frame().state->error.empty())throw std::runtime_error(doc.frame().state->error);
+  const auto baked_scene=doc.copy_scene();
+  const auto baked=baked_scene.active().painted->baked();
+  check(baked&&std::count(baked->coverage.begin(),baked->coverage.end(),255)==4096&&
+        baked->maps.color.rgba[0]>235&&baked->maps.color.rgba[2]<70,
+        "World-metric Bake projects all front-facing texels onto the reflected sculpt and uses its material");
+  check(baked_scene.object(donor).volume->encode()==scene.object(donor).volume->encode()&&
+        doc.undo()&&doc.copy_scene().encode()==before,
+        "Affine volume Bake preserves the original sculpt data and exact Undo");
+}
+
 }
 int main(int argc,char**argv)try {
  if(argc==3&&std::string(argv[1])=="--inspect"){std::cout<<Scene::load(argv[2]).encode().dump()<<'\n';return 0;}
@@ -142,6 +181,7 @@ int main(int argc,char**argv)try {
    f.scene.select(f.target);f.scene.save(argv[2]);return 0;
  }
  matching_source_bake();
+ affine_volume_source();
 
  auto before=f.scene.encode();auto original=f.scene.active().painted->baked();auto layers=f.scene.active().painted->encode()["layers"];
  check(refuses([&]{bake_object(f.scene,f.half,options);})&&f.scene.encode()==before,"Strict projection still refuses partial hits without changing any target or source");
