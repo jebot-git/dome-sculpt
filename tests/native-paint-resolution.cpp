@@ -349,6 +349,32 @@ void filter_binary64_rounding(){
   backend.run({128,64,{0,0,2,2},{0,0,1,1}},layout,input,output,{});
   check(output[0].values[4]==100&&output[0].coverage[1]==0&&output[0].mask==255,
         "Zero coverage keeps the raw authored metallic value and the default mask");
+
+  std::vector<Pixel> large(32*32);
+  constexpr std::array<float,6> coefficients{
+      0.f,0x1p-145f,.37f,10000.f,0x1p-147f,31.9f};
+  for(size_t i=0;i<large.size();++i) {
+    for(size_t c=0;c<coefficients.size();++c)
+      large[i].emission[c]=std::bit_cast<uint64_t>(double(coefficients[c]));
+    const float coverage=std::ldexp(float(i%9)/8.f,-int(i%150));
+    large[i].emission[6]=std::bit_cast<uint64_t>(double(coverage));
+  }
+  layout={};
+  layout.floats=FloatPlane::UnassociatedPaint;
+  const Batch area{2048,64,{0,0,32,32},{0,0,1,1}};
+  for(bool covered:{true,false}) {
+    if(!covered)for(auto &pixel:large)pixel.emission[6]=0;
+    layout.fixed_emission=0;
+    backend.run(area,layout,large,output,{});
+    const auto baseline=output[0];
+    layout.fixed_emission=0x3f;
+    std::copy_n(large.front().emission,6,layout.emission_constants);
+    backend.run(area,layout,large,output,{});
+    for(size_t c=0;c<7;++c)
+      check(std::bit_cast<uint32_t>(float(std::bit_cast<double>(output[0].emission[c])))==
+                std::bit_cast<uint32_t>(float(std::bit_cast<double>(baseline.emission[c]))),
+            "The largest area footprint preserves fixed FLOAT results at storage precision");
+  }
 }
 
 void resize_baked_native_grid(const std::filesystem::path &root,bool missing_device=false) {
@@ -764,6 +790,22 @@ void fullsize_physical_paint(const std::filesystem::path &root) {
               loaded->emission_pixel(layer,0,0)==corner,
           "Cold Open restores compressed storage and original FLOAT samples");
     document.save_async(second).get();
+
+    const auto target=root/"reduced-512.dsculpt";
+    TextureSetEdit edit;
+    edit.action=TextureSetAction::Resolution;
+    edit.resolution=512;
+    document.edit_texture_set(edit);
+    document.save_async(target).get();ready(document);
+    const auto smaller=document.copy_scene().active().painted;
+    check(smaller->resolution()==512 &&
+              smaller->emission_pixel(layer,256,256).physical==center.physical &&
+              Scene::load(target).active().painted->resolution()==512,
+          "The default worker reduces dense 2048 FLOAT paint and preserves its radiance");
+    check(document.undo() && document.copy_scene().active().painted->resolution()==2048 &&
+              document.copy_scene().active().painted->emission_pixel(layer,1024,1024)==center &&
+              document.redo() && document.copy_scene().active().painted->resolution()==512,
+          "Full-size reduction retains its source and result through native Undo and Redo");
   }
   std::ifstream original(first,std::ios::binary),restored(second,std::ios::binary);
   check(original && restored && std::equal(std::istreambuf_iterator<char>(original),{},

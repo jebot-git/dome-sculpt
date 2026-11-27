@@ -57,6 +57,7 @@ inline PaintOverlayTexel sample_overlay_texel_owner(const PaintOverlayPacket &pa
  const auto blend=[](float &destination,float incoming,float coverage){
   destination=destination*(1-coverage)+incoming*coverage;
  };
+ const bool single_layer=!packet.baked()&&packet.layers().size()==1;
  for(const auto &layer:packet.layers()){
   ++sample.work;
   const auto &common=layer.tiles.at(tile);
@@ -88,12 +89,23 @@ inline PaintOverlayTexel sample_overlay_texel_owner(const PaintOverlayPacket &pa
   const auto light=emission?emission->texel(within):PaintEmissionValue{};
   const float coverage=emission?mask*light.coverage:q[12]/255.f*mask;
   if(coverage!=0){
-   sample.work+=14;
-   for(size_t c=0;c<3;++c){
-    blend(value[2][c],emission?light.legacy[c]:overlay_linear_byte(q[6+c]),coverage);
-    blend(value[4][c],light.physical[c],coverage);
+   if(single_layer){
+    // With no underlying contribution, associate the values just once.
+    const auto associate=[coverage](float v){return v==0.f?0.f:v*coverage;};
+    sample.work+=7;
+    for(size_t c=0;c<3;++c){
+     value[2][c]=associate(emission?light.legacy[c]:overlay_linear_byte(q[6+c]));
+     value[4][c]=associate(light.physical[c]);
+    }
+    value[3][3]=coverage;
+   }else{
+    sample.work+=14;
+    for(size_t c=0;c<3;++c){
+     blend(value[2][c],emission?light.legacy[c]:overlay_linear_byte(q[6+c]),coverage);
+     blend(value[4][c],light.physical[c],coverage);
+    }
+    value[3][3]=value[3][3]*(1-coverage)+coverage;
    }
-   value[3][3]=value[3][3]*(1-coverage)+coverage;
   }
  }
  value[2][3]=value[4][3]=value[3][3];

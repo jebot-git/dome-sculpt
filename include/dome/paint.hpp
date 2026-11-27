@@ -147,6 +147,7 @@ public:
   static size_t encoded_storage_bytes(std::span<const uint8_t>);
   static size_t maximum_storage_bytes() noexcept;
   size_t storage_bytes() const noexcept;
+  uint8_t varying_channels() const noexcept { return varying_mask_; }
   PaintEmissionValue texel(size_t index) const noexcept;
   Pixels expand() const noexcept;
 

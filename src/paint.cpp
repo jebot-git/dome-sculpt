@@ -435,9 +435,9 @@ struct PaintedMesh::SurfaceMap {
   uint32_t resolution, columns;
   struct Texel {
     Vec3 position, normal;
-    bool covered = false;
-    uint32_t face = 0;
+    uint32_t face = UINT32_MAX;
     std::array<float, 2> bary{};
+    bool covered() const noexcept { return face != UINT32_MAX; }
   };
   struct Bounds {
     Vec3 lo{INFINITY, INFINITY, INFINITY}, hi{-INFINITY, -INFINITY, -INFINITY};
@@ -574,8 +574,8 @@ struct PaintedMesh::SurfaceMap {
                    raster.positions[ids[2]] * w2;
           size_t index = size_t(y) * r + x;
           auto &t = texels[index];
-          Texel candidate{p,normalized(raster.normals[ids[0]]*w0+raster.normals[ids[1]]*w1+raster.normals[ids[2]]*w2),true,uint32_t(k/3),{w0,w1}};
-          if(!t.covered){t=candidate;++diagnostics.covered_texels;}
+          Texel candidate{p,normalized(raster.normals[ids[0]]*w0+raster.normals[ids[1]]*w1+raster.normals[ids[2]]*w2),uint32_t(k/3),{w0,w1}};
+          if(!t.covered()){t=candidate;++diagnostics.covered_texels;}
           else if(!source){
             if(length(t.position-p)>1e-4f)throw std::invalid_argument("Overlapping UV islands cannot be painted independently");
             t=candidate;
@@ -604,7 +604,7 @@ struct PaintedMesh::SurfaceMap {
         }
     }
     if (!source && (!set_domain||!set_domain->triangles().empty()) && std::none_of(texels.begin(), texels.end(),
-                     [](auto &t) { return t.covered; }))
+                     [](auto &t) { return t.covered(); }))
       throw std::invalid_argument(
           "UV islands have no covered texels at this resolution");
     for (int pass = 0; pass < 4; ++pass) {
@@ -670,7 +670,7 @@ PaintBlurReport PaintedMesh::blur_color_layer_gpu(const PaintBlurOptions&options
   for(uint32_t face=0;face<faces;++face)parent[face]=root(face);
   // These labels name actual indexed writable UV connectivity. Normal/source
   // grids, nearest-position welding and generated texture carriers are absent.
-  auto label=[&](uint32_t x,uint32_t y){const auto&t=surface_->texels[size_t(y)*resolution()+x];return t.covered&&(!texture_set_domain_||texture_set_domain_->contains(t.face))?parent.at(t.face)+1:0;};
+  auto label=[&](uint32_t x,uint32_t y){const auto&t=surface_->texels[size_t(y)*resolution()+x];return t.covered()&&(!texture_set_domain_||texture_set_domain_->contains(t.face))?parent.at(t.face)+1:0;};
   auto draft=snapshot();draft->undo_=undo_;draft->redo_=redo_;draft->history_bytes_=history_bytes_;
   draft->begin_stroke();auto&target=draft->active();
   detail::ColorBlurGpu gpu(options.allow_software_validation);report.device=gpu.device();
@@ -736,7 +736,7 @@ std::shared_ptr<const PaintedMesh::Evaluation> PaintedMesh::evaluate(std::shared
   for(size_t i=0;i<surface_->texels.size();++i){
     if((i&255)==0&&cancelled&&cancelled())throw std::runtime_error("Evaluated paint preparation cancelled");
     auto tile=(i/resolution()/32)*surface_->columns+(i%resolution()/32);
-    auto include=[&](const SurfaceMap::Texel &t){if(!t.covered)return;auto p=result->sample(t).first;auto &b=result->bounds.at(tile);b.lo=low(b.lo,p);b.hi=high(b.hi,p);};
+    auto include=[&](const SurfaceMap::Texel &t){if(!t.covered())return;auto p=result->sample(t).first;auto &b=result->bounds.at(tile);b.lo=low(b.lo,p);b.hi=high(b.hi,p);};
     include(surface_->texels[i]);if(auto linked=surface_->linked.find(uint32_t(i));linked!=surface_->linked.end())for(auto at=linked->second.first;at!=UINT32_MAX;at=surface_->extra[at].next)include(surface_->extra[at].texel);
   }
   return result;
@@ -1562,7 +1562,7 @@ void PaintedMesh::stamp_sampled(const Brush &b,const PaintSettings &settings,con
           float distance=INFINITY,projection_opacity=1;
           uint32_t selected_face=UINT32_MAX;auto selected=settings;
           auto consider=[&](const SurfaceMap::Texel &candidate){
-            if(!candidate.covered)return;
+            if(!candidate.covered())return;
             if((candidate_checks&255)==0)stop();
             if(++candidate_checks>surface_->options.max_candidate_checks)throw std::length_error("Paint candidate work budget exceeded");
             if(texture_set_domain_&&!texture_set_domain_->contains(candidate.face))return;
@@ -2222,7 +2222,7 @@ bool detail::TextureSetPaintAccess::can_resize_unpainted(const PaintedMesh &pain
     !paint.baked_&&!paint.has_physical_emission();
 }
 bool detail::TextureSetPaintAccess::grid_covered(const PaintedMesh &paint,size_t index)noexcept{
-  return index<paint.surface_->texels.size()&&paint.surface_->texels[index].covered;
+  return index<paint.surface_->texels.size()&&paint.surface_->texels[index].covered();
 }
 std::shared_ptr<PaintedMesh>detail::TextureSetPaintAccess::resize_unpainted(const PaintedMesh&before,
     uint32_t r,const TextureSetLimits&limits){
@@ -2341,8 +2341,9 @@ std::shared_ptr<PaintedMesh> detail::TextureSetPaintAccess::resample_plain(const
  if(before.revision_==UINT64_MAX)throw std::overflow_error("Texture-set paint revision exhausted");
  // Bound actual authored candidates before allocating layer output or raster.
  // Mesh/domain still keep the original logical triangle sequence.
- const size_t old_candidates=before.surface_->extra.capacity()*sizeof(PaintedMesh::SurfaceMap::Extra)+before.surface_->linked.bucket_count()*sizeof(void*)+before.surface_->linked.size()*(sizeof(PaintedMesh::SurfaceMap::Head)+4*sizeof(void*)+sizeof(uint32_t));
- size_t candidate_bytes=old_candidates,samples=0,read_grid_work=0;
+ // The layer transfer already charges the resident source raster, including
+ // linked candidates. Only allocations for the replacement belong here.
+ size_t candidate_bytes=0,samples=0,read_grid_work=0;
  const auto r=options.resolution;const auto&mesh=before.mesh();
  if(domain&&before.surface_->options.policy!=PaintUvPolicy::Strict&&
     (before.surface_->options.policy!=PaintUvPolicy::PolygonAuthored||!domain->topology()->polygon_ids()))
@@ -2485,7 +2486,7 @@ struct SourcePaintSamplingAccess {
     const auto raster=detail::native_paint_bake_mesh(paint.mesh(),*paint.paint_sampling_domain(),options.cancelled);
     const auto texel=[&](size_t at){
       const auto &point=surface.texels.at(at);
-      if(!point.covered)throw std::logic_error("Native Bake conversion found an unowned paint texel");
+      if(!point.covered())throw std::logic_error("Native Bake conversion found an unowned paint texel");
       return detail::NativeBakeTexel{point.face,{point.bary[0],point.bary[1],1.-point.bary[0]-point.bary[1]}};
     };
     auto converted=detail::convert_native_bake_grid(raster,*binding.normal_frames->pbr,bake,surface.padding,texel,reduced);
@@ -3196,7 +3197,7 @@ PaintNormalPreparationResult SourceNormalPreparationAccess::prepare(const Painte
     receipt.observed_initial_error=std::max(receipt.observed_initial_error,error);
   };
   for(size_t at=0;at<pixels;++at){if((at&1023)==0)check();const auto owner=atlas->padding[at];if(owner<0)continue;
-    const auto &texel=atlas->texels[size_t(owner)];if(!texel.covered)throw std::logic_error("Prepared normal padding lost its owning surface texel");
+    const auto &texel=atlas->texels[size_t(owner)];if(!texel.covered())throw std::logic_error("Prepared normal padding lost its owning surface texel");
     const float bary[3]={texel.bary[0],texel.bary[1],1-texel.bary[0]-texel.bary[1]};std::array<float,2> uv{};
     for(size_t k=0;k<3;++k){const auto q=source.mesh().uv[source.mesh().indices[texel.face*3+k]];uv[0]+=q[0]*bary[k];uv[1]+=q[1]*bary[k];}
     encode(*pbr,at,maps.normal,maps.normal_scale,uv);
@@ -3264,7 +3265,7 @@ PaintNormalUvProjectionResult SourceNormalPreparationAccess::reproject(const Pai
     const int x0=std::max(0,int(std::floor(std::min({a[0],b[0],c[0]})*r))),x1=std::min(int(r)-1,int(std::ceil(std::max({a[0],b[0],c[0]})*r)));
     const int y0=std::max(0,int(std::floor(std::min({a[1],b[1],c[1]})*r))),y1=std::min(int(r)-1,int(std::ceil(std::max({a[1],b[1],c[1]})*r)));
     for(int y=y0;y<=y1;++y)for(int x=x0;x<=x1;++x){if(++raster_work>options.max_samples)throw std::length_error("Normal UV source-constraint raster exceeds its work budget");if((raster_work&1023)==0)stop();double u=(x+.5)/r,v=(y+.5)/r;float w[]={float(((double(b[1])-c[1])*(u-c[0])+(double(c[0])-b[0])*(v-c[1]))/denominator),float(((double(c[1])-a[1])*(u-c[0])+(double(a[0])-c[0])*(v-c[1]))/denominator),0};w[2]=1-w[0]-w[1];if(std::min({w[0],w[1],w[2]})<-.000001f)continue;
-      const size_t at=size_t(y)*r+size_t(x);if(!atlas->texels[at].covered)throw std::logic_error("Normal UV source constraint lost destination ownership");covered[face]=1;++result.source_constraints;
+      const size_t at=size_t(y)*r+size_t(x);if(!atlas->texels[at].covered())throw std::logic_error("Normal UV source constraint lost destination ownership");covered[face]=1;++result.source_constraints;
       if(atlas->texels[at].face==face)continue;std::array<float,2> uv{};for(size_t k=0;k<3;++k){const auto q=before.uv[before.indices[face*3+k]];uv[0]+=q[0]*w[k];uv[1]+=q[1]*w[k];}audit(*pbr,at,source.normal_projection_->pbr,uv);audit(*toon,at,source.normal_projection_->mtoon,uv);
     }
     if(!covered[face])for(const auto weights:{std::array<float,3>{1,0,0},std::array<float,3>{0,1,0},std::array<float,3>{0,0,1},std::array<float,3>{1.f/3,1.f/3,1.f/3}}){
@@ -3667,7 +3668,7 @@ void detail::TextureSetPaintAccess::reproject_retopology(const PaintedMesh &sour
   for (size_t at = 0; at < texels; ++at) {
     if ((at & 1023) == 0) paint_compute::checkpoint(transfer.cancelled());
     const auto &texel = surface.texels[at];
-    if (!texel.covered) continue;
+    if (!texel.covered()) continue;
     const auto &w = texel.bary;
     const auto hit = transfer.match_patch(texel.position,texel.normal,texel.face,
                                          {w[0],w[1],1-w[0]-w[1]},old_domain.get());
@@ -4128,11 +4129,11 @@ std::shared_ptr<const SourceMaterialBindings> detail::TextureSetPaintAccess::rep
     if ((index&1023)==0) paint_compute::checkpoint(transfer.cancelled());
     transfer.work(1+roles.size()+core_fields.size());
     const auto &texel=surface.texels[index];
-    if (!texel.covered && surface.padding[index]>=0) continue;
+    if (!texel.covered() && surface.padding[index]>=0) continue;
     const auto &w=texel.bary;
-    const auto hit=texel.covered ? transfer.match_patch(texel.position,texel.normal,texel.face,
+    const auto hit=texel.covered() ? transfer.match_patch(texel.position,texel.normal,texel.face,
         {w[0],w[1],1-w[0]-w[1]},from.texture_set_domain_.get()) : std::nullopt;
-    if (texel.covered && !hit && imported)
+    if (texel.covered() && !hit && imported)
       throw std::invalid_argument("A patch texel is outside the imported MToon source surface");
     RetopoToonFrame target{};
     std::array<Vec3,2> authored{};
@@ -4205,7 +4206,7 @@ std::shared_ptr<const SourceMaterialBindings> detail::TextureSetPaintAccess::rep
     throw std::invalid_argument("No matching old surface for the retopology MToon textures");
   for (size_t index=0;index<surface.texels.size();++index) {
     if ((index&1023)==0) paint_compute::checkpoint(transfer.cancelled());
-    if (surface.texels[index].covered || surface.padding[index]<0) continue;
+    if (surface.texels[index].covered() || surface.padding[index]<0) continue;
     transfer.work(roles.size()+core_fields.size());
     const auto pad=[&](Image &image){
       auto &pixels=image.rgba;
@@ -4269,7 +4270,7 @@ std::shared_ptr<const detail::BakedNormalField> detail::TextureSetPaintAccess::r
   for (size_t index=0;index<count;++index) {
     if ((index&1023)==0) paint_compute::checkpoint(transfer.cancelled());
     const auto &texel=surface.texels[index];
-    if (!texel.covered) continue;
+    if (!texel.covered()) continue;
     const auto &w=texel.bary;
     const auto hit=transfer.match_patch(texel.position,texel.normal,texel.face,{w[0],w[1],1-w[0]-w[1]});
     if (!hit) continue;
@@ -4561,7 +4562,7 @@ PaintColorProjectionResult SourceColorPreparationAccess::project(
   std::array<float,4> maximum_error{};
   for(size_t at=0;at<source.surface_->texels.size();++at) {
     if((at&4095)==0)check();
-    const auto &texel=source.surface_->texels[at];if(!texel.covered)continue;
+    const auto &texel=source.surface_->texels[at];if(!texel.covered())continue;
     const float bary[]{texel.bary[0],texel.bary[1],1-texel.bary[0]-texel.bary[1]};
     for(size_t component=0;component<4;++component) {
       float value=0;for(size_t k=0;k<3;++k)value+=colors[source.mesh().indices[size_t(texel.face)*3+k]][component]*bary[k];
@@ -4571,7 +4572,7 @@ PaintColorProjectionResult SourceColorPreparationAccess::project(
   }
   for(size_t at=0;at<source.surface_->texels.size();++at) {
     if((at&4095)==0)check();
-    if(source.surface_->texels[at].covered)continue;
+    if(source.surface_->texels[at].covered())continue;
     auto owner=source.surface_->padding[at];if(owner>=0)std::copy_n(vertex_image->rgba.begin()+size_t(owner)*4,4,vertex_image->rgba.begin()+at*4);
   }
   const auto bound=detail::color_projection_bound(source.mesh(),colors,*vertex_image,options.max_quality_cells,options.cancelled);
@@ -4700,7 +4701,7 @@ PaintColorPreparationResult SourceColorPreparationAccess::prepare(
     for(size_t c=0;c<4;++c){if(before->source_only)a[c]*=material.color[c];a[c]*=vertex[c];receipt.observed_base_error[c]=std::max(receipt.observed_base_error[c],std::min(1.f,std::abs(a[c]-b[c])));}
     if(material.alpha==Material::AlphaMode::Mask && (a[3]>=material.alpha_cutoff)!=(b[3]>=material.alpha_cutoff))++receipt.observed_mask_disagreements;
   };
-  for(const auto &texel:source.surface_->texels)if(texel.covered)probe(texel.face,{texel.bary[0],texel.bary[1],1-texel.bary[0]-texel.bary[1]});
+  for(const auto &texel:source.surface_->texels)if(texel.covered())probe(texel.face,{texel.bary[0],texel.bary[1],1-texel.bary[0]-texel.bary[1]});
   for(size_t face=0;face<source.mesh().indices.size()/3;++face) {
     check();probe(uint32_t(face),{1.f/3,1.f/3,1.f/3});for(size_t corner=0;corner<3;++corner){std::array<float,3> bary{};bary[corner]=1;probe(uint32_t(face),bary);}
   }
@@ -5018,7 +5019,7 @@ PaintedMesh::build_composite(const Material &material,const std::function<bool()
     if(source.normal.image && source.normal_scale>0){
       bool needs_original=false;
       for(size_t at=0;at<surface_->texels.size();++at)
-        if(surface_->texels[at].covered && baked_->coverage[at]<255){needs_original=true;break;}
+        if(surface_->texels[at].covered() && baked_->coverage[at]<255){needs_original=true;break;}
       if(needs_original)corners=tangent_corners(mesh());
     }
     for (size_t at=0;at<size_t(r)*r;++at) {
@@ -5162,7 +5163,7 @@ PaintedMesh::reparameterize(Mesh target,
       throw std::runtime_error("UV paint transfer cancelled");
     for (uint32_t x = 0; x < resolution(); ++x) {
       auto &t = surface->texels[size_t(y) * resolution() + x];
-      if (!t.covered)
+      if (!t.covered())
         continue;
       auto f = t.face * 3;
       float w[] = {t.bary[0], t.bary[1], 1 - t.bary[0] - t.bary[1]};

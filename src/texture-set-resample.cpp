@@ -312,11 +312,44 @@ void omit_default_reduction_channels(const PaintLayer &layer,paint_grid::Layout 
   layout.mask=differing[13]!=0;
 }
 
+void find_fixed_emission(const PaintLayer &layer,paint_grid::Layout &layout,
+                         TextureSetResolutionReport &report,const TextureSetLimits &limits) {
+  if(layer.emission_tiles.empty())return;
+  unsigned fixed=0x3f;
+  bool first=true;
+  for(const auto &tile:layer.emission_tiles) {
+    stop(limits);
+    work(report,1,limits);
+    // A missing tile can derive different coefficients from the legacy bytes.
+    if(!tile)return;
+    fixed&=~tile->varying_channels();
+    const auto sample=tile->texel(0);
+    for(unsigned c=0;c<6;++c) if(fixed&(1u<<c)) {
+      const float v=c<3?sample.legacy[c]:sample.physical[c-3];
+      if(!std::isfinite(v)||v<0||v>(c<3?1.f:maximum_native_emission)) {
+        fixed&=~(1u<<c);
+        continue;
+      }
+      const auto bits=word(v==0?0.:double(v));
+      if(first)layout.emission_constants[c]=bits;
+      else if(layout.emission_constants[c]!=bits)fixed&=~(1u<<c);
+    }
+    if(!fixed)return;
+    first=false;
+  }
+  // The reduction footprint is dyadic. Each FLOAT product fits exactly in
+  // binary64. The sums contain at most 1024 nonnegative terms, so their
+  // rounding and the quotient stay far inside half an ulp at FLOAT storage.
+  // Zero is canonical because the original accumulators start at +0.
+  layout.fixed_emission=uint8_t(fixed);
+}
+
 size_t reduction_tap_work(const paint_grid::Layout &layout) {
   // One input fetch, the byte planes with actual filtering, and the seven
-  // raw plus six associated FLOAT sums of an independent emission plane.
+  // raw plus six associated FLOAT sums, apart from proven constants.
   return 1+std::popcount(layout.active)+std::popcount(layout.coverage_mask)+
-      size_t(layout.mask)+(layout.floats==paint_grid::FloatPlane::Absent?0:13);
+      size_t(layout.mask)+(layout.floats==paint_grid::FloatPlane::Absent?
+          0:13-2*std::popcount(layout.fixed_emission));
 }
 
 bool has_authored_tile(const PaintLayer &layer, size_t tile) {
@@ -368,6 +401,7 @@ Sample filtered_samples(const PaintLayer &l,uint32_t from,auto &&for_each_pixel,
   const bool read_pbr=!selection||selection->pbr;
   const bool read_emission=!selection||selection->floats!=paint_grid::FloatPlane::Absent;
   const bool read_mask=!selection||selection->mask;
+  const unsigned fixed_emission=selection?selection->fixed_emission:0;
   std::array<double, 9> associated{}, raw{};
   std::array<double, 4> coverage{}, pbr{}, pbr_raw{};
   std::array<double, 3> legacy{}, physical{}, legacy_raw{}, physical_raw{};
@@ -405,10 +439,14 @@ Sample filtered_samples(const PaintLayer &l,uint32_t from,auto &&for_each_pixel,
       const double c = s.emission.coverage;
       emission_coverage += w * c;
       for (size_t k = 0; k < 3; ++k) {
-        legacy[k] += w * c * s.emission.legacy[k];
-        physical[k] += w * c * s.emission.physical[k];
-        legacy_raw[k] += w * s.emission.legacy[k];
-        physical_raw[k] += w * s.emission.physical[k];
+        if(!(fixed_emission&(1u<<k))) {
+          legacy[k] += w * c * s.emission.legacy[k];
+          legacy_raw[k] += w * s.emission.legacy[k];
+        }
+        if(!(fixed_emission&(1u<<(k+3)))) {
+          physical[k] += w * c * s.emission.physical[k];
+          physical_raw[k] += w * s.emission.physical[k];
+        }
       }
     }
     if(read_mask)mask += w * double(d[13]) / 255;
@@ -435,10 +473,11 @@ Sample filtered_samples(const PaintLayer &l,uint32_t from,auto &&for_each_pixel,
   if(read_emission) {
     out.emission.coverage = float(std::clamp(emission_coverage, 0., 1.));
     for (size_t k = 0; k < 3; ++k) {
-      out.emission.legacy[k] = float(std::clamp(
+      out.emission.legacy[k] = fixed_emission&(1u<<k)?float(number(selection->emission_constants[k])):float(std::clamp(
           emission_coverage > 0 ? legacy[k] / emission_coverage : legacy_raw[k],
           0., 1.));
-      out.emission.physical[k] =
+      out.emission.physical[k] = fixed_emission&(1u<<(k+3))?
+          float(number(selection->emission_constants[k+3])):
           float(std::clamp(emission_coverage > 0 ? physical[k] / emission_coverage
                                                  : physical_raw[k],
                            0., double(maximum_native_emission)));
@@ -465,18 +504,23 @@ void quality(const PaintLayer &before, const PaintLayer &after, uint32_t from,
              uint32_t to, const TextureSetResolutionOptions &options,
              const TextureSetLimits &limits, TextureSetResolutionReport &report,
              TextureSetResolutionLayerQuality &q, bool native_cells,
-             const paint_grid::Layout *reduction) {
+             const paint_grid::Layout *reduction,bool default_emission_bytes) {
   const auto reconstruct_x = [from,to](uint32_t x) {
     return from > to ? x / (from / to) : x * (to / from);
   };
   double peak = 1;
-  for (const auto &t : before.emission_tiles)
-    if (t)
-      for (size_t i=0;i<PaintEmissionTile::sample_count;++i) {
-        work(report, 1, limits);
-        for (float v : t->texel(i).physical)
-          peak = std::max(peak, double(v));
-      }
+  const unsigned fixed_emission=reduction?reduction->fixed_emission:0;
+  if((fixed_emission&0x38)==0x38) {
+    for(unsigned c=3;c<6;++c)peak=std::max(peak,number(reduction->emission_constants[c]));
+  } else {
+    for (const auto &t : before.emission_tiles)
+      if (t)
+        for (size_t i=0;i<PaintEmissionTile::sample_count;++i) {
+          work(report, 1, limits);
+          for (float v : t->texel(i).physical)
+            peak = std::max(peak, double(v));
+        }
+  }
   double squares = 0;
   size_t count = 0;
   // Coverage and raw/associated values for common, separate PBR and FLOAT.
@@ -490,7 +534,7 @@ void quality(const PaintLayer &before, const PaintLayer &after, uint32_t from,
     const auto values=((1u<<width[g])-1)<<first[g];
     check_group[g]=(reduction->coverage_mask&(1u<<g))||
                    (reduction->active&values)||
-                   (g==3&&reduction->floats!=paint_grid::FloatPlane::Absent);
+                   (g==3&&reduction->floats!=paint_grid::FloatPlane::Absent&&!default_emission_bytes);
     if(!check_group[g])known_components+=1+2*width[g];
   }
   const bool check_mask=!reduction||reduction->mask;
@@ -500,6 +544,11 @@ void quality(const PaintLayer &before, const PaintLayer &after, uint32_t from,
   if(!check_mask)known_components+=1;
   if(!check_pbr)known_components+=2*4;
   if(!check_emission)known_components+=1+4*3;
+  unsigned zero_emission=0;
+  for(unsigned c=0;c<6;++c)
+    if((fixed_emission&(1u<<c))&&!reduction->emission_constants[c])
+      zero_emission|=1u<<c;
+  if(check_emission)known_components+=std::popcount(fixed_emission)+std::popcount(zero_emission);
   const size_t numeric_work=((full_comparison_work-stored_comparison_work)*
       (components-known_components)+components-1)/components;
   auto measure = [&](double a, double b, double &maximum) {
@@ -568,19 +617,21 @@ void quality(const PaintLayer &before, const PaintLayer &after, uint32_t from,
       measure(a.emission.coverage, b.emission.coverage,
               q.emission_relative_error[6]);
       for (size_t k = 0; k < 3; ++k) {
-        measure(a.emission.legacy[k], b.emission.legacy[k],
-                q.emission_value_error[k]);
-        measure(double(a.emission.physical[k]) / peak,
-                double(b.emission.physical[k]) / peak,
-                q.emission_value_error[3 + k]);
-        measure(double(a.emission.legacy[k]) * a.emission.coverage,
-                double(b.emission.legacy[k]) * b.emission.coverage,
-                q.emission_relative_error[k]);
-        const double av = double(a.emission.physical[k]) * a.emission.coverage,
-                     bv = double(b.emission.physical[k]) * b.emission.coverage;
-        q.physical_absolute_error =
-            std::max(q.physical_absolute_error, std::abs(av - bv));
-        measure(av / peak, bv / peak, q.emission_relative_error[3 + k]);
+        if(!(fixed_emission&(1u<<k)))
+          measure(a.emission.legacy[k], b.emission.legacy[k], q.emission_value_error[k]);
+        if(!(fixed_emission&(1u<<(k+3))))
+          measure(double(a.emission.physical[k]) / peak, double(b.emission.physical[k]) / peak,
+                  q.emission_value_error[3 + k]);
+        if(!(zero_emission&(1u<<k)))
+          measure(double(a.emission.legacy[k]) * a.emission.coverage,
+                  double(b.emission.legacy[k]) * b.emission.coverage, q.emission_relative_error[k]);
+        if(!(zero_emission&(1u<<(k+3)))) {
+          const double av = double(a.emission.physical[k]) * a.emission.coverage,
+                       bv = double(b.emission.physical[k]) * b.emission.coverage;
+          q.physical_absolute_error =
+              std::max(q.physical_absolute_error, std::abs(av - bv));
+          measure(av / peak, bv / peak, q.emission_relative_error[3 + k]);
+        }
       }
     }
   }
@@ -859,16 +910,11 @@ std::vector<PaintLayer> resample_texture_set_layers(
   const uint32_t subdivision = native_cells && to > from ? to / from : 1;
   const bool accelerated=subdivision==1&&from!=to&&compute_backend()!="CPU";
   const size_t tiles = size_t(to / 32) * (to / 32);
-  // Old field plus new raster constructor/padding, dense worst-case authored
-  // output and one writable tile of scratch coexist. No dense per-layer image.
-  size_t bytes = TextureSetPaintAccess::working_bytes(before, to);
+  // The original raster is already resident. Its construction scratch is
+  // gone, and the geometry is shared with the replacement raster.
+  const auto raster_working=TextureSetPaintAccess::working_bytes(before,to);
+  size_t bytes = PaintOverlayFactory::raster_storage_bytes(before);
   charge(bytes, 1, before.storage_bytes(), limits);
-  charge(bytes, 1, TextureSetPaintAccess::initial_raster_bytes(from), limits);
-  const auto &geometry = before.mesh();
-  charge(bytes, geometry.positions.size() + geometry.normals.size(),
-         sizeof(Vec3), limits);
-  charge(bytes, geometry.uv.size(), sizeof(std::array<float, 2>), limits);
-  charge(bytes, geometry.indices.size(), sizeof(uint32_t), limits);
   charge(bytes, 3, TextureSetPaintAccess::snapshot_bytes(before), limits);
   const size_t largest = size_t(std::max(from, to)) * std::max(from, to);
   if (!native_cells && before.layers().size() &&
@@ -878,9 +924,18 @@ std::vector<PaintLayer> resample_texture_set_layers(
   charge(bytes, 1,
          sizeof(PaintTile) + sizeof(PaintColorTile) + sizeof(PaintEmissionTile::Pixels),
          limits);
+  const bool prune=native_cells&&from>to;
+  std::vector<paint_grid::Layout> layouts;
+  charge(bytes,before.layers().size(),sizeof(paint_grid::Layout),limits);
+  layouts.reserve(before.layers().size());
   for (const auto &layer : before.layers()) {
     const bool pbr = !layer.pbr_tiles.empty(),
                emission = !layer.emission_tiles.empty();
+    auto &layout=layouts.emplace_back(layer_layout(layer));
+    if(prune) {
+      omit_default_reduction_channels(layer,layout,report,limits);
+      find_fixed_emission(layer,layout,report,limits);
+    }
     size_t affected = tiles;
     if (native_cells) {
       affected = 0;
@@ -891,10 +946,9 @@ std::vector<PaintLayer> resample_texture_set_layers(
       }
       work(report, std::max(tiles, size_t(from / 32) * (from / 32)), limits);
     }
-    charge(bytes, affected,
-           sizeof(PaintTile) + (pbr ? sizeof(PaintColorTile) : 0) +
-               (emission ? PaintEmissionTile::maximum_storage_bytes() : 0),
-           limits);
+    const size_t emission_bytes=emission?PaintEmissionTile::maximum_storage_bytes()-
+        std::popcount(layout.fixed_emission)*PaintEmissionTile::sample_count*sizeof(float):0;
+    charge(bytes,affected,sizeof(PaintTile)+(pbr?sizeof(PaintColorTile):0)+emission_bytes,limits);
     charge(bytes, tiles,
            (1 + size_t(pbr) + size_t(emission)) *
                sizeof(std::shared_ptr<const PaintTile>),
@@ -906,14 +960,16 @@ std::vector<PaintLayer> resample_texture_set_layers(
     return false;
   };
   std::unique_ptr<GridFilter> filter;
-  if(accelerated&&std::ranges::any_of(before.layers(),authored)) {
-    charge(bytes,1,GridFilter::peak_bytes,limits);
+  const bool use_filter=accelerated&&std::ranges::any_of(before.layers(),authored);
+  // The filter is destroyed before resample_plain starts raster construction.
+  charge(bytes,1,std::max(raster_working,use_filter?GridFilter::peak_bytes:0),limits);
+  if(use_filter)
     filter=std::make_unique<GridFilter>();
-  }
   report.peak_bytes = bytes;
   std::vector<PaintLayer> result;
   result.reserve(before.layers().size());
   report.layers.reserve(before.layers().size());
+  size_t layer_index=0;
   for (const auto &layer : before.layers()) {
     stop(limits);
     PaintLayer out;
@@ -927,10 +983,9 @@ std::vector<PaintLayer> resample_texture_set_layers(
     if (!layer.emission_tiles.empty())
       out.emission_tiles.resize(tiles);
     const bool layer_filter=filter&&authored(layer);
-    auto layout=layer_layout(layer);
-    const bool prune=native_cells&&from>to;
-    if(prune)omit_default_reduction_channels(layer,layout,report,limits);
+    const auto &layout=layouts.at(layer_index++);
     const size_t tap_work=prune?reduction_tap_work(layout):32;
+    bool default_emission_bytes=true;
     for (uint32_t ty = 0; ty < to / 32; ++ty)
       for (uint32_t tx = 0; tx < to / 32; ++tx) {
         stop(limits);
@@ -957,6 +1012,7 @@ std::vector<PaintLayer> resample_texture_set_layers(
             c.data[12]=fallback_byte(light.coverage);
             for(size_t k=0;k<3;++k)
               c.data[6+k]=fallback_byte(linear_to_srgb(light.legacy[k]));
+            default_emission_bytes &= !(c.data[6]||c.data[7]||c.data[8]||c.data[12]);
           }
           common.pixels[i]=c;
           emission[i]=light;
@@ -1029,7 +1085,7 @@ std::vector<PaintLayer> resample_texture_set_layers(
     TextureSetResolutionLayerQuality q;
     q.layer = layer.id;
     quality(layer, out, from, to, options, limits, report, q, native_cells,
-            prune?&layout:nullptr);
+            prune?&layout:nullptr,default_emission_bytes);
     report.layers.push_back(std::move(q));
     result.push_back(std::move(out));
   }

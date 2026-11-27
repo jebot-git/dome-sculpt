@@ -30,6 +30,8 @@ struct Layout {
   uint8_t coverage_mask = 0xf;
   FloatPlane floats = FloatPlane::Absent;
   bool mask = false;
+  uint8_t fixed_emission = 0;
+  uint64_t emission_constants[float_channels-1]{};
 };
 struct Rectangle { uint32_t x, y, width, height; };
 struct Batch {
@@ -143,11 +145,13 @@ DOME_GRID_FN Pixel filter(size_t index,const Batch &batch,const Layout &layout,
                  div(mul(weight,integer(p.mask)),integer(255)));
       if (layout.floats!=FloatPlane::Absent) {
         for (unsigned c=0;c<float_channels;++c)
-          emission_raw[c]=add(emission_raw[c],mul(weight,p.emission[c]));
+          if (!(layout.fixed_emission&(1u<<c)))
+            emission_raw[c]=add(emission_raw[c],mul(weight,p.emission[c]));
         if (layout.floats==FloatPlane::UnassociatedPaint) {
           const auto a=mul(weight,p.emission[6]);
           for (unsigned c=0;c<6;++c)
-            emission_weighted[c]=add(emission_weighted[c],mul(a,p.emission[c]));
+            if (!(layout.fixed_emission&(1u<<c)))
+              emission_weighted[c]=add(emission_weighted[c],mul(a,p.emission[c]));
         }
       }
     }
@@ -164,8 +168,8 @@ DOME_GRID_FN Pixel filter(size_t index,const Batch &batch,const Layout &layout,
     const auto a=emission_raw[6];
     out.emission[6]=a;
     for (unsigned c=0;c<6;++c)
-      out.emission[c]=(a&&layout.floats==FloatPlane::UnassociatedPaint)?
-          div(emission_weighted[c],a):emission_raw[c];
+      out.emission[c]=layout.fixed_emission&(1u<<c)?layout.emission_constants[c]:
+          (a&&layout.floats==FloatPlane::UnassociatedPaint)?div(emission_weighted[c],a):emission_raw[c];
   }
   return out;
 }
