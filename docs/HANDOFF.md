@@ -2400,6 +2400,29 @@ non-root skin warning. Earlier painted files with independent shade
 keep their exact bytes.
 [Shared MToon shade validation](validation/shared-shade-mtoon-20261127.json)
 
+### Painted MToon over varying source textures
+
+Standard and Editable GLB support varying static MToon base, shade and
+relative emission when the source images match the native paint grid
+and use level-zero clamp-linear UV0. The worker bounds the difference
+between multiplying the filtered source and uncovered fraction in the
+viewport and filtering their product in the exported PNG. The bound
+covers all locations between texels. Shared shade also carries its
+positive-clamp error, and masked paint preserves the alpha decision.
+Native reopen restores the original source textures and layers.
+Mipmap or out-of-tolerance composition leaves the previous Standard
+GLB intact.
+
+Release and ASan/UBSan each pass 256 export and 175 software graphics
+checks. Both export formats qualify at 64 and 512 square. Software GL
+and Intel Arc A770 match sampled alpha and all 35 picking rays on the
+varying fixture, with at most two RGB bytes of difference. The three
+registered Release tests pass, and the five typed files match across
+profiles and pass the pinned MToon schema. Khronos reports zero errors
+with the existing non-root skin warning on the rigged files. Earlier
+uniform shared shade packages retain their exact bytes.
+[Varying MToon source validation](validation/varying-role-mtoon-20261127.json)
+
 ## Source and integration boundary
 
 - Main now admits product1bc13125 and public fixturef1e193c7 after complete

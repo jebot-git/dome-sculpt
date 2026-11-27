@@ -25,8 +25,11 @@ retained HDR milestone core. The corrected retopology fixture verifies
 ordered Save handling before and after an injected publication failure.
 The layered-normal fixture now verifies authenticated donor Bake directions
 and exact scene history. Both fixtures also pass ASan/UBSan. The broader
-sanitizer group and current full Release sweep are running.
+sanitizer group finished with 18 passes and a timeout on the rebaked
+archive. The isolated replay of that archive passed all allocation and
+cancellation checks. The current full Release sweep is running.
 [Focused regression evidence](validation/layered-normal-retopo-followup-20261127.json)
+[Isolated archive replay](validation/native-mtoon-texture-sets-20261127.json)
 
 Main supports VRM0 export of shaped CC0 VRoid avatars, generated unlit
 grooms, certified UV seam edits and refitted first-person and spring
@@ -183,17 +186,21 @@ roles are uniform and static. The exporter bounds both filtered coverage
 branches, preserves mask decisions, and retains separate shade and PBR
 materials. Editable GLB retains exact painted authoring data. Standard
 export refuses unsupported compositions before replacing the destination.
-Uniform static base and shade roles can share one original image.
-Portable output gives painted shade its own texture and bounds
-interpolation across the shader's positive paint clamp. Tested 64
-and 512 square fields preserve exact Editable GLB authoring state.
-Varying shade sources, live painted UV animation, HDR and typed Bake,
-VRM integration, alternate UVs, original artist frames, resampling,
-and physical verification remain open.
+Static base and shade roles can share one original image. Portable
+output gives painted shade its own texture and bounds interpolation
+across the shader's positive paint clamp. Varying base, shade and
+emission also export when the original images share the paint grid
+and use level-zero clamp-linear UV0. The exporter measures the error
+from filtering the source and paint coverage together. Tested 64 and
+512 square fields preserve exact Editable GLB authoring state.
+Other sampler modes and layouts, live painted UV animation, HDR and
+typed Bake, VRM integration, alternate UVs, original artist frames,
+resampling, and physical verification remain open.
 [Native MToon texture-set evidence](validation/native-mtoon-texture-sets-20261127.json)
 [Portable MToon texture-set evidence](validation/portable-mtoon-texture-sets-20261127.json)
 [Painted MToon texture-set evidence](validation/painted-mtoon-texture-sets-20261127.json)
 [Shared MToon shade evidence](validation/shared-shade-mtoon-20261127.json)
+[Varying MToon source evidence](validation/varying-role-mtoon-20261127.json)
 
 Strict Bake rays now recover source-edge contacts affected by float staging.
 An exact ray hit has priority. A missed ray can use an actual source edge

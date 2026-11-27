@@ -1,0 +1,133 @@
+{
+  "product": "5aa8a6623a179979efc3aa8ba615ac1fb07e0a1b",
+  "parent": "ace2af1e3c97b8fcaf7800f65db3eb27d7608d01",
+  "scope": "Painted base, shared shade and emission over varying authored static level-zero clamp-linear UV0 images aligned with the native paint grid. Sampled mask parity and analytic RGB bounds. Exact native Editable GLB replay at 64 and 512 pixels.",
+  "native_checks_per_profile": 256,
+  "graphics_checks_per_profile": 175,
+  "registered_release_ctests": 3,
+  "terminal_invocation": {
+    "release_native": "21d17a3a83374ffd9f303cd3726e9e73",
+    "asan_native": "855f72fbe3bd49d6a80327ec8565e005",
+    "release_graphics_and_build": "caebfcd01a38403b9672a2c864bffc17",
+    "asan_graphics_and_build": "310551e051ad4504b2b156a8ecfc534b"
+  },
+  "graphics": {
+    "maximum_rgb_byte_difference_each_profile": 2,
+    "alpha_mismatches": 0,
+    "matching_picking_rays_per_fixture": 35,
+    "actual_hardware": "Intel Arc A770"
+  },
+  "app_sha256": {
+    "release": "0106f714ac823f003309b8ae9d7ae7e17c8ad01a4b9980951177e95ac8224642",
+    "asan": "2e9f1d72e77e250ffa3d5b86f19cde48ff9839135556159399cca822e22e82aa"
+  },
+  "files": {
+    "varying-mtoon-standard.glb": {
+      "release": "94658fba3c7fb09b6c226be5f7b3e80196dc6694296557bed4260bc6cf024630",
+      "asan": "94658fba3c7fb09b6c226be5f7b3e80196dc6694296557bed4260bc6cf024630"
+    },
+    "varying-mtoon-editable.glb": {
+      "release": "074cb991f04ad06e9fac9596035c3f75a1aad82821c0ca9bda49ca76bb12ea92",
+      "asan": "074cb991f04ad06e9fac9596035c3f75a1aad82821c0ca9bda49ca76bb12ea92"
+    },
+    "varying-mtoon-512-standard.glb": {
+      "release": "15a1298d198c4b2cf56ed4c767f9e3c62dc8889bdfef78cc8c572b9bcb5bcdc2",
+      "asan": "15a1298d198c4b2cf56ed4c767f9e3c62dc8889bdfef78cc8c572b9bcb5bcdc2"
+    },
+    "varying-mtoon-512-editable.glb": {
+      "release": "893f617f168d8ad3ea760fa820f3f5b38cc7835e781005aa7bd175a1ec3e3c3e",
+      "asan": "893f617f168d8ad3ea760fa820f3f5b38cc7835e781005aa7bd175a1ec3e3c3e"
+    },
+    "rendered-varying-mtoon.glb": {
+      "release": "6be293440b7cd080bbfe4d60a1f99a5a7a6562db8a59d990847872945fff64a0",
+      "asan": "6be293440b7cd080bbfe4d60a1f99a5a7a6562db8a59d990847872945fff64a0"
+    }
+  },
+  "previous_uniform_shared_controls": {
+    "shared-shade-standard.glb": "e44f8ba072a72dc72fd24e5190393c0ef1a80e2451af7f450f3adefb575739fa",
+    "shared-shade-editable.glb": "723110c2076b6e62ae5b227e2f13caf784b41059bf70877293e5c8b7f9a17a7e",
+    "shared-shade-512-standard.glb": "c2e12d8d55a685fa876680996b7079b0c32e4b91bf3e4aef98054613c22f482d",
+    "shared-shade-512-editable.glb": "ae79e13e18ccd913999d70688d562f918e7dbbbdcee4d9480a25c774b0be2e64",
+    "rendered-shared-shade-mtoon.glb": "34bd413ea147d21bc9fee57ec70c70f882ddf8e597e15881ad087cae8671d550"
+  },
+  "certified_filter_bounds": {
+    "varying-mtoon-standard.glb": {
+      "emissiveStrength": 1,
+      "maximumAlphaError": 1.0238418579323607e-06,
+      "maximumLinearColorError": 0.0035242367286202965,
+      "maximumLinearEmissionError": 0.0017425672011089346,
+      "maximumLinearShadeError": 0.0027379595089967726,
+      "maximumShadeInterpolationError": 0.000761333521706444,
+      "maximumSourceFilterError": 8.652455666485957e-05,
+      "sampling": "clamp-linear-level-zero",
+      "version": 1
+    },
+    "varying-mtoon-editable.glb": {
+      "emissiveStrength": 1,
+      "maximumAlphaError": 1.0238418579323607e-06,
+      "maximumLinearColorError": 0.0035242367286202965,
+      "maximumLinearEmissionError": 0.0017425672011089346,
+      "maximumLinearShadeError": 0.0027379595089967726,
+      "maximumShadeInterpolationError": 0.000761333521706444,
+      "maximumSourceFilterError": 8.652455666485957e-05,
+      "sampling": "clamp-linear-level-zero",
+      "version": 1
+    },
+    "varying-mtoon-512-standard.glb": {
+      "emissiveStrength": 1,
+      "maximumAlphaError": 1.0238418579323607e-06,
+      "maximumLinearColorError": 0.0039303112781117555,
+      "maximumLinearEmissionError": 0.00189490571641862,
+      "maximumLinearShadeError": 0.0028047918329032907,
+      "maximumShadeInterpolationError": 0.0006592354237403705,
+      "maximumSourceFilterError": 1.1647536474115715e-05,
+      "sampling": "clamp-linear-level-zero",
+      "version": 1
+    },
+    "varying-mtoon-512-editable.glb": {
+      "emissiveStrength": 1,
+      "maximumAlphaError": 1.0238418579323607e-06,
+      "maximumLinearColorError": 0.0039303112781117555,
+      "maximumLinearEmissionError": 0.00189490571641862,
+      "maximumLinearShadeError": 0.0028047918329032907,
+      "maximumShadeInterpolationError": 0.0006592354237403705,
+      "maximumSourceFilterError": 1.1647536474115715e-05,
+      "sampling": "clamp-linear-level-zero",
+      "version": 1
+    },
+    "rendered-varying-mtoon.glb": {
+      "emissiveStrength": 1,
+      "maximumAlphaError": 1.0238418579323607e-06,
+      "maximumLinearColorError": 0.003969876238693242,
+      "maximumLinearEmissionError": 0.001944854854770891,
+      "maximumLinearShadeError": 0.0027805800130103115,
+      "maximumShadeInterpolationError": 0.000969280484225902,
+      "maximumSourceFilterError": 0.00016826953665882935,
+      "sampling": "clamp-linear-level-zero",
+      "version": 1
+    }
+  },
+  "remaining": "Other grid dimensions, transforms, mipmaps and sampling modes, live UV animation, physical HDR, typed normal Bake, VRM integration and physical-device acceptance.",
+  "archive": {
+    "name": "varying-role-mtoon-20261127.tar.gz",
+    "sha256": "9dc946d9943fbba14c468a3288cb4c48e06696bb009d1f4823f01a4bf5e4ee7b",
+    "files": {
+      "arc/runtime.log": "ab4bc207c8de53f511bddc50c9a7895f4d3bacac59feb48752536271682c1f98",
+      "asan/graphics-runtime.log": "4b2dc0781ae1651b430407274be25b470480e8f2b24f1afb41fe8e35396dc2aa",
+      "asan/portable-runtime.log": "691341fdf1aef6dadbaff8f89369bfe37ce73edd19ba4be7917d2c95feb6b440",
+      "asan/version.log": "1e238f1d1d85c4375fc948017f5f5c3e17adb927cee6804aba9cf201300ca606",
+      "ctest/runtime.log": "aa62f5155ca657363918e559a8c28a86b7e676a9c041741bcdd293c83f64f119",
+      "interop/khronos.jsonl": "44430a867e9037ee23101a2b3ce5b68d7b55fa994a6d699d1aa141e59d946fd6",
+      "interop/rendered-varying-mtoon.glb.khronos.json": "fc801156bc72cb1703b26f2f27acfb3281d1637135d823a21406d1b970b8075b",
+      "interop/schemas.json": "b85c5b55e214d810284292df890ad25d4eea3603cd2376ca782e4ad2d52067ff",
+      "interop/varying-mtoon-512-editable.glb.khronos.json": "08d68107048c75c310fab47de66f49ccc8ded332cd712e1c93b0e4e049cf5f3e",
+      "interop/varying-mtoon-512-standard.glb.khronos.json": "5cde47b93a615a1a1ea8e93a72a52da5cc58cf907459e6eccf5f45dcad0e5197",
+      "interop/varying-mtoon-editable.glb.khronos.json": "38f836c801bff9ce7d3ad11aa53d6ff91ef0cd87bb2484098f68efb5ce5b70c0",
+      "interop/varying-mtoon-standard.glb.khronos.json": "2ca4523761aec58d35cfa0f69e7fddc52deb8833d28f57f9952557a1e9859a06",
+      "prior-regression/broader-asan.log": "0b9ffa467d98509ebe1f62adb03ba093daf7a9f7944a4c0b8f9c755d23633f12",
+      "release/graphics-runtime.log": "4a81afb9f1919595753161d38774a70892e6672bd423ca2c2fcfab5e10d59a94",
+      "release/portable-runtime.log": "aa7182fe8e136776812518f90e57d7340eec5c5270cee1cf9e98332f7a414a4a",
+      "release/version.log": "21fd5be7466827206ecc2de754da031d1976ead80c719bd2542f2508f2c86b8d"
+    }
+  }
+}
