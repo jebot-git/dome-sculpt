@@ -2232,6 +2232,11 @@ has started its all-target build on fixture commit `6b1d0c48` with the
 canonical `acc2b70a` DomeD toolkit.
 [Focused regression validation](validation/layered-normal-retopo-followup-20261127.json)
 
+The earlier sanitizer archive sweep reached the union cases. Its rebaked UV
+archive reached the 600-second CTest limit during the exhaustive Encode
+fault pass. A separate replay of the same binary and input is exercising
+all boundaries with a longer process window.
+
 ### Production retained-source LDR Bake
 
 Two prepared retained 1024-square LDR PBR members now preview and Bake
@@ -2255,10 +2260,45 @@ package for this fixture.
 The previous production HDR Standard and Editable cases retain their
 existing byte-identical outputs.
 
-Larger retained fields, repeated rebaking of multiple members, the
-reflected split-grid strict projection case, typed materials, alternate
-emission coordinates, HDR VRM and physical input acceptance remain open.
+Larger retained fields, typed materials, alternate emission coordinates,
+HDR VRM and physical input acceptance remain open.
 [Production LDR Bake validation](validation/native-texture-set-ldr-production-bake-20261127.json)
+
+### Repeated production Bake on retained material sets
+
+Normal history shares immutable full coverage, byte-identical role images
+and repeated write payloads. The renderer counts a common normal ancestor
+once across retained members. Each accepted Bake keeps its own event,
+selected material, source recipe and access to the prior field. Scene reopen
+replays the recorded fields and retains the existing image references.
+The older two-member project that failed the snapshot staging check now
+opens with both ranges and saves byte for byte.
+
+The 1024-square fixture alternates four more Bakes across two independently
+painted retained fields. It repeats one recipe and projects a different
+normal donor into each field. The test checks source isolation, exact
+undo/redo, cold reopen, Standard GLB and unchanged material membership.
+Editable GLB also restores the full native Bake history.
+
+A separate reflected and sheared 1024-square fixture projects into distinct
+paint and normal grids. Its donor is offset along the world-space geometric
+normal. The strict Bake retains physical FLOAT emission and the projected
+normal direction, and a short ray bound refuses atomically. The Standard
+and Editable outputs preserve the owning native project. The previous
+local-Z test placement has a real sideways shift under shear, so its strict
+ray miss remains a valid control.
+
+All 15 focused Release tests pass. Both production cases pass their
+registered ASan/UBSan checks and produce the same native scenes and GLBs
+as Release. The wider matching sanitizer set is still running. Synthetic
+OpenXR on software GL and Arc A770 reproduces both Standard GLBs. Native
+DomeD Wayland reproduces the repeated Bake package. The four Standard and
+Editable GLBs pass Khronos validation with zero errors and warnings.
+
+Larger fields, other production scenes and physical headset acceptance
+remain open. The full Release and sanitizer archive sweeps from the earlier
+regression milestone retain their own source scopes.
+[Repeated and reflected Bake validation](validation/native-texture-set-repeated-bake-20261127.json)
 
 ## Source and integration boundary
 

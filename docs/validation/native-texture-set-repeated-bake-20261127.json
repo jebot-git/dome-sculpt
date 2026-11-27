@@ -1,0 +1,440 @@
+{
+  "archive": {
+    "filename": "native-texture-set-repeated-bake-20261127.tar.gz",
+    "files": {
+      "asan/affected.json": "0eb59c9e401dd76acdd24442e359a6e2d21031878c3e8a7be405630e9575ce98",
+      "asan/ctest.log": "a833c7624df265b180beeec96b6bfce6f983b781c5edeb004b007eb90287b190",
+      "asan/legacy-open.log": "500c6a9234fe5728b04cdaa6a48d22654ff80ff19a0349b259a7dc986fd586c8",
+      "asan/multi-authoring.log": "d390c769619d73592afeba0652e95d638692128e05fe4f487a9b90fc0ad5dea1",
+      "asan/production.log": "a4fb85109204e3c67ee92a96cd7c904700b3919d11cd13cb26bc69da538f0b5c",
+      "asan/production.xml": "161d0190a5390b791c33e68e7529bec25bfbc6753221cc089504b1dde9280e77",
+      "asan/reflected-authoring.log": "0fe80ccf7533461e8a14279b58a791c65d4c97f11f2ff28ea824a1f9c36a1e57",
+      "diagnostic/world-normal-projection.log": "6333531362c1fa05b0dc9579c542eee5daad6bb67724c3bb5b22174e88f7244d",
+      "earlier-regression/asan-ctest.log": "899e96c1f363356c0e0ec0a2fa38520f0f27fde7ffe83f2612345cf6169646c5",
+      "khronos.log": "9cf0c8e2e4900904a428c9ffd944a7fcb7ef275dbc55ee988eafccb0e728e39c",
+      "khronos/2f2f5ab0827fdb86e190d4142968ffb35613c19c06ae729d1b410ef3c4b1137c.json": "b75d827fa4b95c45d55efc676e84d43fffcf435786a83feefdaf25f126d163be",
+      "khronos/66bbc1d87360cb06a3157c451174b0737169c9dd0678200646ac2047724844ad.json": "993bace1f86823317d020f0e64634981a22a3d04bb7a5b7a20f8ce53e2634a69",
+      "khronos/a900ec92381625ac60054726bfc62426320c90da3994eb16fa85b7cc1cb2dc86.json": "2cd168430ef779aec041ef0c387feedc9027a2e397bbe9e3cfaf8de48bb25ac7",
+      "khronos/db4595c15f2bfe8ca1fbe62ea232a4c577481685eeafc006cae6160eeec83e52.json": "6a7ce987254fc847d8ccdc67c9a8f2f33d081e3016ee7792320db0c8382acabb",
+      "legacy/baseline-cold-open.log": "955745d528f32e7d8a1968642cc39dd36515bfd379b64c55a743ddff7f71d315",
+      "legacy/local-z-projection.log": "6d9a5d906c382ffa5e61f278744810e37401a40eb63543a9544c0f5fef019774",
+      "legacy/second-bake-publication.log": "c610f56d3bb30263cc886bbe9a53ae7eb84b0b84cbe7898bae546eb9d9585dd5",
+      "multi/arc/accept-graphics.json": "bc75ae4ff162aff4733414edfab8fbc2bcbb431e47440c75c29d6ee2d05825b9",
+      "multi/arc/focus-graphics.json": "c2aab908e287dec31eae3cfe0f90e5acdf389516960c600cc3335caad47390a8",
+      "multi/arc/report.json": "3b46ec4f34c68717e31664655377cf419e30e4fe031ad98496288af1fd2535f7",
+      "multi/arc/status.json": "8200f1bb6265d1052bdb3c3ae839b44f45259c5593016911f61588015e64ed72",
+      "multi/software/accept-graphics.json": "6265d100ab81abab1362ec0bc46139042702f012f22f7779e50f29558eab3a37",
+      "multi/software/focus-graphics.json": "3d8f92e09c5f5adbd6a8df7d0c6529a5c4ca960c61e9dafbee568283fe4a41ab",
+      "multi/software/report.json": "3b46ec4f34c68717e31664655377cf419e30e4fe031ad98496288af1fd2535f7",
+      "multi/software/status.json": "38718c0f21b0a84a4ff7ff110e288e5f94ec3bf191ad8ae368885e1537d2a4ff",
+      "multi/wayland/report.json": "4ecec9690cb20b1ffcbdf5ee3c020900c13b005d77f96844c42331d3b5cfbb4d",
+      "multi/wayland/status.json": "e31b4b435e313c99bf00172862e87d508a18450d2ec6bbbf6dd88fd78c49c50d",
+      "reflected/arc/accept-graphics.json": "f5e95dd9e30ec72eea9479f466264871592da5c103ee4706bf37ac1cdda2751e",
+      "reflected/arc/focus-graphics.json": "c2aab908e287dec31eae3cfe0f90e5acdf389516960c600cc3335caad47390a8",
+      "reflected/arc/report.json": "3b46ec4f34c68717e31664655377cf419e30e4fe031ad98496288af1fd2535f7",
+      "reflected/arc/status.json": "b6a768b3ea5296a80a1c2932091b61ab87edb63ab42a2caab5783554770a50c8",
+      "reflected/software/accept-graphics.json": "6265d100ab81abab1362ec0bc46139042702f012f22f7779e50f29558eab3a37",
+      "reflected/software/focus-graphics.json": "3d8f92e09c5f5adbd6a8df7d0c6529a5c4ca960c61e9dafbee568283fe4a41ab",
+      "reflected/software/report.json": "3b46ec4f34c68717e31664655377cf419e30e4fe031ad98496288af1fd2535f7",
+      "reflected/software/status.json": "ac7a3415365aceae57e2af1612dff51bf2ecf1c4ec139ac2e96b7792b4c27fed",
+      "release/affected.json": "0eb59c9e401dd76acdd24442e359a6e2d21031878c3e8a7be405630e9575ce98",
+      "release/ctest.log": "8c1c7899f81bbd20afb6677ea475383ca6df460789a72ac92249c0557268da1b",
+      "release/ctest.xml": "d946376c54f63bd233eb665f7413d540e77e3167021744627bed22c530950f93",
+      "release/legacy-open.log": "1ee4d32ad47e4d49c476941ffc8d48b4640887755929203351826ba91dbc3d8a",
+      "release/multi-authoring.log": "3cc822951346f4975c8283a09ef67902ca837fed5dc3d17fff41498369ed1af6",
+      "release/reflected-authoring.log": "c8ffa5685c2c0e7c48f7cc61f44b83556bc9c07776b728649320995e3dbe7765"
+    },
+    "sha256": "ef172e25d0d89ad457e2d3f7074d724eadd4c41dcd3008fc14e2dcf0f7389a64"
+  },
+  "earlier_archive_fault_replay": {
+    "ActiveState": "active",
+    "ExecMainStatus": "0",
+    "InvocationID": "f0b35d1b1d2043b7924083533bf18191",
+    "MainPID": "2669541"
+  },
+  "frontends": {
+    "multi/arc": {
+      "app_sha256": "6ba8032700d4332a41ead211c317ce10d5668eaa88cea00e646a0909b3b2a54b",
+      "checks": 10,
+      "exit": 0,
+      "input_sha256": "1619dced4b2c96140acc33522ec1091a365bbed94f6728d826e292098bd5412b",
+      "invocation": "3e4d9e2a6aef4583ab67b143c5a679a5",
+      "mode": "arc",
+      "native_sha256": "2f2f5ab0827fdb86e190d4142968ffb35613c19c06ae729d1b410ef3c4b1137c",
+      "phase": "complete",
+      "report_sha256": "3b46ec4f34c68717e31664655377cf419e30e4fe031ad98496288af1fd2535f7",
+      "run_script_sha256": "8acd1aa09712493478daf95679a97dca44d0f9370a38425907934263a129b8ce",
+      "runtime_sha256": "40fa5b55ac329cf6dd77a3bdf5a5eac6f5f840d4ef43efd77678c588538fd8e9",
+      "terminal": true
+    },
+    "multi/software": {
+      "app_sha256": "f2f1fea8a68f388059e23db35ee72b6951e240fc9e8b0f144c0d053117cf6381",
+      "checks": 10,
+      "exit": 0,
+      "input_sha256": "1619dced4b2c96140acc33522ec1091a365bbed94f6728d826e292098bd5412b",
+      "invocation": "94cf62b9a2a04416918e84ea827bdfb7",
+      "mode": "software",
+      "native_sha256": "2f2f5ab0827fdb86e190d4142968ffb35613c19c06ae729d1b410ef3c4b1137c",
+      "phase": "complete",
+      "report_sha256": "3b46ec4f34c68717e31664655377cf419e30e4fe031ad98496288af1fd2535f7",
+      "run_script_sha256": "8acd1aa09712493478daf95679a97dca44d0f9370a38425907934263a129b8ce",
+      "runtime_sha256": "bbb5897e8616b8fafdbd9d22a4bba4f06290e278b37782134867d4b4477c1fac",
+      "terminal": true
+    },
+    "multi/wayland": {
+      "app_sha256": "f2f1fea8a68f388059e23db35ee72b6951e240fc9e8b0f144c0d053117cf6381",
+      "checks": 7,
+      "compositor_sha256": "47920142c8c803dcf5adb63ba643d2e347fbdcd1e15ecd8bce7c1a8dd47c0b7e",
+      "compositor_source": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+      "exit": 0,
+      "input_sha256": "1619dced4b2c96140acc33522ec1091a365bbed94f6728d826e292098bd5412b",
+      "invocation": "efe6df0e0bf64a6989d88f04c52ccaf8",
+      "mode": "wayland",
+      "native_sha256": "2f2f5ab0827fdb86e190d4142968ffb35613c19c06ae729d1b410ef3c4b1137c",
+      "phase": "complete",
+      "probe_sha256": "5bf11c670f66bbb68960073878933055b09582e5173ec1e3f472b413956c55aa",
+      "report_sha256": "4ecec9690cb20b1ffcbdf5ee3c020900c13b005d77f96844c42331d3b5cfbb4d",
+      "run_script_sha256": "fceadea67cb3753cf6aed0356d364fb2fdc425dd76ff19dc3e4498186e850ef4",
+      "terminal": true
+    },
+    "reflected/arc": {
+      "app_sha256": "6ba8032700d4332a41ead211c317ce10d5668eaa88cea00e646a0909b3b2a54b",
+      "checks": 10,
+      "exit": 0,
+      "input_sha256": "4d3fb27341a3c9c32de8127d6ff5f0b470ac8b4be679bedf11de828e83fb4861",
+      "invocation": "86b16181335540ce9ca8aeb21f2ceb81",
+      "mode": "arc",
+      "native_sha256": "db4595c15f2bfe8ca1fbe62ea232a4c577481685eeafc006cae6160eeec83e52",
+      "phase": "complete",
+      "report_sha256": "3b46ec4f34c68717e31664655377cf419e30e4fe031ad98496288af1fd2535f7",
+      "run_script_sha256": "8acd1aa09712493478daf95679a97dca44d0f9370a38425907934263a129b8ce",
+      "runtime_sha256": "40fa5b55ac329cf6dd77a3bdf5a5eac6f5f840d4ef43efd77678c588538fd8e9",
+      "terminal": true
+    },
+    "reflected/software": {
+      "app_sha256": "f2f1fea8a68f388059e23db35ee72b6951e240fc9e8b0f144c0d053117cf6381",
+      "checks": 10,
+      "exit": 0,
+      "input_sha256": "4d3fb27341a3c9c32de8127d6ff5f0b470ac8b4be679bedf11de828e83fb4861",
+      "invocation": "c0b52107bf444970b65fd18e21e2e3c3",
+      "mode": "software",
+      "native_sha256": "db4595c15f2bfe8ca1fbe62ea232a4c577481685eeafc006cae6160eeec83e52",
+      "phase": "complete",
+      "report_sha256": "3b46ec4f34c68717e31664655377cf419e30e4fe031ad98496288af1fd2535f7",
+      "run_script_sha256": "8acd1aa09712493478daf95679a97dca44d0f9370a38425907934263a129b8ce",
+      "runtime_sha256": "bbb5897e8616b8fafdbd9d22a4bba4f06290e278b37782134867d4b4477c1fac",
+      "terminal": true
+    }
+  },
+  "identical_packages": {
+    "reflected-editable": "a900ec92381625ac60054726bfc62426320c90da3994eb16fa85b7cc1cb2dc86",
+    "reflected-native": "4d3fb27341a3c9c32de8127d6ff5f0b470ac8b4be679bedf11de828e83fb4861",
+    "reflected-standard": "db4595c15f2bfe8ca1fbe62ea232a4c577481685eeafc006cae6160eeec83e52",
+    "repeated-editable": "66bbc1d87360cb06a3157c451174b0737169c9dd0678200646ac2047724844ad",
+    "repeated-native-0": "b039a7c1f520981ebb3e8942eb095cb1eeccdf6c9cee810cf1ff420b0ed9c9d9",
+    "repeated-native-1": "9ad8bbee4d261fa3542a1aa2576fbdd2cd466c4248e3a3a6af3c87d464f6b30d",
+    "repeated-native-2": "75bdbf527b60298c201cfe16cdb2424aac5737888793b142d66689e07153e9b7",
+    "repeated-native-3": "1619dced4b2c96140acc33522ec1091a365bbed94f6728d826e292098bd5412b",
+    "repeated-standard": "2f2f5ab0827fdb86e190d4142968ffb35613c19c06ae729d1b410ef3c4b1137c"
+  },
+  "khronos": [
+    {
+      "authored": [
+        [
+          [
+            1024,
+            1024
+          ],
+          [
+            1024,
+            1024
+          ],
+          [
+            1024,
+            1024
+          ]
+        ],
+        [
+          [
+            1024,
+            1024
+          ],
+          [
+            1024,
+            1024
+          ],
+          [
+            1024,
+            1024
+          ]
+        ]
+      ],
+      "errors": 0,
+      "file": "release-verify/registered/texture-set-retained-multi-production-bake/multi.glb",
+      "sha256": "2f2f5ab0827fdb86e190d4142968ffb35613c19c06ae729d1b410ef3c4b1137c",
+      "validator": "2.0.0-dev.3.10",
+      "warnings": 0
+    },
+    {
+      "authored": [
+        [
+          [
+            1024,
+            1024
+          ],
+          [
+            1024,
+            1024
+          ],
+          [
+            1024,
+            1024
+          ]
+        ],
+        [
+          [
+            1024,
+            1024
+          ],
+          [
+            1024,
+            1024
+          ],
+          [
+            1024,
+            1024
+          ]
+        ]
+      ],
+      "errors": 0,
+      "file": "release-authoring-exports/multi/editable.glb",
+      "sha256": "66bbc1d87360cb06a3157c451174b0737169c9dd0678200646ac2047724844ad",
+      "validator": "2.0.0-dev.3.10",
+      "warnings": 0
+    },
+    {
+      "authored": [
+        [
+          [
+            1024,
+            1024
+          ],
+          [
+            1024,
+            1024
+          ],
+          [
+            1024,
+            1024
+          ]
+        ],
+        [
+          [
+            1024,
+            1024
+          ],
+          [
+            1024,
+            1024
+          ],
+          [
+            1024,
+            1024
+          ]
+        ]
+      ],
+      "errors": 0,
+      "file": "release-authoring-exports/reflected/standard.glb",
+      "sha256": "db4595c15f2bfe8ca1fbe62ea232a4c577481685eeafc006cae6160eeec83e52",
+      "validator": "2.0.0-dev.3.10",
+      "warnings": 0
+    },
+    {
+      "authored": [
+        [
+          [
+            1024,
+            1024
+          ],
+          [
+            1024,
+            1024
+          ],
+          [
+            1024,
+            1024
+          ]
+        ],
+        [
+          [
+            1024,
+            1024
+          ],
+          [
+            1024,
+            1024
+          ],
+          [
+            1024,
+            1024
+          ]
+        ]
+      ],
+      "errors": 0,
+      "file": "release-authoring-exports/reflected/editable.glb",
+      "sha256": "a900ec92381625ac60054726bfc62426320c90da3994eb16fa85b7cc1cb2dc86",
+      "validator": "2.0.0-dev.3.10",
+      "warnings": 0
+    }
+  ],
+  "open": "Other production scenes, larger and typed grids, differing original emission coordinates, physical headset/input and full integrated regression.",
+  "product": "778d463d3ba4e6708e25ddd3965179b198db486f",
+  "profiles": {
+    "asan": {
+      "application_sha256": "6ba8032700d4332a41ead211c317ce10d5668eaa88cea00e646a0909b3b2a54b",
+      "core_sha256": "a4b1bd860f5742dc254703dd3fce2b378d4a06c8fe590246da3d432c03111dfa",
+      "fixture_sha256": "b905684f0fe0ec7d297c410782bb6e5c11528545aa991a6fea17df043b335b95",
+      "full_selected_sanitizer_in_progress": {
+        "ActiveState": "active",
+        "ExecMainStatus": "0",
+        "InvocationID": "6dc59ab83f264eeeb0151019feb66d06",
+        "MainPID": "2662938"
+      },
+      "legacy_sha256": "0a927c7d45983446e85c712166e7fce31ca4d08544806a9543d26c36377f2f9b",
+      "observed_sanitizer_passes": [
+        "source-canonical-normal-bake",
+        "baked-normal-field",
+        "baked-normal-field-faults",
+        "layered-normal-native",
+        "canonical-native-pose",
+        "canonical-normal-uv",
+        "canonical-normal-conversion",
+        "layered-normal-render",
+        "texture-set-retained-hdr-production-standard"
+      ],
+      "production_registered": {
+        "texture-set-retained-multi-production-bake": 194.075,
+        "texture-set-retained-reflected-production-bake": 106.136
+      },
+      "recompiled_translation_units": {
+        "dome-sculpt-core": [
+          "bake-authoring.cpp",
+          "baked-normal-archive.cpp",
+          "baked-normal-field.cpp",
+          "canonical-native-pose.cpp",
+          "canonical-normal-owner.cpp",
+          "canonical-paint-archive.cpp",
+          "canonical-paint-sampling.cpp",
+          "canonical-paint-uv.cpp",
+          "color-paint-sampling.cpp",
+          "color-preparation.cpp",
+          "color-uv-reprojection.cpp",
+          "document.cpp",
+          "emission-bake-source.cpp",
+          "emission-package.cpp",
+          "export.cpp",
+          "material-bindings.cpp",
+          "native-authoring-compiler.cpp",
+          "normal-key-derivation.cpp",
+          "normal-preparation.cpp",
+          "normal-preview.cpp",
+          "normal-sampling-replay.cpp",
+          "normal-sampling-surface.cpp",
+          "normal-uv-reprojection.cpp",
+          "paint.cpp",
+          "polygon-scene.cpp",
+          "polygon-surface-owner.cpp",
+          "polygon-surface-preview.cpp",
+          "scene.cpp",
+          "source-uv-bake.cpp",
+          "texture-set-export.cpp",
+          "texture-set-field-source.cpp",
+          "texture-set-worker.cpp",
+          "vrm1-authoring.cpp",
+          "vrm1-export.cpp",
+          "vrm1-expression-layer.cpp"
+        ],
+        "dome-sculpt-render": [
+          "render.cpp"
+        ]
+      },
+      "renderer_sha256": "b12fdae5ba15448a5c4826ee1425240cb6400ffbfc8b0a6bb33b35004bb0b3ca"
+    },
+    "release": {
+      "application_sha256": "f2f1fea8a68f388059e23db35ee72b6951e240fc9e8b0f144c0d053117cf6381",
+      "core_sha256": "890d113418aba24dff1a663b0aef0c332450d93d678b8202e440fbef81c685af",
+      "fixture_sha256": "4694f9fb474bb22f2122794f0f35f9e2ed106c54f6fe32a78160edd7faa58613",
+      "legacy_sha256": "0a927c7d45983446e85c712166e7fce31ca4d08544806a9543d26c36377f2f9b",
+      "recompiled_translation_units": {
+        "dome-sculpt-core": [
+          "bake-authoring.cpp",
+          "baked-normal-archive.cpp",
+          "baked-normal-field.cpp",
+          "canonical-native-pose.cpp",
+          "canonical-normal-owner.cpp",
+          "canonical-paint-archive.cpp",
+          "canonical-paint-sampling.cpp",
+          "canonical-paint-uv.cpp",
+          "color-paint-sampling.cpp",
+          "color-preparation.cpp",
+          "color-uv-reprojection.cpp",
+          "document.cpp",
+          "emission-bake-source.cpp",
+          "emission-package.cpp",
+          "export.cpp",
+          "material-bindings.cpp",
+          "native-authoring-compiler.cpp",
+          "normal-key-derivation.cpp",
+          "normal-preparation.cpp",
+          "normal-preview.cpp",
+          "normal-sampling-replay.cpp",
+          "normal-sampling-surface.cpp",
+          "normal-uv-reprojection.cpp",
+          "paint.cpp",
+          "polygon-scene.cpp",
+          "polygon-surface-owner.cpp",
+          "polygon-surface-preview.cpp",
+          "scene.cpp",
+          "source-uv-bake.cpp",
+          "texture-set-export.cpp",
+          "texture-set-field-source.cpp",
+          "texture-set-worker.cpp",
+          "vrm1-authoring.cpp",
+          "vrm1-export.cpp",
+          "vrm1-expression-layer.cpp"
+        ],
+        "dome-sculpt-render": [
+          "render.cpp"
+        ]
+      },
+      "registered": {
+        "baked-normal-field": 0.0740743,
+        "baked-normal-field-faults": 0.041999,
+        "canonical-native-pose": 0.143759,
+        "canonical-normal-conversion": 0.269534,
+        "canonical-normal-uv": 0.0723334,
+        "layered-normal-native": 0.46461,
+        "layered-normal-render": 2.05285,
+        "source-canonical-normal-bake": 5.58324,
+        "texture-set-retained-bake-source": 2.46121,
+        "texture-set-retained-bake-target": 1.18344,
+        "texture-set-retained-hdr-production-editable": 15.154,
+        "texture-set-retained-hdr-production-standard": 19.4369,
+        "texture-set-retained-ldr-production-bake": 16.3865,
+        "texture-set-retained-multi-production-bake": 30.9113,
+        "texture-set-retained-reflected-production-bake": 17.2616
+      },
+      "renderer_sha256": "ac053cc26d0ec9dddb90bca6bb687f11edc7029f0d45fc7afb048da544ba5a50"
+    }
+  },
+  "scope": "Paired prepared retained PBR texture sets at 1024 square. Repeated native Bake with separate donors, source isolation, exact native history and Standard and Editable GLB. Strict reflected split-grid physical Bake with an independently placed donor and short-range refusal.",
+  "source_sha256": {
+    "CMakeLists.txt": "e522d1aec518d30ff84ab4b0c754cb1b8a52d49e879e8e43b829b76a30c08351",
+    "src/baked-normal-archive.cpp": "5e78aed219d26f520f31ea640ba7fbf21458ce31fc57ef9d3bd0c7cc5a8247e3",
+    "src/baked-normal-field.cpp": "580ccfe2bff51f87f8bdc6d09a4091cd27b6b44e3f1bdf32f2b7b0c2b3590064",
+    "src/baked-normal-field.hpp": "2dd58ce3f02df8540a7793c3414f3880a6e16fbbea1689d1c549c2dc773e87de",
+    "src/texture-set-worker.cpp": "154aa6825d0fb1bb35b4f5ecf64a2198d68c7cb5d1d19d09e187bddbf821079a",
+    "tests/texture-set-source-export.cpp": "81fa32eadfe90ff18388d87a2f7fd8f6d186f8495668f639f296dce4bcbc5cc0"
+  },
+  "toolkit": "acc2b70ae61dedec2a23727f67c60c0303d0f76f"
+}

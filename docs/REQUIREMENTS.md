@@ -161,6 +161,14 @@ Wayland, software and Arc synthetic OpenXR, and independent GLB checks pass
 for this workflow. Larger fields and repeated multi-member rebaking remain
 open. [Production LDR Bake evidence](validation/native-texture-set-ldr-production-bake-20261127.json)
 
+Repeated production Bake now alternates between two retained 1024-square
+PBR fields and preserves both independent editable histories. Equal
+normal payloads share immutable storage. Earlier duplicate-plane archives
+still round-trip byte for byte. A separate reflected and sheared test
+bakes exact FLOAT emission across independent paint and normal grids
+with the donor offset along the actual world-space normal.
+[Repeated and reflected Bake evidence](validation/native-texture-set-repeated-bake-20261127.json)
+
 Strict Bake rays now recover source-edge contacts affected by float staging.
 An exact ray hit has priority. A missed ray can use an actual source edge
 within a radius derived from float spacing and inside its original front/back
