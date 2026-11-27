@@ -1,0 +1,224 @@
+{
+  "product": "0432e1a3bb5d5922d125e19005a11b0eb19e4678",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "release_fltk": "/opt/fltk-vr/toolkit",
+  "fltk_sha256": "35aa46ebf11f5f3a9772d926b05a24938572471d9dbcf3e2718e98376fadbdb3",
+  "desktop_compositor_sha256": "47920142c8c803dcf5adb63ba643d2e347fbdcd1e15ecd8bce7c1a8dd47c0b7e",
+  "release_app_sha256": "81621c9679ab2830d21cfd6564f8034085a38929a208b368c1c7690e771430a7",
+  "release_tests": [
+    "native-paint32-fixture",
+    "retopology-affine-ui-fixture",
+    "layered-normal-native",
+    "layered-normal-uv-native",
+    "retopology-affine-openxr",
+    "retopology-caller-admission",
+    "retopology-input-admission",
+    "dome-sculpt-texture-set-export",
+    "retopology-reapply-plain",
+    "retopology-reapply-affine",
+    "retopology-save-handoff",
+    "retopology-prepared-affine",
+    "retopology-prepared-plain",
+    "retopology-held-admission",
+    "retopology-history-openxr-apply",
+    "authoring-native-normal-union",
+    "retopology-restore-plain",
+    "texture-set-retained-skin",
+    "retopology-history-openxr-cancel",
+    "dome-sculpt-texture-set-source-export",
+    "texture-set-retained-shapekeys",
+    "retopology-restore-affine",
+    "retopology-surface-heat-plain",
+    "retopology-mtoon-plain",
+    "retopology-linked-vrm1",
+    "retopology-mtoon-affine",
+    "retopology-surface-heat-affine",
+    "texture-set-mtoon-independent-paint",
+    "retopology-affine",
+    "retopology-mtoon-v0",
+    "retopology-material-seam-affine",
+    "vrm1-retained-skinned-accessory",
+    "retopology-material-seam-plain",
+    "retopology-affine-wire",
+    "retopology-worker-accepted-publication",
+    "retopology-authoring",
+    "texture-set-mtoon-varying-alpha",
+    "retopology-mixed-material",
+    "retopology-authority-focus",
+    "texture-set-mtoon-derivative-tangent",
+    "dome-sculpt-texture-set-surfaces",
+    "retopology-worker-faults",
+    "retopology-authority-grab",
+    "retopology-worker-reporter-recovery",
+    "texture-set-active-bake",
+    "retopology-subdivide-seam-affine",
+    "retopology-subdivide-seam-plain"
+  ],
+  "strict_cases": [
+    "retopology-restore-affine",
+    "retopology-affine-wire",
+    "retopology-material-seam-plain",
+    "retopology-material-seam-affine",
+    "retopology-authoring",
+    "retopology-mixed-material",
+    "retopology-subdivide-seam-plain",
+    "retopology-reapply-affine",
+    "retopology-subdivide-seam-affine"
+  ],
+  "asan_ubsan": "Rebuilt changed sources and header owners with CMake and ran with strict leak and undefined behavior checks",
+  "release_asan_byte_match_sha256": {
+    "retopology-subdivide-seam-plain/before-seam.dsculpt": "39fca72e8c7268b44150bc677e4f10db3bc0e995544a3e579b9010a01881d264",
+    "retopology-subdivide-seam-plain/after-seam.dsculpt": "d70e3f84420fa0fe98682199ce5f2e5ec494fb078b45ea0ccfaa54e64d93940e",
+    "retopology-subdivide-seam-plain/resubdivided.dsculpt": "ee5ef534c35d199d9281c614ed12fcb861c25697cfdf680800c5a4f289c58e76",
+    "retopology-subdivide-seam-plain/standard.glb": "f9f380b2f1c74d0e90cb6c3a75d6bf4801bdc331d18c30d9d5d26c900c6e7257",
+    "retopology-subdivide-seam-plain/editable.glb": "b5fe88e2add8a74f84ac818a190c390cc3a81fb872626ab33561ee9d0228bf04",
+    "retopology-subdivide-seam-plain/subdivision-only-reference.dsculpt": "436221c33c124336aa98d2bfeb509b7b30301bd0c7321d410015974cf7fd7717",
+    "retopology-subdivide-seam-affine/before-seam.dsculpt": "8a055dd4870e243b19a02f97054168143426bdfd1b595b12b3daf05033298258",
+    "retopology-subdivide-seam-affine/after-seam.dsculpt": "8c081ef723dea2a89aeed8247a69e39e035b5d8868453f0a81094593f2b91e3f",
+    "retopology-subdivide-seam-affine/resubdivided.dsculpt": "d881bc0c6afe983e48d15e5751cb0ced70514750979cb3b5637c28743cf07354",
+    "retopology-subdivide-seam-affine/standard.glb": "3bae050a038fb129ef727ed6f78236940b9c68a215a8f6b3364cb086ca576b43",
+    "retopology-subdivide-seam-affine/editable.glb": "b69a7d654d99f3d7f94aa4c7a97a7b2133696c516ab30e2dbc660bed74036600"
+  },
+  "khronos_validator_version": "2.0.0-dev.3.10",
+  "khronos": {
+    "plain-standard": {
+      "errors": 0,
+      "warnings": []
+    },
+    "plain-editable": {
+      "errors": 0,
+      "warnings": []
+    },
+    "affine-standard": {
+      "errors": 0,
+      "warnings": []
+    },
+    "affine-editable": {
+      "errors": 0,
+      "warnings": []
+    }
+  },
+  "synthetic_openxr": {
+    "arc-plain": {
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "stereo_frames": [
+        6,
+        6
+      ],
+      "changed_rgb_components_per_eye": [
+        29976,
+        29514
+      ],
+      "both_material_colors_in_each_eye": true,
+      "exact_ordered_close": true
+    },
+    "arc-affine": {
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "stereo_frames": [
+        6,
+        6
+      ],
+      "changed_rgb_components_per_eye": [
+        34086,
+        34044
+      ],
+      "both_material_colors_in_each_eye": true,
+      "exact_ordered_close": true
+    },
+    "software-plain": {
+      "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+      "stereo_frames": [
+        6,
+        6
+      ],
+      "changed_rgb_components_per_eye": [
+        29976,
+        29514
+      ],
+      "both_material_colors_in_each_eye": true,
+      "exact_ordered_close": true
+    },
+    "software-affine": {
+      "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+      "stereo_frames": [
+        6,
+        6
+      ],
+      "changed_rgb_components_per_eye": [
+        34080,
+        34044
+      ],
+      "both_material_colors_in_each_eye": true,
+      "exact_ordered_close": true
+    }
+  },
+  "native_wayland": [
+    {
+      "passed": true,
+      "check": "Native retopology editor publishes the canonical Dome Sculpt Wayland identity"
+    },
+    {
+      "passed": true,
+      "check": "The actual Wayland universal menu enables Start patch on the saved replacement"
+    },
+    {
+      "passed": true,
+      "check": "An unchanged reopened patch keeps Apply disabled"
+    },
+    {
+      "passed": true,
+      "check": "Both diagonal endpoints were selected in the canvas without placing new vertices"
+    },
+    {
+      "passed": true,
+      "check": "Clicking Seam edge through the universal menu creates the editable split"
+    },
+    {
+      "passed": true,
+      "check": "The new real seam enables the universal Subdivide edge action"
+    },
+    {
+      "passed": true,
+      "check": "Subdivision changes the selection to the editable midpoint"
+    },
+    {
+      "passed": true,
+      "check": "Apply and universal Save match the native worker reference byte for byte"
+    },
+    {
+      "passed": true,
+      "check": "Native client releases the compositor and export worker on close"
+    }
+  ],
+  "physical_headset": false,
+  "combined_release_at_checkpoint": {
+    "candidate": "0432e1a3bb5d5922d125e19005a11b0eb19e4678",
+    "terminal": false,
+    "invocation": "5fbdca0a590b4f47a64c9c8f609539a0",
+    "phase": "wait for earlier combined Release",
+    "earlier_unit": "ds-mtoon-static-normal-uv-combined-release-20261127.service",
+    "earlier_pid": 64719,
+    "elapsed_seconds": 175.764
+  },
+  "archive_sha256": "69153dd8f0ae2c8ed2be847cb96e3016a85807d4560204df68af0f9974b8f57f",
+  "archive_members_sha256": {
+    "combined-release.py": "66c88487b0f2c6ac702fb2ec93cdd90e9615ce5fe790d7defa2cdf4748afd15a",
+    "release-verified.log": "17eeba4014e68f17a5e997f44b90e15c7495a13c0f5fc017fba6844c404d2c8a",
+    "release/Testing/Temporary/LastTest.log": "b05af729478912ef18f425c9f24aa25ba6890745d5fedb667f20cbebb6abf641",
+    "asan-final.log": "91219ed89975faf69fef4a9b8803dccfb366a53c2341f74a333313895590d09e",
+    "asan/Testing/Temporary/LastTest.log": "7650223c7f593f570444455e0f1ab7da821113c24ce8eca23336840bfd797bca",
+    "asan-final-build.log": "5b92e8a25b4dafe6b07969150430547a82f46113df6ea2d8114680570968ad6c",
+    "run-render.py": "948997fa47b26d7992dcfd0f7e1542a7f5f601690ddd7d26daef3b49bf9364b5",
+    "xr-seam.py": "9999a70971bed83a3b13caa048561292547649efbbcc15ec1f7405f727c2f7df",
+    "khronos.cjs": "dc131aedbd46c3b0296c88927508cfccd6099911ea330bfc253b0de59334b02e",
+    "khronos.json": "d4b577d162baa33d14df773be22c56182006404f58986c75e2a9b2317a4faf97",
+    "run-wayland.py": "23767bba00827e3926e62440da6fd32673d4f52a936e994d5a90dc55610aa5a9",
+    "wayland-seam.py": "31b3b200ea124d45e683bf9caa4f66273b791d521375655beefa93ad688576a2",
+    "wayland-seam/report.json": "c0bb5fc7db7c907c699e5fde1c38e4f78bfc2bf2f328a427f883ae7aa5e10b48",
+    "wayland-seam/corners.json": "2471c5480595ad5be1c2b2c3c3a5c9b18341f9b87da5d2b8beb837e7ec328d88",
+    "xr-arc-plain/compare.json": "73d97afab38b450b517e4dc42d5c91e11ea7e56bef200398b109d1345287099f",
+    "xr-arc-affine/compare.json": "350868c8a5f7c613378c7694ffa37f88fea5907a450b6e8fb01b093ab9872fec",
+    "xr-software-plain/compare.json": "7c794d084de42fdf00f4d2dd387dfc1b6fdafcf9cae866f25dc1df03181bb6e3",
+    "xr-software-affine/compare.json": "30a57503e6ec8144c635cbd53b8dd92892567e7609d44c8d1dae68d38fa70aef"
+  }
+}

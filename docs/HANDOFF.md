@@ -163,6 +163,28 @@ with zero errors or warnings. The 45 selected Release and seven ASan/UBSan
 cases pass, with nine project and GLB files identical across both builds.
 [Material seam validation](validation/retopology-material-seam-20261127.json)
 
+**Subdivide edge** creates an editable midpoint on an existing retopology
+edge. The original ID stays on one half and both halves keep the seam flag.
+Incident triangles split in place. Incident quads use their existing
+triangulation and keep connected faces on both sides of the new midpoint.
+The DomeD universal menu enables the command for two connected points. In
+XR, the edge sector shows **Subdivide edge** when those points share an edge.
+
+Apply resolves new triangles to the prior material side
+using their midpoint and corner ancestry. Both material slots and editable
+paint survive repeated subdivision, moving the seam across its old location,
+and subdividing again after a cold Open. The two native fixtures cover
+plain and reflected/sheared placements, controller dispatch, desktop
+editing, ordered Save, Undo/Redo, and Standard and Editable GLB. The
+nested DomeD canvas and universal menu save the same result as the worker.
+Synthetic OpenXR reopens and renders both colours in both eyes on Arc A770
+and llvmpipe. Khronos reports zero errors and warnings for all four GLBs.
+All 47 selected Release tests and nine ASan/UBSan tests pass. The 11 native
+project and GLB outputs match byte for byte across both builds.
+The new full Release run for `0432e1a3` is queued behind the earlier
+integrated suite as `ds-retopology-subdivide-combined-release-20261127.service`.
+[Edge subdivision validation](validation/retopology-subdivision-20261127.json)
+
 Geometry-changing retopology now transfers native single-material prepared
 normal fields. The worker uses the original placed tangent frame and
 rebuilds the frame on the replacement. It samples the PBR and toon normal

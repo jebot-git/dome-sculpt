@@ -110,6 +110,16 @@ retain the split and its provenance. General subdivision across unresolved
 material boundaries remains required.
 [Material seam evidence](validation/retopology-material-seam-20261127.json)
 
+Retopology edge subdivision is available from the DomeD universal menu and
+the existing XR edge sector. It inserts an editable midpoint, carries seam
+flags onto both halves, and splits incident triangles or triangulated quads.
+Material and paint ownership follow stable triangle ancestry through
+repeated subdivision, Move, Save/Open, and Undo/Redo. The native archive
+keeps subdivision provenance and reads earlier patch archives. A new
+boundary cutting across unrelated material triangles still requires explicit
+material assignment or boundary resolution.
+[Edge subdivision evidence](validation/retopology-subdivision-20261127.json)
+
 Changed retopology faces can now carry native single-material prepared
 normal maps under reflected and sheared placements and after independent
 retained UV editing. The two normal roles keep their own sampling and
