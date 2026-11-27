@@ -150,8 +150,15 @@ together on native single-material patches. The ordinary portable-normal
 command preserves existing resolved colour, and the reverse preparation
 order also works. Apply, Clear Bake, Save/Open and Undo/Redo preserve the
 two owners. Standard and Editable GLB carry the resolved texture and
-portable normal frame. Combined retained UV grids and non-identity colour
-fields remain open. [Combined-field evidence](validation/retopology-color-normal-20261127.json)
+portable normal frame. Non-identity colour fields remain open.
+[Combined-field evidence](validation/retopology-color-normal-20261127.json)
+
+The native identity-colour and portable-normal workflow now retains its
+independent grids through repeated UV edits, ordered Save/Open, Restore,
+rebaking and subsequent changed-topology Apply. GLB keeps the two sampling
+roles alongside the edited layout. Native non-identity fields, imported
+material sets and physical headset acceptance remain open.
+[Combined retained UV evidence](validation/retopology-color-normal-uv-20261127.json)
 
 Changed retopology now reprojects static native MToon texture sets using the
 actual material slot of each triangle and independent role output grids.

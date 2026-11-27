@@ -266,10 +266,29 @@ dispatches conversion through the universal menu and saves the same
 project as the native worker. Synthetic OpenXR compares colour and normal
 controls independently in both eyes on software GL and Intel Arc A770.
 The 55 selected Release tests and six ASan/UBSan workflows pass with 25
-native and GLB files matching across both builds. Combined preparation of
-retained UV grids, non-identity colour fields and imported material sets
-still needs transfer support.
+native and GLB files matching across both builds. Non-identity colour
+fields and imported material sets still need transfer support.
 [Combined colour and normal validation](validation/retopology-color-normal-20261127.json)
+
+The UV editor now keeps the original sampling grids for native patches
+that combine identity-colour preparation and portable baked normals.
+Repeated edits change the displayed UV layout while sharing the exact
+original colour image, editable tiles, Bake and normal-frame owners.
+Save/Open, Undo/Redo and Restore retain both fields. Rebake updates the
+two roles through their retained coordinates. Retopology Apply after a
+cold Open projects the retained fields onto the replacement atlas,
+including after an out-of-range move and edge subdivision.
+
+Standard GLB carries the edited UV layout alongside the original ordered
+colour and normal coordinates. Synthetic OpenXR draws byte-identical RGB
+in both eyes before and after the UV edits on software GL and Intel Arc.
+The nested DomeD test used the universal menu and pointer, confirmed Apply
+was visible at 1280×800, and reopened the saved edit. All six GLBs pass
+Khronos validation with zero errors and warnings. The 61 selected Release
+tests and eight ASan/UBSan tests pass. The two fixtures generate 24 matching
+native and GLB files across both build profiles. Native non-identity fields
+and imported material sets still need their own transfer paths.
+[Combined retained UV validation](validation/retopology-color-normal-uv-20261127.json)
 
 Changed native retopology now transfers static MToon 0 and 1 images per
 material slot. The worker samples each slot's previous rest surface with
