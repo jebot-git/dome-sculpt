@@ -45,8 +45,25 @@ int main(int argc,char **argv)try{
  unsigned number=0;
  for(const auto &normal_file:normal_files){
   const auto normals=Scene::load(normal_file);const auto normal_exact=normals.encode();
-  check(rejects([&]{detail::native_weight_retention_impl::Counter budget(512*1024*1024,500'000'000);budget.material(normals.active().material_bindings);}),
-    "Anatomical ownership budget refuses unrepresented authentic canonical roots, including after Clear");
+  using detail::native_weight_retention_impl::Counter;
+  const auto &binding=normals.active().material_bindings;
+  check(binding&&binding->canonical_attributes,
+    "Anatomical admission receives the genuine canonical root, including after Clear");
+  Counter budget(512*1024*1024);
+  const auto empty=budget.used;
+  budget.material(binding);
+  const auto bytes=budget.used;
+  check(bytes>empty&&budget.count>1,"Anatomical admission accounts for the retained material and canonical owners");
+  budget.material(binding);
+  check(budget.used==bytes,"Anatomical admission charges a shared canonical material only once");
+  bool too_small=false;
+  try {
+   Counter restricted(bytes-1);
+   restricted.material(binding);
+  } catch(const std::length_error&) {
+   too_small=true;
+  }
+  check(too_small,"Anatomical admission rejects the same authentic owners when the budget is one byte short");
   const bool retained_paint=normal_owner(normals.active());
   check(retained_paint?(normal_exact.at("version")==37&&normal_exact.at("source_materials").at("version")==19):
     (normal_exact.at("version")==33||normal_exact.at("version")==34),
