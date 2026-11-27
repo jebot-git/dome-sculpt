@@ -33,6 +33,12 @@ int main()try {
  auto warm=owner->raycast({.013f,.017f,1},{0,0,-1},2);require(bool(warm),"cold indexed ray missed known geometry");
  fail_after=0;auto hit=owner->raycast({.013f,.017f,1},{0,0,-1},2);fail_after=-1;require(bool(hit),"warmed bounded ray allocated or missed known geometry");
  options.voxel_size=owner->voxel_size()*.5f;
+ // A new GPU program makes one-time runtime allocations. The fault probes
+ // repeat the same transaction after that program is cached.
+ {
+  Scene warmup=source;
+  require(resample_sculpt_object(warmup,1,options),"resolution allocation warmup failed");
+ }
  Scene successful=source;allocations=0;observe=true;bool changed=resample_sculpt_object(successful,1,options);observe=false;
  require(changed && allocations>100,"allocation baseline failed");size_t total=allocations;
  std::vector<size_t> boundaries;for(size_t n=0;n<64;++n)boundaries.push_back(n);
