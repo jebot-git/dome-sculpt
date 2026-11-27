@@ -5291,6 +5291,11 @@ if(BUILD_TESTING)
   add_test(NAME texture-set-retained-native-target COMMAND dome-sculpt-texture-set-source-export-test
     --retained-native-target ${CMAKE_CURRENT_BINARY_DIR}/texture-set-retained-native-target)
   set_tests_properties(texture-set-retained-native-target PROPERTIES TIMEOUT 300)
+  foreach(placement plain affine)
+    add_test(NAME texture-set-native-grid-resize-${placement} COMMAND dome-sculpt-texture-set-source-export-test
+      --resize-native-polygon-grid ${CMAKE_CURRENT_BINARY_DIR}/texture-set-native-grid-resize-${placement} ${placement})
+    set_tests_properties(texture-set-native-grid-resize-${placement} PROPERTIES TIMEOUT 300)
+  endforeach()
 
   if(TARGET dome-sculpt AND TARGET dome-sculpt-test-runtime)
     add_test(NAME texture-set-retained-source-openxr COMMAND ${Python3_EXECUTABLE}

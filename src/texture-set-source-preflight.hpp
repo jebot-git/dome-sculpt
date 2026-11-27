@@ -7,18 +7,23 @@ namespace dome::detail {
 inline size_t texture_wire_ref(const nlohmann::json&v,size_t count){
  if((!v.is_number_unsigned()&&(!v.is_number_integer()||v.get<int64_t>()<0))||v.get<uint64_t>()>=count)throw std::invalid_argument("Retained texture field reference exceeds its actual table");return size_t(v.get<uint64_t>());
 }
-// Legacy current grids inherit their entire bake from the retained seed.
-inline unsigned texture_source_bake(const nlohmann::json&paint){
+enum class TextureSourceBake : unsigned {
+ Inherited=0, PreparedNormal=1, NativeNormal=2, MaterialGrid=3, IndependentNativeNormal=4
+};
+inline bool texture_source_native_normal(TextureSourceBake kind)noexcept{
+ return kind==TextureSourceBake::NativeNormal||kind==TextureSourceBake::IndependentNativeNormal;
+}
+inline TextureSourceBake texture_source_bake(const nlohmann::json&paint){
  const auto &payload=paint.at("payload");
  const bool present=paint.contains("field_bake");
- unsigned kind=0;
+ auto kind=TextureSourceBake::Inherited;
  if(present){
   const auto &value=paint.at("field_bake");
-  if(!value.is_number_integer()||(value!=1&&value!=2&&value!=3))
+  if(!value.is_number_integer()||(value!=1&&value!=2&&value!=3&&value!=4))
    throw std::invalid_argument("Unknown Source Paint7 Bake kind");
-  kind=value.get<unsigned>();
+  kind=static_cast<TextureSourceBake>(value.get<unsigned>());
  }
- const bool native=kind==2;
+ const bool native=texture_source_native_normal(kind);
  if(!payload.is_object()||paint.size()!=5+size_t(present)+size_t(native)||
     payload.contains("baked")!=present||paint.contains("normal_detail")!=native)
   throw std::invalid_argument("Source Paint7 current grid has an invalid Bake envelope");
@@ -27,8 +32,14 @@ inline unsigned texture_source_bake(const nlohmann::json&paint){
   if(!bake.is_object()||!bake.at("version").is_number_integer())
    throw std::invalid_argument("Source Paint7 has an invalid baked payload");
   const unsigned base=native?1:5;
-  if(bake.at("version")!=base&&(bake.at("version")!=6||
-     !bake.at("base_version").is_number_integer()||bake.at("base_version")!=base))
+  const auto &version=bake.at("version");
+  // Material-only resize can retain either a prepared independent normal
+  // field or a color Bake inherited by a polygon with vertex normals.
+  const auto supported=[&](const nlohmann::json &v){
+   return v==base||(kind==TextureSourceBake::MaterialGrid&&v==1);
+  };
+  if(!supported(version)&&(version!=6||
+     !bake.at("base_version").is_number_integer()||!supported(bake.at("base_version"))))
    throw std::invalid_argument("Source Paint7 baked payload differs from its normal authority");
  }
  return kind;

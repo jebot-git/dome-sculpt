@@ -26,9 +26,11 @@ namespace detail {
 bool can_resize_retained_texture_grid(const TextureSetView &field) noexcept {
   const auto &paint = field.painted;
   const auto source = field.source ? field.source->source_preview() : nullptr;
-  return paint && !paint->in_stroke() && source &&
-         source->model() == PolygonSurfaceNormalModel::PreparedCorePbr &&
-         paint->baked() && paint->baked()->normal_field;
+  if (!paint || paint->in_stroke() || !source) return false;
+  const auto bake = paint->baked();
+  if (source->model() == PolygonSurfaceNormalModel::NativeNOnly)
+    return resizable_canonical_bake(bake.get()) && (!bake || bake->maps.normal.rgba.empty());
+  return bake && bake->normal_field;
 }
 
 bool can_resize_native_texture_grid(const SculptObject &object) noexcept {

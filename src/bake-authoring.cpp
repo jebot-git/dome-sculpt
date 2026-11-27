@@ -596,10 +596,13 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   const auto retained_uv=target.material_bindings?target.material_bindings->canonical_uv:nullptr;
   const bool native_recipient=retained_recipient&&
       retained_recipient->model()==detail::PolygonSurfaceNormalModel::NativeNOnly;
-  const auto normal_resolution=retained_recipient&&!native_recipient?
-      target.painted->baked()->normal_field->resolution():options.resolution;
-  const bool split_recipient=retained_recipient&&!native_recipient&&
-      (low_mesh.uv!=retained_recipient->normal_coordinates()||normal_resolution!=options.resolution);
+  const auto old_native_normal=native_recipient?retained_recipient->native_bake():nullptr;
+  const auto normal_resolution=old_native_normal?old_native_normal->width:
+      retained_recipient&&!native_recipient?target.painted->baked()->normal_field->resolution():
+      options.resolution;
+  const bool split_recipient=retained_recipient&&
+      (normal_resolution!=options.resolution||
+       (!native_recipient&&low_mesh.uv!=retained_recipient->normal_coordinates()));
   // A pass visits each writable texel at most once. Mapped triangles need
   // no projection ray. The extra normal-coordinate pass does not write AO.
   const bool separate_normal_pass=retained_uv||split_recipient;
@@ -647,7 +650,7 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
     if(progress)normal_options.progress=[&](float value){progress(.5f+.4f*value);};
     encode_retained(normal_options);
     Mesh normal_low=low_mesh;
-    normal_low.uv=retained_recipient->normal_coordinates();
+    if(!native_recipient)normal_low.uv=retained_recipient->normal_coordinates();
     retained_normal_write=detail::bake_mesh_source_normals(normal_low,high,normal_options,
         source_normals,target_triangles,source_fields,source_placement,target_metric_corners,
         settings.corresponding_topology);
@@ -715,13 +718,14 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   }
   std::shared_ptr<const Image> native_normal;
   if(native_recipient){
-    auto normal=std::make_shared<Image>(std::move(textures.maps.normal));
-    const auto &old=retained_recipient->native_bake();
+    auto normal=std::make_shared<Image>(retained_normal_write?
+        std::move(retained_normal_write->normal):std::move(textures.maps.normal));
+    const auto &coverage=retained_normal_write?retained_normal_write->coverage:result.coverage;
     constexpr std::array<uint8_t,4> neutral{128,128,255,0};
-    for(size_t i=0;i<textures.coverage.size();++i){
+    for(size_t i=0;i<coverage.size();++i){
       if((i&1023)==0)check();
-      if(!textures.coverage[i]){
-        const auto *pixel=old?old->rgba.data()+i*4:neutral.data();
+      if(coverage[i]!=1&&coverage[i]!=2){
+        const auto *pixel=old_native_normal?old_native_normal->rgba.data()+i*4:neutral.data();
         std::copy_n(pixel,4,normal->rgba.data()+i*4);
       }
     }

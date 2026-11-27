@@ -33,6 +33,7 @@ public:
   bool owns_read_paint(const PaintedMesh&)const noexcept;
   const std::shared_ptr<const PolygonSurfaceOwner>&polygon_owner()const noexcept{return polygon_;}
   const std::shared_ptr<const PolygonSurfacePreview>&source_preview()const noexcept{return preview_;}
+  bool independent_native_normal()const noexcept{return independent_native_normal_;}
   // The private source view uses the original proved raster/attachment and
   // current member COW values. Editable member Paint retains its subset raster.
   std::shared_ptr<const PaintedMesh> read_view(const TextureSetView &,
@@ -52,9 +53,11 @@ private:
       const PaintedMesh *raster_template=nullptr,OriginalPaint=OriginalPaint::Snapshot);
   void validate_member(const TextureSetView &,const TextureSetLimits &,bool rebake=false)const;
   std::shared_ptr<const TextureSetFieldSource> with_member(
-      const TextureSetView &,const TextureSetLimits &,bool rebake,std::shared_ptr<const Image>)const;
+      const TextureSetView &,const TextureSetLimits &,bool rebake,std::shared_ptr<const Image>,
+      bool independent_native_normal=false)const;
   std::shared_ptr<const TextureSetFieldSource> with_bake(
-      const TextureSetView &,const TextureSetLimits &,std::shared_ptr<const Image> = {})const;
+      const TextureSetView &,const TextureSetLimits &,std::shared_ptr<const Image> = {},
+      bool independent_native_normal=false)const;
   std::shared_ptr<const TextureSetFieldSource> with_material_grid(
       const TextureSetView &,const TextureSetLimits &)const;
   std::shared_ptr<const TextureSetFieldSource> with_cleared_bake(
@@ -66,6 +69,9 @@ private:
   std::shared_ptr<const PaintedMesh>original_,readable_;
   std::shared_ptr<const PolygonSurfaceOwner>polygon_;
   std::shared_ptr<const PolygonSurfacePreview>preview_;
+  // Once the material grid is resampled, the normal image's binary alpha
+  // remains its own coverage even if a later resize restores equal dimensions.
+  bool independent_native_normal_=false;
 };
 // Uses the real source topology/face/corner IDs and one shared Mesh owner.
 // Every triangle receives exactly one requested set; polygon faces cannot split

@@ -65,8 +65,11 @@ nlohmann::json TextureSetFieldCodec::encode(const TextureSetView&view,uint32_t g
   const auto &native=view.source->source_preview()->native_bake();
   const auto &seed=view.source->original_paint()->baked();
   const auto &now=readable->baked();
-  const bool resized=seed&&now&&seed->normal_field&&owner(seed->normal_field,now->normal_field);
-  field["field_bake"]=native?2:resized?3:1;
+  const bool resized=seed&&now&&owner(seed->normal_field,now->normal_field);
+  auto kind=resized?TextureSourceBake::MaterialGrid:TextureSourceBake::PreparedNormal;
+  if(native)kind=view.source->independent_native_normal()?
+      TextureSourceBake::IndependentNativeNormal:TextureSourceBake::NativeNormal;
+  field["field_bake"]=static_cast<unsigned>(kind);
   if(native)field["normal_detail"]=images.add(native);
  }
  return field;
@@ -93,7 +96,8 @@ DecodedTextureSetField TextureSetFieldCodec::decode(const nlohmann::json&j,const
  stop(limits_);if(!j.is_object()||!j.contains("field_source"))return {TextureSetPaintAccess::decode(j,&images,polygon,normal,sampling,context,domain,raster),{},{},{},{}};
  preflight();if(!domain||!materials||!j.is_object()||!j.at("version").is_number_integer()||j.at("version")!=7||number(j.at("set"),UINT32_MAX)!=domain->set()||!j.at("physical_paint").is_boolean()||!j.at("payload").is_object()||j.at("payload").contains("mesh")||j.at("payload").contains("version"))throw std::invalid_argument("Source Paint7 lacks its actual member/current-grid envelope");domain->authenticate_owner(domain);
  const auto bake=texture_source_bake(j);
- const auto native=bake==2?images.at(uint32_t(number(j.at("normal_detail"),UINT32_MAX))):nullptr;
+ const auto native=texture_source_native_normal(bake)?
+     images.at(uint32_t(number(j.at("normal_detail"),UINT32_MAX))):nullptr;
  PolygonSurfaceTransferLimits wire_policy;wire_policy.maximum_working_bytes=limits_.maximum_bytes;wire_policy.geometry.cancelled=limits_.cancelled;(void)PolygonSurfacePaintCodec::preflight_grid(j.at("payload"),j.at("physical_paint").get<bool>(),true,wire_policy);
  const auto id=reference(j.at("field_source"),read_.size());const auto&record=input_->at(id);if(reference(record.at("geometry"),geometry_count_)!=geometry||!owner(domain->topology()->geometry(),geometry_(geometry)))throw std::invalid_argument("Source Paint7 names another actual geometry owner");
  const auto node=uint32_t(reference(record.at("node"),node_count_));const auto binding=materials(uint32_t(number(record.at("binding"),255)));const auto&stage=PolygonSurfaceArchive::reader().stage_at(node);
@@ -110,10 +114,12 @@ DecodedTextureSetField TextureSetFieldCodec::decode(const nlohmann::json&j,const
      TextureSetFieldSource::OriginalPaint::DecodedSeed);
  const auto physical=j.at("physical_paint").get<bool>();
  if(physical&&!context.physical_emission)throw std::invalid_argument("Current source FLOAT planes require their actual enclosing Scene context");
- const auto grid=j.at("payload").at("resolution").get<uint32_t>();
+ const auto grid=uint32_t(number(j.at("payload").at("resolution"),2048));
+ if(grid<64||(grid&(grid-1)))throw std::invalid_argument("Source Paint7 has an invalid writable resolution");
  std::shared_ptr<PaintedMesh> resized_raster;
  if(grid!=seed.seed.painted->resolution()){
-  if(bake!=1&&bake!=3)throw std::invalid_argument("A resized source grid needs its own prepared material Bake");
+  if(bake==TextureSourceBake::Inherited&&seed.seed.painted->baked())
+   throw std::invalid_argument("A resized source grid needs its own material Bake dimensions");
   if(!raster){
    resized_raster=TextureSetPaintAccess::source_grid_prototype(*seed.seed.painted,domain,grid,limits_);
    raster=resized_raster.get();
@@ -124,8 +130,16 @@ DecodedTextureSetField TextureSetFieldCodec::decode(const nlohmann::json&j,const
      grid!=seed.seed.painted->resolution()?*raster:*proto->field().painted,domain,proto);
  if(paint->has_physical_emission()!=physical)throw std::invalid_argument("Source member physical interpretation differs from its actual current planes");
  auto view=proto->field();view.painted=paint;view.material=current;
- auto source=bake==3?proto->with_material_grid(view,limits_):
-             bake?proto->with_bake(view,limits_,native):proto->with_current(view,limits_);
+ std::shared_ptr<const TextureSetFieldSource> source;
+ switch(bake){
+ case TextureSourceBake::Inherited:source=proto->with_current(view,limits_);break;
+ case TextureSourceBake::MaterialGrid:source=proto->with_material_grid(view,limits_);break;
+ case TextureSourceBake::PreparedNormal:
+ case TextureSourceBake::NativeNormal:
+ case TextureSourceBake::IndependentNativeNormal:
+  source=proto->with_bake(view,limits_,native,bake==TextureSourceBake::IndependentNativeNormal);
+  break;
+ }
  used_[id]=1;return {std::move(paint),std::move(source),binding,{},seed.seed.bake_recipe};
 }
 nlohmann::json TextureSetFieldCodec::records()const{if(input_)return *input_;auto out=nlohmann::json::array();for(const auto&r:written_)out.push_back(r.record);return out;}

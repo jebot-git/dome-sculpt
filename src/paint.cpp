@@ -2028,8 +2028,7 @@ bool detail::TextureSetPaintAccess::valid_source_member(const PaintedMesh&member
     const std::shared_ptr<const TextureSetFaceDomain>&domain,const PaintedMesh *current_bake)noexcept{
   using native_weight_state::owner;
   const auto sampling=original.paint_sampling_domain();
-  const bool independent_grid=sampling&&sampling->version()==3&&original.baked_&&
-      original.baked_->normal_field&&member.baked_&&member.baked_->normal_field;
+  const bool independent_grid=sampling&&sampling->version()==3;
   return !(!domain||!owner(member.texture_set_domain_,domain)||!member.surface_||!owner(member.surface_->set_domain,domain)||!domain->matches(original.mesh_owner())||!owner(member.mesh_owner(),original.mesh_owner())||member.editing_||original.editing_||
       (member.resolution()!=original.resolution()&&!independent_grid)||
       !member.valid_paint_sampling_attachment()||!original.valid_paint_sampling_attachment()||!member.valid_source_sampling_attachment()||!original.valid_source_sampling_attachment()||!owner(member.surface_->paint_domain,original.surface_->paint_domain)||!owner(member.surface_->original_sampling,original.surface_->original_sampling)||!owner(member.source_maps_,original.source_maps_)||!owner(member.color_projection_,original.color_projection_)||!owner(member.normal_projection_,original.normal_projection_)||!owner(member.baked_,current_bake?current_bake->baked_:original.baked_));
@@ -2041,10 +2040,9 @@ std::shared_ptr<PaintedMesh> detail::TextureSetPaintAccess::source_grid_prototyp
   const auto sampling=original.paint_sampling_domain();
   if(domain)domain->authenticate_owner(domain);
   if(!sampling||sampling->version()!=3||!original.valid_paint_sampling_attachment()||
-     !original.baked_||!original.baked_->normal_field||
      original.surface_->options.policy!=PaintUvPolicy::Strict||
      (domain&&!domain->matches(original.mesh_owner())))
-    throw std::invalid_argument("Independent paint grid requires its prepared polygon source");
+    throw std::invalid_argument("Independent paint grid requires its retained polygon source");
   const auto bytes=initial_raster_bytes(resolution);
   if(bytes>=limits.maximum_bytes)throw std::length_error("Prepared polygon raster exceeds its byte budget");
   auto options=original.surface_->options;
@@ -2093,12 +2091,12 @@ std::shared_ptr<const PaintedMesh>detail::TextureSetPaintAccess::field_source_vi
 void detail::TextureSetPaintAccess::restore_source_bake(PaintedMesh &paint,const PaintedMesh &original,
     const TextureSetLimits &limits){
   auto restored=original.baked_;
-  if(paint.resolution()!=original.resolution()){
-    if(!restored||!restored->normal_field)
-      throw std::invalid_argument("Restoring a resized Bake requires its original prepared normal field");
+  if(restored&&paint.resolution()!=original.resolution()){
     TextureSetResolutionOptions options;options.resolution=paint.resolution();
     TextureSetResolutionReport report;
-    restored=resample_native_bake_grid(*restored,original.resolution(),options,limits,report,false,true);
+    const bool independent_normal=bool(restored->normal_field);
+    restored=resample_native_bake_grid(*restored,original.resolution(),options,limits,report,
+                                      false,independent_normal);
     const auto existing=paint.baked_?paint.baked_->storage_bytes():0;
     if(paint.storage_bytes()-existing+restored->storage_bytes()>128*1024*1024)
       throw std::length_error("Restored Bake exceeds the native per-field storage bound");
@@ -2232,8 +2230,9 @@ std::shared_ptr<PaintedMesh> detail::TextureSetPaintAccess::resample_plain(const
     !retained_uv->matches_current(before)||!resizable_native_uv_bake(before.baked_.get())))
    throw std::invalid_argument("Resampling requires the actual retained native UV and Bake owner");
  if(retained_field&&(!domain||!sampling||sampling->version()!=3||
-    !same_current(before,*retained_field->field().painted)||!before.baked_||!before.baked_->normal_field))
-   throw std::invalid_argument("Resampling requires the actual prepared polygon field");
+    !same_current(before,*retained_field->field().painted)||
+    !retained_field->source_preview()))
+   throw std::invalid_argument("Resampling requires the actual retained polygon field");
  if(!retained_field&&((!domain&&!retained_uv&&!can_resize_raw(before))||(domain&&(!valid_raster(before)||before.in_stroke()||!domain->matches(before.mesh_owner())||
     before.paint_sampling_domain()||(before.source_maps_&&(!native_mtoon||before.source_maps_->uses_alternate_uv()))||before.source_sampling_prepared()||
     before.sampling_attachment_||before.color_projection_||before.normal_projection_||!resizable_canonical_bake(before.baked_.get())||
@@ -2309,7 +2308,9 @@ std::shared_ptr<PaintedMesh> detail::TextureSetPaintAccess::resample_plain(const
  if(candidate_bytes>=filter_limits.maximum_bytes)throw std::length_error("Texture-set candidates exhaust its peak budget");filter_limits.maximum_bytes-=candidate_bytes;
  // Keep Bake layers aligned with the exact replicated footprint. Native
  // MToon also needs whole paint cells, including its alpha and shade coverage.
- auto layers=detail::resample_texture_set_layers(before,options,filter_limits,report,!domain||before.baked_||native_mtoon);report.peak_bytes+=candidate_bytes;
+ auto layers=detail::resample_texture_set_layers(before,options,filter_limits,report,
+     !domain||before.baked_||native_mtoon||retained_field);
+ report.peak_bytes+=candidate_bytes;
  auto raster_options=before.surface_->options;raster_options.cancelled=limits.cancelled;
  raster_options.max_raster_samples=std::min({raster_options.max_raster_samples,std::max(size_t(1),samples),limits.maximum_work-report.work});
  raster_options.max_candidate_checks=std::min(raster_options.max_candidate_checks,std::max(size_t(1),max_checks));
@@ -2332,7 +2333,8 @@ std::shared_ptr<PaintedMesh> detail::TextureSetPaintAccess::resample_plain(const
  if(raster_work>limits.maximum_work-report.work)throw std::length_error("Texture-set resolution raster exceeds complete work budget");report.work+=raster_work;
  auto result=before.snapshot();result->surface_=std::move(surface);result->layers_=std::move(layers);
  if(before.baked_)
-  result->baked_=detail::resample_native_bake_grid(*before.baked_,before.resolution(),options,limits,report,bool(retained_uv),bool(retained_field));
+  result->baked_=detail::resample_native_bake_grid(*before.baked_,before.resolution(),options,
+      limits,report,bool(retained_uv),retained_field&&before.baked_->normal_field);
  result->allocated_tiles_=result->allocated_color_tiles_=0;
  for(const auto&l:result->layers_){result->allocated_tiles_+=tile_count(l);result->allocated_color_tiles_+=color_tile_count(l);}
  result->composite_cache_=std::make_shared<PaintedMesh::CompositeCache>();result->composite_token_=next_composite_token();++result->revision_;

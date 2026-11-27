@@ -106,8 +106,10 @@ struct TextureSetAccess {
   std::shared_ptr<const TextureSetFieldSource> source;
   if(current.source){
    auto next=current;next.painted=paint;next.bake_recipe=recipe;
+   const bool independent_normal=native_normal&&
+      (current.source->independent_native_normal()||native_normal->width!=paint->resolution());
    source=clearing?current.source->with_cleared_bake(next,limits):
-                   current.source->with_bake(next,limits,std::move(native_normal));
+                   current.source->with_bake(next,limits,std::move(native_normal),independent_normal);
   }else if(native_normal)
    throw std::invalid_argument("A plain texture set cannot borrow retained normal detail");
   std::shared_ptr<TextureSetCollection> collection;
@@ -138,6 +140,7 @@ struct TextureSetAccess {
   copy->readable_ = original.readable_;
   copy->polygon_ = binding ? binding->polygon_surface_transfer : nullptr;
   copy->preview_ = remap.preview(original.preview_, binding);
+  copy->independent_native_normal_ = original.independent_native_normal_;
   std::shared_ptr<const TextureSetFieldSource> result = std::move(copy);
   result->self_ = result;
   return result;
@@ -282,6 +285,9 @@ bool texture_set_bake_present(const TextureSetView &field) noexcept {
  const auto current=field.painted?field.painted->baked():nullptr;
  if(!current)return false;
  if(!field.source)return true;
+ if(const auto &preview=field.source->source_preview();preview&&
+    preview->model()==PolygonSurfaceNormalModel::NativeNOnly)
+  return bool(preview->native_bake());
  const auto seed=field.source->original_paint()->baked();
  if(seed&&seed->normal_field)return current->normal_field!=seed->normal_field;
  return current!=seed;

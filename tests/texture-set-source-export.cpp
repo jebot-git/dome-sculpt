@@ -89,10 +89,18 @@ void move(Document&d){
  const auto topology=d.frame().state->polygon->topology;const auto mesh=topology->triangulate().mesh;const auto a=mesh.positions.at(mesh.indices.at(0)),b=mesh.positions.at(mesh.indices.at(1)),c=mesh.positions.at(mesh.indices.at(2));const auto p=a*.2f+b*.3f+c*.5f,n=normalized(cross(b-a,c-a));
  d.polygon_pointer(p+n,n*-1,PolygonAction::BeginDrag);polygon(d);check(d.frame().state->polygon->moving,"Actual selected face ray begins a native Move gesture");const Vec3 delta{.006f,.003f,0};d.polygon_pointer(p+n+delta,n*-1,PolygonAction::Drag);polygon(d);d.polygon_pointer(p+n+delta,n*-1,PolygonAction::EndDrag);polygon(d);
 }
-Scene source(bool prepared,bool reflected,bool floating=false,bool varying=false,bool recipes=false,bool split_grids=false,uint32_t resolution=64,uint8_t coverage=255){
+Scene source(bool prepared,bool reflected,bool floating=false,bool varying=false,bool recipes=false,bool split_grids=false,uint32_t resolution=64,uint8_t coverage=255,bool inherited_color=false){
  Mesh m;m.positions={{-.8f,-.6f,0},{.8f,-.6f,0},{.8f,.6f,0},{-.8f,.6f,0}};m.normals.assign(4,{0,0,1});if(varying)m.normals[1]=normalized(Vec3{.2f,.1f,1});m.uv={{{.1f,.1f}},{{.9f,.1f}},{{.9f,.9f}},{{.1f,.9f}}};m.indices={0,1,2,0,2,3};
  Scene s;auto&o=s.active();o.mesh_active=true;o.material.double_sided=true;o.material.color={.4f,.3f,.2f,1};o.painted=std::make_shared<PaintedMesh>(m,resolution);
  if(prepared){BakedTextures bake;bake.maps.color=solid({90,100,110,255},resolution);bake.maps.metal_rough=solid({255,160,0,255},resolution);bake.maps.emission=solid({0,0,0,255},resolution);bake.maps.normal=solid({128,128,255,255},resolution);bake.coverage.assign(size_t(resolution)*resolution,coverage);for(size_t y=0;y<resolution;++y)for(size_t x=0;x<resolution;++x){const auto at=(y*resolution+x)*4;bake.maps.normal.rgba[at]=uint8_t(96+16*x/resolution);bake.maps.normal.rgba[at+1]=uint8_t(112+y/3);bake.maps.normal.rgba[at+2]=240;}o.painted->install_bake(std::move(bake));auto converted=convert_canonical_normals({o.painted,{},{},{},o.material,{}});o.painted=std::move(converted.paint);o.material_bindings=std::move(converted.material_bindings);}
+ if(inherited_color){
+  BakedTextures bake;
+  bake.maps.color=solid({92,104,107,255},resolution);
+  bake.maps.metal_rough=solid({255,170,33,255},resolution);
+  bake.maps.emission=solid({12,8,29,255},resolution);
+  bake.coverage.assign(size_t(resolution)*resolution,coverage);
+  o.painted->install_bake(std::move(bake));
+ }
  if(floating){PaintSettings ink;ink.front_only=false;ink.channel=PaintChannel::Emission;ink.emission_units=PaintEmissionUnits::Physical;ink.emission={3,.01f,1};Brush b;b.from=b.to={0,0,0};b.normal={0,0,1};b.radius=2;b.strength=1;o.painted->begin_stroke();o.painted->stamp(b,ink);check(o.painted->end_stroke(),"Negative fixture owns a genuine FLOAT stroke");}
  // The N-only positive must contain real byte paint and request the actual
  // KeepPaint UV transition. Empty ordinary Paint correctly uses the legacy
@@ -1304,7 +1312,7 @@ void bake_multiple_retained_fields(){
   }
  }
 }
-void bake_retained_native(bool reflected,bool smooth,bool outward=false){
+void bake_retained_native(bool reflected,bool smooth,bool outward=false,bool resize_grid=false){
  auto scene=source(false,reflected,false,smooth);
  const auto target=scene.active().id;
  if(!reflected)scene.active().affine_edit.reset();
@@ -1343,6 +1351,24 @@ void bake_retained_native(bool reflected,bool smooth,bool outward=false){
  if(reflected)create_texture_set(scene,donor,std::array<uint64_t,1>{1},"Donor",64);
  scene.active().visible=false;
  scene.active().locked=true;
+ uint64_t alternate=0;
+ if(resize_grid){
+  const auto &input=scene.object(donor).painted->mesh();
+  auto other=input;
+  other.positions={positions[0]*.55f+positions[1]*.45f,positions[1],
+                   positions[2]*.55f+positions[1]*.45f};
+  for(auto &point:other.positions)point.z+=.014f;
+  const auto changed=normalized(tilted+Vec3{.18f,.14f,0});
+  other.normals.assign(3,changed);
+  alternate=scene.add("Complementary native Bake donor",Volume{});
+  auto &high=scene.active();
+  high.mesh_active=true;
+  high.painted=std::make_shared<PaintedMesh>(std::move(other),64);
+  high.affine_edit=placement;
+  high.material.color={.64f,.19f,.28f,1};
+  high.visible=false;
+  high.locked=true;
+ }
  scene.select(target);
  const auto baseline=scene.encode();
  ObjectBakeSettings settings;settings.allow_backfaces=true;settings.allow_partial=true;settings.padding=0;
@@ -1350,6 +1376,32 @@ void bake_retained_native(bool reflected,bool smooth,bool outward=false){
  Document document;document.replace(scene);ready(document);
  check(document.frame().state->can_bake&&!document.frame().state->can_clear_bake,
        "Native retained target admits the actual Bake command");
+ TextureSetEdit resize;
+ resize.action=TextureSetAction::Resolution;
+ resize.set=1;
+ resize.resolution=128;
+ if(resize_grid){
+  check(document.can_resize_native_paint(),"Native painted polygon exposes Paint resolution before the first Bake");
+  document.edit_texture_set(resize);
+  document.save_async("unbaked-resized.dsculpt").get();ready(document);
+  const auto unbaked=Scene::load("unbaked-resized.dsculpt");
+  const auto unbaked_field=active_texture_set(unbaked.active());
+  check(unbaked.encode()==document.copy_scene().encode()&&unbaked_field.painted->resolution()==128&&
+        !unbaked_field.painted->baked()&&!unbaked_field.source->source_preview()->native_bake(),
+        "Resized native paint reopens without inventing a normal or material Bake");
+  Document first;
+  first.replace(unbaked);ready(first);
+  first.bake_from_object(donor,settings);
+  first.save_async("first-bake-after-resize.dsculpt").get();ready(first);
+  const auto first_scene=first.copy_scene();
+  const auto first_field=active_texture_set(first_scene.active());
+  const auto first_normal=first_field.source->source_preview()->native_bake();
+  check(first_normal&&first_normal->width==128&&first_field.painted->baked()->maps.color.width==128&&
+        Scene::load("first-bake-after-resize.dsculpt").encode()==first_scene.encode(),
+        "The first Bake uses the chosen paint size and retains the original seed");
+  check(document.undo()&&document.copy_scene().encode()==baseline,"Undo restores the earlier unbaked grid");
+  ready(document);
+ }
  document.bake_from_object(donor,settings);
  const auto path=std::filesystem::path(outward?"native-target-smooth-portable.dsculpt":"native-target.dsculpt");
  document.save_async(path).get();ready(document);
@@ -1429,6 +1481,137 @@ void bake_retained_native(bool reflected,bool smooth,bool outward=false){
        field.bake_recipe->source.object==donor,"Clear restores original Paint and normal state while keeping Recall");
  check(Scene::decode(cleared.encode()).encode()==cleared.encode()&&
        document.undo()&&document.copy_scene().encode()==saved,"Clear survives cold replay and exact Undo");
+ if(!resize_grid)return;
+ ready(document);
+ document.edit_texture_set(resize);
+ document.save_async("resized-native.dsculpt").get();ready(document);
+ const auto resized=document.copy_scene();
+ const auto resized_field=active_texture_set(resized.active());
+ const auto mixed=resized.encode();
+ check(resized_field.painted->resolution()==128&&resized_field.source->read_view(resized_field)->resolution()==128&&
+       resized_field.painted->baked()->maps.color.width==128&&
+       resized_field.source->source_preview()->native_bake()==next&&next->width==64&&
+       resized_field.source->original_paint()==current.source->original_paint(),
+       "Resized material retains the existing immutable partial normal image");
+ check(texture_set_view(resized.active(),0).source==neighbor.source&&
+       length(resized_field.source->normal(triangle,covered,world,true)-at_hit)==0&&
+       length(resized_field.source->normal(triangle,uncovered,world,true)-at_miss)==0,
+       "The covered and inherited normal sample and the neighboring slot stay exact");
+ check(Scene::load("resized-native.dsculpt").encode()==mixed&&document.undo()&&
+       document.copy_scene().encode()==saved&&document.redo()&&document.copy_scene().encode()==mixed,
+       "Mixed material and normal sizes survive Cold Open, Undo and Redo");
+ auto forged=mixed;
+ auto &entries=forged.at("texture_set_geometry").at("paints");
+ const auto envelope=std::find_if(entries.begin(),entries.end(),[](const auto &p){
+   return p.at("painted").value("field_bake",0)==4;
+ });
+ check(envelope!=entries.end(),"An independent native map declares its own normal coverage grid");
+ envelope->at("painted")["field_bake"]=2;
+ refuses([&]{Scene::decode(forged);},"A same-grid Bake envelope rejects a mixed-size normal image");
+ ready(document);
+ document.export_asset("resized-native-standard.glb",AssetExportFormat::Glb).get();
+ document.export_asset("resized-native-editable.glb",AssetExportFormat::EditableGlb256).get();
+ std::ifstream stream("resized-native-editable.glb",std::ios::binary);
+ const std::vector<uint8_t> bytes{std::istreambuf_iterator<char>(stream),{}};
+ const auto replay=extract_native_authoring(bytes);
+ check(replay&&replay->encode()==mixed,"Editable GLB preserves the separate native normal grid");
+
+ Document cold;
+ cold.open_async("resized-native.dsculpt").get();ready(cold);
+ const auto mixed_owner=active_texture_set(cold.copy_scene().active()).source->source_preview()->native_bake();
+ resize.resolution=64;
+ cold.edit_texture_set(resize);ready(cold);
+ const auto reduced=cold.copy_scene();
+ const auto reduced_field=active_texture_set(reduced.active());
+ check(reduced_field.source->source_preview()->native_bake()==mixed_owner&&
+       Scene::decode(reduced.encode()).encode()==reduced.encode(),
+       "Back at the original size, cold Open retains the separately authored normal coverage");
+ check(cold.undo()&&cold.copy_scene().encode()==mixed,"Undo restores the enlarged material grid");
+ ready(cold);
+ cold.bake_from_object(alternate,settings);
+ cold.save_async("rebaked-native.dsculpt").get();ready(cold);
+ const auto rebaked=cold.copy_scene();
+ const auto rebaked_field=active_texture_set(rebaked.active());
+ const auto other=rebaked_field.source->source_preview()->native_bake();
+ check(other&&other->width==64&&other->rgba!=next->rgba&&
+       rebaked_field.painted->baked()->maps.color.width==128&&
+       rebaked_field.bake_recipe->source.object==alternate,
+       "Partial rebake writes different detail on the old grid and new color on the resized grid");
+ check(length(rebaked_field.source->normal(triangle,covered,world,true)-at_hit)==0&&
+       length(rebaked_field.source->normal(triangle,uncovered,world,true)-at_miss)>.05f,
+       "A partial rebake retains its missed detail and covers a formerly unbaked point");
+ const auto exact=rebaked.encode();
+ check(Scene::load("rebaked-native.dsculpt").encode()==exact,"Cold Open restores both rebaked grids");
+ auto too_sharp=rebaked.snapshot();
+ TextureSetResolutionOptions lower;
+ lower.resolution=64;
+ refuses([&]{resample_texture_set(too_sharp,target,1,lower);},
+         "A reduction that would erase freshly projected material edges is refused");
+ check(too_sharp.encode()==exact,"A rejected resize preserves both independent grids exactly");
+ auto appended=append_native_scene(rebaked,rebaked).scene;
+ const auto imported=active_texture_set(appended.active());
+ const auto namespaced=appended.encode();
+ check(imported.bake_recipe->source.object!=alternate&&
+       imported.source->source_preview()->native_bake()==other&&
+       Scene::decode(namespaced).encode()==namespaced,
+       "Native Append preserves a mixed-size normal field while namespacing its donor");
+ cold.clear_bake();
+ cold.save_async("cleared-native.dsculpt").get();ready(cold);
+ const auto mixed_clear=cold.copy_scene();
+ const auto cleared_field=active_texture_set(mixed_clear.active());
+ check(cleared_field.painted->resolution()==128&&!cleared_field.painted->baked()&&
+       !cleared_field.source->source_preview()->native_bake()&&
+       cleared_field.bake_recipe->source.object==alternate&&
+       Scene::load("cleared-native.dsculpt").encode()==mixed_clear.encode()&&
+       length(cleared_field.source->normal(triangle,uncovered,world,true)-before)==0,
+       "Clear keeps the resized paint and last recipe and restores inherited vertex normals");
+}
+void resize_native_inherited_color(){
+ auto scene=source(false,false,true,false,false,false,64,192,true);
+ const auto target=scene.active().id;
+ select_texture_set(scene,target,1);
+ const auto source_field=active_texture_set(scene.active());
+ const auto original=source_field.painted->baked();
+ check(original&&original->maps.normal.rgba.empty()&&original->coverage.front()==192,
+       "The native source has a genuine inherited color-only Bake");
+ auto high=source_field.painted->mesh();
+ for(auto &point:high.positions)point.z+=.01f;
+ const auto direction=normalized(Vec3{.22f,-.15f,-1.f});
+ high.normals.assign(high.positions.size(),direction);
+ auto placement=scene.active().affine_edit;
+ const auto donor=scene.add("Inherited color overpaint donor",Volume{});
+ scene.active().mesh_active=true;
+ scene.active().painted=std::make_shared<PaintedMesh>(std::move(high),64);
+ scene.active().affine_edit=std::move(placement);
+ scene.active().visible=false;
+ scene.active().locked=true;
+ scene.select(target);
+ TextureSetResolutionOptions choice;
+ choice.resolution=128;
+ check(resample_texture_set(scene,target,1,choice).changed,"Inherited color-only Bake can resize");
+ const auto resized=active_texture_set(scene.active());
+ check(resized.painted->baked()->maps.color.width==128&&resized.painted->baked()->coverage.front()==192&&
+       !resized.source->source_preview()->native_bake(),
+       "Inherited fractional color coverage enlarges while normals stay native");
+ const auto wire=scene.encode();
+ const auto reopened=Scene::decode(wire);
+ check(reopened.encode()==wire,"Material-only native Bake envelope cold-opens with its new resolution");
+ Document document;
+ document.replace(reopened);ready(document);
+ check(!document.frame().state->can_clear_bake,"An inherited color Bake stays protected");
+ ObjectBakeSettings settings;
+ settings.allow_backfaces=true;
+ settings.corresponding_topology=true;
+ document.bake_from_object(donor,settings);ready(document);
+ check(document.frame().state->can_clear_bake,"The newly authored native Bake can be cleared");
+ document.clear_bake();ready(document);
+ const auto cleared=document.copy_scene();
+ const auto field=active_texture_set(cleared.active());
+ check(field.painted->resolution()==128&&
+       field.painted->baked()->maps.color.rgba==resized.painted->baked()->maps.color.rgba&&
+       field.painted->baked()->coverage==resized.painted->baked()->coverage&&
+       !field.source->source_preview()->native_bake()&&Scene::decode(cleared.encode()).encode()==cleared.encode(),
+       "Clear restores the resized inherited color coefficients and repeats through Cold Open");
 }
 void set_bake_pose(Scene &scene,uint64_t object,std::vector<Vec3> positions){
  ShapeKeyEdit create;create.name="Bake pose";
@@ -3052,6 +3235,14 @@ void retopology_retained_materials(bool reflected) {
 
 int main(int argc,char **argv)try {
  const std::string_view mode=argc>1?argv[1]:"";
+ if(argc==4&&mode=="--resize-native-polygon-grid"){
+  std::filesystem::create_directories(argv[2]);std::filesystem::current_path(argv[2]);
+  const bool affine=std::string_view(argv[3])=="affine";
+  bake_retained_native(affine,affine,affine,true);
+  if(!affine)resize_native_inherited_color();
+  std::cout<<"PASS "<<checks<<" native polygon grid and normal Bake checks\n";
+  return 0;
+ }
  if(argc==4&&mode=="--resize-retained-grid"){
   std::filesystem::create_directories(argv[2]);
   std::filesystem::current_path(argv[2]);
