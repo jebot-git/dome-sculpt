@@ -43,6 +43,8 @@ class RetopoMesh {
   std::map<TopologyID, RetopoEdge> edges_;
   std::map<TopologyID, RetopoFace> faces_;
   TopologyID edge_id(TopologyID, TopologyID) const;
+  void transform_impl(const AffineTransform &, const RetopoMesh *original_view,
+                      const RetopoMesh *original_local, const std::function<bool()> &);
 
 public:
   const auto &vertices() const { return vertices_; }
@@ -68,6 +70,10 @@ public:
   // Atomic change of coordinate frame; IDs, allocation cursor, pins, seams and
   // materials survive. Reflections reverse face loops to retain outwardness.
   void transform(const AffineTransform &, const std::function<bool()> & = {});
+  // Use the exact original local positions of vertices left untouched in
+  // this affine view. The inverse transform is used for new or moved points.
+  void transform(const AffineTransform &view_to_local, const RetopoMesh &original_view,
+                 const RetopoMesh &original_local, const std::function<bool()> & = {});
   void set_pinned(TopologyID, bool);
   void set_seam(TopologyID, bool);
   void project(std::span<const TopologyID>, const SurfaceQuery &,

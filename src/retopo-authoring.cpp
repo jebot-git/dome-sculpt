@@ -405,6 +405,31 @@ bool same_patch_surface(const RetopoSurface &a, const RetopoSurface &b) {
          std::ranges::equal(a.mesh.positions, b.mesh.positions, same_position);
 }
 
+std::vector<uint32_t> match_patch_triangles(const RetopoSurface &before, const RetopoSurface &after,
+                                           const std::function<bool()> &cancelled) {
+  auto corners = [](const RetopoSurface &surface, size_t face) {
+    std::array<TopologyID,3> ids;
+    for (size_t k = 0; k < ids.size(); ++k)
+      ids[k] = surface.source_vertices[surface.mesh.indices[face * 3 + k]];
+    std::ranges::sort(ids);
+    return ids;
+  };
+  std::vector<uint32_t> result(after.source_faces.size(), UINT32_MAX);
+  for (size_t i = 0; i < result.size(); ++i) {
+    if ((i & 1023) == 0) stop(cancelled);
+    const auto candidates = std::ranges::equal_range(before.source_faces, after.source_faces[i]);
+    const auto ids = corners(after, i);
+    for (auto it = candidates.begin(); it != candidates.end(); ++it) {
+      const auto candidate = size_t(it - before.source_faces.begin());
+      if (corners(before, candidate) == ids) {
+        result[i] = uint32_t(candidate);
+        break;
+      }
+    }
+  }
+  return result;
+}
+
 std::shared_ptr<DeformationState> transfer_patch_deformation(const DeformationState &before,
     const Mesh &old_mesh, const Mesh &new_mesh, detail::RetopoTransfer &transfer) {
   const auto vertices = new_mesh.positions.size();
@@ -534,10 +559,12 @@ public:
 
   RetopoReplacement(std::shared_ptr<const PaintedMesh> grid, AffineTransform old_world,
                     AffineTransform new_world, std::span<const TopologyID> old_faces,
-                    std::span<const TopologyID> new_faces, const std::function<bool()> &cancelled)
+                    std::span<const TopologyID> new_faces, std::vector<uint32_t> source_triangles,
+                    const std::function<bool()> &cancelled)
       : budget_(cancelled), old_world_(old_world), new_world_(new_world), first_grid_(std::move(grid)),
-        old_faces_(old_faces), new_faces_(new_faces) {
+        old_faces_(old_faces), new_faces_(new_faces), source_triangles_(std::move(source_triangles)) {
     const auto resolution = first_grid_->resolution();
+    budget_.reserve(source_triangles_.size(), sizeof(uint32_t));
     budget_.reserve(1, detail::TextureSetPaintAccess::working_bytes(*first_grid_, resolution));
     charge_raster(*first_grid_);
     grids_.emplace(resolution, first_grid_);
@@ -573,6 +600,7 @@ private:
   AffineTransform old_world_, new_world_;
   std::shared_ptr<const PaintedMesh> first_grid_;
   std::span<const TopologyID> old_faces_, new_faces_;
+  std::vector<uint32_t> source_triangles_;
   std::map<uint32_t,std::shared_ptr<const PaintedMesh>> grids_;
   std::map<const Mesh *,std::unique_ptr<detail::RetopoTransfer>> surfaces_;
   struct Paint {const PaintedMesh *source; std::shared_ptr<const PaintedMesh> projected;};
@@ -607,6 +635,13 @@ private:
     slots.reserve(mesh.indices.size() / 3);
     for (size_t c = 0; c < mesh.indices.size(); c += 3) {
       if ((c & 1023) == 0) stop(budget_.cancelled());
+      const auto old_triangle = source_triangles_[c / 3];
+      if (old_triangle != UINT32_MAX) {
+        // A quad can carry two material slots. Its stable corners survive
+        // reflection, reordering and movement across the old material seam.
+        slots.push_back(existing[old_triangle]);
+        continue;
+      }
       budget_.work(2 * std::bit_width(old_faces_.size()) + 2);
       const auto previous = std::ranges::equal_range(old_faces_, new_faces_[c / 3]);
       if (!previous.empty()) {
@@ -617,6 +652,7 @@ private:
           slots.push_back(fields.front());
           continue;
         }
+        throw std::invalid_argument("Retopology changed a quad diagonal that carries a material boundary");
       }
       const auto a = mesh.positions[mesh.indices[c]], b = mesh.positions[mesh.indices[c + 1]],
                  d = mesh.positions[mesh.indices[c + 2]];
@@ -731,7 +767,7 @@ uint64_t publish_retopology(Scene &scene, const RetopoMesh &topology, uint64_t s
   auto previous = scene.active();
   if (!text::valid_utf8(previous.name)) throw std::invalid_argument("Object names must be valid UTF-8");
   if (!previous.visible || previous.locked) throw std::logic_error("Retopology target changed");
-  scene.object(source);
+  const auto &guide = scene.object(source);
   auto triangles = topology.triangulate(cancelled);
   stop(cancelled);
   Scene staged = scene;
@@ -741,7 +777,7 @@ uint64_t publish_retopology(Scene &scene, const RetopoMesh &topology, uint64_t s
   std::shared_ptr<const DeformationState> deformation;
   std::shared_ptr<const SourceMaterialBindings> material;
   std::shared_ptr<const TextureSetCollection> texture_sets;
-  const auto patch = std::make_shared<const RetopoPatch>(RetopoPatch{source, topology});
+  const auto patch = std::make_shared<RetopoPatch>(RetopoPatch{source, topology});
   std::shared_ptr<const PolygonOrigin> rig_source, shape_source;
   if (previous.retopology) {
     if (previous.retopology->source != source || !previous.mesh_active || !previous.painted ||
@@ -751,22 +787,32 @@ uint64_t publish_retopology(Scene &scene, const RetopoMesh &topology, uint64_t s
     const auto old_world = scene.world_matrix(previous.id);
     const auto desired_world = affine_similarity(transform);
     const bool same_placement = old_world.matrix() == desired_world.matrix();
+    const auto &original = previous.retopology->topology;
+    const auto old_surface = original.triangulate(cancelled);
+    bool same_surface = same_placement && same_patch_surface(old_surface, triangles);
+    if (!same_surface && desired_world.matrix() == AffineTransform{}.matrix() &&
+        (scene.has_affine_placement(previous.id) || scene.has_affine_placement(guide.id))) {
+      // The affine editor works in world metres. Compare in that same frame
+      // and return wire edits to the original local geometry without rounding
+      // its unchanged surface vertices through the inverse transform.
+      auto original_view = original;
+      original_view.transform(old_world, cancelled);
+      same_surface = same_patch_surface(original_view.triangulate(cancelled), triangles);
+      if (same_surface)
+        patch->topology.transform(old_world.inverse(), original_view, original, cancelled);
+    }
     // Preserve the actual avatar instance and other parent-local links. The
     // workspace presents a world similarity, so use the exact affine inverse
     // of its original parent to express the new mesh in that same hierarchy.
     object.group = previous.group;
-    if (object.group) {
-      if (same_placement) {
-        object.transform = previous.transform;
-        object.affine_edit = previous.affine_edit;
-      } else {
-        object.transform = {};
-        object.affine_edit = std::make_shared<const NativeAffineEdit>(scene.parent_matrix(previous.id).inverse() * desired_world);
-      }
+    if (same_placement || same_surface) {
+      object.transform = previous.transform;
+      object.affine_edit = previous.affine_edit;
+    } else if (object.group) {
+      object.transform = {};
+      object.affine_edit = std::make_shared<const NativeAffineEdit>(scene.parent_matrix(previous.id).inverse() * desired_world);
     }
     const auto new_world = staged.world_matrix(id);
-    const auto old_surface = previous.retopology->topology.triangulate(cancelled);
-    const bool same_surface = same_placement && same_patch_surface(old_surface, triangles);
     std::unique_ptr<RetopoReplacement> replacement;
     if (same_surface) {
       painted = previous.painted->snapshot();
@@ -775,12 +821,13 @@ uint64_t publish_retopology(Scene &scene, const RetopoMesh &topology, uint64_t s
       texture_sets = previous.texture_sets;
     } else {
       const auto size = previous.painted->resolution();
+      auto source_triangles = match_patch_triangles(old_surface, triangles, cancelled);
       unwrap(triangles.mesh, size, 4, cancelled);
       PaintSurfaceOptions options;
       options.cancelled = cancelled;
       auto grid = PaintedMesh::from_mesh(std::move(triangles.mesh), size, options);
       replacement = std::make_unique<RetopoReplacement>(std::move(grid), old_world, new_world,
-          old_surface.source_faces, triangles.source_faces, cancelled);
+          old_surface.source_faces, triangles.source_faces, std::move(source_triangles), cancelled);
       auto current = replacement->project(*previous.painted, previous.deformation, previous.material_bindings,
                                           previous.texture_sets);
       painted = current.paint->snapshot();

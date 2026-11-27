@@ -487,6 +487,119 @@ void reapply_patch(bool affine, const std::filesystem::path &out) {
         "Cold replay authenticates the reshaped project's native frame ownership");
 }
 
+void affine_wire_edit(const std::filesystem::path &out) {
+  auto source = author_patch(true, out);
+  const auto patch = source.active().id;
+  const auto donor = source.active().retopology->source;
+  Document document;
+  document.replace(source);
+  settled(document);
+  document.convert_baked_normals();
+  settled(document);
+  document.edit_scene("Place prepared patch under affine transform",[=](Scene &scene, const auto &) {
+    scene.object(patch).affine_edit = std::make_shared<const NativeAffineEdit>(AffineTransform(
+        std::array<double,16>{-.94,.18,0,0,.21,1.05,0,0,0,0,1,0,.02,-.03,.008,1}));
+  });
+  settled(document);
+  const auto before = document.copy_scene();
+  const auto &prepared = before.active();
+  const auto before_world = before.world_matrix(patch);
+  const auto baked = prepared.painted->baked();
+  check(prepared.material_bindings && prepared.material_bindings->canonical_attributes &&
+        baked && baked->normal_field,
+        "The affine patch has a genuine converted normal field and original material owner");
+  document.save_async(out/"affine-wire-before.dsculpt").get();
+
+  document.begin_retopology();
+  drafted(document);
+  const auto workspace = document.frame().state->retopology;
+  check(affine_similarity(workspace->transform).matrix()==AffineTransform{}.matrix() &&
+        before_world.orientation()==AffineOrientation::Reversing,
+        "The reflected and sheared patch opens in the actual world-space workspace");
+  const auto touch_point = point(before.world_matrix(donor),{.45f,.35f,0});
+  touch(document, touch_point);
+  const auto draft = document.frame().state->retopology;
+  const auto added = draft->selected.front();
+  check(draft->topology->vertices().size()==prepared.retopology->topology.vertices().size()+1 &&
+        draft->topology->faces().size()==prepared.retopology->topology.faces().size(),
+        "The actual worker places a new wire point without changing surface faces");
+
+  document.end_retopology(true);
+  const auto path = out/"affine-wire-prepared.dsculpt";
+  document.save_async(path).get();
+  settled(document);
+  const auto after = document.copy_scene();
+  const auto &replacement = after.active();
+  check(after.world_matrix(replacement.id).matrix()==before_world.matrix() &&
+        replacement.painted->mesh_owner()==prepared.painted->mesh_owner() &&
+        replacement.painted->baked()==baked && replacement.material_bindings==prepared.material_bindings,
+        "Wire Apply shares the original atlas, prepared normal field, material and exact local frame");
+  const auto &vertices = replacement.retopology->topology.vertices();
+  for (const auto &[id, vertex] : prepared.retopology->topology.vertices())
+    check(length(vertices.at(id).position-vertex.position)==0.f,
+          "An untouched point keeps its exact original local coordinates");
+  check(length(point(before_world,vertices.at(added).position)-draft->topology->vertices().at(added).position)<1e-6f &&
+        replacement.retopology->topology.faces().begin()->second.vertices==
+            prepared.retopology->topology.faces().begin()->second.vertices,
+        "A new wire point returns to the same world position and preserves reflected face winding");
+  check(Scene::load(path).encode()==after.encode() && document.undo() &&
+        document.copy_scene().encode()==before.encode() && document.redo() &&
+        document.copy_scene().encode()==after.encode(),
+        "Ordered Save, cold Open and Undo/Redo preserve the prepared affine wire edit");
+}
+
+void mixed_material_quad(const std::filesystem::path &out) {
+  auto scene = reference(false);
+  const auto donor = scene.active().id;
+  RetopoMesh patch;
+  const auto a = patch.add_vertex({{-.2f,-.2f,0}});
+  const auto b = patch.add_vertex({{ .2f,-.2f,0}});
+  const auto c = patch.add_vertex({{ .2f, .2f,0}});
+  const auto d = patch.add_vertex({{-.2f, .2f,0}});
+  patch.add_face(std::array{a,b,c,d});
+  const auto original = publish_retopology(scene,patch,donor,{});
+  const auto second = create_texture_set(scene,original,std::array<uint64_t,1>{2},"Blue trim",64);
+  check(edit_texture_set(scene,original,second,[](PaintedMesh &paint,Material &) {
+    paint.add_layer("Blue finish");
+    PaintSettings ink;
+    ink.front_only = false;
+    ink.color = {.1f,.2f,.9f,1};
+    Brush brush;
+    brush.from = brush.to = {.14f,.14f,0};
+    brush.normal = {0,0,1};
+    brush.radius = .22f;
+    brush.strength = 1.f;
+    paint.begin_stroke();
+    paint.stamp(brush,ink);
+    return paint.end_stroke();
+  }),"The second triangle of a single stable quad carries independently edited paint");
+  const auto before = scene.snapshot();
+  patch.move_vertex(b,{.40f,-.10f,0});
+  patch.move_vertex(d,{-.14f,.40f,0});
+  const auto tris = patch.triangulate();
+  const auto &m = tris.mesh;
+  const auto center = (m.positions[m.indices[0]] + m.positions[m.indices[1]] + m.positions[m.indices[2]]) / 3.f;
+  check(SurfaceQuery(scene.active().painted->mesh()).closest(center).triangle==1,
+        "The first triangle has moved across the original material boundary at its centre");
+  publish_retopology(scene,patch,donor,{});
+  const auto &replacement = scene.active();
+  check(replacement.retopology->topology.faces().size()==1 &&
+        replacement.texture_sets->triangle_sets()[0]==0 && replacement.texture_sets->triangle_sets()[1]==second,
+        "The genuine triangle corners preserve both material slots on their side of the quad");
+  const auto blue = texture_set_view(replacement,second).painted;
+  check(blue->layers().back().name=="Blue finish" && std::ranges::any_of(blue->layers().back().tiles,[](const auto &tile) {
+          return tile && std::ranges::any_of(tile->pixels,[](const auto &p) {return p.data[9]>128&&p.data[2]>200;});
+        }),
+        "The changed material field retains its own editable paint");
+  const auto path = out/"mixed-material-quad.dsculpt";
+  scene.save(path);
+  check(Scene::load(path).encode()==scene.encode() && !scene.object(original).visible,
+        "Cold Open retains the replacement quad and its hidden original authoring object");
+  check(scene.object(original).texture_sets==before.active().texture_sets &&
+        detail::TextureSetPaintAccess::same_current(*scene.object(original).painted,*before.active().painted),
+        "The source raster remains exact after the new material allocation");
+}
+
 void paint_checkpoint(Scene &scene, std::string name, std::array<float,4> color) {
   auto &object = scene.active();
   object.painted = object.painted->snapshot();
@@ -648,13 +761,16 @@ void restore_patch_history(bool affine, const std::filesystem::path &out) {
 int main(int argc,char **argv) try {
   if (argc!=3) return 2;
   const std::string_view mode = argv[2];
-  if (mode!="plain" && mode!="affine" && mode!="reapply-plain" && mode!="reapply-affine" &&
+  if (mode!="plain" && mode!="affine" && mode!="affine-wire" && mode!="mixed-material" &&
+      mode!="reapply-plain" && mode!="reapply-affine" &&
       mode!="restore-plain" && mode!="restore-affine") return 2;
   const std::filesystem::path out = argv[1];
   std::filesystem::create_directories(out);
   setenv("XDG_STATE_HOME",(out/"state").c_str(),1);
   setenv("XDG_CONFIG_HOME",(out/"config").c_str(),1);
   if (mode.starts_with("restore-")) restore_patch_history(mode.ends_with("affine"),out);
+  else if (mode=="affine-wire") affine_wire_edit(out);
+  else if (mode=="mixed-material") mixed_material_quad(out);
   else if (mode.starts_with("reapply-")) reapply_patch(mode.ends_with("affine"),out);
   else bind_patch(mode=="affine",out);
   std::cout << "PASS " << checks << " retopology Surface Heat controls\n";

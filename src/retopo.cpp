@@ -270,6 +270,14 @@ void RetopoMesh::move_vertex(TopologyID id, Vec3 p) {
 }
 void RetopoMesh::transform(const AffineTransform &matrix,
                            const std::function<bool()> &cancelled) {
+  transform_impl(matrix, nullptr, nullptr, cancelled);
+}
+void RetopoMesh::transform(const AffineTransform &matrix, const RetopoMesh &original_view,
+                           const RetopoMesh &original_local, const std::function<bool()> &cancelled) {
+  transform_impl(matrix, &original_view, &original_local, cancelled);
+}
+void RetopoMesh::transform_impl(const AffineTransform &matrix, const RetopoMesh *original_view,
+                                const RetopoMesh *original_local, const std::function<bool()> &cancelled) {
   stop(cancelled);
   validate(cancelled);
   const auto orientation = matrix.orientation();
@@ -277,8 +285,18 @@ void RetopoMesh::transform(const AffineTransform &matrix,
     throw std::invalid_argument("Retopology coordinate frame is singular");
   RetopoMesh draft = *this;
   for (auto &[id, vertex] : draft.vertices_) {
-    (void)id; stop(cancelled);
+    stop(cancelled);
     const auto p = vertex.position;
+    if (original_view) {
+      const auto found = original_view->vertices_.find(id);
+      if (found != original_view->vertices_.end()) {
+        const auto before = found->second.position;
+        if (before.x == p.x && before.y == p.y && before.z == p.z) {
+          vertex.position = original_local->vertices_.at(id).position;
+          continue;
+        }
+      }
+    }
     const auto q = matrix.point({p.x, p.y, p.z});
     Vec3 next{float(q[0]), float(q[1]), float(q[2])};
     if ((q[0] != 0 && next.x == 0) || (q[1] != 0 && next.y == 0) ||
