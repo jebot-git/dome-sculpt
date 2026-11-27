@@ -3,6 +3,7 @@
 #include "dome/paint.hpp"
 #include "dome/paint-sampling.hpp"
 namespace dome {
+struct SourceMaterialBindings;
 // Exact private strict-raster/geometry forecast, including constructor scratch.
 // This does not authenticate any material, Paint, or sampling-domain owner.
 size_t paint_sampling_surface_retained_bytes(size_t vertices,size_t corners,uint32_t resolution);
