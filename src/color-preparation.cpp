@@ -35,8 +35,9 @@ std::optional<detail::ColorBoundMemoKey> bound_key(
     const CreatorAppearance *appearance,const PaintColorProjection &projection,
     const std::shared_ptr<const PolygonColorSurface> &descriptor,
     std::span<const std::array<float,4>> colors,bool initial,uint64_t max_cells) {
-  if(!detail::color_bound_scope_active()||appearance||!descriptor||!descriptor->field||
-     !descriptor->topology||projection.quality_cells<512)return {};
+  if(!detail::color_bound_scope_active()||appearance||projection.quality_cells<512)return {};
+  if(descriptor ? !descriptor->field||!descriptor->topology : preparation.receipt.source_field!=SourceColorField::Identity)
+    return {};
   std::shared_ptr<const Mesh> owner,current_owner;
   if(!initial&&preparation.paint_sampling){
     owner=preparation.paint_sampling->domain()->basis();
@@ -52,8 +53,9 @@ std::optional<detail::ColorBoundMemoKey> bound_key(
   if(preparation.projection.get()==&projection)projected=preparation.projection;
   else if(preparation.initial_projection.get()==&projection)projected=preparation.initial_projection;
   if(!projected||!projection.vertex_rgba)return {};
-  detail::ColorBoundMemoKey key;key.mesh=std::move(owner);key.current_mesh=std::move(current_owner);key.field=descriptor->field;
-  key.topology=descriptor->topology;key.projection=std::move(projected);key.image=projection.vertex_rgba;
+  detail::ColorBoundMemoKey key;key.mesh=std::move(owner);key.current_mesh=std::move(current_owner);
+  if(descriptor){key.field=descriptor->field;key.topology=descriptor->topology;}
+  key.projection=std::move(projected);key.image=projection.vertex_rgba;
   key.source_paint=preparation.original_paint;key.sampling=preparation.paint_sampling;
   key.material=preparation.original_material;key.deformation=preparation.original_deformation;
   key.recipe=&preparation;key.max_cells=max_cells;key.claimed_cells=projection.quality_cells;

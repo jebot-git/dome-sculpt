@@ -302,7 +302,7 @@ void PolygonSceneArchive::collect(std::shared_ptr<const PolygonAuthority> root,
         throw std::invalid_argument("Polygon source color projection is not "
                                     "its recorded prepared field");
       projection->validate(o->paint->resolution());
-      if (validate_deep)
+      if (validate_deep && !o->material_bindings->canonical_paint_sampling)
         preparation->validate_current(o->paint->mesh(), o->appearance.get());
     }
     // Preserve the specific color-authority diagnostics before checking

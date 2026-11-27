@@ -5,8 +5,9 @@ namespace dome::detail {
 bool canonical_paint_retention_supported(const SculptObject &o) noexcept {
  const auto b=o.material_bindings;const auto p=o.painted;const auto c=b?b->canonical_attributes:nullptr;
  if(!o.mesh_active||!p||p->in_stroke()||!o.volume||o.volume->in_stroke()||o.appearance||o.polygon||!b||!c||!c->valid_owner(c)||
-    b->has_mtoon||b->native_paint_sampling||b->native_paint_frames||b->color_preparation||b->normal_preparation||!b->normal_frames||
-    p->source_maps()||p->source_sampling_prepared()||p->color_projection()||p->normal_projection()||p->surface_diagnostics().policy!=PaintUvPolicy::Strict)return false;
+    b->has_mtoon||b->native_paint_sampling||b->native_paint_frames||b->normal_preparation||!b->normal_frames||
+    p->source_maps()||p->source_sampling_prepared()||p->normal_projection()||p->surface_diagnostics().policy!=PaintUvPolicy::Strict||
+    !canonical_paint_color_matches(*p,b->color_preparation.get()))return false;
  if(b->key_derivation){if(!b->key_derivation->valid_owner(b->key_derivation)||b->key_derivation->frames()!=b->normal_frames)return false;}
  else if(b->normal_frames!=c->frames())return false;
  const auto retained=b->canonical_paint_sampling;

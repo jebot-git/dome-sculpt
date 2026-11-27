@@ -4,6 +4,8 @@
 #include "dome/paint-sampling.hpp"
 #include "canonical-normal-uv.hpp"
 namespace dome::detail {
+bool canonical_paint_color_matches(const PaintedMesh &,const SourceColorPreparation *) noexcept;
+
 // Detached geometry/grid stage. No material lease or Scene admission is minted.
 // The current-source map is separate from the flattened original normal map.
 struct CanonicalPaintUvGeometry {

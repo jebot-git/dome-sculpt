@@ -189,7 +189,10 @@ MorphNormalBasis SourceKeyDerivation::validate_impl(bool deep,bool read_archive,
   const auto added=targets_.size()-material_->normal_frames->targets.size();
   if(current_targets_.size()!=prior_slots.size()+added)throw std::invalid_argument("Independent key allocation must append each actual new native target slot");
   for(size_t i=0;i<added;++i)if(current_targets_[prior_slots.size()+i]!=material_->normal_frames->next_target+i||!ids.contains(material_->normal_frames->next_target+i))throw std::invalid_argument("Independent key allocation must preserve the genuine monotonic stable ID sequence");
-  material_->validate(deep);source_paint_pairing(paint_.get(),material_.get(),appearance_.get(),false);if(deep&&material_->color_preparation)material_->color_preparation->validate_current(paint_->mesh(),appearance_.get());normal_frame_current_authority(*material_,paint_->mesh(),deformation_.get(),cancelled);
+  material_->validate(deep);source_paint_pairing(paint_.get(),material_.get(),appearance_.get(),false);
+  if(deep&&material_->color_preparation&&!material_->canonical_paint_sampling)
+    material_->color_preparation->validate_current(paint_->mesh(),appearance_.get());
+  normal_frame_current_authority(*material_,paint_->mesh(),deformation_.get(),cancelled);
   if(!material_->normal_preparation&&appearance_){const auto original=material_->uv_origin->appearance;if(!original||!own(original->asset,appearance_->asset)||!own(original->original_bytes,appearance_->original_bytes)||original->source_mesh!=appearance_->source_mesh||original->source_primitive!=appearance_->source_primitive||original->material!=appearance_->material||appearance_->source_vertices.size()!=paint_->mesh().positions.size())throw std::invalid_argument("Generic key anchor borrowed another original primitive appearance");
     for(size_t c=0;c<domain_->basis()->indices.size();++c){if((c&1023)==0)stop(cancelled);const auto v=domain_->basis()->indices[c];if(appearance_->source_vertices.at(domain_->current_vertices().at(v))!=original->source_vertices.at(domain_->source_frame_vertices().at(v)))throw std::invalid_argument("Generic key appearance map differs from its genuine source-frame corners");}}
   if(material_->normal_preparation){const auto &recipe=*material_->normal_preparation;

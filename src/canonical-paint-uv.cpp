@@ -6,6 +6,18 @@
 #include "canonical-key-uv.hpp"
 #include <numeric>
 namespace dome::detail {
+bool canonical_paint_color_matches(const PaintedMesh &paint,const SourceColorPreparation *color) noexcept {
+ const auto &projection=paint.color_projection();
+ if(!color || !projection)return !color && !projection;
+ return color->receipt.source_field==SourceColorField::Identity && !color->paint_sampling &&
+    !color->uv_reprojection && color->projection && projection->vertex_rgba &&
+    color->projection->vertex_rgba==projection->vertex_rgba &&
+    !color->projection->vertex_rgba.owner_before(projection->vertex_rgba) &&
+    !projection->vertex_rgba.owner_before(color->projection->vertex_rgba) &&
+    color->projection->maximum_error==projection->maximum_error &&
+    color->projection->quality_cells==projection->quality_cells;
+}
+
 CanonicalPaintUvGeometry stage_canonical_paint_uv(const SculptObject &source,const Mesh &target,
  std::span<const uint32_t> vertices,const PaintSamplingLimits &limits){
  auto stop=[&]{if(limits.cancelled&&limits.cancelled())throw std::runtime_error("Canonical writable UV stage cancelled");};stop();
@@ -13,9 +25,10 @@ CanonicalPaintUvGeometry stage_canonical_paint_uv(const SculptObject &source,con
   throw std::invalid_argument("Invalid canonical writable UV stage limits");
  const auto paint_source=source.painted;const auto binding=source.material_bindings;const auto origin=binding?binding->canonical_attributes:nullptr;
  if(!source.mesh_active||!paint_source||paint_source->in_stroke()||!origin||!origin->valid_owner(origin)||
-    binding->has_mtoon||binding->normal_preparation||binding->color_preparation||binding->native_paint_sampling||
+    binding->has_mtoon||binding->normal_preparation||binding->native_paint_sampling||
     (!binding->key_derivation&&binding->normal_frames!=origin->frames())||source.appearance||source.polygon||
-    paint_source->surface_diagnostics().policy!=PaintUvPolicy::Strict||paint_source->source_maps()||paint_source->source_sampling_prepared()||paint_source->normal_projection()||paint_source->color_projection())
+    paint_source->surface_diagnostics().policy!=PaintUvPolicy::Strict||paint_source->source_maps()||paint_source->source_sampling_prepared()||paint_source->normal_projection()||
+    !canonical_paint_color_matches(*paint_source,binding->color_preparation.get()))
   throw std::invalid_argument("Canonical writable UV stage needs its genuine supported current normal/grid owners");
  if(binding->key_derivation)canonical_key_uv_authority(*paint_source,*binding,source.deformation.get(),64'000'000,limits.max_working_bytes,limits.cancelled);
  const auto &live=*paint_source;const auto &mesh=live.mesh();
@@ -37,7 +50,9 @@ CanonicalPaintUvGeometry stage_canonical_paint_uv(const SculptObject &source,con
  std::vector<uint32_t> corners(target.indices.size());std::iota(corners.begin(),corners.end(),0);
  auto domain=retain_paint_sampling(mesh,before.paint_sampling_domain(),target,corners,grid_limits);
  auto paint=retain_paint_grid_borrowed(before,target,domain,grid_limits);
- if(paint->baked()!=before.baked()||paint->normal_projection()!=before.normal_projection()||paint->source_maps()!=before.source_maps())throw std::logic_error("Detached canonical UV altered independent immutable paint/normal metadata");
+ if(paint->baked()!=before.baked()||paint->normal_projection()!=before.normal_projection()||
+    paint->color_projection()!=before.color_projection()||paint->source_maps()!=before.source_maps())
+  throw std::logic_error("Detached canonical UV altered independent immutable paint metadata");
  CanonicalPaintUvGeometry out;out.before_paint=std::move(captured);out.paint=std::move(paint);out.normal_uv=std::move(normal);out.domain=std::move(domain);out.current_sources.assign(vertices.begin(),vertices.end());stop();return out;
 }
 }

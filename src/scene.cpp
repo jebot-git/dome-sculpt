@@ -342,7 +342,7 @@ void Scene::validate(bool deep_sources) const {
     detail::polygon_color_owner(polygon.get(),preparation.get(),deep_sources);
     const auto normal_projection=paint?paint->normal_projection():nullptr;
     const auto normal_preparation=binding?binding->normal_preparation:nullptr;
-    if(paint&&paint->baked()&&paint->baked()->normal_field)
+    if((paint&&paint->baked()&&paint->baked()->normal_field)||(binding&&binding->canonical_paint_sampling))
       detail::source_paint_pairing(source_view?source_view.get():paint.get(),binding.get(),appearance.get(),deep_sources);
     if(bool(normal_projection)!=bool(normal_preparation))throw std::invalid_argument("Current normal projection and retained interpretation differ");
     if(normal_projection){
@@ -354,7 +354,7 @@ void Scene::validate(bool deep_sources) const {
       if(projection->vertex_rgba!=preparation->projection->vertex_rgba || projection->maximum_error!=preparation->projection->maximum_error || projection->quality_cells!=preparation->projection->quality_cells)
         throw std::invalid_argument("Current color projection is not the recorded prepared field");
       projection->validate(paint->resolution());source_images.add(projection->vertex_rgba);
-      if(deep_sources)preparation->validate_current(paint->mesh(),appearance.get());
+      if(deep_sources&&!binding->canonical_paint_sampling)preparation->validate_current(paint->mesh(),appearance.get());
     }
     if(binding) {
       if(!paint)throw std::invalid_argument("Resolved material has no persisted painting mesh");

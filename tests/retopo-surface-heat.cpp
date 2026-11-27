@@ -3,6 +3,7 @@
 #include "dome/document.hpp"
 #include "dome/import.hpp"
 #include "dome/native-authoring.hpp"
+#include "dome/paint-sampling.hpp"
 #include "dome/polygon-scene.hpp"
 #include "dome/rig-edit.hpp"
 #include "dome/rig-rest.hpp"
@@ -760,7 +761,94 @@ void prepared_geometry_edit(bool affine,const std::filesystem::path &out,bool de
 
 enum class PreparedColorOrder { ColorOnly, ColorFirst, NormalFirst };
 
-void prepared_color_edit(bool affine,const std::filesystem::path &out,PreparedColorOrder order) {
+Scene edit_prepared_uv(Document &document,const std::filesystem::path &out,uint64_t guide) {
+  const auto original=document.copy_scene();
+  const auto original_json=original.encode();
+  const auto &old=*original.active().painted;
+  const auto &binding=*original.active().material_bindings;
+  const auto scene_file=out/"retained-uv.dsculpt";
+  original.save(out/"retained-uv-source.dsculpt");
+  for (size_t pass=0;pass<2;++pass) {
+    const auto prior=document.copy_scene().encode();
+    document.begin_uv();
+    check(document.wait_uv() && document.frame().state->uv->paint_sampling_required &&
+          document.frame().state->uv->normal_sampling_required,
+          "The UV editor keeps independent prepared paint and normal sampling by default");
+    document.edit_uv(UvAction::Scale,pass==0?.81f:.85f);
+    check(document.wait_uv(), "The actual UV edit validates a changed atlas");
+    document.end_uv(true);
+    document.save_async(scene_file).get();
+    settled(document);
+    const auto accepted=document.copy_scene();
+    const auto &patch=accepted.active();
+    check(patch.painted->mesh().uv!=old.mesh().uv && patch.painted->paint_sampling_domain() &&
+          patch.painted->paint_sampling_domain()->basis()->uv==old.mesh().uv &&
+          patch.painted->baked()==old.baked() && patch.painted->color_projection()==old.color_projection() &&
+          patch.painted->layers().back().pbr_tiles==old.layers().back().pbr_tiles &&
+          patch.material_bindings->color_preparation==binding.color_preparation &&
+          patch.material_bindings->canonical_attributes==binding.canonical_attributes,
+          "UV Apply changes display coordinates and shares the exact old Paint, Bake and preparation owners");
+    const auto encoded=accepted.encode();
+    check(Scene::load(scene_file).encode()==encoded && document.undo() &&
+          document.copy_scene().encode()==prior && document.redo() && document.copy_scene().encode()==encoded,
+          "Ordered Save, cold Open and Undo/Redo preserve both field owners after each UV edit");
+    settled(document);
+  }
+  const auto edited=document.copy_scene();
+  const auto before_bake=edited.encode();
+  document.export_asset(out/"retained-uv-standard.glb",AssetExportFormat::Glb).get();
+  ImportLimits limits;
+  limits.mode=ImportMode::PreserveGltf;
+  const auto standard=import_mesh(out/"retained-uv-standard.glb",limits);
+  const auto &primitive=standard.primitives.front();
+  const auto &material=standard.materials.at(primitive.material);
+  const auto read_uv=[&](int set,uint32_t vertex) {
+    if (set==0) return primitive.mesh.uv.at(vertex);
+    if (set==1) return primitive.uv1.at(vertex);
+    return primitive.extra_uv_sets.at(uint32_t(set)).at(vertex);
+  };
+  check(primitive.colors.empty() && material.color_texture>=0 && material.normal_texture>=0 &&
+        primitive.mesh.indices.size()==old.mesh().indices.size(),
+        "Standard GLB has its independently authored PBR and normal inputs");
+  for (size_t c=0;c<primitive.mesh.indices.size();++c) {
+    const auto vertex=primitive.mesh.indices[c];
+    const auto expected=old.mesh().uv[old.mesh().indices[c]];
+    if (read_uv(material.color_texcoord,vertex)!=expected || read_uv(material.normal_texcoord,vertex)!=expected)
+      throw std::runtime_error("GLB prepared roles sampled the edited UVs instead of their respective original grids");
+  }
+  check(material.color_texcoord!=0 && material.normal_texcoord!=0,
+        "Both emitted texture roles carry the original ordered UV sequence beside the edited layout");
+
+  ObjectBakeSettings settings;
+  settings.front_mm=settings.back_mm=35;
+  settings.ao_samples=0;
+  settings.allow_backfaces=true;
+  document.bake_from_object(guide,settings);
+  settled(document);
+  const auto rebaked=document.copy_scene();
+  const auto &prior=edited.active();
+  const auto &next=rebaked.active();
+  check(next.painted->baked()!=prior.painted->baked() && next.painted->baked()->normal_field &&
+        next.painted->baked()->color_interpretation==BakedColorInterpretation::ResolvedPbr &&
+        next.painted->paint_sampling_domain()==prior.painted->paint_sampling_domain() &&
+        next.material_bindings->color_preparation==binding.color_preparation &&
+        next.painted->baked()->normal_field->prior()==prior.painted->baked()->normal_field,
+        "Rebake writes both prepared fields in their retained coordinates and keeps the previous normal owner");
+  check(document.undo() && document.copy_scene().encode()==before_bake,
+        "Undo Rebake recovers the original independent field data");
+  settled(document);
+  document.begin_uv();
+  check(document.wait_uv(), "The retained UV history is available for Restore");
+  document.edit_uv(UvAction::RestorePaintSource);
+  settled(document);
+  check(document.copy_scene().encode()==original_json && document.undo() &&
+        document.copy_scene().encode()==before_bake,
+        "Restore and Undo recover the exact paired source and edited projects");
+  settled(document);
+  return Scene::load(scene_file);
+}
+
+void prepared_color_edit(bool affine,const std::filesystem::path &out,PreparedColorOrder order,bool retained_uv=false) {
   const bool portable_normals = order!=PreparedColorOrder::ColorOnly;
   auto scene = author_patch(affine,out);
   const auto previous = scene.active().id;
@@ -863,10 +951,15 @@ void prepared_color_edit(bool affine,const std::filesystem::path &out,PreparedCo
       bytes[p+3] = 109;
     }
   }
-  const auto before = Scene::decode(input);
-  before.save(out/"color-before.dsculpt");
+  auto before = Scene::decode(input);
   document.replace(before);
   settled(document);
+  if (retained_uv) {
+    before=edit_prepared_uv(document,out,guide);
+    document.replace(before);
+    settled(document);
+  }
+  before.save(out/"color-before.dsculpt");
   std::shared_ptr<const RetopoView> draft;
   if (affine) draft = relocate_patch(document,before,{.72f,0,0},true);
   else {
@@ -1693,6 +1786,7 @@ int main(int argc,char **argv) try {
       mode!="prepared-color-plain" && mode!="prepared-color-affine" &&
       mode!="prepared-color-normal-plain" && mode!="prepared-color-normal-affine" &&
       mode!="prepared-color-normal-first" &&
+      mode!="prepared-color-normal-uv-plain" && mode!="prepared-color-normal-uv-affine" &&
       mode!="restore-plain" && mode!="restore-affine" && mode!="material-seam-plain" &&
       mode!="material-seam-affine" && mode!="subdivide-seam-plain" && mode!="subdivide-seam-affine") return 2;
   const std::filesystem::path out = argv[1];
@@ -1706,6 +1800,8 @@ int main(int argc,char **argv) try {
   else if (mode.starts_with("subdivide-seam-")) split_material_seam(mode.ends_with("affine"),out,true);
   else if (mode.starts_with("mtoon-")) retopo_toon_materials(mode.ends_with("affine"),mode.ends_with("v0"),out,mode=="mtoon-detached");
   else if (mode=="prepared-color-normal-first") prepared_color_edit(false,out,PreparedColorOrder::NormalFirst);
+  else if (mode.starts_with("prepared-color-normal-uv-"))
+    prepared_color_edit(mode.ends_with("affine"),out,PreparedColorOrder::ColorFirst,true);
   else if (mode.starts_with("prepared-color-")) prepared_color_edit(mode.ends_with("affine"),out,
       mode.starts_with("prepared-color-normal-") ? PreparedColorOrder::ColorFirst : PreparedColorOrder::ColorOnly);
   else if (mode.starts_with("prepared-")) prepared_geometry_edit(mode.ends_with("affine"),out,mode.starts_with("prepared-detached"));

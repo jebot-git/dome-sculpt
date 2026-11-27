@@ -784,7 +784,8 @@ private:
       throw std::invalid_argument("Retopology needs native prepared color with its original identity field");
     detail::source_paint_pairing(&before,&binding,nullptr,false);
     budget_.work(recipe.projection->quality_cells);
-    recipe.validate_current(before.mesh(),nullptr,budget_.cancelled());
+    const auto domain=before.paint_sampling_domain();
+    recipe.validate_current(domain?*domain->basis():before.mesh(),nullptr,budget_.cancelled());
     const auto &grid = grid_for(before.resolution());
     const auto pixels = size_t(grid->resolution()) * grid->resolution();
     budget_.reserve(pixels,4);

@@ -168,8 +168,9 @@ void edit_uv(Document &doc) {
   try {
     int row = std::max(32, dx::size + 14), sx, sy, sw, sh;
     Fl::screen_work_area(sx, sy, sw, sh);
+    // DomeD can report the full output here. Leave room for its menu and taskbar.
     int width = std::min(std::max(840, dx::size * 46), sw - 40),
-        height = std::min(900, sh - 40);
+        height = std::min(900, sh - 4 * row);
     const bool compact_tools=width<dx::size*30+64;
     const bool compact=compact_tools||height<row*8;
     const int toolbar_height=row*(compact_tools?1:4),status_height=compact_tools?std::max(row,dx::size*2+8):row;

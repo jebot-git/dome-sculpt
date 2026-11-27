@@ -51,7 +51,8 @@ void CanonicalPaintSampling::validate(const PaintSamplingLimits &limits,bool dee
   // owner. Pair the immutable before Paint without recursively validating that
   // same chain a second time at every UV step.
   if(!b.canonical_paint_sampling->matches_current(*before_->paint)||before_->paint->source_maps()||
-     before_->paint->source_sampling_prepared()||before_->paint->normal_projection()||before_->paint->color_projection())
+     before_->paint->source_sampling_prepared()||before_->paint->normal_projection()||
+     !canonical_paint_color_matches(*before_->paint,b.color_preparation.get()))
    throw std::invalid_argument("Canonical paint before-state lost its exact older sampling attachment");
   if(before_->paint->baked()&&before_->paint->baked()->normal_field&&before_->paint->baked()->normal_field->origin()!=b.canonical_attributes)
    throw std::invalid_argument("Canonical paint before-state borrowed another independent normal field");
@@ -68,9 +69,11 @@ void CanonicalPaintSampling::validate(const PaintSamplingLimits &limits,bool dee
 void CanonicalPaintSampling::validate_binding(const SourceMaterialBindings &binding,bool deep) const{
  auto own=[](const auto &a,const auto &b){return a==b&&!a.owner_before(b)&&!b.owner_before(a);};
  if(!before_||!before_->material_bindings||!attachment_||!valid_owner(binding.canonical_paint_sampling)||
-    binding.has_mtoon||binding.native_paint_sampling||binding.native_paint_frames||binding.color_preparation||binding.normal_preparation||
+    binding.has_mtoon||binding.native_paint_sampling||binding.native_paint_frames||binding.normal_preparation||
     !binding.sampling_reparameterized||!own(binding.canonical_uv,normal_uv_)||!own(binding.canonical_attributes,normal_uv_->origin())||
-    !own(binding.uv_origin,before_->material_bindings->uv_origin)||binding.normal_frame!=before_->material_bindings->normal_frame)
+    !own(binding.uv_origin,before_->material_bindings->uv_origin)||
+    !own(binding.color_preparation,before_->material_bindings->color_preparation)||
+    binding.normal_frame!=before_->material_bindings->normal_frame)
   throw std::invalid_argument("Canonical writable paint binding lost its actual independent normal/paint source owners");
  const auto &before=*before_->material_bindings;
  const bool original=own(binding.key_derivation,before.key_derivation)&&own(binding.normal_frames,before.normal_frames);
@@ -96,7 +99,8 @@ void CanonicalPaintSampling::validate_binding(const SourceMaterialBindings &bind
 }
 void CanonicalPaintSampling::validate_current(const PaintedMesh &paint,const PaintSamplingLimits &limits,bool deep) const{
  validate(limits,deep);
- if(!matches_current(paint)||paint.source_maps()||paint.source_sampling_prepared()||paint.color_projection()||paint.normal_projection())
+ if(!matches_current(paint)||paint.source_maps()||paint.source_sampling_prepared()||paint.normal_projection()||
+    !canonical_paint_color_matches(paint,before_->material_bindings->color_preparation.get()))
   throw std::invalid_argument("Canonical paint sampling lost its exact current geometry attachment");
  if(paint.baked()&&paint.baked()->normal_field&&paint.baked()->normal_field->origin()!=normal_uv_->origin())
   throw std::invalid_argument("Canonical paint borrowed another baked normal field origin");

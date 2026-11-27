@@ -228,8 +228,14 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
       checkpoint();vertex_alpha|=validated_colors.at(v)[3]<1;
     }
     vertex_transparency.push_back(vertex_alpha);
-    if(input.material_bindings&&input.material_bindings->color_preparation)
-      input.material_bindings->color_preparation->validate_current(input.mesh,input.appearance.get(),cancelled);
+    // The canonical frame exporter authenticates the retained attachment and
+    // verifies the original colour receipt on its writable atlas.
+    if(const auto &binding=input.material_bindings;binding&&binding->color_preparation) {
+      if(!binding->canonical_paint_sampling)
+        binding->color_preparation->validate_current(input.mesh,input.appearance.get(),cancelled);
+      else if(!binding->normal_frames)
+        throw std::invalid_argument("Retained color export needs its own canonical frame and sampling attachment");
+    }
     std::optional<NormalFrameExport> prepared;
     if(input.material_bindings && input.material_bindings->normal_frames)prepared=normal_owner?normal_frame_export_vrm1(*normal_owner,input,cancelled):normal_frame_export(input,source_space,cancelled,source_space==SourceMorphSpace::Native);
     else if(input.material_bindings&&input.material_bindings->native_paint_sampling)prepared=native_paint_export(input,source_space,cancelled);

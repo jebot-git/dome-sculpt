@@ -731,11 +731,14 @@ if(BUILD_TESTING)
                            subdivide-seam-plain subdivide-seam-affine prepared-detached prepared-detached-affine
                            prepared-color-plain prepared-color-affine
                            prepared-color-normal-plain prepared-color-normal-affine prepared-color-normal-first
+                           prepared-color-normal-uv-plain prepared-color-normal-uv-affine
                            mtoon-plain mtoon-affine mtoon-v0 mtoon-detached)
     add_test(NAME retopology-${workflow} COMMAND dome-sculpt-retopo-surface-heat-test
       ${CMAKE_CURRENT_BINARY_DIR}/retopology-${workflow} ${workflow})
     set_tests_properties(retopology-${workflow} PROPERTIES TIMEOUT 480)
   endforeach()
+  set_tests_properties(retopology-prepared-color-normal-uv-plain
+                       retopology-prepared-color-normal-uv-affine PROPERTIES TIMEOUT 1800)
   foreach(placement plain affine)
     add_test(NAME retopology-surface-heat-${placement} COMMAND dome-sculpt-retopo-surface-heat-test
       ${CMAKE_CURRENT_BINARY_DIR}/retopology-surface-heat-${placement} ${placement})
