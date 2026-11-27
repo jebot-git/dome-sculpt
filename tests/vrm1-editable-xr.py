@@ -2,11 +2,13 @@
 """Real native loader/stereo/joystick editable V1 export with synthetic tracking."""
 import argparse,json,os,signal,struct,subprocess,tempfile
 from pathlib import Path
-from xr_test_graphics import hardware_environment
+from xr_test_graphics import hardware_environment, hardware_renderer
 signal.pthread_sigmask(signal.SIG_SETMASK,[])
 p=argparse.ArgumentParser(description=__doc__)
 for name in ['binary','runtime','helper','fixture','gate','out']:p.add_argument(name,type=lambda v:Path(v).resolve())
 a=p.parse_args();a.out.mkdir(parents=True,exist_ok=True);checks=[]
+if not a.gate.is_file():
+ raise FileNotFoundError(f"Editable avatar OpenXR fixture requires the export gate library at {a.gate}")
 def check(ok,label):
  checks.append({'passed':bool(ok),'check':label});(a.out/'report.json').write_text(json.dumps({'checks':checks,'failed':sum(not x['passed'] for x in checks),'physical_headset':False},indent=2)+'\n');print(('PASS ' if ok else 'FAIL ')+label,flush=True);assert ok,label
 with tempfile.TemporaryDirectory(prefix='dome-v1-editable-xr-') as home:
@@ -23,7 +25,7 @@ with tempfile.TemporaryDirectory(prefix='dome-v1-editable-xr-') as home:
    if mode=='cancel':package.write_bytes(b'Prior native Avatar output')
   stamp=source.stat().st_mtime_ns
   with (case/'app.log').open('w') as log:result=subprocess.run([str(a.binary),'--xr','--open',str(opened),'--frames','3000','--save',str(target)],env=e,stdout=log,stderr=subprocess.STDOUT,timeout=240)
-  check(result.returncode==0,name+': actual loader client exits cleanly and accepted worker/Save drains');detail=json.loads(report.read_text());check(detail.get('acquires',0)>0 and detail.get('acquires')==detail.get('image_waits')==detail.get('releases') and detail.get('left_eye_nonblank',0)>0 and detail.get('right_eye_nonblank',0)>0,name+': real stereo GL ownership balances with both nonblank eyes');check(inspect(target)==baseline,name+': final native Save preserves all source/paint/material/rig/morph authorities');check(a.fixture.read_bytes()==original,name+': immutable original input project remains unchanged')
+  check(result.returncode==0,name+': actual loader client exits cleanly and accepted worker/Save drains');detail=json.loads(report.read_text());check(hardware_renderer(detail) and detail.get('acquires',0)>0 and detail.get('acquires')==detail.get('image_waits')==detail.get('releases') and detail.get('left_eye_nonblank',0)>0 and detail.get('right_eye_nonblank',0)>0,name+': hardware stereo GL ownership balances with both nonblank eyes');check(inspect(target)==baseline,name+': final native Save preserves all source/paint/material/rig/morph authorities');check(a.fixture.read_bytes()==original,name+': immutable original input project remains unchanged')
   if mode=='recover':
    saves=list((Path(env['XDG_STATE_HOME'])/'dome-sculpt').glob('Recovery-*.dsculpt'));check(bool(saves) and any(inspect(path)==baseline for path in saves),name+': joystick Save after real package Open writes an independent native recovery project');continue
   check(detail.get('editable_avatar_durable_gate_observed') and (gate/'entered').exists(),name+': actual editable V1 worker reaches durable temporary output before controller continuation');check(all(detail.get('editable_avatar_images',{}).get('13',{}).get(eye,0)>1000 for eye in ['0','1']),name+': actual Files page with editable avatar choices is rendered in both eyes');check(source.stat().st_mtime_ns!=stamp and inspect(source)==baseline,name+': real joystick Native Save queues behind accepted export with exact complete Scene')

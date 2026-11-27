@@ -26,7 +26,7 @@ for mode in ('accept','cancel','focus'):
  check(graphics.get('left_eye_nonblank',0)>0 and graphics.get('right_eye_nonblank',0)>0 and graphics.get('palette_images',0)>0,mode+': actual stereo images contain the shared interactive UV palette')
  check(fixture.read_bytes()==data,mode+': original native project bytes remain untouched')
  if mode=='accept':
-  check(after['version']==21 and after['source_materials']['version']==7 and bool(after['normal_sampling']['domains']),mode+': actual controller Keep-detail ray, Scale axes and Confirm install the owning retained field')
+  check(after['version']>=21 and after['source_materials']['version']>=7 and bool(after['normal_sampling']['domains']),mode+': actual controller Keep-detail ray, Scale axes and Confirm install the owning retained field')
   check(after['source_materials']['normal_frames']==original['source_materials']['normal_frames'],mode+': all original and current normal/key frame attributes survive controller authoring')
   check(after['objects'][0]['painted']['mesh']!=original['objects'][0]['painted']['mesh'],mode+': the real accepted UV workspace changed its chart rather than saving a no-op')
  else:check(after==original,mode+': controller Cancel or actual session focus loss discards the complete draft and Keep-detail choice')

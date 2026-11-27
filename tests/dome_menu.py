@@ -313,6 +313,15 @@ async def main():
         await native_command("File",2,"Close Window")
         await wait(lambda:named("Object and material") is None)
         check(client.poll() is None,"The compositor's universal File Close cancels the modal dialog and retains the sculpt document")
+        undo_state=(await layout())["Undo"][1].get("enabled")
+        await native_command("File",2,"Import mesh...")
+        chooser=await wait(lambda:named("Import model"))
+        check(chooser["app_id"]==window["app_id"] and scene()["focused"]==chooser["id"],
+              "The universal Import command opens the application's native Wayland file chooser")
+        await chord("Control_L","w")
+        await wait(lambda:named("Import model") is None)
+        check(client.poll() is None and (await layout())["Undo"][1].get("enabled")==undo_state,
+              "Ctrl+W cancels the native import chooser and preserves document history")
         await header(9) # Shell-owned Window follows the application's seven exported menus.
         await key("Home");await key("Return");await asyncio.sleep(.4)
         current=next(w for w in scene()["windows"] if w["id"]==window["id"])

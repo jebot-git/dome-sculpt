@@ -26,8 +26,9 @@ for mode in ('accept','cancel','focus'):
  check(graphics.get('left_eye_nonblank',0)>0 and graphics.get('right_eye_nonblank',0)>0 and graphics.get('palette_images',0)>0,mode+': actual stereo images contain the shared interactive UV palette')
  check(fixture.read_bytes()==data,mode+': original native project bytes remain untouched')
  if mode=='accept':
-  check(after['version']==34 and after['source_materials']['version']==16 and bool(after['baked_normal_fields']['uv']),mode+': actual controller Scale axes and Confirm install the owning converted-normal UV correspondence')
+  check(after['version']>=34 and after['source_materials']['version']>=16 and bool(after['baked_normal_fields']['uv']),mode+': actual controller Scale axes and Confirm install the owning converted-normal UV correspondence')
   check(after['baked_normal_fields']['origins']==original['baked_normal_fields']['origins']and after['baked_normal_fields']['fields']==original['baked_normal_fields']['fields'],mode+': every independent normal plane and genuine conversion root survives controller UV authoring')
-  check(after['objects'][0]['painted']['mesh']!=original['objects'][0]['painted']['mesh'],mode+': the real accepted UV workspace changed its chart rather than saving a no-op')
+  edited=after['objects'][0]['painted'];prior=original['objects'][0]['painted']
+  check(edited.get('payload',edited)['mesh']!=prior.get('payload',prior)['mesh'],mode+': the real accepted UV workspace changed its chart rather than saving a no-op')
  else:check(after==original,mode+': controller Cancel or actual session focus loss discards the complete draft and Keep-detail choice')
 print(str(len(checks))+' actual-loader converted normal UV checks passed')

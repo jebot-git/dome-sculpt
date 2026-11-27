@@ -852,14 +852,14 @@ async def main():
               nodes["Undo"][1].get("enabled") is False,
               "Universal Close cancels recovery without changing the document")
         await click("Import mesh...")
-        import_chooser = await wait(lambda: named("Import static mesh"))
+        import_chooser = await wait(lambda: named("Import model"))
         check(import_chooser.get_wm_transient_for() is not None and
               import_chooser.get_wm_class()[1] == window.get_wm_class()[1],
               "Mesh import uses the application's native file chooser")
         await click("Close Window")
         await asyncio.sleep(0.2)
         nodes, tree = await layout()
-        check(named("Import static mesh") is None and nodes["Undo"][1].get("enabled") is False,
+        check(named("Import model") is None and nodes["Undo"][1].get("enabled") is False,
               "Universal Close cancels mesh import without changing scene history")
         await click("Create humanoid...")
         creator = await wait(lambda: named("Create humanoid"))
