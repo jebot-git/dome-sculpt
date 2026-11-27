@@ -10,6 +10,25 @@ replaces the accumulated checkpoint diary; all previous text is preserved,
 byte-for-byte, in [the historical handoff](HANDOFF-HISTORY-20261117.md).
 Update this current summary at milestones rather than prepending more history.
 
+## Current stage — November 27
+
+Dome Sculpt is an integrated authoring candidate. The isolated software
+Release run for `662d889d` passed all 1,366 registered tests. The newer
+controller attachment revision `eea22499` has focused Release and sanitizer
+results, nested DomeD Wayland coverage, and synthetic OpenXR coverage on
+software GL and Intel Arc A770. Its own combined Release rerun started after
+these checks. The [validation receipt](validation/vrm1-xr-attachment-20261127.json)
+contains the earlier complete JUnit and the new focused evidence.
+
+The next acceptance milestone is a complete headset workflow on the current
+build, from a production-size sculpt or imported model through topology, UVs,
+paint, humanoid fitting and export. Sustained local meshing and recovery,
+paint and baking on broader source and deformation cases, robust automatic
+weights, and complete source-aware glTF/VRM interoperability still need work.
+Physical headset, stylus, trackball and 3D-mouse checks and positive runnable
+CUDA/ROCm workloads also remain open. Controller trays and spatial node-based
+editing and history follow the basic production workflows.
+
 ## Nov26 resume: rebuild from committed sources
 
 No Dome Sculpt build jobs were running at resume. The Nov18 temporary SDK,
@@ -2676,9 +2695,28 @@ and four registered sanitizer suites passing. A fresh application opens
 both VRM formats and produces identical GLBs for the normal and fitted pose
 fixtures. The Khronos
 validator reports zero errors. Its material-extension and imported skinned
-node warnings also appear in the source-only control. XR attachment authoring,
-physical headset tests and skinned native accessories remain open.
+node warnings also appear in the source-only control.
 [VRM1 bone accessory validation](validation/vrm1-bone-accessory-20261127.json)
+
+Objects → Avatars → Rig and shapekeys → Attach to bone offers the same worker
+in XR when a rigid native texture-set mesh is selected. The controller picker
+displays the avatar instance and bone, defaults to Cancel, and clears its
+draft on focus or tracking loss. Apply preserves placement and paint in one
+Undo/Redo entry. The selected mesh exports with the chosen avatar instance
+when the project contains multiple imports of the same source.
+
+Release and ASan/UBSan each pass 49 focused assertions and six registered
+cases. Two registered software OpenXR cases pass. Synthetic OpenXR records
+18 assertions each on software GL and Arc A770 for Apply, Cancel, focus loss
+and tracking loss, with matching saved scenes and balanced swapchain use.
+The Arc Files workflow exports an identical Editable VRM from the saved XR
+attachment. Its Khronos validation reports zero errors and the same seven
+warnings as the source-only control. All five pinned VRM/MToon schema checks
+pass. The native Wayland Attach, Save and Undo also pass. The first stereo
+test counted cyan avatar pixels as palette pixels. Its results are preserved
+alongside the corrected panel-background measurements. Physical headset
+tests and skinned native accessories remain open.
+[OpenXR attachment validation](validation/vrm1-xr-attachment-20261127.json)
 
 ## Source and integration boundary
 

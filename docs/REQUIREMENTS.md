@@ -251,8 +251,11 @@ Scene. Source expression targets remain bound to their original material
 identities. The FLTK Scene menu can attach a rigid native texture-set mesh
 to a genuine imported VRM1 bone. Linked posing and fitted-rest changes
 preserve native attachment and paint authority. Both VRM1 modes use the
-original bone as the portable parent. XR attachment authoring, larger typed
-Bake previews, original authored and deforming frames, typed donor
+original bone as the portable parent. The XR controller picker now selects
+the original avatar instance and bone and applies through the shared worker.
+Actual-loader tests cover Apply and Cancel, focus and tracking loss, ordered
+Save, and export of the selected avatar. Larger typed Bake previews,
+original authored and deforming frames, typed donor
 partitions, skinned accessories, VRM0 texture-set
 materials, alternate UVs, resampling, live
 painted animation, other sampler modes and physical verification remain open.
@@ -268,6 +271,7 @@ painted animation, other sampler modes and physical verification remain open.
 [Standard VRM1 native texture-set accessory evidence](validation/vrm1-native-texture-set-20261127.json)
 [Editable VRM1 native texture-set accessory evidence](validation/vrm1-editable-native-texture-set-20261127.json)
 [VRM1 bone attachment evidence](validation/vrm1-bone-accessory-20261127.json)
+[OpenXR bone attachment evidence](validation/vrm1-xr-attachment-20261127.json)
 
 Strict Bake rays now recover source-edge contacts affected by float staging.
 An exact ray hit has priority. A missed ray can use an actual source edge
