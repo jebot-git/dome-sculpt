@@ -22,6 +22,25 @@ The later frozen prepared-colour revision `48952391` passed all 1,399
 registered tests with zero skips. Its terminal status and JUnit hash are
 recorded with the native Bake tangent validation below.
 
+The subsequent combined Release run of `931bbe44` passed 1,404 of 1,406
+tests. The held-contact fixture pressed the trigger after a grab-mode change
+without waiting for that revision's surface. The new fixture holds the mesh
+worker at that boundary and verifies that stale contact is refused. It then
+waits for the current surface, retries the physical grip workflow, and checks
+worker allocation failure, dependent Save refusal, exact source and history,
+and successful retry. It passed 64 consecutive Release runs and the scoped
+ASan/UBSan check. The color-cut job reached allocation boundary 56,576 before
+the previous monolithic run timed out. The test now splits the dynamically
+measured boundaries into eight disjoint cases with the same exact rollback
+and retry assertions at every boundary. All 16 focused Release cases pass,
+including all 56,683 cut allocation boundaries. Six ASan/UBSan runs cover
+native publication, ordinary cut and the first and last 128 cut faults.
+Synthetic OpenXR covers affine contact and focus cancellation on Arc and
+llvmpipe and checks held color-cut isolation and Save on llvmpipe. A fresh
+combined Release run of `9292dfe3` is tracked by
+`ds-held-cut-combined-release-20261127.service`.
+[Held and cut regression evidence](validation/held-cut-regression-20261127.json)
+
 The current texture-set shapekey revision `17367cb0` adds mixed-material
 shapekey authoring and portable rigid VRM 1.0 accessory morphs. It restores
 texture-set history written by earlier Scene40 builds that omitted nullable

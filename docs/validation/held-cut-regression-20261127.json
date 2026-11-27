@@ -1,0 +1,356 @@
+{
+  "archive_members_sha256": {
+    "affine-contact.log": "4b25c8487fce8e62ce50e6ddce54831821c9ed318d5de12ab4bd35ca64c4221c",
+    "asan/colored-boundaries.log": "1a0a2bf14ea6e10249f3cc319649605e421868266ecfbd07ed62905e5adb4f5b",
+    "asan/colored-first.log": "5e98e5b6419cd5f4bd156e61aaa17af07e637a91e96dcf66aa69f7ac46723450",
+    "asan/colored-last.log": "e4509bca0b3a454e03abd4c38eab6d8a35454e181ffcdf270149560d28671fc3",
+    "asan/cut-color-boundaries.build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "asan/native-default.log": "cce2cc1d3b1bfb1bbb2e019cf622ad91fccdd57c2b23094da9395a1ac750bdf0",
+    "asan/native-held.log": "c506b97fd928720050205d9acb9460b41c19288c99d4b67186a1f40eb0791e87",
+    "asan/native-replace.log": "cce2cc1d3b1bfb1bbb2e019cf622ad91fccdd57c2b23094da9395a1ac750bdf0",
+    "asan/native-worker-publication.build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "check-asan.py": "41f1fd88da7d9c65c579ae8e64426dc2116163c0838c7f3303942572ad913314",
+    "check-release.sh": "6e81e31f0dccfd15d397a8ae92898bfe1abbb7976a79b46042f896d1f9601359",
+    "check-xr.sh": "1edcb32064b7879421c59ab8b7bea5a862acc223782bdf3b5ce800ca7e42cbef",
+    "contact-xr-arc.log": "e647d9f457f433002e776ed9b89839c6cf8f9b08e840901039696470d3e17d10",
+    "contact-xr-arc/report.json": "647cf6af20fba7cde14a4b51b466b11fdc4c893458a6db24f4680b232055b216",
+    "contact-xr-software.log": "e647d9f457f433002e776ed9b89839c6cf8f9b08e840901039696470d3e17d10",
+    "contact-xr-software/report.json": "647cf6af20fba7cde14a4b51b466b11fdc4c893458a6db24f4680b232055b216",
+    "cut-xr-software.log": "514720740902372c9bbf98c38797aaa8b030af83d804bb3002c9777c36757023",
+    "cut-xr-software/report.json": "4c8f4e6012236c90641e227a180882b43ac6e41ef04aa03453804781840baa81",
+    "frozen-failures.json": "9195e6b3b7801407d6948d3598a7f0b41e06e36b272f7473bffd650b84e84fc9",
+    "full-release.py": "9d8caea3b8cc7e636406ddecabcda68f81ab649a6421f28fc7c96b336b631427",
+    "held-repeat.log": "db58eda117c5d074712218074b6173d485306e5082c1032622f7479ccfdd9fdd",
+    "product.patch": "7a76ff3c5aacd4737613c198afd036e5a39418972e8a5a2f7afd0c3bc4693dc0",
+    "record.py": "baefca027652a39d5ec88cffdf6beea72940aba19f127235c44b61516ac9cf28",
+    "release-build.log": "ecf17dac8b0d2e4c0b3bbc835db386a8330eed0685322816e672b8a8523683cc",
+    "release-cut-shards.json": "9881b20b754e4bcf2f839c0cef6dd631068b8411d23f5db18ab1bbaa74263336",
+    "release-tests.log": "bf128975175370bb8b9178a8c43380f2aa029bc13903717fad67edd8f3be45ec",
+    "release/held-cut-release.xml": "62bd7c095605860300d012fd7d22be8c546748d5a49280487a2b9ae35467bea1",
+    "repeated-frozen-held.log": "fe1d8e46a256b723b9bcc2647cee5282b167d28fff636683ea27af878c08b4a2",
+    "xr-helpers.log": "375a43dd6260ccf379be99af27f41fe968ae32f2e91468f506b97b6d18761aac"
+  },
+  "archive_sha256": "f5c1251f8fdfc72f3dc5dd6b600b86170e88ceed21a87728dbb05ebe6a3b9bcd",
+  "candidate": "9292dfe3fd2626dcceab2bb1531b19dd2c1d51fb",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "next_combined_release": {
+    "process_observation": {
+      "ActiveState": "active",
+      "ExecMainPID": "4103522",
+      "InvocationID": "1e524361fde244639e0cee574dcf0ae6",
+      "SubState": "running"
+    },
+    "status_at_recording": {
+      "candidate": "9292dfe3fd2626dcceab2bb1531b19dd2c1d51fb",
+      "elapsed_seconds": 7.197,
+      "invocation": "1e524361fde244639e0cee574dcf0ae6",
+      "phase": "build every registered target",
+      "terminal": false
+    }
+  },
+  "previous_combined_release": {
+    "app_sha256": "d278c4ae02fa505a164724cfd0fc7a002e6875b8355e801fe828121c9577c646",
+    "cache_sha256": "f4d76e2981d78f4e127568b908b0cf7d1371ef6fa9d659f66a6fec2b7524284d",
+    "candidate": "931bbe444e6ee3d17625c940e40aa3519bc87600",
+    "earlier_unit": "ds-retopology-prepared-color-combined-release-20261127.service",
+    "elapsed_seconds": 9599.204,
+    "exit": 8,
+    "failed": [
+      "colored-cut-allocation",
+      "native-worker-held-publication"
+    ],
+    "invocation": "65105e10ee4a42159dddcfafc58e0aec",
+    "junit_sha256": "6d7b8136e4fdb2f5335839da072e24b3ad73a1e19c82830cac746e0212476890",
+    "phase": "complete",
+    "registered": 1406,
+    "skipped": [],
+    "terminal": true,
+    "totals": {
+      "fail": 2,
+      "pass": 1404,
+      "skip": 0
+    }
+  },
+  "previous_main": "1c99af36583c1ecbdc1358319912baa50e9365fe",
+  "release_affine_contact_checks": 57,
+  "release_application_sha256": "397be83ddfc19c719d88b325cf67b65f9df67c6b2d2b3592cfaeb331a971ec74",
+  "release_core_sha256": "755a5d6247cf3df3b574ca5d6babd875c6fdfa8054d8495140051ddf6433800c",
+  "release_cut_shards": [
+    {
+      "denied": 7086,
+      "first": 1,
+      "last": 7086,
+      "measured": 56683,
+      "name": "colored-cut-allocation-0",
+      "seconds": 91.9756
+    },
+    {
+      "denied": 7086,
+      "first": 7087,
+      "last": 14172,
+      "measured": 56683,
+      "name": "colored-cut-allocation-1",
+      "seconds": 123.265
+    },
+    {
+      "denied": 7086,
+      "first": 14173,
+      "last": 21258,
+      "measured": 56683,
+      "name": "colored-cut-allocation-2",
+      "seconds": 137.834
+    },
+    {
+      "denied": 7085,
+      "first": 21259,
+      "last": 28343,
+      "measured": 56683,
+      "name": "colored-cut-allocation-3",
+      "seconds": 145.434
+    },
+    {
+      "denied": 7085,
+      "first": 28344,
+      "last": 35428,
+      "measured": 56683,
+      "name": "colored-cut-allocation-4",
+      "seconds": 149.916
+    },
+    {
+      "denied": 7085,
+      "first": 35429,
+      "last": 42513,
+      "measured": 56683,
+      "name": "colored-cut-allocation-5",
+      "seconds": 158.875
+    },
+    {
+      "denied": 7085,
+      "first": 42514,
+      "last": 49598,
+      "measured": 56683,
+      "name": "colored-cut-allocation-6",
+      "seconds": 164.682
+    },
+    {
+      "denied": 7085,
+      "first": 49599,
+      "last": 56683,
+      "measured": 56683,
+      "name": "colored-cut-allocation-7",
+      "seconds": 166.67
+    }
+  ],
+  "release_exhaustive_cut_allocations": 56683,
+  "release_held_repeat_passes": 64,
+  "release_tests": [
+    "colored-cut-admission",
+    "colored-cut-allocation-0",
+    "colored-cut-allocation-1",
+    "colored-cut-allocation-2",
+    "colored-cut-allocation-3",
+    "colored-cut-allocation-4",
+    "colored-cut-allocation-5",
+    "colored-cut-allocation-6",
+    "colored-cut-allocation-7",
+    "colored-cut-boundaries",
+    "colored-cut-document",
+    "colored-plane-cut",
+    "input-worker-publication",
+    "native-worker-generation",
+    "native-worker-held-publication",
+    "native-worker-publication"
+  ],
+  "sanitizer_checks": [
+    "colored-boundaries",
+    "colored-first",
+    "colored-last",
+    "native-default",
+    "native-held",
+    "native-replace"
+  ],
+  "sanitizer_first_and_last_cut_faults": 256,
+  "source_patch_sha256": "7a76ff3c5aacd4737613c198afd036e5a39418972e8a5a2f7afd0c3bc4693dc0",
+  "synthetic_controller": {
+    "contact-xr-arc": {
+      "checks": [
+        {
+          "check": "Affine accept closes and saves normally through real loader",
+          "passed": true
+        },
+        {
+          "check": "Actual accept graphics renderer matches the requested test device",
+          "passed": true
+        },
+        {
+          "check": "Affine accept renders balanced nonblank stereo with actual GL images",
+          "passed": true
+        },
+        {
+          "check": "Real controller grip paints original affine source UV center",
+          "passed": true
+        },
+        {
+          "check": "XR contact retains all original placement/source/geometry/material fields",
+          "passed": true
+        },
+        {
+          "check": "Affine focus closes and saves normally through real loader",
+          "passed": true
+        },
+        {
+          "check": "Actual focus graphics renderer matches the requested test device",
+          "passed": true
+        },
+        {
+          "check": "Affine focus renders balanced nonblank stereo with actual GL images",
+          "passed": true
+        },
+        {
+          "check": "Actual OpenXR focus loss restores complete unaccepted affine source exactly",
+          "passed": true
+        },
+        {
+          "check": "Focus cancellation crosses actual runtime loss and regain events",
+          "passed": true
+        }
+      ],
+      "failed": 0
+    },
+    "contact-xr-software": {
+      "checks": [
+        {
+          "check": "Affine accept closes and saves normally through real loader",
+          "passed": true
+        },
+        {
+          "check": "Actual accept graphics renderer matches the requested test device",
+          "passed": true
+        },
+        {
+          "check": "Affine accept renders balanced nonblank stereo with actual GL images",
+          "passed": true
+        },
+        {
+          "check": "Real controller grip paints original affine source UV center",
+          "passed": true
+        },
+        {
+          "check": "XR contact retains all original placement/source/geometry/material fields",
+          "passed": true
+        },
+        {
+          "check": "Affine focus closes and saves normally through real loader",
+          "passed": true
+        },
+        {
+          "check": "Actual focus graphics renderer matches the requested test device",
+          "passed": true
+        },
+        {
+          "check": "Affine focus renders balanced nonblank stereo with actual GL images",
+          "passed": true
+        },
+        {
+          "check": "Actual OpenXR focus loss restores complete unaccepted affine source exactly",
+          "passed": true
+        },
+        {
+          "check": "Focus cancellation crosses actual runtime loss and regain events",
+          "passed": true
+        }
+      ],
+      "failed": 0
+    },
+    "cut-xr-software": {
+      "checks": [
+        {
+          "check": "Real-loader current-color accept exits through the actual standalone save path",
+          "passed": true
+        },
+        {
+          "check": "Actual page17 joystick/large ray slider author a colored cut with valid tracking",
+          "passed": true
+        },
+        {
+          "check": "Both real GL eyes and OpenXR shutdown ownership remain balanced",
+          "passed": true
+        },
+        {
+          "check": "Controller Apply persists separate colored shell and cap in one native group",
+          "passed": true
+        },
+        {
+          "check": "Real-loader cut retains exact original editable paint, shape, raw source and corner authority",
+          "passed": true
+        },
+        {
+          "check": "Saved XR clipped corners share the actual source RGBA basis and complete source capsule; cap has independent material",
+          "passed": true
+        },
+        {
+          "check": "XR cut neither rasterizes nor rewrites original straight linear corner RGBA",
+          "passed": true
+        },
+        {
+          "check": "Independent saved geometry inspection confirms the actual slider half-space and closed shell/cap",
+          "passed": true
+        },
+        {
+          "check": "Real-loader current-color unconfirmed exits through the actual standalone save path",
+          "passed": true
+        },
+        {
+          "check": "Actual page17 joystick/large ray slider author a colored cut with valid tracking",
+          "passed": true
+        },
+        {
+          "check": "Both real GL eyes and OpenXR shutdown ownership remain balanced",
+          "passed": true
+        },
+        {
+          "check": "Unconfirmed colored cut is cancelled exactly before standalone save",
+          "passed": true
+        },
+        {
+          "check": "Real-loader current-color accept exits through the actual standalone save path",
+          "passed": true
+        },
+        {
+          "check": "Actual page17 joystick/large ray slider author a colored cut with valid tracking",
+          "passed": true
+        },
+        {
+          "check": "Both real GL eyes and OpenXR shutdown ownership remain balanced",
+          "passed": true
+        },
+        {
+          "check": "Actual joystick Holding page enables grab mode, pins the source and enables ghost isolation before Cut",
+          "passed": true
+        },
+        {
+          "check": "Controller Apply persists separate colored shell and cap in one native group",
+          "passed": true
+        },
+        {
+          "check": "Real-loader cut retains exact original editable paint, shape, raw source and corner authority",
+          "passed": true
+        },
+        {
+          "check": "Saved XR clipped corners share the actual source RGBA basis and complete source capsule; cap has independent material",
+          "passed": true
+        },
+        {
+          "check": "XR cut neither rasterizes nor rewrites original straight linear corner RGBA",
+          "passed": true
+        },
+        {
+          "check": "Independent saved geometry inspection confirms the actual slider half-space and closed shell/cap",
+          "passed": true
+        }
+      ],
+      "failed": 0,
+      "synthetic_tracking": true
+    }
+  }
+}
