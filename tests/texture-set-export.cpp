@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
+#include "dome/humanoid-creator.hpp"
 #include "dome/native-authoring.hpp"
 #include "dome/material-bindings.hpp"
 #include "dome/source-placement.hpp"
@@ -66,18 +67,19 @@ Scene mtoon_tangent_scene(std::string_view mode) {
                  {-.3f,-.3f,.5f},{.3f,-.3f,.5f},{0,.3f,.5f}};
  mesh.normals={{0,0,1},{0,.3f,.954f},{0,.4f,.916f},{0,-.3f,.954f},
                {0,-.4f,.916f},{0,0,1},{0,0,1},{0,0,1}};
- if(mode=="flat") std::fill_n(mesh.normals.begin(),5,Vec3{.25f,.16f,.95f});
+ if(mode=="flat"||mode=="rotated"||mode=="dual") std::fill_n(mesh.normals.begin(),5,Vec3{.25f,.16f,.95f});
  if(mode=="slight")
   for(size_t i=0;i<5;++i)mesh.normals[i]={.002f*float(i),.001f*float(i),1};
  if(mode=="incompatible") mesh.normals[1].x=.30f;
  for(auto &normal:mesh.normals)normal=normalized(normal);
  mesh.uv={{.5f,.5f},{.86f,.5f},{.5f,.86f},{.86f,.5f},{.5f,.14f},{.1f,.1f},{.8f,.1f},{.4f,.8f}};
+ if(mode=="dual"){mesh.uv[6]={.3f,.1f};mesh.uv[7]={.2f,.3f};}
  mesh.indices={5,6,7,0,1,2,0,3,4};
  Scene scene;
  std::array<TextureSetInitialField,2> fields;
  for(auto &field:fields)field.resolution=64;
  const auto object=scene.active().id;
- initialize_texture_sets(scene,object,mesh,fields,std::array<TextureSetId,3>{0,1,1});
+ initialize_texture_sets(scene,object,mesh,fields,std::array<TextureSetId,3>{0,mode=="dual"?0u:1u,1});
  if(mode=="mixed"||mode=="incompatible"||mode=="dynamic")
   check(edit_texture_set(scene,object,0,[](PaintedMesh &paint,Material &){
    BakedTextures maps;
@@ -107,13 +109,41 @@ Scene mtoon_tangent_scene(std::string_view mode) {
      {"extensions",{{"VRMC_materials_mtoon",{{"specVersion","1.0"},
          {"shadeMultiplyTexture",{{"index",1}}}}}}}
  };
- if(mode=="rotated") source["normalTexture"]["extensions"]={{"KHR_texture_transform",{{"rotation",.3f}}}};
+ auto &normal=source["normalTexture"];
+ auto &shade=source["extensions"]["VRMC_materials_mtoon"]["shadeMultiplyTexture"];
+ if(mode=="rotated"||mode=="rotated-incompatible"||mode=="dual"){
+  normal["extensions"]={{"KHR_texture_transform",{{"rotation",.43f},{"scale",{1.18f,.83f}},
+                                                    {"offset",{.31f,-.11f}}}}};
+  shade["extensions"]={{"KHR_texture_transform",{{"offset",{.12f,.23f}}}}};
+ }
+ if(mode=="mirror")
+  normal["extensions"]={{"KHR_texture_transform",{{"scale",{-1.3f,.8f}},{"offset",{1.1f,-.17f}}}}};
+ if(mode=="override"){
+  normal["texCoord"]=1;
+  normal["extensions"]={{"KHR_texture_transform",{{"texCoord",0}}}};
+ }
+ if(mode=="precision")
+  normal["extensions"]={{"KHR_texture_transform",{{"offset",{1e7f,0.f}}}}};
+ if(mode=="animated"){
+  normal["extensions"]={{"KHR_texture_transform",{{"offset",{.15f,-.17f}}}}};
+  source["extensions"]["VRMC_materials_mtoon"]["uvAnimationScrollXSpeedFactor"]=.2f;
+ }
+ if(mode=="dual")
+  source["pbrMetallicRoughness"]["baseColorFactor"]={.12f,.34f,.08f,1.f};
  binding.material=MToonMaterial::from_vrm1(source,2);
  binding.roles[size_t(MToonSlot::Normal)].image=std::make_shared<const Image>(
      Image{2,2,{160,83,225,255, 193,134,244,255, 139,191,215,255, 108,205,246,255}});
  binding.roles[size_t(MToonSlot::Shade)].image=std::make_shared<const Image>(Image{1,1,{55,86,112,255}});
  binding.native_reference={current.color,current.emissive,int(current.alpha),current.alpha_cutoff,current.double_sided};
  check(bind_texture_set_mtoon(scene,object,1,binding),"Static fixture uses a genuine typed normal role on an additional material slot");
+ if(mode=="dual"){
+  normal["extensions"]={{"KHR_texture_transform",{{"scale",{-.84f,1.22f}},{"offset",{.81f,-.12f}}}}};
+  source["pbrMetallicRoughness"]["baseColorFactor"]={.16f,.07f,.37f,1.f};
+  binding.material=MToonMaterial::from_vrm1(source,2);
+  const auto primary=texture_set_view(scene.active(),0).material;
+  binding.native_reference={primary.color,primary.emissive,int(primary.alpha),primary.alpha_cutoff,primary.double_sided};
+  check(bind_texture_set_mtoon(scene,object,0,binding),"Both materials use different transforms at a shared vertex");
+ }
  if(mode=="dynamic"){
   DeformationState deformation(mesh);
   deformation.morphs=MorphSet(mesh);
@@ -135,77 +165,82 @@ std::array<float,4> tangent_attribute(const cgltf_accessor *accessor,size_t vert
  return values;
 }
 
-void verify_mtoon_tangents(const Scene &scene,const std::filesystem::path &path,bool explicit_frame) {
- const auto payload=bytes(path);
- cgltf_options options{};
- cgltf_data *data=nullptr;
- check(cgltf_parse(&options,payload.data(),payload.size(),&data)==cgltf_result_success,"cgltf reads the exported GLB");
- struct Owner {cgltf_data *data;~Owner(){cgltf_free(data);}} owner{data};
- check(cgltf_load_buffers(&options,data,path.c_str())==cgltf_result_success&&cgltf_validate(data)==cgltf_result_success,
-       "Independent consumer checks the actual accessor and primitive domains");
- check(data->meshes_count==1&&data->meshes[0].primitives_count==2,"Both materials share a single mesh");
- const auto &ordinary=data->meshes[0].primitives[0], &toon=data->meshes[0].primitives[1];
+void verify_mtoon_primitive(const TextureSetView &source,const cgltf_primitive &toon,
+    const AffineTransform &native,const AffineTransform &exported,bool explicit_frame) {
  const auto *attribute=cgltf_find_accessor(&toon,cgltf_attribute_type_tangent,0);
- check(bool(cgltf_find_accessor(&ordinary,cgltf_attribute_type_tangent,0))==bool(scene.active().painted->baked())&&
-       bool(attribute)==explicit_frame,
+ check(bool(attribute)==(source.material_bindings?explicit_frame:bool(source.painted->baked())),
        "Only the material range that owns a certified basis gets a tangent attribute");
- check(cgltf_find_accessor(&ordinary,cgltf_attribute_type_position,0)==
-       cgltf_find_accessor(&toon,cgltf_attribute_type_position,0),"The material ranges share POSITION storage");
+ if(!source.material_bindings)return;
  check(toon.material&&toon.material->normal_texture.texture&&toon.material->normal_texture.scale==.65f,
        "The exported typed material uses its original normal image and scale");
- const auto source=texture_set_view(scene.active(),1);
  const auto &mesh=source.painted->mesh();
  const auto &typed=*source.material_bindings;
+ const auto &info=toon.material->normal_texture;
+ const auto &texture=typed.material.textures[size_t(MToonSlot::Normal)];
+ const bool transformed=texture.offset!=std::array<float,2>{}||
+     texture.rotation!=0||texture.scale!=std::array<float,2>{1,1};
  const auto &role=typed.roles[size_t(MToonSlot::Normal)];
  const auto original_png=role.image->png();
- const auto *image=toon.material->normal_texture.texture->image;
+ const auto *image=info.texture->image;
  check(image&&image->buffer_view&&image->buffer_view->size==original_png.size()&&
        std::equal(original_png.begin(),original_png.end(),cgltf_buffer_view_data(image->buffer_view)),
        "Normal texture payload remains byte-identical in the independent consumer");
  if(!explicit_frame){
+  check(info.has_transform==(transformed||texture.transform_texcoord>=0),
+        "The original material retains its authored normal transform on implicit export");
   for(size_t index=0;index<toon.targets_count;++index)
    for(size_t attr=0;attr<toon.targets[index].attributes_count;++attr)
     check(toon.targets[index].attributes[attr].type!=cgltf_attribute_type_tangent,
           "An implicit basis also leaves tangent target generation to the consumer");
   return;
  }
+ check(!info.has_transform&&info.texcoord==(transformed?1:0),
+       "The explicit normal map picks its own post-transform coordinate stream directly");
  const auto *out_pos=cgltf_find_accessor(&toon,cgltf_attribute_type_position,0);
  const auto *out_n=cgltf_find_accessor(&toon,cgltf_attribute_type_normal,0);
- const auto node=std::find_if(data->nodes,data->nodes+data->nodes_count,[](const auto &entry){return entry.mesh;});
- check(node!=data->nodes+data->nodes_count,"The material geometry has an actual transform node");
- std::array<float,16> node_world{};
- cgltf_node_transform_world(node,node_world.data());
- std::array<double,16> matrix{};
- std::ranges::copy(node_world,matrix.begin());
- const AffineTransform exported(matrix), native=scene.world_matrix(scene.active().id);
+ const auto *in_uv=cgltf_find_accessor(&toon,cgltf_attribute_type_texcoord,0);
+ const auto *out_uv=cgltf_find_accessor(&toon,cgltf_attribute_type_texcoord,info.texcoord);
  const auto direction=[](const AffineTransform &x,Vec3 v,bool normal) {
   const auto n=normal?x.normal({v.x,v.y,v.z}):x.direction({v.x,v.y,v.z});
   return normalized({float(n[0]),float(n[1]),float(n[2])});
  };
  const auto as_vec=[](const auto &v){return Vec3{v[0],v[1],v[2]};};
- float greatest=0;
- for(size_t t=0;t<2;++t){
+ float greatest=0,uv_error=0;
+ const auto triangles=source.domain->triangles();
+ check(toon.indices->count==3*triangles.size(),"The consumer reads the actual field membership");
+ for(size_t t=0;t<triangles.size();++t){
+  const auto start=3*size_t(triangles[t]);
+  const auto a=mesh.indices[start], b=mesh.indices[start+1], c=mesh.indices[start+2];
+  std::array<std::array<float,2>,3> native_uv{};
+  std::array<std::array<float,4>,3> emitted_uv{};
+  for(size_t i=0;i<3;++i)
+   native_uv[i]=mtoon_uv(typed.material,MToonSlot::Normal,mesh.uv[mesh.indices[start+i]],0);
+  const float du=native_uv[1][0]-native_uv[0][0], dv=native_uv[1][1]-native_uv[0][1];
+  const float eu=native_uv[2][0]-native_uv[0][0], ev=native_uv[2][1]-native_uv[0][1];
+  const float det=du*ev-dv*eu;
+  const auto dx=mesh.positions[b]-mesh.positions[a], dy=mesh.positions[c]-mesh.positions[a];
+  const auto native_u=direction(native,(dx*ev-dy*dv)/det,false);
+  const auto native_v=direction(native,(dy*du-dx*eu)/det,false);
   std::array<Vec3,3> out_normals{},in_normals{},out_tangents{};
-  const float sign=t==0?1.f:-1.f;
-  for(size_t c=0;c<3;++c){
-   const auto original=mesh.indices[(t+1)*3+c];
-   const auto emitted=cgltf_accessor_read_index(toon.indices,t*3+c);
+  std::array<Vec3,3> emitted_v{};
+  for(size_t i=0;i<3;++i){
+   const auto original=mesh.indices[start+i];
+   const auto emitted=cgltf_accessor_read_index(toon.indices,t*3+i);
    const auto actual=tangent_attribute(attribute,emitted,4);
+   in_normals[i]=direction(native,mesh.normals[original],true);
+   const float sign=dot(cross(in_normals[i],native_u),native_v)<0?-1.f:1.f;
    check(actual[3]==sign,
          "All three corners share the correct sign for the mirrored atlas triangle");
-   out_tangents[c]=direction(exported,as_vec(actual),false);
+   out_tangents[i]=direction(exported,as_vec(actual),false);
    check(length(as_vec(tangent_attribute(out_pos,emitted,3))-mesh.positions[original])==0,
          "The normal basis belongs to the actual indexed position");
-   out_normals[c]=direction(exported,as_vec(tangent_attribute(out_n,emitted,3)),true);
-   in_normals[c]=direction(native,mesh.normals[original],true);
-  }
-  const auto a=mesh.indices[(t+1)*3], b=mesh.indices[(t+1)*3+1], c=mesh.indices[(t+1)*3+2];
-  // The fixture has axis-aligned UV derivatives in X and Y. The second
-  // triangle uses the opposite physical U direction and the same V.
-  const auto native_u=direction(native,mesh.positions[b]-mesh.positions[a],false);
-  std::array<Vec3,3> emitted_v{};
-  for(size_t i=0;i<3;++i)
+   out_normals[i]=direction(exported,as_vec(tangent_attribute(out_n,emitted,3)),true);
    emitted_v[i]=normalized(cross(out_normals[i],out_tangents[i]))*sign;
+   const auto base=tangent_attribute(in_uv,emitted,2);
+   check(base[0]==mesh.uv[original][0]&&base[1]==mesh.uv[original][1],
+         "Color and other roles keep the original TEXCOORD_0");
+   emitted_uv[i]=tangent_attribute(out_uv,emitted,2);
+  }
   for(size_t y=0;y<=16;++y)for(size_t x=0;x<=16-y;++x){
    const float p=x/16.f,q=y/16.f,r=1-p-q;
    const auto n=normalized(in_normals[0]*r+in_normals[1]*p+in_normals[2]*q);
@@ -215,8 +250,14 @@ void verify_mtoon_tangents(const Scene &scene,const std::filesystem::path &path,
    const auto out_b=normalized(emitted_v[0]*r+emitted_v[1]*p+emitted_v[2]*q);
    const float u=mesh.uv[a][0]*r+mesh.uv[b][0]*p+mesh.uv[c][0]*q;
    const float v=mesh.uv[a][1]*r+mesh.uv[b][1]*p+mesh.uv[c][1]*q;
-   const auto rgb=sample_source_texture(role,u,v,false);
-   const auto mapped=mtoon_normal_map({rgb[0],rgb[1],rgb[2]},toon.material->normal_texture.scale);
+   const auto uv=mtoon_uv(typed.material,MToonSlot::Normal,{u,v},0);
+   const float out_u=emitted_uv[0][0]*r+emitted_uv[1][0]*p+emitted_uv[2][0]*q;
+   const float out_v=emitted_uv[0][1]*r+emitted_uv[1][1]*p+emitted_uv[2][1]*q;
+   uv_error=std::max({uv_error,std::abs(out_u-uv[0]),std::abs(out_v-uv[1])});
+   const auto rgb=sample_source_texture(role,uv[0],uv[1],false);
+   const auto read=sample_source_texture(role,out_u,out_v,false);
+   const auto mapped=mtoon_normal_map({read[0],read[1],read[2]},info.scale);
+   const float sign=dot(cross(n,ref_t),native_v)<0?-1.f:1.f;
    for(bool front:{false,true}){
     const auto desired=mtoon_material_normal(typed.material,n,{ref_t.x,ref_t.y,ref_t.z,sign},
                                              {rgb[0],rgb[1],rgb[2]},n,front);
@@ -225,16 +266,81 @@ void verify_mtoon_tangents(const Scene &scene,const std::filesystem::path &path,
    }
   }
  }
- std::cout<<"PORTABLE_TANGENT "<<path<<" direction_error="<<greatest<<" samples=612\n";
+ std::cout<<"PORTABLE_TANGENT slot="<<source.id<<" direction_error="<<greatest<<" uv_error="<<uv_error
+          <<" samples="<<306*triangles.size()<<'\n';
+ check(uv_error<1e-6f,"Independent post-transform coordinates reproduce the original normal UV samples");
  check(greatest<2e-5f,"Emitted tangent frames preserve native front and back shading over both triangles");
 }
 
+void verify_mtoon_tangents(const Scene &scene,const std::filesystem::path &path,bool explicit_frame) {
+ const auto payload=bytes(path);
+ cgltf_options options{};
+ cgltf_data *data=nullptr;
+ check(cgltf_parse(&options,payload.data(),payload.size(),&data)==cgltf_result_success,"cgltf reads the exported GLB");
+ struct Owner {cgltf_data *data;~Owner(){cgltf_free(data);}} owner{data};
+ check(cgltf_load_buffers(&options,data,path.c_str())==cgltf_result_success&&cgltf_validate(data)==cgltf_result_success,
+       "Independent consumer checks the actual accessor and primitive domains");
+ check(data->meshes_count==1&&data->meshes[0].primitives_count==2,"Both materials share a single mesh");
+ const auto &primary=data->meshes[0].primitives[0], &second=data->meshes[0].primitives[1];
+ check(cgltf_find_accessor(&primary,cgltf_attribute_type_position,0)==
+       cgltf_find_accessor(&second,cgltf_attribute_type_position,0),"The material ranges share POSITION storage");
+ const auto node=std::find_if(data->nodes,data->nodes+data->nodes_count,[](const auto &entry){return entry.mesh;});
+ check(node!=data->nodes+data->nodes_count,"The material geometry has an actual transform node");
+ std::array<float,16> node_world{};
+ cgltf_node_transform_world(node,node_world.data());
+ std::array<double,16> matrix{};
+ std::ranges::copy(node_world,matrix.begin());
+ const AffineTransform exported(matrix), native=scene.world_matrix(scene.active().id);
+ std::cout<<"CONSUMER "<<path<<'\n';
+ verify_mtoon_primitive(texture_set_view(scene.active(),0),primary,native,exported,explicit_frame);
+ verify_mtoon_primitive(texture_set_view(scene.active(),1),second,native,exported,explicit_frame);
+}
+
+void reimport_transformed_mtoon(const Scene &source,const std::filesystem::path &standard) {
+ Document doc;
+ ImportSettings settings;
+ settings.paint_resolution=64;
+ doc.import_asset(standard,settings);
+ check(doc.wait_asset()&&doc.wait_mesh(),"Standard GLB preserving import settles on the normal asset worker");
+ const auto frame=doc.frame();
+ if(!frame.state->error.empty())throw std::runtime_error(frame.state->error);
+ const auto current=doc.copy_scene();
+ size_t count=0;
+ for(const auto &object:current.objects()){
+  if(!object.material_bindings||!object.material_bindings->has_mtoon)continue;
+  const auto &binding=*object.material_bindings;
+  const auto &texture=binding.material.textures[size_t(MToonSlot::Normal)];
+  const auto &images=binding.roles[size_t(MToonSlot::Normal)];
+  const auto &uv=object.painted->source_maps()->uv1;
+  check(object.appearance&&object.appearance->original_bytes&&texture.texcoord==1&&texture.transform_texcoord<0&&
+        uv&&uv->size()==object.painted->mesh().positions.size()&&
+        binding.normal_frames&&binding.normal_frames->mtoon&&!binding.normal_frames->mtoon->tangents.empty()&&
+        images.image&&images.image->width==2,
+        "Native import retains the actual normal sampling coordinates, tangent attributes and source image");
+  ++count;
+ }
+ check(count==2,"Both independently transformed materials survive standalone GLB import");
+ doc.save_async("dual-imported.dsculpt").get();
+ check(Scene::load("dual-imported.dsculpt").encode()==current.encode(),
+       "Cold Open keeps the imported alternate coordinates and original GLB authority");
+ source.save("dual-native.dsculpt");
+ auto control=source.snapshot();
+ const auto id=control.active().id;
+ for(const TextureSetId slot:{0u,1u}){
+  auto binding=*texture_set_view(control.active(),slot).material_bindings;
+  binding.roles[size_t(MToonSlot::Normal)].image=std::make_shared<const Image>(Image{1,1,{128,128,255,255}});
+  bind_texture_set_mtoon(control,id,slot,binding);
+ }
+ control.save("dual-neutral-normal.dsculpt");
+}
+
 void mtoon_derivative_tangents() {
- for(const std::string_view mode:{"plain","affine","flat","slight","mixed","incompatible","reflected","rotated","dynamic"}){
+ const std::array explicit_modes{"plain","affine","flat","slight","mixed","rotated","mirror","dual","override"};
+ const std::array implicit_modes{"incompatible","reflected","rotated-incompatible","dynamic","precision","animated"};
+ const auto run=[](std::string_view mode,bool explicit_frame){
   auto scene=mtoon_tangent_scene(mode);
   const auto exact=scene.encode();
   const auto surfaces=scene.export_surfaces();
-  const bool explicit_frame=mode=="plain"||mode=="affine"||mode=="flat"||mode=="slight"||mode=="mixed";
   const auto standard=std::string(mode)+"-standard.glb";
   export_glb(surfaces,standard);
   verify_mtoon_tangents(scene,standard,explicit_frame);
@@ -247,9 +353,12 @@ void mtoon_derivative_tangents() {
    verify_mtoon_tangents(scene,editable,true);
    const auto reopened=extract_native_authoring(bytes(editable));
    check(reopened&&reopened->encode()==exact,"Explicit portable tangents do not modify editable authoring");
+   if(mode=="dual")reimport_transformed_mtoon(scene,standard);
   }
   check(scene.encode()==exact,"Export compilation preserves the original native material set and placement");
- }
+ };
+ for(const auto mode:explicit_modes)run(mode,true);
+ for(const auto mode:implicit_modes)run(mode,false);
 }
 
 void mtoon_authoring(){

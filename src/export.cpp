@@ -812,7 +812,8 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
     }
     if(current.alpha_cutoff!=native.alpha_cutoff)params.alpha_cutoff=current.alpha_cutoff;
     for(size_t role=0;role<binding->roles.size();++role){
-      if(binding->roles[role].image&&role!=size_t(MToonSlot::Matcap)&&typed.textures[role].texcoord)
+      if(binding->roles[role].image&&role!=size_t(MToonSlot::Matcap)&&typed.textures[role].texcoord&&
+         !(role==size_t(MToonSlot::Normal)&&compiled.portable_mtoon_normal_coordinates))
         return retain_native();
     }
     auto roles=binding->roles;
@@ -873,6 +874,17 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
       const auto &view=roles[role];
       if(view.image)typed.textures[role].index=texture(*view.image,view);
     }
+    if(compiled.portable_mtoon_normal_coordinates){
+      const auto coordinate=retained_normal_sets.at(object);
+      if(!attributes.contains("TEXCOORD_"+std::to_string(coordinate)))
+        throw std::logic_error("Compiled MToon normal coordinate accessor is missing");
+      auto &normal=typed.textures[size_t(MToonSlot::Normal)];
+      normal.texcoord=coordinate;
+      normal.transform_texcoord=-1;
+      normal.offset={};
+      normal.scale={1,1};
+      normal.rotation=0;
+    }
     auto output=typed.source_json();
     if(hdr&&hdr->strength==1){
       // This strength is generated from resolved radiance. Its default
@@ -914,6 +926,7 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
           {"maximumRelativeError",hdr->measured.maximum_relative_error},
           {"erasedNonzeroSamples",hdr->measured.erased_nonzero_samples}};
     }
+    extensions.clear();
     if(!collect_extensions(collect_extensions,output))
       throw std::logic_error("MToon material writing introduced an unknown extension");
     for(const auto &extension:extensions)use_extension(extension.c_str());
