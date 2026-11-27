@@ -17,6 +17,7 @@
 #include "dome/color-paint-sampling.hpp"
 #include "dome/humanoid-creator.hpp"
 #include "render-mtoon.hpp"
+#include "mtoon-role-sampling.hpp"
 #include "normal-preparation-state.hpp"
 #include "render-target.hpp"
 #include "render-source-pack.hpp"
@@ -126,12 +127,6 @@ std::string pbr_surface_source(std::string source) {
 } // namespace
 namespace {
 bool mtoon_shade_alias(const MToonMaterial&m){auto &a=m.textures[0],&b=m.textures[1];return a.index>=0&&a.index==b.index&&mtoon_coordinate(a)==mtoon_coordinate(b)&&(m.version()==MToonVersion::V0||(a.offset==b.offset&&a.scale==b.scale&&a.rotation==b.rotation));}
-bool resolved_shade_alias(const MToonMaterial &m,const std::array<PaintSourceTexture,size_t(MToonSlot::Count)> &roles) {
-  const auto &a=roles[0],&b=roles[1];const auto &x=m.textures[0],&y=m.textures[1];
-  return a.image && a.image==b.image && a.wrap_s==b.wrap_s && a.wrap_t==b.wrap_t &&
-    a.min_filter==b.min_filter && a.mag_filter==b.mag_filter && mtoon_coordinate(x)==mtoon_coordinate(y) &&
-    (m.version()==MToonVersion::V0 || (x.offset==y.offset && x.scale==y.scale && x.rotation==y.rotation));
-}
 GLenum mtoon_blend(int value){constexpr GLenum factors[]={GL_ZERO,GL_ONE,GL_DST_COLOR,GL_SRC_COLOR,GL_ONE_MINUS_DST_COLOR,GL_SRC_ALPHA,GL_ONE_MINUS_SRC_COLOR,GL_DST_ALPHA,GL_ONE_MINUS_DST_ALPHA,GL_SRC_ALPHA_SATURATE,GL_ONE_MINUS_SRC_ALPHA};if(value<0||value>10)throw std::runtime_error("Unsupported MToon blend factor");return factors[value];}
 }
 
@@ -527,7 +522,7 @@ struct SurfaceRenderer::TextureState {
             view.min_filter=texture.min_filter;view.mag_filter=texture.mag_filter;
           }
         }
-        toon.shade_alias=toon.source?resolved_shade_alias(*typed,toon.roles):mtoon_shade_alias(*typed);
+        toon.shade_alias=toon.source?detail::mtoon_shared_shade(*toon.source):mtoon_shade_alias(*typed);
         bool needs_uv1=false;
         auto original=[&](int destination,int role) {
           const auto &t=typed->textures[role];if(t.index<0)return;

@@ -1729,8 +1729,16 @@ void retopo_toon_materials(bool affine,bool legacy,const std::filesystem::path &
   patch.add_face(std::array{a,b,c,d});
   const auto previous=publish_retopology(scene,patch,guide,{});
   const auto trim=create_texture_set(scene,previous,std::array<uint64_t,1>{2},"Toon trim",64);
+  constexpr auto base=size_t(MToonSlot::Base), shade=size_t(MToonSlot::Shade);
   for (const auto slot:{TextureSetId(0),trim}) {
-    const auto typed=retopo_toon_binding(texture_set_view(scene.active(),slot),slot==trim,legacy && slot==trim);
+    auto typed=retopo_toon_binding(texture_set_view(scene.active(),slot),slot==trim,legacy && slot==trim);
+    typed.roles[shade]=typed.roles[base];
+    typed.material.textures[shade].index=typed.material.textures[base].index;
+    if (slot==trim && !legacy) {
+      if (affine) typed.material.textures[shade].offset[0]+=.09f;
+      else if (detached) typed.roles[shade].mag_filter=9728;
+      else typed.roles[shade].wrap_t=33071;
+    }
     check(bind_texture_set_mtoon(scene,previous,slot,typed),"Each retopology slot owns its material through the native MToon edit");
   }
   check(edit_texture_set(scene,previous,trim,[](PaintedMesh &paint,Material &) {
@@ -1763,9 +1771,10 @@ void retopo_toon_materials(bool affine,bool legacy,const std::filesystem::path &
   settled(document);
   const auto after=document.copy_scene();
   const auto &active=after.active();
+  const auto loaded=Scene::load(path);
   check(active.id!=previous && active.texture_sets->triangle_sets()[1]==trim &&
         active.retopology->topology.encode()!=before.active().retopology->topology.encode() &&
-        !after.object(previous).visible && Scene::load(path).encode()==after.encode(),
+        !after.object(previous).visible && loaded.encode()==after.encode(),
         "Geometry Apply and ordered Save keep two texture sets and the hidden original project");
   size_t checks_at_texel=0;
   float role_error=0, normal_error=0;
@@ -1775,6 +1784,12 @@ void retopo_toon_materials(bool affine,bool legacy,const std::filesystem::path &
     const auto old=texture_set_view(before.active(),slot);
     const auto field=texture_set_view(active,slot);
     const auto &source=*old.material_bindings, &target=*field.material_bindings;
+    const auto &reopened=*texture_set_view(loaded.active(),slot).material_bindings;
+    const bool shared=slot==0 || legacy;
+    check(source.roles[base].image==source.roles[shade].image &&
+          (target.roles[base].image==target.roles[shade].image)==shared &&
+          (reopened.roles[base].image==reopened.roles[shade].image)==shared,
+          "Apply and cold Open preserve Base/Shade sharing only when the source samplers agree");
     const auto r=target.roles[0].image->width;
     check(r==(slot==trim?128u:512u) && target.roles[0].image!=source.roles[0].image &&
           target.roles[size_t(MToonSlot::Matcap)].image==source.roles[size_t(MToonSlot::Matcap)].image &&

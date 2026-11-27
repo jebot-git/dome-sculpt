@@ -3,6 +3,7 @@
 #include "texture-set-native-grid.hpp"
 #include "texture-set-resample.hpp"
 #include "retopo-transfer.hpp"
+#include "mtoon-role-sampling.hpp"
 #include "affine-surface.hpp"
 #include "canonical-normal-uv.hpp"
 #include "normal-bake-encoding.hpp"
@@ -3706,7 +3707,9 @@ std::shared_ptr<const SourceMaterialBindings> detail::TextureSetPaintAccess::rep
   const auto &parameters=material.parameters;
   const bool legacy=material.version()==MToonVersion::V0;
   const bool animated=parameters.scroll!=ToonUv{} || parameters.rotation_speed!=0;
+  constexpr auto base=size_t(MToonSlot::Base), shade=size_t(MToonSlot::Shade);
   constexpr auto matcap=size_t(MToonSlot::Matcap), normal=size_t(MToonSlot::Normal);
+  const bool shared_shade=mtoon_shared_shade(*binding);
   std::vector<size_t> roles;
   uint32_t resolution=replacement.resolution();
   for (size_t role=0;role<binding->roles.size();++role) {
@@ -3714,6 +3717,7 @@ std::shared_ptr<const SourceMaterialBindings> detail::TextureSetPaintAccess::rep
     if (!source.image || role==matcap) continue;
     if (animated && role!=size_t(MToonSlot::UvMask) && !(legacy && role==size_t(MToonSlot::OutlineWidth)))
       throw std::invalid_argument("MToon retopology needs a live sampling adapter for animated texture roles");
+    if (shared_shade && role==shade) continue;
     resolution=std::max({resolution,source.image->width,source.image->height});
     roles.push_back(role);
   }
@@ -3750,18 +3754,26 @@ std::shared_ptr<const SourceMaterialBindings> detail::TextureSetPaintAccess::rep
   auto result=std::make_shared<SourceMaterialBindings>(*binding);
   std::array<std::shared_ptr<Image>,size_t(MToonSlot::Count)> images;
   std::array<std::optional<RetopoToonUv>,size_t(MToonSlot::Count)> mappings;
-  for (const auto role:roles) {
-    mappings[role].emplace(material.textures[legacy?size_t(MToonSlot::Base):role]);
-    auto &image=images[role];
-    image=std::make_shared<Image>(blank_image(resolution));
-    result->roles[role].image=image;
-    result->roles[role].wrap_s=result->roles[role].wrap_t=33071;
-    auto &texture=result->material.textures[role];
+  const auto reset_coordinates=[](MToonTexture &texture) {
     texture.texcoord=0;
     texture.transform_texcoord=-1;
     texture.offset={};
     texture.scale={1,1};
     texture.rotation=0;
+  };
+  for (const auto role:roles) {
+    mappings[role].emplace(material.textures[legacy?base:role]);
+    auto &image=images[role];
+    image=std::make_shared<Image>(blank_image(resolution));
+    result->roles[role].image=image;
+    result->roles[role].wrap_s=result->roles[role].wrap_t=33071;
+    reset_coordinates(result->material.textures[role]);
+  }
+  // Native paint and the portable shader resolve coverage for a shared
+  // Base/Shade sampler together. The replacement must keep one image owner.
+  if (shared_shade) {
+    result->roles[shade]=result->roles[base];
+    reset_coordinates(result->material.textures[shade]);
   }
   if (legacy) {
     auto &main=result->material.textures[size_t(MToonSlot::Base)];

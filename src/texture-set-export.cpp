@@ -10,6 +10,7 @@
 #include "paint-emission-sample.hpp"
 #include "texture-set-native-grid.hpp"
 #include "texture-set-surface.hpp"
+#include "mtoon-role-sampling.hpp"
 #include "deformation-active.hpp"
 #include "source-frame-skin.hpp"
 #include "affine-interaction.hpp"
@@ -42,16 +43,6 @@ void charge(size_t&v,size_t n,size_t u,size_t cap){
 }
 template<class T>bool owner(const std::shared_ptr<const T>&a,const std::shared_ptr<const T>&b){return a==b&&!a.owner_before(b)&&!b.owner_before(a);}
 bool material(const Material&a,const Material&b){return a.name==b.name&&a.color==b.color&&a.metallic==b.metallic&&a.roughness==b.roughness&&a.emissive==b.emissive&&a.toon==b.toon&&a.double_sided==b.double_sided&&a.alpha==b.alpha&&a.alpha_cutoff==b.alpha_cutoff&&a.unlit==b.unlit;}
-
-bool shared_mtoon_shade(const SourceMaterialBindings &binding){
- const auto &base=binding.roles[size_t(MToonSlot::Base)];
- const auto &shade=binding.roles[size_t(MToonSlot::Shade)];
- const auto &x=binding.material.textures[size_t(MToonSlot::Base)];
- const auto &y=binding.material.textures[size_t(MToonSlot::Shade)];
- return base.image&&base.image==shade.image&&base.wrap_s==shade.wrap_s&&base.wrap_t==shade.wrap_t&&
-     base.min_filter==shade.min_filter&&base.mag_filter==shade.mag_filter&&
-     mtoon_coordinate(x)==mtoon_coordinate(y)&&x.offset==y.offset&&x.scale==y.scale&&x.rotation==y.rotation;
-}
 
 const std::array<double,256> &mtoon_linear_bytes(){
  static const auto values=[]{
@@ -1246,7 +1237,7 @@ void charge_mtoon_paint(const TextureSetView &field,size_t &bytes,size_t &work,
  const auto &typed=field.material_bindings->material;
  if(typed.version()==MToonVersion::V1&&typed.parameters.scroll==std::array<float,2>{}&&
     typed.parameters.rotation_speed==0&&!field.painted->source_maps()&&
-    shared_mtoon_shade(*field.material_bindings)){
+    mtoon_shared_shade(*field.material_bindings)){
   charge(bytes,pixels,4,limits.maximum_bytes);
   charge(bytes,resolution,2*sizeof(MToonShadeTap),limits.maximum_bytes);
   charge(work,pixels,24,limits.maximum_work);
@@ -1315,7 +1306,7 @@ ExportBound export_bound(const ObjectSurface&input,const TextureSetLimits&limits
     const auto factor=mtoon_factor(p.base_color[3],binding.native_reference.color[3],native_alpha);
     const auto base_alpha=mtoon_base_alpha_grid(binding,opaque,factor,native_alpha,limits);
     for(const auto role:{MToonSlot::Base,MToonSlot::Shade,MToonSlot::Emission}){
-     if(role==MToonSlot::Shade&&!shared_mtoon_shade(binding))continue;
+     if(role==MToonSlot::Shade&&!mtoon_shared_shade(binding))continue;
      const auto alpha=role==MToonSlot::Base?base_alpha:MToonAlphaGrid::None;
      const auto grid=independent_mtoon_dimensions(binding,role,resolution,alpha);
      if(!grid)continue;
@@ -1531,7 +1522,7 @@ std::optional<PortableMToonSetPaint> compile_mtoon_set_paint(
    out.color=independent(MToonSlot::Base,maps->color,maps->color_coverage,params.base_color,field.material.color,alpha);
   }
   if(!out.color)return {};
-  if(shared_mtoon_shade(binding)){
+  if(mtoon_shared_shade(binding)){
    const auto &factor=params.shade_color;
    out.shade=original?
        compose_shared_mtoon_shade(maps->color,maps->color_coverage,field.material.color,*original,factor,out,limits):
