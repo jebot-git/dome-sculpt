@@ -1,0 +1,203 @@
+{
+  "date": "2026-11-28",
+  "production_commit": "1bfff6c27a0dcc5a392aa7b826be5ddfe984bfb5",
+  "previous_published_commit": "2296eef52f8fb5d77f82585b963612bd1cd7f0a7",
+  "domed_toolkit_commit": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "arc_application": {
+    "file": "artifacts/source-texture-gpu-20261128/evidence/oneapi/dome-sculpt",
+    "sha256": "ea8b671eb7013fe0095af39593445ac527e85be22ca491686b10164aeee7de1a"
+  },
+  "device": "Intel Arc A770 / renderD129 / 0000:03:00.0",
+  "scope": "Original axis-aligned UV0 RGB8 material textures fitting the 512\u20132048 native grid. Base color and legacy emission use sRGB decoding. ORM and separate occlusion use linear decoding. The same device pass applies layered paint, Bake coverage and prepared PBR alpha. The original normal texture and its tangent handling retain their source owner.",
+  "focused_arc_release": {
+    "file": "artifacts/source-texture-gpu-20261128/evidence/oneapi/source-texture-gpu.xml",
+    "sha256": "bb52a3fe509a52e31c7cd428044b8ad298c0142df16d19d086cde1ec1ba90a61",
+    "passed": 6,
+    "tests": [
+      "current-color-source-bake",
+      "paint-overlay-gpu",
+      "color-preparation",
+      "current-color-target-preparation",
+      "paint-composite-compute",
+      "paint-composite-native"
+    ]
+  },
+  "synthetic_openxr": {
+    "checks": 20,
+    "report": {
+      "file": "artifacts/source-texture-gpu-20261128/evidence/oneapi/bake-policy-xr/report.json",
+      "sha256": "5d4fce8613ab15f59b797e104484b0178a7d91102b5a53bd3740dbe6efc44dd4"
+    },
+    "suite": {
+      "file": "artifacts/source-texture-gpu-20261128/evidence/oneapi/bake-policy-hardware.xml",
+      "sha256": "064e82b2ad1ec906252e9ceb2a8748fb30c1a6c5dd88b51bece4bdbfd9b7b118",
+      "passed": 1,
+      "tests": [
+        "bake-policy-openxr"
+      ]
+    },
+    "scope": "Existing Bake controller policy regression with hardware GL and synthetic input."
+  },
+  "headless_sanitizers": {
+    "kernel": {
+      "file": "artifacts/source-texture-gpu-20261128/evidence/asan/paint-composite-compute.cpp.log",
+      "sha256": "cf145700111347e3ca0f304ef4b46f3e74e0497a1fd8390b24e9930892ad9a17"
+    },
+    "native": {
+      "file": "artifacts/source-texture-gpu-20261128/evidence/asan/paint-composite-native.cpp.log",
+      "sha256": "dadeeb880e45b0b8b452d4b53107bb9375d7f69eaa8a517a1a44ef2ccb447a94"
+    },
+    "scope": "Updated sanitizer-built paint and composite sources linked with the preceding headless reference core."
+  },
+  "benchmark": {
+    "fixture": {
+      "file": "artifacts/source-texture-gpu-20261128/evidence/project.dsculpt",
+      "sha256": "8d9a427ba10f3fedd6d041ddedb70d0ccafd1845c45f27e8ec2243a4dffd63c0"
+    },
+    "source": {
+      "file": "artifacts/source-texture-gpu-20261128/evidence/probe.cpp",
+      "sha256": "662360abfa3f316598fcf7ae97089a597cfe069f07385b8d2b1e94e98717295c"
+    },
+    "resolution": 1024,
+    "paired_fresh_processes": 3,
+    "scope": "Timing starts after project open and includes native image construction. The old sweep resumed during this validation window.",
+    "before": {
+      "runs": [
+        {
+          "file": "artifacts/source-texture-gpu-20261128/evidence/measure-before-1.log",
+          "sha256": "e928f4fb8dfcfaaa68460b75a162bf8fe88dfa931a38c7118629f78860cf4de9",
+          "elapsed_ns": 258014450
+        },
+        {
+          "file": "artifacts/source-texture-gpu-20261128/evidence/measure-before-2.log",
+          "sha256": "ee380b515a8d1bc1b0f7d38c5e8761a9d3a6d532575c314af12c0c11ccd6d9c9",
+          "elapsed_ns": 267761493
+        },
+        {
+          "file": "artifacts/source-texture-gpu-20261128/evidence/measure-before-3.log",
+          "sha256": "fd75827960bbd01da39ac60c7d7fa6d5ce7f093acd45b863295fe0e13b54aab0",
+          "elapsed_ns": 264680567
+        }
+      ],
+      "median_ns": 264680567
+    },
+    "after": {
+      "runs": [
+        {
+          "file": "artifacts/source-texture-gpu-20261128/evidence/measure-after-1.log",
+          "sha256": "63955105ff6012d0cf60ee74236addaf5262d937defdd6939fd7a4d3d0de8d33",
+          "elapsed_ns": 56446033
+        },
+        {
+          "file": "artifacts/source-texture-gpu-20261128/evidence/measure-after-2.log",
+          "sha256": "7343c6659aae28e8a89556b55319da3f2d849853dcf7278389923d368aee5112",
+          "elapsed_ns": 45229044
+        },
+        {
+          "file": "artifacts/source-texture-gpu-20261128/evidence/measure-after-3.log",
+          "sha256": "f3cdf9fa84fb0460c1ed08f52df2af47f3d8b36373b1ee51a614ba2a95e10dad",
+          "elapsed_ns": 57563522
+        }
+      ],
+      "median_ns": 56446033
+    }
+  },
+  "exact_map_digests": {
+    "common": "c4e005dcdc7c7e82",
+    "pbr": "a57fb8739360e51",
+    "orm": "6426331b06abd3a9",
+    "emission": "40bede9a1c1e18ad",
+    "normal": "cbf29ce484222325",
+    "color_coverage": "f564eedf2f1aa2c0",
+    "emission_coverage": "bb140926bc8e0de6",
+    "baked_normal": "cbf29ce484222325",
+    "baked_coverage": "cbf29ce484222325",
+    "common_transparency": "1",
+    "pbr_transparency": "1"
+  },
+  "exact_application_glb": {
+    "file": "artifacts/source-texture-gpu-20261128/evidence/after.glb",
+    "sha256": "3a268b1f6a80db79ac6750e70d53a1452095e2066dc74b7341812a5c30a13357",
+    "base_color_png_sha256": "eb422aa84b376da11493a623b2f33406f4d2b2e6b4e64bd8796ce093339edcff",
+    "oneapi_export_trace": {
+      "file": "artifacts/source-texture-gpu-20261128/export-after.log",
+      "sha256": "6d766f3544524c0c0b67bfcb0530788c0d23bf3cf4868593a682e1307b61c108"
+    }
+  },
+  "missing_gpu": {
+    "oneapi": {
+      "file": "artifacts/source-texture-gpu-20261128/missing-device.log",
+      "sha256": "82029a0a48e96aed9e720490124fafd1466553103607ef3f52646c42da7994f2"
+    },
+    "cuda": {
+      "file": "artifacts/source-texture-gpu-20261128/cuda-missing.log",
+      "sha256": "1aa2cd4c68a4c947fd81656c71c883bab4835dee5eb8591dbe4c246aa42c7968"
+    },
+    "rocm": {
+      "file": "artifacts/source-texture-gpu-20261128/rocm-missing.log",
+      "sha256": "41f248435728e28eab2a99fa552c234e5b895bbcc512f0f45c28f784e35270da"
+    },
+    "scope": "New vendor kernels compile and the runtime refuses missing hardware. Positive NVIDIA and AMD execution remain unverified."
+  },
+  "preceding_regression_storage_recovery": {
+    "interrupted_sweep_candidate": "30eaee642f95ce59fbf2f1743e7c368524147acf",
+    "registered": 1443,
+    "completed_at_receipt": 1239,
+    "failures_at_receipt": [
+      "source-paint-resources",
+      "sculpt-resolution-allocation",
+      "normal-color-uv-render",
+      "prepared-normal-vroid-render",
+      "post-uv-avatar-render",
+      "normal-domain-avatar",
+      "normal-domain-avatar-glb",
+      "pbr-preview-avatar",
+      "source-extra-uv-raw",
+      "rig-fit-openxr",
+      "rig-rest-openxr",
+      "source-rest-graph",
+      "paint-composite-render"
+    ],
+    "terminal_at_receipt": false,
+    "original_status": "artifacts/gpu-arc-full-release-20261127/combined-test-status.json",
+    "workspace_free_before_hold_mib": 29,
+    "cases_completed_before_hold": 1096,
+    "same_regression_pid_after_thaw": 2655739,
+    "inventory": "/run/media/blux/Media/.dome-sculpt-validation-20261128-bIsQpFmS/manifest.jsonl",
+    "inventory_sha256": "e15968f19126d97b43a24eda9323a8c6078a1ad76aa4cea4a457f9992e09046c",
+    "verified_files_relocated": 79,
+    "logical_bytes_relocated": 46437083722,
+    "retry": {
+      "status": {
+        "candidate": "30eaee642f95ce59fbf2f1743e7c368524147acf",
+        "terminal": true,
+        "invocation": "89a444eefc4b43ef8101ef9d1ec98598",
+        "runtime_directory": "/run/media/blux/Media/.dome-sculpt-validation-20261128-bIsQpFmS/arc-storage-retry-oiim7yy4",
+        "elapsed_seconds": 282.393,
+        "verified_git_files": 4945,
+        "registered": 1443,
+        "app_sha256": "f1f9bd5fa1b8e61fabb99c05311a1e4348cfbb05a4f48c65780f664d43a84962",
+        "cache_sha256": "afa6979093850c55e448120d951969f0c1eca99450fc73816426109d589b2b85",
+        "phase": "complete",
+        "selected": 12,
+        "totals": {
+          "passed": 12,
+          "failed": 0,
+          "skipped": 0
+        },
+        "failures": [],
+        "skipped": [],
+        "junit_sha256": "67cdd8ab2f0776c469925205f337999d861bc9c7e16454d739f35d0cae293610",
+        "exit": 0
+      },
+      "selected": 12,
+      "same_app_sha256": true,
+      "passed_so_far": 12,
+      "live_status": "artifacts/source-texture-gpu-20261128/retry-test-status.json",
+      "junit": {
+        "file": "artifacts/source-texture-gpu-20261128/retry-arc.xml",
+        "sha256": "67cdd8ab2f0776c469925205f337999d861bc9c7e16454d739f35d0cae293610"
+      }
+    }
+  }
+}

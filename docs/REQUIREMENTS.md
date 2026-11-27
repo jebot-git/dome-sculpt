@@ -25,6 +25,13 @@ reopen, and standard GLB export. Original texture samplers and retained
 paint coordinates still need GPU coverage.
 [Prepared color evidence](validation/prepared-color-gpu-20261128.json)
 
+Original UV0 base color, ORM, occlusion and legacy emission now sample on
+the device for axis-aligned transforms and source images that fit the paint
+grid. Exact Arc tests cover nearest and linear filtering, clamp, repeat,
+mirrored repeat, paint and Bake coverage, and prepared PBR alpha. Larger
+original images, coupled UV axes and retained-coordinate sampling still
+need GPU coverage. [Original texture evidence](validation/source-texture-gpu-20261128.json)
+
 ## Current validation — 2026-11-27
 
 The [current handoff](HANDOFF.md) records the exact combined Release, Arc,

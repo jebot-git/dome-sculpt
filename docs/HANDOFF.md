@@ -144,6 +144,25 @@ by the retries. Three Arc runs pass all 91 failure probes and keep
 the exact source sculpt and protection after each injected failure.
 [Prepared color and allocation evidence](validation/prepared-color-gpu-20261128.json)
 
+The selected compute backend now samples original UV0 base color, ORM,
+occlusion and legacy emission for eligible native paint grids. It retains
+the original image owners and combines nearest or linear filtering with
+the existing paint, Bake and prepared PBR outputs. On the 1024-pixel textured
+fixture, all map checksums and the application GLB match the previous revision.
+Across three paired Arc runs the median compositing time fell from 265 to
+56 milliseconds. The integrated producer also checks that original tangent
+normal data and source ownership remain exact. UV transforms that couple
+their axes, larger source images and independently retained paint coordinates
+still need device support. [Original texture evidence](validation/source-texture-gpu-20261128.json)
+
+The preceding Arc sweep reached 29 MiB of workspace space and was held after
+1,096 cases. Completed artifacts were moved to the local Media drive with
+their hashes verified and their workspace paths preserved. The same sweep
+resumed. All twelve separate reruns passed on the frozen executable after
+the write errors and hold-related timeouts. The original sweep retains those
+results in its log and continues independently.
+[Regression recovery evidence](validation/source-texture-gpu-20261128.json)
+
 Dome Sculpt is an integrated authoring candidate. The isolated software
 Release run for `662d889d` passed all 1,366 registered tests. The newer
 controller attachment revision `eea22499` passed all 1,367 registered tests
