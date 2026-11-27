@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
+#include "affine.hpp"
 #include "rig.hpp"
 #include <optional>
 namespace dome {
@@ -10,6 +11,11 @@ struct WeightBrush {
   uint32_t joint = 0;
   WeightBrushMode mode = WeightBrushMode::Add;
 };
+struct WeightSurfaceJoints {
+  size_t bones = 0;
+  std::optional<uint32_t> direct, mirrored;
+  std::span<const uint8_t> locks;
+};
 struct WeightPaintSurface {
   uint64_t object = 0;
   const Mesh *rest = nullptr;
@@ -18,11 +24,14 @@ struct WeightPaintSurface {
   // world positions for posed editing. Empty means rest.positions already share
   // the brush coordinate frame; no object transform is guessed.
   std::span<const Vec3> positions;
+  std::optional<WeightSurfaceJoints> joints;
 };
 struct WeightBrushSymmetry {
   float plane_x = 0;
   // Explicit involution; joint names and left/right semantics are never inferred.
   std::vector<uint32_t> joints;
+  // Object-local mirror plane placement for a world-metric stroke.
+  std::optional<AffineTransform> object_to_brush;
 };
 struct WeightEditOptions {
   std::vector<uint8_t> locks;

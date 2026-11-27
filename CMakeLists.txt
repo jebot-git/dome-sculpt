@@ -1495,6 +1495,13 @@ if(BUILD_TESTING)
   add_executable(dome-sculpt-weight-authoring-test tests/weight-authoring.cpp)
   target_link_libraries(dome-sculpt-weight-authoring-test PRIVATE dome-sculpt-core)
   add_test(NAME weight-authoring COMMAND dome-sculpt-weight-authoring-test)
+  if(TARGET dome-sculpt AND TARGET dome-sculpt-test-runtime AND Python3_Interpreter_FOUND)
+    add_test(NAME affine-weight-openxr COMMAND ${Python3_EXECUTABLE}
+      ${CMAKE_CURRENT_SOURCE_DIR}/tests/affine-weight-xr.py
+      $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime>
+      $<TARGET_FILE:dome-sculpt-weight-authoring-test> ${CMAKE_CURRENT_BINARY_DIR}/affine-weight-openxr)
+    set_tests_properties(affine-weight-openxr PROPERTIES TIMEOUT 300)
+  endif()
   add_executable(dome-sculpt-skin-authoring-test tests/skin-authoring.cpp)
   target_link_libraries(dome-sculpt-skin-authoring-test PRIVATE dome-sculpt-core)
   add_test(NAME skin-authoring COMMAND dome-sculpt-skin-authoring-test)

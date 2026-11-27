@@ -12,9 +12,8 @@ float influence(const VertexWeights &weights, uint32_t joint) {
     if (i.joint == joint) return i.weight;
   return 0;
 }
-float capsule(Vec3 p, const WeightBrush &brush, bool mirror, float plane) {
-  Vec3 from = brush.from, to = brush.to;
-  if (mirror) { from.x = 2 * plane - from.x; to.x = 2 * plane - to.x; }
+float capsule(Vec3 p, const WeightBrush &brush) {
+  const Vec3 from = brush.from, to = brush.to;
   auto direction = to - from;
   float norm = dot(direction, direction);
   float t = norm > 1e-20f ? std::clamp(dot(p - from, direction) / norm, 0.f, 1.f) : 0;
@@ -63,6 +62,31 @@ WeightEditResult edit_weights(std::span<const WeightPaintSurface> surfaces,
       if (s.joints[i] >= bones || s.joints[s.joints[i]] != i)
         throw std::invalid_argument("Weight symmetry joint map is not involutive");
   }
+  std::vector<WeightBrush> reflected_stroke;
+  if (options.symmetry) {
+    const auto &symmetry = *options.symmetry;
+    std::optional<AffineTransform> reflection;
+    if (symmetry.object_to_brush) {
+      auto local = AffineTransform{}.matrix();
+      local[0] = -1;
+      local[12] = 2 * double(symmetry.plane_x);
+      reflection = *symmetry.object_to_brush * AffineTransform(local) * symmetry.object_to_brush->inverse();
+    }
+    auto point = [&](Vec3 p) {
+      if (!reflection) return Vec3{2 * symmetry.plane_x - p.x, p.y, p.z};
+      const auto q = reflection->point({p.x, p.y, p.z});
+      const Vec3 result{float(q[0]), float(q[1]), float(q[2])};
+      if (!bounded(result)) throw std::invalid_argument("Reflected weight brush leaves the coordinate bounds");
+      return result;
+    };
+    reflected_stroke.assign(brushes.begin(), brushes.end());
+    for (auto &sample : reflected_stroke) {
+      sample.from = point(sample.from);
+      sample.to = point(sample.to);
+    }
+  }
+  const auto mirror_joint = options.symmetry ? options.symmetry->joints[brush.joint] : brush.joint;
+  const WeightSurfaceJoints ordinary{bones, brush.joint, mirror_joint, options.locks};
   size_t vertices = 0, work = 0;
   auto step = [&](size_t count = 1) {
     if (count > options.maximum_work - work)
@@ -84,7 +108,14 @@ WeightEditResult edit_weights(std::span<const WeightPaintSurface> surfaces,
     vertices += count;
     step(count + surface.rest->indices.size());
     surface.rest->validate();
-    surface.weights->validate(count, bones);
+    const auto &joints = surface.joints ? *surface.joints : ordinary;
+    if (!joints.bones || joints.bones > 256 ||
+        (joints.direct && *joints.direct >= joints.bones) ||
+        (joints.mirrored && *joints.mirrored >= joints.bones) ||
+        (!joints.locks.empty() && joints.locks.size() != joints.bones) ||
+        std::ranges::any_of(joints.locks, [](auto lock){return lock > 1;}))
+      throw std::invalid_argument("Invalid weight surface joint slots or locks");
+    surface.weights->validate(count, joints.bones);
     if (!surface.positions.empty() && surface.positions.size() != count)
       throw std::invalid_argument("Weight preview position count differs from rest topology");
     auto positions = surface.positions.empty()
@@ -96,6 +127,7 @@ WeightEditResult edit_weights(std::span<const WeightPaintSurface> surfaces,
   for (const auto &surface : surfaces) {
     const auto &mesh = *surface.rest;
     const auto &original = *surface.weights;
+    const auto &joints = surface.joints ? *surface.joints : ordinary;
     WeightSurfaceEdit edited{surface.object, morph_topology_id(mesh), original};
     std::vector<std::vector<uint32_t>> neighbors;
     if (brush.mode == WeightBrushMode::Smooth) {
@@ -112,16 +144,14 @@ WeightEditResult edit_weights(std::span<const WeightPaintSurface> surfaces,
         row.erase(std::unique(row.begin(), row.end()), row.end());
       }
     }
-    auto plane = options.symmetry ? options.symmetry->plane_x : 0;
-    auto reflected = options.symmetry ? options.symmetry->joints[brush.joint] : brush.joint;
     for (size_t vertex = 0; vertex < mesh.positions.size(); ++vertex) {
       step();
       Vec3 p = surface.positions.empty() ? mesh.positions[vertex] : surface.positions[vertex];
       float direct = 0, mirror = 0;
-      for (const auto &sample : brushes) {
+      for (size_t sample = 0; sample < brushes.size(); ++sample) {
         step(options.symmetry ? 2 : 1);
-        direct = std::max(direct, capsule(p, sample, false, plane));
-        if (options.symmetry) mirror = std::max(mirror, capsule(p, sample, true, plane));
+        if (joints.direct) direct = std::max(direct, capsule(p, brushes[sample]));
+        if (joints.mirrored && options.symmetry) mirror = std::max(mirror, capsule(p, reflected_stroke[sample]));
       }
       if (direct == 0 && mirror == 0) continue;
       ++edited.affected;
@@ -149,8 +179,8 @@ WeightEditResult edit_weights(std::span<const WeightPaintSurface> surfaces,
         if (std::abs(target - old) < 1e-7f) return;
         try {
           edited.weights.vertices[vertex] = paint_weight(
-              edited.weights.vertices[vertex], joint, target, bones,
-              options.locks, options.limits);
+              edited.weights.vertices[vertex], joint, target, joints.bones,
+              joints.locks, options.limits);
         } catch (const std::logic_error &error) {
           constrained = true;
           if (result.diagnostics.size() < 8)
@@ -158,17 +188,14 @@ WeightEditResult edit_weights(std::span<const WeightPaintSurface> surfaces,
                 " vertex " + std::to_string(vertex) + ": " + error.what());
         }
       };
-      if (reflected == brush.joint) assign(brush.joint, std::max(direct, mirror));
-      else {
-        // Central overlap uses the stronger side, avoiding order-dependent
-        // redistribution between two opposing joint assignments.
-        if (direct >= mirror) assign(brush.joint, direct);
-        else assign(reflected, mirror);
-      }
+      // Central overlap uses the stronger side. The nonzero side always has
+      // an authenticated slot in this particular skin.
+      if (direct >= mirror) assign(*joints.direct, direct);
+      else assign(*joints.mirrored, mirror);
       if (constrained) ++edited.constrained;
       if (edited.weights.vertices[vertex] != original.vertices[vertex]) ++edited.changed;
     }
-    edited.weights.validate(mesh.positions.size(), bones);
+    edited.weights.validate(mesh.positions.size(), joints.bones);
     result.affected += edited.affected; result.changed += edited.changed;
     result.constrained += edited.constrained;
     result.surfaces.push_back(std::move(edited));

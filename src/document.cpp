@@ -24,6 +24,7 @@
 #include "shapekey-preview.hpp"
 #include "shapekey-mirror-controls.hpp"
 #include "document-authority.hpp"
+#include "document-held-affine.hpp"
 #include "polygon-conversion.hpp"
 #include "document-polygon-authority.hpp"
 #include "document-authority-transition.hpp"
@@ -750,7 +751,7 @@ void Document::publish_locked(bool force,bool checkpoint) {
     state_.can_cancel_asset|=export_work->cancellable();
   }
   state_.asset_progress=work.progress;
-  state_.can_paint_weights = !scene_.has_affine_placement(active.id) && active.mesh_active && active.painted && object_editable_locked(active.id) &&
+  state_.can_paint_weights = active.mesh_active && active.painted && object_editable_locked(active.id) &&
       active.deformation && active.deformation->skeleton && active.deformation->skin;
   if (!state_.can_paint_weights) state_.weights.enabled = false;
   state_.can_voxel_remesh = parameter_enabled_locked(VrParameter::VoxelSize);
@@ -992,8 +993,9 @@ void Document::stamp_desktop(Brush b) {
     throw std::logic_error("Desktop does not own the active stroke");
   if(native_stroke_&&native_stroke_->texture_set){NativeStrokeSample sample;sample.space=NativeStrokeSpace::EvaluatedWorldBrush;sample.brush=b;if(!sample_native_locked(std::move(sample)))throw std::logic_error("The selected field no longer accepts desktop samples");return;}
   RetopoInputScope admission(*this,bool(state_.retopology));
-  auto t = state_.retopology ? state_.retopology->transform
-                            : object_world_transform_locked(scene_.active().id);
+  const auto t = state_.retopology ? state_.retopology->transform
+      : weight_stroking_ && scene_.has_affine_placement(scene_.active().id)
+          ? weight_held_delta_locked() : object_world_transform_locked(scene_.active().id);
   b.from = world_to_model(t, b.from);
   b.to = world_to_model(t, b.to);
   b.radius /= t.scale;
@@ -1031,11 +1033,18 @@ void Document::cancel_desktop() {
 std::optional<Vec3> Document::raycast(Vec3 p, Vec3 d) const {
   return raycast(p, d, render_frame_time());
 }
+CanvasTransform Document::weight_held_delta_locked() const {
+  if (!state_.object_grabbing || state_.held_object != scene_.active().id) return {};
+  if (held_affine_)
+    return ob::compose(held_affine_->preview_pivot, ob::inverse(held_affine_->base_pivot));
+  return ob::compose(object_world_transform_locked(state_.held_object),
+                     ob::inverse(scene_.world_transform(state_.held_object)));
+}
 std::optional<Vec3> Document::raycast(Vec3 p, Vec3 d, double material_time) const {
   if (!std::isfinite(material_time)) throw std::invalid_argument("Invalid material pick time");
   std::lock_guard lock(model_mutex_);
   if(scene_.active().polygon&&scene_.active().polygon->active&&!scene_.active().mesh_active)return {};
-  if(!state_.retopology && scene_.has_affine_placement(scene_.active().id)) {
+  if(!state_.retopology && !state_.weights.enabled && scene_.has_affine_placement(scene_.active().id)) {
     auto snapshot=mesh_.load();
     if(!object_editable_locked(scene_.active().id)||snapshot->generation!=state_.generation||snapshot->revision!=state_.revision||!snapshot->picking)return {};
     auto hit=snapshot->picking->raycast_target(p,d,10,material_time,scene_.active().id);
@@ -1045,7 +1054,7 @@ std::optional<Vec3> Document::raycast(Vec3 p, Vec3 d, double material_time) cons
     auto mesh = mesh_.load();
     if (mesh->generation != state_.generation || mesh->revision != state_.revision || !mesh->picking) return {};
     const bool held=state_.object_grabbing&&state_.held_object==scene_.active().id;
-    auto delta=held?ob::compose(object_world_transform_locked(state_.held_object),ob::inverse(scene_.world_transform(state_.held_object))):CanvasTransform{};
+    const auto delta=weight_held_delta_locked();
     auto origin=held?world_to_model(delta,p):p;
     auto direction=held?vec(ob::rotate(ob::conjugate(delta.orientation),obv(d))):d;
     auto hit = mesh->picking->raycast_target(origin, direction, held?20/delta.scale:20, material_time,(held||state_.isolate_held)?state_.held_object:0);
@@ -1099,7 +1108,7 @@ Vec3 Document::gradient(Vec3 p) const {
     const auto hit = state_.retopology->source->closest(world_to_model(t, p), options);
     return vec(ob::rotate(t.orientation, obv(hit.normal)));
   }
-  if(scene_.has_affine_placement(scene_.active().id)) {
+  if(!state_.weights.enabled && scene_.has_affine_placement(scene_.active().id)) {
     auto snapshot=mesh_.load();
     if(snapshot->generation!=state_.generation||snapshot->revision!=state_.revision||!snapshot->picking)
       throw std::logic_error("Wait for the current affine surface before querying its normal");
@@ -1107,8 +1116,13 @@ Vec3 Document::gradient(Vec3 p) const {
   }
   if (state_.weights.enabled) {
     auto mesh = mesh_.load();
-    if (mesh->generation == state_.generation && mesh->revision == state_.revision && mesh->picking)
-      return mesh->picking->closest_target(p).surface.normal;
+    if (mesh->generation == state_.generation && mesh->revision == state_.revision && mesh->picking) {
+      const auto delta = weight_held_delta_locked();
+      const auto target = (state_.object_grabbing || state_.isolate_held) ? state_.held_object : 0;
+      const auto normal = mesh->picking->closest_target(world_to_model(delta, p), target).surface.normal;
+      return vec(ob::rotate(delta.orientation, obv(normal)));
+    }
+    throw std::logic_error("Wait for the current weight view before querying its normal");
   }
   auto t = object_world_transform_locked(scene_.active().id);
   return vec(
@@ -1492,7 +1506,14 @@ void Document::finish_spatial() {
     bool accepted_uv = uv_accept_pending_;
     if (!accepted_uv) finish_control_locked(false);
     input_.cancel();
-    if(state_.object_grabbing){if(held_polygon_pending_locked()){object_navigation_.reset();}else if(held_weight_pending_locked()){held_preview_transform_=held_start_transform_;object_navigation_.reset();}else finish_object_grab_locked(false,true);}
+    if(state_.object_grabbing){
+      if(held_polygon_pending_locked())object_navigation_.reset();
+      else if(held_weight_pending_locked()){
+        if(held_affine_)held_affine_=std::make_shared<const HeldAffine>(scene_,state_.held_object);
+        held_preview_transform_=held_start_transform_;
+        object_navigation_.reset();
+      }else finish_object_grab_locked(false,true);
+    }
     if (accepted_uv) input_.take_controls();
     navigation_.reset();
     publish_locked();
@@ -1521,6 +1542,7 @@ void Document::process_locked(const SpatialFrame &incoming) {
       input_.cancel();object_navigation_.reset();navigation_.reset();state_.hands=detail::history_only_hands(state_.hands);publish_locked(false,false);return;
     }
     if(state_.object_grabbing&&held_weight_pending_locked()){
+      if(held_affine_)held_affine_=std::make_shared<const HeldAffine>(scene_,state_.held_object);
       input_.cancel();held_preview_transform_=held_start_transform_;object_navigation_.reset();navigation_.reset();state_.hands=detail::history_only_hands(state_.hands);publish_locked(false,false);return;
     }
     if(state_.expressions)end_expression_preview_locked(false);
@@ -1583,10 +1605,11 @@ void Document::process_locked(const SpatialFrame &incoming) {
   const bool affine_target=scene_.has_affine_placement(scene_.active().id);
   auto object_canvas = state_.retopology
       ? ob::compose(state_.canvas, state_.retopology->transform)
-      : affine_target ? state_.canvas : ob::compose(state_.canvas, object_world_transform_locked(scene_.active().id));
+      : affine_target ? (state_.weights.enabled ? ob::compose(state_.canvas, weight_held_delta_locked()) : state_.canvas)
+                      : ob::compose(state_.canvas, object_world_transform_locked(scene_.active().id));
   input_.radius = state_.radius / object_canvas.scale;
   input_.edit_allowed =
-      !affine_target && (!scene_.active().mesh_active||!scene_.active().deformation||state_.weights.enabled) && !state_.asset_busy && object_editable_locked(scene_.active().id) &&
+      (!affine_target || state_.weights.enabled) && (!scene_.active().mesh_active||!scene_.active().deformation||state_.weights.enabled) && !state_.asset_busy && object_editable_locked(scene_.active().id) &&
       (scene_.active().mesh_active || volume().editable_layer() || volume().sculpt_settings().mask_edit) &&
       (!state_.weights.enabled || (mesh_.load()->generation == state_.generation && mesh_.load()->revision == state_.revision));
   if(state_.texture_face_select||state_.shape_sculpt||state_.selection_mode||state_.rig_fit)input_.edit_allowed=false;
@@ -1911,6 +1934,9 @@ void Document::mesh_loop() {
                                       : std::vector<uint64_t>{};
       std::unordered_set<uint64_t> frame_objects,texture_objects;
       for (auto &o : objects) {
+        const auto weight_slot = std::ranges::find(weighted, o.id) != weighted.end()
+            ? weight_joint_slot(job->scene.active(), job->scene.object(o.id), job->weight_joint)
+            : std::nullopt;
         if(o.texture_set_surface){
           texture_objects.insert(o.id);TextureSetLimits limits;limits.cancelled=cancelled;
           auto cached=texture_layouts.find(o.id);std::shared_ptr<const detail::TextureSetPackedGeometry>layout;
@@ -1923,7 +1949,7 @@ void Document::mesh_loop() {
             texture_layouts.emplace(o.id,layout);texture_layout_bytes+=bytes;++frame_layout_builds;
           }
           detail::TextureSetWorkerView view;view.render_only=true;view.pbr=job->pbr_view;view.weights=job->weight_view;view.masks=job->sculpt_mask_view;
-          view.selected=std::find(weighted.begin(),weighted.end(),o.id)!=weighted.end();view.joint=job->weight_joint;
+          view.selected=bool(weight_slot);view.joint=weight_slot.value_or(0);
           view.weight_values=proposed?proposed->object(o.id).deformation:o.deformation;
           if(view.masks&&o.id==job->scene.active().id)view.mask=[&](uint32_t v){return job->scene.object(o.id).volume->mask_sample(layout->posed()->positions.at(v));};
           detail::append_texture_set_surface(*snapshot,o,layout,view,limits);continue;
@@ -2035,7 +2061,6 @@ void Document::mesh_loop() {
            (packed_vertices && offset+packed_vertices-1>std::numeric_limits<uint32_t>::max()) ||
            o.mesh.indices.size()>std::numeric_limits<size_t>::max()-first)
           throw std::length_error("Packed surface preview exceeds index or container address range");
-        bool selected = std::find(weighted.begin(), weighted.end(), o.id) != weighted.end();
         if(retained && canonical && retained_pose->tangents[2].empty())
           throw std::invalid_argument("Baked normal detail requires a complete canonical preview basis");
         auto frames = canonical && !retained ? current_tangents()
@@ -2084,10 +2109,10 @@ void Document::mesh_loop() {
             snapshot->sculpt_masks.push_back(o.id == job->scene.active().id
                 ? job->scene.object(o.id).volume->mask_sample(o.mesh.positions.at(vertex)) : -1.f);
           if (job->weight_view) {
-            float value = selected ? 0.f : -1.f;
+            float value = weight_slot ? 0.f : -1.f;
             const auto &deformation = proposed ? proposed->object(o.id).deformation : o.deformation;
-            if (selected) for (auto influence : deformation->skin->vertices.at(vertex))
-              if (influence.joint == job->weight_joint) value = influence.weight;
+            if (weight_slot) for (auto influence : deformation->skin->vertices.at(vertex))
+              if (influence.joint == *weight_slot) value = influence.weight;
             snapshot->selected_weights.push_back(value);
           }
         };

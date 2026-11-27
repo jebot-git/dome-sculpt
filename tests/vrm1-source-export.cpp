@@ -877,6 +877,39 @@ void surface_heat_texture_accessory(const std::filesystem::path &out, Scene scen
         texture_set_view(replay->active(), 1).painted->baked()->emission_field->encode() ==
           field.painted->baked()->emission_field->encode(),
         "Editable VRM retains the solved weights and physical emission Bake");
+
+  const auto &first_row = native.skin->vertices.front();
+  uint32_t unused_joint = 0;
+  while (std::ranges::any_of(first_row,[&](const auto &influence){return influence.joint == unused_joint;}))
+    ++unused_joint;
+  WeightToolSettings weight_tool;
+  weight_tool.enabled = true;
+  weight_tool.linked = false;
+  doc.weight_settings(weight_tool, unused_joint);
+  settled();
+  check(doc.begin_desktop(), "The baked and Surface Heat-bound accessory admits an isolated weight brush");
+  const auto vertex = native.preview(current.painted->mesh()).positions.front();
+  const auto p = bound.world_matrix(accessory).point({vertex.x,vertex.y,vertex.z});
+  Brush stamp;
+  stamp.from = stamp.to = {float(p[0]),float(p[1]),float(p[2])};
+  stamp.radius = .04f;
+  doc.stamp_desktop(stamp);
+  doc.end_desktop();
+  settled();
+  const auto edited = doc.copy_scene();
+  const auto edited_field = texture_set_view(edited.object(accessory), 1);
+  check(edited.object(accessory).deformation->skin->vertices.front() != first_row &&
+        edited_field.painted == field.painted && edited_field.bake_recipe == field.bake_recipe &&
+        edited.object(rig).deformation == bound.object(rig).deformation,
+        "A baked multi-material accessory retains its editable layers and exact Bake while its isolated weights change");
+  const auto weighted_portable = out / "heat-weight-painted-editable.vrm";
+  doc.export_asset(weighted_portable, AssetExportFormat::EditableAvatar512).get();
+  auto weighted_replay = extract_native_authoring(bytes(weighted_portable));
+  check(weighted_replay && weighted_replay->active().deformation->skin->vertices ==
+          edited.object(accessory).deformation->skin->vertices &&
+        texture_set_view(weighted_replay->active(), 1).painted->baked()->emission_field->encode() ==
+          field.painted->baked()->emission_field->encode(),
+        "Editable VRM replays the painted weights and baked FLOAT emission together");
 }
 
 void skinned_texture_accessory(const std::filesystem::path &out, Scene initial) {
@@ -1119,6 +1152,47 @@ void skinned_texture_accessory(const std::filesystem::path &out, Scene initial) 
   refused = false;
   try { doc.export_asset(existing, AssetExportFormat::EditableAvatar512).get(); } catch (const std::invalid_argument &) { refused = true; }
   check(refused && bytes(existing) == durable, "Forged source joint slots refuse to replace a durable avatar export");
+
+  const auto recipients = weight_objects(posed, accessory, true);
+  check(std::ranges::find(recipients, rig) != recipients.end() &&
+        weight_joint_slot(posed.object(accessory),posed.object(rig),head) == head,
+        "Weight painting resolves the native accessory and original skin by the shared source joint");
+  const auto repeated_avatar = append_native_scene(posed, posed);
+  check(weight_objects(repeated_avatar.scene,accessory,true) == recipients,
+        "Linked weight painting excludes another instance of the same original file");
+  const auto corner = expected.positions.front();
+  const auto brush_center = posed.world_matrix(accessory).point({corner.x,corner.y,corner.z});
+  Brush weight;
+  weight.from = weight.to = {float(brush_center[0]),float(brush_center[1]),float(brush_center[2])};
+  weight.radius = .045f;
+  WeightToolSettings weight_settings;
+  weight_settings.enabled = true;
+  weight_settings.mode = WeightBrushMode::Replace;
+  weight_settings.value = .15f;
+  weight_settings.strength = .5f;
+  doc.replace(posed);
+  settle();
+  doc.weight_settings(weight_settings,head);
+  settle();
+  check(doc.frame().state->can_paint_weights && doc.begin_desktop(),
+        "The normal desktop brush acquires the actual affine-linked accessory");
+  doc.stamp_desktop(weight);
+  doc.end_desktop();
+  const auto weights_path = out / "skin-weight-painted.dsculpt";
+  doc.save_async(weights_path).get();
+  settle();
+  const auto weighted = doc.copy_scene();
+  const auto &painted_accessory = weighted.object(accessory);
+  check(painted_accessory.deformation->skin->vertices != current.skin->vertices &&
+        painted_accessory.deformation->source_skin_joints == current.source_skin_joints &&
+        painted_accessory.texture_sets == paint && Scene::load(weights_path).encode() == weighted.encode(),
+        "Weight painting persists edited accessory influences with the original joint link and paint intact");
+  const auto weight_export = out / "skin-weight-painted-editable.vrm";
+  doc.export_asset(weight_export,AssetExportFormat::EditableAvatar512).get();
+  verify(weighted, weight_export);
+  const auto replay = extract_native_authoring(bytes(weight_export));
+  check(replay && replay->encode() == weighted.encode(),
+        "Editable VRM retains the weight gesture and the linked accessory's exact authored state");
   surface_heat_texture_accessory(out, scene, accessory, rig);
 }
 

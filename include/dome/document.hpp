@@ -529,6 +529,7 @@ private:
   uint64_t rig_object_ = 0;
   size_t control_rig_index_ = 0;
   bool weight_stroking_ = false;
+  CanvasTransform weight_held_delta_locked() const;
   AssetSource weight_source_{};
   uint32_t weight_joint_ = 0;
   WeightToolSettings weight_stroke_settings_{};

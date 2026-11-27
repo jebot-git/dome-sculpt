@@ -53,6 +53,40 @@ int main() try {
           weight(symmetric.surfaces[0].weights.vertices[0],1)==.5f &&
           weight(symmetric.surfaces[0].weights.vertices[1],2)==.5f,
           "Explicit mirrored capsule and involutive joints paint opposite limbs");
+  {
+    auto shear = AffineTransform{}.matrix();
+    shear[0] = -1.5;
+    shear[1] = .35;
+    shear[5] = .4;
+    shear[12] = .7;
+    const AffineTransform placement(shear);
+    auto place = [&](Vec3 p) {
+      const auto q = placement.point({p.x,p.y,p.z});
+      return Vec3{float(q[0]),float(q[1]),float(q[2])};
+    };
+    auto posed = mesh.positions;
+    for (auto &p : posed) p = place(p);
+    auto placed = brush;
+    placed.from = place(brush.from);
+    placed.to = place(brush.to);
+    auto placed_mirror = mirrored;
+    placed_mirror.symmetry->object_to_brush = placement;
+    SkinWeights reordered;
+    reordered.vertices.assign(4,{{1,1}});
+    std::array<uint8_t, 4> locks{};
+    std::array bodies{
+      WeightPaintSurface{1,&mesh,&skin,posed,{}},
+      WeightPaintSurface{2,&mesh,&reordered,posed,WeightSurfaceJoints{4,3,0,locks}},
+      WeightPaintSurface{3,&mesh,&reordered,posed,WeightSurfaceJoints{4,{},0,locks}}};
+    const auto solved = edit_weights(bodies,3,placed,placed_mirror);
+    require(solved.changed == 10 &&
+        weight(solved.surfaces[0].weights.vertices[1],2) == .5f &&
+        weight(solved.surfaces[1].weights.vertices[0],3) == .5f &&
+        weight(solved.surfaces[1].weights.vertices[1],0) == .5f &&
+        weight(solved.surfaces[2].weights.vertices[0],3) == 0 &&
+        weight(solved.surfaces[2].weights.vertices[1],0) == .5f,
+        "World-metric mirroring follows the authored plane under reflected shear and maps differing skin slot tables");
+  }
   auto self_mirror=mirrored;self_mirror.symmetry->joints={0,1,2};
   auto wide=brush;wide.radius=3;
   auto once=edit_weights(surfaces,3,wide,self_mirror);

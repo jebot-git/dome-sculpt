@@ -111,6 +111,7 @@ bool lost = false, regained = false, reference_event = false;
 bool ink() { return getenv("DOME_XR_FIXTURE_STYLUS") != nullptr; }
 std::string bake_mode(){auto mode=getenv("DOME_XR_FIXTURE_BAKE");return mode?mode:"";}
 std::string skin_mode(){auto mode=getenv("DOME_XR_FIXTURE_SKIN");return mode?mode:"";}
+std::string affine_weight_mode(){const auto *mode=getenv("DOME_XR_FIXTURE_AFFINE_WEIGHT");return mode?mode:"";}
 std::string retopo_mode(){auto mode=getenv("DOME_XR_FIXTURE_RETOPO");return mode?mode:"";}
 bool retopo_history(){return retopo_mode().starts_with("history-");}
 bool history_undo(unsigned n){return (n>=4&&n<=16)||(n>=20&&n<=23)||(n>=48&&n<=54);}
@@ -824,6 +825,7 @@ FN(PollEvent, XrInstance, XrEventDataBuffer *out) {
   if(!editable_avatar_mode().empty())focus_at=1000;
   if(!projection_mode().empty())focus_at=projection_mode()=="focus"?78:1000;
   if(!affine_contact_mode().empty())focus_at=affine_contact_mode()=="focus"?12:90;
+  if(!affine_weight_mode().empty())focus_at=affine_weight_mode()=="focus"?48:1000;
   if (!attachment_mode().empty()) focus_at = attachment_mode() == "focus" ? 47 : 1000;
   if (focus_frame >= focus_at && !lost) {
     lost = true;
@@ -1033,6 +1035,11 @@ FN(GetActionStateBoolean, XrSession, const XrActionStateGetInfo *p,
     return XR_SUCCESS;
   }
   if(!expression_mode().empty()){out->currentState=button&&expression_click();out->changedSinceLastSync=button;return XR_SUCCESS;}
+  if(!affine_weight_mode().empty()){
+    out->currentState=button&&(frame==8||frame==10||frame==12||frame==14||frame==16||frame==18);
+    out->changedSinceLastSync=button;
+    return XR_SUCCESS;
+  }
   if(auto mode=editable_avatar_mode();!mode.empty()){
     out->currentState=button&&(mode=="recover"?(frame==8||frame==10):(frame==8||frame==10||frame==14||frame==18||frame==20||(mode=="cancel"&&(frame==22||frame==24||frame==28))));
     out->changedSinceLastSync=button;return XR_SUCCESS;
@@ -1143,6 +1150,10 @@ FN(GetActionStateFloat, XrSession, const XrActionStateGetInfo *p,
                 (a->name == "tip_force" && ink());
   out->isActive = active;
   out->currentState = 0;
+  if(!affine_weight_mode().empty()){
+    if(right(p->subactionPath)&&a->name=="paint_pressure"&&frame>=46&&frame<=50)out->currentState=.8f;
+    return XR_SUCCESS;
+  }
   if(retopo_history())return XR_SUCCESS;
   if(!expression_mode().empty())return XR_SUCCESS;
   if(!editable_avatar_mode().empty())return XR_SUCCESS;
@@ -1223,6 +1234,14 @@ FN(GetActionStateVector2f, XrSession, const XrActionStateGetInfo *p,
    XrActionStateVector2f *out) {
   auto a = reinterpret_cast<Action *>(p->action);
   out->isActive = XR_TRUE;
+  if(!affine_weight_mode().empty()){
+    const int sector=frame==9||frame==10?8:frame==11||frame==12?10:
+                     frame==13||frame==14?5:frame==15||frame==16?10:frame==17||frame==18?0:-1;
+    const float angle=sector*3.14159265358979323846f/6;
+    out->currentState=right(p->subactionPath)&&a->name=="right_stick"&&sector>=0?
+        XrVector2f{std::cos(angle),std::sin(angle)}:XrVector2f{0,0};
+    return XR_SUCCESS;
+  }
   if(retopo_history()){
     out->currentState={0,0};
     if(right(p->subactionPath)&&a->name=="right_stick"){
@@ -1510,6 +1529,15 @@ FN(LocateSpace, XrSpace handle, XrSpace, XrTime, XrSpaceLocation *p) {
   }
   if(!projection_mode().empty()){p->pose.orientation={0,0,0,1};p->pose.position=s->action?XrVector3f{right(s->hand)?0.f:-.3f,1.48f,frame>=72?-.85f:-.5f}:XrVector3f{0,1.6f,0};return XR_SUCCESS;}
   if(!import_atlas_mode().empty()){p->pose.orientation={0,0,0,1};p->pose.position=s->action?XrVector3f{right(s->hand)?0.f:-.3f,1.48f,-.5f}:XrVector3f{0,1.6f,0};return XR_SUCCESS;}
+  if(!affine_weight_mode().empty()){
+    p->pose.orientation={0,0,0,1};
+    // After the fixture's reference-space change, the same physical point is
+    // expressed 20 cm to the left in the new stage coordinates.
+    const float shift=frame>=43?.2f:0;
+    p->pose.position=s->action?XrVector3f{(right(s->hand)?.35f:-.3f)-shift,1.42f,-.77f}
+                             :XrVector3f{-shift,1.6f,0};
+    return XR_SUCCESS;
+  }
   if(selection_fixture()){
     p->pose.orientation={0,0,0,1};
     if(!s->action)p->pose.position={0,1.6f,0};

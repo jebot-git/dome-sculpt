@@ -4,6 +4,7 @@
 #include "dome/creation.hpp"
 #include "dome/tangents.hpp"
 #include "dome/material-bindings.hpp"
+#include "dome/source-placement.hpp"
 #include <iostream>
 #include <nlohmann/json.hpp>
 using namespace dome;
@@ -25,6 +26,28 @@ float value(const Scene &s, uint64_t object, size_t vertex, uint32_t joint) {
 }
 WeightToolSettings tool() { WeightToolSettings s; s.enabled = true; s.strength = .5f; s.mode = WeightBrushMode::Replace; return s; }
 Brush stamp(Vec3 p) { Brush b; b.from = b.to = p; b.radius = .2f; b.normal = {0, 0, 1}; b.pressure = 1; return b; }
+Scene affine_fixture() {
+  auto scene = fixture();
+  auto placement = AffineTransform{}.matrix();
+  placement[0] = -1.2;
+  placement[4] = .1;
+  placement[5] = .12;
+  placement[12] = -.2;
+  scene.group(scene.active().group).affine_edit =
+      std::make_shared<const NativeAffineEdit>(AffineTransform(placement));
+  // Move the actual posed triangle towards the camera without moving its rest mesh.
+  for (uint64_t id : {1u,2u}) {
+    auto d = *scene.object(id).deformation;
+    d.pose = {d.skeleton->bones[0].rest,d.skeleton->bones[1].rest};
+    d.pose[0].translation.z = .08f;
+    scene.set_deformation(id,d);
+  }
+  return scene;
+}
+Vec3 placed(const Scene &scene,Vec3 position) {
+  const auto p = scene.world_matrix(scene.active().id).point({position.x,position.y,position.z});
+  return {float(p[0]),float(p[1]),float(p[2])};
+}
 void bake_active(Scene &scene) {
   auto painted = std::make_shared<PaintedMesh>(*scene.active().painted);
   auto image = [](std::array<uint8_t,4> color) {
@@ -51,6 +74,40 @@ struct Controller {
 } // namespace
 int main(int argc, char **argv) try {
   if (argc == 3 && std::string_view(argv[1]) == "--ui-fixture") { fixture().save(argv[2]); return 0; }
+  if (argc == 3 && std::string_view(argv[1]) == "--affine-xr-fixture") {
+    auto scene = affine_fixture();
+    for (auto id : {1u, 2u}) {
+      auto d = *scene.object(id).deformation;
+      d.skin->vertices.assign(3, {{1,1}});
+      scene.set_deformation(id,d);
+    }
+    const std::filesystem::path out = argv[2];
+    std::filesystem::create_directories(out);
+    scene.save(out / "before.dsculpt");
+    WeightBrush brush;
+    brush.from = brush.to = placed(scene,{-.5f,-.5f,.08f});
+    brush.radius = .12f; brush.strength = 1; brush.pressure = .8f;
+    const auto result = paint_scene_weights(scene,1,{&brush,1},WeightToolSettings{});
+    check(result.changed == 2 && std::abs(value(scene,2,0,0)-.2f) < 1e-6f,
+          "Affine OpenXR fixture has the expected pressure falloff and two linked paints");
+    scene.save(out / "after.dsculpt");
+    return 0;
+  }
+  if (argc == 4 && std::string_view(argv[1]) == "--check-affine-ui") {
+    const auto before = Scene::load(argv[2]);
+    auto after = Scene::load(argv[3]);
+    const auto &weights = after.object(1).deformation->skin->vertices;
+    check(weights == after.object(2).deformation->skin->vertices &&
+          weights != before.object(1).deformation->skin->vertices &&
+          value(after,1,0,0) > 0 && value(after,1,0,0) <= .25f &&
+          weights[1] == before.object(1).deformation->skin->vertices[1],
+          "The pointer changes only the covered corner weights on the two affine rig parts");
+    after.object(1).deformation = before.object(1).deformation;
+    after.object(2).deformation = before.object(2).deformation;
+    check(after.encode() == before.encode(),
+          "The saved weight gesture preserves placement, paint and every other scene record");
+    return 0;
+  }
   auto original = fixture(); auto source = original.encode();
   WeightBrush b; b.from = b.to = original.active().painted->mesh().positions[0]; b.radius = .2f; b.strength = 1; b.joint = 1;
   auto once = original.snapshot(), dense = original.snapshot(); auto settings = tool();
@@ -74,6 +131,73 @@ int main(int argc, char **argv) try {
   settings = tool();
   auto cancelled = original.snapshot(); check(rejects([&] { paint_scene_weights(cancelled, 1, repeated, settings, [] { return true; }); }) && cancelled.encode() == source,
         "Cancelled worker leaves all linked parts exact");
+  {
+    const auto affine = affine_fixture();
+    const auto before = affine.encode();
+    const auto a = placed(affine,{-.5f,-.5f,.08f});
+    const auto center = placed(affine,{-.46f,-.46f,.08f});
+    auto submitted = stamp(a);
+    submitted.radius = .65f;
+    WeightBrush world;world.from=world.to=a;world.radius=submitted.radius;world.strength=1;world.joint=1;
+    auto expected = affine;
+    const auto result = paint_scene_weights(expected,1,{&world,1},settings);
+    const auto top = placed(affine,{0,.5f,.08f});
+    const float u = 1 - length(top-a)/world.radius;
+    check(result.changed == 4 && value(expected,1,0,1) == .5f &&
+          std::abs(value(expected,2,2,1) - .5f*u*u*(3-2*u)) < 1e-6f &&
+          value(expected,2,1,1) == 0, "The reflected, sheared brush uses circular world-distance falloff on both native receivers");
+    Document affine_doc;
+    affine_doc.replace(affine.snapshot());affine_doc.weight_settings(settings,1);
+    check(affine_doc.wait_mesh() && affine_doc.frame().state->can_paint_weights && affine_doc.frame().state->error.empty(),
+          "Affine-placed native weights acquire an immutable visual and picking view");
+    const auto hit = affine_doc.raycast(center+Vec3{0,0,1},{0,0,-1});
+    check(hit && length(*hit-center) < 1e-5f,"Desktop picks the reflected posed surface in scene coordinates");
+    check(affine_doc.begin_desktop(),"Desktop acquires an affine weight stroke");
+    affine_doc.stamp_desktop(submitted);
+    affine_doc.cancel_desktop();
+    check(affine_doc.copy_scene().encode()==before,"Cancelling an affine weight stroke preserves the exact source");
+    check(affine_doc.begin_desktop(),"Desktop reacquires the affine weight stroke");
+    affine_doc.stamp_desktop(submitted);
+    affine_doc.end_desktop();
+    check(affine_doc.wait_asset() && affine_doc.copy_scene().encode()==expected.encode() &&
+          affine_doc.undo() && affine_doc.copy_scene().encode()==before &&
+          affine_doc.redo() && affine_doc.copy_scene().encode()==expected.encode(),
+          "Desktop applies the world-metric stroke through one exact Undo and Redo entry");
+
+    Document spatial;
+    spatial.replace(affine.snapshot());spatial.configure(Tool::Clay,world.radius);
+    spatial.weight_settings(settings,1);spatial.wait_mesh();
+    Controller hand(spatial);
+    const auto point = ob::transform(spatial.frame().state->canvas,{a.x,a.y,a.z});
+    hand.f.hands[1].tracked.grip.position=point;
+    hand.send();hand.send(1);hand.send();
+    check(spatial.wait_asset() && spatial.frame().state->error.empty() &&
+          std::abs(value(spatial.copy_scene(),1,0,1)-.5f)<1e-6f &&
+          std::abs(value(spatial.copy_scene(),2,2,1)-value(expected,2,2,1))<1e-6f,
+          "Controller contact paints the same world-metric weights through the canvas transform");
+    check(spatial.undo() && spatial.copy_scene().encode()==before,
+          "Controller affine weight stroke restores exact source state");
+    Document held;
+    held.replace(affine.snapshot());held.weight_settings(settings,1);held.wait_mesh();
+    held.configure_object_grab(true,true);
+    check(held.wait_mesh() && held.begin_object_grab(1),"The affine weight tool can isolate its held receiver");
+    CanvasTransform delta{{.25f,.1f,.15f},{0,0,.70710678f,.70710678f},1.5f};
+    held.move_held_object_world(delta);
+    auto moved_point = [&](Vec3 point) {
+      const auto p = ob::transform(delta,{point.x,point.y,point.z});
+      return Vec3{p.x,p.y,p.z};
+    };
+    const auto moved_hit=held.raycast(moved_point(center)+Vec3{0,0,1},{0,0,-1});
+    check(moved_hit && length(*moved_hit-moved_point(center)) < 1e-5f && held.begin_desktop(),
+          "A moved, scaled affine grab still picks the same posed surface");
+    submitted.from=submitted.to=moved_point(a);submitted.radius*=delta.scale;
+    held.stamp_desktop(submitted);
+    held.end_desktop();
+    check(held.wait_asset() && held.frame().state->error.empty() &&
+          std::abs(value(held.copy_scene(),1,0,1)-.5f)<1e-6f &&
+          value(held.copy_scene(),2,0,1)==0,
+          "Held affinity maps the brush to its capture frame and keeps unheld siblings unchanged");
+  }
   Document doc; doc.replace(original.snapshot()); doc.weight_settings(settings, 1); check(doc.wait_mesh(), "Weight debug and posed picking snapshot completes on mesh worker");
   check(doc.frame().surface->selected_weights.size() == doc.frame().surface->mesh.positions.size() && doc.frame().surface->picking,
         "Published immutable snapshot includes exact weight attributes and worker-built BVH");
