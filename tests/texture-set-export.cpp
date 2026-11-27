@@ -638,7 +638,8 @@ std::shared_ptr<const Image> mtoon_independent_image(uint32_t width,uint32_t hei
  return image;
 }
 
-void verify_independent_mtoon_paint(const Scene &scene,const std::filesystem::path &path,bool masked,bool large) {
+void verify_independent_mtoon_paint(const Scene &scene,const std::filesystem::path &path,
+                                   bool large,bool source_alpha=false) {
  const auto payload=bytes(path);
  const auto length=uint32_t(payload.at(12))|(uint32_t(payload.at(13))<<8)|
      (uint32_t(payload.at(14))<<16)|(uint32_t(payload.at(15))<<24);
@@ -656,9 +657,23 @@ void verify_independent_mtoon_paint(const Scene &scene,const std::filesystem::pa
  constexpr auto base=size_t(MToonSlot::Base),emission=size_t(MToonSlot::Emission);
  const auto maps=field.painted->composite(field.material);
  const auto r=field.painted->resolution();
- check(base_output.image->width==(masked?r:3*r)&&base_output.image->height==(masked||large?r:3*r)&&
-       shade_output.image->width==3*r&&emission_output.image->height==r,
+ const auto &p=binding.material.parameters;
+ const bool masked=p.alpha==MToonAlpha::Mask,visible_alpha=p.alpha!=MToonAlpha::Opaque;
+ const auto &source=*binding.roles[base].image;
+ const auto width=source_alpha?source.width:masked?r:3*r;
+ const auto height=source_alpha?source.height:masked||large?r:3*r;
+ check(base_output.image->width==width&&base_output.image->height==height&&
+       shade_output.image->width==(source_alpha?width:3*r)&&emission_output.image->height==r,
        "Generated role grids independently preserve source density and the native mask grid");
+ if(visible_alpha)check(material.at("alphaMode")== (masked?"MASK":"BLEND"),
+                        "The portable material uses the authored alpha mode");
+ if(source_alpha){
+  for(uint32_t y=0;y<height;++y)for(uint32_t x=0;x<width*2/5;++x){
+   const auto at=(size_t(y)*width+x)*4+3;
+   check(base_output.image->rgba[at]==source.rgba[at],
+         "Texels around the unpainted visibility boundary keep exact alpha bytes");
+  }
+ }
  const auto view=[&](const Image &image){
   PaintSourceTexture result;
   result.image=std::shared_ptr<const Image>(maps,&image);
@@ -668,7 +683,6 @@ void verify_independent_mtoon_paint(const Scene &scene,const std::filesystem::pa
  };
  const auto coverage=view(maps->color_coverage),emission_coverage=view(maps->emission_coverage);
  const auto original_base=view(maps->color),original_emission=view(maps->emission);
- const auto &p=binding.material.parameters;
  const auto &m=field.material;
  const std::array sh{p.shade_color.x,p.shade_color.y,p.shade_color.z};
  const std::array ec{p.emission.x,p.emission.y,p.emission.z};
@@ -694,12 +708,14 @@ void verify_independent_mtoon_paint(const Scene &scene,const std::filesystem::pa
    maximum[1]=std::max(maximum[1],double(std::abs(read_shade[k]-desired_shade)));
    maximum[2]=std::max(maximum[2],double(std::abs(read_emission[k]-desired_emission)));
   }
-  if(masked){
-   const auto alpha=U==1?B[3]*p.base_color[3]:C[3];
-   const bool accept=alpha>=p.alpha_cutoff;
+  if(visible_alpha){
+   const auto background=B[3]*p.base_color[3];
+   const auto alpha=U==1?background:std::clamp(C[3]+(background-m.color[3])*U,0.f,1.f);
+   const auto accepts=[&](float value){return masked?value>=p.alpha_cutoff:value>0;};
+   const bool accept=accepts(alpha);
    masks_pass+=accept;masks_fail+=!accept;
-   if(accept!=(read[3]>=p.alpha_cutoff))
-    throw std::runtime_error("The independent masked output changed an actual cutoff decision");
+   if(accept!=accepts(read[3]))
+    throw std::runtime_error("The independent material output changed an actual alpha decision");
    maximum[3]=std::max(maximum[3],double(std::abs(read[3]-alpha)));
   }
  }
@@ -709,12 +725,13 @@ void verify_independent_mtoon_paint(const Scene &scene,const std::filesystem::pa
   check(maximum[k]<=bound+2e-6&&bound<=(k==3?1./255.:.005),
         "Independent texture consumer measures error within the encoded certificate");
  }
- if(masked)check(masks_pass>0&&masks_fail>0,"The fixture exercises both sides of the authored mask cutoff");
+ if(visible_alpha)check(masks_pass>0&&masks_fail>0,"The fixture exercises both sides of its visibility boundary");
  std::cout<<"MTOON_INDEPENDENT "<<path<<" samples="<<143*139<<" rgb="<<maximum[0]<<','<<maximum[1]<<','
           <<maximum[2]<<" alpha="<<maximum[3]<<" mask_pass="<<masks_pass<<" mask_fail="<<masks_fail<<'\n';
 }
 
-void prepare_independent_paint_reimport(const Scene &scene,const std::filesystem::path &standard) {
+void prepare_independent_paint_reimport(const Scene &scene,const std::filesystem::path &standard,
+                                       const std::string &name="masked",uint32_t width=64) {
  Document doc;
  ImportSettings settings;
  settings.paint_resolution=64;
@@ -725,14 +742,18 @@ void prepare_independent_paint_reimport(const Scene &scene,const std::filesystem
  const auto authored=std::ranges::find_if(loaded.objects(),[](const auto &object){
   return object.material_bindings&&object.material_bindings->has_mtoon;
  });
+ const auto alpha=texture_set_view(scene.active(),1).material_bindings->material.parameters.alpha;
  const auto slot=[&](MToonSlot role){return authored->material_bindings->roles[size_t(role)].image;};
- check(authored!=loaded.objects().end()&&authored->material_bindings->material.parameters.alpha==MToonAlpha::Mask&&
-       slot(MToonSlot::Base)&&slot(MToonSlot::Base)->width==64&&
+ check(authored!=loaded.objects().end()&&authored->material_bindings->material.parameters.alpha==alpha&&
+       slot(MToonSlot::Base)&&slot(MToonSlot::Base)->width==width&&
        slot(MToonSlot::Shade)&&slot(MToonSlot::Shade)->width==192&&
        slot(MToonSlot::Emission)&&slot(MToonSlot::Emission)->width==192,
        "Native re-import uses the actual mask and all three independently generated images");
- doc.save_async("masked-imported.dsculpt").get();
- scene.save("masked-native.dsculpt");
+ doc.save_async(name+"-imported.dsculpt").get();
+ scene.save(name+"-native.dsculpt");
+}
+
+void prepare_independent_hidden_ink(const Scene &scene) {
  auto control=scene.snapshot();
  check(edit_texture_set(control,control.active().id,1,[](PaintedMesh &paint,Material &){
   for(const auto &layer:paint.layers()){
@@ -767,13 +788,14 @@ void independent_mtoon_paint_authoring(){
   doc.export_asset(standard,AssetExportFormat::Glb).get();
   doc.export_asset(editable,AssetExportFormat::EditableGlb256).get();
   consumer(standard,2);consumer(editable,2);
-  verify_independent_mtoon_paint(scene,standard,masked,large);
-  verify_independent_mtoon_paint(scene,editable,masked,large);
+  verify_independent_mtoon_paint(scene,standard,large);
+  verify_independent_mtoon_paint(scene,editable,large);
   const auto replay=extract_native_authoring(bytes(editable));
   check(replay&&replay->encode()==exact&&doc.copy_scene().encode()==exact,
         "Editable GLB keeps the original grids, editable layers and source owners");
   if(!masked)continue;
   prepare_independent_paint_reimport(scene,standard);
+  prepare_independent_hidden_ink(scene);
   const auto unchanged=bytes(standard);
   auto sharp=binding;
   sharp.roles[base].image=mtoon_independent_image(120,83,false,true);
@@ -796,6 +818,75 @@ void independent_mtoon_paint_authoring(){
   doc.export_asset("independent-alpha-editable.glb",AssetExportFormat::EditableGlb256).get();
   const auto fallback=extract_native_authoring(bytes("independent-alpha-editable.glb"));
   check(fallback&&fallback->encode()==scene.encode(),"Editable GLB retains the rejected source alpha and native paint");
+ }
+}
+
+void varying_mtoon_alpha_authoring(){
+ constexpr auto base=size_t(MToonSlot::Base),shade=size_t(MToonSlot::Shade),emission=size_t(MToonSlot::Emission);
+ for(const std::string mode:{"cutout","aligned-cutout","blend"}){
+  auto scene=fixture(false,64,64);
+  const auto id=scene.active().id;
+  mtoon_paint_fixture::author(scene,1,{.18f,-.08f,.5f},false,mtoon_paint_fixture::Background::Varying);
+  check(edit_texture_set(scene,id,1,[](PaintedMesh &,Material &material){
+   material.color[3]=1;
+   return true;
+  }),"The actual editable paint field uses an opaque native background");
+  auto binding=*texture_set_view(scene.active(),1).material_bindings;
+  const uint32_t width=mode=="aligned-cutout"?64:192;
+  auto source=std::make_shared<Image>(*mtoon_independent_image(width,64,false));
+  const auto edge=width*7/20;
+  for(uint32_t y=0;y<source->height;++y)for(uint32_t x=0;x<width;++x){
+   const auto at=(size_t(y)*width+x)*4+3;
+   source->rgba[at]=x<edge?0:x==edge?13:x==edge+1?64:uint8_t(170+x*28/width+y*24/source->height);
+  }
+  binding.roles[base].image=binding.roles[shade].image=source;
+  binding.roles[emission].image=mtoon_independent_image(91,47,true);
+  auto &params=binding.material.parameters;
+  params.base_color[3]=binding.native_reference.color[3]=1;
+  params.alpha_cutoff=13.f/255.f;
+  if(mode=="blend"){
+   params.alpha=MToonAlpha::Blend;
+   params.depth_write=false;
+   params.source_blend=5;
+   params.destination_blend=10;
+   params.render_queue=3000;
+  }
+  check(bind_texture_set_mtoon(scene,id,1,binding),"The typed source carries both a visibility edge and varying alpha under paint");
+
+  const auto exact=scene.encode();
+  const auto standard=mode+"-standard.glb",editable=mode+"-editable.glb";
+  Document doc;
+  doc.replace(scene);
+  check(doc.wait_mesh()&&doc.frame().state->error.empty(),"The native worker publishes painted, spatially varying alpha");
+  doc.export_asset(standard,AssetExportFormat::Glb).get();
+  doc.export_asset(editable,AssetExportFormat::EditableGlb256).get();
+  consumer(standard,2);consumer(editable,2);
+  verify_independent_mtoon_paint(scene,standard,false,true);
+  verify_independent_mtoon_paint(scene,editable,false,true);
+  const auto restored=extract_native_authoring(bytes(editable));
+  check(restored&&restored->encode()==exact&&doc.copy_scene().encode()==exact,
+        "Editable GLB retains the varying source alpha and native paint byte for byte");
+  if(mode=="aligned-cutout")continue;
+  prepare_independent_paint_reimport(scene,standard,mode,width);
+  auto control=scene.snapshot();
+  auto filled=std::make_shared<Image>(*source);
+  for(size_t at=3;at<filled->rgba.size();at+=4)filled->rgba[at]=255;
+  auto solid=binding;
+  solid.roles[base].image=solid.roles[shade].image=filled;
+  check(bind_texture_set_mtoon(control,id,1,solid),"The optical control replaces only source alpha");
+  control.save(mode+"-solid-control.dsculpt");
+
+  if(mode!="cutout")continue;
+  const auto unchanged=bytes(standard);
+  params.base_color[3]=.8f;
+  check(bind_texture_set_mtoon(scene,id,1,binding),"The source cutout can be rescaled independently of paint");
+  doc.replace(scene);
+  refuses([&]{doc.export_asset(standard,AssetExportFormat::Glb).get();},
+          "A displaced fractional cutoff crossing cannot be certified on byte alpha");
+  check(bytes(standard)==unchanged,"A failed cutoff proof preserves the existing export");
+  doc.export_asset("uncertified-alpha-editable.glb",AssetExportFormat::EditableGlb256).get();
+  const auto cold=extract_native_authoring(bytes("uncertified-alpha-editable.glb"));
+  check(cold&&cold->encode()==scene.encode(),"Editable GLB still restores the uncertified material exactly");
  }
 }
 
@@ -1105,4 +1196,4 @@ void production_baked_hdr(){
  }
 }
 }
-int main(int argc,char**argv)try{if(argc>1){std::filesystem::create_directories(argv[1]);std::filesystem::current_path(argv[1]);}const std::string_view mode=argc>2?argv[2]:"";if(mode=="--typed-tangent")mtoon_derivative_tangents();else if(mode=="--independent-mtoon")independent_mtoon_paint_authoring();else{portable();authoring();mtoon_authoring();mtoon_painted_authoring();mtoon_shared_shade_authoring();mtoon_varying_authoring();editable_hdr();authority();production_hdr();production_baked_hdr();}std::cout<<"PASS "<<checks<<" texture-set multi-primitive export controls\n";return 0;}catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
+int main(int argc,char**argv)try{if(argc>1){std::filesystem::create_directories(argv[1]);std::filesystem::current_path(argv[1]);}const std::string_view mode=argc>2?argv[2]:"";if(mode=="--typed-tangent")mtoon_derivative_tangents();else if(mode=="--independent-mtoon")independent_mtoon_paint_authoring();else if(mode=="--varying-alpha")varying_mtoon_alpha_authoring();else{portable();authoring();mtoon_authoring();mtoon_painted_authoring();mtoon_shared_shade_authoring();mtoon_varying_authoring();editable_hdr();authority();production_hdr();production_baked_hdr();}std::cout<<"PASS "<<checks<<" texture-set multi-primitive export controls\n";return 0;}catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

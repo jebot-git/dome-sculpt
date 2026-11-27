@@ -5097,6 +5097,9 @@ if(BUILD_TESTING)
   add_test(NAME texture-set-mtoon-independent-paint COMMAND dome-sculpt-texture-set-export-test
     ${CMAKE_CURRENT_BINARY_DIR}/texture-set-independent-mtoon --independent-mtoon)
   set_tests_properties(texture-set-mtoon-independent-paint PROPERTIES TIMEOUT 180)
+  add_test(NAME texture-set-mtoon-varying-alpha COMMAND dome-sculpt-texture-set-export-test
+    ${CMAKE_CURRENT_BINARY_DIR}/texture-set-mtoon-alpha --varying-alpha)
+  set_tests_properties(texture-set-mtoon-varying-alpha PROPERTIES TIMEOUT 180)
 endif()
 
 # Private polygon field-transfer foundation. Complete mathematical TUs only;

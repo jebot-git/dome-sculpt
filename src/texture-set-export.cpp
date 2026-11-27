@@ -20,6 +20,7 @@
 #include <bit>
 #include <limits>
 #include <map>
+#include <numeric>
 namespace dome::detail {
 namespace {
 class ExportBudgetExceeded : public std::length_error {
@@ -503,13 +504,16 @@ std::shared_ptr<const Image> compose_shared_mtoon_shade(
  return image;
 }
 
+enum class MToonAlphaGrid { None, Paint, Source };
+
 std::optional<std::array<uint32_t,2>> independent_mtoon_dimensions(const SourceMaterialBindings &binding,
-    MToonSlot role,uint32_t paint_size,bool exact_alpha) {
+    MToonSlot role,uint32_t paint_size,MToonAlphaGrid alpha) {
  const auto slot=size_t(role);
  const auto &view=binding.roles[slot];
- if(!clamp_linear_mtoon_source(view,binding.material.textures[slot]) ||
-    (view.image->width==paint_size&&view.image->height==paint_size))return {};
- if(exact_alpha)return std::array{paint_size,paint_size};
+ if(!clamp_linear_mtoon_source(view,binding.material.textures[slot]))return {};
+ if(alpha==MToonAlphaGrid::Source)return std::array{view.image->width,view.image->height};
+ if(view.image->width==paint_size&&view.image->height==paint_size)return {};
+ if(alpha==MToonAlphaGrid::Paint)return std::array{paint_size,paint_size};
  const auto axis=[&](uint32_t size){
   // An odd multiple keeps every native paint texel center as an output
   // filter knot, while the new raster has at least the source density.
@@ -552,6 +556,73 @@ struct MToonIndependentTap {
  double uncovered=0;
 };
 
+bool mtoon_alpha_matches_native(const Image &image,float factor,float native,
+                              const TextureSetLimits &limits) {
+ for(size_t at=3;at<image.rgba.size();at+=4){
+  if((at&16383)==3)stop(limits);
+  if((image.rgba[at]/255.f)*factor!=native)return false;
+ }
+ return true;
+}
+
+MToonAlphaGrid mtoon_base_alpha_grid(const SourceMaterialBindings &binding,bool opaque,
+                                    float factor,float native,const TextureSetLimits &limits) {
+ if(opaque)return MToonAlphaGrid::None;
+ constexpr auto base=size_t(MToonSlot::Base);
+ const auto &role=binding.roles[base];
+ if(clamp_linear_mtoon_source(role,binding.material.textures[base])&&
+    !mtoon_alpha_matches_native(*role.image,factor,native,limits))return MToonAlphaGrid::Source;
+ return MToonAlphaGrid::Paint;
+}
+
+bool identical_mtoon_alpha_taps(const Image &a,const Image &b,double u,double v) {
+ if(a.width!=b.width||a.height!=b.height)return false;
+ const auto x=mtoon_filter_axis(u,a.width),y=mtoon_filter_axis(v,a.height);
+ for(const auto j:{y.low,y.high})for(const auto i:{x.low,x.high}){
+  const auto index=(size_t(j)*a.width+i)*4+3;
+  if(a.rgba[index]!=b.rgba[index])return false;
+ }
+ return true;
+}
+
+bool certify_mtoon_alpha_cell(const std::array<const MToonIndependentTap*,4> &corners,
+    const Image &source,const Image &output,double u,double v,float factor,
+    const MToonParameters &params,PortableMToonSetPaint &proof) {
+ const bool unpainted=std::ranges::all_of(corners,[](const auto *tap){return tap->uncovered==1;});
+ // With identical filter taps, a cutout crossing is preserved at every
+ // point in this rectangle, including points exactly on the threshold.
+ if(unpainted&&factor==1&&identical_mtoon_alpha_taps(source,output,u,v))return true;
+ double bg_min=1,bg_max=0,u_min=1,u_max=0;
+ double wanted_min=1,wanted_max=0,emitted_min=1,emitted_max=0,error=0;
+ for(const auto *tap:corners){
+  const double background=tap->background[3];
+  const double emitted=tap->output[3];
+  const double wanted=unpainted?background:background*tap->uncovered+tap->correction[3];
+  bg_min=std::min(bg_min,background);bg_max=std::max(bg_max,background);
+  u_min=std::min(u_min,tap->uncovered);u_max=std::max(u_max,tap->uncovered);
+  emitted_min=std::min(emitted_min,emitted);emitted_max=std::max(emitted_max,emitted);
+  wanted_min=std::min(wanted_min,wanted);wanted_max=std::max(wanted_max,wanted);
+  error=std::max(error,std::abs(emitted-wanted));
+  if(tap->uncovered==1){
+   // The zero-coverage branch can also lie on an edge of a mixed cell.
+   wanted_min=std::min(wanted_min,background);wanted_max=std::max(wanted_max,background);
+   error=std::max(error,std::abs(emitted-background));
+  }
+ }
+ const double covariance=(bg_max-bg_min)*(u_max-u_min)*.25;
+ proof.alpha_error=std::max(proof.alpha_error,error+covariance);
+ proof.source_filter_error=std::max(proof.source_filter_error,covariance);
+ if(proof.alpha_error>1./255.)return false;
+ constexpr double sampling_slack=1e-6;
+ const double low=std::min(wanted_min-covariance,emitted_min)-sampling_slack;
+ const double high=std::max(wanted_max+covariance,emitted_max)+sampling_slack;
+ // The native fragment clamps alpha. For any other MASK threshold the
+ // complete native and portable ranges must stay on the same side.
+ if(params.alpha==MToonAlpha::Mask)
+  return params.alpha_cutoff==0||low>=params.alpha_cutoff||high<params.alpha_cutoff;
+ return low>0;
+}
+
 std::vector<double> mtoon_filter_knots(uint32_t paint,uint32_t original,uint32_t output) {
  std::vector<double> knots;
  knots.reserve(size_t(paint)+original+output+2);
@@ -567,22 +638,18 @@ std::vector<double> mtoon_filter_knots(uint32_t paint,uint32_t original,uint32_t
 std::shared_ptr<const Image> compose_independent_mtoon(MToonSlot role,const Image &source,
     const Image &resolved,const Image &coverage,std::array<uint32_t,2> output,
     const std::array<float,4> &factor,const std::array<float,4> &native,
-    const MToonParameters &params,PortableMToonSetPaint &proof,const TextureSetLimits &limits) {
+    const MToonParameters &params,MToonAlphaGrid alpha,PortableMToonSetPaint &proof,
+    const TextureSetLimits &limits) {
  source.validate();resolved.validate();coverage.validate();
  if(resolved.width!=coverage.width||resolved.height!=coverage.height)
   throw std::logic_error("MToon paint and coverage dimensions differ");
  const bool shade=role==MToonSlot::Shade, base=role==MToonSlot::Base;
- const bool alpha=base&&params.alpha!=MToonAlpha::Opaque;
- const size_t channels=alpha?4:3;
+ const size_t channels=alpha==MToonAlphaGrid::None?3:4;
  const auto [width,height]=output;
- if(alpha){
+ if(alpha==MToonAlphaGrid::Paint){
   // Preserve the existing filtered alpha curve exactly on its paint grid.
   // Covered taps can then interpolate across a mask threshold as before.
   if(width!=resolved.width||height!=resolved.height)return {};
-  for(size_t at=3;at<source.rgba.size();at+=4){
-   if((at&16383)==3)stop(limits);
-   if((source.rgba[at]/255.f)*factor[3]!=native[3])return {};
-  }
  }
  auto image=std::make_shared<Image>(Image{width,height,std::vector<uint8_t>(size_t(width)*height*4,255)});
  const auto sample=[&](double u,double v) {
@@ -610,7 +677,11 @@ std::shared_ptr<const Image> compose_independent_mtoon(MToonSlot role,const Imag
    const size_t at=(size_t(y)*width+x)*4;
    for(size_t k=0;k<3;++k)
     image->rgba[at+k]=mtoon_srgb_byte(tap.uncovered==1?tap.background[k]:value(tap,k));
-   if(alpha)image->rgba[at+3]=resolved.rgba[at+3];
+   if(alpha==MToonAlphaGrid::Paint)image->rgba[at+3]=resolved.rgba[at+3];
+   if(alpha==MToonAlphaGrid::Source){
+    const auto sampled=tap.uncovered==1?tap.background[3]:value(tap,3);
+    image->rgba[at+3]=uint8_t(std::lround(255*std::clamp(sampled,0.,1.)));
+   }
   }
  }
  const auto xs=mtoon_filter_knots(resolved.width,source.width,width);
@@ -628,11 +699,15 @@ std::shared_ptr<const Image> compose_independent_mtoon(MToonSlot role,const Imag
    tap.output=mtoon_filter(*image,mtoon_filter_axis(xs[x],width),
                            mtoon_filter_axis(ys[y],height),channels,true);
    if(!x||!y)continue;
-   const std::array corners{&previous[x-1],&previous[x],&row[x-1],&tap};
+   const std::array<const MToonIndependentTap*,4> corners{&previous[x-1],&previous[x],&row[x-1],&tap};
+   if(alpha==MToonAlphaGrid::Source&&
+      !certify_mtoon_alpha_cell(corners,source,*image,std::midpoint(xs[x-1],xs[x]),
+                               std::midpoint(ys[y-1],ys[y]),factor[3],params,proof))
+    return {};
    // Break at every filter knot of all three grids. Inside each resulting
    // rectangle both input filters and the output filter are bilinear. The
    // product adds covariance and shared shade adds a possible max(0,x) kink.
-   for(size_t k=0;k<channels;++k){
+   for(size_t k=0;k<(alpha==MToonAlphaGrid::Paint?4:3);++k){
     double bg_low=1,bg_high=0,u_low=1,u_high=0,correction_low=0,correction_high=0,error=0;
     for(const auto *corner:corners){
      bg_low=std::min(bg_low,corner->background[k]);bg_high=std::max(bg_high,corner->background[k]);
@@ -1235,9 +1310,13 @@ ExportBound export_bound(const ObjectSurface&input,const TextureSetLimits&limits
     const bool opaque=field.material.alpha!=Material::AlphaMode::Automatic&&
         int(field.material.alpha)!=binding.native_reference.alpha?
         field.material.alpha==Material::AlphaMode::Opaque:p.alpha==MToonAlpha::Opaque;
+    const auto native_alpha=field.material.color[3];
+    const auto factor=mtoon_factor(p.base_color[3],binding.native_reference.color[3],native_alpha);
+    const auto base_alpha=mtoon_base_alpha_grid(binding,opaque,factor,native_alpha,limits);
     for(const auto role:{MToonSlot::Base,MToonSlot::Shade,MToonSlot::Emission}){
      if(role==MToonSlot::Shade&&!shared_mtoon_shade(binding))continue;
-     const auto grid=independent_mtoon_dimensions(binding,role,resolution,role==MToonSlot::Base&&!opaque);
+     const auto alpha=role==MToonSlot::Base?base_alpha:MToonAlphaGrid::None;
+     const auto grid=independent_mtoon_dimensions(binding,role,resolution,alpha);
      if(!grid)continue;
      const auto &source=*binding.roles[size_t(role)].image;
      const auto [w,h]=*grid;
@@ -1246,7 +1325,7 @@ ExportBound export_bound(const ObjectSurface&input,const TextureSetLimits&limits
      charge(independent_bytes,size_t(w)*h,4,SIZE_MAX);
      charge(independent_bytes,columns,2*sizeof(MToonIndependentTap)+sizeof(double),SIZE_MAX);
      charge(independent_bytes,rows,sizeof(double),SIZE_MAX);
-     charge(independent_work,columns*rows,18,SIZE_MAX);
+     charge(independent_work,columns*rows,alpha==MToonAlphaGrid::Source?26:18,SIZE_MAX);
      charge(independent_work,size_t(w)*h,12,SIZE_MAX);
     }
    }
@@ -1362,13 +1441,13 @@ std::optional<PortableMToonSetPaint> compile_mtoon_set_paint(
 
  PortableMToonSetPaint out;
  const auto independent=[&](MToonSlot role,const Image &resolved,const Image &coverage,
-     const std::array<float,4> &factor,const std::array<float,4> &native)->std::shared_ptr<const Image>{
+     const std::array<float,4> &factor,const std::array<float,4> &native,
+     MToonAlphaGrid alpha=MToonAlphaGrid::None)->std::shared_ptr<const Image>{
   if(!compiled.independent_mtoon_paint)return {};
-  const auto dimensions=independent_mtoon_dimensions(binding,role,field.painted->resolution(),
-      role==MToonSlot::Base&&params.alpha!=MToonAlpha::Opaque);
+  const auto dimensions=independent_mtoon_dimensions(binding,role,field.painted->resolution(),alpha);
   if(!dimensions)return {};
   return compose_independent_mtoon(role,*binding.roles[size_t(role)].image,resolved,coverage,
-                                    *dimensions,factor,native,params,out,limits);
+                                    *dimensions,factor,native,params,alpha,out,limits);
  };
  const auto compose=[&](const Image &resolved,const Image &coverage,
      const MToonPaintSource &source,const std::array<float,4> &factor,const std::array<float,4> &native,
@@ -1430,9 +1509,11 @@ std::optional<PortableMToonSetPaint> compile_mtoon_set_paint(
  };
  if(color){
   const auto original=mtoon_paint_source(binding,effective,MToonSlot::Base,field.painted->resolution(),limits);
-  out.color=original?
+  const auto alpha=mtoon_base_alpha_grid(binding,params.alpha==MToonAlpha::Opaque,params.base_color[3],
+                                      field.material.color[3],limits);
+  out.color=original&&alpha!=MToonAlphaGrid::Source?
       compose(maps->color,maps->color_coverage,*original,params.base_color,field.material.color,true,out.color_error):
-      independent(MToonSlot::Base,maps->color,maps->color_coverage,params.base_color,field.material.color);
+      independent(MToonSlot::Base,maps->color,maps->color_coverage,params.base_color,field.material.color,alpha);
   if(!out.color)return {};
   if(shared_mtoon_shade(binding)){
    const auto &factor=params.shade_color;
