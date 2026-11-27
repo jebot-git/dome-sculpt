@@ -27,10 +27,12 @@ struct TextureSetExportField {
   bool portable_mtoon_bake_frame=false, portable_mtoon_derivative_frame=false;
   bool portable_mtoon_normal_coordinates=false;
   bool independent_mtoon_paint=false;
+  bool scaled_mtoon_alpha=false;
   std::optional<TextureSetExportEmission> emission;
 };
 struct PortableMToonSetPaint {
   std::shared_ptr<const Image> color, shade, emission, normal;
+  float alpha_factor=1;
   // Max component errors for clamp-to-edge bilinear reads in linear units.
   double color_error=0, shade_error=0, shade_interpolation_error=0,
       alpha_error=0, emission_error=0, source_filter_error=0;

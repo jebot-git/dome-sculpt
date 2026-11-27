@@ -591,7 +591,7 @@ bool certify_mtoon_alpha_cell(const std::array<const MToonIndependentTap*,4> &co
  const bool unpainted=std::ranges::all_of(corners,[](const auto *tap){return tap->uncovered==1;});
  // With identical filter taps, a cutout crossing is preserved at every
  // point in this rectangle, including points exactly on the threshold.
- if(unpainted&&factor==1&&identical_mtoon_alpha_taps(source,output,u,v))return true;
+ if(unpainted&&factor==proof.alpha_factor&&identical_mtoon_alpha_taps(source,output,u,v))return true;
  double bg_min=1,bg_max=0,u_min=1,u_max=0;
  double wanted_min=1,wanted_max=0,emitted_min=1,emitted_max=0,error=0;
  for(const auto *tap:corners){
@@ -680,7 +680,7 @@ std::shared_ptr<const Image> compose_independent_mtoon(MToonSlot role,const Imag
    if(alpha==MToonAlphaGrid::Paint)image->rgba[at+3]=resolved.rgba[at+3];
    if(alpha==MToonAlphaGrid::Source){
     const auto sampled=tap.uncovered==1?tap.background[3]:value(tap,3);
-    image->rgba[at+3]=uint8_t(std::lround(255*std::clamp(sampled,0.,1.)));
+    image->rgba[at+3]=uint8_t(std::lround(255*std::clamp(sampled/proof.alpha_factor,0.,1.)));
    }
   }
  }
@@ -698,6 +698,7 @@ std::shared_ptr<const Image> compose_independent_mtoon(MToonSlot role,const Imag
    tap=sample(xs[x],ys[y]);
    tap.output=mtoon_filter(*image,mtoon_filter_axis(xs[x],width),
                            mtoon_filter_axis(ys[y],height),channels,true);
+   if(alpha==MToonAlphaGrid::Source)tap.output[3]*=proof.alpha_factor;
    if(!x||!y)continue;
    const std::array<const MToonIndependentTap*,4> corners{&previous[x-1],&previous[x],&row[x-1],&tap};
    if(alpha==MToonAlphaGrid::Source&&
@@ -1268,7 +1269,7 @@ void charge_mtoon_paint(const TextureSetView &field,size_t &bytes,size_t &work,
   }
 }
 
-struct ExportBound { size_t bytes, work; bool independent_mtoon; };
+struct ExportBound { size_t bytes, work; bool independent_mtoon, scaled_mtoon_alpha; };
 ExportBound export_bound(const ObjectSurface&input,const TextureSetLimits&limits,bool measured_physical,bool editable_materials){
  limits.validate();stop(limits);const auto&plan=input.texture_set_surface;
  if(!plan)throw std::invalid_argument("Texture-set export requires its owning surface plan");plan->authenticate_owner(plan);
@@ -1285,7 +1286,7 @@ ExportBound export_bound(const ObjectSurface&input,const TextureSetLimits&limits
     }))
   charge(bytes,count,sizeof(std::array<float,2>),limits.maximum_bytes);
  charge(work,count,64,limits.maximum_work);size_t scratch=0;
- size_t independent_bytes=0,independent_work=0;
+ size_t independent_bytes=0,independent_work=0,scaled_alpha_work=0;
  for(size_t f=0;f<plan->fields().size();++f){
   stop(limits);const auto&field=plan->fields()[f];const auto&draw=plan->draws()[f];
   if(!draw.count)continue;
@@ -1327,6 +1328,11 @@ ExportBound export_bound(const ObjectSurface&input,const TextureSetLimits&limits
      charge(independent_bytes,rows,sizeof(double),SIZE_MAX);
      charge(independent_work,columns*rows,alpha==MToonAlphaGrid::Source?26:18,SIZE_MAX);
      charge(independent_work,size_t(w)*h,12,SIZE_MAX);
+     if(alpha==MToonAlphaGrid::Source&&factor>0&&factor<1){
+      // A failed unit-alpha candidate releases its image and scratch first.
+      charge(scaled_alpha_work,columns*rows,26,SIZE_MAX);
+      charge(scaled_alpha_work,size_t(w)*h,12,SIZE_MAX);
+     }
     }
    }
    if(field.painted->baked()&&!field.painted->baked()->maps.normal.rgba.empty())
@@ -1410,7 +1416,9 @@ ExportBound export_bound(const ObjectSurface&input,const TextureSetLimits&limits
  const bool allow_independent=independent_bytes&&independent_bytes<=limits.maximum_bytes-bytes&&
      independent_work<=limits.maximum_work-work;
  if(allow_independent){bytes+=independent_bytes;work+=independent_work;}
- stop(limits);return {bytes,work,allow_independent};
+ const bool allow_scaled=allow_independent&&scaled_alpha_work&&scaled_alpha_work<=limits.maximum_work-work;
+ if(allow_scaled)work+=scaled_alpha_work;
+ stop(limits);return {bytes,work,allow_independent,allow_scaled};
 }
 } // namespace
 
@@ -1514,6 +1522,14 @@ std::optional<PortableMToonSetPaint> compile_mtoon_set_paint(
   out.color=original&&alpha!=MToonAlphaGrid::Source?
       compose(maps->color,maps->color_coverage,*original,params.base_color,field.material.color,true,out.color_error):
       independent(MToonSlot::Base,maps->color,maps->color_coverage,params.base_color,field.material.color,alpha);
+  if(!out.color&&alpha==MToonAlphaGrid::Source&&compiled.scaled_mtoon_alpha&&
+     params.base_color[3]>0&&params.base_color[3]<1){
+   // Keep the authored multiplier when quantizing it into the PNG would
+   // shift a visibility edge. The scaled result gets its own full proof.
+   out={};
+   out.alpha_factor=params.base_color[3];
+   out.color=independent(MToonSlot::Base,maps->color,maps->color_coverage,params.base_color,field.material.color,alpha);
+  }
   if(!out.color)return {};
   if(shared_mtoon_shade(binding)){
    const auto &factor=params.shade_color;
@@ -1611,7 +1627,7 @@ size_t texture_set_export_working_bound(const ObjectSurface&input,const TextureS
  return export_bound(input,limits,measured_physical,editable_materials).bytes;
 }
 TextureSetExport compile_texture_set_export(const ObjectSurface&input,const TextureSetLimits&limits,bool measured_physical,bool editable_materials){
- auto [bytes,work,independent_mtoon]=export_bound(input,limits,measured_physical,editable_materials);
+ auto [bytes,work,independent_mtoon,scaled_mtoon_alpha]=export_bound(input,limits,measured_physical,editable_materials);
  TextureSetExport out;out.working_bound=bytes;
  const auto&plan=input.texture_set_surface;const auto&rest=*plan->geometry();const auto count=plan->indices().size();
  const bool source=std::any_of(plan->fields().begin(),plan->fields().end(),[](const auto&f){return bool(f.source);});
@@ -1660,6 +1676,7 @@ TextureSetExport compile_texture_set_export(const ObjectSurface&input,const Text
   }
   const bool physical=texture_set_physical_emission(field);
   output.independent_mtoon_paint=independent_mtoon&&!physical;
+  output.scaled_mtoon_alpha=scaled_mtoon_alpha&&!physical;
   const bool typed_hdr=physical&&!editable_materials&&native_mtoon_float_bake(field);
   if(canonical&&!input.deformation&&field.material_bindings&&field.material_bindings->has_mtoon&&
      (!physical||typed_hdr||(editable_materials&&native_mtoon_float_bake(field))))

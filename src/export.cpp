@@ -845,7 +845,7 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
       };
       if(paint->color){
         replace_role(MToonSlot::Base,paint->color);
-        params.base_color={1,1,1,1};
+        params.base_color={1,1,1,paint->alpha_factor};
       }
       if(paint->shade){
         replace_role(MToonSlot::Shade,paint->shade);

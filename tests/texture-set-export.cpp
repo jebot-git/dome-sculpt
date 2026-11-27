@@ -639,7 +639,7 @@ std::shared_ptr<const Image> mtoon_independent_image(uint32_t width,uint32_t hei
 }
 
 void verify_independent_mtoon_paint(const Scene &scene,const std::filesystem::path &path,
-                                   bool large,bool source_alpha=false) {
+                                   bool large,bool source_alpha=false,float expected_alpha_factor=1) {
  const auto payload=bytes(path);
  const auto length=uint32_t(payload.at(12))|(uint32_t(payload.at(13))<<8)|
      (uint32_t(payload.at(14))<<16)|(uint32_t(payload.at(15))<<24);
@@ -649,7 +649,10 @@ void verify_independent_mtoon_paint(const Scene &scene,const std::filesystem::pa
  const auto &material=json.at("materials").at(primitive.at("material").get<size_t>());
  const auto &proof=material.at("extras").at("domeSculptMToonPaint");
  const auto &shade=material.at("extensions").at("VRMC_materials_mtoon").at("shadeMultiplyTexture");
- const auto base_output=glb_texture_view(json,bin,material.at("pbrMetallicRoughness").at("baseColorTexture"));
+ const auto &pbr=material.at("pbrMetallicRoughness");
+ const auto base_output=glb_texture_view(json,bin,pbr.at("baseColorTexture"));
+ const auto export_factor=pbr.value("baseColorFactor",std::array<float,4>{1,1,1,1})[3];
+ check(export_factor==expected_alpha_factor,"The GLB carries the certified alpha multiplier");
  const auto shade_output=glb_texture_view(json,bin,shade);
  const auto emission_output=glb_texture_view(json,bin,material.at("emissiveTexture"));
  const auto field=texture_set_view(scene.active(),1);
@@ -714,9 +717,10 @@ void verify_independent_mtoon_paint(const Scene &scene,const std::filesystem::pa
    const auto accepts=[&](float value){return masked?value>=p.alpha_cutoff:value>0;};
    const bool accept=accepts(alpha);
    masks_pass+=accept;masks_fail+=!accept;
-   if(accept!=accepts(read[3]))
+   const auto emitted=read[3]*export_factor;
+   if(accept!=accepts(emitted))
     throw std::runtime_error("The independent material output changed an actual alpha decision");
-   maximum[3]=std::max(maximum[3],double(std::abs(read[3]-alpha)));
+   maximum[3]=std::max(maximum[3],double(std::abs(emitted-alpha)));
   }
  }
  for(size_t k=0;k<4;++k){
@@ -731,7 +735,7 @@ void verify_independent_mtoon_paint(const Scene &scene,const std::filesystem::pa
 }
 
 void prepare_independent_paint_reimport(const Scene &scene,const std::filesystem::path &standard,
-                                       const std::string &name="masked",uint32_t width=64) {
+                                       const std::string &name="masked",uint32_t width=64,float alpha_factor=1) {
  Document doc;
  ImportSettings settings;
  settings.paint_resolution=64;
@@ -745,10 +749,11 @@ void prepare_independent_paint_reimport(const Scene &scene,const std::filesystem
  const auto alpha=texture_set_view(scene.active(),1).material_bindings->material.parameters.alpha;
  const auto slot=[&](MToonSlot role){return authored->material_bindings->roles[size_t(role)].image;};
  check(authored!=loaded.objects().end()&&authored->material_bindings->material.parameters.alpha==alpha&&
+       authored->material_bindings->material.parameters.base_color[3]==alpha_factor&&
        slot(MToonSlot::Base)&&slot(MToonSlot::Base)->width==width&&
        slot(MToonSlot::Shade)&&slot(MToonSlot::Shade)->width==192&&
        slot(MToonSlot::Emission)&&slot(MToonSlot::Emission)->width==192,
-       "Native re-import uses the actual mask and all three independently generated images");
+       "Native re-import uses the exported alpha settings and all three independently generated images");
  doc.save_async(name+"-imported.dsculpt").get();
  scene.save(name+"-native.dsculpt");
 }
@@ -823,7 +828,7 @@ void independent_mtoon_paint_authoring(){
 
 void varying_mtoon_alpha_authoring(){
  constexpr auto base=size_t(MToonSlot::Base),shade=size_t(MToonSlot::Shade),emission=size_t(MToonSlot::Emission);
- for(const std::string mode:{"cutout","aligned-cutout","blend"}){
+ for(const std::string mode:{"cutout","aligned-cutout","blend","scaled-cutout","scaled-blend"}){
   auto scene=fixture(false,64,64);
   const auto id=scene.active().id;
   mtoon_paint_fixture::author(scene,1,{.18f,-.08f,.5f},false,mtoon_paint_fixture::Background::Varying);
@@ -842,9 +847,11 @@ void varying_mtoon_alpha_authoring(){
   binding.roles[base].image=binding.roles[shade].image=source;
   binding.roles[emission].image=mtoon_independent_image(91,47,true);
   auto &params=binding.material.parameters;
-  params.base_color[3]=binding.native_reference.color[3]=1;
-  params.alpha_cutoff=13.f/255.f;
-  if(mode=="blend"){
+  const float alpha_factor=mode.starts_with("scaled-")?.8f:1;
+  binding.native_reference.color[3]=1;
+  params.base_color[3]=alpha_factor;
+  params.alpha_cutoff=(13.f/255.f)*alpha_factor;
+  if(mode.ends_with("blend")){
    params.alpha=MToonAlpha::Blend;
    params.depth_write=false;
    params.source_blend=5;
@@ -861,13 +868,13 @@ void varying_mtoon_alpha_authoring(){
   doc.export_asset(standard,AssetExportFormat::Glb).get();
   doc.export_asset(editable,AssetExportFormat::EditableGlb256).get();
   consumer(standard,2);consumer(editable,2);
-  verify_independent_mtoon_paint(scene,standard,false,true);
-  verify_independent_mtoon_paint(scene,editable,false,true);
+  verify_independent_mtoon_paint(scene,standard,false,true,alpha_factor);
+  verify_independent_mtoon_paint(scene,editable,false,true,alpha_factor);
   const auto restored=extract_native_authoring(bytes(editable));
   check(restored&&restored->encode()==exact&&doc.copy_scene().encode()==exact,
         "Editable GLB retains the varying source alpha and native paint byte for byte");
   if(mode=="aligned-cutout")continue;
-  prepare_independent_paint_reimport(scene,standard,mode,width);
+  prepare_independent_paint_reimport(scene,standard,mode,width,alpha_factor);
   auto control=scene.snapshot();
   auto filled=std::make_shared<Image>(*source);
   for(size_t at=3;at<filled->rgba.size();at+=4)filled->rgba[at]=255;
@@ -876,13 +883,16 @@ void varying_mtoon_alpha_authoring(){
   check(bind_texture_set_mtoon(control,id,1,solid),"The optical control replaces only source alpha");
   control.save(mode+"-solid-control.dsculpt");
 
-  if(mode!="cutout")continue;
+  if(mode!="scaled-cutout")continue;
   const auto unchanged=bytes(standard);
-  params.base_color[3]=.8f;
-  check(bind_texture_set_mtoon(scene,id,1,binding),"The source cutout can be rescaled independently of paint");
+  auto crossing=std::make_shared<Image>(*source);
+  for(uint32_t y=0;y<crossing->height;++y)for(uint32_t x=width/2;x<width*3/5;++x)
+   crossing->rgba[(size_t(y)*width+x)*4+3]=0;
+  binding.roles[base].image=binding.roles[shade].image=crossing;
+  check(bind_texture_set_mtoon(scene,id,1,binding),"A second cutout edge crosses the actual brush footprint");
   doc.replace(scene);
   refuses([&]{doc.export_asset(standard,AssetExportFormat::Glb).get();},
-          "A displaced fractional cutoff crossing cannot be certified on byte alpha");
+          "The crossing through mixed paint and source alpha refuses both quantizations");
   check(bytes(standard)==unchanged,"A failed cutoff proof preserves the existing export");
   doc.export_asset("uncertified-alpha-editable.glb",AssetExportFormat::EditableGlb256).get();
   const auto cold=extract_native_authoring(bytes("uncertified-alpha-editable.glb"));
