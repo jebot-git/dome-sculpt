@@ -4,6 +4,7 @@
 
 namespace dome::detail {
 class CanonicalNormalUv;
+struct NormalBakeBasis;
 struct BakedNormalFieldOptions {
   size_t max_working_bytes=256*1024*1024;
   size_t max_retained_bytes=128*1024*1024;
@@ -24,6 +25,10 @@ public:
       std::shared_ptr<const CanonicalNormalConversion>,const BakedNormalFieldOptions & = {});
   std::shared_ptr<const BakedNormalField> replace(
       const BakedTextures &,const BakedNormalFieldOptions & = {}) const;
+  // Independent normal write. Its mask is unrelated to material coverage.
+  std::shared_ptr<const BakedNormalField> replace_planes(const Image &,const Image &,
+      std::span<const uint8_t>,const BakedNormalFieldOptions & = {}) const;
+  std::array<Vec3,2> sample(const NormalBakeBasis &, std::array<float,2> uv) const;
   const auto &origin() const noexcept {return origin_;}
   const auto &prior() const noexcept {return prior_;}
   const auto &pbr() const noexcept {return pbr_;}
@@ -40,8 +45,6 @@ public:
 private:
   friend struct native_weight_retention_impl::Counter;
   friend class BakedNormalArchive;
-  std::shared_ptr<const BakedNormalField> replace_planes(const Image &,const Image &,
-      std::span<const uint8_t>,const BakedNormalFieldOptions &) const;
   void account_retained_storage();
   BakedNormalField()=default;
   BakedNormalField(const BakedNormalField&)=delete;

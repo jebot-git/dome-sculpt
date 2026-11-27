@@ -11,6 +11,9 @@
 #include "native-surface-heat.hpp"
 #include "texture-set-paint-access.hpp"
 #include "texture-set-resample.hpp"
+#include "affine-interaction.hpp"
+#include "baked-normal-field.hpp"
+#include "source-bake-normal.hpp"
 #include <algorithm>
 #include <fstream>
 #include <iostream>
@@ -548,6 +551,147 @@ void affine_wire_edit(const std::filesystem::path &out) {
         "Ordered Save, cold Open and Undo/Redo preserve the prepared affine wire edit");
 }
 
+void prepared_geometry_edit(bool affine,const std::filesystem::path &out) {
+  auto source = author_patch(affine,out);
+  const auto previous = source.active().id;
+  const auto guide = source.active().retopology->source;
+  Document document;
+  document.replace(source);
+  settled(document);
+  document.convert_baked_normals();
+  settled(document);
+  document.edit_scene("Add independent normal detail",[=](Scene &scene,const auto &) {
+    auto &object=scene.object(previous);
+    auto paint=object.painted->snapshot();
+    auto bake=*paint->baked();
+    const auto field=bake.normal_field;
+    auto pbr=*field->pbr(), toon=*field->mtoon();
+    const std::vector<uint8_t> normal_coverage(bake.coverage.size(),255);
+    for (size_t i=0;i<bake.coverage.size();++i) {
+      const size_t x=i%paint->resolution();
+      const auto tilt=uint8_t(170+x*16/paint->resolution());
+      const std::array<uint8_t,4> a{tilt,138,245,255};
+      const std::array<uint8_t,4> b{113,tilt,245,255};
+      std::copy(a.begin(),a.end(),pbr.rgba.begin()+i*4);
+      std::copy(b.begin(),b.end(),toon.rgba.begin()+i*4);
+      if (x>=paint->resolution()/2) bake.coverage[i]=0;
+    }
+    bake.normal_field=field->replace_planes(pbr,toon,normal_coverage);
+    paint->clear_bake();
+    paint->install_bake(std::move(bake));
+    PaintSettings ink;
+    ink.color={.8f,.12f,.3f,1};
+    ink.front_only=false;
+    Brush brush;
+    brush.from=brush.to={0,0,0};
+    brush.radius=.24f;
+    brush.normal={0,0,1};
+    brush.strength=1;
+    paint->add_layer("Independent detail");
+    paint->begin_stroke();
+    paint->stamp(brush,ink);
+    if (!paint->end_stroke()) throw std::runtime_error("Prepared fixture needs actual editable paint");
+    object.painted=std::move(paint);
+  });
+  settled(document);
+  if (affine) {
+    document.begin_uv();
+    check(document.wait_uv() && document.frame().state->uv->normal_sampling_required,
+          "The prepared case opens the native UV editor with required source normal sampling");
+    document.edit_uv(UvAction::Scale,.82f);
+    document.end_uv(true);
+    settled(document);
+    auto retained=document.copy_scene();
+    check(retained.active().painted->paint_sampling_domain() &&
+          retained.active().material_bindings->canonical_uv,
+          "The edited atlas keeps independent original writable and normal sampling domains");
+    document.edit_scene("Place retained patch with reflection and shear",[=](Scene &scene,const auto &) {
+      scene.object(previous).affine_edit=std::make_shared<const NativeAffineEdit>(AffineTransform(
+          std::array<double,16>{-.97,.08,0,0,.13,.96,0,0,0,0,1.02,0,.035,-.015,.004,1}));
+    });
+    settled(document);
+  }
+  const auto before=document.copy_scene();
+  const auto &old=before.active();
+  const auto original=old.painted->baked()->normal_field;
+  check(original->pbr()!=original->mtoon() && original->replacements()==1,
+        "Original patch has two distinct prepared normal roles above an independent material coverage field");
+  document.save_async(out/"prepared-before.dsculpt").get();
+  const auto draft=move_patch(document,affine);
+  document.end_retopology(true);
+  const auto file=out/"prepared-reapplied.dsculpt";
+  document.save_async(file).get();
+  settled(document);
+  const auto after=document.copy_scene();
+  const auto &patch=after.active();
+  const auto &paint=*patch.painted;
+  const auto field=paint.baked()->normal_field;
+  check(patch.retopology->topology.encode()!=old.retopology->topology.encode() &&
+        field->origin()==patch.material_bindings->canonical_attributes && field->origin()!=original->origin() &&
+        field->pbr()!=field->mtoon() && after.object(previous).painted->baked()->normal_field==original,
+        "Geometry Apply publishes a fresh prepared atlas, with both source roles and the old immutable authoring object");
+  check(paint.layers().back().name=="Independent detail" && paint.has_paint_data() &&
+        patch.bake_recipe==old.bake_recipe && Scene::load(file).encode()==after.encode(),
+        "Editable paint, the Bake recipe and both normal fields survive ordered Save and cold Open");
+
+  const auto old_world=before.world_matrix(previous), new_world=after.world_matrix(patch.id);
+  const detail::AffineInteractionFrame old_frame(old_world), new_frame(new_world);
+  const auto old_sample=detail::source_bake_normals(old,{}, {256*1024*1024,{},&old_frame});
+  const auto new_sample=detail::source_bake_normals(patch,{}, {256*1024*1024,{},&new_frame});
+  const auto &mesh=paint.mesh();
+  const SurfaceQuery query(old.painted->mesh());
+  SurfaceQueryOptions nearest;
+  nearest.closest_maximum=.2f;
+  size_t samples=0, normal_only=0;
+  float error=0;
+  const auto r=paint.resolution();
+  for (uint32_t tri=0;tri<mesh.indices.size()/3;++tri) {
+    const auto a=mesh.indices[3*tri], b=mesh.indices[3*tri+1], c=mesh.indices[3*tri+2];
+    const auto uv=mesh.uv[a];
+    auto uv_delta=[&](uint32_t vertex) {
+      return std::array{mesh.uv[vertex][0]-uv[0],mesh.uv[vertex][1]-uv[1]};
+    };
+    const auto u=uv_delta(b),v=uv_delta(c);
+    const auto det=u[0]*v[1]-v[0]*u[1];
+    for (uint32_t y=1;y<r;y+=7) for (uint32_t x=1;x<r;x+=7) {
+      const auto sx=(x+.5f)/r-uv[0],sy=(y+.5f)/r-uv[1];
+      const auto b1=(sx*v[1]-sy*v[0])/det,b2=(u[0]*sy-u[1]*sx)/det;
+      const std::array w{1.f-b1-b2,b1,b2};
+      if (std::ranges::min(w)<.08f) continue;
+      const auto location=point(new_world,mesh.positions[a]*w[0]+mesh.positions[b]*w[1]+mesh.positions[c]*w[2]);
+      const auto expected=query.nearest_result(location,old_world,nearest);
+      if (!expected) continue;
+      const auto old_normal=old_sample(expected->surface.triangle,expected->surface.barycentric);
+      const auto new_normal=new_sample(tri,w);
+      for (size_t role=0;role<old_normal.size();++role)
+        error=std::max(error,length(old_normal[role]-new_normal[role]));
+      ++samples;
+      normal_only+=paint.baked()->coverage[size_t(y)*r+x]==0 &&
+                   length(new_normal[0]-new_normal[1])>.15f;
+    }
+  }
+  std::cout<<"PREPARED_TRANSFER samples="<<samples<<" normal_only="<<normal_only<<" error="<<error<<'\n';
+  check(samples>64 && normal_only>16 && error<.025f,
+        "Independent placed sampling verifies both normal maps at texel centres, including zero material coverage");
+  check(document.undo() && document.copy_scene().encode()==before.encode() &&
+        document.redo() && document.copy_scene().encode()==after.encode(),
+        "Undo and Redo retain both complete prepared authoring generations");
+  settled(document);
+  document.export_asset(out/"prepared-editable.glb",AssetExportFormat::EditableGlb256).get();
+  std::ifstream portable(out/"prepared-editable.glb",std::ios::binary);
+  const std::vector<uint8_t> payload{std::istreambuf_iterator<char>(portable),{}};
+  const auto reopened=extract_native_authoring(payload);
+  check(reopened&&reopened->encode()==after.encode(),
+        "Editable GLB retains both prepared normal roles and their complete native editing history");
+
+  auto cleared=before.snapshot();
+  cleared.active().painted->clear_bake();
+  publish_retopology(cleared,*draft->topology,guide,draft->transform);
+  check(!cleared.active().painted->baked() && cleared.active().material_bindings->canonical_attributes &&
+        cleared.active().painted->layers().back().name=="Independent detail",
+        "A changed patch whose Bake was cleared retains its new prepared frame and stays unbaked");
+}
+
 void mixed_material_quad(const std::filesystem::path &out) {
   auto scene = reference(false);
   const auto donor = scene.active().id;
@@ -762,7 +906,7 @@ int main(int argc,char **argv) try {
   if (argc!=3) return 2;
   const std::string_view mode = argv[2];
   if (mode!="plain" && mode!="affine" && mode!="affine-wire" && mode!="mixed-material" &&
-      mode!="reapply-plain" && mode!="reapply-affine" &&
+      mode!="reapply-plain" && mode!="reapply-affine" && mode!="prepared-plain" && mode!="prepared-affine" &&
       mode!="restore-plain" && mode!="restore-affine") return 2;
   const std::filesystem::path out = argv[1];
   std::filesystem::create_directories(out);
@@ -771,6 +915,7 @@ int main(int argc,char **argv) try {
   if (mode.starts_with("restore-")) restore_patch_history(mode.ends_with("affine"),out);
   else if (mode=="affine-wire") affine_wire_edit(out);
   else if (mode=="mixed-material") mixed_material_quad(out);
+  else if (mode.starts_with("prepared-")) prepared_geometry_edit(mode.ends_with("affine"),out);
   else if (mode.starts_with("reapply-")) reapply_patch(mode.ends_with("affine"),out);
   else bind_patch(mode=="affine",out);
   std::cout << "PASS " << checks << " retopology Surface Heat controls\n";

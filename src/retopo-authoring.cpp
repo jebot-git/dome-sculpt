@@ -2,12 +2,17 @@
 #include "dome/retopo-authoring.hpp"
 #include "dome/affine.hpp"
 #include "dome/bake-recipe.hpp"
+#include "dome/normal-preparation.hpp"
 #include "dome/polygon-scene.hpp"
 #include "dome/source-placement.hpp"
 #include "dome/tangents.hpp"
 #include "normal-bake-frames.hpp"
+#include "normal-frame-runtime.hpp"
+#include "baked-normal-field.hpp"
+#include "paint-normal-access.hpp"
 #include "retopo-transfer.hpp"
 #include "skin-affine.hpp"
+#include "source-paint-pairing.hpp"
 #include "source-skin-link.hpp"
 #include "text-utf8.hpp"
 #include "texture-set-paint-access.hpp"
@@ -570,15 +575,12 @@ public:
     grids_.emplace(resolution, first_grid_);
   }
 
-  State project(const PaintedMesh &old_paint, const std::shared_ptr<const DeformationState> &old_deformation,
+  State project(const PaintedMesh &old_paint, const Material &material,
+                const std::shared_ptr<const DeformationState> &old_deformation,
                 const std::shared_ptr<const SourceMaterialBindings> &old_material,
                 const std::shared_ptr<const TextureSetCollection> &old_sets) {
     stop(budget_.cancelled());
     auto &projection = query(old_paint);
-    // Every field of a texture set shares the replacement REST geometry. Its
-    // own raster bounds and same-slot source filter preserve material seams.
-    auto fields = old_sets ? reproject_sets(old_paint, *old_sets, projection) : detail::RetopoTextureSets{};
-    std::shared_ptr<const PaintedMesh> paint = fields.primary ? std::move(fields.primary) : reproject(old_paint, projection);
     std::shared_ptr<const DeformationState> deformation;
     if (old_deformation) {
       const auto match = [&](const Deformation &entry) {
@@ -587,10 +589,16 @@ public:
       const auto found = std::ranges::find_if(deformations_, match);
       if (found != deformations_.end()) deformation = found->projected;
       else {
-        deformation = transfer_patch_deformation(*old_deformation, old_paint.mesh(), paint->mesh(), projection);
+        deformation = transfer_patch_deformation(*old_deformation, old_paint.mesh(), first_grid_->mesh(), projection);
         deformations_.push_back({old_paint.mesh_owner().get(), old_deformation.get(), deformation});
       }
     }
+    if (old_material && old_material->canonical_attributes && !old_sets)
+      return reproject_canonical(old_paint,material,old_deformation,*old_material,deformation,projection);
+    // Every field of a texture set shares the replacement REST geometry. Its
+    // own raster bounds and same-slot source filter preserve material seams.
+    auto fields = old_sets ? reproject_sets(old_paint, *old_sets, projection) : detail::RetopoTextureSets{};
+    std::shared_ptr<const PaintedMesh> paint = fields.primary ? std::move(fields.primary) : reproject(old_paint, projection);
     return {paint, deformation, transfer_patch_material(old_paint, old_material, *paint, deformation, projection),
             std::move(fields.membership)};
   }
@@ -617,6 +625,44 @@ private:
     detail::RetopoTextureSets projected;
   };
   std::vector<ProjectedSets> projected_sets_;
+
+  State reproject_canonical(const PaintedMesh &before,const Material &material,
+      const std::shared_ptr<const DeformationState> &old_deformation,const SourceMaterialBindings &binding,
+      const std::shared_ptr<const DeformationState> &deformation,detail::RetopoTransfer &projection) {
+    if (binding.has_mtoon || binding.normal_preparation || binding.color_preparation ||
+        binding.polygon_surface_transfer || binding.native_paint_sampling || binding.native_paint_frames ||
+        !binding.normal_frames || !binding.normal_frames->pbr || binding.normal_frames->pbr->tangents.empty())
+      throw std::invalid_argument("Retopology needs the prepared native normal material and its actual tangent frame");
+    detail::source_paint_pairing(&before,&binding,nullptr,true);
+    detail::normal_frame_current_authority(binding,before.mesh(),old_deformation.get(),budget_.cancelled());
+    const auto bake=before.baked();
+    if (bake && (!bake->normal_field || bake->normal_field->origin()!=binding.canonical_attributes))
+      throw std::invalid_argument("The prepared Bake no longer owns its current normal field");
+    auto raw=reproject(before,projection,true);
+    // Clear Bake keeps an original conversion lease. Transport its actual
+    // previous raw input to establish the new frame while keeping the live
+    // replacement unbaked.
+    const auto &anchor=*binding.canonical_attributes->before_paint();
+    auto conversion_input=bake?raw:reproject(anchor,query(anchor));
+    NormalPreparationOptions options;
+    options.max_angular_error=binding.canonical_attributes->receipt().accepted_angular_error;
+    options.max_working_bytes=budget_.remaining_bytes();
+    options.cancelled=budget_.cancelled();
+    auto output=convert_canonical_normals({conversion_input,{},{},deformation,material,{}},options);
+    budget_.reserve(1,output.material_bindings->normal_frames->storage_bytes());
+    std::shared_ptr<const PaintedMesh> paint=raw;
+    if (bake) {
+      auto field=detail::TextureSetPaintAccess::reproject_retopology_normals(
+          before,binding,*output.paint,*output.material_bindings,projection);
+      paint=SourceNormalPreparationAccess::adopt_baked_field(*raw,std::move(field),budget_.cancelled());
+    } else {
+      const auto &origin=output.material_bindings->canonical_attributes;
+      budget_.reserve(size_t(origin->before_paint()->resolution())*origin->before_paint()->resolution(),4);
+    }
+    auto material_binding=std::make_shared<SourceMaterialBindings>(*output.material_bindings);
+    material_binding->physical_emission=binding.physical_emission;
+    return {std::move(paint),deformation,std::move(material_binding),{}};
+  }
 
   detail::RetopoTextureSets reproject_sets(const PaintedMesh &primary, const TextureSetCollection &sets,
                                            detail::RetopoTransfer &projection) {
@@ -687,7 +733,8 @@ private:
     return *surface;
   }
 
-  std::shared_ptr<const PaintedMesh> reproject(const PaintedMesh &source, detail::RetopoTransfer &projection) {
+  std::shared_ptr<const PaintedMesh> reproject(const PaintedMesh &source, detail::RetopoTransfer &projection,
+                                               bool prepared_normals=false) {
     const auto existing = std::ranges::find_if(paints_, [&](const Paint &entry) {
       return entry.source == &source || detail::TextureSetPaintAccess::same_current(*entry.source,source);
     });
@@ -703,7 +750,7 @@ private:
       charge_raster(*grid);
     }
     auto output = grid->snapshot();
-    detail::TextureSetPaintAccess::reproject_retopology(source, *output, projection);
+    detail::TextureSetPaintAccess::reproject_retopology(source, *output, projection,prepared_normals);
     paints_.push_back({&source, output});
     return output;
   }
@@ -735,7 +782,7 @@ public:
     if (replacement_) {
       // Restore uses the current object's placement. Its old checkpoints
       // belong to that same object-local space, even if the object was moved.
-      const auto state = replacement_->project(*original->paint, original->deformation, original->material_bindings,
+      const auto state = replacement_->project(*original->paint,original->material,original->deformation,original->material_bindings,
                                                original->texture_sets);
       mapped->paint = state.paint;
       mapped->deformation = state.deformation;
@@ -828,7 +875,7 @@ uint64_t publish_retopology(Scene &scene, const RetopoMesh &topology, uint64_t s
       auto grid = PaintedMesh::from_mesh(std::move(triangles.mesh), size, options);
       replacement = std::make_unique<RetopoReplacement>(std::move(grid), old_world, new_world,
           old_surface.source_faces, triangles.source_faces, std::move(source_triangles), cancelled);
-      auto current = replacement->project(*previous.painted, previous.deformation, previous.material_bindings,
+      auto current = replacement->project(*previous.painted,previous.material,previous.deformation,previous.material_bindings,
                                           previous.texture_sets);
       painted = current.paint->snapshot();
       deformation = std::move(current.deformation);

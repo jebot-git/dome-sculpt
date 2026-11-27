@@ -3,6 +3,9 @@
 #include "texture-set-native-grid.hpp"
 #include "texture-set-resample.hpp"
 #include "retopo-transfer.hpp"
+#include "affine-surface.hpp"
+#include "canonical-normal-uv.hpp"
+#include "normal-bake-encoding.hpp"
 #include "source-paint-parameters.hpp"
 #include "paint-overlay-packet.hpp"
 #include "baked-emission-access.hpp"
@@ -3062,7 +3065,7 @@ void PaintedMesh::install_bake(BakedTextures incoming) {
 }
 
 void detail::TextureSetPaintAccess::reproject_retopology(const PaintedMesh &from,
-    PaintedMesh &replacement, RetopoTransfer &transfer) {
+    PaintedMesh &replacement, RetopoTransfer &transfer,bool prepared_normals) {
   const auto &old_domain = from.texture_set_domain_;
   const auto &new_domain = replacement.texture_set_domain_;
   if (bool(old_domain) != bool(new_domain) || (old_domain && old_domain->set() != new_domain->set()))
@@ -3073,15 +3076,26 @@ void detail::TextureSetPaintAccess::reproject_retopology(const PaintedMesh &from
     if (!old_domain->matches(from.mesh_owner()) || !new_domain->matches(replacement.mesh_owner()))
       throw std::invalid_argument("Retopology paint lost its owning material geometry");
   }
-  if (from.in_stroke() || from.source_maps_ || from.sampling_attachment_ ||
+  if (from.in_stroke() || from.source_maps_ || (from.sampling_attachment_ && !prepared_normals) ||
       from.color_projection_ || from.normal_projection_ ||
       from.surface_->options.policy != PaintUvPolicy::Strict)
     throw std::invalid_argument("Retopology cannot reproject this retained material grid yet");
   const auto bake = from.baked_;
-  if (bake && (bake->normal_authority || bake->normal_field ||
-      bake->normal_interpretation != BakedNormalInterpretation::CanonicalMikk ||
+  if (bake && (bake->normal_authority || bool(bake->normal_field)!=prepared_normals ||
+      bake->normal_interpretation != (prepared_normals?BakedNormalInterpretation::PreparedAttributes:
+                                       BakedNormalInterpretation::CanonicalMikk) ||
       bake->color_interpretation != BakedColorInterpretation::VertexComponent))
     throw std::invalid_argument("Retopology cannot reproject this baked material interpretation yet");
+  std::vector<std::array<float,2>> writable_coordinates;
+  if (const auto domain=from.paint_sampling_domain()) {
+    if (!from.valid_paint_sampling_attachment())
+      throw std::invalid_argument("Retopology lost the authenticated writable paint grid");
+    transfer.reserve(from.mesh().indices.size(),sizeof(std::array<float,2>));
+    PaintSamplingLimits limits;
+    limits.max_working_bytes=transfer.remaining_bytes();
+    limits.cancelled=transfer.cancelled();
+    writable_coordinates=domain->corner_coordinates(from.mesh(),limits);
+  }
   // All writes target the detached new patch. Old layer IDs, active layer,
   // opacity, visibility and the monotonic allocation cursor stay meaningful.
   const auto &surface = *replacement.surface_;
@@ -3123,12 +3137,13 @@ void detail::TextureSetPaintAccess::reproject_retopology(const PaintedMesh &from
   constexpr size_t paint_limit = 128 * 1024 * 1024;
   if (bake) {
     const bool normals = !bake->maps.normal.rgba.empty();
-    transfer.reserve(texels, 13 + (normals ? 4 : 0));
+    transfer.reserve(texels, 13 + ((normals || prepared_normals) ? 4 : 0));
     baked.emplace();
     baked->coverage.resize(texels);
     baked->maps.color = blank_image(resolution);
     baked->maps.metal_rough = blank_image(resolution);
     baked->maps.emission = blank_image(resolution);
+    if (prepared_normals) baked->maps.normal = blank_image(resolution,true);
     if (normals) {
       transfer.reserve(from.mesh().indices.size() + replacement.mesh().indices.size(), 4 * sizeof(Tangent));
       baked->maps.normal = blank_image(resolution, true);
@@ -3160,9 +3175,11 @@ void detail::TextureSetPaintAccess::reproject_retopology(const PaintedMesh &from
     ++hits;
     std::array<float, 2> uv{};
     for (size_t corner = 0; corner < 3; ++corner) {
-      const auto vertex = from.mesh().indices[size_t(hit->triangle) * 3 + corner];
+      const auto index = size_t(hit->triangle) * 3 + corner;
+      const auto value = writable_coordinates.empty()?from.mesh().uv[from.mesh().indices[index]]:
+                                                      writable_coordinates[index];
       for (size_t axis = 0; axis < 2; ++axis)
-        uv[axis] += from.mesh().uv[vertex][axis] * hit->barycentric[corner];
+        uv[axis] += value[axis] * hit->barycentric[corner];
     }
     const auto taps = paint_bilinear_taps(from.resolution(), uv, from.surface_->padding);
     transfer.work(32 + 128 * writable.size());
@@ -3253,6 +3270,95 @@ void detail::TextureSetPaintAccess::reproject_retopology(const PaintedMesh &from
     SourcePaintAccess::merge_bake(replacement, std::move(*baked), BakedNormalWrite::Replace, transfer.cancelled());
   }
   paint_compute::checkpoint(transfer.cancelled());
+}
+std::shared_ptr<const detail::BakedNormalField> detail::TextureSetPaintAccess::reproject_retopology_normals(
+    const PaintedMesh &from,const SourceMaterialBindings &before,
+    const PaintedMesh &replacement,const SourceMaterialBindings &after,RetopoTransfer &transfer) {
+  const auto source=from.baked()?from.baked()->normal_field:nullptr;
+  const auto baseline=replacement.baked()?replacement.baked()->normal_field:nullptr;
+  if (!source || !baseline || source->origin()!=before.canonical_attributes ||
+      baseline->origin()!=after.canonical_attributes || !before.normal_frames || !before.normal_frames->pbr ||
+      !after.normal_frames || !after.normal_frames->pbr ||
+      before.normal_frames->pbr->normals.size()!=from.mesh().indices.size() ||
+      after.normal_frames->pbr->normals.size()!=replacement.mesh().indices.size())
+    throw std::invalid_argument("Retopology lost its original or replacement prepared normal basis");
+  // Reconstruct the actual placed columns used by the renderer on both
+  // atlases. Transforming the final sampled vector cannot account for shear
+  // or the discrete tangent sign of reflected source triangles.
+  const auto columns=[&](const NormalFrames &frames,const AffineTransform &matrix) {
+    transfer.reserve(frames.normals.size(),sizeof(NormalBakeVertex));
+    const AffineInteractionFrame placement(matrix);
+    std::vector<NormalBakeVertex> result;
+    result.reserve(frames.normals.size());
+    for (size_t corner=0;corner<frames.normals.size();++corner) {
+      if ((corner&1023)==0) paint_compute::checkpoint(transfer.cancelled());
+      transfer.work();
+      const auto t=placed_tangent(placement,frames.tangents.at(corner));
+      result.push_back(normal_bake_vertex(placed_normal(placement,frames.normals[corner]),
+                                         {t[0],t[1],t[2]},t[3],NormalVertexBitangent::UnitCross));
+    }
+    return result;
+  };
+  const auto source_columns=columns(*before.normal_frames->pbr,transfer.previous_metric());
+  const auto target_columns=columns(*after.normal_frames->pbr,transfer.replacement_metric());
+  const auto basis=[](const std::vector<NormalBakeVertex> &values,uint32_t face,std::array<double,3> bary) {
+    std::array<NormalBakeVertex,3> v;
+    std::copy_n(values.begin()+size_t(face)*3,3,v.begin());
+    return normal_bake_basis(v,bary,NormalFragmentBasis::UnitColumns);
+  };
+  const auto &surface=*replacement.surface_;
+  const auto count=surface.texels.size();
+  transfer.reserve(count,9);
+  std::array<Image,2> planes{blank_image(surface.resolution,true),blank_image(surface.resolution,true)};
+  std::vector<uint8_t> coverage(count);
+  const auto &old_mesh=from.mesh();
+  const auto &normal_uv=before.canonical_uv;
+  const auto bound=before.canonical_attributes->receipt().accepted_angular_error;
+  size_t hits=0;
+  for (size_t index=0;index<count;++index) {
+    if ((index&1023)==0) paint_compute::checkpoint(transfer.cancelled());
+    const auto &texel=surface.texels[index];
+    if (!texel.covered) continue;
+    const auto hit=transfer.match(texel.position,texel.normal);
+    if (!hit) continue;
+    transfer.work(64);
+    ++hits;
+    std::array<float,2> uv{};
+    for (size_t corner=0;corner<3;++corner) {
+      const auto i=size_t(hit->triangle)*3+corner;
+      const auto source_uv=normal_uv?normal_uv->coordinates().at(normal_uv->mesh()->indices.at(i)):
+                                     old_mesh.uv.at(old_mesh.indices.at(i));
+      for (size_t axis=0;axis<uv.size();++axis) uv[axis]+=source_uv[axis]*hit->barycentric[corner];
+    }
+    const auto &b=hit->barycentric;
+    const auto sampled=source->sample(basis(source_columns,hit->triangle,{b[0],b[1],b[2]}),uv);
+    const auto &w=texel.bary;
+    const auto target=basis(target_columns,texel.face,{w[0],w[1],1.-w[0]-w[1]});
+    for (size_t role=0;role<sampled.size();++role) {
+      const auto value=encode_normal_bake(target,sampled[role]);
+      if (!value || value->quantized_angle_radians>bound)
+        throw std::invalid_argument("Retopology exceeds the prepared normal encoding bound");
+      std::copy(value->rgba.begin(),value->rgba.end(),planes[role].rgba.begin()+index*4);
+    }
+    coverage[index]=255;
+  }
+  if (!hits) throw std::invalid_argument("No matching old surface for the prepared retopology normals");
+  // Preserve the chart's filtering footprint independently of material
+  // coverage. A ray miss inside a chart uses the neutral baseline.
+  for (size_t index=0;index<count;++index) {
+    if ((index&1023)==0) paint_compute::checkpoint(transfer.cancelled());
+    const auto owner=surface.padding[index];
+    if (owner<0 || size_t(owner)==index || !coverage[size_t(owner)]) continue;
+    for (auto &plane:planes)
+      std::copy_n(plane.rgba.begin()+size_t(owner)*4,4,plane.rgba.begin()+index*4);
+    coverage[index]=255;
+  }
+  BakedNormalFieldOptions options;
+  options.max_working_bytes=transfer.remaining_bytes();
+  options.cancelled=transfer.cancelled();
+  auto result=baseline->replace_planes(planes[0],planes[1],coverage,options);
+  transfer.reserve(1,result->retained_bytes());
+  return result;
 }
 void PaintedMesh::install_bake(BakedTextures incoming,BakedNormalWrite normal_write) {
   if(source_sampling_prepared())throw std::logic_error("Independent source paint requires its own source-aware bake adapter");

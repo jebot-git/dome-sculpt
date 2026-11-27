@@ -12,7 +12,10 @@ struct TextureSetPaintAccess {
   static std::shared_ptr<PaintedMesh> resize_unpainted(const PaintedMesh&,uint32_t,const TextureSetLimits&);
   static std::shared_ptr<PaintedMesh> resample_plain(const PaintedMesh&,const TextureSetResolutionOptions&,const TextureSetLimits&,TextureSetResolutionReport&);
   static void reproject_retopology(const PaintedMesh &from, PaintedMesh &replacement,
-                                   RetopoTransfer &);
+                                   RetopoTransfer &,bool prepared_normals=false);
+  static std::shared_ptr<const BakedNormalField> reproject_retopology_normals(
+      const PaintedMesh &from,const SourceMaterialBindings &before,
+      const PaintedMesh &replacement,const SourceMaterialBindings &after,RetopoTransfer &);
   static const std::shared_ptr<const TextureSetFaceDomain>& domain(const PaintedMesh&)noexcept;
   static std::shared_ptr<const void> raster_owner(const PaintedMesh&)noexcept;
   // Membership-required Paint7 payload. The domain is minted only by the

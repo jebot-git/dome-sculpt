@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "baked-normal-field.hpp"
 #include "canonical-normal-uv.hpp"
+#include "dome/source-maps.hpp"
+#include "normal-bake-encoding.hpp"
 namespace dome::detail {
 namespace {
 // Include conservative Image/control-block/container bookkeeping in addition
@@ -105,6 +107,19 @@ std::shared_ptr<const BakedNormalField> BakedNormalField::replace(
      incoming.maps.normal.rgba.empty()||incoming.maps.mtoon_normal.rgba.empty()||incoming.normal_authority)
     throw std::invalid_argument("Independent baked field requires complete newly encoded prepared normal roles");
   return replace_planes(incoming.maps.normal,incoming.maps.mtoon_normal,incoming.coverage,o);
+}
+std::array<Vec3,2> BakedNormalField::sample(const NormalBakeBasis &basis,std::array<float,2> uv) const {
+  PaintSourceTexture view;
+  view.wrap_s=view.wrap_t=33071;
+  view.min_filter=view.mag_filter=9729;
+  std::array<Vec3,2> directions;
+  for (size_t role=0;role<directions.size();++role) {
+    view.image=role?mtoon_:pbr_;
+    const auto value=sample_source_texture(view,uv[0],uv[1],false);
+    const auto n=mtoon_normal_map({value[0],value[1],value[2]},1);
+    directions[role]=normalized(basis.t*n.x+basis.b*n.y+basis.n*n.z);
+  }
+  return directions;
 }
 std::shared_ptr<const BakedNormalField> BakedNormalField::replace_planes(
     const Image &pbr_write,const Image &toon_write,std::span<const uint8_t> coverage,

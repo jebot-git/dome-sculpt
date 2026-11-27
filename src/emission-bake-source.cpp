@@ -516,16 +516,7 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTr
         }
         uv={float(original[0]),float(original[1])};
       }
-      PaintSourceTexture view;
-      view.wrap_s=view.wrap_t=33071;
-      view.min_filter=view.mag_filter=9729;
-      for(size_t role=0;role<2;++role){
-        view.image=role?field->mtoon():field->pbr();
-        const auto value=sample_source_texture(view,uv[0],uv[1],false);
-        const auto n=mtoon_normal_map({value[0],value[1],value[2]},1);
-        result[role]=normalized(basis.t*n.x+basis.b*n.y+basis.n*n.z);
-      }
-      return result;
+      return field->sample(basis,uv);
     }
     if(native_normal.image){
       std::array<NormalBakeVertex,3> corners;

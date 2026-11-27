@@ -13,6 +13,7 @@ public:
   void reserve(size_t count, size_t stride);
   const auto &cancelled() const { return cancelled_; }
   size_t remaining_work() const { return work_left_; }
+  size_t remaining_bytes() const { return bytes_left_; }
 
 private:
   const std::function<bool()> &cancelled_;
@@ -32,6 +33,9 @@ public:
   void reserve(size_t count, size_t stride) { budget_.reserve(count, stride); }
   const auto &cancelled() const { return budget_.cancelled(); }
   const auto &placement_change() const { return placement_change_; }
+  const auto &previous_metric() const { return previous_metric_; }
+  const auto &replacement_metric() const { return replacement_metric_; }
+  size_t remaining_bytes() const { return budget_.remaining_bytes(); }
 
 private:
   RetopoTransferBudget &budget_;
