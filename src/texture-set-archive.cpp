@@ -619,6 +619,12 @@ uint32_t TextureSetArchive::add_paint(const TextureSetView &f,
         "Shared paint record lost its actual membership");
   for (size_t i = 0; i < paints_.size(); ++i) {
     step();
+    if (same(paints_[i].source, f.source)) {
+      // A live holder and its history snapshot can wrap the same sealed
+      // retained field in different Paint objects. Restore one source owner.
+      f.source->validate_field(f, limits_, false);
+      return uint32_t(i);
+    }
     if (same(paints_[i].owner, f.painted)) {
       const auto &prior = paints_[i].source;
       if (!same(prior, f.source) && (prior || f.source)) {

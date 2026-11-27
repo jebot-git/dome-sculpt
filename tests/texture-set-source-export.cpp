@@ -4,16 +4,19 @@
 #include "dome/bake-recipe.hpp"
 #include "dome/native-scene-append.hpp"
 #include "dome/native-authoring.hpp"
+#include "dome/material-visibility.hpp"
 #include "dome/emission-native.hpp"
 #include "humanoid-sha256.hpp"
 #include "dome/normal-preparation.hpp"
 #include "dome/gltf-export.hpp"
 #include "dome/projection.hpp"
+#include "dome/rig-edit.hpp"
 #include "dome/source-maps.hpp"
 #include "dome/source-placement.hpp"
 #include "dome/source-uv-bake.hpp"
 #include "dome/tangents.hpp"
 #include "texture-set-export.hpp"
+#include "texture-set-range.hpp"
 #include "texture-set-bake.hpp"
 #include "texture-set-field-source.hpp"
 #include "polygon-surface-preview.hpp"
@@ -120,6 +123,172 @@ uint32_t index_at(const detail::GltfDocument&d,int index,size_t n){const auto&a=
 Vec3 vector(const std::vector<float>&v){return {v.at(0),v.at(1),v.at(2)};}
 Vec3 unit(AffineVector v){return normalized(Vec3{float(v[0]),float(v[1]),float(v[2])});}
 Image texture_image(const detail::GltfDocument&d,const nlohmann::json&info){const auto&texture=d.json.at("textures").at(info.at("index").get<size_t>());const auto&image=d.json.at("images").at(texture.at("source").get<size_t>());const auto&view=d.json.at("bufferViews").at(image.at("bufferView").get<size_t>());const auto offset=view.value("byteOffset",size_t(0)),count=view.at("byteLength").get<size_t>();check(offset<=d.binary.size()&&count<=d.binary.size()-offset,"Actual material PNG lies within the emitted buffer");return decode_projection_png(std::span(d.binary).subspan(offset,count));}
+void retained_shapes(bool prepared,bool reflected){
+ const auto seed=source(prepared,reflected);
+ const auto object=seed.active().id;
+ const std::string prefix=std::string(prepared?"prepared-":"retained-")+(reflected?"reflected-":"");
+ const auto filename=[&](std::string_view suffix){return std::string(prefix)+std::string(suffix);};
+ seed.save(filename("before.dsculpt"));
+ if(prepared&&!reflected){
+  auto neutral=seed.snapshot();
+  author_shapekey(neutral,object,{});
+  neutral.save(filename("neutral-default.dsculpt"));
+ }
+ const auto baseline=seed.encode();
+ Document doc;
+ doc.open_async(filename("before.dsculpt")).get();ready(doc);
+ check(doc.frame().state->can_author_shapes,"Cold retained fields expose native shapekey authoring");
+ const auto rest_frame=doc.frame().surface;
+ const auto creation=doc.copy_scene();
+ ShapeKeyEdit create;
+ create.name="Retained bend";
+ doc.author_shape(create);ready(doc);
+ const auto neutral=doc.copy_scene().encode();
+ const auto &rest=creation.active().painted->mesh();
+ ShapeKeyEdit replace;
+ replace.action=ShapeKeyAction::Replace;
+ replace.positions=rest.positions;
+ for(auto &p:replace.positions)p.z+=p.x>0?.24f:-.15f;
+ doc.author_shape(replace);ready(doc);
+ const auto authored=doc.copy_scene().encode();
+ check(authored!=neutral&&doc.undo()&&doc.copy_scene().encode()==neutral&&
+       doc.redo()&&doc.copy_scene().encode()==authored,"Retained shape authoring has exact global Undo and Redo");
+ ready(doc);
+ doc.edit_scene("Preview retained bend",[object](Scene &s,const auto &cancelled){
+  RigEdit edit;edit.morph=MorphWeightEdit{0,1};edit_rig(s,object,edit,cancelled);
+ });
+ const auto project=filename("shaped.dsculpt");
+ doc.save_async(project).get();ready(doc);
+ const auto accepted=doc.copy_scene();
+ const auto posed_frame=doc.frame().surface;
+ const auto exact=accepted.encode();
+ const auto world=accepted.world_matrix(object);
+ const auto target=accepted.active().deformation->morphs->target_surface(rest,0);
+ check(Scene::load(project).encode()==exact&&posed_frame->picking&&posed_frame->ranges.size()==2,
+       "Ordered Save and cold reopen preserve authoritative retained shape data");
+ for(const auto &range:posed_frame->ranges){
+  const auto &field=range.texture_set_proof->field();
+  const auto &before=rest_frame->ranges.at(field.id);
+  const auto &old=before.textures->polygon_surface,&current=range.textures->polygon_surface;
+  const auto triangle=field.domain->triangles().front();
+  check(current!=old&&current->shares_streams(*old)&&current->field_owner()==old->field_owner()&&
+        current->baked()==old->baked()&&current->geometric_frames()[triangle][0]==old->geometric_frames()[triangle][0]&&
+        current->geometric_frames()[triangle][2]!=old->geometric_frames()[triangle][2]&&
+        range.textures->color.rgba==before.textures->color.rgba&&
+        range.textures->normal.rgba==before.textures->normal.rgba,
+        "Both posed fields retain original immutable source streams, maps and before frames");
+  range.texture_set_proof->authenticate_stream(posed_frame->mesh,range);
+  Vec3 center{};
+  for(size_t c=0;c<3;++c){
+   const auto logical=range.texture_set_proof->logical_corner(c,range.paint_winding_reversed);
+   const auto p=target.positions[rest.indices[logical]];
+   const auto q=world.point({p.x,p.y,p.z});
+   const Vec3 expected{float(q[0]),float(q[1]),float(q[2])};
+   check(length(expected-posed_frame->mesh.positions.at(posed_frame->mesh.indices.at(range.first+c)))<1e-6f,
+         "Published material corners use actual placed morph positions");
+   center+=expected*(1.f/3);
+  }
+  const auto hit=posed_frame->picking->raycast_target(center+Vec3{0,0,2},{0,0,-1},3,0,object);
+  check(hit&&posed_frame->picking->material_identity(hit->surface.triangle)==SurfaceMaterialIdentity{object,field.id},
+        "Posed material picking keeps original logical material membership");
+ }
+ for(const auto format:{AssetExportFormat::Glb,AssetExportFormat::EditableGlb512}){
+  const auto file=filename(format==AssetExportFormat::Glb?"standard.glb":"editable.glb");
+  doc.export_asset(file,format).get();
+  std::ifstream stream(file,std::ios::binary);
+  const std::vector<uint8_t> bytes{std::istreambuf_iterator<char>(stream),{}};
+  const auto json_length=word(bytes,12);
+  detail::GltfDocument parsed;
+  parsed.json=nlohmann::json::parse(bytes.begin()+20,bytes.begin()+20+json_length);
+  parsed.binary.assign(bytes.begin()+28+json_length,bytes.end());
+  const auto &gltf_mesh=parsed.json.at("meshes").at(0);
+  const auto &primitives=gltf_mesh.at("primitives");
+  check(primitives.size()==2&&gltf_mesh.at("weights")==nlohmann::json::array({1})&&
+        gltf_mesh.at("extras").at("targetNames").at(0)=="Retained bend",
+        "Both material slots export their named live morph");
+  for(size_t field=0;field<primitives.size();++field){
+   const auto &primitive=primitives[field],&attributes=primitive.at("attributes"),&key=primitive.at("targets").at(0);
+   const auto &range=posed_frame->ranges.at(field);
+   const auto triangle=range.texture_set_proof->field().domain->triangles().front();
+   const auto packet=range.textures->polygon_surface;
+   check(key.contains("NORMAL")&&key.contains("TANGENT")==prepared,
+         "Portable morph emits direction channels required by the actual material");
+   const auto &normal=parsed.json.at("materials").at(primitive.at("material").get<size_t>());
+   PaintSourceTexture texture;
+   if(prepared){
+    texture.image=std::make_shared<const Image>(texture_image(parsed,normal.at("normalTexture")));
+    texture.wrap_s=texture.wrap_t=33071;
+    texture.min_filter=texture.mag_filter=9729;
+   }
+   bool changed_normal=false;
+   for(size_t c=0;c<3;++c){
+    const auto v=index_at(parsed,primitive.at("indices"),c);
+    const auto base=vector(attribute(parsed,attributes.at("POSITION"),v,3));
+    const auto p=base+vector(attribute(parsed,key.at("POSITION"),v,3));
+    size_t logical=0;
+    while(logical<3&&length(base-rest.positions[rest.indices[triangle*3+logical]])>1e-6f)++logical;
+    check(logical<3&&length(target.positions[rest.indices[triangle*3+logical]]-p)<1e-6f,
+          "Binary GLB accessors apply shape displacement to the actual member corner");
+    const auto start=vector(attribute(parsed,attributes.at("NORMAL"),v,3));
+    const auto direction=vector(attribute(parsed,key.at("NORMAL"),v,3));
+    changed_normal|=length(direction)>.05f;
+    const auto moved=start+direction;
+    const auto n=unit(world.normal({moved.x,moved.y,moved.z}));
+    auto decoded=n;
+    if(prepared){
+     const auto t=attribute(parsed,attributes.at("TANGENT"),v,4);
+     const auto q=vector(t)+vector(attribute(parsed,key.at("TANGENT"),v,3));
+     const auto tangent=unit(world.direction({q.x,q.y,q.z}));
+     const auto bitangent=normalized(cross(n,tangent))*(t[3]*(reflected?-1.f:1.f));
+     const auto role=normal.at("normalTexture").value("texCoord",0);
+     const auto uv=attribute(parsed,attributes.at("TEXCOORD_"+std::to_string(role)),v,2);
+     const auto sample=sample_source_texture(texture,uv[0],uv[1],false);
+     decoded=normalized(tangent*(2*sample[0]-1)+bitangent*(2*sample[1]-1)+n*(2*sample[2]-1));
+    }
+    std::array<double,3> weights{};
+    weights[logical]=1;
+    check(dot(decoded,packet->normal_at(triangle,weights,world))>.99979f,
+          "Independent GLB direction and image decoding matches the posed native material");
+   }
+   check(changed_normal,"Portable lighting changes on both bent material triangles");
+  }
+  if(format!=AssetExportFormat::Glb){
+   const auto restored=extract_native_authoring(bytes);
+   check(restored&&restored->encode()==exact,"Editable GLB recovers the original retained shape and all native materials");
+  }
+ }
+ const auto &range=posed_frame->ranges.front();
+ std::array<Vec3,3> p;
+ for(size_t c=0;c<3;++c)p[c]=posed_frame->mesh.positions.at(posed_frame->mesh.indices.at(range.first+c));
+ const auto center=p[0]*.84f+p[1]*.08f+p[2]*.08f;
+ const auto direction=normalized(cross(p[1]-p[0],p[2]-p[0]));
+ NativeStrokeSample stroke;
+ stroke.origin=center+direction;
+ stroke.direction=direction*-1;
+ stroke.brush.radius=.6f;
+ stroke.brush.pressure=1;
+ stroke.brush.strength=1;
+ stroke.brush.tool=Tool::Clay;
+ doc.configure_shape_sculpt(true);ready(doc);
+ check(doc.begin_native_stroke()&&doc.sample_native_stroke(stroke),"Desktop brush admits a real posed retained material hit");
+ doc.end_native_stroke(false);
+ check(doc.wait_native_stroke(),"Retained shape gesture cancellation drains");ready(doc);
+ check(doc.copy_scene().encode()==exact,"Cancelling a retained shape stroke restores the exact scene");
+ check(doc.begin_native_stroke()&&doc.sample_native_stroke(stroke),"Desktop brush accepts a second retained material hit");
+ doc.end_native_stroke(true);
+ doc.save_async(filename("after-stroke.dsculpt")).get();
+ check(doc.wait_native_stroke(),"Retained shape gesture acceptance drains");ready(doc);
+ const auto sculpted=doc.copy_scene();
+ check(sculpted.encode()!=exact&&Scene::load(filename("after-stroke.dsculpt")).encode()==sculpted.encode()&&
+       sculpted.active().texture_sets->primary_source()==accepted.active().texture_sets->primary_source(),
+       "Accepted stroke and immediate Save carry shape displacement and the exact original material owner");
+ check(doc.undo()&&doc.copy_scene().encode()==exact,"One Undo removes the accepted retained stroke");ready(doc);
+ doc.configure_shape_sculpt(false);ready(doc);
+ ShapeKeyEdit restore;
+ restore.action=ShapeKeyAction::Restore;
+ doc.author_shape(restore);ready(doc);
+ check(doc.copy_scene().encode()==baseline,"Shape Restore returns the exact original retained scene");
+}
 void audit_normals(const detail::GltfDocument &,const ObjectSurface &,float);
 void retained_hdr_export(bool standard,uint32_t resolution=64){
  auto scene=source(true,false,false,false,false,false,resolution);
@@ -1150,6 +1319,12 @@ void recipe_reference_remap(bool prepared) {
 }
 int main(int argc,char **argv)try {
  const std::string_view mode=argc>1?argv[1]:"";
+ if(argc==3&&mode=="--retained-shapes"){
+  std::filesystem::create_directories(argv[2]);std::filesystem::current_path(argv[2]);
+  for(bool prepared:{false,true})for(bool reflected:{false,true})retained_shapes(prepared,reflected);
+  std::cout<<"PASS "<<checks<<" retained texture-set shapekey controls\n";
+  return 0;
+ }
  if(argc==2&&mode=="--recipe-reference-remap") {
   for(bool prepared:{false,true})recipe_reference_remap(prepared);
   std::cout<<"PASS "<<checks<<" prepared texture recipe controls\n";

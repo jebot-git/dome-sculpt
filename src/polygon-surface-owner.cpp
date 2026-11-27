@@ -111,12 +111,19 @@ std::shared_ptr<const PolygonSurfaceOwner> PolygonSurfaceOwner::rebase_before(
 }
 bool PolygonSurfaceOwner::valid_owner(const std::shared_ptr<const PolygonSurfaceOwner>&p)const noexcept{return p.get()==this&&!self_.expired()&&!self_.owner_before(p)&&!p.owner_before(self_);}
 bool polygon_surface_transfer_required(const SculptObject&o){return o.mesh_active&&o.painted&&(o.painted->paint_sampling_domain()||o.painted->has_physical_emission()||(o.painted->baked()&&o.painted->baked()->normal_field)||(o.material_bindings&&o.material_bindings->polygon_surface_transfer));}
+bool retained_texture_set_shape_pose(const DeformationState *deformation) noexcept {
+ return !deformation||(!deformation->skeleton&&!deformation->skin&&deformation->pose.empty());
+}
 void validate_polygon_surface_model(bool active,const PaintedMesh*paint,
  const PolygonAuthority*polygon,const SourceMaterialBindings*binding,
- const DeformationState*deformation,const CreatorAppearance*appearance){
+ const DeformationState*deformation,const CreatorAppearance*appearance,bool retained_texture_set){
  if(!binding||!binding->polygon_surface_transfer)return;
  const auto&field=binding->polygon_surface_transfer;
- if(!field->valid_owner(field)||!active||!paint||!polygon||!polygon->active||polygon->colors||deformation||appearance||!own(polygon->origin,field->before())||polygon->topology.encode()!=field->trace().current()->encode())throw std::invalid_argument("Polygon field model lost its exact current editable authority and complete source");
+ const bool supported_pose=!deformation||(retained_texture_set&&retained_texture_set_shape_pose(deformation));
+ if(!field->valid_owner(field)||!active||!paint||!polygon||!polygon->active||polygon->colors||
+    !supported_pose||appearance||!own(polygon->origin,field->before())||
+    polygon->topology.encode()!=field->trace().current()->encode())
+  throw std::invalid_argument("Polygon field model lost its exact current editable authority and complete source");
 }
 bool PolygonSurfaceOwner::has_normal_field()const noexcept{return before_&&before_->paint&&before_->paint->baked()&&bool(before_->paint->baked()->normal_field);}
 size_t PolygonSurfaceOwner::source_working_bytes(const PolygonOrigin&before,const PolygonSurfaceTransferLimits&l){return forecast(before,l);}

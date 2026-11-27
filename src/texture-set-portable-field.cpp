@@ -3,6 +3,7 @@
 #include "polygon-surface-preview.hpp"
 #include "polygon-surface-paint.hpp"
 #include "affine-surface.hpp"
+#include "baked-normal-field.hpp"
 #include "emission-authority.hpp"
 #include "texture-set-native-grid.hpp"
 #include "dome/source-maps.hpp"
@@ -86,100 +87,42 @@ double angle(Vec3 expected,Vec3 actual){
  return std::atan2(double(length(cross(expected,actual))),std::clamp(double(dot(expected,actual)),-1.,1.));
 }
 
-// Sample in the original field and encode into the explicit glTF tangent
-// columns. The bake atlas is transient and can be given its own coordinates.
-std::optional<Image> reproject_normal(const PolygonSurfacePreview &preview,
-    std::span<const uint32_t> domain,std::span<PortableTextureSetCorner> corners,
-    const AffineTransform &world,uint32_t source_size,uint32_t size,bool independent,size_t &work,
-    const TextureSetLimits &limits){
- const size_t pixels=size_t(size)*size;
- if(pixels>limits.maximum_bytes/8)throw std::length_error("Portable normal raster exceeds its byte budget");
+template<class Operation>
+bool visit_normal_chart(const PolygonSurfacePreview &preview,uint32_t triangle,
+    std::span<const PortableTextureSetCorner> corners,const AffineTransform &world,
+    uint32_t size,const Operation &operation){
+ const auto &original=preview.native_bake()?preview.paint_coordinates():preview.normal_coordinates();
+ const float hand=world.orientation()==AffineOrientation::Reversing?-1.f:1.f;
+ std::array<Uv,3> source,destination;
+ std::array<NormalBakeVertex,3> frame;
+ for(size_t k=0;k<3;++k){
+  const auto &vertex=corners[k];
+  source[k]=original.at(size_t(triangle)*3+k);
+  destination[k]=vertex.role;
+  const auto t=vertex.tangent;
+  frame[k]=normal_bake_vertex(normal(world,vertex.normal),direction(world,{t[0],t[1],t[2]}),
+      t[3]*hand,NormalVertexBitangent::UnitCross);
+ }
+ const UvTriangle chart(destination,size);
+ return chart.usable()&&operation(triangle,source,chart,frame);
+}
+
+bool normal_map_matches(const PolygonSurfacePreview &preview,std::span<const uint32_t> domain,
+    std::span<const PortableTextureSetCorner> corners,const AffineTransform &world,
+    const std::shared_ptr<const Image> &image,uint32_t source_size,bool independent,
+    size_t &work,const TextureSetLimits &limits){
+ const auto size=image->width;
  const auto charge=[&]{
-  if(work>=limits.maximum_work)throw std::length_error("Portable normal raster exceeds its sample budget");
+  if(work>=limits.maximum_work)throw std::length_error("Portable normal validation exceeds its sample budget");
   if((work++&1023)==0)stop(limits);
  };
- auto raster=std::make_shared<Image>(Image{size,size,std::vector<uint8_t>(4*pixels)});
- auto &image=*raster;
- for(size_t i=0;i<pixels;++i){if((i&1023)==0)stop(limits);image.rgba[i*4]=image.rgba[i*4+1]=128;image.rgba[i*4+2]=image.rgba[i*4+3]=255;}
- std::vector<float> distance(pixels,std::numeric_limits<float>::infinity());
- const size_t columns=size_t(std::ceil(std::sqrt(double(domain.size())))),cell=columns?size/columns:0;
- if(independent&&cell<8)return {};
- const float hand=world.orientation()==AffineOrientation::Reversing?-1.f:1.f;
- const auto &original=preview.native_bake()?preview.paint_coordinates():preview.normal_coordinates();
- const auto visit=[&](size_t face,auto &&operation){
-  const auto triangle=domain[face];
-  std::array<Uv,3> source,destination;
-  std::array<NormalBakeVertex,3> frame;
-  for(size_t k=0;k<3;++k){
-   auto &vertex=corners[face*3+k];
-   source[k]=original.at(size_t(triangle)*3+k);
-   destination[k]=vertex.role;
-   const auto t=vertex.tangent;
-   frame[k]=normal_bake_vertex(normal(world,vertex.normal),direction(world,{t[0],t[1],t[2]}),
-       t[3]*hand,NormalVertexBitangent::UnitCross);
-  }
-  const UvTriangle chart(destination,size);
-  return chart.usable()&&operation(triangle,source,chart,frame);
- };
- for(size_t face=0;independent&&face<domain.size();++face){
-  stop(limits);
-  const auto i=size_t(domain[face])*3;
-  const auto &a=original.at(i),&b=original.at(i+1),&c=original.at(i+2);
-  const std::array<Uv,3> source{a,b,c};
-  const std::array<Uv,3> reference{{{0,0},{1,0},{0,1}}};
-  const bool preserve_layout=UvTriangle(source,size).usable();
-  const auto &layout=preserve_layout?source:reference;
-  for(size_t axis=0;axis<2;++axis){
-   const auto lo=std::min({layout[0][axis],layout[1][axis],layout[2][axis]});
-   const auto hi=std::max({layout[0][axis],layout[1][axis],layout[2][axis]});
-   const auto tile=axis==0?face%columns:face/columns;
-   const auto origin=tile*cell+gutter+1;
-   const auto span=cell-2*(gutter+1);
-   const auto first_pixel=std::floor(double(lo)*source_size);
-   const auto last_pixel=std::ceil(double(hi)*source_size);
-   // Keep the source texel centers aligned when the original span fits.
-   // Shifting the filtering lattice changes sharp partial-Bake edges.
-   const bool aligned=preserve_layout&&last_pixel-first_pixel<=span;
-   for(size_t k=0;k<3;++k){
-    const double value=layout[k][axis];
-    const auto offset=aligned?value*source_size-first_pixel:
-                         span*(value-lo)/(double(hi)-lo);
-    corners[face*3+k].role[axis]=float((origin+offset)/size);
-   }
-  }
- }
- for(size_t face=0;face<domain.size();++face){
-  stop(limits);
-  const bool accepted=visit(face,[&](uint32_t triangle,const auto &source,const auto &chart,const auto &frame){
-   const auto [x0,x1,y0,y1]=chart.bounds();
-   for(int y=y0;y<=y1;++y)for(int x=x0;x<=x1;++x){
-    charge();
-    const double u=(x+.5)/size,v=(y+.5)/size;
-    const auto [b,d]=chart.closest(u,v);
-    const size_t i=size_t(y)*size+x;
-    if(d>gutter||d>=distance[i])continue;
-    // Border texels are still part of the consumer's bilinear footprint.
-    // Use the source image beyond the chart while holding the frame at
-    // the nearest valid barycentrics.
-    const auto uv=independent?interpolate(source,chart.barycentric(u,v)):Uv{float(u),float(v)};
-    const auto wanted=preview.sample_baked_normal(triangle,b,world,uv);
-    const auto basis=normal_bake_basis(frame,b,NormalFragmentBasis::UnitColumns);
-    const auto encoded=encode_normal_bake(basis,wanted);
-    if(!encoded||encoded->rgba[2]<128||encoded->quantized_angle_radians>normal_error_limit)return false;
-    distance[i]=float(d);
-    std::copy(encoded->rgba.begin(),encoded->rgba.end(),image.rgba.begin()+i*4);
-   }
-   return true;
-  });
-  if(!accepted)return {};
- }
  PaintSourceTexture lookup;
- lookup.image=raster;
+ lookup.image=image;
  lookup.wrap_s=lookup.wrap_t=33071;
  lookup.min_filter=lookup.mag_filter=9729;
  for(size_t face=0;face<domain.size();++face){
   stop(limits);
-  const bool accepted=visit(face,[&](uint32_t triangle,const auto &source,const auto &chart,const auto &frame){
+  const bool accepted=visit_normal_chart(preview,domain[face],corners.subspan(face*3,3),world,size,[&](uint32_t triangle,const auto &source,const auto &chart,const auto &frame){
    const auto verify=[&](const Bary &b,Uv uv){
     charge();
     const auto wanted=preview.sample_baked_normal(triangle,b,world,interpolate(source,b));
@@ -221,9 +164,133 @@ std::optional<Image> reproject_normal(const PolygonSurfacePreview &preview,
    const Bary center{1./3,1./3,1./3};
    return verify(center,interpolate(chart.corners,center));
   });
+  if(!accepted)return false;
+ }
+ return true;
+}
+
+// Sample in the original field and encode into the explicit glTF tangent
+// columns. The bake atlas is transient and can be given its own coordinates.
+std::optional<Image> reproject_normal(const PolygonSurfacePreview &preview,
+    std::span<const uint32_t> domain,std::span<PortableTextureSetCorner> corners,
+    const AffineTransform &world,uint32_t source_size,uint32_t size,bool independent,size_t &work,
+    const TextureSetLimits &limits){
+ const size_t pixels=size_t(size)*size;
+ if(pixels>limits.maximum_bytes/8)throw std::length_error("Portable normal raster exceeds its byte budget");
+ const auto charge=[&]{
+  if(work>=limits.maximum_work)throw std::length_error("Portable normal raster exceeds its sample budget");
+  if((work++&1023)==0)stop(limits);
+ };
+ auto raster=std::make_shared<Image>(Image{size,size,std::vector<uint8_t>(4*pixels)});
+ auto &image=*raster;
+ for(size_t i=0;i<pixels;++i){if((i&1023)==0)stop(limits);image.rgba[i*4]=image.rgba[i*4+1]=128;image.rgba[i*4+2]=image.rgba[i*4+3]=255;}
+ std::vector<float> distance(pixels,std::numeric_limits<float>::infinity());
+ const size_t columns=size_t(std::ceil(std::sqrt(double(domain.size())))),cell=columns?size/columns:0;
+ if(independent&&cell<8)return {};
+ const auto &original=preview.native_bake()?preview.paint_coordinates():preview.normal_coordinates();
+ for(size_t face=0;independent&&face<domain.size();++face){
+  stop(limits);
+  const auto i=size_t(domain[face])*3;
+  const auto &a=original.at(i),&b=original.at(i+1),&c=original.at(i+2);
+  const std::array<Uv,3> source{a,b,c};
+  const std::array<Uv,3> reference{{{0,0},{1,0},{0,1}}};
+  const bool preserve_layout=UvTriangle(source,size).usable();
+  const auto &layout=preserve_layout?source:reference;
+  for(size_t axis=0;axis<2;++axis){
+   const auto lo=std::min({layout[0][axis],layout[1][axis],layout[2][axis]});
+   const auto hi=std::max({layout[0][axis],layout[1][axis],layout[2][axis]});
+   const auto tile=axis==0?face%columns:face/columns;
+   const auto origin=tile*cell+gutter+1;
+   const auto span=cell-2*(gutter+1);
+   const auto first_pixel=std::floor(double(lo)*source_size);
+   const auto last_pixel=std::ceil(double(hi)*source_size);
+   // Keep the source texel centers aligned when the original span fits.
+   // Shifting the filtering lattice changes sharp partial-Bake edges.
+   const bool aligned=preserve_layout&&last_pixel-first_pixel<=span;
+   for(size_t k=0;k<3;++k){
+    const double value=layout[k][axis];
+    const auto offset=aligned?value*source_size-first_pixel:
+                         span*(value-lo)/(double(hi)-lo);
+    corners[face*3+k].role[axis]=float((origin+offset)/size);
+   }
+  }
+ }
+ for(size_t face=0;face<domain.size();++face){
+  stop(limits);
+  const bool accepted=visit_normal_chart(preview,domain[face],corners.subspan(face*3,3),world,size,[&](uint32_t triangle,const auto &source,const auto &chart,const auto &frame){
+   const auto [x0,x1,y0,y1]=chart.bounds();
+   for(int y=y0;y<=y1;++y)for(int x=x0;x<=x1;++x){
+    charge();
+    const double u=(x+.5)/size,v=(y+.5)/size;
+    const auto [b,d]=chart.closest(u,v);
+    const size_t i=size_t(y)*size+x;
+    if(d>gutter||d>=distance[i])continue;
+    // Border texels are still part of the consumer's bilinear footprint.
+    // Use the source image beyond the chart while holding the frame at
+    // the nearest valid barycentrics.
+    const auto uv=independent?interpolate(source,chart.barycentric(u,v)):Uv{float(u),float(v)};
+    const auto wanted=preview.sample_baked_normal(triangle,b,world,uv);
+    const auto basis=normal_bake_basis(frame,b,NormalFragmentBasis::UnitColumns);
+    const auto encoded=encode_normal_bake(basis,wanted);
+    if(!encoded||encoded->rgba[2]<128||encoded->quantized_angle_radians>normal_error_limit)return false;
+    distance[i]=float(d);
+    std::copy(encoded->rgba.begin(),encoded->rgba.end(),image.rgba.begin()+i*4);
+   }
+   return true;
+  });
   if(!accepted)return {};
  }
+ if(!normal_map_matches(preview,domain,corners,world,raster,source_size,independent,work,limits))
+  return {};
  return std::move(image);
+}
+std::vector<PortableTextureSetCorner> portable_corners(const PolygonSurfacePreview &preview,
+    std::span<const uint32_t> domain,const AffineTransform &world,bool &reproject,
+    const TextureSetLimits &limits){
+ const bool native=bool(preview.native_bake());
+ if(native)preview.validate_bake_world(domain,world,limits.cancelled);
+ else preview.validate_world(world,1e-6,limits.cancelled);
+ const auto inverse=world.inverse();
+ const float hand=world.orientation()==AffineOrientation::Reversing?-1.f:1.f;
+ const auto &source_normals=preview.normals();
+ std::vector<PortableTextureSetCorner> corners;
+ corners.reserve(domain.size()*3);
+ const bool normal_role=native||preview.model()==PolygonSurfaceNormalModel::PreparedCorePbr;
+ for(auto triangle:domain){
+  stop(limits);
+  const auto first=size_t(triangle)*3;
+  const auto [before,current]=preview.triangle_frames(triangle,world);
+  for(size_t k=0;k<3;++k){
+   const auto index=first+k;
+   const auto n=source_normals.at(index);
+   const auto desired_n=transport(before,current,normal(world,n));
+   const auto local_n=normal(inverse,desired_n);
+   if(length(normal(world,local_n)-desired_n)>5e-6f)
+    throw std::invalid_argument("Portable retained N exceeds floating-point transport bounds");
+   auto local_t=perpendicular(local_n);
+   float sign=1;
+   if(normal_role){
+    Bary corner{};corner[k]=1;
+    const auto old=preview.before_role_basis(triangle,corner,world);
+    const auto desired_t=transport(before,current,old.t);
+    const auto desired_b=transport(before,current,old.b);
+    sign=(dot(cross(desired_n,desired_t),desired_b)<0?-1.f:1.f)*hand;
+    const auto raw=direction(inverse,desired_t);
+    local_t=normal_bake_math::unit(raw-local_n*dot(raw,local_n));
+    const auto t=direction(world,local_t);
+    const auto b=normalized(cross(desired_n,t))*(sign*hand);
+    // Prepared maps and the portable model both interpolate the three
+    // columns. Native Bake instead constructs T and B from the smooth
+    // fragment normal, so matching its endpoints alone is insufficient.
+    reproject|=(native&&length(n-source_normals[first])>0.f)||
+       length(t-desired_t)>5e-6f||length(b-desired_b)>5e-6f;
+   }
+   const auto paint=preview.paint_coordinates().at(index);
+   const auto role=normal_role&&!native?preview.normal_coordinates().at(index):paint;
+   corners.push_back({local_n,{local_t.x,local_t.y,local_t.z,sign},paint,role});
+  }
+ }
+ return corners;
 }
 } // namespace
 
@@ -242,50 +309,9 @@ PortableTextureSetField portable_texture_set_field(const TextureSetView &field,
  if(count>limits.maximum_corners||full>limits.maximum_bytes/64||
     count>(limits.maximum_bytes-full*64)/sizeof(PortableTextureSetCorner)||full>limits.maximum_work/96)
   throw std::length_error("Portable retained field exceeds prospective frame/attribute budget");
- const bool native=bool(preview->native_bake());
- if(native)preview->validate_bake_world(domain,world,limits.cancelled);
- else preview->validate_world(world,1e-6,limits.cancelled);
- const auto inverse=world.inverse();
- const float hand=world.orientation()==AffineOrientation::Reversing?-1.f:1.f;
- const auto &source_normals=preview->normals();
  PortableTextureSetField out;
- out.corners.reserve(count);
- out.normal_role=native||preview->model()==PolygonSurfaceNormalModel::PreparedCorePbr;
- bool reproject=false;
- for(auto triangle:domain){
-  stop(limits);
-  const auto first=size_t(triangle)*3;
-  const auto [before,current]=preview->triangle_frames(triangle,world);
-  for(size_t k=0;k<3;++k){
-   const auto index=first+k;
-   const auto n=source_normals.at(index);
-   const auto desired_n=transport(before,current,normal(world,n));
-   const auto local_n=normal(inverse,desired_n);
-   if(length(normal(world,local_n)-desired_n)>5e-6f)
-    throw std::invalid_argument("Portable retained N exceeds floating-point transport bounds");
-   auto local_t=perpendicular(local_n);
-   float sign=1;
-   if(out.normal_role){
-    Bary corner{};corner[k]=1;
-    const auto old=preview->before_role_basis(triangle,corner,world);
-    const auto desired_t=transport(before,current,old.t);
-    const auto desired_b=transport(before,current,old.b);
-    sign=(dot(cross(desired_n,desired_t),desired_b)<0?-1.f:1.f)*hand;
-    const auto raw=direction(inverse,desired_t);
-    local_t=normal_bake_math::unit(raw-local_n*dot(raw,local_n));
-    const auto t=direction(world,local_t);
-    const auto b=normalized(cross(desired_n,t))*(sign*hand);
-    // Prepared maps and the portable model both interpolate the three
-    // columns. Native Bake instead constructs T and B from the smooth
-    // fragment normal, so matching its endpoints alone is insufficient.
-    reproject|=(native&&length(n-source_normals[first])>0.f)||
-       length(t-desired_t)>5e-6f||length(b-desired_b)>5e-6f;
-   }
-   const auto paint=preview->paint_coordinates().at(index);
-   const auto role=out.normal_role&&!native?preview->normal_coordinates().at(index):paint;
-   out.corners.push_back({local_n,{local_t.x,local_t.y,local_t.z,sign},paint,role});
-  }
- }
+ out.normal_role=preview->native_bake()||preview->model()==PolygonSurfaceNormalModel::PreparedCorePbr;
+ out.corners=portable_corners(*preview,domain,world,out.reprojected,limits);
  std::shared_ptr<TextureMaps> portable;
  if(retained_material_grid(field))portable=PolygonSurfacePaintCodec::preview_retained_material(field,work,limits);
  else{
@@ -302,7 +328,7 @@ PortableTextureSetField portable_texture_set_field(const TextureSetView &field,
  portable->mtoon_normal={};
  portable->baked_normal={};
  portable->baked_coverage={};
- if(reproject){
+ if(out.reprojected){
   const uint32_t original=portable->normal.width;
   const auto maximum=portable_normal_export_max_resolution(original);
   auto image=reproject_normal(*preview,domain,out.corners,world,original,original,false,work,limits);
@@ -316,5 +342,28 @@ PortableTextureSetField portable_texture_set_field(const TextureSetView &field,
  out.maps=std::move(portable);
  stop(limits);
  return out;
+}
+
+std::vector<PortableTextureSetCorner> portable_texture_set_shape(
+    const PolygonSurfacePreview &preview,std::span<const uint32_t> domain,
+    const AffineTransform &world,std::span<const Uv> coordinates,
+    const std::shared_ptr<const TextureMaps> &maps,bool rest_reprojected,
+    size_t &work,const TextureSetLimits &limits){
+ bool reproject=false;
+ auto corners=portable_corners(preview,domain,world,reproject,limits);
+ if(rest_reprojected||reproject){
+  const auto &source=preview.native_bake()?preview.native_bake():preview.baked()->normal_field->pbr();
+  if(!source||!maps||maps->normal.rgba.empty()||coordinates.size()!=corners.size())
+   throw std::invalid_argument("Portable posed normal needs its emitted rest map and coordinates");
+  bool independent=false;
+  for(size_t i=0;i<corners.size();++i){
+   independent|=corners[i].role!=coordinates[i];
+   corners[i].role=coordinates[i];
+  }
+  const std::shared_ptr<const Image> image(maps,&maps->normal);
+  if(!normal_map_matches(preview,domain,corners,world,image,source->width,independent,work,limits))
+   throw std::invalid_argument("The shaped surface cannot preserve this normal map within the portable angular limit");
+ }
+ return corners;
 }
 } // namespace dome::detail

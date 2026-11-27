@@ -9,6 +9,19 @@ namespace {
 void stop(const TextureSetLimits&l){if(l.cancelled&&l.cancelled())throw std::runtime_error("Texture-set attribute layout cancelled");}
 void charge(size_t&t,size_t n,size_t unit,size_t maximum){if(t>maximum||(unit&&n>(maximum-t)/unit))throw std::length_error("Texture-set packed geometry exceeds its working bound");t+=n*unit;}
 bool field_canonical(const TextureSetView&field){return field.painted->baked()&&!field.painted->baked()->maps.normal.rgba.empty();}
+void charge_pose(const TextureSetSurfacePlan &plan,size_t &bytes,size_t &work,
+                 const TextureSetLimits &limits){
+ if(!plan.deformation())return;
+ const auto &rest=*plan.geometry();
+ const auto entries=plan.deformation()->resource_entries();
+ if(entries>8'000'000)throw std::length_error("Texture-set pose exceeds its native deformation bound");
+ charge(work,entries,128,limits.maximum_work);
+ charge(bytes,rest.positions.size()+rest.normals.size(),sizeof(Vec3),limits.maximum_bytes);
+ charge(bytes,rest.uv.size(),sizeof(std::array<float,2>),limits.maximum_bytes);
+ charge(bytes,rest.indices.size(),sizeof(uint32_t),limits.maximum_bytes);
+ charge(bytes,rest.uv_pins.size()+rest.uv_seams.size(),1,limits.maximum_bytes);
+ plan.deformation()->validate(rest);
+}
 template<class T>bool owner(const std::shared_ptr<const T>&a,const std::shared_ptr<const T>&b){return a==b&&!a.owner_before(b)&&!b.owner_before(a);}
 }
 std::shared_ptr<const TextureSetPackedGeometry> prepare_texture_set_packed(
@@ -17,27 +30,45 @@ std::shared_ptr<const TextureSetPackedGeometry> prepare_texture_set_packed(
  const auto&rest=*plan->geometry();const auto count=plan->indices().size();
  const bool source=std::any_of(plan->fields().begin(),plan->fields().end(),[](const auto&f){return bool(f.source);});
  if(source){
-  if(plan->deformation())throw std::invalid_argument("Retained set attributes require their actual posed source adapter");
+  const bool posed=plan->deformation()&&
+      std::ranges::any_of(plan->deformation()->morph_weights,[](float weight){return weight!=0;});
   size_t work=plan->preparation_work(),bytes=2*sizeof(TextureSetPackedGeometry)+128;
   charge(work,count,2*std::bit_width(count)+96,limits.maximum_work);
   charge(bytes,count,3*sizeof(uint32_t)+2*sizeof(Tangent)+sizeof(Vec3)+2*sizeof(std::array<float,2>)+128+10*sizeof(void*),limits.maximum_bytes);
   charge(bytes,rest.indices.size(),sizeof(Tangent),limits.maximum_bytes);
   charge(bytes,plan->fields().size(),sizeof(TextureSetDraw)+sizeof(uint8_t)+sizeof(std::shared_ptr<const PolygonSurfacePreview>),limits.maximum_bytes);
+  if(posed){
+   charge_pose(*plan,bytes,work,limits);
+   charge(bytes,plan->fields().size(),sizeof(std::shared_ptr<const PolygonSurfacePreview>),limits.maximum_bytes);
+   for(const auto &field:plan->fields()){
+    if(!field.source||field.domain->triangles().empty())continue;
+    const auto &original=field.source->source_preview();
+    charge(bytes,original->geometric_frames().size(),sizeof(std::array<std::array<float,4>,4>),limits.maximum_bytes);
+    charge(work,original->geometric_frames().size(),8,limits.maximum_work);
+    charge(work,field.domain->triangles().size(),96,limits.maximum_work);
+   }
+  }
   auto layout=std::shared_ptr<TextureSetPackedGeometry>(new TextureSetPackedGeometry);
-  layout->bytes_=bytes;layout->work_=work;layout->object_=plan->object();layout->rest_=plan->geometry();layout->posed_=layout->rest_;layout->membership_=plan->collection()->primary_domain();
+  layout->bytes_=bytes;layout->work_=work;layout->object_=plan->object();layout->rest_=plan->geometry();
+  layout->deformation_=plan->deformation();layout->membership_=plan->collection()->primary_domain();
+  layout->posed_=posed?std::make_shared<const Mesh>(layout->deformation_->preview(rest)):layout->rest_;
+  stop(limits);
   layout->draws_.assign(plan->draws().begin(),plan->draws().end());layout->corners_.assign(plan->logical_corners().begin(),plan->logical_corners().end());
   bool canonical=false;for(const auto&field:plan->fields())canonical|=!field.source&&field_canonical(field);
-  const auto frames=canonical?tangent_corners(rest,limits.cancelled):std::vector<Tangent>{};
+  const auto frames=canonical?tangent_corners(*layout->posed_,limits.cancelled):std::vector<Tangent>{};
   using Signature=std::array<uint32_t,16>;std::map<Signature,uint32_t>split;
   for(size_t f=0;f<plan->fields().size();++f){
    const auto&field=plan->fields()[f];const auto preview=field.source?field.source->source_preview():nullptr;
    if(field.source){field.source->authenticate_owner(field.source);field.source->validate_field(field,limits);if(!preview)throw std::invalid_argument("Source layout lacks its actual raw before-attribute packet");}
    layout->source_previews_.push_back(preview);layout->canonical_.push_back(!preview&&field_canonical(field));
+   if(posed)
+    layout->posed_previews_.push_back(preview?preview->with_geometry(layout->rest_,*layout->posed_,
+                                       field.domain->triangles(),limits.cancelled):nullptr);
    const auto&draw=plan->draws()[f];
    for(size_t c=0;c<draw.count;++c){
     if((c&1023)==0)stop(limits);const auto logical=plan->logical_corners()[draw.first+c];const auto vertex=rest.indices.at(logical);
     const Tangent tangent=layout->canonical_.back()?frames.at(logical):Tangent{1,0,0,1};
-    const Vec3 n=preview?preview->normals().at(logical):rest.normals.at(vertex);
+    const Vec3 n=preview?preview->normals().at(logical):layout->posed_->normals.at(vertex);
     const Tangent t=preview&&!preview->tangents().empty()?preview->tangents().at(logical):Tangent{1,0,0,1};
     const auto paint=preview?preview->paint_coordinates().at(logical):rest.uv.at(vertex);
     const auto role=preview&&!preview->normal_coordinates().empty()?preview->normal_coordinates().at(logical):rest.uv.at(vertex);
@@ -55,10 +86,6 @@ std::shared_ptr<const TextureSetPackedGeometry> prepare_texture_set_packed(
  for(size_t f=0;f<plan->fields().size();++f)if(field_canonical(plan->fields()[f]))normal_corners+=plan->draws()[f].count;
  size_t work=plan->preparation_work();charge(work,count,8,limits.maximum_work);charge(work,rest.positions.size(),8,limits.maximum_work);
  charge(work,normal_corners,2*std::bit_width(normal_corners)+24,limits.maximum_work);
- if(plan->deformation()){
-  const auto entries=plan->deformation()->resource_entries();if(entries>8'000'000)throw std::length_error("Texture-set pose exceeds its native deformation bound");
-  charge(work,entries,128,limits.maximum_work);plan->deformation()->validate(rest);
- }
  size_t bytes=2*sizeof(TextureSetPackedGeometry)+128;
  charge(bytes,count,3*sizeof(uint32_t)+sizeof(Tangent),limits.maximum_bytes);
  charge(bytes,rest.positions.size(),sizeof(uint32_t),limits.maximum_bytes);
@@ -66,11 +93,7 @@ std::shared_ptr<const TextureSetPackedGeometry> prepare_texture_set_packed(
  // Reserve bounded comparison-tree nodes before Mikk/layout allocation.
  charge(bytes,normal_corners,10*sizeof(void*)+6*sizeof(uint32_t),limits.maximum_bytes);
  if(normal_corners)charge(bytes,rest.indices.size(),sizeof(Tangent),limits.maximum_bytes);
- if(plan->deformation()){
-  charge(bytes,rest.positions.size()+rest.normals.size(),sizeof(Vec3),limits.maximum_bytes);
-  charge(bytes,rest.uv.size(),sizeof(std::array<float,2>),limits.maximum_bytes);charge(bytes,rest.indices.size(),sizeof(uint32_t),limits.maximum_bytes);
-  charge(bytes,rest.uv_pins.size()+rest.uv_seams.size(),1,limits.maximum_bytes);
- }
+ charge_pose(*plan,bytes,work,limits);
  auto layout=std::shared_ptr<TextureSetPackedGeometry>(new TextureSetPackedGeometry);
  layout->bytes_=bytes;layout->work_=work;layout->object_=plan->object();layout->rest_=plan->geometry();layout->deformation_=plan->deformation();layout->membership_=plan->collection()->primary_domain();
  layout->posed_=layout->deformation_?std::make_shared<const Mesh>(layout->deformation_->preview(rest)):layout->rest_;stop(limits);

@@ -5149,6 +5149,9 @@ if(BUILD_TESTING)
   target_link_libraries(dome-sculpt-texture-set-source-export-test PRIVATE dome-sculpt-core)
   add_test(NAME dome-sculpt-texture-set-source-export COMMAND dome-sculpt-texture-set-source-export-test ${CMAKE_CURRENT_BINARY_DIR}/texture-set-source-export-output)
   set_tests_properties(dome-sculpt-texture-set-source-export PROPERTIES TIMEOUT 300)
+  add_test(NAME texture-set-retained-shapekeys COMMAND dome-sculpt-texture-set-source-export-test
+    --retained-shapes ${CMAKE_CURRENT_BINARY_DIR}/texture-set-retained-shapekeys)
+  set_tests_properties(texture-set-retained-shapekeys PROPERTIES TIMEOUT 300)
   add_test(NAME texture-set-prepared-recipe-references COMMAND dome-sculpt-texture-set-source-export-test --recipe-reference-remap)
   set_tests_properties(texture-set-prepared-recipe-references PROPERTIES TIMEOUT 300)
   add_test(NAME texture-set-retained-hdr-editable COMMAND dome-sculpt-texture-set-source-export-test

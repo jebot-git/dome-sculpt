@@ -12,7 +12,8 @@ bool adopt_polygon_surface_edit(Scene &,uint64_t,const PolygonView &,const Scene
 // A before-only material reference cannot hide a mismatched polygon/source.
 void validate_polygon_surface_model(bool mesh_active,const PaintedMesh *,
     const PolygonAuthority *,const SourceMaterialBindings *,
-    const DeformationState *,const CreatorAppearance *);
+    const DeformationState *,const CreatorAppearance *,bool retained_texture_set=false);
+bool retained_texture_set_shape_pose(const DeformationState *) noexcept;
 // Detached owning source for the first Move/Flip transfer boundary. It does
 // not attach a Paint, change a material or grant Scene39 publication authority.
 // Original native/frame IDs remain original; the polygon derivative has its

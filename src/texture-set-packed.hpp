@@ -20,6 +20,9 @@ public:
   std::span<const uint32_t>logical_corners()const noexcept{return corners_;}
   std::span<const Tangent>tangents()const noexcept{return tangents_;}
   bool has_source()const noexcept{return !source_previews_.empty();}
+  const std::shared_ptr<const PolygonSurfacePreview>&source_preview(size_t field)const{
+    return posed_previews_.empty()?source_previews_.at(field):posed_previews_.at(field);
+  }
   std::span<const Vec3>source_normals()const noexcept{return source_normals_;}
   std::span<const Tangent>source_tangents()const noexcept{return source_tangents_;}
   std::span<const std::array<float,2>>paint_coordinates()const noexcept{return paint_;}
@@ -43,6 +46,7 @@ private:
   std::vector<Vec3>source_normals_;
   std::vector<std::array<float,2>>paint_,normal_;
   std::vector<std::shared_ptr<const PolygonSurfacePreview>>source_previews_;
+  std::vector<std::shared_ptr<const PolygonSurfacePreview>>posed_previews_;
 };
 std::shared_ptr<const TextureSetPackedGeometry> prepare_texture_set_packed(
     const std::shared_ptr<const TextureSetSurfacePlan>&,const TextureSetLimits & = {});

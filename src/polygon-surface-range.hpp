@@ -21,8 +21,9 @@ inline void validate_polygon_range(const Mesh&mesh,const SurfaceRange&r,
   if(!r.texture_set_proof)throw std::invalid_argument("Native polygon Bake requires its retained texture-set range");
   packet->validate_bake_world(r.texture_set_proof->field().domain->triangles(),world,cancelled);
  }else packet->validate_world(world,1e-6,cancelled);
- const auto&source=*packet->attachment()->authored_geometry();
  if(r.texture_set_proof)r.texture_set_proof->authenticate(r);
+ const auto &source=r.texture_set_proof?*r.texture_set_proof->geometry_layout()->posed():
+                                       *packet->attachment()->authored_geometry();
  if(r.first>mesh.indices.size()||(r.texture_set_proof?r.count!=r.texture_set_proof->draw().count:r.count!=source.indices.size())||r.count>mesh.indices.size()-r.first||paint.size()!=(vertex_coordinates?mesh.positions.size():mesh.indices.size()))throw std::invalid_argument("Polygon range current corner dimensions differ from its owning field");
  if(renderer&&(!r.source_frame||r.canonical_frame||r.source_normal_only!=(packet->model()==PolygonSurfaceNormalModel::NativeNOnly)||normals.size()!=mesh.positions.size()||(!packet->tangents().empty()&&tangents.size()!=mesh.positions.size())||(!packet->normal_coordinates().empty()&&role_uv.size()!=mesh.positions.size())))throw std::invalid_argument("Polygon range omitted its actual before role streams");
  const auto same=[](Vec3 a,Vec3 b){return a.x==b.x&&a.y==b.y&&a.z==b.z;};

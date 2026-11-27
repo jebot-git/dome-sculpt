@@ -8,6 +8,7 @@
 #include "texture-set-paint-access.hpp"
 #include "texture-set-field-source.hpp"
 #include "polygon-surface-preview.hpp"
+#include "polygon-surface-owner.hpp"
 #include "dome/material-bindings.hpp"
 #include "dome/polygon-scene.hpp"
 #include <algorithm>
@@ -69,10 +70,18 @@ bool texture_set_editable_fields(const SculptObject &object) noexcept {
      std::all_of(object.texture_sets->additional().begin(),object.texture_sets->additional().end(),eligible));
 }
 bool texture_set_shape_editable(const SculptObject &object) noexcept {
- return object.texture_sets && !object.texture_sets->primary_source() &&
-        std::ranges::none_of(object.texture_sets->additional(),
-                            [](const auto &field) { return bool(field.source); }) &&
-        texture_set_editable_fields(object);
+ if(!object.texture_sets||!object.mesh_active||!object.painted||
+    (object.polygon&&object.polygon->colors))return false;
+ const auto eligible=[&](const PaintedMesh *paint,const CreatorAppearance *appearance,
+     const SourceMaterialBindings *binding,const TextureSetFieldSource *source){
+  if(source)return source->source_preview()&&retained_texture_set_shape_pose(object.deformation.get());
+  return plain(paint,appearance,binding)||native_texture_set_mtoon(paint,appearance,binding);
+ };
+ return eligible(object.painted.get(),object.appearance.get(),object.material_bindings.get(),
+                 object.texture_sets->primary_source().get())&&
+     std::ranges::all_of(object.texture_sets->additional(),[&](const auto &field){
+      return eligible(field.painted.get(),field.appearance.get(),field.material_bindings.get(),field.source.get());
+     });
 }
 bool bake_target_supported(const SculptObject &object) {
  if (!object.texture_sets) {
@@ -123,7 +132,13 @@ std::shared_ptr<const TextureSetSurfacePlan> prepare_texture_set_surface(const S
  if(corners>limits.maximum_corners||faces>limits.maximum_triangles)throw std::length_error("Texture-set surface geometry exceeds its declared bounds");
  const auto validate_field=[&](const TextureSetView&field){
   if(!field.painted)throw std::invalid_argument("Texture-set surface field has no actual paint owner");
-  if(field.source){if(o.deformation)throw std::invalid_argument("Retained texture-set fields require their actual posed before-frame adapter");field.source->authenticate_owner(field.source);field.source->validate_field(field,limits);if(!field.source->source_preview())throw std::invalid_argument("Retained texture-set field has no genuine before-role packet");}
+  if(field.source){
+   if(!retained_texture_set_shape_pose(o.deformation.get()))
+    throw std::invalid_argument("Retained texture-set fields require a source skin adapter for skeletal poses");
+   field.source->authenticate_owner(field.source);
+   field.source->validate_field(field,limits);
+   if(!field.source->source_preview())throw std::invalid_argument("Retained texture-set field has no genuine before-role packet");
+  }
   else if(!plain(field.painted.get(),field.appearance.get(),field.material_bindings.get())&&
           !native_texture_set_mtoon(field.painted.get(),field.appearance.get(),field.material_bindings.get()))
     throw std::invalid_argument("Texture-set complex frames need their complete corner-attribute surface adapter");

@@ -33,10 +33,11 @@ std::shared_ptr<const TextureSetRangeProof> prepare_texture_set_range(
  auto result=std::shared_ptr<TextureSetRangeProof>(new TextureSetRangeProof);result->plan_=std::move(plan);result->field_=field;result->layout_=std::move(layout);result->first_=first+result->draw().first;result->vertex_=vertex;
  if(view.source){
   const auto read=view.source->read_view(view);
+  const auto &preview=result->layout_->source_preview(field);
   if(render_only&&retained_material_grid(view)){
    TextureSetLimits limits;limits.cancelled=cancelled;size_t work=0;
-   result->maps_=PolygonSurfacePaintCodec::preview_retained_material(view,work,limits);
-  }else result->maps_=PolygonSurfacePaintCodec::preview(*read,view.material_bindings,view.material,cancelled,view.source->source_preview());
+   result->maps_=PolygonSurfacePaintCodec::preview_retained_material(view,work,limits,preview);
+  }else result->maps_=PolygonSurfacePaintCodec::preview(*read,view.material_bindings,view.material,cancelled,preview);
   if(!result->maps_||!result->maps_->polygon_surface||!result->maps_->polygon_surface->matches(view.material_bindings,read->paint_sampling_attachment())||result->layout_->canonical(field))throw std::invalid_argument("Retained texture-set range lost its actual source/current field packet");
  }else{
   const bool typed=native_texture_set_mtoon(view.painted.get(),view.appearance.get(),view.material_bindings.get());
@@ -73,7 +74,12 @@ void TextureSetRangeProof::authenticate(const SurfaceRange&r)const{
  if(field().source){
   field().source->authenticate_owner(field().source);field().source->validate_field(field(),{},false);
   const auto&packet=maps_->polygon_surface;const auto&binding=field().material_bindings;
-  if(!packet||r.material_bindings!=binding||r.material_bindings.owner_before(binding)||binding.owner_before(r.material_bindings)||!packet->matches(binding,r.paint_sampling_attachment)||!r.source_frame||r.source_normal_only!=(packet->model()==PolygonSurfaceNormalModel::NativeNOnly))throw std::invalid_argument("Retained texture-set range changed its actual source/before-role owners");
+  const auto &expected=layout_->source_preview(field_);
+  if(!packet||!expected||&packet->geometric_frames()!=&expected->geometric_frames()||
+     r.material_bindings!=binding||r.material_bindings.owner_before(binding)||binding.owner_before(r.material_bindings)||
+     !packet->matches(binding,r.paint_sampling_attachment)||!r.source_frame||
+     r.source_normal_only!=(packet->model()==PolygonSurfaceNormalModel::NativeNOnly))
+   throw std::invalid_argument("Retained texture-set range changed its actual source or posed frame owners");
  }else {
   const auto &binding=field().material_bindings;
   if(r.material_bindings!=binding||r.material_bindings.owner_before(binding)||binding.owner_before(r.material_bindings)||

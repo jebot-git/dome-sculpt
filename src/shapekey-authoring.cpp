@@ -135,16 +135,17 @@ ShapeKeyResult author_shapekey(Scene &scene,uint64_t object,const ShapeKeyEdit &
  std::string name=edit.action==ShapeKeyAction::Replace?keys.targets[slot].name:key_name(keys,edit.name);
  // Capturing a native32 frame is a distinct operation from its historical
  // writable UV basis. Preserve both real owners in a detached paired state.
- if(source.material_bindings&&source.material_bindings->native_paint_sampling&&!source.material_bindings->native_paint_frames){
+ if(!source.texture_sets&&source.material_bindings&&source.material_bindings->native_paint_sampling&&!source.material_bindings->native_paint_frames){
   auto captured=detail::capture_native_paint_frames(source,{128*1024*1024,128*1024*1024,cancelled});
   Scene paired=scene;auto &o=paired.object(object);const auto first=source.shape_source?source.shape_source:capture_polygon_origin(scene,object);
   auto b=std::make_shared<SourceMaterialBindings>(*source.material_bindings);b->native_paint_frames=captured;b->uv_origin=captured->origin();b->normal_frames=captured->frames();b->normal_frame=SourceMaterialNormalFrame::OriginalAttributes;b->validate();o.material_bindings=b;o.shape_source=first;
   auto result=detail::author_derived_normal_shapekey(paired,object,edit,cancelled);
   paired.object(object).shape_source=first;paired.validate();stop(cancelled);scene=std::move(paired);return result;
  }
- if(detail::needs_independent_key_domain(source,edit,cancelled))return detail::author_derived_normal_shapekey(scene,object,edit,cancelled);
+ if(!source.texture_sets&&detail::needs_independent_key_domain(source,edit,cancelled))
+  return detail::author_derived_normal_shapekey(scene,object,edit,cancelled);
  if(edit.action==ShapeKeyAction::Mirror&&edit.mirror_frames!=ShapeKeyMirrorFrames::VertexPositions&&(edit.mirror_plane!=0||edit.mirror_frames!=ShapeKeyMirrorFrames::ExactAuthored))throw std::invalid_argument("Explicit-plane frame conversion requires genuine owning native frame authority");
- if(source.material_bindings&&source.material_bindings->normal_preparation)
+ if(!source.texture_sets&&source.material_bindings&&source.material_bindings->normal_preparation)
   return detail::author_prepared_normal_shapekey(scene,object,edit,cancelled);
  auto deform=std::make_shared<DeformationState>(source.deformation?*source.deformation:DeformationState(rest));if(!deform->morphs)deform->morphs=MorphSet(rest);
  Scene next=scene;auto &o=next.object(object);
@@ -168,8 +169,8 @@ ShapeKeyResult author_shapekey(Scene &scene,uint64_t object,const ShapeKeyEdit &
  }else if(edit.action==ShapeKeyAction::Replace)positions=edit.positions;
  stop(cancelled);
  if(source.texture_sets){
-  // Native sets already evaluate one deformed mesh for all material fields.
-  // Keep every field's UV domain and paint authority on the original REST mesh.
+  // All material fields share one target while preserving their independent
+  // sampling and paint owners on the original rest mesh.
   deform->morphs->set_target(rest,name,positions);
   if(!replace&&!deform->morph_weights.empty())deform->morph_weights.push_back(0);
   deform->validate(rest);o.deformation=std::move(deform);next.validate();

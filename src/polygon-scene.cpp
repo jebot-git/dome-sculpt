@@ -16,6 +16,7 @@
 #include "source-placement-archive.hpp"
 #include "text-utf8.hpp"
 #include "texture-set-archive.hpp"
+#include "texture-set-field-source.hpp"
 #include "texture-set-source-preflight.hpp"
 #include "texture-set-recipe-wire.hpp"
 #include <map>
@@ -252,7 +253,8 @@ void PolygonSceneArchive::collect(std::shared_ptr<const PolygonAuthority> root,
                                 o->mesh_active);
     validate_polygon_surface_model(o->mesh_active, o->paint.get(),
                                    o->polygon.get(), o->material_bindings.get(),
-                                   o->deformation.get(), o->appearance.get());
+                                   o->deformation.get(), o->appearance.get(),
+                                   o->texture_sets&&o->texture_sets->primary_source());
     if (o->paint) {
       if (o->paint->in_stroke())
         throw std::invalid_argument("Polygon source has unfinished paint");
@@ -305,7 +307,14 @@ void PolygonSceneArchive::collect(std::shared_ptr<const PolygonAuthority> root,
     }
     // Preserve the specific color-authority diagnostics before checking
     // the additional normal/source pairing contract on this same holder.
-    source_paint_pairing(o->paint.get(), o->material_bindings.get(),
+    auto readable = o->paint;
+    if (o->texture_sets && o->texture_sets->primary_source()) {
+      const auto &source = o->texture_sets->primary_source();
+      const TextureSetView field{0, o->material.name, o->paint, o->material, o->appearance,
+          o->material_bindings, o->bake_recipe, o->texture_sets->primary_domain(), source};
+      readable = source->read_view(field);
+    }
+    source_paint_pairing(readable.get(), o->material_bindings.get(),
                          o->appearance.get(), validate_deep);
     if (o->retopology) {
       if (!o->retopology->source)

@@ -371,7 +371,9 @@ void Scene::validate(bool deep_sources) const {
           "Invalid scene object identity or unfinished stroke");
     name_valid(o.name);
     if(o.texture_sets)o.texture_sets->validate(o,deep_sources);
-    detail::validate_polygon_surface_model(o.mesh_active,o.painted.get(),o.polygon.get(),o.material_bindings.get(),o.deformation.get(),o.appearance.get());
+    detail::validate_polygon_surface_model(o.mesh_active,o.painted.get(),o.polygon.get(),
+        o.material_bindings.get(),o.deformation.get(),o.appearance.get(),
+        o.texture_sets&&o.texture_sets->primary_source());
 
     detail::require_polygon_paint_owner(o.painted.get(),o.polygon.get(),o.mesh_active);
     if(o.shape_source)polygons.add_origin(o.shape_source,deep_sources);

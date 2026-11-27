@@ -953,7 +953,9 @@ ExportBound export_bound(const ObjectSurface&input,const TextureSetLimits&limits
   if(input.deformation->morphs&&!input.deformation->morphs->targets.empty()){
    const size_t targets=input.deformation->morphs->targets.size();
    const bool tangents=std::ranges::any_of(plan->fields(),[](const auto &field){
-    return field.painted->baked()&&!field.painted->baked()->maps.normal.rgba.empty();
+    if(!field.source)return field.painted->baked()&&!field.painted->baked()->maps.normal.rgba.empty();
+    const auto &preview=field.source->source_preview();
+    return preview->native_bake()||preview->model()==PolygonSurfaceNormalModel::PreparedCorePbr;
    });
    charge(bytes,targets,sizeof(SourceMorphChannels),limits.maximum_bytes);
    charge(bytes,count,targets*(tangents?2:1)*sizeof(Vec3)+sizeof(uint32_t),limits.maximum_bytes);
@@ -961,6 +963,13 @@ ExportBound export_bound(const ObjectSurface&input,const TextureSetLimits&limits
    charge(bytes,rest.indices.size(),sizeof(uint32_t)+1+(tangents?2*sizeof(Tangent):0),limits.maximum_bytes);
    charge(work,rest.positions.size()+rest.indices.size(),targets*8,limits.maximum_work);
    if(tangents)charge(work,count,targets*32,limits.maximum_work);
+   for(const auto &field:plan->fields())if(field.source&&!field.domain->triangles().empty()){
+    const auto &preview=*field.source->source_preview();
+    // Endpoint frames/corners are scratch for one field at a time. The
+    // same bound above already accounts for these arrays during rest export.
+    charge(work,preview.geometric_frames().size(),targets*8,limits.maximum_work);
+    charge(work,preview.normals().size(),targets*192,limits.maximum_work);
+   }
   }
  }
  stop(limits);return {bytes,work};
@@ -1162,12 +1171,16 @@ TextureSetExport compile_texture_set_export(const ObjectSurface&input,const Text
  const auto frames=canonical_frames?tangent_corners(rest,limits.cancelled):std::vector<Tangent>{};
  using Signature=std::array<uint32_t,12>;std::map<Signature,uint32_t>vertices;std::vector<uint32_t>rest_vertices;
  std::vector<uint32_t>tangent_corners_by_vertex;
+ struct RetainedShapeRange {size_t field,first_vertex,output;bool reprojected;};
+ std::vector<RetainedShapeRange> retained_shapes;
  if(has_morphs&&canonical_frames)tangent_corners_by_vertex.reserve(count);
  auto&mesh=out.surface.mesh;mesh.indices.reserve(count);rest_vertices.reserve(std::min(count,rest.positions.size()));
  for(size_t f=0;f<plan->fields().size();++f){
   stop(limits);const auto&field=plan->fields()[f];const auto&draw=plan->draws()[f];if(!draw.count)continue;
   const bool canonical=!field.source&&field.painted->baked()&&!field.painted->baked()->maps.normal.rgba.empty();
   const auto portable=field.source?std::optional<PortableTextureSetField>(portable_texture_set_field(field,input.world_matrix(),work,limits)):std::nullopt;
+  if(portable&&has_morphs)
+   retained_shapes.push_back({f,mesh.positions.size(),out.fields.size(),portable->reprojected});
   normal|=canonical||(portable&&portable->normal_role);
   TextureSetExportField output;
   output.set=field.id;
@@ -1199,9 +1212,9 @@ TextureSetExport compile_texture_set_export(const ObjectSurface&input,const Text
    if((c&1023)==0)stop(limits);const auto logical=plan->logical_corners()[draw.first+c];const auto vertex=rest.indices.at(logical);
    const auto n=portable?portable->corners[c].normal:rest.normals.at(vertex);const auto paint=portable?portable->corners[c].paint:rest.uv.at(vertex);const auto role=portable?portable->corners[c].role:rest.uv.at(vertex);
    const Tangent tangent=portable?portable->corners[c].tangent:canonical?frames.at(logical):Tangent{1,0,0,1};Signature key{};key[0]=vertex;size_t k=1;for(float v:tangent)key[k++]=std::bit_cast<uint32_t>(v);for(float v:{n.x,n.y,n.z})key[k++]=std::bit_cast<uint32_t>(v);for(float v:paint)key[k++]=std::bit_cast<uint32_t>(v);for(float v:role)key[k++]=std::bit_cast<uint32_t>(v);
-   // Different pose tangents can meet at a shared REST vertex. Keep the
-   // logical corners of normal-mapped fields distinct through morph export.
-   const bool distinct=canonical&&has_morphs;
+   // Independent retained frames can diverge at a shared rest vertex.
+   // Preserve all logical corners needed to represent endpoint directions.
+   const bool distinct=(canonical||portable.has_value())&&has_morphs;
    auto found=distinct?vertices.end():vertices.find(key);uint32_t id;
    if(found!=vertices.end())id=found->second;
    else{
@@ -1222,14 +1235,38 @@ TextureSetExport compile_texture_set_export(const ObjectSurface&input,const Text
    auto &channels=out.morph_channels.emplace_back();
    channels.normals.reserve(rest_vertices.size());
    const auto shaped_tangents=canonical_frames?tangent_corners(shaped,limits.cancelled):std::vector<Tangent>{};
-   if(canonical_frames)channels.tangents.resize(rest_vertices.size());
+   if(normal)channels.tangents.resize(rest_vertices.size());
+   const auto write_tangent=[&](size_t vertex,const Tangent &to){
+    const auto &from=out.tangents[vertex];
+    if(from[3]!=to[3])
+     throw std::invalid_argument("A shape changes a baked normal's tangent handedness; glTF morphs cannot encode that sign");
+    channels.tangents[vertex]={to[0]-from[0],to[1]-from[1],to[2]-from[2]};
+   };
    for(size_t v=0;v<rest_vertices.size();++v){
     if((v&1023)==0)stop(limits);
     channels.normals.push_back(shaped.normals[rest_vertices[v]]-mesh.normals[v]);
     if(!canonical_frames||tangent_corners_by_vertex[v]==UINT32_MAX)continue;
-    const auto &from=out.tangents[v], &to=shaped_tangents.at(tangent_corners_by_vertex[v]);
-    if(from[3]!=to[3])throw std::invalid_argument("A shape changes a baked normal's tangent handedness; glTF morphs cannot encode that sign");
-    channels.tangents[v]={to[0]-from[0],to[1]-from[1],to[2]-from[2]};
+    write_tangent(v,shaped_tangents.at(tangent_corners_by_vertex[v]));
+   }
+   for(const auto &range:retained_shapes){
+    const auto &field=plan->fields()[range.field];
+    const auto &original=field.source->source_preview();
+    const auto triangles=field.domain->triangles();
+    const auto current=original->with_geometry(plan->geometry(),shaped,triangles,limits.cancelled);
+    if(current==original){
+     std::fill_n(channels.normals.begin()+range.first_vertex,triangles.size()*3,Vec3{});
+     continue;
+    }
+    const auto &output=out.fields[range.output];
+    const auto coordinates=std::span(out.normal_coordinates).subspan(range.first_vertex,output.count);
+    const auto corners=portable_texture_set_shape(*current,triangles,input.world_matrix(),
+        coordinates,output.textures,range.reprojected,work,limits);
+    for(size_t c=0;c<corners.size();++c){
+     if((c&1023)==0)stop(limits);
+     const auto v=range.first_vertex+c;
+     channels.normals[v]=corners[c].normal-mesh.normals[v];
+     if(output.normal_role)write_tangent(v,corners[c].tangent);
+    }
    }
   }
  }

@@ -6,6 +6,7 @@
 #include "dome/normal-preparation.hpp"
 #include "dome/polygon-authoring.hpp"
 #include "dome/render.hpp"
+#include "dome/rig-edit.hpp"
 #include "dome/source-placement.hpp"
 #include "dome/texture-sets.hpp"
 #include "graphics.h"
@@ -91,16 +92,17 @@ void verify_streams(const Fixture&f,const MeshSnapshot&s,bool prepared,bool refl
   check(seen[0]&&seen[1],"Selecting the additional source never removes the primary field");
 }
 enum class Appearance{Normal,RedGreen,RedBlue};
-json verify_pixels(const Pixels&p,bool prepared,bool flip,const World&w,Appearance mode,bool ghost=false,bool cull_additional=false){
-  const auto expected=triangles(flip,w);std::array<size_t,2> count{};size_t outside=0,culled=0;int maximum=0,normal_counter=0,uv_counter=0,frame_counter=0,member_counter=0;
+json verify_pixels(const Pixels&p,bool prepared,bool flip,const World&w,Appearance mode,bool ghost=false,bool cull_additional=false,const std::array<double,2>&shape={}){
+  const auto expected=triangles(flip,w,shape);std::array<size_t,2> count{};size_t outside=0,culled=0;int maximum=0,normal_counter=0,uv_counter=0,frame_counter=0,member_counter=0,stale_counter=0;
   for(int y=0;y<side;++y)for(int x=0;x<side;++x){const double wx=((x+.5)*2/side-1)/projection_scale,wy=((y+.5)*2/side-1)/projection_scale;const auto off=size_t(y*side+x)*4;bool near=false,interior=false;
     for(const auto&t:expected){const auto b=barycentric(t,wx,wy);const auto minimum=*std::min_element(b.begin(),b.end());if(minimum>=-.04)near=true;if(minimum<.12)continue;if(interior)throw std::runtime_error("Independent source triangle interiors overlap");interior=true;++count[t.set];
       std::array<int,4> wanted{};
       if(cull_additional&&t.set==1&&flip){++culled;}
-      else if(mode==Appearance::Normal){V point{};for(size_t k=0;k<3;++k)point=point+t.p[k]*b[k];wanted=finish(specular(source_oracle::normal(t.set,b,prepared,flip,w),point),ghost);
-        const auto wrong_n=finish(specular(source_oracle::normal(t.set,b,prepared,flip,w,false,true),point),ghost),wrong_frame=finish(specular(source_oracle::normal(t.set,b,prepared,flip,w,false,false,true),point),ghost);
-        for(size_t k=0;k<3;++k){normal_counter=std::max(normal_counter,std::abs(wanted[k]-wrong_n[k]));frame_counter=std::max(frame_counter,std::abs(wanted[k]-wrong_frame[k]));}
-        if(prepared){const auto wrong=finish(specular(source_oracle::normal(t.set,b,true,flip,w,true),point),ghost);for(size_t k=0;k<3;++k)uv_counter=std::max(uv_counter,std::abs(wanted[k]-wrong[k]));}
+      else if(mode==Appearance::Normal){V point{};for(size_t k=0;k<3;++k)point=point+t.p[k]*b[k];wanted=finish(specular(source_oracle::normal(t.set,b,prepared,flip,w,false,false,false,shape),point),ghost);
+        const auto wrong_n=finish(specular(source_oracle::normal(t.set,b,prepared,flip,w,false,true,false,shape),point),ghost),wrong_frame=finish(specular(source_oracle::normal(t.set,b,prepared,flip,w,false,false,true,shape),point),ghost);
+        const auto stale=finish(specular(source_oracle::normal(t.set,b,prepared,flip,w),point),ghost);
+        for(size_t k=0;k<3;++k){normal_counter=std::max(normal_counter,std::abs(wanted[k]-wrong_n[k]));frame_counter=std::max(frame_counter,std::abs(wanted[k]-wrong_frame[k]));stale_counter=std::max(stale_counter,std::abs(wanted[k]-stale[k]));}
+        if(prepared){const auto wrong=finish(specular(source_oracle::normal(t.set,b,true,flip,w,true,false,false,shape),point),ghost);for(size_t k=0;k<3;++k)uv_counter=std::max(uv_counter,std::abs(wanted[k]-wrong[k]));}
       }else{
         const V color=t.set==0?V{1,0,0}:mode==Appearance::RedGreen?V{0,1,0}:V{0,0,1};wanted=finish(color,ghost);const auto wrong=finish(t.set==0?(mode==Appearance::RedGreen?V{0,1,0}:V{0,0,1}):V{1,0,0},ghost);for(size_t k=0;k<3;++k)member_counter=std::max(member_counter,std::abs(wanted[k]-wrong[k]));
       }
@@ -109,10 +111,45 @@ json verify_pixels(const Pixels&p,bool prepared,bool flip,const World&w,Appearan
     if(!near){++outside;if(p[off+3])throw std::runtime_error("Sourceful silhouette outside authored geometry");}
   }
   check(count[0]>400&&count[1]>400&&outside>side*side/2,"Both genuine source fields have substantial independent pixel interiors and background");
-  if(mode==Appearance::Normal){check(normal_counter>=6,"Independent normal oracle rejects edited-geometric-only shading");check(frame_counter>=6,"Independent field oracle rejects borrowing sibling geometric transport rows");if(prepared)check(uv_counter>=6,"Asymmetric normal oracle rejects current UV0 in place of original role coordinates");}
+  if(mode==Appearance::Normal&&shape==std::array<double,2>{}){check(normal_counter>=6,"Independent normal oracle rejects edited-geometric-only shading");check(frame_counter>=6,"Independent field oracle rejects borrowing sibling geometric transport rows");if(prepared)check(uv_counter>=6,"Asymmetric normal oracle rejects current UV0 in place of original role coordinates");}
+  else if(mode==Appearance::Normal)check(stale_counter>=6,"Independent shape oracle detects reuse of stale REST primitive frames");
   else check(member_counter>=40,"Independent paint oracle rejects swapped same-object material bindings");
   if(cull_additional&&flip)check(culled>400,"Additional-only backface cull retains a real independent blank mask");
-  return{{"primary_pixels",count[0]},{"additional_pixels",count[1]},{"background_pixels",outside},{"culled_pixels",culled},{"maximum_byte_error",maximum},{"wrong_normal_counter",normal_counter},{"wrong_role_uv_counter",uv_counter},{"wrong_sibling_frame_counter",frame_counter},{"wrong_member_paint_counter",member_counter}};
+  return{{"primary_pixels",count[0]},{"additional_pixels",count[1]},{"background_pixels",outside},{"culled_pixels",culled},{"maximum_byte_error",maximum},{"wrong_normal_counter",normal_counter},{"wrong_role_uv_counter",uv_counter},{"wrong_sibling_frame_counter",frame_counter},{"wrong_member_paint_counter",member_counter},{"stale_frame_counter",stale_counter}};
+}
+json verify_shape(Document &doc,SurfaceRenderer &renderer,Fbo &target,bool prepared,bool reflected,
+                  bool flip,const Pixels &rest,const std::filesystem::path &out){
+ constexpr std::array<double,2> delta{-.31,.52};
+ const auto original=doc.copy_scene();
+ const auto id=original.active().id;
+ ShapeKeyEdit create;create.name="Change retained triangle frames";
+ doc.author_shape(create);ready(doc);
+ ShapeKeyEdit replace;replace.action=ShapeKeyAction::Replace;
+ replace.positions=original.active().painted->mesh().positions;
+ for(unsigned i:{2u,5u}){
+  const auto old=vec(edited(i));
+  const auto at=std::find_if(replace.positions.begin(),replace.positions.end(),[&](Vec3 p){return length(p-old)<1e-6f;});
+  check(at!=replace.positions.end(),"Shapekey locates an independently authored triangle corner");
+  *at=vec(shaped(i,delta));
+ }
+ doc.author_shape(replace);ready(doc);
+ doc.edit_scene("Show retained shape",[=](Scene &scene,const auto &cancelled){
+  RigEdit edit;edit.morph=MorphWeightEdit{0,1};edit_rig(scene,id,edit,cancelled);
+ });
+ ready(doc);
+ const auto posed=doc.frame().surface;
+ const auto pixels=render(renderer,posed,target);
+ const auto metrics=verify_pixels(pixels,prepared,flip,World{reflected},Appearance::Normal,false,false,delta);
+ png(out,pixels);
+ check(render(renderer,posed,target)==pixels,"Second eye renders precisely the same retained morph");
+ check(doc.undo(),"Preview weight has an independent Undo");ready(doc);
+ check(render(renderer,doc.frame().surface,target)==rest,"Zero morph weight renders the exact rest field again");
+ check(doc.redo(),"Preview weight has an independent Redo");ready(doc);
+ check(render(renderer,doc.frame().surface,target)==pixels,"Redo rebuilds the exact posed primitive frames");
+ ShapeKeyEdit restore;restore.action=ShapeKeyAction::Restore;
+ doc.author_shape(restore);ready(doc);
+ check(doc.copy_scene().encode()==original.encode(),"Rendered shapekey Restore preserves the complete retained source");
+ return metrics;
 }
 void paint_member(Scene&scene,TextureSetId set,std::array<float,4>color){
   check(edit_texture_set(scene,scene.active().id,set,[&](PaintedMesh&paint,Material&material){material.unlit=true;material.alpha=Material::AlphaMode::Opaque;material.double_sided=true;paint.add_layer("Independent member color");PaintSettings ink;ink.front_only=false;ink.channel=PaintChannel::Color;ink.color=color;Brush brush;brush.from=brush.to={};brush.normal={0,0,1};brush.radius=5;brush.strength=1;paint.begin_stroke();for(size_t i=0;i<32;++i)paint.stamp(brush,ink);return paint.end_stroke();}),"Actual sourceful field receives a finished saturated native color layer");
@@ -136,7 +173,8 @@ int main(int argc,char**argv)try{
     auto ghost_display=policy(changed,true);auto ghost_pixels=render(renderer,blue,target,ghost_display);auto ghost_metric=verify_pixels(ghost_pixels,prepared,flip,world,Appearance::RedBlue,true);png(out/(name+"-ghost.png"),ghost_pixels);state_contract();
     auto culling=painted.snapshot();check(edit_texture_set(culling,f.object,1,[](PaintedMesh&,Material&m){m.double_sided=false;return true;}),"Actual additional material alone changes cull policy");Document cull;cull.replace(culling);ready(cull);auto culled_pixels=render(renderer,cull.frame().surface,target);auto cull_metric=verify_pixels(culled_pixels,prepared,flip,world,Appearance::RedBlue,false,true);png(out/(name+"-additional-cull.png"),culled_pixels);state_contract();check(render(renderer,blue,target)==blue_pixels&&render(renderer,base,target)==normal_pixels,"Opaque and normal fields recover exact state after ghost/additional-only cull");
     const auto wire=painted.encode();Document reopened;reopened.replace(Scene::decode(wire));ready(reopened);check(render(renderer,reopened.frame().surface,target)==blue_pixels&&reopened.copy_scene().encode()==wire,"Edited sourceful FLOAT/paint/normal fields roundtrip with exact pixels and native state");check(doc.copy_scene().encode()==exact&&f.scene.encode()==exact,"All GPU/read/negative controls preserve the complete original sourceful Scene");
-    evidence.push_back({{"case",name},{"normal",normal_metric},{"canvas",canvas_metric},{"held",held_metric},{"red_green",green_metric},{"red_blue",blue_metric},{"ghost",ghost_metric},{"additional_cull",cull_metric}});
+    const auto pose_metric=verify_shape(doc,renderer,target,prepared,reflected,flip,normal_pixels,out/(name+"-shaped.png"));
+    evidence.push_back({{"case",name},{"normal",normal_metric},{"canvas",canvas_metric},{"held",held_metric},{"red_green",green_metric},{"red_blue",blue_metric},{"ghost",ghost_metric},{"additional_cull",cull_metric},{"shaped",pose_metric}});
   }
   std::ofstream report(out/"oracle.json");report<<json{{"scope","independent actual sourceful same-object39+40 appearance"},{"checks",checks},{"cases",evidence}}.dump(2)<<'\n';check(bool(report),"Independent sourceful per-pixel metrics saved");std::cout<<"PASS "<<checks<<" actual sourceful same-object field appearance controls\n";return 0;
 }catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

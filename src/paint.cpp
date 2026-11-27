@@ -1734,7 +1734,8 @@ std::shared_ptr<const TextureMaps> detail::PolygonSurfacePaintCodec::preview(con
   return maps;
 }
 std::shared_ptr<TextureMaps> detail::PolygonSurfacePaintCodec::preview_retained_material(
-    const TextureSetView&field,size_t &work,const TextureSetLimits&limits) {
+    const TextureSetView&field,size_t &work,const TextureSetLimits&limits,
+    std::shared_ptr<const PolygonSurfacePreview> cached) {
   limits.validate();
   paint_compute::checkpoint(limits.cancelled);
   if(!retained_material_grid(field))
@@ -1742,7 +1743,7 @@ std::shared_ptr<TextureMaps> detail::PolygonSurfacePaintCodec::preview_retained_
   field.source->authenticate_owner(field.source);
   const auto paint=field.source->read_view(field,limits);
   const auto &binding=field.material_bindings;
-  const auto &cached=field.source->source_preview();
+  if(!cached)cached=field.source->source_preview();
   binding->validate();
   binding->polygon_surface_transfer->validate_current(*paint);
   field.material.validate();

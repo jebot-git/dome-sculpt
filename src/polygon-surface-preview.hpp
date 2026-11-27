@@ -24,6 +24,12 @@ public:
  std::shared_ptr<const PolygonSurfacePreview> with_bake(const PaintedMesh &)const;
  std::shared_ptr<const PolygonSurfacePreview> with_bake(
      const PaintedMesh &,std::shared_ptr<const Image>)const;
+ // A transient posed view. The original corner inputs, sampling attachment,
+ // material maps and all before frames retain their exact owners.
+ std::shared_ptr<const PolygonSurfacePreview> with_geometry(
+     const std::shared_ptr<const Mesh> &rest,const Mesh &posed,
+     std::span<const uint32_t> triangles,
+     const std::function<bool()> &cancelled={})const;
  Vec3 sample_native_bake(size_t,std::array<double,3>,const AffineTransform &)const;
  // Explicit image-space lookup used by export at raster centers and gutters.
  // The barycentrics still address the genuine triangle frame.
@@ -46,7 +52,8 @@ public:
  PolygonSurfaceNormalModel model()const noexcept{return model_;}
  // Four RGBA texels/triangle: before N+geometric-W, before T, current N+W,
  // current T. These are GEOMETRIC frames, not extra artist attributes/UVs.
- const auto &geometric_frames()const noexcept{return streams_->frames;}
+ const auto &geometric_frames()const noexcept{return posed_frames_?*posed_frames_:streams_->frames;}
+ const auto &posed_frame_owner()const noexcept{return posed_frames_;}
  std::vector<std::array<std::array<float,4>,4>> placed_frames(const AffineTransform &,
      const std::function<bool()> &cancelled={})const;
  // Certifies complete BEFORE role-basis interpolation, not sampled points.
@@ -77,8 +84,10 @@ private:
    std::vector<Vec3> normals;
    std::vector<std::array<float,4>> tangents;
    std::vector<std::array<float,2>> paint, normal;
+   std::vector<std::array<uint8_t,3>> native_frame_charts;
    std::vector<std::array<std::array<float,4>,4>> frames;
  };
  std::shared_ptr<const Streams> streams_;
+ std::shared_ptr<const std::vector<std::array<std::array<float,4>,4>>> posed_frames_;
 };
 } // namespace dome::detail
