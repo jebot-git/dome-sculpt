@@ -813,6 +813,10 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
         replace_role(MToonSlot::Base,paint->color);
         params.base_color={1,1,1,1};
       }
+      if(paint->shade){
+        replace_role(MToonSlot::Shade,paint->shade);
+        params.shade_color={1,1,1};
+      }
       if(paint->emission){
         replace_role(MToonSlot::Emission,paint->emission);
         params.emission={1,1,1};
@@ -839,6 +843,11 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
           {"maximumAlphaError",paint->alpha_error},
           {"maximumLinearEmissionError",paint->emission_error},
           {"emissiveStrength",params.emission_strength}};
+      if(paint->shade){
+        auto &bounds=output["extras"]["domeSculptMToonPaint"];
+        bounds["maximumLinearShadeError"]=paint->shade_error;
+        bounds["maximumShadeInterpolationError"]=paint->shade_interpolation_error;
+      }
     }
     if(!collect_extensions(collect_extensions,output))
       throw std::logic_error("MToon material writing introduced an unknown extension");

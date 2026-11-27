@@ -23,9 +23,10 @@ size_t checks=0;
 void check(bool yes,const char*s){if(!yes)throw std::runtime_error(s);++checks;}
 template<class F>void refuses(F&&f,const char*s){bool caught=false;try{f();}catch(const std::exception&e){caught=true;std::cout<<"EXPECTED "<<e.what()<<'\n';}check(caught,s);}
 std::vector<uint8_t>bytes(const std::filesystem::path&p){std::ifstream f(p,std::ios::binary);if(!f)throw std::runtime_error("Missing actual export file");return {std::istreambuf_iterator<char>(f),{}};}
-Scene fixture(bool empty=false,uint32_t resolution=64){
+Scene fixture(bool empty=false,uint32_t resolution=64,uint32_t primary_resolution=0){
  Mesh m;m.positions={{-.8f,-.8f,0},{.8f,-.8f,0},{0,.8f,0},{-.8f,-.8f,.5f},{.8f,-.8f,.5f},{0,.8f,.5f}};m.normals.assign(6,{0,0,1});m.uv={{{.1f,.1f}},{{.9f,.1f}},{{.5f,.9f}},{{.1f,.1f}},{{.9f,.1f}},{{.5f,.9f}}};m.indices={0,1,2,3,4,5};
  Scene s;std::vector<TextureSetInitialField>fields(empty?3:2);for(auto&f:fields){f.resolution=resolution;f.material.double_sided=true;}for(size_t f=0;f<fields.size();++f)fields[f].material.name="Material "+std::to_string(f);
+ if(primary_resolution)fields[0].resolution=primary_resolution;
  fields.back().material.color={.1f,.7f,.3f,.6f};fields.back().material.alpha=Material::AlphaMode::Mask;fields.back().material.alpha_cutoff=.3f;
  initialize_texture_sets(s,s.active().id,m,fields,std::array<TextureSetId,2>{empty?1u:0u,empty?2u:1u});
  DeformationState d(m);Skeleton rig;Bone bone;bone.name="Actual joint";bone.rest.translation={.1f,.2f,.3f};rig.bones.push_back(bone);d.skeleton=rig;d.skin=SkinWeights{};d.skin->vertices.assign(6,VertexWeights{{0,1}});d.pose={bone.rest};d.pose[0].translation.x+=.2f;
@@ -193,6 +194,55 @@ void mtoon_painted_authoring(){
  refuses([&]{doc.export_asset("painted-mtoon-standard.glb",AssetExportFormat::Glb).get();},
          "An unsupported quantized cutoff crossing fails before publishing");
  check(bytes("painted-mtoon-standard.glb")==standard,"The cutoff refusal preserves the complete earlier GLB");
+}
+void mtoon_shared_shade_authoring(){
+ auto scene=fixture();
+ mtoon_paint_fixture::author(scene,1,{0,-.08f,.5f},false,mtoon_paint_fixture::Background::SharedShade);
+ auto field=texture_set_view(scene.active(),1);
+ const auto base=size_t(MToonSlot::Base),shade=size_t(MToonSlot::Shade);
+ check(field.material_bindings->roles[base].image==field.material_bindings->roles[shade].image,
+       "The source base and shade are the same immutable image");
+ const auto exact=scene.encode();
+ Document doc;
+ doc.replace(scene);
+ check(doc.wait_mesh()&&doc.frame().state->error.empty(),"The shared shade scene publishes a painted material");
+ doc.export_asset("shared-shade-standard.glb",AssetExportFormat::Glb).get();
+ doc.export_asset("shared-shade-editable.glb",AssetExportFormat::EditableGlb256).get();
+ consumer("shared-shade-standard.glb",2);
+ consumer("shared-shade-editable.glb",2);
+ const auto standard=bytes("shared-shade-standard.glb");
+ const auto replay=extract_native_authoring(bytes("shared-shade-editable.glb"));
+ check(replay&&replay->encode()==exact,"Editable GLB keeps the source alias and all native layers");
+ const auto portable=detail::make_gltf(scene.export_surfaces());
+ const auto &toon=portable.json.at("materials").at(1);
+ const auto &bounds=toon.at("extras").at("domeSculptMToonPaint");
+ const auto limits=bounds.at("maximumLinearShadeError").get<double>();
+ check(limits>0&&limits<=.005&&bounds.at("maximumShadeInterpolationError").get<double>()>0,
+       "The export measures a real shade clamp transition between texels");
+ const auto decoded=MToonMaterial::from_vrm1(toon,portable.json.at("textures").size());
+ check(decoded.textures[base].index>=0&&decoded.textures[shade].index>=0&&
+       decoded.textures[base].index!=decoded.textures[shade].index&&
+       decoded.textures[shade].offset==std::array<float,2>{},
+       "The portable shade receives its own painted texture and current UV sampler");
+ auto exceeded=*field.material_bindings;
+ exceeded.material.parameters.shade_color={1,1,1};
+ check(bind_texture_set_mtoon(scene,scene.active().id,1,exceeded),"The refusal control has a real authored high shade factor");
+ doc.replace(std::move(scene));
+ check(doc.wait_mesh(),"The high shade factor remains valid in the native viewport");
+ refuses([&]{doc.export_asset("shared-shade-standard.glb",AssetExportFormat::Glb).get();},
+         "The portable shade refuses a value above its normalized range");
+ check(bytes("shared-shade-standard.glb")==standard,"The refused shade composition preserves the previous output");
+
+ auto larger=fixture(false,512,64);
+ mtoon_paint_fixture::author(larger,1,{0,-.08f,.5f},false,mtoon_paint_fixture::Background::SharedShade);
+ const auto exact_larger=larger.encode();
+ doc.replace(std::move(larger));
+ check(doc.wait_mesh()&&doc.frame().state->error.empty(),"A 512-square shared shade publishes beside the 64-square PBR field");
+ doc.export_asset("shared-shade-512-standard.glb",AssetExportFormat::Glb).get();
+ doc.export_asset("shared-shade-512-editable.glb",AssetExportFormat::EditableGlb256).get();
+ consumer("shared-shade-512-standard.glb",2);
+ const auto larger_editable=extract_native_authoring(bytes("shared-shade-512-editable.glb"));
+ check(larger_editable&&larger_editable->encode()==exact_larger,"The larger texture set retains exact native paint at the original resolution");
 }
 void editable_hdr(){
  auto scene=fixture();
@@ -500,4 +550,4 @@ void production_baked_hdr(){
  }
 }
 }
-int main(int argc,char**argv)try{if(argc>1){std::filesystem::create_directories(argv[1]);std::filesystem::current_path(argv[1]);}portable();authoring();mtoon_authoring();mtoon_painted_authoring();editable_hdr();authority();production_hdr();production_baked_hdr();std::cout<<"PASS "<<checks<<" texture-set multi-primitive export controls\n";return 0;}catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
+int main(int argc,char**argv)try{if(argc>1){std::filesystem::create_directories(argv[1]);std::filesystem::current_path(argv[1]);}portable();authoring();mtoon_authoring();mtoon_painted_authoring();mtoon_shared_shade_authoring();editable_hdr();authority();production_hdr();production_baked_hdr();std::cout<<"PASS "<<checks<<" texture-set multi-primitive export controls\n";return 0;}catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

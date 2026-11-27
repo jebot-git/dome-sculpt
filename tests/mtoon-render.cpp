@@ -87,7 +87,10 @@ void native_texture_sets(SurfaceRenderer &renderer){
        "Core PBR preview switches only the typed range's visible result");
  check(doc.copy_scene().encode()==scene.encode(),"Preview selection preserves exact authored MToon data");
 }
-void painted_texture_sets(SurfaceRenderer &renderer,const std::filesystem::path &output,bool uniform_roles){
+void painted_texture_sets(SurfaceRenderer &renderer,const std::filesystem::path &output,
+                          mtoon_paint_fixture::Background background){
+ using mtoon_paint_fixture::Background;
+ const bool shared=background==Background::SharedShade;
  std::filesystem::create_directories(output);
  Scene scene;
  std::array<TextureSetInitialField,2> fields;
@@ -95,7 +98,7 @@ void painted_texture_sets(SurfaceRenderer &renderer,const std::filesystem::path 
  fields[0].material.color={0,0,1,1};
  initialize_texture_sets(scene,scene.active().id,set_triangles(),fields,
                          std::array<TextureSetId,2>{0,1});
- mtoon_paint_fixture::author(scene,1,{.44f,-.19f,0},false,uniform_roles);
+ mtoon_paint_fixture::author(scene,1,{.44f,-.19f,0},false,background);
  Document document;
  document.replace(scene);
  check(document.wait_mesh()&&document.frame().state->error.empty(),
@@ -103,7 +106,8 @@ void painted_texture_sets(SurfaceRenderer &renderer,const std::filesystem::path 
  const auto frame=document.frame().surface;
  const auto native=draw(renderer,frame);
 
- const auto path=output/(uniform_roles?"rendered-uniform-painted-mtoon.glb":"rendered-painted-mtoon.glb");
+ const auto path=output/(shared?"rendered-shared-shade-mtoon.glb":
+     background==Background::Uniform?"rendered-uniform-painted-mtoon.glb":"rendered-painted-mtoon.glb");
  export_glb(scene.export_surfaces(),path);
  std::ifstream file(path,std::ios::binary);
  const std::vector<uint8_t> bytes(std::istreambuf_iterator<char>{file},{});
@@ -132,8 +136,8 @@ void painted_texture_sets(SurfaceRenderer &renderer,const std::filesystem::path 
  }
  check(binding.roles[size_t(MToonSlot::Base)].image->width==64&&
        binding.roles[size_t(MToonSlot::Emission)].image->width==64&&
-       binding.roles[size_t(MToonSlot::Shade)].image->width==2,
-       "The independent file read yields generated base and glow images and the original shade image");
+       binding.roles[size_t(MToonSlot::Shade)].image->width==(shared?64u:2u),
+       "The independent file read resolves base, glow and the actual shade image");
  check(binding.material.textures[size_t(MToonSlot::Base)].offset==std::array<float,2>{},
        "A generated paint grid uses its current UVs and clamp sampler without the old transform");
  auto portable=std::make_shared<MeshSnapshot>();
@@ -153,10 +157,21 @@ void painted_texture_sets(SurfaceRenderer &renderer,const std::filesystem::path 
   if(x>66&&x<72&&y>31&&y<40)masked+=expect[3]==0;
   for(size_t c=0;c<3;++c)error=std::max(error,std::abs(expect[c]-actual[c]));
  }
- std::cout<<"PAINTED_MTOON uniform_roles="<<uniform_roles<<" visible="<<visible<<" hole_probes="<<masked
+ std::cout<<"PAINTED_MTOON background="<<int(background)<<" visible="<<visible<<" hole_probes="<<masked
           <<" max_rgb="<<error<<" alpha_differences="<<alpha_differences<<'\n';
  check(visible>700&&masked>10,"The fixture visibly exercises unpainted surface and a painted cutout");
  check(!alpha_differences&&error<=3,"OpenGL output from the parsed GLB agrees at painted, filtered and masked pixels");
+ if(shared){
+  auto untouched=std::make_shared<MeshSnapshot>(*portable);
+  auto alternate=std::make_shared<SourceMaterialBindings>(*portable->ranges.back().material_bindings);
+  const auto source=texture_set_view(scene.active(),1).material_bindings;
+  const auto shade=size_t(MToonSlot::Shade);
+  alternate->roles[shade]=source->roles[shade];
+  alternate->material.parameters.shade_color=source->material.parameters.shade_color;
+  untouched->ranges.back().material_bindings=std::move(alternate);
+  check(delta(draw(renderer,untouched),pixels)>8,
+        "The painted shade changes visible shadow pixels compared with the original shade alone");
+ }
  MaterialSurfaceQuery imported(portable->mesh,portable->ranges);
  size_t rays=0;
  for(float y:{-.5f,-.35f,-.2f,.05f,.22f})for(float x:{.26f,.34f,.42f,.5f,.58f,.66f,.74f}){
@@ -173,8 +188,9 @@ int main(int argc,char**argv)try{
  if(argc>=2&&std::string(argv[1])=="--texture-sets"){Fbo test;SurfaceRenderer renderer;native_texture_sets(renderer);std::cout<<"PASS "<<checks<<" native MToon texture-set graphics checks\n";return 0;}
  if(argc==3&&std::string(argv[1])=="--painted-texture-sets"){
   Fbo test;SurfaceRenderer renderer;
-  painted_texture_sets(renderer,argv[2],false);
-  painted_texture_sets(renderer,argv[2],true);
+  using mtoon_paint_fixture::Background;
+  for(auto background:{Background::Default,Background::Uniform,Background::SharedShade})
+   painted_texture_sets(renderer,argv[2],background);
   std::cout<<"PASS "<<checks<<" painted MToon texture-set graphics checks\n";
   return 0;
  }

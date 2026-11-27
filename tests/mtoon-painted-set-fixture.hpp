@@ -4,8 +4,9 @@
 #include "dome/texture-sets.hpp"
 
 namespace mtoon_paint_fixture {
+enum class Background { Default, Uniform, SharedShade };
 inline void author(dome::Scene &scene,dome::TextureSetId set,dome::Vec3 center,
-                   bool unsafe_mask=false,bool uniform_roles=false){
+                   bool unsafe_mask=false,Background background=Background::Default){
  using namespace dome;
  const auto object=scene.active().id;
  const auto change=[&](PaintedMesh &paint,Material &material){
@@ -52,6 +53,7 @@ inline void author(dome::Scene &scene,dome::TextureSetId set,dome::Vec3 center,
        {"specVersion","1.0"},{"shadeColorFactor",{.12f,.08f,.16f}},
        {"shadeMultiplyTexture",{{"index",0}}}}}}}
  };
+ const bool uniform_roles=background!=Background::Default;
  if(uniform_roles){
   source["pbrMetallicRoughness"]["baseColorTexture"]={{"index",1},
       {"extensions",{{"KHR_texture_transform",{{"offset",{.17f,.35f}}}}}}};
@@ -61,11 +63,16 @@ inline void author(dome::Scene &scene,dome::TextureSetId set,dome::Vec3 center,
   material.roles[size_t(MToonSlot::Emission)].image=
       std::make_shared<const Image>(Image{1,1,{75,180,112,255}});
  }
+ auto &shade=material.roles[size_t(MToonSlot::Shade)];
+ if(background==Background::SharedShade){
+  auto &toon=source["extensions"]["VRMC_materials_mtoon"];
+  toon["shadeMultiplyTexture"]=source["pbrMetallicRoughness"]["baseColorTexture"];
+  toon["shadingShiftFactor"]=-.8f;
+  shade=material.roles[size_t(MToonSlot::Base)];
+ }else shade.image=std::make_shared<const Image>(Image{2,1,{94,111,161,255,81,126,95,255}});
  material.material=MToonMaterial::from_vrm1(source,uniform_roles?3:1);
  material.native_reference={current.color,current.emissive,int(current.alpha),
                             current.alpha_cutoff,current.double_sided};
- material.roles[size_t(MToonSlot::Shade)].image=
-     std::make_shared<const Image>(Image{2,1,{94,111,161,255,81,126,95,255}});
  if(!bind_texture_set_mtoon(scene,object,set,material))
    throw std::runtime_error("Actual test material was not bound to its texture set");
 }
