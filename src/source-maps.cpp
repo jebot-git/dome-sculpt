@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/source-maps.hpp"
+#include "dome/affine.hpp"
 #include "dome/paint.hpp"
 #include "source-texture-grid.hpp"
 #include "source-uv-archive.hpp"
@@ -285,18 +286,15 @@ std::array<float,4> sample_surface_texture(const Mesh &mesh,const PaintSourceMap
   // that chosen pair, not a relabeled geometry stream.
   auto resolved=view;resolved.texcoord=0;return sample_source_texture(resolved,uv[0],uv[1],srgb);
 }
-Vec3 source_texture_normal(const Mesh &mesh,const PaintSourceMaps &maps,size_t triangle,
-                           std::array<float,3> bary,float strength) {
+namespace {
+Vec3 derivative_texture_normal(const Mesh &mesh,const PaintSourceMaps &maps,size_t triangle,
+    std::array<float,3> bary,Vec3 n,const AffineTransform *placement,float strength) {
   if(!std::isfinite(strength)||strength<0||strength>4)throw std::invalid_argument("Invalid source normal strength");
-  std::array<uint32_t,3> ids{};Vec3 n{};
-  for(size_t c=0;c<3;++c){
-    ids[c]=mesh.indices.at(triangle*3+c);
-    n+=normalized(mesh.normals.at(ids[c]))*bary[c];
-
-  }
   n=normalized(n);
-  if(!maps.normal.image||maps.normal_scale==0||strength==0)return n;
-  auto coordinates=source_texture_coordinates(mesh,maps,maps.normal.texcoord);
+  if(!maps.normal.image||(!placement&&maps.normal_scale==0)||strength==0)return n;
+  std::array<uint32_t,3> ids{};
+  for(size_t c=0;c<3;++c)ids[c]=mesh.indices.at(triangle*3+c);
+  const auto coordinates=source_texture_coordinates(mesh,maps,maps.normal.texcoord);
   auto uv0=coordinates[ids[0]],uv1=coordinates[ids[1]],uv2=coordinates[ids[2]];
   const auto &a=maps.normal.uv_transform;
   double u1=double(uv1[0])-uv0[0],v1=double(uv1[1])-uv0[1],
@@ -306,6 +304,10 @@ Vec3 source_texture_normal(const Mesh &mesh,const PaintSourceMaps &maps,size_t t
   double determinant=x1*y2-x2*y1,scale=std::hypot(x1,y1)*std::hypot(x2,y2);
   if(!scale||std::abs(determinant)<=scale*1e-8)return n;
   auto e1=mesh.positions[ids[1]]-mesh.positions[ids[0]],e2=mesh.positions[ids[2]]-mesh.positions[ids[0]];
+  if(placement) {
+    const auto edge=[&](Vec3 value){const auto p=placement->direction({value.x,value.y,value.z});return Vec3{float(p[0]),float(p[1]),float(p[2])};};
+    e1=edge(e1);e2=edge(e2);
+  }
   auto direction=[&](double x,double y,double z){
     double size=std::hypot(x,y,z);if(size<1e-100)return Vec3{};
     double sign=determinant<0?-1:1;return Vec3{float(x/size*sign),float(y/size*sign),float(z/size*sign)};
@@ -321,5 +323,16 @@ Vec3 source_texture_normal(const Mesh &mesh,const PaintSourceMaps &maps,size_t t
   Vec3 detail{float(dx/magnitude),float(dy/magnitude),float(dz/magnitude)};
   auto result=t*detail.x+b*detail.y+n*detail.z;
   return length(result)>1e-8f?normalized(result):n;
+}
+}
+Vec3 source_texture_normal(const Mesh &mesh,const PaintSourceMaps &maps,size_t triangle,
+                           std::array<float,3> bary,float strength) {
+  Vec3 n{};
+  for(size_t c=0;c<3;++c)n+=normalized(mesh.normals.at(mesh.indices.at(triangle*3+c)))*bary[c];
+  return derivative_texture_normal(mesh,maps,triangle,bary,n,nullptr,strength);
+}
+Vec3 source_texture_normal_placed(const Mesh &mesh,const PaintSourceMaps &maps,size_t triangle,
+    std::array<float,3> bary,Vec3 normal,const AffineTransform &placement,float strength) {
+  return derivative_texture_normal(mesh,maps,triangle,bary,normal,&placement,strength);
 }
 } // namespace dome

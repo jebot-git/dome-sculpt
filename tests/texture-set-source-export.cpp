@@ -36,6 +36,7 @@
 #include "source-color-fixtures.hpp"
 #include "source-colors.hpp"
 #include "normal-frame-runtime.hpp"
+#include "source4-baked.hpp"
 #include <bit>
 #include <fstream>
 #include <iostream>
@@ -1806,7 +1807,7 @@ void export_mirrored_mikk() {
  std::cout<<"MIKK_EXPORT native_vertices=5 portable_vertices=6 endpoints=2\n";
 }
 
-void retopology_imported_pbr() {
+void retopology_imported_pbr(bool prior_bake=false) {
  const auto bytes=source_color_fixture::bytes();
  const size_t json_size=word(bytes,12);
  detail::GltfDocument input;
@@ -1835,6 +1836,10 @@ void retopology_imported_pbr() {
  pbr["metallicFactor"]=.6f;
  pbr["metallicRoughnessTexture"]={{"index",0}};
  material["occlusionTexture"]={{"index",0},{"texCoord",1},{"strength",.37f}};
+ if(prior_bake) {
+  material["normalTexture"]["texCoord"]=1;
+  material["normalTexture"]["extensions"]["KHR_texture_transform"]={{"rotation",.31f},{"scale",{.72f,1.13f}}};
+ }
  material["emissiveTexture"]={{"index",0},{"texCoord",1}};
  material["emissiveFactor"]={.75f,.3f,.1f};
  material["extensions"]["KHR_materials_emissive_strength"]["emissiveStrength"]=6;
@@ -1867,10 +1872,32 @@ void retopology_imported_pbr() {
  guide.painted->begin_stroke();guide.painted->stamp(brush,ink);
  check(guide.painted->end_stroke(),"The imported source has its own nonempty editable paint layer");
  guide.painted->layer_properties("Imported editable pigment",false,.37f);
+ if(prior_bake) {
+  BakedTextures layers;
+  layers.maps.color=solid({122,55,168,201});
+  layers.maps.metal_rough=solid({207,61,103,255});
+  layers.maps.normal=solid({142,196,233,255});
+  layers.coverage.resize(4096);
+  std::vector<BakedEmissionSample> physical(4096);
+  for(size_t i=0;i<physical.size();++i){
+   const auto x=i%64,y=i/64;
+   layers.coverage[i]=uint8_t(38+x*3);
+   layers.maps.color.rgba[i*4]=uint8_t(55+x*2);
+   layers.maps.normal.rgba[i*4+1]=uint8_t(136+y);
+   const float a=.21f+.006f*float(y);
+   physical[i]={{.07f*a,0,.03f*a},{(.2f+.048f*float(x))*a,.089f*a,.6f*a},a};
+  }
+  layers.emission_field=BakedEmissionField::create(64,std::move(physical));
+  guide.painted=detail::install_source_bake(*guide.painted,std::move(layers));
+  check(guide.painted->encode().at("version")==8&&guide.painted->valid_source_sampling_attachment(),
+        "The imported guide owns its genuine source-aware Bake and independently filtered FLOAT data");
+ }
  for(const auto &o:scene.objects())if(o.id!=id)scene.object(o.id).visible=false;
  scene.save("raw-guide.dsculpt");
  const auto original=scene.encode();
  const auto geometry=guide.deformation->preview(rest);
+ const auto source_tangents=prior_bake?tangent_corners(geometry):std::vector<Tangent>{};
+ const auto source_packet=prior_bake?detail::PaintOverlayFactory::capture(*guide.painted,{}):nullptr;
 
  Document document;
  document.replace(scene);ready(document);
@@ -1899,6 +1926,10 @@ void retopology_imported_pbr() {
        result.object(id).appearance->original_bytes==guide.appearance->original_bytes&&
        result.object(id).painted->source_maps()==guide.painted->source_maps(),
        "Apply produces a native Bake and the hidden guide retains its authentic images and original GLB");
+ if(prior_bake)
+  check(result.object(id).painted->baked()==guide.painted->baked()&&
+        result.object(id).painted->source_sampling_original()==guide.painted->source_sampling_original(),
+       "The separate hidden guide keeps the exact prior Bake, coverage and original paint owner");
  const auto &before=guide.painted->layers().back(),&after=patch.painted->layers().back();
  check(before.id==after.id&&before.name==after.name&&before.visible==after.visible&&before.opacity==after.opacity&&
        std::ranges::any_of(after.tiles,[](const auto &tile){return tile&&std::ranges::any_of(tile->pixels,[](const auto &p){return p.data[9]>110;});}),
@@ -1915,7 +1946,7 @@ void retopology_imported_pbr() {
  const auto &baked=*patch.painted->baked();
  const auto &image=baked.maps.color;
  const SurfaceQuery query(geometry);
- size_t samples=0;
+ size_t samples=0,partial=0;
  float peak=0,min_dot=1;
  std::array<bool,2> source_triangles{};
  for(size_t c=0;c<target.indices.size();c+=3){
@@ -1935,19 +1966,50 @@ void retopology_imported_pbr() {
    source_triangles.at(hit->triangle)=true;
    const auto role=[&](const auto &texture,bool srgb){return sample_surface_texture(rest,maps,texture,hit->triangle,hit->barycentric,srgb);};
    const auto color=role(maps.color,true),orm=role(maps.metal_rough,false),light=role(maps.emission,true),ao=role(maps.occlusion,false);
+   float coverage=0,emission_coverage=0;
+   std::array<float,7> rendered_bake{};
+   std::array<float,3> rendered_emission{};
+   Vec3 normal_detail{};
+   if(prior_bake){
+    const auto &previous=*guide.painted->baked();
+    const auto uv=source_texture_uv(rest,maps,0,hit->triangle,hit->barycentric);
+    const float sx=uv[0]*64-.5f,sy=uv[1]*64-.5f;
+    const int x0=int(std::floor(sx)),y0=int(std::floor(sy));
+    const float fx=sx-x0,fy=sy-y0;
+    for(int dy=0;dy<2;++dy)for(int dx=0;dx<2;++dx){
+     const float weight=(dx?fx:1-fx)*(dy?fy:1-fy);
+     const auto owner=source_packet->padding()->at(size_t(std::clamp(y0+dy,0,63))*64+std::clamp(x0+dx,0,63));
+     if(owner<0)continue;
+     const auto sample=size_t(owner)*4;
+     const float a=weight*(previous.coverage[owner]/255.f);
+     coverage+=a;
+     for(size_t k=0;k<4;++k){const float c=previous.maps.color.rgba[sample+k]/255.f;rendered_bake[k]+=a*(k<3?srgb_to_linear(c):c);}
+     for(size_t k=0;k<3;++k){
+      rendered_bake[k+4]+=a*(previous.maps.metal_rough.rgba[sample+k]/255.f);
+      const auto emission=previous.emission_field->texel(owner);
+      rendered_emission[k]+=weight*(emission.legacy[k]+emission.absolute[k]);
+     }
+     emission_coverage+=weight*previous.emission_field->texel(owner).coverage;
+     const auto *p=previous.maps.normal.rgba.data()+sample;
+     normal_detail+=Vec3{p[0]*2.f/255-1,p[1]*2.f/255-1,p[2]*2.f/255-1}*a;
+    }
+    partial+=coverage>.12f&&coverage<.9f&&std::abs(coverage-emission_coverage)>.01f;
+   }
    for(size_t k=0;k<4;++k){
     float tint=0;
     for(size_t j=0;j<3;++j)tint+=colors[rest.indices[hit->triangle*3+j]][k]*hit->barycentric[j];
-    const auto expected=guide.material.color[k]*color[k]*tint;
+    const auto expected=(guide.material.color[k]*color[k]*(1-coverage)+rendered_bake[k])*tint;
     const auto raw=image.rgba[at*4+k]/255.f;
     check(std::abs((k<3?srgb_to_linear(raw):raw)-expected)<.006f,"Native Bake retains sampled linear colour and vertex alpha");
    }
    const auto *pixel=baked.maps.metal_rough.rgba.data()+at*4;
-   check(std::abs(pixel[0]/255.f-(1-maps.occlusion_strength*(1-ao[0])))<.003f&&
-         std::abs(pixel[1]/255.f-guide.material.roughness*orm[1])<.003f&&
-         std::abs(pixel[2]/255.f-guide.material.metallic*orm[2])<.003f,"Separate original AO, roughness and metallic roles survive Apply");
+   check(std::abs(pixel[0]/255.f-((1-maps.occlusion_strength*(1-ao[0]))*(1-coverage)+rendered_bake[4]))<.003f&&
+         std::abs(pixel[1]/255.f-(guide.material.roughness*orm[1]*(1-coverage)+rendered_bake[5]))<.003f&&
+         std::abs(pixel[2]/255.f-(guide.material.metallic*orm[2]*(1-coverage)+rendered_bake[6]))<.003f,"Separate original AO, roughness and metallic roles survive Apply");
    const auto radiance=baked.emission_field->texel(at).absolute;
-   for(size_t k=0;k<3;++k)check(std::abs(radiance[k]-guide.material.emissive[k]*light[k])<2e-5f,"Physical emission survives the transfer without RGB8 clipping");
+   for(size_t k=0;k<3;++k)
+    check(std::abs(radiance[k]-(guide.material.emissive[k]*light[k]*(1-emission_coverage)+rendered_emission[k]))<2e-5f,
+          "Physical emission with its independent coverage survives the transfer without RGB8 clipping");
    const auto normal=role(maps.normal,false);
    Vec3 n,t,bitangent;
    for(size_t corner=0;corner<3;++corner){
@@ -1959,8 +2021,35 @@ void retopology_imported_pbr() {
     const float weight=hit->barycentric[corner];
     n+=wn*weight;t+=wt*weight;bitangent+=cross(wn,wt)*(-tt[3]*weight);
    }
-   const auto expected=normalized(normalized(n)*(normal[2]*2-1)+
+   auto expected=normalized(normalized(n)*(normal[2]*2-1)+
        (normalized(t)*(normal[0]*2-1)+normalized(bitangent)*(normal[1]*2-1))*maps.normal_scale);
+   if(prior_bake){
+    const auto first=size_t(hit->triangle)*3;
+    const auto a=geometry.indices[first],b=geometry.indices[first+1],c=geometry.indices[first+2];
+    const auto normal_uv=source_texture_coordinates(rest,maps,maps.normal.texcoord);
+    const auto transform=maps.normal.uv_transform;
+    const auto role_uv=[&](uint32_t vertex){const auto uv=normal_uv[vertex];return std::array{transform[0]*uv[0]+transform[1]*uv[1]+transform[4],transform[2]*uv[0]+transform[3]*uv[1]+transform[5]};};
+    const auto p=role_uv(a),q=role_uv(b),r=role_uv(c);
+    const float det=(q[0]-p[0])*(r[1]-p[1])-(q[1]-p[1])*(r[0]-p[0]);
+    const auto e=to_world(geometry.positions[b])-to_world(geometry.positions[a]),f=to_world(geometry.positions[c])-to_world(geometry.positions[a]);
+    const auto N=normalized(n);
+    auto T=(e*(r[1]-p[1])-f*(q[1]-p[1]))/det;
+    T=normalized(T-N*dot(N,T));
+    auto B=cross(N,T);
+    if(dot(B,(f*(q[0]-p[0])-e*(r[0]-p[0]))/det)<0)B=B*-1;
+    expected=normalized(N*(normal[2]*2-1)+(T*(normal[0]*2-1)+B*(normal[1]*2-1))*maps.normal_scale);
+    if(coverage>0){
+     Vec3 cn,ct,cb;
+     for(size_t k=0;k<3;++k){
+      const auto v=geometry.indices[first+k];const auto gn=geometry.normals[v];
+      const auto gt=source_tangents[first+k];
+      const auto nn=unit(source_world.normal({gn.x,gn.y,gn.z})),tt=unit(source_world.direction({gt[0],gt[1],gt[2]}));
+      const auto weight=hit->barycentric[k];cn+=nn*weight;ct+=tt*weight;cb+=cross(nn,tt)*(-gt[3]*weight);
+     }
+     const auto current=normalized(ct*normal_detail.x+cb*normal_detail.y+cn*normal_detail.z);
+     expected=normalized(expected*(1-coverage)+current*coverage);
+    }
+   }
    const auto *normal_pixel=baked.maps.normal.rgba.data()+at*4;
    const auto local=tangent_frame(target,target_tangents,c/3,{wa,wb,wc}).to_world(
        {normal_pixel[0]*2.f/255-1,normal_pixel[1]*2.f/255-1,normal_pixel[2]*2.f/255-1});
@@ -1969,9 +2058,9 @@ void retopology_imported_pbr() {
    ++samples;
   }
  }
- check(samples>30&&peak>1&&std::ranges::all_of(source_triangles,[](bool a){return a;})&&min_dot>.9997f,
+ check(samples>30&&peak>1&&std::ranges::all_of(source_triangles,[](bool a){return a;})&&min_dot>.9997f&&(!prior_bake||partial>30),
        "Interior controls cover both source triangles with original HDR and posed reflected shading");
- std::cout<<"IMPORTED_PBR interior="<<samples<<" peak="<<peak<<" min_normal_dot="<<min_dot<<'\n';
+ std::cout<<"IMPORTED_PBR interior="<<samples<<" peak="<<peak<<" min_normal_dot="<<min_dot<<" partial="<<partial<<'\n';
  check(Scene::load("raw-patch.dsculpt").encode()==accepted&&document.undo()&&document.copy_scene().encode()==original&&
        document.redo()&&document.copy_scene().encode()==accepted,"Native Save, cold Open, Undo and Redo preserve the source and patch exactly");
  ready(document);
@@ -2162,10 +2251,10 @@ int main(int argc,char **argv)try {
   std::cout<<"PASS "<<checks<<" native Mikk export checks\n";
   return 0;
  }
- if(argc==3&&mode=="--imported-retopology") {
+ if(argc==3&&(mode=="--imported-retopology"||mode=="--imported-prior-bake")) {
   std::filesystem::create_directories(argv[2]);
   std::filesystem::current_path(argv[2]);
-  retopology_imported_pbr();
+  retopology_imported_pbr(mode=="--imported-prior-bake");
   std::cout<<"PASS "<<checks<<" imported material retopology checks\n";
   return 0;
  }

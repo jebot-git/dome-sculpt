@@ -545,7 +545,7 @@ void native_overlay_quality(const PaintedMesh &before, const PaintedMesh &after,
 }
 } // namespace
 std::array<PaintBilinearTap,4> paint_bilinear_taps(uint32_t resolution,
-    std::array<float,2> uv,std::span<const int32_t> padding) {
+    std::array<float,2> uv,std::span<const int32_t> padding,bool require_padding_owner) {
   const double x = std::clamp(double(uv[0]),0.,1.)*resolution-.5;
   const double y = std::clamp(double(uv[1]),0.,1.)*resolution-.5;
   const int ix = int(std::floor(x)), iy = int(std::floor(y));
@@ -557,7 +557,7 @@ std::array<PaintBilinearTap,4> paint_bilinear_taps(uint32_t resolution,
     const auto texel = size_t(sy)*resolution+sx;
     const auto owner = padding[texel];
     const double weight = (i&1?fx:1-fx)*(i&2?fy:1-fy);
-    taps[i] = {owner>=0?size_t(owner):texel,weight};
+    taps[i] = {owner>=0?size_t(owner):texel,owner<0&&require_padding_owner?0:weight};
   }
   return taps;
 }

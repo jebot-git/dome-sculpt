@@ -13,7 +13,7 @@ struct FilteredPaintTexel {
   bool pbr_present = false;
 };
 std::array<PaintBilinearTap,4> paint_bilinear_taps(uint32_t resolution,
-    std::array<float,2> uv,std::span<const int32_t> padding);
+    std::array<float,2> uv,std::span<const int32_t> padding,bool require_padding_owner=false);
 FilteredPaintTexel filter_paint_layer(const PaintLayer &,uint32_t resolution,
     const std::array<PaintBilinearTap,4> &);
 

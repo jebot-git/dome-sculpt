@@ -3125,7 +3125,7 @@ struct ImportedRetopoPbr {
   detail::SourceBakeNormalResolver normal;
   std::vector<std::array<float,4>> colors;
 
-  BakedPixel sample(const SurfaceHit &hit, const std::array<float,4> &tint) const {
+  BakedPixel sample(const SurfaceHit &hit) const {
     const auto role = [&](const PaintSourceTexture &texture, bool srgb) {
       return sample_surface_texture(mesh,maps,texture,hit.triangle,hit.barycentric,srgb);
     };
@@ -3134,7 +3134,7 @@ struct ImportedRetopoPbr {
     const auto emission = role(maps.emission,true);
     const auto ao = role(maps.occlusion,false)[0];
     BakedPixel value{};
-    for (size_t k=0; k<4; ++k) value[k]=material.color[k]*color[k]*tint[k];
+    for (size_t k=0; k<4; ++k) value[k]=material.color[k]*color[k];
     value[4]=1-maps.occlusion_strength*(1-ao);
     value[5]=material.roughness*orm[1];
     value[6]=material.metallic*orm[2];
@@ -3152,6 +3152,37 @@ struct ImportedRetopoPbr {
     return result;
   }
 };
+
+void resolve_imported_bake(BakedPixel &base, const BakedTextures &baked,
+                           const std::array<detail::PaintBilinearTap,4> &taps) {
+  float coverage=0;
+  BakedPixel weighted{};
+  BakedEmissionSample emission;
+  for (const auto &tap:taps) {
+    if (tap.weight<=0) continue;
+    const auto weight=float(tap.weight);
+    const float a=weight*unit(baked.coverage[tap.texel]);
+    if (a>0) {
+      const auto sample=baked_pixel(baked,tap.texel);
+      for (size_t k=0; k<7; ++k) weighted[k]+=sample[k]*a;
+      coverage+=a;
+    }
+    const auto sample=detail::baked_emission_texel(baked,tap.texel);
+    for (size_t k=0; k<3; ++k) {
+      emission.legacy[k]+=sample.legacy[k]*weight;
+      emission.absolute[k]+=sample.absolute[k]*weight;
+    }
+    emission.coverage+=sample.coverage*weight;
+  }
+  for (size_t k=0; k<7; ++k) base[k]=base[k]*(1-std::min(coverage,1.f))+weighted[k];
+  emission.coverage=std::clamp(emission.coverage,0.f,1.f);
+  for (size_t k=0; k<3; ++k) {
+    emission.legacy[k]=std::min(emission.legacy[k],emission.coverage);
+    emission.absolute[k]=std::min(emission.absolute[k],emission.coverage*maximum_native_emission);
+  }
+  const auto radiance=emission.resolve({base[7],base[8],base[9]},1);
+  for (size_t k=0; k<3; ++k) base[7+k]=radiance[k];
+}
 
 Vec3 retained_retopology_normal(const detail::PolygonSurfacePreview &preview,
     size_t triangle, std::array<double,3> bary, const AffineTransform &world) {
@@ -3239,7 +3270,7 @@ void detail::TextureSetPaintAccess::reproject_retopology(const PaintedMesh &sour
     const auto &binding=imported->material_bindings;
     if (!transfer.first_patch() || prepared_normals || retained || old_domain || imported->painted.get()!=&source ||
         !imported->appearance || !from.source_maps_ || !from.valid_source_sampling_attachment() ||
-        from.baked_ || !binding || binding->has_mtoon || imported->material.toon)
+        (from.baked_&&!from.source_sampling_prepared()) || !binding || binding->has_mtoon || imported->material.toon)
       throw std::invalid_argument("Retopology requires an original imported PBR field with its frame and images");
     from.source_maps_->validate_surface(from.mesh());
     const AffineInteractionFrame placement(transfer.previous_metric());
@@ -3359,12 +3390,12 @@ void detail::TextureSetPaintAccess::reproject_retopology(const PaintedMesh &sour
     baked->maps.normal=blank_image(resolution,true);
     baked->maps.metal_rough=blank_image(resolution);
     baked->maps.emission=blank_image(resolution);
-    if (hdr_emission(raw->material.emissive)) {
+    if (hdr_emission(raw->material.emissive) || (bake&&bake->emission_field)) {
       transfer.reserve(texels,2*sizeof(BakedEmissionSample));
       float_bake.resize(texels);
     }
   }
-  if (bake) {
+  if (bake && !raw) {
     const bool normals = !bake->maps.normal.rgba.empty();
     transfer.reserve(texels, 13 + ((normals || prepared_normals || retained_preview) ? 4 : 0) + (resolved_color ? 4 : 0));
     baked.emplace();
@@ -3417,17 +3448,6 @@ void detail::TextureSetPaintAccess::reproject_retopology(const PaintedMesh &sour
     ++hits;
     if (writable.empty() && !bake && !retained_preview && !raw) continue;
     const auto tint = raw ? raw->tint(*hit) : std::array<float,4>{1,1,1,1};
-    if (raw) {
-      transfer.work(144);
-      auto values=raw->sample(*hit,tint);
-      const auto direction=raw->normal(hit->triangle,hit->barycentric)[0];
-      const auto frame=basis(target_columns,texel.face,{w[0],w[1],1-w[0]-w[1]});
-      const auto normal=retained_retopology_detail(frame,direction,255,true);
-      baked_pixel(*baked,at,values,false);
-      std::copy(normal.begin(),normal.end(),baked->maps.normal.rgba.begin()+4*at);
-      baked->coverage[at]=255;
-      if (!float_bake.empty()) float_bake[at]={{},{values[7],values[8],values[9]},1};
-    }
     std::array<float, 2> uv{};
     for (size_t corner = 0; corner < 3; ++corner) {
       const auto index = size_t(hit->triangle) * 3 + corner;
@@ -3436,9 +3456,21 @@ void detail::TextureSetPaintAccess::reproject_retopology(const PaintedMesh &sour
       for (size_t axis = 0; axis < 2; ++axis)
         uv[axis] += value[axis] * hit->barycentric[corner];
     }
-    const auto taps = paint_bilinear_taps(from.resolution(), uv, from.surface_->padding);
+    const auto taps = paint_bilinear_taps(from.resolution(), uv, from.surface_->padding,bool(raw));
     transfer.work((resolved_color ? 48 : 32) + 128 * writable.size());
-    if (bake) {
+    if (raw) {
+      transfer.work(bake?256:144);
+      auto values=raw->sample(*hit);
+      if (bake) resolve_imported_bake(values,*bake,taps);
+      for (size_t k=0; k<4; ++k) values[k]*=tint[k];
+      const auto direction=raw->normal(hit->triangle,hit->barycentric)[0];
+      const auto frame=basis(target_columns,texel.face,{w[0],w[1],1-w[0]-w[1]});
+      const auto normal=retained_retopology_detail(frame,direction,255,true);
+      baked_pixel(*baked,at,values,false);
+      std::copy(normal.begin(),normal.end(),baked->maps.normal.rgba.begin()+4*at);
+      baked->coverage[at]=255;
+      if (!float_bake.empty()) float_bake[at]={{},{values[7],values[8],values[9]},1};
+    } else if (bake) {
       BakedPixel values{};
       std::array<float,4> pbr{};
       float coverage = 0;

@@ -12,6 +12,7 @@ namespace dome {
 struct Image;
 struct Mesh;
 struct Vec3;
+class AffineTransform;
 struct PaintImageLimits {
   size_t max_image_pixels = 16 * 1024 * 1024;
   size_t max_unique_pixels = 64 * 1024 * 1024;
@@ -74,4 +75,8 @@ std::array<float,4> sample_source_texture(const PaintSourceTexture &, float u, f
 // degenerate UV transform retains the interpolated geometric normal.
 Vec3 source_texture_normal(const Mesh &, const PaintSourceMaps &, size_t triangle,
                            std::array<float,3> barycentric, float strength = 1);
+// Evaluate the derivative frame on placed geometry with an already evaluated
+// artist normal. The texture and UV carriers still belong to the input mesh.
+Vec3 source_texture_normal_placed(const Mesh &, const PaintSourceMaps &, size_t triangle,
+    std::array<float,3> barycentric, Vec3 normal, const AffineTransform &, float strength = 1);
 } // namespace dome
