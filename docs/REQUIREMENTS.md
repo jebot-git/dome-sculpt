@@ -259,15 +259,18 @@ support editing and mirroring shapekeys on their shared mesh. Rigid VRM1
 accessories retain morph weights, geometric normal deltas and sampled baked
 tangent deltas in both portable modes. Native reopen restores the complete
 paint and shape history, including compatible older Archive8 layouts.
-Weight transfer and legacy automatic binding now link writable native
+Surface Heat, weight transfer and legacy automatic binding now link writable native
 texture-set accessories to one genuine original VRM 1.0 instance and its
 original joints. Linked poses and authored rest changes preserve the accessory
 paint and morphs. Both VRM 1.0 export modes carry the independent accessory
 weights, inverse binds, material primitives and morphs while referencing the
 actual original rig. The native payload reopens exactly. Nested Wayland and
-synthetic OpenXR exercise weight transfer with a durable save. The Surface Heat
-owning budget and affine interactive weight brushes still need texture-set
-support.
+synthetic OpenXR exercise weight transfer and Surface Heat with durable saves.
+Surface Heat accounts for native texture-set rasters, layers and canonical Bake
+data, including FLOAT emission. It preserves shared owners and rejects stale
+secondary paint edits, cancellation and insufficient memory before publication.
+Affine interactive weight brushes and retained-source preparation still need
+texture-set support.
 Larger typed Bake previews,
 original authored and deforming frames, typed donor
 partitions, retained-source skinned accessories, VRM0 texture-set
@@ -288,6 +291,7 @@ painted animation, other sampler modes and physical verification remain open.
 [OpenXR bone attachment evidence](validation/vrm1-xr-attachment-20261127.json)
 [Native texture-set shapekey evidence](validation/texture-set-shapekeys-20261127.json)
 [Native accessory skin link evidence](validation/vrm1-skinned-accessory-20261127.json)
+[Surface Heat texture-set evidence](validation/vrm1-surface-heat-20261127.json)
 
 Strict Bake rays now recover source-edge contacts affected by float staging.
 An exact ray hit has priority. A missed ray can use an actual source edge

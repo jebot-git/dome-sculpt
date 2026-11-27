@@ -1,0 +1,141 @@
+{
+  "revision": "b9577b72d641fa5919fb386a4e7c785e56af40ba",
+  "canonical_domed_revision": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "release_fltk": "/opt/fltk-vr/toolkit",
+  "asan_fltk": "artifacts/sdk-20261126/toolkit-sanitize",
+  "bitmap_runtime": "/opt/fltk-vr/bdf-runtime",
+  "release_application_sha256": "a9d6598d7fe86b825334af1bc31adfaba61886c78947331ce6fdd01b0bd7211a",
+  "profiles": {
+    "release": {
+      "focused_native_assertions": 191,
+      "new_surface_heat_assertions": 11,
+      "retention_assertions": 11,
+      "registered_cases": [
+        "dome-sculpt-texture-set-export",
+        "surface-heat-current-components",
+        "surface-heat-current-mixed-generic",
+        "surface-heat-native",
+        "surface-heat-real-publication-faults",
+        "vrm1-attachment-openxr",
+        "vrm1-source-export"
+      ],
+      "sampled_factory_failures": 51,
+      "exhaustive_detached_publication_failures": 151,
+      "exhaustive_document_publication_failures": 392,
+      "fixture_sha256": "b0914d79a12ecec2df60c98a4b76902259dac8288a0c0a80bb5fe6def1801f70"
+    },
+    "asan": {
+      "focused_native_assertions": 191,
+      "new_surface_heat_assertions": 11,
+      "retention_assertions": 11,
+      "registered_cases": [
+        "surface-heat-current-components",
+        "surface-heat-current-mixed-generic",
+        "surface-heat-native",
+        "surface-heat-real-publication-faults",
+        "vrm1-source-export"
+      ],
+      "sampled_factory_failures": 51,
+      "exhaustive_detached_publication_failures": 151,
+      "exhaustive_document_publication_failures": 392,
+      "fixture_sha256": "ae9592057a7f371ec3ce9eb01c343ab7b4cb0dfda1674d679b2f75f2c82fef9f"
+    }
+  },
+  "nested_wayland_assertions": 9,
+  "synthetic_openxr": {
+    "software": {
+      "assertions": 24,
+      "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+      "surface_heat_stereo_submissions": 77,
+      "surface_heat_swapchain_releases": 154
+    },
+    "arc": {
+      "assertions": 24,
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "surface_heat_stereo_submissions": 77,
+      "surface_heat_swapchain_releases": 154
+    }
+  },
+  "physical_headset_tested": false,
+  "identical_release_asan_exports_and_projects_sha256": {
+    "heat-before.dsculpt": "91b2e332cafe8d7306943107c02a3c6e7fdeb99628f17d5224ae86819ec1fcd1",
+    "heat-bound.dsculpt": "9967112bcdc766a63f3571529ad3b3d90dd3b7543688e6a773fff1184ddb9849",
+    "heat-bound-editable.vrm": "a16aabaf0501c77c0349709c82784d48f8eb8bff550ce333d6698d136661628a"
+  },
+  "release_cc0_nineteen_target_regressions": {
+    "female": {
+      "input_sha256": "1849937d505cffc66a33bd11277b575fe51125f6da4878e8f9b93d840fb9c375",
+      "unskinned_native_sha256": "407c0b2146c9679c65862498ade06c62d45bd4d249971d21ce6870422229cb74",
+      "bound_sha256": "a05aba3142dca30bd9844e0dc651247867a8cceced58897119c322aa025c9f26"
+    },
+    "male": {
+      "input_sha256": "05e9e52533e60a27089ee46b232dea93f38b2e43ca094745ef7422d7393bb07d",
+      "unskinned_native_sha256": "d3eb67830c01dddd1b8a76aa061c33970f6f932294f141205a6e0b82a425f53a",
+      "bound_sha256": "76dc328851bcffb9f5a70aba5f65187715fe2890ca31bba1c214259c46d11064"
+    }
+  },
+  "consumer": {
+    "khronos": "2.0.0-dev.3.10",
+    "khronos_errors": 0,
+    "khronos_warnings": {
+      "MULTIPLE_EXTENSIONS": 3,
+      "NODE_SKINNED_MESH_NON_ROOT": 3,
+      "NODE_SKINNED_MESH_LOCAL_TRANSFORMS": 2
+    },
+    "pinned_vrm_schema_checks": 4
+  },
+  "archive": {
+    "path": "vrm1-surface-heat-20261127.tar.gz",
+    "sha256": "5d45b58163b736d748a2ff283c12818e93f0f012625364f7b6051e9d5eea08b4",
+    "members_sha256": {
+      "arc.log": "87b7ce10e1f296f06f8cda189966ffae2853f38695a9a78a20c03440eb9f681b",
+      "arc/report.json": "e7d9d784ba84e98ee0bd8ede3cf8f9c283b324a9482c76a468f5c2a26e7c6232",
+      "arc/skin-texture-set-heat.dsculpt": "9967112bcdc766a63f3571529ad3b3d90dd3b7543688e6a773fff1184ddb9849",
+      "arc/skin-texture-set-heat.json": "df3db7771647f36589c2b79f5bf3de72a4d8bfc85430af6453139094ca65561e",
+      "arc/skin-texture-set-heat.log": "bb7c5437b77ba201682341492b2aa636d08c799a2145fcff41f50a19d01f7781",
+      "asan-build.log": "750325a85d81624232091d4498da4ce8e6d2db7d973f584aff1030a6e9a2f1d6",
+      "asan-configure.log": "ef86706bd9ccbbbe60eeaab6aae76c9439e10c457c3b645cbc44b4d286865cc8",
+      "asan/bone.log": "7ad22d70f5c1fff78b20e0d05ca9617b7d82a2f68c0459c949fd6e17f4b40a2c",
+      "asan/factory-sampled.log": "ee1f8192de63f7e42ec700fd262ea4b4cd125a78876813bd8ab51e9f0b1a7d62",
+      "asan/factory-sampled/report.json": "404109ca350bef7a4880795ecfc8cd32f2176bcef38af8dbca682d03442d3761",
+      "asan/registered.log": "bbd46e287ba3af5a833eb8b317ab9278f3bf5fce6f98c2c6578812110f6e9279",
+      "asan/registered.xml": "bfa027692ddffc83462900e58ba77afbf91c06d5a20b643cfef6d897452981e0",
+      "asan/retention.log": "3dacf234a3b8f04d262b52bd041e05ba1b27fbbbb84813a0e67f83e0e16c293d",
+      "asan/surface-heat/real-publication-faults/report.json": "46e35bf69db7bbb4a6abe2e44852cae7dbad305c9de9bf6fcef781abb549ce64",
+      "cc0-build.log": "5a33f8e29b0d7bb01ba20acd47b468521bf21bf03d2c79737c49558e420ac6e2",
+      "khronos.cjs": "402bf249101b4c61aa642dab414dfbdbb9ec8d919c627735d5b238e825a44297",
+      "khronos.json": "ee178ce72eae7343afe72efe05885f34cbf876df1b058eb97d7b407aca6690c8",
+      "khronos.log": "523784e6a68ef27cabe7280658624e4dc9b9ce4400c7225d189f016817a079fc",
+      "receipt.py": "8e732d9acda6dde536383e45ae1df11865a9b4a644e1a70ec3b66e4a4e18c2e3",
+      "release-build.log": "4a7d15b7a122545653f46c6b390c3ef18d48b532a7c0e389dceeb7514498b910",
+      "release-configure.log": "e4caa8a869a9ee4bf75beb3f3be87f3126a61a711458645a722667c82ab7b64b",
+      "release/bone.log": "7ad22d70f5c1fff78b20e0d05ca9617b7d82a2f68c0459c949fd6e17f4b40a2c",
+      "release/bone/heat-before.dsculpt": "91b2e332cafe8d7306943107c02a3c6e7fdeb99628f17d5224ae86819ec1fcd1",
+      "release/bone/heat-bound-editable.vrm": "a16aabaf0501c77c0349709c82784d48f8eb8bff550ce333d6698d136661628a",
+      "release/bone/heat-bound.dsculpt": "9967112bcdc766a63f3571529ad3b3d90dd3b7543688e6a773fff1184ddb9849",
+      "release/cc0-female.log": "4f721222e0a7566455dc5bddb8bac21723a799b854b8735449e25ca281685c58",
+      "release/cc0-male.log": "4f721222e0a7566455dc5bddb8bac21723a799b854b8735449e25ca281685c58",
+      "release/factory-sampled.log": "ee1f8192de63f7e42ec700fd262ea4b4cd125a78876813bd8ab51e9f0b1a7d62",
+      "release/factory-sampled/report.json": "404109ca350bef7a4880795ecfc8cd32f2176bcef38af8dbca682d03442d3761",
+      "release/registered.log": "0a15e86f96d1ac9a9bc48ed24cb330a88fe10880c5e76afefb4ddbde76855e39",
+      "release/registered.xml": "e63d94d3f153e8c0a0916ca78dd7fc1dd63ce8e21669a9450dc5b547a917636a",
+      "release/retention.log": "3dacf234a3b8f04d262b52bd041e05ba1b27fbbbb84813a0e67f83e0e16c293d",
+      "release/surface-heat/real-publication-faults/report.json": "46e35bf69db7bbb4a6abe2e44852cae7dbad305c9de9bf6fcef781abb549ce64",
+      "release/vrm1-attachment-xr/report.json": "e7d9d784ba84e98ee0bd8ede3cf8f9c283b324a9482c76a468f5c2a26e7c6232",
+      "release/vrm1-attachment-xr/skin-texture-set-heat.dsculpt": "9967112bcdc766a63f3571529ad3b3d90dd3b7543688e6a773fff1184ddb9849",
+      "release/vrm1-attachment-xr/skin-texture-set-heat.json": "153affc95b92a2371ab1626c0fc96479035d7ac84925ec822e339e35eb44eb73",
+      "release/vrm1-attachment-xr/skin-texture-set-heat.log": "bb7c5437b77ba201682341492b2aa636d08c799a2145fcff41f50a19d01f7781",
+      "release/xr-registered.log": "579ca0797e6df22679338789c7b7864ffaec6183d7372e084d332ef73347c4b2",
+      "release/xr-registered.xml": "5be99a4d805a69c2e8e81211fbb3a1284cc1cb9426b40054b657e4c4907f8ae1",
+      "schemas.json": "83711103994d1815b9caab4da84b5c1634e8c51351edac50a8d5daeff3201c5f",
+      "schemas.log": "3528fb12b46254e5b8646f1a3d0d24062441f2f8da29e6847f2a7391bf5a845c",
+      "verify-ui.py": "f740c855753653306148a1233c065b82dffaed6ed27d73f26b334a97a463a66a",
+      "wayland-heat.py": "9eb4e50c0668be1300c5dfe584e719773a51abb33df440867f633a10481eb977",
+      "wayland.log": "ed680e2cf9c926191b2fb720d2c45310de157cab91a845ec24ee6e4fa73c0069",
+      "wayland/client.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "wayland/compositor.log": "5e8430b6b0ccd429aaead8a33d66d5fe0822b404fa002ee9bb3a839d6680a3bd",
+      "wayland/heat-bound.dsculpt": "9967112bcdc766a63f3571529ad3b3d90dd3b7543688e6a773fff1184ddb9849",
+      "wayland/report.json": "fcd1a3b3df6477d385d5cfb76dbdd60803a3df667d2c62767b2deb0bf3df8208"
+    }
+  }
+}

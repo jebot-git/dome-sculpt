@@ -25,10 +25,13 @@ shapekey authoring and portable rigid VRM 1.0 accessory morphs. It restores
 texture-set history written by earlier Scene40 builds that omitted nullable
 live rig fields. [Texture-set shapekey validation](validation/texture-set-shapekeys-20261127.json)
 
-Native texture-set accessories can now transfer weights or use legacy automatic
-binding against an original VRM 1.0 avatar. The accessory follows linked pose
-and rest edits and exports against the avatar's original joints in both VRM 1.0
-modes. [Linked native skin validation](validation/vrm1-skinned-accessory-20261127.json)
+Native texture-set accessories can now use Surface Heat, weight transfer, or
+legacy automatic binding against an original VRM 1.0 avatar. Surface Heat keeps
+editable layers and normal and FLOAT emission Bakes in each native material.
+The accessory follows linked pose and rest edits and exports against the
+avatar's original joints in both VRM 1.0 modes.
+[Linked native skin validation](validation/vrm1-skinned-accessory-20261127.json)
+[Surface Heat validation](validation/vrm1-surface-heat-20261127.json)
 
 The next acceptance milestone is a complete headset workflow on the current
 build, from a production-size sculpt or imported model through topology, UVs,
@@ -2789,11 +2792,26 @@ VRM/MToon schema checks pass across the four exports.
 
 Nested DomeD Wayland exercises the universal-menu dialog, Cancel, transfer,
 Save, Undo and Redo. Synthetic OpenXR on software GL and Intel Arc A770
-exercises controller Transfer, ordered Save and Editable VRM export. Surface
-Heat still needs ownership-budget support for texture-set paint. Interactive
-weight brushes in affine placement, linked native accessories for VRM 0.x,
-retained-source fields and physical device use remain open.
+exercises controller Transfer, ordered Save and Editable VRM export.
 [Linked native skin validation](validation/vrm1-skinned-accessory-20261127.json)
+
+Surface Heat now charges the actual shared mesh, raster, material membership,
+paint layers and baked planes retained by the worker. It charges each shared
+owner once. Preparation keeps the original paint and shapes, while publication
+checks the collection identity and adopts the solved weights and original-joint
+link together. The tests include a one-byte budget refusal, a stale edit to
+the inactive paint set, and cancellation during publication. The verified
+fixture has layers on two sets and a real normal and physical emission Bake on
+the secondary set. Both native projects and the Editable VRM match across
+Release and ASan/UBSan. The exported file passes four pinned VRM/MToon schema
+checks with zero Khronos errors and eight warnings.
+
+The DomeD Wayland dialog and synthetic OpenXR controllers on software GL and
+Intel Arc A770 save the same bound project as the native worker. Both existing
+19-part CC0 VRoid binding regressions pass in Release. Interactive weight
+brushes in affine placement, VRM 0.x linked native accessories, retained-source
+fields, independent prepared normal domains and physical device use remain
+open. [Surface Heat validation](validation/vrm1-surface-heat-20261127.json)
 
 ## Source and integration boundary
 
