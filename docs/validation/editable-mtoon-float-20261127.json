@@ -1,0 +1,192 @@
+{
+  "archive": {
+    "filename": "editable-mtoon-float-20261127.tar.gz",
+    "files": {
+      "arc.py": "3917a0f2ab46fdc4b3a5c54b65b8d3a597d712b46cc5ff7085920e1cf1713a23",
+      "asan-arc/graphics.log": "be50438771ea27264d45959de72ef14f6d76f398c6fe37607a4630cade9f330d",
+      "asan-software/graphics.log": "4424307d05ad492f4394f8770bc6d39360961326a5ef290db7ce954864861774",
+      "asan/app-link.log": "af2e2fa769b9b0e15f0021b8a35455843307568734ac704b0c20ccdfd998888c",
+      "asan/archive-product.log": "248587bd25142f6d6294e0d4f8806d37231e5d9e2f6de56f1b7445de06a83949",
+      "asan/archive-refresh.log": "cc5e6d27cce7a9c4fbcda9de358fdf13245ec7b2a0d7cae82ab1efb93c540b6c",
+      "asan/authoring.log": "20d3f93b2815cd4c98a52e9ca1c0a98d4851845ef3d9c333857fe27e61a8a7e4",
+      "asan/export.cpp-compile.log": "aa7041a013882b1c2e7dfb6e4a647aa02444f1a08383d427e1ad2e780bd364ef",
+      "asan/graphics-compile.log": "368c80990e883bb9c18913c5efed4a81a11d20d30742511580a133ac12ce66da",
+      "asan/hdr.log": "08a5126a5aa5107061aaa43d8bbce606e91c6458c5da3eea2f7f54c1457107e1",
+      "asan/native-authoring-compiler.cpp-compile.log": "58a76d3be62eb68ea465a29fa811f6640013a1a791f1fc8920bf0d72b82fb53f",
+      "asan/native-authoring.cpp-compile.log": "89c8369bb250c9a11dc596f34ac2752781abb6f63041460e9f7d278939ffcfee",
+      "asan/portable.log": "242dbfba604e7467db415ae0ce997d4fd43075beafeefee269125136fb5ba8b5",
+      "asan/recipe.log": "684cb87ead6b67066752e447840cfc58823d43c77f29b1a06aa461b4127dda9b",
+      "asan/texture-set-export.cpp-compile.log": "e78ca0f071ff5be7139cdc4d5ccfae93c305b66e6c74324775cb638027a0c408",
+      "build.py": "6cebf6b224b95ae3c040e717ca420e106d7cdc2062fc5292db01b700307a458b",
+      "headless.log": "958cbda788d685b91d680ddb1975e5eff83b204745c2c69f90c01a82770730e3",
+      "khronos.cjs": "a25e1b1caa4d9cf04b0ae88cfff3781b09a5e59157ca1a0cf3a9194502775491",
+      "khronos.json": "c7b2905f1aa2cd358976577cbbb72099437e1a378f9a23226208f92076f79c63",
+      "openxr/report.json": "528845174a2be985afa5ed69f32fdfc7bb9b7e6cf022d1df99eb0ef9bd1c9c78",
+      "openxr/runner.log": "f79164b7bd9e6d4ab4b0b2cd188b63033bcbdaef79f9a24b63bd48862a33b386",
+      "prior-combined-run-at-recording.json": "1813c8216aaff1c9a1804d567d8e982a9f13d2e933f089da480c954fec6e4c0e",
+      "registered.log": "dee65e208d495e26991bf113216e51521b4c5095b028d207d785e69ce2ee35ac",
+      "registered.xml": "af4b998c5820aa09a82471dbccfc3ddeb95459cc34c8d4ea547268b4f647931f",
+      "release-arc/graphics.log": "608b3c9aff41f50a1bfb7cd0122e49bf895fec2a77a36f7daf4d5a7228ebba0f",
+      "release-software/graphics.log": "771796d27a6786563209157d2e5d3c81a5c690e7464408751cd9251b5a245ad2",
+      "release/app-link.log": "013512b1d1205698ff6b39913dc6637baed084fa6e1fef8bbc57c5d791ed4a42",
+      "release/archive-product.log": "849770646a73c59bbc5eb8f3884cbd8672887f4cf5c6133b75a8a13472691912",
+      "release/archive-refresh.log": "8de2396d76a62efdd9add8ee7bcec24f2c0b1a9595ba85f9a6637ec48744eff8",
+      "release/authoring.log": "c9154956a143cc07c517303bcf4540b4e634860829f203e7e932c7b06d6cf554",
+      "release/export.cpp-compile.log": "3a6022c31ff2ecab233990e2099c56a112b567ee52dce9150a77e12c60e88704",
+      "release/graphics-compile.log": "145cdb3e4563783e8ded910b56622903cb0c57638f4f5f0a86f9422aedeb220c",
+      "release/hdr.log": "801f0777225cac4912c9bedf7d4fd05f960b7c7274cdf491a5eb57a6fa173868",
+      "release/native-authoring-compiler.cpp-compile.log": "fc7d8ee3149fd17bfb49894007b5982bd67969840f5585c0adc2bf77b79f09fb",
+      "release/native-authoring.cpp-compile.log": "6bcbf1317b1f703f35b90b6f2ab8d09d40efa6fb16a956b09a11410862f23500",
+      "release/portable.log": "486ba9c4151f9de456f989ede62d30237fdfed436996e4082874327ed4822250",
+      "release/recipe.log": "0d3646c5c00b4bad9ab082dcdbdfa6599f94023c6843c1db50d20bf73d1ea755",
+      "release/texture-set-export.cpp-compile.log": "1f0da192e9ada88b4f20cb0b87ed3041292671269b624e9096b19d4e50d74c73",
+      "schemas.json": "e4a8880042f6a47f3616d226b0fee1e216e47498433fb41b1a7563b6e9b55b32",
+      "ui.py": "efdda0ba5168600b87ef8cc75c12e4ae819f55d3b1b8855635362d9ea3cff914",
+      "wayland-diagnostic/report.json": "8f51ae17c4e3d3aad1bed83a5512a964747e23f041fa4291a81b0b5638ceff5f",
+      "wayland-diagnostic/runner.log": "551ce14e859259b68e203af059ecc9e82ab842cc6fd9db7fe88cd4669c019df7"
+    },
+    "sha256": "74a1abb0f3c175dd832707f68f44aaf3e1e79ad29f8ff547e2c7280ebef0fc95"
+  },
+  "build_outputs_sha256": {
+    "asan": {
+      "dome-sculpt": "aaa7ef66eaaafd2769d3b22d7682348535a6352e4ab5dd29ba50f204f170844a",
+      "dome-sculpt-mtoon-render-test": "c10180c2a1dd2f86bcad9418ff2e2dbf0490fdee95a0bf5eff7b08fd7a33ef80",
+      "libdome-sculpt-core.a": "16e888418fd71609789c713f832c1b74fe6597091210827109dacc7c17283ffe"
+    },
+    "release": {
+      "dome-sculpt": "4d4626408e0898f30620fedb973b274c14c5e3d855dd9d81f420241f78138587",
+      "dome-sculpt-mtoon-render-test": "025e18162728142c494f880eaba34b7d1ec31a68b68259fd9b9b97a24692d964",
+      "libdome-sculpt-core.a": "2ac2157449fb5e7c2b79025b55b3e776baf63bd750faf7c1fa4e0a5245e586bd"
+    }
+  },
+  "byte_identical_outputs": {
+    "full-ldr/baked.dsculpt": "19c7d87b323627eaf611b6598ba8cb4cfecddaf4564b3831bb58c8e81b276cf6",
+    "full-ldr/editable.glb": "88d371010df098b666dfa19059bf99680b099cb203c71e203b6985d51f399763",
+    "full-ldr/recall.dsculpt": "e4636cdfede95a612fd87c6c9a936542b8247b11ea04717ced0e86ea7f8ef1e7",
+    "full-ldr/standard.glb": "dbc5deff3879a02d9808790b768da359325a5d20dc569bb9fb01a818a18c3f14",
+    "gain/baked.dsculpt": "e09e37dea273ffca8abb95f9e282589023146f8e4f579b1eb87127e0e490701f",
+    "gain/bounded-editable.glb": "34f4bb563afaf0eaa5943fd32c8eaa29ef0862520a200b5d9694a55c7e46e404",
+    "gain/budget-editable.glb": "34f4bb563afaf0eaa5943fd32c8eaa29ef0862520a200b5d9694a55c7e46e404",
+    "gain/editable.glb": "c9eae1d4c3ad9c6accb2c258472c6f55a807c9d988e4d2be9f65454023db9827",
+    "gain/recall.dsculpt": "21083a25ad20d720ea7c189c7b8b6725458ca30aa39b29a2ee8ba4594fb2485d",
+    "gain/standard.glb": "319cff3ce4946ebb4a8e4f35d2753b428fae2d635db296bad2d37a8d8af940a3",
+    "gain/unsupported-editable.glb": "1bb66cb2547e6936b96093838642ce9d54b7c83b4305aa1b88698f0236e123a6",
+    "hdr/baked.dsculpt": "0f3ca03638142f8fd308816ebc14c1b7d4d51700596dcfcc332d9daf399ad39a",
+    "hdr/bounded-editable.glb": "d8a8c5961a3f32abb211de0886a1a0edc5e6a2f2745d01357152ba3c4c74d9d7",
+    "hdr/budget-editable.glb": "d8a8c5961a3f32abb211de0886a1a0edc5e6a2f2745d01357152ba3c4c74d9d7",
+    "hdr/editable.glb": "1807bc1aebef58103fbe61c5419ece2aa4c7180ddb8142bd5a584741a0bd1e89",
+    "hdr/recall.dsculpt": "0a3cb3df9276388770f7a8c7e855e8f423f037634292b3f8e92ffd692f4f3c2c",
+    "hdr/standard.glb": "f74532f27215abf8ef2d809cbb6377674fe6ba03e10e2320e73df1c9e1b2a361",
+    "hdr/unbounded-normal-editable.glb": "e78f7c8106b8c2225cca5380b5aa4fe9149d6799104b7b8132814fd5da1ecd4f",
+    "hdr/unsupported-editable.glb": "619c275dcdf7fc2c111bf7a31d10453910f602702764f3ea077310dde51f13de",
+    "ldr/baked.dsculpt": "a450f7381798881a9cfbc9e01858437d44d19b31fd01397b5a47df89f7c568ab",
+    "ldr/editable.glb": "ba95d0149f37e8e465c952e03280aa19069f8293d6dbcfec40d1acfc80831597",
+    "ldr/recall.dsculpt": "01f9134bbbb9fc89b2c279b01d3c6915d547bfe09ab9df53bfcc9e2bf9a23ae8",
+    "ldr/standard.glb": "6b86b297192892313665e02cccd10e99c8bc8d9bf6cb417ba566da6efe1e4d13",
+    "varying-ldr/baked.dsculpt": "40d53dcee213ab213993852f85df0fa75fd36710b0676b48c822d7c02e21a20b",
+    "varying-ldr/editable.glb": "639781c1797ea2dfe56c843f13602540662e0d7097f0ef7a94a3920ccf4fc379",
+    "varying-ldr/recall.dsculpt": "a10777976d4b4c1addc218811d520a3b9f41fa3b0447b44fee108ce0320b0fc1",
+    "varying-ldr/standard.glb": "ebbd63779b99334b8db8a4697c82c5fc28541f0082b2ab51d972f1ebc2a7fa60"
+  },
+  "editable_file_bytes": {
+    "gain": {
+      "core": 7088120,
+      "typed": 7091084
+    },
+    "hdr": {
+      "core": 8425140,
+      "typed": 8428116
+    }
+  },
+  "headless_editable_to_standard_matches": 2,
+  "independent_interop": {
+    "khronos_errors": 0,
+    "khronos_files": 17,
+    "khronos_version": "2.0.0-dev.3.10",
+    "khronos_warnings": 0,
+    "pinned_mtoon_files": 10,
+    "schema_resolver_controls": 2
+  },
+  "prior_combined_release_at_recording": {
+    "app_sha256": "757f265c99f4f811c34bf6d8ab9a0eb7d40ecf4a026350c418550fad2ef5625c",
+    "cache_sha256": "941246a34d52a93f55e2dc9444541cfe7ad057a397a1f773d0d5e28bcb52dc60",
+    "candidate": "662d889da2b3a56e36f2f58f5280a624ae798906",
+    "changed_paths": [
+      "CMakeLists.txt",
+      "docs/HANDOFF.md",
+      "docs/REQUIREMENTS.md",
+      "docs/validation/exact-overlay-gpu-budget-20261127.json",
+      "docs/validation/exact-overlay-gpu-budget-20261127.tar.gz",
+      "docs/validation/native-mtoon-bake-20261127.json",
+      "docs/validation/native-mtoon-bake-20261127.tar.gz",
+      "docs/validation/retopo-save-queue-20261127.json",
+      "docs/validation/retopo-save-queue-20261127.tar.gz",
+      "src/bake-authoring.cpp",
+      "src/bake.cpp",
+      "src/export.cpp",
+      "src/native-authoring-compiler.cpp",
+      "src/render-paint-overlay.hpp",
+      "src/source-bake-normal.hpp",
+      "src/texture-set-export.cpp",
+      "src/texture-set-export.hpp",
+      "src/texture-set-range.cpp",
+      "src/texture-set-surface.cpp",
+      "src/texture-set-worker.cpp",
+      "src/texture-sets.cpp",
+      "tests/bake-recipes-xr.py",
+      "tests/bake-recipes.cpp",
+      "tests/baked-emission-gpu.cpp",
+      "tests/mtoon-render.cpp",
+      "tests/paint-overlay-gpu.cpp"
+    ],
+    "elapsed_seconds": 1049.026,
+    "invocation": "5d6e0b870e0749f1a8e890898960df75",
+    "phase": "run every registered Release test",
+    "registered": 1366,
+    "seed_app_sha256": "e0e7ea525e5338c4080a2af9db1cca0c18d856b5d9ddf37c399214b0afdc2e38",
+    "seed_cache_sha256": "7a052e626ae14dbbeb06a4465ed0203f08e2cba506988b71f891d7d317c00ab0",
+    "seed_registration_error": "texture-set-export was renamed dome-sculpt-texture-set-export",
+    "seed_revision": "f70483e921ded0d80497f36802e9201b9aebc1c1",
+    "terminal": false
+  },
+  "product_revision": "837a29ab017330641423d65f271b27483a4224a4",
+  "profiles": {
+    "asan-arc": {
+      "alpha_differences": 0,
+      "graphics_checks": 189,
+      "maximum_rgb_byte_difference": 1,
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)"
+    },
+    "asan-software": {
+      "alpha_differences": 0,
+      "graphics_checks": 189,
+      "maximum_rgb_byte_difference": 2,
+      "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)"
+    },
+    "release-arc": {
+      "alpha_differences": 0,
+      "graphics_checks": 189,
+      "maximum_rgb_byte_difference": 1,
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)"
+    },
+    "release-software": {
+      "alpha_differences": 0,
+      "graphics_checks": 189,
+      "maximum_rgb_byte_difference": 2,
+      "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)"
+    }
+  },
+  "registered_release_seconds": {
+    "dome-sculpt-texture-set-export": 13.1001,
+    "emission-export": 0.156163,
+    "mtoon-baked-texture-sets": 8.80847,
+    "mtoon-painted-texture-sets": 0.281314,
+    "mtoon-texture-sets": 0.240981,
+    "native-authoring": 0.0587008,
+    "texture-set-bake-recipe": 0.0264081
+  },
+  "ui_release_smoke": {
+    "openxr": 19,
+    "wayland-diagnostic": 16
+  }
+}

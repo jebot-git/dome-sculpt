@@ -2566,6 +2566,32 @@ passes a 16-check native DomeD Wayland Bake workflow and a 19-check
 synthetic OpenXR replay with accepted, cancelled and interrupted edits.
 [Typed FLOAT Bake validation](validation/portable-mtoon-float-20261127.json)
 
+### Editable GLB with FLOAT MToon Bake
+
+Editable GLB now gives eligible native FLOAT texture sets the same static
+MToon preview as Standard GLB. It compiles the normal, color and emission
+proofs within the remaining working budget before emitting any images.
+Two 512-square projects have byte-identical portable images and material
+records in both formats. The mixed MToon and PBR scene keeps its distinct
+material partitions. Document Open restores the exact Scene from Editable
+GLB and produces both GLBs byte for byte on repeat export.
+
+If a material cannot meet the sampling or normal certificate, its
+existing core PBR preview remains available. Sample budget exhaustion
+also keeps this preview with the exact editable source. When a final
+file-size limit fits only the core preview, the worker retries encoding
+before it performs the one atomic write. Wider source domains, larger
+premultiplied fields, deforming frames and VRM remain open.
+
+Release and ASan/UBSan each pass 189 graphics checks in software and on
+Intel Arc A770. Seven focused Release tests pass. Seventeen files pass
+Khronos validation without errors or warnings, and the ten typed files
+pass the pinned MToon schema. The headless application independently
+opens the two Editable fixtures and reproduces their Standard GLBs.
+The same build passes 16 native DomeD Wayland and 19 synthetic OpenXR
+Bake workflow checks.
+[Editable FLOAT Bake validation](validation/editable-mtoon-float-20261127.json)
+
 ## Source and integration boundary
 
 - Main now admits product1bc13125 and public fixturef1e193c7 after complete
