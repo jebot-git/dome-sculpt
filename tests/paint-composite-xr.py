@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Real loader/stereo GL plus selected paint compute; synthetic tracking only."""
-import json,os,re,subprocess,sys,tempfile
+import json,re,subprocess,sys,tempfile
 from pathlib import Path
+from xr_test_graphics import hardware_environment, hardware_renderer
 if len(sys.argv)!=6:raise SystemExit('APP RUNTIME SOURCE INSPECTOR OUTPUT')
 app,runtime,source,helper,out=map(lambda x:Path(x).resolve(),sys.argv[1:]);out.mkdir(parents=True,exist_ok=True);checks=[]
 def check(ok,label):
@@ -15,12 +16,12 @@ def inspect(path):
 original=inspect(source)
 with tempfile.TemporaryDirectory(prefix='dome-paint-compute-xr-') as home:
  manifest=Path(home)/'runtime.json';manifest.write_text(json.dumps({'file_format_version':'1.0.0','runtime':{'library_path':str(runtime)}}))
- env={**os.environ,'XR_RUNTIME_JSON':str(manifest),'HOME':home,'XDG_RUNTIME_DIR':home,'XDG_CONFIG_HOME':home+'/config','XDG_STATE_HOME':home+'/state','UR_ENABLE_LAYERS':'UR_LAYER_TRACING','UR_LOG_TRACING':'level:info'}
+ env={**hardware_environment(),'XR_RUNTIME_JSON':str(manifest),'HOME':home,'XDG_RUNTIME_DIR':home,'XDG_CONFIG_HOME':home+'/config','XDG_STATE_HOME':home+'/state','UR_ENABLE_LAYERS':'UR_LAYER_TRACING','UR_LOG_TRACING':'level:info'}
  for k in ['WAYLAND_DISPLAY','WAYLAND_SOCKET']:env.pop(k,None)
  target=out/'painted.dsculpt';report=out/'runtime.json';env.update(DOME_XR_FIXTURE_PAINT='1',DOME_XR_FIXTURE_REPORT=str(report))
  with (out/'app.log').open('w') as log:process=subprocess.run([str(app),'--xr','--open',str(source),'--frames','45','--save',str(target)],env=env,stdout=log,stderr=subprocess.STDOUT,timeout=90)
  check(process.returncode==0,'Actual native OpenXR application paints/drains/saves and shuts down normally')
- r=json.loads(report.read_text());gpu=r.get('gl_renderer','');check('llvmpipe' in gpu if env.get('LIBGL_ALWAYS_SOFTWARE')=='1' else 'Arc' in gpu and 'A770' in gpu,'Actual stereo renderer matches explicitly requested GL device: '+gpu)
+ r=json.loads(report.read_text());gpu=r.get('gl_renderer','');check(hardware_renderer(r),'Actual stereo renderer matches explicitly requested GL device: '+gpu)
  check(r.get('acquires')==r.get('image_waits')==r.get('releases') and r.get('left_eye_nonblank',0)>0 and r.get('right_eye_nonblank',0)>0 and r.get('palette_images',0)>0,'Both actual GL eyes and tracked paint palette render with balanced image ownership')
  actual=inspect(target);a=actual['objects'][0].copy();b=original['objects'][0].copy();paint=a.pop('painted');before=b.pop('painted');check(a==b and paint['mesh']==before['mesh'] and paint!=before,'Tracked pressure updates actual512 writable layers while preserving original geometry/material/authoring sources')
  info=json.loads(subprocess.check_output([str(app),'--project-info',str(target)]));check(info['paint_blue_texels']>20,'Real nested controller paint controls select blue ink before the pressure stroke')

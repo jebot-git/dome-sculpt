@@ -2,8 +2,8 @@
 """Exercise actual OpenXR attachment authoring with synthetic controllers."""
 import argparse
 import json
-import os
 from pathlib import Path
+from xr_test_graphics import hardware_environment, hardware_renderer
 import signal
 import subprocess
 import tempfile
@@ -12,7 +12,7 @@ signal.pthread_sigmask(signal.SIG_SETMASK, [])
 parser = argparse.ArgumentParser(description=__doc__)
 for name in ("application", "runtime", "fixtures", "output"):
     parser.add_argument(name, type=lambda value: Path(value).resolve())
-parser.add_argument("--renderer", default="llvmpipe")
+parser.add_argument("--renderer", help="Require this substring in the hardware renderer name")
 args = parser.parse_args()
 args.output.mkdir(parents=True, exist_ok=True)
 results = []
@@ -38,9 +38,8 @@ with tempfile.TemporaryDirectory(prefix="dome-xr-attachment-") as directory:
     manifest.write_text(json.dumps({"file_format_version": "1.0.0", "runtime": {
         "library_path": str(args.runtime),
     }}))
-    env = {**os.environ, "XR_RUNTIME_JSON": str(manifest), "LP_NUM_THREADS": "2", "HOME": directory}
-    if args.renderer == "llvmpipe":
-        env["LIBGL_ALWAYS_SOFTWARE"] = "1"
+    env = {**hardware_environment(), "XR_RUNTIME_JSON": str(manifest), "LP_NUM_THREADS": "2", "HOME": directory}
+
     for name in ("config", "data", "state", "cache", "runtime"):
         target = home / name
         target.mkdir(mode=0o700)
@@ -56,7 +55,7 @@ with tempfile.TemporaryDirectory(prefix="dome-xr-attachment-") as directory:
                 env={**env, "DOME_XR_FIXTURE_ATTACHMENT": mode, "DOME_XR_FIXTURE_REPORT": str(report)}, timeout=75)
         check(result.returncode == 0, f"{mode}: OpenXR client exits and drains its Save")
         metrics = json.loads(report.read_text())
-        check(args.renderer.casefold() in metrics["gl_renderer"].casefold() and
+        check(hardware_renderer(metrics, args.renderer) and
               metrics["acquires"] == metrics["image_waits"] == metrics["releases"] > 0,
               f"{mode}: requested renderer and balanced OpenXR swapchains")
         pixels = metrics["attachment_palette_pixels"]
@@ -86,7 +85,7 @@ with tempfile.TemporaryDirectory(prefix="dome-xr-attachment-") as directory:
                 env={**env, "DOME_XR_FIXTURE_SKIN": mode, "DOME_XR_FIXTURE_REPORT": str(report)}, timeout=75)
         check(result.returncode == 0, f"{mode}: OpenXR client exits and drains its Save")
         metrics = json.loads(report.read_text())
-        check(args.renderer.casefold() in metrics["gl_renderer"].casefold() and metrics["stereo_submissions"] > 0 and
+        check(hardware_renderer(metrics, args.renderer) and metrics["stereo_submissions"] > 0 and
               metrics["acquires"] == metrics["image_waits"] == metrics["releases"] > 0,
               f"{mode}: requested renderer and balanced OpenXR stereo swapchains")
         check(target.read_bytes() == bound and source.read_bytes() == original,

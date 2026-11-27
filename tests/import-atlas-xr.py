@@ -2,6 +2,7 @@
 """Real OpenXR loader/GL swapchains; synthetic controller atlas-import workflow."""
 import hashlib,json,os,signal,subprocess,sys
 from pathlib import Path
+from xr_test_graphics import hardware_environment, hardware_renderer
 signal.pthread_sigmask(signal.SIG_SETMASK,[])
 binary,runtime,helper,output=map(lambda value:Path(value).resolve(),sys.argv[1:])
 output.mkdir(parents=True,exist_ok=True)
@@ -20,7 +21,7 @@ try:
   home=directory/'home';home.mkdir(exist_ok=True)
   runtime_directory=directory/'runtime';runtime_directory.mkdir(mode=0o700,exist_ok=True)
   manifest=runtime_directory/'runtime.json';manifest.write_text(json.dumps({'file_format_version':'1.0.0','runtime':{'library_path':str(runtime)}}))
-  env={**os.environ,'XR_RUNTIME_JSON':str(manifest),'LIBGL_ALWAYS_SOFTWARE':'1','LP_NUM_THREADS':'2','HOME':str(home),'XDG_RUNTIME_DIR':str(runtime_directory),'XDG_CONFIG_HOME':str(directory/'config'),'XDG_STATE_HOME':str(directory/'state'),'DOME_XR_FIXTURE_IMPORT_ATLAS':mode,'DOME_XR_FIXTURE_REPORT':str(directory/'runtime.json')}
+  env={**hardware_environment(),'XR_RUNTIME_JSON':str(manifest),'LP_NUM_THREADS':'2','HOME':str(home),'XDG_RUNTIME_DIR':str(runtime_directory),'XDG_CONFIG_HOME':str(directory/'config'),'XDG_STATE_HOME':str(directory/'state'),'DOME_XR_FIXTURE_IMPORT_ATLAS':mode,'DOME_XR_FIXTURE_REPORT':str(directory/'runtime.json')}
   if RAW:env['DOME_XR_FIXTURE_IMPORT_EXTRA_RAW']='1'
   fixture=assets/'source.glb';project=assets/'original.dsculpt';target=directory/'result.dsculpt'
   subprocess.run([str(helper),'--ui-fixture',str(fixture)],env=env,check=True)
@@ -31,7 +32,7 @@ try:
    result=subprocess.run([str(binary),'--xr','--open',str(project),'--frames','126','--save',str(target)],env=env,stdout=stream,stderr=subprocess.STDOUT,timeout=90)
   check(result.returncode==0,mode+': actual native XR import client stops and ordered Save completes')
   runtime_report=json.loads((directory/'runtime.json').read_text());after_inspection=inspect(target);after=after_inspection['scene']
-  check('llvmpipe' in runtime_report.get('gl_renderer','').lower(),mode+': explicitly requested software GL renders actual loader swapchains')
+  check(hardware_renderer(runtime_report),mode+': hardware OpenGL renders the actual loader swapchains')
   check(runtime_report.get('acquires',0)>0 and runtime_report.get('acquires')==runtime_report.get('image_waits')==runtime_report.get('releases'),mode+': actual stereo swapchains preserve balanced acquire/wait/release ownership')
   check(runtime_report.get('stereo_submissions',0)>50 and runtime_report.get('palette_images',0)>0,mode+': actual stereo frames contain the shared XR palette')
   check(all(runtime_report.get('import_atlas_images',{}).get('54',{}).get(eye,0)>1000 for eye in ('0','1')),mode+(': both eyes draw the unchanged original-coordinate options' if RAW else ': both eyes draw options after the real joystick atlas toggle'))

@@ -2,6 +2,7 @@
 """Real OpenXR loader/stereo GL/joystick polygon workflow; synthetic devices."""
 import json,os,signal,subprocess,sys,tempfile
 from pathlib import Path
+from xr_test_graphics import hardware_environment
 signal.pthread_sigmask(signal.SIG_SETMASK,[])
 binary,runtime,output=map(lambda p:Path(p).resolve(),sys.argv[1:]);output.mkdir(parents=True,exist_ok=True)
 checks=[]
@@ -13,7 +14,7 @@ def check(value,message):
  checks.append({'passed':bool(value),'check':message});print(('PASS ' if value else 'FAIL ')+message,flush=True);report();assert value,message
 with tempfile.TemporaryDirectory(prefix='dome-polygon-xr-') as directory:
  root=Path(directory);manifest=root/'runtime.json';manifest.write_text(json.dumps({'file_format_version':'1.0.0','runtime':{'library_path':str(runtime)}}))
- env={**os.environ,'XR_RUNTIME_JSON':str(manifest),'LIBGL_ALWAYS_SOFTWARE':'1','LP_NUM_THREADS':'2','HOME':directory,'XDG_RUNTIME_DIR':directory,'XDG_CONFIG_HOME':directory+'/config','XDG_STATE_HOME':directory+'/state'}
+ env={**hardware_environment(),'XR_RUNTIME_JSON':str(manifest),'LP_NUM_THREADS':'2','HOME':directory,'XDG_RUNTIME_DIR':directory,'XDG_CONFIG_HOME':directory+'/config','XDG_STATE_HOME':directory+'/state'}
  colored=os.environ.get('DOME_POLYGON_XR_COLOR')=='1'
  helper=binary.parent/'dome-sculpt-polygon-document-test';fixture=root/'source.dsculpt';fixture_helper=binary.parent/'dome-sculpt-polygon-color-document-test' if colored else helper;subprocess.run([str(fixture_helper),'--xr-fixture',str(fixture)],env=env,check=True)
  if colored:env['DOME_XR_FIXTURE_POLYGON_COLOR']='1'

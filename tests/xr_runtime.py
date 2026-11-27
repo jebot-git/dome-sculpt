@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Exercise the real loader/client with a synthetic runtime and real GL images."""
 
-import contextlib, json, os, shutil, signal, subprocess, sys, tempfile, time
+import contextlib, json, shutil, signal, subprocess, sys, tempfile, time
 from pathlib import Path
+from xr_test_graphics import hardware_environment
 
 signal.pthread_sigmask(signal.SIG_SETMASK, [])
 binary, runtime, output = map(lambda p: Path(p).resolve(), sys.argv[1:])
@@ -52,9 +53,8 @@ with contextlib.nullcontext(tempfile.mkdtemp(prefix="projects-", dir=output)) as
         )
     )
     env = {
-        **os.environ,
+        **hardware_environment(),
         "XR_RUNTIME_JSON": str(manifest),
-        "LIBGL_ALWAYS_SOFTWARE": "1",
         "HOME": directory,
         "XDG_RUNTIME_DIR": directory,
         "XDG_CONFIG_HOME": directory + "/config",

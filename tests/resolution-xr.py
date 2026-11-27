@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Native resolution controls through the real OpenXR loader and real GL images."""
-import json, os, signal, subprocess, sys, tempfile
+import json, signal, subprocess, sys, tempfile
 from pathlib import Path
+from xr_test_graphics import hardware_environment
 signal.pthread_sigmask(signal.SIG_SETMASK, [])
 binary,runtime,output=map(lambda p:Path(p).resolve(),sys.argv[1:]);output.mkdir(parents=True,exist_ok=True)
 checks=[]
@@ -11,7 +12,7 @@ def check(ok,label):
     assert ok,label
 with tempfile.TemporaryDirectory(prefix='dome-resolution-xr-') as directory:
     root=Path(directory);manifest=root/'runtime.json';manifest.write_text(json.dumps({'file_format_version':'1.0.0','runtime':{'library_path':str(runtime)}}))
-    env={**os.environ,'XR_RUNTIME_JSON':str(manifest),'LIBGL_ALWAYS_SOFTWARE':os.environ.get('LIBGL_ALWAYS_SOFTWARE','1'),'HOME':directory,'XDG_RUNTIME_DIR':directory,'XDG_CONFIG_HOME':directory+'/config','XDG_STATE_HOME':directory+'/state'}
+    env={**hardware_environment(),'XR_RUNTIME_JSON':str(manifest),'HOME':directory,'XDG_RUNTIME_DIR':directory,'XDG_CONFIG_HOME':directory+'/config','XDG_STATE_HOME':directory+'/state'}
     helper=binary.parent/'dome-sculpt-resolution-document-test';fixture=root/'source.dsculpt';subprocess.run([str(helper),'--ui-fixture',str(fixture)],check=True,env=env)
     def inspect(path):
         scene=json.loads(subprocess.check_output([str(helper),'--inspect',str(path)],env=env))

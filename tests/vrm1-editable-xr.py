@@ -2,6 +2,7 @@
 """Real native loader/stereo/joystick editable V1 export with synthetic tracking."""
 import argparse,json,os,signal,struct,subprocess,tempfile
 from pathlib import Path
+from xr_test_graphics import hardware_environment
 signal.pthread_sigmask(signal.SIG_SETMASK,[])
 p=argparse.ArgumentParser(description=__doc__)
 for name in ['binary','runtime','helper','fixture','gate','out']:p.add_argument(name,type=lambda v:Path(v).resolve())
@@ -10,7 +11,7 @@ def check(ok,label):
  checks.append({'passed':bool(ok),'check':label});(a.out/'report.json').write_text(json.dumps({'checks':checks,'failed':sum(not x['passed'] for x in checks),'physical_headset':False},indent=2)+'\n');print(('PASS ' if ok else 'FAIL ')+label,flush=True);assert ok,label
 with tempfile.TemporaryDirectory(prefix='dome-v1-editable-xr-') as home:
  root=Path(home);manifest=root/'runtime.json';manifest.write_text(json.dumps({'file_format_version':'1.0.0','runtime':{'library_path':str(a.runtime)}}));original=a.fixture.read_bytes()
- env={**os.environ,'HOME':home,'XR_RUNTIME_JSON':str(manifest),'LIBGL_ALWAYS_SOFTWARE':'1','LP_NUM_THREADS':'2'}
+ env={**hardware_environment(),'HOME':home,'XR_RUNTIME_JSON':str(manifest),'LP_NUM_THREADS':'2'}
  for name,suffix in [('XDG_CONFIG_HOME','config'),('XDG_STATE_HOME','state'),('XDG_DATA_HOME','data'),('XDG_CACHE_HOME','cache'),('XDG_RUNTIME_DIR','runtime')]:env[name]=str(root/suffix);Path(env[name]).mkdir(mode=0o700)
  def inspect(path):return json.loads(subprocess.check_output([str(a.helper),str(path)],env={k:v for k,v in env.items() if k!='LD_PRELOAD'},text=True))
  baseline=inspect(a.fixture)

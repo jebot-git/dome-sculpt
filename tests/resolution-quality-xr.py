@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Synthetic XR + real Arc GL/compute; no headset or session restart."""
-import json,os,subprocess,tempfile,re,sys
+import json,subprocess,tempfile,re,sys
 from pathlib import Path
+from xr_test_graphics import hardware_environment, hardware_renderer
 if len(sys.argv)!=6:raise SystemExit("usage: resolution-quality-xr.py ONEAPI_APP RUNTIME CPU_FIXTURE INSPECTOR OUTPUT")
 binary,runtime,oracle,helper,out=map(lambda p:Path(p).resolve(),sys.argv[1:]);out.mkdir(parents=True,exist_ok=True)
 source=out/'source.dsculpt';reference=out/'expected.dsculpt'
@@ -22,12 +23,12 @@ with tempfile.TemporaryDirectory(prefix='dome-quality-xr-') as home:
  manifest=Path(home)/'runtime.json';manifest.write_text(json.dumps({'file_format_version':'1.0.0','runtime':{'library_path':str(runtime)}}))
  for mode in ['accept','cancel']:
   target=out/(mode+'.dsculpt');report=out/(mode+'.json');log=out/(mode+'.log')
-  env={**os.environ,'XR_RUNTIME_JSON':str(manifest),'HOME':home,'XDG_RUNTIME_DIR':home,'XDG_CONFIG_HOME':home+'/config','XDG_STATE_HOME':home+'/state','LIBGL_ALWAYS_SOFTWARE':'0','DOME_XR_FIXTURE_REPORT':str(report),'DOME_XR_FIXTURE_RESOLUTION':mode,'UR_ENABLE_LAYERS':'UR_LAYER_TRACING','UR_LOG_TRACING':'level:info'}
+  env={**hardware_environment(),'XR_RUNTIME_JSON':str(manifest),'HOME':home,'XDG_RUNTIME_DIR':home,'XDG_CONFIG_HOME':home+'/config','XDG_STATE_HOME':home+'/state','DOME_XR_FIXTURE_REPORT':str(report),'DOME_XR_FIXTURE_RESOLUTION':mode,'UR_ENABLE_LAYERS':'UR_LAYER_TRACING','UR_LOG_TRACING':'level:info'}
   for name in ['GALLIUM_DRIVER','MESA_LOADER_DRIVER_OVERRIDE','WAYLAND_DISPLAY','WAYLAND_SOCKET']:env.pop(name,None)
   with log.open('w') as stream:
    process=subprocess.run([str(binary),'--xr','--open',str(source),'--frames','36','--save',str(target)],env=env,stdout=stream,stderr=subprocess.STDOUT,timeout=90)
   check(process.returncode==0,'Actual native XR '+mode+' drains and closes normally')
-  r=json.loads(report.read_text());renderer=r.get('gl_renderer','');check('Arc' in renderer and 'A770' in renderer,'Actual '+mode+' stereo renderer is Intel Arc A770: '+renderer)
+  r=json.loads(report.read_text());renderer=r.get('gl_renderer','');check(hardware_renderer(r,'Arc(tm) A770'),'Actual '+mode+' stereo renderer is Intel Arc A770: '+renderer)
   check(r.get('acquires')==r.get('image_waits')==r.get('releases') and r.get('left_eye_nonblank',0)>0 and r.get('right_eye_nonblank',0)>0 and r.get('palette_images',0)>0,'Both GL eyes and resolution palette render with balanced image ownership')
   actual=inspect(target)
   if mode=='accept':

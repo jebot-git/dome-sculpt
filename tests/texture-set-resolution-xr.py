@@ -5,6 +5,7 @@ Run fixture producer and fresh native numeric suite before this workflow gate.
 """
 import hashlib,json,os,signal,subprocess,sys,time,shutil
 from pathlib import Path
+from xr_test_graphics import hardware_environment, hardware_renderer
 signal.pthread_sigmask(signal.SIG_SETMASK,[])
 if len(sys.argv)!=6:raise SystemExit('usage: texture-set-resolution-xr.py APP RUNTIME INSPECTOR FIXTURE_MANIFEST OUTPUT')
 app,runtime,inspector,manifest_path,out=map(lambda p:Path(p).resolve(),sys.argv[1:]);out.mkdir(parents=True,exist_ok=True)
@@ -32,8 +33,8 @@ def drive_case(name,mode,source_key,expected_key,target,set_id):
  global process
  case=out/name;case.mkdir(exist_ok=False);home=case/'home';home.mkdir();gates=case/'gates';gates.mkdir();project=case/'input.dsculpt';project.write_bytes(fixtures[source_key].read_bytes());result=case/'final.dsculpt';runtime_report=case/'runtime.json';runtime_manifest=case/'loader.json'
  runtime_manifest.write_text(json.dumps({'file_format_version':'1.0.0','runtime':{'library_path':str(runtime)}}))
- env={k:v for k,v in os.environ.items() if not k.startswith('DOME_XR_FIXTURE_') and not k.startswith('DOME_XR_TEXTURE_')}
- env.update({'XR_RUNTIME_JSON':str(runtime_manifest),'DOME_XR_FIXTURE_REPORT':str(runtime_report),'DOME_XR_TEXTURE_RESOLUTION':mode,'DOME_XR_TEXTURE_TARGET':str(target),'DOME_XR_TEXTURE_GATES':str(gates),'HOME':str(home),'XDG_RUNTIME_DIR':str(home/'runtime'),'XDG_CONFIG_HOME':str(home/'config'),'XDG_STATE_HOME':str(home/'state'),'XDG_CACHE_HOME':str(home/'cache'),'LIBGL_ALWAYS_SOFTWARE':os.environ.get('LIBGL_ALWAYS_SOFTWARE','1'),'LP_NUM_THREADS':'2','MESA_SHADER_CACHE_DISABLE':'true'})
+ env={k:v for k,v in hardware_environment().items() if not k.startswith('DOME_XR_FIXTURE_') and not k.startswith('DOME_XR_TEXTURE_')}
+ env.update({'XR_RUNTIME_JSON':str(runtime_manifest),'DOME_XR_FIXTURE_REPORT':str(runtime_report),'DOME_XR_TEXTURE_RESOLUTION':mode,'DOME_XR_TEXTURE_TARGET':str(target),'DOME_XR_TEXTURE_GATES':str(gates),'HOME':str(home),'XDG_RUNTIME_DIR':str(home/'runtime'),'XDG_CONFIG_HOME':str(home/'config'),'XDG_STATE_HOME':str(home/'state'),'XDG_CACHE_HOME':str(home/'cache'),'LP_NUM_THREADS':'2','MESA_SHADER_CACHE_DISABLE':'true'})
  for k in ['WAYLAND_DISPLAY','WAYLAND_SOCKET']:env.pop(k,None)
  for k in ['XDG_RUNTIME_DIR','XDG_CONFIG_HOME','XDG_STATE_HOME','XDG_CACHE_HOME']:Path(env[k]).mkdir(mode=0o700)
  original=inspect(project,env);expected=inspect(fixtures[expected_key],env);stamp=project.stat().st_mtime_ns
@@ -75,7 +76,7 @@ def drive_case(name,mode,source_key,expected_key,target,set_id):
  if mode=='quality':
   check(any(v['step']==36 for v in state.get('field_pressures',[])),name+': actual Apply ray is delivered to the independently measured rejecting input')
   check(manifest['quality']['measured_maximum']>.30 or manifest['quality']['measured_rms']>.08,name+': real native loose control measured loss beyond the default acceptance bound')
- renderer=os.environ.get('DOME_FIELD_XR_REQUIRE_RENDERER');check(not renderer or renderer in state.get('gl_renderer',''),name+': renderer matches the explicitly requested runtime profile')
+ renderer=os.environ.get('DOME_FIELD_XR_REQUIRE_RENDERER');check(hardware_renderer(state,renderer),name+': renderer matches the explicitly requested runtime profile')
  maps=Path(str(runtime_report)+'.maps');check(maps.is_file() and str(app) in maps.read_text() and str(runtime) in maps.read_text(),name+': actual process maps contain the pinned ordinary app and new runtime module')
  case_reports.append({'name':name,'mode':mode,'runtime_report':str(runtime_report),'runtime_sha256':sha(runtime_report),'native_sha256':sha(result),'maps_sha256':sha(maps),'renderer':state.get('gl_renderer'),'tracking':'synthetic','scope':'Ordinary app; no private product observer'});report()
 

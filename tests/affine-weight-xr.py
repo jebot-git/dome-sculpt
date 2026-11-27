@@ -2,8 +2,8 @@
 """Exercise affine weight painting through the OpenXR loader and controller."""
 import argparse
 import json
-import os
 from pathlib import Path
+from xr_test_graphics import hardware_environment, hardware_renderer
 import signal
 import subprocess
 import tempfile
@@ -12,7 +12,7 @@ signal.pthread_sigmask(signal.SIG_SETMASK, [])
 parser = argparse.ArgumentParser(description=__doc__)
 for argument in ("application", "runtime", "fixture", "output"):
     parser.add_argument(argument, type=lambda value: Path(value).resolve())
-parser.add_argument("--renderer", default="llvmpipe")
+parser.add_argument("--renderer", help="Require this substring in the hardware renderer name")
 args = parser.parse_args()
 args.output.mkdir(parents=True, exist_ok=True)
 fixtures = args.output / "fixtures"
@@ -35,9 +35,8 @@ with tempfile.TemporaryDirectory(prefix="dome-affine-weights-") as directory:
     manifest = home / "runtime.json"
     manifest.write_text(json.dumps({"file_format_version": "1.0.0", "runtime": {
         "library_path": str(args.runtime)}}))
-    env = {**os.environ, "HOME": directory, "XR_RUNTIME_JSON": str(manifest), "LP_NUM_THREADS": "2"}
-    if args.renderer == "llvmpipe":
-        env["LIBGL_ALWAYS_SOFTWARE"] = "1"
+    env = {**hardware_environment(), "HOME": directory, "XR_RUNTIME_JSON": str(manifest), "LP_NUM_THREADS": "2"}
+
     for name in ("config", "state", "data", "cache", "runtime"):
         target = home / name
         target.mkdir(mode=0o700)
@@ -53,7 +52,7 @@ with tempfile.TemporaryDirectory(prefix="dome-affine-weights-") as directory:
                                 "DOME_XR_FIXTURE_REPORT": str(report)},
                            stdout=log, stderr=subprocess.STDOUT, timeout=120, check=True)
         evidence = json.loads(report.read_text())
-        check(args.renderer.casefold() in evidence["gl_renderer"].casefold() and
+        check(hardware_renderer(evidence, args.renderer) and
               evidence["acquires"] == evidence["image_waits"] == evidence["releases"] > 0 and
               evidence["stereo_submissions"] > 0,
               f"{mode}: the selected renderer submits both eyes and drains the worker Save")

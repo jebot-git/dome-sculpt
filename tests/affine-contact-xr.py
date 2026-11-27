@@ -2,6 +2,7 @@
 """Scene13 contact painting through real OpenXR loader/stereo GL; synthetic tracking."""
 import json,os,signal,subprocess,sys,tempfile
 from pathlib import Path
+from xr_test_graphics import hardware_environment, hardware_renderer
 signal.pthread_sigmask(signal.SIG_SETMASK,[])
 binary,runtime,helper,output=map(lambda p:Path(p).resolve(),sys.argv[1:]);output.mkdir(parents=True,exist_ok=True)
 checks=[]
@@ -11,7 +12,7 @@ def check(ok,label):
  assert ok,label
 with tempfile.TemporaryDirectory(prefix='dome-affine-contact-xr-') as directory:
  root=Path(directory);manifest=root/'runtime.json';manifest.write_text(json.dumps({'file_format_version':'1.0.0','runtime':{'library_path':str(runtime)}}))
- env={**os.environ,'XR_RUNTIME_JSON':str(manifest),'LIBGL_ALWAYS_SOFTWARE':'0' if os.environ.get('DOME_CONTACT_XR_HARDWARE')=='1' else '1','LP_NUM_THREADS':'2','HOME':directory,'XDG_RUNTIME_DIR':directory,'XDG_CONFIG_HOME':directory+'/config','XDG_STATE_HOME':directory+'/state'}
+ env={**hardware_environment(),'XR_RUNTIME_JSON':str(manifest),'LP_NUM_THREADS':'2','HOME':directory,'XDG_RUNTIME_DIR':directory,'XDG_CONFIG_HOME':directory+'/config','XDG_STATE_HOME':directory+'/state'}
  fixture=root/'source.dsculpt';subprocess.run([str(helper),'--ui-fixture',str(fixture)],check=True,env=env)
  def inspect(p):return json.loads(subprocess.check_output([str(helper),'--inspect',str(p)],env=env))
  original=inspect(fixture)
@@ -21,7 +22,7 @@ with tempfile.TemporaryDirectory(prefix='dome-affine-contact-xr-') as directory:
    result=subprocess.run([str(binary),'--xr','--open',str(fixture),'--frames','32','--save',str(target)],env={**env,'DOME_XR_FIXTURE_REPORT':str(report),'DOME_XR_FIXTURE_AFFINE_CONTACT':mode},stdout=log,stderr=subprocess.STDOUT,timeout=90)
   check(result.returncode==0,'Affine '+mode+' closes and saves normally through real loader')
   after=inspect(target);r=json.loads(report.read_text())
-  check(('Arc' in r.get('gl_renderer','')) if os.environ.get('DOME_CONTACT_XR_HARDWARE')=='1' else ('llvmpipe' in r.get('gl_renderer','').lower()),'Actual '+mode+' graphics renderer matches the requested test device')
+  check(hardware_renderer(r, 'Arc' if os.environ.get('DOME_CONTACT_XR_HARDWARE')=='1' else None),'Actual '+mode+' graphics renderer matches the requested test device')
   check(r.get('acquires')==r.get('image_waits')==r.get('releases') and r.get('left_eye_nonblank',0)>0 and r.get('right_eye_nonblank',0)>0 and r.get('tracking_losses',0)==0,'Affine '+mode+' renders balanced nonblank stereo with actual GL images')
   if mode=='accept':
    check(after['center_coverage']>200 and after['scene']!=original['scene'],'Real controller grip paints original affine source UV center')

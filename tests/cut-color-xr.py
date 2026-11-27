@@ -2,6 +2,7 @@
 """Actual OpenXR loader/GL plane-cut workflow with current corner authority."""
 import json,os,signal,subprocess,sys,tempfile
 from pathlib import Path
+from xr_test_graphics import hardware_environment
 signal.pthread_sigmask(signal.SIG_SETMASK,[])
 binary,runtime,out=map(lambda s:Path(s).resolve(),sys.argv[1:]);out.mkdir(parents=True,exist_ok=True)
 checks=[]
@@ -13,7 +14,7 @@ def check(ok,label):
 with tempfile.TemporaryDirectory(prefix="projects-",dir=out) as temporary:
     root=Path(temporary);manifest=root/"runtime.json"
     manifest.write_text(json.dumps({"file_format_version":"1.0.0","runtime":{"library_path":str(runtime)}}))
-    env={**os.environ,"XR_RUNTIME_JSON":str(manifest),"LIBGL_ALWAYS_SOFTWARE":"1","LP_NUM_THREADS":"2","HOME":str(root),"XDG_RUNTIME_DIR":str(root),"XDG_CONFIG_HOME":str(root/"config"),"XDG_STATE_HOME":str(root/"state")}
+    env={**hardware_environment(),"XR_RUNTIME_JSON":str(manifest),"LP_NUM_THREADS":"2","HOME":str(root),"XDG_RUNTIME_DIR":str(root),"XDG_CONFIG_HOME":str(root/"config"),"XDG_STATE_HOME":str(root/"state")}
     fixture=root/"input.dsculpt"
     subprocess.run([str(binary.parent/"dome-sculpt-cut-color-test"),"--ui-fixture",str(fixture)],env=env,check=True)
     def inspect(path):return json.loads(subprocess.check_output([str(binary.parent/"dome-sculpt-cut-authoring-test"),"--inspect",str(path)],env=env,text=True))

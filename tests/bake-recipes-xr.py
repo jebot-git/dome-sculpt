@@ -2,6 +2,7 @@
 """Actual saved-recipe ray Recall, control Confirm/Cancel and Bake through loader/GL stereo."""
 import argparse,json,os,signal,subprocess,tempfile,time
 from pathlib import Path
+from xr_test_graphics import hardware_environment, hardware_renderer
 signal.pthread_sigmask(signal.SIG_SETMASK,[])
 p=argparse.ArgumentParser(description=__doc__)
 for name in ('binary','runtime','helper','out'):p.add_argument(name,type=lambda v:Path(v).resolve())
@@ -14,7 +15,7 @@ def check(ok,label):
  checks.append({'passed':bool(ok),'check':label});(out/'report.json').write_text(json.dumps({'checks':checks,'physical_headset':False},indent=2)+'\n');print(('PASS ' if ok else 'FAIL ')+label,flush=True);assert ok,label
 with tempfile.TemporaryDirectory(prefix='dome-cage-xr-') as directory:
  root=Path(directory);manifest=root/'runtime.json';manifest.write_text(json.dumps({'file_format_version':'1.0.0','runtime':{'library_path':str(a.runtime)}}))
- env={**os.environ,'DOME_XR_FIXTURE_RECIPE':'1','XR_RUNTIME_JSON':str(manifest),'LIBGL_ALWAYS_SOFTWARE':'1','LP_NUM_THREADS':'2','HOME':str(root),'XDG_RUNTIME_DIR':str(root),'XDG_CONFIG_HOME':str(root/'config'),'XDG_STATE_HOME':str(root/'state'),'XDG_CACHE_HOME':str(root/'cache'),'XDG_DATA_HOME':str(root/'data')}
+ env={**hardware_environment(),'DOME_XR_FIXTURE_RECIPE':'1','XR_RUNTIME_JSON':str(manifest),'LP_NUM_THREADS':'2','HOME':str(root),'XDG_RUNTIME_DIR':str(root),'XDG_CONFIG_HOME':str(root/'config'),'XDG_STATE_HOME':str(root/'state'),'XDG_CACHE_HOME':str(root/'cache'),'XDG_DATA_HOME':str(root/'data')}
  source=out/'source.dsculpt';reference=out/'reference.dsculpt'
  if a.texture_set:
   if a.mtoon:env['DOME_BAKE_FIXTURE_MTOON']='1'
@@ -41,7 +42,7 @@ with tempfile.TemporaryDirectory(prefix='dome-cage-xr-') as directory:
     if r.poll() is None:r.terminate();r.wait()
 
   check(r.returncode==0,mode+': actual native XR client exits and ordered Save drains');detail=json.loads(report.read_text());after=inspect(target)
-  check('llvmpipe' in detail.get('gl_renderer','').lower(),mode+': explicit software renderer is actually used')
+  check(hardware_renderer(detail),mode+': hardware OpenGL renders the actual swapchains')
   check(detail.get('acquires',0)>0 and detail.get('acquires')==detail.get('image_waits')==detail.get('releases') and detail.get('left_eye_nonblank',0)>0 and detail.get('right_eye_nonblank',0)>0,mode+': actual stereo ownership balances and both eyes contain rendered output')
   check(all(detail.get('cage_images',{}).get('58',{}).get(eye,0)>1000 for eye in ['0','1']),mode+': both real GL eyes render the edited Source/Cage controls')
   check(source.read_bytes()==before,mode+': input project bytes remain untouched')

@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Actual XR loader/stereo controls for explicit conversion; synthetic poses only."""
-import argparse,json,os,signal,subprocess,tempfile,time
+import argparse,json,signal,subprocess,tempfile,time
 from pathlib import Path
+from xr_test_graphics import hardware_environment, hardware_renderer
 from PIL import Image
 signal.pthread_sigmask(signal.SIG_SETMASK,[])
 p=argparse.ArgumentParser(description=__doc__)
@@ -11,8 +12,8 @@ def check(ok,label):
  checks.append({'passed':bool(ok),'check':label});(out/'report.json').write_text(json.dumps({'checks':checks,'physical_headset':False},indent=2)+'\n');print(('PASS 'if ok else'FAIL ')+label,flush=True);assert ok,label
 with tempfile.TemporaryDirectory(prefix='dome-canonical-xr-')as home:
  root=Path(home);manifest=root/'runtime.json';manifest.write_text(json.dumps({'file_format_version':'1.0.0','runtime':{'library_path':str(a.runtime)}}))
- env={k:v for k,v in os.environ.items()if not k.startswith('DOME_XR_FIXTURE')}
- env.update(XR_RUNTIME_JSON=str(manifest),LIBGL_ALWAYS_SOFTWARE='1',LP_NUM_THREADS='2',HOME=home,XDG_RUNTIME_DIR=home,XDG_CONFIG_HOME=home+'/config',XDG_STATE_HOME=home+'/state',XDG_CACHE_HOME=home+'/cache',XDG_DATA_HOME=home+'/data')
+ env={k:v for k,v in hardware_environment().items()if not k.startswith('DOME_XR_FIXTURE')}
+ env.update(XR_RUNTIME_JSON=str(manifest),LP_NUM_THREADS='2',HOME=home,XDG_RUNTIME_DIR=home,XDG_CONFIG_HOME=home+'/config',XDG_STATE_HOME=home+'/state',XDG_CACHE_HOME=home+'/cache',XDG_DATA_HOME=home+'/data')
  for mode in ['accept','cancel','focus','solo']:
   source=out/(mode+'-source.dsculpt');expected=out/(mode+'-expected.dsculpt');target=out/(mode+'.dsculpt');report=out/(mode+'.json')
   subprocess.run([str(a.helper),'--ui-solo-fixture'if mode=='solo'else'--ui-fixture',str(source)],env=env,check=True)
@@ -34,7 +35,7 @@ with tempfile.TemporaryDirectory(prefix='dome-canonical-xr-')as home:
     if client.poll()is None:client.terminate();client.wait()
   check(client.returncode==0,mode+': actual XR application exits normally and ordered native Save drains')
   detail=json.loads(report.read_text());after=inspect(target)
-  check('llvmpipe'in detail.get('gl_renderer','').lower(),mode+': actual renderer is explicitly software rather than physical GPU qualification')
+  check(hardware_renderer(detail),mode+': hardware OpenGL renders the actual stereo images')
   check(detail.get('acquires',0)>0 and detail.get('acquires')==detail.get('image_waits')==detail.get('releases') and detail.get('left_eye_nonblank',0)>0 and detail.get('right_eye_nonblank',0)>0,mode+': actual GL stereo images balance ownership and both eyes contain output')
   check(all(detail.get('canonical_images',{}).get('34',{}).get(eye,0)>1000 for eye in ['0','1']),mode+': both captured real eyes display the open Source/cage controls before conversion input')
   # Fixed synthetic camera, 1024px eyes and 640px panel put the conversion

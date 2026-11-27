@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Real OpenXR loader/stereo GL + synthetic controller colour UV23 journey."""
-import json,os,signal,subprocess,sys,tempfile
+import json,signal,subprocess,sys,tempfile
 from pathlib import Path
+from xr_test_graphics import hardware_environment
 signal.pthread_sigmask(signal.SIG_SETMASK,[])
 binary,runtime,helper,output=map(lambda p:Path(p).resolve(),sys.argv[1:]);output.mkdir(parents=True,exist_ok=True)
 checks=[]
@@ -11,7 +12,7 @@ def check(ok,label):
  assert ok,label
 with tempfile.TemporaryDirectory(prefix='dome-corner-uv23-xr-') as directory:
  root=Path(directory);manifest=root/'runtime.json';manifest.write_text(json.dumps({'file_format_version':'1.0.0','runtime':{'library_path':str(runtime)}}))
- env={**os.environ,'XR_RUNTIME_JSON':str(manifest),'LIBGL_ALWAYS_SOFTWARE':'1','LP_NUM_THREADS':'2','HOME':directory,'XDG_RUNTIME_DIR':directory,'XDG_CONFIG_HOME':directory+'/config','XDG_STATE_HOME':directory+'/state'}
+ env={**hardware_environment(),'XR_RUNTIME_JSON':str(manifest),'LP_NUM_THREADS':'2','HOME':directory,'XDG_RUNTIME_DIR':directory,'XDG_CONFIG_HOME':directory+'/config','XDG_STATE_HOME':directory+'/state'}
  fixture=root/'source.dsculpt';subprocess.run([str(helper),'--ui-fixture',str(fixture)],check=True,env=env)
  def inspect(path):
   value=json.loads(subprocess.check_output([str(helper),'--inspect',str(path)],env=env))
