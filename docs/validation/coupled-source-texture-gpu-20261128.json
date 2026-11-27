@@ -1,0 +1,247 @@
+{
+  "date": "2026-11-28",
+  "production_commit": "9d885e0b8d788c606d66f8e2ab3fbade05f20877",
+  "previous_published_commit": "d05660c05bcb3ebf242dbc200e455722a8868e40",
+  "domed_toolkit_commit": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "device": "Intel Arc A770 / renderD129 / 0000:03:00.0",
+  "scope": "Coupled UV0 sampling of original color, ORM, occlusion and legacy emission source images that fit the native 512\u20132048 paint grid. Larger original images and retained coordinate domains remain open.",
+  "arc_application": {
+    "file": "artifacts/coupled-source-texture-gpu-20261128/evidence/oneapi/dome-sculpt",
+    "sha256": "242ef6c2ba6b1673a6dfd045ea5457bfb2323e4dc5088567f787bdd78ffd9063"
+  },
+  "focused_arc_release": {
+    "report": {
+      "file": "artifacts/coupled-source-texture-gpu-20261128/evidence/oneapi/coupled-source-texture-gpu.xml",
+      "sha256": "1a288daa14b7f7527c7b60ec1c901d386639be669f4d6783da20d22c15dd7980"
+    },
+    "passed": 6,
+    "tests": [
+      "current-color-source-bake",
+      "paint-overlay-gpu",
+      "color-preparation",
+      "current-color-target-preparation",
+      "paint-composite-compute",
+      "paint-composite-native"
+    ]
+  },
+  "xr_bake_policy": {
+    "checks": 20,
+    "report": {
+      "file": "artifacts/coupled-source-texture-gpu-20261128/evidence/oneapi/bake-policy-xr/report.json",
+      "sha256": "5d4fce8613ab15f59b797e104484b0178a7d91102b5a53bd3740dbe6efc44dd4"
+    },
+    "suite": {
+      "report": {
+        "file": "artifacts/coupled-source-texture-gpu-20261128/evidence/oneapi/bake-policy-hardware.xml",
+        "sha256": "a5cd612be4dec16e22d2a5a64ec572c56c84ad2914691a7b26074776d0dd8f95"
+      },
+      "passed": 1,
+      "tests": [
+        "bake-policy-openxr"
+      ]
+    }
+  },
+  "xr_rotated_project": {
+    "report": {
+      "file": "artifacts/coupled-source-texture-gpu-20261128/evidence/xr-coupled.json",
+      "sha256": "78b3ddeeb8a5bf3f2fe64c5efbf8a5e4d5b491deac9ca997872a61de5a3317d5"
+    },
+    "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+    "archive": {
+      "file": "artifacts/coupled-source-texture-gpu-20261128/evidence/xr-coupled.dsculpt",
+      "sha256": "4be20372524e566c8f9450504e8a7c325516250d3cd8ea28722cd13e17082493"
+    },
+    "balanced_acquires_waits_releases": 12,
+    "nonblank_left_eye": 5,
+    "nonblank_right_eye": 5,
+    "scope": "The seven-frame open/save matches the input archive. The initial longer run applied the stock synthetic menu action and changed only mesh_active."
+  },
+  "headless_sanitizer": {
+    "compute": {
+      "file": "artifacts/coupled-source-texture-gpu-20261128/evidence/asan/paint-composite-compute.cpp.log",
+      "sha256": "1039f65e23b72f6bfa8fa0ab82ad2e6c622322f29e539f7426f377e5ee1ce316"
+    },
+    "native": {
+      "file": "artifacts/coupled-source-texture-gpu-20261128/evidence/asan/paint-composite-native.cpp.log",
+      "sha256": "65c0a49aaa80e83e312dd182835e9e62e8248cd2d69631028dbf3d2952330561"
+    },
+    "scope": "Changed paint, sampler and compositor objects were instrumented and linked with the preceding headless ASan/UBSan reference core."
+  },
+  "gpu_startup_contract": {
+    "no_compute_device": {
+      "desktop": {
+        "file": "artifacts/coupled-source-texture-gpu-20261128/startup-desktop-no-gpu.log",
+        "sha256": "97cf1cd6391951236edc520fe87dbf3b572b69ded88f7ae1936c017c00d8895c"
+      },
+      "xr": {
+        "file": "artifacts/coupled-source-texture-gpu-20261128/startup-xr-no-gpu.log",
+        "sha256": "97cf1cd6391951236edc520fe87dbf3b572b69ded88f7ae1936c017c00d8895c"
+      },
+      "export": {
+        "file": "artifacts/coupled-source-texture-gpu-20261128/startup-export-no-gpu.log",
+        "sha256": "97cf1cd6391951236edc520fe87dbf3b572b69ded88f7ae1936c017c00d8895c"
+      }
+    },
+    "software_openxr": {
+      "file": "artifacts/coupled-source-texture-gpu-20261128/startup-xr-software-gl.log",
+      "sha256": "aac2faafa498540bde06261f4c75d3c065627ee2508ae2a65196a6f370041fa1"
+    },
+    "cpu_configurations": {
+      "desktop": {
+        "file": "artifacts/coupled-source-texture-gpu-20261128/configure-desktop-cpu.log",
+        "sha256": "67d4a1e372fda3c5dce61d5c5a4aa10448cdc675a06decd20e18231efe135ff8"
+      },
+      "xr": {
+        "file": "artifacts/coupled-source-texture-gpu-20261128/configure-xr-cpu.log",
+        "sha256": "67d4a1e372fda3c5dce61d5c5a4aa10448cdc675a06decd20e18231efe135ff8"
+      },
+      "unapproved-headless": {
+        "file": "artifacts/coupled-source-texture-gpu-20261128/configure-unapproved-headless-cpu.log",
+        "sha256": "67d4a1e372fda3c5dce61d5c5a4aa10448cdc675a06decd20e18231efe135ff8"
+      }
+    },
+    "selected_backend_missing_device": {
+      "oneapi": {
+        "file": "artifacts/coupled-source-texture-gpu-20261128/missing-device.log",
+        "sha256": "82029a0a48e96aed9e720490124fafd1466553103607ef3f52646c42da7994f2"
+      },
+      "cuda": {
+        "file": "artifacts/coupled-source-texture-gpu-20261128/cuda-missing.log",
+        "sha256": "772ff26543a5e435c62c8b83b1105f747975961cb79e75725d6ff266bb92a6f0"
+      },
+      "rocm": {
+        "file": "artifacts/coupled-source-texture-gpu-20261128/rocm-missing.log",
+        "sha256": "cc8e523368252da95219be88094ed5c60e3d426146cbe6da680102bf4bd4ed9f"
+      }
+    },
+    "scope": "Updated CUDA and ROCm kernels compile and refuse missing devices. Positive AMD and NVIDIA device execution remains open."
+  },
+  "benchmark": {
+    "fixture": {
+      "file": "artifacts/coupled-source-texture-gpu-20261128/evidence/project.dsculpt",
+      "sha256": "4be20372524e566c8f9450504e8a7c325516250d3cd8ea28722cd13e17082493"
+    },
+    "probe": {
+      "file": "artifacts/coupled-source-texture-gpu-20261128/evidence/probe.cpp",
+      "sha256": "662360abfa3f316598fcf7ae97089a597cfe069f07385b8d2b1e94e98717295c"
+    },
+    "gltf_fixture_builder": {
+      "file": "artifacts/coupled-source-texture-gpu-20261128/evidence/source-color-fixtures.hpp",
+      "sha256": "28bba35b9110795fb11504afa0b914a86558231e568cd9a4fcaa8f02b3f12dac"
+    },
+    "paint_grid_resolution": 1024,
+    "extension": "KHR_texture_transform",
+    "scope": "Three fresh processes per application, timed after project open with output allocation and transfers included.",
+    "before": {
+      "runs": [
+        {
+          "file": "artifacts/coupled-source-texture-gpu-20261128/evidence/measure-before-1.log",
+          "sha256": "b46221e8b1db97adf5f7c12ac3b52e90febab2772d247a8972a1b159e25b197a",
+          "elapsed_ns": 266759759
+        },
+        {
+          "file": "artifacts/coupled-source-texture-gpu-20261128/evidence/measure-before-2.log",
+          "sha256": "6fd9cb5a1d71c8da0c7e05f5819ca7edf191b59a0326206d546b3fbc976cd0ce",
+          "elapsed_ns": 260736044
+        },
+        {
+          "file": "artifacts/coupled-source-texture-gpu-20261128/evidence/measure-before-3.log",
+          "sha256": "e1899f83fa42f3e77c904befead8b83f4846ad31937c477f8232e0b854bd75e2",
+          "elapsed_ns": 268303891
+        }
+      ],
+      "median_ns": 266759759
+    },
+    "after": {
+      "runs": [
+        {
+          "file": "artifacts/coupled-source-texture-gpu-20261128/evidence/measure-after-1.log",
+          "sha256": "b6a4f1bd7338332809f95f84839b6fbf1492f6c6c11d801b7c45c7ca4642ec76",
+          "elapsed_ns": 59683369
+        },
+        {
+          "file": "artifacts/coupled-source-texture-gpu-20261128/evidence/measure-after-2.log",
+          "sha256": "c048df52289d1cff1f049f7a1e5f8ff37931dcdc9c1f038a6304cd566edf8827",
+          "elapsed_ns": 47757365
+        },
+        {
+          "file": "artifacts/coupled-source-texture-gpu-20261128/evidence/measure-after-3.log",
+          "sha256": "02620e7e412a0daa4f2be34971f3c757f3789640e3dcdd33c080aefef670019e",
+          "elapsed_ns": 49504771
+        }
+      ],
+      "median_ns": 49504771
+    },
+    "exact_map_digests": {
+      "color": "60f254f4dc12d5ab",
+      "pbr_color": "5643db8a0c214da5",
+      "orm": "6426331b06abd3a9",
+      "emission": "40bede9a1c1e18ad",
+      "normal": "cbf29ce484222325",
+      "color_coverage": "f564eedf2f1aa2c0",
+      "emission_coverage": "bb140926bc8e0de6",
+      "baked_normal": "cbf29ce484222325",
+      "baked_coverage": "cbf29ce484222325",
+      "common_transparency": "1",
+      "pbr_transparency": "1"
+    }
+  },
+  "exact_application_glb": {
+    "file": {
+      "file": "artifacts/coupled-source-texture-gpu-20261128/evidence/after.glb",
+      "sha256": "e8772da03da0d5329394927bd64441d8346d656d7b1e9426fb3aeddbbd01b49a"
+    },
+    "trace": {
+      "file": "artifacts/coupled-source-texture-gpu-20261128/export-after.log",
+      "sha256": "c058114a7017ab750dfd80b27dd6634d643d3ead7f0e2692f948b9cf0bdb0d07"
+    },
+    "selected_gpu_dispatches": {
+      "launch_source_coordinates": 48,
+      "paint_compute9composite": 48
+    }
+  },
+  "preceding_arc_sweep": {
+    "revision": "30eaee642f95ce59fbf2f1743e7c368524147acf",
+    "status": {
+      "file": "artifacts/gpu-arc-full-release-20261127/combined-test-status.json",
+      "sha256": "3ce7603fd6f32a6f60a3daf9dbed286548fc643ddfe7f18d8aa26b3922855902"
+    },
+    "full": {
+      "passed": 1430,
+      "failed": 13,
+      "skipped": 0
+    },
+    "frozen_storage_and_hold_retries": {
+      "report": {
+        "file": "artifacts/source-texture-gpu-20261128/retry-arc.xml",
+        "sha256": "67cdd8ab2f0776c469925205f337999d861bc9c7e16454d739f35d0cae293610"
+      },
+      "passed": 12,
+      "tests": [
+        "prepared-normal-vroid-render",
+        "post-uv-avatar-render",
+        "normal-domain-avatar",
+        "normal-color-uv-render",
+        "pbr-preview-avatar",
+        "normal-domain-avatar-glb",
+        "source-extra-uv-raw",
+        "paint-sampling-render",
+        "rig-fit-openxr",
+        "paint-composite-render",
+        "rig-rest-openxr",
+        "source-rest-graph"
+      ]
+    },
+    "corrected_fixtures_on_current_candidate": {
+      "report": {
+        "file": "artifacts/coupled-source-texture-gpu-20261128/evidence/oneapi/recovered-fixtures.xml",
+        "sha256": "adfa9e58430dadcb32e769bfa196f32988a50856c1d178b638119776449bc73e"
+      },
+      "passed": 2,
+      "tests": [
+        "source-paint-resources",
+        "sculpt-resolution-allocation"
+      ]
+    }
+  }
+}

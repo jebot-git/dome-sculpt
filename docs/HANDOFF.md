@@ -15,7 +15,8 @@ Update this current summary at milestones rather than prepending more history.
 Dome Sculpt now requires hardware OpenGL and an available GPU for the
 selected compute backend. ONEAPI is the default. CUDA and ROCm remain
 explicit build choices. Desktop and OpenXR refuse software OpenGL or missing
-compute hardware. CPU numerical references build as opt-in headless tests.
+compute hardware. Command-line export also requires the selected compute GPU.
+CPU numerical and sanitizer references build as opt-in headless tests.
 The frozen pre-policy `a2646a28` Release sweep completed with all 1,438 tests
 passing. Its software application results apply to that older revision.
 
@@ -151,17 +152,29 @@ the existing paint, Bake and prepared PBR outputs. On the 1024-pixel textured
 fixture, all map checksums and the application GLB match the previous revision.
 Across three paired Arc runs the median compositing time fell from 265 to
 56 milliseconds. The integrated producer also checks that original tangent
-normal data and source ownership remain exact. UV transforms that couple
-their axes, larger source images and independently retained paint coordinates
-still need device support. [Original texture evidence](validation/source-texture-gpu-20261128.json)
+normal data and source ownership remain exact.
+[Original texture evidence](validation/source-texture-gpu-20261128.json)
+
+Rotated and sheared UV0 sampling now runs on the selected GPU for source
+images that fit the native paint grid. The device generates the taps in
+65,536-pixel batches. It preserves the original wrap, filtering and
+rounding. An imported `KHR_texture_transform` fixture reproduces all nine
+material image digests, transparency flags and the complete GLB. Median
+compositing time was 50 milliseconds, down from 267, across three paired
+fresh processes on Intel Arc A770. The same project opens in synthetic
+OpenXR with hardware stereo and saves byte for byte. The Arc Release and
+headless sanitizer suites pass. CUDA and ROCm compile and refuse missing
+hardware. Larger images and retained-coordinate sampling remain open.
+[Coupled UV0 texture evidence](validation/coupled-source-texture-gpu-20261128.json)
 
 The preceding Arc sweep reached 29 MiB of workspace space and was held after
 1,096 cases. Completed artifacts were moved to the local Media drive with
 their hashes verified and their workspace paths preserved. The same sweep
-resumed. All twelve separate reruns passed on the frozen executable after
-the write errors and hold-related timeouts. The original sweep retains those
-results in its log and continues independently.
-[Regression recovery evidence](validation/source-texture-gpu-20261128.json)
+resumed and finished with 1,430 passes and 13 failures out of 1,443 tests.
+All eleven storage and hold-related failures passed in a separate rerun of
+the frozen executable, along with one dependency. The source-paint budget
+and sculpt allocation fixture corrections pass on the current candidate.
+[Release sweep and retry evidence](validation/coupled-source-texture-gpu-20261128.json)
 
 Dome Sculpt is an integrated authoring candidate. The isolated software
 Release run for `662d889d` passed all 1,366 registered tests. The newer

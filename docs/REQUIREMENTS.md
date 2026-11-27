@@ -4,8 +4,9 @@ Desktop and OpenXR authoring require hardware-accelerated OpenGL and an
 available GPU for the build-selected oneAPI, ROCm or CUDA compute backend.
 OneAPI is the default. This decision supersedes the CPU authoring option in
 the original goal and historical checkpoints. CPU numerical and sanitizer
-references remain opt-in headless test targets. GPU coverage and data-transfer
-efficiency across the remaining workflows still require qualification.
+references remain opt-in headless test targets. Command-line export also
+requires the selected compute device. GPU coverage and data-transfer efficiency
+across the remaining workflows still require qualification.
 
 Eligible 512–2048 current-grid RGB8 Bake materials now composite color, ORM
 and legacy emission on the selected GPU. Their ordered paint, coverage,
@@ -31,6 +32,13 @@ grid. Exact Arc tests cover nearest and linear filtering, clamp, repeat,
 mirrored repeat, paint and Bake coverage, and prepared PBR alpha. Larger
 original images, coupled UV axes and retained-coordinate sampling still
 need GPU coverage. [Original texture evidence](validation/source-texture-gpu-20261128.json)
+
+Rotated and sheared UV0 source textures that fit the native grid now use the
+selected GPU. It resolves coupled taps in bounded batches and preserves the
+original nearest and bilinear rounding. Arc validation covers mixed and fully
+coupled material roles, native Bake and prepared alpha. Larger source images
+and independent retained paint coordinates still need GPU coverage.
+[Coupled UV0 texture evidence](validation/coupled-source-texture-gpu-20261128.json)
 
 ## Current validation — 2026-11-27
 
