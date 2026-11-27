@@ -59,6 +59,14 @@ pass in both Release and ASan/UBSan. An independent reader reconstructs all
 four GLB fixtures from their skin and morph accessors within 0.06 micrometres.
 [Retained texture-set skin validation](validation/retained-texture-set-skin-20261127.json)
 
+Surface Heat also binds meshes after independent frame and shapekey
+authoring. Retention accounts for the actual POSITION correspondences,
+artist normals and tangents, writable paint, and prepared color and normal
+recipes. First bind and rebind preserve the authored frame owners, active
+morphs, mirrored endpoints, and original Restore capsules. The first-bind
+project matches byte for byte across the native worker, DomeD Wayland and
+controller-driven synthetic OpenXR. [Authored frame binding validation](validation/surface-heat-authored-frames-20261127.json)
+
 Native texture-set accessories can now use Surface Heat, weight transfer, or
 legacy automatic binding against an original VRM 1.0 avatar. Surface Heat keeps
 editable layers and normal and FLOAT emission Bakes in each native material.

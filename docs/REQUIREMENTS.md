@@ -38,10 +38,18 @@ Cancel, Undo and Redo. Synthetic OpenXR exercises posed reopen and
 custom-cage Bake on software GL and Intel Arc. Linked VRM 1.0 accessories
 retain their original joint identities in Standard and Editable export.
 Portable GLB and VRM export explicitly refuses active normal frames beyond
-the angular limit. Retained corner colors, independently prepared color and
-key-frame graphs, and retopology require further Surface Heat accounting.
+the angular limit. Retopology still requires further Surface Heat accounting.
 Physical device tests and production scenes remain open.
 [Retained texture-set skin evidence](validation/retained-texture-set-skin-20261127.json)
+
+Surface Heat now covers independent native paint frames, authored POSITION
+domains and prepared normal and corner-color recipes. Binding after key
+creation and rebinding after Mirror keep the original role coordinates,
+paint and normal detail, active morphs and rig history. The retained
+memory cap, Cancel, Undo/Redo and a cold Save round trip are checked on all
+four authored fixture cases. The native worker, DomeD Wayland and synthetic
+OpenXR match exactly for the first-bind case.
+[Authored frame binding evidence](validation/surface-heat-authored-frames-20261127.json)
 
 The current combined atlas and HDR cache source passes all 153 checks
 in both software Release and Intel Arc ASan/UBSan OpenXR replays. Its

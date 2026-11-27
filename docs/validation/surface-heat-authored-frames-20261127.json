@@ -1,0 +1,196 @@
+{
+  "revision": "94c531c024fc6d38f1af9350da38b301a8ff3808",
+  "canonical_domed_revision": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "release_fltk": "/opt/fltk-vr/toolkit",
+  "asan_fltk": "artifacts/sdk-20261126/toolkit-sanitize",
+  "release_application_sha256": "6d0ff50a305bea4c7677468c353bf258fb7a691f650b628a2d486818eebff5ba",
+  "native": {
+    "release": {
+      "registered_cases": [
+        "anatomical-admission-controls",
+        "independent-seam-key-mirror-prepared",
+        "independent-seam-key-mirror-retained",
+        "native-paint-key-frames",
+        "surface-heat-authored-frames",
+        "surface-heat-current-mixed-generic",
+        "surface-heat-native",
+        "texture-set-retained-skin",
+        "vrm1-retained-skinned-accessory"
+      ],
+      "authored_bind_assertions": 56,
+      "native_test_sha256": "395a92f9950b47320a045a9fc3605eeaeade6330c2b74e1770ad20d0a8f57937"
+    },
+    "asan": {
+      "registered_cases": [
+        "anatomical-admission-controls",
+        "independent-seam-key-mirror-prepared",
+        "independent-seam-key-mirror-retained",
+        "native-paint-key-frames",
+        "surface-heat-authored-frames",
+        "surface-heat-current-mixed-generic",
+        "surface-heat-native",
+        "texture-set-retained-skin",
+        "vrm1-retained-skinned-accessory"
+      ],
+      "authored_bind_assertions": 56,
+      "native_test_sha256": "b867bb691097deeada3fd1a6603c16f5acee5bc49c6ab6df2e5081853cf9ab98"
+    }
+  },
+  "qualification": {
+    "native-first": "Native writable-grid paint with independent frames and a weighted seam shape before first bind",
+    "native-rebind": "Cold native paint frame and independently derived key with an existing skin",
+    "prepared-mirror": "Prepared intrinsic and baked normal plus the original Mirror source and active pose",
+    "retained-mirror": "Independent writable, corner color, retained normal, POSITION, and Mirror sources"
+  },
+  "sanitizer_environment": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+  },
+  "cold_release_and_asan_project_sha256": {
+    "surface-heat-authored-frames/native-first/before.dsculpt": "512a99da7d82ea7b811f70191191c8292306cc16328fce9b10c9d8d76cc6aae9",
+    "surface-heat-authored-frames/native-first/bound.dsculpt": "8e68f62061f1a3fb5f5768b919efdc1ac12b46f93506421cdc3315498d28bc2b",
+    "surface-heat-authored-frames/native-rebind/before.dsculpt": "f0402cab449e7c3bb8538f8427c9a588879f339aaf133e9969038ac44d68f206",
+    "surface-heat-authored-frames/native-rebind/bound.dsculpt": "5ec07bd5d87ef077226797c30fe4aace95ad85c966430d448fb2fc6c7b96b863",
+    "surface-heat-authored-frames/prepared-mirror/before.dsculpt": "16e11defd6136e4220ac3069ea3a452e7258dfb8a80b0db80a6bc71e4f9808b3",
+    "surface-heat-authored-frames/prepared-mirror/bound.dsculpt": "8143d607e0b95d3d626ade0e727ba2f646fefb39b903ddc29f5db7e4b2a5a649",
+    "surface-heat-authored-frames/retained-mirror/before.dsculpt": "382056f56706c4400808affdf8ba2717d8fd3f55d1a6ba59131a7b416d6d10ec",
+    "surface-heat-authored-frames/retained-mirror/bound.dsculpt": "0fd7c871b87d623cff247e9e1db764f979d47dabbea36824bf3fb8a190f47b33"
+  },
+  "wayland_bound_project_sha256": "8e68f62061f1a3fb5f5768b919efdc1ac12b46f93506421cdc3315498d28bc2b",
+  "nested_domed_wayland_assertions": 9,
+  "synthetic_openxr": {
+    "software": {
+      "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+      "submissions": 77,
+      "releases": 154,
+      "project_sha256": "8e68f62061f1a3fb5f5768b919efdc1ac12b46f93506421cdc3315498d28bc2b"
+    },
+    "arc": {
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "submissions": 77,
+      "releases": 154,
+      "project_sha256": "8e68f62061f1a3fb5f5768b919efdc1ac12b46f93506421cdc3315498d28bc2b"
+    }
+  },
+  "source_mirror_baseline_software_cases": [
+    "independent-seam-key-mirror-prepared",
+    "independent-seam-key-mirror-prepared-render",
+    "independent-seam-key-mirror-retained",
+    "independent-seam-key-mirror-retained-render"
+  ],
+  "surface_and_independent_glb_rendering": {
+    "software": {
+      "render": {
+        "assertions": 151,
+        "pixel_comparisons": 12,
+        "max_rgba_byte_error": 1
+      },
+      "prepared-mirror": {
+        "assertions": 36,
+        "pixel_comparisons": 9,
+        "max_rgba_byte_error": 1
+      },
+      "retained-mirror": {
+        "assertions": 36,
+        "pixel_comparisons": 9,
+        "max_rgba_byte_error": 1
+      }
+    },
+    "arc": {
+      "render": {
+        "assertions": 151,
+        "pixel_comparisons": 12,
+        "max_rgba_byte_error": 1
+      },
+      "prepared-mirror": {
+        "assertions": 36,
+        "pixel_comparisons": 9,
+        "max_rgba_byte_error": 1
+      },
+      "retained-mirror": {
+        "assertions": 36,
+        "pixel_comparisons": 9,
+        "max_rgba_byte_error": 1
+      }
+    }
+  },
+  "identical_software_and_arc_exports_sha256": {
+    "prepared-mirror/normal-sensitivity.glb": "c4ddeefe911f1e241ce8b3476d9c56e4d3b8e2a4e3fb992b1c060fd51d772474",
+    "prepared-mirror/p0-w0.glb": "b6378262f4f8b9fb1bc89df3ee99efe825c20093f7e8071d93ed38fb3d6a7ef1",
+    "prepared-mirror/p0-w100.glb": "b3cc2014f9da900b70284ff2fb12463b0dc8ad57488a25e0d7b4b11b1327a13f",
+    "prepared-mirror/p0-w35.glb": "6c9271874caed4a05ef48ebfea254bbe45b696a39df636a5243f01c0042d8da4",
+    "prepared-mirror/p1-w0.glb": "c49a5dc72c2e5a3a87baa54b3fa0b7287cb11e495ae705e6647c4cb5d5e3d838",
+    "prepared-mirror/p1-w100.glb": "c4ddeefe911f1e241ce8b3476d9c56e4d3b8e2a4e3fb992b1c060fd51d772474",
+    "prepared-mirror/p1-w35.glb": "e23c98d424b0fb52221ce1fe19fe2ced501c97b041f59f2050528a041b515d8e",
+    "prepared-mirror/p2-w0.glb": "90c6fc84d6f91a5850e872b0f1dfec16ee96452d5daa3ad046201fd179ed900e",
+    "prepared-mirror/p2-w100.glb": "5c57c93c64e327f67e50f51efa5572091b896948078a93301efbb586da393fb4",
+    "prepared-mirror/p2-w35.glb": "152feadfd9a3708a9fe74343cc29cc2c7a962523953e692566ff46cc86819bc0",
+    "render/0/editable.glb": "b6b3ee404c14e628a6fb6291ecf6a1498e443d1beaf14f19821321d58f6d9fb6",
+    "render/0/standard.glb": "a0174c345000032c806f8ad98094920d5bf4f7673aade34721c11c3ce14357e6",
+    "render/1/editable.glb": "880c4fee96f23954bc2e06a303a5282fb85ae2cf026285eb70cf298eee70a350",
+    "render/1/standard.glb": "1ac4f2046838152f2d55452dc60cd8fa79bd97212cdd99d627b845f98ec487e1",
+    "render/2/editable.glb": "61fa26e653e509d645ac9ff13da570fc86e61da10e5e2337bfdc51ab4d945d58",
+    "render/2/standard.glb": "bf6357baf0ea67d06354c286480b714f8077bea62bb998ea548baa961c2efc0c",
+    "render/3/editable.glb": "019c46e4aef01b47d4e0cc4a3f87d80f6812cc3fa20085bf22b400db75e56580",
+    "render/3/standard.glb": "e76054d2e02814b93fbe92c070c35235a8679ea6ff5cad2c4fba49240d4672a3",
+    "render/4/editable.glb": "f9a7abb66beca37b0472cf7fe17c6c3968f3ef6774911f010c3ad7a32a2241ab",
+    "render/4/standard.glb": "db651bf546527dd10361ba347b21a470e210165a30a61569bdb5837c5f458aad",
+    "render/5/editable.glb": "fdaef22d750e0270c580679b380a8d72ee2ab9dcdef14f29113b9a023c396e20",
+    "render/5/standard.glb": "97853217a8f56806251b2af92a89573c4a480beb75a9633f3a23daa770370605",
+    "retained-mirror/normal-sensitivity.glb": "be0fbaac6244331a870dd4686b9b11ff32549668877ed0c96017694acff52d91",
+    "retained-mirror/p0-w0.glb": "6c5cf6217e0363f18737ca28dd68344f52de57ad70b1b436b7e0ce15bd24226c",
+    "retained-mirror/p0-w100.glb": "58035c1163340850452b3a9c9cc0c10f5df2e93250f92342a5c5352948473dee",
+    "retained-mirror/p0-w35.glb": "71280d8ba4bcdacd5b6210c3ab05de5f3e88b7c6b2fb3f6a9de4e70c270cb9d1",
+    "retained-mirror/p1-w0.glb": "56f1a808af6a7b2fb4bdef539d27fefc2a08c8b585b0d19c998e774baf2e67b7",
+    "retained-mirror/p1-w100.glb": "be0fbaac6244331a870dd4686b9b11ff32549668877ed0c96017694acff52d91",
+    "retained-mirror/p1-w35.glb": "16a8b894d4e064cd690e6a7e6183a348c6f54c2ef066a73cb15e5708a0fbd2ab",
+    "retained-mirror/p2-w0.glb": "28db7e9e0e8a6c126152adee04f61025200597a60ff1dd4f08570cf060405276",
+    "retained-mirror/p2-w100.glb": "e3c9a4f3135233a1b150ba2ffb537de7444e130cfcbf8a8cbbdd72440754b873",
+    "retained-mirror/p2-w35.glb": "04a71cdd299a7923d3b9e934086c0848579247a007b622565cf5c1683cd5c189"
+  },
+  "khronos": {
+    "version": "2.0.0-dev.3.10",
+    "files": 32,
+    "errors": 0,
+    "warnings": {
+      "NODE_SKINNED_MESH_NON_ROOT": 32
+    }
+  },
+  "physical_headset_tested": false,
+  "archive": {
+    "path": "surface-heat-authored-frames-20261127.tar.gz",
+    "sha256": "f192dbe1e56f99f75a1b7ea60bc5a3f7c7a1abd7f27238bea9bd386143d2c548",
+    "members_sha256": {
+      "asan-first.log": "d61e383ff3b1fe0bdfb992c70dbc03834ec762e0d249c33c9173ebe6082a877b",
+      "asan-native-evidence.json": "d39786e656415cdee1adb19ba7688d9a69c47e1e1d92d0055979d56845c6cd76",
+      "bind-wayland.log": "40825cd6f6b5001dc29c3731f5aa576161c1984c14e747c4d96387ab2a2500c0",
+      "check-mirror.sh": "7b17c07c5218e7e967c76f7d1e8bb12283cad34621ce4dc160585237f5e24d6d",
+      "check-profile.sh": "9b881e0de7582f2f70ce77e6d4ed8b4013af468e57493a78a4356b9e206aba21",
+      "khronos.cjs": "29d892c5bba4d517052bec552052254e9402bb1fa7de76a4c4589689070c8310",
+      "khronos.json": "9426e4e195651648f15d89e64a6b0144f3e25418165baef498b1bd1280455060",
+      "khronos.log": "01000e8b7ce2daa429687ce5d6c2bc409a9ca5b164032e75af61ff09f7efeff2",
+      "measure-native.py": "7e839a5d987acc2cb58955c4fbeac399870c566fb9e575e1d17d289614aa3be8",
+      "receipt.py": "449306158828ffc9b413c38915a302c8c51c29ca21ffc4986dd1a9b73d2d6511",
+      "release-first.log": "c84f87caa9ebf52024e390a646292b620a06486fa7942b181366f612df750edd",
+      "release-mirror.log": "9a23116a0f27383a5e9380513abbe5748634e9185d2ebfce8b02033fb271813a",
+      "release-native-evidence.json": "d39786e656415cdee1adb19ba7688d9a69c47e1e1d92d0055979d56845c6cd76",
+      "run-bind.py": "faade5a0e8311d578a21641c875150d151a15d035f862b615817aa72f81ab2ae",
+      "run-render.py": "b92383b67ad5e3dbb373fa50dfeabd94b34b2a62de3a29d1d2f0620cab586f1d",
+      "verified-bind-arc.log": "ae7c7c6f3158ff30d9566bd9de162c0662290c5e9a8d63d5a37a11116d0c27fb",
+      "verified-bind-software.log": "b37f598f8a2a1699b389762a2bc7d64c707b1f1df371e448af7fb3e54ec1c55c",
+      "verified-prepared-mirror-arc.log": "507f7784b31e3e63832dcb14b50329d8f8978814a5d40aaa7483ce06b32f3916",
+      "verified-prepared-mirror-software.log": "4e682bf7881777b9b8e46c4cc2c156bc77bad2b86e5d35efb49d83e926aaf44a",
+      "verified-render-arc.log": "740d0267ce9fe8aec648925e43b6b137094d69b617d5f326274ab8c2fd24ae7c",
+      "verified-render-software.log": "b0a1ae952e33b4d350d4b097e1627d3bcc3ff315c9959b377c9c29781b43e3c2",
+      "verified-retained-mirror-arc.log": "914f8e4f2b71a85c9aa6e4dda71d914e8f1a36acd9831b7746a39be7c183a530",
+      "verified-retained-mirror-software.log": "0f7750410896c7c1ceabb012e9c05dca3561010cce55a371e0cd9bdca24bbe30",
+      "wayland-bind/report.json": "423543c9a93d7751303a019199acc1405330a51f0f33a480a00f3c77c97aa1f3",
+      "wayland-heat.py": "3fedf3f292b09016df4e8c9302a78afc92b94c91c0c7abdb5e21ca5b743e0b4d",
+      "xr-bind-arc/compare.json": "3083841ed95448744f7d37c7e558dee24db79f357b5c85ec7169f341caab315a",
+      "xr-bind-arc/report.json": "93ba7f84e6928b7f66b097e9d76b2dd2e61321a7ad3ffde14206c784e2983427",
+      "xr-bind-software/compare.json": "dcb1d8360f1ea68346f7130bb5c625ab895c68465aba4657a5a458527803cd40",
+      "xr-bind-software/report.json": "7ea2ff62cd0206af863da6c487775703b777f97ff63f5f63e37cc9ca3da2e542",
+      "xr-bind.py": "8bff79943d995a96b91855df11644cbc612ad63e0e22f10dfc4f1ae9a0971da8"
+    }
+  }
+}
