@@ -1312,6 +1312,45 @@ void bake_multiple_retained_fields(){
   }
  }
 }
+void reduce_large_native_polygon(const std::filesystem::path &source_file) {
+ Document document;
+ document.open_async(source_file).get();ready(document);
+ const auto source=document.copy_scene();
+ const auto original=active_texture_set(source.active());
+ const auto normal=original.source->source_preview()->native_bake();
+ const auto neighbor=texture_set_view(source.active(),0).source;
+ check(normal&&normal->width==64&&original.painted->resolution()==64,
+       "Large-grid fixture starts with an independent partial normal Bake");
+
+ TextureSetEdit resize;
+ resize.action=TextureSetAction::Resolution;
+ resize.set=original.id;
+ resize.resolution=1024;
+ document.edit_texture_set(resize);ready(document);
+ const auto enlarged=document.copy_scene();
+ const auto enlarged_field=active_texture_set(enlarged.active());
+ check(enlarged_field.painted->resolution()==1024&&
+       enlarged_field.painted->baked()->maps.color.width==1024&&
+       enlarged_field.source->source_preview()->native_bake()==normal,
+       "The default worker enlarges the writable paint and color Bake independently");
+
+ resize.resolution=512;
+ document.edit_texture_set(resize);
+ document.save_async("reduced-native-512.dsculpt").get();ready(document);
+ const auto reduced=document.copy_scene();
+ const auto reduced_field=active_texture_set(reduced.active());
+ check(reduced_field.painted->resolution()==512&&
+       reduced_field.painted->baked()->maps.color.width==512&&
+       reduced_field.source->source_preview()->native_bake()==normal&&
+       texture_set_view(reduced.active(),0).source==neighbor,
+       "The default worker reduces the authored 1024 grid while keeping both independent owners");
+ const auto exact=reduced.encode();
+ check(Scene::load("reduced-native-512.dsculpt").encode()==exact&&
+       document.undo()&&document.copy_scene().encode()==enlarged.encode()&&
+       document.redo()&&document.copy_scene().encode()==exact,
+       "Large reduction keeps exact ordered Save, cold Open and Undo/Redo");
+}
+
 void bake_retained_native(bool reflected,bool smooth,bool outward=false,bool resize_grid=false){
  auto scene=source(false,reflected,false,smooth);
  const auto target=scene.active().id;
@@ -1482,6 +1521,7 @@ void bake_retained_native(bool reflected,bool smooth,bool outward=false,bool res
  check(Scene::decode(cleared.encode()).encode()==cleared.encode()&&
        document.undo()&&document.copy_scene().encode()==saved,"Clear survives cold replay and exact Undo");
  if(!resize_grid)return;
+ if(reflected)reduce_large_native_polygon(path);
  ready(document);
  document.edit_texture_set(resize);
  document.save_async("resized-native.dsculpt").get();ready(document);

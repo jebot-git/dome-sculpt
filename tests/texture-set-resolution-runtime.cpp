@@ -67,7 +67,13 @@ bool field_root_gate(){return field_history()&&(field_step==39||(field_history()
 bool field_close_gate(){return field_history()&&(field_step==43||field_step==57||field_step==71);}
 bool field_reset(){return field_mode()=="focus"||field_mode()=="reference";}
 bool field_mark(const char*name){const auto*p=getenv("DOME_XR_TEXTURE_GATES");return p&&std::filesystem::exists(std::filesystem::path(p)/name);}
-uint32_t field_target(){const auto*p=getenv("DOME_XR_TEXTURE_TARGET");const int n=p?std::atoi(p):64;if(n!=64&&n!=128&&n!=256)throw std::runtime_error("Unexpected actual field target");return uint32_t(n);}
+uint32_t field_target() {
+  const auto *value = getenv("DOME_XR_TEXTURE_TARGET");
+  const int size = value ? std::atoi(value) : 64;
+  if (size < 64 || size > 2048 || (size & (size - 1)))
+    throw std::runtime_error("Unexpected actual field target");
+  return uint32_t(size);
+}
 bool field_wait(){
  if(field_step==9&&field_root_signature.empty())return true;
  if(field_root_gate()){

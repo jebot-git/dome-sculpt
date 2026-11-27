@@ -73,8 +73,15 @@ uint8_t byte(double v) {
   return uint8_t(std::lround(std::clamp(v, 0., 1.) * 255));
 }
 double linear(uint8_t v) {
-  const double x = double(v) / 255;
-  return x <= .04045 ? x / 12.92 : std::pow((x + .055) / 1.055, 2.4);
+  static const auto values = [] {
+    std::array<double, 256> table{};
+    for (size_t i = 0; i < table.size(); ++i) {
+      const double x = double(i) / 255;
+      table[i] = x <= .04045 ? x / 12.92 : std::pow((x + .055) / 1.055, 2.4);
+    }
+    return table;
+  }();
+  return values[v];
 }
 double encoded(double v) {
   return v <= .0031308 ? v * 12.92 : 1.055 * std::pow(v, 1 / 2.4) - .055;
@@ -173,29 +180,54 @@ struct Sample {
   PaintEmissionValue emission;
   bool common_present = false, pbr_present = false, emission_present = false;
 };
-Sample pixel(const PaintLayer &l, uint32_t r, uint32_t x, uint32_t y) {
-  const auto t = size_t(y / 32) * (r / 32) + x / 32,
-             p = size_t(y % 32) * 32 + x % 32;
+struct StoredPixel {
+  const PaintPixel *common = nullptr;
+  const std::array<uint8_t, 4> *pbr = nullptr;
+  const PaintEmissionValue *emission = nullptr;
+  bool empty() const { return !common && !pbr && !emission; }
+  bool operator==(const StoredPixel &other) const {
+    const auto equal = [](const auto *a, const auto *b) {
+      return a == b || (a && b && *a == *b);
+    };
+    return equal(common, other.common) && equal(pbr, other.pbr) &&
+           equal(emission, other.emission);
+  }
+};
+StoredPixel stored_pixel(const PaintLayer &layer, uint32_t r, uint32_t x,
+                         uint32_t y) {
+  const size_t stride = PaintTile::size;
+  const auto tile = (y / stride) * (r / stride) + x / stride;
+  const auto offset = (y % stride) * stride + x % stride;
+  const auto &common = layer.tiles.at(tile);
+  StoredPixel stored;
+  if (common)
+    stored.common = &common->pixels[offset];
+  if (!layer.pbr_tiles.empty())
+    if (const auto &pbr = layer.pbr_tiles.at(tile))
+      stored.pbr = &pbr->pixels[offset];
+  if (!layer.emission_tiles.empty())
+    if (const auto &emission = layer.emission_tiles.at(tile))
+      stored.emission = &emission->pixels[offset];
+  return stored;
+}
+Sample pixel(const StoredPixel &stored) {
   Sample s;
-  if (l.tiles.at(t)) {
-    s.common = l.tiles[t]->pixels[p];
+  if (stored.common) {
+    s.common = *stored.common;
     s.common_present = true;
   }
   const auto &v = s.common.data;
+  const auto *color = stored.pbr ? stored.pbr->data() : v.data();
+  s.pbr_present = bool(stored.pbr);
   for (size_t k = 0; k < 4; ++k)
-    s.pbr[k] = k < 3 ? linear(v[k]) : double(v[k]) / 255;
-  if (!l.pbr_tiles.empty() && l.pbr_tiles.at(t)) {
-    const auto &c = l.pbr_tiles[t]->pixels[p];
-    for (size_t k = 0; k < 4; ++k)
-      s.pbr[k] = k < 3 ? linear(c[k]) : double(c[k]) / 255;
-    s.pbr_present = true;
-  }
-  s.emission.coverage = float(v[12]) / 255;
-  for (size_t k = 0; k < 3; ++k)
-    s.emission.legacy[k] = float(linear(v[6 + k]));
-  if (!l.emission_tiles.empty() && l.emission_tiles.at(t)) {
-    s.emission = l.emission_tiles[t]->pixels[p];
+    s.pbr[k] = k < 3 ? linear(color[k]) : double(color[k]) / 255;
+  if (stored.emission) {
+    s.emission = *stored.emission;
     s.emission_present = true;
+  } else {
+    s.emission.coverage = float(v[12]) / 255;
+    for (size_t k = 0; k < 3; ++k)
+      s.emission.legacy[k] = float(linear(v[6 + k]));
   }
   return s;
 }
@@ -297,7 +329,7 @@ Sample filtered_samples(const PaintLayer &l,uint32_t from,auto &&for_each_pixel)
   double emission_coverage = 0, mask = 0;
   Sample out;
   for_each_pixel([&](uint32_t sx, uint32_t sy, double w) {
-    const auto s = pixel(l, from, sx, sy);
+    const auto s = pixel(stored_pixel(l, from, sx, sy));
     const auto &d = s.common.data;
     out.common_present |= s.common_present;
     out.pbr_present |= s.pbr_present;
@@ -394,6 +426,10 @@ void quality(const PaintLayer &before, const PaintLayer &after, uint32_t from,
       }
   double squares = 0;
   size_t count = 0;
+  // Coverage and raw/associated values for common, separate PBR and FLOAT.
+  constexpr size_t components = 4 + 2 * 9 + 1 + 2 * 4 + 1 + 4 * 3;
+  constexpr size_t stored_comparison_work = 3;
+  constexpr size_t full_comparison_work = 32;
   auto measure = [&](double a, double b, double &maximum) {
     const double e = std::abs(a - b);
     maximum = std::max(maximum, e);
@@ -405,25 +441,30 @@ void quality(const PaintLayer &before, const PaintLayer &after, uint32_t from,
     if (native_cells)
       work(report, from, limits);
     for (uint32_t x = 0; x < from; ++x) {
+      const auto original = stored_pixel(before, from, x, y);
       Sample b;
       if (native_cells) {
         // A native cell is constant over its footprint. Check every original
         // value against its new cell, including new contributions at unpainted
-        // locations after reduction. Two absent tiles contribute zero error.
+        // locations after reduction. Equal stored cells have identical
+        // decoded values and contributions, and still count toward RMS.
         const auto tx = reconstruct_x(x), ty = reconstruct_x(y);
-        const auto old_tile = size_t(y / 32) * (from / 32) + x / 32;
-        const auto new_tile = size_t(ty / 32) * (to / 32) + tx / 32;
-        if (!has_authored_tile(before, old_tile) && !has_authored_tile(after, new_tile)) {
-          constexpr size_t components = 4 + 2 * 9 + 1 + 2 * 4 + 1 + 4 * 3;
+        const auto restored = stored_pixel(after, to, tx, ty);
+        if (original.empty() && restored.empty()) {
           count += components;
           continue;
         }
-        work(report, 32, limits);
-        b = pixel(after, to, tx, ty);
+        work(report, stored_comparison_work, limits);
+        if (original == restored) {
+          count += components;
+          continue;
+        }
+        work(report, full_comparison_work - stored_comparison_work, limits);
+        b = pixel(restored);
       } else {
         b = filtered(after, to, from, x, y, report, limits);
       }
-      const auto a = pixel(before, from, x, y);
+      const auto a = pixel(original);
       const auto &ad = a.common.data;
       const auto &bd = b.common.data;
       for (size_t g = 0; g < 4; ++g) {
