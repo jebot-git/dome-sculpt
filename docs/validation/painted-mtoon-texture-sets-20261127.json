@@ -1,0 +1,72 @@
+{
+  "product": "094e740c7703ba01c9228c809b4e6f16f7e255e1",
+  "parent": "80261283f7292285e2856dcc5fb87f72653754e0",
+  "scope": "Mixed native PBR with painted MToon 1.0. Bound at texels and all level-zero clamp-linear reads. RGBA8 base and relative emission, static uniform authored inputs, exact mask classification, two authored paint layers.",
+  "checks": {
+    "release_native_export": 204,
+    "asan_ubsan_native_export": 204,
+    "release_software_graphics": 87,
+    "asan_ubsan_software_graphics": 87,
+    "arc_a770_graphics": 87,
+    "registered_release_ctests": 3
+  },
+  "terminal_services": {
+    "release_native_export": "334d89beb5c5457daf7647752c1fd4a5",
+    "asan_native_export": "6fe39a8b9509426a8d74e9b498fa8cd9",
+    "release_software_graphics": "b7091290e54e4b0cb1f9ad2488f9e277",
+    "asan_software_graphics": "621c820da8624bebbe4d2cce18c76979"
+  },
+  "image_observations": {
+    "no_original_role_max_srgb_byte_error": 1,
+    "uniform_original_role_max_srgb_byte_error": 2,
+    "alpha_differences": 0,
+    "picking_rays_per_case": 35
+  },
+  "khronos": "Four files with zero errors, two unrigged files with zero warnings; rigged files retain the earlier NODE_SKINNED_MESH_NON_ROOT warning.",
+  "schema": "Four typed MToon outputs, two negative resolver controls, zero schema errors.",
+  "app_sha256": {
+    "release": "27be8314f4885b9b15bdaf2dff7a6d59b6aa1a317cefe8e783a5cd136268c839",
+    "asan": "1f5feb74896cc36507900963bce9dcf12e0ff0f98cba533671362bddc72a2036"
+  },
+  "asset_sha256": {
+    "painted-mtoon-standard.glb": {
+      "release": "ccdbe279e0a61774ccfd7a162583dfe991999eaa2ca323a13c388e0da728dd66",
+      "asan": "ccdbe279e0a61774ccfd7a162583dfe991999eaa2ca323a13c388e0da728dd66"
+    },
+    "painted-mtoon-editable.glb": {
+      "release": "1c77c984a7630bd438f6b3bdf264975fa323c776d9e1a947a7847ea264e5b4db",
+      "asan": "1c77c984a7630bd438f6b3bdf264975fa323c776d9e1a947a7847ea264e5b4db"
+    },
+    "rendered-painted-mtoon.glb": {
+      "release": "30dffcb4869fd6a6e6a076281cd1b9b29ab07cca3622f52ab6616ffb89443850",
+      "asan": "30dffcb4869fd6a6e6a076281cd1b9b29ab07cca3622f52ab6616ffb89443850"
+    },
+    "rendered-uniform-painted-mtoon.glb": {
+      "release": "0efe20ef0491eef79b4a3951f4558af351828caa6bb08bfd55d11086e04138e2",
+      "asan": "0efe20ef0491eef79b4a3951f4558af351828caa6bb08bfd55d11086e04138e2"
+    }
+  },
+  "archive": {
+    "name": "painted-mtoon-texture-sets-20261127.tar.gz",
+    "sha256": "f7c68e66500a0eb3690dd57464aa3a378bb5dd0e9a709831ea9a726e8943a436",
+    "files": {
+      "arc/runtime.log": "d1ad0df9d7286863e6e9c34256e2077b64014c7ba2ae85053975c598c6cdf01f",
+      "asan/graphics-runtime.log": "9c7948af28d3c29c788e15f15c4ffc523b1882e9b7f5685745d4ef319d5abfc6",
+      "asan/graphics-static-parse-refusal.log": "783e804297254cd6402b30f35a6b00e4d5978e4a08d1e0af509af06e21aee948",
+      "asan/portable-runtime.log": "b3603c3709c16822d7710b4ca60a5487d42fb3c05cbee79c4666ee8ba5ab8598",
+      "asan/version.log": "ea426f0166ec65b5bdadbda2b22e3c87126c3e83ad9ce0d696d7a1b769e737fa",
+      "ctest/registered-runtime.log": "51f0652ac6a9cbb43e4abd2c36c6867205f2d886e428ce38d5381deb5cc3c200",
+      "interop/khronos.jsonl": "eb6ade77854e86cde398832285b50b2362f441fd1c00bf137f524a85a0a20d1a",
+      "interop/painted-mtoon-editable.glb.khronos.json": "962bc277bbaec861ea161ad699f37fa6983127dcbe1b2e4c8947dd345ff0d98a",
+      "interop/painted-mtoon-standard.glb.khronos.json": "ec60bb1573db9fd3e1c6b3eef4fbd5a6ddeceab8ae5d8a9bd04001d8640370b6",
+      "interop/rendered-painted-mtoon.glb.khronos.json": "e7906334d6f8838b70d897eaad97dc52f0cc541ed0d632231ba2bf6cc8782817",
+      "interop/rendered-uniform-painted-mtoon.glb.khronos.json": "03fd876bdb2b4f99e5f183ec3d34b101fc334192faab8226c5389d8fdbc4e22b",
+      "interop/schemas.json": "0a304f91eef26ac5a8915b39db9a991306e85e12290f1d416b21e71b2db735e7",
+      "release/graphics-runtime.log": "623ae57093e3c990e31860fd15cf570f3da41e513a3b7a743d2804119b8ce34e",
+      "release/graphics-static-parse-refusal.log": "b7f154bd827e9c26142dba1b4001ff886c94428f41c610fc7c3828cbc0f063a2",
+      "release/portable-runtime.log": "c9e4d6a9d8d0df816d4af899da26110ae73c7c97f7fb2c1c2519cccd8389cbfa",
+      "release/version.log": "b5f61d20b48fe470f79fa0893dd14eaefc91ae7ce2d2f8ad3868c23568ea8134"
+    }
+  },
+  "open": "Varying source role reconstruction, shared base/shade texture, live painted UV animation, HDR physical paint and typed normal Bake, alternate source coordinates, VRM integration and physical-device qualification."
+}

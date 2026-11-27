@@ -2350,6 +2350,34 @@ fields, alternate coordinates, VRM output and full device
 qualification remain open.
 [Portable MToon validation](validation/portable-mtoon-texture-sets-20261127.json)
 
+### Painted MToon 1.0 texture-set export
+
+Standard and Editable GLB now carry layered native RGBA and relative
+emission on resolved MToon 1.0 UV0 fields with uniform static background
+roles. The current compositor supplies color, emission and their
+separate coverage. The exporter bounds the continuous clamp-linear
+reconstruction at its filter taps and checks the uniform zero-coverage
+branch. Masked and blended fields retain alpha compatibility. The
+independent shade texture keeps its own UV and sampler, and the core
+fallback retains the field's ORM image. Editable GLB reopens the exact
+native layers and typed material. Standard GLB preserves the previous
+output when a painted composition would change cutoff classification.
+
+Release and ASan/UBSan each pass 204 native export checks. The two
+standalone files replay against the original viewport on software GL
+and Intel Arc A770. Each graphics profile passes 87 checks with
+identical sampled alpha, 35 matching picking rays per fixture and
+at most two RGB bytes of difference. The three registered Release
+CTest cases pass. The four typed packages match byte for byte across
+profiles and pass the pinned MToon schema. Khronos reports zero
+errors and repeats the existing non-root skin warning on the two
+rigged fixtures.
+
+Varying background roles, shared base/shade textures, live painted UV
+animation, physical HDR, typed normal Bake, additional source UVs,
+VRM material integration and physical-device verification remain open.
+[Painted MToon validation](validation/painted-mtoon-texture-sets-20261127.json)
+
 ## Source and integration boundary
 
 - Main now admits product1bc13125 and public fixturef1e193c7 after complete
