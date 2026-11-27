@@ -1,0 +1,239 @@
+{
+  "archive": {
+    "filename": "portable-mtoon-bake-20261127.tar.gz",
+    "files": {
+      "asan-arc/graphics.log": "d83e736764e410abbf5225f9c7de12c42afa3ec69eb526eafd296040c9c387d2",
+      "asan-software/graphics.log": "f4add29419489ce68abe4706da43d8dd244459c036712d323264a89a51788628",
+      "asan/app-link.log": "9fd291bc0fa725a9a916240e544b1c48d8b89c63f390b7109e22dbc36d293e02",
+      "asan/archive-product.log": "79075c98ce9a34eccb6633fc5a1d85527aab85cdb2a8331cb0cf17617762e912",
+      "asan/archive-refresh.log": "85d48f33650f5f7e945c16df6c181d71fb0a7f4ba13c9ae760ab1a57d28dfa1a",
+      "asan/export.cpp-compile.log": "94904ff6217a1c369a949dcf6aaa3f3188c6d2eaa91be1bdb8523b816f3116e4",
+      "asan/graphics-compile.log": "5b37c142fda3cd9af8753f9c724209ff149bb4ba3db033ce46df79e64ae7f3c8",
+      "asan/portable.log": "5bb4ae58ad46fd70eb9621c41d5b4a9d86266ee4ac4c003ec302ca1135ef85de",
+      "asan/recipe.log": "5d8a565fd5aa084eeeeef6c4e062f22920328bc4f03f98187e8f9d6cda49bef8",
+      "asan/texture-set-export.cpp-compile.log": "9b3cde58f5851f23780d72caf67e6fd73ee20fd3239f5eb1de1fc10e0eba2554",
+      "build.py": "f05b3a0537f014f405f830314f8fba04f093ceef48973512406464a8862eede3",
+      "combined-release.py": "4b6dea453a1f7e5d3a4cb8daaad3db95a5ef6db8319591331bf91c7dfee0e387",
+      "combined/current-status.json": "e6008d8ed3855d5695ec0b2a9d0351720d0dbc16f3d61cabe5440e1f18607bcc",
+      "combined/seed-runner-failure.json": "04f62283a2a2b47c0a20cc13a8260823926f31d8446794664c8976183ed174bb",
+      "headless/full-ldr.glb": "dbc5deff3879a02d9808790b768da359325a5d20dc569bb9fb01a818a18c3f14",
+      "headless/ldr.glb": "6b86b297192892313665e02cccd10e99c8bc8d9bf6cb417ba566da6efe1e4d13",
+      "headless/varying-ldr.glb": "ebbd63779b99334b8db8a4697c82c5fc28541f0082b2ab51d972f1ebc2a7fa60",
+      "khronos.cjs": "74495b75c2e57296e94eae4685ddc57ceaca5e3cb2d56fb1da09512415a97630",
+      "khronos.json": "ad6817629869d148e8a56ebc2c8cbc2e2d565996ef73f8cf6e4e32bcc49fb6c8",
+      "registered.log": "4148fd7a2a9b3a4e9bd9d406263d372df6fd2a61d300de990968b5a8f01eea1d",
+      "registered.xml": "0212c003446d89ea1ed782d285ed58a5d0a96ed02d881c87df94ddc8b43f1274",
+      "release-arc/graphics.log": "d83e736764e410abbf5225f9c7de12c42afa3ec69eb526eafd296040c9c387d2",
+      "release-software/graphics.log": "92fefcd55ad11edc9f7f54627c107d9eaab4be5c626ebf739a8e04a17f2974a2",
+      "release/app-link.log": "139899c9b0a7f2f4c0c788a546b747845b422fb154bef8442730cd8e063cd815",
+      "release/archive-product.log": "84b27c501973127fa17347425000c2a2aa69578d97d058c9f7f2f735e4753100",
+      "release/archive-refresh.log": "4040032b088ae4da561412458cc69fe1fea67c9839d3fd3867f49590ec74be63",
+      "release/export.cpp-compile.log": "39d3048d498e07dfe9887466e717228f9edf61cb5a967069abbfcda56bf6ae0e",
+      "release/graphics-compile.log": "6814bbb02dcd4eae99c88c71fc9e9e185d04c1eda60e76605ab68e3143b01b83",
+      "release/portable.log": "a27a20da82cf805ad1ed51640f60ac44a2a698dcb100edfcb17a7196065a7a4a",
+      "release/recipe.log": "3228a781d89d18b140776d115f28d29ae7e7b163e6df15f3070ad220b1685dec",
+      "release/texture-set-export.cpp-compile.log": "91b9a2a6ee6d0c7c3314f1e78f5439ab82aa0dbfc9686d67850c4ab07b666f9c",
+      "schemas.json": "d46b35579fcca44ace8a0ff342eb40f5ba0e808b880670054f467156a7e5686a"
+    },
+    "sha256": "adb4a0fa0149256d91223978734bddc8fdc7847057ea576a51676bfe96c88a3b"
+  },
+  "build_outputs_sha256": {
+    "asan": {
+      "dome-sculpt": "119c96a1868b739aace447ce78558c95bd1798332b070d6e8cf89983c8aa0306",
+      "dome-sculpt-mtoon-render-test": "e4fa950d6c73e8c575819f76c51cbd1f4b3b8e0bd2b6d83c65b059550a8736d7",
+      "libdome-sculpt-core.a": "811da9b51a3ed80bf3c41137be67796b977a697ca532c12a9e5054232a12df7b"
+    },
+    "release": {
+      "dome-sculpt": "b5c857985ba55a79dc122f451f592ab709cfd2bfcd2909bc5350c81903cf2272",
+      "dome-sculpt-mtoon-render-test": "b06a6a2e315f19d1c132469a73dd6428c4f552fef968b2805984f5c362714bc9",
+      "libdome-sculpt-core.a": "831f169f40cc2c9d8559da84f20002c693ca33f2d3bba67dc404bcc571d18e34"
+    }
+  },
+  "combined_release_at_recording": {
+    "candidate": "662d889da2b3a56e36f2f58f5280a624ae798906",
+    "changed_paths": [
+      "CMakeLists.txt",
+      "docs/HANDOFF.md",
+      "docs/REQUIREMENTS.md",
+      "docs/validation/exact-overlay-gpu-budget-20261127.json",
+      "docs/validation/exact-overlay-gpu-budget-20261127.tar.gz",
+      "docs/validation/native-mtoon-bake-20261127.json",
+      "docs/validation/native-mtoon-bake-20261127.tar.gz",
+      "docs/validation/retopo-save-queue-20261127.json",
+      "docs/validation/retopo-save-queue-20261127.tar.gz",
+      "src/bake-authoring.cpp",
+      "src/bake.cpp",
+      "src/export.cpp",
+      "src/native-authoring-compiler.cpp",
+      "src/render-paint-overlay.hpp",
+      "src/source-bake-normal.hpp",
+      "src/texture-set-export.cpp",
+      "src/texture-set-export.hpp",
+      "src/texture-set-range.cpp",
+      "src/texture-set-surface.cpp",
+      "src/texture-set-worker.cpp",
+      "src/texture-sets.cpp",
+      "tests/bake-recipes-xr.py",
+      "tests/bake-recipes.cpp",
+      "tests/baked-emission-gpu.cpp",
+      "tests/mtoon-render.cpp",
+      "tests/paint-overlay-gpu.cpp"
+    ],
+    "elapsed_seconds": 3.123,
+    "invocation": "5d6e0b870e0749f1a8e890898960df75",
+    "phase": "build the latest Release candidate",
+    "seed_app_sha256": "e0e7ea525e5338c4080a2af9db1cca0c18d856b5d9ddf37c399214b0afdc2e38",
+    "seed_cache_sha256": "7a052e626ae14dbbeb06a4465ed0203f08e2cba506988b71f891d7d317c00ab0",
+    "seed_registration_error": "texture-set-export was renamed dome-sculpt-texture-set-export",
+    "seed_revision": "f70483e921ded0d80497f36802e9201b9aebc1c1",
+    "terminal": false
+  },
+  "exact_output_files_sha256": {
+    "full-ldr/baked.dsculpt": "19c7d87b323627eaf611b6598ba8cb4cfecddaf4564b3831bb58c8e81b276cf6",
+    "full-ldr/editable.glb": "88d371010df098b666dfa19059bf99680b099cb203c71e203b6985d51f399763",
+    "full-ldr/recall.dsculpt": "e4636cdfede95a612fd87c6c9a936542b8247b11ea04717ced0e86ea7f8ef1e7",
+    "full-ldr/standard.glb": "dbc5deff3879a02d9808790b768da359325a5d20dc569bb9fb01a818a18c3f14",
+    "gain/baked.dsculpt": "5f8c479c6b419fc31971e33355109c2d43e1d17c96f621fb948903afd3b3a12f",
+    "gain/editable.glb": "ea7d6cb1e3adc13d066bc929aaba7acd4959355cefd3a757e7c5fe2cddbb7f19",
+    "gain/recall.dsculpt": "53a3b864119159740ece55ab52f3096bf762aca32847699716d0c1363daf209a",
+    "hdr/baked.dsculpt": "bf858cf8dc03c2aa7272f5e7cdb148724f4580ce915c0a76244a4d19d1063bcd",
+    "hdr/editable.glb": "cbf4608b1f99db296c2bfca92370c0d932e86d68fd5408551013c0bdbdf9a41f",
+    "hdr/recall.dsculpt": "5dbef26e10fca679da952eb9b0e3197715ba5de5b962094a15c1b63d424c4afa",
+    "ldr/baked.dsculpt": "a450f7381798881a9cfbc9e01858437d44d19b31fd01397b5a47df89f7c568ab",
+    "ldr/editable.glb": "ba95d0149f37e8e465c952e03280aa19069f8293d6dbcfec40d1acfc80831597",
+    "ldr/recall.dsculpt": "01f9134bbbb9fc89b2c279b01d3c6915d547bfe09ab9df53bfcc9e2bf9a23ae8",
+    "ldr/standard.glb": "6b86b297192892313665e02cccd10e99c8bc8d9bf6cb417ba566da6efe1e4d13",
+    "varying-ldr/baked.dsculpt": "40d53dcee213ab213993852f85df0fa75fd36710b0676b48c822d7c02e21a20b",
+    "varying-ldr/editable.glb": "639781c1797ea2dfe56c843f13602540662e0d7097f0ef7a94a3920ccf4fc379",
+    "varying-ldr/recall.dsculpt": "a10777976d4b4c1addc218811d520a3b9f41fa3b0447b44fee108ce0320b0fc1",
+    "varying-ldr/standard.glb": "ebbd63779b99334b8db8a4697c82c5fc28541f0082b2ab51d972f1ebc2a7fa60"
+  },
+  "headless_standalone_matches": 3,
+  "interop": {
+    "khronos_errors": 0,
+    "khronos_files": 8,
+    "khronos_version": "2.0.0-dev.3.10",
+    "khronos_warnings": 0,
+    "pinned_mtoon_materials": 6,
+    "schema_resolver_controls": 2
+  },
+  "product_revision": "662d889da2b3a56e36f2f58f5280a624ae798906",
+  "profiles": {
+    "asan-arc": {
+      "graphics_checks": 136,
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "standalone_cases": [
+        {
+          "alpha_differences": 0,
+          "maximum_rgb_byte_difference": 1,
+          "normal_bound_rad": 0.00626889,
+          "visible_pixels": 1094,
+          "width": 64
+        },
+        {
+          "alpha_differences": 0,
+          "maximum_rgb_byte_difference": 1,
+          "normal_bound_rad": 0.0101265,
+          "visible_pixels": 1093,
+          "width": 512
+        },
+        {
+          "alpha_differences": 0,
+          "maximum_rgb_byte_difference": 0,
+          "normal_bound_rad": 0.0001,
+          "visible_pixels": 2576,
+          "width": 64
+        }
+      ]
+    },
+    "asan-software": {
+      "graphics_checks": 136,
+      "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+      "standalone_cases": [
+        {
+          "alpha_differences": 0,
+          "maximum_rgb_byte_difference": 2,
+          "normal_bound_rad": 0.00626889,
+          "visible_pixels": 1094,
+          "width": 64
+        },
+        {
+          "alpha_differences": 0,
+          "maximum_rgb_byte_difference": 2,
+          "normal_bound_rad": 0.0101265,
+          "visible_pixels": 1093,
+          "width": 512
+        },
+        {
+          "alpha_differences": 0,
+          "maximum_rgb_byte_difference": 0,
+          "normal_bound_rad": 0.0001,
+          "visible_pixels": 2576,
+          "width": 64
+        }
+      ]
+    },
+    "release-arc": {
+      "graphics_checks": 136,
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "standalone_cases": [
+        {
+          "alpha_differences": 0,
+          "maximum_rgb_byte_difference": 1,
+          "normal_bound_rad": 0.00626889,
+          "visible_pixels": 1094,
+          "width": 64
+        },
+        {
+          "alpha_differences": 0,
+          "maximum_rgb_byte_difference": 1,
+          "normal_bound_rad": 0.0101265,
+          "visible_pixels": 1093,
+          "width": 512
+        },
+        {
+          "alpha_differences": 0,
+          "maximum_rgb_byte_difference": 0,
+          "normal_bound_rad": 0.0001,
+          "visible_pixels": 2576,
+          "width": 64
+        }
+      ]
+    },
+    "release-software": {
+      "graphics_checks": 136,
+      "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+      "standalone_cases": [
+        {
+          "alpha_differences": 0,
+          "maximum_rgb_byte_difference": 2,
+          "normal_bound_rad": 0.00626889,
+          "visible_pixels": 1094,
+          "width": 64
+        },
+        {
+          "alpha_differences": 0,
+          "maximum_rgb_byte_difference": 2,
+          "normal_bound_rad": 0.0101265,
+          "visible_pixels": 1093,
+          "width": 512
+        },
+        {
+          "alpha_differences": 0,
+          "maximum_rgb_byte_difference": 0,
+          "normal_bound_rad": 0.0001,
+          "visible_pixels": 2576,
+          "width": 64
+        }
+      ]
+    }
+  },
+  "registered_release_seconds": {
+    "dome-sculpt-texture-set-export": 10.9344,
+    "mtoon-baked-texture-sets": 2.86745,
+    "mtoon-painted-texture-sets": 0.268029,
+    "mtoon-texture-sets": 0.192949,
+    "texture-set-bake-recipe": 0.0266681
+  },
+  "source_worktree_commits_frozen": true
+}

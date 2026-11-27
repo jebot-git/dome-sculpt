@@ -224,9 +224,15 @@ the target's relative emission strength. Native Save and Editable GLB
 restore the exact LDR and FLOAT Bake. Editable GLB supplies a measured
 core PBR fallback for the tested FLOAT fields. Release, ASan/UBSan and
 Intel Arc cover 64- and 512-square fixtures. The native Wayland menu and
-synthetic OpenXR also exercise the selected-field workflow.
-Larger typed Bake previews, original authored frames, typed donor
-partitions, Standard GLB of typed Bake, VRM integration, alternate UVs,
+synthetic OpenXR also exercise the selected-field workflow. Standard and
+Editable GLB now carry static LDR MToon 1.0 Bake with explicit canonical
+tangents and a bounded linear normal texture. Partially covered fields
+can retain uniform or aligned varying original normals. Complete filtered
+coverage can replace an unrelated original normal raster. The standalone
+files agree with native paint, normal and mask rendering through an
+independent import. Larger typed Bake previews, original authored and
+deforming frames, typed donor partitions, Standard GLB of FLOAT Bake,
+VRM integration, alternate UVs,
 resampling, live painted animation, other portable sampler modes and
 physical verification remain open.
 [Native MToon texture-set evidence](validation/native-mtoon-texture-sets-20261127.json)
@@ -235,6 +241,7 @@ physical verification remain open.
 [Shared MToon shade evidence](validation/shared-shade-mtoon-20261127.json)
 [Varying MToon source evidence](validation/varying-role-mtoon-20261127.json)
 [Native MToon Bake evidence](validation/native-mtoon-bake-20261127.json)
+[Portable MToon Bake evidence](validation/portable-mtoon-bake-20261127.json)
 
 Strict Bake rays now recover source-edge contacts affected by float staging.
 An exact ray hit has priority. A missed ray can use an actual source edge

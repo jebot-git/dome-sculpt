@@ -2505,6 +2505,35 @@ Arc A770. The 19-check synthetic OpenXR replay uses the same hardware
 and writes byte-identical native projects to the earlier software run.
 [Exact GPU overlay budget validation](validation/exact-overlay-gpu-budget-20261127.json)
 
+### Standalone GLB with baked MToon materials
+
+Standard and Editable GLB now emit MToon 1.0 for static LDR baked
+texture sets with certified canonical tangents. The normal compiler
+checks the face and transform basis and bounds the angular difference
+over every bilinear filter cell. It accounts for independent coverage,
+the normalization of the two directions, the product of the original
+normal and the uncovered fraction, and PNG quantization. Partial Bake
+supports uniform and matching clamp-linear UV0 source normal grids.
+Full filtered coverage replaces an independently sampled original map.
+The worker refuses sharp unresolved normal mixtures before replacing an
+existing Standard file. Editable GLB preserves the original Scene.
+
+Release and ASan/UBSan pass 136 graphics checks each in software and on
+Intel Arc A770. A fresh import uses the exported tangent stream. The
+three standalone fixtures have identical mask decisions, with a maximum
+RGB difference of two bytes on software and one on Arc. The largest
+reported angular bound is .01013 radians. All eight Standard and Editable
+files pass Khronos with zero warnings and errors, and the six typed files
+pass the pinned MToon schema. Headless application export reproduces the
+three Standard files byte for byte. Standard FLOAT Bake, broader normal
+coordinates, general affine and deforming frames, and VRM remain open.
+
+The completed `f70483e9` Release build's test runner stopped on a stale
+CTest name before the sweep started. The latest combined runner keeps
+that build intact, reuses its unchanged objects in a private build,
+rebuilds the affected targets, and uses the actual test registration.
+[Portable MToon Bake validation](validation/portable-mtoon-bake-20261127.json)
+
 ## Source and integration boundary
 
 - Main now admits product1bc13125 and public fixturef1e193c7 after complete
