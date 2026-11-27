@@ -3,6 +3,10 @@
 #include <cstdint>
 #include <cstddef>
 #include <bit>
+#include <cmath>
+#if defined(__SYCL_DEVICE_ONLY__)
+#include <sycl/ext/intel/math/imf_rounding_math.hpp>
+#endif
 #if defined(__CUDACC__) || defined(__HIPCC__)
 #define DOME_PC_FN __host__ __device__ inline
 #else
@@ -14,7 +18,7 @@ struct Output { uint8_t color[4]{},orm[4]{},emission[4]{};uint8_t color_coverage
 struct Layer {float opacity=1;uint32_t first_tile=0;};
 struct Parameters {float color[4]{},emission[3]{},metallic=0,roughness=0;uint32_t resolution=0,layers=0,tiles=0;};
 struct Bake {
- const uint8_t *coverage=nullptr,*color=nullptr,*orm=nullptr,*emission=nullptr;
+ const uint8_t *coverage=nullptr,*color=nullptr,*orm=nullptr,*emission=nullptr,*normal=nullptr;
 };
 struct Quantization {float unit[256]{},srgb[256]{};uint32_t threshold[255]{};uint32_t reserved=0;};
 inline constexpr uint32_t absent=UINT32_MAX;
@@ -42,6 +46,47 @@ DOME_PC_FN uint8_t srgb_byte(float v,const Quantization &q){
  return uint8_t(lo);
 }
 DOME_PC_FN float blend(float base,float paint,float a){return add(mul(base,sub(1,a)),mul(paint,a));}
+// Native normals normalize in two separate binary32 steps. Fast device
+// reciprocals can cross a final byte-rounding boundary even one ULP away.
+DOME_PC_FN float normal_length(float squared){
+#if defined(__SYCL_DEVICE_ONLY__)
+ return sycl::ext::intel::math::fsqrt_rn(squared);
+#elif defined(__HIP_DEVICE_COMPILE__)
+ // The wider HIP operation leaves room around the binary32 midpoint.
+ return float(std::sqrt(double(squared)));
+#elif defined(__CUDA_ARCH__)
+ return __fsqrt_rn(squared);
+#else
+ return std::sqrt(squared);
+#endif
+}
+DOME_PC_FN float normal_reciprocal(float length){
+#if defined(__SYCL_DEVICE_ONLY__)
+ return sycl::ext::intel::math::frcp_rn(length);
+#elif defined(__HIP_DEVICE_COMPILE__)
+ return float(1.0/double(length));
+#elif defined(__CUDA_ARCH__)
+ return __frcp_rn(length);
+#else
+ return 1.f/length;
+#endif
+}
+DOME_PC_FN void compose_normal(int32_t owner,Bake bake,const Quantization &q,uint8_t *out){
+ out[0]=out[1]=128;
+ out[2]=out[3]=255;
+ if(owner<0)return;
+ const float coverage=q.unit[bake.coverage[owner]];
+ const auto *normal=bake.normal+size_t(owner)*4;
+ const auto component=[&](uint8_t value){return mul(sub(mul(q.unit[value],2),1),coverage);};
+ const float x=component(normal[0]),y=component(normal[1]);
+ const float z=add(component(normal[2]),sub(1,coverage));
+ const float length=normal_length(add(add(mul(x,x),mul(y,y)),mul(z,z)));
+ if(length<1e-8f)return;
+ const float scale=normal_reciprocal(length);
+ out[0]=linear_byte(add(mul(mul(x,scale),.5f),.5f));
+ out[1]=linear_byte(add(mul(mul(y,scale),.5f),.5f));
+ out[2]=linear_byte(add(mul(mul(z,scale),.5f),.5f));
+}
 DOME_PC_FN Output compose(uint32_t at,const Parameters &p,const Layer *layers,const uint32_t *tiles,
                          const Pixel *pixels,const int32_t *padding,Bake bake,const Quantization &q){
  float color[]{p.color[0],p.color[1],p.color[2],p.color[3]};

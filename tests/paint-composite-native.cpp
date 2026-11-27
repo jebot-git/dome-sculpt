@@ -27,7 +27,7 @@ BakedTextures bake_fixture(uint32_t side){
   const std::array<uint8_t,4> rgba{uint8_t(i%251),52,131,uint8_t(i%256)};
   const std::array<uint8_t,4> orm{uint8_t(i%199),47,16,255};
   const std::array<uint8_t,4> emission{91,uint8_t(i%151),27,255};
-  const std::array<uint8_t,4> normal{173,128,231,255};
+  const std::array<uint8_t,4> normal{uint8_t(i%256),uint8_t(i/17%256),uint8_t(i/113%256),uint8_t(i%37)};
   std::copy(rgba.begin(),rgba.end(),bake.maps.color.rgba.begin()+4*i);
   std::copy(orm.begin(),orm.end(),bake.maps.metal_rough.rgba.begin()+4*i);
   std::copy(emission.begin(),emission.end(),bake.maps.emission.rgba.begin()+4*i);
@@ -45,9 +45,15 @@ void ready(Document&d){if(!d.wait_mesh())throw std::runtime_error("Mesh did not 
 std::string_view real_backend() asm("__real__ZN4dome15compute_backendEv");
 std::string_view wrapped_backend() asm("__wrap__ZN4dome15compute_backendEv");
 std::string_view wrapped_backend(){if(reference_mode)return "CPU";auto name=real_backend();return name=="CPU"?std::string_view{"TEST-HOST-PAINT"}:name;}
-std::vector<paint_compute::Output> real_composite(const paint_compute::Input&,const std::function<bool()>&) asm("__real__ZN4dome13paint_compute9compositeERKNS0_5InputERKSt8functionIFbvEE");
-std::vector<paint_compute::Output> wrapped_composite(const paint_compute::Input&,const std::function<bool()>&) asm("__wrap__ZN4dome13paint_compute9compositeERKNS0_5InputERKSt8functionIFbvEE");
-std::vector<paint_compute::Output> wrapped_composite(const paint_compute::Input&in,const std::function<bool()>&cancelled){++calls;auto result=real_composite(in,cancelled);const auto f=fault.exchange(0);if(f==1)throw std::runtime_error("Injected completed-composite failure");if(f==2)result.back().reserved=1;return result;}
+paint_compute::Result real_composite(const paint_compute::Input&,const std::function<bool()>&) asm("__real__ZN4dome13paint_compute9compositeERKNS0_5InputERKSt8functionIFbvEE");
+paint_compute::Result wrapped_composite(const paint_compute::Input&,const std::function<bool()>&) asm("__wrap__ZN4dome13paint_compute9compositeERKNS0_5InputERKSt8functionIFbvEE");
+paint_compute::Result wrapped_composite(const paint_compute::Input&in,const std::function<bool()>&cancelled){
+ ++calls;auto result=real_composite(in,cancelled);const auto f=fault.exchange(0);
+ if(f==1)throw std::runtime_error("Injected completed-composite failure");
+ if(f==2)result.pixels.back().reserved=1;
+ if(f==3&&!result.normals.empty())result.normals.pop_back();
+ return result;
+}
 int main()try{
  if(real_backend()=="CPU")std::cout<<"TEST-ONLY HOST-CONTROL-FLOW; native sampler, no GPU/SDK numerical claim\n";
  set_paint_composite_cache_budget(0);auto scene=source();const auto raw=scene.active().painted->encode();Material a,b;b.color={.12f,.37f,.8f,.997f};b.emissive={.07f,.01f,.09f};b.metallic=.71f;b.roughness=.22f;
@@ -81,10 +87,12 @@ int main()try{
   check(calls==before_bake+1&&equal(*expected_bake,*result)&&result->baked_base==baked->baked()&&
         !result->normal.rgba.empty()&&result->color_coverage.width==512&&result->emission_coverage.width==512,
         "Native Bake, normal data and replacement coverage are exact when the selected backend composites the material");
-  const auto before_fault=calls.load();
-  fault=1;
-  check(refuses([&]{baked->composite(a);})&&calls==before_fault+1&&baked->composite(b)==result&&baked->encode()==archive,
-        "A failed baked composite keeps the prior maps and complete editable source without CPU substitution");
+  for(int failure:{1,3}){
+   const auto before_fault=calls.load();
+   fault=failure;
+   check(refuses([&]{baked->composite(a);})&&calls==before_fault+1&&baked->composite(b)==result&&baked->encode()==archive,
+         "Baked dispatch failure or truncated normal output keeps the exact source and prior maps without CPU substitution");
+  }
   check(baked->composite(a)->baked_base==baked->baked(),"Retrying the baked composite retains its immutable Bake owner");
  }
  Document d;d.replace(scene);ready(d);const auto original=d.copy_scene().encode();auto held=d.frame().surface->ranges.front().textures;auto held_pixels=held->color.rgba;auto rest=d.copy_scene().active().painted->mesh();const auto rig=d.copy_scene().active().deformation->encode(rest);

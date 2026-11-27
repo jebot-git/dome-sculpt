@@ -4805,7 +4805,8 @@ std::shared_ptr<TextureMaps> gpu_plain_composite(uint32_t r,const std::vector<Pa
  using namespace paint_compute;checkpoint(cancelled);Input in;auto &p=in.parameters;
  p.resolution=r;p.tiles=((r+31)/32)*((r+31)/32);std::copy(material.color.begin(),material.color.end(),p.color);std::copy(material.emissive.begin(),material.emissive.end(),p.emission);p.metallic=material.metallic;p.roughness=material.roughness;
  bool color_coverage=bake!=nullptr,emission_coverage=bake!=nullptr;
- if(bake)in.bake={bake->coverage,bake->maps.color.rgba,bake->maps.metal_rough.rgba,bake->maps.emission.rgba};
+ if(bake)in.bake={bake->coverage,bake->maps.color.rgba,bake->maps.metal_rough.rgba,bake->maps.emission.rgba,
+                  bake->maps.normal.rgba};
  for(const auto &l:layers)if(l.visible&&l.opacity>0&&std::any_of(l.tiles.begin(),l.tiles.end(),[](const auto &p){return bool(p);})){
   checkpoint(cancelled);in.layers.push_back({l.opacity,uint32_t(in.tiles.size())});
   for(const auto &tile:l.tiles){
@@ -4818,7 +4819,13 @@ std::shared_ptr<TextureMaps> gpu_plain_composite(uint32_t r,const std::vector<Pa
  p.layers=uint32_t(in.layers.size());in.padding=padding;checkpoint(cancelled);
  // Bake image spans borrow immutable source bytes. Readback is detached
  // from the source and no output map is published until it has been checked.
- const auto pixels=paint_compute::composite(in,cancelled);auto maps=std::make_shared<TextureMaps>();
+ auto result=paint_compute::composite(in,cancelled);
+ const auto &pixels=result.pixels;
+ const auto expected_normals=in.bake.normal.empty()?0:4*in.padding.size();
+ if(pixels.size()!=in.padding.size()||result.normals.size()!=expected_normals)
+  throw std::runtime_error("Paint composite backend returned invalid image sizes");
+ auto maps=std::make_shared<TextureMaps>();
+ if(!result.normals.empty())maps->normal={r,r,std::move(result.normals)};
  for(auto image:{&maps->color,&maps->metal_rough,&maps->emission})*image={r,r,std::vector<uint8_t>(size_t(r)*r*4)};
  auto coverage=[&](Image &im,bool full){const uint32_t n=full?r:1;im={n,n,std::vector<uint8_t>(size_t(n)*n*4)};for(size_t at=3;at<im.rgba.size();at+=4)im.rgba[at]=255;};
  coverage(maps->color_coverage,color_coverage);coverage(maps->emission_coverage,emission_coverage);
@@ -4916,6 +4923,7 @@ PaintedMesh::build_composite(const Material &material,const std::function<bool()
   const bool accelerated=native_grid&&gpu_plain_composite_eligible(r,layers_,bake!=nullptr);
   auto maps=accelerated?gpu_plain_composite(r,layers_,surface_->padding,material,bake,cancelled):
                          std::make_shared<TextureMaps>();
+  const bool device_normal=!maps->normal.rgba.empty();
   maps->source_maps=source_maps_;
   maps->color_projection=color_projection_;
   maps->normal_projection=normal_projection_;
@@ -4966,7 +4974,8 @@ PaintedMesh::build_composite(const Material &material,const std::function<bool()
     auto field=normal_projection_->version==2?SourceNormalPreparationAccess::resolved(*this):normal_projection_;
     maps->normal=*field->pbr;maps->mtoon_normal=*field->mtoon;
   } else if (baked_ && !baked_->maps.normal.rgba.empty()) {
-    maps->normal=blank_image(r,true);maps->baked_normal=blank_image(r,true);
+    if(!device_normal)maps->normal=blank_image(r,true);
+    maps->baked_normal=blank_image(r,true);
     maps->baked_coverage=blank_image(r);for(size_t at=3;at<maps->baked_coverage.rgba.size();at+=4)maps->baked_coverage.rgba[at]=255;
   }
 
@@ -5088,7 +5097,7 @@ PaintedMesh::build_composite(const Material &material,const std::function<bool()
     // Protected/fractional coverage keeps original source normal detail. Convert
     // that affine-UV derivative frame into the canonical baked tangent basis.
     std::vector<Tangent> corners;
-    if(source.normal.image && source.normal_scale>0){
+    if(!device_normal && source.normal.image && source.normal_scale>0){
       bool needs_original=false;
       for(size_t at=0;at<surface_->texels.size();++at)
         if(surface_->texels[at].covered() && baked_->coverage[at]<255){needs_original=true;break;}
@@ -5098,9 +5107,11 @@ PaintedMesh::build_composite(const Material &material,const std::function<bool()
       if((at&4095)==0)paint_compute::checkpoint(cancelled);
       int32_t owner=surface_->padding[at];
       if (owner<0) continue;
-      float a=unit(baked_->coverage[size_t(owner)]);
-      maps->baked_coverage.rgba[at*4]=byte(a);
-      for(int c=0;c<4;++c)maps->baked_normal.rgba[at*4+c]=baked_->maps.normal.rgba[size_t(owner)*4+c];
+      const auto coverage=baked_->coverage[size_t(owner)];
+      maps->baked_coverage.rgba[at*4]=coverage;
+      std::copy_n(baked_->maps.normal.rgba.data()+size_t(owner)*4,4,maps->baked_normal.rgba.data()+at*4);
+      if(device_normal)continue;
+      float a=unit(coverage);
       const auto normal_detail=unpack_baked_normal(baked_->maps.normal,size_t(owner));
       if(baked_->normal_interpretation==BakedNormalInterpretation::NativeAttributes){
         const auto rgb=detail::composite_native_bake_normal(normal_detail,a);

@@ -21,7 +21,8 @@ void validate(const Input &in,const std::function<bool()> &cancelled){
  const auto &bake=in.bake;
  const size_t baked_pixels=bake.coverage.empty()?0:count;
  if(bake.coverage.size()!=baked_pixels||bake.color.size()!=4*baked_pixels||
-    bake.orm.size()!=4*baked_pixels||bake.emission.size()!=4*baked_pixels)
+    bake.orm.size()!=4*baked_pixels||bake.emission.size()!=4*baked_pixels||
+    (!bake.normal.empty()&&bake.normal.size()!=4*baked_pixels))
   throw std::invalid_argument("Baked paint compositor images must match the native grid");
  for(float v:p.color)if(!std::isfinite(v)||v<0||v>1)throw std::invalid_argument("Invalid paint composite color");
  for(float v:p.emission)if(!std::isfinite(v)||v<0||v>100)throw std::invalid_argument("Invalid paint composite emission");

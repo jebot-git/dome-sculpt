@@ -2,10 +2,17 @@
 #include "paint-composite-backend.hpp"
 #include "paint-grid-filter.hpp"
 namespace dome::paint_compute {
-std::vector<Output> composite(const Input &in,const std::function<bool()> &cancelled){
- validate(in,cancelled);const auto &q=quantization();std::vector<Output> out(in.padding.size());
+Result composite(const Input &in,const std::function<bool()> &cancelled){
+ validate(in,cancelled);const auto &q=quantization();
+ Result out;
+ out.pixels.resize(in.padding.size());
+ if(!in.bake.normal.empty())out.normals.resize(4*in.padding.size());
  const auto bake=in.bake.view();
- for(size_t i=0;i<out.size();++i){if((i&4095)==0)checkpoint(cancelled);out[i]=compose(uint32_t(i),in.parameters,in.layers.data(),in.tiles.data(),in.pixels.data(),in.padding.data(),bake,q);}
+ for(size_t i=0;i<out.pixels.size();++i){
+  if((i&4095)==0)checkpoint(cancelled);
+  out.pixels[i]=compose(uint32_t(i),in.parameters,in.layers.data(),in.tiles.data(),in.pixels.data(),in.padding.data(),bake,q);
+  if(!out.normals.empty())compose_normal(in.padding[i],bake,q,out.normals.data()+4*i);
+ }
  checkpoint(cancelled);return out;
 }
 }
