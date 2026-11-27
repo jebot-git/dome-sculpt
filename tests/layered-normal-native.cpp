@@ -4,6 +4,9 @@
 #undef main
 #include "dome/document.hpp"
 #include "baked-normal-field.hpp"
+#include "emission-bake-source.hpp"
+#include "source-bake-normal.hpp"
+#include "dome/tangents.hpp"
 #include <fstream>
 namespace {
 void settled_layers(Document &d){
@@ -20,6 +23,89 @@ void roundtrip_layers(Document &document,const std::filesystem::path &path){
   check(c&&c->before_paint()==o.material_bindings->uv_origin->paint&&(!o.painted->baked()||o.painted->baked()->normal_field->origin()==c),
     "Restart preserves one genuine shared original paint/frame origin across current material and baked field");
   document.save(path);check(Scene::load(path).encode()==wire,"Actual ordered Document Save/restart retains exact layered normals and material/source data");
+}
+void independent_source_bake(Document &converted,const std::filesystem::path &out) {
+  auto scene=converted.copy_scene();
+  const auto donor=scene.active();
+  const auto source=donor.id;
+  const auto &rest=donor.painted->mesh();
+  const auto mesh=donor.deformation?donor.deformation->preview(rest):rest;
+  const auto target=scene.add("Independent prepared-normal recipient",Volume{});
+  scene.active().transform=donor.transform;
+  scene.active().mesh_active=true;
+  scene.active().painted=std::make_shared<PaintedMesh>(mesh,64);
+  const auto before=scene.encode();
+  const auto normal_source=detail::source_bake_normals(scene.object(source),{});
+  const auto paired=detail::raw_bake_source(scene.object(source),{},&normal_source);
+  check(paired&&normal_source.matches_prepared_source(*paired),
+        "Independent donor uses its actual paired material and normal-frame capture");
+  bool refused=false;
+  try {
+    const detail::SourceBakeNormalResolver missing;
+    (void)detail::raw_bake_source(scene.object(source),{},&missing);
+  } catch(const std::invalid_argument &e) {
+    refused=std::string_view(e.what()).find("paired material capture")!=std::string_view::npos;
+  }
+  check(refused&&scene.encode()==before,
+        "Missing source-frame authority refuses without changing either object");
+
+  ObjectBakeSettings options;
+  options.ao_samples=0;
+  options.padding=0;
+  options.allow_backfaces=true;
+  options.front_mm=options.back_mm=1000;
+  options.corresponding_topology=true;
+  Document document;
+  document.replace(scene);
+  settled_layers(document);
+  document.bake_from_object(source,options);
+  const auto path=out/"independent-prepared-donor.dsculpt";
+  document.save_async(path).get();
+  settled_layers(document);
+  const auto accepted=document.copy_scene();
+  const auto &source_after=accepted.object(source);
+  const auto &bake=accepted.object(target).painted->baked();
+  check(bake&&source_after.painted->mesh_owner()==donor.painted->mesh_owner()&&
+        source_after.painted->baked()==donor.painted->baked()&&
+        source_after.painted->revision()==donor.painted->revision()&&
+        source_after.material_bindings==donor.material_bindings&&source_after.deformation==donor.deformation,
+        "Actual Bake publishes on the independent recipient and retains the donor authorities");
+  const auto corners=tangent_corners(mesh);
+  float maximum_error=0,omitted_error=0;
+  size_t samples=0;
+  constexpr uint32_t resolution=64;
+  for(uint32_t tri=0;tri<mesh.indices.size()/3;++tri){
+    const auto a=mesh.uv.at(mesh.indices.at(size_t(tri)*3));
+    const auto b=mesh.uv.at(mesh.indices.at(size_t(tri)*3+1));
+    const auto c=mesh.uv.at(mesh.indices.at(size_t(tri)*3+2));
+    const float dx=b[0]-a[0],dy=b[1]-a[1],ex=c[0]-a[0],ey=c[1]-a[1];
+    const float det=dx*ey-dy*ex;
+    if(std::abs(det)<1e-8f)continue;
+    for(uint32_t y=0;y<resolution;++y)for(uint32_t x=0;x<resolution;++x){
+      const auto at=size_t(y)*resolution+x;
+      if(bake->coverage.at(at)!=255)continue;
+      const float u=(float(x)+.5f)/resolution-a[0],v=(float(y)+.5f)/resolution-a[1];
+      const float j=(u*ey-v*ex)/det,k=(dx*v-dy*u)/det;
+      const std::array<float,3> bary{1-j-k,j,k};
+      if(*std::min_element(bary.begin(),bary.end())<.12f)continue;
+      const auto basis=tangent_frame(mesh,corners,tri,bary);
+      const auto *rgb=bake->maps.normal.rgba.data()+at*4;
+      const auto actual=basis.to_world({rgb[0]/127.5f-1,rgb[1]/127.5f-1,rgb[2]/127.5f-1});
+      const auto wanted=normal_source(tri,bary)[0];
+      maximum_error=std::max(maximum_error,length(actual-wanted));
+      omitted_error=std::max(omitted_error,length(basis.to_world({0,0,1})-wanted));
+      ++samples;
+    }
+  }
+  std::cout<<"INDEPENDENT_BAKE samples="<<samples<<" max_normal_error="<<maximum_error
+           <<" omitted_normal_error="<<omitted_error<<'\n';
+  check(samples>32&&omitted_error>.07f&&maximum_error<.035f,
+        "Native recipient texels preserve the authored source direction within the Bake tolerance");
+  const auto exact=accepted.encode();
+  check(Scene::load(path).encode()==exact,"Ordered independent Bake Save cold-reopens exactly");
+  check(document.undo()&&document.copy_scene().encode()==before&&
+        document.redo()&&document.copy_scene().encode()==exact,
+        "Independent source Bake has exact Undo and Redo");
 }
 }
 int main(int argc,char **argv)try{
@@ -111,11 +197,8 @@ int main(int argc,char **argv)try{
   }
   {
     auto raw=Scene::load(source/"original-7.dsculpt");Document document;document.replace(raw);settled_layers(document);
-    document.convert_baked_normals();settled_layers(document);auto scene=document.copy_scene();const auto mesh=scene.active().painted->mesh();
-    scene.add("Prepared source guard target",Volume{});scene.active().mesh_active=true;scene.active().painted=std::make_shared<PaintedMesh>(mesh,64);
-    const auto exact=scene.encode();ObjectBakeSettings options;options.ao_samples=0;options.allow_partial=true;options.front_mm=options.back_mm=1000;
-    bool refused=false;try{bake_object(scene,1,options);}catch(const std::exception &e){refused=std::string_view(e.what()).find("source-frame transport")!=std::string_view::npos;}
-    check(refused&&scene.encode()==exact,"Independent prepared source cannot bypass genuine source-frame transport or mutate either object");
+    document.convert_baked_normals();settled_layers(document);
+    independent_source_bake(document,out);
   }
   return 0;
 }catch(const std::exception &e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

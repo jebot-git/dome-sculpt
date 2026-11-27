@@ -52,6 +52,26 @@ namespace queued_fault {
 std::atomic<bool> armed{false}, entered{false}, released{false}, publication{false}, hit{false};
 std::atomic<bool> acceptance{false};
 struct Release { ~Release() { released = true; } };
+std::mutex acceptance_mutex;
+std::condition_variable acceptance_changed;
+bool acceptance_entered=false,acceptance_released=false;
+void arm_acceptance(){
+  std::lock_guard lock(acceptance_mutex);
+  acceptance_entered=acceptance_released=false;
+  acceptance=true;
+}
+bool wait_acceptance(){
+  std::unique_lock lock(acceptance_mutex);
+  return acceptance_changed.wait_for(lock,std::chrono::seconds(5),[]{return acceptance_entered;});
+}
+struct AcceptanceRelease {
+  void release(){
+    std::lock_guard lock(acceptance_mutex);
+    acceptance_released=true;
+    acceptance_changed.notify_all();
+  }
+  ~AcceptanceRelease(){release();}
+};
 }
 extern "C" void real_edit(RetopoWorkspace &, RetopoAction, Vec3, float, const std::function<bool()> &)
   asm("__real__ZN4dome15RetopoWorkspace4editENS_12RetopoActionENS_4Vec3EfRKSt8functionIFbvEE");
@@ -63,10 +83,16 @@ extern "C" void wrapped_edit(RetopoWorkspace &w, RetopoAction a, Vec3 p, float m
     queued_fault::entered = true;
     while (!queued_fault::released.load()) std::this_thread::yield();
   }
+  const bool accepted=worker_fault::worker&&a==RetopoAction::EndGesture&&queued_fault::acceptance.exchange(false);
+  if(accepted){
+    std::unique_lock lock(queued_fault::acceptance_mutex);
+    queued_fault::acceptance_entered=true;
+    queued_fault::acceptance_changed.notify_all();
+    if(!queued_fault::acceptance_changed.wait_for(lock,std::chrono::seconds(10),[]{return queued_fault::acceptance_released;}))
+      throw std::runtime_error("Retopology acceptance test gate timed out");
+  }
   real_edit(w, a, p, mm, cancelled);
-  if (gate) queued_fault::publication = true;
-  if (worker_fault::worker && a == RetopoAction::EndGesture && queued_fault::acceptance.exchange(false))
-    queued_fault::publication = true;
+  if (gate||accepted) queued_fault::publication = true;
 }
 extern "C" void real_publish(Document *, bool, bool) asm("__real__ZN4dome8Document14publish_lockedEbb");
 extern "C" void wrapped_publish(Document *, bool, bool) asm("__wrap__ZN4dome8Document14publish_lockedEbb");
@@ -95,6 +121,7 @@ void acceptance_cases(const std::filesystem::path &out, const Scene &scene) {
   const auto original = scene.encode();
   for (bool next_gesture : {false, true}) {
     Document d; points(d, scene); atlas_gate::Release release;
+    queued_fault::AcceptanceRelease accepted;
     d.edit_retopology(RetopoAction::Face); ready(d);
     const auto before = d.frame().state->retopology->topology->encode();
     held_point(d);
@@ -103,8 +130,11 @@ void acceptance_cases(const std::filesystem::path &out, const Scene &scene) {
     const auto path = out / (next_gesture ? "next-gesture.dsculpt" : "local-undo.dsculpt");
     { std::ofstream prior(path, std::ios::binary); prior << "prior exact file"; }
     atlas_gate::arm(); // The old ready-before-publication path cannot finish the file first.
-    queued_fault::hit = false; queued_fault::acceptance = true;
-    d.end_retopology(true); auto saved = d.save_async(path);
+    queued_fault::hit = false; queued_fault::arm_acceptance();
+    d.end_retopology(true);
+    check(queued_fault::wait_acceptance(),"Accepted gesture reaches the real worker before dependent Save");
+    auto saved = d.save_async(path);
+    accepted.release();
     const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(5);
     while (!queued_fault::hit.load() && std::chrono::steady_clock::now() < deadline)
       std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -120,6 +150,11 @@ void acceptance_cases(const std::filesystem::path &out, const Scene &scene) {
     check(bytes == "prior exact file", "Failed accepted publication preserves existing file bytes");
     check(d.frame().state->retopology && d.frame().state->retopology->topology->encode() == held,
           "Failed Apply retains the exact pre-Apply held draft");
+    bool late_save_refused = false;
+    try { d.save_async(path).get(); } catch (const std::logic_error &e) {
+      late_save_refused = std::string_view(e.what()).find("Apply or cancel retopology") != std::string_view::npos;
+    }
+    check(late_save_refused, "Save submitted after the failure refuses the still-open draft");
     if (next_gesture) {
       held_point(d); d.cancel_desktop(); ready(d);
       check(d.frame().state->retopology->topology->encode() == held,
