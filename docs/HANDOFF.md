@@ -2378,6 +2378,28 @@ animation, physical HDR, typed normal Bake, additional source UVs,
 VRM material integration and physical-device verification remain open.
 [Painted MToon validation](validation/painted-mtoon-texture-sets-20261127.json)
 
+### Painted MToon with a shared base and shade texture
+
+Standard and Editable GLB export separate painted base and shade images
+when both roles share one uniform static source image. The shade compiler
+accounts for the viewport's positive paint clamp. For each filter cell
+it bounds the difference between interpolating the clamped taps and
+clamping the interpolated value. It also checks the original shade
+branch at zero coverage. The native package retains the original alias
+and exact authoring layers. A shade that exceeds the normalized portable
+range leaves the previous Standard GLB intact.
+
+Release and ASan/UBSan each pass 230 export and 131 software graphics
+checks. The 512-square painted set exports beside a 64-square PBR
+set and cold reopens with exact native paint. On the masked shared
+shade fixture, software GL differs by at most two RGB bytes and
+Intel Arc A770 by at most one. Alpha coverage and all 35 tested
+picking rays agree. The five typed outputs pass the pinned MToon
+schema with no Khronos errors. The rigged files keep the preexisting
+non-root skin warning. Earlier painted files with independent shade
+keep their exact bytes.
+[Shared MToon shade validation](validation/shared-shade-mtoon-20261127.json)
+
 ## Source and integration boundary
 
 - Main now admits product1bc13125 and public fixturef1e193c7 after complete

@@ -1,0 +1,125 @@
+{
+  "product": "46778174993c40e75110266090807bf8aab6c0eb",
+  "parent": "b5edab4882dd8d279acf0ce45cb511f1f3faa23a",
+  "scope": "Masked painted UV0 MToon 1.0 fields with an actual shared uniform base/shade source image and transform. Standard and exact Editable GLB at 64 and 512 pixels, independent shade after export, kept native alias.",
+  "native_checks_per_profile": 230,
+  "graphics_checks_per_profile": 131,
+  "release_ctests": 3,
+  "terminal_invocation": {
+    "release": "85cccad98cf44a578242c62733b11a19",
+    "asan": "e53b47ed4aaa42b989bef98773ea105a"
+  },
+  "graphics": {
+    "release_software_maximum_rgb_byte_difference": 2,
+    "asan_software_maximum_rgb_byte_difference": 2,
+    "Arc_A770_maximum_rgb_byte_difference": 1,
+    "alpha_mismatches": 0,
+    "matching_picking_rays_per_fixture": 35
+  },
+  "app_sha256": {
+    "release": "9303f08478296187cd329372f73fa6e66a67d829c434b0ee20b5972a3af517e8",
+    "asan": "dd23eb1a29263eae12eb5714a2c1dd27397d65d270e9f1c6a27f6970257d0a84"
+  },
+  "files": {
+    "shared-shade-standard.glb": {
+      "release": "e44f8ba072a72dc72fd24e5190393c0ef1a80e2451af7f450f3adefb575739fa",
+      "asan": "e44f8ba072a72dc72fd24e5190393c0ef1a80e2451af7f450f3adefb575739fa"
+    },
+    "shared-shade-editable.glb": {
+      "release": "723110c2076b6e62ae5b227e2f13caf784b41059bf70877293e5c8b7f9a17a7e",
+      "asan": "723110c2076b6e62ae5b227e2f13caf784b41059bf70877293e5c8b7f9a17a7e"
+    },
+    "shared-shade-512-standard.glb": {
+      "release": "c2e12d8d55a685fa876680996b7079b0c32e4b91bf3e4aef98054613c22f482d",
+      "asan": "c2e12d8d55a685fa876680996b7079b0c32e4b91bf3e4aef98054613c22f482d"
+    },
+    "shared-shade-512-editable.glb": {
+      "release": "ae79e13e18ccd913999d70688d562f918e7dbbbdcee4d9480a25c774b0be2e64",
+      "asan": "ae79e13e18ccd913999d70688d562f918e7dbbbdcee4d9480a25c774b0be2e64"
+    },
+    "rendered-shared-shade-mtoon.glb": {
+      "release": "34bd413ea147d21bc9fee57ec70c70f882ddf8e597e15881ad087cae8671d550",
+      "asan": "34bd413ea147d21bc9fee57ec70c70f882ddf8e597e15881ad087cae8671d550"
+    }
+  },
+  "earlier_nonshared_controls": {
+    "painted-mtoon-standard.glb": "ccdbe279e0a61774ccfd7a162583dfe991999eaa2ca323a13c388e0da728dd66",
+    "painted-mtoon-editable.glb": "1c77c984a7630bd438f6b3bdf264975fa323c776d9e1a947a7847ea264e5b4db",
+    "rendered-painted-mtoon.glb": "30dffcb4869fd6a6e6a076281cd1b9b29ab07cca3622f52ab6616ffb89443850",
+    "rendered-uniform-painted-mtoon.glb": "0efe20ef0491eef79b4a3951f4558af351828caa6bb08bfd55d11086e04138e2"
+  },
+  "certified_filter_bounds": {
+    "shared-shade-standard.glb": {
+      "emissiveStrength": 1,
+      "maximumAlphaError": 1.0238418579323607e-06,
+      "maximumLinearColorError": 0.003825192051793962,
+      "maximumLinearEmissionError": 0.0017031673019317895,
+      "maximumLinearShadeError": 0.0026366669221292985,
+      "maximumShadeInterpolationError": 0.000761333521706444,
+      "sampling": "clamp-linear-level-zero",
+      "version": 1
+    },
+    "shared-shade-editable.glb": {
+      "emissiveStrength": 1,
+      "maximumAlphaError": 1.0238418579323607e-06,
+      "maximumLinearColorError": 0.003825192051793962,
+      "maximumLinearEmissionError": 0.0017031673019317895,
+      "maximumLinearShadeError": 0.0026366669221292985,
+      "maximumShadeInterpolationError": 0.000761333521706444,
+      "sampling": "clamp-linear-level-zero",
+      "version": 1
+    },
+    "shared-shade-512-standard.glb": {
+      "emissiveStrength": 1,
+      "maximumAlphaError": 1.0238418579323607e-06,
+      "maximumLinearColorError": 0.003934663403286603,
+      "maximumLinearEmissionError": 0.001803164853057453,
+      "maximumLinearShadeError": 0.0026366669221292985,
+      "maximumShadeInterpolationError": 0.0006592354237403705,
+      "sampling": "clamp-linear-level-zero",
+      "version": 1
+    },
+    "shared-shade-512-editable.glb": {
+      "emissiveStrength": 1,
+      "maximumAlphaError": 1.0238418579323607e-06,
+      "maximumLinearColorError": 0.003934663403286603,
+      "maximumLinearEmissionError": 0.001803164853057453,
+      "maximumLinearShadeError": 0.0026366669221292985,
+      "maximumShadeInterpolationError": 0.0006592354237403705,
+      "sampling": "clamp-linear-level-zero",
+      "version": 1
+    },
+    "rendered-shared-shade-mtoon.glb": {
+      "emissiveStrength": 1,
+      "maximumAlphaError": 1.0238418579323607e-06,
+      "maximumLinearColorError": 0.003934663403286603,
+      "maximumLinearEmissionError": 0.001803164853057453,
+      "maximumLinearShadeError": 0.0026295923924296296,
+      "maximumShadeInterpolationError": 0.000969280484225902,
+      "sampling": "clamp-linear-level-zero",
+      "version": 1
+    }
+  },
+  "remaining": "Varying source textures, live painted animation, physical HDR, typed Bake, broader texture sampling, VRM integration and physical devices.",
+  "archive": {
+    "name": "shared-shade-mtoon-20261127.tar.gz",
+    "sha256": "e3b62a18007688cc7dc1443c0446744871451d960fbcb90aeb7334261058ca08",
+    "files": {
+      "arc/runtime.log": "88578c790751763454f5303ce2b75b2f63b4fb1287452fc02b3808218a29650a",
+      "asan/graphics-runtime.log": "e72f675ec54c7f9ab5c88b638bac5dfd0f72b8135ec57fb56e0cc8d8054a0ead",
+      "asan/portable-runtime.log": "fe32f6e7ba39ba71e1caa27a97502b1f2320b692698339d4cd996728d69234a5",
+      "asan/version.log": "264a39458f32c9848b801a46412f22bd034e6d069f4deca6839e4c021d747052",
+      "ctest/runtime.log": "61008cbf5cc7c6de688e167960d6a6f83e623accc7776a201e82c2a7b54d9e00",
+      "interop/khronos.jsonl": "ab35d9265bd0b0a185473be4c40cbe61c7c0bf8bc69713e62f0ef3ccce297ab4",
+      "interop/rendered-shared-shade-mtoon.glb.khronos.json": "3f8c53724533702e8e329b688908c6b235f4b6aa16b91204ba99800325e14832",
+      "interop/schemas.json": "f022c904e82a62eb82190915755b91714ec19f295d20589c853f59860c19c96c",
+      "interop/shared-shade-512-editable.glb.khronos.json": "6415f9a8a90cb86d76b874700ad1f0e64a39b684b43ac7ef48568946d5eb2b54",
+      "interop/shared-shade-512-standard.glb.khronos.json": "589031fac0789df4d8b0bf03a96eed74f16f502ac96c7e708ff977f42056b1bf",
+      "interop/shared-shade-editable.glb.khronos.json": "5844ca90d7e843b5670cccd77653dd47f79c835b8000cda9d0309f95ca3dffef",
+      "interop/shared-shade-standard.glb.khronos.json": "4e65d55cb15ccb8167a050d75f9cded80b06a2fcf3716a4327cd1ccfd72a79b2",
+      "release/graphics-runtime.log": "4c64667757811fcc29ff0dfacf7e49ecbd55d80babb1e46243809ad7e2715bf1",
+      "release/portable-runtime.log": "b73cca40d973663c798289a37e607e2a137e29db44f2d1a6b204415a49765253",
+      "release/version.log": "a18c4bb103db6ab0b789c80504a87dcf4ebfdde36b1452d0ca481276601b6429"
+    }
+  }
+}

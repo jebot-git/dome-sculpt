@@ -183,12 +183,17 @@ roles are uniform and static. The exporter bounds both filtered coverage
 branches, preserves mask decisions, and retains separate shade and PBR
 materials. Editable GLB retains exact painted authoring data. Standard
 export refuses unsupported compositions before replacing the destination.
-Varying and shared shade sources, live painted UV animation, HDR and
-typed Bake, VRM integration, alternate UVs, original artist frames,
-resampling, and physical verification remain open.
+Uniform static base and shade roles can share one original image.
+Portable output gives painted shade its own texture and bounds
+interpolation across the shader's positive paint clamp. Tested 64
+and 512 square fields preserve exact Editable GLB authoring state.
+Varying shade sources, live painted UV animation, HDR and typed Bake,
+VRM integration, alternate UVs, original artist frames, resampling,
+and physical verification remain open.
 [Native MToon texture-set evidence](validation/native-mtoon-texture-sets-20261127.json)
 [Portable MToon texture-set evidence](validation/portable-mtoon-texture-sets-20261127.json)
 [Painted MToon texture-set evidence](validation/painted-mtoon-texture-sets-20261127.json)
+[Shared MToon shade evidence](validation/shared-shade-mtoon-20261127.json)
 
 Strict Bake rays now recover source-edge contacts affected by float staging.
 An exact ray hit has priority. A missed ray can use an actual source edge
