@@ -31,6 +31,36 @@
 #include "source-skin-world.hpp"
 namespace dome {
 namespace {
+bool has_morph_pose(const SculptObject &object) {
+  return object.deformation&&std::ranges::any_of(object.deformation->morph_weights,
+                                                [](float weight){return weight!=0;});
+}
+
+// The source and target share one allowance for transient posed frames.
+// Paint, UVs, and original artist columns stay on their immutable owners.
+struct RetainedBakePose {
+  const std::function<bool()> &cancelled;
+  size_t bytes=0,work=0;
+
+  std::shared_ptr<const detail::PolygonSurfacePreview> field(
+      const TextureSetView &field,const Mesh *geometry) {
+    const auto &original=field.source->source_preview();
+    if(!geometry)return original;
+    const auto &frames=original->geometric_frames();
+    const auto &domain=*field.domain;
+    const auto members=domain.triangles();
+    const TextureSetLimits limits;
+    if(frames.size()>(limits.maximum_bytes-bytes)/sizeof(frames.front())||
+       frames.size()>(limits.maximum_work-work)/8||
+       members.size()>(limits.maximum_work-work-frames.size()*8)/96)
+      throw std::length_error("Retained Bake pose exceeds the frame workspace");
+    auto posed=original->with_geometry(field.painted->mesh_owner(),*geometry,members,cancelled);
+    if(posed->posed_frame_owner())bytes+=frames.size()*sizeof(frames.front());
+    work+=frames.size()*8+members.size()*96;
+    return posed;
+  }
+};
+
 // Reuse the sealed before/current streams once the hit belongs to its field.
 // Replaying the complete polygon graph per texel would dominate projection.
 Vec3 retained_source_normal(const detail::PolygonSurfacePreview &preview, size_t triangle,
@@ -89,7 +119,9 @@ Vec3 retained_source_normal(const detail::PolygonSurfacePreview &preview, size_t
 std::vector<detail::RetainedSourceBakeField> capture_texture_set_bake_source(
     BakeSource &high, SculptObject source, CanvasTransform normal_to_target,
     const std::optional<detail::AffineInteractionFrame> &placement,
-    const std::function<bool()> &cancelled) {
+    RetainedBakePose &pose) {
+  const auto &cancelled=pose.cancelled;
+  const auto *deformed=has_morph_pose(source)?&high.mesh:nullptr;
   const auto primary=texture_set_view(source,0);
   const auto collection=std::move(source.texture_sets);
   high.materials.clear();
@@ -120,7 +152,9 @@ std::vector<detail::RetainedSourceBakeField> capture_texture_set_bake_source(
       return;
     }
     const auto paint=detail::texture_set_source_read_view(field,limits);
-    const auto preview=field.source->source_preview();
+    const auto preview=pose.field(field,deformed);
+    if(deformed)preview->validate_bake_world(field.domain->triangles(),
+        placement?placement->world():AffineTransform{},cancelled);
     material.maps=detail::PolygonSurfacePaintCodec::preview(*paint,field.material_bindings,
         field.material,cancelled,preview);
     const auto packet=material.maps->overlay;
@@ -260,7 +294,11 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   for (auto mm : {settings.front_mm, settings.back_mm, settings.ao_distance_mm})
     if (!std::isfinite(mm) || mm < 0 || mm > 100'000)
       throw std::invalid_argument("Invalid world-millimetre bake distance");
-  if (target.deformation) {
+  const bool retained_target=recipient&&bool(recipient->source);
+  std::optional<Mesh> posed_target;
+  if(retained_target){
+    if(has_morph_pose(target))posed_target=target.deformation->preview(target.painted->mesh());
+  }else if (target.deformation) {
     auto preview = target.deformation->preview(target.painted->mesh());
     const auto &rest = target.painted->mesh();
     for (size_t i = 0; i < rest.positions.size(); ++i)
@@ -346,7 +384,10 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
     metric_from_world=AffineTransform(matrix);
   }
   std::vector<detail::RetainedSourceBakeField> source_fields;
-  if(source.texture_sets)source_fields=capture_texture_set_bake_source(high,source,relative,placement,cancelled);
+  RetainedBakePose retained_pose{cancelled};
+  const auto retained_recipient=retained_target
+    ?retained_pose.field(*recipient,posed_target?&*posed_target:nullptr):nullptr;
+  if(source.texture_sets)source_fields=capture_texture_set_bake_source(high,source,relative,placement,retained_pose);
   else{
     high.materials[0].material=source.material;
     high.materials[0].resolved_emission=detail::emission_bake_source(source,cancelled,&source_normals);
@@ -433,7 +474,6 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   const bool native_attributes=native_writable&&target.material_bindings->native_paint_frames&&
       (!old_bake||old_bake->normal_interpretation==BakedNormalInterpretation::NativeAttributes);
   std::optional<Mesh> low;
-  const auto retained_recipient=recipient&&recipient->source?recipient->source->source_preview():nullptr;
   if(native_writable){
     PaintSamplingLimits limits;
     limits.cancelled=cancelled;
@@ -449,7 +489,7 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
       options.low_tangents=frame.tangents;
     }
   }else if(retained_recipient){
-    const auto &mesh=target.painted->mesh();
+    const auto &mesh=posed_target?*posed_target:target.painted->mesh();
     if(mesh.indices.size()>2'000'000)
       throw std::length_error("Retained Bake target exceeds the corner workspace");
     low.emplace();
@@ -495,7 +535,7 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   if(settings.cage_object)
     options.cage_positions=detail::object_bake_cage(scene,target.id,settings.cage_object,
         target.painted->mesh(),low?*low:target.painted->mesh(),cancelled,
-        target_placement?&metric_from_world:nullptr);
+        target_placement?&metric_from_world:nullptr,posed_target?&*posed_target:nullptr);
   std::vector<Tangent> target_metric_corners;
   if(target_placement){
     if(!low)low=target.painted->mesh();

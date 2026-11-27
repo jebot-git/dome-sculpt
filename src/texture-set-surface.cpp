@@ -98,7 +98,7 @@ bool bake_target_supported(const SculptObject &object) {
   return false;
  if(field.source){
   const auto &preview=field.source->source_preview();
-  return !object.deformation&&bool(preview);
+  return retained_texture_set_shape_pose(object.deformation.get())&&bool(preview);
  }
  return plain(field.painted.get(),field.appearance.get(),field.material_bindings.get())||
         native_texture_set_mtoon(field.painted.get(),field.appearance.get(),field.material_bindings.get());
@@ -117,7 +117,7 @@ bool bake_source_supported(const SculptObject &object, bool affine) {
  }
  if(!object.mesh_active||!object.painted||(object.polygon&&object.polygon->colors))return false;
  const auto eligible=[&](const auto &field){
-  if(field.source)return !object.deformation&&field.source->source_preview()&&
+  if(field.source)return retained_texture_set_shape_pose(object.deformation.get())&&field.source->source_preview()&&
       field.material_bindings&&!field.material_bindings->has_mtoon;
   return plain(field.painted.get(),field.appearance.get(),field.material_bindings.get());
  };

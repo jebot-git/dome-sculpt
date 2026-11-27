@@ -29,7 +29,9 @@ size_t TextureSetFieldSource::working_bytes(const TextureSetView&source,const Te
 std::shared_ptr<const TextureSetFieldSource>TextureSetFieldSource::capture(const TextureSetView&source,std::shared_ptr<const TextureSetFaceDomain>domain,const TextureSetLimits&limits){
  return capture_prepared(source,std::move(domain),{},limits);
 }
-std::shared_ptr<const TextureSetFieldSource>TextureSetFieldSource::capture_prepared(const TextureSetView&source,std::shared_ptr<const TextureSetFaceDomain>domain,std::shared_ptr<const PolygonSurfacePreview>preview,const TextureSetLimits&limits,const PaintedMesh*raster_template){
+std::shared_ptr<const TextureSetFieldSource>TextureSetFieldSource::capture_prepared(const TextureSetView&source,
+    std::shared_ptr<const TextureSetFaceDomain>domain,std::shared_ptr<const PolygonSurfacePreview>preview,
+    const TextureSetLimits&limits,const PaintedMesh*raster_template,OriginalPaint original_paint){
  limits.validate();stop(limits);source_model(source,limits);if(domain)domain->authenticate_owner(domain);
  if(!domain||!domain->topology()||!domain->matches(source.painted->mesh_owner())||!owner(domain->topology()->geometry(),source.painted->mesh_owner()))throw std::invalid_argument("Texture-set source field borrowed another geometry/membership owner");
  if(source.material_bindings&&source.material_bindings->polygon_surface_transfer){
@@ -41,7 +43,11 @@ std::shared_ptr<const TextureSetFieldSource>TextureSetFieldSource::capture_prepa
  uint32_t previous=0;bool first=true;for(auto t:domain->triangles()){stop(limits);if(t>=mesh.indices.size()/3||(!first&&t<=previous))throw std::invalid_argument("Texture-set source membership is not its exact ordered triangle domain");previous=t;first=false;}
  const auto peak=working_bytes(source,limits);
  if(source.material_bindings&&source.material_bindings->polygon_surface_transfer){const auto&before=*source.material_bindings->polygon_surface_transfer->before();const auto replay=PolygonSurfaceOwner::source_working_bytes(before,polygon_limits(limits));const size_t copies=preview?1:2;if(replay>(limits.maximum_bytes-peak)/copies)throw std::length_error("Texture-set shared before inputs/replay plus member/read raster exceed their simultaneous byte quota");}
- auto result=std::shared_ptr<TextureSetFieldSource>(new TextureSetFieldSource);result->original_=source.painted->snapshot();result->field_=source;result->field_.source.reset();result->field_.id=domain->set();result->field_.domain=std::move(domain);
+ auto result=std::shared_ptr<TextureSetFieldSource>(new TextureSetFieldSource);
+ // The codec already holds the detached seed read from one wire record.
+ // Members decoded from that record must keep the same immutable original.
+ result->original_=original_paint==OriginalPaint::DecodedSeed?source.painted:source.painted->snapshot();
+ result->field_=source;result->field_.source.reset();result->field_.id=domain->set();result->field_.domain=std::move(domain);
  auto member=raster_template?TextureSetPaintAccess::bind_raster(*result->original_,result->field_.domain,*raster_template,limits):TextureSetPaintAccess::bind(*result->original_,result->field_.domain,result->original_->resolution(),limits);result->field_.painted=member->snapshot();
  if(source.material_bindings)result->polygon_=source.material_bindings->polygon_surface_transfer;
  // Construct and validate the actual privileged read view before sealing the

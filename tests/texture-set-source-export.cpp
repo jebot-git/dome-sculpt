@@ -1263,6 +1263,190 @@ void bake_retained_native(bool reflected,bool smooth,bool outward=false){
  check(Scene::decode(cleared.encode()).encode()==cleared.encode()&&
        document.undo()&&document.copy_scene().encode()==saved,"Clear survives cold replay and exact Undo");
 }
+void set_bake_pose(Scene &scene,uint64_t object,std::vector<Vec3> positions){
+ ShapeKeyEdit create;create.name="Bake pose";
+ author_shapekey(scene,object,create);
+ ShapeKeyEdit edit;edit.action=ShapeKeyAction::Replace;edit.positions=std::move(positions);
+ author_shapekey(scene,object,edit);
+ RigEdit pose;pose.morph=MorphWeightEdit{0,1};
+ edit_rig(scene,object,pose);
+}
+Vec3 posed_source_direction(const TextureSetView &field,const Mesh &posed,
+    uint32_t triangle,const std::array<double,3> &bary,const AffineTransform &world){
+ // Build the new axes directly from the authored endpoint and original UV
+ // gradients. Only the already qualified rest material supplies the sample.
+ const auto &packet=*field.source->source_preview();
+ const size_t first=size_t(triangle)*3;
+ const auto &uv=packet.normal_coordinates();
+ const auto e1=posed.positions.at(posed.indices[first+1])-posed.positions.at(posed.indices[first]);
+ const auto e2=posed.positions.at(posed.indices[first+2])-posed.positions.at(posed.indices[first]);
+ const float du1=uv[first+1][0]-uv[first][0],du2=uv[first+2][0]-uv[first][0];
+ const float dv1=uv[first+1][1]-uv[first][1],dv2=uv[first+2][1]-uv[first][1];
+ const float inverse=1/(du1*dv2-du2*dv1);
+ const auto local_n=cross(e1,e2),local_t=(e1*dv2-e2*dv1)*inverse,local_b=(e2*du1-e1*du2)*inverse;
+ const auto n=unit(world.normal({local_n.x,local_n.y,local_n.z}));
+ const auto raw_t=unit(world.direction({local_t.x,local_t.y,local_t.z}));
+ const auto raw_b=unit(world.direction({local_b.x,local_b.y,local_b.z}));
+ const auto t=normalized(raw_t-n*dot(n,raw_t));
+ const auto b=cross(n,t)*(dot(cross(n,t),raw_b)<0?-1.f:1.f);
+ const auto reference=packet.triangle_frames(triangle,world).second.basis;
+ const auto authored=field.source->normal(triangle,bary,world,true);
+ return normalized(t*dot(reference.t,authored)+b*dot(reference.b,authored)+n*dot(reference.n,authored));
+}
+void bake_posed_retained(bool prepared,bool reflected,bool corresponding,bool cage){
+ auto recipient=source(prepared,reflected,false,false,false,prepared);
+ auto donor_scene=source(true,reflected,false,false,false,true);
+ if(!reflected){recipient.active().affine_edit.reset();donor_scene.active().affine_edit.reset();}
+ auto append=append_native_scene(recipient,donor_scene);
+ auto scene=std::move(append.scene);
+ const auto target=recipient.active().id,donor=append.objects.at(0);
+ scene.select(target);
+ select_texture_set(scene,target,1);
+ const auto start=active_texture_set(scene.active());
+ const auto triangle=start.domain->triangles().front();
+ const auto world=scene.world_matrix(target);
+ auto low=scene.active().painted->mesh();
+ for(auto &v:low.positions)v.z+=.30f+.23f*v.x+.17f*v.y;
+ const auto p=low.positions.at(low.indices[triangle*3]);
+ const auto e1=low.positions.at(low.indices[triangle*3+1])-p;
+ const auto e2=low.positions.at(low.indices[triangle*3+2])-p;
+ const auto n=cross(e1,e2);
+ const auto normal=unit(world.normal({n.x,n.y,n.z}));
+ const auto delta=world.inverse().direction({.014*normal.x,.014*normal.y,.014*normal.z});
+ const Vec3 offset{float(delta[0]),float(delta[1]),float(delta[2])};
+ auto high=low;
+ for(auto &v:high.positions)v+=offset;
+ set_bake_pose(scene,target,low.positions);
+ set_bake_pose(scene,donor,high.positions);
+ for(TextureSetId id:{0u,1u})
+  check(edit_texture_set(scene,donor,id,[id](PaintedMesh &paint,Material &material){
+   material.emissive={};
+   paint.add_layer("Exact posed FLOAT donor");
+   Brush brush;brush.from=brush.to={};brush.normal={0,0,1};brush.radius=4;brush.strength=1;
+   PaintSettings ink;ink.front_only=false;ink.channel=PaintChannel::Emission;
+   ink.emission_units=PaintEmissionUnits::Physical;
+   ink.emission=id?std::array<float,3>{3.f,.125f,.5f}:std::array<float,3>{.5f,7.f,1.f};
+   paint.begin_stroke();paint.stamp(brush,ink);return paint.end_stroke();
+  }),"Both retained donor members own distinct unclamped FLOAT emission");
+ scene.object(donor).visible=false;
+ scene.object(donor).locked=true;
+ const auto sample_field=texture_set_view(scene.object(donor),1);
+ constexpr std::array<double,3> bary{.22,.33,.45};
+ const auto expected=posed_source_direction(sample_field,high,triangle,bary,world);
+ check(length(expected-sample_field.source->normal(triangle,bary,world,true))>.12f,
+       "Independent source oracle detects a stale donor rest basis");
+ ObjectBakeSettings settings;
+ settings.corresponding_topology=corresponding;
+ settings.allow_backfaces=true;
+ settings.ao_samples=corresponding?0:2;
+ settings.padding=0;
+ settings.front_mm=settings.back_mm=24;
+ if(cage){
+  const auto placement=scene.active().affine_edit;
+  auto cage_mesh=low;
+  for(auto &v:cage_mesh.positions)v+=offset*1.5f;
+  settings.cage_object=scene.add("Posed cage with ordered vertices",Volume{});
+  auto &object=scene.active();
+  object.mesh_active=true;object.visible=false;object.affine_edit=placement;
+  object.painted=std::make_shared<PaintedMesh>(std::move(cage_mesh),64);
+ }
+ scene.select(target);
+ const auto baseline=scene.encode();
+ scene.save("before.dsculpt");
+ const auto probe=[&](uint64_t id){
+  auto stale=scene.snapshot();
+  RigEdit zero;zero.morph=MorphWeightEdit{0,0};
+  stale.object(id).visible=true;stale.object(id).locked=false;
+  edit_rig(stale,id,zero);
+  const auto original=stale.encode();
+  refuses([&]{bake_object(stale,donor,settings);},"A neutral endpoint alone misses the differently placed partner");
+  check(stale.encode()==original,"Failed posed projection preserves the original pose and material fields");
+ };
+ if(!cage){probe(donor);probe(target);}
+ auto cancelled=scene.snapshot();
+ bool stop=false;
+ refuses([&]{bake_object(cancelled,donor,settings,[&]{return stop;},[&](float progress){stop=progress>.25f;});},
+         "Active posed Bake honours cancellation inside projection");
+ check(stop&&cancelled.encode()==baseline,"Cancelled posed Bake preserves both meshes, maps, and recipes");
+ Document document;
+ document.open_async("before.dsculpt").get();ready(document);
+ check(document.frame().state->can_bake,"Cold Open exposes the active retained Bake target");
+ const auto before=document.copy_scene();
+ const auto cold=before.encode();
+ check(cold==baseline,"Cold Open preserves the exact scene and shares retained source seeds across history");
+ document.bake_from_object(donor,settings);
+ document.save_async("baked.dsculpt").get();ready(document);
+ const auto saved=document.copy_scene();
+ const auto exact=saved.encode();
+ check(exact!=baseline&&Scene::load("baked.dsculpt").encode()==exact,
+       "Ordered Save cold-reopens the two morphs and their editable Bake");
+ const auto selected=active_texture_set(saved.active());
+ const auto original=active_texture_set(before.active());
+ const auto untouched=texture_set_view(saved.active(),0);
+ check(selected.source->original_paint()==original.source->original_paint()&&
+       untouched.source==texture_set_view(before.active(),0).source&&
+       saved.active().deformation==before.active().deformation&&
+       saved.object(donor).deformation==before.object(donor).deformation,
+       "Bake preserves both authored morph owners, the original surface and the sibling field");
+ const auto &maps=selected.painted->baked();
+ check(maps&&maps->emission_field&&selected.bake_recipe&&
+       selected.bake_recipe->source.object==donor&&
+       selected.bake_recipe->settings.corresponding_topology==corresponding&&
+       selected.bake_recipe->settings.cage_object==settings.cage_object,
+       "The selected member carries exact HDR channels and a replayable Bake recipe");
+ check(prepared?maps->normal_field&&maps->normal_field->prior()==original.painted->baked()->normal_field:
+                bool(selected.source->source_preview()->native_bake()),
+       "Posed Bake keeps the target's actual prepared or native normal authority");
+ const auto &surface=*document.frame().surface;
+ const auto range=std::ranges::find_if(surface.ranges,[&](const SurfaceRange &r){
+  return r.object==target&&r.texture_set==1;
+ });
+ check(range!=surface.ranges.end(),"Actual viewport publishes the rebaked posed range");
+ const auto n_baked=range->textures->polygon_surface->normal_at(triangle,bary,world);
+ check(length(n_baked-expected)<.022f,"Baked native posed lighting matches the independent transformed donor direction");
+ const auto paint_uv=selected.source->sample(triangle,bary).paint_uv;
+ const auto emission=maps->emission_field->sample(paint_uv[0],paint_uv[1]).resolve({},1);
+ const auto donor_uv=sample_field.source->sample(triangle,bary).paint_uv;
+ const auto donor_maps=detail::PolygonSurfacePaintCodec::preview(
+     *sample_field.source->read_view(sample_field),sample_field.material_bindings,sample_field.material);
+ const auto donor_channels=detail::sample_overlay_values(*donor_maps->overlay,donor_uv[0],donor_uv[1],false);
+ const auto radiance=BakedEmissionSample{{donor_channels[2][0],donor_channels[2][1],donor_channels[2][2]},
+     {donor_channels[4][0],donor_channels[4][1],donor_channels[4][2]},donor_channels[3][3]}.resolve({},1);
+ check(radiance[0]>1&&std::abs(emission[0]-radiance[0])<.003f&&
+       std::abs(emission[1]-radiance[1])<.003f&&std::abs(emission[2]-radiance[2])<.003f,
+       "Baked FLOAT radiance comes from the genuine posed material member");
+ for(const auto &[file,format]:{
+     std::pair{"posed-standard.glb",AssetExportFormat::Glb},
+     std::pair{"posed-editable.glb",AssetExportFormat::EditableGlb512}}){
+  document.export_asset(file,format).get();
+  cgltf_options options{};
+  cgltf_data *data=nullptr;
+  check(cgltf_parse_file(&options,file,&data)==cgltf_result_success,"Portable worker exports the posed Bake");
+  const std::unique_ptr<cgltf_data,decltype(&cgltf_free)> owner(data,cgltf_free);
+  check(cgltf_load_buffers(&options,data,file)==cgltf_result_success&&
+        cgltf_validate(data)==cgltf_result_success&&data->meshes_count==1&&
+        data->meshes[0].primitives_count==2&&data->meshes[0].weights_count==1&&
+        data->meshes[0].weights[0]==1.f,"Independent glTF consumer sees the two material slots and active morph");
+  const auto &mapped=data->meshes[0].primitives[1];
+  check(mapped.material&&mapped.material->normal_texture.texture&&mapped.targets_count==1&&
+        cgltf_find_accessor(&mapped,cgltf_attribute_type_tangent,0),
+        "Portable posed Bake carries the actual normal image, tangents and morph");
+  std::ifstream stream(file,std::ios::binary);
+  const std::vector<uint8_t> bytes{std::istreambuf_iterator<char>(stream),{}};
+  const auto restored=format==AssetExportFormat::Glb?extract_native_emission(bytes):extract_native_authoring(bytes);
+  check(restored&&restored->encode()==exact,"Portable files preserve the editable posed Bake and hidden donors");
+ }
+ check(document.undo()&&document.copy_scene().encode()==cold,
+       "Posed Bake Undo restores the entire cold-open scene");
+ check(document.redo()&&document.copy_scene().encode()==exact,"Posed Bake Redo restores the exact bake");ready(document);
+ document.clear_bake();ready(document);
+ const auto cleared=active_texture_set(document.copy_scene().active());
+ check(cleared.painted->baked()==original.painted->baked()&&cleared.bake_recipe&&
+       cleared.bake_recipe->source.object==donor,"Clear restores inherited detail on the active pose and keeps Recall");
+ document.copy_scene().save("recall.dsculpt");
+ document.bake_from_object(donor,cleared.bake_recipe->settings);ready(document);
+ check(document.copy_scene().encode()==exact,"Rebaking the recalled live pose reproduces the exact project");
+}
 void recipe_reference_remap(bool prepared) {
  auto scene = source(prepared,false,false,false,true);
  const auto before = scene.encode();
@@ -1319,6 +1503,18 @@ void recipe_reference_remap(bool prepared) {
 }
 int main(int argc,char **argv)try {
  const std::string_view mode=argc>1?argv[1]:"";
+ if(argc==3&&mode=="--posed-retained-bake"){
+  const auto out=std::filesystem::absolute(argv[2]);std::filesystem::create_directories(out);
+  for(const auto &[leaf,prepared,reflected,corresponding,cage]:{
+      std::tuple{"native-ray",false,false,false,false},
+      std::tuple{"prepared-matching",true,true,true,false},
+      std::tuple{"prepared-cage",true,true,false,true}}){
+   std::filesystem::create_directories(out/leaf);std::filesystem::current_path(out/leaf);
+   bake_posed_retained(prepared,reflected,corresponding,cage);
+  }
+  std::cout<<"PASS "<<checks<<" posed retained Bake controls\n";
+  return 0;
+ }
  if(argc==3&&mode=="--retained-shapes"){
   std::filesystem::create_directories(argv[2]);std::filesystem::current_path(argv[2]);
   for(bool prepared:{false,true})for(bool reflected:{false,true})retained_shapes(prepared,reflected);

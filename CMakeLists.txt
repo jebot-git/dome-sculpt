@@ -5152,6 +5152,9 @@ if(BUILD_TESTING)
   add_test(NAME texture-set-retained-shapekeys COMMAND dome-sculpt-texture-set-source-export-test
     --retained-shapes ${CMAKE_CURRENT_BINARY_DIR}/texture-set-retained-shapekeys)
   set_tests_properties(texture-set-retained-shapekeys PROPERTIES TIMEOUT 300)
+  add_test(NAME texture-set-retained-posed-bake COMMAND dome-sculpt-texture-set-source-export-test
+    --posed-retained-bake ${CMAKE_CURRENT_BINARY_DIR}/texture-set-retained-posed-bake)
+  set_tests_properties(texture-set-retained-posed-bake PROPERTIES TIMEOUT 300)
   add_test(NAME texture-set-prepared-recipe-references COMMAND dome-sculpt-texture-set-source-export-test --recipe-reference-remap)
   set_tests_properties(texture-set-prepared-recipe-references PROPERTIES TIMEOUT 300)
   add_test(NAME texture-set-retained-hdr-editable COMMAND dome-sculpt-texture-set-source-export-test

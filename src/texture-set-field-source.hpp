@@ -44,9 +44,11 @@ public:
 private:
   friend struct TextureSetAccess;
   friend class TextureSetFieldCodec;
+  enum class OriginalPaint { Snapshot, DecodedSeed };
   static std::shared_ptr<const TextureSetFieldSource> capture_prepared(
       const TextureSetView &,std::shared_ptr<const TextureSetFaceDomain>,
-      std::shared_ptr<const PolygonSurfacePreview>,const TextureSetLimits &,const PaintedMesh*raster_template=nullptr);
+      std::shared_ptr<const PolygonSurfacePreview>,const TextureSetLimits &,
+      const PaintedMesh *raster_template=nullptr,OriginalPaint=OriginalPaint::Snapshot);
   void validate_member(const TextureSetView &,const TextureSetLimits &,bool rebake=false)const;
   std::shared_ptr<const TextureSetFieldSource> with_member(
       const TextureSetView &,const TextureSetLimits &,bool rebake,std::shared_ptr<const Image>)const;

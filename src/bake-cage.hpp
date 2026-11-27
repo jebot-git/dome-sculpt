@@ -9,7 +9,8 @@ namespace dome::detail {
 // ordered target vertex IDs, transported through the existing low-basis corners.
 inline std::vector<Vec3> object_bake_cage(const Scene &scene,uint64_t target_id,
     uint64_t cage_id,const Mesh &target,const Mesh &low,
-    const std::function<bool()> &cancelled,const AffineTransform *metric_from_world=nullptr) {
+    const std::function<bool()> &cancelled,const AffineTransform *metric_from_world=nullptr,
+    const Mesh *evaluated_target=nullptr) {
   auto stop=[&]{if(cancelled&&cancelled())throw std::runtime_error("Bake cage cancelled");};
   stop();
   if(cage_id==target_id)throw std::invalid_argument("Choose a different editable mesh for the bake cage");
@@ -21,6 +22,10 @@ inline std::vector<Vec3> object_bake_cage(const Scene &scene,uint64_t target_id,
   const auto &rest=object.painted->mesh();
   if(low.indices.size()!=target.indices.size())
     throw std::invalid_argument("Low bake basis lost the ordered target corners");
+  const auto &sample_target=evaluated_target?*evaluated_target:target;
+  if(evaluated_target&&(sample_target.positions.size()!=target.positions.size()||
+                       sample_target.indices!=target.indices))
+    throw std::invalid_argument("Evaluated bake target changed its cage vertex identities");
   std::optional<Mesh> posed;
   if(object.deformation){stop();posed=object.deformation->preview(rest);stop();}
   const auto &visible=posed?*posed:rest;
@@ -39,14 +44,14 @@ inline std::vector<Vec3> object_bake_cage(const Scene &scene,uint64_t target_id,
       throw std::invalid_argument("Bake cage basis contains an invalid corner identity");
     if(identity[v]!=UINT32_MAX&&identity[v]!=original)
       throw std::invalid_argument("Low bake basis merges distinct target cage identities");
-    const auto a=low.positions[v],b=target.positions[original];
+    const auto a=low.positions[v],b=sample_target.positions[original];
     if(a.x!=b.x||a.y!=b.y||a.z!=b.z)
-      throw std::invalid_argument("Low bake basis moved the target cage rest positions");
+      throw std::invalid_argument("Low bake basis changed the target positions used for the cage");
     identity[v]=original;
   }
   // An unchanged target may retain unused vertices. Their identities are also
   // explicit; a split/retained basis must instead witness every output vertex.
-  const bool unchanged=&low==&target;
+  const bool unchanged=&low==&sample_target;
   std::vector<Vec3> positions;positions.reserve(low.positions.size());
   for(size_t v=0;v<low.positions.size();++v){
     if((v&1023)==0)stop();
