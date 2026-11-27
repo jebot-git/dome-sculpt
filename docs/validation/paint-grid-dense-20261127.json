@@ -1,0 +1,143 @@
+{
+  "utc": "2026-11-27T19:40:26.474247+00:00",
+  "product": "686440b0e11d84491f92034954fb90e39d25ab55",
+  "parent": "11edcfeb96cd9f7603964a972101cbf94dbf03f9",
+  "patch_sha256": "1a3930469346d155491f998d9a39161f90e2b3d4c1e72430bb99146e38c6c64b",
+  "DomeD": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "toolkits": {
+    "FLTK": "/opt/fltk-vr/toolkit",
+    "BDF": "/opt/fltk-vr/bdf-runtime",
+    "oneAPI": "DPC++ 7.2.0",
+    "CUDA": "13.4.59 sm86",
+    "ROCm": "7.1.52802 gfx1030"
+  },
+  "release_tests": {
+    "release": {
+      "resize": {
+        "passed": 24,
+        "junit_sha256": "b6dcadebbdd88648c1271c20f70348347d4dc886cef55f5255bd3ff5b97823f4"
+      },
+      "adjacent": {
+        "passed": 7,
+        "junit_sha256": "b2c5d47240dbf0df776ecd8510d6d05660d14ca8ab3420153aca1fcfa456a800"
+      },
+      "app_sha256": "2b10ed069ee285b3d3e51f930e63a42b5afbef43c99ea71a2224675c569323ae"
+    },
+    "oneapi": {
+      "resize": {
+        "passed": 25,
+        "junit_sha256": "f5bbdb7e054805e07dd660c6d5ab20b8a6dae0adf02983047b0e10d3cf9a8358"
+      },
+      "adjacent": {
+        "passed": 7,
+        "junit_sha256": "57cfb01af4d46920364f90a0c9e5f2ca99d485b582edb4dbd04f9da313f07028"
+      },
+      "app_sha256": "c4ca4399ed403956a66a8129ac10c7c6194a573b161769bfe1aa9606c5e7cea5"
+    },
+    "cuda": {
+      "missing_device": {
+        "passed": 1,
+        "junit_sha256": "84d16aa8c8ee133d1439b091cef7f5b205b5c0e5abe01de382bdb6ea99f9ba84"
+      },
+      "app_sha256": "41cc26ac7609b3198d3aaf6cf1bf8600bffc44cc5cd3ae16ea98cb74a5cd82fa"
+    },
+    "rocm": {
+      "missing_device": {
+        "passed": 1,
+        "junit_sha256": "e8d145d5e5c40d8ada1946df43ad6b6b040595dcff6e64d6f1c0eb63449e827b"
+      },
+      "app_sha256": "ebb49941d2007984925529e731655bd566edd53592a561d1a7d24db9d585cedd"
+    }
+  },
+  "strict_ASan_UBSan": {
+    "painted": {
+      "log_sha256": "ddb5c0bd995ac77e3df2adfdbb5b64e9c9ad0483ee2c1b4f33fcb693536fef49",
+      "last_line": "PASS Dense reduction preserves exact ordered Save, cold Open and history"
+    },
+    "baked": {
+      "log_sha256": "b7f68bc5539a2f69ffbcb2589966ff1dd4107915a471cd31477f837de1b8defe",
+      "last_line": "PASS The default quality guard refuses a reduction that would erase sharp normal detail"
+    },
+    "retained": {
+      "log_sha256": "d138f5847b76ad558a3b31f0f43ee90b652bb647204f11c0360aac03a1eb8b20",
+      "last_line": "PASS Bake after cold reopen uses the new writable grid and retained native normal frame"
+    },
+    "baked-emission-native": {
+      "log_sha256": "875a8a141978fff9cd39a8d34ff37e89f40b9f785aacaa01da706d522bbd63f1",
+      "last_line": "Native baked emission 69 checks PASS"
+    },
+    "affine": {
+      "log_sha256": "6f6036581f12f0c89ed1851ed80097b4c9b16c102500e9d768ecf57892e466e7",
+      "last_line": "PASS 779 native polygon grid and normal Bake checks"
+    }
+  },
+  "exact_overlay_comparison": {
+    "coefficients": 43305760,
+    "fixtures": 5,
+    "log_sha256": "d9945216ffe492cd8290e4431f2451a7b68f1000ac013284c97e0ee5343ffc3b"
+  },
+  "dense_FLOAT_and_local_hidden_mask_1024_to_512": {
+    "input_sha256": "fc6c5b4b2c2de4f505223c29e021bbdaae1fc305c659cfc266692f9dee36f72e",
+    "default_work_limit": 128000000,
+    "profiles": {
+      "previous_256m": {
+        "work": 168052163,
+        "peak_bytes": 120133260,
+        "layer_taps": 1167360,
+        "metrics_sha256": "c0b0709fafe39635d03a4376eb12bb8d2504718a452b566503d77350cacd5dc4",
+        "project_sha256": "25a4b9418e663d892935ecc755ac4a67eae0b09dced0ea31a66bdfe9e05047d3"
+      },
+      "CPU_default": {
+        "work": 119555523,
+        "peak_bytes": 120133260,
+        "layer_taps": 1167360,
+        "metrics_sha256": "c0b0709fafe39635d03a4376eb12bb8d2504718a452b566503d77350cacd5dc4",
+        "project_sha256": "25a4b9418e663d892935ecc755ac4a67eae0b09dced0ea31a66bdfe9e05047d3"
+      },
+      "Arc_default": {
+        "work": 119555523,
+        "peak_bytes": 137451116,
+        "layer_taps": 1167360,
+        "metrics_sha256": "c0b0709fafe39635d03a4376eb12bb8d2504718a452b566503d77350cacd5dc4",
+        "project_sha256": "25a4b9418e663d892935ecc755ac4a67eae0b09dced0ea31a66bdfe9e05047d3"
+      }
+    },
+    "previous_default": "work refusal without output",
+    "native_zero_tolerance": "quality refusal with exact source preservation"
+  },
+  "two_fully_dense_layers_1024_to_512": {
+    "profiles": {
+      "previous_256m": {
+        "work": 200781962,
+        "peak_bytes": 136648338,
+        "layer_taps": 2097152,
+        "metrics_sha256": "40841b3c2f48bc301f1e7379a71165882abf6df406f12481dd91a5dffa3ce42b",
+        "project_sha256": "73734b26cf9faf4a0a6df86e55d45d615d538a70d155f80988181cbe07c0eaca"
+      },
+      "current_256m": {
+        "work": 152285322,
+        "peak_bytes": 136648338,
+        "layer_taps": 2097152,
+        "metrics_sha256": "40841b3c2f48bc301f1e7379a71165882abf6df406f12481dd91a5dffa3ce42b",
+        "project_sha256": "73734b26cf9faf4a0a6df86e55d45d615d538a70d155f80988181cbe07c0eaca"
+      }
+    },
+    "current_default": "work refusal without output"
+  },
+  "Arc_DomeD_Wayland": {
+    "passed": 12,
+    "report_sha256": "37ce671d43167e9963bad0e4a50345f917a5019904b57840a6378cf987e6c09b",
+    "paint_grid_launches": 285,
+    "trace_sha256": "06faf77928d35ff8392d0c6663ab8f62c58f1606e16165ae9a964b406349b939"
+  },
+  "Arc_synthetic_OpenXR": {
+    "passed": 12,
+    "report_sha256": "2e6fdc1588fbf38cecc4f9b19c384bb53514f940010aea8e4d326dfb1815f594",
+    "paint_grid_launches": 285,
+    "trace_sha256": "8d186719dddc9aa4444a179dae24876ef82a9ada2008a5c309c3b326e829cf71",
+    "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+    "balanced_frames": 634,
+    "runtime_sha256": "d0e80502e363efd9b4a0089ef41b44c86328e8e96485c0e50acedd1b0f5c40a8"
+  },
+  "scope": "Both frontends drive the ordinary editor with the same dense native project. Physical headset, positive AMD and NVIDIA execution, and two fully dense layers under the default budget remain open."
+}

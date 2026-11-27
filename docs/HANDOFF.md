@@ -507,6 +507,26 @@ CPU Release regression is running from frozen product `b73fd2df` under
 GPU execution on AMD and NVIDIA hardware remain open.
 [Native paint reduction validation](validation/paint-grid-production-budget-20261127.json)
 
+Overlay reconstruction now resolves the raster owner once and blends only
+channel groups that contribute at that texel. An absent Bake and empty
+layer tiles no longer charge full composition work. A 1024-to-512 reduction
+with varying FLOAT paint across the whole atlas and a localized hidden mask
+now uses 119,555,523 work units, down from 168,052,163. CPU and Arc produce
+the same saved project and exact error measurements as the previous
+higher-budget run. Zero tolerance still refuses the genuinely varying
+input and preserves both layers. Two fully dense layers still require
+152,285,322 work units on the comparison fixture.
+
+The focused Release runs pass 31 CPU and 32 oneAPI tests, including native
+Bake, GPU paint-plane comparison and VRM expression rendering. Five strict
+ASan/UBSan workflows pass. Direct comparisons against the previous overlay
+sampler match over 43 million float coefficients bit for bit across dense
+paint, legacy and FLOAT Bake, and independent PBR and MToon views. Native
+Wayland and synthetic OpenXR apply, undo and redo the same dense reduction
+on Arc with exact project saves. CUDA and ROCm build and refuse absent
+devices. The frozen full Release run of `b73fd2df` is still in progress.
+[Dense paint reduction validation](validation/paint-grid-dense-20261127.json)
+
 Retopology reapply now works on native multi-material accessories attached
 to original VRM 1.0 joints. The replacement keeps its avatar hierarchy and
 the material of each surviving single-material face. Each paint and Bake

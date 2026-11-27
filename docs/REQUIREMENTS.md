@@ -267,6 +267,17 @@ Save, Undo and Redo on Arc. Broader large or densely painted reductions and
 physical-device acceptance remain required.
 [Native paint reduction validation](validation/paint-grid-production-budget-20261127.json)
 
+A genuinely varying 1024-pixel native paint atlas now reduces to 512 with
+the default work and reconstruction limits. The fixture covers dense
+visible FLOAT emission and a separate hidden mask. Reconstruction composes
+each sampled texel using its actual contributing channel groups and
+keeps the same measured error limits for hidden and visible paint. The
+native worker, DomeD Wayland and synthetic OpenXR save the same project.
+Two fully dense layers exceed the normal work budget on the tested
+fixture. Broader dense layer stacks and physical-device acceptance remain
+required.
+[Dense paint reduction validation](validation/paint-grid-dense-20261127.json)
+
 Native multi-material retopology preserves independently painted and baked
 grids and original VRM 1.0 joint links when Apply changes the patch.
 Linked Shape Restore uses the current pose of the original imported rig.
