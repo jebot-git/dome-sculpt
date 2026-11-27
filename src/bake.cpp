@@ -593,10 +593,13 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
   if (!result.projected) throw std::runtime_error("No low UV texels projected onto the high source");
   if(o.progress)o.progress(.9f);
   cancel(o); if (o.padding) pad(result,o,emission); cancel(o);
-  if(float_emission)result.emission_field=BakedEmissionField::generate(o.resolution,[&](size_t i){
-    const bool covered=result.coverage[i]==1||result.coverage[i]==2;
-    return BakedEmissionSample{{},emission[i],covered?1.f:0.f};
-  },{emission_budget,o.cancelled});
+  if(float_emission){
+    const auto generate=target_triangles.empty()?BakedEmissionField::generate:BakedEmissionField::generate_compact;
+    result.emission_field=generate(o.resolution,[&](size_t i){
+      const bool covered=result.coverage[i]==1||result.coverage[i]==2;
+      return BakedEmissionSample{{},emission[i],covered?1.f:0.f};
+    },{emission_budget,o.cancelled});
+  }
   cancel(o);
   if(o.progress)o.progress(1);
   return result;

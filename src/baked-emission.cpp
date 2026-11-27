@@ -158,9 +158,19 @@ BakedEmissionField::create(uint32_t r, std::span<const BakedEmissionSample> valu
 }
 std::shared_ptr<const BakedEmissionField> BakedEmissionField::generate(uint32_t r,
     const std::function<BakedEmissionSample(size_t)> &source,const BakedEmissionLimits &limits){
+  return generate_storage(r,source,limits,false);
+}
+std::shared_ptr<const BakedEmissionField> BakedEmissionField::generate_compact(uint32_t r,
+    const std::function<BakedEmissionSample(size_t)> &source,const BakedEmissionLimits &limits){
+  return generate_storage(r,source,limits,true);
+}
+std::shared_ptr<const BakedEmissionField> BakedEmissionField::generate_storage(uint32_t r,
+    const std::function<BakedEmissionSample(size_t)> &source,const BakedEmissionLimits &limits,
+    bool prefer_compact){
   const size_t count=checked_count(r,limits);
   if(!source)throw std::invalid_argument("Missing baked emission sample generator");
-  if(count<=limits.max_bytes/sizeof(BakedEmissionSample)){
+  const auto dense_bytes=count*sizeof(BakedEmissionSample);
+  const auto dense=[&]{
     std::vector<BakedEmissionSample> values(count);
     for(size_t i=0;i<count;++i){
       if((i&4095)==0)stop(limits);
@@ -169,7 +179,8 @@ std::shared_ptr<const BakedEmissionField> BakedEmissionField::generate(uint32_t 
     }
     stop(limits);
     return std::shared_ptr<const BakedEmissionField>(new BakedEmissionField(r,std::move(values)));
-  }
+  };
+  if(!prefer_compact&&dense_bytes<=limits.max_bytes)return dense();
   PackedLayout layout;
   bool binary=true;
   for(size_t i=0;i<count;++i){
@@ -184,7 +195,9 @@ std::shared_ptr<const BakedEmissionField> BakedEmissionField::generate(uint32_t 
   }
   layout.binary=binary&&(layout.mask&coverage_component);
   if(layout.binary)layout.mask&=~coverage_component;
-  if(layout.retained(count)>limits.max_bytes)
+  const auto compact_bytes=layout.retained(count);
+  if(dense_bytes<=limits.max_bytes&&dense_bytes<=compact_bytes)return dense();
+  if(compact_bytes>limits.max_bytes)
     throw std::length_error("Exact FLOAT baked emission exceeds the available paint budget");
   auto result=std::unique_ptr<BakedEmissionField>(new BakedEmissionField(r));
   result->varying_mask_=layout.mask;

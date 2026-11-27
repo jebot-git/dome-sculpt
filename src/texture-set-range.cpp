@@ -34,6 +34,7 @@ std::shared_ptr<const TextureSetRangeProof> prepare_texture_set_range(
   if(!result->maps_||!result->maps_->polygon_surface||!result->maps_->polygon_surface->matches(view.material_bindings,read->paint_sampling_attachment())||result->layout_->canonical(field))throw std::invalid_argument("Retained texture-set range lost its actual source/current field packet");
  }else{
   result->maps_=render_only?CurrentGridPaintPreview::for_field(result->plan_->object(),view,cancelled):nullptr;
+  if(render_only&&!result->maps_)result->maps_=EmissionExportAccess::preview_texture_set_bake(*view.painted,view.material,cancelled);
   if(!result->maps_)result->maps_=EmissionExportAccess::requires_preview(*view.painted,view.material,view.material_bindings.get())?
     EmissionExportAccess::preview(*view.painted,view.material,cancelled):view.painted->preview(view.material,cancelled);
   if(!result->maps_||result->maps_->source_only||result->maps_->source_maps||result->maps_->normal_projection||result->maps_->color_projection||result->maps_->polygon_surface)throw std::invalid_argument("Texture-set complex field cannot borrow the plain range proof");

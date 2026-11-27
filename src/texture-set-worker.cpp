@@ -5,6 +5,7 @@
 #include "current-paint-preview.hpp"
 #include "polygon-surface-preview.hpp"
 #include "texture-set-paint-access.hpp"
+#include "texture-set-native-grid.hpp"
 #include <algorithm>
 #include <bit>
 #include <limits>
@@ -17,14 +18,14 @@ void charge_preview_work(size_t &work,size_t count,size_t cost,const TextureSetL
   throw std::length_error("Texture-set field preview exceeds its charged work bound");
  work+=count*cost;
 }
-void charge_current_grid(size_t&bytes,size_t&work,const TextureSetView&field,const TextureSetLimits&limits){
+void charge_grid_capture(size_t&bytes,size_t&work,const TextureSetView&field,const TextureSetLimits&limits,bool classify_alpha){
  const auto&paint=*field.painted;
  const size_t tile_area=PaintTile::size*PaintTile::size;
  const size_t pixels=size_t(paint.resolution())*paint.resolution(),tiles=pixels/tile_area;
  const auto &layers=paint.layers();
  const auto visible=[](const PaintLayer&layer){return layer.visible&&layer.opacity>0;};
  const size_t visible_layers=std::count_if(layers.begin(),layers.end(),visible);
- const bool transparent_base=field.material.color[3]<.999f;
+ const bool transparent_base=classify_alpha&&field.material.color[3]<.999f;
  size_t storage_entries=0;
  for(const auto&layer:layers)
   storage_entries+=layer.tiles.size()+layer.pbr_tiles.size()+layer.emission_tiles.size();
@@ -50,7 +51,7 @@ void charge_current_grid(size_t&bytes,size_t&work,const TextureSetView&field,con
  charge(bytes,owners,6*sizeof(void*),limits);
  charge(bytes,1,paint.storage_bytes(),limits);
  charge_preview_work(work,owners,2*std::bit_width(owners)+4,limits);
- charge_preview_work(work,scan_tiles*tile_area,1+8*visible_layers,limits);
+ if(classify_alpha)charge_preview_work(work,scan_tiles*tile_area,1+8*visible_layers,limits);
 }
 size_t map_bytes(const TextureMaps&m){
  size_t bytes=sizeof(TextureMaps);for(const auto*i:{&m.color,&m.metal_rough,&m.emission,&m.normal,&m.mtoon_normal,&m.color_coverage,&m.emission_coverage,&m.baked_normal,&m.baked_coverage,&m.pbr_color}){
@@ -102,7 +103,11 @@ void append_texture_set_surface(MeshSnapshot&snapshot,const ObjectSurface&o,
   const size_t pixels=size_t(field.painted->resolution())*field.painted->resolution();
   const auto layers=field.painted->layers().size();
   if(view.render_only&&CurrentGridPaintPreview::eligible_field(plan->object(),field)){
-   charge_current_grid(bytes,preview_work,field,limits);
+   charge_grid_capture(bytes,preview_work,field,limits,true);
+  }else if(view.render_only&&!field.source&&field.painted->baked()&&field.painted->baked()->emission_field&&native_hdr_grid(*field.painted)){
+   charge_grid_capture(bytes,preview_work,field,limits,false);
+   charge(bytes,1,native_hdr_grid_bytes(*field.painted),limits);
+   charge_native_hdr_grid_work(*field.painted,preview_work,limits);
   }else{
    charge(bytes,pixels,128,limits);
    charge_preview_work(preview_work,pixels,(layers+1)*32,limits);

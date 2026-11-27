@@ -7,6 +7,7 @@
 #include "emission-paint-access.hpp"
 #include "dome/source-uv-bake.hpp"
 #include "texture-set-export.hpp"
+#include "paint-overlay-packet.hpp"
 #include "gltf-document.hpp"
 #include "paint-emission-sample.hpp"
 #include "cgltf.h"
@@ -257,5 +258,107 @@ void production_hdr(){
         "Production GLB export restores the exact native layers, membership and rig");
  }
 }
+
+void production_baked_hdr(){
+ auto scene=fixture(false,1024);
+ const auto target=scene.active().id;
+ scene.active().deformation.reset();
+ const auto mesh=scene.active().painted->mesh();
+ for(TextureSetId set:{0u,1u})check(edit_texture_set(scene,target,set,[set](PaintedMesh &paint,Material &material){
+  material.emissive={.1f,.2f,.3f};
+  PaintSettings ink;
+  ink.front_only=false;
+  ink.channel=PaintChannel::Color;
+  ink.color=set?std::array<float,4>{.3f,.12f,.8f,.5f}:std::array<float,4>{.7f,.4f,.1f,.75f};
+  Brush brush;
+  brush.from=brush.to={0,-.1f,set?.5f:0.f};
+  brush.normal={0,0,1};
+  brush.radius=.049f;
+  brush.strength=.72f;
+  paint.begin_stroke();
+  paint.stamp(brush,ink);
+  return paint.end_stroke();
+ }),"Both native baked recipients start with distinct writable color detail");
+ const auto donor=scene.add("Independent hidden HDR donor",Volume{});
+ auto &source=scene.object(donor);
+ source.visible=false;
+ source.locked=true;
+ source.mesh_active=true;
+ source.material.emissive={4,.8f,.25f};
+ source.material.color={.4f,.7f,.22f,1};
+ auto donor_mesh=mesh;
+ for(size_t vertex=0;vertex<donor_mesh.positions.size();++vertex){
+  donor_mesh.positions[vertex].z+=.01f;
+  donor_mesh.uv[vertex][0]=donor_mesh.uv[vertex][0]*.45f+(vertex>=3?.5f:0.f);
+  donor_mesh.normals[vertex]=normalized(Vec3{vertex>=3?-.14f:.21f,.25f,1.f});
+ }
+ source.painted=std::make_shared<PaintedMesh>(std::move(donor_mesh),64);
+ scene.select(target);
+ Document doc;
+ ObjectBakeSettings settings;
+ settings.ao_samples=2;
+ settings.allow_backfaces=true;
+ settings.corresponding_topology=true;
+ for(TextureSetId set:{0u,1u}){
+  select_texture_set(scene,target,set);
+  doc.replace(scene);
+  check(doc.wait_mesh()&&doc.frame().state->error.empty(),"Baked material remains ready while selecting its neighbor");
+  doc.bake_from_object(donor,settings);
+  check(doc.wait_asset()&&doc.wait_mesh()&&doc.frame().state->error.empty(),"Actual per-member Bake publishes the renderable endpoint");
+  scene=doc.copy_scene();
+  const auto field=texture_set_view(scene.active(),set);
+  const auto &bake=field.painted->baked();
+  check(bake&&bake->emission_field&&bake->emission_field->resolution()==1024&&
+        bake->emission_field->storage().dense.empty()&&
+        !bake->maps.normal.rgba.empty()&&field.bake_recipe&&
+        std::count(bake->coverage.begin(),bake->coverage.end(),255)>100'000,
+        "Each 1024-square Bake retains covered normal, AO and physical-emission data and its recipe");
+ }
+ const auto prior=scene.encode();
+ const auto neighbor=scene.active().painted->baked();
+ doc.bake_from_object(donor,settings);
+ check(doc.wait_asset()&&doc.wait_mesh()&&doc.frame().state->error.empty(),"Selected production rebake publishes normally");
+ scene=doc.copy_scene();
+ check(scene.active().painted->baked()==neighbor&&
+       active_texture_set(scene.active()).painted->baked()->emission_field->storage().dense.empty(),
+       "Rebake keeps the untouched material owner and compacts the merged FLOAT result");
+ const auto exact=scene.encode();
+ check(doc.undo()&&doc.copy_scene().encode()==prior&&
+       doc.redo()&&doc.copy_scene().encode()==exact&&doc.wait_mesh(),"Rebake retains exact Undo and Redo");
+ const std::filesystem::path path="production-baked.dsculpt";
+ doc.save_async(path).get();
+ doc.open_async(path).get();
+ check(doc.wait_mesh()&&doc.frame().state->error.empty()&&doc.copy_scene().encode()==exact,
+       "Both baked members publish and pick after exact cold Open");
+ const auto snapshot=doc.frame().surface;
+ check(snapshot&&snapshot->ranges.size()==2&&snapshot->picking,"Cold Open exposes both authenticated material ranges");
+ const auto assembly=scene.export_surfaces();
+ {
+  const auto compiled=detail::compile_texture_set_export(assembly.at(0),{},true);
+  for(const auto &output:compiled.fields){
+   const auto field=texture_set_view(scene.active(),output.set);
+   auto safe=field.material;
+   safe.emissive={};
+   const auto reference=detail::EmissionExportAccess::other_channels(*field.painted,safe,{});
+   const auto same_maps=[&](const TextureMaps &maps){
+    return maps.color.rgba==reference->color.rgba&&maps.metal_rough.rgba==reference->metal_rough.rgba&&
+        maps.normal.rgba==reference->normal.rgba&&maps.transparent==reference->transparent;
+   };
+   check(same_maps(*output.textures),"Every portable baked albedo, ORM and resolved normal matches the original compositor");
+   const auto &preview=*snapshot->ranges.at(output.set).textures;
+   check(same_maps(preview)&&preview.baked_base&&preview.overlay&&preview.overlay->baked()==preview.baked_base,
+         "Every preview material byte matches while the GPU retains the actual FLOAT Bake owner");
+  }
+ }
+ for(const auto &[name,format]:std::array{
+     std::pair{"production-baked-standard.glb",AssetExportFormat::Glb},
+     std::pair{"production-baked-editable.glb",AssetExportFormat::EditableGlb512}}){
+  doc.export_asset(name,format).get();
+  const auto file=bytes(name);
+  if(format==AssetExportFormat::Glb)compare_production_exrs(file,scene);
+  const auto restored=format==AssetExportFormat::Glb?extract_native_emission(file):extract_native_authoring(file);
+  check(restored&&restored->encode()==exact,"Production GLB restores exact independent Bake, recipe and paint data");
+ }
 }
-int main(int argc,char**argv)try{if(argc>1){std::filesystem::create_directories(argv[1]);std::filesystem::current_path(argv[1]);}portable();authoring();editable_hdr();authority();production_hdr();std::cout<<"PASS "<<checks<<" texture-set multi-primitive export controls\n";return 0;}catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
+}
+int main(int argc,char**argv)try{if(argc>1){std::filesystem::create_directories(argv[1]);std::filesystem::current_path(argv[1]);}portable();authoring();editable_hdr();authority();production_hdr();production_baked_hdr();std::cout<<"PASS "<<checks<<" texture-set multi-primitive export controls\n";return 0;}catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

@@ -45,6 +45,16 @@ int main() try {
   check(layout.dense.empty()&&layout.binary_coverage.size()==3&&layout.varying_mask==56,
         "Exact packed field uses constant legacy and binary coverage");
   const auto packed_bytes=packed->encode();
+  const auto preferred=BakedEmissionField::generate_compact(9,sparse);
+  check(preferred->encode()==packed_bytes,"A material member chooses the existing compact layout before it hits the memory ceiling");
+  const auto varying=[](size_t i){
+    const float coverage=.25f+float(i%19)/64.f;
+    return BakedEmissionSample{{coverage*.1f,coverage*.2f,coverage*.3f},
+                               {coverage*1.1f,coverage*2.2f,coverage*3.3f},coverage};
+  };
+  const auto preferred_dense=BakedEmissionField::generate_compact(9,varying);
+  check(preferred_dense->storage().dense.size()==81,"A fully varying field keeps the smaller dense layout");
+  for(size_t i=0;i<81;++i)exact(preferred_dense->texel(i),varying(i));
   check(packed_bytes.at(8)==2&&BakedEmissionField::inspect_encoded(packed_bytes).retained_bytes==packed->storage_bytes(),
         "Packed wire reports actual retained bytes");
   const auto packed_reopen=BakedEmissionField::decode(packed_bytes);

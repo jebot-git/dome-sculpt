@@ -1,5 +1,6 @@
 #include "texture-set-field-source.hpp"
 #include "texture-set-paint-access.hpp"
+#include "texture-set-native-grid.hpp"
 #include "texture-set-resample.hpp"
 #include "source-paint-parameters.hpp"
 #include "paint-overlay-packet.hpp"
@@ -254,6 +255,9 @@ struct PaintedMesh::CompositeCache {
   uint64_t native_emission_token=0;
   CompositeFactors native_emission_factors{};
   std::weak_ptr<const TextureMaps> native_emission_preview;
+  uint64_t texture_set_bake_token=0;
+  CompositeFactors texture_set_bake_factors{};
+  std::weak_ptr<const TextureMaps> texture_set_bake_preview;
   std::weak_ptr<const detail::CurrentGridPaintPreview> current_grid_preview;
   using GridKey=std::tuple<uint64_t,uintptr_t,uintptr_t,std::array<uint32_t,9>>;
   struct GridEntry {std::weak_ptr<const detail::CurrentGridPaintPreview> owner;uint64_t used=0;};
@@ -1772,6 +1776,31 @@ std::shared_ptr<const TextureMaps> detail::EmissionExportAccess::preview(const P
   retention.retain(maps, paint.composite_token_, factors, false, CompositeUse::NativeEmission);
   return maps;
 }
+std::shared_ptr<const TextureMaps> detail::EmissionExportAccess::preview_texture_set_bake(
+    const PaintedMesh &paint,const Material &material,const std::function<bool()> &cancelled) {
+  if(!paint.texture_set_domain_||!paint.baked_||!paint.baked_->emission_field||!detail::native_hdr_grid(paint))
+    return {};
+  paint_compute::checkpoint(cancelled);
+  material.validate();
+  const CompositeFactors factors{material.color,material.emissive,material.metallic,material.roughness};
+  auto &cache=*paint.composite_cache_;
+  {
+    std::lock_guard lock(cache.mutex);
+    if(cache.texture_set_bake_token==paint.composite_token_&&cache.texture_set_bake_factors==factors)
+      if(auto held=cache.texture_set_bake_preview.lock())
+        if(NativeEmissionOwner{paint.mesh_owner(),{}}.matches(*held))return held;
+  }
+  TextureSetLimits limits;limits.cancelled=cancelled;size_t work=0;
+  auto maps=detail::compile_native_hdr_grid(paint,material,work,limits);
+  maps->baked_base=paint.baked_;
+  maps->overlay=PaintOverlayFactory::capture_native_emission(paint,cancelled);
+  paint_compute::checkpoint(cancelled);
+  std::lock_guard lock(cache.mutex);
+  cache.texture_set_bake_token=paint.composite_token_;
+  cache.texture_set_bake_factors=factors;
+  cache.texture_set_bake_preview=maps;
+  return maps;
+}
 std::span<const int32_t> detail::EmissionExportAccess::writable_padding(const PaintedMesh &paint) {
   if(!paint.surface_||paint.editing_||!paint.valid_source_sampling_attachment()||
      !paint.valid_paint_sampling_attachment())
@@ -3011,7 +3040,8 @@ void SourcePaintAccess::merge_bake(PaintedMesh &paint,BakedTextures incoming,Bak
           (merged.emission_field?merged.emission_field->storage_bytes():0);
       if(other>=maximum)
         throw std::length_error("Merged FLOAT baked emission exceeds paint storage budget");
-      merged.emission_field=BakedEmissionField::generate(paint.resolution(),[&](size_t i){
+      const auto generate=paint.texture_set_domain_?BakedEmissionField::generate_compact:BakedEmissionField::generate;
+      merged.emission_field=generate(paint.resolution(),[&](size_t i){
         return BakedEmissionField::over(detail::baked_emission_texel(*paint.baked_,i),
                                        detail::baked_emission_texel(incoming,i));
       },{maximum-other,cancelled});

@@ -55,6 +55,11 @@ public:
   static std::shared_ptr<const BakedEmissionField>
   generate(uint32_t resolution,const std::function<BakedEmissionSample(size_t)> &,
            const BakedEmissionLimits & = {});
+  // Material members prefer the smaller exact layout before reserving their
+  // shared Scene archive. A genuinely dense field can still use version 1.
+  static std::shared_ptr<const BakedEmissionField>
+  generate_compact(uint32_t resolution,const std::function<BakedEmissionSample(size_t)> &,
+                   const BakedEmissionLimits & = {});
   static std::shared_ptr<const BakedEmissionField>
   decode(std::span<const uint8_t>, const BakedEmissionLimits & = {});
   // Complete wire/coefficient validation without allocating retained storage.
@@ -102,6 +107,9 @@ public:
   BakedEmissionField(const BakedEmissionField &) = delete;
   BakedEmissionField &operator=(const BakedEmissionField &) = delete;
 private:
+  static std::shared_ptr<const BakedEmissionField>
+  generate_storage(uint32_t,const std::function<BakedEmissionSample(size_t)> &,
+                   const BakedEmissionLimits &,bool prefer_compact);
   explicit BakedEmissionField(uint32_t r):resolution_(r){}
   BakedEmissionField(uint32_t r, std::span<const BakedEmissionSample> values)
       : resolution_(r), values_(values.begin(), values.end()) {}

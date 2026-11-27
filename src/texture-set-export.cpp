@@ -8,6 +8,7 @@
 #include "emission-authority.hpp"
 #include "emission-export.hpp"
 #include "paint-emission-sample.hpp"
+#include "texture-set-native-grid.hpp"
 #include <bit>
 #include <map>
 namespace dome::detail {
@@ -17,12 +18,8 @@ void charge(size_t&v,size_t n,size_t u,size_t cap){if(v>cap||(u&&n>(cap-v)/u))th
 template<class T>bool owner(const std::shared_ptr<const T>&a,const std::shared_ptr<const T>&b){return a==b&&!a.owner_before(b)&&!b.owner_before(a);}
 bool material(const Material&a,const Material&b){return a.name==b.name&&a.color==b.color&&a.metallic==b.metallic&&a.roughness==b.roughness&&a.emissive==b.emissive&&a.toon==b.toon&&a.double_sided==b.double_sided&&a.alpha==b.alpha&&a.alpha_cutoff==b.alpha_cutoff&&a.unlit==b.unlit;}
 
-bool plain_writable_grid(const TextureSetView &field) {
- const auto &paint=*field.painted;
- return !field.source&&!field.appearance&&!field.material_bindings&&!paint.baked()&&
-     !paint.source_maps()&&!paint.color_projection()&&!paint.normal_projection()&&
-     !paint.paint_sampling_domain()&&!paint.paint_sampling_attachment()&&
-     paint.surface_diagnostics().policy==PaintUvPolicy::Strict;
+bool native_material_grid(const TextureSetView &field) {
+ return !field.source&&!field.appearance&&!field.material_bindings&&native_hdr_grid(*field.painted);
 }
 
 // Padding refers to the actual writable owner texel, which can be in a
@@ -57,22 +54,61 @@ public:
  std::vector<uint16_t> tile_layers;
 };
 
-std::shared_ptr<const TextureMaps> compile_plain_nonemission(const TextureSetView &field,
-    size_t &work,const TextureSetLimits &limits) {
- const auto &paint=*field.painted;
- const SparseExportGrid grid(paint,work,limits);
+void charge_native_grid(const PaintedMesh &paint,const SparseExportGrid &grid,size_t &work,
+    const TextureSetLimits &limits) {
  const auto count=grid.padding.size();
- charge(work,count,3,limits.maximum_work);
+ const auto &baked=paint.baked();
+ const bool normal=baked&&!baked->maps.normal.rgba.empty();
+ charge(work,count,normal?4:3,limits.maximum_work);
  for(size_t at=0;at<count;++at){
   if((at&4095)==0)stop(limits);
+  const auto owner=grid.padding[at];
+  if(baked&&owner>=0&&baked->coverage[size_t(owner)])
+   charge(work,1,normal?16:10,limits.maximum_work);
   charge(work,std::popcount(grid.mask(at)),12,limits.maximum_work);
  }
+}
+} // namespace
+
+bool native_hdr_grid(const PaintedMesh &paint) noexcept {
+ const auto &baked=paint.baked();
+ return !paint.source_maps()&&!paint.color_projection()&&!paint.normal_projection()&&
+     !paint.paint_sampling_domain()&&!paint.paint_sampling_attachment()&&!paint.source_sampling_prepared()&&
+     paint.surface_diagnostics().policy==PaintUvPolicy::Strict&&
+     (!baked||(!baked->normal_field&&!baked->normal_authority&&
+       baked->normal_interpretation==BakedNormalInterpretation::CanonicalMikk&&
+       baked->color_interpretation==BakedColorInterpretation::VertexComponent));
+}
+
+size_t native_hdr_grid_bytes(const PaintedMesh &paint) noexcept {
+ const auto r=paint.resolution();
+ const auto &baked=paint.baked();
+ const bool normal=baked&&!baked->maps.normal.rgba.empty();
+ return sizeof(TextureMaps)+size_t(r)*r*(normal?12:8)+size_t(r/PaintTile::size)*(r/PaintTile::size)*sizeof(uint16_t);
+}
+
+void charge_native_hdr_grid_work(const PaintedMesh &paint,size_t &work,const TextureSetLimits &limits) {
+ const SparseExportGrid grid(paint,work,limits);
+ charge_native_grid(paint,grid,work,limits);
+}
+
+std::shared_ptr<TextureMaps> compile_native_hdr_grid(const PaintedMesh &paint,const Material &material,
+    size_t &work,const TextureSetLimits &limits) {
+ if(!native_hdr_grid(paint))throw std::invalid_argument("HDR grid compilation needs actual native colour and normal owners");
+ if(native_hdr_grid_bytes(paint)>limits.maximum_bytes)
+  throw std::length_error("Native HDR material fields exceed their working budget");
+ const SparseExportGrid grid(paint,work,limits);
+ charge_native_grid(paint,grid,work,limits);
+ const auto count=grid.padding.size();
+ const auto &baked=paint.baked();
+ const bool normal=baked&&!baked->maps.normal.rgba.empty();
  auto maps=std::make_shared<TextureMaps>();
  auto &albedo=maps->color,&orm=maps->metal_rough;
  for(auto *image:{&albedo,&orm}){
   image->width=image->height=grid.resolution;
   image->rgba.resize(count*4);
  }
+ if(normal)maps->normal={grid.resolution,grid.resolution,std::vector<uint8_t>(count*4)};
  const auto unit=[](uint8_t value){return float(value)/255;};
  const auto byte=[](float value){return uint8_t(std::lround(std::clamp(value,0.f,1.f)*255));};
  static const auto linear_byte=[]{
@@ -80,7 +116,6 @@ std::shared_ptr<const TextureMaps> compile_plain_nonemission(const TextureSetVie
   for(size_t i=0;i<table.size();++i)table[i]=srgb_to_linear(float(i)/255);
   return table;
  }();
- const auto &material=field.material;
  const auto encode_color=[&](const std::array<float,4> &color){
   return std::array{byte(linear_to_srgb(color[0])),byte(linear_to_srgb(color[1])),
       byte(linear_to_srgb(color[2])),byte(color[3])};
@@ -92,11 +127,29 @@ std::shared_ptr<const TextureMaps> compile_plain_nonemission(const TextureSetVie
   if((at&4095)==0)stop(limits);
   auto mask=grid.mask(at);
   auto color=base_color,surface=base_orm;
+  std::array<uint8_t,4> normal_sample{128,128,255,255};
   float alpha=material.color[3];
-  if(mask){
-   const size_t owner=size_t(grid.padding[at]),tile=grid.tile(owner),within=grid.within(owner);
+  const auto owner=grid.padding[at];
+  const float baked_coverage=baked&&owner>=0?unit(baked->coverage[size_t(owner)]):0.f;
+  if(mask||baked_coverage>0){
    auto linear=material.color;
-   float roughness=material.roughness,metallic=material.metallic;
+   std::array<float,3> material_values{1,material.roughness,material.metallic};
+   const auto bake_mix=[&](float base,float value){return base*(1-baked_coverage)+value*baked_coverage;};
+   if(baked_coverage>0){
+    const size_t offset=size_t(owner)*4;
+    const auto *baked_color=baked->maps.color.rgba.data()+offset;
+    const auto *baked_orm=baked->maps.metal_rough.rgba.data()+offset;
+    for(size_t i=0;i<4;++i)linear[i]=bake_mix(linear[i],i<3?linear_byte[baked_color[i]]:unit(baked_color[i]));
+    for(size_t i=0;i<3;++i)material_values[i]=bake_mix(material_values[i],unit(baked_orm[i]));
+    if(normal){
+     const auto *detail=baked->maps.normal.rgba.data()+offset;
+     Vec3 direction{unit(detail[0])*2-1,unit(detail[1])*2-1,unit(detail[2])*2-1};
+     direction=direction*baked_coverage+Vec3{0,0,1}*(1-baked_coverage);
+     direction=length(direction)<1e-8f?Vec3{0,0,1}:normalized(direction);
+     normal_sample={byte(direction.x*.5f+.5f),byte(direction.y*.5f+.5f),byte(direction.z*.5f+.5f),255};
+    }
+   }
+   const size_t tile=grid.tile(size_t(owner)),within=grid.within(size_t(owner));
    for(;mask;mask&=mask-1){
     const auto &layer=layers[std::countr_zero(mask)];
     const auto &data=layer.tiles[tile]->pixels[within].data;
@@ -106,21 +159,22 @@ std::shared_ptr<const TextureMaps> compile_plain_nonemission(const TextureSetVie
      return base*(1-a)+paint*a;
     };
     for(size_t i=0;i<4;++i)linear[i]=blend(linear[i],i<3?linear_byte[data[i]]:unit(data[i]),data[9]);
-    roughness=blend(roughness,unit(data[5]),data[11]);
-    metallic=blend(metallic,unit(data[4]),data[10]);
+    material_values[1]=blend(material_values[1],unit(data[5]),data[11]);
+    material_values[2]=blend(material_values[2],unit(data[4]),data[10]);
    }
    color=encode_color(linear);
    alpha=linear[3];
-   surface[1]=byte(roughness);
-   surface[2]=byte(metallic);
+   for(size_t i=0;i<3;++i)surface[i]=byte(material_values[i]);
   }
   maps->transparent|=alpha<.999f;
   std::copy(color.begin(),color.end(),albedo.rgba.data()+at*4);
   std::copy(surface.begin(),surface.end(),orm.rgba.data()+at*4);
+  if(normal)std::copy(normal_sample.begin(),normal_sample.end(),maps->normal.rgba.data()+at*4);
  }
  return maps;
 }
 
+namespace {
 // The per-field exporter uses the same paint-grid coordinate as the fragment
 // shader. Contributions are composed before sampling. The original field and
 // its exact FLOAT values remain in the author's native Scene payload.
@@ -139,21 +193,28 @@ public:
   charge(work,sampler_.index_work(),1,limits.maximum_work);
   const size_t count=size_t(resolution)*resolution;
   size_t variable_count=count;
-  if(plain_writable_grid(field)){
+  if(native_material_grid(field)){
    grid_.emplace(*paint_,work,limits);
    const auto rgb=BakedEmissionSample{}.resolve(background_,1.f);
    constant_={rgb[0],rgb[1],rgb[2],0,0,0,0,0,0,0};
    charge(work,count,1+passes,limits.maximum_work);
+   size_t baked_only=0;
    for(size_t at=0;at<count;++at){
     if((at&4095)==0)stop(limits);
-    constant_count_+=!variable(at);
+    if(!grid_->mask(at)){
+     if(paint_->baked()&&grid_->padding[at]>=0)++baked_only;
+     else ++constant_count_;
+    }
    }
-   variable_count-=constant_count_;
+   charge(work,baked_only,passes*14,limits.maximum_work);
+   variable_count-=constant_count_+baked_only;
   }
   charge(work,variable_count,passes*(sampler_.work_per_texel()+12+(source_.image?16:0)),
       limits.maximum_work);
  }
- bool variable(size_t at) const { return !grid_||grid_->mask(at); }
+ bool variable(size_t at) const {
+  return !grid_||grid_->mask(at)||(paint_->baked()&&grid_->padding[at]>=0);
+ }
  const auto &constant() const { return constant_; }
  size_t constant_count() const { return constant_count_; }
  size_t working_bytes() const {
@@ -165,7 +226,9 @@ public:
    const auto sample=sample_source_texture(source_,(float(x)+.5f)/resolution,(float(y)+.5f)/resolution,true);
    for(size_t k=0;k<3;++k)background[k]*=sample[k];
   }
-  const auto contribution=sampler_.sample_texel(x,y);
+  const size_t at=size_t(y)*resolution+x;
+  const auto contribution=grid_&&paint_->baked()&&!grid_->mask(at)?
+      baked_emission_texel(*paint_->baked(),size_t(grid_->padding[at])):sampler_.sample_texel(x,y);
   const auto rgb=contribution.resolve(background,1.f);
   return {rgb[0],rgb[1],rgb[2],contribution.legacy[0],contribution.legacy[1],contribution.legacy[2],
       contribution.absolute[0],contribution.absolute[1],contribution.absolute[2],contribution.coverage};
@@ -250,10 +313,10 @@ ExportBound export_bound(const ObjectSurface&input,const TextureSetLimits&limits
   if(hdr&&(!measured_physical||field.material.toon||field.appearance||
       (field.material_bindings&&field.material_bindings->has_mtoon)))
    throw std::invalid_argument("Texture-set HDR emission needs its per-material precision-qualified export compiler");
-  if(hdr&&plain_writable_grid(field)){
+  if(hdr&&native_material_grid(field)){
    const size_t pixels=size_t(resolution)*resolution;
-   charge(bytes,pixels,12,limits.maximum_bytes);
-   charge(bytes,pixels/(PaintTile::size*PaintTile::size),sizeof(uint16_t),limits.maximum_bytes);
+   charge(bytes,1,native_hdr_grid_bytes(*field.painted),limits.maximum_bytes);
+   charge(bytes,pixels,4,limits.maximum_bytes);
    continue;
   }
   charge(bytes,size_t(resolution)*resolution,64,limits.maximum_bytes);
@@ -341,7 +404,7 @@ TextureSetExport compile_texture_set_export(const ObjectSurface&input,const Text
    output.emission=compile_emission(field,work,limits);
    output.material.emissive={};
    if(portable)output.textures=portable->maps;
-   else if(plain_writable_grid(field))output.textures=compile_plain_nonemission(field,work,limits);
+   else if(native_material_grid(field))output.textures=compile_native_hdr_grid(*field.painted,field.material,work,limits);
    else output.textures=EmissionExportAccess::other_channels(
        *texture_set_source_read_view(field,limits),output.material,limits.cancelled);
   }else output.textures=portable?portable->maps:field.painted->composite(field.material,limits.cancelled);
