@@ -5091,6 +5091,9 @@ if(BUILD_TESTING)
   target_link_libraries(dome-sculpt-texture-set-export-test PRIVATE dome-sculpt-core)
   add_test(NAME dome-sculpt-texture-set-export COMMAND dome-sculpt-texture-set-export-test ${CMAKE_CURRENT_BINARY_DIR}/texture-set-export-output)
   set_tests_properties(dome-sculpt-texture-set-export PROPERTIES TIMEOUT 180)
+  add_test(NAME texture-set-mtoon-derivative-tangent COMMAND dome-sculpt-texture-set-export-test
+    ${CMAKE_CURRENT_BINARY_DIR}/texture-set-derivative-tangent --typed-tangent)
+  set_tests_properties(texture-set-mtoon-derivative-tangent PROPERTIES TIMEOUT 180)
 endif()
 
 # Private polygon field-transfer foundation. Complete mathematical TUs only;

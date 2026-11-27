@@ -12,6 +12,8 @@
 #include "texture-set-surface.hpp"
 #include "deformation-active.hpp"
 #include "source-frame-skin.hpp"
+#include "affine-interaction.hpp"
+#include "normal-bake-encoding.hpp"
 #include "dome/material-bindings.hpp"
 #include "dome/material-visibility.hpp"
 #include "dome/paint-sampling.hpp"
@@ -179,6 +181,116 @@ bool portable_mtoon_bake_frame(const Mesh &mesh,const TextureSetView &field,
      dot(cross(n,axis),bitangent)*t[3]<=0)return false;
  }
  return true;
+}
+
+using TriangleTangents=std::array<Tangent,3>;
+std::optional<std::vector<TriangleTangents>> portable_mtoon_derivative_frames(const Mesh &mesh,
+    const TextureSetView &field,const AffineTransform &world,const TextureSetLimits &limits) {
+ const auto &binding=field.material_bindings;
+ constexpr size_t normal=size_t(MToonSlot::Normal);
+ if(!native_texture_set_mtoon(field.painted.get(),field.appearance.get(),binding.get()) ||
+    binding->material.version()!=MToonVersion::V1 || !binding->roles[normal].image ||
+    world.orientation()!=AffineOrientation::Preserving)
+  return {};
+ const auto &p=binding->material.parameters;
+ const auto &texture=binding->material.textures[normal];
+ // A time-independent translation of the UV does not affect its Jacobian.
+ // Keep the explicit frame in untransformed UV0 so readers that apply their
+ // own KHR_texture_transform correction do not rotate these tangents again.
+ if(texture.offset!=std::array<float,2>{} || texture.scale!=std::array<float,2>{1,1} ||
+    texture.rotation!=0 || p.rotation_speed!=0 ||
+    (p.scroll!=std::array<float,2>{} && binding->roles[size_t(MToonSlot::UvMask)].image))
+  return {};
+ using namespace normal_bake_math;
+ const AffineInteractionFrame placement(world);
+ std::vector<TriangleTangents> frames;
+ frames.reserve(field.domain->triangles().size());
+ constexpr double axis_limit=2e-4, hand_margin=1e-3;
+ const auto variance_bound=[](const std::array<D,3> &corners){
+  double diameter=0;
+  for(size_t a=0;a<3;++a)for(size_t b=0;b<a;++b){
+   const D delta{corners[a][0]-corners[b][0],corners[a][1]-corners[b][1],corners[a][2]-corners[b][2]};
+   diameter=std::max(diameter,dot(delta,delta));
+  }
+  return diameter/3;
+ };
+ for(const uint32_t face:field.domain->triangles()){
+  if((frames.size()&1023)==0)stop(limits);
+  const size_t first=size_t(face)*3;
+  const auto a=mesh.indices[first], b=mesh.indices[first+1], c=mesh.indices[first+2];
+  const auto &u=mesh.uv[a], &v=mesh.uv[b], &w=mesh.uv[c];
+  const double du=double(v[0])-u[0], dv=double(v[1])-u[1];
+  const double eu=double(w[0])-u[0], ev=double(w[1])-u[1];
+  const double determinant=du*ev-dv*eu;
+  if(std::abs(determinant)<=1e-8*std::max(std::hypot(du,dv)*std::hypot(eu,ev),1e-20))
+   return {};
+  const auto dp=world.direction(vec(mesh.positions[b]-mesh.positions[a]));
+  const auto dq=world.direction(vec(mesh.positions[c]-mesh.positions[a]));
+  const double sign=std::copysign(1.,determinant);
+  D raw_t{},raw_b{};
+  for(size_t axis=0;axis<3;++axis){
+   raw_t[axis]=(dp[axis]*ev-dq[axis]*dv)*sign;
+   raw_b[axis]=(dq[axis]*du-dp[axis]*eu)*sign;
+  }
+  if(std::hypot(raw_t[0],raw_t[1],raw_t[2])<1e-20 ||
+     std::hypot(raw_b[0],raw_b[1],raw_b[2])<1e-20)
+   return {};
+  raw_t=unit(raw_t);raw_b=unit(raw_b);
+  const std::array n{unit(placement.normal(vec(mesh.normals[a]))),
+                     unit(placement.normal(vec(mesh.normals[b]))),
+                     unit(placement.normal(vec(mesh.normals[c])))};
+  std::array<D,3> tangents{};
+  double cone=1,tangent_cone=1,max_dot=0,min_projection=1,max_projection=0;
+  for(size_t corner=0;corner<3;++corner){
+   cone=std::min(cone,dot(n[0],n[corner]));
+   const double projection=dot(n[corner],raw_t);
+   max_dot=std::max(max_dot,std::abs(projection));
+   D t{};
+   for(size_t axis=0;axis<3;++axis)t[axis]=raw_t[axis]-n[corner][axis]*projection;
+   const double length=std::hypot(t[0],t[1],t[2]);
+   if(length<1e-5)return {};
+   min_projection=std::min(min_projection,length);
+   max_projection=std::max(max_projection,length);
+   tangents[corner]=unit(t);
+   tangent_cone=std::min(tangent_cone,dot(tangents[0],tangents[corner]));
+  }
+  if(cone<.5||tangent_cone<.5||max_dot>=cone)return {};
+  const double normal_variance=variance_bound(n), tangent_variance=variance_bound(tangents);
+  // With barycentric weights w, A=sum(w*N) has |A| >= cone. The difference
+  // between averaging the vertex projections and projecting along A/|A|
+  // has two terms: covariance of N, and the normalization of A. Each is
+  // bounded by 1-|A|^2. Normalizing the three projections before averaging
+  // adds the covariance of the projection lengths with the unit tangents.
+  const double component=max_dot/cone;
+  const double projected_floor=std::sqrt(1-component*component);
+  const double projection_error=std::min(2*normal_variance,max_dot+component)+
+      .5*(max_projection-min_projection)*std::sqrt(tangent_variance);
+  if(projection_error>=projected_floor)return {};
+  const double tangent_error=2*projection_error/(projected_floor-projection_error);
+  // Interpolating cross products can differ from crossing the interpolated
+  // columns by their covariance. The positive cone bounds prevent a zero
+  // tangent or bitangent anywhere inside the triangle.
+  const double cross_error=tangent_error+std::sqrt(normal_variance*tangent_variance);
+  if(cross_error>=cone*tangent_cone||
+     2*cross_error/(cone*tangent_cone-cross_error)>axis_limit*.9)
+   return {};
+  const double side=std::copysign(1.,dot(cross(n[0],tangents[0]),raw_b));
+  TriangleTangents stored{};
+  for(size_t corner=0;corner<3;++corner){
+   const auto &t=tangents[corner];
+   if(dot(cross(n[corner],t),raw_b)*side<hand_margin)return {};
+   const auto local=unit(placement.inverse().direction(t));
+   stored[corner]={float(local[0]),float(local[1]),float(local[2]),float(side)};
+   const auto &value=stored[corner];
+   const D written{value[0],value[1],value[2]};
+   const auto placed=unit(world.direction(written));
+   if(std::abs(dot(written,unit(vec(mesh.normals[mesh.indices[first+corner]]))))>1e-5 ||
+      std::hypot(placed[0]-t[0],placed[1]-t[1],placed[2]-t[2])>2e-6)
+    return {};
+  }
+  frames.push_back(stored);
+ }
+ return frames;
 }
 
 // A cell's filtered vectors are convex combinations of its four taps.
@@ -900,6 +1012,10 @@ ExportBound export_bound(const ObjectSurface&input,const TextureSetLimits&limits
   const auto resolution=field.painted->resolution();
   const bool hdr=texture_set_physical_emission(field);
   const bool mtoon=field.material_bindings&&field.material_bindings->has_mtoon;
+  if(mtoon&&field.material_bindings->roles[size_t(MToonSlot::Normal)].image){
+   charge(bytes,draw.count,sizeof(Tangent),limits.maximum_bytes);
+   charge(work,draw.count,64,limits.maximum_work);
+  }
   const bool editable_pbr=editable_materials&&baked_mtoon_pbr_fallback(field);
   const bool typed_hdr=hdr&&!editable_materials&&native_mtoon_float_bake(field);
   const bool sparse_retained=retained_material_grid(field);
@@ -1176,6 +1292,8 @@ TextureSetExport compile_texture_set_export(const ObjectSurface&input,const Text
  const auto *morphs=input.deformation&&input.deformation->morphs?&*input.deformation->morphs:nullptr;
  const bool has_morphs=morphs&&!morphs->targets.empty();
  const bool skin_check=source&&input.deformation&&evaluates_skin(*input.deformation);
+ const bool static_geometry=!has_morphs&&(!input.deformation||!evaluates_skin(*input.deformation));
+ const auto world=input.world_matrix();
  bool normal=false;
  // Tangent basis is evaluated in REST, never the current pose. Include the
  // actual vertex and role-specific frame bits in every necessary split.
@@ -1190,22 +1308,28 @@ TextureSetExport compile_texture_set_export(const ObjectSurface&input,const Text
  for(size_t f=0;f<plan->fields().size();++f){
   stop(limits);const auto&field=plan->fields()[f];const auto&draw=plan->draws()[f];if(!draw.count)continue;
   const bool canonical=!field.source&&field.painted->baked()&&!field.painted->baked()->maps.normal.rgba.empty();
-  const auto portable=field.source?std::optional<PortableTextureSetField>(portable_texture_set_field(field,input.world_matrix(),work,limits)):std::nullopt;
+  const auto portable=field.source?std::optional<PortableTextureSetField>(portable_texture_set_field(field,world,work,limits)):std::nullopt;
+  const auto typed_frames=static_geometry&&!canonical&&!field.source?
+      portable_mtoon_derivative_frames(rest,field,world,limits):std::nullopt;
   if(portable&&(has_morphs||skin_check))
    retained_shapes.push_back({f,mesh.positions.size(),out.fields.size(),portable->reprojected});
-  normal|=canonical||(portable&&portable->normal_role);
+  const bool retained_normal=portable&&portable->normal_role;
+  const bool tangent_attribute=canonical||retained_normal||bool(typed_frames);
+  normal|=tangent_attribute;
   TextureSetExportField output;
   output.set=field.id;
   output.name=field.name;
   output.first=mesh.indices.size();
   output.count=draw.count;
   output.material=field.material;
-  output.normal_role=portable&&portable->normal_role;
+  output.normal_role=retained_normal;
+  output.tangent_attribute=tangent_attribute;
+  output.portable_mtoon_derivative_frame=bool(typed_frames);
   const bool physical=texture_set_physical_emission(field);
   const bool typed_hdr=physical&&!editable_materials&&native_mtoon_float_bake(field);
   if(canonical&&!input.deformation&&field.material_bindings&&field.material_bindings->has_mtoon&&
      (!physical||typed_hdr||(editable_materials&&native_mtoon_float_bake(field))))
-   output.portable_mtoon_bake_frame=portable_mtoon_bake_frame(rest,field,frames,input.world_matrix(),limits);
+   output.portable_mtoon_bake_frame=portable_mtoon_bake_frame(rest,field,frames,world,limits);
   if(physical){
    if(typed_hdr&&!output.portable_mtoon_bake_frame)
     throw std::invalid_argument("Typed FLOAT Bake needs its certified canonical tangent frame");
@@ -1223,7 +1347,11 @@ TextureSetExport compile_texture_set_export(const ObjectSurface&input,const Text
   for(size_t c=0;c<draw.count;++c){
    if((c&1023)==0)stop(limits);const auto logical=plan->logical_corners()[draw.first+c];const auto vertex=rest.indices.at(logical);
    const auto n=portable?portable->corners[c].normal:rest.normals.at(vertex);const auto paint=portable?portable->corners[c].paint:rest.uv.at(vertex);const auto role=portable?portable->corners[c].role:rest.uv.at(vertex);
-   const Tangent tangent=portable?portable->corners[c].tangent:canonical?frames.at(logical):Tangent{1,0,0,1};Signature key{};key[0]=vertex;size_t k=1;for(float v:tangent)key[k++]=std::bit_cast<uint32_t>(v);for(float v:{n.x,n.y,n.z})key[k++]=std::bit_cast<uint32_t>(v);for(float v:paint)key[k++]=std::bit_cast<uint32_t>(v);for(float v:role)key[k++]=std::bit_cast<uint32_t>(v);
+   if(typed_frames&&field.domain->triangles()[c/3]!=logical/3)
+    throw std::logic_error("Typed tangent correspondence differs from the emitted material range");
+   const Tangent tangent=portable?portable->corners[c].tangent:canonical?frames.at(logical):
+       typed_frames?typed_frames->at(c/3)[c%3]:Tangent{1,0,0,1};
+   Signature key{};key[0]=vertex;size_t k=1;for(float v:tangent)key[k++]=std::bit_cast<uint32_t>(v);for(float v:{n.x,n.y,n.z})key[k++]=std::bit_cast<uint32_t>(v);for(float v:paint)key[k++]=std::bit_cast<uint32_t>(v);for(float v:role)key[k++]=std::bit_cast<uint32_t>(v);
    // Independent retained frames can diverge at a shared rest vertex.
    // Preserve all logical corners needed to represent endpoint directions.
    const bool distinct=(canonical||portable.has_value())&&has_morphs;
@@ -1271,7 +1399,7 @@ TextureSetExport compile_texture_set_export(const ObjectSurface&input,const Text
     }
     const auto &output=out.fields[range.output];
     const auto coordinates=std::span(out.normal_coordinates).subspan(range.first_vertex,output.count);
-    const auto corners=portable_texture_set_shape(*current,triangles,input.world_matrix(),
+    const auto corners=portable_texture_set_shape(*current,triangles,world,
         coordinates,output.textures,range.reprojected,work,limits);
     for(size_t c=0;c<corners.size();++c){
      if((c&1023)==0)stop(limits);
@@ -1285,7 +1413,6 @@ TextureSetExport compile_texture_set_export(const ObjectSurface&input,const Text
  if(skin_check){
   const auto &deformation=*input.deformation;
   const auto posed=deformation.preview(rest);
-  const auto world=input.world_matrix();
   const auto matrices=deformation.skeleton->skin_matrices(deformation.pose);
   std::vector<RigMatrix> normal_matrices;
   normal_matrices.reserve(matrices.size());

@@ -677,6 +677,11 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
       accessor["count"]=field.count;accessor["byteOffset"]=field.first*sizeof(uint32_t);
       int index=first_accessor;if(f){index=int(j["accessors"].size());j["accessors"].push_back(std::move(accessor));}else j["accessors"][index]=std::move(accessor);
       primitive["indices"]=index;primitive["extras"]["dome_sculpt_texture_set"]={{"id",field.set},{"name",field.name}};
+      if(!field.tangent_attribute){
+        primitive.at("attributes").erase("TANGENT");
+        if(auto targets=primitive.find("targets");targets!=primitive.end())
+          for(auto &target:*targets)target.erase("TANGENT");
+      }
       if(f){const int material=append_material(field.material,false);primitive["material"]=material;extra_materials.push_back({i,f,material});}
       primitives.push_back(std::move(primitive));
     }
@@ -726,7 +731,7 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
   std::vector<std::shared_ptr<const Image>> mtoon_paint_images;
   std::deque<MToonFloatPreview> mtoon_float_previews;
   const auto write_set_mtoon=[&](const TextureSetView &field,const TextureSetExportField &compiled,
-                                 size_t object,int material_id){
+                                 size_t object,size_t primitive,int material_id){
     const auto &binding=field.material_bindings;
     if(!binding||!binding->has_mtoon)return false;
     auto retain_native=[&]{
@@ -742,9 +747,9 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
        binding->physical_emission||(compiled.emission&&!hdr&&!try_editable_float))
       return retain_native();
 
-    const auto &attributes=j["meshes"][result.objects[object].mesh]["primitives"][0]["attributes"];
+    const auto &attributes=j["meshes"][result.objects[object].mesh]["primitives"][primitive]["attributes"];
     if(binding->roles[size_t(MToonSlot::Normal)].image&&attributes.contains("TANGENT")&&
-       !compiled.portable_mtoon_bake_frame)
+       !compiled.portable_mtoon_bake_frame&&!compiled.portable_mtoon_derivative_frame)
       return retain_native();
 
     (void)binding->material.copy_working_bytes(12*1024*1024,cancelled);
@@ -1043,7 +1048,7 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
       const auto owners=objects[i].texture_set_surface->fields();
       const auto original=std::ranges::find(owners,field->set,&TextureSetView::id);
       if(original==owners.end())throw std::logic_error("Exported material set lost its owning field");
-      if(write_set_mtoon(*original,*field,i,result.objects[i].material))continue;
+      if(write_set_mtoon(*original,*field,i,0,result.objects[i].material))continue;
     }
     write_textures(object_at(i),i,result.objects[i].material,
         field&&!bundles[i]->paint_coordinates.empty(),field&&field->normal_role,
@@ -1054,7 +1059,7 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
     const auto owners=objects[extra.object].texture_set_surface->fields();
     const auto original=std::ranges::find(owners,field.set,&TextureSetView::id);
     if(original==owners.end())throw std::logic_error("Exported material set lost its owning field");
-    if(write_set_mtoon(*original,field,extra.object,extra.material))continue;
+    if(write_set_mtoon(*original,field,extra.object,extra.field,extra.material))continue;
     material_view.material=field.material;material_view.textures=field.textures;
     write_textures(material_view,extra.object,extra.material,!bundles[extra.object]->paint_coordinates.empty(),field.normal_role,field.emission?&*field.emission:nullptr);
   }

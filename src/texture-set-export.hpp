@@ -23,7 +23,8 @@ struct TextureSetExportField {
   size_t first=0,count=0;
   Material material;
   std::shared_ptr<const TextureMaps> textures;
-  bool normal_role=false, portable_mtoon_bake_frame=false;
+  bool normal_role=false, tangent_attribute=false;
+  bool portable_mtoon_bake_frame=false, portable_mtoon_derivative_frame=false;
   std::optional<TextureSetExportEmission> emission;
 };
 struct PortableMToonSetPaint {
