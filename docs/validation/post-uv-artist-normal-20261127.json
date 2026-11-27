@@ -52,6 +52,18 @@
         "prepared-keys-after-uv-render"
       ],
       "source": "Product correction with the concurrent uncommitted retopology resampling extraction"
+    },
+    "exact": {
+      "tests": [
+        "independent-seam-key-mirror-prepared",
+        "native-paint-key-frames",
+        "normal-bake-frame-authoring",
+        "prepared-keys-after-uv",
+        "independent-seam-key-mirror-retained",
+        "post-uv-key-strokes",
+        "prepared-keys-after-uv-render"
+      ],
+      "source": "2d171233546482b790bbef05df7083797fb1917c"
     }
   },
   "actual_open_gl": {
@@ -86,7 +98,7 @@
   },
   "physical_headset_tested": false,
   "archive": {
-    "sha256": "51fe58f4afe70e42ec7e1b34126ba42a6033a53ee050fb697bf3fcb2ac544326",
+    "sha256": "b69f3b0e9e0a80f83a8d4fe592524b53a487a348a3ba10e67bf6c0ed621d843a",
     "members_sha256": {
       "release.log": "9edff0213d91011e4a11c2a87998fe3ad80bd8250d70415fbaab400fbc06b9da",
       "arc.log": "9c23f917c5a29c7c6734bbea08149bdf67701df0bd6d99bd5d21cd49926e7701",
@@ -98,7 +110,8 @@
       "baseline-regression.log": "2b0f6de3034f6955be2f03753032d1914d1fda62367ea0cf82f367174a8b7992",
       "generate-legacy-fixture.py": "fa9f98c0762630d3fce5601623abd3d2e7233a9f9009b676ff60249e42943c4d",
       "archive-main.cpp": "597c80a3a33ec0fa5d3d5836ea8d15ea89d2fc6f00ee47bded827fea83ca198a",
-      "asan-fixed.log": "d9597a595c415e6e6339dfaae200fde8eb3da570e5308022043281d8543cfc6a"
+      "asan-fixed.log": "d9597a595c415e6e6339dfaae200fde8eb3da570e5308022043281d8543cfc6a",
+      "asan-exact.log": "8f1826cebfcbd1e1ade78de1dc9153abbd40d36aa4b98b47558494cfdf4edc16"
     }
   }
 }

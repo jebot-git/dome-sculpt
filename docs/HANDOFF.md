@@ -42,10 +42,8 @@ artist's normal and tangent offsets. Projects saved with the affected
 independent-corner calculation reopen and resave byte for byte. Their old
 targets stay exact when a new key is edited. The focused Release suite, 77
 independent graphical checks on Intel Arc A770, and the synthetic OpenXR
-accept, cancel and focus workflows pass. Six ASan/UBSan tests passed in a
-working build that included the local retopology resampling draft. The
-exact-source sanitizer rebuild and the full Release rerun of `2d171233`
-are underway. The full run uses
+accept, cancel and focus workflows pass. All seven selected tests also passed
+in the exact-source ASan/UBSan build. The full Release rerun of `2d171233` uses
 `ds-post-uv-artist-combined-release-20261127.service`.
 [Artist-normal validation](validation/post-uv-artist-normal-20261127.json)
 
@@ -79,6 +77,22 @@ workflows run from retopology Apply through Bake, bind, weight painting,
 pose, and GLB export. Cold Restore recovers the original unbound patch
 and Bake. The first bind matches across the native worker, DomeD Wayland,
 and synthetic OpenXR on software GL and Intel Arc. [Retopology skin validation](validation/retopology-surface-heat-20261127.json)
+
+Reapplying a changed native retopology patch now reprojects its editable
+paint and Bake from the previous patch's rest surface. It carries the active
+layer, hidden masks, physical emission and sub-byte baked emission coverage,
+and reorients canonical baked normals for the new atlas. Skin and shapekey
+data use the same world-metric rest correspondence. The previous patch and
+its history remain available as a hidden object. Wire-only edits share the
+existing raster and deformation owners. Touching a visible point on a patch
+offset for Bake works before projection of the drag. The Release fixtures
+cover plain and reflected/sheared reference placements, ordered Save,
+late cancellation, Undo/Redo, native frame replay and GLB skin/morph export.
+All 15 selected Release and seven ASan/UBSan tests passed. Nested DomeD
+Wayland covers reopen, Move, Cancel and exact Save. Synthetic OpenXR
+renders the replacement in both eyes on software GL and Intel Arc A770.
+Prepared and retained material grids, imported joint links and new Restore
+capsules for changed geometry remain open. [Retopology reapply validation](validation/retopology-reapply-20261127.json)
 
 Surface Heat also binds meshes after independent frame and shapekey
 authoring. Retention accounts for the actual POSITION correspondences,

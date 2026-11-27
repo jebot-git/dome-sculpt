@@ -66,9 +66,18 @@ survive bind, weight painting, Save, Undo/Redo and rig Restore. Plain and
 reflected/sheared source cases retain their stable quad, pin and seam.
 Both GLB modes preserve the weighted pose in an independent geometry
 consumer. Khronos still reports implicit tangent generation and skinned
-node hierarchy advisories for these fixtures. Automatic paint or skin
-transfer when publishing changed topology remains a separate workflow.
+node hierarchy advisories for these fixtures.
 [Retopology skin evidence](validation/retopology-surface-heat-20261127.json)
+
+Applying changed native retopology now carries editable layers, masks,
+canonical Bake and independent FLOAT emission to the replacement. The
+worker projects mesh attributes onto the previous rest surface, preserving
+the native rig, pose and shapekey POSITION data under affine placement.
+Native geometric key frames follow the replacement atlas. Save, cancellation
+and one Undo/Redo retain both patch generations. Wire-only edits keep the
+existing raster and deformation owners. Retained material grids, imported
+linked rigs and topology-changing Restore capsules remain open.
+[Retopology reapply evidence](validation/retopology-reapply-20261127.json)
 
 The current combined atlas and HDR cache source passes all 153 checks
 in both software Release and Intel Arc ASan/UBSan OpenXR replays. Its

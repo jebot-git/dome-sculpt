@@ -1,0 +1,145 @@
+{
+  "revision": "85df310fc666780149fbf60890c90cbf6ef34035",
+  "canonical_domed_revision": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "release_fltk": "/opt/fltk-vr/toolkit",
+  "asan_fltk": "artifacts/sdk-20261126/toolkit-sanitize",
+  "release_application_sha256": "dfa6f56aa50f965dcde20b09bb38d6805b16df0ca6affd021d40ad720b6bccbe",
+  "native_release_test_sha256": "32376a90225dfea781aabb27635990db05bef199bfb51ff1240346e280913073",
+  "native_sanitizer_test_sha256": "bb85823c2f9449b964a855e97ca5a61b590a6b60d8c7aaac9b390b5c0d63c184",
+  "release": {
+    "tests": [
+      "retopology-affine-ui-fixture",
+      "retopology-affine-openxr",
+      "retopology-caller-admission",
+      "retopology-input-admission",
+      "retopology-reapply-plain",
+      "retopology-reapply-affine",
+      "dome-sculpt-texture-set-resolution",
+      "retopology-save-handoff",
+      "retopology-surface-heat-plain",
+      "retopology-surface-heat-affine",
+      "retopology-affine",
+      "retopology-authoring",
+      "retopology-worker-accepted-publication",
+      "retopo-cancellation-boundaries",
+      "native-authored-paint-resolution"
+    ],
+    "final_test_fixture_replays": [
+      "retopology-reapply-affine",
+      "retopology-reapply-plain"
+    ]
+  },
+  "sanitizer": {
+    "tests": [
+      "retopology-save-handoff",
+      "retopology-reapply-plain",
+      "retopology-surface-heat-plain",
+      "retopology-surface-heat-affine",
+      "retopology-affine",
+      "retopology-authoring",
+      "retopology-reapply-affine"
+    ],
+    "asan_options": "detect_leaks=1:halt_on_error=1",
+    "ubsan_options": "halt_on_error=1:print_stacktrace=1"
+  },
+  "native_reapply_assertions_per_plain_and_affine_case": 30,
+  "release_files_sha256": {
+    "retopology-reapply-plain/before-reapply.dsculpt": "7777adde43a3626af7e413089207f96eca83424ad7ed2bfcecb37116b1618545",
+    "retopology-reapply-plain/reapplied.dsculpt": "512be60e5b4391dd31643cbbe71f2b761417012f68931f8a723fd2f2769a4a83",
+    "retopology-reapply-plain/reapplied.glb": "f52640810d8bf1df6332e531311289242dfe1b64dadfaf24298ab0d4a4dd7081",
+    "retopology-reapply-affine/before-reapply.dsculpt": "f9f39d574d3fe7a0b488bbe8a79fe888593d077505b6ebb1088c2dd8193587ab",
+    "retopology-reapply-affine/reapplied.dsculpt": "731e69b9b57190dec3914b66ac922afe2f5ef3bcfb8db27b31ec652d49aeef2f",
+    "retopology-reapply-affine/reapplied.glb": "c867b3fae700b17587239e59faf3aeb367818466df6b7c1d8aaee7df7a38871b"
+  },
+  "sanitizer_files_sha256": {
+    "retopology-reapply-plain/before-reapply.dsculpt": "7777adde43a3626af7e413089207f96eca83424ad7ed2bfcecb37116b1618545",
+    "retopology-reapply-plain/reapplied.dsculpt": "512be60e5b4391dd31643cbbe71f2b761417012f68931f8a723fd2f2769a4a83",
+    "retopology-reapply-plain/reapplied.glb": "f52640810d8bf1df6332e531311289242dfe1b64dadfaf24298ab0d4a4dd7081",
+    "retopology-reapply-affine/before-reapply.dsculpt": "f9f39d574d3fe7a0b488bbe8a79fe888593d077505b6ebb1088c2dd8193587ab",
+    "retopology-reapply-affine/reapplied.dsculpt": "731e69b9b57190dec3914b66ac922afe2f5ef3bcfb8db27b31ec652d49aeef2f",
+    "retopology-reapply-affine/reapplied.glb": "c867b3fae700b17587239e59faf3aeb367818466df6b7c1d8aaee7df7a38871b"
+  },
+  "release_sanitizer_exact_file_matches": [
+    "retopology-reapply-affine/before-reapply.dsculpt",
+    "retopology-reapply-affine/reapplied.dsculpt",
+    "retopology-reapply-affine/reapplied.glb",
+    "retopology-reapply-plain/before-reapply.dsculpt",
+    "retopology-reapply-plain/reapplied.dsculpt",
+    "retopology-reapply-plain/reapplied.glb"
+  ],
+  "nested_domed_wayland": {
+    "assertions": 6,
+    "editor_reopen_menu_cancel_and_exact_save": true
+  },
+  "synthetic_openxr": {
+    "initial_affine_apply_controller_assertions": 27,
+    "reopened_replacement_stereo": {
+      "software": {
+        "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+        "differing_rgb_components_per_eye": [
+          17806,
+          17386
+        ],
+        "stereo_submissions_per_reopen": 6,
+        "releases_per_reopen": 12,
+        "exact_project_save": true
+      },
+      "arc": {
+        "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+        "differing_rgb_components_per_eye": [
+          17601,
+          17282
+        ],
+        "stereo_submissions_per_reopen": 6,
+        "releases_per_reopen": 12,
+        "exact_project_save": true
+      }
+    }
+  },
+  "independent_glb_consumer": [
+    {
+      "file": "retopology-reapply-plain/reapplied.glb",
+      "corners": 6,
+      "maximum_position_error_m": 2.1924000452762696e-10,
+      "maximum_weight_error": 0
+    },
+    {
+      "file": "retopology-reapply-affine/reapplied.glb",
+      "corners": 6,
+      "maximum_position_error_m": 3.923478756326894e-08,
+      "maximum_weight_error": 0
+    }
+  ],
+  "khronos": {
+    "version": "2.0.0-dev.3.10",
+    "files": 2,
+    "errors": 0,
+    "warnings": {
+      "MESH_PRIMITIVE_GENERATED_TANGENT_SPACE": 2,
+      "NODE_SKINNED_MESH_NON_ROOT": 2
+    }
+  },
+  "open": [
+    "prepared/retained material grids",
+    "linked original joint graphs",
+    "new Restore capsules after geometry changes",
+    "physical headset"
+  ],
+  "archive": {
+    "sha256": "f710a2006e04d42faf1e431488b9b92c0c3ae8202e1122f74f8075cddda7c7f6",
+    "members_sha256": {
+      "release-final.log": "32794584acff2d73ef75b088ebad516622ce6a59ae1f924376011c1a748e4b80",
+      "release-framed.log": "3266a042b366d913b6e807acaee1757734c5c68bbfcebb373e4115b50d5a9abc",
+      "asan-final.log": "086a4086d12940470ffb58abf179fd88b319c338378a1530d598eeb97aeedadc",
+      "khronos.json": "848dea450daa481dddbf25054870ed9459b1335597969eaddf656f1c8d8ad94b",
+      "consumer.json": "1fc71bc48df5a66beeff53e430766d69702b5b13ba1d2b70ea656a359673a7f8",
+      "consumer.py": "776660bee09fd2148445b691470d8f2a76242871578c88df7cac5049ca3afb6e",
+      "release-reapply-assertions.log": "7eb8cce1ea7b0568e77c3c34019ce6391ab7f4ca7a1a38347f3d724c49bf0762",
+      "asan-reapply-assertions.log": "2962f663273355fb74cda4215f80406bc6ff0622ef7a4366460fa87e1c9d93f0",
+      "wayland.json": "57c49923fada5f513ba5122e811210418db445f4b4e4ab03d1073e00b960d56e",
+      "software-openxr.json": "c6158c18bb79f073a3dd328fb7044e8e6a71030fe03f9236f4ce29e984117eda",
+      "arc-openxr.json": "3f107ca6d7db68a14aea8a522c73b96dfdf06f6d5be48039c5c81116a0e24018",
+      "controller-openxr.json": "a80a2101c9ac4d1247a977cf8880f5f5c1cf0aab0c17236e0c7bf51f24d87274"
+    }
+  }
+}
