@@ -394,6 +394,20 @@ std::vector<ObjectSurface> emission_export_surfaces(const Scene &scene,const std
    object.material_bindings=std::move(binding);
   }
  }
- auto surfaces=detached.preview_surface_bundles(cancelled,{});for(auto &surface:surfaces){const auto &original=scene.object(surface.id);if(original.texture_sets)continue;surface.material=original.material;surface.material_bindings=original.material_bindings;if(original.painted&&(original.painted->has_physical_emission()||detail::hdr_emission(original.material.emissive)||(original.material_bindings&&detail::physical_emission(*original.material_bindings)))){auto maps=std::make_shared<TextureMaps>(*surface.textures);maps->overlay=detail::PaintOverlayFactory::capture(*original.painted,cancelled);surface.textures=std::move(maps);}}return surfaces;
+ auto surfaces=detached.preview_surface_bundles(cancelled,{});
+ for(auto &surface:surfaces){
+  const auto &original=scene.object(surface.id);
+  if(original.texture_sets)continue;
+  surface.material=original.material;
+  surface.material_bindings=original.material_bindings;
+  surface.retopo_mtoon_export=detail::RetopoMToonExport::capture(original,cancelled);
+  if(original.painted&&(original.painted->has_physical_emission()||detail::hdr_emission(original.material.emissive)||
+      (original.material_bindings&&detail::physical_emission(*original.material_bindings)))){
+   auto maps=std::make_shared<TextureMaps>(*surface.textures);
+   maps->overlay=detail::PaintOverlayFactory::capture(*original.painted,cancelled);
+   surface.textures=std::move(maps);
+  }
+ }
+ return surfaces;
 }
 }

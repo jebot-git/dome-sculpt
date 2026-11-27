@@ -19,6 +19,7 @@
 #include "dome/material-visibility.hpp"
 #include "dome/paint-sampling.hpp"
 #include <bit>
+#include <cstring>
 #include <limits>
 #include <map>
 #include <numeric>
@@ -215,7 +216,8 @@ std::optional<PortableMToonFrames> portable_mtoon_derivative_frames(const Mesh &
  PortableMToonFrames result;
  result.normal_coordinates=transformed||texture.transform_texcoord>=0;
  auto &frames=result.triangles;
- frames.reserve(field.domain->triangles().size());
+ const size_t faces=field.domain?field.domain->triangles().size():mesh.indices.size()/3;
+ frames.reserve(faces);
  constexpr double axis_limit=2e-4, hand_margin=1e-3;
  const auto variance_bound=[](const std::array<D,3> &corners){
   double diameter=0;
@@ -225,7 +227,8 @@ std::optional<PortableMToonFrames> portable_mtoon_derivative_frames(const Mesh &
   }
   return diameter/3;
  };
- for(const uint32_t face:field.domain->triangles()){
+ for(size_t i=0;i<faces;++i){
+  const auto face=field.domain?field.domain->triangles()[i]:i;
   if((frames.size()&1023)==0)stop(limits);
   const size_t first=size_t(face)*3;
   const auto a=mesh.indices[first], b=mesh.indices[first+1], c=mesh.indices[first+2];
@@ -1592,6 +1595,106 @@ std::optional<MToonFloatPreview> compile_editable_mtoon_float_preview(
 bool texture_set_physical_emission(const TextureSetView &field) {
  return hdr_emission(field.material.emissive)||(field.painted&&field.painted->has_physical_emission())||
      (field.material_bindings&&physical_emission(*field.material_bindings));
+}
+
+std::shared_ptr<const RetopoMToonExport> RetopoMToonExport::capture(const SculptObject &object,
+    const std::function<bool()> &cancelled) {
+ const auto &paint=object.painted;
+ const auto &binding=object.material_bindings;
+ if(!object.retopology||object.texture_sets||!object.mesh_active||object.deformation||
+    !native_texture_set_mtoon(paint.get(),object.appearance.get(),binding.get())||
+    binding->material.version()!=MToonVersion::V1||!paint->source_maps()||paint->in_stroke()||
+    paint->baked()||paint->has_physical_emission()||binding->physical_emission)
+  return {};
+ const auto &params=binding->material.parameters;
+ if(params.rotation_speed!=0||params.scroll!=std::array<float,2>{})return {};
+ const auto &core=paint->source_maps()->normal;
+ const auto &normal=binding->material.textures[size_t(MToonSlot::Normal)];
+ // Both materials read the same explicit tangent attribute in a portable
+ // primitive. The independently projected maps must use the same UV basis.
+ if(core.texcoord||core.uv_transform!=std::array<float,6>{1,0,0,1,0,0}||
+    normal.texcoord||normal.transform_texcoord!=-1||normal.offset!=std::array<float,2>{}||
+    normal.scale!=std::array<float,2>{1,1}||normal.rotation!=0)
+  return {};
+ for(const auto &layer:paint->layers())if(layer.visible&&layer.opacity>0){
+  for(const auto &tile:layer.tiles){
+   if(cancelled&&cancelled())throw std::runtime_error("MToon export capture cancelled");
+   // Metallic/roughness layers affect the Core PBR material compiled by the
+   // ordinary writer. MToon uses independent base, shade and emission roles.
+   if(tile&&std::ranges::any_of(tile->pixels,[](const auto &pixel){
+       return pixel.data[13]&&(pixel.data[9]||pixel.data[12]);
+     }))return {};
+  }
+ }
+ auto result=std::shared_ptr<RetopoMToonExport>(new RetopoMToonExport);
+ result->object_=object.id;
+ result->field_=texture_set_view(object,0);
+ result->field_.painted=paint->snapshot();
+ return result;
+}
+
+void RetopoMToonExport::authenticate(const ObjectSurface &surface,const TextureSetLimits &limits) const {
+ stop(limits);
+ const auto equal=[](const auto &a,const auto &b){
+  return a.size()==b.size()&&(a.empty()||!std::memcmp(a.data(),b.data(),a.size()*sizeof(a.front())));
+ };
+ const auto &source=field_.painted->mesh();
+ const auto &mesh=surface.mesh;
+ if(surface.id!=object_||surface.appearance||surface.deformation||surface.texture_set_surface||
+    !equal(mesh.positions,source.positions)||!equal(mesh.normals,source.normals)||!equal(mesh.uv,source.uv)||
+    mesh.indices!=source.indices||mesh.uv_pins!=source.uv_pins||mesh.uv_seams!=source.uv_seams)
+  throw std::invalid_argument("Projected MToon export lost its exact current mesh owner");
+}
+
+std::optional<TextureSetExport> compile_retopo_mtoon_export(const ObjectSurface &object,const TextureSetLimits &limits) {
+ limits.validate();
+ const auto &owner=*object.retopo_mtoon_export;
+ const auto &field=owner.field();
+ const auto &mesh=object.mesh;
+ const size_t count=mesh.indices.size();
+ if(count>limits.maximum_corners||count/3>limits.maximum_triangles||mesh.positions.size()>limits.maximum_corners)
+  throw std::length_error("MToon export exceeds geometry bounds");
+ size_t bytes=sizeof(TextureSetExport),work=0;
+ charge(work,count,64,limits.maximum_work);
+ charge(bytes,count,sizeof(MToonNormalCorner)+2*sizeof(uint32_t)+sizeof(Tangent)+2*sizeof(Vec3)+
+        sizeof(std::array<float,2>)+6*sizeof(void*),limits.maximum_bytes);
+ charge(bytes,mesh.positions.size(),2*sizeof(Vec3)+sizeof(std::array<float,2>),limits.maximum_bytes);
+ owner.authenticate(object,limits);
+ mesh.validate();
+ const auto frames=portable_mtoon_derivative_frames(mesh,field,object.world_matrix(),limits);
+ if(!frames||frames->normal_coordinates)return {};
+
+ TextureSetExport out;
+ out.working_bound=bytes;
+ out.surface=object;
+ auto &emitted=out.surface.mesh;
+ emitted=Mesh{};
+ emitted.indices.reserve(count);
+ std::map<std::pair<uint32_t,std::array<uint32_t,4>>,uint32_t> indices;
+ for(size_t face=0;face<frames->triangles.size();++face){
+  if((face&1023)==0)stop(limits);
+  for(size_t c=0;c<3;++c){
+   const auto vertex=mesh.indices[face*3+c];
+   const auto &tangent=frames->triangles[face][c].tangent;
+   const auto [entry,fresh]=indices.emplace(std::pair{vertex,std::bit_cast<std::array<uint32_t,4>>(tangent)},
+                                            uint32_t(emitted.positions.size()));
+   if(fresh){
+    emitted.positions.push_back(mesh.positions[vertex]);
+    emitted.normals.push_back(mesh.normals[vertex]);
+    emitted.uv.push_back(mesh.uv[vertex]);
+    out.tangents.push_back(tangent);
+   }
+   emitted.indices.push_back(entry->second);
+  }
+ }
+ TextureSetExportField material;
+ material.name=field.name;
+ material.count=count;
+ material.material=field.material;
+ material.tangent_attribute=true;
+ material.portable_mtoon_derivative_frame=true;
+ out.fields.push_back(std::move(material));
+ return out;
 }
 
 EmissionExportRaster texture_set_emission_raster(const TextureSetView &field,const TextureSetLimits &limits,bool authored_mtoon){

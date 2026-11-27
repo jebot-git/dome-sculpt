@@ -113,6 +113,12 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
     }
     bundles[i]=compile_texture_set_export(objects[i],limits,measured,bool(raw_authority));
     bundle_working_bytes+=bundles[i]->working_bound;
+  }else if(source_space==SourceMorphSpace::Native&&!normal_owner&&objects[i].retopo_mtoon_export){
+    TextureSetLimits limits;limits.cancelled=cancelled;
+    if(bundle_working_bytes>=limits.maximum_bytes)throw std::length_error("Aggregate material export budget exhausted");
+    limits.maximum_bytes-=bundle_working_bytes;
+    bundles[i]=compile_retopo_mtoon_export(objects[i],limits);
+    if(bundles[i])bundle_working_bytes+=bundles[i]->working_bound;
   }
   auto object_at=[&](size_t i)->const ObjectSurface&{return bundles[i]?bundles[i]->surface:objects[i];};
 
@@ -675,7 +681,7 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
   }
   struct ExtraMaterial {size_t object,field;int material;};
   std::vector<ExtraMaterial>extra_materials;
-  for(size_t i=0;i<objects.size();++i)if(bundles[i]){
+  for(size_t i=0;i<objects.size();++i)if(bundles[i]&&objects[i].texture_set_surface){
     stop();const auto&bundle=*bundles[i];auto&primitives=j["meshes"][result.objects[i].mesh]["primitives"];
     const auto base=primitives.at(0);const int first_accessor=base.at("indices");const auto index_template=j["accessors"].at(first_accessor);
     primitives=nlohmann::json::array();
@@ -738,10 +744,11 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
   std::vector<std::shared_ptr<const Image>> mtoon_paint_images;
   std::deque<MToonFloatPreview> mtoon_float_previews;
   const auto write_set_mtoon=[&](const TextureSetView &field,const TextureSetExportField &compiled,
-                                 size_t object,size_t primitive,int material_id){
+                                 size_t object,size_t primitive,int material_id,bool variant=false){
     const auto &binding=field.material_bindings;
     if(!binding||!binding->has_mtoon)return false;
     auto retain_native=[&]{
+      if(variant)return false;
       if(!raw_authority)
         throw std::invalid_argument("This MToon texture set needs an exact portable material adapter. Editable GLB preserves the native material and paint.");
       j["materials"][material_id]["extras"]["domeSculptNativeMaterial"]="MToon in embedded authoring data";
@@ -762,8 +769,8 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
     (void)binding->material.copy_working_bytes(12*1024*1024,cancelled);
     auto typed=binding->material;
     auto original=typed.source_json();
-    if(original.contains("occlusionTexture")||
-       (original.contains("pbrMetallicRoughness")&&original.at("pbrMetallicRoughness").contains("metallicRoughnessTexture")))
+    if(!variant&&(original.contains("occlusionTexture")||
+       (original.contains("pbrMetallicRoughness")&&original.at("pbrMetallicRoughness").contains("metallicRoughnessTexture"))))
       return retain_native();
 
     // Source JSON retains independent metadata. Remap only extensions whose
@@ -836,7 +843,7 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
     PaintSourceTexture paint_sampler;
     paint_sampler.wrap_s=paint_sampler.wrap_t=33071;
     paint_sampler.min_filter=paint_sampler.mag_filter=9729;
-    if(field.painted->has_paint_data()){
+    if(!variant&&field.painted->has_paint_data()){
       TextureSetLimits limits;
       limits.cancelled=cancelled;
       if(float_preview)paint=std::move(float_preview->paint);
@@ -893,6 +900,10 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
       normal.rotation=0;
     }
     auto output=typed.source_json();
+    if(variant){
+      output.erase("occlusionTexture");
+      output["pbrMetallicRoughness"].erase("metallicRoughnessTexture");
+    }
     if(params.alpha!=MToonAlpha::Mask)
       output.erase("alphaCutoff");
     if(hdr&&hdr->strength==1){
@@ -1065,7 +1076,7 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
     }
   };
   for(size_t i=0;i<objects.size();++i){
-    const auto *field=bundles[i]?&bundles[i]->fields.front():nullptr;
+    const auto *field=bundles[i]&&objects[i].texture_set_surface?&bundles[i]->fields.front():nullptr;
     if(field){
       const auto owners=objects[i].texture_set_surface->fields();
       const auto original=std::ranges::find(owners,field->set,&TextureSetView::id);
@@ -1075,6 +1086,18 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
     write_textures(object_at(i),i,result.objects[i].material,
         field&&!bundles[i]->paint_coordinates.empty(),field&&field->normal_role,
         field&&field->emission?&*field->emission:nullptr);
+    if(!field&&bundles[i]&&objects[i].retopo_mtoon_export){
+      auto &materials=j["materials"];
+      const int id=int(materials.size());
+      materials.push_back(nlohmann::json::object());
+      if(write_set_mtoon(objects[i].retopo_mtoon_export->field(),bundles[i]->fields.front(),i,0,id,true)){
+        use_extension("KHR_materials_variants");
+        j["extensions"]["KHR_materials_variants"]["variants"]={{{"name","MToon"}}};
+        const auto &identity=result.objects[i];
+        auto &primitive=j["meshes"][identity.mesh]["primitives"][0];
+        primitive["extensions"]["KHR_materials_variants"]["mappings"]={{{"material",id},{"variants",{0}}}};
+      }else materials.erase(materials.size()-1);
+    }
   }
   for(const auto&extra:extra_materials){
     stop();const auto&field=bundles[extra.object]->fields[extra.field];ObjectSurface material_view;

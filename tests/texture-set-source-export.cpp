@@ -2075,6 +2075,76 @@ void retopology_imported_pbr(bool prior_bake=false) {
  check(Scene::load("raw-editable.glb").encode()==accepted,"Editable GLB restores the complete imported-source project");
 }
 
+struct PortableRetopoImages {
+ Image core_orm, mtoon_base, mtoon_normal;
+};
+
+PortableRetopoImages check_portable_retopo_mtoon(const std::filesystem::path &path,const SculptObject &patch) {
+ cgltf_options options{};cgltf_data *data=nullptr;
+ check(cgltf_parse_file(&options,path.c_str(),&data)==cgltf_result_success,"Independent reader opens the GLB");
+ const std::unique_ptr<cgltf_data,decltype(&cgltf_free)> owner(data,cgltf_free);
+ check(cgltf_load_buffers(&options,data,path.c_str())==cgltf_result_success&&cgltf_validate(data)==cgltf_result_success&&
+       data->meshes_count==1&&data->meshes[0].primitives_count==1,"Independent reader validates one shared primitive");
+ const auto &primitive=data->meshes[0].primitives[0];
+ check(data->variants_count==1&&std::string_view(data->variants[0].name)=="MToon"&&primitive.mappings_count==1&&
+       primitive.mappings[0].variant==0&&primitive.mappings[0].material!=primitive.material,
+       "GLB has a selectable authored MToon variant and an independent Core PBR material");
+ const auto &core=*primitive.material,&toon=*primitive.mappings[0].material;
+ check(core.normal_texture.texture&&toon.normal_texture.texture&&core.normal_texture.texture!=toon.normal_texture.texture&&
+       core.occlusion_texture.texture&&core.pbr_metallic_roughness.metallic_roughness_texture.texture,
+       "The two portable materials keep separate normal images and the Core PBR occlusion and metallic roles");
+ std::ifstream stream(path,std::ios::binary);
+ const std::vector<uint8_t> bytes{std::istreambuf_iterator<char>(stream),{}};
+ const auto json=nlohmann::json::parse(bytes.begin()+20,bytes.begin()+20+word(bytes,12));
+ const auto &typed=json.at("materials").at(&toon-data->materials);
+ const auto &extension=typed.at("extensions").at("VRMC_materials_mtoon");
+ const auto &binding=*patch.material_bindings;
+ check(extension.at("specVersion")=="1.0"&&extension.contains("matcapTexture")&&extension.contains("rimMultiplyTexture")&&
+       extension.contains("shadingShiftTexture")&&
+       typed.at("extensions").at("KHR_materials_emissive_strength").at("emissiveStrength")==binding.material.parameters.emission_strength,
+       "Portable MToon carries the actual typed roles and original emissive strength");
+ check((extension.at("shadeMultiplyTexture").at("index")==typed.at("pbrMetallicRoughness").at("baseColorTexture").at("index"))==
+           (binding.roles[0].image==binding.roles[1].image),"Portable sharing matches the native Base and Shade samplers");
+ const auto tangents=cgltf_find_accessor(&primitive,cgltf_attribute_type_tangent,0);
+ const auto positions=cgltf_find_accessor(&primitive,cgltf_attribute_type_position,0);
+ const auto normals=cgltf_find_accessor(&primitive,cgltf_attribute_type_normal,0);
+ const auto coordinates=cgltf_find_accessor(&primitive,cgltf_attribute_type_texcoord,0);
+ check(tangents&&positions&&normals&&coordinates&&primitive.indices->count==patch.painted->mesh().indices.size(),
+       "Both portable materials have explicit tangents on every emitted corner");
+ const auto read=[](const cgltf_accessor *accessor,size_t vertex){
+  std::array<float,4> out{};
+  if(!cgltf_accessor_read_float(accessor,vertex,out.data(),out.size()))throw std::runtime_error("Cannot read portable accessor");
+  return out;
+ };
+ const auto vector=[](const auto &a){return Vec3{a[0],a[1],a[2]};};
+ for(size_t face=0;face<primitive.indices->count;face+=3){
+  std::array<cgltf_size,3> ids;
+  for(size_t k=0;k<3;++k)ids[k]=cgltf_accessor_read_index(primitive.indices,face+k);
+  const auto a=read(coordinates,ids[0]),b=read(coordinates,ids[1]),c=read(coordinates,ids[2]);
+  const auto x=vector(read(positions,ids[1]))-vector(read(positions,ids[0]));
+  const auto y=vector(read(positions,ids[2]))-vector(read(positions,ids[0]));
+  const auto du=b[0]-a[0],dv=b[1]-a[1],eu=c[0]-a[0],ev=c[1]-a[1];
+  const auto determinant=du*ev-dv*eu;
+  for(auto id:ids){
+   const auto n=normalized(vector(read(normals,id)));
+   const auto raw=(x*ev-y*dv)/determinant;
+   const auto t=normalized(raw-n*dot(n,raw));
+   const auto b=(y*du-x*eu)/determinant;
+   const auto actual=read(tangents,id);
+   check(dot(vector(actual),t)>.99999f&&dot(cross(n,t),b)*actual[3]>0,
+         "Independent accessor tangent and handedness agree with the patch derivatives");
+  }
+ }
+ const auto read_image=[](const cgltf_texture_view &texture){
+  const auto *view=texture.texture&&texture.texture->image?texture.texture->image->buffer_view:nullptr;
+  const auto *png=view?cgltf_buffer_view_data(view):nullptr;
+  if(!png)throw std::runtime_error("Portable material image is not embedded");
+  return decode_projection_png({png,view->size});
+ };
+ return {read_image(core.pbr_metallic_roughness.metallic_roughness_texture),
+         read_image(toon.pbr_metallic_roughness.base_color_texture),read_image(toon.normal_texture)};
+}
+
 void retopology_imported_mtoon(bool tinted,bool unprepared) {
  auto input=imported_retopo_input(true);
  if(!tinted)input.json["meshes"][0]["primitives"][0]["attributes"].erase("COLOR_0");
@@ -2281,9 +2351,45 @@ void retopology_imported_mtoon(bool tinted,bool unprepared) {
  check(Scene::load("raw-patch.dsculpt").encode()==accepted&&doc.undo()&&doc.copy_scene().encode()==original&&
        doc.redo()&&doc.copy_scene().encode()==accepted,"Imported MToon Apply, Save, Undo and Redo preserve the guide and patch");
  ready(doc);
+ doc.export_asset("raw-standard.glb",AssetExportFormat::Glb).get();
  doc.export_asset("raw-editable.glb",AssetExportFormat::EditableGlb256).get();
+ const auto original_images=check_portable_retopo_mtoon("raw-standard.glb",patch);
+ check_portable_retopo_mtoon("raw-editable.glb",patch);
  check(Scene::load("raw-editable.glb").encode()==accepted,"Editable GLB retains both material interpretations and editable ink");
  if(!tinted&&!unprepared){
+  auto painted=result.snapshot();
+  auto &scalar=*painted.active().painted;
+  scalar.add_layer("Core roughness and metallic");
+  const auto p0=target.positions[target.indices[0]];
+  const auto p1=target.positions[target.indices[1]];
+  const auto p2=target.positions[target.indices[2]];
+  Brush scalar_brush;
+  scalar_brush.from=scalar_brush.to=(p0+p1+p2)/3.f;
+  scalar_brush.normal=normalized(cross(p1-p0,p2-p0));
+  scalar_brush.radius=2;
+  PaintSettings settings;
+  settings.front_only=false;
+  settings.roughness=.03f;
+  settings.metallic=.92f;
+  for(const auto channel:{PaintChannel::Roughness,PaintChannel::Metallic}){
+   settings.channel=channel;
+   scalar.begin_stroke();scalar.stamp(scalar_brush,settings);
+   check(scalar.end_stroke(),"Projected patch accepts an editable Core PBR scalar stroke");
+  }
+  Document painted_doc;painted_doc.replace(painted);ready(painted_doc);
+  painted_doc.export_asset("raw-scalar-paint.glb",AssetExportFormat::Glb).get();
+  const auto edited=check_portable_retopo_mtoon("raw-scalar-paint.glb",painted.active());
+  const auto &before=original_images.core_orm,&after=edited.core_orm;
+  check(before.width==after.width&&before.height==after.height,"Core PBR scalar painting preserves export image dimensions");
+  size_t changed_roughness=0,changed_metallic=0;
+  for(size_t i=0;i<before.rgba.size();i+=4){
+   changed_roughness+=before.rgba[i+1]!=after.rgba[i+1];
+   changed_metallic+=before.rgba[i+2]!=after.rgba[i+2];
+  }
+  check(changed_roughness>100&&changed_metallic>100&&edited.mtoon_base.rgba==original_images.mtoon_base.rgba&&
+        edited.mtoon_normal.rgba==original_images.mtoon_normal.rgba,
+        "Independent image decoding finds the Core PBR scalar strokes and unchanged MToon textures");
+
   doc.begin_retopology();draft();
   doc.edit_retopology(RetopoAction::MoveMode);draft();
   const auto start=doc.frame().state->retopology;

@@ -57,6 +57,7 @@ struct SculptObject {
 bool source_is_dormant(const SculptObject &);
 class PaintSamplingAttachment;
 class NormalPreviewProof;
+namespace detail { class RetopoMToonExport; }
 struct NativeSceneAppend;
 struct ObjectSurface {
   uint64_t id = 0;
@@ -86,6 +87,9 @@ struct ObjectSurface {
   // Worker-only multi-material bundle; mesh stays empty to avoid a second
   // full authoring geometry copy. Legacy single-material consumers refuse it.
   std::shared_ptr<const detail::TextureSetSurfacePlan> texture_set_surface{};
+  // Export-only snapshot of the projected typed material before Core PBR
+  // fallback preparation changes the preview material or emission maps.
+  std::shared_ptr<const detail::RetopoMToonExport> retopo_mtoon_export{};
 };
 // Scene copies retain object volumes for command history. Use snapshot() for
 // detached immutable geometry on meshing and file workers.

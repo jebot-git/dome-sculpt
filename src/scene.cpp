@@ -3,6 +3,7 @@
 #include "texture-set-field-codec.hpp"
 #include "texture-set-source-preflight.hpp"
 #include "texture-set-surface.hpp"
+#include "texture-set-export.hpp"
 #include "dome/texture-sets.hpp"
 #include "texture-set-graph.hpp"
 #include "texture-set-archive.hpp"
@@ -1476,6 +1477,7 @@ std::vector<ObjectSurface> Scene::export_surfaces(const std::function<bool()> &c
   for(auto &surface:result){
     if(cancelled&&cancelled())throw std::runtime_error("Source paint export cancelled");
     const auto &o=object(surface.id);
+    surface.retopo_mtoon_export=detail::RetopoMToonExport::capture(o,cancelled);
     if(o.mesh_active&&o.painted->source_sampling_prepared())
       detail::source_paint_export(*o.painted,surface,cancelled);
   }

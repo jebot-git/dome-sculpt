@@ -38,6 +38,17 @@ struct PortableMToonSetPaint {
       alpha_error=0, emission_error=0, source_filter_error=0;
   double normal_error_radians=0;
 };
+class RetopoMToonExport {
+public:
+  const TextureSetView &field() const noexcept { return field_; }
+  static std::shared_ptr<const RetopoMToonExport> capture(const SculptObject &,
+      const std::function<bool()> &);
+  void authenticate(const ObjectSurface &,const TextureSetLimits &) const;
+private:
+  RetopoMToonExport()=default;
+  uint64_t object_=0;
+  TextureSetView field_;
+};
 std::optional<PortableMToonSetPaint> compile_mtoon_set_paint(
     const TextureSetView &,const TextureSetExportField &,const MToonMaterial &,
     const TextureSetLimits &);
@@ -62,4 +73,6 @@ size_t texture_set_export_working_bound(const ObjectSurface &,
     const TextureSetLimits & = {}, bool measured_physical=false, bool editable_materials=false);
 TextureSetExport compile_texture_set_export(const ObjectSurface &,
     const TextureSetLimits & = {}, bool measured_physical=false, bool editable_materials=false);
+std::optional<TextureSetExport> compile_retopo_mtoon_export(const ObjectSurface &,
+    const TextureSetLimits &);
 } // namespace dome::detail

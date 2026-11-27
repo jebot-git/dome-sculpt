@@ -263,6 +263,7 @@ std::vector<ObjectSurface> native_authoring_surfaces(const Scene &scene,
   }
   auto surfaces=sets?detached.preview_surface_bundles(cancelled,{}):detached.preview_surfaces(cancelled);
   for(auto &surface:surfaces){const auto &original=scene.object(surface.id);
+    surface.retopo_mtoon_export=RetopoMToonExport::capture(original,cancelled);
     if(native_physical(original)){
       if(surface.mesh.positions.size()>policy.max_vertices||surface.mesh.indices.size()/3>policy.max_triangles)
         throw std::length_error("Native physical extracted geometry exceeds its budget");
