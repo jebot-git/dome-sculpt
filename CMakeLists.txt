@@ -1549,6 +1549,9 @@ if(BUILD_TESTING AND TARGET dome-sculpt-render)
   set_tests_properties(mtoon-render PROPERTIES ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1")
   add_test(NAME mtoon-texture-sets COMMAND dome-sculpt-mtoon-render-test --texture-sets)
   set_tests_properties(mtoon-texture-sets PROPERTIES ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2" TIMEOUT 90)
+  add_test(NAME mtoon-painted-texture-sets COMMAND dome-sculpt-mtoon-render-test
+    --painted-texture-sets ${CMAKE_CURRENT_BINARY_DIR}/mtoon-painted-texture-sets)
+  set_tests_properties(mtoon-painted-texture-sets PROPERTIES ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2" TIMEOUT 90)
 endif()
 
 if(BUILD_TESTING)

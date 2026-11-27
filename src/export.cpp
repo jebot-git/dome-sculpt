@@ -709,7 +709,10 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
     j["textures"].push_back({{"source",source},{"sampler",sampler}});
     texture_ids[key2]=index; return index;
   };
-  const auto write_set_mtoon=[&](const TextureSetView &field,size_t object,int material_id){
+  // Keep generated texture owners alive for the image-identity table.
+  std::vector<std::shared_ptr<const Image>> mtoon_paint_images;
+  const auto write_set_mtoon=[&](const TextureSetView &field,const TextureSetExportField &compiled,
+                                 size_t object,int material_id){
     const auto &binding=field.material_bindings;
     if(!binding||!binding->has_mtoon)return false;
     auto retain_native=[&]{
@@ -718,7 +721,7 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
       j["materials"][material_id]["extras"]["domeSculptNativeMaterial"]="MToon in embedded authoring data";
       return false;
     };
-    if(field.source||field.painted->has_paint_data()||binding->material.version()!=MToonVersion::V1||
+    if(field.source||binding->material.version()!=MToonVersion::V1||
        binding->physical_emission)
       return retain_native();
 
@@ -742,6 +745,7 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
       for(const auto &[name,child]:value.items()){
         if(name=="extras")continue;
         if(name=="extensions"){
+          if(!child.is_object())return false;
           for(const auto &[extension,body]:child.items()){
             (void)body;
             if(extension!="VRMC_materials_mtoon"&&extension!="KHR_texture_transform"&&
@@ -788,15 +792,54 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
       if(binding->roles[role].image&&role!=size_t(MToonSlot::Matcap)&&typed.textures[role].texcoord)
         return retain_native();
     }
-    for(size_t role=0;role<binding->roles.size();++role){
+    auto roles=binding->roles;
+    std::optional<PortableMToonSetPaint> paint;
+    PaintSourceTexture paint_sampler;
+    paint_sampler.wrap_s=paint_sampler.wrap_t=33071;
+    paint_sampler.min_filter=paint_sampler.mag_filter=9729;
+    if(field.painted->has_paint_data()){
+      TextureSetLimits limits;
+      limits.cancelled=cancelled;
+      paint=compile_mtoon_set_paint(field,compiled,typed,limits);
+      if(!paint)return retain_native();
+      const auto replace_role=[&](MToonSlot slot,const std::shared_ptr<const Image> &image){
+        auto &role=roles[size_t(slot)];
+        role=paint_sampler;
+        role.image=image;
+        typed.textures[size_t(slot)]=MToonTexture{.index=0,.encoding=MToonEncoding::Srgb};
+        mtoon_paint_images.push_back(image);
+      };
+      if(paint->color){
+        replace_role(MToonSlot::Base,paint->color);
+        params.base_color={1,1,1,1};
+      }
+      if(paint->emission){
+        replace_role(MToonSlot::Emission,paint->emission);
+        params.emission={1,1,1};
+      }
+    }
+    for(size_t role=0;role<roles.size();++role){
       stop();
-      const auto &view=binding->roles[role];
+      const auto &view=roles[role];
       if(view.image)typed.textures[role].index=texture(*view.image,view);
     }
     auto output=typed.source_json();
     output["name"]=field.name;
     output["pbrMetallicRoughness"]["metallicFactor"]=current.metallic;
     output["pbrMetallicRoughness"]["roughnessFactor"]=current.roughness;
+    if(paint){
+      auto &pbr=output["pbrMetallicRoughness"];
+      const auto orm=texture(compiled.textures->metal_rough,paint_sampler);
+      pbr["metallicFactor"]=pbr["roughnessFactor"]=1;
+      pbr["metallicRoughnessTexture"]={{"index",orm}};
+      output["occlusionTexture"]={{"index",orm}};
+      output["extras"]["domeSculptMToonPaint"]={
+          {"version",1},{"sampling","clamp-linear-level-zero"},
+          {"maximumLinearColorError",paint->color_error},
+          {"maximumAlphaError",paint->alpha_error},
+          {"maximumLinearEmissionError",paint->emission_error},
+          {"emissiveStrength",params.emission_strength}};
+    }
     if(!collect_extensions(collect_extensions,output))
       throw std::logic_error("MToon material writing introduced an unknown extension");
     for(const auto &extension:extensions)use_extension(extension.c_str());
@@ -931,7 +974,7 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
       const auto owners=objects[i].texture_set_surface->fields();
       const auto original=std::ranges::find(owners,field->set,&TextureSetView::id);
       if(original==owners.end())throw std::logic_error("Exported material set lost its owning field");
-      if(write_set_mtoon(*original,i,result.objects[i].material))continue;
+      if(write_set_mtoon(*original,*field,i,result.objects[i].material))continue;
     }
     write_textures(object_at(i),i,result.objects[i].material,
         field&&!bundles[i]->paint_coordinates.empty(),field&&field->normal_role,
@@ -942,7 +985,7 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
     const auto owners=objects[extra.object].texture_set_surface->fields();
     const auto original=std::ranges::find(owners,field.set,&TextureSetView::id);
     if(original==owners.end())throw std::logic_error("Exported material set lost its owning field");
-    if(write_set_mtoon(*original,extra.object,extra.material))continue;
+    if(write_set_mtoon(*original,field,extra.object,extra.material))continue;
     material_view.material=field.material;material_view.textures=field.textures;
     write_textures(material_view,extra.object,extra.material,!bundles[extra.object]->paint_coordinates.empty(),field.normal_role,field.emission?&*field.emission:nullptr);
   }

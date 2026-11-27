@@ -4,6 +4,7 @@
 #include "emission-fallback-metrics.hpp"
 #include <optional>
 #include "dome/tangents.hpp"
+namespace dome { class MToonMaterial; }
 namespace dome::detail {
 struct TextureSetExportEmission {
   Image image;
@@ -23,6 +24,14 @@ struct TextureSetExportField {
   bool normal_role=false;
   std::optional<TextureSetExportEmission> emission;
 };
+struct PortableMToonSetPaint {
+  std::shared_ptr<const Image> color, emission;
+  // Max component errors for clamp-to-edge bilinear reads in linear units.
+  double color_error=0, alpha_error=0, emission_error=0;
+};
+std::optional<PortableMToonSetPaint> compile_mtoon_set_paint(
+    const TextureSetView &,const TextureSetExportField &,const MToonMaterial &,
+    const TextureSetLimits &);
 // One REST geometry and deformation expansion for the entire mesh instance.
 // Material ranges refer into one index stream; no per-material mesh/rig copies.
 struct TextureSetExport {

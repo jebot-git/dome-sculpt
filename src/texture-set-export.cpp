@@ -9,6 +9,8 @@
 #include "emission-export.hpp"
 #include "paint-emission-sample.hpp"
 #include "texture-set-native-grid.hpp"
+#include "dome/material-bindings.hpp"
+#include "dome/material-visibility.hpp"
 #include "dome/paint-sampling.hpp"
 #include <bit>
 #include <map>
@@ -463,6 +465,14 @@ ExportBound export_bound(const ObjectSurface&input,const TextureSetLimits&limits
   const auto resolution=field.painted->resolution();
   const bool hdr=texture_set_physical_emission(field);
   const bool sparse_retained=retained_material_grid(field);
+  if(field.material_bindings&&field.material_bindings->has_mtoon&&field.painted->has_paint_data()){
+   const size_t pixels=size_t(resolution)*resolution;
+   charge(bytes,pixels,8,limits.maximum_bytes);
+   charge(work,pixels,12,limits.maximum_work);
+   for(auto role:{MToonSlot::Base,MToonSlot::Emission})
+    if(const auto &image=field.material_bindings->roles[size_t(role)].image)
+     charge(work,size_t(image->width)*image->height,1,limits.maximum_work);
+  }
   if(hdr&&(!measured_physical||field.material.toon||field.appearance||
       (field.material_bindings&&field.material_bindings->has_mtoon)))
    throw std::invalid_argument("Texture-set HDR emission needs its per-material precision-qualified export compiler");
@@ -509,6 +519,127 @@ ExportBound export_bound(const ObjectSurface&input,const TextureSetLimits&limits
  stop(limits);return {bytes,work};
 }
 } // namespace
+
+std::optional<PortableMToonSetPaint> compile_mtoon_set_paint(
+    const TextureSetView &field,const TextureSetExportField &compiled,
+    const MToonMaterial &effective,const TextureSetLimits &limits){
+ const auto &maps=compiled.textures;
+ if(!maps||compiled.set!=field.id||field.source||field.appearance||field.painted->baked()||
+    field.painted->source_maps()||maps->overlay||maps->source_maps||!maps->normal.rgba.empty()||
+    texture_set_physical_emission(field))
+  return {};
+ const auto &binding=*field.material_bindings;
+ const auto &params=effective.parameters;
+ const auto covered=[&](const Image &image){
+  for(size_t at=0;at<image.rgba.size();at+=4){
+   if((at&16383)==0)stop(limits);
+   if(image.rgba[at])return true;
+  }
+  return false;
+ };
+ const bool color=covered(maps->color_coverage),emission=covered(maps->emission_coverage);
+ if((color||emission)&&(params.scroll!=std::array<float,2>{}||params.rotation_speed!=0))
+  return {};
+ const auto &base=binding.roles[size_t(MToonSlot::Base)];
+ const auto &shade=binding.roles[size_t(MToonSlot::Shade)];
+ const auto &base_slot=effective.textures[size_t(MToonSlot::Base)];
+ const auto &shade_slot=effective.textures[size_t(MToonSlot::Shade)];
+ // A shade alias also receives paint in the viewport. It needs a separate
+ // reconstruction of that nonlinear contribution before it can be emitted.
+ if(color&&base.image&&base.image==shade.image&&base.wrap_s==shade.wrap_s&&
+    base.wrap_t==shade.wrap_t&&base.min_filter==shade.min_filter&&
+    base.mag_filter==shade.mag_filter&&mtoon_coordinate(base_slot)==mtoon_coordinate(shade_slot)&&
+    base_slot.offset==shade_slot.offset&&base_slot.scale==shade_slot.scale&&
+    base_slot.rotation==shade_slot.rotation)
+  return {};
+ const auto uniform=[&](MToonSlot role)->std::optional<std::array<float,4>>{
+  const auto &image=binding.roles[size_t(role)].image;
+  if(!image)return mtoon_default_texel(role);
+  image->validate();
+  for(size_t at=4;at<image->rgba.size();at+=4){
+   if((at&16383)==0)stop(limits);
+   if(!std::equal(image->rgba.begin(),image->rgba.begin()+4,image->rgba.begin()+at))return {};
+  }
+  std::array<float,4> value{};
+  for(size_t k=0;k<4;++k){
+   const float unit=image->rgba[k]/255.f;
+   value[k]=k<3?mtoon_srgb_to_linear(unit):unit;
+  }
+  return value;
+ };
+
+ PortableMToonSetPaint out;
+ const auto compose=[&](const Image &resolved,const Image &coverage,
+     std::array<float,4> background,const std::array<float,4> &native,
+     bool use_alpha,double &rgb_error)->std::shared_ptr<const Image>{
+  const auto resolution=field.painted->resolution();
+  if(resolved.width!=resolution||resolved.height!=resolution||
+     coverage.width!=resolution||coverage.height!=resolution)
+   throw std::logic_error("MToon material lost the current paint grid");
+  resolved.validate();coverage.validate();
+  const bool visible_alpha=use_alpha&&params.alpha!=MToonAlpha::Opaque;
+  // Alpha changes away from zero coverage must retain the original byte
+  // curve exactly on a mask or a transparent surface.
+  if(visible_alpha&&background[3]!=native[3])return {};
+  const auto pass_alpha=[&](double alpha){
+   return params.alpha==MToonAlpha::Mask?alpha>=params.alpha_cutoff:alpha>0;
+  };
+  auto result=std::make_shared<Image>(resolved);
+  static const auto linear=[]{
+   std::array<double,256> values{};
+   for(size_t i=0;i<values.size();++i)values[i]=mtoon_srgb_to_linear(float(i)/255.f);
+   return values;
+  }();
+  for(size_t at=0;at<resolved.rgba.size();at+=4){
+   if((at&16383)==0)stop(limits);
+   const double cover=coverage.rgba[at]/255.;
+   for(size_t k=0;k<(use_alpha?4u:3u);++k){
+    const auto before=resolved.rgba[at+k];
+    const double decoded=k<3?linear[before]:before/255.;
+    // With a constant authored role, this unbounded correction is affine
+    // in the two filtered images. Its bilinear error is bounded at the taps.
+    const double corrected=decoded+(double(background[k])-native[k])*(1-cover);
+    const double clamped=std::clamp(corrected,0.,1.);
+    const auto quantized=uint8_t(std::lround((k<3?mtoon_linear_to_srgb(float(clamped)):clamped)*255.));
+    const double restored=k<3?linear[quantized]:quantized/255.;
+    if(visible_alpha&&k==3&&(quantized!=before||
+       (cover==0&&pass_alpha(restored)!=pass_alpha(background[k]))))return {};
+    double &error=k<3?rgb_error:out.alpha_error;
+    error=std::max(error,std::abs(restored-corrected));
+    // Zero filtered coverage uses an alternate uniform branch. Every tap
+    // with nonzero filter weight then has zero coverage as well.
+    if(cover==0)error=std::max(error,std::abs(restored-background[k]));
+    result->rgba[at+k]=quantized;
+   }
+  }
+  return result;
+ };
+ if(color){
+  auto original=uniform(MToonSlot::Base);
+  if(!original)return {};
+  for(size_t k=0;k<4;++k)(*original)[k]*=params.base_color[k];
+  out.color=compose(maps->color,maps->color_coverage,*original,field.material.color,true,out.color_error);
+  if(!out.color)return {};
+ }
+ if(emission){
+  auto original=uniform(MToonSlot::Emission);
+  if(!original)return {};
+  const std::array factor{params.emission.x,params.emission.y,params.emission.z};
+  for(size_t k=0;k<3;++k)(*original)[k]*=factor[k];
+  const auto &native=field.material.emissive;
+  out.emission=compose(maps->emission,maps->emission_coverage,*original,
+                       {native[0],native[1],native[2],1},false,out.emission_error);
+  if(!out.emission)return {};
+ }
+ // A typical nearest sRGB byte step has at most .0045 linear error.
+ // Include arithmetic tolerance in the recorded bound, before acceptance.
+ constexpr double sampling_slack=1e-6;
+ if(out.color){out.color_error+=sampling_slack;out.alpha_error+=sampling_slack;}
+ if(out.emission)out.emission_error+=sampling_slack;
+ if(out.color_error>.005||out.emission_error>.005||out.alpha_error>1./255.)
+  return {};
+ return out;
+}
 
 bool texture_set_physical_emission(const TextureSetView &field) {
  return hdr_emission(field.material.emissive)||(field.painted&&field.painted->has_physical_emission())||

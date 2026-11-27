@@ -2,6 +2,7 @@
 #include "dome/document.hpp"
 #include "dome/native-authoring.hpp"
 #include "dome/material-bindings.hpp"
+#include "mtoon-painted-set-fixture.hpp"
 #include "dome/emission-native.hpp"
 #include "emission-export.hpp"
 #include "emission-exr-owned.hpp"
@@ -156,6 +157,42 @@ void mtoon_authoring(){
  const auto replay=extract_native_authoring(bytes("mtoon-painted-editable.glb"));
  check(replay&&replay->encode()==with_paint,
        "Editable GLB preserves the unresolved MToon paint and source material together");
+}
+void mtoon_painted_authoring(){
+ auto scene=fixture();
+ mtoon_paint_fixture::author(scene,1,{0,-.08f,.5f});
+ const auto exact=scene.encode();
+ Document doc;
+ doc.replace(scene);
+ check(doc.wait_mesh()&&doc.frame().state->error.empty(),"Native MToon with two authored paint layers publishes");
+ doc.export_asset("painted-mtoon-standard.glb",AssetExportFormat::Glb).get();
+ doc.export_asset("painted-mtoon-editable.glb",AssetExportFormat::EditableGlb256).get();
+ consumer("painted-mtoon-standard.glb",2);
+ consumer("painted-mtoon-editable.glb",2);
+ const auto standard=bytes("painted-mtoon-standard.glb");
+ const auto replay=extract_native_authoring(bytes("painted-mtoon-editable.glb"));
+ check(replay&&replay->encode()==exact&&doc.copy_scene().encode()==exact,
+       "Painted MToon export preserves every native layer, source material and rig");
+ const auto portable=detail::make_gltf(scene.export_surfaces());
+ const auto &toon=portable.json.at("materials").at(1);
+ const auto &bounds=toon.at("extras").at("domeSculptMToonPaint");
+ const auto decoded=MToonMaterial::from_vrm1(toon,portable.json.at("textures").size());
+ check(bounds.at("maximumLinearColorError").get<double>()<=.005&&
+       bounds.at("maximumLinearEmissionError").get<double>()<=.005&&
+       bounds.at("maximumAlphaError").get<double>()<=1./255.,
+       "Portable MToon records bounded reconstruction of each paint channel");
+ check(decoded.parameters.alpha==MToonAlpha::Mask&&decoded.parameters.alpha_cutoff==.45f&&
+       decoded.textures[size_t(MToonSlot::Base)].index>=0&&
+       decoded.textures[size_t(MToonSlot::Emission)].index>=0&&
+       decoded.textures[size_t(MToonSlot::Shade)].index>=0,
+       "Standard GLB retains its mask, two generated textures and original shade role");
+ auto unsafe=fixture();
+ mtoon_paint_fixture::author(unsafe,1,{0,-.08f,.5f},true);
+ doc.replace(std::move(unsafe));
+ check(doc.wait_mesh(),"The alpha-boundary control reaches the actual document");
+ refuses([&]{doc.export_asset("painted-mtoon-standard.glb",AssetExportFormat::Glb).get();},
+         "An unsupported quantized cutoff crossing fails before publishing");
+ check(bytes("painted-mtoon-standard.glb")==standard,"The cutoff refusal preserves the complete earlier GLB");
 }
 void editable_hdr(){
  auto scene=fixture();
@@ -463,4 +500,4 @@ void production_baked_hdr(){
  }
 }
 }
-int main(int argc,char**argv)try{if(argc>1){std::filesystem::create_directories(argv[1]);std::filesystem::current_path(argv[1]);}portable();authoring();mtoon_authoring();editable_hdr();authority();production_hdr();production_baked_hdr();std::cout<<"PASS "<<checks<<" texture-set multi-primitive export controls\n";return 0;}catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
+int main(int argc,char**argv)try{if(argc>1){std::filesystem::create_directories(argv[1]);std::filesystem::current_path(argv[1]);}portable();authoring();mtoon_authoring();mtoon_painted_authoring();editable_hdr();authority();production_hdr();production_baked_hdr();std::cout<<"PASS "<<checks<<" texture-set multi-primitive export controls\n";return 0;}catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

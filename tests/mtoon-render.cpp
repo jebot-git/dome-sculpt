@@ -6,7 +6,11 @@
 #include "dome/material-visibility.hpp"
 #include "dome/material-bindings.hpp"
 #include "dome/texture-sets.hpp"
+#include "dome/import-image.hpp"
+#include "../src/gltf-document.hpp"
+#include "mtoon-painted-set-fixture.hpp"
 #include "graphics.h"
+#include <fstream>
 #include <iostream>
 using namespace dome;
 namespace {
@@ -37,20 +41,23 @@ std::array<int,4> expected(const MToonMaterial&m,const MToonSamples&s,Vec3 norma
  MToonLighting q;q.normal=normal;q.view={0,0,1};q.light_direction=normalized(Vec3{-.4f,.8f,.7f});q.light_color={1,1,1};q.gi_up={.25f,.25f,.25f};q.gi_down={.1f,.1f,.1f};q.gi=q.gi_down*(.5f-.5f*normal.y)+q.gi_up*(.5f+.5f*normal.y);q.normal_oriented=true;auto c=mtoon_shade(m,s,q);std::array<int,4> p{};for(int k=0;k<3;++k)p[k]=int(std::lround(std::clamp(mtoon_linear_to_srgb(c.color[k]),0.f,1.f)*255));p[3]=int(std::lround(c.color[3]*255));return p;
 }
 bool close(std::array<int,4>a,std::array<int,4>b,int tolerance=2){for(int k=0;k<4;++k)if(std::abs(a[k]-b[k])>tolerance)return false;return true;}
-void native_texture_sets(SurfaceRenderer &renderer){
+Mesh set_triangles(){
  Mesh mesh;
  mesh.positions={{-.85f,-.65f,0},{-.10f,-.65f,0},{-.475f,.65f,0},
                  {.10f,-.65f,0},{.85f,-.65f,0},{.475f,.65f,0}};
  mesh.normals.assign(6,{0,0,1});
  mesh.uv={{{0,0}},{{1,0}},{{.5f,1}},{{0,0}},{{1,0}},{{.5f,1}}};
  mesh.indices={0,1,2,3,4,5};
+ return mesh;
+}
+void native_texture_sets(SurfaceRenderer &renderer){
  Scene scene;
  std::array<TextureSetInitialField,2> fields;
  for(auto &field:fields){field.resolution=64;field.material=white();}
  fields[0].material.color={0,0,1,1};
  fields[1].material.color={1,0,0,1};
  const auto object=scene.active().id;
- initialize_texture_sets(scene,object,mesh,fields,std::array<TextureSetId,2>{0,1});
+ initialize_texture_sets(scene,object,set_triangles(),fields,std::array<TextureSetId,2>{0,1});
  SourceMaterialBindings binding;
  binding.material=MToonMaterial::from_vrm1({
      {"alphaMode","MASK"},{"emissiveFactor",{0,1,0}},
@@ -80,10 +87,97 @@ void native_texture_sets(SurfaceRenderer &renderer){
        "Core PBR preview switches only the typed range's visible result");
  check(doc.copy_scene().encode()==scene.encode(),"Preview selection preserves exact authored MToon data");
 }
+void painted_texture_sets(SurfaceRenderer &renderer,const std::filesystem::path &output,bool uniform_roles){
+ std::filesystem::create_directories(output);
+ Scene scene;
+ std::array<TextureSetInitialField,2> fields;
+ for(auto &field:fields){field.resolution=64;field.material=white();}
+ fields[0].material.color={0,0,1,1};
+ initialize_texture_sets(scene,scene.active().id,set_triangles(),fields,
+                         std::array<TextureSetId,2>{0,1});
+ mtoon_paint_fixture::author(scene,1,{.44f,-.19f,0},false,uniform_roles);
+ Document document;
+ document.replace(scene);
+ check(document.wait_mesh()&&document.frame().state->error.empty(),
+       "The painted material and adjacent PBR mesh render through the native document");
+ const auto frame=document.frame().surface;
+ const auto native=draw(renderer,frame);
+
+ const auto path=output/(uniform_roles?"rendered-uniform-painted-mtoon.glb":"rendered-painted-mtoon.glb");
+ export_glb(scene.export_surfaces(),path);
+ std::ifstream file(path,std::ios::binary);
+ const std::vector<uint8_t> bytes(std::istreambuf_iterator<char>{file},{});
+ check(bytes.size()>20,"Standard GLB is available as a standalone file");
+ const auto length=uint32_t(bytes[12])|(uint32_t(bytes[13])<<8)|
+                   (uint32_t(bytes[14])<<16)|(uint32_t(bytes[15])<<24);
+ check(length<bytes.size()-20,"The emitted GLB has a bounded material JSON chunk");
+ const auto json=nlohmann::json::parse(bytes.begin()+20,bytes.begin()+20+length);
+ const auto &primitive=json.at("meshes").at(0).at("primitives").at(1);
+ const auto &material=json.at("materials").at(primitive.at("material").get<size_t>());
+ auto decoded=import_glb(bytes,{},ImportMode::PreserveGltf);
+ const auto target=std::find_if(decoded.primitives.begin(),decoded.primitives.end(),
+      [](const auto &surface){return surface.source_primitive==1;});
+ check(target!=decoded.primitives.end()&&target->mesh.indices.size()==3,
+       "A fresh consumer recovers the actual second primitive and its UVs");
+ SourceMaterialBindings binding;
+ binding.material=MToonMaterial::from_vrm1(material,decoded.textures.size());
+ for(size_t role=0;role<binding.roles.size();++role){
+  const auto index=binding.material.textures[role].index;
+  if(index<0)continue;
+  const auto &slot=decoded.textures.at(size_t(index));
+  auto &view=binding.roles[role];
+  view.image=std::make_shared<const Image>(decode_import_image(decoded.images.at(size_t(slot.image))));
+  view.wrap_s=slot.wrap_s;view.wrap_t=slot.wrap_t;
+  view.min_filter=slot.min_filter;view.mag_filter=slot.mag_filter;
+ }
+ check(binding.roles[size_t(MToonSlot::Base)].image->width==64&&
+       binding.roles[size_t(MToonSlot::Emission)].image->width==64&&
+       binding.roles[size_t(MToonSlot::Shade)].image->width==2,
+       "The independent file read yields generated base and glow images and the original shade image");
+ check(binding.material.textures[size_t(MToonSlot::Base)].offset==std::array<float,2>{},
+       "A generated paint grid uses its current UVs and clamp sampler without the old transform");
+ auto portable=std::make_shared<MeshSnapshot>();
+ portable->mesh=target->mesh;
+ Material fallback;
+ fallback.color=binding.native_reference.color;
+ fallback.alpha=Material::AlphaMode(binding.native_reference.alpha);
+ portable->ranges.push_back({100,0,portable->mesh.indices.size(),fallback,{},{},0});
+ portable->ranges.back().material_bindings=std::make_shared<const SourceMaterialBindings>(std::move(binding));
+ const auto pixels=draw(renderer,portable);
+ int error=0;
+ size_t visible=0,masked=0,alpha_differences=0;
+ for(int y=0;y<Fbo::size;++y)for(int x=Fbo::size/2;x<Fbo::size;++x){
+  const auto expect=at(native,x,y),actual=at(pixels,x,y);
+  alpha_differences+=expect[3]!=actual[3];
+  visible+=expect[3]!=0;
+  if(x>66&&x<72&&y>31&&y<40)masked+=expect[3]==0;
+  for(size_t c=0;c<3;++c)error=std::max(error,std::abs(expect[c]-actual[c]));
+ }
+ std::cout<<"PAINTED_MTOON uniform_roles="<<uniform_roles<<" visible="<<visible<<" hole_probes="<<masked
+          <<" max_rgb="<<error<<" alpha_differences="<<alpha_differences<<'\n';
+ check(visible>700&&masked>10,"The fixture visibly exercises unpainted surface and a painted cutout");
+ check(!alpha_differences&&error<=3,"OpenGL output from the parsed GLB agrees at painted, filtered and masked pixels");
+ MaterialSurfaceQuery imported(portable->mesh,portable->ranges);
+ size_t rays=0;
+ for(float y:{-.5f,-.35f,-.2f,.05f,.22f})for(float x:{.26f,.34f,.42f,.5f,.58f,.66f,.74f}){
+  const Vec3 origin{x,y,2};
+  check(bool(imported.raycast(origin,{0,0,-1}))==bool(frame->picking->raycast(origin,{0,0,-1})),
+        "Parsed Standard GLB agrees with native material visibility at the paint boundary");
+  ++rays;
+ }
+ std::cout<<"PAINTED_MTOON rays="<<rays<<'\n';
+}
 }
 int main(int argc,char**argv)try{
  NativeGraphics graphics;std::string device=reinterpret_cast<const char*>(glGetString(GL_RENDERER));std::cout<<"GPU "<<device<<'\n';check(argc<2||std::string(argv[1])!="--hardware"||(device.find("llvmpipe")==std::string::npos&&device.find("softpipe")==std::string::npos),"Production renderer runs on requested hardware");
  if(argc>=2&&std::string(argv[1])=="--texture-sets"){Fbo test;SurfaceRenderer renderer;native_texture_sets(renderer);std::cout<<"PASS "<<checks<<" native MToon texture-set graphics checks\n";return 0;}
+ if(argc==3&&std::string(argv[1])=="--painted-texture-sets"){
+  Fbo test;SurfaceRenderer renderer;
+  painted_texture_sets(renderer,argv[2],false);
+  painted_texture_sets(renderer,argv[2],true);
+  std::cout<<"PASS "<<checks<<" painted MToon texture-set graphics checks\n";
+  return 0;
+ }
  Fbo f;SurfaceRenderer renderer;renderer.set_frame_time(0);glBindFramebuffer(GL_FRAMEBUFFER,0);renderer.draw(std::make_shared<MeshSnapshot>(),{},identity,{0,0,2},1,1,false);std::array<uint8_t,4> desktop{};glReadPixels(0,0,1,1,GL_RGBA,GL_UNSIGNED_BYTE,desktop.data());check(desktop[0]==48&&desktop[1]==48&&desktop[2]==48,"Default desktop framebuffer attachment encoding and depth queries resolve correctly");f.bind();
  auto blended=white();blended.color={.25f,.5f,1,.5f};blended.alpha=Material::AlphaMode::Blend;
  auto result=at(draw(renderer,snapshot(blended)));check(close(result,{99,137,188,128}),"Transparent source RGB blends in linear floating point before sRGB transfer; alpha stays linear");
