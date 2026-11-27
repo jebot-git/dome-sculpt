@@ -3183,7 +3183,8 @@ void detail::TextureSetPaintAccess::reproject_retopology(const PaintedMesh &from
       writable.back().common.resize(tile_slots);
     }
   }
-  if (writable.empty() && !bake) return;
+  const bool validate_assignment = transfer.first_patch() && old_domain;
+  if (writable.empty() && !bake && !validate_assignment) return;
 
   std::optional<BakedTextures> baked;
   std::vector<BakedEmissionSample> float_bake;
@@ -3234,6 +3235,7 @@ void detail::TextureSetPaintAccess::reproject_retopology(const PaintedMesh &from
                                          {w[0],w[1],1-w[0]-w[1]},old_domain.get());
     if (!hit) continue;
     ++hits;
+    if (writable.empty() && !bake) continue;
     std::array<float, 2> uv{};
     for (size_t corner = 0; corner < 3; ++corner) {
       const auto index = size_t(hit->triangle) * 3 + corner;

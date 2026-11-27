@@ -1408,6 +1408,181 @@ SourceMaterialBindings retopo_toon_binding(const TextureSetView &slot,bool trim,
   return binding;
 }
 
+void first_material_patch(bool affine, const std::filesystem::path &out) {
+  Mesh mesh;
+  mesh.positions={{-.5f,-.5f,0},{0,-.5f,0},{.5f,-.5f,0},
+                  {-.5f,.5f,0},{0,.5f,0},{.5f,.5f,0}};
+  mesh.normals.assign(6,{0,0,1});
+  mesh.uv={{0,0},{.5f,0},{1,0},{0,1},{.5f,1},{1,1}};
+  mesh.indices={0,1,4,0,4,3,1,2,5,1,5,4};
+  Material left,right;
+  left.name="Painted red surface";
+  left.color={.85f,.15f,.07f,1};
+  right.name="Painted blue surface";
+  right.color={.1f,.25f,.9f,1};
+  Scene scene;
+  scene.active().visible=false;
+  const auto guide=scene.add("Two source materials",Volume{});
+  initialize_texture_sets(scene,guide,mesh,
+      std::array{TextureSetInitialField{left,64},TextureSetInitialField{right,128}},
+      std::array<TextureSetId,4>{0,0,1,1});
+  scene.select(guide);
+  if (affine)
+    scene.active().affine_edit=std::make_shared<const NativeAffineEdit>(AffineTransform(
+        std::array<double,16>{-1.1,.12,0,0,.23,.89,0,0,0,0,1,0,.08,-.04,.06,1}));
+  const auto world=scene.world_matrix(guide);
+  auto unpainted=scene.snapshot();
+
+  // A separate Bake donor leaves a real recipe and coverage on the primary set.
+  const auto bake_source=scene.add("Original Bake donor",Volume{});
+  auto &donor=scene.object(bake_source);
+  donor.mesh_active=true;
+  donor.painted=std::make_shared<PaintedMesh>(mesh,64);
+  donor.material.color={.6f,.25f,.08f,1};
+  auto donor_placement=world.matrix();
+  donor_placement[14]+=.008;
+  donor.affine_edit=std::make_shared<const NativeAffineEdit>(AffineTransform(donor_placement));
+  donor.visible=false;
+  scene.select(guide);
+  ObjectBakeSettings bake;
+  bake.ao_samples=0;
+  bake.allow_backfaces=true;
+  bake.front_mm=bake.back_mm=30;
+  bake_object(scene,bake_source,bake);
+
+  if (affine)
+    check(bind_texture_set_mtoon(scene,guide,1,retopo_toon_binding(texture_set_view(scene.active(),1),true,false)),
+          "The reflected guide carries an actual static MToon field with typed images");
+  for (const auto set:{0u,1u}) {
+    check(edit_texture_set(scene,guide,set,[&](PaintedMesh &paint,Material &) {
+      paint.add_layer(set ? "Blue ink" : "Red ink");
+      PaintSettings ink;
+      ink.front_only=false;
+      ink.color=set?right.color:left.color;
+      Brush brush;
+      brush.from=brush.to={set?.25f:-.25f,0,0};
+      brush.normal={0,0,1};
+      brush.radius=.21f;
+      brush.strength=1;
+      paint.begin_stroke();
+      paint.stamp(brush,ink);
+      if (!paint.end_stroke()) return false;
+      if (!set) paint.layer_properties("Red ink",false,.65f);
+      return true;
+    }),"Original material slot has its own editable coat before retopology");
+  }
+  check(select_texture_set(scene,guide,1),"Secondary material is active before first Apply");
+  const auto exact=scene.encode();
+  scene.save(out/"first-material-source.dsculpt");
+
+  // A continuous triangle crossing the material boundary is ambiguous even
+  // when its midpoint picks a unique material. Neither side may be smeared.
+  RetopoMesh crossing;
+  std::array<TopologyID,3> points;
+  const std::array<Vec3,3> samples{{{-.4f,-.3f,0},{.3f,-.3f,0},{-.25f,.3f,0}}};
+  for (size_t i=0;i<points.size();++i) points[i]=crossing.add_vertex({point(world,samples[i])});
+  if (affine) std::swap(points[1],points[2]);
+  crossing.add_face(points);
+  const auto check_crossing=[&](Scene &input) {
+    const auto before=input.encode();
+    bool refused=false;
+    try { publish_retopology(input,crossing,guide,{}); }
+    catch (const std::invalid_argument &error) {
+      refused=std::string_view(error.what()).find("source material boundary")!=std::string_view::npos;
+    }
+    check(refused && input.encode()==before,"Crossing a material boundary refuses before changing the original scene");
+  };
+  check_crossing(unpainted);
+  check_crossing(scene);
+
+  Document doc;
+  doc.replace(scene);
+  settled(doc);
+  doc.begin_retopology();
+  drafted(doc);
+  const auto make_face=[&](std::array<Vec3,4> corners) {
+    for (auto corner:corners) touch(doc,point(world,corner));
+    doc.edit_retopology(RetopoAction::Face);
+    drafted(doc);
+  };
+  make_face({{{-.37f,-.32f,0},{0,-.32f,0},{0,.32f,0},{-.37f,.32f,0}}});
+  make_face({{{0,-.32f,0},{.37f,-.32f,0},{.37f,.32f,0},{0,.32f,0}}});
+  const auto draft=doc.frame().state->retopology;
+  check(draft->topology->faces().size()==2 && draft->topology->vertices().size()==6,
+        "The native worker creates two adjoining faces with an explicit shared material border");
+  doc.end_retopology(true);
+  const auto project=out/"first-material-patch.dsculpt";
+  doc.save_async(project).get();
+  settled(doc);
+  const auto after=doc.copy_scene();
+  const auto &patch=after.active();
+  check(patch.id!=guide && patch.retopology->source==guide && !after.object(guide).visible &&
+        after.object(guide).texture_sets==scene.active().texture_sets && patch.texture_sets->active()==1,
+        "First Apply retains the hidden guide and the active material on the new patch");
+
+  const auto original_from_patch=world.inverse()*after.world_matrix(patch.id);
+  for (const auto set:{0u,1u}) {
+    const auto before=texture_set_view(scene.active(),set);
+    const auto field=texture_set_view(patch,set);
+    const auto &layer=field.painted->layers().back();
+    check(field.name==before.name && field.painted->resolution()==before.painted->resolution() &&
+          layer.id==before.painted->layers().back().id && layer.visible==bool(set) &&
+          layer.opacity==(set?1.f:.65f) && field.bake_recipe==before.bake_recipe && field.domain->triangles().size()==2,
+          "Each projected material keeps its own raster, layer state and Bake recipe");
+    check(std::ranges::any_of(layer.tiles,[set](const auto &tile) {
+            return tile && std::ranges::any_of(tile->pixels,[set](const auto &pixel) {
+              return pixel.data[9]>128 && pixel.data[set?2:0]>195 && pixel.data[set?0:2]<150;
+            });
+          }),"The replacement's layers contain the correct slot's projected pigment");
+    for (auto triangle:field.domain->triangles()) {
+      const auto &m=field.painted->mesh();
+      Vec3 centre{};
+      for (size_t c=0;c<3;++c) centre+=m.positions[m.indices[triangle*3+c]]/3.f;
+      check(set ? point(original_from_patch,centre).x>0 : point(original_from_patch,centre).x<0,
+            "Independent inverse placement puts every emitted triangle on the proper source material side");
+    }
+  }
+  check(patch.painted->baked() && patch.bake_recipe->source.object==bake_source &&
+        std::ranges::any_of(patch.painted->baked()->coverage,[](auto a) {return a>128;}),
+        "The original colour and normal Bake remain covered on the replacement atlas");
+  if (affine) {
+    const auto old=texture_set_view(scene.active(),1).material_bindings;
+    const auto field=texture_set_view(patch,1).material_bindings;
+    check(field->has_mtoon && field->roles[0].image!=old->roles[0].image &&
+          field->roles[0].image->width==128 && field->roles[size_t(MToonSlot::Matcap)].image==
+          old->roles[size_t(MToonSlot::Matcap)].image,
+          "The static MToon field projects independent role images and retains its view-dependent MatCap");
+  }
+  const auto accepted=after.encode();
+  check(Scene::load(project).encode()==accepted && doc.undo() && doc.copy_scene().encode()==exact &&
+        doc.redo() && doc.copy_scene().encode()==accepted,
+        "Ordered Save, cold Open and one Undo/Redo preserve both material-bearing objects");
+  settled(doc);
+  const auto glb=out/"first-material-editable.glb";
+  doc.export_asset(glb,AssetExportFormat::EditableGlb256).get();
+  check(Scene::load(glb).encode()==accepted,"Editable GLB restores the complete transferred patch and original guide");
+  if (!affine) {
+    const auto path=out/"first-material-standard.glb";
+    doc.export_asset(path,AssetExportFormat::Glb).get();
+    ImportLimits limits;
+    limits.mode=ImportMode::PreserveGltf;
+    const auto exported=import_mesh(path,limits);
+    check(exported.primitives.size()==2 && exported.primitives.front().material!=exported.primitives.back().material,
+          "An independent GLB reader sees both materials on the new shared-surface patch");
+  }
+  const auto move=move_patch(doc,affine);
+  doc.end_retopology(true);
+  const auto edited=out/"first-material-reapplied.dsculpt";
+  doc.save_async(edited).get();
+  settled(doc);
+  const auto replacement=doc.copy_scene();
+  check(replacement.active().retopology->topology.encode()==move->topology->encode() &&
+        std::ranges::equal(replacement.active().texture_sets->triangle_sets(),patch.texture_sets->triangle_sets()) &&
+        !replacement.object(patch.id).visible && replacement.object(patch.id).texture_sets==patch.texture_sets &&
+        Scene::load(edited).encode()==replacement.encode(),
+        "Reapply changes the newly transferred patch, preserving all slot assignments and its hidden prior patch");
+}
+
 std::array<float,2> retopo_toon_test_uv(const Mesh &mesh,uint32_t face,std::array<float,3> weights) {
   std::array<float,2> uv{};
   for (size_t k=0;k<3;++k)
@@ -1780,6 +1955,7 @@ int main(int argc,char **argv) try {
   if (argc!=3) return 2;
   const std::string_view mode = argv[2];
   if (mode!="plain" && mode!="affine" && mode!="affine-wire" && mode!="mixed-material" &&
+      mode!="first-material-plain" && mode!="first-material-affine" &&
       mode!="mtoon-plain" && mode!="mtoon-affine" && mode!="mtoon-v0" && mode!="mtoon-detached" &&
       mode!="reapply-plain" && mode!="reapply-affine" && mode!="prepared-plain" && mode!="prepared-affine" &&
       mode!="prepared-detached" && mode!="prepared-detached-affine" &&
@@ -1796,6 +1972,7 @@ int main(int argc,char **argv) try {
   if (mode.starts_with("restore-")) restore_patch_history(mode.ends_with("affine"),out);
   else if (mode=="affine-wire") affine_wire_edit(out);
   else if (mode=="mixed-material") mixed_material_quad(out);
+  else if (mode.starts_with("first-material-")) first_material_patch(mode.ends_with("affine"),out);
   else if (mode.starts_with("material-seam-")) split_material_seam(mode.ends_with("affine"),out);
   else if (mode.starts_with("subdivide-seam-")) split_material_seam(mode.ends_with("affine"),out,true);
   else if (mode.starts_with("mtoon-")) retopo_toon_materials(mode.ends_with("affine"),mode.ends_with("v0"),out,mode=="mtoon-detached");

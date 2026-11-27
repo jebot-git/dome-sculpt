@@ -728,6 +728,7 @@ if(BUILD_TESTING)
   target_include_directories(dome-sculpt-retopo-surface-heat-test PRIVATE src)
   target_link_libraries(dome-sculpt-retopo-surface-heat-test PRIVATE dome-sculpt-core)
   foreach(workflow IN ITEMS affine-wire mixed-material material-seam-plain material-seam-affine
+                           first-material-plain first-material-affine
                            subdivide-seam-plain subdivide-seam-affine prepared-detached prepared-detached-affine
                            prepared-color-plain prepared-color-affine
                            prepared-color-normal-plain prepared-color-normal-affine prepared-color-normal-first

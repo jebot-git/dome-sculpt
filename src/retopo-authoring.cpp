@@ -9,6 +9,7 @@
 #include "normal-bake-frames.hpp"
 #include "normal-frame-runtime.hpp"
 #include "baked-normal-field.hpp"
+#include "deformation-active.hpp"
 #include "paint-normal-access.hpp"
 #include "retopo-transfer.hpp"
 #include "skin-affine.hpp"
@@ -76,8 +77,9 @@ Vec3 normal_direction(const AffineTransform &frame, Vec3 normal) {
 
 detail::RetopoTransfer::RetopoTransfer(const Mesh &previous_mesh,
     const AffineTransform &previous, const AffineTransform &replacement,
-    RetopoTransferBudget &budget, std::span<const RetopoCorrespondence> retained)
-    : budget_(budget), retained_(retained), placement_change_(replacement.inverse() * previous) {
+    RetopoTransferBudget &budget, std::span<const RetopoCorrespondence> retained, bool first_patch)
+    : budget_(budget), retained_(retained), first_patch_(first_patch),
+      placement_change_(replacement.inverse() * previous) {
   // Subtract a common translation before narrowing the query point. Meshes
   // far from the world origin still use the authored affine metric.
   auto old = previous.matrix();
@@ -164,6 +166,17 @@ std::optional<SurfaceHit> detail::RetopoTransfer::match_retained(Vec3 position, 
 
 std::optional<SurfaceHit> detail::RetopoTransfer::match_patch(Vec3 position, Vec3 normal,
     uint32_t face, std::array<float,3> weights, const TextureSetFaceDomain *source_domain) {
+  if (first_patch_ && source_domain && std::ranges::min(weights) > 1e-6f) {
+    // Without earlier patch corners, every interior texel must agree with
+    // the material picked at the face centre. The same-slot lookup alone
+    // could project sideways across a source material boundary.
+    auto hit = match(position, normal);
+    if (!hit)
+      throw std::invalid_argument("A patch face is outside the source material surface");
+    if (!source_domain->contains(hit->triangle))
+      throw std::invalid_argument("Split the patch along its source material boundary before Apply");
+    return hit;
+  }
   if (auto spatial = match(position,normal,source_domain)) return spatial;
   return match_retained(position,normal,face,weights,source_domain);
 }
@@ -863,7 +876,8 @@ private:
     if (cached != projected_sets_.end()) return cached->projected;
     const auto existing = sets.triangle_sets();
     const auto &mesh = first_grid_->mesh();
-    if (existing.size() != primary.mesh().indices.size() / 3 || existing.size() != old_faces_.size() ||
+    const bool first_patch = old_faces_.empty();
+    if (existing.size() != primary.mesh().indices.size() / 3 || (!first_patch && existing.size() != old_faces_.size()) ||
         new_faces_.size() != mesh.indices.size() / 3)
       throw std::invalid_argument("Retopology source material slots differ from its genuine mesh");
     budget_.reserve(mesh.indices.size() / 3, sizeof(TextureSetId));
@@ -871,7 +885,7 @@ private:
     slots.reserve(mesh.indices.size() / 3);
     for (size_t c = 0; c < mesh.indices.size(); c += 3) {
       if ((c & 1023) == 0) stop(budget_.cancelled());
-      const auto old_triangle = correspondence_[c / 3].triangle;
+      const auto old_triangle = first_patch ? UINT32_MAX : correspondence_[c / 3].triangle;
       if (old_triangle != UINT32_MAX) {
         // A quad can carry two material slots. Its stable corners survive
         // reflection, reordering and movement across the old material seam.
@@ -893,6 +907,8 @@ private:
       const auto a = mesh.positions[mesh.indices[c]], b = mesh.positions[mesh.indices[c + 1]],
                  d = mesh.positions[mesh.indices[c + 2]];
       const auto hit = projection.match((a + b + d) / 3.f, cross(b - a,d - a));
+      if (first_patch && !hit)
+        throw std::invalid_argument("A patch face is outside the source material surface");
       slots.push_back(hit ? existing[hit->triangle] : 0);
     }
     auto result = detail::project_retopology_texture_sets(primary, primary_binding, sets,
@@ -929,7 +945,7 @@ private:
       std::span<const detail::RetopoCorrespondence> retained;
       if (&paint.mesh()==&original_rest_ || same_rest_corners(paint.mesh(),original_rest_,budget_.cancelled()))
         retained=correspondence_;
-      surface=std::make_unique<detail::RetopoTransfer>(paint.mesh(),old_world_,new_world_,budget_,retained);
+      surface=std::make_unique<detail::RetopoTransfer>(paint.mesh(),old_world_,new_world_,budget_,retained,old_faces_.empty());
     }
     return *surface;
   }
@@ -1092,15 +1108,28 @@ uint64_t publish_retopology(Scene &scene, const RetopoMesh &topology, uint64_t s
     rig_source = history.rebase(previous.rig_source);
     shape_source = history.rebase(previous.shape_source);
   } else {
-    unwrap(triangles.mesh, 512, 4, cancelled);
+    const bool project_materials = previous.id == source && previous.texture_sets &&
+        !detail::evaluates_geometry(previous.deformation.get()) &&
+        !previous.texture_sets->topology()->polygon_ids() && detail::texture_set_editable_fields(previous);
+    const auto resolution = project_materials ? previous.painted->resolution() : 512;
+    unwrap(triangles.mesh, resolution, 4, cancelled);
     PaintSurfaceOptions options;
     options.cancelled = cancelled;
-    painted = PaintedMesh::from_mesh(std::move(triangles.mesh), 512, options);
+    painted = PaintedMesh::from_mesh(std::move(triangles.mesh), resolution, options);
+    if (project_materials) {
+      RetopoReplacement replacement(painted, previous.painted->mesh(), scene.world_matrix(source), staged.world_matrix(id),
+          {}, triangles.source_faces, {}, cancelled);
+      auto current = replacement.project(*previous.painted, previous.material, {}, previous.material_bindings,
+                                          previous.texture_sets);
+      painted = current.paint->snapshot();
+      material = std::move(current.material);
+      texture_sets = std::move(current.texture_sets);
+    }
   }
   object.painted = std::move(painted); object.mesh_active = true;
   object.material = previous.material; object.retopology = patch;
   object.material_bindings = std::move(material);
-  if (previous.retopology) object.bake_recipe = previous.bake_recipe;
+  if (previous.retopology || texture_sets) object.bake_recipe = previous.bake_recipe;
   object.deformation = std::move(deformation);
   object.rig_source = std::move(rig_source);
   object.shape_source = std::move(shape_source);
