@@ -584,6 +584,92 @@ void resize_retained_native_grid(const std::filesystem::path &root) {
         "Bake after cold reopen uses the new writable grid and retained native normal frame");
 }
 
+void reduce_dense_native_grid(const std::filesystem::path &root) {
+  Scene scene;
+  Mesh mesh;
+  mesh.positions = {{0,0,0},{1,0,0},{1,1,0},{0,1,0}};
+  mesh.normals.assign(4, {0,0,1});
+  mesh.indices = {0,1,2,0,2,3};
+  mesh.uv = {{0,0},{1,0},{1,1},{0,1}};
+  auto paint = std::make_shared<PaintedMesh>(std::move(mesh), 1024);
+  scene.active().mesh_active = true;
+  scene.active().painted = paint;
+  const auto visible = paint->active_layer();
+  Brush brush;
+  brush.normal = {0,0,1};
+  brush.from = brush.to = {.8f,.6f,0};
+  brush.radius = 1.35f;
+  brush.strength = .28f;
+  PaintSettings ink;
+  ink.front_only = false;
+  const auto stamp = [&] {
+    paint->begin_stroke();
+    paint->stamp(brush, ink);
+    check(paint->end_stroke(), "Brush authors genuine native grid data");
+  };
+  stamp();
+  ink.channel = PaintChannel::Emission;
+  ink.emission_units = PaintEmissionUnits::Physical;
+  ink.emission = {1500,.0003f,12};
+  stamp();
+  check(std::ranges::all_of(paint->layers().front().emission_tiles,
+                           [](const auto &tile) { return bool(tile); }) &&
+            paint->emission_pixel(visible,100,100).coverage !=
+                paint->emission_pixel(visible,101,100).coverage,
+        "The 1024 grid has varying physical emission across a fully authored layer");
+
+  paint->add_layer("Hidden local detail");
+  const auto hidden = paint->active_layer();
+  brush.from = brush.to = {.83f,.12f,0};
+  brush.radius = .17f;
+  ink.channel = PaintChannel::Color;
+  ink.color = {.15f,.08f,.04f,.2f};
+  stamp();
+  ink.channel = PaintChannel::Mask;
+  ink.mask = .2f;
+  stamp();
+  paint->layer_properties("Hidden local detail",false,.7f);
+  const auto before = scene.encode();
+  auto strict = scene.snapshot();
+  const auto strict_paint = strict.active().painted;
+  bool refused_loss = false;
+  try {
+    resample_native_texture_grid(strict, scene.active().id,
+        {.resolution=512,.maximum_component_error=0,.maximum_rms_error=0},
+        detail::native_texture_grid_limits());
+  } catch (const std::runtime_error &error) {
+    refused_loss = std::string_view(error.what()).find("reconstruction bounds") !=
+                   std::string_view::npos;
+  }
+  check(refused_loss && strict.active().painted == strict_paint && strict.encode() == before,
+        "A lossless-only reduction diagnoses real loss and preserves the original paint");
+
+  Document doc;
+  doc.replace(scene);
+  ready(doc);
+  doc.save_async(root / "dense-native-1024.dsculpt").get();
+  TextureSetEdit resize;
+  resize.action = TextureSetAction::Resolution;
+  resize.resolution = 512;
+  doc.edit_texture_set(resize);
+  const auto path = root / "dense-native-512.dsculpt";
+  doc.save_async(path).get();
+  ready(doc);
+  const auto after = doc.copy_scene();
+  const auto &reduced = *after.active().painted;
+  const auto mask = reduced.pixel(hidden,425,61).data[13];
+  check(reduced.resolution() == 512 && reduced.mesh_owner() == paint->mesh_owner() &&
+            reduced.active_layer() == hidden && !reduced.layers().back().visible &&
+            reduced.layers().back().opacity == .7f && mask > 0 && mask < 255 &&
+            std::abs(reduced.emission_pixel(visible,200,200).physical[0]-1500.f)<.002f,
+        "The default worker keeps dense FLOAT radiance and the hidden mask on the new grid");
+  const auto expected = after.encode();
+  check(Scene::load(path).encode() == expected &&
+            doc.undo() && doc.copy_scene().encode() == before &&
+            doc.redo() && doc.copy_scene().encode() == expected,
+        "Dense reduction preserves exact ordered Save, cold Open and history");
+}
+
 } // namespace
 
 int main(int argc,char **argv) try {
@@ -595,6 +681,7 @@ int main(int argc,char **argv) try {
  else if(std::string_view(argv[1])=="painted") {
   resize_painted_source_grid(root);
   resize_physical_native_grid(root);
+  reduce_dense_native_grid(root);
  } else if(std::string_view(argv[1])=="baked") {
   resize_baked_native_grid(root);
  } else if(std::string_view(argv[1])=="missing-bake-device") {

@@ -712,11 +712,11 @@ void native_overlay_quality(const PaintedMesh &before, const PaintedMesh &after,
           const auto owner = packet.padding()->at(size_t(sy) * grid + sx);
           if (owner < 0 || (!packet.baked() && !tiles.at(size_t(owner / grid / 32) * (grid / 32) + owner % grid / 32)))
             return;
-          work(report, (packet.layers().size() + 1) * 32, limits);
-          const auto sample = sample_overlay_texel_values(packet, int(sx), int(sy), pbr);
+          const auto sample = sample_overlay_texel_owner(packet, size_t(owner), pbr);
+          work(report, sample.work, limits);
           for (size_t plane = 0; plane < widths.size(); ++plane)
             for (size_t c = 0; c < widths[plane]; ++c)
-              values[plane][c] += weight * sample[plane][c];
+              values[plane][c] += weight * sample.values[plane][c];
         });
         return values;
       };

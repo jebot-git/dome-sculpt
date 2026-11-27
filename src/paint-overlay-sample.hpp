@@ -7,35 +7,105 @@
 #include <cmath>
 namespace dome::detail {
 using PaintOverlayValues=std::array<std::array<float,4>,5>;
+struct PaintOverlayTexel {
+ PaintOverlayValues values{};
+ // Charge the directory probes and the channel groups actually composed.
+ size_t work=0;
+};
+
+inline float overlay_linear_byte(uint8_t value){
+ static const auto table=[] {
+  std::array<float,256> result{};
+  for(size_t i=0;i<result.size();++i){
+   const float x=float(i)/255.f;
+   result[i]=x<=.04045f?x/12.92f:std::pow((x+.055f)/1.055f,2.4f);
+  }
+  return result;
+ }();
+ return table[value];
+}
+
 // Asset-worker point evaluation of the five independent linear contribution
 // fields. Filtering follows composition, matching the live GPU planes. There
 // is no dense float image, mutable paint access or GPU readback.
-inline PaintOverlayValues sample_overlay_texel_values(const PaintOverlayPacket &packet,int x,int y,bool pbr){
+inline PaintOverlayTexel sample_overlay_texel_owner(const PaintOverlayPacket &packet,
+                                                   size_t at,bool pbr){
+ const size_t r=packet.resolution(),stride=PaintTile::size;
+ const size_t x=at%r,y=at/r,tile=(y/stride)*(r/stride)+x/stride;
+ const size_t within=(y%stride)*stride+x%stride;
+ PaintOverlayTexel sample;
+ auto &value=sample.values;
+ if(const auto &baked=packet.baked()){
+  sample.work+=32;
+  const float a=baked->coverage.at(at)/255.f;
+  const auto &color=pbr&&baked->color_interpretation==BakedColorInterpretation::ResolvedPbr
+      ? baked->maps.pbr_color : baked->maps.color;
+  for(size_t c=0;c<4;++c){
+   const auto channel=color.rgba.at(at*4+c);
+   value[0][c]=(c<3?overlay_linear_byte(channel):channel/255.f)*a;
+   value[3][c]=a;
+  }
+  const auto emission=baked_emission_texel(*baked,at);
+  for(size_t c=0;c<3;++c){
+   value[1][c]=baked->maps.metal_rough.rgba.at(at*4+c)/255.f*a;
+   value[2][c]=emission.legacy[c];
+   value[4][c]=emission.absolute[c];
+  }
+  value[3][3]=emission.coverage;
+  value[1][3]=a;
+ }
+ const auto blend=[](float &destination,float incoming,float coverage){
+  destination=destination*(1-coverage)+incoming*coverage;
+ };
+ for(const auto &layer:packet.layers()){
+  ++sample.work;
+  const auto &common=layer.tiles.at(tile);
+  if(!common)continue;
+  ++sample.work;
+  const auto &q=common->pixels[within].data;
+  const float mask=q[13]/255.f*layer.opacity;
+  if(mask==0)continue;
+  sample.work+=3;
+  const float color_coverage=q[9]/255.f*mask;
+  if(color_coverage!=0){
+   sample.work+=8;
+   const auto *color=q.data();
+   if(pbr&&!layer.pbr_tiles.empty())
+    if(const auto &secondary=layer.pbr_tiles.at(tile))
+     color=secondary->pixels[within].data();
+   for(size_t c=0;c<4;++c)
+    blend(value[0][c],c<3?overlay_linear_byte(color[c]):color[c]/255.f,color_coverage);
+   value[3][0]=value[3][0]*(1-color_coverage)+color_coverage;
+  }
+  for(size_t c=1;c<=2;++c){
+   const float coverage=q[9+c]/255.f*mask;
+   if(coverage==0)continue;
+   sample.work+=2;
+   blend(value[1][3-c],q[3+c]/255.f,coverage);
+   value[3][c]=value[3][c]*(1-coverage)+coverage;
+  }
+  const auto *emission=layer.emission_tiles.empty()?nullptr:layer.emission_tiles.at(tile).get();
+  const auto *light=emission?&emission->pixels[within]:nullptr;
+  const float coverage=light?mask*light->coverage:q[12]/255.f*mask;
+  if(coverage!=0){
+   sample.work+=14;
+   for(size_t c=0;c<3;++c){
+    blend(value[2][c],light?light->legacy[c]:overlay_linear_byte(q[6+c]),coverage);
+    blend(value[4][c],light?light->physical[c]:0,coverage);
+   }
+   value[3][3]=value[3][3]*(1-coverage)+coverage;
+  }
+ }
+ value[2][3]=value[4][3]=value[3][3];
+ return sample;
+}
+inline PaintOverlayValues sample_overlay_texel_values(const PaintOverlayPacket &packet,
+                                                      int x,int y,bool pbr){
  const auto r=packet.resolution();
- auto linear=[](float x){return x<=.04045f?x/12.92f:std::pow((x+.055f)/1.055f,2.4f);};
-
-  PaintOverlayValues value{};x=std::clamp(x,0,int(r)-1);y=std::clamp(y,0,int(r)-1);
-  const auto owner=packet.padding()->at(size_t(y)*r+size_t(x));if(owner<0)return value;
-  const size_t at=size_t(owner),px=at%r,py=at/r,tile=(py/32)*(r/32)+px/32,within=(py%32)*32+px%32;
-  if(const auto &baked=packet.baked()){
-   const float a=baked->coverage.at(at)/255.f;const auto &colour=pbr&&baked->color_interpretation==BakedColorInterpretation::ResolvedPbr?baked->maps.pbr_color:baked->maps.color;
-   for(size_t c=0;c<4;++c){const float sample=colour.rgba.at(at*4+c)/255.f;value[0][c]=(c<3?linear(sample):sample)*a;value[3][c]=a;}
-   const auto emission=baked_emission_texel(*baked,at);
-   for(size_t c=0;c<3;++c){value[1][c]=baked->maps.metal_rough.rgba.at(at*4+c)/255.f*a;value[2][c]=emission.legacy[c];value[4][c]=emission.absolute[c];}
-   value[3][3]=emission.coverage;
-   value[1][3]=a;
-  }
-  for(const auto &layer:packet.layers())if(const auto &common=layer.tiles.at(tile)){
-   const auto &q=common->pixels[within].data;const float mask=q[13]/255.f*layer.opacity;
-   std::array<float,4> coverage;for(size_t c=0;c<4;++c)coverage[c]=q[9+c]/255.f*mask;
-   for(size_t c=0;c<4;++c){float sample=q[c]/255.f;if(pbr&&!layer.pbr_tiles.empty())if(const auto &colour=layer.pbr_tiles.at(tile))sample=colour->pixels[within][c]/255.f;value[0][c]=value[0][c]*(1-coverage[0])+(c<3?linear(sample):sample)*coverage[0];}
-   value[1][1]=value[1][1]*(1-coverage[2])+q[5]/255.f*coverage[2];value[1][2]=value[1][2]*(1-coverage[1])+q[4]/255.f*coverage[1];
-   const auto emission=!layer.emission_tiles.empty()?layer.emission_tiles.at(tile):nullptr;
-   if(emission)coverage[3]=mask*emission->pixels[within].coverage;
-   for(size_t c=0;c<3;++c){const float legacy=emission?emission->pixels[within].legacy[c]:linear(q[6+c]/255.f),physical=emission?emission->pixels[within].physical[c]:0;value[2][c]=value[2][c]*(1-coverage[3])+legacy*coverage[3];value[4][c]=value[4][c]*(1-coverage[3])+physical*coverage[3];}
-   for(size_t c=0;c<4;++c)value[3][c]=value[3][c]*(1-coverage[c])+coverage[c];
-  }
-  value[2][3]=value[4][3]=value[3][3];return value;
+ x=std::clamp(x,0,int(r)-1);
+ y=std::clamp(y,0,int(r)-1);
+ const auto owner=packet.padding()->at(size_t(y)*r+size_t(x));
+ return owner<0?PaintOverlayValues{}:sample_overlay_texel_owner(packet,size_t(owner),pbr).values;
 }
 inline PaintOverlayValues sample_overlay_values(const PaintOverlayPacket &packet,float u,float v,bool pbr){
  if(!std::isfinite(u)||!std::isfinite(v))throw std::invalid_argument("Nonfinite paint overlay sample");
