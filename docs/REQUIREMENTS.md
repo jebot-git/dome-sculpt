@@ -233,10 +233,19 @@ neighboring slots. The fixtures cover independent UV streams, hidden
 physical paint and masks, dual-grid rebaking and Clear Bake, cold Open,
 desktop and synthetic XR history, Standard GLB texture dimensions and
 tangents, and exact Editable GLB replay. A 1024-pixel Document resize
-retains the original 64-pixel normal field after cold Open. Native N-only
-and other source-authority resizing, broader production geometry,
-accelerated resampling, and physical headset acceptance remain open.
+retains the original 64-pixel normal field after cold Open.
 [Prepared polygon grid resize evidence](validation/prepared-grid-resize-20261127.json)
+
+Native polygon material slots with inherited vertex normals resize writable
+paint before or after a Bake. Their existing normal maps keep the original
+resolution and binary coverage through resize, partial rebake, cold Save
+and Open, Undo and Redo, and append with donor remapping. Clear Bake restores
+the inherited normals and material coefficients at the new size. The
+validated Standard and Editable GLB exports preserve exact normal image
+bytes and a separate material texture resolution. Wider original-source
+material models, production geometry, GPU resampling, and physical headsets
+remain open.
+[Native polygon grid resize evidence](validation/native-polygon-grid-resize-20261127.json)
 
 Native multi-material retopology preserves independently painted and baked
 grids and original VRM 1.0 joint links when Apply changes the patch.

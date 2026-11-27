@@ -1,0 +1,434 @@
+{
+  "utc": "2026-11-27T18:44:33.563187+00:00",
+  "product": "fbdddf525bf89eba25b25bedd903a1b4f5fb6c7a",
+  "parent": "b7fb4520e9f8a6666aff0bea434b525f98df5ce9",
+  "patch_sha256": "19aed724d286312f566488679b49fc50b5c41d2f593454cb288be25b96b747ce",
+  "toolkit": {
+    "DomeD": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+    "release_prefix": "/opt/fltk-vr/toolkit",
+    "bitmap_prefix": "/opt/fltk-vr/bdf-runtime"
+  },
+  "release": {
+    "binary_sha256": "78307f14bb8d90fc0b4c38279a33c8340e8843ad14d2bbc7fec8bf44325bfae7",
+    "test_names": [
+      "dome-sculpt-texture-set-source-export",
+      "retopology-imported-pbr",
+      "retopology-imported-bake-resize",
+      "retopology-imported-mtoon-resize",
+      "texture-set-retained-retopology-plain",
+      "texture-set-retained-retopology-affine",
+      "texture-set-retained-shapekeys",
+      "texture-set-retained-resize-matching",
+      "texture-set-retained-resize-split",
+      "texture-set-retained-posed-bake",
+      "texture-set-retained-skin",
+      "texture-set-prepared-recipe-references",
+      "texture-set-retained-bake-source",
+      "texture-set-retained-bake-target",
+      "texture-set-retained-native-target",
+      "texture-set-native-grid-resize-plain",
+      "texture-set-native-grid-resize-affine",
+      "dome-sculpt-texture-set-resolution",
+      "dome-sculpt-texture-set-baked-resolution",
+      "dome-sculpt-texture-set-baked-mtoon-resolution",
+      "native-empty-paint-resolution",
+      "native-authored-paint-resolution",
+      "native-baked-paint-resolution",
+      "native-retained-paint-resolution"
+    ],
+    "junit_sha256": "cf63fd9f3b96de0d03f821cb362001b0e2ac3a1b29ffc20636d5275768e720b3"
+  },
+  "scoped_ASan_UBSan": {
+    "binary_sha256": "01867d31bbd024a417912797b768ef2c4cc48bfde05d2d3fd571b1c9003172f0",
+    "rebuilt_dependencies": 19,
+    "workflows": {
+      "plain": {
+        "checks": [
+          "PASS 789 native polygon grid and normal Bake checks"
+        ],
+        "log_sha256": "5323b395b547d661f5215f9c62c0b97307356342186d9f4af7314bd7769995ce"
+      },
+      "affine": {
+        "checks": [
+          "PASS 772 native polygon grid and normal Bake checks"
+        ],
+        "log_sha256": "cfbb00718453dba5780865e31fcad41925a83b62ab5e640dced13071bc93ee23"
+      },
+      "prepared": {
+        "checks": [
+          "PASS 47 retained polygon paint resolution checks"
+        ],
+        "log_sha256": "e77af1dbe6b45ed22a6c24fd0373af65ad471f72efb06e3961a4d80fd5f376be"
+      },
+      "prior-normal": {
+        "checks": [
+          "PASS 1534 native-normal retained target checks"
+        ],
+        "log_sha256": "c7ba07a258c4eda9f73a124b4191d823e18360cdabb53bd5633a886c61d1264f"
+      }
+    }
+  },
+  "matching_release_and_sanitizer_output": {
+    "plain": {
+      "native-target.dsculpt": "25282404d9bea3945c1eb2bbef1872d0239e4e27c51ef32f8919feee29066f17",
+      "unbaked-resized.dsculpt": "ccc7b5c4c7e50f220fcb8b1e6114dde7eec975b474488dbce409ba61600e97cd",
+      "first-bake-after-resize.dsculpt": "f87d2c30a147c6bfe6fd167caaaf5e70134dbe15ee5afee9750e4dc98ef9d23b",
+      "resized-native.dsculpt": "5fc6de5dfd189e39168ac0dda601f9fa763d7640a73e1433eab0771b0ea88512",
+      "rebaked-native.dsculpt": "9f9504c1958b03daec1493fc35e2717eee471da2ad7ca839ec7349478d13e323",
+      "cleared-native.dsculpt": "897a22103b4e1cd7cbe300675ae528b811f5da27daf170152477dd9ebb49031a",
+      "resized-native-standard.glb": "2ebb6b701c0b6ab69fd09e44be9b1605312efc44efeffa4b9277a6869f48292a",
+      "resized-native-editable.glb": "eeb4200f3481fc9a4ce09ced969554d62c33e7d89d8695b01cd8ee6c43a64d7b"
+    },
+    "affine": {
+      "native-target-smooth-portable.dsculpt": "b7e10a9313b5719ce7ba26e930b72ee753720ddc184c0484368c132fb8615824",
+      "unbaked-resized.dsculpt": "c3befc260f455ce66d2f515bb8683f9e1d842924b9e27fef5242374aeaea06c4",
+      "first-bake-after-resize.dsculpt": "246fe974589c4c85f5ae7686305f3b14bb2e50f8d5d57ef2c496842e637758e9",
+      "resized-native.dsculpt": "8a0236832587e7232be8078fd572ba4c58d178544d88acf196ceb61f23a7e398",
+      "rebaked-native.dsculpt": "c88f1941f361cd84c33e1bb43dd5500ae289fa57ba1b7f742a20052746329dd4",
+      "cleared-native.dsculpt": "dd32db155662be4d900b073cd9dfec9b0023eaad2d51f66a25222dbdd14a46ec",
+      "resized-native-standard.glb": "46ffd018f32a03ab365ed08ece614a9cc232bd3e05a2bb400c5f71839259f669",
+      "resized-native-editable.glb": "b773e478852dcdaebaf41d92498cb570534f82a7a5042e1dc3e0af3e40683057"
+    }
+  },
+  "DomeD_Wayland": {
+    "checks": [
+      {
+        "passed": true,
+        "check": "Native Wayland paint client publishes the Dome Sculpt identity"
+      },
+      {
+        "passed": true,
+        "check": "Native Wayland client exports the universal texture-set command"
+      },
+      {
+        "passed": true,
+        "check": "The loaded retained native paint slot enables the universal texture-set command"
+      },
+      {
+        "passed": true,
+        "check": "The FLTK dialog opens on the current 64-pixel grid under the same Wayland identity"
+      },
+      {
+        "passed": true,
+        "check": "DomeD key events stage the 128-pixel choice"
+      },
+      {
+        "passed": true,
+        "check": "Ctrl+W cancels the draft without writing the project"
+      },
+      {
+        "passed": true,
+        "check": "Reopening after cancellation shows the original grid"
+      },
+      {
+        "passed": true,
+        "check": "DomeD keyboard navigation reaches the native Apply button"
+      },
+      {
+        "passed": true,
+        "check": "Ordered native Save matches the complete controller-authored 128-pixel project"
+      },
+      {
+        "passed": true,
+        "check": "Universal Undo and Save restore the exact original project"
+      },
+      {
+        "passed": true,
+        "check": "Universal Redo and Save reproduce the exact enlarged project"
+      },
+      {
+        "passed": true,
+        "check": "Native Wayland client closes after the paint worker and history operations"
+      }
+    ],
+    "complete": true
+  },
+  "synthetic_OpenXR": {
+    "software": {
+      "complete": true,
+      "checks": [
+        "accepted rendered palette shows the expected history and closes after Save",
+        "accepted controller Save matches the complete native project byte for byte",
+        "undone rendered palette shows the expected history and closes after Save",
+        "undone controller Save matches the complete native project byte for byte",
+        "redone rendered palette shows the expected history and closes after Save",
+        "redone controller Save matches the complete native project byte for byte",
+        "OpenXR app drains and final close persists the exact resized patch",
+        "Real OpenXR loader balances frame, images and both swapchains",
+        "Both eyes render the patch and its actual resolution panel",
+        "Loader delivers actual panel navigation and slider rays",
+        "Requested OpenGL renderer drives the workflow",
+        "Process maps witness the ordinary application and synthetic runtime module"
+      ],
+      "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+      "runtime": "/home/blux/de-xr/dome-sculpt/artifacts/current-integrated-full-release-20261127/build/libdome-sculpt-texture-resolution-runtime.so",
+      "balanced_frames": 156
+    },
+    "arc": {
+      "complete": true,
+      "checks": [
+        "accepted rendered palette shows the expected history and closes after Save",
+        "accepted controller Save matches the complete native project byte for byte",
+        "undone rendered palette shows the expected history and closes after Save",
+        "undone controller Save matches the complete native project byte for byte",
+        "redone rendered palette shows the expected history and closes after Save",
+        "redone controller Save matches the complete native project byte for byte",
+        "OpenXR app drains and final close persists the exact resized patch",
+        "Real OpenXR loader balances frame, images and both swapchains",
+        "Both eyes render the patch and its actual resolution panel",
+        "Loader delivers actual panel navigation and slider rays",
+        "Requested OpenGL renderer drives the workflow",
+        "Process maps witness the ordinary application and synthetic runtime module"
+      ],
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "runtime": "/home/blux/de-xr/dome-sculpt/artifacts/current-integrated-full-release-20261127/build/libdome-sculpt-texture-resolution-runtime.so",
+      "balanced_frames": 174
+    }
+  },
+  "native_1024": {
+    "result": "PASS 1024-pixel Document resize and cold Open, with the exact 64-pixel normal owner",
+    "project_sha256": "c440459f769124087fb581c235732549c707bb3bd9f7c37e8c04105833c02222"
+  },
+  "glTF": {
+    "exported_grids_and_normal_image_identity": {
+      "plain": {
+        "before": {
+          "normal": {
+            "size": [
+              64,
+              64
+            ],
+            "uv": 1,
+            "sha256": "95b946e69b136e3396bf8fa7ccb3bfc667425198c452481ad63bada332223df8"
+          },
+          "base_color": {
+            "size": [
+              64,
+              64
+            ],
+            "uv": 1,
+            "sha256": "b1f020201291793ec4c25d289f370d2af5e3e9dec6feab2aa2ed2ab8ec66c42d"
+          }
+        },
+        "resized": {
+          "normal": {
+            "size": [
+              64,
+              64
+            ],
+            "uv": 1,
+            "sha256": "95b946e69b136e3396bf8fa7ccb3bfc667425198c452481ad63bada332223df8"
+          },
+          "base_color": {
+            "size": [
+              128,
+              128
+            ],
+            "uv": 1,
+            "sha256": "ccbfb9858ff8ce3361b211665c6d5523e33c18afdd0b7d728fa47f86c8ea64fe"
+          }
+        }
+      },
+      "affine": {
+        "before": {
+          "normal": {
+            "size": [
+              64,
+              64
+            ],
+            "uv": 1,
+            "sha256": "e49185c0f0a368c048fac211c8f8ceef10f59d8ae9c85554702f65670c53c819"
+          },
+          "base_color": {
+            "size": [
+              64,
+              64
+            ],
+            "uv": 1,
+            "sha256": "b1f020201291793ec4c25d289f370d2af5e3e9dec6feab2aa2ed2ab8ec66c42d"
+          }
+        },
+        "resized": {
+          "normal": {
+            "size": [
+              64,
+              64
+            ],
+            "uv": 1,
+            "sha256": "e49185c0f0a368c048fac211c8f8ceef10f59d8ae9c85554702f65670c53c819"
+          },
+          "base_color": {
+            "size": [
+              128,
+              128
+            ],
+            "uv": 1,
+            "sha256": "ccbfb9858ff8ce3361b211665c6d5523e33c18afdd0b7d728fa47f86c8ea64fe"
+          }
+        }
+      }
+    },
+    "validator": {
+      "validator": "2.0.0-dev.3.10",
+      "results": [
+        {
+          "file": "release/texture-set-native-grid-resize-plain/native-normal-bake.glb",
+          "issues": {
+            "numErrors": 0,
+            "numWarnings": 0,
+            "numInfos": 2,
+            "numHints": 0,
+            "messages": [
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/1/attributes/TEXCOORD_0"
+              }
+            ],
+            "truncated": false
+          }
+        },
+        {
+          "file": "release/texture-set-native-grid-resize-plain/resized-native-standard.glb",
+          "issues": {
+            "numErrors": 0,
+            "numWarnings": 0,
+            "numInfos": 2,
+            "numHints": 0,
+            "messages": [
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/1/attributes/TEXCOORD_0"
+              }
+            ],
+            "truncated": false
+          }
+        },
+        {
+          "file": "release/texture-set-native-grid-resize-plain/resized-native-editable.glb",
+          "issues": {
+            "numErrors": 0,
+            "numWarnings": 0,
+            "numInfos": 3,
+            "numHints": 0,
+            "messages": [
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/1/attributes/TEXCOORD_0"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/bufferViews/13"
+              }
+            ],
+            "truncated": false
+          }
+        },
+        {
+          "file": "release/texture-set-native-grid-resize-affine/native-normal-smooth-bake.glb",
+          "issues": {
+            "numErrors": 0,
+            "numWarnings": 0,
+            "numInfos": 2,
+            "numHints": 0,
+            "messages": [
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/1/attributes/TEXCOORD_0"
+              }
+            ],
+            "truncated": false
+          }
+        },
+        {
+          "file": "release/texture-set-native-grid-resize-affine/resized-native-standard.glb",
+          "issues": {
+            "numErrors": 0,
+            "numWarnings": 0,
+            "numInfos": 2,
+            "numHints": 0,
+            "messages": [
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/1/attributes/TEXCOORD_0"
+              }
+            ],
+            "truncated": false
+          }
+        },
+        {
+          "file": "release/texture-set-native-grid-resize-affine/resized-native-editable.glb",
+          "issues": {
+            "numErrors": 0,
+            "numWarnings": 0,
+            "numInfos": 3,
+            "numHints": 0,
+            "messages": [
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/1/attributes/TEXCOORD_0"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/bufferViews/13"
+              }
+            ],
+            "truncated": false
+          }
+        }
+      ]
+    }
+  },
+  "scope": "Native retained polygon material resize on the CPU build. The Arc runtime evidence is OpenGL rendering with synthetic OpenXR controller input."
+}

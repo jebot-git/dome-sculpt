@@ -444,10 +444,28 @@ produce byte-identical project saves through Apply, Undo, and Redo. Standard
 GLB exports the changed slot at 128 pixels for color and 64 for its normal
 map, including explicit tangents and a separate normal UV stream in the split
 case. Editable GLB restores the exact scene after resize and rebake. Khronos
-reports zero errors and warnings on all ten exports. The native N-only polygon
-lane, broader production geometry, accelerated resampling, and physical
-headsets remain open.
+reports zero errors and warnings on all ten exports.
 [Prepared polygon grid resize evidence](validation/prepared-grid-resize-20261127.json)
+
+Native polygon slots with inherited vertex normals now resize before or
+after their first Bake. The first Bake uses the chosen material size.
+Existing baked normal pixels and binary coverage keep their original raster,
+including when the material returns to the same size. Partial rebake writes
+each plane at its own resolution and keeps missed normal pixels. Clear Bake
+restores vertex normals and any inherited color Bake at the chosen paint
+size. Native Append keeps the normal image while updating the donor reference.
+The worker refuses a reduction that would erase newly baked color edges.
+
+All 24 focused Release tests and four scoped ASan/UBSan workflows passed.
+The fixtures cover plain and reflected, sheared placements, exact cold Open
+and history, and a 1024-pixel material grid with its original 64-pixel normal
+image. Nested DomeD Wayland and synthetic OpenXR on Arc A770 and
+llvmpipe match the native worker saves. Standard and Editable GLB keep
+byte-identical normal PNGs through resize, with explicit tangents. Khronos
+reports zero errors and warnings on six exports. Broader source material
+models, production geometry, accelerated resampling, and physical headset
+qualification remain open.
+[Native polygon grid resize evidence](validation/native-polygon-grid-resize-20261127.json)
 
 Retopology reapply now works on native multi-material accessories attached
 to original VRM 1.0 joints. The replacement keeps its avatar hierarchy and
