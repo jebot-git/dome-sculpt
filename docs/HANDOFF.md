@@ -25,6 +25,11 @@ shapekey authoring and portable rigid VRM 1.0 accessory morphs. It restores
 texture-set history written by earlier Scene40 builds that omitted nullable
 live rig fields. [Texture-set shapekey validation](validation/texture-set-shapekeys-20261127.json)
 
+Native texture-set accessories can now transfer weights or use legacy automatic
+binding against an original VRM 1.0 avatar. The accessory follows linked pose
+and rest edits and exports against the avatar's original joints in both VRM 1.0
+modes. [Linked native skin validation](validation/vrm1-skinned-accessory-20261127.json)
+
 The next acceptance milestone is a complete headset workflow on the current
 build, from a production-size sculpt or imported model through topology, UVs,
 paint, humanoid fitting and export. Sustained local meshing and recovery,
@@ -2719,8 +2724,8 @@ attachment. Its Khronos validation reports zero errors and the same seven
 warnings as the source-only control. All five pinned VRM/MToon schema checks
 pass. The native Wayland Attach, Save and Undo also pass. The first stereo
 test counted cyan avatar pixels as palette pixels. Its results are preserved
-alongside the corrected panel-background measurements. Physical headset
-tests and skinned native accessories remain open.
+alongside the corrected panel-background measurements. Physical headset tests
+remain open.
 [OpenXR attachment validation](validation/vrm1-xr-attachment-20261127.json)
 
 ### Shapekey sculpt and export across native texture sets
@@ -2738,8 +2743,8 @@ original avatar bone. The portable mesh uses one morph target across its
 material primitives, with normals derived from the shared mesh. Baked-normal
 corners carry derived tangent deltas. Independent buffer reads match the
 native weight-one endpoints. A target that changes tangent handedness needs
-an alternate portable representation. Retained source texture sets and
-skinned accessories still need their own authoring and export transport.
+an alternate portable representation. Retained source texture sets still need
+their own shapekey authoring and export transport.
 
 Archive8 now writes the nullable live rig fields expected by the Scene40
 reader. Earlier texture-only Archive8 projects that omit all those fields
@@ -2758,6 +2763,37 @@ VRM as the native worker. The Khronos validator reports zero errors and the
 same seven warnings as the source-only control. Ten pinned extension schema
 checks pass across the two files. Physical-headset qualification remains open.
 [Texture-set shapekey validation](validation/texture-set-shapekeys-20261127.json)
+
+### Native accessory skinning against original VRM 1.0 joints
+
+Bind or transfer skin on desktop and the controller skin panel can bind a
+native texture-set mesh to a visible original VRM 1.0 skin. Weight transfer
+and legacy automatic binding keep the accessory's world placement, materials,
+paint and morphs. The saved native link identifies one imported instance, its
+reference mesh node and the original joint for each weight slot. Appending a
+second copy namespaces the link. The active accessory can drive linked pose
+and rest edits and identifies the intended avatar for export. Rest edits
+transport the inverse binds and locked parts refuse the complete linked edit.
+
+Both VRM 1.0 modes retain the accessory's two material primitives, weights,
+inverse binds and shape target while using the same emitted joints as the
+original avatar. An independent reader evaluates the actual joint matrices,
+inverse binds, weights and morph deltas and checks the posed vertices against
+the native mesh before and after rest fitting. Both exports restore the exact
+native authoring state. A stale joint-slot table refuses export before it can
+replace an existing file. The Khronos validator reports zero errors and eight
+warnings per file. Seven also appear on the source-only control, with one
+additional non-root skinned mesh warning for the accessory. The emitted
+placement chain carries the authored mesh orientation. All 16 selected pinned
+VRM/MToon schema checks pass across the four exports.
+
+Nested DomeD Wayland exercises the universal-menu dialog, Cancel, transfer,
+Save, Undo and Redo. Synthetic OpenXR on software GL and Intel Arc A770
+exercises controller Transfer, ordered Save and Editable VRM export. Surface
+Heat still needs ownership-budget support for texture-set paint. Interactive
+weight brushes in affine placement, linked native accessories for VRM 0.x,
+retained-source fields and physical device use remain open.
+[Linked native skin validation](validation/vrm1-skinned-accessory-20261127.json)
 
 ## Source and integration boundary
 
