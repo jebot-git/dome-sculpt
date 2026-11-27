@@ -15,9 +15,10 @@ struct AtomicWriteOptions {
   // A caller can atomically claim this commit boundary against cancellation.
   std::function<void()> before_commit;
 };
-inline void atomic_write(const std::filesystem::path &path,
-                         std::span<const uint8_t> bytes,
-                         const AtomicWriteOptions &options) {
+namespace detail {
+template<class Produce>
+void atomic_write_generated(const std::filesystem::path &path,
+                            const AtomicWriteOptions &options,Produce produce) {
   auto check=[&]{if(options.cancelled && options.cancelled())
     throw std::runtime_error("Output cancelled");};
   check();
@@ -37,17 +38,16 @@ inline void atomic_write(const std::filesystem::path &path,
     throw std::runtime_error("Cannot create output file");
   try {
     const std::filesystem::path temporary_path(temporary.data());
-    size_t done = 0;
-    while (done < bytes.size()) {
-      check();
-      auto n = write(fd, bytes.data() + done,
-                     std::min(bytes.size() - done, size_t(1024 * 1024)));
-      if (n < 0 && errno == EINTR)
-        continue;
-      if (n <= 0)
-        throw std::runtime_error("Cannot write output file");
-      done += size_t(n);
-    }
+    const auto write_bytes=[&](std::span<const uint8_t> bytes) {
+      while(!bytes.empty()) {
+        check();
+        const auto n=write(fd,bytes.data(),std::min(bytes.size(),size_t(1024*1024)));
+        if(n<0&&errno==EINTR)continue;
+        if(n<=0)throw std::runtime_error("Cannot write output file");
+        bytes=bytes.subspan(size_t(n));
+      }
+    };
+    produce(write_bytes);
     check();
     if (fsync(fd))
       throw std::runtime_error("Cannot sync output file");
@@ -74,6 +74,12 @@ inline void atomic_write(const std::filesystem::path &path,
     unlink(temporary.data());
     throw;
   }
+}
+} // namespace detail
+inline void atomic_write(const std::filesystem::path &path,
+                         std::span<const uint8_t> bytes,
+                         const AtomicWriteOptions &options) {
+  detail::atomic_write_generated(path,options,[&](const auto &write_bytes){write_bytes(bytes);});
 }
 inline void atomic_write(const std::filesystem::path &path,
                          std::span<const uint8_t> bytes) {

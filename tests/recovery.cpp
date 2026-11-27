@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/recovery.hpp"
 #include <atomic>
+#include <charconv>
 #include <condition_variable>
 #include <fstream>
 #include <iostream>
@@ -223,6 +224,37 @@ int main() try {
     check(service.status().failed == 1 && !service.status().error.empty() && RecoveryService::discover(limited).candidates.empty(),
           "Oversized recovery files fail explicitly without publishing partial metadata");
     check(rejects([&] { service.set_source({"../escape", 1, {}}); }), "Untrusted source IDs cannot escape the recovery directory");
+  }
+  {
+    auto exact=temp.path/"exact-size";
+    const auto cb=nlohmann::json::to_cbor(scene.encode());
+    RecoveryOptions options;options.max_file_bytes=cb.size();
+    RecoveryService service(exact,options);service.set_source(source);
+    service.enqueue(request(source,1,scene));
+    check(service.flush()&&service.status().committed==1&&service.status().latest->bytes==cb.size(),
+          "A recovery at the exact streamed byte limit commits with its measured size");
+    auto bigger=scene.snapshot();
+    bigger.active().name+=" with a longer description";
+    service.enqueue(request(source,2,bigger));
+    check(service.flush()&&service.status().committed==1&&service.status().failed==1,
+          "A later oversized recovery leaves the committed generation intact");
+    auto found=RecoveryService::discover(exact,options);
+    check(found.errors.empty()&&found.candidates.size()==1&&found.candidates[0].revision==1&&
+          RecoveryService::load(found.candidates[0],options).encode()==scene.encode(),
+          "Discovery and restore authenticate the entire original checkpoint after bounded failure");
+    const auto &hash=found.candidates[0].checksum;
+    uint64_t recorded=0,expected=14695981039346656037ull;
+    const auto parsed=std::from_chars(hash.data(),hash.data()+hash.size(),recorded,16);
+    for(uint8_t byte:cb)expected=(expected^byte)*1099511628211ull;
+    check(parsed.ec==std::errc{}&&parsed.ptr==hash.data()+hash.size()&&recorded==expected,
+          "The streamed checkpoint retains the existing FNV-1a checksum of canonical CBOR");
+    size_t files=0;
+    for(const auto &entry:std::filesystem::directory_iterator(exact)) {
+      const auto extension=entry.path().extension();
+      if(extension==".dsculpt"||extension==".recovery"||extension==".lock")++files;
+      else throw std::runtime_error("A failed streamed recovery left a staging file");
+    }
+    check(files==3,"A streamed size refusal cleans its temporary output");
   }
   std::cout << "Recovery native tests complete\n";
 } catch (const std::exception &e) { std::cerr << "FAIL " << e.what() << '\n'; return 1; }

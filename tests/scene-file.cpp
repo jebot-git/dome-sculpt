@@ -71,6 +71,8 @@ int main(int argc, char **argv) try {
   const auto project = out/"original.dsculpt";
   scene.save(project);
   const auto original_project = read(project);
+  check(original_project == nlohmann::json::to_cbor(exact),
+        "Streamed native Save produces the exact canonical CBOR bytes");
   auto ordinary = load_scene_file(project);
   check(ordinary.kind == SceneFileKind::Project && ordinary.scene.encode() == exact,
         "Ordinary native project retains exact content and project kind");

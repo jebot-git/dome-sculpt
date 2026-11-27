@@ -58,7 +58,6 @@
 #include "normal-projection-identity.hpp"
 #include "normal-frame-runtime.hpp"
 #include "dome/retopo-authoring.hpp"
-#include "io.hpp"
 #include "text-utf8.hpp"
 #include "volume-archive.hpp"
 #include "polygon-scene-archive.hpp"
@@ -1457,12 +1456,6 @@ Scene Scene::decode_owning(const nlohmann::json &j,
   for(const auto &g:result.groups_)if(g.source_placement && detail::minimum_scene_version(g.source_placement->model.get())>unsigned(version))throw std::invalid_argument("Original source coordinates require their actual scene feature version");
   result.validate();
   return result;
-}
-void Scene::save(const std::filesystem::path &path) const {
-  auto bytes = nlohmann::json::to_cbor(encode());
-  if (bytes.size() > 256 * 1024 * 1024)
-    throw std::length_error("Scene exceeds file size limit");
-  atomic_write(path, bytes);
 }
 Scene Scene::load(const std::filesystem::path &path) { return load(path, {}); }
 Scene Scene::load(const std::filesystem::path &path, const std::function<bool()> &cancelled) {

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/recovery.hpp"
 #include "io.hpp"
+#include "native-scene-write.hpp"
 #include <algorithm>
 #include <condition_variable>
 #include <cstdlib>
@@ -19,7 +20,6 @@
 namespace dome {
 namespace {
 using Json = nlohmann::json;
-constexpr uint64_t MaxSceneBytes = 256ull * 1024 * 1024;
 struct Fd {
   int value = -1;
   explicit Fd(int v) : value(v) {}
@@ -32,7 +32,7 @@ struct Fd {
 void options_valid(const RecoveryOptions &o) {
   if (!o.max_pending || o.max_pending > 8 || !o.retained_per_source ||
       o.retained_per_source > 8 || !o.max_scan_entries || o.max_scan_entries > 16384 ||
-      !o.max_file_bytes || o.max_file_bytes > MaxSceneBytes)
+      !o.max_file_bytes || o.max_file_bytes > detail::maximum_native_scene_bytes)
     throw std::invalid_argument("Invalid recovery storage limits");
 }
 bool id_valid(const std::string &id) {
@@ -67,7 +67,7 @@ void sync_directory(const std::filesystem::path &root) {
   Fd fd(open(root.c_str(), O_RDONLY | O_DIRECTORY | O_CLOEXEC | O_NOFOLLOW));
   if (fd.value < 0 || fsync(fd.value)) io_error("Cannot sync recovery directory");
 }
-struct CheckedFile { uint64_t size = 0, hash = 14695981039346656037ull; std::vector<uint8_t> bytes; };
+struct CheckedFile { uint64_t size=0,hash=detail::scene_checksum_seed; std::vector<uint8_t> bytes; };
 CheckedFile read_checked(const std::filesystem::path &path, uint64_t limit, bool keep = false) {
   Fd fd(open(path.c_str(), O_RDONLY | O_CLOEXEC | O_NOFOLLOW | O_NONBLOCK));
   if (fd.value < 0) io_error("Cannot open recovery file");
@@ -85,9 +85,11 @@ CheckedFile read_checked(const std::filesystem::path &path, uint64_t limit, bool
     if (n < 0 && errno == EINTR) continue;
     if (n < 0) io_error("Cannot read recovery file");
     if (!n) break;
-    result.size += uint64_t(n);
-    if (result.size > limit) throw std::length_error("Recovery file grew beyond limit");
-    for (ssize_t i = 0; i < n; ++i) result.hash = (result.hash ^ buffer[size_t(i)]) * 1099511628211ull;
+    if(uint64_t(n)>limit-result.size)throw std::length_error("Recovery file grew beyond limit");
+    if(uint64_t(n)>uint64_t(st.st_size)-result.size)
+      throw std::runtime_error("Recovery file changed while reading");
+    result.size+=uint64_t(n);
+    result.hash=detail::extend_scene_checksum(result.hash,std::span(buffer).first(size_t(n)));
     if (keep) result.bytes.insert(result.bytes.end(), buffer.begin(), buffer.begin() + n);
   }
   if (result.size != uint64_t(st.st_size)) throw std::runtime_error("Recovery file changed while reading");
@@ -102,8 +104,8 @@ bool newer(const RecoveryCandidate &a, const RecoveryCandidate &b) {
   return std::tie(a.source.generation, a.revision, a.sequence, a.metadata) >
          std::tie(b.source.generation, b.revision, b.sequence, b.metadata);
 }
-RecoveryCandidate candidate(const std::filesystem::path &root,
-                            const std::filesystem::path &filename, const RecoveryOptions &o) {
+RecoveryCandidate candidate_metadata(const std::filesystem::path &root,
+                                     const std::filesystem::path &filename, const RecoveryOptions &o) {
   auto name = filename.string();
   if (filename != filename.filename() || filename.extension() != ".recovery" || name.size() > 128)
     throw std::invalid_argument("Invalid recovery metadata filename");
@@ -125,6 +127,11 @@ RecoveryCandidate candidate(const std::filesystem::path &root,
   result.checksum = j.at("fnv1a64").get<std::string>();
   if (!result.revision || !result.sequence || !result.bytes || result.bytes > o.max_file_bytes || result.checksum.size() != 16)
     throw std::runtime_error("Invalid recovery metadata bounds");
+  return result;
+}
+RecoveryCandidate candidate(const std::filesystem::path &root,
+                            const std::filesystem::path &filename,const RecoveryOptions &o) {
+  auto result=candidate_metadata(root,filename,o);
   auto data = root / filename;
   data.replace_extension(".dsculpt");
   auto checked = read_checked(data, o.max_file_bytes);
@@ -230,12 +237,11 @@ struct RecoveryService::Impl {
     bool published = false;
     try {
       checkpoint(RecoveryPhase::Serialize);
-      request.snapshot.save(staging); // Trusted native serializer/atomic fsync.
-      auto checked = read_checked(staging, options.max_file_bytes);
+      const auto written=detail::write_native_scene(request.snapshot,staging,options.max_file_bytes,true);
       auto now = uint64_t(std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch()).count());
       sequence = std::max(sequence + 1, now);
       RecoveryCandidate record{request.source, request.revision, request.content, sequence,
-          checked.size, checksum(checked.hash), root, meta.filename()};
+          written.bytes, checksum(written.checksum), root, meta.filename()};
       Json metadata = {{"format", "dome-sculpt-recovery"}, {"version", 1},
           {"source_id", record.source.id}, {"generation", record.source.generation},
           {"source_path", record.source.source_path.string()}, {"revision", record.revision},
@@ -379,7 +385,7 @@ RecoveryDiscovery RecoveryService::discover(const std::filesystem::path &root, R
 }
 Scene RecoveryService::load(const RecoveryCandidate &selected, RecoveryOptions options) {
   options_valid(options); private_root(selected.root, false);
-  auto record = candidate(selected.root, selected.metadata, options);
+  auto record = candidate_metadata(selected.root, selected.metadata, options);
   if (record.source != selected.source || record.revision != selected.revision || record.content != selected.content ||
       record.sequence != selected.sequence || record.checksum != selected.checksum || record.bytes != selected.bytes)
     throw std::runtime_error("Selected recovery changed; refresh discovery before opening it");
