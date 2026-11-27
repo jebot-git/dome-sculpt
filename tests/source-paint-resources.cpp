@@ -26,10 +26,11 @@ int main(int argc,char **argv)try {
     auto before=PaintedMesh::from_maps(original,source(),2048,policy);auto target=original;
     target.uv={{.1f,.1f},{.9f,.1f},{.9f,.9f},{.1f,.9f}};
     const std::array<uint32_t,4> vertices{0,1,2,3};
-    check(refuses([&]{prepare_source_paint(before,target,vertices);}),"Default smaller caller budget remains enforced");
-    SourcePaintOptions options;options.max_working_bytes=SourcePaintOptions::maximum_working_bytes;
-    auto paint=prepare_source_paint(before,target,vertices,options);auto encoded=paint->encode();
-    check(read(encoded)->encode()==encoded,"Actual 2048 original/current grids save and reopen under the existing maximum budget");
+    SourcePaintOptions limited;limited.max_working_bytes=64*1024*1024;
+    check(refuses([&]{prepare_source_paint(before,target,vertices,limited);}),
+          "An explicit smaller caller budget still refuses the real 2048 grid transfer");
+    auto paint=prepare_source_paint(before,target,vertices);auto encoded=paint->encode();
+    check(read(encoded)->encode()==encoded,"Both compact 2048 grids fit the default budget and reopen exactly");
     for(int n=1;n<16;++n)paint->add_layer("Empty reserved layer");
     encoded=paint->encode();check(read(encoded)->encode()==encoded,"All sixteen metadata layers remain saveable");
     std::cout<<"PASS real2048 save/reopen and smaller caller budget\n"<<std::flush;
