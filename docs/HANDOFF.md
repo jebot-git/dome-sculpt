@@ -314,6 +314,27 @@ emission, physical Bake, typed VRM and physical headset acceptance remain
 required.
 [Mixed-resolution portable MToon evidence](validation/retopology-portable-mixed-20261127.json)
 
+Retopology patches with a native writable atlas now use the same resolution
+dialog and XR controls as other native painting meshes. The tested patch
+starts at 64, reaches 256 through the controller and 512 through the desktop
+worker, and keeps its 128-pixel projected textures, topology, hidden guide,
+and paint layer identities. Every authored texel, including hidden paint,
+survives enlargement and the tested reduction back to 64. The previously
+qualified mixed-resolution exporter now measures upsampled maps on the actual
+mesh UV triangles, including cells intersecting chart edges. Unused atlas
+texels no longer determine the error bound when the writable grid is larger
+than the projected source. Standard GLB keeps the two independent materials.
+Editable GLB retains the full 512-pixel project. All 23 selected Release and
+17 ASan/UBSan tests pass. Twelve nested DomeD Wayland checks and twelve
+synthetic controller checks on each renderer reproduce the exact 256-pixel
+project through Apply, Save, Undo and Redo. The software controller run passes
+with a pause after each durable Save. Six GLBs pass Khronos validation, and
+512-pixel MToon reimports match native stereo within two 8-bit values on Arc
+and llvmpipe. Painted resampling has been qualified on the CPU build. Baked and
+independently prepared atlas resizing, larger painted patches, accelerated
+resampling and physical device acceptance remain required.
+[Retopology paint resolution evidence](validation/retopology-paint-resize-20261127.json)
+
 Retopology reapply now works on native multi-material accessories attached
 to original VRM 1.0 joints. The replacement keeps its avatar hierarchy and
 the material of each surviving single-material face. Each paint and Bake

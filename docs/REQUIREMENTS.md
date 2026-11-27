@@ -183,6 +183,17 @@ sampling, absolute emission, physically baked and deformed variants, and typed
 VRM remain required.
 [Mixed-resolution portable MToon evidence](validation/retopology-portable-mixed-20261127.json)
 
+Standalone retopology patches with native writable paint now expose the
+desktop and XR paint resolution controls. The worker changes only the raster
+and preserves the mesh, projected roles, hidden guide and layer metadata.
+Budget refusal, cancellation, exact Undo and Redo, ordered Save and Editable
+GLB are covered on a 64-to-256-to-512 painted MToon patch with 128-pixel
+projected images. Portable GLB qualifies larger writable grids by checking
+every filter cell intersecting the actual mesh UV triangles. Baked and
+prepared grids, larger production assets, accelerated resampling and physical
+device acceptance remain open.
+[Retopology paint resolution evidence](validation/retopology-paint-resize-20261127.json)
+
 Native multi-material retopology preserves independently painted and baked
 grids and original VRM 1.0 joint links when Apply changes the patch.
 Linked Shape Restore uses the current pose of the original imported rig.
