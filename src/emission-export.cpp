@@ -303,6 +303,7 @@ void finish_emission_export(GltfDocument &document,EmissionExportPrepared &prepa
    const auto &receipt=material.at("extras").at("domeSculptPortableEmission");
    entry.texcoord=material.at("emissiveTexture").value("texCoord",0u);
    const auto extensions=material.find("extensions");
+   entry.authored_mtoon=extensions!=material.end()&&extensions->contains("VRMC_materials_mtoon");
    if(extensions!=material.end()&&extensions->contains("KHR_materials_emissive_strength"))
     entry.fallback_strength=extensions->at("KHR_materials_emissive_strength").at("emissiveStrength").get<float>();
    entry.fallback_factor=material.at("emissiveFactor").get<std::array<float,3>>();

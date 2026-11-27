@@ -259,7 +259,8 @@ using FieldIdentity=std::pair<uint64_t,std::optional<uint32_t>>;
 std::optional<uint32_t> texture_set_descriptor(const Json &entry,bool allowed){
  if(!entry.contains("textureSet"))return {};
  const auto &member=entry.at("textureSet");
- if(!allowed||!member.is_object()||member.size()!=2||entry.contains("domain")||entry.at("view")!="pbr")
+ if(!allowed||!member.is_object()||member.size()!=2||entry.contains("domain")||
+    (entry.at("view")!="pbr"&&entry.at("view")!="authored-mtoon"))
   throw std::invalid_argument("Unknown native HDR texture-set domain");
  integer(member.at("texCoord"),7,"Native HDR texture-set coordinate index exceeds policy");
  return uint32_t(integer(member.at("id"),UINT32_MAX,"Invalid native HDR texture-set identity"));
@@ -280,11 +281,23 @@ void check_texture_set_domain(const Json &j,std::span<const uint8_t> binary,cons
   if(primitive)throw std::invalid_argument("HDR texture-set primitive identity is ambiguous");
   primitive=&candidate;
  }
- const auto &info=j.at("materials").at(entry.at("material").get<size_t>()).at("emissiveTexture");
+ const auto &material=j.at("materials").at(entry.at("material").get<size_t>());
+ const auto extensions=material.find("extensions");
+ const bool typed=entry.at("view")=="authored-mtoon";
+ if(typed!=(extensions!=material.end()&&extensions->contains("VRMC_materials_mtoon"))||
+    (typed&&(coordinate!=0||!field.material_bindings||!field.material_bindings->has_mtoon)))
+  throw std::invalid_argument("HDR texture-set view differs from its actual material model");
+ const auto &info=material.at("emissiveTexture");
  if(!primitive||primitive->at("material")!=entry.at("material")||info.contains("extensions")||
     info.value("texCoord",0u)!=coordinate)
   throw std::invalid_argument("HDR texture-set record differs from its emitted primitive or coordinate");
  const auto &attrs=primitive->at("attributes");
+ if(typed){
+  const auto &sampler=j.at("samplers").at(j.at("textures").at(info.at("index").get<size_t>()).at("sampler").get<size_t>());
+  if(!attrs.contains("TANGENT")||sampler.at("wrapS")!=33071||sampler.at("wrapT")!=33071||
+     sampler.at("minFilter")!=9729||sampler.at("magFilter")!=9729)
+   throw std::invalid_argument("Typed FLOAT texture-set lost its certified tangent frame or sampler");
+ }
  const auto indices=domain_accessor(j,binary,primitive->at("indices"),"SCALAR",1,6'000'000,5125);
  const auto positions=domain_accessor(j,binary,attrs.at("POSITION"),"VEC3",3,2'000'000,5126);
  const auto uv=domain_accessor(j,binary,attrs.at("TEXCOORD_"+std::to_string(coordinate)),
@@ -457,7 +470,7 @@ void detail::attach_native_emission(GltfDocument &document,const NativeEmissionE
   TextureSetLimits set_limits;
   set_limits.cancelled=cancelled;
   const auto field=entry.texture_set?
-      texture_set_emission_raster(texture_set_view(current_object,*entry.texture_set),set_limits):
+      texture_set_emission_raster(texture_set_view(current_object,*entry.texture_set),set_limits,entry.authored_mtoon):
       export_emission_raster(current_object,cancelled,entry.authored_mtoon);
   if(field.resolution!=entry.image.width||field.resolution!=entry.image.height||field.version!=entry.image.version)
    throw std::invalid_argument("Streamed HDR differs from its exact native raster");
@@ -554,7 +567,7 @@ std::optional<Scene> extract_native_emission(std::span<const uint8_t> bytes,cons
    check_texture_set_domain(j,binary,entry,object,field,limits.cancelled);
    TextureSetLimits set_limits;
    set_limits.cancelled=limits.cancelled;
-   validate_streamed_image(j,binary,entry,detail::texture_set_emission_raster(field,set_limits),limits);
+   validate_streamed_image(j,binary,entry,detail::texture_set_emission_raster(field,set_limits,entry.at("view")=="authored-mtoon"),limits);
    continue;
   }
   if(texture_sets&&object.texture_sets)throw std::invalid_argument("HDR texture-set field omitted its material identity");

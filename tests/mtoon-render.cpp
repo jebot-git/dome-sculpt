@@ -7,6 +7,7 @@
 #include "dome/material-visibility.hpp"
 #include "dome/material-bindings.hpp"
 #include "dome/native-authoring.hpp"
+#include "dome/emission-native.hpp"
 #include "dome/texture-sets.hpp"
 #include "dome/import-image.hpp"
 #include "../src/gltf-document.hpp"
@@ -91,6 +92,56 @@ void native_texture_sets(SurfaceRenderer &renderer){
  check(doc.copy_scene().encode()==scene.encode(),"Preview selection preserves exact authored MToon data");
 }
 
+void verify_float_filter(const EmissionInterchangeImage &exr,const Image &portable,
+                         const SourceMaterialBindings &source,const MToonMaterial &exported,double bound){
+ const auto &original=source.roles[size_t(MToonSlot::Emission)].image;
+ const auto &before=source.material.parameters;
+ const auto &after=exported.parameters;
+ const std::array native_factor{before.emission.x,before.emission.y,before.emission.z};
+ const std::array export_factor{after.emission.x,after.emission.y,after.emission.z};
+ const auto linear=[](uint8_t q){
+  const double x=q/255.;
+  return x<=.04045?x/12.92:std::pow((x+.055)/1.055,2.4);
+ };
+ std::array<double,256> srgb{};
+ for(size_t i=0;i<srgb.size();++i)srgb[i]=linear(uint8_t(i));
+ double worst=0;
+ size_t count=0,changing_coverage=0;
+ for(size_t y=0;y+1<exr.height;++y)for(size_t x=0;x+1<exr.width;++x){
+  const auto i=y*exr.width+x;
+  const std::array taps{i,i+1,i+exr.width,i+exr.width+1};
+  const bool transition=std::any_of(taps.begin()+1,taps.end(),[&](size_t at){
+   return exr.pixels[at][9]!=exr.pixels[i][9];
+  });
+  if(!transition&&(y%7||x%7))continue;
+  for(const auto &f:{std::array{.27,.72},std::array{.84,.41}}){
+   const auto filter=[&](const auto &sample){
+    return std::lerp(std::lerp(sample(taps[0]),sample(taps[1]),f[0]),
+                     std::lerp(sample(taps[2]),sample(taps[3]),f[0]),f[1]);
+   };
+   const auto coefficient=[&](size_t component){
+    return filter([&](size_t at){return double(exr.pixels[at][component]);});
+   };
+   const auto coverage=coefficient(9);
+   changing_coverage+=coverage>0&&coverage<1;
+   for(size_t k=0;k<3;++k){
+    const auto original_texel=[&](size_t at){return srgb[original->rgba[at*4+k]];};
+    const double base=original?filter(original_texel):1.;
+    const double native=base*native_factor[k]*before.emission_strength*(1-coverage)+
+                        coefficient(k+3)*before.emission_strength+coefficient(k+6);
+    const auto encoded=[&](size_t at){return srgb[portable.rgba[at*4+k]];};
+    const double gltf=filter(encoded)*export_factor[k]*after.emission_strength;
+    worst=std::max(worst,std::abs(native-gltf));
+    ++count;
+   }
+  }
+ }
+ std::cout<<"FLOAT_FILTER samples="<<count<<" fractional="<<changing_coverage
+          <<" maximum_error="<<worst<<" bound="<<bound<<'\n';
+ check(count>1000&&changing_coverage>0&&worst<=bound,
+       "Independent fractional taps match the original typed emission and FLOAT coefficients within the bound");
+}
+
 void baked_texture_set(SurfaceRenderer &renderer, const std::filesystem::path &directory,
                        TextureSetId set, uint32_t resolution, float gain, bool hdr_donor,
                        bool varying_normal=false, bool full_coverage=false) {
@@ -118,6 +169,11 @@ void baked_texture_set(SurfaceRenderer &renderer, const std::filesystem::path &d
   field.material = white();
   field.material.color = {0,0,1,1};
  }
+ if(hdr_donor){
+  auto &sibling=fields[1-set].material;
+  sibling.unlit=false;
+  sibling.emissive={.024f,1.15f,.12f};
+ }
  auto &current = fields[set].material;
  fields[set].resolution = resolution;
  current.color = {.31f,.67f,.83f,.75f};
@@ -127,7 +183,8 @@ void baked_texture_set(SurfaceRenderer &renderer, const std::filesystem::path &d
  current.emissive = {.012f,.024f,.03f};
  initialize_texture_sets(scene,object,mesh,fields,membership);
  select_texture_set(scene,object,set);
- check(edit_texture_set(scene,object,set,[right](PaintedMesh &paint,Material &) {
+ const bool physical=hdr_donor||gain!=1;
+ check(edit_texture_set(scene,object,set,[right,physical,hdr_donor](PaintedMesh &paint,Material &) {
   PaintSettings ink;
   ink.front_only = false;
   ink.color = {.85f,.23f,.1f,.03f};
@@ -139,6 +196,14 @@ void baked_texture_set(SurfaceRenderer &renderer, const std::filesystem::path &d
   paint.add_layer("Ink over the bake");
   paint.begin_stroke();
   paint.stamp(brush,ink);
+  if(physical){
+   ink.channel=PaintChannel::Emission;
+   ink.emission_units=hdr_donor?PaintEmissionUnits::Physical:PaintEmissionUnits::MaterialRelative;
+   ink.emission=hdr_donor?std::array{.43f,.02f,.59f}:std::array{.073f,.02f,.19f};
+   brush.from=brush.to={right?.5f:-.5f,-.48f,0};
+   brush.radius=.075f;
+   paint.stamp(brush,ink);
+  }
   return paint.end_stroke();
  }),"A real editable paint layer lies above the selected set's Bake");
 
@@ -150,6 +215,22 @@ void baked_texture_set(SurfaceRenderer &renderer, const std::filesystem::path &d
      {"extensions",{{"VRMC_materials_mtoon",{{"specVersion","1.0"},
        {"shadingShiftFactor",-.3f},{"shadeColorFactor",{.09f,.04f,.2f}}}}}}
  },2);
+ if(hdr_donor){
+  auto authored=binding.material.source_json();
+  authored["emissiveTexture"]={{"index",2}};
+  binding.material=MToonMaterial::from_vrm1(authored,3);
+  auto &emission=binding.roles[size_t(MToonSlot::Emission)];
+  Image gradient{resolution,resolution,std::vector<uint8_t>(size_t(resolution)*resolution*4,255)};
+  for(uint32_t y=0;y<resolution;++y)for(uint32_t x=0;x<resolution;++x){
+   const auto at=(size_t(y)*resolution+x)*4;
+   gradient.rgba[at]=uint8_t(60+78*x/resolution);
+   gradient.rgba[at+1]=uint8_t(115+100*y/resolution);
+   gradient.rgba[at+2]=uint8_t(150+80*x/resolution);
+  }
+  emission.image=std::make_shared<const Image>(std::move(gradient));
+  emission.wrap_s=emission.wrap_t=GL_CLAMP_TO_EDGE;
+  emission.min_filter=emission.mag_filter=GL_LINEAR;
+ }
  binding.material.parameters.emission_strength = gain;
  binding.native_reference = {current.color,current.emissive,int(current.alpha),
                              current.alpha_cutoff,current.double_sided};
@@ -268,17 +349,20 @@ void baked_texture_set(SurfaceRenderer &renderer, const std::filesystem::path &d
  const auto gltf = nlohmann::json::parse(bytes.begin()+20,bytes.begin()+20+json_length);
  const auto &primitive = gltf.at("meshes").at(0).at("primitives").at(set);
  const auto &material = gltf.at("materials").at(primitive.at("material").get<size_t>());
- const bool standard_eligible=!hdr_donor&&gain==1;
  check(material.contains("normalTexture")&&material.contains("emissiveTexture")&&
-       (standard_eligible?material["extensions"].contains("VRMC_materials_mtoon"):
-                          material.at("extras").contains("domeSculptNativeMaterial")),
+       (physical?material.at("extras").contains("domeSculptNativeMaterial"):
+                 material["extensions"].contains("VRMC_materials_mtoon")),
        "Editable GLB carries the typed material or its labeled core fallback plus native state");
- if(standard_eligible){
+ {
   const auto file=prefix / "standard.glb";
   doc.export_asset(file,AssetExportFormat::Glb).get();
   std::ifstream stream(file,std::ios::binary);
   const std::vector<uint8_t> portable(std::istreambuf_iterator<char>{stream},{});
-  check(!extract_native_authoring(portable),"Standard GLB carries an interoperable material independently of native data");
+  check(!extract_native_authoring(portable),"Standard GLB carries an interoperable material independently of Editable GLB data");
+  if(physical){
+   const auto recovered=extract_native_emission(portable);
+   check(recovered&&recovered->encode()==after.encode(),"Standard FLOAT GLB exactly restores every native paint, Bake and recipe");
+  }
   const auto length=uint32_t(portable.at(12))|(uint32_t(portable.at(13))<<8)|
       (uint32_t(portable.at(14))<<16)|(uint32_t(portable.at(15))<<24);
   const auto json=nlohmann::json::parse(portable.begin()+20,portable.begin()+20+length);
@@ -291,6 +375,42 @@ void baked_texture_set(SurfaceRenderer &renderer, const std::filesystem::path &d
   const auto &exported=json.at("materials").at(source_primitive.at("material").get<size_t>());
   const auto bound=exported.at("extras").at("domeSculptMToonPaint").at("maximumNormalErrorRadians").get<double>();
   check(bound>0&&bound<=(full_coverage?.00011:.02),"Standard MToon records a bounded normal filtering error");
+  EmissionInterchangeImage exr;
+  double between=0;
+  if(physical){
+   const auto &receipt=exported.at("extras").at("domeSculptPortableEmission");
+   const auto &package=json.at("extras").at("domeSculptEmission");
+   const auto &images=package.at("images");
+   check(images.size()==(hdr_donor?2u:1u),"FLOAT export carries a separate resource for each physical member");
+   const auto selected_exr=std::find_if(images.begin(),images.end(),[&](const auto &entry){
+    return entry.at("textureSet").at("id")==set;
+   });
+   check(selected_exr!=images.end(),"The exact package identifies the selected member independently of table order");
+   const auto &entry=*selected_exr;
+   if(hdr_donor)
+    check(std::any_of(images.begin(),images.end(),[&](const auto &other){
+     return other.at("textureSet").at("id")==1-set&&other.at("view")=="pbr";
+    }),"A physical PBR sibling keeps its own model and resource in the same package");
+   check(entry.at("view")=="authored-mtoon"&&entry.at("textureSet").at("id")==set&&
+       entry.at("fallback").at("view")=="authored-mtoon",
+       "The exact FLOAT resource is explicitly bound to authored MToon and its face partition");
+   const auto &buffer=json.at("bufferViews").at(entry.at("bufferView").get<size_t>());
+   exr=decode_emission_exr(std::span(portable).subspan(28+length+buffer.at("byteOffset").get<size_t>(),
+       buffer.at("byteLength").get<size_t>()));
+   bool has_overlay=false,has_bake=false;
+   const auto emission=source.material.emissive[1];
+   const auto donor_green=hdr_donor?emission:srgb_round_trip(emission);
+   for(const auto &q:exr.pixels){
+    has_overlay|=hdr_donor?q[9]>0&&q[8]>.06f:q[5]>.01f;
+    has_bake|=q[9]==1&&q[4]==0&&q[1]==q[7]&&std::abs(q[7]-donor_green)<=1e-6f;
+   }
+   check(exr.version==2&&exr.width==resolution&&has_overlay&&has_bake,
+        "Decoded FLOAT channels preserve legacy or physical strokes and donor radiance independently");
+   between=receipt.at("betweenTexelErrorBound").get<double>();
+   check(between>receipt.at("maximumAbsoluteError").get<double>()&&
+         between<=.005*entry.at("fallback").at("strength").get<float>(),
+         "The emitted texture records an absolute bound including between-texel filtering");
+  }
   SourceMaterialBindings decoded;
   decoded.material=MToonMaterial::from_vrm1(exported,imported.textures.size());
   for(size_t i=0;i<decoded.roles.size();++i){
@@ -301,6 +421,12 @@ void baked_texture_set(SurfaceRenderer &renderer, const std::filesystem::path &d
    view.image=std::make_shared<const Image>(decode_import_image(imported.images.at(size_t(slot.image))));
    view.wrap_s=slot.wrap_s;view.wrap_t=slot.wrap_t;
    view.min_filter=slot.min_filter;view.mag_filter=slot.mag_filter;
+  }
+  if(physical){
+   const auto &emission=decoded.roles[size_t(MToonSlot::Emission)].image;
+   check(emission&&emission->width==exr.width&&emission->height==exr.height,
+         "The typed baked emissive image matches its FLOAT grid");
+   verify_float_filter(exr,*emission,binding,decoded.material,between);
   }
   const auto &normal=decoded.roles[size_t(MToonSlot::Normal)];
   check(normal.image&&normal.image->width==resolution&&normal.wrap_s==GL_CLAMP_TO_EDGE&&
@@ -331,7 +457,29 @@ void baked_texture_set(SurfaceRenderer &renderer, const std::filesystem::path &d
  }
  const auto standard = prefix / "preexisting.glb";
  std::ofstream(standard)<<"previous export";
- if(standard_eligible&&!full_coverage){
+ if(physical){
+  auto unsupported=after.snapshot();
+  auto adjusted=*selected.material_bindings;
+  const auto role=size_t(MToonSlot::Emission);
+  auto authored=adjusted.material.source_json();
+  authored["emissiveTexture"]={{"index",2}};
+  adjusted.material=MToonMaterial::from_vrm1(authored,3);
+  adjusted.roles[role].image=std::make_shared<const Image>(Image{2,1,{0,255,15,255,255,0,45,255}});
+  adjusted.roles[role].wrap_s=GL_REPEAT;
+  check(bind_texture_set_mtoon(unsupported,object,set,adjusted),"A nonaligned source remains valid native authoring data");
+  auto options=GltfExportOptions{};
+  auto emission=std::make_shared<NativeEmissionExport>();
+  emission->scene=std::make_shared<const Scene>(std::move(unsupported));
+  emission->allow_measured_core_fallback=true;
+  options.emission=emission;
+  bool refused=false;
+  try{
+   export_glb(emission_export_surfaces(*emission->scene),standard,options);
+  }catch(const std::invalid_argument &error){
+   refused=std::string_view(error.what()).find("constant or aligned clamp-linear")!=std::string_view::npos;
+  }
+  check(refused,"Typed FLOAT GLB refuses a varying emission source with unrelated sampling");
+ }else if(!full_coverage){
   auto sharp=after.snapshot();
   auto adjusted=*selected.material_bindings;
   auto &source=adjusted.roles[size_t(MToonSlot::Normal)];
@@ -347,8 +495,7 @@ void baked_texture_set(SurfaceRenderer &renderer, const std::filesystem::path &d
   check(bind_texture_set_mtoon(sharp,object,set,adjusted)&&
         rejects([&]{export_glb(sharp.export_surfaces(),standard);}),
         "A sharp alternating original normal field fails the portable filter bound");
- }else if(!standard_eligible)check(rejects([&]{doc.export_asset(standard,AssetExportFormat::Glb).get();}),
-                                  "Standard GLB refuses unsupported typed FLOAT Bake");
+ }
  std::ifstream file(standard);
  check(std::string(std::istreambuf_iterator<char>{file},{})=="previous export", "Refused Standard GLB preserves its destination");
 
@@ -358,6 +505,14 @@ void baked_texture_set(SurfaceRenderer &renderer, const std::filesystem::path &d
  reopened.open(native_path);
  check(reopened.wait_mesh()&&draw(renderer,reopened.frame().surface)==pixels,
        "Cold Open restores identical typed viewport pixels");
+ if(physical){
+  const auto second=prefix/"reopened-standard.glb";
+  reopened.export_asset(second,AssetExportFormat::Glb).get();
+  std::ifstream original(prefix/"standard.glb",std::ios::binary),again(second,std::ios::binary);
+  const std::vector<uint8_t> expected(std::istreambuf_iterator<char>{original},{});
+  const std::vector<uint8_t> actual(std::istreambuf_iterator<char>{again},{});
+  check(!actual.empty()&&actual==expected,"Cold Open reproduces the exact typed FLOAT GLB bytes");
+ }
  check(reopened.frame().state->can_clear_bake,"Clear Bake is available on the reopened selected field");
  reopened.clear_bake();
  check(reopened.wait_asset()&&reopened.wait_mesh()&&reopened.frame().state->error.empty()&&

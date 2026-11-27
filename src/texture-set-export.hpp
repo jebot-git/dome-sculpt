@@ -11,10 +11,11 @@ struct TextureSetExportEmission {
   std::array<float,3> factor{};
   float strength=1;
   ResolvedFallbackMetrics measured;
+  std::optional<double> filter_error;
 };
 bool texture_set_physical_emission(const TextureSetView &);
 struct EmissionExportRaster;
-EmissionExportRaster texture_set_emission_raster(const TextureSetView &,const TextureSetLimits &);
+EmissionExportRaster texture_set_emission_raster(const TextureSetView &,const TextureSetLimits &,bool authored_mtoon);
 struct TextureSetExportField {
   TextureSetId set=0;
   std::string name;

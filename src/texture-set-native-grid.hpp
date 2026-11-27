@@ -4,7 +4,7 @@
 #include "dome/texture-sets.hpp"
 
 namespace dome::detail {
-enum class TextureSetGridMode { NativeHdr, RetainedHdr, RetainedLdr };
+enum class TextureSetGridMode { NativeHdr, RetainedHdr, RetainedLdr, NativeMToonHdr };
 
 bool native_hdr_grid(const PaintedMesh &) noexcept;
 bool retained_material_grid(const TextureSetView &) noexcept;

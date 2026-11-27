@@ -721,8 +721,9 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
       j["materials"][material_id]["extras"]["domeSculptNativeMaterial"]="MToon in embedded authoring data";
       return false;
     };
+    const auto *hdr=compiled.emission&&compiled.emission->filter_error?&*compiled.emission:nullptr;
     if(field.source||binding->material.version()!=MToonVersion::V1||
-       binding->physical_emission)
+       binding->physical_emission||(compiled.emission&&!hdr))
       return retain_native();
 
     const auto &attributes=j["meshes"][result.objects[object].mesh]["primitives"][0]["attributes"];
@@ -773,7 +774,7 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
     for(size_t channel=0;channel<emission.size();++channel){
       auto &factor=emission[channel];
       factor=mtoon_factor(factor,native.emission[channel],current.emissive[channel]);
-      if(!unit(factor))return retain_native();
+      if(!hdr&&!unit(factor))return retain_native();
     }
     params.emission={emission[0],emission[1],emission[2]};
     if(current.double_sided!=native.double_sided)
@@ -830,12 +831,25 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
         params.normal_scale=1;
       }
     }
+    if(hdr){
+      roles[size_t(MToonSlot::Emission)]={};
+      typed.textures[size_t(MToonSlot::Emission)]=MToonTexture{
+          .index=texture(hdr->image,paint_sampler),.encoding=MToonEncoding::Srgb};
+      params.emission={hdr->factor[0],hdr->factor[1],hdr->factor[2]};
+      params.emission_strength=hdr->strength;
+    }
     for(size_t role=0;role<roles.size();++role){
       stop();
       const auto &view=roles[role];
       if(view.image)typed.textures[role].index=texture(*view.image,view);
     }
     auto output=typed.source_json();
+    if(hdr&&hdr->strength==1){
+      // This strength is generated from resolved radiance. Its default
+      // representation must not depend on whether the source was reopened.
+      output.at("extensions").erase("KHR_materials_emissive_strength");
+      extensions.erase("KHR_materials_emissive_strength");
+    }
     output["name"]=field.name;
     output["pbrMetallicRoughness"]["metallicFactor"]=current.metallic;
     output["pbrMetallicRoughness"]["roughnessFactor"]=current.roughness;
@@ -849,7 +863,7 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
           {"version",1},{"sampling","clamp-linear-level-zero"},
           {"maximumLinearColorError",paint->color_error},
           {"maximumAlphaError",paint->alpha_error},
-          {"maximumLinearEmissionError",paint->emission_error},
+          {"maximumLinearEmissionError",hdr?*hdr->filter_error:paint->emission_error},
           {"emissiveStrength",params.emission_strength}};
       if(paint->shade){
         auto &bounds=output["extras"]["domeSculptMToonPaint"];
@@ -860,6 +874,15 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
         output["extras"]["domeSculptMToonPaint"]["maximumSourceFilterError"]=paint->source_filter_error;
       if(paint->normal)
         output["extras"]["domeSculptMToonPaint"]["maximumNormalErrorRadians"]=paint->normal_error_radians;
+    }
+    if(hdr){
+      output["extras"]["domeSculptPortableEmission"]={{"version",1},
+          {"evaluation","finite-current-authored-mtoon-texture-set"},{"units","native-linear-radiance"},
+          {"lossless",false},{"unlitIgnoresEmission",false},{"errorScope","clamp-linear-level-zero"},
+          {"betweenTexelErrorBound",*hdr->filter_error},
+          {"maximumAbsoluteError",hdr->measured.maximum_absolute_error},
+          {"maximumRelativeError",hdr->measured.maximum_relative_error},
+          {"erasedNonzeroSamples",hdr->measured.erased_nonzero_samples}};
     }
     if(!collect_extensions(collect_extensions,output))
       throw std::logic_error("MToon material writing introduced an unknown extension");
