@@ -4790,20 +4790,22 @@ PaintedMesh::composite(const Material &material,const std::function<bool()> &can
   composite_retention().retain(maps,composite_token_,factors,false);return maps;
 }
 namespace {
-bool gpu_plain_composite_eligible(uint32_t r,const std::vector<PaintLayer> &layers){
+bool gpu_plain_composite_eligible(uint32_t r,const std::vector<PaintLayer> &layers,bool baked_coverage){
  if(compute_backend()=="CPU"||r<512||r>2048)return false;
  size_t contributing=0;
  for(const auto &l:layers){
   if(std::any_of(l.pbr_tiles.begin(),l.pbr_tiles.end(),[](const auto &p){return bool(p);}))return false;
   if(l.visible&&l.opacity>0&&std::any_of(l.tiles.begin(),l.tiles.end(),[](const auto &p){return bool(p);}))++contributing;
  }
- return contributing&&uint64_t(r)*r*contributing<=128*1024*1024;
+ return (contributing||baked_coverage)&&uint64_t(r)*r*contributing<=128*1024*1024;
 }
 std::shared_ptr<TextureMaps> gpu_plain_composite(uint32_t r,const std::vector<PaintLayer> &layers,
-    const std::vector<int32_t> &padding,const Material &material,const std::function<bool()> &cancelled){
+    const std::vector<int32_t> &padding,const Material &material,const BakedTextures *bake,
+    const std::function<bool()> &cancelled){
  using namespace paint_compute;checkpoint(cancelled);Input in;auto &p=in.parameters;
  p.resolution=r;p.tiles=((r+31)/32)*((r+31)/32);std::copy(material.color.begin(),material.color.end(),p.color);std::copy(material.emissive.begin(),material.emissive.end(),p.emission);p.metallic=material.metallic;p.roughness=material.roughness;
- bool color_coverage=false,emission_coverage=false;
+ bool color_coverage=bake!=nullptr,emission_coverage=bake!=nullptr;
+ if(bake)in.bake={bake->coverage,bake->maps.color.rgba,bake->maps.metal_rough.rgba,bake->maps.emission.rgba};
  for(const auto &l:layers)if(l.visible&&l.opacity>0&&std::any_of(l.tiles.begin(),l.tiles.end(),[](const auto &p){return bool(p);})){
   checkpoint(cancelled);in.layers.push_back({l.opacity,uint32_t(in.tiles.size())});
   for(const auto &tile:l.tiles){
@@ -4814,8 +4816,8 @@ std::shared_ptr<TextureMaps> gpu_plain_composite(uint32_t r,const std::vector<Pa
   }
  }
  p.layers=uint32_t(in.layers.size());in.padding=padding;checkpoint(cancelled);
- // No model/cache/renderer memory is passed to the backend. All readbacks
- // complete before any output image is constructed or exposed.
+ // Bake image spans borrow immutable source bytes. Readback is detached
+ // from the source and no output map is published until it has been checked.
  const auto pixels=paint_compute::composite(in,cancelled);auto maps=std::make_shared<TextureMaps>();
  for(auto image:{&maps->color,&maps->metal_rough,&maps->emission})*image={r,r,std::vector<uint8_t>(size_t(r)*r*4)};
  auto coverage=[&](Image &im,bool full){const uint32_t n=full?r:1;im={n,n,std::vector<uint8_t>(size_t(n)*n*4)};for(size_t at=3;at<im.rgba.size();at+=4)im.rgba[at]=255;};
@@ -4902,17 +4904,21 @@ std::shared_ptr<TextureMaps>
 PaintedMesh::build_composite(const Material &material,const std::function<bool()> &cancelled) const {
   paint_compute::checkpoint(cancelled);
   if(has_physical_emission()||std::any_of(material.emissive.begin(),material.emissive.end(),[](float v){return v>1;}))throw std::logic_error("Physical emission requires its linear composite adapter");
-  // This packet owns only the legacy grid/padding. Independent paint domains,
-  // normal metadata/events, actual original images and prepared projections need
-  // their existing CPU interpretation until a genuine packet adapter exists.
-  if(!surface_->paint_domain&&!sampling_attachment_&&(!source_maps_||source_maps_->empty())&&!baked_&&!color_projection_&&!normal_projection_&&gpu_plain_composite_eligible(resolution(),layers_))
-    return gpu_plain_composite(resolution(),layers_,surface_->padding,material,cancelled);
   if(source_maps_&&source_maps_->uses_alternate_uv())throw std::invalid_argument(source_maps_->extra_uv_sets.empty()?"UV1 source compositing requires explicit source-coordinate preparation":"Extra source UV compositing requires explicit source-coordinate preparation");
-  auto maps = std::make_shared<TextureMaps>();
+  // The compute packet uses the current native grid with its actual padding.
+  // Source samplers, independent paint domains and projections keep their own adapters.
+  const auto r=resolution();
+  const bool native_grid=!surface_->paint_domain&&!sampling_attachment_&&
+      (!source_maps_||source_maps_->empty())&&!color_projection_&&!normal_projection_&&
+      (!baked_||!baked_->emission_field);
+  const auto *bake=native_grid&&baked_&&compute_backend()!="CPU"&&r>=512&&
+      std::ranges::any_of(baked_->coverage,[](uint8_t value){return value!=0;})?baked_.get():nullptr;
+  const bool accelerated=native_grid&&gpu_plain_composite_eligible(r,layers_,bake!=nullptr);
+  auto maps=accelerated?gpu_plain_composite(r,layers_,surface_->padding,material,bake,cancelled):
+                         std::make_shared<TextureMaps>();
   maps->source_maps=source_maps_;
   maps->color_projection=color_projection_;
   maps->normal_projection=normal_projection_;
-  uint32_t r=resolution();
   const PaintSourceMaps empty;
   const auto &source=source_maps_?*source_maps_:empty;
   auto dimensions=[&](Image &image,std::initializer_list<const PaintSourceTexture*> views){
@@ -4922,7 +4928,7 @@ PaintedMesh::build_composite(const Material &material,const std::function<bool()
       throw std::length_error("Composited original texture exceeds output pixel budget");
     image.rgba.resize(size_t(image.width)*image.height*4);
   };
-  dimensions(maps->color,{&source.color});
+  if(!accelerated)dimensions(maps->color,{&source.color});
   PaintSourceTexture projected_vertex_color;
   if(color_projection_) {
     color_projection_->validate(r);
@@ -4931,8 +4937,10 @@ PaintedMesh::build_composite(const Material &material,const std::function<bool()
     projected_vertex_color.wrap_s=projected_vertex_color.wrap_t=33071;
     projected_vertex_color.min_filter=projected_vertex_color.mag_filter=9729;
   }
-  dimensions(maps->metal_rough,{&source.metal_rough,&source.occlusion});
-  dimensions(maps->emission,{&source.emission});
+  if(!accelerated){
+    dimensions(maps->metal_rough,{&source.metal_rough,&source.occlusion});
+    dimensions(maps->emission,{&source.emission});
+  }
   auto make_coverage=[&](Image &coverage,const Image &base,int component) {
     bool covered=baked_&&std::any_of(baked_->coverage.begin(),baked_->coverage.end(),[](uint8_t x){return x!=0;});
     for(const auto &layer:layers_)if(layer.visible&&layer.opacity>0) {
@@ -4946,8 +4954,10 @@ PaintedMesh::build_composite(const Material &material,const std::function<bool()
     coverage.rgba.assign(size_t(coverage.width)*coverage.height*4,0);
     for(size_t at=3;at<coverage.rgba.size();at+=4)coverage.rgba[at]=255;
   };
-  make_coverage(maps->color_coverage,maps->color,9);
-  make_coverage(maps->emission_coverage,maps->emission,12);
+  if(!accelerated){
+    make_coverage(maps->color_coverage,maps->color,9);
+    make_coverage(maps->emission_coverage,maps->emission,12);
+  }
   maps->baked_base=baked_;
   if(baked_&&baked_->normal_field){
     baked_->normal_field->validate();maps->normal=*baked_->normal_field->pbr();maps->mtoon_normal=*baked_->normal_field->mtoon();
@@ -4960,101 +4970,103 @@ PaintedMesh::build_composite(const Material &material,const std::function<bool()
     maps->baked_coverage=blank_image(r);for(size_t at=3;at<maps->baked_coverage.rgba.size();at+=4)maps->baked_coverage.rgba[at]=255;
   }
 
-  // These values are decoded directly from byte images and sparse layer
-  // tiles. Original samplers still interpolate in their existing domain.
-  static const auto linear_byte = [] {
-    std::array<float, 256> table{};
-    for (size_t value = 0; value < table.size(); ++value)
-      table[value] = srgb_to_linear(unit(uint8_t(value)));
-    return table;
-  }();
-  const detail::SourceTextureGrid occlusion(source.occlusion,maps->metal_rough.width,maps->metal_rough.height,false);
-  const detail::SourceTextureGrid projected(projected_vertex_color,maps->color.width,maps->color.height,false);
-  const auto tile_layers=composite_tile_layers(layers_,surface_->tiles.size());
-  for(int channel=0;channel<3;++channel){
-    auto &image=channel==0?maps->color:channel==1?maps->metal_rough:maps->emission;
-    const auto &source_view=channel==0?source.color:channel==1?source.metal_rough:source.emission;
-    const detail::SourceTextureGrid source_grid(source_view,image.width,image.height,channel!=1);
-    const Image *baked_image = nullptr;
-    if (baked_)
-      baked_image = channel == 0 ? &baked_->maps.color :
-                    channel == 1 ? &baked_->maps.metal_rough :
-                    baked_->emission_field ? nullptr : &baked_->maps.emission;
-    for(uint32_t y=0;y<image.height;++y)for(uint32_t x=0;x<image.width;++x){
-      if((x&255)==0)paint_compute::checkpoint(cancelled);
-      float u=(float(x)+.5f)/image.width,v=(float(y)+.5f)/image.height;
-      const auto sampled=source_grid.sample(x,y);
-      std::array<float,4> value{};
-      if(channel==0)for(int k=0;k<4;++k)value[k]=material.color[k]*sampled[k];
-      else if(channel==1){
-        const float ao=occlusion.sample(x,y)[0];
-        value={1-source.occlusion_strength*(1-ao),material.roughness*sampled[1],material.metallic*sampled[2],1};
-      }else{for(int k=0;k<3;++k)value[k]=material.emissive[k]*sampled[k];value[3]=1;}
-      auto pbr_value=value;
-      if(channel==0 && color_projection_) {
-        const auto vertex=projected.sample(x,y);
-        for(int k=0;k<4;++k)pbr_value[k]*=vertex[k];
-      }
-      uint32_t tx=std::min(r-1,uint32_t(u*r)),ty=std::min(r-1,uint32_t(v*r));
-      int32_t owner=surface_->padding[size_t(ty)*r+tx];
-      uint32_t px=owner>=0?uint32_t(owner)%r:tx,py=owner>=0?uint32_t(owner)/r:ty;
-      float replacement_coverage=0;
-      if (baked_ && owner >= 0) {
-        const auto texel = size_t(owner) * 4;
-        const float a = unit(baked_->coverage[size_t(owner)]);
-        replacement_coverage = a;
-        for (int k = 0; k < (channel == 0 ? 4 : 3); ++k) {
-          const uint8_t sample = baked_image ? baked_image->rgba[texel + k] : 0;
-          const float decoded = channel == 1 || k == 3 ? unit(sample) : linear_byte[sample];
-          value[k] = value[k] * (1 - a) + decoded * a;
-        }
+  if(!accelerated){
+    // These values are decoded directly from byte images and sparse layer
+    // tiles. Original samplers still interpolate in their existing domain.
+    static const auto linear_byte = [] {
+      std::array<float, 256> table{};
+      for (size_t value = 0; value < table.size(); ++value)
+        table[value] = srgb_to_linear(unit(uint8_t(value)));
+      return table;
+    }();
+    const detail::SourceTextureGrid occlusion(source.occlusion,maps->metal_rough.width,maps->metal_rough.height,false);
+    const detail::SourceTextureGrid projected(projected_vertex_color,maps->color.width,maps->color.height,false);
+    const auto tile_layers=composite_tile_layers(layers_,surface_->tiles.size());
+    for(int channel=0;channel<3;++channel){
+      auto &image=channel==0?maps->color:channel==1?maps->metal_rough:maps->emission;
+      const auto &source_view=channel==0?source.color:channel==1?source.metal_rough:source.emission;
+      const detail::SourceTextureGrid source_grid(source_view,image.width,image.height,channel!=1);
+      const Image *baked_image = nullptr;
+      if (baked_)
+        baked_image = channel == 0 ? &baked_->maps.color :
+                      channel == 1 ? &baked_->maps.metal_rough :
+                      baked_->emission_field ? nullptr : &baked_->maps.emission;
+      for(uint32_t y=0;y<image.height;++y)for(uint32_t x=0;x<image.width;++x){
+        if((x&255)==0)paint_compute::checkpoint(cancelled);
+        float u=(float(x)+.5f)/image.width,v=(float(y)+.5f)/image.height;
+        const auto sampled=source_grid.sample(x,y);
+        std::array<float,4> value{};
+        if(channel==0)for(int k=0;k<4;++k)value[k]=material.color[k]*sampled[k];
+        else if(channel==1){
+          const float ao=occlusion.sample(x,y)[0];
+          value={1-source.occlusion_strength*(1-ao),material.roughness*sampled[1],material.metallic*sampled[2],1};
+        }else{for(int k=0;k<3;++k)value[k]=material.emissive[k]*sampled[k];value[3]=1;}
+        auto pbr_value=value;
         if(channel==0 && color_projection_) {
-          if(baked_->color_interpretation!=BakedColorInterpretation::ResolvedPbr)throw std::logic_error("Prepared surface contains unresolved baked colors");
-          for(int k=0;k<4;++k) {
-            const auto sample = baked_->maps.pbr_color.rgba[texel + k];
-            const float decoded = k < 3 ? linear_byte[sample] : unit(sample);
-            pbr_value[k] = pbr_value[k] * (1 - a) + decoded * a;
+          const auto vertex=projected.sample(x,y);
+          for(int k=0;k<4;++k)pbr_value[k]*=vertex[k];
+        }
+        uint32_t tx=std::min(r-1,uint32_t(u*r)),ty=std::min(r-1,uint32_t(v*r));
+        int32_t owner=surface_->padding[size_t(ty)*r+tx];
+        uint32_t px=owner>=0?uint32_t(owner)%r:tx,py=owner>=0?uint32_t(owner)/r:ty;
+        float replacement_coverage=0;
+        if (baked_ && owner >= 0) {
+          const auto texel = size_t(owner) * 4;
+          const float a = unit(baked_->coverage[size_t(owner)]);
+          replacement_coverage = a;
+          for (int k = 0; k < (channel == 0 ? 4 : 3); ++k) {
+            const uint8_t sample = baked_image ? baked_image->rgba[texel + k] : 0;
+            const float decoded = channel == 1 || k == 3 ? unit(sample) : linear_byte[sample];
+            value[k] = value[k] * (1 - a) + decoded * a;
+          }
+          if(channel==0 && color_projection_) {
+            if(baked_->color_interpretation!=BakedColorInterpretation::ResolvedPbr)throw std::logic_error("Prepared surface contains unresolved baked colors");
+            for(int k=0;k<4;++k) {
+              const auto sample = baked_->maps.pbr_color.rgba[texel + k];
+              const float decoded = k < 3 ? linear_byte[sample] : unit(sample);
+              pbr_value[k] = pbr_value[k] * (1 - a) + decoded * a;
+            }
           }
         }
-      }
 
-      const auto tile=composite_tile(px,py,surface_->columns);
-      const auto within=size_t(py%PaintTile::size)*PaintTile::size+px%PaintTile::size;
-      for(auto remaining=owner>=0?tile_layers[tile]:uint16_t{};remaining;remaining&=remaining-1){
-        const auto &l=layers_[std::countr_zero(remaining)];
-        const auto &p=l.tiles[tile]->pixels[within];
-        float mask=unit(p.data[13])*l.opacity;
-        float weight=mask*unit(p.data[channel==2?12:9]);replacement_coverage=replacement_coverage*(1-weight)+weight;
-        auto blend=[&](float base,int data,int coverage,bool srgb){
-          const float a = mask * unit(p.data[coverage]);
-          const auto sample = p.data[data];
-          const float paint = srgb ? linear_byte[sample] : unit(sample);
-          return base*(1-a)+paint*a;
-        };
-        if(channel==0)for(int k=0;k<4;++k)value[k]=blend(value[k],k,9,k<3);
-        else if(channel==1){value[1]=blend(value[1],5,11,false);value[2]=blend(value[2],4,10,false);}
-        else for(int k=0;k<3;++k)value[k]=blend(value[k],6+k,12,true);
-        if(channel==0 && color_projection_) {
-          std::array<uint8_t,4> painted{p.data[0],p.data[1],p.data[2],p.data[3]};
-          if(!l.pbr_tiles.empty()&&l.pbr_tiles[tile])painted=l.pbr_tiles[tile]->pixels[within];
-          const float a=mask*unit(p.data[9]);
-          for(int k=0;k<4;++k) {
-            const float sample = k < 3 ? linear_byte[painted[k]] : unit(painted[k]);
-            pbr_value[k]=pbr_value[k]*(1-a)+sample*a;
+        const auto tile=composite_tile(px,py,surface_->columns);
+        const auto within=size_t(py%PaintTile::size)*PaintTile::size+px%PaintTile::size;
+        for(auto remaining=owner>=0?tile_layers[tile]:uint16_t{};remaining;remaining&=remaining-1){
+          const auto &l=layers_[std::countr_zero(remaining)];
+          const auto &p=l.tiles[tile]->pixels[within];
+          float mask=unit(p.data[13])*l.opacity;
+          float weight=mask*unit(p.data[channel==2?12:9]);replacement_coverage=replacement_coverage*(1-weight)+weight;
+          auto blend=[&](float base,int data,int coverage,bool srgb){
+            const float a = mask * unit(p.data[coverage]);
+            const auto sample = p.data[data];
+            const float paint = srgb ? linear_byte[sample] : unit(sample);
+            return base*(1-a)+paint*a;
+          };
+          if(channel==0)for(int k=0;k<4;++k)value[k]=blend(value[k],k,9,k<3);
+          else if(channel==1){value[1]=blend(value[1],5,11,false);value[2]=blend(value[2],4,10,false);}
+          else for(int k=0;k<3;++k)value[k]=blend(value[k],6+k,12,true);
+          if(channel==0 && color_projection_) {
+            std::array<uint8_t,4> painted{p.data[0],p.data[1],p.data[2],p.data[3]};
+            if(!l.pbr_tiles.empty()&&l.pbr_tiles[tile])painted=l.pbr_tiles[tile]->pixels[within];
+            const float a=mask*unit(p.data[9]);
+            for(int k=0;k<4;++k) {
+              const float sample = k < 3 ? linear_byte[painted[k]] : unit(painted[k]);
+              pbr_value[k]=pbr_value[k]*(1-a)+sample*a;
+            }
           }
         }
+        size_t at=(size_t(y)*image.width+x)*4;
+        for(int k=0;k<4;++k)image.rgba[at+k]=byte(channel!=1&&k<3?linear_to_srgb(value[k]):value[k]);
+        if(channel==0){
+          maps->transparent|=value[3]<.999f;
+          if(color_projection_) {
+            for(int k=0;k<4;++k)maps->pbr_color.rgba[at+k]=byte(k<3?linear_to_srgb(pbr_value[k]):pbr_value[k]);
+            maps->pbr_transparent|=pbr_value[3]<.999f;
+          }
+          if(maps->color_coverage.width==image.width&&maps->color_coverage.height==image.height)maps->color_coverage.rgba[at]=byte(replacement_coverage);
+        } else if(channel==2 && maps->emission_coverage.width==image.width && maps->emission_coverage.height==image.height)
+          maps->emission_coverage.rgba[at]=byte(replacement_coverage);
       }
-      size_t at=(size_t(y)*image.width+x)*4;
-      for(int k=0;k<4;++k)image.rgba[at+k]=byte(channel!=1&&k<3?linear_to_srgb(value[k]):value[k]);
-      if(channel==0){
-        maps->transparent|=value[3]<.999f;
-        if(color_projection_) {
-          for(int k=0;k<4;++k)maps->pbr_color.rgba[at+k]=byte(k<3?linear_to_srgb(pbr_value[k]):pbr_value[k]);
-          maps->pbr_transparent|=pbr_value[3]<.999f;
-        }
-        if(maps->color_coverage.width==image.width&&maps->color_coverage.height==image.height)maps->color_coverage.rgba[at]=byte(replacement_coverage);
-      } else if(channel==2 && maps->emission_coverage.width==image.width && maps->emission_coverage.height==image.height)
-        maps->emission_coverage.rgba[at]=byte(replacement_coverage);
     }
   }
   if(normal_projection_ && normal_projection_->version==1 && baked_ && !baked_->maps.normal.rgba.empty()) {

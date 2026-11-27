@@ -13,6 +13,9 @@ struct Pixel { uint8_t data[14]{}; };
 struct Output { uint8_t color[4]{},orm[4]{},emission[4]{};uint8_t color_coverage=0,emission_coverage=0,transparent=0,reserved=0; };
 struct Layer {float opacity=1;uint32_t first_tile=0;};
 struct Parameters {float color[4]{},emission[3]{},metallic=0,roughness=0;uint32_t resolution=0,layers=0,tiles=0;};
+struct Bake {
+ const uint8_t *coverage=nullptr,*color=nullptr,*orm=nullptr,*emission=nullptr;
+};
 struct Quantization {float unit[256]{},srgb[256]{};uint32_t threshold[255]{};uint32_t reserved=0;};
 inline constexpr uint32_t absent=UINT32_MAX;
 // Volatile float expression boundaries prohibit contraction without changing
@@ -40,11 +43,24 @@ DOME_PC_FN uint8_t srgb_byte(float v,const Quantization &q){
 }
 DOME_PC_FN float blend(float base,float paint,float a){return add(mul(base,sub(1,a)),mul(paint,a));}
 DOME_PC_FN Output compose(uint32_t at,const Parameters &p,const Layer *layers,const uint32_t *tiles,
-                         const Pixel *pixels,const int32_t *padding,const Quantization &q){
+                         const Pixel *pixels,const int32_t *padding,Bake bake,const Quantization &q){
  float color[]{p.color[0],p.color[1],p.color[2],p.color[3]};
  float emission[]{p.emission[0],p.emission[1],p.emission[2]};
- float rough=p.roughness,metal=p.metallic,cc=0,ec=0;const auto owner=padding[at];
+ float ao=1,rough=p.roughness,metal=p.metallic,cc=0,ec=0;const auto owner=padding[at];
  if(owner>=0){
+  if(bake.coverage){
+   const auto offset=size_t(owner)*4;
+   const float weight=q.unit[bake.coverage[owner]];
+   cc=ec=weight;
+   for(unsigned c=0;c<3;++c){
+    color[c]=blend(color[c],q.srgb[bake.color[offset+c]],weight);
+    emission[c]=blend(emission[c],q.srgb[bake.emission[offset+c]],weight);
+   }
+   color[3]=blend(color[3],q.unit[bake.color[offset+3]],weight);
+   ao=blend(ao,q.unit[bake.orm[offset]],weight);
+   rough=blend(rough,q.unit[bake.orm[offset+1]],weight);
+   metal=blend(metal,q.unit[bake.orm[offset+2]],weight);
+  }
   const auto x=uint32_t(owner)%p.resolution,y=uint32_t(owner)/p.resolution;
   const auto tile=(y/32)*((p.resolution+31)/32)+x/32,offset=(y%32)*32+x%32;
   for(uint32_t li=0;li<p.layers;++li){
@@ -59,7 +75,7 @@ DOME_PC_FN Output compose(uint32_t at,const Parameters &p,const Layer *layers,co
   }
  }
  Output out;for(uint32_t c=0;c<3;++c){out.color[c]=srgb_byte(color[c],q);out.emission[c]=srgb_byte(emission[c],q);}
- out.color[3]=linear_byte(color[3]);out.orm[0]=255;out.orm[1]=linear_byte(rough);out.orm[2]=linear_byte(metal);out.orm[3]=out.emission[3]=255;
+ out.color[3]=linear_byte(color[3]);out.orm[0]=linear_byte(ao);out.orm[1]=linear_byte(rough);out.orm[2]=linear_byte(metal);out.orm[3]=out.emission[3]=255;
  out.color_coverage=linear_byte(cc);out.emission_coverage=linear_byte(ec);out.transparent=color[3]<.999f;return out;
 }
 static_assert(sizeof(Pixel)==14&&sizeof(Output)==16&&sizeof(Layer)==8&&sizeof(Parameters)==48&&sizeof(Quantization)==3072);

@@ -14,8 +14,27 @@ namespace {
 thread_local bool reference_mode=false;std::atomic_uint calls=0;std::atomic_int fault=0;size_t checks=0;
 void check(bool b,const char*m){++checks;if(!b)throw std::runtime_error(m);std::cout<<"PASS "<<m<<'\n';}
 template<class F>bool refuses(F f){try{f();return false;}catch(const std::exception&e){std::cout<<"REFUSAL "<<e.what()<<'\n';return true;}}
-bool equal(const TextureMaps&a,const TextureMaps&b){return a.color.rgba==b.color.rgba&&a.metal_rough.rgba==b.metal_rough.rgba&&a.emission.rgba==b.emission.rgba&&a.color_coverage.rgba==b.color_coverage.rgba&&a.color_coverage.width==b.color_coverage.width&&a.emission_coverage.rgba==b.emission_coverage.rgba&&a.emission_coverage.width==b.emission_coverage.width&&a.transparent==b.transparent&&a.normal.rgba==b.normal.rgba&&a.pbr_color.rgba==b.pbr_color.rgba;}
+bool equal(const TextureMaps&a,const TextureMaps&b){return a.color.rgba==b.color.rgba&&a.metal_rough.rgba==b.metal_rough.rgba&&a.emission.rgba==b.emission.rgba&&a.color_coverage.rgba==b.color_coverage.rgba&&a.color_coverage.width==b.color_coverage.width&&a.emission_coverage.rgba==b.emission_coverage.rgba&&a.emission_coverage.width==b.emission_coverage.width&&a.transparent==b.transparent&&a.normal.rgba==b.normal.rgba&&a.pbr_color.rgba==b.pbr_color.rgba&&a.baked_normal.rgba==b.baked_normal.rgba&&a.baked_coverage.rgba==b.baked_coverage.rgba;}
 std::shared_ptr<PaintedMesh> clone(const nlohmann::json &j){return PaintedMesh::decode(j);}
+BakedTextures bake_fixture(uint32_t side){
+ BakedTextures bake;
+ const size_t count=size_t(side)*side;
+ bake.coverage.resize(count);
+ for(auto *plane:{&bake.maps.color,&bake.maps.metal_rough,&bake.maps.emission,&bake.maps.normal})
+  *plane={side,side,std::vector<uint8_t>(4*count)};
+ for(size_t i=0;i<count;++i){
+  bake.coverage[i]=i%7==0?255:i%7==1?0:106;
+  const std::array<uint8_t,4> rgba{uint8_t(i%251),52,131,uint8_t(i%256)};
+  const std::array<uint8_t,4> orm{uint8_t(i%199),47,16,255};
+  const std::array<uint8_t,4> emission{91,uint8_t(i%151),27,255};
+  const std::array<uint8_t,4> normal{173,128,231,255};
+  std::copy(rgba.begin(),rgba.end(),bake.maps.color.rgba.begin()+4*i);
+  std::copy(orm.begin(),orm.end(),bake.maps.metal_rough.rgba.begin()+4*i);
+  std::copy(emission.begin(),emission.end(),bake.maps.emission.rgba.begin()+4*i);
+  std::copy(normal.begin(),normal.end(),bake.maps.normal.rgba.begin()+4*i);
+ }
+ return bake;
+}
 Scene source(){
  Mesh m;m.positions={{-.5f,-.5f,0},{.5f,-.5f,0},{.5f,.5f,0},{-.5f,.5f,0}};m.normals.assign(4,{0,0,1});m.uv={{{0,0}},{{1,0}},{{1,1}},{{0,1}}};m.indices={0,1,2,0,2,3};auto p=std::make_shared<PaintedMesh>(m,512);
  p->begin_stroke();Brush b;b.from=b.to={.3f,.3f,0};b.radius=.1f;b.pressure=1;b.strength=1;b.normal={0,0,1};PaintSettings settings;settings.color={0,1,0,1};p->stamp(b,settings);if(!p->end_stroke())throw std::runtime_error("Seed paint must actually mutate the surface");
@@ -49,6 +68,24 @@ int main()try{
  size_t polls=0;p=clone(raw);p->composite(b,[&]{++polls;return false;});
  for(size_t boundary:{size_t(1),polls/3,polls-1,polls}){
   p=clone(raw);base=p->composite(a);size_t at=0;check(refuses([&]{p->composite(b,[&]{return ++at>=boundary;});}),"Cancellation before/during/after staging returns no map");n=calls.load();check(p->composite(a)==base&&calls==n&&p->encode()==raw,"Cancellation retains old cache and immutable source exactly");check(equal(*p->composite(b),*expected),"Cancelled composite can retry the exact same source");
+ }
+ for(bool painted:{false,true}){
+  auto baked=painted?clone(raw):std::make_shared<PaintedMesh>(scene.active().painted->mesh(),512);
+  baked->install_bake(bake_fixture(baked->resolution()));
+  const auto archive=baked->encode();
+  reference_mode=true;
+  const auto expected_bake=clone(archive)->composite(b);
+  reference_mode=false;
+  const auto before_bake=calls.load();
+  const auto result=baked->composite(b);
+  check(calls==before_bake+1&&equal(*expected_bake,*result)&&result->baked_base==baked->baked()&&
+        !result->normal.rgba.empty()&&result->color_coverage.width==512&&result->emission_coverage.width==512,
+        "Native Bake, normal data and replacement coverage are exact when the selected backend composites the material");
+  const auto before_fault=calls.load();
+  fault=1;
+  check(refuses([&]{baked->composite(a);})&&calls==before_fault+1&&baked->composite(b)==result&&baked->encode()==archive,
+        "A failed baked composite keeps the prior maps and complete editable source without CPU substitution");
+  check(baked->composite(a)->baked_base==baked->baked(),"Retrying the baked composite retains its immutable Bake owner");
  }
  Document d;d.replace(scene);ready(d);const auto original=d.copy_scene().encode();auto held=d.frame().surface->ranges.front().textures;auto held_pixels=held->color.rgba;auto rest=d.copy_scene().active().painted->mesh();const auto rig=d.copy_scene().active().deformation->encode(rest);
  const auto native_start=calls.load();PaintSettings settings;settings.color={1,0,0,1};d.paint_settings(settings);check(d.begin_native_stroke(),"Real posed native paint gesture admitted");NativeStrokeSample sample;sample.origin={.3f,.1f,1};sample.direction={0,0,-1};sample.brush.radius=.2f;sample.brush.pressure=1;sample.brush.strength=1;d.sample_native_stroke(sample);d.end_native_stroke();
