@@ -77,8 +77,9 @@ Vec3 normal_direction(const AffineTransform &frame, Vec3 normal) {
 
 detail::RetopoTransfer::RetopoTransfer(const Mesh &previous_mesh,
     const AffineTransform &previous, const AffineTransform &replacement,
-    RetopoTransferBudget &budget, std::span<const RetopoCorrespondence> retained, bool first_patch)
-    : budget_(budget), retained_(retained), first_patch_(first_patch),
+    RetopoTransferBudget &budget, std::span<const RetopoCorrespondence> retained, bool first_patch,
+    const DeformationState *source_pose)
+    : budget_(budget), retained_(retained), first_patch_(first_patch), posed_source_(evaluates_geometry(source_pose)),
       placement_change_(replacement.inverse() * previous) {
   // Subtract a common translation before narrowing the query point. Meshes
   // far from the world origin still use the authored affine metric.
@@ -95,13 +96,28 @@ detail::RetopoTransfer::RetopoTransfer(const Mesh &previous_mesh,
   // The detached BVH owns triangle order, bounds and nodes as well as the mesh.
   reserve(faces, 224);
   work(previous_mesh.positions.size() + previous_mesh.indices.size());
-  old_surface_ = std::make_unique<SurfaceQuery>(previous_mesh, cancelled());
+  std::optional<Mesh> posed;
+  if (posed_source_) {
+    // The evaluator can hold its working mesh and a new skin or morph result
+    // at once. The BVH's copy is already included in the source budget above.
+    reserve(previous_mesh.positions.size(), 2 * (2 * sizeof(Vec3) + sizeof(std::array<float, 2>)));
+    reserve(previous_mesh.indices.size(), 2 * sizeof(uint32_t));
+    reserve(previous_mesh.uv_pins.size() + previous_mesh.uv_seams.size(), 2);
+    work(source_pose->resource_entries() * 128);
+    stop(cancelled());
+    posed = source_pose->preview(previous_mesh);
+    stop(cancelled());
+    if (posed->indices != previous_mesh.indices || posed->uv != previous_mesh.uv)
+      throw std::invalid_argument("The posed retopology source lost its original material corners");
+  }
+  const auto &geometry = posed ? *posed : previous_mesh;
+  old_surface_ = std::make_unique<SurfaceQuery>(geometry, cancelled());
   world_normals_.reserve(faces);
-  for (size_t corner = 0; corner < previous_mesh.indices.size(); corner += 3) {
+  for (size_t corner = 0; corner < geometry.indices.size(); corner += 3) {
     if ((corner & 1023) == 0) stop(cancelled());
-    const auto a = previous_mesh.positions[previous_mesh.indices[corner]];
-    const auto b = previous_mesh.positions[previous_mesh.indices[corner + 1]];
-    const auto c = previous_mesh.positions[previous_mesh.indices[corner + 2]];
+    const auto a = geometry.positions[geometry.indices[corner]];
+    const auto b = geometry.positions[geometry.indices[corner + 1]];
+    const auto c = geometry.positions[geometry.indices[corner + 2]];
     const auto normal = cross(b - a, c - a);
     world_normals_.push_back(length(normal) > 0 ? normal_direction(previous_metric_, normal) : Vec3{});
   }
@@ -717,9 +733,9 @@ public:
   RetopoReplacement(std::shared_ptr<const PaintedMesh> grid,const Mesh &original_rest,AffineTransform old_world,
                     AffineTransform new_world, std::span<const TopologyID> old_faces,
                     std::span<const TopologyID> new_faces, std::vector<detail::RetopoCorrespondence> correspondence,
-                    const std::function<bool()> &cancelled)
+                    const std::function<bool()> &cancelled, const DeformationState *first_source_pose=nullptr)
       : budget_(cancelled), old_world_(old_world), new_world_(new_world), first_grid_(std::move(grid)),
-        original_rest_(original_rest),
+        original_rest_(original_rest), first_source_pose_(first_source_pose),
         old_faces_(old_faces), new_faces_(new_faces), correspondence_(std::move(correspondence)) {
     const auto resolution = first_grid_->resolution();
     budget_.reserve(correspondence_.size(), sizeof(detail::RetopoCorrespondence));
@@ -767,6 +783,7 @@ private:
   AffineTransform old_world_, new_world_;
   std::shared_ptr<const PaintedMesh> first_grid_;
   const Mesh &original_rest_;
+  const DeformationState *first_source_pose_;
   std::span<const TopologyID> old_faces_, new_faces_;
   std::vector<detail::RetopoCorrespondence> correspondence_;
   std::map<uint32_t,std::shared_ptr<const PaintedMesh>> grids_;
@@ -945,7 +962,8 @@ private:
       std::span<const detail::RetopoCorrespondence> retained;
       if (&paint.mesh()==&original_rest_ || same_rest_corners(paint.mesh(),original_rest_,budget_.cancelled()))
         retained=correspondence_;
-      surface=std::make_unique<detail::RetopoTransfer>(paint.mesh(),old_world_,new_world_,budget_,retained,old_faces_.empty());
+      surface=std::make_unique<detail::RetopoTransfer>(paint.mesh(),old_world_,new_world_,budget_,retained,
+          old_faces_.empty(),first_source_pose_);
     }
     return *surface;
   }
@@ -1109,7 +1127,6 @@ uint64_t publish_retopology(Scene &scene, const RetopoMesh &topology, uint64_t s
     shape_source = history.rebase(previous.shape_source);
   } else {
     const bool project_materials = previous.id == source && previous.texture_sets &&
-        !detail::evaluates_geometry(previous.deformation.get()) &&
         !previous.texture_sets->topology()->polygon_ids() && detail::texture_set_editable_fields(previous);
     const auto resolution = project_materials ? previous.painted->resolution() : 512;
     unwrap(triangles.mesh, resolution, 4, cancelled);
@@ -1118,7 +1135,7 @@ uint64_t publish_retopology(Scene &scene, const RetopoMesh &topology, uint64_t s
     painted = PaintedMesh::from_mesh(std::move(triangles.mesh), resolution, options);
     if (project_materials) {
       RetopoReplacement replacement(painted, previous.painted->mesh(), scene.world_matrix(source), staged.world_matrix(id),
-          {}, triangles.source_faces, {}, cancelled);
+          {}, triangles.source_faces, {}, cancelled,previous.deformation.get());
       auto current = replacement.project(*previous.painted, previous.material, {}, previous.material_bindings,
                                           previous.texture_sets);
       painted = current.paint->snapshot();

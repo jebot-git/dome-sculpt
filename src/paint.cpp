@@ -3189,6 +3189,23 @@ void detail::TextureSetPaintAccess::reproject_retopology(const PaintedMesh &from
   std::optional<BakedTextures> baked;
   std::vector<BakedEmissionSample> float_bake;
   std::vector<Tangent> source_tangents, target_tangents;
+  std::vector<NormalBakeVertex> source_columns, target_columns;
+  const auto &source_geometry = transfer.source_geometry();
+  const auto placed_columns = [&](const Mesh &mesh, std::span<const Tangent> tangents,
+                                  const AffineTransform &matrix) {
+    transfer.reserve(tangents.size(), sizeof(NormalBakeVertex));
+    transfer.work(16 * tangents.size());
+    const AffineInteractionFrame placement(matrix);
+    std::vector<NormalBakeVertex> columns;
+    columns.reserve(tangents.size());
+    for (size_t corner = 0; corner < tangents.size(); ++corner) {
+      if ((corner & 1023) == 0) paint_compute::checkpoint(transfer.cancelled());
+      const auto t = placed_tangent(placement,tangents[corner]);
+      const auto n = placed_normal(placement,mesh.normals[mesh.indices[corner]]);
+      columns.push_back(normal_bake_vertex(n,{t[0],t[1],t[2]},t[3],NormalVertexBitangent::RawCross));
+    }
+    return columns;
+  };
   size_t layer_bytes = resolved_color ? replacement.color_projection_->vertex_rgba->rgba.size() : 0;
   constexpr size_t paint_limit = 128 * 1024 * 1024;
   if (bake) {
@@ -3207,8 +3224,12 @@ void detail::TextureSetPaintAccess::reproject_retopology(const PaintedMesh &from
     if (normals) {
       transfer.reserve(from.mesh().indices.size() + replacement.mesh().indices.size(), 4 * sizeof(Tangent));
       baked->maps.normal = blank_image(resolution, true);
-      source_tangents = tangent_corners(from.mesh(), transfer.cancelled());
+      source_tangents = tangent_corners(source_geometry, transfer.cancelled());
       target_tangents = tangent_corners(replacement.mesh(), transfer.cancelled());
+      if (transfer.posed_source()) {
+        source_columns = placed_columns(source_geometry,source_tangents,transfer.previous_metric());
+        target_columns = placed_columns(replacement.mesh(),target_tangents,transfer.replacement_metric());
+      }
     }
     if (bake->emission_field) {
       transfer.reserve(texels, 2 * sizeof(BakedEmissionSample));
@@ -3283,17 +3304,39 @@ void detail::TextureSetPaintAccess::reproject_retopology(const PaintedMesh &from
       }
       if (coverage > 0) {
         for (auto &value : values) value /= coverage;
+        std::optional<NormalBakeEncoding> posed_normal;
         if (!source_tangents.empty()) {
-          const auto old_frame = tangent_frame(from.mesh(), source_tangents, hit->triangle, hit->barycentric);
-          const auto new_frame = tangent_frame(replacement.mesh(), target_tangents, texel.face,
-              {texel.bary[0], texel.bary[1], 1 - texel.bary[0] - texel.bary[1]});
-          const Vec3 old_normal = old_frame.to_world({values[10], values[11], values[12]});
-          const auto changed = transfer.placement_change().normal({old_normal.x, old_normal.y, old_normal.z});
-          const auto new_normal = new_frame.to_tangent({float(changed[0]), float(changed[1]), float(changed[2])});
-          values[10] = new_normal.x; values[11] = new_normal.y; values[12] = new_normal.z;
+          const Vec3 old_normal{values[10],values[11],values[12]};
+          if (transfer.posed_source()) {
+            // The viewport places the posed tangent and normal columns
+            // separately before interpolation, including under shear.
+            transfer.work(48);
+            const auto basis = [](const std::vector<NormalBakeVertex> &columns, size_t face,
+                                  std::array<float,3> weights) {
+              const size_t c = 3 * face;
+              return normal_bake_basis({columns[c],columns[c+1],columns[c+2]},
+                  {weights[0],weights[1],weights[2]},NormalFragmentBasis::RawColumns);
+            };
+            const auto old_frame = basis(source_columns,hit->triangle,hit->barycentric);
+            const auto new_frame = basis(target_columns,texel.face,{w[0],w[1],1-w[0]-w[1]});
+            const auto world = TangentFrame{old_frame.t,old_frame.b,old_frame.n}.to_world(old_normal);
+            posed_normal = encode_normal_bake(new_frame,world);
+            if (!posed_normal || posed_normal->quantized_angle_radians > .02)
+              throw std::invalid_argument("Retopology exceeds the posed Bake normal error limit");
+          } else {
+            const auto old_frame = tangent_frame(source_geometry, source_tangents, hit->triangle, hit->barycentric);
+            const auto new_frame = tangent_frame(replacement.mesh(), target_tangents, texel.face,
+                {w[0],w[1],1-w[0]-w[1]});
+            const auto direction = old_frame.to_world(old_normal);
+            const auto changed = transfer.placement_change().normal({direction.x,direction.y,direction.z});
+            const auto new_normal = new_frame.to_tangent({float(changed[0]),float(changed[1]),float(changed[2])});
+            values[10] = new_normal.x; values[11] = new_normal.y; values[12] = new_normal.z;
+          }
         }
         baked->coverage[at] = byte(coverage);
-        baked_pixel(*baked, at, values);
+        baked_pixel(*baked, at, values,!posed_normal);
+        if (posed_normal)
+          std::copy(posed_normal->rgba.begin(),posed_normal->rgba.end(),baked->maps.normal.rgba.begin()+4*at);
         if (resolved_color)
           for (size_t k = 0; k < pbr.size(); ++k) {
             const auto value = pbr[k] / coverage;
@@ -3481,7 +3524,7 @@ std::shared_ptr<const SourceMaterialBindings> detail::TextureSetPaintAccess::rep
     transfer.work(stats.raster_samples+stats.candidate_checks);
   }
   const auto &surface=*(separate_grid?separate_grid->surface_:replacement.surface_);
-  const auto &old_mesh=from.mesh(), &new_mesh=replacement.mesh();
+  const auto &old_mesh=transfer.source_geometry(), &new_mesh=replacement.mesh();
   const AffineInteractionFrame previous(transfer.previous_metric()), next(transfer.replacement_metric());
   const MToonTexture identity;
   const auto normal_slot=legacy?size_t(MToonSlot::Base):normal;

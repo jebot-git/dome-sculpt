@@ -1408,7 +1408,7 @@ SourceMaterialBindings retopo_toon_binding(const TextureSetView &slot,bool trim,
   return binding;
 }
 
-void first_material_patch(bool affine, const std::filesystem::path &out) {
+void first_material_patch(bool affine, const std::filesystem::path &out, bool posed) {
   Mesh mesh;
   mesh.positions={{-.5f,-.5f,0},{0,-.5f,0},{.5f,-.5f,0},
                   {-.5f,.5f,0},{0,.5f,0},{.5f,.5f,0}};
@@ -1430,14 +1430,16 @@ void first_material_patch(bool affine, const std::filesystem::path &out) {
   if (affine)
     scene.active().affine_edit=std::make_shared<const NativeAffineEdit>(AffineTransform(
         std::array<double,16>{-1.1,.12,0,0,.23,.89,0,0,0,0,1,0,.08,-.04,.06,1}));
-  const auto world=scene.world_matrix(guide);
+  auto world=scene.world_matrix(guide);
   auto unpainted=scene.snapshot();
 
   // A separate Bake donor leaves a real recipe and coverage on the primary set.
   const auto bake_source=scene.add("Original Bake donor",Volume{});
   auto &donor=scene.object(bake_source);
   donor.mesh_active=true;
-  donor.painted=std::make_shared<PaintedMesh>(mesh,64);
+  auto donor_mesh=mesh;
+  if (posed) donor_mesh.normals.assign(6,normalized(Vec3{.44f,-.17f,1}));
+  donor.painted=std::make_shared<PaintedMesh>(donor_mesh,64);
   donor.material.color={.6f,.25f,.08f,1};
   auto donor_placement=world.matrix();
   donor_placement[14]+=.008;
@@ -1472,6 +1474,46 @@ void first_material_patch(bool affine, const std::filesystem::path &out) {
     }),"Original material slot has its own editable coat before retopology");
   }
   check(select_texture_set(scene,guide,1),"Secondary material is active before first Apply");
+  auto evaluated=mesh;
+  if (posed) {
+    DeformationState pose(mesh);
+    pose.morphs.emplace(mesh);
+    MorphTarget target{"Sloping wide pose",{}};
+    for (auto p:mesh.positions)
+      target.delta.push_back({1.3f+.06f*p.x+.06f*p.y,-.2f+.12f*p.y,.11f+.40f*p.x-.17f*p.y});
+    pose.morphs->targets.push_back(std::move(target));
+    pose.morph_weights={.8f};
+    if (affine) {
+      pose.skeleton=Skeleton{{Bone{"Guide pose joint"}}};
+      pose.skin=SkinWeights{};
+      pose.skin->vertices.assign(mesh.positions.size(),{{0,1}});
+      pose.pose.resize(1);
+      pose.pose[0].translation={.13f,-.08f,.11f};
+      pose.pose[0].rotation={.9855848f,0,.16918235f,0};
+    }
+    scene.set_deformation(guide,pose);
+    unpainted.set_deformation(guide,pose);
+    evaluated=pose.preview(mesh);
+    check(SurfaceQuery(mesh).closest(evaluated.positions[1]).distance>.45f &&
+          evaluated.indices==mesh.indices && evaluated.uv==mesh.uv,
+          "The active pose moves the source beyond REST projection reach while preserving material corners");
+    // Keep the evaluated guide in the default stereo field of view while its
+    // REST mesh remains far enough away to prove which surface was sampled.
+    const auto middle=(evaluated.positions[0]+evaluated.positions[5])*.5f;
+    const auto offset=world.point({middle.x,middle.y,middle.z});
+    auto placement=world.matrix();
+    for(size_t axis=0;axis<3;++axis) placement[12+axis]-=offset[axis];
+    for(auto *current:{&scene,&unpainted}) {
+      if(affine) current->active().affine_edit=std::make_shared<const NativeAffineEdit>(AffineTransform(placement));
+      else current->active().transform.position={float(placement[12]),float(placement[13]),float(placement[14])};
+    }
+    world=scene.world_matrix(guide);
+  }
+  const auto guide_local=[&](Vec3 p) {
+    return evaluated.positions[0]+(evaluated.positions[2]-evaluated.positions[0])*(p.x+.5f)
+                                +(evaluated.positions[3]-evaluated.positions[0])*(p.y+.5f);
+  };
+  const auto guide_point=[&](Vec3 p) {return point(world,guide_local(p));};
   const auto exact=scene.encode();
   scene.save(out/"first-material-source.dsculpt");
 
@@ -1480,7 +1522,7 @@ void first_material_patch(bool affine, const std::filesystem::path &out) {
   RetopoMesh crossing;
   std::array<TopologyID,3> points;
   const std::array<Vec3,3> samples{{{-.4f,-.3f,0},{.3f,-.3f,0},{-.25f,.3f,0}}};
-  for (size_t i=0;i<points.size();++i) points[i]=crossing.add_vertex({point(world,samples[i])});
+  for (size_t i=0;i<points.size();++i) points[i]=crossing.add_vertex({guide_point(samples[i])});
   if (affine) std::swap(points[1],points[2]);
   crossing.add_face(points);
   const auto check_crossing=[&](Scene &input) {
@@ -1501,7 +1543,7 @@ void first_material_patch(bool affine, const std::filesystem::path &out) {
   doc.begin_retopology();
   drafted(doc);
   const auto make_face=[&](std::array<Vec3,4> corners) {
-    for (auto corner:corners) touch(doc,point(world,corner));
+    for (auto corner:corners) touch(doc,guide_point(corner));
     doc.edit_retopology(RetopoAction::Face);
     drafted(doc);
   };
@@ -1520,7 +1562,9 @@ void first_material_patch(bool affine, const std::filesystem::path &out) {
         after.object(guide).texture_sets==scene.active().texture_sets && patch.texture_sets->active()==1,
         "First Apply retains the hidden guide and the active material on the new patch");
 
-  const auto original_from_patch=world.inverse()*after.world_matrix(patch.id);
+  const auto patch_world=after.world_matrix(patch.id);
+  const auto original_from_patch=world.inverse()*patch_world;
+  const SurfaceQuery guide_query(evaluated);
   for (const auto set:{0u,1u}) {
     const auto before=texture_set_view(scene.active(),set);
     const auto field=texture_set_view(patch,set);
@@ -1538,13 +1582,66 @@ void first_material_patch(bool affine, const std::filesystem::path &out) {
       const auto &m=field.painted->mesh();
       Vec3 centre{};
       for (size_t c=0;c<3;++c) centre+=m.positions[m.indices[triangle*3+c]]/3.f;
-      check(set ? point(original_from_patch,centre).x>0 : point(original_from_patch,centre).x<0,
-            "Independent inverse placement puts every emitted triangle on the proper source material side");
+      const auto hit=guide_query.closest(point(original_from_patch,centre));
+      check(hit.distance<1e-5f && scene.active().texture_sets->triangle_sets()[hit.triangle]==set,
+            "Every emitted triangle lies on the proper source material side in evaluated geometry");
     }
   }
   check(patch.painted->baked() && patch.bake_recipe->source.object==bake_source &&
         std::ranges::any_of(patch.painted->baked()->coverage,[](auto a) {return a>128;}),
         "The original colour and normal Bake remain covered on the replacement atlas");
+  if (posed) {
+    check(!patch.deformation && after.object(guide).deformation==scene.active().deformation,
+          "The patch captures the visible geometry and the hidden guide retains its original pose and rig");
+    const auto canonical_normal=[](const Mesh &surface,const AffineTransform &placement,
+        const Tangent &t, uint32_t corner, const uint8_t *rgba) {
+      const auto stretch=placement.direction({t[0],t[1],t[2]});
+      const auto n=surface.normals[surface.indices[corner]];
+      const auto inverse=placement.normal({n.x,n.y,n.z});
+      const auto tangent=normalized(Vec3{float(stretch[0]),float(stretch[1]),float(stretch[2])});
+      const auto normal=normalized(Vec3{float(inverse[0]),float(inverse[1]),float(inverse[2])});
+      const float hand=t[3]*(placement.orientation()==AffineOrientation::Reversing?-1.f:1.f);
+      return normalized(tangent*(rgba[0]/127.5f-1)+cross(normal,tangent)*hand*(rgba[1]/127.5f-1)+
+                        normal*(rgba[2]/127.5f-1));
+    };
+    const auto prior=scene.active().painted->baked();
+    const auto previous=std::ranges::find(prior->coverage,uint8_t(255))-prior->coverage.begin();
+    check(size_t(previous)<prior->coverage.size() &&
+          std::abs(int(prior->maps.normal.rgba[4*previous])-128)>20,
+          "The source Bake contains authored off-axis normal detail");
+    const auto old_tangents=tangent_corners(evaluated);
+    const auto rest_tangents=tangent_corners(mesh);
+    const auto *old_sample=prior->maps.normal.rgba.data()+4*previous;
+    check(length(canonical_normal(evaluated,world,old_tangents[0],0,old_sample)-
+                 canonical_normal(mesh,world,rest_tangents[0],0,old_sample))>.1f,
+          "Using the REST normal frame would visibly change the posed Bake shading");
+    const auto &target=patch.painted->mesh();
+    const auto tangents=tangent_corners(target);
+    const auto &output=*patch.painted->baked();
+    const float r=patch.painted->resolution();
+    size_t tested=0;
+    float maximum=0;
+    for (const auto face:patch.texture_sets->primary_domain()->triangles()) {
+      const auto a=target.uv[target.indices[face*3]], b=target.uv[target.indices[face*3+1]], c=target.uv[target.indices[face*3+2]];
+      const std::array u{b[0]-a[0],b[1]-a[1]}, v{c[0]-a[0],c[1]-a[1]};
+      const float area=u[0]*v[1]-u[1]*v[0];
+      for (size_t i=0;i<output.coverage.size();++i) {
+        if(output.coverage[i]<250) continue;
+        const float x=(float(i%size_t(r))+.5f)/r-a[0],y=(float(i/size_t(r))+.5f)/r-a[1];
+        const float w1=(x*v[1]-y*v[0])/area,w2=(u[0]*y-u[1]*x)/area;
+        if(std::min({w1,w2,1-w1-w2})<.12f) continue;
+        const auto p=target.positions[target.indices[face*3]]*(1-w1-w2)+
+                     target.positions[target.indices[face*3+1]]*w1+target.positions[target.indices[face*3+2]]*w2;
+        const auto source=guide_query.closest(point(original_from_patch,p)).triangle;
+        const auto old=canonical_normal(evaluated,world,old_tangents[source*3],source*3,old_sample);
+        const auto now=canonical_normal(target,patch_world,tangents[face*3],face*3,output.maps.normal.rgba.data()+4*i);
+        maximum=std::max(maximum,length(old-now));
+        ++tested;
+      }
+    }
+    std::cout<<"POSED_NORMAL samples="<<tested<<" max_chord="<<maximum<<'\n';
+    check(tested>30 && maximum<.021f,"An independent placed tangent-frame check preserves posed Bake normals");
+  }
   if (affine) {
     const auto old=texture_set_view(scene.active(),1).material_bindings;
     const auto field=texture_set_view(patch,1).material_bindings;
@@ -1956,6 +2053,7 @@ int main(int argc,char **argv) try {
   const std::string_view mode = argv[2];
   if (mode!="plain" && mode!="affine" && mode!="affine-wire" && mode!="mixed-material" &&
       mode!="first-material-plain" && mode!="first-material-affine" &&
+      mode!="first-material-posed-plain" && mode!="first-material-posed-affine" &&
       mode!="mtoon-plain" && mode!="mtoon-affine" && mode!="mtoon-v0" && mode!="mtoon-detached" &&
       mode!="reapply-plain" && mode!="reapply-affine" && mode!="prepared-plain" && mode!="prepared-affine" &&
       mode!="prepared-detached" && mode!="prepared-detached-affine" &&
@@ -1972,7 +2070,7 @@ int main(int argc,char **argv) try {
   if (mode.starts_with("restore-")) restore_patch_history(mode.ends_with("affine"),out);
   else if (mode=="affine-wire") affine_wire_edit(out);
   else if (mode=="mixed-material") mixed_material_quad(out);
-  else if (mode.starts_with("first-material-")) first_material_patch(mode.ends_with("affine"),out);
+  else if (mode.starts_with("first-material-")) first_material_patch(mode.ends_with("affine"),out,mode.starts_with("first-material-posed-"));
   else if (mode.starts_with("material-seam-")) split_material_seam(mode.ends_with("affine"),out);
   else if (mode.starts_with("subdivide-seam-")) split_material_seam(mode.ends_with("affine"),out,true);
   else if (mode.starts_with("mtoon-")) retopo_toon_materials(mode.ends_with("affine"),mode.ends_with("v0"),out,mode=="mtoon-detached");

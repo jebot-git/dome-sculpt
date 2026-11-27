@@ -30,7 +30,8 @@ class RetopoTransfer {
 public:
   RetopoTransfer(const Mesh &, const AffineTransform &previous,
                  const AffineTransform &replacement,
-                 RetopoTransferBudget &, std::span<const RetopoCorrespondence>, bool first_patch);
+                 RetopoTransferBudget &, std::span<const RetopoCorrespondence>, bool first_patch,
+                 const DeformationState *source_pose = nullptr);
   RetopoTransfer(const RetopoTransfer &) = delete;
   RetopoTransfer &operator=(const RetopoTransfer &) = delete;
   std::optional<SurfaceHit> match(Vec3 position, Vec3 normal,
@@ -41,6 +42,8 @@ public:
       std::array<float,3> weights, const TextureSetFaceDomain *source_domain = nullptr);
   bool has_retained(uint32_t face) const noexcept;
   bool first_patch() const noexcept { return first_patch_; }
+  bool posed_source() const noexcept { return posed_source_; }
+  const Mesh &source_geometry() const { return old_surface_->mesh(); }
   void work(size_t amount = 1) { budget_.work(amount); }
   void reserve(size_t count, size_t stride) { budget_.reserve(count, stride); }
   const auto &cancelled() const { return budget_.cancelled(); }
@@ -53,7 +56,7 @@ public:
 private:
   RetopoTransferBudget &budget_;
   std::span<const RetopoCorrespondence> retained_;
-  bool first_patch_;
+  bool first_patch_, posed_source_;
   AffineTransform previous_metric_, replacement_metric_, placement_change_;
   std::unique_ptr<SurfaceQuery> old_surface_;
   std::vector<Vec3> world_normals_;
