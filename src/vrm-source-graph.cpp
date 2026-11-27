@@ -49,6 +49,9 @@ Json prefix_key(const std::vector<SceneGroup> &prefix) {
   return result;
 }
 } // namespace
+bool native_vrm_texture_set_accessory(const ObjectSurface &object) noexcept {
+  return object.texture_set_surface && !object.appearance;
+}
 VrmSourceGraph vrm_source_graph(const std::vector<ObjectSurface> &objects,
                                 const Json &original,
                                 const std::function<bool()> &cancelled,size_t max_snapshot_bytes) {
@@ -67,6 +70,8 @@ VrmSourceGraph vrm_source_graph(const std::vector<ObjectSurface> &objects,
   std::map<std::string, std::optional<uint32_t>> edits;
   for (const auto &o : objects) {
     stop(cancelled);
+    if (version1 && native_vrm_texture_set_accessory(o))
+      continue;
     require(o.appearance && o.appearance->asset && o.appearance->original_bytes,
             "every source part needs immutable original identity");
     const auto &a = *o.appearance;
@@ -303,7 +308,8 @@ std::vector<int> emit_vrm_source_graph(
     auto surface=j.at("nodes").at(size_t(emitted.node));
     require(surface.contains("mesh") && surface.at("mesh").get<int>()==emitted.mesh &&
                 !surface.contains("children"),"generated surface payload is not a mesh leaf");
-    ++source_surfaces.at(size_t(objects[i].appearance->source_node));
+    if (!native_vrm_texture_set_accessory(objects[i]))
+      ++source_surfaces.at(size_t(objects[i].appearance->source_node));
     surfaces.push_back(std::move(surface));
   }
   j["nodes"]=Json::array();
@@ -343,6 +349,7 @@ std::vector<int> emit_vrm_source_graph(
     if (g.source_placement)
       root = matrix(root, g.source_placement->local(), g.name + " original");
   }
+  const int avatar_root = root;
   root = attach(root, {{"name", "Original VRM shared source graph"}});
   AffineTransform prefix_world;
   for (const auto &g : graph.prefix)
@@ -425,11 +432,42 @@ std::vector<int> emit_vrm_source_graph(
   // its original node, retaining that node's name/extras/ordered children.
   // Material/primitive splits and nonidentity rigid artist placements retain
   // separate mesh leaves; no dummy skins or skeletal end-sites are invented.
+  std::map<uint64_t, int> accessory_groups;
   for (size_t i = 0; i < objects.size(); ++i) {
     stop(cancelled);
     auto &emitted = doc.objects[i];
-    const auto &a = *objects[i].appearance;
+    const auto &object = objects[i];
     auto surface=std::move(surfaces[i]);
+    if (native_vrm_texture_set_accessory(object)) {
+      require(!object.deformation && !object.rig_source &&
+                  !surface.contains("skin") && emitted.joints.empty(),
+              "native texture-set accessories require a rigid local mesh");
+      require(avatar_root >= 0 && object.groups.size() >= graph.prefix.size() &&
+                  std::equal(graph.prefix.begin(), graph.prefix.end(), object.groups.begin(),
+                      [](const auto &source, const auto &native) {
+                        return source.id == native.id && source.parent == native.parent &&
+                               group_local_matrix(source).matrix() == group_local_matrix(native).matrix();
+                      }),
+              "native texture-set accessory is outside the original avatar's instance");
+      int parent = avatar_root;
+      for (auto group = object.groups.begin() + graph.prefix.size(); group != object.groups.end(); ++group) {
+        require(!group->source_placement && !group->humanoid,
+                "native texture-set accessory needs ordinary groups under the avatar root");
+        if (const auto found = accessory_groups.find(group->id); found != accessory_groups.end()) {
+          parent = found->second;
+          continue;
+        }
+        if (group->affine_edit)
+          parent = matrix(parent, group->affine_edit->matrix(), group->name + " native affine");
+        parent = matrix(parent, affine_similarity(group->transform), group->name);
+        accessory_groups.emplace(group->id, parent);
+      }
+      if (object.affine_edit)
+        parent = matrix(parent, object.affine_edit->matrix(), object.name + " native affine");
+      emitted.node = attach(parent, std::move(surface));
+      continue;
+    }
+    const auto &a = *object.appearance;
     int target = nodes.at(size_t(a.source_node));
     bool direct=source_surfaces.at(size_t(a.source_node))==1;
     for(auto at=surface.begin();at!=surface.end();++at)

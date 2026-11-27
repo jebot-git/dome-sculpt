@@ -77,26 +77,47 @@ bool retained_avatar(const SculptObject &object) {
   return asset && asset->mode == ImportMode::PreserveGltf &&
          asset->avatar_version != ImportedAvatarVersion::None;
 }
+uint64_t original_avatar_root(std::span<const SceneGroup> path, const CreatorAppearance &appearance) {
+  for (auto it = path.rbegin(); it != path.rend(); ++it) {
+    const auto &placement = it->source_placement;
+    if (!placement || !placement->model || placement->model->asset != appearance.asset ||
+        placement->model->original_bytes != appearance.original_bytes)
+      continue;
+    const auto instance = placement->source_instance;
+    if (std::ranges::find(path, instance, &SceneGroup::id) != path.end())
+      return instance;
+  }
+  return 0;
+}
 uint64_t avatar_group(const Scene &scene, uint64_t object) {
-  auto group = scene.object(object).group;
-  auto path = scene.group_path(group);
+  const auto &active = scene.object(object);
+  const auto path = scene.group_path(active.group);
   for (auto it = path.rbegin(); it != path.rend(); ++it)
     if (it->humanoid)
       return it->id;
-  const auto &appearance = scene.object(object).appearance;
-  if (retained_avatar(scene.object(object)))
-    for (auto it = path.rbegin(); it != path.rend(); ++it) {
-      if (!it->source_placement || !it->source_placement->model ||
-          it->source_placement->model->asset != appearance->asset ||
-          it->source_placement->model->original_bytes !=
-              appearance->original_bytes)
+  if (retained_avatar(active))
+    if (const auto instance = original_avatar_root(path, *active.appearance))
+      return instance;
+  if (active.texture_sets && !active.appearance && !active.deformation && !active.rig_source) {
+    size_t deepest = 0;
+    uint64_t selected = 0;
+    for (const auto &part : scene.objects()) {
+      if (!part.visible || !part.appearance || !part.appearance->asset ||
+          part.appearance->asset->avatar_version != ImportedAvatarVersion::Vrm1)
         continue;
-      const auto instance = it->source_placement->source_instance;
-      if (std::any_of(path.begin(), path.end(),
-                      [&](const auto &g) { return g.id == instance; }))
-        return instance;
+      const auto source_path = scene.group_path(part.group);
+      const auto instance = original_avatar_root(source_path, *part.appearance);
+      const auto root = std::ranges::find(path, instance, &SceneGroup::id);
+      if (root == path.end() || (selected && size_t(root - path.begin()) <= deepest) ||
+          std::any_of(root + 1, path.end(), [](const auto &group) { return bool(group.source_placement); }))
+        continue;
+      deepest = size_t(root - path.begin());
+      selected = instance;
     }
-  return group;
+    if (selected)
+      return selected;
+  }
+  return active.group;
 }
 bool in_group(const Scene &scene, const SculptObject &object, uint64_t group) {
   auto path = scene.group_path(object.group);

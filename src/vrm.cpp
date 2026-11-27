@@ -404,8 +404,12 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &original_input_obje
   if (input_objects.empty())
     fail("no avatar surfaces");
 
-  for(const auto &object:input_objects)if(detail::hdr_emission(object.material.emissive)||(object.material_bindings&&detail::physical_emission(*object.material_bindings)))
-    fail("physical emission requires a precision-qualified VRM export adapter");
+  for(const auto &object:input_objects)
+    if ((detail::hdr_emission(object.material.emissive) ||
+         (object.material_bindings && detail::physical_emission(*object.material_bindings))) &&
+        !(object.texture_set_surface && physical &&
+          detail::matches_texture_set_emission_surface(*physical, object)))
+      fail("physical emission requires a precision-qualified VRM export adapter");
   for(const auto &object:input_objects)if(object.source_dormant)
     fail("source attributes are dormant for "+object.name+
       "; restore the original mesh or explicitly prepare, reproject and bake its source data before export");
@@ -439,6 +443,8 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &original_input_obje
   if (!original.contains("extensions") ||
       !original.at("extensions").contains("VRM"))
     fail("only original VRM0 is supported by this source-preserving path");
+  if (std::ranges::any_of(objects, [](const auto &object) { return bool(object.texture_set_surface); }))
+    fail("texture-set accessories need an explicit VRM0 material adapter");
   std::unique_ptr<detail::CreatorVrmAuthority> creator;
   if(detail::has_creator_vrm_origin(objects)) {
     if(original_space)fail("original-node authoring cannot borrow a creator rest certificate");

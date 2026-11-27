@@ -6,6 +6,9 @@
 #include "dome/gltf-export.hpp"
 #include "dome/vrm.hpp"
 #include "dome/creation.hpp"
+#include "dome/bake-recipe.hpp"
+#include "dome/texture-sets.hpp"
+#include "dome/source-placement.hpp"
 #include "emission-export.hpp"
 #include "cgltf.h"
 #include <fstream>
@@ -80,4 +83,189 @@ void strength_case(const std::filesystem::path &directory,float strength){
 }
 
 }
-int main(int argc,char**argv)try{if(argc!=2)return 2;std::filesystem::path out=argv[1];std::filesystem::create_directories(out);for(auto base:{"vroid-beta-female","vroid-beta-male"}){Scene scene;append_humanoid(scene,humanoid_baseline_defaults(base),base,{},64);current(out,std::move(scene),base);}auto f=source(false);import_fixture::Fixture original;for(auto uv:{"TEXCOORD_0","TEXCOORD_1"})f.j["meshes"][0]["primitives"][0]["attributes"][uv]=original.j["meshes"][0]["primitives"][0]["attributes"][uv];f.j["materials"][0]["extensions"].erase("KHR_materials_unlit");auto &used=f.j["extensionsUsed"];for(auto i=used.begin();i!=used.end();)if(i->get_ref<const std::string&>()=="KHR_materials_unlit")i=used.erase(i);else ++i;auto path=out/"independent-v1-source.vrm";canonical_leaf_nodes(f);f.save(path);ImportAuthoringOptions options;options.paint_resolution=64;auto scene=prepare_authoring_import(Scene{},path,options).scene;current(out,std::move(scene),"independent-v1");for(float strength:{0.f,5.f})strength_case(out,strength);std::cout<<"HDR typed VRM: "<<checks<<" checks\n";return 0;}catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
+
+namespace {
+Mesh accessory_part(float x) {
+ Mesh mesh;
+ mesh.positions={{x-.375f,-.375f,0},{x+.375f,-.375f,0},{x+.375f,.375f,0},{x-.375f,.375f,0}};
+ mesh.normals.assign(4,{0,0,1});
+ mesh.uv={{0,0},{1,0},{1,1},{0,1}};
+ mesh.indices={0,1,2,0,2,3};
+ return mesh;
+}
+
+void native_texture_set_accessory(const std::filesystem::path &out) {
+ auto fixture=source(false);
+ const import_fixture::Fixture uv_source;
+ for(auto uv:{"TEXCOORD_0","TEXCOORD_1"})
+  fixture.j["meshes"][0]["primitives"][0]["attributes"][uv]=uv_source.j.at("meshes").at(0).at("primitives").at(0).at("attributes").at(uv);
+ fixture.j["materials"][0]["extensions"].erase("KHR_materials_unlit");
+ auto &used=fixture.j["extensionsUsed"];
+ used.erase(std::find(used.begin(),used.end(),"KHR_materials_unlit"));
+ fixture.j["extensions"]["VRMC_vrm"]["expressions"]["custom"]["avatarTint"]={
+     {"materialColorBinds",J::array({{{"material",0},{"type","color"},{"targetValue",{.75f,.5f,.25f,.6f}}}})}};
+ canonical_leaf_nodes(fixture);
+ const auto original=out/"accessory-source.vrm";
+ fixture.save(original);
+ ImportAuthoringOptions settings;
+ settings.paint_resolution=64;
+
+ Scene seed;
+ const auto accessory=seed.active().id;
+ seed.active().name="Native baked accessory";
+ auto imported=prepare_authoring_import(seed,original,settings);
+ auto scene=std::move(imported.scene);
+ const auto avatar=imported.objects.front();
+ const auto ancestry=scene.group_path(scene.object(avatar).group);
+ const auto placement=std::find_if(ancestry.rbegin(),ancestry.rend(),[](const auto &g){return bool(g.source_placement);});
+ check(placement!=ancestry.rend(),"Actual imported VRM1 supplies a source-instance root");
+ const auto instance=placement->source_placement->source_instance;
+ auto &object=scene.object(accessory);
+ const auto workshop=scene.add_group("Accessory workshop",{{.125f,.25f,.5f},{},1},instance);
+ object.group=scene.add_group("Accessory mount",{{-.25f,.125f,.25f},{},1},workshop);
+ object.transform.position={.5f,-.25f,.125f};
+ auto mesh=accessory_part(-.5f);
+ const auto sibling=accessory_part(.5f);
+ mesh.positions.insert(mesh.positions.end(),sibling.positions.begin(),sibling.positions.end());
+ mesh.normals.insert(mesh.normals.end(),sibling.normals.begin(),sibling.normals.end());
+ mesh.uv.insert(mesh.uv.end(),sibling.uv.begin(),sibling.uv.end());
+ for(auto v:sibling.indices)mesh.indices.push_back(4+v);
+ std::array<TextureSetInitialField,2> fields;
+ fields[0].material.color={.42f,.55f,.77f,.75f};
+ fields[0].material.alpha=Material::AlphaMode::Mask;
+ fields[0].material.alpha_cutoff=.35f;
+ fields[0].material.emissive={.012f,.024f,.042f};
+ fields[0].resolution=512;
+ fields[1].resolution=64;
+ fields[1].material.emissive={.05f,1.25f,.2f};
+ const std::array<TextureSetId,4> membership{0,0,1,1};
+ initialize_texture_sets(scene,accessory,mesh,fields,membership);
+ SourceMaterialBindings binding;
+ const auto &native=fields[0].material;
+ binding.native_reference={native.color,native.emissive,int(native.alpha),native.alpha_cutoff,native.double_sided};
+ binding.material=MToonMaterial::from_vrm1({
+     {"alphaMode","MASK"},{"alphaCutoff",native.alpha_cutoff},{"emissiveFactor",native.emissive},
+     {"pbrMetallicRoughness",{{"baseColorFactor",native.color}}},
+     {"normalTexture",{{"index",0}}},
+     {"extensions",{{"VRMC_materials_mtoon",{{"specVersion","1.0"},{"shadeColorFactor",{.2f,.1f,.3f}}}},
+                    {"KHR_materials_emissive_strength",{{"emissiveStrength",2.f}}}}}
+ },1);
+ binding.roles[size_t(MToonSlot::Normal)].image=std::make_shared<const Image>(Image{1,1,{140,165,248,255}});
+ check(bind_texture_set_mtoon(scene,accessory,0,binding),"Native accessory owns its own typed material with a distinct PBR partition");
+ auto donor_mesh=accessory_part(-.625f);
+ for(auto &point:donor_mesh.positions)point.z+=.0125f;
+ for(auto &normal:donor_mesh.normals)normal=normalized(Vec3{.2f,-.31f,1.f});
+ const auto donor=scene.add("Hidden accessory Bake donor",Volume{},scene.object(accessory).transform);
+ auto &source_object=scene.object(donor);
+ source_object.group=scene.object(accessory).group;
+ source_object.visible=false;
+ source_object.mesh_active=true;
+ source_object.material.color={.28f,.57f,.32f,.9f};
+ source_object.material.emissive={.08f,1.5f,.18f};
+ source_object.painted=std::make_shared<PaintedMesh>(std::move(donor_mesh),64);
+ scene.select(accessory);
+
+ Document doc;
+ doc.replace(scene);
+ check(doc.wait_mesh()&&doc.frame().state->can_bake,"Actual accessory uses the shared selected-field Bake worker");
+ ObjectBakeSettings bake_settings;
+ bake_settings.allow_partial=true;
+ bake_settings.padding=0;
+ bake_settings.ao_samples=2;
+ doc.bake_from_object(donor,bake_settings);
+ const auto project=out/"native-accessory.dsculpt";
+ doc.save_async(project).get();
+ const auto baked=doc.copy_scene();
+ const auto &paint=texture_set_view(baked.object(accessory),0).painted;
+ check(paint->baked()&&paint->baked()->emission_field&&
+       std::any_of(paint->baked()->coverage.begin(),paint->baked()->coverage.end(),[](auto v){return v==0;})&&
+       std::any_of(paint->baked()->coverage.begin(),paint->baked()->coverage.end(),[](auto v){return v>0;}),
+       "Actual nonempty partial Bake retains exact FLOAT emission and uncovered normals");
+
+ const auto source_only=detail::emission_export_subset(baked,imported.objects);
+ const auto baseline=out/"accessory-avatar-baseline.vrm";
+ export_vrm(source_only.export_surfaces(),baseline);
+ check(doc.frame().state->can_export_avatar&&doc.copy_scene().active().id==accessory,
+       "The selected nested accessory resolves the original avatar for Export Selected Avatar");
+ const auto vrm_path=out/"native-accessory.vrm";
+ doc.export_asset(vrm_path,AssetExportFormat::Avatar).get();
+ const auto vrm_data=file_bytes(vrm_path);
+ const auto j=glb_json(vrm_path);
+ check(j.at("extensions").at("VRMC_vrm").at("meta").at("name")=="MatCap only",
+       "Regular Document Avatar export preserves the original VRM1 model metadata");
+ const auto graph=geometry(vrm_path);
+ auto original_graph=graph;
+ std::erase_if(original_graph.get_ref<J::array_t &>(),[](const auto &entry){
+  const auto name=entry.at("name").template get<std::string>();
+  return name=="Native baked accessory"||name=="Accessory workshop"||name=="Accessory mount";
+ });
+ check(original_graph==geometry(baseline),
+       "Independent source node transforms, ordered geometry, and morph identities survive the accessory export");
+ const auto native_graph=std::find_if(graph.begin(),graph.end(),[](const auto &entry){
+  return entry.at("name")=="Native baked accessory";
+ });
+ const auto native_node=std::find_if(j.at("nodes").begin(),j.at("nodes").end(),[](const auto &entry){
+  return entry.value("name",std::string{})=="Native baked accessory"&&entry.contains("mesh");
+ });
+ const auto mount=std::find_if(j.at("nodes").begin(),j.at("nodes").end(),[](const auto &entry){
+  return entry.value("name",std::string{})=="Accessory mount";
+ });
+ check(native_graph!=graph.end()&&native_node!=j.at("nodes").end()&&mount!=j.at("nodes").end()&&
+       native_graph->at("world")==J(baked.world_matrix(accessory).float_matrix())&&
+       mount->at("children").at(0)==std::distance(j.at("nodes").begin(),native_node)&&
+       !native_node->contains("skin"),
+       "Independent importer finds the rigid native mesh under its exact nested avatar placement");
+
+ const auto &primitives=j.at("meshes").at(native_node->at("mesh").get<size_t>()).at("primitives");
+ check(primitives.size()==2&&primitives.at(0).at("extras").at("dome_sculpt_texture_set").at("id")==0&&
+       primitives.at(1).at("extras").at("dome_sculpt_texture_set").at("id")==1&&
+       primitives.at(0).at("attributes").contains("TANGENT"),
+       "Both accessory face partitions and the certified tangent frame reach ordinary VRM primitives");
+ const auto &material=j.at("materials").at(primitives.at(0).at("material").get<size_t>());
+ const auto &pbr=j.at("materials").at(primitives.at(1).at("material").get<size_t>());
+ check(material.at("extensions").contains("VRMC_materials_mtoon")&&
+       material.at("extensions").at("KHR_materials_emissive_strength").at("emissiveStrength")>=1.49&&
+       !pbr.at("extensions").contains("VRMC_materials_mtoon"),
+       "The authored MToon accessory and its PBR sibling preserve separate physical materials");
+ const auto &targets=j.at("extensions").at("VRMC_vrm").at("expressions").at("custom").at("avatarTint").at("materialColorBinds");
+ check(targets.size()==imported.objects.size()&&std::none_of(targets.begin(),targets.end(),[&](const auto &target){
+  return target.at("material")==primitives.at(0).at("material")||target.at("material")==primitives.at(1).at("material");
+ }),"Original avatar expressions retain their source parts and never target the native accessory");
+
+ const auto &entries=j.at("extras").at("domeSculptEmission").at("images");
+ check(entries.size()==2&&entries.at(0).at("view")=="authored-mtoon"&&entries.at(1).at("view")=="pbr"&&
+       entries.at(0).at("object")==accessory&&entries.at(1).at("object")==accessory,
+       "Both FLOAT resources are bound to their genuine VRM node, material and partition");
+ const auto exr=decode_emission_exr(resource(vrm_data,j,entries.at(0)));
+ check(exr.width==512&&std::any_of(exr.pixels.begin(),exr.pixels.end(),[](const auto &q){
+  return q[9]==1.f&&q[1]==1.5f&&q[7]==1.5f;
+ }),"Independent OpenEXR decode preserves absolute donor brightness separately from MToon gain");
+ auto ids=imported.objects;
+ ids.push_back(accessory);
+ const auto expected=detail::emission_export_subset(doc.copy_scene(),ids);
+ const auto restored=extract_native_emission(vrm_data);
+ check(restored&&restored->encode()==expected.encode()&&
+       texture_set_view(restored->object(accessory),0).bake_recipe->source.object==unavailable_bake_object,
+       "VRM restores the exact selected avatar and accessory with the excluded donor explicitly unavailable");
+ auto owner=std::make_shared<NativeEmissionExport>();
+ owner->scene=std::make_shared<const Scene>(restored->snapshot());
+ owner->allow_measured_core_fallback=true;
+ VrmExportOptions options;
+ options.emission=owner;
+ const auto again=out/"native-accessory-second.vrm";
+ export_vrm(emission_export_surfaces(*owner->scene),again,options);
+ check(file_bytes(again)==vrm_data,"Second VRM1 export reproduces every byte from the exact restored native project");
+
+ auto unrelated=restored->snapshot();
+ unrelated.object(accessory).group=unrelated.add_group("Outside the avatar");
+ owner->scene=std::make_shared<const Scene>(std::move(unrelated));
+ bool rejected=false;
+ try {
+  export_vrm(emission_export_surfaces(*owner->scene),again,options);
+ } catch(const std::invalid_argument &e) {
+  rejected=std::string_view(e.what()).find("outside the original avatar's instance")!=std::string_view::npos;
+ }
+ check(rejected&&file_bytes(again)==vrm_data,"An unrelated accessory cannot enter the avatar or replace the previous export");
+}
+}
+int main(int argc,char**argv)try{if(argc!=2&&argc!=3)return 2;std::filesystem::path out=argv[1];std::filesystem::create_directories(out);native_texture_set_accessory(out);if(argc==3){std::cout<<"VRM1 native texture set: "<<checks<<" checks\n";return 0;}for(auto base:{"vroid-beta-female","vroid-beta-male"}){Scene scene;append_humanoid(scene,humanoid_baseline_defaults(base),base,{},64);current(out,std::move(scene),base);}auto f=source(false);import_fixture::Fixture original;for(auto uv:{"TEXCOORD_0","TEXCOORD_1"})f.j["meshes"][0]["primitives"][0]["attributes"][uv]=original.j["meshes"][0]["primitives"][0]["attributes"][uv];f.j["materials"][0]["extensions"].erase("KHR_materials_unlit");auto &used=f.j["extensionsUsed"];for(auto i=used.begin();i!=used.end();)if(i->get_ref<const std::string&>()=="KHR_materials_unlit")i=used.erase(i);else ++i;auto path=out/"independent-v1-source.vrm";canonical_leaf_nodes(f);f.save(path);ImportAuthoringOptions options;options.paint_resolution=64;auto scene=prepare_authoring_import(Scene{},path,options).scene;current(out,std::move(scene),"independent-v1");for(float strength:{0.f,5.f})strength_case(out,strength);std::cout<<"HDR typed VRM: "<<checks<<" checks\n";return 0;}catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

@@ -9,6 +9,7 @@
 #include "vrm1-authoring.hpp"
 #include "vrm1-normal-export.hpp"
 #include "native-authoring-attach.hpp"
+#include "texture-set-surface.hpp"
 #include <set>
 #include <bit>
 namespace dome::detail {
@@ -36,10 +37,11 @@ static VrmExportReport export_vrm1_impl(const std::vector<ObjectSurface> &object
                             const Vrm1AuthoringCompilation *authoring) {
   stop(options);
   validate_vrm1_metadata(original, options.cancelled, true);
-  require(!objects.empty(), "no original source surfaces");
-  require(objects.front().appearance && objects.front().appearance->asset,
+  const auto source_part = std::ranges::find_if(objects,
+      [](const auto &object) { return bool(object.appearance); });
+  require(source_part != objects.end() && source_part->appearance->asset,
           "missing immutable original source");
-  const auto &origin = *objects.front().appearance;
+  const auto &origin = *source_part->appearance;
   const auto &asset = *origin.asset;
   require(asset.mode == ImportMode::PreserveGltf,
           "original source is not a preserving capture");
@@ -86,6 +88,15 @@ static VrmExportReport export_vrm1_impl(const std::vector<ObjectSurface> &object
         }
   for (const auto &object : objects) {
     stop(options);
+    if (native_vrm_texture_set_accessory(object)) {
+      require(!authoring && !object.deformation && !object.rig_source &&
+                  !object.source_dormant,
+              "texture-set accessory needs a current rigid native Standard VRM1 mesh");
+      require(std::ranges::none_of(object.texture_set_surface->fields(),
+                  [](const auto &field) { return field.source || field.appearance; }),
+              "texture-set accessory cannot borrow retained source material identities");
+      continue;
+    }
     require(object.appearance && object.appearance->asset == origin.asset &&
                 object.appearance->original_bytes == origin.original_bytes,
             "parts do not share one immutable original model");
@@ -187,8 +198,9 @@ static VrmExportReport export_vrm1_impl(const std::vector<ObjectSurface> &object
               "before source-retaining export");
   // VRM1 uses native glTF axes. Original is the older VRM0 basis conversion,
   // not a version-neutral switch for all VRM formats.
-  auto document =
-      authoring?make_vrm1_authoring_gltf(*authoring,options.cancelled):make_gltf(objects, SourceMorphSpace::Native, true, options.cancelled);
+  auto document = authoring ? make_vrm1_authoring_gltf(*authoring, options.cancelled) :
+      physical ? make_gltf_emission(*physical, true, options.cancelled) :
+      make_gltf(objects, SourceMorphSpace::Native, true, options.cancelled);
   auto &j = document.json;
   auto &binary = document.binary;
   Vrm1IdentityMap identities;
@@ -340,6 +352,8 @@ static VrmExportReport export_vrm1_impl(const std::vector<ObjectSurface> &object
   for (size_t i = 0; i < objects.size(); ++i) {
     stop(options);
     const auto &object = objects[i];
+    if (native_vrm_texture_set_accessory(object))
+      continue;
     const auto &a = *object.appearance;
     const auto &emitted = document.objects[i];
     require(a.source_node >= 0 && size_t(a.source_node) < asset.nodes.size() &&

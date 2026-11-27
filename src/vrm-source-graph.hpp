@@ -19,6 +19,9 @@ struct VrmSourceGraph {
   std::vector<std::optional<std::string>> names;
   nlohmann::json humanoid;
 };
+// A texture-set accessory is a separate native mesh, with no claim on an
+// original avatar node or expression target.
+bool native_vrm_texture_set_accessory(const ObjectSurface &) noexcept;
 // Explicitly authenticated original-space route; conventional creator exports
 // keep their existing transport. No source graph is inferred from names.
 VrmSourceGraph vrm_source_graph(const std::vector<ObjectSurface> &,

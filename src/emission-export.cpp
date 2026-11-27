@@ -247,7 +247,6 @@ EmissionExportPrepared prepare_emission_export(std::span<const ObjectSurface> ob
    validate_texture_set_surface(surface,owner,*options.scene,cancelled);
    for(const auto &field:surface.texture_set_surface->fields())
     if(!field.domain->triangles().empty()&&texture_set_physical_emission(field)){
-     if(authored_mtoon)throw std::invalid_argument("Texture-set HDR VRM needs its typed material adapter");
      charge_pixels(field.painted->resolution());
      texture_set_hdr=true;
     }
