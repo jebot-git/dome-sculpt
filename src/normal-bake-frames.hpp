@@ -2,6 +2,7 @@
 #pragma once
 #include "dome/material-bindings.hpp"
 #include "dome/deformation.hpp"
+#include "morph-normal-basis.hpp"
 namespace dome::detail {
 // Detached candidate for an EXPLICIT authoring conversion. Creating this value
 // neither changes a material nor establishes normal-texture conversion quality.
@@ -29,7 +30,8 @@ struct NativeNormalBakeTarget {
 };
 NativeNormalBakeTarget normal_bake_author_native_target(const Mesh &,
     const NormalFrames &,std::span<const Vec3> edited_positions,uint64_t target_id,
-    const NormalBakeFrameOptions & = {});
+    const NormalBakeFrameOptions & = {},
+    MorphNormalBasis = MorphNormalBasis::Geometry);
 // Current UV copies may have split vertices. Map their newly authored POSITION
 // deltas back to the captured native origin ONLY by exact ordered corners.
 // Contradictory copies, changed rest geometry, or an unreferenced origin vertex

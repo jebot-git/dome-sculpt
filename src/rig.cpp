@@ -3,6 +3,7 @@
 // see docs/RIGGING.md for pinned source, copyright, license and deviations.
 #include "dome/rig.hpp"
 #include "automatic-humanoid-support.hpp"
+#include "morph-normal-basis.hpp"
 #include <bitset>
 #include "dome/affine.hpp"
 #include <bit>
@@ -964,9 +965,15 @@ Mesh MorphSet::evaluate(const Mesh &m, std::span<const float> weights) const {
 }
 Mesh MorphSet::target_surface(const Mesh &m, size_t target,
                              const std::function<bool()> &cancelled) const {
-  const auto &delta = targets.at(target).delta;
+  return detail::morph_target_surface(m, *this, target,
+                                    detail::MorphNormalBasis::PreserveRestForUnchanged, cancelled);
+}
+Mesh detail::morph_target_surface(const Mesh &m, const MorphSet &morphs, size_t target,
+                                 MorphNormalBasis basis,
+                                 const std::function<bool()> &cancelled) {
+  const auto &delta = morphs.targets.at(target).delta;
   m.validate();
-  if (topology != morph_topology_id(m) || delta.size() != m.positions.size())
+  if (morphs.topology != morph_topology_id(m) || delta.size() != m.positions.size())
     throw std::invalid_argument("Morph target differs from its rest surface");
   Mesh result = m;
   bool changed = false;
@@ -977,7 +984,7 @@ Mesh MorphSet::target_surface(const Mesh &m, size_t target,
     const auto a = result.positions[v], b = m.positions[v];
     changed |= a.x != b.x || a.y != b.y || a.z != b.z;
   }
-  if (changed)
+  if (changed || basis == MorphNormalBasis::Geometry)
     normals(result, cancelled);
   result.validate();
   return result;

@@ -59,7 +59,7 @@ std::vector<Vec3> normal_bake_target_origin_positions(const Mesh &current,
 }
 NativeNormalBakeTarget normal_bake_author_native_target(const Mesh &mesh,
     const NormalFrames &base,std::span<const Vec3> edited_positions,uint64_t id,
-    const NormalBakeFrameOptions &options) {
+    const NormalBakeFrameOptions &options,MorphNormalBasis basis) {
   if(!id||!options.max_work||options.max_work>256*1024*1024||!options.max_bytes||options.max_bytes>128*1024*1024)
     throw std::invalid_argument("Invalid native normal-key authoring policy");
   Budget budget{options};budget.check();mesh.validate();base.validate();
@@ -72,7 +72,7 @@ NativeNormalBakeTarget normal_bake_author_native_target(const Mesh &mesh,
     throw std::length_error("Native normal-key authoring exceeds its detached memory budget");
   budget.check(corners+vertices);
   MorphSet temporary(mesh);temporary.set_target(mesh,"explicit-native-key",edited_positions);
-  auto key_mesh=temporary.evaluate(mesh,std::array<float,1>{1});
+  auto key_mesh=morph_target_surface(mesh,temporary,0,basis,options.cancelled);
   NormalFrames key_base;key_base.normals.reserve(corners);
   for(auto v:mesh.indices)key_base.normals.push_back(key_mesh.normals[v]);
   std::vector<Tangent> tangent;

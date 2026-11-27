@@ -71,6 +71,39 @@ void artist_offset_oracle(const Scene &scene, size_t slot) {
   check(offset > .02f && retained,
         "Independent cross-product frames prove post-UV key authoring retains non-geometric artist-normal offsets instead of replacing them with geometry normals");
 }
+void artist_rest_endpoint(const Scene &scene, size_t slot, const std::filesystem::path &project) {
+  Document document;
+  document.replace(scene);
+  settled(document);
+  const auto before = document.copy_scene().encode();
+  ShapeKeyEdit edit;
+  edit.action = ShapeKeyAction::Replace;
+  edit.target = slot;
+  edit.positions = scene.active().painted->mesh().positions;
+  document.author_shape(edit);
+  settled(document);
+
+  const auto result = document.copy_scene();
+  const auto &frames = *result.active().material_bindings->normal_frames;
+  const auto &key = key_frame(*frames.pbr, frames.current_targets.at(slot));
+  const auto &positions = result.active().deformation->morphs->targets.at(slot).delta;
+  const auto near_zero = [](Vec3 delta) { return length(delta) < 1e-5f; };
+  check(std::ranges::all_of(positions, near_zero) && !key.normals.empty() && !key.tangents.empty() &&
+            std::ranges::all_of(key.normals, near_zero) && std::ranges::all_of(key.tangents, near_zero),
+        "Returning the edited key to its rest positions restores the original artist normals and tangents");
+  check(result.active().painted->encode() == scene.active().painted->encode(),
+        "Returning the artist key to rest preserves the original Paint and UV sampling");
+  const auto after = result.encode();
+  check(document.undo() && document.copy_scene().encode() == before &&
+            document.redo() && document.copy_scene().encode() == after,
+        "One Undo and Redo preserve the exact two artist key endpoints");
+  document.save(project);
+  Document reopened;
+  reopened.open(project);
+  settled(reopened);
+  check(reopened.copy_scene().encode() == after,
+        "Cold Open preserves the artist key returned to rest");
+}
 void geometric_oracle(const Scene &scene, size_t slot) {
   const auto &object = scene.active();
   const auto &mesh = object.painted->mesh();
@@ -201,6 +234,7 @@ int main(int argc, char **argv) try {
   changed = authored(changed, name + "-authored.dsculpt", false);
   artist_offset_oracle(changed, slot);
   consumers(changed, false, name, native, framebuffer, independent);
+  artist_rest_endpoint(changed, slot, name + "-rest.dsculpt");
   check(artist.encode() == artist_exact,
         "Authored-normal post-UV consumer checks leave the complete artist source unchanged");
   std::cout << "PASS " << checks << " post-UV authored key graphical checks\n";

@@ -60,6 +60,6 @@ std::shared_ptr<const SourceKeyDerivation> KeyDerivationCodec::decode(const nloh
     }else if(!t.at("reference").is_null())reference=number(t.at("reference"),true);
     node->targets_.push_back({number(t.at("id"),true),reference});if(t.contains("operation")&&t.at("operation").get_ref<const std::string&>()=="mirror"){node->targets_.back().mirror_tolerance=t.at("tolerance").get<float>();if(t.contains("plane"))node->targets_.back().mirror_conversion=DerivedMirrorConversion{t.at("plane").get<double>(),t.at("frame_policy")=="exact-authored-v1"?ShapeKeyMirrorFrames::ExactAuthored:ShapeKeyMirrorFrames::BaseRelative};}
   }
-  node->validate(true,cancelled);stop(cancelled);std::swap(frames.frames_,staged.frames_);frames.domains_.swap(staged.domains_);frames.used_.swap(staged.used_);return node;
+  node->normal_basis_=node->validate_impl(true,true,cancelled);stop(cancelled);std::swap(frames.frames_,staged.frames_);frames.domains_.swap(staged.domains_);frames.used_.swap(staged.used_);return node;
 }
 } // namespace dome::detail

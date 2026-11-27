@@ -7,18 +7,20 @@ namespace dome::detail {
 namespace {void stop(const std::function<bool()> &cancelled){if(cancelled&&cancelled())throw std::runtime_error("Shapekey authoring cancelled");}}
 NormalFrameTarget author_key_attributes(const Mesh &rest,const NormalFrames &artist,
     const NormalFrameTarget *old_key,std::span<const Vec3> old_positions,
-    std::span<const Vec3> new_positions,uint64_t id,const std::function<bool()> &cancelled){
+    std::span<const Vec3> new_positions,uint64_t id,const std::function<bool()> &cancelled,
+    MorphNormalBasis basis){
  // Rotate the previous artist endpoint by the geometric frame's change. This
- // preserves smoothing/normal offsets; it does not label generated N/T as the
- // original authored channels. REST and every other key remain immutable.
+ // preserves smoothing and normal offsets. Evaluate the geometric frame even
+ // at rest so the artist's normal remains an offset from that frame.
  MorphSet before(rest);before.set_target(rest,"geometric-reference",old_positions);
- auto mesh=before.evaluate(rest,std::array<float,1>{1});
+ auto mesh=morph_target_surface(rest,before,0,basis,cancelled);
  NormalFrames geometric;geometric.origin_vertex_count=uint32_t(rest.positions.size());geometric.origin_vertices=rest.indices;
  geometric.normals.reserve(rest.indices.size());for(auto v:rest.indices)geometric.normals.push_back(mesh.normals[v]);
  if(!artist.tangents.empty()){
   geometric.tangents=tangent_corners(mesh,cancelled);geometric.generated_tangents=true;geometric.generated_uv=0;
  }
- auto after=detail::normal_bake_author_native_target(rest,geometric,new_positions,id,{128*1024*1024,128*1024*1024,cancelled}).attributes;
+ auto after=normal_bake_author_native_target(rest,geometric,new_positions,id,
+     {128*1024*1024,128*1024*1024,cancelled},basis).attributes;
  NormalFrameTarget result;result.id=id;result.normals.reserve(rest.indices.size());if(!artist.tangents.empty())result.tangents.reserve(rest.indices.size());
  for(size_t c=0;c<rest.indices.size();++c){if((c&1023)==0)stop(cancelled);
   auto n0=geometric.normals[c],n1=n0+after.normals[c];Vec3 t0,t1;float handedness=1;

@@ -152,7 +152,8 @@ bool same_frames(const NormalFrameSet&a,const NormalFrameSet&b){
 bool key_recipe_sampling_matches(const SourceNormalPreparation &a,const SourceNormalPreparation &b){return own(a.canonical_conversion,b.canonical_conversion)&&own(a.original_paint,b.original_paint)&&own(a.original_material,b.original_material)&&own(a.original_appearance,b.original_appearance)&&own(a.original_deformation,b.original_deformation)&&own(a.sampling_domain,b.sampling_domain)&&own(a.uv_reprojection,b.uv_reprojection)&&a.receipt.encode()==b.receipt.encode()&&normal_projection_identity(*a.projection,*b.projection)&&normal_projection_identity(*a.initial_projection,*b.initial_projection);}
 bool SourceKeyDerivation::uses_explicit_mirror() const noexcept {return std::any_of(targets_.begin(),targets_.end(),[](const auto &t){return bool(t.mirror_conversion);});}
 const std::vector<Vec3> &SourceKeyDerivation::positions(uint64_t id) const {if(!frames_)throw std::invalid_argument("Independent key endpoints have no owning frame registry");return identity(*frames_,id).positions;}
-std::shared_ptr<const NormalFrameSet> SourceKeyDerivation::replay(const std::function<bool()> &cancelled) const {
+std::shared_ptr<const NormalFrameSet> SourceKeyDerivation::replay(
+    const std::function<bool()> &cancelled,MorphNormalBasis normal_basis) const {
   stop(cancelled);const auto &before=*material_->normal_frames;const auto &basis=*domain_->basis();const auto map=anchor_map(*this);const size_t count=targets_.size();key_budget(deformation_.get(),basis.positions.size(),count);
   replay_frame_bytes(*this,cancelled);
   auto out=std::make_shared<NormalFrameSet>(before);out->position_domain=domain_;out->targets.clear();out->current_targets=current_targets_;out->next_target=next_target_;
@@ -163,13 +164,17 @@ std::shared_ptr<const NormalFrameSet> SourceKeyDerivation::replay(const std::fun
     auto frame=std::make_shared<NormalFrames>(*artist);frame->origin_vertex_count=uint32_t(basis.positions.size());frame->origin_vertices=basis.indices;frame->targets.clear();auto mesh=basis;if(!artist->tangents.empty())mesh.uv=role_coordinates(*this,coordinate,cancelled);
     for(const auto &t:targets_){stop(cancelled);const auto &endpoint=positions(t.id);std::vector<Vec3> previous(mesh.positions.size());auto seed=seed_attributes(*this,t,*artist,coordinate,cancelled);const NormalFrameTarget *old_key=t.reference?&seed:nullptr;if(t.reference){auto old_position=seed_positions(*this,t,cancelled);for(size_t v=0;v<map.size();++v)previous[v]=old_position.at(t.mirror_tolerance?v:map[v]);}
       NormalFrameTarget target;if(vectors(previous,endpoint)){if(old_key)target=*old_key;target.id=t.id;}
-      else {auto old_positions=mesh.positions,new_positions=mesh.positions;for(size_t v=0;v<map.size();++v){old_positions[v]+=previous[v];new_positions[v]+=endpoint[v];}target=author_key_attributes(mesh,*artist,old_key,old_positions,new_positions,t.id,cancelled);}
+      else {auto old_positions=mesh.positions,new_positions=mesh.positions;for(size_t v=0;v<map.size();++v){old_positions[v]+=previous[v];new_positions[v]+=endpoint[v];}target=author_key_attributes(mesh,*artist,old_key,old_positions,new_positions,t.id,cancelled,normal_basis);}
       frame->targets.push_back(std::move(target));
     }frame->validate();copies.push_back({artist.get(),coordinate,frame});return frame;
   };
   out->pbr=role(before.pbr,ShapeFrameRole::Pbr);out->mtoon=role(before.mtoon,ShapeFrameRole::MToon);out->canonical=role(before.canonical,ShapeFrameRole::Canonical);out->validate();stop(cancelled);return out;
 }
 void SourceKeyDerivation::validate(bool deep,const std::function<bool()> &cancelled) const {
+  validate_impl(deep,false,cancelled);
+}
+MorphNormalBasis SourceKeyDerivation::validate_impl(bool deep,bool read_archive,
+    const std::function<bool()> &cancelled) const {
   if(!paint_||!material_||!material_->normal_frames||!domain_||!frames_||targets_.empty()||targets_.size()>128||current_targets_.size()>128||!own(frames_->position_domain,domain_)||frames_->current_targets!=current_targets_||frames_->next_target!=next_target_||frames_->targets.size()!=targets_.size())throw std::invalid_argument("Incomplete owning independent key derivation");
   // Even mutable before-material aliases cannot create an unbounded recursive
   // source graph during a standalone/deep validation.
@@ -191,7 +196,19 @@ void SourceKeyDerivation::validate(bool deep,const std::function<bool()> &cancel
     if(!paint_->normal_projection()||!normal_projection_identity(*paint_->normal_projection(),*recipe.projection))throw std::invalid_argument("Independent key anchor lost its actual prepared normal field");
     recipe.validate_current(paint_->mesh(),appearance_.get(),cancelled);if(recipe.sampling_domain)recipe.sampling_domain->validate_paint(*paint_,*material_,deep,cancelled);
   }else if(paint_->normal_projection())throw std::invalid_argument("Independent key anchor has unbound normal sampling planes");
-  domain_->validate(deep,cancelled);if(deformation_)deformation_->validate(paint_->mesh());if(deep&&!same_frames(*frames_,*replay(cancelled)))throw std::invalid_argument("Independent key attributes differ from genuine source-role authoring replay");
+  domain_->validate(deep,cancelled);if(deformation_)deformation_->validate(paint_->mesh());
+  if(!deep)return normal_basis_;
+  if(read_archive){
+    try {
+      if(same_frames(*frames_,*replay(cancelled)))return MorphNormalBasis::Geometry;
+    } catch(const std::invalid_argument &) {
+      // Older records could keep the authored rest normal when replaying a
+      // zero-displacement endpoint. Check that exact historical rule below.
+    }
+    if(same_frames(*frames_,*replay(cancelled,MorphNormalBasis::PreserveRestForUnchanged)))
+      return MorphNormalBasis::PreserveRestForUnchanged;
+  }else if(same_frames(*frames_,*replay(cancelled,normal_basis_)))return normal_basis_;
+  throw std::invalid_argument("Independent key attributes differ from genuine source-role authoring replay");
 }
 bool needs_independent_key_domain(const SculptObject &o,const ShapeKeyEdit &edit,
     const std::function<bool()> &cancelled){
@@ -226,11 +243,14 @@ ShapeKeyResult author_derived_normal_shapekey(Scene &scene,uint64_t object,const
   stop(cancelled);const auto &source=scene.object(object);const auto &binding=source.material_bindings;normal_frame_current_authority(*binding,source.painted->mesh(),source.deformation.get(),cancelled);const auto recipe=binding->normal_preparation;if(recipe)recipe->validate_current(source.painted->mesh(),source.appearance.get(),cancelled);
   const auto &current=source.painted->mesh();const auto *original_keys=source.deformation&&source.deformation->morphs?&*source.deformation->morphs:nullptr;const size_t count=original_keys?original_keys->targets.size():0;const bool duplicate=edit.action==ShapeKeyAction::Duplicate,mix=edit.action==ShapeKeyAction::CaptureMix,mirror=edit.action==ShapeKeyAction::Mirror;const bool vertex_mirror=mirror&&edit.mirror_frames==ShapeKeyMirrorFrames::VertexPositions;const bool create=edit.action==ShapeKeyAction::Create||duplicate||mix||mirror;if((!create||duplicate||mirror)&&edit.target>=count)throw std::invalid_argument("Choose an existing shapekey");if(create&&count>=128)throw std::length_error("Shapekey target budget exceeded");
   // Reserve the new owning-anchor depth before snapshots or target arrays.
-  if(duplicate||mix||mirror){size_t depth=1;for(auto anchor=binding->key_derivation;anchor;anchor=anchor->before_material()->key_derivation){stop(cancelled);if(++depth>32)throw std::length_error("Named key anchor exceeds bounded source history before allocation");}}
+  const auto old=binding->key_derivation;
+  if(duplicate||mix||mirror||(old&&old->normal_basis_!=MorphNormalBasis::Geometry&&edit.action!=ShapeKeyAction::Rename)){size_t depth=1;for(auto anchor=old;anchor;anchor=anchor->before_material()->key_derivation){stop(cancelled);if(++depth>32)throw std::length_error("Key anchor exceeds bounded source history before allocation");}}
   key_budget(source.deformation.get(),current.positions.size(),count+(create?1:0));
   const auto domain=derive_frame_position_domain(source.painted->mesh_owner(),*binding,cancelled);key_budget(source.deformation.get(),domain->basis()->positions.size(),binding->normal_frames->targets.size()+(create?1:0));
-  const auto old=binding->key_derivation;
-  const bool reuse=!duplicate&&!mix&&!mirror&&old&&old->position_domain()==domain&&old->before_paint()->mesh_owner()==source.painted->mesh_owner()&&bool(recipe)==bool(old->before_material()->normal_preparation)&&(!recipe||key_recipe_sampling_matches(*recipe,*old->before_material()->normal_preparation));
+  const bool reuse_candidate=!duplicate&&!mix&&!mirror&&old&&old->position_domain()==domain&&old->before_paint()->mesh_owner()==source.painted->mesh_owner()&&bool(recipe)==bool(old->before_material()->normal_preparation)&&(!recipe||key_recipe_sampling_matches(*recipe,*old->before_material()->normal_preparation));
+  const bool reanchor_legacy=reuse_candidate&&old->normal_basis_!=MorphNormalBasis::Geometry;
+  // Keep every retained legacy target exact when the first new edit is made.
+  const bool reuse=reuse_candidate&&!reanchor_legacy;
   if(edit.action!=ShapeKeyAction::Rename){
     auto entries=source.deformation?source.deformation->resource_entries():size_t(0);
     if(create){const auto addition=current.positions.size()+(source.deformation&&!source.deformation->morph_weights.empty()?1:0);if(addition>8'000'000-entries)throw std::length_error("Prospective native key deformation exceeds quota before allocation");entries+=addition;}
@@ -274,6 +294,6 @@ ShapeKeyResult author_derived_normal_shapekey(Scene &scene,uint64_t object,const
   node->frames_=node->replay(cancelled);node->validate(true,cancelled);
   deform->morphs->set_target(source.painted->mesh(),name,endpoint);if(duplicate)deform->morphs->targets.back().delta=original_keys->targets.at(edit.target).delta;if(mirror)deform->morphs->targets.back().delta=mirrored_delta;if(create&&!deform->morph_weights.empty())deform->morph_weights.push_back(0);deform->validate(source.painted->mesh());std::shared_ptr<const SourceNormalPreparation> next_recipe;if(recipe){auto prepared=std::make_shared<SourceNormalPreparation>(*recipe);prepared->target_frames=node->frames_;prepared->key_derivation=node;next_recipe=std::move(prepared);}
   auto next_binding=std::make_shared<SourceMaterialBindings>(*binding);next_binding->normal_frames=node->frames_;next_binding->normal_preparation=next_recipe;next_binding->key_derivation=node;seal_native_paint_frames(*next_binding,cancelled);next_binding->validate();normal_frame_current_authority(*next_binding,source.painted->mesh(),deform.get(),cancelled);
-  Scene next=scene;auto &output=next.object(object);output.material_bindings=next_binding;output.deformation=deform;if(!reuse&&(!binding->native_paint_frames||!output.shape_source))output.shape_source=capture_polygon_origin(scene,object);next.validate();stop(cancelled);scene=std::move(next);return{slot,true};
+  Scene next=scene;auto &output=next.object(object);output.material_bindings=next_binding;output.deformation=deform;if(!reuse&&(!output.shape_source||(!reanchor_legacy&&!binding->native_paint_frames)))output.shape_source=capture_polygon_origin(scene,object);next.validate();stop(cancelled);scene=std::move(next);return{slot,true};
 }
 } // namespace dome::detail

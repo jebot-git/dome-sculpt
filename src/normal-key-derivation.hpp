@@ -3,6 +3,7 @@
 #include "dome/shapekey-authoring.hpp"
 #include "dome/normal-preparation.hpp"
 #include "frame-position-domain.hpp"
+#include "morph-normal-basis.hpp"
 namespace dome::detail {
 struct DerivedMirrorConversion {
   double plane=0;
@@ -48,7 +49,11 @@ private:
   std::vector<DerivedKeyTarget> targets_;
   std::vector<uint64_t> current_targets_;
   uint64_t next_target_=1;
-  std::shared_ptr<const NormalFrameSet> replay(const std::function<bool()> &) const;
+  MorphNormalBasis normal_basis_=MorphNormalBasis::Geometry;
+  std::shared_ptr<const NormalFrameSet> replay(const std::function<bool()> &,
+      MorphNormalBasis = MorphNormalBasis::Geometry) const;
+  MorphNormalBasis validate_impl(bool deep, bool read_archive,
+      const std::function<bool()> &) const;
   friend ShapeKeyResult author_derived_normal_shapekey(Scene &,uint64_t,const ShapeKeyEdit &,const std::function<bool()> &);
 };
 bool needs_independent_key_domain(const SculptObject &,const ShapeKeyEdit &,
