@@ -886,6 +886,8 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
       normal.rotation=0;
     }
     auto output=typed.source_json();
+    if(params.alpha!=MToonAlpha::Mask)
+      output.erase("alphaCutoff");
     if(hdr&&hdr->strength==1){
       // This strength is generated from resolved radiance. Its default
       // representation must not depend on whether the source was reopened.

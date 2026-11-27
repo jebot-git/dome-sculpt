@@ -26,6 +26,7 @@ struct TextureSetExportField {
   bool normal_role=false, tangent_attribute=false;
   bool portable_mtoon_bake_frame=false, portable_mtoon_derivative_frame=false;
   bool portable_mtoon_normal_coordinates=false;
+  bool independent_mtoon_paint=false;
   std::optional<TextureSetExportEmission> emission;
 };
 struct PortableMToonSetPaint {
