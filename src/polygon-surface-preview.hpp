@@ -67,6 +67,7 @@ public:
    return streams_ == other.streams_ && attachment_ == other.attachment_;
  }
 private:
+ friend struct native_weight_retention_impl::Counter;
  friend class BakeRecipeRemap;
  PolygonSurfacePreview()=default;
  std::weak_ptr<const PolygonSurfacePreview>self_;

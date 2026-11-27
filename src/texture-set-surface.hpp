@@ -8,8 +8,8 @@ struct TextureSetDraw {
 };
 // One current geometry authority, one partitioned EBO and one explicit logical
 // corner stream. No per-set Mesh or deformation copy. Plain fields and genuine
-// retained polygon field descriptors have separate owning producers; unsupported
-// source roles and posed retained frames remain explicitly guarded.
+// retained polygon field descriptors have separate owning producers. Their
+// geometric frames use the same evaluated surface as positions and picking.
 class TextureSetSurfacePlan {
 public:
   uint64_t object()const noexcept{return object_;}

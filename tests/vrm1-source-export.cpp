@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "cgltf.h"
+#include "polygon-surface-owner.hpp"
 #include "dome/document.hpp"
 #include "dome/import-authoring.hpp"
 #include "dome/rig-edit.hpp"
@@ -15,6 +16,7 @@
 #include "native-surface-heat.hpp"
 #include "source-rigid-pose.hpp"
 #include "source-skin-link.hpp"
+#include "dome/polygon-authoring.hpp"
 #include "vrm1-metadata.hpp"
 #include <fstream>
 #include <iostream>
@@ -1195,6 +1197,87 @@ void skinned_texture_accessory(const std::filesystem::path &out, Scene initial) 
         "Editable VRM retains the weight gesture and the linked accessory's exact authored state");
   surface_heat_texture_accessory(out, scene, accessory, rig);
 }
+void retained_skinned_accessory(const std::filesystem::path &out) {
+  std::filesystem::create_directories(out);
+  Scene scene;
+  const auto accessory = scene.active().id;
+  auto &object = scene.active();
+  object.name = "Retained skinned collar";
+  object.mesh_active = true;
+  Mesh mesh;
+  mesh.positions = {{-.33f,.08f,0},{.32f,.08f,0},{.32f,.55f,0},{-.33f,.55f,0}};
+  mesh.normals.assign(4,{0,0,1});
+  mesh.uv = {{.13f,.13f},{.87f,.13f},{.87f,.87f},{.13f,.87f}};
+  mesh.indices = {0,1,2,0,2,3};
+  object.painted=std::make_shared<PaintedMesh>(mesh,64);
+  PaintSettings paint;
+  paint.channel=PaintChannel::Emission;
+  paint.emission_units=PaintEmissionUnits::Physical;
+  paint.emission={2,.15f,.25f};
+  paint.front_only=false;
+  Brush brush;
+  brush.from=brush.to={0,.30f,0};
+  brush.normal={0,0,1};
+  brush.radius=2;
+  brush.strength=1;
+  object.painted->begin_stroke();
+  object.painted->stamp(brush,paint);
+  check(object.painted->end_stroke(),"Retained accessory starts from a genuine FLOAT paint layer");
+  const auto original=scene.snapshot();
+  const auto capture=detail::PolygonSurfaceOwner::capture(original,accessory);
+  PolygonWorkspace polygon(*capture->trace().original());
+  polygon.mode(PolygonSelectionMode::Vertex);
+  polygon.select(polygon.view().topology->vertices().front().id);
+  polygon.begin_move();polygon.move_to({0,0,.018f});polygon.end_move(true);
+  check(detail::adopt_polygon_surface_edit(scene,accessory,polygon.view(),original),
+        "Actual polygon authoring captures the accessory's original editable source");
+  const auto face=scene.active().polygon->topology.faces().front().id;
+  create_texture_set(scene,accessory,std::array<uint64_t,1>{face},"Retained second slot",64);
+  const auto source=scene.active().texture_sets;
+  auto fixture=metadata_source();
+  const auto input=out/"original.vrm";
+  fixture.save(input);
+  ImportAuthoringOptions options;options.paint_resolution=64;
+  const auto imported=prepare_authoring_import(scene,input,options);
+  auto staged=imported.scene.snapshot();
+  staged.select(accessory);
+  SkinAuthoringOptions bind;bind.mode=SkinAuthoringMode::Transfer;bind.reference=imported.objects.front();
+  bind.transfer_distance=4;
+  Document document;
+  const auto settle=[&] {
+    if(!document.wait_asset()||!document.wait_mesh()||!document.frame().state->error.empty())
+      throw std::runtime_error("Retained linked collar failed: "+document.frame().state->error);
+  };
+  document.replace(staged);settle();
+  document.bind_skin(bind);
+  document.save_async(out/"linked.dsculpt").get();settle();
+  const auto linked=document.copy_scene();
+  const auto &collar=linked.object(accessory);
+  const auto link=detail::source_skin_link(linked.group_path(collar.group),*collar.deformation);
+  check(link&&link==detail::source_rig_instance(linked,linked.object(bind.reference))&&
+        collar.texture_sets==source&&Scene::load(out/"linked.dsculpt").encode()==linked.encode(),
+        "Linked retained skin preserves the true source joint table, both original material owners and cold replay");
+  for(const auto &[name,format]:{
+      std::pair{"retained-standard.vrm",AssetExportFormat::Avatar},
+      std::pair{"retained-editable.vrm",AssetExportFormat::EditableAvatar512}}) {
+    const auto path=out/name;
+    document.export_asset(path,format).get();
+    cgltf_options read{};
+    cgltf_data *data=nullptr;
+    check(cgltf_parse_file(&read,path.c_str(),&data)==cgltf_result_success,"Independent glTF reader opens the retained VRM accessory");
+    const auto owned=std::unique_ptr<cgltf_data,decltype(&cgltf_free)>(data,cgltf_free);
+    check(cgltf_load_buffers(&read,data,path.c_str())==cgltf_result_success&&cgltf_validate(data)==cgltf_result_success,
+          "Independent glTF reader validates the linked VRM avatar");
+    const auto *leaf=std::find_if(data->nodes,data->nodes+data->nodes_count,[](const auto &node){
+      return node.mesh&&node.name&&std::string_view(node.name)=="Retained skinned collar surface";
+    });
+    check(leaf!=data->nodes+data->nodes_count&&leaf->skin&&leaf->mesh->primitives_count==2&&
+          leaf->skin->joints_count==collar.deformation->source_skin_joints.size(),
+          "Both retained material primitives share the original avatar's emitted joint table");
+    const auto restored=format==AssetExportFormat::Avatar?extract_native_emission(bytes(path)):extract_native_authoring(bytes(path));
+    check(restored&&restored->encode()==linked.encode(),"Retained VRM restores the exact source and skin history");
+  }
+}
 
 void bone_accessory(const std::filesystem::path &out) {
   using namespace dome;
@@ -1390,6 +1473,11 @@ void bone_accessory(const std::filesystem::path &out) {
 int main(int argc, char **argv) try {
   if (argc < 3)
     return 2;
+  if (argc == 3 && std::string_view(argv[1]) == "--retained-skinned-accessory") {
+    retained_skinned_accessory(argv[2]);
+    std::cout << "PASS retained VRM 1.0 skinned accessory\n";
+    return 0;
+  }
   if (std::string_view(argv[1]) == "--bone-accessory") {
     bone_accessory(argv[2]);
     std::cout << "PASS native VRM1 bone accessory workflow\n";

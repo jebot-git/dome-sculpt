@@ -24,6 +24,7 @@
 #include "gltf-document.hpp"
 #include "cgltf.h"
 #include "native-paint-sampling.hpp"
+#include "native-surface-heat.hpp"
 #include "polygon-surface-owner.hpp"
 #include "polygon-surface-paint.hpp"
 #include "paint-overlay-sample.hpp"
@@ -1293,7 +1294,7 @@ Vec3 posed_source_direction(const TextureSetView &field,const Mesh &posed,
  const auto authored=field.source->normal(triangle,bary,world,true);
  return normalized(t*dot(reference.t,authored)+b*dot(reference.b,authored)+n*dot(reference.n,authored));
 }
-void bake_posed_retained(bool prepared,bool reflected,bool corresponding,bool cage){
+void bake_posed_retained(bool prepared,bool reflected,bool corresponding,bool cage,bool skinned=false){
  auto recipient=source(prepared,reflected,false,false,false,prepared);
  auto donor_scene=source(true,reflected,false,false,false,true);
  if(!reflected){recipient.active().affine_edit.reset();donor_scene.active().affine_edit.reset();}
@@ -1318,6 +1319,20 @@ void bake_posed_retained(bool prepared,bool reflected,bool corresponding,bool ca
  for(auto &v:high.positions)v+=offset;
  set_bake_pose(scene,target,low.positions);
  set_bake_pose(scene,donor,high.positions);
+ if(skinned){
+  for(const auto id:{target,donor}){
+   auto &object=scene.object(id);
+   auto deformation=std::make_shared<DeformationState>(*object.deformation);
+   deformation->skeleton.emplace();
+   deformation->skeleton->bones.push_back(Bone{"Bake root"});
+   deformation->skin.emplace();
+   deformation->skin->vertices.resize(object.painted->mesh().positions.size(),{{0,1}});
+   deformation->pose={JointTransform{{0,0,.15f},{},{1,1,1}}};
+   object.deformation=std::move(deformation);
+  }
+  for(auto &v:low.positions)v.z+=.15f;
+  for(auto &v:high.positions)v.z+=.15f;
+ }
  for(TextureSetId id:{0u,1u})
   check(edit_texture_set(scene,donor,id,[id](PaintedMesh &paint,Material &material){
    material.emissive={};
@@ -1447,6 +1462,181 @@ void bake_posed_retained(bool prepared,bool reflected,bool corresponding,bool ca
  document.bake_from_object(donor,cleared.bake_recipe->settings);ready(document);
  check(document.copy_scene().encode()==exact,"Rebaking the recalled live pose reproduces the exact project");
 }
+void skin_retained_materials(){
+ auto scene=source(true,false,false,false,false,true);
+ const auto target=scene.active().id;
+ scene.active().affine_edit.reset();
+ auto shaped=scene.active().painted->mesh();
+ for(auto &v:shaped.positions)v.z+=.12f*v.x+.09f*v.y;
+ set_bake_pose(scene,target,shaped.positions);
+ const auto rest=scene.active().painted->mesh();
+ const auto rig=scene.add("Two-joint retained material rig",Volume{});
+ auto &reference=scene.active();
+ reference.mesh_active=true;
+ reference.visible=false;
+ reference.painted=std::make_shared<PaintedMesh>(rest,64);
+ auto native=std::make_shared<DeformationState>(rest);
+ native->skeleton.emplace();
+ Bone root{"Root"};
+ root.rest.translation={-.65f,-.42f,0};
+ root.length=.62f;
+ Bone tip{"Tip"};
+ tip.parent=0;
+ tip.rest.translation={1.3f,0,0};
+ tip.length=.62f;
+ native->skeleton->bones={root,tip};
+ reference.deformation=native;
+ scene.select(target);
+ select_texture_set(scene,target,1);
+ const auto initial=scene.encode();
+ scene.save("before-bind.dsculpt");
+ const auto cold=Scene::load("before-bind.dsculpt");
+ const std::array targets{target};
+ detail::NativeSurfaceHeatOptions bounds;
+ const auto retained=detail::native_weight_retention(cold,bounds.maximum_total-bounds.maximum_workspace);
+ const auto &field=texture_set_view(cold.active(),1);
+ check(field.source&&field.source->original_paint()&&field.source->source_preview()&&
+       retained.bytes>field.source->original_paint()->storage_bytes(),
+       "Cold Surface Heat retention accounts for the actual shared field and its ancestor paint");
+ bounds.maximum_total=bounds.maximum_workspace+retained.bytes;
+ auto admitted=detail::capture_native_surface_heat(cold,targets,rig,bounds);
+ check(admitted.matches(cold),"Exact retained byte limit admits the complete cold source graph");
+ --bounds.maximum_total;
+ bool refused_bound=false;
+ try{(void)detail::capture_native_surface_heat(cold,targets,rig,bounds);}
+ catch(const std::length_error &){refused_bound=true;}
+ check(refused_bound&&cold.encode()==initial,
+       "One byte below the retained limit refuses the real graph before staging");
+ Document document;
+ document.replace(scene);ready(document);
+ SkinAuthoringOptions bind;
+ bind.mode=SkinAuthoringMode::SurfaceHeat;
+ bind.reference=rig;
+ bind.seed_distance=1.1f;
+ check(document.frame().state->can_bind_skin,"Current retained mesh exposes the ordinary Bind Skin workflow");
+ document.bind_skin(bind);
+ document.save_async("bound.dsculpt").get();ready(document);
+ const auto bound=document.copy_scene();
+ const auto &skin=*bound.active().deformation;
+ const auto exact_bind=bound.encode();
+ check(skin.skeleton&&skin.skin&&bound.active().texture_sets==scene.active().texture_sets&&
+       skin.morphs->encode()==scene.active().deformation->morphs->encode(),
+       "Surface Heat binds the actual retained mesh without replacing its source, UVs or authored shape");
+ check(Scene::load("bound.dsculpt").encode()==exact_bind&&document.undo()&&
+       document.copy_scene().encode()==initial&&document.redo()&&document.copy_scene().encode()==exact_bind,
+       "Native retained Bind Skin has exact history and cold reopen");ready(document);
+ auto modify_pose=[&](RigEdit edit){
+  document.edit_scene("Pose retained material mesh",[=](Scene &candidate,const auto &cancelled){
+   edit_rig(candidate,target,edit,cancelled);
+  });
+  ready(document);
+ };
+ RigEdit flex;
+ flex.joint=JointAdjustment{1,{},{0,0,.26f}};
+ modify_pose(flex);
+ const auto flexed=document.copy_scene();
+ auto independent=shaped;
+ const auto &rows=flexed.active().deformation->skin->vertices;
+ for(size_t v=0;v<independent.positions.size();++v)
+  for(const auto influence:rows[v])if(influence.joint==1)independent.positions[v].z+=.26f*influence.weight;
+ const auto surface=document.frame().surface;
+ check(surface->ranges.size()==2&&surface->picking,"Skinned retained preview publishes both material fields and picking");
+ for(const auto &range:surface->ranges){
+  const auto &proof=*range.texture_set_proof;
+  const auto packet=range.textures->polygon_surface;
+  const auto &field=proof.field();
+  const auto triangle=field.domain->triangles().front();
+  Vec3 center{};
+  for(size_t c=0;c<3;++c){
+   const auto logical=proof.logical_corner(c,range.paint_winding_reversed);
+   const auto p=independent.positions[rest.indices[logical]];
+   check(length(p-surface->mesh.positions[surface->mesh.indices[range.first+c]])<3e-6f,
+         "Posed retained corner matches the independent two-joint displacement");
+   center+=p*(1.f/3);
+  }
+  constexpr std::array<double,3> b{1./3,1./3,1./3};
+  check(length(packet->normal_at(triangle,b,AffineTransform{})-
+               posed_source_direction(field,independent,triangle,b,AffineTransform{}))<3e-6f&&
+        packet->shares_streams(*field.source->source_preview()),
+        "Nonrigid skinning transports the original material direction over each deformed triangle");
+  const auto hit=surface->picking->raycast_target(center+Vec3{0,0,1},{0,0,-1},2,0,target);
+  check(hit&&surface->picking->material_identity(hit->surface.triangle)==SurfaceMaterialIdentity{target,field.id},
+        "Posed retained picking preserves the exact material membership");
+ }
+ const auto flexed_exact=flexed.encode();
+ auto expected_refusal=std::filesystem::path("uncertified.glb");
+ {std::ofstream old(expected_refusal);old<<"previous";
+ }
+ {
+  Document refusal;
+  refusal.replace(flexed);ready(refusal);
+  bool rejected=false;
+  try{refusal.export_asset(expected_refusal,AssetExportFormat::Glb).get();}
+  catch(const std::invalid_argument &error){
+   rejected=std::string_view(error.what()).find("portable angular limit in the active skin pose")!=std::string_view::npos;
+  }
+  check(rejected,"Export refuses the actual portable normal mismatch in a nonrigid pose");
+ }
+ {std::ifstream previous(expected_refusal);std::string value;previous>>value;
+  check(value=="previous"&&document.copy_scene().encode()==flexed_exact,
+        "Refusal preserves the previous output and the complete editable pose");
+ }
+ auto first=rows.front();
+ float joint0=0;
+ for(const auto influence:first)if(influence.joint==0)joint0=influence.weight;
+ WeightToolSettings weights;
+ weights.enabled=true;weights.linked=false;
+ document.weight_settings(weights,joint0<.5f?0:1);ready(document);
+ Brush stamp;
+ stamp.from=stamp.to=independent.positions.front();
+ stamp.radius=.07f;
+ check(document.begin_desktop(),"Weight painting acquires the skinned retained mesh");
+ document.stamp_desktop(stamp);
+ document.cancel_desktop();
+ check(document.copy_scene().encode()==flexed_exact,"Cancelling a retained weight gesture preserves its source");
+ check(document.begin_desktop(),"A second retained weight gesture can begin");
+ document.stamp_desktop(stamp);document.end_desktop();ready(document);
+ const auto weighted=document.copy_scene();
+ check(weighted.active().deformation->skin->vertices.front()!=first&&
+       weighted.active().texture_sets==bound.active().texture_sets,
+       "Weight painting changes influences and preserves each retained field exactly");
+ weights.enabled=false;
+ document.weight_settings(weights);
+ RigEdit rigid;
+ rigid.reset_pose=true;
+ rigid.joint=JointAdjustment{0,{0,18,0},{.05f,0,.11f}};
+ modify_pose(rigid);
+ const auto ready_scene=document.copy_scene();
+ const auto portable_history=ready_scene.encode();
+ document.save_async("rigid-pose.dsculpt").get();
+ check(Scene::load("rigid-pose.dsculpt").encode()==portable_history,
+       "Cold native Open keeps both skin weights and shape data with their material history");
+ for(const auto &[file,format]:{
+     std::pair{"skinned-standard.glb",AssetExportFormat::Glb},
+     std::pair{"skinned-editable.glb",AssetExportFormat::EditableGlb512}}){
+  document.export_asset(file,format).get();
+  cgltf_options options{};
+  cgltf_data *data=nullptr;
+  check(cgltf_parse_file(&options,file,&data)==cgltf_result_success,"Portable file emits the certified skinned material mesh");
+  const std::unique_ptr<cgltf_data,decltype(&cgltf_free)> owner(data,cgltf_free);
+  check(cgltf_load_buffers(&options,data,file)==cgltf_result_success&&cgltf_validate(data)==cgltf_result_success&&
+        data->skins_count==1&&data->skins[0].joints_count==2&&data->meshes[0].primitives_count==2,
+        "Independent consumer sees the actual two-joint rig and two material primitives");
+  for(size_t f=0;f<2;++f){
+   const auto &primitive=data->meshes[0].primitives[f];
+   check(primitive.targets_count==1&&primitive.material->normal_texture.texture&&
+         cgltf_find_accessor(&primitive,cgltf_attribute_type_weights,0)&&
+         cgltf_find_accessor(&primitive,cgltf_attribute_type_joints,0),
+         "Both portable primitives preserve independent normal detail, skin and morph channels");
+  }
+  if(format==AssetExportFormat::EditableGlb512){
+   std::ifstream stream(file,std::ios::binary);
+   const std::vector<uint8_t> bytes{std::istreambuf_iterator<char>(stream),{}};
+   const auto replay=extract_native_authoring(bytes);
+   check(replay&&replay->encode()==portable_history,"Editable GLB restores the exact skinned project");
+  }
+ }
+}
 void recipe_reference_remap(bool prepared) {
  auto scene = source(prepared,false,false,false,true);
  const auto before = scene.encode();
@@ -1503,6 +1693,17 @@ void recipe_reference_remap(bool prepared) {
 }
 int main(int argc,char **argv)try {
  const std::string_view mode=argc>1?argv[1]:"";
+ if(argc==3&&mode=="--retained-skin"){
+  const auto out=std::filesystem::absolute(argv[2]);
+  std::filesystem::create_directories(out/"skin");
+  std::filesystem::current_path(out/"skin");
+  skin_retained_materials();
+  std::filesystem::create_directories(out/"bake");
+  std::filesystem::current_path(out/"bake");
+  bake_posed_retained(true,true,false,true,true);
+  std::cout<<"PASS "<<checks<<" retained skin, material and Bake controls\n";
+  return 0;
+ }
  if(argc==3&&mode=="--posed-retained-bake"){
   const auto out=std::filesystem::absolute(argv[2]);std::filesystem::create_directories(out);
   for(const auto &[leaf,prepared,reflected,corresponding,cage]:{

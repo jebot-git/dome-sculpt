@@ -24,6 +24,7 @@ public:
   nlohmann::json encode() const;
   void validate(bool deep=true) const;
 private:
+  friend struct native_weight_retention_impl::Counter;
   CanonicalNormalConversion()=default;
   CanonicalNormalConversion(const CanonicalNormalConversion&)=delete;
   CanonicalNormalConversion &operator=(const CanonicalNormalConversion&)=delete;

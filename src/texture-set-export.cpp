@@ -10,6 +10,8 @@
 #include "paint-emission-sample.hpp"
 #include "texture-set-native-grid.hpp"
 #include "texture-set-surface.hpp"
+#include "deformation-active.hpp"
+#include "source-frame-skin.hpp"
 #include "dome/material-bindings.hpp"
 #include "dome/material-visibility.hpp"
 #include "dome/paint-sampling.hpp"
@@ -934,6 +936,10 @@ ExportBound export_bound(const ObjectSurface&input,const TextureSetLimits&limits
    charge(bytes,preview->geometric_frames().size(),64,limits.maximum_bytes);
    charge(bytes,draw.count,sizeof(PortableTextureSetCorner)+2*sizeof(std::array<float,2>)+3*sizeof(float),limits.maximum_bytes);
    charge(work,preview->normals().size(),128,limits.maximum_work);
+   if(input.deformation&&evaluates_skin(*input.deformation)){
+    charge(work,preview->geometric_frames().size(),8,limits.maximum_work);
+    charge(work,draw.count,256+input.deformation->morph_weights.size()*4,limits.maximum_work);
+   }
    if(preview->native_bake()||preview->model()==PolygonSurfaceNormalModel::PreparedCorePbr){
     const auto width=preview->native_bake()?preview->native_bake()->width:
         preview->baked()->normal_field->pbr()->width;
@@ -950,6 +956,11 @@ ExportBound export_bound(const ObjectSurface&input,const TextureSetLimits&limits
  charge(bytes,scratch,1,limits.maximum_bytes);
  if(input.deformation){
   const auto entries=input.deformation->resource_entries();charge(bytes,entries,32,limits.maximum_bytes);charge(work,entries,16,limits.maximum_work);
+  if(evaluates_skin(*input.deformation)&&std::ranges::any_of(plan->fields(),[](const auto &f){return bool(f.source);})){
+   charge(bytes,rest.positions.size(),4*sizeof(Vec3)+2*sizeof(std::array<float,2>)+2,limits.maximum_bytes);
+   charge(bytes,rest.indices.size(),2*sizeof(uint32_t)+2,limits.maximum_bytes);
+   charge(bytes,input.deformation->skeleton->bones.size(),4*sizeof(RigMatrix),limits.maximum_bytes);
+  }
   if(input.deformation->morphs&&!input.deformation->morphs->targets.empty()){
    const size_t targets=input.deformation->morphs->targets.size();
    const bool tangents=std::ranges::any_of(plan->fields(),[](const auto &field){
@@ -1164,6 +1175,7 @@ TextureSetExport compile_texture_set_export(const ObjectSurface&input,const Text
  const bool source=std::any_of(plan->fields().begin(),plan->fields().end(),[](const auto&f){return bool(f.source);});
  const auto *morphs=input.deformation&&input.deformation->morphs?&*input.deformation->morphs:nullptr;
  const bool has_morphs=morphs&&!morphs->targets.empty();
+ const bool skin_check=source&&input.deformation&&evaluates_skin(*input.deformation);
  bool normal=false;
  // Tangent basis is evaluated in REST, never the current pose. Include the
  // actual vertex and role-specific frame bits in every necessary split.
@@ -1179,7 +1191,7 @@ TextureSetExport compile_texture_set_export(const ObjectSurface&input,const Text
   stop(limits);const auto&field=plan->fields()[f];const auto&draw=plan->draws()[f];if(!draw.count)continue;
   const bool canonical=!field.source&&field.painted->baked()&&!field.painted->baked()->maps.normal.rgba.empty();
   const auto portable=field.source?std::optional<PortableTextureSetField>(portable_texture_set_field(field,input.world_matrix(),work,limits)):std::nullopt;
-  if(portable&&has_morphs)
+  if(portable&&(has_morphs||skin_check))
    retained_shapes.push_back({f,mesh.positions.size(),out.fields.size(),portable->reprojected});
   normal|=canonical||(portable&&portable->normal_role);
   TextureSetExportField output;
@@ -1268,6 +1280,47 @@ TextureSetExport compile_texture_set_export(const ObjectSurface&input,const Text
      if(output.normal_role)write_tangent(v,corners[c].tangent);
     }
    }
+  }
+ }
+ if(skin_check){
+  const auto &deformation=*input.deformation;
+  const auto posed=deformation.preview(rest);
+  const auto world=input.world_matrix();
+  const auto matrices=deformation.skeleton->skin_matrices(deformation.pose);
+  std::vector<RigMatrix> normal_matrices;
+  normal_matrices.reserve(matrices.size());
+  for(const auto &matrix:matrices){
+   stop(limits);
+   normal_matrices.push_back(source_frame_inverse_transpose(matrix));
+  }
+  for(const auto &range:retained_shapes){
+   stop(limits);
+   const auto &field=plan->fields()[range.field];
+   const auto triangles=field.domain->triangles();
+   const auto posed_field=field.source->source_preview()->with_geometry(plan->geometry(),posed,triangles,limits.cancelled);
+   const auto &output=out.fields[range.output];
+   std::vector<PortableTextureSetCorner> corners;
+   corners.reserve(output.count);
+   for(size_t c=0;c<output.count;++c){
+    if((c&1023)==0)stop(limits);
+    const auto v=mesh.indices.at(output.first+c);
+    const auto &base=out.tangents[v];
+    Vec3 n=mesh.normals[v],t{base[0],base[1],base[2]};
+    for(size_t key=0;key<deformation.morph_weights.size();++key){
+     const auto weight=deformation.morph_weights[key];
+     const auto &morph=out.morph_channels[key];
+     n+=morph.normals[v]*weight;
+     if(output.normal_role)t+=morph.tangents[v]*weight;
+    }
+    Vec3 skin_n{},skin_t{};
+    for(const auto influence:deformation.skin->vertices.at(rest_vertices[v])){
+     skin_n+=source_frame_direction(normal_matrices.at(influence.joint),n)*influence.weight;
+     if(output.normal_role)skin_t+=source_frame_direction(matrices.at(influence.joint),t)*influence.weight;
+    }
+    corners.push_back({skin_n,{skin_t.x,skin_t.y,skin_t.z,base[3]},
+                       out.paint_coordinates[v],out.normal_coordinates[v]});
+   }
+   certify_portable_texture_set_skin(*posed_field,triangles,corners,world,output.textures,work,limits);
   }
  }
  mesh.validate();out.surface.id=input.id;out.surface.name=input.name;out.surface.transform=input.transform;out.surface.groups=input.groups;out.surface.affine_edit=input.affine_edit;out.surface.rig_source=input.rig_source;

@@ -8,7 +8,6 @@
 #include "texture-set-paint-access.hpp"
 #include "texture-set-field-source.hpp"
 #include "polygon-surface-preview.hpp"
-#include "polygon-surface-owner.hpp"
 #include "dome/material-bindings.hpp"
 #include "dome/polygon-scene.hpp"
 #include <algorithm>
@@ -72,9 +71,9 @@ bool texture_set_editable_fields(const SculptObject &object) noexcept {
 bool texture_set_shape_editable(const SculptObject &object) noexcept {
  if(!object.texture_sets||!object.mesh_active||!object.painted||
     (object.polygon&&object.polygon->colors))return false;
- const auto eligible=[&](const PaintedMesh *paint,const CreatorAppearance *appearance,
+ const auto eligible=[](const PaintedMesh *paint,const CreatorAppearance *appearance,
      const SourceMaterialBindings *binding,const TextureSetFieldSource *source){
-  if(source)return source->source_preview()&&retained_texture_set_shape_pose(object.deformation.get());
+  if(source)return bool(source->source_preview());
   return plain(paint,appearance,binding)||native_texture_set_mtoon(paint,appearance,binding);
  };
  return eligible(object.painted.get(),object.appearance.get(),object.material_bindings.get(),
@@ -96,10 +95,7 @@ bool bake_target_supported(const SculptObject &object) {
  const auto field=active_texture_set(object);
  if((object.polygon&&object.polygon->colors)||!field.domain||field.domain->triangles().empty())
   return false;
- if(field.source){
-  const auto &preview=field.source->source_preview();
-  return retained_texture_set_shape_pose(object.deformation.get())&&bool(preview);
- }
+ if(field.source)return bool(field.source->source_preview());
  return plain(field.painted.get(),field.appearance.get(),field.material_bindings.get())||
         native_texture_set_mtoon(field.painted.get(),field.appearance.get(),field.material_bindings.get());
 }
@@ -116,8 +112,8 @@ bool bake_source_supported(const SculptObject &object, bool affine) {
   return !object.appearance&&!object.material_bindings;
  }
  if(!object.mesh_active||!object.painted||(object.polygon&&object.polygon->colors))return false;
- const auto eligible=[&](const auto &field){
-  if(field.source)return retained_texture_set_shape_pose(object.deformation.get())&&field.source->source_preview()&&
+ const auto eligible=[](const auto &field){
+  if(field.source)return field.source->source_preview()&&
       field.material_bindings&&!field.material_bindings->has_mtoon;
   return plain(field.painted.get(),field.appearance.get(),field.material_bindings.get());
  };
@@ -133,8 +129,6 @@ std::shared_ptr<const TextureSetSurfacePlan> prepare_texture_set_surface(const S
  const auto validate_field=[&](const TextureSetView&field){
   if(!field.painted)throw std::invalid_argument("Texture-set surface field has no actual paint owner");
   if(field.source){
-   if(!retained_texture_set_shape_pose(o.deformation.get()))
-    throw std::invalid_argument("Retained texture-set fields require a source skin adapter for skeletal poses");
    field.source->authenticate_owner(field.source);
    field.source->validate_field(field,limits);
    if(!field.source->source_preview())throw std::invalid_argument("Retained texture-set field has no genuine before-role packet");

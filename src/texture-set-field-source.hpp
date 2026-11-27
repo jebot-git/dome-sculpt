@@ -42,6 +42,7 @@ public:
   Vec3 normal(uint32_t,std::array<double,3>,const AffineTransform &,bool pbr,
       const TextureSetLimits & = {})const;
 private:
+  friend struct native_weight_retention_impl::Counter;
   friend struct TextureSetAccess;
   friend class TextureSetFieldCodec;
   enum class OriginalPaint { Snapshot, DecodedSeed };

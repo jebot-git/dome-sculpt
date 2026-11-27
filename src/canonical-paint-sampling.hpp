@@ -32,6 +32,7 @@ public:
           current_sources_ == other.current_sources_;
  }
 private:
+ friend struct native_weight_retention_impl::Counter;
  CanonicalPaintSampling()=default;
  CanonicalPaintSampling(const CanonicalPaintSampling&)=delete;
  CanonicalPaintSampling &operator=(const CanonicalPaintSampling&)=delete;

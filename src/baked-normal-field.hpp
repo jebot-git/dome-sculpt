@@ -38,6 +38,7 @@ public:
       const std::shared_ptr<const CanonicalNormalUv> &,
       const std::function<bool()> &cancelled={}) const;
 private:
+  friend struct native_weight_retention_impl::Counter;
   friend class BakedNormalArchive;
   std::shared_ptr<const BakedNormalField> replace_planes(const Image &,const Image &,
       std::span<const uint8_t>,const BakedNormalFieldOptions &) const;

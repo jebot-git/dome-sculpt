@@ -2,6 +2,7 @@
 #include "dome/deformation.hpp"
 #include "humanoid-placement.hpp"
 #include "deformation-json.hpp"
+#include "deformation-active.hpp"
 #include <nlohmann/json.hpp>
 #include <set>
 namespace dome {
@@ -106,7 +107,7 @@ Mesh DeformationState::preview(const Mesh &rest) const {
   Mesh result = rest;
   if (morphs && !morph_weights.empty())
     result = morphs->evaluate(rest, morph_weights);
-  if (skeleton && skin && (!pose.empty() || skeleton->inverse_bind_override))
+  if (detail::evaluates_skin(*this))
     result = deform_mesh(result, *skin, *skeleton, pose);
   return result;
 }

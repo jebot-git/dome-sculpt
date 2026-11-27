@@ -2,6 +2,7 @@
 #include "texture-set-packed.hpp"
 #include "texture-set-field-source.hpp"
 #include "polygon-surface-preview.hpp"
+#include "deformation-active.hpp"
 #include <bit>
 #include <map>
 namespace dome::detail {
@@ -30,8 +31,7 @@ std::shared_ptr<const TextureSetPackedGeometry> prepare_texture_set_packed(
  const auto&rest=*plan->geometry();const auto count=plan->indices().size();
  const bool source=std::any_of(plan->fields().begin(),plan->fields().end(),[](const auto&f){return bool(f.source);});
  if(source){
-  const bool posed=plan->deformation()&&
-      std::ranges::any_of(plan->deformation()->morph_weights,[](float weight){return weight!=0;});
+  const bool posed=evaluates_geometry(plan->deformation().get());
   size_t work=plan->preparation_work(),bytes=2*sizeof(TextureSetPackedGeometry)+128;
   charge(work,count,2*std::bit_width(count)+96,limits.maximum_work);
   charge(bytes,count,3*sizeof(uint32_t)+2*sizeof(Tangent)+sizeof(Vec3)+2*sizeof(std::array<float,2>)+128+10*sizeof(void*),limits.maximum_bytes);

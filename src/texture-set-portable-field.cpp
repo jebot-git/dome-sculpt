@@ -366,4 +366,44 @@ std::vector<PortableTextureSetCorner> portable_texture_set_shape(
  }
  return corners;
 }
+
+void certify_portable_texture_set_skin(const PolygonSurfacePreview &preview,
+    std::span<const uint32_t> domain,std::span<const PortableTextureSetCorner> posed,
+    const AffineTransform &world,const std::shared_ptr<const TextureMaps> &maps,
+    size_t &work,const TextureSetLimits &limits){
+ constexpr auto error="Retained material normals exceed the portable angular limit in the active skin pose";
+ if(!maps||posed.size()!=domain.size()*3)
+  throw std::invalid_argument("Portable skin lost its posed texture-set corners");
+ if(!maps->normal.rgba.empty()){
+  const auto &original=preview.native_bake()?preview.native_bake():preview.baked()->normal_field->pbr();
+  const auto &source_uv=preview.native_bake()?preview.paint_coordinates():preview.normal_coordinates();
+  bool independent=false;
+  for(size_t f=0;f<domain.size();++f)
+   for(size_t c=0;c<3;++c)independent|=posed[f*3+c].role!=source_uv.at(size_t(domain[f])*3+c);
+  const std::shared_ptr<const Image> image(maps,&maps->normal);
+  if(!normal_map_matches(preview,domain,posed,world,image,original->width,independent,work,limits))
+   throw std::invalid_argument(error);
+  return;
+ }
+ // Unit corner normals share one geometric transport and are smoothly
+ // interpolated. Require closer agreement at their corners and check the
+ // actual face edges and interior against the portable interpolation.
+ for(size_t f=0;f<domain.size();++f){
+  stop(limits);
+  const auto triangle=domain[f];
+  const auto [before,current]=preview.triangle_frames(triangle,world);
+  std::array<Vec3,3> wanted{},actual{};
+  for(size_t c=0;c<3;++c){
+   wanted[c]=transport(before,current,normal(world,preview.normals().at(size_t(triangle)*3+c)));
+   actual[c]=normal(world,posed[f*3+c].normal);
+   if(angle(wanted[c],actual[c])>normal_error_limit/4)throw std::invalid_argument(error);
+  }
+  for(size_t c=0;c<3;++c){
+   if(angle(normalized(wanted[c]+wanted[(c+1)%3]),normalized(actual[c]+actual[(c+1)%3]))>
+      normal_error_limit)throw std::invalid_argument(error);
+  }
+  if(angle(normalized(wanted[0]+wanted[1]+wanted[2]),normalized(actual[0]+actual[1]+actual[2]))>
+     normal_error_limit)throw std::invalid_argument(error);
+ }
+}
 } // namespace dome::detail

@@ -29,13 +29,9 @@
 #include "emission-paint-access.hpp"
 #include "affine-surface.hpp"
 #include "source-skin-world.hpp"
+#include "deformation-active.hpp"
 namespace dome {
 namespace {
-bool has_morph_pose(const SculptObject &object) {
-  return object.deformation&&std::ranges::any_of(object.deformation->morph_weights,
-                                                [](float weight){return weight!=0;});
-}
-
 // The source and target share one allowance for transient posed frames.
 // Paint, UVs, and original artist columns stay on their immutable owners.
 struct RetainedBakePose {
@@ -121,7 +117,7 @@ std::vector<detail::RetainedSourceBakeField> capture_texture_set_bake_source(
     const std::optional<detail::AffineInteractionFrame> &placement,
     RetainedBakePose &pose) {
   const auto &cancelled=pose.cancelled;
-  const auto *deformed=has_morph_pose(source)?&high.mesh:nullptr;
+  const auto *deformed=detail::evaluates_geometry(source.deformation.get())?&high.mesh:nullptr;
   const auto primary=texture_set_view(source,0);
   const auto collection=std::move(source.texture_sets);
   high.materials.clear();
@@ -297,7 +293,8 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   const bool retained_target=recipient&&bool(recipient->source);
   std::optional<Mesh> posed_target;
   if(retained_target){
-    if(has_morph_pose(target))posed_target=target.deformation->preview(target.painted->mesh());
+    if(detail::evaluates_geometry(target.deformation.get()))
+      posed_target=target.deformation->preview(target.painted->mesh());
   }else if (target.deformation) {
     auto preview = target.deformation->preview(target.painted->mesh());
     const auto &rest = target.painted->mesh();

@@ -1890,15 +1890,26 @@ std::shared_ptr<PaintedMesh> detail::EmissionExportAccess::without_emission(cons
   for(auto &layer:detached->layers_){layer.emission_tiles.clear();for(auto &tile:layer.tiles)if(tile){bool emission=false;for(const auto &pixel:tile->pixels)emission|=pixel.data[6]||pixel.data[7]||pixel.data[8]||pixel.data[12];if(emission){auto copy=std::make_shared<PaintTile>(*tile);for(auto &pixel:copy->pixels){pixel.data[6]=pixel.data[7]=pixel.data[8]=pixel.data[12]=0;}tile=std::move(copy);}}}
   return detached;
 }
-detail::NativeWeightPaintAccess::Surface detail::NativeWeightPaintAccess::surface(const PaintedMesh &paint,bool prospective) {
+detail::NativeWeightPaintAccess::Paint detail::NativeWeightPaintAccess::paint(const PaintedMesh &paint,bool prospective) {
   if (!paint.surface_ || paint.editing_ || (!prospective&&(!paint.undo_.empty() || !paint.redo_.empty())))
     throw std::invalid_argument("Native weight input must be a detached current-paint snapshot");
-  const auto &surface=*paint.surface_;
-  if(surface.original_sampling || surface.paint_domain || paint.sampling_attachment_ ||
-     paint.color_projection_ || paint.normal_projection_)
-    throw std::invalid_argument("Native anatomical input budget does not yet represent prepared paint domains");
   if (!detail::TextureSetPaintAccess::valid_raster(paint))
     throw std::invalid_argument("Native weight raster lost its texture-set membership");
+  return {surface(paint.surface_),paint.sampling_attachment_,paint.color_projection_,
+          paint.normal_projection_,paint.baked_};
+}
+detail::NativeWeightPaintAccess::Surface detail::NativeWeightPaintAccess::surface(
+    const PaintSamplingAttachment &attachment) {
+  auto stored=std::static_pointer_cast<const PaintedMesh::SurfaceMap>(attachment.surface_);
+  if(!stored||!attachment.matches(stored->geometry,stored->paint_domain))
+    throw std::invalid_argument("Native weight input lost its paint sampling attachment");
+  return surface(stored);
+}
+detail::NativeWeightPaintAccess::Surface detail::NativeWeightPaintAccess::surface(
+    const std::shared_ptr<const PaintedMesh::SurfaceMap> &owner) {
+  const auto &surface=*owner;
+  if(surface.options.cancelled)
+    throw std::invalid_argument("Native weight input retained a mutable paint callback");
   size_t bytes=sizeof(PaintedMesh::SurfaceMap)+64;
   auto add=[&](size_t count,size_t unit){if(unit&&count>(SIZE_MAX-bytes)/unit)throw std::length_error("Native paint retained-byte overflow");bytes+=count*unit;if(count){const size_t overhead=count*unit>=128u*1024u?4096:64;if(overhead>SIZE_MAX-bytes)throw std::length_error("Native paint allocation allowance overflow");bytes+=overhead;}};
   add(surface.diagnostics.unpaintable_uv_faces.capacity(),sizeof(uint32_t));
@@ -1909,8 +1920,25 @@ detail::NativeWeightPaintAccess::Surface detail::NativeWeightPaintAccess::surfac
   add(surface.tiles.capacity(),sizeof(PaintedMesh::SurfaceMap::Bounds));add(surface.padding.capacity(),sizeof(int32_t));
   add(surface.linked.size(),sizeof(PaintedMesh::SurfaceMap::Links::value_type)+3*sizeof(void*)+32);
   add(surface.linked.bucket_count(),sizeof(void*));
-  return {paint.surface_, surface.raster_data, surface.geometry, surface.set_domain,
-          paint.baked_, surface_bytes, bytes};
+  Surface result;
+  result.owner=owner;
+  result.raster=surface.raster_data;
+  result.geometry=surface.geometry;
+  result.membership=surface.set_domain;
+  result.domain=surface.paint_domain;
+  result.bytes=surface_bytes;
+  result.raster_bytes=bytes;
+  if(const auto &original=surface.original_sampling){
+    bytes=sizeof(*original);
+    add(original->vertices.capacity(),sizeof(uint32_t));
+    result.original_sampling=original;
+    result.original_bytes=bytes;
+    result.before=original->before;
+    result.original_maps=original->current_maps;
+    result.original_bake=original->baked;
+    result.original_uvs={original->original_uv0,original->original_uv1,original->authored_uv1};
+  }
+  return result;
 }
 bool detail::NativeWeightPaintAccess::same_current(const PaintedMesh&a,const PaintedMesh&b) noexcept {
   using namespace native_weight_state;

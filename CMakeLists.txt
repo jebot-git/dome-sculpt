@@ -3327,6 +3327,9 @@ if(BUILD_TESTING)
   target_include_directories(dome-sculpt-vrm1-source-export-test PRIVATE src third_party/cgltf)
   target_link_libraries(dome-sculpt-vrm1-source-export-test PRIVATE dome-sculpt-core)
   add_test(NAME vrm1-source-export COMMAND dome-sculpt-vrm1-source-export-test --selftest ${CMAKE_CURRENT_BINARY_DIR}/vrm1-source-export)
+  add_test(NAME vrm1-retained-skinned-accessory COMMAND dome-sculpt-vrm1-source-export-test
+    --retained-skinned-accessory ${CMAKE_CURRENT_BINARY_DIR}/vrm1-retained-skinned-accessory)
+  set_tests_properties(vrm1-retained-skinned-accessory PROPERTIES TIMEOUT 300)
   set_tests_properties(vrm1-source-export PROPERTIES TIMEOUT 180 FIXTURES_SETUP vrm1-source-model)
   if(TARGET dome-sculpt AND TARGET dome-sculpt-test-runtime AND Python3_Interpreter_FOUND)
     add_test(NAME vrm1-attachment-openxr COMMAND ${Python3_EXECUTABLE}
@@ -5155,6 +5158,9 @@ if(BUILD_TESTING)
   add_test(NAME texture-set-retained-posed-bake COMMAND dome-sculpt-texture-set-source-export-test
     --posed-retained-bake ${CMAKE_CURRENT_BINARY_DIR}/texture-set-retained-posed-bake)
   set_tests_properties(texture-set-retained-posed-bake PROPERTIES TIMEOUT 300)
+  add_test(NAME texture-set-retained-skin COMMAND dome-sculpt-texture-set-source-export-test
+    --retained-skin ${CMAKE_CURRENT_BINARY_DIR}/texture-set-retained-skin)
+  set_tests_properties(texture-set-retained-skin PROPERTIES TIMEOUT 300)
   add_test(NAME texture-set-prepared-recipe-references COMMAND dome-sculpt-texture-set-source-export-test --recipe-reference-remap)
   set_tests_properties(texture-set-prepared-recipe-references PROPERTIES TIMEOUT 300)
   add_test(NAME texture-set-retained-hdr-editable COMMAND dome-sculpt-texture-set-source-export-test

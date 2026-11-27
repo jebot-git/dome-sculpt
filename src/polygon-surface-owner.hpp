@@ -13,7 +13,6 @@ bool adopt_polygon_surface_edit(Scene &,uint64_t,const PolygonView &,const Scene
 void validate_polygon_surface_model(bool mesh_active,const PaintedMesh *,
     const PolygonAuthority *,const SourceMaterialBindings *,
     const DeformationState *,const CreatorAppearance *,bool retained_texture_set=false);
-bool retained_texture_set_shape_pose(const DeformationState *) noexcept;
 // Detached owning source for the first Move/Flip transfer boundary. It does
 // not attach a Paint, change a material or grant Scene39 publication authority.
 // Original native/frame IDs remain original; the polygon derivative has its
@@ -83,6 +82,7 @@ public:
  std::shared_ptr<const PaintSamplingDomain> paint_domain(std::shared_ptr<const Mesh>,
      const PolygonSurfaceTransferLimits &) const;
 private:
+ friend struct native_weight_retention_impl::Counter;
  friend class BakeRecipeRemap;
  friend class PolygonSurfacePreview;
  friend class PolygonSurfaceNodeReader;

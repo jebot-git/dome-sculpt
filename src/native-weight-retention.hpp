@@ -9,7 +9,10 @@
 #include "dome/source-placement.hpp"
 #include "dome/bake-recipe.hpp"
 #include <array>
+namespace dome { struct SourceNormalUvLayout; }
 namespace dome::detail {
+class CanonicalNormalUv;
+class NativePaintSampling;
 struct NativeWeightVolumeAccess {
  static bool same_current(const Volume&a,const Volume&b)noexcept{
    using namespace native_weight_state;
@@ -52,7 +55,18 @@ struct Counter {
     if(count==seen.size())throw std::length_error("Native owning source node cap");
     add(64);seen[count++]={p,p.get(),tag<Value>(),true};++active;return true;
   }
-  template<class T> void leave(const std::shared_ptr<T>&p){for(size_t i=count;i;--i)if(seen[i-1].address==p.get()&&seen[i-1].type==tag<std::remove_cv_t<T>>()&&!p.owner_before(seen[i-1].owner)&&!seen[i-1].owner.owner_before(p)){seen[i-1].active=false;--active;return;}throw std::logic_error("Native owning ledger leave");}
+  template<class T> void leave(const std::shared_ptr<T>&p){
+    for(size_t i=count;i;--i){
+      step();
+      auto &entry=seen[i-1];
+      if(entry.address!=p.get()||entry.type!=tag<std::remove_cv_t<T>>()||
+         p.owner_before(entry.owner)||entry.owner.owner_before(p))continue;
+      entry.active=false;
+      --active;
+      return;
+    }
+    throw std::logic_error("Native owning ledger leave");
+  }
   void mesh(const Mesh&m){vector(m.positions);vector(m.normals);vector(m.uv);vector(m.indices);vector(m.uv_pins);vector(m.uv_seams);}
   void mesh(const std::shared_ptr<const Mesh>& p){if(enter(p)){add(sizeof(*p));mesh(*p);leave(p);}}
   template<class T> void shared_vector(const std::shared_ptr<const std::vector<T>>&p){if(enter(p)){add(sizeof(*p));vector(*p);leave(p);}}
@@ -95,16 +109,7 @@ struct Counter {
     else if(j.is_string())text(j.get_ref<const std::string&>());
     else if(j.is_binary())add(j.get_binary().capacity()+64);
   }
-  void material(const std::shared_ptr<const SourceMaterialBindings>&p){if(enter(p)){
-    unsupported(p->native_paint_frames,"Native surface weights require the retained native paint/frame closure adapter");
-    unsupported(p->canonical_attributes,"Native anatomical budget requires its retained canonical attribute closure adapter");
-    unsupported(p->canonical_uv,"Native anatomical budget requires its retained canonical UV closure adapter");
-    unsupported(p->native_paint_sampling,"Native anatomical budget requires its retained native paint closure adapter");
-    unsupported(p->canonical_paint_sampling,"Native weight budget requires the retained canonical paint closure adapter");
-    unsupported(p->polygon_surface_transfer,"Native weight budget requires the retained polygon surface closure adapter");
-    unsupported(p->color_preparation,"Native anatomical budget has not yet admitted prepared colour closures");unsupported(p->normal_preparation,"Native anatomical budget has not yet admitted prepared normal closures");unsupported(p->key_derivation,"Native anatomical budget has not yet admitted key derivation closures");
-    add(sizeof(*p));for(auto*j:NativeWeightMaterialAccess::json(p->material))json(*j);vector(p->material.diagnostics);for(auto&s:p->material.diagnostics)text(s);for(auto&t:p->roles)image(t.image);frame_set(p->normal_frames);uv_origin(p->uv_origin);leave(p);
-  }}
+  void material(const std::shared_ptr<const SourceMaterialBindings>&);
   void uv_origin(const std::shared_ptr<const SourceUvOrigin>&p){if(enter(p)){
     add(sizeof(*p));paint(p->paint);appearance(p->appearance);deformation(p->deformation);
     for(auto&t:p->roles)image(t.image);
@@ -115,15 +120,12 @@ struct Counter {
     // Prospective current wrappers will have history/cache detached. Historical
     // paint owners must already have the same no-history immutable form.
     const auto&v=*p;
-    const auto surface=NativeWeightPaintAccess::surface(v,prospective);
-    if(enter(surface.owner)){
-      add(surface.bytes);
-      if(enter(surface.raster)){add(surface.raster_bytes);leave(surface.raster);}
-      mesh(surface.geometry);
-      texture_domain(surface.membership);
-      leave(surface.owner);
-    }
-    baked(surface.baked);
+    const auto closure=NativeWeightPaintAccess::paint(v,prospective);
+    paint_surface(closure.surface);
+    attachment(closure.attachment);
+    color_projection(closure.color);
+    normal_projection(closure.normal);
+    baked(closure.baked);
     add(sizeof(PaintedMesh)+256);add(v.layers().capacity(),sizeof(PaintLayer));
     for(auto&l:v.layers()){text(l.name);vector(l.tiles);vector(l.pbr_tiles);vector(l.emission_tiles);
       for(auto&t:l.tiles)if(enter(t)){add(sizeof(*t));leave(t);}
@@ -147,9 +149,28 @@ struct Counter {
   void placement(const std::shared_ptr<const SourcePlacementCapsule>&p){if(enter(p)){add(sizeof(*p));vector(p->groups);for(auto&g:p->groups)group(g);if(enter(p->object_edit)){add(sizeof(*p->object_edit));leave(p->object_edit);}leave(p);}}
   void bake_recipe(const std::shared_ptr<const ObjectBakeRecipe>&p){if(enter(p)){add(sizeof(*p));text(p->source.name);if(p->cage)text(p->cage->name);leave(p);}}
   void origin(const std::shared_ptr<const PolygonOrigin>&p){if(enter(p)){
-    if(p->retopology||p->polygon)throw std::invalid_argument("Native anatomical total budget has not yet admitted retained editable topology");
+    unsupported(p->retopology,"Native anatomical total budget has not yet admitted retained retopology");
+    polygon(p->polygon);
     add(sizeof(*p));text(p->name);text(p->material.name);volume(p->volume);paint(p->paint);texture_sets(p->texture_sets);deformation(p->deformation);appearance(p->appearance);material(p->material_bindings);placement(p->placement);origin(p->shape_source);origin(p->rig_source);bake_recipe(p->bake_recipe);leave(p);
   }}
+  void paint_surface(const NativeWeightPaintAccess::Surface&);
+  void attachment(const std::shared_ptr<const PaintSamplingAttachment>&);
+  void sampling_domain(const std::shared_ptr<const PaintSamplingDomain>&);
+  void color_projection(const std::shared_ptr<const PaintColorProjection>&);
+  void normal_projection(const std::shared_ptr<const PaintNormalProjection>&);
+  void normal_detail(const std::shared_ptr<const NormalDetailAuthority>&);
+  void baked_normal(const std::shared_ptr<const BakedNormalField>&);
+  void canonical_conversion(const std::shared_ptr<const CanonicalNormalConversion>&);
+  void canonical_uv(const std::shared_ptr<const CanonicalNormalUv>&);
+  void canonical_sampling(const std::shared_ptr<const CanonicalPaintSampling>&);
+  void native_sampling(const std::shared_ptr<const NativePaintSampling>&);
+  void uv_layout(const std::shared_ptr<const SourceNormalUvLayout>&);
+  void polygon(const std::shared_ptr<const PolygonAuthority>&);
+  void polygon_mesh(const PolygonMesh&);
+  void polygon_owner(const std::shared_ptr<const PolygonSurfaceOwner>&);
+  void polygon_preview(const std::shared_ptr<const PolygonSurfacePreview>&);
+  void field_source(const std::shared_ptr<const TextureSetFieldSource>&);
+  template<class Field> void field_view(const Field&);
 };
 }
 inline NativeWeightRetention native_weight_retention(const Scene&scene,size_t maximum,size_t maximum_work=500'000'000) {
@@ -157,7 +178,8 @@ inline NativeWeightRetention native_weight_retention(const Scene&scene,size_t ma
   Counter c(maximum,maximum_work);c.add(sizeof(Scene));c.add(scene.objects().capacity(),sizeof(SculptObject));c.add(scene.groups().capacity(),sizeof(SceneGroup));
   for(auto&g:scene.groups())c.group(g);
   for(auto&o:scene.objects()){
-    if(o.retopology||o.polygon)throw std::invalid_argument("Native anatomical total budget has not yet admitted editable topology");
+    c.unsupported(o.retopology,"Native anatomical total budget has not yet admitted retopology");
+    c.polygon(o.polygon);
     c.text(o.name);c.text(o.material.name);c.volume(o.volume,true);c.paint(o.painted,true);c.texture_sets(o.texture_sets);c.deformation(o.deformation);c.appearance(o.appearance);c.material(o.material_bindings);c.origin(o.shape_source);c.origin(o.rig_source);c.bake_recipe(o.bake_recipe);if(c.enter(o.affine_edit)){c.add(sizeof(*o.affine_edit));c.leave(o.affine_edit);}
   }
   return {c.used,c.work,c.count};

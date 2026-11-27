@@ -151,6 +151,40 @@ json verify_shape(Document &doc,SurfaceRenderer &renderer,Fbo &target,bool prepa
  check(doc.copy_scene().encode()==original.encode(),"Rendered shapekey Restore preserves the complete retained source");
  return metrics;
 }
+json verify_skin(Document &doc,SurfaceRenderer &renderer,Fbo &target,bool prepared,bool reflected,
+                 bool flip,const Pixels &rest,const std::filesystem::path &out){
+ constexpr std::array<double,2> delta{.40,.32};
+ const auto original=doc.copy_scene();
+ auto candidate=original.snapshot();
+ const auto &mesh=candidate.active().painted->mesh();
+ auto deformation=std::make_shared<DeformationState>(mesh);
+ deformation->skeleton.emplace();
+ Bone root{"Root"}, tip{"Tip"};
+ tip.parent=0;
+ deformation->skeleton->bones={root,tip};
+ deformation->skin.emplace();
+ for(auto p:mesh.positions){
+  float weight=0;
+  for(size_t field=0;field<2;++field)
+   if(length(p-vec(edited(field*3+2)))<1e-6f)weight=float(delta[field]*2);
+  VertexWeights row{{0,1-weight}};
+  if(weight>0)row.push_back({1,weight});
+  deformation->skin->vertices.push_back(std::move(row));
+ }
+ deformation->pose.resize(2);
+ deformation->pose[1].translation.z=.5f;
+ candidate.active().deformation=std::move(deformation);
+ const auto exact=candidate.encode();
+ doc.replace(Scene::decode(exact));ready(doc);
+ auto current=doc.frame().surface;
+ const auto pixels=render(renderer,current,target);
+ const auto metrics=verify_pixels(pixels,prepared,flip,World{reflected},Appearance::Normal,false,false,delta);
+ png(out,pixels);
+ check(render(renderer,current,target)==pixels,"Both submitted eyes reuse the same skinned material frames");
+ doc.replace(original);ready(doc);
+ check(render(renderer,doc.frame().surface,target)==rest,"The original static material renders exactly after skinned playback");
+ return metrics;
+}
 void paint_member(Scene&scene,TextureSetId set,std::array<float,4>color){
   check(edit_texture_set(scene,scene.active().id,set,[&](PaintedMesh&paint,Material&material){material.unlit=true;material.alpha=Material::AlphaMode::Opaque;material.double_sided=true;paint.add_layer("Independent member color");PaintSettings ink;ink.front_only=false;ink.channel=PaintChannel::Color;ink.color=color;Brush brush;brush.from=brush.to={};brush.normal={0,0,1};brush.radius=5;brush.strength=1;paint.begin_stroke();for(size_t i=0;i<32;++i)paint.stamp(brush,ink);return paint.end_stroke();}),"Actual sourceful field receives a finished saturated native color layer");
 }
@@ -174,7 +208,8 @@ int main(int argc,char**argv)try{
     auto culling=painted.snapshot();check(edit_texture_set(culling,f.object,1,[](PaintedMesh&,Material&m){m.double_sided=false;return true;}),"Actual additional material alone changes cull policy");Document cull;cull.replace(culling);ready(cull);auto culled_pixels=render(renderer,cull.frame().surface,target);auto cull_metric=verify_pixels(culled_pixels,prepared,flip,world,Appearance::RedBlue,false,true);png(out/(name+"-additional-cull.png"),culled_pixels);state_contract();check(render(renderer,blue,target)==blue_pixels&&render(renderer,base,target)==normal_pixels,"Opaque and normal fields recover exact state after ghost/additional-only cull");
     const auto wire=painted.encode();Document reopened;reopened.replace(Scene::decode(wire));ready(reopened);check(render(renderer,reopened.frame().surface,target)==blue_pixels&&reopened.copy_scene().encode()==wire,"Edited sourceful FLOAT/paint/normal fields roundtrip with exact pixels and native state");check(doc.copy_scene().encode()==exact&&f.scene.encode()==exact,"All GPU/read/negative controls preserve the complete original sourceful Scene");
     const auto pose_metric=verify_shape(doc,renderer,target,prepared,reflected,flip,normal_pixels,out/(name+"-shaped.png"));
-    evidence.push_back({{"case",name},{"normal",normal_metric},{"canvas",canvas_metric},{"held",held_metric},{"red_green",green_metric},{"red_blue",blue_metric},{"ghost",ghost_metric},{"additional_cull",cull_metric},{"shaped",pose_metric}});
+    const auto skin_metric=verify_skin(doc,renderer,target,prepared,reflected,flip,normal_pixels,out/(name+"-skinned.png"));
+    evidence.push_back({{"case",name},{"normal",normal_metric},{"canvas",canvas_metric},{"held",held_metric},{"red_green",green_metric},{"red_blue",blue_metric},{"ghost",ghost_metric},{"additional_cull",cull_metric},{"shaped",pose_metric},{"skinned",skin_metric}});
   }
   std::ofstream report(out/"oracle.json");report<<json{{"scope","independent actual sourceful same-object39+40 appearance"},{"checks",checks},{"cases",evidence}}.dump(2)<<'\n';check(bool(report),"Independent sourceful per-pixel metrics saved");std::cout<<"PASS "<<checks<<" actual sourceful same-object field appearance controls\n";return 0;
 }catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

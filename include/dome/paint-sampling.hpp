@@ -7,7 +7,7 @@
 #include <span>
 #include <utility>
 namespace dome {
-namespace detail { class PolygonSurfaceOwner; }
+namespace detail { class PolygonSurfaceOwner; struct NativeWeightPaintAccess; namespace native_weight_retention_impl { struct Counter; } }
 struct PaintSamplingLimits {
   size_t max_vertices=2'000'000,max_triangles=2'000'000;
   size_t max_basis_bytes=128*1024*1024,max_working_bytes=256*1024*1024;
@@ -37,6 +37,7 @@ public:
   Mesh raster_mesh(const Mesh &,const PaintSamplingLimits & = {}) const;
 private:
   friend class detail::PolygonSurfaceOwner;
+  friend struct detail::native_weight_retention_impl::Counter;
   PaintSamplingDomain(std::shared_ptr<const Mesh> basis,std::vector<uint32_t> corners,
                       std::shared_ptr<const Mesh> derived)
       : PaintSamplingDomain(std::move(basis),std::move(corners)) {
@@ -102,6 +103,7 @@ private:
   // Actual geometry-only SurfaceMap owner, not a Paint/Material/recipe edge.
   std::shared_ptr<const void> surface_;
   friend class PaintedMesh;
+  friend struct detail::NativeWeightPaintAccess;
   friend struct SourcePaintSamplingAccess;
 };
 // Exact, explicit source-corner map, not positional/nearest matching. A complete

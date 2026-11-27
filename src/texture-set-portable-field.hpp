@@ -25,4 +25,8 @@ std::vector<PortableTextureSetCorner> portable_texture_set_shape(
  const PolygonSurfacePreview&,std::span<const uint32_t>,const AffineTransform&,
  std::span<const std::array<float,2>>,const std::shared_ptr<const TextureMaps>&,
  bool rest_reprojected,size_t &work,const TextureSetLimits&);
+void certify_portable_texture_set_skin(const PolygonSurfacePreview &,
+ std::span<const uint32_t>,std::span<const PortableTextureSetCorner>,
+ const AffineTransform &,const std::shared_ptr<const TextureMaps> &,
+ size_t &work,const TextureSetLimits &);
 }
