@@ -249,6 +249,26 @@ All seven GLBs report zero Khronos errors and a skinned-node hierarchy
 warning. All six portable typed materials pass the official MToon schema.
 [Independent MToon paint validation](validation/mtoon-independent-paint-20261127.json)
 
+Painted MToon 1 Standard and Editable GLB now cover varying source alpha
+on matching or independent base and paint grids. The portable base image
+uses the source grid. Unpainted cutout transitions retain their original
+filter taps, including a cutoff at a source texel value. In painted cells,
+the compiler bounds alpha error and checks both sides of the mask cutoff
+or the zero-alpha boundary of a blended material. Standard export preserves
+the destination if a cutoff crossing cannot be certified. Editable GLB
+reopens the original typed source and paint in that case.
+
+All 43 selected Release cases and six ASan/UBSan workflows passed, with 13
+project and GLB files byte-identical across both builds. A separate PNG
+reader checked 119,262 samples across six exported materials. Maximum
+measured alpha error was 0.001876 with all visibility decisions preserved.
+Synthetic OpenXR re-imports were within three 8-bit RGB levels for the
+cutout and four for the blended material in both eyes on Arc A770 and
+llvmpipe. An opaque-alpha control changed both eyes for both materials.
+Khronos reports zero errors in all seven files and a skinned hierarchy
+warning in each. All six portable typed materials pass the MToon schema.
+[Varying MToon alpha validation](validation/mtoon-varying-alpha-20261127.json)
+
 Surface Heat also binds meshes after independent frame and shapekey
 authoring. Retention accounts for the actual POSITION correspondences,
 artist normals and tangents, writable paint, and prepared color and normal

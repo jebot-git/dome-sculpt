@@ -149,10 +149,17 @@ Native MToon 1 painted materials now have a portable export path for
 independent source and paint resolutions. Static clamp-linear base, shared
 shade and emission use separate output dimensions and full filter-cell
 quality certification. Masked source materials preserve their native alpha
-curve when the background alpha agrees. Live UV changes, other filter modes
-and general spatially varying source alpha still need their own portable
-representations.
+curve when the background alpha agrees.
 [Independent painted MToon evidence](validation/mtoon-independent-paint-20261127.json)
+
+Static painted MToon 1 now also exports spatially varying mask and blend
+alpha on matching or independent grids. Exact unpainted source taps
+preserve cutout crossings. The compiler bounds alpha error in painted
+cells and certifies mask and zero-alpha classification over each whole
+filter cell. An uncertifiable crossing keeps the original authoring source
+in Editable GLB. Live UV changes, other sampling modes, and general
+cutoff crossings through painted cells still need portable representations.
+[Varying MToon alpha evidence](validation/mtoon-varying-alpha-20261127.json)
 
 The current combined atlas and HDR cache source passes all 153 checks
 in both software Release and Intel Arc ASan/UBSan OpenXR replays. Its

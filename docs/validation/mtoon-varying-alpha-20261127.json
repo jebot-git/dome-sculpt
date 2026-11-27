@@ -1,0 +1,360 @@
+{
+  "product": "88cb38873ce341539c09bde129304a538b08914c",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "release_fltk": "/opt/fltk-vr/toolkit",
+  "release_tests": [
+    "native-paint32-fixture",
+    "retopology-affine-ui-fixture",
+    "layered-normal-native",
+    "layered-normal-uv-native",
+    "retopology-affine-openxr",
+    "retopology-input-admission",
+    "retopology-caller-admission",
+    "retopology-reapply-plain",
+    "retopology-reapply-affine",
+    "retopology-save-handoff",
+    "retopology-prepared-affine",
+    "retopology-prepared-plain",
+    "dome-sculpt-texture-set-export",
+    "retopology-held-admission",
+    "retopology-restore-plain",
+    "retopology-history-openxr-apply",
+    "authoring-native-normal-union",
+    "texture-set-retained-shapekeys",
+    "texture-set-retained-skin",
+    "retopology-history-openxr-cancel",
+    "retopology-restore-affine",
+    "dome-sculpt-texture-set-source-export",
+    "retopology-mtoon-plain",
+    "retopology-linked-vrm1",
+    "retopology-mtoon-affine",
+    "texture-set-mtoon-independent-paint",
+    "retopology-surface-heat-plain",
+    "retopology-surface-heat-affine",
+    "retopology-affine-wire",
+    "retopology-mtoon-v0",
+    "retopology-affine",
+    "retopology-authoring",
+    "retopology-worker-faults",
+    "vrm1-retained-skinned-accessory",
+    "retopology-worker-accepted-publication",
+    "retopology-mixed-material",
+    "texture-set-mtoon-varying-alpha",
+    "texture-set-mtoon-derivative-tangent",
+    "dome-sculpt-texture-set-surfaces",
+    "retopology-authority-grab",
+    "retopology-authority-focus",
+    "retopology-worker-reporter-recovery",
+    "texture-set-active-bake"
+  ],
+  "strict_workflows": [
+    "derivative",
+    "independent",
+    "varying-alpha",
+    "mtoon-plain",
+    "mtoon-affine",
+    "prepared-affine"
+  ],
+  "strict_method": "Compiled the changed exporter and test translation units with generated ASan/UBSan CMake commands, then relinked the matched archive and fixtures. Leak and undefined behavior checks were strict.",
+  "independent_png_sampling": {
+    "cutout-standard.glb": {
+      "samples": 19877,
+      "rgb_error": [
+        0.00362188,
+        0.00274321,
+        0.0017938
+      ],
+      "alpha_error": 0.001876,
+      "mask_visible": 12870,
+      "mask_discarded": 7007
+    },
+    "cutout-editable.glb": {
+      "samples": 19877,
+      "rgb_error": [
+        0.00362188,
+        0.00274321,
+        0.0017938
+      ],
+      "alpha_error": 0.001876,
+      "mask_visible": 12870,
+      "mask_discarded": 7007
+    },
+    "aligned-cutout-standard.glb": {
+      "samples": 19877,
+      "rgb_error": [
+        0.00362968,
+        0.00275084,
+        0.0017938
+      ],
+      "alpha_error": 0.00181699,
+      "mask_visible": 12870,
+      "mask_discarded": 7007
+    },
+    "aligned-cutout-editable.glb": {
+      "samples": 19877,
+      "rgb_error": [
+        0.00362968,
+        0.00275084,
+        0.0017938
+      ],
+      "alpha_error": 0.00181699,
+      "mask_visible": 12870,
+      "mask_discarded": 7007
+    },
+    "blend-standard.glb": {
+      "samples": 19877,
+      "rgb_error": [
+        0.00362188,
+        0.00274321,
+        0.0017938
+      ],
+      "alpha_error": 0.001876,
+      "mask_visible": 13013,
+      "mask_discarded": 6864
+    },
+    "blend-editable.glb": {
+      "samples": 19877,
+      "rgb_error": [
+        0.00362188,
+        0.00274321,
+        0.0017938
+      ],
+      "alpha_error": 0.001876,
+      "mask_visible": 13013,
+      "mask_discarded": 6864
+    }
+  },
+  "release_asan_byte_match_sha256": {
+    "texture-set-mtoon-alpha/cutout-standard.glb": "e7c81b93fa9ec457dba64f04a38b5684389c77b26d188661a1ad1b01a7f18d76",
+    "texture-set-mtoon-alpha/cutout-editable.glb": "24afb8f57de921124e2d84e70575c5e4d8585008da29c93385218577dd53885a",
+    "texture-set-mtoon-alpha/aligned-cutout-standard.glb": "0ca460fa1b9f19ca67517786eda02c4a1d86323f5bccfecbe12ba5e2c12f4708",
+    "texture-set-mtoon-alpha/aligned-cutout-editable.glb": "4ef2743a7b4a81cdccc54d3478a6145272df267b4f560e59b38ee03a885708bc",
+    "texture-set-mtoon-alpha/blend-standard.glb": "859e0fe620395c326fb852ed0c55c42adda2cb50acaea84af92714036ff8da1f",
+    "texture-set-mtoon-alpha/blend-editable.glb": "5e11756b82431e12f41e916314f73a86da7f4f0d9857c1289aad93467b07d476",
+    "texture-set-mtoon-alpha/uncertified-alpha-editable.glb": "dfde932d287bdfe987017f0a5a5a74cf213c0a736e3b1912dd56c3a133ba6cff",
+    "texture-set-mtoon-alpha/cutout-native.dsculpt": "2b588a88360282a48a1d747ee16628dba998c043ee2a3435bb5c1b05f41f360f",
+    "texture-set-mtoon-alpha/cutout-imported.dsculpt": "956bcb36eb83c250fbd2b7161774b53d3c6b2f322244329ff1fa9688ea05e2c5",
+    "texture-set-mtoon-alpha/cutout-solid-control.dsculpt": "5a94b4400043a7f88343a22d9fbddbd893b19f535a45346ff0be080c9f3eed58",
+    "texture-set-mtoon-alpha/blend-native.dsculpt": "c39d74ecc8f5c596a93a08c6907c4354e9cb5b8f20b63fec1dfcbd84f138e236",
+    "texture-set-mtoon-alpha/blend-imported.dsculpt": "3764ae6f8c7062b393009f146a24ed8f7f5d0ad73cfff33dc5149b9991641bfa",
+    "texture-set-mtoon-alpha/blend-solid-control.dsculpt": "07da8360b11b48b46fca35d908274b16371574da51fa61a6ef350c53cbdc6960"
+  },
+  "khronos_validator_version": "2.0.0-dev.3.10",
+  "khronos": {
+    "cutout-standard.glb": {
+      "errors": 0,
+      "warnings": [
+        "NODE_SKINNED_MESH_NON_ROOT"
+      ]
+    },
+    "cutout-editable.glb": {
+      "errors": 0,
+      "warnings": [
+        "NODE_SKINNED_MESH_NON_ROOT"
+      ]
+    },
+    "aligned-cutout-standard.glb": {
+      "errors": 0,
+      "warnings": [
+        "NODE_SKINNED_MESH_NON_ROOT"
+      ]
+    },
+    "aligned-cutout-editable.glb": {
+      "errors": 0,
+      "warnings": [
+        "NODE_SKINNED_MESH_NON_ROOT"
+      ]
+    },
+    "blend-standard.glb": {
+      "errors": 0,
+      "warnings": [
+        "NODE_SKINNED_MESH_NON_ROOT"
+      ]
+    },
+    "blend-editable.glb": {
+      "errors": 0,
+      "warnings": [
+        "NODE_SKINNED_MESH_NON_ROOT"
+      ]
+    },
+    "uncertified-alpha-editable.glb": {
+      "errors": 0,
+      "warnings": [
+        "NODE_SKINNED_MESH_NON_ROOT"
+      ]
+    }
+  },
+  "official_mtoon_schema_checks": 6,
+  "synthetic_openxr_native_vs_standard_reimport": {
+    "arc-cutout": {
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "stereo_frames": [
+        6,
+        6,
+        6
+      ],
+      "native_vs_standard": [
+        {
+          "changed": 4841,
+          "maximum": 3,
+          "mean": 0.030514,
+          "p99": 2
+        },
+        {
+          "changed": 7925,
+          "maximum": 3,
+          "mean": 0.047907,
+          "p99": 2
+        }
+      ],
+      "solid_alpha_control": [
+        {
+          "changed": 37686,
+          "maximum": 161,
+          "mean": 8.031156,
+          "p99": 101
+        },
+        {
+          "changed": 33648,
+          "maximum": 161,
+          "mean": 7.656123,
+          "p99": 99
+        }
+      ],
+      "native_reopen_and_save_exact": true
+    },
+    "arc-blend": {
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "stereo_frames": [
+        6,
+        6,
+        6
+      ],
+      "native_vs_standard": [
+        {
+          "changed": 13604,
+          "maximum": 4,
+          "mean": 0.066497,
+          "p99": 2
+        },
+        {
+          "changed": 15503,
+          "maximum": 4,
+          "mean": 0.076878,
+          "p99": 2
+        }
+      ],
+      "solid_alpha_control": [
+        {
+          "changed": 212030,
+          "maximum": 101,
+          "mean": 17.579639,
+          "p99": 99
+        },
+        {
+          "changed": 248076,
+          "maximum": 101,
+          "mean": 17.910752,
+          "p99": 99
+        }
+      ],
+      "native_reopen_and_save_exact": true
+    },
+    "software-cutout": {
+      "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+      "stereo_frames": [
+        6,
+        6,
+        6
+      ],
+      "native_vs_standard": [
+        {
+          "changed": 6264,
+          "maximum": 3,
+          "mean": 0.039896,
+          "p99": 2
+        },
+        {
+          "changed": 10108,
+          "maximum": 3,
+          "mean": 0.060378,
+          "p99": 2
+        }
+      ],
+      "solid_alpha_control": [
+        {
+          "changed": 37686,
+          "maximum": 161,
+          "mean": 8.024049,
+          "p99": 99
+        },
+        {
+          "changed": 33648,
+          "maximum": 161,
+          "mean": 7.655576,
+          "p99": 99
+        }
+      ],
+      "native_reopen_and_save_exact": true
+    },
+    "software-blend": {
+      "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+      "stereo_frames": [
+        6,
+        6,
+        6
+      ],
+      "native_vs_standard": [
+        {
+          "changed": 12136,
+          "maximum": 4,
+          "mean": 0.057383,
+          "p99": 2
+        },
+        {
+          "changed": 12229,
+          "maximum": 4,
+          "mean": 0.057272,
+          "p99": 2
+        }
+      ],
+      "solid_alpha_control": [
+        {
+          "changed": 211656,
+          "maximum": 101,
+          "mean": 17.555762,
+          "p99": 99
+        },
+        {
+          "changed": 247395,
+          "maximum": 101,
+          "mean": 17.899251,
+          "p99": 99
+        }
+      ],
+      "native_reopen_and_save_exact": true
+    }
+  },
+  "physical_headset": false,
+  "archive_sha256": "3595cf8cb791ff8396d1374b28d32010cace39dfe9f77d78d891c8a35d52d614",
+  "archive_members_sha256": {
+    "release-final.log": "e4104466e838553111d0a7d17e14c8c3b9c6a5f8c5fbccbcda4f1955b8f666cb",
+    "release/Testing/Temporary/LastTest.log": "bde3713783272bda12a1fea1b05082e7fd9937ba840e98de040e69e32dba3f9a",
+    "asan-build.log": "851dcf5f8cb3dc0a1db8a58308c5e4f877c2865b5617a897806157c1ab267624",
+    "run-render.py": "a249b4755df5a760f1c943c934e3c0ca74b0e44a739b011b7c89f42de7839444",
+    "xr-alpha.py": "9f7bec981807ad1fbf54160a3d6d4f042619f609e31b9bab65f26f738942a61a",
+    "khronos.json": "08d88cccdf89bac4bad894c6ba540345c4b646fdd4cd323d4a5704535fecff80",
+    "khronos.cjs": "b5bacd6ff6ea3057c1efa259912cd7b1a38b4d5c46b6d703b9c00b6640ec73a6",
+    "schemas.json": "d58cdaea95376b8d7464033121b8156a104b86543e626db4ef7df81b99a7584c",
+    "xr-arc-cutout/compare.json": "cb0f0ecf5f4f68c6683a05e640634d2f65f80c619e80200c1b232cf6318d5233",
+    "xr-arc-blend/compare.json": "0730fb5be8c8b8b2a5ca6b114c64381b8b2ed1042d1bc2b5b213fdb98b71898a",
+    "xr-software-cutout/compare.json": "2a22c4f00f48a33963064236daeb03d1ea9d57714b68ba44b9604960b00a5a9e",
+    "xr-software-blend/compare.json": "fc6bf748fdee35b4dfec46d83f9246ac3acc11e4fc8c6e7483c967bfc550cc09",
+    "asan-derivative.log": "c441bdfbc5ceaaaa5bc747f48b75a41003f681342125e9ccd77f9d1b2b364c5f",
+    "asan-independent.log": "f3112e9edcef196d0efb9fd1f83569b8f0d01bac5215b35daf7d4f1e01d992b5",
+    "asan-varying-alpha.log": "3d69c6ad5760be77422d06eb45c00ef6dfa90a7c3e8cf00f74dc8b7708650e15",
+    "asan-mtoon-plain.log": "b6c3723dc7d0aaa0a531898776f88fde914c1c526734289b6aa575e081b8f141",
+    "asan-mtoon-affine.log": "fd6004124f3573e08c0078604d40a1ae338b263462cb42737e2963a9621181a7",
+    "asan-prepared-affine.log": "bf6ce3f15f1432cee5afbbcf8e1d3fdf5f7debf4f9def0e38ef26df41bd421ae"
+  }
+}
