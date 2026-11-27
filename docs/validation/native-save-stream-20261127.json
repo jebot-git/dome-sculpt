@@ -1,0 +1,222 @@
+{
+  "date": "2026-11-27",
+  "streaming_commit": "99cf797e448819be8808224f190a5041b26764f8",
+  "source_paint_fixture_commit": "21bd9e1d00ba09348e770cfaa0909767c9040319",
+  "domed_toolkit_commit": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "arc_release_application": {
+    "file": "artifacts/native-save-stream-20261127/oneapi/dome-sculpt",
+    "sha256": "59ee84d46ee7657cc90aafb3efc82ce65a6b620baaab776f9f39c717b3768a18"
+  },
+  "policy": {
+    "gpu_backend": "ONEAPI",
+    "device": "Intel Arc A770 / renderD129",
+    "cpu_desktop_configuration_refused": {
+      "file": "artifacts/native-save-stream-20261127/configure-cpu-desktop.log",
+      "sha256": "67d4a1e372fda3c5dce61d5c5a4aa10448cdc675a06decd20e18231efe135ff8"
+    },
+    "cpu_xr_configuration_refused": {
+      "file": "artifacts/native-save-stream-20261127/configure-cpu-xr.log",
+      "sha256": "67d4a1e372fda3c5dce61d5c5a4aa10448cdc675a06decd20e18231efe135ff8"
+    },
+    "without_gpu": {
+      "exit": 1,
+      "file": "artifacts/native-save-stream-20261127/no-compute-device.log",
+      "sha256": "97cf1cd6391951236edc520fe87dbf3b572b69ded88f7ae1936c017c00d8895c"
+    },
+    "synthetic_openxr_with_forced_llvmpipe_and_arc_compute": {
+      "exit": 1,
+      "file": "artifacts/native-save-stream-20261127/software-opengl-rejected.log",
+      "sha256": "aac2faafa498540bde06261f4c75d3c065627ee2508ae2a65196a6f370041fa1"
+    }
+  },
+  "focused_ctest": {
+    "passed": 10,
+    "failed": 0,
+    "skipped": 0,
+    "test_names": [
+      "atomic-write-allocation",
+      "scene-file",
+      "source-paint-resources",
+      "native-worker-publication",
+      "authoring-journey",
+      "durable-recovery",
+      "export-cancellation",
+      "authoring-save",
+      "native-authored-paint-resolution",
+      "native-fullsize-physical-paint"
+    ],
+    "file": "artifacts/native-save-stream-20261127/oneapi/bounded-writes-arc.xml",
+    "sha256": "b7192d1dae97fc93925e48f2d9279c24beb445cdda498cd5056f93d7a0547021"
+  },
+  "native_interfaces": {
+    "nested_domed_wayland": {
+      "file": "artifacts/native-save-stream-20261127/wayland-resize-v3/report.json",
+      "sha256": "55800c6ed88913294a4de60e553d195eef4692e15f8d7128a16f41912b191819",
+      "checks": 12,
+      "oneapi_paint_grid_kernel_traced": true,
+      "trace": {
+        "file": "artifacts/native-save-stream-20261127/wayland-resize-v3/client.log",
+        "sha256": "7cca298b55cb9e34d2203b781819175c92e1b0b80dd8977f51f3ff04eceeaef9"
+      }
+    },
+    "synthetic_openxr": {
+      "file": "artifacts/native-save-stream-20261127/field-xr-paced-arc-v3/report.json",
+      "sha256": "c2c60db9a50e6b009aba5f08c69e40357babc7b77e416a9113cb4b36868cff51",
+      "checks": 12,
+      "oneapi_paint_grid_kernel_traced": true,
+      "trace": {
+        "file": "artifacts/native-save-stream-20261127/field-xr-paced-arc-v3/app.log",
+        "sha256": "9ef976c92833423ae6bb644a8452c84a91d4171e286999a3281ddb9702c3520f"
+      },
+      "balanced_frames": 668
+    }
+  },
+  "benchmark": {
+    "baseline_commit": "30eaee642f95ce59fbf2f1743e7c368524147acf",
+    "scope": "Three alternating paired Release runs. Load is outside the timed interval. Peak process RSS includes the decoded input inherited by the forked writer. The full regression sweep ran concurrently. Recovery includes durable publication and normal retention scans. Both file fixtures produced byte-identical canonical CBOR every run.",
+    "receipt": {
+      "file": "artifacts/native-save-stream-20261127/benchmark.log",
+      "sha256": "21ba56eb771eca19b579a97aff7deb61709d7f031391b46c512b6f16fdf3cca8"
+    },
+    "save": {
+      "before": {
+        "trials": [
+          {
+            "trial": 1,
+            "elapsed_ns": 928224716,
+            "peak_rss_kib": 649972
+          },
+          {
+            "trial": 2,
+            "elapsed_ns": 975633783,
+            "peak_rss_kib": 650000
+          },
+          {
+            "trial": 3,
+            "elapsed_ns": 829915409,
+            "peak_rss_kib": 649916
+          }
+        ],
+        "median": {
+          "elapsed_ns": 928224716,
+          "peak_rss_kib": 649972
+        }
+      },
+      "after": {
+        "trials": [
+          {
+            "trial": 1,
+            "elapsed_ns": 705504249,
+            "peak_rss_kib": 421596
+          },
+          {
+            "trial": 2,
+            "elapsed_ns": 824123982,
+            "peak_rss_kib": 421784
+          },
+          {
+            "trial": 3,
+            "elapsed_ns": 665641683,
+            "peak_rss_kib": 421548
+          }
+        ],
+        "median": {
+          "elapsed_ns": 705504249,
+          "peak_rss_kib": 421596
+        }
+      },
+      "fixture_bytes": 176308777,
+      "original_and_output_sha256": "cea227a1cedd4f18f1c23fe28b5a0fce386933f9f8ef978467652e3faa5f2571"
+    },
+    "recover": {
+      "before": {
+        "trials": [
+          {
+            "trial": 1,
+            "elapsed_ns": 1975557916,
+            "peak_rss_kib": 1797748
+          },
+          {
+            "trial": 2,
+            "elapsed_ns": 2103781168,
+            "peak_rss_kib": 1797496
+          },
+          {
+            "trial": 3,
+            "elapsed_ns": 2262477961,
+            "peak_rss_kib": 1797808
+          }
+        ],
+        "median": {
+          "elapsed_ns": 2103781168,
+          "peak_rss_kib": 1797748
+        }
+      },
+      "after": {
+        "trials": [
+          {
+            "trial": 1,
+            "elapsed_ns": 1975271262,
+            "peak_rss_kib": 1694608
+          },
+          {
+            "trial": 2,
+            "elapsed_ns": 2177541337,
+            "peak_rss_kib": 1694420
+          },
+          {
+            "trial": 3,
+            "elapsed_ns": 2525619691,
+            "peak_rss_kib": 1694608
+          }
+        ],
+        "median": {
+          "elapsed_ns": 2177541337,
+          "peak_rss_kib": 1694608
+        }
+      },
+      "fixture_bytes": 50692148,
+      "original_and_output_sha256": "db9c506daedc1b13992838200b95e9e4569e98155bce306142803aca6cb8edb8",
+      "output_fnv1a64": "790c27f421ed627e"
+    }
+  },
+  "headless_asan_ubsan_reference": {
+    "scope": "Current scene, native scene writer, recovery, volume and export translation units with the preceding sanitized reference core. Leak detection enabled. Headless only.",
+    "cases": {
+      "atomic-write-allocation.cpp": {
+        "file": "artifacts/native-save-stream-20261127/asan/atomic-write-allocation.cpp.log",
+        "sha256": "0e3863f158f06dc45c5e5b10a64ffd86abab056eab621cd2256e12869eccb0da",
+        "checks": 22
+      },
+      "scene-file.cpp": {
+        "file": "artifacts/native-save-stream-20261127/asan/scene-file.cpp.log",
+        "sha256": "cdddd86a95d993c23a4f0037003863b608b6e342d91e0b6fd66e9b1eec329b0a",
+        "checks": 17
+      },
+      "recovery.cpp": {
+        "file": "artifacts/native-save-stream-20261127/asan/recovery.cpp.log",
+        "sha256": "8c9067714afe14bca71089f71adc2b180107023f9a43c87acd3dc1393e8d4934",
+        "checks": 46
+      }
+    }
+  },
+  "prior_full_arc_release": {
+    "candidate": "30eaee642f95ce59fbf2f1743e7c368524147acf",
+    "registered": 1443,
+    "completed_at_receipt": 372,
+    "passed_at_receipt": 372,
+    "terminal_at_receipt": false,
+    "verified_git_files": 4945,
+    "allocation_plan_seconds": {
+      "canonical-paint37-emission-fault-plan": 6.29,
+      "canonical-paint37-key-create-fault-plan": 4.48,
+      "canonical-paint37-key-replace-fault-plan": 4.76
+    },
+    "live_status": "artifacts/gpu-arc-full-release-20261127/combined-test-status.json"
+  },
+  "open_validation": [
+    "Complete the full Arc regression on the new writer revision.",
+    "Test a sustained working session and interruption on a physical headset.",
+    "Positive CUDA and ROCm execution on their target hardware."
+  ]
+}

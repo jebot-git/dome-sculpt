@@ -78,10 +78,29 @@ The all-target oneAPI build completed after correcting the index type in
 the Surface Heat stress fixture. All three affected fixture executables
 passed. The first 1,443-case sweep was interrupted when its source mount
 hid the Git metadata needed by the allocation-plan tests. The rerun
-verifies the frozen commit and complete tracked file list inside the
-sandbox and uses a fresh fixture directory. It is building the compact
-transfer revision before the full Arc suite.
+verified the frozen commit and all 4,945 tracked paths inside the sandbox.
+The emission, key creation and key replacement plans passed and their
+dependent tests are running. The sweep uses the compact transfer revision
+and a fresh fixture directory.
 [FLOAT transfer and Release recovery evidence](validation/gpu-paint-float-transfer-20261127.json)
+
+Native Save and recovery stream canonical CBOR through the bounded atomic
+writer. They still construct the Scene JSON. Recovery computes the same
+checksum during writes and checks it during a single payload read when
+restoring. An oversized checkpoint preserves the preceding valid record.
+A 176 MB paint project's Save produced the original bytes with median peak
+RSS falling from 635 to 412 MiB. A 51 MB multi-object recovery checkpoint
+also reproduced the original bytes and checksum, with median peak RSS
+falling from 1,756 to 1,655 MiB and overlapping elapsed times. The compact
+source-paint fixture now verifies a successful default-budget adoption and
+refusal under a 64 MiB cap. All ten focused Arc Release cases pass. Nested
+DomeD Wayland and synthetic OpenXR each pass twelve checks including exact
+Save and Undo/Redo. The headless sanitizer reference passes the atomic
+writer, native scene and recovery suites. The Release application rejects
+missing GPU compute and refuses llvmpipe in OpenXR with Arc compute present.
+CPU application configuration was refused for both desktop and XR. The
+full sweep still runs on the preceding source.
+[Native Save and recovery evidence](validation/native-save-stream-20261127.json)
 
 Dome Sculpt is an integrated authoring candidate. The isolated software
 Release run for `662d889d` passed all 1,366 registered tests. The newer
