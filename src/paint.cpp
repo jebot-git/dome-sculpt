@@ -1893,21 +1893,23 @@ detail::NativeWeightPaintAccess::Surface detail::NativeWeightPaintAccess::surfac
   if (!paint.surface_ || paint.editing_ || (!prospective&&(!paint.undo_.empty() || !paint.redo_.empty())))
     throw std::invalid_argument("Native weight input must be a detached current-paint snapshot");
   const auto &surface=*paint.surface_;
-  if(surface.original_sampling || surface.paint_domain || paint.sampling_attachment_ || paint.texture_set_domain_ ||
-     paint.color_projection_ || paint.normal_projection_ || paint.baked_)
+  if(surface.original_sampling || surface.paint_domain || paint.sampling_attachment_ ||
+     paint.color_projection_ || paint.normal_projection_)
     throw std::invalid_argument("Native anatomical input budget does not yet represent prepared paint domains");
+  if (!detail::TextureSetPaintAccess::valid_raster(paint))
+    throw std::invalid_argument("Native weight raster lost its texture-set membership");
   size_t bytes=sizeof(PaintedMesh::SurfaceMap)+64;
   auto add=[&](size_t count,size_t unit){if(unit&&count>(SIZE_MAX-bytes)/unit)throw std::length_error("Native paint retained-byte overflow");bytes+=count*unit;if(count){const size_t overhead=count*unit>=128u*1024u?4096:64;if(overhead>SIZE_MAX-bytes)throw std::length_error("Native paint allocation allowance overflow");bytes+=overhead;}};
-  const auto &m=surface.mesh;
-  add(m.positions.capacity(),sizeof(Vec3));add(m.normals.capacity(),sizeof(Vec3));
-  add(m.uv.capacity(),sizeof(std::array<float,2>));add(m.indices.capacity(),sizeof(uint32_t));
-  add(m.uv_pins.capacity(),1);add(m.uv_seams.capacity(),1);
+  add(surface.diagnostics.unpaintable_uv_faces.capacity(),sizeof(uint32_t));
+  const auto surface_bytes = bytes;
+  bytes = sizeof(PaintedMesh::SurfaceMap::Raster)+64;
   add(surface.texels.capacity(),sizeof(PaintedMesh::SurfaceMap::Texel));
   add(surface.extra.capacity(),sizeof(PaintedMesh::SurfaceMap::Extra));
   add(surface.tiles.capacity(),sizeof(PaintedMesh::SurfaceMap::Bounds));add(surface.padding.capacity(),sizeof(int32_t));
   add(surface.linked.size(),sizeof(PaintedMesh::SurfaceMap::Links::value_type)+3*sizeof(void*)+32);
-  add(surface.linked.bucket_count(),sizeof(void*));add(surface.diagnostics.unpaintable_uv_faces.capacity(),sizeof(uint32_t));
-  return {paint.surface_,bytes};
+  add(surface.linked.bucket_count(),sizeof(void*));
+  return {paint.surface_, surface.raster_data, surface.geometry, surface.set_domain,
+          paint.baked_, surface_bytes, bytes};
 }
 bool detail::NativeWeightPaintAccess::same_current(const PaintedMesh&a,const PaintedMesh&b) noexcept {
   using namespace native_weight_state;

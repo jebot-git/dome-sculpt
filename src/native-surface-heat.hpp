@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
+#include "source-skin-link.hpp"
+#include "texture-set-paint-access.hpp"
 #include "native-anatomical-weights.hpp"
 #include "visibility-heat-bind.hpp"
 #include "humanoid-heat-sources.hpp"
@@ -32,7 +34,7 @@ class NativeSurfaceHeatRequest {
   std::shared_ptr<const uint64_t>identity_;
   friend NativeSurfaceHeatRequest capture_native_surface_heat(const Scene&,std::span<const uint64_t>,uint64_t,const NativeSurfaceHeatOptions&);
   friend NativeSurfaceHeatPrepared prepare_native_surface_heat(const NativeSurfaceHeatRequest&,const std::function<bool()>&);
-  friend bool adopt_native_surface_heat(Scene&,const NativeSurfaceHeatRequest&,NativeSurfaceHeatPrepared&&);
+  friend bool adopt_native_surface_heat(Scene&,const NativeSurfaceHeatRequest&,NativeSurfaceHeatPrepared&&,const std::function<bool()>&);
 public:
   bool matches(const Scene&s)const{return lease_.matches(s);}
 };
@@ -42,7 +44,7 @@ class NativeSurfaceHeatPrepared {
   NativeSurfaceHeatReport report_;
   std::shared_ptr<const uint64_t>identity_;
   friend NativeSurfaceHeatPrepared prepare_native_surface_heat(const NativeSurfaceHeatRequest&,const std::function<bool()>&);
-  friend bool adopt_native_surface_heat(Scene&,const NativeSurfaceHeatRequest&,NativeSurfaceHeatPrepared&&);
+  friend bool adopt_native_surface_heat(Scene&,const NativeSurfaceHeatRequest&,NativeSurfaceHeatPrepared&&,const std::function<bool()>&);
 public:
   const NativeSurfaceHeatReport&report()const noexcept{return report_;}
 };
@@ -119,7 +121,17 @@ inline NativeSurfaceHeatPrepared prepare_native_surface_heat(const NativeSurface
     else bytes.add(sizeof(DeformationState));
     geometry_weight_authoring::deformation_copy_bytes(ref,bytes,work);
     bytes.add(o.painted->mesh().positions.size(),sizeof(VertexWeights)+options.limits.max_influences*sizeof(Influence)+64);
-    if(!o.rig_source){bytes.add(sizeof(PolygonOrigin)+sizeof(PaintedMesh)+sizeof(Volume)+4096);bytes.add(o.painted->storage_bytes());}
+    if(o.texture_sets && !o.appearance && reference.appearance){
+      // Publishing a first linked bind allocates a deformation with the re-framed
+      // original skeleton alongside the solver's own detached result.
+      if(o.deformation)geometry_weight_authoring::deformation_copy_bytes(*o.deformation,bytes,work);
+      geometry_weight_authoring::deformation_copy_bytes(ref,bytes,work);
+      bytes.add(o.painted->mesh().positions.size(),sizeof(VertexWeights)+options.limits.max_influences*sizeof(Influence)+64);
+    }
+    if(!o.rig_source){
+      bytes.add(sizeof(PolygonOrigin)+sizeof(PaintedMesh)+sizeof(Volume)+4096);
+      bytes.add(o.texture_sets ? TextureSetPaintAccess::snapshot_bytes(*o.painted) : o.painted->storage_bytes());
+    }
   }
   const size_t fixed_bytes=bytes.used;
   if(fixed_bytes>=options.maximum_workspace-65536)throw std::length_error("Native surface heat output staging leaves no field workspace");
@@ -197,14 +209,26 @@ inline NativeSurfaceHeatPrepared prepare_native_surface_heat(const NativeSurface
   }
   work.stop();result.report_.work=work.used;result.report_.changed=result.changes_.size();return result;
 }
-inline bool adopt_native_surface_heat(Scene&scene,const NativeSurfaceHeatRequest&request,NativeSurfaceHeatPrepared&&result){
+inline bool adopt_native_surface_heat(Scene&scene,const NativeSurfaceHeatRequest&request,NativeSurfaceHeatPrepared&&result,
+ const std::function<bool()>&cancelled={}){
   if(!result.identity_||result.identity_!=request.identity_||result.identity_.owner_before(request.identity_)||request.identity_.owner_before(result.identity_))throw std::invalid_argument("Surface heat result belongs to a different owning request");
   if(!request.lease_.matches(scene))throw std::runtime_error("Surface heat source lease changed before publication");
   if(result.changes_.size()>request.targets_.size())throw std::invalid_argument("Surface heat prepared recipients exceed captured request");
   if(result.changes_.empty())return false;
   Scene staged=scene;size_t cursor=0;
-  for(const auto&change:result.changes_){while(cursor<request.targets_.size()&&request.targets_[cursor]!=change.object)++cursor;if(cursor==request.targets_.size()||!change.deformation||!change.origin)throw std::invalid_argument("Surface heat prepared target/capsule identity");++cursor;auto&o=staged.object(change.object);o.deformation=change.deformation;o.rig_source=change.origin;}
-  staged.validate();if(!request.lease_.matches(scene))throw std::runtime_error("Surface heat source changed during final validation");
+  for(const auto &change:result.changes_){
+    while(cursor<request.targets_.size()&&request.targets_[cursor]!=change.object)++cursor;
+    if(cursor==request.targets_.size()||!change.deformation||!change.origin)
+      throw std::invalid_argument("Surface heat prepared target/capsule identity");
+    ++cursor;
+    auto &object=staged.object(change.object);
+    object.deformation=change.deformation;
+    object.rig_source=change.origin;
+    link_native_source_skin(staged,change.object,request.reference_,cancelled);
+  }
+  staged.validate();
+  if(cancelled&&cancelled())throw std::runtime_error("Surface heat binding cancelled before publication");
+  if(!request.lease_.matches(scene))throw std::runtime_error("Surface heat source changed during final validation");
   static_assert(std::is_nothrow_move_assignable_v<Scene>);scene=std::move(staged);return true;
 }
 }

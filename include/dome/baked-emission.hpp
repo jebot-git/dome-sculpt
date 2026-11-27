@@ -11,6 +11,7 @@
 #include <vector>
 
 namespace dome {
+namespace detail::native_weight_retention_impl { struct Counter; }
 // Premultiplied, linear FLOAT coefficients. Legacy is relative to the current
 // typed material strength; absolute is already resolved radiance. Neither may
 // be reconstructed from the ordinary display RGB8 emission image. In
@@ -107,6 +108,7 @@ public:
   BakedEmissionField(const BakedEmissionField &) = delete;
   BakedEmissionField &operator=(const BakedEmissionField &) = delete;
 private:
+  friend struct detail::native_weight_retention_impl::Counter;
   static std::shared_ptr<const BakedEmissionField>
   generate_storage(uint32_t,const std::function<BakedEmissionSample(size_t)> &,
                    const BakedEmissionLimits &,bool prefer_compact);

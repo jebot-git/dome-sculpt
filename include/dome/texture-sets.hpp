@@ -6,7 +6,7 @@ namespace dome {
 using TextureSetId = uint32_t;
 struct PolygonOrigin;
 struct TextureSetView;
-namespace detail { class TextureSetFieldSource; struct TextureSetAccess; struct TextureSetPaintAccess; class TextureSetArchive; }
+namespace detail { class TextureSetFieldSource; struct TextureSetAccess; struct TextureSetPaintAccess; class TextureSetArchive; namespace native_weight_retention_impl { struct Counter; } }
 struct TextureSetInitialField {Material material;uint32_t resolution=512;};
 struct TextureSetLimits {
   size_t maximum_sets_per_object=64,maximum_sets_per_scene=256;
@@ -26,6 +26,7 @@ public:
   bool polygon_ids()const noexcept{return polygon_ids_;}
 private:
   friend struct detail::TextureSetAccess;
+  friend struct detail::native_weight_retention_impl::Counter;
   friend class detail::TextureSetArchive;
   TextureSetTopology()=default;
   TextureSetTopology(const TextureSetTopology&)=default;
@@ -46,6 +47,7 @@ public:
   void authenticate_owner(const std::shared_ptr<const TextureSetFaceDomain>&)const;
 private:
   friend struct detail::TextureSetAccess;
+  friend struct detail::native_weight_retention_impl::Counter;
   friend class detail::TextureSetArchive;
   friend class TextureSetCollection;
   TextureSetFaceDomain()=default;
@@ -85,6 +87,7 @@ public:
   void validate(const PolygonOrigin&,bool deep=true,const TextureSetLimits & = {})const;
 private:
   friend struct detail::TextureSetAccess;
+  friend struct detail::native_weight_retention_impl::Counter;
   friend class detail::TextureSetArchive;
   friend void initialize_texture_sets(Scene&,uint64_t,const Mesh&,std::span<const TextureSetInitialField>,std::span<const TextureSetId>,const TextureSetLimits&);
   friend TextureSetId create_texture_set(Scene&,uint64_t,std::span<const uint64_t>,std::string,uint32_t,const TextureSetLimits&);

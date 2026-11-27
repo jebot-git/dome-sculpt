@@ -12,6 +12,7 @@
 #include "dome/native-scene-append.hpp"
 #include "dome/source-placement.hpp"
 #include "emission-export.hpp"
+#include "native-surface-heat.hpp"
 #include "source-rigid-pose.hpp"
 #include "source-skin-link.hpp"
 #include "vrm1-metadata.hpp"
@@ -756,6 +757,128 @@ void shape_texture_accessory(const std::filesystem::path &out, dome::Scene scene
   }
 }
 
+void surface_heat_texture_accessory(const std::filesystem::path &out, Scene scene, uint64_t accessory, uint64_t rig) {
+  for (TextureSetId set : {0u, 1u}) {
+    check(edit_texture_set(scene, accessory, set, [set](PaintedMesh &paint, Material &) {
+      paint.add_layer(set ? "Secondary finish" : "Primary finish");
+      const auto &mesh = paint.mesh();
+      const auto first = set * 3;
+      Brush brush;
+      brush.from = brush.to = (mesh.positions[mesh.indices[first]] +
+          mesh.positions[mesh.indices[first + 1]] + mesh.positions[mesh.indices[first + 2]]) / 3.f;
+      brush.normal = {0, 0, 1};
+      brush.radius = .035f;
+      brush.strength = .8f;
+      PaintSettings ink;
+      ink.color = set ? std::array{.21f, .6f, .9f, .8f} : std::array{.8f, .22f, .36f, .75f};
+      paint.begin_stroke();
+      paint.stamp(brush, ink);
+      return paint.end_stroke();
+    }), "Each material partition receives an actual editable paint layer");
+  }
+  const auto donor = scene.add("Hidden Surface Heat bake donor", Volume{});
+  auto &source = scene.object(donor);
+  source.visible = false;
+  source.locked = true;
+  source.mesh_active = true;
+  source.transform = scene.object(accessory).transform;
+  source.material.emissive = {3.f, .7f, .25f};
+  auto donor_mesh = scene.object(accessory).painted->mesh();
+  for (auto &p : donor_mesh.positions) p.z += .007f;
+  for (auto &n : donor_mesh.normals) n = normalized(Vec3{.15f, .2f, 1.f});
+  source.painted = std::make_shared<PaintedMesh>(std::move(donor_mesh), 64);
+  scene.select(accessory);
+  select_texture_set(scene, accessory, 1);
+
+  Document doc;
+  auto settled = [&] {
+    if (!doc.wait_asset() || !doc.wait_mesh() || !doc.frame().state->error.empty())
+      throw std::runtime_error("Surface Heat workflow did not settle: " + doc.frame().state->error);
+  };
+  doc.replace(scene);
+  settled();
+  detail::NativeSurfaceHeatOptions bounds;
+  const auto input_budget = bounds.maximum_total - bounds.maximum_workspace;
+  const auto unbaked = detail::native_weight_retention(scene, input_budget);
+  ObjectBakeSettings bake;
+  bake.ao_samples = 2;
+  bake.allow_backfaces = true;
+  bake.corresponding_topology = true;
+  doc.bake_from_object(donor, bake);
+  settled();
+  scene = doc.copy_scene();
+  select_texture_set(scene, accessory, 0);
+  doc.replace(scene);
+  settled();
+  const auto before = scene.encode();
+  const auto collection = scene.object(accessory).texture_sets;
+  const auto field = texture_set_view(scene.object(accessory), 1);
+  check(field.bake_recipe && field.painted->has_paint_data() && field.painted->baked() &&
+        field.painted->baked()->emission_field && !field.painted->baked()->maps.normal.rgba.empty(),
+        "Surface Heat input has a real non-primary layered normal and physical emission Bake");
+  doc.save_async(out / "heat-before.dsculpt").get();
+
+  const std::array selected{accessory};
+  const auto retained = detail::native_weight_retention(scene, input_budget);
+  check(retained.bytes >= unbaked.bytes + field.painted->baked()->emission_field->storage_bytes() +
+        field.painted->baked()->maps.normal.rgba.size(),
+        "Native owning admission includes the secondary FLOAT field");
+  auto limited = bounds;
+  limited.maximum_total = limited.maximum_workspace + retained.bytes - 1;
+  bool refused = false;
+  try { detail::capture_native_surface_heat(scene, selected, rig, limited); }
+  catch (const std::length_error &) { refused = true; }
+  check(refused && scene.encode() == before, "One byte below the retained budget refuses before staging");
+
+  const auto request = detail::capture_native_surface_heat(scene, selected, rig, bounds);
+  auto stale = scene.snapshot();
+  edit_texture_set(stale, accessory, 1, [](PaintedMesh &paint, Material &) {
+    paint.layer_properties("Secondary finish", true, .5f);
+    return true;
+  });
+  check(!request.matches(stale), "The captured lease detects edits to an inactive paint owner");
+  auto prepared = detail::prepare_native_surface_heat(request);
+  const auto stale_before = stale.encode();
+  refused = false;
+  try { detail::adopt_native_surface_heat(stale, request, std::move(prepared)); }
+  catch (const std::runtime_error &) { refused = true; }
+  check(refused && stale.encode() == stale_before, "A stale worker cannot overwrite a newer texture-set edit");
+  auto cancelled = scene;
+  refused = false;
+  try { detail::adopt_native_surface_heat(cancelled, request, std::move(prepared), [] { return true; }); }
+  catch (const std::runtime_error &) { refused = true; }
+  check(refused && cancelled.encode() == before, "Cancellation during linked bind publication preserves the whole project");
+
+  SkinAuthoringOptions options;
+  options.reference = rig;
+  options.mode = SkinAuthoringMode::SurfaceHeat;
+  doc.bind_skin(options, doc.draft_scene().source);
+  auto saved = out / "heat-bound.dsculpt";
+  doc.save_async(saved).get();
+  settled();
+  const auto bound = doc.copy_scene();
+  const auto &current = bound.object(accessory);
+  const auto &native = *current.deformation;
+  const auto other = texture_set_view(current, 1);
+  check(native.skin && native.source_skin_joints == scene.object(rig).appearance->source_joint_nodes &&
+        native.morphs->encode() == scene.object(accessory).deformation->morphs->encode() &&
+        current.texture_sets == collection && other.painted == field.painted &&
+        other.painted->baked() == field.painted->baked() && other.bake_recipe == field.bake_recipe,
+        "Surface Heat publishes one skin link while preserving the complete paint and morph owners");
+  check(Scene::load(saved).encode() == bound.encode() && doc.undo() && doc.copy_scene().encode() == before &&
+        doc.redo() && doc.copy_scene().encode() == bound.encode(),
+        "Ordered Save and UndoRedo preserve both texture-set and surface-weight authority");
+  settled();
+  const auto portable = out / "heat-bound-editable.vrm";
+  doc.export_asset(portable, AssetExportFormat::EditableAvatar512).get();
+  auto replay = extract_native_authoring(bytes(portable));
+  check(replay && replay->active().id == accessory &&
+        replay->active().deformation->encode(replay->active().painted->mesh()) == native.encode(current.painted->mesh()) &&
+        texture_set_view(replay->active(), 1).painted->baked()->emission_field->encode() ==
+          field.painted->baked()->emission_field->encode(),
+        "Editable VRM retains the solved weights and physical emission Bake");
+}
+
 void skinned_texture_accessory(const std::filesystem::path &out, Scene initial) {
   const auto accessory = initial.active().id;
   initial.active().name = "Native skinned collar";
@@ -996,6 +1119,7 @@ void skinned_texture_accessory(const std::filesystem::path &out, Scene initial) 
   refused = false;
   try { doc.export_asset(existing, AssetExportFormat::EditableAvatar512).get(); } catch (const std::invalid_argument &) { refused = true; }
   check(refused && bytes(existing) == durable, "Forged source joint slots refuse to replace a durable avatar export");
+  surface_heat_texture_accessory(out, scene, accessory, rig);
 }
 
 void bone_accessory(const std::filesystem::path &out) {

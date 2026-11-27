@@ -16,6 +16,6 @@ bool author_surface_heat_skin(Scene&scene,std::span<const uint64_t>targets,
  if(cancelled&&cancelled())throw std::runtime_error("Surface heat binding cancelled after owning capture");
  auto prepared=detail::prepare_native_surface_heat(request,cancelled);
  if(cancelled&&cancelled())throw std::runtime_error("Surface heat binding cancelled before publication");
- return detail::adopt_native_surface_heat(scene,request,std::move(prepared));
+ return detail::adopt_native_surface_heat(scene,request,std::move(prepared),cancelled);
 }
 }
