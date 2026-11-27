@@ -102,6 +102,20 @@ CPU application configuration was refused for both desktop and XR. The
 full sweep still runs on the preceding source.
 [Native Save and recovery evidence](validation/native-save-stream-20261127.json)
 
+Native 512–2048 paint grids now composite RGB8 Bake color, occlusion,
+roughness, metallic and legacy emission on the selected GPU. The same pass
+applies ordered paint layers, fractional coverage and padding. The original
+normal-map processing and editable Bake owner are preserved. On Intel Arc,
+the 2048-pixel reference fixture produces identical material images and a
+byte-identical GLB export. With the compositor and paint-grid resampling in
+separate oneAPI device modules, median cold compositing time is 0.60 seconds
+across three paired runs, down from 1.04 seconds on the previous revision.
+All eight focused Arc Release tests and twenty synthetic OpenXR Bake policy
+checks pass. The scoped sanitizer reference passes. Updated CUDA and ROCm
+compositors compile and explicitly refuse missing hardware. The independent
+source-coordinate and prepared paint adapters still need GPU coverage.
+[Native Bake compositing evidence](validation/native-bake-composite-gpu-20261127.json)
+
 Dome Sculpt is an integrated authoring candidate. The isolated software
 Release run for `662d889d` passed all 1,366 registered tests. The newer
 controller attachment revision `eea22499` passed all 1,367 registered tests

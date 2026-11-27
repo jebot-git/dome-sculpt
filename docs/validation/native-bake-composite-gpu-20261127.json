@@ -1,0 +1,200 @@
+{
+  "date": "2026-11-27",
+  "source_commit": "d3f80d63177f55a6711dce298b67f8f39a6f1a04",
+  "previous_published_commit": "426b42643adf5827c1418225890e94515177ebc1",
+  "domed_toolkit_commit": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "optimized_arc_application": {
+    "file": "artifacts/native-bake-gpu-20261127/oneapi/dome-sculpt",
+    "sha256": "d961150affc287ef14282082f6add7e0045f02d9ce6cfcbd828ae8787ef26bfb"
+  },
+  "device": "Intel Arc A770 at 0000:03:00.0 / renderD129",
+  "scope": "512\u20132048 source-free native RGB8 Bake compositing for color, ORM, legacy emission and replacement coverage. Ordered paint and padding are included. Existing normals retain their owning processor. Independent source-coordinate, projected and FLOAT material compilers remain outside this route.",
+  "arc_release": {
+    "file": "artifacts/native-bake-gpu-20261127/oneapi/native-bake-gpu.xml",
+    "sha256": "219a5481b6dd927c95651a22bc0f44bad1d092ca0b1fb9ce26b2b1a1d913d20d",
+    "passed": 8,
+    "cases": [
+      "authoring-journey",
+      "bake",
+      "paint-overlay-gpu",
+      "paint-composite-compute",
+      "paint-composite-native",
+      "native-authored-paint-resolution",
+      "native-bake-resize-missing-device",
+      "native-fullsize-physical-paint"
+    ]
+  },
+  "synthetic_openxr": {
+    "file": "artifacts/native-bake-gpu-20261127/oneapi/bake-policy-hardware.xml",
+    "sha256": "a16586c7c7cee4e5a7db854b1467f268937fd3738a10da2e80eeb1cceecf1b92",
+    "passed": 1,
+    "cases": [
+      "bake-policy-openxr"
+    ],
+    "checks": 20,
+    "report": {
+      "file": "artifacts/native-bake-gpu-20261127/oneapi/bake-policy-xr/report.json",
+      "sha256": "5d4fce8613ab15f59b797e104484b0178a7d91102b5a53bd3740dbe6efc44dd4"
+    },
+    "physical_headset": false
+  },
+  "headless_asan_ubsan": {
+    "scope": "Current paint and compute translation units linked into the preceding sanitized headless reference core. Reference core has no hardware driver instrumentation.",
+    "oracle": {
+      "file": "artifacts/native-bake-gpu-20261127/asan/paint-composite-compute.cpp.log",
+      "sha256": "fa58249dedca07818abe5fad9dabd39207c2db2e2941b0650acb82cb2ce27bb6"
+    },
+    "native": {
+      "file": "artifacts/native-bake-gpu-20261127/asan/paint-composite-native.cpp.log",
+      "sha256": "21661a7b3d10d3e00e4063fe5c90c4b75dcf56b94bc14c9fefb4da69fb06a39b"
+    }
+  },
+  "exact_material_maps": {
+    "color": "ed2cf4e33a49022c",
+    "orm": "36e22263432ac787",
+    "emission": "c02381535d0765d9",
+    "normal": "b455d777511306c1",
+    "color_coverage": "df2ed4811fcc9d6a",
+    "emission_coverage": "2a0336e9e5aca07d",
+    "baked_normal": "b3b78ab4273a8d15",
+    "baked_coverage": "3423d148030085ed",
+    "transparent": "1"
+  },
+  "benchmark": {
+    "size": 2048,
+    "input": {
+      "file": "artifacts/native-bake-gpu-20261127/project.dsculpt",
+      "sha256": "f831ec22df411a010567582f32bb57ec31f0adbedbd9b3eaab7d3031a3c762fe"
+    },
+    "trials": {
+      "before": {
+        "runs": [
+          {
+            "file": "artifacts/native-bake-gpu-20261127/measure-before-1.log",
+            "sha256": "3b3ed6d3a2969cac105adb9a53a8fbb0f8ce548eec8d5f808ecff841808c6877",
+            "elapsed_ns": 1007322716
+          },
+          {
+            "file": "artifacts/native-bake-gpu-20261127/measure-before-2.log",
+            "sha256": "18a9b8cba166f955880534f1676c11e2951f1c899f5dfc1f5168569f06c18ee8",
+            "elapsed_ns": 1041772425
+          },
+          {
+            "file": "artifacts/native-bake-gpu-20261127/measure-before-3.log",
+            "sha256": "39d76ede6d50a307188e5d9694bf1a7a393c17f4cd9b0cad31cf894b6f5e877f",
+            "elapsed_ns": 1194591767
+          }
+        ],
+        "median_ns": 1041772425
+      },
+      "after": {
+        "runs": [
+          {
+            "file": "artifacts/native-bake-gpu-20261127/measure-after-1.log",
+            "sha256": "03fdb338c097bdf51e3ef7d66779c2ea8cb37ab3f698dc55c78ab08edbb8f922",
+            "elapsed_ns": 640543474
+          },
+          {
+            "file": "artifacts/native-bake-gpu-20261127/measure-after-2.log",
+            "sha256": "b17f9242b8feabb8acc69eacb312ac6207f98b87cef225994884ab3fc633616a",
+            "elapsed_ns": 571775172
+          },
+          {
+            "file": "artifacts/native-bake-gpu-20261127/measure-after-3.log",
+            "sha256": "595081f79052b2ff562cb7d8910b146f01904cda39747e162e93d31e7d182ee2",
+            "elapsed_ns": 601318187
+          }
+        ],
+        "median_ns": 601318187
+      }
+    },
+    "scope": "Three paired fresh processes. Times start after native Scene Open and include material image creation. The full regression was running during the measurements."
+  },
+  "byte_identical_glb": {
+    "file": "artifacts/native-bake-gpu-20261127/after.glb",
+    "sha256": "b3abe77a019835b6a1a44b2b28afe14edade29ed5fe0e598921f9ad1cdda8d51",
+    "bytes": 454036,
+    "image_data": [
+      {
+        "pixels": [
+          2048,
+          2048
+        ],
+        "mime_type": "image/png",
+        "bytes": 176765
+      },
+      {
+        "pixels": [
+          2048,
+          2048
+        ],
+        "mime_type": "image/png",
+        "bytes": 124332
+      },
+      {
+        "pixels": [
+          2048,
+          2048
+        ],
+        "mime_type": "image/png",
+        "bytes": 26263
+      },
+      {
+        "pixels": [
+          2048,
+          2048
+        ],
+        "mime_type": "image/png",
+        "bytes": 124441
+      }
+    ],
+    "device_trace": {
+      "file": "artifacts/native-bake-gpu-20261127/export-after.log",
+      "sha256": "2018b562b7d4149ad59e4c6cd3a4279784739ec5ee1e10a7ec2a4fea557bc428"
+    }
+  },
+  "oneapi_first_dispatch": {
+    "unsplit_profile": {
+      "file": "artifacts/native-bake-gpu-20261127/profile.log",
+      "sha256": "4939261fcf13a1e36a77518e816edd5411becfae9064fb7ce8c252df887fe978"
+    },
+    "unsplit_first_dispatch_ms": 9754.23,
+    "unsplit_all_kernels_device_ms": 3.73907,
+    "unsplit_all_readback_device_ms": 10.9056,
+    "unsplit_device_il_bytes": 94368,
+    "split_device_il_bytes": 25892,
+    "unsplit_benchmark": {
+      "file": "artifacts/native-bake-gpu-20261127/unsplit-benchmark.log",
+      "sha256": "4d74cd94133c5db71652da82b71b4c7167a988ef994d56bb0c7cd78beec2fa25"
+    },
+    "split_trace": {
+      "file": "artifacts/native-bake-gpu-20261127/trace-after.out",
+      "sha256": "b1723c6e44ccb14478af805bd16a83e02a9b4fef6f0559a9951552b00a080069"
+    },
+    "compiler_reference": "https://www.intel.com/content/www/us/en/docs/dpcpp-cpp-compiler/developer-guide-reference/2026-0/fsycl-device-code-split.html"
+  },
+  "vendor_missing_device": {
+    "oneapi": {
+      "file": "artifacts/native-bake-gpu-20261127/missing-device.log",
+      "sha256": "a1cf3916320544004330c555f6b65126a7eb9220405dc58db911a926f6ac4b58"
+    },
+    "cuda": {
+      "file": "artifacts/native-bake-gpu-20261127/cuda-missing.log",
+      "sha256": "a5fc64a55cc525ecd5355dd80921940ad8090c4105aba832d13e9ed9347ab9d1"
+    },
+    "rocm": {
+      "file": "artifacts/native-bake-gpu-20261127/rocm-missing.log",
+      "sha256": "66313be17a4b6ea4520604d5867add2722c49f6dc1e9ce801cdc47cd41918238"
+    },
+    "cuda_and_rocm_scope": "Updated backend and oracle built and linked against the respective vendor runtime. Numerics and positive execution on AMD and NVIDIA hardware remain open."
+  },
+  "preceding_full_arc_sweep": {
+    "candidate": "30eaee642f95ce59fbf2f1743e7c368524147acf",
+    "registered": 1443,
+    "passed_at_receipt": 543,
+    "failed_at_receipt": 1,
+    "terminal": false,
+    "known_stale_test_fix": "21bd9e1d00ba09348e770cfaa0909767c9040319",
+    "live_status": "artifacts/gpu-arc-full-release-20261127/combined-test-status.json"
+  }
+}
