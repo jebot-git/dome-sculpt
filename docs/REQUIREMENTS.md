@@ -108,9 +108,19 @@ patch rasters, including a Bake from an imported GLB and a reflected, sheared
 case with partial material Bake coverage and FLOAT emission. Paint and normal
 coordinates come from the original per-slot owners. The hidden guide retains
 its original data. Release, ASan/UBSan, nested DomeD Wayland, synthetic stereo
-and Khronos GLB checks cover this path. Direct raw imported fields, prepared
-MToon, and physical headset qualification remain open.
+and Khronos GLB checks cover this path. Prepared MToon and physical headset
+qualification remain open.
 [Prepared PBR transfer evidence](validation/retopology-first-retained-20261127.json)
+
+Direct first transfer of an imported PBR guide now resolves source role UVs,
+vertex RGBA, normal frames and physical emission across both source triangles
+in a reflected, sheared morph fixture. The published quad keeps separate
+editable layers. Native persistence and Editable GLB retain the original
+GLB and its pose. Focused Release and ASan/UBSan, nested DomeD Wayland,
+synthetic OpenXR and GLB validation cover the tested case. Portable explicit
+tangents, original guides with prior Bake data, and imported MToon material
+transfer remain required.
+[Imported PBR retopology evidence](validation/retopology-first-imported-20261127.json)
 
 Native multi-material retopology preserves independently painted and baked
 grids and original VRM 1.0 joint links when Apply changes the patch.

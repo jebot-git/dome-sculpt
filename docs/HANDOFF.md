@@ -156,9 +156,27 @@ files across build profiles. Nested DomeD Wayland traces both materials, applies
 and saves the patch, and exports both paint and normal maps. Five GLBs pass
 Khronos validation with zero errors and warnings. Synthetic OpenXR reopens
 and renders the guide and patch in both eyes on Intel Arc A770 and llvmpipe.
-Direct sampling of raw imported material fields, prepared MToon transfer, and
-physical headset acceptance remain open.
+Prepared MToon transfer and physical headset acceptance remain open.
 [Prepared PBR transfer validation](validation/retopology-first-retained-20261127.json)
+
+First Apply also samples an imported PBR object's original images directly.
+The worker resolves per-role UVs and transforms, vertex colour and alpha,
+metallic/roughness, occlusion and authored normals at hits on the evaluated
+source surface. It writes a native Bake beneath the reprojected editable
+layers and stores HDR emission as FLOAT. The native project keeps the exact
+GLB, pose, layer history and placement on the hidden guide. The new patch
+captures the visible geometry with a new writable atlas.
+
+The reflected and sheared fixture uses an active morph, alternate texture
+coordinates and a quad spanning both source triangles. The previous product
+reproduces the missing Bake. The 45 selected Release and 12 strict sanitizer
+tests pass, and five native and GLB files match across profiles. Nested DomeD
+Wayland traces, applies, saves and exports the quad. Synthetic OpenXR renders
+the original and the patch on Intel Arc A770 and llvmpipe. Khronos reports no
+errors and advises that each patch export relies on runtime tangent generation.
+Existing authored Bake data on an imported guide, imported MToon, and physical
+headset acceptance remain open for this route.
+[Imported PBR retopology validation](validation/retopology-first-imported-20261127.json)
 
 Retopology reapply now works on native multi-material accessories attached
 to original VRM 1.0 joints. The replacement keeps its avatar hierarchy and
