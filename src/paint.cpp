@@ -1134,6 +1134,18 @@ detail::PaintOverlayFactory::source_coordinates(const PaintedMesh &paint){
 std::shared_ptr<const detail::PaintOverlayPacket> detail::PaintOverlayFactory::capture(const PaintedMesh &paint,const std::function<bool()> &cancelled){
   return capture_impl(paint,cancelled,false,nullptr);
 }
+size_t detail::PaintOverlayFactory::raster_storage_bytes(const PaintedMesh &paint) noexcept{
+  const auto &surface=*paint.surface_;
+  const auto &mesh=surface.mesh;
+  return sizeof(PaintedMesh::SurfaceMap)+
+    (mesh.positions.capacity()+mesh.normals.capacity())*sizeof(Vec3)+mesh.uv.capacity()*sizeof(std::array<float,2>)+
+    mesh.indices.capacity()*sizeof(uint32_t)+mesh.uv_pins.capacity()+mesh.uv_seams.capacity()+
+    surface.texels.capacity()*sizeof(PaintedMesh::SurfaceMap::Texel)+surface.extra.capacity()*sizeof(PaintedMesh::SurfaceMap::Extra)+
+    surface.tiles.capacity()*sizeof(PaintedMesh::SurfaceMap::Bounds)+surface.padding.capacity()*sizeof(int32_t)+
+    surface.linked.size()*(sizeof(std::pair<const uint32_t,PaintedMesh::SurfaceMap::Head>)+2*sizeof(void*))+surface.linked.bucket_count()*sizeof(void*)+
+    surface.diagnostics.unpaintable_uv_faces.capacity()*sizeof(uint32_t)+
+    (surface.paint_domain?surface.paint_domain->retained_bytes():0);
+}
 std::shared_ptr<const detail::PaintOverlayPacket> detail::PaintOverlayFactory::capture_paired_bake(
     const PaintedMesh &paint,const std::shared_ptr<const PaintNormalProjection> &projection,
     const std::function<bool()> &cancelled) {
@@ -1171,12 +1183,8 @@ std::shared_ptr<const detail::PaintOverlayPacket> detail::PaintOverlayFactory::c
   packet->empty_=!packet->baked_;
   // The aliasing padding pointer keeps its complete immutable SurfaceMap alive.
   // Charge that retained owner conservatively, not only the padding subvector.
-  const auto &surface=*paint.surface_;const auto &mesh=surface.mesh;
-  packet->storage_bytes_=sizeof(PaintOverlayPacket)+sizeof(PaintedMesh::SurfaceMap)+
-    (mesh.positions.capacity()+mesh.normals.capacity())*sizeof(Vec3)+mesh.uv.capacity()*sizeof(std::array<float,2>)+mesh.indices.capacity()*sizeof(uint32_t)+mesh.uv_pins.capacity()+mesh.uv_seams.capacity()+
-    surface.texels.capacity()*sizeof(PaintedMesh::SurfaceMap::Texel)+surface.extra.capacity()*sizeof(PaintedMesh::SurfaceMap::Extra)+surface.tiles.capacity()*sizeof(PaintedMesh::SurfaceMap::Bounds)+surface.padding.capacity()*sizeof(int32_t)+
-    surface.linked.size()*(sizeof(std::pair<const uint32_t,PaintedMesh::SurfaceMap::Head>)+2*sizeof(void*))+surface.linked.bucket_count()*sizeof(void*)+surface.diagnostics.unpaintable_uv_faces.capacity()*sizeof(uint32_t)+
-    (surface.paint_domain?surface.paint_domain->retained_bytes():0);
+  const auto &surface=*paint.surface_;
+  packet->storage_bytes_=sizeof(PaintOverlayPacket)+raster_storage_bytes(paint);
   auto coordinate_storage=[](const PaintSourceMaps *maps){size_t n=0;if(!maps)return n;
     n=sizeof(PaintSourceMaps);if(maps->uv1)n+=maps->uv1->capacity()*sizeof(std::array<float,2>);
     for(const auto &[set,uv]:maps->extra_uv_sets)if(uv)n+=uv->capacity()*sizeof(std::array<float,2>)+sizeof(decltype(maps->extra_uv_sets)::value_type)+3*sizeof(void*);
@@ -1681,6 +1689,29 @@ bool PaintedMesh::redo() {
   ++revision_;
   return true;
 }
+namespace {
+void finish_polygon_maps(TextureMaps &maps,const PaintedMesh &paint,
+    const std::shared_ptr<const SourceMaterialBindings> &binding,
+    std::shared_ptr<const detail::PaintOverlayPacket> packet,
+    const std::shared_ptr<const detail::PolygonSurfacePreview> &cached,
+    const std::function<bool()> &cancelled){
+  maps.baked_base=paint.baked();
+  if(paint.baked()&&paint.baked()->normal_field){
+    maps.normal=*paint.baked()->normal_field->pbr();
+    maps.mtoon_normal=*paint.baked()->normal_field->mtoon();
+  }
+  maps.overlay=std::move(packet);
+  detail::PolygonSurfaceTransferLimits limits;
+  limits.geometry.cancelled=cancelled;
+  if(cached&&!cached->matches(binding,paint.paint_sampling_attachment()))
+    throw std::invalid_argument("Cached polygon preview borrowed another actual source/material attachment");
+  maps.polygon_surface=cached?cached->with_bake(paint):detail::PolygonSurfacePreview::create(paint,binding,limits);
+  if(const auto &normal=maps.polygon_surface->native_bake())maps.normal=*normal;
+  maps.polygon_surface->validate_maps(maps);
+  paint_compute::checkpoint(cancelled);
+}
+}
+
 std::shared_ptr<const TextureMaps> detail::PolygonSurfacePaintCodec::preview(const PaintedMesh&paint,
     const std::shared_ptr<const SourceMaterialBindings>&binding,const Material&material,const std::function<bool()>&cancelled,
     std::shared_ptr<const detail::PolygonSurfacePreview>cached){
@@ -1698,14 +1729,34 @@ std::shared_ptr<const TextureMaps> detail::PolygonSurfacePaintCodec::preview(con
   auto safe=material;if(physical)safe.emissive={};
   // Only colour/ORM/emission use this original-grid composite. The full genuine
   // normal field remains separately owned and is evaluated by the typed range.
-  auto maps=std::make_shared<TextureMaps>(*detached->build_composite(safe,cancelled));maps->baked_base=paint.baked_;
-  if(paint.baked_&&paint.baked_->normal_field){maps->normal=*paint.baked_->normal_field->pbr();maps->mtoon_normal=*paint.baked_->normal_field->mtoon();}
-  maps->overlay=std::move(packet);PolygonSurfaceTransferLimits limits;limits.geometry.cancelled=cancelled;
-  if(cached&&!cached->matches(binding,paint.paint_sampling_attachment()))throw std::invalid_argument("Cached polygon preview borrowed another actual source/material attachment");
-  maps->polygon_surface=cached?cached->with_bake(paint):PolygonSurfacePreview::create(paint,binding,limits);
-  if(const auto &normal=maps->polygon_surface->native_bake())maps->normal=*normal;
-  maps->polygon_surface->validate_maps(*maps);
-  paint_compute::checkpoint(cancelled);return maps;
+  auto maps=detached->build_composite(safe,cancelled);
+  finish_polygon_maps(*maps,paint,binding,std::move(packet),cached,cancelled);
+  return maps;
+}
+std::shared_ptr<TextureMaps> detail::PolygonSurfacePaintCodec::preview_retained_hdr(
+    const TextureSetView&field,size_t &work,const TextureSetLimits&limits) {
+  limits.validate();
+  paint_compute::checkpoint(limits.cancelled);
+  if(!retained_hdr_grid(field))
+    throw std::invalid_argument("Retained HDR preview requires its actual PBR material member");
+  field.source->authenticate_owner(field.source);
+  const auto paint=field.source->read_view(field,limits);
+  const auto &binding=field.material_bindings;
+  const auto &cached=field.source->source_preview();
+  binding->validate();
+  binding->polygon_surface_transfer->validate_current(*paint);
+  field.material.validate();
+  const auto normal_bytes=retained_hdr_normal_bytes(field);
+  const auto map_bytes=native_hdr_grid_bytes(*paint,true);
+  if(map_bytes>limits.maximum_bytes||normal_bytes>limits.maximum_bytes-map_bytes)
+    throw std::length_error("Retained HDR preview exceeds its material and normal byte limit");
+  if(work>limits.maximum_work||normal_bytes/2>limits.maximum_work-work)
+    throw std::length_error("Retained HDR normal carriage exceeds its work limit");
+  work+=normal_bytes/2; // Copy and validate both normal images at texel granularity.
+  auto maps=compile_native_hdr_grid(*paint,field.material,work,limits,true);
+  auto packet=PaintOverlayFactory::capture_native_emission(*paint,limits.cancelled);
+  finish_polygon_maps(*maps,*paint,binding,std::move(packet),cached,limits.cancelled);
+  return maps;
 }
 bool detail::EmissionExportAccess::requires_preview(const PaintedMesh &paint,const Material &material,
     const SourceMaterialBindings *binding) {

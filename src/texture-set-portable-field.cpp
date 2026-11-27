@@ -4,6 +4,7 @@
 #include "polygon-surface-paint.hpp"
 #include "affine-surface.hpp"
 #include "emission-authority.hpp"
+#include "texture-set-native-grid.hpp"
 #include "dome/source-maps.hpp"
 #include <algorithm>
 #include <cmath>
@@ -285,12 +286,16 @@ PortableTextureSetField portable_texture_set_field(const TextureSetView &field,
    out.corners.push_back({local_n,{local_t.x,local_t.y,local_t.z,sign},paint,role});
   }
  }
- const auto read=field.source->read_view(field,limits);
- const auto maps=PolygonSurfacePaintCodec::preview(*read,field.material_bindings,field.material,limits.cancelled,preview);
- preview->validate_maps(*maps);
- if(!maps->pbr_color.rgba.empty())
+ std::shared_ptr<TextureMaps> portable;
+ if(retained_hdr_grid(field))portable=PolygonSurfacePaintCodec::preview_retained_hdr(field,work,limits);
+ else{
+  const auto read=field.source->read_view(field,limits);
+  const auto maps=PolygonSurfacePaintCodec::preview(*read,field.material_bindings,field.material,limits.cancelled,preview);
+  portable=std::make_shared<TextureMaps>(*maps);
+ }
+ preview->validate_maps(*portable);
+ if(!portable->pbr_color.rgba.empty())
   throw std::invalid_argument("Retained resolved colour export needs its actual per-field colour interpretation");
- auto portable=std::make_shared<TextureMaps>(*maps);
  portable->overlay.reset();
  portable->polygon_surface.reset();
  portable->baked_base.reset();
@@ -298,7 +303,7 @@ PortableTextureSetField portable_texture_set_field(const TextureSetView &field,
  portable->baked_normal={};
  portable->baked_coverage={};
  if(reproject){
-  const uint32_t original=maps->normal.width;
+  const uint32_t original=portable->normal.width;
   const auto maximum=portable_normal_export_max_resolution(original);
   auto image=reproject_normal(*preview,domain,out.corners,world,original,original,false,work,limits);
   if(!image&&maximum>original)

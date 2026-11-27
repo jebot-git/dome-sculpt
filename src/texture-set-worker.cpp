@@ -5,10 +5,12 @@
 #include "current-paint-preview.hpp"
 #include "polygon-surface-preview.hpp"
 #include "texture-set-paint-access.hpp"
+#include "texture-set-field-source.hpp"
 #include "texture-set-native-grid.hpp"
 #include <algorithm>
 #include <bit>
 #include <limits>
+#include <set>
 namespace dome::detail {
 namespace {
 void stop(const TextureSetLimits&l){if(l.cancelled&&l.cancelled())throw std::runtime_error("Texture-set snapshot cancelled");}
@@ -97,6 +99,7 @@ void append_texture_set_surface(MeshSnapshot&snapshot,const ObjectSurface&o,
  size_t preview_work=layout->preparation_work();
  if(preview_work>limits.maximum_work||corners>limits.maximum_work-preview_work||vertices>limits.maximum_work-preview_work-corners)throw std::length_error("Texture-set snapshot geometry exceeds its work bound");
  preview_work+=corners+vertices;
+ std::set<std::shared_ptr<const void>,std::owner_less<>> retained_rasters;
  for(size_t i=0;i<plan->fields().size();++i){
   if(!plan->draws()[i].count)continue;
   const auto&field=plan->fields()[i];
@@ -108,6 +111,17 @@ void append_texture_set_surface(MeshSnapshot&snapshot,const ObjectSurface&o,
    charge_grid_capture(bytes,preview_work,field,limits,false);
    charge(bytes,1,native_hdr_grid_bytes(*field.painted),limits);
    charge_native_hdr_grid_work(*field.painted,preview_work,limits);
+  }else if(view.render_only&&retained_hdr_grid(field)){
+   const auto read=field.source->read_view(field,limits);
+   const auto normals=retained_hdr_normal_bytes(field);
+   charge_grid_capture(bytes,preview_work,field,limits,false);
+   const auto original=TextureSetPaintAccess::raster_owner(*read);
+   if(retained_rasters.insert(original).second)
+    charge(bytes,1,PaintOverlayFactory::raster_storage_bytes(*read),limits);
+   charge(bytes,1,native_hdr_grid_bytes(*read,true),limits);
+   charge(bytes,1,normals,limits);
+   charge_preview_work(preview_work,normals/2,1,limits);
+   charge_native_hdr_grid_work(*read,preview_work,limits,true);
   }else{
    charge(bytes,pixels,128,limits);
    charge_preview_work(preview_work,pixels,(layers+1)*32,limits);

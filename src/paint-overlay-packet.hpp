@@ -76,6 +76,7 @@ inline bool overlay_uses_float_emission(const PaintOverlayPacket &packet) noexce
   return false;
 }
 struct PaintOverlayFactory {
+ static size_t raster_storage_bytes(const PaintedMesh &) noexcept;
  static std::shared_ptr<const PaintOverlayPacket> capture_paired_bake(
      const PaintedMesh &,const std::shared_ptr<const PaintNormalProjection> &,
      const std::function<bool()> &cancelled={});

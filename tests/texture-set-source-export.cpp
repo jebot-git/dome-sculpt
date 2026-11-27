@@ -24,6 +24,8 @@
 #include "polygon-surface-owner.hpp"
 #include "polygon-surface-paint.hpp"
 #include "paint-overlay-sample.hpp"
+#include "paint-emission-sample.hpp"
+#include "emission-exr-owned.hpp"
 #include <bit>
 #include <fstream>
 #include <iostream>
@@ -34,7 +36,7 @@ void check(bool v,const char*s){if(!v)throw std::runtime_error(s);++checks;}
 template<class F>void refuses(F&&f,const char*s){bool rejected=false;try{f();}catch(const std::exception&e){rejected=true;std::cout<<"EXPECTED "<<e.what()<<'\n';}check(rejected,s);}
 void ready(Document&d){check(d.wait_asset(std::chrono::seconds(120))&&d.wait_mesh(std::chrono::seconds(120)),"Actual native workers settle");if(!d.frame().state->error.empty())throw std::runtime_error(d.frame().state->error);}
 void polygon(Document&d){check(d.wait_polygon(std::chrono::seconds(120)),"Actual native polygon queue settles");if(!d.frame().state->error.empty())throw std::runtime_error(d.frame().state->error);}
-Image solid(std::array<uint8_t,4>rgba){Image out{64,64,{}};out.rgba.resize(64*64*4);for(size_t i=0;i<64*64;++i)std::copy(rgba.begin(),rgba.end(),out.rgba.begin()+i*4);return out;}
+Image solid(std::array<uint8_t,4>rgba,uint32_t resolution=64){Image out{resolution,resolution,{}};out.rgba.resize(size_t(resolution)*resolution*4);for(size_t i=0;i<out.rgba.size();i+=4)std::copy(rgba.begin(),rgba.end(),out.rgba.begin()+i);return out;}
 void native_owner_controls(const Scene&scene){
  const auto exact=scene.encode();const auto &actor=scene.active();const auto binding=actor.material_bindings;const auto native=binding->native_paint_sampling;
  const auto reopened=Scene::decode(exact);check(reopened.encode()==exact,"Actual native UV owner has an exact owning codec cycle before polygon capture");check(binding->sampling_reparameterized,"Genuine native KeepPaint before-binding declares its reparameterized sampling interpretation");
@@ -61,10 +63,10 @@ void move(Document&d){
  const auto topology=d.frame().state->polygon->topology;const auto mesh=topology->triangulate().mesh;const auto a=mesh.positions.at(mesh.indices.at(0)),b=mesh.positions.at(mesh.indices.at(1)),c=mesh.positions.at(mesh.indices.at(2));const auto p=a*.2f+b*.3f+c*.5f,n=normalized(cross(b-a,c-a));
  d.polygon_pointer(p+n,n*-1,PolygonAction::BeginDrag);polygon(d);check(d.frame().state->polygon->moving,"Actual selected face ray begins a native Move gesture");const Vec3 delta{.006f,.003f,0};d.polygon_pointer(p+n+delta,n*-1,PolygonAction::Drag);polygon(d);d.polygon_pointer(p+n+delta,n*-1,PolygonAction::EndDrag);polygon(d);
 }
-Scene source(bool prepared,bool reflected,bool floating=false,bool varying=false,bool recipes=false,bool split_grids=false){
+Scene source(bool prepared,bool reflected,bool floating=false,bool varying=false,bool recipes=false,bool split_grids=false,uint32_t resolution=64){
  Mesh m;m.positions={{-.8f,-.6f,0},{.8f,-.6f,0},{.8f,.6f,0},{-.8f,.6f,0}};m.normals.assign(4,{0,0,1});if(varying)m.normals[1]=normalized(Vec3{.2f,.1f,1});m.uv={{{.1f,.1f}},{{.9f,.1f}},{{.9f,.9f}},{{.1f,.9f}}};m.indices={0,1,2,0,2,3};
- Scene s;auto&o=s.active();o.mesh_active=true;o.material.double_sided=true;o.material.color={.4f,.3f,.2f,1};o.painted=std::make_shared<PaintedMesh>(m,64);
- if(prepared){BakedTextures bake;bake.maps.color=solid({90,100,110,255});bake.maps.metal_rough=solid({255,160,0,255});bake.maps.emission=solid({0,0,0,255});bake.maps.normal=solid({128,128,255,255});bake.coverage.assign(64*64,255);for(size_t y=0;y<64;++y)for(size_t x=0;x<64;++x){const auto at=(y*64+x)*4;bake.maps.normal.rgba[at]=uint8_t(96+x/4);bake.maps.normal.rgba[at+1]=uint8_t(112+y/3);bake.maps.normal.rgba[at+2]=240;}o.painted->install_bake(std::move(bake));auto converted=convert_canonical_normals({o.painted,{},{},{},o.material,{}});o.painted=std::move(converted.paint);o.material_bindings=std::move(converted.material_bindings);}
+ Scene s;auto&o=s.active();o.mesh_active=true;o.material.double_sided=true;o.material.color={.4f,.3f,.2f,1};o.painted=std::make_shared<PaintedMesh>(m,resolution);
+ if(prepared){BakedTextures bake;bake.maps.color=solid({90,100,110,255},resolution);bake.maps.metal_rough=solid({255,160,0,255},resolution);bake.maps.emission=solid({0,0,0,255},resolution);bake.maps.normal=solid({128,128,255,255},resolution);bake.coverage.assign(size_t(resolution)*resolution,255);for(size_t y=0;y<resolution;++y)for(size_t x=0;x<resolution;++x){const auto at=(y*resolution+x)*4;bake.maps.normal.rgba[at]=uint8_t(96+16*x/resolution);bake.maps.normal.rgba[at+1]=uint8_t(112+y/3);bake.maps.normal.rgba[at+2]=240;}o.painted->install_bake(std::move(bake));auto converted=convert_canonical_normals({o.painted,{},{},{},o.material,{}});o.painted=std::move(converted.paint);o.material_bindings=std::move(converted.material_bindings);}
  if(floating){PaintSettings ink;ink.front_only=false;ink.channel=PaintChannel::Emission;ink.emission_units=PaintEmissionUnits::Physical;ink.emission={3,.01f,1};Brush b;b.from=b.to={0,0,0};b.normal={0,0,1};b.radius=2;b.strength=1;o.painted->begin_stroke();o.painted->stamp(b,ink);check(o.painted->end_stroke(),"Negative fixture owns a genuine FLOAT stroke");}
  // The N-only positive must contain real byte paint and request the actual
  // KeepPaint UV transition. Empty ordinary Paint correctly uses the legacy
@@ -94,7 +96,7 @@ Scene source(bool prepared,bool reflected,bool floating=false,bool varying=false
  const auto before_polygon=d.copy_scene().encode();d.begin_polygon(true);polygon(d);d.edit_polygon(PolygonAction::Faces);polygon(d);d.edit_polygon(PolygonAction::SelectAll);polygon(d);move(d);d.edit_polygon(PolygonAction::FlipFaces);polygon(d);d.end_polygon(true);ready(d);
  if(!prepared&&!floating){const auto accepted=d.copy_scene().encode();check(accepted.at("version")==39&&Scene::decode(accepted).encode()==accepted,"Actual native UV to Move/Flip field has an exact owning Scene39 codec cycle");auto cyclic=accepted;const auto &bindings=cyclic.at("source_materials").at("bindings");size_t field_binding=0;while(field_binding<bindings.size()&&bindings.at(field_binding).at("polygon_surface_transfer").is_null())++field_binding;check(field_binding<bindings.size(),"Owning native history has its actual current polygon material node");cyclic.at("source_materials").at("native_paints").at(0).at("before_binding")=field_binding;refuses([&]{Scene::decode(cyclic);},"Nested native history cannot borrow a future current-field material or create a source cycle");check(d.undo()&&d.copy_scene().encode()==before_polygon&&d.redo()&&d.copy_scene().encode()==accepted,"Actual native Move/Flip has exact global Undo/Redo and original UV owner history");Document restart;restart.replace(Scene::decode(accepted));ready(restart);restart.restore_polygon_source();ready(restart);check(restart.copy_scene().encode()==before_polygon,"Restarted polygon source Restore recovers the actual original native UV paint owner");}
  auto result=d.copy_scene();auto&actor=result.active();auto placement=AffineTransform{}.matrix();placement[0]=reflected?-1.2:1.2;placement[1]=.1;placement[4]=.3;placement[5]=.8;placement[9]=.15;placement[10]=1.1;actor.affine_edit=std::make_shared<const NativeAffineEdit>(AffineTransform(placement));
- check(actor.material_bindings&&actor.material_bindings->polygon_surface_transfer,"Actual accepted native edit owns its original field");if(!prepared&&!floating){const auto &before=actor.material_bindings->polygon_surface_transfer->before();check(before->material_bindings&&before->material_bindings->native_paint_sampling&&before->paint->paint_sampling_domain()&&before->paint->paint_sampling_domain()->version()==1&&!before->paint->has_physical_emission(),"Genuine polygon before-root retains the complete native UV paint owner and original non-FLOAT basis");check(actor.material_bindings->polygon_surface_transfer->matches_current(*actor.painted),"Accepted N-only owner authenticates the actual new current Paint attachment");check(before->material_bindings->sampling_reparameterized&&!actor.material_bindings->sampling_reparameterized,"Actual native before=true and polygon current=false remain separate owning sampling interpretations");}const auto object=actor.id;const auto face=actor.polygon->topology.faces().front().id;create_texture_set(result,object,std::array<uint64_t,1>{face},"Exported retained slot",64);
+ check(actor.material_bindings&&actor.material_bindings->polygon_surface_transfer,"Actual accepted native edit owns its original field");if(!prepared&&!floating){const auto &before=actor.material_bindings->polygon_surface_transfer->before();check(before->material_bindings&&before->material_bindings->native_paint_sampling&&before->paint->paint_sampling_domain()&&before->paint->paint_sampling_domain()->version()==1&&!before->paint->has_physical_emission(),"Genuine polygon before-root retains the complete native UV paint owner and original non-FLOAT basis");check(actor.material_bindings->polygon_surface_transfer->matches_current(*actor.painted),"Accepted N-only owner authenticates the actual new current Paint attachment");check(before->material_bindings->sampling_reparameterized&&!actor.material_bindings->sampling_reparameterized,"Actual native before=true and polygon current=false remain separate owning sampling interpretations");}const auto object=actor.id;const auto face=actor.polygon->topology.faces().front().id;create_texture_set(result,object,std::array<uint64_t,1>{face},"Exported retained slot",resolution);
  // Collection publication atomically replaces Scene; retain the stable ID,
  // never a reference into its previous object vector, across public edits.
  edit_texture_set(result,object,1,[](PaintedMesh&,Material&m){m.name="Actual current second material";m.roughness=.3f;return true;});result.validate();const auto wire=result.encode();check(Scene::decode(wire).encode()==wire,"Actual current per-field native source collection survives owning Scene40 and retained history transport");return result;
@@ -105,21 +107,91 @@ uint32_t index_at(const detail::GltfDocument&d,int index,size_t n){const auto&a=
 Vec3 vector(const std::vector<float>&v){return {v.at(0),v.at(1),v.at(2)};}
 Vec3 unit(AffineVector v){return normalized(Vec3{float(v[0]),float(v[1]),float(v[2])});}
 Image texture_image(const detail::GltfDocument&d,const nlohmann::json&info){const auto&texture=d.json.at("textures").at(info.at("index").get<size_t>());const auto&image=d.json.at("images").at(texture.at("source").get<size_t>());const auto&view=d.json.at("bufferViews").at(image.at("bufferView").get<size_t>());const auto offset=view.value("byteOffset",size_t(0)),count=view.at("byteLength").get<size_t>();check(offset<=d.binary.size()&&count<=d.binary.size()-offset,"Actual material PNG lies within the emitted buffer");return decode_projection_png(std::span(d.binary).subspan(offset,count));}
-void retained_hdr_export(bool standard){
- auto scene=source(true,false);
+void audit_normals(const detail::GltfDocument &,const ObjectSurface &,float);
+void retained_hdr_export(bool standard,uint32_t resolution=64){
+ auto scene=source(true,false,false,false,false,false,resolution);
  const auto object=scene.active().id;
- for(TextureSetId set:{0u,1u})check(edit_texture_set(scene,object,set,[&](PaintedMesh &paint,Material &material){
+ const bool production=resolution>64;
+ for(TextureSetId set:{0u,1u}){
+  Vec3 center{};
+  if(production){
+   const auto member=texture_set_view(scene.active(),set);
+   const auto &mesh=member.painted->mesh();
+   const auto triangle=member.domain->triangles().front();
+   for(size_t k=0;k<3;++k)center+=mesh.positions.at(mesh.indices.at(size_t(triangle)*3+k))*(1.f/3);
+  }
+  check(edit_texture_set(scene,object,set,[&](PaintedMesh &paint,Material &material){
    material.emissive=set?std::array<float,3>{.15f,.6f,.1f}:std::array<float,3>{.6f,.1f,.2f};
    paint.add_layer("Distinct editable HDR field");
-   Brush brush;brush.from=brush.to={0,0,0};brush.normal={0,0,1};brush.radius=2;brush.strength=.8f;
+   Brush brush;brush.from=brush.to=center;brush.normal={0,0,1};brush.radius=production?.046f:2.f;brush.strength=.8f;
    PaintSettings settings;settings.front_only=false;settings.channel=PaintChannel::Emission;
    settings.emission_units=PaintEmissionUnits::Physical;
    settings.emission=set?std::array<float,3>{.05f,11.f,1.f}:std::array<float,3>{6.f,.03f,.5f};
-   paint.begin_stroke();paint.stamp(brush,settings);return paint.end_stroke();
- }),"The retained texture set has independently authored FLOAT radiance");
+   paint.begin_stroke();paint.stamp(brush,settings);const bool emission=paint.end_stroke();
+   if(!production)return emission;
+   settings.channel=PaintChannel::Color;
+   settings.color={.7f,.13f,.4f,.72f};
+   brush.from.x+=.023f;brush.to=brush.from;
+   paint.begin_stroke();paint.stamp(brush,settings);
+   const bool color=paint.end_stroke();
+   return emission&&color;
+  }),"The retained texture set has independently authored FLOAT radiance");
+ }
  const auto exact=scene.encode();
  Document doc;
- doc.replace(scene);ready(doc);
+ if(production){
+  scene.save("source.dsculpt");doc.open_async("source.dsculpt").get();ready(doc);
+  const auto frame=doc.frame().surface;
+  check(frame&&frame->ranges.size()==2&&frame->picking,
+        "Cold native Open publishes both production retained sets and authenticated picking");
+  for(const auto &range:frame->ranges){
+   const auto member=texture_set_view(scene.active(),range.texture_set);
+   const auto paint=member.source->read_view(member);
+   const auto reference=detail::PolygonSurfacePaintCodec::preview(*paint,member.material_bindings,
+       member.material,{},member.source->source_preview());
+   const auto &maps=*range.textures;
+   check(maps.color.rgba==reference->color.rgba&&maps.metal_rough.rgba==reference->metal_rough.rgba&&
+       maps.normal.rgba==reference->normal.rgba&&maps.mtoon_normal.rgba==reference->mtoon_normal.rgba&&
+       maps.transparent==reference->transparent&&maps.polygon_surface,
+       "Production preview matches every original material and retained normal byte");
+  }
+  if(standard){
+   const auto active=active_texture_set(scene.active());
+   const auto triangle=active.domain->triangles().front();
+   const auto &mesh=active.painted->mesh();
+   const auto world=scene.world_matrix(object);
+   std::array<Vec3,3> points;
+   for(size_t k=0;k<3;++k){
+    const auto p=mesh.positions.at(mesh.indices.at(size_t(triangle)*3+k));
+    const auto q=world.point({p.x,p.y,p.z});
+    points[k]={float(q[0]),float(q[1]),float(q[2])};
+   }
+   const auto center=(points[0]+points[1]+points[2])*(1.f/3);
+   const auto n=normalized(cross(points[1]-points[0],points[2]-points[0]));
+   PaintSettings ink;
+   ink.front_only=false;
+   ink.color={.2f,.8f,.45f,.9f};
+   doc.paint_settings(ink);
+   doc.configure(Tool::Clay,.035f);
+   NativeStrokeSample sample;
+   sample.origin=center+n*.14f;
+   sample.direction=n*-1;
+   sample.brush.radius=.035f;
+   sample.brush.pressure=1;
+   sample.brush.strength=1;
+   check(doc.begin_native_stroke()&&doc.sample_native_stroke(sample),
+         "Production retained member admits a native desktop paint ray");
+   doc.end_native_stroke(true);
+   check(doc.wait_native_stroke(),"Prepared retained desktop stroke drains");
+   ready(doc);
+   const auto accepted=doc.copy_scene().encode();
+   check(accepted!=exact,"Desktop stroke changes the selected retained member");
+   check(doc.undo()&&doc.copy_scene().encode()==exact&&
+         doc.redo()&&doc.copy_scene().encode()==accepted&&doc.undo()&&doc.copy_scene().encode()==exact,
+         "Prepared retained desktop paint has exact Undo and Redo");
+   ready(doc);
+  }
+ }else{doc.replace(scene);ready(doc);}
  const std::filesystem::path file=standard?"standard-retained-hdr.glb":"editable-retained-hdr.glb";
  doc.export_asset(file,standard?AssetExportFormat::Glb:AssetExportFormat::EditableGlb512).get();
  std::ifstream stream(file,std::ios::binary);
@@ -155,8 +227,15 @@ void retained_hdr_export(bool standard){
    size_t peak=0;
    for(size_t i=0;i<image.rgba.size();i+=4)peak=std::max(peak,size_t(image.rgba[i+set]));
    const auto strength=m.at("extensions").at("KHR_materials_emissive_strength").at("emissiveStrength").get<float>();
-   check(image.width==64&&image.height==64&&peak==255&&m.at("emissiveFactor").at(set)==1&&
+   check(image.width==resolution&&image.height==resolution&&peak==255&&m.at("emissiveFactor").at(set)==1&&
          strength>(set?5.f:2.f),"Independent decoded PNG and strength keep the field's above-one dominant radiance");
+ }
+ if(production){
+   const auto surfaces=scene.export_surfaces();
+   audit_normals(parsed,surfaces.at(0),.02f);
+   TextureSetLimits tight;tight.maximum_work=2'000'000;
+   refuses([&]{detail::compile_texture_set_export(surfaces.at(0),tight,true);},
+       "A tighter shared budget still refuses the production material grids");
  }
  if(standard){
    const auto &package=parsed.json.at("extras").at("domeSculptEmission");
@@ -167,10 +246,27 @@ void retained_hdr_export(bool standard){
      const auto &view=parsed.json.at("bufferViews").at(record.at("bufferView").get<size_t>());
      const auto raw=std::span(parsed.binary).subspan(view.at("byteOffset").get<size_t>(),
          view.at("byteLength").get<size_t>());
-     const auto field=decode_emission_exr(raw);
-     check(record.at("textureSet").at("id")==set&&field.width==64&&field.version==2,
-         "The independent OpenEXR resource carries its actual member and full FLOAT grid");
+     const auto member=texture_set_view(scene.active(),set);
+     const auto paint=member.source->read_view(member);
+     const detail::PaintEmissionSampler reference(*paint);
+     const auto background=member.material_bindings->physical_emission.value_or(member.material.emissive);
+     size_t visited=0;
+     const auto field=detail::read_emission_exr_rows(raw,[&](uint32_t y,std::span<const detail::EmissionExrPixel> pixels){
+       for(size_t i=0;i<pixels.size();++i){
+         const auto q=reference.sample_texel(uint32_t(i%resolution),y+uint32_t(i/resolution));
+         const auto rgb=q.resolve(background,1);
+         const detail::EmissionExrPixel want{rgb[0],rgb[1],rgb[2],q.legacy[0],q.legacy[1],q.legacy[2],
+             q.absolute[0],q.absolute[1],q.absolute[2],q.coverage};
+         if(std::bit_cast<std::array<uint32_t,10>>(want)!=std::bit_cast<std::array<uint32_t,10>>(pixels[i]))
+           throw std::runtime_error("Retained FLOAT texel differs from the dense reference");
+         ++visited;
+       }
+     },{});
+     check(record.at("textureSet").at("id")==set&&field.width==resolution&&field.version==2&&
+         visited==size_t(resolution)*resolution,
+         "The independent OpenEXR resource carries every exact FLOAT coefficient of its member");
    }
+   if(!production){
    auto bad_package=[&](const char *name,const char *expected,const auto &alter){
      auto damaged=parsed;
      auto &marker=damaged.json["extras"]["domeSculptEmission"];
@@ -192,6 +288,7 @@ void retained_hdr_export(bool standard){
      std::swap(images[0]["sha256"],images[1]["sha256"]);
    });
    bad_package("omitted-hdr-member.glb","omitted a visible physical material",[](auto &images){images.erase(1);});
+   }
  }
  std::cout<<"RETAINED_HDR "<<(standard?"Standard":"Editable")<<" "<<bytes.size()
           <<" container bytes; native source exact\n";
@@ -928,10 +1025,10 @@ int main(int argc,char **argv)try {
   std::cout<<"PASS "<<checks<<" native-normal retained target checks\n";
   return 0;
  }
- if(argc==3&&(mode=="--retained-hdr-editable"||mode=="--retained-hdr-standard")){
+ if((argc==3||argc==4)&&(mode=="--retained-hdr-editable"||mode=="--retained-hdr-standard")){
   std::filesystem::create_directories(argv[2]);std::filesystem::current_path(argv[2]);
   const bool standard=mode=="--retained-hdr-standard";
-  retained_hdr_export(standard);
+  retained_hdr_export(standard,argc==4?uint32_t(std::stoul(argv[3])):64);
   std::cout<<"PASS "<<checks<<" retained "<<(standard?"Standard":"Editable")<<" HDR controls\n";
   return 0;
  }

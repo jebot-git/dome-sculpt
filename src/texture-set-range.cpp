@@ -7,6 +7,7 @@
 #include "dome/document.hpp"
 #include "paint-overlay-packet.hpp"
 #include "current-paint-preview.hpp"
+#include "texture-set-native-grid.hpp"
 #include <bit>
 #include <limits>
 namespace dome::detail {
@@ -30,7 +31,11 @@ std::shared_ptr<const TextureSetRangeProof> prepare_texture_set_range(
  if(first>std::numeric_limits<size_t>::max()-plan->draws()[field].first||vertex>UINT32_MAX||layout->vertices().size()>uint64_t(UINT32_MAX)+1-vertex)throw std::length_error("Texture-set packed location exceeds native index bounds");
  auto result=std::shared_ptr<TextureSetRangeProof>(new TextureSetRangeProof);result->plan_=std::move(plan);result->field_=field;result->layout_=std::move(layout);result->first_=first+result->draw().first;result->vertex_=vertex;
  if(view.source){
-  const auto read=view.source->read_view(view);result->maps_=PolygonSurfacePaintCodec::preview(*read,view.material_bindings,view.material,cancelled,view.source->source_preview());
+  const auto read=view.source->read_view(view);
+  if(render_only&&retained_hdr_grid(view)){
+   TextureSetLimits limits;limits.cancelled=cancelled;size_t work=0;
+   result->maps_=PolygonSurfacePaintCodec::preview_retained_hdr(view,work,limits);
+  }else result->maps_=PolygonSurfacePaintCodec::preview(*read,view.material_bindings,view.material,cancelled,view.source->source_preview());
   if(!result->maps_||!result->maps_->polygon_surface||!result->maps_->polygon_surface->matches(view.material_bindings,read->paint_sampling_attachment())||result->layout_->canonical(field))throw std::invalid_argument("Retained texture-set range lost its actual source/current field packet");
  }else{
   result->maps_=render_only?CurrentGridPaintPreview::for_field(result->plan_->object(),view,cancelled):nullptr;

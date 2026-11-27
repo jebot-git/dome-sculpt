@@ -2,6 +2,7 @@
 #pragma once
 #include "polygon-surface-codec.hpp"
 #include "dome/material-bindings.hpp"
+namespace dome {struct TextureSetView;struct TextureSetLimits;}
 namespace dome::detail {
 // Typed private envelope seam. An actual replayed node grants only its exact
 // current geometry/grid correspondence, never another field or arbitrary Paint.
@@ -12,6 +13,8 @@ struct PolygonSurfacePaintCodec {
      const std::shared_ptr<const SourceMaterialBindings> &,const Material &,
      const std::function<bool()> &cancelled={},
      std::shared_ptr<const PolygonSurfacePreview> cached={});
+ static std::shared_ptr<TextureMaps> preview_retained_hdr(const TextureSetView &,size_t &,
+     const TextureSetLimits &);
  static nlohmann::json encode(const PaintedMesh &,
      const std::shared_ptr<const SourceMaterialBindings> &,PolygonSurfaceNodeWriter &,
      PaintImageArchive &,NormalSamplingArchive * = nullptr,
