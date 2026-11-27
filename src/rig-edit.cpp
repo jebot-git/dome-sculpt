@@ -4,6 +4,7 @@
 #include <nlohmann/json.hpp>
 #include "source-rigid-pose.hpp"
 #include "source-rest-scene.hpp"
+#include "source-skin-link.hpp"
 #include "native-rig-pose-scope.hpp"
 namespace dome {
 namespace {
@@ -34,6 +35,24 @@ void edit_rig(Scene &scene, uint64_t object, const RigEdit &edit,
   const auto &source = scene.object(object);
   const auto &old = editable(source);
   bool pose_edit = edit.joint.has_value() || edit.reset_pose;
+  if (pose_edit && !old.source_skin_joints.empty()) {
+    if (!edit.linked_pose) throw std::invalid_argument("Pose all linked parts of the original avatar");
+    const auto link = detail::source_skin_link(scene.group_path(source.group), old);
+    const auto &reference = detail::source_skin_reference(scene, *link);
+    if (old.source_skin_joints != reference.appearance->source_joint_nodes)
+      throw std::invalid_argument("The linked attachment has a stale original joint table");
+    Scene next = scene;
+    auto shared = edit;
+    shared.morph.reset();
+    edit_rig(next, reference.id, shared, cancelled);
+    if (edit.morph) {
+      RigEdit morph;
+      morph.morph = edit.morph;
+      edit_rig(next, object, morph, cancelled);
+    }
+    scene = std::move(next);
+    return;
+  }
   if(pose_edit&&source.rig_source&&detail::source_rest_identity(scene,source)){
     detail::edit_source_rest_pose(scene,object,edit,cancelled);return;
   }
@@ -55,9 +74,12 @@ void edit_rig(Scene &scene, uint64_t object, const RigEdit &edit,
   if (pose_edit && imported && !edit.linked_pose) {
     for (const auto &part : scene.objects()) {
       check_cancel(cancelled);
-      if (!detail::native_texture_set_accessory(part)) continue;
-      const auto bone = detail::source_accessory_attachment(scene.group_path(part.group));
-      if (bone && bone->model == imported->model && bone->source_instance == imported->source_instance)
+      std::shared_ptr<const SourceNodePlacement> attachment;
+      if (part.deformation && !part.deformation->source_skin_joints.empty())
+        attachment = detail::source_skin_link(scene.group_path(part.group), *part.deformation);
+      else if (detail::native_texture_set_accessory(part))
+        attachment = detail::source_accessory_attachment(scene.group_path(part.group));
+      if (attachment && detail::same_source_skin_instance(*attachment, *imported))
         throw std::invalid_argument("Pose all linked rig parts when an accessory is attached to an avatar bone");
     }
   }
@@ -186,6 +208,7 @@ void edit_rig(Scene &scene, uint64_t object, const RigEdit &edit,
   Scene result = scene;
   for (auto &[id, next] : changes) result.object(id).deformation = std::move(next);
   if (pose_edit && edit.linked_pose && imported) {
+    detail::update_native_source_skins(scene, result, *imported, cancelled);
     for (const auto &o : scene.objects()) {
       check_cancel(cancelled);
       if (o.deformation && o.deformation->skin) continue;

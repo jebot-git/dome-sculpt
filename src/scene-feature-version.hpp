@@ -26,6 +26,7 @@ inline unsigned minimum_scene_version(const PolygonOrigin *p);
 inline unsigned minimum_scene_version(const DeformationState *d) {
   if (!d || !d->skeleton)
     return 0;
+  if(!d->source_skin_joints.empty())return 40u;
   if(std::any_of(d->pose.begin(),d->pose.end(),[](const auto&t){return bool(t.full_local_matrix);}))return 25u;
   const auto &s = *d->skeleton;
   return s.inverse_bind_override || s.space_matrix ||
@@ -118,6 +119,7 @@ inline unsigned minimum_scene_version(const PolygonAuthority *p){return source_f
 inline unsigned minimum_scene_version(const PolygonOrigin *p){return source_feature_version(nullptr,p);}
 inline unsigned minimum_deformation_scene_version(const nlohmann::json &d) {
   if(!d.is_null()){
+    if(d.contains("source_skin_joints")||(d.contains("version")&&d.at("version")==3))return 40;
     if(d.contains("version")&&d.at("version")==2)return 25;
     if(d.contains("pose")&&d.at("pose").is_array())for(const auto&t:d.at("pose"))if(t.is_object()&&t.contains("full_local_matrix"))return 25;
   }

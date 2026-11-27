@@ -61,6 +61,7 @@ struct Append {
   std::map<const SourcePlacementCapsule *,std::shared_ptr<const SourcePlacementCapsule>> capsules;
   std::map<const PolygonOrigin *,std::shared_ptr<const PolygonOrigin>> origins;
   std::map<const PolygonAuthority *,std::shared_ptr<const PolygonAuthority>> authorities;
+  std::map<const DeformationState *,std::shared_ptr<const DeformationState>> deformations;
   std::map<const RetopoPatch *,std::shared_ptr<const RetopoPatch>> patches;
   void stop() const {if(cancelled&&cancelled())throw std::runtime_error("Native package append cancelled");}
   void collect_group(const SceneGroup &g){reserved_groups.insert(g.id);source_group_ids.insert(g.id);if(g.source_placement)instances.insert(g.source_placement->source_instance);}
@@ -160,10 +161,20 @@ struct Append {
     auto n=std::make_shared<PolygonAuthority>(*p);n->origin=origin(p->origin);
     authorities.emplace(p.get(),n);return n;
   }
+  std::shared_ptr<const DeformationState> deformation(const std::shared_ptr<const DeformationState> &p){
+    stop();if(!p||!p->source_skin_instance)return p;
+    if(auto at=deformations.find(p.get());at!=deformations.end())return at->second;
+    const auto root=groups.find(p->source_skin_instance);
+    if(root==groups.end())throw std::invalid_argument("Native package lost its linked skin instance root");
+    auto n=std::make_shared<DeformationState>(*p);
+    n->source_skin_instance=root->second;
+    deformations.emplace(p.get(),n);return n;
+  }
   std::shared_ptr<const PolygonOrigin> origin(const std::shared_ptr<const PolygonOrigin> &p){
     stop();if(!p)return {};
     if(auto i=origins.find(p.get());i!=origins.end())return i->second;
     auto n=std::make_shared<PolygonOrigin>(*p);
+    n->deformation=deformation(p->deformation);
     n->placement=capsule(p->placement);n->polygon=authority(p->polygon);
     n->shape_source=origin(p->shape_source);n->rig_source=origin(p->rig_source);
     n->retopology=patch(p->retopology);n->bake_recipe=bake_recipes.recipe(p->bake_recipe);
@@ -233,6 +244,7 @@ NativeSceneAppend append_native_scene(const Scene &destination,const Scene &pack
   const detail::BakeRecipeRemap::OriginRemap retained=[&a](const auto &before){return a.origin(before);};
   for(const auto &o:source.objects()){
     a.stop();auto copy=o;copy.id=a.objects.at(o.id);copy.group=o.group?a.groups.at(o.group):0;
+    copy.deformation=a.deformation(o.deformation);
     copy.polygon=a.authority(o.polygon);copy.shape_source=a.origin(o.shape_source);
     copy.rig_source=a.origin(o.rig_source);copy.retopology=a.patch(o.retopology);
     copy.bake_recipe=a.bake_recipes.recipe(o.bake_recipe);

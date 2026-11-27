@@ -120,6 +120,7 @@ target_sources(dome-sculpt-core PRIVATE src/cut-authoring.cpp src/cut-color.cpp 
 target_sources(dome-sculpt-core PRIVATE src/object-selection.cpp)
 target_sources(dome-sculpt-core PRIVATE src/source-sampling-transport.cpp)
 target_sources(dome-sculpt-core PRIVATE src/source-placement.cpp src/source-placement-archive.cpp)
+target_sources(dome-sculpt-core PRIVATE src/source-skin-link.cpp)
 target_sources(dome-sculpt-core PRIVATE src/polygon-authoring.cpp src/polygon-source.cpp src/polygon-color-source.cpp src/polygon-color-archive.cpp src/polygon-scene.cpp src/polygon-conversion.cpp src/document-polygon.cpp)
 target_sources(dome-sculpt-core PRIVATE src/polygon-surface-transfer.cpp src/polygon-surface-owner.cpp src/polygon-surface-codec.cpp src/polygon-surface-preview.cpp src/polygon-surface-paint.cpp src/polygon-surface-archive.cpp)
 target_include_directories(dome-sculpt-core PRIVATE third_party/cgltf)

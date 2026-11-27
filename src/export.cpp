@@ -535,6 +535,7 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
             if(pose.full_local_matrix)identity["pose"].back()["full_local_matrix"]=*pose.full_local_matrix;
           }
           if(d.humanoid) identity["humanoid"]=d.humanoid->encode();
+          if(!d.source_skin_joints.empty())identity["nativeSourceJointSlots"]=d.source_skin_joints;
           if(source_bones){
             auto extras=nlohmann::json::array();bool present=false;
             for(auto source:o.appearance->source_joint_nodes){

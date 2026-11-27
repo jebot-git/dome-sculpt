@@ -34,6 +34,7 @@
 #include "dome/vrm-authoring.hpp"
 #include "editable-avatar-eligibility.hpp"
 #include "source-rigid-pose.hpp"
+#include "source-skin-link.hpp"
 #include "dome/gltf-export.hpp"
 #include "dome/mesh-processing.hpp"
 #include "dome/mesh-authoring.hpp"
@@ -99,6 +100,8 @@ uint64_t avatar_group(const Scene &scene, uint64_t object) {
   if (retained_avatar(active))
     if (const auto instance = original_avatar_root(path, *active.appearance))
       return instance;
+  if (active.deformation && !active.deformation->source_skin_joints.empty())
+    return detail::source_skin_link(path, *active.deformation)->source_instance;
   if (detail::native_texture_set_accessory(active)) {
     const auto bone = detail::source_accessory_attachment(path);
     size_t deepest = 0;
@@ -755,7 +758,8 @@ void Document::publish_locked(bool force,bool checkpoint) {
   state_.can_export_avatar = avatar && std::any_of(scene_.objects().begin(), scene_.objects().end(),
       [&](const auto &o) { return retained_avatar(o) && in_group(scene_, o, avatar); });
   state_.can_export_editable_avatar = state_.can_export_avatar && active.visible &&
-      (detail::editable_avatar_source(active) || (detail::native_texture_set_accessory(active) &&
+      (detail::editable_avatar_source(active) || ((detail::native_texture_set_accessory(active) ||
+          (active.deformation && !active.deformation->source_skin_joints.empty())) &&
           std::any_of(scene_.objects().begin(), scene_.objects().end(), [&](const auto &o) {
             return o.visible && detail::editable_avatar_source(o) && in_group(scene_, o, avatar);
           })));

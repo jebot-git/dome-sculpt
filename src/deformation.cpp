@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/deformation.hpp"
 #include "humanoid-placement.hpp"
+#include "deformation-json.hpp"
 #include <nlohmann/json.hpp>
+#include <set>
 namespace dome {
 namespace {
 constexpr size_t maximum_entries = 8'000'000;
@@ -20,7 +22,7 @@ void source_valid(const Mesh &mesh, uint64_t source) {
 DeformationState::DeformationState(const Mesh &mesh)
     : source(morph_topology_id(mesh)) {}
 size_t DeformationState::resource_entries() const {
-  size_t count = pose.size() + morph_weights.size();
+  size_t count = pose.size() + morph_weights.size() + source_skin_joints.size();
   for(const auto &t:pose)if(t.full_local_matrix)count+=16;
   if (morphs) {
     if (morphs->targets.size() > 128)
@@ -47,6 +49,18 @@ void DeformationState::validate(const Mesh &rest) const {
   resource_entries();
   if (!skeleton && (skin || humanoid || !pose.empty()))
     fail("Skin, humanoid mapping or pose requires a skeleton");
+  if (bool(source_skin_instance) != !source_skin_joints.empty() ||
+      (!source_skin_instance && source_skin_node) || source_skin_node >= 100000)
+    fail("Invalid source skin instance or mesh node");
+  if (!source_skin_joints.empty()) {
+    if (!skin || !skeleton || !skeleton->space_matrix || !skeleton->inverse_bind_override ||
+        source_skin_joints.size() != skeleton->bones.size() || source_skin_joints.size() > 256)
+      fail("Linked source skin requires a complete explicit bind and joint table");
+    std::set<uint32_t> unique;
+    for (const auto joint : source_skin_joints)
+      if (joint >= 100000 || !unique.insert(joint).second)
+        fail("Invalid or repeated original joint in source skin link");
+  }
   if (skeleton) {
     skeleton->validate();
     if (!pose.empty())
@@ -99,7 +113,7 @@ Mesh DeformationState::preview(const Mesh &rest) const {
 nlohmann::json DeformationState::encode(const Mesh &rest) const {
   validate(rest);
   const bool exact_pose=std::any_of(pose.begin(),pose.end(),[](const auto &t){return bool(t.full_local_matrix);});
-  auto json = nlohmann::json{{"version", exact_pose?2:1},
+  auto json = nlohmann::json{{"version", source_skin_joints.empty()?(exact_pose?2:1):3},
                              {"source", source},
                              {"pose", nlohmann::json::array()},
                              {"morph_weights", morph_weights}};
@@ -117,11 +131,16 @@ nlohmann::json DeformationState::encode(const Mesh &rest) const {
   json["landmarks"] = landmarks ? landmarks->encode() : nlohmann::json(nullptr);
   json["expressions"] =
       expressions ? expressions->encode() : nlohmann::json(nullptr);
+  if (source_skin_instance) {
+    json["source_skin_instance"] = source_skin_instance;
+    json["source_skin_node"] = source_skin_node;
+    json["source_skin_joints"] = source_skin_joints;
+  }
   return json;
 }
 DeformationState DeformationState::decode(const nlohmann::json &j,
                                           const Mesh &rest) {
-  if (!j.is_object() || !j.at("version").is_number_integer() || (j.at("version") != 1 && j.at("version") != 2) ||
+  if (!j.is_object() || !j.at("version").is_number_integer() || (j.at("version") != 1 && j.at("version") != 2 && j.at("version") != 3) ||
       (!j.at("source").is_number_unsigned() &&
        (!j.at("source").is_number_integer() ||
         j.at("source").get<int64_t>() < 0)))
@@ -135,15 +154,14 @@ DeformationState DeformationState::decode(const nlohmann::json &j,
       values.size() > 128)
     fail("Deformation preview resource limits exceeded");
   // Aggregate dimensions before allocating authoring arrays.
-  size_t entries = pose.size() + values.size();
-  bool has_exact_pose=false;
-  for(const auto &t:pose)if(t.contains("full_local_matrix")){
-    if(j.at("version")==1)fail("Exact pose-local matrix requires deformation version two");
-    const auto &matrix=t.at("full_local_matrix");if(!matrix.is_array()||matrix.size()!=16)fail("Invalid exact pose-local matrix dimensions");
-    for(const auto &v:matrix)if(!v.is_number())fail("Invalid exact pose-local matrix component");
-    entries+=16;has_exact_pose=true;
+  size_t entries = pose.size() + values.size() + detail::encoded_pose_matrix_entries(j);
+  const auto link_entries = detail::encoded_source_skin_entries(j);
+  entries += link_entries;
+  if(link_entries) {
+    result.source_skin_instance = j.at("source_skin_instance").get<uint64_t>();
+    result.source_skin_node = j.at("source_skin_node").get<uint32_t>();
+    result.source_skin_joints = j.at("source_skin_joints").get<std::vector<uint32_t>>();
   }
-  if(j.at("version")==2&&!has_exact_pose)fail("Deformation version two requires exact pose-local authority");
   const auto &skin = j.at("skin"), &morphs = j.at("morphs");
   if (!skin.is_null()) {
     const auto &vertices = skin.at("vertices");

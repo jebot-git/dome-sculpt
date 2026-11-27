@@ -77,7 +77,7 @@ void edit_skin_dialog(Document &doc) {
       names.reserve(scene->objects().size());items.reserve(scene->objects().size()+1);
       for(const auto &o:scene->objects()) if((mode->value()!=2 || detail::anatomical_source_target(scene->object(target))) && o.mesh_active && o.painted && o.deformation &&
           o.deformation->skeleton && (mode->value()!=1 || (o.deformation->skin && o.id!=target)) && (mode->value()!=2 || (o.deformation->humanoid && o.deformation->humanoid->joints.contains("head") && o.deformation->humanoid->joints.contains("leftEye") && o.deformation->humanoid->joints.contains("rightEye")))) {
-        ids.push_back(o.id);names.push_back(o.name+(o.visible?"":" [hidden]"));
+        ids.push_back(o.id);names.push_back("#"+std::to_string(o.id)+" "+o.name+(o.visible?"":" [hidden]"));
       }
       for(const auto &name:names){Fl_Menu_Item item{};item.label(name.c_str());items.push_back(item);}
       items.emplace_back();source->copy(items.data());
@@ -88,7 +88,10 @@ void edit_skin_dialog(Document &doc) {
       if(!anatomical){fields[4]->activate();fields[5]->activate();if(heat)fields[0]->activate();else if(mode->value()==0){fields[0]->activate();fields[1]->activate();fields[3]->activate();}else fields[2]->activate();}
       for(auto *field:budgets)if(bounded)field->activate();else field->deactivate();
       if(bounded&&has_selection)selected->activate();else selected->deactivate();
-      hint->label(heat?"Automatic weights from visible bone support.\nKeep paint, morphs and pose.\nDifferent rest rigs need explicit joint mapping.":anatomical?"Complete retained unskinned source group.\nAnatomical surface/contact weights in REST.\nFixed4 influences / prune0.00001; originals retained.":"Bind in the reference rest frame.\nKeep target paint, morphs and pose.\nDifferent rigs need joint mapping.");
+      hint->label(anatomical?"Complete retained unskinned source group.\nAnatomical surface/contact weights in REST.\nFour influences with originals retained.":
+        scene->object(target).texture_sets?"Bind in the reference rest frame.\nA visible original VRM 1.0 rig also links poses and avatar export.":
+        heat?"Automatic weights from visible bone support.\nKeep paint, morphs and pose.\nDifferent rest rigs need explicit joint mapping.":
+        "Bind in the reference rest frame.\nKeep target paint, morphs and pose.\nDifferent rigs need joint mapping.");
       apply->label(anatomical?"Bind anatomy":"Bind / transfer");
     }
   } context{&window,&source,&mode,&apply,&draft.scene,target.id,&options,{},{},

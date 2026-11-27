@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "source-rest-graph.hpp"
 #include "source-rigid-pose.hpp"
+#include "source-skin-link.hpp"
 #include "import-skin.hpp"
 #include "dome/polygon-scene.hpp"
 #include <set>
@@ -30,7 +31,12 @@ std::shared_ptr<const SourceNodePlacement> source_rest_identity(const Scene &sce
 }
 std::vector<uint64_t> source_rest_targets(const Scene &scene,uint64_t selected){
  const auto identity=source_rest_identity(scene,scene.object(selected));require(bool(identity),"Select an authenticated original source instance for rest editing");std::vector<uint64_t> targets;
- for(const auto &object:scene.objects())if(member(identity,source_rest_identity(scene,object)))targets.push_back(object.id);
+ for(const auto &object:scene.objects()){
+  auto other=source_rest_identity(scene,object);
+  if(!other&&object.deformation&&!object.deformation->source_skin_joints.empty())
+   other=source_skin_link(scene.group_path(object.group),*object.deformation);
+  if(member(identity,other))targets.push_back(object.id);
+ }
  require(!targets.empty()&&targets.size()<=256,"Original source instance exceeds native object bounds");return targets;
 }
 SourcePoseResolution SourceRestGraph::pose_agreement(uint32_t node)const{

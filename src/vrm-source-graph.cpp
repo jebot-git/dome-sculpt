@@ -6,6 +6,7 @@
 #include "source-morph.hpp"
 #include "source-rest-graph.hpp"
 #include "source-rigid-pose.hpp"
+#include "source-skin-link.hpp"
 #include "dome/polygon-scene.hpp"
 #include "dome/humanoid-creator.hpp"
 #include "bone-metadata.hpp"
@@ -62,7 +63,7 @@ VrmSourceGraph vrm_source_graph(const std::vector<ObjectSurface> &objects,
   // their existing allocation/geometry path. The format's existing256MiB output
   // bound is also the explicit detached REST-snapshot budget; no renderer cap.
   std::optional<SourceRestGraph> fitted;
-  if(std::any_of(objects.begin(),objects.end(),[](const auto &o){return bool(o.rig_source);})){auto selected=std::find_if(objects.begin(),objects.end(),[](const auto &o){return o.deformation&&o.deformation->skin;});require(selected!=objects.end(),"fitted source export needs an actual source skin");fitted=capture_source_rest_graph(objects,selected->id,max_snapshot_bytes,cancelled);}
+  if(std::any_of(objects.begin(),objects.end(),[](const auto &o){return o.appearance&&o.rig_source;})){auto selected=std::find_if(objects.begin(),objects.end(),[](const auto &o){return o.appearance&&o.deformation&&o.deformation->skin;});require(selected!=objects.end(),"fitted source export needs an actual source skin");fitted=capture_source_rest_graph(objects,selected->id,max_snapshot_bytes,cancelled);}
 
   std::vector<bool> current;
   std::vector<std::optional<float>> joint_lengths;
@@ -415,7 +416,7 @@ std::vector<int> emit_vrm_source_graph(
     else j["nodes"][nodes[parent]]["children"]=std::move(children);
   }
   for(auto node:nodes)remap_source_node_extras(j["nodes"][node],nodes,cancelled);
-  for(const auto &object:objects)if(object.deformation&&object.deformation->skin){
+  for(const auto &object:objects)if(object.appearance&&object.deformation&&object.deformation->skin){
     const auto &lengths=object.deformation->skeleton->bones;
     const auto &sources=object.appearance->source_joint_nodes;
     for(size_t slot=0;slot<sources.size();++slot){stop(cancelled);
@@ -434,15 +435,24 @@ std::vector<int> emit_vrm_source_graph(
   // Material/primitive splits and nonidentity rigid artist placements retain
   // separate mesh leaves; no dummy skins or skeletal end-sites are invented.
   std::map<uint64_t, int> accessory_groups;
+  auto remap_skin = [&](GltfObjectIdentity &emitted, const std::vector<uint32_t> &source_nodes) {
+    auto &skin = j["skins"].at(j["nodes"][emitted.node].at("skin").get<size_t>());
+    require(emitted.joints.size() == source_nodes.size(), "skin slot count differs from original joint identity");
+    skin["joints"] = Json::array();
+    emitted.joints.clear();
+    for (const auto source : source_nodes) {
+      const auto joint = nodes.at(source);
+      emitted.joints.push_back(uint32_t(joint));
+      skin["joints"].push_back(joint);
+    }
+    skin["skeleton"] = root;
+  };
   for (size_t i = 0; i < objects.size(); ++i) {
     stop(cancelled);
     auto &emitted = doc.objects[i];
     const auto &object = objects[i];
     auto surface=std::move(surfaces[i]);
     if (native_vrm_texture_set_accessory(object)) {
-      require(rigid_accessory_deformation(object.deformation) && !object.rig_source &&
-                  !surface.contains("skin") && emitted.joints.empty(),
-              "native texture-set accessories require a rigid local mesh");
       require(avatar_root >= 0 && object.groups.size() >= graph.prefix.size() &&
                   std::equal(graph.prefix.begin(), graph.prefix.end(), object.groups.begin(),
                       [](const auto &source, const auto &native) {
@@ -450,6 +460,30 @@ std::vector<int> emit_vrm_source_graph(
                                group_local_matrix(source).matrix() == group_local_matrix(native).matrix();
                       }),
               "native texture-set accessory is outside the original avatar's instance");
+      if (object.deformation && !object.deformation->source_skin_joints.empty()) {
+        const auto link = source_skin_link(object.groups, *object.deformation);
+        require(link->model == graph.model && link->source_instance == graph.instance && surface.contains("skin"),
+                "native skin link is outside the original avatar's instance");
+        const auto original = std::ranges::find_if(objects, [&](const auto &part) {
+          if (!part.appearance || !part.deformation || !part.deformation->skin ||
+              part.appearance->source_node != int(link->source_node)) return false;
+          const auto placement = source_accessory_attachment(part.groups);
+          return placement && placement->source_node == link->source_node &&
+                 same_source_skin_instance(*placement, *link);
+        });
+        require(original != objects.end(), "native skin link has no visible original reference part");
+        authenticate_native_source_skin(object, *original, cancelled);
+        const auto local = prefix_world.inverse() * object.world_matrix();
+        int parent = avatar_root;
+        if (local.matrix() != AffineTransform{}.matrix())
+          parent = matrix(parent, local, object.name + " skin placement");
+        emitted.node = attach(parent, std::move(surface));
+        remap_skin(emitted, object.deformation->source_skin_joints);
+        continue;
+      }
+      require(rigid_accessory_deformation(object.deformation) && !object.rig_source &&
+                  !surface.contains("skin") && emitted.joints.empty(),
+              "native texture-set accessories require a rigid local mesh or an authenticated original skin");
       int parent = avatar_root;
       auto group = object.groups.begin() + graph.prefix.size();
       if (const auto bone = source_accessory_attachment(object.groups)) {
@@ -515,16 +549,7 @@ std::vector<int> emit_vrm_source_graph(
       emitted.node=target;
     }else emitted.node=attach(target,std::move(surface));
     if (!objects[i].deformation || !objects[i].deformation->skin)continue;
-    auto skin = j["nodes"][emitted.node].at("skin").get<size_t>();
-    auto &output = j["skins"].at(skin);
-    output["joints"] = Json::array();
-    emitted.joints.clear();
-    for (auto source : a.source_joint_nodes) {
-      auto joint = nodes.at(source);
-      emitted.joints.push_back(uint32_t(joint));
-      output["joints"].push_back(joint);
-    }
-    output["skeleton"] = root;
+    remap_skin(emitted, a.source_joint_nodes);
   }
   return nodes;
 }

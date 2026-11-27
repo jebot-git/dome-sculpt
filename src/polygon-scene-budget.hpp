@@ -146,6 +146,7 @@ struct PolygonSceneBudget {
     };
     add_entries(p.size());
     add_entries(encoded_pose_matrix_entries(d));
+    add_entries(encoded_source_skin_entries(d));
     add_entries(w.size());
     if (!d.at("skin").is_null()) {
       const auto &rows = d.at("skin").at("vertices");

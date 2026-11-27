@@ -42,7 +42,8 @@ inline void deformation_copy_bytes(const DeformationState &d, Bytes &b,
   b.add(sizeof(d));
   b.add(d.pose.size(), sizeof(JointTransform));
   b.add(d.morph_weights.size(), sizeof(float));
-  w.step(d.pose.size() + d.morph_weights.size() + 1);
+  b.add(d.source_skin_joints.size(), sizeof(uint32_t));
+  w.step(d.pose.size() + d.morph_weights.size() + d.source_skin_joints.size() + 1);
   if (d.skeleton) {
     const auto &s = *d.skeleton;
     b.add(s.bones.size(), sizeof(Bone));

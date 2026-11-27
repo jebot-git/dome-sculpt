@@ -19,7 +19,7 @@ inline std::shared_ptr<const DeformationState> normal_frame_remap_deformation(
   if(!input)return {};
   input->validate(source);
   if(vertices.size()!=target.positions.size() || vertices.size()>2'000'000)throw std::invalid_argument("Deformation remap dimensions differ");
-  size_t entries=input->pose.size()+input->morph_weights.size();constexpr size_t limit=8'000'000;
+  size_t entries=input->pose.size()+input->morph_weights.size()+input->source_skin_joints.size();constexpr size_t limit=8'000'000;
   for(const auto &pose:input->pose)if(pose.full_local_matrix){if(16>limit-entries)throw std::length_error("Remapped exact pose matrices exceed native deformation quota");entries+=16;}
   if(input->morphs && vertices.size() && input->morphs->targets.size()>(limit-entries)/vertices.size())throw std::length_error("Remapped morph POSITION arrays exceed native deformation quota");
   if(input->morphs)entries+=input->morphs->targets.size()*vertices.size();
@@ -27,6 +27,9 @@ inline std::shared_ptr<const DeformationState> normal_frame_remap_deformation(
   for(size_t n=0;n<vertices.size();++n){if((n&1023)==0 && cancelled && cancelled())throw std::runtime_error("Deformation remap cancelled");auto v=vertices[n];if(v>=source.positions.size())throw std::invalid_argument("Deformation remap vertex is outside its source");if(target.positions[n].x!=source.positions[v].x || target.positions[n].y!=source.positions[v].y || target.positions[n].z!=source.positions[v].z)throw std::invalid_argument("Deformation remap changed rest POSITION values");identity&=v==n;if(input->skin){auto count=input->skin->vertices[v].size();if(count>limit-entries)throw std::length_error("Remapped skin and morph arrays exceed native deformation quota");entries+=count;}}
   if(identity && target.indices==source.indices)return input;
   auto out=std::make_shared<DeformationState>(target);out->skeleton=input->skeleton;out->humanoid=input->humanoid;out->landmarks=input->landmarks;out->expressions=input->expressions;out->pose=input->pose;out->morph_weights=input->morph_weights;
+  out->source_skin_joints=input->source_skin_joints;
+  out->source_skin_instance=input->source_skin_instance;
+  out->source_skin_node=input->source_skin_node;
   if(input->skin){out->skin=SkinWeights{};out->skin->vertices.reserve(vertices.size());for(size_t n=0;n<vertices.size();++n){if((n&1023)==0 && cancelled && cancelled())throw std::runtime_error("Deformation remap cancelled");out->skin->vertices.push_back(input->skin->vertices[vertices[n]]);}}
   if(input->morphs){out->morphs=MorphSet(target);for(const auto &old:input->morphs->targets){MorphTarget t;t.name=old.name;t.delta.reserve(vertices.size());for(size_t n=0;n<vertices.size();++n){if((n&1023)==0 && cancelled && cancelled())throw std::runtime_error("Deformation remap cancelled");t.delta.push_back(old.delta[vertices[n]]);}out->morphs->targets.push_back(std::move(t));}}
   out->validate(target);return out;

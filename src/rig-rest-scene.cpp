@@ -5,6 +5,7 @@
 #include "rig-rest-transport.hpp"
 #include "source-rigid-pose.hpp"
 #include "source-rest-scene.hpp"
+#include "source-skin-link.hpp"
 #include <nlohmann/json.hpp>
 #include <set>
 namespace dome {
@@ -28,6 +29,10 @@ void restore(SculptObject &object,const PolygonOrigin &origin){
 
 std::vector<uint64_t> rig_rest_linked_objects(const Scene &scene,uint64_t id){
  const auto &source=scene.object(id);if(!source.deformation||!source.deformation->skeleton)throw std::invalid_argument("Select an existing rig for linked fitting");if(detail::source_rest_identity(scene,source))return detail::source_rest_targets(scene,id);const auto &deformation=*source.deformation;const auto group=boundary(scene,source);std::vector<uint64_t> result{id};
+ if(!deformation.source_skin_joints.empty()){
+  const auto link=detail::source_skin_link(scene.group_path(source.group),deformation);
+  return detail::source_rest_targets(scene,detail::source_skin_reference(scene,*link).id);
+ }
  const auto original=[](const SculptObject&o){return o.rig_source?o.rig_source->deformation:o.deformation;};
  if(!group)return result;
  for(const auto &o:scene.objects()){
@@ -44,6 +49,13 @@ bool author_rig_rest(Scene &scene,uint64_t id,std::span<const RigRestJointEdit> 
  // Original-node rigs have different joint slot tables and rigid descendants.
  // They require the normalized source graph adapter, never name/slot guessing.
  if(detail::source_rest_identity(scene,selected))return detail::author_source_rig_rest(scene,id,edits,options,cancelled);
+ if(!original.source_skin_joints.empty()){
+  const auto link=detail::source_skin_link(scene.group_path(selected.group),original);
+  const auto &reference=detail::source_skin_reference(scene,*link);
+  if(original.source_skin_joints!=reference.appearance->source_joint_nodes)
+   throw std::invalid_argument("The linked attachment has a stale original joint table");
+  return detail::author_source_rig_rest(scene,reference.id,edits,options,cancelled);
+ }
  auto proposal=transport_rig_rest(*original.skeleton,original.pose,scene.world_matrix(id),edits,options,cancelled);
  if(!proposal.changed)return false;
  const auto key=original.skeleton->encode();const auto group=boundary(scene,selected);

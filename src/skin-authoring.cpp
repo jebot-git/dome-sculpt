@@ -5,6 +5,7 @@
 #include "normal-frame-runtime.hpp"
 #include "polygon-conversion.hpp"
 #include "source-rest-scene.hpp"
+#include "source-skin-link.hpp"
 #include <nlohmann/json.hpp>
 namespace dome {
 namespace {
@@ -119,7 +120,7 @@ bool author_skin(Scene &scene,uint64_t target_id,const SkinAuthoringOptions &opt
   bool same_placement=exact_metric?reference_matrix.matrix()==target_matrix.matrix():equal_placement(reference_world,target_world);
   if(exact_metric&&!same_placement)skeleton=detail::skin_reframe(*source.skeleton,change,placement_work);
   if(same_placement) { skeleton=*source.skeleton; pose=source.pose; }
-  if(existing && target.deformation->skeleton->encode()!=skeleton.encode())
+  if(existing && target.deformation->source_skin_joints.empty() && target.deformation->skeleton->encode()!=skeleton.encode())
     throw std::invalid_argument("Target has a different rest rig; use an explicit joint-mapping workflow");
   if((!options.locks.empty() && (!existing || !target.deformation->skin ||
        options.locks.size()!=skeleton.bones.size())) ||
@@ -189,7 +190,11 @@ bool author_skin(Scene &scene,uint64_t target_id,const SkinAuthoringOptions &opt
       for(const auto &i:row) equal &= std::any_of(old.begin(),old.end(),[&](const auto &o){return i==o;});
       if(equal)row=old;else same=false;
     }
-    if(same){stop(cancelled);return false;}
+    if(same){
+      Scene linked=scene;
+      if(!detail::link_native_source_skin(linked,target_id,options.reference,cancelled))return false;
+      linked.validate(false);stop(cancelled);scene=std::move(linked);return true;
+    }
   }
   auto next=target.deformation ? *target.deformation : DeformationState(target.painted->mesh());
   next.skeleton=std::move(skeleton); next.skin=std::move(weights);
@@ -224,6 +229,7 @@ bool author_skin(Scene &scene,uint64_t target_id,const SkinAuthoringOptions &opt
   Scene result=scene;
   result.object(target.id).deformation=std::make_shared<const DeformationState>(std::move(next));
   result.object(target.id).rig_source=std::move(original);
+  detail::link_native_source_skin(result,target.id,options.reference,cancelled);
   result.validate(false); stop(cancelled); scene=std::move(result);return true;
 }
 } // namespace dome

@@ -2,14 +2,15 @@
 #include "source-rest-scene.hpp"
 #include "polygon-conversion.hpp"
 #include "source-rigid-pose.hpp"
+#include "source-skin-link.hpp"
 #include <set>
 namespace dome::detail {
 namespace {
 void stop(const std::function<bool()> &cancelled){if(cancelled&&cancelled())throw std::runtime_error("Source rig authoring cancelled");}
 void require(bool value,const char *message){if(!value)throw std::invalid_argument(message);}
-void admission(const Scene &scene,const SourceRestGraph &graph,uint64_t selected,const RigRestOptions &options){
+void admission(const Scene &scene,uint64_t selected,const RigRestOptions &options){
  options.validate();require(options.linked,"Original-node REST edits require complete linked source authority");
- std::set<uint64_t> expected,actual;for(const auto &part:graph.parts){expected.insert(part.object);const auto &object=scene.object(part.object);require(!object.locked&&object.mesh_active&&object.painted,"A linked source part is locked or has no original mesh");if(part.object==selected)require(object.visible,"Select a visible original source rig");}
+ std::set<uint64_t> expected,actual;for(const auto id:source_rest_targets(scene,selected)){expected.insert(id);const auto &object=scene.object(id);require(!object.locked&&object.mesh_active&&object.painted,"A linked source part is locked or has no original mesh");if(id==selected)require(object.visible,"Select a visible original source rig");}
  if(!options.linked_objects.empty()){for(auto id:options.linked_objects)require(actual.insert(id).second,"Repeated linked source target identity");require(actual==expected,"Captured linked targets must include exactly this original model/instance, including its rigid parts");}
 }
 void update_landmarks(DeformationState &deformation){if(deformation.landmarks&&deformation.humanoid){const auto segments=deformation.skeleton->segments();for(auto &[role,point]:deformation.landmarks->points){auto at=deformation.humanoid->joints.find(role);if(at!=deformation.humanoid->joints.end())point=segments.at(at->second)[0];}}}
@@ -63,7 +64,7 @@ void restore(SculptObject &object,const PolygonOrigin &origin){
 Quat rotation(Vec3 d){auto axis=[](Vec3 a,float degrees){const auto v=degrees*.008726646259971648f;return Quat{std::cos(v),a.x*std::sin(v),a.y*std::sin(v),a.z*std::sin(v)};};return axis({0,0,1},d.z)*axis({0,1,0},d.y)*axis({1,0,0},d.x);}
 }
 bool author_source_rig_rest(Scene &scene,uint64_t selected,std::span<const RigRestJointEdit> edits,RigRestOptions options,const std::function<bool()> &cancelled,std::span<const SourceRestParentEdit> parents){
- stop(cancelled);const auto graph=capture_source_rest_graph(scene,selected,cancelled);admission(scene,graph,selected,options);const auto old_pose=source_rest_pose(graph,cancelled);const auto plan=plan_source_rest(graph,selected,edits,options,cancelled,parents);if(!plan.changed)return false;
+ stop(cancelled);const auto graph=capture_source_rest_graph(scene,selected,cancelled);admission(scene,selected,options);const auto old_pose=source_rest_pose(graph,cancelled);const auto plan=plan_source_rest(graph,selected,edits,options,cancelled,parents);if(!plan.changed)return false;
  Scene next=scene;for(const auto &part:graph.parts){stop(cancelled);if(!next.object(part.object).rig_source)next.object(part.object).rig_source=capture_polygon_origin(scene,part.object);}
  for(const auto &skin:plan.skins){stop(cancelled);auto &target=next.object(skin.object);auto deformation=std::make_shared<DeformationState>(*target.deformation);deformation->skeleton=skin.skeleton;deformation->pose=skin.pose;update_landmarks(*deformation);deformation->validate(target.painted->mesh());target.deformation=std::move(deformation);
   if(target.appearance->source_joint_nodes!=skin.source_nodes){auto appearance=std::make_shared<CreatorAppearance>(*target.appearance);appearance->source_joint_nodes=skin.source_nodes;target.appearance=std::move(appearance);}
@@ -77,15 +78,18 @@ bool author_source_rig_rest(Scene &scene,uint64_t selected,std::span<const RigRe
   stop(cancelled);
   if(const auto node=accessory_node(scene,object,graph))preserve(object.id,*node);
  }
+ update_native_source_skins(scene,next,*source_rest_identity(scene,scene.object(selected)),cancelled);
  next.validate();stop(cancelled);scene=std::move(next);return true;
 }
 void restore_source_rig_rest(Scene &scene,uint64_t selected,RigRestOptions options,const std::function<bool()> &cancelled){
- stop(cancelled);const auto graph=capture_source_rest_graph(scene,selected,cancelled);admission(scene,graph,selected,options);const auto old_pose=source_rest_pose(graph,cancelled);Scene next=scene;
+ stop(cancelled);const auto graph=capture_source_rest_graph(scene,selected,cancelled);admission(scene,selected,options);const auto old_pose=source_rest_pose(graph,cancelled);Scene next=scene;
  for(const auto &part:graph.parts){stop(cancelled);const auto &object=scene.object(part.object);require(bool(object.rig_source),"A linked source part has no first rig-fitting source");restore(next.object(part.object),*object.rig_source);}
- const auto restored=capture_source_rest_graph(next,selected,cancelled);const auto restored_pose=source_rest_pose(restored,cancelled);rigid_delta(scene,next,graph,old_pose,restored,restored_pose,cancelled,options.maximum_world_error);next.validate();stop(cancelled);scene=std::move(next);
+ const auto restored=capture_source_rest_graph(next,selected,cancelled);const auto restored_pose=source_rest_pose(restored,cancelled);rigid_delta(scene,next,graph,old_pose,restored,restored_pose,cancelled,options.maximum_world_error);
+ update_native_source_skins(scene,next,*source_rest_identity(scene,scene.object(selected)),cancelled);
+ next.validate();stop(cancelled);scene=std::move(next);
 }
 void edit_source_rest_pose(Scene &scene,uint64_t selected,const RigEdit &edit,const std::function<bool()> &cancelled){
- stop(cancelled);require(edit.linked_pose,"Fitted original-node poses require an explicit linked edit");const auto graph=capture_source_rest_graph(scene,selected,cancelled);RigRestOptions options;admission(scene,graph,selected,options);const auto old_pose=source_rest_pose(graph,cancelled);
+ stop(cancelled);require(edit.linked_pose,"Fitted original-node poses require an explicit linked edit");const auto graph=capture_source_rest_graph(scene,selected,cancelled);RigRestOptions options;admission(scene,selected,options);const auto old_pose=source_rest_pose(graph,cancelled);
  const auto &object=scene.object(selected);require(object.deformation&&object.deformation->skeleton&&object.deformation->skin,"Select an authored source skin for joint editing");const auto &before=*object.deformation;std::optional<uint32_t> edited_node;std::optional<RigMatrix> edited_local;
  if(edit.joint){const auto &adjustment=*edit.joint;require(adjustment.joint<before.skeleton->bones.size()&&finite(adjustment.degrees)&&finite(adjustment.translation)&&std::max({std::abs(adjustment.degrees.x),std::abs(adjustment.degrees.y),std::abs(adjustment.degrees.z)})<=180&&std::max({std::abs(adjustment.translation.x),std::abs(adjustment.translation.y),std::abs(adjustment.translation.z)})<=10,"Invalid bounded source joint adjustment");
   edited_node=object.appearance->source_joint_nodes.at(adjustment.joint);auto joint=before.pose.empty()?before.skeleton->bones.at(adjustment.joint).rest:before.pose.at(adjustment.joint);
@@ -99,6 +103,8 @@ void edit_source_rest_pose(Scene &scene,uint64_t selected,const RigEdit &edit,co
   if(part.object==selected&&edit.morph){if(deformation->morph_weights.empty())deformation->morph_weights.resize(deformation->morphs->targets.size());deformation->morph_weights[edit.morph->target]=edit.morph->weight;}
   deformation->validate(*part.mesh);next.object(part.object).deformation=std::move(deformation);
  }
- const auto checked=capture_source_rest_graph(next,selected,cancelled);const auto new_pose=source_rest_pose(checked,cancelled);rigid_delta(scene,next,graph,old_pose,checked,new_pose,cancelled);next.validate();stop(cancelled);scene=std::move(next);
+ const auto checked=capture_source_rest_graph(next,selected,cancelled);const auto new_pose=source_rest_pose(checked,cancelled);rigid_delta(scene,next,graph,old_pose,checked,new_pose,cancelled);
+ update_native_source_skins(scene,next,*source_rest_identity(scene,scene.object(selected)),cancelled);
+ next.validate();stop(cancelled);scene=std::move(next);
 }
 } // namespace dome::detail

@@ -71,4 +71,23 @@ with tempfile.TemporaryDirectory(prefix="dome-xr-attachment-") as directory:
         if mode == "tracking":
             check(metrics.get("attachment_tracking_loss") and metrics.get("tracking_losses", 0) > 0,
                   "The loader reports tracking loss for the attachment controller")
+
+    source = args.fixtures / "skin-before.dsculpt"
+    original = source.read_bytes()
+    bound = (args.fixtures / "skin-bound.dsculpt").read_bytes()
+    assert original != bound
+    report = args.output / "skin-transfer.json"
+    target = args.output / "skin-transfer.dsculpt"
+    with (args.output / "skin-transfer.log").open("w") as log:
+        result = subprocess.run([
+            str(args.application), "--xr", "--open", str(source), "--frames", "90", "--save", str(target),
+        ], stdout=log, stderr=subprocess.STDOUT,
+            env={**env, "DOME_XR_FIXTURE_SKIN": "transfer", "DOME_XR_FIXTURE_REPORT": str(report)}, timeout=75)
+    check(result.returncode == 0, "skin transfer: OpenXR client exits and drains its Save")
+    metrics = json.loads(report.read_text())
+    check(args.renderer.casefold() in metrics["gl_renderer"].casefold() and metrics["stereo_submissions"] > 0 and
+          metrics["acquires"] == metrics["image_waits"] == metrics["releases"] > 0,
+          "skin transfer: requested renderer and balanced OpenXR stereo swapchains")
+    check(target.read_bytes() == bound and source.read_bytes() == original,
+          "skin transfer: controller binds to the original rig and preserves exact native paint and source identities")
 print(f"{len(results)} actual-loader attachment checks passed", flush=True)

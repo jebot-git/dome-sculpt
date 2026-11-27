@@ -9,9 +9,11 @@
 #include "dome/vrm.hpp"
 #include "dome/emission-native.hpp"
 #include "dome/native-authoring.hpp"
+#include "dome/native-scene-append.hpp"
 #include "dome/source-placement.hpp"
 #include "emission-export.hpp"
 #include "source-rigid-pose.hpp"
+#include "source-skin-link.hpp"
 #include "vrm1-metadata.hpp"
 #include <fstream>
 #include <iostream>
@@ -754,6 +756,248 @@ void shape_texture_accessory(const std::filesystem::path &out, dome::Scene scene
   }
 }
 
+void skinned_texture_accessory(const std::filesystem::path &out, Scene initial) {
+  const auto accessory = initial.active().id;
+  initial.active().name = "Native skinned collar";
+  initial.active().transform.position = {.48f, .10f, -.045f};
+  initial.active().transform.scale = .86f;
+  ShapeKeyEdit key;
+  key.name = "Flare";
+  author_shapekey(initial, accessory, key);
+  key.action = ShapeKeyAction::Replace;
+  key.positions = initial.active().painted->mesh().positions;
+  key.positions[2].z += .04f;
+  author_shapekey(initial, accessory, key);
+  const auto paint = initial.active().texture_sets;
+
+  auto fixture = metadata_source();
+  auto &used = fixture.j["extensionsUsed"].get_ref<J::array_t &>();
+  for (const auto *extension : {"VRMC_springBone", "VRMC_node_constraint"}) std::erase(used, J(extension));
+  fixture.j["extensions"].erase("VRMC_springBone");
+  for (auto &node : fixture.j["nodes"]) node.erase("extensions");
+  const auto &roles = fixture.j["extensions"]["VRMC_vrm"]["humanoid"]["humanBones"];
+  const auto hips = roles.at("hips").at("node");
+  auto &primitive = fixture.j["meshes"][0]["primitives"][0]["attributes"];
+  const auto joint_view = fixture.j["accessors"][primitive.at("JOINTS_0").get<size_t>()]["bufferView"].get<size_t>();
+  const auto offset = fixture.j["bufferViews"][joint_view]["byteOffset"].get<size_t>();
+  for (size_t v = 0; v < 4; ++v) fixture.bin[offset + v * 8 + 2] = 1;
+  primitive["WEIGHTS_0"] = fixture.values({.75f,.25f,0,0, .60f,.40f,0,0, .35f,.65f,0,0, .8f,.2f,0,0}, 4, "VEC4");
+  for (auto &skin : fixture.j["skins"])
+    skin["joints"][1] = hips;
+  const auto source_path = out / "skinned-source.vrm";
+  fixture.save(source_path);
+  ImportAuthoringOptions options;
+  options.paint_resolution = 64;
+  const auto imported = prepare_authoring_import(initial, source_path, options);
+  auto scene = imported.scene.snapshot();
+  scene.select(accessory);
+  const auto rig = imported.objects.front();
+  const auto head = scene.object(rig).deformation->humanoid->joints.at("head");
+  const auto original_world = scene.world_matrix(accessory);
+  const auto before = scene.encode();
+
+  Document doc;
+  auto settle = [&] {
+    if (!doc.wait_asset() || !doc.wait_mesh() || !doc.frame().state->error.empty())
+      throw std::runtime_error("Native skin link did not settle: " + doc.frame().state->error);
+  };
+  doc.replace(scene);
+  settle();
+  doc.save_async(out / "skin-before.dsculpt").get();
+  SkinAuthoringOptions bind;
+  bind.mode = SkinAuthoringMode::Transfer;
+  bind.reference = rig;
+  doc.bind_skin(bind, doc.draft_scene().source);
+  const auto saved = out / "skin-bound.dsculpt";
+  doc.save_async(saved).get();
+  settle();
+  const auto bound = doc.copy_scene();
+  const auto &collar = bound.object(accessory);
+  const auto &deformation = *collar.deformation;
+  const auto link = detail::source_skin_link(bound.group_path(collar.group), deformation);
+  const auto &reference = bound.object(rig);
+  check(link && link == detail::source_rig_instance(bound, reference) &&
+        deformation.source_skin_joints == reference.appearance->source_joint_nodes &&
+        std::ranges::all_of(deformation.skin->vertices, [](const auto &row) { return row.size() == 2; }),
+        "Weight transfer creates a durable link to the actual instance and retains both genuine joint influences");
+  double placement_error = 0;
+  for (size_t i = 0; i < 16; ++i)
+    placement_error = std::max(placement_error, std::abs(original_world.matrix()[i] - bound.world_matrix(accessory).matrix()[i]));
+  check(placement_error < 1e-9 && collar.texture_sets == paint &&
+        deformation.morphs->encode() == scene.object(accessory).deformation->morphs->encode(),
+        "Linking preserves world placement, native material ownership and existing shapekeys");
+  check(Scene::load(saved).encode() == bound.encode() && doc.undo() && doc.copy_scene().encode() == before &&
+        doc.redo() && doc.copy_scene().encode() == bound.encode(),
+        "The linked bind is one undoable asset operation and the ordered Save restores its exact source authority");
+  auto appended = append_native_scene(bound, bound);
+  const auto copied = appended.scene.active().id;
+  const auto &appended_skin = *appended.scene.active().deformation;
+  check(appended_skin.source_skin_instance != deformation.source_skin_instance &&
+        appended_skin.source_skin_joints == deformation.source_skin_joints &&
+        Scene::decode(appended.scene.encode()).encode() == appended.scene.encode(),
+        "Appending the native package namespaces the imported avatar instance and retains joint and paint authority");
+  appended.scene.object(copied).group = collar.group;
+  bool cross_instance = false;
+  try { appended.scene.validate(false); } catch (const std::invalid_argument &) { cross_instance = true; }
+  check(cross_instance, "Moving a linked skin to another instance of the same file cannot transfer its rig authority");
+  auto restored_accessory = bound.snapshot();
+  restore_rig_source(restored_accessory, accessory, false);
+  check(restored_accessory.object(accessory).deformation->encode(restored_accessory.object(accessory).painted->mesh()) ==
+        scene.object(accessory).deformation->encode(scene.object(accessory).painted->mesh()) &&
+        restored_accessory.object(accessory).texture_sets == paint,
+        "Restoring the accessory's original source removes its skin link and keeps its native shape and paint");
+  auto automatic = scene.snapshot();
+  auto automatic_options = bind;
+  automatic_options.mode = SkinAuthoringMode::Automatic;
+  automatic_options.seed_distance = 6;
+  check(author_skin(automatic, accessory, automatic_options) &&
+        automatic.object(accessory).deformation->source_skin_joints == deformation.source_skin_joints &&
+        automatic.object(accessory).texture_sets == paint,
+        "The automatic bind route adopts the same original joint identities and native paint");
+  settle();
+  auto linked_ids = rig_rest_linked_objects(bound, rig);
+  check(std::ranges::find(linked_ids, accessory) != linked_ids.end() && linked_ids == rig_rest_linked_objects(bound, accessory),
+        "Original-rig fitting captures the same exact recipients from both the avatar and its linked accessory");
+  RigEdit edit;
+  edit.joint = JointAdjustment{head, {0, 22, 4}, {.02f, -.01f, .04f}};
+  edit.morph = MorphWeightEdit{0, .6f};
+  doc.edit_scene("Pose the linked garment", [accessory, edit](Scene &value, const auto &cancelled) {
+    edit_rig(value, accessory, edit, cancelled);
+  }, doc.draft_scene().source);
+  settle();
+  const auto posed = doc.copy_scene();
+  const auto &current = *posed.object(accessory).deformation;
+  check(current.skeleton->local_matrices(current.pose) ==
+        posed.object(rig).deformation->skeleton->local_matrices(posed.object(rig).deformation->pose) &&
+        current.morph_weights == std::vector{.6f},
+        "Pose from the linked accessory updates the original avatar and keeps morph edits on the selected mesh");
+  auto locked = bound.snapshot();
+  locked.object(accessory).locked = true;
+  const auto locked_before = locked.encode();
+  auto joint = edit;
+  joint.morph.reset();
+  bool refused = false;
+  try { edit_rig(locked, rig, joint); } catch (const std::invalid_argument &) { refused = true; }
+  check(refused && locked.encode() == locked_before, "A locked native skin refuses the complete linked pose transaction");
+  joint.linked_pose = false;
+  auto unlinked = bound.snapshot();
+  refused = false;
+  try { edit_rig(unlinked, rig, joint); } catch (const std::invalid_argument &) { refused = true; }
+  check(refused && unlinked.encode() == bound.encode(), "Per-part pose edits cannot leave an attached native skin behind");
+
+  auto fitted = posed.snapshot();
+  const auto &current_mesh = posed.object(accessory).painted->mesh();
+  const auto expected = current.preview(current_mesh);
+  const auto head_world = fitted.world_matrix(rig) * AffineTransform(fitted.object(rig).deformation->skeleton->world().at(head));
+  const auto pivot = head_world.point({0, 0, 0});
+  RigRestJointEdit rest;
+  rest.joint = head;
+  rest.world_position = Vec3{float(pivot[0] + .008), float(pivot[1] - .003), float(pivot[2])};
+  check(author_rig_rest(fitted, accessory, {&rest, 1}) && fitted.object(accessory).texture_sets == paint,
+        "A current rest edit from the linked accessory fits the original avatar and retains native paint");
+  const auto fitted_preview = fitted.object(accessory).deformation->preview(current_mesh);
+  bool matches = expected.positions.size() == fitted_preview.positions.size();
+  for (size_t i = 0; i < expected.positions.size(); ++i)
+    matches &= length(expected.positions[i] - fitted_preview.positions[i]) < 2e-5f;
+  check(matches, "Original rest fitting transports the accessory bind without moving its evaluated surface");
+  auto restored_avatar = fitted.snapshot();
+  restore_rig_source(restored_avatar, rig, true);
+  const auto &restored_skin = *restored_avatar.object(accessory).deformation;
+  check(restored_skin.source_skin_joints == deformation.source_skin_joints &&
+        restored_skin.skeleton->encode() == deformation.skeleton->encode() &&
+        restored_skin.morph_weights == current.morph_weights,
+        "Restoring the avatar's first rig transports the linked skin and preserves its authored morph weight");
+
+  const auto posed_file = out / "skin-ready-to-export.dsculpt";
+  doc.save_async(posed_file).get();
+  auto verify = [&](const Scene &state, const std::filesystem::path &path) {
+    const auto &native = *state.object(accessory).deformation;
+    const auto local = native.preview(current_mesh);
+    const auto model = state.world_matrix(accessory);
+    cgltf_options opts{};
+    cgltf_data *raw = nullptr;
+    check(cgltf_parse_file(&opts, path.c_str(), &raw) == cgltf_result_success, "Independent cgltf opens the exported skinned accessory");
+    const auto reader = std::unique_ptr<cgltf_data, decltype(&cgltf_free)>(raw, cgltf_free);
+    check(cgltf_load_buffers(&opts, raw, path.c_str()) == cgltf_result_success && cgltf_validate(raw) == cgltf_result_success,
+          "Independent cgltf validates the shared rig and material resources");
+    const auto *leaf = std::find_if(raw->nodes, raw->nodes + raw->nodes_count, [](const auto &node) {
+      return node.mesh && node.name && std::string_view(node.name) == "Native skinned collar surface";
+    });
+    const auto payload = json(path);
+    const auto &avatar = payload.at("extensions").at("VRMC_vrm");
+    const auto shared_head = avatar.at("humanoid").at("humanBones").at("head").at("node").get<size_t>();
+    check(leaf != raw->nodes + raw->nodes_count && leaf->skin && leaf->mesh->primitives_count == 2 &&
+          leaf->skin->joints[head] == raw->nodes + shared_head && leaf->mesh->weights_count == 1 &&
+          leaf->mesh->weights[0] == .6f, "Both primitives share one real skin and the original humanoid head node");
+    const auto &expressions = avatar.at("expressions").at("preset").at("happy");
+    check(std::ranges::none_of(expressions.at("morphTargetBinds"), [&](const auto &bind) {
+      return bind.at("node") == size_t(leaf - raw->nodes);
+    }), "Native accessory morphs retain their own identity separate from original expression binds");
+    for (size_t part = 0; part < leaf->mesh->primitives_count; ++part) {
+      const auto &primitive = leaf->mesh->primitives[part];
+      const auto joints = cgltf_find_accessor(&primitive, cgltf_attribute_type_joints, 0);
+      const auto weights = cgltf_find_accessor(&primitive, cgltf_attribute_type_weights, 0);
+      const auto positions = cgltf_find_accessor(&primitive, cgltf_attribute_type_position, 0);
+      check(joints && weights && positions && primitive.targets_count == 1, "Every material receives its real weight and morph accessors");
+      const auto *attributes = primitive.targets[0].attributes;
+      const auto *attributes_end = attributes + primitive.targets[0].attributes_count;
+      const auto *position_delta = std::find_if(attributes, attributes_end,
+          [](const auto &attribute) { return attribute.type == cgltf_attribute_type_position; });
+      if (position_delta == attributes_end || !position_delta->data)
+        throw std::runtime_error("Missing portable morph position accessor");
+      const auto *morph = position_delta->data;
+      for (size_t corner = 0; corner < primitive.indices->count; ++corner) {
+        const auto vertex = cgltf_accessor_read_index(primitive.indices, corner);
+        std::array<float, 3> p{}, delta{};
+        std::array<cgltf_uint, 4> slots{};
+        std::array<float, 4> influence{};
+        check(cgltf_accessor_read_float(positions, vertex, p.data(), p.size()) &&
+              cgltf_accessor_read_float(morph, vertex, delta.data(), delta.size()) &&
+              cgltf_accessor_read_uint(joints, vertex, slots.data(), slots.size()) &&
+              cgltf_accessor_read_float(weights, vertex, influence.data(), influence.size()), "Independent reader reads actual portable skin and morph attributes");
+        std::array<double, 3> sum{};
+        for (size_t n = 0; n < slots.size(); ++n) {
+          if (!influence[n]) continue;
+          RigMatrix joint_world, inverse_bind;
+          cgltf_node_transform_world(leaf->skin->joints[slots[n]], joint_world.data());
+          if (!cgltf_accessor_read_float(leaf->skin->inverse_bind_matrices, slots[n], inverse_bind.data(), inverse_bind.size()))
+            throw std::runtime_error("Invalid portable inverse bind accessor");
+          const auto value = (AffineTransform(joint_world) * AffineTransform(inverse_bind)).point(
+              {p[0] + .6f * delta[0], p[1] + .6f * delta[1], p[2] + .6f * delta[2]});
+          for (size_t axis = 0; axis < 3; ++axis) sum[axis] += value[axis] * influence[n];
+        }
+        const auto native_position = local.positions.at(current_mesh.indices.at(part * 3 + corner));
+        const auto world = model.point({native_position.x, native_position.y, native_position.z});
+        check(std::hypot(sum[0] - world[0], sum[1] - world[1], sum[2] - world[2]) < 2e-5,
+              "Actual portable joint/IBM/weight/morph evaluation agrees with the posed native vertex");
+      }
+    }
+  };
+  for (const auto &[stage, state] : std::array<std::pair<const char *, const Scene *>, 2>{{{"pose", &posed}, {"rest", &fitted}}}) {
+    doc.replace(*state);
+    settle();
+    for (const auto format : {AssetExportFormat::Avatar, AssetExportFormat::EditableAvatar512}) {
+      const bool editable = format != AssetExportFormat::Avatar;
+      const auto path = out / (std::string("skin-") + stage + (editable ? "-editable.vrm" : ".vrm"));
+      doc.export_asset(path, format).get();
+      verify(*state, path);
+      const auto restored = editable ? extract_native_authoring(bytes(path)) : extract_native_emission(bytes(path));
+      check(restored && restored->encode() == state->encode(), "Both VRM modes restore the exact linked native authoring state");
+    }
+  }
+
+  auto foreign = posed.snapshot();
+  auto invalid = std::make_shared<DeformationState>(*foreign.object(accessory).deformation);
+  std::swap(invalid->source_skin_joints.front(), invalid->source_skin_joints.back());
+  foreign.object(accessory).deformation = invalid;
+  doc.replace(foreign);
+  const auto existing = out / "skin-pose-editable.vrm";
+  const auto durable = bytes(existing);
+  refused = false;
+  try { doc.export_asset(existing, AssetExportFormat::EditableAvatar512).get(); } catch (const std::invalid_argument &) { refused = true; }
+  check(refused && bytes(existing) == durable, "Forged source joint slots refuse to replace a durable avatar export");
+}
+
 void bone_accessory(const std::filesystem::path &out) {
   using namespace dome;
   std::filesystem::create_directories(out);
@@ -941,6 +1185,7 @@ void bone_accessory(const std::filesystem::path &out) {
         "Reset follows the fitted rest attachment and the result survives a native restart");
   spatial_bone_accessory(out, scene, source_path, accessory);
   shape_texture_accessory(out, attached, accessory, rig, head);
+  skinned_texture_accessory(out, initial);
 }
 } // namespace
 #ifndef DOME_VRM1_SOURCE_EXPORT_NO_MAIN

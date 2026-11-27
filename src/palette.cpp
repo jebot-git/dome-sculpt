@@ -342,7 +342,7 @@ void SpatialPalette::raster(const EditorState &s) {
         auto index=size_t(std::clamp(std::lround(value),0l,long(s.skin_sources.empty()?0:s.skin_sources.size()-1)));
         auto id=s.skin_sources.empty()?0:s.skin_sources[index];
         auto found=std::find_if(s.objects.begin(),s.objects.end(),[&](const auto &o){return o.id==id;});
-        label=found==s.objects.end()?"No reference":found->name+(found->visible?"":" [hidden]");
+        label=found==s.objects.end()?"No reference":"#"+std::to_string(found->id)+" "+found->name+(found->visible?"":" [hidden]");
       }
       else if(c.parameter==VrParameter::SkinMode)label=detail::skin_method_label(detail::skin_method_mode(int(std::lround(value))));
       else if(c.parameter==VrParameter::SkinDistances){char size[48];snprintf(size,sizeof(size),"%.2f mm",double(skin_distance_metres(value))*1000);label+=size;}

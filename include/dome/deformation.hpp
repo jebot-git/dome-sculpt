@@ -17,6 +17,11 @@ struct DeformationState {
   // geometry.
   std::vector<JointTransform> pose;
   std::vector<float> morph_weights;
+  // Keep the imported instance and mesh node independent from native
+  // placement so reparenting cannot silently bind the skin to another rig.
+  uint64_t source_skin_instance = 0;
+  uint32_t source_skin_node = 0;
+  std::vector<uint32_t> source_skin_joints;
   DeformationState() = default;
   explicit DeformationState(const Mesh &rest);
   void validate(const Mesh &rest) const;

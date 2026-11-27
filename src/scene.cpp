@@ -46,6 +46,7 @@
 #include "polygon-color-target.hpp"
 #include "dome/source-placement.hpp"
 #include "source-placement-archive.hpp"
+#include "source-skin-link.hpp"
 #include "dome/import-source.hpp"
 #include "dome/humanoid-creator.hpp"
 #include "dome/source-maps.hpp"
@@ -396,6 +397,11 @@ void Scene::validate(bool deep_sources) const {
       if (!o.painted)
         throw std::invalid_argument("Deformation has no retained rest mesh");
       o.deformation->validate(o.painted->mesh());
+      if (!o.deformation->source_skin_joints.empty()) {
+        if (!o.mesh_active || o.appearance || !o.texture_sets)
+          throw std::invalid_argument("A linked source skin requires a native texture-set mesh");
+        detail::source_skin_link(group_path(o.group), *o.deformation);
+      }
       deformation_entries += o.deformation->resource_entries();
       if (deformation_entries > 8'000'000)
         throw std::length_error("Scene deformation budget exceeded");
