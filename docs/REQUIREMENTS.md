@@ -255,6 +255,18 @@ masked. Positive AMD and NVIDIA execution, larger production geometry
 within the normal worker budget, and physical headset checks remain open.
 [Paint grid compute validation](validation/paint-grid-compute-20261127.json)
 
+The retained native polygon fixture now reduces from 1024 to 512 within the
+unchanged default editor budget. Raw-identical source and destination paint
+cells contribute zero error and retain their full RMS weight. Differing
+cells still undergo the original per-component quality checks. A varying
+native paint control retains the exact error measurements, including on a
+hidden masked layer and visible FLOAT emission. CPU and Arc produce
+byte-identical projects with the separate 64-pixel normal Bake. Native
+Wayland and synthetic OpenXR verify the large reduction through Apply,
+Save, Undo and Redo on Arc. Broader large or densely painted reductions and
+physical-device acceptance remain required.
+[Native paint reduction validation](validation/paint-grid-production-budget-20261127.json)
+
 Native multi-material retopology preserves independently painted and baked
 grids and original VRM 1.0 joint links when Apply changes the patch.
 Linked Shape Restore uses the current pose of the original imported rig.

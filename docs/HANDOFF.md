@@ -485,6 +485,28 @@ production performance, positive AMD and NVIDIA execution, and physical
 headset qualification remain open.
 [Paint grid compute validation](validation/paint-grid-compute-20261127.json)
 
+The native worker now checks identical stored paint cells before decoding or
+reconstructing their contributions. They still count toward the RMS sample
+total. Different cells retain the full quality check, including hidden
+values, masks, secondary PBR color and FLOAT coverage and radiance. The
+1024-to-512 native polygon case now uses 98,408,870 work units within the
+existing 128-million limit. CPU and Arc save the same project as the
+previous higher-budget reference, including its separate 64-pixel normal
+Bake. A varying control preserves every reported maximum and RMS error and
+still refuses a zero-tolerance reduction.
+
+The current Release builds pass 24 focused tests on CPU and 25 on Arc,
+including the default worker's large reduction, cold Open and exact
+Undo/Redo. Four scoped strict ASan/UBSan workflows pass. Nested DomeD
+Wayland and synthetic OpenXR both apply the 1024-to-512 change through
+the normal UI and save identical states after Apply, Undo and Redo. Level
+Zero traces record 272 paint-grid kernel submissions in each workflow.
+CUDA and ROCm both build and pass missing-device refusal. A fresh full
+CPU Release regression is running from frozen product `b73fd2df` under
+`ds-full-release-paint-budget-20261127.service`. Physical headset tests and
+GPU execution on AMD and NVIDIA hardware remain open.
+[Native paint reduction validation](validation/paint-grid-production-budget-20261127.json)
+
 Retopology reapply now works on native multi-material accessories attached
 to original VRM 1.0 joints. The replacement keeps its avatar hierarchy and
 the material of each surviving single-material face. Each paint and Bake

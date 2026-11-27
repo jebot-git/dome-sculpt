@@ -1,0 +1,126 @@
+{
+  "utc": "2026-11-27T19:24:14.427321+00:00",
+  "product": "b73fd2dfc7bb52c05744c5561b326d10aa22b64f",
+  "parent": "dba8a7a2e6bce911e501fc090db53528231cda08",
+  "patch_sha256": "6e4061eb15d6e1a03b404e9b418dfc040b75e717cb48e4128d91f9adf510dc89",
+  "DomeD": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "toolkits": {
+    "FLTK": "/opt/fltk-vr/toolkit",
+    "BDF": "/opt/fltk-vr/bdf-runtime",
+    "oneAPI": "DPC++ 7.2.0",
+    "CUDA": "13.4.59 sm86",
+    "ROCm": "7.1.52802 gfx1030"
+  },
+  "build_and_test": {
+    "CPU_release": {
+      "passed": 24,
+      "junit_sha256": "ea77466d4c4bc422ca7cb9cb285252fb6ff62b4e9dc9fbc75625a54b0037717a",
+      "app_sha256": "15ad61a82a5779c5242a604884aef80b184529a4533a294cedcdff67846e2272"
+    },
+    "Arc_A770_oneAPI": {
+      "passed": 25,
+      "junit_sha256": "0a83c921ce801363271f4971d6d8abfd1458c9d1102c079e0d573be91b81e3c1",
+      "app_sha256": "187bc857388f8c509617cde1da4bfb8190c509b0ddf52dfb4882fbf46674d68b"
+    },
+    "CUDA_missing_device": {
+      "passed": 1,
+      "junit_sha256": "df669b5eba3a9e5cddc9cbe648628092288a5d23a8dd90df2657e93fbf4518e4",
+      "app_sha256": "941ab9ce37ebdcea5f96c59804feed08efdc3e252d94b79319599d49d4917843"
+    },
+    "ROCm_missing_device": {
+      "passed": 1,
+      "junit_sha256": "15638a6aa4f983cf93df48938e139e90aa0bae9fa3b81e3dd52b923767e16ea5",
+      "app_sha256": "2a7a3daf2eb6b5e1d2cdbaaf794e0e28a2b07ff933fdb5e12d0a8202c06615d3"
+    }
+  },
+  "strict_ASan_UBSan": {
+    "baked": {
+      "log_sha256": "b7f68bc5539a2f69ffbcb2589966ff1dd4107915a471cd31477f837de1b8defe",
+      "final_line": "PASS The default quality guard refuses a reduction that would erase sharp normal detail"
+    },
+    "painted": {
+      "log_sha256": "9c4c2004e928381168cbdbe524958ac6d6165571e69b03badc4793dd14be68eb",
+      "final_line": "PASS Physical paint survives ordered native Save, reopen, Undo and Redo"
+    },
+    "retained": {
+      "log_sha256": "d138f5847b76ad558a3b31f0f43ee90b652bb647204f11c0360aac03a1eb8b20",
+      "final_line": "PASS Bake after cold reopen uses the new writable grid and retained native normal frame"
+    },
+    "affine": {
+      "log_sha256": "6f6036581f12f0c89ed1851ed80097b4c9b16c102500e9d768ecf57892e466e7",
+      "final_line": "PASS 779 native polygon grid and normal Bake checks"
+    }
+  },
+  "reductions": {
+    "retained_polygon_1024_to_512": {
+      "input_sha256": "c440459f769124087fb581c235732549c707bb3bd9f7c37e8c04105833c02222",
+      "default_maximum_work": 128000000,
+      "previous_diagnostic_maximum_work": 256000000,
+      "previous_refusal": "Texture-set resolution exceeds its measured work budget",
+      "kept_normal_width": 64,
+      "project_sha256": "62521595e0732f25640ea81a6438f7c82c8ef2fd58960d09d8c8d48817a4c233",
+      "quality_metrics_sha256": "e4ac3e7d878b241e8c17d4d572833b21c56ed6f0f814e952acbd64ebf230f898",
+      "profiles": {
+        "old": {
+          "work": 128817574,
+          "peak_bytes": 111103160,
+          "layer_taps": 1048576
+        },
+        "cpu": {
+          "work": 98408870,
+          "peak_bytes": 111103160,
+          "layer_taps": 1048576
+        },
+        "arc": {
+          "work": 98408870,
+          "peak_bytes": 145738872,
+          "layer_taps": 1048576
+        }
+      }
+    },
+    "native_varying_128_to_64": {
+      "witness": "A visible color/FLOAT layer and a separate hidden masked layer. Zero error limits refuse atomically on every profile. The explicit loose control compares all maximum and RMS errors.",
+      "project_sha256": "e870a1792791056f8fa13a4c3696fdedfa68d2f07dbf20ee5eccf63c3d362b41",
+      "quality_metrics_sha256": "8e7fd09ff25924723256d205a0a5f7e58fd300aec2be31e3f185ef1feabb2743",
+      "profiles": {
+        "old": {
+          "work": 1470588,
+          "peak_bytes": 1458822,
+          "layer_taps": 12288
+        },
+        "cpu": {
+          "work": 1256713,
+          "peak_bytes": 1458822,
+          "layer_taps": 12288
+        },
+        "arc": {
+          "work": 1256713,
+          "peak_bytes": 18776678,
+          "layer_taps": 12288
+        }
+      }
+    }
+  },
+  "Arc_DomeD_Wayland": {
+    "passed": 12,
+    "report_sha256": "44c3a82c3103dd504735b3d71b22db996b1504edd99de11c3759d3f23caeb945",
+    "paint_grid_launches": 272,
+    "trace_sha256": "5ef45fa03dbd9b746a112d2340d028686be33e8e34e8a09e450cc934c4b8a018"
+  },
+  "Arc_synthetic_OpenXR": {
+    "passed": 12,
+    "report_sha256": "9748f69ad26c0cdf2f2784509042ace67a5cd2628c2444754fd5957675bde49b",
+    "paint_grid_launches": 272,
+    "trace_sha256": "103f1c9577ef8bbba98bf6eb92083c6dc33c955021b6cebbf38548449445fd12",
+    "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+    "balanced_frames": 415,
+    "runtime_sha256": "d0e80502e363efd9b4a0089ef41b44c86328e8e96485c0e50acedd1b0f5c40a8"
+  },
+  "full_Release_launch": {
+    "unit": "ds-full-release-paint-budget-20261127.service",
+    "invocation": "a8085bcfd42640db86ff658687cd4f5c",
+    "revision": "b73fd2dfc7bb52c05744c5561b326d10aa22b64f",
+    "phase_at_recording": "build every registered target"
+  },
+  "scope": "Focused paint-resolution publication and exact error checking. Physical headset and AMD and NVIDIA hardware execution remain open."
+}
