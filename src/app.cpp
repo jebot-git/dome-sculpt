@@ -11,6 +11,7 @@
 #include "spacenav-options.hpp"
 #include "native-fontconfig.hpp"
 #include "native-display-runtime.hpp"
+#include "hardware-opengl.hpp"
 #include "dome/mesh.hpp"
 #include "dome/render.hpp"
 #include "dome/session-appearance.hpp"
@@ -53,6 +54,17 @@
 #include <thread>
 using namespace dome;
 namespace {
+void require_gpu_compute() {
+  if (compute_backend()=="CPU")
+    throw std::runtime_error("Dome Sculpt requires a GPU compute backend");
+  Sample probe{};
+  try {
+    apply_brush(std::span(&probe,1),Brush{});
+  } catch (const std::exception &error) {
+    throw std::runtime_error("Dome Sculpt requires an available "+std::string(compute_backend())+
+                             " GPU. "+error.what());
+  }
+}
 #ifdef DOME_HAS_XR
 // A signal handler only requests a stop. Frame completion, input draining,
 // OpenXR cleanup and final saving happen normally on the application threads.
@@ -103,6 +115,7 @@ struct Canvas : Fl_Gl_Window {
   std::string capture;
   std::function<void()> changed,view_boundary;
   bool view_focused=false,mouse_navigation=false;
+  bool require_accelerated_viewport=false;
   Canvas(int x, int y, int w, int h) : Fl_Gl_Window(x, y, w, h) {
     mode(FL_RGB | FL_DOUBLE | FL_DEPTH | FL_OPENGL3);
     end();
@@ -383,6 +396,8 @@ struct Canvas : Fl_Gl_Window {
     return Fl_Gl_Window::handle(event);
   }
   void draw() override {
+    if(require_accelerated_viewport&&(!renderer||!context_valid()))
+      detail::require_hardware_opengl();
     update_mesh();
     if (!context_valid() && renderer) {
       renderer->abandon();
@@ -1571,6 +1586,7 @@ int main(int argc, char **argv) try {
               << " / Blender 5.4 Alpha trackball basis\n";
     return 0;
   }
+  require_gpu_compute();
   if (argc == 4 && std::string(argv[1]) == "--export-project") {
     Document document;
     document.replace(Scene::load(argv[2]));
@@ -1754,6 +1770,7 @@ int main(int argc, char **argv) try {
   Fl_Window::default_xclass("org.domed.Sculpt");
   dx::init();
   App app;
+  app.canvas.require_accelerated_viewport=true;
   if (argc == 3 && std::string(argv[1]) == "--smoke-test")
     app.canvas.capture = argv[2];
   else if (argc == 2) {

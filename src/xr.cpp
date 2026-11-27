@@ -2,6 +2,7 @@
 // Session lifecycle adapted from OpenBrush Native (Apache-2.0); see
 // third_party/openbrush/NOTICE.
 #include "dome/xr.hpp"
+#include "hardware-opengl.hpp"
 #include "polygon-view-render.hpp"
 #include "dome/frame-clock.hpp"
 #include <algorithm>
@@ -56,6 +57,7 @@ void XrSculpt::probe() {
 }
 XrSculpt::XrSculpt(Document &value, std::atomic_bool *stopping, bool overlay)
     : document(value), stop(stopping) {
+  detail::require_hardware_opengl();
   try {
     setup(overlay);
     document.begin_spatial();

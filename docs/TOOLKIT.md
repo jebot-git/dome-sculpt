@@ -8,6 +8,11 @@ Actual loader/UI validation is separate. A Release toolkit must not be used as
 a substitute for a whole-owned sanitizer desktop toolkit. The supported
 native-only sanitizer configuration does not discover or qualify FLTK.
 
+Use a GPU backend for current application builds. The current build example
+uses oneAPI with `icpx`. The older CPU application commands below document
+frozen source revisions. Current CPU references build only the headless test
+targets.
+
 The following Nov17/earlier prefix descriptions retain their historical scope.
 
 The current workspace prefixes are

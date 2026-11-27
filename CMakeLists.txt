@@ -2,11 +2,17 @@ cmake_minimum_required(VERSION 3.24)
 project(DomeSculpt VERSION 0.1.0 LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(DOME_COMPUTE_BACKEND CPU CACHE STRING "Sculpt compute backend: CPU, CUDA, ROCM, ONEAPI")
-set_property(CACHE DOME_COMPUTE_BACKEND PROPERTY STRINGS CPU CUDA ROCM ONEAPI)
+set(DOME_COMPUTE_BACKEND ONEAPI CACHE STRING "Sculpt GPU backend: CUDA, ROCM, ONEAPI")
+set_property(CACHE DOME_COMPUTE_BACKEND PROPERTY STRINGS CUDA ROCM ONEAPI)
 option(DOME_BUILD_UI "Build the native FLTK application" ON)
 option(DOME_BUILD_XR "Build native OpenXR sculpting" ON)
+option(DOME_CPU_REFERENCE_TESTS "Permit the headless CPU reference tests" OFF)
+include(CTest)
+set(dome_hardware_test_application "${CMAKE_CURRENT_BINARY_DIR}/test-dome-sculpt-with-gpu")
 if(DOME_COMPUTE_BACKEND STREQUAL "CPU")
+  if(NOT DOME_CPU_REFERENCE_TESTS OR NOT BUILD_TESTING OR DOME_BUILD_UI OR DOME_BUILD_XR)
+    message(FATAL_ERROR "Dome Sculpt requires a GPU backend (ONEAPI, CUDA or ROCM). CPU is available only for headless reference tests with DOME_CPU_REFERENCE_TESTS=ON, BUILD_TESTING=ON, DOME_BUILD_UI=OFF and DOME_BUILD_XR=OFF.")
+  endif()
   set(compute_source src/backend_cpu.cpp src/sparse-resample-cpu.cpp)
   set(paint_compute_source src/paint-composite-cpu.cpp)
 elseif(DOME_COMPUTE_BACKEND STREQUAL "CUDA")
@@ -143,7 +149,6 @@ target_include_directories(dome-sculpt-emission-codec PUBLIC include)
 target_link_libraries(dome-sculpt-emission-codec PRIVATE PkgConfig::DOME_EMISSION_OPENEXR dome-sculpt-baked-emission)
 target_sources(dome-sculpt-core PRIVATE src/emission-package.cpp src/native-authoring.cpp src/native-authoring-compiler.cpp src/emission-export.cpp)
 target_link_libraries(dome-sculpt-core PRIVATE dome-sculpt-emission-codec)
-include(CTest)
 if(BUILD_TESTING)
   # Standalone typed field: no borrowed core objects/public TextureMaps ABI.
   add_executable(dome-sculpt-baked-emission-test tests/baked-emission.cpp src/baked-emission.cpp)
@@ -1219,17 +1224,17 @@ if(DOME_BUILD_UI OR DOME_BUILD_XR OR BUILD_TESTING)
         find_package(Python3 REQUIRED COMPONENTS Interpreter)
         add_test(NAME corner-color-uv23-xr COMMAND ${Python3_EXECUTABLE}
           ${CMAKE_CURRENT_SOURCE_DIR}/tests/corner-color-uv23-xr.py
-          $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime>
+          "${dome_hardware_test_application}" $<TARGET_FILE:dome-sculpt-test-runtime>
           $<TARGET_FILE:dome-sculpt-corner-color-uv23-gui-fixture>
           ${CMAKE_CURRENT_BINARY_DIR}/corner-color-uv23-xr)
         set_tests_properties(corner-color-uv23-xr PROPERTIES TIMEOUT 360 ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2")
-        add_test(NAME polygon-openxr COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/polygon-xr.py $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime> ${CMAKE_CURRENT_BINARY_DIR}/polygon-xr)
-        add_test(NAME polygon-color-openxr COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/polygon-xr.py $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime> ${CMAKE_CURRENT_BINARY_DIR}/polygon-color-xr)
+        add_test(NAME polygon-openxr COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/polygon-xr.py "${dome_hardware_test_application}" $<TARGET_FILE:dome-sculpt-test-runtime> ${CMAKE_CURRENT_BINARY_DIR}/polygon-xr)
+        add_test(NAME polygon-color-openxr COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/polygon-xr.py "${dome_hardware_test_application}" $<TARGET_FILE:dome-sculpt-test-runtime> ${CMAKE_CURRENT_BINARY_DIR}/polygon-color-xr)
         set_tests_properties(polygon-color-openxr PROPERTIES ENVIRONMENT "DOME_POLYGON_XR_COLOR=1")
-        add_test(NAME bake-policy-openxr COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/bake-policy-xr.py $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime> ${CMAKE_CURRENT_BINARY_DIR}/bake-policy-xr)
-        add_test(NAME procedural-openxr COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/procedural-xr.py $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime> ${CMAKE_CURRENT_BINARY_DIR}/procedural-xr)
-        add_test(NAME resolution-openxr COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/resolution-xr.py $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime> ${CMAKE_CURRENT_BINARY_DIR}/resolution-xr)
-        add_test(NAME openxr-client COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/xr_runtime.py $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime> ${CMAKE_CURRENT_BINARY_DIR}/xr-client)
+        add_test(NAME bake-policy-openxr COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/bake-policy-xr.py "${dome_hardware_test_application}" $<TARGET_FILE:dome-sculpt-test-runtime> ${CMAKE_CURRENT_BINARY_DIR}/bake-policy-xr)
+        add_test(NAME procedural-openxr COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/procedural-xr.py "${dome_hardware_test_application}" $<TARGET_FILE:dome-sculpt-test-runtime> ${CMAKE_CURRENT_BINARY_DIR}/procedural-xr)
+        add_test(NAME resolution-openxr COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/resolution-xr.py "${dome_hardware_test_application}" $<TARGET_FILE:dome-sculpt-test-runtime> ${CMAKE_CURRENT_BINARY_DIR}/resolution-xr)
+        add_test(NAME openxr-client COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/xr_runtime.py "${dome_hardware_test_application}" $<TARGET_FILE:dome-sculpt-test-runtime> ${CMAKE_CURRENT_BINARY_DIR}/xr-client)
         find_program(DOME_XVFB_EXECUTABLE Xvfb)
         if(DOME_XVFB_EXECUTABLE)
           foreach(native_font_mode desktop xr)
@@ -1239,10 +1244,10 @@ if(DOME_BUILD_UI OR DOME_BUILD_XR OR BUILD_TESTING)
               ENVIRONMENT_MODIFICATION "LD_LIBRARY_PATH=path_list_prepend:$<TARGET_FILE_DIR:fltk::fltk-shared>")
           endforeach()
         endif()
-      add_test(NAME colored-cut-openxr COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/cut-color-xr.py $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime> ${CMAKE_CURRENT_BINARY_DIR}/colored-cut-xr)
+      add_test(NAME colored-cut-openxr COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/cut-color-xr.py "${dome_hardware_test_application}" $<TARGET_FILE:dome-sculpt-test-runtime> ${CMAKE_CURRENT_BINARY_DIR}/colored-cut-xr)
       set_tests_properties(colored-cut-openxr PROPERTIES TIMEOUT 180 ENVIRONMENT_MODIFICATION "LD_LIBRARY_PATH=path_list_prepend:$<TARGET_FILE_DIR:fltk::fltk-shared>")
-        add_test(NAME import-atlas-openxr COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/import-atlas-xr.py $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime> $<TARGET_FILE:dome-sculpt-import-texture-atlas-test> ${CMAKE_CURRENT_BINARY_DIR}/import-atlas-xr)
-        add_test(NAME import-vrm-openxr COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/import-vrm-xr.py $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime> $<TARGET_FILE:dome-sculpt-vrm-import-test> ${CMAKE_CURRENT_BINARY_DIR}/import-vrm-xr)
+        add_test(NAME import-atlas-openxr COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/import-atlas-xr.py "${dome_hardware_test_application}" $<TARGET_FILE:dome-sculpt-test-runtime> $<TARGET_FILE:dome-sculpt-import-texture-atlas-test> ${CMAKE_CURRENT_BINARY_DIR}/import-atlas-xr)
+        add_test(NAME import-vrm-openxr COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/import-vrm-xr.py "${dome_hardware_test_application}" $<TARGET_FILE:dome-sculpt-test-runtime> $<TARGET_FILE:dome-sculpt-vrm-import-test> ${CMAKE_CURRENT_BINARY_DIR}/import-vrm-xr)
         set_tests_properties(import-vrm-openxr PROPERTIES TIMEOUT 180)
       endif()
     endif()
@@ -1428,6 +1433,13 @@ if(BUILD_TESTING AND TARGET dome-sculpt AND DOME_BUILD_XR)
     "LD_LIBRARY_PATH=path_list_prepend:$<TARGET_FILE_DIR:fltk::fltk-shared>")
 endif()
 if(TARGET dome-sculpt)
+  if(BUILD_TESTING)
+    # Independent image oracles may use Mesa software rendering. The actual
+    # application subprocess in the same fixtures still requires hardware.
+    file(GENERATE OUTPUT "${dome_hardware_test_application}"
+      CONTENT "#!/bin/sh\nunset LIBGL_ALWAYS_SOFTWARE\nexec \"$<TARGET_FILE:dome-sculpt>\" \"\$@\"\n"
+      FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
+  endif()
   file(GENERATE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/run-dome-sculpt"
     CONTENT "#!/bin/sh\nexport LD_LIBRARY_PATH=\"$<TARGET_FILE_DIR:fltk::fltk-shared>:${dome_bitmap_prefix}/lib\${LD_LIBRARY_PATH:+:\$LD_LIBRARY_PATH}\"\nexec \"$<TARGET_FILE:dome-sculpt>\" \"\$@\"\n"
     FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
@@ -1541,7 +1553,7 @@ if(BUILD_TESTING)
   if(TARGET dome-sculpt AND TARGET dome-sculpt-test-runtime AND Python3_Interpreter_FOUND)
     add_test(NAME affine-weight-openxr COMMAND ${Python3_EXECUTABLE}
       ${CMAKE_CURRENT_SOURCE_DIR}/tests/affine-weight-xr.py
-      $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime>
+      "${dome_hardware_test_application}" $<TARGET_FILE:dome-sculpt-test-runtime>
       $<TARGET_FILE:dome-sculpt-weight-authoring-test> ${CMAKE_CURRENT_BINARY_DIR}/affine-weight-openxr)
     set_tests_properties(affine-weight-openxr PROPERTIES TIMEOUT 300)
   endif()
@@ -2242,7 +2254,7 @@ if(BUILD_TESTING AND TARGET dome-sculpt-render)
   set_tests_properties(color-preparation-render PROPERTIES ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2" TIMEOUT 240)
 endif()
 if(BUILD_TESTING AND TARGET dome-sculpt AND TARGET dome-sculpt-test-runtime)
-  add_test(NAME bake-color-openxr COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/bake-color-xr.py $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime> ${CMAKE_CURRENT_BINARY_DIR}/bake-color-xr)
+  add_test(NAME bake-color-openxr COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/bake-color-xr.py "${dome_hardware_test_application}" $<TARGET_FILE:dome-sculpt-test-runtime> ${CMAKE_CURRENT_BINARY_DIR}/bake-color-xr)
   set_tests_properties(bake-color-openxr PROPERTIES TIMEOUT 300 ENVIRONMENT_MODIFICATION "LD_LIBRARY_PATH=path_list_prepend:$<TARGET_FILE_DIR:fltk::fltk-shared>")
 endif()
 
@@ -2327,7 +2339,7 @@ endif()
 if(BUILD_TESTING AND TARGET dome-sculpt AND TARGET dome-sculpt-test-runtime AND TARGET dome-sculpt-affine-contact-test)
   add_test(NAME affine-contact-openxr COMMAND ${Python3_EXECUTABLE}
     ${CMAKE_CURRENT_SOURCE_DIR}/tests/affine-contact-xr.py
-    $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime>
+    "${dome_hardware_test_application}" $<TARGET_FILE:dome-sculpt-test-runtime>
     $<TARGET_FILE:dome-sculpt-affine-contact-test> ${CMAKE_CURRENT_BINARY_DIR}/affine-contact-xr)
   set_tests_properties(affine-contact-openxr PROPERTIES TIMEOUT 150)
 endif()
@@ -2335,7 +2347,7 @@ endif()
 if(BUILD_TESTING AND TARGET dome-sculpt AND TARGET dome-sculpt-test-runtime AND TARGET dome-sculpt-object-selection-test)
   add_test(NAME object-selection-openxr COMMAND ${Python3_EXECUTABLE}
     ${CMAKE_CURRENT_SOURCE_DIR}/tests/object-selection-xr.py
-    $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime>
+    "${dome_hardware_test_application}" $<TARGET_FILE:dome-sculpt-test-runtime>
     $<TARGET_FILE:dome-sculpt-object-selection-test> ${CMAKE_CURRENT_BINARY_DIR}/object-selection-xr)
   set_tests_properties(object-selection-openxr PROPERTIES TIMEOUT 120)
 endif()
@@ -2640,7 +2652,7 @@ endif()
 if(BUILD_TESTING AND TARGET dome-sculpt AND TARGET dome-sculpt-test-runtime)
   add_test(NAME projection-openxr COMMAND ${Python3_EXECUTABLE}
     ${CMAKE_CURRENT_SOURCE_DIR}/tests/projection-xr.py
-    $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime>
+    "${dome_hardware_test_application}" $<TARGET_FILE:dome-sculpt-test-runtime>
     $<TARGET_FILE:dome-sculpt-projection-native-test> ${CMAKE_CURRENT_BINARY_DIR}/projection-xr)
   set_tests_properties(projection-openxr PROPERTIES TIMEOUT 150)
 endif()
@@ -2663,7 +2675,7 @@ if(BUILD_TESTING AND TARGET dome-sculpt-render)
   set_tests_properties(pbr-preview-avatar PROPERTIES ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2" TIMEOUT 480)
   if(TARGET dome-sculpt AND TARGET dome-sculpt-test-runtime)
     add_test(NAME pbr-preview-openxr COMMAND ${Python3_EXECUTABLE}
-      ${CMAKE_CURRENT_SOURCE_DIR}/tests/pbr-preview-xr.py $<TARGET_FILE:dome-sculpt>
+      ${CMAKE_CURRENT_SOURCE_DIR}/tests/pbr-preview-xr.py "${dome_hardware_test_application}"
       $<TARGET_FILE:dome-sculpt-test-runtime> $<TARGET_FILE:dome-sculpt-pbr-preview-test>
       ${CMAKE_CURRENT_BINARY_DIR}/pbr-preview-xr)
     set_tests_properties(pbr-preview-openxr PROPERTIES TIMEOUT 120)
@@ -2767,7 +2779,7 @@ endif()
 
 if(BUILD_TESTING AND TARGET dome-sculpt AND TARGET dome-sculpt-test-runtime)
   foreach(mode atlas raw)
-    add_test(NAME source-extra-uv-${mode}-openxr COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/import-atlas-xr.py $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime> $<TARGET_FILE:dome-sculpt-source-extra-uv-ui-test> ${CMAKE_CURRENT_BINARY_DIR}/source-extra-uv-${mode}-xr)
+    add_test(NAME source-extra-uv-${mode}-openxr COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/import-atlas-xr.py "${dome_hardware_test_application}" $<TARGET_FILE:dome-sculpt-test-runtime> $<TARGET_FILE:dome-sculpt-source-extra-uv-ui-test> ${CMAKE_CURRENT_BINARY_DIR}/source-extra-uv-${mode}-xr)
     set_tests_properties(source-extra-uv-${mode}-openxr PROPERTIES TIMEOUT 180 ENVIRONMENT "DOME_IMPORT_EXTRA_UV=1;DOME_IMPORT_EXTRA_RAW=$<IF:$<STREQUAL:${mode},raw>,1,0>;LP_NUM_THREADS=2")
   endforeach()
 endif()
@@ -2851,7 +2863,7 @@ if(BUILD_TESTING AND TARGET dome-sculpt-render)
   set_tests_properties(rig-fit-render PROPERTIES TIMEOUT 60 ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2")
 endif()
 if(BUILD_TESTING AND TARGET dome-sculpt AND TARGET dome-sculpt-test-runtime)
-  add_test(NAME rig-fit-openxr COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/rig-fit-xr.py $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime> $<TARGET_FILE:dome-sculpt-rig-fit-authoring-test> ${CMAKE_CURRENT_BINARY_DIR}/rig-fit-xr)
+  add_test(NAME rig-fit-openxr COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/rig-fit-xr.py "${dome_hardware_test_application}" $<TARGET_FILE:dome-sculpt-test-runtime> $<TARGET_FILE:dome-sculpt-rig-fit-authoring-test> ${CMAKE_CURRENT_BINARY_DIR}/rig-fit-xr)
   set_tests_properties(rig-fit-openxr PROPERTIES TIMEOUT 180)
 endif()
 
@@ -3135,7 +3147,7 @@ if(BUILD_TESTING AND DOME_BUILD_UI)
 endif()
 
 if(BUILD_TESTING AND TARGET dome-sculpt AND TARGET dome-sculpt-test-runtime)
- add_test(NAME rig-rest-openxr COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/rig-rest-xr.py $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime> $<TARGET_FILE:dome-sculpt-rig-rest-authoring-test> ${CMAKE_CURRENT_BINARY_DIR}/rig-rest-xr)
+ add_test(NAME rig-rest-openxr COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/rig-rest-xr.py "${dome_hardware_test_application}" $<TARGET_FILE:dome-sculpt-test-runtime> $<TARGET_FILE:dome-sculpt-rig-rest-authoring-test> ${CMAKE_CURRENT_BINARY_DIR}/rig-rest-xr)
  set_tests_properties(rig-rest-openxr PROPERTIES TIMEOUT 180)
 endif()
 
@@ -3383,7 +3395,7 @@ if(BUILD_TESTING)
   if(TARGET dome-sculpt AND TARGET dome-sculpt-test-runtime AND Python3_Interpreter_FOUND)
     add_test(NAME vrm1-attachment-openxr COMMAND ${Python3_EXECUTABLE}
       ${CMAKE_CURRENT_SOURCE_DIR}/tests/vrm1-attachment-xr.py
-      $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime>
+      "${dome_hardware_test_application}" $<TARGET_FILE:dome-sculpt-test-runtime>
       ${CMAKE_CURRENT_BINARY_DIR}/vrm1-source-export/bone-accessory ${CMAKE_CURRENT_BINARY_DIR}/vrm1-attachment-xr)
     set_tests_properties(vrm1-attachment-openxr PROPERTIES TIMEOUT 360 FIXTURES_REQUIRED vrm1-source-model)
   endif()
@@ -3700,7 +3712,7 @@ if(BUILD_TESTING)
   if(TARGET dome-sculpt AND TARGET dome-sculpt-test-runtime)
     add_test(NAME vrm1-expression-openxr COMMAND ${Python3_EXECUTABLE}
       ${CMAKE_CURRENT_SOURCE_DIR}/tests/vrm1-expression-xr.py
-      $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime>
+      "${dome_hardware_test_application}" $<TARGET_FILE:dome-sculpt-test-runtime>
       $<TARGET_FILE:dome-sculpt-vrm1-expression-preview-test>
       $<TARGET_FILE:dome-sculpt-native-authoring-inspect>
       ${CMAKE_CURRENT_BINARY_DIR}/vrm1-background-fixture/baseline.dsculpt
@@ -4025,7 +4037,7 @@ endif()
 if(BUILD_TESTING AND TARGET dome-sculpt AND TARGET dome-sculpt-test-runtime)
   add_test(NAME shapekey-mirror-openxr COMMAND ${Python3_EXECUTABLE}
     ${CMAKE_CURRENT_SOURCE_DIR}/tests/xr-mirror.py
-    $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime>
+    "${dome_hardware_test_application}" $<TARGET_FILE:dome-sculpt-test-runtime>
     $<TARGET_FILE:dome-sculpt-xr-mirror-fixture>
     ${CMAKE_CURRENT_BINARY_DIR}/shapekey-mirror-xr)
   set_tests_properties(shapekey-mirror-openxr PROPERTIES TIMEOUT 600)
@@ -4047,13 +4059,13 @@ endif()
 if(BUILD_TESTING AND TARGET dome-sculpt AND TARGET dome-sculpt-test-runtime)
   add_test(NAME bake-cage-openxr COMMAND ${Python3_EXECUTABLE}
     ${CMAKE_CURRENT_SOURCE_DIR}/tests/bake-cage-xr.py
-    $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime>
+    "${dome_hardware_test_application}" $<TARGET_FILE:dome-sculpt-test-runtime>
     $<TARGET_FILE:dome-sculpt-bake-cage-test>
     ${CMAKE_CURRENT_BINARY_DIR}/bake-cage-xr)
   set_tests_properties(bake-cage-openxr PROPERTIES TIMEOUT 600)
   add_test(NAME bake-polygon-cage-openxr COMMAND ${Python3_EXECUTABLE}
     ${CMAKE_CURRENT_SOURCE_DIR}/tests/bake-cage-xr.py
-    $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime>
+    "${dome_hardware_test_application}" $<TARGET_FILE:dome-sculpt-test-runtime>
     $<TARGET_FILE:dome-sculpt-bake-cage-polygon-test>
     ${CMAKE_CURRENT_BINARY_DIR}/bake-polygon-cage-xr)
   set_tests_properties(bake-polygon-cage-openxr PROPERTIES TIMEOUT 600)
@@ -4131,19 +4143,19 @@ endif()
 if(BUILD_TESTING AND TARGET dome-sculpt AND TARGET dome-sculpt-test-runtime)
   add_test(NAME bake-recipes-openxr COMMAND ${Python3_EXECUTABLE}
     ${CMAKE_CURRENT_SOURCE_DIR}/tests/bake-recipes-xr.py
-    $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime>
+    "${dome_hardware_test_application}" $<TARGET_FILE:dome-sculpt-test-runtime>
     $<TARGET_FILE:dome-sculpt-bake-recipes-test>
     ${CMAKE_CURRENT_BINARY_DIR}/bake-recipes-xr)
   set_tests_properties(bake-recipes-openxr PROPERTIES TIMEOUT 600)
   add_test(NAME texture-set-active-bake-openxr COMMAND ${Python3_EXECUTABLE}
     ${CMAKE_CURRENT_SOURCE_DIR}/tests/bake-recipes-xr.py
-    $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime>
+    "${dome_hardware_test_application}" $<TARGET_FILE:dome-sculpt-test-runtime>
     $<TARGET_FILE:dome-sculpt-bake-recipes-test>
     ${CMAKE_CURRENT_BINARY_DIR}/texture-set-active-bake-openxr --texture-set)
   set_tests_properties(texture-set-active-bake-openxr PROPERTIES TIMEOUT 600)
   add_test(NAME mtoon-texture-set-bake-openxr COMMAND ${Python3_EXECUTABLE}
     ${CMAKE_CURRENT_SOURCE_DIR}/tests/bake-recipes-xr.py
-    $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime>
+    "${dome_hardware_test_application}" $<TARGET_FILE:dome-sculpt-test-runtime>
     $<TARGET_FILE:dome-sculpt-bake-recipes-test>
     ${CMAKE_CURRENT_BINARY_DIR}/mtoon-texture-set-bake-openxr --texture-set --mtoon)
   set_tests_properties(mtoon-texture-set-bake-openxr PROPERTIES TIMEOUT 600)
@@ -4355,7 +4367,7 @@ endif()
 if(BUILD_TESTING AND TARGET dome-sculpt AND TARGET dome-sculpt-test-runtime AND TARGET dome-sculpt-export-cancel-gate AND Python3_Interpreter_FOUND)
   add_test(NAME vrm1-editable-openxr COMMAND ${Python3_EXECUTABLE}
     ${CMAKE_CURRENT_SOURCE_DIR}/tests/vrm1-editable-xr.py
-    $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime>
+    "${dome_hardware_test_application}" $<TARGET_FILE:dome-sculpt-test-runtime>
     $<TARGET_FILE:dome-sculpt-vrm1-editable-ui-test>
     ${CMAKE_CURRENT_BINARY_DIR}/vrm1-editable-ui/source.dsculpt
     $<TARGET_FILE:dome-sculpt-export-cancel-gate> ${CMAKE_CURRENT_BINARY_DIR}/vrm1-editable-xr)
@@ -4767,7 +4779,7 @@ if(BUILD_TESTING AND TARGET dome-sculpt-render)
 endif()
 if(BUILD_TESTING AND TARGET dome-sculpt AND TARGET dome-sculpt-test-runtime AND Python3_Interpreter_FOUND)
   add_test(NAME native-key-uv-openxr COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/native-key-uv-xr.py
-    $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime> $<TARGET_FILE:dome-sculpt-native-authoring-inspect>
+    "${dome_hardware_test_application}" $<TARGET_FILE:dome-sculpt-test-runtime> $<TARGET_FILE:dome-sculpt-native-authoring-inspect>
     ${CMAKE_CURRENT_BINARY_DIR}/native-key-uv/before.dsculpt ${CMAKE_CURRENT_BINARY_DIR}/native-key-uv-openxr)
   set_tests_properties(native-key-uv-openxr PROPERTIES FIXTURES_REQUIRED native_key_uv TIMEOUT 300
     ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2")
@@ -4801,7 +4813,7 @@ if(BUILD_TESTING)
 endif()
 if(BUILD_TESTING AND TARGET dome-sculpt AND TARGET dome-sculpt-test-runtime AND TARGET dome-sculpt-native-authoring-inspect AND Python3_Interpreter_FOUND)
   add_test(NAME retopology-affine-openxr COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/retopo-affine-xr.py
-    $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime> $<TARGET_FILE:dome-sculpt-native-authoring-inspect>
+    "${dome_hardware_test_application}" $<TARGET_FILE:dome-sculpt-test-runtime> $<TARGET_FILE:dome-sculpt-native-authoring-inspect>
     ${CMAKE_CURRENT_BINARY_DIR}/retopology-affine-ui.dsculpt ${CMAKE_CURRENT_BINARY_DIR}/retopology-affine-openxr)
   set_tests_properties(retopology-affine-openxr PROPERTIES FIXTURES_REQUIRED retopology_affine_ui TIMEOUT 600
     ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2")
@@ -5300,7 +5312,7 @@ if(BUILD_TESTING)
   if(TARGET dome-sculpt AND TARGET dome-sculpt-test-runtime)
     add_test(NAME texture-set-retained-source-openxr COMMAND ${Python3_EXECUTABLE}
       ${CMAKE_CURRENT_SOURCE_DIR}/tests/bake-recipes-xr.py
-      $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime>
+      "${dome_hardware_test_application}" $<TARGET_FILE:dome-sculpt-test-runtime>
       $<TARGET_FILE:dome-sculpt-texture-set-source-export-test>
       ${CMAKE_CURRENT_BINARY_DIR}/texture-set-retained-source-openxr --texture-set)
     set_tests_properties(texture-set-retained-source-openxr PROPERTIES TIMEOUT 600)

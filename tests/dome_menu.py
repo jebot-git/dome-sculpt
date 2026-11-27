@@ -2,7 +2,7 @@
 """Native FLTK/Wayland commands through a private running DomeD universal menu.
 Harness setup follows DomeD scripts/test-global-menu.py; no other GUI toolkit.
 """
-import asyncio, json, os, platform, re, signal, socket, subprocess, sys, tempfile, time, urllib.request
+import asyncio, json, os, re, signal, socket, subprocess, sys, tempfile, time, urllib.request
 from pathlib import Path
 from dbus_next.aio import MessageBus
 from dbus_next import Variant
@@ -20,8 +20,9 @@ resolution_flow=os.environ.get("DOME_SCULPT_RESOLUTION_DOME")=="1"
 procedural_flow=os.environ.get("DOME_SCULPT_PROCEDURAL_DOME")=="1"
 assert sum((mask_flow,resolution_flow,procedural_flow))<=1,"Select one DomeD workflow"
 out=root/("artifacts/dome-menu-procedural" if procedural_flow else "artifacts/dome-menu-resolution" if resolution_flow else "artifacts/dome-menu-sculpt-mask" if mask_flow else "artifacts/dome-menu");out.mkdir(parents=True,exist_ok=True)
-icd=Path(os.environ["DOME_TEST_VULKAN_ICD"]) if "DOME_TEST_VULKAN_ICD" in os.environ else next((p for p in [Path("/usr/share/vulkan/icd.d/lvp_icd.json"),Path("/usr/share/vulkan/icd.d/lvp_icd."+platform.machine()+".json")] if p.is_file()),None)
-if icd is None or not icd.is_file():raise RuntimeError("Set DOME_TEST_VULKAN_ICD to the installed software Vulkan ICD manifest")
+icd=os.environ.get("DOME_TEST_VULKAN_ICD")
+if icd and not Path(icd).is_file():
+    raise RuntimeError("DOME_TEST_VULKAN_ICD must point to an installed hardware Vulkan ICD manifest")
 
 processes=[];checks=[]
 def check(ok,label):
@@ -51,8 +52,12 @@ async def main():
         (config/"keyboard.json").write_text(json.dumps({"ime":False,"layout":"us"}))
         apps=home/"data/applications";apps.mkdir(parents=True)
         (apps/"org.domed.Sculpt.desktop").write_text((root/"packaging/org.domed.Sculpt.desktop").read_text())
-        env={**os.environ,"HOME":tmp,"DISPLAY":screen,"XDG_CONFIG_HOME":str(home/"config"),"XDG_DATA_HOME":str(home/"data"),"XDG_CACHE_HOME":str(home/"cache"),"XDG_RUNTIME_DIR":tmp,"XDG_CURRENT_DESKTOP":"Dome","XDG_SESSION_TYPE":"wayland","VK_DRIVER_FILES":str(icd),"LIBGL_ALWAYS_SOFTWARE":"1","LIBGL_KOPPER_DISABLE":"true","DOME_RENDER_CAPTURE":str(out/"render.ppm"),"DOME_LOGIN_SESSION":"0","DOME_PREVIEW_PORT":str(port),"DOME_RENDERER":"vulkan","DOME_START_XR":"0","RUST_LOG":"warn"}
-        for key in ["WAYLAND_DISPLAY","WAYLAND_SOCKET","FLTK_BACKEND","QT_QPA_PLATFORM","LD_LIBRARY_PATH"]:env.pop(key,None)
+        env={**os.environ,"HOME":tmp,"DISPLAY":screen,"XDG_CONFIG_HOME":str(home/"config"),"XDG_DATA_HOME":str(home/"data"),"XDG_CACHE_HOME":str(home/"cache"),"XDG_RUNTIME_DIR":tmp,"XDG_CURRENT_DESKTOP":"Dome","XDG_SESSION_TYPE":"wayland","LIBGL_KOPPER_DRI2":"1","DOME_RENDER_CAPTURE":str(out/"render.ppm"),"DOME_LOGIN_SESSION":"0","DOME_PREVIEW_PORT":str(port),"DOME_RENDERER":"vulkan","DOME_START_XR":"0","RUST_LOG":"warn"}
+        for key in ("WAYLAND_DISPLAY","WAYLAND_SOCKET","FLTK_BACKEND","QT_QPA_PLATFORM","LD_LIBRARY_PATH",
+                    "LIBGL_ALWAYS_SOFTWARE","LIBGL_KOPPER_DISABLE","VK_DRIVER_FILES","VK_ICD_FILENAMES"):
+            env.pop(key,None)
+        if icd:
+            env["VK_DRIVER_FILES"]=icd
         # Keep inherited overrides isolated, but permit an explicitly selected
         # private toolkit/font runtime when qualifying a new DomeD revision.
         if library_path:=os.environ.get("DOME_TEST_LIBRARY_PATH"):

@@ -1,0 +1,126 @@
+{
+  "date": "2026-11-27",
+  "paint_commit": "93f59c75442ac6243667dfbaad4c3b0138143944",
+  "domed_toolkit_commit": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "arc_release_executable_sha256": "ca946b418ca56bf2918513b4bf019867a9cfdf9dd598fb8879eab299c5ae163a",
+  "arc_device": {
+    "gpu": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+    "render_node": "/dev/dri/renderD129",
+    "desktop_compositor": "Dome compositor renderer: vulkan (zink Vulkan 1.4(Intel(R) Arc(tm) A770 Graphics (DG2) (INTEL_OPEN_SOURCE_MESA)))"
+  },
+  "configurations": {
+    "default": "ONEAPI",
+    "cpu_application_config_rejected": true,
+    "cpu_application_config_rejected_with_reference_opt_in": true,
+    "explicit_headless_cpu_reference_configured": true
+  },
+  "compute_backends": {
+    "ONEAPI": {
+      "native_release_built": true,
+      "missing_device_exit": 1,
+      "missing_device_error": "Dome Sculpt requires an available ONEAPI GPU. No device of requested type 'info::device_type::gpu' available."
+    },
+    "CUDA": {
+      "native_release_built": true,
+      "missing_device_exit": 1,
+      "missing_device_error": "Dome Sculpt requires an available CUDA GPU. CUDA driver version is insufficient for CUDA runtime version",
+      "missing_device_paint_ctest_passed": true,
+      "positive_hardware_tested": false
+    },
+    "ROCM": {
+      "native_release_built": true,
+      "missing_device_exit": 1,
+      "missing_device_error": "Dome Sculpt requires an available ROCM GPU. no ROCm-capable device is detected",
+      "missing_device_paint_ctest_passed": true,
+      "positive_hardware_tested": false
+    }
+  },
+  "software_graphics_rejection": {
+    "openxr": "Dome Sculpt requires hardware-accelerated OpenGL. Current renderer is llvmpipe (LLVM 22.1.8, 256 bits)",
+    "desktop": "Dome Sculpt requires hardware-accelerated OpenGL. Current renderer is llvmpipe (LLVM 22.1.8, 256 bits)",
+    "actual_arc_compute_available": true
+  },
+  "mixed_2048_to_1024": {
+    "metrics": {
+      "baseline": {
+        "work": 272639306,
+        "tracked_peak_bytes": 309315044,
+        "source_samples": 4194304,
+        "log": "artifacts/paint-raster-rest-20261127/baseline-mixed-quality.log"
+      },
+      "release": {
+        "work": 213920060,
+        "tracked_peak_bytes": 183486100,
+        "source_samples": 4194304,
+        "log": "artifacts/paint-raster-rest-20261127/release-mixed-quality.log"
+      },
+      "oneapi": {
+        "work": 213920060,
+        "tracked_peak_bytes": 183486100,
+        "source_samples": 4194304,
+        "log": "artifacts/paint-raster-rest-20261127/oneapi-mixed-quality.log"
+      }
+    },
+    "result_sha256": "3bf1bbb5bc69dcf10e745d46c0759e2d5f005227a2ac28468ba8bbf4b091dd05",
+    "same_reconstruction_measurements": true,
+    "worker_byte_limit": 268435456,
+    "standalone_coarsen_work_limit": 256000000
+  },
+  "focused_arc_ctest": [
+    {
+      "tests": 26,
+      "failed": 0,
+      "file": "artifacts/gpu-only-paint-20261127/oneapi/grid-arc.xml",
+      "sha256": "f0762836155de101e6b97bde58a2f7b4c1fccd860754da1b1f74f9cebd9fbdc1"
+    },
+    {
+      "tests": 9,
+      "failed": 0,
+      "file": "artifacts/gpu-only-paint-20261127/oneapi/extra-arc.xml",
+      "sha256": "d71dbed3236d34bce18dc6087c068ac155f5038e38bfbc93a0d15a3ffe0d7ccb"
+    },
+    {
+      "tests": 11,
+      "failed": 0,
+      "file": "artifacts/gpu-only-paint-20261127/oneapi/rest-geometry-arc.xml",
+      "sha256": "1730c9385f521f23de411c4210b1c18d64f515e10f97e05efa9906d82d0d9d0a"
+    }
+  ],
+  "hardware_workflows": {
+    "nested_wayland": {
+      "checks": 12,
+      "oneapi_paint_kernel_traced": true,
+      "report": "artifacts/gpu-only-paint-20261127/wayland-resize-v3/report.json"
+    },
+    "synthetic_openxr": {
+      "checks": 12,
+      "oneapi_paint_kernel_traced": true,
+      "balanced_frames": 842,
+      "report": "artifacts/gpu-only-paint-20261127/field-xr-paced-arc-v3/report.json"
+    },
+    "native_hardware_process_exit_checks": 6,
+    "nested_domed_general_menu_checks": 8
+  },
+  "historical_full_release": {
+    "candidate": "a2646a2898d8141fe43fc673d79b41bddabeef1e",
+    "totals": {
+      "pass": 1438,
+      "fail": 0,
+      "skip": 0
+    },
+    "junit_sha256": "30a3ae754c1d98807da2a6e39c5bca3acd91cd49880c885c06597e0092d4e1c1",
+    "scope": "Pre-policy CPU and software graphics checkpoint"
+  },
+  "open_validation": [
+    "Full GPU-only Release test sweep on the current source.",
+    "Physical headset and positive CUDA and ROCm execution on their target hardware.",
+    "Private Xvfb pixel validation: Xvfb did not provide DRI3 swapchain presentation for Arc. Native framebuffer smoke capture succeeded. The separate X11 universal-menu suite passed recovery checks and timed out identifying the import picker."
+  ],
+  "artifact_directory": "artifacts/gpu-only-paint-20261127",
+  "headless_asan_ubsan_reference": {
+    "fullsize_mixed_passed": true,
+    "note": "The first harness link used the older raster archive. The rerun verifies the compact raster object and links it into the native reference.",
+    "receipt": "artifacts/gpu-only-paint-20261127/asan/fullsize-mixed.log",
+    "receipt_sha256": "59df76968084f06cec5e6be910d29b6b069de1236901f0416e0d5df61472ddfa"
+  }
+}

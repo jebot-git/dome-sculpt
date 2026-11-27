@@ -19,13 +19,13 @@ suite. Exact origins, licenses and source checksums are in
 ## Build
 
 ```sh
-export PKG_CONFIG_PATH="$PWD/artifacts/bitmap-runtime-eee23b7/lib/pkgconfig"
-export LD_LIBRARY_PATH="$PWD/artifacts/bitmap-runtime-eee23b7/lib:$PWD/artifacts/toolkit-eee23b7/lib"
+export PKG_CONFIG_PATH="/opt/fltk-vr/bdf-runtime/lib/pkgconfig:/usr/lib64/pkgconfig"
+export LD_LIBRARY_PATH="/opt/fltk-vr/toolkit/lib:/opt/fltk-vr/bdf-runtime/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release \
-  -DDOME_COMPUTE_BACKEND=CPU -DFLTK_DIR="$PWD/artifacts/toolkit-eee23b7/share/fltk"
+  -DCMAKE_CXX_COMPILER=icpx -DDOME_COMPUTE_BACKEND=ONEAPI -DBUILD_TESTING=OFF \
+  -DFLTK_DIR="/opt/fltk-vr/toolkit/share/fltk"
 cmake --build build --parallel 2
-ctest --test-dir build --output-on-failure
-build/dome-sculpt
+build/run-dome-sculpt
 ```
 
 Prepare the current canonical toolkit as described in [TOOLKIT](docs/TOOLKIT.md).
@@ -34,20 +34,24 @@ Requires a C++20 compiler, CMake 3.24+, the patched DomeD
 FLTK 1.4.5, OpenGL/GLU, EGL, OpenXR, FreeType, HarfBuzz, ICU, GIO, Fontconfig, libpng, libjpeg, zlib,
 X11/Wayland development libraries and `wayland-scanner`. xatlas is pinned and
 vendored alongside MikkTSpace, the native ufbx FBX/OBJ reader and pinned JSON 3.12
-with upstream lifetime/exception backports, so configuring does not fetch their sources. Set both `DOME_BUILD_UI=OFF` and `DOME_BUILD_XR=OFF` to
-build just the native core and tests. `BUILD_TESTING=OFF` excludes test harness
+with upstream lifetime/exception backports, so configuring does not fetch their sources.
+`BUILD_TESTING=OFF` excludes test harness
 dependencies, including Python.
-The application's default FLTK backend follows its environment; tests explicitly
-use X11 in a private display. No installation or running session changes are
-needed to run the build.
+The application's default FLTK backend follows its environment.
 
-`DOME_COMPUTE_BACKEND` selects exactly one implementation at build time:
+`DOME_COMPUTE_BACKEND` selects the application's GPU backend at build time.
 
-- `CPU`: portable reference implementation, currently verified.
-- `CUDA`: CUDA translation unit; requires nvcc, CUDA runtime and a device.
-- `ROCM`: the shared GPU kernel compiled as HIP; requires a ROCm compiler/runtime.
-- `ONEAPI`: SYCL GPU kernel; configure with `-DCMAKE_CXX_COMPILER=icpx` and install
+- `CUDA` requires nvcc, the CUDA runtime and a compatible GPU.
+- `ROCM` compiles the shared GPU kernel as HIP and requires a ROCm compiler,
+  runtime and compatible GPU.
+- `ONEAPI` is the default. Configure with `-DCMAKE_CXX_COMPILER=icpx` and install
   the matching GPU driver/runtime.
+
+Desktop and OpenXR authoring require a working device for the selected
+compute backend and a hardware-accelerated OpenGL context. CPU numerical
+references can be built separately with `-DDOME_CPU_REFERENCE_TESTS=ON
+-DDOME_COMPUTE_BACKEND=CPU -DDOME_BUILD_UI=OFF -DDOME_BUILD_XR=OFF
+-DBUILD_TESTING=ON` in a fresh build directory.
 
 The ONEAPI production core and brush path have now run on the Intel Arc A770,
 including CPU-reference, native model/undo and missing-GPU checks. Its queue and
@@ -206,6 +210,12 @@ The universal-menu audit covers main, parameter, UV and file-dialog contexts;
 see [the audit](docs/UNIVERSAL-MENU-AUDIT.md).
 
 ## Validation
+
+Run application tests with the selected compute driver and hardware OpenGL.
+Configure with `BUILD_TESTING=ON` to enable CTest. The nested DomeD test uses the
+system's Vulkan driver selection. Set `DOME_TEST_VULKAN_ICD` to a hardware
+driver manifest to pin its compositor when testing more than one installed
+driver.
 
 ```sh
 uv run --with python-xlib --with pillow python tests/gui.py

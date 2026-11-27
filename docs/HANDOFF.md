@@ -12,6 +12,34 @@ Update this current summary at milestones rather than prepending more history.
 
 ## Current stage — November 27
 
+Dome Sculpt now requires hardware OpenGL and an available GPU for the
+selected compute backend. ONEAPI is the default. CUDA and ROCm remain
+explicit build choices. Desktop and OpenXR refuse software OpenGL or missing
+compute hardware. CPU numerical references build as opt-in headless tests.
+The frozen pre-policy `a2646a28` Release sweep completed with all 1,438 tests
+passing. Its software application results apply to that older revision.
+
+Dense mixed color and FLOAT paint can now be reduced from 2048 to 1024
+through the native editor. The paint raster reconstructs rest-space samples
+from retained geometry and packed barycentrics. The filter skips accumulation
+for common values proved constant. The mixed fixture takes 213,920,060
+work units and 183,486,100 bytes of tracked worker storage. Its saved output
+and reconstruction measurements match the earlier run exactly. The 256 MiB
+memory cap and quality thresholds remain in force. Only explicit standalone
+2048 coarsening receives the larger work allowance. A packed tile accessor
+also fixes the independent VRM paint oracle in `dcf2f0a0`.
+
+On Intel Arc A770 the hardware-only Release application passes Apply, Save,
+Undo and Redo through the native FLTK universal menu in nested DomeD Wayland
+and through controller actions in synthetic OpenXR. Each path saves the same
+project byte for byte. The compositor enables DMA-BUF on the Arc render
+node. The oneAPI trace records the paint-grid kernel in both paths. All 46
+selected Arc Release cases pass. The headless ASan/UBSan reference passes
+the full-size mixed case through Save and Undo/Redo. CUDA and ROCm build
+and refuse missing devices. Positive AMD and NVIDIA execution,
+the new configuration's complete Release suite and physical XR qualification
+remain open. [GPU-only paint validation](validation/gpu-only-paint-20261127.json)
+
 Dome Sculpt is an integrated authoring candidate. The isolated software
 Release run for `662d889d` passed all 1,366 registered tests. The newer
 controller attachment revision `eea22499` passed all 1,367 registered tests

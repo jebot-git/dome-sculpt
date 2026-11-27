@@ -107,10 +107,10 @@ async def main():
             "DISPLAY": screen,
             "XDG_CURRENT_DESKTOP": "Dome",
             "FLTK_BACKEND": "x11",
-            "LIBGL_ALWAYS_SOFTWARE": "1",
+            "LIBGL_KOPPER_DRI2": "1",
             "XMODIFIERS": "@im=none",
         }
-        for key in ("WAYLAND_DISPLAY", "WAYLAND_SOCKET"):
+        for key in ("WAYLAND_DISPLAY", "WAYLAND_SOCKET", "LIBGL_ALWAYS_SOFTWARE"):
             env.pop(key, None)
         if compact:
             config = Path(home, "config/dome/appearance.json")
@@ -815,9 +815,9 @@ async def main():
             "File uses Ctrl+W Close Window and leaves application Quit to DomeD",
         )
         check(
-            nodes["PBR"][1].get("toggle-type") == "radio"
-            and nodes["PBR"][1].get("toggle-state") == 1,
-            "The current shading mode has an exported radio marker",
+            nodes["Authored material"][1].get("toggle-type") == "radio"
+            and nodes["Authored material"][1].get("toggle-state") == 1,
+            "The default authored material view has an exported radio marker",
         )
         check(
             nodes["Delete object"][1].get("enabled") is False

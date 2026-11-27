@@ -8,8 +8,8 @@ mode=os.environ.get('DOME_NATIVE_FONT_MODE','all');assert mode in ('all','deskto
 def check(ok,label):
  checks.append({'passed':bool(ok),'check':label});print(('PASS ' if ok else 'FAIL ')+label,flush=True);(out/'report.json').write_text(json.dumps({'checks':checks,'complete':False},indent=2)+'\n');assert ok,label
 with tempfile.TemporaryDirectory(prefix='dome-native-font-') as home:
- env={**os.environ,'HOME':home,'XDG_CONFIG_HOME':home+'/config','XDG_DATA_HOME':home+'/data','XDG_STATE_HOME':home+'/state','XDG_CACHE_HOME':home+'/cache','XDG_RUNTIME_DIR':home,'XDG_CURRENT_DESKTOP':'Dome','LIBGL_ALWAYS_SOFTWARE':'1','LP_NUM_THREADS':'2','SPNAV_SOCKET':home+'/unavailable.sock'}
- for k in ('DISPLAY','WAYLAND_DISPLAY','WAYLAND_SOCKET','FLTK_BACKEND'):env.pop(k,None)
+ env={**os.environ,'HOME':home,'XDG_CONFIG_HOME':home+'/config','XDG_DATA_HOME':home+'/data','XDG_STATE_HOME':home+'/state','XDG_CACHE_HOME':home+'/cache','XDG_RUNTIME_DIR':home,'XDG_CURRENT_DESKTOP':'Dome','LP_NUM_THREADS':'2','SPNAV_SOCKET':home+'/unavailable.sock'}
+ for k in ('DISPLAY','WAYLAND_DISPLAY','WAYLAND_SOCKET','FLTK_BACKEND','LIBGL_ALWAYS_SOFTWARE'):env.pop(k,None)
  manifest=Path(home,'runtime.json');manifest.write_text(json.dumps({'file_format_version':'1.0.0','runtime':{'library_path':str(runtime)}}));env['XR_RUNTIME_JSON']=str(manifest)
  def run(name,args,extra=None):
   with (out/(name+'.log')).open('w') as log:return subprocess.run([str(binary),*args],env={**env,**(extra or {})},stdout=log,stderr=subprocess.STDOUT,timeout=90)
@@ -23,12 +23,13 @@ with tempfile.TemporaryDirectory(prefix='dome-native-font-') as home:
   rd,wr=os.pipe();log=(out/'xvfb.log').open('w');server=subprocess.Popen(['Xvfb','-displayfd',str(wr),'-screen','0','1000x800x24','-nolisten','tcp'],pass_fds=(wr,),stdout=log,stderr=log);os.close(wr)
   try:
    with os.fdopen(rd) as pipe:screen=':'+pipe.readline().strip()
-   image=out/'smoke.ppm';result=run('smoke',['--smoke-test',str(image)],{'DISPLAY':screen,'FLTK_BACKEND':'x11'})
+   desktop={'DISPLAY':screen,'FLTK_BACKEND':'x11','LIBGL_KOPPER_DRI2':'1'}
+   image=out/'smoke.ppm';result=run('smoke',['--smoke-test',str(image)],desktop)
    check(result.returncode==0 and image.is_file() and image.stat().st_size>1000,'Native desktop smoke capture preserves its image and returns through normal App/font teardown')
-   result=run('capture-error',['--smoke-test',str(Path(home,'nonexistent/capture.ppm'))],{'DISPLAY':screen,'FLTK_BACKEND':'x11'})
+   result=run('capture-error',['--smoke-test',str(Path(home,'nonexistent/capture.ppm'))],desktop)
    check(result.returncode==1 and 'Cannot write capture' in (out/'capture-error.log').read_text(),'Capture write failure unwinds native App and process font ownership with its existing error status')
    if lifecycle:
-    with (out/'context-lifetime.log').open('w') as log:result=subprocess.run([str(lifecycle)],env={**env,'DISPLAY':screen,'FLTK_BACKEND':'x11'},stdout=log,stderr=subprocess.STDOUT,timeout=90)
+    with (out/'context-lifetime.log').open('w') as log:result=subprocess.run([str(lifecycle)],env={**env,**desktop,'LIBGL_ALWAYS_SOFTWARE':'1'},stdout=log,stderr=subprocess.STDOUT,timeout=90)
     check(result.returncode==0,'Actual native Canvas safely repeats hide/show, redraw, partial initialization and worker teardown')
   finally:
    if server.poll() is None:server.terminate()

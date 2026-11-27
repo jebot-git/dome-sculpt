@@ -66,11 +66,11 @@ try:
             "XDG_DATA_HOME": home + "/data",
             "DISPLAY": screen,
             "FLTK_BACKEND": "x11",
-            "LIBGL_ALWAYS_SOFTWARE": "1",
+            "LIBGL_KOPPER_DRI2": "1",
             "XDG_CURRENT_DESKTOP": "Dome",
             "XMODIFIERS": "@im=none",
         }
-        for key in ("WAYLAND_DISPLAY", "WAYLAND_SOCKET"):
+        for key in ("WAYLAND_DISPLAY", "WAYLAND_SOCKET", "LIBGL_ALWAYS_SOFTWARE"):
             env.pop(key, None)
         log = (out / "app.log").open("w")
         app = subprocess.Popen(
