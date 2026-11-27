@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "dome/color-preparation.hpp"
 #include "dome/document.hpp"
 #include "paint-composite-backend.hpp"
 #include "current-paint-preview.hpp"
 #include "dome/paint-sampling.hpp"
 #include "paint-sampling-access.hpp"
+#include "source-color-fixtures.hpp"
 #include <numeric>
 #include <nlohmann/json.hpp>
 #include <atomic>
@@ -11,10 +13,10 @@
 #include <unistd.h>
 using namespace dome;
 namespace {
-thread_local bool reference_mode=false;std::atomic_uint calls=0;std::atomic_int fault=0;size_t checks=0;
+thread_local bool reference_mode=false;std::atomic_uint calls=0,prepared_calls=0;std::atomic_int fault=0;size_t checks=0;
 void check(bool b,const char*m){++checks;if(!b)throw std::runtime_error(m);std::cout<<"PASS "<<m<<'\n';}
 template<class F>bool refuses(F f){try{f();return false;}catch(const std::exception&e){std::cout<<"REFUSAL "<<e.what()<<'\n';return true;}}
-bool equal(const TextureMaps&a,const TextureMaps&b){return a.color.rgba==b.color.rgba&&a.metal_rough.rgba==b.metal_rough.rgba&&a.emission.rgba==b.emission.rgba&&a.color_coverage.rgba==b.color_coverage.rgba&&a.color_coverage.width==b.color_coverage.width&&a.emission_coverage.rgba==b.emission_coverage.rgba&&a.emission_coverage.width==b.emission_coverage.width&&a.transparent==b.transparent&&a.normal.rgba==b.normal.rgba&&a.pbr_color.rgba==b.pbr_color.rgba&&a.baked_normal.rgba==b.baked_normal.rgba&&a.baked_coverage.rgba==b.baked_coverage.rgba;}
+bool equal(const TextureMaps&a,const TextureMaps&b){return a.color.rgba==b.color.rgba&&a.metal_rough.rgba==b.metal_rough.rgba&&a.emission.rgba==b.emission.rgba&&a.color_coverage.rgba==b.color_coverage.rgba&&a.color_coverage.width==b.color_coverage.width&&a.emission_coverage.rgba==b.emission_coverage.rgba&&a.emission_coverage.width==b.emission_coverage.width&&a.transparent==b.transparent&&a.pbr_transparent==b.pbr_transparent&&a.normal.rgba==b.normal.rgba&&a.pbr_color.rgba==b.pbr_color.rgba&&a.baked_normal.rgba==b.baked_normal.rgba&&a.baked_coverage.rgba==b.baked_coverage.rgba;}
 std::shared_ptr<PaintedMesh> clone(const nlohmann::json &j){return PaintedMesh::decode(j);}
 BakedTextures bake_fixture(uint32_t side){
  BakedTextures bake;
@@ -49,9 +51,11 @@ paint_compute::Result real_composite(const paint_compute::Input&,const std::func
 paint_compute::Result wrapped_composite(const paint_compute::Input&,const std::function<bool()>&) asm("__wrap__ZN4dome13paint_compute9compositeERKNS0_5InputERKSt8functionIFbvEE");
 paint_compute::Result wrapped_composite(const paint_compute::Input&in,const std::function<bool()>&cancelled){
  ++calls;auto result=real_composite(in,cancelled);const auto f=fault.exchange(0);
+ if(!in.projected_color.empty())++prepared_calls;
  if(f==1)throw std::runtime_error("Injected completed-composite failure");
  if(f==2)result.pixels.back().reserved=1;
  if(f==3&&!result.normals.empty())result.normals.pop_back();
+ if(f==4&&!result.pbr_colors.empty())result.pbr_colors.pop_back();
  return result;
 }
 int main()try{
@@ -94,6 +98,42 @@ int main()try{
          "Baked dispatch failure or truncated normal output keeps the exact source and prior maps without CPU substitution");
   }
   check(baked->composite(a)->baked_base==baked->baked(),"Retrying the baked composite retains its immutable Bake owner");
+ }
+ {
+  auto colored=source_color_fixture::model(false,true,false,512,false);
+  auto &object=colored.active();
+  Brush brush;brush.from=brush.to={.23f,.24f,0};brush.radius=.23f;brush.normal={0,0,1};
+  PaintSettings paint;paint.color={.93f,.57f,.13f,1};paint.flow=.71f;paint.front_only=false;
+  object.painted->begin_stroke();object.painted->stamp(brush,paint);
+  check(object.painted->end_stroke(),"An actual source COLOR_0 mesh receives a common paint layer");
+  const auto original=colored.encode();
+  const auto start=prepared_calls.load();
+  auto prepared=prepare_source_colors({object.painted,object.appearance,object.material_bindings,object.deformation,object.material});
+  check(prepared.converted&&prepared_calls>start&&colored.encode()==original,
+        "The native producer prepares actual imported vertex color on the selected backend and retains the source");
+  auto unbaked=prepared.paint->composite(object.material);
+  check(!unbaked->transparent&&unbaked->pbr_transparent&&unbaked->pbr_color.rgba!=unbaked->color.rgba,
+        "Prepared PBR alpha remains distinct from the opaque common color image");
+  auto bake=bake_fixture(512);
+  bake.color_interpretation=BakedColorInterpretation::ResolvedPbr;
+  bake.maps.pbr_color=bake.maps.color;
+  for(size_t i=0;i<bake.maps.pbr_color.rgba.size();i+=4)std::swap(bake.maps.pbr_color.rgba[i],bake.maps.pbr_color.rgba[i+2]);
+  prepared.paint->install_bake(std::move(bake));
+  object.painted=prepared.paint;object.material_bindings=prepared.material_bindings;
+  const auto archive=colored.encode();
+  auto restarted=Scene::decode(archive);
+  reference_mode=true;
+  const auto expected_prepared=restarted.active().painted->composite(b);
+  reference_mode=false;
+  const auto dispatch=prepared_calls.load();
+  const auto current_prepared=object.painted->composite(b);
+  check(prepared_calls==dispatch+1&&equal(*expected_prepared,*current_prepared)&&restarted.encode()==archive,
+        "Prepared color, resolved Bake, alpha and the archive match the independent native reference byte for byte");
+  fault=4;
+  check(refuses([&]{object.painted->composite(a);})&&object.painted->composite(b)==current_prepared&&colored.encode()==archive,
+        "Truncated prepared color publishes no maps and leaves the baked source and previous cache exact");
+  check(object.painted->composite(a)->color_projection==prepared.paint->color_projection(),
+        "Prepared color retry keeps the original projection owner");
  }
  Document d;d.replace(scene);ready(d);const auto original=d.copy_scene().encode();auto held=d.frame().surface->ranges.front().textures;auto held_pixels=held->color.rgba;auto rest=d.copy_scene().active().painted->mesh();const auto rig=d.copy_scene().active().deformation->encode(rest);
  const auto native_start=calls.load();PaintSettings settings;settings.color={1,0,0,1};d.paint_settings(settings);check(d.begin_native_stroke(),"Real posed native paint gesture admitted");NativeStrokeSample sample;sample.origin={.3f,.1f,1};sample.direction={0,0,-1};sample.brush.radius=.2f;sample.brush.pressure=1;sample.brush.strength=1;d.sample_native_stroke(sample);d.end_native_stroke();

@@ -29,10 +29,22 @@ struct Input {
   std::vector<Pixel> pixels;
   std::vector<int32_t> padding;
   BakeImages bake;
+  std::span<const uint8_t> projected_color,baked_pbr_color;
+  // One optional PBR tile index per packed common tile.
+  std::vector<uint32_t> color_tiles;
+  std::vector<ColorPixel> color_pixels;
+  size_t image_bytes() const noexcept {
+    return bake.size_bytes()+projected_color.size()+baked_pbr_color.size();
+  }
+  PreparedColor device_colors(const uint8_t *images,const uint32_t *ids,const ColorPixel *colors) const noexcept {
+    if(projected_color.empty())return {};
+    const auto *vertex=images+bake.size_bytes();
+    return {vertex,baked_pbr_color.empty()?nullptr:vertex+projected_color.size(),ids,colors};
+  }
 };
 struct Result {
   std::vector<Output> pixels;
-  std::vector<uint8_t> normals;
+  std::vector<uint8_t> normals,pbr_colors;
 };
 const Quantization &quantization();
 void validate(const Input &,const std::function<bool()> &cancelled);

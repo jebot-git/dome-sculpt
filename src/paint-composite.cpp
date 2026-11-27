@@ -24,6 +24,16 @@ void validate(const Input &in,const std::function<bool()> &cancelled){
     bake.orm.size()!=4*baked_pixels||bake.emission.size()!=4*baked_pixels||
     (!bake.normal.empty()&&bake.normal.size()!=4*baked_pixels))
   throw std::invalid_argument("Baked paint compositor images must match the native grid");
+ const bool prepared=!in.projected_color.empty();
+ if(in.projected_color.size()!=(prepared?4*count:0)||in.baked_pbr_color.size()!=(prepared?4*baked_pixels:0)||
+    (!in.color_tiles.empty()&&(!prepared||in.color_tiles.size()!=in.pixels.size()/1024))||
+    in.color_pixels.size()%1024||(!in.color_pixels.empty()&&in.color_tiles.empty()))
+  throw std::invalid_argument("Prepared color compositor inputs must match the native grid and common tiles");
+ if(in.color_pixels.size()>(maximum_tile_bytes-in.pixels.size()*sizeof(Pixel))/sizeof(ColorPixel))
+  throw std::length_error("Prepared color compositor tiles exceed the shared storage budget");
+ for(auto id:in.color_tiles)
+  if(id!=absent&&id>=in.color_pixels.size()/1024)
+   throw std::out_of_range("Prepared color tile owner is invalid");
  for(float v:p.color)if(!std::isfinite(v)||v<0||v>1)throw std::invalid_argument("Invalid paint composite color");
  for(float v:p.emission)if(!std::isfinite(v)||v<0||v>100)throw std::invalid_argument("Invalid paint composite emission");
  for(float v:{p.metallic,p.roughness})if(!std::isfinite(v)||v<0||v>1)throw std::invalid_argument("Invalid paint composite material");

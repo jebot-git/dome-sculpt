@@ -7,10 +7,14 @@ Result composite(const Input &in,const std::function<bool()> &cancelled){
  Result out;
  out.pixels.resize(in.padding.size());
  if(!in.bake.normal.empty())out.normals.resize(4*in.padding.size());
+ if(!in.projected_color.empty())out.pbr_colors.resize(4*in.padding.size());
  const auto bake=in.bake.view();
+ const PreparedColor prepared{in.projected_color.data(),in.baked_pbr_color.data(),
+                              in.color_tiles.empty()?nullptr:in.color_tiles.data(),in.color_pixels.data()};
  for(size_t i=0;i<out.pixels.size();++i){
   if((i&4095)==0)checkpoint(cancelled);
-  out.pixels[i]=compose(uint32_t(i),in.parameters,in.layers.data(),in.tiles.data(),in.pixels.data(),in.padding.data(),bake,q);
+  auto *pbr=out.pbr_colors.empty()?nullptr:out.pbr_colors.data()+4*i;
+  out.pixels[i]=compose(uint32_t(i),in.parameters,in.layers.data(),in.tiles.data(),in.pixels.data(),in.padding.data(),bake,prepared,q,pbr);
   if(!out.normals.empty())compose_normal(in.padding[i],bake,q,out.normals.data()+4*i);
  }
  checkpoint(cancelled);return out;

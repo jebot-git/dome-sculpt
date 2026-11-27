@@ -16,8 +16,11 @@ namespace {
 size_t checks=0;void check(bool b,const char*m){++checks;if(!b)throw std::runtime_error(m);}
 uint8_t byte(float v){return uint8_t(std::lround(std::clamp(v,0.f,1.f)*255));}
 float unit(uint8_t v){return float(v)/255;}
-Output reference(const Input &in,size_t at){
+Output reference(const Input &in,size_t at,std::array<uint8_t,4> *prepared=nullptr){
  const auto &p=in.parameters;float c[]{p.color[0],p.color[1],p.color[2],p.color[3]},e[]{p.emission[0],p.emission[1],p.emission[2]},ao=1,rough=p.roughness,metal=p.metallic,cc=0,ec=0;const auto owner=in.padding[at];
+ std::array<float,4> pbr{};
+ if(prepared)for(size_t k=0;k<4;++k)pbr[k]=c[k]*unit(in.projected_color[4*at+k]);
+ const auto decode_color=[](uint8_t v,size_t k){return k==3?unit(v):srgb_to_linear(unit(v));};
  if(owner>=0){const auto x=uint32_t(owner)%p.resolution,y=uint32_t(owner)/p.resolution,t=(y/32)*((p.resolution+31)/32)+x/32,pixel=(y%32)*32+x%32;
   if(!in.bake.coverage.empty()){
    const float a=unit(in.bake.coverage[owner]);
@@ -27,6 +30,7 @@ Output reference(const Input &in,size_t at){
     const float sample=unit(in.bake.color[texel+k]);
     c[k]=c[k]*(1-a)+(k==3?sample:srgb_to_linear(sample))*a;
    }
+   if(prepared)for(size_t k=0;k<4;++k)pbr[k]=pbr[k]*(1-a)+decode_color(in.baked_pbr_color[texel+k],k)*a;
    for(unsigned k=0;k<3;++k)e[k]=e[k]*(1-a)+srgb_to_linear(unit(in.bake.emission[texel+k]))*a;
    ao=ao*(1-a)+unit(in.bake.orm[texel])*a;
    rough=rough*(1-a)+unit(in.bake.orm[texel+1])*a;
@@ -36,9 +40,20 @@ Output reference(const Input &in,size_t at){
    auto blend=[&](float base,int data,int coverage,bool srgb){float a=mask*unit(v.data[coverage]),paint=unit(v.data[data]);if(srgb)paint=srgb_to_linear(paint);return base*(1-a)+paint*a;};
    float a=mask*unit(v.data[9]);cc=cc*(1-a)+a;a=mask*unit(v.data[12]);ec=ec*(1-a)+a;
    for(int k=0;k<4;++k)c[k]=blend(c[k],k,9,k<3);rough=blend(rough,5,11,false);metal=blend(metal,4,10,false);for(int k=0;k<3;++k)e[k]=blend(e[k],6+k,12,true);
+   if(prepared){
+    const auto alt=in.color_tiles.empty()?absent:in.color_tiles[id];
+    const auto *samples=alt==absent?v.data:in.color_pixels[size_t(alt)*1024+pixel].rgba;
+    const float alpha=mask*unit(v.data[9]);
+    for(size_t k=0;k<4;++k)pbr[k]=pbr[k]*(1-alpha)+decode_color(samples[k],k)*alpha;
+   }
   }
  }
- Output o;for(int k=0;k<3;++k){o.color[k]=byte(linear_to_srgb(c[k]));o.emission[k]=byte(linear_to_srgb(e[k]));}o.color[3]=byte(c[3]);o.orm[0]=byte(ao);o.orm[1]=byte(rough);o.orm[2]=byte(metal);o.orm[3]=o.emission[3]=255;o.color_coverage=byte(cc);o.emission_coverage=byte(ec);o.transparent=c[3]<.999f;return o;
+ Output o;for(int k=0;k<3;++k){o.color[k]=byte(linear_to_srgb(c[k]));o.emission[k]=byte(linear_to_srgb(e[k]));}o.color[3]=byte(c[3]);o.orm[0]=byte(ao);o.orm[1]=byte(rough);o.orm[2]=byte(metal);o.orm[3]=o.emission[3]=255;o.color_coverage=byte(cc);o.emission_coverage=byte(ec);o.transparent=c[3]<.999f;
+ if(prepared){
+  for(size_t k=0;k<4;++k)(*prepared)[k]=byte(k==3?pbr[k]:linear_to_srgb(pbr[k]));
+  if(pbr[3]<.999f)o.transparent|=prepared_transparency;
+ }
+ return o;
 }
 std::array<uint8_t,4> reference_normal(const Input &in,size_t at){
  const auto owner=in.padding[at];
@@ -75,6 +90,17 @@ struct BakeFixture {
  }
  BakeImages images()const{return {coverage,color,orm,emission,normal};}
 };
+void attach_prepared_tiles(Input &input){
+ std::mt19937 rng(0x741a1);
+ for(size_t tile=0;tile<input.pixels.size()/1024;++tile){
+  if(tile%3==1){input.color_tiles.push_back(absent);continue;}
+  input.color_tiles.push_back(uint32_t(input.color_pixels.size()/1024));
+  const auto start=input.color_pixels.size();
+  input.color_pixels.resize(start+1024);
+  for(size_t i=start;i<input.color_pixels.size();++i)
+   for(auto &component:input.color_pixels[i].rgba)component=uint8_t(rng());
+ }
+}
 template<class F>bool refuses(F f){try{f();return false;}catch(const std::exception&e){std::cout<<"REFUSAL "<<e.what()<<'\n';return true;}}
 }
 int main(int argc,char**argv)try{
@@ -82,7 +108,9 @@ int main(int argc,char**argv)try{
   check(refuses([&]{paint_compute::composite(in);}),"Missing selected device silently returned CPU paint composite");
   const BakeFixture baked(in.padding.size());in.bake=baked.images();
   check(refuses([&]{paint_compute::composite(in);}),"Missing selected device silently returned CPU baked paint composite");
-  std::cout<<"PASS selected-backend missing-device refusal for plain and baked paint\n";return 0;
+  in.projected_color=baked.color;in.baked_pbr_color=baked.orm;attach_prepared_tiles(in);
+  check(refuses([&]{paint_compute::composite(in);}),"Missing device silently returned CPU prepared color composite");
+  std::cout<<"PASS selected-backend missing-device refusal for plain, baked and prepared paint\n";return 0;
  }
 #ifdef DOME_TEST_SYCL
  sycl::device device{sycl::gpu_selector_v};auto name=device.get_info<sycl::info::device::name>();auto pci=device.get_info<sycl::ext::intel::info::device::pci_address>();std::cout<<"ACTUAL_GPU "<<name<<" pci="<<pci<<'\n';if(std::getenv("DOME_REQUIRE_ARC_PCI03"))check(name.find("Arc")!=std::string::npos&&name.find("A770")!=std::string::npos&&pci=="0000:03:00.0","Wrong requested paint compute device");
@@ -117,6 +145,28 @@ int main(int argc,char**argv)try{
   check(without.normals.empty()&&without.pixels.size()==out.pixels.size()&&
         !std::memcmp(without.pixels.data(),out.pixels.data(),out.pixels.size()*sizeof(Output)),
         "The optional Bake normal does not affect material channels");
+ }
+ for(bool baked_input:{false,true}){
+  in=fixture(288,baked_input?5:0,24);
+  const BakeFixture baked(in.padding.size());
+  in.projected_color=baked.color;
+  if(baked_input){in.bake=baked.images();in.baked_pbr_color=baked.orm;attach_prepared_tiles(in);}
+  const auto result=paint_compute::composite(in);
+  check(result.pbr_colors.size()==4*in.padding.size(),"Prepared color output size differs from the grid");
+  for(size_t at=0;at<result.pixels.size();++at){
+   std::array<uint8_t,4> pbr{};
+   const auto expected=reference(in,at,&pbr);
+   check(!std::memcmp(&result.pixels[at],&expected,sizeof(Output)),"Prepared color changes common maps or raw float transparency");
+   check(std::equal(pbr.begin(),pbr.end(),result.pbr_colors.data()+4*at),"Prepared PBR color differs from the independent vertex, Bake and layer oracle");
+  }
+  auto bad=in;bad.projected_color=bad.projected_color.subspan(1);
+  check(refuses([&]{paint_compute::composite(bad);}),"Malformed projection was submitted to the GPU");
+  if(baked_input){
+   bad=in;bad.baked_pbr_color={};
+   check(refuses([&]{paint_compute::composite(bad);}),"Prepared Bake without a resolved color was submitted to the GPU");
+   bad=in;bad.color_tiles[0]=uint32_t(bad.color_pixels.size()/1024);
+   check(refuses([&]{paint_compute::composite(bad);}),"Invalid alternate color tile was submitted to the GPU");
+  }
  }
  in=fixture(64,3,99);for(int i=0;i<5;++i){auto bad=in;if(i==0)bad.padding[0]=-2;if(i==1)bad.tiles[1]=UINT32_MAX-1;if(i==2)bad.layers[0].first_tile=1;if(i==3)bad.parameters.color[0]=NAN;if(i==4)bad.parameters.resolution=4096;check(refuses([&]{paint_compute::composite(bad);}),"Invalid packet was dispatched");}
  const BakeFixture baked(in.padding.size());in.bake=baked.images();

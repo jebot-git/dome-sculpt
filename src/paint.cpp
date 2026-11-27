@@ -4790,28 +4790,48 @@ PaintedMesh::composite(const Material &material,const std::function<bool()> &can
   composite_retention().retain(maps,composite_token_,factors,false);return maps;
 }
 namespace {
-bool gpu_plain_composite_eligible(uint32_t r,const std::vector<PaintLayer> &layers,bool baked_coverage){
+bool gpu_plain_composite_eligible(uint32_t r,const std::vector<PaintLayer> &layers,bool baked_coverage,bool projected){
  if(compute_backend()=="CPU"||r<512||r>2048)return false;
  size_t contributing=0;
  for(const auto &l:layers){
-  if(std::any_of(l.pbr_tiles.begin(),l.pbr_tiles.end(),[](const auto &p){return bool(p);}))return false;
+  if(!projected&&std::any_of(l.pbr_tiles.begin(),l.pbr_tiles.end(),[](const auto &p){return bool(p);}))return false;
   if(l.visible&&l.opacity>0&&std::any_of(l.tiles.begin(),l.tiles.end(),[](const auto &p){return bool(p);}))++contributing;
  }
- return (contributing||baked_coverage)&&uint64_t(r)*r*contributing<=128*1024*1024;
+ return (contributing||baked_coverage||projected)&&uint64_t(r)*r*contributing<=128*1024*1024;
 }
 std::shared_ptr<TextureMaps> gpu_plain_composite(uint32_t r,const std::vector<PaintLayer> &layers,
     const std::vector<int32_t> &padding,const Material &material,const BakedTextures *bake,
-    const std::function<bool()> &cancelled){
+    const PaintColorProjection *projection,const std::function<bool()> &cancelled){
  using namespace paint_compute;checkpoint(cancelled);Input in;auto &p=in.parameters;
  p.resolution=r;p.tiles=((r+31)/32)*((r+31)/32);std::copy(material.color.begin(),material.color.end(),p.color);std::copy(material.emissive.begin(),material.emissive.end(),p.emission);p.metallic=material.metallic;p.roughness=material.roughness;
  bool color_coverage=bake!=nullptr,emission_coverage=bake!=nullptr;
  if(bake)in.bake={bake->coverage,bake->maps.color.rgba,bake->maps.metal_rough.rgba,bake->maps.emission.rgba,
                   bake->maps.normal.rgba};
+ if(projection){
+  in.projected_color=projection->vertex_rgba->rgba;
+  if(bake){
+   if(bake->color_interpretation!=BakedColorInterpretation::ResolvedPbr)
+    throw std::logic_error("Prepared surface contains unresolved baked colors");
+   in.baked_pbr_color=bake->maps.pbr_color.rgba;
+  }
+ }
  for(const auto &l:layers)if(l.visible&&l.opacity>0&&std::any_of(l.tiles.begin(),l.tiles.end(),[](const auto &p){return bool(p);})){
   checkpoint(cancelled);in.layers.push_back({l.opacity,uint32_t(in.tiles.size())});
-  for(const auto &tile:l.tiles){
+  for(size_t index=0;index<l.tiles.size();++index){
+   const auto &tile=l.tiles[index];
    checkpoint(cancelled);if(!tile){in.tiles.push_back(absent);continue;}
-   if(in.pixels.size()>maximum_tile_bytes/sizeof(Pixel)-1024)throw std::length_error("Paint composite packed tile budget exceeded");
+   const auto *alternate=projection&&!l.pbr_tiles.empty()?l.pbr_tiles.at(index).get():nullptr;
+   const auto common_pixels=in.pixels.size()+PaintTile::size*PaintTile::size;
+   const auto prepared_pixels=in.color_pixels.size()+(alternate?PaintTile::size*PaintTile::size:0);
+   if(common_pixels*sizeof(Pixel)+prepared_pixels*sizeof(ColorPixel)>maximum_tile_bytes)
+    throw std::length_error("Paint composite packed tile budget exceeded");
+   if(projection)in.color_tiles.push_back(alternate?uint32_t(in.color_pixels.size()/1024):absent);
+   if(alternate){
+    const auto first=in.color_pixels.size();
+    in.color_pixels.resize(prepared_pixels);
+    for(size_t i=0;i<alternate->pixels.size();++i)
+     std::copy(alternate->pixels[i].begin(),alternate->pixels[i].end(),in.color_pixels[first+i].rgba);
+   }
    in.tiles.push_back(uint32_t(in.pixels.size()/1024));const auto first=in.pixels.size();in.pixels.resize(first+1024);
    for(size_t i=0;i<1024;++i){const auto &v=tile->pixels[i].data;std::copy(v.begin(),v.end(),in.pixels[first+i].data);color_coverage|=v[13]&&v[9];emission_coverage|=v[13]&&v[12];}
   }
@@ -4822,16 +4842,21 @@ std::shared_ptr<TextureMaps> gpu_plain_composite(uint32_t r,const std::vector<Pa
  auto result=paint_compute::composite(in,cancelled);
  const auto &pixels=result.pixels;
  const auto expected_normals=in.bake.normal.empty()?0:4*in.padding.size();
- if(pixels.size()!=in.padding.size()||result.normals.size()!=expected_normals)
+ const auto expected_pbr=projection?4*in.padding.size():0;
+ if(pixels.size()!=in.padding.size()||result.normals.size()!=expected_normals||result.pbr_colors.size()!=expected_pbr)
   throw std::runtime_error("Paint composite backend returned invalid image sizes");
  auto maps=std::make_shared<TextureMaps>();
  if(!result.normals.empty())maps->normal={r,r,std::move(result.normals)};
+ if(projection)maps->pbr_color={r,r,std::move(result.pbr_colors)};
  for(auto image:{&maps->color,&maps->metal_rough,&maps->emission})*image={r,r,std::vector<uint8_t>(size_t(r)*r*4)};
  auto coverage=[&](Image &im,bool full){const uint32_t n=full?r:1;im={n,n,std::vector<uint8_t>(size_t(n)*n*4)};for(size_t at=3;at<im.rgba.size();at+=4)im.rgba[at]=255;};
  coverage(maps->color_coverage,color_coverage);coverage(maps->emission_coverage,emission_coverage);
+ const unsigned valid_transparency=common_transparency|(projection?prepared_transparency:0);
  for(size_t i=0;i<pixels.size();++i){
-  if((i&4095)==0)checkpoint(cancelled);const auto &v=pixels[i];if(v.reserved||v.transparent>1)throw std::runtime_error("Paint composite backend returned invalid metadata");
-  std::copy_n(v.color,4,maps->color.rgba.data()+i*4);std::copy_n(v.orm,4,maps->metal_rough.rgba.data()+i*4);std::copy_n(v.emission,4,maps->emission.rgba.data()+i*4);maps->transparent|=v.transparent;
+  if((i&4095)==0)checkpoint(cancelled);const auto &v=pixels[i];if(v.reserved||(v.transparent&~valid_transparency))throw std::runtime_error("Paint composite backend returned invalid metadata");
+  std::copy_n(v.color,4,maps->color.rgba.data()+i*4);std::copy_n(v.orm,4,maps->metal_rough.rgba.data()+i*4);std::copy_n(v.emission,4,maps->emission.rgba.data()+i*4);
+  maps->transparent|=bool(v.transparent&common_transparency);
+  maps->pbr_transparent|=bool(v.transparent&prepared_transparency);
   if(color_coverage)maps->color_coverage.rgba[i*4]=v.color_coverage;if(emission_coverage)maps->emission_coverage.rgba[i*4]=v.emission_coverage;
  }
  checkpoint(cancelled);return maps;
@@ -4913,15 +4938,16 @@ PaintedMesh::build_composite(const Material &material,const std::function<bool()
   if(has_physical_emission()||std::any_of(material.emissive.begin(),material.emissive.end(),[](float v){return v>1;}))throw std::logic_error("Physical emission requires its linear composite adapter");
   if(source_maps_&&source_maps_->uses_alternate_uv())throw std::invalid_argument(source_maps_->extra_uv_sets.empty()?"UV1 source compositing requires explicit source-coordinate preparation":"Extra source UV compositing requires explicit source-coordinate preparation");
   // The compute packet uses the current native grid with its actual padding.
-  // Source samplers, independent paint domains and projections keep their own adapters.
+  // Source samplers, independent paint domains and prepared normal fields keep their own adapters.
   const auto r=resolution();
+  if(color_projection_)color_projection_->validate(r);
   const bool native_grid=!surface_->paint_domain&&!sampling_attachment_&&
-      (!source_maps_||source_maps_->empty())&&!color_projection_&&!normal_projection_&&
+      (!source_maps_||source_maps_->empty())&&!normal_projection_&&
       (!baked_||!baked_->emission_field);
   const auto *bake=native_grid&&baked_&&compute_backend()!="CPU"&&r>=512&&
       std::ranges::any_of(baked_->coverage,[](uint8_t value){return value!=0;})?baked_.get():nullptr;
-  const bool accelerated=native_grid&&gpu_plain_composite_eligible(r,layers_,bake!=nullptr);
-  auto maps=accelerated?gpu_plain_composite(r,layers_,surface_->padding,material,bake,cancelled):
+  const bool accelerated=native_grid&&gpu_plain_composite_eligible(r,layers_,bake!=nullptr,bool(color_projection_));
+  auto maps=accelerated?gpu_plain_composite(r,layers_,surface_->padding,material,bake,color_projection_.get(),cancelled):
                          std::make_shared<TextureMaps>();
   const bool device_normal=!maps->normal.rgba.empty();
   maps->source_maps=source_maps_;
@@ -4938,8 +4964,7 @@ PaintedMesh::build_composite(const Material &material,const std::function<bool()
   };
   if(!accelerated)dimensions(maps->color,{&source.color});
   PaintSourceTexture projected_vertex_color;
-  if(color_projection_) {
-    color_projection_->validate(r);
+  if(color_projection_&&!accelerated) {
     dimensions(maps->pbr_color,{&source.color});
     projected_vertex_color.image=color_projection_->vertex_rgba;
     projected_vertex_color.wrap_s=projected_vertex_color.wrap_t=33071;

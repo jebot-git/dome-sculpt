@@ -14,11 +14,18 @@
 #endif
 namespace dome::paint_compute {
 struct Pixel { uint8_t data[14]{}; };
+struct ColorPixel { uint8_t rgba[4]{}; };
 struct Output { uint8_t color[4]{},orm[4]{},emission[4]{};uint8_t color_coverage=0,emission_coverage=0,transparent=0,reserved=0; };
+inline constexpr uint8_t common_transparency=1,prepared_transparency=2;
 struct Layer {float opacity=1;uint32_t first_tile=0;};
 struct Parameters {float color[4]{},emission[3]{},metallic=0,roughness=0;uint32_t resolution=0,layers=0,tiles=0;};
 struct Bake {
  const uint8_t *coverage=nullptr,*color=nullptr,*orm=nullptr,*emission=nullptr,*normal=nullptr;
+};
+struct PreparedColor {
+ const uint8_t *vertex=nullptr,*baked=nullptr;
+ const uint32_t *tiles=nullptr;
+ const ColorPixel *pixels=nullptr;
 };
 struct Quantization {float unit[256]{},srgb[256]{};uint32_t threshold[255]{};uint32_t reserved=0;};
 inline constexpr uint32_t absent=UINT32_MAX;
@@ -88,8 +95,14 @@ DOME_PC_FN void compose_normal(int32_t owner,Bake bake,const Quantization &q,uin
  out[2]=linear_byte(add(mul(mul(z,scale),.5f),.5f));
 }
 DOME_PC_FN Output compose(uint32_t at,const Parameters &p,const Layer *layers,const uint32_t *tiles,
-                         const Pixel *pixels,const int32_t *padding,Bake bake,const Quantization &q){
+                         const Pixel *pixels,const int32_t *padding,Bake bake,PreparedColor prepared,
+                         const Quantization &q,uint8_t *prepared_out){
  float color[]{p.color[0],p.color[1],p.color[2],p.color[3]};
+ float pbr[4]{};
+ if(prepared_out){
+  const auto *vertex=prepared.vertex+size_t(at)*4;
+  for(unsigned c=0;c<4;++c)pbr[c]=mul(color[c],q.unit[vertex[c]]);
+ }
  float emission[]{p.emission[0],p.emission[1],p.emission[2]};
  float ao=1,rough=p.roughness,metal=p.metallic,cc=0,ec=0;const auto owner=padding[at];
  if(owner>=0){
@@ -102,6 +115,10 @@ DOME_PC_FN Output compose(uint32_t at,const Parameters &p,const Layer *layers,co
     emission[c]=blend(emission[c],q.srgb[bake.emission[offset+c]],weight);
    }
    color[3]=blend(color[3],q.unit[bake.color[offset+3]],weight);
+   if(prepared_out)for(unsigned c=0;c<4;++c){
+    const auto value=prepared.baked[offset+c];
+    pbr[c]=blend(pbr[c],c<3?q.srgb[value]:q.unit[value],weight);
+   }
    ao=blend(ao,q.unit[bake.orm[offset]],weight);
    rough=blend(rough,q.unit[bake.orm[offset+1]],weight);
    metal=blend(metal,q.unit[bake.orm[offset+2]],weight);
@@ -114,6 +131,11 @@ DOME_PC_FN Output compose(uint32_t at,const Parameters &p,const Layer *layers,co
    const auto ca=mul(mask,q.unit[v.data[9]]),ea=mul(mask,q.unit[v.data[12]]);
    cc=add(mul(cc,sub(1,ca)),ca);ec=add(mul(ec,sub(1,ea)),ea);
    for(uint32_t c=0;c<4;++c)color[c]=blend(color[c],c<3?q.srgb[v.data[c]]:q.unit[v.data[c]],ca);
+   if(prepared_out){
+    const auto pbr_id=prepared.tiles?prepared.tiles[id]:absent;
+    const auto *rgba=pbr_id==absent?v.data:prepared.pixels[size_t(pbr_id)*1024+offset].rgba;
+    for(unsigned c=0;c<4;++c)pbr[c]=blend(pbr[c],c<3?q.srgb[rgba[c]]:q.unit[rgba[c]],ca);
+   }
    rough=blend(rough,q.unit[v.data[5]],mul(mask,q.unit[v.data[11]]));
    metal=blend(metal,q.unit[v.data[4]],mul(mask,q.unit[v.data[10]]));
    for(uint32_t c=0;c<3;++c)emission[c]=blend(emission[c],q.srgb[v.data[6+c]],ea);
@@ -121,8 +143,15 @@ DOME_PC_FN Output compose(uint32_t at,const Parameters &p,const Layer *layers,co
  }
  Output out;for(uint32_t c=0;c<3;++c){out.color[c]=srgb_byte(color[c],q);out.emission[c]=srgb_byte(emission[c],q);}
  out.color[3]=linear_byte(color[3]);out.orm[0]=linear_byte(ao);out.orm[1]=linear_byte(rough);out.orm[2]=linear_byte(metal);out.orm[3]=out.emission[3]=255;
- out.color_coverage=linear_byte(cc);out.emission_coverage=linear_byte(ec);out.transparent=color[3]<.999f;return out;
+ out.color_coverage=linear_byte(cc);out.emission_coverage=linear_byte(ec);
+ if(color[3]<.999f)out.transparent=common_transparency;
+ if(prepared_out){
+  for(unsigned c=0;c<3;++c)prepared_out[c]=srgb_byte(pbr[c],q);
+  prepared_out[3]=linear_byte(pbr[3]);
+  if(pbr[3]<.999f)out.transparent|=prepared_transparency;
+ }
+ return out;
 }
-static_assert(sizeof(Pixel)==14&&sizeof(Output)==16&&sizeof(Layer)==8&&sizeof(Parameters)==48&&sizeof(Quantization)==3072);
+static_assert(sizeof(Pixel)==14&&sizeof(ColorPixel)==4&&sizeof(Output)==16&&sizeof(Layer)==8&&sizeof(Parameters)==48&&sizeof(Quantization)==3072);
 }
 #undef DOME_PC_FN
