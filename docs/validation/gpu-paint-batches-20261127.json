@@ -1,0 +1,128 @@
+{
+  "date": "2026-11-27",
+  "toolkit_commit": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "Optimized oneAPI on Intel Arc A770 renderD129, nested DomeD and real OpenXR loader with synthetic tracking",
+  "hardware_regression_fixture_commit": "6774047f06f3c17d571aa33b782201c0a1e0e679",
+  "batch_implementation_commit": "c1dd54594ffaacb982cc8980864a22dec7c9349f",
+  "batch_app_sha256": "76574e69b27447079ac9211c9a39e6793da64b0cee3cf8eff854e9fb525fefc6",
+  "arc_mixed_2048_to_1024": {
+    "tracked_work": 213920060,
+    "tracked_peak_bytes": 183486100,
+    "source_samples": 4194304,
+    "final_project_sha256": "3bf1bbb5bc69dcf10e745d46c0759e2d5f005227a2ac28468ba8bbf4b091dd05",
+    "identical_recorded_reconstruction_metrics": true,
+    "before": {
+      "elapsed_seconds": [
+        18.04,
+        16.98,
+        17.09
+      ],
+      "median_seconds": 17.09,
+      "filter_dispatches": 1024,
+      "usm_copy_calls_with_tables": 2049,
+      "usm_copy_bytes_with_tables": 461381616,
+      "trace": {
+        "file": "artifacts/paint-grid-batched-20261127/before-trace.stdout",
+        "sha256": "338586c8dcc2649079a1648a83965fbbae8d47c3e1bb54c3ad242672d15fcc35"
+      }
+    },
+    "after": {
+      "elapsed_seconds": [
+        16.61,
+        16.82,
+        17.14
+      ],
+      "median_seconds": 16.82,
+      "filter_dispatches": 64,
+      "usm_copy_calls_with_tables": 129,
+      "usm_copy_bytes_with_tables": 461381616,
+      "trace": {
+        "file": "artifacts/paint-grid-batched-20261127/after-trace.stdout",
+        "sha256": "4e5234c2530ee21dc2fe4c02d9460040a59260aa0691416c93f6df19a15a30ce"
+      }
+    }
+  },
+  "registered_hardware_application_suite": {
+    "unique_cases_passed": 42,
+    "initial_run": {
+      "file": "artifacts/gpu-arc-xr-validation-20261127/focused-arc.xml",
+      "sha256": "d543f06dfd11b4b6295994fefad62165fc17d5f18c28fe3d94a002c246aac5de"
+    },
+    "gate_retry": {
+      "file": "artifacts/gpu-arc-xr-validation-20261127/gate-focused-arc.xml",
+      "sha256": "34bf8c0d54733200771602432174a6f251bcd5f162d64fc0604aff9bc3eff4db"
+    },
+    "initial_cases_omitted_by_incomplete_fixture_build": [
+      "vrm1-editable-openxr",
+      "vrm1-editable-scene",
+      "vrm1-painted-authoring"
+    ],
+    "retry_app_sha256": "ca946b418ca56bf2918513b4bf019867a9cfdf9dd598fb8879eab299c5ae163a"
+  },
+  "focused_batch_release_ctest": [
+    {
+      "passed": 26,
+      "file": "artifacts/paint-grid-batched-20261127/oneapi/grid-arc.xml",
+      "sha256": "1d32e736b890db33693bdce3f4cfea62a7c7aee02d6df0cb7e827f8ea1bf20fe"
+    },
+    {
+      "passed": 9,
+      "file": "artifacts/paint-grid-batched-20261127/oneapi/extra-arc.xml",
+      "sha256": "a13046c56eb5815d3af1e68b2f2591d4a4ccae8f2f3a3f849c883624b28fd54b"
+    },
+    {
+      "passed": 11,
+      "file": "artifacts/paint-grid-batched-20261127/oneapi/rest-geometry-arc.xml",
+      "sha256": "a07df46aa0d266810070e7d7663ff1fac15e56018b8b774403194a19efbecde5"
+    }
+  ],
+  "manual_xr_cases": {
+    "normal-domain": {
+      "passed": 20,
+      "file": "artifacts/paint-grid-batched-20261127/manual-xr-archive/normal-domain/report.json",
+      "sha256": "c2554b64705134c7aa089f25ea7124b456d21198a93c893d112244cfcee8c097"
+    },
+    "paint-sampling": {
+      "passed": 20,
+      "file": "artifacts/paint-grid-batched-20261127/manual-xr-archive/paint-sampling/report.json",
+      "sha256": "f785ecf261fba2f1e852eee11ccae7ca2ba073b967a38cce7b17e67ac6d61b0f"
+    },
+    "layered-normal-uv": {
+      "passed": 20,
+      "file": "artifacts/paint-grid-batched-20261127/manual-xr-archive/layered-normal-uv/report.json",
+      "sha256": "70882b41d9d45c9d780c732753f0affa3ffc8df91c6228043de46ca380288a3a"
+    },
+    "layered-normal": {
+      "passed": 30,
+      "file": "artifacts/paint-grid-batched-20261127/manual-xr-final/layered-normal/report.json",
+      "sha256": "d679a6dd8ca5129258a43a2c92eea2b118a5a2e3aea22c70b992c3140463b4bc"
+    }
+  },
+  "hardware_ui": {
+    "Wayland": {
+      "passed": 12,
+      "file": "artifacts/paint-grid-batched-20261127/wayland-resize-v3/report.json",
+      "sha256": "55800c6ed88913294a4de60e553d195eef4692e15f8d7128a16f41912b191819"
+    },
+    "synthetic OpenXR": {
+      "passed": 12,
+      "file": "artifacts/paint-grid-batched-20261127/field-xr-paced-arc-v3/report.json",
+      "sha256": "45c0eab18d1c4759c4cb81cc188811074519b98721b2a0220b27a7b6507a9e29"
+    },
+    "DomeD universal menu": {
+      "passed": 10,
+      "file": "artifacts/paint-grid-batched-20261127/public-root/artifacts/dome-menu/report.json",
+      "sha256": "e4dbaf17ccbed7bea358e424102866033b2d4669af2b2a64250f411aa9b02979"
+    }
+  },
+  "cuda_and_rocm": {
+    "native_release_linked": true,
+    "missing_device_native_bake_checks_passed": true,
+    "positive_hardware_pending": true
+  },
+  "remaining_validation": {
+    "full_arc_suite_stage": "artifacts/gpu-arc-full-release-20261127",
+    "physical_tracking_pending": true,
+    "x11": "Private Xvfb passed the real import chooser and cancellation. Hardware presentation still needs a DRI3-capable X11 test display."
+  }
+}

@@ -40,6 +40,29 @@ and refuse missing devices. Positive AMD and NVIDIA execution,
 the new configuration's complete Release suite and physical XR qualification
 remain open. [GPU-only paint validation](validation/gpu-only-paint-20261127.json)
 
+The native OpenXR regression fixtures now enter the application directly
+with hardware OpenGL. The initial Arc run and the completed VRM export-gate
+retry cover all 42 focused cases. Four standalone UV and normal workflows
+pass 90 additional checks, including accept, cancel and focus loss. They
+verify preserved field ownership across current archive versions. Nested
+DomeD confirms that the universal Import command opens the real Wayland
+chooser and Ctrl+W cancels it without changing history. The X11 import
+chooser also passes. Xvfb presentation still needs a DRI3-capable display.
+
+GPU paint coarsening now packs adjacent authored tiles into one bounded
+dispatch. The 2048-to-1024 mixed fixture goes from 1,024 to 64 dispatched
+kernels and from 2,049 to 129 USM copies, including the table upload.
+The transferred byte count is unchanged. The complete saved project and
+reconstruction metrics match exactly. Tracked peak worker memory remains
+183,486,100 bytes. In three alternating cold Open, reduction and Save runs
+per build, the median is 17.09 seconds before batching and 16.82 seconds
+afterward. The measured times overlap. All 46 focused paint cases pass on
+Arc, including fourfold coarsening across an authored run, a gap and a new
+row. Nested Wayland and synthetic OpenXR again save and replay the result
+exactly. The all-target Arc Release build is in progress and will refresh
+to this checkpoint before running the combined suite.
+[Batching and hardware regression evidence](validation/gpu-paint-batches-20261127.json)
+
 Dome Sculpt is an integrated authoring candidate. The isolated software
 Release run for `662d889d` passed all 1,366 registered tests. The newer
 controller attachment revision `eea22499` passed all 1,367 registered tests
