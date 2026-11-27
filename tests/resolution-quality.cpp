@@ -8,18 +8,53 @@
 #include <nlohmann/json.hpp>
 #include <bit>
 #include <condition_variable>
+#include <future>
 #include <iostream>
+#include <utility>
 #include <unistd.h>
 using namespace dome;
 namespace {
-unsigned checks=0;std::atomic_uint calls=0;std::atomic_bool fail=false,gate=false;
-std::mutex mutex;std::condition_variable changed;bool entered=false,released=false;
+unsigned checks=0;std::atomic_uint calls=0;std::atomic_bool fail=false;
+std::mutex mutex;std::condition_variable changed;
+unsigned serial=0,armed=0,entered=0,released=0;
 void check(bool b,const char*m){++checks;if(!b)throw std::runtime_error(m);std::cout<<"PASS "<<m<<'\n';}
 template<class F>bool refuses(F f){try{f();return false;}catch(const std::exception&e){std::cout<<"REFUSAL "<<e.what()<<'\n';return true;}}
-void arm(){std::lock_guard l(mutex);entered=released=false;gate=true;}
-void await(){std::unique_lock l(mutex);if(!changed.wait_for(l,std::chrono::seconds(30),[]{return entered;}))throw std::runtime_error("Actual aggregate GPU quality boundary did not enter");}
-void release(){std::lock_guard l(mutex);released=true;changed.notify_all();}
+void arm(){std::lock_guard l(mutex);armed=++serial;}
+void await(){
+ std::unique_lock l(mutex);
+ const auto expected=serial;
+ if(!changed.wait_for(l,std::chrono::seconds(30),[&]{return entered>=expected;}))
+  throw std::runtime_error("Actual aggregate quality boundary did not enter");
+}
+void release(){std::lock_guard l(mutex);released=serial;changed.notify_all();}
+void wait_at_gate(){
+ std::unique_lock l(mutex);
+ const auto ticket=std::exchange(armed,0u);
+ if(!ticket)return;
+ entered=ticket;
+ changed.notify_all();
+ if(!changed.wait_for(l,std::chrono::seconds(30),[&]{return released>=ticket;}))
+  throw std::runtime_error("Quality gate timed out");
+}
 struct Release{~Release(){release();}};
+void check_gate_rearm(){
+ arm();
+ auto previous=std::async(std::launch::async,wait_at_gate);
+ await();
+ {
+  // Force the next gate to arm before the old worker can see its release.
+  std::lock_guard l(mutex);
+  released=serial;
+  armed=++serial;
+  changed.notify_all();
+ }
+ previous.get();
+ auto current=std::async(std::launch::async,wait_at_gate);
+ await();
+ release();
+ current.get();
+ check(true,"Rearming after release keeps both worker gates independent");
+}
 nlohmann::json ordered(const Volume &v){auto j=v.encode();std::sort(j["samples"].begin(),j["samples"].end());for(auto &l:j["sculpt_layers"])std::sort(l["delta"].begin(),l["delta"].end());if(j.contains("sculpt_mask"))std::sort(j["sculpt_mask"]["values"].begin(),j["sculpt_mask"]["values"].end());return j;}
 Volume fixture(int size=33){
  Volume v(.02f);auto id=v.add_layer("Hidden independent 日本語");v.layer_properties(id,"Hidden independent 日本語",false,true,.37f);v.fill_mask(.37f);
@@ -46,9 +81,12 @@ void ready(Document&d){if(!d.wait_mesh())throw std::runtime_error("Current immut
 extern "C" uint64_t quality_real(SparseFieldSampler*,std::span<const sparse_resample::ErrorQuery>,const std::function<bool()>&) asm("__real__ZN4dome18SparseFieldSampler13maximum_errorESt4spanIKNS_15sparse_resample10ErrorQueryELm18446744073709551615EERKSt8functionIFbvEE");
 extern "C" uint64_t quality_wrap(SparseFieldSampler*s,std::span<const sparse_resample::ErrorQuery>q,const std::function<bool()>&cancelled) asm("__wrap__ZN4dome18SparseFieldSampler13maximum_errorESt4spanIKNS_15sparse_resample10ErrorQueryELm18446744073709551615EERKSt8functionIFbvEE");
 extern "C" uint64_t quality_wrap(SparseFieldSampler*s,std::span<const sparse_resample::ErrorQuery>q,const std::function<bool()>&cancelled){
- ++calls;auto value=quality_real(s,q,cancelled);
- if(gate.exchange(false)){std::unique_lock l(mutex);entered=true;changed.notify_all();if(!changed.wait_for(l,std::chrono::seconds(30),[]{return released;}))throw std::runtime_error("Quality gate timed out");}
- if(fail.load())throw std::runtime_error("Injected post-aggregate quality failure");return value;
+ ++calls;
+ const bool inject=fail.load();
+ const auto value=quality_real(s,q,cancelled);
+ wait_at_gate();
+ if(inject)throw std::runtime_error("Injected post-aggregate quality failure");
+ return value;
 }
 int main(int argc,char**argv)try{
  auto source=fixture();const auto before=ordered(source);auto owner=source.geometry_owner();auto o=options();
@@ -79,6 +117,7 @@ int main(int argc,char**argv)try{
  check(closed.layers()[0].delta.size()>=32768&&closed_result.replacement&&closed_result.report.source.closed_manifold()&&closed_result.report.target.closed_manifold()&&closed_result.report.source_euler==closed_result.report.target_euler&&closed_result.report.minimum_normal_dot>=.5f&&(gpu?calls.load()>0:calls.load()==0),"Eligible visible closed Volume retains certified topology/distance/normals alongside aggregate reconstruction");
  o=options();
  if(!gpu){std::cout<<"PASS "<<checks<<" native CPU quality integration checks\n";return 0;}
+ check_gate_rearm();
  fail=true;o=options();check(refuses([&]{resample_sculpt(source,o);})&&ordered(source)==before,"Real aggregate post-readback failure preserves full detached source and never retries on CPU");fail=false;
  auto path=std::filesystem::temp_directory_path()/("dome-quality-"+std::to_string(getpid())+".dsculpt");
  Document d;d.replace(scene(source));ready(d);const auto original=d.copy_scene().encode();const auto paint_owner=d.copy_scene().active().painted;const auto other_owner=d.copy_scene().object(2).volume->geometry_owner();
