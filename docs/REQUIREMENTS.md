@@ -91,9 +91,17 @@ undeformed native reference. Paint layers, Bake and supported static
 MToon roles follow the patch on their own grids. Interior raster samples
 check that each destination triangle belongs to its chosen source material.
 The original source becomes the hidden guide, and subsequent Apply uses
-the patch's material ancestry. Prepared imported fields and actively
-deformed first-transfer sources remain open.
+the patch's material ancestry.
 [First material transfer evidence](validation/retopology-first-material-20261127.json)
+
+First material transfer supports native guides with active morphs and skin
+poses. The evaluated surface supplies ray and nearest-hit geometry. The
+original triangle and UV order stays authoritative for paint. Canonical
+Bake normals use the placed posed tangent frame and the quantized output
+is checked against the patch frame. Supported static MToon texture roles
+also use the posed surface. The original rig and morphs stay editable on
+the hidden guide. Prepared imported fields remain open.
+[Posed material transfer evidence](validation/retopology-first-material-pose-20261127.json)
 
 Native multi-material retopology preserves independently painted and baked
 grids and original VRM 1.0 joint links when Apply changes the patch.

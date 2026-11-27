@@ -121,10 +121,26 @@ project and GLB outputs match across profiles. Nested DomeD Wayland builds
 the first two faces with pointer gestures and exports two material slots
 through the universal menu. Synthetic OpenXR renders both material sets in
 both eyes on Intel Arc A770 and llvmpipe. All four worker and Wayland exports
-pass Khronos validation with zero errors and warnings. Prepared imported
-fields and actively deformed references still need their own first-transfer
-adapters.
+pass Khronos validation with zero errors and warnings.
 [First material transfer validation](validation/retopology-first-material-20261127.json)
+
+First Apply also accepts native guides with active shapekeys or skin
+poses. Picking and material assignment use the evaluated surface, while
+paint still samples its original ordered triangle UVs. Baked normal maps
+are reoriented between the placed tangent frames of the posed mesh and the
+new patch. Static MToon roles use the posed geometry for their derivative
+frames. The new patch captures the visible geometry. Its hidden guide
+keeps the original rig, shapekeys, materials and pose.
+
+The two fixtures place the visible surface beyond rest projection reach.
+The reflected and sheared case combines active skin and morphs with a typed
+MToon material. The 36 selected Release tests and eight strict ASan/UBSan
+cases pass. Nine native files and GLBs match across build profiles. Nested
+DomeD Wayland traces, applies, saves and exports the morph-only patch.
+Synthetic OpenXR renders both material slots in both eyes on Arc A770 and
+llvmpipe. Four GLBs pass Khronos validation with zero errors and warnings.
+Prepared imported fields still need their first-transfer adapter.
+[Posed material transfer validation](validation/retopology-first-material-pose-20261127.json)
 
 Retopology reapply now works on native multi-material accessories attached
 to original VRM 1.0 joints. The replacement keeps its avatar hierarchy and

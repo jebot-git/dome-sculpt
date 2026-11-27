@@ -1,0 +1,307 @@
+{
+  "product": "853c4140a9adf61f456536b1edf0569e23e71d60",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "canonical_domed_compositor_sha256": "47920142c8c803dcf5adb63ba643d2e347fbdcd1e15ecd8bce7c1a8dd47c0b7e",
+  "release_binary_sha256": "fd5b01c9bc89883fe58d9c566c821eac2ccd79f8bf6ca2f3d198beceff9d74b3",
+  "sanitizer_binary_sha256": "cdec1eb9da091b0b8da84ccbd1dfec7eb3f36e92f75d1dd9f03b526e6428407e",
+  "release_tests": [
+    "retopology-prepared-color-normal-first",
+    "retopology-prepared-color-normal-plain",
+    "dome-sculpt-texture-set-export",
+    "retopology-prepared-color-normal-affine",
+    "retopology-reapply-plain",
+    "retopology-save-handoff",
+    "retopology-reapply-affine",
+    "retopology-held-admission",
+    "retopology-history-openxr-apply",
+    "retopology-history-openxr-cancel",
+    "retopology-restore-plain",
+    "retopology-mtoon-detached",
+    "retopology-restore-affine",
+    "retopology-mtoon-plain",
+    "retopology-mtoon-affine",
+    "retopology-linked-vrm1",
+    "retopology-surface-heat-plain",
+    "retopology-affine",
+    "retopology-surface-heat-affine",
+    "retopology-subdivide-seam-plain",
+    "retopology-mtoon-v0",
+    "retopology-subdivide-seam-affine",
+    "retopology-material-seam-plain",
+    "retopology-authoring",
+    "retopology-material-seam-affine",
+    "retopology-first-material-affine",
+    "retopology-first-material-posed-plain",
+    "retopology-first-material-posed-affine",
+    "retopology-first-material-plain",
+    "retopology-mixed-material",
+    "retopology-authority-focus",
+    "retopology-authority-grab",
+    "dome-sculpt-texture-set-surfaces",
+    "retopology-prepared-color-normal-uv-affine",
+    "retopology-prepared-color-normal-uv-plain",
+    "canonical-paint-color-hdr"
+  ],
+  "strict_asan_ubsan": [
+    "retopology-material-seam-plain",
+    "retopology-material-seam-affine",
+    "retopology-mtoon-plain",
+    "retopology-first-material-affine",
+    "retopology-first-material-posed-plain",
+    "retopology-first-material-posed-affine",
+    "retopology-first-material-plain",
+    "retopology-mixed-material"
+  ],
+  "native_checks": {
+    "plain": {
+      "release": {
+        "checks": 27,
+        "normal_samples": 820,
+        "max_normal_chord": 9.5414e-08
+      },
+      "asan": {
+        "checks": 27,
+        "normal_samples": 820,
+        "max_normal_chord": 9.5414e-08
+      }
+    },
+    "affine": {
+      "release": {
+        "checks": 28,
+        "normal_samples": 745,
+        "max_normal_chord": 6.664e-08
+      },
+      "asan": {
+        "checks": 28,
+        "normal_samples": 745,
+        "max_normal_chord": 6.664e-08
+      }
+    }
+  },
+  "identical_native_projects_and_glbs_sha256": {
+    "retopology-first-material-posed-plain/first-material-editable.glb": "e3131a4e082a9e6a84898de82d7821dd37701fe41a884058ec15720befaeab68",
+    "retopology-first-material-posed-plain/first-material-patch.dsculpt": "b83c9fff688b277e1fddb8b188be0127ced512b5bcc1500bbae91fa77f937da1",
+    "retopology-first-material-posed-plain/first-material-reapplied.dsculpt": "b6fdeb90c3e3cc95b4575c010aea43b4f2637a9e393b0692444d1030fabc8e84",
+    "retopology-first-material-posed-plain/first-material-source.dsculpt": "1a823514a4bb56682c1ed47267aad50c5469d56d10ba4dd45635530cb5c83804",
+    "retopology-first-material-posed-plain/first-material-standard.glb": "8186a05c715a40457a3c380f5e4e6a9ff7a2b0e0b662b0df1fc984ecf1053362",
+    "retopology-first-material-posed-affine/first-material-editable.glb": "92f4285546c61d8ed6b4820b9dfe5b8ba04d811da4b22e3f53eb5c0942a59b6f",
+    "retopology-first-material-posed-affine/first-material-patch.dsculpt": "e72a4ac031731859029e9b2bc2573221f179c30a41959efda05308a4d18d9acf",
+    "retopology-first-material-posed-affine/first-material-reapplied.dsculpt": "5154d44a5945294b4deb7f74ce58e565239e77d70b1beedeeea43d4c4c7bef90",
+    "retopology-first-material-posed-affine/first-material-source.dsculpt": "44e0237ca45ffd04eb88559bd95ac6b84cc96803695435ae6fb276cfead89a59"
+  },
+  "wayland": {
+    "checks": [
+      {
+        "passed": true,
+        "check": "Native retopology editor publishes the canonical Dome Sculpt Wayland identity"
+      },
+      {
+        "passed": true,
+        "check": "The actual Wayland universal menu enables Start patch on a posed two-material source"
+      },
+      {
+        "passed": true,
+        "check": "An empty patch keeps Apply disabled"
+      },
+      {
+        "passed": true,
+        "check": "Canvas gestures create two adjacent editable faces on the original material boundary"
+      },
+      {
+        "passed": true,
+        "check": "Universal Apply and Save publish a separate two-face patch and hide the original guide"
+      },
+      {
+        "passed": true,
+        "check": "An independent reader finds both exported paint textures and their material slots"
+      },
+      {
+        "passed": true,
+        "check": "Native client releases the compositor and export worker on close"
+      }
+    ],
+    "complete": true
+  },
+  "synthetic_openxr": {
+    "arc-plain": {
+      "material_pixels_per_eye": {
+        "first-material-source": {
+          "0": [
+            31800,
+            41193
+          ],
+          "1": [
+            31069,
+            46367
+          ]
+        },
+        "first-material-patch": {
+          "0": [
+            17388,
+            26219
+          ],
+          "1": [
+            16954,
+            25522
+          ]
+        }
+      },
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "submissions_per_project": 6,
+      "differing_rgb_components_per_eye": [
+        88159,
+        104880
+      ],
+      "exact_native_save": true
+    },
+    "arc-affine": {
+      "material_pixels_per_eye": {
+        "first-material-source": {
+          "0": [
+            36739,
+            12820
+          ],
+          "1": [
+            40360,
+            11451
+          ]
+        },
+        "first-material-patch": {
+          "0": [
+            22463,
+            7530
+          ],
+          "1": [
+            22365,
+            7202
+          ]
+        }
+      },
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "submissions_per_project": 6,
+      "differing_rgb_components_per_eye": [
+        107722,
+        111152
+      ],
+      "exact_native_save": true
+    },
+    "software-plain": {
+      "material_pixels_per_eye": {
+        "first-material-source": {
+          "0": [
+            31799,
+            41192
+          ],
+          "1": [
+            31068,
+            46366
+          ]
+        },
+        "first-material-patch": {
+          "0": [
+            17387,
+            26218
+          ],
+          "1": [
+            16954,
+            25521
+          ]
+        }
+      },
+      "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+      "submissions_per_project": 6,
+      "differing_rgb_components_per_eye": [
+        88158,
+        104877
+      ],
+      "exact_native_save": true
+    },
+    "software-affine": {
+      "material_pixels_per_eye": {
+        "first-material-source": {
+          "0": [
+            36738,
+            12754
+          ],
+          "1": [
+            40359,
+            11399
+          ]
+        },
+        "first-material-patch": {
+          "0": [
+            22462,
+            7496
+          ],
+          "1": [
+            22365,
+            7177
+          ]
+        }
+      },
+      "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+      "submissions_per_project": 6,
+      "differing_rgb_components_per_eye": [
+        108519,
+        112157
+      ],
+      "exact_native_save": true
+    }
+  },
+  "khronos_version": "2.0.0-dev.3.10",
+  "khronos": {
+    "release/retopology-first-material-posed-plain/first-material-standard.glb": {
+      "numErrors": 0,
+      "numWarnings": 0,
+      "numInfos": 0,
+      "numHints": 0
+    },
+    "release/retopology-first-material-posed-plain/first-material-editable.glb": {
+      "numErrors": 0,
+      "numWarnings": 0,
+      "numInfos": 1,
+      "numHints": 0
+    },
+    "release/retopology-first-material-posed-affine/first-material-editable.glb": {
+      "numErrors": 0,
+      "numWarnings": 0,
+      "numInfos": 1,
+      "numHints": 0
+    },
+    "wayland-first-material/wayland-patch.glb": {
+      "numErrors": 0,
+      "numWarnings": 0,
+      "numInfos": 0,
+      "numHints": 0
+    }
+  },
+  "physical_headset": false,
+  "archive_sha256": "d5a25dba13ecf97963b5371d36bc89f8bb5bac328a685f1236a9273fe7176dc4",
+  "archive_members_sha256": {
+    "check-profile.sh": "511aab4cb5eceaed731ac807ffbcaa2100e0a30f709aaefd119c9a3176057126",
+    "relink-sanitizer.py": "3656fc8f55012e2998265bf1f5d04fd3020b535332115b72e7ea7b888c1713f8",
+    "release-final.log": "7d85cd5ad2ac7d656151cdbbb25585d2eedc6f3a6a6a92add4633fe2fb9d987f",
+    "release-final-build.log": "ecf722a58ec3c7bdeb290e1e72dd410f2eafa2d3ee6dd8a2eeddf7d27ffaeb94",
+    "asan-final.log": "81779298255fef23eb83e5f3b46e5f08474b587e24c7730961110fb534e6b78d",
+    "asan-final-configure.log": "42de122ee3d67b18b81e97e686f712e8ecc2fc12f832b524d2ee7ba7943bd11d",
+    "asan-final-build.log": "e71336e174f57a3dbe29a17fdf4d567ba1e5920dfd35eb5f2dcb14a7ae03692c",
+    "release-plain-controls.log": "f0453471153c9c11aab8fc50e12bdd7596d91ab6a90b7acb50162bb56526ce9a",
+    "asan-plain-controls.log": "04997c23c221a47745bd90d014a3c43ec8a36eae333c8213c768a717b6540a4d",
+    "release-affine-controls.log": "1e1968af428797da0955e6c85091b12420686593bf00266f93586285b0c84828",
+    "asan-affine-controls.log": "26d1d3de89678a8a72ad6f86e6af522ecdf52777fa9e5bd2fc38af3ef5a9ed02",
+    "khronos.cjs": "a7827307bab4275677d008710f26c9fe132f82a2808cc5838fac94de0e8dbe9a",
+    "khronos.json": "1f5dde905a70bb06d957403713a8891aa30c00fba1df6b2383c5d3c3e0e4eed8",
+    "run-wayland.py": "b968eed4b8fb156c347835dbbbe66532d091c10060d9d0e30df8301c2244c65e",
+    "wayland-first-material.py": "c5991140d067d7fbdb49ecf53a6595c8702a571a0ac4db99a7e7c61edf2cf71b",
+    "bind-wayland.log": "7004b4156aeeb2de8de0521be2e2cb792730cf56e81b911c612faa978cb10d26",
+    "wayland-first-material/report.json": "1eee0e4d0c29fc30b1c439c8188a639d8b0179365f80ededcc346c97be05ba68",
+    "wayland-first-material/corners.json": "bd3bee045f8b799399b7b4668c4d8e71f43bf293c227041f768f99866837c8f4",
+    "record.py": "ca29508909f758f3bc57bab5982719dfc6c35dd722ca352564974f5803bc88c6",
+    "run-render.py": "af29903acbd4ea5c62bc0c8613729e993242853ae2f9db2c31aa24d5e9370987",
+    "xr-first-material.py": "c0c8547d75f232ab1f72766aa10a8aa7c345bdfd97e4b1f427a4eda97d178e6c",
+    "xr-arc-plain/compare.json": "8fe2e61c28ba6d4d95f597bdde369a121507a284d43525331a14802b7a1be9a8",
+    "xr-arc-affine/compare.json": "91e5106f8c7ec1f667e83d6649c1a17cf56c52724c2d0367d58ef0d7edbaf5db",
+    "xr-software-plain/compare.json": "d402806a1c372f17985460ff07797e70059ef6bd6847ea8ffac8dd78113b6699",
+    "xr-software-affine/compare.json": "117626b67135eafef16ce635dd4f05f56e999cabe55f8d7b389e275345e5635d"
+  }
+}
