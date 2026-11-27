@@ -83,7 +83,7 @@ const Material &NativePaintSampling::original_native_material() const noexcept {
 }
 bool NativePaintSampling::valid_owner(const std::shared_ptr<const NativePaintSampling> &owner) const noexcept {auto actual=self_.lock();return actual&&actual==owner&&!actual.owner_before(owner)&&!owner.owner_before(actual);}
 bool NativePaintSampling::matches_current(const PaintedMesh &paint) const noexcept {
-  return native_grid_state(paint)&&attachment_&&before_&&paint.resolution()==before_->resolution()&&paint.valid_paint_sampling_attachment()&&attachment_->matches(paint.mesh_owner(),paint.paint_sampling_domain());
+  return native_grid_state(paint)&&attachment_&&before_&&paint.valid_paint_sampling_attachment()&&attachment_->matches(paint.mesh_owner(),paint.paint_sampling_domain());
 }
 void NativePaintSampling::validate_mesh(const Mesh &mesh,const PaintSamplingLimits &limits) const {
   stop(limits);if(!attachment_)throw std::invalid_argument("Native retained paint has no sealed current geometry");same_mesh(mesh,*attachment_->authored_geometry(),limits);

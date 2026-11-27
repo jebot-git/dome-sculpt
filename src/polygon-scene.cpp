@@ -1202,7 +1202,7 @@ PolygonSceneArchive PolygonSceneArchive::decode(
                                     "conflicting immutable material owners");
       if (!bound_paints[id]) {
         out.paints_[id] =
-            rebind_paint_sampling_geometry(*value->paint, attachment);
+            rebind_material_paint_sampling_geometry(*value->paint, value->material_bindings.get());
         bound_paints[id] = attachment;
       }
       value->paint = out.paints_[id];
@@ -1465,7 +1465,7 @@ struct PolygonSceneReader::Impl {
                                     "conflicting immutable material owners");
       if (!bound_paints[paint_id]) {
         out.paints_[paint_id] =
-            rebind_paint_sampling_geometry(*value->paint, attachment);
+            rebind_material_paint_sampling_geometry(*value->paint, value->material_bindings.get());
         bound_paints[paint_id] = attachment;
       }
       value->paint = out.paints_[paint_id];

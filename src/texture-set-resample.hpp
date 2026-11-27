@@ -23,6 +23,11 @@ inline bool resizable_canonical_bake(const BakedTextures *bake) noexcept {
   return !bake || (!bake->normal_authority && !bake->normal_field &&
                     bake->normal_interpretation == BakedNormalInterpretation::CanonicalMikk);
 }
+inline bool resizable_native_uv_bake(const BakedTextures *bake) noexcept {
+  return resizable_canonical_bake(bake) ||
+      (bake && !bake->normal_authority && !bake->normal_field &&
+       bake->normal_interpretation == BakedNormalInterpretation::NativeAttributes);
+}
 
 // No geometry interpretation: filters every authored texel, including hidden,
 // masked and currently uncovered values, on independently preserved planes.
@@ -31,5 +36,5 @@ std::vector<PaintLayer> resample_texture_set_layers(
     const TextureSetLimits &, TextureSetResolutionReport &, bool native_cells = false);
 std::shared_ptr<const BakedTextures> resample_native_bake_grid(
     const BakedTextures &,uint32_t original,const TextureSetResolutionOptions &,
-    const TextureSetLimits &,TextureSetResolutionReport &);
+    const TextureSetLimits &,TextureSetResolutionReport &,bool retained_native_uv);
 } // namespace dome::detail

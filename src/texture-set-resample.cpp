@@ -7,6 +7,7 @@
 #include "texture-set-graph.hpp"
 #include "texture-set-paint-access.hpp"
 #include "texture-set-surface.hpp"
+#include "native-paint-sampling.hpp"
 #include <algorithm>
 #include <cmath>
 #include <limits>
@@ -21,13 +22,20 @@ void TextureSetResolutionOptions::validate() const {
 }
 namespace detail {
 bool can_resize_native_texture_grid(const SculptObject &object) noexcept {
-  if (!object.mesh_active || !object.painted || object.texture_sets ||
-      object.polygon ||
-      !TextureSetPaintAccess::can_resize_raw(*object.painted))
+  if (!object.mesh_active || !object.painted || object.texture_sets || object.polygon)
+    return false;
+  const auto &binding = object.material_bindings;
+  if (binding && binding->native_paint_sampling) {
+    const auto &owner = binding->native_paint_sampling;
+    const auto &paint = *object.painted;
+    return !paint.in_stroke() && owner->valid_owner(owner) && owner->matches_current(paint) &&
+           resizable_native_uv_bake(paint.baked().get()) &&
+           (resizable_canonical_bake(paint.baked().get()) || bool(binding->native_paint_frames));
+  }
+  if (!TextureSetPaintAccess::can_resize_raw(*object.painted))
     return false;
   // A retopology patch retains topology and mesh identity independently of
   // its writable raster. The raw-grid transition keeps its projected images.
-  const auto &binding = object.material_bindings;
   return !binding ||
          (!binding->normal_preparation && !binding->color_preparation &&
           !binding->canonical_attributes && !binding->native_paint_sampling &&
@@ -738,16 +746,17 @@ std::vector<PaintLayer> resample_texture_set_layers(
 
 std::shared_ptr<const BakedTextures> resample_native_bake_grid(
     const BakedTextures &before,uint32_t from,const TextureSetResolutionOptions &options,
-    const TextureSetLimits &limits,TextureSetResolutionReport &report) {
+    const TextureSetLimits &limits,TextureSetResolutionReport &report,bool retained_native_uv) {
   stop(limits);
   before.validate(from);
-  if(!resizable_canonical_bake(&before))
-    throw std::invalid_argument("Paint resolution requires an ordinary canonical Bake grid");
+  if(!(retained_native_uv?resizable_native_uv_bake(&before):resizable_canonical_bake(&before)))
+    throw std::invalid_argument("Paint resolution requires its supported native Bake grid");
   const auto to=options.resolution;
   const size_t source_pixels=size_t(from)*from,target_pixels=size_t(to)*to;
   const bool enlarge=to>=from;
   auto after=std::make_shared<BakedTextures>();
   after->color_interpretation=before.color_interpretation;
+  after->normal_interpretation=before.normal_interpretation;
   after->maps.transparent=before.maps.transparent;
   const std::array old_images{&before.maps.color,&before.maps.pbr_color,&before.maps.metal_rough,
                              &before.maps.normal,&before.maps.emission};
@@ -887,11 +896,20 @@ TextureSetResolutionReport resample_native_texture_grid(
   const bool empty = detail::TextureSetPaintAccess::can_resize_unpainted(*before.painted);
   if (!empty && compute_backend() != "CPU")
     throw std::logic_error("Paint grid resampling requires the CPU build");
+  const auto retained = before.material_bindings ? before.material_bindings->native_paint_sampling : nullptr;
+  if (retained) {
+    PaintSamplingLimits policy;
+    policy.cancelled=limits.cancelled;
+    policy.max_work=limits.maximum_work;
+    policy.max_working_bytes=limits.maximum_bytes;
+    retained->validate_current(*before.painted,policy);
+  }
   const auto resized = empty
       ? detail::TextureSetPaintAccess::resize_unpainted(*before.painted, options.resolution, limits)
-      : detail::TextureSetPaintAccess::resample_plain(*before.painted, options, limits, report);
+      : detail::TextureSetPaintAccess::resample_plain(*before.painted, options, limits, report,false,retained.get());
   if (resized->mesh_owner() != before.painted->mesh_owner() ||
       resized->source_maps() != before.painted->source_maps() ||
+      resized->paint_sampling_attachment() != before.painted->paint_sampling_attachment() ||
       !resized->valid_source_sampling_attachment() ||
       !resized->valid_paint_sampling_attachment())
     throw std::invalid_argument("Native resolution lost its immutable mesh or image authority");

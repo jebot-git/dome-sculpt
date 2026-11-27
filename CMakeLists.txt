@@ -5331,6 +5331,8 @@ if(BUILD_TESTING)
     ${CMAKE_CURRENT_BINARY_DIR}/native-authored-paint-resolution)
   add_test(NAME native-baked-paint-resolution COMMAND dome-sculpt-native-paint-resolution-test baked
     ${CMAKE_CURRENT_BINARY_DIR}/native-baked-paint-resolution)
+  add_test(NAME native-retained-paint-resolution COMMAND dome-sculpt-native-paint-resolution-test retained
+    ${CMAKE_CURRENT_BINARY_DIR}/native-retained-paint-resolution)
   set_tests_properties(native-empty-paint-resolution native-authored-paint-resolution PROPERTIES TIMEOUT 420)
 endif()
 

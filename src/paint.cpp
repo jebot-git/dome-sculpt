@@ -2161,10 +2161,15 @@ std::shared_ptr<PaintedMesh>detail::TextureSetPaintAccess::bind(const PaintedMes
   if(limits.cancelled&&limits.cancelled())throw std::runtime_error("Texture-set paint binding cancelled");return result;
 }
 std::shared_ptr<PaintedMesh> detail::TextureSetPaintAccess::resample_plain(const PaintedMesh&before,
-    const TextureSetResolutionOptions&options,const TextureSetLimits&limits,TextureSetResolutionReport&report,bool native_mtoon){
+    const TextureSetResolutionOptions&options,const TextureSetLimits&limits,TextureSetResolutionReport&report,
+    bool native_mtoon,const NativePaintSampling *retained_uv){
  options.validate();limits.validate();const auto domain=before.texture_set_domain_;
+ const auto sampling=before.paint_sampling_domain();
  if(domain)domain->authenticate_owner(domain);
- if((!domain&&!can_resize_raw(before))||(domain&&(!valid_raster(before)||before.in_stroke()||!domain->matches(before.mesh_owner())||
+ if(retained_uv&&(!valid_raster(before)||before.in_stroke()||domain||!sampling||sampling->version()!=1||
+    !retained_uv->matches_current(before)||!resizable_native_uv_bake(before.baked_.get())))
+   throw std::invalid_argument("Resampling requires the actual retained native UV and Bake owner");
+ if((!domain&&!retained_uv&&!can_resize_raw(before))||(domain&&(!valid_raster(before)||before.in_stroke()||!domain->matches(before.mesh_owner())||
     before.paint_sampling_domain()||(before.source_maps_&&(!native_mtoon||before.source_maps_->uses_alternate_uv()))||before.source_sampling_prepared()||
     before.sampling_attachment_||before.color_projection_||before.normal_projection_||!resizable_canonical_bake(before.baked_.get())||
     before.surface_->original_sampling||before.surface_->source_capture_only)))
@@ -2183,11 +2188,24 @@ std::shared_ptr<PaintedMesh> detail::TextureSetPaintAccess::resample_plain(const
   if(fixed>limits.maximum_work-report.work)throw std::length_error("Native raster initialization exceeds its prospective work bound");
   report.work+=fixed;
  }
+ if(retained_uv){
+  constexpr size_t vertex_bytes=2*sizeof(Vec3)+sizeof(std::array<float,2>)+sizeof(uint32_t);
+  if(mesh.indices.size()>(limits.maximum_bytes-std::min(limits.maximum_bytes,candidate_bytes))/vertex_bytes||
+     mesh.indices.size()>(limits.maximum_work-report.work)/16)
+    throw std::length_error("Retained UV raster construction exceeds its prospective budget");
+  candidate_bytes+=mesh.indices.size()*vertex_bytes;
+  report.work+=16*mesh.indices.size();
+ }
+ const auto uv=[&](size_t corner) {
+  if(!retained_uv)return mesh.uv.at(mesh.indices.at(corner));
+  const auto &basis=*sampling->basis();
+  return basis.uv.at(basis.indices.at(sampling->source_corners()[corner]));
+ };
  const size_t triangle_count=domain?domain->triangles().size():mesh.indices.size()/3;
  for(size_t index=0;index<triangle_count;++index){
   if(limits.cancelled&&limits.cancelled())throw std::runtime_error("Texture-set candidate forecast cancelled");
   const auto triangle=domain?domain->triangles()[index]:index;
-  const auto a=mesh.uv.at(mesh.indices.at(size_t(triangle)*3)),b=mesh.uv.at(mesh.indices.at(size_t(triangle)*3+1)),c=mesh.uv.at(mesh.indices.at(size_t(triangle)*3+2));
+  const auto a=uv(size_t(triangle)*3),b=uv(size_t(triangle)*3+1),c=uv(size_t(triangle)*3+2);
   const int x0=std::max(0,int(std::floor(std::min({a[0],b[0],c[0]})*r))),x1=std::min(int(r)-1,int(std::ceil(std::max({a[0],b[0],c[0]})*r)));
   const int y0=std::max(0,int(std::floor(std::min({a[1],b[1],c[1]})*r))),y1=std::min(int(r)-1,int(std::ceil(std::max({a[1],b[1],c[1]})*r)));
   const size_t n=size_t(std::max(0,x1-x0+1))*std::max(0,y1-y0+1);
@@ -2216,7 +2234,9 @@ std::shared_ptr<PaintedMesh> detail::TextureSetPaintAccess::resample_plain(const
   raster_options.max_candidate_checks=std::max(size_t(1),std::min(raster_options.max_candidate_checks,limits.maximum_work-report.work-samples));
  }
  PaintSamplingLimits sampling_limits;sampling_limits.cancelled=limits.cancelled;
- auto surface=std::make_shared<PaintedMesh::SurfaceMap>(before.surface_->geometry,options.resolution,std::move(raster_options),nullptr,sampling_limits,domain);
+ sampling_limits.max_work=limits.maximum_work;
+ sampling_limits.max_working_bytes=limits.maximum_bytes;
+ auto surface=std::make_shared<PaintedMesh::SurfaceMap>(before.surface_->geometry,options.resolution,std::move(raster_options),sampling,sampling_limits,domain);
  // The exact current-grid forecast bounds this construction only. Retain the
  // original caller ceilings for a later larger grid, rather than persisting a
  // downsample's smaller sample/check forecast as a lifetime size restriction.
@@ -2228,7 +2248,7 @@ std::shared_ptr<PaintedMesh> detail::TextureSetPaintAccess::resample_plain(const
  if(raster_work>limits.maximum_work-report.work)throw std::length_error("Texture-set resolution raster exceeds complete work budget");report.work+=raster_work;
  auto result=before.snapshot();result->surface_=std::move(surface);result->layers_=std::move(layers);
  if(before.baked_)
-  result->baked_=detail::resample_native_bake_grid(*before.baked_,before.resolution(),options,limits,report);
+  result->baked_=detail::resample_native_bake_grid(*before.baked_,before.resolution(),options,limits,report,bool(retained_uv));
  result->allocated_tiles_=result->allocated_color_tiles_=0;
  for(const auto&l:result->layers_){result->allocated_tiles_+=tile_count(l);result->allocated_color_tiles_+=color_tile_count(l);}
  result->composite_cache_=std::make_shared<PaintedMesh::CompositeCache>();result->composite_token_=next_composite_token();++result->revision_;
@@ -2336,7 +2356,8 @@ struct SourcePaintSamplingAccess {
     if(limits.cancelled&&limits.cancelled())throw std::runtime_error("Retained normal adoption cancelled");return result;
   }
   static std::shared_ptr<PaintedMesh> rebind(const PaintedMesh &paint,
-      std::shared_ptr<const PaintSamplingAttachment> attachment,const PaintSamplingLimits &limits){
+      std::shared_ptr<const PaintSamplingAttachment> attachment,const PaintSamplingLimits &limits,
+      bool independent_resolution=false){
     auto stop=[&]{if(limits.cancelled&&limits.cancelled())throw std::runtime_error("Writable paint geometry rebind cancelled");};stop();
     if(paint.in_stroke()||!attachment||!attachment->surface_||!paint.valid_paint_sampling_attachment())
       throw std::invalid_argument("Writable paint rebind requires finished independently sealed geometry");
@@ -2345,14 +2366,20 @@ struct SourcePaintSamplingAccess {
       throw std::invalid_argument("Writable paint rebind cannot replace its exact domain owner");
     const auto surface=std::static_pointer_cast<const PaintedMesh::SurfaceMap>(attachment->surface_);
     const auto &a=paint.mesh(),&b=surface->mesh;
-    if(paint.resolution()!=surface->resolution||paint.surface_->options.policy!=surface->options.policy||
+    const bool same_grid=paint.resolution()==surface->resolution;
+    if((!same_grid&&!independent_resolution)||paint.surface_->options.policy!=surface->options.policy||
        !surface->sampling_raster_proven||!attachment->matches(surface->geometry,surface->paint_domain)||
        a.positions.size()!=b.positions.size()||a.normals.size()!=b.normals.size()||a.indices!=b.indices||a.uv!=b.uv||a.uv_pins!=b.uv_pins||a.uv_seams!=b.uv_seams)
       throw std::invalid_argument("Writable paint rebind differs in current layout, resolution or policy");
     domain->validate_current(a,limits);
     for(size_t v=0;v<a.positions.size();++v){if((v&1023)==0)stop();if(a.positions[v].x!=b.positions[v].x||a.positions[v].y!=b.positions[v].y||a.positions[v].z!=b.positions[v].z||a.normals[v].x!=b.normals[v].x||a.normals[v].y!=b.normals[v].y||a.normals[v].z!=b.normals[v].z)
       throw std::invalid_argument("Writable paint rebind differs from exact REST geometry");}
-    auto result=paint.snapshot();result->surface_=surface;result->sampling_attachment_=std::move(attachment);stop();return result;
+    auto result=paint.snapshot();
+    // The codec has already constructed and validated the requested raster.
+    // Reattach the native history's exact mesh owner without copying pixels.
+    result->surface_=same_grid?surface:
+        std::make_shared<const PaintedMesh::SurfaceMap>(*paint.surface_,surface->geometry,domain);
+    result->sampling_attachment_=std::move(attachment);stop();return result;
   }
   template<class Geometry> static std::shared_ptr<PaintedMesh> retain(const PaintedMesh &before,Geometry &&authored,
       std::shared_ptr<const PaintSamplingDomain> domain,const PaintSamplingLimits &limits,bool native_grid=false){
@@ -2507,6 +2534,15 @@ std::shared_ptr<PaintedMesh> adopt_retained_paint_normal(const PaintedMesh &pain
 std::shared_ptr<PaintedMesh> rebind_paint_sampling_geometry(const PaintedMesh &paint,
     std::shared_ptr<const PaintSamplingAttachment> attachment,const PaintSamplingLimits &limits){
   return SourcePaintSamplingAccess::rebind(paint,std::move(attachment),limits);
+}
+std::shared_ptr<PaintedMesh> detail::rebind_material_paint_sampling_geometry(const PaintedMesh &paint,
+    const SourceMaterialBindings *binding,const PaintSamplingLimits &limits) {
+  const auto native=binding?binding->native_paint_sampling:nullptr;
+  auto result=SourcePaintSamplingAccess::rebind(paint,material_paint_attachment(binding),limits,
+      native&&native->valid_owner(native));
+  if(native&&!native->matches_current(*result))
+    throw std::invalid_argument("Decoded native paint grid lost its retained UV owner");
+  return result;
 }
 struct SourceKeyPaintAccess {
   // A declared key-domain alias names a complete SurfaceMap, including Source4

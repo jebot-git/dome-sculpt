@@ -24,4 +24,8 @@ std::shared_ptr<PaintedMesh> adopt_retained_paint_normal(const PaintedMesh &,con
     const PaintSamplingLimits & = {});
 std::shared_ptr<PaintedMesh> rebind_paint_sampling_geometry(const PaintedMesh &,
     std::shared_ptr<const PaintSamplingAttachment>,const PaintSamplingLimits & = {});
+namespace detail {
+std::shared_ptr<PaintedMesh> rebind_material_paint_sampling_geometry(const PaintedMesh &,
+    const SourceMaterialBindings *,const PaintSamplingLimits & = {});
+}
 }

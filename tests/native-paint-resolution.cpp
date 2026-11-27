@@ -1,9 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/creation.hpp"
+#include "dome/bake-authoring.hpp"
+#include "dome/bake-recipe.hpp"
+#include "dome/material-bindings.hpp"
 #include "dome/humanoid-creator.hpp"
 #include "dome/texture-set-resolution.hpp"
 #include "texture-set-resample.hpp"
 #include "import-controller-driver.hpp"
+#include "native-paint-sampling.hpp"
 #include <algorithm>
 #include <cmath>
 #include <filesystem>
@@ -393,6 +397,169 @@ void resize_baked_native_grid(const std::filesystem::path &root) {
   }
 }
 
+void resize_retained_native_grid(const std::filesystem::path &root) {
+  Mesh mesh;
+  mesh.positions={{-.85f,-.75f,0},{.85f,-.75f,0},{.85f,.75f,0},{-.85f,.75f,0}};
+  mesh.normals.assign(4,{0,0,1});
+  mesh.uv={{{.05f,.05f}},{{.95f,.05f}},{{.95f,.95f}},{{.05f,.95f}}};
+  mesh.indices={0,1,2,0,2,3};
+  Scene scene;
+  const auto id=scene.active().id;
+  auto paint=std::make_shared<PaintedMesh>(mesh,128);
+  scene.active().mesh_active=true;
+  scene.active().painted=paint;
+  PaintSettings ink;
+  ink.color={.74f,.21f,.13f,.87f};
+  ink.front_only=false;
+  Brush brush;
+  brush.radius=.65f;
+  paint->begin_stroke();
+  paint->stamp(brush,ink);
+  ink.channel=PaintChannel::Mask;
+  ink.mask=.44f;
+  paint->stamp(brush,ink);
+  check(paint->end_stroke(),"Original grid carries authored colour and an independent mask");
+  paint->add_layer("Hidden HDR");
+  ink.channel=PaintChannel::Emission;
+  ink.emission_units=PaintEmissionUnits::Physical;
+  ink.emission={2000,.018f,4};
+  ink.flow=.0001f;
+  paint->begin_stroke();
+  paint->stamp(brush,ink);
+  check(paint->end_stroke(),"Original grid carries hidden sub-byte FLOAT paint");
+  paint->layer_properties("Hidden HDR",false,.71f);
+  const auto donor=scene.add("Hidden normal and HDR donor",Volume{});
+  for(auto &p:mesh.positions)p.z=.018f;
+  mesh.normals.assign(4,normalized(Vec3{.25f,-.19f,1}));
+  auto &source=scene.object(donor);
+  source.painted=std::make_shared<PaintedMesh>(std::move(mesh),64);
+  source.mesh_active=true;
+  source.visible=false;
+  source.material.emissive={2.9f,.17f,.05f};
+  scene.select(id);
+  const auto initial=scene.encode();
+  Document doc;
+  doc.replace(scene);
+  ready(doc);
+  const auto edit_uv=[&](float amount) {
+    doc.begin_uv();
+    check(doc.wait_uv()&&doc.frame().state->uv->paint_sampling_available,"UV editor offers the actual Keep Paint route");
+    if(!doc.frame().state->uv->retain_paint_sampling)doc.edit_uv(UvAction::RetainPaint);
+    doc.edit_uv(UvAction::Pick,.5f,.5f);
+    doc.edit_uv(UvAction::Scale,amount);
+    check(doc.wait_uv()&&doc.frame().state->uv->valid,"The edited display UV atlas validates");
+    doc.end_uv(true);
+    ready(doc);
+  };
+  edit_uv(.6f);
+  const auto retained=doc.copy_scene();
+  const auto &uv=retained.active();
+  check(uv.material_bindings&&uv.material_bindings->native_paint_sampling&&uv.painted->mesh().uv!=paint->mesh().uv&&
+        uv.painted->paint_sampling_domain()->basis()->uv==paint->mesh().uv,
+        "Writable UVs remain on the original atlas after the authored display UV edit");
+  if(compute_backend()!="CPU"){
+    auto unchanged=retained;
+    check(refuses([&]{resample_native_texture_grid(unchanged,id,{256});})&&unchanged.encode()==retained.encode(),
+          "An unavailable native UV grid backend refuses atomically");
+    return;
+  }
+  auto edited=retained;
+  check(resample_native_texture_grid(edited,id,{256}).changed,"A retained writable atlas can enlarge before Bake");
+  edited.save(root/"unbaked256.dsculpt");
+  doc.open(root/"unbaked256.dsculpt");
+  ready(doc);
+  edit_uv(.85f);
+  const auto second=doc.copy_scene();
+  const auto second_owner=second.active().material_bindings->native_paint_sampling;
+  check(second.active().painted->resolution()==256&&second_owner->history_depth()==2&&
+        second_owner->before_paint()->resolution()==256&&second_owner->original_paint()->resolution()==128,
+        "A second UV edit captures the resized grid and keeps the original grid in its lineage");
+  doc.save(root/"second-uv.dsculpt");
+  check(Scene::load(root/"second-uv.dsculpt").encode()==second.encode(),"The mixed-resolution UV lineage replays on cold open");
+  detail::restore_native_paint(edited,id);
+  check(edited.encode()==initial,"Restore UV and paint recovers the exact original scene and grid size");
+
+  doc.replace(retained);
+  ready(doc);
+  ObjectBakeSettings settings;
+  settings.ao_samples=0;
+  settings.front_mm=settings.back_mm=50;
+  auto canonical=retained;
+  check(bake_object(canonical,donor,settings).projected>0&&
+        canonical.active().painted->baked()->normal_interpretation==BakedNormalInterpretation::CanonicalMikk,
+        "Native Bake before a shape key uses its kept canonical tangent grid");
+  check(resample_native_texture_grid(canonical,id,{256}).changed&&
+        canonical.active().painted->baked()->maps.normal.width==256,
+        "Native UV regridding also preserves an ordinary canonical Bake");
+  ShapeKeyEdit key;
+  key.name="Retained normal frame";
+  doc.author_shape(key);
+  ready(doc);
+  doc.bake_from_object(donor,settings);
+  doc.save_async(root/"baked128.dsculpt").get();
+  ready(doc);
+  const auto before=doc.copy_scene();
+  const auto &old=before.active();
+  const auto old_bake=old.painted->baked();
+  check(old_bake&&old_bake->emission_field&&old.material_bindings->native_paint_frames&&
+        old_bake->normal_interpretation==BakedNormalInterpretation::NativeAttributes&&old.bake_recipe,
+        "Actual Bake on the kept atlas captures authored normal frames, FLOAT light and a recipe");
+  auto cancelled=before;
+  auto limits=detail::native_texture_grid_limits();
+  size_t polls=0;
+  limits.cancelled=[&]{return ++polls>300;};
+  check(refuses([&]{resample_native_texture_grid(cancelled,id,{256},limits);})&&cancelled.encode()==before.encode(),
+        "Cancellation during retained-grid work discards the private candidate and keeps owners");
+  check(doc.can_resize_native_paint(),"The same DomeD Paint resolution command admits the retained Bake");
+  ImportDriver hand(doc);
+  hand.open();hand.sector(9);hand.sector(1);hand.sector(6);
+  check(doc.frame().state->controls.parameter==VrParameter::TextureResolution,"XR opens the retained Bake grid control");
+  hand.ray(.4f);hand.panel_button(true);
+  doc.save_async(root/"baked256.dsculpt").get();
+  ready(doc);
+  const auto grown=doc.copy_scene();
+  const auto &current=grown.active();
+  const auto new_bake=current.painted->baked();
+  check(new_bake&&new_bake->emission_field&&current.painted->resolution()==256&&
+        current.material_bindings==old.material_bindings&&current.bake_recipe==old.bake_recipe&&
+        current.painted->paint_sampling_attachment()==old.painted->paint_sampling_attachment()&&
+        current.painted->mesh_owner()==old.painted->mesh_owner()&&new_bake->normal_interpretation==old_bake->normal_interpretation,
+        "Resize keeps the Bake and sampling owners and the authored display geometry");
+  bool exact=true;
+  for(uint32_t y=0;y<256&&exact;++y)for(uint32_t x=0;x<256&&exact;++x){
+    const size_t at=size_t(y)*256+x, prior=size_t(y/2)*128+x/2;
+    exact=new_bake->coverage[at]==old_bake->coverage[prior]&&
+      std::equal(new_bake->maps.normal.rgba.data()+4*at,new_bake->maps.normal.rgba.data()+4*at+4,
+                 old_bake->maps.normal.rgba.data()+4*prior);
+    const auto a=old_bake->emission_field->texel(prior),b=new_bake->emission_field->texel(at);
+    exact&=a.coverage==b.coverage&&a.absolute==b.absolute&&a.legacy==b.legacy;
+    for(const auto &layer:old.painted->layers())
+      exact&=old.painted->pixel(layer.id,x/2,y/2)==current.painted->pixel(layer.id,x,y)&&
+             old.painted->emission_pixel(layer.id,x/2,y/2)==current.painted->emission_pixel(layer.id,x,y);
+  }
+  check(exact,"Every authored cell, baked normal and FLOAT value survives enlargement");
+  auto reduced=grown;
+  check(resample_native_texture_grid(reduced,id,{128}).changed,"The kept native attribute grid reduces to its original size");
+  const auto reduced_bake=reduced.active().painted->baked();
+  check(reduced_bake&&reduced_bake->normal_interpretation==BakedNormalInterpretation::NativeAttributes&&
+        reduced_bake->maps.normal.rgba==old_bake->maps.normal.rgba&&reduced_bake->coverage==old_bake->coverage,
+        "Exact-cell reduction recovers the original authored normal samples");
+  const auto saved=grown.encode();
+  check(Scene::load(root/"baked256.dsculpt").encode()==saved&&doc.undo()&&doc.copy_scene().encode()==before.encode()&&
+        doc.redo()&&doc.copy_scene().encode()==saved,"Ordered Save, cold Open and one Undo/Redo retain both resolutions");
+  ready(doc);
+  doc.export_asset(root/"resized-standard.glb",AssetExportFormat::Glb).get();
+  doc.export_asset(root/"resized-editable.glb",AssetExportFormat::EditableGlb256).get();
+  check(Scene::load(root/"resized-editable.glb").encode()==saved,"Editable GLB reopens the full retained UV authoring scene");
+  doc.open(root/"baked256.dsculpt");
+  ready(doc);
+  doc.bake_from_object(donor,settings);
+  ready(doc);
+  const auto rebaked=doc.copy_scene();
+  check(rebaked.active().painted->resolution()==256&&rebaked.active().painted->baked()->maps.normal.width==256,
+        "Bake after cold reopen uses the new writable grid and retained native normal frame");
+}
+
 } // namespace
 
 int main(int argc,char **argv) try {
@@ -407,6 +574,8 @@ int main(int argc,char **argv) try {
    resize_physical_native_grid(root);
  } else if(std::string_view(argv[1])=="baked") {
   resize_baked_native_grid(root);
+ } else if(std::string_view(argv[1])=="retained") {
+  resize_retained_native_grid(root);
  } else {
   throw std::invalid_argument("Unknown paint resolution fixture");
  }

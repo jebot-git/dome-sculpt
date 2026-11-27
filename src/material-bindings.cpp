@@ -823,7 +823,7 @@ SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,
     const auto attachment=detail::material_paint_attachment(before.get());
     if(!attachment)throw std::invalid_argument("Retained beforePaint lacks its own complete material witness");
     if(bound_paints[id]&&bound_paints[id]!=attachment)throw std::invalid_argument("One retained paint record cannot acquire conflicting geometry/material owners");
-    if(!bound_paints[id]){auto rebound=rebind_paint_sampling_geometry(*paints[id],attachment);paints[id]=native_paint?std::make_shared<const PaintedMesh>(*rebound):std::move(rebound);bound_paints[id]=attachment;}
+    if(!bound_paints[id]){auto rebound=detail::rebind_material_paint_sampling_geometry(*paints[id],before.get());paints[id]=native_paint?std::make_shared<const PaintedMesh>(*rebound):std::move(rebound);bound_paints[id]=attachment;}
     return paints[id];
   };
   for(const auto &value:input.at("origins")) {

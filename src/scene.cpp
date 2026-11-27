@@ -1400,9 +1400,7 @@ Scene Scene::decode_owning(const nlohmann::json &j,
       o.material_bindings=source_materials.at(binding.get<uint32_t>());
     }
     if(o.painted&&!o.texture_sets&&o.painted->paint_sampling_domain()){
-      const auto attachment=detail::material_paint_attachment(o.material_bindings.get());
-      if(!attachment)throw std::invalid_argument("Current writable paint lacks its own exact material witness");
-      o.painted=rebind_paint_sampling_geometry(*o.painted,attachment);
+      o.painted=detail::rebind_material_paint_sampling_geometry(*o.painted,o.material_bindings.get());
     }
     if(o.painted&&!o.texture_sets&&o.material_bindings&&o.material_bindings->key_derivation)o.painted=detail::adopt_key_paint_geometry(*o.painted,*o.material_bindings,o.appearance.get(),o.deformation.get());
     if(polygon_fields && !v.at("polygon").is_null())o.polygon=polygons.at(detail::polygon_archive_index(v.at("polygon"),polygons.authorities().size()));
