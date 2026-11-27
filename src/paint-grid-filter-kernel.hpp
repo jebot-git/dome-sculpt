@@ -30,7 +30,9 @@ struct Layout {
   uint8_t coverage_mask = 0xf;
   FloatPlane floats = FloatPlane::Absent;
   bool mask = false;
+  uint8_t fixed_common = 0;
   uint8_t fixed_emission = 0;
+  uint8_t common_constants[6]{};
   uint64_t emission_constants[float_channels-1]{};
 };
 struct Rectangle { uint32_t x, y, width, height; };
@@ -163,6 +165,8 @@ DOME_GRID_FN Pixel filter(size_t index,const Batch &batch,const Layout &layout,
     const auto value=a?div(weighted[c],a):raw[c];
     out.values[c]=quantize(value,(layout.srgb&(1u<<c))?tables.srgb_threshold:tables.unit_threshold);
   }
+  for (unsigned c=0;c<6;++c) if (layout.fixed_common&(1u<<c))
+    out.values[c]=layout.common_constants[c];
   if (layout.mask) out.mask=quantize(mask,tables.unit_threshold);
   if (layout.floats!=FloatPlane::Absent) {
     const auto a=emission_raw[6];

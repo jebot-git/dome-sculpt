@@ -458,7 +458,6 @@ struct PaintedMesh::SurfaceMap {
   bool source_capture_only=false;
   uint32_t resolution, columns;
   struct Texel {
-    Vec3 position, normal;
     uint32_t face = UINT32_MAX;
     std::array<float, 2> bary{};
     bool covered() const noexcept { return face != UINT32_MAX; }
@@ -472,6 +471,9 @@ struct PaintedMesh::SurfaceMap {
   PaintSurfaceOptions options;
   PaintSurfaceDiagnostics diagnostics;
   struct Raster {
+    // UV seam edits can attach the raster to a different logical mesh. Keep
+    // the exact rest corners that authored these barycentrics and bounds.
+    std::shared_ptr<const Mesh> rest_geometry;
     Links linked;
     std::vector<Extra> extra;
     std::vector<Texel> texels;
@@ -487,6 +489,28 @@ struct PaintedMesh::SurfaceMap {
   static const Mesh &checked_geometry(const std::shared_ptr<const Mesh> &geometry) {
     if(!geometry)throw std::invalid_argument("Missing immutable paint geometry");
     return *geometry;
+  }
+  Vec3 interpolate_rest(const Texel &texel, const std::vector<Vec3> &attribute) const {
+    const auto &indices = raster_data->rest_geometry->indices;
+    const size_t first = size_t(texel.face) * 3;
+    const auto [u,v] = texel.bary;
+    return attribute[indices[first]] * u + attribute[indices[first+1]] * v +
+           attribute[indices[first+2]] * (1-u-v);
+  }
+  Vec3 rest_position(const Texel &texel) const {
+    return interpolate_rest(texel,raster_data->rest_geometry->positions);
+  }
+  Vec3 rest_normal(const Texel &texel) const {
+    return normalized(interpolate_rest(texel,raster_data->rest_geometry->normals));
+  }
+  static size_t mesh_storage_bytes(const Mesh &mesh) noexcept {
+    return (mesh.positions.capacity()+mesh.normals.capacity())*sizeof(Vec3)+
+           mesh.uv.capacity()*sizeof(std::array<float,2>)+mesh.indices.capacity()*sizeof(uint32_t)+
+           mesh.uv_pins.capacity()+mesh.uv_seams.capacity();
+  }
+  size_t extra_rest_storage_bytes() const noexcept {
+    const auto &rest = raster_data->rest_geometry;
+    return rest==geometry ? 0 : sizeof(Mesh)+mesh_storage_bytes(*rest);
   }
   // The existing same-UV triangle correspondence permits raster reuse while
   // replacing the immutable vertex/index owner. A reference member must be
@@ -514,7 +538,8 @@ struct PaintedMesh::SurfaceMap {
     // A fresh raster is writable solely during construction. Published
     // SurfaceMaps may share its immutable sample and padding arrays.
     auto data=std::const_pointer_cast<Raster>(raster_data);
-    auto &[linked,extra,texels,tiles,padding]=*data;
+    auto &[rest,linked,extra,texels,tiles,padding]=*data;
+    rest=geometry;
     tiles.resize(size_t(columns)*columns);
     if((options.policy!=PaintUvPolicy::Strict&&options.policy!=PaintUvPolicy::SourceAuthored&&options.policy!=PaintUvPolicy::PolygonAuthored)||
        !options.max_raster_samples||options.max_raster_samples>512*1024*1024||
@@ -598,15 +623,16 @@ struct PaintedMesh::SurfaceMap {
                    raster.positions[ids[2]] * w2;
           size_t index = size_t(y) * r + x;
           auto &t = texels[index];
-          Texel candidate{p,normalized(raster.normals[ids[0]]*w0+raster.normals[ids[1]]*w1+raster.normals[ids[2]]*w2),uint32_t(k/3),{w0,w1}};
+          Texel candidate{uint32_t(k/3),{w0,w1}};
           if(!t.covered()){t=candidate;++diagnostics.covered_texels;}
           else if(!source){
-            if(length(t.position-p)>1e-4f)throw std::invalid_argument("Overlapping UV islands cannot be painted independently");
+            if(length(rest_position(t)-p)>1e-4f)throw std::invalid_argument("Overlapping UV islands cannot be painted independently");
             t=candidate;
           }else{
+            const auto candidate_normal=rest_normal(candidate);
             auto same=[&](const Texel &other){
               if(++diagnostics.candidate_checks>options.max_candidate_checks)throw std::length_error("Paint surface comparison budget exceeded");
-              return length(other.position-p)<=1e-5f&&dot(other.normal,candidate.normal)>.9999f;
+              return length(rest_position(other)-p)<=1e-5f&&dot(rest_normal(other),candidate_normal)>.9999f;
             };
             bool duplicate=same(t);auto found=linked.find(uint32_t(index));
             if(!duplicate&&found!=linked.end())for(auto at=found->second.first;at!=UINT32_MAX;at=extra[at].next)
@@ -889,7 +915,7 @@ struct SourcePaintAccess {
     return bytes;
   }
   static Footprint footprint(const PaintedMesh &p) {
-    return {geometry_bytes(p.mesh()),coordinate_bytes(maps(p)),
+    return {geometry_bytes(p.mesh())+p.surface_->extra_rest_storage_bytes(),coordinate_bytes(maps(p)),
       uint64_t(p.resolution())*p.resolution(),uint64_t(p.allocated_color_tiles_)*sizeof(PaintColorTile)+
       [&]{uint64_t n=p.baked_?p.baked_->storage_bytes():0;for(const auto &l:p.layers_)n+=common_storage_bytes(l)+emission_storage_bytes(l);return n;}(),!p.surface_->source_capture_only};
   }
@@ -1254,10 +1280,8 @@ std::shared_ptr<const detail::PaintOverlayPacket> detail::PaintOverlayFactory::c
 }
 size_t detail::PaintOverlayFactory::raster_storage_bytes(const PaintedMesh &paint) noexcept{
   const auto &surface=*paint.surface_;
-  const auto &mesh=surface.mesh;
-  return sizeof(PaintedMesh::SurfaceMap)+
-    (mesh.positions.capacity()+mesh.normals.capacity())*sizeof(Vec3)+mesh.uv.capacity()*sizeof(std::array<float,2>)+
-    mesh.indices.capacity()*sizeof(uint32_t)+mesh.uv_pins.capacity()+mesh.uv_seams.capacity()+
+  return sizeof(PaintedMesh::SurfaceMap)+sizeof(PaintedMesh::SurfaceMap::Raster)+
+    PaintedMesh::SurfaceMap::mesh_storage_bytes(surface.mesh)+surface.extra_rest_storage_bytes()+
     surface.texels.capacity()*sizeof(PaintedMesh::SurfaceMap::Texel)+surface.extra.capacity()*sizeof(PaintedMesh::SurfaceMap::Extra)+
     surface.tiles.capacity()*sizeof(PaintedMesh::SurfaceMap::Bounds)+surface.padding.capacity()*sizeof(int32_t)+
     surface.linked.size()*(sizeof(std::pair<const uint32_t,PaintedMesh::SurfaceMap::Head>)+2*sizeof(void*))+surface.linked.bucket_count()*sizeof(void*)+
@@ -1308,11 +1332,9 @@ std::shared_ptr<const detail::PaintOverlayPacket> detail::PaintOverlayFactory::c
     for(const auto &[set,uv]:maps->extra_uv_sets)if(uv)n+=uv->capacity()*sizeof(std::array<float,2>)+sizeof(decltype(maps->extra_uv_sets)::value_type)+3*sizeof(void*);
     return n;};
   packet->storage_bytes_+=coordinate_storage(paint.source_maps_.get())+(paint.baked_?paint.baked_->storage_bytes():0);
-  if(const auto &proof=surface.original_sampling){const auto &original=*proof->before;const auto &old=*original.surface_;const auto &m=old.mesh;
-    packet->storage_bytes_+=sizeof(PaintedMesh::SurfaceMap::OriginalSampling)+proof->vertices.capacity()*sizeof(uint32_t)+(proof->original_uv0->capacity()+(proof->authored_uv1?proof->authored_uv1->capacity()+proof->original_uv1->capacity():0))*sizeof(std::array<float,2>)+sizeof(PaintedMesh)+sizeof(PaintedMesh::SurfaceMap)+
-      (m.positions.capacity()+m.normals.capacity())*sizeof(Vec3)+m.uv.capacity()*sizeof(std::array<float,2>)+m.indices.capacity()*sizeof(uint32_t)+m.uv_pins.capacity()+m.uv_seams.capacity()+
-      old.texels.capacity()*sizeof(PaintedMesh::SurfaceMap::Texel)+old.extra.capacity()*sizeof(PaintedMesh::SurfaceMap::Extra)+old.tiles.capacity()*sizeof(PaintedMesh::SurfaceMap::Bounds)+old.padding.capacity()*sizeof(int32_t)+
-      old.linked.size()*(sizeof(std::pair<const uint32_t,PaintedMesh::SurfaceMap::Head>)+2*sizeof(void*))+old.linked.bucket_count()*sizeof(void*)+old.diagnostics.unpaintable_uv_faces.capacity()*sizeof(uint32_t)+coordinate_storage(original.source_maps_.get());
+  if(const auto &proof=surface.original_sampling){const auto &original=*proof->before;
+    packet->storage_bytes_+=sizeof(PaintedMesh::SurfaceMap::OriginalSampling)+proof->vertices.capacity()*sizeof(uint32_t)+(proof->original_uv0->capacity()+(proof->authored_uv1?proof->authored_uv1->capacity()+proof->original_uv1->capacity():0))*sizeof(std::array<float,2>)+sizeof(PaintedMesh)+
+      raster_storage_bytes(original)+coordinate_storage(original.source_maps_.get());
     for(const auto &layer:original.layers_)packet->storage_bytes_+=sizeof(PaintLayer)+layer.name.capacity()+(layer.tiles.capacity()+layer.pbr_tiles.capacity()+layer.emission_tiles.capacity())*sizeof(std::shared_ptr<const PaintTile>);
   }
   std::set<const PaintTile*> common_owners;std::set<const PaintColorTile*> color_owners;std::set<const PaintEmissionTile*> emission_owners;
@@ -1596,12 +1618,15 @@ void PaintedMesh::stamp_sampled(const Brush &b,const PaintSettings &settings,con
             if((candidate_checks&255)==0)stop();
             if(++candidate_checks>surface_->options.max_candidate_checks)throw std::length_error("Paint candidate work budget exceeded");
             if(texture_set_domain_&&!texture_set_domain_->contains(candidate.face))return;
-            auto evaluated=evaluation?evaluation->sample(candidate):std::pair{candidate.position,candidate.normal};
-            auto position=evaluated.first,normal=evaluated.second;
-            if(settings.front_only&&dot(normal,n)<=.05f)return;
+            const auto evaluated=evaluation?evaluation->sample(candidate):
+                std::pair{surface_->rest_position(candidate),Vec3{}};
+            const auto position=evaluated.first;
             float u=axis2>1e-20f?std::clamp(dot(position-b.from,axis)/axis2,0.f,1.f):0;
             float d=length(position-(b.from+axis*u));
             if(d>=radius||d>distance+1e-7f||(std::abs(d-distance)<=1e-7f&&candidate.face>=selected_face))return;
+            const auto normal=evaluation?evaluated.second:
+                (settings.front_only||sampler)?surface_->rest_normal(candidate):Vec3{};
+            if(settings.front_only&&dot(normal,n)<=.05f)return;
             auto value=settings;float opacity=1;
             if(sampler){auto sample=sampler(position,normal);if(!sample)return;value=sample->settings;opacity=sample->opacity;}
             if(opacity<=0)return;
@@ -2065,6 +2090,7 @@ detail::NativeWeightPaintAccess::Surface detail::NativeWeightPaintAccess::surfac
   result.owner=owner;
   result.raster=surface.raster_data;
   result.geometry=surface.geometry;
+  result.raster_geometry=surface.raster_data->rest_geometry;
   result.membership=surface.set_domain;
   result.domain=surface.paint_domain;
   result.bytes=surface_bytes;
@@ -3704,7 +3730,7 @@ void detail::TextureSetPaintAccess::reproject_retopology(const PaintedMesh &sour
     const auto &texel = surface.texels[at];
     if (!texel.covered()) continue;
     const auto &w = texel.bary;
-    const auto hit = transfer.match_patch(texel.position,texel.normal,texel.face,
+    const auto hit = transfer.match_patch(surface.rest_position(texel),surface.rest_normal(texel),texel.face,
                                          {w[0],w[1],1-w[0]-w[1]},old_domain.get());
     if (!hit) {
       if (imported) throw std::invalid_argument("A retopology texel falls outside the original imported material surface");
@@ -4165,7 +4191,7 @@ std::shared_ptr<const SourceMaterialBindings> detail::TextureSetPaintAccess::rep
     const auto &texel=surface.texels[index];
     if (!texel.covered() && surface.padding[index]>=0) continue;
     const auto &w=texel.bary;
-    const auto hit=texel.covered() ? transfer.match_patch(texel.position,texel.normal,texel.face,
+    const auto hit=texel.covered() ? transfer.match_patch(surface.rest_position(texel),surface.rest_normal(texel),texel.face,
         {w[0],w[1],1-w[0]-w[1]},from.texture_set_domain_.get()) : std::nullopt;
     if (texel.covered() && !hit && imported)
       throw std::invalid_argument("A patch texel is outside the imported MToon source surface");
@@ -4306,7 +4332,7 @@ std::shared_ptr<const detail::BakedNormalField> detail::TextureSetPaintAccess::r
     const auto &texel=surface.texels[index];
     if (!texel.covered()) continue;
     const auto &w=texel.bary;
-    const auto hit=transfer.match_patch(texel.position,texel.normal,texel.face,{w[0],w[1],1-w[0]-w[1]});
+    const auto hit=transfer.match_patch(surface.rest_position(texel),surface.rest_normal(texel),texel.face,{w[0],w[1],1-w[0]-w[1]});
     if (!hit) continue;
     transfer.work(64);
     ++hits;

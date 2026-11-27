@@ -6,7 +6,7 @@ namespace dome::detail {
 struct NativeWeightPaintAccess {
   struct Surface {
     std::shared_ptr<const void> owner, raster, original_sampling;
-    std::shared_ptr<const Mesh> geometry;
+    std::shared_ptr<const Mesh> geometry, raster_geometry;
     std::shared_ptr<const TextureSetFaceDomain> membership;
     std::shared_ptr<const PaintSamplingDomain> domain;
     std::shared_ptr<const PaintedMesh> before;

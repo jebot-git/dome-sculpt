@@ -68,6 +68,12 @@ void Document::queue_texture_set_locked(TextureSetEdit edit,AssetSource expected
   switch(edit.action){
   case TextureSetAction::Resolution:{
    TextureSetResolutionOptions options;options.resolution=edit.resolution;
+   if(native_resize&&scene.object(object).painted->resolution()==2048&&options.resolution<2048) {
+    // Full-size coarsening audits every authored source cell and its
+    // reconstructed material on this cancellable worker. Keep the existing
+    // byte and fidelity limits while allowing both passes for dense fields.
+    limits.maximum_work=256'000'000;
+   }
    const auto report=native_resize?resample_native_texture_grid(scene,object,options,limits):
      resample_texture_set(scene,object,edit.set,options,limits);
    *changed=report.changed;break;

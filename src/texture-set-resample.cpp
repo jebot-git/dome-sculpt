@@ -289,27 +289,46 @@ paint_grid::Layout layer_layout(const PaintLayer &layer) {
   return layout;
 }
 
-void omit_default_reduction_channels(const PaintLayer &layer,paint_grid::Layout &layout,
-                                     TextureSetResolutionReport &report,const TextureSetLimits &limits) {
+void classify_common_reduction_channels(const PaintLayer &layer,paint_grid::Layout &layout,
+                                         TextureSetResolutionReport &report,const TextureSetLimits &limits) {
   // Test stored bytes, including unassociated values under zero coverage.
-  // Absent common tiles contribute the default bytes. Neither independent
-  // color nor FLOAT emission can be classified by the common plane.
+  // Absent common tiles contribute the default bytes. Physical emission
+  // rewrites its legacy fallback after filtering, so test only the six
+  // color/metal/rough coefficients for arbitrary constants.
+  const PaintPixel defaults;
+  const auto &first=layer.tiles.front();
+  const auto &reference=first?first->pixels.front().data:defaults.data;
   std::array<uint8_t,14> differing{};
+  std::array<uint8_t,6> varying{};
+  const auto nonzero=[](uint8_t value){return value!=0;};
   for(const auto &tile:layer.tiles) {
     stop(limits);
-    if(!tile||PaintTile::is_shared_default(tile.get()))continue;
+    if(!tile||PaintTile::is_shared_default(tile.get())) {
+      for(size_t c=0;c<varying.size();++c)varying[c]|=reference[c];
+      continue;
+    }
     work(report,tile->pixels.size(),limits);
     for(const auto &pixel:tile->pixels) {
       for(size_t c=0;c<13;++c)differing[c]|=pixel.data[c];
       differing[13]|=pixel.data[13]^255u;
+      for(size_t c=0;c<varying.size();++c)varying[c]|=pixel.data[c]^reference[c];
     }
-    if(std::ranges::all_of(differing,[](uint8_t value){return value!=0;}))break;
+    if(std::ranges::all_of(differing,nonzero)&&std::ranges::all_of(varying,nonzero))break;
   }
   for(unsigned c=0;c<9;++c)
     if(!differing[c])layout.active&=~(1u<<c);
   for(unsigned g=0;g<4;++g)
     if(!differing[9+g])layout.coverage_mask&=~(1u<<g);
   layout.mask=differing[13]!=0;
+  // With any coverage, a constant coefficient's weighted mean stays in
+  // that byte's quantization interval. With zero coverage the raw mean
+  // has the same property. At most 1024 positive binary64 terms accumulate
+  // far less rounding error than the distance to either byte threshold.
+  for(unsigned c=0;c<varying.size();++c)if(!varying[c]) {
+    layout.fixed_common|=uint8_t(1u<<c);
+    layout.common_constants[c]=reference[c];
+    layout.active&=~(1u<<c);
+  }
 }
 
 void find_fixed_emission(const PaintLayer &layer,paint_grid::Layout &layout,
@@ -468,6 +487,8 @@ Sample filtered_samples(const PaintLayer &l,uint32_t from,auto &&for_each_pixel,
     }
   }
   if(read_mask)out.common.data[13] = byte(mask);
+  if(selection)for(size_t c=0;c<6;++c)
+    if(selection->fixed_common&(1u<<c))out.common.data[c]=selection->common_constants[c];
   if(read_pbr)for (size_t k = 0; k < 4; ++k)
     out.pbr[k] = coverage[0] > 0 ? pbr[k] / coverage[0] : pbr_raw[k];
   if(read_emission) {
@@ -529,6 +550,10 @@ void quality(const PaintLayer &before, const PaintLayer &after, uint32_t from,
   constexpr size_t stored_comparison_work = 3;
   constexpr size_t full_comparison_work = 32;
   std::array<bool,4> check_group{true,true,true,true};
+  const unsigned fixed_common=reduction?reduction->fixed_common:0;
+  unsigned zero_common=0;
+  if(reduction)for(unsigned c=0;c<6;++c)
+    if((fixed_common&(1u<<c))&&!reduction->common_constants[c])zero_common|=1u<<c;
   size_t known_components=0;
   if(reduction)for(unsigned g=0;g<4;++g) {
     const auto values=((1u<<width[g])-1)<<first[g];
@@ -536,13 +561,17 @@ void quality(const PaintLayer &before, const PaintLayer &after, uint32_t from,
                    (reduction->active&values)||
                    (g==3&&reduction->floats!=paint_grid::FloatPlane::Absent&&!default_emission_bytes);
     if(!check_group[g])known_components+=1+2*width[g];
+    else known_components+=std::popcount(fixed_common&values)+std::popcount(zero_common&values);
   }
   const bool check_mask=!reduction||reduction->mask;
   const bool check_pbr=!reduction||reduction->pbr||check_group[0];
+  const unsigned fixed_pbr=reduction&&!reduction->pbr?fixed_common&15u:0;
+  const unsigned zero_pbr=reduction&&!reduction->pbr?zero_common&15u:0;
   const bool check_emission=!reduction||check_group[3]||
       reduction->floats!=paint_grid::FloatPlane::Absent;
   if(!check_mask)known_components+=1;
   if(!check_pbr)known_components+=2*4;
+  else known_components+=std::popcount(fixed_pbr)+std::popcount(zero_pbr);
   if(!check_emission)known_components+=1+4*3;
   unsigned zero_emission=0;
   for(unsigned c=0;c<6;++c)
@@ -598,18 +627,20 @@ void quality(const PaintLayer &before, const PaintLayer &after, uint32_t from,
         measure(ac, bc, q.contribution_error[9 + g]);
         for (size_t k = 0; k < width[g]; ++k) {
           const auto c = first[g] + k;
+          if(zero_common&(1u<<c))continue;
           const double av = (c < 3 || c >= 6) ? linear(ad[c])
                                               : double(ad[c]) / 255,
                        bv = (c < 3 || c >= 6) ? linear(bd[c])
                                               : double(bd[c]) / 255;
-          measure(av, bv, q.value_error[c]);
+          if(!(fixed_common&(1u<<c)))measure(av, bv, q.value_error[c]);
           measure(av * ac, bv * bc, q.contribution_error[c]);
         }
       }
       if(check_mask)measure(double(ad[13]) / 255, double(bd[13]) / 255,
                            q.contribution_error[13]);
       if(check_pbr)for (size_t k = 0; k < 4; ++k) {
-        measure(a.pbr[k], b.pbr[k], q.pbr_value_error[k]);
+        if(zero_pbr&(1u<<k))continue;
+        if(!(fixed_pbr&(1u<<k)))measure(a.pbr[k], b.pbr[k], q.pbr_value_error[k]);
         measure(a.pbr[k] * double(ad[9]) / 255, b.pbr[k] * double(bd[9]) / 255,
                 q.pbr_error[k]);
       }
@@ -933,7 +964,7 @@ std::vector<PaintLayer> resample_texture_set_layers(
                emission = !layer.emission_tiles.empty();
     auto &layout=layouts.emplace_back(layer_layout(layer));
     if(prune) {
-      omit_default_reduction_channels(layer,layout,report,limits);
+      classify_common_reduction_channels(layer,layout,report,limits);
       find_fixed_emission(layer,layout,report,limits);
     }
     size_t affected = tiles;

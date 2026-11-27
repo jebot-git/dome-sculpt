@@ -73,14 +73,17 @@ inline PaintOverlayTexel sample_overlay_texel_owner(const PaintOverlayPacket &pa
    sample.work+=3;
    const float color_coverage=q[9]/255.f*mask;
    if(color_coverage!=0){
-    sample.work+=8;
+    sample.work+=single_layer?4:8;
     const auto *color=q.data();
     if(pbr&&!layer.pbr_tiles.empty())
      if(const auto &secondary=layer.pbr_tiles.at(tile))
       color=secondary->pixels[within].data();
-    for(size_t c=0;c<4;++c)
-     blend(value[0][c],c<3?overlay_linear_byte(color[c]):color[c]/255.f,color_coverage);
-    value[3][0]=value[3][0]*(1-color_coverage)+color_coverage;
+    for(size_t c=0;c<4;++c){
+     const float incoming=c<3?overlay_linear_byte(color[c]):color[c]/255.f;
+     if(single_layer)value[0][c]=incoming*color_coverage;
+     else blend(value[0][c],incoming,color_coverage);
+    }
+    value[3][0]=single_layer?color_coverage:value[3][0]*(1-color_coverage)+color_coverage;
    }
    for(size_t c=1;c<=2;++c){
     const float coverage=q[9+c]/255.f*mask;

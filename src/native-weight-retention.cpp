@@ -34,6 +34,7 @@ void Counter::paint_surface(const NativeWeightPaintAccess::Surface &surface) {
     leave(surface.raster);
   }
   mesh(surface.geometry);
+  mesh(surface.raster_geometry);
   texture_domain(surface.membership);
   sampling_domain(surface.domain);
   if (enter(surface.original_sampling)) {

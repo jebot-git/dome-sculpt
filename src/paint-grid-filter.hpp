@@ -25,6 +25,8 @@ inline void validate(const Batch &batch,const Layout &layout,size_t inputs,size_
       inputs!=size_t(batch.source.width)*batch.source.height||inputs>max_input_pixels||
       outputs!=size_t(batch.target.width)*batch.target.height||outputs>max_output_pixels||
       !layout.groups||layout.groups>4||layout.active>=(1u<<channels)||
+      (layout.fixed_common&&(batch.from<=batch.to||layout.fixed_common>=64||
+          (layout.fixed_common&layout.active)))||
       (layout.fixed_emission&&(batch.from<=batch.to||
           layout.floats!=FloatPlane::UnassociatedPaint||layout.fixed_emission>=64)))
     throw std::invalid_argument("Invalid bounded paint-grid batch");

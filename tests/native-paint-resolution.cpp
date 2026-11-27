@@ -321,9 +321,15 @@ void filter_binary64_rounding(){
     input[i].mask=masks[i];
   }
   Tables tables{};
-  for(unsigned i=0;i<256;++i)tables.unit[i]=std::bit_cast<uint64_t>(i/255.);
-  for(unsigned i=0;i<255;++i)
+  const auto decode=[](double x){return x<=.04045?x/12.92:std::pow((x+.055)/1.055,2.4);};
+  for(unsigned i=0;i<256;++i) {
+    tables.unit[i]=std::bit_cast<uint64_t>(i/255.);
+    tables.srgb[i]=std::bit_cast<uint64_t>(decode(i/255.));
+  }
+  for(unsigned i=0;i<255;++i) {
     tables.unit_threshold[i]=std::bit_cast<uint64_t>((i+.5)/255.);
+    tables.srgb_threshold[i]=std::bit_cast<uint64_t>(decode((i+.5)/255.));
+  }
   Layout layout;
   layout.floats=FloatPlane::UnassociatedPaint;
   Filter backend(tables);
@@ -351,25 +357,44 @@ void filter_binary64_rounding(){
         "Zero coverage keeps the raw authored metallic value and the default mask");
 
   std::vector<Pixel> large(32*32);
+  constexpr std::array<uint8_t,6> common{1,255,129,127,254,91};
   constexpr std::array<float,6> coefficients{
       0.f,0x1p-145f,.37f,10000.f,0x1p-147f,31.9f};
   for(size_t i=0;i<large.size();++i) {
+    std::copy(common.begin(),common.end(),large[i].values);
+    for(size_t c=0;c<3;++c)large[i].coverage[c]=uint8_t(i*(c+1)%256);
     for(size_t c=0;c<coefficients.size();++c)
       large[i].emission[c]=std::bit_cast<uint64_t>(double(coefficients[c]));
     const float coverage=std::ldexp(float(i%9)/8.f,-int(i%150));
     large[i].emission[6]=std::bit_cast<uint64_t>(double(coverage));
   }
   layout={};
+  layout.srgb=7;
+  layout.groups=4;
+  layout.group[4]=1;
+  layout.group[5]=2;
   layout.floats=FloatPlane::UnassociatedPaint;
   const Batch area{2048,64,{0,0,32,32},{0,0,1,1}};
   for(bool covered:{true,false}) {
-    if(!covered)for(auto &pixel:large)pixel.emission[6]=0;
+    if(!covered)for(auto &pixel:large) {
+      pixel.emission[6]=0;
+      std::fill_n(pixel.coverage,4,0);
+    }
+    layout.active=0x3f;
+    layout.fixed_common=0;
     layout.fixed_emission=0;
     backend.run(area,layout,large,output,{});
     const auto baseline=output[0];
+    layout.active=0;
+    layout.fixed_common=0x3f;
+    std::copy(common.begin(),common.end(),layout.common_constants);
     layout.fixed_emission=0x3f;
     std::copy_n(large.front().emission,6,layout.emission_constants);
     backend.run(area,layout,large,output,{});
+    check(std::equal(common.begin(),common.end(),baseline.values) &&
+              std::equal(common.begin(),common.end(),output[0].values) &&
+              std::equal(std::begin(baseline.coverage),std::end(baseline.coverage),output[0].coverage),
+          "Fixed sRGB, alpha and material bytes agree with actual area filtering at any coverage");
     for(size_t c=0;c<7;++c)
       check(std::bit_cast<uint32_t>(float(std::bit_cast<double>(output[0].emission[c])))==
                 std::bit_cast<uint32_t>(float(std::bit_cast<double>(baseline.emission[c]))),
@@ -834,6 +859,38 @@ void fullsize_physical_paint(const std::filesystem::path &root) {
   check(paint->layers().front().tiles[center_tile]==common_owner,
         "Cancelling local overpaint restores the original immutable common owner");
   std::cout<<"Full-size retained paint bytes "<<paint->storage_bytes()<<'\n';
+
+  brush.radius=1.35f;
+  brush.strength=.28f;
+  color.front_only=false;
+  color.color={.8f,.4f,.1f,.8f};
+  paint->begin_stroke();
+  paint->stamp(brush,color);
+  check(paint->end_stroke() && !PaintTile::is_shared_default(paint->layers().front().tiles.front().get()) &&
+            paint->emission_pixel(layer,1024,1024)==center,
+        "The original full-size grid has dense color and independently varying FLOAT coverage");
+  const auto original_pixel=paint->pixel(layer,1024,1024);
+  Document document;
+  document.replace(scene.snapshot());
+  ready(document);
+  TextureSetEdit edit;
+  edit.action=TextureSetAction::Resolution;
+  edit.resolution=1024;
+  const auto mixed=root/"mixed-1024.dsculpt";
+  document.edit_texture_set(edit);
+  document.save_async(mixed).get();
+  ready(document);
+  const auto reduced=document.copy_scene().active().painted;
+  const auto reduced_pixel=reduced->pixel(layer,512,512);
+  check(reduced->resolution()==1024 && reduced->mesh_owner()==paint->mesh_owner() &&
+            std::equal(original_pixel.data.begin(),original_pixel.data.begin()+4,reduced_pixel.data.begin()) &&
+            reduced->emission_pixel(layer,512,512).physical==center.physical &&
+            Scene::load(mixed).active().painted->emission_pixel(layer,512,512)==reduced->emission_pixel(layer,512,512),
+        "Ordinary 2048-to-1024 coarsening retains dense sRGB and FLOAT paint through ordered Save and Open");
+  check(document.undo() && document.copy_scene().active().painted->pixel(layer,1024,1024)==original_pixel &&
+            document.copy_scene().active().painted->emission_pixel(layer,1024,1024)==center &&
+            document.redo() && document.copy_scene().active().painted->resolution()==1024,
+        "Mixed full-size coarsening preserves its original and resized layers through Undo and Redo");
 }
 
 } // namespace
