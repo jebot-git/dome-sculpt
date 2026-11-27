@@ -153,6 +153,14 @@ texture-set HDR VRM and physical headset verification remain open.
 [Production baked texture-set HDR evidence](validation/native-texture-set-hdr-baked-production-20261127.json)
 [Production retained texture-set HDR evidence](validation/native-texture-set-hdr-retained-production-20261127.json)
 
+Two retained 1024-square LDR PBR members now publish an exact preview
+and support a selected-field Bake, native reopen, Undo/Redo, and Standard
+and Editable GLB within the existing work and byte limits. The original
+material and coverage compositor is the byte reference. Release, ASan/UBSan, DomeD
+Wayland, software and Arc synthetic OpenXR, and independent GLB checks pass
+for this workflow. Larger fields and repeated multi-member rebaking remain
+open. [Production LDR Bake evidence](validation/native-texture-set-ldr-production-bake-20261127.json)
+
 Strict Bake rays now recover source-edge contacts affected by float staging.
 An exact ray hit has priority. A missed ray can use an actual source edge
 within a radius derived from float spacing and inside its original front/back

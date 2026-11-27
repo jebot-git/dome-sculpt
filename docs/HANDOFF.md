@@ -2232,6 +2232,34 @@ has started its all-target build on fixture commit `6b1d0c48` with the
 canonical `acc2b70a` DomeD toolkit.
 [Focused regression validation](validation/layered-normal-retopo-followup-20261127.json)
 
+### Production retained-source LDR Bake
+
+Two prepared retained 1024-square LDR PBR members now preview and Bake
+within the existing work and byte limits. Preview and Standard GLB compile
+color, ORM, byte emission and replacement coverage from the authentic
+read raster and sparse tiles. The snapshot budgets each distinct retained
+raster once and accounts for the actual layer capture and output arrays.
+The normal field keeps its existing coordinate and material authority.
+
+The registered workflow checks all material, coverage and normal bytes
+against the original compositor. It exercises cancelling projection,
+ordered Bake and Save, exact native reopen, Undo/Redo and Clear of the
+selected field. The independent member keeps its original Bake and source.
+Release and ASan/UBSan produce identical native and Standard GLB files.
+Khronos validation reports zero errors and warnings and confirms two
+1024-square color, normal and emission sets. Private DomeD Wayland and
+synthetic OpenXR on software GL and Arc A770 reproduce the Standard GLB.
+The three Editable GLB presets reopen the exact native scene and retain
+both original 1024-square material fields. They emit the same validated
+package for this fixture.
+The previous production HDR Standard and Editable cases retain their
+existing byte-identical outputs.
+
+Larger retained fields, repeated rebaking of multiple members, the
+reflected split-grid strict projection case, typed materials, alternate
+emission coordinates, HDR VRM and physical input acceptance remain open.
+[Production LDR Bake validation](validation/native-texture-set-ldr-production-bake-20261127.json)
+
 ## Source and integration boundary
 
 - Main now admits product1bc13125 and public fixturef1e193c7 after complete

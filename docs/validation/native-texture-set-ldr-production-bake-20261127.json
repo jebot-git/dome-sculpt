@@ -1,0 +1,274 @@
+{
+  "archive": {
+    "filename": "native-texture-set-ldr-production-bake-20261127.tar.gz",
+    "files": {
+      "arc/accept-graphics.json": "bc75ae4ff162aff4733414edfab8fbc2bcbb431e47440c75c29d6ee2d05825b9",
+      "arc/focus-graphics.json": "3772c2600f576fa14f20b07cd8425089a131c4b9f90bb268d3289d8f49a76b74",
+      "arc/report.json": "3b46ec4f34c68717e31664655377cf419e30e4fe031ad98496288af1fd2535f7",
+      "arc/status.json": "1d563806039d685b6c7a70bf62713330f51ea21c15c3c36774e02e5766335527",
+      "asan/editable.log": "c53501e2811204c569e43fcb1960106fae1814753298f1b200633ad6c334093b",
+      "asan/native/current-paint-preview-native.log": "651b454857686fcac935870d5344c6162dd537ac6b6e406dd58c8b292294a2df",
+      "asan/native/native-target.log": "0e53928d49daa92c8b45ba3ab2ccc4c64dc7a2498ac880eacd7780b97f2db93a",
+      "asan/native/production-hdr-editable.log": "3b118b61b457be60d567d4aa1d1b2cc316a068698b38fa1b2b452306f3757d3b",
+      "asan/native/production-hdr-standard.log": "33e8fa545da4bcd5e229115efc951ab561f87be14b4ab9f295f46c6f81f5ffa3",
+      "asan/native/production-ldr.log": "6a37249409272b52edd1b37d16f2fd7ef74c98b80d4cd421f7e10b58ee721d16",
+      "asan/native/retained-source.log": "5d098a7f401c189ce32403e42cc3b0c351bf843a7f5b13f5822c3fa93f8bc6d8",
+      "asan/native/retained-target.log": "a835d84ea88f2cfd578133553d0ab9ae6a8ea979bd06aede6c3902c8f9b375d3",
+      "asan/native/texture-set-export.log": "72e117684374ac4060dfae4fed0b04b46bcfbd878c1ccc894775f37622ddbefc",
+      "asan/native/texture-set-surfaces.log": "fe5274431d609b970d1e1713162618365e93e9e144ba33acc11344166b9556fb",
+      "asan/registered.log": "e35358593452839eb7f7052ae28453bc29356692c41447aea5dbcb2c8f7036d9",
+      "asan/registered.xml": "603a94e8ef9bb5ea601d42794f4244ff34b536e3486c720234295eb154f3b3f3",
+      "asan/standard-khronos.json": "9b9f46ac387b0ea10462234dfcd820d02ae243e1c456ad992ee126bb4dc6f119",
+      "editable-khronos.json": "3f15b25a0f22be913bc7252c6074ae1cfbb7dbcdeab6e96c83d97d53951c57e2",
+      "khronos-editable.log": "59ff67f1508c054acfec7e553c03f2a0f433f035dceecb8672e5fc4665bb54a3",
+      "khronos.log": "5f2c4d03efe206fddd199f36cea00a8f0b05b22254aeda8aeebe112dcf290d61",
+      "prior/arc-premature-binary-observer.json": "f6eeeb6f0a323ca84c75bb0019c474c14a51415acb0aae7a88bcf0f6399bdcc1",
+      "prior/first-candidate-post-bake-budget.log": "10112c5d5a831a73860ee2f721b9397c2d22b93187c1a524632b0d46afef8e33",
+      "prior/pbr-hdr.log": "cc368739f589ac6a586b34646a46c3c2be67aa56bfd00736572db561bc740ffb",
+      "prior/pbr.log": "11c21830a8557a0e6b42f8f0064ba56dfab1997406f886426dd516982fd3258d",
+      "prior/physical-hdr.log": "6d9a5d906c382ffa5e61f278744810e37401a40eb63543a9544c0f5fef019774",
+      "prior/physical.log": "36807fe30ee72f10186dc24a7a318cb08e8abb325e572a9c142cb036d1173ae1",
+      "release/editable.log": "b8fd3840a79c31f3dcae2226d1c62f51d7c3fccae679aea4e7c6b73c466cf539",
+      "release/native/current-paint-preview-native.log": "e6fecb26a9c07a2a95672778bb32e420fe6947215d2a449cd94d278f7acf2bbd",
+      "release/native/native-target.log": "46c54421185cef6d38387394e932bb081f354d4295ebe5a301b44cd3c6005983",
+      "release/native/production-hdr-editable.log": "609bd31888439b9990c54647086e0468fa7855a6d11a3a1cceb5c26df242a339",
+      "release/native/production-hdr-standard.log": "16687265967ce3b1d122da36a63aa109e4055e4ee223761d5b0b936087fb63b5",
+      "release/native/production-ldr.log": "ee2b3a8bac902c30e11b09dfef52eb7786ca5bd32364876df8b08d5741fb5a19",
+      "release/native/retained-source.log": "2864b82c7712958e91cfe742c66b2b7722326d8d355444351dc0377b383cf572",
+      "release/native/retained-target.log": "cb1a13237207d602a07f24f3e8e8e17943e942ee15990f82ea60fb5390deb8d6",
+      "release/native/texture-set-export.log": "ce15347f47bf4801f37f3d5e56a9212bb7d24b195bcaa0b62af0ef3e1e2209bd",
+      "release/native/texture-set-surfaces.log": "bb5f390011224f5f923b300a5a51615ecd6e6fba4094f6a03a5361e4cdb888c2",
+      "release/registered.log": "86aee3167b09a9bbc65e425acb9e7add1c0166b9e883f54b8853972327042c74",
+      "release/registered.xml": "78491ce65ae2726d2f382a5d43417264be8185ad184042494c0fc4717434b51e",
+      "release/standard-khronos.json": "c1ced3570a12a3b00dd574ac9a05ca4afe154bf37eca5ce803a1c1f5694939ee",
+      "software/accept-graphics.json": "ab454556d5fed930f1dc46afd4b408ad85e067be51067f766ccfc4d3495c9a74",
+      "software/focus-graphics.json": "18552a3213df0b90f4a6282f51e873fa7cfe038c9a061d9b8f9d7cd2af3acf45",
+      "software/report.json": "3b46ec4f34c68717e31664655377cf419e30e4fe031ad98496288af1fd2535f7",
+      "software/status.json": "cba9b9a2585aebb3d896ca21595d54fda424ca93b583762cc1f7d9aee811908e",
+      "wayland/report.json": "4ecec9690cb20b1ffcbdf5ee3c020900c13b005d77f96844c42331d3b5cfbb4d",
+      "wayland/status.json": "8575472f6bfb372f2d6c7d68f494229046139b9ff75406c9fe20990d85a3a1b1"
+    },
+    "sha256": "9b1f4b723c64dfd5c59f8e807825bde40e10bfa2c646caa6e9d9c5dbec047cca"
+  },
+  "frontends": {
+    "arc": {
+      "app_sha256": "adb678d313b6a2abb3e9a680cfc2b9e8fa9aef02284b605e886a60ba364abbb4",
+      "checks": 10,
+      "exit": 0,
+      "input_sha256": "2613dd4251dbdaffe73d5037f0c7fadc5e5e04920acc3652e452eda4c7464de5",
+      "invocation": "a1353cb31fe94f22b163deb6601c0fa2",
+      "mode": "arc",
+      "native_sha256": "12e06c8c25c45bf6ca9f89cc2822974e81be5d21d1ae343dda64f4fe46804607",
+      "phase": "complete",
+      "report_sha256": "3b46ec4f34c68717e31664655377cf419e30e4fe031ad98496288af1fd2535f7",
+      "run_script_sha256": "8acd1aa09712493478daf95679a97dca44d0f9370a38425907934263a129b8ce",
+      "runtime_sha256": "40fa5b55ac329cf6dd77a3bdf5a5eac6f5f840d4ef43efd77678c588538fd8e9",
+      "terminal": true
+    },
+    "software": {
+      "app_sha256": "0fa0b7cc97035832d86bd7e66bf7372dcf7f7b95bd64470c8c6aa80f38bce3b8",
+      "checks": 10,
+      "exit": 0,
+      "input_sha256": "2613dd4251dbdaffe73d5037f0c7fadc5e5e04920acc3652e452eda4c7464de5",
+      "invocation": "1c0e0cb2b0f8470b8ae0eca516da9494",
+      "mode": "software",
+      "native_sha256": "12e06c8c25c45bf6ca9f89cc2822974e81be5d21d1ae343dda64f4fe46804607",
+      "phase": "complete",
+      "report_sha256": "3b46ec4f34c68717e31664655377cf419e30e4fe031ad98496288af1fd2535f7",
+      "run_script_sha256": "8acd1aa09712493478daf95679a97dca44d0f9370a38425907934263a129b8ce",
+      "runtime_sha256": "bbb5897e8616b8fafdbd9d22a4bba4f06290e278b37782134867d4b4477c1fac",
+      "terminal": true
+    },
+    "wayland": {
+      "app_sha256": "0fa0b7cc97035832d86bd7e66bf7372dcf7f7b95bd64470c8c6aa80f38bce3b8",
+      "checks": 7,
+      "compositor_sha256": "47920142c8c803dcf5adb63ba643d2e347fbdcd1e15ecd8bce7c1a8dd47c0b7e",
+      "compositor_source": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+      "exit": 0,
+      "input_sha256": "2613dd4251dbdaffe73d5037f0c7fadc5e5e04920acc3652e452eda4c7464de5",
+      "invocation": "1c5fe6089ab54dc9bc1af631b58fb338",
+      "mode": "wayland",
+      "native_sha256": "12e06c8c25c45bf6ca9f89cc2822974e81be5d21d1ae343dda64f4fe46804607",
+      "phase": "complete",
+      "probe_sha256": "5bf11c670f66bbb68960073878933055b09582e5173ec1e3f472b413956c55aa",
+      "report_sha256": "4ecec9690cb20b1ffcbdf5ee3c020900c13b005d77f96844c42331d3b5cfbb4d",
+      "run_script_sha256": "fceadea67cb3753cf6aed0356d364fb2fdc425dd76ff19dc3e4498186e850ef4",
+      "terminal": true
+    }
+  },
+  "identical_packages": {
+    "editable": {
+      "256": "80acf7e17ace88b71766f9c809c8bfb2a6a5a5c685691160ebd951daa96376c3",
+      "512": "80acf7e17ace88b71766f9c809c8bfb2a6a5a5c685691160ebd951daa96376c3",
+      "1024": "80acf7e17ace88b71766f9c809c8bfb2a6a5a5c685691160ebd951daa96376c3"
+    },
+    "prior_hdr_editable": "d9239629bec8588c801b8d5a7d79551758bfc6c98d1005c106f7f49d3d57147b",
+    "prior_hdr_standard": "64b9f80beaa352525233f55c7e434ebc4972e35ca7efab89b1f8911738cab6cb",
+    "project": "2613dd4251dbdaffe73d5037f0c7fadc5e5e04920acc3652e452eda4c7464de5",
+    "standard": "12e06c8c25c45bf6ca9f89cc2822974e81be5d21d1ae343dda64f4fe46804607"
+  },
+  "khronos": [
+    {
+      "authored": [
+        [
+          [
+            1024,
+            1024
+          ],
+          [
+            1024,
+            1024
+          ],
+          [
+            1024,
+            1024
+          ]
+        ],
+        [
+          [
+            1024,
+            1024
+          ],
+          [
+            1024,
+            1024
+          ],
+          [
+            1024,
+            1024
+          ]
+        ]
+      ],
+      "errors": 0,
+      "file": "release-final-grid/production-ldr/retained-target.glb",
+      "sha256": "12e06c8c25c45bf6ca9f89cc2822974e81be5d21d1ae343dda64f4fe46804607",
+      "validator": "2.0.0-dev.3.10",
+      "warnings": 0
+    },
+    {
+      "authored": [
+        [
+          [
+            1024,
+            1024
+          ],
+          [
+            1024,
+            1024
+          ],
+          [
+            1024,
+            1024
+          ]
+        ],
+        [
+          [
+            1024,
+            1024
+          ],
+          [
+            1024,
+            1024
+          ],
+          [
+            1024,
+            1024
+          ]
+        ]
+      ],
+      "errors": 0,
+      "file": "asan-final-grid/production-ldr/retained-target.glb",
+      "sha256": "12e06c8c25c45bf6ca9f89cc2822974e81be5d21d1ae343dda64f4fe46804607",
+      "validator": "2.0.0-dev.3.10",
+      "warnings": 0
+    },
+    {
+      "authored": [
+        [
+          [
+            1024,
+            1024
+          ],
+          [
+            1024,
+            1024
+          ],
+          [
+            1024,
+            1024
+          ]
+        ],
+        [
+          [
+            1024,
+            1024
+          ],
+          [
+            1024,
+            1024
+          ],
+          [
+            1024,
+            1024
+          ]
+        ]
+      ],
+      "errors": 0,
+      "file": "release-editable-grid-verified/editable-retained-1024.glb",
+      "sha256": "80acf7e17ace88b71766f9c809c8bfb2a6a5a5c685691160ebd951daa96376c3",
+      "validator": "2.0.0-dev.3.10",
+      "warnings": 0
+    }
+  ],
+  "open": "Physical headset, larger retained fields, repeated multi-member rebake, the reflected split-grid strict projection case, typed material sets, alternate source emission coordinates, HDR VRM and the full integrated regression.",
+  "product": "dfb705c78b872dc375d005085ff355049afa9e2e",
+  "profiles": {
+    "asan": {
+      "app_sha256": "adb678d313b6a2abb3e9a680cfc2b9e8fa9aef02284b605e886a60ba364abbb4",
+      "checks": {
+        "current-paint-preview-native": 8425,
+        "native-target": 1534,
+        "production-hdr-editable": 736,
+        "production-hdr-standard": 745,
+        "production-ldr": 46,
+        "retained-source": 1155,
+        "retained-target": 79,
+        "texture-set-export": 149,
+        "texture-set-surfaces": 72
+      },
+      "core_sha256": "3fe6c574e70d0ecf219ff6fe326310a8afe27e421f58989f2d2e16d0e4199013",
+      "registered_seconds": 98.6964,
+      "test_sha256": "8783bec7982faccbca6e280fe0bf71fdebff96c9841305b06320d17a80653435"
+    },
+    "release": {
+      "app_sha256": "0fa0b7cc97035832d86bd7e66bf7372dcf7f7b95bd64470c8c6aa80f38bce3b8",
+      "checks": {
+        "current-paint-preview-native": 8425,
+        "native-target": 1534,
+        "production-hdr-editable": 736,
+        "production-hdr-standard": 745,
+        "production-ldr": 46,
+        "retained-source": 1155,
+        "retained-target": 79,
+        "texture-set-export": 149,
+        "texture-set-surfaces": 72
+      },
+      "core_sha256": "29932734d1ad128edeb828961ce3ff2daf55221dbc1d4238151dcf98f58d9370",
+      "registered_seconds": 16.0417,
+      "test_sha256": "537efbca4a47a210a4e5b987385b99a8c5b6d93d2075721883e27003ec033207"
+    }
+  },
+  "scope": "Two prepared retained LDR PBR texture-set members at 1024 square, original read-raster and separate normal authority, exact material and coverage reference, primary worker Bake, ordered Save and cold reopen, history and Standard GLB. Retained FLOAT production Standard and Editable packages checked for compatibility.",
+  "source_sha256": {
+    "CMakeLists.txt": "4f0d98d446f521574e9408ac643dd99659c425640b9a0426d8a629dda0a94aef",
+    "src/paint.cpp": "d6e9006b2c2ff8bb0b1ddacebaeab6d766cbbc8e40763d974184a013e8fe0ea0",
+    "src/polygon-surface-paint.hpp": "f5e81ed9040c534276353ae1f1f0aabd617b7da79e3cd8021fd5dfbe469f187a",
+    "src/texture-set-export.cpp": "d5b89e576e7a07c97100d9a2d47f070fca7cee4e30dc829eed64de3d7cbeaabf",
+    "src/texture-set-native-grid.hpp": "4e335558a1f1849c2a925420907eb5b04169733dc8db565133a91a1f96497a91",
+    "src/texture-set-portable-field.cpp": "46600c218fbecbb864f52a2cea27a8632b183e247a8965cc26c1798b610dfe9b",
+    "src/texture-set-range.cpp": "30787e2b35426fdbf95c768431d4aee8f7414e457122b777a4a4c70c1fe10f34",
+    "src/texture-set-worker.cpp": "b70bc78c353a9ceab038a00fb12c952f35f8aee61ff151bafd814d01a3b4cc75",
+    "tests/texture-set-source-export.cpp": "a3e14e3ec720a3c80114d4ffb0b77014c24551363f022052519fbba6f8281f56"
+  },
+  "toolkit": "acc2b70ae61dedec2a23727f67c60c0303d0f76f"
+}
