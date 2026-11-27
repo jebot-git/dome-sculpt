@@ -45,6 +45,30 @@ bool same_placement(const Scene &scene,uint64_t id,CanvasTransform legacy,const 
   if(affine)return scene.world_matrix(id).matrix()==affine->matrix();
   return !scene.has_affine_placement(id)&&same(scene.world_transform(id),legacy);
 }
+std::unique_ptr<MaterialSurfaceQuery> texture_set_query(
+    const Scene &scene, const SculptObject &object, bool pbr,
+    const std::function<bool()> &cancelled) {
+  TextureSetLimits limits;
+  limits.cancelled = cancelled;
+  ObjectSurface bundle;
+  bundle.id = object.id;
+  bundle.name = object.name;
+  bundle.transform = object.transform;
+  bundle.material = object.material;
+  bundle.deformation = object.deformation;
+  bundle.groups = scene.group_path(object.group);
+  bundle.affine_edit = object.affine_edit;
+  bundle.rig_source = object.rig_source;
+  bundle.texture_set_surface = detail::prepare_texture_set_surface(object, limits);
+  auto layout = detail::prepare_texture_set_packed(bundle.texture_set_surface, limits);
+  MeshSnapshot snapshot;
+  detail::TextureSetWorkerView view;
+  view.render_only = true;
+  view.pbr = pbr;
+  detail::append_texture_set_surface(snapshot, bundle, layout, view, limits);
+  return std::make_unique<MaterialSurfaceQuery>(snapshot.mesh, snapshot.ranges, cancelled,
+      snapshot.source_colors, PaintVertexCoordinates{snapshot.paint_coordinates});
+}
 }
 bool Document::begin_native_stroke(){
   std::lock_guard lock(model_mutex_);return begin_native_locked();
@@ -62,7 +86,7 @@ bool Document::begin_native_locked(uint32_t spatial_owner,NativeStrokeSpace spac
   if(!native_source_scene_||preview->generation!=state_.generation||preview->revision!=state_.revision||preview->pbr_view!=state_.pbr_view||preview->view_epoch!=state_.view_epoch){state_.message="Wait for the current surface before painting";publish_locked();return false;}
   const bool projected=o.mesh_active&&!state_.shape_sculpt&&state_.projection&&state_.projection->settings.enabled&&state_.projection->image;
   if(projected&&(!o.mesh_active||state_.shape_sculpt||state_.projection->placing))return false;
-  auto field_lease=o.texture_sets?detail::capture_texture_set_stroke(scene_,o.id):nullptr;
+  auto field_lease=o.texture_sets&&!state_.shape_sculpt?detail::capture_texture_set_stroke(scene_,o.id):nullptr;
   auto session=std::make_shared<NativeStroke>();session->texture_set=std::move(field_lease);session->epoch=++native_epoch_;
   if(projected){
     session->projection=state_.projection;
@@ -78,7 +102,7 @@ bool Document::begin_native_locked(uint32_t spatial_owner,NativeStrokeSpace spac
   if(state_.object_grabbing&&space==NativeStrokeSpace::EvaluatedWorldBrush)session->held_basis=held_affine_;
   if(state_.shape_sculpt&&space!=NativeStrokeSpace::Ray)return false;
   if(space==NativeStrokeSpace::EvaluatedWorldBrush&&!o.mesh_active)return false;
-  if(state_.shape_sculpt&&o.texture_sets)throw std::logic_error("Texture-set shape editing requires its complete field/frame remap");
+  if(state_.shape_sculpt&&o.texture_sets&&!detail::texture_set_shape_editable(o))return false;
   if(state_.shape_sculpt){if(!o.deformation||!o.deformation->morphs||state_.morph_target>=o.deformation->morphs->targets.size()||state_.object_grabbing)return false;session->shape_target=state_.morph_target;}
   std::lock_guard queue(native_mutex_);
   if(native_jobs_.size()>=8){state_.error="Desktop gesture queue is full; retry after pending cancellation finishes";publish_locked();return false;}
@@ -188,7 +212,11 @@ void Document::native_loop(){
       if(o.mesh_active){
         std::shared_ptr<const Mesh> geometry;
         bool reflected=false;
-        if(session->affine_world) {
+        if(shape&&o.texture_sets){
+          auto preview=working.snapshot();
+          detail::shape_sculpt_preview(preview,o.id,*session->shape_target);
+          query=texture_set_query(preview,preview.object(o.id),session->pbr_view,cancelled);
+        }else if(session->affine_world) {
           auto placed=std::make_shared<Mesh>(shape?shape->preview():o.deformation?o.deformation->preview(o.painted->mesh()):o.painted->mesh());
           auto frame=detail::placement_frame(working,o.id);detail::place_mesh(*placed,frame,cancelled);
           if(auto positions=source_world_positions(working,o,shape.get(),cancelled))placed->positions=std::move(*positions);
@@ -197,10 +225,8 @@ void Document::native_loop(){
         if(cancelled())throw std::runtime_error("Desktop stroke cancelled");
         if(!shape&&(o.deformation||session->affine_world))evaluation=paint_target->evaluate(geometry,cancelled);
         if(session->texture_set){
-          TextureSetLimits limits;limits.cancelled=cancelled;ObjectSurface bundle;bundle.id=o.id;bundle.name=o.name;bundle.transform=o.transform;bundle.material=o.material;bundle.deformation=o.deformation;bundle.groups=working.group_path(o.group);bundle.affine_edit=o.affine_edit;bundle.rig_source=o.rig_source;bundle.texture_set_surface=detail::prepare_texture_set_surface(o,limits);
-          auto layout=detail::prepare_texture_set_packed(bundle.texture_set_surface,limits);MeshSnapshot query_snapshot;detail::TextureSetWorkerView view;view.render_only=true;view.pbr=session->pbr_view;detail::append_texture_set_surface(query_snapshot,bundle,layout,view,limits);
-          query=std::make_unique<MaterialSurfaceQuery>(query_snapshot.mesh,query_snapshot.ranges,cancelled,query_snapshot.source_colors,PaintVertexCoordinates{query_snapshot.paint_coordinates});
-        }else{
+          query=texture_set_query(working,o,session->pbr_view,cancelled);
+        }else if(!query){
         query_range.emplace(SurfaceRange{o.id,0,geometry->indices.size(),o.material,o.material_bindings&&o.material_bindings->polygon_surface_transfer?detail::PolygonSurfacePaintCodec::preview(*o.painted,o.material_bindings,o.material,cancelled):o.painted->preview(o.material,cancelled),o.appearance,0,o.material_bindings});
         auto &range=*query_range;
         range.reflected=reflected;
@@ -316,12 +342,14 @@ void Document::native_loop(){
           auto preview=working.snapshot();
           if(session->texture_set){TextureSetLimits limits;limits.cancelled=cancelled;detail::adopt_texture_set_stroke(preview,session->texture_set,*paint_target,limits);}
           if(shape){ShapeKeyEdit edit;edit.action=ShapeKeyAction::Replace;edit.target=*session->shape_target;edit.positions.assign(shape->positions().begin(),shape->positions().end());author_shapekey(preview,o.id,edit,cancelled);detail::shape_sculpt_preview(preview,o.id,*session->shape_target);
-            auto geometry=shape->preview();auto frame=detail::placement_frame(working,o.id);if(session->affine_world){detail::place_mesh(geometry,frame,cancelled);if(auto positions=source_world_positions(working,o,shape.get(),cancelled))geometry.positions=std::move(*positions);}
-            // Only evaluated geometry changes during this gesture. Preserve
-            // the original immutable material, sampling attachment/proof and
-            // its explicitly logical-corner paint stream for every refresh.
-            if(!query_range||geometry.indices.size()!=query_range->count)throw std::logic_error("Shape preview changed its visibility triangle correspondence");
-            query=std::make_unique<MaterialSurfaceQuery>(geometry,std::span<const SurfaceRange>(&*query_range,1),cancelled,query_colors,PaintCornerCoordinates{query_paint});
+            if(o.texture_sets){
+              query=texture_set_query(preview,preview.object(o.id),session->pbr_view,cancelled);
+            }else{
+              auto geometry=shape->preview();auto frame=detail::placement_frame(working,o.id);if(session->affine_world){detail::place_mesh(geometry,frame,cancelled);if(auto positions=source_world_positions(working,o,shape.get(),cancelled))geometry.positions=std::move(*positions);}
+              // Keep the original material and its logical-corner paint stream.
+              if(!query_range||geometry.indices.size()!=query_range->count)throw std::logic_error("Shape preview changed its visibility triangle correspondence");
+              query=std::make_unique<MaterialSurfaceQuery>(geometry,std::span<const SurfaceRange>(&*query_range,1),cancelled,query_colors,PaintCornerCoordinates{query_paint});
+            }
           }
           std::lock_guard lock(model_mutex_);
           if(native_stroke_!=session||session->source.generation!=state_.generation||session->source.revision!=state_.revision||scene_.active().id!=session->source.object||scene_.active().deformation!=session->deformation||!same_placement(scene_,session->source.object,session->transform,session->affine_world))throw std::runtime_error("Desktop source or pose changed");

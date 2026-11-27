@@ -4,6 +4,7 @@
 #include "emission-fallback-metrics.hpp"
 #include <optional>
 #include "dome/tangents.hpp"
+#include "source-morph.hpp"
 namespace dome { class MToonMaterial; }
 namespace dome::detail {
 struct TextureSetExportEmission {
@@ -47,6 +48,7 @@ std::optional<MToonFloatPreview> compile_editable_mtoon_float_preview(
 struct TextureSetExport {
   ObjectSurface surface;
   std::vector<Tangent> tangents;
+ std::vector<SourceMorphChannels> morph_channels;
   std::vector<std::array<float,2>>paint_coordinates,normal_coordinates;
   std::vector<TextureSetExportField> fields;
   size_t working_bound=0;

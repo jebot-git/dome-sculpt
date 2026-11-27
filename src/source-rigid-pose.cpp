@@ -24,7 +24,13 @@ std::vector<AccessoryRig> accessory_rigs(const Scene &scene) {
 
 bool native_texture_set_accessory(const SculptObject &object) noexcept {
   return object.mesh_active && object.painted && object.texture_sets &&
-      !object.appearance && !object.deformation && !object.rig_source;
+      !object.appearance && rigid_accessory_deformation(object.deformation) && !object.rig_source;
+}
+
+bool rigid_accessory_deformation(const std::shared_ptr<const DeformationState> &deformation) noexcept {
+  return !deformation || (deformation->morphs && !deformation->skeleton &&
+      !deformation->skin && !deformation->humanoid && !deformation->landmarks &&
+      !deformation->expressions);
 }
 
 std::shared_ptr<const SourceNodePlacement>

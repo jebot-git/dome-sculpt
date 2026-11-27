@@ -124,6 +124,8 @@ struct MorphSet {
   void mirror_target(const Mesh &, size_t target, std::string name,
                      float tolerance = 1e-4f);
   Mesh evaluate(const Mesh &, std::span<const float> weights) const;
+  Mesh target_surface(const Mesh &, size_t target,
+                      const std::function<bool()> &cancelled = {}) const;
   nlohmann::json encode() const;
   static MorphSet decode(const nlohmann::json &, const Mesh &);
 };

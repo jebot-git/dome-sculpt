@@ -948,7 +948,21 @@ ExportBound export_bound(const ObjectSurface&input,const TextureSetLimits&limits
   if(!sparse_retained)charge(work,size_t(resolution)*resolution,16+8*field.painted->layers().size(),limits.maximum_work);
  }
  charge(bytes,scratch,1,limits.maximum_bytes);
- if(input.deformation){const auto entries=input.deformation->resource_entries();charge(bytes,entries,32,limits.maximum_bytes);charge(work,entries,16,limits.maximum_work);}
+ if(input.deformation){
+  const auto entries=input.deformation->resource_entries();charge(bytes,entries,32,limits.maximum_bytes);charge(work,entries,16,limits.maximum_work);
+  if(input.deformation->morphs&&!input.deformation->morphs->targets.empty()){
+   const size_t targets=input.deformation->morphs->targets.size();
+   const bool tangents=std::ranges::any_of(plan->fields(),[](const auto &field){
+    return field.painted->baked()&&!field.painted->baked()->maps.normal.rgba.empty();
+   });
+   charge(bytes,targets,sizeof(SourceMorphChannels),limits.maximum_bytes);
+   charge(bytes,count,targets*(tangents?2:1)*sizeof(Vec3)+sizeof(uint32_t),limits.maximum_bytes);
+   charge(bytes,rest.positions.size(),2*sizeof(Vec3)+sizeof(std::array<float,2>)+1,limits.maximum_bytes);
+   charge(bytes,rest.indices.size(),sizeof(uint32_t)+1+(tangents?2*sizeof(Tangent):0),limits.maximum_bytes);
+   charge(work,rest.positions.size()+rest.indices.size(),targets*8,limits.maximum_work);
+   if(tangents)charge(work,count,targets*32,limits.maximum_work);
+  }
+ }
  stop(limits);return {bytes,work};
 }
 } // namespace
@@ -1139,12 +1153,16 @@ TextureSetExport compile_texture_set_export(const ObjectSurface&input,const Text
  TextureSetExport out;out.working_bound=bytes;
  const auto&plan=input.texture_set_surface;const auto&rest=*plan->geometry();const auto count=plan->indices().size();
  const bool source=std::any_of(plan->fields().begin(),plan->fields().end(),[](const auto&f){return bool(f.source);});
+ const auto *morphs=input.deformation&&input.deformation->morphs?&*input.deformation->morphs:nullptr;
+ const bool has_morphs=morphs&&!morphs->targets.empty();
  bool normal=false;
  // Tangent basis is evaluated in REST, never the current pose. Include the
  // actual vertex and role-specific frame bits in every necessary split.
  const bool canonical_frames=std::any_of(plan->fields().begin(),plan->fields().end(),[](const auto&field){return !field.source&&field.painted->baked()&&!field.painted->baked()->maps.normal.rgba.empty();});
  const auto frames=canonical_frames?tangent_corners(rest,limits.cancelled):std::vector<Tangent>{};
  using Signature=std::array<uint32_t,12>;std::map<Signature,uint32_t>vertices;std::vector<uint32_t>rest_vertices;
+ std::vector<uint32_t>tangent_corners_by_vertex;
+ if(has_morphs&&canonical_frames)tangent_corners_by_vertex.reserve(count);
  auto&mesh=out.surface.mesh;mesh.indices.reserve(count);rest_vertices.reserve(std::min(count,rest.positions.size()));
  for(size_t f=0;f<plan->fields().size();++f){
   stop(limits);const auto&field=plan->fields()[f];const auto&draw=plan->draws()[f];if(!draw.count)continue;
@@ -1181,17 +1199,40 @@ TextureSetExport compile_texture_set_export(const ObjectSurface&input,const Text
    if((c&1023)==0)stop(limits);const auto logical=plan->logical_corners()[draw.first+c];const auto vertex=rest.indices.at(logical);
    const auto n=portable?portable->corners[c].normal:rest.normals.at(vertex);const auto paint=portable?portable->corners[c].paint:rest.uv.at(vertex);const auto role=portable?portable->corners[c].role:rest.uv.at(vertex);
    const Tangent tangent=portable?portable->corners[c].tangent:canonical?frames.at(logical):Tangent{1,0,0,1};Signature key{};key[0]=vertex;size_t k=1;for(float v:tangent)key[k++]=std::bit_cast<uint32_t>(v);for(float v:{n.x,n.y,n.z})key[k++]=std::bit_cast<uint32_t>(v);for(float v:paint)key[k++]=std::bit_cast<uint32_t>(v);for(float v:role)key[k++]=std::bit_cast<uint32_t>(v);
-   auto found=vertices.find(key);uint32_t id;
+   // Different pose tangents can meet at a shared REST vertex. Keep the
+   // logical corners of normal-mapped fields distinct through morph export.
+   const bool distinct=canonical&&has_morphs;
+   auto found=distinct?vertices.end():vertices.find(key);uint32_t id;
    if(found!=vertices.end())id=found->second;
    else{
     if(mesh.positions.size()>=2'000'000)throw std::length_error("Texture-set exported vertex splits exceed the native geometry limit");
-    id=uint32_t(mesh.positions.size());vertices.emplace(key,id);rest_vertices.push_back(vertex);mesh.positions.push_back(rest.positions.at(vertex));mesh.normals.push_back(n);if(!rest.uv.empty())mesh.uv.push_back(rest.uv.at(vertex));if(!rest.uv_pins.empty())mesh.uv_pins.push_back(rest.uv_pins.at(vertex));out.tangents.push_back(tangent);if(source){out.paint_coordinates.push_back(paint);out.normal_coordinates.push_back(role);}
+    id=uint32_t(mesh.positions.size());if(!distinct)vertices.emplace(key,id);rest_vertices.push_back(vertex);mesh.positions.push_back(rest.positions.at(vertex));mesh.normals.push_back(n);if(!rest.uv.empty())mesh.uv.push_back(rest.uv.at(vertex));if(!rest.uv_pins.empty())mesh.uv_pins.push_back(rest.uv_pins.at(vertex));out.tangents.push_back(tangent);if(source){out.paint_coordinates.push_back(paint);out.normal_coordinates.push_back(role);}
+    if(has_morphs&&canonical_frames)tangent_corners_by_vertex.push_back(canonical?logical:UINT32_MAX);
    }
    mesh.indices.push_back(id);if(!rest.uv_seams.empty())mesh.uv_seams.push_back(rest.uv_seams.at(logical));
   }
   out.fields.push_back(std::move(output));
  }
  if(out.fields.empty()||mesh.indices.size()!=count)throw std::invalid_argument("Texture-set export omitted a nonempty material range");
+ if(has_morphs){
+  out.morph_channels.reserve(morphs->targets.size());
+  for(size_t target=0;target<morphs->targets.size();++target){
+   stop(limits);
+   const auto shaped=morphs->target_surface(rest,target,limits.cancelled);
+   auto &channels=out.morph_channels.emplace_back();
+   channels.normals.reserve(rest_vertices.size());
+   const auto shaped_tangents=canonical_frames?tangent_corners(shaped,limits.cancelled):std::vector<Tangent>{};
+   if(canonical_frames)channels.tangents.resize(rest_vertices.size());
+   for(size_t v=0;v<rest_vertices.size();++v){
+    if((v&1023)==0)stop(limits);
+    channels.normals.push_back(shaped.normals[rest_vertices[v]]-mesh.normals[v]);
+    if(!canonical_frames||tangent_corners_by_vertex[v]==UINT32_MAX)continue;
+    const auto &from=out.tangents[v], &to=shaped_tangents.at(tangent_corners_by_vertex[v]);
+    if(from[3]!=to[3])throw std::invalid_argument("A shape changes a baked normal's tangent handedness; glTF morphs cannot encode that sign");
+    channels.tangents[v]={to[0]-from[0],to[1]-from[1],to[2]-from[2]};
+   }
+  }
+ }
  mesh.validate();out.surface.id=input.id;out.surface.name=input.name;out.surface.transform=input.transform;out.surface.groups=input.groups;out.surface.affine_edit=input.affine_edit;out.surface.rig_source=input.rig_source;
  out.surface.material=out.fields[0].material;out.surface.textures=out.fields[0].textures;
  out.surface.deformation=normal_frame_remap_deformation(input.deformation,rest,mesh,rest_vertices,limits.cancelled);

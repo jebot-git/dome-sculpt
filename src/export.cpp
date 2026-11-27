@@ -463,17 +463,23 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
           j["accessors"][accessor]["min"] = {low.x, low.y, low.z};
           j["accessors"][accessor]["max"] = {high.x, high.y, high.z};
           nlohmann::json channels={{"POSITION",accessor}};
-          SourceMorphChannels directions;
-          if(frame){directions.normals=frame->normal_targets.at(native_target);directions.tangents=frame->tangent_targets.at(native_target);++native_target;}
-          else directions=source_attributes->target(native_target++,recompute_changed_normals);
           auto direction=[&](const std::vector<Vec3> &values,const char *name){
             if(values.empty())return;
             begin=data.size();
             for(auto p:values)floats(std::array{p.x,p.y,p.z});
             channels[name]=add(begin,data.size()-begin,34962,values.size(),5126,"VEC3");
           };
-          direction(directions.normals,"NORMAL");direction(directions.tangents,"TANGENT");
-          result.normal_targets_recomputed+=directions.normals_recomputed;
+          if(frame){
+            direction(frame->normal_targets.at(native_target),"NORMAL");
+            direction(frame->tangent_targets.at(native_target),"TANGENT");
+          }else{
+            const auto &bundle=bundles[object_index];
+            const auto directions=bundle?SourceMorphChannels{}:source_attributes->target(native_target,recompute_changed_normals);
+            const auto &values=bundle?bundle->morph_channels.at(native_target):directions;
+            direction(values.normals,"NORMAL");direction(values.tangents,"TANGENT");
+            result.normal_targets_recomputed+=values.normals_recomputed;
+          }
+          ++native_target;
           targets.push_back(std::move(channels));
           names.push_back(target.name);
         }

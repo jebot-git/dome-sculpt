@@ -640,10 +640,10 @@ nlohmann::json Scene::encode() const {
   std::unique_ptr<detail::TextureSetFieldCodec>field_codec;
   if(shared_sets){texture_archive.shared_records();field_codec=std::make_unique<detail::TextureSetFieldCodec>();texture_archive.field_encoder([&](const TextureSetView&field,uint32_t geometry){return field_codec->encode(field,geometry,source_images,&normal_domains,&writable_domains,[&](auto binding){return source_materials.add(std::move(binding));});},[&]{return field_codec->records();});}
   // Keep old UV-only Scene26 records free of fabricated rig-history fields.
-  // Scene25 retains its original nullable layout; real nested history owns pool6.
+  // Nested rig, recipe and texture history all use the nullable rig-field layout.
   const bool rig_fields=feature_version==25 ||
     std::any_of(objects_.begin(),objects_.end(),[](const auto &o){return bool(o.rig_source);}) ||
-    std::any_of(polygons.origins().begin(),polygons.origins().end(),[](const auto &o){return bool(o->rig_source)||bool(o->bake_recipe);});
+    std::any_of(polygons.origins().begin(),polygons.origins().end(),[](const auto &o){return bool(o->rig_source)||bool(o->bake_recipe)||bool(o->texture_sets);});
   j["next_group_id"] = next_group_;
   j["groups"] = nlohmann::json::array();
   for (auto &g : groups_) {
@@ -833,9 +833,10 @@ Scene Scene::decode_owning(const nlohmann::json &j,
   auto key_feature=[&](const char *table,const char *field){return key_context&&detail::encoded_key_feature(j.at("source_materials"),table,field);};
   if(version==22&&(!key_context||!j.at("source_materials").at("key_derivations").is_array()||j.at("source_materials").at("key_derivations").empty()))throw std::invalid_argument("Scene22 requires actual owning native key derivation");
   if(j.contains("source_materials")&&detail::material_archive_base_version(j.at("source_materials"))==10&&version<22)throw std::invalid_argument("Owning native key derivation requires Scene22");
-  const bool rig_pool=j.contains("polygon_sources")&&(j.at("polygon_sources").at("version")==6||j.at("polygon_sources").at("version")==7||j.at("polygon_sources").at("version")==8);
+  const bool texture_history=j.contains("polygon_sources")&&j.at("polygon_sources").at("version")==8;
+  const bool rig_pool=texture_history||(j.contains("polygon_sources")&&(j.at("polygon_sources").at("version")==6||j.at("polygon_sources").at("version")==7));
   const bool shared_corner_context=j.contains("polygon_sources")&&(j.at("polygon_sources").at("version")==5||(rig_pool&&j.at("polygon_sources").at("shared_colors").get<bool>()));
-  if(j.contains("polygon_sources")&&j.at("polygon_sources").at("version")==8&&(version!=40||!j.contains("texture_set_geometry")||j.at("texture_set_geometry").at("version")!=2))throw std::invalid_argument("Retained texture history8 requires actual Scene40/shared geometry2");
+  if(texture_history&&(version!=40||!j.contains("texture_set_geometry")||j.at("texture_set_geometry").at("version")!=2))throw std::invalid_argument("Retained texture history8 requires actual Scene40/shared geometry2");
   if(version<25&&rig_pool)throw std::invalid_argument("Rig source archive requires Scene25");
   if(paint_context&&version<24)throw std::invalid_argument("Independent writable paint requires explicit Scene24");
   if(version==24&&(!paint_context||!j.contains("source_materials")||(detail::material_archive_base_version(j.at("source_materials"))!=9&&!(key_context&&key_feature("color_preparations","paint_sampling")))))throw std::invalid_argument("Scene24 requires its actual paired material9 and writable domain pool");
@@ -900,11 +901,17 @@ Scene Scene::decode_owning(const nlohmann::json &j,
     for(const auto &o:objects)if(o.contains("affine_edit"))detail::placement_index(o.at("affine_edit"),state.at("edits").size());
     if(j.contains("polygon_sources"))for(const auto &o:j.at("polygon_sources").at("origins"))if(o.contains("placement"))detail::placement_index(o.at("placement"),state.at("capsules").size());
   }
+  // Earlier Scene40 writers could omit all live rig fields when archive8 was
+  // selected solely by texture-set history. The archive still authenticates
+  // every retained field and requires an explicit nullable origin rig slot.
+  const bool legacy_texture_history=texture_history&&j.at("polygon_sources").at("bake_recipes")==false&&
+      std::ranges::none_of(objects,[](const auto &o){return o.contains("rig_source");})&&
+      std::ranges::all_of(j.at("polygon_sources").at("origins"),[](const auto &o){return o.at("rig_source").is_null();});
   for(const auto &o:objects){
     detail::require_material_emission_version(o.at("material"),unsigned(version));
     if(version>=16){if(!o.contains("shape_source"))throw std::invalid_argument("Incomplete shape source scene fields");}
     else if(o.contains("shape_source"))throw std::invalid_argument("Shape source requires Scene16");
-    if(version==25||rig_pool){if(!o.contains("rig_source"))throw std::invalid_argument("Incomplete rig source scene fields");}
+    if(version==25||(rig_pool&&!legacy_texture_history)){if(!o.contains("rig_source"))throw std::invalid_argument("Incomplete rig source scene fields");}
     else if(version<25&&o.contains("rig_source")&&!o.at("rig_source").is_null())throw std::invalid_argument("Rig source requires Scene25");
   }
   if(j.contains("polygon_sources"))for(const auto &origin:j.at("polygon_sources").at("origins"))detail::require_material_emission_version(origin.at("material"),unsigned(version));

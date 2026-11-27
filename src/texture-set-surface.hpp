@@ -43,6 +43,7 @@ private:
 };
 bool texture_set_plain_fields(const SculptObject&)noexcept;
 bool texture_set_editable_fields(const SculptObject&)noexcept;
+bool texture_set_shape_editable(const SculptObject&)noexcept;
 bool native_texture_set_mtoon(const PaintedMesh*,const CreatorAppearance*,
                               const SourceMaterialBindings*)noexcept;
 std::shared_ptr<const TextureSetSurfacePlan> prepare_texture_set_surface(

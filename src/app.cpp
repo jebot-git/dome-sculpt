@@ -871,10 +871,10 @@ struct App {
            active->editable);
 
     for(const auto *name:{"&Scene/Shapekeys/New shapekey...","&Scene/Shapekeys/Capture shape mix..."})enable(name,!modal&&s->can_author_shapes);
-    for(const auto *name:{"&Scene/Shapekeys/Duplicate shapekey...","&Scene/Shapekeys/Mirror shapekey...","&Scene/Shapekeys/Rename shapekey..."})enable(name,!modal&&s->can_select_shape);
+    for(const auto *name:{"&Scene/Shapekeys/Duplicate shapekey...","&Scene/Shapekeys/Mirror shapekey...","&Scene/Shapekeys/Rename shapekey..."})enable(name,!modal&&s->can_author_shapes&&s->can_select_shape);
     enable("&Scene/Shapekeys/Restore before shape authoring...",!modal&&s->can_restore_shapes);
     enable("&Scene/Shapekeys/Choose shapekey...",!modal&&s->can_select_shape);
-    enable("&Scene/Shapekeys/Sculpt selected shapekey",!modal&&s->can_select_shape);checked("&Scene/Shapekeys/Sculpt selected shapekey",s->shape_sculpt);
+    enable("&Scene/Shapekeys/Sculpt selected shapekey",!modal&&s->can_author_shapes&&s->can_select_shape);checked("&Scene/Shapekeys/Sculpt selected shapekey",s->shape_sculpt);
     if (active != s->objects.end()) {
       checked("&Scene/&Visible", active->visible);
       checked("&Scene/&Locked", active->locked);

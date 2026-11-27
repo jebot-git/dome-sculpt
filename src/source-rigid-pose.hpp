@@ -18,6 +18,7 @@ struct AvatarAttachmentView {
 };
 
 bool native_texture_set_accessory(const SculptObject &) noexcept;
+bool rigid_accessory_deformation(const std::shared_ptr<const DeformationState> &) noexcept;
 // Recover the exact imported endpoint from a native child's placement path.
 std::shared_ptr<const SourceNodePlacement>
 source_accessory_attachment(std::span<const SceneGroup>);

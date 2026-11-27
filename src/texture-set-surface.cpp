@@ -68,6 +68,12 @@ bool texture_set_editable_fields(const SculptObject &object) noexcept {
  return eligible(object)&&(!object.texture_sets||
      std::all_of(object.texture_sets->additional().begin(),object.texture_sets->additional().end(),eligible));
 }
+bool texture_set_shape_editable(const SculptObject &object) noexcept {
+ return object.texture_sets && !object.texture_sets->primary_source() &&
+        std::ranges::none_of(object.texture_sets->additional(),
+                            [](const auto &field) { return bool(field.source); }) &&
+        texture_set_editable_fields(object);
+}
 bool bake_target_supported(const SculptObject &object) {
  if (!object.texture_sets) {
    const auto binding=object.material_bindings;

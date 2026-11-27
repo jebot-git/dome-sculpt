@@ -114,9 +114,11 @@ float segment_distance(Vec3 p, Vec3 a, Vec3 b) {
       p -
       (a + d * (q > 1e-20f ? std::clamp(dot(p - a, d) / q, 0.f, 1.f) : 0.f)));
 }
-void normals(Mesh &m) {
+void normals(Mesh &m, const std::function<bool()> &cancelled = {}) {
   m.normals.assign(m.positions.size(), {});
   for (size_t t = 0; t < m.indices.size(); t += 3) {
+    if (((t / 3) & 1023) == 0 && cancelled && cancelled())
+      throw std::runtime_error("Morph normal evaluation cancelled");
     auto a = m.indices[t], b = m.indices[t + 1], c = m.indices[t + 2];
     auto n =
         cross(m.positions[b] - m.positions[a], m.positions[c] - m.positions[a]);
@@ -124,8 +126,11 @@ void normals(Mesh &m) {
     m.normals[b] += n;
     m.normals[c] += n;
   }
-  for (auto &n : m.normals)
-    n = normalized(n);
+  for (size_t v = 0; v < m.normals.size(); ++v) {
+    if ((v & 1023) == 0 && cancelled && cancelled())
+      throw std::runtime_error("Morph normal evaluation cancelled");
+    m.normals[v] = normalized(m.normals[v]);
+  }
 }
 // Closest point on a triangle, expressed in its convex barycentric regions.
 std::array<float, 3> closest(Vec3 p, Vec3 a, Vec3 b, Vec3 c) {
@@ -951,10 +956,31 @@ Mesh MorphSet::evaluate(const Mesh &m, std::span<const float> weights) const {
     for (size_t v = 0; v < m.positions.size(); v++)
       out.positions[v] += targets[t].delta[v] * weights[t];
   }
-  if (active)
+  if (active && !std::equal(out.positions.begin(), out.positions.end(), m.positions.begin(),
+                           [](Vec3 a, Vec3 b) { return a.x == b.x && a.y == b.y && a.z == b.z; }))
     normals(out);
   out.validate();
   return out;
+}
+Mesh MorphSet::target_surface(const Mesh &m, size_t target,
+                             const std::function<bool()> &cancelled) const {
+  const auto &delta = targets.at(target).delta;
+  m.validate();
+  if (topology != morph_topology_id(m) || delta.size() != m.positions.size())
+    throw std::invalid_argument("Morph target differs from its rest surface");
+  Mesh result = m;
+  bool changed = false;
+  for (size_t v = 0; v < delta.size(); ++v) {
+    if ((v & 1023) == 0 && cancelled && cancelled())
+      throw std::runtime_error("Morph target evaluation cancelled");
+    result.positions[v] += delta[v];
+    const auto a = result.positions[v], b = m.positions[v];
+    changed |= a.x != b.x || a.y != b.y || a.z != b.z;
+  }
+  if (changed)
+    normals(result, cancelled);
+  result.validate();
+  return result;
 }
 nlohmann::json MorphSet::encode() const {
   nlohmann::json j = {{"version", 1},

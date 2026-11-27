@@ -604,7 +604,8 @@ void Document::publish_locked(bool force,bool checkpoint) {
   if(cancel_polygon_publication){state_.polygon.reset();state_.polygon_object=0;
     if(polygon_accept_&&asset_work_.load()==polygon_accept_->work)state_.asset_busy=false;}
   if(state_.shape_sculpt&&(state_.shape_sculpt_object!=active.id||!active.mesh_active||!active.deformation||
-    !active.deformation->morphs||active.deformation->morphs->targets.empty()||state_.weights.enabled||state_.polygon||state_.cut||state_.retopology||uv_)){
+    !active.deformation->morphs||active.deformation->morphs->targets.empty()||state_.weights.enabled||state_.polygon||state_.cut||state_.retopology||uv_||
+    (active.texture_sets&&!detail::texture_set_shape_editable(active)))){
     state_.shape_sculpt=false;state_.shape_sculpt_object=0;force=true;
   }
   uint64_t paint_revision = active.mesh_active ? active.painted->revision() : 0;
@@ -690,9 +691,10 @@ void Document::publish_locked(bool force,bool checkpoint) {
       state_.morph_target = std::min(state_.morph_target, d.morphs->targets.size() - 1);
   }
   state_.mesh_active = active.mesh_active;
-  state_.can_author_shapes=shape_target_ready_locked();
-  state_.can_restore_shapes=state_.can_author_shapes&&bool(active.shape_source);
-  state_.can_select_shape=state_.can_author_shapes&&active.deformation&&active.deformation->morphs&&!active.deformation->morphs->targets.empty();
+  const bool shape_ready=shape_target_ready_locked();
+  state_.can_author_shapes=shape_ready&&(!active.texture_sets||detail::texture_set_shape_editable(active));
+  state_.can_restore_shapes=shape_ready&&bool(active.shape_source);
+  state_.can_select_shape=shape_ready&&active.deformation&&active.deformation->morphs&&!active.deformation->morphs->targets.empty();
   state_.can_cut = !state_.shape_sculpt && detail::cut_color_supported(active) && !state_.polygon && !state_.cut && !state_.retopology && !uv_ && !state_.asset_busy && !state_.recovery_busy && !control_before_ &&
       !action_active_locked() && object_editable_locked(active.id) && scene_.objects().size()<=254 && scene_.groups().size()<128 &&
       (active.mesh_active||!active.volume->voxels().empty());
@@ -3233,8 +3235,11 @@ bool Document::command_enabled_locked(SpatialCommand command) const {
       std::any_of(exports_.begin(),exports_.end(),[](const auto &work){return work && work->cancellable();});
   if(command==SpatialCommand::SelectionMode||command==SpatialCommand::SelectionFocus)return selection_ready_locked();
   if(command==SpatialCommand::ObjectHierarchy)return true;
-  if(shape_command(command))return shape_target_ready_locked()&&
-    ((command==SpatialCommand::ShapeNew||command==SpatialCommand::ShapeCapture)||state_.can_select_shape);
+  if(shape_command(command)){
+    const auto &active=scene_.active();
+    return shape_target_ready_locked()&&(!active.texture_sets||detail::texture_set_shape_editable(active))&&
+        ((command==SpatialCommand::ShapeNew||command==SpatialCommand::ShapeCapture)||state_.can_select_shape);
+  }
   if(polygon_command(command))return polygon_command_enabled_locked(command);
   if(state_.polygon && command!=SpatialCommand::ObjectGrabMode&&command!=SpatialCommand::HoldObject&&command!=SpatialCommand::ReleaseObject&&command!=SpatialCommand::GhostOthers&&command!=SpatialCommand::CancelObjectGrab&&command!=SpatialCommand::CancelWork)return polygon_command_enabled_locked(command);
   if(import_command(command)) {

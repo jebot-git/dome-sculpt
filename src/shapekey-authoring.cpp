@@ -15,6 +15,7 @@
 #include "normal-key-derivation.hpp"
 #include "native-paint-frame-source.hpp"
 #include "key-mirror-correspondence.hpp"
+#include "texture-set-surface.hpp"
 #include <vector>
 namespace dome {
 namespace {
@@ -117,6 +118,8 @@ ShapeKeyResult author_shapekey(Scene &scene,uint64_t object,const ShapeKeyEdit &
   o.material_bindings=origin.material_bindings;o.retopology=origin.retopology;o.polygon=origin.polygon;o.shape_source=origin.shape_source;o.rig_source=origin.rig_source;o.bake_recipe=origin.bake_recipe;o.texture_sets=origin.texture_sets;
   next.validate();stop(cancelled);scene=std::move(next);return {0,true};
  }
+ if(source.texture_sets&&!detail::texture_set_shape_editable(source))
+  throw std::invalid_argument("Shapekeys on retained texture sets require their original material frames");
  if(edit.action==ShapeKeyAction::Mirror&&(!std::isfinite(edit.mirror_plane)||std::abs(edit.mirror_plane)>1e6||size_t(edit.mirror_frames)>2))throw std::invalid_argument("Invalid explicit Mirror plane or frame interpretation");
  const auto &rest=source.painted->mesh();rest.validate();
  const MorphSet empty(rest);const auto &keys=source.deformation&&source.deformation->morphs?*source.deformation->morphs:empty;
@@ -164,6 +167,14 @@ ShapeKeyResult author_shapekey(Scene &scene,uint64_t object,const ShapeKeyEdit &
   for(size_t t=0;t<count;++t){float weight=deform->morph_weights.empty()?0:deform->morph_weights[t];for(size_t v=0;v<positions.size();++v){if((v&1023)==0)stop(cancelled);positions[v]+=deform->morphs->targets[t].delta[v]*weight;}}
  }else if(edit.action==ShapeKeyAction::Replace)positions=edit.positions;
  stop(cancelled);
+ if(source.texture_sets){
+  // Native sets already evaluate one deformed mesh for all material fields.
+  // Keep every field's UV domain and paint authority on the original REST mesh.
+  deform->morphs->set_target(rest,name,positions);
+  if(!replace&&!deform->morph_weights.empty())deform->morph_weights.push_back(0);
+  deform->validate(rest);o.deformation=std::move(deform);next.validate();
+  stop(cancelled);scene=std::move(next);return {slot,true};
+ }
  auto binding=source.material_bindings?std::make_shared<SourceMaterialBindings>(*source.material_bindings):std::make_shared<SourceMaterialBindings>();
  if(!binding->normal_frames){
   if(source.appearance)throw std::invalid_argument("Prepare the retained original normal attributes before authoring source shapekeys");

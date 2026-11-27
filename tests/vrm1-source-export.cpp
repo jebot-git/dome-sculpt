@@ -4,6 +4,7 @@
 #include "dome/import-authoring.hpp"
 #include "dome/rig-edit.hpp"
 #include "dome/rig-rest.hpp"
+#include "dome/tangents.hpp"
 #include "dome/texture-sets.hpp"
 #include "dome/vrm.hpp"
 #include "dome/emission-native.hpp"
@@ -14,6 +15,7 @@
 #include "vrm1-metadata.hpp"
 #include <fstream>
 #include <iostream>
+#include <thread>
 #define main matcap_fixture_main
 #include "vrm-matcap-import.cpp"
 #undef main
@@ -526,6 +528,232 @@ void spatial_bone_accessory(const std::filesystem::path &out, const Scene &origi
   doc.finish_spatial();
 }
 
+void shape_texture_accessory(const std::filesystem::path &out, dome::Scene scene,
+                             uint64_t accessory, uint64_t rig, uint32_t head) {
+  using namespace dome;
+  check(edit_texture_set(scene, accessory, 1, [](PaintedMesh &paint, Material &) {
+    BakedTextures baked;
+    const auto size = paint.resolution();
+    const auto map = [size](std::array<uint8_t, 4> color) {
+      Image image{size, size, std::vector<uint8_t>(size_t(size) * size * 4)};
+      for (size_t p = 0; p < image.rgba.size(); p += 4)
+        std::copy(color.begin(), color.end(), image.rgba.begin() + p);
+      return image;
+    };
+    baked.maps.color = map({64, 96, 128, 255});
+    baked.maps.metal_rough = map({255, 128, 0, 255});
+    baked.maps.emission = map({0, 0, 0, 255});
+    baked.maps.normal = map({149, 132, 252, 255});
+    baked.coverage.assign(size_t(size) * size, 255);
+    paint.install_bake(std::move(baked));
+    Brush brush;
+    brush.from = brush.to = {-.045f, .04f, 0};
+    brush.normal = {0, 0, 1};
+    brush.radius = .05f;
+    PaintSettings ink;
+    ink.color = {.8f, .4f, .2f, 1};
+    ink.front_only = false;
+    paint.begin_stroke();
+    paint.stamp(brush, ink);
+    return paint.end_stroke();
+  }), "The secondary shape field has its own normal Bake and writable paint");
+  Scene initial = scene.snapshot();
+  auto paint_exact = [&](const Scene &after) {
+    for (TextureSetId set : {0u, 1u}) {
+      const auto before = texture_set_view(initial.object(accessory), set);
+      const auto current = texture_set_view(after.object(accessory), set);
+      if (before.domain != current.domain || before.painted->mesh_owner() != current.painted->mesh_owner() ||
+          before.painted->baked() != current.painted->baked() ||
+          before.painted->active_layer() != current.painted->active_layer())
+        return false;
+      const auto same_layer = [](const PaintLayer &a, const PaintLayer &b) {
+        return a.id == b.id && a.name == b.name && a.visible == b.visible && a.opacity == b.opacity &&
+               a.tiles == b.tiles && a.pbr_tiles == b.pbr_tiles && a.emission_tiles == b.emission_tiles;
+      };
+      if (!std::ranges::equal(before.painted->layers(), current.painted->layers(), same_layer))
+        return false;
+    }
+    return true;
+  };
+
+  Document doc;
+  auto settle = [&] {
+    if (!doc.wait_native_stroke() || !doc.wait_asset() || !doc.wait_mesh() || !doc.frame().state->error.empty())
+      throw std::runtime_error("Texture-set shapekey did not settle: " + doc.frame().state->error);
+  };
+  doc.replace(scene);
+  settle();
+  doc.save_async(out / "shape-before.dsculpt").get();
+  doc.author_shape({}, doc.draft_scene().source);
+  doc.save_async(out / "shape-created.dsculpt").get();
+  settle();
+  const auto before = doc.copy_scene().encode();
+  auto old_archive = before;
+  for (auto &object : old_archive.at("objects")) object.erase("rig_source");
+  check(before.at("polygon_sources").at("version") == 8 && Scene::decode(old_archive).encode() == before,
+        "Legacy texture-only history without nullable live rig fields reopens and normalizes on Save");
+  old_archive.at("objects").at(0)["rig_source"] = nullptr;
+  bool incomplete = false;
+  try { (void)Scene::decode(old_archive); } catch (const std::invalid_argument &) { incomplete = true; }
+  check(incomplete, "Partial rig-field omission is refused in the Scene40 archive");
+  doc.configure_shape_sculpt(true);
+  settle();
+  const auto world = scene.world_matrix(accessory);
+  const auto point = world.point({-.09, .09, .75});
+  NativeStrokeSample ray;
+  ray.origin = {float(point[0]), float(point[1]), float(point[2])};
+  ray.direction = {0, 0, -1};
+  ray.brush.radius = .06f;
+  check(doc.begin_native_stroke() && doc.sample_native_stroke(ray),
+        "Desktop shapekey sculpt admits a ray on the inactive secondary paint field");
+  const auto preview_deadline = std::chrono::steady_clock::now() + std::chrono::seconds(10);
+  while (doc.frame().state->native_samples == 0 && doc.frame().state->error.empty() &&
+         std::chrono::steady_clock::now() < preview_deadline) {
+    std::this_thread::sleep_for(std::chrono::milliseconds(40));
+    if (!doc.sample_native_stroke(ray)) break;
+  }
+  check(doc.frame().state->native_samples > 0 && doc.wait_mesh() &&
+        doc.frame().surface->native_samples > 0 && doc.copy_scene().encode() == before,
+        "Live partitioned preview rebuilds the material-aware query without publishing the draft into history");
+  doc.end_native_stroke();
+  doc.save_async(out / "shape-sculpted.dsculpt").get();
+  settle();
+  const auto accepted = doc.copy_scene();
+  const auto &delta = accepted.object(accessory).deformation->morphs->targets.at(0).delta;
+  check(delta.at(3).z > .002f && delta.at(0).z == 0 && paint_exact(accepted) &&
+        accepted.object(accessory).deformation->morph_weights.empty(),
+        "A ray on the inactive material shapes its actual corner with exact native paint and saved weights");
+  check(Scene::load(out / "shape-sculpted.dsculpt").encode() == accepted.encode() &&
+        doc.undo() && doc.copy_scene().encode() == before && doc.redo() && doc.copy_scene().encode() == accepted.encode(),
+        "Ordered Save, reopen, Undo and Redo preserve the whole partitioned sculpt transaction");
+  settle();
+  check(doc.begin_native_stroke() && doc.sample_native_stroke(ray), "The accepted texture-set shape can be edited again");
+  doc.end_native_stroke(false);
+  settle();
+  check(doc.copy_scene().encode() == accepted.encode(), "Cancelled sculpt preserves the exact accessory project");
+
+  doc.configure(Tool::Clay, .07f);
+  SpatialFrame input;
+  input.focused = input.head_valid = true;
+  input.head.position = {0, 1.6f, 0};
+  auto &hand = input.hands[1].tracked;
+  hand.valid = hand.aimValid = true;
+  const auto submit = [&](float pressure) {
+    const auto canvas = doc.frame().state->canvas;
+    hand.grip.position = hand.aim.position = ob::transform(canvas, {ray.origin.x, ray.origin.y, ray.origin.z});
+    hand.grip.orientation = hand.aim.orientation = canvas.orientation;
+    hand.trigger = pressure;
+    ++input.sequence;
+    input.time += .05;
+    doc.submit(input);
+    if (!doc.wait_input()) throw std::runtime_error("Texture-set shape controller did not settle");
+  };
+  submit(0);
+  submit(.85f);
+  submit(0);
+  settle();
+  const auto controller = doc.copy_scene();
+  check(controller.object(accessory).deformation->morphs->targets[0].delta[3].z > delta[3].z && paint_exact(controller),
+        "Controller pressure sculpts the same mesh across paint partitions");
+  submit(.8f);
+  input.focused = false;
+  submit(.8f);
+  settle();
+  check(doc.copy_scene().encode() == controller.encode(), "XR focus loss rolls back the entire active shape gesture");
+  doc.configure_shape_sculpt(false);
+  settle();
+
+  auto current = controller.snapshot();
+  RigEdit pose;
+  pose.joint = JointAdjustment{head, {0, 4, 8}, {}};
+  edit_rig(current, rig, pose);
+  RigEdit slider;
+  slider.morph = MorphWeightEdit{0, .75f};
+  edit_rig(current, accessory, slider);
+  const auto &object = current.object(accessory);
+  const auto &rest = object.painted->mesh();
+  const auto &morphs = *object.deformation->morphs;
+  const auto shaped = morphs.evaluate(rest, std::array{1.f});
+  const auto tangents = tangent_corners(shaped);
+  const auto rest_tangents = tangent_corners(rest);
+  check(length(shaped.normals[3] - rest.normals[3]) > .001f &&
+        std::abs(tangents[5][2] - rest_tangents[5][2]) > .001f,
+        "The sculpt fixture exercises changed native normals and baked-normal tangents");
+  check(current.world_matrix(accessory).matrix() != world.matrix() && paint_exact(current),
+        "The reshaped accessory still follows the original joint with exact paint and Bake");
+  auto mirrored = current.snapshot();
+  ShapeKeyEdit mirror;
+  mirror.action = ShapeKeyAction::Mirror;
+  mirror.mirror_frames = ShapeKeyMirrorFrames::VertexPositions;
+  const auto reflected = author_shapekey(mirrored, accessory, mirror);
+  check(reflected.changed && reflected.target == 1 && paint_exact(mirrored) &&
+        mirrored.object(accessory).deformation->morphs->targets[1].delta[2].z == morphs.targets[0].delta[3].z,
+        "Mirroring the sculpted target preserves both paint fields and creates its real geometric counterpart");
+  doc.replace(current);
+  settle();
+  doc.save_async(out / "shape-ready-to-export.dsculpt").get();
+  for (const auto format : {AssetExportFormat::Avatar, AssetExportFormat::EditableAvatar512}) {
+    const bool editable = format == AssetExportFormat::EditableAvatar512;
+    const auto path = out / (editable ? "shape-accessory-editable.vrm" : "shape-accessory.vrm");
+    doc.export_asset(path, format).get();
+    const auto payload = json(path);
+    const auto bone = payload.at("extensions").at("VRMC_vrm").at("humanoid").at("humanBones").at("head").at("node").get<size_t>();
+    cgltf_options options{};
+    cgltf_data *raw = nullptr;
+    check(cgltf_parse_file(&options, path.c_str(), &raw) == cgltf_result_success,
+          "The independent reader opens the authored morph in exported VRM1");
+    const auto reader = std::unique_ptr<cgltf_data, decltype(&cgltf_free)>(raw, cgltf_free);
+    check(cgltf_load_buffers(&options, raw, path.c_str()) == cgltf_result_success && cgltf_validate(raw) == cgltf_result_success,
+          "The authored VRM morph frames and material resources pass independent glTF validation");
+    const auto *leaf = std::find_if(raw->nodes, raw->nodes + raw->nodes_count, [](const auto &node) {
+      return node.mesh && node.name && std::string_view(node.name) == "Native head light";
+    });
+    bool attached = false;
+    if (leaf != raw->nodes + raw->nodes_count)
+      for (auto parent = leaf->parent; parent; parent = parent->parent) attached |= parent == raw->nodes + bone;
+    check(attached && !leaf->skin &&
+          leaf->mesh->primitives_count == 2 && leaf->mesh->weights_count == 1 && leaf->mesh->weights[0] == .75f,
+          "One unskinned shape mesh with both fields and the saved weight remains attached to the real bone");
+    auto attribute = [](const cgltf_morph_target &target, cgltf_attribute_type type) {
+      const auto it = std::find_if(target.attributes, target.attributes + target.attributes_count,
+                                   [=](const auto &value) { return value.type == type; });
+      if (it == target.attributes + target.attributes_count) throw std::runtime_error("Missing authored morph attribute");
+      return it->data;
+    };
+    auto vector = [](const cgltf_accessor *accessor, size_t vertex) -> Vec3 {
+      std::array<float, 4> values{};
+      if (!accessor || !cgltf_accessor_read_float(accessor, vertex, values.data(), values.size()))
+        throw std::runtime_error("Unable to independently read morph vertex accessor");
+      return {values[0], values[1], values[2]};
+    };
+    for (size_t part = 0; part < 2; ++part) {
+      const auto &primitive = leaf->mesh->primitives[part];
+      if (primitive.indices->count != 3 || primitive.targets_count != 1) throw std::runtime_error("Wrong shape material partition");
+      const auto &target = primitive.targets[0];
+      for (size_t c = 0; c < 3; ++c) {
+        const auto corner = part * 3 + c;
+        const auto original = rest.indices[corner];
+        const auto vertex = cgltf_accessor_read_index(primitive.indices, c);
+        const auto position = vector(cgltf_find_accessor(&primitive, cgltf_attribute_type_position, 0), vertex) +
+            vector(attribute(target, cgltf_attribute_type_position), vertex);
+        const auto normal = vector(cgltf_find_accessor(&primitive, cgltf_attribute_type_normal, 0), vertex) +
+            vector(attribute(target, cgltf_attribute_type_normal), vertex);
+        check(length(position - shaped.positions[original]) < 1e-6f && length(normal - shaped.normals[original]) < 1e-6f,
+              "Portable position and derived normal match the exact native weight-one corner");
+        if (part == 1) {
+          const auto tangent = vector(cgltf_find_accessor(&primitive, cgltf_attribute_type_tangent, 0), vertex) +
+              vector(attribute(target, cgltf_attribute_type_tangent), vertex);
+          const auto &value = tangents[corner];
+          check(length(tangent - Vec3{value[0], value[1], value[2]}) < 1e-6f,
+                "Normal-mapped corner preserves the native morph tangent in the actual exported buffer");
+        }
+      }
+    }
+    const auto restored = editable ? extract_native_authoring(bytes(path)) : extract_native_emission(bytes(path));
+    check(restored && restored->encode() == current.encode(), "The portable result restores the exact attached native shape, field layers and original avatar");
+  }
+}
+
 void bone_accessory(const std::filesystem::path &out) {
   using namespace dome;
   std::filesystem::create_directories(out);
@@ -712,6 +940,7 @@ void bone_accessory(const std::filesystem::path &out) {
         Scene::decode(fitted.encode()).encode() == fitted.encode(),
         "Reset follows the fitted rest attachment and the result survives a native restart");
   spatial_bone_accessory(out, scene, source_path, accessory);
+  shape_texture_accessory(out, attached, accessory, rig, head);
 }
 } // namespace
 #ifndef DOME_VRM1_SOURCE_EXPORT_NO_MAIN

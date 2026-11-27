@@ -440,7 +440,7 @@ std::vector<int> emit_vrm_source_graph(
     const auto &object = objects[i];
     auto surface=std::move(surfaces[i]);
     if (native_vrm_texture_set_accessory(object)) {
-      require(!object.deformation && !object.rig_source &&
+      require(rigid_accessory_deformation(object.deformation) && !object.rig_source &&
                   !surface.contains("skin") && emitted.joints.empty(),
               "native texture-set accessories require a rigid local mesh");
       require(avatar_root >= 0 && object.groups.size() >= graph.prefix.size() &&
