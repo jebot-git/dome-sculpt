@@ -21,10 +21,14 @@ struct BackgroundPaintOracle {
   auto decode=[](double v){return v<=.04045?v/12.92:std::pow((v+.055)/1.055,2.4);};
   for(const auto pixel:valid){const size_t x=pixel%size,y=pixel/size,tile=(y/32)*(size/32)+x/32,within=(y%32)*32+x%32;std::array<double,4> color{},emission{},coverage{},physical{};
    for(const auto &layer:paint.layers())if(layer.visible&&layer.opacity>0&&layer.tiles.at(tile)){
-    const auto &data=layer.tiles.at(tile)->pixels[within].data;const double mask=data[13]/255.*layer.opacity,ca=data[9]/255.*mask;double ea=data[12]/255.*mask;const dome::PaintEmissionValue *linear=(!layer.emission_tiles.empty()&&layer.emission_tiles.at(tile))?&layer.emission_tiles.at(tile)->pixels[within]:nullptr;if(linear)ea=linear->coverage*mask;
+    const auto &data=layer.tiles.at(tile)->pixels[within].data;
+    const double mask=data[13]/255.*layer.opacity,ca=data[9]/255.*mask;
+    const auto *tile_emission=layer.emission_tiles.empty()?nullptr:layer.emission_tiles.at(tile).get();
+    const auto linear=tile_emission?tile_emission->texel(within):dome::PaintEmissionValue{};
+    const double ea=(tile_emission?double(linear.coverage):data[12]/255.)*mask;
     if(!layer.pbr_tiles.empty()&&layer.pbr_tiles.at(tile))throw std::runtime_error("Oracle unexpectedly received a prepared PBR color plane");
     for(size_t k=0;k<4;++k)color[k]=color[k]*(1-ca)+(k==3?data[k]/255.:decode(data[k]/255.))*ca;
-    for(size_t k=0;k<3;++k){emission[k]=emission[k]*(1-ea)+(linear?linear->legacy[k]:decode(data[k+6]/255.))*ea;physical[k]=physical[k]*(1-ea)+(linear?linear->physical[k]:0)*ea;}
+    for(size_t k=0;k<3;++k){emission[k]=emission[k]*(1-ea)+(tile_emission?linear.legacy[k]:decode(data[k+6]/255.))*ea;physical[k]=physical[k]*(1-ea)+linear.physical[k]*ea;}
     coverage[0]=coverage[0]*(1-ca)+ca;coverage[3]=coverage[3]*(1-ea)+ea;
    }
    for(size_t k=0;k<4;++k){planes[0][pixel*4+k]=float(color[k]);planes[1][pixel*4+k]=float(emission[k]);planes[2][pixel*4+k]=float(coverage[k]);planes[3][pixel*4+k]=float(physical[k]);}
