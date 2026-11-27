@@ -5216,6 +5216,9 @@ if(BUILD_TESTING)
   target_link_libraries(dome-sculpt-texture-set-source-export-test PRIVATE dome-sculpt-core)
   add_test(NAME dome-sculpt-texture-set-source-export COMMAND dome-sculpt-texture-set-source-export-test ${CMAKE_CURRENT_BINARY_DIR}/texture-set-source-export-output)
   set_tests_properties(dome-sculpt-texture-set-source-export PROPERTIES TIMEOUT 300)
+  add_test(NAME retopology-imported-pbr COMMAND dome-sculpt-texture-set-source-export-test
+    --imported-retopology ${CMAKE_CURRENT_BINARY_DIR}/retopology-imported-pbr)
+  set_tests_properties(retopology-imported-pbr PROPERTIES TIMEOUT 400)
   foreach(placement plain affine)
     add_test(NAME texture-set-retained-retopology-${placement} COMMAND dome-sculpt-texture-set-source-export-test
       --retained-retopology ${CMAKE_CURRENT_BINARY_DIR}/texture-set-retained-retopology-${placement} ${placement})

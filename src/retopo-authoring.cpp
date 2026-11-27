@@ -1145,12 +1145,21 @@ uint64_t publish_retopology(Scene &scene, const RetopoMesh &topology, uint64_t s
         (sets->primary_source() || std::ranges::any_of(sets->additional(),[](const auto &field) { return bool(field.source); }));
     const bool project_materials = previous.id == source && sets && !previous.appearance &&
         (retained || (!sets->topology()->polygon_ids() && detail::texture_set_editable_fields(previous)));
-    const auto resolution = project_materials ? previous.painted->resolution() : 512;
+    const bool imported_pbr = previous.id == source && !sets && previous.mesh_active && previous.painted &&
+        previous.appearance && previous.painted->source_maps() && !previous.material.toon &&
+        previous.material_bindings && !previous.material_bindings->has_mtoon;
+    const auto resolution = project_materials || imported_pbr ? previous.painted->resolution() : 512;
     unwrap(triangles.mesh, resolution, 4, cancelled);
     PaintSurfaceOptions options;
     options.cancelled = cancelled;
     painted = PaintedMesh::from_mesh(std::move(triangles.mesh), resolution, options);
-    if (project_materials) {
+    if (imported_pbr) {
+      detail::RetopoTransferBudget budget(cancelled);
+      budget.reserve(1,detail::TextureSetPaintAccess::working_bytes(*painted,resolution));
+      detail::RetopoTransfer projection(previous.painted->mesh(),scene.world_matrix(source),staged.world_matrix(id),
+          budget,{},true,previous.deformation.get());
+      detail::TextureSetPaintAccess::reproject_retopology(*previous.painted,*painted,projection,false,nullptr,&previous);
+    } else if (project_materials) {
       RetopoReplacement replacement(painted, previous.painted->mesh(), scene.world_matrix(source), staged.world_matrix(id),
           {}, triangles.source_faces, {}, cancelled,previous.deformation.get());
       auto current = replacement.project(previous.painted, previous.material, {}, previous.material_bindings,

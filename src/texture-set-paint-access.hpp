@@ -13,7 +13,8 @@ struct TextureSetPaintAccess {
   static std::shared_ptr<PaintedMesh> resample_plain(const PaintedMesh&,const TextureSetResolutionOptions&,const TextureSetLimits&,TextureSetResolutionReport&);
   static void reproject_retopology(const PaintedMesh &from, PaintedMesh &replacement,
                                   RetopoTransfer &,bool prepared_normals=false,
-                                  const TextureSetView *retained=nullptr);
+                                  const TextureSetView *retained=nullptr,
+                                  const SculptObject *imported=nullptr);
   static std::shared_ptr<const SourceMaterialBindings> reproject_retopology_mtoon(const PaintedMesh &from,
       const PaintedMesh &replacement, const std::shared_ptr<const SourceMaterialBindings> &, RetopoTransfer &);
   static std::shared_ptr<const BakedNormalField> reproject_retopology_normals(

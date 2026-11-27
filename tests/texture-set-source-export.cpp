@@ -33,6 +33,9 @@
 #include "paint-emission-sample.hpp"
 #include "emission-exr-owned.hpp"
 #include "emission-paint-access.hpp"
+#include "source-color-fixtures.hpp"
+#include "source-colors.hpp"
+#include "normal-frame-runtime.hpp"
 #include <bit>
 #include <fstream>
 #include <iostream>
@@ -1694,6 +1697,180 @@ void recipe_reference_remap(bool prepared) {
  refuses([&]{Scene::decode(forged);},"Shared polygon sampling rejects a different geometric recipe");
 
 }
+void retopology_imported_pbr() {
+ const auto bytes=source_color_fixture::bytes();
+ const size_t json_size=word(bytes,12);
+ detail::GltfDocument input;
+ input.json=nlohmann::json::parse(bytes.begin()+20,bytes.begin()+20+json_size);
+ input.binary.assign(bytes.begin()+28+json_size,bytes.end());
+ auto &attributes=input.json["meshes"][0]["primitives"][0]["attributes"];
+ const std::array<float,8> alternate{.83f,.67f,.07f,.8f,.14f,.1f,.94f,.2f};
+ const auto append_uv=[&] {
+  const auto start=input.binary.size();
+  for(float value:alternate){
+   const auto bits=std::bit_cast<uint32_t>(value);
+   for(size_t b=0;b<4;++b)input.binary.push_back(uint8_t(bits>>(8*b)));
+  }
+  auto &views=input.json["bufferViews"];
+  const auto id=views.size();
+  views.push_back({{"buffer",0},{"byteOffset",start},{"byteLength",input.binary.size()-start},{"target",34962}});
+  auto &accessors=input.json["accessors"];
+  const auto index=accessors.size();
+  accessors.push_back({{"bufferView",id},{"componentType",5126},{"count",4},{"type","VEC2"}});
+  return index;
+ };
+ attributes["TEXCOORD_1"]=append_uv();
+ auto &material=input.json["materials"][0];
+ auto &pbr=material["pbrMetallicRoughness"];
+ pbr["baseColorTexture"]={{"index",0},{"texCoord",1},{"extensions",{{"KHR_texture_transform",{{"offset",{.12f,-.09f}},{"rotation",.23f},{"scale",{.8f,.65f}}}}}}};
+ pbr["metallicFactor"]=.6f;
+ pbr["metallicRoughnessTexture"]={{"index",0}};
+ material["occlusionTexture"]={{"index",0},{"texCoord",1},{"strength",.37f}};
+ material["emissiveTexture"]={{"index",0},{"texCoord",1}};
+ material["emissiveFactor"]={.75f,.3f,.1f};
+ material["extensions"]["KHR_materials_emissive_strength"]["emissiveStrength"]=6;
+ material["doubleSided"]=true;
+ input.json["extensionsUsed"]={"KHR_texture_transform","KHR_materials_emissive_strength"};
+ input.json["meshes"][0]["weights"]={.8f};
+ input.json["nodes"][0]["matrix"]={-1.05,0,0,0,0,.86,0,0,0,0,1.07,0,.03,.06,.09,1};
+ input.json["buffers"][0]["byteLength"]=input.binary.size();
+ detail::write_glb(std::move(input),"original-import.glb");
+ ImportAuthoringOptions options;options.paint_resolution=64;options.prepare_texture_atlas=true;
+ auto imported=prepare_authoring_import(Scene{},"original-import.glb",options);
+ check(imported.objects.size()==1,"The real GLB authoring entry point imports one posed PBR object");
+ auto scene=std::move(imported.scene);
+ const auto id=imported.objects.front();
+ scene.select(id);
+ auto &guide=scene.active();
+ auto shear=AffineTransform{}.matrix();
+ shear[1]=.12;shear[4]=.17;shear[9]=.1;
+ guide.affine_edit=std::make_shared<const NativeAffineEdit>(AffineTransform(shear));
+ const auto source_world=scene.world_matrix(id);
+ const auto &rest=guide.painted->mesh();
+ const auto &maps=*guide.painted->source_maps();
+ check(guide.appearance&&guide.material_bindings->normal_frames&&guide.deformation&&
+       guide.deformation->morph_weights[0]>.7f&&maps.color.texcoord!=0&&maps.color.image&&maps.normal.image&&
+       maps.occlusion.image&&maps.metal_rough.image&&maps.emission.image&&guide.material.emissive[0]>1,
+       "Authentic import retains independent sampling roles, authored frames, morph and physical radiance");
+ guide.painted->add_layer("Imported editable pigment");
+ PaintSettings ink;ink.front_only=false;ink.color={.8f,.3f,.16f,.7f};
+ Brush brush;brush.from=brush.to={0,0,0};brush.radius=2;brush.normal={0,0,1};brush.strength=.71f;
+ guide.painted->begin_stroke();guide.painted->stamp(brush,ink);
+ check(guide.painted->end_stroke(),"The imported source has its own nonempty editable paint layer");
+ guide.painted->layer_properties("Imported editable pigment",false,.37f);
+ for(const auto &o:scene.objects())if(o.id!=id)scene.object(o.id).visible=false;
+ scene.save("raw-guide.dsculpt");
+ const auto original=scene.encode();
+ const auto geometry=guide.deformation->preview(rest);
+
+ Document document;
+ document.replace(scene);ready(document);
+ document.begin_retopology();
+ const auto draft=[&] {
+  check(document.wait_retopology(),"Retopology edit settles");
+  const auto view=document.frame().state->retopology;
+  if(view&&!view->error.empty())throw std::runtime_error(view->error);
+ };
+ draft();
+ const auto to_world=[&](Vec3 p){const auto q=source_world.point({p.x,p.y,p.z});return Vec3{float(q[0]),float(q[1]),float(q[2])};};
+ // Trace a quad whose interior crosses the imported triangulation diagonal.
+ for(auto corner:geometry.positions){
+  check(document.begin_desktop(),"Desktop gesture admits a point on the imported geometry");
+  Brush pick;pick.from=pick.to=to_world(corner*.84f);pick.radius=.01f;
+  document.stamp_desktop(pick);document.end_desktop();draft();
+ }
+ document.edit_retopology(RetopoAction::Face);draft();
+ document.end_retopology(true);
+ document.save_async("raw-patch.dsculpt").get();ready(document);
+ const auto result=document.copy_scene();
+ const auto accepted=result.encode();
+ const auto &patch=result.active();
+ check(patch.retopology&&patch.retopology->source==id&&patch.painted->baked()&&
+       !patch.appearance&&!patch.material_bindings&&!result.object(id).visible&&
+       result.object(id).appearance->original_bytes==guide.appearance->original_bytes&&
+       result.object(id).painted->source_maps()==guide.painted->source_maps(),
+       "Apply produces a native Bake and the hidden guide retains its authentic images and original GLB");
+ const auto &before=guide.painted->layers().back(),&after=patch.painted->layers().back();
+ check(before.id==after.id&&before.name==after.name&&before.visible==after.visible&&before.opacity==after.opacity&&
+       std::ranges::any_of(after.tiles,[](const auto &tile){return tile&&std::ranges::any_of(tile->pixels,[](const auto &p){return p.data[9]>110;});}),
+       "The projected editable ink remains separate and retains its active layer properties");
+
+ const auto &target=patch.painted->mesh();
+ const auto target_world=result.world_matrix(patch.id);
+ const auto relative=source_world.inverse()*target_world;
+ const auto target_tangents=tangent_corners(target);
+ const auto colors=detail::source_vertex_colors(guide.appearance.get(),rest.positions.size());
+ detail::NormalFrameLayout layout;layout.vertices=rest.indices;
+ for(uint32_t c=0;c<rest.indices.size();++c)layout.corners.push_back(c);
+ const auto posed=detail::normal_frame_preview(*guide.material_bindings->normal_frames,layout,guide.deformation.get(),{},1);
+ const auto &baked=*patch.painted->baked();
+ const auto &image=baked.maps.color;
+ const SurfaceQuery query(geometry);
+ size_t samples=0;
+ float peak=0,min_dot=1;
+ std::array<bool,2> source_triangles{};
+ for(size_t c=0;c<target.indices.size();c+=3){
+  const auto vi=target.indices[c],vj=target.indices[c+1],vk=target.indices[c+2];
+  const auto a=target.uv[vi],b=target.uv[vj],d=target.uv[vk];
+  const std::array u{b[0]-a[0],b[1]-a[1]},v{d[0]-a[0],d[1]-a[1]};
+  const float area=u[0]*v[1]-u[1]*v[0];
+  for(size_t y=3;y<image.height;y+=5)for(size_t x=4;x<image.width;x+=5){
+   const auto at=y*image.width+x;
+   const float px=(x+.5f)/image.width-a[0],py=(y+.5f)/image.height-a[1];
+   const float wb=(px*v[1]-py*v[0])/area,wc=(u[0]*py-u[1]*px)/area,wa=1-wb-wc;
+   if(std::min({wa,wb,wc})<.07f)continue;
+   const auto p=target.positions[vi]*wa+target.positions[vj]*wb+target.positions[vk]*wc;
+   const auto q=relative.point({p.x,p.y,p.z});
+   const auto hit=query.nearest(Vec3{float(q[0]),float(q[1]),float(q[2])},SurfaceQueryOptions{.closest_maximum=.01f});
+   check(hit.has_value()&&baked.coverage[at]==255,"An interior patch texel covers its actual imported surface");
+   source_triangles.at(hit->triangle)=true;
+   const auto role=[&](const auto &texture,bool srgb){return sample_surface_texture(rest,maps,texture,hit->triangle,hit->barycentric,srgb);};
+   const auto color=role(maps.color,true),orm=role(maps.metal_rough,false),light=role(maps.emission,true),ao=role(maps.occlusion,false);
+   for(size_t k=0;k<4;++k){
+    float tint=0;
+    for(size_t j=0;j<3;++j)tint+=colors[rest.indices[hit->triangle*3+j]][k]*hit->barycentric[j];
+    const auto expected=guide.material.color[k]*color[k]*tint;
+    const auto raw=image.rgba[at*4+k]/255.f;
+    check(std::abs((k<3?srgb_to_linear(raw):raw)-expected)<.006f,"Native Bake retains sampled linear colour and vertex alpha");
+   }
+   const auto *pixel=baked.maps.metal_rough.rgba.data()+at*4;
+   check(std::abs(pixel[0]/255.f-(1-maps.occlusion_strength*(1-ao[0])))<.003f&&
+         std::abs(pixel[1]/255.f-guide.material.roughness*orm[1])<.003f&&
+         std::abs(pixel[2]/255.f-guide.material.metallic*orm[2])<.003f,"Separate original AO, roughness and metallic roles survive Apply");
+   const auto radiance=baked.emission_field->texel(at).absolute;
+   for(size_t k=0;k<3;++k)check(std::abs(radiance[k]-guide.material.emissive[k]*light[k])<2e-5f,"Physical emission survives the transfer without RGB8 clipping");
+   const auto normal=role(maps.normal,false);
+   Vec3 n,t,bitangent;
+   for(size_t corner=0;corner<3;++corner){
+    const auto i=hit->triangle*3+corner;
+    const auto nn=posed.normals[0].at(i);
+    const auto tt=posed.tangents[0].at(i);
+    const auto wn=unit(source_world.normal({nn.x,nn.y,nn.z}));
+    const auto wt=unit(source_world.direction({tt[0],tt[1],tt[2]}));
+    const float weight=hit->barycentric[corner];
+    n+=wn*weight;t+=wt*weight;bitangent+=cross(wn,wt)*(-tt[3]*weight);
+   }
+   const auto expected=normalized(normalized(n)*(normal[2]*2-1)+
+       (normalized(t)*(normal[0]*2-1)+normalized(bitangent)*(normal[1]*2-1))*maps.normal_scale);
+   const auto *normal_pixel=baked.maps.normal.rgba.data()+at*4;
+   const auto local=tangent_frame(target,target_tangents,c/3,{wa,wb,wc}).to_world(
+       {normal_pixel[0]*2.f/255-1,normal_pixel[1]*2.f/255-1,normal_pixel[2]*2.f/255-1});
+   min_dot=std::min(min_dot,dot(expected,unit(target_world.normal({local.x,local.y,local.z}))));
+   peak=std::max(peak,radiance[0]);
+   ++samples;
+  }
+ }
+ check(samples>30&&peak>1&&std::ranges::all_of(source_triangles,[](bool a){return a;})&&min_dot>.9997f,
+       "Interior controls cover both source triangles with original HDR and posed reflected shading");
+ std::cout<<"IMPORTED_PBR interior="<<samples<<" peak="<<peak<<" min_normal_dot="<<min_dot<<'\n';
+ check(Scene::load("raw-patch.dsculpt").encode()==accepted&&document.undo()&&document.copy_scene().encode()==original&&
+       document.redo()&&document.copy_scene().encode()==accepted,"Native Save, cold Open, Undo and Redo preserve the source and patch exactly");
+ ready(document);
+ document.export_asset("raw-standard.glb",AssetExportFormat::Glb).get();
+ document.export_asset("raw-editable.glb",AssetExportFormat::EditableGlb256).get();
+ check(Scene::load("raw-editable.glb").encode()==accepted,"Editable GLB restores the complete imported-source project");
+}
+
 void retopology_retained_materials(bool reflected) {
  auto scene=source(true,reflected,false,false,true,true,64,reflected?200:255);
  const auto guide=scene.active().id;
@@ -1867,6 +2044,13 @@ void retopology_retained_materials(bool reflected) {
 
 int main(int argc,char **argv)try {
  const std::string_view mode=argc>1?argv[1]:"";
+ if(argc==3&&mode=="--imported-retopology") {
+  std::filesystem::create_directories(argv[2]);
+  std::filesystem::current_path(argv[2]);
+  retopology_imported_pbr();
+  std::cout<<"PASS "<<checks<<" imported material retopology checks\n";
+  return 0;
+ }
  if(argc==4&&mode=="--retained-retopology"){
   std::filesystem::create_directories(argv[2]);
   std::filesystem::current_path(argv[2]);
