@@ -20,6 +20,11 @@ software GL and Intel Arc A770. Its own combined Release rerun started after
 these checks. The [validation receipt](validation/vrm1-xr-attachment-20261127.json)
 contains the earlier complete JUnit and the new focused evidence.
 
+The current texture-set shapekey revision `17367cb0` adds mixed-material
+shapekey authoring and portable rigid VRM 1.0 accessory morphs. It restores
+texture-set history written by earlier Scene40 builds that omitted nullable
+live rig fields. [Texture-set shapekey validation](validation/texture-set-shapekeys-20261127.json)
+
 The next acceptance milestone is a complete headset workflow on the current
 build, from a production-size sculpt or imported model through topology, UVs,
 paint, humanoid fitting and export. Sustained local meshing and recovery,
@@ -2717,6 +2722,42 @@ test counted cyan avatar pixels as palette pixels. Its results are preserved
 alongside the corrected panel-background measurements. Physical headset
 tests and skinned native accessories remain open.
 [OpenXR attachment validation](validation/vrm1-xr-attachment-20261127.json)
+
+### Shapekey sculpt and export across native texture sets
+
+The existing FLTK and XR shapekey tools now operate on the shared mesh of
+writable native texture sets. The ray follows actual posed and visible faces
+across material partitions, including the inactive paint set. Preview stays
+in detached geometry. The accepted stroke updates the selected target while
+preserving the native rest mesh, paint fields, Bake and saved morph weights.
+Undo, Redo, ordered Save, explicit Cancel and XR focus loss each exercise the
+same native Scene authority as Create and Mirror.
+
+Standard and Editable VRM 1.0 keep a rigid accessory shapekey on the actual
+original avatar bone. The portable mesh uses one morph target across its
+material primitives, with normals derived from the shared mesh. Baked-normal
+corners carry derived tangent deltas. Independent buffer reads match the
+native weight-one endpoints. A target that changes tangent handedness needs
+an alternate portable representation. Retained source texture sets and
+skinned accessories still need their own authoring and export transport.
+
+Archive8 now writes the nullable live rig fields expected by the Scene40
+reader. Earlier texture-only Archive8 projects that omit all those fields
+reopen and serialize to the complete layout. Mixed omission still refuses
+before publication. The fixture verifies native reopen, attached posing, and
+exact embedded Scene recovery from both export modes.
+Release and leak-checked ASan/UBSan each pass 89 focused assertions, including
+40 for the texture-set workflow. Eight registered Release cases and seven
+registered sanitizer cases pass. The four native projects and both VRM files
+match byte for byte across the two builds.
+Nested DomeD Wayland passes nine checks, including default Cancel, Apply,
+Save, Undo and Redo from the universal menu. The actual OpenXR loader and
+synthetic runtime pass five export checks each on software GL and Intel Arc
+A770. Both runs reopen the authored accessory and write the same Editable
+VRM as the native worker. The Khronos validator reports zero errors and the
+same seven warnings as the source-only control. Ten pinned extension schema
+checks pass across the two files. Physical-headset qualification remains open.
+[Texture-set shapekey validation](validation/texture-set-shapekeys-20261127.json)
 
 ## Source and integration boundary
 

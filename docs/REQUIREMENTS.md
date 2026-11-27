@@ -254,7 +254,12 @@ preserve native attachment and paint authority. Both VRM1 modes use the
 original bone as the portable parent. The XR controller picker now selects
 the original avatar instance and bone and applies through the shared worker.
 Actual-loader tests cover Apply and Cancel, focus and tracking loss, ordered
-Save, and export of the selected avatar. Larger typed Bake previews,
+Save, and export of the selected avatar. Writable native texture sets now
+support editing and mirroring shapekeys on their shared mesh. Rigid VRM1
+accessories retain morph weights, geometric normal deltas and sampled baked
+tangent deltas in both portable modes. Native reopen restores the complete
+paint and shape history, including compatible older Archive8 layouts.
+Larger typed Bake previews,
 original authored and deforming frames, typed donor
 partitions, skinned accessories, VRM0 texture-set
 materials, alternate UVs, resampling, live
@@ -272,6 +277,7 @@ painted animation, other sampler modes and physical verification remain open.
 [Editable VRM1 native texture-set accessory evidence](validation/vrm1-editable-native-texture-set-20261127.json)
 [VRM1 bone attachment evidence](validation/vrm1-bone-accessory-20261127.json)
 [OpenXR bone attachment evidence](validation/vrm1-xr-attachment-20261127.json)
+[Native texture-set shapekey evidence](validation/texture-set-shapekeys-20261127.json)
 
 Strict Bake rays now recover source-edge contacts affected by float staging.
 An exact ray hit has priority. A missed ray can use an actual source edge
