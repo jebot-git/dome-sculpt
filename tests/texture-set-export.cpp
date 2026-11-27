@@ -128,9 +128,18 @@ Scene mtoon_tangent_scene(std::string_view mode) {
   normal["extensions"]={{"KHR_texture_transform",{{"offset",{.15f,-.17f}}}}};
   source["extensions"]["VRMC_materials_mtoon"]["uvAnimationScrollXSpeedFactor"]=.2f;
  }
- if(mode=="dual")
+ if(mode=="dual"){
   source["pbrMetallicRoughness"]["baseColorFactor"]={.12f,.34f,.08f,1.f};
- binding.material=MToonMaterial::from_vrm1(source,2);
+  auto &toon=source["extensions"]["VRMC_materials_mtoon"];
+  toon["shadingToonyFactor"]=.05f;
+  toon["shadingShiftFactor"]=-.45f;
+  toon["shadeColorFactor"]={.018f,.024f,.014f};
+  toon["matcapFactor"]={.24f,.17f,.15f};
+  toon["matcapTexture"]={{"index",2}};
+  binding.roles[size_t(MToonSlot::Matcap)].image=std::make_shared<const Image>(
+      Image{2,2,{255,18,18,255, 15,215,22,255, 10,18,218,255, 248,223,35,255}});
+ }
+ binding.material=MToonMaterial::from_vrm1(source,mode=="dual"?3:2);
  binding.roles[size_t(MToonSlot::Normal)].image=std::make_shared<const Image>(
      Image{2,2,{160,83,225,255, 193,134,244,255, 139,191,215,255, 108,205,246,255}});
  binding.roles[size_t(MToonSlot::Shade)].image=std::make_shared<const Image>(Image{1,1,{55,86,112,255}});
@@ -139,7 +148,7 @@ Scene mtoon_tangent_scene(std::string_view mode) {
  if(mode=="dual"){
   normal["extensions"]={{"KHR_texture_transform",{{"scale",{-.84f,1.22f}},{"offset",{.81f,-.12f}}}}};
   source["pbrMetallicRoughness"]["baseColorFactor"]={.16f,.07f,.37f,1.f};
-  binding.material=MToonMaterial::from_vrm1(source,2);
+  binding.material=MToonMaterial::from_vrm1(source,3);
   const auto primary=texture_set_view(scene.active(),0).material;
   binding.native_reference={primary.color,primary.emissive,int(primary.alpha),primary.alpha_cutoff,primary.double_sided};
   check(bind_texture_set_mtoon(scene,object,0,binding),"Both materials use different transforms at a shared vertex");
