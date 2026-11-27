@@ -219,6 +219,14 @@ grids, wider portable export, larger assets, acceleration and physical device
 verification remain open.
 [Native MToon grid resize evidence](validation/texture-set-mtoon-resize-20261127.json)
 
+Standalone native meshes with a **Keep Paint** UV history can resize the
+original writable atlas while keeping the authored display UVs and normal
+frame authority. The tested workflows cover canonical and authored-normal
+Bakes, hidden FLOAT paint, cold Open, a second UV edit, Restore, and baking
+again at the new size. Both GLB modes carry the two UV streams and explicit
+tangents. Prepared polygon material-set resampling remains open.
+[Retained native UV grid resize evidence](validation/native-uv-grid-resize-20261127.json)
+
 Native multi-material retopology preserves independently painted and baked
 grids and original VRM 1.0 joint links when Apply changes the patch.
 Linked Shape Restore uses the current pose of the original imported rig.

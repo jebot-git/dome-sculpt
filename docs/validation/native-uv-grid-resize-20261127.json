@@ -1,0 +1,582 @@
+{
+  "archive_members_sha256": {
+    "asan/baked.log": "8a18df868e8379eff6383b0ef918dcdc8869b911c19c1da45a3f46eadd298222",
+    "asan/painted.log": "9c4c2004e928381168cbdbe524958ac6d6165571e69b03badc4793dd14be68eb",
+    "asan/retained-v1.log": "d3620557b80c464d1961e17fc6851874511095f78d2af149b868724c769d30e8",
+    "asan/retained.log": "d138f5847b76ad558a3b31f0f43ee90b652bb647204f11c0360aac03a1eb8b20",
+    "bake-build.log": "efd3c94dad541057fb4ae801d717fc0b7121c64636b03b5bd8533da8fb393be0",
+    "bake-tests.log": "dac595104fc8e3a820ec958a680a36b1be72526277569281ec77fc5de2d081c4",
+    "baseline-new.log": "e02507ae24b2fa4990b527bad442fd6e804d536422442018c43062e15ef9f692",
+    "baseline-old.log": "fbfa92bb0e7ae0eafe0f1bafd99cf2bdc9fc2b3e01d09ebf589068c98bf8f53e",
+    "baseline-probe.cpp": "876b2f5749ca245fb237b64ee3a635bea357e00118e7e26911a22d5a36e2ac00",
+    "bind-wayland.log": "a67724b9d68a43e333d1db7f9317c3fc0e5c735f1d2556876fec1b3ee6aa4614",
+    "build-v2.sh": "4df6e034c3a001cfe2185014d94d83df2e0b8336ab82c43f2ad0ca764d1dd23b",
+    "build.sh": "bc6909560201e52efb39e7adea31d671961ed7b70b9141fb8647ee62b4d68cd2",
+    "check-asan-v2.py": "ae720e0a2577bf20e8e0b204b22ee1859f4e628c5bef69932274e57cc816cf37",
+    "check-asan.py": "c3d69461b8e3b5f68fda28c6e0e26f39c65f2eadb0fd4ea2deeb6f945cb9f8cc",
+    "check-bake.sh": "bd4e53241996a3839d113a55fa4740c130251714bb389d7f6df969477117ba51",
+    "check-baseline.py": "273f292ac23a1901a311e544c5136a11e49118803efb8a6f9176eb659522e08c",
+    "check-release-v2.sh": "a9b02641b87a6bac7594c17957fe8886252c80ac67046b9731b2529788daad31",
+    "field-xr-paced-arc.log": "3f5669241733f1253b3f74a80c6b6c3260792abb8454d75fe886dc9a5f700d20",
+    "field-xr-paced-arc/report.json": "365d1ec56f2b8ac530cf71d432602ec099ca17e39f5568e8b31edd68a5de2153",
+    "field-xr-paced-arc/runtime.json": "5311845df8d1b477761dff850320fdcfb581f5ae3f777b70359b8716cfc4ac63",
+    "field-xr-paced-software.log": "3f5669241733f1253b3f74a80c6b6c3260792abb8454d75fe886dc9a5f700d20",
+    "field-xr-paced-software/report.json": "2914906e854bd5002fc5c77b83b3c72ceb96c729f0283ca4234e639239b7dc74",
+    "field-xr-paced-software/runtime.json": "7f6ae00295b45207ec120e8457c7c689dd8b473a74566388eb3034adfab5d279",
+    "field-xr-paced.py": "cdba18add6b31f0deeef1ff5687fec363e1a2c256c95dbdc8c157e307ca2457d",
+    "inspect-portable.py": "4d43bccc72358f5be357e534170dca50bd46ab7f2eff1058a3934357aa3227f8",
+    "khronos.cjs": "db5ce4bbc0922b401ec59c9c21d0a6427e8a9ea6e4b29089d19acfe9697dc40d",
+    "khronos.json": "ece6545cef9d548c5de5a97ce5390ad6e1a678bbc6affb3d30b187def2a67f7f",
+    "khronos.log": "72d3ac3cda3aaa09e607de904e5669b6ccc4f978654889a658912cf7529eed9d",
+    "portable-attributes.json": "e4720b7576cbafa21abd81effb960f46195c815965d7a4f2a98053f539423770",
+    "record.py": "833f4f9b88131cac42a29fa59a7a09d2d4da008721ea1d6ddb55ca339a70b926",
+    "regression-build.log": "61abeea7a82c624a3f20c96324f873f8cb0bd232a40833864496d0ce91a2f80a",
+    "release-build.log": "757f08c480201b59bf60406fe311c164679cbe58bd8e8797e881294eb6f15d79",
+    "release-tests.log": "a2a192922eeb9442b08eaef3522a82337bd909a1fca8a93745464286f796977e",
+    "release-v2-build.log": "7864f4adeb4e05821f8e649d9cd7f1c51c4d6ef5abfe5de731ae148bbb4e084d",
+    "release/native-uv-bake-checks.xml": "dd6e283cef4c8010577023bfcb769896b6c62c4bdf8d7cd3fe7dd6e05b72906f",
+    "release/native-uv-resize.xml": "f87bd498b24cd5db8469e5c26cb4089a522a36fdcda219a48ad84b5e3ed78354",
+    "render-portable.cpp": "3e4b1750de629a190b376555cdd1d23c1b7f93343ce3aca1af5d8edffac78aef",
+    "render-portable.py": "3326ad46cb11360a4ba66fe89313bf4dc64e43717234b6c6af2e9c34b5782113",
+    "retained-v1.log": "d3620557b80c464d1961e17fc6851874511095f78d2af149b868724c769d30e8",
+    "retained-v2.log": "d138f5847b76ad558a3b31f0f43ee90b652bb647204f11c0360aac03a1eb8b20",
+    "retained-v2/render-portable-arc.log": "02d7a87f0565d9440538a7a60aa8d8b91b05ac6fb502c6adbe5c2f15895d4c3c",
+    "retained-v2/render-portable-software.log": "ad0cfaa5ef3477391ff1dd93df733e07b86e22b815a9595b2fd0d6f42e784915",
+    "retained1024-default-budget.log": "64a4a708784198a1061e48bc95971f7bbe6c9dc1f31778bea3f3117a3345ef41",
+    "retained1024.log": "54689253609fed7e8fb37a3a64c24445d41264e6dfab546006e8bd0b321ba221",
+    "run-field-xr-paced.py": "19ea519d4465347cc88ce3cf1659f7cf2db7dde61a71f5754d65fb46e49656e1",
+    "run-wayland.py": "452c63b807a30e9cdd8a97754fd41322b59c0abc17ac59d99264fd285bf662f0",
+    "source-v2.patch": "45d867d315d1060dd654edcbf06360325fdf0bbac2ac11fa8df0e4eefb1f28e1",
+    "strip-editable-package.py": "478013101a02fef2d3429bab89210645262bfe15caf3fa9dcc0e616bdb6213b5",
+    "wayland-resize.py": "c8fbef643fb9920e58721d1845f60d77e95301416a199c3d8e6a78d5171daba5",
+    "wayland-resize/report.json": "6f410e4ceb255c3bf0f9204051d0e3c3670002d180a0c62efd9eb6b4b102a28b"
+  },
+  "archive_sha256": "2c7586b03db355a6d3d14d97cc98acdd277d42ea866511f1b34744e49ef62f73",
+  "backend": "CPU",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "khronos": {
+    "results": [
+      {
+        "file": "retained-v2/resized-standard.glb",
+        "issues": {
+          "messages": [
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0",
+              "severity": 2
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "pointer": "/bufferViews/12",
+              "severity": 2
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "pointer": "/bufferViews/13",
+              "severity": 2
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "pointer": "/textures/3",
+              "severity": 2
+            }
+          ],
+          "numErrors": 0,
+          "numHints": 0,
+          "numInfos": 4,
+          "numWarnings": 0,
+          "truncated": false
+        }
+      },
+      {
+        "file": "retained-v2/resized-editable.glb",
+        "issues": {
+          "messages": [
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0",
+              "severity": 2
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "pointer": "/bufferViews/12",
+              "severity": 2
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "pointer": "/textures/3",
+              "severity": 2
+            }
+          ],
+          "numErrors": 0,
+          "numHints": 0,
+          "numInfos": 3,
+          "numWarnings": 0,
+          "truncated": false
+        }
+      },
+      {
+        "file": "retained-v2/portable.glb",
+        "issues": {
+          "messages": [
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0",
+              "severity": 2
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "pointer": "/bufferViews/12",
+              "severity": 2
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "pointer": "/bufferViews/13",
+              "severity": 2
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "pointer": "/textures/3",
+              "severity": 2
+            }
+          ],
+          "numErrors": 0,
+          "numHints": 0,
+          "numInfos": 4,
+          "numWarnings": 0,
+          "truncated": false
+        }
+      }
+    ],
+    "validator": "2.0.0-dev.3.10"
+  },
+  "matching_native_and_glb_sha256": {
+    "baked128.dsculpt": "acd364e28784500f285215d0325a87da936e9360ba01f006c8c6c98a1d0eae24",
+    "baked256.dsculpt": "f823c104eb2cfea3e94a5ed38d9bb05d04d06ec9ab8888278cdaf954dfb3a4ef",
+    "resized-editable.glb": "a849d3fdec3d3786803cc8fe6392a3dd227d088cfc91746db6c4ca873d374717",
+    "resized-standard.glb": "67568c732a30aef4d8fcd4487b6731d856bf6ed212f72789e0371ebf12ef257c",
+    "second-uv.dsculpt": "3b77a66f3954ec1521ad30d8ffc8e74d1f1ec7c591f44c59dbc7e5d8a9edfc17",
+    "unbaked256.dsculpt": "ec9ca708caa2cfb5a13e570382bf8592a56d498516989c0208683ca9618f966e"
+  },
+  "native_budget_1024": {
+    "accounted_peak_bytes": 125275894,
+    "measured_work": 97437178
+  },
+  "native_fixture_checks": 24,
+  "physical_headset": false,
+  "portable_attributes": {
+    "portable.glb": {
+      "display_uv": [
+        [
+          0.22999998927116394,
+          0.22999998927116394
+        ],
+        [
+          0.7699999809265137,
+          0.22999998927116394
+        ],
+        [
+          0.7699999809265137,
+          0.7699999809265137
+        ],
+        [
+          0.22999998927116394,
+          0.7699999809265137
+        ]
+      ],
+      "emissive_strength": 2.9000000953674316,
+      "images": {
+        "base": [
+          256,
+          256
+        ],
+        "emission": [
+          256,
+          256
+        ],
+        "metal_rough": [
+          256,
+          256
+        ],
+        "normal": [
+          256,
+          256
+        ],
+        "occlusion": [
+          256,
+          256
+        ]
+      },
+      "paint_uv": [
+        [
+          0.05000000074505806,
+          0.05000000074505806
+        ],
+        [
+          0.949999988079071,
+          0.05000000074505806
+        ],
+        [
+          0.949999988079071,
+          0.949999988079071
+        ],
+        [
+          0.05000000074505806,
+          0.949999988079071
+        ]
+      ],
+      "tangents": [
+        [
+          0.9999999403953552,
+          0.0,
+          0.0,
+          1.0
+        ],
+        [
+          1.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        [
+          0.9999999403953552,
+          0.0,
+          0.0,
+          1.0
+        ],
+        [
+          1.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    "resized-editable.glb": {
+      "display_uv": [
+        [
+          0.22999998927116394,
+          0.22999998927116394
+        ],
+        [
+          0.7699999809265137,
+          0.22999998927116394
+        ],
+        [
+          0.7699999809265137,
+          0.7699999809265137
+        ],
+        [
+          0.22999998927116394,
+          0.7699999809265137
+        ]
+      ],
+      "emissive_strength": 2.9000000953674316,
+      "images": {
+        "base": [
+          256,
+          256
+        ],
+        "emission": [
+          256,
+          256
+        ],
+        "metal_rough": [
+          256,
+          256
+        ],
+        "normal": [
+          256,
+          256
+        ],
+        "occlusion": [
+          256,
+          256
+        ]
+      },
+      "paint_uv": [
+        [
+          0.05000000074505806,
+          0.05000000074505806
+        ],
+        [
+          0.949999988079071,
+          0.05000000074505806
+        ],
+        [
+          0.949999988079071,
+          0.949999988079071
+        ],
+        [
+          0.05000000074505806,
+          0.949999988079071
+        ]
+      ],
+      "tangents": [
+        [
+          0.9999999403953552,
+          0.0,
+          0.0,
+          1.0
+        ],
+        [
+          1.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        [
+          0.9999999403953552,
+          0.0,
+          0.0,
+          1.0
+        ],
+        [
+          1.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    "resized-standard.glb": {
+      "display_uv": [
+        [
+          0.22999998927116394,
+          0.22999998927116394
+        ],
+        [
+          0.7699999809265137,
+          0.22999998927116394
+        ],
+        [
+          0.7699999809265137,
+          0.7699999809265137
+        ],
+        [
+          0.22999998927116394,
+          0.7699999809265137
+        ]
+      ],
+      "emissive_strength": 2.9000000953674316,
+      "images": {
+        "base": [
+          256,
+          256
+        ],
+        "emission": [
+          256,
+          256
+        ],
+        "metal_rough": [
+          256,
+          256
+        ],
+        "normal": [
+          256,
+          256
+        ],
+        "occlusion": [
+          256,
+          256
+        ]
+      },
+      "paint_uv": [
+        [
+          0.05000000074505806,
+          0.05000000074505806
+        ],
+        [
+          0.949999988079071,
+          0.05000000074505806
+        ],
+        [
+          0.949999988079071,
+          0.949999988079071
+        ],
+        [
+          0.05000000074505806,
+          0.949999988079071
+        ]
+      ],
+      "tangents": [
+        [
+          0.9999999403953552,
+          0.0,
+          0.0,
+          1.0
+        ],
+        [
+          1.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        [
+          0.9999999403953552,
+          0.0,
+          0.0,
+          1.0
+        ],
+        [
+          1.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  },
+  "previous_main": "e0b0b115a9605cb2a2a262bb91f63989f3333861",
+  "product": "2df0271e6b6c88a9abd915f2d39acef9ca059f89",
+  "release_application_sha256": "abdc38e260b42350561faa71b9ad62d69db6d4daf337a951631d9140c335c576",
+  "release_tests": [
+    "dome-sculpt-texture-set-baked-mtoon-resolution",
+    "dome-sculpt-texture-set-baked-resolution",
+    "dome-sculpt-texture-set-resolution",
+    "legacy-native-key-bake-conversion",
+    "mtoon-resized-texture-set",
+    "native-authored-paint-resolution",
+    "native-baked-paint-resolution",
+    "native-empty-paint-resolution",
+    "native-key-uv",
+    "native-key-uv-metadata",
+    "native-key-uv-worker",
+    "native-key-writable-bake-recipient",
+    "native-paint-rig-uv",
+    "native-paint-rig-uv-worker",
+    "native-paint-sampling-transitions",
+    "native-retained-paint-resolution",
+    "native-writable-bake-recipient",
+    "retopology-imported-bake-resize",
+    "retopology-imported-mtoon-resize",
+    "retopology-imported-pbr",
+    "texture-set-retained-bake-source",
+    "texture-set-retained-bake-target",
+    "texture-set-retained-posed-bake"
+  ],
+  "sanitizer_checks": {
+    "baked": 11,
+    "painted": 42,
+    "retained": 24
+  },
+  "source_patch_sha256": "45d867d315d1060dd654edcbf06360325fdf0bbac2ac11fa8df0e4eefb1f28e1",
+  "synthetic_controller": {
+    "arc": {
+      "balanced_frames": 187,
+      "checks": [
+        "accepted rendered palette shows the expected history and closes after Save",
+        "accepted controller Save matches the complete native project byte for byte",
+        "undone rendered palette shows the expected history and closes after Save",
+        "undone controller Save matches the complete native project byte for byte",
+        "redone rendered palette shows the expected history and closes after Save",
+        "redone controller Save matches the complete native project byte for byte",
+        "OpenXR app drains and final close persists the exact resized patch",
+        "Real OpenXR loader balances frame, images and both swapchains",
+        "Both eyes render the patch and its actual resolution panel",
+        "Loader delivers actual panel navigation and slider rays",
+        "Requested OpenGL renderer drives the workflow",
+        "Process maps witness the ordinary application and synthetic runtime module"
+      ],
+      "complete": true,
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "runtime": "/home/blux/de-xr/dome-sculpt/artifacts/current-integrated-full-release-20261127/build/libdome-sculpt-texture-resolution-runtime.so"
+    },
+    "software": {
+      "balanced_frames": 164,
+      "checks": [
+        "accepted rendered palette shows the expected history and closes after Save",
+        "accepted controller Save matches the complete native project byte for byte",
+        "undone rendered palette shows the expected history and closes after Save",
+        "undone controller Save matches the complete native project byte for byte",
+        "redone rendered palette shows the expected history and closes after Save",
+        "redone controller Save matches the complete native project byte for byte",
+        "OpenXR app drains and final close persists the exact resized patch",
+        "Real OpenXR loader balances frame, images and both swapchains",
+        "Both eyes render the patch and its actual resolution panel",
+        "Loader delivers actual panel navigation and slider rays",
+        "Requested OpenGL renderer drives the workflow",
+        "Process maps witness the ordinary application and synthetic runtime module"
+      ],
+      "complete": true,
+      "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+      "runtime": "/home/blux/de-xr/dome-sculpt/artifacts/current-integrated-full-release-20261127/build/libdome-sculpt-texture-resolution-runtime.so"
+    }
+  },
+  "visuals": {
+    "arc": {
+      "maximum_rgba8_error": 0,
+      "renderer": "Arc(tm) A770",
+      "visible_pixels": 10368
+    },
+    "software": {
+      "maximum_rgba8_error": 0,
+      "renderer": "llvmpipe",
+      "visible_pixels": 10368
+    }
+  },
+  "wayland": {
+    "checks": [
+      {
+        "check": "Native Wayland paint client publishes the Dome Sculpt identity",
+        "passed": true
+      },
+      {
+        "check": "Native Wayland client exports the universal texture-set command",
+        "passed": true
+      },
+      {
+        "check": "The loaded retained UV atlas enables the universal texture-set command",
+        "passed": true
+      },
+      {
+        "check": "The FLTK dialog opens on the current 128-pixel grid under the same Wayland identity",
+        "passed": true
+      },
+      {
+        "check": "DomeD key events stage the 256-pixel choice",
+        "passed": true
+      },
+      {
+        "check": "Ctrl+W cancels the draft without writing the project",
+        "passed": true
+      },
+      {
+        "check": "Reopening after cancellation shows the original grid",
+        "passed": true
+      },
+      {
+        "check": "DomeD keyboard navigation reaches the native Apply button",
+        "passed": true
+      },
+      {
+        "check": "Ordered native Save matches the complete controller-authored 256-pixel project",
+        "passed": true
+      },
+      {
+        "check": "Universal Undo and Save restore the exact original project",
+        "passed": true
+      },
+      {
+        "check": "Universal Redo and Save reproduce the exact enlarged project",
+        "passed": true
+      },
+      {
+        "check": "Native Wayland client closes after the paint worker and history operations",
+        "passed": true
+      }
+    ],
+    "complete": true
+  }
+}

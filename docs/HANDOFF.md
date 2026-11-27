@@ -408,6 +408,28 @@ open. Standard export of other source-role combinations still needs its own
 portable representation.
 [Native MToon grid resize evidence](validation/texture-set-mtoon-resize-20261127.json)
 
+**Paint resolution** now also resizes the original writable atlas of a native
+mesh whose display UVs were edited with **Keep Paint**. The new raster uses
+the retained corner coordinates, and the display mesh, UV history and Bake
+recipe keep their owners. The fixture grows from 128 to 256 with exact hidden
+paint, authored normal samples and FLOAT emission. A second display UV edit
+captures the 256-pixel writable grid while Restore still recovers the original
+128-pixel source. Both canonical and authored-normal Bakes are covered.
+The authored-normal fixture cold-opens, reduces to the original normal
+samples, and can Bake again on the new writable grid. A direct 128-to-1024
+probe also succeeds under the normal desktop worker budget.
+
+All 23 focused Release tests and three strict ASan/UBSan workflows pass.
+The nested DomeD Wayland dialog and synthetic OpenXR on Intel Arc A770 and
+llvmpipe save the same project after Apply, Undo and Redo. Standard and
+Editable GLB carry distinct display and paint UVs with explicit tangents.
+The native fixture and its package-free export match exactly in 10,368
+visible framebuffer pixels on both renderers. The three GLBs pass Khronos
+validation with zero errors and warnings. Independently prepared polygon
+material sets, accelerated resampling and physical device acceptance remain
+open.
+[Retained native UV grid resize evidence](validation/native-uv-grid-resize-20261127.json)
+
 Retopology reapply now works on native multi-material accessories attached
 to original VRM 1.0 joints. The replacement keeps its avatar hierarchy and
 the material of each surviving single-material face. Each paint and Bake
