@@ -5248,6 +5248,11 @@ if(BUILD_TESTING)
   add_test(NAME texture-set-retained-shapekeys COMMAND dome-sculpt-texture-set-source-export-test
     --retained-shapes ${CMAKE_CURRENT_BINARY_DIR}/texture-set-retained-shapekeys)
   set_tests_properties(texture-set-retained-shapekeys PROPERTIES TIMEOUT 300)
+  foreach(grid matching split)
+    add_test(NAME texture-set-retained-resize-${grid} COMMAND dome-sculpt-texture-set-source-export-test
+      --resize-retained-grid ${CMAKE_CURRENT_BINARY_DIR}/texture-set-retained-resize-${grid} ${grid})
+    set_tests_properties(texture-set-retained-resize-${grid} PROPERTIES TIMEOUT 300)
+  endforeach()
   add_test(NAME texture-set-retained-posed-bake COMMAND dome-sculpt-texture-set-source-export-test
     --posed-retained-bake ${CMAKE_CURRENT_BINARY_DIR}/texture-set-retained-posed-bake)
   set_tests_properties(texture-set-retained-posed-bake PROPERTIES TIMEOUT 300)

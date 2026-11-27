@@ -596,17 +596,19 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   const auto retained_uv=target.material_bindings?target.material_bindings->canonical_uv:nullptr;
   const bool native_recipient=retained_recipient&&
       retained_recipient->model()==detail::PolygonSurfaceNormalModel::NativeNOnly;
+  const auto normal_resolution=retained_recipient&&!native_recipient?
+      target.painted->baked()->normal_field->resolution():options.resolution;
   const bool split_recipient=retained_recipient&&!native_recipient&&
-      low_mesh.uv!=retained_recipient->normal_coordinates();
+      (low_mesh.uv!=retained_recipient->normal_coordinates()||normal_resolution!=options.resolution);
   // A pass visits each writable texel at most once. Mapped triangles need
   // no projection ray. The extra normal-coordinate pass does not write AO.
   const bool separate_normal_pass=retained_uv||split_recipient;
   const uint64_t projection_rays=!settings.corresponding_topology;
-  const uint64_t rays_per_texel=uint64_t(options.ao_samples)+projection_rays+
-      (separate_normal_pass?projection_rays:0);
   // Keep a nonzero valid allowance if a matching normal-only second pass
   // follows a primary pass that uses the complete projected AO budget.
-  const uint64_t sufficient_rays=uint64_t(options.resolution)*options.resolution*rays_per_texel+1;
+  const uint64_t sufficient_rays=uint64_t(options.resolution)*options.resolution*
+      (uint64_t(options.ao_samples)+projection_rays)+
+      (separate_normal_pass?uint64_t(normal_resolution)*normal_resolution*projection_rays:0)+1;
   options.max_rays=std::max(options.max_rays,std::min(sufficient_rays,detail::bake_ray_limit));
   const auto target_triangles=recipient?recipient->domain->triangles():std::span<const uint32_t>{};
   const auto encode_retained=[&](BakeOptions &options){
@@ -636,6 +638,7 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   std::optional<BakeResult> retained_normal_write;
   if(split_recipient){
     auto normal_options=options;
+    normal_options.resolution=normal_resolution;
     normal_options.ao_samples=0;
     if(result.rays>=options.max_rays||result.raster_samples>=options.max_raster_samples)
       throw std::length_error("Retained texture-set normal bake lacks aggregate projection/raster budget");

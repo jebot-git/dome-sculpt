@@ -85,7 +85,7 @@ struct TextureSetAccess {
        const std::shared_ptr<const TextureSetCollection> &membership,
        const TextureSetView &recipient, std::shared_ptr<PaintedMesh> paint,
        std::shared_ptr<const ObjectBakeRecipe> recipe,const TextureSetLimits &limits,
-       std::shared_ptr<const Image> native_normal) {
+       std::shared_ptr<const Image> native_normal,bool clearing=false) {
   stop(limits);
   if (!same_owner(target.texture_sets,membership) || target.texture_sets->active()!=recipient.id)
    throw std::invalid_argument("The active texture set changed during Bake");
@@ -106,7 +106,8 @@ struct TextureSetAccess {
   std::shared_ptr<const TextureSetFieldSource> source;
   if(current.source){
    auto next=current;next.painted=paint;next.bake_recipe=recipe;
-   source=current.source->with_bake(next,limits,std::move(native_normal));
+   source=clearing?current.source->with_cleared_bake(next,limits):
+                   current.source->with_bake(next,limits,std::move(native_normal));
   }else if(native_normal)
    throw std::invalid_argument("A plain texture set cannot borrow retained normal detail");
   std::shared_ptr<TextureSetCollection> collection;
@@ -278,7 +279,12 @@ void stage_texture_set_bake(SculptObject &target,
  TextureSetAccess::stage_bake(target,membership,recipient,std::move(paint),std::move(recipe),limits,std::move(native_normal));
 }
 bool texture_set_bake_present(const TextureSetView &field) noexcept {
- return field.painted&&field.painted->baked()&&(!field.source||field.painted->baked()!=field.source->original_paint()->baked());
+ const auto current=field.painted?field.painted->baked():nullptr;
+ if(!current)return false;
+ if(!field.source)return true;
+ const auto seed=field.source->original_paint()->baked();
+ if(seed&&seed->normal_field)return current->normal_field!=seed->normal_field;
+ return current!=seed;
 }
 void clear_texture_set_bake(Scene &scene,const TextureSetLimits &limits){
  auto &object=scene.active();
@@ -286,8 +292,8 @@ void clear_texture_set_bake(Scene &scene,const TextureSetLimits &limits){
  if(!texture_set_bake_present(field))throw std::invalid_argument("The selected texture set has no current Bake to clear");
  if(field.source){
   auto paint=field.painted->snapshot();
-  TextureSetPaintAccess::restore_source_bake(*paint,*field.source->original_paint());
-  stage_texture_set_bake(object,object.texture_sets,field,std::move(paint),field.bake_recipe,limits);
+  TextureSetPaintAccess::restore_source_bake(*paint,*field.source->original_paint(),limits);
+  TextureSetAccess::stage_bake(object,object.texture_sets,field,std::move(paint),field.bake_recipe,limits,{},true);
   return;
  }
  edit_texture_set(scene,object.id,field.id,[](PaintedMesh &paint,Material &){

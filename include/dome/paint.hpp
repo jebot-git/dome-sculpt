@@ -99,6 +99,7 @@ struct BakedTextures {
   // maps.emission is empty: RGB8 is not a second emission authority.
   std::shared_ptr<const BakedEmissionField> emission_field;
   void validate(uint32_t resolution) const;
+  void validate(uint32_t resolution, bool independent_normal_grid) const;
   size_t storage_bytes() const;
 };
 enum class BakedNormalWrite { Replace, PreserveRetained };

@@ -4,6 +4,8 @@
 #include "dome/source-maps.hpp"
 #include "emission-paint-access.hpp"
 #include "paint-overlay-sample.hpp"
+#include "polygon-surface-preview.hpp"
+#include "texture-set-field-source.hpp"
 #include "texture-set-graph.hpp"
 #include "texture-set-paint-access.hpp"
 #include "texture-set-surface.hpp"
@@ -21,6 +23,14 @@ void TextureSetResolutionOptions::validate() const {
         "Invalid texture-set resolution or reconstruction quality policy");
 }
 namespace detail {
+bool can_resize_retained_texture_grid(const TextureSetView &field) noexcept {
+  const auto &paint = field.painted;
+  const auto source = field.source ? field.source->source_preview() : nullptr;
+  return paint && !paint->in_stroke() && source &&
+         source->model() == PolygonSurfaceNormalModel::PreparedCorePbr &&
+         paint->baked() && paint->baked()->normal_field;
+}
+
 bool can_resize_native_texture_grid(const SculptObject &object) noexcept {
   if (!object.mesh_active || !object.painted || object.texture_sets || object.polygon)
     return false;
@@ -746,10 +756,12 @@ std::vector<PaintLayer> resample_texture_set_layers(
 
 std::shared_ptr<const BakedTextures> resample_native_bake_grid(
     const BakedTextures &before,uint32_t from,const TextureSetResolutionOptions &options,
-    const TextureSetLimits &limits,TextureSetResolutionReport &report,bool retained_native_uv) {
+    const TextureSetLimits &limits,TextureSetResolutionReport &report,bool retained_native_uv,
+    bool independent_normal_grid) {
   stop(limits);
-  before.validate(from);
-  if(!(retained_native_uv?resizable_native_uv_bake(&before):resizable_canonical_bake(&before)))
+  before.validate(from, independent_normal_grid);
+  if(!independent_normal_grid &&
+     !(retained_native_uv?resizable_native_uv_bake(&before):resizable_canonical_bake(&before)))
     throw std::invalid_argument("Paint resolution requires its supported native Bake grid");
   const auto to=options.resolution;
   const size_t source_pixels=size_t(from)*from,target_pixels=size_t(to)*to;
@@ -757,6 +769,7 @@ std::shared_ptr<const BakedTextures> resample_native_bake_grid(
   auto after=std::make_shared<BakedTextures>();
   after->color_interpretation=before.color_interpretation;
   after->normal_interpretation=before.normal_interpretation;
+  after->normal_field=before.normal_field;
   after->maps.transparent=before.maps.transparent;
   const std::array old_images{&before.maps.color,&before.maps.pbr_color,&before.maps.metal_rough,
                              &before.maps.normal,&before.maps.emission};
@@ -827,7 +840,7 @@ std::shared_ptr<const BakedTextures> resample_native_bake_grid(
     },{std::min(size_t(128*1024*1024),limits.maximum_bytes-report.peak_bytes),limits.cancelled});
     charge(report.peak_bytes,1,after->emission_field->storage_bytes(),limits);
   }
-  after->validate(to);
+  after->validate(to, independent_normal_grid);
   if(enlarge)return after;
 
   // Compare unflattened Bake contributions, including hidden values that
@@ -939,14 +952,15 @@ resample_texture_set(Scene &scene, uint64_t object, TextureSetId set,
         "Resolution editing needs an actual material-set collection");
   object_before.texture_sets->validate(object_before, true, limits);
   const auto field = texture_set_view(object_before, set);
+  const bool retained = detail::can_resize_retained_texture_grid(field);
   const bool typed = detail::native_texture_set_mtoon(
       field.painted.get(), field.appearance.get(), field.material_bindings.get());
-  if (field.source || (!typed && (field.material_bindings || field.painted->source_maps())) ||
+  if (!retained && (field.source || (!typed && (field.material_bindings || field.painted->source_maps())) ||
       field.appearance ||
       field.painted->paint_sampling_domain() ||
       field.painted->source_sampling_prepared() ||
       field.painted->color_projection() || field.painted->normal_projection() ||
-      !detail::resizable_canonical_bake(field.painted->baked().get()))
+      !detail::resizable_canonical_bake(field.painted->baked().get())))
     throw std::invalid_argument("Source or independently prepared field resolution needs "
                                 "its authenticated writable-grid transition");
   TextureSetResolutionReport report;
@@ -959,6 +973,7 @@ resample_texture_set(Scene &scene, uint64_t object, TextureSetId set,
   if (compute_backend() != "CPU")
     throw std::logic_error("Texture-set resolution backend is not implemented "
                            "for the selected accelerator");
+  const bool separate_roles = typed || retained;
   const size_t before_pixels = size_t(field.painted->resolution()) *
                                field.painted->resolution(),
                after_pixels = size_t(options.resolution) * options.resolution;
@@ -968,10 +983,10 @@ resample_texture_set(Scene &scene, uint64_t object, TextureSetId set,
   const bool physical = field.painted->has_physical_emission() ||
       std::any_of(field.material.emissive.begin(), field.material.emissive.end(),
                   [](float v) { return v > 1; });
-  const size_t material_bytes = typed ? 0 : (before_pixels + after_pixels) *
+  const size_t material_bytes = separate_roles ? 0 : (before_pixels + after_pixels) *
                                (128 + (physical ? layer_count * 32 + sizeof(std::array<double, 4>) : 0)) +
       (physical ? 2 * sizeof(std::vector<std::array<double, 4>>) : 0);
-  const size_t material_work = typed ? 0 :
+  const size_t material_work = separate_roles ? 0 :
       (before_pixels + after_pixels) * (field.painted->layers().size() + 1) *
           32 +
       14 * (before_pixels + std::max(after_pixels, 4 * before_pixels)) +
@@ -992,8 +1007,9 @@ resample_texture_set(Scene &scene, uint64_t object, TextureSetId set,
       scene, object, set,
       [&](PaintedMesh &paint, Material &material) {
         const auto resized = detail::TextureSetPaintAccess::resample_plain(
-            paint, options, transfer_limits, report, typed);
-        if (typed) {
+            paint, options, transfer_limits, report, typed, nullptr,
+            retained ? field.source.get() : nullptr);
+        if (separate_roles) {
           // The original MToon and PBR role images still sample the same UVs.
           // Certify the independently composed paint and coverage fields.
           if (resized->source_maps() != paint.source_maps())

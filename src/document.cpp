@@ -2456,8 +2456,9 @@ bool Document::parameter_enabled_locked(VrParameter parameter) const {
   if (state_.asset_busy || parameter == VrParameter::None)
     return false;
   auto &o = scene_.active();
-  if(parameter==VrParameter::TextureResolution&&!o.texture_sets)
-    return detail::can_resize_native_texture_grid(o)&&object_editable_locked(o.id)&&
+  if(parameter==VrParameter::TextureResolution&&
+     (!o.texture_sets||detail::can_resize_retained_texture_grid(active_texture_set(o))))
+    return (o.texture_sets||detail::can_resize_native_texture_grid(o))&&object_editable_locked(o.id)&&
       !action_active_locked()&&!state_.recovery_busy&&!state_.polygon&&!state_.retopology&&!state_.cut&&!uv_;
   if(o.texture_sets&&detail::texture_set_control(parameter))return object_editable_locked(o.id)&&detail::texture_set_editable_fields(o)&&!action_active_locked()&&!state_.recovery_busy;
   if (parameter == VrParameter::LayerOpacity ||

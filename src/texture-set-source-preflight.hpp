@@ -14,7 +14,7 @@ inline unsigned texture_source_bake(const nlohmann::json&paint){
  unsigned kind=0;
  if(present){
   const auto &value=paint.at("field_bake");
-  if(!value.is_number_integer()||(value!=1&&value!=2))
+  if(!value.is_number_integer()||(value!=1&&value!=2&&value!=3))
    throw std::invalid_argument("Unknown Source Paint7 Bake kind");
   kind=value.get<unsigned>();
  }

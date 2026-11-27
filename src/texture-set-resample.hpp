@@ -18,6 +18,7 @@ FilteredPaintTexel filter_paint_layer(const PaintLayer &,uint32_t resolution,
     const std::array<PaintBilinearTap,4> &);
 
 bool can_resize_native_texture_grid(const SculptObject &) noexcept;
+bool can_resize_retained_texture_grid(const TextureSetView &) noexcept;
 TextureSetLimits native_texture_grid_limits();
 inline bool resizable_canonical_bake(const BakedTextures *bake) noexcept {
   return !bake || (!bake->normal_authority && !bake->normal_field &&
@@ -36,5 +37,6 @@ std::vector<PaintLayer> resample_texture_set_layers(
     const TextureSetLimits &, TextureSetResolutionReport &, bool native_cells = false);
 std::shared_ptr<const BakedTextures> resample_native_bake_grid(
     const BakedTextures &,uint32_t original,const TextureSetResolutionOptions &,
-    const TextureSetLimits &,TextureSetResolutionReport &,bool retained_native_uv);
+    const TextureSetLimits &,TextureSetResolutionReport &,bool retained_native_uv,
+    bool independent_normal_grid);
 } // namespace dome::detail

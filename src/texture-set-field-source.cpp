@@ -74,7 +74,32 @@ void TextureSetFieldSource::validate_field(const TextureSetView&value,const Text
 }
 std::shared_ptr<const PaintedMesh>TextureSetFieldSource::read_view(const TextureSetView&value,const TextureSetLimits&limits)const{validate_field(value,limits,false);return readable_;}
 std::shared_ptr<const TextureSetFieldSource>TextureSetFieldSource::with_current(const TextureSetView&value,const TextureSetLimits&limits)const{
+ if(value.painted&&value.painted->resolution()!=field_.painted->resolution())
+  return with_material_grid(value,limits);
  return with_member(value,limits,false,preview_?preview_->native_bake():nullptr);
+}
+std::shared_ptr<const TextureSetFieldSource> TextureSetFieldSource::with_material_grid(
+    const TextureSetView &value,const TextureSetLimits &limits)const{
+ const auto before=field_.painted->baked();
+ const auto after=value.painted?value.painted->baked():nullptr;
+ if(!preview_||preview_->model()!=PolygonSurfaceNormalModel::PreparedCorePbr||
+    !before||!before->normal_field||!after||!owner(before->normal_field,after->normal_field)||
+    !owner(value.bake_recipe,field_.bake_recipe))
+  throw std::invalid_argument("Resized material grid lost its independent normal or Bake recipe");
+ after->validate(value.painted->resolution(),true);
+ return with_member(value,limits,true,{});
+}
+std::shared_ptr<const TextureSetFieldSource> TextureSetFieldSource::with_cleared_bake(
+    const TextureSetView &value,const TextureSetLimits &limits)const{
+ const auto original=original_->baked();
+ const auto restored=value.painted?value.painted->baked():nullptr;
+ const bool same_grid=value.painted&&value.painted->resolution()==original_->resolution();
+ if((same_grid&&!owner(original,restored))||
+    (!same_grid&&(!original||!original->normal_field||!restored||
+                  !owner(original->normal_field,restored->normal_field)))||
+    !owner(value.bake_recipe,field_.bake_recipe))
+  throw std::invalid_argument("Clear Bake lost its inherited material grid or normal field");
+ return with_member(value,limits,true,{});
 }
 std::shared_ptr<const TextureSetFieldSource>TextureSetFieldSource::with_bake(
     const TextureSetView&value,const TextureSetLimits&limits,std::shared_ptr<const Image> native)const{
@@ -118,19 +143,32 @@ std::shared_ptr<const TextureSetFieldSource>TextureSetFieldSource::with_bake(
 std::shared_ptr<const TextureSetFieldSource>TextureSetFieldSource::with_member(
     const TextureSetView&value,const TextureSetLimits&limits,bool rebake,std::shared_ptr<const Image> native)const{
  validate_member(value,limits,rebake);if(working_bytes(value,limits)>limits.maximum_bytes)throw std::length_error("Updated source field exceeds metadata/raster quota");
- auto next=std::shared_ptr<TextureSetFieldSource>(new TextureSetFieldSource);next->field_=value;next->field_.source.reset();next->field_.painted=value.painted->snapshot();next->original_=original_;next->polygon_=polygon_;next->readable_=TextureSetPaintAccess::field_source_view(*next->field_.painted,*original_,field_.domain,limits,next->field_.painted.get());
+ auto next=std::shared_ptr<TextureSetFieldSource>(new TextureSetFieldSource);next->field_=value;next->field_.source.reset();next->field_.painted=value.painted->snapshot();next->original_=original_;next->polygon_=polygon_;next->readable_=TextureSetPaintAccess::field_source_view(*next->field_.painted,*original_,field_.domain,limits,next->field_.painted.get(),readable_.get());
  next->preview_=preview_?preview_->with_bake(*next->readable_,std::move(native)):nullptr;
  std::shared_ptr<const TextureSetFieldSource>sealed(new const TextureSetFieldSource(std::move(*next)));sealed->self_=sealed;sealed->validate_field(sealed->field_,limits);return sealed;
 }
 std::shared_ptr<const TextureSetFieldSource>TextureSetFieldSource::repartition(const TextureSetView&value,std::shared_ptr<const TextureSetFaceDomain>domain,const TextureSetLimits&limits)const{
  auto source=value;source.painted=read_view(value,limits);source.domain.reset();source.source.reset();
+ const auto current_bake=source.painted->baked();
+ const auto seed_bake=original_->baked();
+ const bool same_normal=current_bake&&seed_bake&&seed_bake->normal_field&&
+                        owner(current_bake->normal_field,seed_bake->normal_field);
+ if(source.painted->resolution()!=original_->resolution()){
+  const auto current_paint=source.painted;
+  source.painted=original_;
+  auto next=capture_prepared(source,domain,preview_->with_bake(*original_,{}),limits);
+  auto prototype=TextureSetPaintAccess::source_grid_prototype(*original_,domain,current_paint->resolution(),limits);
+  auto current=next->field();
+  current.painted=TextureSetPaintAccess::bind_raster(*current_paint,domain,*prototype,limits);
+  return same_normal?next->with_material_grid(current,limits):next->with_bake(current,limits);
+ }
  if(owner(source.painted->baked(),original_->baked()))return capture_prepared(source,std::move(domain),preview_,limits);
  const auto with_bake=source.painted;
  auto baseline=with_bake->snapshot();TextureSetPaintAccess::restore_source_bake(*baseline,*original_);
  source.painted=baseline;
  auto next=capture_prepared(source,std::move(domain),preview_->with_bake(*baseline,{}),limits);
  auto current=next->field();current.painted=TextureSetPaintAccess::bind_raster(*with_bake,current.domain,*current.painted,limits);
- return next->with_bake(current,limits,preview_->native_bake());
+ return same_normal?next->with_material_grid(current,limits):next->with_bake(current,limits,preview_->native_bake());
 }
 TextureSetFieldSample TextureSetFieldSource::sample(uint32_t triangle,std::array<double,3>b,const TextureSetLimits&limits)const{
  limits.validate();stop(limits);authenticate_owner(self_.lock());if(!field_.domain->contains(triangle))throw std::invalid_argument("A foreign logical triangle cannot sample this material field");double sum=0;for(double x:b){if(!std::isfinite(x)||x<0||x>1)throw std::invalid_argument("Texture-set field barycentrics are outside their actual triangle");sum+=x;}if(std::abs(sum-1)>1e-6)throw std::invalid_argument("Texture-set field barycentrics do not form an actual triangle point");

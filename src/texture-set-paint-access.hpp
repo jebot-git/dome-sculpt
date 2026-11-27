@@ -11,7 +11,7 @@ struct TextureSetPaintAccess {
   static bool can_resize_unpainted(const PaintedMesh&) noexcept;
   static bool grid_covered(const PaintedMesh&,size_t) noexcept;
   static std::shared_ptr<PaintedMesh> resize_unpainted(const PaintedMesh&,uint32_t,const TextureSetLimits&);
-  static std::shared_ptr<PaintedMesh> resample_plain(const PaintedMesh&,const TextureSetResolutionOptions&,const TextureSetLimits&,TextureSetResolutionReport&,bool native_mtoon=false,const NativePaintSampling *retained_uv=nullptr);
+  static std::shared_ptr<PaintedMesh> resample_plain(const PaintedMesh&,const TextureSetResolutionOptions&,const TextureSetLimits&,TextureSetResolutionReport&,bool native_mtoon=false,const NativePaintSampling *retained_uv=nullptr,const TextureSetFieldSource *retained_field=nullptr);
   static void reproject_retopology(const PaintedMesh &from, PaintedMesh &replacement,
                                   RetopoTransfer &,bool prepared_normals=false,
                                   const TextureSetView *retained=nullptr,
@@ -45,8 +45,11 @@ struct TextureSetPaintAccess {
       const PaintedMesh *current_bake=nullptr)noexcept;
   static std::shared_ptr<const PaintedMesh> field_source_view(const PaintedMesh &member,
       const PaintedMesh &original,const std::shared_ptr<const TextureSetFaceDomain>&,
-      const TextureSetLimits&,const PaintedMesh *current_bake=nullptr);
-  static void restore_source_bake(PaintedMesh &,const PaintedMesh &original);
+      const TextureSetLimits&,const PaintedMesh *current_bake=nullptr,const PaintedMesh *read_raster=nullptr);
+  static std::shared_ptr<PaintedMesh> source_grid_prototype(const PaintedMesh &original,
+      const std::shared_ptr<const TextureSetFaceDomain>&,uint32_t,const TextureSetLimits&);
+  static void restore_source_bake(PaintedMesh &,const PaintedMesh &original,
+                                  const TextureSetLimits & = {});
   static std::shared_ptr<PaintedMesh> bind_raster(const PaintedMesh&,
       std::shared_ptr<const TextureSetFaceDomain>,const PaintedMesh&,
       const TextureSetLimits&);

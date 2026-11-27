@@ -50,9 +50,11 @@ void Document::queue_texture_set_locked(TextureSetEdit edit,AssetSource expected
  const auto object=scene_.active().id;require_object_editable_locked(object);
  const bool native_resize=edit.action==TextureSetAction::Resolution&&edit.set==0&&
    detail::can_resize_native_texture_grid(scene_.active());
+ const bool retained_resize=edit.action==TextureSetAction::Resolution&&scene_.active().texture_sets&&
+   detail::can_resize_retained_texture_grid(texture_set_view(scene_.active(),edit.set));
  if(edit.action==TextureSetAction::Select){
   if(!scene_.active().texture_sets)throw std::logic_error("Choose an object with material sets");
- }else if(!native_resize&&!detail::texture_set_editable_fields(scene_.active()))
+ }else if(!native_resize&&!retained_resize&&!detail::texture_set_editable_fields(scene_.active()))
   throw std::logic_error("This texture-set edit requires an editable native material");
  if(edit.action==TextureSetAction::MToon&&!scene_.active().texture_sets)
   throw std::logic_error("Choose an object with material sets");
@@ -60,8 +62,8 @@ void Document::queue_texture_set_locked(TextureSetEdit edit,AssetSource expected
  auto changed=std::make_shared<bool>(false);
  const auto source=AssetSource{state_.generation,state_.revision,object,state_.edit_authority};
  const char*label=edit.action==TextureSetAction::Create?"Create texture set":edit.action==TextureSetAction::AssignFaces?"Assign material faces":edit.action==TextureSetAction::Select?"Select texture set":edit.action==TextureSetAction::Rename?"Rename texture set":edit.action==TextureSetAction::Material?"Edit texture-set material":edit.action==TextureSetAction::Resolution?"Resize paint":edit.action==TextureSetAction::MToon?"Use MToon 1.0":"Edit texture-set layer";
- queue_scene_operation_locked(label,[object,edit=std::move(edit),changed,native_resize](Scene&scene,const auto&cancelled){
-  auto limits=native_resize?detail::native_texture_grid_limits():TextureSetLimits{};
+ queue_scene_operation_locked(label,[object,edit=std::move(edit),changed,native_resize,retained_resize](Scene&scene,const auto&cancelled){
+  auto limits=native_resize||retained_resize?detail::native_texture_grid_limits():TextureSetLimits{};
   limits.cancelled=cancelled;
   switch(edit.action){
   case TextureSetAction::Resolution:{
@@ -107,8 +109,7 @@ void Document::queue_texture_set_locked(TextureSetEdit edit,AssetSource expected
 
 bool Document::can_resize_native_paint()const{
  std::lock_guard lock(model_mutex_);
- return !scene_.active().texture_sets&&!control_before_&&
-   parameter_enabled_locked(VrParameter::TextureResolution);
+ return !control_before_&&parameter_enabled_locked(VrParameter::TextureResolution);
 }
 bool Document::can_select_texture_sets()const{
  std::lock_guard lock(model_mutex_);

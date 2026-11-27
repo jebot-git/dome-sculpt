@@ -133,6 +133,163 @@ uint32_t index_at(const detail::GltfDocument&d,int index,size_t n){const auto&a=
 Vec3 vector(const std::vector<float>&v){return {v.at(0),v.at(1),v.at(2)};}
 Vec3 unit(AffineVector v){return normalized(Vec3{float(v[0]),float(v[1]),float(v[2])});}
 Image texture_image(const detail::GltfDocument&d,const nlohmann::json&info){const auto&texture=d.json.at("textures").at(info.at("index").get<size_t>());const auto&image=d.json.at("images").at(texture.at("source").get<size_t>());const auto&view=d.json.at("bufferViews").at(image.at("bufferView").get<size_t>());const auto offset=view.value("byteOffset",size_t(0)),count=view.at("byteLength").get<size_t>();check(offset<=d.binary.size()&&count<=d.binary.size()-offset,"Actual material PNG lies within the emitted buffer");return decode_projection_png(std::span(d.binary).subspan(offset,count));}
+void resize_retained_grid(bool split){
+ auto scene=source(true,split,false,false,false,split);
+ const auto target=scene.active().id;
+ constexpr TextureSetId slot=1;
+ select_texture_set(scene,target,slot);
+ const auto material_field=active_texture_set(scene.active());
+ const auto sibling=texture_set_view(scene.active(),0);
+ const auto world=scene.world_matrix(target);
+ const auto triangle=material_field.domain->triangles().front();
+ constexpr std::array<double,3> sample{.2,.3,.5};
+ const auto normal=material_field.source->normal(triangle,sample,world,true);
+ const auto coordinates=material_field.source->sample(triangle,sample);
+ const auto root_normal=material_field.painted->baked()->normal_field;
+ auto high=scene.active().painted->mesh();
+ high.normals.assign(high.positions.size(),normalized(Vec3{.18f,-.24f,-1.f}));
+ for(auto &position:high.positions)position.z+=.008f;
+ const auto placement=scene.active().affine_edit;
+ const auto donor=scene.add("Resized material normal donor",Volume{});
+ auto &donor_object=scene.active();
+ donor_object.mesh_active=true;
+ donor_object.painted=std::make_shared<PaintedMesh>(std::move(high),64);
+ donor_object.affine_edit=placement;
+ donor_object.material.color={.82f,.11f,.27f,1};
+ donor_object.visible=false;
+ donor_object.locked=true;
+ scene.select(target);
+ scene.save("before.dsculpt");
+ const auto before=scene.encode();
+ TextureSetResolutionOptions options;
+ options.resolution=128;
+ TextureSetLimits cancelled;
+ cancelled.cancelled=[] {return true;};
+ refuses([&]{resample_texture_set(scene,target,slot,options,cancelled);},
+         "Cancellation preserves the actual retained source");
+ check(scene.encode()==before,"Cancelled resize does not publish a modified field");
+ Document document;
+ document.replace(scene);
+ ready(document);
+ check(document.can_resize_native_paint(),"Prepared material slot exposes Paint resolution");
+ TextureSetEdit resize;
+ resize.action=TextureSetAction::Resolution;
+ resize.set=slot;
+ resize.resolution=128;
+ document.edit_texture_set(resize);
+ document.save_async("resized.dsculpt").get();
+ ready(document);
+ auto resized=document.copy_scene();
+ const auto current=active_texture_set(resized.active());
+ const auto read=current.source->read_view(current);
+ const auto other=texture_set_view(resized.active(),0);
+ check(current.painted->resolution()==128&&read->resolution()==128&&
+       current.painted->baked()->normal_field==root_normal&&root_normal->resolution()==64&&
+       current.source->original_paint()==material_field.source->original_paint(),
+       "The writable and read grids resize with the exact independent normal owner");
+ check(other.source==sibling.source&&other.painted->baked()==sibling.painted->baked()&&
+       other.painted->resolution()==64,"The neighboring material and its Bake remain unchanged");
+ check(current.source->sample(triangle,sample).paint_uv==coordinates.paint_uv&&
+       current.source->sample(triangle,sample).normal_uv==coordinates.normal_uv&&
+       length(current.source->normal(triangle,sample,world,true)-normal)==0,
+       "Independent material coordinates and normal samples do not move");
+ const auto exact=resized.encode();
+ const auto cold=Scene::load("resized.dsculpt");
+ check(cold.encode()==exact&&document.undo()&&document.copy_scene().encode()==before&&
+       document.redo()&&document.copy_scene().encode()==exact,
+       "Ordered Save, cold Open, Undo and Redo preserve both grids");
+ Document reopened;
+ reopened.replace(cold);
+ ready(reopened);
+ check(!reopened.frame().state->can_clear_bake,"Grid resize alone does not enable Clear Bake");
+ ObjectBakeSettings bake;
+ bake.allow_backfaces=true;
+ bake.padding=0;
+ bake.corresponding_topology=true;
+ reopened.bake_from_object(donor,bake);
+ reopened.save_async("rebaked.dsculpt").get();
+ ready(reopened);
+ const auto baked=reopened.copy_scene();
+ const auto projected=active_texture_set(baked.active());
+ const auto written=projected.painted->baked()->normal_field;
+ check(written->prior()==active_texture_set(cold.active()).painted->baked()->normal_field&&
+       written->resolution()==64&&projected.painted->baked()->maps.color.width==128&&
+       projected.bake_recipe->source.object==donor,
+       "Rebake writes material and normal detail on their own grids");
+ check(Scene::load("rebaked.dsculpt").encode()==baked.encode(),"Cold reopen preserves a mixed-resolution rebake");
+ reopened.clear_bake();
+ ready(reopened);
+ const auto cleared=reopened.copy_scene();
+ const auto restored=active_texture_set(cleared.active());
+ check(restored.painted->resolution()==128&&
+       restored.painted->baked()->normal_field==written->prior()&&
+       restored.painted->baked()->maps.color.rgba==current.painted->baked()->maps.color.rgba,
+       "Clear Bake keeps the resized material and restores inherited normal detail");
+ check(Scene::decode(cleared.encode()).encode()==cleared.encode(),
+       "Cleared Bake state reopens on both independent grids");
+ resize.resolution=64;
+ reopened.edit_texture_set(resize);
+ ready(reopened);
+ const auto reduced=reopened.copy_scene();
+ const auto reduced_field=active_texture_set(reduced.active());
+ check(reduced_field.painted->baked()->normal_field==written->prior()&&
+       reduced_field.painted->baked()->maps.color.rgba==material_field.painted->baked()->maps.color.rgba&&
+       Scene::decode(reduced.encode()).encode()==reduced.encode(),
+       "Reducing to the seed size recovers its material coefficients and stays editable");
+ auto painted=reduced.snapshot();
+ check(edit_texture_set(painted,target,slot,[&](PaintedMesh &paint,Material &){
+  paint.add_layer("Hidden light and mask");
+  Brush brush;
+  for(size_t corner=0;corner<3;++corner)
+   brush.to+=paint.mesh().positions.at(paint.mesh().indices.at(triangle*3+corner))/3.f;
+  brush.from=brush.to;
+  brush.radius=.24f;
+  brush.strength=.8f;
+  brush.blend=.3f;
+  PaintSettings ink;
+  ink.front_only=false;
+  ink.channel=PaintChannel::Emission;
+  ink.emission_units=PaintEmissionUnits::Physical;
+  ink.emission={2,.1f,.2f};
+  paint.begin_stroke();
+  paint.stamp(brush,ink);
+  if(!paint.end_stroke())throw std::runtime_error("Hidden layer needs a genuine physical paint stroke");
+  ink.channel=PaintChannel::Mask;
+  paint.begin_stroke();
+  paint.stamp(brush,ink);
+  if(!paint.end_stroke())throw std::runtime_error("Hidden layer needs a genuine mask edit");
+  paint.layer_properties("Hidden light and mask",false,.75f);
+  return true;
+ }),"Retained source owns hidden physical light and mask edits");
+ const auto old_paint=active_texture_set(painted.active()).painted;
+ const auto &old_layer=old_paint->layers().back();
+ check(resample_texture_set(painted,target,slot,options).changed,"Hidden physical colour and mask enlarge");
+ const auto large=active_texture_set(painted.active());
+ check(large.painted->has_physical_emission()&&large.painted->active_layer()==old_layer.id&&
+       !large.painted->layers().back().visible,"Resizing preserves hidden layer state and FLOAT storage");
+ check(Scene::decode(painted.encode()).encode()==painted.encode(),"Hidden FLOAT paint round trips at the enlarged resolution");
+ options.resolution=64;
+ check(resample_texture_set(painted,target,slot,options).changed,"Hidden physical colour and mask reduce");
+ const auto restored_paint=active_texture_set(painted.active()).painted;
+ const auto &restored_layer=restored_paint->layers().back();
+ for(size_t tile=0;tile<old_layer.tiles.size();++tile){
+  const auto &source=old_layer.tiles[tile];
+  const auto &dest=restored_layer.tiles[tile];
+  check(bool(source)==bool(dest),"Native byte tile occupancy survives the round trip");
+  const auto &source_light=old_layer.emission_tiles[tile];
+  const auto &dest_light=restored_layer.emission_tiles[tile];
+  check(bool(source_light)==bool(dest_light),"Physical light tile occupancy survives the round trip");
+  for(size_t pixel=0;source&&pixel<source->pixels.size();++pixel)
+   if(source->pixels[pixel].data!=dest->pixels[pixel].data)
+    throw std::runtime_error("Hidden byte paint changed across exact round-trip");
+  for(size_t pixel=0;source_light&&pixel<source_light->pixels.size();++pixel){
+   const auto &a=source_light->pixels[pixel];
+   const auto &b=dest_light->pixels[pixel];
+   if(a.physical!=b.physical||a.legacy!=b.legacy||a.coverage!=b.coverage)
+    throw std::runtime_error("Hidden physical coefficients changed across exact round-trip");
+  }
+ }
+}
 void retained_shapes(bool prepared,bool reflected){
  const auto seed=source(prepared,reflected);
  const auto object=seed.active().id;
@@ -2895,6 +3052,13 @@ void retopology_retained_materials(bool reflected) {
 
 int main(int argc,char **argv)try {
  const std::string_view mode=argc>1?argv[1]:"";
+ if(argc==4&&mode=="--resize-retained-grid"){
+  std::filesystem::create_directories(argv[2]);
+  std::filesystem::current_path(argv[2]);
+  resize_retained_grid(std::string_view(argv[3])=="split");
+  std::cout<<"PASS "<<checks<<" retained polygon paint resolution checks\n";
+  return 0;
+ }
  if(argc==3&&mode=="--native-mikk-export") {
   std::filesystem::create_directories(argv[2]);
   std::filesystem::current_path(argv[2]);

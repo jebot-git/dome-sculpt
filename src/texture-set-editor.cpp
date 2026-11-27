@@ -19,7 +19,7 @@ void choose_paint_resolution(Fl_Choice &choice,uint32_t current) {
  choice.value(grid);
 }
 
-void resize_native_paint(Document &doc,const AssetSource &source,uint32_t current) {
+void resize_native_paint(Document &doc,const AssetSource &source,TextureSetId set,uint32_t current) {
  int x,y,w,h;
  Fl::screen_work_area(x,y,w,h);
  const int row=std::max(28,dx::size+12);
@@ -45,6 +45,7 @@ void resize_native_paint(Document &doc,const AssetSource &source,uint32_t curren
  if(accepted){
   TextureSetEdit edit;
   edit.action=TextureSetAction::Resolution;
+  edit.set=set;
   edit.resolution=64u<<resolution.value();
   doc.edit_texture_set(std::move(edit),source);
  }
@@ -54,8 +55,10 @@ void edit_texture_sets(Document&doc){
  const auto state=doc.frame().state;
  const AssetSource source{state->generation,state->revision,state->active_object,state->edit_authority};
  const bool selection_only=!state->can_edit_texture_sets;
- if(selection_only&&state->texture_sets.size()==1&&doc.can_resize_native_paint()){
-  resize_native_paint(doc,source,state->texture_sets.front().resolution);
+ const bool can_resize=doc.can_resize_native_paint();
+ if(selection_only&&state->texture_sets.size()==1&&can_resize){
+  const auto &set=state->texture_sets.front();
+  resize_native_paint(doc,source,set.id,set.resolution);
   return;
  }
  if(selection_only&&!doc.can_select_texture_sets()){
@@ -83,8 +86,26 @@ void edit_texture_sets(Document&doc){
  if(selection_only)operations.hide();
  content.size(width-24,selection_only?row*3:y+row*3);content.end();scroll.end();
  Fl_Button cancel(width/2-150,height-row*1.5,140,row,"Cancel"),apply(width/2+10,height-row*1.5,140,row,"Apply");bool accepted=false;
+ bool resize=false;
+ Fl_Button resize_active(16,height-row*1.5,140,row,"Resize active…");
+ if(selection_only&&can_resize){
+  const int button_width=std::min(140,(width-50)/3);
+  resize_active.size(button_width,row);
+  cancel.resize(width-26-2*button_width,cancel.y(),button_width,row);
+  apply.resize(width-16-button_width,apply.y(),button_width,row);
+  resize_active.callback([](Fl_Widget *widget,void *data){
+   *static_cast<bool *>(data)=true;
+   widget->window()->hide();
+  },&resize);
+ }else resize_active.hide();
  cancel.callback([](Fl_Widget*w,void*){w->window()->hide();});apply.callback([](Fl_Widget*w,void*p){*static_cast<bool*>(p)=true;w->window()->hide();},&accepted);
- window.end();window.set_modal();dx::style(&window);window.show();while(window.shown())Fl::wait();if(!accepted)return;
+ window.end();window.set_modal();dx::style(&window);window.show();while(window.shown())Fl::wait();
+ if(resize){
+  const auto &set=state->texture_sets.at(size_t(selected));
+  resize_native_paint(doc,source,set.id,set.resolution);
+  return;
+ }
+ if(!accepted)return;
  if(member.value()<0||size_t(member.value())>=state->texture_sets.size())throw std::invalid_argument("Select an actual material set");
  TextureSetEdit edit;edit.set=state->texture_sets[size_t(member.value())].id;edit.name=name.value();
  switch(action.value()){

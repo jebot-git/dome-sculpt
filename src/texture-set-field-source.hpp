@@ -55,6 +55,10 @@ private:
       const TextureSetView &,const TextureSetLimits &,bool rebake,std::shared_ptr<const Image>)const;
   std::shared_ptr<const TextureSetFieldSource> with_bake(
       const TextureSetView &,const TextureSetLimits &,std::shared_ptr<const Image> = {})const;
+  std::shared_ptr<const TextureSetFieldSource> with_material_grid(
+      const TextureSetView &,const TextureSetLimits &)const;
+  std::shared_ptr<const TextureSetFieldSource> with_cleared_bake(
+      const TextureSetView &,const TextureSetLimits &)const;
   TextureSetFieldSource()=default;
   TextureSetFieldSource(TextureSetFieldSource&&)=default;
   mutable std::weak_ptr<const TextureSetFieldSource>self_;
