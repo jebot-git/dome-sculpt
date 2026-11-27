@@ -226,6 +226,24 @@ errors and warnings. Imported MToon, other independently prepared imported
 normal or colour variants, and physical headset qualification remain open.
 [Prior imported Bake validation](validation/retopology-imported-prior-bake-20261127.json)
 
+Native MToon retopology now keeps a single projected image when Base and
+Shade actually share their source image, sampler and effective coordinates.
+This preserves the paint contribution in shadow across Apply and cold Open.
+Roles with different wrapping, filtering or UV transforms retain independent
+images. MToon 0 uses its shared texture transform. The viewport and the
+portable material compiler use the same sharing rule as the worker.
+
+The 15 selected Release and 11 strict ASan/UBSan cases cover static V0 and
+V1, reflected affine placement and edits that rely on saved correspondence.
+Six native patch GLBs pass Khronos validation with zero errors and warnings.
+On the painted V0 patch, independently splitting Shade into a byte-identical
+image changes 290 shadow pixels on Arc and 294 on llvmpipe. The unpainted
+controls match exactly. Synthetic OpenXR reopens and saves both variants
+exactly on both renderers. The imported MToon 1 probe still reproduces first
+Apply dropping the typed material. The original asset remains on the hidden
+guide. Retopology of imported MToon needs its own role, UV and normal transfer.
+[Shared MToon shading validation](validation/retopology-mtoon-shared-shade-20261127.json)
+
 Retopology reapply now works on native multi-material accessories attached
 to original VRM 1.0 joints. The replacement keeps its avatar hierarchy and
 the material of each surviving single-material face. Each paint and Bake

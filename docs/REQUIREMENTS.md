@@ -140,6 +140,16 @@ case. Imported MToon, other independently prepared imported fields and
 physical headset acceptance remain required.
 [Prior imported Bake evidence](validation/retopology-imported-prior-bake-20261127.json)
 
+Native MToon retopology preserves a shared Base/Shade image through Apply,
+Save and cold Open when both roles use the same sampling. Independent
+wrapping, filtering and transforms keep their own projected images. Native
+paint continues to contribute to shadow shading on the shared role. This
+passes MToon 0 and 1 worker controls, with a painted MToon 0 comparison on
+Intel Arc and llvmpipe and synthetic OpenXR replay. A real imported MToon 1
+model still loses its typed material on first Apply. Its original MToon role
+images, coordinates and posed attribute normals need a separate transfer.
+[Shared MToon shading evidence](validation/retopology-mtoon-shared-shade-20261127.json)
+
 Native multi-material retopology preserves independently painted and baked
 grids and original VRM 1.0 joint links when Apply changes the patch.
 Linked Shape Restore uses the current pose of the original imported rig.

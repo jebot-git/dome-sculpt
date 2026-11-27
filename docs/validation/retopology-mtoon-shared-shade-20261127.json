@@ -1,0 +1,674 @@
+{
+  "product": "fa6cf9f0e9d6bb5e4b378e2523980d5c910ecbb0",
+  "previous_main": "d12c59f31e4745137be2c4285d863af83f0ba4d6",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "release_app_sha256": "36f9c2b180874d391a7a892d5285f530f422a0c652e3a670c2303e6cba1736bd",
+  "release_tests": [
+    "retopology-mtoon-plain",
+    "retopology-mtoon-detached",
+    "retopology-first-material-posed-affine",
+    "retopology-mtoon-affine",
+    "retopology-first-material-affine",
+    "retopology-first-material-posed-plain",
+    "retopology-imported-prior-bake",
+    "retopology-mtoon-v0",
+    "retopology-first-material-plain",
+    "native-mikk-export",
+    "retopology-imported-pbr",
+    "mtoon-texture-sets",
+    "native-mtoon-preview-contracts",
+    "mtoon-painted-texture-sets",
+    "mtoon-baked-texture-sets"
+  ],
+  "asan_ubsan_incremental": {
+    "based_on": "d12c59f31e4745137be2c4285d863af83f0ba4d6",
+    "instrumented_binary_sha256": "4355a49b7f0952c40741fe7d58e8a536e8bbca289dc5301ddd42ba0ee27d8a79",
+    "tests": [
+      "plain",
+      "affine",
+      "v0",
+      "detached"
+    ]
+  },
+  "native_oracle": {
+    "plain": {
+      "role_samples": 4312,
+      "max_role_error": 0.00351506,
+      "max_normal_vector_error": 0.00343126
+    },
+    "affine": {
+      "role_samples": 4263,
+      "max_role_error": 0.00346583,
+      "max_normal_vector_error": 0.0035171
+    },
+    "v0": {
+      "role_samples": 4350,
+      "max_role_error": 0.00358576,
+      "max_normal_vector_error": 0.00343126
+    },
+    "detached": {
+      "role_samples": 4480,
+      "max_role_error": 0.00354928,
+      "max_normal_vector_error": 0.00346291
+    }
+  },
+  "identical_release_and_sanitizer_artifacts_sha256": {
+    "retopology-mtoon-plain/mtoon-before.dsculpt": "ab48b5c07efc175176a0fce6761f84a9083342b1c547e5588537f84d44d6323e",
+    "retopology-mtoon-plain/mtoon-retopo.dsculpt": "68490faa6547f69dc5378e1a3ee8ae8d45d794df92f8d51003bd9607ef87273e",
+    "retopology-mtoon-plain/mtoon-portable.glb": "634713d9c499aff60771fbca16151ac898cf2b2e38be0fc384097c65c60c456f",
+    "retopology-mtoon-plain/mtoon-retopo.glb": "0630d13db0f463eff2e4ef0e3d763f7db12ee59d142324520027e5412aa281d0",
+    "retopology-mtoon-affine/mtoon-before.dsculpt": "132a444fab977377744da17fd7f386f8a19b3efdb75deaaaf254249bb7392328",
+    "retopology-mtoon-affine/mtoon-retopo.dsculpt": "cfc69a77c0bbcbef56e65db983dfdeafe97864776fc009f80bcff2f43303b28a",
+    "retopology-mtoon-affine/mtoon-portable.glb": "7f378cc2dfd7724313b3cd33b204e42bb72d632a589580432a1b151f05972a17",
+    "retopology-mtoon-affine/mtoon-retopo.glb": "20a401da6897b125c9c2d8f6e6ed163b6018d58341412d79cdb6ba2d529de9c6",
+    "retopology-mtoon-v0/mtoon-before.dsculpt": "49f9b18e48c55b816f665280fc4b665403dc390f5c9cc6257e9e123c7e10b7fc",
+    "retopology-mtoon-v0/mtoon-retopo.dsculpt": "5d6560ad6c1045552f1d4ae64ecda9b0ec7578a5d49899613cca8c22d0444f29",
+    "retopology-mtoon-detached/mtoon-before.dsculpt": "5f3bf8979fe3cf157f7c3951419e6ccbc07aec0bb42766f24fe13fdb31a474a2",
+    "retopology-mtoon-detached/mtoon-retopo.dsculpt": "01fbe20eb6cbfd3da3220abc7af5f1ba0ee81fc9433daaa39a46599422ec0c4c",
+    "retopology-mtoon-detached/mtoon-portable.glb": "49d8e2c6eded901b23a519ba398399b3cc4f2e4bfc1a0cf953a7537137995f8c",
+    "retopology-mtoon-detached/mtoon-retopo.glb": "86167bf211433a3462a1b485f64fcd3f46283a22fdfd44f0b4ec780c7fae24ca"
+  },
+  "renderers": {
+    "arc": {
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "affected_legacy_shadow_pixels": 290,
+      "maximum_channel_difference_8bit": 41,
+      "unpainted_control_identical": true,
+      "stereo_differing_components_per_eye": [
+        15584,
+        15548
+      ],
+      "stereo_submissions_per_project": 6,
+      "stereo_exact_ordered_close": true
+    },
+    "software": {
+      "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+      "affected_legacy_shadow_pixels": 294,
+      "maximum_channel_difference_8bit": 41,
+      "unpainted_control_identical": true,
+      "stereo_differing_components_per_eye": [
+        15421,
+        15366
+      ],
+      "stereo_submissions_per_project": 6,
+      "stereo_exact_ordered_close": true
+    }
+  },
+  "physical_headset": false,
+  "imported_mtoon_open_regression": {
+    "tested_revisions": [
+      "d12c59f31e4745137be2c4285d863af83f0ba4d6",
+      "fa6cf9f0e9d6bb5e4b378e2523980d5c910ecbb0"
+    ],
+    "probe_observations": [
+      "ORIGINAL 1 has_typed_material=1",
+      "RESULT has_typed_material=0 texture_atlas=512"
+    ]
+  },
+  "khronos": {
+    "validator": "2.0.0-dev.3.10",
+    "results": [
+      {
+        "file": "imported-mtoon1.glb",
+        "issues": {
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 1,
+          "numHints": 9,
+          "messages": [
+            {
+              "code": "UNSUPPORTED_EXTENSION",
+              "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_materials_mtoon'.",
+              "severity": 2,
+              "pointer": "/extensionsUsed/2"
+            },
+            {
+              "code": "BUFFER_VIEW_TARGET_MISSING",
+              "message": "bufferView.target should be set for vertex or index data.",
+              "severity": 3,
+              "pointer": "/meshes/0/primitives/0/attributes/COLOR_0"
+            },
+            {
+              "code": "BUFFER_VIEW_TARGET_MISSING",
+              "message": "bufferView.target should be set for vertex or index data.",
+              "severity": 3,
+              "pointer": "/meshes/0/primitives/0/attributes/NORMAL"
+            },
+            {
+              "code": "BUFFER_VIEW_TARGET_MISSING",
+              "message": "bufferView.target should be set for vertex or index data.",
+              "severity": 3,
+              "pointer": "/meshes/0/primitives/0/attributes/POSITION"
+            },
+            {
+              "code": "BUFFER_VIEW_TARGET_MISSING",
+              "message": "bufferView.target should be set for vertex or index data.",
+              "severity": 3,
+              "pointer": "/meshes/0/primitives/0/attributes/TANGENT"
+            },
+            {
+              "code": "BUFFER_VIEW_TARGET_MISSING",
+              "message": "bufferView.target should be set for vertex or index data.",
+              "severity": 3,
+              "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+            },
+            {
+              "code": "BUFFER_VIEW_TARGET_MISSING",
+              "message": "bufferView.target should be set for vertex or index data.",
+              "severity": 3,
+              "pointer": "/meshes/0/primitives/0/indices"
+            },
+            {
+              "code": "BUFFER_VIEW_TARGET_MISSING",
+              "message": "bufferView.target should be set for vertex or index data.",
+              "severity": 3,
+              "pointer": "/meshes/0/primitives/0/targets/0/NORMAL"
+            },
+            {
+              "code": "BUFFER_VIEW_TARGET_MISSING",
+              "message": "bufferView.target should be set for vertex or index data.",
+              "severity": 3,
+              "pointer": "/meshes/0/primitives/0/targets/0/POSITION"
+            },
+            {
+              "code": "BUFFER_VIEW_TARGET_MISSING",
+              "message": "bufferView.target should be set for vertex or index data.",
+              "severity": 3,
+              "pointer": "/meshes/0/primitives/0/targets/0/TANGENT"
+            }
+          ],
+          "truncated": false
+        },
+        "sha256": "a0b10396c6aed7c590871e75e49dd3d6210969c96ad29f8f755e8a48c1df242b"
+      },
+      {
+        "file": "release/retopology-mtoon-plain/mtoon-portable.glb",
+        "issues": {
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 13,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNSUPPORTED_EXTENSION",
+              "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_materials_mtoon'.",
+              "severity": 2,
+              "pointer": "/extensionsUsed/1"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/3"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/4"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/5"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/6"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/8"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/10"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/11"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/12"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/13"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/14"
+            },
+            {
+              "code": "IMAGE_NPOT_DIMENSIONS",
+              "message": "Image has non-power-of-two dimensions: 9x8.",
+              "severity": 2,
+              "pointer": "/images/4"
+            },
+            {
+              "code": "IMAGE_NPOT_DIMENSIONS",
+              "message": "Image has non-power-of-two dimensions: 96x8.",
+              "severity": 2,
+              "pointer": "/images/11"
+            }
+          ],
+          "truncated": false
+        },
+        "sha256": "634713d9c499aff60771fbca16151ac898cf2b2e38be0fc384097c65c60c456f"
+      },
+      {
+        "file": "release/retopology-mtoon-plain/mtoon-retopo.glb",
+        "issues": {
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 7,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNSUPPORTED_EXTENSION",
+              "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_materials_mtoon'.",
+              "severity": 2,
+              "pointer": "/extensionsUsed/1"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/15"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/3"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/4"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/5"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/6"
+            },
+            {
+              "code": "IMAGE_NPOT_DIMENSIONS",
+              "message": "Image has non-power-of-two dimensions: 9x8.",
+              "severity": 2,
+              "pointer": "/images/4"
+            }
+          ],
+          "truncated": false
+        },
+        "sha256": "0630d13db0f463eff2e4ef0e3d763f7db12ee59d142324520027e5412aa281d0"
+      },
+      {
+        "file": "release/retopology-mtoon-affine/mtoon-portable.glb",
+        "issues": {
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 13,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNSUPPORTED_EXTENSION",
+              "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_materials_mtoon'.",
+              "severity": 2,
+              "pointer": "/extensionsUsed/1"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/3"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/4"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/5"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/6"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/8"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/10"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/11"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/12"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/13"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/14"
+            },
+            {
+              "code": "IMAGE_NPOT_DIMENSIONS",
+              "message": "Image has non-power-of-two dimensions: 9x8.",
+              "severity": 2,
+              "pointer": "/images/4"
+            },
+            {
+              "code": "IMAGE_NPOT_DIMENSIONS",
+              "message": "Image has non-power-of-two dimensions: 96x8.",
+              "severity": 2,
+              "pointer": "/images/11"
+            }
+          ],
+          "truncated": false
+        },
+        "sha256": "7f378cc2dfd7724313b3cd33b204e42bb72d632a589580432a1b151f05972a17"
+      },
+      {
+        "file": "release/retopology-mtoon-affine/mtoon-retopo.glb",
+        "issues": {
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 7,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNSUPPORTED_EXTENSION",
+              "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_materials_mtoon'.",
+              "severity": 2,
+              "pointer": "/extensionsUsed/1"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/15"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/3"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/4"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/5"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/6"
+            },
+            {
+              "code": "IMAGE_NPOT_DIMENSIONS",
+              "message": "Image has non-power-of-two dimensions: 9x8.",
+              "severity": 2,
+              "pointer": "/images/4"
+            }
+          ],
+          "truncated": false
+        },
+        "sha256": "20a401da6897b125c9c2d8f6e6ed163b6018d58341412d79cdb6ba2d529de9c6"
+      },
+      {
+        "file": "release/retopology-mtoon-detached/mtoon-portable.glb",
+        "issues": {
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 13,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNSUPPORTED_EXTENSION",
+              "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_materials_mtoon'.",
+              "severity": 2,
+              "pointer": "/extensionsUsed/1"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/3"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/4"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/5"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/6"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/8"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/10"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/11"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/12"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/13"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/14"
+            },
+            {
+              "code": "IMAGE_NPOT_DIMENSIONS",
+              "message": "Image has non-power-of-two dimensions: 9x8.",
+              "severity": 2,
+              "pointer": "/images/4"
+            },
+            {
+              "code": "IMAGE_NPOT_DIMENSIONS",
+              "message": "Image has non-power-of-two dimensions: 96x8.",
+              "severity": 2,
+              "pointer": "/images/11"
+            }
+          ],
+          "truncated": false
+        },
+        "sha256": "49d8e2c6eded901b23a519ba398399b3cc4f2e4bfc1a0cf953a7537137995f8c"
+      },
+      {
+        "file": "release/retopology-mtoon-detached/mtoon-retopo.glb",
+        "issues": {
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 7,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNSUPPORTED_EXTENSION",
+              "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_materials_mtoon'.",
+              "severity": 2,
+              "pointer": "/extensionsUsed/1"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/15"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/3"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/4"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/5"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/6"
+            },
+            {
+              "code": "IMAGE_NPOT_DIMENSIONS",
+              "message": "Image has non-power-of-two dimensions: 9x8.",
+              "severity": 2,
+              "pointer": "/images/4"
+            }
+          ],
+          "truncated": false
+        },
+        "sha256": "86167bf211433a3462a1b485f64fcd3f46283a22fdfd44f0b4ec780c7fae24ca"
+      }
+    ]
+  },
+  "archive_sha256": "96ace25546d04d711e303939c770fe328a99825e2fcac4b705a0c08f067e1eb8",
+  "archive_members_sha256": {
+    "record.py": "7874a0e0eede754667c6df307babb69fcd3e549a5ca16e3e727edb5a7920fb48",
+    "baseline-fixture.log": "1e84765cf822846fac7b2fe566761da90dab664cbec5a2e4415e81e19ee5c5de",
+    "check.sh": "ea1960c38f78e9ce282ea2a853332afc5f8c5716c1dc1be228202d54144c6e7d",
+    "release-build.log": "e0965021fd4397e8bcc85e88f715a59fe50bf43e69d0b8f50860d3bf1909b059",
+    "release-tests.log": "9c93ff77c616d569add06adc8ee7df830b052e0e62c9ae6576e134adf92618c5",
+    "check-incremental-asan.py": "9208f46792b894501a498cbe4658681326c567279d630b713ce9ffd55736790a",
+    "incremental-asan.log": "1fa3dd828d559cb1c94879bdf57294c5665175abe9d2d8e37730539c9c2ca6ac",
+    "imported-probe.cpp": "058417b913a17de4bf4a7dcbe34c23682ba5eac1a2b1f7b3c823d7cd2e7e85d8",
+    "imported-probe.py": "948eb24c342a8a6ebaff6b2ad553625c12bea519c3a72131f686cb1e8028aeac",
+    "imported-probe.log": "7d81323c51d6024dde807060626028b5e024bf49a0e83b86e4be591767a93c71",
+    "imported-probe-current.log": "7d81323c51d6024dde807060626028b5e024bf49a0e83b86e4be591767a93c71",
+    "imported-mtoon1.glb": "a0b10396c6aed7c590871e75e49dd3d6210969c96ad29f8f755e8a48c1df242b",
+    "render-shade.cpp": "077174ca95fb25176cbf6dbf46544903718012115dcb360897100b009964de59",
+    "render-shade.py": "e6779cd6e7aacdfa0a2fef91afb576ec9c99ca22009db9442f88f9f4f0e60188",
+    "run-render.py": "fcc24ae3e444e9da93d6ef71186b2b57e6570a147d6903124039b7184c86f260",
+    "xr-shade.py": "3877514dd3ffd97c1222cb9d010692bbb02524d7da518f913afe79d790cc256e",
+    "khronos.cjs": "524e2f35f615478533605a15091213b5975c7306dc32394b812e2682b70fd2c2",
+    "khronos.json": "2bbde5c1c35afa84feeb2c7f75d1900438e33b44bcb5c4bb762697a8fcc084cd",
+    "khronos.log": "f34729dceee9fbfde72253c2db309f51f8ff4abf236461d31852beecdbfb3014",
+    "retopology-mtoon-plain-controls.log": "ff11eb6ea887f35d091cee05af75a6b63561b5144990834cab902e5f811aa7d2",
+    "retopology-mtoon-affine-controls.log": "426d74d6c381b1e642766846877ef9eb600c1c46917cf7c775c70d4bdf3efde7",
+    "retopology-mtoon-v0-controls.log": "3cc32cff8de4a0a461adad62109ccbd4c5b221de2e9b521854c080c0c697db3f",
+    "retopology-mtoon-detached-controls.log": "dc82d6d172870856aa1785cbe4bc5b8e4cd2de9eab6735b04d57ceb2f676fb8c",
+    "asan-build.log": "80373246eb2f27fb964a62bdbbfbf3e8f6e9b58d6da10f3bf1c9ff8d06684aeb",
+    "asan-tests.log": "49d4339d9e15bbe54224c14ef842f6735759d169c1018e9171570e025933ad0e",
+    "render-shade-arc.log": "76fe2241e27d38fee77e2427de8f8858777496197b980aff3af0262b98ddb862",
+    "xr-arc-shade/compare.json": "cac0424970c447490a07708f7ba92e1f1b907edddb902d6471cf88bb7270e134",
+    "verified-shade-arc.log": "4c268f6fab409818c2ac89e0af7ce08dc00a942e2032e9026609b29d6f5e6084",
+    "render-shade-software.log": "14f752db616bdea9be1fa51dfe0134092e16b2b52ed1dfb550654647fc69c215",
+    "xr-software-shade/compare.json": "c4d986548ff6e0982fe2c1dc34ee2ee3069aa8754c53a7506d8fcb4cddaf674e",
+    "verified-shade-software.log": "9b0262131591b0ab2b99643af9be49c9da618ff760314df9c8ef59a5893e6492"
+  },
+  "asan_ubsan_ninja": {
+    "tests": [
+      "retopology-first-material-affine",
+      "retopology-first-material-posed-affine",
+      "retopology-first-material-posed-plain",
+      "retopology-first-material-plain",
+      "retopology-imported-prior-bake",
+      "retopology-imported-pbr",
+      "native-mikk-export",
+      "retopology-mtoon-v0",
+      "retopology-mtoon-plain",
+      "retopology-mtoon-affine",
+      "retopology-mtoon-detached"
+    ],
+    "instrumented_binary_sha256": "cf9ecfc66d5ad6134abf1f1e2b46544bf36c6cc1e9def29a20456be062e91d69"
+  }
+}
