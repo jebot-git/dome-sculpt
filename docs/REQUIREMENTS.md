@@ -303,9 +303,16 @@ constant radiance from immutable tile values and still measures every varying
 coverage footprint. CPU and Intel Arc produce the same project and exact
 reconstruction errors as the previous high-budget run. Ordered Save, cold
 Open, Undo and Redo retain the accepted project and the original paint.
-The 1024 destination, broader dense stacks and physical-input qualification
-remain required.
 [Default full-size reduction validation](validation/paint-grid-fullsize-reduce-20261127.json)
+
+A present common paint tile with untouched bytes can now share an immutable
+owner while retaining independently authored FLOAT coverage and radiance.
+Local color edits detach that owner, and cancel and history restore it. Legacy
+project bytes and the physical-emission fallback remain exact. The full 2048
+case also reduces to 1024 within the standard limits and the GPU preview
+uploads its common tile once. Mixed dense color and FLOAT workloads, larger
+layer stacks and physical-input qualification remain required.
+[Shared common paint validation](validation/paint-grid-fullsize-half-20261127.json)
 
 Native multi-material retopology preserves independently painted and baked
 grids and original VRM 1.0 joint links when Apply changes the patch.

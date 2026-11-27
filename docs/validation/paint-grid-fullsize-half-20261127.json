@@ -1,0 +1,285 @@
+{
+  "utc": "2026-11-27T21:08:39.867076+00:00",
+  "product": "930718f253fc880a88ec67d5964cae17e85428c9",
+  "parent": "5f9b49444bcdf6d8e937d859c79e0a090bf08528",
+  "DomeD": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "toolkits": {
+    "FLTK": "/opt/fltk-vr/toolkit",
+    "BDF": "/opt/fltk-vr/bdf-runtime",
+    "oneAPI": "DPC++ 7.2.0"
+  },
+  "limits": {
+    "maximum_work": 128000000,
+    "maximum_bytes": 268435456,
+    "field_retention": 134217728
+  },
+  "shared_common": {
+    "source_resolution": 2048,
+    "common_slots": 4096,
+    "unique_shared_common_owners": 1,
+    "source_bytes_previous": 75694080,
+    "source_bytes": 16973824,
+    "original_project_sha256": "432656673567bda902328bb7bc5c2b82d8fca4078147daf8dff48ea39ed80650"
+  },
+  "native_release": {
+    "cpu": {
+      "resize": {
+        "passed": 25,
+        "junit_sha256": "8b2a0c930c3a101a6db9c7bdee33a35b804ca3ce5a3ef2c2944e7e28c146b37a"
+      },
+      "adjacent": {
+        "passed": 9,
+        "junit_sha256": "2f25935f50805e5afeb7ad1a652cddd70202833a1262330e632650b5d1f2bddc"
+      },
+      "ownership": {
+        "passed": 3,
+        "junit_sha256": "be4ecfa76dd62cffb48a2b4927c36860699ff0cc76ce82aa250471f74b5f4fa4"
+      },
+      "default_reductions": {
+        "512": {
+          "work": 92547528,
+          "peak_bytes": 201718500,
+          "filter_samples": 4194304,
+          "report_sha256": "985da20f0ed55bd8ddb34fa045b6bfde812bd9004010cffa85ee347209d9f5a7",
+          "project_sha256": "7b3f28fe0f773b49e48c1ec57a4e3f1d2e0af9873398659036dba086b921fb46"
+        },
+        "1024": {
+          "work": 118493664,
+          "peak_bytes": 250594788,
+          "filter_samples": 4194304,
+          "report_sha256": "ab1a46082d1dbbfe48d900bf4a70e9a5ab69017e489c6985709a046ee366ef44",
+          "project_sha256": "ccdc2e57c013d052e26aace9537b8db2db66948210462f2e8c7375b979a55876"
+        }
+      },
+      "app_sha256": "ac3132b8c0be12b696723eca90fdb1219384ba3c9fdca72f8f5f238122839356"
+    },
+    "oneapi": {
+      "resize": {
+        "passed": 26,
+        "junit_sha256": "5e58b3050262992d47d9ddd8a3280fc05ec9bbd9119560a9eae1de052b3d4914"
+      },
+      "adjacent": {
+        "passed": 9,
+        "junit_sha256": "4178a81f43b57b081e26c64d417b2500edf55b673bf3ce98faa57b864628e491"
+      },
+      "ownership": {
+        "passed": 3,
+        "junit_sha256": "c8b1a6e4f6ecbb3864f8cc1cba4935aab96c07d3897eafe2e0799d703d97ac9a"
+      },
+      "default_reductions": {
+        "512": {
+          "work": 92547528,
+          "peak_bytes": 207490526,
+          "filter_samples": 4194304,
+          "report_sha256": "c6f9778bb2f552cee4fcf538fdd3d164b53c45dbebcc15ed4d8f4d5e3e83f588",
+          "project_sha256": "7b3f28fe0f773b49e48c1ec57a4e3f1d2e0af9873398659036dba086b921fb46",
+          "filter": {
+            "submissions": 256,
+            "trace_sha256": "fe6ed507f22fe5ac72644fb440e6b7c2176773c799dc3c83f9964abce8a9e7da"
+          }
+        },
+        "1024": {
+          "work": 118493664,
+          "peak_bytes": 250594788,
+          "filter_samples": 4194304,
+          "report_sha256": "ab1a46082d1dbbfe48d900bf4a70e9a5ab69017e489c6985709a046ee366ef44",
+          "project_sha256": "ccdc2e57c013d052e26aace9537b8db2db66948210462f2e8c7375b979a55876",
+          "filter": {
+            "submissions": 1024,
+            "trace_sha256": "aedf59b83a5ecc179a59bb2855fcf3130229991bd6f7167e8bbd653e1e138fed"
+          }
+        }
+      },
+      "app_sha256": "eb28a17e7d17736136b3eb508fac2374ba73b905b2f782f1ed2e292be3eaf1d1"
+    }
+  },
+  "strict_ASan_UBSan": {
+    "fullsize": {
+      "log_sha256": "bee1003332fe6a911b6ea243dee3968368c5bb4d3cc03aa9e6b0a6fc1fde3b78",
+      "last_line": "Full-size retained paint bytes 16973824"
+    },
+    "painted": {
+      "log_sha256": "094bf9ff3d47d5f060765571862774342eb06fe0b269ff1a580bd6e9f1bf501e",
+      "last_line": "PASS Dense reduction preserves exact ordered Save, cold Open and history"
+    },
+    "baked": {
+      "log_sha256": "8930db7702553dd43c5d99908932af6c9535f3cf9693da0dccdf9261fd42c794",
+      "last_line": "PASS The default quality guard refuses a reduction that would erase sharp normal detail"
+    },
+    "retained": {
+      "log_sha256": "d138f5847b76ad558a3b31f0f43ee90b652bb647204f11c0360aac03a1eb8b20",
+      "last_line": "PASS Bake after cold reopen uses the new writable grid and retained native normal frame"
+    },
+    "baked-emission-native": {
+      "log_sha256": "875a8a141978fff9cd39a8d34ff37e89f40b9f785aacaa01da706d522bbd63f1",
+      "last_line": "Native baked emission 69 checks PASS"
+    },
+    "affine": {
+      "log_sha256": "6f6036581f12f0c89ed1851ed80097b4c9b16c102500e9d768ecf57892e466e7",
+      "last_line": "PASS 779 native polygon grid and normal Bake checks"
+    }
+  },
+  "earlier_projects_byte_identical": {
+    "native-authored-paint-resolution/dense-native-512.dsculpt": "f2d10b67287f7ff776ebb4daf393f98f452639554c034ec5d62c5c16b5c92076",
+    "native-authored-paint-resolution/dense-visible-512.dsculpt": "9a1cf1b919abd6ca84574d9bf15b80aa0619c0467e01eb11c240130b7f5fdae4",
+    "native-baked-paint-resolution/native-ldr-bake64.dsculpt": "2dff5d83ae7df5ba543936bb6b4483c61d035656d6b129ce3bd83c613e1d2edb",
+    "native-baked-paint-resolution/native-float-bake64.dsculpt": "96a22a10cc0e6d2a9541236456664c1578e008bdcb3510189df63c36dd6f28df"
+  },
+  "preview_previous_bytes": 436243456,
+  "OpenGL_preview": {
+    "software": {
+      "compared_coefficients": 16777216,
+      "maximum_relative_error": 5.96037e-08,
+      "GPU_preview_bytes": 369200128,
+      "common_uploads": 1,
+      "log_sha256": "71c206d0bf59d5f10cc8a9d886950f7295f609da34b0f86f7a198b7373a556c6"
+    },
+    "arc": {
+      "compared_coefficients": 16777216,
+      "maximum_relative_error": 5.96037e-08,
+      "GPU_preview_bytes": 369200128,
+      "common_uploads": 1,
+      "log_sha256": "c837495bd71db82d3e976999418848d66dc0f6e47b1117454e0dd50b400d7763"
+    }
+  },
+  "GPU_fence_replay": {
+    "predecessor": "ab918a1f3a4f4900f4d1ac620c021a9690c0befc",
+    "previous_failure_sha256": "0d8ccb7715531db930ac11a88cdd245602816ceee62b216ba41e53d29989211c",
+    "fixed_repeated_software": [
+      "12c91bbcf78e57e20371f4ec8b242a29029d4072e9d2ad25068cbaa032cf6d1c",
+      "12c91bbcf78e57e20371f4ec8b242a29029d4072e9d2ad25068cbaa032cf6d1c",
+      "12c91bbcf78e57e20371f4ec8b242a29029d4072e9d2ad25068cbaa032cf6d1c"
+    ],
+    "fixed_actual_Arc_sha256": "4a57a2f113ed30a17d03bfda7a7bf4b2a3e695d7677f987a8dc42807667d5660"
+  },
+  "nested_DomeD_Wayland": {
+    "target": 1024,
+    "checks": 12,
+    "report_sha256": "55800c6ed88913294a4de60e553d195eef4692e15f8d7128a16f41912b191819",
+    "dispatch": {
+      "submissions": 1025,
+      "trace_sha256": "38772f4121f24e5e88498acc5a2f4dba08b287ccca23f1bab75818bbd98b3f14"
+    }
+  },
+  "Arc_synthetic_OpenXR": {
+    "target": 1024,
+    "checks": 12,
+    "balanced_frames": 771,
+    "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+    "report_sha256": "4e0075beb3f92a52ff3d03b799c7adac4e179d3c62b0588a8b9f65ad533e3b58",
+    "dispatch": {
+      "submissions": 1025,
+      "trace_sha256": "9ce487cd933c61e8a2d1a0355e2f7b90adb3300e8b42065c18c7c5f3e01c078f"
+    }
+  },
+  "diagnostic": {
+    "exact_sub_UNORM8": {
+      "512": {
+        "layer_filter_and_quality": 37755008,
+        "raster": 5767240,
+        "overlay": 49025280,
+        "charged_peak_bytes": 201718500
+      },
+      "1024": {
+        "layer_filter_and_quality": 37748120,
+        "raster": 23068744,
+        "overlay": 57676800,
+        "charged_peak_bytes": 250594788
+      }
+    },
+    "mixed_dense_color_and_FLOAT": {
+      "512": {
+        "layer_filter_and_quality": 134215945,
+        "raster": 5767240,
+        "overlay": 98046208,
+        "charged_peak_bytes": 260438748
+      },
+      "1024": {
+        "layer_filter_and_quality": 134222082,
+        "raster": 23068744,
+        "overlay": 115348480,
+        "charged_peak_bytes": 309315036
+      }
+    },
+    "default_refusal_mixed_resize": "Texture-set resolution exceeds its complete peak-byte budget",
+    "default_refusal_dense_second_layer": "Paint storage budget exceeded"
+  },
+  "vendor_on_previous_product": {
+    "cuda": {
+      "missing_device": {
+        "passed": 1,
+        "junit_sha256": "821f6b06f1a588343231f06cbe168fd4d4137827b819f7cd0971b38ab44c6824"
+      },
+      "app_sha256": "e2048d673bf3f2a54ff1cbd790cb6f32a775b07a9dd8ff83b6dea13efacc0840"
+    },
+    "rocm": {
+      "missing_device": {
+        "passed": 1,
+        "junit_sha256": "dcf3915ca7764b91f8c8d104c396af8344bd52e06aeb3f51cffd32391e467faf"
+      },
+      "app_sha256": "eba5f4d0147583c05d1ea3c7bd00f08373b7564cd44283f0874e2742bd676975"
+    }
+  },
+  "vendor_exact_jobs": {
+    "cuda": {
+      "status": {
+        "ActiveState": "inactive",
+        "SubState": "dead",
+        "InvocationID": "",
+        "Result": "success",
+        "ExecMainStatus": "0"
+      },
+      "missing_device": {
+        "passed": 1,
+        "junit_sha256": "5ad9a68f8dcbf8040cc1c98449a1b06d7a6f5fda0af3991c715b511338e9984b"
+      },
+      "application_sha256": "87aa616993da3d72bf2f34dc70360333e9b26de3ba083f5a9eb0cade3b3abc92",
+      "log_sha256": "73943271aee0ea3568d17afbb924f1c639bb35b9342ce63dbd1925ff777f7559"
+    },
+    "rocm": {
+      "status": {
+        "ActiveState": "inactive",
+        "SubState": "dead",
+        "InvocationID": "",
+        "Result": "success",
+        "ExecMainStatus": "0"
+      },
+      "missing_device": {
+        "passed": 1,
+        "junit_sha256": "f52507c27be325a3d58ff02692b2ddeeb0014893dd3e66362180ecd64eb26c20"
+      },
+      "application_sha256": "21ca2f3235a140cc60bd31281d39ecd6c318622acbe248e6fb10e370f4719c16",
+      "log_sha256": "28243e300a90d62f80a25ca3c2f7efa856e1655aa4e74f32e27cff4907a5a3aa"
+    }
+  },
+  "full_release_in_progress": {
+    "ds-full-release-paint-ctest-20261127.service": {
+      "registered": 1438,
+      "passed_at_capture": 1216,
+      "status": {
+        "ActiveState": "active",
+        "SubState": "running",
+        "InvocationID": "1334762ea6bf4947b07a3b5211d43417",
+        "Result": "success",
+        "ExecMainStatus": "0"
+      }
+    },
+    "ds-fullsize-reduce-all-release-20261127.service": {
+      "observed": {
+        "candidate": "ab918a1f3a4f4900f4d1ac620c021a9690c0befc",
+        "terminal": false,
+        "invocation": "167a5531b97a4154a314ce348b739b08",
+        "phase": "resume frozen Release build from the existing compiler cache",
+        "elapsed_seconds": 1.857
+      },
+      "status": {
+        "ActiveState": "active",
+        "SubState": "running",
+        "InvocationID": "167a5531b97a4154a314ce348b739b08",
+        "Result": "success",
+        "ExecMainStatus": "0"
+      }
+    }
+  },
+  "scope": "Physical FLOAT paint with a default common plane. Two 2048 coarsening destinations, local color detachment and cancellation, historic wire replay, and exact GPU preview. Dense mixed channels, larger layer stacks and physical device workflows remain open."
+}

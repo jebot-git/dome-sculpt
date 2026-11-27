@@ -590,10 +590,8 @@ CPU and Arc both use 110,111,176 work units, down from 241,958,472 on the
 previous diagnostic. The charged peak is 260,438,756 bytes on CPU and
 266,210,782 bytes with the Level Zero filter. Arc submits 256 kernel batches.
 The complete native project and all reconstruction errors match the previous
-high-budget run. The 1024 result also matches exactly with diagnostic limits.
-It still exceeds the default peak-byte budget and requires 138,416,608 work
-units. Larger destination sizes, broader dense stacks and physical headset
-acceptance remain open.
+high-budget run. At this checkpoint the 1024 result also matched exactly under
+diagnostic limits, with 138,416,608 work units.
 
 Nested DomeD Wayland uses the universal menu and FLTK dialog to verify Cancel,
 Apply, Save, Undo and Redo. The synthetic runtime drives the normal OpenXR
@@ -609,6 +607,40 @@ in progress at capture. The all-target Release build for this exact product
 revision started under `ds-fullsize-reduce-all-release-20261127.service`.
 It will run the full suite after the earlier frozen sweep exits.
 [Default full-size reduction validation](validation/paint-grid-fullsize-reduce-20261127.json)
+
+Present common paint tiles with untouched bytes now share one immutable
+owner. Archive presence, FLOAT coverage and the legacy fallback are preserved.
+A local color stroke detaches the common tile only where its bytes change.
+Cancel and Undo restore the original owner. Cold Open reuses the shared tile
+and reproduces the original native wire bytes. The fixture's retained field
+bytes fall from 75,694,080 to 16,973,824. The OpenGL preview uploads one common
+tile for the 4,096 FLOAT tiles and uses 369,200,128 bytes, down from
+436,243,456. The independent preview passes all 16,777,216 FLOAT comparisons
+on llvmpipe and Intel Arc.
+
+The 2048-to-1024 reduction of this layer fits the unchanged limits with
+118,493,664 work units and a charged peak of 250,594,788 bytes on CPU and Arc.
+The 512 result remains exact. Both destination projects and all reconstruction
+errors match the historical diagnostic results. The mixed dense color/FLOAT
+fixture still needs 272,639,306 work units and 309,315,036 bytes for 1024.
+Its layer filtering and quality phase accounts for 134,222,082 work units.
+The second dense layer reaches the field-retention guard. Mixed full-size
+stacks and physical headset acceptance remain open.
+
+The adjacent preview regression exposed a slot-retention bug after a GPU
+fence finished. The fixture reproduces the failure on `ab918a1f` by completing
+the first four resolves before adding a fifth object. The planner now keeps
+native input owners for all selected objects while it stages a new resolve.
+The real GL test verifies one GPU-side buffer copy, one upload for the new
+slot, and exact later resolves for each old input without reuploads.
+
+Nested DomeD Wayland and synthetic OpenXR complete Apply, Save, Undo and Redo
+at 1024. Each runs the selected Arc kernel and writes the same native project.
+The optimized builds pass 37 focused CPU tests and 38 oneAPI tests. Six native
+ASan/UBSan workflows pass. The current CUDA and ROCm application builds both
+pass the missing-device regression. Positive NVIDIA and AMD execution and
+physical headset workflows remain open.
+[Shared common paint validation](validation/paint-grid-fullsize-half-20261127.json)
 
 Retopology reapply now works on native multi-material accessories attached
 to original VRM 1.0 joints. The replacement keeps its avatar hierarchy and
