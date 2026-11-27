@@ -181,6 +181,26 @@ after projects on Intel Arc A770 and llvmpipe. Imported prepared texture sets,
 live UV animation transfer, and broader portable painted MToon remain open.
 [Typed MToon retopology validation](validation/retopology-typed-material-20261127.json)
 
+Standard and Editable GLB now carry explicit tangents for static native
+MToon 1 normal maps when the placed vertex frames reproduce the viewport's UV
+derivative frame throughout each triangle. The exporter checks interpolation
+and handedness, including on mirrored UVs and under positive shear. It keeps
+the original normal image and scale. Each material primitive only receives
+its own tangent stream, so an adjacent canonical PBR Bake can coexist with
+a toon material that still needs client-generated tangents. Reflected node
+placement, transformed or rotating normal UVs, deformation, and incompatible
+smooth frames retain the existing implicit export path. The native project
+keeps the original material and geometry in either export mode.
+All 41 distinct Release tests and four ASan/UBSan workflows pass, with
+22 native and GLB artifacts byte-identical between builds. The independent
+reader measured a maximum direction-vector error of 7.57e-7 over 6,120
+front and back comparisons. Khronos and the official MToon schemas report
+zero errors on 18 GLBs. The 14 explicit-tangent exports, including both
+retopology placements from the preceding milestone, report zero warnings.
+Synthetic OpenXR renders the native and Editable GLB reopen identically
+on Intel Arc A770 and llvmpipe, with identical saved project bytes.
+[Portable MToon tangent validation](validation/mtoon-portable-tangent-20261127.json)
+
 Surface Heat also binds meshes after independent frame and shapekey
 authoring. Retention accounts for the actual POSITION correspondences,
 artist normals and tangents, writable paint, and prepared color and normal

@@ -1,0 +1,277 @@
+{
+  "product": "81f0943518e7a41fc9598eeef17cacf7df83d835",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "release_fltk": "/opt/fltk-vr/toolkit",
+  "release_test_runs": {
+    "final": 37,
+    "retained": 5
+  },
+  "release_tests": [
+    "authoring-native-normal-union",
+    "dome-sculpt-texture-set-export",
+    "dome-sculpt-texture-set-source-export",
+    "dome-sculpt-texture-set-surfaces",
+    "layered-normal-native",
+    "layered-normal-uv-native",
+    "native-paint32-fixture",
+    "retopology-affine",
+    "retopology-affine-openxr",
+    "retopology-affine-ui-fixture",
+    "retopology-affine-wire",
+    "retopology-authoring",
+    "retopology-authority-focus",
+    "retopology-authority-grab",
+    "retopology-caller-admission",
+    "retopology-held-admission",
+    "retopology-history-openxr-apply",
+    "retopology-history-openxr-cancel",
+    "retopology-input-admission",
+    "retopology-linked-vrm1",
+    "retopology-mixed-material",
+    "retopology-mtoon-affine",
+    "retopology-mtoon-plain",
+    "retopology-mtoon-v0",
+    "retopology-prepared-affine",
+    "retopology-prepared-plain",
+    "retopology-reapply-affine",
+    "retopology-reapply-plain",
+    "retopology-restore-affine",
+    "retopology-restore-plain",
+    "retopology-save-handoff",
+    "retopology-surface-heat-affine",
+    "retopology-surface-heat-plain",
+    "retopology-worker-accepted-publication",
+    "retopology-worker-faults",
+    "retopology-worker-reporter-recovery",
+    "texture-set-active-bake",
+    "texture-set-mtoon-derivative-tangent",
+    "texture-set-retained-shapekeys",
+    "texture-set-retained-skin",
+    "vrm1-retained-skinned-accessory"
+  ],
+  "strict_sanitizers": [
+    "ASan",
+    "UBSan"
+  ],
+  "strict_workflows": [
+    "derivative",
+    "mtoon-plain",
+    "mtoon-affine",
+    "prepared-affine"
+  ],
+  "strict_method": "Recompiled export and all dependent texture-set-export header translation units using generated ASan/UBSan CMake commands. Recompiled the final geometry compiler and independent reader, then relinked the matched archive and fixtures.",
+  "independent_cgltf_direction_comparisons": {
+    "plain-standard.glb": {
+      "max_direction_vector_error": 1.90828e-07,
+      "samples": 612
+    },
+    "plain-editable.glb": {
+      "max_direction_vector_error": 1.90828e-07,
+      "samples": 612
+    },
+    "affine-standard.glb": {
+      "max_direction_vector_error": 2.46208e-07,
+      "samples": 612
+    },
+    "affine-editable.glb": {
+      "max_direction_vector_error": 2.46208e-07,
+      "samples": 612
+    },
+    "flat-standard.glb": {
+      "max_direction_vector_error": 1.88486e-07,
+      "samples": 612
+    },
+    "flat-editable.glb": {
+      "max_direction_vector_error": 1.88486e-07,
+      "samples": 612
+    },
+    "slight-standard.glb": {
+      "max_direction_vector_error": 7.56885e-07,
+      "samples": 612
+    },
+    "slight-editable.glb": {
+      "max_direction_vector_error": 7.56885e-07,
+      "samples": 612
+    },
+    "mixed-standard.glb": {
+      "max_direction_vector_error": 2.46208e-07,
+      "samples": 612
+    },
+    "mixed-editable.glb": {
+      "max_direction_vector_error": 2.46208e-07,
+      "samples": 612
+    }
+  },
+  "release_asan_identical_sha256": {
+    "texture-set-derivative-tangent/plain-standard.glb": "b2f1c9c9de8723500420f56562b987c94b24f762508195215b21fd1e4e05a485",
+    "texture-set-derivative-tangent/plain-editable.glb": "445e85b97af9e95503e63af3401493c0109c19b6d7fce7f559dfb6c702c6a7b2",
+    "texture-set-derivative-tangent/affine-standard.glb": "20b65f95b770b5173a71f9ec72d13708dcb13809537d5a9d3c97d517ad16e7c3",
+    "texture-set-derivative-tangent/affine-editable.glb": "351f963d3c64c7fb98bb8270fb0b6c02fc5493362dca21430071a0953c0784ed",
+    "texture-set-derivative-tangent/flat-standard.glb": "d88f5a93e26d31eac6485e6b70fe595754b1cab139e3931da6ead79098a56a5c",
+    "texture-set-derivative-tangent/flat-editable.glb": "a6ab3d40041abcbba890a2f0a4cb5d194582dcfd69c73ad32e4b4b8cd17a5d75",
+    "texture-set-derivative-tangent/slight-standard.glb": "31e79c0c41a7634983133f4395c71cd4a17cf01fb0cb93440cf76692fe6899b4",
+    "texture-set-derivative-tangent/slight-editable.glb": "a3f0ff18caa69ac2369684a1d1e14e1973710ab4b411ada5177caf638ee83587",
+    "texture-set-derivative-tangent/mixed-standard.glb": "e6599fad0991e5cf91f9d16ff45080f3a2629ba46c7c4a917a606a663aa8b888",
+    "texture-set-derivative-tangent/mixed-editable.glb": "3ee3bdb6ac15051274901a6cd9e99ae8d97a2083dfd80ae8295e241beb5bddef",
+    "texture-set-derivative-tangent/reflected-standard.glb": "0dfa9ee43219eb80a0184c64d20588feea4f9c1d16f6953db168cf0d8293c395",
+    "texture-set-derivative-tangent/incompatible-standard.glb": "63ec2cef640327e46eed7f274dbe6b4825446e6b47e46ae3562668741dda6ae5",
+    "texture-set-derivative-tangent/rotated-standard.glb": "7d79e76a284b53449106d272db7ea94051749f3c8c16adfccd09d7810132c84d",
+    "texture-set-derivative-tangent/dynamic-standard.glb": "3e8cead98687a2258f352ac230bea02908a99b7dd4ba5a9be5cc187821379e31",
+    "retopology-mtoon-plain/mtoon-portable.glb": "db7915afcb556174833c51dd430b40f644aad30b6831e1ea41334eee765fb598",
+    "retopology-mtoon-plain/mtoon-retopo.glb": "63629f2fd79d24e84a7b12b07b7df2706ab5d287379990aa48f773f777c2ef32",
+    "retopology-mtoon-affine/mtoon-portable.glb": "9271bd1033c045d868020c2b33310c8cc2cccbe5803e6e19049974f9d69c48c1",
+    "retopology-mtoon-affine/mtoon-retopo.glb": "478caf405fbb8df2b41234718fa473838d482f213abf86bf442c6718e4367aa7",
+    "retopology-mtoon-plain/mtoon-before.dsculpt": "cd6429d8b66989161edb0d8e0ec78eaadbdda3709639ac1741f9d6b042a78d1e",
+    "retopology-mtoon-plain/mtoon-retopo.dsculpt": "53d4ed5d5d4493686442592adbe2542dfb89ddfb81dd345c50d3b463cf12f35b",
+    "retopology-mtoon-affine/mtoon-before.dsculpt": "68e972f0de5956e9ed7b86986449a1a69eab864459d1aad44e018ee4bb49e951",
+    "retopology-mtoon-affine/mtoon-retopo.dsculpt": "a2cb19c42cd9a2d4f7a224ca5961973957800377d0ebeaa9a724319be21c84b8"
+  },
+  "khronos_validator_version": "2.0.0-dev.3.10",
+  "khronos": {
+    "texture-set-derivative-tangent/plain-standard.glb": {
+      "explicit_tangents": true,
+      "errors": 0,
+      "warnings": []
+    },
+    "texture-set-derivative-tangent/plain-editable.glb": {
+      "explicit_tangents": true,
+      "errors": 0,
+      "warnings": []
+    },
+    "texture-set-derivative-tangent/affine-standard.glb": {
+      "explicit_tangents": true,
+      "errors": 0,
+      "warnings": []
+    },
+    "texture-set-derivative-tangent/affine-editable.glb": {
+      "explicit_tangents": true,
+      "errors": 0,
+      "warnings": []
+    },
+    "texture-set-derivative-tangent/flat-standard.glb": {
+      "explicit_tangents": true,
+      "errors": 0,
+      "warnings": []
+    },
+    "texture-set-derivative-tangent/flat-editable.glb": {
+      "explicit_tangents": true,
+      "errors": 0,
+      "warnings": []
+    },
+    "texture-set-derivative-tangent/slight-standard.glb": {
+      "explicit_tangents": true,
+      "errors": 0,
+      "warnings": []
+    },
+    "texture-set-derivative-tangent/slight-editable.glb": {
+      "explicit_tangents": true,
+      "errors": 0,
+      "warnings": []
+    },
+    "texture-set-derivative-tangent/mixed-standard.glb": {
+      "explicit_tangents": true,
+      "errors": 0,
+      "warnings": []
+    },
+    "texture-set-derivative-tangent/mixed-editable.glb": {
+      "explicit_tangents": true,
+      "errors": 0,
+      "warnings": []
+    },
+    "texture-set-derivative-tangent/reflected-standard.glb": {
+      "explicit_tangents": false,
+      "errors": 0,
+      "warnings": [
+        "MESH_PRIMITIVE_GENERATED_TANGENT_SPACE"
+      ]
+    },
+    "texture-set-derivative-tangent/incompatible-standard.glb": {
+      "explicit_tangents": false,
+      "errors": 0,
+      "warnings": [
+        "MESH_PRIMITIVE_GENERATED_TANGENT_SPACE"
+      ]
+    },
+    "texture-set-derivative-tangent/rotated-standard.glb": {
+      "explicit_tangents": false,
+      "errors": 0,
+      "warnings": [
+        "MESH_PRIMITIVE_GENERATED_TANGENT_SPACE"
+      ]
+    },
+    "texture-set-derivative-tangent/dynamic-standard.glb": {
+      "explicit_tangents": false,
+      "errors": 0,
+      "warnings": [
+        "MESH_PRIMITIVE_GENERATED_TANGENT_SPACE"
+      ]
+    },
+    "retopology-mtoon-plain/mtoon-portable.glb": {
+      "explicit_tangents": true,
+      "errors": 0,
+      "warnings": []
+    },
+    "retopology-mtoon-plain/mtoon-retopo.glb": {
+      "explicit_tangents": true,
+      "errors": 0,
+      "warnings": []
+    },
+    "retopology-mtoon-affine/mtoon-portable.glb": {
+      "explicit_tangents": true,
+      "errors": 0,
+      "warnings": []
+    },
+    "retopology-mtoon-affine/mtoon-retopo.glb": {
+      "explicit_tangents": true,
+      "errors": 0,
+      "warnings": []
+    }
+  },
+  "official_mtoon_schemas": 18,
+  "synthetic_openxr_native_vs_editable_glb": {
+    "arc": {
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "stereo_frames": [
+        6,
+        6
+      ],
+      "differing_rgb_components_per_eye": [
+        0,
+        0
+      ],
+      "native_and_editable_scene_reopen_exact": true
+    },
+    "software": {
+      "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+      "stereo_frames": [
+        6,
+        6
+      ],
+      "differing_rgb_components_per_eye": [
+        0,
+        0
+      ],
+      "native_and_editable_scene_reopen_exact": true
+    }
+  },
+  "physical_headset": false,
+  "full_earlier_release_revision": "71e3e6df",
+  "primary_specification": "https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#geometry",
+  "archive_sha256": "75318f1f216e218e694fb08393cb32af6c1efe1868c2d6267e10735549f23bee",
+  "archive_members_sha256": {
+    "release-final.log": "0b0672230b6383244fc758715227f545efea6f873ed1d9463929db9cab25ddce",
+    "release-derivative.log": "0f9c452596b1e038674205131243e6ae5605cdaee81867a0d3dcec542e44d58b",
+    "release-retained.log": "2508798b02a86dc27a7229d125a9db1ccc6719ba76aeea49f83cbd4426f7cac0",
+    "asan-build.log": "88de31a4265e9b741f042b069ea5022e11c74fad6d554eed0d1d22588e77bd21",
+    "xr-arc/compare.json": "230dadc7b3af77c14236cb70743fa40fc1db6a74eabc712047a5cf3aa465a279",
+    "xr-software/compare.json": "ce3f776b5e2a0ea3c5a042cb143bc64f099a897a631856f58fcd82d49e8e8021",
+    "xr-editable.py": "fc21077ce0bcd38913a6f9933f8449d13b7d9c257b61c435838cf0940e9668ee",
+    "khronos.json": "02f7f45a1ee70f03e91f2aa324b3fe1eda8f33e527e10f3c45abd1daeb79a133",
+    "khronos.cjs": "1a5390f8add9d3095823ffe38b255733ec618f87ebc8ce1f43a1e386115ca96e",
+    "schemas.json": "b83f5bf6746b99b9214495ed5d6415b5269ed354516ea32dbffbff3d9c1a1f87",
+    "asan-derivative.log": "0f9c452596b1e038674205131243e6ae5605cdaee81867a0d3dcec542e44d58b",
+    "asan-mtoon-plain.log": "b6c3723dc7d0aaa0a531898776f88fde914c1c526734289b6aa575e081b8f141",
+    "asan-mtoon-affine.log": "fd6004124f3573e08c0078604d40a1ae338b263462cb42737e2963a9621181a7",
+    "asan-prepared-affine.log": "bf6ce3f15f1432cee5afbbcf8e1d3fdf5f7debf4f9def0e38ef26df41bd421ae"
+  }
+}

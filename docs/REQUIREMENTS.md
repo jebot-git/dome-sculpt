@@ -124,6 +124,17 @@ control. Animated UV transport, incompatible two-sided normal frames,
 imported prepared sets and broader painted portable export remain open.
 [Typed MToon retopology evidence](validation/retopology-typed-material-20261127.json)
 
+Static native MToon 1 texture-set exports can now carry explicit per-corner
+tangents in Standard and Editable GLB. The compiler bounds the difference
+between interpolated exported frames and the original viewport derivative
+frame over the whole triangle. The typed normal image and scale stay exact.
+Mirrored UVs keep the correct handedness and positive affine placements
+retain their node transforms. Other material primitives retain their own
+canonical, retained or implicit basis. Reflected node placement, rotated
+normal UVs, more general smooth shading and deformation remain open for
+explicit tangent transport.
+[Portable MToon tangent evidence](validation/mtoon-portable-tangent-20261127.json)
+
 The current combined atlas and HDR cache source passes all 153 checks
 in both software Release and Intel Arc ASan/UBSan OpenXR replays. Its
 export is byte-identical across both profiles and independently validates
