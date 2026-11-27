@@ -745,6 +745,46 @@ void reduce_dense_native_grid(const std::filesystem::path &root) {
   verify(two_visible,true,"dense-visible");
 }
 
+void reduce_sparse_native_grid() {
+  Scene scene;
+  Mesh mesh;
+  mesh.positions={{0,0,0},{1,0,0},{1,1,0},{0,1,0}};
+  mesh.normals.assign(4,{0,0,1});
+  mesh.indices={0,1,2,0,2,3};
+  mesh.uv={{0,0},{1,0},{1,1},{0,1}};
+  auto paint=std::make_shared<PaintedMesh>(std::move(mesh),512);
+  scene.active().mesh_active=true;
+  scene.active().painted=paint;
+  const auto layer=paint->active_layer();
+  Brush brush;
+  brush.normal={0,0,1};
+  brush.radius=.075f;
+  brush.strength=.25f;
+  PaintSettings ink;
+  ink.channel=PaintChannel::Mask;
+  ink.front_only=false;
+  const auto stamp=[&](float x,float y,float mask) {
+    brush.from=brush.to={x,y,0};
+    ink.mask=mask;
+    paint->begin_stroke();
+    paint->stamp(brush,ink);
+    return paint->end_stroke();
+  };
+  check(stamp(.125f,.125f,.35f)&&stamp(.375f,.125f,.5f)&&
+        stamp(.875f,.125f,.65f)&&stamp(.625f,.375f,.8f),
+        "Sparse reduction authors two adjacent tiles, a gap and a separate row");
+  const auto report=resample_native_texture_grid(scene,scene.active().id,{.resolution=128});
+  const auto &reduced=*scene.active().painted;
+  const auto &tiles=reduced.layers().front().tiles;
+  check(report.changed&&report.output_tiles==4&&report.filtered_samples==4*32*32*16&&
+        tiles[0]&&tiles[1]&&!tiles[2]&&tiles[3]&&tiles[6],
+        "Fourfold coarsening only filters and allocates authored target footprints");
+  const auto mask=[&](uint32_t x,uint32_t y){return reduced.pixel(layer,x,y).data[13];};
+  check(mask(16,16)<mask(48,16)&&mask(48,16)<mask(112,16)&&
+        mask(112,16)<mask(80,48)&&mask(80,48)<255&&mask(80,16)==255,
+        "Distinct masks remain in their original tiles across an authored run, a gap and a new row");
+}
+
 void fullsize_physical_paint(const std::filesystem::path &root) {
   PaintEmissionTile::Pixels values;
   for (size_t i = 0; i < values.size(); ++i) {
@@ -905,6 +945,7 @@ int main(int argc,char **argv) try {
   resize_painted_source_grid(root);
   resize_physical_native_grid(root);
   reduce_dense_native_grid(root);
+  reduce_sparse_native_grid();
  } else if(std::string_view(argv[1])=="baked") {
   resize_baked_native_grid(root);
  } else if(std::string_view(argv[1])=="missing-bake-device") {

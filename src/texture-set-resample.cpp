@@ -114,6 +114,22 @@ const paint_grid::Tables &grid_tables() {
 class GridFilter {
   paint_grid::Filter filter_{grid_tables()};
   std::vector<paint_grid::Pixel> input_,output_;
+
+  std::span<const paint_grid::Pixel> dispatch(const paint_grid::Batch &batch,
+      const paint_grid::Layout &layout,const std::function<bool()> &cancelled,
+      const auto &read) {
+    const auto &source=batch.source;
+    input_.resize(size_t(source.width)*source.height);
+    output_.resize(size_t(batch.target.width)*batch.target.height);
+    for(uint32_t y=0;y<source.height;++y) {
+      paint_grid::checkpoint(cancelled);
+      for(uint32_t x=0;x<source.width;++x)
+        input_[size_t(y)*source.width+x]=read(source.x+x,source.y+y);
+    }
+    filter_.run(batch,layout,input_,output_,cancelled);
+    return output_;
+  }
+
 public:
   static constexpr size_t peak_bytes=2*(sizeof(paint_grid::Tables)+
       (paint_grid::max_input_pixels+paint_grid::max_output_pixels)*sizeof(paint_grid::Pixel));
@@ -121,6 +137,17 @@ public:
     input_.reserve(paint_grid::max_input_pixels);
     output_.reserve(paint_grid::max_output_pixels);
   }
+  // A reduction strip has an integral footprint and fits one bounded
+  // dispatch. Its output stays available while the caller packs its tiles.
+  std::span<const paint_grid::Pixel> coarsen_strip(uint32_t from,uint32_t to,
+      const paint_grid::Rectangle &target,const paint_grid::Layout &layout,
+      const std::function<bool()> &cancelled,const auto &read) {
+    const auto scale=from/to;
+    const paint_grid::Rectangle source{target.x*scale,target.y*scale,
+                                      target.width*scale,target.height*scale};
+    return dispatch({from,to,source,target},layout,cancelled,read);
+  }
+
   void apply(uint32_t from,uint32_t to,paint_grid::Rectangle target,
       const paint_grid::Layout &layout,const std::function<bool()> &cancelled,
       auto &&read,auto &&write) {
@@ -139,20 +166,13 @@ public:
         rows/=2;
         std::tie(sy,height)=source_range(target.y+row,rows);
       }
-      input_.resize(size_t(width)*height);
-      output_.resize(size_t(target.width)*rows);
-      for(uint32_t y=0;y<height;++y) {
-        paint_grid::checkpoint(cancelled);
-        for(uint32_t x=0;x<width;++x)
-          input_[size_t(y)*width+x]=read(sx+x,sy+y);
-      }
       const paint_grid::Batch batch{from,to,{sx,sy,width,height},
                                     {target.x,target.y+row,target.width,rows}};
-      filter_.run(batch,layout,input_,output_,cancelled);
+      const auto pixels=dispatch(batch,layout,cancelled,read);
       for(uint32_t y=0;y<rows;++y) {
         paint_grid::checkpoint(cancelled);
         for(uint32_t x=0;x<target.width;++x)
-          write(x,row+y,output_[size_t(y)*target.width+x]);
+          write(x,row+y,pixels[size_t(y)*target.width+x]);
       }
       row+=rows;
     }
@@ -1000,6 +1020,12 @@ std::vector<PaintLayer> resample_texture_set_layers(
   std::vector<PaintLayer> result;
   result.reserve(before.layers().size());
   report.layers.reserve(before.layers().size());
+  constexpr uint32_t tile_side=PaintTile::size;
+  constexpr size_t tile_pixels=size_t(tile_side)*tile_side;
+  const uint32_t tiles_per_row=to/tile_side;
+  const size_t taps=from>to?size_t(from/to)*(from/to):4;
+  const uint32_t tiles_per_dispatch=from>to ?
+      uint32_t(std::min(paint_grid::max_output_pixels,paint_grid::max_input_pixels/taps)/tile_pixels) : 0;
   size_t layer_index=0;
   for (const auto &layer : before.layers()) {
     stop(limits);
@@ -1016,9 +1042,17 @@ std::vector<PaintLayer> resample_texture_set_layers(
     const bool layer_filter=filter&&authored(layer);
     const auto &layout=layouts.at(layer_index++);
     const size_t tap_work=prune?reduction_tap_work(layout):32;
+    const auto account=[&](size_t count) {
+      const size_t samples=count*tile_pixels*taps;
+      work(report,tap_work*samples,limits);
+      report.filtered_samples+=samples;
+    };
+    const auto read=[&](uint32_t x,uint32_t y){return grid_layer_pixel(layer,from,x,y);};
     bool default_emission_bytes=true;
-    for (uint32_t ty = 0; ty < to / 32; ++ty)
-      for (uint32_t tx = 0; tx < to / 32; ++tx) {
+    for (uint32_t ty = 0; ty < tiles_per_row; ++ty) {
+      uint32_t strip_start=0,strip_end=0;
+      std::span<const paint_grid::Pixel> strip;
+      for (uint32_t tx = 0; tx < tiles_per_row; ++tx) {
         stop(limits);
         if (native_cells && !has_authored_footprint(layer, from, to, tx, ty))
           continue;
@@ -1049,32 +1083,51 @@ std::vector<PaintLayer> resample_texture_set_layers(
           emission[i]=light;
         };
         if(layer_filter) {
-          const auto taps=from>to?size_t(from/to)*(from/to):4;
-          work(report,tap_work*1024*taps,limits);
-          report.filtered_samples+=1024*taps;
-          filter->apply(from,to,{tx*32,ty*32,32,32},layout,limits.cancelled,
-            [&](uint32_t x,uint32_t y){return grid_layer_pixel(layer,from,x,y);},
-            [&](uint32_t x,uint32_t y,const paint_grid::Pixel &p){
-              const size_t i=size_t(y)*32+x;
-              PaintPixel c;
-              std::copy_n(p.values,9,c.data.data());
-              std::copy_n(p.coverage,4,c.data.data()+9);
-              c.data[13]=p.mask;
-              PaintEmissionValue light;
-              if(layout.floats!=paint_grid::FloatPlane::Absent) {
-                for(size_t k=0;k<3;++k) {
-                  light.legacy[k]=float(std::clamp(number(p.emission[k]),0.,1.));
-                  light.physical[k]=float(std::clamp(number(p.emission[k+3]),0.,double(maximum_native_emission)));
-                }
-                light.coverage=float(std::clamp(number(p.emission[6]),0.,1.));
-                light.validate();
+          const auto write=[&](uint32_t x,uint32_t y,const paint_grid::Pixel &p) {
+            const size_t i=size_t(y)*tile_side+x;
+            PaintPixel c;
+            std::copy_n(p.values,9,c.data.data());
+            std::copy_n(p.coverage,4,c.data.data()+9);
+            c.data[13]=p.mask;
+            PaintEmissionValue light;
+            if(layout.floats!=paint_grid::FloatPlane::Absent) {
+              for(size_t k=0;k<3;++k) {
+                light.legacy[k]=float(std::clamp(number(p.emission[k]),0.,1.));
+                light.physical[k]=float(std::clamp(number(p.emission[k+3]),0.,double(maximum_native_emission)));
               }
-              has_common|=bool(p.present&1);
-              has_pbr|=bool(p.present&2);
-              has_emission|=bool(p.present&4);
-              if(layout.pbr)std::copy_n(p.values+9,4,pbr.pixels[i].data());
-              store(i,c,light);
-            });
+              light.coverage=float(std::clamp(number(p.emission[6]),0.,1.));
+              light.validate();
+            }
+            has_common|=bool(p.present&1);
+            has_pbr|=bool(p.present&2);
+            has_emission|=bool(p.present&4);
+            if(layout.pbr)std::copy_n(p.values+9,4,pbr.pixels[i].data());
+            store(i,c,light);
+          };
+          if(tiles_per_dispatch>1) {
+            if(tx>=strip_end) {
+              strip_start=tx;
+              strip_end=tx+1;
+              while(strip_end<tiles_per_row && strip_end-tx<tiles_per_dispatch &&
+                    (!native_cells || has_authored_footprint(layer,from,to,strip_end,ty)))
+                ++strip_end;
+              account(strip_end-strip_start);
+              strip=filter->coarsen_strip(from,to,
+                  {tx*tile_side,ty*tile_side,(strip_end-tx)*tile_side,tile_side},
+                  layout,limits.cancelled,read);
+            }
+            const auto width=(strip_end-strip_start)*tile_side;
+            const auto offset=(tx-strip_start)*tile_side;
+            for(uint32_t y=0;y<tile_side;++y) {
+              stop(limits);
+              for(uint32_t x=0;x<tile_side;++x)
+                write(x,y,strip[size_t(y)*width+offset+x]);
+            }
+          } else {
+            account(1);
+            filter->apply(from,to,{tx*tile_side,ty*tile_side,tile_side,tile_side},
+                          layout,limits.cancelled,read,write);
+          }
         }else if(!accelerated)for (uint32_t y = 0; y < 32; ++y)
           for (uint32_t x = 0; x < 32; ++x) {
             const auto grid_x = tx * 32 + x, grid_y = ty * 32 + y;
@@ -1114,6 +1167,7 @@ std::vector<PaintLayer> resample_texture_set_layers(
           out.emission_tiles[t] =
               PaintEmissionTile::pack(emission);
       }
+    }
     TextureSetResolutionLayerQuality q;
     q.layer = layer.id;
     quality(layer, out, from, to, options, limits, report, q, native_cells,
