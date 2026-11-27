@@ -239,10 +239,33 @@ Six native patch GLBs pass Khronos validation with zero errors and warnings.
 On the painted V0 patch, independently splitting Shade into a byte-identical
 image changes 290 shadow pixels on Arc and 294 on llvmpipe. The unpainted
 controls match exactly. Synthetic OpenXR reopens and saves both variants
-exactly on both renderers. The imported MToon 1 probe still reproduces first
-Apply dropping the typed material. The original asset remains on the hidden
-guide. Retopology of imported MToon needs its own role, UV and normal transfer.
+exactly on both renderers. The earlier imported MToon 1 probe reproduced first
+Apply dropping the typed material and became the regression for the next change.
 [Shared MToon shading validation](validation/retopology-mtoon-shared-shade-20261127.json)
+
+First Apply now transfers static imported MToon 1 to an editable native patch.
+The worker evaluates the posed guide in metres and resolves the original
+coordinates and transform for each texture role. Base and Shade keep genuine
+image sharing. MatCap keeps its view-space sampler. The patch stores separate
+normal textures for the authored MToon and Core PBR views, plus the Core PBR
+colour, AO, metallic/roughness and emission images. Existing layers transfer
+on the writable atlas. The hidden guide keeps its original asset and pose.
+
+Fixtures cover a reflected and sheared active morph, hidden editable paint,
+source vertex tint and authored UV1 used only by MToon. A changed patch can
+Apply again and Undo to the previous material state. Native Save and Editable
+GLB restore both material views and the ink. Intel Arc and llvmpipe produce
+the same viewport on cold Editable reopen and render the ink when enabled.
+DomeD Wayland covers Apply, Save and portable preview export. Synthetic OpenXR
+replays the original and patch in stereo. All 18 focused Release and 14 strict
+ASan/UBSan cases pass. The portable preview uses Core PBR. Khronos reports zero
+errors and advises that its exported normals rely on runtime tangent generation.
+
+Animated sampling, imported prior Bakes, combined vertex tint and colour ink,
+and incompatible two-sided normal frames still require dedicated transfer
+paths. Portable typed MToon GLB/VRM output for these patches and physical
+headset qualification remain open.
+[Imported MToon retopology validation](validation/retopology-imported-mtoon-20261127.json)
 
 Retopology reapply now works on native multi-material accessories attached
 to original VRM 1.0 joints. The replacement keeps its avatar hierarchy and

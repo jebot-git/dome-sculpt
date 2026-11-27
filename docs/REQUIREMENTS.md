@@ -145,10 +145,18 @@ Save and cold Open when both roles use the same sampling. Independent
 wrapping, filtering and transforms keep their own projected images. Native
 paint continues to contribute to shadow shading on the shared role. This
 passes MToon 0 and 1 worker controls, with a painted MToon 0 comparison on
-Intel Arc and llvmpipe and synthetic OpenXR replay. A real imported MToon 1
-model still loses its typed material on first Apply. Its original MToon role
-images, coordinates and posed attribute normals need a separate transfer.
+Intel Arc and llvmpipe and synthetic OpenXR replay. The original imported
+MToon 1 probe is retained as the failing baseline for first Apply.
 [Shared MToon shading evidence](validation/retopology-mtoon-shared-shade-20261127.json)
+
+Static imported MToon 1 now transfers on first Apply with original per-role
+UV sampling, posed imported normals, shared Shade and view-space MatCap.
+Separate Core PBR texture roles remain available and editable paint layers
+survive Apply, changed-topology reapply, Undo, Save and Editable GLB. Actual
+DomeD Wayland and synthetic OpenXR cover the admitted case. Portable typed
+GLB/VRM, animated roles, prior imported Bake fields, combined tint and colour
+paint, incompatible two-sided normals and physical XR remain required.
+[Imported MToon retopology evidence](validation/retopology-imported-mtoon-20261127.json)
 
 Native multi-material retopology preserves independently painted and baked
 grids and original VRM 1.0 joint links when Apply changes the patch.

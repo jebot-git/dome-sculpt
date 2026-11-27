@@ -1,0 +1,584 @@
+{
+  "product": "511b45a6ee66219ffae8ab4ca70022044529709f",
+  "previous_main": "863cbfdc8dfee53a7b49482fe30070a550c0ba87",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "canonical_compositor_sha256": "47920142c8c803dcf5adb63ba643d2e347fbdcd1e15ecd8bce7c1a8dd47c0b7e",
+  "release_application_sha256": "dc51bfdac2ab8d616b54b42bf41213d2590682443b95d1b769623c7fb1f366de",
+  "asan_test_sha256": "6d04f0be8a070e58dec3ac6eb1c0eb8cde8c8ff0110fc62892b792c122ed90d6",
+  "asan_build": "changed translation units incrementally rebuilt from the completed sanitizer core",
+  "tests": {
+    "release": [
+      "mtoon-texture-sets",
+      "retopology-mtoon-affine",
+      "retopology-mtoon-detached",
+      "retopology-mtoon-plain",
+      "retopology-mtoon-v0",
+      "retopology-first-material-posed-affine",
+      "retopology-first-material-affine",
+      "native-mtoon-preview-contracts",
+      "retopology-imported-mtoon-painted",
+      "retopology-imported-prior-bake",
+      "retopology-first-material-posed-plain",
+      "retopology-imported-pbr",
+      "retopology-first-material-plain",
+      "retopology-imported-mtoon-tinted",
+      "retopology-imported-mtoon-unprepared",
+      "native-mikk-export",
+      "mtoon-painted-texture-sets",
+      "mtoon-baked-texture-sets"
+    ],
+    "asan": [
+      "retopology-first-material-plain",
+      "retopology-first-material-posed-plain",
+      "retopology-first-material-affine",
+      "retopology-first-material-posed-affine",
+      "retopology-mtoon-v0",
+      "retopology-mtoon-plain",
+      "retopology-imported-pbr",
+      "retopology-mtoon-affine",
+      "retopology-imported-prior-bake",
+      "retopology-imported-mtoon-tinted",
+      "retopology-imported-mtoon-painted",
+      "native-mikk-export",
+      "retopology-imported-mtoon-unprepared",
+      "retopology-mtoon-detached"
+    ]
+  },
+  "native_samples": {
+    "release": {
+      "painted": {
+        "checks": 101,
+        "samples": 70,
+        "maximum_role_error": 0.00361782,
+        "maximum_pbr_error": 0.00358874,
+        "minimum_typed_normal_dot": 0.999998,
+        "minimum_pbr_normal_dot": 0.999999
+      },
+      "tinted": {
+        "checks": 89,
+        "samples": 70,
+        "maximum_role_error": 0.00361782,
+        "maximum_pbr_error": 0.00358874,
+        "minimum_typed_normal_dot": 0.999998,
+        "minimum_pbr_normal_dot": 0.999999
+      },
+      "unprepared": {
+        "checks": 92,
+        "samples": 70,
+        "maximum_role_error": 0.00375438,
+        "maximum_pbr_error": 0.00375438,
+        "minimum_typed_normal_dot": 0.999998,
+        "minimum_pbr_normal_dot": 0.999999
+      }
+    },
+    "asan": {
+      "painted": {
+        "checks": 101,
+        "samples": 70,
+        "maximum_role_error": 0.00361782,
+        "maximum_pbr_error": 0.00358874,
+        "minimum_typed_normal_dot": 0.999998,
+        "minimum_pbr_normal_dot": 0.999999
+      },
+      "tinted": {
+        "checks": 89,
+        "samples": 70,
+        "maximum_role_error": 0.00361782,
+        "maximum_pbr_error": 0.00358874,
+        "minimum_typed_normal_dot": 0.999998,
+        "minimum_pbr_normal_dot": 0.999999
+      },
+      "unprepared": {
+        "checks": 92,
+        "samples": 70,
+        "maximum_role_error": 0.00375438,
+        "maximum_pbr_error": 0.00375438,
+        "minimum_typed_normal_dot": 0.999998,
+        "minimum_pbr_normal_dot": 0.999999
+      }
+    }
+  },
+  "identical_native_and_glb_outputs_sha256": {
+    "retopology-imported-mtoon-painted/original-import.glb": "924b184d05375c778de14fb0594a7c9035d45e20c7a27ed0f41acf5f3ef55ff6",
+    "retopology-imported-mtoon-painted/raw-guide.dsculpt": "4d0fdb2761a9c94d9f1763342903ed448b346c7eeefdec87a4b68a6e2ad644be",
+    "retopology-imported-mtoon-painted/raw-patch.dsculpt": "40ccdf057148d5bef37bcf68f6f970d7dd07a92cad794162a1ca95d209a61073",
+    "retopology-imported-mtoon-painted/raw-editable.glb": "2639d8484ae17b6be42cd66882dcba6a8282a8c99e99f2cd019e68646d882fd2",
+    "retopology-imported-mtoon-painted/raw-reapplied.dsculpt": "3db5e60de30718160fabb43cce7c73c5293958c02b8360b66fedb0868453c470",
+    "retopology-imported-mtoon-tinted/original-import.glb": "ba577eebedf3ba6aa16a3ce04d8e63312218b0ca3e11dba38d3bbfcce36e6175",
+    "retopology-imported-mtoon-tinted/raw-guide.dsculpt": "db5bc566ccc77cf7734e3c5ce62a850dd5d82081058e44639d174e333388716a",
+    "retopology-imported-mtoon-tinted/raw-patch.dsculpt": "804b02390636d022eec55d52bf57251419f990a1a3beac7e5709bcff95a0c8a0",
+    "retopology-imported-mtoon-tinted/raw-editable.glb": "5c611154b79986ca6e0c0fac2b7f219fa0f7e64050c2db9a51371253ee0c577d",
+    "retopology-imported-mtoon-unprepared/original-import.glb": "9401091518406eacc818bf95c5913978ce2ef827940b5ca3304eff9323229eeb",
+    "retopology-imported-mtoon-unprepared/raw-guide.dsculpt": "4a807c8d5ae56705be80fd7f8fd4f625fc2e39f3b3e164e8e31cef4a20e3e44c",
+    "retopology-imported-mtoon-unprepared/raw-patch.dsculpt": "a6bf3e362d7f4f934647b2196ac352473669d9aa97d65b0fb11a4f0dd187873a",
+    "retopology-imported-mtoon-unprepared/raw-editable.glb": "5234ab21250ae41e2f6bd9c217769697c21bedc7db60e2990d5074342c5f8e1a"
+  },
+  "renderers": {
+    "software": {
+      "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+      "pixels_differing_between_typed_and_core": 5754,
+      "visible_ink_pixels_typed": 5139,
+      "visible_ink_pixels_core": 5339,
+      "same_pixels_after_editable_glb_reopen": true,
+      "exact_openxr_close": true,
+      "stereo_submissions_per_project": 6,
+      "stereo_differences": [
+        34386,
+        35211
+      ]
+    },
+    "arc": {
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "pixels_differing_between_typed_and_core": 5754,
+      "visible_ink_pixels_typed": 5045,
+      "visible_ink_pixels_core": 5322,
+      "same_pixels_after_editable_glb_reopen": true,
+      "exact_openxr_close": true,
+      "stereo_submissions_per_project": 6,
+      "stereo_differences": [
+        37744,
+        37938
+      ]
+    }
+  },
+  "physical_headset": false,
+  "dome_wayland": {
+    "checks": [
+      {
+        "passed": true,
+        "check": "Native retopology editor publishes the canonical Dome Sculpt Wayland identity"
+      },
+      {
+        "passed": true,
+        "check": "The actual Wayland universal menu enables Start patch on the original imported MToon guide"
+      },
+      {
+        "passed": true,
+        "check": "An empty patch keeps Apply disabled"
+      },
+      {
+        "passed": true,
+        "check": "Canvas gestures trace a new quad across the source triangulation"
+      },
+      {
+        "passed": true,
+        "check": "Universal Apply and Save publish a separate quad patch and hide the original guide"
+      },
+      {
+        "passed": true,
+        "check": "An independent reader finds the projected Core PBR base colour, normal and emission in the portable preview"
+      },
+      {
+        "passed": true,
+        "check": "Native client releases the compositor and export worker on close"
+      }
+    ],
+    "complete": true
+  },
+  "khronos": {
+    "validator": "2.0.0-dev.3.10",
+    "results": [
+      {
+        "file": "qualified-debug-painted/original-import.glb",
+        "issues": {
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 2,
+          "numHints": 8,
+          "messages": [
+            {
+              "code": "UNSUPPORTED_EXTENSION",
+              "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_materials_mtoon'.",
+              "severity": 2,
+              "pointer": "/extensionsUsed/2"
+            },
+            {
+              "code": "BUFFER_VIEW_TARGET_MISSING",
+              "message": "bufferView.target should be set for vertex or index data.",
+              "severity": 3,
+              "pointer": "/meshes/0/primitives/0/attributes/NORMAL"
+            },
+            {
+              "code": "BUFFER_VIEW_TARGET_MISSING",
+              "message": "bufferView.target should be set for vertex or index data.",
+              "severity": 3,
+              "pointer": "/meshes/0/primitives/0/attributes/POSITION"
+            },
+            {
+              "code": "BUFFER_VIEW_TARGET_MISSING",
+              "message": "bufferView.target should be set for vertex or index data.",
+              "severity": 3,
+              "pointer": "/meshes/0/primitives/0/attributes/TANGENT"
+            },
+            {
+              "code": "BUFFER_VIEW_TARGET_MISSING",
+              "message": "bufferView.target should be set for vertex or index data.",
+              "severity": 3,
+              "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+            },
+            {
+              "code": "BUFFER_VIEW_TARGET_MISSING",
+              "message": "bufferView.target should be set for vertex or index data.",
+              "severity": 3,
+              "pointer": "/meshes/0/primitives/0/indices"
+            },
+            {
+              "code": "BUFFER_VIEW_TARGET_MISSING",
+              "message": "bufferView.target should be set for vertex or index data.",
+              "severity": 3,
+              "pointer": "/meshes/0/primitives/0/targets/0/NORMAL"
+            },
+            {
+              "code": "BUFFER_VIEW_TARGET_MISSING",
+              "message": "bufferView.target should be set for vertex or index data.",
+              "severity": 3,
+              "pointer": "/meshes/0/primitives/0/targets/0/POSITION"
+            },
+            {
+              "code": "BUFFER_VIEW_TARGET_MISSING",
+              "message": "bufferView.target should be set for vertex or index data.",
+              "severity": 3,
+              "pointer": "/meshes/0/primitives/0/targets/0/TANGENT"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/accessors/3"
+            }
+          ],
+          "truncated": false
+        },
+        "sha256": "924b184d05375c778de14fb0594a7c9035d45e20c7a27ed0f41acf5f3ef55ff6"
+      },
+      {
+        "file": "qualified-debug-painted/raw-editable.glb",
+        "issues": {
+          "numErrors": 0,
+          "numWarnings": 1,
+          "numInfos": 2,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "MESH_PRIMITIVE_GENERATED_TANGENT_SPACE",
+              "message": "Material requires a tangent space but the mesh primitive does not provide it. Runtime-generated tangent space may be non-portable across implementations.",
+              "severity": 1,
+              "pointer": "/meshes/0/primitives/0/material"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/10"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/2"
+            }
+          ],
+          "truncated": false
+        },
+        "sha256": "2639d8484ae17b6be42cd66882dcba6a8282a8c99e99f2cd019e68646d882fd2"
+      },
+      {
+        "file": "qualified-debug-tinted/original-import.glb",
+        "issues": {
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 1,
+          "numHints": 9,
+          "messages": [
+            {
+              "code": "UNSUPPORTED_EXTENSION",
+              "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_materials_mtoon'.",
+              "severity": 2,
+              "pointer": "/extensionsUsed/2"
+            },
+            {
+              "code": "BUFFER_VIEW_TARGET_MISSING",
+              "message": "bufferView.target should be set for vertex or index data.",
+              "severity": 3,
+              "pointer": "/meshes/0/primitives/0/attributes/COLOR_0"
+            },
+            {
+              "code": "BUFFER_VIEW_TARGET_MISSING",
+              "message": "bufferView.target should be set for vertex or index data.",
+              "severity": 3,
+              "pointer": "/meshes/0/primitives/0/attributes/NORMAL"
+            },
+            {
+              "code": "BUFFER_VIEW_TARGET_MISSING",
+              "message": "bufferView.target should be set for vertex or index data.",
+              "severity": 3,
+              "pointer": "/meshes/0/primitives/0/attributes/POSITION"
+            },
+            {
+              "code": "BUFFER_VIEW_TARGET_MISSING",
+              "message": "bufferView.target should be set for vertex or index data.",
+              "severity": 3,
+              "pointer": "/meshes/0/primitives/0/attributes/TANGENT"
+            },
+            {
+              "code": "BUFFER_VIEW_TARGET_MISSING",
+              "message": "bufferView.target should be set for vertex or index data.",
+              "severity": 3,
+              "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+            },
+            {
+              "code": "BUFFER_VIEW_TARGET_MISSING",
+              "message": "bufferView.target should be set for vertex or index data.",
+              "severity": 3,
+              "pointer": "/meshes/0/primitives/0/indices"
+            },
+            {
+              "code": "BUFFER_VIEW_TARGET_MISSING",
+              "message": "bufferView.target should be set for vertex or index data.",
+              "severity": 3,
+              "pointer": "/meshes/0/primitives/0/targets/0/NORMAL"
+            },
+            {
+              "code": "BUFFER_VIEW_TARGET_MISSING",
+              "message": "bufferView.target should be set for vertex or index data.",
+              "severity": 3,
+              "pointer": "/meshes/0/primitives/0/targets/0/POSITION"
+            },
+            {
+              "code": "BUFFER_VIEW_TARGET_MISSING",
+              "message": "bufferView.target should be set for vertex or index data.",
+              "severity": 3,
+              "pointer": "/meshes/0/primitives/0/targets/0/TANGENT"
+            }
+          ],
+          "truncated": false
+        },
+        "sha256": "ba577eebedf3ba6aa16a3ce04d8e63312218b0ca3e11dba38d3bbfcce36e6175"
+      },
+      {
+        "file": "qualified-debug-tinted/raw-editable.glb",
+        "issues": {
+          "numErrors": 0,
+          "numWarnings": 1,
+          "numInfos": 2,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "MESH_PRIMITIVE_GENERATED_TANGENT_SPACE",
+              "message": "Material requires a tangent space but the mesh primitive does not provide it. Runtime-generated tangent space may be non-portable across implementations.",
+              "severity": 1,
+              "pointer": "/meshes/0/primitives/0/material"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/10"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/2"
+            }
+          ],
+          "truncated": false
+        },
+        "sha256": "5c611154b79986ca6e0c0fac2b7f219fa0f7e64050c2db9a51371253ee0c577d"
+      },
+      {
+        "file": "qualified-debug-unprepared/original-import.glb",
+        "issues": {
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 3,
+          "numHints": 8,
+          "messages": [
+            {
+              "code": "UNSUPPORTED_EXTENSION",
+              "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_materials_mtoon'.",
+              "severity": 2,
+              "pointer": "/extensionsUsed/2"
+            },
+            {
+              "code": "BUFFER_VIEW_TARGET_MISSING",
+              "message": "bufferView.target should be set for vertex or index data.",
+              "severity": 3,
+              "pointer": "/meshes/0/primitives/0/attributes/NORMAL"
+            },
+            {
+              "code": "BUFFER_VIEW_TARGET_MISSING",
+              "message": "bufferView.target should be set for vertex or index data.",
+              "severity": 3,
+              "pointer": "/meshes/0/primitives/0/attributes/POSITION"
+            },
+            {
+              "code": "BUFFER_VIEW_TARGET_MISSING",
+              "message": "bufferView.target should be set for vertex or index data.",
+              "severity": 3,
+              "pointer": "/meshes/0/primitives/0/attributes/TANGENT"
+            },
+            {
+              "code": "BUFFER_VIEW_TARGET_MISSING",
+              "message": "bufferView.target should be set for vertex or index data.",
+              "severity": 3,
+              "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+            },
+            {
+              "code": "BUFFER_VIEW_TARGET_MISSING",
+              "message": "bufferView.target should be set for vertex or index data.",
+              "severity": 3,
+              "pointer": "/meshes/0/primitives/0/indices"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_1"
+            },
+            {
+              "code": "BUFFER_VIEW_TARGET_MISSING",
+              "message": "bufferView.target should be set for vertex or index data.",
+              "severity": 3,
+              "pointer": "/meshes/0/primitives/0/targets/0/NORMAL"
+            },
+            {
+              "code": "BUFFER_VIEW_TARGET_MISSING",
+              "message": "bufferView.target should be set for vertex or index data.",
+              "severity": 3,
+              "pointer": "/meshes/0/primitives/0/targets/0/POSITION"
+            },
+            {
+              "code": "BUFFER_VIEW_TARGET_MISSING",
+              "message": "bufferView.target should be set for vertex or index data.",
+              "severity": 3,
+              "pointer": "/meshes/0/primitives/0/targets/0/TANGENT"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/accessors/3"
+            }
+          ],
+          "truncated": false
+        },
+        "sha256": "9401091518406eacc818bf95c5913978ce2ef827940b5ca3304eff9323229eeb"
+      },
+      {
+        "file": "qualified-debug-unprepared/raw-editable.glb",
+        "issues": {
+          "numErrors": 0,
+          "numWarnings": 1,
+          "numInfos": 2,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "MESH_PRIMITIVE_GENERATED_TANGENT_SPACE",
+              "message": "Material requires a tangent space but the mesh primitive does not provide it. Runtime-generated tangent space may be non-portable across implementations.",
+              "severity": 1,
+              "pointer": "/meshes/0/primitives/0/material"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/10"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/2"
+            }
+          ],
+          "truncated": false
+        },
+        "sha256": "5234ab21250ae41e2f6bd9c217769697c21bedc7db60e2990d5074342c5f8e1a"
+      },
+      {
+        "file": "wayland-first-material/wayland-patch.glb",
+        "issues": {
+          "numErrors": 0,
+          "numWarnings": 1,
+          "numInfos": 3,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "MESH_PRIMITIVE_GENERATED_TANGENT_SPACE",
+              "message": "Material requires a tangent space but the mesh primitive does not provide it. Runtime-generated tangent space may be non-portable across implementations.",
+              "severity": 1,
+              "pointer": "/meshes/0/primitives/0/material"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/9"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/10"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/2"
+            }
+          ],
+          "truncated": false
+        },
+        "sha256": "cd987ba38f1f7d540d3b568cd1ece627733ef722ee093adf5b4cd300e0f927f3"
+      }
+    ]
+  },
+  "portable_preview": "Core PBR with generated tangent space, native MToon recovered by Editable GLB",
+  "archive_sha256": "f6d1797c4716594cbf4dcabba18843480b8638e4fdf6a50d65a141932ff7e26e",
+  "archive_members_sha256": {
+    "record.py": "72ac9561e15b159a3a34b65a88c45359b8b174ef7429bec74309d664c11712c4",
+    "baseline.py": "0b4446bde1933a440964a569aeed804f4b0c3ac6d28383c354502793e506ce54",
+    "baseline-fixture.log": "f9688ed1801cf806fc8af5682cef89328a7aa8a94281d336978bd245dbd6a074",
+    "check.sh": "2a11fd359846676f72fbe2dd042efba2c01bf19eae8b84e3e0e86b75cf4f08e4",
+    "check-final.sh": "30a8a578b0485d930fb89e13df83d7cc5e3bc4cfb59b9e7d021f473b60a08007",
+    "check-incremental-asan.py": "868f2c21913a733934706cdb0c97ea31bd86f62299c6bbd8eac6bb360693ec88",
+    "khronos.cjs": "6e9c14556f92e8d8a7474e93cd95925467fbf3932d33b2c4448705d6998efe25",
+    "khronos.json": "226cd0a1677ee395005baeea55a11aec1d60be99a1299442b525712fd1784f69",
+    "khronos.log": "5ffd799872ccacc14501ccd33fc70f1886045c704bbb0dd2c668e715862c4bf8",
+    "run-render.py": "af29903acbd4ea5c62bc0c8613729e993242853ae2f9db2c31aa24d5e9370987",
+    "xr-first-material.py": "8744c1fd197ce0d74ff310e5159c2af681c5527beff6e355e5ed361cbdc6722a",
+    "run-wayland.py": "5c0e13aef3656540d9a7058f6df77cb7f37ea4083eb11dcbc4da83b958ec13c6",
+    "wayland-first-material.py": "2a3a0f16a7162bf1374eeb0573d566e1e9248ddcd7e2c122ee32dfc259f62288",
+    "bind-wayland.log": "75652f46f9da1bec8c3afc3b09d3697b36caddbdf1cc78f20e6cded2f6335a54",
+    "wayland-first-material/report.json": "fdceb91b1241957ba95aa3db7c402383d025ecbf4775cab71a7868b46f229849",
+    "wayland-first-material/corners.json": "be5dd396b9b7bd64f77942b4ec67c5d26136c5fde70fc9c6cab4fdf41e1d3f78",
+    "wayland-first-material/source-viewport.png": "12a6c2b5db0d8b1c6d405dcd214602920b9a895c1c30012a76da58ae30566126",
+    "render-authorities.cpp": "5caf551147cd5a89ef3c51cae96b1ee741e9b769a10df1d90b94c239758d9428",
+    "render-authorities.py": "002d142feb52ea9d1015e44f703c7f13e6d2763a0d62846847d9b946eeaa42af",
+    "render-authorities-software.log": "090f515a57881c9b0ef036c2afed68b1d4f3a7fbd1e0f611ee45e232cc89824b",
+    "xr-software-affine/compare.json": "67258cea4bd9ec865f8a2de3f955e089f3ff098334b58af7e88cf69533b6a1af",
+    "verified-affine-software.log": "0a391ac2fcb1f40aae1f6a8755953366fc3f4611f6d6dfe4978daa242ee9dfa0",
+    "render-authorities-arc.log": "09183dc672bda1a32a6849ba7f6eadc1cae4aeb488e98a03a625baeb3ee7b328",
+    "xr-arc-affine/compare.json": "d1ba8ed853d3b3a2e619876499a160a3869a9bd017b03aeaeb6f585eda0e2d33",
+    "verified-affine-arc.log": "d13d2ac653e16cc656e64b141d142788e6bfd39141cbf05ab8f0771d88533c0c",
+    "asan-tests.log": "c319742360239a736866b29d963fc801d18ba4704c3e5b5a5a45bba6acd624a3",
+    "exact-asan/paint.cpp.build.log": "947b90184800d1622be203207321541712c34c8101f1a48a4235b519b13133f4",
+    "exact-asan/retopo-authoring.cpp.build.log": "7f031f1961268fd511ad2df7a07dfcb6e68e22ded4d73f6cbcdd16b618fa07eb",
+    "exact-asan/emission-bake-source.cpp.build.log": "fecca5dd0a2bc1961a5a2527a1c430790a041e8562ddf2d4df081828b0ca7db9",
+    "exact-asan/bake.cpp.build.log": "0338df728b2a200fe6378f653e972e1b0e8deaa8a8aa0396d82def9d4f6fd1a8",
+    "exact-asan/bake-authoring.cpp.build.log": "3f1255ee8914b47d3c90ac92116eb1d628983533fbf591284458e12db9dc8798",
+    "exact-asan/texture-set-surface.cpp.build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "exact-asan/texture-set-source-export.cpp.build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "release-final-tests.log": "83653c5064a13f8db49171b6907a2c2b49b1336f5e896a2e8620786fdbd7d21f",
+    "release-final-build.log": "249ac5131936e916cb7876d823a9416423efb52bd6159f64b787c171bdc5cb1d",
+    "release-painted-native-controls.log": "bd889527d37145e29fbf5517ab32a136a7998ce0c646580e9c857b5a980c5875",
+    "release-tinted-native-controls.log": "5aed847c6f38bdbc6fe0ce8123230f7e6afdfaeb6dd0154e6ea70a1281639135",
+    "release-unprepared-native-controls.log": "aad9633361079395a8269fd700326dd91a9eb050a039e26e25fc0f371e86ea36",
+    "asan-incremental-tests.log": "8a6a70725b4784792eece2e7faef5d210d354423e56c039b85059bd330a70af0",
+    "asan-painted-native-controls.log": "c32fcbf3f3bc2f1374b7432c8ac442ac634ad911d55310bc0f62e3f133a12e59",
+    "asan-tinted-native-controls.log": "5bc682b60a7a5b98265e891a16d5d80221ee9230ccc55a7f796bdd19af3a7202",
+    "asan-unprepared-native-controls.log": "fbc4fa6fcf6773fe6ba0687ad91cd072fc6120f57f5367db7a799f8b3b9f6292"
+  }
+}
