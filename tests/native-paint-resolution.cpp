@@ -334,6 +334,20 @@ void filter_binary64_rounding(){
   backend.run({64,128,{10,1,2,2},{22,4,1,1}},layout,input,output,{});
   check(output[0].mask==125,
         "Bilinear mask weights retain CPU multiply-before-divide rounding");
+
+  constexpr std::array<uint8_t,4> hidden_metal{28,76,132,164};
+  for(size_t i=0;i<input.size();++i) {
+    input[i].values[4]=hidden_metal[i];
+    input[i].mask=255;
+  }
+  layout.active=1u<<4;
+  layout.groups=4;
+  layout.group[4]=1;
+  layout.coverage_mask=0;
+  layout.mask=false;
+  backend.run({128,64,{0,0,2,2},{0,0,1,1}},layout,input,output,{});
+  check(output[0].values[4]==100&&output[0].coverage[1]==0&&output[0].mask==255,
+        "Zero coverage keeps the raw authored metallic value and the default mask");
 }
 
 void resize_baked_native_grid(const std::filesystem::path &root,bool missing_device=false) {
@@ -618,17 +632,20 @@ void reduce_dense_native_grid(const std::filesystem::path &root) {
                 paint->emission_pixel(visible,101,100).coverage,
         "The 1024 grid has varying physical emission across a fully authored layer");
 
-  paint->add_layer("Hidden local detail");
+  paint->add_layer("Dense secondary detail");
   const auto hidden = paint->active_layer();
   brush.from = brush.to = {.83f,.12f,0};
-  brush.radius = .17f;
+  brush.radius = 1.35f;
   ink.channel = PaintChannel::Color;
-  ink.color = {.15f,.08f,.04f,.2f};
+  ink.color = {.8f,.4f,.1f,.8f};
   stamp();
   ink.channel = PaintChannel::Mask;
   ink.mask = .2f;
   stamp();
-  paint->layer_properties("Hidden local detail",false,.7f);
+  paint->layer_properties("Dense secondary detail",false,.7f);
+  check(std::ranges::all_of(paint->layers().back().tiles,
+                           [](const auto &tile) { return bool(tile); }),
+        "The separate hidden layer authors every tile before reduction");
   const auto before = scene.encode();
   auto strict = scene.snapshot();
   const auto strict_paint = strict.active().painted;
@@ -644,30 +661,36 @@ void reduce_dense_native_grid(const std::filesystem::path &root) {
   check(refused_loss && strict.active().painted == strict_paint && strict.encode() == before,
         "A lossless-only reduction diagnoses real loss and preserves the original paint");
 
-  Document doc;
-  doc.replace(scene);
-  ready(doc);
-  doc.save_async(root / "dense-native-1024.dsculpt").get();
-  TextureSetEdit resize;
-  resize.action = TextureSetAction::Resolution;
-  resize.resolution = 512;
-  doc.edit_texture_set(resize);
-  const auto path = root / "dense-native-512.dsculpt";
-  doc.save_async(path).get();
-  ready(doc);
-  const auto after = doc.copy_scene();
-  const auto &reduced = *after.active().painted;
-  const auto mask = reduced.pixel(hidden,425,61).data[13];
-  check(reduced.resolution() == 512 && reduced.mesh_owner() == paint->mesh_owner() &&
-            reduced.active_layer() == hidden && !reduced.layers().back().visible &&
-            reduced.layers().back().opacity == .7f && mask > 0 && mask < 255 &&
-            std::abs(reduced.emission_pixel(visible,200,200).physical[0]-1500.f)<.002f,
-        "The default worker keeps dense FLOAT radiance and the hidden mask on the new grid");
-  const auto expected = after.encode();
-  check(Scene::load(path).encode() == expected &&
-            doc.undo() && doc.copy_scene().encode() == before &&
-            doc.redo() && doc.copy_scene().encode() == expected,
-        "Dense reduction preserves exact ordered Save, cold Open and history");
+  const auto verify = [&](const Scene &source,bool second_visible,const std::string &name) {
+    Document doc;
+    doc.replace(source.snapshot());
+    ready(doc);
+    doc.save_async(root / (name+"-1024.dsculpt")).get();
+    TextureSetEdit resize;
+    resize.action = TextureSetAction::Resolution;
+    resize.resolution = 512;
+    doc.edit_texture_set(resize);
+    const auto path = root / (name+"-512.dsculpt");
+    doc.save_async(path).get();
+    ready(doc);
+    const auto after = doc.copy_scene();
+    const auto &reduced = *after.active().painted;
+    const auto mask = reduced.pixel(hidden,425,61).data[13];
+    check(reduced.resolution() == 512 && reduced.mesh_owner() == paint->mesh_owner() &&
+              reduced.active_layer() == hidden && reduced.layers().back().visible == second_visible &&
+              reduced.layers().back().opacity == .7f && mask > 0 && mask < 255 &&
+              std::abs(reduced.emission_pixel(visible,200,200).physical[0]-1500.f)<.002f,
+          "The default worker keeps dense FLOAT radiance and the second layer's mask and visibility");
+    const auto expected = after.encode();
+    check(Scene::load(path).encode() == expected &&
+              doc.undo() && doc.copy_scene().encode() == source.encode() &&
+              doc.redo() && doc.copy_scene().encode() == expected,
+          "Dense reduction preserves exact ordered Save, cold Open and history");
+  };
+  verify(scene,false,"dense-native");
+  auto two_visible=scene.snapshot();
+  two_visible.active().painted->layer_properties("Dense secondary detail",true,.7f);
+  verify(two_visible,true,"dense-visible");
 }
 
 } // namespace

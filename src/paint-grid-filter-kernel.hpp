@@ -27,6 +27,7 @@ struct Layout {
   uint32_t pbr = 0;
   uint8_t group[channels]{};
   uint8_t groups = 1;
+  uint8_t coverage_mask = 0xf;
   FloatPlane floats = FloatPlane::Absent;
   bool mask = false;
 };
@@ -125,7 +126,7 @@ DOME_GRID_FN Pixel filter(size_t index,const Batch &batch,const Layout &layout,
       const auto &p = input[size_t(source_y-batch.source.y)*batch.source.width+source_x-batch.source.x];
       out.present |= p.present;
       uint64_t group_weight[4]{};
-      for (unsigned g=0;g<layout.groups;++g) {
+      for (unsigned g=0;g<layout.groups;++g) if(layout.coverage_mask&(1u<<g)) {
         group_weight[g]=mul(weight,tables.unit[p.coverage[g]]);
         coverage[g]=add(coverage[g],group_weight[g]);
       }
@@ -151,7 +152,7 @@ DOME_GRID_FN Pixel filter(size_t index,const Batch &batch,const Layout &layout,
       }
     }
   }
-  for (unsigned g=0;g<layout.groups;++g)
+  for (unsigned g=0;g<layout.groups;++g) if(layout.coverage_mask&(1u<<g))
     out.coverage[g]=quantize(coverage[g],tables.unit_threshold);
   for (unsigned c=0;c<channels;++c) if (layout.active&(1u<<c)) {
     const auto a=coverage[layout.group[c]];
