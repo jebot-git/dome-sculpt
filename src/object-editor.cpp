@@ -15,7 +15,6 @@
 #include <FL/Fl_Value_Input.H>
 #include <FL/fl_ask.H>
 #include <cstdio>
-#include <set>
 namespace dome {
 bool recover_project(Document &document) {
   auto state = document.frame().state;
@@ -58,18 +57,7 @@ void edit_visibility(Document &document){
 }
 void attach_avatar_accessory_dialog(Document &document) {
   const auto draft = document.draft_scene();
-  struct Rig { uint64_t object; std::string name; const Skeleton *skeleton; };
-  std::vector<Rig> rigs;
-  std::set<uint64_t> instances;
-  for (const auto &object : draft.scene.objects()) {
-    if (!object.visible || !object.deformation || !object.deformation->skin ||
-        !object.deformation->skeleton) continue;
-    const auto source = detail::source_rig_instance(draft.scene, object);
-    if (!source || source->model->asset->avatar_version != ImportedAvatarVersion::Vrm1 ||
-        !instances.insert(source->source_instance).second) continue;
-    rigs.push_back({object.id, draft.scene.group(source->source_instance).name,
-                    &*object.deformation->skeleton});
-  }
+  const auto rigs = detail::accessory_rigs(draft.scene);
   if (rigs.empty()) throw std::invalid_argument("Open a skinned VRM 1.0 avatar to attach an accessory");
 
   int sx, sy, sw, sh;
@@ -84,10 +72,10 @@ void attach_avatar_accessory_dialog(Document &document) {
   avatar.copy(avatars.data());
   avatar.value(0);
   struct Choices {
-    const std::vector<Rig> &rigs;
+    const std::vector<detail::AccessoryRig> &rigs;
     Fl_Choice &joint;
     void update(size_t index) {
-      const auto &bones = rigs.at(index).skeleton->bones;
+      const auto &bones = rigs.at(index).deformation->skeleton->bones;
       std::vector<Fl_Menu_Item> items(bones.size() + 1);
       for (size_t i = 0; i < bones.size(); ++i) items[i].label(bones[i].name.c_str());
       joint.copy(items.data());

@@ -3,6 +3,20 @@
 #include "dome/scene.hpp"
 #include "dome/source-placement.hpp"
 namespace dome::detail {
+struct AccessoryRig {
+  uint64_t object, instance;
+  std::string name;
+  std::shared_ptr<const DeformationState> deformation;
+};
+std::vector<AccessoryRig> accessory_rigs(const Scene &);
+
+struct AvatarAttachmentView {
+  uint64_t generation, revision, object, edit_authority;
+  uint32_t owner;
+  std::shared_ptr<const std::vector<AccessoryRig>> rigs;
+  size_t avatar = 0, bone = 0;
+};
+
 bool native_texture_set_accessory(const SculptObject &) noexcept;
 // Recover the exact imported endpoint from a native child's placement path.
 std::shared_ptr<const SourceNodePlacement>

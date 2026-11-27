@@ -9,6 +9,9 @@
 namespace dome {
 void Document::attach_avatar_accessory(uint64_t rig, uint32_t joint, AssetSource expected) {
   std::lock_guard lock(model_mutex_);
+  attach_avatar_accessory_locked(rig, joint, expected);
+}
+void Document::attach_avatar_accessory_locked(uint64_t rig, uint32_t joint, AssetSource expected) {
   const auto id = scene_.active().id;
   if (!state_.can_attach_avatar_accessory || !object_editable_locked(id))
     throw std::logic_error("Select an editable native texture-set accessory and a visible VRM 1.0 avatar");
@@ -18,6 +21,133 @@ void Document::attach_avatar_accessory(uint64_t rig, uint32_t joint, AssetSource
         *changed = detail::attach_source_accessory(scene, id, rig, joint, cancelled);
       }, expected, {}, {}, changed);
 }
+
+bool Document::avatar_attachment_source_matches_locked() const {
+  const auto &view = state_.avatar_attachment;
+  return view && view->generation == state_.generation && view->revision == state_.revision &&
+      view->object == scene_.active().id && view->edit_authority == state_.edit_authority &&
+      object_editable_locked(view->object) && input_.menu_open() &&
+      input_.menu_page() == avatar_attachment_page && input_.menu_device() == view->owner;
+}
+
+bool Document::avatar_attachment_command_enabled_locked(SpatialCommand command) const {
+  if (command == SpatialCommand::AttachBoneBegin)
+    return state_.can_attach_avatar_accessory && !state_.avatar_attachment && !stopping_.load() &&
+        !state_.asset_busy && !state_.recovery_busy && !desktop_ && !native_stroke_ &&
+        !action_active_locked() && !control_before_ && !uv_ && !state_.object_grabbing &&
+        !state_.polygon && !state_.cut && !state_.retopology && !state_.rig_fit &&
+        !state_.expressions && (!state_.projection || !state_.projection->placing);
+  if (!avatar_attachment_source_matches_locked() || state_.asset_busy) return false;
+  const auto &view = *state_.avatar_attachment;
+  if (command == SpatialCommand::AttachPreviousAvatar || command == SpatialCommand::AttachNextAvatar)
+    return view.rigs->size() > 1;
+  if (command == SpatialCommand::AttachPreviousBone || command == SpatialCommand::AttachNextBone)
+    return view.rigs->at(view.avatar).deformation->skeleton->bones.size() > 1;
+  return command == SpatialCommand::AttachBoneCancel || command == SpatialCommand::AttachBoneApply;
+}
+
+void Document::discard_avatar_attachment_locked() {
+  state_.avatar_attachment.reset();
+  if (input_.menu_page() == avatar_attachment_page) input_.cancel();
+  // A trigger held during modal navigation needs a new physical press.
+  state_.selection_release = {true, true};
+  state_.selection_pressed = {true, true};
+}
+
+void Document::avatar_attachment_command_locked(SpatialCommand command) {
+  if (!avatar_attachment_command_enabled_locked(command)) return;
+  if (command == SpatialCommand::AttachBoneBegin) {
+    auto rigs = std::make_shared<const std::vector<detail::AccessoryRig>>(detail::accessory_rigs(scene_));
+    if (rigs->empty()) throw std::invalid_argument("Open a skinned VRM 1.0 avatar to attach an accessory");
+    const auto owner = input_.command_device();
+    auto next = std::make_shared<detail::AvatarAttachmentView>(detail::AvatarAttachmentView{
+        state_.generation, state_.revision, scene_.active().id, state_.edit_authority, owner, rigs});
+    if (const auto mounted = detail::source_accessory_attachment(scene_.group_path(scene_.active().group))) {
+      const auto selected = std::ranges::find(*rigs, mounted->source_instance, &detail::AccessoryRig::instance);
+      if (selected != rigs->end()) {
+        next->avatar = size_t(selected - rigs->begin());
+        const auto &joints = scene_.object(selected->object).appearance->source_joint_nodes;
+        const auto joint = std::ranges::find(joints, mounted->source_node);
+        if (joint != joints.end()) next->bone = size_t(joint - joints.begin());
+      }
+    }
+    Transaction transaction(*this);
+    state_.avatar_attachment = std::move(next);
+    input_.retain_page(avatar_attachment_page, owner, 8);
+    publish_locked(false, false);
+    transaction.commit(false);
+    return;
+  }
+  if (command == SpatialCommand::AttachBoneApply) {
+    auto view = state_.avatar_attachment;
+    auto input = input_;
+    const auto pressed = state_.selection_pressed, release = state_.selection_release;
+    discard_avatar_attachment_locked();
+    try {
+      attach_avatar_accessory_locked(view->rigs->at(view->avatar).object, uint32_t(view->bone),
+          {view->generation, view->revision, view->object, view->edit_authority});
+    } catch (...) {
+      input_ = std::move(input);
+      state_.avatar_attachment = std::move(view);
+      state_.selection_pressed = pressed;
+      state_.selection_release = release;
+      throw;
+    }
+    return;
+  }
+
+  Transaction transaction(*this);
+  if (command == SpatialCommand::AttachBoneCancel) {
+    discard_avatar_attachment_locked();
+  } else {
+    auto next = std::make_shared<detail::AvatarAttachmentView>(*state_.avatar_attachment);
+    const auto cycle = [](size_t current, size_t count, bool forward) {
+      return (current + (forward ? 1 : count - 1)) % count;
+    };
+    if (command == SpatialCommand::AttachPreviousAvatar || command == SpatialCommand::AttachNextAvatar) {
+      next->avatar = cycle(next->avatar, next->rigs->size(), command == SpatialCommand::AttachNextAvatar);
+      next->bone = 0;
+    } else {
+      const auto count = next->rigs->at(next->avatar).deformation->skeleton->bones.size();
+      next->bone = cycle(next->bone, count, command == SpatialCommand::AttachNextBone);
+    }
+    state_.avatar_attachment = std::move(next);
+  }
+  publish_locked(false, false);
+  transaction.commit(false);
+}
+
+bool Document::process_avatar_attachment_spatial_locked(const SpatialFrame &frame) {
+  const auto view = state_.avatar_attachment;
+  if (!view) return false;
+  const auto &hand = frame.hands.at(view->owner - 1);
+  if (!avatar_attachment_source_matches_locked() || !frame.focused || !frame.head_valid ||
+      !ob::finite(frame.head) || !hand.tracked.valid || !ob::finite(hand.tracked.grip)) {
+    Transaction transaction(*this);
+    discard_avatar_attachment_locked();
+    state_.hands = detail::history_only_hands(state_.hands);
+    publish_locked(false, false);
+    transaction.commit(false);
+    return true;
+  }
+  SpatialSample sample;
+  sample.id = view->owner;
+  sample.sequence = frame.sequence;
+  sample.time = frame.time;
+  sample.focused = sample.tracked = true;
+  sample.stick_x = hand.x;
+  sample.stick_y = hand.y;
+  sample.trigger = hand.tracked.trigger > .02f;
+  sample.joystick_press = hand.joystick;
+  sample.kind = hand.kind;
+  input_.update(sample);
+  // No scene, hierarchy, or physical history action consumes a press in this menu.
+  state_.hands = frame.hands;
+  if (auto command = input_.take_command()) avatar_attachment_command_locked(*command);
+  else publish_locked(false, false);
+  return true;
+}
+
 void Document::fit_humanoid_rig(HumanLandmarks landmarks,RigFitOptions options,AssetSource expected){
  options.validate();std::lock_guard lock(model_mutex_);
  const auto id=scene_.active().id;

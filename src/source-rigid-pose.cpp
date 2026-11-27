@@ -4,7 +4,24 @@
 #include <algorithm>
 #include <map>
 #include <ranges>
+#include <set>
 namespace dome::detail {
+std::vector<AccessoryRig> accessory_rigs(const Scene &scene) {
+  std::vector<AccessoryRig> rigs;
+  std::set<uint64_t> instances;
+  for (const auto &object : scene.objects()) {
+    if (!object.visible || !object.deformation || !object.deformation->skin ||
+        !object.deformation->skeleton) continue;
+    const auto source = source_rig_instance(scene, object);
+    if (!source || source->model->asset->avatar_version != ImportedAvatarVersion::Vrm1 ||
+        source_accessory_attachment(scene.group_path(object.group)) != source ||
+        !instances.insert(source->source_instance).second) continue;
+    rigs.push_back({object.id, source->source_instance, scene.group(source->source_instance).name,
+                    object.deformation});
+  }
+  return rigs;
+}
+
 bool native_texture_set_accessory(const SculptObject &object) noexcept {
   return object.mesh_active && object.painted && object.texture_sets &&
       !object.appearance && !object.deformation && !object.rig_source;

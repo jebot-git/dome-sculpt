@@ -3320,6 +3320,13 @@ if(BUILD_TESTING)
   target_link_libraries(dome-sculpt-vrm1-source-export-test PRIVATE dome-sculpt-core)
   add_test(NAME vrm1-source-export COMMAND dome-sculpt-vrm1-source-export-test --selftest ${CMAKE_CURRENT_BINARY_DIR}/vrm1-source-export)
   set_tests_properties(vrm1-source-export PROPERTIES TIMEOUT 180 FIXTURES_SETUP vrm1-source-model)
+  if(TARGET dome-sculpt AND TARGET dome-sculpt-test-runtime AND Python3_Interpreter_FOUND)
+    add_test(NAME vrm1-attachment-openxr COMMAND ${Python3_EXECUTABLE}
+      ${CMAKE_CURRENT_SOURCE_DIR}/tests/vrm1-attachment-xr.py
+      $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime>
+      ${CMAKE_CURRENT_BINARY_DIR}/vrm1-source-export/bone-accessory ${CMAKE_CURRENT_BINARY_DIR}/vrm1-attachment-xr)
+    set_tests_properties(vrm1-attachment-openxr PROPERTIES TIMEOUT 360 FIXTURES_REQUIRED vrm1-source-model)
+  endif()
   add_executable(dome-sculpt-vrm1-expression-render-fixture-test tests/vrm1-expression-render-fixture.cpp)
   target_include_directories(dome-sculpt-vrm1-expression-render-fixture-test PRIVATE src third_party/cgltf)
   target_link_libraries(dome-sculpt-vrm1-expression-render-fixture-test PRIVATE dome-sculpt-core)

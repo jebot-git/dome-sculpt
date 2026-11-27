@@ -33,6 +33,7 @@ namespace dome {
 namespace detail {class SculptSceneChunks;}
 class MaterialSurfaceQuery;
 namespace detail {class TextureSetRangeProof;class TextureSetStrokeLease;}
+namespace detail {struct AvatarAttachmentView;}
 struct SpatialHand {
   TrackedHand tracked;
   bool joystick = false;
@@ -137,6 +138,7 @@ struct EditorState {
   bool can_voxel_remesh = false;
   bool can_export_avatar = false, can_export_editable_avatar = false;
   bool can_attach_avatar_accessory = false;
+  std::shared_ptr<const detail::AvatarAttachmentView> avatar_attachment;
   float voxel_size_mm = 30;
   std::array<bool, 12> menu_enabled{true, true, true, true, true, true,
                                     true, true, true, true, true, true};
@@ -488,6 +490,12 @@ private:
   void require_object_editable_locked(uint64_t) const;
   bool reject_texture_paint_locked();
   void require_authority_locked(AssetSource) const;
+  void attach_avatar_accessory_locked(uint64_t rig, uint32_t joint, AssetSource);
+  bool avatar_attachment_source_matches_locked() const;
+  bool avatar_attachment_command_enabled_locked(SpatialCommand) const;
+  void avatar_attachment_command_locked(SpatialCommand);
+  void discard_avatar_attachment_locked();
+  bool process_avatar_attachment_spatial_locked(const SpatialFrame &);
   EditorState state_;
   bool desktop_ = false, anchored_ = false;
   uint64_t last_volume_ = 0, last_paint_ = 0, content_ = 1, saved_content_ = 1,

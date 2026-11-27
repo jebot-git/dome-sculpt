@@ -398,6 +398,134 @@ void independent(const Scene &scene, const std::filesystem::path &output) {
             !emitted["extensions"].contains("VRM"),
         "Output preserves actual VRM1 version without legacy relabel");
 }
+void spatial_bone_accessory(const std::filesystem::path &out, const Scene &original,
+                            const std::filesystem::path &source, uint64_t accessory) {
+  using namespace dome;
+  check(spatial_action(avatar_attachment_page, 2) == SpatialCommand::AttachPreviousBone &&
+        spatial_action(avatar_attachment_page, 8) == SpatialCommand::AttachBoneCancel &&
+        spatial_action(avatar_attachment_page, 10) == SpatialCommand::AttachBoneApply &&
+        !spatial_action(spatial_page_count, 0), "Attachment owns distinct commands and keeps the radial page boundary");
+  ImportAuthoringOptions options;
+  options.paint_resolution = 64;
+  auto second = prepare_authoring_import(original, source, options);
+  auto &scene = second.scene;
+  const auto rig = second.objects.front();
+  const auto identity = detail::source_rig_instance(scene, scene.object(rig));
+  if (!identity) throw std::runtime_error("Missing second imported rig identity");
+  scene.group(identity->source_instance).name = "Second imported avatar";
+  scene.group(identity->source_instance).transform.position.x = .22f;
+  scene.select(accessory);
+
+  Document doc;
+  doc.replace(scene);
+  doc.begin_spatial();
+  doc.save_async(out / "xr-before-attach.dsculpt").get();
+  const auto before = scene.encode();
+  SpatialFrame frame;
+  frame.focused = frame.head_valid = true;
+  frame.head.position = {0, 1.6f, 0};
+  for (size_t i = 0; i < 2; ++i) {
+    auto &hand = frame.hands[i];
+    hand.tracked.valid = hand.tracked.aimValid = true;
+    hand.tracked.grip.position = hand.tracked.aim.position = {i ? 0.f : -.3f, 1.48f, -.52f};
+  }
+  auto submit = [&] {
+    ++frame.sequence;
+    frame.time += .02;
+    doc.submit(frame);
+    if (!doc.wait_input()) throw std::runtime_error("Controller attachment input did not drain");
+  };
+  auto click = [&](int sector, float trigger = 0) {
+    auto &hand = frame.hands[1];
+    const auto angle = float(sector) * 3.14159265358979323846f / 6;
+    hand.x = sector < 0 ? 0 : std::cos(angle);
+    hand.y = sector < 0 ? 0 : std::sin(angle);
+    hand.joystick = false;
+    hand.tracked.trigger = 0;
+    submit();
+    hand.joystick = true;
+    hand.tracked.trigger = trigger;
+    submit();
+    hand.joystick = false;
+    hand.x = hand.y = 0;
+    submit();
+  };
+  auto open = [&] {
+    click(-1);
+    click(8);
+    click(10);
+    click(5);
+    if (doc.frame().state->menu_page != 11 || !doc.frame().state->menu_enabled[0])
+      throw std::runtime_error("The VR Rig page did not expose attachment for the selected accessory");
+    click(0);
+    const auto state = doc.frame().state;
+    if (!state->avatar_attachment || state->menu_page != avatar_attachment_page || state->menu_index != 8 ||
+        state->avatar_attachment->owner != 2 || state->avatar_attachment->rigs->size() != 2)
+      throw std::runtime_error("The controller did not open its owned two-avatar picker");
+  };
+  submit();
+  open();
+  click(1);
+  click(3);
+  auto state = doc.frame().state;
+  check(state->avatar_attachment && state->avatar_attachment->avatar == 1 && state->avatar_attachment->bone == 1 &&
+        state->avatar_attachment->rigs->at(1).object == rig && doc.copy_scene().encode() == before,
+        "Controller cycles exact avatar instances and joints without editing the scene");
+  frame.hands[0].undo = true;
+  frame.hands[0].joystick = true;
+  submit();
+  frame.hands[0].joystick = false;
+  check(doc.frame().state->avatar_attachment->bone == 1 && doc.copy_scene().encode() == before,
+        "The other controller cannot change the picker or trigger document history");
+  click(8, .9f);
+  check(!doc.frame().state->avatar_attachment && !doc.frame().state->menu &&
+        !doc.frame().state->native_pending && doc.copy_scene().encode() == before,
+        "Explicit Cancel and a carried trigger leave attachment and paint unchanged");
+  frame.hands[0].undo = false;
+  frame.hands[1].tracked.trigger = 0;
+
+  open();
+  frame.hands[1].tracked.valid = false;
+  submit();
+  check(!doc.frame().state->avatar_attachment && doc.copy_scene().encode() == before,
+        "Loss of the owning controller retires its uncommitted choice");
+  frame.hands[1].tracked.valid = true;
+  open();
+  frame.focused = false;
+  submit();
+  check(!doc.frame().state->avatar_attachment && doc.copy_scene().encode() == before,
+        "OpenXR focus loss cancels the picker without queuing attachment work");
+  frame.focused = true;
+  open();
+  doc.select_object(rig);
+  check(!doc.frame().state->avatar_attachment && !doc.frame().state->menu,
+        "A different selected object retires stale attachment authority");
+  doc.select_object(accessory);
+
+  open();
+  click(1);
+  click(3);
+  click(10, .9f);
+  const auto saved = out / "xr-attached.dsculpt";
+  doc.save_async(saved).get();
+  auto expected = scene.snapshot();
+  detail::attach_source_accessory(expected, accessory, rig, 1, {});
+  check(doc.wait_asset() && !doc.frame().state->avatar_attachment && doc.frame().state->error.empty() &&
+        !doc.frame().state->native_pending && doc.copy_scene().encode() == expected.encode() &&
+        Scene::load(saved).encode() == expected.encode(),
+        "Controller Apply and ordered Save match the shared worker without a carried paint press");
+  const auto target = out / "xr-attachment-editable.vrm";
+  doc.export_asset(target, AssetExportFormat::EditableAvatar512).get();
+  auto ids = second.objects;
+  ids.push_back(accessory);
+  const auto native = extract_native_authoring(bytes(target));
+  check(native && native->encode() == detail::emission_export_subset(expected, ids).encode(),
+        "Export from the newly attached selection includes the chosen avatar instance only");
+  check(doc.undo() && doc.copy_scene().encode() == before && doc.redo() &&
+        doc.copy_scene().encode() == expected.encode(), "Controller attachment publishes one complete Undo and Redo");
+  doc.finish_spatial();
+}
+
 void bone_accessory(const std::filesystem::path &out) {
   using namespace dome;
   std::filesystem::create_directories(out);
@@ -583,6 +711,7 @@ void bone_accessory(const std::filesystem::path &out) {
   check(near(fit_before.matrix(), fitted.world_matrix(accessory).matrix()) &&
         Scene::decode(fitted.encode()).encode() == fitted.encode(),
         "Reset follows the fitted rest attachment and the result survives a native restart");
+  spatial_bone_accessory(out, scene, source_path, accessory);
 }
 } // namespace
 #ifndef DOME_VRM1_SOURCE_EXPORT_NO_MAIN

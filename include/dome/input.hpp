@@ -6,7 +6,8 @@
 #include <optional>
 namespace dome {
 // Shared page registry:18 procedural,19/22 polygon,20 holding,21/23 import.
-inline constexpr int spatial_page_count=33; //25 projection;26 preview;27 rig fitting;28 export;29 expressions;30 emission;31 material texture sets;32 paint filters.
+inline constexpr int avatar_attachment_page = 33;
+inline constexpr int spatial_page_count = avatar_attachment_page + 1;
 inline constexpr int spatial_max_page=spatial_page_count-1;
 enum class DeviceKind { Controller, SpatialStylus };
 enum class SpatialCommand {
@@ -101,8 +102,13 @@ enum class SpatialCommand {
   ExpressionIncrease, ExpressionReset, ExpressionApply, ExpressionCancel,
   EmissionRelative=16384, EmissionPhysical, EmissionBlack,
   TexturePrevious=32768, TextureNext, TexturePickFaces, TextureClearFaces, TextureCreate, TextureAssign, TextureMToon,
-  BlurColorLayer=65536
+  BlurColorLayer=65536,
+  AttachBoneBegin, AttachPreviousAvatar, AttachNextAvatar, AttachPreviousBone,
+  AttachNextBone, AttachBoneCancel, AttachBoneApply
 };
+inline bool avatar_attachment_command(SpatialCommand c) {
+  return c >= SpatialCommand::AttachBoneBegin && c <= SpatialCommand::AttachBoneApply;
+}
 inline bool texture_set_command(SpatialCommand c){return c>=SpatialCommand::TexturePrevious&&c<=SpatialCommand::TextureMToon;}
 inline bool editable_export_command(SpatialCommand c){return c>=SpatialCommand::ExportEditable256&&c<=SpatialCommand::ExportEditable1024;}
 inline bool expression_command(SpatialCommand c){return c>=SpatialCommand::ExpressionBegin&&c<=SpatialCommand::ExpressionCancel;}

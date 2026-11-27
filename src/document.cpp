@@ -620,6 +620,9 @@ void Document::publish_locked(bool force,bool checkpoint) {
     state_.expressions.reset();++state_.view_epoch;
   }
   if(state_.rig_fit&&!rig_fit_source_matches_locked())state_.rig_fit.reset();
+  if (state_.avatar_attachment && (!avatar_attachment_source_matches_locked() ||
+                                  state_.asset_busy || state_.recovery_busy))
+    discard_avatar_attachment_locked();
   if(state_.polygon_handoff&&state_.polygon_handoff_revision==UINT64_MAX)state_.polygon_handoff_revision=state_.revision;
   if(state_.polygon_handoff&&(state_.polygon_handoff_generation!=state_.generation||state_.polygon_handoff_revision!=state_.revision||state_.polygon_handoff_object!=active.id||!object_editable_locked(active.id))) {
     state_.polygon_handoff.reset();state_.polygon_handoff_object=0;
@@ -817,6 +820,10 @@ void Document::publish_locked(bool force,bool checkpoint) {
                              : command ? command_enabled_locked(*command)
                                        : true;
     if(state_.menu_page==26&&i>3&&i!=8)state_.menu_enabled[i]=false;
+    if (state_.menu_page == 11 && i == 0 && state_.can_attach_avatar_accessory)
+      state_.menu_enabled[i] = avatar_attachment_command_enabled_locked(SpatialCommand::AttachBoneBegin);
+    if (state_.menu_page == avatar_attachment_page && !command)
+      state_.menu_enabled[i] = false;
 
   }
   bool weight_preview = weight_stroking_ && !weight_samples_.empty() &&
@@ -1497,6 +1504,7 @@ void Document::process_locked(const SpatialFrame &incoming) {
     if(f.hands[i].tracked.trigger<=.02f)state_.selection_release[i]=false;
     else f.hands[i].tracked.trigger=0;
   }
+  if (process_avatar_attachment_spatial_locked(f)) return;
   if(process_rig_fit_spatial_locked(f)){return;}
   if(process_projection_spatial_locked(f)){return;}
   if(native_stroke_&&native_stroke_->spatial_owner){if(native_stroke_->space==NativeStrokeSpace::Ray)process_shape_spatial_locked(f);else process_affine_paint_spatial_locked(f);return;}
@@ -1648,6 +1656,10 @@ void Document::process_locked(const SpatialFrame &incoming) {
       return;
     }
     state_.hands=f.hands;
+    if (avatar_attachment_command(*c)) {
+      avatar_attachment_command_locked(*c);
+      return;
+    }
     // Mask page commands already end their gesture on menu entry. Retain the
     // live page so toggles and Fill can be followed by Resume without losing it.
     if (!state_.retopology && !state_.cut && !sculpt_mask_command(*c) && !import_command(*c) && !projection_command(*c) && !preview_command(*c) && !rig_fit_command(*c) && !expression_command(*c) &&
@@ -3194,6 +3206,8 @@ void Document::control_event_locked(VrControlEvent event) {
 }
 
 bool Document::command_enabled_locked(SpatialCommand command) const {
+  if (avatar_attachment_command(command)) return avatar_attachment_command_enabled_locked(command);
+  if (state_.avatar_attachment && (command == SpatialCommand::Undo || command == SpatialCommand::Redo)) return false;
   if(command==SpatialCommand::BlurColorLayer){
     const auto &object=scene_.active();
     if(!object.mesh_active||!object.painted)return false;

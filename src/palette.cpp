@@ -11,6 +11,7 @@
 #include <bit>
 #include "palette-text.hpp"
 #include "emission-control-scale.hpp"
+#include "source-rigid-pose.hpp"
 namespace dome {
 namespace {
 GLuint shader(GLenum kind, const char *text) {
@@ -491,6 +492,7 @@ void SpatialPalette::raster(const EditorState &s) {
   const auto &labels = spatial_labels(s.menu_page);
   constexpr float pi = 3.14159265358979323846f;
   for (int i = 0; i < 12; ++i) {
+    if (s.menu_page == avatar_attachment_page && !*labels[i]) continue;
     float a = i * pi / 6;
     int x = int(320 + 220 * std::cos(a)) * unit_,
         y = int(320 - 220 * std::sin(a)) * unit_;
@@ -502,7 +504,7 @@ void SpatialPalette::raster(const EditorState &s) {
     if (!s.menu_enabled[i])
       for (int c = 0; c < 3; ++c)
         label_color[c] = uint8_t((int(fg[c]) + bg[c]) / 2);
-    const std::string label = s.menu_page==14&&i==7&&s.skin_options.mode==SkinAuthoringMode::SurfaceHeat&&s.selected_objects.size()>1 ? "Bind selected" : s.menu_page==16 && s.retopology && i==3 && s.retopology->selected.size()==4 ? "Bridge edges" : s.menu_page==16 && s.retopology && i==1 ? (s.retopology->extruding?"Extrude edge":s.retopology->moving?"Move points":"Place points") : s.menu_page==27?rig_fit_tool_label(s.rig_fit.get(),i):s.menu_page==25?projection_tool_label(s.projection.get(),i):s.menu_page==19&&i==0 ? (s.polygon?"Resume editing":s.polygon_has_source?"Edit / original":s.polygon_requires_conversion?"Convert / source":"Start editing") : s.menu_page == 16 && i == 0 && s.retopology ? "Resume patch" : s.menu_page == 15 && i == 0 && s.sculpt_settings.mask_edit ? "Resume mask" : labels[i];
+    const std::string label = s.menu_page==11 && i==0 && s.can_attach_avatar_accessory ? "Attach to bone" : s.menu_page==14&&i==7&&s.skin_options.mode==SkinAuthoringMode::SurfaceHeat&&s.selected_objects.size()>1 ? "Bind selected" : s.menu_page==16 && s.retopology && i==3 && s.retopology->selected.size()==4 ? "Bridge edges" : s.menu_page==16 && s.retopology && i==1 ? (s.retopology->extruding?"Extrude edge":s.retopology->moving?"Move points":"Place points") : s.menu_page==27?rig_fit_tool_label(s.rig_fit.get(),i):s.menu_page==25?projection_tool_label(s.projection.get(),i):s.menu_page==19&&i==0 ? (s.polygon?"Resume editing":s.polygon_has_source?"Edit / original":s.polygon_requires_conversion?"Convert / source":"Start editing") : s.menu_page == 16 && i == 0 && s.retopology ? "Resume patch" : s.menu_page == 15 && i == 0 && s.sculpt_settings.mask_edit ? "Resume mask" : labels[i];
     int cell = 102 * unit_;
     auto fitted = text_font_->layout(label, cell);
     size_t split = std::string::npos;
@@ -534,7 +536,7 @@ void SpatialPalette::raster(const EditorState &s) {
         rect(mx + 2 * unit_, my + 2 * unit_, 4 * unit_, 4 * unit_, label_color);
     }
   }
-  if (s.menu_page != 29 && s.menu_page != 28 && s.menu_page != 24 && s.menu_page != 11 && s.menu_page != 12 && s.menu_page != 13 && s.menu_page != 14 && s.menu_page != 15 && s.menu_page != 16 && s.menu_page != 17 && s.menu_page!=19 && s.menu_page!=22 && s.menu_page != 21 && s.menu_page != 23) {
+  if (s.menu_page != avatar_attachment_page && s.menu_page != 29 && s.menu_page != 28 && s.menu_page != 24 && s.menu_page != 11 && s.menu_page != 12 && s.menu_page != 13 && s.menu_page != 14 && s.menu_page != 15 && s.menu_page != 16 && s.menu_page != 17 && s.menu_page!=19 && s.menu_page!=22 && s.menu_page != 21 && s.menu_page != 23) {
     text(320 * unit_, 295 * unit_, "Stick to choose", fg);
     text(320 * unit_, 320 * unit_, "Press to confirm", fg);
   }
@@ -543,7 +545,18 @@ void SpatialPalette::raster(const EditorState &s) {
     text(320*unit_,295*unit_,view.settings?rig_fit_parameter_text(view):rig_fit_selection_label(view),fg);
     text(320*unit_,320*unit_,view.rest_source?std::to_string(view.bone_heads.size())+" original bones":rig_fit_selection_point(view)?std::to_string(view.landmarks.points.size())+" landmarks placed":"Not placed",fg);
   }
-  const char *page = s.menu_page==32 ? "Paint filters / controls" : s.menu_page==31 ? "Material texture sets" : s.menu_page==30 ? "Emission / HDR" : s.menu_page==29 ? "VRM1 expression preview" : s.menu_page==28 ? "Export / editable project" : s.menu_page==27 ? "Humanoid rig fitting" : s.menu_page==25 ? "Image projection" : s.menu_page==24 ? "Shapekey tools" : s.menu_page==22 ? "Polygon topology" : s.menu_page==19 ? "Polygon edit" : s.menu_page == 23 ? "Import options" : s.menu_page == 21 ? "Import model" : s.menu_page == 20 ? "Holding / isolation" : s.menu_page == 18 ? "Procedural sculpt" : s.menu_page == 17 ? "Plane cut" : s.menu_page == 16 ? "Retopology" : s.menu_page == 15 ? "Masks / symmetry" : s.menu_page == 14 ? "Bind / transfer skin"
+  if (s.menu_page == avatar_attachment_page && s.avatar_attachment) {
+    const auto &view = *s.avatar_attachment;
+    const auto &rig = view.rigs->at(view.avatar);
+    const auto &bones = rig.deformation->skeleton->bones;
+    text(320 * unit_, 286 * unit_, rig.name, fg, 310 * unit_);
+    text(320 * unit_, 315 * unit_, bones.at(view.bone).name, accent, 310 * unit_);
+    const auto count = std::to_string(view.bone + 1) + " / " + std::to_string(bones.size());
+    text(320 * unit_, 343 * unit_, view.rigs->size() == 1 ? count :
+         "Avatar " + std::to_string(view.avatar + 1) + " / " + std::to_string(view.rigs->size()) + "    Bone " + count,
+         fg, 310 * unit_);
+  }
+  const char *page = s.menu_page==avatar_attachment_page ? "Attach accessory to avatar bone" : s.menu_page==32 ? "Paint filters / controls" : s.menu_page==31 ? "Material texture sets" : s.menu_page==30 ? "Emission / HDR" : s.menu_page==29 ? "VRM1 expression preview" : s.menu_page==28 ? "Export / editable project" : s.menu_page==27 ? "Humanoid rig fitting" : s.menu_page==25 ? "Image projection" : s.menu_page==24 ? "Shapekey tools" : s.menu_page==22 ? "Polygon topology" : s.menu_page==19 ? "Polygon edit" : s.menu_page == 23 ? "Import options" : s.menu_page == 21 ? "Import model" : s.menu_page == 20 ? "Holding / isolation" : s.menu_page == 18 ? "Procedural sculpt" : s.menu_page == 17 ? "Plane cut" : s.menu_page == 16 ? "Retopology" : s.menu_page == 15 ? "Masks / symmetry" : s.menu_page == 14 ? "Bind / transfer skin"
                      : s.menu_page == 13 ? "Skin weights"
                      : s.menu_page == 12 ? "Mesh baking"
                      : s.menu_page == 11 ? "Rig and shapekeys"
