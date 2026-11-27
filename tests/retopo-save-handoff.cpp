@@ -7,6 +7,8 @@
 #include <fstream>
 #include <cstdlib>
 #include <new>
+#include <string_view>
+#include <thread>
 namespace handoff_fault {
 thread_local bool armed=false,hit=false;
 thread_local size_t calls=0,fail=0;
@@ -48,16 +50,120 @@ extern "C" void wrapped_edit(RetopoWorkspace &workspace,RetopoAction action,Vec3
   real_edit(workspace,action,p,distance,cancelled);
   if(error)throw std::runtime_error("Test-injected independent retopology finalization failure");
 }
+
+namespace {
+struct FileGate {
+  std::mutex mutex;
+  std::condition_variable changed;
+  bool armed = false;
+  bool entered = false;
+
+  void arm() {
+    std::lock_guard lock(mutex);
+    entered = false;
+    armed = true;
+  }
+  bool wait() {
+    std::unique_lock lock(mutex);
+    return changed.wait_for(lock, std::chrono::seconds(120), [&] { return entered; });
+  }
+  void stop() {
+    std::unique_lock lock(mutex);
+    if (!armed) return;
+    entered = true;
+    changed.notify_all();
+    changed.wait(lock, [&] { return !armed; });
+  }
+  void release() {
+    std::lock_guard lock(mutex);
+    armed = false;
+    changed.notify_all();
+  }
+} file_gate;
+struct ReleaseFileGate { ~ReleaseFileGate() { file_gate.release(); } };
+}
+
+extern "C" int __real_fsync(int);
+extern "C" int __wrap_fsync(int fd) {
+  file_gate.stop();
+  return __real_fsync(fd);
+}
+
 namespace {
 constexpr Matrix handoff_matrix{-1.3,.1,0,0,.35,.8,.05,0,.1,.15,1.2,0,.15,-.1,.2,1};
 std::string bytes(const std::filesystem::path &p){std::ifstream f(p,std::ios::binary);return {std::istreambuf_iterator<char>(f),{}};}
 void prior(const std::filesystem::path &p){std::ofstream(p,std::ios::binary)<<"previous exact native file";}
 std::string failure(std::future<void> &f){try{f.get();return {};}catch(const std::exception &e){return e.what();}}
-void draft(Document &d,const Scene &s,bool face=true){
-  d.replace(s.snapshot());check(d.wait_mesh(),"Current native source is ready before retopology");d.begin_retopology();ready(d);
+void author_draft(Document &d, bool face) {
+  d.begin_retopology();ready(d);
   if(!face)return;
   for(auto p:std::array<Vec3,3>{{{-.2f,-.15f,-.055f},{.2f,-.15f,.025f},{0,.15f,.015f}}})place(d,point(handoff_matrix,evaluated(p,true)));
   d.edit_retopology(RetopoAction::Face);ready(d);
+}
+void draft(Document &d,const Scene &s,bool face=true){
+  d.replace(s.snapshot());check(d.wait_mesh(),"Current native source is ready before retopology");
+  author_draft(d, face);
+}
+void require_full_file_queue(Document &document, const std::filesystem::path &path) {
+  try {
+    auto unexpectedly_admitted = document.save_async(path);
+  } catch (const std::runtime_error &error) {
+    if (std::string_view(error.what()) != "File work queue is full") throw;
+    check(bytes(path) == "previous exact native file", "Queue overflow preserves the previous file");
+    return;
+  }
+  throw std::runtime_error("A full file queue unexpectedly admitted another Save");
+}
+void file_queue_capacity(const std::filesystem::path &out, const Scene &source,
+                         const nlohmann::json &original) {
+  Document document;
+  ReleaseFileGate release_file;
+  input_gate::Release release_input;
+  document.replace(source.snapshot());
+  check(document.wait_mesh(), "Current native source is ready before retopology");
+  const auto previous_path = out / "before-apply.dsculpt";
+  file_gate.arm();
+  auto previous = document.save_async(previous_path);
+  check(file_gate.wait(), "Older Save owns the file worker while Apply is queued");
+  author_draft(document, true);
+  input_gate::arm();
+  document.end_retopology(true);
+  check(input_gate::wait(), "Independent topology work is held before publication");
+
+  // The queued Apply and seven dependent Saves occupy all eight pending slots.
+  std::vector<std::future<void>> saves;
+  saves.reserve(8);
+  const auto save_path = [&](size_t index) { return out / ("queued-" + std::to_string(index) + ".dsculpt"); };
+  for (size_t i = 0; i < 7; ++i) saves.push_back(document.save_async(save_path(i)));
+  const auto overflow = out / "overflow.dsculpt";
+  prior(overflow);
+  require_full_file_queue(document, overflow);
+
+  // Completing the older Save allows the worker to dequeue Apply. Its input
+  // stays held, so only Apply's slot can become free before publication.
+  file_gate.release();
+  previous.get();
+  const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(120);
+  for (;;) {
+    try {
+      saves.push_back(document.save_async(save_path(7)));
+      break;
+    } catch (const std::runtime_error &error) {
+      if (std::string_view(error.what()) != "File work queue is full") throw;
+      if (std::chrono::steady_clock::now() >= deadline)
+        throw std::runtime_error("File worker did not dequeue accepted Apply");
+      std::this_thread::sleep_for(std::chrono::milliseconds(2));
+    }
+  }
+  require_full_file_queue(document, overflow);
+  check(Scene::load(previous_path).encode() == original, "Older Save retains the original scene");
+  input_gate::release();
+  for (auto &save : saves) save.get();
+  const auto accepted = document.copy_scene().encode();
+  for (size_t i = 0; i < saves.size(); ++i)
+    check(Scene::load(save_path(i)).encode() == accepted, "Queued Save captures the exact accepted scene");
+  document.save(overflow);
+  check(Scene::load(overflow).encode() == accepted, "Previously refused Save can retry after the queue drains");
 }
 void close_cancelled(Document &d){input_gate::release();check(d.wait_asset(),"Cancelled accepted work drains");if(d.frame().state->retopology)d.end_retopology(false);}
 void runtime_cases(const std::filesystem::path &out,const Scene &s){
@@ -102,12 +208,7 @@ void runtime_cases(const std::filesystem::path &out,const Scene &s){
   check(closed.wait_for(std::chrono::seconds(120))==std::future_status::ready,"Shutdown releases every independent worker after acceptance");closed.get();saved.get();
   const auto loaded=Scene::load(path);check(loaded.objects().size()==2&&loaded.active().retopology&&!loaded.object(s.active().id).visible,"Shutdown Save retains complete actual source and authored patch");
  }
- {
-  Document d;draft(d,s);input_gate::Release release;input_gate::arm();d.end_retopology(true);check(input_gate::wait(),"File-capacity case holds accepted independent input");
-  std::vector<std::future<void>> saves;for(size_t i=0;i<8;++i)saves.push_back(d.save_async(out/("queued-"+std::to_string(i)+".dsculpt")));
-  const auto overflow=out/"overflow.dsculpt";prior(overflow);check(refuses([&]{(void)d.save_async(overflow);})&&bytes(overflow)=="previous exact native file","Real eight-entry file queue refuses overflow before any output mutation");
-  input_gate::release();for(auto &f:saves)f.get();const auto accepted=d.copy_scene().encode();for(size_t i=0;i<8;++i)check(Scene::load(out/("queued-"+std::to_string(i)+".dsculpt")).encode()==accepted,"Every admitted queued Save uses the same exact accepted endpoint");
- }
+ file_queue_capacity(out, s, exact);
 }
 void admission_faults(const std::filesystem::path &out,const Scene &s){
  const auto exact=s.encode();size_t count=0;
