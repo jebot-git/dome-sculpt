@@ -1,0 +1,539 @@
+{
+  "archive_members_sha256": {
+    "alpha-observer-software.log": "83e7c877e15ce74f5727299dc88cec316388dbd288cf8bb6709c080d0aa92d71",
+    "asan-baked-material-controls.log": "560040a087a21da52156b236635e750fb731d32dd46e298f5d5aeb3121221f22",
+    "asan-tests.log": "c3e442e56660222d3b5747ff29d90c2311a5b4b486802a8cc743741797dd452c",
+    "asan/paint.cpp.build.log": "3b6d1e02cd6961b7a0aab03e5229e9924887fe3468fac837b400f669c69d6960",
+    "asan/texture-set-resample.cpp.build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "asan/texture-set-resolution.cpp.build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "baseline.log": "ef00d3e15551e6b8199ff2d1fe6cd2374dfba89efbed2ddd204a06736a97ec6d",
+    "bind-wayland.log": "002da5047f5529ef704f2718c79ea2ffdd5ba20be3f7d3603bf9f43108801711",
+    "check-asan.py": "6584c5370f38699d8213c113b3a578110c57ea4cc380850126d2e56e2cb4cef1",
+    "check-baseline.py": "da6fe65f1d5bea52af8fbe92b9965ddca2e91b22c468f108b74adb999d1be4c6",
+    "check-portable.py": "88b055f1da021c2a49e9f60e09531cd8c65ec3437195e3224bc81cc9d4420498",
+    "check-v1.sh": "71bb15a5e8cc5f843d3426d3259d6d52f806a75ca77453af75dd1afcaf208cf3",
+    "check-v2.sh": "96c8ff64192b56dcb919363a00156d07ae16cee327eadfeadecc85be127a152c",
+    "field-xr-paced-arc.log": "3f5669241733f1253b3f74a80c6b6c3260792abb8454d75fe886dc9a5f700d20",
+    "field-xr-paced-arc/report.json": "04ae4416130051ef2af71959b070b858d78e6466343d6cdaad2892660c45d09d",
+    "field-xr-paced-arc/runtime.json": "5fd4eccbc22132649f33a66ffefea7b4d7e7030e555b9732362fc63af7ce9720",
+    "field-xr-paced-software.log": "3f5669241733f1253b3f74a80c6b6c3260792abb8454d75fe886dc9a5f700d20",
+    "field-xr-paced-software/report.json": "97846ef65a3aa649832b24f549c5aca8f9aa8bd6c27365d847d4ccb1a9a5a88d",
+    "field-xr-paced-software/runtime.json": "ec0ded5262c77764d28b97498d76e6d8a8de7ebfd849f708eb19854b34869fb8",
+    "field-xr-paced.py": "9a34c4bd493c0c65a3e219d503a17acdaae1200cb2da61c459c1f93b5b963a90",
+    "khronos.cjs": "6dd6ff439f2f1a5b6d4a1a2f9517a21193f316a750d037fd83c35381c21cf0a5",
+    "khronos.json": "0c638447b44c0a96476b5910a3174072eed79e127e5da9911a9f5db99b2f2a24",
+    "khronos.log": "c917e45eabd5f369c8bd4480d5580e2d5a26efe848c3cc85e36a51a03606dcb3",
+    "portable-attributes.json": "233e578087b8bda44fd9b2f2854b64096c3d9e5e50506bf3063cb9ea939d8624",
+    "record.py": "758ed9f76d98507ed00a963a94a7c65e699765b70a27e1ef888524282f3b14c9",
+    "release-baked-material-controls.log": "6b27fd26cd726e3cdd8a16307db61c64b65c51b75e5588ba226f96d423794514",
+    "release-v1-build.log": "0f3dfa3659a8aa6d6a730e6bf9fad8d868cae684040963e86ded50aa0b21369a",
+    "release-v1-tests.log": "45e32f2145c40024a9e4d6b0cd1d7a78ac1005e1bf4adb4b065196e2a6bca794",
+    "release-v2-build.log": "536e322c395a95f01dbe8e56e5cddd335c55dac61846f56bdd16bd65f86523fa",
+    "release-v2-tests.log": "f34c467552d11b7f1439cdcb944d5cff9311f8250085b07e87513c335e42fba7",
+    "render-portable.cpp": "2a78c257c3d95dada58bc76642fb5bcd18a5fafd830700905a087d29978b90c9",
+    "render-portable.py": "d96e06c1bd00de6ba4d88eb05e09fd5712058dcf0ffb2064a69c7d11abb171d2",
+    "run-field-xr-paced.py": "19ea519d4465347cc88ce3cf1659f7cf2db7dde61a71f5754d65fb46e49656e1",
+    "run-render.py": "5be192ec76f6fd3e133069ea1e36a0e7c503af5e3731431f16a32283e569e8ce",
+    "run-wayland.py": "72bc44bab3cab6b1f5d0621cc5fe85322b1da6beb8fd9f0de2b598a7e987dac2",
+    "source-v2.patch": "1e2d4b100b995675ee97255509755bdf2dc3d1a5f2fd5ee6508ccf4c5fea72e8",
+    "strip-editable-package.py": "478013101a02fef2d3429bab89210645262bfe15caf3fa9dcc0e616bdb6213b5",
+    "v2-baked/render-portable-arc.log": "14a4095f48f3d5b73dffa4f7fa7edc4983dfb91185e7258d9b37924a97c8996a",
+    "v2-baked/render-portable-software.log": "a9d0b0f6da8dd62443a543bf7ab80c4baab40cb441a586b2c856274d277925c7",
+    "v2-baked/verified-stereo-arc.log": "8e6d77da23f2b1d74ecf1d1f8b3848fd0f2654db51f255ec42971697a2a5ba99",
+    "v2-baked/verified-stereo-software.log": "5d205ca46420863eb96cf274bbfdde242d734439d1c43aac07db950067400d99",
+    "wayland-resize.py": "56c2f9e561c22ef26a361b51e661071fb682148a07161d2a630c3f675b4c16f9",
+    "wayland-resize/report.json": "cddbdc36c2b25ea24a188bd22de6a8b64b2f4d2b305aa947745f4ecc0acd6c99",
+    "xr-arc-v2-baked/compare.json": "066e011b1754e20411f28b804b021d822c4b2f503008a72a3038c5b21e55067b",
+    "xr-portable.py": "724326b5605bf8ba5303bb80810cc3785c1fc703e2cf778fe764f28381161077",
+    "xr-software-v2-baked/compare.json": "561949cf5f4b92fd4a6c3c0f62537b564dc9758492b87bc1c895ca1f7be4ae53"
+  },
+  "archive_sha256": "c33481358d29232837cbb634f35a14aae887105083b01983cf4fc33bdc3cbeca",
+  "backend": "CPU",
+  "baked_material_checks": 52,
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "graphics": {
+    "arc": {
+      "maximum_8_bit": 1,
+      "per_eye": [
+        {
+          "components": 4738,
+          "maximum_channel_difference": 1
+        },
+        {
+          "components": 8180,
+          "maximum_channel_difference": 1
+        }
+      ],
+      "pixels_by_material": [
+        5814,
+        5814
+      ],
+      "renderer": "Arc(tm) A770",
+      "rms": 0.0862493
+    },
+    "software": {
+      "maximum_8_bit": 1,
+      "per_eye": [
+        {
+          "components": 4873,
+          "maximum_channel_difference": 1
+        },
+        {
+          "components": 8340,
+          "maximum_channel_difference": 1
+        }
+      ],
+      "pixels_by_material": [
+        5814,
+        5814
+      ],
+      "renderer": "llvmpipe",
+      "rms": 0.0837194
+    }
+  },
+  "khronos": {
+    "results": [
+      {
+        "file": "v2-baked/baked-member-standard.glb",
+        "issues": {
+          "messages": [
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "pointer": "/bufferViews/13",
+              "severity": 2
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "pointer": "/bufferViews/14",
+              "severity": 2
+            }
+          ],
+          "numErrors": 0,
+          "numHints": 0,
+          "numInfos": 2,
+          "numWarnings": 0,
+          "truncated": false
+        }
+      },
+      {
+        "file": "v2-baked/baked-member-editable.glb",
+        "issues": {
+          "messages": [
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "pointer": "/bufferViews/13",
+              "severity": 2
+            }
+          ],
+          "numErrors": 0,
+          "numHints": 0,
+          "numInfos": 1,
+          "numWarnings": 0,
+          "truncated": false
+        }
+      },
+      {
+        "file": "v2-baked/portable.glb",
+        "issues": {
+          "messages": [
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "pointer": "/bufferViews/13",
+              "severity": 2
+            }
+          ],
+          "numErrors": 0,
+          "numHints": 0,
+          "numInfos": 1,
+          "numWarnings": 0,
+          "truncated": false
+        }
+      }
+    ],
+    "validator": "2.0.0-dev.3.10"
+  },
+  "matching_native_and_glb_sha256": {
+    "baked-member-128.dsculpt": "3769c0c274430324fd40b8ca262469c6cb7af40c2a0a042fceabd300ab0803c0",
+    "baked-member-256.dsculpt": "9251c257c6bfa524ad3b491008407391e1cd15abaaa743ab1b057c3aa871e38d",
+    "baked-member-editable.glb": "b1b8430e995e84701196e82083630cb4174ab93c4b18f6f48881a5638815ebcf",
+    "baked-member-standard.glb": "d33612f591aa9e68c3972f518badecd5cabc53123fbdf25218d2f802f91725c7"
+  },
+  "physical_headset": false,
+  "portable_attributes": {
+    "baked-member-editable.glb": [
+      {
+        "emissive_strength": 1,
+        "indices": [
+          0,
+          1,
+          2,
+          0,
+          2,
+          3
+        ],
+        "maps": {
+          "base": [
+            64,
+            64
+          ],
+          "emission": [
+            64,
+            64
+          ],
+          "metal_rough": [
+            64,
+            64
+          ],
+          "normal": [
+            64,
+            64
+          ],
+          "occlusion": [
+            64,
+            64
+          ]
+        },
+        "material": "Sibling",
+        "tangents_available": true
+      },
+      {
+        "emissive_strength": 691.3598022460938,
+        "indices": [
+          4,
+          5,
+          6,
+          4,
+          6,
+          7
+        ],
+        "maps": {
+          "base": [
+            256,
+            256
+          ],
+          "emission": [
+            256,
+            256
+          ],
+          "metal_rough": [
+            256,
+            256
+          ],
+          "normal": [
+            256,
+            256
+          ],
+          "occlusion": [
+            256,
+            256
+          ]
+        },
+        "material": "Resize",
+        "tangents_available": true
+      }
+    ],
+    "baked-member-standard.glb": [
+      {
+        "emissive_strength": 1,
+        "indices": [
+          0,
+          1,
+          2,
+          0,
+          2,
+          3
+        ],
+        "maps": {
+          "base": [
+            64,
+            64
+          ],
+          "emission": [
+            64,
+            64
+          ],
+          "metal_rough": [
+            64,
+            64
+          ],
+          "normal": [
+            64,
+            64
+          ],
+          "occlusion": [
+            64,
+            64
+          ]
+        },
+        "material": "Sibling",
+        "tangents_available": true
+      },
+      {
+        "emissive_strength": 691.3598022460938,
+        "indices": [
+          4,
+          5,
+          6,
+          4,
+          6,
+          7
+        ],
+        "maps": {
+          "base": [
+            256,
+            256
+          ],
+          "emission": [
+            256,
+            256
+          ],
+          "metal_rough": [
+            256,
+            256
+          ],
+          "normal": [
+            256,
+            256
+          ],
+          "occlusion": [
+            256,
+            256
+          ]
+        },
+        "material": "Resize",
+        "tangents_available": true
+      }
+    ],
+    "portable.glb": [
+      {
+        "emissive_strength": 1,
+        "indices": [
+          0,
+          1,
+          2,
+          0,
+          2,
+          3
+        ],
+        "maps": {
+          "base": [
+            64,
+            64
+          ],
+          "emission": [
+            64,
+            64
+          ],
+          "metal_rough": [
+            64,
+            64
+          ],
+          "normal": [
+            64,
+            64
+          ],
+          "occlusion": [
+            64,
+            64
+          ]
+        },
+        "material": "Sibling",
+        "tangents_available": true
+      },
+      {
+        "emissive_strength": 691.3598022460938,
+        "indices": [
+          4,
+          5,
+          6,
+          4,
+          6,
+          7
+        ],
+        "maps": {
+          "base": [
+            256,
+            256
+          ],
+          "emission": [
+            256,
+            256
+          ],
+          "metal_rough": [
+            256,
+            256
+          ],
+          "normal": [
+            256,
+            256
+          ],
+          "occlusion": [
+            256,
+            256
+          ]
+        },
+        "material": "Resize",
+        "tangents_available": true
+      }
+    ]
+  },
+  "previous_core_sha256": "0e76841c2db184b79a7eaf4041f4505913b3efb95b27c3358e6941e1db3bd5f3",
+  "previous_main": "ba94b8d0e3f062ec8b01643ec54728c8dd7dcd10",
+  "previous_worker_refusal": "EXPECTED Texture-set retained owner bytes exceed bounds\nFAIL after 41 checks: Source/baked/prepared field resolution needs its authenticated writable-grid transition\n",
+  "product": "b460593f4cb655dcd5ee7bc3ff920b97f1edc515",
+  "release_application_sha256": "397be83ddfc19c719d88b325cf67b65f9df67c6b2d2b3592cfaeb331a971ec74",
+  "sanitizer_core_sha256": "c0d6b98ccbed8a4f39ff13d7f3f346beca8c94cfec8dc50eb7b52aa6f13d08b5",
+  "source_patch_sha256": "1e2d4b100b995675ee97255509755bdf2dc3d1a5f2fd5ee6508ccf4c5fea72e8",
+  "synthetic_controller": {
+    "arc": {
+      "balanced_frames": 198,
+      "checks": [
+        "accepted rendered palette shows the expected history and closes after Save",
+        "accepted controller Save matches the complete native project byte for byte",
+        "undone rendered palette shows the expected history and closes after Save",
+        "undone controller Save matches the complete native project byte for byte",
+        "redone rendered palette shows the expected history and closes after Save",
+        "redone controller Save matches the complete native project byte for byte",
+        "OpenXR app drains and final close persists the exact resized patch",
+        "Real OpenXR loader balances frame, images and both swapchains",
+        "Both eyes render the patch and its actual resolution panel",
+        "Loader delivers actual panel navigation and slider rays",
+        "Requested OpenGL renderer drives the workflow",
+        "Process maps witness the ordinary application and synthetic runtime module"
+      ],
+      "complete": true,
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "runtime": "/home/blux/de-xr/dome-sculpt/artifacts/current-integrated-full-release-20261127/build/libdome-sculpt-texture-resolution-runtime.so"
+    },
+    "software": {
+      "balanced_frames": 185,
+      "checks": [
+        "accepted rendered palette shows the expected history and closes after Save",
+        "accepted controller Save matches the complete native project byte for byte",
+        "undone rendered palette shows the expected history and closes after Save",
+        "undone controller Save matches the complete native project byte for byte",
+        "redone rendered palette shows the expected history and closes after Save",
+        "redone controller Save matches the complete native project byte for byte",
+        "OpenXR app drains and final close persists the exact resized patch",
+        "Real OpenXR loader balances frame, images and both swapchains",
+        "Both eyes render the patch and its actual resolution panel",
+        "Loader delivers actual panel navigation and slider rays",
+        "Requested OpenGL renderer drives the workflow",
+        "Process maps witness the ordinary application and synthetic runtime module"
+      ],
+      "complete": true,
+      "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+      "runtime": "/home/blux/de-xr/dome-sculpt/artifacts/current-integrated-full-release-20261127/build/libdome-sculpt-texture-resolution-runtime.so"
+    }
+  },
+  "tests": {
+    "asan": [
+      "dome-sculpt-texture-set-baked-resolution",
+      "dome-sculpt-texture-set-resolution",
+      "native-mikk-export",
+      "retopology-first-material-affine",
+      "retopology-first-material-plain",
+      "retopology-first-material-posed-affine",
+      "retopology-first-material-posed-plain",
+      "retopology-imported-bake-resize",
+      "retopology-imported-mtoon-mixed-hdr",
+      "retopology-imported-mtoon-mixed-ldr",
+      "retopology-imported-mtoon-painted",
+      "retopology-imported-mtoon-resize",
+      "retopology-imported-mtoon-tinted",
+      "retopology-imported-mtoon-unprepared",
+      "retopology-imported-pbr",
+      "retopology-imported-prior-bake",
+      "retopology-mtoon-affine",
+      "retopology-mtoon-detached",
+      "retopology-mtoon-plain",
+      "retopology-mtoon-v0"
+    ],
+    "release": [
+      "dome-sculpt-texture-set-baked-resolution",
+      "dome-sculpt-texture-set-resolution",
+      "mtoon-baked-texture-sets",
+      "mtoon-painted-texture-sets",
+      "mtoon-texture-sets",
+      "native-authored-paint-resolution",
+      "native-baked-paint-resolution",
+      "native-empty-paint-resolution",
+      "native-mikk-export",
+      "native-mtoon-preview-contracts",
+      "retopology-first-material-affine",
+      "retopology-first-material-plain",
+      "retopology-first-material-posed-affine",
+      "retopology-first-material-posed-plain",
+      "retopology-imported-bake-resize",
+      "retopology-imported-mtoon-mixed-hdr",
+      "retopology-imported-mtoon-mixed-ldr",
+      "retopology-imported-mtoon-painted",
+      "retopology-imported-mtoon-resize",
+      "retopology-imported-mtoon-tinted",
+      "retopology-imported-mtoon-unprepared",
+      "retopology-imported-pbr",
+      "retopology-imported-prior-bake",
+      "retopology-mtoon-affine",
+      "retopology-mtoon-detached",
+      "retopology-mtoon-plain",
+      "retopology-mtoon-v0"
+    ]
+  },
+  "wayland": {
+    "checks": [
+      {
+        "check": "Native Wayland paint client publishes the Dome Sculpt identity",
+        "passed": true
+      },
+      {
+        "check": "Native Wayland client exports the universal texture-set command",
+        "passed": true
+      },
+      {
+        "check": "The loaded baked texture set enables the universal texture-set command",
+        "passed": true
+      },
+      {
+        "check": "The FLTK dialog opens on the current 128-pixel grid under the same Wayland identity",
+        "passed": true
+      },
+      {
+        "check": "DomeD key events stage the 256-pixel choice",
+        "passed": true
+      },
+      {
+        "check": "Ctrl+W cancels the draft without writing the project",
+        "passed": true
+      },
+      {
+        "check": "Reopening after cancellation shows the original grid",
+        "passed": true
+      },
+      {
+        "check": "DomeD keyboard navigation reaches the native Apply button",
+        "passed": true
+      },
+      {
+        "check": "Ordered native Save matches the complete controller-authored 256-pixel project",
+        "passed": true
+      },
+      {
+        "check": "Universal Undo and Save restore the exact original project",
+        "passed": true
+      },
+      {
+        "check": "Universal Redo and Save reproduce the exact enlarged project",
+        "passed": true
+      },
+      {
+        "check": "Native Wayland client closes after the paint worker and history operations",
+        "passed": true
+      }
+    ],
+    "complete": true
+  }
+}

@@ -346,10 +346,27 @@ its explicit tangents. Editable GLB restores the full resized project. All 25
 selected Release and 19 ASan/UBSan workflows pass. The exact resized project
 matches the desktop and controller saves through Apply, Undo and Redo. Six
 GLBs pass Khronos validation. Package-free Core PBR reimport matches the native
-stereo view within two 8-bit levels on Intel Arc and llvmpipe. Independently
-prepared and texture-set Bake grids, larger painted assets, accelerated
-resampling and physical device acceptance remain required.
+stereo view within two 8-bit levels on Intel Arc and llvmpipe.
 [Canonical Bake resize evidence](validation/retopology-bake-resize-20261127.json)
+
+**Resize active set** now also resizes a canonical PBR Bake on one native
+material slot. The selected slot keeps its face domain and Bake recipe. The
+fixture enlarges the second slot from 128 to 256 and checks each baked and
+authored paint cell, including hidden layers and FLOAT emission. Reducing the
+fixture back to 128 restores the original baked texels and FLOAT coefficients.
+The primary RGB8 Bake can also resize independently. Budget refusal and
+Cancel preserve the original project. Ordered Save, cold Open, Undo and Redo
+agree byte for byte across the native worker, DomeD Wayland and synthetic
+OpenXR on Intel Arc A770 and llvmpipe.
+
+All 27 focused Release and 20 strict ASan/UBSan cases pass. Standard and
+Editable GLB carry each material's own faces, texture dimensions and explicit
+tangents. Both exports and the package-free copy pass Khronos validation with
+zero errors and warnings. The package-free reimport differs from the native
+view by at most one 8-bit RGB level in both eyes. Independently prepared and
+source-retained material grids, typed MToon sets, larger assets, accelerated
+resampling and physical device acceptance remain open.
+[Per-material Bake resize evidence](validation/texture-set-bake-resize-20261127.json)
 
 Retopology reapply now works on native multi-material accessories attached
 to original VRM 1.0 joints. The replacement keeps its avatar hierarchy and

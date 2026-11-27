@@ -198,9 +198,19 @@ FLOAT emission and authored layers. The tested reducing path uses coverage-
 weighted material and normal samples, preserves sub-byte emission coverage and
 measures reconstruction against the original grid. Ordered Save, exact history,
 Standard and Editable GLB, prepared guide retention and controller workflows
-are checked on the accepted patch. Independently prepared and texture-set Bake
-grids, larger assets, acceleration and physical device testing remain open.
+are checked on the accepted patch.
 [Canonical Bake resize evidence](validation/retopology-bake-resize-20261127.json)
+
+Each native PBR material slot can now resize its own canonical Bake with the
+paint grid while keeping its face domain, Bake recipe, sibling slots and hidden
+Bake source. The second slot's enlargement preserves every original baked and
+authored paint cell. The tested inverse reduction restores the original baked
+data. Save, cold Open and history are covered through the native worker, nested
+DomeD Wayland and synthetic OpenXR. Standard and Editable GLB preserve both
+materials and their explicit normal-map tangents. Independently prepared,
+source-retained and typed MToon material grids, larger assets, acceleration and
+physical device testing remain open.
+[Per-material Bake resize evidence](validation/texture-set-bake-resize-20261127.json)
 
 Native multi-material retopology preserves independently painted and baked
 grids and original VRM 1.0 joint links when Apply changes the patch.
