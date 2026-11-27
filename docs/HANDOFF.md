@@ -2608,8 +2608,8 @@ The saved VRM restores the exact selected native scene and explicitly
 marks the hidden donor unavailable when it falls outside export scope.
 A second export reproduces the same file bytes. The Wayland universal menu
 and synthetic OpenXR Files command write the same VRM as the Document worker.
-Source-bone attachments, deforming or retained source texture-set partitions
-and VRM0 materials remain open.
+Deforming or retained source texture-set partitions and VRM0 materials
+remain open.
 
 The native worker passes 20 focused checks in both Release and ASan/UBSan.
 Five registered Release suites pass. Independent cgltf compares the original
@@ -2646,9 +2646,39 @@ A770 produces the same VRM through the controller Files command. The
 controller Cancel preserves a prior destination at the durable write boundary.
 A fresh headless process opens the Editable VRM and publishes the same GLB as
 reopening its Standard counterpart. The Khronos validator and pinned VRM1 and
-MToon schemas pass. Physical headset testing and bone-attached, skinned or
-retained-source accessory material transport remain open.
+MToon schemas pass. Physical headset testing and skinned or retained-source
+accessory material transport remain open.
 [Editable VRM1 native texture-set validation](validation/vrm1-editable-native-texture-set-20261127.json)
+
+### Rigid accessories attached to original VRM1 bones
+
+Scene → Attach accessory to avatar bone places a selected rigid native
+texture-set mesh under a joint of a visible original VRM1 skin. The worker
+creates missing placement groups from the immutable original hierarchy and
+keeps the mesh's current world placement. Linked posing moves the accessory
+with the joint. Rest fitting preserves current placement and subsequent
+posing and reset use the fitted pivot. Attach, ordered Save and Undo/Redo
+preserve paint and source data. Repeating the same attachment adds no Undo
+entry. A changed pose with a locked accessory refuses the linked operation.
+
+Both VRM1 export modes emit the rigid mesh beneath the actual source bone.
+Independent cgltf checks the emitted world matrix against the native pose and
+verifies both material partitions on the same rigid mesh. The source keeps its
+expression and explicit spring-joint references. The embedded project restores
+the exact fitted and first-rest owners, attachment, and paint. The VRM 1.0
+spring chain follows the explicit joint list. [VRM 1.0 spring-bone specification](https://github.com/vrm-c/vrm-specification/blob/master/specification/VRMC_springBone-1.0/README.md#joints)
+
+The native DomeD Wayland command passes default Cancel, attachment, Save,
+and Undo. Synthetic OpenXR on software GL and Intel Arc A770 writes an
+identical Editable VRM through the controller Files page. Release and
+ASan/UBSan each pass 39 focused assertions, with seven registered Release
+and four registered sanitizer suites passing. A fresh application opens
+both VRM formats and produces identical GLBs for the normal and fitted pose
+fixtures. The Khronos
+validator reports zero errors. Its material-extension and imported skinned
+node warnings also appear in the source-only control. XR attachment authoring,
+physical headset tests and skinned native accessories remain open.
+[VRM1 bone accessory validation](validation/vrm1-bone-accessory-20261127.json)
 
 ## Source and integration boundary
 

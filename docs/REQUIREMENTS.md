@@ -248,8 +248,12 @@ The selected nested accessory resolves the avatar from the desktop and XR
 export commands. Editable VRM1 shares the certified portable accessory output
 and restores the exact FLOAT Bake and editable texture sets from its native
 Scene. Source expression targets remain bound to their original material
-identities. Larger typed Bake previews, original authored and deforming
-frames, typed donor partitions, source-bone attachment, VRM0 texture-set
+identities. The FLTK Scene menu can attach a rigid native texture-set mesh
+to a genuine imported VRM1 bone. Linked posing and fitted-rest changes
+preserve native attachment and paint authority. Both VRM1 modes use the
+original bone as the portable parent. XR attachment authoring, larger typed
+Bake previews, original authored and deforming frames, typed donor
+partitions, skinned accessories, VRM0 texture-set
 materials, alternate UVs, resampling, live
 painted animation, other sampler modes and physical verification remain open.
 [Native MToon texture-set evidence](validation/native-mtoon-texture-sets-20261127.json)
@@ -263,6 +267,7 @@ painted animation, other sampler modes and physical verification remain open.
 [Editable typed FLOAT preview evidence](validation/editable-mtoon-float-20261127.json)
 [Standard VRM1 native texture-set accessory evidence](validation/vrm1-native-texture-set-20261127.json)
 [Editable VRM1 native texture-set accessory evidence](validation/vrm1-editable-native-texture-set-20261127.json)
+[VRM1 bone attachment evidence](validation/vrm1-bone-accessory-20261127.json)
 
 Strict Bake rays now recover source-edge contacts affected by float staging.
 An exact ray hit has priority. A missed ray can use an actual source edge

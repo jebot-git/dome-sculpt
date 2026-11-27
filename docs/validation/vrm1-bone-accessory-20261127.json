@@ -1,0 +1,191 @@
+{
+  "archive": {
+    "filename": "vrm1-bone-accessory-20261127.tar.gz",
+    "members": {
+      "asan/bone.log": "e43b36fc43a9bacba0f9e516bad5027ae9f1d4264088c01f5e264a49a152b9f5",
+      "asan/build.log": "c5243193f94d2e20a8a7dc80d0abcaa5077f7a5381335d389dc319cd8906ae5f",
+      "asan/compile_commands.json": "438ee6eaf89f709b1a3ad9b077fb202c6812a8bbc6f35d3d1ccf9903b83319d1",
+      "asan/configure.log": "0afca07dc2faca59edcb6e34be4d2c2c93dd68a45f49084bf519be344624e05d",
+      "asan/previous-accessory.log": "d6c3b77bf4bd301c3d1aa400dd44cc8e3f8c0a833f532dae5211d909a14f7471",
+      "asan/registered.log": "de6a045f97410695c30d86671ba1f9ddf57927679cb0ddb4bd7c5db45b458a27",
+      "asan/registered.xml": "18185e99ba1c584398c3e8f45e4b80df76aee27e56d7533c280030f820cacf3d",
+      "asan/verification-build.log": "92492ec0f65ba5efafeb694bb2af5b7a07126000bd9a68338a07f2f00b6a1fbf",
+      "cold-reopen.log": "55019ad18f49891b255fa3599512c59b50a8ee57ec2f58a983ea00a98751b81f",
+      "khronos.cjs": "72f848bbd4e4d2caafbaf895cca46cfb2613aed5584d3b7184dbf697c7573eeb",
+      "khronos.json": "7f0383af186c22e8ed83e4527a75ec96217245f7686153acad985340a59225fd",
+      "khronos.log": "625fd3e560a3f8559aa506ccc565cc91e50d1918bb1a8a4128aad19ecb7f1f8c",
+      "previous-combined-release-status.json": "4d7db65dda844bf1a6ee1f89c2f0c321a441f2851a45b3933a5aa874b139e95a",
+      "receipt.py": "4b181008d5c5e96a26f253831243dd50c4a6ce21586a37bde473de56bd1ef599",
+      "release-wayland.log": "c9ff3e7f9854d2a42d7d432149596a6631beba5f7056a2654c3c9cbfdbb7c6d8",
+      "release-wayland/report.json": "c47fb25b9bafad2166954965d280b0042578d20b6aa545e031bd5e7af761f73f",
+      "release/bone-fixture-archive-context.log": "26b9e2bdb32ab47c7eb9614a4ceef92a7fdec8d5e02b6b63eee150217b440150",
+      "release/bone.log": "e43b36fc43a9bacba0f9e516bad5027ae9f1d4264088c01f5e264a49a152b9f5",
+      "release/build.log": "268c089ede5ba9a8c68998c53f9fef7be1709e293de7039ccd11704de4bed674",
+      "release/compile_commands.json": "1c0c7b21b12db02c2be0fa9e836995a4bde28b0dd5d025d04eb1207257131d7e",
+      "release/configure.log": "ef0ce6c588245462449b41724fefcfe20e0496e2088453d7870928d0a9ee01af",
+      "release/fixture-fitted-build.log": "721d91ce93b71d55ec7c575bd6b94a5c3dc41ddfbe07e7a93e08c2f45ec11712",
+      "release/fixture-refresh.log": "721d91ce93b71d55ec7c575bd6b94a5c3dc41ddfbe07e7a93e08c2f45ec11712",
+      "release/registered.log": "4b71101372ac139808cc0051e24a7d8ce931bb43ac42d8260e451ff0550126d4",
+      "release/registered.xml": "b2e306e901250796740910c5576bb2868f0fba14021d34e39bdd3af261d7e04a",
+      "release/verification-build.log": "110fd99e3947d05037105e813c4a31ab09af623277ccdd2e0c7e61b0e95146ce",
+      "schemas.json": "dad33957e84814cd6d2f6ade93090fcecd0d86af2e254df8f654104e334568d9",
+      "schemas.log": "5223f95f84b574d98001346c9cde16f57105a0451e595115f1f2de1774c8bc4e",
+      "ui.py": "2040de0744677398e30f60e9cf31abb1bbd74f437bd94018abdfcfcb79bf8d2e",
+      "wayland-bone.py": "261d3879391e7d3d03e3b4a577435fa08eedd810dec13fbcd7ff0331f462ace5",
+      "xr-arc.log": "8f4fc371a35ba401776f5cb9fd6a4dd288b3c3c4a6f6775f3567879fed809cb8",
+      "xr-arc/runtime.json": "aa520e3e0c6b700a9e7aaabd1c8c3b2b5d153675fd479305e32087554c9040b8",
+      "xr-bone.py": "bd0ce474b8982fbe4bfbe5e078b2b7007aad3cd7b47c4fe3c0c608d51d6a7512",
+      "xr-software.log": "8f4fc371a35ba401776f5cb9fd6a4dd288b3c3c4a6f6775f3567879fed809cb8",
+      "xr-software/runtime.json": "749225c4eab9f83eb0298b30105006a1e38ff6e13c117202ac736236d8603c9b"
+    },
+    "sha256": "e91166ce509b78c45ca90b91b5da34be97e27a2965be47d92d20443261aaf6d6"
+  },
+  "canonical_domed_revision": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "earlier_combined_release": {
+    "app_sha256": "757f265c99f4f811c34bf6d8ab9a0eb7d40ecf4a026350c418550fad2ef5625c",
+    "cache_sha256": "941246a34d52a93f55e2dc9444541cfe7ad057a397a1f773d0d5e28bcb52dc60",
+    "candidate": "662d889da2b3a56e36f2f58f5280a624ae798906",
+    "changed_paths": [
+      "CMakeLists.txt",
+      "docs/HANDOFF.md",
+      "docs/REQUIREMENTS.md",
+      "docs/validation/exact-overlay-gpu-budget-20261127.json",
+      "docs/validation/exact-overlay-gpu-budget-20261127.tar.gz",
+      "docs/validation/native-mtoon-bake-20261127.json",
+      "docs/validation/native-mtoon-bake-20261127.tar.gz",
+      "docs/validation/retopo-save-queue-20261127.json",
+      "docs/validation/retopo-save-queue-20261127.tar.gz",
+      "src/bake-authoring.cpp",
+      "src/bake.cpp",
+      "src/export.cpp",
+      "src/native-authoring-compiler.cpp",
+      "src/render-paint-overlay.hpp",
+      "src/source-bake-normal.hpp",
+      "src/texture-set-export.cpp",
+      "src/texture-set-export.hpp",
+      "src/texture-set-range.cpp",
+      "src/texture-set-surface.cpp",
+      "src/texture-set-worker.cpp",
+      "src/texture-sets.cpp",
+      "tests/bake-recipes-xr.py",
+      "tests/bake-recipes.cpp",
+      "tests/baked-emission-gpu.cpp",
+      "tests/mtoon-render.cpp",
+      "tests/paint-overlay-gpu.cpp"
+    ],
+    "elapsed_seconds": 1049.026,
+    "invocation": "5d6e0b870e0749f1a8e890898960df75",
+    "observed_passes": 1363,
+    "observed_reported_failures": 0,
+    "phase": "run every registered Release test",
+    "registered": 1366,
+    "seed_app_sha256": "e0e7ea525e5338c4080a2af9db1cca0c18d856b5d9ddf37c399214b0afdc2e38",
+    "seed_cache_sha256": "7a052e626ae14dbbeb06a4465ed0203f08e2cba506988b71f891d7d317c00ab0",
+    "seed_registration_error": "texture-set-export was renamed dome-sculpt-texture-set-export",
+    "seed_revision": "f70483e921ded0d80497f36802e9201b9aebc1c1",
+    "terminal": false
+  },
+  "interop": {
+    "added_khronos_warnings": 0,
+    "identical_cold_open_glb_outputs": {
+      "fitted": "a7e1a0c5d660b6bf9163c0046348b8915399897f8ce7ea84d8bb355df5efeccd",
+      "head": "0cc6e7947521a193d60087b4f4db2971e3ffa71545752d466143220f0b1b2933"
+    },
+    "khronos_errors": 0,
+    "khronos_files": 5,
+    "khronos_version": "2.0.0-dev.3.10",
+    "pinned_schema_checks": 23,
+    "source_only_warning_control": [
+      {
+        "code": "MULTIPLE_EXTENSIONS",
+        "count": 3,
+        "owner_name": "Alpha source",
+        "table": "materials"
+      },
+      {
+        "code": "NODE_SKINNED_MESH_LOCAL_TRANSFORMS",
+        "count": 1,
+        "owner_name": "Instance one",
+        "table": "nodes"
+      },
+      {
+        "code": "NODE_SKINNED_MESH_LOCAL_TRANSFORMS",
+        "count": 1,
+        "owner_name": "Instance two",
+        "table": "nodes"
+      },
+      {
+        "code": "NODE_SKINNED_MESH_NON_ROOT",
+        "count": 1,
+        "owner_name": "Instance one",
+        "table": "nodes"
+      },
+      {
+        "code": "NODE_SKINNED_MESH_NON_ROOT",
+        "count": 1,
+        "owner_name": "Instance two",
+        "table": "nodes"
+      }
+    ]
+  },
+  "matching_fixture_outputs": {
+    "default-bone.dsculpt": "43c8f97546459ba4bd3ca30bb1f8ebaaabea278f47885b8bb517d656784c6dcc",
+    "fitted-editable.vrm": "ed674939bdb540c7467d6a0e069feddea473642d1cff8e5608e4c6b2a6140f14",
+    "fitted-standard.vrm": "4681b53f350af72dad058869bc9e7f646859bfd41d2d8ed1ae7068f39be2acd1",
+    "head-attached.dsculpt": "d4d7845272d975b27a1f4fc04ae97fabcd3a4ba44eda7706885eb0a7bf73b3c9",
+    "head-editable.vrm": "7f12891751295232ad6163c9ac281069dbf68307d4f65925bb152f280828c0d1",
+    "head-posed.dsculpt": "94a559a2225747700ccce8a6966a37c5fb3ad8d638d4b911006436effd00bd60",
+    "head-source-only.vrm": "87c37f55ce7ee3bf14577a63b639feb0e69727682a5648a37a7a98773fa7bc7c",
+    "head-standard.vrm": "48a8ebdb19c8c8b26aef1cf94f7a7ae6157fe72ffefcd4db6431dc10ed14ea13",
+    "pre-attach.dsculpt": "f7ad0654c5ef0c46034345b9bb245c297fd4d7e881d2ac923968e05f737c03db"
+  },
+  "product_revision": "b1de72a684a2f87e8d6ec8825af0430d3307534b",
+  "profiles": {
+    "asan": {
+      "core_sha256": "12c83a053cc7accb2b1c1aa5845356441640738e8d582416a2f0a3c16f8f33a0",
+      "focused_assertions": 39,
+      "registered": [
+        "source-rest-scene",
+        "source-rigid-bind-rest",
+        "vrm1-source-export",
+        "vrm1-painted-authoring"
+      ],
+      "test_sha256": "dbd11edd32a62416894797790b702d663116d865c2740fd32708e33f2d100a33"
+    },
+    "release": {
+      "app_sha256": "f2d145e89fa4d8c0298e2d7412f2c52a2b5b468814b608c04bd62b7d775aa42a",
+      "core_sha256": "52f87ebfef71652cd921e8c38a1998ce94154830398ed8d91b4d94bc84596b96",
+      "focused_assertions": 39,
+      "registered": [
+        "emission-vrm",
+        "vrm",
+        "source-rest-scene",
+        "source-rigid-bind-rest",
+        "vrm1-source-export",
+        "vrm1-painted-authoring",
+        "vrm1-export-worker"
+      ],
+      "synthetic_openxr_runtime": "a509d343406cb8ca044821b06e3cd90d5a1730d6747abfb27a6fa1e4c5487d65",
+      "test_sha256": "a140c49a76a36ba368e5dc7353ca37c6e12d7cda637bbc49425f5b69fbed8a82"
+    }
+  },
+  "runtime_paths": {
+    "wayland": {
+      "checks": 8,
+      "saved_scene": "43c8f97546459ba4bd3ca30bb1f8ebaaabea278f47885b8bb517d656784c6dcc"
+    },
+    "xr-arc": {
+      "checks": 5,
+      "physical_headset": false,
+      "releases": 78,
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)"
+    },
+    "xr-software": {
+      "checks": 5,
+      "physical_headset": false,
+      "releases": 78,
+      "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)"
+    }
+  },
+  "scope": "Rigged imported VRM 1.0 with a native rigid painted texture-set bone attachment, including fitted source poses."
+}
