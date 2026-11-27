@@ -143,18 +143,13 @@ void footprint(uint32_t from, uint32_t to, uint32_t x, uint32_t y, F &&f) {
     }
   }
 }
-Sample filtered(const PaintLayer &l, uint32_t from, uint32_t to, uint32_t x,
-                uint32_t y, TextureSetResolutionReport &report,
-                const TextureSetLimits &limits) {
+Sample filtered_samples(const PaintLayer &l,uint32_t from,auto &&for_each_pixel) {
   std::array<double, 9> associated{}, raw{};
   std::array<double, 4> coverage{}, pbr{}, pbr_raw{};
   std::array<double, 3> legacy{}, physical{}, legacy_raw{}, physical_raw{};
   double emission_coverage = 0, mask = 0;
   Sample out;
-  footprint(from, to, x, y, [&](uint32_t sx, uint32_t sy, double w) {
-    work(report, 32, limits);
-    ++report.filtered_samples;
-    if((report.filtered_samples&255)==0)stop(limits);
+  for_each_pixel([&](uint32_t sx, uint32_t sy, double w) {
     const auto s = pixel(l, from, sx, sy);
     const auto &d = s.common.data;
     out.common_present |= s.common_present;
@@ -221,6 +216,19 @@ Sample filtered(const PaintLayer &l, uint32_t from, uint32_t to, uint32_t x,
   }
   out.emission.validate();
   return out;
+}
+
+Sample filtered(const PaintLayer &l, uint32_t from, uint32_t to, uint32_t x,
+                uint32_t y, TextureSetResolutionReport &report,
+                const TextureSetLimits &limits) {
+  return filtered_samples(l,from,[&](auto &&sample) {
+    footprint(from,to,x,y,[&](uint32_t sx,uint32_t sy,double weight) {
+      work(report,32,limits);
+      ++report.filtered_samples;
+      if((report.filtered_samples&255)==0)stop(limits);
+      sample(sx,sy,weight);
+    });
+  });
 }
 void quality(const PaintLayer &before, const PaintLayer &after, uint32_t from,
              uint32_t to, const TextureSetResolutionOptions &options,
@@ -536,6 +544,33 @@ void native_overlay_quality(const PaintedMesh &before, const PaintedMesh &after,
     throw std::runtime_error("Native resolution cannot preserve the layered paint overlay within its reconstruction bounds");
 }
 } // namespace
+std::array<PaintBilinearTap,4> paint_bilinear_taps(uint32_t resolution,
+    std::array<float,2> uv,std::span<const int32_t> padding) {
+  const double x = std::clamp(double(uv[0]),0.,1.)*resolution-.5;
+  const double y = std::clamp(double(uv[1]),0.,1.)*resolution-.5;
+  const int ix = int(std::floor(x)), iy = int(std::floor(y));
+  const double fx = x-ix, fy = y-iy;
+  std::array<PaintBilinearTap,4> taps;
+  for(size_t i=0;i<taps.size();++i){
+    const auto sx = std::clamp(ix+int(i&1),0,int(resolution)-1);
+    const auto sy = std::clamp(iy+int(i>>1),0,int(resolution)-1);
+    const auto texel = size_t(sy)*resolution+sx;
+    const auto owner = padding[texel];
+    const double weight = (i&1?fx:1-fx)*(i&2?fy:1-fy);
+    taps[i] = {owner>=0?size_t(owner):texel,weight};
+  }
+  return taps;
+}
+
+FilteredPaintTexel filter_paint_layer(const PaintLayer &layer,uint32_t resolution,
+    const std::array<PaintBilinearTap,4> &taps) {
+  const auto source = filtered_samples(layer,resolution,[&](auto &&sample) {
+    for(const auto &tap:taps)
+      if(tap.weight!=0)sample(uint32_t(tap.texel%resolution),uint32_t(tap.texel/resolution),tap.weight);
+  });
+  return {source.common,source.emission};
+}
+
 std::vector<PaintLayer> resample_texture_set_layers(
     const PaintedMesh &before, const TextureSetResolutionOptions &options,
     const TextureSetLimits &limits, TextureSetResolutionReport &report,

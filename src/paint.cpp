@@ -2,6 +2,7 @@
 #include "texture-set-paint-access.hpp"
 #include "texture-set-native-grid.hpp"
 #include "texture-set-resample.hpp"
+#include "retopo-transfer.hpp"
 #include "source-paint-parameters.hpp"
 #include "paint-overlay-packet.hpp"
 #include "baked-emission-access.hpp"
@@ -3058,6 +3059,188 @@ size_t PaintedMesh::storage_bytes() const {
 }
 void PaintedMesh::install_bake(BakedTextures incoming) {
   install_bake(std::move(incoming),BakedNormalWrite::Replace);
+}
+
+void detail::TextureSetPaintAccess::reproject_retopology(const PaintedMesh &from,
+    PaintedMesh &replacement, RetopoTransfer &transfer) {
+  if (from.in_stroke() || from.source_maps_ || from.sampling_attachment_ || from.texture_set_domain_ ||
+      from.color_projection_ || from.normal_projection_ ||
+      from.surface_->options.policy != PaintUvPolicy::Strict)
+    throw std::invalid_argument("Retopology cannot reproject this retained material grid yet");
+  const auto bake = from.baked_;
+  if (bake && (bake->normal_authority || bake->normal_field ||
+      bake->normal_interpretation != BakedNormalInterpretation::CanonicalMikk ||
+      bake->color_interpretation != BakedColorInterpretation::VertexComponent))
+    throw std::invalid_argument("Retopology cannot reproject this baked material interpretation yet");
+  // All writes target the detached new patch. Old layer IDs, active layer,
+  // opacity, visibility and the monotonic allocation cursor stay meaningful.
+  const auto &surface = *replacement.surface_;
+  const auto texels = surface.texels.size();
+  const auto tile_slots = surface.tiles.size();
+  const auto resolution = surface.resolution;
+  transfer.reserve(1, working_bytes(replacement, resolution));
+  transfer.reserve(from.layers_.size(), sizeof(PaintLayer) + 4 * tile_slots * sizeof(std::shared_ptr<const PaintTile>));
+  if (from.revision_ == UINT64_MAX) throw std::overflow_error("Paint revision exhausted");
+  replacement.active_ = from.active_;
+  replacement.next_ = from.next_;
+  replacement.revision_ = from.revision_ + 1;
+  replacement.layers_.clear();
+  replacement.layers_.reserve(from.layers_.size());
+
+  struct WritableLayer {
+    size_t slot;
+    std::vector<std::shared_ptr<PaintTile>> common;
+    std::vector<std::shared_ptr<PaintEmissionTile>> emission;
+  };
+  std::vector<WritableLayer> writable;
+  for (size_t slot = 0; slot < from.layers_.size(); ++slot) {
+    const auto &layer = from.layers_[slot];
+    replacement.layers_.push_back({layer.id, layer.name, layer.visible, layer.opacity,
+                                   std::vector<std::shared_ptr<const PaintTile>>(tile_slots), {}, {}});
+    if (color_tile_count(layer)) throw std::invalid_argument("Retopology needs the prepared PBR color owner");
+    if (tile_count(layer) || emission_tile_count(layer)) {
+      writable.push_back({slot, {}, {}});
+      writable.back().common.resize(tile_slots);
+    }
+  }
+  if (writable.empty() && !bake) return;
+
+  std::optional<BakedTextures> baked;
+  std::vector<BakedEmissionSample> float_bake;
+  std::vector<Tangent> source_tangents, target_tangents;
+  size_t layer_bytes = 0;
+  constexpr size_t paint_limit = 128 * 1024 * 1024;
+  if (bake) {
+    const bool normals = !bake->maps.normal.rgba.empty();
+    transfer.reserve(texels, 13 + (normals ? 4 : 0));
+    baked.emplace();
+    baked->coverage.resize(texels);
+    baked->maps.color = blank_image(resolution);
+    baked->maps.metal_rough = blank_image(resolution);
+    baked->maps.emission = blank_image(resolution);
+    if (normals) {
+      transfer.reserve(from.mesh().indices.size() + replacement.mesh().indices.size(), 4 * sizeof(Tangent));
+      baked->maps.normal = blank_image(resolution, true);
+      source_tangents = tangent_corners(from.mesh(), transfer.cancelled());
+      target_tangents = tangent_corners(replacement.mesh(), transfer.cancelled());
+    }
+    if (bake->emission_field) {
+      transfer.reserve(texels, 2 * sizeof(BakedEmissionSample));
+      float_bake.resize(texels);
+    }
+  }
+
+  auto allocate_tile = [&](auto &tile) {
+    if (tile) return;
+    using Tile = typename std::decay_t<decltype(tile)>::element_type;
+    if (sizeof(Tile) > paint_limit - layer_bytes)
+      throw std::length_error("Retopology exceeds editable paint storage");
+    layer_bytes += sizeof(Tile);
+    transfer.reserve(1, sizeof(Tile));
+    tile = std::make_shared<Tile>();
+  };
+  size_t hits = 0;
+  for (size_t at = 0; at < texels; ++at) {
+    if ((at & 1023) == 0) paint_compute::checkpoint(transfer.cancelled());
+    const auto &texel = surface.texels[at];
+    if (!texel.covered) continue;
+    const auto hit = transfer.match(texel.position, texel.normal);
+    if (!hit) continue;
+    ++hits;
+    std::array<float, 2> uv{};
+    for (size_t corner = 0; corner < 3; ++corner) {
+      const auto vertex = from.mesh().indices[size_t(hit->triangle) * 3 + corner];
+      for (size_t axis = 0; axis < 2; ++axis)
+        uv[axis] += from.mesh().uv[vertex][axis] * hit->barycentric[corner];
+    }
+    const auto taps = paint_bilinear_taps(from.resolution(), uv, from.surface_->padding);
+    transfer.work(32 + 128 * writable.size());
+    if (bake) {
+      BakedPixel values{};
+      float coverage = 0;
+      for (const auto &tap : taps) {
+        const auto weight = float(tap.weight);
+        const auto alpha = weight * unit(bake->coverage[tap.texel]);
+        if (alpha > 0) {
+          const auto sample = baked_pixel(*bake, tap.texel);
+          for (size_t i = 0; i < values.size(); ++i) values[i] += sample[i] * alpha;
+          coverage += alpha;
+        }
+        if (!float_bake.empty() && weight > 0) {
+          const auto sample = bake->emission_field->texel(tap.texel);
+          auto &dest = float_bake[at];
+          for (size_t i = 0; i < 3; ++i) {
+            dest.legacy[i] += sample.legacy[i] * weight;
+            dest.absolute[i] += sample.absolute[i] * weight;
+          }
+          dest.coverage += sample.coverage * weight;
+        }
+      }
+      if (!float_bake.empty()) {
+        auto &sample = float_bake[at];
+        sample.coverage = std::clamp(sample.coverage, 0.f, 1.f);
+        for (size_t k = 0; k < 3; ++k) {
+          sample.legacy[k] = std::min(sample.legacy[k], sample.coverage);
+          sample.absolute[k] = std::min(sample.absolute[k], sample.coverage * maximum_native_emission);
+        }
+      }
+      if (coverage > 0) {
+        for (auto &value : values) value /= coverage;
+        if (!source_tangents.empty()) {
+          const auto old_frame = tangent_frame(from.mesh(), source_tangents, hit->triangle, hit->barycentric);
+          const auto new_frame = tangent_frame(replacement.mesh(), target_tangents, texel.face,
+              {texel.bary[0], texel.bary[1], 1 - texel.bary[0] - texel.bary[1]});
+          const Vec3 old_normal = old_frame.to_world({values[10], values[11], values[12]});
+          const auto changed = transfer.placement_change().normal({old_normal.x, old_normal.y, old_normal.z});
+          const auto new_normal = new_frame.to_tangent({float(changed[0]), float(changed[1]), float(changed[2])});
+          values[10] = new_normal.x; values[11] = new_normal.y; values[12] = new_normal.z;
+        }
+        baked->coverage[at] = byte(coverage);
+        baked_pixel(*baked, at, values);
+      }
+    }
+    const auto x = at % resolution, y = at / resolution;
+    const auto tile = y / 32 * surface.columns + x / 32;
+    const auto pixel = y % 32 * 32 + x % 32;
+    for (auto &layer : writable) {
+      const auto &old_layer = from.layers_[layer.slot];
+      auto sample = filter_paint_layer(old_layer, from.resolution(), taps);
+      const bool emission = !old_layer.emission_tiles.empty() && sample.emission != PaintEmissionValue{};
+      if (!old_layer.emission_tiles.empty()) {
+        // One FLOAT texel makes the entire tile authoritative. Canonicalize
+        // the byte fallback even for neighbors sampled from legacy-only tiles.
+        sample.common.data[12] = byte(sample.emission.coverage);
+        for (size_t k = 0; k < 3; ++k)
+          sample.common.data[6 + k] = byte(linear_to_srgb(sample.emission.legacy[k]));
+      }
+      if (sample.common == PaintPixel{} && !emission) continue;
+      auto &dest = replacement.layers_[layer.slot];
+      auto &common = layer.common[tile];
+      allocate_tile(common);
+      dest.tiles[tile] = common;
+      common->pixels[pixel] = sample.common;
+      if (emission) {
+        if (layer.emission.empty()) { layer.emission.resize(tile_slots); dest.emission_tiles.resize(tile_slots); }
+        allocate_tile(layer.emission[tile]);
+        layer.emission[tile]->pixels[pixel] = sample.emission;
+        dest.emission_tiles[tile] = layer.emission[tile];
+      }
+    }
+  }
+  if (!hits) throw std::invalid_argument("No matching old surface for the retopology paint or Bake");
+  for (const auto &layer : replacement.layers_)
+    replacement.allocated_tiles_ += tile_count(layer);
+  if (baked) {
+    if (!float_bake.empty()) {
+      const auto other = layer_bytes + baked->storage_bytes() - baked->maps.emission.rgba.size();
+      if (other >= paint_limit) throw std::length_error("Retopology Bake exceeds paint storage");
+      baked->emission_field = BakedEmissionField::generate_compact(resolution,
+          [&](size_t at) { return float_bake[at]; }, {paint_limit - other, transfer.cancelled()});
+      baked->maps.emission = {};
+    }
+    SourcePaintAccess::merge_bake(replacement, std::move(*baked), BakedNormalWrite::Replace, transfer.cancelled());
+  }
+  paint_compute::checkpoint(transfer.cancelled());
 }
 void PaintedMesh::install_bake(BakedTextures incoming,BakedNormalWrite normal_write) {
   if(source_sampling_prepared())throw std::logic_error("Independent source paint requires its own source-aware bake adapter");

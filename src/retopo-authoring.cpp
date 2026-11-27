@@ -1,7 +1,15 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/retopo-authoring.hpp"
 #include "dome/affine.hpp"
+#include "dome/bake-recipe.hpp"
+#include "dome/source-placement.hpp"
+#include "dome/tangents.hpp"
+#include "normal-bake-frames.hpp"
+#include "retopo-transfer.hpp"
+#include "skin-affine.hpp"
 #include "text-utf8.hpp"
+#include "texture-set-paint-access.hpp"
+#include <algorithm>
 #include <limits>
 #include <type_traits>
 namespace dome {
@@ -40,6 +48,78 @@ Vec3 face_normal(const RetopoMesh &mesh, const RetopoFace &face) {
                     mesh.vertices().at(face.vertices[(i + 1) % face.vertices.size()]).position);
   return normal;
 }
+
+bool same_position(Vec3 a, Vec3 b) {
+  return a.x == b.x && a.y == b.y && a.z == b.z;
+}
+
+AffineVector coordinates(Vec3 value) { return {value.x, value.y, value.z}; }
+
+Vec3 normal_direction(const AffineTransform &frame, Vec3 normal) {
+  const auto value = frame.normal(coordinates(normal));
+  const double magnitude = std::hypot(value[0], value[1], value[2]);
+  if (!(magnitude > 0) || !std::isfinite(magnitude))
+    throw std::invalid_argument("Retopology correspondence has an invalid normal");
+  return {float(value[0] / magnitude), float(value[1] / magnitude), float(value[2] / magnitude)};
+}
+}
+
+detail::RetopoTransfer::RetopoTransfer(const Mesh &previous_mesh,
+    const AffineTransform &previous, const AffineTransform &replacement,
+    const std::function<bool()> &cancelled)
+    : cancelled_(cancelled), placement_change_(replacement.inverse() * previous) {
+  // Subtract a common translation before narrowing the query point. Meshes
+  // far from the world origin still use the authored affine metric.
+  auto old = previous.matrix();
+  auto next = replacement.matrix();
+  for (size_t axis = 12; axis < 15; ++axis) {
+    next[axis] -= old[axis];
+    old[axis] = 0;
+  }
+  previous_metric_ = AffineTransform(old);
+  replacement_metric_ = AffineTransform(next);
+  const size_t faces = previous_mesh.indices.size() / 3;
+  reserve(previous_mesh.positions.size(), 2 * sizeof(Vec3) + sizeof(std::array<float, 2>) + 1);
+  // The detached BVH owns triangle order, bounds and nodes as well as the mesh.
+  reserve(faces, 224);
+  work(previous_mesh.positions.size() + previous_mesh.indices.size());
+  old_surface_ = std::make_unique<SurfaceQuery>(previous_mesh, cancelled_);
+  world_normals_.reserve(faces);
+  for (size_t corner = 0; corner < previous_mesh.indices.size(); corner += 3) {
+    if ((corner & 1023) == 0) stop(cancelled_);
+    const auto a = previous_mesh.positions[previous_mesh.indices[corner]];
+    const auto b = previous_mesh.positions[previous_mesh.indices[corner + 1]];
+    const auto c = previous_mesh.positions[previous_mesh.indices[corner + 2]];
+    const auto normal = cross(b - a, c - a);
+    world_normals_.push_back(length(normal) > 0 ? normal_direction(previous_metric_, normal) : Vec3{});
+  }
+  options_.cancelled = cancelled_;
+  // This is the maximum projection span exposed in the retopology editor.
+  options_.closest_maximum = .2f;
+  options_.triangle_filter = [this](uint32_t face) {
+    work();
+    return dot(world_normals_[face], current_normal_) > 0;
+  };
+}
+
+void detail::RetopoTransfer::work(size_t amount) {
+  if (amount > work_left_) throw std::length_error("Retopology transfer exceeds the surface work budget");
+  work_left_ -= amount;
+}
+
+void detail::RetopoTransfer::reserve(size_t count, size_t stride) {
+  if (count > bytes_left_ / stride) throw std::length_error("Retopology transfer exceeds working storage");
+  bytes_left_ -= count * stride;
+}
+
+std::optional<SurfaceHit> detail::RetopoTransfer::match(Vec3 position, Vec3 normal) {
+  work();
+  current_normal_ = normal_direction(replacement_metric_, normal);
+  const auto point = skin_affine_point(replacement_metric_, position);
+  if (previous_metric_.matrix() == AffineTransform{}.matrix())
+    return old_surface_->nearest(point, options_);
+  const auto result = old_surface_->nearest_result(point, previous_metric_, options_);
+  return result ? std::optional(result->surface) : std::nullopt;
 }
 RetopoWorkspace::RetopoWorkspace(const Scene &scene, const std::function<bool()> &cancelled) {
   const auto &active = scene.active();
@@ -170,8 +250,10 @@ void RetopoWorkspace::edit(RetopoAction action, Vec3 point, float snap_mm,
     if (action == RetopoAction::Sample) {
       if (!gesture_) throw std::logic_error("Begin a retopology gesture first");
       if (sampled_ && !view_.moving && !view_.extruding) return;
-      point = project(point);
+      if (!finite(point)) throw std::invalid_argument("Invalid retopology point");
       if (view_.extruding) {
+        const auto touched = point;
+        point = project(point);
         bool incident = false;
         auto edge_id = selected_edge(draft, selected, cancelled, true, &incident);
         auto e = draft.edges().at(edge_id);
@@ -179,8 +261,11 @@ void RetopoWorkspace::edit(RetopoAction action, Vec3 point, float snap_mm,
         if (!sampled_) {
           auto ab = b - a; const float square = dot(ab, ab);
           if (!(square > 0)) throw std::runtime_error("Choose a nonzero boundary edge");
-          auto nearest = a + ab * std::clamp(dot(point - a, ab) / square, 0.f, 1.f);
-          if (length(point - nearest) > std::min(.01f, snap_mm * .00025f) / view_.transform.scale)
+          auto edge_distance = [&](Vec3 p) {
+            return length(p - a - ab * std::clamp(dot(p - a, ab) / square, 0.f, 1.f));
+          };
+          if (std::min(edge_distance(touched),edge_distance(point)) >
+              std::min(.01f, snap_mm * .00025f) / view_.transform.scale)
             throw std::runtime_error("Touch the selected edge before dragging an extrusion");
         } else {
           const auto offset = point - extrude_anchor_;
@@ -201,12 +286,23 @@ void RetopoWorkspace::edit(RetopoAction action, Vec3 point, float snap_mm,
           }
         }
       } else if (!sampled_) {
-        TopologyID nearest = 0;
-        float distance = std::min(.01f, snap_mm * .00025f) / view_.transform.scale;
-        for (const auto &[id, v] : draft.vertices()) {
-          stop(cancelled);
-          auto d = length(v.position - point);
-          if (d <= distance) { nearest = id; distance = d; }
+        auto touched_vertex = [&](Vec3 p) {
+          TopologyID nearest = 0;
+          float distance = std::min(.01f, snap_mm * .00025f) / view_.transform.scale;
+          for (const auto &[id, v] : draft.vertices()) {
+            stop(cancelled);
+            const auto d = length(v.position - p);
+            if (d <= distance) { nearest = id; distance = d; }
+          }
+          return nearest;
+        };
+        // A reopened patch may have been offset for Bake. First pick its
+        // visible vertices at their actual placement, then use projection for
+        // contact close to the reference and for newly placed points.
+        auto nearest = touched_vertex(point);
+        if (!nearest) {
+          point = project(point);
+          nearest = touched_vertex(point);
         }
         if (view_.moving) {
           if (!nearest) throw std::runtime_error("Touch an existing point to move it");
@@ -221,7 +317,7 @@ void RetopoWorkspace::edit(RetopoAction action, Vec3 point, float snap_mm,
             selected.push_back(nearest);
           }
         }
-      } else if (view_.moving && moving_vertex_) draft.move_vertex(moving_vertex_, point);
+      } else if (view_.moving && moving_vertex_) draft.move_vertex(moving_vertex_, project(point));
     } else if (action == RetopoAction::BridgeEdges) {
       if (selected.size() != 4) throw std::runtime_error("Select two boundary edges as four endpoints");
       const auto a = selected[0], b = selected[1], c = selected[2], d = selected[3];
@@ -293,6 +389,134 @@ void RetopoWorkspace::edit(RetopoAction action, Vec3 point, float snap_mm,
   view_.changed = view_.topology != original_;
   ++view_.revision;
 }
+namespace {
+
+bool same_patch_surface(const RetopoSurface &a, const RetopoSurface &b) {
+  return a.source_vertices == b.source_vertices && a.source_faces == b.source_faces &&
+         a.materials == b.materials && a.mesh.indices == b.mesh.indices &&
+         a.mesh.uv == b.mesh.uv && a.mesh.uv_pins == b.mesh.uv_pins &&
+         a.mesh.uv_seams == b.mesh.uv_seams &&
+         std::ranges::equal(a.mesh.positions, b.mesh.positions, same_position);
+}
+
+std::shared_ptr<DeformationState> transfer_patch_deformation(const DeformationState &before,
+    const Mesh &old_mesh, const Mesh &new_mesh, detail::RetopoTransfer &transfer) {
+  if (before.source_skin_instance)
+    throw std::invalid_argument("Retopology cannot reproject a skin linked to imported joints yet");
+  const auto vertices = new_mesh.positions.size();
+  const size_t targets = before.morphs ? before.morphs->targets.size() : 0;
+  if (targets && vertices > 8'000'000 / targets)
+    throw std::length_error("Retopology shapekeys exceed native deformation storage");
+  if (targets) transfer.reserve(vertices * targets, sizeof(Vec3));
+  if (before.skin) transfer.reserve(vertices, sizeof(VertexWeights));
+  auto result = std::make_shared<DeformationState>(new_mesh);
+  result->skeleton = before.skeleton;
+  result->humanoid = before.humanoid;
+  result->landmarks = before.landmarks;
+  result->expressions = before.expressions;
+  result->pose = before.pose;
+  result->morph_weights = before.morph_weights;
+  const auto &change = transfer.placement_change();
+  if (change.matrix() != AffineTransform{}.matrix()) {
+    detail::SkinGeometryWork work(500'000'000, transfer.cancelled());
+    if (before.skeleton) result->skeleton = detail::skin_reframe(*before.skeleton, change, work);
+    if (before.landmarks) result->landmarks = detail::skin_reframe_landmarks(*before.landmarks, change, work);
+  }
+  if (before.morphs) {
+    result->morphs.emplace(new_mesh);
+    for (const auto &target : before.morphs->targets)
+      result->morphs->targets.push_back({target.name, std::vector<Vec3>(vertices)});
+  }
+  if (before.skin) {
+    result->skin.emplace();
+    result->skin->vertices.reserve(vertices);
+  }
+  if (targets || before.skin) {
+    size_t entries = result->resource_entries();
+    for (size_t vertex = 0; vertex < vertices; ++vertex) {
+      if ((vertex & 1023) == 0) stop(transfer.cancelled());
+      const auto hit = transfer.match(new_mesh.positions[vertex], new_mesh.normals[vertex]);
+      if (!hit)
+        throw std::invalid_argument("Some retopology vertices have no matching rest surface for weights or shapekeys");
+      std::array<uint32_t,3> old;
+      std::copy_n(old_mesh.indices.begin() + size_t(hit->triangle) * 3, 3, old.begin());
+      const auto &bary = hit->barycentric;
+      if (before.skin) {
+        const auto bones = before.skeleton->bones.size();
+        std::array<double,256> by_joint{};
+        for (size_t c = 0; c < 3; ++c) {
+          if (bary[c] <= 0) continue;
+          const auto &corner = before.skin->vertices[old[c]];
+          transfer.work(corner.size());
+          for (const auto &influence : corner)
+            by_joint[influence.joint] += double(influence.weight) * bary[c];
+        }
+        // Two or three source vertices may name the same joint.
+        VertexWeights weights;
+        transfer.work(bones);
+        for (uint32_t joint = 0; joint < bones; ++joint)
+          if (by_joint[joint] > 0) weights.push_back({joint,float(std::min(by_joint[joint],1.0))});
+        auto normalized = normalize_weights(std::move(weights), bones, {}, {32, 0});
+        if (normalized.size() > 8'000'000 - entries)
+          throw std::length_error("Retopology weights exceed native deformation storage");
+        entries += normalized.size();
+        transfer.reserve(normalized.capacity(), sizeof(Influence));
+        result->skin->vertices.push_back(std::move(normalized));
+      }
+      transfer.work(targets * 3);
+      for (size_t target = 0; target < targets; ++target) {
+        const auto &delta = before.morphs->targets[target].delta;
+        const Vec3 value = delta[old[0]] * bary[0] + delta[old[1]] * bary[1] + delta[old[2]] * bary[2];
+        const auto direction = change.direction(coordinates(value));
+        result->morphs->targets[target].delta[vertex] = {float(direction[0]),float(direction[1]),float(direction[2])};
+      }
+    }
+  }
+  result->validate(new_mesh);
+  return result;
+}
+
+std::shared_ptr<const SourceMaterialBindings> transfer_patch_material(const SculptObject &before,
+    const std::shared_ptr<PaintedMesh> &paint, const std::shared_ptr<DeformationState> &deformation,
+    detail::RetopoTransfer &transfer) {
+  if (!before.material_bindings) return {};
+  const auto &binding = *before.material_bindings;
+  if (binding.has_mtoon || binding.normal_preparation || binding.color_preparation ||
+      binding.canonical_attributes || binding.canonical_uv || binding.native_paint_sampling ||
+      binding.native_paint_frames || binding.canonical_paint_sampling ||
+      binding.polygon_surface_transfer || binding.sampling_reparameterized || binding.key_derivation)
+    throw std::invalid_argument("Retopology cannot reproject this source-retaining material yet");
+  auto result = std::make_shared<SourceMaterialBindings>(binding);
+  if (const auto &frames = binding.normal_frames) {
+    const auto &old = before.painted->mesh();
+    if (!frames->pbr || frames->pbr != frames->mtoon || frames->position_domain || frames->canonical ||
+        frames->pbr->source_vertex_count || frames->pbr->source_corner_count ||
+        (!frames->pbr->tangents.empty() && !frames->pbr->generated_tangents) ||
+        frames->pbr->normals.size() != old.indices.size())
+      throw std::invalid_argument("Retopology cannot reproject independent artist normal frames yet");
+    for (size_t i = 0; i < old.indices.size(); ++i) {
+      if ((i & 1023) == 0) stop(transfer.cancelled());
+      if (!same_position(frames->pbr->normals[i], old.normals[old.indices[i]]))
+        throw std::invalid_argument("Retopology cannot reproject edited rest normals yet");
+    }
+    const auto &mesh = paint->mesh();
+    const size_t targets = deformation && deformation->morphs ? deformation->morphs->targets.size() : 0;
+    transfer.reserve(mesh.indices.size(), (2 + 2 * targets) * sizeof(Vec3) + sizeof(Tangent));
+    result->normal_frames = detail::normal_bake_frame_candidate(mesh, deformation.get(), nullptr,
+        {128 * 1024 * 1024, 128 * 1024 * 1024, transfer.cancelled()}).frames;
+  }
+  if (binding.uv_origin) {
+    auto origin = std::make_shared<SourceUvOrigin>();
+    origin->paint = paint->snapshot();
+    origin->deformation = deformation;
+    result->uv_origin = std::move(origin);
+  }
+  result->validate();
+  return result;
+}
+
+} // namespace
+
 uint64_t publish_retopology(Scene &scene, const RetopoMesh &topology, uint64_t source,
                             CanvasTransform transform, const std::function<bool()> &cancelled) {
   stop(cancelled);
@@ -302,17 +526,60 @@ uint64_t publish_retopology(Scene &scene, const RetopoMesh &topology, uint64_t s
   scene.object(source);
   auto triangles = topology.triangulate(cancelled);
   stop(cancelled);
-  unwrap(triangles.mesh, 512, 4, cancelled);
-  stop(cancelled);
-  auto painted = std::make_shared<PaintedMesh>(std::move(triangles.mesh), 512);
+  std::shared_ptr<PaintedMesh> painted;
+  std::shared_ptr<const DeformationState> deformation;
+  std::shared_ptr<const SourceMaterialBindings> material;
+  bool same_surface = false;
+  if (previous.retopology) {
+    if (previous.retopology->source != source || !previous.mesh_active || !previous.painted ||
+        previous.texture_sets || previous.appearance || previous.polygon)
+      throw std::invalid_argument("Retopology cannot replace this material or topology authority yet");
+    const auto old_world = scene.world_matrix(previous.id);
+    const auto new_world = affine_similarity(transform);
+    same_surface = old_world.matrix() == new_world.matrix() &&
+                   same_patch_surface(previous.retopology->topology.triangulate(cancelled), triangles);
+    if (same_surface) {
+      painted = previous.painted->snapshot();
+      deformation = previous.deformation;
+      material = previous.material_bindings;
+    } else {
+      const auto size = previous.painted->resolution();
+      unwrap(triangles.mesh, size, 4, cancelled);
+      PaintSurfaceOptions options;
+      options.cancelled = cancelled;
+      painted = PaintedMesh::from_mesh(std::move(triangles.mesh), size, options);
+      detail::RetopoTransfer transfer(previous.painted->mesh(), old_world, new_world, cancelled);
+      detail::TextureSetPaintAccess::reproject_retopology(*previous.painted, *painted, transfer);
+      std::shared_ptr<DeformationState> remapped;
+      if (previous.deformation)
+        remapped = transfer_patch_deformation(*previous.deformation, previous.painted->mesh(), painted->mesh(), transfer);
+      material = transfer_patch_material(previous, painted, remapped, transfer);
+      deformation = std::move(remapped);
+    }
+  } else {
+    unwrap(triangles.mesh, 512, 4, cancelled);
+    PaintSurfaceOptions options;
+    options.cancelled = cancelled;
+    painted = PaintedMesh::from_mesh(std::move(triangles.mesh), 512, options);
+  }
   auto patch = std::make_shared<const RetopoPatch>(RetopoPatch{source, topology});
-  // Construct all heavy/throwing data before modifying the detached scene.
-  auto id = scene.add(text::utf8_prefix(previous.name,240) + " retopo", Volume{}, transform);
-  auto &object = scene.object(id);
+  Scene staged = scene;
+  auto id = staged.add(text::utf8_prefix(previous.name,240) + " retopo", Volume{}, transform);
+  auto &object = staged.object(id);
   object.painted = std::move(painted); object.mesh_active = true;
   object.material = previous.material; object.retopology = std::move(patch);
-  scene.object(previous.id).visible = false;
-  if (source != previous.id) scene.object(source).visible = false;
+  object.material_bindings = std::move(material);
+  if (previous.retopology) object.bake_recipe = previous.bake_recipe;
+  object.deformation = std::move(deformation);
+  if (same_surface) {
+    object.rig_source = previous.rig_source;
+    object.shape_source = previous.shape_source;
+  }
+  staged.object(previous.id).visible = false;
+  if (source != previous.id) staged.object(source).visible = false;
+  staged.validate(false);
+  stop(cancelled);
+  scene = std::move(staged);
   return id;
 }
 } // namespace dome

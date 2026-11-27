@@ -731,6 +731,9 @@ if(BUILD_TESTING)
     add_test(NAME retopology-surface-heat-${placement} COMMAND dome-sculpt-retopo-surface-heat-test
       ${CMAKE_CURRENT_BINARY_DIR}/retopology-surface-heat-${placement} ${placement})
     set_tests_properties(retopology-surface-heat-${placement} PROPERTIES TIMEOUT 480)
+    add_test(NAME retopology-reapply-${placement} COMMAND dome-sculpt-retopo-surface-heat-test
+      ${CMAKE_CURRENT_BINARY_DIR}/retopology-reapply-${placement} reapply-${placement})
+    set_tests_properties(retopology-reapply-${placement} PROPERTIES TIMEOUT 480)
   endforeach()
   add_executable(dome-sculpt-retopo-affine-test tests/retopo-affine.cpp)
   target_link_libraries(dome-sculpt-retopo-affine-test PRIVATE dome-sculpt-core)

@@ -5,6 +5,7 @@
 #include "dome/native-authoring.hpp"
 #include "dome/rig-edit.hpp"
 #include "dome/rig-rest.hpp"
+#include "dome/shapekey-authoring.hpp"
 #include "dome/source-placement.hpp"
 #include "native-surface-heat.hpp"
 #include <algorithm>
@@ -285,15 +286,212 @@ void bind_patch(bool affine,const std::filesystem::path &out) {
   check(reopened && reopened->encode()==posed && document.copy_scene().encode()==posed,
         "Editable GLB recovers the complete posed project and its original editing history");
 }
+
+void reapply_patch(bool affine, const std::filesystem::path &out) {
+  auto scene = author_patch(affine, out);
+  const auto old_id = scene.active().id;
+  const auto donor = scene.active().retopology->source;
+  SkinAuthoringOptions skin;
+  skin.reference = donor;
+  skin.mode = SkinAuthoringMode::SurfaceHeat;
+  skin.seed_distance = affine ? .65f : .30f;
+  check(author_skin(scene, old_id, skin), "The editable patch has a real Surface Heat solution");
+  auto &old = scene.active();
+  const auto &mesh = old.painted->mesh();
+  auto deformation = *old.deformation;
+  deformation.morphs.emplace(mesh);
+  auto shaped = mesh.positions;
+  for (auto &p : shaped) p.z += .03f + .02f * p.x;
+  deformation.morphs->set_target(mesh, "Raise patch", shaped);
+  deformation.morph_weights = {.4f};
+  scene.set_deformation(old_id, std::move(deformation));
+  RigEdit pose;
+  pose.linked_pose = false;
+  pose.joint = JointAdjustment{1,{0,10,0},{0,0,.03f}};
+  edit_rig(scene,old_id,pose);
+  auto &painted_patch = scene.active();
+  painted_patch.painted = painted_patch.painted->snapshot();
+  auto &paint = *painted_patch.painted;
+  Brush brush;
+  brush.from = brush.to = {0,0,0};
+  brush.normal = {0,0,1};
+  brush.radius = .22f;
+  brush.strength = 1;
+  PaintSettings mask;
+  mask.channel = PaintChannel::Mask;
+  mask.mask = .15f;
+  mask.front_only = false;
+  paint.add_layer("Hidden stencil");
+  paint.begin_stroke(); paint.stamp(brush,mask);
+  check(paint.end_stroke(), "The old patch has an authored mask");
+  paint.layer_properties("Hidden stencil",false,.6f);
+  PaintSettings ink;
+  ink.channel = PaintChannel::Color;
+  ink.color = {.82f,.09f,.19f,1};
+  ink.front_only = false;
+  paint.add_layer("Surface pigment");
+  paint.begin_stroke(); paint.stamp(brush,ink);
+  check(paint.end_stroke(), "The old patch has independent editable pigment above its Bake");
+  PaintSettings glow;
+  glow.channel = PaintChannel::Emission;
+  glow.emission_units = PaintEmissionUnits::Physical;
+  glow.emission = {4,2,.5f};
+  glow.front_only = false;
+  paint.add_layer("Physical glow");
+  paint.begin_stroke(); paint.stamp(brush,glow);
+  check(paint.end_stroke() && paint.has_physical_emission(), "The old patch has a physical emission layer");
+
+  // Add an independent sub-R8 emission coefficient to the genuine projected
+  // Bake while retaining its color, normal, ORM, common coverage, and recipe.
+  auto bake = *paint.baked();
+  bake.emission_field = BakedEmissionField::generate_compact(paint.resolution(), [&](size_t i) {
+    if (!bake.coverage[i]) return BakedEmissionSample{};
+    return BakedEmissionSample{{.0005f,0,0},{3,.125f,0},.001f};
+  });
+  bake.maps.emission = {};
+  paint.clear_bake();
+  paint.install_bake(std::move(bake));
+  const auto previous = scene.encode();
+  scene.save(out/"before-reapply.dsculpt");
+  const auto layer = paint.active_layer();
+
+  Document document;
+  document.replace(scene);
+  settled(document);
+  document.begin_retopology();
+  drafted(document);
+  document.edit_retopology(RetopoAction::MoveMode);
+  drafted(document);
+  const auto start = document.frame().state->retopology;
+  const auto &vertices = start->topology->vertices();
+  const auto &[corner, vertex] = *std::ranges::find_if(vertices, [](const auto &v) { return !v.second.pinned; });
+  auto original_world = point(affine_similarity(start->transform),vertex.position);
+  auto toward_center = original_world + Vec3{-.035f,.025f,0};
+  if (affine) toward_center = original_world + Vec3{.04f,.02f,0};
+  check(document.begin_desktop(), "Desktop retopology admits the patch Move gesture");
+  Brush drag;
+  drag.from = drag.to = original_world;
+  document.stamp_desktop(drag);
+  drafted(document);
+  drag.from = original_world;
+  drag.to = toward_center;
+  document.stamp_desktop(drag);
+  document.end_desktop();
+  drafted(document);
+  const auto draft = document.frame().state->retopology;
+  check(length(draft->topology->vertices().at(corner).position-vertex.position)>.02f,
+        "Controller-shared workspace changes a real patch vertex before Apply");
+  document.end_retopology(true);
+  document.save_async(out/"reapplied.dsculpt").get();
+  settled(document);
+  const auto changed = document.copy_scene();
+  const auto &current = changed.active();
+  check(current.id != old_id && current.retopology->source == donor && !changed.object(old_id).visible &&
+        changed.object(old_id).painted->encode()==paint.encode() &&
+        changed.object(old_id).deformation==scene.active().deformation,
+        "Apply keeps the previous patch and its independent authored state exact");
+  check(current.bake_recipe==scene.active().bake_recipe && current.painted->baked() &&
+        current.painted->baked()->emission_field && current.painted->has_physical_emission() &&
+        current.painted->active_layer()==layer && current.painted->layers().size()==paint.layers().size(),
+        "Replacement keeps editable layers, Bake settings, an active layer, and both FLOAT authorities");
+  const auto &mask_layer = current.painted->layers()[1];
+  check(!mask_layer.visible && mask_layer.opacity==.6f && mask_layer.name=="Hidden stencil" &&
+        std::ranges::any_of(mask_layer.tiles,[](const auto &tile) {
+          return tile && std::ranges::any_of(tile->pixels,[](const auto &p) {return p.data[13]<100;});
+        }), "The hidden layer retains its opacity and independently editable mask samples");
+  check(std::ranges::any_of(current.painted->layers()[2].tiles,[](const auto &tile) {
+          return tile && std::ranges::any_of(tile->pixels,[](const auto &p) {return p.data[9]>120&&p.data[0]>180;});
+        }), "The replacement atlas contains authored pigment samples");
+  check(std::ranges::any_of(current.painted->baked()->emission_field->values(),[](const auto &p) {
+          return p.absolute[0]>2.8f && p.legacy[0]>.00045f && p.coverage>0 && p.coverage<.002f;
+        }), "Bake preserves separate FLOAT coefficients below one byte of coverage");
+  const auto &base = *current.painted->baked();
+  const auto &rgb = base.maps.color.rgba;
+  size_t green = 0;
+  for (size_t i = 0; i < base.coverage.size(); ++i)
+    green += base.coverage[i]>128 && rgb[4*i+1]>rgb[4*i]+15;
+  check(green>64 && !base.maps.normal.rgba.empty() && !base.maps.metal_rough.rgba.empty(),
+        "The original Bake's color, normal and material maps survive below the layers");
+  const auto &model = *current.deformation;
+  const auto &key = model.morphs->targets.front();
+  check(key.name=="Raise patch" && model.morph_weights==std::vector{.4f} && model.pose.size()==2 &&
+        model.skin->vertices.size()==current.painted->mesh().positions.size(),
+        "Skin and shapekey transfer keeps the original rig, pose and active key");
+  for (size_t v = 0; v < key.delta.size(); ++v) {
+    const auto p = current.painted->mesh().positions[v];
+    check(length(key.delta[v]-Vec3{0,0,.03f+.02f*p.x})<.002f,
+          "The projected key delta agrees with an independent linear rest-space oracle");
+  }
+  const auto committed = changed.encode();
+  check(Scene::load(out/"reapplied.dsculpt").encode()==committed && document.undo() &&
+        document.copy_scene().encode()==previous && document.redo() &&
+        document.copy_scene().encode()==committed,
+        "Ordered Save, Cold Open and one Undo/Redo preserve both patch generations");
+
+  auto direct = scene;
+  size_t checks_before_publication = 0;
+  publish_retopology(direct,*draft->topology,donor,draft->transform,[&] {
+    ++checks_before_publication;
+    return false;
+  });
+  check(direct.encode()==committed,"The worker and detached reprojection publish the same scene");
+  size_t probes = 0;
+  bool cancelled = false;
+  try { publish_retopology(scene,*draft->topology,donor,draft->transform,[&] {
+      return ++probes == checks_before_publication;
+    });
+  } catch (const std::runtime_error &) { cancelled = true; }
+  check(cancelled && scene.encode()==previous,"Late transfer cancellation leaves the original project exact");
+
+  settled(document);
+  document.export_asset(out/"reapplied.glb",AssetExportFormat::Glb).get();
+  ImportLimits limits;
+  limits.mode = ImportMode::PreserveGltf;
+  const auto exported = import_mesh(out/"reapplied.glb",limits);
+  check(exported.primitives.size()==1 && exported.skins.size()==1 &&
+        !exported.primitives[0].influences.empty() && exported.primitives[0].morph_targets.size()==1,
+        "Portable export carries the replacement's real skin and shapekey");
+
+  auto wire = current.retopology->topology;
+  const auto first = wire.vertices().begin()->second.position;
+  wire.add_vertex({first + Vec3{.06f,.08f,0}});
+  auto wire_only = changed;
+  publish_retopology(wire_only,wire,donor,current.transform);
+  check(wire_only.active().retopology->topology.vertices().size()==wire.vertices().size() &&
+        wire_only.active().painted->encode()==current.painted->encode() &&
+        wire_only.active().painted->mesh_owner()==current.painted->mesh_owner() &&
+        wire_only.active().deformation==current.deformation,
+        "Wire-only edits keep the existing atlas and exact deformation owners");
+
+  auto framed = scene;
+  framed.active().painted = framed.active().painted->snapshot();
+  framed.active().painted->clear_bake();
+  ShapeKeyEdit add_key;
+  add_key.name = "Geometry frame";
+  const auto created = author_shapekey(framed,old_id,add_key);
+  const auto old_frames = framed.active().material_bindings->normal_frames;
+  publish_retopology(framed,*draft->topology,donor,draft->transform);
+  const auto &replacement = framed.active();
+  const auto frames = replacement.material_bindings->normal_frames;
+  check(created.changed && frames!=old_frames && frames->current_targets.size()==2 &&
+        frames->pbr->origin_vertices==replacement.painted->mesh().indices &&
+        replacement.deformation->morphs->targets[created.target].name==add_key.name,
+        "Native shapekey authoring retains its targets and uses new atlas-corner frames");
+  check(Scene::decode(framed.encode()).encode()==framed.encode(),
+        "Cold replay authenticates the reshaped project's native frame ownership");
+}
 }
 
 int main(int argc,char **argv) try {
-  if (argc!=3 || (std::string_view(argv[2])!="plain" && std::string_view(argv[2])!="affine")) return 2;
+  if (argc!=3) return 2;
+  const std::string_view mode = argv[2];
+  if (mode!="plain" && mode!="affine" && mode!="reapply-plain" && mode!="reapply-affine") return 2;
   const std::filesystem::path out = argv[1];
   std::filesystem::create_directories(out);
   setenv("XDG_STATE_HOME",(out/"state").c_str(),1);
   setenv("XDG_CONFIG_HOME",(out/"config").c_str(),1);
-  bind_patch(std::string_view(argv[2])=="affine",out);
+  if (mode.starts_with("reapply-")) reapply_patch(mode.ends_with("affine"),out);
+  else bind_patch(mode=="affine",out);
   std::cout << "PASS " << checks << " retopology Surface Heat controls\n";
 } catch(const std::exception &error) {
   std::cerr << "FAIL " << error.what() << '\n';

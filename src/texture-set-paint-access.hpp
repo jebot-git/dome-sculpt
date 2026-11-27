@@ -4,12 +4,15 @@
 namespace dome {struct TextureSetResolutionOptions;struct TextureSetResolutionReport;}
 namespace dome::detail {
 struct PolygonSurfaceStage;
+class RetopoTransfer;
 struct TextureSetPaintAccess {
   static bool can_resize_raw(const PaintedMesh&) noexcept;
   static bool can_resize_unpainted(const PaintedMesh&) noexcept;
   static bool grid_covered(const PaintedMesh&,size_t) noexcept;
   static std::shared_ptr<PaintedMesh> resize_unpainted(const PaintedMesh&,uint32_t,const TextureSetLimits&);
   static std::shared_ptr<PaintedMesh> resample_plain(const PaintedMesh&,const TextureSetResolutionOptions&,const TextureSetLimits&,TextureSetResolutionReport&);
+  static void reproject_retopology(const PaintedMesh &from, PaintedMesh &replacement,
+                                   RetopoTransfer &);
   static const std::shared_ptr<const TextureSetFaceDomain>& domain(const PaintedMesh&)noexcept;
   static std::shared_ptr<const void> raster_owner(const PaintedMesh&)noexcept;
   // Membership-required Paint7 payload. The domain is minted only by the
