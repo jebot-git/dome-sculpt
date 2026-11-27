@@ -2053,14 +2053,17 @@ std::shared_ptr<PaintedMesh>detail::TextureSetPaintAccess::bind_raster(const Pai
   if(snapshot_bytes(before)>limits.maximum_bytes)throw std::length_error("Source member raster metadata exceeds its quota");auto result=before.snapshot();result->surface_=prototype.surface_;result->texture_set_domain_=domain;result->sampling_attachment_=prototype.sampling_attachment_;result->composite_cache_=std::make_shared<PaintedMesh::CompositeCache>();result->composite_token_=next_composite_token();return result;
 }
 bool detail::TextureSetPaintAccess::can_resize_raw(const PaintedMesh &paint)noexcept{
+  const auto &bake=paint.baked_;
+  const bool native_bake=!bake||(!bake->normal_authority&&!bake->normal_field&&
+      bake->normal_interpretation==BakedNormalInterpretation::CanonicalMikk);
   return valid_raster(paint)&&!paint.in_stroke()&&!paint.texture_set_domain_&&
-    !paint.sampling_attachment_&&!paint.color_projection_&&!paint.normal_projection_&&!paint.baked_&&
+    !paint.sampling_attachment_&&!paint.color_projection_&&!paint.normal_projection_&&native_bake&&
     !paint.surface_->paint_domain&&!paint.surface_->original_sampling&&!paint.surface_->source_capture_only&&
     paint.surface_->options.policy!=PaintUvPolicy::PolygonAuthored;
 }
 bool detail::TextureSetPaintAccess::can_resize_unpainted(const PaintedMesh &paint)noexcept{
   return can_resize_raw(paint)&&!paint.allocated_tiles_&&!paint.allocated_color_tiles_&&
-    !paint.has_physical_emission();
+    !paint.baked_&&!paint.has_physical_emission();
 }
 bool detail::TextureSetPaintAccess::grid_covered(const PaintedMesh &paint,size_t index)noexcept{
   return index<paint.surface_->texels.size()&&paint.surface_->texels[index].covered;
@@ -2225,6 +2228,8 @@ std::shared_ptr<PaintedMesh> detail::TextureSetPaintAccess::resample_plain(const
  const auto raster_work=surface->diagnostics.raster_samples+surface->diagnostics.candidate_checks;
  if(raster_work>limits.maximum_work-report.work)throw std::length_error("Texture-set resolution raster exceeds complete work budget");report.work+=raster_work;
  auto result=before.snapshot();result->surface_=std::move(surface);result->layers_=std::move(layers);
+ if(before.baked_)
+  result->baked_=detail::resample_native_bake_grid(*before.baked_,before.resolution(),options,limits,report);
  result->allocated_tiles_=result->allocated_color_tiles_=0;
  for(const auto&l:result->layers_){result->allocated_tiles_+=tile_count(l);result->allocated_color_tiles_+=color_tile_count(l);}
  result->composite_cache_=std::make_shared<PaintedMesh::CompositeCache>();result->composite_token_=next_composite_token();++result->revision_;

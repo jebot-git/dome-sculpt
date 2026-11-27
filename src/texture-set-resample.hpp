@@ -25,4 +25,7 @@ TextureSetLimits native_texture_grid_limits();
 std::vector<PaintLayer> resample_texture_set_layers(
     const PaintedMesh &, const TextureSetResolutionOptions &,
     const TextureSetLimits &, TextureSetResolutionReport &, bool native_cells = false);
+std::shared_ptr<const BakedTextures> resample_native_bake_grid(
+    const BakedTextures &,uint32_t original,const TextureSetResolutionOptions &,
+    const TextureSetLimits &,TextureSetResolutionReport &);
 } // namespace dome::detail

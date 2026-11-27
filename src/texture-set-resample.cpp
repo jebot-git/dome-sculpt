@@ -478,6 +478,15 @@ void native_overlay_quality(const PaintedMesh &before, const PaintedMesh &after,
   const auto r = coarse.resolution();
   double emission_peak = 1, squares = 0;
   size_t count = 0;
+  if (old->baked() && old->baked()->emission_field) {
+    const auto &field = *old->baked()->emission_field;
+    work(report, field.sample_count(), limits);
+    for (size_t i = 0; i < field.sample_count(); ++i) {
+      if ((i & 4095) == 0) stop(limits);
+      for (float value : field.texel(i).absolute)
+        emission_peak = std::max(emission_peak, double(value));
+    }
+  }
   for (const auto &layer : old->layers())
     for (const auto &tile : layer.emission_tiles)
       if (tile) {
@@ -515,7 +524,7 @@ void native_overlay_quality(const PaintedMesh &before, const PaintedMesh &after,
         footprint(grid, r, x, y, [&](uint32_t sx, uint32_t sy, double weight) {
           work(report, 1, limits);
           const auto owner = packet.padding()->at(size_t(sy) * grid + sx);
-          if (owner < 0 || !tiles.at(size_t(owner / grid / 32) * (grid / 32) + owner % grid / 32))
+          if (owner < 0 || (!packet.baked() && !tiles.at(size_t(owner / grid / 32) * (grid / 32) + owner % grid / 32)))
             return;
           work(report, (packet.layers().size() + 1) * 32, limits);
           const auto sample = sample_overlay_texel_values(packet, int(sx), int(sy), false);
@@ -723,6 +732,141 @@ std::vector<PaintLayer> resample_texture_set_layers(
   }
   stop(limits);
   return result;
+}
+
+std::shared_ptr<const BakedTextures> resample_native_bake_grid(
+    const BakedTextures &before,uint32_t from,const TextureSetResolutionOptions &options,
+    const TextureSetLimits &limits,TextureSetResolutionReport &report) {
+  stop(limits);
+  before.validate(from);
+  if(before.normal_interpretation!=BakedNormalInterpretation::CanonicalMikk||
+     before.normal_authority||before.normal_field)
+    throw std::invalid_argument("Paint resolution requires an ordinary canonical Bake grid");
+  const auto to=options.resolution;
+  const size_t source_pixels=size_t(from)*from,target_pixels=size_t(to)*to;
+  const bool enlarge=to>=from;
+  auto after=std::make_shared<BakedTextures>();
+  after->color_interpretation=before.color_interpretation;
+  after->maps.transparent=before.maps.transparent;
+  const std::array old_images{&before.maps.color,&before.maps.pbr_color,&before.maps.metal_rough,
+                             &before.maps.normal,&before.maps.emission};
+  const std::array new_images{&after->maps.color,&after->maps.pbr_color,&after->maps.metal_rough,
+                             &after->maps.normal,&after->maps.emission};
+  const auto planes=std::ranges::count_if(old_images,[](const auto *image){return !image->rgba.empty();});
+  charge(report.peak_bytes,1,sizeof(BakedTextures),limits);
+  charge(report.peak_bytes,target_pixels,1+4*size_t(planes),limits);
+  work(report,std::max(source_pixels,target_pixels)*(1+4*size_t(planes)),limits);
+  for(size_t role=0;role<old_images.size();++role)
+    if(!old_images[role]->rgba.empty())*new_images[role]={to,to,std::vector<uint8_t>(4*target_pixels)};
+  after->coverage.resize(target_pixels);
+  // Each image carries unassociated material values and one shared linear
+  // mask. Use mask-weighted linear values when reducing. Normal RGB stores a
+  // signed tangent vector, and the native shader normalizes after blending.
+  const auto srgb=[](size_t role,size_t k){return (role<2||role==4)&&k<3;};
+  const auto decode=[&](uint8_t v,size_t role,size_t k){return srgb(role,k)?linear(v):v/255.;};
+  const auto prior_cell=[&](uint32_t x,uint32_t y){return size_t(y/(to/from))*from+x/(to/from);};
+  for(uint32_t y=0;y<to;++y){
+    stop(limits);
+    for(uint32_t x=0;x<to;++x){
+      const size_t dst=size_t(y)*to+x;
+      if(enlarge){
+        const auto src=prior_cell(x,y);
+        after->coverage[dst]=before.coverage[src];
+        for(size_t role=0;role<old_images.size();++role)if(!old_images[role]->rgba.empty())
+          std::copy_n(old_images[role]->rgba.data()+src*4,4,new_images[role]->rgba.data()+dst*4);
+        continue;
+      }
+      double coverage=0;
+      std::array<std::array<double,4>,5> visible{},raw{};
+      footprint(from,to,x,y,[&](uint32_t sx,uint32_t sy,double area){
+        const size_t src=size_t(sy)*from+sx;
+        const double weight=before.coverage[src]/255.*area;
+        coverage+=weight;
+        for(size_t role=0;role<old_images.size();++role)if(!old_images[role]->rgba.empty())
+          for(size_t k=0;k<4;++k){
+            const double value=decode(old_images[role]->rgba[src*4+k],role,k);
+            visible[role][k]+=value*weight;
+            raw[role][k]+=value*area;
+          }
+      });
+      after->coverage[dst]=byte(coverage);
+      for(size_t role=0;role<new_images.size();++role)if(!new_images[role]->rgba.empty())
+        for(size_t k=0;k<4;++k){
+          const auto value=coverage>0?visible[role][k]/coverage:raw[role][k];
+          new_images[role]->rgba[dst*4+k]=byte(srgb(role,k)?encoded(value):value);
+        }
+    }
+  }
+  if(const auto &emission=before.emission_field){
+    after->emission_field=BakedEmissionField::generate_compact(to,[&](size_t i){
+      const auto x=uint32_t(i%to),y=uint32_t(i/to);
+      if(enlarge){work(report,1,limits);return emission->texel(prior_cell(x,y));}
+      std::array<double,3> legacy{},absolute{};
+      double coverage=0;
+      footprint(from,to,x,y,[&](uint32_t sx,uint32_t sy,double area){
+        work(report,8,limits);
+        const auto sample=emission->texel(size_t(sy)*from+sx);
+        coverage+=sample.coverage*area;
+        for(size_t k=0;k<3;++k){
+          legacy[k]+=sample.legacy[k]*area;
+          absolute[k]+=sample.absolute[k]*area;
+        }
+      });
+      return BakedEmissionSample{{float(legacy[0]),float(legacy[1]),float(legacy[2])},
+          {float(absolute[0]),float(absolute[1]),float(absolute[2])},float(coverage)};
+    },{std::min(size_t(128*1024*1024),limits.maximum_bytes-report.peak_bytes),limits.cancelled});
+    charge(report.peak_bytes,1,after->emission_field->storage_bytes(),limits);
+  }
+  after->validate(to);
+  if(enlarge)return after;
+
+  // Compare unflattened Bake contributions, including hidden values that
+  // the live paint stack can cover. Inspect every original cell so averaging
+  // can neither conceal a sharp normal edge nor erase significant HDR detail.
+  std::array<double,3> peak{1,1,1};
+  if(before.emission_field){
+    work(report,source_pixels*4,limits);
+    for(size_t i=0;i<source_pixels;++i){
+      if((i&4095)==0)stop(limits);
+      const auto sample=before.emission_field->texel(i);
+      for(size_t k=0;k<3;++k)peak[k]=std::max(peak[k],double(sample.absolute[k]));
+    }
+  }
+  work(report,source_pixels*(1+4*size_t(planes)+(before.emission_field?7:0)),limits);
+  double squares=0;
+  size_t count=0;
+  auto measure=[&](double error){
+    if(error>options.maximum_component_error)
+      throw std::runtime_error("Paint resolution cannot preserve the baked material, normals and emission within its quality bounds");
+    squares+=error*error;
+    ++count;
+  };
+  const auto scale=from/to;
+  for(uint32_t y=0;y<from;++y){
+    stop(limits);
+    for(uint32_t x=0;x<from;++x){
+      const size_t src=size_t(y)*from+x,dst=size_t(y/scale)*to+x/scale;
+      const double a=before.coverage[src]/255.,b=after->coverage[dst]/255.;
+      measure(std::abs(a-b));
+      for(size_t role=0;role<old_images.size();++role)if(!old_images[role]->rgba.empty())
+        for(size_t k=0;k<4;++k){
+          const auto old=decode(old_images[role]->rgba[src*4+k],role,k);
+          const auto now=decode(new_images[role]->rgba[dst*4+k],role,k);
+          measure(std::abs(role==3&&k<3?a*(2*old-1)-b*(2*now-1):a*old-b*now));
+        }
+      if(before.emission_field){
+        const auto old=before.emission_field->texel(src),now=after->emission_field->texel(dst);
+        measure(std::abs(double(old.coverage)-now.coverage));
+        for(size_t k=0;k<3;++k){
+          measure(std::abs(double(old.legacy[k])-now.legacy[k]));
+          measure(std::abs(double(old.absolute[k])-now.absolute[k])/peak[k]);
+        }
+      }
+    }
+  }
+  if(std::sqrt(squares/count)>options.maximum_rms_error)
+    throw std::runtime_error("Paint resolution cannot preserve the baked material, normals and emission within its quality bounds");
+  return after;
 }
 } // namespace detail
 TextureSetResolutionReport resample_native_texture_grid(

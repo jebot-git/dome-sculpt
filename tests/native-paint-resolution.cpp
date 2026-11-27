@@ -5,6 +5,7 @@
 #include "texture-set-resample.hpp"
 #include "import-controller-driver.hpp"
 #include <algorithm>
+#include <cmath>
 #include <filesystem>
 #include <iostream>
 #include <nlohmann/json.hpp>
@@ -305,6 +306,93 @@ void resize_physical_native_grid(const std::filesystem::path &root) {
         "Physical paint survives ordered native Save, reopen, Undo and Redo");
 }
 
+void resize_baked_native_grid(const std::filesystem::path &root) {
+  const auto make_fixture=[](bool physical,bool sharp){
+    Scene scene;
+    Mesh mesh;
+    mesh.positions={{-1,-1,0},{1,-1,0},{1,1,0},{-1,1,0}};
+    mesh.normals.assign(4,{0,0,1});
+    mesh.uv={{{0,0}},{{1,0}},{{1,1}},{{0,1}}};
+    mesh.indices={0,1,2,0,2,3};
+    auto paint=std::make_shared<PaintedMesh>(std::move(mesh),128);
+    BakedTextures bake;
+    const auto image=[](){return Image{128,128,std::vector<uint8_t>(128*128*4,255)};};
+    bake.maps.color=image();
+    bake.maps.metal_rough=image();
+    bake.maps.normal=image();
+    if(!physical)bake.maps.emission=image();
+    bake.coverage.resize(128*128);
+    for(size_t i=0;i<bake.coverage.size();++i){
+      const bool odd=i%2;
+      bake.coverage[i]=sharp?255:odd?144:112;
+      bake.maps.color.rgba[i*4]=odd?123:86;
+      bake.maps.color.rgba[i*4+3]=odd?188:155;
+      bake.maps.metal_rough.rgba[i*4+1]=odd?153:100;
+      bake.maps.normal.rgba[i*4]=sharp?(odd?240:15):(odd?162:144);
+      bake.maps.normal.rgba[i*4+1]=128;
+      bake.maps.normal.rgba[i*4+2]=sharp?186:246;
+      if(!physical)bake.maps.emission.rgba[i*4]=odd?102:78;
+    }
+    if(physical)bake.emission_field=BakedEmissionField::generate(128,[](size_t i){
+      const float coverage=i%2?.0015f:.001f;
+      return BakedEmissionSample{{.2f*coverage,.05f*coverage,0},
+          {8000*coverage,50*coverage,.12f*coverage},coverage};
+    });
+    paint->install_bake(std::move(bake));
+    scene.active().mesh_active=true;
+    scene.active().painted=std::move(paint);
+    return scene;
+  };
+  for(bool physical:{false,true}){
+    auto scene=make_fixture(physical,false);
+    const auto id=scene.active().id;
+    const auto before=scene.encode();
+    if(compute_backend()!="CPU"){
+      check(refuses([&]{resample_native_texture_grid(scene,id,{64});})&&scene.encode()==before,
+            "An unavailable accelerated Bake resize refuses atomically");
+      continue;
+    }
+    const auto source=scene.active().painted;
+    auto no_loss=TextureSetResolutionOptions{.resolution=64,.maximum_component_error=0,.maximum_rms_error=0};
+    check(refuses([&]{resample_native_texture_grid(scene,id,no_loss);})&&scene.encode()==before,
+          "A zero-tolerance Bake reduction refuses and keeps the exact original field");
+    const auto result=resample_native_texture_grid(scene,id,{64});
+    const auto &bake=*scene.active().painted->baked();
+    const auto &prior=*source->baked();
+    check(result.changed&&scene.active().painted->mesh_owner()==source->mesh_owner()&&
+          bake.coverage.front()==128&&bake.maps.normal.width==64,
+          "A reduced Bake keeps the mesh and reconstructs the linear normal and coverage grids");
+    constexpr float even=7.f/16,odd=9.f/16;
+    const auto blend=[](uint8_t a,uint8_t b){return (even*a+odd*b)/255.f;};
+    const float wanted=even*srgb_to_linear(prior.maps.color.rgba[0]/255.f)+
+                       odd*srgb_to_linear(prior.maps.color.rgba[4]/255.f);
+    check(std::abs(srgb_to_linear(bake.maps.color.rgba[0]/255.f)-wanted)<.004f&&
+          std::abs(bake.maps.color.rgba[3]/255.f-blend(prior.maps.color.rgba[3],prior.maps.color.rgba[7]))<.002f&&
+          std::abs(bake.maps.metal_rough.rgba[1]/255.f-blend(100,153))<.002f&&
+          std::abs(bake.maps.normal.rgba[0]/255.f-blend(144,162))<.002f,
+          "Independent coverage-weighted reads agree for sRGB, alpha, ORM and the tangent vector");
+    if(physical){
+      const auto emission=bake.emission_field->texel(0);
+      check(bake.maps.emission.rgba.empty()&&std::abs(emission.coverage-.00125f)<1e-9f&&emission.coverage<1.f/255&&
+            std::abs(emission.absolute[0]-10.f)<1e-5f&&std::abs(emission.legacy[0]-.00025f)<1e-9f,
+            "FLOAT reduction retains sub-byte coverage and both premultiplied emission planes");
+    }else{
+      const float wanted_emission=even*srgb_to_linear(78/255.f)+odd*srgb_to_linear(102/255.f);
+      check(!bake.emission_field&&std::abs(srgb_to_linear(bake.maps.emission.rgba[0]/255.f)-wanted_emission)<.004f,
+            "Legacy Bake emission remains an sRGB image with the correct coverage-weighted value");
+    }
+    const auto path=root/(physical?"native-float-bake64.dsculpt":"native-ldr-bake64.dsculpt");
+    scene.save(path);
+    check(Scene::load(path).encode()==scene.encode(),"Cold open retains the reduced Bake and coverage");
+  }
+  if(compute_backend()=="CPU"){
+    auto sharp=make_fixture(false,true);
+    const auto before=sharp.encode();
+    check(refuses([&]{resample_native_texture_grid(sharp,sharp.active().id,{64});})&&sharp.encode()==before,
+          "The default quality guard refuses a reduction that would erase sharp normal detail");
+  }
+}
+
 } // namespace
 
 int main(int argc,char **argv) try {
@@ -317,6 +405,8 @@ int main(int argc,char **argv) try {
   resize_painted_source_grid(root);
   if(dome::compute_backend()=="CPU")
    resize_physical_native_grid(root);
+ } else if(std::string_view(argv[1])=="baked") {
+  resize_baked_native_grid(root);
  } else {
   throw std::invalid_argument("Unknown paint resolution fixture");
  }

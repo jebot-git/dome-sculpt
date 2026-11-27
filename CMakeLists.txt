@@ -5222,6 +5222,9 @@ if(BUILD_TESTING)
   add_test(NAME retopology-imported-prior-bake COMMAND dome-sculpt-texture-set-source-export-test
     --imported-prior-bake ${CMAKE_CURRENT_BINARY_DIR}/retopology-imported-prior-bake)
   set_tests_properties(retopology-imported-prior-bake PROPERTIES TIMEOUT 400)
+  add_test(NAME retopology-imported-bake-resize COMMAND dome-sculpt-texture-set-source-export-test
+    --imported-retopology-resize ${CMAKE_CURRENT_BINARY_DIR}/retopology-imported-bake-resize)
+  set_tests_properties(retopology-imported-bake-resize PROPERTIES TIMEOUT 400)
   foreach(case painted tinted unprepared mixed-hdr mixed-ldr resize)
     add_test(NAME retopology-imported-mtoon-${case} COMMAND dome-sculpt-texture-set-source-export-test
       --imported-mtoon ${CMAKE_CURRENT_BINARY_DIR}/retopology-imported-mtoon-${case} ${case})
@@ -5313,6 +5316,8 @@ if(BUILD_TESTING)
     ${CMAKE_CURRENT_BINARY_DIR}/native-empty-paint-resolution)
   add_test(NAME native-authored-paint-resolution COMMAND dome-sculpt-native-paint-resolution-test painted
     ${CMAKE_CURRENT_BINARY_DIR}/native-authored-paint-resolution)
+  add_test(NAME native-baked-paint-resolution COMMAND dome-sculpt-native-paint-resolution-test baked
+    ${CMAKE_CURRENT_BINARY_DIR}/native-baked-paint-resolution)
   set_tests_properties(native-empty-paint-resolution native-authored-paint-resolution PROPERTIES TIMEOUT 420)
 endif()
 

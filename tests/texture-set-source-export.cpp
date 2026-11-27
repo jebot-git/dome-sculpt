@@ -1853,7 +1853,7 @@ detail::GltfDocument imported_retopo_input(bool transformed_normal) {
  return input;
 }
 
-void retopology_imported_pbr(bool prior_bake=false) {
+void retopology_imported_pbr(bool prior_bake=false,bool resize=false) {
  detail::write_glb(imported_retopo_input(prior_bake),"original-import.glb");
  ImportAuthoringOptions options;options.paint_resolution=64;options.prepare_texture_atlas=true;
  auto imported=prepare_authoring_import(Scene{},"original-import.glb",options);
@@ -2075,6 +2075,46 @@ void retopology_imported_pbr(bool prior_bake=false) {
  check_native_mikk_glb("raw-standard.glb",target);
  check_native_mikk_glb("raw-editable.glb",target);
  check(Scene::load("raw-editable.glb").encode()==accepted,"Editable GLB restores the complete imported-source project");
+ if(resize){
+  check(document.can_resize_native_paint(),"The genuine native Bake keeps the patch resize control enabled");
+  ImportDriver hand(document);
+  hand.open();hand.sector(9);hand.sector(1);hand.sector(6);
+  check(document.frame().state->controls.parameter==VrParameter::TextureResolution,
+        "Controller navigation opens the Canonical Bake grid size panel");
+  hand.ray(.4f);hand.panel_button(true);
+  document.save_async("resized-bake.dsculpt").get();ready(document);
+  const auto larger=document.copy_scene();
+  const auto &object=larger.active();
+  const auto &grown=*object.painted->baked();
+  check(object.painted->resolution()==256&&object.painted->mesh_owner()==patch.painted->mesh_owner()&&
+        object.retopology==patch.retopology&&grown.normal_interpretation==BakedNormalInterpretation::CanonicalMikk&&
+        grown.emission_field&&grown.maps.emission.rgba.empty(),
+        "Enlarged Bake retains topology, canonical normal basis and a separate FLOAT emission owner");
+  bool exact=true;
+  for(uint32_t y=0;y<256&&exact;++y)for(uint32_t x=0;x<256&&exact;++x){
+   const size_t src=size_t(y/4)*64+x/4,dst=size_t(y)*256+x;
+   exact=grown.coverage[dst]==baked.coverage[src];
+   for(auto [previous,current]:{std::pair{&baked.maps.color,&grown.maps.color},
+       {&baked.maps.metal_rough,&grown.maps.metal_rough},{&baked.maps.normal,&grown.maps.normal}})
+    exact&=std::equal(previous->rgba.data()+4*src,previous->rgba.data()+4*src+4,current->rgba.data()+4*dst);
+   const auto a=baked.emission_field->texel(src),b=grown.emission_field->texel(dst);
+   exact&=a.coverage==b.coverage&&a.legacy==b.legacy&&a.absolute==b.absolute;
+   for(const auto &layer:patch.painted->layers())
+    exact&=object.painted->pixel(layer.id,x,y)==patch.painted->pixel(layer.id,x/4,y/4);
+  }
+  check(exact,"Every baked material, normal, FLOAT coefficient and hidden layer cell survives the enlargement");
+  const auto resized=larger.encode();
+  check(Scene::load("resized-bake.dsculpt").encode()==resized&&document.undo()&&document.copy_scene().encode()==accepted&&
+        document.redo()&&document.copy_scene().encode()==resized,
+        "Bake grid changes preserve the complete guide and project through Save, Undo and Redo");
+  ready(document);
+  document.export_asset("resized-bake-standard.glb",AssetExportFormat::Glb).get();
+  document.export_asset("resized-bake-editable.glb",AssetExportFormat::EditableGlb256).get();
+  check_native_mikk_glb("resized-bake-standard.glb",target);
+  check_native_mikk_glb("resized-bake-editable.glb",target);
+  check(Scene::load("resized-bake-editable.glb").encode()==resized,
+        "Editable GLB reopens the resized canonical Bake and FLOAT storage exactly");
+ }
 }
 
 struct PortableRetopoImages {
@@ -2862,10 +2902,10 @@ int main(int argc,char **argv)try {
   std::cout<<"PASS "<<checks<<" native Mikk export checks\n";
   return 0;
  }
- if(argc==3&&(mode=="--imported-retopology"||mode=="--imported-prior-bake")) {
+ if(argc==3&&(mode=="--imported-retopology"||mode=="--imported-prior-bake"||mode=="--imported-retopology-resize")) {
   std::filesystem::create_directories(argv[2]);
   std::filesystem::current_path(argv[2]);
-  retopology_imported_pbr(mode=="--imported-prior-bake");
+  retopology_imported_pbr(mode!="--imported-retopology",mode=="--imported-retopology-resize");
   std::cout<<"PASS "<<checks<<" imported material retopology checks\n";
   return 0;
  }
