@@ -160,6 +160,17 @@ roles alongside the edited layout. Native non-identity fields, imported
 material sets and physical headset acceptance remain open.
 [Combined retained UV evidence](validation/retopology-color-normal-uv-20261127.json)
 
+Native identity-colour patches can carry physical FLOAT Bake and paint
+together with prepared PBR colour and portable normal maps through Standard
+and Editable GLB. Standard retains the exact HDR payload alongside the
+portable fallback. Both formats preserve the complete editable native
+project, the original sampling coordinates, and the current UV layout.
+Independent GLB reads, rehashed-package forgery controls, nested DomeD
+Wayland export, controller export and cancel, and scoped Release and
+ASan/UBSan runs cover this workflow. Imported sets and non-identity colour
+fields need their own transfer paths.
+[Retained HDR evidence](validation/retopology-color-normal-hdr-20261127.json)
+
 Changed retopology now reprojects static native MToon texture sets using the
 actual material slot of each triangle and independent role output grids.
 Native MToon 0 shared transforms and MToon 1 per-role transforms both follow

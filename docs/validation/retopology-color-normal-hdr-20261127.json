@@ -1,0 +1,184 @@
+{
+  "product": "931bbe444e6ee3d17625c940e40aa3519bc87600",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "canonical_domed_compositor_sha256": "47920142c8c803dcf5adb63ba643d2e347fbdcd1e15ecd8bce7c1a8dd47c0b7e",
+  "release_app_sha256": "83e40e5839c27d3d6e555e6e6d53133a1808c23febfe9d769fd5c573a088eec8",
+  "selected_release": [
+    "native-paint32-fixture",
+    "canonical-normal-owning",
+    "canonical-paint37-fixture",
+    "canonical-paint37-native-7-4",
+    "native-authoring-real",
+    "canonical-paint37-emission-render",
+    "native-paint32-emission",
+    "native-paint32-emission-mixed",
+    "canonical-paint37-emission-mixed",
+    "canonical-paint37-emission-contracts",
+    "native-paint32-emission-contracts",
+    "canonical-paint37-emission-worker",
+    "xr-editable-export",
+    "xr-native-paint32-export",
+    "retopology-prepared-color-normal-uv-affine",
+    "retopology-prepared-color-normal-uv-plain",
+    "canonical-paint-color-hdr",
+    "xr-canonical-paint-color-hdr-export"
+  ],
+  "strict_asan_ubsan": {
+    "test": "canonical-paint-color-hdr",
+    "checks": 20,
+    "leak_detection": true,
+    "binary_sha256": "a18a18074e5271898b12aef83e6ce69fbbb3403cac987af94bb4a26382b64496"
+  },
+  "identical_release_and_sanitizer_output_sha256": {
+    "original.dsculpt": "23ccb5a69d44f6fe5914d8d427dccd81f229d794014d8df0ed6d3f56428475fc",
+    "standard.glb": "e4b684cf9bedb7854ec79c17dc84f5b895f7af9fa3c7fadcc0397a2a1fb78130",
+    "editable.glb": "e38cb0d746dd9dfee352cb9e141b1908da6a698c66a30a3ca3c747bfc573e0c0"
+  },
+  "fixture_sha256": "d0da953de68a596cda7b899fa75db22544fbb85b26ec112b9682e3044e801f0d",
+  "wayland": {
+    "checks": [
+      {
+        "passed": true,
+        "check": "Retained HDR project opens with the canonical Wayland application identity"
+      },
+      {
+        "passed": true,
+        "check": "The DomeD universal menu enables Standard GLB export"
+      },
+      {
+        "passed": true,
+        "check": "Real FLTK chooser publishes Sculpt.glb after worker export"
+      },
+      {
+        "passed": true,
+        "check": "DomeD Standard GLB matches native worker bytes exactly"
+      },
+      {
+        "passed": true,
+        "check": "Editable policy uses native FLTK with the canonical application identity"
+      },
+      {
+        "passed": true,
+        "check": "Return in the Editable policy defaults to Cancel"
+      },
+      {
+        "passed": true,
+        "check": "Real FLTK chooser publishes Project.glb after worker export"
+      },
+      {
+        "passed": true,
+        "check": "DomeD Editable GLB restores the original document and keeps the project file exact"
+      },
+      {
+        "passed": true,
+        "check": "Native client releases the compositor and export worker on close"
+      }
+    ],
+    "complete": true
+  },
+  "synthetic_openxr": {
+    "software": {
+      "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+      "stereo_submissions": 6,
+      "action_syncs": 7,
+      "opaque_pixels": {
+        "0": {
+          "opaque": 1479
+        },
+        "1": {
+          "opaque": 1203
+        }
+      },
+      "native_save_sha256": "23ccb5a69d44f6fe5914d8d427dccd81f229d794014d8df0ed6d3f56428475fc"
+    },
+    "arc": {
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "stereo_submissions": 6,
+      "action_syncs": 7,
+      "opaque_pixels": {
+        "0": {
+          "opaque": 1477
+        },
+        "1": {
+          "opaque": 1201
+        }
+      },
+      "native_save_sha256": "23ccb5a69d44f6fe5914d8d427dccd81f229d794014d8df0ed6d3f56428475fc"
+    }
+  },
+  "khronos_validator": "2.0.0-dev.3.10",
+  "matching_wayland_xr_editable_512_sha256": "3fb12c0541e0b28c2d924073e7685a5dc95df66b90e6087b33283361d08b19d3",
+  "controller_checks": 69,
+  "khronos": {
+    "release/canonical-paint-color-hdr/standard.glb": {
+      "numErrors": 0,
+      "numWarnings": 0,
+      "numInfos": 4,
+      "numHints": 0
+    },
+    "release/canonical-paint-color-hdr/editable.glb": {
+      "numErrors": 0,
+      "numWarnings": 0,
+      "numInfos": 3,
+      "numHints": 0
+    },
+    "wayland-hdr/Sculpt.glb": {
+      "numErrors": 0,
+      "numWarnings": 0,
+      "numInfos": 4,
+      "numHints": 0
+    },
+    "wayland-hdr/Project.glb": {
+      "numErrors": 0,
+      "numWarnings": 0,
+      "numInfos": 3,
+      "numHints": 0
+    }
+  },
+  "earlier_full_release": {
+    "candidate": "0432e1a3bb5d5922d125e19005a11b0eb19e4678",
+    "terminal": true,
+    "invocation": "5fbdca0a590b4f47a64c9c8f609539a0",
+    "phase": "complete",
+    "earlier_unit": "ds-mtoon-static-normal-uv-combined-release-20261127.service",
+    "elapsed_seconds": 5428.091,
+    "registered": 1394,
+    "app_sha256": "cd18cefa53c6ca1aa22c32b2605fb208df9da6318b2a97bdbf224b87b60889cd",
+    "cache_sha256": "052864d537338b8d77e15ec671a50be1630d9c7248183ed20bc3717dc0cbace1",
+    "exit": 0,
+    "totals": {
+      "pass": 1394,
+      "fail": 0,
+      "skip": 0
+    },
+    "failed": [],
+    "skipped": [],
+    "junit_sha256": "f0cca2e296382b4aa29420c342bd535c1fb9ea34986a80d406ce9986c934893e"
+  },
+  "physical_headset": false,
+  "archive_sha256": "a38b244025619022b71b1cc3043e2de49f337ce9af91dd04ddb3c72ecfbdff12",
+  "archive_members_sha256": {
+    "hdr-check.sh": "729b8389007d6d050b702bd5b44350ff914f2864fc67c31a133e8f1a57acfda7",
+    "relink-sanitizer.py": "b5cbc5fedbde12656cc4535351cc255c5c5a88b2670714247d24c9decc833ee8",
+    "canonical-paint-color-hdr-release.log": "b10d7205eddcb03007ab3a575879971342e98a9ded9bd59865288aa30551f226",
+    "xr-canonical-paint-color-hdr-export-release.log": "268edbca63ea066a5b0d56f22214f485a418afa1896d71c52363688459ea62af",
+    "release-controller.log": "dd9c88cf1cfeea84054cd2a0cc92a017b9df6a0f89ad1a49af5f0b5dc01def45",
+    "release-controller-build.log": "1c7670bfb2a17d4bd8b9dea60e24664b429305efd91ac1a57919b597520c14cd",
+    "asan-validated.log": "873042f94dbc735fc0594178e38bcdc3a7e754f00cb4b7fd79036ceea266f3f3",
+    "asan-validated-build.log": "cf79f820890bcb577f8041bb2cdec1b3672785329174220908cfae6564b01e34",
+    "asan-validated-configure.log": "1ba955c58e54832411d45c6a326e84a6c2a2a8a10adea10af2eb8ce6ef2c422e",
+    "asan-live-runtime.log": "87c3710e373c94d78498f3cc7f78fe889fa8d5f97db038fc91432493bb6ba8af",
+    "khronos.cjs": "1d300ee950f1420230cda0a1edcef1cbce309029a3f9e13554a9d17326ef36dc",
+    "khronos.json": "38d013949511598221aa3ec5a52a473d75cab3ee074651c3d44503c72c3af9e6",
+    "previous-full-release.json": "cd06bf70f36c5aae08b3cf53cc3c4713e85e100deda350e1ce053e6d42a0377e",
+    "record.py": "3a354000355e61da73e5679ae0f07a51a3a5a38ee897224e535a355fd7bdb0a3",
+    "run-wayland.py": "8a07b9b0a1eb6e86bbb4443bf4971877804e773c9e321dad6a4dc9b4c78bee6b",
+    "wayland-hdr.py": "df3d7ef71efecd55580a0d4c3a1236398c54f981c1aee66a4355046632950de9",
+    "bind-wayland.log": "72cc17b6fe84a115567e6de0b8ccaba0543b0fc3ddaaeb1a695e566e27bf3c23",
+    "wayland-hdr/report.json": "b2fd0a350d9d86bcd93b6a4252ceed7061a060edaf25b9f0a15309f2d6f47c4b",
+    "run-render.py": "f2f75fa39e19214c0f4a3671b0406859323d8704aecb45926d72187972db7ac2",
+    "xr-prepare.py": "30b5bcaa7edede25891b24fd9338340dd3cf54ba057098df48f95d609d72c6c1",
+    "xr-software/compare.json": "fc27c8f650b7a59d83f4bd69df6591fe9f8bfbf7cc39acad6a638bd937590752",
+    "xr-arc/compare.json": "6ab86246cb70728f86146da2d19357df0f08e95ef6153589d40a1a4f54171598"
+  }
+}

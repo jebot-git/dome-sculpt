@@ -290,6 +290,31 @@ native and GLB files across both build profiles. Native non-identity fields
 and imported material sets still need their own transfer paths.
 [Combined retained UV validation](validation/retopology-color-normal-uv-20261127.json)
 
+Native identity-colour retopology patches with portable baked normals can
+now export physical emission in Standard and Editable GLB. An HDR Bake and
+subsequent physical paint share the retained writable grid with prepared PBR
+colour. The normal map keeps its separate sampling grid and the edited UV0
+layout remains available. Standard GLB includes the exact FLOAT field and
+native project with a portable emissive texture and strength. Editable GLB
+preserves the same native authoring state and offers 256, 512 and 1024 pixel
+portable emission. The Standard reader rejects a rehashed package that
+substitutes the base-colour UV set or borrows the normal map as base colour.
+Project Info can now read the native HDR scene and its Bake envelope.
+
+All 18 selected Release cases pass, including 69 controller checks for
+export, cancel, reopen and ordered Save. The focused strict ASan/UBSan run
+passes with leak detection and produces three byte-identical files against
+Release. Standard export bytes match between the native worker, nested
+DomeD universal menu and synthetic controller. The Wayland and controller
+512-pixel Editable outputs also match. All four worker and Wayland GLBs
+pass Khronos validation with zero errors and warnings. The native project
+renders in both eyes in synthetic OpenXR on Intel Arc A770 and llvmpipe.
+The earlier `0432e1a3` Release sweep passed all 1,394 tests. The full sweep
+of this milestone (`931bbe44`) is queued behind the still-running `48952391`
+sweep. Imported prepared sets, non-identity colour fields and physical
+headset acceptance remain open.
+[Retained HDR validation](validation/retopology-color-normal-hdr-20261127.json)
+
 Changed native retopology now transfers static MToon 0 and 1 images per
 material slot. The worker samples each slot's previous rest surface with
 the authored texture transform, wrapping and color encoding. The replacement
