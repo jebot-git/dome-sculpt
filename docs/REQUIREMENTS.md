@@ -137,6 +137,15 @@ per-material sets, imported source textures and physical XR
 production workflows remain required.
 [Prepared geometry evidence](validation/retopology-prepared-reproject-20261127.json)
 
+Retopology Apply preserves separate common and resolved PBR Bake and paint
+for single-material native patches with an identity vertex-colour field.
+The new field has its own certified atlas, while the hidden original keeps
+its previous preparation and Bake. Standard GLB carries the resolved
+texture and Editable GLB reopens the paint layers and their preparation.
+Imported prepared sets, simultaneous independently prepared normal and
+colour owners, and physical headset acceptance remain open.
+[Prepared colour evidence](validation/retopology-prepared-color-20261127.json)
+
 Changed retopology now reprojects static native MToon texture sets using the
 actual material slot of each triangle and independent role output grids.
 Native MToon 0 shared transforms and MToon 1 per-role transforms both follow

@@ -225,6 +225,30 @@ with zero errors and warnings. Synthetic OpenXR reopens and renders the
 changed prepared patch on llvmpipe and Intel Arc A770.
 [Prepared geometry validation](validation/retopology-prepared-reproject-20261127.json)
 
+Changed native retopology preserves independently resolved PBR colour when
+the patch has a single native material and an identity vertex-colour field.
+Bake can create this state when the source has authored glTF `COLOR_0`.
+Apply certifies the replacement atlas and then filters both the common and
+resolved colour planes using the same rest correspondence and coverage.
+Hidden colour layers stay editable with their original IDs, opacity and
+visibility. The previous patch keeps its original prepared owner, and a
+cleared Bake stays cleared.
+
+The ordinary Move fixture and the reflected, sheared fixture with a 72 cm
+move and an edge subdivision pass ordered Save, cold Open and Undo/Redo.
+Standard GLB embeds the exact resolved PBR texture as its base colour.
+Editable GLB restores the native editing state.
+Khronos reports zero errors and one generated-tangent warning per export.
+Nested DomeD Wayland verifies reopen, Move mode, Cancel and exact Save.
+Synthetic OpenXR compares the resolved Bake with a common-colour control
+in both eyes on llvmpipe and Intel Arc A770. All 52 selected Release tests
+and five ASan/UBSan workflows pass. Ten native project and GLB files
+match byte for byte across both builds. A full Release sweep of `48952391`
+is queued behind the earlier edge-subdivision sweep. Prepared imported
+material sets and combined independent colour and prepared normal owners
+still need their transfer adapters.
+[Prepared colour validation](validation/retopology-prepared-color-20261127.json)
+
 Changed native retopology now transfers static MToon 0 and 1 images per
 material slot. The worker samples each slot's previous rest surface with
 the authored texture transform, wrapping and color encoding. The replacement
