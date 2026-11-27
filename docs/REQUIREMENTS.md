@@ -242,10 +242,18 @@ resolution and binary coverage through resize, partial rebake, cold Save
 and Open, Undo and Redo, and append with donor remapping. Clear Bake restores
 the inherited normals and material coefficients at the new size. The
 validated Standard and Editable GLB exports preserve exact normal image
-bytes and a separate material texture resolution. Wider original-source
-material models, production geometry, GPU resampling, and physical headsets
-remain open.
+bytes and a separate material texture resolution.
 [Native polygon grid resize evidence](validation/native-polygon-grid-resize-20261127.json)
+
+Selected oneAPI, CUDA, and ROCm builds now dispatch the actual layer and
+Bake filtering stages to their device runtimes. The CPU reference and Arc
+A770 match for identical authored projects, including mask rounding and
+FLOAT emission below byte coverage. Native Wayland and synthetic OpenXR
+drive the Arc worker with exact Save and history. Both CUDA and ROCm
+compile and link the current native app and refuse work with all devices
+masked. Positive AMD and NVIDIA execution, larger production geometry
+within the normal worker budget, and physical headset checks remain open.
+[Paint grid compute validation](validation/paint-grid-compute-20261127.json)
 
 Native multi-material retopology preserves independently painted and baked
 grids and original VRM 1.0 joint links when Apply changes the patch.

@@ -36,9 +36,10 @@ and retry assertions at every boundary. All 16 focused Release cases pass,
 including all 56,683 cut allocation boundaries. Six ASan/UBSan runs cover
 native publication, ordinary cut and the first and last 128 cut faults.
 Synthetic OpenXR covers affine contact and focus cancellation on Arc and
-llvmpipe and checks held color-cut isolation and Save on llvmpipe. A fresh
-combined Release run of `9292dfe3` is tracked by
-`ds-held-cut-combined-release-20261127.service`.
+llvmpipe and checks held color-cut isolation and Save on llvmpipe. The
+combined Release run of `9292dfe3` finished with 1,430 passes and one
+`bake-polygon-cage` failure at dependent Save. Three isolated retries of
+that binary and one retry of the current CPU build passed.
 [Held and cut regression evidence](validation/held-cut-regression-20261127.json)
 
 The current texture-set shapekey revision `17367cb0` adds mixed-material
@@ -462,10 +463,27 @@ and history, and a 1024-pixel material grid with its original 64-pixel normal
 image. Nested DomeD Wayland and synthetic OpenXR on Arc A770 and
 llvmpipe match the native worker saves. Standard and Editable GLB keep
 byte-identical normal PNGs through resize, with explicit tangents. Khronos
-reports zero errors and warnings on six exports. Broader source material
-models, production geometry, accelerated resampling, and physical headset
-qualification remain open.
+reports zero errors and warnings on six exports.
 [Native polygon grid resize evidence](validation/native-polygon-grid-resize-20261127.json)
+
+Paint resolution now runs authored layer filtering and Bake reduction on the
+selected oneAPI, CUDA, or ROCm backend. Bounded GPU batches filter sRGB,
+linear material and normal bytes, masks, secondary PBR color, and FLOAT
+emission. Exact whole-cell enlargement copies authored data directly.
+Host reconstruction checks, source identity, cancellation, and history
+still decide whether the worker can publish the detached result.
+
+The CPU Release suite passed 24 selected tests. Arc A770 passed those tests
+and a missing-device refusal. Identical input projects yielded byte-identical
+results across bilinear enlargement and area reduction. Real Level Zero
+traces also record the kernel during Wayland and synthetic OpenXR edits
+whose saved endpoints match the CPU reference. CUDA and ROCm built the
+native app and both passed missing-device refusal. A 1024-to-512 diagnostic
+matched across CPU and Arc using a 256-million-work allowance. The normal
+128-million allowance refused that fixture. Broader source models, sustained
+production performance, positive AMD and NVIDIA execution, and physical
+headset qualification remain open.
+[Paint grid compute validation](validation/paint-grid-compute-20261127.json)
 
 Retopology reapply now works on native multi-material accessories attached
 to original VRM 1.0 joints. The replacement keeps its avatar hierarchy and

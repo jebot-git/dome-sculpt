@@ -1,0 +1,221 @@
+{
+  "utc": "2026-11-27T19:13:05.800141+00:00",
+  "product": "aa58c8b37eb93498a29286979f393b4ce02d2c28",
+  "parent": "421552dbc0537e3e8a1ba53f1a0907015926f274",
+  "patch_sha256": "81fba5c9ba2268d2518ff03425874e7b2142a8e03d11c4e6f0bad1956caaa843",
+  "toolkits": {
+    "DomeD": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+    "FLTK": "/opt/fltk-vr/toolkit",
+    "bitmap": "/opt/fltk-vr/bdf-runtime",
+    "DPC++": "7.2.0",
+    "DPC++_archive_sha256": "385586a25e75ac727883f0be5e442dec0ee81b3c20f9a29037a79921ad2f1728",
+    "CUDA": "13.4.59 sm86",
+    "ROCm": "7.1.52802 gfx1030"
+  },
+  "CPU_release": {
+    "names": [
+      "dome-sculpt-texture-set-source-export",
+      "retopology-imported-pbr",
+      "retopology-imported-bake-resize",
+      "retopology-imported-mtoon-resize",
+      "texture-set-retained-retopology-plain",
+      "texture-set-retained-retopology-affine",
+      "texture-set-retained-shapekeys",
+      "texture-set-retained-resize-matching",
+      "texture-set-retained-resize-split",
+      "texture-set-retained-posed-bake",
+      "texture-set-retained-skin",
+      "texture-set-prepared-recipe-references",
+      "texture-set-retained-bake-source",
+      "texture-set-retained-bake-target",
+      "texture-set-retained-native-target",
+      "texture-set-native-grid-resize-plain",
+      "texture-set-native-grid-resize-affine",
+      "dome-sculpt-texture-set-resolution",
+      "dome-sculpt-texture-set-baked-resolution",
+      "dome-sculpt-texture-set-baked-mtoon-resolution",
+      "native-empty-paint-resolution",
+      "native-authored-paint-resolution",
+      "native-baked-paint-resolution",
+      "native-retained-paint-resolution"
+    ],
+    "junit_sha256": "36f1ca1084ae7cb84da2e091218d23489058547834c9f00907205d6af867cd21",
+    "app_sha256": "cf911400c4a89c63166423b8098d36696d268a5dca41404270762a4eca79ea91"
+  },
+  "Arc_A770_oneAPI": {
+    "names": [
+      "dome-sculpt-texture-set-source-export",
+      "retopology-imported-pbr",
+      "retopology-imported-bake-resize",
+      "retopology-imported-mtoon-resize",
+      "texture-set-retained-retopology-plain",
+      "texture-set-retained-retopology-affine",
+      "texture-set-retained-shapekeys",
+      "texture-set-retained-resize-matching",
+      "texture-set-retained-resize-split",
+      "texture-set-retained-posed-bake",
+      "texture-set-retained-skin",
+      "texture-set-prepared-recipe-references",
+      "texture-set-retained-bake-source",
+      "texture-set-retained-bake-target",
+      "texture-set-retained-native-target",
+      "texture-set-native-grid-resize-plain",
+      "texture-set-native-grid-resize-affine",
+      "dome-sculpt-texture-set-resolution",
+      "dome-sculpt-texture-set-baked-resolution",
+      "dome-sculpt-texture-set-baked-mtoon-resolution",
+      "native-empty-paint-resolution",
+      "native-authored-paint-resolution",
+      "native-baked-paint-resolution",
+      "native-bake-resize-missing-device",
+      "native-retained-paint-resolution"
+    ],
+    "junit_sha256": "4653ad8d7d887dcbd8e4c71413972bebb9485542ac8ebda8222105851ab261f0",
+    "app_sha256": "156358b7f335e0d9417a1390985fd0671172a8a68fafe1a7174ac9fa088086c9"
+  },
+  "CUDA_missing_device": {
+    "names": [
+      "native-bake-resize-missing-device"
+    ],
+    "junit_sha256": "83b769978af25305d3c3c5d7047440842f54aedb31704c425370ef724a66d12f",
+    "app_sha256": "4f622aa7e508f02f88db4435cc5b43f2bb2daecfe8d60d8e5a89d8cdf43051b7"
+  },
+  "ROCm_missing_device": {
+    "names": [
+      "native-bake-resize-missing-device"
+    ],
+    "junit_sha256": "fd1137519499ddf89c7be34e53e86d5a8952374a6a44d6f1ccb9114c7655b1fe",
+    "app_sha256": "85d63e13b4ee90a27bf586c5a2d7ff1b55c71f66e245066feec1da8034553c72"
+  },
+  "CPU_scoped_ASan_UBSan": {
+    "baked": {
+      "passes": 13,
+      "log_sha256": "b7f68bc5539a2f69ffbcb2589966ff1dd4107915a471cd31477f837de1b8defe"
+    },
+    "painted": {
+      "passes": 42,
+      "log_sha256": "9c4c2004e928381168cbdbe524958ac6d6165571e69b03badc4793dd14be68eb"
+    },
+    "retained": {
+      "passes": 24,
+      "log_sha256": "d138f5847b76ad558a3b31f0f43ee90b652bb647204f11c0360aac03a1eb8b20"
+    }
+  },
+  "byte_identical_CPU_Arc_projects": {
+    "extra64": "412f4daddc6f256f855a9c390870f141849d23ed752b4d38f95cac167d79fc06",
+    "extra256": "750c2dc5f54d92fa6b2f90627d3f30d9e77aac2b86d4b99938f7f551871b22f6",
+    "primary128": "ddebc55d7ee8cfecbaec3d1821ed8a19a4038d2419b891bba6ba00fe8d6f2aac",
+    "native-float-bake64": "96a22a10cc0e6d2a9541236456664c1578e008bdcb3510189df63c36dd6f28df",
+    "native-ldr-bake64": "2dff5d83ae7df5ba543936bb6b4483c61d035656d6b129ce3bd83c613e1d2edb"
+  },
+  "Arc_native_Bake": {
+    "paint_grid_launches": 7,
+    "trace_sha256": "754d5b513cc781a8803a37310c9b5ac6ced8b9e21cd40b1b557c5a5b2b28dc78"
+  },
+  "Arc_DomeD_Wayland": {
+    "checks": [
+      {
+        "passed": true,
+        "check": "Native Wayland paint client publishes the Dome Sculpt identity"
+      },
+      {
+        "passed": true,
+        "check": "Native Wayland client exports the universal texture-set command"
+      },
+      {
+        "passed": true,
+        "check": "The retained native paint slot enables the universal texture-set command"
+      },
+      {
+        "passed": true,
+        "check": "The FLTK dialog opens on the current 128-pixel grid under the same Wayland identity"
+      },
+      {
+        "passed": true,
+        "check": "DomeD key events stage the 64-pixel choice"
+      },
+      {
+        "passed": true,
+        "check": "Ctrl+W cancels the draft without writing the project"
+      },
+      {
+        "passed": true,
+        "check": "Reopening after cancellation shows the original grid"
+      },
+      {
+        "passed": true,
+        "check": "DomeD keyboard navigation reaches the native Apply button"
+      },
+      {
+        "passed": true,
+        "check": "Ordered native Save matches the complete controller-authored 64-pixel project"
+      },
+      {
+        "passed": true,
+        "check": "Universal Undo and Save restore the exact original project"
+      },
+      {
+        "passed": true,
+        "check": "Universal Redo and Save reproduce the exact reduced project"
+      },
+      {
+        "passed": true,
+        "check": "Native Wayland client closes after the paint worker and history operations"
+      }
+    ],
+    "complete": true,
+    "paint_grid_launches": 5,
+    "trace_sha256": "8156196f8b554ce2dadf82ef55aaa4e74b0afac0c7c5515ba597f1ce4f7c8311"
+  },
+  "Arc_synthetic_OpenXR": {
+    "complete": true,
+    "checks": [
+      "accepted rendered palette shows the expected history and closes after Save",
+      "accepted controller Save matches the complete native project byte for byte",
+      "undone rendered palette shows the expected history and closes after Save",
+      "undone controller Save matches the complete native project byte for byte",
+      "redone rendered palette shows the expected history and closes after Save",
+      "redone controller Save matches the complete native project byte for byte",
+      "OpenXR app drains and final close persists the exact resized patch",
+      "Real OpenXR loader balances frame, images and both swapchains",
+      "Both eyes render the patch and its actual resolution panel",
+      "Loader delivers actual panel navigation and slider rays",
+      "Requested OpenGL renderer drives the workflow",
+      "Process maps witness the ordinary application and synthetic runtime module"
+    ],
+    "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+    "runtime": "/home/blux/de-xr/dome-sculpt/artifacts/current-integrated-full-release-20261127/build/libdome-sculpt-texture-resolution-runtime.so",
+    "balanced_frames": 476,
+    "paint_grid_launches": 5,
+    "trace_sha256": "4a7a3c6d42a2b844cb7a9065b5e742216324083f40f3f9431a761131336e7202"
+  },
+  "larger_single_run_diagnostic": {
+    "pixels": [
+      1024,
+      512
+    ],
+    "layer_taps": 1048576,
+    "native_128_million_work_budget": "refused",
+    "explicit_work_budget": 256000000,
+    "elapsed_seconds_including_open_and_save": {
+      "release": 0.59,
+      "oneapi": 0.84
+    },
+    "equal_project_sha256": "62521595e0732f25640ea81a6438f7c82c8ef2fd58960d09d8c8d48817a4c233"
+  },
+  "earlier_combined_CPU_release": {
+    "revision": "9292dfe3fd2626dcceab2bb1531b19dd2c1d51fb",
+    "totals": {
+      "pass": 1430,
+      "fail": 1,
+      "skip": 0
+    },
+    "failed": [
+      "bake-polygon-cage"
+    ],
+    "junit_sha256": "030096e83429af789084ee3065e86222d95dc8b363b158361dbe4f61af939f1b",
+    "isolated_retries_earlier": 3,
+    "isolated_retries_current": 1
+  },
+  "scope": "Actual Intel Arc filtering. CUDA and ROCm compiled and failed cleanly with no devices selected. Physical headsets and positive AMD and NVIDIA execution remain open."
+}
