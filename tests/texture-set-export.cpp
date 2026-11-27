@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
 #include "dome/native-authoring.hpp"
+#include "dome/material-bindings.hpp"
 #include "dome/emission-native.hpp"
 #include "emission-export.hpp"
 #include "emission-exr-owned.hpp"
@@ -54,6 +55,28 @@ void authoring(){
  Document doc;doc.replace(scene);check(doc.wait_mesh(std::chrono::seconds(30)),"Actual native mesh worker publishes the initial set-aware endpoint");auto task=doc.export_asset("native-editable.glb",AssetExportFormat::EditableGlb256);task.get();consumer("native-editable.glb",2);const auto native=extract_native_authoring(bytes("native-editable.glb"));check(native&&native->encode()==exact&&doc.copy_scene().encode()==exact,"Real native export worker preserves exact authoring without changing the current document");
  auto portable=doc.export_asset("native-portable.glb",AssetExportFormat::Glb);portable.get();consumer("native-portable.glb",2);
  SourceUvBakeOptions policy;policy.max_working_bytes=1024;const auto old=bytes("editable.glb");refuses([&]{export_glb_authoring(owner,"editable.glb",{},policy);},"A small actual native working budget refuses before staging the material fields");check(bytes("editable.glb")==old,"Rejected native working budget preserves the previous durable output");
+}
+void mtoon_authoring(){
+ auto scene=fixture();
+ const auto object=scene.active().id;
+ const auto native=texture_set_view(scene.active(),1).material;
+ SourceMaterialBindings binding;
+ binding.material=MToonMaterial::from_vrm1({
+  {"pbrMetallicRoughness",{{"baseColorTexture",{{"index",0}}}}},
+  {"extensions",{{"VRMC_materials_mtoon",{{"specVersion","1.0"},{"shadeColorFactor",{.3,.1,.7}}}}}}
+ },1);
+ binding.native_reference={native.color,native.emissive,int(native.alpha),native.alpha_cutoff,native.double_sided};
+ binding.roles[size_t(MToonSlot::Base)].image=std::make_shared<const Image>(Image{1,1,{203,78,152,255}});
+ check(bind_texture_set_mtoon(scene,object,1,binding),"The editable export fixture owns an actual MToon field");
+ const auto exact=scene.encode();
+ Document doc;
+ doc.replace(std::move(scene));
+ check(doc.wait_mesh()&&doc.frame().state->error.empty(),"MToon and PBR publish together on a rigged mesh");
+ doc.export_asset("mtoon-editable.glb",AssetExportFormat::EditableGlb256).get();
+ consumer("mtoon-editable.glb",2);
+ const auto restored=extract_native_authoring(bytes("mtoon-editable.glb"));
+ check(restored&&restored->encode()==exact&&doc.copy_scene().encode()==exact,
+       "The editable package preserves the typed graph, image, skin, morph and independent native grids");
 }
 void editable_hdr(){
  auto scene=fixture();
@@ -361,4 +384,4 @@ void production_baked_hdr(){
  }
 }
 }
-int main(int argc,char**argv)try{if(argc>1){std::filesystem::create_directories(argv[1]);std::filesystem::current_path(argv[1]);}portable();authoring();editable_hdr();authority();production_hdr();production_baked_hdr();std::cout<<"PASS "<<checks<<" texture-set multi-primitive export controls\n";return 0;}catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
+int main(int argc,char**argv)try{if(argc>1){std::filesystem::create_directories(argv[1]);std::filesystem::current_path(argv[1]);}portable();authoring();mtoon_authoring();editable_hdr();authority();production_hdr();production_baked_hdr();std::cout<<"PASS "<<checks<<" texture-set multi-primitive export controls\n";return 0;}catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

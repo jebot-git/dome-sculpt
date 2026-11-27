@@ -7,6 +7,7 @@
 #include "dome/polygon-scene.hpp"
 #include "texture-set-paint-access.hpp"
 #include "texture-set-graph.hpp"
+#include "texture-set-surface.hpp"
 #include "text-utf8.hpp"
 #include <algorithm>
 #include <limits>
@@ -51,6 +52,11 @@ void TextureSetCollection::validate_owner(const TextureSetView&primary,bool acti
  const auto validate_source=[&](const TextureSetView&v){
   if(v.source){v.source->authenticate_owner(v.source);v.source->validate_field(v,l,deep);}
   else if(v.material_bindings&&v.material_bindings->polygon_surface_transfer)throw std::invalid_argument("A source-backed set requires its actual retained field descriptor");
+  else if(v.material_bindings&&v.material_bindings->has_mtoon){
+   if(!detail::native_texture_set_mtoon(v.painted.get(),v.appearance.get(),v.material_bindings.get()))
+    throw std::invalid_argument("MToon texture set requires its supported current UV0 material and paint owners");
+   v.material_bindings->validate(deep);
+  }
  };
  validate_source(primary);for(const auto&f:additional_)validate_source({f.id,f.name,f.painted,f.material,f.appearance,f.material_bindings,f.bake_recipe,f.domain,f.source});
  if(!selected||texels>16*1024*1024)throw std::length_error("Texture-set active ID or aggregate paint-map budget is invalid");
@@ -337,6 +343,36 @@ bool rename_texture_set(Scene&scene,uint64_t object,TextureSetId id,std::string 
  auto next=scene;auto&o=next.object(object);auto c=std::shared_ptr<TextureSetCollection>(new TextureSetCollection(*before.texture_sets));
  if(!id)o.material.name=std::move(name);else{auto it=std::find_if(c->additional_.begin(),c->additional_.end(),[&](const auto&r){return r.id==id;});it->name=std::move(name);}o.texture_sets=std::move(c);
  next.validate(false);stop(limits);scene=std::move(next);return true;
+}
+bool bind_texture_set_mtoon(Scene &scene,uint64_t object,TextureSetId id,
+                            const SourceMaterialBindings &binding,const TextureSetLimits &limits){
+ limits.validate();stop(limits);
+ const auto &before=scene.object(object);
+ if(!before.texture_sets||!before.visible||before.locked||!before.mesh_active||
+    !before.painted||before.painted->in_stroke())
+  throw std::logic_error("MToon requires an editable texture set");
+ const auto field=texture_set_view(before,id);
+ if(field.source||!detail::native_texture_set_mtoon(field.painted.get(),field.appearance.get(),&binding)||
+    (field.material_bindings&&!detail::native_texture_set_mtoon(
+      field.painted.get(),field.appearance.get(),field.material_bindings.get())))
+  throw std::invalid_argument("This texture set needs a source-aware MToon material adapter");
+ if(field.material_bindings.get()==&binding)return false;
+ binding.validate();
+ auto owned=std::make_shared<const SourceMaterialBindings>(binding);
+ auto next=scene;
+ auto &target=next.object(object);
+ auto sets=std::shared_ptr<TextureSetCollection>(new TextureSetCollection(*target.texture_sets));
+ if(!id){
+  target.material_bindings=std::move(owned);
+ }else{
+  auto selected=std::find_if(sets->additional_.begin(),sets->additional_.end(),
+      [id](const auto &slot){return slot.id==id;});
+  selected->material_bindings=std::move(owned);
+ }
+ target.texture_sets=std::move(sets);
+ next.validate();stop(limits);
+ scene=std::move(next);
+ return true;
 }
 bool edit_texture_set(Scene&scene,uint64_t object,TextureSetId id,
     const std::function<bool(PaintedMesh&,Material&)>&edit,const TextureSetLimits&limits){

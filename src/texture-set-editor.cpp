@@ -69,7 +69,7 @@ void edit_texture_sets(Document&doc){
  int selected=0;for(size_t k=0;k<state->texture_sets.size();++k){const auto&s=state->texture_sets[k];labels.push_back(std::to_string(s.id)+": "+s.name+" / "+std::to_string(s.resolution)+" / "+std::to_string(s.triangles)+" faces");items[k].label(labels.back().c_str());if(s.id==state->active_texture_set)selected=int(k);}
  member.copy(items.data());member.value(selected);y+=row;
  Fl_Group operations(0,y,width-24,row*17);operations.resizable(nullptr);
- Fl_Choice action(label,y,width-label-40,row-4,"Apply action");action.add("Select set|New set from picked faces|Assign picked faces to set|Rename set|Edit active set material|Resize active set");action.value(0);y+=row;
+ Fl_Choice action(label,y,width-label-40,row-4,"Apply action");action.add("Select set|New set from picked faces|Assign picked faces to set|Rename set|Edit active set material|Resize active set|Use MToon 1.0");action.value(0);y+=row;
  Fl_Choice resolution(label,y,width-label-40,row-4,"Paint resolution");choose_paint_resolution(resolution,state->texture_sets[size_t(selected)].resolution);y+=row;
  Fl_Output faces(label,y,width-label-40,row-4,"Picked faces");const auto count=std::to_string(state->texture_faces.size());faces.value(count.c_str());y+=row;
  Fl_Input name(label,y,width-label-40,row-4,"New / replacement name");name.value(state->texture_sets[size_t(selected)].name.c_str());y+=row;
@@ -92,6 +92,7 @@ void edit_texture_sets(Document&doc){
  case 1:edit.action=TextureSetAction::Create;edit.faces=state->texture_faces;break;
  case 2:edit.action=TextureSetAction::AssignFaces;edit.faces=state->texture_faces;break;
  case 3:edit.action=TextureSetAction::Rename;break;
+ case 6:edit.action=TextureSetAction::MToon;break;
  case 5:
   if(edit.set!=state->active_texture_set)throw std::invalid_argument("Select that material set before resizing its paint");
   if(resolution.value()<0||resolution.value()>5)throw std::invalid_argument("Choose a real paint resolution");

@@ -7,6 +7,7 @@
 #include "dome/material-bindings.hpp"
 #include "texture-set-recipe-wire.hpp"
 #include "texture-set-source-preflight.hpp"
+#include "texture-set-surface.hpp"
 namespace dome::detail {namespace {
 void stop(const TextureSetLimits&l){if(l.cancelled&&l.cancelled())throw std::runtime_error("Texture-set field codec cancelled");}
 template<class T>bool owner(const std::shared_ptr<const T>&a,const std::shared_ptr<const T>&b){return a==b&&!a.owner_before(b)&&!b.owner_before(a);}
@@ -31,16 +32,18 @@ void TextureSetFieldCodec::preflight()const{
 }
 nlohmann::json TextureSetFieldCodec::encode(const TextureSetView&view,uint32_t geometry,PaintImageArchive&images,NormalSamplingArchive*normal,PaintSamplingArchive*sampling,const MaterialWriter&materials){
  stop(limits_);if(!view.source){
-  // A plain field's recipe is an independent future Bake context, not an
-  // original image/material/normal capability. Carry it in the actual Scene40
-  // membership envelope; source-backed fields keep their existing seed codec.
-  if(view.bake_recipe&&(view.material_bindings||view.appearance||view.painted->paint_sampling_domain()||
+  const bool mtoon=native_texture_set_mtoon(view.painted.get(),view.appearance.get(),view.material_bindings.get());
+  if((mtoon&&!materials)||(!mtoon&&(view.material_bindings||view.appearance)))
+    throw std::invalid_argument("Texture-set material needs its actual Scene40 writer");
+  if(!mtoon&&view.bake_recipe&&(view.painted->paint_sampling_domain()||
       view.painted->source_sampling_prepared()||view.painted->source_maps()||view.painted->color_projection()||
       view.painted->normal_projection()||(view.painted->baked()&&view.painted->baked()->normal_field)))
     throw std::invalid_argument("Texture-set recipe field needs its actual source/material adapter");
   auto member=TextureSetPaintAccess::encode(*view.painted,&images,normal,sampling);
-  if(!view.bake_recipe)return member;
-  nlohmann::json result={{"version",7},{"set",view.id},{"field_kind","bake_recipe"},{"field_recipe",view.bake_recipe->encode()}};
+  if(!mtoon&&!view.bake_recipe)return member;
+  nlohmann::json result={{"version",7},{"set",view.id},{"field_kind",mtoon?"mtoon":"bake_recipe"}};
+  if(mtoon)result["field_material"]=materials(view.material_bindings);
+  if(view.bake_recipe)result["field_recipe"]=view.bake_recipe->encode();
   result["payload"]=std::move(member);return result;
  }
  view.source->authenticate_owner(view.source);view.source->validate_field(view,limits_);if(!materials||!view.material_bindings||!view.source->polygon_owner())throw std::invalid_argument("Source Paint7 requires its actual material/node writer");
@@ -66,14 +69,23 @@ nlohmann::json TextureSetFieldCodec::encode(const TextureSetView&view,uint32_t g
  return field;
 }
 DecodedTextureSetField TextureSetFieldCodec::decode(const nlohmann::json&j,const std::shared_ptr<const TextureSetFaceDomain>&domain,uint32_t geometry,const Material&current,const PaintImageArchive&images,const NormalSamplingArchive*normal,const PaintSamplingArchive*sampling,const MaterialReader&materials,bool polygon,const PaintedMesh*raster,const SourcePaintDecodeContext&context){
- if(j.is_object()&&(j.contains("field_kind")||j.contains("field_recipe"))){
-  stop(limits_);const auto &member=texture_set_recipe_member(j);
-  auto recipe=ObjectBakeRecipe::decode(j.at("field_recipe"));
+ const auto &member=texture_set_metadata_member(j);
+ if(&member!=&j){
+  stop(limits_);
+  auto recipe=j.contains("field_recipe")?ObjectBakeRecipe::decode(j.at("field_recipe")):nullptr;
+  std::shared_ptr<const SourceMaterialBindings> binding;
+  if(j.contains("field_material")){
+   if(!materials)throw std::invalid_argument("MToon texture set lacks its actual Scene40 material reader");
+   binding=materials(uint32_t(number(j.at("field_material"),255)));
+   if(!binding)throw std::invalid_argument("MToon texture set lacks its actual material");
+  }
   auto paint=TextureSetPaintAccess::decode(member,&images,polygon,normal,sampling,context,domain,raster);
-  if(paint->paint_sampling_domain()||paint->source_sampling_prepared()||paint->source_maps()||paint->color_projection()||
-      paint->normal_projection()||(paint->baked()&&paint->baked()->normal_field))
+  if(binding&&!native_texture_set_mtoon(paint.get(),nullptr,binding.get()))
+    throw std::invalid_argument("MToon texture set has an incompatible paint or material owner");
+  if(!binding&&(paint->paint_sampling_domain()||paint->source_sampling_prepared()||paint->source_maps()||paint->color_projection()||
+      paint->normal_projection()||(paint->baked()&&paint->baked()->normal_field)))
     throw std::invalid_argument("Texture-set recipe field cannot grant source/material capability");
-  return {std::move(paint),{},{},{},std::move(recipe)};
+  return {std::move(paint),{},std::move(binding),{},std::move(recipe)};
  }
  stop(limits_);if(!j.is_object()||!j.contains("field_source"))return {TextureSetPaintAccess::decode(j,&images,polygon,normal,sampling,context,domain,raster),{},{},{},{}};
  preflight();if(!domain||!materials||!j.is_object()||!j.at("version").is_number_integer()||j.at("version")!=7||number(j.at("set"),UINT32_MAX)!=domain->set()||!j.at("physical_paint").is_boolean()||!j.at("payload").is_object()||j.at("payload").contains("mesh")||j.at("payload").contains("version"))throw std::invalid_argument("Source Paint7 lacks its actual member/current-grid envelope");domain->authenticate_owner(domain);

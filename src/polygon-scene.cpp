@@ -583,10 +583,16 @@ void PolygonSceneArchive::preflight(const nlohmann::json &j,
       return;
     const auto &sets = object.at("texture_sets");
     const auto field = [&](const nlohmann::json &wire) {
-      const auto &paint=texture_set_recipe_member(wire);
+      const auto &paint=texture_set_metadata_member(wire);
       if(paint.is_object()&&paint.contains("field_source")){
         if(!texture_geometry||!materials||!polygon_surfaces)throw std::invalid_argument("Source Paint7 requires its actual enclosing material/node/geometry preflight");
         (void)texture_source_seed(paint,*texture_geometry,*materials,*polygon_surfaces);return;
+      }
+      if(wire.contains("field_material")){
+        if(!texture_geometry||!materials)throw std::invalid_argument("Typed Paint7 requires its enclosing material pool");
+        const auto &pool=materials->at("bindings");
+        const auto id=polygon_archive_index(wire.at("field_material"),pool.size());
+        if(pool.at(id).at("material").is_null())throw std::invalid_argument("Typed Paint7 names an untyped material");
       }
       if (!paint.is_object() ||
           (paint.contains("version") && paint.at("version") == 6))
@@ -610,9 +616,11 @@ void PolygonSceneArchive::preflight(const nlohmann::json &j,
       for(const auto*paint:paints){
         field(*paint);
         if(first){
-          const auto&member=texture_set_recipe_member(*paint);
+          const auto&member=texture_set_metadata_member(*paint);
           const auto*seed=member.contains("field_source")?texture_source_seed(member,*texture_geometry,*materials,*polygon_surfaces):nullptr;
-          if(!object.at("appearance").is_null()||(seed?object.at("material_bindings")!=seed->at("binding"):!object.at("material_bindings").is_null()))throw std::invalid_argument("Shared primary source/material owner is unrepresented or foreign");
+          const auto expected_material=seed?seed->at("binding"):paint->value("field_material",nlohmann::json(nullptr));
+          if(!object.at("appearance").is_null()||object.at("material_bindings")!=expected_material)
+            throw std::invalid_argument("Shared primary source/material owner is unrepresented or foreign");
           const auto&recipe=object.contains("bake_recipe")?object.at("bake_recipe"):nlohmann::json(nullptr);
           const auto&expected=seed?seed->at("bake_recipe"):(paint->contains("field_recipe")?paint->at("field_recipe"):nlohmann::json(nullptr));
           if(recipe!=expected)throw std::invalid_argument("Shared primary recipe differs from its explicitly referenced field context");

@@ -69,6 +69,7 @@ private:
   struct PaintRecord {
     std::shared_ptr<const PaintedMesh> owner;
     std::shared_ptr<const TextureSetFieldSource> source;
+    std::shared_ptr<const SourceMaterialBindings> binding;
     uint32_t raster = 0;
     nlohmann::json payload;
     TextureSetArchiveField decoded;

@@ -8,7 +8,9 @@
 #include "texture-set-paint-access.hpp"
 #include "texture-set-field-source.hpp"
 #include "polygon-surface-preview.hpp"
+#include "dome/material-bindings.hpp"
 #include "dome/polygon-scene.hpp"
+#include <algorithm>
 #include <bit>
 namespace dome::detail {
 namespace {
@@ -35,6 +37,36 @@ bool texture_set_plain_fields(const SculptObject&o)noexcept{
      if (!plain(field.painted.get(), field.appearance.get(), field.material_bindings.get()))
        return false;
  return true;
+}
+bool native_texture_set_mtoon(const PaintedMesh *paint,const CreatorAppearance *appearance,
+                               const SourceMaterialBindings *binding) noexcept {
+ if(!paint||appearance||!binding||!binding->has_mtoon||binding->uv_origin||
+    binding->normal_frame!=SourceMaterialNormalFrame::UvDerivative||binding->normal_frames||
+    binding->color_preparation||binding->normal_preparation||binding->key_derivation||
+    binding->canonical_attributes||binding->canonical_uv||binding->native_paint_sampling||
+    binding->native_paint_frames||binding->canonical_paint_sampling||binding->polygon_surface_transfer||
+    paint->color_projection()||paint->normal_projection()||paint->paint_sampling_domain()||
+    paint->source_sampling_prepared()||
+    (paint->source_maps()&&paint->source_maps()->uses_alternate_uv())||
+    (paint->baked()&&(paint->baked()->normal_field||paint->baked()->normal_authority||
+                      paint->baked()->normal_interpretation!=BakedNormalInterpretation::CanonicalMikk)))
+  return false;
+ for(size_t role=0;role<binding->material.textures.size();++role){
+  const auto &texture=binding->material.textures[role];
+  if(texture.index<0||role==size_t(MToonSlot::Matcap))continue;
+  if((texture.transform_texcoord>=0?texture.transform_texcoord:int(texture.texcoord))!=0)
+   return false;
+ }
+ return true;
+}
+bool texture_set_editable_fields(const SculptObject &object) noexcept {
+ if(!object.mesh_active||!object.painted||(object.polygon&&object.polygon->colors))return false;
+ const auto eligible=[](const auto &field){
+  return plain(field.painted.get(),field.appearance.get(),field.material_bindings.get())||
+      native_texture_set_mtoon(field.painted.get(),field.appearance.get(),field.material_bindings.get());
+ };
+ return eligible(object)&&(!object.texture_sets||
+     std::all_of(object.texture_sets->additional().begin(),object.texture_sets->additional().end(),eligible));
 }
 bool bake_target_supported(const SculptObject &object) {
  if (!object.texture_sets) {
@@ -85,7 +117,8 @@ std::shared_ptr<const TextureSetSurfacePlan> prepare_texture_set_surface(const S
  const auto validate_field=[&](const TextureSetView&field){
   if(!field.painted)throw std::invalid_argument("Texture-set surface field has no actual paint owner");
   if(field.source){if(o.deformation)throw std::invalid_argument("Retained texture-set fields require their actual posed before-frame adapter");field.source->authenticate_owner(field.source);field.source->validate_field(field,limits);if(!field.source->source_preview())throw std::invalid_argument("Retained texture-set field has no genuine before-role packet");}
-  else if(!plain(field.painted.get(),field.appearance.get(),field.material_bindings.get()))
+  else if(!plain(field.painted.get(),field.appearance.get(),field.material_bindings.get())&&
+          !native_texture_set_mtoon(field.painted.get(),field.appearance.get(),field.material_bindings.get()))
     throw std::invalid_argument("Texture-set complex frames need their complete corner-attribute surface adapter");
  };
  validate_field(texture_set_view(o,0));for(const auto&field:o.texture_sets->additional())validate_field(texture_set_view(o,field.id));

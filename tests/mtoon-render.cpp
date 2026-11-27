@@ -4,6 +4,8 @@
 #include "dome/humanoid-creator.hpp"
 #include "dome/source-maps.hpp"
 #include "dome/material-visibility.hpp"
+#include "dome/material-bindings.hpp"
+#include "dome/texture-sets.hpp"
 #include "graphics.h"
 #include <iostream>
 using namespace dome;
@@ -35,9 +37,53 @@ std::array<int,4> expected(const MToonMaterial&m,const MToonSamples&s,Vec3 norma
  MToonLighting q;q.normal=normal;q.view={0,0,1};q.light_direction=normalized(Vec3{-.4f,.8f,.7f});q.light_color={1,1,1};q.gi_up={.25f,.25f,.25f};q.gi_down={.1f,.1f,.1f};q.gi=q.gi_down*(.5f-.5f*normal.y)+q.gi_up*(.5f+.5f*normal.y);q.normal_oriented=true;auto c=mtoon_shade(m,s,q);std::array<int,4> p{};for(int k=0;k<3;++k)p[k]=int(std::lround(std::clamp(mtoon_linear_to_srgb(c.color[k]),0.f,1.f)*255));p[3]=int(std::lround(c.color[3]*255));return p;
 }
 bool close(std::array<int,4>a,std::array<int,4>b,int tolerance=2){for(int k=0;k<4;++k)if(std::abs(a[k]-b[k])>tolerance)return false;return true;}
+void native_texture_sets(SurfaceRenderer &renderer){
+ Mesh mesh;
+ mesh.positions={{-.85f,-.65f,0},{-.10f,-.65f,0},{-.475f,.65f,0},
+                 {.10f,-.65f,0},{.85f,-.65f,0},{.475f,.65f,0}};
+ mesh.normals.assign(6,{0,0,1});
+ mesh.uv={{{0,0}},{{1,0}},{{.5f,1}},{{0,0}},{{1,0}},{{.5f,1}}};
+ mesh.indices={0,1,2,3,4,5};
+ Scene scene;
+ std::array<TextureSetInitialField,2> fields;
+ for(auto &field:fields){field.resolution=64;field.material=white();}
+ fields[0].material.color={0,0,1,1};
+ fields[1].material.color={1,0,0,1};
+ const auto object=scene.active().id;
+ initialize_texture_sets(scene,object,mesh,fields,std::array<TextureSetId,2>{0,1});
+ SourceMaterialBindings binding;
+ binding.material=MToonMaterial::from_vrm1({
+     {"alphaMode","MASK"},{"emissiveFactor",{0,1,0}},
+     {"pbrMetallicRoughness",{{"baseColorFactor",{0,0,0,1}},{"baseColorTexture",{{"index",0}}}}},
+     {"extensions",{{"VRMC_materials_mtoon",{{"specVersion","1.0"},{"shadeColorFactor",{0,0,0}}}}}}
+ },1);
+ const auto &material=fields[1].material;
+ binding.native_reference={material.color,material.emissive,int(material.alpha),
+                           material.alpha_cutoff,material.double_sided};
+ auto &base=binding.roles[size_t(MToonSlot::Base)];
+ base.image=std::make_shared<const Image>(Image{2,1,{255,255,255,0,255,255,255,255}});
+ base.wrap_s=base.wrap_t=GL_CLAMP_TO_EDGE;
+ base.min_filter=base.mag_filter=GL_NEAREST;
+ check(bind_texture_set_mtoon(scene,object,1,binding),"Native material partition attaches its typed shader");
+
+ Document doc;
+ doc.replace(Scene::decode(scene.encode()));
+ check(doc.wait_mesh()&&doc.frame().state->error.empty(),"Cold Scene40 MToon set publishes real render ranges");
+ const auto authored=draw(renderer,doc.frame().surface);
+ check(close(at(authored,23,33),{0,0,255,255}),"MToon leaves the neighboring PBR range blue");
+ check(at(authored,60,33)[3]==0,"MToon mask leaves its transparent atlas half empty");
+ check(close(at(authored,77,33),{0,255,0,255}),"MToon draws the opaque half using its independent emission factor");
+ doc.shading(false);
+ check(doc.wait_mesh()&&doc.frame().state->error.empty(),"Core PBR view republishes the same material partition");
+ const auto pbr=draw(renderer,doc.frame().surface);
+ check(close(at(pbr,23,33),{0,0,255,255})&&close(at(pbr,77,33),{255,0,0,255}),
+       "Core PBR preview switches only the typed range's visible result");
+ check(doc.copy_scene().encode()==scene.encode(),"Preview selection preserves exact authored MToon data");
+}
 }
 int main(int argc,char**argv)try{
  NativeGraphics graphics;std::string device=reinterpret_cast<const char*>(glGetString(GL_RENDERER));std::cout<<"GPU "<<device<<'\n';check(argc<2||std::string(argv[1])!="--hardware"||(device.find("llvmpipe")==std::string::npos&&device.find("softpipe")==std::string::npos),"Production renderer runs on requested hardware");
+ if(argc>=2&&std::string(argv[1])=="--texture-sets"){Fbo test;SurfaceRenderer renderer;native_texture_sets(renderer);std::cout<<"PASS "<<checks<<" native MToon texture-set graphics checks\n";return 0;}
  Fbo f;SurfaceRenderer renderer;renderer.set_frame_time(0);glBindFramebuffer(GL_FRAMEBUFFER,0);renderer.draw(std::make_shared<MeshSnapshot>(),{},identity,{0,0,2},1,1,false);std::array<uint8_t,4> desktop{};glReadPixels(0,0,1,1,GL_RGBA,GL_UNSIGNED_BYTE,desktop.data());check(desktop[0]==48&&desktop[1]==48&&desktop[2]==48,"Default desktop framebuffer attachment encoding and depth queries resolve correctly");f.bind();
  auto blended=white();blended.color={.25f,.5f,1,.5f};blended.alpha=Material::AlphaMode::Blend;
  auto result=at(draw(renderer,snapshot(blended)));check(close(result,{99,137,188,128}),"Transparent source RGB blends in linear floating point before sRGB transfer; alpha stays linear");

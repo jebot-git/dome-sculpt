@@ -8,6 +8,7 @@
 #include "paint-overlay-packet.hpp"
 #include "current-paint-preview.hpp"
 #include "texture-set-native-grid.hpp"
+#include "texture-set-surface.hpp"
 #include <bit>
 #include <limits>
 namespace dome::detail {
@@ -38,11 +39,15 @@ std::shared_ptr<const TextureSetRangeProof> prepare_texture_set_range(
   }else result->maps_=PolygonSurfacePaintCodec::preview(*read,view.material_bindings,view.material,cancelled,view.source->source_preview());
   if(!result->maps_||!result->maps_->polygon_surface||!result->maps_->polygon_surface->matches(view.material_bindings,read->paint_sampling_attachment())||result->layout_->canonical(field))throw std::invalid_argument("Retained texture-set range lost its actual source/current field packet");
  }else{
-  result->maps_=render_only?CurrentGridPaintPreview::for_field(result->plan_->object(),view,cancelled):nullptr;
+  const bool typed=native_texture_set_mtoon(view.painted.get(),view.appearance.get(),view.material_bindings.get());
+  result->maps_=render_only&&!typed?CurrentGridPaintPreview::for_field(result->plan_->object(),view,cancelled):nullptr;
   if(render_only&&!result->maps_)result->maps_=EmissionExportAccess::preview_texture_set_bake(*view.painted,view.material,cancelled);
   if(!result->maps_)result->maps_=EmissionExportAccess::requires_preview(*view.painted,view.material,view.material_bindings.get())?
     EmissionExportAccess::preview(*view.painted,view.material,cancelled):view.painted->preview(view.material,cancelled);
-  if(!result->maps_||result->maps_->source_only||result->maps_->source_maps||result->maps_->normal_projection||result->maps_->color_projection||result->maps_->polygon_surface)throw std::invalid_argument("Texture-set complex field cannot borrow the plain range proof");
+  if(!result->maps_||(!typed&&(result->maps_->source_only||result->maps_->source_maps))||
+     (typed&&result->maps_->source_maps!=view.painted->source_maps())||
+     result->maps_->normal_projection||result->maps_->color_projection||result->maps_->polygon_surface)
+   throw std::invalid_argument("Texture-set material maps differ from their owning field");
   if((!result->maps_->normal.rgba.empty())!=result->layout_->canonical(field))throw std::invalid_argument("Texture-set canonical tangent layout differs from its actual field");
  }
  if(const auto&packet=result->maps_->overlay){
@@ -69,7 +74,13 @@ void TextureSetRangeProof::authenticate(const SurfaceRange&r)const{
   field().source->authenticate_owner(field().source);field().source->validate_field(field(),{},false);
   const auto&packet=maps_->polygon_surface;const auto&binding=field().material_bindings;
   if(!packet||r.material_bindings!=binding||r.material_bindings.owner_before(binding)||binding.owner_before(r.material_bindings)||!packet->matches(binding,r.paint_sampling_attachment)||!r.source_frame||r.source_normal_only!=(packet->model()==PolygonSurfaceNormalModel::NativeNOnly))throw std::invalid_argument("Retained texture-set range changed its actual source/before-role owners");
- }else if(r.material_bindings||r.paint_sampling_attachment||r.source_frame||r.source_normal_only)throw std::invalid_argument("Plain texture-set range fabricated source roles");
+ }else {
+  const auto &binding=field().material_bindings;
+  if(r.material_bindings!=binding||r.material_bindings.owner_before(binding)||binding.owner_before(r.material_bindings)||
+     (binding&&!native_texture_set_mtoon(field().painted.get(),field().appearance.get(),binding.get()))||
+     r.paint_sampling_attachment||r.source_frame||r.source_normal_only)
+   throw std::invalid_argument("Texture-set range changed its actual native material authority");
+ }
 }
 void TextureSetRangeProof::authenticate_tint(const Mesh&mesh,const SurfaceRange&r,std::span<const std::array<float,4>>colors)const{
  authenticate(r);if(colors.empty())return;

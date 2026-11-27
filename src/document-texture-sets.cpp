@@ -7,15 +7,39 @@
 #include "document-authority.hpp"
 #include "texture-set-range.hpp"
 #include "dome/material-visibility.hpp"
+#include "dome/material-bindings.hpp"
 #include <algorithm>
 #include <cmath>
+#include <nlohmann/json.hpp>
 namespace dome {
+namespace {
+SourceMaterialBindings default_texture_set_mtoon(const Material &material){
+ using Alpha=Material::AlphaMode;
+ const char *alpha=material.alpha==Alpha::Mask?"MASK":
+     (material.alpha==Alpha::Blend||(material.alpha==Alpha::Automatic&&material.color[3]<.999f))?"BLEND":"OPAQUE";
+ const float strength=std::max(1.f,*std::max_element(material.emissive.begin(),material.emissive.end()));
+ auto emission=material.emissive;
+ for(float &component:emission)component/=strength;
+ const std::array<float,3> shade{material.color[0]*.65f,material.color[1]*.65f,material.color[2]*.65f};
+ nlohmann::json extensions={{"VRMC_materials_mtoon",{{"specVersion","1.0"},{"shadeColorFactor",shade}}}};
+ if(strength>1)extensions["KHR_materials_emissive_strength"]={{"emissiveStrength",strength}};
+ SourceMaterialBindings binding;
+ binding.material=MToonMaterial::from_vrm1({
+     {"name",material.name},{"pbrMetallicRoughness",{{"baseColorFactor",material.color}}},
+     {"alphaMode",alpha},{"alphaCutoff",material.alpha_cutoff},{"doubleSided",material.double_sided},
+     {"emissiveFactor",emission},{"extensions",std::move(extensions)}});
+ binding.native_reference={material.color,material.emissive,int(material.alpha),
+                           material.alpha_cutoff,material.double_sided};
+ if(strength>1)binding.physical_emission=material.emissive;
+ return binding;
+}
+}
 void Document::edit_texture_set(TextureSetEdit edit,AssetSource expected){
  std::lock_guard lock(model_mutex_);
  queue_texture_set_locked(std::move(edit),expected);
 }
 void Document::queue_texture_set_locked(TextureSetEdit edit,AssetSource expected){
- if(edit.action<TextureSetAction::Create||edit.action>TextureSetAction::Resolution||edit.faces.size()>2'000'000||edit.name.size()>256||!std::isfinite(edit.value)||
+ if(edit.action<TextureSetAction::Create||edit.action>TextureSetAction::MToon||edit.faces.size()>2'000'000||edit.name.size()>256||!std::isfinite(edit.value)||
     (edit.resolution&&(edit.resolution<64||edit.resolution>2048||(edit.resolution&(edit.resolution-1)))))throw std::invalid_argument("Invalid texture-set request");
  if(edit.action==TextureSetAction::Material)edit.material.validate();
  if(edit.action==TextureSetAction::Resolution&&!edit.resolution)throw std::invalid_argument("Choose a real target field resolution");
@@ -28,12 +52,14 @@ void Document::queue_texture_set_locked(TextureSetEdit edit,AssetSource expected
    detail::can_resize_native_texture_grid(scene_.active());
  if(edit.action==TextureSetAction::Select){
   if(!scene_.active().texture_sets)throw std::logic_error("Choose an object with material sets");
- }else if(!native_resize&&!detail::texture_set_plain_fields(scene_.active()))
-  throw std::logic_error("This texture-set edit requires plain editable materials");
+ }else if(!native_resize&&!detail::texture_set_editable_fields(scene_.active()))
+  throw std::logic_error("This texture-set edit requires an editable native material");
+ if(edit.action==TextureSetAction::MToon&&!scene_.active().texture_sets)
+  throw std::logic_error("Choose an object with material sets");
  auto lease=native_resize?nullptr:detail::capture_texture_set_recipient(scene_,object);
  auto changed=std::make_shared<bool>(false);
  const auto source=AssetSource{state_.generation,state_.revision,object,state_.edit_authority};
- const char*label=edit.action==TextureSetAction::Create?"Create texture set":edit.action==TextureSetAction::AssignFaces?"Assign material faces":edit.action==TextureSetAction::Select?"Select texture set":edit.action==TextureSetAction::Rename?"Rename texture set":edit.action==TextureSetAction::Material?"Edit texture-set material":edit.action==TextureSetAction::Resolution?"Resize paint":"Edit texture-set layer";
+ const char*label=edit.action==TextureSetAction::Create?"Create texture set":edit.action==TextureSetAction::AssignFaces?"Assign material faces":edit.action==TextureSetAction::Select?"Select texture set":edit.action==TextureSetAction::Rename?"Rename texture set":edit.action==TextureSetAction::Material?"Edit texture-set material":edit.action==TextureSetAction::Resolution?"Resize paint":edit.action==TextureSetAction::MToon?"Use MToon 1.0":"Edit texture-set layer";
  queue_scene_operation_locked(label,[object,edit=std::move(edit),changed,native_resize](Scene&scene,const auto&cancelled){
   auto limits=native_resize?detail::native_texture_grid_limits():TextureSetLimits{};
   limits.cancelled=cancelled;
@@ -69,6 +95,12 @@ void Document::queue_texture_set_locked(TextureSetEdit edit,AssetSource expected
     return true;
    },limits);break;
   case TextureSetAction::Material:*changed=dome::edit_texture_set(scene,object,edit.set,[&](PaintedMesh&,Material&m){if(detail::same_texture_material(m,edit.material))return false;m=edit.material;return true;},limits);break;
+  case TextureSetAction::MToon:{
+   const auto field=texture_set_view(scene.object(object),edit.set);
+   if(!field.material_bindings)
+     *changed=bind_texture_set_mtoon(scene,object,edit.set,default_texture_set_mtoon(field.material),limits);
+   break;
+  }
   }
  },source,{}, {},changed,{},0,0,{},{},0,{},std::move(lease));
 }
@@ -87,7 +119,8 @@ bool Document::texture_set_command_enabled_locked(SpatialCommand command)const{
  const auto&o=scene_.active();
  if(command==SpatialCommand::TexturePrevious||command==SpatialCommand::TextureNext)
   return o.texture_sets&&!o.texture_sets->additional().empty();
- if((o.polygon&&!o.texture_sets)||!detail::texture_set_plain_fields(o))return false;
+ if((o.polygon&&!o.texture_sets)||!detail::texture_set_editable_fields(o))return false;
+ if(command==SpatialCommand::TextureMToon)return o.texture_sets&&!active_texture_set(o).material_bindings;
  if(command==SpatialCommand::TextureCreate)return !state_.texture_faces.empty()&&(!o.texture_sets||o.texture_sets->additional().size()<63);
  if(command==SpatialCommand::TextureAssign)return o.texture_sets&&!state_.texture_faces.empty();
  if(command==SpatialCommand::TextureClearFaces)return !state_.texture_faces.empty();return true;
@@ -101,7 +134,9 @@ void Document::texture_set_command_locked(SpatialCommand command){
  if(command==SpatialCommand::TexturePickFaces){state_.texture_face_select=!state_.texture_face_select;texture_face_geometry_=o.painted->mesh_owner();texture_face_object_=o.id;texture_face_pressed_={true,true};input_.cancel();state_.selection_mode=false;state_.object_grab_mode=false;return;}
  if(command==SpatialCommand::TextureClearFaces){state_.texture_faces.clear();return;}
  TextureSetEdit edit;
- if(command==SpatialCommand::TexturePrevious||command==SpatialCommand::TextureNext){
+ if(command==SpatialCommand::TextureMToon){
+  edit.action=TextureSetAction::MToon;edit.set=o.texture_sets->active();
+ }else if(command==SpatialCommand::TexturePrevious||command==SpatialCommand::TextureNext){
   std::vector<TextureSetId>ids{0};for(const auto&s:o.texture_sets->additional())ids.push_back(s.id);const auto at=std::find(ids.begin(),ids.end(),o.texture_sets->active());
   const size_t index=size_t(at-ids.begin()),count=ids.size();edit.action=TextureSetAction::Select;edit.set=ids[(index+count+(command==SpatialCommand::TextureNext?1:-1))%count];
  }else{if(texture_face_geometry_!=o.painted->mesh_owner()||texture_face_geometry_.owner_before(o.painted->mesh_owner())||o.painted->mesh_owner().owner_before(texture_face_geometry_))throw std::logic_error("Texture face selection belongs to an earlier geometry");

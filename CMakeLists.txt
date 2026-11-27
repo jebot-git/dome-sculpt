@@ -1547,6 +1547,8 @@ if(BUILD_TESTING AND TARGET dome-sculpt-render)
     ${CMAKE_CURRENT_SOURCE_DIR}/assets/humanoid/vroid/base-female.vrm
     ${CMAKE_CURRENT_SOURCE_DIR}/assets/humanoid/vroid/base-male.vrm)
   set_tests_properties(mtoon-render PROPERTIES ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1")
+  add_test(NAME mtoon-texture-sets COMMAND dome-sculpt-mtoon-render-test --texture-sets)
+  set_tests_properties(mtoon-texture-sets PROPERTIES ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2" TIMEOUT 90)
 endif()
 
 if(BUILD_TESTING)

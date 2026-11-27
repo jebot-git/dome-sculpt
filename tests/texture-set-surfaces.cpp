@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/texture-sets.hpp"
 #include "dome/material-visibility.hpp"
+#include "dome/material-bindings.hpp"
 #include "dome/source-placement.hpp"
 #include "texture-set-worker.hpp"
 #include "texture-set-paint-access.hpp"
@@ -110,5 +111,134 @@ void native(){
  check(denied.frame().state->can_undo==history&&denied.frame().state->error.find("Overlapping UV islands")!=std::string::npos,"Actual native refusal retains its strict cause and adds no history entry");
  denied.save("strict-reassignment-preserved.dsculpt");check(Scene::load("strict-reassignment-preserved.dsculpt").encode()==values,"Subsequent real native Save/reopen retains the exact pre-refusal material fields");
 }
+void native_mtoon(){
+ using Json=nlohmann::json;
+ auto scene=overlap(false);
+ const auto object=scene.active().id;
+ const auto other=scene.active().painted;
+ const auto foreground=active_texture_set(scene.active());
+ SourceMaterialBindings binding;
+ binding.material=MToonMaterial::from_vrm1({
+   {"alphaMode","MASK"},{"alphaCutoff",.5f},{"doubleSided",true},
+   {"pbrMetallicRoughness",{{"baseColorTexture",{{"index",0}}}}},
+   {"extensions",{{"VRMC_materials_mtoon",{
+      {"specVersion","1.0"},{"shadeMultiplyTexture",{{"index",0}}}}}}}
+ },1);
+ const auto &material=foreground.material;
+ binding.native_reference={material.color,material.emissive,int(material.alpha),
+                           material.alpha_cutoff,material.double_sided};
+ const auto image=std::make_shared<const Image>(Image{2,1,{255,20,10,0,20,255,10,255}});
+ for(auto slot:{MToonSlot::Base,MToonSlot::Shade}){
+  auto &role=binding.roles[size_t(slot)];
+  role.image=image;
+  role.wrap_s=role.wrap_t=33071;
+  role.min_filter=role.mag_filter=9728;
+ }
+ auto missing_uv=binding;
+ for(auto slot:{MToonSlot::Base,MToonSlot::Shade})
+  missing_uv.material.textures[size_t(slot)].texcoord=1;
+ const auto original=scene.encode();
+ refuses([&]{bind_texture_set_mtoon(scene,object,1,missing_uv);},"An alternate role coordinate cannot use the current UV0 membership");
+ TextureSetLimits cancelled;
+ cancelled.cancelled=[] {return true;};
+ refuses([&]{bind_texture_set_mtoon(scene,object,1,binding,cancelled);},"A cancelled MToon edit publishes no field");
+ check(scene.encode()==original,"Rejected material edits leave both grids and memberships intact");
+ check(bind_texture_set_mtoon(scene,object,1,binding),"Resolved MToon installs on the selected field");
+ const auto installed=active_texture_set(scene.active());
+ check(installed.painted==foreground.painted&&scene.active().painted==other&&
+       installed.material_bindings.get()!=&binding&&!scene.active().material_bindings,
+       "Assigning an owned material preserves the paint grids and neighboring PBR material");
+ binding.roles[size_t(MToonSlot::Base)].image.reset();
+ check(installed.material_bindings->roles[size_t(MToonSlot::Base)].image==image,
+       "Editing the caller's binding does not mutate the scene");
+ auto [layout,frame]=pack(scene);
+ (void)layout;
+ MaterialSurfaceQuery query(frame.mesh,frame.ranges);
+ for(const auto &[x,want]:std::array<std::pair<float,TextureSetId>,2>{{{-.33f,0},{.33f,1}}}){
+  const auto hit=query.raycast({x,-.15f,2},{0,0,-1});
+  check(hit&&query.material_identity(hit->triangle)==SurfaceMaterialIdentity{object,want},
+        "Picking uses the foreground MToon texture's masked and visible portions");
+ }
+ auto wrong=frame.ranges;
+ wrong[1].material_bindings=std::make_shared<const SourceMaterialBindings>(*installed.material_bindings);
+ refuses([&]{MaterialSurfaceQuery invalid(frame.mesh,wrong);},"A matching value is not the range's actual binding owner");
+ const auto encoded=scene.encode();
+ check(encoded.at("texture_set_geometry").at("version")==2,"Resolved MToon uses the owning Scene40 archive");
+ auto reopened=Scene::decode(encoded);
+ const auto decoded=texture_set_view(reopened.active(),1).material_bindings;
+ check(reopened.encode()==encoded&&decoded&&decoded->material.encode()==installed.material_bindings->material.encode(),
+       "Cold Scene40 decode keeps the exact typed material and native bytes");
+ const auto &base=decoded->roles[size_t(MToonSlot::Base)];
+ const auto &shade=decoded->roles[size_t(MToonSlot::Shade)];
+ check(base.image&&base.image==shade.image&&base.image->rgba==image->rgba&&base.mag_filter==9728&&base.wrap_s==33071,
+       "Role images retain their shared owner, exact pixels and sampler settings");
+ auto malformed=encoded;
+ for(auto &record:malformed.at("texture_set_geometry").at("paints")){
+  auto &paint=record.at("painted");
+  if(paint.contains("field_material"))paint["field_material"]=255;
+ }
+ refuses([&]{Scene::decode(malformed);},"A field cannot refer outside the scene material pool");
+
+ Document doc;
+ doc.replace(std::move(reopened));
+ check(doc.wait_mesh()&&doc.frame().state->can_edit_texture_sets,"The actual document publishes editable mixed PBR and MToon fields");
+ TextureSetEdit apply;
+ apply.action=TextureSetAction::MToon;
+ apply.set=0;
+ doc.edit_texture_set(apply);
+ check(doc.wait_asset()&&doc.wait_mesh()&&doc.frame().state->error.empty(),"The ordered material command binds MToon to the primary set");
+ const auto both=doc.copy_scene().encode();
+ check(both!=encoded&&doc.copy_scene().active().material_bindings->material.version()==MToonVersion::V1,
+       "The normal document command creates an independent 1.0 material");
+ doc.save("native-mtoon-texture-sets.dsculpt");
+ check(Scene::load("native-mtoon-texture-sets.dsculpt").encode()==both,"Ordered Save restores primary and secondary material identities");
+ check(doc.undo()&&doc.copy_scene().encode()==encoded,"Undo restores the exact mixed shader scene");
+ check(doc.redo()&&doc.copy_scene().encode()==both,"Redo restores both typed materials");
+ check(doc.wait_mesh(),"Redo republishes both material ranges");
+ PaintSettings paint;
+ paint.color={.2f,.4f,1,1};
+ paint.front_only=false;
+ doc.paint_settings(paint);
+ doc.configure(Tool::Clay,.08f);
+ NativeStrokeSample sample;
+ sample.origin={.33f,-.15f,2};
+ sample.direction={0,0,-1};
+ sample.brush.radius=.08f;
+ sample.brush.strength=sample.brush.pressure=1;
+ check(doc.begin_native_stroke()&&doc.sample_native_stroke(sample),"The actual desktop paint ray hits the typed field");
+ doc.end_native_stroke(true);
+ check(doc.wait_native_stroke()&&doc.wait_mesh()&&doc.frame().state->error.empty()&&
+       texture_set_view(doc.copy_scene().active(),1).painted->has_paint_data()&&
+       !doc.copy_scene().active().painted->has_paint_data(),
+       "Desktop layer painting remains independent on a typed material after restore");
+
+ Document spatial;
+ spatial.replace(Scene::decode(original));
+ check(spatial.wait_mesh(),"XR material action starts with both fields published");
+ SpatialFrame input;
+ input.focused=input.head_valid=true;
+ input.head.position={0,1.6f,0};
+ auto &hand=input.hands[1];
+ hand.tracked.valid=true;
+ hand.tracked.grip.position={0,1.48f,-.5f};
+ const auto send=[&](float x=0,float y=0,bool joystick=false){
+  hand.x=x;hand.y=y;hand.joystick=joystick;
+  ++input.sequence;input.time+=.05;
+  spatial.submit(input);
+  check(spatial.wait_input(),"The XR input worker drains the actual joystick command");
+ };
+ const auto sector=[&](int index){
+  const float angle=index*3.14159265359f/6;
+  send(std::cos(angle),std::sin(angle));send(std::cos(angle),std::sin(angle),true);send();
+ };
+ send();send(0,0,true);send();sector(9);sector(9);
+ check(spatial.frame().state->menu_page==26&&spatial_action(26,4)==SpatialCommand::TextureMToon,
+       "The actual joystick reaches the typed-set assignment in View options");
+ sector(4);
+ check(spatial.wait_asset()&&spatial.wait_mesh()&&spatial.frame().state->error.empty()&&
+       active_texture_set(spatial.copy_scene().active()).material_bindings&&
+       !spatial.copy_scene().active().material_bindings,
+       "The spatial action assigns MToon to the active field and preserves the neighbor");
 }
-int main()try{initial_controls();raster();query();boundary();native();std::cout<<"PASS "<<checks<<" texture-set raster/worker/query controls\n";return 0;}catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
+}
+int main()try{initial_controls();raster();query();boundary();native();native_mtoon();std::cout<<"PASS "<<checks<<" texture-set raster/worker/query controls\n";return 0;}catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

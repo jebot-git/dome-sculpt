@@ -744,7 +744,7 @@ void Document::publish_locked(bool force,bool checkpoint) {
   if(texture_face_object_!=active.id||!active.mesh_active||!active.painted||texture_face_geometry_!=active.painted->mesh_owner()){state_.texture_faces.clear();state_.texture_face_select=false;texture_face_geometry_.reset();texture_face_object_=0;}
   state_.texture_sets.clear();state_.active_texture_set=active.texture_sets?active.texture_sets->active():0;
   state_.texture_material=selected_field?selected_field->material:active.material;
-  state_.can_edit_texture_sets=selected_field&&(!active.polygon||active.texture_sets)&&detail::texture_set_plain_fields(active)&&object_editable_locked(active.id)&&!state_.asset_busy&&!state_.recovery_busy&&!native_stroke_&&!control_before_&&!state_.polygon&&!state_.retopology&&!state_.cut&&!uv_;
+  state_.can_edit_texture_sets=selected_field&&(!active.polygon||active.texture_sets)&&detail::texture_set_editable_fields(active)&&object_editable_locked(active.id)&&!state_.asset_busy&&!state_.recovery_busy&&!native_stroke_&&!control_before_&&!state_.polygon&&!state_.retopology&&!state_.cut&&!uv_;
   if(selected_field){
     const auto primary=texture_set_view(active,0);state_.texture_sets.push_back({0,primary.name,primary.painted->resolution(),primary.domain?primary.domain->triangles().size():primary.painted->mesh().indices.size()/3});
     if(active.texture_sets)for(const auto&s:active.texture_sets->additional())state_.texture_sets.push_back({s.id,s.name,s.painted->resolution(),s.domain->triangles().size()});
@@ -2380,7 +2380,7 @@ bool Document::parameter_enabled_locked(VrParameter parameter) const {
   if(parameter==VrParameter::TextureResolution&&!o.texture_sets)
     return detail::can_resize_native_texture_grid(o)&&object_editable_locked(o.id)&&
       !action_active_locked()&&!state_.recovery_busy&&!state_.polygon&&!state_.retopology&&!state_.cut&&!uv_;
-  if(o.texture_sets&&detail::texture_set_control(parameter))return object_editable_locked(o.id)&&detail::texture_set_plain_fields(o)&&!action_active_locked()&&!state_.recovery_busy;
+  if(o.texture_sets&&detail::texture_set_control(parameter))return object_editable_locked(o.id)&&detail::texture_set_editable_fields(o)&&!action_active_locked()&&!state_.recovery_busy;
   if (parameter == VrParameter::LayerOpacity ||
       parameter == VrParameter::LayerOrder)
     return o.mesh_active && o.painted &&

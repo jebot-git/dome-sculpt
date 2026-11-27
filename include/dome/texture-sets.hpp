@@ -92,6 +92,8 @@ private:
   friend bool select_texture_set(Scene&,uint64_t,TextureSetId);
   friend bool rename_texture_set(Scene&,uint64_t,TextureSetId,std::string,const TextureSetLimits&);
   friend bool edit_texture_set(Scene&,uint64_t,TextureSetId,const std::function<bool(PaintedMesh&,Material&)> &,const TextureSetLimits&);
+  friend bool bind_texture_set_mtoon(Scene&,uint64_t,TextureSetId,
+      const SourceMaterialBindings&,const TextureSetLimits&);
   void validate_owner(const TextureSetView&,bool,const std::shared_ptr<const PolygonAuthority>&,
       bool,const TextureSetLimits&)const;
   TextureSetCollection()=default;
@@ -115,7 +117,7 @@ struct TextureSetView {
   std::shared_ptr<const TextureSetFaceDomain> domain;
   std::shared_ptr<const detail::TextureSetFieldSource> source;
 };
-enum class TextureSetAction { Create, AssignFaces, Select, Rename, Material, LayerOpacity, LayerOrder, AddLayer, DeleteLayer, NextLayer, ToggleLayer, Resolution };
+enum class TextureSetAction { Create, AssignFaces, Select, Rename, Material, LayerOpacity, LayerOrder, AddLayer, DeleteLayer, NextLayer, ToggleLayer, Resolution, MToon };
 // Native/desktop/XR requests operate on persistent logical face IDs and one
 // explicit material slot of the active mesh, never an object/group alias.
 struct TextureSetEdit {
@@ -151,4 +153,6 @@ bool select_texture_set(Scene&,uint64_t object,TextureSetId);
 bool edit_texture_set(Scene&,uint64_t object,TextureSetId,
     const std::function<bool(PaintedMesh&,Material&)> &,const TextureSetLimits & = {});
 bool rename_texture_set(Scene&,uint64_t,TextureSetId,std::string,const TextureSetLimits & = {});
+bool bind_texture_set_mtoon(Scene&,uint64_t,TextureSetId,const SourceMaterialBindings&,
+                            const TextureSetLimits & = {});
 } // namespace dome

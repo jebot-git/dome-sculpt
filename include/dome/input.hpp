@@ -100,10 +100,10 @@ enum class SpatialCommand {
   ExpressionBegin=6144, ExpressionPrevious, ExpressionNext, ExpressionDecrease,
   ExpressionIncrease, ExpressionReset, ExpressionApply, ExpressionCancel,
   EmissionRelative=16384, EmissionPhysical, EmissionBlack,
-  TexturePrevious=32768, TextureNext, TexturePickFaces, TextureClearFaces, TextureCreate, TextureAssign,
+  TexturePrevious=32768, TextureNext, TexturePickFaces, TextureClearFaces, TextureCreate, TextureAssign, TextureMToon,
   BlurColorLayer=65536
 };
-inline bool texture_set_command(SpatialCommand c){return c>=SpatialCommand::TexturePrevious&&c<=SpatialCommand::TextureAssign;}
+inline bool texture_set_command(SpatialCommand c){return c>=SpatialCommand::TexturePrevious&&c<=SpatialCommand::TextureMToon;}
 inline bool editable_export_command(SpatialCommand c){return c>=SpatialCommand::ExportEditable256&&c<=SpatialCommand::ExportEditable1024;}
 inline bool expression_command(SpatialCommand c){return c>=SpatialCommand::ExpressionBegin&&c<=SpatialCommand::ExpressionCancel;}
 inline bool editable_avatar_export_command(SpatialCommand c){return c>=SpatialCommand::ExportEditableAvatar256&&c<=SpatialCommand::ExportEditableAvatar1024;}

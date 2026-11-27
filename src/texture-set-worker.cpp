@@ -159,6 +159,7 @@ void append_texture_set_surface(MeshSnapshot&snapshot,const ObjectSurface&o,
   stop(limits);if(!plan->draws()[f].count)continue;
   auto proof=prepare_texture_set_range(plan,layout,f,first,offset,limits.cancelled,view.render_only);
   SurfaceRange range{o.id,proof->first_index(),proof->draw().count,proof->field().material,proof->textures(),nullptr,offset};
+  range.material_bindings=proof->field().material_bindings;
   range.object_world=world;range.world_frame_valid=!affine;if(frame)range.affine_world=frame->world();
   if(const auto&packet=range.textures->polygon_surface){packet->validate_world(frame->world(),1e-6,limits.cancelled);range.material_bindings=proof->field().material_bindings;range.paint_sampling_attachment=packet->attachment();range.source_frame=true;range.source_normal_only=packet->model()==PolygonSurfaceNormalModel::NativeNOnly;}
   range.paint_winding_reversed=reflected;range.pbr_view=view.pbr;range.texture_set=proof->field().id;range.texture_set_proof=std::move(proof);

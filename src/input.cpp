@@ -13,7 +13,7 @@ const std::array<const char *, 12> &spatial_labels(int page) {
   if(page==28)return exporting;
   static const std::array<const char*,12> expressions={"Previous expression","Next expression","Weight -","Weight +","Reset weights","Apply static pose","Cancel preview","Authored","Back","Core PBR","",""};
   if(page==29)return expressions;
-  static const std::array<const char *,12> preview={"Authored","Core PBR","Toon preview","Expressions","","","","","Back","","",""};
+  static const std::array<const char *,12> preview={"Authored","Core PBR","Toon preview","Expressions","Use MToon 1.0 on set","","","","Back","","",""};
   if(page==26)return preview;
   static const std::array<const char *, 12> root = {
       "Clay", "Carve",       "Smooth",  "Flatten",   "Undo",       "Redo",
@@ -181,6 +181,7 @@ std::optional<SpatialCommand> spatial_action(int page, int index) {
     if(index==0)return SpatialCommand::PreviewAuthored;
     if(index==1)return SpatialCommand::PreviewPbr;
     if(index==2)return SpatialCommand::PreviewToon;
+    if(index==4)return SpatialCommand::TextureMToon;
     return {};
   }
   if (index < 0 || index >= 12 || page < 0 || page >= spatial_page_count || page == 5 ||
