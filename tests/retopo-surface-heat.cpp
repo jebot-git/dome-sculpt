@@ -744,6 +744,150 @@ void mixed_material_quad(const std::filesystem::path &out) {
         "The source raster remains exact after the new material allocation");
 }
 
+void split_material_seam(bool affine, const std::filesystem::path &out) {
+  auto scene = reference(affine);
+  const auto donor = scene.active().id;
+  RetopoMesh quad;
+  const auto a = quad.add_vertex({{-.2f,-.2f,0}});
+  const auto b = quad.add_vertex({{ .2f,-.2f,0}});
+  const auto c = quad.add_vertex({{ .2f, .2f,0}});
+  const auto d = quad.add_vertex({{-.2f, .2f,0}});
+  const auto face = quad.add_face(std::array{a,b,c,d});
+  quad.set_pinned(a,true);
+  const auto quad_bytes = quad.encode();
+  check(nlohmann::json::parse(quad_bytes).at("version")==1 && RetopoMesh::decode(quad_bytes).encode()==quad_bytes,
+        "Existing quad archives keep their original topology format and bytes");
+  size_t cancellation = 0;
+  bool cancelled = false;
+  try { quad.toggle_seam(b,d,[&]{ return ++cancellation == 3; }); }
+  catch (const std::runtime_error &) { cancelled = true; }
+  check(cancelled && quad.encode()==quad_bytes,"Cancelling after building the split preserves the original topology and IDs");
+  auto wired = quad;
+  const auto wire = wired.add_edge(b,d);
+  wired.toggle_seam(b,d);
+  check(wired.faces().size()==2 && wired.edges().size()==5 && wired.edges().at(wire).seam,
+        "An existing diagonal wire becomes the real seam without changing its ID");
+
+  const auto original = publish_retopology(scene,quad,donor,{});
+  if (affine) scene.active().affine_edit = scene.object(donor).affine_edit;
+  const auto secondary = create_texture_set(scene,original,std::array<uint64_t,1>{2},"Blue trim",64);
+  for (const auto set : {0u,secondary}) {
+    check(edit_texture_set(scene,original,set,[&](PaintedMesh &paint,Material &material) {
+      paint.add_layer(set ? "Blue finish" : "Red finish");
+      material.color = set ? std::array<float,4>{.15f,.3f,.9f,1} : std::array<float,4>{.9f,.2f,.12f,1};
+      PaintSettings ink;
+      ink.front_only = false;
+      ink.color = material.color;
+      Brush brush;
+      brush.from = brush.to = set ? Vec3{.12f,.12f,0} : Vec3{-.12f,-.12f,0};
+      brush.normal = {0,0,1};
+      brush.radius = .24f;
+      brush.strength = 1;
+      paint.begin_stroke();
+      paint.stamp(brush,ink);
+      return paint.end_stroke();
+    }),"Each side starts with distinct material and editable paint");
+  }
+  const auto before = scene.encode();
+  const auto world = scene.world_matrix(original);
+  scene.save(out/"before-seam.dsculpt");
+  Document doc;
+  doc.replace(scene);
+  settled(doc);
+  doc.begin_retopology();
+  drafted(doc);
+  const auto choose = [&](TopologyID id) { touch(doc,point(world,quad.vertices().at(id).position)); };
+  choose(a);
+  choose(c);
+  const auto unsupported = doc.frame().state->retopology->topology;
+  doc.edit_retopology(RetopoAction::Seam);
+  check(doc.wait_retopology() && !doc.frame().state->retopology->error.empty() &&
+        doc.frame().state->retopology->topology==unsupported,
+        "The other diagonal cannot silently cut across the material boundary");
+  doc.edit_retopology(RetopoAction::Clear);
+  drafted(doc);
+  choose(b);
+  choose(d);
+  const auto unsplit = doc.frame().state->retopology->topology;
+  doc.edit_retopology(RetopoAction::Seam);
+  drafted(doc);
+  const auto split = doc.frame().state->retopology->topology;
+  check(split->vertices().size()==4 && split->edges().size()==5 && split->faces().size()==2 &&
+        split->vertices().at(a).pinned && split->faces().begin()->first==face &&
+        split->faces().rbegin()->second.split_from==face &&
+        std::ranges::any_of(split->edges(),[&](const auto &entry) {
+          const auto &e = entry.second;
+          return e.seam && ((e.a==b && e.b==d) || (e.a==d && e.b==b));
+        }),"Seam Edge exposes the existing diagonal with two stable triangle faces and keeps the old vertices and pin");
+  const auto split_bytes = split->encode();
+  check(nlohmann::json::parse(split_bytes).at("version")==2 && RetopoMesh::decode(split_bytes).encode()==split_bytes,
+        "Split provenance round-trips through the native topology archive");
+  check(doc.undo() && doc.wait_retopology() && doc.frame().state->retopology->topology==unsplit &&
+        doc.redo() && doc.wait_retopology() && doc.frame().state->retopology->topology==split,
+        "Draft Undo and Redo restore the exact seam and selection snapshots");
+  if (!affine) {
+    auto reference = scene.snapshot();
+    publish_retopology(reference,*split,donor,doc.frame().state->retopology->transform);
+    reference.save(out/"seam-only-reference.dsculpt");
+  }
+
+  doc.edit_retopology(RetopoAction::MoveMode);
+  drafted(doc);
+  const auto drag = [&](TopologyID id, Vec3 destination) {
+    check(doc.begin_desktop(),"Move admits a regular gesture on the new seam");
+    Brush brush;
+    brush.from = brush.to = point(world,quad.vertices().at(id).position);
+    doc.stamp_desktop(brush);
+    drafted(doc);
+    brush.to = point(world,destination);
+    doc.stamp_desktop(brush);
+    doc.end_desktop();
+    drafted(doc);
+  };
+  const Vec3 new_b{.08f,-.32f,0}, new_d{-.32f,.08f,0};
+  drag(b,new_b);
+  drag(d,new_d);
+  const auto center = (new_b + new_d + quad.vertices().at(c).position)/3.f;
+  check(SurfaceQuery(scene.active().painted->mesh()).closest(center).triangle==0,
+        "The new blue face centre lies on the old red side, ruling out centroid material assignment");
+  doc.end_retopology(true);
+  doc.save_async(out/"after-seam.dsculpt").get();
+  settled(doc);
+  const auto applied = doc.copy_scene();
+  const auto &object = applied.active();
+  const auto topology = object.retopology->topology.triangulate();
+  const auto slots = object.texture_sets->triangle_sets();
+  check(topology.source_faces.size()==2 && slots[0]==0 && slots[1]==secondary &&
+        object.retopology->topology.faces().rbegin()->second.split_from==face,
+        "Apply assigns both parts by original material-side identity across the transformed seam");
+  for (const auto set : {0u,secondary}) {
+    const auto field = texture_set_view(object,set);
+    const auto channel = set ? 2 : 0;
+    check(field.painted->layers().back().name==(set ? "Blue finish" : "Red finish") &&
+          std::ranges::any_of(field.painted->layers().back().tiles,[&](const auto &tile) {
+            return tile && std::ranges::any_of(tile->pixels,[&](const auto &pixel) {
+              return pixel.data[9]>128 && pixel.data[channel]>200;
+            });
+          }),"The replacement texture field still owns its original editable ink");
+  }
+  const auto exact = applied.encode();
+  check(Scene::load(out/"after-seam.dsculpt").encode()==exact && !applied.object(original).visible &&
+        applied.object(original).texture_sets==scene.active().texture_sets,
+        "Ordered Save and cold Open preserve both split authority and the hidden original paint");
+  doc.export_asset(out/"standard.glb",AssetExportFormat::Glb).get();
+  doc.export_asset(out/"editable.glb",AssetExportFormat::EditableGlb512).get();
+  const auto portable = import_mesh(out/"standard.glb");
+  check(portable.primitives.size()==2 && std::ranges::all_of(portable.primitives,[](const auto &primitive) {
+          return primitive.mesh.indices.size()==3;
+        }),"The Standard GLB carries each new material side as its own triangle");
+  std::ifstream editable(out/"editable.glb",std::ios::binary);
+  const std::vector<uint8_t> bytes{std::istreambuf_iterator<char>(editable),{}};
+  const auto reopened = extract_native_authoring(bytes);
+  check(reopened && reopened->encode()==exact && doc.undo() && doc.copy_scene().encode()==before &&
+        doc.redo() && doc.copy_scene().encode()==exact,
+        "Editable GLB and global Undo and Redo retain the exact two authoring generations");
+}
+
 SourceMaterialBindings retopo_toon_binding(const TextureSetView &slot,bool trim,bool legacy) {
   auto info=[](int index) {
     return nlohmann::json{{"index",index},{"extensions",{{"KHR_texture_transform",{
@@ -1176,7 +1320,8 @@ int main(int argc,char **argv) try {
   if (mode!="plain" && mode!="affine" && mode!="affine-wire" && mode!="mixed-material" &&
       mode!="mtoon-plain" && mode!="mtoon-affine" && mode!="mtoon-v0" &&
       mode!="reapply-plain" && mode!="reapply-affine" && mode!="prepared-plain" && mode!="prepared-affine" &&
-      mode!="restore-plain" && mode!="restore-affine") return 2;
+      mode!="restore-plain" && mode!="restore-affine" && mode!="material-seam-plain" &&
+      mode!="material-seam-affine") return 2;
   const std::filesystem::path out = argv[1];
   std::filesystem::create_directories(out);
   setenv("XDG_STATE_HOME",(out/"state").c_str(),1);
@@ -1184,6 +1329,7 @@ int main(int argc,char **argv) try {
   if (mode.starts_with("restore-")) restore_patch_history(mode.ends_with("affine"),out);
   else if (mode=="affine-wire") affine_wire_edit(out);
   else if (mode=="mixed-material") mixed_material_quad(out);
+  else if (mode.starts_with("material-seam-")) split_material_seam(mode.ends_with("affine"),out);
   else if (mode.starts_with("mtoon-")) retopo_toon_materials(mode.ends_with("affine"),mode.ends_with("v0"),out);
   else if (mode.starts_with("prepared-")) prepared_geometry_edit(mode.ends_with("affine"),out);
   else if (mode.starts_with("reapply-")) reapply_patch(mode.ends_with("affine"),out);

@@ -5,6 +5,7 @@
 // Copyright(C) 2004-2016 Visual Computing Lab, ISTI-CNR, GPL-2.0-or-later.
 #include "dome/retopo.hpp"
 #include "dome/affine.hpp"
+#include "retopo-archive.hpp"
 #include <bit>
 #include <limits>
 #include <nlohmann/json.hpp>
@@ -224,6 +225,50 @@ TopologyID RetopoMesh::add_face(std::span<const TopologyID> ids,
   *this = std::move(draft);
   return id;
 }
+void RetopoMesh::toggle_seam(TopologyID a, TopologyID b, const std::function<bool()> &cancelled) {
+  stop(cancelled);
+  if (a == b) throw std::invalid_argument("Select two distinct seam endpoints");
+  const auto existing = edge_id(a, b);
+  TopologyID face_id = 0;
+  bool ambiguous = false;
+  std::array<std::array<TopologyID, 3>, 2> corners{};
+  for (const auto &[id, face] : faces_) {
+    stop(cancelled);
+    const auto first = std::ranges::find(face.vertices, a), second = std::ranges::find(face.vertices, b);
+    if (first == face.vertices.end() || second == face.vertices.end()) continue;
+    const auto distance = size_t(std::abs(first - second));
+    if (distance == 1 || distance + 1 == face.vertices.size()) {
+      set_seam(existing, !edges_.at(existing).seam);
+      return;
+    }
+    const auto triangles = face_triangles(face, vertices_);
+    const auto is_incident = [&](const auto &triangle) {
+      return std::ranges::any_of(triangle, [&](auto k) { return face.vertices[k] == a; }) &&
+             std::ranges::any_of(triangle, [&](auto k) { return face.vertices[k] == b; });
+    };
+    if (!std::ranges::all_of(triangles, is_incident)) continue;
+    if (face_id) { ambiguous = true; continue; }
+    face_id = id;
+    for (size_t t = 0; t < corners.size(); ++t)
+      for (size_t k = 0; k < corners[t].size(); ++k) corners[t][k] = face.vertices[triangles[t][k]];
+  }
+  if (ambiguous) throw std::invalid_argument("The selected diagonal belongs to more than one quad");
+  if (!face_id) {
+    if (!existing) throw std::invalid_argument("Select an edge or the existing triangulation diagonal of a quad");
+    set_seam(existing, !edges_.at(existing).seam);
+    return;
+  }
+  if (faces_.size() >= budget) throw std::length_error("Topology face budget exceeded");
+  RetopoMesh draft = *this;
+  draft.add_edge(a, b, true);
+  if (draft.next_ == UINT64_MAX) throw std::length_error("Topology IDs exhausted");
+  auto &first = draft.faces_.at(face_id);
+  first.vertices.assign(corners[0].begin(), corners[0].end());
+  const auto &second = corners[1];
+  draft.faces_.emplace(draft.next_++, RetopoFace{{second.begin(), second.end()}, first.material, face_id});
+  draft.validate(cancelled);
+  *this = std::move(draft);
+}
 void RetopoMesh::remove_face(TopologyID id) {
   RetopoMesh draft = *this;
   if (!draft.faces_.erase(id))
@@ -352,6 +397,9 @@ void RetopoMesh::validate(const std::function<bool()> &fn) const {
   for (auto &[id, f] : faces_) {
     stop(fn);
     identity(id);
+    if (f.split_from && (f.vertices.size() != 3 || f.split_from >= id ||
+                         vertices_.contains(f.split_from) || edges_.contains(f.split_from)))
+      throw std::runtime_error("Invalid retopology split origin");
     auto sorted = f.vertices;
     std::sort(sorted.begin(), sorted.end());
     if (std::adjacent_find(sorted.begin(), sorted.end()) != sorted.end() ||
@@ -549,8 +597,14 @@ std::string RetopoMesh::encode() const {
         {id, {v.position.x, v.position.y, v.position.z}, v.uv, v.pinned});
   for (auto &[id, e] : edges_)
     j["edges"].push_back({id, e.a, e.b, e.seam});
-  for (auto &[id, f] : faces_)
-    j["faces"].push_back({id, f.vertices, f.material});
+  for (auto &[id, f] : faces_) {
+    auto face = nlohmann::json::array({id, f.vertices, f.material});
+    if (f.split_from) {
+      j["version"] = detail::retopo_split_archive_version;
+      face.push_back(f.split_from);
+    }
+    j["faces"].push_back(std::move(face));
+  }
   return j.dump();
 }
 RetopoMesh RetopoMesh::decode(std::string_view text) {
@@ -576,8 +630,9 @@ RetopoMesh RetopoMesh::decode(std::string_view text) {
       --depth;
   }
   auto j = nlohmann::json::parse(text);
-  if (!j.is_object() || j.size() != 5 || j.at("version") != 1)
+  if (!detail::retopo_archive_shape(j))
     throw std::runtime_error("Unsupported topology format");
+  const bool split_records = j.at("version") == detail::retopo_split_archive_version;
   RetopoMesh out;
   out.next_ = json_id(j.at("next"));
   for (auto name : {"vertices", "edges", "faces"})
@@ -609,7 +664,8 @@ RetopoMesh RetopoMesh::decode(std::string_view text) {
       throw std::runtime_error("Duplicate edge ID");
   }
   for (auto &f : j.at("faces")) {
-    if (!f.is_array() || f.size() != 3 || !f[1].is_array() || f[1].size() < 3 ||
+    if (!f.is_array() || (f.size() != 3 && !(split_records && f.size() == 4)) ||
+        !f[1].is_array() || f[1].size() < 3 ||
         f[1].size() > 4 || !f[2].is_number_unsigned() ||
         f[2].get<uint64_t>() > UINT32_MAX)
       throw std::runtime_error("Invalid topology face record");
@@ -617,7 +673,8 @@ RetopoMesh RetopoMesh::decode(std::string_view text) {
     for (auto &v : f[1])
       ids.push_back(json_id(v));
     if (!out.faces_
-             .emplace(json_id(f[0]), RetopoFace{ids, f[2].get<uint32_t>()})
+             .emplace(json_id(f[0]), RetopoFace{std::move(ids), f[2].get<uint32_t>(),
+                                                f.size() == 4 ? json_id(f[3]) : 0})
              .second)
       throw std::runtime_error("Duplicate face ID");
   }

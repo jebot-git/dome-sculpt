@@ -1197,7 +1197,7 @@ Scene Scene::decode_owning(const nlohmann::json &j,
         if(depth>32)throw std::length_error("Topology JSON nesting exceeds limit");
         return true;
       });
-      if(!metadata.is_object() || metadata.size()!=5 || !metadata.at("version").is_number_integer() || metadata.at("version")!=1)
+      if(!detail::retopo_archive_shape(metadata))
         throw std::runtime_error("Unsupported topology format");
       for(const auto *field:{"vertices","edges","faces"}) {
         const auto &records=metadata.at(field);const size_t maximum=std::string_view(field)=="edges"?300'000:100'000;

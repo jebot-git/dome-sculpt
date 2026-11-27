@@ -8,6 +8,7 @@
 #include "baked-emission-codec.hpp"
 #include "scene-paint-raster.hpp"
 #include "scene-bake-archive.hpp"
+#include "retopo-archive.hpp"
 #include <nlohmann/json.hpp>
 #include <optional>
 namespace dome::detail {
@@ -193,7 +194,7 @@ struct PolygonSceneBudget {
             throw std::length_error("Retained retopology nesting exceeded");
           return true;
         });
-    if (!j.is_object() || j.size() != 5 || j.at("version") != 1)
+    if (!retopo_archive_shape(j))
       throw std::invalid_argument("Invalid retained retopology topology");
     for (const auto *key : {"vertices", "edges", "faces"}) {
       const auto &v = j.at(key);

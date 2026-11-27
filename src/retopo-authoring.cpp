@@ -359,14 +359,7 @@ void RetopoWorkspace::edit(RetopoAction action, Vec3 point, float snap_mm,
     } else if (action == RetopoAction::Wire || action == RetopoAction::Seam) {
       if (selected.size() != 2) throw std::runtime_error("Select two edge endpoints");
       if (action == RetopoAction::Wire) draft.add_edge(selected[0], selected[1]);
-      else {
-        TopologyID edge = 0; bool seam = false;
-        for (auto &[id, e] : draft.edges())
-          if ((e.a == selected[0] && e.b == selected[1]) || (e.b == selected[0] && e.a == selected[1]))
-            { edge = id; seam = e.seam; break; }
-        if (!edge) throw std::runtime_error("Connect the endpoints before marking a seam");
-        draft.set_seam(edge, !seam);
-      }
+      else draft.toggle_seam(selected[0],selected[1],cancelled);
     } else if (action == RetopoAction::Pin) {
       if (selected.empty()) throw std::runtime_error("Select points to pin or unpin");
       bool pin = std::any_of(selected.begin(), selected.end(), [&](auto id) { return !draft.vertices().at(id).pinned; });
@@ -412,6 +405,7 @@ bool same_patch_surface(const RetopoSurface &a, const RetopoSurface &b) {
 }
 
 std::vector<uint32_t> match_patch_triangles(const RetopoSurface &before, const RetopoSurface &after,
+                                           const RetopoMesh &replacement,
                                            const std::function<bool()> &cancelled) {
   auto corners = [](const RetopoSurface &surface, size_t face) {
     std::array<TopologyID,3> ids;
@@ -423,14 +417,19 @@ std::vector<uint32_t> match_patch_triangles(const RetopoSurface &before, const R
   std::vector<uint32_t> result(after.source_faces.size(), UINT32_MAX);
   for (size_t i = 0; i < result.size(); ++i) {
     if ((i & 1023) == 0) stop(cancelled);
-    const auto candidates = std::ranges::equal_range(before.source_faces, after.source_faces[i]);
     const auto ids = corners(after, i);
-    for (auto it = candidates.begin(); it != candidates.end(); ++it) {
-      const auto candidate = size_t(it - before.source_faces.begin());
-      if (corners(before, candidate) == ids) {
-        result[i] = uint32_t(candidate);
-        break;
+    const auto face = after.source_faces[i];
+    for (auto parent : {face, replacement.faces().at(face).split_from}) {
+      if (!parent) break;
+      const auto candidates = std::ranges::equal_range(before.source_faces, parent);
+      for (auto it = candidates.begin(); it != candidates.end(); ++it) {
+        const auto candidate = size_t(it - before.source_faces.begin());
+        if (corners(before, candidate) == ids) {
+          result[i] = uint32_t(candidate);
+          break;
+        }
       }
+      if (result[i] != UINT32_MAX) break;
     }
   }
   return result;
@@ -881,7 +880,7 @@ uint64_t publish_retopology(Scene &scene, const RetopoMesh &topology, uint64_t s
       texture_sets = previous.texture_sets;
     } else {
       const auto size = previous.painted->resolution();
-      auto source_triangles = match_patch_triangles(old_surface, triangles, cancelled);
+      auto source_triangles = match_patch_triangles(old_surface, triangles, patch->topology, cancelled);
       unwrap(triangles.mesh, size, 4, cancelled);
       PaintSurfaceOptions options;
       options.cancelled = cancelled;
