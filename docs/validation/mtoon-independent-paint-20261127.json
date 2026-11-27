@@ -1,0 +1,278 @@
+{
+  "product": "e4f3ded3cddaa895a3435901b05a0e62fded6365",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "release_fltk": "/opt/fltk-vr/toolkit",
+  "release_tests": [
+    "retopology-affine-ui-fixture",
+    "native-paint32-fixture",
+    "layered-normal-native",
+    "layered-normal-uv-native",
+    "retopology-affine-openxr",
+    "retopology-input-admission",
+    "dome-sculpt-texture-set-export",
+    "retopology-reapply-plain",
+    "retopology-reapply-affine",
+    "retopology-save-handoff",
+    "retopology-prepared-affine",
+    "retopology-caller-admission",
+    "retopology-prepared-plain",
+    "retopology-held-admission",
+    "retopology-history-openxr-apply",
+    "retopology-restore-plain",
+    "authoring-native-normal-union",
+    "texture-set-retained-skin",
+    "texture-set-retained-shapekeys",
+    "retopology-history-openxr-cancel",
+    "retopology-restore-affine",
+    "dome-sculpt-texture-set-source-export",
+    "retopology-mtoon-plain",
+    "retopology-mtoon-affine",
+    "retopology-linked-vrm1",
+    "retopology-surface-heat-plain",
+    "retopology-surface-heat-affine",
+    "texture-set-mtoon-independent-paint",
+    "retopology-affine",
+    "retopology-mtoon-v0",
+    "retopology-affine-wire",
+    "retopology-worker-faults",
+    "retopology-authoring",
+    "vrm1-retained-skinned-accessory",
+    "retopology-worker-accepted-publication",
+    "retopology-mixed-material",
+    "texture-set-mtoon-derivative-tangent",
+    "retopology-authority-focus",
+    "dome-sculpt-texture-set-surfaces",
+    "texture-set-active-bake",
+    "retopology-authority-grab",
+    "retopology-worker-reporter-recovery"
+  ],
+  "strict_workflows": [
+    "derivative",
+    "independent",
+    "mtoon-plain",
+    "mtoon-affine",
+    "prepared-affine"
+  ],
+  "strict_method": "Compiled all owners of the changed texture-set-export header with generated ASan/UBSan CMake commands, then recompiled the final exporter and relinked the matched archive and fixtures.",
+  "independent_png_sampling": {
+    "masked-standard.glb": {
+      "samples": 19877,
+      "rgb_error": [
+        0.00349391,
+        0.00258726,
+        0.00186259
+      ],
+      "alpha_error": 1.19209e-07,
+      "mask_visible": 18611,
+      "mask_discarded": 1266
+    },
+    "masked-editable.glb": {
+      "samples": 19877,
+      "rgb_error": [
+        0.00349391,
+        0.00258726,
+        0.00186259
+      ],
+      "alpha_error": 1.19209e-07,
+      "mask_visible": 18611,
+      "mask_discarded": 1266
+    },
+    "opaque-standard.glb": {
+      "samples": 19877,
+      "rgb_error": [
+        0.00358933,
+        0.00258726,
+        0.00186259
+      ],
+      "alpha_error": 0.0,
+      "mask_visible": 0,
+      "mask_discarded": 0
+    },
+    "opaque-editable.glb": {
+      "samples": 19877,
+      "rgb_error": [
+        0.00358933,
+        0.00258726,
+        0.00186259
+      ],
+      "alpha_error": 0.0,
+      "mask_visible": 0,
+      "mask_discarded": 0
+    },
+    "large-standard.glb": {
+      "samples": 19877,
+      "rgb_error": [
+        0.00338203,
+        0.00270572,
+        0.00185478
+      ],
+      "alpha_error": 0.0,
+      "mask_visible": 0,
+      "mask_discarded": 0
+    },
+    "large-editable.glb": {
+      "samples": 19877,
+      "rgb_error": [
+        0.00338203,
+        0.00270572,
+        0.00185478
+      ],
+      "alpha_error": 0.0,
+      "mask_visible": 0,
+      "mask_discarded": 0
+    }
+  },
+  "release_asan_byte_match_sha256": {
+    "texture-set-independent-mtoon/masked-standard.glb": "018f63c9be42f4f381f66c2ad1400b7b914968dffaa9cd2a89eddb40addeeb83",
+    "texture-set-independent-mtoon/masked-editable.glb": "2eb417f9d3662a50cf61dfb22dcf64a2e8fbb2bb262a5bf1ade1fe510fa691c8",
+    "texture-set-independent-mtoon/opaque-standard.glb": "a8b3a72081e6d8f578fea463c76a54464fef153c8261c41647c06c1247760bbe",
+    "texture-set-independent-mtoon/opaque-editable.glb": "add92c93ffb8f3236605b8c063a3bfcac77a6a79982ebc803a9074623d01080c",
+    "texture-set-independent-mtoon/large-standard.glb": "75ce6675b76cdb03c6b59f029fa73b01d2b3747d40102ed849e881f87765c458",
+    "texture-set-independent-mtoon/large-editable.glb": "4fbc31d0210539c792b133a37d4ba9cd5c8f928542a97f84dcec8d77609f829c",
+    "texture-set-independent-mtoon/independent-alpha-editable.glb": "2b583e3d8542feffdc51a161b5af739dcde444709b059befd560b0434b0a8481",
+    "texture-set-independent-mtoon/masked-native.dsculpt": "32722811a8f419c91c1e8e228b061e4614aed6e381145e9d47687188a4dad4f3",
+    "texture-set-independent-mtoon/masked-imported.dsculpt": "095067723df7f6e422617b3122420a30b521a05fbd35d934d27310a795437fd5",
+    "texture-set-independent-mtoon/masked-hidden-ink.dsculpt": "221aa6c2e8bc8d4b99528eeb0bdf6748ad72c64ffb04102d735cea14c4ba2e28"
+  },
+  "khronos_validator_version": "2.0.0-dev.3.10",
+  "khronos": {
+    "masked-standard.glb": {
+      "errors": 0,
+      "warnings": [
+        "NODE_SKINNED_MESH_NON_ROOT"
+      ]
+    },
+    "masked-editable.glb": {
+      "errors": 0,
+      "warnings": [
+        "NODE_SKINNED_MESH_NON_ROOT"
+      ]
+    },
+    "opaque-standard.glb": {
+      "errors": 0,
+      "warnings": [
+        "NODE_SKINNED_MESH_NON_ROOT"
+      ]
+    },
+    "opaque-editable.glb": {
+      "errors": 0,
+      "warnings": [
+        "NODE_SKINNED_MESH_NON_ROOT"
+      ]
+    },
+    "large-standard.glb": {
+      "errors": 0,
+      "warnings": [
+        "NODE_SKINNED_MESH_NON_ROOT"
+      ]
+    },
+    "large-editable.glb": {
+      "errors": 0,
+      "warnings": [
+        "NODE_SKINNED_MESH_NON_ROOT"
+      ]
+    },
+    "independent-alpha-editable.glb": {
+      "errors": 0,
+      "warnings": [
+        "NODE_SKINNED_MESH_NON_ROOT"
+      ]
+    }
+  },
+  "official_mtoon_schema_checks": 6,
+  "synthetic_openxr_native_vs_standard_reimport": {
+    "arc": {
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "stereo_frames": [
+        6,
+        6,
+        6
+      ],
+      "native_vs_standard": [
+        {
+          "changed": 4321,
+          "maximum": 3,
+          "mean": 0.030114,
+          "p99": 2
+        },
+        {
+          "changed": 5012,
+          "maximum": 3,
+          "mean": 0.034564,
+          "p99": 2
+        }
+      ],
+      "hidden_ink_control": [
+        {
+          "changed": 112743,
+          "maximum": 177,
+          "mean": 18.070833,
+          "p99": 101
+        },
+        {
+          "changed": 143375,
+          "maximum": 177,
+          "mean": 23.436312,
+          "p99": 101
+        }
+      ],
+      "native_reopen_and_save_exact": true
+    },
+    "software": {
+      "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+      "stereo_frames": [
+        6,
+        6,
+        6
+      ],
+      "native_vs_standard": [
+        {
+          "changed": 3186,
+          "maximum": 3,
+          "mean": 0.024063,
+          "p99": 1
+        },
+        {
+          "changed": 3597,
+          "maximum": 3,
+          "mean": 0.027074,
+          "p99": 2
+        }
+      ],
+      "hidden_ink_control": [
+        {
+          "changed": 112852,
+          "maximum": 177,
+          "mean": 18.02902,
+          "p99": 101
+        },
+        {
+          "changed": 143581,
+          "maximum": 177,
+          "mean": 23.381387,
+          "p99": 101
+        }
+      ],
+      "native_reopen_and_save_exact": true
+    }
+  },
+  "physical_headset": false,
+  "archive_sha256": "0747142d9cea59266a2552b6f172af4b8f1355005b42292c575d5db37ec4d613",
+  "archive_members_sha256": {
+    "release-final.log": "dd50c3c6145c9e2a782e996658f595b0e57fb9a86e49f7cefb74ed3834d500b5",
+    "release/Testing/Temporary/LastTest.log": "c644ccd7e71198f4eb1473c6dd125a4b515ddf34421f6f54244f69caa63c2ede",
+    "asan-core-build.log": "20cbb9f45030174b7b65e5881087a2909f3d61a770874fc4c29b4a06a9176b7f",
+    "asan-build.log": "5a77c5449408044aa27714628e47ab43bad0d27590c7d14f3acf06bb7670b406",
+    "xr-arc/compare.json": "79fef44d7f322e53feb4e7ccee4ac3ec9b2a05fb731b848a440ddb03d06b786a",
+    "xr-software/compare.json": "e740784d01e70fbf800d72bca86e2dce4dd03ebb87e7a01241b5cd2511c2942e",
+    "xr-paint.py": "5550d4d469cf819eba1b75fd889ab2b30556939676c7a786493684b92c2983e4",
+    "khronos.json": "20b8e19cffcbd334f76c777e4e61d08313cba501d98b7d620c41681af342a96c",
+    "khronos.cjs": "ea0c0487118c6ab491339cd17a837748a7af9f4441badd0b23363b1d7ceddfd8",
+    "schemas.json": "7fe31dcef17e92956e1c784d5d4f5e9956cdcd38b700e352613d87bdb3d78675",
+    "asan-derivative.log": "c441bdfbc5ceaaaa5bc747f48b75a41003f681342125e9ccd77f9d1b2b364c5f",
+    "asan-independent.log": "0dbe28e16a5441150f819bbad5218bbff5be803b2ee48308e3e437a0146e576b",
+    "asan-mtoon-plain.log": "b6c3723dc7d0aaa0a531898776f88fde914c1c526734289b6aa575e081b8f141",
+    "asan-mtoon-affine.log": "fd6004124f3573e08c0078604d40a1ae338b263462cb42737e2963a9621181a7",
+    "asan-prepared-affine.log": "bf6ce3f15f1432cee5afbbcf8e1d3fdf5f7debf4f9def0e38ef26df41bd421ae"
+  }
+}

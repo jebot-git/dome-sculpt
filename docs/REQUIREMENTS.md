@@ -145,6 +145,15 @@ material slots with their original texture bytes and frame owners. Animated
 or reflected-node transport and more general deformation remain required.
 [Static normal transform evidence](validation/mtoon-static-normal-uv-20261127.json)
 
+Native MToon 1 painted materials now have a portable export path for
+independent source and paint resolutions. Static clamp-linear base, shared
+shade and emission use separate output dimensions and full filter-cell
+quality certification. Masked source materials preserve their native alpha
+curve when the background alpha agrees. Live UV changes, other filter modes
+and general spatially varying source alpha still need their own portable
+representations.
+[Independent painted MToon evidence](validation/mtoon-independent-paint-20261127.json)
+
 The current combined atlas and HDR cache source passes all 153 checks
 in both software Release and Intel Arc ASan/UBSan OpenXR replays. Its
 export is byte-identical across both profiles and independently validates

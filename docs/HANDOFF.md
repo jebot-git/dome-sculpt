@@ -225,6 +225,30 @@ The full Release regression for frozen product `8ba3c55d` is running as
 The focused checks include the later color and normal-map witness fixture.
 [Static normal transform validation](validation/mtoon-static-normal-uv-20261127.json)
 
+Standard and Editable GLB now export painted native MToon 1 materials whose
+static base, aliased shade and emission images use resolutions independent
+of the editable paint. The compiler evaluates each original filter and
+checks its output over the union of the source, paint and output filter
+cells. It includes the source and coverage product and the shared-shade
+clamp in the error bounds. Masked output preserves the native alpha grid
+and its cutoff when the source alpha matches the native background.
+The validated inputs use clamp-to-edge, linear level-zero sampling in UV0,
+including rectangular source images and a 256-square paint field. A sharp
+source or an incompatible independent alpha field can fail Standard export
+without replacing the destination. Editable GLB keeps the original images,
+native layers and masks in those cases.
+The separate PNG consumer checked 119,262 UV samples and found a maximum
+linear RGB error of 0.00359. Both masked exports retained the same cutoff
+decision at every sampled point. The masked Standard GLB re-import renders
+within three 8-bit RGB levels of the native project on Arc A770 and
+llvmpipe in synthetic OpenXR. Hiding the source paint changes the image
+substantially in both eyes, confirming that this comparison reads the paint.
+The qualification includes 42 Release tests and five ASan/UBSan workflows,
+with all ten native and GLB artifacts byte-identical between builds.
+All seven GLBs report zero Khronos errors and a skinned-node hierarchy
+warning. All six portable typed materials pass the official MToon schema.
+[Independent MToon paint validation](validation/mtoon-independent-paint-20261127.json)
+
 Surface Heat also binds meshes after independent frame and shapekey
 authoring. Retention accounts for the actual POSITION correspondences,
 artist normals and tangents, writable paint, and prepared color and normal
