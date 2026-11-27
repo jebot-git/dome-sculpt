@@ -43,11 +43,23 @@ struct Input {
   std::vector<int32_t> padding;
   BakeImages bake;
   std::span<const uint8_t> projected_color,baked_pbr_color;
+  std::span<const detail::SourceTextureAxis> projected_columns,projected_rows;
   // One optional PBR tile index per packed common tile.
   std::vector<uint32_t> color_tiles;
   std::vector<ColorPixel> color_pixels;
   std::array<TextureInput,SourceRoleCount> sources;
   float occlusion_strength=1;
+  Extent native_extent() const noexcept {return {parameters.resolution,parameters.resolution};}
+  Extent extent(unsigned channels) const noexcept {
+    auto result=native_extent();
+    for(unsigned i=0;i<sources.size();++i)if(channels&source_channels[i]){
+      if(sources[i].width>result.width)result.width=sources[i].width;
+      if(sources[i].height>result.height)result.height=sources[i].height;
+    }
+    return result;
+  }
+  bool expanded() const noexcept {return extent(material_channels)!=native_extent();}
+  std::array<OutputGrid,4> output_grids() const noexcept;
   size_t bake_and_projection_bytes() const noexcept {
     return bake.size_bytes()+projected_color.size()+baked_pbr_color.size();
   }
@@ -57,7 +69,7 @@ struct Input {
     return bytes;
   }
   size_t axis_count() const noexcept {
-    size_t count=0;
+    size_t count=projected_columns.size()+projected_rows.size();
     for(const auto &source:sources)count+=source.columns.size()+source.rows.size();
     return count;
   }
@@ -79,6 +91,10 @@ struct Input {
   }
   template<class Copy>
   void visit_axes(Copy copy) const {
+    if(!projected_columns.empty()){
+      copy(projected_columns);
+      copy(projected_rows);
+    }
     for(const auto &source:sources)if(!source.columns.empty()){
       copy(source.columns);
       copy(source.rows);
@@ -103,6 +119,7 @@ struct Input {
   SourceMaterial device_sources(const uint8_t *images,const detail::SourceTextureAxis *axes) const noexcept {
     SourceMaterial result;
     result.occlusion_strength=occlusion_strength;
+    if(!projected_columns.empty())axes+=projected_columns.size()+projected_rows.size();
     size_t offset=bake_and_projection_bytes();
     for(size_t role=0;role<sources.size();++role){
       const auto &source=sources[role];
@@ -119,27 +136,42 @@ struct Input {
     return result;
   }
   SourceCoordinateBatch device_coordinate_jobs(const SourceTerms *terms,SourcePixelTaps *output,size_t stride,
-                                               SourceMaterial &material) const noexcept {
+                                               SourceMaterial &material,unsigned channels) const noexcept {
     SourceCoordinateBatch batch;
     for(size_t role=0;role<sources.size();++role){
       const auto &source=sources[role];
       if(!source.coupled())continue;
-      auto *job_output=output+batch.size*stride;
-      batch.jobs[batch.size++]=source.coordinate_job(terms,terms+source.column_terms.size(),job_output);
-      material.textures[role].mapped=job_output;
+      if(channels&source_channels[role]){
+        auto *job_output=output+batch.size*stride;
+        batch.jobs[batch.size++]=source.coordinate_job(terms,terms+source.column_terms.size(),job_output);
+        material.textures[role].mapped=job_output;
+      }
       terms+=source.column_terms.size()+source.row_terms.size();
     }
     return batch;
   }
-  PreparedColor device_colors(const uint8_t *images,const uint32_t *ids,const ColorPixel *colors) const noexcept {
+  PreparedColor device_colors(const uint8_t *images,const uint32_t *ids,const ColorPixel *colors,
+                              const detail::SourceTextureAxis *axes) const noexcept {
     if(projected_color.empty())return {};
     const auto *vertex=images+bake.size_bytes();
-    return {vertex,baked_pbr_color.empty()?nullptr:vertex+projected_color.size(),ids,colors};
+    return prepared_view(vertex,baked_pbr_color.empty()?nullptr:vertex+projected_color.size(),ids,colors,
+                         axes,projected_columns.empty()?nullptr:axes+projected_columns.size());
+  }
+  PreparedColor prepared_view(const uint8_t *vertex,const uint8_t *baked,const uint32_t *ids,const ColorPixel *colors,
+                              const detail::SourceTextureAxis *columns,const detail::SourceTextureAxis *rows) const noexcept {
+    PreparedColor view{vertex,baked,ids,colors,{}};
+    if(!projected_columns.empty())view.sampled_vertex={vertex,columns,rows,parameters.resolution,false};
+    return view;
   }
 };
 struct Result {
   std::vector<Output> pixels;
+  std::array<std::vector<uint8_t>,3> planes;
+  std::vector<ColorInfo> color_info;
+  std::vector<uint8_t> emission_coverage;
   std::vector<uint8_t> normals,pbr_colors;
+  explicit Result(const Input &);
+  OutputView view(OutputGrid,size_t first);
 };
 const Quantization &quantization();
 void validate(const Input &,const std::function<bool()> &cancelled);
@@ -148,4 +180,18 @@ void checkpoint(const std::function<bool()> &cancelled);
 // and the final cancellation check succeed. No renderer/model memory aliases.
 Result composite(const Input &,const std::function<bool()> &cancelled={});
 inline constexpr size_t chunk_pixels=65536,maximum_pixels=4*1024*1024,maximum_tile_bytes=128*1024*1024;
+inline constexpr size_t maximum_output_pixels=16*1024*1024;
+inline constexpr uint32_t maximum_extent=8192;
+inline constexpr size_t output_scratch_bytes=chunk_pixels*(sizeof(Output)+8);
+OutputView scratch_view(uint8_t *,OutputGrid,bool combined);
+template<class Copy>
+void read_output(OutputView target,OutputView scratch,size_t count,Copy copy){
+  if(target.combined)copy(target.combined,scratch.combined,count*sizeof(Output));
+  for(unsigned plane=0;plane<3;++plane)if(target.images[plane])
+    copy(target.images[plane],scratch.images[plane],count*4);
+  if(target.color_info)copy(target.color_info,scratch.color_info,count*sizeof(ColorInfo));
+  if(target.emission_coverage)copy(target.emission_coverage,scratch.emission_coverage,count);
+  if(target.normal)copy(target.normal,scratch.normal,count*4);
+  if(target.pbr)copy(target.pbr,scratch.pbr,count*4);
+}
 }

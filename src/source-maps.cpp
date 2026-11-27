@@ -84,7 +84,7 @@ float texel_center(uint32_t at,uint32_t extent) {
 detail::SourceTextureProducts detail::source_texture_products(const PaintSourceTexture &source,
     uint32_t width,uint32_t height){
   source.validate();
-  if(!source.image||!width||!height||width>2048||height>2048)
+  if(!source.image||!width||!height||width>8192||height>8192)
     throw std::invalid_argument("Invalid coupled source texture grid");
   const auto &m=source.uv_transform;
   const auto bits=[](double value){return std::bit_cast<uint64_t>(value);};

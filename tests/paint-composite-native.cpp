@@ -54,7 +54,10 @@ paint_compute::Result wrapped_composite(const paint_compute::Input&in,const std:
  if(!in.projected_color.empty())++prepared_calls;
  if(!in.sources[paint_compute::SourceColor].rgba.empty())++textured_calls;
  if(f==1)throw std::runtime_error("Injected completed-composite failure");
- if(f==2)result.pixels.back().reserved=1;
+ if(f==2){
+  if(result.pixels.empty())result.color_info.back().transparency=128;
+  else result.pixels.back().reserved=1;
+ }
  if(f==3&&!result.normals.empty())result.normals.pop_back();
  if(f==4&&!result.pbr_colors.empty())result.pbr_colors.pop_back();
  return result;
@@ -100,8 +103,10 @@ int main()try{
   }
   check(baked->composite(a)->baked_base==baked->baked(),"Retrying the baked composite retains its immutable Bake owner");
  }
- for(bool textured:{false,true}){
-  auto colored=source_color_fixture::model(false,true,false,512,textured);
+ for(unsigned variant:{0,1,2}){
+  const bool textured=variant!=0,large=variant==2;
+  const uint32_t source_width=large?703:2,source_height=large?535:2;
+  auto colored=source_color_fixture::model(false,true,false,512,textured,source_width,source_height);
   auto &object=colored.active();
   Brush brush;brush.from=brush.to={.23f,.24f,0};brush.radius=.23f;brush.normal={0,0,1};
   PaintSettings paint;paint.color={.93f,.57f,.13f,1};paint.flow=.71f;paint.front_only=false;
@@ -134,9 +139,18 @@ int main()try{
   check(prepared_calls==dispatch+1&&equal(*expected_prepared,*current_prepared)&&restarted.encode()==archive&&
         current_prepared->source_maps==object.painted->source_maps(),
         "Prepared color, resolved Bake, alpha and the archive match the independent native reference byte for byte");
+  check(current_prepared->color.width==(large?source_width:512)&&current_prepared->color.height==(large?source_height:512)&&
+        current_prepared->pbr_color.width==current_prepared->color.width&&current_prepared->pbr_color.height==current_prepared->color.height&&
+        current_prepared->metal_rough.width==512&&current_prepared->metal_rough.height==512,
+        "Original image dimensions govern only the affected native material outputs");
   fault=4;
   check(refuses([&]{object.painted->composite(a);})&&object.painted->composite(b)==current_prepared&&colored.encode()==archive,
         "Truncated prepared color publishes no maps and leaves the baked source and previous cache exact");
+  if(large){
+   fault=2;
+   check(refuses([&]{object.painted->composite(a);})&&object.painted->composite(b)==current_prepared&&colored.encode()==archive,
+         "An invalid expanded passthrough result preserves the complete source and held composite");
+  }
   check(object.painted->composite(a)->color_projection==prepared.paint->color_projection(),
         "Prepared color retry keeps the original projection owner");
   if(textured){

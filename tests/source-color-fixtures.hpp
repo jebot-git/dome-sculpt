@@ -8,7 +8,8 @@
 #include <bit>
 namespace source_color_fixture {
 using namespace dome;
-inline std::vector<uint8_t> bytes(bool zero_colors=false,bool direction_targets=true,bool curved=false,bool textured=true){
+inline std::vector<uint8_t> bytes(bool zero_colors=false,bool direction_targets=true,bool curved=false,bool textured=true,
+                                  uint32_t color_width=2,uint32_t color_height=2){
  nlohmann::json j={{"asset",{{"version","2.0"},{"extras",{{"license","CC0"}}}}},{"bufferViews",nlohmann::json::array()},{"accessors",nlohmann::json::array()}};std::vector<uint8_t> bin;
  auto word=[](std::vector<uint8_t>&b,uint32_t x){for(unsigned k=0;k<4;++k)b.push_back(uint8_t(x>>(8*k)));};
  auto view=[&](const std::vector<uint8_t>&b){while(bin.size()%4)bin.push_back(0);int id=int(j["bufferViews"].size());j["bufferViews"].push_back({{"buffer",0},{"byteOffset",bin.size()},{"byteLength",b.size()}});bin.insert(bin.end(),b.begin(),b.end());return id;};
@@ -22,6 +23,14 @@ inline std::vector<uint8_t> bytes(bool zero_colors=false,bool direction_targets=
  j["materials"]={{{"pbrMetallicRoughness",{{"baseColorFactor",{.6f,.4f,.2f,1}},{"metallicFactor",0},{"roughnessFactor",.8f}}},{"alphaMode","OPAQUE"}}};
  if(textured){
   Image diffuse{2,2,{80,160,240,255,220,80,140,255,160,220,64,255,240,128,192,255}},bump{1,1,{230,153,204,255}};
+  if(color_width!=2||color_height!=2){
+   diffuse={color_width,color_height,std::vector<uint8_t>(size_t(color_width)*color_height*4)};
+   for(uint32_t y=0;y<color_height;++y)for(uint32_t x=0;x<color_width;++x){
+    auto *pixel=diffuse.rgba.data()+(size_t(y)*color_width+x)*4;
+    pixel[0]=uint8_t(x*11+y*7);pixel[1]=uint8_t(x/3+y*13);pixel[2]=uint8_t(x*17+y/5);
+    pixel[3]=255;
+   }
+  }
   int c=view(diffuse.png()),n=view(bump.png());j["images"]={{{"mimeType","image/png"},{"bufferView",c}},{{"mimeType","image/png"},{"bufferView",n}}};
   j["samplers"]={{{"wrapS",33071},{"wrapT",33071},{"minFilter",9729},{"magFilter",9729}}};j["textures"]={{{"source",0},{"sampler",0}},{{"source",1},{"sampler",0}}};
   j["materials"][0]["pbrMetallicRoughness"]["baseColorTexture"]={{"index",0}};
@@ -30,8 +39,9 @@ inline std::vector<uint8_t> bytes(bool zero_colors=false,bool direction_targets=
  j["meshes"]={{{"weights",{0}},{"primitives",{{{"attributes",{{"POSITION",pos},{"NORMAL",normal},{"TEXCOORD_0",uv},{"COLOR_0",color},{"TANGENT",tangent}}},{"indices",ix},{"material",0},{"targets",{{{"POSITION",dp},{"NORMAL",dn},{"TANGENT",dt}}}}}}}}};if(!direction_targets){auto &target=j["meshes"][0]["primitives"][0]["targets"][0];target.erase("NORMAL");target.erase("TANGENT");}j["nodes"]={{{"mesh",0}}};j["scenes"]={{{"nodes",{0}}}};j["scene"]=0;
  while(bin.size()%4)bin.push_back(0);j["buffers"]={{{"byteLength",bin.size()}}};auto text=j.dump();while(text.size()%4)text.push_back(' ');std::vector<uint8_t> out;for(auto v:{0x46546c67u,2u,uint32_t(28+text.size()+bin.size()),uint32_t(text.size()),0x4e4f534au})word(out,v);out.insert(out.end(),text.begin(),text.end());word(out,uint32_t(bin.size()));word(out,0x004e4942);out.insert(out.end(),bin.begin(),bin.end());return out;
 }
-inline Scene model(bool zero_colors=false,bool direction_targets=true,bool curved=false,uint32_t resolution=64,bool textured=true){
- auto raw=std::make_shared<const std::vector<uint8_t>>(bytes(zero_colors,direction_targets,curved,textured));ImportLimits limits;limits.mode=ImportMode::PreserveGltf;auto asset=std::make_shared<const ImportedAsset>(import_glb(*raw,limits));const auto &p=asset->primitives.at(0);
+inline Scene model(bool zero_colors=false,bool direction_targets=true,bool curved=false,uint32_t resolution=64,bool textured=true,
+                   uint32_t color_width=2,uint32_t color_height=2){
+ auto raw=std::make_shared<const std::vector<uint8_t>>(bytes(zero_colors,direction_targets,curved,textured,color_width,color_height));ImportLimits limits;limits.mode=ImportMode::PreserveGltf;auto asset=std::make_shared<const ImportedAsset>(import_glb(*raw,limits));const auto &p=asset->primitives.at(0);
  auto appearance=std::make_shared<CreatorAppearance>();appearance->asset=asset;appearance->original_bytes=raw;appearance->source_mesh=p.source_mesh;appearance->source_primitive=p.source_primitive;appearance->material=int(p.material);appearance->source_material=int(p.material)-1;appearance->source_node=0;uint32_t length=0;for(unsigned k=0;k<4;++k)length|=uint32_t(raw->at(12+k))<<(k*8);auto json=nlohmann::json::parse(raw->begin()+20,raw->begin()+20+length);appearance->material_json=json.at("materials").at(appearance->source_material).dump();appearance->source_basis_quaternion=Quat{};appearance->source_morph_targets={0};for(uint32_t v=0;v<p.mesh.positions.size();++v)appearance->source_vertices.push_back(v);auto images=std::make_shared<std::vector<std::shared_ptr<const Image>>>();for(const auto &im:asset->images)images->push_back(std::make_shared<const Image>(decode_projection_png(im.bytes)));appearance->decoded_images=images;
  std::shared_ptr<PaintedMesh> paint;
  if(textured){

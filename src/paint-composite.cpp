@@ -15,6 +15,57 @@ const Quantization &quantization(){
   }return q;
  }();return table;
 }
+std::array<OutputGrid,4> Input::output_grids() const noexcept {
+ std::array<OutputGrid,4> grids{};
+ auto add=[&](Extent extent,unsigned channel){
+  for(auto &grid:grids)if(!grid.channels||grid.extent==extent){
+   grid.extent=extent;
+   grid.channels|=channel;
+   return;
+  }
+ };
+ add(extent(Color),Color|(projected_color.empty()?0u:Pbr));
+ add(extent(Orm),Orm);
+ add(extent(Emission),Emission);
+ if(!bake.normal.empty())add(native_extent(),Normal);
+ return grids;
+}
+Result::Result(const Input &input){
+ if(input.expanded()){
+  for(unsigned plane=0;plane<planes.size();++plane)planes[plane].resize(input.extent(1u<<plane).size()*4);
+  color_info.resize(input.extent(Color).size());
+  emission_coverage.resize(input.extent(Emission).size());
+ }else pixels.resize(input.native_extent().size());
+ if(!input.projected_color.empty())pbr_colors.resize(input.extent(Color).size()*4);
+ if(!input.bake.normal.empty())normals.resize(input.native_extent().size()*4);
+}
+OutputView Result::view(OutputGrid grid,size_t first){
+ OutputView view;
+ if(!pixels.empty())view.combined=pixels.data()+first;
+ else{
+  for(unsigned plane=0;plane<planes.size();++plane)if(grid.writes(1u<<plane))
+   view.images[plane]=planes[plane].data()+4*first;
+  if(grid.writes(Color))view.color_info=color_info.data()+first;
+  if(grid.writes(Emission))view.emission_coverage=emission_coverage.data()+first;
+ }
+ if(grid.writes(Pbr))view.pbr=pbr_colors.data()+4*first;
+ if(grid.writes(Normal))view.normal=normals.data()+4*first;
+ return view;
+}
+OutputView scratch_view(uint8_t *buffer,OutputGrid grid,bool combined){
+ static_assert(alignof(Output)==1&&alignof(ColorInfo)==1);
+ auto reserve=[&](size_t bytes){auto *slice=buffer;buffer+=bytes*chunk_pixels;return slice;};
+ OutputView view;
+ if(combined)view.combined=reinterpret_cast<Output *>(reserve(sizeof(Output)));
+ else{
+  for(unsigned plane=0;plane<3;++plane)if(grid.writes(1u<<plane))view.images[plane]=reserve(4);
+  if(grid.writes(Color))view.color_info=reinterpret_cast<ColorInfo *>(reserve(sizeof(ColorInfo)));
+  if(grid.writes(Emission))view.emission_coverage=reserve(1);
+ }
+ if(grid.writes(Pbr))view.pbr=reserve(4);
+ if(grid.writes(Normal))view.normal=reserve(4);
+ return view;
+}
 void validate(const Input &in,const std::function<bool()> &cancelled){
  checkpoint(cancelled);const auto &p=in.parameters;const uint64_t count=uint64_t(p.resolution)*p.resolution,tiles=uint64_t((p.resolution+31)/32)*((p.resolution+31)/32);
  if(p.resolution<32||p.resolution>2048||p.resolution%32||count>maximum_pixels||p.layers>128||p.layers!=in.layers.size()||p.tiles!=tiles||in.tiles.size()!=tiles*p.layers||in.padding.size()!=count||in.pixels.size()%1024||in.pixels.size()>maximum_tile_bytes/sizeof(Pixel)||count*std::max(1u,p.layers)>128*1024*1024)throw std::length_error("Paint composite packet exceeds bounded dimensions/work");
@@ -36,22 +87,45 @@ void validate(const Input &in,const std::function<bool()> &cancelled){
    throw std::out_of_range("Prepared color tile owner is invalid");
  if(!std::isfinite(in.occlusion_strength)||in.occlusion_strength<0||in.occlusion_strength>1)
   throw std::invalid_argument("Invalid source texture occlusion strength");
- for(const auto &source:in.sources){
+ for(unsigned role=0;role<in.sources.size();++role){
+  const auto &source=in.sources[role];
   if(source.rgba.empty()){
    if(source.width||source.height||!source.columns.empty()||!source.rows.empty()||
       !source.column_terms.empty()||!source.row_terms.empty())
     throw std::invalid_argument("Source texture coordinates have no image owner");
    continue;
   }
-  if(!source.width||!source.height||source.width>p.resolution||source.height>p.resolution||
+  if(!source.width||!source.height||source.width>maximum_extent||source.height>maximum_extent||
      source.rgba.size()!=4*size_t(source.width)*source.height)
-   throw std::invalid_argument("Source texture inputs do not fit the compositor grid");
+   throw std::invalid_argument("Source texture image exceeds the compositor limits");
+ }
+ for(const auto &grid:in.output_grids())if(grid.extent.size()>maximum_output_pixels)
+  throw std::length_error("Composited original texture exceeds output pixel budget");
+ if(in.expanded()&&!std::has_single_bit(p.resolution))
+  throw std::invalid_argument("Expanded material grids require a native power-of-two paint grid");
+ const auto check_axis=[](std::span<const detail::SourceTextureAxis> taps,uint32_t extent){
+  for(const auto &tap:taps){
+   if(uint32_t(tap.first)>=extent||uint32_t(tap.second)>=extent||!std::isfinite(tap.fraction)||tap.fraction<0||tap.fraction>1)
+    throw std::out_of_range("Source texture tap is outside the declared image");
+  }
+ };
+ const auto color_grid=in.extent(Color);
+ const bool sample_projection=prepared&&color_grid!=in.native_extent();
+ if(in.projected_columns.size()!=(sample_projection?color_grid.width:0)||
+    in.projected_rows.size()!=(sample_projection?color_grid.height:0))
+  throw std::invalid_argument("Prepared vertex color coordinates do not fit the expanded grid");
+ check_axis(in.projected_columns,p.resolution);
+ check_axis(in.projected_rows,p.resolution);
+ for(unsigned role=0;role<in.sources.size();++role){
+  const auto &source=in.sources[role];
+  if(source.rgba.empty())continue;
+  const auto extent=in.extent(source_channels[role]);
   checkpoint(cancelled);
   if(source.coupled()){
    const auto valid_mode=[](int mode){return mode==33071||mode==33648||mode==10497;};
    const auto valid_term=[](uint64_t v){return (v&0x7fffffffffffffffull)<=std::bit_cast<uint64_t>(10000.);};
-   if(!source.columns.empty()||!source.rows.empty()||source.column_terms.size()!=p.resolution||
-      source.row_terms.size()!=p.resolution||!valid_mode(source.transform.wrap_s)||!valid_mode(source.transform.wrap_t)||
+   if(!source.columns.empty()||!source.rows.empty()||source.column_terms.size()!=extent.width||
+      source.row_terms.size()!=extent.height||!valid_mode(source.transform.wrap_s)||!valid_mode(source.transform.wrap_t)||
       !valid_term(source.transform.offset_u)||!valid_term(source.transform.offset_v))
     throw std::invalid_argument("Invalid coupled source texture transform");
    for(const auto terms:{source.column_terms,source.row_terms})
@@ -59,14 +133,8 @@ void validate(const Input &in,const std::function<bool()> &cancelled){
      throw std::invalid_argument("Coupled source texture term exceeds the transform bounds");
    continue;
   }
-  if(source.columns.size()!=p.resolution||source.rows.size()!=p.resolution||!source.row_terms.empty())
+  if(source.columns.size()!=extent.width||source.rows.size()!=extent.height||!source.row_terms.empty())
    throw std::invalid_argument("Source texture coordinates do not fit the compositor grid");
-  const auto check_axis=[&](std::span<const detail::SourceTextureAxis> taps,uint32_t extent){
-   for(const auto &tap:taps){
-    if(uint32_t(tap.first)>=extent||uint32_t(tap.second)>=extent||!std::isfinite(tap.fraction)||tap.fraction<0||tap.fraction>1)
-     throw std::out_of_range("Source texture tap is outside the declared image");
-   }
-  };
   check_axis(source.columns,source.width);
   check_axis(source.rows,source.height);
  }

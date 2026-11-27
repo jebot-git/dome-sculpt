@@ -5,31 +5,30 @@
 namespace dome::paint_compute {
 Result composite(const Input &in,const std::function<bool()> &cancelled){
  validate(in,cancelled);const auto &q=quantization();
- Result out;
- out.pixels.resize(in.padding.size());
- if(!in.bake.normal.empty())out.normals.resize(4*in.padding.size());
- if(!in.projected_color.empty())out.pbr_colors.resize(4*in.padding.size());
+ Result out(in);
  const auto bake=in.bake.view();
- const PreparedColor prepared{in.projected_color.data(),in.baked_pbr_color.data(),
-                              in.color_tiles.empty()?nullptr:in.color_tiles.data(),in.color_pixels.data()};
- auto source=in.source_views();
- SourceCoordinateBatch batch;
- SourcePixelTaps mapped[SourceRoleCount];
- for(size_t role=0;role<in.sources.size();++role){
-  const auto &texture=in.sources[role];
-  if(!texture.coupled())continue;
-  source.textures[role].mapped=&mapped[batch.size];
-  batch.jobs[batch.size]=texture.coordinate_job(texture.column_terms.data(),texture.row_terms.data(),&mapped[batch.size]);
-  ++batch.size;
- }
- for(size_t i=0;i<out.pixels.size();++i){
-  if((i&4095)==0)checkpoint(cancelled);
-  auto *pbr=out.pbr_colors.empty()?nullptr:out.pbr_colors.data()+4*i;
-  source.first=uint32_t(i);
-  for(unsigned j=0;j<batch.size;++j)
-   mapped[j]=source_coordinates(batch.jobs[j],uint32_t(i)%in.parameters.resolution,uint32_t(i)/in.parameters.resolution);
-  out.pixels[i]=compose(uint32_t(i),in.parameters,in.layers.data(),in.tiles.data(),in.pixels.data(),in.padding.data(),bake,prepared,source,q,pbr);
-  if(!out.normals.empty())compose_normal(in.padding[i],bake,q,out.normals.data()+4*i);
+ const auto prepared=in.prepared_view(in.projected_color.data(),in.baked_pbr_color.data(),
+     in.color_tiles.empty()?nullptr:in.color_tiles.data(),in.color_pixels.data(),in.projected_columns.data(),in.projected_rows.data());
+ for(const auto grid:in.output_grids()){
+  if(!grid.channels)break;
+  auto source=in.source_views();
+  SourceCoordinateBatch batch;
+  SourcePixelTaps mapped[SourceRoleCount];
+  for(size_t role=0;role<in.sources.size();++role){
+   const auto &texture=in.sources[role];
+   if(!texture.coupled()||!grid.writes(source_channels[role]))continue;
+   source.textures[role].mapped=&mapped[batch.size];
+   batch.jobs[batch.size]=texture.coordinate_job(texture.column_terms.data(),texture.row_terms.data(),&mapped[batch.size]);
+   ++batch.size;
+  }
+  const auto view=out.view(grid,0);
+  for(uint32_t at=0;at<grid.extent.size();++at){
+   if((at&4095)==0)checkpoint(cancelled);
+   source.first=at;
+   for(unsigned j=0;j<batch.size;++j)
+    mapped[j]=source_coordinates(batch.jobs[j],at%grid.extent.width,at/grid.extent.width);
+   write_output(view,grid,at,at,in.parameters,in.layers.data(),in.tiles.data(),in.pixels.data(),in.padding.data(),bake,prepared,source,q);
+  }
  }
  checkpoint(cancelled);return out;
 }

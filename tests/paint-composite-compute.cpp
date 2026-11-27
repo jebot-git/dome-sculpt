@@ -19,7 +19,8 @@ size_t checks=0;void check(bool b,const char*m){++checks;if(!b)throw std::runtim
 uint8_t byte(float v){return uint8_t(std::lround(std::clamp(v,0.f,1.f)*255));}
 float unit(uint8_t v){return float(v)/255;}
 using SourceSamples=std::array<std::array<float,4>,SourceRoleCount>;
-Output reference(const Input &in,size_t at,std::array<uint8_t,4> *prepared=nullptr,const SourceSamples *samples=nullptr){
+Output reference(const Input &in,size_t at,std::array<uint8_t,4> *prepared=nullptr,const SourceSamples *samples=nullptr,
+                 const std::array<float,4> *vertex=nullptr){
  const auto &p=in.parameters;float c[]{p.color[0],p.color[1],p.color[2],p.color[3]},e[]{p.emission[0],p.emission[1],p.emission[2]},ao=1,rough=p.roughness,metal=p.metallic,cc=0,ec=0;const auto owner=in.padding[at];
  if(samples){
   for(size_t k=0;k<4;++k)c[k]*=(*samples)[SourceColor][k];
@@ -28,7 +29,7 @@ Output reference(const Input &in,size_t at,std::array<uint8_t,4> *prepared=nullp
   ao=1-in.occlusion_strength*(1-(*samples)[SourceOcclusion][0]);
  }
  std::array<float,4> pbr{};
- if(prepared)for(size_t k=0;k<4;++k)pbr[k]=c[k]*unit(in.projected_color[4*at+k]);
+ if(prepared)for(size_t k=0;k<4;++k)pbr[k]=c[k]*(vertex?(*vertex)[k]:unit(in.projected_color[4*at+k]));
  const auto decode_color=[](uint8_t v,size_t k){return k==3?unit(v):srgb_to_linear(unit(v));};
  if(owner>=0){const auto x=uint32_t(owner)%p.resolution,y=uint32_t(owner)/p.resolution,t=(y/32)*((p.resolution+31)/32)+x/32,pixel=(y%32)*32+x%32;
   if(!in.bake.coverage.empty()){
@@ -114,11 +115,11 @@ struct SourceFixture {
  std::array<PaintSourceTexture,SourceRoleCount> textures;
  std::array<std::optional<detail::SourceTextureGrid>,SourceRoleCount> grids;
  std::array<detail::SourceTextureProducts,SourceRoleCount> products;
- explicit SourceFixture(Input &in,unsigned coupled_roles=0){
-  const auto r=in.parameters.resolution;
+ explicit SourceFixture(Input &in,unsigned coupled_roles=0,bool expanded=false){
   std::mt19937 rng(0x56e0c);
   for(size_t role=0;role<textures.size();++role){
-   const uint32_t width=19+uint32_t(role)*3,height=11+uint32_t(role);
+   constexpr std::array<Extent,SourceRoleCount> expanded_extents{{{2053,19},{341,22},{146,129},{27,237}}};
+   const auto [width,height]=expanded?expanded_extents[role]:Extent{19+uint32_t(role)*3,11+uint32_t(role)};
    auto image=std::make_shared<Image>(Image{width,height,std::vector<uint8_t>(4*size_t(width)*height)});
    for(auto &byte:image->rgba)byte=uint8_t(rng());
    auto &texture=textures[role];texture.image=image;
@@ -135,15 +136,20 @@ struct SourceFixture {
     }};
     texture.uv_transform=transforms[role];
    }
-   const auto &grid=grids[role].emplace(texture,r,r,role==SourceColor||role==SourceEmission);
    auto &input=in.sources[role];
    input.rgba=image->rgba;
    input.width=width;
    input.height=height;
    input.nearest=texture.mag_filter==9728;
+  }
+  for(size_t role=0;role<textures.size();++role){
+   const auto &texture=textures[role];
+   const auto [width,height]=in.extent(source_channels[role]);
+   const auto &grid=grids[role].emplace(texture,width,height,role==SourceColor||role==SourceEmission);
+   auto &input=in.sources[role];
    if(coupled_roles&(1u<<role)){
     auto &terms=products[role];
-    terms=detail::source_texture_products(texture,r,r);
+    terms=detail::source_texture_products(texture,width,height);
     input.column_terms=terms.columns;
     input.row_terms=terms.rows;
     input.transform=terms.transform;
@@ -154,10 +160,26 @@ struct SourceFixture {
   }
   in.occlusion_strength=.47f;
  }
- SourceSamples sample(uint32_t x,uint32_t y)const{
+ SourceSamples sample(uint32_t x,uint32_t y,unsigned channels=material_channels)const{
   SourceSamples result;
-  for(size_t role=0;role<grids.size();++role)result[role]=grids[role]->sample(x,y);
+  for(size_t role=0;role<grids.size();++role)
+   result[role]=channels&source_channels[role]?grids[role]->sample(x,y):std::array<float,4>{1,1,1,1};
   return result;
+ }
+};
+struct VertexFixture {
+ PaintSourceTexture texture;
+ std::optional<detail::SourceTextureGrid> grid;
+ VertexFixture(Input &input,const BakeFixture &bake){
+  const auto r=input.parameters.resolution;
+  texture.image=std::make_shared<Image>(Image{r,r,bake.color});
+  texture.wrap_s=texture.wrap_t=33071;
+  const auto extent=input.extent(Color);
+  auto &sampling=grid.emplace(texture,extent.width,extent.height,false);
+  input.projected_color=texture.image->rgba;
+  input.projected_columns=sampling.columns();
+  input.projected_rows=sampling.rows();
+  input.baked_pbr_color=bake.orm;
  }
 };
 template<class F>bool refuses(F f){try{f();return false;}catch(const std::exception&e){std::cout<<"REFUSAL "<<e.what()<<'\n';return true;}}
@@ -171,7 +193,10 @@ int main(int argc,char**argv)try{
   check(refuses([&]{paint_compute::composite(in);}),"Missing device silently returned CPU prepared color composite");
   const SourceFixture source(in,0b0101);
   check(refuses([&]{paint_compute::composite(in);}),"Missing device silently returned CPU textured paint composite");
-  std::cout<<"PASS selected-backend missing-device refusal for plain, baked, prepared and textured paint\n";return 0;
+  auto separate=fixture(64,2,41);
+  const SourceFixture expanded(separate,0b0111,true);
+  check(refuses([&]{paint_compute::composite(separate);}),"Missing device silently returned CPU expanded texture composite");
+  std::cout<<"PASS selected-backend missing-device refusal for plain, baked, prepared and expanded textured paint\n";return 0;
  }
 #ifdef DOME_TEST_SYCL
  sycl::device device{sycl::gpu_selector_v};auto name=device.get_info<sycl::info::device::name>();auto pci=device.get_info<sycl::ext::intel::info::device::pci_address>();std::cout<<"ACTUAL_GPU "<<name<<" pci="<<pci<<'\n';if(std::getenv("DOME_REQUIRE_ARC_PCI03"))check(name.find("Arc")!=std::string::npos&&name.find("A770")!=std::string::npos&&pci=="0000:03:00.0","Wrong requested paint compute device");
@@ -247,6 +272,49 @@ int main(int argc,char**argv)try{
    bad=in;bad.color_tiles[0]=uint32_t(bad.color_pixels.size()/1024);
    check(refuses([&]{paint_compute::composite(bad);}),"Invalid alternate color tile was submitted to the GPU");
   }
+ }
+ {
+  auto expanded=fixture(128,4,775);
+  const SourceFixture source(expanded,0b1111,true);
+  const BakeFixture baked(expanded.padding.size());expanded.bake=baked.images();
+  const VertexFixture vertex(expanded,baked);
+  attach_prepared_tiles(expanded);
+  const auto result=paint_compute::composite(expanded);
+  check(result.pixels.empty(),"Unequal output grids must not stage interleaved color, ORM and emission");
+  const std::array extents{Extent{2053,128},Extent{341,237},Extent{146,129}};
+  for(unsigned plane=0;plane<extents.size();++plane){
+   const auto [width,height]=extents[plane];
+   check(result.planes[plane].size()==4*size_t(width)*height,"Expanded material retained the wrong native width or height");
+   for(uint32_t y=0;y<height;++y)for(uint32_t x=0;x<width;++x){
+    const uint32_t r=expanded.parameters.resolution;
+    const auto native_x=uint32_t(((float(x)+.5f)/width)*r),native_y=uint32_t(((float(y)+.5f)/height)*r);
+    const size_t at=size_t(y)*width+x;
+    const auto sampled=source.sample(x,y,1u<<plane);
+    const auto projected=plane==0?vertex.grid->sample(x,y):std::array<float,4>{};
+    std::array<uint8_t,4> pbr{};
+    const auto expected=reference(expanded,size_t(native_y)*r+native_x,
+                                  plane==0?&pbr:nullptr,&sampled,&projected);
+    const uint8_t *rgba[]{expected.color,expected.orm,expected.emission};
+    check(std::equal(rgba[plane],rgba[plane]+4,result.planes[plane].data()+4*at),"Expanded texture differs from historical sampling, padding, Bake or paint");
+    if(plane==0){
+     check(std::equal(pbr.begin(),pbr.end(),result.pbr_colors.data()+4*at),"Expanded prepared vertex color was not bilinearly sampled");
+     check(result.color_info[at].transparency==expected.transparent&&result.color_info[at].coverage==expected.color_coverage,"Expanded alpha and color coverage differ from the native oracle");
+    }
+    if(plane==2)check(result.emission_coverage[at]==expected.emission_coverage,"Expanded emission coverage differs from the native oracle");
+   }
+  }
+  check(result.normals.size()==expanded.padding.size()*4,"Bake normals must stay on the native paint grid");
+  for(size_t at=0;at<expanded.padding.size();++at){
+   const auto normal=reference_normal(expanded,at);
+   check(std::equal(normal.begin(),normal.end(),result.normals.data()+4*at),"Expanded material changed native Bake normals");
+  }
+  auto malformed=expanded;malformed.projected_columns=malformed.projected_columns.subspan(1);
+  check(refuses([&]{paint_compute::composite(malformed);}),"Malformed expanded vertex color grid was submitted to the GPU");
+  auto oversized=fixture(128,0,1);
+  std::vector<uint8_t> thin(8192*4);
+  oversized.sources[SourceOrm].width=8192;oversized.sources[SourceOrm].height=1;oversized.sources[SourceOrm].rgba=thin;
+  oversized.sources[SourceOcclusion].width=1;oversized.sources[SourceOcclusion].height=8192;oversized.sources[SourceOcclusion].rgba=thin;
+  check(refuses([&]{paint_compute::composite(oversized);}),"Combined ORM layout exceeds the native output budget");
  }
  in=fixture(64,3,99);for(int i=0;i<5;++i){auto bad=in;if(i==0)bad.padding[0]=-2;if(i==1)bad.tiles[1]=UINT32_MAX-1;if(i==2)bad.layers[0].first_tile=1;if(i==3)bad.parameters.color[0]=NAN;if(i==4)bad.parameters.resolution=4096;check(refuses([&]{paint_compute::composite(bad);}),"Invalid packet was dispatched");}
  const BakeFixture baked(in.padding.size());in.bake=baked.images();

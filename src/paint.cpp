@@ -4793,13 +4793,7 @@ namespace {
 auto composite_source_textures(const PaintSourceMaps &maps){
  return std::array{&maps.color,&maps.metal_rough,&maps.emission,&maps.occlusion};
 }
-bool gpu_source_textures_eligible(const PaintSourceMaps &maps,uint32_t resolution){
- return std::ranges::all_of(composite_source_textures(maps),[&](const auto *source){
-  return !source->image||(source->image->width<=resolution&&source->image->height<=resolution);
- });
-}
 bool gpu_plain_composite_eligible(uint32_t r,const std::vector<PaintLayer> &layers,bool material_input,bool projected){
- if(compute_backend()=="CPU"||r<512||r>2048)return false;
  size_t contributing=0;
  for(const auto &l:layers){
   if(!projected&&std::any_of(l.pbr_tiles.begin(),l.pbr_tiles.end(),[](const auto &p){return bool(p);}))return false;
@@ -4829,21 +4823,37 @@ std::shared_ptr<TextureMaps> gpu_plain_composite(uint32_t r,const std::vector<Pa
   input.width=texture.image->width;
   input.height=texture.image->height;
   input.nearest=texture.mag_filter==9728;
+ }
+ for(size_t role=0;role<textures.size();++role){
+  const auto &texture=*textures[role];
+  if(!texture.image)continue;
+  auto &input=in.sources[role];
+  const auto extent=in.extent(source_channels[role]);
   if(texture.uv_transform[1]!=0||texture.uv_transform[2]!=0){
    auto &products=source_products[role];
-   products=detail::source_texture_products(texture,r,r);
+   products=detail::source_texture_products(texture,extent.width,extent.height);
    input.column_terms=products.columns;
    input.row_terms=products.rows;
    input.transform=products.transform;
   }else{
-   const auto &grid=source_grids[role].emplace(texture,r,r,false);
+   const auto &grid=source_grids[role].emplace(texture,extent.width,extent.height,false);
    input.columns=grid.columns();
    input.rows=grid.rows();
   }
  }
  in.occlusion_strength=source.occlusion_strength;
+ std::optional<detail::SourceTextureGrid> projected_grid;
  if(projection){
   in.projected_color=projection->vertex_rgba->rgba;
+  const auto extent=in.extent(Color);
+  if(extent!=in.native_extent()){
+   PaintSourceTexture vertex;
+   vertex.image=projection->vertex_rgba;
+   vertex.wrap_s=vertex.wrap_t=33071;
+   const auto &grid=projected_grid.emplace(vertex,extent.width,extent.height,false);
+   in.projected_columns=grid.columns();
+   in.projected_rows=grid.rows();
+  }
   if(bake){
    if(bake->color_interpretation!=BakedColorInterpretation::ResolvedPbr)
     throw std::logic_error("Prepared surface contains unresolved baked colors");
@@ -4876,23 +4886,56 @@ std::shared_ptr<TextureMaps> gpu_plain_composite(uint32_t r,const std::vector<Pa
  // from the source and no output map is published until it has been checked.
  auto result=paint_compute::composite(in,cancelled);
  const auto &pixels=result.pixels;
+ const auto color_size=in.extent(Color),orm_size=in.extent(Orm),emission_size=in.extent(Emission);
+ const bool expanded=in.expanded();
  const auto expected_normals=in.bake.normal.empty()?0:4*in.padding.size();
- const auto expected_pbr=projection?4*in.padding.size():0;
- if(pixels.size()!=in.padding.size()||result.normals.size()!=expected_normals||result.pbr_colors.size()!=expected_pbr)
+ const auto expected_pbr=projection?4*color_size.size():0;
+ if(pixels.size()!=(expanded?0:in.padding.size())||result.normals.size()!=expected_normals||result.pbr_colors.size()!=expected_pbr)
   throw std::runtime_error("Paint composite backend returned invalid image sizes");
  auto maps=std::make_shared<TextureMaps>();
  if(!result.normals.empty())maps->normal={r,r,std::move(result.normals)};
- if(projection)maps->pbr_color={r,r,std::move(result.pbr_colors)};
- for(auto image:{&maps->color,&maps->metal_rough,&maps->emission})*image={r,r,std::vector<uint8_t>(size_t(r)*r*4)};
- auto coverage=[&](Image &im,bool full){const uint32_t n=full?r:1;im={n,n,std::vector<uint8_t>(size_t(n)*n*4)};for(size_t at=3;at<im.rgba.size();at+=4)im.rgba[at]=255;};
- coverage(maps->color_coverage,color_coverage);coverage(maps->emission_coverage,emission_coverage);
+ if(projection)maps->pbr_color={color_size.width,color_size.height,std::move(result.pbr_colors)};
+ const std::array extents{color_size,orm_size,emission_size};
+ const std::array images{&maps->color,&maps->metal_rough,&maps->emission};
+ for(size_t plane=0;plane<images.size();++plane){
+  const auto extent=extents[plane];
+  auto &rgba=result.planes[plane];
+  if(!expanded)rgba.resize(extent.size()*4);
+  if(rgba.size()!=extent.size()*4)throw std::runtime_error("Paint composite backend returned invalid image sizes");
+  *images[plane]={extent.width,extent.height,std::move(rgba)};
+ }
+ auto coverage=[&](Image &im,Extent extent,bool full){
+  if(!full)extent={1,1};
+  im={extent.width,extent.height,std::vector<uint8_t>(extent.size()*4)};
+  for(size_t at=3;at<im.rgba.size();at+=4)im.rgba[at]=255;
+ };
+ coverage(maps->color_coverage,color_size,color_coverage);
+ coverage(maps->emission_coverage,emission_size,emission_coverage);
  const unsigned valid_transparency=common_transparency|(projection?prepared_transparency:0);
+ auto accumulate_color=[&](size_t i,uint8_t transparent,uint8_t coverage){
+  if(transparent&~valid_transparency)throw std::runtime_error("Paint composite backend returned invalid metadata");
+  maps->transparent|=bool(transparent&common_transparency);
+  maps->pbr_transparent|=bool(transparent&prepared_transparency);
+  if(color_coverage)maps->color_coverage.rgba[i*4]=coverage;
+ };
+ if(expanded){
+  if(result.color_info.size()!=color_size.size()||result.emission_coverage.size()!=emission_size.size())
+   throw std::runtime_error("Paint composite backend returned invalid coverage sizes");
+  for(size_t i=0;i<result.color_info.size();++i){
+   if((i&4095)==0)checkpoint(cancelled);
+   const auto &color=result.color_info[i];
+   accumulate_color(i,color.transparency,color.coverage);
+  }
+  if(emission_coverage)for(size_t i=0;i<result.emission_coverage.size();++i){
+   if((i&4095)==0)checkpoint(cancelled);
+   maps->emission_coverage.rgba[i*4]=result.emission_coverage[i];
+  }
+ }
  for(size_t i=0;i<pixels.size();++i){
-  if((i&4095)==0)checkpoint(cancelled);const auto &v=pixels[i];if(v.reserved||(v.transparent&~valid_transparency))throw std::runtime_error("Paint composite backend returned invalid metadata");
+  if((i&4095)==0)checkpoint(cancelled);const auto &v=pixels[i];if(v.reserved)throw std::runtime_error("Paint composite backend returned invalid metadata");
   std::copy_n(v.color,4,maps->color.rgba.data()+i*4);std::copy_n(v.orm,4,maps->metal_rough.rgba.data()+i*4);std::copy_n(v.emission,4,maps->emission.rgba.data()+i*4);
-  maps->transparent|=bool(v.transparent&common_transparency);
-  maps->pbr_transparent|=bool(v.transparent&prepared_transparency);
-  if(color_coverage)maps->color_coverage.rgba[i*4]=v.color_coverage;if(emission_coverage)maps->emission_coverage.rgba[i*4]=v.emission_coverage;
+  accumulate_color(i,v.transparent,v.color_coverage);
+  if(emission_coverage)maps->emission_coverage.rgba[i*4]=v.emission_coverage;
  }
  checkpoint(cancelled);return maps;
 }
@@ -4978,12 +5021,16 @@ PaintedMesh::build_composite(const Material &material,const std::function<bool()
   if(color_projection_)color_projection_->validate(r);
   const PaintSourceMaps empty;
   const auto &source=source_maps_?*source_maps_:empty;
+  const auto source_textures=composite_source_textures(source);
+  const bool expanded=std::ranges::any_of(source_textures,[r](const auto *texture){
+    return texture->image&&(texture->image->width>r||texture->image->height>r);
+  });
   const bool native_grid=!surface_->paint_domain&&!sampling_attachment_&&
-      gpu_source_textures_eligible(source,r)&&!normal_projection_&&
+      !normal_projection_&&compute_backend()!="CPU"&&(r>=512||expanded)&&
       (!baked_||!baked_->emission_field);
-  const auto *bake=native_grid&&baked_&&compute_backend()!="CPU"&&r>=512&&
+  const auto *bake=native_grid&&baked_&&
       std::ranges::any_of(baked_->coverage,[](uint8_t value){return value!=0;})?baked_.get():nullptr;
-  const bool material_input=bake||color_projection_||std::ranges::any_of(composite_source_textures(source),
+  const bool material_input=bake||color_projection_||std::ranges::any_of(source_textures,
                                                                   [](const auto *texture){return bool(texture->image);});
   const bool accelerated=native_grid&&gpu_plain_composite_eligible(r,layers_,material_input,bool(color_projection_));
   auto maps=accelerated?gpu_plain_composite(r,layers_,surface_->padding,material,bake,color_projection_.get(),source,cancelled):
