@@ -86,6 +86,9 @@ int main(int argc,char**argv)try{
   std::vector<uint64_t>actors;std::vector<std::shared_ptr<const dome::detail::CurrentGridPaintPreview>>packets;std::vector<nlohmann::json>native;
   for(size_t i=0;i<5;++i){if(i)fields.duplicate(first);auto&o=fields.active();PaintSettings ink;ink.color={float(i+1)/7,.19f,.73f,.31f};stroke(*o.painted,ink,{-.2f,-.2f,0},.7f,.04f);actors.push_back(o.id);native.push_back(o.painted->encode());packets.push_back(dome::detail::CurrentGridPaintPreview::for_render(o)->current_grid_preview);}
   const auto exact=fields.encode();Compiler growth;auto initial=packets;initial.pop_back();prepare(growth,initial);auto before=growth.stats();check(before.common_tiles==4&&before.payload_bytes==4*16384,"Four actual sparse actor fields fill exactly four common input slots");
+  // Let the first resolve finish before admitting a new visible field. Old
+  // input slots are still needed for their selected owners after that fence.
+  glFinish();
   const auto copy_start=copies.size(),upload_start=uploads.size();prepare(growth,packets);const auto after=growth.stats();check(copies.size()==copy_start+1,"A fifth real COW field executes exactly one genuine GPU store copy");const auto copy=copies.back();
   check(copy.from&&copy.to&&copy.from!=copy.to&&copy.source_size==3072+4*16384&&copy.destination_size==3072+8*16384&&copy.source_offset==0&&copy.destination_offset==0&&copy.bytes==copy.source_size,"Actual GL stores grow capacity4 to8 and copy every old native byte/table entirely on the GPU");
   size_t common_uploads=0,common_bytes=0;for(size_t i=upload_start;i<uploads.size();++i)if(uploads[i].buffer==copy.to){++common_uploads;common_bytes+=size_t(uploads[i].bytes);check(uploads[i].offset==3072+4*16384,"Growth uploads only the genuinely new fifth native slot");}

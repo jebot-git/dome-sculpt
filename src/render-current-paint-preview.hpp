@@ -167,22 +167,23 @@ void main(){
  };
  Plan plan(const std::vector<Data>&inputs,size_t working){
   if(inputs.size()>512)throw std::length_error("Current-grid preview descriptor bound exceeded");Plan p;p.peak=requested_;p.names=images_;size_t scratch=0,directory=0;
+  bool builds=false;
   auto cpu=[&](size_t n){if(scratch>working||n>working-scratch)throw std::length_error("Current-grid planning exceeds declared CPU scratch budget");scratch+=n;};
   cpu(inputs.size()*1024+32768);
   auto bytes=[&](size_t n){if(n>SIZE_MAX-p.peak)throw std::length_error("Current-grid store forecast overflow");p.peak+=n;};
   for(const auto&input:inputs){auto d=data(input);if(!p.wanted.insert(d).second)continue;const auto&field=*d->layers();
    if(field.layers().size()>16)throw std::length_error("Current-grid visible layer bound exceeded");
-   if(!entries_.contains(d)){bytes(resolved_bytes(d));const auto size=std::max(size_t(1),field.layers().size()*size_t(field.resolution()/32)*(field.resolution()/32))*8;bytes(size);directory=std::max(directory,size);p.names+=(d->physical_emission()?5:3)+1;}
+   if(!entries_.contains(d)){builds=true;bytes(resolved_bytes(d));const auto size=std::max(size_t(1),field.layers().size()*size_t(field.resolution()/32)*(field.resolution()/32))*8;bytes(size);directory=std::max(directory,size);p.names+=(d->physical_emission()?5:3)+1;}
    const auto&pad=field.padding();if(p.padding.insert(pad).second&&!padding_.contains(pad)){bytes(pad->size()*4);++p.names;}
-   if(entries_.contains(d))continue;
-   for(const auto&l:field.layers())for(size_t i=0;i<l.tiles.size();++i)if(l.tiles[i]){
-    cpu(256);p.common.insert(l.tiles[i]);if(!l.emission_tiles.empty()&&l.emission_tiles[i])p.emission.insert(l.emission_tiles[i]);
-   }
   }
   cpu(directory);
-  p.common_capacity=wanted_capacity(common_,p.common,completed_);p.emission_capacity=wanted_capacity(emission_,p.emission,completed_);
-  const bool builds=std::any_of(p.wanted.begin(),p.wanted.end(),[&](const auto&d){return !entries_.contains(d);});
   if(builds){
+   // A completed resolve fence lets an unselected slot be reused. A field
+   // that is still selected keeps its inputs for subsequent material edits.
+   for(const auto&d:p.wanted)for(const auto&l:d->layers()->layers())for(size_t i=0;i<l.tiles.size();++i)if(l.tiles[i]){
+    cpu(256);p.common.insert(l.tiles[i]);if(!l.emission_tiles.empty()&&l.emission_tiles[i])p.emission.insert(l.emission_tiles[i]);
+   }
+   p.common_capacity=wanted_capacity(common_,p.common,completed_);p.emission_capacity=wanted_capacity(emission_,p.emission,completed_);
    if(!common_.buffer.name||p.common_capacity!=common_.capacity)bytes(3072+p.common_capacity*16384);
    if(!emission_.buffer.name||p.emission_capacity!=emission_.capacity)bytes(std::max(size_t(4),p.emission_capacity*28672));
    if(!common_.view.name||p.common_capacity!=common_.capacity)++p.names;if(!emission_.view.name||p.emission_capacity!=emission_.capacity)++p.names;
