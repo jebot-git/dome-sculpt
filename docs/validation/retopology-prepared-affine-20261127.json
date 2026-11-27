@@ -1,0 +1,74 @@
+{
+  "revision": "b2e77aae3e072bea1a3b565dcfe121f1d87e0f67",
+  "canonical_domed_revision": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "release_fltk": "/opt/fltk-vr/toolkit",
+  "sanitizer_fltk": "artifacts/sdk-20261126/toolkit-sanitize",
+  "release_tests": [
+    "retopology-affine",
+    "retopology-affine-wire",
+    "retopology-authoring",
+    "retopology-linked-vrm1",
+    "retopology-mixed-material",
+    "retopology-reapply-affine",
+    "retopology-reapply-plain",
+    "retopology-restore-affine",
+    "retopology-restore-plain",
+    "retopology-save-handoff",
+    "retopology-surface-heat-affine",
+    "retopology-surface-heat-plain",
+    "retopology-worker-faults"
+  ],
+  "asan_ubsan_modes": [
+    "affine-wire",
+    "mixed-material",
+    "reapply-affine",
+    "restore-affine"
+  ],
+  "sanitizer_method": "Recompiled both changed core translation units and the final fixture with generated ASan/UBSan CMake flags and relinked against the matching known core archive members",
+  "release_sanitizer_matched_native_sha256": {
+    "retopology-affine-wire/affine-wire-before.dsculpt": "5db2ee28180d058b331d5313f1301d389029bb3a8ae85f7b618ed6dd78f095b6",
+    "retopology-affine-wire/affine-wire-prepared.dsculpt": "af2b94bd6148e483f2f83fc965ce0c2859eee32569f08de1d535747687332258",
+    "retopology-mixed-material/mixed-material-quad.dsculpt": "c87d0fc2e0e541f0a17a2699784e2cb0f60be81953f0142921a6f240cfe36e3c"
+  },
+  "release_app_sha256": "ee123b045bf92ca42257c62419cb1ef0fe979fd41009413a58afe3cde831c48d",
+  "asan_ubsan_fixture_sha256": "8d1005c9c91eb6e4381117deb457f3f5c4ce534f8b7f307835c9bec8c123d656",
+  "synthetic_openxr": {
+    "arc": {
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "rgb_differences_per_eye": [
+        0,
+        0
+      ],
+      "stereo_submissions_per_state": [
+        6,
+        6
+      ],
+      "exact_reopen_and_close": true
+    },
+    "software": {
+      "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+      "rgb_differences_per_eye": [
+        0,
+        0
+      ],
+      "stereo_submissions_per_state": [
+        6,
+        6
+      ],
+      "exact_reopen_and_close": true
+    }
+  },
+  "physical_headset": false,
+  "archive_sha256": "1d76898db4d62c8def445b495cb8a539ce721eeb9b26013f837bc249f0e577c8",
+  "archive_members_sha256": {
+    "release.log": "2f86fc8619a3015edcf64a77a89d0b0443b8a3a9570ac629fca500b63f7f7b43",
+    "release-fixtures.log": "57335118d874289b192c85bf9301dcfac1d7d08b4f86d580151fd7122d230c46",
+    "sanitizer-build.log": "e58ec723fd21bd44ef7ebe47689b6a0c20a69229ce3d758a2d0a2c8f853d7c6b",
+    "sanitizer-affine-wire.log": "43dc7d99a653eb71d19d43f3c43d7c7928fd60d05342abf193da8a29c805cb16",
+    "sanitizer-mixed-material.log": "39c7b01041835af5b55fce9ef8958c5a683a74dabe634f69b0174081f2dd61c3",
+    "sanitizer-reapply-affine.log": "a99670917a9a5fefe287ccd0f71ab4482a8d09cf70d7e6ccfa09748b3ec6b48c",
+    "sanitizer-restore-affine.log": "91ea01bfff12e655238ea03ce21998c5eefb55f9f90bac25a4c716927a95bf9f",
+    "arc-synthetic-openxr.json": "968871cf19be1edbb3ae1d1fdb241d6884f5197cf4c67ced08ee692ce47fc0b1",
+    "software-synthetic-openxr.json": "eaaaf57d0311acb0753c28723ecfdefff69b1e08e4258d1b883fc43d15674f09"
+  }
+}

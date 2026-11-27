@@ -92,9 +92,17 @@ Linked Shape Restore uses the current pose of the original imported rig.
 Standard and Editable VRM reference the original humanoid joints. The
 Editable package includes genuine hidden retopology guides required by
 the exported parts and their history. Source-authored and prepared
-material grids, mixed-material face subdivision and physical-device
-workflow acceptance remain open.
+material reprojection, mixed-material face subdivision and
+physical-device workflow acceptance remain open.
 [Linked retopology evidence](validation/retopology-linked-skin-20261127.json)
+
+Affine wire edits now retain the actual local transform, original prepared
+normal field, and exact face coordinates. Native Save and Undo/Redo keep
+the retained source owners. Material slots within a quad follow surviving
+triangles by stable corner IDs across movements that cross the old material
+boundary. Support for subdivision across mixed-material diagonals remains
+required.
+[Affine and material-corner evidence](validation/retopology-prepared-affine-20261127.json)
 
 The current combined atlas and HDR cache source passes all 153 checks
 in both software Release and Intel Arc ASan/UBSan OpenXR replays. Its

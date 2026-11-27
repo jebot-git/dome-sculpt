@@ -124,6 +124,20 @@ The full Release qualification of `71e3e6df` is running as
 `ds-retopology-linked-skin-combined-release-20261127.service`.
 [Linked retopology validation](validation/retopology-linked-skin-20261127.json)
 
+Wire-only edits in the affine retopology workspace keep the original local
+surface, placement, atlas, and prepared normal owners. Apply transforms only
+new or moved wire points back into the local frame. This preserves authored
+shading through reflection and shear. When a mixed-material quad changes
+shape, surviving triangles keep their material slots by stable corner
+identity even if their centres cross the previous seam. A changed diagonal
+that crosses two existing slots requires an explicit material boundary.
+Reprojection of prepared material grids onto changed face geometry remains open.
+All 13 focused Release tests and four ASan/UBSan workflows pass. The three
+native verification files match across both profiles. Synthetic OpenXR
+reopens the prepared project with identical before and after RGB in both
+eyes on llvmpipe and Intel Arc A770.
+[Affine and material-corner validation](validation/retopology-prepared-affine-20261127.json)
+
 Surface Heat also binds meshes after independent frame and shapekey
 authoring. Retention accounts for the actual POSITION correspondences,
 artist normals and tangents, writable paint, and prepared color and normal
