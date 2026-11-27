@@ -2076,7 +2076,7 @@ void retopology_imported_pbr(bool prior_bake=false) {
 }
 
 struct PortableRetopoImages {
- Image core_orm, mtoon_base, mtoon_normal, mtoon_emission;
+ Image core_orm, mtoon_base, mtoon_normal, mtoon_emission, mtoon_shade;
 };
 
 PortableRetopoImages check_portable_retopo_mtoon(const std::filesystem::path &path,const SculptObject &patch,bool ink=false) {
@@ -2149,13 +2149,94 @@ PortableRetopoImages check_portable_retopo_mtoon(const std::filesystem::path &pa
   if(!png)throw std::runtime_error("Portable material image is not embedded");
   return decode_projection_png({png,view->size});
  };
+ const auto shade_index=extension.at("shadeMultiplyTexture").at("index").get<size_t>();
+ if(shade_index>=data->textures_count)throw std::runtime_error("Portable MToon shade texture index is out of range");
+ cgltf_texture_view shade{};
+ shade.texture=&data->textures[shade_index];
  return {read_image(core.pbr_metallic_roughness.metallic_roughness_texture),
          read_image(toon.pbr_metallic_roughness.base_color_texture),read_image(toon.normal_texture),
-         read_image(toon.emissive_texture)};
+         read_image(toon.emissive_texture),read_image(shade)};
 }
 
-void retopology_imported_mtoon(bool tinted,bool unprepared) {
+void verify_mixed_retopo_sampling(const Scene &scene,const PortableRetopoImages &exported) {
+ const auto &patch=scene.active();
+ const auto &binding=*patch.material_bindings;
+ const auto &params=binding.material.parameters;
+ const std::array shade_factor{params.shade_color.x,params.shade_color.y,params.shade_color.z};
+ const std::array emission_factor{params.emission.x,params.emission.y,params.emission.z};
+ const auto &core=*patch.painted->source_maps();
+ const auto preview=scene.preview_surfaces();
+ const auto view=std::ranges::find(preview,patch.id,&ObjectSurface::id);
+ check(view!=preview.end()&&view->textures,"The native renderer's actual derived paint and coverage maps are available");
+ const auto &derived=*view->textures;
+ const bool hdr=std::ranges::max(patch.material.emissive)>1;
+ const bool shared=binding.roles[0].image==binding.roles[1].image;
+ const auto packet=detail::PaintOverlayFactory::capture(*patch.painted);
+ const auto texture=[](const Image &image){
+  PaintSourceTexture role;
+  role.image=std::shared_ptr<const Image>(std::shared_ptr<const Image>{},&image);
+  role.wrap_s=role.wrap_t=33071;
+  role.min_filter=role.mag_filter=9729;
+  return role;
+ };
+ const auto base=texture(exported.mtoon_base),shade=texture(exported.mtoon_shade),emission=texture(exported.mtoon_emission);
+ const auto composed_base=texture(derived.color),composed_emission=texture(derived.emission);
+ const auto color_coverage=texture(derived.color_coverage),emission_coverage=texture(derived.emission_coverage);
+ float max_base=0,max_shade=0,max_emission=0;
+ size_t painted_samples=0;
+ for(unsigned y=0;y<131;++y)for(unsigned x=0;x<127;++x){
+  // These points cross both texel-center phases and avoid testing only taps.
+  const float u=(x+.31f)/127,v=(y+.73f)/131;
+  const auto srgb=[&](const PaintSourceTexture &role){return sample_source_texture(role,u,v,true);};
+  const auto linear=[&](const PaintSourceTexture &role){return sample_source_texture(role,u,v,false);};
+  const auto typed=srgb(binding.roles[size_t(MToonSlot::Base)]);
+  const auto darkness=srgb(binding.roles[size_t(MToonSlot::Shade)]);
+  const auto authored_emission=srgb(binding.roles[size_t(MToonSlot::Emission)]);
+  const auto pbr=srgb(core.color),pbr_emission=srgb(core.emission);
+  const auto composed=srgb(composed_base),composed_glow=srgb(composed_emission);
+  const float cover=linear(color_coverage)[0],glow=linear(emission_coverage)[0];
+  const auto contributions=hdr?detail::sample_overlay_values(*packet,u,v,false):detail::PaintOverlayValues{};
+  if(cover>.01f)++painted_samples;
+  const auto actual_base=srgb(base),actual_shade=srgb(shade),actual_emission=srgb(emission);
+  for(size_t k=0;k<3;++k){
+   const float typed_base=params.base_color[k]*typed[k],generic=patch.material.color[k]*pbr[k];
+   const float expected_base=cover>0?std::max(0.f,composed[k]+(typed_base-generic)*(1-cover)):typed_base;
+   const float expected_shade=darkness[k]*(shared?(1-cover):1)+
+       (shared&&cover>0?std::max(0.f,composed[k]-generic*(1-cover))/patch.material.color[k]:0);
+   const float typed_emission=authored_emission[k]*emission_factor[k];
+   const float expected_emission=hdr?typed_emission*(1-contributions[3][3])+contributions[2][k]:
+       glow>0?std::max(0.f,composed_glow[k]+(typed_emission-pbr_emission[k]*patch.material.emissive[k])*(1-glow)):
+              typed_emission;
+   max_base=std::max(max_base,std::abs(actual_base[k]-expected_base));
+   max_shade=std::max(max_shade,std::abs((shared?actual_shade[k]:actual_shade[k]*shade_factor[k])-expected_shade*shade_factor[k]));
+   max_emission=std::max(max_emission,std::abs(actual_emission[k]-expected_emission));
+  }
+ }
+ check(painted_samples>50&&max_base<.00801f&&max_shade<.00801f&&max_emission<.00801f,
+       "Independent filtered material reads stay within tolerance between both grids");
+ std::cout<<"MIXED_MTOON painted="<<painted_samples<<" base_error="<<max_base<<" shade_error="<<max_shade
+          <<" emission_error="<<max_emission<<" base_size="<<exported.mtoon_base.width<<" emission_size="
+          <<exported.mtoon_emission.width<<" strength="<<params.emission_strength<<'\n';
+}
+
+void retopology_imported_mtoon(bool tinted,bool unprepared,bool mixed) {
  auto input=imported_retopo_input(true);
+ if(mixed){
+  Image source{128,128,std::vector<uint8_t>(128*128*4,255)};
+  for(unsigned y=0;y<source.height;++y)for(unsigned x=0;x<source.width;++x){
+   const auto offset=(size_t(y)*source.width+x)*4;
+   source.rgba[offset]=uint8_t(72+x/2+y/4);
+   source.rgba[offset+1]=uint8_t(85+y/2+x/4);
+   source.rgba[offset+2]=uint8_t(156+x/4-y/4);
+  }
+  const auto png=source.png();
+  auto &views=input.json["bufferViews"];
+  const auto offset=input.binary.size();
+  views.push_back({{"buffer",0},{"byteOffset",offset},{"byteLength",png.size()}});
+  input.json["images"][0]["bufferView"]=views.size()-1;
+  input.binary.insert(input.binary.end(),png.begin(),png.end());
+  input.json["buffers"][0]["byteLength"]=input.binary.size();
+ }
  if(!tinted)input.json["meshes"][0]["primitives"][0]["attributes"].erase("COLOR_0");
  auto &material=input.json["materials"][0];
  material["doubleSided"]=false;
@@ -2241,6 +2322,9 @@ void retopology_imported_mtoon(bool tinted,bool unprepared) {
  const auto &target=patch.painted->mesh();
  const auto &core=*patch.painted->source_maps();
  const auto &out_image=*output.roles[size_t(MToonSlot::Base)].image;
+ if(mixed)check(patch.painted->resolution()==64&&out_image.width==128&&out_image.height==128&&
+       core.color.image->width==128&&core.emission.image->width==128,
+       "Actual retopology keeps the 64 writable grid and independent 128 projected textures");
  check((output.roles[0].image==output.roles[1].image)!=unprepared&&
        output.roles[size_t(MToonSlot::Matcap)].image==binding.roles[size_t(MToonSlot::Matcap)].image&&
        output.material.gpu_parameters()==binding.material.gpu_parameters()&&core.color.image&&core.normal.image&&
@@ -2410,6 +2494,11 @@ void retopology_imported_mtoon(bool tinted,bool unprepared) {
          edited.mtoon_emission.rgba!=original_images.mtoon_emission.rgba&&
          edited.mtoon_normal.rgba==original_images.mtoon_normal.rgba,
          "The exported variant carries visible colour and emission in its own textures and preserves its normal field");
+   if(mixed){
+    check(edited.mtoon_base.width>=128&&edited.mtoon_emission.width>=128,
+          "Portable paint resolves the larger source texture and its independent coverage and emission knots");
+    verify_mixed_retopo_sampling(painted,edited);
+   }
   }
   check(Scene::load("visible-editable.glb").encode()==painted.encode()&&
        Scene::load("visible-paint.dsculpt").encode()==painted.encode(),"Portable paint compilation preserves the editable project exactly");
@@ -2682,7 +2771,7 @@ int main(int argc,char **argv)try {
   std::filesystem::create_directories(argv[2]);
   std::filesystem::current_path(argv[2]);
   const std::string_view variant=argv[3];
-  retopology_imported_mtoon(variant=="tinted",variant=="unprepared");
+  retopology_imported_mtoon(variant=="tinted",variant=="unprepared"||variant=="mixed-ldr",variant.starts_with("mixed-"));
   std::cout<<"PASS "<<checks<<" imported MToon retopology checks\n";
   return 0;
  }
