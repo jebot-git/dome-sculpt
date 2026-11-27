@@ -25,6 +25,16 @@ shapekey authoring and portable rigid VRM 1.0 accessory morphs. It restores
 texture-set history written by earlier Scene40 builds that omitted nullable
 live rig fields. [Texture-set shapekey validation](validation/texture-set-shapekeys-20261127.json)
 
+Retained PBR texture sets now support shapekey authoring and sculpting,
+including independently prepared normal maps. Each material keeps its
+original raster, sampling coordinates and artist attributes as its
+triangles move. Scene40 reopens the editable shape and its original material
+history. Standard and Editable GLB carry per-corner morph normals and
+tangents where the material requires them. Release and ASan/UBSan pass the
+focused worker suite. Eight OpenGL fixtures pass on llvmpipe and Intel Arc,
+nested DomeD Wayland covers Create and Undo/Redo, and synthetic OpenXR
+reopens and renders the saved pose in both eyes. [Retained texture-set shapekey validation](validation/retained-texture-set-shapekeys-20261127.json)
+
 Native texture-set accessories can now use Surface Heat, weight transfer, or
 legacy automatic binding against an original VRM 1.0 avatar. Surface Heat keeps
 editable layers and normal and FLOAT emission Bakes in each native material.

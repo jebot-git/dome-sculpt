@@ -6,6 +6,19 @@ remaining regression work. The dormant-paint fix on main has a fresh
 Release build and three focused native results. The full production goal
 remains active.
 
+Authenticated retained PBR texture-set meshes now support native shapekey
+authoring, posed material picking and desktop shape sculpt. Per-triangle
+geometric frames follow the pose while source imagery, channels and
+coordinates keep their original owners. The current Scene40 format
+preserves the shape, retained paint and Restore capsule together.
+Standard and Editable GLB carry vertex displacement and the per-corner
+normal and tangent endpoints required by the qualified materials. Release,
+ASan/UBSan, nested DomeD Wayland, independent OpenGL on software and Arc,
+and synthetic OpenXR cover the reported workflows. Posed Bake, skeletal
+deformation and typed MToon for retained sets, nonlinear mixed-weight
+portable lighting, and physical headset acceptance remain open.
+[Retained texture-set shapekey evidence](validation/retained-texture-set-shapekeys-20261127.json)
+
 The current combined atlas and HDR cache source passes all 153 checks
 in both software Release and Intel Arc ASan/UBSan OpenXR replays. Its
 export is byte-identical across both profiles and independently validates
