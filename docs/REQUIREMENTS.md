@@ -169,6 +169,17 @@ bakes exact FLOAT emission across independent paint and normal grids
 with the donor offset along the actual world-space normal.
 [Repeated and reflected Bake evidence](validation/native-texture-set-repeated-bake-20261127.json)
 
+Native texture sets now own resolved MToon materials alongside PBR
+members. The FLTK texture-set dialog and XR View menu assign a MToon 1.0
+material to the chosen field. Native preview, alpha-aware picking and
+desktop painting use that field's UV0, role images and samplers. Scene40
+reopen, Undo/Redo and Editable GLB preserve the exact authoring state.
+The focused Release and ASan/UBSan suites, the Arc render fixture and an
+actual FLTK dialog replay pass. Typed portable GLB and VRM materials,
+original artist frames, alternate UVs, typed Bake and resampling, and
+physical-device verification remain open.
+[Native MToon texture-set evidence](validation/native-mtoon-texture-sets-20261127.json)
+
 Strict Bake rays now recover source-edge contacts affected by float staging.
 An exact ray hit has priority. A missed ray can use an actual source edge
 within a radius derived from float spacing and inside its original front/back

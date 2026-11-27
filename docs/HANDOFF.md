@@ -2288,9 +2288,11 @@ and Editable outputs preserve the owning native project. The previous
 local-Z test placement has a real sideways shift under shear, so its strict
 ray miss remains a valid control.
 
-All 15 focused Release tests pass. Both production cases pass their
-registered ASan/UBSan checks and produce the same native scenes and GLBs
-as Release. The wider matching sanitizer set is still running. Synthetic
+All 15 focused cases pass in Release and ASan/UBSan. Both production
+cases produce the same native scenes and GLBs across profiles. The
+isolated strict owning-archive replay passes all 3,257 decode and
+4,903 encode allocation-failure checks and all 19 file-load cancellation
+checks. Synthetic
 OpenXR on software GL and Arc A770 reproduces both Standard GLBs. Native
 DomeD Wayland reproduces the repeated Bake package. The four Standard and
 Editable GLBs pass Khronos validation with zero errors and warnings.
@@ -2299,6 +2301,31 @@ Larger fields, other production scenes and physical headset acceptance
 remain open. The full Release and sanitizer archive sweeps from the earlier
 regression milestone retain their own source scopes.
 [Repeated and reflected Bake validation](validation/native-texture-set-repeated-bake-20261127.json)
+
+### Native MToon material assignment for texture sets
+
+A native UV0 texture set can own a resolved MToon material, its original
+role images and samplers. The shared material archive retains those
+owners across save and reopen. Adjacent PBR sets keep their separate
+materials and paint grids. The regular range renderer, alpha-aware
+picking and desktop paint gesture share the selected field's identity.
+The FLTK texture-set dialog and the XR View options both expose an
+ordered MToon 1.0 assignment with Undo and Redo.
+
+Release and strict ASan/UBSan each pass the four focused suites with
+323 checks. The new shader and mask fixture passes on llvmpipe and
+Intel Arc A770. The earlier shader suite passes all 81 checks on
+llvmpipe. The actual FLTK universal-menu and modal replay on a private
+Xvfb display passes 11 checks, including Cancel, ordered Save and fresh
+application reopen. The native test exercises the real joystick input
+worker. Both profiles emit byte-identical Editable GLB and recover the
+same MToon graph, role image, paint, skin and morph data.
+
+The Editable GLB's visible primitives use core PBR fallback. Typed
+portable material output, imported artist frames and alternate
+coordinates, typed Bake/resampling, matched Wayland, and physical XR
+remain open.
+[Native MToon validation](validation/native-mtoon-texture-sets-20261127.json)
 
 ## Source and integration boundary
 

@@ -1,0 +1,57 @@
+{
+  "product": "70b41e8864085559b6f020bb6f242fe7f0e467a3",
+  "before": "5cfeabec8adcdea4c6f6bdb5fca147ee92f1d0c2",
+  "canonical_domed_toolkit": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "Native resolved UV0 MToon and PBR texture sets. Independent Editable GLB authoring replay. Actual FLTK and native joystick action, offscreen software and Intel Arc rendering.",
+  "release_assertions": {
+    "dome-sculpt-texture-set-surfaces-test": 112,
+    "dome-sculpt-texture-set-export-test": 157,
+    "dome-sculpt-texture-set-native-test": 45,
+    "dome-sculpt-mtoon-render-test": 9
+  },
+  "sanitizer_assertions": {
+    "dome-sculpt-texture-set-surfaces-test": 112,
+    "dome-sculpt-texture-set-export-test": 157,
+    "dome-sculpt-texture-set-native-test": 45,
+    "dome-sculpt-mtoon-render-test": 9
+  },
+  "existing_mtoon_render_assertions": 81,
+  "actual_arc_assertions": 9,
+  "fltk_xvfb_assertions": 11,
+  "app_sha256": {
+    "release": "15896f77e9a83cf75917d7a988404fb48bcf1a89782a6d18989c742d7f206e40",
+    "asan": "1d3bb642d53c6dc298a0daa964dcbb15d712989e03221d8070473bff061df207"
+  },
+  "editable_glb_sha256": {
+    "release": "f964e2c37b8d3601f46567cbbb8e1bc6053e6016f16342bf6b7d092c04e5c544",
+    "asan": "f964e2c37b8d3601f46567cbbb8e1bc6053e6016f16342bf6b7d092c04e5c544"
+  },
+  "terminal_success_invocations": {
+    "release": "db76f6b0a8a647aea970093d9b042138",
+    "asan": "a7006eec630d47e496d2e4eb326aa07e",
+    "fltk_private_x11": "3982bec5957b48e19b02eccfa3234381"
+  },
+  "remaining": "Typed portable GLB and VRM materials, artist frames and alternate UVs, typed Bake and resampling, larger production scenes, matched nested Wayland and physical XR, full integration sweep.",
+  "archive": {
+    "name": "native-mtoon-texture-sets-20261127.tar.gz",
+    "sha256": "4e506efd93893c192906908d9d4ea09961050b12b0ad204f770ae5177ed95016",
+    "files": {
+      "arc/mtoon-texture-set.log": "0f352ee5b48addcd7f777fca2835b4f05d33838468ca86f1332b0ee13e6ed131",
+      "asan/dome-sculpt-mtoon-render-test.log": "ad6a1b1873a340c545fe5ead9efd89db7fbd9d2c889fc8ad7ea0e1f8f7d9f147",
+      "asan/dome-sculpt-texture-set-export-test.log": "b48e9e9ad49841b52482f38510cd6a627d2a181aca84bea7822bb6b305aa2de9",
+      "asan/dome-sculpt-texture-set-native-test.log": "e74965ccb11c21cf42ebf3534db5b18d0a25f6ead94ae369a7603b5469cc3e77",
+      "asan/dome-sculpt-texture-set-surfaces-test.log": "0d74bdd3d660b4ff5f82b255e8bd91dad590699193b3b6357e4176e808f19475",
+      "fltk/commands.jsonl": "b986257ad0e98a815a06f624d4312531b67bbbc00d1791a638c784713ef97c9f",
+      "fltk/driver.py": "edb8d67a18635d275a4c9fe259e8d7297fdc7f69caab976133709436b9d9fe02",
+      "fltk/first-wrapper-error.json": "b1858506d19cc6f98772861f7d9b2d19d25aa4786746689e483c28f30c48c801",
+      "fltk/report.json": "b4736d5733f826d803d3346ca8c52dbb46f08194d5292055efdc65b06a6ef68f",
+      "previous-bake/fifteen-sanitizer-cases.log": "5a93f86643ee8eaa1f0226af115e2046f9ac39000133f3322ff82a20fd373828",
+      "previous-bake/isolated-archive-fault.log": "1b78c64c1fb2bacd82f15435dcb35436e00c1c3136647ad0903974f8f2e2742c",
+      "release/dome-sculpt-mtoon-render-test.log": "0eb875f8ff1adfae955975c272caee4fead9ca890e6809db0ed6b5a5f3323512",
+      "release/dome-sculpt-texture-set-export-test.log": "e3b0baa25e872461d035583015c00ae78f0a9455f61f72c7f64ab6df62b3ddf5",
+      "release/dome-sculpt-texture-set-native-test.log": "aa85c6c3a1f36721a8d9fe16e310af45d55e27e8fb2b544d00e342b19b4d90ef",
+      "release/dome-sculpt-texture-set-surfaces-test.log": "12dce758a8554bf36b92d5fa41fd2e86dd07df0f663142f6a9d3e4d182a79aff",
+      "release/mtoon-render-existing.log": "bb4eec5dcf9330fc64ba03a7de6f155bd598726802fe8be8c66f6b39b55e5108"
+    }
+  }
+}
