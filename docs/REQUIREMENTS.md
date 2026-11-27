@@ -100,9 +100,15 @@ Affine wire edits now retain the actual local transform, original prepared
 normal field, and exact face coordinates. Native Save and Undo/Redo keep
 the retained source owners. Material slots within a quad follow surviving
 triangles by stable corner IDs across movements that cross the old material
-boundary. Support for subdivision across mixed-material diagonals remains
-required.
+boundary.
 [Affine and material-corner evidence](validation/retopology-prepared-affine-20261127.json)
+
+The native and controller-shared Seam Edge action can split a quad along its
+existing triangulation diagonal. Each new face preserves its old material
+slot and editable ink. The native archive, cancel, Undo/Redo and ordered Save
+retain the split and its provenance. General subdivision across unresolved
+material boundaries remains required.
+[Material seam evidence](validation/retopology-material-seam-20261127.json)
 
 Changed retopology faces can now carry native single-material prepared
 normal maps under reflected and sheared placements and after independent

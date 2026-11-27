@@ -142,6 +142,27 @@ reopens the prepared project with identical before and after RGB in both
 eyes on llvmpipe and Intel Arc A770.
 [Affine and material-corner validation](validation/retopology-prepared-affine-20261127.json)
 
+Retopology can turn a quad's existing triangulation diagonal into an
+editable seam. In Place Points mode, select both endpoints and choose
+**Seam edge**. The patch keeps the original vertices, pins and first face
+ID. The second triangle receives its own stable ID and records which
+quad it came from. A wire already on the diagonal keeps its edge ID.
+Both triangles retain their material slots and editable paint after one
+moves across the former boundary. The opposite diagonal still requires
+the material boundary to be resolved first.
+
+The plain and reflected, sheared fixtures cover the split, Move, draft and
+document Undo/Redo, ordered Save, cold Open, and Standard and Editable GLB.
+The native archive accepts both the original topology records and records
+with split provenance. The nested DomeD Wayland test selects the diagonal
+in the canvas and applies it through the universal menu. The saved file
+matches the worker reference byte for byte. Synthetic OpenXR reopens the
+plain and affine projects with both colours visible in each eye on Arc
+A770 and llvmpipe. Both GLB modes in both fixtures pass Khronos validation
+with zero errors or warnings. The 45 selected Release and seven ASan/UBSan
+cases pass, with nine project and GLB files identical across both builds.
+[Material seam validation](validation/retopology-material-seam-20261127.json)
+
 Geometry-changing retopology now transfers native single-material prepared
 normal fields. The worker uses the original placed tangent frame and
 rebuilds the frame on the replacement. It samples the PBR and toon normal
