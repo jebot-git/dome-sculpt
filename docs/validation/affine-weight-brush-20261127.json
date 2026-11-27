@@ -1,0 +1,168 @@
+{
+  "revision": "179a8b793d7f4bae22c959e866551fda456d1dee",
+  "canonical_domed_revision": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "release_fltk": "/opt/fltk-vr/toolkit",
+  "asan_fltk": "artifacts/sdk-20261126/toolkit-sanitize",
+  "bitmap_runtime": "/opt/fltk-vr/bdf-runtime",
+  "profiles": {
+    "release": {
+      "kernel_assertions": 43,
+      "document_assertions": 80,
+      "native_vrm1_assertions": 217,
+      "registered_cases": [
+        "affine-weight-openxr",
+        "skin-affine-authoring",
+        "skin-source-pose",
+        "vrm1-attachment-openxr",
+        "vrm1-source-export",
+        "weight-authoring",
+        "weight-edit"
+      ],
+      "native_fixture_sha256": "ccfde4e8824d620ccc2d6f5cf7a30556da3134c47a6c90faba4c7d71eec406c0"
+    },
+    "asan": {
+      "kernel_assertions": 43,
+      "document_assertions": 80,
+      "native_vrm1_assertions": 217,
+      "registered_cases": [
+        "skin-affine-authoring",
+        "skin-source-pose",
+        "vrm1-source-export",
+        "weight-authoring",
+        "weight-edit"
+      ],
+      "native_fixture_sha256": "e66d62c0e1902ca4be6466ecb53ef0f6124c157a3f2b8f4b10d2cb9268a57d22"
+    }
+  },
+  "release_application_sha256": "44edcf56fb8157b23b7ded891e69ca688a59cc98ee3d2db556d19dfa795ccf83",
+  "wayland_assertions": 10,
+  "synthetic_openxr": {
+    "software": {
+      "checks": 7,
+      "cases": {
+        "accept": {
+          "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+          "stereo_frames": 64,
+          "swapchain_releases": 128,
+          "reference_changes": 1
+        },
+        "focus": {
+          "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+          "stereo_frames": 64,
+          "swapchain_releases": 128,
+          "reference_changes": 1
+        }
+      }
+    },
+    "arc": {
+      "checks": 7,
+      "cases": {
+        "accept": {
+          "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+          "stereo_frames": 64,
+          "swapchain_releases": 128,
+          "reference_changes": 1
+        },
+        "focus": {
+          "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+          "stereo_frames": 64,
+          "swapchain_releases": 128,
+          "reference_changes": 1
+        }
+      }
+    }
+  },
+  "physical_headset_tested": false,
+  "identical_release_sanitizer_files_sha256": {
+    "xr-fixture/before.dsculpt": "eb0410bd52048d3fbe2554880b22c82263fa79b539aeb6714b69da2faeee9ba4",
+    "xr-fixture/after.dsculpt": "69f46a87902a695d2f5ef30674226f07fed11ef8696d85cb5716b057e89fadb2",
+    "qualified/skin-weight-painted.dsculpt": "3071679cc04636954238b91c4656320c76e15996012914a8a464455b49ed314d",
+    "qualified/skin-weight-painted-editable.vrm": "43df51ce1dfa02d059be7780f6b353d2845fb3ab94cfbc473d07cbe2c8ae20f5",
+    "qualified/heat-weight-painted-editable.vrm": "f591c6e862b706f5f7ac9f4e8bf8c24ff43d41710de19f1feabf467bcfa081a2"
+  },
+  "portability": {
+    "khronos": "2.0.0-dev.3.10",
+    "khronos_errors_per_file": 0,
+    "khronos_warnings_per_file": {
+      "skin-weight-painted-editable.vrm": {
+        "MULTIPLE_EXTENSIONS": 3,
+        "NODE_SKINNED_MESH_NON_ROOT": 3,
+        "NODE_SKINNED_MESH_LOCAL_TRANSFORMS": 2
+      },
+      "heat-weight-painted-editable.vrm": {
+        "MULTIPLE_EXTENSIONS": 3,
+        "NODE_SKINNED_MESH_NON_ROOT": 3,
+        "NODE_SKINNED_MESH_LOCAL_TRANSFORMS": 2
+      }
+    },
+    "pinned_schema_checks": 8
+  },
+  "archive": {
+    "path": "affine-weight-brush-20261127.tar.gz",
+    "sha256": "36973ca494818949a02d9b30f6dbd350e8e4ae541a8f5178c7cd13764b2e61af",
+    "members_sha256": {
+      "arc.log": "f89a74d2402d2a834b18699c8db9420bb51f20c6ee6e0cc30c7d1f1d10691a19",
+      "arc/accept.dsculpt": "69f46a87902a695d2f5ef30674226f07fed11ef8696d85cb5716b057e89fadb2",
+      "arc/accept.json": "c12d8c9d691ab8d43d4bdafce2ea0c8648cdbb6fc8e54033e1becc50e68ac4e3",
+      "arc/accept.log": "a7ae69c6e46a6a7d652c22c3b499dacdde3571be3865be03a0e63c422a4212e1",
+      "arc/focus.dsculpt": "eb0410bd52048d3fbe2554880b22c82263fa79b539aeb6714b69da2faeee9ba4",
+      "arc/focus.json": "bdd2a89245e050c2c590749658628e35d380fd61ce6feeb15d318abfea5f0166",
+      "arc/focus.log": "bc1ca89ad4f451d467bfabf7f5e17df930873c276c9eff8da89b674457a9fcfa",
+      "arc/report.json": "31a14c81930ea20a3dbda9875090ba5ca95ac5bd9de64848c64028f713adaada",
+      "asan-baked-fixture-build.log": "721d91ce93b71d55ec7c575bd6b94a5c3dc41ddfbe07e7a93e08c2f45ec11712",
+      "asan-configure.log": "84af7eb448cf65c89c22cd0059dace2fe0d000ecbdd141eec6fbeb9c758b5caa",
+      "asan-final-build.log": "ab8c9c0926ae54597f214d540cc17a3649522f1b53e5c952dc8995321e821004",
+      "asan/document.log": "7822e07d479ecc692271756aa0679233cbc73eadded321d97f47b525405af03e",
+      "asan/final-vrm1.log": "cca33e7194ff81953ed6a4f71337fbbc19ceb9282dfa28961add98107c357a94",
+      "asan/final-vrm1.xml": "dfeb2863eb7b8c910e9c2e01cd513dc1b4d3dd68ffc51d47e3a289680c27a70c",
+      "asan/kernel.log": "146f88bb6f9fd866a18575aa76b60eb63f7585b585b91e0e67dddcb9405ab24a",
+      "asan/qualified.log": "ffaea835bb19730d5cbd19a5bf6c95fd852a5eb1cbd16659d366a6ca0918a368",
+      "asan/registered.log": "d7feda43bcc457dd9bbc86bedba19b6315377397b0e1598672f4646883486631",
+      "asan/registered.xml": "f0390896156b7613e67d521428e5df32c25a17b79bfd2b4a4fc185a492435169",
+      "asan/xr-fixture.log": "aac4502b8ef461e51e182b7951bf5733609c712dea550a800ec38edeae33ee03",
+      "initial-arc-reference.dsculpt": "eb0410bd52048d3fbe2554880b22c82263fa79b539aeb6714b69da2faeee9ba4",
+      "initial-arc-reference.json": "0a9d035eea187cf5aa01c93515945ced10693a7c01428e4ae2a93b0aa7c33e7e",
+      "initial-arc-reference.log": "a4d577f9bf67c18985fb3d8bba959ab080d1ab783d1c564e1de04f5a95b9647b",
+      "khronos.cjs": "c63f5ab3ea6150d19c3fecd6133e73c05256f591e5317bd60dca4ecbf732970f",
+      "khronos.json": "2739632bf5c9b7c776d142f9b1002d977462f7f1f74cdfc7946e45aae7ba150c",
+      "khronos.log": "8f034d95468070c55db2e298062359a5a300017cf773524050ab80891e1d46b0",
+      "receipt.py": "ef1e539d1a904268ee06179269be786b5a04c57ae06cce6f8aa0b60c852acb3a",
+      "release-baked-fixture-build.log": "721d91ce93b71d55ec7c575bd6b94a5c3dc41ddfbe07e7a93e08c2f45ec11712",
+      "release-configure.log": "d218bb6f49380f7fc36a30161411a5e7323ef658079d3bd41325c75f6e934a7c",
+      "release-exact-build.log": "048d9c5c5f4b9978e4f3a5472a32f7fe76291f2280395f267468f51db6769587",
+      "release-regeneration.log": "19c544d07f8ecb2e93ca6cf2c5bf5cfe1bccb0feb956a5da34d212f3ead25d97",
+      "release-xr-refresh.log": "a52b7e462416c851ee9a2907c9a3b78af5b87191cb335db17bb63431038a1971",
+      "release/affine-weight-openxr/accept.dsculpt": "69f46a87902a695d2f5ef30674226f07fed11ef8696d85cb5716b057e89fadb2",
+      "release/affine-weight-openxr/accept.json": "3698cf2c0e78340aec321eca7b17d7a2003f2efaae34b9f105ec834af87794c8",
+      "release/affine-weight-openxr/accept.log": "a7ae69c6e46a6a7d652c22c3b499dacdde3571be3865be03a0e63c422a4212e1",
+      "release/affine-weight-openxr/focus.dsculpt": "eb0410bd52048d3fbe2554880b22c82263fa79b539aeb6714b69da2faeee9ba4",
+      "release/affine-weight-openxr/focus.json": "14293ec17a696efbbaa1dea82b84e78ac841f318563151249cbc8693cf6afda5",
+      "release/affine-weight-openxr/focus.log": "bc1ca89ad4f451d467bfabf7f5e17df930873c276c9eff8da89b674457a9fcfa",
+      "release/affine-weight-openxr/report.json": "31a14c81930ea20a3dbda9875090ba5ca95ac5bd9de64848c64028f713adaada",
+      "release/document.log": "7822e07d479ecc692271756aa0679233cbc73eadded321d97f47b525405af03e",
+      "release/final-vrm1.log": "4dafe564aba4b4d467745d6c9b07621d84e33e16f63ac188abda8997e8103568",
+      "release/final-vrm1.xml": "de82dca51b0873fa05c609baf9b937fb2dfe398bdb4e15b7e6501cea1a1c5e47",
+      "release/initial-registered.log": "7843fd4f918fa1038f14e90b7ab3b8d3f8d1c53f65c955ff7ee94274d7be615c",
+      "release/initial-registered.xml": "b8a2abf738e9cc30b311926c49ec7db25a3908e5ca5c37dbbcf3945ec00682f8",
+      "release/kernel.log": "146f88bb6f9fd866a18575aa76b60eb63f7585b585b91e0e67dddcb9405ab24a",
+      "release/qualified.log": "ffaea835bb19730d5cbd19a5bf6c95fd852a5eb1cbd16659d366a6ca0918a368",
+      "release/qualified/heat-weight-painted-editable.vrm": "f591c6e862b706f5f7ac9f4e8bf8c24ff43d41710de19f1feabf467bcfa081a2",
+      "release/qualified/skin-weight-painted-editable.vrm": "43df51ce1dfa02d059be7780f6b353d2845fb3ab94cfbc473d07cbe2c8ae20f5",
+      "release/qualified/skin-weight-painted.dsculpt": "3071679cc04636954238b91c4656320c76e15996012914a8a464455b49ed314d",
+      "release/registered.log": "9e03bc507124bd7bfd397049ef43e131b7fdd047da3be2a51cc4c21eb093d502",
+      "release/registered.xml": "9a183038ca7a9ecf398f2bffb7b37e47bf234c16c759f191cdd50e662b8cf4c5",
+      "release/xr-fixture.log": "aac4502b8ef461e51e182b7951bf5733609c712dea550a800ec38edeae33ee03",
+      "release/xr-fixture/after.dsculpt": "69f46a87902a695d2f5ef30674226f07fed11ef8696d85cb5716b057e89fadb2",
+      "release/xr-fixture/before.dsculpt": "eb0410bd52048d3fbe2554880b22c82263fa79b539aeb6714b69da2faeee9ba4",
+      "schemas.json": "25b636d149305d0d7943e5b137ceb1731f89901dc4b44a8ee264186139f12317",
+      "schemas.log": "6be84e01c38ca0206afb4ff0c5acfa354fab6db158c4841470dbb7e21b7e7c87",
+      "verify-ui.py": "7684fb46766bc54cb1612781682664d3fd723d6451bccfb9947b3de70c14c7b0",
+      "wayland-weight.py": "1f7ed26a20b4e2c044c699bed0d9f4a6338dac487f76e0715c9e2436f78edb99",
+      "wayland.log": "8ecfd95959b6b5f68b89b12421c2c0864bc9db12e4cca54d54d9c17655caaad3",
+      "wayland/client.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "wayland/compositor.log": "707c2cda8319713f874d5a729c83108bc07422aeeac063ef9b385578a6accdee",
+      "wayland/pointer-weights.dsculpt": "8d28f8170d3c71cb70b6e166381d106b37b27ed9334fbe5c5dc8f0b0636e0bfd",
+      "wayland/report.json": "94a5147e0daae1152fe275794fa5a809f4e504de96b01e6bc74d3fcd197e6a60"
+    }
+  }
+}

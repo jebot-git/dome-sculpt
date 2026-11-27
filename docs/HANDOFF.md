@@ -33,6 +33,12 @@ avatar's original joints in both VRM 1.0 modes.
 [Linked native skin validation](validation/vrm1-skinned-accessory-20261127.json)
 [Surface Heat validation](validation/vrm1-surface-heat-20261127.json)
 
+Desktop and controller weight brushes now work on affine-placed skins and
+native accessories linked to an imported VRM 1.0 rig. The brush uses scene
+metres under non-uniform scale, shear and reflection. Linked painting follows
+original joint IDs across the visible parts of one imported instance.
+[Affine weight brush validation](validation/affine-weight-brush-20261127.json)
+
 The next acceptance milestone is a complete headset workflow on the current
 build, from a production-size sculpt or imported model through topology, UVs,
 paint, humanoid fitting and export. Sustained local meshing and recovery,
@@ -2808,10 +2814,36 @@ checks with zero Khronos errors and eight warnings.
 
 The DomeD Wayland dialog and synthetic OpenXR controllers on software GL and
 Intel Arc A770 save the same bound project as the native worker. Both existing
-19-part CC0 VRoid binding regressions pass in Release. Interactive weight
-brushes in affine placement, VRM 0.x linked native accessories, retained-source
-fields, independent prepared normal domains and physical device use remain
-open. [Surface Heat validation](validation/vrm1-surface-heat-20261127.json)
+19-part CC0 VRoid binding regressions pass in Release. VRM 0.x linked native
+accessories, retained-source fields, independent prepared normal domains and
+physical device use remain open.
+[Surface Heat validation](validation/vrm1-surface-heat-20261127.json)
+
+### Affine weight brushes and linked joint slots
+
+The existing skin weight tool accepts world-space capsules on affine meshes.
+Renderer picking and worker evaluation use the posed surface. Symmetry mirrors
+the stroke through the object's local plane and preserves a circular radius
+around the mirrored path. Ordinary similarity placement retains its existing
+local brush coordinates. A held object's preview motion is removed from the
+brush sample before solving, with the held object as the sole edit target.
+
+Linked native accessories and source meshes resolve their selected, mirrored,
+and locked joints through the same immutable original-node table. Each
+recipient can use a different skin slot order. A recipient lacking a selected
+joint can still receive a valid mirrored influence. A separately imported
+instance of the same file remains outside that edit. Native tests exercise
+reflected shear, differing tables, cancellation, Undo and Redo. The textured
+VRM 1.0 fixture replays authored weights, morphs and baked FLOAT emission from
+Editable VRM, and the Khronos and pinned VRM schema checks are recorded below.
+
+The DomeD Wayland test invokes the actual universal-menu weight dialog and
+paints the rendered heatmap with the pointer. Both synthetic OpenXR profiles
+exercise controller contact after a reference-space change. Losing focus
+before release restores the session's original native project. The first
+fixture used pre-rebase coordinates and missed the mesh by 20 cm. The corrected
+fixture keeps contact at the same physical point.
+[Affine weight brush validation](validation/affine-weight-brush-20261127.json)
 
 ## Source and integration boundary
 

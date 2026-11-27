@@ -269,8 +269,11 @@ synthetic OpenXR exercise weight transfer and Surface Heat with durable saves.
 Surface Heat accounts for native texture-set rasters, layers and canonical Bake
 data, including FLOAT emission. It preserves shared owners and rejects stale
 secondary paint edits, cancellation and insufficient memory before publication.
-Affine interactive weight brushes and retained-source preparation still need
-texture-set support.
+The desktop pointer and OpenXR controllers now paint weights on affine
+placements in scene metres. Local-plane symmetry, per-skin joint remapping,
+locks and isolation preserve the original avatar identity and native paint.
+Retained-source preparation and qualification on physical input devices
+remain open.
 Larger typed Bake previews,
 original authored and deforming frames, typed donor
 partitions, retained-source skinned accessories, VRM0 texture-set
@@ -292,6 +295,7 @@ painted animation, other sampler modes and physical verification remain open.
 [Native texture-set shapekey evidence](validation/texture-set-shapekeys-20261127.json)
 [Native accessory skin link evidence](validation/vrm1-skinned-accessory-20261127.json)
 [Surface Heat texture-set evidence](validation/vrm1-surface-heat-20261127.json)
+[Affine weight brush evidence](validation/affine-weight-brush-20261127.json)
 
 Strict Bake rays now recover source-edge contacts affected by float staging.
 An exact ray hit has priority. A missed ray can use an actual source edge
