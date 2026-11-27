@@ -9,7 +9,35 @@
 using namespace dome;
 namespace {
 Vec3 placed(const AffineTransform&a,Vec3 p){const auto q=a.point({p.x,p.y,p.z});return {float(q[0]),float(q[1]),float(q[2])};}
-Mesh patch(float x,bool ring){Mesh m;constexpr size_t n=16;const float outer=ring?.020f:.012f,inner=.015f;const float z=ring?.1001f:.1f;if(!ring){m.positions.push_back({x,.05f,z});m.normals.push_back({0,0,1});m.uv.push_back({.5f,.5f});}for(size_t row=0;row<(ring?2u:1u);++row)for(size_t i=0;i<n;++i){float a=2*std::numbers::pi_v<float>*float(i)/n;float r=row?inner:outer;float dx=r*std::cos(a),dy=r*std::sin(a);m.positions.push_back({x+dx,.05f+dy,z});m.normals.push_back({0,0,ring?-1.f:1.f});m.uv.push_back({.5f+dx/(outer*2.5f),.5f+dy/(outer*2.5f)});}for(uint32_t i=0;i<n;++i){auto next=(i+1)%n;if(ring){m.indices.insert(m.indices.end(),{i,i+n,next,next,i+n,next+n});}else m.indices.insert(m.indices.end(),{0,i+1,next+1});}m.validate();return m;}
+Mesh patch(float x,bool ring) {
+  Mesh m;
+  constexpr uint32_t count=16;
+  const float outer=ring?.020f:.012f,inner=.015f;
+  const float z=ring?.1001f:.1f;
+  if(!ring) {
+    m.positions.push_back({x,.05f,z});
+    m.normals.push_back({0,0,1});
+    m.uv.push_back({.5f,.5f});
+  }
+  for(uint32_t row=0;row<(ring?2u:1u);++row)
+    for(uint32_t i=0;i<count;++i) {
+      const float angle=2*std::numbers::pi_v<float>*float(i)/count;
+      const float radius=row?inner:outer;
+      const float dx=radius*std::cos(angle),dy=radius*std::sin(angle);
+      m.positions.push_back({x+dx,.05f+dy,z});
+      m.normals.push_back({0,0,ring?-1.f:1.f});
+      m.uv.push_back({.5f+dx/(outer*2.5f),.5f+dy/(outer*2.5f)});
+    }
+  for(uint32_t i=0;i<count;++i) {
+    const uint32_t next=(i+1)%count;
+    if(ring)
+      m.indices.insert(m.indices.end(),{i,i+count,next,next,i+count,next+count});
+    else
+      m.indices.insert(m.indices.end(),{0,i+1,next+1});
+  }
+  m.validate();
+  return m;
+}
 Mesh closed_eye(){Mesh m;m.positions={{-.04f,.05f,.1f},{-.06f,.05f,.1f},{-.05f,.06f,.1f},{-.05f,.04f,.1f},{-.05f,.05f,.11f},{-.05f,.05f,.09f}};for(auto p:m.positions)m.normals.push_back(normalized(p-Vec3{-.05f,.05f,.1f}));m.uv.assign(6,{.5f,.5f});m.indices={0,2,4,2,1,4,1,3,4,3,0,4,2,0,5,1,2,5,3,1,5,0,3,5};unwrap(m,128,2);return m;}
 Mesh shell(Vec3 center,Vec3 radius,bool boundary=false){Mesh m;m.positions={center+Vec3{radius.x,0,0},center-Vec3{radius.x,0,0},center+Vec3{0,radius.y,0},center-Vec3{0,radius.y,0},center+Vec3{0,0,radius.z},center-Vec3{0,0,radius.z}};if(boundary)m.positions[1]={-.05f,.05f,.1f};for(auto p:m.positions)m.normals.push_back(normalized(p-center));m.uv.assign(6,{.5f,.5f});m.indices={0,2,4,2,1,4,1,3,4,3,0,4,2,0,5,1,2,5,3,1,5,0,3,5};unwrap(m,128,2);return m;}
 
