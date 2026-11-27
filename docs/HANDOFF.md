@@ -330,10 +330,26 @@ synthetic controller checks on each renderer reproduce the exact 256-pixel
 project through Apply, Save, Undo and Redo. The software controller run passes
 with a pause after each durable Save. Six GLBs pass Khronos validation, and
 512-pixel MToon reimports match native stereo within two 8-bit values on Arc
-and llvmpipe. Painted resampling has been qualified on the CPU build. Baked and
-independently prepared atlas resizing, larger painted patches, accelerated
-resampling and physical device acceptance remain required.
+and llvmpipe. Painted resampling has been qualified on the CPU build.
 [Retopology paint resolution evidence](validation/retopology-paint-resize-20261127.json)
+
+The same worker now resizes native canonical Bakes on standalone meshes and
+retopology patches. Enlargement copies every baked texel and independent FLOAT
+coefficient. Reduction area-filters the common material and tangent-vector
+values by coverage, and filters FLOAT legacy, absolute and coverage coefficients
+separately. It checks the original cells and their composed paint overlay before
+publishing. The reduction fixtures preserve RGB8 emission and FLOAT coverage
+below one byte and reject a reduction that would lose sharp normal detail.
+The imported PBR patch grows from 64 to 256 with exact baked normals, material
+channels, FLOAT values, hidden paint and original guide. Standard GLB carries
+its explicit tangents. Editable GLB restores the full resized project. All 25
+selected Release and 19 ASan/UBSan workflows pass. The exact resized project
+matches the desktop and controller saves through Apply, Undo and Redo. Six
+GLBs pass Khronos validation. Package-free Core PBR reimport matches the native
+stereo view within two 8-bit levels on Intel Arc and llvmpipe. Independently
+prepared and texture-set Bake grids, larger painted assets, accelerated
+resampling and physical device acceptance remain required.
+[Canonical Bake resize evidence](validation/retopology-bake-resize-20261127.json)
 
 Retopology reapply now works on native multi-material accessories attached
 to original VRM 1.0 joints. The replacement keeps its avatar hierarchy and

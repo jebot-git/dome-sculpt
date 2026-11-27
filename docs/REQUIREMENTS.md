@@ -189,10 +189,18 @@ and preserves the mesh, projected roles, hidden guide and layer metadata.
 Budget refusal, cancellation, exact Undo and Redo, ordered Save and Editable
 GLB are covered on a 64-to-256-to-512 painted MToon patch with 128-pixel
 projected images. Portable GLB qualifies larger writable grids by checking
-every filter cell intersecting the actual mesh UV triangles. Baked and
-prepared grids, larger production assets, accelerated resampling and physical
-device acceptance remain open.
+every filter cell intersecting the actual mesh UV triangles.
 [Retopology paint resolution evidence](validation/retopology-paint-resize-20261127.json)
+
+Native canonical Bakes now resize with standalone writable grids. Enlarging an
+imported PBR retopology Bake retains exact normal, colour, ORM, common coverage,
+FLOAT emission and authored layers. The tested reducing path uses coverage-
+weighted material and normal samples, preserves sub-byte emission coverage and
+measures reconstruction against the original grid. Ordered Save, exact history,
+Standard and Editable GLB, prepared guide retention and controller workflows
+are checked on the accepted patch. Independently prepared and texture-set Bake
+grids, larger assets, acceleration and physical device testing remain open.
+[Canonical Bake resize evidence](validation/retopology-bake-resize-20261127.json)
 
 Native multi-material retopology preserves independently painted and baked
 grids and original VRM 1.0 joint links when Apply changes the patch.
