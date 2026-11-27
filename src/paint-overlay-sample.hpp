@@ -63,29 +63,33 @@ inline PaintOverlayTexel sample_overlay_texel_owner(const PaintOverlayPacket &pa
   const auto &common=layer.tiles.at(tile);
   if(!common)continue;
   ++sample.work;
-  const auto &q=common->pixels[within].data;
-  const float mask=q[13]/255.f*layer.opacity;
-  if(mask==0)continue;
-  sample.work+=3;
-  const float color_coverage=q[9]/255.f*mask;
-  if(color_coverage!=0){
-   sample.work+=8;
-   const auto *color=q.data();
-   if(pbr&&!layer.pbr_tiles.empty())
-    if(const auto &secondary=layer.pbr_tiles.at(tile))
-     color=secondary->pixels[within].data();
-   for(size_t c=0;c<4;++c)
-    blend(value[0][c],c<3?overlay_linear_byte(color[c]):color[c]/255.f,color_coverage);
-   value[3][0]=value[3][0]*(1-color_coverage)+color_coverage;
-  }
-  for(size_t c=1;c<=2;++c){
-   const float coverage=q[9+c]/255.f*mask;
-   if(coverage==0)continue;
-   sample.work+=2;
-   blend(value[1][3-c],q[3+c]/255.f,coverage);
-   value[3][c]=value[3][c]*(1-coverage)+coverage;
-  }
+  const bool defaults=PaintTile::is_shared_default(common.get());
   const auto *emission=layer.emission_tiles.empty()?nullptr:layer.emission_tiles.at(tile).get();
+  if(defaults&&!emission)continue;
+  const auto &q=common->pixels[within].data;
+  const float mask=defaults?layer.opacity:q[13]/255.f*layer.opacity;
+  if(mask==0)continue;
+  if(!defaults){
+   sample.work+=3;
+   const float color_coverage=q[9]/255.f*mask;
+   if(color_coverage!=0){
+    sample.work+=8;
+    const auto *color=q.data();
+    if(pbr&&!layer.pbr_tiles.empty())
+     if(const auto &secondary=layer.pbr_tiles.at(tile))
+      color=secondary->pixels[within].data();
+    for(size_t c=0;c<4;++c)
+     blend(value[0][c],c<3?overlay_linear_byte(color[c]):color[c]/255.f,color_coverage);
+    value[3][0]=value[3][0]*(1-color_coverage)+color_coverage;
+   }
+   for(size_t c=1;c<=2;++c){
+    const float coverage=q[9+c]/255.f*mask;
+    if(coverage==0)continue;
+    sample.work+=2;
+    blend(value[1][3-c],q[3+c]/255.f,coverage);
+    value[3][c]=value[3][c]*(1-coverage)+coverage;
+   }
+  }
   const auto light=emission?emission->texel(within):PaintEmissionValue{};
   const float coverage=emission?mask*light.coverage:q[12]/255.f*mask;
   if(coverage!=0){

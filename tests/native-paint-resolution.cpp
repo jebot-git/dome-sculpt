@@ -761,14 +761,19 @@ void fullsize_physical_paint(const std::filesystem::path &root) {
   paint->stamp(brush,ink);
   check(paint->end_stroke(),"The native brush authors FLOAT emission over the full 2048 grid");
   const auto &tiles=paint->layers().front().emission_tiles;
+  const auto &common=paint->layers().front().tiles;
   const auto center=paint->emission_pixel(layer,1024,1024);
   const auto corner=paint->emission_pixel(layer,0,0);
   check(tiles.size()==4096 && std::ranges::all_of(tiles,[](const auto &tile){return bool(tile);}) &&
             tiles.size()*(PaintEmissionTile::wire_bytes+sizeof(PaintTile))>128*1024*1024 &&
-            paint->storage_bytes()<80*1024*1024 &&
+            paint->storage_bytes()<20*1024*1024 &&
             center.physical==ink.emission && corner.physical==ink.emission &&
             center.coverage>corner.coverage && center.coverage<1.f/255,
         "All 4096 tiles retain varying sub-byte coverage and exact radiance within the storage limit");
+  const auto common_owner=common.front();
+  check(PaintTile::is_shared_default(common_owner.get()) &&
+            std::ranges::all_of(common,[&](const auto &tile){return tile==common_owner;}),
+        "Present default common tiles share one owner while the FLOAT plane remains independently authored");
   const auto center_owner=tiles.at(32*64+32);
   check(paint->undo() && !paint->has_physical_emission() &&
             paint->redo() && paint->layers().front().emission_tiles.at(32*64+32)==center_owner,
@@ -787,30 +792,47 @@ void fullsize_physical_paint(const std::filesystem::path &root) {
     const auto loaded=document.copy_scene().active().painted;
     check(loaded->storage_bytes()==paint->storage_bytes() &&
               loaded->emission_pixel(layer,1024,1024)==center &&
+              loaded->layers().front().tiles.back()==common_owner &&
               loaded->emission_pixel(layer,0,0)==corner,
-          "Cold Open restores compressed storage and original FLOAT samples");
+          "Cold Open restores shared common tiles and original FLOAT samples");
     document.save_async(second).get();
 
-    const auto target=root/"reduced-512.dsculpt";
-    TextureSetEdit edit;
-    edit.action=TextureSetAction::Resolution;
-    edit.resolution=512;
-    document.edit_texture_set(edit);
-    document.save_async(target).get();ready(document);
-    const auto smaller=document.copy_scene().active().painted;
-    check(smaller->resolution()==512 &&
-              smaller->emission_pixel(layer,256,256).physical==center.physical &&
-              Scene::load(target).active().painted->resolution()==512,
-          "The default worker reduces dense 2048 FLOAT paint and preserves its radiance");
-    check(document.undo() && document.copy_scene().active().painted->resolution()==2048 &&
-              document.copy_scene().active().painted->emission_pixel(layer,1024,1024)==center &&
-              document.redo() && document.copy_scene().active().painted->resolution()==512,
-          "Full-size reduction retains its source and result through native Undo and Redo");
+    for (const auto resolution : {512u,1024u}) {
+      const auto target=root/("reduced-"+std::to_string(resolution)+".dsculpt");
+      TextureSetEdit edit;
+      edit.action=TextureSetAction::Resolution;
+      edit.resolution=resolution;
+      document.edit_texture_set(edit);
+      document.save_async(target).get();ready(document);
+      const auto smaller=document.copy_scene().active().painted;
+      check(smaller->resolution()==resolution &&
+                smaller->layers().front().tiles.back()==common_owner &&
+                smaller->emission_pixel(layer,resolution/2,resolution/2).physical==center.physical &&
+                Scene::load(target).active().painted->resolution()==resolution,
+            "The default worker reduces dense 2048 FLOAT paint and preserves its radiance and shared carrier");
+      check(document.undo() && document.copy_scene().active().painted->resolution()==2048 &&
+                document.copy_scene().active().painted->emission_pixel(layer,1024,1024)==center &&
+                document.redo() && document.copy_scene().active().painted->resolution()==resolution &&
+                document.undo(),
+            "Full-size reduction retains its source and result through native Undo and Redo");
+      ready(document);
+    }
   }
   std::ifstream original(first,std::ios::binary),restored(second,std::ios::binary);
   check(original && restored && std::equal(std::istreambuf_iterator<char>(original),{},
                                           std::istreambuf_iterator<char>(restored),{}),
         "Cold Open and resave preserve the original native wire bytes");
+  const size_t center_tile=32*64+32;
+  PaintSettings color;
+  brush.radius=.012f;
+  paint->begin_stroke();
+  paint->stamp(brush,color);
+  check(paint->layers().front().tiles[center_tile]!=common_owner &&
+            common_owner->has_default_pixels() && paint->emission_pixel(layer,1024,1024)==center,
+        "Local color overpaint detaches the shared common tile and preserves FLOAT emission");
+  paint->cancel_stroke();
+  check(paint->layers().front().tiles[center_tile]==common_owner,
+        "Cancelling local overpaint restores the original immutable common owner");
   std::cout<<"Full-size retained paint bytes "<<paint->storage_bytes()<<'\n';
 }
 

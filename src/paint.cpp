@@ -70,6 +70,24 @@
 #include <mutex>
 #include <list>
 namespace dome {
+const PaintTile PaintTile::default_tile_{};
+
+std::shared_ptr<const PaintTile> PaintTile::shared_default() {
+  static const auto owner = std::shared_ptr<const PaintTile>(&default_tile_, [](const PaintTile *) {});
+  return owner;
+}
+
+bool PaintTile::has_default_pixels() const noexcept {
+  static_assert(sizeof(PaintPixel) == 14 && sizeof(PaintTile) == size * size * 14);
+  return std::memcmp(this, &default_tile_, sizeof(PaintTile)) == 0;
+}
+
+size_t PaintTile::encoded_storage_bytes(std::span<const uint8_t> bytes) {
+  if (bytes.size() != sizeof(PaintTile))
+    throw std::invalid_argument("Invalid paint tile byte count");
+  return std::memcmp(bytes.data(), &default_tile_, sizeof(PaintTile)) == 0 ? 0 : sizeof(PaintTile);
+}
+
 namespace {
 std::array<float,7> emission_channels(const PaintEmissionValue &value) {
   return {value.legacy[0], value.legacy[1], value.legacy[2],
@@ -164,6 +182,12 @@ void name_valid(const std::string &s) {
 }
 size_t tile_count(const PaintLayer &layer) {
   return std::count_if(layer.tiles.begin(),layer.tiles.end(),[](const auto &tile){return bool(tile);});
+}
+size_t common_storage_bytes(const PaintLayer &layer) {
+  size_t bytes = 0;
+  for (const auto &tile : layer.tiles)
+    bytes += PaintTile::storage_bytes(tile.get());
+  return bytes;
 }
 size_t color_tile_count(const PaintLayer &layer) {
   return std::count_if(layer.pbr_tiles.begin(),layer.pbr_tiles.end(),[](const auto &tile){return bool(tile);});
@@ -866,8 +890,8 @@ struct SourcePaintAccess {
   }
   static Footprint footprint(const PaintedMesh &p) {
     return {geometry_bytes(p.mesh()),coordinate_bytes(maps(p)),
-      uint64_t(p.resolution())*p.resolution(),uint64_t(p.allocated_tiles_)*sizeof(PaintTile)+
-      uint64_t(p.allocated_color_tiles_)*sizeof(PaintColorTile)+[&]{uint64_t n=p.baked_?p.baked_->storage_bytes():0;for(const auto &l:p.layers_)n+=emission_storage_bytes(l);return n;}(),!p.surface_->source_capture_only};
+      uint64_t(p.resolution())*p.resolution(),uint64_t(p.allocated_color_tiles_)*sizeof(PaintColorTile)+
+      [&]{uint64_t n=p.baked_?p.baked_->storage_bytes():0;for(const auto &l:p.layers_)n+=common_storage_bytes(l)+emission_storage_bytes(l);return n;}(),!p.surface_->source_capture_only};
   }
   // One canonical forecast for preparation, save, decode and prospective
   // strokes. Reserve the full sixteen layer-slot arrays, so metadata-only
@@ -962,7 +986,8 @@ struct SourcePaintAccess {
         }
         const auto &tiles=layer.at("tiles");
         if(!tiles.is_array()||tiles.size()>size*size/1024||(original&&!tiles.empty()))throw std::invalid_argument("Invalid or nonpristine source paint tiles");
-        result.tiles+=tiles.size()*sizeof(PaintTile);
+        for(const auto &tile:tiles)
+          result.tiles+=PaintTile::encoded_storage_bytes(tile.at("data").get_binary());
         if(layer.contains("pbr_color_tiles")&&(!layer.at("pbr_color_tiles").is_array()||!layer.at("pbr_color_tiles").empty()))
           throw std::invalid_argument("Independent source paint cannot borrow a prepared color plane");
       }
@@ -1298,7 +1323,7 @@ std::shared_ptr<const detail::PaintOverlayPacket> detail::PaintOverlayFactory::c
     if(layer.visible&&layer.opacity>0){
       packet->layers_.push_back({layer.opacity,layer.tiles,layer.pbr_tiles,layer.emission_tiles});
       packet->storage_bytes_+=(layer.tiles.size()+layer.pbr_tiles.size()+layer.emission_tiles.size())*sizeof(std::shared_ptr<const PaintTile>);
-      for(const auto &tile:layer.tiles)if(tile){packet->empty_=false;if(common_owners.insert(tile.get()).second)packet->storage_bytes_+=sizeof(PaintTile);}
+      for(const auto &tile:layer.tiles)if(tile){packet->empty_=false;if(common_owners.insert(tile.get()).second)packet->storage_bytes_+=PaintTile::storage_bytes(tile.get());}
       for(const auto &tile:layer.pbr_tiles)if(tile&&color_owners.insert(tile.get()).second)packet->storage_bytes_+=sizeof(PaintColorTile);
       for(const auto &tile:layer.emission_tiles)if(tile&&emission_owners.insert(tile.get()).second)packet->storage_bytes_+=tile->storage_bytes();
     }
@@ -1530,11 +1555,16 @@ void PaintedMesh::stamp_sampled(const Brush &b,const PaintSettings &settings,con
   auto prior = l.tiles;
   auto prior_colors = l.pbr_tiles;
   auto prior_emission = l.emission_tiles;
-  size_t emission_bytes=0;for(const auto &layer:layers_)emission_bytes+=emission_storage_bytes(layer);
+  size_t common_bytes=0,emission_bytes=0;
+  for(const auto &layer:layers_) {
+    common_bytes+=common_storage_bytes(layer);
+    emission_bytes+=emission_storage_bytes(layer);
+  }
+  const size_t original_common_bytes=common_bytes;
   const size_t original_emission_bytes=emission_bytes;
   size_t allocated = allocated_tiles_;
   size_t allocated_colors = allocated_color_tiles_;
-  const size_t retained_storage=storage_bytes()-allocated_tiles_*sizeof(PaintTile)-
+  const size_t retained_storage=storage_bytes()-original_common_bytes-
     allocated_color_tiles_*sizeof(PaintColorTile)-original_emission_bytes;
   const uint64_t source_working=source_sampling_prepared()?SourcePaintAccess::working_bytes(*this):0;
   bool changed = false;
@@ -1675,6 +1705,11 @@ void PaintedMesh::stamp_sampled(const Brush &b,const PaintSettings &settings,con
       if (tile_changed || color_changed || emission_changed) {
         if(!l.tiles[tile])++allocated;
         if(color_changed && !l.pbr_tiles[tile])++allocated_colors;
+        std::shared_ptr<const PaintTile> common=l.tiles[tile];
+        if(tile_changed || !common)
+          common=copy->has_default_pixels()?PaintTile::shared_default():std::move(copy);
+        common_bytes-=PaintTile::storage_bytes(l.tiles[tile].get());
+        common_bytes+=PaintTile::storage_bytes(common.get());
         std::shared_ptr<const PaintEmissionTile> sealed_emission;
         if (emission_changed) {
           sealed_emission=PaintEmissionTile::pack(*emission_copy);
@@ -1682,13 +1717,13 @@ void PaintedMesh::stamp_sampled(const Brush &b,const PaintSettings &settings,con
             emission_bytes-=l.emission_tiles[tile]->storage_bytes();
           emission_bytes+=sealed_emission->storage_bytes();
         }
-        const uint64_t added=uint64_t(allocated-allocated_tiles_)*sizeof(PaintTile)+
+        const uint64_t added=(common_bytes>original_common_bytes?common_bytes-original_common_bytes:0)+
           uint64_t(allocated_colors-allocated_color_tiles_)*sizeof(PaintColorTile)+
           (emission_bytes>original_emission_bytes?emission_bytes-original_emission_bytes:0);
-        if(retained_storage+allocated*sizeof(PaintTile)+allocated_colors*sizeof(PaintColorTile)+emission_bytes>128*1024*1024||
+        if(retained_storage+common_bytes+allocated_colors*sizeof(PaintColorTile)+emission_bytes>128*1024*1024||
            (source_sampling_prepared()&&source_working+added>SourcePaintOptions::maximum_working_bytes))
           throw std::length_error("Paint storage budget exceeded");
-        l.tiles[tile] = std::move(copy);
+        l.tiles[tile] = std::move(common);
         if(color_changed)l.pbr_tiles[tile]=std::move(color_copy);
         if(sealed_emission){if(l.emission_tiles.empty())l.emission_tiles.resize(l.tiles.size());l.emission_tiles[tile]=std::move(sealed_emission);}
         changed = true;
@@ -1724,7 +1759,7 @@ bool PaintedMesh::end_stroke() {
   size_t bytes = 0;
   for (size_t i = 0; i < tiles.size(); ++i)
     if (before_[i] != tiles[i])
-      bytes += sizeof(PaintTile) * 2;
+      bytes += PaintTile::storage_bytes(before_[i].get())+PaintTile::storage_bytes(tiles[i].get());
   for(size_t i=0;i<colors.size();++i)if(before_colors_[i]!=colors[i])bytes+=sizeof(PaintColorTile)*2;
   for(size_t i=0;i<std::max(before_emission_.size(),emission.size());++i) {
     const auto old=i<before_emission_.size()?before_emission_[i].get():nullptr;
@@ -3330,8 +3365,7 @@ size_t PaintedMesh::storage_bytes() const {
   if(source_maps_)for(const auto &[set,uv]:source_maps_->extra_uv_sets)result+=uv->size()*sizeof(std::array<float,2>);
   if(normal_projection_)result+=normal_projection_->pbr->rgba.size()+normal_projection_->mtoon->rgba.size();
   for (const auto &layer : layers_)
-    for (const auto &tile : layer.tiles)
-      if (tile) result += sizeof(PaintTile);
+    result += common_storage_bytes(layer);
   for(const auto &layer:layers_)result+=color_tile_count(layer)*sizeof(PaintColorTile);
   if(source_sampling_prepared()) {
     const auto original=source_sampling_original();const auto &m=original->mesh();
@@ -5728,11 +5762,16 @@ std::shared_ptr<PaintedMesh> PaintedMesh::decode_impl(const nlohmann::json &inpu
       if (i >= l.tiles.size() || l.tiles[i] || !data.is_binary() ||
           data.get_binary().size() != 32 * 32 * 14)
         throw std::runtime_error("Invalid paint tile data");
-      allocated += sizeof(PaintTile);
+      auto &bytes = data.get_binary();
+      const auto tile_bytes = PaintTile::encoded_storage_bytes(bytes);
+      if (!tile_bytes) {
+        l.tiles[i] = PaintTile::shared_default();
+        continue;
+      }
+      allocated += tile_bytes;
       if (allocated > 128 * 1024 * 1024)
         throw std::length_error("Paint storage budget exceeded");
       auto tile = std::make_shared<PaintTile>();
-      auto &bytes = data.get_binary();
       size_t offset = 0;
       for (auto &p : tile->pixels)
         for (auto &b : p.data)

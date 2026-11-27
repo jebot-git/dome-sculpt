@@ -762,8 +762,10 @@ SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,
     const auto &layers=paint.at("layers");
     if(!layers.is_array() || layers.empty() || layers.size()>16)throw std::runtime_error("Invalid original UV layers");
     for(const auto &layer:layers) {
-      if(!layer.at("tiles").is_array())throw std::runtime_error("Invalid original UV tiles");
-      tile_bytes+=layer.at("tiles").size()*sizeof(PaintTile);
+      const auto &common=layer.at("tiles");
+      if(!common.is_array()||common.size()>r*r/1024)throw std::runtime_error("Invalid original UV tiles");
+      for(const auto &tile:common)
+        tile_bytes+=PaintTile::encoded_storage_bytes(tile.at("data").get_binary());
       if(layer.contains("pbr_color_tiles")) {
         if(!layer.at("pbr_color_tiles").is_array())throw std::runtime_error("Invalid original PBR color tiles");
         tile_bytes+=layer.at("pbr_color_tiles").size()*sizeof(PaintColorTile);

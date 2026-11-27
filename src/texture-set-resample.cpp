@@ -297,7 +297,7 @@ void omit_default_reduction_channels(const PaintLayer &layer,paint_grid::Layout 
   std::array<uint8_t,14> differing{};
   for(const auto &tile:layer.tiles) {
     stop(limits);
-    if(!tile)continue;
+    if(!tile||PaintTile::is_shared_default(tile.get()))continue;
     work(report,tile->pixels.size(),limits);
     for(const auto &pixel:tile->pixels) {
       for(size_t c=0;c<13;++c)differing[c]|=pixel.data[c];
@@ -1072,7 +1072,8 @@ std::vector<PaintLayer> resample_texture_set_layers(
           }
         const auto t = size_t(ty) * (to / 32) + tx;
         if (exact_common || has_common || has_pbr || has_emission) {
-          out.tiles[t] = std::make_shared<const PaintTile>(std::move(common));
+          out.tiles[t] = common.has_default_pixels()?PaintTile::shared_default():
+              std::make_shared<const PaintTile>(std::move(common));
           ++report.output_tiles;
         }
         if (exact_pbr || has_pbr)

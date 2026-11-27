@@ -130,6 +130,20 @@ struct PaintPixel {
 struct PaintTile {
   static constexpr uint32_t size = 32;
   std::array<PaintPixel, size * size> pixels;
+
+  // A present tile can carry FLOAT emission or prepared color even when all
+  // of its common bytes are untouched. Share those bytes without losing the
+  // tile's presence or changing the native archive layout.
+  static std::shared_ptr<const PaintTile> shared_default();
+  bool has_default_pixels() const noexcept;
+  static bool is_shared_default(const PaintTile *tile) noexcept { return tile == &default_tile_; }
+  static size_t storage_bytes(const PaintTile *tile) noexcept {
+    return tile && !is_shared_default(tile) ? sizeof(PaintTile) : 0;
+  }
+  static size_t encoded_storage_bytes(std::span<const uint8_t>);
+
+private:
+  static const PaintTile default_tile_;
 };
 struct PaintColorTile {
   // Sparse optional second color plane. Ordinary PaintPixel/Tile layouts do

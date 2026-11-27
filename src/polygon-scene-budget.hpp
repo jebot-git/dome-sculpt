@@ -81,8 +81,9 @@ struct PolygonSceneBudget {
       const auto &t = l.at("tiles");
       if (!t.is_array() || t.size() > 4096)
         throw std::invalid_argument("Invalid polygon paint tile count");
-      add(paint_bytes, t.size() * sizeof(PaintTile), 256 * 1024 * 1024,
-          "Scene retained paint storage exceeded");
+      for(const auto &tile:t)
+        add(paint_bytes, PaintTile::encoded_storage_bytes(tile.at("data").get_binary()),
+            256 * 1024 * 1024, "Scene retained paint storage exceeded");
       if (l.contains("pbr_color_tiles")) {
         const auto &pbr = l.at("pbr_color_tiles");
         if (!pbr.is_array() || pbr.size() > 4096)
