@@ -1,0 +1,150 @@
+{
+  "utc": "2026-11-27T20:14:51.045223+00:00",
+  "product": "24b5a505e220fae56d2e0213228f3910aaf43ac2",
+  "parent": "73b03b3a9cbedeff1fdde5a6d49d3f4f1b5cc231",
+  "patch_sha256": "f3f2eab018e1f35a71a139a4d88207be6e36f9a6d9a29a5fddb3ca756d50ee0d",
+  "DomeD": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "toolkits": {
+    "FLTK": "/opt/fltk-vr/toolkit",
+    "BDF": "/opt/fltk-vr/bdf-runtime",
+    "oneAPI": "DPC++ 7.2.0"
+  },
+  "release": {
+    "cpu": {
+      "resize": {
+        "passed": 25,
+        "junit_sha256": "6252e56505eaf4223038ff81eb60254fa094f363af45a2cfe52ec7753609b8f2"
+      },
+      "adjacent": {
+        "passed": 9,
+        "junit_sha256": "45261342259121901020c1cd08246dc9cf0f6cabd5f2b293db43b673a18e6cb1"
+      },
+      "app_sha256": "9ba554647dc80abcd51644e2f89b8ec95bcd4e1e7aa53e5aa65407fec30db45e"
+    },
+    "oneapi": {
+      "resize": {
+        "passed": 26,
+        "junit_sha256": "e2a1d55255246d3493b3d46eded0dac1fa61a28ca9a12a8025cf28a33667f1bb"
+      },
+      "adjacent": {
+        "passed": 9,
+        "junit_sha256": "f3aad0d6eff8fc3f5d274db870e81d65f81a5697a21e317ce1a49bcc3eb0e33c"
+      },
+      "app_sha256": "8c078ad64ad0a72a34f432eba6c48df36d5ffd0c876ffbc0acfd78f7c55811f7"
+    }
+  },
+  "strict_ASan_UBSan": {
+    "fullsize": {
+      "log_sha256": "cf379306c551765c89eb4596458d17f90913608e4793c775c53f67d22df0d661",
+      "last_line": "Full-size retained paint bytes 75694080"
+    },
+    "painted": {
+      "log_sha256": "094bf9ff3d47d5f060765571862774342eb06fe0b269ff1a580bd6e9f1bf501e",
+      "last_line": "PASS Dense reduction preserves exact ordered Save, cold Open and history"
+    },
+    "baked": {
+      "log_sha256": "a6dc1e4b2abc7a93baf43b963136c02e3fa95bda826871fc057b50eb52365d0f",
+      "last_line": "PASS The default quality guard refuses a reduction that would erase sharp normal detail"
+    },
+    "retained": {
+      "log_sha256": "d138f5847b76ad558a3b31f0f43ee90b652bb647204f11c0360aac03a1eb8b20",
+      "last_line": "PASS Bake after cold reopen uses the new writable grid and retained native normal frame"
+    },
+    "baked-emission-native": {
+      "log_sha256": "875a8a141978fff9cd39a8d34ff37e89f40b9f785aacaa01da706d522bbd63f1",
+      "last_line": "Native baked emission 69 checks PASS"
+    },
+    "affine": {
+      "log_sha256": "6f6036581f12f0c89ed1851ed80097b4c9b16c102500e9d768ecf57892e466e7",
+      "last_line": "PASS 779 native polygon grid and normal Bake checks"
+    }
+  },
+  "fullsize_paint": {
+    "pixels": 2048,
+    "tiles": 4096,
+    "limit_bytes": 134217728,
+    "prior_dense_layout_bytes": 176160768,
+    "packed_retained_bytes": 75694080,
+    "project_file_bytes": 176308777,
+    "project_sha256": "432656673567bda902328bb7bc5c2b82d8fca4078147daf8dff48ea39ed80650"
+  },
+  "earlier_projects_byte_identical": {
+    "native-authored-paint-resolution/dense-native-512": "f2d10b67287f7ff776ebb4daf393f98f452639554c034ec5d62c5c16b5c92076",
+    "native-authored-paint-resolution/dense-visible-512": "9a1cf1b919abd6ca84574d9bf15b80aa0619c0467e01eb11c240130b7f5fdae4",
+    "native-baked-paint-resolution/native-ldr-bake64": "2dff5d83ae7df5ba543936bb6b4483c61d035656d6b129ce3bd83c613e1d2edb",
+    "native-baked-paint-resolution/native-float-bake64": "96a22a10cc0e6d2a9541236456664c1578e008bdcb3510189df63c36dd6f28df"
+  },
+  "fullsize_local_edit": {
+    "changed_tiles": 4,
+    "retained_bytes": 75743232,
+    "log_sha256": "86640f1f8ae6f4ca366006b82f6d542637203c3b64695b3a6959d113dbdf33df"
+  },
+  "GPU_preview": {
+    "software": {
+      "float_comparisons": 16777216,
+      "maximum_relative_error": 5.96037e-08,
+      "preview_bytes": 436243456,
+      "log_sha256": "0289dfbd1a2e4303a7a821079bd790426042a3c1d1040aafae74cc3c440cf43f"
+    },
+    "arc": {
+      "float_comparisons": 16777216,
+      "maximum_relative_error": 5.96037e-08,
+      "preview_bytes": 436243456,
+      "log_sha256": "5a4b178ceb4c60c85ab3e18df06b80071654cc4e6b3caec4fe0de6332e004894"
+    }
+  },
+  "nested_DomeD_Wayland": {
+    "passes": 5,
+    "report_sha256": "01f441794c3c2bbc06ad400a2c4722e77cc44f4b2971499272cfa693f69e1062"
+  },
+  "Arc_synthetic_OpenXR": {
+    "completed": true,
+    "native_sha256": "432656673567bda902328bb7bc5c2b82d8fca4078147daf8dff48ea39ed80650",
+    "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+    "balanced_frames": 85,
+    "original_grid": 2048,
+    "app_sha256": "9ba554647dc80abcd51644e2f89b8ec95bcd4e1e7aa53e5aa65407fec30db45e",
+    "runtime_sha256": "d0e80502e363efd9b4a0089ef41b44c86328e8e96485c0e50acedd1b0f5c40a8",
+    "report_sha256": "dfc9392d96b3e1e5e2d0cf6a056bf040256d661e865086c7ff922fa50b704534"
+  },
+  "fullsize_resolution_diagnostic": {
+    "default_work_limit": 128000000,
+    "default_peak_byte_limit": 268435456,
+    "diagnostic_work_allowance": 512000000,
+    "diagnostic_byte_allowance": 536870912,
+    "destination": {
+      "512": {
+        "default_refusal": "Texture-set resolution exceeds its complete peak-byte budget",
+        "diagnostic_work": 241958472,
+        "diagnostic_peak_bytes": 301399876,
+        "layer_taps": 4194304,
+        "work_by_phase": {
+          "layer_filter_and_quality": 142601472,
+          "raster": 5767240,
+          "overlay_reconstruction": 93589760
+        }
+      },
+      "1024": {
+        "default_refusal": "Texture-set resolution exceeds its complete peak-byte budget",
+        "diagnostic_work": 275743672,
+        "diagnostic_peak_bytes": 372296260,
+        "layer_taps": 4194304,
+        "work_by_phase": {
+          "layer_filter_and_quality": 142569328,
+          "raster": 23068744,
+          "overlay_reconstruction": 110105600
+        }
+      }
+    }
+  },
+  "earlier_full_Release": {
+    "revision": "a2646a2898d8141fe43fc673d79b41bddabeef1e",
+    "build_completed": true,
+    "build_log_sha256": "9736b3d6bae44b352edd4bb9f87c01e7c24409412f4eb673b8e66d64f5de3387",
+    "test_unit": "ds-full-release-paint-ctest-20261127.service",
+    "test_invocation": "1334762ea6bf4947b07a3b5211d43417",
+    "registered": 1438,
+    "phase_at_recording": "run all Release tests"
+  },
+  "scope": "Native authoring, project replay, and GPU preview of one fully authored 2048 FLOAT layer. Default full-size reduction and physical headset qualification remain open."
+}

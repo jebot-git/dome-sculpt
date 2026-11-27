@@ -288,6 +288,16 @@ layer stacks, additional material channels and physical-device acceptance
 remain required.
 [Two dense paint layers validation](validation/paint-grid-channel-filter-20261127.json)
 
+Native FLOAT paint now packs constant channels by tile and keeps all
+varying values and coverage bit for bit. The shared storage supports a
+fully authored 2048-pixel layer under the original paint retention
+limit. The full-size fixture covers a native brush stroke, exact history,
+ordered Save, cold Open, raw wire replay and GPU preview on software and
+Intel Arc. The original on-disk format and FLOAT fallback validation are
+preserved. Full-size default reduction, broader dense stacks and
+physical-input qualification remain required.
+[Full-size FLOAT paint validation](validation/paint-emission-fullsize-20261127.json)
+
 Native multi-material retopology preserves independently painted and baked
 grids and original VRM 1.0 joint links when Apply changes the patch.
 Linked Shape Restore uses the current pose of the original imported rig.

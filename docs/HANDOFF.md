@@ -546,10 +546,41 @@ build and retain their missing-device refusals.
 The first frozen `b73fd2df` full Release attempt stopped because two
 paint-sampling tests included a header that lacked the declaration of
 `SourceMaterialBindings`. Commit `a2646a28` supplies it. Both affected
-test sources compile in the resumed frozen build using the preserved
-compiler cache. The all-target build and regression are still in progress
-under `ds-full-release-paint-header-20261127.service`.
+test sources compile and the resumed frozen all-target build completed.
+Its harness looked for the app in the old compiler-cache directory after
+the sandbox closed. The corrected harness runs all 1,438 registered tests
+against the completed build under `ds-full-release-paint-ctest-20261127.service`.
 [Two dense paint layers validation](validation/paint-grid-channel-filter-20261127.json)
+
+FLOAT paint tiles now store each constant channel once and retain all bits
+of varying channels. Coverage remains independent of legacy brightness
+and physical radiance, including below one byte of coverage. Painting,
+resampling, retopology, Bake, render staging and the native archive use
+the same immutable tile values. The original FLOAT wire layout still
+round trips byte for byte. Retention and archive preflights charge the
+actual packed owners.
+
+The native brush now authors all 4,096 tiles of a 2048-pixel FLOAT field
+within the existing 128 MiB per-field limit. The fixture retains 75,694,080
+bytes, compared with 176,160,768 bytes in the previous dense layout.
+Undo and Redo restore the original tile owner. Ordered Save and cold Open
+reproduce the project bytes on CPU and oneAPI. Native DomeD Wayland and
+synthetic OpenXR save the same full-size project through the application.
+After cold Open, a second stroke with different radiance changes four
+tile owners. Undo and Redo restore the exact before and after owners.
+Independent preview checks compare 16,777,216 physical radiance and coverage
+values on llvmpipe and Intel Arc, with maximum relative error below
+`6e-8`. The ordinary viewport draws without a production readback. The
+focused Release runs pass 34 CPU and 35 oneAPI cases, and six strict
+ASan/UBSan workflows pass.
+
+The default 2048-to-512 and 2048-to-1024 reductions still hit the
+prospective byte limit. Larger diagnostic allowances report 241,958,472
+and 275,743,672 work units respectively. The layer filtering and quality
+pass alone uses about 142.6 million units on either target. Full-size
+interactive painting across wider layer stacks, default reduction of
+full-size atlases and physical headset acceptance remain open.
+[Full-size FLOAT paint validation](validation/paint-emission-fullsize-20261127.json)
 
 Retopology reapply now works on native multi-material accessories attached
 to original VRM 1.0 joints. The replacement keeps its avatar hierarchy and
