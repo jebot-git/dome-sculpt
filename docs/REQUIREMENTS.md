@@ -38,7 +38,7 @@ Cancel, Undo and Redo. Synthetic OpenXR exercises posed reopen and
 custom-cage Bake on software GL and Intel Arc. Linked VRM 1.0 accessories
 retain their original joint identities in Standard and Editable export.
 Portable GLB and VRM export explicitly refuses active normal frames beyond
-the angular limit. Retopology still requires further Surface Heat accounting.
+the angular limit.
 Physical device tests and production scenes remain open.
 [Retained texture-set skin evidence](validation/retained-texture-set-skin-20261127.json)
 
@@ -50,6 +50,16 @@ memory cap, Cancel, Undo/Redo and a cold Save round trip are checked on all
 four authored fixture cases. The native worker, DomeD Wayland and synthetic
 OpenXR match exactly for the first-bind case.
 [Authored frame binding evidence](validation/surface-heat-authored-frames-20261127.json)
+
+Surface Heat supports editable retopology after Apply and explicit Bake.
+The patch's topology records, atlas, hidden painted source and its rig
+survive bind, weight painting, Save, Undo/Redo and rig Restore. Plain and
+reflected/sheared source cases retain their stable quad, pin and seam.
+Both GLB modes preserve the weighted pose in an independent geometry
+consumer. Khronos still reports implicit tangent generation and skinned
+node hierarchy advisories for these fixtures. Automatic paint or skin
+transfer when publishing changed topology remains a separate workflow.
+[Retopology skin evidence](validation/retopology-surface-heat-20261127.json)
 
 The current combined atlas and HDR cache source passes all 153 checks
 in both software Release and Intel Arc ASan/UBSan OpenXR replays. Its

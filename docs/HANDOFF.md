@@ -59,6 +59,14 @@ pass in both Release and ASan/UBSan. An independent reader reconstructs all
 four GLB fixtures from their skin and morph accessors within 0.06 micrometres.
 [Retained texture-set skin validation](validation/retained-texture-set-skin-20261127.json)
 
+Surface Heat now accepts editable retopology patches and their retained rig
+origins. Admission counts the stable topology records and shared patch
+owner before allocating a request. Plain and reflected, sheared source
+workflows run from retopology Apply through Bake, bind, weight painting,
+pose, and GLB export. Cold Restore recovers the original unbound patch
+and Bake. The first bind matches across the native worker, DomeD Wayland,
+and synthetic OpenXR on software GL and Intel Arc. [Retopology skin validation](validation/retopology-surface-heat-20261127.json)
+
 Surface Heat also binds meshes after independent frame and shapekey
 authoring. Retention accounts for the actual POSITION correspondences,
 artist normals and tangents, writable paint, and prepared color and normal

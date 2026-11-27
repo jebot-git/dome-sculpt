@@ -1,0 +1,180 @@
+{
+  "revision": "246288169894a71fa8e090a4b8a4d707b3bc0561",
+  "canonical_domed_revision": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "release_fltk": "/opt/fltk-vr/toolkit",
+  "asan_fltk": "artifacts/sdk-20261126/toolkit-sanitize",
+  "release_application_sha256": "8cd54ae1a7b16afba23b70c68561bd66d9a6d8bc72abf63636aaeb7d96b0770c",
+  "qualification": {
+    "plain": "Native projected quad, pin, seam, hidden painted and rigged source, color Bake, Surface Heat, weight painting, Restore and pose",
+    "affine": "Same workflow from reflected and sheared original with exact rig space and independent published patch coordinates",
+    "openxr": "Bind and reopen/pose on a plain retopology patch using the application and synthetic controller/runtime"
+  },
+  "native": {
+    "release": {
+      "tests": [
+        "anatomical-admission-controls",
+        "independent-seam-key-mirror-prepared",
+        "independent-seam-key-mirror-retained",
+        "native-paint-key-frames",
+        "retopology-affine",
+        "retopology-authoring",
+        "retopology-save-handoff",
+        "retopology-surface-heat-affine",
+        "retopology-surface-heat-plain",
+        "surface-heat-authored-frames",
+        "surface-heat-native"
+      ],
+      "case_assertions": {
+        "plain": 25,
+        "affine": 25
+      },
+      "native_test_sha256": "b0592f7495fa3c5f76bceb3e377a86c54bffbdcd459bb8797fca3720ac4bad7b"
+    },
+    "asan": {
+      "tests": [
+        "anatomical-admission-controls",
+        "independent-seam-key-mirror-prepared",
+        "independent-seam-key-mirror-retained",
+        "native-paint-key-frames",
+        "retopology-affine",
+        "retopology-authoring",
+        "retopology-save-handoff",
+        "retopology-surface-heat-affine",
+        "retopology-surface-heat-plain",
+        "surface-heat-authored-frames",
+        "surface-heat-native"
+      ],
+      "case_assertions": {
+        "plain": 25,
+        "affine": 25
+      },
+      "native_test_sha256": "aaf8278b7ae6053ed5a0fe8a63e3cc6193c98fb8fd60fa0a5b0ed71ea4520c70"
+    }
+  },
+  "sanitizer_environment": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+  },
+  "identical_release_asan_files_sha256": {
+    "retopology-surface-heat-plain/patch.dsculpt": "dd794076f3ff13348175974fc07ebd14662f6e6172d75f5f8ea0c91e389ba91c",
+    "retopology-surface-heat-plain/before-bind.dsculpt": "778b81b5726ae22adee67588eae3ab95e670767f8bcedf62156f04a784f2daf8",
+    "retopology-surface-heat-plain/bound.dsculpt": "398f2eebb11778637bd44aa6771b43fcd810d9e0af6c4596cf98753116e9a444",
+    "retopology-surface-heat-plain/posed.dsculpt": "cad0a93cd8a4afd07def221998f2f4907c7f30a50a4e66d4c84820558bb87f6b",
+    "retopology-surface-heat-plain/standard.glb": "a062060eaa66bf4abf83da0c19c9c909f5ecf7b838d01f6e92b373a541529ce4",
+    "retopology-surface-heat-plain/editable.glb": "7ad6340d4aaa86c7c3a79818d123afec6e6df2a49afa88643e68313e503a0b53",
+    "retopology-surface-heat-affine/patch.dsculpt": "77cbc7bad43591af4fda49c702b8dcacd296c91f889a899c44ff846bec924879",
+    "retopology-surface-heat-affine/before-bind.dsculpt": "8c6fa55fef2fbd61640f3dea8b8736a62e57ca643e468b793cde3e55d0d73c50",
+    "retopology-surface-heat-affine/bound.dsculpt": "8c6fdac78b8568c06498383223dd029840e85317eb83dc0fea457b3d3babf588",
+    "retopology-surface-heat-affine/posed.dsculpt": "152f08cb58a8f0122028d8edd273e9dce9298fbe467c427c60bd49dffbcd8832",
+    "retopology-surface-heat-affine/standard.glb": "3e51b0c70626d84bc0b0788d349541b98486037d9bd27f1a6d7bcd9ea8c8ae7a",
+    "retopology-surface-heat-affine/editable.glb": "f5cfdd82ad93621a6e13dee71cab01935345f5727117695979c905dbc65dfbd4"
+  },
+  "nested_domed_wayland_assertions": 9,
+  "synthetic_openxr": {
+    "software": {
+      "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+      "bind": {
+        "project_sha256": "398f2eebb11778637bd44aa6771b43fcd810d9e0af6c4596cf98753116e9a444",
+        "stereo_submissions": 77,
+        "image_releases": 154
+      },
+      "pose": {
+        "project_reopen_and_close_exact": true,
+        "stereo_submissions_per_case": 6,
+        "image_releases_per_case": 12,
+        "different_rgb_components_per_eye": [
+          87834,
+          86983
+        ]
+      }
+    },
+    "arc": {
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "bind": {
+        "project_sha256": "398f2eebb11778637bd44aa6771b43fcd810d9e0af6c4596cf98753116e9a444",
+        "stereo_submissions": 77,
+        "image_releases": 154
+      },
+      "pose": {
+        "project_reopen_and_close_exact": true,
+        "stereo_submissions_per_case": 6,
+        "image_releases_per_case": 12,
+        "different_rgb_components_per_eye": [
+          87993,
+          87118
+        ]
+      }
+    }
+  },
+  "independent_glb_consumer": [
+    {
+      "file": "retopology-surface-heat-plain/standard.glb",
+      "corners": 6,
+      "maximum_position_error_m": 0,
+      "maximum_weight_error": 0
+    },
+    {
+      "file": "retopology-surface-heat-plain/editable.glb",
+      "corners": 6,
+      "maximum_position_error_m": 0,
+      "maximum_weight_error": 0
+    },
+    {
+      "file": "retopology-surface-heat-affine/standard.glb",
+      "corners": 6,
+      "maximum_position_error_m": 3.852697433804194e-08,
+      "maximum_weight_error": 0
+    },
+    {
+      "file": "retopology-surface-heat-affine/editable.glb",
+      "corners": 6,
+      "maximum_position_error_m": 3.852697433804194e-08,
+      "maximum_weight_error": 0
+    }
+  ],
+  "khronos": {
+    "version": "2.0.0-dev.3.10",
+    "files": 4,
+    "errors": 0,
+    "warnings": {
+      "MESH_PRIMITIVE_GENERATED_TANGENT_SPACE": 4,
+      "NODE_SKINNED_MESH_NON_ROOT": 4
+    }
+  },
+  "physical_headset_tested": false,
+  "archive": {
+    "path": "retopology-surface-heat-20261127.tar.gz",
+    "sha256": "db8ba51ad712b07afc73bd7f242ad54939f32a30d0bc0989df15f3dbd4f051df",
+    "members_sha256": {
+      "asan-current.log": "e08e1a6a3449d57ce45282f5db517eac79b3d5a1e0906d6bf5bc9c0c643cbccc",
+      "asan-native-evidence.json": "6376d0b1a8cec17e1c2f72783e5f14e25534274b924c03e9a9bef20c14a6077e",
+      "bind-wayland.log": "28e079bd70b3c844373c422b142605bd59018fb642ecd57bcd93c2da83174d62",
+      "check-profile.sh": "35dac9771396ed3be35ff1bb0151f1e6bfa0cdebcd20eb9b4356af18dc47b838",
+      "consumer.json": "6505ca41271accf385447afdb4c761e9146bf74d7490eda156cfed50f7be5a2c",
+      "consumer.log": "6505ca41271accf385447afdb4c761e9146bf74d7490eda156cfed50f7be5a2c",
+      "consumer.py": "65ebc4048df548163f57d257a8a0176977286a2d8ceea06e053d7073cc83cf5b",
+      "khronos.cjs": "c96db67b539acb4264faa6558ea1bdbfe3f19d17809c30a4252952254198fdaa",
+      "khronos.json": "bcc3437aa22adb7328971b4ae224c357d32508cf691965d929c0f6bf381b5df4",
+      "khronos.log": "ce5662408ae52f3dc875e9590f2b437996e502a9a30e7ea48c5b4fd3a0e0d51e",
+      "receipt.py": "d941ffb524d961fdd5714f828b97b1d47ebf724b1af4eb5c9270dbc002fde6aa",
+      "release-native-evidence.json": "6376d0b1a8cec17e1c2f72783e5f14e25534274b924c03e9a9bef20c14a6077e",
+      "release-repaired.log": "d7cfe46e7418608e36ef86056160a5a34b5805a8a44e180b30ab648d8383e1c0",
+      "run-bind.py": "00ed2d6feb595e774472de28d904c025518ad97f3a3ab0aa5416657f386af939",
+      "run-render.py": "25c9f902f469bc46a912fb157a40d33fc7edee9d931df93f7e7595c358616470",
+      "verified-bind-arc.log": "5e2625d21617c162bf1d3dafe35777f51851592618032ec762ddb149a5f3b8d4",
+      "verified-bind-software.log": "aa18aa6e95da7aeebc5238c29bb095971307d0c72c3fd5f471c86600a5e7dbc0",
+      "verified-pose-arc.log": "8d4d5632fbe8064a1674dcf760cc0852b41419f09ed8b2765ce00f1deb6f53ea",
+      "verified-pose-software.log": "0095b41bc3192aff4670245bcc2d6bb0c1c597c8c1a20aaf542955521898d90f",
+      "wayland-bind/report.json": "c0a96e7908de4a42f896484c16a950b97793b23c865066d1073069ad9d2876fe",
+      "wayland-heat.py": "d4bd674fcd839a3e759de5dbde70ee05bec2bd8fde30842f663b11d0708d5f2e",
+      "xr-arc/compare.json": "2715f3d0d0983668b45253c9f037645935f44fc7a03197ead12783d85d21ecd2",
+      "xr-bind-arc/compare.json": "3083841ed95448744f7d37c7e558dee24db79f357b5c85ec7169f341caab315a",
+      "xr-bind-arc/report.json": "566001120458b30ca8b82cc9a5a15ae1627e49847c3206b03934b2d059b49b57",
+      "xr-bind-software/compare.json": "dcb1d8360f1ea68346f7130bb5c625ab895c68465aba4657a5a458527803cd40",
+      "xr-bind-software/report.json": "990ad198bf5c90b9506cd3e79e121f7b0bf91160c52c7e1b08b6f726c18fa748",
+      "xr-bind.py": "ab88a34dd32bc203ec37144989bf128f706b42980f3fd1dfb72607496fcd6c64",
+      "xr-pose.py": "c120860d3261915f5d56027fcb7f5f088709898321d63370b6a72f76f8c57dfe",
+      "xr-software/compare.json": "b963a0185aa7819b41b3884660de1f53be002dcf81a81417896e7024b207872f"
+    }
+  }
+}
