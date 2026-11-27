@@ -128,6 +128,22 @@ preceding revision. With the device program warm, the medians were 0.30 and
 0.37 seconds respectively. CUDA and ROCm compile and refuse missing hardware.
 [Native Bake normal evidence](validation/native-bake-normal-gpu-20261128.json)
 
+Prepared native vertex color now composites on the selected GPU when the
+material uses no original texture samplers. The pass resolves a separate PBR
+color image and alpha while preserving the common color image, alternate
+paint tiles and fractional Bake coverage. On the 1024-pixel imported
+`COLOR_0` fixture, derived maps and the complete application GLB export
+match byte for byte. Median compositing time across three paired Arc runs
+fell from 256 to 78 milliseconds. Six focused Arc Release tests and the
+headless sanitizer reference pass. Original texture samplers and retained
+paint coordinates still need device adapters.
+
+The full Arc sweep exposed an allocation test that measured 301 one-time
+GPU runtime allocations. The fixture now measures the warmed operation used
+by the retries. Three Arc runs pass all 91 failure probes and keep
+the exact source sculpt and protection after each injected failure.
+[Prepared color and allocation evidence](validation/prepared-color-gpu-20261128.json)
+
 Dome Sculpt is an integrated authoring candidate. The isolated software
 Release run for `662d889d` passed all 1,366 registered tests. The newer
 controller attachment revision `eea22499` passed all 1,367 registered tests

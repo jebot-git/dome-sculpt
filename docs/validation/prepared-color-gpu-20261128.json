@@ -1,0 +1,174 @@
+{
+  "date": "2026-11-28",
+  "product_commit": "c03409ba85f83624db6e686dcabc9aaa024374d8",
+  "allocation_fixture_commit": "60b6a97da80b0b9563c8fb96d17e82a7aa91c4a1",
+  "benchmark_baseline_commit": "ae0d6ff4589e02440f647455e143ac2d91130049",
+  "domed_toolkit_commit": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "arc_release_application": {
+    "file": "artifacts/prepared-color-gpu-20261128/oneapi/dome-sculpt",
+    "sha256": "b02eeb3f76e27fd9a611e1d2b2380263113de6db216e9756a7ed709e4fff59fa"
+  },
+  "device": "Intel Arc A770 / 0000:03:00.0 / renderD129",
+  "scope": "Eligible 512\u20132048 native grids with a validated COLOR_0 projection and no original texture samplers. The GPU composites separate common and prepared PBR images, including resolved Bake color, sparse alternate paint tiles, original padding and independent straight-alpha coverage.",
+  "arc_release": {
+    "file": "artifacts/prepared-color-gpu-20261128/oneapi/prepared-color-gpu.xml",
+    "sha256": "73c72cfafde17257975d8c160eb35e67e894a0508641c0e070af2755e5ed4d27",
+    "passed": 6,
+    "tests": [
+      "current-color-source-bake",
+      "paint-overlay-gpu",
+      "color-preparation",
+      "current-color-target-preparation",
+      "paint-composite-compute",
+      "paint-composite-native"
+    ]
+  },
+  "synthetic_openxr": {
+    "checks": 20,
+    "report": {
+      "file": "artifacts/prepared-color-gpu-20261128/oneapi/bake-policy-xr/report.json",
+      "sha256": "5d4fce8613ab15f59b797e104484b0178a7d91102b5a53bd3740dbe6efc44dd4"
+    },
+    "suite": {
+      "file": "artifacts/prepared-color-gpu-20261128/oneapi/bake-policy-hardware.xml",
+      "sha256": "2509712c670b4f4580969ea2650c60583ad3d88b1c50c93e65686df1af8eeb8a",
+      "passed": 1,
+      "tests": [
+        "bake-policy-openxr"
+      ]
+    },
+    "scope": "Existing Bake policy renderer and controller regression with hardware GL and synthetic input."
+  },
+  "headless_sanitizers": {
+    "compute": {
+      "file": "artifacts/prepared-color-gpu-20261128/asan/paint-composite-compute.cpp.log",
+      "sha256": "2494af9e99ebf43f1621a83f40904536ebc3179de34a0a2952bfb0fb67fd20af"
+    },
+    "native": {
+      "file": "artifacts/prepared-color-gpu-20261128/asan/paint-composite-native.cpp.log",
+      "sha256": "66d4e422963328e48d437eb3b20527267a26a8651247e02892b86fa31d39385f"
+    },
+    "scope": "Current sanitizer-built paint and compute translation units with preceding headless test reference archive."
+  },
+  "benchmark": {
+    "fixture": {
+      "file": "artifacts/prepared-color-gpu-20261128/project.dsculpt",
+      "sha256": "6abd90a4a5226a44cb99e7100fe43e94047a0628906a4fd43a783a08f5be6e97"
+    },
+    "generator": {
+      "file": "artifacts/prepared-color-gpu-20261128/probe.cpp",
+      "sha256": "ffef41d80fe22a2cf225bc70150785a5853810670e82f14b36077cebb580c55b"
+    },
+    "grid_side": 1024,
+    "scope": "Three paired runs, measured after opening the editable native project. Includes upload, all GPU work, readback and material image construction. Full Arc suite remained active during measurements.",
+    "before": {
+      "runs": [
+        {
+          "file": "artifacts/prepared-color-gpu-20261128/measure-before-1.log",
+          "sha256": "c011f2b52b98f4baeb377ffb6b7c04d57dc268452d0f54d0a2e8e516562ad84f",
+          "elapsed_ns": 253791876
+        },
+        {
+          "file": "artifacts/prepared-color-gpu-20261128/measure-before-2.log",
+          "sha256": "de6e9ecb6154a9b7aa7c28b156b2370089c31ab2b03ba99db973e0ce86f92b96",
+          "elapsed_ns": 255545636
+        },
+        {
+          "file": "artifacts/prepared-color-gpu-20261128/measure-before-3.log",
+          "sha256": "43e7a155581d4367f7c366efd8678a05e56294d527224789e7c29fa9d448a6db",
+          "elapsed_ns": 295363122
+        }
+      ],
+      "median_ns": 255545636
+    },
+    "after": {
+      "runs": [
+        {
+          "file": "artifacts/prepared-color-gpu-20261128/measure-after-1.log",
+          "sha256": "a57aedf6d31148ed317516dd19abbf583853c9c92a9f45bb4084ff4fe5f9d5ca",
+          "elapsed_ns": 104002758
+        },
+        {
+          "file": "artifacts/prepared-color-gpu-20261128/measure-after-2.log",
+          "sha256": "690593cb2042b26ee219d16c9869069ae9861e46bf1c6a24755817fa1125df8f",
+          "elapsed_ns": 63389545
+        },
+        {
+          "file": "artifacts/prepared-color-gpu-20261128/measure-after-3.log",
+          "sha256": "d5ed0167b7507726c89024552b1d27517d3a672630723eff009a1b92bbd63cf0",
+          "elapsed_ns": 78074226
+        }
+      ],
+      "median_ns": 78074226
+    }
+  },
+  "exact_map_digests": {
+    "common": "85956ac1e96205cd",
+    "pbr": "f8c4dcf396bdffed",
+    "orm": "6426331b06abd3a9",
+    "emission": "40bede9a1c1e18ad",
+    "normal": "cbf29ce484222325",
+    "color_coverage": "f564eedf2f1aa2c0",
+    "emission_coverage": "bb140926bc8e0de6",
+    "baked_normal": "cbf29ce484222325",
+    "baked_coverage": "cbf29ce484222325",
+    "common_transparency": "1",
+    "pbr_transparency": "1"
+  },
+  "application_glb": {
+    "file": "artifacts/prepared-color-gpu-20261128/after.glb",
+    "sha256": "82ab63f2d2cb0f674978111766ec86c41a323aa70fb8760e2275ccc942b9baf6",
+    "all_bytes_equal": true,
+    "embedded_pbr_texture_size": [
+      1024,
+      1024
+    ],
+    "embedded_pbr_png_sha256": "ebf4f913c890f0dac14f66e5c066012cdc50319a218c2af8d41c3b46791d91ca",
+    "vertex_color_applied_once": true,
+    "oneapi_trace": {
+      "file": "artifacts/prepared-color-gpu-20261128/export-after.log",
+      "sha256": "c5eb508ad2de14cb039a963f2eff00bcd0ed08e2a36fbdba67d55a9a356df87c"
+    }
+  },
+  "vendor_refusal": {
+    "oneapi": {
+      "file": "artifacts/prepared-color-gpu-20261128/missing-device.log",
+      "sha256": "175656dae70b120db23b47b6935732b422c98bb1ac2a481e536f9db18be736a5"
+    },
+    "cuda": {
+      "file": "artifacts/prepared-color-gpu-20261128/cuda-missing.log",
+      "sha256": "67ace548d78c118235f7e6de5e132f176abd6a148044aae63ba6164e67d8f3f1"
+    },
+    "rocm": {
+      "file": "artifacts/prepared-color-gpu-20261128/rocm-missing.log",
+      "sha256": "1c5e5a089ef9a89bba7eece1faffd5c685bdc4ed28b340acafa1cbd99049f12d"
+    },
+    "scope": "Current CUDA and HIP modules compiled and linked with the missing-device oracle. Positive AMD and NVIDIA hardware remains open."
+  },
+  "allocation_fixture": {
+    "diagnosis": {
+      "file": "artifacts/prepared-color-gpu-20261128/diagnose-alloc.log",
+      "sha256": "6dae750c787c86e5f0c699d361e2f8bc4cb3ae039b2179592ba92add6ad7ef9f"
+    },
+    "warm_measurements": 5,
+    "first_operation_allocations": 127078,
+    "subsequent_operation_allocations": 126777,
+    "selected_boundaries_per_retry": 91,
+    "exact_retries": 3,
+    "validated_retries": {
+      "file": "artifacts/prepared-color-gpu-20261128/allocation-tests.log",
+      "sha256": "1c28ddcc5f55419851801256810e1677d8e48a7efd52a32ae229d93b820a9fc2"
+    }
+  },
+  "preceding_full_arc_sweep": {
+    "candidate": "30eaee642f95ce59fbf2f1743e7c368524147acf",
+    "registered": 1443,
+    "completed_at_receipt": 939,
+    "failures_at_receipt": [
+      "source-paint-resources",
+      "sculpt-resolution-allocation"
+    ],
+    "terminal": false,
+    "live_status": "artifacts/gpu-arc-full-release-20261127/combined-test-status.json"
+  }
+}

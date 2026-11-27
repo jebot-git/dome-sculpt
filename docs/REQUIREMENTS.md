@@ -18,6 +18,13 @@ rounding and padded coverage. Arc Release and the 2048-pixel GLB fixture
 confirm exact output. The CUDA and ROCm paths built and rejected missing
 devices. [Native Bake normal evidence](validation/native-bake-normal-gpu-20261128.json)
 
+Native prepared `COLOR_0` materials without original texture samplers now
+use the same device compositor for separate common and PBR outputs. Arc
+validation confirms exact layered and baked color, alpha, native project
+reopen, and standard GLB export. Original texture samplers and retained
+paint coordinates still need GPU coverage.
+[Prepared color evidence](validation/prepared-color-gpu-20261128.json)
+
 ## Current validation — 2026-11-27
 
 The [current handoff](HANDOFF.md) records the exact combined Release, Arc,
