@@ -33,8 +33,21 @@ tangents where the material requires them. Release and ASan/UBSan pass the
 focused worker suite. Eight OpenGL fixtures pass on llvmpipe and Intel Arc,
 nested DomeD Wayland covers Create and Undo/Redo, and synthetic OpenXR
 reopens and renders the saved pose in both eyes. A fresh combined Release
-run for `9db1ed93` is running separately.
+run for `9db1ed93` finished with 1,368 passes and one artist-normal failure.
 [Retained texture-set shapekey validation](validation/retained-texture-set-shapekeys-20261127.json)
+
+Shapekey authoring now uses a geometric reference even at zero displacement.
+Creating a key after UV edits and returning a key to rest preserve the
+artist's normal and tangent offsets. Projects saved with the affected
+independent-corner calculation reopen and resave byte for byte. Their old
+targets stay exact when a new key is edited. The focused Release suite, 77
+independent graphical checks on Intel Arc A770, and the synthetic OpenXR
+accept, cancel and focus workflows pass. Six ASan/UBSan tests passed in a
+working build that included the local retopology resampling draft. The
+exact-source sanitizer rebuild and the full Release rerun of `2d171233`
+are underway. The full run uses
+`ds-post-uv-artist-combined-release-20261127.service`.
+[Artist-normal validation](validation/post-uv-artist-normal-20261127.json)
 
 Bake now projects between active shapekey poses on retained PBR material
 sets. Ray projection with AO, matching triangles and custom cages use the

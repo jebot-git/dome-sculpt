@@ -1,0 +1,104 @@
+{
+  "revision": "2d171233546482b790bbef05df7083797fb1917c",
+  "canonical_domed_revision": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "release_fltk": "/opt/fltk-vr/toolkit",
+  "sanitizer_fltk": "artifacts/sdk-20261126/toolkit-sanitize",
+  "earlier_combined_release": {
+    "candidate": "9db1ed935ff7bab46ece5206b2d06e29f04ac3a0",
+    "terminal": true,
+    "invocation": "e5d10f6508e046448e55d12d0a12f75a",
+    "phase": "complete",
+    "elapsed_seconds": 4795.369,
+    "registered": 1369,
+    "app_sha256": "9b707e5cd9e6b96106fc063346599523b63598e4d12c4851e14097f5755a7380",
+    "cache_sha256": "16bb6cb059e5e6aff26ffbe8733fdec3be43bdbfad78c5a9ca262175b08ff337",
+    "exit": 8,
+    "totals": {
+      "pass": 1368,
+      "fail": 1,
+      "skip": 0
+    },
+    "failed": [
+      "prepared-keys-after-uv-render"
+    ],
+    "skipped": [],
+    "junit_sha256": "b8bdf2422f2cdbac9e9c4e50c579566c40ab9a8e52415259a5c738fd74524057"
+  },
+  "focused_release": {
+    "tests": [
+      "native-key-uv",
+      "independent-seam-key-mirror-retained",
+      "native-key-uv-worker",
+      "native-key-uv-render",
+      "prepared-keys-after-uv",
+      "post-uv-key-strokes",
+      "independent-seam-key-mirror-prepared",
+      "native-paint-key-frames",
+      "normal-bake-frame-authoring",
+      "native-key-uv-openxr",
+      "prepared-keys-after-uv-render"
+    ],
+    "application_sha256": "c9d5da3ef28606205ce2f5df38bdd73576c3ed1320a8a95e91ff7f6763f772db",
+    "artist_normal_render_test_sha256": "820b783be181fb92083030041792eb71d482bbf45612fb028c1875be56d84138"
+  },
+  "sanitizer": {
+    "fixed": {
+      "tests": [
+        "independent-seam-key-mirror-prepared",
+        "native-paint-key-frames",
+        "prepared-keys-after-uv",
+        "independent-seam-key-mirror-retained",
+        "post-uv-key-strokes",
+        "prepared-keys-after-uv-render"
+      ],
+      "source": "Product correction with the concurrent uncommitted retopology resampling extraction"
+    }
+  },
+  "actual_open_gl": {
+    "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+    "assertions": 77,
+    "independent_export_reader": true
+  },
+  "synthetic_openxr": {
+    "assertions": 26,
+    "controller_cases": [
+      "accept",
+      "cancel",
+      "focus loss"
+    ]
+  },
+  "compatibility": {
+    "prior_product": "246288169894a71fa8e090a4b8a4d707b3bc0561",
+    "unchanged_archive_sha256": "22e1d5da1f207f1f4b5a4f2a47723902c04aa7995bdba74788b90ddd5c563df0",
+    "new_edit": [
+      "previous target remains exact",
+      "first Restore capsule remains exact",
+      "correct geometric reference",
+      "cold decode authenticates both targets"
+    ]
+  },
+  "full_rerun_at_snapshot": {
+    "service": "ds-post-uv-artist-combined-release-20261127.service",
+    "main_pid": 1170176,
+    "invocation": "01886451a9fb402f8c088ba33569884b",
+    "phase": "build every registered target",
+    "state": "running"
+  },
+  "physical_headset_tested": false,
+  "archive": {
+    "sha256": "51fe58f4afe70e42ec7e1b34126ba42a6033a53ee050fb697bf3fcb2ac544326",
+    "members_sha256": {
+      "release.log": "9edff0213d91011e4a11c2a87998fe3ad80bd8250d70415fbaab400fbc06b9da",
+      "arc.log": "9c23f917c5a29c7c6734bbea08149bdf67701df0bd6d99bd5d21cd49926e7701",
+      "legacy-authoring.log": "52d38b5a5042018bb5ff4ae3ccfee8db7fa83f826c6fe66bee0886d82dfd0d5d",
+      "legacy.dsculpt": "22e1d5da1f207f1f4b5a4f2a47723902c04aa7995bdba74788b90ddd5c563df0",
+      "legacy-reedited.dsculpt": "79bacfdfc8dec71d24514ec2223762e425d554c6fc8f8ad08b293d42a759e0fc",
+      "synthetic-openxr.json": "49e3ed1ff42960ae0d5d08fad610c94dd70fe65029fca3835a59a1ab65563ef3",
+      "earlier-combined-release.json": "47641acb695527f7141f6f7c3b042e98af433e697ff3b4c8d378d9f6cf7272fe",
+      "baseline-regression.log": "2b0f6de3034f6955be2f03753032d1914d1fda62367ea0cf82f367174a8b7992",
+      "generate-legacy-fixture.py": "fa9f98c0762630d3fce5601623abd3d2e7233a9f9009b676ff60249e42943c4d",
+      "archive-main.cpp": "597c80a3a33ec0fa5d3d5836ea8d15ea89d2fc6f00ee47bded827fea83ca198a",
+      "asan-fixed.log": "d9597a595c415e6e6339dfaae200fde8eb3da570e5308022043281d8543cfc6a"
+    }
+  }
+}

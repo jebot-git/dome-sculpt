@@ -19,6 +19,15 @@ sets, nonlinear mixed-weight portable lighting,
 and physical headset acceptance remain open.
 [Retained texture-set shapekey evidence](validation/retained-texture-set-shapekeys-20261127.json)
 
+New and replaced shapekey endpoints preserve artist normal and tangent
+offsets after UV edits, including when the edited positions return to rest.
+The original paint and sampling replay remain exact through Undo, Redo and
+Cold Open. Historical independent-corner projects replay their saved frame
+calculation exactly, and new edits preserve their existing endpoints and
+Restore capsule. The `9db1ed93` full Release failure reproduced on the
+previous product code and passes the focused check on `2d171233`.
+[Artist-normal evidence](validation/post-uv-artist-normal-20261127.json)
+
 Retained PBR sets now donate and receive editable Bake data with active
 shapekey weights. Authenticated posed triangles drive ray and matching
 projection, conditional AO and custom cage placement. Normal detail is
