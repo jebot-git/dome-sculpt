@@ -318,7 +318,10 @@ void ordinary() {
     source_exact(candidate, baseline, original);
   }
 }
-void faults(size_t first = 1, size_t last = SIZE_MAX) {
+void faults(size_t first = 1, size_t last = SIZE_MAX,
+            size_t shard = 0, size_t shards = 1) {
+  if (shards == 0 || shards > 16 || shard >= shards)
+    throw std::invalid_argument("Invalid colored-cut allocation shard");
   set_paint_composite_cache_budget(0);
   auto original = cut_color_fixture::scene(true, true);
   auto baseline = original.encode();
@@ -341,6 +344,15 @@ void faults(size_t first = 1, size_t last = SIZE_MAX) {
   const auto measured = allocations;
   check(measured > 100, "Real detached colored cut exposes meaningful owned "
                         "allocation boundaries");
+  if (shards > 1) {
+    // Partition the measured run so toolchain-dependent allocation counts
+    // still receive complete coverage, including the final partial shard.
+    const auto offset = [&](size_t index) {
+      return (measured / shards) * index + std::min(index, measured % shards);
+    };
+    first = offset(shard) + 1;
+    last = offset(shard + 1);
+  }
   if (!first || first > measured)
     throw std::invalid_argument("Fault range is outside measured cut allocations");
   last = std::min(last, measured);
@@ -401,6 +413,8 @@ void faults(size_t first = 1, size_t last = SIZE_MAX) {
 int main(int argc, char **argv) try {
   if (argc == 4 && std::string_view(argv[1]) == "--fault-range")
     faults(std::stoull(argv[2]), std::stoull(argv[3]));
+  else if (argc == 4 && std::string_view(argv[1]) == "--fault-shard")
+    faults(1, SIZE_MAX, std::stoull(argv[2]), std::stoull(argv[3]));
   else if (argc == 2 && std::string_view(argv[1]) == "--faults")
     faults();
   else

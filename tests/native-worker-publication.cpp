@@ -13,21 +13,42 @@
 using namespace dome;
 namespace dome {struct DocumentTransactionTestAccess {
  static std::thread::id worker(Document&d){return d.native_thread_.get_id();}
+ static std::thread::id mesh_worker(Document&d){return d.mesh_thread_.get_id();}
  static bool pending(Document&d){return d.native_notice_pending_.load();}
  static bool no_history(Document&d){std::lock_guard lock(d.model_mutex_);return d.undo_.empty()&&d.redo_.empty();}
 };}
 namespace {
-std::thread::id target;
+std::atomic<std::thread::id> target{},paused_mesh{};
 std::atomic_bool denied=false,block=false;
 std::atomic<size_t> observed=0;
 std::binary_semaphore entered(0),release(0);
+std::binary_semaphore mesh_entered(0),mesh_release(0);
+struct ReleaseGate {
+  std::binary_semaphore &semaphore;
+  bool opened=false;
+  void open(){if(!opened){opened=true;semaphore.release();}}
+  ~ReleaseGate(){open();}
+};
 size_t checks=0;
 void check(bool b,const char*m){if(!b)throw std::runtime_error(m);++checks;}
 template<class F>void await(F f,const char*m){const auto end=std::chrono::steady_clock::now()+std::chrono::seconds(8);while(!f()){if(std::chrono::steady_clock::now()>end)throw std::runtime_error(m);std::this_thread::sleep_for(std::chrono::milliseconds(2));}}
 Mesh quad(){Mesh m;m.positions={{-.3f,-.3f,0},{.3f,-.3f,0},{.3f,.3f,0},{-.3f,.3f,0}};m.normals.assign(4,{0,0,1});m.uv={{{0,0}},{{1,0}},{{1,1}},{{0,1}}};m.indices={0,1,2,0,2,3};return m;}
 NativeStrokeSample ray(){NativeStrokeSample s;s.origin={0,0,1};s.direction={0,0,-1};s.brush.radius=.1f;return s;}
 }
-void*operator new(size_t n){if(std::this_thread::get_id()==target){if(block.exchange(false)){entered.release();release.acquire();}if(denied.load()){++observed;throw std::bad_alloc();}}if(auto*p=std::malloc(n?n:1))return p;throw std::bad_alloc();}
+void*operator new(size_t n){
+  const auto current=std::this_thread::get_id();
+  if(current==paused_mesh.load(std::memory_order_relaxed)){
+    paused_mesh.store({},std::memory_order_relaxed);
+    mesh_entered.release();
+    mesh_release.acquire();
+  }
+  if(current==target.load(std::memory_order_relaxed)){
+    if(block.exchange(false)){entered.release();release.acquire();}
+    if(denied.load()){++observed;throw std::bad_alloc();}
+  }
+  if(auto*p=std::malloc(n?n:1))return p;
+  throw std::bad_alloc();
+}
 void*operator new[](size_t n){return ::operator new(n);}void operator delete(void*p)noexcept{std::free(p);}void operator delete[](void*p)noexcept{std::free(p);}void operator delete(void*p,size_t)noexcept{std::free(p);}void operator delete[](void*p,size_t)noexcept{std::free(p);}
 int main(int argc,char**argv)try{
  const bool replace=argc>1&&std::string(argv[1])=="replace";
@@ -37,14 +58,41 @@ int main(int argc,char**argv)try{
  Scene scene;scene.active().painted=std::make_shared<PaintedMesh>(quad(),64);scene.active().mesh_active=true;
  if(held){auto a=AffineTransform{}.matrix();a[0]=-2;a[4]=.3;scene.active().affine_edit=std::make_shared<const NativeAffineEdit>(AffineTransform(a));}
  Document d;d.replace(scene);check(d.wait_mesh(),"Source is ready");const auto before=d.copy_scene().encode();target=DocumentTransactionTestAccess::worker(d);
- struct ReleaseGate{bool opened=false;void open(){if(!opened){opened=true;release.release();}}~ReleaseGate(){open();}}gate;
+ ReleaseGate gate{release};
  SpatialFrame frame;
  auto send=[&]{++frame.sequence;frame.time+=.05;d.submit(frame);check(d.wait_input(),"Actual held frame drains");};
- if(held){d.configure_object_grab(true,true);frame.focused=frame.head_valid=true;frame.head.position={0,1.6f,0};for(auto &h:frame.hands)h.tracked.valid=true;frame.hands[0].tracked.grip.position={0,1.4f,-.3f};send();frame.hands[1].tracked.grip.position=ob::transform(d.frame().state->canvas,{0,0,0});frame.hands[1].tracked.grip.orientation=d.frame().state->canvas.orientation;send();frame.hands[0].tracked.squeeze=1;send();check(d.frame().state->object_grabbing,"Actual physical affine grip starts before worker denial");}
+ if(held){
+   ReleaseGate mesh_gate{mesh_release};
+   paused_mesh=DocumentTransactionTestAccess::mesh_worker(d);
+   d.configure_object_grab(true,true);
+   check(mesh_entered.try_acquire_for(std::chrono::seconds(8)),
+         "The render worker has taken the new grab-mode revision");
+   frame.focused=frame.head_valid=true;
+   frame.head.position={0,1.6f,0};
+   for(auto &h:frame.hands)h.tracked.valid=true;
+   frame.hands[0].tracked.grip.position={0,1.4f,-.3f};
+   send();
+   frame.hands[1].tracked.grip.position=ob::transform(d.frame().state->canvas,{0,0,0});
+   frame.hands[1].tracked.grip.orientation=d.frame().state->canvas.orientation;
+   send();
+   frame.hands[0].tracked.squeeze=1;
+   send();
+   check(d.frame().state->object_grabbing,"Actual physical affine grip starts before worker denial");
+   frame.hands[1].tracked.trigger=1;
+   send();
+   const auto stale=d.frame();
+   check(stale.state->revision>stale.surface->revision&&!stale.state->native_pending&&
+         stale.state->message=="Wait for the current surface before painting",
+         "Contact on the stale grab-mode surface is refused before native work");
+   frame.hands[1].tracked.trigger=0;
+   send();
+   mesh_gate.open();
+   check(d.wait_mesh(),"The current grab-mode surface is ready for contact painting");
+ }
  denied=block=true;
  if(held){frame.hands[1].tracked.trigger=1;send();check(d.frame().state->native_pending,"Actual held contact gesture reaches native worker");}
  else check(d.begin_native_stroke(),"Real native gesture admitted before worker denial");
- entered.acquire();
+ check(entered.try_acquire_for(std::chrono::seconds(8)),"The target worker enters the denied allocation gate");
  if(held){frame.hands[0].tracked.squeeze=0;send();}
  else {check(d.sample_native_stroke(ray()),"Sample queued while target worker is blocked");d.end_native_stroke();}
  auto path=home/"ordered.dsculpt";auto saved=d.save_async(path);
