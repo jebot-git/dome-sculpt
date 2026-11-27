@@ -5141,6 +5141,12 @@ if(BUILD_TESTING)
   add_test(NAME texture-set-retained-ldr-production-bake COMMAND dome-sculpt-texture-set-source-export-test
     --retained-bake-target ${CMAKE_CURRENT_BINARY_DIR}/texture-set-retained-ldr-production-bake 1024)
   set_tests_properties(texture-set-retained-ldr-production-bake PROPERTIES TIMEOUT 300)
+  add_test(NAME texture-set-retained-reflected-production-bake COMMAND dome-sculpt-texture-set-source-export-test
+    --retained-bake-target ${CMAKE_CURRENT_BINARY_DIR}/texture-set-retained-reflected-production-bake 1024 reflected)
+  set_tests_properties(texture-set-retained-reflected-production-bake PROPERTIES TIMEOUT 600)
+  add_test(NAME texture-set-retained-multi-production-bake COMMAND dome-sculpt-texture-set-source-export-test
+    --retained-multi-bake-target ${CMAKE_CURRENT_BINARY_DIR}/texture-set-retained-multi-production-bake)
+  set_tests_properties(texture-set-retained-multi-production-bake PROPERTIES TIMEOUT 900)
   add_test(NAME texture-set-retained-native-target COMMAND dome-sculpt-texture-set-source-export-test
     --retained-native-target ${CMAKE_CURRENT_BINARY_DIR}/texture-set-retained-native-target)
   set_tests_properties(texture-set-retained-native-target PROPERTIES TIMEOUT 300)

@@ -766,7 +766,13 @@ void bake_retained_recipient(TextureSetId id,bool physical,uint32_t resolution=6
  const auto old_normal=old.source->normal(covered,{.2,.3,.5},world,true);
  Mesh high=scene.active().painted->mesh();
  const auto local=normalized(Vec3{.18f,-.24f,-1.f});
- for(auto &p:high.positions)p.z+=.012f;
+ Vec3 displacement{0,0,.012f};
+ if(physical&&resolution>64){
+  const auto outward=unit(world.normal({0,0,1}));
+  const auto local_offset=world.inverse().direction({.012*outward.x,.012*outward.y,.012*outward.z});
+  displacement={float(local_offset[0]),float(local_offset[1]),float(local_offset[2])};
+ }
+ for(auto &p:high.positions)p+=displacement;
  high.normals.assign(high.positions.size(),local);
  const auto placement=scene.active().affine_edit;
  const auto donor=scene.add("Independent production Bake donor",Volume{});
@@ -819,9 +825,22 @@ void bake_retained_recipient(TextureSetId id,bool physical,uint32_t resolution=6
        "Actual prepared retained target admits Bake and protects its inherited detail");
  auto stopped=scene.snapshot();
  bool cancelled=false;
- refuses([&]{bake_object(stopped,donor,settings,[&]{return cancelled;},[&](float x){cancelled=x>.6f;});},
-         "Cancellation interrupts the retained field projection before publication");
- check(stopped.encode()==baseline,"An interrupted normal projection preserves both role grids");
+ bool interrupted=false;
+ try{
+  bake_object(stopped,donor,settings,[&]{return cancelled;},[&](float x){cancelled=x>.6f;});
+ }catch(const std::runtime_error &error){
+  interrupted=std::string_view(error.what()).find("cancelled")!=std::string_view::npos;
+ }
+ check(cancelled&&interrupted&&stopped.encode()==baseline,
+       "Actual cancellation interrupts projection and preserves both role grids");
+ if(physical&&resolution>64){
+  auto too_short=settings;too_short.front_mm=too_short.back_mm=1;
+  bool missed=false;
+  try{bake_object(stopped,donor,too_short);}
+  catch(const std::runtime_error &error){missed=std::string_view(error.what()).starts_with("Projection missed");}
+  check(missed&&stopped.encode()==baseline,
+        "Strict affine projection with a short range keeps the original split grids exactly");
+ }
  document.bake_from_object(donor,settings);
  const auto file=std::filesystem::path("retained-target.dsculpt");
  document.save_async(file).get();ready(document);
@@ -843,6 +862,14 @@ void bake_retained_recipient(TextureSetId id,bool physical,uint32_t resolution=6
  const auto expected=unit(world.normal({local.x,local.y,local.z}));
  check(length(N-expected)<.018f&&length(N-old_normal)>.08f,
        "Published normal resolves the projected direction under the actual placed basis");
+ if(physical&&resolution>64){
+  const auto coordinates=current.source->sample(covered,{.2,.3,.5});
+  check(coordinates.normal_uv&&coordinates.paint_uv!=*coordinates.normal_uv,
+        "Both sampled split-grid coordinates remain independently authored after strict projection");
+  const auto emission=baked->emission_field->sample(coordinates.paint_uv[0],coordinates.paint_uv[1]).resolve({},1);
+  check(std::abs(emission[0]-3.f)<1e-5f&&std::abs(emission[1]-.1f)<1e-5f&&std::abs(emission[2]-.2f)<1e-5f,
+        "Strict reflected projection retains the donor's unclamped physical RGB in the paint grid");
+ }
  if(!physical){
   const auto path=std::filesystem::path("retained-target.glb");
   document.export_asset(path,AssetExportFormat::Glb).get();
@@ -876,6 +903,70 @@ void bake_retained_recipient(TextureSetId id,bool physical,uint32_t resolution=6
        "Clear restores inherited detail and keeps the last recipe available");
  check(Scene::decode(cleared.encode()).encode()==cleared.encode()&&
        document.undo()&&document.copy_scene().encode()==saved,"Clear survives cold replay and exact Undo");
+}
+void bake_multiple_retained_fields(){
+ bake_retained_recipient(1,false,1024);
+ auto seed=Scene::load("retained-target.dsculpt");
+ const auto target=seed.active().id;
+ const auto recipe=*active_texture_set(seed.active()).bake_recipe;
+ const auto original_donor=seed.object(recipe.source.object);
+ auto different=original_donor.painted->mesh();
+ const auto direction=normalized(Vec3{-.24f,.11f,-1.f});
+ different.normals.assign(different.positions.size(),direction);
+ const auto alternate=seed.add("Independent second normal donor",Volume{});
+ auto &donor=seed.active();
+ donor.mesh_active=true;
+ donor.painted=std::make_shared<PaintedMesh>(different,64);
+ donor.transform=original_donor.transform;
+ donor.material.color={.27f,.62f,.09f,1};
+ donor.visible=false;
+ donor.locked=true;
+ seed.select(target);
+ Document document;document.replace(seed);ready(document);
+ for(unsigned index=0;index<4;++index){
+  const TextureSetId selected=index%2;
+  if(document.frame().state->active_texture_set!=selected){
+   document.texture_set_action(SpatialCommand::TextureNext);ready(document);
+  }
+  const auto before=document.copy_scene();
+  const auto previous=active_texture_set(before.active());
+  const auto neighbor=texture_set_view(before.active(),1-selected);
+  const auto source=index<2?original_donor.id:alternate;
+  const auto file=std::filesystem::path("multi-"+std::to_string(index)+".dsculpt");
+  document.bake_from_object(source,recipe.settings);
+  document.save_async(file).get();ready(document);
+  const auto accepted=document.copy_scene();
+  const auto current=active_texture_set(accepted.active());
+  const auto other=texture_set_view(accepted.active(),1-selected);
+  const auto field=current.painted->baked()->normal_field;
+  const auto prior=previous.painted->baked()->normal_field;
+  check(current.id==selected&&field->prior()==prior&&current.bake_recipe->source.object==source&&
+        current.source->original_paint()==previous.source->original_paint(),
+        "Each Bake records its own recipe and exact normal event on the selected field");
+  check(other.source==neighbor.source&&other.painted->baked()==neighbor.painted->baked(),
+        "Alternating the active field preserves the independent member");
+  check(field->pbr()==field->mtoon()&& &field->normal_coverage()==&prior->normal_coverage(),
+        "Equal normal planes and immutable full coverage retain shared storage");
+  if(index==1)check(field->pbr()==prior->pbr()&&field->retained_bytes()-prior->retained_bytes()<4096,
+        "Repeating the same projection records an event while sharing the byte-identical normal payload");
+  if(index>=2){
+   const auto triangle=current.domain->triangles().front();
+   const auto world=accepted.world_matrix(target);
+   const auto normal=current.source->normal(triangle,{.2,.3,.5},world,true);
+   check(field->pbr()!=prior->pbr()&&length(normal-direction)<.018f,
+         "A different donor changes the selected resolved field and preserves its earlier plane");
+  }
+  if(index==3){
+   const auto exact=accepted.encode();
+   check(Scene::load(file).encode()==exact,"The multi-field project cold-reopens exactly");
+   check(document.undo()&&document.copy_scene().encode()==before.encode()&&
+         document.redo()&&document.copy_scene().encode()==exact,
+         "The multi-field Bake has exact Undo and Redo");
+   ready(document);
+   document.export_asset("multi.glb",AssetExportFormat::Glb).get();
+   check(document.copy_scene().encode()==exact,"Standard GLB preserves both editable Bake histories");
+  }
+ }
 }
 void bake_retained_native(bool reflected,bool smooth,bool outward=false){
  auto scene=source(false,reflected,false,smooth);
@@ -1087,14 +1178,21 @@ int main(int argc,char **argv)try {
   std::cout<<"PASS "<<checks<<" retained "<<(standard?"Standard":"Editable")<<" HDR controls\n";
   return 0;
  }
- if((argc==3||argc==4)&&mode=="--retained-bake-target"){
+ if((argc==3||argc==4||argc==5)&&mode=="--retained-bake-target"){
   std::filesystem::create_directories(argv[2]);std::filesystem::current_path(argv[2]);
-  if(argc==4)bake_retained_recipient(1,false,uint32_t(std::stoul(argv[3])));
+  if(argc==5&&std::string_view(argv[4])=="reflected")bake_retained_recipient(0,true,uint32_t(std::stoul(argv[3])));
+  else if(argc==4)bake_retained_recipient(1,false,uint32_t(std::stoul(argv[3])));
   else{
    bake_retained_recipient(1,false);
    bake_retained_recipient(0,true);
   }
   std::cout<<"PASS "<<checks<<" retained target Bake controls\n";
+  return 0;
+ }
+ if(argc==3&&mode=="--retained-multi-bake-target"){
+  std::filesystem::create_directories(argv[2]);std::filesystem::current_path(argv[2]);
+  bake_multiple_retained_fields();
+  std::cout<<"PASS "<<checks<<" repeated production retained Bake controls\n";
   return 0;
  }
  if(argc==3&&mode=="--retained-bake-source"){

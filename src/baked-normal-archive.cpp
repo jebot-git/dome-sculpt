@@ -144,7 +144,7 @@ nlohmann::json BakedNormalArchive::encode(){
       {"baseline",f->intrinsic_baseline_},{"pbr",write_images_->add(f->pbr_)},{"mtoon",write_images_->add(f->mtoon_)},
       {"write_pbr",f->write_pbr_?nlohmann::json(write_images_->add(f->write_pbr_)):nlohmann::json(nullptr)},
       {"write_mtoon",f->write_mtoon_?nlohmann::json(write_images_->add(f->write_mtoon_)):nlohmann::json(nullptr)},
-      {"write_coverage",nlohmann::json::binary(f->write_coverage_)}});
+      {"write_coverage",f->write_coverage_?nlohmann::json::binary(*f->write_coverage_):nlohmann::json::binary({})}});
   }
   if(!uv_.empty()){
     j["version"]=2;j["uv"]=nlohmann::json::array();
@@ -174,19 +174,25 @@ std::shared_ptr<const BakedNormalField> BakedNormalArchive::field_at(uint32_t id
   field_busy_[id]=1;
   const auto &j=input_->at("fields")[id];const auto origin=origin_at(uint32_t(ref(j.at("origin"),origins_.size())));
   std::shared_ptr<const BakedNormalField> replay;
+  std::shared_ptr<const Image> write_pbr,write_mtoon;
   if(j.at("prior").is_null())replay=j.at("baseline").get<bool>()?BakedNormalField::from_intrinsic(origin):BakedNormalField::from_canonical(origin);
   else{
     const auto prior=field_at(uint32_t(ref(j.at("prior"),id)));
-    const auto pbr=images_.at(uint32_t(ref(j.at("write_pbr"),images_.size()))),toon=images_.at(uint32_t(ref(j.at("write_mtoon"),images_.size())));
-    replay=prior->replace_planes(*pbr,*toon,j.at("write_coverage").get_binary(),{});
+    write_pbr=images_.at(uint32_t(ref(j.at("write_pbr"),images_.size())));
+    write_mtoon=images_.at(uint32_t(ref(j.at("write_mtoon"),images_.size())));
+    replay=prior->replace_planes(*write_pbr,*write_mtoon,j.at("write_coverage").get_binary(),{});
     if(replay==prior)throw std::invalid_argument("Redundant normal write cannot mint a new field identity");
   }
   const auto pbr=images_.at(uint32_t(ref(j.at("pbr"),images_.size()))),toon=images_.at(uint32_t(ref(j.at("mtoon"),images_.size())));
   if(!same(*replay->pbr(),*pbr)||!same(*replay->mtoon(),*toon)||replay->origin()!=origin||replay->intrinsic_baseline()!=j.at("baseline").get<bool>())
     throw std::invalid_argument("Persisted baked normals differ from actual owning field replay");
   // The private factories allocated a mutable object; publish archive image
-  // owners only after complete replay equality, before any caller can see it.
+  // owners only after complete replay equality. Preserve explicit original
+  // image identities, including distinct but equal planes from older files.
   auto adopted=std::const_pointer_cast<BakedNormalField>(replay);adopted->pbr_=pbr;adopted->mtoon_=toon;
+  adopted->write_pbr_=std::move(write_pbr);adopted->write_mtoon_=std::move(write_mtoon);
+  adopted->account_retained_storage();
+  adopted->validate();
   fields_[id]=std::move(adopted);field_busy_[id]=0;return fields_[id];
 }
 void BakedNormalArchive::require_reachable() const {

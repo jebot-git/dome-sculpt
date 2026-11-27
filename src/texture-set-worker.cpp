@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "texture-set-worker.hpp"
 #include "affine-surface.hpp"
+#include "baked-normal-field.hpp"
 #include "paint-overlay-packet.hpp"
 #include "current-paint-preview.hpp"
 #include "polygon-surface-preview.hpp"
@@ -20,8 +21,9 @@ void charge_preview_work(size_t &work,size_t count,size_t cost,const TextureSetL
   throw std::length_error("Texture-set field preview exceeds its charged work bound");
  work+=count*cost;
 }
+using NormalHistoryOwners=std::set<std::shared_ptr<const BakedNormalField>,std::owner_less<>>;
 void charge_grid_capture(size_t&bytes,size_t&work,const TextureSetView&field,const TextureSetLimits&limits,
-    bool classify_alpha,bool shared_raster=false){
+    bool classify_alpha,NormalHistoryOwners *normal_history=nullptr){
  const auto&paint=*field.painted;
  const size_t tile_area=PaintTile::size*PaintTile::size;
  const size_t pixels=size_t(paint.resolution())*paint.resolution(),tiles=pixels/tile_area;
@@ -34,7 +36,7 @@ void charge_grid_capture(size_t&bytes,size_t&work,const TextureSetView&field,con
   storage_entries+=layer.tiles.size()+layer.pbr_tiles.size()+layer.emission_tiles.size();
  // Charge the retained raster, sparse storage, copied directories and the
  // temporary ordered owner sets used by capture. Include cold-cache work.
- const auto capture_bytes=shared_raster?TextureSetPaintAccess::snapshot_bytes(paint):
+ const auto capture_bytes=normal_history?TextureSetPaintAccess::snapshot_bytes(paint):
      TextureSetPaintAccess::working_bytes(paint,paint.resolution());
  charge(bytes,1,capture_bytes,limits);
  charge(bytes,tiles,visible_layers*3*sizeof(std::shared_ptr<const PaintTile>)+8,limits);
@@ -54,7 +56,18 @@ void charge_grid_capture(size_t&bytes,size_t&work,const TextureSetView&field,con
   scan_tiles+=transparent_base||common;
  }
  charge(bytes,owners,6*sizeof(void*),limits);
- charge(bytes,1,paint.storage_bytes(),limits);
+ auto storage=paint.storage_bytes();
+ if(normal_history&&paint.baked()){
+  for(auto node=paint.baked()->normal_field;node;node=node->prior()){
+   stop(limits);
+   if(!normal_history->insert(node).second){
+    storage-=node->retained_bytes();
+    break;
+   }
+   charge(bytes,1,sizeof(std::shared_ptr<const BakedNormalField>)+4*sizeof(void*),limits);
+  }
+ }
+ charge(bytes,1,storage,limits);
  charge_preview_work(work,owners,2*std::bit_width(owners)+4,limits);
  if(classify_alpha)charge_preview_work(work,scan_tiles*tile_area,1+8*visible_layers,limits);
 }
@@ -103,6 +116,7 @@ void append_texture_set_surface(MeshSnapshot&snapshot,const ObjectSurface&o,
  if(preview_work>limits.maximum_work||corners>limits.maximum_work-preview_work||vertices>limits.maximum_work-preview_work-corners)throw std::length_error("Texture-set snapshot geometry exceeds its work bound");
  preview_work+=corners+vertices;
  std::set<std::shared_ptr<const void>,std::owner_less<>> retained_rasters;
+ NormalHistoryOwners normal_history;
  for(size_t i=0;i<plan->fields().size();++i){
   if(!plan->draws()[i].count)continue;
   const auto&field=plan->fields()[i];
@@ -117,7 +131,7 @@ void append_texture_set_surface(MeshSnapshot&snapshot,const ObjectSurface&o,
   }else if(view.render_only&&retained_material_grid(field)){
    const auto read=field.source->read_view(field,limits);
    const auto normals=retained_hdr_normal_bytes(field);
-   charge_grid_capture(bytes,preview_work,field,limits,false,true);
+   charge_grid_capture(bytes,preview_work,field,limits,false,&normal_history);
    // The plan retains each member raster and the packet aliases its read
    // raster. Neither capture allocates a replacement raster.
    for(const auto *paint:{field.painted.get(),read.get()}){

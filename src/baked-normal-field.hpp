@@ -28,7 +28,7 @@ public:
   const auto &prior() const noexcept {return prior_;}
   const auto &pbr() const noexcept {return pbr_;}
   const auto &mtoon() const noexcept {return mtoon_;}
-  const auto &normal_coverage() const noexcept {return coverage_;}
+  const auto &normal_coverage() const noexcept {return *coverage_;}
   uint32_t resolution() const noexcept {return pbr_->width;}
   uint32_t replacements() const noexcept {return replacements_;}
   bool intrinsic_baseline() const noexcept {return intrinsic_baseline_;}
@@ -41,6 +41,7 @@ private:
   friend class BakedNormalArchive;
   std::shared_ptr<const BakedNormalField> replace_planes(const Image &,const Image &,
       std::span<const uint8_t>,const BakedNormalFieldOptions &) const;
+  void account_retained_storage();
   BakedNormalField()=default;
   BakedNormalField(const BakedNormalField&)=delete;
   BakedNormalField &operator=(const BakedNormalField&)=delete;
@@ -48,10 +49,10 @@ private:
   std::shared_ptr<const CanonicalNormalConversion> origin_;
   std::shared_ptr<const BakedNormalField> prior_;
   std::shared_ptr<const Image> pbr_,mtoon_;
-  std::vector<uint8_t> coverage_;
+  std::shared_ptr<const std::vector<uint8_t>> coverage_;
   // Exact detached operation input retained for an eventual replaying codec.
   std::shared_ptr<const Image> write_pbr_,write_mtoon_;
-  std::vector<uint8_t> write_coverage_;
+  std::shared_ptr<const std::vector<uint8_t>> write_coverage_;
   uint32_t replacements_=0;
   bool intrinsic_baseline_=false;
   size_t retained_bytes_=0;
