@@ -21,14 +21,15 @@ struct TextureSetExportField {
   size_t first=0,count=0;
   Material material;
   std::shared_ptr<const TextureMaps> textures;
-  bool normal_role=false;
+  bool normal_role=false, portable_mtoon_bake_frame=false;
   std::optional<TextureSetExportEmission> emission;
 };
 struct PortableMToonSetPaint {
-  std::shared_ptr<const Image> color, shade, emission;
+  std::shared_ptr<const Image> color, shade, emission, normal;
   // Max component errors for clamp-to-edge bilinear reads in linear units.
   double color_error=0, shade_error=0, shade_interpolation_error=0,
       alpha_error=0, emission_error=0, source_filter_error=0;
+  double normal_error_radians=0;
 };
 std::optional<PortableMToonSetPaint> compile_mtoon_set_paint(
     const TextureSetView &,const TextureSetExportField &,const MToonMaterial &,

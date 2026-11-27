@@ -726,7 +726,8 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
       return retain_native();
 
     const auto &attributes=j["meshes"][result.objects[object].mesh]["primitives"][0]["attributes"];
-    if(binding->roles[size_t(MToonSlot::Normal)].image&&attributes.contains("TANGENT"))
+    if(binding->roles[size_t(MToonSlot::Normal)].image&&attributes.contains("TANGENT")&&
+       !compiled.portable_mtoon_bake_frame)
       return retain_native();
 
     (void)binding->material.copy_working_bytes(12*1024*1024,cancelled);
@@ -802,11 +803,12 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
       limits.cancelled=cancelled;
       paint=compile_mtoon_set_paint(field,compiled,typed,limits);
       if(!paint)return retain_native();
-      const auto replace_role=[&](MToonSlot slot,const std::shared_ptr<const Image> &image){
+      const auto replace_role=[&](MToonSlot slot,const std::shared_ptr<const Image> &image,
+                                  MToonEncoding encoding=MToonEncoding::Srgb){
         auto &role=roles[size_t(slot)];
         role=paint_sampler;
         role.image=image;
-        typed.textures[size_t(slot)]=MToonTexture{.index=0,.encoding=MToonEncoding::Srgb};
+        typed.textures[size_t(slot)]=MToonTexture{.index=0,.encoding=encoding};
         mtoon_paint_images.push_back(image);
       };
       if(paint->color){
@@ -820,6 +822,12 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
       if(paint->emission){
         replace_role(MToonSlot::Emission,paint->emission);
         params.emission={1,1,1};
+      }
+      if(paint->normal){
+        if(!attributes.contains("TANGENT"))throw std::logic_error("Portable MToon Bake needs its canonical tangent stream");
+        replace_role(MToonSlot::Normal,paint->normal,MToonEncoding::Normal);
+        params.normal_enabled=true;
+        params.normal_scale=1;
       }
     }
     for(size_t role=0;role<roles.size();++role){
@@ -850,6 +858,8 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
       }
       if(paint->source_filter_error>0)
         output["extras"]["domeSculptMToonPaint"]["maximumSourceFilterError"]=paint->source_filter_error;
+      if(paint->normal)
+        output["extras"]["domeSculptMToonPaint"]["maximumNormalErrorRadians"]=paint->normal_error_radians;
     }
     if(!collect_extensions(collect_extensions,output))
       throw std::logic_error("MToon material writing introduced an unknown extension");

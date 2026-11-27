@@ -98,6 +98,159 @@ struct MToonShadeTap {
  MToonSourceTap sampling;
 };
 
+struct MToonNormalTap {
+ Vec3 original, baked;
+ float coverage=0, quantization=0;
+};
+
+Vec3 normal_rgb(const uint8_t *p){
+ return {2.f*p[0]/255.f-1,2.f*p[1]/255.f-1,2.f*p[2]/255.f-1};
+}
+
+bool portable_mtoon_bake_frame(const Mesh &mesh,const TextureSetView &field,
+    std::span<const Tangent> tangents,const AffineTransform &world,const TextureSetLimits &limits){
+ const auto &m=world.matrix();
+ const auto product=[&](size_t a,size_t b){
+  return m[4*a]*m[4*b]+m[4*a+1]*m[4*b+1]+m[4*a+2]*m[4*b+2];
+ };
+ const double scale=product(0,0), tolerance=scale*1e-6;
+ if(world.orientation()!=AffineOrientation::Preserving||scale<=0||
+    std::abs(product(1,1)-scale)>tolerance||std::abs(product(2,2)-scale)>tolerance||
+    std::abs(product(0,1))>tolerance||std::abs(product(0,2))>tolerance||std::abs(product(1,2))>tolerance)
+  return false;
+ constexpr float error=1e-5f;
+ size_t processed=0;
+ for(auto face:field.domain->triangles()){
+  if((processed++&1023)==0)stop(limits);
+  const size_t first=size_t(face)*3;
+  const auto a=mesh.indices[first],b=mesh.indices[first+1],c=mesh.indices[first+2];
+  const auto n=mesh.normals[a];
+  const auto &t=tangents[first];
+  const Vec3 axis{t[0],t[1],t[2]};
+  if(length(mesh.normals[b]-n)>error||length(mesh.normals[c]-n)>error||
+     tangents[first+1]!=t||tangents[first+2]!=t||std::abs(length(n)-1)>error||
+     std::abs(length(axis)-1)>error||std::abs(dot(n,axis))>error)return false;
+  // An original UV-derivative map and the exported Mikk frame must use
+  // the same axes. Check the actual triangle derivatives and handedness.
+  const auto p=mesh.positions[b]-mesh.positions[a],q=mesh.positions[c]-mesh.positions[a];
+  const auto u=mesh.uv[a],v=mesh.uv[b],w=mesh.uv[c];
+  const float du=v[0]-u[0],dv=v[1]-u[1],eu=w[0]-u[0],ev=w[1]-u[1];
+  const float det=du*ev-dv*eu;
+  if(std::abs(det)<1e-9f)return false;
+  const auto derivative=(p*ev-q*dv)/det, bitangent=(q*du-p*eu)/det;
+  const auto projected=derivative-n*dot(derivative,n);
+  if(length(projected)<1e-8f||length(normalized(projected)-axis)>error||
+     dot(cross(n,axis),bitangent)*t[3]<=0)return false;
+ }
+ return true;
+}
+
+// A cell's filtered vectors are convex combinations of its four taps.
+// Project them onto one unit tap to bound length from below and use the
+// longest tap as the upper bound. Keep a separate bound on positive Z.
+struct NormalCone {
+ Vec3 reference{};
+ float low=1,high=0,min_z=1;
+ void add(Vec3 v){
+  const float norm=length(v);
+  if(high==0&&norm>0)reference=v/norm;
+  low=std::min(low,dot(reference,v));
+  high=std::max(high,norm);
+  min_z=std::min(min_z,v.z);
+ }
+ float normalization_error() const { return std::max(1-low,high-1); }
+};
+
+double mtoon_normal_cell_error(const std::array<const MToonNormalTap *,4> &taps){
+ constexpr double frame_and_sampling_slack=1e-4;
+ float min_coverage=1,max_coverage=0,quantization=0;
+ for(const auto *tap:taps){
+  min_coverage=std::min(min_coverage,tap->coverage);
+  max_coverage=std::max(max_coverage,tap->coverage);
+  quantization=std::max(quantization,tap->quantization);
+ }
+ // With full coverage both texture reads normalize the same filtered RGB.
+ if(min_coverage==1)return frame_and_sampling_slack;
+ NormalCone original,baked;
+ Vec3 maximum=taps[0]->original,minimum=maximum;
+ for(const auto *tap:taps){
+  original.add(tap->original);
+  if(tap->coverage>0)baked.add(tap->baked);
+  const auto v=tap->original;
+  maximum={std::max(maximum.x,v.x),std::max(maximum.y,v.y),std::max(maximum.z,v.z)};
+  minimum={std::min(minimum.x,v.x),std::min(minimum.y,v.y),std::min(minimum.z,v.z)};
+ }
+ // The original part has an additional product of filtered direction and
+ // uncovered fraction. Bound its covariance componentwise, then take its norm.
+ const double covariance=.25*(max_coverage-min_coverage)*length(maximum-minimum);
+ const double normal_length_low=baked.high==0?original.min_z/original.high:
+     std::min(original.min_z/original.high,baked.min_z/baked.high);
+ // Leave room for frame and floating-point normalization differences.
+ const double delta=quantization+covariance+(1-min_coverage)*original.normalization_error()+
+     max_coverage*baked.normalization_error()+frame_and_sampling_slack;
+ return normal_length_low>delta?std::asin(delta/normal_length_low):std::acos(-1.);
+}
+
+std::shared_ptr<const Image> compose_mtoon_baked_normal(const TextureSetView &field,
+    const TextureMaps &maps,const MToonMaterial &effective,double &bound,const TextureSetLimits &limits){
+ const auto &normal=maps.baked_normal,&coverage=maps.baked_coverage;
+ const auto r=field.painted->resolution();
+ normal.validate();coverage.validate();
+ if(normal.width!=r||normal.height!=r||coverage.width!=r||coverage.height!=r)
+  throw std::logic_error("MToon Bake lost its normal and coverage grids");
+ const auto &role=field.material_bindings->roles[size_t(MToonSlot::Normal)];
+ const auto &texture=effective.textures[size_t(MToonSlot::Normal)];
+ const Image *aligned=nullptr;
+ Vec3 original{0,0,1};
+ if(role.image&&effective.parameters.normal_enabled){
+  role.image->validate();
+  bool uniform=true;
+  for(size_t at=4;at<role.image->rgba.size();at+=4){
+   if((at&16383)==0)stop(limits);
+   if(!std::equal(role.image->rgba.begin(),role.image->rgba.begin()+3,role.image->rgba.begin()+at)){
+    uniform=false;break;
+   }
+  }
+  if(uniform&&texture.rotation==0&&texture.scale[0]>0&&texture.scale[1]>0){
+   const auto *p=role.image->rgba.data();
+   original=mtoon_normal_map({p[0]/255.f,p[1]/255.f,p[2]/255.f},effective.parameters.normal_scale);
+  }else if(aligned_mtoon_source(role,texture,r))aligned=role.image.get();
+  else for(size_t at=0;at<coverage.rgba.size();at+=4){
+   if((at&16383)==0)stop(limits);
+   if(coverage.rgba[at]!=255)return {};
+  }
+ }
+ constexpr double limit=.02;
+ auto output=std::make_shared<Image>(normal);
+ std::vector<MToonNormalTap> previous(r),row(r);
+ for(size_t y=0;y<r;++y){
+  stop(limits);
+  for(size_t x=0;x<r;++x){
+   const auto i=(y*r+x)*4;
+   auto &tap=row[x];
+   tap={original,normal_rgb(normal.rgba.data()+i),coverage.rgba[i]/255.f,0};
+   if(aligned){
+    tap.original=normal_rgb(aligned->rgba.data()+i);
+    tap.original.x*=effective.parameters.normal_scale;
+    tap.original.y*=effective.parameters.normal_scale;
+   }
+   if((tap.coverage<1&&tap.original.z<=0)||(tap.coverage>0&&tap.baked.z<=0))return {};
+   if(tap.coverage<1){
+    const auto value=tap.original*(1-tap.coverage)+tap.baked*tap.coverage;
+    const std::array channels{value.x,value.y,value.z};
+    for(size_t k=0;k<3;++k)output->rgba[i+k]=uint8_t(std::lround(std::clamp(channels[k]*.5f+.5f,0.f,1.f)*255));
+    tap.quantization=length(normal_rgb(output->rgba.data()+i)-value);
+   }
+   const size_t left=x?x-1:x;
+   const auto &above=y?previous:row;
+   bound=std::max(bound,mtoon_normal_cell_error({&above[left],&above[x],&row[left],&tap}));
+   if(bound>limit)return {};
+  }
+  previous.swap(row);
+ }
+ return output;
+}
+
 std::shared_ptr<const Image> compose_shared_mtoon_shade(
     const Image &resolved,const Image &coverage,const std::array<float,4> &native,
     const MToonPaintSource &source,Vec3 factor,PortableMToonSetPaint &proof,
@@ -611,11 +764,19 @@ ExportBound export_bound(const ObjectSurface&input,const TextureSetLimits&limits
    charge(work,pixels,12,limits.maximum_work);
    const auto &typed=field.material_bindings->material;
    if(typed.version()==MToonVersion::V1&&typed.parameters.scroll==std::array<float,2>{}&&
-      typed.parameters.rotation_speed==0&&!field.painted->baked()&&!field.painted->source_maps()&&
+      typed.parameters.rotation_speed==0&&!field.painted->source_maps()&&
       shared_mtoon_shade(*field.material_bindings)){
     charge(bytes,pixels,4,limits.maximum_bytes);
     charge(bytes,resolution,2*sizeof(MToonShadeTap),limits.maximum_bytes);
     charge(work,pixels,24,limits.maximum_work);
+   }
+   if(field.painted->baked()&&!field.painted->baked()->maps.normal.rgba.empty()){
+    charge(bytes,pixels,4,limits.maximum_bytes);
+    charge(bytes,resolution,2*sizeof(MToonNormalTap),limits.maximum_bytes);
+    charge(work,pixels,42,limits.maximum_work);
+    charge(work,draw.count,8,limits.maximum_work);
+    if(const auto &image=field.material_bindings->roles[size_t(MToonSlot::Normal)].image)
+     charge(work,size_t(image->width)*image->height,1,limits.maximum_work);
    }
    for(auto role:{MToonSlot::Base,MToonSlot::Emission})
     if(const auto &image=field.material_bindings->roles[size_t(role)].image){
@@ -677,10 +838,13 @@ std::optional<PortableMToonSetPaint> compile_mtoon_set_paint(
     const MToonMaterial &effective,const TextureSetLimits &limits){
  const auto &maps=compiled.textures;
  if(!maps||compiled.set!=field.id||!field.material_bindings||!field.material_bindings->has_mtoon||
-    field.source||field.appearance||field.painted->baked()||
-    field.painted->source_maps()||maps->overlay||maps->source_maps||!maps->normal.rgba.empty()||
+    field.source||field.appearance||field.painted->source_maps()||maps->overlay||maps->source_maps||
     texture_set_physical_emission(field))
   return {};
+ const auto &bake=field.painted->baked();
+ const bool normal=bake&&!bake->maps.normal.rgba.empty();
+ if(maps->baked_base!=bake||(!maps->normal.rgba.empty())!=normal||
+    (normal&&!compiled.portable_mtoon_bake_frame))return {};
  const auto &binding=*field.material_bindings;
  const auto &params=effective.parameters;
  const auto covered=[&](const Image &image){
@@ -691,7 +855,7 @@ std::optional<PortableMToonSetPaint> compile_mtoon_set_paint(
   return false;
  };
  const bool color=covered(maps->color_coverage),emission=covered(maps->emission_coverage);
- if((color||emission)&&(params.scroll!=std::array<float,2>{}||params.rotation_speed!=0))
+ if((color||emission||normal)&&(params.scroll!=std::array<float,2>{}||params.rotation_speed!=0))
   return {};
  const auto background_source=[&](MToonSlot role)->std::optional<MToonPaintSource>{
   const auto &view=binding.roles[size_t(role)];
@@ -798,6 +962,10 @@ std::optional<PortableMToonSetPaint> compile_mtoon_set_paint(
                        {native[0],native[1],native[2],1},false,out.emission_error);
   if(!out.emission)return {};
  }
+ if(normal){
+  out.normal=compose_mtoon_baked_normal(field,*maps,effective,out.normal_error_radians,limits);
+  if(!out.normal)return {};
+ }
  // A typical nearest sRGB byte step has at most .0045 linear error.
  // Include arithmetic tolerance in the recorded bound, before acceptance.
  constexpr double sampling_slack=1e-6;
@@ -860,6 +1028,9 @@ TextureSetExport compile_texture_set_export(const ObjectSurface&input,const Text
   output.count=draw.count;
   output.material=field.material;
   output.normal_role=portable&&portable->normal_role;
+  if(canonical&&!input.deformation&&field.material_bindings&&field.material_bindings->has_mtoon&&
+     !texture_set_physical_emission(field))
+   output.portable_mtoon_bake_frame=portable_mtoon_bake_frame(rest,field,frames,input.world_matrix(),limits);
   if(texture_set_physical_emission(field)){
    const bool editable_pbr=editable_materials&&baked_mtoon_pbr_fallback(field);
    output.emission=compile_emission(field,work,limits);
