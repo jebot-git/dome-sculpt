@@ -14,8 +14,8 @@ preserves the shape, retained paint and Restore capsule together.
 Standard and Editable GLB carry vertex displacement and the per-corner
 normal and tangent endpoints required by the qualified materials. Release,
 ASan/UBSan, nested DomeD Wayland, independent OpenGL on software and Arc,
-and synthetic OpenXR cover the reported workflows. Skeletal deformation and
-typed MToon for retained sets, nonlinear mixed-weight portable lighting,
+and synthetic OpenXR cover the reported workflows. Typed MToon for retained
+sets, nonlinear mixed-weight portable lighting,
 and physical headset acceptance remain open.
 [Retained texture-set shapekey evidence](validation/retained-texture-set-shapekeys-20261127.json)
 
@@ -28,6 +28,20 @@ separate grids, and FLOAT emission. The Bake recipe restores settings
 and uses the scene's current poses when reapplied. Native project and
 GLB round trips preserve the baked results and the original source history.
 [Posed texture-set Bake evidence](validation/retained-texture-set-posed-bake-20261127.json)
+
+Retained PBR polygon texture sets now support native Surface Heat, weight
+painting, combined skin and shapekey preview, picking and Bake. The bounded
+admission counts original and current material owners before allocating a
+request. The native worker, DomeD Wayland and synthetic OpenXR bind paths
+produce byte-identical projects at the same radius. Wayland also covers
+Cancel, Undo and Redo. Synthetic OpenXR exercises posed reopen and
+custom-cage Bake on software GL and Intel Arc. Linked VRM 1.0 accessories
+retain their original joint identities in Standard and Editable export.
+Portable GLB and VRM export explicitly refuses active normal frames beyond
+the angular limit. Retained corner colors, independently prepared color and
+key-frame graphs, and retopology require further Surface Heat accounting.
+Physical device tests and production scenes remain open.
+[Retained texture-set skin evidence](validation/retained-texture-set-skin-20261127.json)
 
 The current combined atlas and HDR cache source passes all 153 checks
 in both software Release and Intel Arc ASan/UBSan OpenXR replays. Its

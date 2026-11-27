@@ -44,6 +44,21 @@ follows subsequent shape edits. Clear and Recall preserve the authored
 shapes. Cold Open shares the original paint seed between live material fields
 and their history. [Posed texture-set Bake validation](validation/retained-texture-set-posed-bake-20261127.json)
 
+Surface Heat can now bind the editable polygon meshes behind retained
+PBR texture sets, including their separate writable and normal-map grids.
+Admission follows the actual immutable owners and counts shared rasters,
+polygon histories and normal fields once. The viewport, picking and Bake
+use the same evaluated surface when skin weights and shapekeys are active.
+Native Save and Undo preserve the skin and the original material history.
+Standard and Editable GLB and VRM 1.0 carry the skin when the portable
+normal frame meets the angular limit in the active pose. Other poses stay
+editable in the native project and export reports the frame mismatch.
+The native worker, DomeD Wayland dialog and synthetic OpenXR controller
+produce byte-identical binds at the same radius. The 16 focused native cases
+pass in both Release and ASan/UBSan. An independent reader reconstructs all
+four GLB fixtures from their skin and morph accessors within 0.06 micrometres.
+[Retained texture-set skin validation](validation/retained-texture-set-skin-20261127.json)
+
 Native texture-set accessories can now use Surface Heat, weight transfer, or
 legacy automatic binding against an original VRM 1.0 avatar. Surface Heat keeps
 editable layers and normal and FLOAT emission Bakes in each native material.
