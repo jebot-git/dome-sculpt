@@ -269,6 +269,30 @@ Khronos reports zero errors in all seven files and a skinned hierarchy
 warning in each. All six portable typed materials pass the MToon schema.
 [Varying MToon alpha validation](validation/mtoon-varying-alpha-20261127.json)
 
+Painted MToon can also preserve a non-unit source opacity multiplier in
+glTF `baseColorFactor`. The worker uses this representation when baking the
+multiplier into PNG alpha cannot certify the original visibility. Exact
+unpainted source taps then keep the cutout edge and the blend's zero-alpha
+boundary. The compiler rechecks the physical alpha after filtering and
+applying the exported multiplier. A second cutoff edge through the brush
+footprint still triggers atomic Standard export refusal and exact Editable
+recovery.
+
+The four new cutout and blend GLBs use an authored multiplier of 0.8. An
+independent PNG reader checked 79,508 samples in those files. The largest
+measured absolute alpha difference was 0.00150818, with identical sampled
+visibility decisions. In synthetic OpenXR re-imports, 99% of components
+in each eye were within two 8-bit RGB levels on Arc A770 and llvmpipe.
+The llvmpipe linear swapchain had 81 dark components in one eye where
+a single framebuffer code step expanded to six or nine levels in the
+sRGB capture. With a native sRGB swapchain, the blended case matched within
+one level at every component in both eyes. All 43 selected Release cases
+and six ASan/UBSan workflows passed. The 23 project and GLB
+outputs match byte for byte between both builds. Khronos found zero errors
+and the skinned hierarchy warning in all 11 files. All ten typed materials
+pass the MToon schema.
+[Scaled MToon alpha validation](validation/mtoon-scaled-alpha-20261127.json)
+
 Surface Heat also binds meshes after independent frame and shapekey
 authoring. Retention accounts for the actual POSITION correspondences,
 artist normals and tangents, writable paint, and prepared color and normal

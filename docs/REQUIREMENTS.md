@@ -161,6 +161,15 @@ in Editable GLB. Live UV changes, other sampling modes, and general
 cutoff crossings through painted cells still need portable representations.
 [Varying MToon alpha evidence](validation/mtoon-varying-alpha-20261127.json)
 
+For qualifying MToon mask and blend exports, a second bounded compiler
+pass keeps the non-unit authored `baseColorFactor` alpha when folding it
+into the PNG would shift the visibility boundary. The exported multiplier
+and exact source taps preserve the unpainted transition. Painted cells
+receive physical alpha and classification checks with the actual output
+multiplier. This covers authored scalar opacity with static clamp-linear UV0
+and remains bounded by worker admission.
+[Scaled MToon alpha evidence](validation/mtoon-scaled-alpha-20261127.json)
+
 The current combined atlas and HDR cache source passes all 153 checks
 in both software Release and Intel Arc ASan/UBSan OpenXR replays. Its
 export is byte-identical across both profiles and independently validates
