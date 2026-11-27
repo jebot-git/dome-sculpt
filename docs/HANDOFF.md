@@ -185,6 +185,28 @@ The new full Release run for `0432e1a3` is queued behind the earlier
 integrated suite as `ds-retopology-subdivide-combined-release-20261127.service`.
 [Edge subdivision validation](validation/retopology-subdivision-20261127.json)
 
+Retopology Apply now retains paint, baked material roles and deformation
+when a moved patch exceeds the ordinary 20 cm projection range. When the
+spatial query misses, Apply uses the old triangle's stable corners and
+the interpolated parents of any new subdivision midpoint. It checks the
+actual rest-corner order, the source material slot and the placed facing
+before using this correspondence.
+
+The plain and reflected/sheared prepared fixtures move 72 cm and subdivide
+a boundary. The independent consumer verifies 5,854 normal samples, with
+2,990 at zero material coverage, and a maximum direction-vector difference
+of 0.00504. The transported skin weights agree exactly in these fixtures,
+and the largest world-space shapekey-delta error is under seven nanometres.
+A separate two-slot MToon fixture exercises the same fallback for typed
+base, shade, normal and other roles plus editable paint. Ordered Save,
+cold Open, Undo/Redo and Editable GLB retain the native results.
+Synthetic OpenXR reopens and saves the moved prepared patch in both eyes
+on Arc A770 and llvmpipe. Khronos reports zero errors in all four outputs
+and a skinned-node hierarchy warning in the two prepared GLBs. All 50
+selected Release tests and seven ASan/UBSan workflows pass, with ten native
+and GLB files identical across the two builds.
+[Retained correspondence validation](validation/retopology-retained-fallback-20261127.json)
+
 Geometry-changing retopology now transfers native single-material prepared
 normal fields. The worker uses the original placed tangent frame and
 rebuilds the frame on the replacement. It samples the PBR and toon normal

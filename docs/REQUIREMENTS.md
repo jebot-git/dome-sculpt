@@ -120,6 +120,14 @@ boundary cutting across unrelated material triangles still requires explicit
 material assignment or boundary resolution.
 [Edge subdivision evidence](validation/retopology-subdivision-20261127.json)
 
+If the spatial query misses during retopology Apply, the worker can use
+verified stable triangle correspondence. It carries editable paint, normal
+and typed material samples, skin weights, and shapekey deltas across a
+large move and a new subdivision midpoint. Admission checks the current
+rest-corner order, facing and material slot. Evidence covers prepared
+single-material patches and native MToon texture sets.
+[Retained correspondence evidence](validation/retopology-retained-fallback-20261127.json)
+
 Changed retopology faces can now carry native single-material prepared
 normal maps under reflected and sheared placements and after independent
 retained UV editing. The two normal roles keep their own sampling and

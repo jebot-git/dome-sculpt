@@ -1,0 +1,231 @@
+{
+  "product": "f2eed0dce3c39dc0b0fd1560c222495f41a0e484",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "release_fltk": "/opt/fltk-vr/toolkit",
+  "release_app_sha256": "6f1dbaab936e9b9cb9257a54ec1ed7e67ca4462c49fa29c36da7b32579c6e85e",
+  "release_tests": [
+    "retopology-affine-ui-fixture",
+    "native-paint32-fixture",
+    "layered-normal-native",
+    "layered-normal-uv-native",
+    "retopology-caller-admission",
+    "retopology-input-admission",
+    "retopology-affine-openxr",
+    "dome-sculpt-texture-set-export",
+    "retopology-reapply-plain",
+    "retopology-reapply-affine",
+    "retopology-prepared-affine",
+    "retopology-save-handoff",
+    "retopology-prepared-plain",
+    "retopology-held-admission",
+    "retopology-history-openxr-apply",
+    "authoring-native-normal-union",
+    "retopology-prepared-detached-affine",
+    "retopology-prepared-detached",
+    "retopology-restore-plain",
+    "texture-set-retained-skin",
+    "texture-set-retained-shapekeys",
+    "retopology-history-openxr-cancel",
+    "retopology-mtoon-affine",
+    "dome-sculpt-texture-set-source-export",
+    "retopology-restore-affine",
+    "retopology-mtoon-plain",
+    "retopology-linked-vrm1",
+    "retopology-surface-heat-affine",
+    "retopology-surface-heat-plain",
+    "texture-set-mtoon-independent-paint",
+    "retopology-affine-wire",
+    "retopology-mtoon-v0",
+    "retopology-affine",
+    "retopology-material-seam-affine",
+    "retopology-subdivide-seam-plain",
+    "retopology-material-seam-plain",
+    "retopology-subdivide-seam-affine",
+    "retopology-worker-faults",
+    "retopology-authoring",
+    "vrm1-retained-skinned-accessory",
+    "texture-set-mtoon-varying-alpha",
+    "retopology-authority-focus",
+    "texture-set-mtoon-derivative-tangent",
+    "retopology-worker-accepted-publication",
+    "retopology-mixed-material",
+    "texture-set-active-bake",
+    "dome-sculpt-texture-set-surfaces",
+    "retopology-worker-reporter-recovery",
+    "retopology-authority-grab",
+    "retopology-mtoon-detached"
+  ],
+  "strict_asan_ubsan_cases": [
+    "prepared-detached",
+    "prepared-detached-affine",
+    "prepared-plain",
+    "prepared-affine",
+    "subdivide-seam-affine",
+    "reapply-affine",
+    "mtoon-detached"
+  ],
+  "release_asan_byte_match_sha256": {
+    "retopology-prepared-detached/prepared-before.dsculpt": "75e49a7cc21f475b9eddece2c05d4b6e17603424daebe392501987417f33e92e",
+    "retopology-prepared-detached/prepared-reapplied.dsculpt": "04a87fda8a79fe13c0f26ee03221549c20539f2dbeb14f0db2eeb551397c7dac",
+    "retopology-prepared-detached/prepared-editable.glb": "227ef221fde4f9f27bfd1a16764884b614480122d76ffdd05f945c6a0072fb1e",
+    "retopology-prepared-detached-affine/prepared-before.dsculpt": "dc0f3d99489351dd77ae13580efd91ef097e92e22defc24f3c1a47ddf017e3f8",
+    "retopology-prepared-detached-affine/prepared-reapplied.dsculpt": "893888ebecea1e941bb11165069306c76f5865d2c7bdedaa0601dae4c8ad2102",
+    "retopology-prepared-detached-affine/prepared-editable.glb": "70dba4a54b03b602d6d78fee09345bf94abe14fe694dde9245a633f72af2605e",
+    "retopology-mtoon-detached/mtoon-before.dsculpt": "cd6429d8b66989161edb0d8e0ec78eaadbdda3709639ac1741f9d6b042a78d1e",
+    "retopology-mtoon-detached/mtoon-retopo.dsculpt": "b0363d76f605576bcbe7dcadef99c15dcf7ca332a4f8f1244152328f345ae99c",
+    "retopology-mtoon-detached/mtoon-retopo.glb": "63c8b578596ff8179308e62a458404f7e29987e98021c1d2145cfe4d56e1befe",
+    "retopology-mtoon-detached/mtoon-portable.glb": "e19b5db344562eabd9e6a4cb99c16c6d1b857bd02d3e2a3ddebe09bc90dc83db"
+  },
+  "independent_correspondence_samples": {
+    "prepared-detached": {
+      "samples": 3080,
+      "zero_material_coverage_normal_samples": 1540,
+      "maximum_direction_vector_difference": 2.73143e-07,
+      "maximum_weight_error": 0.0,
+      "maximum_world_shapekey_delta_error_metres": 1.19209e-09
+    },
+    "prepared-detached-affine": {
+      "samples": 2774,
+      "zero_material_coverage_normal_samples": 1450,
+      "maximum_direction_vector_difference": 0.00503856,
+      "maximum_weight_error": 0.0,
+      "maximum_world_shapekey_delta_error_metres": 6.74725e-09
+    },
+    "mtoon-detached": {
+      "samples": 4480,
+      "maximum_linear_role_error": 0.00354928,
+      "maximum_normal_direction_error": 0.00346291
+    }
+  },
+  "khronos_validator_version": "2.0.0-dev.3.10",
+  "khronos": {
+    "retopology-prepared-detached/prepared-editable.glb": {
+      "errors": 0,
+      "warnings": [
+        "NODE_SKINNED_MESH_NON_ROOT"
+      ]
+    },
+    "retopology-prepared-detached-affine/prepared-editable.glb": {
+      "errors": 0,
+      "warnings": [
+        "NODE_SKINNED_MESH_NON_ROOT"
+      ]
+    },
+    "retopology-mtoon-detached/mtoon-retopo.glb": {
+      "errors": 0,
+      "warnings": []
+    },
+    "retopology-mtoon-detached/mtoon-portable.glb": {
+      "errors": 0,
+      "warnings": []
+    }
+  },
+  "official_mtoon_schema_checks": 3,
+  "synthetic_openxr": {
+    "arc-detached": {
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "balanced_stereo_frames": [
+        6,
+        6
+      ],
+      "different_rgb_components": [
+        86925,
+        86498
+      ],
+      "exact_native_save": true
+    },
+    "arc-detached-affine": {
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "balanced_stereo_frames": [
+        6,
+        6
+      ],
+      "different_rgb_components": [
+        90513,
+        91985
+      ],
+      "exact_native_save": true
+    },
+    "software-detached": {
+      "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+      "balanced_stereo_frames": [
+        6,
+        6
+      ],
+      "different_rgb_components": [
+        86950,
+        86513
+      ],
+      "exact_native_save": true
+    },
+    "software-detached-affine": {
+      "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+      "balanced_stereo_frames": [
+        6,
+        6
+      ],
+      "different_rgb_components": [
+        89978,
+        91423
+      ],
+      "exact_native_save": true
+    }
+  },
+  "physical_headset": false,
+  "integrated_release_at_checkpoint": [
+    {
+      "candidate": "8ba3c55d73d311b0836daccf69b5a6f1d596a19a",
+      "terminal": true,
+      "invocation": "378bfc74957941659465cd43d5356df0",
+      "phase": "complete",
+      "elapsed_seconds": 4672.138,
+      "registered": 1388,
+      "app_sha256": "5cad5679475a7a479530a7da49966724e49a95843160cde8ebd0ddcb3b8b7cc0",
+      "cache_sha256": "4b194aed6628c3141b19b6b66d7f1c8019c2aa73292407d122903fc3ac58c03b",
+      "exit": 8,
+      "totals": {
+        "pass": 1387,
+        "fail": 1,
+        "skip": 0
+      },
+      "failed": [
+        "resolution-quality-host-aggregate"
+      ],
+      "skipped": [],
+      "junit_sha256": "1327023f5711ac6bd29265ad7431e9ef47e4e1d89a9b2d5a246f5db04098643f"
+    },
+    {
+      "candidate": "0432e1a3bb5d5922d125e19005a11b0eb19e4678",
+      "terminal": false,
+      "invocation": "5fbdca0a590b4f47a64c9c8f609539a0",
+      "phase": "build every registered target",
+      "earlier_unit": "ds-mtoon-static-normal-uv-combined-release-20261127.service",
+      "elapsed_seconds": 880.487
+    }
+  ],
+  "archive_sha256": "a3b94a6e9284b6c8ecbdda864ae564cbf2622f4781f91d7c101854de541f3c6f",
+  "archive_members_sha256": {
+    "release-final.log": "cbdc7309916e248934daa766395e4f866e52bf7f3b5c310a9c65f8e057909599",
+    "release/Testing/Temporary/LastTest.log": "306943e8827ffe731a3592fa72e3e3322c629673fc007af5e8f5103055e03f4d",
+    "asan-build.log": "4d25374d6a6da14694dfa4eec645f5132dc11bc41a8008adbd8aabb80ef0b62f",
+    "asan-final-build.log": "3ae3fb9c7b4e5ab09fc118d88af696076a1b99614fa66a1b638f0414fc6ed21a",
+    "strict-final.sh": "6a62c283a84f2997300ba47b4a8b47d58ede849a5885472a486a44fa1f22a153",
+    "relink-sanitizer.py": "4ea224db0c3934e05144c9e76e50d27f975b4e9f90b106716adac5994f43fd37",
+    "run-render.py": "81b8c934a42d78116138381914e3571e41c550fc0f5c777b35eba666b24b716a",
+    "xr-prepare.py": "a91bee9658881aa31e98972324f63c7dc5f7aa510d89510c9207f40d33ddb37d",
+    "khronos.cjs": "70467c2576c0d13ce8ad0dd9375edc241752b0cb29d665db9693b5384c6b3af1",
+    "khronos.json": "adc62aacb096f6c30e6a32bf1e317b05a2c2b5e4684edf8b16a6cafeea9189c6",
+    "schemas.json": "754cc4997e0e88e7acd73349cb32e40d5835f2e30ac5ca4c876c33048257a894",
+    "xr-arc-detached/compare.json": "66898d0d1a4240289716976c34e71f3fa6dd020dd0df77a70d7073d77bcb58c5",
+    "xr-arc-detached-affine/compare.json": "ba3a77a2ebff436b9b658773e37bfacae754324364db5fd98babd7dddc91c35d",
+    "xr-software-detached/compare.json": "23812d42af5c5d49a47ade26dbc17e3fb4e21658a80ea1778fcc3ef8157c0bd0",
+    "xr-software-detached-affine/compare.json": "0e0744131b50a00049393d908b399dd96bf2d37e3b9ccfb84ac238c914ef8a0e",
+    "asan-prepared-detached.log": "9f96e89bef76f28b39c04913bfa2ab8ef3e50eb0c859291417fb2aa7b91f2063",
+    "asan-prepared-detached-affine.log": "0337b58621181427c58e6d61934672a860f4a4dd9b1a774960c1fc91852c5dc7",
+    "asan-prepared-plain.log": "a51a45058052301e47acf3be8c94e11cf3cc1baec6dc96afa86d08f7b82bc0e4",
+    "asan-prepared-affine.log": "bf6ce3f15f1432cee5afbbcf8e1d3fdf5f7debf4f9def0e38ef26df41bd421ae",
+    "asan-subdivide-seam-affine.log": "2c4682388fd83f18efba24235de836361523095803a2f60018d2aa5da19248d8",
+    "asan-reapply-affine.log": "a99670917a9a5fefe287ccd0f71ab4482a8d09cf70d7e6ccfa09748b3ec6b48c",
+    "asan-mtoon-detached.log": "523d9876859045b6352643996d0c8e858e5ed58883b78307e9317fa4f3869b4e"
+  }
+}
