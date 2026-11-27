@@ -294,9 +294,18 @@ fully authored 2048-pixel layer under the original paint retention
 limit. The full-size fixture covers a native brush stroke, exact history,
 ordered Save, cold Open, raw wire replay and GPU preview on software and
 Intel Arc. The original on-disk format and FLOAT fallback validation are
-preserved. Full-size default reduction, broader dense stacks and
-physical-input qualification remain required.
+preserved.
 [Full-size FLOAT paint validation](validation/paint-emission-fullsize-20261127.json)
+
+One densely authored 2048-pixel FLOAT layer now reduces to 512 under the
+editor's existing 128-million-work and 256 MiB peak budgets. The filter proves
+constant radiance from immutable tile values and still measures every varying
+coverage footprint. CPU and Intel Arc produce the same project and exact
+reconstruction errors as the previous high-budget run. Ordered Save, cold
+Open, Undo and Redo retain the accepted project and the original paint.
+The 1024 destination, broader dense stacks and physical-input qualification
+remain required.
+[Default full-size reduction validation](validation/paint-grid-fullsize-reduce-20261127.json)
 
 Native multi-material retopology preserves independently painted and baked
 grids and original VRM 1.0 joint links when Apply changes the patch.

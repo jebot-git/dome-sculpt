@@ -1,0 +1,174 @@
+{
+  "utc": "2026-11-27T20:39:27.666896+00:00",
+  "product": "ab918a1f3a4f4900f4d1ac620c021a9690c0befc",
+  "parent": "04a4f56022a3282711c1b75178d2b949b0377f59",
+  "DomeD": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "toolkits": {
+    "FLTK": "/opt/fltk-vr/toolkit",
+    "BDF": "/opt/fltk-vr/bdf-runtime",
+    "oneAPI": "DPC++ 7.2.0"
+  },
+  "budgets": {
+    "maximum_work": 128000000,
+    "maximum_peak_bytes": 268435456,
+    "diagnostic_maximum_work": 512000000,
+    "diagnostic_maximum_peak_bytes": 536870912
+  },
+  "old_measured_512": {
+    "work": 241958472,
+    "peak_bytes": 301399876,
+    "filter_samples": 4194304,
+    "report_sha256": "1dae2cff6abf3bba926bafb581e5d7dce3ad0c0a67449471304e2415a643889d"
+  },
+  "old_measured_1024": {
+    "work": 275743672,
+    "peak_bytes": 372296260,
+    "filter_samples": 4194304,
+    "report_sha256": "6b9f6e6f4650a432859fa008af5f4a490ea41886aa72b8a76c8139a0ca542c8c"
+  },
+  "release": {
+    "cpu": {
+      "resize": {
+        "passed": 25,
+        "junit_sha256": "dd0c0b39260a109a8f8520e20a2136a99a7a6d35d2350d52773922c2f72c871f"
+      },
+      "adjacent": {
+        "passed": 9,
+        "junit_sha256": "799207e97f2caa260168b558fe881ac8a2f2b95d0c4120632365377cab688db9"
+      },
+      "app_sha256": "745ce8c3ed94742aea0e1bf64d769fb15b3bfcd054119a38978e325df0026a9e",
+      "downsample_512": {
+        "work": 110111176,
+        "peak_bytes": 260438756,
+        "filter_samples": 4194304,
+        "report_sha256": "2b4c8c1db021ebe1afe3b185ae4b24ef9b5b951c9b26b746f8964075f3426c71"
+      },
+      "downsample_1024_diagnostic": {
+        "work": 138416608,
+        "peak_bytes": 309315044,
+        "filter_samples": 4194304,
+        "report_sha256": "6acd647fe3af4746daae60632dfcf318126f8dbfa8ad959836eeb26c4b169cf3"
+      },
+      "default_1024_refusal": {
+        "detail": "Texture-set resolution exceeds its complete peak-byte budget",
+        "log_sha256": "754279ddbe8f2e86b6305c8dfc0fa30163ed2514ca7522c8db1f3b03949fe409"
+      }
+    },
+    "oneapi": {
+      "resize": {
+        "passed": 26,
+        "junit_sha256": "8b9467e4a9b7df6863285c6b3f71db7615d62e8d43d4b63e9ac824675026c52c"
+      },
+      "adjacent": {
+        "passed": 9,
+        "junit_sha256": "07ca8239105345624eead5a69d33397b320e20677fc24945a03d138a73efc5b4"
+      },
+      "app_sha256": "7d25f719e987adebf9a808619a4b9e2102ece89b7ad599d4155e4af2b63e8822",
+      "downsample_512": {
+        "work": 110111176,
+        "peak_bytes": 266210782,
+        "filter_samples": 4194304,
+        "report_sha256": "972485fd0f988f57bbbaf897a25345b917214466468dd29c30f3024da9c10d7f"
+      },
+      "downsample_1024_diagnostic": {
+        "work": 138416608,
+        "peak_bytes": 309315044,
+        "filter_samples": 4194304,
+        "report_sha256": "6acd647fe3af4746daae60632dfcf318126f8dbfa8ad959836eeb26c4b169cf3"
+      },
+      "default_1024_refusal": {
+        "detail": "Texture-set resolution exceeds its complete peak-byte budget",
+        "log_sha256": "754279ddbe8f2e86b6305c8dfc0fa30163ed2514ca7522c8db1f3b03949fe409"
+      }
+    }
+  },
+  "strict_ASan_UBSan": {
+    "fullsize": {
+      "log_sha256": "5128720d1b8a6093156237cceef25108944d3b367f0408dbcc73409dc14466e5",
+      "last_line": "Full-size retained paint bytes 75694080"
+    },
+    "painted": {
+      "log_sha256": "094bf9ff3d47d5f060765571862774342eb06fe0b269ff1a580bd6e9f1bf501e",
+      "last_line": "PASS Dense reduction preserves exact ordered Save, cold Open and history"
+    },
+    "baked": {
+      "log_sha256": "8930db7702553dd43c5d99908932af6c9535f3cf9693da0dccdf9261fd42c794",
+      "last_line": "PASS The default quality guard refuses a reduction that would erase sharp normal detail"
+    },
+    "retained": {
+      "log_sha256": "d138f5847b76ad558a3b31f0f43ee90b652bb647204f11c0360aac03a1eb8b20",
+      "last_line": "PASS Bake after cold reopen uses the new writable grid and retained native normal frame"
+    },
+    "baked-emission-native": {
+      "log_sha256": "875a8a141978fff9cd39a8d34ff37e89f40b9f785aacaa01da706d522bbd63f1",
+      "last_line": "Native baked emission 69 checks PASS"
+    },
+    "affine": {
+      "log_sha256": "6f6036581f12f0c89ed1851ed80097b4c9b16c102500e9d768ecf57892e466e7",
+      "last_line": "PASS 779 native polygon grid and normal Bake checks"
+    }
+  },
+  "independent_overlay_equivalence": {
+    "float_comparisons": 189584160,
+    "fixtures": 5,
+    "log_sha256": "b13a5d4e9dc8f0f72cbf0b5bcfa07ba7641b86dfab2712e9569d0e991488f142"
+  },
+  "native_projects": {
+    "original_2048_sha256": "432656673567bda902328bb7bc5c2b82d8fca4078147daf8dff48ea39ed80650",
+    "identical_512_sha256": "7b3f28fe0f773b49e48c1ec57a4e3f1d2e0af9873398659036dba086b921fb46",
+    "identical_1024_diagnostic_sha256": "ccdc2e57c013d052e26aace9537b8db2db66948210462f2e8c7375b979a55876"
+  },
+  "probes_oneapi": {
+    "resize512": {
+      "submissions": 256,
+      "trace_sha256": "12e2875a2e6a67dc03c0d993a7cbb583d9befa4e46a02cf0fd4b98b920b4833c"
+    },
+    "resize1024_diagnostic": {
+      "submissions": 1024,
+      "trace_sha256": "554862c3ac3345eb04726a897761a6479733da2e4ec2dd1ab0171917b30925c3"
+    }
+  },
+  "earlier_full_release": {
+    "revision": "a2646a2898d8141fe43fc673d79b41bddabeef1e",
+    "systemd_invocation": "1334762ea6bf4947b07a3b5211d43417",
+    "registered": 1438,
+    "passed_at_capture": 688,
+    "other_results_at_capture": 0
+  },
+  "exact_full_release": {
+    "candidate": "ab918a1f3a4f4900f4d1ac620c021a9690c0befc",
+    "terminal": false,
+    "invocation": "167a5531b97a4154a314ce348b739b08",
+    "phase": "resume frozen Release build from the existing compiler cache",
+    "elapsed_seconds": 1.857
+  },
+  "vendor_profiles": {
+    "cuda": {
+      "full_profile": "still running at capture",
+      "kernel_object_sha256": "afc21d01f9cb5684aac9f75ef820187708b0af50d2163c12cb087bee169dd225"
+    },
+    "rocm": {
+      "full_profile": "still running at capture",
+      "kernel_object_sha256": "4d618c3d74e72bdbf943b71064ecad2e92f1c7119e0a9a5a8ceb7788dcc4830b"
+    }
+  },
+  "scope": "Default-budget coarsening of one full-size FLOAT paint layer with constant radiance and varying sub-byte coverage. Broader full-size authored and physical-device cases remain open.",
+  "nested_DomeD_Wayland": {
+    "checks": 12,
+    "report_sha256": "ac9cb847ecb5e68e292eb550eb8b211563403c9c09067a24e6dd8ac2f6a9d10c",
+    "trace": {
+      "submissions": 257,
+      "trace_sha256": "ebd81b6b351e13db34c9b100e62ef615c474f28fb16d07d3c6d1384f070c4962"
+    }
+  },
+  "Arc_synthetic_OpenXR": {
+    "checks": 12,
+    "balanced_frames": 703,
+    "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+    "report_sha256": "47974f28cdcd2886c77c686717be0186d7493ca5754a9738897827632706bad6",
+    "trace": {
+      "submissions": 257,
+      "trace_sha256": "00eaa54cb7e883ade26f0a1e500e6ddcb0dd3ba4ab0d2d4c852c02c37951d293"
+    }
+  }
+}

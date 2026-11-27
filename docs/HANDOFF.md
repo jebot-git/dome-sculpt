@@ -574,13 +574,41 @@ values on llvmpipe and Intel Arc, with maximum relative error below
 focused Release runs pass 34 CPU and 35 oneAPI cases, and six strict
 ASan/UBSan workflows pass.
 
-The default 2048-to-512 and 2048-to-1024 reductions still hit the
-prospective byte limit. Larger diagnostic allowances report 241,958,472
-and 275,743,672 work units respectively. The layer filtering and quality
-pass alone uses about 142.6 million units on either target. Full-size
-interactive painting across wider layer stacks, default reduction of
-full-size atlases and physical headset acceptance remain open.
 [Full-size FLOAT paint validation](validation/paint-emission-fullsize-20261127.json)
+
+The native texture-set editor now reduces the same 2048-pixel FLOAT layer to
+512 within its default budgets. Immutable tiles prove which radiance lanes
+are constant across the full source. The filter carries those values exactly
+and still averages varying coverage. The resident raster uses one face word
+per cell to represent both ownership and coverage. Admission charges the
+resident source and the largest simultaneous filter or raster allocation.
+Reconstruction still counts every sample and measures all changing values.
+The one-visible-layer overlay associates emission directly when no Bake is
+present.
+
+CPU and Arc both use 110,111,176 work units, down from 241,958,472 on the
+previous diagnostic. The charged peak is 260,438,756 bytes on CPU and
+266,210,782 bytes with the Level Zero filter. Arc submits 256 kernel batches.
+The complete native project and all reconstruction errors match the previous
+high-budget run. The 1024 result also matches exactly with diagnostic limits.
+It still exceeds the default peak-byte budget and requires 138,416,608 work
+units. Larger destination sizes, broader dense stacks and physical headset
+acceptance remain open.
+
+Nested DomeD Wayland uses the universal menu and FLTK dialog to verify Cancel,
+Apply, Save, Undo and Redo. The synthetic runtime drives the normal OpenXR
+controller palette through Apply, Save, Undo and Redo on Intel Arc and checks
+rendered panels in both eyes. Both workflows reproduce the original and
+resized native projects byte for byte.
+
+The focused Release runs pass 34 CPU and 35 oneAPI tests. Six strict
+ASan/UBSan workflows pass. The independent overlay comparison matches
+189,584,160 FLOAT coefficients bit for bit across five fixtures. CUDA and
+ROCm compile the updated filter kernel. Their full application builds were
+in progress at capture. The all-target Release build for this exact product
+revision started under `ds-fullsize-reduce-all-release-20261127.service`.
+It will run the full suite after the earlier frozen sweep exits.
+[Default full-size reduction validation](validation/paint-grid-fullsize-reduce-20261127.json)
 
 Retopology reapply now works on native multi-material accessories attached
 to original VRM 1.0 joints. The replacement keeps its avatar hierarchy and
