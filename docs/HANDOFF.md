@@ -59,9 +59,29 @@ per build, the median is 17.09 seconds before batching and 16.82 seconds
 afterward. The measured times overlap. All 46 focused paint cases pass on
 Arc, including fourfold coarsening across an authored run, a gap and a new
 row. Nested Wayland and synthetic OpenXR again save and replay the result
-exactly. The all-target Arc Release build is in progress and will refresh
-to this checkpoint before running the combined suite.
+exactly.
 [Batching and hardware regression evidence](validation/gpu-paint-batches-20261127.json)
+
+Paint-grid uploads and readbacks now carry the original binary32 FLOAT
+words. The device still accumulates and divides in binary64. Integer
+conversion preserves subnormals and rounds once to binary32 at readback.
+The mixed 2048-to-1024 project remains byte-identical with the same
+reconstruction metrics and memory accounting. That Arc trace moves
+293,609,456 bytes including tables, down from 461,381,616 bytes, with
+32 MiB less readback. The median cold Open, reduction and Save time is
+13.76 seconds across three runs per build, down from 15.35 seconds.
+All 46 selected Arc cases pass, along with the nested Wayland and
+synthetic OpenXR workflows. CUDA and ROCm compile and pass the scoped
+missing-device checks.
+
+The all-target oneAPI build completed after correcting the index type in
+the Surface Heat stress fixture. All three affected fixture executables
+passed. The first 1,443-case sweep was interrupted when its source mount
+hid the Git metadata needed by the allocation-plan tests. The rerun
+verifies the frozen commit and complete tracked file list inside the
+sandbox and uses a fresh fixture directory. It is building the compact
+transfer revision before the full Arc suite.
+[FLOAT transfer and Release recovery evidence](validation/gpu-paint-float-transfer-20261127.json)
 
 Dome Sculpt is an integrated authoring candidate. The isolated software
 Release run for `662d889d` passed all 1,366 registered tests. The newer

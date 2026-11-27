@@ -1,0 +1,134 @@
+{
+  "date": "2026-11-27",
+  "candidate": "30eaee642f95ce59fbf2f1743e7c368524147acf",
+  "domed_toolkit": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "hardware": "Intel Arc A770 /dev/dri/renderD129 with optimized oneAPI",
+  "release_app_sha256": "f1f9bd5fa1b8e61fabb99c05311a1e4348cfbb05a4f48c65780f664d43a84962",
+  "mixed_native_grid_2048_to_1024": {
+    "project_sha256": "3bf1bbb5bc69dcf10e745d46c0759e2d5f005227a2ac28468ba8bbf4b091dd05",
+    "exact_reconstruction_report": true,
+    "tracked_work": 213920060,
+    "tracked_peak_bytes": 183486100,
+    "source_samples": 4194304,
+    "before": {
+      "packet_bytes": 88,
+      "kernel_dispatches": 64,
+      "usm_copy_calls": 129,
+      "upload_bytes_including_tables": 369106928,
+      "readback_bytes": 92274688,
+      "total_bytes": 461381616,
+      "elapsed_seconds": [
+        15.96,
+        15.35,
+        14.65
+      ],
+      "median_seconds": 15.35,
+      "trace": {
+        "file": "artifacts/paint-grid-float-transfer-20261127/before-trace.stdout",
+        "sha256": "f87df78f63c3d6161be29b5b6667e9b5070df69f648b512f5030bbb440e711da"
+      }
+    },
+    "after": {
+      "packet_bytes": 56,
+      "kernel_dispatches": 64,
+      "usm_copy_calls": 129,
+      "upload_bytes_including_tables": 234889200,
+      "readback_bytes": 58720256,
+      "total_bytes": 293609456,
+      "elapsed_seconds": [
+        14.1,
+        13.76,
+        12.89
+      ],
+      "median_seconds": 13.76,
+      "trace": {
+        "file": "artifacts/paint-grid-float-transfer-20261127/after-trace.stdout",
+        "sha256": "e777167fafdf829e5f378b85909b8a2131f2b6e5275fd8ac0d5da72220d14e40"
+      }
+    }
+  },
+  "conversion_address_undefined_sanitizers": {
+    "finite_binary32_words": 1044565,
+    "finite_binary64_words": 1048039,
+    "file": "artifacts/paint-grid-float-transfer-20261127/sanitized-compare.log",
+    "sha256": "0043abcedd49f685a7f559f80e0debfa97938b4d5f096f434e105f2aea96b3c2"
+  },
+  "focused_oneapi": [
+    {
+      "passed": 26,
+      "file": "artifacts/paint-grid-float-transfer-20261127/oneapi/grid-arc.xml",
+      "sha256": "75811d0456045261ac386147253b27f77b80960ee2d22c0cb50037a997030764"
+    },
+    {
+      "passed": 9,
+      "file": "artifacts/paint-grid-float-transfer-20261127/oneapi/extra-arc.xml",
+      "sha256": "8ecdb9a0d3f6375ef4218b0af53d316978514e1e73e8d8c1d509faa2991bd78f"
+    },
+    {
+      "passed": 11,
+      "file": "artifacts/paint-grid-float-transfer-20261127/oneapi/rest-geometry-arc.xml",
+      "sha256": "46ad0dd24f28c3b3a284da8458f8c803f61f1b794846c6083ebcc08ae696fa11"
+    }
+  ],
+  "native_hardware_workflows": {
+    "nested_domed_wayland": {
+      "passed": 12,
+      "file": "artifacts/paint-grid-float-transfer-20261127/wayland-resize-v3/report.json",
+      "sha256": "55800c6ed88913294a4de60e553d195eef4692e15f8d7128a16f41912b191819"
+    },
+    "synthetic_openxr": {
+      "passed": 12,
+      "file": "artifacts/paint-grid-float-transfer-20261127/field-xr-paced-arc-v3/report.json",
+      "sha256": "1d1d6faa7cc7330169ecca9f436192ad575e35c44bf52d717e6fe2f26e1dc892"
+    }
+  },
+  "vendor_compilation": {
+    "cuda": {
+      "passed": 1,
+      "file": "artifacts/paint-grid-float-transfer-20261127/cuda/channels-missing.xml",
+      "sha256": "4065761133264aa63b74f56b67670ee585e4baf15ac45236c4a026d9bbd71f73"
+    },
+    "rocm": {
+      "passed": 1,
+      "file": "artifacts/paint-grid-float-transfer-20261127/rocm/channels-missing.xml",
+      "sha256": "3f42af831a7d3e1cd8faf8797c37a925556064faf24c728ec0469ce30a223566"
+    }
+  },
+  "surface_heat_fixture_repair": {
+    "all_target_build_registered": 1443,
+    "all_target_build_revision": "5080a13169ee4486a8c5f5d6bb889f0fb20f56ef",
+    "runtime_receipts": {
+      "head-stress": {
+        "passed": 18,
+        "file": "artifacts/gpu-arc-full-release-20261127/early-surface-heat-head-stress/run.log",
+        "sha256": "ecbe5263c39a08b5be8ce59a917feda8a8c1b0dcef78582e36e074148e2422ac"
+      },
+      "component": {
+        "passed": 1,
+        "file": "artifacts/gpu-arc-full-release-20261127/early-surface-heat-component/run.log",
+        "sha256": "468bdb7e6ddce13bfdf2e2ff19f190a811939563a4f677b87ed5407ab113365d"
+      },
+      "mixed-generic": {
+        "passed": 5,
+        "file": "artifacts/gpu-arc-full-release-20261127/early-surface-heat-mixed-generic/run.log",
+        "sha256": "d162b033e5c20e3a0d2e3c057df3ebf1171075799196ac77b3b9a1c95e364507"
+      }
+    }
+  },
+  "full_release_runner": {
+    "first_sweep_interrupted": true,
+    "first_sweep_cause": "The frozen source bind masked Git worktree metadata needed by three allocation-plan fixtures.",
+    "first_sweep_log": {
+      "file": "artifacts/gpu-arc-full-release-20261127/first-test-mount/combined-ctest.log",
+      "sha256": "30514820b0fc774f45a91995160b26dd22f49614f42b088d568d3211d13dcced"
+    },
+    "recovery": "Read-only Git metadata bound separately, matching HEAD and complete tracked file list verified in the sandbox, fresh test-output directory.",
+    "current_artifacts": "artifacts/gpu-arc-full-release-20261127",
+    "current_service": "ds-arc-full-float-transfer-20261127.service",
+    "current_suite_complete": false
+  },
+  "other_open_validation": [
+    "Physical headset",
+    "Positive CUDA and ROCm execution"
+  ]
+}
