@@ -1,0 +1,197 @@
+{
+  "arc": {
+    "executable_sha256": "1a0d802e20692fa9e720fb0e6c0b282af93908f541b9a6c828e604c5da51183a",
+    "project_sha256": "0c05096d00d8f3648b90f6f7bcf5e48ec75a48fc5630c2d6b744cdd794b5b34c",
+    "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+    "strict_asan_ubsan": true
+  },
+  "archive": {
+    "filename": "layered-normal-retopo-followup-20261127.tar.gz",
+    "files": {
+      "arc/strict-layered-native.log": "32b102e48ba510141247e7c58f05035fd08736ab91e1c960c66a6d139f5aa8ba",
+      "asan/ctest.log": "84b51dee397bc4deb452d181a004418060c13733f5aea6042c5b4e328335492f",
+      "asan/live-ctest-output.log": "0e5f7004e40bb7f4310471b1072ccec36daade4da5a4287495a31246e00d46d6",
+      "asan/prior-layered-native-failure.log": "2efb43ec93a339c27beb31fe755c699cb89b948313ce0a04f877166c50cd1fcc",
+      "asan/prior-retopo-replay-0.log": "7ecffadd00ef405491e255be5fdbd94706989b07f7bff0687f26a1104de48441",
+      "asan/prior-retopo-replay-1.log": "47e1b0edb26068df157d5723a29e079d1a20552e3f0adbaab3f8c2e4590ec345",
+      "asan/prior-retopo-replay-2.log": "5c92bf61f601dc8b45f412112242cc156a12ca24073dcabdc8650a4bfe894010",
+      "asan/prior-retopo-replay-3.log": "9894298fac4b853835f1a9f6be07622e42964d5a8a612ab7d88e36aca6e8fe4d",
+      "asan/retopo-repeat-0.log": "74dfb3143c1a0b9f4024deb454a4c23c8818313ee123f7852be760588aa4b8a4",
+      "asan/retopo-repeat-1.log": "3ae139ea58473e0ae028e97d4324b2a7b5521badc1bdde30888937e9e94d2264",
+      "asan/retopo-repeat-10.log": "6f9271e3dfab5b01eb19121fda91aba7598e93370ddf2516cf7e06af5e67bdff",
+      "asan/retopo-repeat-11.log": "97ab77fc08b1be7844f39385c21534d9401ea75fa512ac682e588921746d4b85",
+      "asan/retopo-repeat-2.log": "bfb281ecadcf13adf9fb1efa9fbc5935746296edd107c42fb2d62786694c1106",
+      "asan/retopo-repeat-3.log": "e6a0cf5a1c45a10bf10ea2365fcddf12f123e0f5ece3ba2d501c95f8a37018c6",
+      "asan/retopo-repeat-4.log": "ab46438b26b0ca1a4ddd2a33b5164df2a49f77f180e4af34a641059b4ce4f2e1",
+      "asan/retopo-repeat-5.log": "7146568bfcb1306780ef541880e7535766e199b6c23530324f7b954712212f0f",
+      "asan/retopo-repeat-6.log": "760593b539b36e0d0f1dccdf738336b034d9f38281fde4f10101544c4eb4e4a0",
+      "asan/retopo-repeat-7.log": "c57a86633995c185e7015aa9e808167c63fd6c599be39aa11748f389c1376ee6",
+      "asan/retopo-repeat-8.log": "bd6f8b4a45191c7b5d28084648303e94d81bdeb5d94d25a275e38c7e1d779b6d",
+      "asan/retopo-repeat-9.log": "fb7e67b808f35ea90e2a8cee27e321d6c0867120171bce519bea0d25c7d35e5c",
+      "diagnostics/subsampled-layered-native.log": "a772015fa9ad3bc9f0d1284f882961932e26d36db528874872471c9d4b9747cf",
+      "integrated-full-release-status.json": "2430bcef4660b802ec6a6533f369daaf5bbc6fe320752937e76ee201969e3846",
+      "prior-full-release-status.json": "5a2bff294005eb7e0e3f2657d3d94b86c997bf48dc1b0a321d25ad17ce0b212c",
+      "release/ctest.log": "a80493e7b919c09abe37080cf3736bfaf9e8214d4a6e5895b499cbac4bfd015a",
+      "release/ctest.xml": "e2c49ef2191db64e204e3b12cbb99099fef913027184b0a5eb0770ad3b04a480",
+      "release/full-ctest-output.log": "bc741db528549f0dd66578254d884d91fcf9cde2db524e2be2225608fa356835",
+      "release/prior-layered-native-failure.log": "258d66ba2aa04d61626f84493d314a40caac9b61417b2e820564bdd237e759a9",
+      "release/prior-retopo-replay-0.log": "33d333adad5b91eacf6daafbeb1df783dad1ae965c32b6f25479b2f8f0272e92",
+      "release/prior-retopo-replay-1.log": "886eb9d5a1ae6c948affd99d703c92d74fe9c14a880e8f4803f71b46e5174aac",
+      "release/prior-retopo-replay-2.log": "b117b20bf48eb58f9e46bcfa65d5dcf065afb7e2c8e37eb99bd857a6ead7d9d0",
+      "release/prior-retopo-replay-3.log": "9e3796a989c69eb5eb27b1858cd6ddf15b908582a8ac07d5245934034e8ca374",
+      "release/retopo-repeat-0.log": "7ad792c7fdf4d9aca6fcb82508fc9c74017c56ec0f00662e4a39c5068753e2bb",
+      "release/retopo-repeat-1.log": "e3f052c1b69d7591d2bba5368b3c2d9353c302e7222643f4f4c3b2e288cdb529",
+      "release/retopo-repeat-10.log": "a6ce7b4b53e9f0a70f7f9c874e3f90e26751ff46424cfa8bed0f6373f1548da5",
+      "release/retopo-repeat-11.log": "37e42eb8c5251e6257f7443730cc2d417b6d71c25be30a9b039cbf7ca9b2318a",
+      "release/retopo-repeat-2.log": "71745c9e9acbb4c90e37205aa2dc9567444f2786d51d857518190a4cd3535f76",
+      "release/retopo-repeat-3.log": "47d7756166e2d39c99cc13e1e4d4afcd65e861a87522331cca05b34041b8e56e",
+      "release/retopo-repeat-4.log": "dc93be3032a343725cb941b807b280a4696029c964c54c6b0c830e2029e8b59c",
+      "release/retopo-repeat-5.log": "10c202a96f594effd044bd1188bf618b59f214c941085a83ac3cc0e6cdb408dd",
+      "release/retopo-repeat-6.log": "f6447873a0bdef96ddffe120a3bd7112c34bcc30b708ff1846566a0413a44419",
+      "release/retopo-repeat-7.log": "4c629424ea015cbbcd7343f81bad5351488abb0c64768ec0ac5aafd71e6a64f5",
+      "release/retopo-repeat-8.log": "68a84bf2f56ef5be52d2df381f25e9ed12e09f210821673f62e0a61ad0e73f20",
+      "release/retopo-repeat-9.log": "b64d2093bbef6229b7caf635fa4203b7214ffcbf7984e71d84174fc86390b021"
+    },
+    "sha256": "8cb1de5c1394f1332520f21cea7c3734902bb4da98791fb9fee409bc37a9085a"
+  },
+  "current_full_release": {
+    "cache_sha256": "3a78be26db84fc17bb90c3920a76db5e5cd131aeaf1bb726ce9ae2a41ad129b1",
+    "candidate": "6b1d0c481475ec0caee28927cbf908653b9449bb",
+    "configure": [
+      "cmake",
+      "-S",
+      "/home/blux/de-xr/dome-sculpt/artifacts/current-integrated-full-release-20261127/source",
+      "-B",
+      "/home/blux/de-xr/dome-sculpt/artifacts/current-integrated-full-release-20261127/build",
+      "-G",
+      "Ninja",
+      "-DCMAKE_BUILD_TYPE=Release",
+      "-DDOME_COMPUTE_BACKEND=CPU",
+      "-DFLTK_DIR=/opt/fltk-vr/toolkit/share/fltk"
+    ],
+    "elapsed_seconds": 8.592,
+    "invocation": "af6f9a343d404660bcb6d1c241599230",
+    "phase": "build all Release targets",
+    "terminal": false,
+    "toolkit": "/opt/fltk-vr/toolkit"
+  },
+  "direction_checks": {
+    "covered_interior_samples": 272,
+    "maximum_error": 0.00631529,
+    "maximum_error_limit": 0.035,
+    "omitted_normal_error": 0.98783
+  },
+  "fixture": "6b1d0c481475ec0caee28927cbf908653b9449bb",
+  "fixture_files": {
+    "tests/layered-normal-native.cpp": "b789d74a205fa7bb56e509afcf438bd612b5dbd06a1e7730d10221990253919d",
+    "tests/retopo-worker-faults.cpp": "36dffc2d5efa2146ce9cf7db9f9229cae423f4ed4b06f83a42dfc2b369620a6f"
+  },
+  "prior_full_release": {
+    "app_sha256": "c0b9bc7c1ff74d000a3b326ff4a5ce33ff7503956d4b60c3f21d8b8782abd743",
+    "cache_sha256": "97edb93023080fb84b53c391977d34eca284aa03c31424b16c80e61f45e52b8d",
+    "candidate": "ed491ddf685ebd5e637decafe8c88d6b7290ec87",
+    "configure": [
+      "cmake",
+      "-S",
+      "/home/blux/de-xr/dome-sculpt/artifacts/first-key-2048-full-release-20261126/source",
+      "-B",
+      "/home/blux/de-xr/dome-sculpt/artifacts/first-key-2048-full-release-20261126/build",
+      "-G",
+      "Ninja",
+      "-DCMAKE_BUILD_TYPE=Release",
+      "-DDOME_COMPUTE_BACKEND=CPU",
+      "-DFLTK_DIR=/opt/fltk-vr/toolkit/share/fltk"
+    ],
+    "elapsed_seconds": 7508.364,
+    "exit": 8,
+    "failed": [
+      "layered-normal-native",
+      "retopology-worker-accepted-publication"
+    ],
+    "invocation": "f2ab900377b24945ad65607e34043114",
+    "junit_sha256": "6b9cdcaebd4baa830daae567466d694a09a7781e96647d4e98459ff60d0b83cd",
+    "phase": "complete",
+    "registered": 1350,
+    "skipped": [
+      "authoring-native-normal-union",
+      "authoring-union-archive-0",
+      "authoring-union-archive-2",
+      "authoring-union-archive-4",
+      "authoring-union-archive-6",
+      "canonical-native-pose",
+      "canonical-normal-uv",
+      "layered-normal-render",
+      "layered-normal-uv-archive-cleared",
+      "layered-normal-uv-archive-queued",
+      "layered-normal-uv-archive-rebaked",
+      "layered-normal-uv-native",
+      "layered-normal-uv-safety"
+    ],
+    "terminal": true,
+    "toolkit": "/opt/fltk-vr/toolkit",
+    "totals": {
+      "fail": 2,
+      "pass": 1335,
+      "skip": 13
+    }
+  },
+  "product": "e64e9a51241bf770d2c26e12f4f6e30a9ac7b0e3",
+  "profiles": {
+    "asan": {
+      "checks_each_repeat": 102,
+      "core_sha256": "3b4ae691d5473ad9289c76671894d99a0ca3023d3295050e6ea364b9b59b1c5c",
+      "observed_passes": [
+        "source-canonical-normal-bake",
+        "retopology-worker-faults",
+        "retopology-worker-reporter-recovery",
+        "retopology-worker-accepted-publication",
+        "layered-normal-native",
+        "canonical-native-pose",
+        "layered-normal-uv-native"
+      ],
+      "project_sha256": "0c05096d00d8f3648b90f6f7bcf5e48ec75a48fc5630c2d6b744cdd794b5b34c",
+      "registered_ctest_in_progress": {
+        "ActiveState": "active",
+        "ExecMainStatus": "0",
+        "InvocationID": "b5d146f046584798878892de5992c9dc",
+        "MainPID": "1704699",
+        "SubState": "running"
+      },
+      "retopo_executable_sha256": "86f5d7d11a80097f2f08a9df7378ddb7b4f641c3bb1b0358e7dc256ea1711d5c",
+      "retopo_repeats": 12,
+      "test_executable_sha256": "1a0d802e20692fa9e720fb0e6c0b282af93908f541b9a6c828e604c5da51183a"
+    },
+    "release": {
+      "checks_each_repeat": 102,
+      "core_sha256": "9404f8f0a3944d5b30338e52d7699e5ce46fd94a9d3895b8b9981ab7d38d0db8",
+      "ctest": {
+        "authoring-native-normal-union": 1.99596,
+        "authoring-union-archive-0": 23.582,
+        "authoring-union-archive-2": 61.0808,
+        "authoring-union-archive-4": 49.0537,
+        "authoring-union-archive-6": 65.4105,
+        "canonical-native-pose": 0.0727375,
+        "canonical-normal-uv": 0.046032,
+        "layered-normal-native": 0.247084,
+        "layered-normal-render": 0.884291,
+        "layered-normal-uv-archive-cleared": 20.4318,
+        "layered-normal-uv-archive-queued": 21.0445,
+        "layered-normal-uv-archive-rebaked": 24.4848,
+        "layered-normal-uv-native": 0.96443,
+        "layered-normal-uv-safety": 0.0276665,
+        "native-paint32-fixture": 0.0211001,
+        "retopology-worker-accepted-publication": 0.183703,
+        "retopology-worker-faults": 0.4012,
+        "retopology-worker-reporter-recovery": 0.0133318,
+        "source-canonical-normal-bake": 3.25356
+      },
+      "project_sha256": "0c05096d00d8f3648b90f6f7bcf5e48ec75a48fc5630c2d6b744cdd794b5b34c",
+      "registered_total": 19,
+      "retopo_executable_sha256": "9a5bd4bb6c72f1d6797735d632ad4362cd421d470478c8d80c1093017a532723",
+      "retopo_repeats": 12,
+      "test_executable_sha256": "dee8a5170eb7c5536af6e570d51602eced36fa67fb3f6b8a27eedb4e47406be1"
+    }
+  },
+  "scope": "Test fixture updates. Native layered source-frame authority, Bake directions and exact history. Deterministic accepted retopology publication and ordered Save rollback. Focused tests replay against the retained HDR milestone core and matching unchanged render/support objects.",
+  "toolkit": "acc2b70ae61dedec2a23727f67c60c0303d0f76f"
+}

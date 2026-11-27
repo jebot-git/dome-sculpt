@@ -19,6 +19,15 @@ remain open. Main's rendered material controls replay independently passes
 [Combined OpenXR evidence](validation/combined-atlas-hdr-openxr-20261126.json)
 [Full Release regression evidence](validation/combined-atlas-hdr-full-release-20261126.json)
 
+Both failing fixtures and all 13 skipped dependents from the earlier
+`ed491ddf` Release sweep pass in the 19-case focused rerun against the
+retained HDR milestone core. The corrected retopology fixture verifies
+ordered Save handling before and after an injected publication failure.
+The layered-normal fixture now verifies authenticated donor Bake directions
+and exact scene history. Both fixtures also pass ASan/UBSan. The broader
+sanitizer group and current full Release sweep are running.
+[Focused regression evidence](validation/layered-normal-retopo-followup-20261127.json)
+
 Main supports VRM0 export of shaped CC0 VRoid avatars, generated unlit
 grooms, certified UV seam edits and refitted first-person and spring
 metadata. Uniform shapes and avatars without spring geometry support a

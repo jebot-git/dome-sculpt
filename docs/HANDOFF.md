@@ -2202,6 +2202,36 @@ emission coordinates, HDR VRM, full integrated regression and physical
 headset acceptance remain open.
 [Retained texture-set validation](validation/native-texture-set-hdr-retained-production-20261127.json)
 
+### Layered-normal Bake and retopology regression follow-up
+
+The earlier full Release sweep on `ed491ddf` finished with 1,335 passes,
+two failures and 13 dependency skips. The layered-normal producer still
+expected the independent Bake rejection that preceded authenticated source
+frame transport. It now verifies the paired material and normal capture,
+refuses a missing capture, then uses the actual Document worker to bake the
+converted donor onto a separate native mesh. It verifies donor ownership,
+direction at each covered interior texel, ordered Save and cold reopen,
+and exact Undo/Redo. Software Release, software ASan/UBSan and the Arc A770
+ASan/UBSan replay measure 272 samples with maximum direction error 0.00631529
+under the existing 0.035 limit. Omitting the source normal raises the maximum
+error to 0.98783.
+The three profiles produce identical saved project bytes.
+
+The retopology acceptance test now holds the actual worker before editing the
+draft so Save attaches to the accepted publication before the injected fault.
+It separately checks that a Save submitted after the failure refuses the still
+open draft. Both paths preserve the prior file. Twelve repeated acceptance
+runs pass 102 checks each in Release and ASan/UBSan. The product source for these
+checks is unchanged from the retained HDR milestone.
+
+All 19 selected Release CTests pass, including all 13 cases skipped in the
+earlier sweep. Seven of the matching ASan/UBSan CTests have passed, including
+both revised fixtures and the independent canonical source Bake. The
+remaining sanitizer archives are running. The current full Release sweep
+has started its all-target build on fixture commit `6b1d0c48` with the
+canonical `acc2b70a` DomeD toolkit.
+[Focused regression validation](validation/layered-normal-retopo-followup-20261127.json)
+
 ## Source and integration boundary
 
 - Main now admits product1bc13125 and public fixturef1e193c7 after complete
