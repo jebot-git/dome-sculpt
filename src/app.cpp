@@ -2,6 +2,8 @@
 #include "appearance.h"
 #include "desktop-menu.h"
 #include "dome/document.hpp"
+#include "emission-authority.hpp"
+#include "emission-paint-access.hpp"
 #include "export-editor.hpp"
 #include "editable-avatar-eligibility.hpp"
 #include "dome/frame-clock.hpp"
@@ -1674,7 +1676,11 @@ int main(int argc, char **argv) try {
     uint64_t paint_hash = 1469598103934665603ULL;
     size_t blue_texels = 0;
     if (scene.active().painted) {
-      auto map = scene.active().painted->composite(scene.active().material);
+      const auto &paint = *scene.active().painted;
+      const auto &material = scene.active().material;
+      const auto map = (paint.has_physical_emission() || detail::hdr_emission(material.emissive))
+          ? detail::EmissionExportAccess::other_channels(paint, material, {})
+          : paint.composite(material);
       for (auto byte : map->color.rgba) {
         paint_hash ^= byte;
         paint_hash *= 1099511628211ULL;
@@ -1701,7 +1707,8 @@ int main(int argc, char **argv) try {
       return result;
     };
     auto objects = nlohmann::json::array();
-    for (auto value : encoded.at("objects")) {
+    const auto &payload = encoded.contains("payload") ? encoded.at("payload") : encoded;
+    for (auto value : payload.at("objects")) {
       bool visible = value.at("visible");
       value.erase("visible");
       // Plain scenes omit the v8 feature keys; extended scenes include nulls

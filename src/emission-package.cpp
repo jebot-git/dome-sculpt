@@ -320,6 +320,35 @@ void check_texture_set_domain(const Json &j,std::span<const uint8_t> binary,cons
    throw std::invalid_argument("HDR texture-set emitted paint corner differs from its exact native member");
  }
 }
+void validate_canonical_role_png(const Json &j,std::span<const uint8_t> binary,const Json &info,const Image &expected,
+    const std::function<bool()> &cancelled){
+ auto resource=[](const Json &table,const Json &index,const char *message)->const Json&{
+  const auto at=integer(index,table.size(),message);
+  if(!table.is_array()||at>=table.size())throw std::invalid_argument(message);
+  return table[at];
+ };
+ const auto &textures=j.at("textures"),&images=j.at("images"),&samplers=j.at("samplers");
+ const auto &texture=resource(textures,info.at("index"),"Canonical HDR texture index is invalid");
+ const auto &sampler=resource(samplers,texture.at("sampler"),"Canonical HDR sampler index is invalid");
+ if(sampler.value("wrapS",Json(10497))!=33071||sampler.value("wrapT",Json(10497))!=33071||
+    sampler.value("minFilter",Json(9729))!=9729||sampler.value("magFilter",Json(9729))!=9729)
+  throw std::invalid_argument("Canonical HDR material must retain its clamp-linear sampler");
+ const auto &image=resource(images,texture.at("source"),"Canonical HDR image index is invalid");
+ if(image.contains("uri")||image.at("mimeType")!="image/png")
+  throw std::invalid_argument("Canonical HDR material must retain its embedded PNG");
+ const auto &view=resource(j.at("bufferViews"),image.at("bufferView"),"Canonical HDR image view is invalid");
+ if(integer(view.at("buffer"),0,"Canonical HDR image buffer differs")||view.contains("byteStride")||view.contains("target"))
+  throw std::invalid_argument("Canonical HDR material image view differs");
+ const auto begin=integer(view.value("byteOffset",Json(0)),binary.size(),"Canonical HDR image offset is invalid");
+ const auto length=integer(view.at("byteLength"),binary.size(),"Canonical HDR image length is invalid");
+ if(length>binary.size()-begin)throw std::invalid_argument("Canonical HDR image exceeds BIN");
+ stop(cancelled);
+ const auto expected_png=expected.png();
+ stop(cancelled);
+ const auto actual=binary.subspan(begin,length);
+ if(!std::ranges::equal(expected_png,actual))
+  throw std::invalid_argument("Canonical HDR image differs from its independently owned material field");
+}
 size_t domain_descriptor(const Json &domain,bool canonical_allowed=false){
  if(!domain.is_object()||domain.size()!=3||integer(domain.at("version"),1,"Unknown native HDR domain version")!=1||
     (domain.at("kind")!="native-paint32"&&(!canonical_allowed||domain.at("kind")!="canonical-paint37")))
@@ -383,18 +412,17 @@ void native_domain(const Json &j,std::span<const uint8_t> binary,const Json &ent
   const auto normal_uv=domain_accessor(j,binary,attributes.at("TEXCOORD_"+std::to_string(normal_coordinate)),"VEC2",2,2'000'000,5126);
   if(normal_uv.count!=positions.count)throw std::invalid_argument("Canonical HDR normal coordinate dimensions differ");
   for(size_t v=0;v<normal_uv.count;++v){if((v&1023)==0)stop(cancelled);if(normal_uv.scalar(v,0)!=frame->normal_coordinates[v][0]||normal_uv.scalar(v,1)!=frame->normal_coordinates[v][1])throw std::invalid_argument("Canonical HDR borrowed another normal coordinate domain");}
-  const auto &textures=j.at("textures"),&images=j.at("images"),&samplers=j.at("samplers");
-  const auto ti=integer(normal_info.at("index"),textures.size(),"Canonical HDR normal texture invalid");if(ti>=textures.size())throw std::invalid_argument("Canonical HDR normal texture invalid");
-  const auto &texture=textures[ti];const auto si=integer(texture.at("source"),images.size(),"Canonical HDR normal image invalid"),ss=integer(texture.at("sampler"),samplers.size(),"Canonical HDR normal sampler invalid");
-  if(si>=images.size()||ss>=samplers.size())throw std::invalid_argument("Canonical HDR normal resource invalid");
-  const auto &sampler=samplers[ss];if(sampler.value("wrapS",10497)!=33071||sampler.value("wrapT",10497)!=33071||sampler.value("minFilter",9729)!=9729||sampler.value("magFilter",9729)!=9729)throw std::invalid_argument("Canonical HDR normal sampler differs");
-  const auto &image=images[si];if(image.contains("uri")||image.at("mimeType")!="image/png")throw std::invalid_argument("Canonical HDR normal image interpretation differs");
-  const auto &views=j.at("bufferViews");const auto vi=integer(image.at("bufferView"),views.size(),"Canonical HDR normal image view invalid");if(vi>=views.size())throw std::invalid_argument("Canonical HDR normal image view invalid");
-  const auto &iv=views[vi];if(integer(iv.at("buffer"),0,"Canonical HDR normal image buffer differs")||iv.contains("byteStride")||iv.contains("target"))throw std::invalid_argument("Canonical HDR normal image view differs");
-  const auto begin=integer(iv.value("byteOffset",Json(0)),binary.size(),"Canonical HDR normal image offset invalid"),length=integer(iv.at("byteLength"),binary.size(),"Canonical HDR normal image length invalid");
-  if(length>binary.size()-begin)throw std::invalid_argument("Canonical HDR normal image exceeds BIN");
-  const auto expected_png=frame->prepared_normal.image->png();const auto actual_png=binary.subspan(begin,length);
-  if(expected_png.size()!=actual_png.size()||!std::equal(expected_png.begin(),expected_png.end(),actual_png.begin()))throw std::invalid_argument("Canonical HDR normal image differs from its independent owning field");
+  validate_canonical_role_png(j,binary,normal_info,*frame->prepared_normal.image,cancelled);
+  if(binding->color_preparation){
+   const auto &pbr=j.at("materials")[material].at("pbrMetallicRoughness");
+   const auto &color=pbr.at("baseColorTexture");
+   if(color.contains("extensions")||integer(color.value("texCoord",Json(0)),7,"Canonical HDR color coordinate exceeds policy")!=coordinate||
+      attributes.contains("COLOR_0")||
+      pbr.value("baseColorFactor",Json::array({1,1,1,1}))!=Json::array({1,1,1,1})||
+      !frame->surface.textures||frame->surface.textures->pbr_color.rgba.empty())
+    throw std::invalid_argument("Canonical HDR resolved color differs from its retained sampling domain");
+   validate_canonical_role_png(j,binary,color,frame->surface.textures->pbr_color,cancelled);
+  }
  }
  if(frame){
   auto directions=[&](const Json &channels,const char *name,const std::vector<Vec3> &values){

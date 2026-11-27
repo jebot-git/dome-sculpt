@@ -12,6 +12,7 @@
 #include "native-paint-sampling.hpp"
 #include "native-grid-composite-work.hpp"
 #include "native-paint-export-policy.hpp"
+#include "canonical-paint-export-policy.hpp"
 #include "native-paint-frame-export-policy.hpp"
 #include <cstring>
 #include <tuple>
@@ -56,6 +57,8 @@ NativeExtractionCost native_extraction_cost(const Scene &scene,const SourceUvBak
         ?native_paint_frame_export_working_bytes(o,policy.max_working_bytes-cost.bytes,cancelled)
         :native_paint_export_working_bytes(p.mesh(),o.deformation.get());
       bytes(working,1);
+    }else if(o.material_bindings&&o.material_bindings->canonical_paint_sampling){
+      bytes(canonical_paint_export_working_bytes(o,policy.max_working_bytes-cost.bytes,cancelled),1);
     }
     const auto maps=p.source_maps();
     auto pixels=[&](std::initializer_list<const PaintSourceTexture*> roles){uint32_t w=r,h=r;
@@ -72,7 +75,7 @@ NativeExtractionCost native_extraction_cost(const Scene &scene,const SourceUvBak
     // the compositor may use a singleton when no corresponding coverage exists.
     bytes(color,8);bytes(orm,4);bytes(emission,8);
     if(p.color_projection())bytes(color,4);
-    if(p.normal_projection())bytes(grid,8);
+    if(p.normal_projection()||(p.baked()&&p.baked()->normal_field))bytes(grid,8);
     else if(p.baked()&&!p.baked()->maps.normal.rgba.empty())bytes(grid,12);
     for(const auto &layer:p.layers()){
       bytes(layer.tiles.capacity()+layer.pbr_tiles.capacity()+layer.emission_tiles.capacity(),sizeof(void*)*2);
@@ -136,11 +139,16 @@ NativePhysicalField native_physical_field(const SculptObject &o,
   if(!o.painted)throw std::invalid_argument("Native physical view requires its actual paint owner");
   const auto &paint=*o.painted;
   if(paint.paint_sampling_domain()) {
-    const auto colors=o.material_bindings?o.material_bindings->color_preparation:nullptr;
-    const auto native=o.material_bindings?o.material_bindings->native_paint_sampling:nullptr;
-    if(!paint.valid_paint_sampling_attachment()||bool(native)==bool(colors&&colors->paint_sampling))
+    const auto binding=o.material_bindings;
+    const auto colors=binding?binding->color_preparation:nullptr;
+    const auto native=binding?binding->native_paint_sampling:nullptr;
+    const auto canonical=binding?binding->canonical_paint_sampling:nullptr;
+    if(!paint.valid_paint_sampling_attachment()||
+       int(bool(native))+int(bool(canonical))+int(bool(colors&&colors->paint_sampling))!=1)
       throw std::invalid_argument("Native physical paint lost its independently authenticated sampling domain");
-    if(native){PaintSamplingLimits limits;limits.cancelled=cancelled;native->validate_current(paint,limits);}
+    PaintSamplingLimits limits;limits.cancelled=cancelled;
+    if(native)native->validate_current(paint,limits);
+    else if(canonical){canonical->validate_binding(*binding,true);canonical->validate_current(paint,limits);}
     else {if(!colors->paint_sampling->matches_current(paint))throw std::invalid_argument("Native physical paint borrowed another current owner");colors->paint_sampling->validate_current(paint.mesh(),cancelled);}
   }
   const auto maps=paint.source_maps();
@@ -212,10 +220,12 @@ bool native_paint_compiled_emission(const NativeAuthoringCapture &capture,const 
   auto stop=[&]{if(cancelled&&cancelled())throw std::runtime_error("Native paint emitted-view replay cancelled");};stop();
   const auto &object=capture.scene().object(surface.id);const auto binding=object.material_bindings;
   const auto owner=binding?binding->native_paint_sampling:nullptr;
-  if(!owner||!native_physical(object))return false;
+  const auto canonical=binding?binding->canonical_paint_sampling:nullptr;
+  if((!owner&&!canonical)||!native_physical(object))return false;
   const auto original=std::find_if(capture.originals().begin(),capture.originals().end(),[&](const auto &s){return s.id==surface.id;});
   auto fail=[] {throw std::invalid_argument("Native emission view differs from its exact captured paint authority");};
-  if(original==capture.originals().end()||!object.painted||!owner->valid_owner(owner))fail();
+  if(original==capture.originals().end()||!object.painted||bool(owner)==bool(canonical)||
+     (owner&&!owner->valid_owner(owner))||(canonical&&!canonical->valid_owner(canonical)))fail();
   auto same_owner=[](const auto &a,const auto &b){return a==b&&!a.owner_before(b)&&!b.owner_before(a);};
   auto material=[](const Material &m){return std::tie(m.name,m.color,m.metallic,m.roughness,m.toon,m.double_sided,m.alpha,m.alpha_cutoff,m.unlit);};
   if(surface.name!=original->name||material(surface.material)!=material(original->material)||surface.material.emissive!=std::array<float,3>{}||
@@ -227,8 +237,15 @@ bool native_paint_compiled_emission(const NativeAuthoringCapture &capture,const 
   auto same=[](const auto &a,const auto &b){return a.size()==b.size()&&(a.empty()||!std::memcmp(a.data(),b.data(),a.size()*sizeof(a.front())));};
   const auto &mesh=surface.mesh,&expected=original->mesh;
   if(!same(mesh.positions,expected.positions)||!same(mesh.normals,expected.normals)||!same(mesh.uv,expected.uv)||mesh.indices!=expected.indices||mesh.uv_pins!=expected.uv_pins||mesh.uv_seams!=expected.uv_seams||!same(surface.paint_corner_coordinates,original->paint_corner_coordinates))fail();
-  PaintSamplingLimits limits;limits.cancelled=cancelled;owner->validate_current(*object.painted,limits);owner->validate_mesh(mesh,limits);
-  if(!surface.textures||surface.textures->overlay||surface.textures->source_maps||surface.textures->normal_projection||surface.textures->color_projection||
+  PaintSamplingLimits limits;limits.cancelled=cancelled;
+  if(canonical){
+    canonical->validate_binding(*binding,true);canonical->validate_current(*object.painted,limits);
+    const auto &attachment=canonical->attachment();
+    if(!same_owner(surface.paint_sampling_attachment,attachment)||
+       surface.paint_corner_coordinates!=attachment->domain()->corner_coordinates(mesh,limits))fail();
+  }else{owner->validate_current(*object.painted,limits);owner->validate_mesh(mesh,limits);}
+  if(!surface.textures||surface.textures->overlay||surface.textures->source_maps||surface.textures->normal_projection||
+     !same_owner(surface.textures->color_projection,object.painted->color_projection())||
      bool(surface.textures->baked_base)!=bool(object.painted->baked()))fail();
   stop();return true;
 }
@@ -472,7 +489,7 @@ NativeAuthoringCompilation compile_native_authoring(
       // Geometry, retained coordinates, role frames and normal proof come from
       // the actual captured surface. Only this emitted current material changes.
       surface.material.emissive={};
-      if(surface.material_bindings&&!surface.material_bindings->native_paint_sampling){auto binding=std::make_shared<SourceMaterialBindings>(*surface.material_bindings);
+      if(surface.material_bindings&&!surface.material_bindings->native_paint_sampling&&!surface.material_bindings->canonical_paint_sampling){auto binding=std::make_shared<SourceMaterialBindings>(*surface.material_bindings);
         binding->physical_emission.reset();binding->native_reference.emission={};surface.material_bindings=std::move(binding);}
       result.emission.push_back(std::move(field.emission));
       result.diagnostics.push_back("Object "+std::to_string(object.id)+

@@ -147,7 +147,7 @@ void validate_native_emission_surfaces(const EmissionExportPrepared &prepared,co
 static EmissionExportRaster canonical_paint_emission_raster(const SculptObject &object,const std::function<bool()> &cancelled,bool streaming){
  const auto binding=object.material_bindings;const auto owner=binding?binding->canonical_paint_sampling:nullptr;
  if(!object.mesh_active||!object.painted||!owner||!owner->valid_owner(owner)||!owner->matches_current(*object.painted)||
-    binding->has_mtoon||binding->native_paint_sampling||binding->native_paint_frames||binding->normal_preparation||binding->color_preparation||object.appearance||object.polygon)
+    binding->has_mtoon||binding->native_paint_sampling||binding->native_paint_frames||binding->normal_preparation||object.appearance||object.polygon)
   throw std::invalid_argument("Canonical HDR field needs its genuine independent current normal/paint owners");
  PaintSamplingLimits limits;limits.cancelled=cancelled;binding->validate();owner->validate_current(*object.painted,limits);
  canonical_paint_export_working_bytes(object,512*1024*1024,cancelled);

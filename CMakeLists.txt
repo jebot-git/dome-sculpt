@@ -739,6 +739,15 @@ if(BUILD_TESTING)
   endforeach()
   set_tests_properties(retopology-prepared-color-normal-uv-plain
                        retopology-prepared-color-normal-uv-affine PROPERTIES TIMEOUT 1800)
+  set_tests_properties(retopology-prepared-color-normal-uv-plain PROPERTIES FIXTURES_SETUP canonical_color_hdr_input)
+  add_executable(dome-sculpt-canonical-paint-color-hdr-test tests/canonical-paint-color-hdr.cpp)
+  target_include_directories(dome-sculpt-canonical-paint-color-hdr-test PRIVATE src)
+  target_link_libraries(dome-sculpt-canonical-paint-color-hdr-test PRIVATE dome-sculpt-core)
+  add_test(NAME canonical-paint-color-hdr COMMAND dome-sculpt-canonical-paint-color-hdr-test
+    ${CMAKE_CURRENT_BINARY_DIR}/retopology-prepared-color-normal-uv-plain/retained-uv.dsculpt
+    ${CMAKE_CURRENT_BINARY_DIR}/canonical-paint-color-hdr)
+  set_tests_properties(canonical-paint-color-hdr PROPERTIES
+    FIXTURES_REQUIRED canonical_color_hdr_input FIXTURES_SETUP canonical_color_hdr_export TIMEOUT 1800)
   foreach(placement plain affine)
     add_test(NAME retopology-surface-heat-${placement} COMMAND dome-sculpt-retopo-surface-heat-test
       ${CMAKE_CURRENT_BINARY_DIR}/retopology-surface-heat-${placement} ${placement})
@@ -3911,6 +3920,11 @@ if(BUILD_TESTING)
   target_link_libraries(dome-sculpt-xr-editable-export-test PRIVATE dome-sculpt-core)
   target_link_options(dome-sculpt-xr-editable-export-test PRIVATE -Wl,--wrap=fsync)
   add_test(NAME xr-editable-export COMMAND dome-sculpt-xr-editable-export-test ${CMAKE_CURRENT_BINARY_DIR}/xr-editable-export)
+  add_test(NAME xr-canonical-paint-color-hdr-export COMMAND dome-sculpt-xr-editable-export-test
+    ${CMAKE_CURRENT_BINARY_DIR}/xr-canonical-paint-color-hdr-export
+    ${CMAKE_CURRENT_BINARY_DIR}/canonical-paint-color-hdr/original.dsculpt)
+  set_tests_properties(xr-canonical-paint-color-hdr-export PROPERTIES
+    FIXTURES_REQUIRED canonical_color_hdr_export TIMEOUT 900)
   set_tests_properties(xr-editable-export PROPERTIES TIMEOUT 1200)
 endif()
 
