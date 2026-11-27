@@ -3,11 +3,15 @@
 #include "dome/native-authoring.hpp"
 #include "dome/emission-native.hpp"
 #include "emission-export.hpp"
+#include "emission-exr-owned.hpp"
+#include "emission-paint-access.hpp"
 #include "dome/source-uv-bake.hpp"
 #include "texture-set-export.hpp"
 #include "gltf-document.hpp"
+#include "paint-emission-sample.hpp"
 #include "cgltf.h"
 #include <nlohmann/json.hpp>
+#include <bit>
 #include <fstream>
 #include <iostream>
 using namespace dome;
@@ -16,9 +20,9 @@ size_t checks=0;
 void check(bool yes,const char*s){if(!yes)throw std::runtime_error(s);++checks;}
 template<class F>void refuses(F&&f,const char*s){bool caught=false;try{f();}catch(const std::exception&e){caught=true;std::cout<<"EXPECTED "<<e.what()<<'\n';}check(caught,s);}
 std::vector<uint8_t>bytes(const std::filesystem::path&p){std::ifstream f(p,std::ios::binary);if(!f)throw std::runtime_error("Missing actual export file");return {std::istreambuf_iterator<char>(f),{}};}
-Scene fixture(bool empty=false){
+Scene fixture(bool empty=false,uint32_t resolution=64){
  Mesh m;m.positions={{-.8f,-.8f,0},{.8f,-.8f,0},{0,.8f,0},{-.8f,-.8f,.5f},{.8f,-.8f,.5f},{0,.8f,.5f}};m.normals.assign(6,{0,0,1});m.uv={{{.1f,.1f}},{{.9f,.1f}},{{.5f,.9f}},{{.1f,.1f}},{{.9f,.1f}},{{.5f,.9f}}};m.indices={0,1,2,3,4,5};
- Scene s;std::vector<TextureSetInitialField>fields(empty?3:2);for(auto&f:fields){f.resolution=64;f.material.double_sided=true;}for(size_t f=0;f<fields.size();++f)fields[f].material.name="Material "+std::to_string(f);
+ Scene s;std::vector<TextureSetInitialField>fields(empty?3:2);for(auto&f:fields){f.resolution=resolution;f.material.double_sided=true;}for(size_t f=0;f<fields.size();++f)fields[f].material.name="Material "+std::to_string(f);
  fields.back().material.color={.1f,.7f,.3f,.6f};fields.back().material.alpha=Material::AlphaMode::Mask;fields.back().material.alpha_cutoff=.3f;
  initialize_texture_sets(s,s.active().id,m,fields,std::array<TextureSetId,2>{empty?1u:0u,empty?2u:1u});
  DeformationState d(m);Skeleton rig;Bone bone;bone.name="Actual joint";bone.rest.translation={.1f,.2f,.3f};rig.bones.push_back(bone);d.skeleton=rig;d.skin=SkinWeights{};d.skin->vertices.assign(6,VertexWeights{{0,1}});d.pose={bone.rest};d.pose[0].translation.x+=.2f;
@@ -138,5 +142,120 @@ void authority(){
  surfaces=scene.export_surfaces();TextureSetLimits limits;limits.maximum_bytes=1024;refuses([&]{detail::compile_texture_set_export(surfaces[0],limits);},"Explicit per-material layout budget refuses before geometry expansion");limits={};limits.cancelled=[]{return true;};refuses([&]{detail::compile_texture_set_export(surfaces[0],limits);},"Material export cancellation keeps the source endpoint exact");
  check(scene.encode()==exact,"Every plan/pose/budget/cancellation refusal keeps all authoring values exact");
 }
+
+void compare_production_exrs(const std::vector<uint8_t> &file,const Scene &scene){
+ const auto json_length=uint32_t(file.at(12))|(uint32_t(file.at(13))<<8)|
+     (uint32_t(file.at(14))<<16)|(uint32_t(file.at(15))<<24);
+ const auto json=nlohmann::json::parse(file.begin()+20,file.begin()+20+json_length);
+ const auto &resources=json.at("extras").at("domeSculptEmission").at("images");
+ check(resources.size()==2,"Both high-resolution HDR members have independent exact EXR resources");
+ const auto binary=std::span(file).subspan(28+json_length);
+ for(const auto &resource:resources){
+  const auto set=resource.at("textureSet").at("id").get<TextureSetId>();
+  const auto field=texture_set_view(scene.active(),set);
+  const detail::PaintEmissionSampler dense_reference(*field.painted);
+  const auto &view=json.at("bufferViews").at(resource.at("bufferView").get<size_t>());
+  const auto exr=binary.subspan(view.at("byteOffset").get<size_t>(),view.at("byteLength").get<size_t>());
+  const auto resolution=field.painted->resolution();
+  size_t verified=0;
+  const auto description=detail::read_emission_exr_rows(exr,
+      [&](uint32_t y,std::span<const detail::EmissionExrPixel> pixels){
+       for(size_t i=0;i<pixels.size();++i){
+        const auto q=dense_reference.sample_texel(uint32_t(i%resolution),y+uint32_t(i/resolution));
+        const auto rgb=q.resolve(field.material.emissive,1.f);
+        const detail::EmissionExrPixel expected{rgb[0],rgb[1],rgb[2],q.legacy[0],q.legacy[1],q.legacy[2],
+                                              q.absolute[0],q.absolute[1],q.absolute[2],q.coverage};
+        if(std::bit_cast<std::array<uint32_t,10>>(pixels[i])!=
+           std::bit_cast<std::array<uint32_t,10>>(expected))
+         throw std::runtime_error("Sparse EXR disagrees with dense reference");
+        ++verified;
+       }
+      },{});
+  check(description.width==resolution&&description.height==resolution&&description.version==2&&
+        verified==size_t(resolution)*resolution,
+        "Every encoded EXR channel bit matches the original dense per-texel sampler");
+ }
 }
-int main(int argc,char**argv)try{if(argc>1){std::filesystem::create_directories(argv[1]);std::filesystem::current_path(argv[1]);}portable();authoring();editable_hdr();authority();std::cout<<"PASS "<<checks<<" texture-set multi-primitive export controls\n";return 0;}catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
+
+void production_hdr(){
+ auto scene=fixture(false,1024);
+ const auto object=scene.active().id;
+ for(TextureSetId set:{0u,1u})check(edit_texture_set(scene,object,set,[set](PaintedMesh &paint,Material &material){
+  material.emissive=set?std::array<float,3>{.15f,.07f,.03f}:std::array<float,3>{.08f,.2f,.17f};
+  PaintSettings ink;
+  ink.front_only=false;
+  ink.color=set?std::array<float,4>{.1f,.3f,.7f,.5f}:std::array<float,4>{.6f,.2f,.1f,.8f};
+  ink.emission_units=PaintEmissionUnits::Physical;
+  ink.emission=set?std::array<float,3>{.2f,9.f,1.f}:std::array<float,3>{5.f,.15f,.3f};
+  ink.metallic=.18f;
+  ink.roughness=.83f;
+  Brush brush;
+  brush.from=brush.to={0,-.1f,set?.5f:0.f};
+  brush.normal={0,0,1};
+  brush.radius=.046f;
+  brush.strength=.82f;
+  const auto stamp=[&](PaintChannel channel){
+   ink.channel=channel;
+   paint.begin_stroke();
+   paint.stamp(brush,ink);
+   check(paint.end_stroke(),"Production channel stroke commits actual sparse values");
+  };
+  for(auto channel:{PaintChannel::Emission,PaintChannel::Color,PaintChannel::Metallic,PaintChannel::Roughness})stamp(channel);
+  paint.add_layer("Independent ordered detail");
+  brush.from.x=brush.to.x=.026f;
+  ink.color={.7f,.4f,.2f,.3f};
+  stamp(PaintChannel::Color);
+  paint.layer_properties("Independent ordered detail",true,.41f);
+  paint.add_layer("Hidden physical detail");
+  brush.from.x=brush.to.x=.19f;
+  ink.emission={110.f,10.f,90.f};
+  stamp(PaintChannel::Emission);
+  paint.layer_properties("Hidden physical detail",false,1.f);
+  return true;
+ }),"Each production field owns independent visible and hidden layers");
+
+ const auto exact=scene.encode();
+ const auto assembly=scene.export_surfaces();
+ {
+  const auto compiled=detail::compile_texture_set_export(assembly.at(0),{},true);
+  check(compiled.fields.size()==2,"Default export budget retains both 1024-square fields");
+  for(const auto &output:compiled.fields){
+   const auto field=texture_set_view(scene.active(),output.set);
+   auto safe=field.material;
+   safe.emissive={};
+   const auto reference=detail::EmissionExportAccess::other_channels(*field.painted,safe,{});
+   check(output.textures->color.rgba==reference->color.rgba&&
+         output.textures->metal_rough.rgba==reference->metal_rough.rgba&&
+         output.textures->transparent==reference->transparent,
+         "All production albedo, alpha and ORM samples match the original compositor exactly");
+   check(output.emission&&output.emission->image.width==1024&&
+         output.emission->strength>1&&output.emission->strength<10,
+         "Portable emission keeps full grid and visible radiance while excluding hidden detail");
+  }
+ }
+ TextureSetLimits small;
+ small.maximum_work=2'000'000;
+ refuses([&]{detail::compile_texture_set_export(assembly.at(0),small,true);},
+         "Cumulative sparse sampling still refuses a tight work budget");
+ small={};
+ small.maximum_bytes=20*1024*1024;
+ refuses([&]{detail::compile_texture_set_export(assembly.at(0),small,true);},
+         "Full-resolution portable images still count toward the export byte limit");
+ Document doc;
+ doc.replace(scene);
+ check(doc.wait_mesh(std::chrono::seconds(45))&&doc.frame().state->error.empty(),
+       "Document publishes the production authored material ranges");
+ for(const auto &[name,format]:std::array{
+     std::pair{"production-standard.glb",AssetExportFormat::Glb},
+     std::pair{"production-editable.glb",AssetExportFormat::EditableGlb512}}){
+  doc.export_asset(name,format).get();
+  consumer(name,2);
+  const auto file=bytes(name);
+  if(format==AssetExportFormat::Glb)compare_production_exrs(file,scene);
+  const auto restored=format==AssetExportFormat::Glb?extract_native_emission(file):extract_native_authoring(file);
+  check(restored&&restored->encode()==exact&&doc.copy_scene().encode()==exact,
+        "Production GLB export restores the exact native layers, membership and rig");
+ }
+}
+}
+int main(int argc,char**argv)try{if(argc>1){std::filesystem::create_directories(argv[1]);std::filesystem::current_path(argv[1]);}portable();authoring();editable_hdr();authority();production_hdr();std::cout<<"PASS "<<checks<<" texture-set multi-primitive export controls\n";return 0;}catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

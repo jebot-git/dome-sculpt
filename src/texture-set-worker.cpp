@@ -4,11 +4,54 @@
 #include "paint-overlay-packet.hpp"
 #include "current-paint-preview.hpp"
 #include "polygon-surface-preview.hpp"
+#include "texture-set-paint-access.hpp"
+#include <algorithm>
+#include <bit>
 #include <limits>
 namespace dome::detail {
 namespace {
 void stop(const TextureSetLimits&l){if(l.cancelled&&l.cancelled())throw std::runtime_error("Texture-set snapshot cancelled");}
 void charge(size_t&t,size_t n,size_t unit,const TextureSetLimits&l){if(t>l.maximum_bytes||(unit&&n>(l.maximum_bytes-t)/unit))throw std::length_error("Texture-set snapshot exceeds its declared staging bytes");t+=n*unit;}
+void charge_preview_work(size_t &work,size_t count,size_t cost,const TextureSetLimits&limits){
+ if(work>limits.maximum_work||count>(limits.maximum_work-work)/cost)
+  throw std::length_error("Texture-set field preview exceeds its charged work bound");
+ work+=count*cost;
+}
+void charge_current_grid(size_t&bytes,size_t&work,const TextureSetView&field,const TextureSetLimits&limits){
+ const auto&paint=*field.painted;
+ const size_t tile_area=PaintTile::size*PaintTile::size;
+ const size_t pixels=size_t(paint.resolution())*paint.resolution(),tiles=pixels/tile_area;
+ const auto &layers=paint.layers();
+ const auto visible=[](const PaintLayer&layer){return layer.visible&&layer.opacity>0;};
+ const size_t visible_layers=std::count_if(layers.begin(),layers.end(),visible);
+ const bool transparent_base=field.material.color[3]<.999f;
+ size_t storage_entries=0;
+ for(const auto&layer:layers)
+  storage_entries+=layer.tiles.size()+layer.pbr_tiles.size()+layer.emission_tiles.size();
+ // Charge the retained raster, sparse storage, copied directories and the
+ // temporary ordered owner sets used by capture. Include cold-cache work.
+ charge(bytes,1,TextureSetPaintAccess::working_bytes(paint,paint.resolution()),limits);
+ charge(bytes,tiles,visible_layers*3*sizeof(std::shared_ptr<const PaintTile>)+8,limits);
+ charge_preview_work(work,storage_entries,8,limits);
+ charge_preview_work(work,tiles,2+2*visible_layers,limits);
+ if(transparent_base)charge_preview_work(work,pixels,1,limits);
+ size_t scan_tiles=0,owners=0;
+ for(size_t tile=0;tile<tiles;++tile){
+  if((tile&63)==0)stop(limits);
+  bool common=false;
+  for(const auto&layer:layers)if(visible(layer)){
+   common|=bool(layer.tiles[tile]);
+   owners+=bool(layer.tiles[tile]);
+   owners+=!layer.pbr_tiles.empty()&&bool(layer.pbr_tiles[tile]);
+   owners+=!layer.emission_tiles.empty()&&bool(layer.emission_tiles[tile]);
+  }
+  scan_tiles+=transparent_base||common;
+ }
+ charge(bytes,owners,6*sizeof(void*),limits);
+ charge(bytes,1,paint.storage_bytes(),limits);
+ charge_preview_work(work,owners,2*std::bit_width(owners)+4,limits);
+ charge_preview_work(work,scan_tiles*tile_area,1+8*visible_layers,limits);
+}
 size_t map_bytes(const TextureMaps&m){
  size_t bytes=sizeof(TextureMaps);for(const auto*i:{&m.color,&m.metal_rough,&m.emission,&m.normal,&m.mtoon_normal,&m.color_coverage,&m.emission_coverage,&m.baked_normal,&m.baked_coverage,&m.pbr_color}){
   if(i->rgba.size()>SIZE_MAX-bytes)throw std::length_error("Texture-set map storage overflow");bytes+=i->rgba.size();
@@ -53,18 +96,17 @@ void append_texture_set_surface(MeshSnapshot&snapshot,const ObjectSurface&o,
  size_t preview_work=layout->preparation_work();
  if(preview_work>limits.maximum_work||corners>limits.maximum_work-preview_work||vertices>limits.maximum_work-preview_work-corners)throw std::length_error("Texture-set snapshot geometry exceeds its work bound");
  preview_work+=corners+vertices;
- for(const auto&field:plan->fields()){
+ for(size_t i=0;i<plan->fields().size();++i){
+  if(!plan->draws()[i].count)continue;
+  const auto&field=plan->fields()[i];
   const size_t pixels=size_t(field.painted->resolution())*field.painted->resolution();
   const auto layers=field.painted->layers().size();
   if(view.render_only&&CurrentGridPaintPreview::eligible_field(plan->object(),field)){
-   // The renderer borrows actual COW inputs and padding: no dense CPU colour,
-   // normal or FLOAT composite is created. Charge retained native stores plus
-   // captured sparse owner directories and exact alpha-classification metadata.
-   charge(bytes,1,field.painted->storage_bytes(),limits);
-   charge(bytes,pixels/1024,layers*3*sizeof(std::shared_ptr<const PaintTile>)+8,limits);
-  }else charge(bytes,pixels,128,limits);
-  if(pixels&&(layers+1)>(limits.maximum_work-preview_work)/pixels/32)throw std::length_error("Texture-set field preview exceeds its charged work bound");
-  preview_work+=pixels*(layers+1)*32;
+   charge_current_grid(bytes,preview_work,field,limits);
+  }else{
+   charge(bytes,pixels,128,limits);
+   charge_preview_work(preview_work,pixels,(layers+1)*32,limits);
+  }
  }
  const bool affine=layout->has_source()||bool(o.affine_edit)||std::any_of(o.groups.begin(),o.groups.end(),[](const auto&g){return g.source_placement||g.affine_edit;});
  const auto frame=affine?std::optional<AffineInteractionFrame>(placement_frame(o)):std::nullopt;

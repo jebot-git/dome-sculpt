@@ -1279,14 +1279,17 @@ std::shared_ptr<const TextureMaps> detail::PaintOverlayFactory::capture_current_
     !old->layers_->padding().owner_before(packet->layers_->padding())&&!packet->layers_->padding().owner_before(old->layers_->padding())&&old->layers_->layers().size()==layers.size();
   if(compatible)for(size_t i=0;i<layers.size();++i)
     compatible&=old->layers_->layers()[i].opacity==layers[i].opacity;
-  packet->transparent_=material.color[3]<.999f&&
+  const bool transparent_base=material.color[3]<.999f;
+  packet->transparent_=transparent_base&&
     std::find(packet->layers_->padding()->begin(),packet->layers_->padding()->end(),-1)!=packet->layers_->padding()->end();
   for(size_t tile=0;tile<packet->transparent_tiles_.size();++tile){
     if((tile&63)==0)paint_compute::checkpoint(cancelled);
     bool reuse=compatible;
     if(reuse)for(size_t i=0;i<layers.size();++i)reuse&=old->layers_->layers()[i].tiles[tile]==layers[i].tiles[tile];
     bool transparent=reuse?old->transparent_tiles_[tile]:false;
-    if(!reuse)for(uint32_t y=0;y<32&&!transparent;++y)for(uint32_t x=0;x<32;++x){
+    const bool scan_alpha=!reuse&&(transparent_base||std::any_of(layers.begin(),layers.end(),
+      [tile](const auto&layer){return bool(layer.tiles[tile]);}));
+    if(scan_alpha)for(uint32_t y=0;y<32&&!transparent;++y)for(uint32_t x=0;x<32;++x){
       const auto px=uint32_t(tile%columns)*32+x,py=uint32_t(tile/columns)*32+y;
       if(packet->layers_->padding()->at(size_t(py)*r+px)==int32_t(size_t(py)*r+px)&&packet->alpha_texel(px,py)<.999f){transparent=true;break;}
     }

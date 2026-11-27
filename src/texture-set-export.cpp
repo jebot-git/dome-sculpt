@@ -17,12 +17,117 @@ void charge(size_t&v,size_t n,size_t u,size_t cap){if(v>cap||(u&&n>(cap-v)/u))th
 template<class T>bool owner(const std::shared_ptr<const T>&a,const std::shared_ptr<const T>&b){return a==b&&!a.owner_before(b)&&!b.owner_before(a);}
 bool material(const Material&a,const Material&b){return a.name==b.name&&a.color==b.color&&a.metallic==b.metallic&&a.roughness==b.roughness&&a.emissive==b.emissive&&a.toon==b.toon&&a.double_sided==b.double_sided&&a.alpha==b.alpha&&a.alpha_cutoff==b.alpha_cutoff&&a.unlit==b.unlit;}
 
+bool plain_writable_grid(const TextureSetView &field) {
+ const auto &paint=*field.painted;
+ return !field.source&&!field.appearance&&!field.material_bindings&&!paint.baked()&&
+     !paint.source_maps()&&!paint.color_projection()&&!paint.normal_projection()&&
+     !paint.paint_sampling_domain()&&!paint.paint_sampling_attachment()&&
+     paint.surface_diagnostics().policy==PaintUvPolicy::Strict;
+}
+
+// Padding refers to the actual writable owner texel, which can be in a
+// different tile from the display texel. Preserve native layer order there.
+class SparseExportGrid {
+public:
+ SparseExportGrid(const PaintedMesh &paint,size_t &work,const TextureSetLimits &limits)
+     :padding(EmissionExportAccess::writable_padding(paint)),resolution(paint.resolution()),
+      columns(resolution/PaintTile::size),tile_layers(size_t(columns)*columns) {
+  const auto &layers=paint.layers();
+  charge(work,tile_layers.size(),layers.size()+1,limits.maximum_work);
+  for(size_t i=0;i<layers.size();++i){
+   stop(limits);
+   const auto &layer=layers[i];
+   if(!layer.visible||layer.opacity<=0)continue;
+   for(size_t tile=0;tile<tile_layers.size();++tile)
+    if(layer.tiles[tile])tile_layers[tile]|=uint16_t(1u<<i);
+  }
+ }
+ size_t tile(size_t owner) const {
+  return (owner/resolution/PaintTile::size)*columns+owner%resolution/PaintTile::size;
+ }
+ size_t within(size_t owner) const {
+  return (owner/resolution%PaintTile::size)*PaintTile::size+owner%PaintTile::size;
+ }
+ uint16_t mask(size_t at) const {
+  const auto owner=padding[at];
+  return owner<0?0:tile_layers[tile(size_t(owner))];
+ }
+ std::span<const int32_t> padding;
+ uint32_t resolution,columns;
+ std::vector<uint16_t> tile_layers;
+};
+
+std::shared_ptr<const TextureMaps> compile_plain_nonemission(const TextureSetView &field,
+    size_t &work,const TextureSetLimits &limits) {
+ const auto &paint=*field.painted;
+ const SparseExportGrid grid(paint,work,limits);
+ const auto count=grid.padding.size();
+ charge(work,count,3,limits.maximum_work);
+ for(size_t at=0;at<count;++at){
+  if((at&4095)==0)stop(limits);
+  charge(work,std::popcount(grid.mask(at)),12,limits.maximum_work);
+ }
+ auto maps=std::make_shared<TextureMaps>();
+ auto &albedo=maps->color,&orm=maps->metal_rough;
+ for(auto *image:{&albedo,&orm}){
+  image->width=image->height=grid.resolution;
+  image->rgba.resize(count*4);
+ }
+ const auto unit=[](uint8_t value){return float(value)/255;};
+ const auto byte=[](float value){return uint8_t(std::lround(std::clamp(value,0.f,1.f)*255));};
+ static const auto linear_byte=[]{
+  std::array<float,256> table{};
+  for(size_t i=0;i<table.size();++i)table[i]=srgb_to_linear(float(i)/255);
+  return table;
+ }();
+ const auto &material=field.material;
+ const auto encode_color=[&](const std::array<float,4> &color){
+  return std::array{byte(linear_to_srgb(color[0])),byte(linear_to_srgb(color[1])),
+      byte(linear_to_srgb(color[2])),byte(color[3])};
+ };
+ const auto base_color=encode_color(material.color);
+ const std::array<uint8_t,4> base_orm{255,byte(material.roughness),byte(material.metallic),255};
+ const auto &layers=paint.layers();
+ for(size_t at=0;at<count;++at){
+  if((at&4095)==0)stop(limits);
+  auto mask=grid.mask(at);
+  auto color=base_color,surface=base_orm;
+  float alpha=material.color[3];
+  if(mask){
+   const size_t owner=size_t(grid.padding[at]),tile=grid.tile(owner),within=grid.within(owner);
+   auto linear=material.color;
+   float roughness=material.roughness,metallic=material.metallic;
+   for(;mask;mask&=mask-1){
+    const auto &layer=layers[std::countr_zero(mask)];
+    const auto &data=layer.tiles[tile]->pixels[within].data;
+    const float weight=unit(data[13])*layer.opacity;
+    const auto blend=[&](float base,float paint,uint8_t coverage){
+     const float a=weight*unit(coverage);
+     return base*(1-a)+paint*a;
+    };
+    for(size_t i=0;i<4;++i)linear[i]=blend(linear[i],i<3?linear_byte[data[i]]:unit(data[i]),data[9]);
+    roughness=blend(roughness,unit(data[5]),data[11]);
+    metallic=blend(metallic,unit(data[4]),data[10]);
+   }
+   color=encode_color(linear);
+   alpha=linear[3];
+   surface[1]=byte(roughness);
+   surface[2]=byte(metallic);
+  }
+  maps->transparent|=alpha<.999f;
+  std::copy(color.begin(),color.end(),albedo.rgba.data()+at*4);
+  std::copy(surface.begin(),surface.end(),orm.rgba.data()+at*4);
+ }
+ return maps;
+}
+
 // The per-field exporter uses the same paint-grid coordinate as the fragment
 // shader. Contributions are composed before sampling. The original field and
 // its exact FLOAT values remain in the author's native Scene payload.
 class TextureSetEmissionSamples {
 public:
- TextureSetEmissionSamples(const TextureSetView &field,const TextureSetLimits &limits)
+ TextureSetEmissionSamples(const TextureSetView &field,size_t &work,size_t passes,
+     const TextureSetLimits &limits)
      :paint_(texture_set_source_read_view(field,limits)),
       sampler_(*paint_,limits.cancelled),resolution(paint_->resolution()) {
   const auto &binding=field.material_bindings;
@@ -31,8 +136,30 @@ public:
    source_=maps->emission;
   if(source_.image&&source_.texcoord!=0)
    throw std::invalid_argument("Texture-set HDR requires its actual alternate emission coordinates");
+  charge(work,sampler_.index_work(),1,limits.maximum_work);
+  const size_t count=size_t(resolution)*resolution;
+  size_t variable_count=count;
+  if(plain_writable_grid(field)){
+   grid_.emplace(*paint_,work,limits);
+   const auto rgb=BakedEmissionSample{}.resolve(background_,1.f);
+   constant_={rgb[0],rgb[1],rgb[2],0,0,0,0,0,0,0};
+   charge(work,count,1+passes,limits.maximum_work);
+   for(size_t at=0;at<count;++at){
+    if((at&4095)==0)stop(limits);
+    constant_count_+=!variable(at);
+   }
+   variable_count-=constant_count_;
+  }
+  charge(work,variable_count,passes*(sampler_.work_per_texel()+12+(source_.image?16:0)),
+      limits.maximum_work);
  }
- EmissionExrPixel pixel(uint32_t x,uint32_t y)const{
+ bool variable(size_t at) const { return !grid_||grid_->mask(at); }
+ const auto &constant() const { return constant_; }
+ size_t constant_count() const { return constant_count_; }
+ size_t working_bytes() const {
+  return sizeof(*this)+(grid_?grid_->tile_layers.capacity()*sizeof(uint16_t):0);
+ }
+ EmissionExrPixel sample_variable(uint32_t x,uint32_t y) const {
   auto background=background_;
   if(source_.image){
    const auto sample=sample_source_texture(source_,(float(x)+.5f)/resolution,(float(y)+.5f)/resolution,true);
@@ -43,29 +170,28 @@ public:
   return {rgb[0],rgb[1],rgb[2],contribution.legacy[0],contribution.legacy[1],contribution.legacy[2],
       contribution.absolute[0],contribution.absolute[1],contribution.absolute[2],contribution.coverage};
  }
- void charge_work(size_t &work,size_t passes,const TextureSetLimits &limits)const{
-  charge(work,sampler_.index_work(),1,limits.maximum_work);
-  charge(work,size_t(resolution)*resolution,passes*(sampler_.work_per_texel()+12+(source_.image?16:0)),
-      limits.maximum_work);
- }
 private:
  std::shared_ptr<const PaintedMesh> paint_;
  PaintEmissionSampler sampler_;
  std::array<float,3> background_{};
  PaintSourceTexture source_;
+ std::optional<SparseExportGrid> grid_;
+ EmissionExrPixel constant_{};
+ size_t constant_count_=0;
 public:
  uint32_t resolution;
 };
 TextureSetExportEmission compile_emission(const TextureSetView &field,size_t &work,const TextureSetLimits &limits) {
- const TextureSetEmissionSamples samples(field,limits);
- samples.charge_work(work,2,limits);
+ const TextureSetEmissionSamples samples(field,work,2,limits);
  const auto resolution=samples.resolution;
  const auto count=size_t(resolution)*resolution;
  std::array<float,3> peak{};
+ if(samples.constant_count())std::copy_n(samples.constant().begin(),3,peak.begin());
  for(uint32_t y=0;y<resolution;++y){
   stop(limits);
   for(uint32_t x=0;x<resolution;++x){
-   const auto rgb=samples.pixel(x,y);
+   if(!samples.variable(size_t(y)*resolution+x))continue;
+   const auto rgb=samples.sample_variable(x,y);
    for(size_t k=0;k<3;++k)peak[k]=std::max(peak[k],rgb[k]);
   }
  }
@@ -76,19 +202,28 @@ TextureSetExportEmission compile_emission(const TextureSetView &field,size_t &wo
  auto &image=out.image;
  image.width=image.height=resolution;
  image.rgba.resize(count*4);
- for(uint32_t y=0;y<resolution;++y){
-  stop(limits);
-  for(uint32_t x=0;x<resolution;++x){
-   const size_t at=(size_t(y)*resolution+x)*4;
-   const auto rgb=samples.pixel(x,y);
+ const auto encode=[&](const EmissionExrPixel &rgb){
+   std::array<uint8_t,4> pixel{0,0,0,255};
    for(size_t k=0;k<3;++k){
     const float linear=peak[k]>0?rgb[k]/peak[k]:0.f;
     const float srgb=linear<=.0031308f?linear*12.92f:1.055f*std::pow(linear,1.f/2.4f)-.055f;
     const auto encoded=uint8_t(std::clamp(std::lround(srgb*255),0l,255l));
-    image.rgba[at+k]=encoded;
+    pixel[k]=encoded;
     out.measured.sample(rgb[k],resolved_fallback_radiance(encoded,out.factor[k],out.strength,field.material.unlit));
    }
-   image.rgba[at+3]=255;
+   return pixel;
+ };
+ std::array<uint8_t,4> constant{};
+ if(samples.constant_count()){
+  constant=encode(samples.constant());
+  out.measured.erased_nonzero_samples*=samples.constant_count();
+ }
+ for(uint32_t y=0;y<resolution;++y){
+  stop(limits);
+  for(uint32_t x=0;x<resolution;++x){
+   const size_t at=size_t(y)*resolution+x;
+   const auto pixel=samples.variable(at)?encode(samples.sample_variable(x,y)):constant;
+   std::copy(pixel.begin(),pixel.end(),image.rgba.data()+at*4);
   }
  }
  return out;
@@ -111,6 +246,16 @@ ExportBound export_bound(const ObjectSurface&input,const TextureSetLimits&limits
   if(!draw.count)continue;
   charge(bytes,1,sizeof(TextureSetExportField)+field.name.size()+field.material.name.size()+258,limits.maximum_bytes);
   const auto resolution=field.painted->resolution();
+  const bool hdr=texture_set_physical_emission(field);
+  if(hdr&&(!measured_physical||field.material.toon||field.appearance||
+      (field.material_bindings&&field.material_bindings->has_mtoon)))
+   throw std::invalid_argument("Texture-set HDR emission needs its per-material precision-qualified export compiler");
+  if(hdr&&plain_writable_grid(field)){
+   const size_t pixels=size_t(resolution)*resolution;
+   charge(bytes,pixels,12,limits.maximum_bytes);
+   charge(bytes,pixels/(PaintTile::size*PaintTile::size),sizeof(uint16_t),limits.maximum_bytes);
+   continue;
+  }
   charge(bytes,size_t(resolution)*resolution,64,limits.maximum_bytes);
   scratch=std::max(scratch,TextureSetPaintAccess::working_bytes(*field.painted,resolution));
   if(field.source){
@@ -130,12 +275,7 @@ ExportBound export_bound(const ObjectSurface&input,const TextureSetLimits&limits
     scratch=std::max(scratch,pixels*8);
    }
   }
-  if(texture_set_physical_emission(field)){
-   if(!measured_physical||field.material.toon||field.appearance||
-      (field.material_bindings&&field.material_bindings->has_mtoon))
-    throw std::invalid_argument("Texture-set HDR emission needs its per-material precision-qualified export compiler");
-   charge(bytes,size_t(resolution)*resolution,4,limits.maximum_bytes);
-  }
+  if(hdr)charge(bytes,size_t(resolution)*resolution,4,limits.maximum_bytes);
   charge(work,size_t(resolution)*resolution,16+8*field.painted->layers().size(),limits.maximum_work);
  }
  charge(bytes,scratch,1,limits.maximum_bytes);
@@ -153,17 +293,19 @@ EmissionExportRaster texture_set_emission_raster(const TextureSetView &field,con
  if(!texture_set_physical_emission(field)||!field.domain||field.domain->triangles().empty()||
     field.material.toon||field.appearance||(field.material_bindings&&field.material_bindings->has_mtoon))
   throw std::invalid_argument("Texture-set HDR requires an actual physical PBR material member");
- TextureSetEmissionSamples samples(field,limits);
  size_t work=0;
- samples.charge_work(work,1,limits);
+ TextureSetEmissionSamples samples(field,work,1,limits);
  const auto resolution=samples.resolution;
- return {resolution,2,sizeof(TextureSetEmissionSamples),
+ const auto working_bytes=samples.working_bytes();
+ return {resolution,2,working_bytes,
       [samples=std::move(samples),cancelled=limits.cancelled,resolution](uint32_t y,std::span<EmissionExrPixel> rows){
         if(size_t(y)>resolution||rows.size()>size_t(resolution-y)*resolution)
          throw std::logic_error("Texture-set HDR read exceeds its owning raster");
         for(size_t i=0;i<rows.size();++i){
          if((i&1023)==0&&cancelled&&cancelled())throw std::runtime_error("Texture-set HDR raster cancelled");
-         rows[i]=samples.pixel(uint32_t(i%resolution),y+uint32_t(i/resolution));
+         const auto at=size_t(y)*resolution+i;
+         rows[i]=samples.variable(at)?
+             samples.sample_variable(uint32_t(i%resolution),y+uint32_t(i/resolution)):samples.constant();
         }
       }};
 }
@@ -196,11 +338,12 @@ TextureSetExport compile_texture_set_export(const ObjectSurface&input,const Text
   output.material=field.material;
   output.normal_role=portable&&portable->normal_role;
   if(texture_set_physical_emission(field)){
-   const auto paint=texture_set_source_read_view(field,limits);
    output.emission=compile_emission(field,work,limits);
    output.material.emissive={};
-   output.textures=portable?portable->maps:EmissionExportAccess::other_channels(
-       *paint,output.material,limits.cancelled);
+   if(portable)output.textures=portable->maps;
+   else if(plain_writable_grid(field))output.textures=compile_plain_nonemission(field,work,limits);
+   else output.textures=EmissionExportAccess::other_channels(
+       *texture_set_source_read_view(field,limits),output.material,limits.cancelled);
   }else output.textures=portable?portable->maps:field.painted->composite(field.material,limits.cancelled);
   for(size_t c=0;c<draw.count;++c){
    if((c&1023)==0)stop(limits);const auto logical=plan->logical_corners()[draw.first+c];const auto vertex=rest.indices.at(logical);

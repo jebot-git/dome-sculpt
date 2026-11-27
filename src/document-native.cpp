@@ -198,7 +198,7 @@ void Document::native_loop(){
         if(!shape&&(o.deformation||session->affine_world))evaluation=paint_target->evaluate(geometry,cancelled);
         if(session->texture_set){
           TextureSetLimits limits;limits.cancelled=cancelled;ObjectSurface bundle;bundle.id=o.id;bundle.name=o.name;bundle.transform=o.transform;bundle.material=o.material;bundle.deformation=o.deformation;bundle.groups=working.group_path(o.group);bundle.affine_edit=o.affine_edit;bundle.rig_source=o.rig_source;bundle.texture_set_surface=detail::prepare_texture_set_surface(o,limits);
-          auto layout=detail::prepare_texture_set_packed(bundle.texture_set_surface,limits);MeshSnapshot query_snapshot;detail::TextureSetWorkerView view;view.pbr=session->pbr_view;detail::append_texture_set_surface(query_snapshot,bundle,layout,view,limits);
+          auto layout=detail::prepare_texture_set_packed(bundle.texture_set_surface,limits);MeshSnapshot query_snapshot;detail::TextureSetWorkerView view;view.render_only=true;view.pbr=session->pbr_view;detail::append_texture_set_surface(query_snapshot,bundle,layout,view,limits);
           query=std::make_unique<MaterialSurfaceQuery>(query_snapshot.mesh,query_snapshot.ranges,cancelled,query_snapshot.source_colors,PaintVertexCoordinates{query_snapshot.paint_coordinates});
         }else{
         query_range.emplace(SurfaceRange{o.id,0,geometry->indices.size(),o.material,o.material_bindings&&o.material_bindings->polygon_surface_transfer?detail::PolygonSurfacePaintCodec::preview(*o.painted,o.material_bindings,o.material,cancelled):o.painted->preview(o.material,cancelled),o.appearance,0,o.material_bindings});

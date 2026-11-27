@@ -14,6 +14,85 @@ std::shared_ptr<const TextureMaps> wrapped_preview(const PaintedMesh*p,const Mat
 std::shared_ptr<const TextureMaps> real_emission(const PaintedMesh&,const Material&,const std::function<bool()>&) asm("__real__ZN4dome6detail20EmissionExportAccess7previewERKNS_11PaintedMeshERKNS_8MaterialERKSt8functionIFbvEE");
 std::shared_ptr<const TextureMaps> wrapped_emission(const PaintedMesh&,const Material&,const std::function<bool()>&) asm("__wrap__ZN4dome6detail20EmissionExportAccess7previewERKNS_11PaintedMeshERKNS_8MaterialERKSt8functionIFbvEE");
 std::shared_ptr<const TextureMaps> wrapped_emission(const PaintedMesh&p,const Material&m,const std::function<bool()>&c){if(auditing)++materializations;return real_emission(p,m,c);}
+namespace {
+void production_texture_sets(){
+ constexpr uint32_t resolution=1024;
+ Mesh mesh;
+ mesh.positions={{-.8f,-.8f,0},{.8f,-.8f,0},{0,.8f,0},
+                 {-.8f,-.8f,.5f},{.8f,-.8f,.5f},{0,.8f,.5f}};
+ mesh.normals.assign(6,{0,0,1});
+ mesh.uv={{{.1f,.1f}},{{.9f,.1f}},{{.5f,.9f}},{{.1f,.1f}},{{.9f,.1f}},{{.5f,.9f}}};
+ mesh.indices={0,1,2,3,4,5};
+ Scene scene;
+ const auto id=scene.active().id;
+ std::array<TextureSetInitialField,2> fields;
+ for(auto&field:fields)field.resolution=resolution;
+ fields[1].material.color[3]=.75f;
+ fields[1].material.alpha=Material::AlphaMode::Mask;
+ initialize_texture_sets(scene,id,mesh,fields,std::array<TextureSetId,2>{0,1});
+ for(TextureSetId set:{0u,1u}){
+  check(edit_texture_set(scene,id,set,[set](PaintedMesh&paint,Material&){
+   PaintSettings ink;
+   ink.channel=PaintChannel::Emission;
+   ink.emission_units=PaintEmissionUnits::Physical;
+   ink.emission=set?std::array<float,3>{.2f,8.f,.4f}:std::array<float,3>{5.f,.2f,.1f};
+   const float z=set?.5f:0.f;
+   stroke(paint,ink,{.12f,.09f,z},.8f,.035f);
+   ink.channel=PaintChannel::Color;
+   ink.color={.2f,.5f,.1f,.7f};
+   stroke(paint,ink,{-.15f,-.07f,z},.8f,.045f);
+   return true;
+  }),"Production fixture authors actual color and FLOAT emission in each member");
+ }
+ select_texture_set(scene,id,1);
+ const auto exact=scene.encode();
+ auto path=std::filesystem::temp_directory_path()/("current-grid-texture-sets-"+std::to_string(getpid())+".dsculpt");
+ scene.save(path);
+ Document doc;
+ const auto before_materializations=materializations.load();
+ auditing=true;
+ doc.open_async(path).get();
+ std::filesystem::remove(path);
+ check(doc.wait_mesh()&&doc.frame().state->error.empty(),"Cold native Open publishes both 1024-square paint fields within default limits");
+ const auto frame=doc.frame().surface;
+ check(frame&&frame->ranges.size()==2&&frame->picking,"Native frame publishes both material ranges and authenticated picking");
+ for(const auto&range:frame->ranges){
+  const auto&packet=range.textures->current_grid_preview;
+  check(packet&&packet->physical_emission()&&packet->layers()->resolution()==resolution,
+        "Each actual member has an independent sparse full-resolution FLOAT preview");
+  packet->authenticate_range(frame->mesh,range,true);
+  check(packet->alpha_texel(0,0)==fields[range.texture_set].material.color[3],
+        "Unpainted padding retains the exact base alpha of its own material");
+  check(packet->transparent(),"Both sparse painted alpha and translucent base are classified for blending");
+ }
+ check(doc.copy_scene().encode()==exact,"Cold Open keeps the exact native data and active texture set");
+ PaintSettings ink;
+ ink.color={.9f,.2f,.6f,1};
+ ink.front_only=false;
+ doc.paint_settings(ink);
+ doc.configure(Tool::Clay,.06f);
+ NativeStrokeSample sample;
+ sample.origin={0,0,2};
+ sample.direction={0,0,-1};
+ sample.brush.radius=.06f;
+ sample.brush.pressure=1;
+ sample.brush.strength=1;
+ check(doc.begin_native_stroke()&&doc.sample_native_stroke(sample),"Desktop paint ray begins on the selected full-resolution member");
+ doc.end_native_stroke(true);
+ auto save=doc.save_async(path);
+ check(doc.wait_native_stroke()&&doc.wait_mesh()&&doc.frame().state->error.empty(),
+       "Selected-set stroke finishes without dense field materialization");
+ save.get();
+ auditing=false;
+ check(materializations==before_materializations,"Cold preview and desktop stroke both avoid dense CPU map generation");
+ const auto accepted=doc.copy_scene().encode();
+ check(accepted!=exact&&Scene::load(path).encode()==accepted,"Ordered Save preserves exact accepted texture-set stroke");
+ std::filesystem::remove(path);
+ check(doc.undo()&&doc.copy_scene().encode()==exact,"One Undo restores both original members");
+ check(doc.redo()&&doc.copy_scene().encode()==accepted,"One Redo restores the exact painted result");
+ check(doc.wait_mesh(),"Production texture-set history worker drains");
+}
+}
 int main()try{
  set_paint_composite_cache_budget(0);
  for(bool physical:{false,true}){
@@ -41,5 +120,6 @@ int main()try{
   check(sets.encode()==exact&&d.copy_scene().encode()==exact,"Multi-set render packets preserve all distinct resolutions/material/native owners");
  }
  auto sourced=fixture();auto source=std::make_shared<PaintSourceMaps>();source->color.image=std::make_shared<const Image>(Image{1,1,{1,2,3,4}});sourced.active().painted=PaintedMesh::from_maps(quad(),source,64);check(!detail::CurrentGridPaintPreview::eligible(sourced.active())&&!detail::CurrentGridPaintPreview::for_render(sourced.active()),"Original source-backed material remains outside plain current-grid admission");
+ production_texture_sets();
  std::cout<<"PASS "<<checks<<" current-grid native authority/materialization/history checks\n";
 }catch(const std::exception&e){auditing=false;std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

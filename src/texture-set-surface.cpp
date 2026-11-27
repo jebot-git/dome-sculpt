@@ -101,7 +101,8 @@ std::shared_ptr<const TextureSetSurfacePlan> prepare_texture_set_surface(const S
  size_t bytes=2*sizeof(TextureSetSurfacePlan)+128;charge(bytes,corners,2*sizeof(uint32_t),limits);
  charge(bytes,o.texture_sets->additional().size()+1,sizeof(TextureSetView)+sizeof(TextureSetDraw),limits);
  charge(bytes,o.texture_sets->additional().size()+1,514,limits); // Two bounded names per captured field.
- charge(bytes,1,TextureSetPaintAccess::working_bytes(*o.painted,o.painted->resolution()),limits);
+ // The primary snapshot copies layer directories and shares its immutable raster.
+ charge(bytes,1,TextureSetPaintAccess::snapshot_bytes(*o.painted),limits);
  size_t validation_scratch=0;
  // Exact raw-ID uniqueness and face-slot replay use bounded tree nodes. This
  // scratch is released before packet arrays are allocated; budget the peak.
