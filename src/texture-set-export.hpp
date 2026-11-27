@@ -37,6 +37,7 @@ struct PortableMToonSetPaint {
   double color_error=0, shade_error=0, shade_interpolation_error=0,
       alpha_error=0, emission_error=0, source_filter_error=0;
   double normal_error_radians=0;
+  bool retopo_uv_domain=false;
 };
 class RetopoMToonExport {
 public:

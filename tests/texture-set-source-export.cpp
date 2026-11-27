@@ -13,6 +13,7 @@
 #include "dome/projection.hpp"
 #include "dome/rig-edit.hpp"
 #include "dome/retopo-authoring.hpp"
+#include "dome/texture-set-resolution.hpp"
 #include "dome/source-maps.hpp"
 #include "dome/source-placement.hpp"
 #include "dome/source-uv-bake.hpp"
@@ -37,6 +38,7 @@
 #include "source-colors.hpp"
 #include "normal-frame-runtime.hpp"
 #include "source4-baked.hpp"
+#include "import-controller-driver.hpp"
 #include <bit>
 #include <fstream>
 #include <iostream>
@@ -2158,7 +2160,7 @@ PortableRetopoImages check_portable_retopo_mtoon(const std::filesystem::path &pa
          read_image(toon.emissive_texture),read_image(shade)};
 }
 
-void verify_mixed_retopo_sampling(const Scene &scene,const PortableRetopoImages &exported) {
+void verify_mixed_retopo_sampling(const Scene &scene,const PortableRetopoImages &exported,bool visible_only=false) {
  const auto &patch=scene.active();
  const auto &binding=*patch.material_bindings;
  const auto &params=binding.material.parameters;
@@ -2184,9 +2186,20 @@ void verify_mixed_retopo_sampling(const Scene &scene,const PortableRetopoImages 
  const auto color_coverage=texture(derived.color_coverage),emission_coverage=texture(derived.emission_coverage);
  float max_base=0,max_shade=0,max_emission=0;
  size_t painted_samples=0;
+ const auto &mesh=patch.painted->mesh();
+ const auto uv_visible=[&](float u,float v){
+  const auto edge=[&](const auto &a,const auto &b){return (b[0]-a[0])*(v-a[1])-(b[1]-a[1])*(u-a[0]);};
+  for(size_t i=0;i<mesh.indices.size();i+=3){
+   const auto &a=mesh.uv[mesh.indices[i]],&b=mesh.uv[mesh.indices[i+1]],&c=mesh.uv[mesh.indices[i+2]];
+   const std::array sides{edge(a,b),edge(b,c),edge(c,a)};
+   if(std::ranges::min(sides)>=0||std::ranges::max(sides)<=0)return true;
+  }
+  return false;
+ };
  for(unsigned y=0;y<131;++y)for(unsigned x=0;x<127;++x){
   // These points cross both texel-center phases and avoid testing only taps.
   const float u=(x+.31f)/127,v=(y+.73f)/131;
+  if(visible_only&&!uv_visible(u,v))continue;
   const auto srgb=[&](const PaintSourceTexture &role){return sample_source_texture(role,u,v,true);};
   const auto linear=[&](const PaintSourceTexture &role){return sample_source_texture(role,u,v,false);};
   const auto typed=srgb(binding.roles[size_t(MToonSlot::Base)]);
@@ -2219,7 +2232,95 @@ void verify_mixed_retopo_sampling(const Scene &scene,const PortableRetopoImages 
           <<exported.mtoon_emission.width<<" strength="<<params.emission_strength<<'\n';
 }
 
-void retopology_imported_mtoon(bool tinted,bool unprepared,bool mixed) {
+void resize_retopo_paint(Document &doc,const Scene &original) {
+ const auto &patch=original.active();
+ const auto &paint=*patch.painted;
+ check(doc.can_resize_native_paint()&&paint.resolution()==64&&paint.source_maps()->color.image->width==128,
+       "A painted patch with independent projected images enables the native resolution control");
+ const auto before=original.encode();
+ auto rejected=original.snapshot();
+ TextureSetLimits low_budget;
+ low_budget.maximum_bytes=1;
+ refuses([&]{resample_native_texture_grid(rejected,patch.id,{256},low_budget);},
+         "An insufficient raster budget refuses retopology resize");
+ check(rejected.encode()==before,"A rejected resize preserves the entire patch and its hidden guide");
+ TextureSetLimits cancelled;
+ unsigned polls=0;
+ cancelled.cancelled=[&]{return ++polls==20;};
+ refuses([&]{resample_native_texture_grid(rejected,patch.id,{256},cancelled);},
+         "Cancellation interrupts the retopology raster worker");
+ check(polls==20&&rejected.encode()==before,"Cancellation preserves the full native project");
+
+ ImportDriver hand(doc);
+ const auto open_resize=[&]{
+  if(!doc.frame().state->menu)hand.open();
+  if(doc.frame().state->menu_page!=31){hand.sector(9);hand.sector(1);}
+  hand.sector(6);
+  check(doc.frame().state->controls.parameter==VrParameter::TextureResolution,
+        "The controller opens the shared Paint resolution panel on the patch");
+ };
+ open_resize();
+ hand.ray(.4f);
+ hand.panel_button(false);
+ check(!doc.frame().state->asset_busy&&doc.copy_scene().encode()==before,
+       "Cancelling the controller panel preserves the original raster");
+ open_resize();
+ hand.ray(.4f);
+ hand.panel_button(true);
+ doc.save_async("resized-256.dsculpt").get();ready(doc);
+ const auto smaller=doc.copy_scene();
+ const auto &current=smaller.active();
+ check(current.painted->resolution()==256&&current.painted->source_maps()==paint.source_maps()&&
+       current.painted->mesh_owner()==paint.mesh_owner()&&current.retopology==patch.retopology&&
+       current.material_bindings==patch.material_bindings,
+       "The controller resizes only the raster and preserves immutable mesh, patch and projected images");
+ auto previous=smaller.snapshot();
+ previous.active().painted=patch.painted;
+ const auto saved=smaller.encode();
+ check(previous.encode()==before&&Scene::load("resized-256.dsculpt").encode()==saved,
+       "Ordered Save and cold Open preserve topology, guide, source images and layer history");
+ check(doc.undo()&&doc.copy_scene().encode()==before&&doc.redo()&&doc.copy_scene().encode()==saved,
+       "The accepted resize creates one exact Undo and Redo");
+ ready(doc);
+
+ TextureSetEdit edit{.action=TextureSetAction::Resolution,.resolution=512};
+ const auto selection=doc.frame().state;
+ const AssetSource source{selection->generation,selection->revision,selection->active_object,selection->edit_authority};
+ doc.edit_texture_set(edit,source);
+ doc.save_async("resized-512.dsculpt").get();ready(doc);
+ const auto larger=doc.copy_scene();
+ const auto &large=*larger.active().painted;
+ check(large.resolution()==512&&large.mesh_owner()==paint.mesh_owner()&&large.source_maps()==paint.source_maps()&&
+       larger.active().retopology==patch.retopology&&larger.active().material_bindings==patch.material_bindings&&
+       large.active_layer()==paint.active_layer(),"The desktop worker enlarges the same patch to 512 with its original roles");
+ for(const auto &layer:paint.layers()){
+  const auto result=std::ranges::find(large.layers(),layer.id,&PaintLayer::id);
+  bool exact=result!=large.layers().end()&&result->visible==layer.visible&&result->opacity==layer.opacity;
+  for(uint32_t y=0;y<512&&exact;++y)for(uint32_t x=0;x<512&&exact;++x)
+   exact=large.pixel(layer.id,x,y)==paint.pixel(layer.id,x/8,y/8);
+  check(exact,"Larger retopology raster preserves every authored layer byte and visibility state");
+ }
+ doc.export_asset("resized-standard.glb",AssetExportFormat::Glb).get();
+ doc.export_asset("resized-editable.glb",AssetExportFormat::EditableGlb256).get();
+ for(const auto *path:{"resized-standard.glb","resized-editable.glb"}){
+  const auto exported=check_portable_retopo_mtoon(path,larger.active(),true);
+  check(exported.mtoon_base.width>=512&&exported.mtoon_emission.width>=512,
+        "The typed GLB compiles the higher-resolution paint and original material grids");
+  verify_mixed_retopo_sampling(larger,exported,true);
+ }
+ check(Scene::load("resized-editable.glb").encode()==larger.encode()&&
+       Scene::load("resized-512.dsculpt").encode()==larger.encode(),
+       "Editable export retains the complete 512 project and the original projected textures");
+ auto reduced=smaller.snapshot();
+ const auto report=resample_native_texture_grid(reduced,patch.id,{64});
+ const auto &restored=*reduced.active().painted;
+ bool exact=report.changed&&restored.resolution()==64&&restored.source_maps()==paint.source_maps();
+ for(const auto &layer:paint.layers())for(uint32_t y=0;y<64&&exact;++y)for(uint32_t x=0;x<64&&exact;++x)
+  exact=restored.pixel(layer.id,x,y)==paint.pixel(layer.id,x,y);
+ check(exact,"Reducing the resized patch recovers all original authored texels");
+}
+
+void retopology_imported_mtoon(bool tinted,bool unprepared,bool mixed,bool resize) {
  auto input=imported_retopo_input(true);
  if(mixed){
   Image source{128,128,std::vector<uint8_t>(128*128*4,255)};
@@ -2502,6 +2603,7 @@ void retopology_imported_mtoon(bool tinted,bool unprepared,bool mixed) {
   }
   check(Scene::load("visible-editable.glb").encode()==painted.encode()&&
        Scene::load("visible-paint.dsculpt").encode()==painted.encode(),"Portable paint compilation preserves the editable project exactly");
+  if(resize)resize_retopo_paint(paint_doc,painted);
  }
  if(!tinted&&!unprepared){
   auto painted=result.snapshot();
@@ -2771,7 +2873,8 @@ int main(int argc,char **argv)try {
   std::filesystem::create_directories(argv[2]);
   std::filesystem::current_path(argv[2]);
   const std::string_view variant=argv[3];
-  retopology_imported_mtoon(variant=="tinted",variant=="unprepared"||variant=="mixed-ldr",variant.starts_with("mixed-"));
+  retopology_imported_mtoon(variant=="tinted",variant=="unprepared"||variant=="mixed-ldr",
+                            variant.starts_with("mixed-")||variant=="resize",variant=="resize");
   std::cout<<"PASS "<<checks<<" imported MToon retopology checks\n";
   return 0;
  }

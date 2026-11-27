@@ -21,9 +21,11 @@ void TextureSetResolutionOptions::validate() const {
 namespace detail {
 bool can_resize_native_texture_grid(const SculptObject &object) noexcept {
   if (!object.mesh_active || !object.painted || object.texture_sets ||
-      object.polygon || object.retopology ||
+      object.polygon ||
       !TextureSetPaintAccess::can_resize_raw(*object.painted))
     return false;
+  // A retopology patch retains topology and mesh identity independently of
+  // its writable raster. The raw-grid transition keeps its projected images.
   const auto &binding = object.material_bindings;
   return !binding ||
          (!binding->normal_preparation && !binding->color_preparation &&

@@ -943,6 +943,8 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
       }
       if(paint->source_filter_error>0)
         output["extras"]["domeSculptMToonPaint"]["maximumSourceFilterError"]=paint->source_filter_error;
+      if(paint->retopo_uv_domain)
+        output["extras"]["domeSculptMToonPaint"]["errorDomain"]="mesh-uv-triangles";
       if(paint->normal)
         output["extras"]["domeSculptMToonPaint"]["maximumNormalErrorRadians"]=paint->normal_error_radians;
     }

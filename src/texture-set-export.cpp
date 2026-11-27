@@ -1676,9 +1676,50 @@ struct RetopoPaintInputs {
  }
 };
 
+std::vector<uint8_t> retopo_sampled_cells(const Mesh &mesh,std::span<const double> xs,
+    std::span<const double> ys,TextureSetLimits &remaining) {
+ // A row is the horizontal strip between two consecutive filter knots.
+ // Include every cell intersecting a closed triangle and allow for float
+ // interpolation of the emitted UVs along its edges.
+ constexpr double slack=8*std::numeric_limits<float>::epsilon();
+ const auto cells=[](std::span<const double> knots,double low,double high){
+  const auto begin=std::lower_bound(knots.begin(),knots.end(),low-slack)-knots.begin();
+  const auto end=std::upper_bound(knots.begin(),knots.end(),high+slack)-knots.begin();
+  return std::pair{std::max(size_t{1},size_t(begin)),std::min(knots.size(),size_t(end)+1)};
+ };
+ std::vector<uint8_t> visible(xs.size()*ys.size());
+ size_t work=0;
+ for(size_t first=0;first<mesh.indices.size();first+=3){
+  if((first/3)%1024==0)stop(remaining);
+  const std::array triangle{mesh.uv[mesh.indices[first]],mesh.uv[mesh.indices[first+1]],mesh.uv[mesh.indices[first+2]]};
+  const auto [ymin,ymax]=std::ranges::minmax(triangle,{},[](const auto &uv){return uv[1];});
+  const auto [start,end]=cells(ys,ymin[1],ymax[1]);
+  charge(work,end-start,24,remaining.maximum_work);
+  for(size_t y=start;y<end;++y){
+   const double low=ys[y-1]-slack,high=ys[y]+slack;
+   double left=1,right=0;
+   const auto include=[&](double u){left=std::min(left,u);right=std::max(right,u);};
+   for(size_t k=0;k<3;++k){
+    const auto &a=triangle[k],&b=triangle[(k+1)%3];
+    if(a[1]>=low&&a[1]<=high)include(a[0]);
+    for(double boundary:{low,high})
+     if(boundary>std::min(a[1],b[1])&&boundary<std::max(a[1],b[1]))
+      include(std::lerp(double(a[0]),double(b[0]),(boundary-a[1])/(double(b[1])-a[1])));
+   }
+   if(left>right)continue;
+   const auto [first_cell,last_cell]=cells(xs,left,right);
+   charge(work,last_cell-first_cell,1,remaining.maximum_work);
+   auto row=std::span(visible).subspan(y*xs.size(),xs.size());
+   std::fill(row.begin()+first_cell,row.begin()+last_cell,uint8_t{1});
+  }
+ }
+ remaining.maximum_work-=work;
+ return visible;
+}
+
 std::shared_ptr<const Image> raster_retopo_mtoon_role(const RetopoPaintInputs &input,
     const MToonParameters &params,std::array<uint32_t,2> output,
-    PortableMToonSetPaint &proof,TextureSetLimits &remaining) {
+    const Mesh *mesh,PortableMToonSetPaint &proof,TextureSetLimits &remaining) {
  const auto [width,height]=output;
  const auto extent=[](const Image *image,bool x){return !image?0u:x?image->width:image->height;};
  const uint32_t coeff=input.hdr?input.paint_resolution:0;
@@ -1700,6 +1741,7 @@ std::shared_ptr<const Image> raster_retopo_mtoon_role(const RetopoPaintInputs &i
  charge(bytes,pixels,4,remaining.maximum_bytes);
  charge(bytes,xs_max,2*sizeof(RetopoPaintTap)+sizeof(double),remaining.maximum_bytes);
  charge(bytes,ys_max,sizeof(double),remaining.maximum_bytes);
+ if(mesh)charge(bytes,xs_max*ys_max,1,remaining.maximum_bytes);
  const size_t sample_work=input.hdr?input.hdr->work_per_sample():0;
  charge(work,pixels,32+sample_work,remaining.maximum_work);
  charge(work,xs_max*ys_max,64+sample_work,remaining.maximum_work);
@@ -1724,6 +1766,8 @@ std::shared_ptr<const Image> raster_retopo_mtoon_role(const RetopoPaintInputs &i
  }
  const auto knots=[](const auto &axis){return mtoon_filter_knots({axis[0],axis[1],axis[2],axis[3],axis[4],axis[5]});};
  const auto xs=knots(columns),ys=knots(rows);
+ const auto visible=mesh?retopo_sampled_cells(*mesh,xs,ys,remaining):std::vector<uint8_t>{};
+ proof.retopo_uv_domain|=bool(mesh);
  std::vector<RetopoPaintTap> previous(xs.size()),row(xs.size());
  for(size_t y=0;y<ys.size();++y){
   stop(remaining);
@@ -1731,7 +1775,7 @@ std::shared_ptr<const Image> raster_retopo_mtoon_role(const RetopoPaintInputs &i
    auto &tap=row[x];
    tap=input.sample(xs[x],ys[y]);
    tap.encoded=RetopoPaintInputs::read(*image,xs[x],ys[y],input.channels(),true);
-   if(x&&y&&!certify_retopo_paint_cell({&previous[x-1],&previous[x],&row[x-1],&tap},
+   if(x&&y&&(!mesh||visible[y*xs.size()+x])&&!certify_retopo_paint_cell({&previous[x-1],&previous[x],&row[x-1],&tap},
                                       input.role,input.hdr!=nullptr,params,proof))return {};
   }
   previous.swap(row);
@@ -1762,17 +1806,24 @@ std::shared_ptr<const Image> compose_retopo_mtoon_role(const TextureSetView &fie
  const RetopoPaintInputs input{role,typed.image.get(),hdr?nullptr:generic.image.get(),resolved,coverage,hdr,r,factor,native_factor};
  std::array<uint32_t,2> size{hdr?r:resolved->width,hdr?r:resolved->height};
  bool mixed=false;
+ bool smaller_source=false;
  for(const auto *image:{input.typed,input.generic,input.coverage})if(image){
   mixed|=image->width!=size[0]||image->height!=size[1];
+  smaller_source|=image->width<r||image->height<r;
   size={std::max(size[0],image->width),std::max(size[1],image->height)};
  }
+ const auto &mesh=field.painted->mesh();
+ const bool unit_uv=smaller_source&&std::ranges::all_of(mesh.uv,[](const auto &uv){
+  return uv[0]>=0&&uv[0]<=1&&uv[1]>=0&&uv[1]<=1;
+ });
+ const auto *sampled=unit_uv?&mesh:nullptr;
  // Every proof cell is split on the union of input and output texel-center
  // knots. A denser grid is useful only when the original phases differ.
  auto candidate=proof;
- auto result=raster_retopo_mtoon_role(input,p,size,candidate,remaining);
+ auto result=raster_retopo_mtoon_role(input,p,size,sampled,candidate,remaining);
  if(!result&&mixed&&std::ranges::max(size)<=8192/3){
   candidate=proof;
-  result=raster_retopo_mtoon_role(input,p,{size[0]*3,size[1]*3},candidate,remaining);
+  result=raster_retopo_mtoon_role(input,p,{size[0]*3,size[1]*3},sampled,candidate,remaining);
  }
  if(result)proof=std::move(candidate);
  return result;
