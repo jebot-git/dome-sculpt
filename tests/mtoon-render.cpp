@@ -7,6 +7,7 @@
 #include "dome/material-visibility.hpp"
 #include "dome/material-bindings.hpp"
 #include "dome/native-authoring.hpp"
+#include "dome/source-uv-bake.hpp"
 #include "dome/emission-native.hpp"
 #include "dome/texture-sets.hpp"
 #include "dome/import-image.hpp"
@@ -140,6 +141,38 @@ void verify_float_filter(const EmissionInterchangeImage &exr,const Image &portab
           <<" maximum_error="<<worst<<" bound="<<bound<<'\n';
  check(count>1000&&changing_coverage>0&&worst<=bound,
        "Independent fractional taps match the original typed emission and FLOAT coefficients within the bound");
+}
+
+struct PreviewGlb {
+ std::vector<uint8_t> bytes;
+ uint32_t json_size=0;
+ nlohmann::json json;
+ explicit PreviewGlb(const std::filesystem::path &path) {
+  std::ifstream file(path,std::ios::binary);
+  bytes.assign(std::istreambuf_iterator<char>{file},{});
+  for(size_t k=0;k<4;++k)json_size|=uint32_t(bytes.at(12+k))<<(8*k);
+  if(bytes.size()<28||json_size>bytes.size()-28)throw std::runtime_error("Invalid fixture GLB length");
+  json=nlohmann::json::parse(bytes.begin()+20,bytes.begin()+20+json_size);
+ }
+ const nlohmann::json &material(TextureSetId set)const {
+  const auto &primitive=json.at("meshes").at(0).at("primitives").at(set);
+  return json.at("materials").at(primitive.at("material").get<size_t>());
+ }
+ std::span<const uint8_t> image_bytes(size_t index)const {
+  const auto &image=json.at("images").at(index);
+  const auto &view=json.at("bufferViews").at(image.at("bufferView").get<size_t>());
+  return std::span(bytes).subspan(28+json_size+view.value("byteOffset",size_t(0)),
+      view.at("byteLength").get<size_t>());
+ }
+};
+
+void verify_editable_fallback(const PreviewGlb &glb,const Scene &expected,TextureSetId set){
+ const auto &material=glb.material(set);
+ const auto restored=extract_native_authoring(glb.bytes);
+ check(restored&&restored->encode()==expected.encode()&&material.contains("normalTexture")&&
+       material.contains("emissiveTexture")&&!material.value("extensions",nlohmann::json::object()).contains("VRMC_materials_mtoon")&&
+       material.at("extras").contains("domeSculptNativeMaterial"),
+       "Editable fallback carries measured core textures and the exact native MToon Scene");
 }
 
 void baked_texture_set(SurfaceRenderer &renderer, const std::filesystem::path &directory,
@@ -340,32 +373,33 @@ void baked_texture_set(SurfaceRenderer &renderer, const std::filesystem::path &d
 
  const auto path = prefix / "editable.glb";
  doc.export_asset(path,AssetExportFormat::EditableGlb256).get();
- std::ifstream input(path,std::ios::binary);
- const std::vector<uint8_t> bytes(std::istreambuf_iterator<char>{input},{});
- const auto editable = extract_native_authoring(bytes);
+ const PreviewGlb editable_file(path);
+ const auto editable=extract_native_authoring(editable_file.bytes);
  check(editable&&editable->encode()==after.encode(),"Editable GLB restores the typed Bake and paint exactly");
- const auto json_length = uint32_t(bytes.at(12))|(uint32_t(bytes.at(13))<<8)|
-     (uint32_t(bytes.at(14))<<16)|(uint32_t(bytes.at(15))<<24);
- const auto gltf = nlohmann::json::parse(bytes.begin()+20,bytes.begin()+20+json_length);
- const auto &primitive = gltf.at("meshes").at(0).at("primitives").at(set);
- const auto &material = gltf.at("materials").at(primitive.at("material").get<size_t>());
+ const auto &material=editable_file.material(set);
  check(material.contains("normalTexture")&&material.contains("emissiveTexture")&&
-       (physical?material.at("extras").contains("domeSculptNativeMaterial"):
-                 material["extensions"].contains("VRMC_materials_mtoon")),
-       "Editable GLB carries the typed material or its labeled core fallback plus native state");
+       material.at("extensions").contains("VRMC_materials_mtoon"),
+       "Editable GLB preserves the typed MToon preview independently of native data");
  {
   const auto file=prefix / "standard.glb";
   doc.export_asset(file,AssetExportFormat::Glb).get();
-  std::ifstream stream(file,std::ios::binary);
-  const std::vector<uint8_t> portable(std::istreambuf_iterator<char>{stream},{});
+  const PreviewGlb standard_file(file);
+  const auto &portable=standard_file.bytes;
+  const auto &json=standard_file.json;
+  const auto length=standard_file.json_size;
   check(!extract_native_authoring(portable),"Standard GLB carries an interoperable material independently of Editable GLB data");
   if(physical){
    const auto recovered=extract_native_emission(portable);
    check(recovered&&recovered->encode()==after.encode(),"Standard FLOAT GLB exactly restores every native paint, Bake and recipe");
+   check(editable_file.json.at("materials")==json.at("materials")&&
+         editable_file.json.at("meshes")==json.at("meshes"),
+         "Both formats emit the same typed FLOAT materials, face memberships and tangent accessors");
+   const auto count=json.at("images").size();
+   bool identical=editable_file.json.at("images").size()==count;
+   for(size_t i=0;i<count&&identical;++i)
+    identical=std::ranges::equal(editable_file.image_bytes(i),standard_file.image_bytes(i));
+   check(identical,"Both formats emit identical portable images for the FLOAT material and its sibling");
   }
-  const auto length=uint32_t(portable.at(12))|(uint32_t(portable.at(13))<<8)|
-      (uint32_t(portable.at(14))<<16)|(uint32_t(portable.at(15))<<24);
-  const auto json=nlohmann::json::parse(portable.begin()+20,portable.begin()+20+length);
   const auto imported=import_glb(portable,{},ImportMode::PreserveGltf);
   const auto primitive=std::find_if(imported.primitives.begin(),imported.primitives.end(),
       [set](const auto &p){return p.source_primitive==int(set);});
@@ -479,6 +513,44 @@ void baked_texture_set(SurfaceRenderer &renderer, const std::filesystem::path &d
    refused=std::string_view(error.what()).find("constant or aligned clamp-linear")!=std::string_view::npos;
   }
   check(refused,"Typed FLOAT GLB refuses a varying emission source with unrelated sampling");
+  NativeAuthoringExport fallback;
+  fallback.scene=emission->scene;
+  fallback.allow_portable_fallback=true;
+  const auto unsupported_file=prefix/"unsupported-editable.glb";
+  export_glb_authoring(fallback,unsupported_file);
+  verify_editable_fallback(PreviewGlb(unsupported_file),*fallback.scene,set);
+  if(hdr_donor){
+   auto sharp=after.snapshot();
+   auto normal_adjustment=*selected.material_bindings;
+   normal_adjustment.roles[size_t(MToonSlot::Normal)].image=
+       std::make_shared<const Image>(Image{2,1,{250,135,220,255,40,185,220,255}});
+   check(bind_texture_set_mtoon(sharp,object,set,normal_adjustment),
+         "An unrelated original normal raster remains valid native authoring data");
+   fallback.scene=std::make_shared<const Scene>(std::move(sharp));
+   const auto normal_fallback=prefix/"unbounded-normal-editable.glb";
+   export_glb_authoring(fallback,normal_fallback);
+   verify_editable_fallback(PreviewGlb(normal_fallback),*fallback.scene,set);
+  }
+
+
+  fallback.scene=std::make_shared<const Scene>(after.snapshot());
+  SourceUvBakeOptions limited_policy;
+  limited_policy.max_sample_operations=1;
+  const auto budget_file=prefix/"budget-editable.glb";
+  export_glb_authoring(fallback,budget_file,{},limited_policy);
+  const PreviewGlb budget(budget_file);
+  verify_editable_fallback(budget,after,set);
+  GltfExportOptions wire_limit;
+  wire_limit.max_output_bytes=budget.bytes.size();
+  check(editable_file.bytes.size()>wire_limit.max_output_bytes,
+        "The exact output quota fits the core preview and excludes the typed preview");
+  size_t publications=0;
+  wire_limit.before_commit=[&]{++publications;};
+  const auto bounded=prefix/"bounded-editable.glb";
+  export_glb_authoring(fallback,bounded,wire_limit);
+  check(PreviewGlb(bounded).bytes==budget.bytes&&publications==1,
+        "An output quota retries the compact preview before one atomic publication");
+
  }else if(!full_coverage){
   auto sharp=after.snapshot();
   auto adjusted=*selected.material_bindings;
@@ -502,16 +574,20 @@ void baked_texture_set(SurfaceRenderer &renderer, const std::filesystem::path &d
  check(doc.undo()&&doc.copy_scene().encode()==before.encode(),"Undo restores the exact unbaked typed field");
  check(doc.redo()&&doc.copy_scene().encode()==after.encode(),"Redo restores the exact selected Bake");
  Document reopened;
- reopened.open(native_path);
+ reopened.open(physical?path:native_path);
  check(reopened.wait_mesh()&&draw(renderer,reopened.frame().surface)==pixels,
        "Cold Open restores identical typed viewport pixels");
  if(physical){
+  check(reopened.copy_scene().encode()==after.encode(),
+        "The actual Document Open path restores the exact Editable FLOAT project");
   const auto second=prefix/"reopened-standard.glb";
   reopened.export_asset(second,AssetExportFormat::Glb).get();
-  std::ifstream original(prefix/"standard.glb",std::ios::binary),again(second,std::ios::binary);
-  const std::vector<uint8_t> expected(std::istreambuf_iterator<char>{original},{});
-  const std::vector<uint8_t> actual(std::istreambuf_iterator<char>{again},{});
-  check(!actual.empty()&&actual==expected,"Cold Open reproduces the exact typed FLOAT GLB bytes");
+  check(PreviewGlb(second).bytes==PreviewGlb(prefix/"standard.glb").bytes,
+        "Cold Open reproduces the exact typed FLOAT Standard GLB bytes");
+  const auto second_editable=prefix/"reopened-editable.glb";
+  reopened.export_asset(second_editable,AssetExportFormat::EditableGlb256).get();
+  check(PreviewGlb(second_editable).bytes==editable_file.bytes,
+        "Cold Open reproduces the exact typed FLOAT Editable GLB bytes");
  }
  check(reopened.frame().state->can_clear_bake,"Clear Bake is available on the reopened selected field");
  reopened.clear_bake();

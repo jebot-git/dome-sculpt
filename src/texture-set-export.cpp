@@ -18,10 +18,19 @@
 #include <map>
 namespace dome::detail {
 namespace {
+class ExportBudgetExceeded : public std::length_error {
+public:
+ using std::length_error::length_error;
+};
+class MToonFloatUnavailable : public std::invalid_argument {
+public:
+ using std::invalid_argument::invalid_argument;
+};
+
 void stop(const TextureSetLimits&l){if(l.cancelled&&l.cancelled())throw std::runtime_error("Texture-set export cancelled");}
 void charge(size_t&v,size_t n,size_t u,size_t cap){
  if(v>cap||(u&&n>(cap-v)/u))
-  throw std::length_error("Texture-set export exceeds its working budget ("+std::to_string(v)+
+  throw ExportBudgetExceeded("Texture-set export exceeds its working budget ("+std::to_string(v)+
       " already charged, "+std::to_string(n)+" entries at "+std::to_string(u)+
       ", limit "+std::to_string(cap)+")");
  v+=n*u;
@@ -667,12 +676,12 @@ public:
    const auto &typed=binding->material;
    const auto &p=typed.parameters;
    if(p.scroll!=std::array<float,2>{}||p.rotation_speed!=0)
-    throw std::invalid_argument("Typed FLOAT Bake needs static texture coordinates");
+    throw MToonFloatUnavailable("Typed FLOAT Bake needs static texture coordinates");
    if(const auto &image=binding->roles[size_t(MToonSlot::Emission)].image)
     charge(work,size_t(image->width)*image->height,1,limits.maximum_work);
    typed_source_=mtoon_paint_source(*binding,typed,MToonSlot::Emission,resolution,limits);
    if(!typed_source_)
-    throw std::invalid_argument("Typed FLOAT Bake needs a constant or aligned clamp-linear emission source");
+    throw MToonFloatUnavailable("Typed FLOAT Bake needs a constant or aligned clamp-linear emission source");
    legacy_strength_=p.emission_strength;
    const std::array factor{p.emission.x,p.emission.y,p.emission.z};
    for(size_t k=0;k<3;++k){
@@ -832,10 +841,42 @@ TextureSetExportEmission compile_emission(const TextureSetView &field,size_t &wo
   // fraction and original emission contributes a non-linear term.
   const double filter_error=out.measured.maximum_absolute_error+source_filter_error+1e-6*scale;
   if(filter_error>.005*scale)
-   throw std::invalid_argument("Typed FLOAT Bake emission exceeds its portable filter bound");
+   throw MToonFloatUnavailable("Typed FLOAT Bake emission exceeds its portable filter bound");
   out.filter_error=filter_error;
  }
  return out;
+}
+
+void charge_mtoon_paint(const TextureSetView &field,size_t &bytes,size_t &work,
+    const TextureSetLimits &limits,bool typed_hdr){
+ const auto resolution=field.painted->resolution();
+ const size_t pixels=size_t(resolution)*resolution;
+ charge(bytes,pixels,8,limits.maximum_bytes);
+ charge(work,pixels,12,limits.maximum_work);
+ const auto &typed=field.material_bindings->material;
+ if(typed.version()==MToonVersion::V1&&typed.parameters.scroll==std::array<float,2>{}&&
+    typed.parameters.rotation_speed==0&&!field.painted->source_maps()&&
+    shared_mtoon_shade(*field.material_bindings)){
+  charge(bytes,pixels,4,limits.maximum_bytes);
+  charge(bytes,resolution,2*sizeof(MToonShadeTap),limits.maximum_bytes);
+  charge(work,pixels,24,limits.maximum_work);
+ }
+ if(field.painted->baked()&&!field.painted->baked()->maps.normal.rgba.empty()){
+  charge(bytes,pixels,4,limits.maximum_bytes);
+  charge(bytes,resolution,2*sizeof(MToonNormalTap),limits.maximum_bytes);
+  charge(work,pixels,42,limits.maximum_work);
+  if(const auto &image=field.material_bindings->roles[size_t(MToonSlot::Normal)].image)
+   charge(work,size_t(image->width)*image->height,1,limits.maximum_work);
+ }
+ for(auto role:{MToonSlot::Base,MToonSlot::Emission})
+  if(const auto &image=field.material_bindings->roles[size_t(role)].image){
+   const bool float_emission=typed_hdr&&role==MToonSlot::Emission;
+   if(!float_emission)charge(work,size_t(image->width)*image->height,1,limits.maximum_work);
+   if(aligned_mtoon_source(field.material_bindings->roles[size_t(role)],typed.textures[size_t(role)],resolution)){
+    charge(bytes,resolution,2*sizeof(MToonSourceTap),limits.maximum_bytes);
+    if(!float_emission)charge(work,pixels,18,limits.maximum_work);
+   }
+  }
 }
 
 struct ExportBound { size_t bytes, work; };
@@ -861,34 +902,9 @@ ExportBound export_bound(const ObjectSurface&input,const TextureSetLimits&limits
   const bool typed_hdr=hdr&&!editable_materials&&native_mtoon_float_bake(field);
   const bool sparse_retained=retained_material_grid(field);
   if(mtoon&&!editable_pbr&&field.painted->has_paint_data()){
-   const size_t pixels=size_t(resolution)*resolution;
-   charge(bytes,pixels,8,limits.maximum_bytes);
-   charge(work,pixels,12,limits.maximum_work);
-   const auto &typed=field.material_bindings->material;
-   if(typed.version()==MToonVersion::V1&&typed.parameters.scroll==std::array<float,2>{}&&
-      typed.parameters.rotation_speed==0&&!field.painted->source_maps()&&
-      shared_mtoon_shade(*field.material_bindings)){
-    charge(bytes,pixels,4,limits.maximum_bytes);
-    charge(bytes,resolution,2*sizeof(MToonShadeTap),limits.maximum_bytes);
-    charge(work,pixels,24,limits.maximum_work);
-   }
-   if(field.painted->baked()&&!field.painted->baked()->maps.normal.rgba.empty()){
-    charge(bytes,pixels,4,limits.maximum_bytes);
-    charge(bytes,resolution,2*sizeof(MToonNormalTap),limits.maximum_bytes);
-    charge(work,pixels,42,limits.maximum_work);
+   charge_mtoon_paint(field,bytes,work,limits,typed_hdr);
+   if(field.painted->baked()&&!field.painted->baked()->maps.normal.rgba.empty())
     charge(work,draw.count,8,limits.maximum_work);
-    if(const auto &image=field.material_bindings->roles[size_t(MToonSlot::Normal)].image)
-     charge(work,size_t(image->width)*image->height,1,limits.maximum_work);
-   }
-   for(auto role:{MToonSlot::Base,MToonSlot::Emission})
-    if(const auto &image=field.material_bindings->roles[size_t(role)].image){
-     const bool float_emission=typed_hdr&&role==MToonSlot::Emission;
-     if(!float_emission)charge(work,size_t(image->width)*image->height,1,limits.maximum_work);
-     if(aligned_mtoon_source(field.material_bindings->roles[size_t(role)],typed.textures[size_t(role)],resolution)){
-      charge(bytes,resolution,2*sizeof(MToonSourceTap),limits.maximum_bytes);
-      if(!float_emission)charge(work,pixels,18,limits.maximum_work);
-     }
-    }
   }
   if(hdr&&(!measured_physical||(mtoon?!(editable_pbr||typed_hdr):field.material.toon||field.appearance)))
    throw std::invalid_argument("Texture-set HDR emission needs its per-material precision-qualified export compiler");
@@ -1056,6 +1072,40 @@ std::optional<PortableMToonSetPaint> compile_mtoon_set_paint(
  return out;
 }
 
+std::optional<MToonFloatPreview> compile_editable_mtoon_float_preview(
+    const TextureSetView &field,const MToonMaterial &effective,TextureSetLimits &budget){
+ stop(budget);
+ if(!native_mtoon_float_bake(field)||!budget.maximum_bytes||!budget.maximum_work)
+  return {};
+ size_t work=0;
+ size_t bytes=sizeof(MToonFloatPreview);
+ std::optional<MToonFloatPreview> result;
+ try {
+  charge_mtoon_paint(field,bytes,work,budget,true);
+  charge(bytes,1,native_material_grid_bytes(*field.painted,TextureSetGridMode::NativeMToonHdr),budget.maximum_bytes);
+  const auto resolution=field.painted->resolution();
+  charge(bytes,size_t(resolution)*resolution,4,budget.maximum_bytes);
+
+  TextureSetExportField candidate;
+  candidate.set=field.id;
+  candidate.portable_mtoon_bake_frame=true;
+  candidate.emission=compile_emission(field,work,budget,true);
+  auto maps=compile_native_material_grid(*field.painted,field.material,work,budget,TextureSetGridMode::NativeMToonHdr);
+  candidate.textures=maps;
+  if(auto paint=compile_mtoon_set_paint(field,candidate,effective,budget))
+   result.emplace(MToonFloatPreview{std::move(*candidate.emission),std::move(maps->metal_rough),std::move(*paint)});
+ } catch(const MToonFloatUnavailable &) {
+  // A legal authored material can lie outside the portable sampling domain.
+ } catch(const std::overflow_error &) {
+  // The typed resolved view has its own finite radiance range.
+ } catch(const ExportBudgetExceeded &) {
+  // The original Editable fallback has its own, already reserved budget.
+ }
+ budget.maximum_work-=work;
+ if(result)budget.maximum_bytes-=bytes;
+ return result;
+}
+
 bool texture_set_physical_emission(const TextureSetView &field) {
  return hdr_emission(field.material.emissive)||(field.painted&&field.painted->has_physical_emission())||
      (field.material_bindings&&physical_emission(*field.material_bindings));
@@ -1111,7 +1161,7 @@ TextureSetExport compile_texture_set_export(const ObjectSurface&input,const Text
   const bool physical=texture_set_physical_emission(field);
   const bool typed_hdr=physical&&!editable_materials&&native_mtoon_float_bake(field);
   if(canonical&&!input.deformation&&field.material_bindings&&field.material_bindings->has_mtoon&&
-     (!physical||typed_hdr))
+     (!physical||typed_hdr||(editable_materials&&native_mtoon_float_bake(field))))
    output.portable_mtoon_bake_frame=portable_mtoon_bake_frame(rest,field,frames,input.world_matrix(),limits);
   if(physical){
    if(typed_hdr&&!output.portable_mtoon_bake_frame)

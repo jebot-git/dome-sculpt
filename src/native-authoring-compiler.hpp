@@ -2,6 +2,7 @@
 #pragma once
 #include "native-authoring-capture.hpp"
 #include "dome/source-uv-bake.hpp"
+#include "dome/texture-sets.hpp"
 namespace dome::detail {
 struct GltfDocument;
 // Selectively extract native float-paint geometry/other channels. Raw original
@@ -24,6 +25,7 @@ struct NativeAuthoringCompilation {
   std::vector<ObjectSurface> surfaces;
   std::vector<std::string> diagnostics;
   std::vector<NativeAuthoringEmission> emission;
+  TextureSetLimits texture_set_preview;
 };
 // Replay only the actual sealed capture's emission-normalized native32 view.
 // This is neither a public surface permission nor original Source4 authority.

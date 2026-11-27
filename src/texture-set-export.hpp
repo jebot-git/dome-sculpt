@@ -35,6 +35,13 @@ struct PortableMToonSetPaint {
 std::optional<PortableMToonSetPaint> compile_mtoon_set_paint(
     const TextureSetView &,const TextureSetExportField &,const MToonMaterial &,
     const TextureSetLimits &);
+struct MToonFloatPreview {
+  TextureSetExportEmission emission;
+  Image metal_rough;
+  PortableMToonSetPaint paint;
+};
+std::optional<MToonFloatPreview> compile_editable_mtoon_float_preview(
+    const TextureSetView &,const MToonMaterial &,TextureSetLimits &remaining);
 // One REST geometry and deformation expansion for the entire mesh instance.
 // Material ranges refer into one index stream; no per-material mesh/rig copies.
 struct TextureSetExport {

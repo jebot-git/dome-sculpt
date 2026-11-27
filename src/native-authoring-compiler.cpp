@@ -328,6 +328,12 @@ NativeAuthoringCompilation compile_native_authoring(
   reserve(raw_proof_peak,1); // Keep the single proof peak available during writer replay.
   reserve(emission_fields,sizeof(NativeAuthoringEmission));
   NativeAuthoringCompilation result;result.emission.reserve(emission_fields);
+  const auto set_preview_budget=[&](size_t retained_memory,size_t samples){
+    auto &budget=result.texture_set_preview;
+    budget.maximum_bytes=std::min(budget.maximum_bytes,policy.max_working_bytes-fixed-retained_memory);
+    budget.maximum_work=std::min(budget.maximum_work,policy.max_sample_operations-
+        std::min(samples,policy.max_sample_operations));
+  };
   if (!painted) {
     result.surfaces = capture.originals();
     for (auto &surface : result.surfaces) {
@@ -345,6 +351,7 @@ NativeAuthoringCompilation compile_native_authoring(
           ": original raw emission images/samplers/coordinates retained; current radiance uses explicit factor and strength");
       }
     }
+    set_preview_budget(0,0);
     return result;
   }
   // The capture already owns an immutable snapshot. A shallow Scene copy only
@@ -481,6 +488,7 @@ NativeAuthoringCompilation compile_native_authoring(
   for(size_t i=0;i<result.surfaces.size();++i)
     if(result.surfaces[i].id!=capture.ids()[i])
       throw std::invalid_argument("Native authoring compilation changed emitted object ordering");
+  set_preview_budget(retained_memory,samples);
   return result;
 }
 void finish_native_authoring_emission(GltfDocument &document,

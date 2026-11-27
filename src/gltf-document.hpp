@@ -5,6 +5,7 @@
 #include <nlohmann/json.hpp>
 namespace dome::detail {
 class NativeAuthoringCapture;
+struct NativeAuthoringCompilation;
 struct EmissionExportPrepared;
 struct GltfObjectIdentity {
   int node = -1, mesh = -1, material = -1;
@@ -23,8 +24,8 @@ GltfDocument make_gltf(const std::vector<ObjectSurface> &,
                        std::function<bool()> cancelled = {});
 // Private Scene-owner path only; public strict writers retain their guard.
 GltfDocument make_gltf_authoring(const NativeAuthoringCapture &,
-    const std::vector<ObjectSurface> &, bool recompute_changed_normals,
-    std::function<bool()> cancelled = {});
+    const NativeAuthoringCompilation &, bool recompute_changed_normals,
+    std::function<bool()> cancelled,bool *wrote_preview);
 GltfDocument make_gltf_emission(const EmissionExportPrepared &, bool recompute_changed_normals, std::function<bool()> cancelled);
 class Vrm1AuthoringCompilation;
 // Authenticated typed Scene compilation only. The ordinary exporter retains

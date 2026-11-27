@@ -23,6 +23,7 @@
 #include "bone-metadata.hpp"
 #include "humanoid-placement.hpp"
 #include <bit>
+#include <deque>
 #include <map>
 #include <set>
 #include <nlohmann/json.hpp>
@@ -63,10 +64,14 @@ GltfExportReport export_glb(const std::vector<ObjectSurface> &objects,
   stop();detail::write_glb(std::move(document),path,options.cancelled,options.before_commit);return report;
 }
 namespace detail {
+struct EditableMToonExport {
+  TextureSetLimits budget;
+  bool &wrote_preview;
+};
 static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objects,
     SourceMorphSpace source_space,bool recompute_changed_normals,std::function<bool()> cancelled,
     const NativeAuthoringCapture *raw_authority,const EmissionExportPrepared *physical,
-    const Vrm1AuthoringCompilation *normal_owner) {
+    const Vrm1AuthoringCompilation *normal_owner,EditableMToonExport *editable_preview=nullptr) {
   auto stop=[&]{if(cancelled && cancelled())throw std::runtime_error("glTF export cancelled");};
   size_t work=0;auto checkpoint=[&]{if((++work&1023)==0)stop();};
   stop();
@@ -711,6 +716,7 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
   };
   // Keep generated texture owners alive for the image-identity table.
   std::vector<std::shared_ptr<const Image>> mtoon_paint_images;
+  std::deque<MToonFloatPreview> mtoon_float_previews;
   const auto write_set_mtoon=[&](const TextureSetView &field,const TextureSetExportField &compiled,
                                  size_t object,int material_id){
     const auto &binding=field.material_bindings;
@@ -722,8 +728,10 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
       return false;
     };
     const auto *hdr=compiled.emission&&compiled.emission->filter_error?&*compiled.emission:nullptr;
+    const bool try_editable_float=editable_preview&&compiled.emission&&!hdr&&
+        compiled.portable_mtoon_bake_frame;
     if(field.source||binding->material.version()!=MToonVersion::V1||
-       binding->physical_emission||(compiled.emission&&!hdr))
+       binding->physical_emission||(compiled.emission&&!hdr&&!try_editable_float))
       return retain_native();
 
     const auto &attributes=j["meshes"][result.objects[object].mesh]["primitives"][0]["attributes"];
@@ -774,7 +782,7 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
     for(size_t channel=0;channel<emission.size();++channel){
       auto &factor=emission[channel];
       factor=mtoon_factor(factor,native.emission[channel],current.emissive[channel]);
-      if(!hdr&&!unit(factor))return retain_native();
+      if(!(hdr||try_editable_float)&&!unit(factor))return retain_native();
     }
     params.emission={emission[0],emission[1],emission[2]};
     if(current.double_sided!=native.double_sided)
@@ -795,6 +803,14 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
         return retain_native();
     }
     auto roles=binding->roles;
+    MToonFloatPreview *float_preview=nullptr;
+    if(try_editable_float){
+      auto candidate=compile_editable_mtoon_float_preview(field,typed,editable_preview->budget);
+      if(!candidate)return retain_native();
+      float_preview=&mtoon_float_previews.emplace_back(std::move(*candidate));
+      hdr=&float_preview->emission;
+      editable_preview->wrote_preview=true;
+    }
     std::optional<PortableMToonSetPaint> paint;
     PaintSourceTexture paint_sampler;
     paint_sampler.wrap_s=paint_sampler.wrap_t=33071;
@@ -802,7 +818,8 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
     if(field.painted->has_paint_data()){
       TextureSetLimits limits;
       limits.cancelled=cancelled;
-      paint=compile_mtoon_set_paint(field,compiled,typed,limits);
+      if(float_preview)paint=std::move(float_preview->paint);
+      else paint=compile_mtoon_set_paint(field,compiled,typed,limits);
       if(!paint)return retain_native();
       const auto replace_role=[&](MToonSlot slot,const std::shared_ptr<const Image> &image,
                                   MToonEncoding encoding=MToonEncoding::Srgb){
@@ -855,7 +872,7 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
     output["pbrMetallicRoughness"]["roughnessFactor"]=current.roughness;
     if(paint){
       auto &pbr=output["pbrMetallicRoughness"];
-      const auto orm=texture(compiled.textures->metal_rough,paint_sampler);
+      const auto orm=texture(float_preview?float_preview->metal_rough:compiled.textures->metal_rough,paint_sampler);
       pbr["metallicFactor"]=pbr["roughnessFactor"]=1;
       pbr["metallicRoughnessTexture"]={{"index",orm}};
       output["occlusionTexture"]={{"index",orm}};
@@ -1044,9 +1061,16 @@ GltfDocument make_gltf_emission(const EmissionExportPrepared &prepared,bool reco
  return make_gltf_impl(prepared.surfaces,SourceMorphSpace::Native,recompute_changed_normals,std::move(cancelled),nullptr,&prepared,nullptr);
 }
 GltfDocument make_gltf_authoring(const NativeAuthoringCapture &capture,
-    const std::vector<ObjectSurface> &objects,bool recompute_changed_normals,
-    std::function<bool()> cancelled) {
-  auto document=make_gltf_impl(objects,SourceMorphSpace::Native,recompute_changed_normals,cancelled,&capture,nullptr,nullptr);
+    const NativeAuthoringCompilation &compiled,bool recompute_changed_normals,
+    std::function<bool()> cancelled,bool *wrote_preview) {
+  const auto &objects=compiled.surfaces;
+  std::optional<EditableMToonExport> preview;
+  if(wrote_preview){
+    preview.emplace(EditableMToonExport{compiled.texture_set_preview,*wrote_preview});
+    preview->budget.cancelled=cancelled;
+  }
+  auto document=make_gltf_impl(objects,SourceMorphSpace::Native,recompute_changed_normals,cancelled,
+      &capture,nullptr,nullptr,preview?&*preview:nullptr);
   auto &j=document.json;
   for(size_t i=0;i<objects.size();++i) {
     if(cancelled&&cancelled())throw std::runtime_error("Raw source emission finish cancelled");

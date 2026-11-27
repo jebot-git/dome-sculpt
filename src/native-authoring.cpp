@@ -97,9 +97,27 @@ GltfExportReport export_glb_authoring(const NativeAuthoringExport &owner,const s
  const auto capture=detail::NativeAuthoringCapture::create(owner,options.cancelled,paint_policy);
  auto compiler_policy=paint_policy;compiler_policy.cancelled={};
  auto compiled=detail::compile_native_authoring(*capture,compiler_policy,options.max_output_bytes,options.cancelled);
- auto document=detail::make_gltf_authoring(*capture,compiled.surfaces,options.recompute_changed_normals,options.cancelled);
- detail::finish_native_authoring_emission(document,compiled,options.max_output_bytes,options.cancelled);
- detail::attach_native_authoring(document,*capture,options.max_output_bytes,options.cancelled);const uint64_t size=28+((uint64_t(document.json.dump().size())+3)&~uint64_t(3))+((uint64_t(document.binary.size())+3)&~uint64_t(3));if(size>options.max_output_bytes)throw std::length_error("Complete native authoring GLB exceeds output budget");
+ auto encode=[&](bool *wrote_preview){
+  auto document=detail::make_gltf_authoring(*capture,compiled,options.recompute_changed_normals,
+      options.cancelled,wrote_preview);
+  detail::finish_native_authoring_emission(document,compiled,options.max_output_bytes,options.cancelled);
+  detail::attach_native_authoring(document,*capture,options.max_output_bytes,options.cancelled);
+  const uint64_t size=28+((uint64_t(document.json.dump().size())+3)&~uint64_t(3))+
+      ((uint64_t(document.binary.size())+3)&~uint64_t(3));
+  if(size>options.max_output_bytes)throw std::length_error("Complete native authoring GLB exceeds output budget");
+  return document;
+ };
+ bool wrote_preview=false;
+ auto document=[&]{
+  try{
+   return encode(&wrote_preview);
+  }catch(const std::length_error &){
+   if(!wrote_preview)throw;
+   // The optional typed view can be larger than the ordinary PBR preview.
+   // Retry before the atomic writer sees any bytes.
+   return encode(nullptr);
+  }
+ }();
  GltfExportReport report{capture->ids().size(),document.normal_targets_recomputed,{"Exact native authoring Scene retained; portable core view is not declared lossless"}};report.diagnostics.insert(report.diagnostics.end(),compiled.diagnostics.begin(),compiled.diagnostics.end());stop(options.cancelled);detail::write_glb(std::move(document),path,options.cancelled,options.before_commit);return report;
 }
 std::optional<Scene> extract_native_authoring(std::span<const uint8_t> bytes,const NativeAuthoringReadLimits &limits){
