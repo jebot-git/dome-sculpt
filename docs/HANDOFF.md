@@ -18,6 +18,9 @@ controller attachment revision `eea22499` passed all 1,367 registered tests
 in its combined Release run. It also has focused sanitizer results,
 nested DomeD Wayland coverage, and synthetic OpenXR coverage on software GL
 and Intel Arc A770. [Controller attachment validation](validation/vrm1-xr-attachment-20261127.json)
+The later frozen prepared-colour revision `48952391` passed all 1,399
+registered tests with zero skips. Its terminal status and JUnit hash are
+recorded with the native Bake tangent validation below.
 
 The current texture-set shapekey revision `17367cb0` adds mixed-material
 shapekey authoring and portable rigid VRM 1.0 accessory morphs. It restores
@@ -177,6 +180,32 @@ errors and advises that each patch export relies on runtime tangent generation.
 Existing authored Bake data on an imported guide, imported MToon, and physical
 headset acceptance remain open for this route.
 [Imported PBR retopology validation](validation/retopology-first-imported-20261127.json)
+
+Native single-material PBR exports with canonical Bake now write the actual
+UV0 Mikk tangent as a GLB attribute. Static exports preserve the original
+vertex order where possible and split vertices when their ordered corners
+need different tangents. Morph exports carry the native normal and tangent
+changes at each endpoint. A split duplicates the skin influences and morph
+positions of its original rest vertex. Editable GLB reopens the original
+mesh, layers and Bake exactly. glTF encodes tangent handedness on the base
+attribute, so a morph
+endpoint that reverses that sign requires a different portable representation.
+[glTF morph target specification](https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#_morph_targets)
+
+An independent GLB reader reconstructs the tangent at every corner of the
+imported PBR patch. Its five exported texture roles keep the same image bytes.
+A second fixture shares a vertex across opposite-handed
+charts, with skin weights and two morph endpoints. Native DomeD Wayland
+exports the attributed patch from the universal menu, and synthetic OpenXR
+renders on Intel Arc A770 and llvmpipe. Reimporting the portable GLB data
+and replaying it in stereo differs from the native patch by at most two
+RGB levels per component. A 405,000-triangle static Bake writes all 203,401
+tangents without splitting its regular chart. All 58 selected Release and
+11 strict sanitizer tests pass. Khronos reports zero runtime-tangent warnings.
+The two skinned GLBs retain the existing skin-node advisory.
+Nonlinear shading between morph endpoints and full physical headset
+acceptance remain open.
+[Native Bake tangent validation](validation/native-bake-tangents-20261127.json)
 
 Retopology reapply now works on native multi-material accessories attached
 to original VRM 1.0 joints. The replacement keeps its avatar hierarchy and
