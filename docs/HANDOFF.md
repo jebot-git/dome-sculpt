@@ -501,10 +501,9 @@ Undo/Redo. Four scoped strict ASan/UBSan workflows pass. Nested DomeD
 Wayland and synthetic OpenXR both apply the 1024-to-512 change through
 the normal UI and save identical states after Apply, Undo and Redo. Level
 Zero traces record 272 paint-grid kernel submissions in each workflow.
-CUDA and ROCm both build and pass missing-device refusal. A fresh full
-CPU Release regression is running from frozen product `b73fd2df` under
-`ds-full-release-paint-budget-20261127.service`. Physical headset tests and
-GPU execution on AMD and NVIDIA hardware remain open.
+CUDA and ROCm both build and pass missing-device refusal. The initial full
+CPU Release attempt for `b73fd2df` stopped in compilation. Physical headset
+tests and GPU execution on AMD and NVIDIA hardware remain open.
 [Native paint reduction validation](validation/paint-grid-production-budget-20261127.json)
 
 Overlay reconstruction now resolves the raster owner once and blends only
@@ -514,7 +513,7 @@ with varying FLOAT paint across the whole atlas and a localized hidden mask
 now uses 119,555,523 work units, down from 168,052,163. CPU and Arc produce
 the same saved project and exact error measurements as the previous
 higher-budget run. Zero tolerance still refuses the genuinely varying
-input and preserves both layers. Two fully dense layers still require
+input and preserves both layers. This revision's two-dense-layer case requires
 152,285,322 work units on the comparison fixture.
 
 The focused Release runs pass 31 CPU and 32 oneAPI tests, including native
@@ -524,8 +523,33 @@ sampler match over 43 million float coefficients bit for bit across dense
 paint, legacy and FLOAT Bake, and independent PBR and MToon views. Native
 Wayland and synthetic OpenXR apply, undo and redo the same dense reduction
 on Arc with exact project saves. CUDA and ROCm build and refuse absent
-devices. The frozen full Release run of `b73fd2df` is still in progress.
+devices.
 [Dense paint reduction validation](validation/paint-grid-dense-20261127.json)
+
+Native layer reduction now checks the stored bytes once per layer and
+omits filtering for common channels that hold their default values
+throughout. Raw values remain independent of coverage, including a
+nonzero metallic value with zero coverage. Independent PBR color and
+FLOAT emission retain their filtering and fallback rules. Default
+channels contribute the original number of samples to the reconstruction
+RMS. The selected CPU or GPU backend still performs the authored filtering.
+
+The 1024-to-512 reduction of two fully dense layers now uses 110,482,752
+work units with the second layer hidden and 127,523,392 with both visible.
+Both are within the existing 128-million limit. CPU and Arc results
+match the previous higher-budget projects and all error measurements.
+Native Wayland and synthetic OpenXR confirm exact Apply, Save, Undo and
+Redo with both layers visible. The focused Release runs pass 31 CPU and
+32 oneAPI cases. Five strict ASan/UBSan workflows pass. CUDA and ROCm
+build and retain their missing-device refusals.
+
+The first frozen `b73fd2df` full Release attempt stopped because two
+paint-sampling tests included a header that lacked the declaration of
+`SourceMaterialBindings`. Commit `a2646a28` supplies it. Both affected
+test sources compile in the resumed frozen build using the preserved
+compiler cache. The all-target build and regression are still in progress
+under `ds-full-release-paint-header-20261127.service`.
+[Two dense paint layers validation](validation/paint-grid-channel-filter-20261127.json)
 
 Retopology reapply now works on native multi-material accessories attached
 to original VRM 1.0 joints. The replacement keeps its avatar hierarchy and

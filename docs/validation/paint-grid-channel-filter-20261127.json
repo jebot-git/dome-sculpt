@@ -1,0 +1,177 @@
+{
+  "utc": "2026-11-27T19:54:38.697430+00:00",
+  "product": "525f6120fbff7241dc50668df88123861546e1a2",
+  "parent": "8eec5b26cd82d3c0e360fc3f968c7921c8a71f74",
+  "patch_sha256": "44316b8e6a82760bf7f7880e73411d08e49b32e10e40f908d9736197cd04cbc1",
+  "DomeD": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "toolkits": {
+    "FLTK": "/opt/fltk-vr/toolkit",
+    "BDF": "/opt/fltk-vr/bdf-runtime",
+    "oneAPI": "DPC++ 7.2.0",
+    "CUDA": "13.4.59 sm86",
+    "ROCm": "7.1.52802 gfx1030"
+  },
+  "release_tests": {
+    "release": {
+      "resize": {
+        "passed": 24,
+        "junit_sha256": "0c7f4b2be4c54dab6e52d9d60d8b26400f293210f3c944040928f4aace78b1e9"
+      },
+      "adjacent": {
+        "passed": 7,
+        "junit_sha256": "c72f18f272d9d0f4ef4918c4b51279f9a5891d13a5a29df3daec3caeb030b87c"
+      },
+      "app_sha256": "4c11ab0f8065eeb45d065da99cac3db8d5d1d73f78f57b49b3982f7e3247d375"
+    },
+    "oneapi": {
+      "resize": {
+        "passed": 25,
+        "junit_sha256": "799791101de933ef871718dbbbfefc4cb49ab0be2c3a8768b7d44a02daaac325"
+      },
+      "adjacent": {
+        "passed": 7,
+        "junit_sha256": "d13e818f67b2f21f2127e9c07181b543cf1752751a8c2e182bca44b9388e0746"
+      },
+      "app_sha256": "8e2912f039de7374e65769196f31b871f1e8be5fb31faffc4d78f115edace62a"
+    },
+    "cuda": {
+      "missing_device": {
+        "passed": 1,
+        "junit_sha256": "bcf9ae05a35fe82b1d49afb89a0746d734e24986d5c3017d690e6b75ac67e98a"
+      },
+      "app_sha256": "9637f7e862751de5b6ae370b092d0aae7375e399432e28b230c3873b71b6e8f9"
+    },
+    "rocm": {
+      "missing_device": {
+        "passed": 1,
+        "junit_sha256": "89fd9c20164e2e1b65a847bf9b799ce0e41d72d7d93aa845f025d3bdc398974f"
+      },
+      "app_sha256": "fbf0b7f4693a93d95ae5ef4b592bfd11e45826ab7cf9c97d8b1bffdc0583977a"
+    }
+  },
+  "strict_ASan_UBSan": {
+    "painted": {
+      "log_sha256": "094bf9ff3d47d5f060765571862774342eb06fe0b269ff1a580bd6e9f1bf501e",
+      "last_line": "PASS Dense reduction preserves exact ordered Save, cold Open and history"
+    },
+    "baked": {
+      "log_sha256": "a6dc1e4b2abc7a93baf43b963136c02e3fa95bda826871fc057b50eb52365d0f",
+      "last_line": "PASS The default quality guard refuses a reduction that would erase sharp normal detail"
+    },
+    "retained": {
+      "log_sha256": "d138f5847b76ad558a3b31f0f43ee90b652bb647204f11c0360aac03a1eb8b20",
+      "last_line": "PASS Bake after cold reopen uses the new writable grid and retained native normal frame"
+    },
+    "baked-emission-native": {
+      "log_sha256": "875a8a141978fff9cd39a8d34ff37e89f40b9f785aacaa01da706d522bbd63f1",
+      "last_line": "Native baked emission 69 checks PASS"
+    },
+    "affine": {
+      "log_sha256": "6f6036581f12f0c89ed1851ed80097b4c9b16c102500e9d768ecf57892e466e7",
+      "last_line": "PASS 779 native polygon grid and normal Bake checks"
+    }
+  },
+  "raw_metallic_after_erasing_all_coverage": {
+    "previous": {
+      "checks": 20480,
+      "log_sha256": "65b88f5921d70729048e960f9274161f59b78173c579d90da89d8bf3d61fbd2f",
+      "project_sha256": "2404d18dbed55451dd88a980e7bf44d5e5ebad9193ce6770a4df4a2c70fa5a08"
+    },
+    "cpu": {
+      "checks": 20480,
+      "log_sha256": "65b88f5921d70729048e960f9274161f59b78173c579d90da89d8bf3d61fbd2f",
+      "project_sha256": "2404d18dbed55451dd88a980e7bf44d5e5ebad9193ce6770a4df4a2c70fa5a08"
+    },
+    "arc": {
+      "checks": 20480,
+      "log_sha256": "65b88f5921d70729048e960f9274161f59b78173c579d90da89d8bf3d61fbd2f",
+      "project_sha256": "2404d18dbed55451dd88a980e7bf44d5e5ebad9193ce6770a4df4a2c70fa5a08"
+    }
+  },
+  "dense_1024_to_512": {
+    "default_work_limit": 128000000,
+    "old_diagnostic_limit": 256000000,
+    "second_layer_hidden": {
+      "profiles": {
+        "old": {
+          "work": 152285322,
+          "peak_bytes": 136648350,
+          "layer_taps": 2097152,
+          "metrics_sha256": "40841b3c2f48bc301f1e7379a71165882abf6df406f12481dd91a5dffa3ce42b",
+          "project_sha256": "f2d10b67287f7ff776ebb4daf393f98f452639554c034ec5d62c5c16b5c92076"
+        },
+        "cpu": {
+          "work": 110482752,
+          "peak_bytes": 136648350,
+          "layer_taps": 2097152,
+          "metrics_sha256": "40841b3c2f48bc301f1e7379a71165882abf6df406f12481dd91a5dffa3ce42b",
+          "project_sha256": "f2d10b67287f7ff776ebb4daf393f98f452639554c034ec5d62c5c16b5c92076"
+        },
+        "arc": {
+          "work": 110482752,
+          "peak_bytes": 153966206,
+          "layer_taps": 2097152,
+          "metrics_sha256": "40841b3c2f48bc301f1e7379a71165882abf6df406f12481dd91a5dffa3ce42b",
+          "project_sha256": "f2d10b67287f7ff776ebb4daf393f98f452639554c034ec5d62c5c16b5c92076"
+        }
+      },
+      "input_sha256": "fa0b0176b927163966180baa39d75fac9b12209fa10ee5fde4deca3a72ad82d1"
+    },
+    "both_layers_visible": {
+      "profiles": {
+        "old": {
+          "work": 169325962,
+          "peak_bytes": 136648350,
+          "layer_taps": 2097152,
+          "metrics_sha256": "94fa0aa4faabb85f5e708c4eebc53fce259d15e4b8988df02cf4103b5a8d7aeb",
+          "project_sha256": "9a1cf1b919abd6ca84574d9bf15b80aa0619c0467e01eb11c240130b7f5fdae4"
+        },
+        "cpu": {
+          "work": 127523392,
+          "peak_bytes": 136648350,
+          "layer_taps": 2097152,
+          "metrics_sha256": "94fa0aa4faabb85f5e708c4eebc53fce259d15e4b8988df02cf4103b5a8d7aeb",
+          "project_sha256": "9a1cf1b919abd6ca84574d9bf15b80aa0619c0467e01eb11c240130b7f5fdae4"
+        },
+        "arc": {
+          "work": 127523392,
+          "peak_bytes": 153966206,
+          "layer_taps": 2097152,
+          "metrics_sha256": "94fa0aa4faabb85f5e708c4eebc53fce259d15e4b8988df02cf4103b5a8d7aeb",
+          "project_sha256": "9a1cf1b919abd6ca84574d9bf15b80aa0619c0467e01eb11c240130b7f5fdae4"
+        }
+      },
+      "input_sha256": "d349e8cbbf0e252f45883400fdb78e266bda6f53ff1278f39b2c12f2b1965bbc"
+    }
+  },
+  "Arc_DomeD_Wayland": {
+    "passed": 12,
+    "report_sha256": "37ce671d43167e9963bad0e4a50345f917a5019904b57840a6378cf987e6c09b",
+    "paint_grid_launches": 512,
+    "trace_sha256": "1711be1952c451619e5182043e5afd98934e63f78aaae8e01ae25ad8e692b4d5"
+  },
+  "Arc_synthetic_OpenXR": {
+    "passed": 12,
+    "report_sha256": "9ffc111f91182dd053b2b8fa4422b5339ee84683853663e2815177cd445e55c8",
+    "paint_grid_launches": 512,
+    "trace_sha256": "83cc9eff44079e613fe8a18ba4ff6dccf4707febab7a91781b093d7c12e425fe",
+    "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+    "balanced_frames": 606,
+    "runtime_sha256": "d0e80502e363efd9b4a0089ef41b44c86328e8e96485c0e50acedd1b0f5c40a8"
+  },
+  "full_Release": {
+    "initial_revision": "b73fd2dfc7bb52c05744c5561b326d10aa22b64f",
+    "initial_invocation": "a8085bcfd42640db86ff658687cd4f5c",
+    "diagnosis": "The private paint-sampling access header lacked a declaration of SourceMaterialBindings.",
+    "initial_build_sha256": "ab7ed8f1e13ccf838f4603421c3a9e6414d0c1897607dd87c5a9db3b3989d7c7",
+    "repair_revision": "a2646a2898d8141fe43fc673d79b41bddabeef1e",
+    "resumed_invocation": "885464701cc54ec299a59901034a9294",
+    "resumed_unit": "ds-full-release-paint-header-20261127.service",
+    "phase_at_recording": "resume frozen Release build from the existing compiler cache",
+    "recompiled_sources": [
+      "tests/paint-sampling-grid.cpp",
+      "tests/paint-sampling-archive.cpp"
+    ]
+  },
+  "scope": "Two fully authored layers on native mixed FLOAT and common paint. Physical headset and AMD and NVIDIA hardware execution remain open."
+}

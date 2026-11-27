@@ -273,10 +273,20 @@ visible FLOAT emission and a separate hidden mask. Reconstruction composes
 each sampled texel using its actual contributing channel groups and
 keeps the same measured error limits for hidden and visible paint. The
 native worker, DomeD Wayland and synthetic OpenXR save the same project.
-Two fully dense layers exceed the normal work budget on the tested
-fixture. Broader dense layer stacks and physical-device acceptance remain
-required.
+At this checkpoint two fully dense layers exceeded the normal work
+budget on the tested fixture.
 [Dense paint reduction validation](validation/paint-grid-dense-20261127.json)
+
+The same default worker now accepts two fully authored 1024-pixel layers
+reducing to 512, with the second layer either hidden or visible. The
+reduction proves absent common channels from the stored data, including
+raw paint with zero coverage. The reconstruction limits, RMS sample
+counts, masks and independent FLOAT emission stay intact. CPU and Arc
+save identical projects and match the previous exact error measurements.
+Wayland and synthetic OpenXR pass the fully visible case. Broader dense
+layer stacks, additional material channels and physical-device acceptance
+remain required.
+[Two dense paint layers validation](validation/paint-grid-channel-filter-20261127.json)
 
 Native multi-material retopology preserves independently painted and baked
 grids and original VRM 1.0 joint links when Apply changes the patch.
