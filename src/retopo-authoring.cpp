@@ -360,6 +360,11 @@ void RetopoWorkspace::edit(RetopoAction action, Vec3 point, float snap_mm,
       if (selected.size() != 2) throw std::runtime_error("Select two edge endpoints");
       if (action == RetopoAction::Wire) draft.add_edge(selected[0], selected[1]);
       else draft.toggle_seam(selected[0],selected[1],cancelled);
+    } else if (action == RetopoAction::SubdivideEdge) {
+      if (selected.size() != 2) throw std::runtime_error("Select the two endpoints of an existing edge");
+      const auto edge = draft.edge_between(selected[0],selected[1]);
+      if (!edge) throw std::runtime_error("Connect the endpoints before subdividing an edge");
+      selected = {draft.subdivide_edge(edge,cancelled)};
     } else if (action == RetopoAction::Pin) {
       if (selected.empty()) throw std::runtime_error("Select points to pin or unpin");
       bool pin = std::any_of(selected.begin(), selected.end(), [&](auto id) { return !draft.vertices().at(id).pinned; });
@@ -391,6 +396,8 @@ void RetopoWorkspace::edit(RetopoAction action, Vec3 point, float snap_mm,
   }
   view_.can_undo = !undo_.empty() || (gesture_ && gesture_->topology != view_.topology);
   view_.can_redo = !redo_.empty() && !gesture_;
+  view_.selected_edge_id = view_.selected.size() == 2 ?
+      view_.topology->edge_between(view_.selected[0],view_.selected[1]) : 0;
   view_.changed = view_.topology != original_;
   ++view_.revision;
 }
@@ -404,32 +411,79 @@ bool same_patch_surface(const RetopoSurface &a, const RetopoSurface &b) {
          std::ranges::equal(a.mesh.positions, b.mesh.positions, same_position);
 }
 
+using StableTriangle = std::array<TopologyID,3>;
+
+StableTriangle combine_corner_support(std::initializer_list<StableTriangle> corners) {
+  StableTriangle result{};
+  size_t used = 0;
+  for (const auto &corner : corners) {
+    if (!corner[0]) return {};
+    for (auto id : corner) {
+      if (!id || std::ranges::find(result,id) != result.end()) continue;
+      if (used == result.size()) return {};
+      result[used++] = id;
+    }
+  }
+  std::ranges::sort(std::span(result).first(used));
+  return result;
+}
+
 std::vector<uint32_t> match_patch_triangles(const RetopoSurface &before, const RetopoSurface &after,
-                                           const RetopoMesh &replacement,
+                                           const RetopoMesh &previous, const RetopoMesh &replacement,
                                            const std::function<bool()> &cancelled) {
   auto corners = [](const RetopoSurface &surface, size_t face) {
-    std::array<TopologyID,3> ids;
+    StableTriangle ids;
     for (size_t k = 0; k < ids.size(); ++k)
       ids[k] = surface.source_vertices[surface.mesh.indices[face * 3 + k]];
     std::ranges::sort(ids);
     return ids;
   };
+  // Stop at vertices in the preceding topology, even if they were created
+  // by an earlier subdivision. Material correspondence is to that generation.
+  std::map<TopologyID,StableTriangle> midpoint_support;
+  const auto support = [&](TopologyID id) -> StableTriangle {
+    if (previous.vertices().contains(id)) return {id,0,0};
+    const auto found = midpoint_support.find(id);
+    return found == midpoint_support.end() ? StableTriangle{} : found->second;
+  };
+  for (const auto &[id,vertex] : replacement.vertices()) {
+    stop(cancelled);
+    const auto [a,b] = vertex.split_edge;
+    if (a && !previous.vertices().contains(id))
+      midpoint_support.emplace(id,combine_corner_support({support(a),support(b)}));
+  }
+  std::map<StableTriangle,uint32_t> source_triangles;
   std::vector<uint32_t> result(after.source_faces.size(), UINT32_MAX);
   for (size_t i = 0; i < result.size(); ++i) {
     if ((i & 1023) == 0) stop(cancelled);
     const auto ids = corners(after, i);
+    const auto original = midpoint_support.empty() ? StableTriangle{} :
+        combine_corner_support({support(ids[0]),support(ids[1]),support(ids[2])});
     const auto face = after.source_faces[i];
     for (auto parent : {face, replacement.faces().at(face).split_from}) {
       if (!parent) break;
       const auto candidates = std::ranges::equal_range(before.source_faces, parent);
       for (auto it = candidates.begin(); it != candidates.end(); ++it) {
         const auto candidate = size_t(it - before.source_faces.begin());
-        if (corners(before, candidate) == ids) {
+        const auto old_corners = corners(before,candidate);
+        if (old_corners == ids || old_corners == original) {
           result[i] = uint32_t(candidate);
           break;
         }
       }
       if (result[i] != UINT32_MAX) break;
+    }
+    if (result[i] != UINT32_MAX || !original[2]) continue;
+    if (source_triangles.empty()) {
+      for (size_t triangle = 0; triangle < before.source_faces.size(); ++triangle) {
+        if ((triangle & 1023) == 0) stop(cancelled);
+        const auto [position, inserted] = source_triangles.try_emplace(corners(before,triangle),uint32_t(triangle));
+        if (!inserted) position->second = UINT32_MAX;
+      }
+    }
+    if (const auto found = source_triangles.find(original); found != source_triangles.end()) {
+      if (found->second == UINT32_MAX) throw std::invalid_argument("Retopology subdivision has ambiguous material ancestry");
+      result[i] = found->second;
     }
   }
   return result;
@@ -880,7 +934,7 @@ uint64_t publish_retopology(Scene &scene, const RetopoMesh &topology, uint64_t s
       texture_sets = previous.texture_sets;
     } else {
       const auto size = previous.painted->resolution();
-      auto source_triangles = match_patch_triangles(old_surface, triangles, patch->topology, cancelled);
+      auto source_triangles = match_patch_triangles(old_surface, triangles, original, patch->topology, cancelled);
       unwrap(triangles.mesh, size, 4, cancelled);
       PaintSurfaceOptions options;
       options.cancelled = cancelled;

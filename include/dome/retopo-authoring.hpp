@@ -12,13 +12,14 @@ struct RetopoPatch {
 enum class RetopoAction {
   BeginGesture, Sample, EndGesture, CancelGesture,
   Mode, Face, Wire, Delete, Pin, Seam, Relax, Snap, Clear, Undo, Redo, PlaceMode, MoveMode,
-  BridgeEdges, ExtrudeMode
+  BridgeEdges, ExtrudeMode, SubdivideEdge
 };
 struct RetopoView {
   std::shared_ptr<const RetopoMesh> topology;
   std::shared_ptr<const SurfaceQuery> source;
   CanvasTransform transform{};
   std::vector<TopologyID> selected;
+  TopologyID selected_edge_id = 0;
   uint64_t revision = 1;
   bool moving = false, can_undo = false, can_redo = false, changed = false;
   bool busy = false, committing = false;

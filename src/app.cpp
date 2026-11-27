@@ -690,6 +690,7 @@ struct App {
     menu.add("&Mesh/Retopology/Extrude edge", 0, command, this, FL_MENU_RADIO);
     menu.add("&Mesh/Retopology/Make face", 0, command, this);
     menu.add("&Mesh/Retopology/Connect edge", 0, command, this);
+    menu.add("&Mesh/Retopology/Subdivide edge", 0, command, this);
     menu.add("&Mesh/Retopology/Bridge edges", 0, command, this);
     menu.add("&Mesh/Retopology/Delete points", 0, command, this);
     menu.add("&Mesh/Retopology/Pin points", 0, command, this);
@@ -1025,6 +1026,7 @@ struct App {
     size_t selected = retopo ? retopo->selected.size() : 0;
     enable("&Mesh/Retopology/Make face", editing && selected >= 3);
     enable("&Mesh/Retopology/Connect edge", editing && selected == 2);
+    enable("&Mesh/Retopology/Subdivide edge", editing && retopo->selected_edge_id);
     enable("&Mesh/Retopology/Bridge edges", editing && selected == 4);
     enable("&Mesh/Retopology/Extrude edge", editing && selected == 2);
     enable("&Mesh/Retopology/Seam edge", editing && selected == 2);
@@ -1421,6 +1423,8 @@ struct App {
       canvas.document.edit_retopology(label == "Extrude edge" ? RetopoAction::ExtrudeMode : label == "Move points" ? RetopoAction::MoveMode : RetopoAction::PlaceMode);
     } else if (label == "Projection distance...") {
       edit_retopology_distance(canvas.document);
+    } else if (label == "Subdivide edge") {
+      canvas.document.edit_retopology(RetopoAction::SubdivideEdge);
     } else if (label == "Make face" || label == "Connect edge" || label == "Bridge edges" || label == "Delete points" ||
                label == "Pin points" || label == "Seam edge" || label == "Relax patch" ||
                label == "Snap points" || label == "Clear point selection") {

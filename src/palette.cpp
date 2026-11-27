@@ -504,7 +504,14 @@ void SpatialPalette::raster(const EditorState &s) {
     if (!s.menu_enabled[i])
       for (int c = 0; c < 3; ++c)
         label_color[c] = uint8_t((int(fg[c]) + bg[c]) / 2);
-    const std::string label = s.menu_page==11 && i==0 && s.can_attach_avatar_accessory ? "Attach to bone" : s.menu_page==14&&i==7&&s.skin_options.mode==SkinAuthoringMode::SurfaceHeat&&s.selected_objects.size()>1 ? "Bind selected" : s.menu_page==16 && s.retopology && i==3 && s.retopology->selected.size()==4 ? "Bridge edges" : s.menu_page==16 && s.retopology && i==1 ? (s.retopology->extruding?"Extrude edge":s.retopology->moving?"Move points":"Place points") : s.menu_page==27?rig_fit_tool_label(s.rig_fit.get(),i):s.menu_page==25?projection_tool_label(s.projection.get(),i):s.menu_page==19&&i==0 ? (s.polygon?"Resume editing":s.polygon_has_source?"Edit / original":s.polygon_requires_conversion?"Convert / source":"Start editing") : s.menu_page == 16 && i == 0 && s.retopology ? "Resume patch" : s.menu_page == 15 && i == 0 && s.sculpt_settings.mask_edit ? "Resume mask" : labels[i];
+    std::string label = s.menu_page==11 && i==0 && s.can_attach_avatar_accessory ? "Attach to bone" : s.menu_page==14&&i==7&&s.skin_options.mode==SkinAuthoringMode::SurfaceHeat&&s.selected_objects.size()>1 ? "Bind selected" : s.menu_page==27?rig_fit_tool_label(s.rig_fit.get(),i):s.menu_page==25?projection_tool_label(s.projection.get(),i):s.menu_page==19&&i==0 ? (s.polygon?"Resume editing":s.polygon_has_source?"Edit / original":s.polygon_requires_conversion?"Convert / source":"Start editing") : s.menu_page == 15 && i == 0 && s.sculpt_settings.mask_edit ? "Resume mask" : labels[i];
+    if (s.menu_page == 16 && s.retopology) {
+      const auto &patch = *s.retopology;
+      if (i == 0) label = "Resume patch";
+      if (i == 1) label = patch.extruding ? "Extrude edge" : patch.moving ? "Move points" : "Place points";
+      if (i == 3 && patch.selected.size() == 4) label = "Bridge edges";
+      if (i == 3 && patch.selected_edge_id) label = "Subdivide edge";
+    }
     int cell = 102 * unit_;
     auto fitted = text_font_->layout(label, cell);
     size_t split = std::string::npos;

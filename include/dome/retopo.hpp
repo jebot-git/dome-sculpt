@@ -10,6 +10,7 @@ struct RetopoVertex {
   Vec3 position{};
   std::array<float, 2> uv{};
   bool pinned = false;
+  std::array<TopologyID, 2> split_edge{};
 };
 struct RetopoEdge {
   TopologyID a = 0, b = 0;
@@ -55,8 +56,11 @@ public:
   TopologyID add_vertex(RetopoVertex);
   TopologyID add_edge(TopologyID a, TopologyID b, bool seam = false);
   TopologyID add_face(std::span<const TopologyID>, uint32_t material = 0);
+  TopologyID edge_between(TopologyID a, TopologyID b) const { return edge_id(a, b); }
   // Toggle a seam, or turn the current diagonal of a quad into one.
   void toggle_seam(TopologyID a, TopologyID b, const std::function<bool()> &cancelled = {});
+  // Keep the existing edge ID on its first half. Retain both halves of a seam.
+  TopologyID subdivide_edge(TopologyID, const std::function<bool()> &cancelled = {});
   // Ordered quad boundary: first/second and third/fourth must be existing,
   // disjoint wire or boundary edges. Existing IDs/materials/seams survive.
   TopologyID bridge_edges(std::array<TopologyID, 4>,

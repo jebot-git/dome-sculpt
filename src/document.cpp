@@ -3559,9 +3559,11 @@ void Document::command_locked(SpatialCommand command) {
     if (command == SpatialCommand::RetopoApply || command == SpatialCommand::RetopoCancel)
       end_retopology_locked(command == SpatialCommand::RetopoApply);
     else {
+      const auto &view = *state_.retopology;
       auto action = command == SpatialCommand::RetopoMode ? RetopoAction::Mode
           : command == SpatialCommand::RetopoFace ? RetopoAction::Face
-          : command == SpatialCommand::RetopoWire ? (state_.retopology->selected.size() == 4 ? RetopoAction::BridgeEdges : RetopoAction::Wire)
+          : command == SpatialCommand::RetopoWire ? (view.selected.size() == 4 ? RetopoAction::BridgeEdges :
+                view.selected_edge_id ? RetopoAction::SubdivideEdge : RetopoAction::Wire)
           : command == SpatialCommand::RetopoDelete ? RetopoAction::Delete
           : command == SpatialCommand::RetopoRelax ? RetopoAction::Relax
           : command == SpatialCommand::RetopoPin ? RetopoAction::Pin : RetopoAction::Seam;

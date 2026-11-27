@@ -269,6 +269,54 @@ void RetopoMesh::toggle_seam(TopologyID a, TopologyID b, const std::function<boo
   draft.validate(cancelled);
   *this = std::move(draft);
 }
+TopologyID RetopoMesh::subdivide_edge(TopologyID id, const std::function<bool()> &cancelled) {
+  stop(cancelled);
+  const auto existing = edges_.at(id);
+  const auto [a,b,seam] = existing;
+  const auto &first = vertices_.at(a), &last = vertices_.at(b);
+  const Vec3 center{std::midpoint(first.position.x,last.position.x),std::midpoint(first.position.y,last.position.y),
+                    std::midpoint(first.position.z,last.position.z)};
+  const auto collapsed = [&](Vec3 p) { return center.x == p.x && center.y == p.y && center.z == p.z; };
+  if (collapsed(first.position) || collapsed(last.position))
+    throw std::invalid_argument("Edge is too short to subdivide at the current precision");
+  RetopoMesh draft = *this;
+  const auto midpoint = draft.add_vertex({
+      center,
+      {std::midpoint(first.uv[0],last.uv[0]),std::midpoint(first.uv[1],last.uv[1])},false,edge(a,b)});
+  draft.edges_.at(id).b = midpoint;
+  draft.add_edge(midpoint,b,seam);
+  for (const auto &[face_id, face] : faces_) {
+    stop(cancelled);
+    const auto endpoint = std::ranges::find(face.vertices,a);
+    if (endpoint == face.vertices.end()) continue;
+    const auto i = size_t(endpoint - face.vertices.begin()), n = face.vertices.size();
+    if (face.vertices[(i+1)%n] != b && face.vertices[(i+n-1)%n] != b) continue;
+    std::vector<std::array<TopologyID,3>> replacement;
+    for (auto t : face_triangles(face,vertices_)) {
+      const std::array corners{face.vertices[t[0]],face.vertices[t[1]],face.vertices[t[2]]};
+      size_t start = 0;
+      while (start < 3 && edge(corners[start],corners[(start+1)%3]) != edge(a,b)) ++start;
+      if (start == 3) replacement.push_back(corners);
+      else {
+        replacement.push_back({corners[start],midpoint,corners[(start+2)%3]});
+        replacement.push_back({midpoint,corners[(start+1)%3],corners[(start+2)%3]});
+      }
+    }
+    for (size_t t = 0; t < replacement.size(); ++t) {
+      const auto &corners = replacement[t];
+      for (size_t k = 0; k < corners.size(); ++k) draft.add_edge(corners[k],corners[(k+1)%3]);
+      if (!t) draft.faces_.at(face_id).vertices.assign(corners.begin(),corners.end());
+      else {
+        if (draft.faces_.size() >= budget || draft.next_ == UINT64_MAX)
+          throw std::length_error("Topology face/ID budget exceeded");
+        draft.faces_.emplace(draft.next_++,RetopoFace{{corners.begin(),corners.end()},face.material,face_id});
+      }
+    }
+  }
+  draft.validate(cancelled);
+  *this = std::move(draft);
+  return midpoint;
+}
 void RetopoMesh::remove_face(TopologyID id) {
   RetopoMesh draft = *this;
   if (!draft.faces_.erase(id))
@@ -380,6 +428,10 @@ void RetopoMesh::validate(const std::function<bool()> &fn) const {
       stop(fn);
     identity(id);
     vertex(v);
+    const auto [a,b] = v.split_edge;
+    if ((a || b) && (!a || a >= b || b >= id || edges_.contains(a) || edges_.contains(b) ||
+                     faces_.contains(a) || faces_.contains(b)))
+      throw std::runtime_error("Invalid retopology edge subdivision origin");
   }
   std::map<Edge, TopologyID> indexed;
   for (auto &[id, e] : edges_) {
@@ -592,19 +644,26 @@ std::string RetopoMesh::encode() const {
                       {"vertices", nlohmann::json::array()},
                       {"edges", nlohmann::json::array()},
                       {"faces", nlohmann::json::array()}};
-  for (auto &[id, v] : vertices_)
-    j["vertices"].push_back(
-        {id, {v.position.x, v.position.y, v.position.z}, v.uv, v.pinned});
+  int version = 1;
+  for (auto &[id, v] : vertices_) {
+    auto vertex = nlohmann::json::array({id, {v.position.x, v.position.y, v.position.z}, v.uv, v.pinned});
+    if (v.split_edge[0]) {
+      version = detail::retopo_subdivision_archive_version;
+      vertex.push_back(v.split_edge);
+    }
+    j["vertices"].push_back(std::move(vertex));
+  }
   for (auto &[id, e] : edges_)
     j["edges"].push_back({id, e.a, e.b, e.seam});
   for (auto &[id, f] : faces_) {
     auto face = nlohmann::json::array({id, f.vertices, f.material});
     if (f.split_from) {
-      j["version"] = detail::retopo_split_archive_version;
+      version = std::max(version,detail::retopo_split_archive_version);
       face.push_back(f.split_from);
     }
     j["faces"].push_back(std::move(face));
   }
+  j["version"] = version;
   return j.dump();
 }
 RetopoMesh RetopoMesh::decode(std::string_view text) {
@@ -632,7 +691,8 @@ RetopoMesh RetopoMesh::decode(std::string_view text) {
   auto j = nlohmann::json::parse(text);
   if (!detail::retopo_archive_shape(j))
     throw std::runtime_error("Unsupported topology format");
-  const bool split_records = j.at("version") == detail::retopo_split_archive_version;
+  const int version = j.at("version");
+  const bool split_records = version >= detail::retopo_split_archive_version;
   RetopoMesh out;
   out.next_ = json_id(j.at("next"));
   for (auto name : {"vertices", "edges", "faces"})
@@ -641,16 +701,22 @@ RetopoMesh RetopoMesh::decode(std::string_view text) {
             (std::string_view(name) == "edges" ? budget * 3 : budget))
       throw std::length_error("Topology record budget exceeded");
   for (auto &v : j.at("vertices")) {
-    if (!v.is_array() || v.size() != 4 || !v[1].is_array() ||
+    if (!v.is_array() || (v.size() != 4 && !(version == detail::retopo_subdivision_archive_version && v.size() == 5)) ||
+        !v[1].is_array() ||
         v[1].size() != 3 || !v[2].is_array() || v[2].size() != 2 ||
         !v[3].is_boolean())
       throw std::runtime_error("Invalid topology vertex record");
+    Edge parent{};
+    if (v.size() == 5) {
+      if (!v[4].is_array() || v[4].size() != 2) throw std::runtime_error("Invalid subdivision origin record");
+      parent = {json_id(v[4][0]),json_id(v[4][1])};
+    }
     if (!out.vertices_
              .emplace(json_id(v[0]),
                       RetopoVertex{{v[1][0].get<float>(), v[1][1].get<float>(),
                                     v[1][2].get<float>()},
                                    v[2].get<std::array<float, 2>>(),
-                                   v[3].get<bool>()})
+                                   v[3].get<bool>(),parent})
              .second)
       throw std::runtime_error("Duplicate topology vertex ID");
   }

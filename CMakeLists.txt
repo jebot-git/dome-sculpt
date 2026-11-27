@@ -727,7 +727,8 @@ if(BUILD_TESTING)
   add_executable(dome-sculpt-retopo-surface-heat-test tests/retopo-surface-heat.cpp)
   target_include_directories(dome-sculpt-retopo-surface-heat-test PRIVATE src)
   target_link_libraries(dome-sculpt-retopo-surface-heat-test PRIVATE dome-sculpt-core)
-  foreach(workflow IN ITEMS affine-wire mixed-material material-seam-plain material-seam-affine mtoon-plain mtoon-affine mtoon-v0)
+  foreach(workflow IN ITEMS affine-wire mixed-material material-seam-plain material-seam-affine
+                           subdivide-seam-plain subdivide-seam-affine mtoon-plain mtoon-affine mtoon-v0)
     add_test(NAME retopology-${workflow} COMMAND dome-sculpt-retopo-surface-heat-test
       ${CMAKE_CURRENT_BINARY_DIR}/retopology-${workflow} ${workflow})
     set_tests_properties(retopology-${workflow} PROPERTIES TIMEOUT 480)

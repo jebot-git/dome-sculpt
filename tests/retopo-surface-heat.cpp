@@ -744,7 +744,7 @@ void mixed_material_quad(const std::filesystem::path &out) {
         "The source raster remains exact after the new material allocation");
 }
 
-void split_material_seam(bool affine, const std::filesystem::path &out) {
+void split_material_seam(bool affine, const std::filesystem::path &out, bool subdivide=false) {
   auto scene = reference(affine);
   const auto donor = scene.active().id;
   RetopoMesh quad;
@@ -767,6 +767,15 @@ void split_material_seam(bool affine, const std::filesystem::path &out) {
   wired.toggle_seam(b,d);
   check(wired.faces().size()==2 && wired.edges().size()==5 && wired.edges().at(wire).seam,
         "An existing diagonal wire becomes the real seam without changing its ID");
+  if (subdivide) {
+    auto boundary = quad;
+    const auto edge = boundary.edge_between(b,c);
+    boundary.set_seam(edge,true);
+    const auto added = boundary.subdivide_edge(edge);
+    check(boundary.faces().size()==3 && boundary.edges().at(edge).b==added &&
+          boundary.edges().at(boundary.edge_between(added,c)).seam,
+          "Subdividing a quad boundary retains the edge ID and both seam halves without a T-junction");
+  }
 
   const auto original = publish_retopology(scene,quad,donor,{});
   if (affine) scene.active().affine_edit = scene.object(donor).affine_edit;
@@ -825,10 +834,56 @@ void split_material_seam(bool affine, const std::filesystem::path &out) {
   check(doc.undo() && doc.wait_retopology() && doc.frame().state->retopology->topology==unsplit &&
         doc.redo() && doc.wait_retopology() && doc.frame().state->retopology->topology==split,
         "Draft Undo and Redo restore the exact seam and selection snapshots");
-  if (!affine) {
+  if (!affine && !subdivide) {
     auto reference = scene.snapshot();
     publish_retopology(reference,*split,donor,doc.frame().state->retopology->transform);
     reference.save(out/"seam-only-reference.dsculpt");
+  }
+
+  TopologyID middle=0,quarter=0;
+  if (subdivide) {
+    const auto edge = split->edge_between(b,d);
+    check(edge && doc.frame().state->retopology->selected_edge_id==edge,
+          "The selected shared edge enables the document subdivision command");
+    SpatialFrame input;
+    input.focused=input.head_valid=true;
+    input.head.position={0,1.6f,0};
+    input.hands[1].tracked.valid=true;
+    const auto send = [&](float y=0,bool click=false) {
+      ++input.sequence;input.time+=.02;
+      input.hands[1].y=y;input.hands[1].joystick=click;
+      doc.submit(input);
+      check(doc.wait_input(),"Controller submission drains through the normal input worker");
+    };
+    send();send(0,true);send();
+    check(doc.frame().state->menu && doc.frame().state->menu_page==16,
+          "The controller opens the Retopology palette with the selected edge");
+    send(1);send(1,true);send();
+    drafted(doc);
+    doc.cancel_spatial_menu();
+    const auto first = doc.frame().state->retopology;
+    check(first->selected.size()==1 && first->topology->faces().size()==4,
+          "The controller edge sector actually subdivides both incident faces");
+    middle=first->selected.front();
+    check(first->topology->edges().at(edge).b==middle && !first->topology->vertices().at(middle).pinned,
+          "The new midpoint is the editable selection and keeps the first edge ID");
+    if (!affine) {
+      auto reference = scene.snapshot();
+      publish_retopology(reference,*first->topology,donor,first->transform);
+      reference.save(out/"subdivision-only-reference.dsculpt");
+    }
+    choose(b);
+    doc.edit_retopology(RetopoAction::SubdivideEdge);
+    drafted(doc);
+    const auto repeat = doc.frame().state->retopology;
+    check(repeat->selected.size()==1 && repeat->topology->faces().size()==6 &&
+          std::ranges::count_if(repeat->topology->edges(),[](const auto &e){return e.second.seam;})==3,
+          "The desktop command subdivides a seam half again and retains all three seam segments");
+    quarter=repeat->selected.front();
+    const auto saved_subdivision=repeat->topology->encode();
+    check(nlohmann::json::parse(saved_subdivision).at("version")==3 &&
+          RetopoMesh::decode(saved_subdivision).encode()==saved_subdivision,
+          "Native subdivision provenance survives an independent topology decode");
   }
 
   doc.edit_retopology(RetopoAction::MoveMode);
@@ -836,7 +891,8 @@ void split_material_seam(bool affine, const std::filesystem::path &out) {
   const auto drag = [&](TopologyID id, Vec3 destination) {
     check(doc.begin_desktop(),"Move admits a regular gesture on the new seam");
     Brush brush;
-    brush.from = brush.to = point(world,quad.vertices().at(id).position);
+    const auto current = doc.frame().state->retopology;
+    brush.from = brush.to = point(affine_similarity(current->transform),current->topology->vertices().at(id).position);
     doc.stamp_desktop(brush);
     drafted(doc);
     brush.to = point(world,destination);
@@ -846,6 +902,10 @@ void split_material_seam(bool affine, const std::filesystem::path &out) {
   };
   const Vec3 new_b{.08f,-.32f,0}, new_d{-.32f,.08f,0};
   drag(b,new_b);
+  if (subdivide) {
+    drag(quarter,{-.02f,-.22f,0});
+    drag(middle,{-.12f,-.12f,0});
+  }
   drag(d,new_d);
   const auto center = (new_b + new_d + quad.vertices().at(c).position)/3.f;
   check(SurfaceQuery(scene.active().painted->mesh()).closest(center).triangle==0,
@@ -857,9 +917,14 @@ void split_material_seam(bool affine, const std::filesystem::path &out) {
   const auto &object = applied.active();
   const auto topology = object.retopology->topology.triangulate();
   const auto slots = object.texture_sets->triangle_sets();
-  check(topology.source_faces.size()==2 && slots[0]==0 && slots[1]==secondary &&
-        object.retopology->topology.faces().rbegin()->second.split_from==face,
-        "Apply assigns both parts by original material-side identity across the transformed seam");
+  const size_t per_side = subdivide ? 3 : 1;
+  check(topology.source_faces.size()==2*per_side && slots.size()==2*per_side,
+        "Apply keeps both sides of the editable seam");
+  for(size_t triangle=0;triangle<slots.size();++triangle) {
+    const auto corner = [&](size_t k){return topology.source_vertices[topology.mesh.indices[3*triangle+k]];};
+    const bool blue = corner(0)==c || corner(1)==c || corner(2)==c;
+    check(slots[triangle]==(blue?secondary:0),"Every child face keeps its original material-side identity");
+  }
   for (const auto set : {0u,secondary}) {
     const auto field = texture_set_view(object,set);
     const auto channel = set ? 2 : 0;
@@ -877,15 +942,34 @@ void split_material_seam(bool affine, const std::filesystem::path &out) {
   doc.export_asset(out/"standard.glb",AssetExportFormat::Glb).get();
   doc.export_asset(out/"editable.glb",AssetExportFormat::EditableGlb512).get();
   const auto portable = import_mesh(out/"standard.glb");
-  check(portable.primitives.size()==2 && std::ranges::all_of(portable.primitives,[](const auto &primitive) {
-          return primitive.mesh.indices.size()==3;
-        }),"The Standard GLB carries each new material side as its own triangle");
+  check(portable.primitives.size()==2 && std::ranges::all_of(portable.primitives,[&](const auto &primitive) {
+          return primitive.mesh.indices.size()==3*per_side;
+        }),"The Standard GLB carries every new triangle in its material primitive");
   std::ifstream editable(out/"editable.glb",std::ios::binary);
   const std::vector<uint8_t> bytes{std::istreambuf_iterator<char>(editable),{}};
   const auto reopened = extract_native_authoring(bytes);
   check(reopened && reopened->encode()==exact && doc.undo() && doc.copy_scene().encode()==before &&
         doc.redo() && doc.copy_scene().encode()==exact,
         "Editable GLB and global Undo and Redo retain the exact two authoring generations");
+  if (subdivide) {
+    doc.open_async(out/"after-seam.dsculpt").get();
+    settled(doc);
+    doc.begin_retopology();
+    drafted(doc);
+    const auto current = doc.frame().state->retopology;
+    for (auto id : {b,quarter})
+      touch(doc,point(affine_similarity(current->transform),current->topology->vertices().at(id).position));
+    doc.edit_retopology(RetopoAction::SubdivideEdge);
+    drafted(doc);
+    doc.end_retopology(true);
+    doc.save_async(out/"resubdivided.dsculpt").get();
+    settled(doc);
+    const auto next = doc.copy_scene();
+    const auto next_slots = next.active().texture_sets->triangle_sets();
+    check(next_slots.size()==8 && std::ranges::count(next_slots,secondary)==4 &&
+          Scene::load(out/"resubdivided.dsculpt").encode()==next.encode(),
+          "A cold project subdivides a moved seam again using the last saved material-side geometry");
+  }
 }
 
 SourceMaterialBindings retopo_toon_binding(const TextureSetView &slot,bool trim,bool legacy) {
@@ -1321,7 +1405,7 @@ int main(int argc,char **argv) try {
       mode!="mtoon-plain" && mode!="mtoon-affine" && mode!="mtoon-v0" &&
       mode!="reapply-plain" && mode!="reapply-affine" && mode!="prepared-plain" && mode!="prepared-affine" &&
       mode!="restore-plain" && mode!="restore-affine" && mode!="material-seam-plain" &&
-      mode!="material-seam-affine") return 2;
+      mode!="material-seam-affine" && mode!="subdivide-seam-plain" && mode!="subdivide-seam-affine") return 2;
   const std::filesystem::path out = argv[1];
   std::filesystem::create_directories(out);
   setenv("XDG_STATE_HOME",(out/"state").c_str(),1);
@@ -1330,6 +1414,7 @@ int main(int argc,char **argv) try {
   else if (mode=="affine-wire") affine_wire_edit(out);
   else if (mode=="mixed-material") mixed_material_quad(out);
   else if (mode.starts_with("material-seam-")) split_material_seam(mode.ends_with("affine"),out);
+  else if (mode.starts_with("subdivide-seam-")) split_material_seam(mode.ends_with("affine"),out,true);
   else if (mode.starts_with("mtoon-")) retopo_toon_materials(mode.ends_with("affine"),mode.ends_with("v0"),out);
   else if (mode.starts_with("prepared-")) prepared_geometry_edit(mode.ends_with("affine"),out);
   else if (mode.starts_with("reapply-")) reapply_patch(mode.ends_with("affine"),out);
