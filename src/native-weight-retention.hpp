@@ -9,7 +9,11 @@
 #include "dome/source-placement.hpp"
 #include "dome/bake-recipe.hpp"
 #include <array>
-namespace dome { struct SourceNormalUvLayout; }
+namespace dome {
+struct SourceNormalSampling;
+struct SourceColorPreparation;
+struct PolygonColorSurface;
+}
 namespace dome::detail {
 class CanonicalNormalUv;
 class NativePaintSampling;
@@ -101,7 +105,7 @@ struct Counter {
   }
   void frames(const std::shared_ptr<const NormalFrames>&p){if(enter(p)){add(sizeof(*p));vector(p->origin_vertices);vector(p->source_vertices);vector(p->source_corners);vector(p->normals);vector(p->tangents);vector(p->targets);for(auto&t:p->targets){vector(t.normals);vector(t.tangents);}leave(p);}}
   template<class T> void unsupported(const std::shared_ptr<T>&p,const char*message){std::shared_ptr<const void>empty;if(p||p.owner_before(empty)||empty.owner_before(p))throw std::invalid_argument(message);}
-  void frame_set(const std::shared_ptr<const NormalFrameSet>&p){if(enter(p)){unsupported(p->position_domain,"Native anatomical input has not yet admitted independent frame POSITION domains");add(sizeof(*p));frames(p->pbr);frames(p->mtoon);frames(p->canonical);vector(p->targets);for(auto&t:p->targets)vector(t.positions);vector(p->current_targets);leave(p);}}
+  void frame_set(const std::shared_ptr<const NormalFrameSet>&);
   void json(const nlohmann::json&j,size_t depth=0){
     if(depth>64)throw std::length_error("Native material JSON depth");add(sizeof(j));
     if(j.is_object()){for(auto&i:j.items()){add(128);text(i.key());json(i.value(),depth+1);}}
@@ -109,11 +113,16 @@ struct Counter {
     else if(j.is_string())text(j.get_ref<const std::string&>());
     else if(j.is_binary())add(j.get_binary().capacity()+64);
   }
+  void toon(const MToonMaterial &m) {
+    for (auto *value : NativeWeightMaterialAccess::json(m)) json(*value);
+    vector(m.diagnostics);
+    for (const auto &message : m.diagnostics) text(message);
+  }
   void material(const std::shared_ptr<const SourceMaterialBindings>&);
   void uv_origin(const std::shared_ptr<const SourceUvOrigin>&p){if(enter(p)){
     add(sizeof(*p));paint(p->paint);appearance(p->appearance);deformation(p->deformation);
     for(auto&t:p->roles)image(t.image);
-    if(p->material){for(auto*j:NativeWeightMaterialAccess::json(*p->material))json(*j);vector(p->material->diagnostics);for(auto&s:p->material->diagnostics)text(s);}
+    if(p->material)toon(*p->material);
     text(p->creator_kind);text(p->creator_parameters);leave(p);
   }}
   void paint(const std::shared_ptr<const PaintedMesh>&p,bool prospective=false){if(!enter(p))return;
@@ -164,7 +173,15 @@ struct Counter {
   void canonical_uv(const std::shared_ptr<const CanonicalNormalUv>&);
   void canonical_sampling(const std::shared_ptr<const CanonicalPaintSampling>&);
   void native_sampling(const std::shared_ptr<const NativePaintSampling>&);
-  void uv_layout(const std::shared_ptr<const SourceNormalUvLayout>&);
+  void position_domain(const std::shared_ptr<const FramePositionDomain>&);
+  void derived_key(const std::shared_ptr<const SourceKeyDerivation>&);
+  void native_frames(const std::shared_ptr<const NativePaintFrameSource>&);
+  void normal_preparation(const std::shared_ptr<const SourceNormalPreparation>&);
+  void normal_sampling(const std::shared_ptr<const SourceNormalSampling>&);
+  void color_preparation(const std::shared_ptr<const SourceColorPreparation>&);
+  template<class Layout> void uv_layout(const std::shared_ptr<const Layout>&);
+  void polygon_colors(const std::shared_ptr<const PolygonColorField>&);
+  void polygon_color_surface(const std::shared_ptr<const PolygonColorSurface>&);
   void polygon(const std::shared_ptr<const PolygonAuthority>&);
   void polygon_mesh(const PolygonMesh&);
   void polygon_owner(const std::shared_ptr<const PolygonSurfaceOwner>&);

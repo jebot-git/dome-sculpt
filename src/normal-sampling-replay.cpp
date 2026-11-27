@@ -152,7 +152,16 @@ bool SourceNormalSampling::has_sealed_metadata()const noexcept{return metadata_s
 namespace detail {
 struct NormalMetadataSealAccess {
  static void mint(SourceNormalSampling &p){p.metadata_seal_=std::make_shared<const SourceNormalSampling::MetadataSeal>(p);}
+ static std::pair<std::shared_ptr<const void>,size_t> retained(const SourceNormalSampling &p) {
+   const auto &seal=p.metadata_seal_;
+   if(!seal)return {};
+   if(!seal->matches(p))throw std::invalid_argument("Native weight input lost its sealed normal sampling source");
+   return {seal,sizeof(*seal)};
+ }
 };
+std::pair<std::shared_ptr<const void>,size_t> retained_normal_sampling_seal(const SourceNormalSampling &p) {
+  return NormalMetadataSealAccess::retained(p);
+}
 void authenticate_normal_sampling_metadata(std::shared_ptr<SourceNormalSampling> p,const std::function<bool()> &cancelled){
  if(!p)throw std::invalid_argument("Missing independent normal metadata source");
  p->validate(true,cancelled);stop(cancelled);

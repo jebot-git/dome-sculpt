@@ -4643,6 +4643,14 @@ if(BUILD_TESTING)
   set_tests_properties(native-paint-key-frames PROPERTIES TIMEOUT 600
     FIXTURES_SETUP native-paint-key-frames-model
     ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;XR_RUNTIME_JSON=${CMAKE_CURRENT_BINARY_DIR}/native-paint-key-no-physical-runtime.json")
+  add_test(NAME surface-heat-authored-frames COMMAND dome-sculpt-native-paint-key-frames-test --surface-heat
+    ${CMAKE_CURRENT_BINARY_DIR}/surface-heat-authored-frames
+    ${CMAKE_CURRENT_BINARY_DIR}/native-paint-key-frames/replaced.dsculpt
+    ${CMAKE_CURRENT_BINARY_DIR}/independent-seam-key-mirror-prepared/native-after.dsculpt
+    ${CMAKE_CURRENT_BINARY_DIR}/independent-seam-key-mirror-retained/native-after.dsculpt)
+  set_tests_properties(surface-heat-authored-frames PROPERTIES TIMEOUT 600
+    FIXTURES_REQUIRED "native-paint-key-frames-model;independent_mirror_prepared;independent_mirror_retained"
+    ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;XR_RUNTIME_JSON=${CMAKE_CURRENT_BINARY_DIR}/native-paint-key-no-physical-runtime.json")
   add_executable(dome-sculpt-native-paint-key-export-budget-test tests/native-paint-key-export-budget.cpp)
   target_include_directories(dome-sculpt-native-paint-key-export-budget-test PRIVATE src)
   target_link_libraries(dome-sculpt-native-paint-key-export-budget-test PRIVATE dome-sculpt-core)

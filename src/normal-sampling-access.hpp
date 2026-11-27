@@ -3,6 +3,9 @@
 #include "dome/normal-sampling.hpp"
 #include "dome/source-uv-bake.hpp"
 namespace dome::detail {
+// The seal owns copies of the same source pointers. Authenticate the copies
+// before another owner ledger follows the public source graph.
+std::pair<std::shared_ptr<const void>,size_t> retained_normal_sampling_seal(const SourceNormalSampling &);
 // Full independent replay precedes any private runtime metadata seal.
 void authenticate_normal_sampling_metadata(std::shared_ptr<SourceNormalSampling>,const std::function<bool()> & = {});
 // Replay only the normal/coverage metadata of the existing SourceUV transfer.

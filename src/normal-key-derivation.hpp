@@ -33,6 +33,7 @@ public:
   const std::vector<Vec3> &positions(uint64_t id) const;
   void validate(bool deep=true,const std::function<bool()> &cancelled={}) const;
 private:
+  friend struct native_weight_retention_impl::Counter;
   friend class KeyDerivationCodec;
   SourceKeyDerivation()=default;
   SourceKeyDerivation(const SourceKeyDerivation&)=delete;

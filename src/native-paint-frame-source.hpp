@@ -23,6 +23,7 @@ class NativePaintFrameSource final {
 
   NativePaintFrameSource()=default;
   NativePaintFrameSource(const NativePaintFrameSource&)=delete;
+  friend struct native_weight_retention_impl::Counter;
   friend class NativePaintFrameCodec;
   friend std::shared_ptr<const NativePaintFrameSource> capture_native_paint_frames(
       const SculptObject &,const NormalBakeFrameOptions &);

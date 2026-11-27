@@ -4,12 +4,27 @@
 #include "baked-normal-field.hpp"
 #include "canonical-normal-uv.hpp"
 #include "canonical-paint-sampling.hpp"
+#include "dome/color-paint-sampling.hpp"
 #include "dome/normal-sampling.hpp"
+#include "dome/polygon-color.hpp"
 #include "dome/texture-sets.hpp"
+#include "native-paint-frame-source.hpp"
 #include "native-paint-sampling.hpp"
+#include "normal-sampling-access.hpp"
 #include "texture-set-field-source.hpp"
 
 namespace dome::detail::native_weight_retention_impl {
+template<class Layout> void Counter::uv_layout(const std::shared_ptr<const Layout> &layout) {
+  if (!enter(layout)) return;
+  add(sizeof(*layout));
+  vector(layout->source_vertices);
+  vector(layout->indices);
+  vector(layout->uv);
+  vector(layout->pins);
+  vector(layout->seams);
+  leave(layout);
+}
+
 void Counter::paint_surface(const NativeWeightPaintAccess::Surface &surface) {
   if (!enter(surface.owner)) return;
   add(surface.bytes);
@@ -127,23 +142,164 @@ void Counter::baked(const std::shared_ptr<const BakedTextures> &paint) {
 
 void Counter::material(const std::shared_ptr<const SourceMaterialBindings> &binding) {
   if (!enter(binding)) return;
-  unsupported(binding->native_paint_frames,"Native surface weights require the retained native paint/frame closure adapter");
-  unsupported(binding->color_preparation,"Native anatomical budget has not yet admitted prepared colour closures");
-  unsupported(binding->normal_preparation,"Native anatomical budget has not yet admitted prepared normal closures");
-  unsupported(binding->key_derivation,"Native anatomical budget has not yet admitted key derivation closures");
   add(sizeof(*binding));
-  for (auto *value : NativeWeightMaterialAccess::json(binding->material)) json(*value);
-  vector(binding->material.diagnostics);
-  for (const auto &message : binding->material.diagnostics) text(message);
+  toon(binding->material);
   for (const auto &role : binding->roles) image(role.image);
   frame_set(binding->normal_frames);
   uv_origin(binding->uv_origin);
   canonical_conversion(binding->canonical_attributes);
   canonical_uv(binding->canonical_uv);
   native_sampling(binding->native_paint_sampling);
+  native_frames(binding->native_paint_frames);
+  color_preparation(binding->color_preparation);
+  normal_preparation(binding->normal_preparation);
+  derived_key(binding->key_derivation);
   canonical_sampling(binding->canonical_paint_sampling);
   polygon_owner(binding->polygon_surface_transfer);
   leave(binding);
+}
+
+void Counter::position_domain(const std::shared_ptr<const FramePositionDomain> &domain) {
+  if (!enter(domain)) return;
+  add(sizeof(*domain));
+  for (const auto &geometry : {domain->basis(), domain->before_basis(),
+                               domain->current_geometry(), domain->source_frame_basis()})
+    mesh(geometry);
+  vector(domain->current_vertices());
+  vector(domain->origin_vertices());
+  vector(domain->source_frame_vertices());
+  position_domain(domain->previous());
+  leave(domain);
+}
+
+void Counter::frame_set(const std::shared_ptr<const NormalFrameSet> &value) {
+  if (!enter(value)) return;
+  add(sizeof(*value));
+  frames(value->pbr);
+  frames(value->mtoon);
+  frames(value->canonical);
+  vector(value->targets);
+  for (const auto &target : value->targets) vector(target.positions);
+  vector(value->current_targets);
+  position_domain(value->position_domain);
+  leave(value);
+}
+
+void Counter::derived_key(const std::shared_ptr<const SourceKeyDerivation> &key) {
+  if (!enter(key)) return;
+  if (!key->valid_owner(key)) throw std::invalid_argument("Native weight input lost its derived shapekey owner");
+  add(sizeof(*key));
+  paint(key->before_paint());
+  material(key->before_material());
+  deformation(key->before_deformation());
+  appearance(key->before_appearance());
+  position_domain(key->position_domain());
+  frame_set(key->frames());
+  vector(key->targets());
+  vector(key->current_targets_);
+  leave(key);
+}
+
+void Counter::native_frames(const std::shared_ptr<const NativePaintFrameSource> &value) {
+  if (!enter(value)) return;
+  if (!value->valid_owner(value)) throw std::invalid_argument("Native weight input lost its native frame owner");
+  add(sizeof(*value));
+  paint(value->before_paint());
+  material(value->before_material());
+  uv_origin(value->origin());
+  frame_set(value->base_frames());
+  frame_set(value->frames());
+  derived_key(value->keys());
+  vector(value->metadata_);
+  for (const auto &role : value->role_owners_) frames(role);
+  for (const auto &domain : value->domain_owners_) position_domain(domain);
+  leave(value);
+}
+
+void Counter::normal_sampling(const std::shared_ptr<const SourceNormalSampling> &value) {
+  if (!enter(value)) return;
+  add(sizeof(*value));
+  const auto [seal, bytes] = retained_normal_sampling_seal(*value);
+  if (enter(seal)) {
+    add(bytes);
+    leave(seal);
+  }
+  uv_layout(value->layout);
+  normal_projection(value->projection);
+  paint(value->before_paint);
+  appearance(value->before_appearance);
+  deformation(value->before_deformation);
+  material(value->before_material);
+  material(value->sampling_material);
+  if (value->current_sampling_reference) toon(*value->current_sampling_reference);
+  sampling_domain(value->metadata_sampling_domain);
+  leave(value);
+}
+
+void Counter::color_preparation(const std::shared_ptr<const SourceColorPreparation> &value) {
+  if (!enter(value)) return;
+  add(sizeof(*value));
+  color_projection(value->projection);
+  color_projection(value->initial_projection);
+  paint(value->original_paint);
+  appearance(value->original_appearance);
+  deformation(value->original_deformation);
+  material(value->original_material);
+  polygon_color_surface(value->polygon_colors);
+  const auto &reprojection = value->uv_reprojection;
+  if (enter(reprojection)) {
+    add(sizeof(*reprojection));
+    uv_layout(reprojection->layout);
+    polygon_color_surface(reprojection->polygon_colors);
+    color_projection(reprojection->projection);
+    paint(reprojection->before_paint);
+    appearance(reprojection->before_appearance);
+    deformation(reprojection->before_deformation);
+    material(reprojection->before_material);
+    leave(reprojection);
+  }
+  const auto &sampling = value->paint_sampling;
+  if (enter(sampling)) {
+    add(sizeof(*sampling));
+    sampling_domain(sampling->domain());
+    uv_layout(sampling->layout());
+    polygon_color_surface(sampling->current_descriptor());
+    polygon_color_surface(sampling->sampling_descriptor());
+    paint(sampling->before_paint());
+    appearance(sampling->before_appearance());
+    deformation(sampling->before_deformation());
+    material(sampling->before_material());
+    attachment(sampling->geometry_attachment());
+    leave(sampling);
+  }
+  leave(value);
+}
+
+void Counter::normal_preparation(const std::shared_ptr<const SourceNormalPreparation> &value) {
+  if (!enter(value)) return;
+  add(sizeof(*value));
+  normal_projection(value->projection);
+  normal_projection(value->initial_projection);
+  frame_set(value->target_frames);
+  paint(value->original_paint);
+  appearance(value->original_appearance);
+  deformation(value->original_deformation);
+  material(value->original_material);
+  const auto &reprojection = value->uv_reprojection;
+  if (enter(reprojection)) {
+    add(sizeof(*reprojection));
+    uv_layout(reprojection->layout);
+    normal_projection(reprojection->projection);
+    paint(reprojection->before_paint);
+    appearance(reprojection->before_appearance);
+    deformation(reprojection->before_deformation);
+    material(reprojection->before_material);
+    leave(reprojection);
+  }
+  normal_sampling(value->sampling_domain);
+  derived_key(value->key_derivation);
+  canonical_conversion(value->canonical_conversion);
+  leave(value);
 }
 
 void Counter::canonical_conversion(const std::shared_ptr<const CanonicalNormalConversion> &value) {
@@ -157,17 +313,6 @@ void Counter::canonical_conversion(const std::shared_ptr<const CanonicalNormalCo
   frame_set(value->frames());
   normal_projection(value->projection());
   leave(value);
-}
-
-void Counter::uv_layout(const std::shared_ptr<const SourceNormalUvLayout> &layout) {
-  if (!enter(layout)) return;
-  add(sizeof(*layout));
-  vector(layout->source_vertices);
-  vector(layout->indices);
-  vector(layout->uv);
-  vector(layout->pins);
-  vector(layout->seams);
-  leave(layout);
 }
 
 void Counter::canonical_uv(const std::shared_ptr<const CanonicalNormalUv> &value) {
@@ -212,11 +357,33 @@ void Counter::polygon_mesh(const PolygonMesh &mesh) {
   for (const auto &face : mesh.faces()) vector(face.corners);
 }
 
+void Counter::polygon_colors(const std::shared_ptr<const PolygonColorField> &field) {
+  if (!enter(field)) return;
+  add(sizeof(*field));
+  shared_vector(field->source_owner());
+  vector(field->corners());
+  for (const auto &corner : field->corners()) vector(corner.provenance);
+  leave(field);
+}
+
+void Counter::polygon_color_surface(const std::shared_ptr<const PolygonColorSurface> &surface) {
+  if (!enter(surface)) return;
+  add(sizeof(*surface));
+  const auto &topology = surface->topology;
+  if (enter(topology)) {
+    add(sizeof(*topology));
+    polygon_mesh(*topology);
+    leave(topology);
+  }
+  polygon_colors(surface->field);
+  leave(surface);
+}
+
 void Counter::polygon(const std::shared_ptr<const PolygonAuthority> &value) {
   if (!enter(value)) return;
-  unsupported(value->colors,"Native weight input needs the polygon corner colour closure");
   add(sizeof(*value));
   polygon_mesh(value->topology);
+  polygon_colors(value->colors);
   origin(value->origin);
   leave(value);
 }

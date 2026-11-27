@@ -20,11 +20,17 @@ int main()try{
  auto frame=std::make_shared<NormalFrames>();frame->origin_vertex_count=3;frame->origin_vertices=m.indices;frame->normals=m.normals;auto frames=std::make_shared<NormalFrameSet>();frames->pbr=frame;frames->validate();
  auto origin=std::make_shared<SourceUvOrigin>();origin->paint=paint->snapshot();SourceMaterialBindings binding;binding.has_mtoon=false;binding.normal_frames=frames;binding.uv_origin=origin;
  auto domain=derive_frame_position_domain(paint->mesh_owner(),binding,{});domain->validate();auto derived=std::make_shared<NormalFrameSet>(*frames);derived->position_domain=domain;derived->validate();
- check(bad([&]{native_weight_retention_impl::Counter c(1024*1024);c.frame_set(derived);}),"Genuine separately owned frame POSITION domain refuses before unrepresented resource retention");
+ {native_weight_retention_impl::Counter c(1024*1024);c.frame_set(derived);const auto bytes=c.used,owners=c.count;
+  c.position_domain(domain);
+  check(owners>=5&&bytes>domain->storage_bytes()&&c.used==bytes&&c.count==owners,
+        "Independent POSITION geometry and correspondences are charged once across shared owners");
+  bool short_input=false;try{native_weight_retention_impl::Counter small(bytes-1);small.frame_set(derived);}
+  catch(const std::length_error&){short_input=true;}
+  check(short_input,"Missing one byte at the owning bound rejects the independently authored frame domain");}
  {native_weight_retention_impl::Counter c(1024*1024);c.frame_set(frames);check(c.count>0,"Ordinary represented native frame closure remains admitted");}
  auto owner=std::make_shared<int>(4);auto null=std::make_shared<NormalFrameSet>(*frames);null->position_domain=std::shared_ptr<const FramePositionDomain>(owner,nullptr);
  check(bad([&]{native_weight_retention_impl::Counter c(1024*1024);c.frame_set(null);}),"Owned-null independent geometry alias cannot disappear from the preflight");
  auto unbound=std::make_shared<SourceMaterialBindings>();unbound->normal_preparation=std::shared_ptr<const SourceNormalPreparation>(owner,nullptr);
- check(bad([&]{native_weight_retention_impl::Counter c(1024*1024);c.material(unbound);}),"Owned-null unsupported preparation cannot disappear from resource admission");
+ check(bad([&]{native_weight_retention_impl::Counter c(1024*1024);c.material(unbound);}),"Owned-null normal preparation cannot disappear from resource admission");
  std::cout<<"Anatomical admission controls "<<checks<<std::endl;return 0;
 }catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<std::endl;return 1;}
