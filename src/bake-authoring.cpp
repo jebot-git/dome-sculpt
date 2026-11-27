@@ -588,11 +588,14 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   };
   if(retained_recipient&&!split_recipient)encode_retained(options);
   if(separate_normal_pass&&progress)options.progress=[&](float value){progress(.1f+.4f*value);};
+  // A typed recipient's relative layer gain must not dim or amplify the donor.
+  const bool absolute_emission=recipient&&!recipient->source&&recipient->material_bindings&&
+      recipient->material_bindings->has_mtoon&&recipient->material_bindings->material.parameters.emission_strength!=1;
   auto result = native_attributes?detail::bake_mesh_native_attributes(low_mesh,high,options,
       source_normals,source_fields,source_placement,target_metric_corners,settings.corresponding_topology):
       detail::bake_mesh_source_normals(low_mesh,high,options,source_normals,
       target_triangles,source_fields,source_placement,target_metric_corners,
-      settings.corresponding_topology);
+      settings.corresponding_topology,absolute_emission);
   std::optional<BakeResult> retained_normal_write;
   if(split_recipient){
     auto normal_options=options;

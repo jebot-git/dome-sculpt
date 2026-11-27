@@ -2,9 +2,11 @@
 #define DOME_BAKE_CAGE_HELPERS_ONLY
 #include "bake-cage.cpp"
 #include "dome/bake-recipe.hpp"
+#include "dome/material-bindings.hpp"
 #include "dome/native-scene-append.hpp"
 #include "dome/native-authoring.hpp"
 #include <fstream>
+#include <cstdlib>
 #include "polygon-conversion.hpp"
 #include "dome/shapekey-authoring.hpp"
 #include "dome/texture-sets.hpp"
@@ -163,6 +165,19 @@ int main(int argc,char **argv)try{
   }
   if(argc==4&&std::string_view(argv[1])=="--texture-set-xr-fixture"){
     auto scene=texture_set_bake_scene(.060f,.070f);
+    if(std::getenv("DOME_BAKE_FIXTURE_MTOON")) {
+      const auto material=active_texture_set(scene.active()).material;
+      SourceMaterialBindings binding;
+      binding.material=MToonMaterial::from_vrm1({
+          {"pbrMetallicRoughness",{{"baseColorFactor",material.color}}},
+          {"extensions",{{"VRMC_materials_mtoon",{{"specVersion","1.0"},
+              {"shadeColorFactor",{.2f,.3f,.4f}}}}}}
+      });
+      binding.native_reference={material.color,material.emissive,int(material.alpha),
+                                material.alpha_cutoff,material.double_sided};
+      require_cage(bind_texture_set_mtoon(scene,scene.active().id,1,binding),
+                   "The active source/cage fixture uses its own typed MToon material");
+    }
     const auto source=scene.objects()[1].id;
     const auto cage=scene.objects()[2].id;
     const auto settings=texture_set_probe_settings(cage);

@@ -1,13 +1,16 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/render.hpp"
+#include "dome/bake-recipe.hpp"
 #include "dome/mtoon.hpp"
 #include "dome/humanoid-creator.hpp"
 #include "dome/source-maps.hpp"
 #include "dome/material-visibility.hpp"
 #include "dome/material-bindings.hpp"
+#include "dome/native-authoring.hpp"
 #include "dome/texture-sets.hpp"
 #include "dome/import-image.hpp"
 #include "../src/gltf-document.hpp"
+#include "../src/texture-set-paint-access.hpp"
 #include "mtoon-painted-set-fixture.hpp"
 #include "graphics.h"
 #include <fstream>
@@ -87,6 +90,182 @@ void native_texture_sets(SurfaceRenderer &renderer){
        "Core PBR preview switches only the typed range's visible result");
  check(doc.copy_scene().encode()==scene.encode(),"Preview selection preserves exact authored MToon data");
 }
+
+void baked_texture_set(SurfaceRenderer &renderer, const std::filesystem::path &directory,
+                       TextureSetId set, uint32_t resolution, float gain, bool hdr_donor) {
+ const auto right = set != 0;
+ const auto prefix = directory / (hdr_donor ? "hdr" : gain == 1 ? "ldr" : "gain");
+ std::filesystem::create_directories(prefix);
+ const auto mesh = set_triangles();
+ Scene scene;
+ const auto object = scene.active().id;
+ std::array<TextureSetInitialField,2> fields;
+ for (auto &field : fields) {
+  field.resolution = 64;
+  field.material = white();
+  field.material.color = {0,0,1,1};
+ }
+ auto &current = fields[set].material;
+ fields[set].resolution = resolution;
+ current.color = {.31f,.67f,.83f,.75f};
+ current.unlit = false;
+ current.alpha = Material::AlphaMode::Mask;
+ current.alpha_cutoff = .4f;
+ current.emissive = {.012f,.024f,.03f};
+ initialize_texture_sets(scene,object,mesh,fields,std::array<TextureSetId,2>{0,1});
+ select_texture_set(scene,object,set);
+ check(edit_texture_set(scene,object,set,[right](PaintedMesh &paint,Material &) {
+  PaintSettings ink;
+  ink.front_only = false;
+  ink.color = {.85f,.23f,.1f,1.f};
+  Brush brush;
+  brush.from = brush.to = {right?.46f:-.46f,.22f,0};
+  brush.normal = {0,0,1};
+  brush.radius = .13f;
+  brush.strength = .81f;
+  paint.add_layer("Ink over the bake");
+  paint.begin_stroke();
+  paint.stamp(brush,ink);
+  return paint.end_stroke();
+ }),"A real editable paint layer lies above the selected set's Bake");
+
+ SourceMaterialBindings binding;
+ binding.material = MToonMaterial::from_vrm1({
+     {"alphaMode","MASK"},{"alphaCutoff",current.alpha_cutoff},{"emissiveFactor",current.emissive},
+     {"pbrMetallicRoughness",{{"baseColorFactor",current.color},{"baseColorTexture",{{"index",0}}}}},
+     {"normalTexture",{{"index",1}}},
+     {"extensions",{{"VRMC_materials_mtoon",{{"specVersion","1.0"},
+       {"shadingShiftFactor",-.3f},{"shadeColorFactor",{.09f,.04f,.2f}}}}}}
+ },2);
+ binding.material.parameters.emission_strength = gain;
+ binding.native_reference = {current.color,current.emissive,int(current.alpha),
+                             current.alpha_cutoff,current.double_sided};
+ binding.roles[size_t(MToonSlot::Base)].image = image({204,173,118,255});
+ binding.roles[size_t(MToonSlot::Normal)].image = image({136,180,240,255});
+ check(bind_texture_set_mtoon(scene,object,set,binding),"The selected partition has a typed base and original normal role");
+
+ const auto donor = scene.add("Hidden bake donor",Volume{});
+ auto &source = scene.object(donor);
+ source.visible = false;
+ source.locked = true;
+ source.mesh_active = true;
+ source.material.color = {.57f,.19f,.39f,.91f};
+ source.material.emissive = {.06f,hdr_donor?1.4f:.11f,.023f};
+ auto donor_mesh = mesh;
+ const auto donor_normal = normalized(Vec3{.45f,-.42f,1.f});
+ for (size_t i=0;i<donor_mesh.positions.size();++i) {
+  auto &position = donor_mesh.positions[i];
+  position.x += i < 3 ? -.14f : .14f;
+  position.z += .01f;
+  donor_mesh.uv[i][0] = donor_mesh.uv[i][0]*.44f + (i>=3?.52f:0.f);
+  donor_mesh.normals[i] = donor_normal;
+ }
+ source.painted = std::make_shared<PaintedMesh>(std::move(donor_mesh),64);
+ scene.select(object);
+
+ Document doc;
+ doc.replace(scene);
+ check(doc.wait_mesh()&&doc.frame().state->error.empty(),"Selected native MToon material renders before Bake");
+ check(doc.frame().state->can_bake,"Shared Bake controls admit the selected MToon recipient");
+ const auto before = doc.copy_scene();
+ const auto field = texture_set_view(before.object(object),set);
+ const auto sibling = texture_set_view(before.object(object),right?0:1);
+ const auto authored = draw(renderer,doc.frame().surface);
+ ObjectBakeSettings settings;
+ settings.allow_partial = true;
+ settings.ao_samples = 3;
+ settings.padding = 0;
+ doc.bake_from_object(donor,settings);
+ const auto native_path = prefix / "baked.dsculpt";
+ doc.save_async(native_path).get();
+ check(doc.wait_asset()&&doc.wait_mesh()&&doc.frame().state->error.empty(),
+       "Bake and immediately queued Save publish the typed viewport");
+ const auto after = doc.copy_scene();
+ const auto selected = texture_set_view(after.object(object),set);
+ const auto untouched = texture_set_view(after.object(object),right?0:1);
+ const auto &bake = selected.painted->baked();
+ check(selected.material_bindings==field.material_bindings&&selected.domain==field.domain&&
+       selected.painted->layers().back().tiles==field.painted->layers().back().tiles,
+       "Bake preserves the exact MToon binding, face domain and editable layer tiles");
+ check(detail::TextureSetPaintAccess::same_current(*untouched.painted,*sibling.painted)&&
+       untouched.domain==sibling.domain,
+       "The neighboring PBR set keeps its exact paint and face domain");
+ check(bake&&bake->normal_interpretation==BakedNormalInterpretation::CanonicalMikk&&
+       !bake->maps.normal.rgba.empty()&&bool(bake->emission_field)==(hdr_donor||gain!=1),
+       "Selected Bake owns canonical normals and the appropriate emission representation");
+ check(selected.bake_recipe&&selected.bake_recipe->source.object==donor&&
+       selected.bake_recipe->settings.ao_samples==3&&selected.bake_recipe->settings.allow_partial,
+       "The selected field owns the actual donor and Bake settings");
+ check(Scene::load(native_path).encode()==after.encode(),"Ordered native Save restores every baked and authored field");
+
+ const auto pixels = draw(renderer,doc.frame().surface);
+ const int baked_x = right?79:16, kept_x = right?59:36, other_x = right?25:70, y = 32;
+ const auto original = at(authored,kept_x,y);
+ check(original[3]==255&&at(pixels,kept_x,y)==original,"A missed texel keeps original typed shading and normal");
+ check(at(pixels,other_x,y)==at(authored,other_x,y),"The adjacent PBR field keeps its exact visible pixels");
+ const auto srgb_round_trip = [](float x) {
+  return mtoon_srgb_to_linear(std::round(mtoon_linear_to_srgb(x)*255.f)/255.f);
+ };
+ auto resolved = binding.material;
+ resolved.parameters.base_color = {1,1,1,1};
+ resolved.parameters.emission = {1,1,1};
+ resolved.parameters.emission_strength = 1;
+ MToonSamples material_samples;
+ const auto emission_sample = [&](size_t component) {
+  return hdr_donor||gain!=1 ? source.material.emissive[component]
+                           : srgb_round_trip(source.material.emissive[component]);
+ };
+ for (size_t component=0;component<3;++component)
+  material_samples.base[component] = srgb_round_trip(source.material.color[component]);
+ material_samples.emission = {emission_sample(0),emission_sample(1),emission_sample(2)};
+ material_samples.base[3] = source.material.color[3];
+ const auto projected = at(pixels,baked_x,y);
+ const auto want = expected(resolved,material_samples,donor_normal);
+ std::cout<<"BAKED_MTOON grid="<<resolution<<" gain="<<gain<<" HDR="<<hdr_donor
+          <<" actual="<<projected[0]<<','<<projected[1]<<','<<projected[2]<<','<<projected[3]
+          <<" expected="<<want[0]<<','<<want[1]<<','<<want[2]<<','<<want[3]<<'\n';
+ check(close(projected,want,3)&&projected!=at(authored,baked_x,y),
+       "The typed shader reads donor color, canonical normal and absolute brightness at the hit");
+
+ const auto path = prefix / "editable.glb";
+ doc.export_asset(path,AssetExportFormat::EditableGlb256).get();
+ std::ifstream input(path,std::ios::binary);
+ const std::vector<uint8_t> bytes(std::istreambuf_iterator<char>{input},{});
+ const auto editable = extract_native_authoring(bytes);
+ check(editable&&editable->encode()==after.encode(),"Editable GLB restores the typed Bake and paint exactly");
+ const auto json_length = uint32_t(bytes.at(12))|(uint32_t(bytes.at(13))<<8)|
+     (uint32_t(bytes.at(14))<<16)|(uint32_t(bytes.at(15))<<24);
+ const auto gltf = nlohmann::json::parse(bytes.begin()+20,bytes.begin()+20+json_length);
+ const auto &primitive = gltf.at("meshes").at(0).at("primitives").at(set);
+ const auto &material = gltf.at("materials").at(primitive.at("material").get<size_t>());
+ check(material.at("extras").contains("domeSculptNativeMaterial")&&
+       material.contains("normalTexture")&&material.contains("emissiveTexture"),
+       "Editable GLB labels the native typed material and emits a usable core fallback");
+ const auto standard = prefix / "preexisting.glb";
+ std::ofstream(standard)<<"previous export";
+ check(rejects([&]{doc.export_asset(standard,AssetExportFormat::Glb).get();}),
+       "Standard GLB rejects typed Bake until it can carry the complete typed material");
+ std::ifstream file(standard);
+ check(std::string(std::istreambuf_iterator<char>{file},{})=="previous export", "Refused Standard GLB preserves its destination");
+
+ check(doc.undo()&&doc.copy_scene().encode()==before.encode(),"Undo restores the exact unbaked typed field");
+ check(doc.redo()&&doc.copy_scene().encode()==after.encode(),"Redo restores the exact selected Bake");
+ Document reopened;
+ reopened.open(native_path);
+ check(reopened.wait_mesh()&&draw(renderer,reopened.frame().surface)==pixels,
+       "Cold Open restores identical typed viewport pixels");
+ check(reopened.frame().state->can_clear_bake,"Clear Bake is available on the reopened selected field");
+ reopened.clear_bake();
+ check(reopened.wait_asset()&&reopened.wait_mesh()&&reopened.frame().state->error.empty()&&
+       draw(renderer,reopened.frame().surface)==authored,"Clear Bake recovers the original typed rendering and layers");
+ const auto cleared = reopened.copy_scene();
+ const auto field_cleared = texture_set_view(cleared.object(object),set);
+ check(!field_cleared.painted->baked()&&field_cleared.bake_recipe&&
+       field_cleared.bake_recipe->encode()==selected.bake_recipe->encode(),
+       "Clear Bake retains the exact per-field recipe for Recall");
+ reopened.save(prefix / "recall.dsculpt");
+}
+
 void painted_texture_sets(SurfaceRenderer &renderer,const std::filesystem::path &output,
                           mtoon_paint_fixture::Background background){
  using mtoon_paint_fixture::Background;
@@ -187,6 +366,15 @@ void painted_texture_sets(SurfaceRenderer &renderer,const std::filesystem::path 
 int main(int argc,char**argv)try{
  NativeGraphics graphics;std::string device=reinterpret_cast<const char*>(glGetString(GL_RENDERER));std::cout<<"GPU "<<device<<'\n';check(argc<2||std::string(argv[1])!="--hardware"||(device.find("llvmpipe")==std::string::npos&&device.find("softpipe")==std::string::npos),"Production renderer runs on requested hardware");
  if(argc>=2&&std::string(argv[1])=="--texture-sets"){Fbo test;SurfaceRenderer renderer;native_texture_sets(renderer);std::cout<<"PASS "<<checks<<" native MToon texture-set graphics checks\n";return 0;}
+ if(argc==3&&std::string(argv[1])=="--baked-texture-sets"){
+  Fbo test;
+  SurfaceRenderer renderer;
+  baked_texture_set(renderer,argv[2],1,64,1,false);
+  baked_texture_set(renderer,argv[2],1,512,2,false);
+  baked_texture_set(renderer,argv[2],0,512,1,true);
+  std::cout<<"PASS "<<checks<<" baked MToon texture-set graphics checks\n";
+  return 0;
+ }
  if(argc==3&&std::string(argv[1])=="--painted-texture-sets"){
   Fbo test;SurfaceRenderer renderer;
   using mtoon_paint_fixture::Background;

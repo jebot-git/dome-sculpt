@@ -85,7 +85,8 @@ bool bake_target_supported(const SculptObject &object) {
   const auto &preview=field.source->source_preview();
   return !object.deformation&&bool(preview);
  }
- return plain(field.painted.get(),field.appearance.get(),field.material_bindings.get());
+ return plain(field.painted.get(),field.appearance.get(),field.material_bindings.get())||
+        native_texture_set_mtoon(field.painted.get(),field.appearance.get(),field.material_bindings.get());
 }
 
 bool bake_source_supported(const SculptObject &object, bool affine) {

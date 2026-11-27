@@ -124,7 +124,7 @@ void append_texture_set_surface(MeshSnapshot&snapshot,const ObjectSurface&o,
   const auto layers=field.painted->layers().size();
   if(view.render_only&&CurrentGridPaintPreview::eligible_field(plan->object(),field)){
    charge_grid_capture(bytes,preview_work,field,limits,true);
-  }else if(view.render_only&&!field.source&&field.painted->baked()&&field.painted->baked()->emission_field&&native_hdr_grid(*field.painted)){
+  }else if(view.render_only&&!field.source&&!field.material_bindings&&field.painted->baked()&&field.painted->baked()->emission_field&&native_hdr_grid(*field.painted)){
    charge_grid_capture(bytes,preview_work,field,limits,false);
    charge(bytes,1,native_material_grid_bytes(*field.painted,TextureSetGridMode::NativeHdr),limits);
    charge_native_material_grid_work(*field.painted,preview_work,limits,TextureSetGridMode::NativeHdr);

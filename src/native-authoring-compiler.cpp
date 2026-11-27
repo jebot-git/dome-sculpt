@@ -291,7 +291,7 @@ NativeAuthoringCompilation compile_native_authoring(
       TextureSetLimits limits;limits.cancelled=stop;
       if(fixed>=policy.max_working_bytes)throw std::length_error("Native texture-set export working budget exhausted");
       limits.maximum_bytes=std::min(limits.maximum_bytes,policy.max_working_bytes-fixed);
-      reserve(texture_set_export_working_bound(surface,limits,true),1);continue;
+      reserve(texture_set_export_working_bound(surface,limits,true,true),1);continue;
     }
     if(native_physical(object)&&(mesh.positions.size()>policy.max_vertices||mesh.indices.size()/3>policy.max_triangles))
       throw std::length_error("Native physical captured geometry exceeds its budget before staging");

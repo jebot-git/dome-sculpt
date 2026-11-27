@@ -41,7 +41,7 @@ std::shared_ptr<const TextureSetRangeProof> prepare_texture_set_range(
  }else{
   const bool typed=native_texture_set_mtoon(view.painted.get(),view.appearance.get(),view.material_bindings.get());
   result->maps_=render_only&&!typed?CurrentGridPaintPreview::for_field(result->plan_->object(),view,cancelled):nullptr;
-  if(render_only&&!result->maps_)result->maps_=EmissionExportAccess::preview_texture_set_bake(*view.painted,view.material,cancelled);
+  if(render_only&&!typed&&!result->maps_)result->maps_=EmissionExportAccess::preview_texture_set_bake(*view.painted,view.material,cancelled);
   if(!result->maps_)result->maps_=EmissionExportAccess::requires_preview(*view.painted,view.material,view.material_bindings.get())?
     EmissionExportAccess::preview(*view.painted,view.material,cancelled):view.painted->preview(view.material,cancelled);
   if(!result->maps_||(!typed&&(result->maps_->source_only||result->maps_->source_maps))||

@@ -1554,6 +1554,9 @@ if(BUILD_TESTING AND TARGET dome-sculpt-render)
   add_test(NAME mtoon-painted-texture-sets COMMAND dome-sculpt-mtoon-render-test
     --painted-texture-sets ${CMAKE_CURRENT_BINARY_DIR}/mtoon-painted-texture-sets)
   set_tests_properties(mtoon-painted-texture-sets PROPERTIES ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2" TIMEOUT 90)
+  add_test(NAME mtoon-baked-texture-sets COMMAND dome-sculpt-mtoon-render-test
+    --baked-texture-sets ${CMAKE_CURRENT_BINARY_DIR}/mtoon-baked-texture-sets)
+  set_tests_properties(mtoon-baked-texture-sets PROPERTIES ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2" TIMEOUT 180)
 endif()
 
 if(BUILD_TESTING)
@@ -4066,6 +4069,12 @@ if(BUILD_TESTING AND TARGET dome-sculpt AND TARGET dome-sculpt-test-runtime)
     $<TARGET_FILE:dome-sculpt-bake-recipes-test>
     ${CMAKE_CURRENT_BINARY_DIR}/texture-set-active-bake-openxr --texture-set)
   set_tests_properties(texture-set-active-bake-openxr PROPERTIES TIMEOUT 600)
+  add_test(NAME mtoon-texture-set-bake-openxr COMMAND ${Python3_EXECUTABLE}
+    ${CMAKE_CURRENT_SOURCE_DIR}/tests/bake-recipes-xr.py
+    $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime>
+    $<TARGET_FILE:dome-sculpt-bake-recipes-test>
+    ${CMAKE_CURRENT_BINARY_DIR}/mtoon-texture-set-bake-openxr --texture-set --mtoon)
+  set_tests_properties(mtoon-texture-set-bake-openxr PROPERTIES TIMEOUT 600)
 endif()
 
 target_sources(dome-sculpt-core PRIVATE src/baked-normal-field.cpp src/baked-normal-archive.cpp src/canonical-normal-uv.cpp src/canonical-native-pose.cpp)

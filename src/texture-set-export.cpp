@@ -9,6 +9,7 @@
 #include "emission-export.hpp"
 #include "paint-emission-sample.hpp"
 #include "texture-set-native-grid.hpp"
+#include "texture-set-surface.hpp"
 #include "dome/material-bindings.hpp"
 #include "dome/material-visibility.hpp"
 #include "dome/paint-sampling.hpp"
@@ -160,6 +161,12 @@ std::shared_ptr<const Image> compose_shared_mtoon_shade(
 
 bool native_material_grid(const TextureSetView &field) {
  return !field.source&&!field.appearance&&!field.material_bindings&&native_hdr_grid(*field.painted);
+}
+
+bool baked_mtoon_pbr_fallback(const TextureSetView &field) {
+ return !field.source&&native_texture_set_mtoon(field.painted.get(),field.appearance.get(),field.material_bindings.get())&&
+     !field.material_bindings->physical_emission&&field.painted->baked()&&
+     field.painted->baked()->emission_field&&native_hdr_grid(*field.painted);
 }
 
 // Padding refers to the actual writable owner texel, which can be in a
@@ -456,7 +463,7 @@ public:
   charge(work,sampler_.index_work(),1,limits.maximum_work);
   const size_t count=size_t(resolution)*resolution;
   size_t variable_count=count;
-  if(native_material_grid(field)||retained_hdr_grid(field)){
+  if(native_material_grid(field)||retained_hdr_grid(field)||baked_mtoon_pbr_fallback(field)){
    grid_.emplace(*paint_,work,limits);
    constants_[0]=resolve({});
    if(const auto &baked=paint_->baked())
@@ -578,7 +585,7 @@ TextureSetExportEmission compile_emission(const TextureSetView &field,size_t &wo
 }
 
 struct ExportBound { size_t bytes, work; };
-ExportBound export_bound(const ObjectSurface&input,const TextureSetLimits&limits,bool measured_physical){
+ExportBound export_bound(const ObjectSurface&input,const TextureSetLimits&limits,bool measured_physical,bool editable_materials){
  limits.validate();stop(limits);const auto&plan=input.texture_set_surface;
  if(!plan)throw std::invalid_argument("Texture-set export requires its owning surface plan");plan->authenticate_owner(plan);
  if(input.id!=plan->object()||!owner(input.deformation,plan->deformation())||plan->fields().empty()||!material(input.material,plan->fields()[0].material)||
@@ -595,8 +602,10 @@ ExportBound export_bound(const ObjectSurface&input,const TextureSetLimits&limits
   charge(bytes,1,sizeof(TextureSetExportField)+field.name.size()+field.material.name.size()+258,limits.maximum_bytes);
   const auto resolution=field.painted->resolution();
   const bool hdr=texture_set_physical_emission(field);
+  const bool mtoon=field.material_bindings&&field.material_bindings->has_mtoon;
+  const bool editable_pbr=editable_materials&&baked_mtoon_pbr_fallback(field);
   const bool sparse_retained=retained_material_grid(field);
-  if(field.material_bindings&&field.material_bindings->has_mtoon&&field.painted->has_paint_data()){
+  if(mtoon&&!editable_pbr&&field.painted->has_paint_data()){
    const size_t pixels=size_t(resolution)*resolution;
    charge(bytes,pixels,8,limits.maximum_bytes);
    charge(work,pixels,12,limits.maximum_work);
@@ -617,10 +626,9 @@ ExportBound export_bound(const ObjectSurface&input,const TextureSetLimits&limits
      }
     }
   }
-  if(hdr&&(!measured_physical||field.material.toon||field.appearance||
-      (field.material_bindings&&field.material_bindings->has_mtoon)))
+  if(hdr&&(!measured_physical||(mtoon?!editable_pbr:field.material.toon||field.appearance)))
    throw std::invalid_argument("Texture-set HDR emission needs its per-material precision-qualified export compiler");
-  if(hdr&&native_material_grid(field)){
+  if(hdr&&(native_material_grid(field)||editable_pbr)){
    const size_t pixels=size_t(resolution)*resolution;
    charge(bytes,1,native_material_grid_bytes(*field.painted,TextureSetGridMode::NativeHdr),limits.maximum_bytes);
    charge(bytes,pixels,4,limits.maximum_bytes);
@@ -825,11 +833,11 @@ EmissionExportRaster texture_set_emission_raster(const TextureSetView &field,con
       }};
 }
 
-size_t texture_set_export_working_bound(const ObjectSurface&input,const TextureSetLimits&limits,bool measured_physical){
- return export_bound(input,limits,measured_physical).bytes;
+size_t texture_set_export_working_bound(const ObjectSurface&input,const TextureSetLimits&limits,bool measured_physical,bool editable_materials){
+ return export_bound(input,limits,measured_physical,editable_materials).bytes;
 }
-TextureSetExport compile_texture_set_export(const ObjectSurface&input,const TextureSetLimits&limits,bool measured_physical){
- auto [bytes,work]=export_bound(input,limits,measured_physical);
+TextureSetExport compile_texture_set_export(const ObjectSurface&input,const TextureSetLimits&limits,bool measured_physical,bool editable_materials){
+ auto [bytes,work]=export_bound(input,limits,measured_physical,editable_materials);
  TextureSetExport out;out.working_bound=bytes;
  const auto&plan=input.texture_set_surface;const auto&rest=*plan->geometry();const auto count=plan->indices().size();
  const bool source=std::any_of(plan->fields().begin(),plan->fields().end(),[](const auto&f){return bool(f.source);});
@@ -853,10 +861,12 @@ TextureSetExport compile_texture_set_export(const ObjectSurface&input,const Text
   output.material=field.material;
   output.normal_role=portable&&portable->normal_role;
   if(texture_set_physical_emission(field)){
+   const bool editable_pbr=editable_materials&&baked_mtoon_pbr_fallback(field);
    output.emission=compile_emission(field,work,limits);
    output.material.emissive={};
+   if(editable_pbr)output.material.toon=false;
    if(portable)output.textures=portable->maps;
-   else if(native_material_grid(field))output.textures=compile_native_material_grid(
+   else if(native_material_grid(field)||editable_pbr)output.textures=compile_native_material_grid(
        *field.painted,field.material,work,limits,TextureSetGridMode::NativeHdr);
    else output.textures=EmissionExportAccess::other_channels(
        *texture_set_source_read_view(field,limits),output.material,limits.cancelled);

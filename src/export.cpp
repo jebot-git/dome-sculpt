@@ -105,7 +105,7 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
         throw std::invalid_argument("Editable texture set borrowed another native surface plan");
       measured=true;
     }
-    bundles[i]=compile_texture_set_export(objects[i],limits,measured);
+    bundles[i]=compile_texture_set_export(objects[i],limits,measured,bool(raw_authority));
     bundle_working_bytes+=bundles[i]->working_bound;
   }
   auto object_at=[&](size_t i)->const ObjectSurface&{return bundles[i]?bundles[i]->surface:objects[i];};

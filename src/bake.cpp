@@ -309,7 +309,7 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
     std::span<const detail::RetainedSourceBakeField> source_fields = {},
     detail::SourceBakePlacement source_placement = {},
     std::span<const Tangent> target_metric_corners = {},
-    bool corresponding_topology = false,bool dual_normal = true) {
+    bool corresponding_topology = false,bool dual_normal = true,bool absolute_emission = false) {
   if(o.progress)o.progress(0);
   cancel(o); validate(low,source,o,source_fields,source_normals);
   if(corresponding_topology&&(!o.cage_positions.empty()||!o.source_triangles.empty()||
@@ -342,7 +342,7 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
         throw std::invalid_argument("Prepared raw material source has a conflicting retained normal event");
     }
   }
-  const bool float_emission=std::any_of(source.materials.begin(),source.materials.end(),[](const auto &m){return bool(m.resolved_emission);})||
+  const bool float_emission=absolute_emission||std::any_of(source.materials.begin(),source.materials.end(),[](const auto &m){return bool(m.resolved_emission);})||
       std::any_of(source_fields.begin(),source_fields.end(),[](const auto &field){return field.physical_emission;});
   constexpr size_t retained_limit=128*1024*1024;
   size_t emission_budget=0;
@@ -610,9 +610,9 @@ BakeResult bake_mesh(const Mesh &low,const BakeSource &source,const BakeOptions 
 BakeResult detail::bake_mesh_source_normals(const Mesh &low,const BakeSource &source,const BakeOptions &options,
  const SourceBakeNormalResolver &normal,std::span<const uint32_t> target_triangles,
  std::span<const RetainedSourceBakeField> source_fields,SourceBakePlacement source_placement,
- std::span<const Tangent> target_metric_corners,bool corresponding_topology){
+ std::span<const Tangent> target_metric_corners,bool corresponding_topology,bool absolute_emission){
  return bake_mesh_impl(low,source,options,normal,target_triangles,source_fields,source_placement,
-                       target_metric_corners,corresponding_topology);
+                       target_metric_corners,corresponding_topology,true,absolute_emission);
 }
 BakeResult detail::bake_mesh_native_attributes(const Mesh &low,const BakeSource &source,const BakeOptions &options,
  const SourceBakeNormalResolver &normal,std::span<const RetainedSourceBakeField> source_fields,

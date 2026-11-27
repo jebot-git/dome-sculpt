@@ -89,7 +89,13 @@ struct TextureSetAccess {
   if (!same_owner(target.texture_sets,membership) || target.texture_sets->active()!=recipient.id)
    throw std::invalid_argument("The active texture set changed during Bake");
   const auto current=texture_set_view(target,recipient.id);
-  if (current.source!=recipient.source || !same_owner(current.domain,recipient.domain) ||
+  const auto same_optional_owner=[](const auto &a,const auto &b){
+   return a==b&&!a.owner_before(b)&&!b.owner_before(a);
+  };
+  if (!same_optional_owner(current.source,recipient.source) || !same_owner(current.domain,recipient.domain) ||
+      !same_optional_owner(current.material_bindings,recipient.material_bindings) ||
+      !same_optional_owner(current.appearance,recipient.appearance) ||
+      !same_optional_owner(current.bake_recipe,recipient.bake_recipe) ||
       !TextureSetPaintAccess::same_current(*current.painted,*recipient.painted) ||
       !paint || paint->in_stroke() || !recipe ||
       !same_owner(TextureSetPaintAccess::domain(*paint),current.domain) ||

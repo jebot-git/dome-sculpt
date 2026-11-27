@@ -43,7 +43,7 @@ struct TextureSetExport {
   size_t working_bound=0;
 };
 size_t texture_set_export_working_bound(const ObjectSurface &,
-    const TextureSetLimits & = {}, bool measured_physical=false);
+    const TextureSetLimits & = {}, bool measured_physical=false, bool editable_materials=false);
 TextureSetExport compile_texture_set_export(const ObjectSurface &,
-    const TextureSetLimits & = {}, bool measured_physical=false);
+    const TextureSetLimits & = {}, bool measured_physical=false, bool editable_materials=false);
 } // namespace dome::detail

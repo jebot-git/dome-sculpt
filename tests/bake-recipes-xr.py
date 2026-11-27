@@ -6,7 +6,10 @@ signal.pthread_sigmask(signal.SIG_SETMASK,[])
 p=argparse.ArgumentParser(description=__doc__)
 for name in ('binary','runtime','helper','out'):p.add_argument(name,type=lambda v:Path(v).resolve())
 p.add_argument('--texture-set',action='store_true',help='Replay Recall and Bake on the selected additional material')
-a=p.parse_args();out=a.out;out.mkdir(parents=True,exist_ok=True);checks=[]
+p.add_argument('--mtoon',action='store_true',help='Use a typed MToon material on the selected texture set')
+a=p.parse_args()
+if a.mtoon and not a.texture_set:p.error('--mtoon requires --texture-set')
+out=a.out;out.mkdir(parents=True,exist_ok=True);checks=[]
 def check(ok,label):
  checks.append({'passed':bool(ok),'check':label});(out/'report.json').write_text(json.dumps({'checks':checks,'physical_headset':False},indent=2)+'\n');print(('PASS ' if ok else 'FAIL ')+label,flush=True);assert ok,label
 with tempfile.TemporaryDirectory(prefix='dome-cage-xr-') as directory:
@@ -14,6 +17,7 @@ with tempfile.TemporaryDirectory(prefix='dome-cage-xr-') as directory:
  env={**os.environ,'DOME_XR_FIXTURE_RECIPE':'1','XR_RUNTIME_JSON':str(manifest),'LIBGL_ALWAYS_SOFTWARE':'1','LP_NUM_THREADS':'2','HOME':str(root),'XDG_RUNTIME_DIR':str(root),'XDG_CONFIG_HOME':str(root/'config'),'XDG_STATE_HOME':str(root/'state'),'XDG_CACHE_HOME':str(root/'cache'),'XDG_DATA_HOME':str(root/'data')}
  source=out/'source.dsculpt';reference=out/'reference.dsculpt'
  if a.texture_set:
+  if a.mtoon:env['DOME_BAKE_FIXTURE_MTOON']='1'
   subprocess.run([str(a.helper),'--texture-set-xr-fixture',str(source),str(reference)],env=env,check=True)
  else:
   subprocess.run([str(a.helper),'--ui-wide-fixture' if os.environ.get('DOME_RECIPE_WIDE')=='1' else '--ui-fixture',str(source)],env=env,check=True)
