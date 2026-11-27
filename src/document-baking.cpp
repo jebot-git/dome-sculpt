@@ -135,6 +135,8 @@ bool Document::canonical_conversion_ready_locked() const {
   if(o.texture_sets||scene_.has_affine_placement(o.id))return false;
   if(state_.object_grabbing||!bake_target_ready_locked())return false;
   if(detail::native_bake_conversion_supported(o))return true;
+  if(!o.appearance && !o.polygon && o.painted &&
+     detail::prepared_color_bake_conversion_supported(*o.painted,o.material_bindings.get()))return true;
   if(o.material_bindings&&o.material_bindings->normal_preparation){
     const auto &p=*o.material_bindings->normal_preparation;
     return p.canonical_conversion&&!p.uv_reprojection&&!p.sampling_domain&&!p.key_derivation;

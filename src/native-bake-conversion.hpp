@@ -7,6 +7,9 @@
 namespace dome {
 struct SculptObject;
 namespace detail {
+bool prepared_color_bake_conversion_supported(const PaintedMesh &,
+    const SourceMaterialBindings *) noexcept;
+
 struct NativeBakeConversion {
   std::shared_ptr<PaintedMesh> paint;
   double maximum_sample_error = 0;

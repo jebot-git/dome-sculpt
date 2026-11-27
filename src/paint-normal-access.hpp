@@ -24,6 +24,8 @@ struct SourceNormalPreparationAccess {
       std::shared_ptr<const PaintNormalProjection>,const std::function<bool()> & = {});
   static std::shared_ptr<PaintedMesh> adopt_baked_field(const PaintedMesh &,
       std::shared_ptr<const detail::BakedNormalField>,const std::function<bool()> & = {});
+  static std::shared_ptr<const PaintedMesh> canonical_color_reference(const PaintedMesh &,
+      const SourceMaterialBindings &,size_t &working_bytes,const std::function<bool()> &);
   static std::shared_ptr<const Image> canonical_intrinsic(const PaintedMesh &,
       const std::function<bool()> & = {});
   static std::shared_ptr<PaintedMesh> upgrade_canonical(const PaintedMesh &,

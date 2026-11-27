@@ -129,7 +129,16 @@ NormalPreparationResult convert_canonical_normals(const ColorPreparationInput &i
   if(retained&&(legacy->uv_reprojection||legacy->sampling_domain||legacy->key_derivation||input.material_bindings->normal_frames!=retained->frames()))
     throw std::invalid_argument("Converted legacy descendants require their complete layer/sampling upgrade adapter");
   if(retained){input.material_bindings->validate();legacy->validate_current(input.paint->mesh(),input.appearance.get());}
-  const auto owner=retained?retained:detail::CanonicalNormalConversion::create(input,options);
+  auto source=input;
+  auto conversion_options=options;
+  if (!retained && input.paint && input.paint->color_projection()) {
+    if (input.appearance || !input.material_bindings)
+      throw std::invalid_argument("Prepared color needs its own native material for portable normals");
+    source.paint=SourceNormalPreparationAccess::canonical_color_reference(*input.paint,*input.material_bindings,
+        conversion_options.max_working_bytes,options.cancelled);
+    source.material_bindings.reset();
+  }
+  const auto owner=retained?retained:detail::CanonicalNormalConversion::create(source,conversion_options);
   auto binding=input.material_bindings?std::make_shared<SourceMaterialBindings>(*input.material_bindings):std::make_shared<SourceMaterialBindings>();
   binding->has_mtoon=false;binding->normal_frame=SourceMaterialNormalFrame::OriginalAttributes;
   binding->normal_frames=owner->frames();binding->normal_preparation.reset();binding->canonical_attributes=owner;
@@ -138,8 +147,9 @@ NormalPreparationResult convert_canonical_normals(const ColorPreparationInput &i
     binding->native_reference.alpha=int(input.material.alpha);binding->native_reference.alpha_cutoff=input.material.alpha_cutoff;binding->native_reference.double_sided=input.material.double_sided;}
   detail::BakedNormalFieldOptions field_options;field_options.max_working_bytes=options.max_working_bytes;field_options.cancelled=options.cancelled;
   auto field=detail::BakedNormalField::from_canonical(owner,field_options);
+  const auto &live=source.paint==input.paint?*owner->before_paint():*input.paint;
   auto paint=retained?SourceNormalPreparationAccess::upgrade_canonical(*input.paint,std::move(field),options.cancelled):
-    SourceNormalPreparationAccess::adopt_baked_field(*owner->before_paint(),std::move(field),options.cancelled);
+    SourceNormalPreparationAccess::adopt_baked_field(live,std::move(field),options.cancelled);
   binding->validate();if(options.cancelled&&options.cancelled())throw std::runtime_error("Canonical normal conversion cancelled");
   return {std::move(paint),std::move(binding),true};
 }

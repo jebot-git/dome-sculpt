@@ -2436,6 +2436,22 @@ bool detail::native_bake_conversion_supported(const SculptObject &o) noexcept {
       owner->valid_owner(owner)&&owner->matches_current(*o.painted)&&
       binding->native_paint_frames->valid_owner(binding->native_paint_frames);
 }
+bool detail::prepared_color_bake_conversion_supported(const PaintedMesh &paint,
+    const SourceMaterialBindings *binding) noexcept {
+  const auto bake = paint.baked();
+  return binding && binding->color_preparation && paint.color_projection() &&
+      binding->color_preparation->receipt.source_field==SourceColorField::Identity &&
+      !binding->color_preparation->paint_sampling && !binding->color_preparation->uv_reprojection &&
+      !binding->has_mtoon && !binding->normal_preparation && !binding->normal_frames &&
+      !binding->canonical_attributes && !binding->canonical_uv && !binding->canonical_paint_sampling &&
+      !binding->native_paint_sampling && !binding->native_paint_frames && !binding->polygon_surface_transfer &&
+      !binding->key_derivation && !binding->sampling_reparameterized &&
+      binding->normal_frame==SourceMaterialNormalFrame::UvDerivative &&
+      !paint.in_stroke() && !paint.source_maps() && !paint.source_sampling_prepared() &&
+      !paint.paint_sampling_domain() && !paint.normal_projection() &&
+      bake && bake->color_interpretation==BakedColorInterpretation::ResolvedPbr &&
+      bake->normal_interpretation==BakedNormalInterpretation::CanonicalMikk && !bake->maps.normal.rgba.empty();
+}
 detail::NativeBakeConversion detail::convert_native_baked_normals(const SculptObject &object,
     const NormalPreparationOptions &options) {
   return SourcePaintSamplingAccess::convert_native_bake(object,options);
@@ -2836,6 +2852,41 @@ std::shared_ptr<PaintedMesh> SourceNormalPreparationAccess::adopt_baked_field(co
   if(result->storage_bytes()>128*1024*1024)throw std::length_error("Independent baked normals exceed paint storage budget");
   result->composite_token_=next_composite_token();++result->revision_;
   if(cancelled&&cancelled())throw std::runtime_error("Baked normal adoption cancelled");return result;
+}
+std::shared_ptr<const PaintedMesh> SourceNormalPreparationAccess::canonical_color_reference(
+    const PaintedMesh &source,const SourceMaterialBindings &binding,size_t &working_bytes,
+    const std::function<bool()> &cancelled) {
+  if (!detail::prepared_color_bake_conversion_supported(source,&binding))
+    throw std::invalid_argument("Portable normals need their own native canonical Bake and identity color field");
+  paint_compute::checkpoint(cancelled);
+  binding.validate(false);
+  detail::source_paint_pairing(&source,&binding,nullptr,false);
+  binding.color_preparation->validate_current(source.mesh(),nullptr,cancelled);
+  const auto &old = *source.baked_;
+  const size_t copy_bytes = detail::TextureSetPaintAccess::snapshot_bytes(source) +
+      old.storage_bytes() - old.maps.pbr_color.rgba.size() -
+      (old.emission_field ? old.emission_field->storage_bytes() : 0);
+  if (copy_bytes >= working_bytes)
+    throw std::length_error("Portable normals exceed the working budget for their canonical reference");
+  working_bytes -= copy_bytes;
+
+  // Replay only the canonical normal inputs. The live object and its color
+  // receipt retain the original resolved pixels and editable layer planes.
+  auto result = source.snapshot();
+  auto bake = std::make_shared<BakedTextures>();
+  bake->coverage = old.coverage;
+  bake->maps.color = old.maps.color;
+  bake->maps.metal_rough = old.maps.metal_rough;
+  bake->maps.emission = old.maps.emission;
+  bake->maps.normal = old.maps.normal;
+  bake->emission_field = old.emission_field;
+  result->baked_ = std::move(bake);
+  result->color_projection_.reset();
+  result->allocated_color_tiles_ = 0;
+  for (auto &layer : result->layers_) layer.pbr_tiles.clear();
+  result->composite_token_ = next_composite_token();
+  paint_compute::checkpoint(cancelled);
+  return result;
 }
 std::shared_ptr<const Image> SourceNormalPreparationAccess::canonical_intrinsic(
     const PaintedMesh &source,const std::function<bool()> &cancelled){

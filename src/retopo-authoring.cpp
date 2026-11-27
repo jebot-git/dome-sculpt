@@ -776,7 +776,8 @@ private:
 
   State reproject_color(const PaintedMesh &before,const Material &material,
       const SourceMaterialBindings &binding,
-      const std::shared_ptr<const DeformationState> &deformation,detail::RetopoTransfer &projection) {
+      const std::shared_ptr<const DeformationState> &deformation,detail::RetopoTransfer &projection,
+      bool prepared_normals=false) {
     const auto &recipe = *binding.color_preparation;
     if (recipe.receipt.source_field != SourceColorField::Identity || recipe.paint_sampling ||
         recipe.uv_reprojection || before.source_maps() || before.source_sampling_prepared())
@@ -791,9 +792,12 @@ private:
 
     // Certify the new atlas's unpainted identity field. The separate paint and
     // Bake roles are subsequently transported as live edits on that field.
-    auto raw_binding = std::make_shared<SourceMaterialBindings>(binding);
-    raw_binding->color_preparation.reset();
-    auto rebound = transfer_patch_material(before,raw_binding,*grid,deformation,projection);
+    std::shared_ptr<const SourceMaterialBindings> rebound;
+    if (!prepared_normals) {
+      auto raw_binding = std::make_shared<SourceMaterialBindings>(binding);
+      raw_binding->color_preparation.reset();
+      rebound = transfer_patch_material(before,raw_binding,*grid,deformation,projection);
+    }
     ColorPreparationOptions options;
     options.resolve_identity = true;
     options.max_projection_error = recipe.receipt.accepted_projection_error;
@@ -804,14 +808,14 @@ private:
     auto output = prepare_source_colors({grid,{},rebound,deformation,material,{}},options);
     const auto &receipt = output.material_bindings->color_preparation->receipt;
     budget_.work(receipt.tested_quality_cells + receipt.probe_samples);
-    detail::TextureSetPaintAccess::reproject_retopology(before,*output.paint,projection);
+    detail::TextureSetPaintAccess::reproject_retopology(before,*output.paint,projection,prepared_normals);
     return {std::move(output.paint),deformation,std::move(output.material_bindings),{}};
   }
 
   State reproject_canonical(const PaintedMesh &before,const Material &material,
       const std::shared_ptr<const DeformationState> &old_deformation,const SourceMaterialBindings &binding,
       const std::shared_ptr<const DeformationState> &deformation,detail::RetopoTransfer &projection) {
-    if (binding.has_mtoon || binding.normal_preparation || binding.color_preparation ||
+    if (binding.has_mtoon || binding.normal_preparation ||
         binding.polygon_surface_transfer || binding.native_paint_sampling || binding.native_paint_frames ||
         !binding.normal_frames || !binding.normal_frames->pbr || binding.normal_frames->pbr->tangents.empty())
       throw std::invalid_argument("Retopology needs the prepared native normal material and its actual tangent frame");
@@ -820,7 +824,8 @@ private:
     const auto bake=before.baked();
     if (bake && (!bake->normal_field || bake->normal_field->origin()!=binding.canonical_attributes))
       throw std::invalid_argument("The prepared Bake no longer owns its current normal field");
-    auto raw=reproject(before,projection,true);
+    auto color = binding.color_preparation ? reproject_color(before,material,binding,deformation,projection,true) : State{};
+    auto raw = color.paint ? color.paint : reproject(before,projection,true);
     // Clear Bake keeps an original conversion lease. Transport its actual
     // previous raw input to establish the new frame while keeping the live
     // replacement unbaked.
@@ -830,7 +835,7 @@ private:
     options.max_angular_error=binding.canonical_attributes->receipt().accepted_angular_error;
     options.max_working_bytes=budget_.remaining_bytes();
     options.cancelled=budget_.cancelled();
-    auto output=convert_canonical_normals({conversion_input,{},{},deformation,material,{}},options);
+    auto output=convert_canonical_normals({conversion_input,{},bake?color.material:nullptr,deformation,material,{}},options);
     budget_.reserve(1,output.material_bindings->normal_frames->storage_bytes());
     std::shared_ptr<const PaintedMesh> paint=raw;
     if (bake) {
@@ -842,6 +847,7 @@ private:
       budget_.reserve(size_t(origin->before_paint()->resolution())*origin->before_paint()->resolution(),4);
     }
     auto material_binding=std::make_shared<SourceMaterialBindings>(*output.material_bindings);
+    if (!bake && color.material) material_binding->color_preparation=color.material->color_preparation;
     material_binding->physical_emission=binding.physical_emission;
     return {std::move(paint),deformation,std::move(material_binding),{}};
   }

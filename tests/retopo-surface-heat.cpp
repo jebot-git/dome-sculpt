@@ -758,7 +758,10 @@ void prepared_geometry_edit(bool affine,const std::filesystem::path &out,bool de
         "A changed patch whose Bake was cleared retains its new prepared frame and stays unbaked");
 }
 
-void prepared_color_edit(bool affine,const std::filesystem::path &out) {
+enum class PreparedColorOrder { ColorOnly, ColorFirst, NormalFirst };
+
+void prepared_color_edit(bool affine,const std::filesystem::path &out,PreparedColorOrder order) {
+  const bool portable_normals = order!=PreparedColorOrder::ColorOnly;
   auto scene = author_patch(affine,out);
   const auto previous = scene.active().id;
   const auto guide = scene.active().retopology->source;
@@ -767,13 +770,17 @@ void prepared_color_edit(bool affine,const std::filesystem::path &out) {
   donor.visible = false;
   donor.affine_edit = scene.object(guide).affine_edit;
   scene.object(guide) = std::move(donor);
-  scene.active().painted->clear_bake();
+  if (order!=PreparedColorOrder::NormalFirst) scene.active().painted->clear_bake();
   scene.active().painted->add_layer("Independent painted color");
   const auto layer_id = scene.active().painted->active_layer();
 
   Document document;
   document.replace(scene);
   settled(document);
+  if (order==PreparedColorOrder::NormalFirst) {
+    document.convert_baked_normals();
+    settled(document);
+  }
   ObjectBakeSettings settings;
   settings.front_mm = settings.back_mm = 35;
   settings.ao_samples = 0;
@@ -789,8 +796,43 @@ void prepared_color_edit(bool affine,const std::filesystem::path &out) {
         bake->maps.color.rgba!=bake->maps.pbr_color.rgba,
         "Bake from original COLOR_0 produces truly different common and PBR pixels on the native patch");
 
-  auto painted = raw.snapshot();
+  if (order==PreparedColorOrder::ColorFirst) {
+    raw.save(out/"color-normal-unconverted.dsculpt");
+    document.convert_baked_normals();
+    settled(document);
+    const auto converted = document.copy_scene();
+    const auto &normal = converted.active().painted->baked();
+    check(normal && normal->normal_field && converted.active().material_bindings->color_preparation==recipe &&
+          normal->maps.color.rgba==bake->maps.color.rgba && normal->maps.pbr_color.rgba==bake->maps.pbr_color.rgba &&
+          normal->coverage==bake->coverage && normal->normal_field->origin()->before_paint()->baked()->maps.normal.rgba==bake->maps.normal.rgba,
+          "The portable normals command keeps the exact original resolved colors and proves its separate canonical normal pixels");
+    check(document.undo() && document.copy_scene().encode()==raw.encode() &&
+          document.redo() && document.copy_scene().encode()==converted.encode(),
+          "Conversion of a colored Bake is one exact Undo/Redo transaction");
+    converted.save(out/"color-normal-converted.dsculpt");
+    settled(document);
+  }
+  if (order==PreparedColorOrder::NormalFirst)
+    check(bake->normal_field && recipe->original_material && recipe->original_material->canonical_attributes,
+          "Preparing colors and rebaking works with an earlier independent normal owner");
+
+  auto painted = document.copy_scene().snapshot();
   auto &paint = *painted.active().painted;
+  if (portable_normals) {
+    auto live = *paint.baked();
+    auto pbr = *live.normal_field->pbr();
+    auto toon = *live.normal_field->mtoon();
+    const std::array<uint8_t,4> pbr_texel{186,129,242,255}, toon_texel{127,174,246,255};
+    const auto size = paint.resolution();
+    for (size_t at=0;at<live.coverage.size();++at) {
+      std::copy(pbr_texel.begin(),pbr_texel.end(),pbr.rgba.begin()+at*4);
+      std::copy(toon_texel.begin(),toon_texel.end(),toon.rgba.begin()+at*4);
+      if (at%size >= 3*size/4) live.coverage[at]=0;
+    }
+    live.normal_field=live.normal_field->replace_planes(pbr,toon,std::vector<uint8_t>(live.coverage.size(),255));
+    paint.clear_bake();
+    paint.install_bake(std::move(live));
+  }
   const auto &mesh = paint.mesh();
   const Vec3 center = (mesh.positions[mesh.indices[0]] + mesh.positions[mesh.indices[1]] +
                        mesh.positions[mesh.indices[2]]) / 3.f;
@@ -850,6 +892,7 @@ void prepared_color_edit(bool affine,const std::filesystem::path &out) {
   check(hidden.id==layer_id && !hidden.visible && hidden.opacity==.625f && new_paint.active_layer()==layer_id,
         "Layer visibility, opacity and active ID survive color transport");
   size_t covered=0, independent_bake=0, independent_layer=0;
+  size_t normal_without_color=0;
   const auto size = new_paint.resolution();
   for (uint32_t y=0;y<size;++y) for (uint32_t x=0;x<size;++x) {
     const auto at = size_t(y)*size + x;
@@ -860,11 +903,20 @@ void prepared_color_edit(bool affine,const std::filesystem::path &out) {
     const auto &common = new_paint.pixel(layer_id,x,y).data;
     const auto pbr = new_paint.pbr_pixel(layer_id,x,y);
     independent_layer += common[9]>190 && common[0]>190 && pbr[0]==41 && pbr[2]==216 && pbr[3]==109;
+    if (portable_normals && resolved.coverage[at]==0 && resolved.normal_field)
+      normal_without_color += std::abs(int(resolved.normal_field->pbr()->rgba[at*4])-
+                                       resolved.normal_field->mtoon()->rgba[at*4])>30;
   }
   std::cout << "RESOLVED_COLOR covered=" << covered << " independent_bake=" << independent_bake
             << " independent_layer=" << independent_layer << '\n';
   check(covered>1000 && independent_bake>1000 && independent_layer>100,
         "Replacement coverage retains both independently sampled Bake colors and the hidden editable PBR tile data");
+  if (portable_normals) {
+    std::cout << "COMBINED_NORMAL independent_without_color=" << normal_without_color << '\n';
+    check(resolved.normal_field && resolved.normal_field->origin()==patch.material_bindings->canonical_attributes &&
+          normal_without_color>1000 && resolved.normal_field->origin()->before_paint()->mesh_owner()==new_paint.mesh_owner(),
+          "Both normal roles remain in the replacement frame with coverage independent from color");
+  }
   const auto encoded = after.encode();
   check(Scene::load(out/"color-after.dsculpt").encode()==encoded && document.undo() &&
         document.copy_scene().encode()==before.encode() && document.redo() && document.copy_scene().encode()==encoded,
@@ -899,12 +951,27 @@ void prepared_color_edit(bool affine,const std::filesystem::path &out) {
   control.active().painted->install_bake(std::move(fallback));
   control.save(out/"color-common-control.dsculpt");
 
+  if (portable_normals) {
+    auto normal_control = after.snapshot();
+    auto neutral = resolved;
+    neutral.normal_field = detail::BakedNormalField::from_intrinsic(patch.material_bindings->canonical_attributes);
+    normal_control.active().painted->clear_bake();
+    normal_control.active().painted->install_bake(std::move(neutral));
+    normal_control.save(out/"color-normal-flat-control.dsculpt");
+  }
+
   auto cleared = before.snapshot();
   cleared.active().painted->clear_bake();
   publish_retopology(cleared,*draft->topology,guide,draft->transform);
   check(!cleared.active().painted->baked() && cleared.active().painted->color_projection() &&
-        cleared.active().painted->layers().back().id==layer_id,
+        cleared.active().painted->layers().back().id==layer_id &&
+        (!portable_normals || cleared.active().material_bindings->canonical_attributes),
         "A cleared Bake stays cleared while the prepared editable color remains available");
+  if (portable_normals) {
+    cleared.save(out/"color-normal-cleared.dsculpt");
+    check(Scene::load(out/"color-normal-cleared.dsculpt").encode()==cleared.encode(),
+          "Cold Open retains both independent preparation owners after Clear and Apply");
+  }
 }
 
 void mixed_material_quad(const std::filesystem::path &out) {
@@ -1624,6 +1691,8 @@ int main(int argc,char **argv) try {
       mode!="reapply-plain" && mode!="reapply-affine" && mode!="prepared-plain" && mode!="prepared-affine" &&
       mode!="prepared-detached" && mode!="prepared-detached-affine" &&
       mode!="prepared-color-plain" && mode!="prepared-color-affine" &&
+      mode!="prepared-color-normal-plain" && mode!="prepared-color-normal-affine" &&
+      mode!="prepared-color-normal-first" &&
       mode!="restore-plain" && mode!="restore-affine" && mode!="material-seam-plain" &&
       mode!="material-seam-affine" && mode!="subdivide-seam-plain" && mode!="subdivide-seam-affine") return 2;
   const std::filesystem::path out = argv[1];
@@ -1636,7 +1705,9 @@ int main(int argc,char **argv) try {
   else if (mode.starts_with("material-seam-")) split_material_seam(mode.ends_with("affine"),out);
   else if (mode.starts_with("subdivide-seam-")) split_material_seam(mode.ends_with("affine"),out,true);
   else if (mode.starts_with("mtoon-")) retopo_toon_materials(mode.ends_with("affine"),mode.ends_with("v0"),out,mode=="mtoon-detached");
-  else if (mode.starts_with("prepared-color-")) prepared_color_edit(mode.ends_with("affine"),out);
+  else if (mode=="prepared-color-normal-first") prepared_color_edit(false,out,PreparedColorOrder::NormalFirst);
+  else if (mode.starts_with("prepared-color-")) prepared_color_edit(mode.ends_with("affine"),out,
+      mode.starts_with("prepared-color-normal-") ? PreparedColorOrder::ColorFirst : PreparedColorOrder::ColorOnly);
   else if (mode.starts_with("prepared-")) prepared_geometry_edit(mode.ends_with("affine"),out,mode.starts_with("prepared-detached"));
   else if (mode.starts_with("reapply-")) reapply_patch(mode.ends_with("affine"),out);
   else bind_patch(mode=="affine",out);
