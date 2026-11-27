@@ -1,0 +1,168 @@
+{
+  "archive": {
+    "filename": "vrm1-editable-native-texture-set-20261127.tar.gz",
+    "members": {
+      "asan/accessory.log": "d6c3b77bf4bd301c3d1aa400dd44cc8e3f8c0a833f532dae5211d909a14f7471",
+      "asan/build.log": "3e883d2af834ca1450d333b8163d998a8c5d20b0d8ea3488fb69704b23ec4a9e",
+      "asan/compile_commands.json": "ba47b6da21cc71d10b9d7799e355b5ce3d8678e85f5d1322f888d89b448f0749",
+      "asan/configure.log": "0d850c79afcc21c1b313941d835206f007bfad4ee4b6e717156fef48a8068805",
+      "asan/registered.log": "a16c4a530b409a49bbdf8ed6244b31d9a5578c0578ea441fb1c480662a03ca23",
+      "asan/registered.xml": "95ba0bcd8e4f4d69a795c981eb81a3c313bdd712f7580463402548f50d61c430",
+      "headless.log": "79763657f064bab1bdca26ef5fab75a87bac9c7c2753860c7cb153e451e83f2b",
+      "khronos.cjs": "1af15fbb00d07a3ae441e7d706ce846cc58bdd1f8e8c16bb41c6f85d046e0e91",
+      "khronos.json": "d9877c4b8336bb86bf7c8d820bf4b79816fbd7d642a29f37a24197504145d9d6",
+      "khronos.log": "f50a4b57d485371f43589c2511f101d0404d4c332623e366c9af2f073ef82eb4",
+      "previous-combined-release-status.json": "d24215bd40e449b4b628e2b7209a7bd5e1e9a5a7f207a0c76404b6d31e454bde",
+      "receipt.py": "3eadb2dce92b60efc798d3efcbfdbc12fb85a53491baaca9f21b37ddd2526e28",
+      "release-wayland-pointer-fixed-point-timeout.log": "c2365b1b0930877957421ff053a74651197928230723fa5dd75aa822a31b042a",
+      "release-wayland-pointer-timeout.log": "ce39aae75099eccf57beeed535d3ae755e19350de43364897c747d50f9d3db67",
+      "release-wayland-pointer.log": "bc04c80b7a2e4f27eeb1d4859b2572f9236bf86adeda5b0508872755c0baebf2",
+      "release-wayland-pointer/report.json": "9e732b39ec89ecc8b459939a4def8aa884629b52b1786a5f04190000c439ef3b",
+      "release-wayland-pointer/target.json": "319ee41f919eab76a7e0039819acc31537732390cf48c3efffa36ae900e2b10b",
+      "release-wayland.log": "22c9bc147973bcab746026d3c46051968a4de682df6a20198add7903cd24527d",
+      "release-wayland/report.json": "9e732b39ec89ecc8b459939a4def8aa884629b52b1786a5f04190000c439ef3b",
+      "release/accessory.log": "d6c3b77bf4bd301c3d1aa400dd44cc8e3f8c0a833f532dae5211d909a14f7471",
+      "release/build.log": "04d7e18c9a7b75701a31ada66ad562a8441558da4f37d4eb5ad617e9f2308478",
+      "release/compile_commands.json": "fe453c8a2062aefc7241bcfa9006851ab48c9301bdbbdb68ec0cf184614df0d2",
+      "release/configure.log": "2e83794f4ba3b1a8c8489ba6f09057bc2de0724d7ebd658d373ac6a1e871d2e9",
+      "release/registered.log": "dbaee9fed74f9d6c0d9c0f8f31656f10d02b58f47765346bd5af42eb64dc75fa",
+      "release/registered.xml": "e77065d44b1cab8d43065b84a591e20397d3fc6dc8a07d0a07811100e9ed23d1",
+      "schemas.json": "a343ac32a0a382bf55d91659640cfa3181373e152426eeedd5ace1d5c9b507a8",
+      "schemas.log": "2621dbfc3af88a0126e9b45a3c7314e66dea46547bf7d97e7917ab9db3701122",
+      "ui.py": "80d1b45b3743bc2ea6e2b8281fe0523278e60dcd66fb580f06114fbf4954d32f",
+      "wayland-accessory.py": "2d9de2fb96e832cdef56f7eada503d531ee050f2580ed67a657d067b8f8dfec7",
+      "wayland-pointer-first.py": "86bc1e8747db249bc3243a07a4179e7df240004da3d07b59a164d1ba41fd4a20",
+      "wayland-pointer-fixed-point.py": "328668bd0d276f610e9efcc49c020b46b30d81cd0ccf7e94e5116b01e8e17fd6",
+      "wayland-pointer.py": "adbd17967ec9ceb7d424e5a9fa8d164071c880ba91388c129511e7f25361d4d2",
+      "xr-accessory.py": "44ef247247bbbd54c3d965afb7c8c70221f442daa28a7d95e879a06e1d7c1190",
+      "xr-arc.log": "8f4fc371a35ba401776f5cb9fd6a4dd288b3c3c4a6f6775f3567879fed809cb8",
+      "xr-arc/runtime.json": "05a29e9b9568da97c53138ef22857cfd1f3287ad140957880f6e0dea3c61fedf",
+      "xr-build.log": "a52b7e462416c851ee9a2907c9a3b78af5b87191cb335db17bb63431038a1971",
+      "xr-software-cancel.log": "b8ff5b79bd7ca5383e4d95c0d1b344c7aca1145a67b8c007c3de11426974dce5",
+      "xr-software-cancel/runtime.json": "f1aae2089648ab2442740cbe116794dde1928bd55bb2f6577da33a49d62ad2a9",
+      "xr-software.log": "8f4fc371a35ba401776f5cb9fd6a4dd288b3c3c4a6f6775f3567879fed809cb8",
+      "xr-software/runtime.json": "94852903659fd24219c2535288a31abea49174574843e2ffe47b439444e1f4d0"
+    },
+    "sha256": "b9af0ca11f7f114d20fdcf020db2fa73c2748e58f8306f6eaed8998dc12523e0"
+  },
+  "byte_identical_outputs": {
+    "native-accessory-editable-second.vrm": "0d8c4b87973b5dd4c731e6e6b6734de441b3d98767510716a7f878037f6ea24b",
+    "native-accessory-editable.vrm": "0d8c4b87973b5dd4c731e6e6b6734de441b3d98767510716a7f878037f6ea24b",
+    "native-accessory.dsculpt": "b9355f1038729e3a75195e437637ca401dbb401e3741e49978724dd4eb31bed3",
+    "native-accessory.vrm": "5c609c9435e9267d692a9b67239bbbb05779648e8c2bca1a3159d993ebcd13e9"
+  },
+  "canonical_domed_revision": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "earlier_combined_release": {
+    "app_sha256": "757f265c99f4f811c34bf6d8ab9a0eb7d40ecf4a026350c418550fad2ef5625c",
+    "cache_sha256": "941246a34d52a93f55e2dc9444541cfe7ad057a397a1f773d0d5e28bcb52dc60",
+    "candidate": "662d889da2b3a56e36f2f58f5280a624ae798906",
+    "changed_paths": [
+      "CMakeLists.txt",
+      "docs/HANDOFF.md",
+      "docs/REQUIREMENTS.md",
+      "docs/validation/exact-overlay-gpu-budget-20261127.json",
+      "docs/validation/exact-overlay-gpu-budget-20261127.tar.gz",
+      "docs/validation/native-mtoon-bake-20261127.json",
+      "docs/validation/native-mtoon-bake-20261127.tar.gz",
+      "docs/validation/retopo-save-queue-20261127.json",
+      "docs/validation/retopo-save-queue-20261127.tar.gz",
+      "src/bake-authoring.cpp",
+      "src/bake.cpp",
+      "src/export.cpp",
+      "src/native-authoring-compiler.cpp",
+      "src/render-paint-overlay.hpp",
+      "src/source-bake-normal.hpp",
+      "src/texture-set-export.cpp",
+      "src/texture-set-export.hpp",
+      "src/texture-set-range.cpp",
+      "src/texture-set-surface.cpp",
+      "src/texture-set-worker.cpp",
+      "src/texture-sets.cpp",
+      "tests/bake-recipes-xr.py",
+      "tests/bake-recipes.cpp",
+      "tests/baked-emission-gpu.cpp",
+      "tests/mtoon-render.cpp",
+      "tests/paint-overlay-gpu.cpp"
+    ],
+    "elapsed_seconds": 1049.026,
+    "invocation": "5d6e0b870e0749f1a8e890898960df75",
+    "observed_passes": 965,
+    "observed_reported_failures": 0,
+    "phase": "run every registered Release test",
+    "registered": 1366,
+    "seed_app_sha256": "e0e7ea525e5338c4080a2af9db1cca0c18d856b5d9ddf37c399214b0afdc2e38",
+    "seed_cache_sha256": "7a052e626ae14dbbeb06a4465ed0203f08e2cba506988b71f891d7d317c00ab0",
+    "seed_registration_error": "texture-set-export was renamed dome-sculpt-texture-set-export",
+    "seed_revision": "f70483e921ded0d80497f36802e9201b9aebc1c1",
+    "terminal": false
+  },
+  "interop": {
+    "cold_glb_identical_from_standard_and_editable_vrm": true,
+    "cold_glb_sha256": "df913ab66c979194a995a95faf50dcbd1e0270132e18769110d36186b3e9f2ee",
+    "khronos_errors": 0,
+    "khronos_files": 4,
+    "khronos_version": "2.0.0-dev.3.10",
+    "khronos_warnings": 0,
+    "pinned_schema_checks": 14
+  },
+  "product_revision": "51219fa91ac90ed6153eb8740de86b8c3ed42f36",
+  "profiles": {
+    "asan": {
+      "core": "03adeeea1296aff8143a3306dc1c1205ea76bbd60e90bbb7c956b27f327ddeb7",
+      "native_checks": 31,
+      "native_test": "360ac05d9d37980f60eab99c129f1fe44b656825afd3b97fa70b6adb07e679a2",
+      "registered_cases": [
+        "emission-vrm",
+        "vrm1-source-export",
+        "vrm1-painted-authoring"
+      ]
+    },
+    "release": {
+      "application": "1d28802eb0ae950266111d866d21a01b3bd5771343224cf81ac80235f0e0630b",
+      "core": "b4edf90ef571d1084c350944f09dd4ecc21ed9a3cc8b3d09c44bc9cf37cea0d7",
+      "native_checks": 31,
+      "native_test": "99c54c9e66b6c2846653d96987aa29bbdb3196ec80b673fec6a6db32d7a54bce",
+      "registered_cases": [
+        "emission-vrm",
+        "vrm-rest-metadata",
+        "vrm1-source-export",
+        "vrm1-painted-authoring",
+        "vrm1-export-worker",
+        "dome-sculpt-texture-set-export"
+      ],
+      "synthetic_openxr_runtime": "a509d343406cb8ca044821b06e3cd90d5a1730d6747abfb27a6fa1e4c5487d65"
+    }
+  },
+  "runtime_paths": {
+    "openxr-arc": {
+      "checks": 5,
+      "output_sha256": "0d8c4b87973b5dd4c731e6e6b6734de441b3d98767510716a7f878037f6ea24b",
+      "physical_headset": false,
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "swapchain_releases": 88
+    },
+    "openxr-software": {
+      "checks": 5,
+      "output_sha256": "0d8c4b87973b5dd4c731e6e6b6734de441b3d98767510716a7f878037f6ea24b",
+      "physical_headset": false,
+      "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+      "swapchain_releases": 86
+    },
+    "openxr-software-cancel": {
+      "checks": 5,
+      "output_sha256": "0f3143afed2d5daecf0126548f1e1ab463c046fb8be7411c09e0cb437dc2e32a",
+      "physical_headset": false,
+      "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+      "swapchain_releases": 88
+    },
+    "wayland-keyboard": {
+      "checks": 8,
+      "output_sha256": "0d8c4b87973b5dd4c731e6e6b6734de441b3d98767510716a7f878037f6ea24b"
+    },
+    "wayland-pointer": {
+      "checks": 8,
+      "output_sha256": "0d8c4b87973b5dd4c731e6e6b6734de441b3d98767510716a7f878037f6ea24b"
+    }
+  },
+  "scope": "VRM 1.0, nested native rigid texture-set accessories with certified native portable materials"
+}

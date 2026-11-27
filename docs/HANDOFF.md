@@ -2608,8 +2608,8 @@ The saved VRM restores the exact selected native scene and explicitly
 marks the hidden donor unavailable when it falls outside export scope.
 A second export reproduces the same file bytes. The Wayland universal menu
 and synthetic OpenXR Files command write the same VRM as the Document worker.
-Source-bone attachments, deforming or retained source texture-set partitions,
-VRM0 materials and Editable VRM remain open.
+Source-bone attachments, deforming or retained source texture-set partitions
+and VRM0 materials remain open.
 
 The native worker passes 20 focused checks in both Release and ASan/UBSan.
 Five registered Release suites pass. Independent cgltf compares the original
@@ -2620,6 +2620,35 @@ synthetic OpenXR on software GL and Intel Arc A770 each produce the exact
 verified VRM. The headless application reopens it and emits a Standard GLB
 with the identical accessory PNG payloads.
 [Native VRM1 texture-set validation](validation/vrm1-native-texture-set-20261127.json)
+
+### Native texture-set accessories in Editable VRM1
+
+Editable VRM1 includes eligible rigid native accessories under the imported
+avatar root. The selected accessory enables both the DomeD universal-menu
+command and the controller Files command. The worker preserves the captured
+accessory plan and compiles the original avatar parts in that same export.
+The accessory keeps its certified native texture-set grid. The dialog's
+resolution selects the compiled preview resolution for original source paint.
+
+The portable accessory uses the same partition geometry, tangent frame,
+MToon and PBR materials, samplers and PNGs as Standard VRM1. Original
+expressions still bind to their source parts. Editable VRM keeps the exact
+FLOAT Bake and authoring data in the embedded selected Scene. Document Open
+restores that Scene, including the unavailable marker for a hidden donor
+excluded from export. Repeat export reproduces the same bytes, and a foreign
+accessory cannot replace an existing destination.
+
+Release and ASan/UBSan each pass 31 focused native checks. Six registered
+Release suites and three sanitizer suites pass. The native Wayland menu
+passes default Cancel and confirms the export by keyboard and pointer.
+Synthetic OpenXR on software GL and Intel Arc
+A770 produces the same VRM through the controller Files command. The
+controller Cancel preserves a prior destination at the durable write boundary.
+A fresh headless process opens the Editable VRM and publishes the same GLB as
+reopening its Standard counterpart. The Khronos validator and pinned VRM1 and
+MToon schemas pass. Physical headset testing and bone-attached, skinned or
+retained-source accessory material transport remain open.
+[Editable VRM1 native texture-set validation](validation/vrm1-editable-native-texture-set-20261127.json)
 
 ## Source and integration boundary
 
