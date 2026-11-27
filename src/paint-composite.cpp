@@ -34,6 +34,28 @@ void validate(const Input &in,const std::function<bool()> &cancelled){
  for(auto id:in.color_tiles)
   if(id!=absent&&id>=in.color_pixels.size()/1024)
    throw std::out_of_range("Prepared color tile owner is invalid");
+ if(!std::isfinite(in.occlusion_strength)||in.occlusion_strength<0||in.occlusion_strength>1)
+  throw std::invalid_argument("Invalid source texture occlusion strength");
+ for(const auto &source:in.sources){
+  if(source.rgba.empty()){
+   if(source.width||source.height||!source.columns.empty()||!source.rows.empty())
+    throw std::invalid_argument("Source texture coordinates have no image owner");
+   continue;
+  }
+  if(!source.width||!source.height||source.width>p.resolution||source.height>p.resolution||
+     source.rgba.size()!=4*size_t(source.width)*source.height||
+     source.columns.size()!=p.resolution||source.rows.size()!=p.resolution)
+   throw std::invalid_argument("Source texture inputs do not fit the compositor grid");
+  const auto check_axis=[&](std::span<const detail::SourceTextureAxis> taps,uint32_t extent){
+   for(const auto &tap:taps){
+    if(uint32_t(tap.first)>=extent||uint32_t(tap.second)>=extent||!std::isfinite(tap.fraction)||tap.fraction<0||tap.fraction>1)
+     throw std::out_of_range("Source texture tap is outside the declared image");
+   }
+  };
+  checkpoint(cancelled);
+  check_axis(source.columns,source.width);
+  check_axis(source.rows,source.height);
+ }
  for(float v:p.color)if(!std::isfinite(v)||v<0||v>1)throw std::invalid_argument("Invalid paint composite color");
  for(float v:p.emission)if(!std::isfinite(v)||v<0||v>100)throw std::invalid_argument("Invalid paint composite emission");
  for(float v:{p.metallic,p.roughness})if(!std::isfinite(v)||v<0||v>1)throw std::invalid_argument("Invalid paint composite material");

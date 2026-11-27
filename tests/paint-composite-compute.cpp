@@ -2,10 +2,12 @@
 #include "paint-composite-backend.hpp"
 #include "dome/paint.hpp"
 #include "dome/brush.hpp"
+#include "source-texture-grid.hpp"
 #include <algorithm>
 #include <cmath>
 #include <cstring>
 #include <iostream>
+#include <optional>
 #include <random>
 #ifdef DOME_TEST_SYCL
 #include <sycl/sycl.hpp>
@@ -16,8 +18,15 @@ namespace {
 size_t checks=0;void check(bool b,const char*m){++checks;if(!b)throw std::runtime_error(m);}
 uint8_t byte(float v){return uint8_t(std::lround(std::clamp(v,0.f,1.f)*255));}
 float unit(uint8_t v){return float(v)/255;}
-Output reference(const Input &in,size_t at,std::array<uint8_t,4> *prepared=nullptr){
+using SourceSamples=std::array<std::array<float,4>,SourceRoleCount>;
+Output reference(const Input &in,size_t at,std::array<uint8_t,4> *prepared=nullptr,const SourceSamples *samples=nullptr){
  const auto &p=in.parameters;float c[]{p.color[0],p.color[1],p.color[2],p.color[3]},e[]{p.emission[0],p.emission[1],p.emission[2]},ao=1,rough=p.roughness,metal=p.metallic,cc=0,ec=0;const auto owner=in.padding[at];
+ if(samples){
+  for(size_t k=0;k<4;++k)c[k]*=(*samples)[SourceColor][k];
+  for(size_t k=0;k<3;++k)e[k]*=(*samples)[SourceEmission][k];
+  rough*=(*samples)[SourceOrm][1];metal*=(*samples)[SourceOrm][2];
+  ao=1-in.occlusion_strength*(1-(*samples)[SourceOcclusion][0]);
+ }
  std::array<float,4> pbr{};
  if(prepared)for(size_t k=0;k<4;++k)pbr[k]=c[k]*unit(in.projected_color[4*at+k]);
  const auto decode_color=[](uint8_t v,size_t k){return k==3?unit(v):srgb_to_linear(unit(v));};
@@ -101,6 +110,32 @@ void attach_prepared_tiles(Input &input){
    for(auto &component:input.color_pixels[i].rgba)component=uint8_t(rng());
  }
 }
+struct SourceFixture {
+ std::array<PaintSourceTexture,SourceRoleCount> textures;
+ std::array<std::optional<detail::SourceTextureGrid>,SourceRoleCount> grids;
+ explicit SourceFixture(Input &in){
+  const auto r=in.parameters.resolution;
+  std::mt19937 rng(0x56e0c);
+  for(size_t role=0;role<textures.size();++role){
+   const uint32_t width=19+uint32_t(role)*3,height=11+uint32_t(role);
+   auto image=std::make_shared<Image>(Image{width,height,std::vector<uint8_t>(4*size_t(width)*height)});
+   for(auto &byte:image->rgba)byte=uint8_t(rng());
+   auto &texture=textures[role];texture.image=image;
+   texture.uv_transform={role%2?1.61f:-1.47f,0,0,.81f,-.25f,.16f};
+   texture.wrap_s=role==0?33648:role==1?33071:10497;
+   texture.wrap_t=role==0?33071:role==2?33648:10497;
+   texture.mag_filter=role==1?9728:9729;
+   const auto &grid=grids[role].emplace(texture,r,r,role==SourceColor||role==SourceEmission);
+   in.sources[role]={image->rgba,grid.columns(),grid.rows(),width,height,texture.mag_filter==9728};
+  }
+  in.occlusion_strength=.47f;
+ }
+ SourceSamples sample(uint32_t x,uint32_t y)const{
+  SourceSamples result;
+  for(size_t role=0;role<grids.size();++role)result[role]=grids[role]->sample(x,y);
+  return result;
+ }
+};
 template<class F>bool refuses(F f){try{f();return false;}catch(const std::exception&e){std::cout<<"REFUSAL "<<e.what()<<'\n';return true;}}
 }
 int main(int argc,char**argv)try{
@@ -110,7 +145,9 @@ int main(int argc,char**argv)try{
   check(refuses([&]{paint_compute::composite(in);}),"Missing selected device silently returned CPU baked paint composite");
   in.projected_color=baked.color;in.baked_pbr_color=baked.orm;attach_prepared_tiles(in);
   check(refuses([&]{paint_compute::composite(in);}),"Missing device silently returned CPU prepared color composite");
-  std::cout<<"PASS selected-backend missing-device refusal for plain, baked and prepared paint\n";return 0;
+  const SourceFixture source(in);
+  check(refuses([&]{paint_compute::composite(in);}),"Missing device silently returned CPU textured paint composite");
+  std::cout<<"PASS selected-backend missing-device refusal for plain, baked, prepared and textured paint\n";return 0;
  }
 #ifdef DOME_TEST_SYCL
  sycl::device device{sycl::gpu_selector_v};auto name=device.get_info<sycl::info::device::name>();auto pci=device.get_info<sycl::ext::intel::info::device::pci_address>();std::cout<<"ACTUAL_GPU "<<name<<" pci="<<pci<<'\n';if(std::getenv("DOME_REQUIRE_ARC_PCI03"))check(name.find("Arc")!=std::string::npos&&name.find("A770")!=std::string::npos&&pci=="0000:03:00.0","Wrong requested paint compute device");
@@ -149,18 +186,27 @@ int main(int argc,char**argv)try{
  for(bool baked_input:{false,true}){
   in=fixture(288,baked_input?5:0,24);
   const BakeFixture baked(in.padding.size());
+  const SourceFixture source(in);
   in.projected_color=baked.color;
   if(baked_input){in.bake=baked.images();in.baked_pbr_color=baked.orm;attach_prepared_tiles(in);}
   const auto result=paint_compute::composite(in);
   check(result.pbr_colors.size()==4*in.padding.size(),"Prepared color output size differs from the grid");
   for(size_t at=0;at<result.pixels.size();++at){
    std::array<uint8_t,4> pbr{};
-   const auto expected=reference(in,at,&pbr);
-   check(!std::memcmp(&result.pixels[at],&expected,sizeof(Output)),"Prepared color changes common maps or raw float transparency");
-   check(std::equal(pbr.begin(),pbr.end(),result.pbr_colors.data()+4*at),"Prepared PBR color differs from the independent vertex, Bake and layer oracle");
+   const auto sampled=source.sample(uint32_t(at%in.parameters.resolution),uint32_t(at/in.parameters.resolution));
+   const auto expected=reference(in,at,&pbr,&sampled);
+   check(!std::memcmp(&result.pixels[at],&expected,sizeof(Output)),"Source sampling and compositing differ from the native color, ORM, emission or alpha oracle");
+   check(std::equal(pbr.begin(),pbr.end(),result.pbr_colors.data()+4*at),"Prepared PBR color differs from the independent texture, vertex, Bake and layer oracle");
   }
   auto bad=in;bad.projected_color=bad.projected_color.subspan(1);
   check(refuses([&]{paint_compute::composite(bad);}),"Malformed projection was submitted to the GPU");
+  bad=in;bad.sources[0].rows=bad.sources[0].rows.subspan(1);
+  check(refuses([&]{paint_compute::composite(bad);}),"Incomplete texture coordinates were submitted to the GPU");
+  bad=in;auto wrong=std::vector<detail::SourceTextureAxis>(in.sources[0].columns.begin(),in.sources[0].columns.end());
+  wrong[1].second=-1;bad.sources[0].columns=wrong;
+  check(refuses([&]{paint_compute::composite(bad);}),"Invalid source texture tap was submitted to the GPU");
+  bad=in;bad.sources[0].rgba=bad.sources[0].rgba.subspan(4);
+  check(refuses([&]{paint_compute::composite(bad);}),"Truncated source image was submitted to the GPU");
   if(baked_input){
    bad=in;bad.baked_pbr_color={};
    check(refuses([&]{paint_compute::composite(bad);}),"Prepared Bake without a resolved color was submitted to the GPU");

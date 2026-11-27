@@ -4790,23 +4790,44 @@ PaintedMesh::composite(const Material &material,const std::function<bool()> &can
   composite_retention().retain(maps,composite_token_,factors,false);return maps;
 }
 namespace {
-bool gpu_plain_composite_eligible(uint32_t r,const std::vector<PaintLayer> &layers,bool baked_coverage,bool projected){
+auto composite_source_textures(const PaintSourceMaps &maps){
+ return std::array{&maps.color,&maps.metal_rough,&maps.emission,&maps.occlusion};
+}
+bool gpu_source_textures_eligible(const PaintSourceMaps &maps,uint32_t resolution){
+ return std::ranges::all_of(composite_source_textures(maps),[&](const auto *source){
+  return !source->image||(source->image->width<=resolution&&source->image->height<=resolution&&
+      source->uv_transform[1]==0&&source->uv_transform[2]==0);
+ });
+}
+bool gpu_plain_composite_eligible(uint32_t r,const std::vector<PaintLayer> &layers,bool material_input,bool projected){
  if(compute_backend()=="CPU"||r<512||r>2048)return false;
  size_t contributing=0;
  for(const auto &l:layers){
   if(!projected&&std::any_of(l.pbr_tiles.begin(),l.pbr_tiles.end(),[](const auto &p){return bool(p);}))return false;
   if(l.visible&&l.opacity>0&&std::any_of(l.tiles.begin(),l.tiles.end(),[](const auto &p){return bool(p);}))++contributing;
  }
- return (contributing||baked_coverage||projected)&&uint64_t(r)*r*contributing<=128*1024*1024;
+ return (contributing||material_input)&&uint64_t(r)*r*contributing<=128*1024*1024;
 }
 std::shared_ptr<TextureMaps> gpu_plain_composite(uint32_t r,const std::vector<PaintLayer> &layers,
     const std::vector<int32_t> &padding,const Material &material,const BakedTextures *bake,
-    const PaintColorProjection *projection,const std::function<bool()> &cancelled){
+    const PaintColorProjection *projection,const PaintSourceMaps &source,const std::function<bool()> &cancelled){
  using namespace paint_compute;checkpoint(cancelled);Input in;auto &p=in.parameters;
  p.resolution=r;p.tiles=((r+31)/32)*((r+31)/32);std::copy(material.color.begin(),material.color.end(),p.color);std::copy(material.emissive.begin(),material.emissive.end(),p.emission);p.metallic=material.metallic;p.roughness=material.roughness;
  bool color_coverage=bake!=nullptr,emission_coverage=bake!=nullptr;
- if(bake)in.bake={bake->coverage,bake->maps.color.rgba,bake->maps.metal_rough.rgba,bake->maps.emission.rgba,
-                  bake->maps.normal.rgba};
+ if(bake){
+  in.bake={bake->coverage,bake->maps.color.rgba,bake->maps.metal_rough.rgba,bake->maps.emission.rgba,{}};
+  if(!source.normal.image||source.normal_scale<=0)in.bake.normal=bake->maps.normal.rgba;
+ }
+ std::array<std::optional<detail::SourceTextureGrid>,SourceRoleCount> source_grids;
+ const auto textures=composite_source_textures(source);
+ for(size_t role=0;role<textures.size();++role){
+  const auto &texture=*textures[role];
+  if(!texture.image)continue;
+  checkpoint(cancelled);
+  const auto &grid=source_grids[role].emplace(texture,r,r,false);
+  in.sources[role]={texture.image->rgba,grid.columns(),grid.rows(),texture.image->width,texture.image->height,texture.mag_filter==9728};
+ }
+ in.occlusion_strength=source.occlusion_strength;
  if(projection){
   in.projected_color=projection->vertex_rgba->rgba;
   if(bake){
@@ -4938,23 +4959,25 @@ PaintedMesh::build_composite(const Material &material,const std::function<bool()
   if(has_physical_emission()||std::any_of(material.emissive.begin(),material.emissive.end(),[](float v){return v>1;}))throw std::logic_error("Physical emission requires its linear composite adapter");
   if(source_maps_&&source_maps_->uses_alternate_uv())throw std::invalid_argument(source_maps_->extra_uv_sets.empty()?"UV1 source compositing requires explicit source-coordinate preparation":"Extra source UV compositing requires explicit source-coordinate preparation");
   // The compute packet uses the current native grid with its actual padding.
-  // Source samplers, independent paint domains and prepared normal fields keep their own adapters.
+  // Independent paint domains and prepared normal fields keep their own adapters.
   const auto r=resolution();
   if(color_projection_)color_projection_->validate(r);
+  const PaintSourceMaps empty;
+  const auto &source=source_maps_?*source_maps_:empty;
   const bool native_grid=!surface_->paint_domain&&!sampling_attachment_&&
-      (!source_maps_||source_maps_->empty())&&!normal_projection_&&
+      gpu_source_textures_eligible(source,r)&&!normal_projection_&&
       (!baked_||!baked_->emission_field);
   const auto *bake=native_grid&&baked_&&compute_backend()!="CPU"&&r>=512&&
       std::ranges::any_of(baked_->coverage,[](uint8_t value){return value!=0;})?baked_.get():nullptr;
-  const bool accelerated=native_grid&&gpu_plain_composite_eligible(r,layers_,bake!=nullptr,bool(color_projection_));
-  auto maps=accelerated?gpu_plain_composite(r,layers_,surface_->padding,material,bake,color_projection_.get(),cancelled):
+  const bool material_input=bake||color_projection_||std::ranges::any_of(composite_source_textures(source),
+                                                                  [](const auto *texture){return bool(texture->image);});
+  const bool accelerated=native_grid&&gpu_plain_composite_eligible(r,layers_,material_input,bool(color_projection_));
+  auto maps=accelerated?gpu_plain_composite(r,layers_,surface_->padding,material,bake,color_projection_.get(),source,cancelled):
                          std::make_shared<TextureMaps>();
   const bool device_normal=!maps->normal.rgba.empty();
   maps->source_maps=source_maps_;
   maps->color_projection=color_projection_;
   maps->normal_projection=normal_projection_;
-  const PaintSourceMaps empty;
-  const auto &source=source_maps_?*source_maps_:empty;
   auto dimensions=[&](Image &image,std::initializer_list<const PaintSourceTexture*> views){
     image.width=image.height=r;
     for(auto view:views)if(view->image){image.width=std::max(image.width,view->image->width);image.height=std::max(image.height,view->image->height);}

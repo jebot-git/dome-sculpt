@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
+#include "source-texture-axis.hpp"
 #include <cstdint>
 #include <cstddef>
 #include <bit>
@@ -27,6 +28,17 @@ struct PreparedColor {
  const uint32_t *tiles=nullptr;
  const ColorPixel *pixels=nullptr;
 };
+enum SourceRole : unsigned { SourceColor, SourceOrm, SourceEmission, SourceOcclusion, SourceRoleCount };
+struct SourceTexture {
+ const uint8_t *rgba=nullptr;
+ const detail::SourceTextureAxis *columns=nullptr,*rows=nullptr;
+ uint32_t width=0;
+ bool nearest=false;
+};
+struct SourceMaterial {
+ SourceTexture textures[SourceRoleCount];
+ float occlusion_strength=1;
+};
 struct Quantization {float unit[256]{},srgb[256]{};uint32_t threshold[255]{};uint32_t reserved=0;};
 inline constexpr uint32_t absent=UINT32_MAX;
 // Volatile float expression boundaries prohibit contraction without changing
@@ -53,6 +65,27 @@ DOME_PC_FN uint8_t srgb_byte(float v,const Quantization &q){
  return uint8_t(lo);
 }
 DOME_PC_FN float blend(float base,float paint,float a){return add(mul(base,sub(1,a)),mul(paint,a));}
+DOME_PC_FN void sample_source(SourceTexture texture,uint32_t x,uint32_t y,bool srgb,
+                              const Quantization &q,float (&result)[4]){
+ if(!texture.rgba){
+  for(auto &channel:result)channel=1;
+  return;
+ }
+ const auto column=texture.columns[x],row=texture.rows[y];
+ const auto decode=[&](const uint8_t *rgba,unsigned c){return srgb&&c<3?q.srgb[rgba[c]]:q.unit[rgba[c]];};
+ if(texture.nearest){
+  const auto *rgba=texture.rgba+(size_t(row.first)*texture.width+column.first)*4;
+  for(unsigned c=0;c<4;++c)result[c]=decode(rgba,c);
+  return;
+ }
+ for(auto &channel:result)channel=0;
+ for(unsigned tap=0;tap<4;++tap){
+  const bool right=tap&1,bottom=tap&2;
+  const auto *rgba=texture.rgba+(size_t(bottom?row.second:row.first)*texture.width+(right?column.second:column.first))*4;
+  const float weight=mul(right?column.fraction:sub(1,column.fraction),bottom?row.fraction:sub(1,row.fraction));
+  for(unsigned c=0;c<4;++c)result[c]=add(result[c],mul(weight,decode(rgba,c)));
+ }
+}
 // Native normals normalize in two separate binary32 steps. Fast device
 // reciprocals can cross a final byte-rounding boundary even one ULP away.
 DOME_PC_FN float normal_length(float squared){
@@ -96,15 +129,23 @@ DOME_PC_FN void compose_normal(int32_t owner,Bake bake,const Quantization &q,uin
 }
 DOME_PC_FN Output compose(uint32_t at,const Parameters &p,const Layer *layers,const uint32_t *tiles,
                          const Pixel *pixels,const int32_t *padding,Bake bake,PreparedColor prepared,
-                         const Quantization &q,uint8_t *prepared_out){
- float color[]{p.color[0],p.color[1],p.color[2],p.color[3]};
+                         const SourceMaterial &source,const Quantization &q,uint8_t *prepared_out){
+ const uint32_t column=at%p.resolution,row=at/p.resolution;
+ float color[4],orm[4],sampled_emission[4],occlusion[4];
+ sample_source(source.textures[SourceColor],column,row,true,q,color);
+ sample_source(source.textures[SourceOrm],column,row,false,q,orm);
+ sample_source(source.textures[SourceEmission],column,row,true,q,sampled_emission);
+ sample_source(source.textures[SourceOcclusion],column,row,false,q,occlusion);
+ for(unsigned c=0;c<4;++c)color[c]=mul(color[c],p.color[c]);
  float pbr[4]{};
  if(prepared_out){
   const auto *vertex=prepared.vertex+size_t(at)*4;
   for(unsigned c=0;c<4;++c)pbr[c]=mul(color[c],q.unit[vertex[c]]);
  }
- float emission[]{p.emission[0],p.emission[1],p.emission[2]};
- float ao=1,rough=p.roughness,metal=p.metallic,cc=0,ec=0;const auto owner=padding[at];
+ float emission[]{mul(p.emission[0],sampled_emission[0]),mul(p.emission[1],sampled_emission[1]),mul(p.emission[2],sampled_emission[2])};
+ float ao=sub(1,mul(source.occlusion_strength,sub(1,occlusion[0])));
+ float rough=mul(p.roughness,orm[1]),metal=mul(p.metallic,orm[2]),cc=0,ec=0;
+ const auto owner=padding[at];
  if(owner>=0){
   if(bake.coverage){
    const auto offset=size_t(owner)*4;

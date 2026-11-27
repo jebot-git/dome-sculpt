@@ -16,6 +16,8 @@ Result composite(const Input &in,const std::function<bool()> &cancelled){
  auto pixels=allocate.template operator()<Pixel>(in.pixels.size());auto padding=allocate.template operator()<int32_t>(in.padding.size());
  std::unique_ptr<uint8_t,UsmDeleter> baked{nullptr,{&queue}};
  if(const auto bytes=in.image_bytes())baked=allocate.template operator()<uint8_t>(bytes);
+ std::unique_ptr<detail::SourceTextureAxis,UsmDeleter> axes{nullptr,{&queue}};
+ if(const auto count=in.axis_count())axes=allocate.template operator()<detail::SourceTextureAxis>(count);
  auto quant=allocate.template operator()<Quantization>(1);auto output=allocate.template operator()<Output>(chunk_pixels);
  std::unique_ptr<uint32_t,UsmDeleter> color_tiles{nullptr,{&queue}};
  std::unique_ptr<ColorPixel,UsmDeleter> color_pixels{nullptr,{&queue}};
@@ -42,15 +44,17 @@ Result composite(const Input &in,const std::function<bool()> &cancelled){
   queue.memcpy(padding.get(),in.padding.data(),in.padding.size()*sizeof(int32_t));queue.memcpy(quant.get(),&table,sizeof(table));
   const auto bake=in.bake.device_view(baked.get());
   const auto prepared=in.device_colors(baked.get(),color_tiles.get(),color_pixels.get());
-  if(baked){
-   auto *target=baked.get();
-   for(const auto plane:{in.bake.coverage,in.bake.color,in.bake.orm,in.bake.emission,in.bake.normal,
-                         in.projected_color,in.baked_pbr_color}){
-    if(plane.empty())continue;
-    queue.memcpy(target,plane.data(),plane.size_bytes());
-    target+=plane.size_bytes();
-   }
-  }
+  const auto source=in.device_sources(baked.get(),axes.get());
+  auto *image_target=baked.get();
+  in.visit_images([&](const auto plane){
+   queue.memcpy(image_target,plane.data(),plane.size_bytes());
+   image_target+=plane.size();
+  });
+  auto *axis_target=axes.get();
+  in.visit_axes([&](const auto taps){
+   queue.memcpy(axis_target,taps.data(),taps.size_bytes());
+   axis_target+=taps.size();
+  });
   const auto p=in.parameters;const auto l=layers.get();const auto t=tiles.get();const auto px=pixels.get();const auto pad=padding.get();const auto q=quant.get();const auto out=output.get();
   auto *normal=normal_output.get();
   auto *pbr=pbr_output.get();
@@ -59,7 +63,7 @@ Result composite(const Input &in,const std::function<bool()> &cancelled){
    const auto count=std::min(chunk_pixels,result.pixels.size()-first);
    queue.parallel_for(sycl::range<1>{count},[=](sycl::id<1> id){
     const auto at=uint32_t(first+id[0]);
-    out[id]=compose(at,p,l,t,px,pad,bake,prepared,*q,pbr?pbr+4*id[0]:nullptr);
+    out[id]=compose(at,p,l,t,px,pad,bake,prepared,source,*q,pbr?pbr+4*id[0]:nullptr);
     if(normal)compose_normal(pad[at],bake,*q,normal+4*id[0]);
    });
    queue.memcpy(result.pixels.data()+first,out,count*sizeof(Output));

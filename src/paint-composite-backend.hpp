@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 #include "paint-composite-kernel.hpp"
+#include <array>
 #include <functional>
 #include <span>
 #include <vector>
@@ -22,6 +23,12 @@ struct BakeImages {
     return {buffer,colors,orms,emissions,normal.empty()?nullptr:emissions+emission.size()};
   }
 };
+struct TextureInput {
+  std::span<const uint8_t> rgba;
+  std::span<const detail::SourceTextureAxis> columns,rows;
+  uint32_t width=0,height=0;
+  bool nearest=false;
+};
 struct Input {
   Parameters parameters;
   std::vector<Layer> layers;
@@ -33,8 +40,55 @@ struct Input {
   // One optional PBR tile index per packed common tile.
   std::vector<uint32_t> color_tiles;
   std::vector<ColorPixel> color_pixels;
-  size_t image_bytes() const noexcept {
+  std::array<TextureInput,SourceRoleCount> sources;
+  float occlusion_strength=1;
+  size_t bake_and_projection_bytes() const noexcept {
     return bake.size_bytes()+projected_color.size()+baked_pbr_color.size();
+  }
+  size_t image_bytes() const noexcept {
+    auto bytes=bake_and_projection_bytes();
+    for(const auto &source:sources)bytes+=source.rgba.size();
+    return bytes;
+  }
+  size_t axis_count() const noexcept {
+    size_t count=0;
+    for(const auto &source:sources)count+=source.columns.size()+source.rows.size();
+    return count;
+  }
+  template<class Copy>
+  void visit_images(Copy copy) const {
+    for(const auto plane:{bake.coverage,bake.color,bake.orm,bake.emission,bake.normal,projected_color,baked_pbr_color})
+      if(!plane.empty())copy(plane);
+    for(const auto &source:sources)if(!source.rgba.empty())copy(source.rgba);
+  }
+  template<class Copy>
+  void visit_axes(Copy copy) const {
+    for(const auto &source:sources)if(!source.rgba.empty()){
+      copy(source.columns);
+      copy(source.rows);
+    }
+  }
+  SourceMaterial source_views() const noexcept {
+    SourceMaterial result;
+    result.occlusion_strength=occlusion_strength;
+    for(size_t role=0;role<sources.size();++role){
+      const auto &source=sources[role];
+      if(!source.rgba.empty())result.textures[role]={source.rgba.data(),source.columns.data(),source.rows.data(),source.width,source.nearest};
+    }
+    return result;
+  }
+  SourceMaterial device_sources(const uint8_t *images,const detail::SourceTextureAxis *axes) const noexcept {
+    SourceMaterial result;
+    result.occlusion_strength=occlusion_strength;
+    size_t offset=bake_and_projection_bytes();
+    for(size_t role=0;role<sources.size();++role){
+      const auto &source=sources[role];
+      if(source.rgba.empty())continue;
+      result.textures[role]={images+offset,axes,axes+source.columns.size(),source.width,source.nearest};
+      offset+=source.rgba.size();
+      axes+=source.columns.size()+source.rows.size();
+    }
+    return result;
   }
   PreparedColor device_colors(const uint8_t *images,const uint32_t *ids,const ColorPixel *colors) const noexcept {
     if(projected_color.empty())return {};
