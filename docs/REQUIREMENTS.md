@@ -135,6 +135,16 @@ normal UVs, more general smooth shading and deformation remain open for
 explicit tangent transport.
 [Portable MToon tangent evidence](validation/mtoon-portable-tangent-20261127.json)
 
+Static MToon 1 texture-set normal transforms now export as explicit
+post-transform coordinates with corresponding tangents. Rotation, offset,
+non-uniform scaling and UV mirroring preserve the source image and sampler.
+The normal role has its own accessor while other material roles keep their
+original coordinates. Certification bounds coordinate precision and tangent
+interpolation. The native GLB import worker restores independently transformed
+material slots with their original texture bytes and frame owners. Animated
+or reflected-node transport and more general deformation remain required.
+[Static normal transform evidence](validation/mtoon-static-normal-uv-20261127.json)
+
 The current combined atlas and HDR cache source passes all 153 checks
 in both software Release and Intel Arc ASan/UBSan OpenXR replays. Its
 export is byte-identical across both profiles and independently validates

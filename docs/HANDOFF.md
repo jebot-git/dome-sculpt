@@ -124,8 +124,9 @@ Undo/Redo results exactly, and synthetic OpenXR renders the linked pose on
 llvmpipe and Intel Arc A770. Both exports pass the official VRM schemas and
 Khronos validation with zero errors. Khronos reports eight warnings per
 export for combined material extensions and transformed skinned nodes.
-The full Release qualification of `71e3e6df` is running as
-`ds-retopology-linked-skin-combined-release-20261127.service`.
+The frozen `71e3e6df` Release suite completed with all 1,380 cases passing.
+Its terminal status and JUnit hash are included with the later
+[MToon UV milestone evidence](validation/mtoon-static-normal-uv-20261127.json).
 [Linked retopology validation](validation/retopology-linked-skin-20261127.json)
 
 Wire-only edits in the affine retopology workspace keep the original local
@@ -200,6 +201,29 @@ retopology placements from the preceding milestone, report zero warnings.
 Synthetic OpenXR renders the native and Editable GLB reopen identically
 on Intel Arc A770 and llvmpipe, with identical saved project bytes.
 [Portable MToon tangent validation](validation/mtoon-portable-tangent-20261127.json)
+
+Portable static MToon 1 normal maps now keep authored rotation, scale,
+offset and mirroring through the Standard and Editable GLB writers. The
+compiler places the post-transform coordinates in an independent glTF
+accessor and derives the tangent frame from their actual Jacobian.
+It preserves the normal image, sampler and strength and keeps other roles
+on their existing domains. Different material transforms split shared
+vertices when needed. The Standard file reimports through the native asset
+worker with both original role images, tangent attributes and alternate
+coordinates. A UV0 override with an identity transform uses the existing
+UV0 accessor. Animated transforms, insufficient coordinate precision and
+uncertifiable shading frames keep their existing implicit export path.
+All 41 selected Release tests and four ASan/UBSan workflows pass. The 35
+native and GLB outputs match byte for byte across both builds. All 28 GLBs
+pass Khronos and the official MToon schemas with zero errors. The 22
+explicit-tangent GLBs have zero Khronos warnings. Synthetic OpenXR compares
+the native two-material project with its Standard GLB re-import on Arc A770
+and llvmpipe. All four stereo images are within two 8-bit RGB levels. A
+neutral-map control changes more than 112,000 RGB components in each eye.
+The full Release regression for frozen product `8ba3c55d` is running as
+`ds-mtoon-static-normal-uv-combined-release-20261127.service`.
+The focused checks include the later color and normal-map witness fixture.
+[Static normal transform validation](validation/mtoon-static-normal-uv-20261127.json)
 
 Surface Heat also binds meshes after independent frame and shapekey
 authoring. Retention accounts for the actual POSITION correspondences,
