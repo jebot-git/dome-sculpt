@@ -1921,11 +1921,12 @@ Intel Arc each pass 10 checks, including cancellation. The first Arc observer
 looked for the Release comparison fixture in the sanitizer output directory.
 The corrected observer passes with the same application and runtime.
 
-A fresh full Release build of `ed491ddf` is running under
-`ds-first-key-2048-full-release-20261126.service` with the current DomeD SDK.
-The resulting full private CTest run is gated on the preceding run releasing
-test resources. Read the exact run state under
-`artifacts/first-key-2048-full-release-20261126/status.json`.
+The full Release regression for `ed491ddf` finished with 1,335 passes,
+two failures and 13 dependency skips. The failed cases are
+`layered-normal-native` and `retopology-worker-accepted-publication`.
+The terminal result and raw JUnit are under
+`artifacts/first-key-2048-full-release-20261126/`. This run covers that
+earlier snapshot.
 
 Standard GLB passes Khronos validation with zero errors and a skinned-node
 parent warning. The first-key checkpoint's default Editable GLB worker reached
@@ -2172,6 +2173,34 @@ and the two export work caps. Its 512+512 control passes. Large retained
 fields, typed MToon, alternate emission coordinates, HDR VRM, full
 integrated regression and physical headset verification remain open.
 [Baked texture-set validation](validation/native-texture-set-hdr-baked-production-20261127.json)
+
+### Production-size retained-source HDR texture sets
+
+Two independent prepared-source 1024-square members now cold-open, paint
+through the desktop worker and export in Standard and Editable GLB. The
+preview and exporter use the actual original padded raster for material
+filtering. Work accounting charges both material grids, regional paint
+and normal copies, and the shared original raster once. The compiler
+reuses Bake samples only when their coefficients are constant. It keeps
+the unpainted background separate and counts both in the measured
+portable emission fallback. The source membership and distinct paint
+and normal coordinates remain intact.
+
+Release and ASan/UBSan compare every preview material and normal byte
+against the original compositor and every Standard EXR coefficient
+against the dense per-texel sampler. The native workflow verifies desktop
+paint with exact Undo/Redo, independent normal accuracy, exact Save and
+GLB reopen, and a smaller work limit that still refuses the export.
+The older 512-square retained source and both exports reproduce the
+original bytes. The two new 1024 cases are registered in CTest.
+
+Nested DomeD Wayland and synthetic OpenXR on software GL and Intel Arc
+match the native Standard package byte for byte. All six checked GLBs
+pass Khronos validation with zero errors and warnings. Larger retained fields,
+production-resolution retained rebaking, typed MToon, alternate source
+emission coordinates, HDR VRM, full integrated regression and physical
+headset acceptance remain open.
+[Retained texture-set validation](validation/native-texture-set-hdr-retained-production-20261127.json)
 
 ## Source and integration boundary
 

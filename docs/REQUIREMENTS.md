@@ -127,7 +127,11 @@ match the 1024+1024 Standard GLB. Two native HDR PBR Bake members now pass
 1024+1024 preview, rebake, exact Undo/Redo, cold Open, Standard and Editable
 GLB, with complete native recipes preserved. The producer retains the
 smaller exact FLOAT layout when available under the existing archive
-limits. Larger and retained-source baked fields,
+limits. The prepared retained-source route also passes cold Open,
+desktop painting with exact Undo/Redo and both GLB formats at 1024+1024.
+It preserves the original filtering raster, paint and normal coordinates
+and exact FLOAT emission in Standard GLB. Larger retained fields,
+production-size retained rebakes,
 typed texture-set materials, alternate source emission coordinates,
 texture-set HDR VRM and physical headset verification remain open.
 [Full-resolution writable atlas evidence](validation/native-writable-raster-2048-20261126.json) · [Default AO evidence](validation/default-ao-bake-2048-20261126.json) · [First shapekey evidence](validation/native-writable-first-key-2048-20261126.json) · [Editable GLB evidence](validation/native-editable-glb-2048-20261126.json) · [Physical FLOAT Bake evidence](validation/native-hdr-compact-bake-2048-20261126.json)
@@ -138,6 +142,7 @@ texture-set HDR VRM and physical headset verification remain open.
 [Texture-set Standard HDR evidence](validation/native-texture-set-hdr-standard-20261127.json)
 [Production texture-set HDR evidence](validation/native-texture-set-hdr-production-20261127.json)
 [Production baked texture-set HDR evidence](validation/native-texture-set-hdr-baked-production-20261127.json)
+[Production retained texture-set HDR evidence](validation/native-texture-set-hdr-retained-production-20261127.json)
 
 Strict Bake rays now recover source-edge contacts affected by float staging.
 An exact ray hit has priority. A missed ray can use an actual source edge
