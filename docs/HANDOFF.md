@@ -293,10 +293,26 @@ Wayland checks cover reopening the painted patch and exporting through the
 universal menu. Khronos validated 19 files without warnings, and ten materials
 pass the MToon schema. Package-free MToon reimport stays within two 8-bit RGB
 levels in independent OpenGL and synthetic stereo on Intel Arc and llvmpipe.
-Active deformation, animated sampling, separate atlas resolutions, absolute
-emission and physical Bake, typed VRM and physical headset acceptance remain
-required.
 [Painted portable MToon evidence](validation/retopology-portable-paint-20261127.json)
+
+Painted retopology can now export that variant when the writable grid and
+projected images use different resolutions. The compiler checks each interval
+between the texel centers of the current source, paint and exported images.
+The HDR preview reads the native material-relative coefficients from the
+writable grid, and the lower-strength preview keeps the native derived
+emission and coverage images. Two actual imported patches use a 64-pixel
+writable atlas and 128-pixel role textures. The independent reader checks
+16,637 UV samples per file, including 4,080 painted samples. Standard GLB
+preserves the default Core PBR image bytes. Editable GLB keeps the live
+mixed-resolution project and layers. All 20 selected Release and 16 ASan/UBSan
+tests pass, along with seven nested DomeD Wayland checks. Khronos validates 13
+GLBs without warnings. Reimported MToon stays within two 8-bit levels of the
+native view in independent OpenGL and synthetic stereo on Intel Arc and
+llvmpipe. The twelve previously qualified aligned-grid GLBs are byte-identical.
+Active deformations, animated sampling, cutoff-crossing alpha, absolute
+emission, physical Bake, typed VRM and physical headset acceptance remain
+required.
+[Mixed-resolution portable MToon evidence](validation/retopology-portable-mixed-20261127.json)
 
 Retopology reapply now works on native multi-material accessories attached
 to original VRM 1.0 joints. The replacement keeps its avatar hierarchy and

@@ -171,9 +171,17 @@ aligned static grids. The portable texture compiler resolves paint separately
 for Base, shared Shade and emission and checks the filtered result against the
 native shader. Independent Shade maps retain their original owner. Both HDR
 and lower-strength authored emitters preserve their original multiplier.
-Different grid resolutions, cutoff-crossing paint, animated sampling, absolute
-emission, physically baked and deformed variants, and typed VRM remain required.
 [Painted portable MToon evidence](validation/retopology-portable-paint-20261127.json)
+
+Static projected MToon and independent paint emission grids now also support
+mixed resolutions in the portable variant. The compiler checks the union of
+source, coverage and output filter cells, including the clamped boundary. The
+qualified 64/128 imports preserve both native emission paths, shared Shade
+where applicable, exact Editable persistence and the Core preview. Wider atlas
+and resource-bound production coverage, cutoff-crossing paint, animated
+sampling, absolute emission, physically baked and deformed variants, and typed
+VRM remain required.
+[Mixed-resolution portable MToon evidence](validation/retopology-portable-mixed-20261127.json)
 
 Native multi-material retopology preserves independently painted and baked
 grids and original VRM 1.0 joint links when Apply changes the patch.
