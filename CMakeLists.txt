@@ -46,7 +46,7 @@ endif()
 # Sparse interpolation has a separate nearest-even binary64 contract. Keep
 # multiply/add boundaries identical to the integer GPU implementation even
 # when the caller enables native CPU/FMA optimization. Brush math is separate.
-set_property(SOURCE src/sculpt-resolution.cpp src/sparse-resample-cpu.cpp
+set_property(SOURCE src/sculpt-resolution.cpp src/sparse-resample-cpu.cpp src/texture-set-resample.cpp
   APPEND PROPERTY COMPILE_OPTIONS "$<$<COMPILE_LANGUAGE:CXX>:-ffp-contract=off>")
 
 include(GNUInstallDirs)
@@ -5333,7 +5333,7 @@ if(BUILD_TESTING)
   set_tests_properties(dome-sculpt-texture-set-baked-mtoon-resolution PROPERTIES TIMEOUT 300)
 
   add_executable(dome-sculpt-native-paint-resolution-test tests/native-paint-resolution.cpp)
-  target_include_directories(dome-sculpt-native-paint-resolution-test PRIVATE src)
+  target_include_directories(dome-sculpt-native-paint-resolution-test PRIVATE src third_party)
   target_link_libraries(dome-sculpt-native-paint-resolution-test PRIVATE dome-sculpt-core)
   add_test(NAME native-empty-paint-resolution COMMAND dome-sculpt-native-paint-resolution-test empty
     ${CMAKE_CURRENT_BINARY_DIR}/native-empty-paint-resolution)
@@ -5341,6 +5341,12 @@ if(BUILD_TESTING)
     ${CMAKE_CURRENT_BINARY_DIR}/native-authored-paint-resolution)
   add_test(NAME native-baked-paint-resolution COMMAND dome-sculpt-native-paint-resolution-test baked
     ${CMAKE_CURRENT_BINARY_DIR}/native-baked-paint-resolution)
+  if(NOT DOME_COMPUTE_BACKEND STREQUAL "CPU")
+    add_test(NAME native-bake-resize-missing-device COMMAND dome-sculpt-native-paint-resolution-test
+      missing-bake-device ${CMAKE_CURRENT_BINARY_DIR}/native-bake-resize-missing-device)
+    set_tests_properties(native-bake-resize-missing-device PROPERTIES TIMEOUT 90
+      ENVIRONMENT "ONEAPI_DEVICE_SELECTOR=opencl:cpu;CUDA_VISIBLE_DEVICES=-1;HIP_VISIBLE_DEVICES=-1;ROCR_VISIBLE_DEVICES=-1")
+  endif()
   add_test(NAME native-retained-paint-resolution COMMAND dome-sculpt-native-paint-resolution-test retained
     ${CMAKE_CURRENT_BINARY_DIR}/native-retained-paint-resolution)
   set_tests_properties(native-empty-paint-resolution native-authored-paint-resolution PROPERTIES TIMEOUT 420)

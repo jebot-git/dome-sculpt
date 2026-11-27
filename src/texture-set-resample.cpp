@@ -3,6 +3,7 @@
 #include "dome/material-bindings.hpp"
 #include "dome/source-maps.hpp"
 #include "emission-paint-access.hpp"
+#include "paint-grid-filter.hpp"
 #include "paint-overlay-sample.hpp"
 #include "polygon-surface-preview.hpp"
 #include "texture-set-field-source.hpp"
@@ -11,8 +12,10 @@
 #include "texture-set-surface.hpp"
 #include "native-paint-sampling.hpp"
 #include <algorithm>
+#include <bit>
 #include <cmath>
 #include <limits>
+#include <tuple>
 namespace dome {
 void TextureSetResolutionOptions::validate() const {
   if (resolution < 64 || resolution > 2048 || (resolution & (resolution - 1)) ||
@@ -76,6 +79,78 @@ double linear(uint8_t v) {
 double encoded(double v) {
   return v <= .0031308 ? v * 12.92 : 1.055 * std::pow(v, 1 / 2.4) - .055;
 }
+uint64_t word(double v) { return std::bit_cast<uint64_t>(v); }
+double number(uint64_t v) { return std::bit_cast<double>(v); }
+const paint_grid::Tables &grid_tables() {
+  static const auto table=[] {
+    paint_grid::Tables result{};
+    for(unsigned i=0;i<256;++i) {
+      result.unit[i]=word(i/255.);
+      result.srgb[i]=word(linear(uint8_t(i)));
+    }
+    // Share the first binary64 input that produces each byte, including
+    // the host's exact sRGB and half-byte rounding boundaries.
+    for(unsigned i=1;i<256;++i) for(bool srgb:{false,true}) {
+      uint64_t lo=0,hi=word(1.);
+      while(lo<hi) {
+        const auto mid=lo+(hi-lo)/2;
+        const auto v=number(mid);
+        if(byte(srgb?encoded(v):v)>=i)hi=mid;
+        else lo=mid+1;
+      }
+      (srgb?result.srgb_threshold:result.unit_threshold)[i-1]=lo;
+    }
+    return result;
+  }();
+  return table;
+}
+class GridFilter {
+  paint_grid::Filter filter_{grid_tables()};
+  std::vector<paint_grid::Pixel> input_,output_;
+public:
+  static constexpr size_t peak_bytes=2*(sizeof(paint_grid::Tables)+
+      (paint_grid::max_input_pixels+paint_grid::max_output_pixels)*sizeof(paint_grid::Pixel));
+  GridFilter() {
+    input_.reserve(paint_grid::max_input_pixels);
+    output_.reserve(paint_grid::max_output_pixels);
+  }
+  void apply(uint32_t from,uint32_t to,paint_grid::Rectangle target,
+      const paint_grid::Layout &layout,const std::function<bool()> &cancelled,
+      auto &&read,auto &&write) {
+    const auto source_range=[&](uint32_t first,uint32_t count) {
+      const auto a=paint_grid::axis(from,to,first);
+      const auto b=paint_grid::axis(from,to,first+count-1);
+      return std::pair{a.first,(from>to?b.first+b.count:b.second+1)-a.first};
+    };
+    const auto [sx,width]=source_range(target.x,target.width);
+    for(uint32_t row=0;row<target.height;) {
+      paint_grid::checkpoint(cancelled);
+      uint32_t rows=std::min(target.height-row,uint32_t(paint_grid::max_output_pixels/target.width));
+      auto [sy,height]=source_range(target.y+row,rows);
+      while(size_t(width)*height>paint_grid::max_input_pixels) {
+        if(rows==1)throw std::length_error("Paint-grid footprint cannot fit a bounded device batch");
+        rows/=2;
+        std::tie(sy,height)=source_range(target.y+row,rows);
+      }
+      input_.resize(size_t(width)*height);
+      output_.resize(size_t(target.width)*rows);
+      for(uint32_t y=0;y<height;++y) {
+        paint_grid::checkpoint(cancelled);
+        for(uint32_t x=0;x<width;++x)
+          input_[size_t(y)*width+x]=read(sx+x,sy+y);
+      }
+      const paint_grid::Batch batch{from,to,{sx,sy,width,height},
+                                    {target.x,target.y+row,target.width,rows}};
+      filter_.run(batch,layout,input_,output_,cancelled);
+      for(uint32_t y=0;y<rows;++y) {
+        paint_grid::checkpoint(cancelled);
+        for(uint32_t x=0;x<target.width;++x)
+          write(x,row+y,output_[size_t(y)*target.width+x]);
+      }
+      row+=rows;
+    }
+  }
+};
 void stop(const TextureSetLimits &l) {
   if (l.cancelled && l.cancelled())
     throw std::runtime_error("Texture-set resolution cancelled");
@@ -123,6 +198,55 @@ Sample pixel(const PaintLayer &l, uint32_t r, uint32_t x, uint32_t y) {
     s.emission_present = true;
   }
   return s;
+}
+paint_grid::Pixel grid_layer_pixel(const PaintLayer &layer,uint32_t r,uint32_t x,uint32_t y) {
+  const auto tile=size_t(y/32)*(r/32)+x/32,offset=size_t(y%32)*32+x%32;
+  paint_grid::Pixel p;
+  if(const auto &common=layer.tiles[tile]) {
+    const auto &bytes=common->pixels[offset].data;
+    std::copy_n(bytes.data(),9,p.values);
+    std::copy_n(bytes.data()+9,4,p.coverage);
+    p.mask=bytes[13];
+    p.present=1;
+  }
+  if(!layer.pbr_tiles.empty()) {
+    const auto &plane=layer.pbr_tiles[tile];
+    if(plane) {
+      std::copy_n(plane->pixels[offset].data(),4,p.values+9);
+      p.present|=2;
+    }else std::copy_n(p.values,4,p.values+9);
+  }
+  if(!layer.emission_tiles.empty()) {
+    const auto &plane=layer.emission_tiles[tile];
+    if(plane) {
+      const auto &light=plane->pixels[offset];
+      for(unsigned c=0;c<3;++c) {
+        p.emission[c]=word(light.legacy[c]);
+        p.emission[3+c]=word(light.physical[c]);
+      }
+      p.emission[6]=word(light.coverage);
+      p.present|=4;
+    }else{
+      const auto &table=grid_tables();
+      for(unsigned c=0;c<3;++c)
+        p.emission[c]=word(float(number(table.srgb[p.values[6+c]])));
+      p.emission[6]=word(float(p.coverage[3])/255);
+    }
+  }
+  return p;
+}
+paint_grid::Layout layer_layout(const PaintLayer &layer) {
+  paint_grid::Layout layout;
+  layout.active=layer.pbr_tiles.empty()?0x1ffu:0x1fffu;
+  layout.pbr=layout.active&0x1e00u;
+  layout.srgb=0x1c7u|(7u<<9);
+  layout.groups=4;
+  layout.group[4]=1;
+  layout.group[5]=2;
+  for(unsigned c=6;c<9;++c)layout.group[c]=3;
+  layout.mask=true;
+  if(!layer.emission_tiles.empty())layout.floats=paint_grid::FloatPlane::UnassociatedPaint;
+  return layout;
 }
 bool has_authored_tile(const PaintLayer &layer, size_t tile) {
   return bool(layer.tiles.at(tile)) ||
@@ -621,6 +745,7 @@ std::vector<PaintLayer> resample_texture_set_layers(
   // values and unassociated colour. The separate overlay check still
   // certifies the effect of rebuilding the geometry's writable raster.
   const uint32_t subdivision = native_cells && to > from ? to / from : 1;
+  const bool accelerated=subdivision==1&&from!=to&&compute_backend()!="CPU";
   const size_t tiles = size_t(to / 32) * (to / 32);
   // Old field plus new raster constructor/padding, dense worst-case authored
   // output and one writable tile of scratch coexist. No dense per-layer image.
@@ -663,6 +788,16 @@ std::vector<PaintLayer> resample_texture_set_layers(
                sizeof(std::shared_ptr<const PaintTile>),
            limits);
   }
+  const auto authored=[](const PaintLayer &layer){
+    for(size_t t=0;t<layer.tiles.size();++t)
+      if(has_authored_tile(layer,t))return true;
+    return false;
+  };
+  std::unique_ptr<GridFilter> filter;
+  if(accelerated&&std::ranges::any_of(before.layers(),authored)) {
+    charge(bytes,1,GridFilter::peak_bytes,limits);
+    filter=std::make_unique<GridFilter>();
+  }
   report.peak_bytes = bytes;
   std::vector<PaintLayer> result;
   result.reserve(before.layers().size());
@@ -679,6 +814,8 @@ std::vector<PaintLayer> resample_texture_set_layers(
       out.pbr_tiles.resize(tiles);
     if (!layer.emission_tiles.empty())
       out.emission_tiles.resize(tiles);
+    const bool layer_filter=filter&&authored(layer);
+    const auto layout=layer_layout(layer);
     for (uint32_t ty = 0; ty < to / 32; ++ty)
       for (uint32_t tx = 0; tx < to / 32; ++tx) {
         stop(limits);
@@ -699,7 +836,44 @@ std::vector<PaintLayer> resample_texture_set_layers(
         PaintColorTile pbr;
         PaintEmissionTile emission;
         bool has_common = false, has_pbr = false, has_emission = false;
-        for (uint32_t y = 0; y < 32; ++y)
+        const auto store=[&](size_t i,PaintPixel c,PaintEmissionValue light) {
+          // Any tile owning FLOAT also needs its matching legacy fallback.
+          if (!layer.emission_tiles.empty()) {
+            c.data[12]=fallback_byte(light.coverage);
+            for(size_t k=0;k<3;++k)
+              c.data[6+k]=fallback_byte(linear_to_srgb(light.legacy[k]));
+          }
+          common.pixels[i]=c;
+          emission.pixels[i]=light;
+        };
+        if(layer_filter) {
+          const auto taps=from>to?size_t(from/to)*(from/to):4;
+          work(report,32*1024*taps,limits);
+          report.filtered_samples+=1024*taps;
+          filter->apply(from,to,{tx*32,ty*32,32,32},layout,limits.cancelled,
+            [&](uint32_t x,uint32_t y){return grid_layer_pixel(layer,from,x,y);},
+            [&](uint32_t x,uint32_t y,const paint_grid::Pixel &p){
+              const size_t i=size_t(y)*32+x;
+              PaintPixel c;
+              std::copy_n(p.values,9,c.data.data());
+              std::copy_n(p.coverage,4,c.data.data()+9);
+              c.data[13]=p.mask;
+              PaintEmissionValue light;
+              if(layout.floats!=paint_grid::FloatPlane::Absent) {
+                for(size_t k=0;k<3;++k) {
+                  light.legacy[k]=float(std::clamp(number(p.emission[k]),0.,1.));
+                  light.physical[k]=float(std::clamp(number(p.emission[k+3]),0.,double(maximum_native_emission)));
+                }
+                light.coverage=float(std::clamp(number(p.emission[6]),0.,1.));
+                light.validate();
+              }
+              has_common|=bool(p.present&1);
+              has_pbr|=bool(p.present&2);
+              has_emission|=bool(p.present&4);
+              if(layout.pbr)std::copy_n(p.values+9,4,pbr.pixels[i].data());
+              store(i,c,light);
+            });
+        }else if(!accelerated)for (uint32_t y = 0; y < 32; ++y)
           for (uint32_t x = 0; x < 32; ++x) {
             const auto grid_x = tx * 32 + x, grid_y = ty * 32 + y;
             const auto i = size_t(y) * 32 + x;
@@ -720,17 +894,7 @@ std::vector<PaintLayer> resample_texture_set_layers(
             has_common |= s.common_present;
             has_pbr |= s.pbr_present;
             has_emission |= s.emission_present;
-            // If any pixel of a target tile owns a FLOAT plane, every pixel in
-            // that tile must carry an exactly matching legacy fallback;
-            // physical stays zero for samples that only owned the legacy plane.
-            if (!layer.emission_tiles.empty()) {
-              s.common.data[12] = fallback_byte(s.emission.coverage);
-              for (size_t k = 0; k < 3; ++k)
-                s.common.data[6 + k] =
-                    fallback_byte(linear_to_srgb(s.emission.legacy[k]));
-            }
-            common.pixels[i] = s.common;
-            emission.pixels[i] = s.emission;
+            store(i,s.common,s.emission);
             for (size_t k = 0; k < 4; ++k)
               pbr.pixels[i][k] = byte(k < 3 ? encoded(s.pbr[k]) : s.pbr[k]);
           }
@@ -790,7 +954,54 @@ std::shared_ptr<const BakedTextures> resample_native_bake_grid(
   const auto srgb=[](size_t role,size_t k){return (role<2||role==4)&&k<3;};
   const auto decode=[&](uint8_t v,size_t role,size_t k){return srgb(role,k)?linear(v):v/255.;};
   const auto prior_cell=[&](uint32_t x,uint32_t y){return size_t(y/(to/from))*from+x/(to/from);};
-  for(uint32_t y=0;y<to;++y){
+  const bool accelerated=!enlarge&&compute_backend()!="CPU";
+  std::vector<BakedEmissionSample> device_emission;
+  if(accelerated) {
+    charge(report.peak_bytes,1,GridFilter::peak_bytes,limits);
+    paint_grid::Layout layout;
+    for(size_t role=0;role<old_images.size();++role)if(!old_images[role]->rgba.empty()) {
+      layout.active|=15u<<(4*role);
+      if(srgb(role,0))layout.srgb|=7u<<(4*role);
+    }
+    const auto &emission=before.emission_field;
+    if(emission) {
+      layout.floats=paint_grid::FloatPlane::BakedCoefficients;
+      charge(report.peak_bytes,target_pixels,sizeof(BakedEmissionSample),limits);
+      work(report,8*source_pixels,limits);
+      device_emission.resize(target_pixels);
+    }
+    GridFilter filter;
+    filter.apply(from,to,{0,0,to,to},layout,limits.cancelled,
+      [&](uint32_t x,uint32_t y){
+        const size_t src=size_t(y)*from+x;
+        paint_grid::Pixel p;
+        p.coverage[0]=before.coverage[src];
+        for(size_t role=0;role<old_images.size();++role)if(!old_images[role]->rgba.empty())
+          std::copy_n(old_images[role]->rgba.data()+4*src,4,p.values+4*role);
+        if(emission) {
+          const auto sample=emission->texel(src);
+          for(unsigned c=0;c<3;++c) {
+            p.emission[c]=word(sample.legacy[c]);
+            p.emission[3+c]=word(sample.absolute[c]);
+          }
+          p.emission[6]=word(sample.coverage);
+        }
+        return p;
+      },[&](uint32_t x,uint32_t y,const paint_grid::Pixel &p){
+        const size_t dst=size_t(y)*to+x;
+        after->coverage[dst]=p.coverage[0];
+        for(size_t role=0;role<new_images.size();++role)if(!new_images[role]->rgba.empty())
+          std::copy_n(p.values+4*role,4,new_images[role]->rgba.data()+4*dst);
+        if(emission) {
+          auto &sample=device_emission[dst];
+          for(unsigned c=0;c<3;++c) {
+            sample.legacy[c]=float(number(p.emission[c]));
+            sample.absolute[c]=float(number(p.emission[3+c]));
+          }
+          sample.coverage=float(number(p.emission[6]));
+        }
+      });
+  }else for(uint32_t y=0;y<to;++y){
     stop(limits);
     for(uint32_t x=0;x<to;++x){
       const size_t dst=size_t(y)*to+x;
@@ -824,6 +1035,7 @@ std::shared_ptr<const BakedTextures> resample_native_bake_grid(
   }
   if(const auto &emission=before.emission_field){
     after->emission_field=BakedEmissionField::generate_compact(to,[&](size_t i){
+      if(accelerated)return device_emission[i];
       const auto x=uint32_t(i%to),y=uint32_t(i/to);
       if(enlarge){work(report,1,limits);return emission->texel(prior_cell(x,y));}
       std::array<double,3> legacy{},absolute{};
@@ -909,8 +1121,6 @@ TextureSetResolutionReport resample_native_texture_grid(
   if (report.original_resolution == report.resolution)
     return report;
   const bool empty = detail::TextureSetPaintAccess::can_resize_unpainted(*before.painted);
-  if (!empty && compute_backend() != "CPU")
-    throw std::logic_error("Paint grid resampling requires the CPU build");
   const auto retained = before.material_bindings ? before.material_bindings->native_paint_sampling : nullptr;
   if (retained) {
     PaintSamplingLimits policy;
@@ -972,9 +1182,6 @@ resample_texture_set(Scene &scene, uint64_t object, TextureSetId set,
     detail::stop(limits);
     return report;
   }
-  if (compute_backend() != "CPU")
-    throw std::logic_error("Texture-set resolution backend is not implemented "
-                           "for the selected accelerator");
   const bool separate_roles = typed || retained;
   const size_t before_pixels = size_t(field.painted->resolution()) *
                                field.painted->resolution(),

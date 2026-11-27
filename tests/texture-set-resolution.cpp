@@ -770,12 +770,6 @@ void baked_member(bool typed_mtoon) {
         !old.maps.normal.rgba.empty()&&field.bake_recipe&&field.bake_recipe->source.object==source,
         "The real Bake worker publishes a canonical FLOAT Bake and recipe on the additional member");
   const auto before=baked.encode();
-  if(compute_backend()!="CPU"){
-    auto refused=baked;
-    refuses([&]{resample_texture_set(refused,target,1,{256});},"Missing accelerated canonical Bake resizing refuses");
-    check(refused.encode()==before,"An unavailable backend preserves every material and its Bake");
-    return;
-  }
   auto denied=baked;
   TextureSetLimits limits;
   limits.maximum_bytes=1;
@@ -871,12 +865,6 @@ void typed_source_grid() {
   const auto before=active_texture_set(scene.active());
   check(before.id==set && before.painted->source_maps() && !before.source,
         "The native MToon partition has independent generic UV0 sources and real paint");
-  if (compute_backend()!="CPU") {
-    const auto exact=scene.encode();
-    refuses([&]{resample_texture_set(scene,id,set,{128});},"A missing typed resampling backend refuses");
-    check(scene.encode()==exact,"The unavailable backend preserves independent source maps");
-    return;
-  }
   check(resample_texture_set(scene,id,set,{128}).changed,"Native MToon with independent core images resizes");
   const auto resized=active_texture_set(scene.active());
   check(resized.domain==before.domain && resized.material_bindings==before.material_bindings &&

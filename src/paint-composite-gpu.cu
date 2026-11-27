@@ -26,6 +26,7 @@
 #define DS_ERROR_TEXT cudaGetErrorString
 #endif
 #include "paint-composite-backend.hpp"
+#include "paint-grid-filter.hpp"
 namespace dome {namespace {
 template<class E>void checked(E value){if(value!=DS_SUCCESS)throw std::runtime_error(DS_ERROR_TEXT(value));}
 __global__ void paint_pixels(paint_compute::Parameters p,const paint_compute::Layer *layers,const uint32_t *tiles,
@@ -64,6 +65,38 @@ std::vector<Output> composite(const Input &in,const std::function<bool()> &cance
   checkpoint(cancelled);
  }catch(...){(void)DS_SYNC();throw;}
  return result;
+}
+}
+
+namespace paint_grid {
+namespace {
+__global__ void grid_pixels(Batch batch,Layout layout,const Tables *tables,
+                            const Pixel *input,Pixel *output,size_t count) {
+  const size_t i=size_t(blockIdx.x)*blockDim.x+threadIdx.x;
+  if(i<count)output[i]=filter(i,batch,layout,*tables,input);
+}
+}
+struct Filter::Impl {
+  Buffer<Tables> tables{1};
+  Buffer<Pixel> input{max_input_pixels},output{max_output_pixels};
+  explicit Impl(const Tables &host) {
+    checked(DS_COPY(tables.data,&host,sizeof(host),DS_TO_DEVICE));
+  }
+};
+Filter::Filter(const Tables &tables):impl_(std::make_unique<Impl>(tables)){}
+Filter::~Filter()=default;
+void Filter::run(const Batch &batch,const Layout &layout,std::span<const Pixel> input,
+                 std::span<Pixel> output,const std::function<bool()> &cancelled) {
+  validate(batch,layout,input.size(),output.size());
+  checkpoint(cancelled);
+  auto &gpu=*impl_;
+  checked(DS_COPY(gpu.input.data,input.data(),input.size_bytes(),DS_TO_DEVICE));
+  constexpr unsigned block=128;
+  grid_pixels<<<(output.size()+block-1)/block,block>>>(batch,layout,gpu.tables.data,
+      gpu.input.data,gpu.output.data,output.size());
+  checked(DS_LAST_ERROR());
+  checked(DS_COPY(output.data(),gpu.output.data,output.size_bytes(),DS_TO_HOST));
+  checkpoint(cancelled);
 }
 }
 }

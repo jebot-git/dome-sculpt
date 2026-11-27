@@ -8,7 +8,9 @@
 #include "texture-set-resample.hpp"
 #include "import-controller-driver.hpp"
 #include "native-paint-sampling.hpp"
+#include "paint-grid-filter.hpp"
 #include <algorithm>
+#include <bit>
 #include <cmath>
 #include <filesystem>
 #include <iostream>
@@ -130,13 +132,6 @@ void resize_painted_source_grid(const std::filesystem::path &root) {
     TextureSetResolutionOptions options;
     options.resolution = 256;
     auto limits = detail::native_texture_grid_limits();
-    if (compute_backend() != "CPU") {
-      check(refuses([&] { resample_native_texture_grid(scene, id, options, limits); }) &&
-                scene.encode() == before,
-            "Missing accelerated grid resampling refuses without CPU substitution or paint loss");
-      continue;
-    }
-
     auto constrained = limits;
     unsigned polls = 0;
     constrained.cancelled = [&] { return ++polls >= 500; };
@@ -310,7 +305,39 @@ void resize_physical_native_grid(const std::filesystem::path &root) {
         "Physical paint survives ordered native Save, reopen, Undo and Redo");
 }
 
-void resize_baked_native_grid(const std::filesystem::path &root) {
+void filter_binary64_rounding(){
+  using namespace dome::paint_grid;
+  // A genuine blended layer sample whose exact quotient lies just below a
+  // binary32 rounding boundary. The legacy and FLOAT lanes share the filter.
+  constexpr std::array<uint32_t,4> legacy{0x3cb1a100,0x3cb181c0,0x3cb15819,0x3cb138db};
+  constexpr std::array<uint32_t,4> coverage{0x3f1a7ea4,0x3f1a896a,0x3f1a97cb,0x3f1aa296};
+  constexpr std::array<uint8_t,4> masks{126,125,125,124};
+  std::array<Pixel,4> input{};
+  std::array<Pixel,1> output{};
+  for(size_t i=0;i<input.size();++i) {
+    input[i].emission[1]=std::bit_cast<uint64_t>(double(std::bit_cast<float>(legacy[i])));
+    input[i].emission[6]=std::bit_cast<uint64_t>(double(std::bit_cast<float>(coverage[i])));
+    input[i].mask=masks[i];
+  }
+  Tables tables{};
+  for(unsigned i=0;i<256;++i)tables.unit[i]=std::bit_cast<uint64_t>(i/255.);
+  for(unsigned i=0;i<255;++i)
+    tables.unit_threshold[i]=std::bit_cast<uint64_t>((i+.5)/255.);
+  Layout layout;
+  layout.floats=FloatPlane::UnassociatedPaint;
+  Filter backend(tables);
+  backend.run({128,64,{0,0,2,2},{0,0,1,1}},layout,input,output,{});
+  check(output[0].emission[1]==0x3f962d9d2f9f3b9eull,
+        "The selected kernel keeps the exact binary64 quotient before FLOAT storage");
+  layout.floats=FloatPlane::Absent;
+  layout.mask=true;
+  backend.run({64,128,{10,1,2,2},{22,4,1,1}},layout,input,output,{});
+  check(output[0].mask==125,
+        "Bilinear mask weights retain CPU multiply-before-divide rounding");
+}
+
+void resize_baked_native_grid(const std::filesystem::path &root,bool missing_device=false) {
+  if(!missing_device)filter_binary64_rounding();
   const auto make_fixture=[](bool physical,bool sharp){
     Scene scene;
     Mesh mesh;
@@ -351,9 +378,12 @@ void resize_baked_native_grid(const std::filesystem::path &root) {
     auto scene=make_fixture(physical,false);
     const auto id=scene.active().id;
     const auto before=scene.encode();
-    if(compute_backend()!="CPU"){
-      check(refuses([&]{resample_native_texture_grid(scene,id,{64});})&&scene.encode()==before,
-            "An unavailable accelerated Bake resize refuses atomically");
+    if(missing_device){
+      const auto owner=scene.active().painted;
+      check(compute_backend()!="CPU"&&
+            refuses([&]{resample_native_texture_grid(scene,id,{64});})&&
+            scene.encode()==before&&scene.active().painted==owner,
+            "The selected unavailable GPU fails Bake reduction without publishing a replacement");
       continue;
     }
     const auto source=scene.active().painted;
@@ -389,7 +419,7 @@ void resize_baked_native_grid(const std::filesystem::path &root) {
     scene.save(path);
     check(Scene::load(path).encode()==scene.encode(),"Cold open retains the reduced Bake and coverage");
   }
-  if(compute_backend()=="CPU"){
+  if(!missing_device){
     auto sharp=make_fixture(false,true);
     const auto before=sharp.encode();
     check(refuses([&]{resample_native_texture_grid(sharp,sharp.active().id,{64});})&&sharp.encode()==before,
@@ -457,12 +487,6 @@ void resize_retained_native_grid(const std::filesystem::path &root) {
   check(uv.material_bindings&&uv.material_bindings->native_paint_sampling&&uv.painted->mesh().uv!=paint->mesh().uv&&
         uv.painted->paint_sampling_domain()->basis()->uv==paint->mesh().uv,
         "Writable UVs remain on the original atlas after the authored display UV edit");
-  if(compute_backend()!="CPU"){
-    auto unchanged=retained;
-    check(refuses([&]{resample_native_texture_grid(unchanged,id,{256});})&&unchanged.encode()==retained.encode(),
-          "An unavailable native UV grid backend refuses atomically");
-    return;
-  }
   auto edited=retained;
   check(resample_native_texture_grid(edited,id,{256}).changed,"A retained writable atlas can enlarge before Bake");
   edited.save(root/"unbaked256.dsculpt");
@@ -570,10 +594,11 @@ int main(int argc,char **argv) try {
   resize_source_grid(root);
  else if(std::string_view(argv[1])=="painted") {
   resize_painted_source_grid(root);
-  if(dome::compute_backend()=="CPU")
-   resize_physical_native_grid(root);
+  resize_physical_native_grid(root);
  } else if(std::string_view(argv[1])=="baked") {
   resize_baked_native_grid(root);
+ } else if(std::string_view(argv[1])=="missing-bake-device") {
+  resize_baked_native_grid(root,true);
  } else if(std::string_view(argv[1])=="retained") {
   resize_retained_native_grid(root);
  } else {
