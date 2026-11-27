@@ -263,9 +263,24 @@ errors and advises that its exported normals rely on runtime tangent generation.
 
 Animated sampling, imported prior Bakes, combined vertex tint and colour ink,
 and incompatible two-sided normal frames still require dedicated transfer
-paths. Portable typed MToon GLB/VRM output for these patches and physical
-headset qualification remain open.
+paths. Physical headset qualification remains open.
 [Imported MToon retopology validation](validation/retopology-imported-mtoon-20261127.json)
+
+Standard and Editable GLB now export a selectable MToon 1 material for
+standalone static imported retopology patches whose projected normals share
+the atlas basis. Core PBR stays the default material. Both materials use an
+explicit shared tangent stream and keep their separate normal textures.
+The MToon variant preserves the projected roles, genuine Base and Shade
+sharing, MatCap and original emissive strength. Roughness and metallic strokes
+affect the default material and preserve the typed textures. Editable GLB
+restores the full native project. All 18 selected Release, 14 ASan/UBSan and
+eight nested Wayland checks pass. Khronos validates 13 files with zero errors
+or warnings, and nine typed materials pass their MToon schema. The selectable
+material reimports without embedded authoring data and matches native MToon
+within one 8-bit value in each synthetic OpenXR eye on llvmpipe and Intel Arc.
+Visible colour and emission paint, active deformations, animated sampling,
+physical Bake, typed VRM and physical headset acceptance remain required.
+[Portable MToon retopology validation](validation/retopology-portable-mtoon-20261127.json)
 
 Retopology reapply now works on native multi-material accessories attached
 to original VRM 1.0 joints. The replacement keeps its avatar hierarchy and

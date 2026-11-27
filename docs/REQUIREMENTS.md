@@ -153,10 +153,19 @@ Static imported MToon 1 now transfers on first Apply with original per-role
 UV sampling, posed imported normals, shared Shade and view-space MatCap.
 Separate Core PBR texture roles remain available and editable paint layers
 survive Apply, changed-topology reapply, Undo, Save and Editable GLB. Actual
-DomeD Wayland and synthetic OpenXR cover the admitted case. Portable typed
-GLB/VRM, animated roles, prior imported Bake fields, combined tint and colour
+DomeD Wayland and synthetic OpenXR cover the admitted case. Animated roles,
+prior imported Bake fields, combined tint and colour
 paint, incompatible two-sided normals and physical XR remain required.
 [Imported MToon retopology evidence](validation/retopology-imported-mtoon-20261127.json)
+
+Static standalone imported retopology patches with a shared atlas normal basis
+now export Core PBR and a selectable typed MToon 1 GLB material. Explicit
+derivative tangents serve both independent normal images. Metallic and
+roughness paint stay on the Core PBR material. Independent re-import and
+stereo replay verify the two material interpretations, and Editable GLB keeps
+the original native data. Typed VRM, visible colour and emission paint, access
+to animated sampling and deformed or physically baked variants remain required.
+[Portable MToon retopology evidence](validation/retopology-portable-mtoon-20261127.json)
 
 Native multi-material retopology preserves independently painted and baked
 grids and original VRM 1.0 joint links when Apply changes the patch.
