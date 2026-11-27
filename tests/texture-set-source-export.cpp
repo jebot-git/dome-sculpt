@@ -2076,10 +2076,10 @@ void retopology_imported_pbr(bool prior_bake=false) {
 }
 
 struct PortableRetopoImages {
- Image core_orm, mtoon_base, mtoon_normal;
+ Image core_orm, mtoon_base, mtoon_normal, mtoon_emission;
 };
 
-PortableRetopoImages check_portable_retopo_mtoon(const std::filesystem::path &path,const SculptObject &patch) {
+PortableRetopoImages check_portable_retopo_mtoon(const std::filesystem::path &path,const SculptObject &patch,bool ink=false) {
  cgltf_options options{};cgltf_data *data=nullptr;
  check(cgltf_parse_file(&options,path.c_str(),&data)==cgltf_result_success,"Independent reader opens the GLB");
  const std::unique_ptr<cgltf_data,decltype(&cgltf_free)> owner(data,cgltf_free);
@@ -2104,7 +2104,15 @@ PortableRetopoImages check_portable_retopo_mtoon(const std::filesystem::path &pa
        typed.at("extensions").at("KHR_materials_emissive_strength").at("emissiveStrength")==binding.material.parameters.emission_strength,
        "Portable MToon carries the actual typed roles and original emissive strength");
  check((extension.at("shadeMultiplyTexture").at("index")==typed.at("pbrMetallicRoughness").at("baseColorTexture").at("index"))==
-           (binding.roles[0].image==binding.roles[1].image),"Portable sharing matches the native Base and Shade samplers");
+           (!ink&&binding.roles[0].image==binding.roles[1].image),"The portable Base and Shade roles preserve the applicable shared or resolved samples");
+ if(ink){
+  const auto &proof=typed.at("extras").at("domeSculptMToonPaint");
+  check(proof.at("maximumLinearColorError").get<double>()<=.008&&
+        proof.at("maximumLinearEmissionError").get<double>()<=.008*binding.material.parameters.emission_strength&&
+        (proof.contains("maximumLinearShadeError")==(binding.roles[0].image==binding.roles[1].image))&&
+        (!proof.contains("maximumLinearShadeError")||proof.at("maximumLinearShadeError").get<double>()<=.008),
+        "Visible ink records its colour, emitted radiance and applicable shared shade bounds");
+ }
  const auto tangents=cgltf_find_accessor(&primitive,cgltf_attribute_type_tangent,0);
  const auto positions=cgltf_find_accessor(&primitive,cgltf_attribute_type_position,0);
  const auto normals=cgltf_find_accessor(&primitive,cgltf_attribute_type_normal,0);
@@ -2142,7 +2150,8 @@ PortableRetopoImages check_portable_retopo_mtoon(const std::filesystem::path &pa
   return decode_projection_png({png,view->size});
  };
  return {read_image(core.pbr_metallic_roughness.metallic_roughness_texture),
-         read_image(toon.pbr_metallic_roughness.base_color_texture),read_image(toon.normal_texture)};
+         read_image(toon.pbr_metallic_roughness.base_color_texture),read_image(toon.normal_texture),
+         read_image(toon.emissive_texture)};
 }
 
 void retopology_imported_mtoon(bool tinted,bool unprepared) {
@@ -2356,6 +2365,55 @@ void retopology_imported_mtoon(bool tinted,bool unprepared) {
  const auto original_images=check_portable_retopo_mtoon("raw-standard.glb",patch);
  check_portable_retopo_mtoon("raw-editable.glb",patch);
  check(Scene::load("raw-editable.glb").encode()==accepted,"Editable GLB retains both material interpretations and editable ink");
+ {
+  auto painted=result.snapshot();
+  if(unprepared){
+   auto &object=painted.active();
+   auto ldr=std::make_shared<SourceMaterialBindings>(*object.material_bindings);
+   auto &strength=ldr->material.parameters.emission_strength;
+   const auto ratio=1.15f/strength;
+   for(size_t k=0;k<3;++k){
+    object.material.emissive[k]*=ratio;
+    ldr->native_reference.emission[k]*=ratio;
+   }
+   strength=1.15f;
+   object.material_bindings=std::move(ldr);
+  }
+  auto &ink=*painted.active().painted;
+  ink.add_layer("Visible colour and emission");
+  const auto p0=target.positions[target.indices[0]];
+  const auto p1=target.positions[target.indices[1]];
+  const auto p2=target.positions[target.indices[2]];
+  Brush brush;
+  brush.from=brush.to=(p0+p1+p2)/3.f;
+  brush.normal=normalized(cross(p1-p0,p2-p0));
+  brush.radius=length(p1-p0)*.38f;
+  brush.strength=.43f;
+  PaintSettings settings;
+  settings.front_only=false;
+  settings.color={.72f,.24f,.41f,.84f};
+  settings.emission={.42f,.18f,.31f};
+  for(const auto channel:{PaintChannel::Color,PaintChannel::Emission}){
+   settings.channel=channel;
+   ink.begin_stroke();ink.stamp(brush,settings);
+   check(ink.end_stroke(),"Projected patch accepts visible editable colour and emission strokes");
+  }
+  ink.layer_properties("Visible colour and emission",true,.54f);
+  check(!ink.has_physical_emission(),"Emission stroke stays in the material-relative representation");
+  Document paint_doc;paint_doc.replace(painted);ready(paint_doc);
+  paint_doc.save_async("visible-paint.dsculpt").get();
+  paint_doc.export_asset("visible-standard.glb",AssetExportFormat::Glb).get();
+  paint_doc.export_asset("visible-editable.glb",AssetExportFormat::EditableGlb256).get();
+  for(const auto *path:{"visible-standard.glb","visible-editable.glb"}){
+   const auto edited=check_portable_retopo_mtoon(path,painted.active(),true);
+   check(edited.mtoon_base.rgba!=original_images.mtoon_base.rgba&&
+         edited.mtoon_emission.rgba!=original_images.mtoon_emission.rgba&&
+         edited.mtoon_normal.rgba==original_images.mtoon_normal.rgba,
+         "The exported variant carries visible colour and emission in its own textures and preserves its normal field");
+  }
+  check(Scene::load("visible-editable.glb").encode()==painted.encode()&&
+       Scene::load("visible-paint.dsculpt").encode()==painted.encode(),"Portable paint compilation preserves the editable project exactly");
+ }
  if(!tinted&&!unprepared){
   auto painted=result.snapshot();
   auto &scalar=*painted.active().painted;

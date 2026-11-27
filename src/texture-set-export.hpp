@@ -52,6 +52,8 @@ private:
 std::optional<PortableMToonSetPaint> compile_mtoon_set_paint(
     const TextureSetView &,const TextureSetExportField &,const MToonMaterial &,
     const TextureSetLimits &);
+std::optional<PortableMToonSetPaint> compile_retopo_mtoon_paint(
+    const TextureSetView &,const MToonMaterial &,TextureSetLimits &remaining);
 struct MToonFloatPreview {
   TextureSetExportEmission emission;
   Image metal_rough;

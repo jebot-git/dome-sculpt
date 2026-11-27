@@ -743,6 +743,10 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
   // Keep generated texture owners alive for the image-identity table.
   std::vector<std::shared_ptr<const Image>> mtoon_paint_images;
   std::deque<MToonFloatPreview> mtoon_float_previews;
+  TextureSetLimits retopo_paint_limits;
+  retopo_paint_limits.maximum_bytes-=bundle_working_bytes;
+  retopo_paint_limits.maximum_work=256'000'000;
+  retopo_paint_limits.cancelled=cancelled;
   const auto write_set_mtoon=[&](const TextureSetView &field,const TextureSetExportField &compiled,
                                  size_t object,size_t primitive,int material_id,bool variant=false){
     const auto &binding=field.material_bindings;
@@ -843,11 +847,14 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
     PaintSourceTexture paint_sampler;
     paint_sampler.wrap_s=paint_sampler.wrap_t=33071;
     paint_sampler.min_filter=paint_sampler.mag_filter=9729;
-    if(!variant&&field.painted->has_paint_data()){
-      TextureSetLimits limits;
-      limits.cancelled=cancelled;
-      if(float_preview)paint=std::move(float_preview->paint);
-      else paint=compile_mtoon_set_paint(field,compiled,typed,limits);
+    if(field.painted->has_paint_data()){
+      if(variant)paint=compile_retopo_mtoon_paint(field,typed,retopo_paint_limits);
+      else if(float_preview)paint=std::move(float_preview->paint);
+      else {
+        TextureSetLimits limits;
+        limits.cancelled=cancelled;
+        paint=compile_mtoon_set_paint(field,compiled,typed,limits);
+      }
       if(!paint)return retain_native();
       const auto replace_role=[&](MToonSlot slot,const std::shared_ptr<const Image> &image,
                                   MToonEncoding encoding=MToonEncoding::Srgb){
@@ -915,17 +922,19 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
     output["name"]=field.name;
     output["pbrMetallicRoughness"]["metallicFactor"]=current.metallic;
     output["pbrMetallicRoughness"]["roughnessFactor"]=current.roughness;
-    if(paint){
-      auto &pbr=output["pbrMetallicRoughness"];
-      const auto orm=texture(float_preview?float_preview->metal_rough:compiled.textures->metal_rough,paint_sampler);
-      pbr["metallicFactor"]=pbr["roughnessFactor"]=1;
-      pbr["metallicRoughnessTexture"]={{"index",orm}};
-      output["occlusionTexture"]={{"index",orm}};
+    if(paint&&(!variant||paint->color||paint->emission)){
+      if(!variant){
+        auto &pbr=output["pbrMetallicRoughness"];
+        const auto orm=texture(float_preview?float_preview->metal_rough:compiled.textures->metal_rough,paint_sampler);
+        pbr["metallicFactor"]=pbr["roughnessFactor"]=1;
+        pbr["metallicRoughnessTexture"]={{"index",orm}};
+        output["occlusionTexture"]={{"index",orm}};
+      }
       output["extras"]["domeSculptMToonPaint"]={
           {"version",1},{"sampling","clamp-linear-level-zero"},
           {"maximumLinearColorError",paint->color_error},
           {"maximumAlphaError",paint->alpha_error},
-          {"maximumLinearEmissionError",hdr?*hdr->filter_error:paint->emission_error},
+          {"maximumLinearEmissionError",hdr?*hdr->filter_error:variant?paint->emission_error*params.emission_strength:paint->emission_error},
           {"emissiveStrength",params.emission_strength}};
       if(paint->shade){
         auto &bounds=output["extras"]["domeSculptMToonPaint"];

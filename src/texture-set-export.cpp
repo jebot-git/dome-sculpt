@@ -1558,6 +1558,189 @@ std::optional<PortableMToonSetPaint> compile_mtoon_set_paint(
  return out;
 }
 
+namespace {
+struct RetopoPaintTap {
+ MToonSourceTap product, core_shade;
+ // Only shared Shade clips the isolated paint contribution before adding it.
+ std::array<double,4> shade_ink{}, unpainted_error{};
+ double encoded_alpha=1;
+};
+
+std::shared_ptr<const Image> compose_retopo_mtoon_role(const TextureSetView &field,
+    const MToonMaterial &effective,MToonSlot role,const TextureMaps *maps,
+    const PaintEmissionSampler *hdr,PortableMToonSetPaint &proof,const TextureSetLimits &limits) {
+ const auto &p=effective.parameters;
+ const auto &binding=*field.material_bindings;
+ const auto r=field.painted->resolution();
+ const bool color=role==MToonSlot::Base,shade=role==MToonSlot::Shade;
+ const auto &core_maps=*field.painted->source_maps();
+ const auto &generic=role==MToonSlot::Emission?core_maps.emission:core_maps.color;
+ const auto typed=mtoon_paint_source(binding,effective,role,r,limits);
+ if(!typed)return {};
+ const auto aligned=[&](const PaintSourceTexture &view){
+  return !view.image||(view.texcoord==0&&view.uv_transform==std::array<float,6>{1,0,0,1,0,0}&&
+                       aligned_mtoon_source(view,MToonTexture{},r));
+ };
+ if(!hdr&&!aligned(generic))return {};
+ const auto &linear=mtoon_linear_bytes();
+ const auto &native=field.material;
+ const auto factor=color?p.base_color:shade?std::array{p.shade_color.x,p.shade_color.y,p.shade_color.z,1.f}:
+     std::array{p.emission.x,p.emission.y,p.emission.z,1.f};
+ const auto *resolved=hdr?nullptr:role==MToonSlot::Emission?&maps->emission:&maps->color;
+ const auto *coverage=hdr?nullptr:role==MToonSlot::Emission?&maps->emission_coverage:&maps->color_coverage;
+ if(resolved&&(resolved->width!=r||resolved->height!=r||coverage->width!=r||coverage->height!=r))return {};
+ auto image=std::make_shared<Image>(Image{r,r,std::vector<uint8_t>(size_t(r)*r*4,255)});
+ std::vector<RetopoPaintTap> previous(r),row(r);
+ auto &bound=color?proof.color_error:shade?proof.shade_error:proof.emission_error;
+ constexpr double rgb_limit=.008, arithmetic_slack=2e-6;
+ for(uint32_t y=0;y<r;++y){
+  stop(limits);
+  for(uint32_t x=0;x<r;++x){
+   const size_t at=(size_t(y)*r+x)*4;
+   auto &tap=row[x];
+   const auto original=typed->sample(at);
+   const auto emission=hdr?hdr->sample_texel(x,y):BakedEmissionSample{};
+   auto &product=tap.product;
+   product.uncovered=1-(hdr?double(emission.coverage):coverage->rgba[at]/255.);
+   tap.core_shade.uncovered=product.uncovered;
+   const bool uncovered=!hdr&&product.uncovered==1;
+   bool paint_border=false;
+   if(uncovered){
+    for(uint32_t v=y?y-1:0;v<=std::min(y+1,r-1)&&!paint_border;++v)
+     for(uint32_t u=x?x-1:0;u<=std::min(x+1,r-1);++u)
+      paint_border|=coverage->rgba[(size_t(v)*r+u)*4]!=0;
+   }
+   for(size_t k=0;k<(color?4u:3u);++k){
+    const bool alpha=k==3;
+    const double typed_value=original[k]*factor[k];
+    const auto decode=[&](uint8_t b){return alpha?b/255.:linear[b];};
+    double legacy_background=0,composite=0;
+    if(hdr)composite=emission.legacy[k];
+    else {
+     const double generic_value=generic.image?decode(generic.image->rgba[at+k]):1.;
+     legacy_background=generic_value*(color||shade?native.color[k]:native.emissive[k]);
+     composite=decode(resolved->rgba[at+k]);
+    }
+    const double divisor=shade&&native.color[k]>0?native.color[k]:1.;
+    product.background[k]=shade?typed_value:typed_value-legacy_background;
+    tap.core_shade.background[k]=shade?legacy_background*factor[k]/divisor:0;
+    tap.shade_ink[k]=shade?(composite-legacy_background*product.uncovered)*factor[k]/divisor:0;
+    const double raw=shade?typed_value*product.uncovered+std::max(0.,tap.shade_ink[k]):
+        composite+product.background[k]*product.uncovered;
+    // At zero coverage the native shader bypasses quantization in the Core
+    // composite. On that contour, one portable texel must represent the
+    // native tap and its limit from the painted side. Center their error.
+    const double target=uncovered?(paint_border?std::midpoint(typed_value,raw):typed_value):raw;
+    const auto byte=alpha?uint8_t(std::lround(std::clamp(target,0.,1.)*255)):mtoon_srgb_byte(target);
+    image->rgba[at+k]=byte;
+    const double encoded=decode(byte);
+    product.error[k]=encoded-raw;
+    tap.unpainted_error[k]=uncovered?std::abs(encoded-typed_value):0;
+    if(alpha)tap.encoded_alpha=encoded;
+   }
+   const auto left=x?x-1:x;
+   const auto &above=y?previous:row;
+   const std::array<const RetopoPaintTap*,4> taps{&above[left],&above[x],&row[left],&tap};
+   const std::array<const MToonSourceTap*,4> products{&taps[0]->product,&taps[1]->product,&taps[2]->product,&tap.product};
+   const bool empty=std::ranges::all_of(products,[](const auto *entry){return entry->uncovered==1;});
+   for(size_t k=0;k<(color?4u:3u);++k){
+    double unpainted_error=0;
+    double low_encoded=products[0]->error[k],high_encoded=low_encoded;
+    for(const auto *entry:taps){
+     unpainted_error=std::max(unpainted_error,entry->unpainted_error[k]);
+     low_encoded=std::min(low_encoded,entry->product.error[k]);
+     high_encoded=std::max(high_encoded,entry->product.error[k]);
+    }
+    double covariance=mtoon_source_filter_error(products,k),kink=0;
+    if(shade&&!empty){
+     double low=0,high=0;
+     for(const auto *entry:taps){low=std::min(low,entry->shade_ink[k]);high=std::max(high,entry->shade_ink[k]);}
+     kink=low<0&&high>0?-low*high/(high-low):0;
+     proof.shade_interpolation_error=std::max(proof.shade_interpolation_error,kink);
+     // In the shared-shade case the two source products vary independently.
+     // The signed paint residual also loses a covariance of Core and coverage.
+     covariance+=mtoon_source_filter_error({&taps[0]->core_shade,&taps[1]->core_shade,
+                                           &taps[2]->core_shade,&tap.core_shade},k);
+    }
+    proof.source_filter_error=std::max(proof.source_filter_error,covariance);
+    // Clamping the signed shade contribution is convex. Its interpolation
+    // error only increases the portable value, so retain the sign of the
+    // encoded error when combining its interval with the two covariances.
+    double local_error=unpainted_error;
+    if(!empty||hdr)
+     local_error=std::max({local_error,std::abs(low_encoded-covariance),std::abs(high_encoded+covariance+kink)});
+    local_error+=arithmetic_slack;
+    if(k==3){
+     proof.alpha_error=std::max(proof.alpha_error,local_error);
+     if(p.alpha==MToonAlpha::Opaque)continue;
+     const auto [lowest,highest]=std::ranges::minmax(taps,{},[](const auto *entry){return entry->encoded_alpha;});
+     const double cutoff=p.alpha==MToonAlpha::Mask?p.alpha_cutoff:0;
+     if(lowest->encoded_alpha-local_error<=cutoff&&highest->encoded_alpha+local_error>=cutoff)return {};
+     if(proof.alpha_error>1./255.)return {};
+    }else {
+     bound=std::max(bound,local_error);
+     if(bound>rgb_limit)return {};
+    }
+   }
+  }
+  previous.swap(row);
+ }
+ return image;
+}
+} // namespace
+
+std::optional<PortableMToonSetPaint> compile_retopo_mtoon_paint(const TextureSetView &field,
+    const MToonMaterial &effective,TextureSetLimits &remaining)try {
+ const auto &paint=*field.painted;
+ const auto &binding=*field.material_bindings;
+ size_t work=0,bytes=0;
+ const auto [color,emission]=legacy_coverage(paint,work,remaining);
+ remaining.maximum_work-=work;
+ if(!color&&!emission)return PortableMToonSetPaint{};
+ work=0;
+ const auto r=paint.resolution();
+ const bool shade=color&&mtoon_shared_shade(binding);
+ const bool hdr=emission&&EmissionExportAccess::requires_preview(paint,field.material,&binding);
+ const size_t pixels=size_t(r)*r;
+ // The current Core compositor and three bounded role passes run on the
+ // file worker. Each proof uses two rows and one result image per role.
+ charge(work,pixels,48+12*paint.layers().size(),remaining.maximum_work);
+ charge(bytes,pixels,48,remaining.maximum_bytes);
+ charge(bytes,r,2*sizeof(RetopoPaintTap),remaining.maximum_bytes);
+ const size_t roles=size_t(color)+size_t(shade)+size_t(emission);
+ charge(work,pixels,72*roles,remaining.maximum_work);
+ std::optional<PaintEmissionSampler> coefficients;
+ if(hdr){
+  coefficients.emplace(paint,remaining.cancelled);
+  charge(work,coefficients->index_work(),1,remaining.maximum_work);
+  charge(work,pixels,coefficients->work_per_texel(),remaining.maximum_work);
+ }
+ // Colour always uses the native derived bytes, including the original Core
+ // backdrop that the shader removes before inserting the typed role.
+ const auto maps=EmissionExportAccess::requires_preview(paint,field.material,&binding)?
+     EmissionExportAccess::preview(paint,field.material,remaining.cancelled):paint.composite(field.material,remaining.cancelled);
+ remaining.maximum_work-=work;
+ PortableMToonSetPaint out;
+ if(color){
+  out.color=compose_retopo_mtoon_role(field,effective,MToonSlot::Base,maps.get(),nullptr,out,remaining);
+  if(!out.color)return {};
+ }
+ if(shade){
+  out.shade=compose_retopo_mtoon_role(field,effective,MToonSlot::Shade,maps.get(),nullptr,out,remaining);
+  if(!out.shade)return {};
+ }
+ if(emission&&effective.parameters.emission_strength!=0){
+  out.emission=compose_retopo_mtoon_role(field,effective,MToonSlot::Emission,maps.get(),
+      coefficients?&*coefficients:nullptr,out,remaining);
+  if(!out.emission)return {};
+ }
+ remaining.maximum_bytes-=pixels*roles*4;
+ return out;
+} catch(const ExportBudgetExceeded &) {
+ // The independent Core view and an Editable package can still be emitted.
+ return {};
+}
+
 std::optional<MToonFloatPreview> compile_editable_mtoon_float_preview(
     const TextureSetView &field,const MToonMaterial &effective,TextureSetLimits &budget){
  stop(budget);
@@ -1616,16 +1799,7 @@ std::shared_ptr<const RetopoMToonExport> RetopoMToonExport::capture(const Sculpt
     normal.texcoord||normal.transform_texcoord!=-1||normal.offset!=std::array<float,2>{}||
     normal.scale!=std::array<float,2>{1,1}||normal.rotation!=0)
   return {};
- for(const auto &layer:paint->layers())if(layer.visible&&layer.opacity>0){
-  for(const auto &tile:layer.tiles){
-   if(cancelled&&cancelled())throw std::runtime_error("MToon export capture cancelled");
-   // Metallic/roughness layers affect the Core PBR material compiled by the
-   // ordinary writer. MToon uses independent base, shade and emission roles.
-   if(tile&&std::ranges::any_of(tile->pixels,[](const auto &pixel){
-       return pixel.data[13]&&(pixel.data[9]||pixel.data[12]);
-     }))return {};
-  }
- }
+ if(cancelled&&cancelled())throw std::runtime_error("MToon export capture cancelled");
  auto result=std::shared_ptr<RetopoMToonExport>(new RetopoMToonExport);
  result->object_=object.id;
  result->field_=texture_set_view(object,0);
